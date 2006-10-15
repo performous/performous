@@ -81,6 +81,8 @@ void CSong::parseFile( void )
 				TNote * tmp = new TNote();
 				tmp->type = TYPE_NOTE_SLEEP;
 				sscanf(buff+1,"%d",&tmp->timestamp);
+				// This is an ugly hack to work with Ultrastar SuperStar (Jamelia) and others
+				tmp->timestamp+=2;
 				notes.push_back(tmp);
 				break;
 			}
@@ -178,6 +180,8 @@ CSongs::CSongs()
 
 	while( (dirEntry = readdir(dir)) != NULL ) {
 		if( dirEntry->d_name[0] == '.' )
+			continue;
+		if( !strcmp(dirEntry->d_name,"CVS") )
 			continue;
 		
 		char * path = new char[1024];
