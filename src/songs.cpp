@@ -219,6 +219,11 @@ CSongs::CSongs()
 			SDL_FreeRW(rwop);
 		}
 		if( !parseFile(tmp) ) {
+			delete[] path;
+			delete[] txt;
+			delete[] cover;
+			if( texture_nocover != tmp->coverTex )
+				delete tmp->coverTex;
 			delete tmp;
 		} else {
 			tmp->parseFile();
