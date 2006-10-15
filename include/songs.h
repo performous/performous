@@ -69,7 +69,7 @@ class CSongs {
 		~CSongs();
 		CSong * getSong( int i ) {return songs[i];};
 		int nbSongs( void ) {return songs.size();};
-		void parseFile( CSong * tmp );
+		bool parseFile( CSong * tmp );
 		void sortByEdition( void );
 		void sortByGenre( void );
 		void sortByTitle( void );

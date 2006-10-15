@@ -107,13 +107,13 @@ CSong::CSong()
 	video = NULL;
 }
 
-void CSongs::parseFile( CSong * tmp )
+bool CSongs::parseFile( CSong * tmp )
 {
 	char buff[256];
 	sprintf(buff,"%s/%s",tmp->path,tmp->filename);
 	FILE * fp = fopen(buff,"r");
 	if(!fp)
-		return;
+		return false;
 	while(fgets(buff,256,fp)) {
 		if(buff[0] != '#' )
 			continue;
@@ -162,6 +162,7 @@ void CSongs::parseFile( CSong * tmp )
 		}
 	}
 	fclose(fp);
+	return true;
 }
 
 CSongs::CSongs()
@@ -217,11 +218,12 @@ CSongs::CSongs()
 			SDL_FreeSurface(coverSurface);
 			SDL_FreeRW(rwop);
 		}
-
-		parseFile(tmp);
-		tmp->parseFile();
-
-		songs.push_back(tmp);
+		if( !parseFile(tmp) ) {
+			delete tmp;
+		} else {
+			tmp->parseFile();
+			songs.push_back(tmp);
+		}
 	}
 	closedir(dir);
 
