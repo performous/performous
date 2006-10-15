@@ -179,6 +179,7 @@ void CScreenSing::draw( void )
 		}
 
 		if( pos != -1 ) {
+			glPointSize(15.0);
 			glBegin(GL_POINTS);
 				glColor4f(0.0,0.0,1.0,1.0);
 				glVertex2d(400-(width/2)+separation, CScreenManager::getSingletonPtr()->getHeight()-(int)CScreenManager::getSingletonPtr()->getRecord()->getNoteFreq(song->notes[pos]->note));
