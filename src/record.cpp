@@ -125,7 +125,8 @@ void CFft::compute(int nframes,signed short int *indata)
 	for (i=0; i<nframes; i++) {
 		buf[i] = indata[i]/32768.;
 	}
-	measure(nframes, 4, buf);
+	if( nframes > 0 )
+		measure(nframes, 4, buf);
 }
 
 CRecord::CRecord( char * deviceName )
