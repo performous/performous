@@ -13,3 +13,6 @@ directory.txt into it
 
 The mp3 should be sampled at 48000Hz (use convert.sh to convert your mp3 and
 be carefull it overwrite your current mp3)
+
+If you need Jamelia MP3 for test download it with UlstraStar (pascal/windows
+version) and convert it.
