@@ -187,15 +187,15 @@ void CScreenSing::draw( void )
 		}
 
 		TTF_CloseFont(font);
-	}
 
-	if(freq != 0.0) {
-		glPointSize(15.0);
-		glBegin(GL_POINTS);
-			glColor4f(0.6,0.0,0.0,1.0);
-			glVertex2d(400, CScreenManager::getSingletonPtr()->getHeight()-(int)CScreenManager::getSingletonPtr()->getRecord()->getFreq());
-			glColor4f(0.0,0.8,0.0,1.0);
-			glVertex2d(400, CScreenManager::getSingletonPtr()->getHeight()-(int)CScreenManager::getSingletonPtr()->getRecord()->getNoteFreq(note));
-		glEnd();
+		if(freq != 0.0) {
+			glPointSize(15.0);
+			glBegin(GL_POINTS);
+				glColor4f(0.6,0.0,0.0,1.0);
+				glVertex2d(400-(width/2)+separation, CScreenManager::getSingletonPtr()->getHeight()-(int)CScreenManager::getSingletonPtr()->getRecord()->getFreq());
+				glColor4f(0.0,0.8,0.0,1.0);
+				glVertex2d(400-(width/2)+separation, CScreenManager::getSingletonPtr()->getHeight()-(int)CScreenManager::getSingletonPtr()->getRecord()->getNoteFreq(note));
+			glEnd();
+		}
 	}
 }
