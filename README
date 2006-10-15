@@ -1,3 +1,7 @@
+Compile:
+
+To compile just run 'make'
+
 Dependencies:
 	- SDL SDL_Mixer SDL_ttf SDL_image
 	- FFTW
@@ -6,3 +10,6 @@ Dependencies:
 
 Place the songs into songs/directory and put directory.mp3 directory.png and
 directory.txt into it
+
+The mp3 should be sampled at 48000Hz (use convert.sh to convert your mp3 and
+be carefull it overwrite your current mp3)
