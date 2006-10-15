@@ -1,0 +1,18 @@
+#ifndef __SCREENINTRO_H__
+#define __SCREENINTRO_H__
+
+#include <screen.h>
+#include <texture.h>
+
+class CScreenIntro : public CScreen {
+	public:
+	CScreenIntro( char * name );
+	~CScreenIntro();
+	void manageEvent( SDL_Event event );
+	void draw(void);
+	private:
+	CSdlTexture * titleTex;
+	int cursor;
+};
+
+#endif
