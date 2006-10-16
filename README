@@ -17,3 +17,6 @@ If you need Jamelia MP3 for test download it with UlstraStar (pascal/windows
 version) and convert it.
 
 Press 's' at the introduction screen to select your song
+
+If your song is not UTF-8 encoded please do :
+	iconv --from-code=ISO-8859-1 --to-code=UTF-8 source.txt dest.txt
