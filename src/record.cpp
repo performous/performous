@@ -108,7 +108,7 @@ void CFft::measure(int nframes, int overlap, float *indata)
 						}
 					}
 				}
-				if( peaks[k].freq > 80. && peaks[k].freq < 850. && peaks[k].db > -45. )
+				if( peaks[k].freq > 80. && peaks[k].freq < 850. && peaks[k].db > -55. )
 					m_freq = peaks[k].freq;
 				else
 					m_freq = 0.0;

@@ -3,7 +3,7 @@ Compile:
 To compile just run 'make'
 
 Dependencies:
-	- SDL SDL_Mixer SDL_ttf SDL_image
+	- SDL SDL_Mixer SDL_ttf SDL_image SDL_gfx
 	- FFTW
 	- libalsa
 	- libGL

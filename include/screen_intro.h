@@ -2,7 +2,6 @@
 #define __SCREENINTRO_H__
 
 #include <screen.h>
-#include <texture.h>
 
 class CScreenIntro : public CScreen {
 	public:
@@ -11,7 +10,7 @@ class CScreenIntro : public CScreen {
 	void manageEvent( SDL_Event event );
 	void draw(void);
 	private:
-	CSdlTexture * titleTex;
+	SDL_Surface *title;
 	int cursor;
 };
 

@@ -2,7 +2,6 @@
 #define __SCREENSING_H__
 
 #include <screen.h>
-#include <texture.h>
 
 class CScreenSing : public CScreen {
 	public:
@@ -11,12 +10,10 @@ class CScreenSing : public CScreen {
 	void manageEvent( SDL_Event event );
 	void draw(void);
 	private:
-	CSdlTexture * titleTex;
+	SDL_Surface * title;
 	bool play;
 	bool finished;
 	unsigned int start;
-	unsigned int currentSyllable;
-	unsigned int currentSentence;
 };
 
 #endif

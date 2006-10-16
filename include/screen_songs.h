@@ -2,7 +2,6 @@
 #define __SCREENSONGS_H__
 
 #include <screen.h>
-#include <texture.h>
 #include <songs.h>
 
 class CScreenSongs : public CScreen {
@@ -12,7 +11,7 @@ class CScreenSongs : public CScreen {
 	void manageEvent( SDL_Event event );
 	void draw(void);
 	private:
-	CSdlTexture * titleTex;
+	SDL_Surface * title;
 	int songId;
 };
 

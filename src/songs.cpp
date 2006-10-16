@@ -174,9 +174,7 @@ CSongs::CSongs()
 	dir = opendir("songs/");
 	order = 2;
 	SDL_RWops *rwop_nocover = SDL_RWFromFile("images/no_cover.png", "rb");
-	SDL_Surface * surface_nocover = IMG_LoadPNG_RW(rwop_nocover);
-	texture_nocover = new CSdlTexture(surface_nocover);
-	SDL_FreeSurface(surface_nocover);
+	surface_nocover = IMG_LoadPNG_RW(rwop_nocover);
 	SDL_FreeRW(rwop_nocover);
 
 	while( (dirEntry = readdir(dir)) != NULL ) {
@@ -211,19 +209,17 @@ CSongs::CSongs()
 		SDL_RWops *rwop = SDL_RWFromFile(buff, "rb");
 		SDL_Surface * coverSurface = IMG_LoadPNG_RW(rwop);
 		if( coverSurface == NULL )
-			tmp->coverTex = texture_nocover;
+			tmp->coverSurf = surface_nocover;
 		else {
-			CSdlTexture * sdlTex = new CSdlTexture(coverSurface);
-			tmp->coverTex = sdlTex;
-			SDL_FreeSurface(coverSurface);
+			tmp->coverSurf = coverSurface;
 			SDL_FreeRW(rwop);
 		}
 		if( !parseFile(tmp) ) {
 			delete[] path;
 			delete[] txt;
 			delete[] cover;
-			if( texture_nocover != tmp->coverTex )
-				delete tmp->coverTex;
+			if( surface_nocover != tmp->coverSurf )
+				delete tmp->coverSurf;
 			delete tmp;
 		} else {
 			tmp->parseFile();
@@ -250,11 +246,11 @@ CSongs::~CSongs()
 			delete[] songs[i]->notes[j]->syllable;
 			delete songs[i]->notes[j];
 		}
-		if( texture_nocover != songs[i]->coverTex )
-			delete songs[i]->coverTex;
+		if( surface_nocover != songs[i]->coverSurf )
+			SDL_FreeSurface(songs[i]->coverSurf);
 		delete songs[i];
 	}
-	delete texture_nocover;
+	delete surface_nocover;
 
 }
 

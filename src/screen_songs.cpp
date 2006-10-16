@@ -8,16 +8,14 @@ CScreenSongs::CScreenSongs(char * name)
 
 	SDL_Color black = {0, 0, 0,0};
 	TTF_Font *font = TTF_OpenFont("fonts/arial.ttf", 65);
-	SDL_Surface *title = TTF_RenderUTF8_Blended(font, "Choose your song", black);
-	titleTex = new CSdlTexture(title);
+	title = TTF_RenderUTF8_Blended(font, "Choose your song", black);
 	
-	SDL_FreeSurface(title);
 	TTF_CloseFont(font);
 }
 
 CScreenSongs::~CScreenSongs()
 {
-	delete titleTex;
+	SDL_FreeSurface(title);
 }
 
 void CScreenSongs::manageEvent( SDL_Event event )
@@ -83,22 +81,26 @@ char * order[4] = {
 
 void CScreenSongs::draw( void )
 {
-	glColor4f(1.0,1.0,1.0,1.0);
-	titleTex->draw( 200 , 0 , 400 , 100 );
-	CScreenManager::getSingletonPtr()->getSong()->coverTex->draw(300,200,200,200);
-	
+	CScreenManager * sm = CScreenManager::getSingletonPtr();
+	SDL_Rect position;
+
+	// Draw the title
+	position.x=(sm->getWidth()-title->w)/2;
+	position.y=0;
+	SDL_BlitSurface(title, NULL,  sm->getSDLScreen(), &position);
+	// Draw the cover
+	position.x=(sm->getWidth()-sm->getSong()->coverSurf->w)/2;
+	position.y=200;
+	SDL_BlitSurface(sm->getSong()->coverSurf,NULL,sm->getSDLScreen(), &position);
+	// Draw the "Order by" text
 	SDL_Color black = {0,0,0,0};
-
 	TTF_Font *font = TTF_OpenFont("fonts/arial.ttf", 25);
-	char * my_order;
-
-	my_order = order[CScreenManager::getSingletonPtr()->getSongs()->getOrder()];
-	
+	char * my_order = order[sm->getSongs()->getOrder()];
 	SDL_Surface * orderSurf = TTF_RenderUTF8_Blended(font, my_order , black);
-	CSdlTexture * orderTex = new CSdlTexture(orderSurf);
-	orderTex->draw(300,550);
+	position.x=(sm->getWidth()-sm->getSong()->coverSurf->w)/2;
+	position.y=500;
+	SDL_BlitSurface(orderSurf, NULL,  sm->getSDLScreen(), &position);
+
 	SDL_FreeSurface(orderSurf);
 	TTF_CloseFont(font);
-
-	delete orderTex;
 }

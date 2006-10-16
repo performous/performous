@@ -1,5 +1,6 @@
 #include <screen_sing.h>
 #include <SDL/SDL_ttf.h>
+#include <SDL/SDL_gfxPrimitives.h>
 #include <songs.h>
 
 CScreenSing::CScreenSing(char * name)
@@ -7,21 +8,17 @@ CScreenSing::CScreenSing(char * name)
 	screenName = name;
 	play = false;
 	finished = false;
-	currentSentence = 0;
-	currentSyllable = 0;
 
 	SDL_Color black = {0, 0, 0,0};
 	TTF_Font *font = TTF_OpenFont("fonts/arial.ttf", 65);
-	SDL_Surface *title = TTF_RenderUTF8_Blended(font, "Let\'s Sing !!!", black);
-	titleTex = new CSdlTexture(title);
+	title = TTF_RenderUTF8_Blended(font, "Let\'s Sing !!!", black);
 	
-	SDL_FreeSurface(title);
 	TTF_CloseFont(font);
 }
 
 CScreenSing::~CScreenSing()
 {
-	delete titleTex;
+	SDL_FreeSurface(title);
 }
 
 void CScreenSing::manageEvent( SDL_Event event )
@@ -39,8 +36,6 @@ void CScreenSing::manageEvent( SDL_Event event )
 	}
 	if( !play ) {
 		char buff[1024];
-		currentSentence = 0;
-		currentSyllable = 0;
 		CSong * song = CScreenManager::getSingletonPtr()->getSong();
 		sprintf(buff,"%s/%s",song->path,song->mp3);
 		fprintf(stdout,"Now playing : (%d) : %s\n",CScreenManager::getSingletonPtr()->getSongId(),buff);
@@ -52,8 +47,6 @@ void CScreenSing::manageEvent( SDL_Event event )
 	if( finished ) {
 		play = false;
 		finished = false;
-		currentSentence = 0;
-		currentSyllable = 0;
 		CScreenManager::getSingletonPtr()->activateScreen("Songs");
 		return;
 	}
@@ -62,140 +55,157 @@ void CScreenSing::manageEvent( SDL_Event event )
 
 void CScreenSing::draw( void )
 {
-	glColor4f(1.0,1.0,1.0,1.0);
-	titleTex->draw( 200 , 0 , 400 , 100 );
+	CScreenManager * sm = CScreenManager::getSingletonPtr();
+	CRecord * record    = sm->getRecord();
+	CSong   * song      = sm->getSong();
+	SDL_Rect position;
+	float freq;
+	int note;
 
-	CScreenManager::getSingletonPtr()->getRecord()->compute();
-	float freq = CScreenManager::getSingletonPtr()->getRecord()->getFreq();
-	int note = CScreenManager::getSingletonPtr()->getRecord()->getNoteId();
-	CSong * song = CScreenManager::getSingletonPtr()->getSong();
+	// Draw the title
+	position.x=(sm->getWidth()-title->w)/2;
+	position.y=0;
+	SDL_BlitSurface(title, NULL,  sm->getSDLScreen(), &position);
+
+
+	//record->compute();
+	freq = record->getFreq();
+	note = record->getNoteId();
 
 	if(play) {
-		unsigned int date = SDL_GetTicks() - start;
-		char dateStr[32];
-		sprintf(dateStr,"Time: %u:%.2u",(date/1000)/60,(date/1000)%60);
-
+		// Compute the time in the song
+		unsigned int time = SDL_GetTicks() - start;
+		// Load usefull colors
 		SDL_Color black = {  0,  0,  0,0};
 		SDL_Color blue  = { 50, 50,255,0};
-		TTF_Font *font = TTF_OpenFont("fonts/arial.ttf", 65);
+		// Declare the font we use
+		TTF_Font *font;
 
-		SDL_Surface * noteSurf = TTF_RenderUTF8_Blended(font, CScreenManager::getSingletonPtr()->getRecord()->getNoteStr(note) , black);
-		CSdlTexture * noteTex = new CSdlTexture(noteSurf);
-		noteTex->draw(300,450,100);
-		SDL_FreeSurface(noteSurf);
-		delete noteTex;
-		TTF_CloseFont(font);
-
+		// Compute and draw the timer
+		{
+		char dateStr[32];
+		sprintf(dateStr,"Time: %u:%.2u",(time/1000)/60,(time/1000)%60);
 		font = TTF_OpenFont("fonts/arial.ttf", 25);
 		SDL_Surface * timeSurf = TTF_RenderUTF8_Blended(font, dateStr , black);
-		CSdlTexture * timeTex = new CSdlTexture(timeSurf);
-		timeTex->draw(0,0);
+		position.x=0;
+		position.y=0;
+		SDL_BlitSurface(timeSurf, NULL,  sm->getSDLScreen(), &position);
 		SDL_FreeSurface(timeSurf);
-		delete timeTex;
 		TTF_CloseFont(font);
+		}
 		
-		font = TTF_OpenFont("fonts/arial.ttf", 45);
+		// draw the sang note
+		{
+		font = TTF_OpenFont("fonts/arial.ttf", 25);
+		SDL_Surface * noteSurf = TTF_RenderUTF8_Blended(font, record->getNoteStr(note) , black);
+		position.x=0;
+		position.y=sm->getHeight()-noteSurf->h;
+		SDL_BlitSurface(noteSurf, NULL,  sm->getSDLScreen(), &position);
+		SDL_FreeSurface(noteSurf);
+		TTF_CloseFont(font);
+		}
 
-		currentSentence = 0;
+		// compute and draw the text
+		font = TTF_OpenFont("fonts/arial.ttf", 40);
+		unsigned int currentSentence = 0;
 		unsigned int i = 0;
+		unsigned int end = 0;
+		unsigned int totalBpm = 0;
 
+		// Find the last SLEEP before where we are
 		for( i = 0 ; i <  song->notes.size() ; i++ ) {
-			if( date > ( song->notes[i]->timestamp  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap &&
-			    song->notes[i]->type == TYPE_NOTE_SLEEP ) {
-				currentSentence=i;
+			totalBpm += song->notes[i]->length;
+			if( time > ( song->notes[i]->timestamp  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap ) {
+				if( song->notes[i]->type == TYPE_NOTE_SLEEP )
+					currentSentence=i;
+			} else {
+				// Here we are too far
+				break;
 			}
 		}
 		
-		for( i = currentSentence ; i <  song->notes.size() ; i++ ) {
-			if( song->notes[i]->type == TYPE_NOTE_SING ) {
-				currentSentence = i;
-				break;
+		// Find the first SING after this SLEEP and the next SLEEP
+		bool found=false;
+		for( end = currentSentence ; end <  song->notes.size() ; end++ ) {
+			if( !found && song->notes[end]->type == TYPE_NOTE_SING ) {
+				currentSentence = end;
+				found = true;
 			}
+			if( found && song->notes[end]->type == TYPE_NOTE_SLEEP )
+				break;
 		}
 
-		for( i = currentSentence ; i <  song->notes.size() ; i++ ) {
-			if( song->notes[i]->type == TYPE_NOTE_SLEEP ) {
-				break;
-			}
-		}
+		// Here we have : (L: SLEEP, I: SING)
+		// N: now
+		// C: currentSentence
+		// E: end
+		//
+		// L  I  I  I  I  I  I  L
+		//    |      |          |
+		//    C      N          E
 
-		unsigned int end = i;
 		char sentencePast[128];
 		char sentenceFuture[128];
 		sentencePast[0] = '\0';
 		sentenceFuture[0] = '\0';
 
-
+		
 		for( i = currentSentence ; i < end ; i ++ ) {
-			if( date > ( song->notes[i]->timestamp  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap )
+			// if C <= timestamp < N
+			if( time > ( song->notes[i]->timestamp  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap )
 				strcat(sentencePast,song->notes[i]->syllable);
+			// if N <= timestamp < E
 			else
 				strcat(sentenceFuture,song->notes[i]->syllable);
 		}
-		
+
 		SDL_Surface * sentencePastSurf = NULL;
 		SDL_Surface * sentenceFutureSurf = NULL;
-		CSdlTexture * sentencePastTex = NULL;
-		CSdlTexture * sentenceFutureTex = NULL;
-		int width = 0;
+		int sentenceSurfWidth = 0;
 		int separation = 0;
 		
 		if( sentencePast[0] ) {
 			sentencePastSurf = TTF_RenderUTF8_Blended(font, sentencePast , blue);
-			sentencePastTex = new CSdlTexture(sentencePastSurf);
-			width = sentencePastTex->getWidth();
-			separation = width;
+			sentenceSurfWidth = sentencePastSurf->w;
+			separation = sentencePastSurf->w;
 		}
 
 		if( sentenceFuture[0] ) {
 			sentenceFutureSurf = TTF_RenderUTF8_Blended(font, sentenceFuture , black);
-			sentenceFutureTex = new CSdlTexture(sentenceFutureSurf);
-			width += sentenceFutureTex->getWidth();
+			sentenceSurfWidth += sentenceFutureSurf->w;
 		}
-
-		if( sentencePastTex )
-			sentencePastTex->draw(400-(width/2),500);
-		if( sentenceFutureTex )
-			sentenceFutureTex->draw( 400-(width/2)+separation,500);
-
 
 		if( sentencePastSurf ) {
+			position.x=(sm->getWidth()-sentenceSurfWidth)/2;
+			position.y=550;
+			SDL_BlitSurface(sentencePastSurf, NULL,  sm->getSDLScreen(), &position);
 			SDL_FreeSurface(sentencePastSurf);
-			delete sentencePastTex;
+		}
+		if( sentenceFutureSurf ) {
+			position.x=(sm->getWidth()-sentenceSurfWidth)/2+separation;
+			position.y=550;
+			SDL_BlitSurface(sentenceFutureSurf, NULL,  sm->getSDLScreen(), &position);
+			SDL_FreeSurface(sentenceFutureSurf);
 		}
 
-		if( sentenceFutureSurf ) {
-			SDL_FreeSurface(sentenceFutureSurf);
-			delete sentenceFutureTex;
-		}
+		TTF_CloseFont(font);
 
 		int pos = -1;
 
 		for( i = 0 ; i <  song->notes.size() - 1 ; i++ ) {
-			 if( date > ( song->notes[i]->timestamp  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap &&
-			     date < ( song->notes[i+1]->timestamp  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap &&
+			 if( time > ( song->notes[i]->timestamp  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap &&
+			     time < ( song->notes[i+1]->timestamp  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap &&
 			 	song->notes[i]->type == TYPE_NOTE_SING )
 				pos=i;
 		}
 
 		if( pos != -1 ) {
-			glPointSize(15.0);
-			glBegin(GL_POINTS);
-				glColor4f(0.0,0.0,1.0,1.0);
-				glVertex2d(400-(width/2)+separation, CScreenManager::getSingletonPtr()->getHeight()-(int)CScreenManager::getSingletonPtr()->getRecord()->getNoteFreq(song->notes[pos]->note));
-			glEnd();
+			filledCircleRGBA(sm->getSDLScreen(),(sm->getWidth()-sentenceSurfWidth)/2+separation, sm->getHeight()-(int)record->getNoteFreq(song->notes[pos]->note),5,0,0,255,255);
 		}
 
-		TTF_CloseFont(font);
-
 		if(freq != 0.0) {
-			glPointSize(15.0);
-			glBegin(GL_POINTS);
-				glColor4f(0.6,0.0,0.0,1.0);
-				glVertex2d(400-(width/2)+separation, CScreenManager::getSingletonPtr()->getHeight()-(int)CScreenManager::getSingletonPtr()->getRecord()->getFreq());
-				glColor4f(0.0,0.8,0.0,1.0);
-				glVertex2d(400-(width/2)+separation, CScreenManager::getSingletonPtr()->getHeight()-(int)CScreenManager::getSingletonPtr()->getRecord()->getNoteFreq(note));
-			glEnd();
+			filledCircleRGBA(sm->getSDLScreen(),(sm->getWidth()-sentenceSurfWidth)/2+separation, sm->getHeight()-(int)record->getFreq(),5,153,0,0,255);
+			filledCircleRGBA(sm->getSDLScreen(),(sm->getWidth()-sentenceSurfWidth)/2+separation, sm->getHeight()-(int)record->getNoteFreq(note),5,0,204,0,255);
 		}
 	}
 }

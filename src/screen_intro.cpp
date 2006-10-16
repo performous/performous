@@ -7,16 +7,14 @@ CScreenIntro::CScreenIntro(char * name)
 	cursor=0;
 	SDL_Color black = {0, 0, 0,0};
 	TTF_Font *font = TTF_OpenFont("fonts/arial.ttf", 65);
-	SDL_Surface *title = TTF_RenderUTF8_Blended(font, "UltraStar NG", black);
-	titleTex = new CSdlTexture(title);
+	title = TTF_RenderUTF8_Blended(font, "UltraStar NG", black);
 	
-	SDL_FreeSurface(title);
 	TTF_CloseFont(font);
 }
 
 CScreenIntro::~CScreenIntro()
 {
-	delete titleTex;
+	SDL_FreeSurface(title);
 }
 
 void CScreenIntro::manageEvent( SDL_Event event )
@@ -42,6 +40,9 @@ void CScreenIntro::manageEvent( SDL_Event event )
 
 void CScreenIntro::draw( void )
 {
-	glColor4f(1.0,1.0,1.0,1.0);
-	titleTex->draw( 200 , 0 , 400 , 100 );
+	CScreenManager * sm = CScreenManager::getSingletonPtr();
+	SDL_Rect position;
+	position.x=(sm->getWidth()-title->w)/2;
+	position.y=0;
+	SDL_BlitSurface(title, NULL,  sm->getSDLScreen(), &position);
 }

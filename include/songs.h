@@ -2,7 +2,7 @@
 #define __SONGS_H__
 
 #include <vector>
-#include <texture.h>
+#include <SDL/SDL.h>
 
 typedef struct _SBpm {
 	float bpm;
@@ -44,7 +44,7 @@ class CSong {
 	char * text;
 	char * creator;
 	char * cover;
-	CSdlTexture * coverTex;
+	SDL_Surface * coverSurf;
 	char * mp3;
 	char * background;
 	char * video;
@@ -80,7 +80,7 @@ class CSongs {
 		int selected;
 		int order;
 		int category;
-		CSdlTexture * texture_nocover;
+		SDL_Surface * surface_nocover;
 };
 
 #endif

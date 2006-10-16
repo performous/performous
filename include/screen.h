@@ -40,6 +40,9 @@ class CScreenManager : public CSingleton <CScreenManager>{
 				return screens[i];
 	}
 
+	void setSDLScreen( SDL_Surface * _screen ) { screen = _screen;};
+	SDL_Surface * getSDLScreen( void ) { return screen;};
+
 	int getWidth( void ) {return width;};
 	int getHeight( void ) {return height;};
 
@@ -64,6 +67,7 @@ class CScreenManager : public CSingleton <CScreenManager>{
 	private:
 	std::vector <CScreen *> screens;
 	CScreen * currentScreen;
+	SDL_Surface * screen;
 	CAudio * audio;
 	CRecord * record;
 	CSongs * songs;
