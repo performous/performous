@@ -6,7 +6,6 @@ Dependencies:
 	- SDL SDL_Mixer SDL_ttf SDL_image SDL_gfx
 	- FFTW
 	- libalsa
-	- libGL
 
 Place the songs into songs/directory and put directory.mp3 directory.png and
 directory.txt into it
