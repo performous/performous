@@ -1,6 +1,7 @@
 #include <screen_sing.h>
 #include <SDL/SDL_ttf.h>
 #include <SDL/SDL_gfxPrimitives.h>
+#include <SDL/SDL_rotozoom.h>
 #include <songs.h>
 
 CScreenSing::CScreenSing(char * name)
@@ -77,6 +78,7 @@ void CScreenSing::draw( void )
 		unsigned int time = SDL_GetTicks() - start;
 		// Load usefull colors
 		SDL_Color black = {  0,  0,  0,0};
+		SDL_Color white = {255,255,255,0};
 		SDL_Color blue  = { 50, 50,255,0};
 		// Declare the font we use
 		TTF_Font *font;
@@ -84,13 +86,23 @@ void CScreenSing::draw( void )
 		// Compute and draw the timer
 		{
 		char dateStr[32];
-		sprintf(dateStr,"Time: %u:%.2u",(time/1000)/60,(time/1000)%60);
+		sprintf(dateStr,"TIME");
 		font = TTF_OpenFont("fonts/arial.ttf", 25);
-		SDL_Surface * timeSurf = TTF_RenderUTF8_Blended(font, dateStr , black);
-		position.x=0;
-		position.y=0;
-		SDL_BlitSurface(timeSurf, NULL,  sm->getSDLScreen(), &position);
-		SDL_FreeSurface(timeSurf);
+
+		SDL_Surface * timeSurf1 = TTF_RenderUTF8_Blended(font, dateStr , white);
+		boxRGBA( sm->getSDLScreen(),5 , 5 , 15+timeSurf1->w, 15+timeSurf1->h,0,0,0,255);
+		position.x=10;
+		position.y=10;
+		SDL_BlitSurface(timeSurf1, NULL,  sm->getSDLScreen(), &position);
+
+		sprintf(dateStr,"%.2u:%.2u",(time/1000)/60,(time/1000)%60);
+		SDL_Surface * timeSurf2 = TTF_RenderUTF8_Blended(font, dateStr , black);
+		position.x=timeSurf1->w+25;
+		position.y=10;
+		SDL_BlitSurface(timeSurf2, NULL,  sm->getSDLScreen(), &position);
+
+		SDL_FreeSurface(timeSurf1);
+		SDL_FreeSurface(timeSurf2);
 		TTF_CloseFont(font);
 		}
 		
@@ -145,50 +157,23 @@ void CScreenSing::draw( void )
 		//    C      N          E
 
 		char sentencePast[128];
+		char sentenceNow[128];
 		char sentenceFuture[128];
 		sentencePast[0] = '\0';
+		sentenceNow[0] = '\0';
 		sentenceFuture[0] = '\0';
 
 		
 		for( i = currentSentence ; i < end ; i ++ ) {
 			// if C <= timestamp < N
-			if( time > ( song->notes[i]->timestamp  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap )
+			if( time > ( (song->notes[i]->timestamp+song->notes[i]->length)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap )
 				strcat(sentencePast,song->notes[i]->syllable);
-			// if N <= timestamp < E
-			else
+			// if N+d <= timestamp < E
+			else if( time < ( (song->notes[i]->timestamp)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap )
 				strcat(sentenceFuture,song->notes[i]->syllable);
+			else
+				strcat(sentenceNow,song->notes[i]->syllable);
 		}
-
-		SDL_Surface * sentencePastSurf = NULL;
-		SDL_Surface * sentenceFutureSurf = NULL;
-		int sentenceSurfWidth = 0;
-		int separation = 0;
-		
-		if( sentencePast[0] ) {
-			sentencePastSurf = TTF_RenderUTF8_Blended(font, sentencePast , blue);
-			sentenceSurfWidth = sentencePastSurf->w;
-			separation = sentencePastSurf->w;
-		}
-
-		if( sentenceFuture[0] ) {
-			sentenceFutureSurf = TTF_RenderUTF8_Blended(font, sentenceFuture , black);
-			sentenceSurfWidth += sentenceFutureSurf->w;
-		}
-
-		if( sentencePastSurf ) {
-			position.x=(sm->getWidth()-sentenceSurfWidth)/2;
-			position.y=550;
-			SDL_BlitSurface(sentencePastSurf, NULL,  sm->getSDLScreen(), &position);
-			SDL_FreeSurface(sentencePastSurf);
-		}
-		if( sentenceFutureSurf ) {
-			position.x=(sm->getWidth()-sentenceSurfWidth)/2+separation;
-			position.y=550;
-			SDL_BlitSurface(sentenceFutureSurf, NULL,  sm->getSDLScreen(), &position);
-			SDL_FreeSurface(sentenceFutureSurf);
-		}
-
-		TTF_CloseFont(font);
 
 		int pos = -1;
 
@@ -199,13 +184,72 @@ void CScreenSing::draw( void )
 				pos=i;
 		}
 
+		SDL_Surface * sentencePastSurf = NULL;
+		SDL_Surface * sentenceFutureSurf = NULL;
+		SDL_Surface * sentenceNowSurf = NULL;
+		SDL_Surface * sentenceNowSurf2 = NULL;
+		int sentencePastWidth = 0;
+		int sentenceNowWidth = 0;
+		int sentenceFutureWidth = 0;
+		int sentenceWidth = 0;
+		
+		if( sentencePast[0] ) {
+			sentencePastSurf = TTF_RenderUTF8_Blended(font, sentencePast , blue);
+			sentencePastWidth = sentencePastSurf->w;
+		}
+		
+		if( sentenceNow[0] && pos != -1) {
+			sentenceNowSurf = TTF_RenderUTF8_Blended(font, sentenceNow , blue);
+			unsigned int length = song->notes[pos]->length;
+			unsigned int timestamp = song->notes[pos]->timestamp;
+			float length_ms = length * 60 * 1000 / ( song->bpm[0].bpm * 4 );
+			float timestamp_ms = timestamp * 60 * 1000 / ( song->bpm[0].bpm * 4 ) + song->gap;
+			float started_ms = time - timestamp_ms;
+			float factor = 1.2 - 0.2*started_ms/length_ms;
+
+			sentenceNowSurf2 = zoomSurface (sentenceNowSurf, factor, factor, SMOOTHING_ON);
+			sentenceNowWidth += sentenceNowSurf->w;
+			SDL_FreeSurface(sentenceNowSurf);
+		}
+		
+		if( sentenceFuture[0] ) {
+			sentenceFutureSurf = TTF_RenderUTF8_Blended(font, sentenceFuture , black);
+			sentenceFutureWidth = sentenceFutureSurf->w;
+		}
+
+		sentenceWidth = sentencePastWidth + sentenceNowWidth + sentenceFutureWidth;
+
+		if( sentencePastSurf ) {
+			position.x=(sm->getWidth()-sentenceWidth)/2;
+			position.y=sm->getHeight()-sentencePastSurf->h;
+			SDL_BlitSurface(sentencePastSurf, NULL,  sm->getSDLScreen(), &position);
+			SDL_FreeSurface(sentencePastSurf);
+		}
+		
+		if( sentenceNowSurf ) {
+			position.x=(sm->getWidth()-sentenceWidth)/2+sentencePastWidth-(sentenceNowSurf2->w-sentenceNowWidth)/2;
+			position.y=sm->getHeight()-sentenceNowSurf2->h;
+			SDL_BlitSurface(sentenceNowSurf2, NULL,  sm->getSDLScreen(), &position);
+			SDL_FreeSurface(sentenceNowSurf2);
+		}
+		
+		if( sentenceFutureSurf ) {
+			position.x=(sm->getWidth()-sentenceWidth)/2+sentencePastWidth+sentenceNowWidth;
+			position.y=sm->getHeight()-sentenceFutureSurf->h;
+			SDL_BlitSurface(sentenceFutureSurf, NULL,  sm->getSDLScreen(), &position);
+			SDL_FreeSurface(sentenceFutureSurf);
+		}
+
+		TTF_CloseFont(font);
+
+
 		if( pos != -1 ) {
-			filledCircleRGBA(sm->getSDLScreen(),(sm->getWidth()-sentenceSurfWidth)/2+separation, sm->getHeight()-(int)record->getNoteFreq(song->notes[pos]->note),5,0,0,255,255);
+			filledCircleRGBA(sm->getSDLScreen(),(sm->getWidth()-sentenceWidth)/2+sentencePastWidth+sentenceNowWidth/2, sm->getHeight()-(int)record->getNoteFreq(song->notes[pos]->note),5,0,0,255,255);
 		}
 
 		if(freq != 0.0) {
-			filledCircleRGBA(sm->getSDLScreen(),(sm->getWidth()-sentenceSurfWidth)/2+separation, sm->getHeight()-(int)record->getFreq(),5,153,0,0,255);
-			filledCircleRGBA(sm->getSDLScreen(),(sm->getWidth()-sentenceSurfWidth)/2+separation, sm->getHeight()-(int)record->getNoteFreq(note),5,0,204,0,255);
+			filledCircleRGBA(sm->getSDLScreen(),(sm->getWidth()-sentenceWidth)/2+sentencePastWidth+sentenceNowWidth/2, sm->getHeight()-(int)record->getFreq(),5,153,0,0,255);
+			filledCircleRGBA(sm->getSDLScreen(),(sm->getWidth()-sentenceWidth)/2+sentencePastWidth+sentenceNowWidth/2, sm->getHeight()-(int)record->getNoteFreq(note),5,0,204,0,255);
 		}
 	}
 }
