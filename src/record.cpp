@@ -3,7 +3,7 @@
 #include <math.h>
 #include <string>
 
-#define MAX_FFT_LENGTH 22000
+#define MAX_FFT_LENGTH 48000
 #define MAX_PEAKS 4
 unsigned int rate = MAX_FFT_LENGTH;
 typedef struct {
@@ -108,7 +108,7 @@ void CFft::measure(int nframes, int overlap, float *indata)
 						}
 					}
 				}
-				if( peaks[k].freq > 80. && peaks[k].freq < 850. && peaks[k].db > -55. )
+				if( peaks[k].freq > 100. && peaks[k].freq < 500. && peaks[k].db > -55. )
 					m_freq = peaks[k].freq;
 				else
 					m_freq = 0.0;
@@ -145,6 +145,8 @@ CRecord::CRecord( char * deviceName )
 	snd_pcm_hw_params_set_access(alsaHandle, hw_params,SND_PCM_ACCESS_RW_INTERLEAVED);
 	snd_pcm_hw_params_set_format(alsaHandle, hw_params,SND_PCM_FORMAT_S16_LE);
 	snd_pcm_hw_params_set_rate_near(alsaHandle, hw_params,&rate, 0);
+	if( rate != MAX_FFT_LENGTH )
+		fprintf(stderr, "rate as changed, please report this as a bug\n");
 	snd_pcm_hw_params_set_channels(alsaHandle, hw_params, 1);
 	snd_pcm_hw_params(alsaHandle, hw_params);
 	snd_pcm_hw_params_free(hw_params);
@@ -159,7 +161,7 @@ CRecord::~CRecord()
 
 void CRecord::compute( void )
 {
-	int frames = 384;
+	int frames = 128;
 	int nFrames = 0;
 	nFrames = snd_pcm_readi(alsaHandle, buf, frames);
 	if(nFrames == -EPIPE)
