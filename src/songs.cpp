@@ -73,7 +73,8 @@ void CSong::parseFile( void )
 				// Shift 2 Octave
 				tmp->note-=24;
 				// This is an ugly hack to work with Ultrastar SuperStar (Jamelia) and others
-				tmp->timestamp+=2;
+				// Has been removed, should be checked by users
+				//tmp->timestamp+=2;
 				notes.push_back(tmp);
 				break;
 			}
@@ -82,7 +83,8 @@ void CSong::parseFile( void )
 				tmp->type = TYPE_NOTE_SLEEP;
 				sscanf(buff+1,"%d",&tmp->timestamp);
 				// This is an ugly hack to work with Ultrastar SuperStar (Jamelia) and others
-				tmp->timestamp+=2;
+				// Has been removed, should be checked by users
+				//tmp->timestamp+=2;
 				notes.push_back(tmp);
 				break;
 			}
