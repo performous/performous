@@ -163,6 +163,7 @@ void CScreenSing::draw( void )
 		sentenceNow[0] = '\0';
 		sentenceFuture[0] = '\0';
 
+		int pos = -1;
 		
 		for( i = currentSentence ; i < end ; i ++ ) {
 			// if C <= timestamp < N
@@ -173,13 +174,9 @@ void CScreenSing::draw( void )
 				strcat(sentenceFuture,song->notes[i]->syllable);
 			else
 				strcat(sentenceNow,song->notes[i]->syllable);
-		}
-
-		int pos = -1;
-
-		for( i = 0 ; i <  song->notes.size() - 1 ; i++ ) {
-			 if( time > ( song->notes[i]->timestamp  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap &&
-			     time < ( song->notes[i+1]->timestamp  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap &&
+			if( i != song->notes.size() - 1 &&
+			    time > ( song->notes[i]->timestamp  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap &&
+			    time < ( song->notes[i+1]->timestamp  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap &&
 			 	song->notes[i]->type == TYPE_NOTE_SING )
 				pos=i;
 		}
