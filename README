@@ -11,7 +11,8 @@ Place the songs into songs/directory and put directory.mp3 directory.png and
 directory.txt into it
 
 The mp3 should be sampled at 48000Hz (use convert.sh to convert your mp3 and
-be carefull it overwrite your current mp3)
+be carefull it overwrite your current mp3) because SDL_Mixer doesn't resample
+the mp3.
 
 If you need Jamelia MP3 for test download it with UlstraStar (pascal/windows
 version) and convert it.
@@ -20,3 +21,5 @@ Press 's' at the introduction screen to select your song
 
 If your song is not UTF-8 encoded please do :
 	iconv --from-code=ISO-8859-1 --to-code=UTF-8 source.txt dest.txt
+If your song is DOS based (\r\n) please do :
+	dos2unix source.txt
