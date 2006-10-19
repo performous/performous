@@ -7,32 +7,32 @@
 
 #include <SDL/SDL_image.h>
 
-bool CSong::operator< (const CSong&  right) const
+bool compareSongs( CSong * left , CSong * right)
 {
-	if( orderType != right.orderType )
+	if( left->orderType != right->orderType )
 		fprintf(stderr,"Order mismatch\n");
 	char * ordering1;
 	char * ordering2;
-	switch(orderType) {
+	switch(left->orderType) {
 		case 0: //edition
-			ordering1 = edition;
-			ordering2 = right.edition;
+			ordering1 = left->edition;
+			ordering2 = right->edition;
 			break;
 		case 1: //genre
-			ordering1 = genre;
-			ordering2 = right.genre;
+			ordering1 = left->genre;
+			ordering2 = right->genre;
 			break;
 		case 2: //title
-			ordering1 = title;
-			ordering2 = right.title;
+			ordering1 = left->title;
+			ordering2 = right->title;
 			break;
 		case 3: //artist
-			ordering1 = artist;
-			ordering2 = right.artist;
+			ordering1 = left->artist;
+			ordering2 = right->artist;
 			break;
 		default:
-			ordering1 = title;
-			ordering2 = right.title;
+			ordering1 = left->title;
+			ordering2 = right->title;
 			break;
 	}
 	if(!ordering1)
@@ -229,8 +229,6 @@ CSongs::CSongs()
 		}
 	}
 	closedir(dir);
-
-	sortByTitle();
 }
 
 CSongs::~CSongs()
@@ -261,26 +259,26 @@ void CSongs::sortByEdition( void )
 	order = 0;
 	for(unsigned int i = 0; i < songs.size(); i++)
 		songs[i]->orderType = 0;
-	sort(songs.begin(), songs.end());
+	sort(songs.begin(), songs.end(),compareSongs);
 }
 void CSongs::sortByGenre( void )
 {
 	order = 1;
 	for(unsigned int i = 0; i < songs.size(); i++)
 		songs[i]->orderType = 1;
-	sort(songs.begin(), songs.end());
+	sort(songs.begin(), songs.end(),compareSongs);
 }
 void CSongs::sortByTitle( void )
 {
 	order = 2;
 	for(unsigned int i = 0; i < songs.size(); i++)
 		songs[i]->orderType = 2;
-	sort(songs.begin(), songs.end());
+	sort(songs.begin(), songs.end(),compareSongs);
 }
 void CSongs::sortByArtist( void )
 {
 	order = 3;
 	for(unsigned int i = 0; i < songs.size(); i++)
 		songs[i]->orderType = 3;
-	sort(songs.begin(), songs.end());
+	sort(songs.begin(), songs.end(),compareSongs);
 }

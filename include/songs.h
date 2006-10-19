@@ -32,8 +32,6 @@ class CSong {
 	~CSong() {};
 	void parseFile( void );
 	
-	bool operator< (const CSong&  right) const;
-
 	char * path;
 	char * filename;
 	std::vector <char *> category;

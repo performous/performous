@@ -33,6 +33,7 @@ void CScreenIntro::manageEvent( SDL_Event event )
 				fprintf(stdout,"cursor++\n");
 			} else if( keypressed == SDLK_s ) {
 				CScreenManager::getSingletonPtr()->setSongs(new CSongs() );
+				CScreenManager::getSingletonPtr()->getSongs()->sortByArtist();
 				CScreenManager::getSingletonPtr()->activateScreen("Songs");
 			}
 	}
