@@ -126,7 +126,6 @@ void CScreenSing::draw( void )
 
 		// Find the last SLEEP before where we are
 		for( i = 0 ; i <  song->notes.size() ; i++ ) {
-			totalBpm += song->notes[i]->length;
 			if( time > ( song->notes[i]->timestamp  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap ) {
 				if( song->notes[i]->type == TYPE_NOTE_SLEEP )
 					currentSentence=i;
@@ -164,21 +163,60 @@ void CScreenSing::draw( void )
 		sentenceFuture[0] = '\0';
 
 		int pos = -1;
+		for( i = currentSentence ; i < end ; i ++ ) {
+			totalBpm+=song->notes[i]->length;
+		}
+		
+		float bpmPixelUnit = (sm->getWidth() - 100. - 100.)/(totalBpm*1.0);
+		int currentBpm = 0;
 		
 		for( i = currentSentence ; i < end ; i ++ ) {
 			// if C <= timestamp < N
-			if( time > ( (song->notes[i]->timestamp+song->notes[i]->length)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap )
+			if( time > ( (song->notes[i]->timestamp+song->notes[i]->length)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap ) {
+				int y = sm->getHeight()-(int)record->getNoteFreq(song->notes[i]->note);
+				int begin = (int) (currentBpm*bpmPixelUnit);
+				int end   = (int) ((currentBpm+song->notes[i]->length)*bpmPixelUnit);
 				strcat(sentencePast,song->notes[i]->syllable);
+				boxRGBA(sm->getSDLScreen(),105+begin,y-5,
+			        	                   100+end,y+5,
+			                	           0,0,255,255);
+			}
 			// if N+d <= timestamp < E
-			else if( time < ( (song->notes[i]->timestamp)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap )
+			else if( time < ( (song->notes[i]->timestamp)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap ) {
+				int begin = (int) (currentBpm*bpmPixelUnit);
+				int end   = (int) ((currentBpm+song->notes[i]->length)*bpmPixelUnit);
+				int y = sm->getHeight()-(int)record->getNoteFreq(song->notes[i]->note);
 				strcat(sentenceFuture,song->notes[i]->syllable);
-			else
+				boxRGBA(sm->getSDLScreen(),105+begin,y-5,
+			        	                   100+end,y+5,
+			                	           200,200,200,255);
+			}
+			else {
 				strcat(sentenceNow,song->notes[i]->syllable);
+				int y = sm->getHeight()-(int)record->getNoteFreq(song->notes[i]->note);
+				int begin   = (int) (currentBpm*bpmPixelUnit);
+				int end     = (int) ((currentBpm+song->notes[i]->length)*bpmPixelUnit);
+				float note_start = (time - ( (song->notes[i]->timestamp)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) - song->gap);
+				float note_total = (song->notes[i]->length)  * 60 * 1000 / ( song->bpm[0].bpm * 4 );
+				int current = (int) ((currentBpm + note_start*song->notes[i]->length/note_total)*bpmPixelUnit);
+				boxRGBA(sm->getSDLScreen(),105+begin,y-5,
+			        	                   100+current,y+5,
+			                	           0,0,255,255);
+
+				boxRGBA(sm->getSDLScreen(),100+current,y-5,
+			        	                   100+end,y+5,
+			                	           200,200,200,255);
+				if(freq != 0.0) {
+					filledCircleRGBA(sm->getSDLScreen(),100+current, sm->getHeight()-(int)record->getFreq(),5,153,0,0,255);
+					filledCircleRGBA(sm->getSDLScreen(),100+current, sm->getHeight()-(int)record->getNoteFreq(note),5,0,204,0,255);
+				}
+			}
 			if( i != song->notes.size() - 1 &&
 			    time > ( song->notes[i]->timestamp  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap &&
 			    time < ( song->notes[i+1]->timestamp  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap &&
 			 	song->notes[i]->type == TYPE_NOTE_SING )
 				pos=i;
+			currentBpm += song->notes[i]->length;
 		}
 
 		SDL_Surface * sentencePastSurf = NULL;
@@ -240,13 +278,5 @@ void CScreenSing::draw( void )
 		TTF_CloseFont(font);
 
 
-		if( pos != -1 ) {
-			filledCircleRGBA(sm->getSDLScreen(),(sm->getWidth()-sentenceWidth)/2+sentencePastWidth+sentenceNowWidth/2, sm->getHeight()-(int)record->getNoteFreq(song->notes[pos]->note),5,0,0,255,255);
-		}
-
-		if(freq != 0.0) {
-			filledCircleRGBA(sm->getSDLScreen(),(sm->getWidth()-sentenceWidth)/2+sentencePastWidth+sentenceNowWidth/2, sm->getHeight()-(int)record->getFreq(),5,153,0,0,255);
-			filledCircleRGBA(sm->getSDLScreen(),(sm->getWidth()-sentenceWidth)/2+sentencePastWidth+sentenceNowWidth/2, sm->getHeight()-(int)record->getNoteFreq(note),5,0,204,0,255);
-		}
 	}
 }
