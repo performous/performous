@@ -126,7 +126,7 @@ void CScreenSing::draw( void )
 
 		// Find the last SLEEP before where we are
 		for( i = 0 ; i <  song->notes.size() ; i++ ) {
-			if( time > ( song->notes[i]->timestamp  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap ) {
+			if( time > ( (song->notes[i]->timestamp + song->notes[i]->length )* 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap ) {
 				if( song->notes[i]->type == TYPE_NOTE_SLEEP )
 					currentSentence=i;
 			} else {
