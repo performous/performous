@@ -1,8 +1,47 @@
 - Replace SDL Mixer with a true MP3 (mpeg ?) library (to get rid of the rate
-  problem
+  problem)
+- Use a cross platform input sound library (portAudio ?)
 - Take car of the \r \n at the end of line
 - Do note preload all the songs at screen_song
 - Cache song sentences
 
 GENERAL:
 - Enhance/Add screens (sing, configuration, composer, etc)
+
+Change songs directory structure :
+
++- songs
+   +- category_1
+   |  +- category_1.png (cover of the category)
+   |  +- song_1
+   |  |  +- song_1.txt
+   |  |  +- backgroung.png (name given in #BACKGROUND directive of song_1.txt)
+   |  |  +- song.mp3 (name given in #MP3 directive of song_1.txt)
+   |  |  +- song.mpg (name given in #VIDEO directive of song_1.txt)
+   |  |  +- cover.png (name given in #COVER directive of song_1.txt)
+   |  +- song_2
+   |  +- ...
+   |  +- song_n
+   +- category_2
+   +- ...
+   +- category_n
+
+screns browsing :
+
+Intro
+ +-> Choose category
+   +-> Choose song (and level)
+     +-> Sing
+       +-> Score
+         +-> Go back to Choose song
+ +-> Configuration
+   +-> Configure sound
+     +-> Choose sound card
+     +-> Music level
+     +-> Mic level
+     +-> Mic fft sensibility ( in db with db-meter )
+   +-> Configure theme
+   +-> etc.
+ +-> Accorder (for guitar for example)
+ +-> Song composer/modifier
+ +-> Quit
