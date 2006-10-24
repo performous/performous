@@ -70,11 +70,8 @@ void CSong::parseFile( void )
 				sscanf(buff+1,"%d %d %d %n",&tmp->timestamp, &tmp->length , &tmp->note , &shift);
 				sprintf(syllable,"%s",buff+shift+1);
 				tmp->syllable = syllable;
-				// Shift 2 Octave
+				// Shift 2 Octave 
 				tmp->note-=24;
-				// This is an ugly hack to work with Ultrastar SuperStar (Jamelia) and others
-				// Has been removed, should be checked by users
-				//tmp->timestamp+=2;
 				notes.push_back(tmp);
 				break;
 			}
@@ -82,9 +79,6 @@ void CSong::parseFile( void )
 				TNote * tmp = new TNote();
 				tmp->type = TYPE_NOTE_SLEEP;
 				sscanf(buff+1,"%d",&tmp->timestamp);
-				// This is an ugly hack to work with Ultrastar SuperStar (Jamelia) and others
-				// Has been removed, should be checked by users
-				//tmp->timestamp+=2;
 				notes.push_back(tmp);
 				break;
 			}
@@ -156,6 +150,8 @@ bool CSongs::parseFile( CSong * tmp )
 			tmp->creator = creator;
 		} else if(!strncmp("#GAP:",buff,5)) {
 			sscanf(buff+5,"%f",&tmp->gap);
+			// The following hack is to stay sync with ultratar
+			tmp->gap+=200;
 		} else if(!strncmp("#BPM:",buff,5)) {
 			TBpm bpm;
 			bpm.start = 0.0;
