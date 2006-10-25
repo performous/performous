@@ -35,9 +35,12 @@ bool compareSongs( CSong * left , CSong * right)
 			ordering2 = right->title;
 			break;
 	}
-	if(!ordering1)
+	// VERY IMPORTANT, if equal compareSongs MUST return false
+	if(ordering1 == NULL && ordering2 == NULL)
+		return false;
+	if(ordering1 == NULL)
 		return true;
-	if(!ordering2)
+	if(ordering2 == NULL)
 		return false;
 	int cmp = strcmp(ordering1,ordering2);
 	if( cmp < 0 )
@@ -70,8 +73,6 @@ void CSong::parseFile( void )
 				sscanf(buff+1,"%d %d %d %n",&tmp->timestamp, &tmp->length , &tmp->note , &shift);
 				sprintf(syllable,"%s",buff+shift+1);
 				tmp->syllable = syllable;
-				// Shift 2 Octave 
-				tmp->note-=24;
 				notes.push_back(tmp);
 				break;
 			}
