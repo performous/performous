@@ -53,6 +53,7 @@ void CSong::parseFile( void )
 {
 	char buff[256];
 	sprintf(buff,"%s/%s",path,filename);
+	int relativeShift = 0;
 
 	FILE * fp = fopen(buff,"r");
 	while(fgets(buff,256,fp)) {
@@ -71,6 +72,7 @@ void CSong::parseFile( void )
 				tmp->type = TYPE_NOTE_SING;
 				buff[len-1] = '\0';
 				sscanf(buff+1,"%d %d %d %n",&tmp->timestamp, &tmp->length , &tmp->note , &shift);
+				tmp->timestamp += relativeShift;
 				sprintf(syllable,"%s",buff+shift+1);
 				tmp->syllable = syllable;
 				if( tmp->note <= noteMin )
@@ -82,8 +84,12 @@ void CSong::parseFile( void )
 			}
 			case '-' : {
 				TNote * tmp = new TNote();
+				int timestamp;
 				tmp->type = TYPE_NOTE_SLEEP;
-				sscanf(buff+1,"%d",&tmp->timestamp);
+				sscanf(buff+1,"%d",&timestamp);
+				tmp->timestamp = relativeShift + timestamp;
+				if(relative)
+					relativeShift += timestamp;
 				notes.push_back(tmp);
 				break;
 			}
@@ -108,6 +114,7 @@ CSong::CSong()
 	video = NULL;
 	noteMin = 256;
 	noteMax = -256;
+	relative = false;
 }
 
 bool CSongs::parseFile( CSong * tmp )
@@ -164,6 +171,11 @@ bool CSongs::parseFile( CSong * tmp )
 			bpm.start = 0.0;
 			sscanf(buff+5,"%f",&bpm.bpm);
 			tmp->bpm.push_back(bpm);
+		} else if(!strncmp("#RELATIVE:",buff,10)) {
+			if( buff[10] == 'y' )
+				tmp->relative = true;
+			else
+				tmp->relative = false;
 		}
 	}
 	fclose(fp);
