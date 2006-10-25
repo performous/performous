@@ -54,6 +54,8 @@ class CSong {
 	std::vector <TBpm> bpm;
 	float gap;
 	TScore score[3];
+	int noteMin;
+	int noteMax;
 	std::vector <TNote *> notes;
 	bool visible;
 	bool main;

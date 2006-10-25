@@ -169,11 +169,12 @@ void CScreenSing::draw( void )
 		
 		float bpmPixelUnit = (sm->getWidth() - 100. - 100.)/(totalBpm*1.0);
 		int currentBpm = 0;
-		
+
 		for( i = currentSentence ; i < end ; i ++ ) {
 			// if C <= timestamp < N
 			if( time > ( (song->notes[i]->timestamp+song->notes[i]->length)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap ) {
-				int y = sm->getHeight()-(int)record->getNoteFreq(song->notes[i]->note);
+				int noteFinal = song->notes[i]->note - (song->noteMin/12)*12+(song->noteMin%12);
+				int y = sm->getHeight()-(int)record->getNoteFreq(noteFinal);
 				int begin = (int) (currentBpm*bpmPixelUnit);
 				int end   = (int) ((currentBpm+song->notes[i]->length)*bpmPixelUnit);
 				strcat(sentencePast,song->notes[i]->syllable);
@@ -183,9 +184,10 @@ void CScreenSing::draw( void )
 			}
 			// if N+d <= timestamp < E
 			else if( time < ( (song->notes[i]->timestamp)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap ) {
+				int noteFinal = song->notes[i]->note - (song->noteMin/12)*12+(song->noteMin%12);
+				int y = sm->getHeight()-(int)record->getNoteFreq(noteFinal);
 				int begin = (int) (currentBpm*bpmPixelUnit);
 				int end   = (int) ((currentBpm+song->notes[i]->length)*bpmPixelUnit);
-				int y = sm->getHeight()-(int)record->getNoteFreq(song->notes[i]->note);
 				strcat(sentenceFuture,song->notes[i]->syllable);
 				boxRGBA(sm->getSDLScreen(),105+begin,y-5,
 			        	                   100+end,y+5,
@@ -193,7 +195,8 @@ void CScreenSing::draw( void )
 			}
 			else {
 				strcat(sentenceNow,song->notes[i]->syllable);
-				int y = sm->getHeight()-(int)record->getNoteFreq(song->notes[i]->note);
+				int noteFinal = song->notes[i]->note - (song->noteMin/12)*12+(song->noteMin%12);
+				int y = sm->getHeight()-(int)record->getNoteFreq(noteFinal);
 				int begin   = (int) (currentBpm*bpmPixelUnit);
 				int end     = (int) ((currentBpm+song->notes[i]->length)*bpmPixelUnit);
 				float note_start = (time - ( (song->notes[i]->timestamp)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) - song->gap);

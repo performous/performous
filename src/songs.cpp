@@ -73,6 +73,10 @@ void CSong::parseFile( void )
 				sscanf(buff+1,"%d %d %d %n",&tmp->timestamp, &tmp->length , &tmp->note , &shift);
 				sprintf(syllable,"%s",buff+shift+1);
 				tmp->syllable = syllable;
+				if( tmp->note <= noteMin )
+					noteMin = tmp->note;
+				if( tmp->note >= noteMax )
+					noteMax = tmp->note;
 				notes.push_back(tmp);
 				break;
 			}
@@ -102,6 +106,8 @@ CSong::CSong()
 	mp3 = NULL;
 	background = NULL;
 	video = NULL;
+	noteMin = 256;
+	noteMax = -256;
 }
 
 bool CSongs::parseFile( CSong * tmp )
