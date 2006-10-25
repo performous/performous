@@ -95,12 +95,25 @@ void CScreenSongs::draw( void )
 	// Draw the "Order by" text
 	SDL_Color black = {0,0,0,0};
 	TTF_Font *font = TTF_OpenFont("fonts/arial.ttf", 25);
+
+	SDL_Surface * artistSurf = TTF_RenderUTF8_Blended(font, sm->getSong()->artist , black);
+	position.x=(sm->getWidth()-artistSurf->w)/2;
+	position.y=475;
+	SDL_BlitSurface(artistSurf, NULL,  sm->getSDLScreen(), &position);
+	SDL_FreeSurface(artistSurf); 
+
+	SDL_Surface * titleSurf = TTF_RenderUTF8_Blended(font, sm->getSong()->title , black);
+	position.x=(sm->getWidth()-titleSurf->w)/2;
+	position.y=500;
+	SDL_BlitSurface(titleSurf, NULL,  sm->getSDLScreen(), &position);
+	SDL_FreeSurface(titleSurf); 
+
 	char * my_order = order[sm->getSongs()->getOrder()];
 	SDL_Surface * orderSurf = TTF_RenderUTF8_Blended(font, my_order , black);
-	position.x=(sm->getWidth()-sm->getSong()->coverSurf->w)/2;
-	position.y=500;
+	position.x=(sm->getWidth()-orderSurf->w)/2;
+	position.y=550;
 	SDL_BlitSurface(orderSurf, NULL,  sm->getSDLScreen(), &position);
-
 	SDL_FreeSurface(orderSurf);
+
 	TTF_CloseFont(font);
 }
