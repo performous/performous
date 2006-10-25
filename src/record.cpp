@@ -220,7 +220,6 @@ float CRecord::getNoteFreq( int id )
 	if( id == -1 )
 		return 0.0;
 	
-	id -= 24;
 	for(int i = 0 ; i < id ; i++)
 		result *= HALF_TONE;
 	return result;
@@ -231,8 +230,8 @@ int CRecord::getNoteId( void )
 	float freq = fft->getFreq();
 	if(freq == 0.0)
 		return -1;
-	int gamme = 2;
-	while( gamme < 6 ) {
+	int gamme = 0;
+	while( gamme < 8 ) {
 		for( int i = 0 ; i < 12 ; i++ )
 			if(freq < gameSep[i])
 				return (i+12*gamme);
