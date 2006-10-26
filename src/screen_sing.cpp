@@ -215,9 +215,17 @@ void CScreenSing::draw( void )
 				boxRGBA(sm->getSDLScreen(),100+current,y-5,
 			        	                   100+end,y+5,
 			                	           200,200,200,255);
+
+				// Lets find the nearest note from the song
+				int noteSingFinal = (note)%12;
+				int noteFinal2    = (song->notes[i]->note)%12;
+				int diff = abs(noteSingFinal-noteFinal2);
+				if( diff > 6 )
+					noteSingFinal = noteFinal - 12 + diff;
+				else
+					noteSingFinal = noteFinal + diff;
 				if(freq != 0.0) {
-					filledCircleRGBA(sm->getSDLScreen(),100+current, sm->getHeight()-(int)record->getFreq(),5,153,0,0,255);
-					filledCircleRGBA(sm->getSDLScreen(),100+current, sm->getHeight()-(int)record->getNoteFreq(note),5,0,204,0,255);
+					filledCircleRGBA(sm->getSDLScreen(),100+current, sm->getHeight()-(int)record->getNoteFreq(noteSingFinal),5,0,204,0,255);
 				}
 			}
 			if( i != song->notes.size() - 1 &&
