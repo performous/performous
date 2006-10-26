@@ -63,6 +63,12 @@ void CScreenSing::draw( void )
 	float freq;
 	int note;
 
+	if( play && !sm->getAudio()->isPlaying() ) {
+		play = false;
+		CScreenManager::getSingletonPtr()->activateScreen("Songs");
+		return;
+	}
+
 	// Draw the title
 	position.x=(sm->getWidth()-title->w)/2;
 	position.y=0;

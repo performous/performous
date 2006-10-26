@@ -40,7 +40,6 @@ void CAudio::playMusic( char * filename )
 		music=NULL;
 	}
 	music = Mix_LoadMUS(filename);
-	//while( !isPlaying() )
 	Mix_PlayMusic(music, 1);
 }
 
@@ -53,7 +52,7 @@ bool CAudio::isPlaying( void )
 	}
 }
 
-void CAudio::stopMusic()
+void CAudio::stopMusic( void )
 {
 	Mix_HaltMusic();
 }
