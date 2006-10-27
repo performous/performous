@@ -9,6 +9,7 @@ CScreenSing::CScreenSing(char * name)
 	screenName = name;
 	play = false;
 	finished = false;
+	mpeg = NULL;
 
 
 	SDL_Color black = {0, 0, 0,0};
@@ -40,6 +41,11 @@ void CScreenSing::manageEvent( SDL_Event event )
 			keypressed = event.key.keysym.sym;
 			if( keypressed == SDLK_ESCAPE || keypressed == SDLK_q ) {
 				CScreenManager::getSingletonPtr()->getAudio()->stopMusic();
+				if( mpeg != NULL ) {
+					SMPEG_delete(mpeg);
+					mpeg=NULL;
+				}
+				SDL_FillRect(videoSurf,NULL,0xffffff);
 				play = false;
 				CScreenManager::getSingletonPtr()->activateScreen("Songs");
 				return;
@@ -48,15 +54,17 @@ void CScreenSing::manageEvent( SDL_Event event )
 	if( !play ) {
 		char buff[1024];
 		CSong * song = CScreenManager::getSingletonPtr()->getSong();
-
-		sprintf(buff,"%s/%s",song->path,song->video);
-		fprintf(stdout,"Now playing : (%d) : %s\n",CScreenManager::getSingletonPtr()->getSongId(),buff);
-		mpeg = SMPEG_new(buff, &info, 0);
-		SMPEG_setdisplay(mpeg, videoSurf, NULL, NULL);
-		SMPEG_enablevideo(mpeg, 1);
-		SMPEG_enableaudio(mpeg, 0);
-		SMPEG_setvolume(mpeg, 0);
-		SMPEG_scaleXY(mpeg, 400 , 300 );
+		
+		if( song->video != NULL ) {
+			sprintf(buff,"%s/%s",song->path,song->video);
+			fprintf(stdout,"Now playing : (%d) : %s\n",CScreenManager::getSingletonPtr()->getSongId(),buff);
+			mpeg = SMPEG_new(buff, &info, 0);
+			SMPEG_setdisplay(mpeg, videoSurf, NULL, NULL);
+			SMPEG_enablevideo(mpeg, 1);
+			SMPEG_enableaudio(mpeg, 0);
+			SMPEG_setvolume(mpeg, 0);
+			SMPEG_scaleXY(mpeg, 400 , 300 );
+		}
 
 		sprintf(buff,"%s/%s",song->path,song->mp3);
 		fprintf(stdout,"Now playing : (%d) : %s\n",CScreenManager::getSingletonPtr()->getSongId(),buff);
@@ -77,7 +85,11 @@ void CScreenSing::draw( void )
 
 	if( play && !sm->getAudio()->isPlaying() ) {
 		play = false;
-		SMPEG_delete(mpeg);
+		if( mpeg != NULL ) {
+			SMPEG_delete(mpeg);
+			mpeg=NULL;
+		}
+		SDL_FillRect(videoSurf,NULL,0xffffff);
 		CScreenManager::getSingletonPtr()->activateScreen("Songs");
 		return;
 	}
@@ -104,12 +116,12 @@ void CScreenSing::draw( void )
 
 		
 		// Draw the video
-		{
-		if( SMPEG_status(mpeg) != SMPEG_PLAYING && time > song->videoGap )
-			SMPEG_play(mpeg);
-		position.x=200;
-		position.y=150;
-		SDL_BlitSurface(videoSurf, NULL,  sm->getSDLScreen(), &position);
+		if( mpeg != NULL ){
+			if( SMPEG_status(mpeg) != SMPEG_PLAYING && time > song->videoGap )
+				SMPEG_play(mpeg);
+			position.x=200;
+			position.y=150;
+			SDL_BlitSurface(videoSurf, NULL,  sm->getSDLScreen(), &position);
 		}
 
 
