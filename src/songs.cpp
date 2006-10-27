@@ -115,6 +115,8 @@ CSong::CSong()
 	noteMin = 256;
 	noteMax = -256;
 	relative = false;
+	videoGap=0;
+	gap=0;
 }
 
 bool CSongs::parseFile( CSong * tmp )
@@ -171,6 +173,16 @@ bool CSongs::parseFile( CSong * tmp )
 			bpm.start = 0.0;
 			sscanf(buff+5,"%f",&bpm.bpm);
 			tmp->bpm.push_back(bpm);
+		} else if(!strncmp("#VIDEO:",buff,7)) {
+			int len = strlen(buff);
+			char * video = new char[len - 7];
+
+			buff[len-1]='\0'; // Replace the \n with a \0
+			memcpy(video,buff+7,len - 7);
+			tmp->video = video;
+		} else if(!strncmp("#VIDEOGAP:",buff,10)) {
+			sscanf(buff+10,"%f",&tmp->videoGap);
+			tmp->videoGap+=200;
 		} else if(!strncmp("#RELATIVE:",buff,10)) {
 			if( buff[10] == 'y' )
 				tmp->relative = true;
@@ -257,6 +269,7 @@ CSongs::~CSongs()
 		delete[] songs[i]->artist;
 		delete[] songs[i]->edition;
 		delete[] songs[i]->creator;
+		delete[] songs[i]->video;
 		for(unsigned int j = 0; j < songs[i]->notes.size(); j++) {
 			delete[] songs[i]->notes[j]->syllable;
 			delete songs[i]->notes[j];
