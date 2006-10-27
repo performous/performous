@@ -10,9 +10,18 @@ CScreenSing::CScreenSing(char * name)
 	play = false;
 	finished = false;
 
+
 	SDL_Color black = {0, 0, 0,0};
 	TTF_Font *font = TTF_OpenFont("fonts/arial.ttf", 65);
 	title = TTF_RenderUTF8_Blended(font, "Let\'s Sing !!!", black);
+	videoSurf = SDL_AllocSurface( CScreenManager::getSingletonPtr()->getSDLScreen()->flags,
+			400 , 300 ,
+			CScreenManager::getSingletonPtr()->getSDLScreen()->format->BitsPerPixel,
+			CScreenManager::getSingletonPtr()->getSDLScreen()->format->Rmask,
+			CScreenManager::getSingletonPtr()->getSDLScreen()->format->Gmask,
+			CScreenManager::getSingletonPtr()->getSDLScreen()->format->Bmask,
+			CScreenManager::getSingletonPtr()->getSDLScreen()->format->Amask);
+	SDL_FillRect(videoSurf,NULL,0xffffff);
 	
 	TTF_CloseFont(font);
 }
@@ -20,6 +29,7 @@ CScreenSing::CScreenSing(char * name)
 CScreenSing::~CScreenSing()
 {
 	SDL_FreeSurface(title);
+	SDL_FreeSurface(videoSurf);
 }
 
 void CScreenSing::manageEvent( SDL_Event event )
@@ -38,20 +48,22 @@ void CScreenSing::manageEvent( SDL_Event event )
 	if( !play ) {
 		char buff[1024];
 		CSong * song = CScreenManager::getSingletonPtr()->getSong();
+
+		sprintf(buff,"%s/%s",song->path,song->video);
+		fprintf(stdout,"Now playing : (%d) : %s\n",CScreenManager::getSingletonPtr()->getSongId(),buff);
+		mpeg = SMPEG_new(buff, &info, 0);
+		SMPEG_setdisplay(mpeg, videoSurf, NULL, NULL);
+		SMPEG_enablevideo(mpeg, 1);
+		SMPEG_enableaudio(mpeg, 0);
+		SMPEG_setvolume(mpeg, 0);
+		SMPEG_scaleXY(mpeg, 400 , 300 );
+
 		sprintf(buff,"%s/%s",song->path,song->mp3);
 		fprintf(stdout,"Now playing : (%d) : %s\n",CScreenManager::getSingletonPtr()->getSongId(),buff);
 		CScreenManager::getSingletonPtr()->getAudio()->playMusic(buff);
 		start = SDL_GetTicks();
 		play = true;
 	}
-	
-	if( finished ) {
-		play = false;
-		finished = false;
-		CScreenManager::getSingletonPtr()->activateScreen("Songs");
-		return;
-	}
-		
 }
 
 void CScreenSing::draw( void )
@@ -65,6 +77,7 @@ void CScreenSing::draw( void )
 
 	if( play && !sm->getAudio()->isPlaying() ) {
 		play = false;
+		SMPEG_delete(mpeg);
 		CScreenManager::getSingletonPtr()->activateScreen("Songs");
 		return;
 	}
@@ -88,6 +101,17 @@ void CScreenSing::draw( void )
 		SDL_Color blue  = { 50, 50,255,0};
 		// Declare the font we use
 		TTF_Font *font;
+
+		
+		// Draw the video
+		{
+		if( SMPEG_status(mpeg) != SMPEG_PLAYING && time > song->videoGap )
+			SMPEG_play(mpeg);
+		position.x=200;
+		position.y=150;
+		SDL_BlitSurface(videoSurf, NULL,  sm->getSDLScreen(), &position);
+		}
+
 
 		// Compute and draw the timer
 		{
