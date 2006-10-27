@@ -182,7 +182,8 @@ bool CSongs::parseFile( CSong * tmp )
 			tmp->video = video;
 		} else if(!strncmp("#VIDEOGAP:",buff,10)) {
 			sscanf(buff+10,"%f",&tmp->videoGap);
-			tmp->videoGap+=200;
+			tmp->videoGap*=1000;
+			tmp->videoGap+=600;
 		} else if(!strncmp("#RELATIVE:",buff,10)) {
 			if( buff[10] == 'y' )
 				tmp->relative = true;
