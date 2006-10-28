@@ -3,7 +3,6 @@
 - Use a cross platform input sound library (portAudio ?)
 - Take car of the \r \n at the end of line
 - Do note preload all the songs at screen_song
-- Cache song sentences
 
 GENERAL:
 - Enhance/Add screens (sing, configuration, composer, etc)
