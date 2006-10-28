@@ -7,7 +7,7 @@
 #include <cairotosdl.h>
 
 CScreenSing::CScreenSing(char * name)
-: pitchGraph(800-105, 600)
+: pitchGraph(800, 600)
 {
 	screenName = name;
 	play = false;
@@ -52,6 +52,8 @@ void CScreenSing::manageEvent( SDL_Event event )
 				}
 				SDL_FillRect(videoSurf,NULL,0xffffff);
 				play = false;
+				sentence.clear();
+				pitchGraph.clear();
 				CScreenManager::getSingletonPtr()->activateScreen("Songs");
 				return;
 			}
@@ -95,6 +97,8 @@ void CScreenSing::draw( void )
 			mpeg=NULL;
 		}
 		SDL_FillRect(videoSurf,NULL,0xffffff);
+		sentence.clear();
+		pitchGraph.clear();
 		CScreenManager::getSingletonPtr()->activateScreen("Songs");
 		return;
 	}
@@ -260,7 +264,7 @@ void CScreenSing::draw( void )
 					noteSingFinal = noteFinal + diff;
 				if(freq != 0.0) {
 					pitchGraph.renderPitch(
-						record->getNoteFreq(noteSingFinal)/sm->getHeight(),
+						(sm->getHeight() - record->getNoteFreq(noteSingFinal))/sm->getHeight(),
 						((double)current)/sm->getWidth());
 				}
 				if( time < ( (sentence[i]->timestamp+sentence[i]->length)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap )
@@ -325,7 +329,7 @@ void CScreenSing::draw( void )
 		}
 		
 		SDL_Surface* pitchGraphSurf = CairoToSdl::BlitToSdl(pitchGraph.getCurrent());
-		position.x = 105;
+		position.x = 100;
 		position.y = 0;
 		SDL_BlitSurface(pitchGraphSurf,	NULL, sm->getSDLScreen(), &position);
 		SDL_FreeSurface(pitchGraphSurf);
