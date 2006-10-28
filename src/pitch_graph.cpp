@@ -1,23 +1,15 @@
 #include <pitch_graph.h>
 #include <cairo/cairo.h>
 
+#include <iostream>
+
 PitchGraph::PitchGraph(int _width, int _height)
-	:width(width),
-	height(height),
-	clearPage(1)
+	:width(_width),
+	height(_height),
+	clearPage(1),
+	surface(NULL),
+	dc(NULL)
 {
-	// TODO Initializers
-	width = _width;
-	height = _height;
-
-	surface = cairo_image_surface_create(
-		CAIRO_FORMAT_ARGB32,
-		width, height);
-	dc = cairo_create(surface);
-	cairo_scale(dc, width, height);
-	cairo_set_source_rgba(dc, 1, 0, 0, 1.0);
-	cairo_set_line_width(dc, 0.01);
-
 	clear();
 }
 
@@ -39,14 +31,40 @@ cairo_surface_t* PitchGraph::renderPitch(double pitch, double time)
 
 void PitchGraph::clear()
 {
+	if(this->dc)
+	{
+		cairo_destroy(dc);
+	}
+
+	if(this->surface)
+	{
+		cairo_surface_destroy(surface);
+	}
+	
+	surface = cairo_image_surface_create(
+		CAIRO_FORMAT_ARGB32,
+		width, height);
+	dc = cairo_create(surface);
+	cairo_scale(dc, width, height);
+	cairo_set_line_width(dc, 0.01);
+
+
 	cairo_new_path(dc);
-	cairo_paint_with_alpha(dc, 0);
 	clearPage = 1;
+	
+	cairo_set_source_rgba(this->dc, 1, 0, 0, 1.0);
 }
 
 
 PitchGraph::~PitchGraph()
 {
-	cairo_destroy(dc);
-	cairo_surface_destroy (surface);
+	if(this->dc)
+	{
+		cairo_destroy(dc);
+	}
+
+	if(this->surface)
+	{
+		cairo_surface_destroy(surface);
+	}
 }
