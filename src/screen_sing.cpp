@@ -3,25 +3,30 @@
 #include <SDL/SDL_gfxPrimitives.h>
 #include <SDL/SDL_rotozoom.h>
 #include <songs.h>
+#include <pitch_graph.h>
+#include <cairotosdl.h>
 
 CScreenSing::CScreenSing(char * name)
+: pitchGraph(800-105, 600)
 {
 	screenName = name;
 	play = false;
 	finished = false;
 	mpeg = NULL;
+	SDL_Surface *screen;
 
+	screen = CScreenManager::getSingletonPtr()->getSDLScreen();
 
 	SDL_Color black = {0, 0, 0,0};
 	TTF_Font *font = TTF_OpenFont("fonts/arial.ttf", 65);
 	title = TTF_RenderUTF8_Blended(font, "Let\'s Sing !!!", black);
-	videoSurf = SDL_AllocSurface( CScreenManager::getSingletonPtr()->getSDLScreen()->flags,
+	videoSurf = SDL_AllocSurface( screen->flags,
 			400 , 300 ,
-			CScreenManager::getSingletonPtr()->getSDLScreen()->format->BitsPerPixel,
-			CScreenManager::getSingletonPtr()->getSDLScreen()->format->Rmask,
-			CScreenManager::getSingletonPtr()->getSDLScreen()->format->Gmask,
-			CScreenManager::getSingletonPtr()->getSDLScreen()->format->Bmask,
-			CScreenManager::getSingletonPtr()->getSDLScreen()->format->Amask);
+			screen->format->BitsPerPixel,
+			screen->format->Rmask,
+			screen->format->Gmask,
+			screen->format->Bmask,
+			screen->format->Amask);
 	SDL_FillRect(videoSurf,NULL,0xffffff);
 	
 	TTF_CloseFont(font);
@@ -163,87 +168,80 @@ void CScreenSing::draw( void )
 		font = TTF_OpenFont("fonts/arial.ttf", 40);
 		unsigned int currentSentence = 0;
 		unsigned int i = 0;
-		unsigned int end = 0;
 		unsigned int totalBpm = 0;
 
-		// Find the last SLEEP before where we are
-		for( i = 0 ; i <  song->notes.size() ; i++ ) {
-			if( time > ( (song->notes[i]->timestamp + song->notes[i]->length )* 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap ) {
+		// If the sentence is not empty and the last syllable is in the past
+		// we clear the sentence
+		if( !sentence.empty() &&
+		    time > ( (sentence[sentence.size()-1]->timestamp + sentence[sentence.size()-1]->length )* 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap ) {
+			sentence.clear();
+			pitchGraph.clear();
+		}
+		// If the sentence is empty we create it
+		if( sentence.empty() ) {
+			for( i = 0 ; i <  song->notes.size() ; i++ ) {
+				if( time > ( (song->notes[i]->timestamp + song->notes[i]->length )* 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap ) {
+					if( song->notes[i]->type == TYPE_NOTE_SLEEP )
+						currentSentence=i;
+				} else {
+					break;
+				}
+			}
+			for( i = currentSentence ; i <  song->notes.size() ; i++ ) {
+				currentSentence=i;
+				if( song->notes[i]->type != TYPE_NOTE_SLEEP )
+					break;
+			}
+			for( i = currentSentence ; i <  song->notes.size() ; i++ ) {
 				if( song->notes[i]->type == TYPE_NOTE_SLEEP )
-					currentSentence=i;
-			} else {
-				// Here we are too far
-				break;
+					break;
+				else
+					sentence.push_back(song->notes[i]);
 			}
 		}
-		
-		// Find the first SING after this SLEEP and the next SLEEP
-		bool found=false;
-		for( end = currentSentence ; end <  song->notes.size() ; end++ ) {
-			if( !found && song->notes[end]->type == TYPE_NOTE_SING ) {
-				currentSentence = end;
-				found = true;
-			}
-			if( found && song->notes[end]->type == TYPE_NOTE_SLEEP )
-				break;
-		}
 
-		// Here we have : (L: SLEEP, I: SING)
-		// N: now
-		// C: currentSentence
-		// E: end
-		//
-		// L  I  I  I  I  I  I  L
-		//    |      |          |
-		//    C      N          E
+		char sentencePast[128]   ; sentencePast[0]   = '\0';
+		char sentenceNow[128]    ; sentenceNow[0]    = '\0';
+		char sentenceFuture[128] ; sentenceFuture[0] = '\0';
 
-		char sentencePast[128];
-		char sentenceNow[128];
-		char sentenceFuture[128];
-		sentencePast[0] = '\0';
-		sentenceNow[0] = '\0';
-		sentenceFuture[0] = '\0';
-
-		int pos = -1;
-		for( i = currentSentence ; i < end ; i ++ ) {
-			totalBpm+=song->notes[i]->length;
-		}
+		totalBpm = sentence[sentence.size()-1]->length + sentence[sentence.size()-1]->timestamp - sentence[0]->timestamp;
 		
 		float bpmPixelUnit = (sm->getWidth() - 100. - 100.)/(totalBpm*1.0);
-		int currentBpm = 0;
 
-		for( i = currentSentence ; i < end ; i ++ ) {
+		int pos = -1;
+		for( i = 0 ; i < sentence.size() ; i ++ ) {
+			int currentBpm = sentence[i]->timestamp - sentence[0]->timestamp;
 			// if C <= timestamp < N
-			if( time > ( (song->notes[i]->timestamp+song->notes[i]->length)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap ) {
-				int noteFinal = song->notes[i]->note - (song->noteMin/12)*12+(song->noteMin%12);
+			if( time > ( (sentence[i]->timestamp+sentence[i]->length)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap ) {
+				int noteFinal = sentence[i]->note - (song->noteMin/12)*12+(song->noteMin%12);
 				int y = sm->getHeight()-(int)record->getNoteFreq(noteFinal);
 				int begin = (int) (currentBpm*bpmPixelUnit);
-				int end   = (int) ((currentBpm+song->notes[i]->length)*bpmPixelUnit);
-				strcat(sentencePast,song->notes[i]->syllable);
+				int end   = (int) ((currentBpm+sentence[i]->length)*bpmPixelUnit);
+				strcat(sentencePast,sentence[i]->syllable);
 				boxRGBA(sm->getSDLScreen(),105+begin,y-5,
 			        	                   100+end,y+5,
 			                	           0,0,255,255);
 			}
 			// if N+d <= timestamp < E
-			else if( time < ( (song->notes[i]->timestamp)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap ) {
-				int noteFinal = song->notes[i]->note - (song->noteMin/12)*12+(song->noteMin%12);
+			else if( time < ( (sentence[i]->timestamp)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap ) {
+				int noteFinal = sentence[i]->note - (song->noteMin/12)*12+(song->noteMin%12);
 				int y = sm->getHeight()-(int)record->getNoteFreq(noteFinal);
 				int begin = (int) (currentBpm*bpmPixelUnit);
-				int end   = (int) ((currentBpm+song->notes[i]->length)*bpmPixelUnit);
-				strcat(sentenceFuture,song->notes[i]->syllable);
+				int end   = (int) ((currentBpm+sentence[i]->length)*bpmPixelUnit);
+				strcat(sentenceFuture,sentence[i]->syllable);
 				boxRGBA(sm->getSDLScreen(),105+begin,y-5,
 			        	                   100+end,y+5,
 			                	           200,200,200,255);
 			}
 			else {
-				strcat(sentenceNow,song->notes[i]->syllable);
-				int noteFinal = song->notes[i]->note - (song->noteMin/12)*12+(song->noteMin%12);
+				strcat(sentenceNow,sentence[i]->syllable);
+				int noteFinal = sentence[i]->note - (song->noteMin/12)*12+(song->noteMin%12);
 				int y = sm->getHeight()-(int)record->getNoteFreq(noteFinal);
 				int begin   = (int) (currentBpm*bpmPixelUnit);
-				int end     = (int) ((currentBpm+song->notes[i]->length)*bpmPixelUnit);
-				float note_start = (time - ( (song->notes[i]->timestamp)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) - song->gap);
-				float note_total = (song->notes[i]->length)  * 60 * 1000 / ( song->bpm[0].bpm * 4 );
-				int current = (int) ((currentBpm + note_start*song->notes[i]->length/note_total)*bpmPixelUnit);
+				int end     = (int) ((currentBpm+sentence[i]->length)*bpmPixelUnit);
+				float note_start = (time - ( (sentence[i]->timestamp)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) - song->gap);
+				float note_total = (sentence[i]->length)  * 60 * 1000 / ( song->bpm[0].bpm * 4 );
+				int current = (int) ((currentBpm + note_start*sentence[i]->length/note_total)*bpmPixelUnit);
 				boxRGBA(sm->getSDLScreen(),105+begin,y-5,
 			        	                   100+current,y+5,
 			                	           0,0,255,255);
@@ -254,22 +252,20 @@ void CScreenSing::draw( void )
 
 				// Lets find the nearest note from the song
 				int noteSingFinal = (note)%12;
-				int noteFinal2    = (song->notes[i]->note)%12;
+				int noteFinal2    = (sentence[i]->note)%12;
 				int diff = abs(noteSingFinal-noteFinal2);
 				if( diff > 6 )
 					noteSingFinal = noteFinal - 12 + diff;
 				else
 					noteSingFinal = noteFinal + diff;
 				if(freq != 0.0) {
-					filledCircleRGBA(sm->getSDLScreen(),100+current, sm->getHeight()-(int)record->getNoteFreq(noteSingFinal),5,0,204,0,255);
+					pitchGraph.renderPitch(
+						record->getNoteFreq(noteSingFinal)/sm->getHeight(),
+						((double)current)/sm->getWidth());
 				}
+				if( time < ( (sentence[i]->timestamp+sentence[i]->length)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap )
+					pos=i;
 			}
-			if( i != song->notes.size() - 1 &&
-			    time > ( song->notes[i]->timestamp  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap &&
-			    time < ( song->notes[i+1]->timestamp  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap &&
-			 	song->notes[i]->type == TYPE_NOTE_SING )
-				pos=i;
-			currentBpm += song->notes[i]->length;
 		}
 
 		SDL_Surface * sentencePastSurf = NULL;
@@ -288,8 +284,8 @@ void CScreenSing::draw( void )
 		
 		if( sentenceNow[0] && pos != -1) {
 			sentenceNowSurf = TTF_RenderUTF8_Blended(font, sentenceNow , blue);
-			unsigned int length = song->notes[pos]->length;
-			unsigned int timestamp = song->notes[pos]->timestamp;
+			unsigned int length = sentence[pos]->length;
+			unsigned int timestamp = sentence[pos]->timestamp;
 			float length_ms = length * 60 * 1000 / ( song->bpm[0].bpm * 4 );
 			float timestamp_ms = timestamp * 60 * 1000 / ( song->bpm[0].bpm * 4 ) + song->gap;
 			float started_ms = time - timestamp_ms;
@@ -327,6 +323,13 @@ void CScreenSing::draw( void )
 			SDL_BlitSurface(sentenceFutureSurf, NULL,  sm->getSDLScreen(), &position);
 			SDL_FreeSurface(sentenceFutureSurf);
 		}
+		
+		SDL_Surface* pitchGraphSurf = CairoToSdl::BlitToSdl(pitchGraph.getCurrent());
+		position.x = 105;
+		position.y = 0;
+		SDL_BlitSurface(pitchGraphSurf,	NULL, sm->getSDLScreen(), &position);
+		SDL_FreeSurface(pitchGraphSurf);
+
 
 		TTF_CloseFont(font);
 

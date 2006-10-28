@@ -3,6 +3,7 @@
 
 #include <screen.h>
 #include <smpeg/smpeg.h>
+#include <pitch_graph.h>
 
 class CScreenSing : public CScreen {
 	public:
@@ -13,6 +14,10 @@ class CScreenSing : public CScreen {
 	private:
 	SDL_Surface * title;
 	SDL_Surface * videoSurf;
+	// Keeps the pitch tracking graphics
+	// in separate surface
+	PitchGraph pitchGraph;
+	std::vector <TNote *> sentence;
 	bool play;
 	bool finished;
 	unsigned int start;
