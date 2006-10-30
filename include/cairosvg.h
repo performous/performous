@@ -1,0 +1,17 @@
+#ifndef __CAIROSVG_H__
+#define __CAIROSVG_H__
+
+#include <cairo/cairo.h>
+#include <SDL/SDL.h>
+
+class CairoSVG {
+	public:
+	CairoSVG( const char * filename );
+	~CairoSVG( void );
+	SDL_Surface * getSDLSurface(void) {return sdl_svg;};
+	private:
+	cairo_surface_t* surface;
+	SDL_Surface *  sdl_svg;
+};
+
+#endif
