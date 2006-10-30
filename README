@@ -24,3 +24,5 @@ If your song is not UTF-8 encoded please do :
 	iconv --from-code=ISO-8859-1 --to-code=UTF-8 source.txt dest.txt
 If your song is DOS based (\r\n) please do :
 	dos2unix source.txt
+If you want to send a patch :
+	cvs diff -NuF^f > mypatch.patch
