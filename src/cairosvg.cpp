@@ -11,7 +11,7 @@
   #include <librsvg/rsvg-cairo.h>
 #endif
 
-CairoSVG::CairoSVG( const char * filename , int _width , int _height )
+CairoSVG::CairoSVG( const char * filename , unsigned int _width , unsigned int _height )
 {
 	cairo_t * dc;
 	unsigned int height,width;
@@ -33,9 +33,15 @@ CairoSVG::CairoSVG( const char * filename , int _width , int _height )
 	height = svgDimension.height;
 #endif
 
+	if( _width == 0 )
+		_width = width;
+	if( _height == 0 )
+		_height = height;
+
 	surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, _width, _height);
 	dc = cairo_create(surface);
 	cairo_scale (dc,(double) _width/width,(double)_height/height);
+
 #ifdef USE_LIBSVG_CAIRO
 	svg_cairo_render (scr, dc);
 	sdl_svg=CairoToSdl::BlitToSdl(surface);
