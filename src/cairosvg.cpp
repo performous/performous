@@ -11,24 +11,31 @@
   #include <librsvg/rsvg-cairo.h>
 #endif
 
-CairoSVG::CairoSVG( const char * filename )
+CairoSVG::CairoSVG( const char * filename , int _width , int _height )
 {
 	cairo_t * dc;
+	unsigned int height,width;
 
 #ifdef USE_LIBSVG_CAIRO
 	svg_cairo_t *scr;
 	svg_cairo_create(&scr);
 	svg_cairo_parse (scr, filename);
+	svg_cairo_get_size (scr, &width, &height);
 #endif
 #ifdef USE_LIBRSVG
 	RsvgHandle * svgHandle=NULL;
 	GError* pError = NULL;
+	RsvgDimensionData svgDimension;
 	rsvg_init();
 	svgHandle = rsvg_handle_new_from_file(filename,&pError);
+	rsvg_handle_get_dimensions (svgHandle, &svgDimension);
+	width  = svgDimension.width;
+	height = svgDimension.height;
 #endif
 
-	surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, 800, 600);
+	surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, _width, _height);
 	dc = cairo_create(surface);
+	cairo_scale (dc,(double) _width/width,(double)_height/height);
 #ifdef USE_LIBSVG_CAIRO
 	svg_cairo_render (scr, dc);
 	sdl_svg=CairoToSdl::BlitToSdl(surface);
