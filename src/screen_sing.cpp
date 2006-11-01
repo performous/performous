@@ -45,17 +45,7 @@ void CScreenSing::manageEvent( SDL_Event event )
 		case SDL_KEYDOWN:
 			keypressed = event.key.keysym.sym;
 			if( keypressed == SDLK_ESCAPE || keypressed == SDLK_q ) {
-				CScreenManager::getSingletonPtr()->getAudio()->stopMusic();
-				if( mpeg != NULL ) {
-					SMPEG_delete(mpeg);
-					mpeg=NULL;
-				}
-				SDL_FillRect(videoSurf,NULL,0xffffff);
-				play = false;
-				sentence.clear();
-				pitchGraph.clear();
-				CScreenManager::getSingletonPtr()->activateScreen("Songs");
-				return;
+				finished = true;
 			}
 	}
 	if( !play ) {
@@ -91,16 +81,21 @@ void CScreenSing::draw( void )
 	int note;
 
 	if( play && !sm->getAudio()->isPlaying() ) {
-		play = false;
+		finished = true;
+	}
+
+	if(finished) {
+		CScreenManager::getSingletonPtr()->getAudio()->stopMusic();
 		if( mpeg != NULL ) {
 			SMPEG_delete(mpeg);
 			mpeg=NULL;
 		}
 		SDL_FillRect(videoSurf,NULL,0xffffff);
+		play = false;
+		finished = false;
 		sentence.clear();
 		pitchGraph.clear();
 		CScreenManager::getSingletonPtr()->activateScreen("Songs");
-		return;
 	}
 
 	// Draw the title
