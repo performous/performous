@@ -47,6 +47,7 @@ void PitchGraph::clear()
 	dc = cairo_create(surface);
 	cairo_scale(dc, width, height);
 	cairo_set_line_width(dc, 0.01);
+	cairo_set_line_cap(dc,CAIRO_LINE_CAP_ROUND);
 
 
 	cairo_new_path(dc);
