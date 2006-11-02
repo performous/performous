@@ -156,14 +156,16 @@ CRecord::CRecord( char * deviceName )
 CRecord::~CRecord()
 {
 	delete fft;
+	snd_pcm_drain(alsaHandle);
 	snd_pcm_close(alsaHandle);
 }
 
 void CRecord::compute( void )
 {
-	int frames = 128;
+	int frames  = 1;
 	int nFrames = 0;
 	nFrames = snd_pcm_readi(alsaHandle, buf, frames);
+
 	if(nFrames == -EPIPE)
 		snd_pcm_prepare(alsaHandle);
 	else if(nFrames < 0)
