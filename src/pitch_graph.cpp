@@ -21,6 +21,7 @@ cairo_surface_t* PitchGraph::renderPitch(double pitch, double time)
 
 	if( pitch == 0.0 ){
 		cairo_move_to(dc, time, pitch);
+		cairo_stroke_preserve(dc);
 		return surface;
 	}
 
