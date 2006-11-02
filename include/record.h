@@ -26,7 +26,7 @@ class CFft {
 
 class CRecord {
 	public:
-	CRecord(char * captureDevice = "hw:0,0");
+	CRecord(char * captureDevice = "default");
 	~CRecord();
 	void compute();
 	float getFreq( void ) { return fft->getFreq(); }
