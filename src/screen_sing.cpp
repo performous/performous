@@ -212,7 +212,7 @@ void CScreenSing::draw( void )
 			int currentBpm = sentence[i]->timestamp - sentence[0]->timestamp;
 			// if C <= timestamp < N
 			if( time > ( (sentence[i]->timestamp+sentence[i]->length)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap ) {
-				int noteFinal = sentence[i]->note - (song->noteMin/12)*12+(song->noteMin%12);
+				int noteFinal = sentence[i]->note - (song->noteMin/12)*12;
 				int y = sm->getHeight()-(int)record->getNoteFreq(noteFinal);
 				int begin = (int) (currentBpm*bpmPixelUnit);
 				int end   = (int) ((currentBpm+sentence[i]->length)*bpmPixelUnit);
@@ -223,7 +223,7 @@ void CScreenSing::draw( void )
 			}
 			// if N+d <= timestamp < E
 			else if( time < ( (sentence[i]->timestamp)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap ) {
-				int noteFinal = sentence[i]->note - (song->noteMin/12)*12+(song->noteMin%12);
+				int noteFinal = sentence[i]->note - (song->noteMin/12)*12;
 				int y = sm->getHeight()-(int)record->getNoteFreq(noteFinal);
 				int begin = (int) (currentBpm*bpmPixelUnit);
 				int end   = (int) ((currentBpm+sentence[i]->length)*bpmPixelUnit);
@@ -234,7 +234,7 @@ void CScreenSing::draw( void )
 			}
 			else {
 				strcat(sentenceNow,sentence[i]->syllable);
-				int noteFinal = sentence[i]->note - (song->noteMin/12)*12+(song->noteMin%12);
+				int noteFinal = sentence[i]->note - (song->noteMin/12)*12;
 				int y = sm->getHeight()-(int)record->getNoteFreq(noteFinal);
 				int begin   = (int) (currentBpm*bpmPixelUnit);
 				int end     = (int) ((currentBpm+sentence[i]->length)*bpmPixelUnit);
@@ -250,16 +250,19 @@ void CScreenSing::draw( void )
 			                	           200,200,200,255);
 
 				// Lets find the nearest note from the song
-				int noteSingFinal = (note)%12;
-				int noteFinal2    = (sentence[i]->note)%12;
-				int diff = abs(noteSingFinal-noteFinal2);
+				int diff =  abs(sentence[i]->note-note)%12;
+
 				if( diff > 6 )
-					noteSingFinal = noteFinal - 12 + diff;
-				else
-					noteSingFinal = noteFinal + diff;
+					diff -= 12;
+				int noteSingFinal = noteFinal - diff ;
+
 				if(freq != 0.0) {
 					pitchGraph.renderPitch(
 						(sm->getHeight() - record->getNoteFreq(noteSingFinal))/sm->getHeight(),
+						((double)current)/sm->getWidth());
+				} else {
+					pitchGraph.renderPitch(
+						0.0,
 						((double)current)/sm->getWidth());
 				}
 				if( time < ( (sentence[i]->timestamp+sentence[i]->length)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap )
