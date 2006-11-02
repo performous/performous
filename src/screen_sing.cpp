@@ -250,11 +250,16 @@ void CScreenSing::draw( void )
 			                	           200,200,200,255);
 
 				// Lets find the nearest note from the song
-				int diff =  abs(sentence[i]->note-note)%12;
+				int diff =  sentence[i]->note%12 - note%12;
 
 				if( diff > 6 )
 					diff -= 12;
+				if( diff < -6 )
+					diff += 12;
+
 				int noteSingFinal = noteFinal - diff ;
+				if( noteSingFinal < 0 )
+					noteSingFinal +=12;
 
 				if(freq != 0.0) {
 					pitchGraph.renderPitch(
