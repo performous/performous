@@ -6,16 +6,12 @@ CScreenSongs::CScreenSongs(char * name)
 	screenName = name;
 	songId=0;
 
-	SDL_Color black = {0, 0, 0,0};
-	TTF_Font *font = TTF_OpenFont("fonts/arial.ttf", 65);
-	title = TTF_RenderUTF8_Blended(font, "Choose your song", black);
-	
-	TTF_CloseFont(font);
+	cairo_svg = new CairoSVG("themes/default/songs.svg",800,600);
 }
 
 CScreenSongs::~CScreenSongs()
 {
-	SDL_FreeSurface(title);
+	delete cairo_svg;
 }
 
 void CScreenSongs::manageEvent( SDL_Event event )
@@ -84,13 +80,11 @@ void CScreenSongs::draw( void )
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
 	SDL_Rect position;
 
-	// Draw the title
-	position.x=(sm->getWidth()-title->w)/2;
-	position.y=0;
-	SDL_BlitSurface(title, NULL,  sm->getSDLScreen(), &position);
+	SDL_BlitSurface(cairo_svg->getSDLSurface(),NULL,sm->getSDLScreen(),NULL);
+	
 	// Draw the cover
 	position.x=(sm->getWidth()-sm->getSong()->coverSurf->w)/2;
-	position.y=200;
+	position.y=(sm->getHeight()-sm->getSong()->coverSurf->h)/2;
 	SDL_BlitSurface(sm->getSong()->coverSurf,NULL,sm->getSDLScreen(), &position);
 	// Draw the "Order by" text
 	SDL_Color black = {0,0,0,0};

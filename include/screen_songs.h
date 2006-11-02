@@ -3,6 +3,7 @@
 
 #include <screen.h>
 #include <songs.h>
+#include <cairosvg.h>
 
 class CScreenSongs : public CScreen {
 	public:
@@ -11,7 +12,7 @@ class CScreenSongs : public CScreen {
 	void manageEvent( SDL_Event event );
 	void draw(void);
 	private:
-	SDL_Surface * title;
+	CairoSVG * cairo_svg;
 	int songId;
 };
 
