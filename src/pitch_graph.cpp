@@ -2,6 +2,7 @@
 #include <cairo/cairo.h>
 
 #include <iostream>
+#include <math.h>
 
 PitchGraph::PitchGraph(int _width, int _height)
 	:width(_width),
@@ -15,6 +16,14 @@ PitchGraph::PitchGraph(int _width, int _height)
 
 cairo_surface_t* PitchGraph::renderPitch(double pitch, double time)
 {
+	double lastPitch,lastTime;
+	cairo_get_current_point(dc,&lastTime , &lastPitch);
+
+	if( pitch == 0.0 ){
+		cairo_move_to(dc, time, pitch);
+		return surface;
+	}
+
 	if(clearPage)
 	{
 		cairo_move_to(dc, time, pitch);
@@ -22,7 +31,14 @@ cairo_surface_t* PitchGraph::renderPitch(double pitch, double time)
 	}
 	else
 	{
-		cairo_line_to(dc, time, pitch);
+		if( lastPitch == 0 )
+			cairo_move_to(dc, time, pitch);
+		else if( fabs( lastPitch-pitch) < 0.001 )
+			cairo_line_to(dc, time, pitch);
+		else {
+			cairo_line_to(dc, time, lastPitch);
+			cairo_move_to(dc, time, pitch);
+		}
 	}
 
 	cairo_stroke_preserve(dc);
@@ -47,7 +63,7 @@ void PitchGraph::clear()
 	dc = cairo_create(surface);
 	cairo_scale(dc, width, height);
 	cairo_set_line_width(dc, 0.01);
-	cairo_set_line_cap(dc,CAIRO_LINE_CAP_ROUND);
+	//cairo_set_line_cap(dc,CAIRO_LINE_CAP_ROUND);
 
 
 	cairo_new_path(dc);
