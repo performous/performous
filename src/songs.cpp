@@ -167,7 +167,7 @@ bool CSongs::parseFile( CSong * tmp )
 		} else if(!strncmp("#GAP:",buff,5)) {
 			sscanf(buff+5,"%f",&tmp->gap);
 			// The following hack is to stay sync with ultratar
-			tmp->gap+=200;
+			tmp->gap+=300;
 		} else if(!strncmp("#BPM:",buff,5)) {
 			TBpm bpm;
 			bpm.start = 0.0;
