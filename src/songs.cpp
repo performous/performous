@@ -124,8 +124,10 @@ bool CSongs::parseFile( CSong * tmp )
 	char buff[256];
 	sprintf(buff,"%s/%s",tmp->path,tmp->filename);
 	FILE * fp = fopen(buff,"r");
-	if(!fp)
+	if(!fp) {
+		fprintf(stderr , "Cannot open \"%s\"\n",buff);
 		return false;
+	}
 	while(fgets(buff,256,fp)) {
 		if(buff[0] != '#' )
 			continue;
