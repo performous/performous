@@ -65,7 +65,7 @@ void init( void )
 	SDL_EnableKeyRepeat(125, 125);
 }
 
-int thread_func(void *unused)
+int thread_func(void *)
 {
 	while( !screenManager->isFinished() ) {
 		screenManager->getRecord()->compute();
@@ -73,7 +73,7 @@ int thread_func(void *unused)
 	return 1;
 }
 
-int main( int arc , char ** argv)
+int main( int , char ** )
 {
 	init();
 
