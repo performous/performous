@@ -14,7 +14,8 @@ class CAudio {
 	void stopMusic( void );
 	int loadSound( char * filename );
 	void playSound( int channel , int id );
-	private:
+	int getMP3info( char * filename );
+        private:
 	Mix_Music *music;
 	std::vector <Mix_Chunk *> sounds;
 };
