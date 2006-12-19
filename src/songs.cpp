@@ -173,6 +173,10 @@ bool CSongs::parseFile( CSong * tmp )
 		} else if(!strncmp("#BPM:",buff,5)) {
 			TBpm bpm;
 			bpm.start = 0.0;
+			// We replace ',' by '.' for internationalization
+			char * comma = strchr(buff,',');
+			if( comma != NULL )
+				*comma = '.';
 			sscanf(buff+5,"%f",&bpm.bpm);
 			tmp->bpm.push_back(bpm);
 		} else if(!strncmp("#VIDEO:",buff,7)) {
