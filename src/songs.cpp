@@ -73,6 +73,9 @@ void CSong::parseFile( void )
 				buff[len-1] = '\0';
 				sscanf(buff+1,"%d %d %d %n",&tmp->timestamp, &tmp->length , &tmp->note , &shift);
 				tmp->timestamp += relativeShift;
+				// go to the first non-space char
+				while( isspace(buff[shift+1]) )
+					shift++;
 				sprintf(syllable,"%s",buff+shift+1);
 				tmp->syllable = syllable;
 				if( tmp->note <= noteMin )
