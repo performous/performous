@@ -1,9 +1,9 @@
 #ifndef __AUDIO_H_
 #define __AUDIO_H_
 
-#include "SDL/SDL_mixer.h"
+#include <xine.h>
 #include <vector>
-
+       
 class CAudio {
 	public:
 	CAudio();
@@ -14,10 +14,14 @@ class CAudio {
 	void stopMusic( void );
 	int loadSound( char * filename );
 	void playSound( int channel , int id );
-	int getMP3info( char * filename );
         private:
-	Mix_Music *music;
-	std::vector <Mix_Chunk *> sounds;
+        std::vector <char *> sounds; 
+        xine_t               *xine;
+        xine_stream_t        *stream;
+        xine_video_port_t    *vo_port;
+        xine_audio_port_t    *ao_port;
+        xine_event_queue_t   *event_queue;
+        bool xine_playing;
 };
 
 #endif

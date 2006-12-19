@@ -3,20 +3,17 @@ Compile:
 To compile just run 'make'
 
 Dependencies:
-	- SDL SDL_Mixer SDL_ttf SDL_image cairo librsvg
+	- SDL SDL_ttf SDL_image cairo librsvg
 	- smpeg
 	- FFTW
 	- libalsa
+	- xine
 
 Place the songs into songs/directory and put directory.mp3 directory.png and
 directory.txt into it
 
-The mp3 should be sampled at 48000Hz (use convert.sh to convert your mp3 and
-be carefull it overwrite your current mp3) because SDL_Mixer doesn't resample
-the mp3.
-
 If you need Jamelia MP3 for test download it with UlstraStar (pascal/windows
-version) and convert it.
+version).
 
 Press 's' at the introduction screen to select your song
 
