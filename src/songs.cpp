@@ -70,13 +70,11 @@ void CSong::parseFile( void )
 				char * syllable = new char[16];
 
 				tmp->type = TYPE_NOTE_SING;
-				buff[len-1] = '\0';
-				sscanf(buff+1,"%d %d %d %n",&tmp->timestamp, &tmp->length , &tmp->note , &shift);
+				if (buff[len-2] == '\r') len--;
+				buff[len-1] = '\0'; // Replace the \n or \r with a \0
+				sscanf(buff+1,"%d %d %d%n",&tmp->timestamp, &tmp->length , &tmp->note , &shift);
 				tmp->timestamp += relativeShift;
-				// go to the first non-space char
-				while( isspace(buff[shift+1]) )
-					shift++;
-				sprintf(syllable,"%s",buff+shift+1);
+				sprintf(syllable,"%s",buff+shift+2);
 				tmp->syllable = syllable;
 				if( tmp->note <= noteMin )
 					noteMin = tmp->note;
@@ -138,40 +136,40 @@ bool CSongs::parseFile( CSong * tmp )
 			int len = strlen(buff);
 			char * title = new char[len - 7];
 
-			buff[len-1]='\0'; // Replace the \n with a \0
 			if (buff[len-2] == '\r') len--;
+			buff[len-1]='\0'; // Replace the \n or \r with a \0
 			memcpy(title,buff+7,len - 7);
 			tmp->title = title;
 		} else if(!strncmp("#EDITION:",buff,9)) {
 			int len = strlen(buff);
 			char * edition = new char[len - 9];
 
-			buff[len-1]='\0'; // Replace the \n with a \0
 			if (buff[len-2] == '\r') len--;
+			buff[len-1]='\0'; // Replace the \n or \r with a \0
 			memcpy(edition,buff+9,len - 9);
 			tmp->edition = edition;
 		} else if(!strncmp("#ARTIST:",buff,8)) {
 			int len = strlen(buff);
 			char * artist = new char[len - 8];
 
-			buff[len-1]='\0'; // Replace the \n with a \0
 			if (buff[len-2] == '\r') len--;
+			buff[len-1]='\0'; // Replace the \n or \r with a \0
 			memcpy(artist,buff+8,len - 8);
 			tmp->artist = artist;
 		} else if(!strncmp("#MP3:",buff,5)) {
 			int len = strlen(buff);
 			char * mp3 = new char[len - 5];
 
-			buff[len-1]='\0'; // Replace the \n with a \0
 			if (buff[len-2] == '\r') len--;
+			buff[len-1]='\0'; // Replace the \n or \r with a \0
 			memcpy(mp3,buff+5,len - 5);
 			tmp->mp3 = mp3;
 		} else if(!strncmp("#CREATOR:",buff,9)) {
 			int len = strlen(buff);
 			char * creator = new char[len - 9];
 
-			buff[len-1]='\0'; // Replace the \n with a \0
 			if (buff[len-2] == '\r') len--;
+			buff[len-1]='\0'; // Replace the \n or \r with a \0
 			memcpy(creator,buff+9,len - 9);
 			tmp->creator = creator;
 		} else if(!strncmp("#GAP:",buff,5)) {
@@ -191,8 +189,8 @@ bool CSongs::parseFile( CSong * tmp )
 			int len = strlen(buff);
 			char * video = new char[len - 7];
 
-			buff[len-1]='\0'; // Replace the \n with a \0
 			if (buff[len-2] == '\r') len--;
+			buff[len-1]='\0'; // Replace the \n or \r with a \0
 			memcpy(video,buff+7,len - 7);
 			tmp->video = video;
 		} else if(!strncmp("#VIDEOGAP:",buff,10)) {
