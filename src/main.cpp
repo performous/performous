@@ -46,7 +46,7 @@ void init( void )
 	}
 	TTF_Init();
 
-	SDL_WM_SetCaption("UltraStar-ng - 0.0.8", "WM_DEFAULT");
+	SDL_WM_SetCaption("UltraStar-ng - 0.0.9", "WM_DEFAULT");
 	const SDL_VideoInfo * videoInf = SDL_GetVideoInfo();
 
 	unsigned SDL_videoFlags  = 0;
