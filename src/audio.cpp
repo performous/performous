@@ -22,7 +22,7 @@ CAudio::~CAudio()
         xine_exit(xine);
 }
 
-void CAudio::loadMusic( char * filename )
+void CAudio::loadMusic( char * )
 {
         ;
 }
@@ -67,7 +67,7 @@ int CAudio::loadSound( char * filename )
         return sounds.size()-1;
 }
 
-void CAudio::playSound( int channel , int id )
+void CAudio::playSound( int , int id )
 {
         if (isPlaying()) 
             stopMusic();
