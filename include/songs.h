@@ -61,6 +61,7 @@ class CSong {
 	bool main;
 	int orderNum;
 	int orderType;
+        int maxScore;
 };
 
 class CSongs {

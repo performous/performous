@@ -6,6 +6,8 @@
 #include <algorithm>
 
 #include <SDL/SDL_image.h>
+#include <SDL/SDL_gfxPrimitives.h>
+#include <SDL/SDL_rotozoom.h>    
 
 bool compareSongs( CSong * left , CSong * right)
 {
@@ -54,7 +56,7 @@ void CSong::parseFile( void )
 	char buff[256];
 	sprintf(buff,"%s/%s",path,filename);
 	int relativeShift = 0;
-
+        maxScore = 0;
 	FILE * fp = fopen(buff,"r");
 	while(fgets(buff,256,fp)) {
 		switch( buff[0] ) {
@@ -81,7 +83,8 @@ void CSong::parseFile( void )
 				if( tmp->note >= noteMax )
 					noteMax = tmp->note;
 				notes.push_back(tmp);
-				break;
+				maxScore += tmp->length;
+                                break;
 			}
 			case '-' : {
 				TNote * tmp = new TNote();
@@ -202,7 +205,15 @@ bool CSongs::parseFile( CSong * tmp )
 				tmp->relative = true;
 			else
 				tmp->relative = false;
-		}
+		} else if(!strncmp("#COVER:",buff,7)) {
+ 			int len = strlen(buff);
+			char * cover = new char[len - 7];
+
+			if (buff[len-2] == '\r') len--;
+			buff[len-1]='\0'; // Replace the \n or \r with a \0
+			memcpy(cover,buff+7,len - 7);
+			tmp->cover = cover;
+                }
 	}
 	fclose(fp);
 	return true;
@@ -244,28 +255,33 @@ CSongs::CSongs()
 		char * txt = new char[strlen(dirEntry->d_name)+4+1];
 		sprintf(txt,"%s.txt",dirEntry->d_name);
 		tmp->filename = txt;
-		char * cover = new char[strlen(dirEntry->d_name)+4+1];
-		sprintf(cover,"%s.png",dirEntry->d_name);
-		tmp->cover = cover;
-
-		sprintf(buff,"%s/%s/%s","songs",dirEntry->d_name,cover);
-		SDL_RWops *rwop = SDL_RWFromFile(buff, "rb");
-		SDL_Surface * coverSurface = IMG_LoadPNG_RW(rwop);
-		if( coverSurface == NULL )
-			tmp->coverSurf = surface_nocover;
-		else {
-			tmp->coverSurf = coverSurface;
-			SDL_FreeRW(rwop);
-		}
 		if( !parseFile(tmp) ) {
 			delete[] path;
 			delete[] txt;
-			delete[] cover;
-			if( surface_nocover != tmp->coverSurf )
-				delete tmp->coverSurf;
 			delete tmp;
 		} else {
-			tmp->parseFile();
+			if(!tmp->cover) {
+                            char * cover = new char[strlen(dirEntry->d_name)+4+1];
+		            sprintf(cover,"%s.png",dirEntry->d_name);
+		            tmp->cover = cover;
+                        }
+
+		        sprintf(buff,"%s/%s/%s","songs",dirEntry->d_name,tmp->cover);
+		        SDL_RWops *rwop = SDL_RWFromFile(buff, "rb");
+		        SDL_Surface * coverSurface = NULL;
+                        if(strstr(tmp->cover, ".png"))
+                            coverSurface = IMG_LoadPNG_RW(rwop);
+		        else if(strstr(tmp->cover, ".jpg"))
+                            coverSurface = IMG_LoadJPG_RW(rwop);
+	                           
+                        if( coverSurface == NULL )
+			    tmp->coverSurf = surface_nocover;
+		        else {
+			    tmp->coverSurf = zoomSurface(coverSurface,(double) 256/coverSurface->w,(double) 256/coverSurface->h,1);
+			    SDL_FreeRW(rwop);
+		        }
+		        
+                        tmp->parseFile();
 			songs.push_back(tmp);
 		}
 	}

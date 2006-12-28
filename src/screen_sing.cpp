@@ -68,7 +68,8 @@ void CScreenSing::manageEvent( SDL_Event event )
 		CScreenManager::getSingletonPtr()->getAudio()->playMusic(buff);
 		start = SDL_GetTicks();
 		play = true;
-	}
+	        song->score[0].score = 0;
+        }
 }
 
 void CScreenSing::draw( void )
@@ -151,7 +152,21 @@ void CScreenSing::draw( void )
 		SDL_FreeSurface(timeSurf2);
 		TTF_CloseFont(font);
 		}
-		
+		//draw score		
+                {
+		char scoreStr[32];
+		font = TTF_OpenFont("fonts/arial.ttf", 40);
+
+		sprintf(scoreStr,"%04d",int(song->score[0].score/10)*10);
+		SDL_Surface * scoreSurf = TTF_RenderUTF8_Blended(font, scoreStr , black);
+		position.x=80;
+		position.y=50;
+		SDL_BlitSurface(scoreSurf, NULL,  sm->getSDLScreen(), &position);
+
+		SDL_FreeSurface(scoreSurf);
+		TTF_CloseFont(font);
+		}
+	
 		// draw the sang note
 		{
 		font = TTF_OpenFont("fonts/arial.ttf", 25);
@@ -265,7 +280,10 @@ void CScreenSing::draw( void )
 					pitchGraph.renderPitch(
 						(sm->getHeight() - record->getNoteFreq(noteSingFinal))/sm->getHeight(),
 						((double)current)/sm->getWidth());
-				} else {
+                                                if (record->getNoteFreq(noteSingFinal) == record->getNoteFreq(noteFinal)) {
+                                                    song->score[0].score += 10000 / song->maxScore;
+                                                }
+                                } else {
 					pitchGraph.renderPitch(
 						0.0,
 						((double)current)/sm->getWidth());
