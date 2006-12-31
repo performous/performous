@@ -44,7 +44,6 @@ CairoSVG::CairoSVG( const char * filename , unsigned int _width , unsigned int _
 #ifdef USE_LIBSVG_CAIRO
 	svg_cairo_render (scr, dc);
 	sdl_svg=CairoToSdl::BlitToSdl(surface);
-	cairo_destroy (dc);
 	svg_cairo_destroy (scr);
 #endif
 #ifdef USE_LIBRSVG
@@ -52,6 +51,7 @@ CairoSVG::CairoSVG( const char * filename , unsigned int _width , unsigned int _
 	sdl_svg=CairoToSdl::BlitToSdl(surface);
 	rsvg_handle_free (svgHandle);
 #endif
+	cairo_destroy (dc);
 }
 
 CairoSVG::CairoSVG( const char * data , size_t data_len ,unsigned int _width , unsigned int _height )
@@ -88,7 +88,6 @@ CairoSVG::CairoSVG( const char * data , size_t data_len ,unsigned int _width , u
 #ifdef USE_LIBSVG_CAIRO
 	svg_cairo_render (scr, dc);
 	sdl_svg=CairoToSdl::BlitToSdl(surface);
-	cairo_destroy (dc);
 	svg_cairo_destroy (scr);
 #endif
 #ifdef USE_LIBRSVG
@@ -96,6 +95,7 @@ CairoSVG::CairoSVG( const char * data , size_t data_len ,unsigned int _width , u
 	sdl_svg=CairoToSdl::BlitToSdl(surface);
 	rsvg_handle_free (svgHandle);
 #endif
+	cairo_destroy (dc);
 }
 
 CairoSVG::~CairoSVG( void )
