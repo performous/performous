@@ -100,7 +100,7 @@ void CScreenSing::draw( void )
 	}
 
 	// Draw the title
-	position.x=(sm->getWidth()-title->w)/2;
+	position.x=sm->getWidth()-title->w;
 	position.y=0;
 	SDL_BlitSurface(title, NULL,  sm->getSDLScreen(), &position);
 
@@ -110,12 +110,15 @@ void CScreenSing::draw( void )
 	note = record->getNoteId();
 
 	if(play) {
-		// Compute the time in the song
-		unsigned int time = SDL_GetTicks() - start;
+		// Get the time in the song
+                unsigned int time = sm->getAudio()->getPosition();
+		// Compute how far we're in the song
+		double songPercent = (double)time / (double)sm->getAudio()->getLength();
 		// Load usefull colors
 		SDL_Color black = {  0,  0,  0,0};
 		SDL_Color white = {255,255,255,0};
 		SDL_Color blue  = { 50, 50,255,0};
+
 		// Declare the font we use
 		TTF_Font *font;
 
@@ -130,7 +133,7 @@ void CScreenSing::draw( void )
 		}
 
 
-		// Compute and draw the timer
+		// Compute and draw the timer and the progressbar
 		{
 		char dateStr[32];
 		sprintf(dateStr,"TIME");
@@ -147,6 +150,13 @@ void CScreenSing::draw( void )
 		position.x=timeSurf1->w+25;
 		position.y=10;
 		SDL_BlitSurface(timeSurf2, NULL,  sm->getSDLScreen(), &position);
+
+		int posx = position.x + timeSurf2->w + 25;
+
+		// grey box
+		boxRGBA(sm->getSDLScreen(), posx, 10, posx + 100, 10+timeSurf2->h, 200, 200, 200, 255);
+		// black progressbar
+		boxRGBA(sm->getSDLScreen(), posx, 10, (int) (posx + 100 * songPercent), 10+timeSurf2->h, 0, 0, 0, 255);
 
 		SDL_FreeSurface(timeSurf1);
 		SDL_FreeSurface(timeSurf2);
