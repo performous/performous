@@ -18,7 +18,7 @@ CScreenSing::CScreenSing(char * name)
 	screen = CScreenManager::getSingletonPtr()->getSDLScreen();
 
 	SDL_Color black = {0, 0, 0,0};
-	TTF_Font *font = TTF_OpenFont("fonts/arial.ttf", 65);
+	TTF_Font *font = TTF_OpenFont("fonts/DejaVuSansCondensed.ttf", 65);
 	title = TTF_RenderUTF8_Blended(font, "Let\'s Sing !!!", black);
 	videoSurf = SDL_AllocSurface( screen->flags,
 			400 , 300 ,
@@ -137,7 +137,7 @@ void CScreenSing::draw( void )
 		{
 		char dateStr[32];
 		sprintf(dateStr,"TIME");
-		font = TTF_OpenFont("fonts/arial.ttf", 25);
+		font = TTF_OpenFont("fonts/DejaVuSansCondensed.ttf", 25);
 
 		SDL_Surface * timeSurf1 = TTF_RenderUTF8_Blended(font, dateStr , white);
 		boxRGBA( sm->getSDLScreen(),5 , 5 , 15+timeSurf1->w, 15+timeSurf1->h,0,0,0,255);
@@ -165,7 +165,7 @@ void CScreenSing::draw( void )
 		//draw score		
                 {
 		char scoreStr[32];
-		font = TTF_OpenFont("fonts/arial.ttf", 40);
+		font = TTF_OpenFont("fonts/DejaVuSansCondensed.ttf", 40);
 
 		sprintf(scoreStr,"%04d",int(song->score[0].score/10)*10);
 		SDL_Surface * scoreSurf = TTF_RenderUTF8_Blended(font, scoreStr , black);
@@ -179,7 +179,7 @@ void CScreenSing::draw( void )
 	
 		// draw the sang note
 		{
-		font = TTF_OpenFont("fonts/arial.ttf", 25);
+		font = TTF_OpenFont("fonts/DejaVuSansCondensed.ttf", 25);
 		SDL_Surface * noteSurf = TTF_RenderUTF8_Blended(font, record->getNoteStr(note) , black);
 		position.x=0;
 		position.y=sm->getHeight()-noteSurf->h;
@@ -189,7 +189,7 @@ void CScreenSing::draw( void )
 		}
 
 		// compute and draw the text
-		font = TTF_OpenFont("fonts/arial.ttf", 40);
+		font = TTF_OpenFont("fonts/DejaVuSansCondensed.ttf", 40);
 		unsigned int currentSentence = 0;
 		unsigned int i = 0;
 		unsigned int totalBpm = 0;

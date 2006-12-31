@@ -88,7 +88,7 @@ void CScreenSongs::draw( void )
 	SDL_BlitSurface(sm->getSong()->coverSurf,NULL,sm->getSDLScreen(), &position);
 	// Draw the "Order by" text
 	SDL_Color black = {0,0,0,0};
-	TTF_Font *font = TTF_OpenFont("fonts/arial.ttf", 25);
+	TTF_Font *font = TTF_OpenFont("fonts/DejaVuSansCondensed.ttf", 25);
 
 	SDL_Surface * artistSurf = TTF_RenderUTF8_Blended(font, sm->getSong()->artist , black);
 	position.x=(sm->getWidth()-artistSurf->w)/2;
