@@ -15,8 +15,10 @@ typedef struct _SScore {
 	char * length;
 } TScore ;
 
-#define TYPE_NOTE_SING  0
-#define TYPE_NOTE_SLEEP 1
+#define TYPE_NOTE_FREESTYLE 0
+#define TYPE_NOTE_NORMAL  1
+#define TYPE_NOTE_GOLDEN 2
+#define TYPE_NOTE_SLEEP 3
 
 typedef struct _SNote {
 	int type;

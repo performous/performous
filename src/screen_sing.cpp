@@ -291,7 +291,7 @@ void CScreenSing::draw( void )
 						(sm->getHeight() - record->getNoteFreq(noteSingFinal))/sm->getHeight(),
 						((double)current)/sm->getWidth());
                                                 if (record->getNoteFreq(noteSingFinal) == record->getNoteFreq(noteFinal)) {
-                                                    song->score[0].score += 10000 / song->maxScore;
+                                                    song->score[0].score += (10000 / song->maxScore) * sentence[i]->type;
                                                 }
                                 } else {
 					pitchGraph.renderPitch(

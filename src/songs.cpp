@@ -64,15 +64,22 @@ void CSong::parseFile( void )
 				continue;
 			case 'E' :
 				break;
-			case ':' :
+			case 'F' :
+                        case ':' :
 			case '*' : {
 				TNote * tmp = new TNote();
 				int shift;
 				int len = strlen(buff);
 				char * syllable = new char[16];
 
-				tmp->type = TYPE_NOTE_SING;
-				if (buff[len-2] == '\r') len--;
+                                if (buff[0] == 'F')
+                                    tmp->type = TYPE_NOTE_FREESTYLE;
+                                if (buff[0] == '*')
+                                    tmp->type = TYPE_NOTE_GOLDEN;
+                                if (buff[0] == ':')
+                                    tmp->type = TYPE_NOTE_NORMAL;
+			        
+                                if (buff[len-2] == '\r') len--;
 				buff[len-1] = '\0'; // Replace the \n or \r with a \0
 				sscanf(buff+1,"%d %d %d%n",&tmp->timestamp, &tmp->length , &tmp->note , &shift);
 				tmp->timestamp += relativeShift;
@@ -83,7 +90,7 @@ void CSong::parseFile( void )
 				if( tmp->note >= noteMax )
 					noteMax = tmp->note;
 				notes.push_back(tmp);
-				maxScore += tmp->length;
+				maxScore += tmp->length * tmp->type;
                                 break;
 			}
 			case '-' : {
