@@ -1,6 +1,9 @@
-- Use a cross platform input sound library (portAudio ?)
-- Take car of the \r \n at the end of line
 - Do note preload all the songs at screen_song
+- Add multi-line lyrics support
+- Add "To start" cursor before sentence beginning in more than 'n' beat
+- Draw "to be sung" notes with cairo instead of SDLRectangle
+  This should enable "sing" notes strech in a themed rectangle
+- Use a cross platform input sound library (portAudio ?)
 
 GENERAL:
 - Enhance/Add screens (sing, configuration, composer, etc)
