@@ -122,7 +122,8 @@ CSong::CSong()
 	cover = NULL;
 	mp3 = NULL;
 	background = NULL;
-	video = NULL;
+	backgroundSurf = NULL;
+        video = NULL;
 	noteMin = 256;
 	noteMax = -256;
 	relative = false;
@@ -201,7 +202,15 @@ bool CSongs::parseFile( CSong * tmp )
 			buff[len-1]='\0'; // Replace the \n or \r with a \0
 			memcpy(video,buff+7,len - 7);
 			tmp->video = video;
-		} else if(!strncmp("#VIDEOGAP:",buff,10)) {
+                } else if(!strncmp("#BACKGROUND:",buff,12)) {
+                        int len = strlen(buff);
+                        char * background = new char[len - 12];
+
+                        if (buff[len-2] == '\r') len--;
+                        buff[len-1]='\0'; // Replace the \n or \r with a \0
+                        memcpy(background,buff+12,len - 12);
+                        tmp->background = background;
+                } else if(!strncmp("#VIDEOGAP:",buff,10)) {
 			sscanf(buff+10,"%f",&tmp->videoGap);
 			tmp->videoGap*=1000;
 			tmp->videoGap+=600;
@@ -286,6 +295,24 @@ CSongs::CSongs()
 			    SDL_FreeRW(rwop);
 		        }
 		        
+                        sprintf(buff,"%s/%s/%s","songs",dirEntry->d_name,tmp->background);
+                        rwop = SDL_RWFromFile(buff, "rb");
+                        
+                        if (tmp->background) {
+                            SDL_Surface * backgroundSurface = NULL;
+                            if(strstr(tmp->background, ".png"))
+                                backgroundSurface = IMG_LoadPNG_RW(rwop);
+                            else if(strstr(tmp->background, ".jpg"))
+                                backgroundSurface = IMG_LoadJPG_RW(rwop);
+                                                 
+                            if( backgroundSurface == NULL )
+                                tmp->backgroundSurf = NULL;
+                            else {
+                                tmp->backgroundSurf = zoomSurface(backgroundSurface,(double)800/backgroundSurface->w,(double)600/backgroundSurface->h,1);
+                                SDL_FreeRW(rwop);
+                            }
+                        }
+                        
                         tmp->parseFile();
 			songs.push_back(tmp);
 		}
@@ -311,7 +338,9 @@ CSongs::~CSongs()
 		}
 		if( surface_nocover != songs[i]->coverSurf )
 			SDL_FreeSurface(songs[i]->coverSurf);
-		delete songs[i];
+		if( songs[i]->backgroundSurf )
+                        SDL_FreeSurface(songs[i]->backgroundSurf);
+                delete songs[i];
 	}
 	delete surface_nocover;
 

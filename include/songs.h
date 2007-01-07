@@ -47,7 +47,8 @@ class CSong {
 	SDL_Surface * coverSurf;
 	char * mp3;
 	char * background;
-	char * video;
+         SDL_Surface * backgroundSurf;	
+        char * video;
 	float videoGap;
 	int noteGap;
 	float start;

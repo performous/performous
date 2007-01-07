@@ -21,7 +21,7 @@ CScreenSing::CScreenSing(char * name)
 	TTF_Font *font = TTF_OpenFont("fonts/DejaVuSansCondensed.ttf", 65);
 	title = TTF_RenderUTF8_Blended(font, "Let\'s Sing !!!", black);
 	videoSurf = SDL_AllocSurface( screen->flags,
-			400 , 300 ,
+			800 , 600 ,
 			screen->format->BitsPerPixel,
 			screen->format->Rmask,
 			screen->format->Gmask,
@@ -42,7 +42,8 @@ CScreenSing::~CScreenSing()
 
 void CScreenSing::manageEvent( SDL_Event event )
 {
-	int keypressed;
+	CScreenManager * sm = CScreenManager::getSingletonPtr();
+        int keypressed;
 	switch(event.type) {
 		case SDL_KEYDOWN:
 			keypressed = event.key.keysym.sym;
@@ -63,7 +64,12 @@ void CScreenSing::manageEvent( SDL_Event event )
 			SMPEG_enableaudio(mpeg, 0);
 			SMPEG_setvolume(mpeg, 0);
 			SMPEG_scaleXY(mpeg, 400 , 300 );
-		}
+               } else if (song->backgroundSurf != NULL ) {
+                        SDL_Rect position;
+                        position.x = 0;
+                        position.y = 0;
+                        SDL_BlitSurface(song->backgroundSurf,NULL,sm->getSDLScreen(), &position);
+               }
 
 		sprintf(buff,"%s/%s",song->path,song->mp3);
 		fprintf(stdout,"Now playing : (%d) : %s\n",CScreenManager::getSingletonPtr()->getSongId(),buff);
@@ -102,8 +108,14 @@ void CScreenSing::draw( void )
 	}
 
 	// Draw the background 
-        SDL_BlitSurface(theme->bg->getSDLSurface(),NULL,sm->getSDLScreen(),NULL);
         theme->theme->clear();
+        if (song->backgroundSurf) {
+            SDL_Rect position;
+            position.x = 0;
+            position.y = 0;
+            SDL_BlitSurface(song->backgroundSurf,NULL,sm->getSDLScreen(), &position);
+        }
+
 
 	//record->compute();
 	freq = record->getFreq();
@@ -127,12 +139,13 @@ void CScreenSing::draw( void )
 		if( mpeg != NULL ){
 			if( SMPEG_status(mpeg) != SMPEG_PLAYING && time > song->videoGap )
 				SMPEG_play(mpeg);
-			position.x=200;
-			position.y=150;
+			position.x=0;
+			position.y=0;
 			SDL_BlitSurface(videoSurf, NULL,  sm->getSDLScreen(), &position);
-		}
+                }
 
-
+                SDL_BlitSurface(theme->bg->getSDLSurface(),NULL,sm->getSDLScreen(),NULL);
+ 
 		// Compute and draw the timer and the progressbar
 		{
 		char dateStr[32];
@@ -341,7 +354,7 @@ void CScreenSing::draw( void )
 
 
 		TTF_CloseFont(font);
-
+                
                 SDL_Surface *themeSurf = CairoToSdl::BlitToSdl(theme->theme->getCurrent());
                 SDL_BlitSurface(themeSurf, NULL,sm->getSDLScreen(),NULL);
                 SDL_FreeSurface(themeSurf);
