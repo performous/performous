@@ -8,6 +8,7 @@ Dependencies:
 	- FFTW
 	- libalsa
 	- xine
+	- libxml2
 
 Place the songs into songs/directory and put directory.txt into it (with
 #MP3 and others set)
