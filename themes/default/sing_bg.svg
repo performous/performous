@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.0"
+   width="800"
+   height="600"
+   id="svg3465">
+  <defs
+     id="defs3467" />
+  <g
+     style="display:inline"
+     id="layer7">
+    <g
+       transform="translate(-70.29598,-55.89189)"
+       style="opacity:1;display:inline"
+       id="layer1">
+      <g
+         id="g12180">
+        <rect
+           width="70.617508"
+           height="19.192251"
+           x="87.577827"
+           y="71.324577"
+           style="opacity:1;fill:black;fill-opacity:1;stroke:black;stroke-width:11.16368675;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           id="rect2923" />
+        <text
+           x="89.800629"
+           y="90.942192"
+           style="font-size:28px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:white;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Arial"
+           id="text4711"
+           xml:space="preserve"><tspan
+             x="89.800629"
+             y="90.942192"
+             id="tspan4713">TIME</tspan></text>
+      </g>
+      <g
+         id="g4723">
+        <path
+           d=""
+           style="font-size:25px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;opacity:0.09090899;fill:black;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;font-family:Arial Black"
+           id="text4775" />
+      </g>
+      <g
+         id="g4781">
+        <path
+           d=""
+           style="font-size:25px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;opacity:0.09090899;fill:black;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;font-family:Arial Black"
+           id="text4833" />
+      </g>
+    </g>
+    <rect
+       width="274.87445"
+       height="15.595572"
+       x="189.16682"
+       y="17.231014"
+       style="opacity:1;fill:#c8c8c8;fill-opacity:1;stroke:black;stroke-width:1.44169283;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
+       id="rect4719" />
+  </g>
+</svg>

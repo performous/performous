@@ -4,7 +4,7 @@
 #include <screen.h>
 #include <smpeg/smpeg.h>
 #include <pitch_graph.h>
-
+#include <theme.h>
 class CScreenSing : public CScreen {
 	public:
 	CScreenSing( char * name );
@@ -23,6 +23,7 @@ class CScreenSing : public CScreen {
 	unsigned int start;
 	SMPEG *mpeg;
 	SMPEG_Info info;
+        CThemeSing *theme;
 };
 
 #endif

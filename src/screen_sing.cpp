@@ -30,12 +30,14 @@ CScreenSing::CScreenSing(char * name)
 	SDL_FillRect(videoSurf,NULL,0xffffff);
 	
 	TTF_CloseFont(font);
+        theme = new CThemeSing();
 }
 
 CScreenSing::~CScreenSing()
 {
 	SDL_FreeSurface(title);
 	SDL_FreeSurface(videoSurf);
+        delete theme;
 }
 
 void CScreenSing::manageEvent( SDL_Event event )
@@ -78,7 +80,7 @@ void CScreenSing::draw( void )
 	CRecord * record    = sm->getRecord();
 	CSong   * song      = sm->getSong();
 	SDL_Rect position;
-	float freq;
+        float freq;
 	int note;
 
 	if( play && !sm->getAudio()->isPlaying() ) {
@@ -99,11 +101,9 @@ void CScreenSing::draw( void )
 		CScreenManager::getSingletonPtr()->activateScreen("Songs");
 	}
 
-	// Draw the title
-	position.x=sm->getWidth()-title->w;
-	position.y=0;
-	SDL_BlitSurface(title, NULL,  sm->getSDLScreen(), &position);
-
+	// Draw the background 
+        SDL_BlitSurface(theme->bg->getSDLSurface(),NULL,sm->getSDLScreen(),NULL);
+        theme->theme->clear();
 
 	//record->compute();
 	freq = record->getFreq();
@@ -136,45 +136,19 @@ void CScreenSing::draw( void )
 		// Compute and draw the timer and the progressbar
 		{
 		char dateStr[32];
-		sprintf(dateStr,"TIME");
-		font = TTF_OpenFont("fonts/DejaVuSansCondensed.ttf", 25);
-
-		SDL_Surface * timeSurf1 = TTF_RenderUTF8_Blended(font, dateStr , white);
-		boxRGBA( sm->getSDLScreen(),5 , 5 , 15+timeSurf1->w, 15+timeSurf1->h,0,0,0,255);
-		position.x=10;
-		position.y=10;
-		SDL_BlitSurface(timeSurf1, NULL,  sm->getSDLScreen(), &position);
-
 		sprintf(dateStr,"%.2u:%.2u",(time/1000)/60,(time/1000)%60);
-		SDL_Surface * timeSurf2 = TTF_RenderUTF8_Blended(font, dateStr , black);
-		position.x=timeSurf1->w+25;
-		position.y=10;
-		SDL_BlitSurface(timeSurf2, NULL,  sm->getSDLScreen(), &position);
-
-		int posx = position.x + timeSurf2->w + 25;
-
-		// grey box
-		boxRGBA(sm->getSDLScreen(), posx, 10, posx + 100, 10+timeSurf2->h, 200, 200, 200, 255);
-		// black progressbar
-		boxRGBA(sm->getSDLScreen(), posx, 10, (int) (posx + 100 * songPercent), 10+timeSurf2->h, 0, 0, 0, 255);
-
-		SDL_FreeSurface(timeSurf1);
-		SDL_FreeSurface(timeSurf2);
-		TTF_CloseFont(font);
-		}
+                theme->timertxt.text = dateStr;
+                theme->theme->PrintText(theme->timertxt);
+                theme->progressfg.width = theme->progressfg.final_width * songPercent;
+                theme->theme->DrawRect(theme->progressfg); 
+	        }
 		//draw score		
                 {
 		char scoreStr[32];
-		font = TTF_OpenFont("fonts/DejaVuSansCondensed.ttf", 40);
-
-		sprintf(scoreStr,"%04d",int(song->score[0].score/10)*10);
-		SDL_Surface * scoreSurf = TTF_RenderUTF8_Blended(font, scoreStr , black);
-		position.x=80;
-		position.y=50;
-		SDL_BlitSurface(scoreSurf, NULL,  sm->getSDLScreen(), &position);
-
-		SDL_FreeSurface(scoreSurf);
-		TTF_CloseFont(font);
+                SDL_BlitSurface(theme->p1box->getSDLSurface(),NULL,sm->getSDLScreen(),NULL);
+                sprintf(scoreStr,"%04d",int(song->score[0].score/10)*10);
+                theme->p1score.text = scoreStr;
+                theme->theme->PrintText(theme->p1score);
 		}
 	
 		// draw the sang note
@@ -190,7 +164,7 @@ void CScreenSing::draw( void )
 
 		// compute and draw the text
 		font = TTF_OpenFont("fonts/DejaVuSansCondensed.ttf", 40);
-		unsigned int currentSentence = 0;
+	        unsigned int currentSentence = 0;
 		unsigned int i = 0;
 		unsigned int totalBpm = 0;
 
@@ -368,6 +342,9 @@ void CScreenSing::draw( void )
 
 		TTF_CloseFont(font);
 
-
+                SDL_Surface *themeSurf = CairoToSdl::BlitToSdl(theme->theme->getCurrent());
+                SDL_BlitSurface(themeSurf, NULL,sm->getSDLScreen(),NULL);
+                SDL_FreeSurface(themeSurf);
 	}
+ 
 }

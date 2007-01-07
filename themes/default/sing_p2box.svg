@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.0"
+   width="800"
+   height="600"
+   id="svg3465">
+  <defs
+     id="defs3467" />
+  <g
+     id="layer18">
+    <g
+       transform="translate(699.9968,0)"
+       style="opacity:1;display:inline"
+       id="g15073">
+      <path
+         d="M 19.910288,85.57917 C 17.731566,85.57517 15.615482,86.41345 14.074888,87.95404 C 12.534295,89.49465 11.696015,91.61071 11.700018,93.78945 L 11.700018,137.41923 C 11.710437,141.94383 15.385682,145.60389 19.910288,145.59558 L 53.77787,145.59558 C 83.98066,145.59558 85.93173,163 85.93173,163 L 85.93173,149.59893 L 85.93173,145.52773 L 85.93173,137.41923 L 85.93173,133.3141 L 85.93173,93.78945 C 85.94004,89.26484 82.27997,85.58959 77.75538,85.57917 L 19.910288,85.57917 z "
+         style="fill:#ff1e1e;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:15.09577942;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1"
+         id="path15077" />
+      <text
+         x="23.083454"
+         y="129.71555"
+         style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:white;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Arial Black"
+         id="text15079"
+         xml:space="preserve"><tspan
+           x="23.083454"
+           y="129.71555"
+           id="tspan15081">P2</tspan></text>
+    </g>
+  </g>
+</svg>
