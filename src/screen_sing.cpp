@@ -57,13 +57,19 @@ void CScreenSing::manageEvent( SDL_Event event )
 		
 		if( song->video != NULL ) {
 			sprintf(buff,"%s/%s",song->path,song->video);
-			fprintf(stdout,"Now playing : (%d) : %s\n",CScreenManager::getSingletonPtr()->getSongId(),buff);
+			fprintf(stdout,"Now playing: (%d) : %s\n",CScreenManager::getSingletonPtr()->getSongId(),buff);
 			mpeg = SMPEG_new(buff, &info, 0);
-			SMPEG_setdisplay(mpeg, videoSurf, NULL, NULL);
-			SMPEG_enablevideo(mpeg, 1);
-			SMPEG_enableaudio(mpeg, 0);
-			SMPEG_setvolume(mpeg, 0);
-			SMPEG_scaleXY(mpeg, 400 , 300 );
+			if( SMPEG_error( mpeg ) ) {
+				fprintf( stderr, "SMPEG error: %s\n", SMPEG_error( mpeg ) );
+				SMPEG_delete( mpeg );
+				mpeg = NULL;
+			} else {
+				SMPEG_setdisplay(mpeg, videoSurf, NULL, NULL);
+				SMPEG_enablevideo(mpeg, 1);
+				SMPEG_enableaudio(mpeg, 0);
+				SMPEG_setvolume(mpeg, 0);
+				SMPEG_scaleXY(mpeg, 400 , 300 );
+			}
                } else if (song->backgroundSurf != NULL ) {
                         SDL_Rect position;
                         position.x = 0;
