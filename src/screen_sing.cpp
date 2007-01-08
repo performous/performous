@@ -68,7 +68,7 @@ void CScreenSing::manageEvent( SDL_Event event )
 				SMPEG_enablevideo(mpeg, 1);
 				SMPEG_enableaudio(mpeg, 0);
 				SMPEG_setvolume(mpeg, 0);
-				SMPEG_scaleXY(mpeg, 400 , 300 );
+				SMPEG_scaleXY(mpeg, 800 , 600 );
 			}
                } else if (song->backgroundSurf != NULL ) {
                         SDL_Rect position;
