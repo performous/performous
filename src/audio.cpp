@@ -1,6 +1,8 @@
 #include <audio.h>
 #include <xine.h>
 
+#define XINE_LENGTH_ERROR -1
+
 CAudio::CAudio()
 {
 	xine = xine_new();
@@ -40,14 +42,25 @@ void CAudio::playMusic( char * filename )
             printf("could not open %s\n", filename);
         }
 
-	xine_get_pos_length(stream, &pos_stream, &pos_time, &length);
+	if( !xine_get_pos_length(stream, &pos_stream, &pos_time, &length) )
+		length = XINE_LENGTH_ERROR;
 
         xine_playing = 1;
 }
 
 int CAudio::getLength( void )
 {
-  return length;
+	if( length == XINE_LENGTH_ERROR ) {
+        	int pos_stream;
+		int pos_time;
+		if( !xine_get_pos_length(stream, &pos_stream, &pos_time, &length) )
+			length = XINE_LENGTH_ERROR;
+	}
+
+	if( length == XINE_LENGTH_ERROR )
+		return 0;
+	else
+		return length;
 }
 
 bool CAudio::isPlaying( void )
