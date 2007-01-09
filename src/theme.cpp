@@ -16,23 +16,25 @@ void CTheme::clear() {
         surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
         dc = cairo_create(surface);
 }
-cairo_surface_t *CTheme::PrintText(TThemeTxt text) {
+cairo_surface_t *CTheme::PrintText(TThemeTxt *text) {
         cairo_select_font_face(dc, "Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-        cairo_set_font_size(dc, text.fontsize);
-        cairo_move_to(dc, text.x, text.y);
-        cairo_text_path(dc, text.text);
-       if (text.fill_col.r != -1 && text.fill_col.g != -1 && text.fill_col.b != -1) {
-            cairo_set_source_rgba(dc, text.fill_col.r, text.fill_col.g, text.fill_col.b, text.fill_col.a);
-            if (text.stroke_col.r != -1 && text.stroke_col.g != -1 && text.stroke_col.b != -1)
+        cairo_set_font_size(dc, (*text).fontsize);
+        cairo_move_to(dc, (*text).x, (*text).y);
+        cairo_text_extents(dc, (*text).text, &(*text).extents);
+        cairo_move_to(dc, (*text).x - ((*text).extents.width - (*text).extents.width/(*text).scale)/2, (*text).y - ((*text).extents.height - (*text).extents.height/(*text).scale)/2);
+        cairo_set_font_size(dc, (*text).fontsize * (*text).scale);
+        cairo_text_path(dc, (*text).text);
+        if ((*text).fill_col.r != -1 && (*text).fill_col.g != -1 && (*text).fill_col.b != -1) {
+            cairo_set_source_rgba(dc, (*text).fill_col.r, (*text).fill_col.g, (*text).fill_col.b, (*text).fill_col.a);
+            if ((*text).stroke_col.r != -1 && (*text).stroke_col.g != -1 && (*text).stroke_col.b != -1)
                 cairo_fill_preserve(dc);
             else
                 cairo_fill(dc);
         }
-        if (text.stroke_col.r != -1 && text.stroke_col.g != -1 && text.stroke_col.b != -1) {
-            cairo_set_source_rgba(dc, text.stroke_col.r, text.stroke_col.b, text.stroke_col.g, text.stroke_col.a);
-            cairo_set_source_rgba(dc, 1, text.stroke_col.b, text.stroke_col.g, text.stroke_col.a);
+        if ((*text).stroke_col.r != -1 && (*text).stroke_col.g != -1 && (*text).stroke_col.b != -1) {
+            cairo_set_source_rgba(dc, (*text).stroke_col.r, (*text).stroke_col.b, (*text).stroke_col.g, (*text).stroke_col.a);
             cairo_stroke(dc);
-        } 
+        }
        return surface;
 }
 cairo_surface_t *CTheme::DrawRect(TThemeRect rect) {
@@ -47,6 +49,13 @@ cairo_surface_t *CTheme::DrawRect(TThemeRect rect) {
         }
         return surface;
 }
+cairo_text_extents_t CTheme::GetTextExtents(TThemeTxt text) {
+        cairo_text_extents_t extents;
+        cairo_set_font_size(dc, text.fontsize);
+        cairo_move_to(dc, text.x, text.y);
+        cairo_text_extents(dc, text.text, &extents);
+        return extents;
+}
 void CTheme::ParseSVGForText(char *filename, TThemeTxt *text) {
         xmlDoc *doc = NULL;
         xmlNode *root_element = NULL;
@@ -55,6 +64,7 @@ void CTheme::ParseSVGForText(char *filename, TThemeTxt *text) {
         walk_tree(root_element, text);
         xmlFreeDoc(doc);
         xmlCleanupParser();
+        (*text).scale = 1.0;
 }
 void CTheme::ParseSVGForRect(char *filename, TThemeRect *rect) {
         xmlDoc *doc = NULL;
@@ -225,6 +235,10 @@ CThemeSing::CThemeSing() {
         theme = new CTheme(800, 600);
         theme->ParseSVGForText("themes/default/sing_timetxt.svg", &timertxt);
         theme->ParseSVGForText("themes/default/sing_p1score.svg", &p1score);
+        theme->ParseSVGForText("themes/default/sing_lyricscurrent.svg", &lyricspast);
+        theme->ParseSVGForText("themes/default/sing_lyricscurrent.svg", &lyricsfuture);
+        theme->ParseSVGForText("themes/default/sing_lyricshighlight.svg", &lyricshighlight);
+        theme->ParseSVGForText("themes/default/sing_lyricsnext.svg", &lyricsnextsentence);
         theme->ParseSVGForRect("themes/default/sing_progressfg.svg", &progressfg);
 }
 CThemeSing::~CThemeSing() {

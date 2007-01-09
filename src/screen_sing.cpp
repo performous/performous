@@ -149,7 +149,7 @@ void CScreenSing::draw( void )
 			position.y=0;
 			SDL_BlitSurface(videoSurf, NULL,  sm->getSDLScreen(), &position);
                 }
-
+                
                 SDL_BlitSurface(theme->bg->getSDLSurface(),NULL,sm->getSDLScreen(),NULL);
  
 		// Compute and draw the timer and the progressbar
@@ -157,7 +157,7 @@ void CScreenSing::draw( void )
 		char dateStr[32];
 		sprintf(dateStr,"%.2u:%.2u",(time/1000)/60,(time/1000)%60);
                 theme->timertxt.text = dateStr;
-                theme->theme->PrintText(theme->timertxt);
+                theme->theme->PrintText(&theme->timertxt);
                 theme->progressfg.width = theme->progressfg.final_width * songPercent;
                 theme->theme->DrawRect(theme->progressfg); 
 	        }
@@ -167,7 +167,7 @@ void CScreenSing::draw( void )
                 SDL_BlitSurface(theme->p1box->getSDLSurface(),NULL,sm->getSDLScreen(),NULL);
                 sprintf(scoreStr,"%04d",int(song->score[0].score/10)*10);
                 theme->p1score.text = scoreStr;
-                theme->theme->PrintText(theme->p1score);
+                theme->theme->PrintText(&theme->p1score);
 		}
 	
 		// draw the sang note
@@ -220,7 +220,8 @@ void CScreenSing::draw( void )
 		char sentencePast[128]   ; sentencePast[0]   = '\0';
 		char sentenceNow[128]    ; sentenceNow[0]    = '\0';
 		char sentenceFuture[128] ; sentenceFuture[0] = '\0';
-
+                char sentenceWhole[128]; sentenceWhole[0] = '\0';
+                char sentenceNextSentence[128] ; sentenceNextSentence[0] = '\0';
 		totalBpm = sentence[sentence.size()-1]->length + sentence[sentence.size()-1]->timestamp - sentence[0]->timestamp;
 		
 		float bpmPixelUnit = (sm->getWidth() - 100. - 100.)/(totalBpm*1.0);
@@ -294,24 +295,23 @@ void CScreenSing::draw( void )
 				if( time < ( (sentence[i]->timestamp+sentence[i]->length)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap )
 					pos=i;
 			}
+                        strcat(sentenceWhole, sentence[i]->syllable);
 		}
 
-		SDL_Surface * sentencePastSurf = NULL;
-		SDL_Surface * sentenceFutureSurf = NULL;
-		SDL_Surface * sentenceNowSurf = NULL;
-		SDL_Surface * sentenceNowSurf2 = NULL;
-		int sentencePastWidth = 0;
-		int sentenceNowWidth = 0;
-		int sentenceFutureWidth = 0;
-		int sentenceWidth = 0;
-		
-		if( sentencePast[0] ) {
-			sentencePastSurf = TTF_RenderUTF8_Blended(font, sentencePast , blue);
-			sentencePastWidth = sentencePastSurf->w;
+                TThemeTxt tmp;
+                tmp = theme->lyricspast;
+                tmp.text = sentenceWhole;
+                cairo_text_extents_t extents = theme->theme->GetTextExtents(tmp);
+                theme->lyricspast.x = (sm->getWidth() - extents.width)/2;
+                theme->lyricspast.extents.x_advance = 0;
+                theme->lyricshighlight.extents.x_advance= 0;
+                
+                if( sentencePast[0] ) {
+                        theme->lyricspast.text = sentencePast;
+                        theme->theme->PrintText(&theme->lyricspast);
 		}
 		
 		if( sentenceNow[0] && pos != -1) {
-			sentenceNowSurf = TTF_RenderUTF8_Blended(font, sentenceNow , blue);
 			unsigned int length = sentence[pos]->length;
 			unsigned int timestamp = sentence[pos]->timestamp;
 			float length_ms = length * 60 * 1000 / ( song->bpm[0].bpm * 4 );
@@ -319,38 +319,18 @@ void CScreenSing::draw( void )
 			float started_ms = time - timestamp_ms;
 			float factor = 1.2 - 0.2*started_ms/length_ms;
 
-			sentenceNowSurf2 = zoomSurface (sentenceNowSurf, factor, factor, SMOOTHING_ON);
-			sentenceNowWidth += sentenceNowSurf->w;
-			SDL_FreeSurface(sentenceNowSurf);
-		}
+	                theme->lyricshighlight.x = theme->lyricspast.x + theme->lyricspast.extents.x_advance;
+                        theme->lyricshighlight.text = sentenceNow;
+                        theme->lyricshighlight.scale = factor;
+                        theme->theme->PrintText(&theme->lyricshighlight);
+ 	        }
 		
 		if( sentenceFuture[0] ) {
-			sentenceFutureSurf = TTF_RenderUTF8_Blended(font, sentenceFuture , black);
-			sentenceFutureWidth = sentenceFutureSurf->w;
+	                theme->lyricsfuture.text = sentenceFuture;
+                        theme->lyricsfuture.x = theme->lyricspast.x + theme->lyricspast.extents.x_advance + theme->lyricshighlight.extents.x_advance;
+                        theme->theme->PrintText(&theme->lyricsfuture);
 		}
 
-		sentenceWidth = sentencePastWidth + sentenceNowWidth + sentenceFutureWidth;
-
-		if( sentencePastSurf ) {
-			position.x=(sm->getWidth()-sentenceWidth)/2;
-			position.y=sm->getHeight()-sentencePastSurf->h;
-			SDL_BlitSurface(sentencePastSurf, NULL,  sm->getSDLScreen(), &position);
-			SDL_FreeSurface(sentencePastSurf);
-		}
-		
-		if( sentenceNowSurf ) {
-			position.x=(sm->getWidth()-sentenceWidth)/2+sentencePastWidth-(sentenceNowSurf2->w-sentenceNowWidth)/2;
-			position.y=sm->getHeight()-sentenceNowSurf2->h;
-			SDL_BlitSurface(sentenceNowSurf2, NULL,  sm->getSDLScreen(), &position);
-			SDL_FreeSurface(sentenceNowSurf2);
-		}
-		
-		if( sentenceFutureSurf ) {
-			position.x=(sm->getWidth()-sentenceWidth)/2+sentencePastWidth+sentenceNowWidth;
-			position.y=sm->getHeight()-sentenceFutureSurf->h;
-			SDL_BlitSurface(sentenceFutureSurf, NULL,  sm->getSDLScreen(), &position);
-			SDL_FreeSurface(sentenceFutureSurf);
-		}
 		
 		SDL_Surface* pitchGraphSurf = CairoToSdl::BlitToSdl(pitchGraph.getCurrent());
 		position.x = 100;

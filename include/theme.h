@@ -10,9 +10,11 @@ typedef struct _SRGBA {
 typedef struct _SThemeTxt {
         double x;
         double y;
+        cairo_text_extents_t extents;
         TRGBA fill_col;
         TRGBA stroke_col;
         double fontsize;
+        double scale;
         char *text;
 
 } TThemeTxt;
@@ -30,8 +32,9 @@ class CTheme {
         public:
         CTheme(int width, int height);
         ~CTheme();
-        cairo_surface_t *PrintText(TThemeTxt text); 
+        cairo_surface_t *PrintText(TThemeTxt *text); 
         cairo_surface_t *DrawRect(TThemeRect rect);
+        cairo_text_extents_t GetTextExtents(TThemeTxt text);
         cairo_surface_t* getCurrent() {return this->surface;}
         void ParseSVGForText(char *filename, TThemeTxt *text);
         void ParseSVGForRect(char *filename, TThemeRect *rect);
@@ -54,6 +57,10 @@ class CThemeSing {
         CairoSVG *p1box;
         TThemeTxt timertxt; 
         TThemeTxt p1score;
+        TThemeTxt lyricspast;
+        TThemeTxt lyricsfuture;  
+        TThemeTxt lyricshighlight;
+        TThemeTxt lyricsnextsentence;
         TThemeRect progressfg;
         CTheme *theme;
         private:
