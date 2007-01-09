@@ -12,7 +12,6 @@ class CScreenSing : public CScreen {
 	void manageEvent( SDL_Event event );
 	void draw(void);
 	private:
-	SDL_Surface * title;
 	SDL_Surface * videoSurf;
 	// Keeps the pitch tracking graphics
 	// in separate surface

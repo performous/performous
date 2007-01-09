@@ -1,10 +1,13 @@
 #include <screen_sing.h>
-#include <SDL/SDL_ttf.h>
-#include <SDL/SDL_gfxPrimitives.h>
-#include <SDL/SDL_rotozoom.h>
 #include <songs.h>
 #include <pitch_graph.h>
 #include <cairotosdl.h>
+
+// TODO: removed these includes
+// Just needed for the sung note (A A# ...)
+#include <SDL/SDL_ttf.h>
+// Just needed for the "to be sung" note (blue/grey box)
+#include <SDL/SDL_gfxPrimitives.h>
 
 CScreenSing::CScreenSing(char * name)
 : pitchGraph(800, 600)
@@ -17,9 +20,6 @@ CScreenSing::CScreenSing(char * name)
 
 	screen = CScreenManager::getSingletonPtr()->getSDLScreen();
 
-	SDL_Color black = {0, 0, 0,0};
-	TTF_Font *font = TTF_OpenFont("fonts/DejaVuSansCondensed.ttf", 65);
-	title = TTF_RenderUTF8_Blended(font, "Let\'s Sing !!!", black);
 	videoSurf = SDL_AllocSurface( screen->flags,
 			800 , 600 ,
 			screen->format->BitsPerPixel,
@@ -28,14 +28,11 @@ CScreenSing::CScreenSing(char * name)
 			screen->format->Bmask,
 			screen->format->Amask);
 	SDL_FillRect(videoSurf,NULL,0xffffff);
-	
-	TTF_CloseFont(font);
         theme = new CThemeSing();
 }
 
 CScreenSing::~CScreenSing()
 {
-	SDL_FreeSurface(title);
 	SDL_FreeSurface(videoSurf);
         delete theme;
 }
@@ -132,15 +129,7 @@ void CScreenSing::draw( void )
                 unsigned int time = sm->getAudio()->getPosition();
 		// Compute how far we're in the song
 		double songPercent = (double)time / (double)sm->getAudio()->getLength();
-		// Load usefull colors
-		SDL_Color black = {  0,  0,  0,0};
-		SDL_Color white = {255,255,255,0};
-		SDL_Color blue  = { 50, 50,255,0};
 
-		// Declare the font we use
-		TTF_Font *font;
-
-		
 		// Draw the video
 		if( mpeg != NULL ){
 			if( SMPEG_status(mpeg) != SMPEG_PLAYING && time > song->videoGap )
@@ -172,7 +161,8 @@ void CScreenSing::draw( void )
 	
 		// draw the sang note
 		{
-		font = TTF_OpenFont("fonts/DejaVuSansCondensed.ttf", 25);
+		SDL_Color black = {  0,  0,  0,0};
+		TTF_Font *font = TTF_OpenFont("fonts/DejaVuSansCondensed.ttf", 25);
 		SDL_Surface * noteSurf = TTF_RenderUTF8_Blended(font, record->getNoteStr(note) , black);
 		position.x=0;
 		position.y=sm->getHeight()-noteSurf->h;
@@ -182,7 +172,6 @@ void CScreenSing::draw( void )
 		}
 
 		// compute and draw the text
-		font = TTF_OpenFont("fonts/DejaVuSansCondensed.ttf", 40);
 	        unsigned int currentSentence = 0;
 		unsigned int i = 0;
 		unsigned int totalBpm = 0;
@@ -338,9 +327,6 @@ void CScreenSing::draw( void )
 		SDL_BlitSurface(pitchGraphSurf,	NULL, sm->getSDLScreen(), &position);
 		SDL_FreeSurface(pitchGraphSurf);
 
-
-		TTF_CloseFont(font);
-                
                 SDL_Surface *themeSurf = CairoToSdl::BlitToSdl(theme->theme->getCurrent());
                 SDL_BlitSurface(themeSurf, NULL,sm->getSDLScreen(),NULL);
                 SDL_FreeSurface(themeSurf);
