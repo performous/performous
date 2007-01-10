@@ -90,6 +90,24 @@ void CTheme::walk_tree(xmlNode * a_node, TThemeTxt *text)
                             sscanf((char *) xmlGetProp(cur_node, attr->name),"%lf",&(*text).x);
                         } else if (!strcasecmp((char *) attr->name, "y")) {
                             sscanf((char *) xmlGetProp(cur_node, attr->name),"%lf",&(*text).y);
+                        } else if (!strcasecmp((char *) attr->name, "transform")) {
+                            double x_trans, y_trans;
+                            char tmp_string[10], *p; 
+                            tmp_string[0] = '\0';
+                            string = (char *) xmlGetProp(cur_node, attr->name);
+                            if(!strncasecmp(string, "translate(", 10)) {
+                                string += 10;
+                                p = strchr(string, ',');
+                                strncat(tmp_string, string, p - string);
+                                sscanf(tmp_string, "%lf", &x_trans);
+                                string = p + 1;
+                                p = strchr(string, ')');
+                                tmp_string[0] = '\0';
+                                strncat(tmp_string, string, p - string);
+                                sscanf(tmp_string, "%lf", &y_trans);
+                                (*text).x += x_trans;
+                                (*text).y += y_trans;
+                            }
                         } else if (!strcasecmp((char *) attr->name, "style")) {
                            string = strtok((char *) xmlGetProp(cur_node, attr->name), ";");
                            while (string != NULL) {

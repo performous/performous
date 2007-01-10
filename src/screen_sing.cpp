@@ -60,7 +60,7 @@ void CScreenSing::manageEvent( SDL_Event event )
 				fprintf( stderr, "SMPEG error: %s\n", SMPEG_error( mpeg ) );
 				SMPEG_delete( mpeg );
 				mpeg = NULL;
-			} else {
+		} else {
 				SMPEG_setdisplay(mpeg, videoSurf, NULL, NULL);
 				SMPEG_enablevideo(mpeg, 1);
 				SMPEG_enableaudio(mpeg, 0);
@@ -77,9 +77,11 @@ void CScreenSing::manageEvent( SDL_Event event )
 		sprintf(buff,"%s/%s",song->path,song->mp3);
 		fprintf(stdout,"Now playing : (%d) : %s\n",CScreenManager::getSingletonPtr()->getSongId(),buff);
 		CScreenManager::getSingletonPtr()->getAudio()->playMusic(buff);
-		start = SDL_GetTicks();
+		sentenceNextSentence[0] = '\n';
+                start = SDL_GetTicks();
 		play = true;
 	        song->score[0].score = 0;
+                song_pos = 0;
         }
 }
 
@@ -97,7 +99,8 @@ void CScreenSing::draw( void )
 	}
 
 	if(finished) {
-		CScreenManager::getSingletonPtr()->getAudio()->stopMusic();
+		printf("finished!\n");
+                CScreenManager::getSingletonPtr()->getAudio()->stopMusic();
 		if( mpeg != NULL ) {
 			SMPEG_delete(mpeg);
 			mpeg=NULL;
@@ -172,7 +175,6 @@ void CScreenSing::draw( void )
 		}
 
 		// compute and draw the text
-	        unsigned int currentSentence = 0;
 		unsigned int i = 0;
 		unsigned int totalBpm = 0;
 
@@ -180,43 +182,51 @@ void CScreenSing::draw( void )
 		// we clear the sentence
 		if( !sentence.empty() &&
 		    time > ( (sentence[sentence.size()-1]->timestamp + sentence[sentence.size()-1]->length )* 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap ) {
-			sentence.clear();
-			pitchGraph.clear();
+                        sentence.clear();
+                        pitchGraph.clear();
 		}
 		// If the sentence is empty we create it
-		if( sentence.empty() ) {
-			for( i = 0 ; i <  song->notes.size() ; i++ ) {
-				if( time > ( (song->notes[i]->timestamp + song->notes[i]->length )* 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap ) {
-					if( song->notes[i]->type == TYPE_NOTE_SLEEP )
-						currentSentence=i;
-				} else {
-					break;
-				}
-			}
-			for( i = currentSentence ; i <  song->notes.size() ; i++ ) {
-				currentSentence=i;
-				if( song->notes[i]->type != TYPE_NOTE_SLEEP )
-					break;
-			}
-			for( i = currentSentence ; i <  song->notes.size() ; i++ ) {
-				if( song->notes[i]->type == TYPE_NOTE_SLEEP )
-					break;
-				else
-					sentence.push_back(song->notes[i]);
-			}
-		}
-
-		char sentencePast[128]   ; sentencePast[0]   = '\0';
+                if( sentence.empty() ) {
+                        while(song->notes[song_pos]->type == TYPE_NOTE_SLEEP) {
+                            if (song_pos < song->notes.size() - 1)
+                                song_pos++;
+                            else
+                                break;
+                        }
+                        while(song->notes[song_pos]->type != TYPE_NOTE_SLEEP) {
+                            sentence.push_back(song->notes[song_pos]);
+                            if (song_pos < song->notes.size() - 1)
+                                song_pos++;
+                            else 
+                                break;
+                        }
+                        sentenceNextSentence[0] = '\0';
+                        i = song_pos;
+                        while(song->notes[i]->type == TYPE_NOTE_SLEEP) {
+                            if(i < song->notes.size() - 1)
+                                i++;
+                            else
+                                break;
+                        }
+                        while(song->notes[i]->type != TYPE_NOTE_SLEEP) {
+                            strcat(sentenceNextSentence, song->notes[i]->syllable); 
+                            if(i < song->notes.size() - 1)
+                                i++;
+                            else
+                                break;
+                        }
+                }
+		
+                char sentencePast[128]   ; sentencePast[0]   = '\0';
 		char sentenceNow[128]    ; sentenceNow[0]    = '\0';
 		char sentenceFuture[128] ; sentenceFuture[0] = '\0';
                 char sentenceWhole[128]; sentenceWhole[0] = '\0';
-                char sentenceNextSentence[128] ; sentenceNextSentence[0] = '\0';
-		totalBpm = sentence[sentence.size()-1]->length + sentence[sentence.size()-1]->timestamp - sentence[0]->timestamp;
+        	totalBpm = sentence[sentence.size()-1]->length + sentence[sentence.size()-1]->timestamp - sentence[0]->timestamp;
 		
 		float bpmPixelUnit = (sm->getWidth() - 100. - 100.)/(totalBpm*1.0);
 
 		int pos = -1;
-		for( i = 0 ; i < sentence.size() ; i ++ ) {
+                for( i = 0 ; i < sentence.size() ; i ++ ) {
 			int currentBpm = sentence[i]->timestamp - sentence[0]->timestamp;
 			// if C <= timestamp < N
 			if( time > ( (sentence[i]->timestamp+sentence[i]->length)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap ) {
@@ -286,7 +296,7 @@ void CScreenSing::draw( void )
 			}
                         strcat(sentenceWhole, sentence[i]->syllable);
 		}
-
+    
                 TThemeTxt tmp;
                 tmp = theme->lyricspast;
                 tmp.text = sentenceWhole;
@@ -320,7 +330,12 @@ void CScreenSing::draw( void )
                         theme->theme->PrintText(&theme->lyricsfuture);
 		}
 
-		
+	        if( sentenceNextSentence[0] ) {
+                        theme->lyricsnextsentence.text = sentenceNextSentence;
+                        theme->lyricsnextsentence.extents = theme->theme->GetTextExtents(theme->lyricsnextsentence);
+                        theme->lyricsnextsentence.x = (sm->getWidth() - theme->lyricsnextsentence.extents.width)/2;
+                        theme->theme->PrintText(&theme->lyricsnextsentence);
+                }
 		SDL_Surface* pitchGraphSurf = CairoToSdl::BlitToSdl(pitchGraph.getCurrent());
 		position.x = 100;
 		position.y = 0;

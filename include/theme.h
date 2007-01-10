@@ -1,3 +1,6 @@
+#ifndef __THEME_H__
+#define __THEME_H__
+
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include <cairosvg.h>
@@ -66,4 +69,4 @@ class CThemeSing {
         private:
 };
 
-
+#endif

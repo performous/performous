@@ -43,11 +43,11 @@
      width="800px"
      height="600px"
      inkscape:zoom="1.2633333"
-     inkscape:cx="423.3465"
-     inkscape:cy="358.25231"
+     inkscape:cx="423.34647"
+     inkscape:cy="294.92774"
      inkscape:window-x="0"
      inkscape:window-y="0"
-     inkscape:current-layer="layer11" />
+     inkscape:current-layer="layer16" />
   <defs
      id="defs3467">
     <linearGradient
@@ -316,58 +316,47 @@
      inkscape:groupmode="layer"
      id="layer17"
      inkscape:label="lyrics_next">
-    <g
-       style="display:inline"
-       id="layer8"
-       transform="translate(1.12793e-6,-4.920703e-4)">
-      <text
-         x="186.71419"
-         y="603.1134"
-         transform="translate(-48.88997,-45.85788)"
-         style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;opacity:1;fill:#7f7f7e;fill-opacity:1;stroke:black;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:inline;font-family:Arial Black"
-         id="text6611"
-         xml:space="preserve"
-         sodipodi:linespacing="125%"><tspan
-           x="186.71419"
-           y="603.1134"
-           id="tspan6613">lyrics</tspan></text>
-    </g>
+    <text
+       sodipodi:linespacing="125%"
+       xml:space="preserve"
+       id="text6611"
+       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#7f7f7e;fill-opacity:1;stroke:black;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:inline;font-family:Arial Black"
+       y="575.25488"
+       x="137.82422"><tspan
+         id="tspan6613"
+         y="575.25488"
+         x="137.82422">lyrics</tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
      id="layer16"
      inkscape:label="lyrics_current">
-    <g
-       id="layer9"
-       transform="translate(1.12793e-6,3.756055e-4)">
-      <text
-         x="186.71419"
-         y="555.51154"
-         transform="translate(-48.88997,-45.85788)"
-         style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;opacity:1;fill:#cd9be3;fill-opacity:1;stroke:black;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:inline;font-family:Arial Black"
-         id="text3481"
-         xml:space="preserve"
-         sodipodi:linespacing="125%"><tspan
-           x="186.71419"
-           y="555.51154"
-           id="tspan2921">lyrics</tspan></text>
-    </g>
+    <text
+       sodipodi:linespacing="125%"
+       xml:space="preserve"
+       id="text3481"
+       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cd9be3;fill-opacity:1;stroke:black;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:inline;font-family:Arial Black"
+       y="527.65424"
+       x="137.82422"><tspan
+         id="tspan2921"
+         y="527.65424"
+         x="137.82422">lyrics</tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"
      id="layer10"
-     inkscape:label="lyrics_highlight">
+     inkscape:label="lyrics_highlight"
+     style="opacity:1">
     <text
-       transform="translate(-48.88997,-45.85788)"
-       x="316.35016"
-       y="555.38385"
+       x="267.46017"
+       y="527.52618"
        style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;opacity:1;fill:#9b03df;fill-opacity:1;stroke:black;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:inline;font-family:Arial Black"
        id="text10203"
        xml:space="preserve"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan10205"
-         x="316.35016"
-         y="555.38385">lyrics</tspan></text>
+         x="267.46017"
+         y="527.52618">lyrics</tspan></text>
   </g>
 </svg>

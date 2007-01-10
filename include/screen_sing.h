@@ -17,10 +17,12 @@ class CScreenSing : public CScreen {
 	// in separate surface
 	PitchGraph pitchGraph;
 	std::vector <TNote *> sentence;
-	bool play;
+        bool play;
 	bool finished;
 	unsigned int start;
-	SMPEG *mpeg;
+        unsigned int song_pos;
+	char sentenceNextSentence[128]; 
+        SMPEG *mpeg;
 	SMPEG_Info info;
         CThemeSing *theme;
 };
