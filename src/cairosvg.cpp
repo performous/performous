@@ -100,7 +100,8 @@ CairoSVG::CairoSVG( const char * data , size_t data_len ,unsigned int _width , u
 
 CairoSVG::~CairoSVG( void )
 {
-	SDL_FreeSurface(sdl_svg);
+	if (sdl_svg)
+                SDL_FreeSurface(sdl_svg);
 	if(surface)
 		cairo_surface_destroy(surface);
 }

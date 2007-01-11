@@ -17,7 +17,7 @@ void CTheme::clear() {
         dc = cairo_create(surface);
 }
 cairo_surface_t *CTheme::PrintText(TThemeTxt *text) {
-        cairo_select_font_face(dc, "Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+        cairo_select_font_face(dc, (*text).fontfamily, (*text).fontstyle, (*text).fontweight);
         cairo_set_font_size(dc, (*text).fontsize);
         cairo_move_to(dc, (*text).x, (*text).y);
         cairo_text_extents(dc, (*text).text, &(*text).extents);
@@ -41,7 +41,10 @@ cairo_surface_t *CTheme::DrawRect(TThemeRect rect) {
         cairo_rectangle(dc, rect.x, rect.y, rect.width, rect.height);
         if (rect.fill_col.r != -1 && rect.fill_col.g != -1 && rect.fill_col.b != -1) {
             cairo_set_source_rgba(dc, rect.fill_col.r, rect.fill_col.g, rect.fill_col.b, rect.fill_col.a);
-            cairo_fill(dc);
+            if (rect.stroke_col.r != -1 && rect.stroke_col.g != -1 && rect.stroke_col.b != -1)
+                cairo_fill_preserve(dc);
+            else
+                cairo_fill(dc);
         }
         if (rect.stroke_col.r != -1 && rect.stroke_col.g != -1 && rect.stroke_col.b != -1) {
             cairo_set_source_rgba(dc, rect.stroke_col.r, rect.stroke_col.b, rect.stroke_col.g, rect.stroke_col.a);
@@ -61,10 +64,17 @@ void CTheme::ParseSVGForText(char *filename, TThemeTxt *text) {
         xmlNode *root_element = NULL;
         doc = xmlReadFile(filename, NULL, 0);
         root_element = xmlDocGetRootElement(doc);
+        
+        /* set some defaults */
+        (*text).scale = 1.0;
+        (*text).fontfamily[0]  ='\0';
+        strncat((*text).fontfamily,"Sans",4);
+        (*text).fontstyle = CAIRO_FONT_SLANT_NORMAL;
+        (*text).fontweight = CAIRO_FONT_WEIGHT_NORMAL;
+        
         walk_tree(root_element, text);
         xmlFreeDoc(doc);
         xmlCleanupParser();
-        (*text).scale = 1.0;
 }
 void CTheme::ParseSVGForRect(char *filename, TThemeRect *rect) {
         xmlDoc *doc = NULL;
@@ -113,6 +123,23 @@ void CTheme::walk_tree(xmlNode * a_node, TThemeTxt *text)
                            while (string != NULL) {
                                 if (!strncasecmp(string, "font-size:", 10)) {
                                     sscanf((string + 10),"%lf", &(*text).fontsize);
+                                } else if (!strncasecmp(string, "font-family:", 12)) {
+                                    (*text).fontfamily[0]  ='\0';
+                                    strncat((*text).fontfamily, (string + 12), 31);     /* copy no more than 31 bytes to not caue buffer overrun */
+                                } else if (!strncasecmp(string, "font-style:", 11)) {
+                                    if(!strncasecmp((string + 11), "normal", 6)) {
+                                        (*text).fontstyle = CAIRO_FONT_SLANT_NORMAL;
+                                    } else if(!strncasecmp((string + 11), "italic", 6)) {
+                                        (*text).fontstyle = CAIRO_FONT_SLANT_ITALIC;
+                                    } else if(!strncasecmp((string + 11), "oblique", 6)) {
+                                        (*text).fontstyle = CAIRO_FONT_SLANT_OBLIQUE;
+                                    }
+                                } else if (!strncasecmp(string, "font-weight:", 12)) {
+                                    if(!strncasecmp((string + 12), "normal", 6)) {
+                                        (*text).fontweight = CAIRO_FONT_WEIGHT_NORMAL;
+                                    } else if(!strncasecmp((string + 12), "bold", 4)) {
+                                        (*text).fontweight = CAIRO_FONT_WEIGHT_BOLD;
+                                    }
                                 } else if (!strncasecmp(string, "fill:", 5)) {
                                     getcolor((string + 5), &(*text).fill_col);
                                 } else if (!strncasecmp(string, "fill-opacity:", 13)) {

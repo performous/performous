@@ -17,6 +17,9 @@ typedef struct _SThemeTxt {
         TRGBA fill_col;
         TRGBA stroke_col;
         double fontsize;
+        char fontfamily[32];
+        cairo_font_slant_t fontstyle;
+        cairo_font_weight_t fontweight;
         double scale;
         char *text;
 
