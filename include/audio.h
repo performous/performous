@@ -8,9 +8,6 @@
 #endif
 
 #ifdef USE_GSTREAMER
-#  warning ###################################
-#  warning Gstreamer support is experimental
-#  warning ###################################
 #  include <gst/gst.h>
 #endif
        
@@ -39,7 +36,6 @@ class CAudio {
 #endif
 #ifdef USE_GSTREAMER
 	GstElement *music;
-	static gboolean bus_call (GstBus *bus,GstMessage *msg,gpointer data);
 #endif
 };
 

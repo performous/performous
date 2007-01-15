@@ -2,10 +2,6 @@
 
 #define LENGTH_ERROR -1
 
-#ifdef USE_GSTREAMER
-bool gst_playing;
-#endif
-
 CAudio::CAudio()
 {
 #ifdef USE_LIBXINE
@@ -21,9 +17,6 @@ CAudio::CAudio()
 	gst_init (NULL, NULL);
 	/* set up */
 	music = gst_element_factory_make ("playbin", "play");
-	GstBus *bus = gst_pipeline_get_bus (GST_PIPELINE (music));
-	gst_bus_add_watch ( bus ,bus_call, NULL);
-	gst_object_unref (bus);
 #endif
 	length = 0;
 }
@@ -76,7 +69,6 @@ void CAudio::playMusic( char * filename )
 		length = LENGTH_ERROR;
 	else
 		length = (int) (len/1000000);
-	gst_playing = 1;
 #endif
 }
 
@@ -124,7 +116,16 @@ bool CAudio::isPlaying( void )
 	}
 #endif
 #ifdef USE_GSTREAMER
-	return gst_playing;
+	// If the length cannot be computed, we assume that the song is playing
+	// (happening in the first fex seconds)
+	if( getLength()==0 )
+		return true;
+
+	// If we are not in the last second, then we are not at the end of the song 
+	if( getLength() - getPosition() > 1000 )
+		return true;
+	else
+		return false;
 #endif
 }
 
@@ -135,7 +136,6 @@ void CAudio::stopMusic( void )
 #endif
 #ifdef USE_GSTREAMER
 	gst_element_set_state (music, GST_STATE_NULL);
-	gst_playing = 0;
 #endif
 }
 
@@ -175,26 +175,3 @@ int CAudio::getPosition( void )
 
   return position;
 }
-
-#ifdef USE_GSTREAMER
-gboolean CAudio::bus_call( GstBus *bus, GstMessage *msg, gpointer    data )
-{
-	bus = bus;
-	data = data;
-
-	switch (GST_MESSAGE_TYPE (msg)) {
-		case GST_MESSAGE_EOS:
-			gst_playing = 0;
-			break;
-		case GST_MESSAGE_ERROR: {
-			break;
-	        }
-		case GST_MESSAGE_TAG: {
-			break;
-		}
-		default:
-			break;
-	}
-	return TRUE;
-}
-#endif
