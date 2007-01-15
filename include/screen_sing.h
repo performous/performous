@@ -21,9 +21,11 @@ class CScreenSing : public CScreen {
 	bool finished;
 	unsigned int start;
         unsigned int song_pos;
-	char sentenceNextSentence[128]; 
+	char sentenceNextSentence[128];
+#ifdef USE_SMPEG
         SMPEG *mpeg;
 	SMPEG_Info info;
+#endif
         CThemeSing *theme;
 };
 

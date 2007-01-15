@@ -12,7 +12,9 @@ CScreenSing::CScreenSing(char * name)
 	screenName = name;
 	play = false;
 	finished = false;
+#ifdef USE_SMPEG
 	mpeg = NULL;
+#endif
 	SDL_Surface *screen;
 
 	screen = CScreenManager::getSingletonPtr()->getSDLScreen();
@@ -51,6 +53,7 @@ void CScreenSing::manageEvent( SDL_Event event )
 		CSong * song = CScreenManager::getSingletonPtr()->getSong();
 		
 		if( song->video != NULL ) {
+#ifdef USE_SMPEG
 			sprintf(buff,"%s/%s",song->path,song->video);
 			fprintf(stdout,"Now playing: (%d) : %s\n",CScreenManager::getSingletonPtr()->getSongId(),buff);
 			mpeg = SMPEG_new(buff, &info, 0);
@@ -65,6 +68,10 @@ void CScreenSing::manageEvent( SDL_Event event )
 				SMPEG_setvolume(mpeg, 0);
 				SMPEG_scaleXY(mpeg, 800 , 600 );
 			}
+#else
+			fprintf(stdout,"Video file was found, but Ultrastar-ng was not compile with smpeg support\n");
+#endif
+
                         if(song->backgroundSurf)
                                 SDL_FreeSurface(song->backgroundSurf);
                         
@@ -85,8 +92,6 @@ void CScreenSing::manageEvent( SDL_Event event )
                         SDL_BlitSurface(theme->bg->getSDLSurface(),NULL,song->backgroundSurf,NULL);
                         SDL_BlitSurface(theme->p1box->getSDLSurface(),NULL,song->backgroundSurf,NULL);
                         SDL_BlitSurface(song->backgroundSurf,NULL,sm->getSDLScreen(), NULL);
-
-
                 } else if (song->backgroundSurf != NULL ) {
                         SDL_BlitSurface(theme->bg->getSDLSurface(),NULL,song->backgroundSurf,NULL);
                         SDL_BlitSurface(theme->p1box->getSDLSurface(),NULL,song->backgroundSurf,NULL);
@@ -135,10 +140,12 @@ void CScreenSing::draw( void )
 
 	if(finished) {
                 CScreenManager::getSingletonPtr()->getAudio()->stopMusic();
+#ifdef USE_SMPEG
 		if( mpeg != NULL ) {
 			SMPEG_delete(mpeg);
 			mpeg=NULL;
 		}
+#endif
 		SDL_FillRect(videoSurf,NULL,0xffffff);
 		play = false;
 		finished = false;
@@ -158,6 +165,7 @@ void CScreenSing::draw( void )
 		double songPercent = (double)time / (double)sm->getAudio()->getLength();
 
 		// Draw the video
+#ifdef USE_SMPEG
 		if( mpeg != NULL ){
 			if( SMPEG_status(mpeg) != SMPEG_PLAYING && time > song->videoGap )
 				SMPEG_play(mpeg);
@@ -165,6 +173,7 @@ void CScreenSing::draw( void )
 			position.y=0;
 			SDL_BlitSurface(videoSurf, NULL,  sm->getSDLScreen(), &position);
                 } 
+#endif
                 if (song->backgroundSurf) {
                     SDL_BlitSurface(song->backgroundSurf,NULL,sm->getSDLScreen(), NULL);
                 }
