@@ -2,9 +2,12 @@
 #define __SCREENSING_H__
 
 #include <screen.h>
-#include <smpeg/smpeg.h>
 #include <pitch_graph.h>
 #include <theme.h>
+#ifdef USE_SMPEG
+#  include <smpeg/smpeg.h>
+#endif
+
 class CScreenSing : public CScreen {
 	public:
 	CScreenSing( char * name );
