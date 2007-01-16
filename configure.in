@@ -1,0 +1,176 @@
+dnl #  ########################################################################
+AC_INIT(Makefile.am)
+echo "Configure launch with the following arguments: $*"
+dnl #  ########################################################################
+
+AM_INIT_AUTOMAKE(UltraStar-ng,[0.0.9])
+AC_PREFIX_DEFAULT([/usr/local])
+AC_CONFIG_HEADERS([config.h:config.h.in:config.h.incl],,[[
+	echo > config.h.incl
+	echo >> config.h.incl "/* Ultrastar computed includes */"
+	echo >> config.h.incl "$ac_includes_default"
+]])
+
+dnl ###########################################################################
+dnl #### generate config.h  for C++   sources
+
+CFLAGS="-Wall $CFLAGS"
+CXXFLAGS="-Wall $CXXFLAGS"
+
+# standard programs
+AC_PROG_CC
+AC_PROG_CXX
+AC_PROG_RANLIB
+AC_PROG_INSTALL
+
+
+# Processing configure input configuration flags
+AC_ARG_WITH(audio,
+	AC_HELP_STRING("--with-audio={gstreamer,xine}",
+		"implementation of the audio layer (default: xine)"),
+	[audio_layer="$withval"],
+	[audio_layer="xine"]
+)
+
+AC_ARG_WITH(svg,
+	AC_HELP_STRING("--with-svg={cairo,librsvg}",
+		"implementation of the svg rendering layer (default: librsvg)"),
+	[svg_layer="$withval"],
+	[svg_layer="librsvg"]
+)
+
+AC_ARG_WITH(video,
+	 AC_HELP_STRING("--with-video={smpeg,disable}",
+	 	"implementation of the video rendering layer (default: smpeg)"),
+	[video_layer="$withval"],
+	[video_layer="smpeg"]
+)
+
+# Check for the standard headers
+AC_HEADER_STDC
+AC_HEADER_DIRENT
+
+AC_LANG_SAVE
+	AC_LANG_CPLUSPLUS
+	AC_CHECK_HEADERS([algorithm vector iostream],
+		have_stdpp_headers=yes, 
+		AC_MSG_ERROR([You need to have the libstdc++ headers installed]))
+AC_LANG_RESTORE
+
+AC_CHECK_HEADERS([fcntl.h math.h stdlib.h stdio.h dirent.h sys/ioctl.h sys/types.h sys/stat.h ],
+	have_std_headers=yes,
+	AC_MSG_ERROR(You need to have the standard c headers installed) )
+
+PKG_CHECK_MODULES(cairo, cairo , ,
+	AC_MSG_ERROR(This game connot be build without cairo))
+
+PKG_CHECK_MODULES(libxml, libxml-2.0 , ,
+	AC_MSG_ERROR(This game connot be build without libxml-2))
+
+PKG_CHECK_MODULES(fftw3f, fftw3f , ,
+	AC_MSG_ERROR(This game connot be build without fftw3f))
+
+PKG_CHECK_MODULES(alsa, alsa , ,
+	AC_MSG_ERROR(This game connot be build without alsa))
+
+AC_CHECK_PROGS(SDLCONFIG, sdl-config, AC_MSG_ERROR(Cannot find sdl-config))
+AC_CHECK_LIB(SDL_ttf, TTF_Quit,,AC_MSG_ERROR(Cannot find SDL_ttf))
+AC_CHECK_LIB(SDL_image, IMG_LoadPNG_RW,,AC_MSG_ERROR(Cannot find SDL_image))
+AC_CHECK_LIB(SDL_gfx, zoomSurface,,AC_MSG_ERROR(Cannot find SDL_gfx))
+
+dnl ###########################################################################
+dnl #### processing things
+
+# standard headers are installed, we include them in the config.h file
+
+ac_includes_default=$(cat <<USNG_EOF
+/* libstd++ headers */
+#include <algorithm>
+#include <string>
+#include <vector>
+#include <iostream>
+/* libc headers */
+#include <fcntl.h>
+#include <math.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <dirent.h>
+#include <sys/ioctl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+USNG_EOF)
+
+# Do things for cairo
+CAIRO_FLAGS=`pkg-config --cflags cairo`
+CAIRO_LIBS=`pkg-config --libs cairo`
+ac_includes_default=$(cat <<USNG_EOF
+/* cairo headers */
+#include <cairo.h>
+USNG_EOF)
+AC_SUBST(CAIRO_FLAGS)
+AC_SUBST(CAIRO_LIBS)
+
+# Do things for libxml
+XML_FLAGS=`xml2-config --cflags`
+XML_LIBS=`xml2-config --libs`
+ac_includes_default=$(cat <<USNG_EOF
+/* libxml2 headers */
+#include <libxml/parser.h>
+#include <libxml/tree.h>
+USNG_EOF)
+AC_SUBST(XML_FLAGS)
+AC_SUBST(XML_LIBS)
+
+# Do things for libsdl
+SDL_FLAGS=`$SDLCONFIG --cflags`
+SDL_LIBS=`$SDLCONFIG --libs`
+ac_includes_default=$(cat <<USNG_EOF
+/* libsdl headers */
+#include <SDL/SDL.h>
+/* other SDL headers
+#include <SDL/SDL_image.h>
+#include <SDL/SDL_gfx.h>
+#include <SDL/SDL_ttf.h>
+#include <SDL/SDL_gfxPrimitives.h>
+#include <SDL/SDL_rotozoom.h>    
+USNG_EOF)
+AC_SUBST(SDL_FLAGS)
+AC_SUBST(SDL_LIBS)
+
+# Do things for fftw3f
+FFT_FLAGS=`pkg-config --cflags fftw3f`
+FFT_LIBS=`pkg-config --libs fftw3f`
+ac_includes_default=$(cat <<USNG_EOF
+/* libsdl headers */
+#include <fftw3.h>
+USNG_EOF)
+AC_SUBST(FFT_FLAGS)
+AC_SUBST(FFT_LIBS)
+
+# Do things for alsa
+ALSA_FLAGS=`pkg-config --cflags alsa`
+ALSA_LIBS=`pkg-config --libs alsa`
+ac_includes_default=$(cat <<USNG_EOF
+/* alsa headers */
+#include <alsa/asoundlib.h>
+USNG_EOF)
+AC_SUBST(ALSA_FLAGS)
+AC_SUBST(ALSA_LIBS)
+dnl ###########################################################################
+dnl #### generation of the outputs
+
+AC_OUTPUT(
+	Makefile
+	src/Makefile
+)
+
+echo ""
+echo "Ultrastar-ng is now configured to your system with the following"
+echo "user-defined options."
+echo ""
+echo "Option | Flag         | Chosen implementation "
+echo "----------------------------------------------"
+echo "audio  | --with-audio | $audio_layer          "
+echo "video  | --with-video | $video_layer          "
+echo "svg    | --with-svg   | $svg_layer            "
+echo ""
