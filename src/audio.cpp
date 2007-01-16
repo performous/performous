@@ -16,7 +16,21 @@ CAudio::CAudio()
 	/* init GStreamer */
 	gst_init (NULL, NULL);
 	/* set up */
+	GstElement *sink,*fakesink;
 	music = gst_element_factory_make ("playbin", "play");
+	/*If you don't want play video with gstreamer*/
+	fakesink = gst_element_factory_make ("fakesink", "fakesink");
+        g_object_set (G_OBJECT (music), "video-sink", fakesink, NULL);
+        /*Output sink*/
+        sink = gst_element_factory_make ("gconfaudiosink", "audiosink");
+        /* if we could create the gconf sink use that, otherwise let playbin decide */
+        if (sink != NULL) {
+                /* set the profile property on the gconfaudiosink to "music and movies" */
+                if (g_object_class_find_property (G_OBJECT_GET_CLASS (sink), "profile"))
+                        g_object_set (G_OBJECT (sink), "profile", 1, NULL);
+
+                g_object_set (G_OBJECT (music), "audio-sink", sink, NULL);
+        }
 #endif
 	length = 0;
 }
