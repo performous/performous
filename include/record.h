@@ -1,8 +1,7 @@
 #ifndef __RECORD_H_
 #define __RECORD_H_
 
-#include <fftw3.h>
-#include <alsa/asoundlib.h>
+#include "../config.h"
 
 class CFft {
 	public:

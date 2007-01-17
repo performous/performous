@@ -1,8 +1,4 @@
 #include <pitch_graph.h>
-#include <cairo/cairo.h>
-
-#include <iostream>
-#include <math.h>
 
 PitchGraph::PitchGraph(int _width, int _height)
 	:width(_width),

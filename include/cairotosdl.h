@@ -1,8 +1,7 @@
 #ifndef __CAIROTOSDL_H__
 #define __CAIROTOSDL_H__
 
-#include <cairo/cairo.h>
-#include <SDL/SDL.h>
+#include "../config.h"
 
 /** 
  * Functions to ease cairo-sdl-cooperation

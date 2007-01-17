@@ -1,15 +1,6 @@
 #include <cairosvg.h>
 #include <cairotosdl.h>
 
-#ifdef USE_LIBSVG_CAIRO
-  #include <svg.h>
-  #include <svg-cairo.h>
-#endif
-
-#ifdef USE_LIBRSVG
-  #include <librsvg/rsvg.h>
-  #include <librsvg/rsvg-cairo.h>
-#endif
 CairoSVG::CairoSVG( const char * filename , unsigned int _width , unsigned int _height )
 {
 	cairo_t * dc;

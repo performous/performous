@@ -1,15 +1,7 @@
 #ifndef __AUDIO_H_
 #define __AUDIO_H_
 
-#include <vector>
-
-#ifdef USE_LIBXINE
-#  include <xine.h>
-#endif
-
-#ifdef USE_GSTREAMER
-#  include <gst/gst.h>
-#endif
+#include "../config.h"
        
 class CAudio {
 	public:

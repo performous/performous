@@ -1,6 +1,7 @@
 #ifndef __PITCH_GRAPH_H__
 #define __PITCH_GRAPH_H__
-#include <cairo/cairo.h>
+
+#include "../config.h"
 
 class PitchGraph
 {

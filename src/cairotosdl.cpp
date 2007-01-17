@@ -1,7 +1,5 @@
 #include <cairotosdl.h>
 
-#include <iostream>
-
 SDL_Surface* CairoToSdl::BlitToSdl(cairo_surface_t* src)
 {
 	static Uint32 rmask = 0x00ff0000;

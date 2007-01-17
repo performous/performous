@@ -1,5 +1,4 @@
 #include <screen_songs.h>
-#include <SDL/SDL_ttf.h>
 
 CScreenSongs::CScreenSongs(char * name)
 {

@@ -1,13 +1,4 @@
 #include <songs.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <dirent.h>
-
-#include <algorithm>
-
-#include <SDL/SDL_image.h>
-#include <SDL/SDL_gfxPrimitives.h>
-#include <SDL/SDL_rotozoom.h>    
 
 bool compareSongs( CSong * left , CSong * right)
 {

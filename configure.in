@@ -3,7 +3,7 @@ AC_INIT(Makefile.am)
 echo "Configure launch with the following arguments: $*"
 dnl #  ########################################################################
 
-AM_INIT_AUTOMAKE(UltraStar-ng,[0.0.9])
+AM_INIT_AUTOMAKE(UltraStar-ng,[0.1.0])
 AC_PREFIX_DEFAULT([/usr/local])
 AC_CONFIG_HEADERS([config.h:config.h.in:config.h.incl],,[[
 	echo > config.h.incl
@@ -142,7 +142,6 @@ $ac_includes_default
 #include <SDL/SDL.h>
 /* other SDL headers */
 #include <SDL/SDL_image.h>
-#include <SDL/SDL_gfx.h>
 #include <SDL/SDL_ttf.h>
 #include <SDL/SDL_gfxPrimitives.h>
 #include <SDL/SDL_rotozoom.h>    
@@ -198,80 +197,119 @@ AC_SUBST(VIDEO_FLAGS)
 AC_SUBST(VIDEO_LIBS)
 
 # Do things for audio
-if test $xine_detected = yes ; then
-	case $audio_layer in
-		xine*|autodetect*) 
+case $audio_layer in
+	xine*)
+		if test $xine_detected = yes ; then
 			audio_layer="xine"
-			AUDIO_FLAGS=`xine-config --cflags`
-			AUDIO_LIBS=`xine-config --libs`
-			ac_includes_default=$(cat <<-USNG_EOF
-			$ac_includes_default
-			/* video headers */
-			#define USE_LIBXINE 1
-			#include <xine.h>
-			USNG_EOF)
-			;;
-		*) ;;
-	esac
-else if test $gst_detected = yes ; then
-	case $audio_layer in
-		gstreamer*|autodetect*) 
+		else
+			audio_layer="no"
+		fi
+		;;	
+	gstreamer*)
+		if test $gst_detected = yes ; then
 			audio_layer="gstreamer"
-			AUDIO_FLAGS=`pkg-config --cflags gstreamer-0.10`
-			AUDIO_LIBS=`pkg-config --libs gstreamer-0.10`
-			ac_includes_default=$(cat <<-USNG_EOF
-			$ac_includes_default
-			/* video headers */
-			#define USE_GSTREAMER 1
-			#include <gst/gst.h>
-			USNG_EOF)
-			;;
-		*) ;;
-	esac
-else
-	AC_MSG_ERROR("I'm sure you wish audio in this game")
-fi ; fi
+		else
+			audio_layer="no"
+		fi
+		;;
+	autodetect*)
+		if test $xine_detected = yes ; then
+			audio_layer="xine"
+		else if test $gst_detected = yes ; then
+			audio_layer="gstreamer"
+		else
+			audio_layer="no"
+		fi ; fi
+		;;
+esac
+
+case $audio_layer in
+	xine*)
+		AUDIO_FLAGS=`xine-config --cflags`
+		AUDIO_LIBS=`xine-config --libs`
+		ac_includes_default=$(cat <<-USNG_EOF
+		$ac_includes_default
+		/* video headers */
+		#define USE_LIBXINE 1
+		#include <xine.h>
+		USNG_EOF)
+		;;
+	gstreamer*)
+		AUDIO_FLAGS=`pkg-config --cflags gstreamer-0.10`
+		AUDIO_LIBS=`pkg-config --libs gstreamer-0.10`
+		ac_includes_default=$(cat <<-USNG_EOF
+		$ac_includes_default
+		/* video headers */
+		#define USE_GSTREAMER 1
+		#include <gst/gst.h>
+		USNG_EOF)
+		;;
+	no*)
+		AC_MSG_ERROR("I'm sure you wish audio in this game")
+		;;
+esac
+
 AC_SUBST(AUDIO_FLAGS)
 AC_SUBST(AUDIO_LIBS)
 
 # Do things for svg
-if test $librsvg_detected = yes ; then
-	case $svg_layer in
-		librsvg*|autodetect*) 
+case $svg_layer in
+	librsvg*)
+		if test $librsvg_detected = yes ; then
 			svg_layer="librsvg"
-			SVG_FLAGS=`pkg-config --cflags librsvg-2.0`
-			SVG_LIBS=`pkg-config --libs librsvg-2.0`
-			ac_includes_default=$(cat <<-USNG_EOF
-			$ac_includes_default
-			/* svg headers */
-			#define USE_LIBRSVG 1
-			#include <librsvg/rsvg.h>
-			#include <librsvg/rsvg-cairo.h>
-			USNG_EOF)
-			;;
-		*) ;;
-	esac
-else if test $cairosvg_detected = yes ; then
-	case $svg_layer in
-		cairo*|autodetect*) 
+		else
+			svg_layer="no"
+		fi
+		;;
+	cairo*)
+		if test $cairosvg_detected = yes ; then
 			svg_layer="cairo"
-			SVG_FLAGS=`pkg-config --cflags libsvg-cairo`
-			SVG_LIBS=`pkg-config --libs libsvg-cairo`
-			ac_includes_default=$(cat <<-USNG_EOF
-			$ac_includes_default
-			/* svg headers */
-			#define USE_LIBSVG_CAIRO 1
-			#include <svg.h>
-			#include <svg-cairo.h>
-			USNG_EOF)
-			;;
-		*) ;;
-	esac
-else
-	AC_MSG_ERROR("Ultrstar-ng doesn't support non svg rendering")
-fi ; fi
+		else
+			svg_layer="no"
+		fi
+		;;
+	autodetect*)
+		if test $librsvg_detected = yes ; then
+			svg_layer="librsvg"
+		else if test $cairosvg_detected = yes ; then
+			svg_layer="cairo"
+		else
+			svg_layer="no"
+		fi ; fi
+		;;
+esac
+
+case $svg_layer in
+	librsvg*)
+		SVG_FLAGS=`pkg-config --cflags librsvg-2.0`
+		SVG_LIBS=`pkg-config --libs librsvg-2.0`
+		ac_includes_default=$(cat <<-USNG_EOF
+		$ac_includes_default
+		/* svg headers */
+		#define USE_LIBRSVG 1
+		#include <librsvg/rsvg.h>
+		#include <librsvg/rsvg-cairo.h>
+		USNG_EOF)
+		;;
+	cairo*)
+		SVG_FLAGS=`pkg-config --cflags libsvg-cairo`
+		SVG_LIBS=`pkg-config --libs libsvg-cairo`
+		ac_includes_default=$(cat <<-USNG_EOF
+		$ac_includes_default
+		/* svg headers */
+		#define USE_LIBSVG_CAIRO 1
+		#include <svg.h>
+		#include <svg-cairo.h>
+		USNG_EOF)
+		;;
+	no*)
+		AC_MSG_ERROR("Ultrstar-ng doesn't support non svg rendering")
+		;;
+esac
+
 AC_SUBST(SVG_FLAGS)
 AC_SUBST(SVG_LIBS)
+
 dnl ###########################################################################
 dnl #### generation of the outputs
 

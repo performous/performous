@@ -3,9 +3,6 @@
 #include <pitch_graph.h>
 #include <cairotosdl.h>
 
-// Just needed for the "to be sung" note (blue/grey box)
-#include <SDL/SDL_gfxPrimitives.h>
-
 CScreenSing::CScreenSing(char * name)
 : pitchGraph(800, 600)
 {

@@ -1,8 +1,7 @@
 #ifndef __CAIROSVG_H__
 #define __CAIROSVG_H__
 
-#include <cairo/cairo.h>
-#include <SDL/SDL.h>
+#include "../config.h"
 
 class CairoSVG {
 	public:

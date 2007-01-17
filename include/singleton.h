@@ -1,6 +1,8 @@
 #ifndef __SINGLETON_H__
 #define __SINGLETON_H__
 
+#include "../config.h"
+
 template <class T> class CSingleton {
 	protected:
 	static T* ms_CSingleton;

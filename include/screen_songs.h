@@ -1,6 +1,8 @@
 #ifndef __SCREENSONGS_H__
 #define __SCREENSONGS_H__
 
+#include "../config.h"
+
 #include <screen.h>
 #include <songs.h>
 #include <cairosvg.h>

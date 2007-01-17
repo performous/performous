@@ -1,12 +1,4 @@
-#include <SDL/SDL.h>
-#include <SDL/SDL_ttf.h>
-#include <SDL/SDL_thread.h>
-
-#include <sys/ioctl.h>
-#include <linux/soundcard.h>
-#include <fcntl.h>
-#include <fftw3.h>
-#include <math.h>
+#include "../config.h"
 
 #include <screen.h>
 #include <screen_intro.h>
@@ -45,7 +37,8 @@ void init( void )
 	}
 	TTF_Init();
 
-	SDL_WM_SetCaption("UltraStar-ng - 0.0.9", "WM_DEFAULT");
+	
+	SDL_WM_SetCaption(PACKAGE" - "VERSION, "WM_DEFAULT");
 	const SDL_VideoInfo * videoInf = SDL_GetVideoInfo();
 
 	unsigned SDL_videoFlags  = 0;

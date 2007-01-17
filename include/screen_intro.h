@@ -1,6 +1,8 @@
 #ifndef __SCREENINTRO_H__
 #define __SCREENINTRO_H__
 
+#include "../config.h"
+
 #include <screen.h>
 #include <cairosvg.h>
 

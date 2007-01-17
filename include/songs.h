@@ -1,8 +1,7 @@
 #ifndef __SONGS_H__
 #define __SONGS_H__
 
-#include <vector>
-#include <SDL/SDL.h>
+#include "../config.h"
 
 typedef struct _SBpm {
 	float bpm;

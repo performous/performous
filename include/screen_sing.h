@@ -1,12 +1,11 @@
 #ifndef __SCREENSING_H__
 #define __SCREENSING_H__
 
+#include "../config.h"
+
 #include <screen.h>
 #include <pitch_graph.h>
 #include <theme.h>
-#ifdef USE_SMPEG
-#  include <smpeg/smpeg.h>
-#endif
 
 class CScreenSing : public CScreen {
 	public:

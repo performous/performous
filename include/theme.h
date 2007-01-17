@@ -1,9 +1,10 @@
 #ifndef __THEME_H__
 #define __THEME_H__
 
-#include <libxml/parser.h>
-#include <libxml/tree.h>
+#include "../config.h"
+
 #include <cairosvg.h>
+
 typedef struct _SRGBA {
         double r;
         double g;

@@ -31,8 +31,8 @@ CAudio::CAudio()
 
                 g_object_set (G_OBJECT (music), "audio-sink", sink, NULL);
         }
-	gst_object_unref (GST_OBJECT (sink));
-	gst_object_unref (GST_OBJECT (fakesink));
+	//gst_object_unref (GST_OBJECT (sink));
+	//gst_object_unref (GST_OBJECT (fakesink));
 #endif
 	length = 0;
 }

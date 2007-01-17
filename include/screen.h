@@ -1,8 +1,7 @@
 #ifndef __SCREEN_H__
 #define __SCREEN_H__
 
-#include <SDL/SDL.h>
-#include <vector>
+#include "../config.h"
 
 #include <singleton.h>
 #include <audio.h>

@@ -1,7 +1,4 @@
 #include <record.h>
-#include <stdlib.h>
-#include <math.h>
-#include <string>
 
 #define MAX_FFT_LENGTH 48000
 #define MAX_PEAKS 4
