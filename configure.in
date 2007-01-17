@@ -26,24 +26,24 @@ AC_PROG_INSTALL
 
 # Processing configure input configuration flags
 AC_ARG_WITH(audio,
-	AC_HELP_STRING("--with-audio={xine,gstreamer}",
-		"implementation of the audio layer (default: autodetect)"),
+	AC_HELP_STRING(--with-audio[={xine|gstreamer}],
+		implementation of the audio layer (default: autodetect)),
 	[audio_layer="$withval"],
 	[audio_layer="autodetect"]
 )
 if test $audio_layer = yes ; then audio_layer="autodetect" ; fi
 
 AC_ARG_WITH(svg,
-	AC_HELP_STRING("--with-svg={cairo,librsvg}",
-		"implementation of the svg rendering layer (default: librsvg)"),
+	AC_HELP_STRING(--with-svg[={cairo|librsvg}],
+		implementation of the svg rendering layer (default: librsvg)),
 	[svg_layer="$withval"],
 	[svg_layer="librsvg"]
 )
 if test $svg_layer = yes ; then svg_layer="librsvg" ; fi
 
 AC_ARG_WITH(video,
-	 AC_HELP_STRING("--with-video={smpeg,disable}",
-	 	"implementation of the video rendering layer (default: autodetect)"),
+	 AC_HELP_STRING(--with-video[={smpeg|disable}],
+	 	implementation of the video rendering layer (default: autodetect)),
 	[video_layer="$withval"],
 	[video_layer="autodetect"]
 )
