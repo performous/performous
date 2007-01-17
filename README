@@ -1,13 +1,18 @@
-Compile:
+To install from CVS :
 
-To compile just run 'make'
+./autogen.sh
+./configure --with-a-lot-of-options
+make
+
+To run the game :
+./src/ultrastarng
 
 Dependencies:
-	- SDL SDL_ttf SDL_image cairo librsvg
-	- smpeg
+	- SDL SDL_ttf SDL_image cairo (cairo-svg|librsvg)
+	- smpeg (optional)
 	- FFTW
 	- libalsa
-	- xine
+	- (xine|gstreamer)
 	- libxml2
 
 Place the songs into songs/directory and put directory.txt into it (with
@@ -16,9 +21,8 @@ Place the songs into songs/directory and put directory.txt into it (with
 If you need Jamelia MP3 for test download it with UlstraStar (pascal/windows
 version).
 
-Press 's' at the introduction screen to select your song
-
 If your song is not UTF-8 encoded please do :
 	iconv --from-code=ISO-8859-1 --to-code=UTF-8 source.txt dest.txt
+
 If you want to send a patch :
 	cvs diff -NuF^f > mypatch.patch
