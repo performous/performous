@@ -31,6 +31,8 @@ CAudio::CAudio()
 
                 g_object_set (G_OBJECT (music), "audio-sink", sink, NULL);
         }
+	gst_object_unref (GST_OBJECT (sink));
+	gst_object_unref (GST_OBJECT (fakesink));
 #endif
 	length = 0;
 }
@@ -141,6 +143,7 @@ bool CAudio::isPlaying( void )
 	else
 		return false;
 #endif
+	return true;
 }
 
 void CAudio::stopMusic( void )
@@ -165,7 +168,7 @@ void CAudio::playSound( int , int )
 
 int CAudio::getPosition( void )
 {
-  int position;
+  int position = 0;
 
 #ifdef USE_LIBXINE
   int pos_stream;
