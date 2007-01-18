@@ -64,8 +64,8 @@ AC_CHECK_HEADERS([fcntl.h math.h stdlib.h stdio.h dirent.h sys/ioctl.h sys/types
 	have_std_headers=yes,
 	AC_MSG_ERROR(You need to have the standard c headers installed) )
 
-PKG_CHECK_MODULES(cairo, cairo , ,
-	AC_MSG_ERROR(This game connot be build without cairo))
+PKG_CHECK_MODULES(cairo, cairo >= 1.2 , ,
+	AC_MSG_ERROR(This game connot be build without cairo < 1.2 ))
 
 PKG_CHECK_MODULES(libxml, libxml-2.0 , ,
 	AC_MSG_ERROR(This game connot be build without libxml-2))
@@ -140,6 +140,7 @@ ac_includes_default=$(cat <<USNG_EOF
 $ac_includes_default
 /* libsdl headers */
 #include <SDL/SDL.h>
+#include <SDL/SDL_thread.h>
 /* other SDL headers */
 #include <SDL/SDL_image.h>
 #include <SDL/SDL_ttf.h>
