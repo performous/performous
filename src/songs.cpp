@@ -1,4 +1,5 @@
 #include <songs.h>
+#include <screen.h>
 
 bool compareSongs( CSong * left , CSong * right)
 {
@@ -228,9 +229,10 @@ CSongs::CSongs()
 	struct dirent* dirEntry;
 	struct stat    info;
 	char buff[1024];
-	dir = opendir("songs/");
+	char * songs_dir = CScreenManager::getSingletonPtr()->getSongsDirectory();
+	dir = opendir(songs_dir);
 	order = 2;
-	SDL_RWops *rwop_nocover = SDL_RWFromFile("images/no_cover.png", "rb");
+	SDL_RWops *rwop_nocover = SDL_RWFromFile(IMAGES_DIR "/no_cover.png", "rb");
 	surface_nocover = IMG_LoadPNG_RW(rwop_nocover);
 	SDL_FreeRW(rwop_nocover);
 
@@ -241,7 +243,7 @@ CSongs::CSongs()
 			continue;
 		
 		char * path = new char[1024];
-		sprintf(path,"%s%s","songs/",dirEntry->d_name);
+		sprintf(path,"%s%s",songs_dir,dirEntry->d_name);
 		stat(path,&info);
 		if ( !S_ISDIR(info.st_mode) ) {
 			delete[] path;
@@ -269,7 +271,7 @@ CSongs::CSongs()
 		            tmp->cover = cover;
                         }
 
-		        sprintf(buff,"%s/%s/%s","songs",dirEntry->d_name,tmp->cover);
+		        sprintf(buff,"%s/%s/%s",songs_dir,dirEntry->d_name,tmp->cover);
 		        SDL_RWops *rwop = SDL_RWFromFile(buff, "rb");
 		        SDL_Surface * coverSurface = NULL;
                         if(strstr(tmp->cover, ".png"))
@@ -284,7 +286,7 @@ CSongs::CSongs()
 			    SDL_FreeRW(rwop);
 		        }
 		        
-                        sprintf(buff,"%s/%s/%s","songs",dirEntry->d_name,tmp->background);
+                        sprintf(buff,"%s/%s/%s",songs_dir,dirEntry->d_name,tmp->background);
                         rwop = SDL_RWFromFile(buff, "rb");
                         
                         if (tmp->background) {

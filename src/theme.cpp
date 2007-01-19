@@ -276,16 +276,16 @@ CTheme::~CTheme() {
         }
 }
 CThemeSing::CThemeSing() {
-        bg = new CairoSVG("themes/default/sing_bg.svg", 800, 600);
-        p1box = new CairoSVG("themes/default/sing_p1box.svg", 800, 600);
+        bg = new CairoSVG(THEMES_DIR "/default/sing_bg.svg", 800, 600);
+        p1box = new CairoSVG(THEMES_DIR "/default/sing_p1box.svg", 800, 600);
         theme = new CTheme(800, 600);
-        theme->ParseSVGForText("themes/default/sing_timetxt.svg", &timertxt);
-        theme->ParseSVGForText("themes/default/sing_p1score.svg", &p1score);
-        theme->ParseSVGForText("themes/default/sing_lyricscurrent.svg", &lyricspast);
-        theme->ParseSVGForText("themes/default/sing_lyricscurrent.svg", &lyricsfuture);
-        theme->ParseSVGForText("themes/default/sing_lyricshighlight.svg", &lyricshighlight);
-        theme->ParseSVGForText("themes/default/sing_lyricsnext.svg", &lyricsnextsentence);
-        theme->ParseSVGForRect("themes/default/sing_progressfg.svg", &progressfg);
+        theme->ParseSVGForText(THEMES_DIR "/default/sing_timetxt.svg", &timertxt);
+        theme->ParseSVGForText(THEMES_DIR "/default/sing_p1score.svg", &p1score);
+        theme->ParseSVGForText(THEMES_DIR "/default/sing_lyricscurrent.svg", &lyricspast);
+        theme->ParseSVGForText(THEMES_DIR "/default/sing_lyricscurrent.svg", &lyricsfuture);
+        theme->ParseSVGForText(THEMES_DIR "/default/sing_lyricshighlight.svg", &lyricshighlight);
+        theme->ParseSVGForText(THEMES_DIR "/default/sing_lyricsnext.svg", &lyricsnextsentence);
+        theme->ParseSVGForRect(THEMES_DIR "/default/sing_progressfg.svg", &progressfg);
 }
 CThemeSing::~CThemeSing() {
         delete bg;

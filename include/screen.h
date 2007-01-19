@@ -21,7 +21,7 @@ class CScreen {
 
 class CScreenManager : public CSingleton <CScreenManager>{
 	public:
-	CScreenManager( int width , int height );
+	CScreenManager( int width , int height , char * songs_dir );
 	~CScreenManager();
 	void addScreen( CScreen * screen ) { 
 		screens.push_back(screen);
@@ -63,7 +63,10 @@ class CScreenManager : public CSingleton <CScreenManager>{
 
 	void finished(void) { m_finished=true; };
 	bool isFinished(void) { return m_finished; };
+
+	char * getSongsDirectory( void ) { return m_songs_dir; };
 	private:
+	char * m_songs_dir;
 	std::vector <CScreen *> screens;
 	CScreen * currentScreen;
 	SDL_Surface * screen;

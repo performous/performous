@@ -2,7 +2,7 @@
 
 template<> CScreenManager* CSingleton<CScreenManager>::ms_CSingleton = NULL;
 
-CScreenManager::CScreenManager( int _width , int _height )
+CScreenManager::CScreenManager( int _width , int _height , char * _songs_dir )
 {
 	m_finished=false;
 	audio = NULL;
@@ -11,6 +11,7 @@ CScreenManager::CScreenManager( int _width , int _height )
 	songId = 0;
 	width = _width;
 	height = _height;
+	m_songs_dir = _songs_dir;
 }
 
 CScreenManager::~CScreenManager()

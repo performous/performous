@@ -65,11 +65,16 @@ int thread_func(void *)
 	return 1;
 }
 
-int main( int , char ** )
+int main( int argc, char ** argv )
 {
+	if( argc != 2 ) {
+		fprintf(stdout,"Usage: %s songs_directory\n",argv[0]);
+		return EXIT_FAILURE;
+	}
+
 	init();
 
-	screenManager = new CScreenManager( width, height );
+	screenManager = new CScreenManager( width, height , argv[1] );
 	CScreen * screen;
 
 	screenManager->setSDLScreen(screenSDL);
@@ -105,4 +110,5 @@ int main( int , char ** )
 
 	TTF_Quit();
 	SDL_Quit();
+	return EXIT_SUCCESS;
 }

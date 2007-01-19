@@ -5,7 +5,7 @@ CScreenSongs::CScreenSongs(char * name)
 	screenName = name;
 	songId=0;
 
-	cairo_svg = new CairoSVG("themes/default/songs.svg",800,600);
+	cairo_svg = new CairoSVG(THEMES_DIR "/default/songs.svg",800,600);
 }
 
 CScreenSongs::~CScreenSongs()
@@ -87,7 +87,7 @@ void CScreenSongs::draw( void )
 	SDL_BlitSurface(sm->getSong()->coverSurf,NULL,sm->getSDLScreen(), &position);
 	// Draw the "Order by" text
 	SDL_Color black = {0,0,0,0};
-	TTF_Font *font = TTF_OpenFont("fonts/DejaVuSansCondensed.ttf", 25);
+	TTF_Font *font = TTF_OpenFont(FONTS_DIR "/DejaVuSansCondensed.ttf", 25);
 
 	SDL_Surface * artistSurf = TTF_RenderUTF8_Blended(font, sm->getSong()->artist , black);
 	position.x=(sm->getWidth()-artistSurf->w)/2;
