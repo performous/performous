@@ -17,6 +17,7 @@ typedef struct _SThemeTxt {
         cairo_text_extents_t extents;
         TRGBA fill_col;
         TRGBA stroke_col;
+        double stroke_width;
         double fontsize;
         char fontfamily[32];
         cairo_font_slant_t fontstyle;
@@ -34,6 +35,7 @@ typedef struct _SThemeRect {
         double height;
         TRGBA fill_col;
         TRGBA stroke_col;
+        double stroke_width;
 } TThemeRect;
 class CTheme {
         public:

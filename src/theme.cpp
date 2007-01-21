@@ -33,6 +33,7 @@ cairo_surface_t *CTheme::PrintText(TThemeTxt *text) {
                 cairo_fill(dc);
         }
         if ((*text).stroke_col.r != -1 && (*text).stroke_col.g != -1 && (*text).stroke_col.b != -1) {
+            cairo_set_line_width(dc, (*text).stroke_width);
             cairo_set_source_rgba(dc, (*text).stroke_col.r, (*text).stroke_col.b, (*text).stroke_col.g, (*text).stroke_col.a);
             cairo_stroke(dc);
         }
@@ -48,6 +49,7 @@ cairo_surface_t *CTheme::DrawRect(TThemeRect rect) {
                 cairo_fill(dc);
         }
         if (rect.stroke_col.r != -1 && rect.stroke_col.g != -1 && rect.stroke_col.b != -1) {
+            cairo_set_line_width(dc, rect.stroke_width);
             cairo_set_source_rgba(dc, rect.stroke_col.r, rect.stroke_col.b, rect.stroke_col.g, rect.stroke_col.a);
             cairo_stroke(dc);
         }
@@ -72,7 +74,8 @@ void CTheme::ParseSVGForText(char *filename, TThemeTxt *text) {
         strncat((*text).fontfamily,"Sans",4);
         (*text).fontstyle = CAIRO_FONT_SLANT_NORMAL;
         (*text).fontweight = CAIRO_FONT_WEIGHT_NORMAL;
-        
+        (*text).stroke_width = 0;
+
         walk_tree(root_element, text);
         xmlFreeDoc(doc);
         xmlCleanupParser();
@@ -82,6 +85,9 @@ void CTheme::ParseSVGForRect(char *filename, TThemeRect *rect) {
         xmlNode *root_element = NULL;
         doc = xmlReadFile(filename, NULL, 0);
         root_element = xmlDocGetRootElement(doc);
+        /* set some defaults */
+        (*rect).stroke_width = 0;
+        
         walk_tree(root_element, rect);
         xmlFreeDoc(doc);
         xmlCleanupParser();
@@ -132,7 +138,7 @@ void CTheme::walk_tree(xmlNode * a_node, TThemeTxt *text)
                                         (*text).fontstyle = CAIRO_FONT_SLANT_NORMAL;
                                     } else if(!strncasecmp((string + 11), "italic", 6)) {
                                         (*text).fontstyle = CAIRO_FONT_SLANT_ITALIC;
-                                    } else if(!strncasecmp((string + 11), "oblique", 6)) {
+                                    } else if(!strncasecmp((string + 11), "oblique", 7)) {
                                         (*text).fontstyle = CAIRO_FONT_SLANT_OBLIQUE;
                                     }
                                 } else if (!strncasecmp(string, "font-weight:", 12)) {
@@ -149,6 +155,8 @@ void CTheme::walk_tree(xmlNode * a_node, TThemeTxt *text)
                                     getcolor((string + 7), &(*text).stroke_col);
                                 } else if (!strncasecmp(string, "stroke-opacity:", 15)) {
                                     sscanf((string + 15), "%lf", &(*text).stroke_col.a);
+                                } else if (!strncasecmp(string, "stroke-width:", 13)) {
+                                    sscanf((string + 13),"%lf", &(*text).stroke_width);
                                 }
                                 string = strtok(NULL, ";");
                            }
@@ -195,6 +203,8 @@ void CTheme::walk_tree(xmlNode * a_node, TThemeRect *rect)
                                     getcolor((string + 7), &(*rect).stroke_col);
                                 } else if (!strncasecmp(string, "stroke-opacity:", 15)) {
                                     sscanf((string + 15), "%lf", &(*rect).stroke_col.a);
+                                } else if (!strncasecmp(string, "stroke-width:", 13)) {
+                                    sscanf((string + 13),"%lf", &(*rect).stroke_width);
                                 }
                                 string = strtok(NULL, ";");
                            }
