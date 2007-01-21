@@ -3,7 +3,7 @@ AC_INIT(Makefile.am)
 echo "Configure launch with the following arguments: $*"
 dnl #  ########################################################################
 
-AM_INIT_AUTOMAKE(UltraStar-ng,[0.1.0])
+AM_INIT_AUTOMAKE(UltraStar-ng,[0.1.0-dev])
 AC_PREFIX_DEFAULT(/usr/local)
 
 AC_CONFIG_HEADERS([config.h:config.h.in:config.h.incl],,[[
@@ -255,7 +255,7 @@ case $audio_layer in
 		USNG_EOF)
 		;;
 	no*)
-		AC_MSG_ERROR("I'm sure you wish audio in this game")
+		AC_MSG_ERROR("I'm sure you wish audio in this game please install eather xine or gstreamer")
 		;;
 esac
 
@@ -313,7 +313,7 @@ case $svg_layer in
 		USNG_EOF)
 		;;
 	no*)
-		AC_MSG_ERROR("Ultrstar-ng doesn't support non svg rendering")
+		AC_MSG_ERROR("Ultrstar-ng doesn't support non svg rendering please install eather cairo-svg or librsvg")
 		;;
 esac
 
