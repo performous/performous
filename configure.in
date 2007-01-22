@@ -71,7 +71,7 @@ AC_CHECK_HEADERS([fcntl.h math.h stdlib.h stdio.h dirent.h sys/ioctl.h sys/types
 	AC_MSG_ERROR(You need to have the standard c headers installed) )
 
 PKG_CHECK_MODULES(cairo, cairo >= 1.2 , ,
-	AC_MSG_ERROR(This game connot be build without cairo < 1.2 ))
+	AC_MSG_ERROR(This game connot be build without cairo >= 1.2 ))
 
 PKG_CHECK_MODULES(libxml, libxml-2.0 , ,
 	AC_MSG_ERROR(This game connot be build without libxml-2))
