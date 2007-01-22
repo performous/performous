@@ -8,7 +8,7 @@ To run the game :
 ./src/ultrastarng
 
 Dependencies:
-	- SDL SDL_ttf SDL_image cairo (cairo-svg|librsvg)
+	- SDL SDL_image cairo (cairo-svg|librsvg)
 	- smpeg (optional)
 	- FFTW
 	- libalsa

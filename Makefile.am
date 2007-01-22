@@ -19,9 +19,6 @@ themes_DATA = themes/default/intro.svg \
 imagesdir   = @IMAGES_DIR@
 images_DATA = images/no_cover.png
 
-fontsdir    = @FONTS_DIR@
-fonts_DATA  = fonts/DejaVuSansCondensed.ttf
-	
 includes = include/audio.h \
 	include/cairotosdl.h \
 	include/pitch_graph.h \
@@ -35,4 +32,4 @@ includes = include/audio.h \
 	include/screen_songs.h \
 	include/songs.h
 
-EXTRA_DIST = $(themes_DATA) $(images_DATA) $(fonts_DATA) $(includes)
+EXTRA_DIST = $(themes_DATA) $(images_DATA) $(includes)
