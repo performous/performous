@@ -58,6 +58,17 @@ class CTheme {
         void getcolor(char *string, TRGBA *col);
 };
 
+class CThemeSongs {
+	public:
+	CThemeSongs();
+	~CThemeSongs();
+	CairoSVG *bg;
+	TThemeTxt song;
+	TThemeTxt order;
+        CTheme *theme;
+	private:
+};
+
 class CThemeSing {
         public:
         CThemeSing();

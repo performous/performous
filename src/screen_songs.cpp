@@ -1,16 +1,17 @@
 #include <screen_songs.h>
+#include <cairotosdl.h>
 
 CScreenSongs::CScreenSongs(char * name)
 {
 	screenName = name;
 	songId=0;
 
-	cairo_svg = new CairoSVG(THEMES_DIR "/default/songs.svg",800,600);
+	theme = new CThemeSongs();
 }
 
 CScreenSongs::~CScreenSongs()
 {
-	delete cairo_svg;
+	delete theme;
 }
 
 void CScreenSongs::manageEvent( SDL_Event event )
@@ -77,36 +78,39 @@ char * order[4] = {
 void CScreenSongs::draw( void )
 {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
-	SDL_Rect position;
 
-	SDL_BlitSurface(cairo_svg->getSDLSurface(),NULL,sm->getSDLScreen(),NULL);
+	theme->theme->clear();
+
+	SDL_BlitSurface(theme->bg->getSDLSurface(),NULL,sm->getSDLScreen(),NULL);
 	
+	// Draw the "Order by" text
+	{
+	char * orderStr = order[sm->getSongs()->getOrder()];
+	theme->order.text = orderStr;
+	cairo_text_extents_t extents = theme->theme->GetTextExtents(theme->order);
+	theme->order.x = (sm->getWidth() - extents.width)/2;
+	theme->theme->PrintText(&theme->order);
+	}
+
+	// Draw the "Song informations"
+	{
+	char informationStr[1024];
+	sprintf(informationStr,"%s - %s",sm->getSong()->artist, sm->getSong()->title);
+	theme->song.text = informationStr;
+	cairo_text_extents_t extents = theme->theme->GetTextExtents(theme->song);
+	theme->song.x = (sm->getWidth() - extents.width)/2;
+	theme->theme->PrintText(&theme->song);
+	}
+
 	// Draw the cover
+	{
+	SDL_Rect position;
 	position.x=(sm->getWidth()-sm->getSong()->coverSurf->w)/2;
 	position.y=(sm->getHeight()-sm->getSong()->coverSurf->h)/2;
 	SDL_BlitSurface(sm->getSong()->coverSurf,NULL,sm->getSDLScreen(), &position);
-	// Draw the "Order by" text
-	SDL_Color black = {0,0,0,0};
-	TTF_Font *font = TTF_OpenFont(FONTS_DIR "/DejaVuSansCondensed.ttf", 25);
+	}
 
-	SDL_Surface * artistSurf = TTF_RenderUTF8_Blended(font, sm->getSong()->artist , black);
-	position.x=(sm->getWidth()-artistSurf->w)/2;
-	position.y=475;
-	SDL_BlitSurface(artistSurf, NULL,  sm->getSDLScreen(), &position);
-	SDL_FreeSurface(artistSurf); 
-
-	SDL_Surface * titleSurf = TTF_RenderUTF8_Blended(font, sm->getSong()->title , black);
-	position.x=(sm->getWidth()-titleSurf->w)/2;
-	position.y=500;
-	SDL_BlitSurface(titleSurf, NULL,  sm->getSDLScreen(), &position);
-	SDL_FreeSurface(titleSurf); 
-
-	char * my_order = order[sm->getSongs()->getOrder()];
-	SDL_Surface * orderSurf = TTF_RenderUTF8_Blended(font, my_order , black);
-	position.x=(sm->getWidth()-orderSurf->w)/2;
-	position.y=550;
-	SDL_BlitSurface(orderSurf, NULL,  sm->getSDLScreen(), &position);
-	SDL_FreeSurface(orderSurf);
-
-	TTF_CloseFont(font);
+	SDL_Surface *themeSurf = CairoToSdl::BlitToSdl(theme->theme->getCurrent());
+	SDL_BlitSurface(themeSurf, NULL,sm->getSDLScreen(),NULL);
+	SDL_FreeSurface(themeSurf);
 }

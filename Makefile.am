@@ -2,7 +2,9 @@ SUBDIRS = src
 
 themesdir   = @THEMES_DIR@/default
 themes_DATA = themes/default/intro.svg \
-	themes/default/songs.svg \
+	themes/default/songs_bg.svg \
+	themes/default/songs_order.svg \
+	themes/default/songs_song.svg \
 	themes/default/sing_bg.svg \
 	themes/default/sing_lyricscurrent.svg \
 	themes/default/sing_lyricshighlight.svg \

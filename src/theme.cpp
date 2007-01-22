@@ -285,6 +285,16 @@ CTheme::~CTheme() {
             cairo_surface_destroy(surface);
         }
 }
+CThemeSongs::CThemeSongs() {
+	bg = new CairoSVG(THEMES_DIR "/default/songs_bg.svg", 800, 600);
+        theme = new CTheme(800, 600);
+	theme->ParseSVGForText(THEMES_DIR "/default/songs_song.svg", &song);
+	theme->ParseSVGForText(THEMES_DIR "/default/songs_order.svg", &order);
+}
+CThemeSongs::~CThemeSongs() {
+	delete bg;
+	delete theme;
+}
 CThemeSing::CThemeSing() {
         bg = new CairoSVG(THEMES_DIR "/default/sing_bg.svg", 800, 600);
         p1box = new CairoSVG(THEMES_DIR "/default/sing_p1box.svg", 800, 600);
