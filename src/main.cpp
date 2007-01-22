@@ -65,14 +65,19 @@ int thread_func(void *)
 
 int main( int argc, char ** argv )
 {
+	char * songs_directory;
 	if( argc != 2 ) {
 		fprintf(stdout,"Usage: %s songs_directory\n",argv[0]);
 		return EXIT_FAILURE;
 	}
 
+	// Add the trailing slash
+	songs_directory = new char[strlen(argv[1])+2];
+	sprintf(songs_directory,"%s/",argv[1]);
+
 	init();
 
-	screenManager = new CScreenManager( width, height , argv[1] );
+	screenManager = new CScreenManager( width, height , songs_directory );
 	CScreen * screen;
 
 	screenManager->setSDLScreen(screenSDL);
@@ -105,6 +110,7 @@ int main( int argc, char ** argv )
 	SDL_WaitThread(thread, NULL);
 
 	delete screenManager;
+	delete[] songs_directory;
 
 	SDL_Quit();
 	return EXIT_SUCCESS;
