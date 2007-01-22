@@ -35,8 +35,6 @@ void init( void )
 		SDL_Quit();
 		exit(EXIT_FAILURE);
 	}
-	TTF_Init();
-
 	
 	SDL_WM_SetCaption(PACKAGE" - "VERSION, "WM_DEFAULT");
 	const SDL_VideoInfo * videoInf = SDL_GetVideoInfo();
@@ -108,7 +106,6 @@ int main( int argc, char ** argv )
 
 	delete screenManager;
 
-	TTF_Quit();
 	SDL_Quit();
 	return EXIT_SUCCESS;
 }

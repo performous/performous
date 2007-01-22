@@ -30,9 +30,6 @@ AC_SUBST(THEMES_DIR)
 IMAGES_DIR="${datadir}/ultrastar-ng/images/"
 AC_SUBST(IMAGES_DIR)
 
-FONTS_DIR="${datadir}/ultrastar-ng/fonts/"
-AC_SUBST(FONTS_DIR)
-
 # Processing configure input configuration flags
 AC_ARG_WITH(audio,
 	AC_HELP_STRING(--with-audio[={xine|gstreamer}],
@@ -91,7 +88,6 @@ PKG_CHECK_MODULES(xine, libxine , [xine_detected=yes] , [xine_detected=no])
 PKG_CHECK_MODULES(gstreamer, gstreamer-0.10 , [gst_detected=yes] , [gst_detected=no])
 
 AC_CHECK_PROGS(SDLCONFIG, sdl-config, AC_MSG_ERROR(Cannot find sdl-config))
-AC_CHECK_LIB(SDL_ttf, TTF_Quit,,AC_MSG_ERROR(Cannot find SDL_ttf))
 AC_CHECK_LIB(SDL_image, IMG_LoadPNG_RW,,AC_MSG_ERROR(Cannot find SDL_image))
 AC_CHECK_LIB(SDL_gfx, zoomSurface,,AC_MSG_ERROR(Cannot find SDL_gfx))
 AC_CHECK_LIB(smpeg,SMPEG_new,[video_detected="yes"],[video_detected="no"])
@@ -152,7 +148,6 @@ $ac_includes_default
 #include <SDL/SDL_thread.h>
 /* other SDL headers */
 #include <SDL/SDL_image.h>
-#include <SDL/SDL_ttf.h>
 #include <SDL/SDL_gfxPrimitives.h>
 #include <SDL/SDL_rotozoom.h>    
 USNG_EOF)

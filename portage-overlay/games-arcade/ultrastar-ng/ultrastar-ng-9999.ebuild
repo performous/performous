@@ -27,7 +27,6 @@ DEPEND="
 	!deprecated_cairo_svg? ( >=gnome-base/librsvg-2 )
 
 	media-libs/libsdl
-	media-libs/sdl-ttf
 	media-libs/sdl-image
 	media-libs/sdl-gfx
 	!novideo? ( media-libs/smpeg )
