@@ -18,23 +18,23 @@ void CTheme::clear() {
         dc = cairo_create(surface);
 }
 cairo_surface_t *CTheme::PrintText(TThemeTxt *text) {
-        cairo_select_font_face(dc, (*text).fontfamily, (*text).fontstyle, (*text).fontweight);
-        cairo_set_font_size(dc, (*text).fontsize);
-        cairo_move_to(dc, (*text).x, (*text).y);
-        cairo_text_extents(dc, (*text).text, &(*text).extents);
-        cairo_move_to(dc, (*text).x - ((*text).extents.width - (*text).extents.width/(*text).scale)/2, (*text).y - ((*text).extents.height - (*text).extents.height/(*text).scale)/2);
-        cairo_set_font_size(dc, (*text).fontsize * (*text).scale);
-        cairo_text_path(dc, (*text).text);
-        if ((*text).fill_col.r != -1 && (*text).fill_col.g != -1 && (*text).fill_col.b != -1) {
-            cairo_set_source_rgba(dc, (*text).fill_col.r, (*text).fill_col.g, (*text).fill_col.b, (*text).fill_col.a);
-            if ((*text).stroke_col.r != -1 && (*text).stroke_col.g != -1 && (*text).stroke_col.b != -1)
+        cairo_select_font_face(dc, text->fontfamily, text->fontstyle, text->fontweight);
+        cairo_set_font_size(dc, text->fontsize);
+        cairo_move_to(dc, text->x, text->y);
+        cairo_text_extents(dc, text->text, &(text->extents));
+        cairo_move_to(dc, text->x - (text->extents.width - text->extents.width/text->scale)/2, text->y - (text->extents.height - text->extents.height/text->scale)/2);
+        cairo_set_font_size(dc, text->fontsize * text->scale);
+        cairo_text_path(dc, text->text);
+        if (text->fill_col.r != -1 && text->fill_col.g != -1 && text->fill_col.b != -1) {
+            cairo_set_source_rgba(dc, text->fill_col.r, text->fill_col.g, text->fill_col.b, text->fill_col.a);
+            if (text->stroke_col.r != -1 && text->stroke_col.g != -1 && text->stroke_col.b != -1)
                 cairo_fill_preserve(dc);
             else
                 cairo_fill(dc);
         }
-        if ((*text).stroke_col.r != -1 && (*text).stroke_col.g != -1 && (*text).stroke_col.b != -1) {
-            cairo_set_line_width(dc, (*text).stroke_width);
-            cairo_set_source_rgba(dc, (*text).stroke_col.r, (*text).stroke_col.b, (*text).stroke_col.g, (*text).stroke_col.a);
+        if (text->stroke_col.r != -1 && text->stroke_col.g != -1 && text->stroke_col.b != -1) {
+            cairo_set_line_width(dc, text->stroke_width);
+            cairo_set_source_rgba(dc, text->stroke_col.r, text->stroke_col.b, text->stroke_col.g, text->stroke_col.a);
             cairo_stroke(dc);
         }
        return surface;
@@ -69,12 +69,12 @@ void CTheme::ParseSVGForText(char *filename, TThemeTxt *text) {
         root_element = xmlDocGetRootElement(doc);
         
         /* set some defaults */
-        (*text).scale = 1.0;
-        (*text).fontfamily[0]  ='\0';
-        strncat((*text).fontfamily,"Sans",4);
-        (*text).fontstyle = CAIRO_FONT_SLANT_NORMAL;
-        (*text).fontweight = CAIRO_FONT_WEIGHT_NORMAL;
-        (*text).stroke_width = 0;
+        text->scale = 1.0;
+        text->fontfamily[0]  ='\0';
+        strncat(text->fontfamily,"Sans",4);
+        text->fontstyle = CAIRO_FONT_SLANT_NORMAL;
+        text->fontweight = CAIRO_FONT_WEIGHT_NORMAL;
+        text->stroke_width = 0;
 
         walk_tree(root_element, text);
         xmlFreeDoc(doc);
@@ -86,7 +86,7 @@ void CTheme::ParseSVGForRect(char *filename, TThemeRect *rect) {
         doc = xmlReadFile(filename, NULL, 0);
         root_element = xmlDocGetRootElement(doc);
         /* set some defaults */
-        (*rect).stroke_width = 0;
+        rect->stroke_width = 0;
         
         walk_tree(root_element, rect);
         xmlFreeDoc(doc);
@@ -104,9 +104,9 @@ void CTheme::walk_tree(xmlNode * a_node, TThemeTxt *text)
                 while (attr != NULL) {
                    if (!strcasecmp((char *) cur_node->name, "text")) {
                         if (!strcasecmp((char *) attr->name, "x")) {
-                            sscanf((char *) xmlGetProp(cur_node, attr->name),"%lf",&(*text).x);
+                            sscanf((char *) xmlGetProp(cur_node, attr->name),"%lf",&(text->x));
                         } else if (!strcasecmp((char *) attr->name, "y")) {
-                            sscanf((char *) xmlGetProp(cur_node, attr->name),"%lf",&(*text).y);
+                            sscanf((char *) xmlGetProp(cur_node, attr->name),"%lf",&(text->y));
                         } else if (!strcasecmp((char *) attr->name, "transform")) {
                             double x_trans, y_trans;
                             char tmp_string[10], *p; 
@@ -122,41 +122,41 @@ void CTheme::walk_tree(xmlNode * a_node, TThemeTxt *text)
                                 tmp_string[0] = '\0';
                                 strncat(tmp_string, string, p - string);
                                 sscanf(tmp_string, "%lf", &y_trans);
-                                (*text).x += x_trans;
-                                (*text).y += y_trans;
+                                text->x += x_trans;
+                                text->y += y_trans;
                             }
                         } else if (!strcasecmp((char *) attr->name, "style")) {
                            string = strtok((char *) xmlGetProp(cur_node, attr->name), ";");
                            while (string != NULL) {
                                 if (!strncasecmp(string, "font-size:", 10)) {
-                                    sscanf((string + 10),"%lf", &(*text).fontsize);
+                                    sscanf((string + 10),"%lf", &(text->fontsize));
                                 } else if (!strncasecmp(string, "font-family:", 12)) {
-                                    (*text).fontfamily[0]  ='\0';
+                                    text->fontfamily[0]  ='\0';
                                     strncat((*text).fontfamily, (string + 12), 31);     /* copy no more than 31 bytes to not caue buffer overrun */
                                 } else if (!strncasecmp(string, "font-style:", 11)) {
                                     if(!strncasecmp((string + 11), "normal", 6)) {
-                                        (*text).fontstyle = CAIRO_FONT_SLANT_NORMAL;
+                                        text->fontstyle = CAIRO_FONT_SLANT_NORMAL;
                                     } else if(!strncasecmp((string + 11), "italic", 6)) {
-                                        (*text).fontstyle = CAIRO_FONT_SLANT_ITALIC;
+                                        text->fontstyle = CAIRO_FONT_SLANT_ITALIC;
                                     } else if(!strncasecmp((string + 11), "oblique", 7)) {
-                                        (*text).fontstyle = CAIRO_FONT_SLANT_OBLIQUE;
+                                        text->fontstyle = CAIRO_FONT_SLANT_OBLIQUE;
                                     }
                                 } else if (!strncasecmp(string, "font-weight:", 12)) {
                                     if(!strncasecmp((string + 12), "normal", 6)) {
-                                        (*text).fontweight = CAIRO_FONT_WEIGHT_NORMAL;
+                                        text->fontweight = CAIRO_FONT_WEIGHT_NORMAL;
                                     } else if(!strncasecmp((string + 12), "bold", 4)) {
-                                        (*text).fontweight = CAIRO_FONT_WEIGHT_BOLD;
+                                        text->fontweight = CAIRO_FONT_WEIGHT_BOLD;
                                     }
                                 } else if (!strncasecmp(string, "fill:", 5)) {
-                                    getcolor((string + 5), &(*text).fill_col);
+                                    getcolor((string + 5), &(text->fill_col));
                                 } else if (!strncasecmp(string, "fill-opacity:", 13)) {
-                                    sscanf((string + 13), "%lf", &(*text).fill_col.a);
+                                    sscanf((string + 13), "%lf", &(text->fill_col.a));
                                 } else if (!strncasecmp(string, "stroke:", 7)) {
-                                    getcolor((string + 7), &(*text).stroke_col);
+                                    getcolor((string + 7), &(text->stroke_col));
                                 } else if (!strncasecmp(string, "stroke-opacity:", 15)) {
-                                    sscanf((string + 15), "%lf", &(*text).stroke_col.a);
+                                    sscanf((string + 15), "%lf", &(text->stroke_col.a));
                                 } else if (!strncasecmp(string, "stroke-width:", 13)) {
-                                    sscanf((string + 13),"%lf", &(*text).stroke_width);
+                                    sscanf((string + 13),"%lf", &(text->stroke_width));
                                 }
                                 string = strtok(NULL, ";");
                            }
@@ -183,28 +183,28 @@ void CTheme::walk_tree(xmlNode * a_node, TThemeRect *rect)
                 while (attr != NULL) {
                    if (!strcasecmp((char *) cur_node->name, "rect")) {
                         if (!strcasecmp((char *) attr->name, "x")) {
-                            sscanf((char *) xmlGetProp(cur_node, attr->name),"%lf",&(*rect).x);
+                            sscanf((char *) xmlGetProp(cur_node, attr->name),"%lf",&(rect->x));
                         } else if (!strcasecmp((char *) attr->name, "y")) {
-                            sscanf((char *) xmlGetProp(cur_node, attr->name),"%lf",&(*rect).y);
+                            sscanf((char *) xmlGetProp(cur_node, attr->name),"%lf",&(rect->y));
                         } else if (!strcasecmp((char *) attr->name, "width")) {
-                            sscanf((char *) xmlGetProp(cur_node, attr->name),"%lf",&(*rect).final_width);
-                            (*rect).width = (*rect).final_width;
+                            sscanf((char *) xmlGetProp(cur_node, attr->name),"%lf",&(rect->final_width));
+                            rect->width = rect->final_width;
                         } else if (!strcasecmp((char *) attr->name, "height")) {
-                            sscanf((char *) xmlGetProp(cur_node, attr->name),"%lf",&(*rect).final_height);
-                            (*rect).height = (*rect).final_height;
+                            sscanf((char *) xmlGetProp(cur_node, attr->name),"%lf",&(rect->final_height));
+                            rect->height = rect->final_height;
                         } else if (!strcasecmp((char *) attr->name, "style")) {
                            string = strtok((char *) xmlGetProp(cur_node, attr->name), ";");
                            while (string != NULL) {
                                 if (!strncasecmp(string, "fill:", 5)) {
-                                    getcolor((string + 5), &(*rect).fill_col);
+                                    getcolor((string + 5), &(rect->fill_col));
                                 } else if (!strncasecmp(string, "fill-opacity:", 13)) {
-                                    sscanf((string + 13), "%lf", &(*rect).fill_col.a);
+                                    sscanf((string + 13), "%lf", &(rect->fill_col.a));
                                 } else if (!strncasecmp(string, "stroke:", 7)) {
-                                    getcolor((string + 7), &(*rect).stroke_col);
+                                    getcolor((string + 7), &(rect->stroke_col));
                                 } else if (!strncasecmp(string, "stroke-opacity:", 15)) {
-                                    sscanf((string + 15), "%lf", &(*rect).stroke_col.a);
+                                    sscanf((string + 15), "%lf", &(rect->stroke_col.a));
                                 } else if (!strncasecmp(string, "stroke-width:", 13)) {
-                                    sscanf((string + 13),"%lf", &(*rect).stroke_width);
+                                    sscanf((string + 13),"%lf", &(rect->stroke_width));
                                 }
                                 string = strtok(NULL, ";");
                            }
@@ -224,56 +224,56 @@ void CTheme::getcolor(char *string, TRGBA *col) {
         if (string[0] == '#') {
             if(strlen(string) == 7) {
                 sscanf((string+1), "%02x %02x %02x", &r, &g, &b);
-                (*col).r = (double) r / 255;
-                (*col).g = (double) g / 255;
-                (*col).b = (double) b / 255;
+                col->r = (double) r / 255;
+                col->g = (double) g / 255;
+                col->b = (double) b / 255;
             }
         } else if(!strcasecmp(string, "red")) {
-            (*col).r = 1;
-            (*col).g = (*col).b = 0;
+            col->r = 1;
+            col->g = col->b = 0;
         } else if(!strcasecmp(string, "lime")) {
-            (*col).g = 1;
-            (*col).r = (*col).b = 0;
+            col->g = 1;
+            col->r = col->b = 0;
         } else if(!strcasecmp(string, "blue")) {
-            (*col).b = 1;
-            (*col).r = (*col).g = 0;
+            col->b = 1;
+            col->r = col->g = 0;
         } else if(!strcasecmp(string, "black")) {
-            (*col).r = (*col).g = (*col).b = 0;
+            col->r = col->g = col->b = 0;
         } else if(!strcasecmp(string, "silver")) {
-            (*col).r = (*col).g = (*col).b = 0.75;
+            col->r = col->g = col->b = 0.75;
         } else if(!strcasecmp(string, "gray")) {
-            (*col).r = (*col).g = (*col).b = 0.5;
+            col->r = col->g = col->b = 0.5;
         } else if(!strcasecmp(string, "white")) {
-            (*col).r = (*col).g = (*col).b = 1;
+            col->r = col->g = col->b = 1;
         } else if(!strcasecmp(string, "maroon")) {
-            (*col).r = 0.5;
-            (*col).g = (*col).b = 0;
+            col->r = 0.5;
+            col->g = col->b = 0;
         } else if(!strcasecmp(string, "purple")) {
-            (*col).g = 0.5;
-            (*col).r = (*col).b = 0.5;
+            col->g = 0.5;
+            col->r = col->b = 0.5;
         } else if(!strcasecmp(string, "fuchsia")) {
-            (*col).g = 0.5;
-            (*col).r = (*col).b = 1;
+            col->g = 0.5;
+            col->r = col->b = 1;
         } else if(!strcasecmp(string, "green")) {
-            (*col).g = 0.5;
-            (*col).r = (*col).b = 0;
+            col->g = 0.5;
+            col->r = col->b = 0;
         } else if(!strcasecmp(string, "olive")) {
-            (*col).b = 0;
-            (*col).r = (*col).g = 0.5;
+            col->b = 0;
+            col->r = col->g = 0.5;
         } else if(!strcasecmp(string, "yellow")) {
-            (*col).b = 0;
-            (*col).r = (*col).g = 1;
+            col->b = 0;
+            col->r = col->g = 1;
         } else if(!strcasecmp(string, "navy")) {
-            (*col).b = 0.5;
-            (*col).r = (*col).g = 0;
+            col->b = 0.5;
+            col->r = col->g = 0;
         } else if(!strcasecmp(string, "teal")) {
-            (*col).r = 0;
-            (*col).g = (*col).b = 0.5;
+            col->r = 0;
+            col->g = col->b = 0.5;
         } else if(!strcasecmp(string, "aqua")) {
-            (*col).r = 0;
-            (*col).g = (*col).b = 1;
+            col->r = 0;
+            col->g = col->b = 1;
         } else if(!strcasecmp((string), "none")) {
-            (*col).r = (*col).g = (*col).b = -1;
+            col->r = col->g = col->b = -1;
         }
     
 }
