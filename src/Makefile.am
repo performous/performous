@@ -2,6 +2,7 @@ bin_PROGRAMS = ultrastarng
 
 ultrastarng_SOURCES = main.cpp \
 	audio.cpp \
+	video.cpp \
 	record.cpp \
 	songs.cpp \
 	screenmanager.cpp \

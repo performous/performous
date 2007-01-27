@@ -9,9 +9,7 @@ CScreenSing::CScreenSing(char * name)
 	screenName = name;
 	play = false;
 	finished = false;
-#ifdef USE_SMPEG
-	mpeg = NULL;
-#endif
+	video = new CVideo();
 	SDL_Surface *screen;
 
 	screen = CScreenManager::getSingletonPtr()->getSDLScreen();
@@ -31,6 +29,7 @@ CScreenSing::~CScreenSing()
 {
 	if(videoSurf)
             SDL_FreeSurface(videoSurf);
+	delete video;
         delete theme;
 }
 
@@ -50,24 +49,9 @@ void CScreenSing::manageEvent( SDL_Event event )
 		CSong * song = CScreenManager::getSingletonPtr()->getSong();
 		
 		if( song->video != NULL ) {
-#ifdef USE_SMPEG
 			sprintf(buff,"%s/%s",song->path,song->video);
 			fprintf(stdout,"Now playing: (%d) : %s\n",CScreenManager::getSingletonPtr()->getSongId(),buff);
-			mpeg = SMPEG_new(buff, &info, 0);
-			if( SMPEG_error( mpeg ) ) {
-				fprintf( stderr, "SMPEG error: %s\n", SMPEG_error( mpeg ) );
-				SMPEG_delete( mpeg );
-				mpeg = NULL;
-		        } else {
-				SMPEG_setdisplay(mpeg, videoSurf, NULL, NULL);
-				SMPEG_enablevideo(mpeg, 1);
-				SMPEG_enableaudio(mpeg, 0);
-				SMPEG_setvolume(mpeg, 0);
-				SMPEG_scaleXY(mpeg, 800 , 600 );
-			}
-#else
-			fprintf(stdout,"Video file was found, but Ultrastar-ng was not compile with smpeg support\n");
-#endif
+			video->loadVideo(buff,videoSurf,800,600);
 
                         if(song->backgroundSurf)
                                 SDL_FreeSurface(song->backgroundSurf);
@@ -137,12 +121,7 @@ void CScreenSing::draw( void )
 
 	if(finished) {
                 CScreenManager::getSingletonPtr()->getAudio()->stopMusic();
-#ifdef USE_SMPEG
-		if( mpeg != NULL ) {
-			SMPEG_delete(mpeg);
-			mpeg=NULL;
-		}
-#endif
+		video->unloadVideo();
 		SDL_FillRect(videoSurf,NULL,0xffffff);
 		play = false;
 		finished = false;
@@ -162,15 +141,14 @@ void CScreenSing::draw( void )
 		double songPercent = (double)time / (double)sm->getAudio()->getLength();
 
 		// Draw the video
-#ifdef USE_SMPEG
-		if( mpeg != NULL ){
-			if( SMPEG_status(mpeg) != SMPEG_PLAYING && time > song->videoGap )
-				SMPEG_play(mpeg);
+		if( !video->isPlaying() && time > song->videoGap )
+			video->play();
+		if( video->isPlaying() ) {
 			position.x=0;
 			position.y=0;
 			SDL_BlitSurface(videoSurf, NULL,  sm->getSDLScreen(), &position);
-                } 
-#endif
+		}
+
                 if (song->backgroundSurf) {
                     SDL_BlitSurface(song->backgroundSurf,NULL,sm->getSDLScreen(), NULL);
                 }

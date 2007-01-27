@@ -6,6 +6,7 @@
 #include <screen.h>
 #include <pitch_graph.h>
 #include <theme.h>
+#include <video.h>
 
 class CScreenSing : public CScreen {
 	public:
@@ -24,10 +25,7 @@ class CScreenSing : public CScreen {
 	unsigned int start;
         unsigned int song_pos;
 	char sentenceNextSentence[128];
-#ifdef USE_SMPEG
-        SMPEG *mpeg;
-	SMPEG_Info info;
-#endif
+	CVideo * video;
         CThemeSing *theme;
 };
 

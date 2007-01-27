@@ -20,6 +20,7 @@ imagesdir   = @IMAGES_DIR@
 images_DATA = images/no_cover.png
 
 includes = include/audio.h \
+	include/video.h \
 	include/cairotosdl.h \
 	include/pitch_graph.h \
 	include/screen.h \
