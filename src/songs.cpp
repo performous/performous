@@ -284,7 +284,7 @@ CSongs::CSongs()
 		        else {
 			    // Here we want to have cover of 256x256 in 800x600 and scale it if the resolution is different
 			    int w = CScreenManager::getSingletonPtr()->getWidth()*256/800;
-			    int h = CScreenManager::getSingletonPtr()->getHeight()*256/800;
+			    int h = CScreenManager::getSingletonPtr()->getHeight()*256/600;
 			    tmp->coverSurf = zoomSurface(coverSurface,(double) w/coverSurface->w,(double) h/coverSurface->h,1);
 			    SDL_FreeRW(rwop);
 		        }
