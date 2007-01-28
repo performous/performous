@@ -282,7 +282,10 @@ CSongs::CSongs()
                         if( coverSurface == NULL )
 			    tmp->coverSurf = surface_nocover;
 		        else {
-			    tmp->coverSurf = zoomSurface(coverSurface,(double) 256/coverSurface->w,(double) 256/coverSurface->h,1);
+			    // Here we want to have cover of 256x256 in 800x600 and scale it if the resolution is different
+			    int w = CScreenManager::getSingletonPtr()->getWidth()*256/800;
+			    int h = CScreenManager::getSingletonPtr()->getHeight()*256/800;
+			    tmp->coverSurf = zoomSurface(coverSurface,(double) w/coverSurface->w,(double) h/coverSurface->h,1);
 			    SDL_FreeRW(rwop);
 		        }
 		        
@@ -299,7 +302,9 @@ CSongs::CSongs()
                             if( backgroundSurface == NULL )
                                 tmp->backgroundSurf = NULL;
                             else {
-                                tmp->backgroundSurf = zoomSurface(backgroundSurface,(double)800/backgroundSurface->w,(double)600/backgroundSurface->h,1);
+			    	int w = CScreenManager::getSingletonPtr()->getWidth();
+			    	int h = CScreenManager::getSingletonPtr()->getHeight();
+                                tmp->backgroundSurf = zoomSurface(backgroundSurface,(double)w/backgroundSurface->w,(double)h/backgroundSurface->h,1);
                                 SDL_FreeRW(rwop);
                             }
                         }

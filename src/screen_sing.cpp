@@ -4,7 +4,7 @@
 #include <cairotosdl.h>
 
 CScreenSing::CScreenSing(char * name)
-: pitchGraph(800, 600)
+: pitchGraph(CScreenManager::getSingletonPtr()->getWidth(), CScreenManager::getSingletonPtr()->getHeight())
 {
 	screenName = name;
 	play = false;
@@ -15,7 +15,8 @@ CScreenSing::CScreenSing(char * name)
 	screen = CScreenManager::getSingletonPtr()->getSDLScreen();
 
 	videoSurf = SDL_AllocSurface( screen->flags,
-			800 , 600 ,
+			CScreenManager::getSingletonPtr()->getWidth(),
+			CScreenManager::getSingletonPtr()->getHeight(),
 			screen->format->BitsPerPixel,
 			screen->format->Rmask,
 			screen->format->Gmask,
@@ -51,7 +52,7 @@ void CScreenSing::manageEvent( SDL_Event event )
 		if( song->video != NULL ) {
 			sprintf(buff,"%s/%s",song->path,song->video);
 			fprintf(stdout,"Now playing: (%d) : %s\n",CScreenManager::getSingletonPtr()->getSongId(),buff);
-			video->loadVideo(buff,videoSurf,800,600);
+			video->loadVideo(buff,videoSurf,sm->getWidth(),sm->getHeight());
 
                         if(song->backgroundSurf)
                                 SDL_FreeSurface(song->backgroundSurf);
@@ -79,7 +80,7 @@ void CScreenSing::manageEvent( SDL_Event event )
                         SDL_BlitSurface(song->backgroundSurf,NULL,sm->getSDLScreen(), NULL);
                } else {
                         song->backgroundSurf = SDL_CreateRGBSurface( CScreenManager::getSingletonPtr()->getSDLScreen()->flags,
-                                                        800 , 600 ,
+                                                        sm->getWidth() , sm->getHeight() ,
                                                         CScreenManager::getSingletonPtr()->getSDLScreen()->format->BitsPerPixel,
                                                         CScreenManager::getSingletonPtr()->getSDLScreen()->format->Rmask,
                                                         CScreenManager::getSingletonPtr()->getSDLScreen()->format->Gmask,
