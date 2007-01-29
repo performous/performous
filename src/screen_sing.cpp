@@ -315,7 +315,7 @@ void CScreenSing::draw( void )
                 tmptxt = theme->lyricspast;
                 tmptxt.text = sentenceWhole;
                 cairo_text_extents_t extents = theme->theme->GetTextExtents(tmptxt);
-                theme->lyricspast.x = (sm->getWidth() - extents.width)/2;
+                theme->lyricspast.x = (theme->lyricspast.svg_width - extents.width)/2;
                 theme->lyricspast.extents.x_advance = 0;
                 theme->lyricshighlight.extents.x_advance= 0;
                 
@@ -347,7 +347,7 @@ void CScreenSing::draw( void )
 	        if( sentenceNextSentence[0] ) {
                         theme->lyricsnextsentence.text = sentenceNextSentence;
                         theme->lyricsnextsentence.extents = theme->theme->GetTextExtents(theme->lyricsnextsentence);
-                        theme->lyricsnextsentence.x = (sm->getWidth() - theme->lyricsnextsentence.extents.width)/2;
+                        theme->lyricsnextsentence.x = (theme->lyricsnextsentence.svg_width - theme->lyricsnextsentence.extents.width)/2;
                         theme->theme->PrintText(&theme->lyricsnextsentence);
                 }
 		SDL_Surface* pitchGraphSurf = CairoToSdl::BlitToSdl(pitchGraph.getCurrent());

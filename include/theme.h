@@ -14,6 +14,8 @@ typedef struct _SRGBA {
 typedef struct _SThemeTxt {
         double x;
         double y;
+        double svg_width;
+        double svg_height;
         cairo_text_extents_t extents;
         TRGBA fill_col;
         TRGBA stroke_col;
@@ -29,6 +31,8 @@ typedef struct _SThemeTxt {
 typedef struct _SThemeRect {
         double x;
         double y;
+        double svg_width;
+        double svg_height;
         double final_width;
         double final_height;
         double width;

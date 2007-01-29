@@ -88,7 +88,7 @@ void CScreenSongs::draw( void )
 	char * orderStr = order[sm->getSongs()->getOrder()];
 	theme->order.text = orderStr;
 	cairo_text_extents_t extents = theme->theme->GetTextExtents(theme->order);
-	theme->order.x = (sm->getWidth() - extents.width)/2;
+	theme->order.x = (theme->order.svg_width - extents.width)/2;
 	theme->theme->PrintText(&theme->order);
 	}
 
@@ -98,7 +98,7 @@ void CScreenSongs::draw( void )
 	sprintf(informationStr,"%s - %s",sm->getSong()->artist, sm->getSong()->title);
 	theme->song.text = informationStr;
 	cairo_text_extents_t extents = theme->theme->GetTextExtents(theme->song);
-	theme->song.x = (sm->getWidth() - extents.width)/2;
+	theme->song.x = (theme->song.svg_width - extents.width)/2;
 	theme->theme->PrintText(&theme->song);
 	}
 

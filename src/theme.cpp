@@ -19,6 +19,8 @@ void CTheme::clear() {
         dc = cairo_create(surface);
 }
 cairo_surface_t *CTheme::PrintText(TThemeTxt *text) {
+        cairo_save(dc);
+        cairo_scale(dc, width/text->svg_width, height/text->svg_height);
         cairo_select_font_face(dc, text->fontfamily, text->fontstyle, text->fontweight);
         cairo_set_font_size(dc, text->fontsize);
         cairo_move_to(dc, text->x, text->y);
@@ -38,9 +40,12 @@ cairo_surface_t *CTheme::PrintText(TThemeTxt *text) {
             cairo_set_source_rgba(dc, text->stroke_col.r, text->stroke_col.b, text->stroke_col.g, text->stroke_col.a);
             cairo_stroke(dc);
         }
-       return surface;
+        cairo_restore(dc);
+        return surface;
 }
 cairo_surface_t *CTheme::DrawRect(TThemeRect rect) {
+        cairo_save(dc);
+        cairo_scale(dc, width/rect.svg_width, height/rect.svg_height);
         cairo_rectangle(dc, rect.x, rect.y, rect.width, rect.height);
         if (rect.fill_col.r != -1 && rect.fill_col.g != -1 && rect.fill_col.b != -1) {
             cairo_set_source_rgba(dc, rect.fill_col.r, rect.fill_col.g, rect.fill_col.b, rect.fill_col.a);
@@ -54,6 +59,7 @@ cairo_surface_t *CTheme::DrawRect(TThemeRect rect) {
             cairo_set_source_rgba(dc, rect.stroke_col.r, rect.stroke_col.b, rect.stroke_col.g, rect.stroke_col.a);
             cairo_stroke(dc);
         }
+        cairo_restore(dc);
         return surface;
 }
 cairo_text_extents_t CTheme::GetTextExtents(TThemeTxt text) {
@@ -164,6 +170,12 @@ void CTheme::walk_tree(xmlNode * a_node, TThemeTxt *text)
 
                         }
 
+                    } else if (!strcasecmp((char *) cur_node->name, "svg")) {
+                         if (!strcasecmp((char *) attr->name, "width")) {
+                            sscanf((char *) xmlGetProp(cur_node, attr->name),"%lf",&(text->svg_width));
+                        } else if (!strcasecmp((char *) attr->name, "height")) {
+                            sscanf((char *) xmlGetProp(cur_node, attr->name),"%lf",&(text->svg_height));
+                        } 
                     }
                     attr = attr->next;
                 }
@@ -182,7 +194,7 @@ void CTheme::walk_tree(xmlNode * a_node, TThemeRect *rect)
             if (cur_node->properties != NULL) {
                 attr = cur_node->properties;
                 while (attr != NULL) {
-                   if (!strcasecmp((char *) cur_node->name, "rect")) {
+                    if (!strcasecmp((char *) cur_node->name, "rect")) {
                         if (!strcasecmp((char *) attr->name, "x")) {
                             sscanf((char *) xmlGetProp(cur_node, attr->name),"%lf",&(rect->x));
                         } else if (!strcasecmp((char *) attr->name, "y")) {
@@ -212,6 +224,12 @@ void CTheme::walk_tree(xmlNode * a_node, TThemeRect *rect)
 
                         }
 
+                    } else if (!strcasecmp((char *) cur_node->name, "svg")) {
+                        if (!strcasecmp((char *) attr->name, "width")) {
+                            sscanf((char *) xmlGetProp(cur_node, attr->name),"%lf",&(rect->svg_width));
+                        } else if (!strcasecmp((char *) attr->name, "height")) {
+                            sscanf((char *) xmlGetProp(cur_node, attr->name),"%lf",&(rect->svg_height));
+                        } 
                     }
                     attr = attr->next;
                 }
