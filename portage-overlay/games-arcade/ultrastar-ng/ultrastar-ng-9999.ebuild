@@ -39,7 +39,7 @@ S=${WORKDIR}/${ECVS_MODULE}
 pkg_setup() {
 	if use deprecated_cairo_svg ; then
 		ewarn "librsvg flag is not used, please be aware that"
-		ewarn "compiling ultrastar-ng without the librsvg use flag"
+		ewarn "compiling ultrastar-ng with the deprecated_cairo_svg use flag"
 		ewarn "will compile the game with the old, deprecated, ugly"
 		ewarn "cairo-svg rendering engine"
 	fi
