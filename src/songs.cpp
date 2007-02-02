@@ -225,7 +225,7 @@ bool CSongs::parseFile( CSong * tmp )
 
 CSongs::CSongs()
 {
-	DIR * dir;
+	DIR * dir=NULL;
 	struct dirent* dirEntry;
 	struct stat    info;
 	char buff[1024];
@@ -235,6 +235,9 @@ CSongs::CSongs()
 	SDL_RWops *rwop_nocover = SDL_RWFromFile(IMAGES_DIR "/no_cover.png", "rb");
 	surface_nocover = IMG_LoadPNG_RW(rwop_nocover);
 	SDL_FreeRW(rwop_nocover);
+
+	if( dir == NULL )
+		return;
 
 	while( (dirEntry = readdir(dir)) != NULL ) {
 		if( dirEntry->d_name[0] == '.' )
