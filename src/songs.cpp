@@ -345,6 +345,14 @@ CSongs::~CSongs()
 
 }
 
+CSong * CSongs::getSong( unsigned int i )
+{
+	if( i >= songs.size())
+		return NULL;
+	else
+		return songs[i];
+}
+
 void CSongs::sortByEdition( void )
 {
 	order = 0;

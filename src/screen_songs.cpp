@@ -79,6 +79,12 @@ void CScreenSongs::draw( void )
 {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
 
+	if( sm->getSong() == NULL ) {
+		fprintf(stdout,"No songs found in \"%s\", returning to intro screen\n", sm->getSongsDirectory());
+		sm->activateScreen("Intro");
+		return;
+	}
+
 	theme->theme->clear();
 
 	SDL_BlitSurface(theme->bg->getSDLSurface(),NULL,sm->getSDLScreen(),NULL);

@@ -70,7 +70,7 @@ class CSongs {
 	public:
 		CSongs();
 		~CSongs();
-		CSong * getSong( int i ) {return songs[i];};
+		CSong * getSong( unsigned int i );
 		int nbSongs( void ) {return songs.size();};
 		bool parseFile( CSong * tmp );
 		void sortByEdition( void );
