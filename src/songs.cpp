@@ -75,7 +75,7 @@ void CSong::parseFile( void )
 				buff[len-1] = '\0'; // Replace the \n or \r with a \0
 				sscanf(buff+1,"%d %d %d%n",&tmp->timestamp, &tmp->length , &tmp->note , &shift);
 				tmp->timestamp += relativeShift;
-				sprintf(syllable,"%s",buff+shift+2);
+				snprintf(syllable,16,"%s",buff+shift+2);
 				tmp->syllable = syllable;
 				if( tmp->note <= noteMin )
 					noteMin = tmp->note;
