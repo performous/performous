@@ -305,28 +305,49 @@ CTheme::~CTheme() {
         }
 }
 CThemeSongs::CThemeSongs() {
+	char * theme_path = new char[1024];
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
-	bg = new CairoSVG(THEMES_DIR "/default/songs_bg.svg", sm->getWidth(), sm->getHeight());
+
+	sm->getThemePathFile(theme_path,"songs_bg.svg");
+	bg = new CairoSVG(theme_path, sm->getWidth(), sm->getHeight());
+
         theme = new CTheme(sm->getWidth(), sm->getHeight());
-	theme->ParseSVGForText(THEMES_DIR "/default/songs_song.svg", &song);
-	theme->ParseSVGForText(THEMES_DIR "/default/songs_order.svg", &order);
+	sm->getThemePathFile(theme_path,"songs_song.svg");
+	theme->ParseSVGForText(theme_path, &song);
+	sm->getThemePathFile(theme_path,"songs_order.svg");
+	theme->ParseSVGForText(theme_path, &order);
+	
+	delete[] theme_path;
 }
 CThemeSongs::~CThemeSongs() {
 	delete bg;
 	delete theme;
 }
 CThemeSing::CThemeSing() {
+	char * theme_path = new char[1024];
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
-        bg = new CairoSVG(THEMES_DIR "/default/sing_bg.svg", sm->getWidth(), sm->getHeight());
-        p1box = new CairoSVG(THEMES_DIR "/default/sing_p1box.svg", sm->getWidth(), sm->getHeight());
+
+	sm->getThemePathFile(theme_path,"sing_bg.svg");
+        bg = new CairoSVG(theme_path, sm->getWidth(), sm->getHeight());
+	sm->getThemePathFile(theme_path,"sing_p1box.svg");
+        p1box = new CairoSVG(theme_path, sm->getWidth(), sm->getHeight());
         theme = new CTheme(sm->getWidth(), sm->getHeight());
-        theme->ParseSVGForText(THEMES_DIR "/default/sing_timetxt.svg", &timertxt);
-        theme->ParseSVGForText(THEMES_DIR "/default/sing_p1score.svg", &p1score);
-        theme->ParseSVGForText(THEMES_DIR "/default/sing_lyricscurrent.svg", &lyricspast);
-        theme->ParseSVGForText(THEMES_DIR "/default/sing_lyricscurrent.svg", &lyricsfuture);
-        theme->ParseSVGForText(THEMES_DIR "/default/sing_lyricshighlight.svg", &lyricshighlight);
-        theme->ParseSVGForText(THEMES_DIR "/default/sing_lyricsnext.svg", &lyricsnextsentence);
-        theme->ParseSVGForRect(THEMES_DIR "/default/sing_progressfg.svg", &progressfg);
+	sm->getThemePathFile(theme_path,"sing_timetxt.svg");
+        theme->ParseSVGForText(theme_path, &timertxt);
+	sm->getThemePathFile(theme_path,"sing_p1score.svg");
+        theme->ParseSVGForText(theme_path, &p1score);
+	sm->getThemePathFile(theme_path,"sing_lyricscurrent.svg");
+        theme->ParseSVGForText(theme_path, &lyricspast);
+	sm->getThemePathFile(theme_path,"sing_lyricscurrent.svg");
+        theme->ParseSVGForText(theme_path, &lyricsfuture);
+	sm->getThemePathFile(theme_path,"sing_lyricshighlight.svg");
+        theme->ParseSVGForText(theme_path, &lyricshighlight);
+	sm->getThemePathFile(theme_path,"sing_lyricsnext.svg");
+        theme->ParseSVGForText(theme_path, &lyricsnextsentence);
+	sm->getThemePathFile(theme_path,"sing_progressfg.svg");
+        theme->ParseSVGForRect(theme_path, &progressfg);
+
+	delete[] theme_path;
 }
 CThemeSing::~CThemeSing() {
         delete bg;

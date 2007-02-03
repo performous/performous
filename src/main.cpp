@@ -83,8 +83,11 @@ void usage( char * progname )
 
 int main( int argc, char ** argv )
 {
-	char * songs_directory;
-	char ch;
+	char * songs_directory = NULL;
+	char * theme_name      = NULL;
+	CScreen * screen       = NULL;
+	char ch                = 0;
+	SDL_Thread *thread     = NULL;
 
 	static struct option long_options[] =
 		{
@@ -99,7 +102,7 @@ int main( int argc, char ** argv )
 	while ((ch = getopt_long(argc, argv, "t:W:H:hv", long_options, NULL)) != -1) {
 		switch(ch) {
 			case 't':
-				fprintf(stdout,"Theme selection is not yet available\n");
+				theme_name = optarg;
 				break;
 			case 'W':
 				width=atoi(optarg);
@@ -127,8 +130,10 @@ int main( int argc, char ** argv )
 
 	init();
 
-	screenManager = new CScreenManager( width, height , songs_directory );
-	CScreen * screen;
+	if( theme_name != NULL )
+		screenManager = new CScreenManager( width, height , songs_directory , theme_name );
+	else
+		screenManager = new CScreenManager( width, height , songs_directory );
 
 	screenManager->setSDLScreen(screenSDL);
 	screenManager->setAudio( new CAudio() );
@@ -143,11 +148,7 @@ int main( int argc, char ** argv )
 
 	screenManager->activateScreen("Intro");
 
-	shot = screenManager->getAudio()->loadSound("sounds/shot.wav");
-	explose = screenManager->getAudio()->loadSound("sounds/explose.wav");
-	change = screenManager->getAudio()->loadSound("sounds/change.wav");
-
-	SDL_Thread *thread = SDL_CreateThread(thread_func, NULL);
+	thread = SDL_CreateThread(thread_func, NULL);
 
 	while( !screenManager->isFinished() ) {
 		SDL_FillRect(screenSDL,NULL,0xffffff);

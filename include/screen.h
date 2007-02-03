@@ -21,7 +21,7 @@ class CScreen {
 
 class CScreenManager : public CSingleton <CScreenManager>{
 	public:
-	CScreenManager( int width , int height , char * songs_dir );
+	CScreenManager( int width , int height , char * songs_dir , char * theme_name="default");
 	~CScreenManager();
 	void addScreen( CScreen * screen ) { 
 		screens.push_back(screen);
@@ -65,8 +65,11 @@ class CScreenManager : public CSingleton <CScreenManager>{
 	bool isFinished(void) { return m_finished; };
 
 	char * getSongsDirectory( void ) { return m_songs_dir; };
+	char * getThemeName( void ) { return m_theme_name; };
+	void getThemePathFile( char * dest , char * file);
 	private:
 	char * m_songs_dir;
+	char * m_theme_name;
 	std::vector <CScreen *> screens;
 	CScreen * currentScreen;
 	SDL_Surface * screen;

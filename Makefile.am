@@ -1,7 +1,21 @@
 SUBDIRS = src
 
-themesdir   = @THEMES_DIR@/default
-themes_DATA = themes/default/intro.svg \
+themesdir   = @THEMES_DIR@
+themes_DATA = themes/jesusda/intro.svg \
+	themes/jesusda/songs_bg.svg \
+	themes/jesusda/songs_order.svg \
+	themes/jesusda/songs_song.svg \
+	themes/jesusda/sing_bg.svg \
+	themes/jesusda/sing_lyricscurrent.svg \
+	themes/jesusda/sing_lyricshighlight.svg \
+	themes/jesusda/sing_lyricsnext.svg \
+	themes/jesusda/sing_p1box.svg \
+	themes/jesusda/sing_p1score.svg \
+	themes/jesusda/sing_p2box.svg \
+	themes/jesusda/sing_p2score.svg \
+	themes/jesusda/sing_progressfg.svg \
+	themes/jesusda/sing_timetxt.svg \
+	themes/default/intro.svg \
 	themes/default/songs_bg.svg \
 	themes/default/songs_order.svg \
 	themes/default/songs_song.svg \

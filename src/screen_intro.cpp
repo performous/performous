@@ -4,7 +4,10 @@ CScreenIntro::CScreenIntro(char * name)
 {
 	screenName = name;
 
-	cairo_svg = new CairoSVG(THEMES_DIR "/default/intro.svg",CScreenManager::getSingletonPtr()->getWidth(),CScreenManager::getSingletonPtr()->getHeight());
+	char * theme_path = new char[1024];
+	CScreenManager::getSingletonPtr()->getThemePathFile(theme_path,"intro.svg");
+	cairo_svg = new CairoSVG(theme_path,CScreenManager::getSingletonPtr()->getWidth(),CScreenManager::getSingletonPtr()->getHeight());
+	delete[] theme_path;
 }
 
 CScreenIntro::~CScreenIntro()
