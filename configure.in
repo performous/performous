@@ -66,7 +66,7 @@ AC_LANG_SAVE
 		AC_MSG_ERROR([You need to have the libstdc++ headers installed]))
 AC_LANG_RESTORE
 
-AC_CHECK_HEADERS([fcntl.h math.h stdlib.h stdio.h dirent.h sys/ioctl.h sys/types.h sys/stat.h ],
+AC_CHECK_HEADERS([fcntl.h math.h stdlib.h stdio.h getopt.h dirent.h sys/ioctl.h sys/types.h sys/stat.h ],
 	have_std_headers=yes,
 	AC_MSG_ERROR(You need to have the standard c headers installed) )
 
@@ -105,6 +105,7 @@ $ac_includes_default
 #include <vector>
 #include <iostream>
 /* libc headers */
+#include <getopt.h>
 #include <fcntl.h>
 #include <math.h>
 #include <stdlib.h>

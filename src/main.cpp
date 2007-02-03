@@ -63,17 +63,67 @@ int thread_func(void *)
 	return 1;
 }
 
+void usage( char * progname )
+{
+	fprintf(stdout,"Usage: %s [options] song_directory\n", progname);
+	fprintf(stdout,"Options:\n");
+	fprintf(stdout,"--------\n");
+	fprintf(stdout,"-h, --help\n");
+	fprintf(stdout,"Display this text and exit\n");
+	fprintf(stdout,"-W, --width (Default: 640)\n");
+	fprintf(stdout,"Set window width\n");
+	fprintf(stdout,"-H, --height (Default: 480)\n");
+	fprintf(stdout,"Set window height\n");
+	fprintf(stdout,"-t, --theme\n");
+	fprintf(stdout,"Set theme\n");
+	fprintf(stdout,"-v, --version\n");
+	fprintf(stdout,"Display version number and exit\n");
+	exit(EXIT_SUCCESS);
+}
+
 int main( int argc, char ** argv )
 {
 	char * songs_directory;
-	if( argc != 2 ) {
-		fprintf(stdout,"Usage: %s songs_directory\n",argv[0]);
-		return EXIT_FAILURE;
+	char ch;
+
+	static struct option long_options[] =
+		{
+		{"width",required_argument,NULL,'W'},
+		{"height",required_argument,NULL,'H'},
+		{"theme",required_argument,NULL,'t'},
+		{"help",no_argument,NULL,'h'},
+		{"version",no_argument,NULL,'v'},
+		{0, 0, 0, 0}
+	};
+
+	while ((ch = getopt_long(argc, argv, "t:W:H:hv", long_options, NULL)) != -1) {
+		switch(ch) {
+			case 't':
+				fprintf(stdout,"Theme selection is not yet available\n");
+				break;
+			case 'W':
+				width=atoi(optarg);
+				break;
+			case 'H':
+				height=atoi(optarg);
+				break;
+			case 'h':
+				usage(argv[0]);
+				break;
+			case 'v':
+				fprintf(stdout,"%s %s\n",PACKAGE, VERSION);
+				exit(EXIT_SUCCESS);
+				break;
+		}
+	}
+
+	if( optind == argc ) {
+		usage(argv[0]);
 	}
 
 	// Add the trailing slash
-	songs_directory = new char[strlen(argv[1])+2];
-	sprintf(songs_directory,"%s/",argv[1]);
+	songs_directory = new char[strlen(argv[optind])+2];
+	sprintf(songs_directory,"%s/",argv[optind]);
 
 	init();
 
