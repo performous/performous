@@ -53,11 +53,6 @@ CAudio::~CAudio()
 #endif
 }
 
-void CAudio::loadMusic( char * )
-{
-        ;
-}
-
 void CAudio::playMusic( char * filename )
 {
         if (isPlaying()) 
@@ -154,16 +149,6 @@ void CAudio::stopMusic( void )
 #ifdef USE_GSTREAMER
 	gst_element_set_state (music, GST_STATE_NULL);
 #endif
-}
-
-int CAudio::loadSound( char * filename )
-{
-        sounds.push_back(filename);
-        return sounds.size()-1;
-}
-
-void CAudio::playSound( int , int )
-{
 }
 
 int CAudio::getPosition( void )
