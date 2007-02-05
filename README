@@ -1,22 +1,26 @@
 To install from CVS :
 
-./autogen.sh
-./configure --with-a-lot-of-options
-make
+  ./autogen.sh
+  # use --help for a complete list of configure options
+  ./configure --with-a-lot-of-options
+  make
+  make install
 
 To run the game :
-./src/ultrastarng
+
+  # $prefix is generaly set to /usr or /usr/local/
+  $prefix/bin/ultrastarng
 
 Dependencies:
-	- SDL SDL_image cairo (cairo-svg|librsvg)
-	- smpeg (optional)
-	- FFTW
-	- libalsa
-	- (xine|gstreamer)
-	- libxml2
-
-Place the songs into songs/directory and put directory.txt into it (with
-#MP3 and others set)
+	- SDL : for window management
+	- SDL_image SDL_gfx : for image and zoom of SDL surface
+	- cairo >= 1.2 : for scalable graphical support
+	- cairo-svg (deprecated) or librsvg : for svg rendering (themes=
+	- smpeg (optional) : for video playback
+	- fftw3 : for captured note computation
+	- libalsa : capturing API used
+	- xine or gstreamer : for audio playback
+	- libxml2 : used as librsvg hack for theming
 
 If you need Jamelia MP3 for test download it with UlstraStar (pascal/windows
 version).
