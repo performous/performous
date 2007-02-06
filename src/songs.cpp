@@ -46,7 +46,7 @@ bool compareSongs( CSong * left , CSong * right)
 void CSong::parseFile( void )
 {
 	char buff[256];
-	sprintf(buff,"%s/%s",path,filename);
+	snprintf(buff,256,"%s/%s",path,filename);
 	int relativeShift = 0;
         maxScore = 0;
 	FILE * fp = fopen(buff,"r");
@@ -126,7 +126,7 @@ CSong::CSong()
 bool CSongs::parseFile( CSong * tmp )
 {
 	char buff[256];
-	sprintf(buff,"%s/%s",tmp->path,tmp->filename);
+	snprintf(buff,256,"%s/%s",tmp->path,tmp->filename);
 	FILE * fp = fopen(buff,"r");
 	if(!fp) {
 		fprintf(stderr , "Cannot open \"%s\"\n",buff);
@@ -246,7 +246,7 @@ CSongs::CSongs()
 			continue;
 		
 		char * path = new char[1024];
-		sprintf(path,"%s%s",songs_dir,dirEntry->d_name);
+		snprintf(path,1024,"%s%s",songs_dir,dirEntry->d_name);
 		stat(path,&info);
 		if ( !S_ISDIR(info.st_mode) ) {
 			delete[] path;
@@ -261,7 +261,7 @@ CSongs::CSongs()
 		tmp->orderType = 2;
 		tmp->path = path;
 		char * txt = new char[strlen(dirEntry->d_name)+4+1];
-		sprintf(txt,"%s.txt",dirEntry->d_name);
+		sprintf(txt,"%s.txt",dirEntry->d_name); // safe sprintf
 		tmp->filename = txt;
 		if( !parseFile(tmp) ) {
 			delete[] path;
@@ -270,11 +270,11 @@ CSongs::CSongs()
 		} else {
 			if(!tmp->cover) {
                             char * cover = new char[strlen(dirEntry->d_name)+4+1];
-		            sprintf(cover,"%s.png",dirEntry->d_name);
+		            sprintf(cover,"%s.png",dirEntry->d_name); // safe sprintf
 		            tmp->cover = cover;
                         }
 
-		        sprintf(buff,"%s/%s/%s",songs_dir,dirEntry->d_name,tmp->cover);
+		        snprintf(buff,1024,"%s/%s/%s",songs_dir,dirEntry->d_name,tmp->cover);
 		        SDL_RWops *rwop = SDL_RWFromFile(buff, "rb");
 		        SDL_Surface * coverSurface = NULL;
                         if(strstr(tmp->cover, ".png"))
@@ -292,7 +292,7 @@ CSongs::CSongs()
 			    SDL_FreeRW(rwop);
 		        }
 		        
-                        sprintf(buff,"%s/%s/%s",songs_dir,dirEntry->d_name,tmp->background);
+                        snprintf(buff,1024,"%s/%s/%s",songs_dir,dirEntry->d_name,tmp->background);
                         rwop = SDL_RWFromFile(buff, "rb");
                         
                         if (tmp->background) {

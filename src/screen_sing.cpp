@@ -50,7 +50,7 @@ void CScreenSing::manageEvent( SDL_Event event )
 		CSong * song = CScreenManager::getSingletonPtr()->getSong();
 		
 		if( song->video != NULL ) {
-			sprintf(buff,"%s/%s",song->path,song->video);
+			snprintf(buff,1024,"%s/%s",song->path,song->video);
 			fprintf(stdout,"Now playing: (%d) : %s\n",CScreenManager::getSingletonPtr()->getSongId(),buff);
 			video->loadVideo(buff,videoSurf,sm->getWidth(),sm->getHeight());
 
@@ -94,7 +94,7 @@ void CScreenSing::manageEvent( SDL_Event event )
                }
 
 
-		sprintf(buff,"%s/%s",song->path,song->mp3);
+		snprintf(buff,1024,"%s/%s",song->path,song->mp3);
 		fprintf(stdout,"Now playing : (%d) : %s\n",CScreenManager::getSingletonPtr()->getSongId(),buff);
 		CScreenManager::getSingletonPtr()->getAudio()->playMusic(buff);
 		sentenceNextSentence[0] = '\n';

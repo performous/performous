@@ -126,7 +126,7 @@ int main( int argc, char ** argv )
 
 	// Add the trailing slash
 	songs_directory = new char[strlen(argv[optind])+2];
-	sprintf(songs_directory,"%s/",argv[optind]);
+	sprintf(songs_directory,"%s/",argv[optind]); // safe sprintf
 
 	init();
 
