@@ -1,3 +1,12 @@
+Features:
+
+- Add scoring/analysis
+- Add difficulty
+- Add song pre-"view" in songs screen
+
+
+Fixes/Enhancement:
+
 - Do note preload all the songs at screen_song
 - Add binary dump of the songs (to speed up directory browsing)
 - Add "To start" cursor before sentence beginning in more than 'n' beat
