@@ -69,15 +69,15 @@ void usage( char * progname )
 	fprintf(stdout,"Options:\n");
 	fprintf(stdout,"--------\n");
 	fprintf(stdout,"-h, --help\n");
-	fprintf(stdout,"Display this text and exit\n");
+	fprintf(stdout,"\tDisplay this text and exit\n");
 	fprintf(stdout,"-W, --width (Default: 640)\n");
-	fprintf(stdout,"Set window width\n");
+	fprintf(stdout,"\tSet window width\n");
 	fprintf(stdout,"-H, --height (Default: 480)\n");
-	fprintf(stdout,"Set window height\n");
+	fprintf(stdout,"\tSet window height\n");
 	fprintf(stdout,"-t, --theme\n");
-	fprintf(stdout,"Set theme\n");
+	fprintf(stdout,"\tSet theme\n");
 	fprintf(stdout,"-v, --version\n");
-	fprintf(stdout,"Display version number and exit\n");
+	fprintf(stdout,"\tDisplay version number and exit\n");
 	exit(EXIT_SUCCESS);
 }
 
