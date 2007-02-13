@@ -30,7 +30,7 @@ void checkEvents( void )
 
 void init( void )
 {
-	if( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO) ==  -1 ) {
+	if( SDL_Init(SDL_INIT_VIDEO) ==  -1 ) {
 		fprintf(stderr,"SDL_Init Error\n");
 		SDL_Quit();
 		exit(EXIT_FAILURE);
