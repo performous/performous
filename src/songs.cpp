@@ -232,7 +232,12 @@ CSongs::CSongs()
 	char * songs_dir = CScreenManager::getSingletonPtr()->getSongsDirectory();
 	dir = opendir(songs_dir);
 	order = 2;
-	SDL_RWops *rwop_nocover = SDL_RWFromFile(IMAGES_DIR "/no_cover.png", "rb");
+
+	char * theme_path = new char[1024];
+	CScreenManager::getSingletonPtr()->getThemePathFile(theme_path,"no_cover.png");
+	SDL_RWops *rwop_nocover = SDL_RWFromFile(theme_path, "rb");
+	delete[] theme_path;
+
 	surface_nocover = IMG_LoadPNG_RW(rwop_nocover);
 	SDL_FreeRW(rwop_nocover);
 

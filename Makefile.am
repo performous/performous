@@ -1,7 +1,8 @@
 SUBDIRS = src
 
 themesdefdir   = @THEMES_DIR@/default
-themesdef_DATA = themes/default/intro.svg \
+themesdef_DATA = themes/default/no_cover.png \
+	themes/default/intro.svg \
 	themes/default/songs_bg.svg \
 	themes/default/songs_order.svg \
 	themes/default/songs_song.svg \
@@ -16,24 +17,22 @@ themesdef_DATA = themes/default/intro.svg \
 	themes/default/sing_progressfg.svg \
 	themes/default/sing_timetxt.svg
 
-themesjdadir   = @THEMES_DIR@/jesusda
-themesjda_DATA = themes/jesusda/intro.svg \
-	themes/jesusda/songs_bg.svg \
-	themes/jesusda/songs_order.svg \
-	themes/jesusda/songs_song.svg \
-	themes/jesusda/sing_bg.svg \
-	themes/jesusda/sing_lyricscurrent.svg \
-	themes/jesusda/sing_lyricshighlight.svg \
-	themes/jesusda/sing_lyricsnext.svg \
-	themes/jesusda/sing_p1box.svg \
-	themes/jesusda/sing_p1score.svg \
-	themes/jesusda/sing_p2box.svg \
-	themes/jesusda/sing_p2score.svg \
-	themes/jesusda/sing_progressfg.svg \
-	themes/jesusda/sing_timetxt.svg
-
-imagesdir   = @IMAGES_DIR@
-images_DATA = images/no_cover.png
+themeslimadir   = @THEMES_DIR@/lima
+themeslima_DATA = themes/lima/no_cover.png \
+	themes/lima/intro.svg \
+	themes/lima/songs_bg.svg \
+	themes/lima/songs_order.svg \
+	themes/lima/songs_song.svg \
+	themes/lima/sing_bg.svg \
+	themes/lima/sing_lyricscurrent.svg \
+	themes/lima/sing_lyricshighlight.svg \
+	themes/lima/sing_lyricsnext.svg \
+	themes/lima/sing_p1box.svg \
+	themes/lima/sing_p1score.svg \
+	themes/lima/sing_p2box.svg \
+	themes/lima/sing_p2score.svg \
+	themes/lima/sing_progressfg.svg \
+	themes/lima/sing_timetxt.svg
 
 includes = include/audio.h \
 	include/video.h \
@@ -49,4 +48,4 @@ includes = include/audio.h \
 	include/screen_songs.h \
 	include/songs.h
 
-EXTRA_DIST = $(themesdef_DATA) $(themesjda_DATA) $(images_DATA) $(includes)
+EXTRA_DIST = $(themesdef_DATA) $(themeslima_DATA) $(includes)
