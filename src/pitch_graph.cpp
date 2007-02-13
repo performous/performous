@@ -30,8 +30,6 @@ cairo_surface_t* PitchGraph::renderPitch(double pitch, double time)
 	{
 		if( lastPitch == 0 )
 			cairo_move_to(dc, time, pitch);
-		else if( fabs( lastPitch-pitch) < 0.001 )
-			cairo_line_to(dc, time, pitch);
 		else {
 			cairo_line_to(dc, time, lastPitch);
 			cairo_move_to(dc, time, pitch);
