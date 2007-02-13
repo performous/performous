@@ -238,8 +238,14 @@ CSongs::CSongs()
 	SDL_RWops *rwop_nocover = SDL_RWFromFile(theme_path, "rb");
 	delete[] theme_path;
 
+	surface_nocover = NULL;
 	surface_nocover = IMG_LoadPNG_RW(rwop_nocover);
 	SDL_FreeRW(rwop_nocover);
+
+	if( !surface_nocover ) {
+		printf("IMG_LoadPNG_RW: %s\n", IMG_GetError());
+		return;
+	}
 
 	if( dir == NULL )
 		return;
