@@ -12,9 +12,7 @@ SDL_Event event;
 SDL_Surface * screenSDL;
 CScreenManager *screenManager;
 
-int shot;
-int explose;
-int change;
+bool capture = true;
 
 void checkEvents( void )
 {
@@ -76,6 +74,8 @@ void usage( char * progname )
 	fprintf(stdout,"\tSet window height\n");
 	fprintf(stdout,"-t, --theme\n");
 	fprintf(stdout,"\tSet theme (theme name or absolute path to the theme)\n");
+	fprintf(stdout,"-c, --no-capture\n");
+	fprintf(stdout,"\tDisable sound capture thread\n");
 	fprintf(stdout,"-v, --version\n");
 	fprintf(stdout,"\tDisplay version number and exit\n");
 	exit(EXIT_SUCCESS);
@@ -95,11 +95,12 @@ int main( int argc, char ** argv )
 		{"height",required_argument,NULL,'H'},
 		{"theme",required_argument,NULL,'t'},
 		{"help",no_argument,NULL,'h'},
+		{"no-capture",no_argument,NULL,'c'},
 		{"version",no_argument,NULL,'v'},
 		{0, 0, 0, 0}
 	};
 
-	while ((ch = getopt_long(argc, argv, "t:W:H:hv", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "t:W:H:hcv", long_options, NULL)) != -1) {
 		switch(ch) {
 			case 't':
 				theme_name = optarg;
@@ -112,6 +113,9 @@ int main( int argc, char ** argv )
 				break;
 			case 'h':
 				usage(argv[0]);
+				break;
+			case 'c':
+				capture=false;
 				break;
 			case 'v':
 				fprintf(stdout,"%s %s\n",PACKAGE, VERSION);
@@ -148,7 +152,8 @@ int main( int argc, char ** argv )
 
 	screenManager->activateScreen("Intro");
 
-	thread = SDL_CreateThread(thread_func, NULL);
+	if( capture )
+		thread = SDL_CreateThread(thread_func, NULL);
 
 	while( !screenManager->isFinished() ) {
 		SDL_FillRect(screenSDL,NULL,0xffffff);
@@ -158,7 +163,8 @@ int main( int argc, char ** argv )
 		SDL_Delay(50);
 	}
 
-	SDL_WaitThread(thread, NULL);
+	if( capture )
+		SDL_WaitThread(thread, NULL);
 
 	delete screenManager;
 	delete[] songs_directory;
