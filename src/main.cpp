@@ -75,7 +75,7 @@ void usage( char * progname )
 	fprintf(stdout,"-H, --height (Default: 480)\n");
 	fprintf(stdout,"\tSet window height\n");
 	fprintf(stdout,"-t, --theme\n");
-	fprintf(stdout,"\tSet theme\n");
+	fprintf(stdout,"\tSet theme (theme name or absolute path to the theme)\n");
 	fprintf(stdout,"-v, --version\n");
 	fprintf(stdout,"\tDisplay version number and exit\n");
 	exit(EXIT_SUCCESS);

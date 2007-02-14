@@ -26,5 +26,8 @@ CScreenManager::~CScreenManager()
 
 void CScreenManager::getThemePathFile( char * dest , char * file)
 {
-	sprintf(dest,"%s/%s/%s",THEMES_DIR,m_theme_name,file);
+	if( m_theme_name[0] == '/' )
+		sprintf(dest,"%s/%s",m_theme_name,file);
+	else
+		sprintf(dest,"%s/%s/%s",THEMES_DIR,m_theme_name,file);
 }
