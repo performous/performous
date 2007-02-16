@@ -64,6 +64,7 @@ cairo_surface_t *CTheme::DrawRect(TThemeRect rect) {
 }
 cairo_text_extents_t CTheme::GetTextExtents(TThemeTxt text) {
         cairo_text_extents_t extents;
+        cairo_select_font_face(dc, text.fontfamily, text.fontstyle, text.fontweight);
         cairo_set_font_size(dc, text.fontsize);
         cairo_move_to(dc, text.x, text.y);
         cairo_text_extents(dc, text.text, &extents);
