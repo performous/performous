@@ -120,6 +120,7 @@ void CScreenSongs::draw( void )
 	// Draw the cover
 	{
 	SDL_Rect position;
+	SDL_Rect size;
 	position.x=(sm->getWidth()-sm->getSong()->coverSurf->w)/2;
 	position.y=(sm->getHeight()-sm->getSong()->coverSurf->h)/2;
 #ifdef USE_OPENGL
@@ -129,13 +130,12 @@ void CScreenSongs::draw( void )
 #endif
 	}
 #ifdef USE_OPENGL
-        glClear (GL_COLOR_BUFFER_BIT);
         SDL_GL::draw_func(  sm->getWidth(),
                             sm->getHeight(),
                             cairo_image_surface_get_data(theme->theme->getCurrent()),
                             theme_texture, GL_BGRA);
 
-       SDL_GL::draw_func(  sm->getWidth(),
+	SDL_GL::draw_func(  sm->getWidth(),
                             sm->getHeight(),
                             (unsigned char *) virtSurf->pixels,
                             bg_texture, GL_BGRA);
