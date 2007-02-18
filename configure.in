@@ -154,7 +154,6 @@ $ac_includes_default
 #include <SDL/SDL_thread.h>
 /* other SDL headers */
 #include <SDL/SDL_image.h>
-#include <SDL/SDL_gfxPrimitives.h>
 #include <SDL/SDL_rotozoom.h>    
 USNG_EOF)
 AC_SUBST(SDL_FLAGS)
