@@ -251,7 +251,9 @@ void CScreenSing::draw( void )
 		
 		float bpmPixelUnit = (sm->getWidth() - 100. - 100.)/(totalBpm*1.0);
                 TThemeRect tmprect;
-                tmprect.stroke_col.r = tmprect.stroke_col.g = tmprect.stroke_col.b = tmprect.stroke_col.a = -1;
+                tmprect.stroke_col.r = tmprect.stroke_col.g = tmprect.stroke_col.b = 0;
+		tmprect.stroke_col.a = 255;
+		tmprect.stroke_width = 2;
                 tmprect.svg_width = sm->getWidth();
                 tmprect.svg_height = sm->getHeight();
                 tmprect.height = 10;
