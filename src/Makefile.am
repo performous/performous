@@ -13,7 +13,8 @@ ultrastarng_SOURCES = main.cpp \
 	pitch_graph.cpp \
 	cairosvg.cpp \
 	theme.cpp \
-	sdl_gl.cpp
+	sdl_gl.cpp \
+	video_driver.cpp
 
 INCLUDES = -I../include \
 	@CAIRO_FLAGS@ @XML_FLAGS@ @SDL_FLAGS@ @FFT_FLAGS@ @ALSA_FLAGS@ \

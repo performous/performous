@@ -1,20 +1,5 @@
 #include <sdl_gl.h>
 #ifdef USE_OPENGL
-void SDL_GL::init_gl ()
-{
-#ifdef DEBUG
-        printf ("OpenGL version: %s\n", glGetString (GL_VERSION));
-        printf ("OpenGL vendor: %s\n", glGetString (GL_VENDOR));
-        printf ("OpenGL renderer: %s\n", glGetString (GL_RENDERER));
-#endif
-        glClearColor (1.0f, 1.0f, 1.0f, 1.0f);
-        glDisable (GL_DEPTH_TEST);
-        glDisable(GL_CULL_FACE);
-        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glEnable (GL_BLEND);
-        glEnable (GL_TEXTURE_RECTANGLE_ARB);
-}
-
 void SDL_GL::draw_func (int _width,int _height, unsigned char* surfacedata, unsigned int textureid, GLenum format) {
 
         glMatrixMode (GL_MODELVIEW);

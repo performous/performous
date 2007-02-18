@@ -47,6 +47,7 @@ includes = include/audio.h \
 	include/screen_intro.h \
 	include/screen_songs.h \
 	include/songs.h \
-	include/sdl_gl.h
+	include/sdl_gl.h \
+	include/video_driver.h
 
 EXTRA_DIST = $(themesdef_DATA) $(themeslima_DATA) $(includes)
