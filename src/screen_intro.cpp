@@ -42,7 +42,6 @@ void CScreenIntro::draw( void )
 {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
 #ifdef USE_OPENGL
-        glClear (GL_COLOR_BUFFER_BIT);
         SDL_GL::draw_func(  sm->getWidth(),
                             sm->getHeight(),
                             (unsigned char *) cairo_svg->getSDLSurface()->pixels,
