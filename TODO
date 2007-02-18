@@ -8,6 +8,7 @@ Features:
 Fixes/Enhancement:
 
 - Have a try with SGE instead of SDL_gfx (benchmark both)
+- Use cairo_surface_create_for_image instead of SDL_image
 - Do note preload all the songs at screen_song
 - Add the drawing resolution (draw small surfaces and then zoom to the
   rendering bigger surface)
