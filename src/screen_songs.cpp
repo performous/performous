@@ -1,5 +1,8 @@
 #include <screen_songs.h>
 #include <cairotosdl.h>
+#ifdef USE_OPENGL
+#include <sdl_gl.h>
+#endif
 
 CScreenSongs::CScreenSongs(char * name)
 {
@@ -7,6 +10,10 @@ CScreenSongs::CScreenSongs(char * name)
 	songId=0;
 
 	theme = new CThemeSongs();
+#ifdef USE_OPENGL
+        SDL_GL::initTexture (CScreenManager::getSingletonPtr()->getWidth(),CScreenManager::getSingletonPtr()->getHeight(), &bg_texture, GL_BGRA);
+        SDL_GL::initTexture (CScreenManager::getSingletonPtr()->getWidth(),CScreenManager::getSingletonPtr()->getHeight(), &theme_texture, GL_BGRA);
+#endif
 }
 
 CScreenSongs::~CScreenSongs()
@@ -86,9 +93,11 @@ void CScreenSongs::draw( void )
 	}
 
 	theme->theme->clear();
-
+#ifdef USE_OPENGL
+        SDL_Surface *virtSurf = theme->bg->getSDLSurface();
+#else
 	SDL_BlitSurface(theme->bg->getSDLSurface(),NULL,sm->getSDLScreen(),NULL);
-	
+#endif	
 	// Draw the "Order by" text
 	{
 	char * orderStr = order[sm->getSongs()->getOrder()];
@@ -113,10 +122,26 @@ void CScreenSongs::draw( void )
 	SDL_Rect position;
 	position.x=(sm->getWidth()-sm->getSong()->coverSurf->w)/2;
 	position.y=(sm->getHeight()-sm->getSong()->coverSurf->h)/2;
-	SDL_BlitSurface(sm->getSong()->coverSurf,NULL,sm->getSDLScreen(), &position);
+#ifdef USE_OPENGL
+        SDL_BlitSurface(sm->getSong()->coverSurf,NULL, virtSurf, &position);
+#else
+        SDL_BlitSurface(sm->getSong()->coverSurf,NULL,sm->getSDLScreen(), &position);
+#endif
 	}
+#ifdef USE_OPENGL
+        glClear (GL_COLOR_BUFFER_BIT);
+        SDL_GL::draw_func(  sm->getWidth(),
+                            sm->getHeight(),
+                            cairo_image_surface_get_data(theme->theme->getCurrent()),
+                            theme_texture, GL_BGRA);
 
+       SDL_GL::draw_func(  sm->getWidth(),
+                            sm->getHeight(),
+                            (unsigned char *) virtSurf->pixels,
+                            bg_texture, GL_BGRA);
+#else
 	SDL_Surface *themeSurf = CairoToSdl::BlitToSdl(theme->theme->getCurrent());
 	SDL_BlitSurface(themeSurf, NULL,sm->getSDLScreen(),NULL);
 	SDL_FreeSurface(themeSurf);
+#endif
 }

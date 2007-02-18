@@ -27,6 +27,11 @@ class CScreenSing : public CScreen {
 	char sentenceNextSentence[128];
 	CVideo * video;
         CThemeSing *theme;
+#ifdef USE_OPENGL
+        unsigned int theme_texture;
+        unsigned int pitchgraph_texture;
+        unsigned int bg_texture;
+#endif
 };
 
 #endif

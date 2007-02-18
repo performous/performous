@@ -52,6 +52,14 @@ AC_ARG_WITH(video,
 )
 if test $video_layer = yes ; then video_layer="autodetect" ; fi
 
+AC_ARG_WITH(graphics_driver,
+        AC_HELP_STRING(--with-graphics_driver[={sdl|opengl}],
+                graphics driver selection (default: sdl)),
+        [graphics_driver="$withval"],
+        [graphics_driver="sdl"]
+)
+if test $graphics_driver = yes; then graphics_driver="sdl"; fi
+
 # Check for the standard headers
 AC_HEADER_STDC
 AC_HEADER_DIRENT
@@ -313,6 +321,28 @@ esac
 AC_SUBST(SVG_FLAGS)
 AC_SUBST(SVG_LIBS)
 
+case $graphics_driver in
+	sdl*)
+		GL_LIBS=""
+		ac_includes_default=$(cat <<-USNG_EOF
+		$ac_includes_default
+		/* graphics driver */
+		#define USE_SDL 1
+		USNG_EOF)
+		;;
+        opengl*)
+		GL_LIBS="-lGL -lGLU"
+		ac_includes_default=$(cat <<-USNG_EOF
+		$ac_includes_default
+		/* graphics driver */
+		#define USE_OPENGL 1 
+		#include <SDL/SDL_opengl.h>
+		USNG_EOF)
+		;;
+esac
+
+AC_SUBST(GL_LIBS)
+
 dnl ###########################################################################
 dnl #### generation of the outputs
 
@@ -325,9 +355,10 @@ echo ""
 echo "Ultrastar-ng is now configured to your system with the following"
 echo "user-defined options."
 echo ""
-echo "Option | Flag         | Chosen implementation "
-echo "----------------------------------------------"
-echo "audio  | --with-audio | $audio_layer          "
-echo "video  | --with-video | $video_layer          "
-echo "svg    | --with-svg   | $svg_layer            "
+echo "Option           | Flag                   | Chosen implementation "
+echo "------------------------------------------------------------------"
+echo "audio            | --with-audio           | $audio_layer          "
+echo "video            | --with-video           | $video_layer          "
+echo "svg              | --with-svg             | $svg_layer            "
+echo "graphics driver  | --with-graphics_driver | $graphics_driver      "
 echo ""

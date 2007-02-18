@@ -2,7 +2,9 @@
 #include <songs.h>
 #include <pitch_graph.h>
 #include <cairotosdl.h>
-
+#ifdef USE_OPENGL
+#include <sdl_gl.h>
+#endif
 CScreenSing::CScreenSing(char * name)
 : pitchGraph(CScreenManager::getSingletonPtr()->getWidth(), CScreenManager::getSingletonPtr()->getHeight())
 {
@@ -24,6 +26,11 @@ CScreenSing::CScreenSing(char * name)
 			screen->format->Amask);
 	SDL_FillRect(videoSurf,NULL,0xffffff);
         theme = new CThemeSing();
+#ifdef USE_OPENGL
+        SDL_GL::initTexture (CScreenManager::getSingletonPtr()->getWidth(),CScreenManager::getSingletonPtr()->getHeight(), &theme_texture, GL_BGRA); 
+        SDL_GL::initTexture (CScreenManager::getSingletonPtr()->getWidth(),CScreenManager::getSingletonPtr()->getHeight(), &pitchgraph_texture, GL_BGRA); 
+        SDL_GL::initTexture (CScreenManager::getSingletonPtr()->getWidth(),CScreenManager::getSingletonPtr()->getHeight(), &bg_texture, GL_RGBA); 
+#endif
 }
 
 CScreenSing::~CScreenSing()
@@ -73,26 +80,26 @@ void CScreenSing::manageEvent( SDL_Event event )
 
                         SDL_BlitSurface(theme->bg->getSDLSurface(),NULL,song->backgroundSurf,NULL);
                         SDL_BlitSurface(theme->p1box->getSDLSurface(),NULL,song->backgroundSurf,NULL);
-                        SDL_BlitSurface(song->backgroundSurf,NULL,sm->getSDLScreen(), NULL);
                 } else if (song->backgroundSurf != NULL ) {
                         SDL_BlitSurface(theme->bg->getSDLSurface(),NULL,song->backgroundSurf,NULL);
                         SDL_BlitSurface(theme->p1box->getSDLSurface(),NULL,song->backgroundSurf,NULL);
-                        SDL_BlitSurface(song->backgroundSurf,NULL,sm->getSDLScreen(), NULL);
-               } else {
-                        song->backgroundSurf = SDL_CreateRGBSurface( CScreenManager::getSingletonPtr()->getSDLScreen()->flags,
-                                                        sm->getWidth() , sm->getHeight() ,
-                                                        CScreenManager::getSingletonPtr()->getSDLScreen()->format->BitsPerPixel,
-                                                        CScreenManager::getSingletonPtr()->getSDLScreen()->format->Rmask,
-                                                        CScreenManager::getSingletonPtr()->getSDLScreen()->format->Gmask,
-                                                        CScreenManager::getSingletonPtr()->getSDLScreen()->format->Bmask,
-                                                        CScreenManager::getSingletonPtr()->getSDLScreen()->format->Amask);
-                        SDL_FillRect(song->backgroundSurf,NULL,0xffffff);
+
+                } else {
+                        song->backgroundSurf = SDL_CreateRGBSurface(    SDL_SRCALPHA, sm->getWidth(), sm->getHeight(), 32, 
+                                                                        0x000000ff, 
+                                                                        0x0000ff00,
+                                                                        0x00ff0000,
+                                                                        0xff000000);
+                        SDL_FillRect(song->backgroundSurf,NULL,SDL_MapRGB(song->backgroundSurf->format, 255, 255, 255));
                         SDL_BlitSurface(theme->bg->getSDLSurface(),NULL,song->backgroundSurf,NULL);
                         SDL_BlitSurface(theme->p1box->getSDLSurface(),NULL,song->backgroundSurf,NULL);
-                        SDL_BlitSurface(song->backgroundSurf,NULL,sm->getSDLScreen(), NULL);
-
                }
 
+#ifdef USE_OPENGL
+                SDL_GL::draw_func(CScreenManager::getSingletonPtr()->getWidth(),CScreenManager::getSingletonPtr()->getHeight(), (unsigned char *) song->backgroundSurf->pixels, bg_texture, GL_RGBA);
+#else
+                SDL_BlitSurface(song->backgroundSurf,NULL,sm->getSDLScreen(), NULL);
+#endif
 
 		snprintf(buff,1024,"%s/%s",song->path,song->mp3);
 		fprintf(stdout,"Now playing : (%d) : %s\n",CScreenManager::getSingletonPtr()->getSongId(),buff);
@@ -150,10 +157,13 @@ void CScreenSing::draw( void )
 			SDL_BlitSurface(videoSurf, NULL,  sm->getSDLScreen(), &position);
 		}
 
-                if (song->backgroundSurf) {
+               if (song->backgroundSurf) {
+#ifdef USE_OPENGL
+                    SDL_GL::draw_func(CScreenManager::getSingletonPtr()->getWidth(),CScreenManager::getSingletonPtr()->getHeight(), NULL, bg_texture, GL_RGBA);
+#else
                     SDL_BlitSurface(song->backgroundSurf,NULL,sm->getSDLScreen(), NULL);
+#endif
                 }
-
  
  
 		// Compute and draw the timer and the progressbar
@@ -237,8 +247,14 @@ void CScreenSing::draw( void )
         	totalBpm = sentence[sentence.size()-1]->length + sentence[sentence.size()-1]->timestamp - sentence[0]->timestamp;
 		
 		float bpmPixelUnit = (sm->getWidth() - 100. - 100.)/(totalBpm*1.0);
+                TThemeRect tmprect;
+                tmprect.stroke_col.r = tmprect.stroke_col.g = tmprect.stroke_col.b = tmprect.stroke_col.a = -1;
+                tmprect.svg_width = sm->getWidth();
+                tmprect.svg_height = sm->getHeight();
+                tmprect.height = 10;
+		tmprect.fill_col.a = 255;
 
-		int pos = -1;
+                int pos = -1;
                 if (time <= ((song->notes[song->notes.size() - 1]->timestamp + song->notes[song->notes.size()-1]->length)*60*1000) / ( song->bpm[0].bpm * 4 ) + song->gap) {
                     for( i = 0 ; i < sentence.size() ; i ++ ) {
 			    int currentBpm = sentence[i]->timestamp - sentence[0]->timestamp;
@@ -249,9 +265,13 @@ void CScreenSing::draw( void )
 				    int begin = (int) (currentBpm*bpmPixelUnit);
 				    int end   = (int) ((currentBpm+sentence[i]->length)*bpmPixelUnit);
 				    strcat(sentencePast,sentence[i]->syllable);
-				    boxRGBA(sm->getSDLScreen(),105+begin,y-5,
-			                	                   100+end,y+5,
-			                        	           0,0,255,255);
+				    tmprect.x = 105 + begin;
+                                    tmprect.y = y - 5;
+                                    tmprect.width = 100 + end - tmprect.x;
+                                    tmprect.fill_col.r = 0;
+                                    tmprect.fill_col.g = 0;
+                                    tmprect.fill_col.b = 255;
+                                    theme->theme->DrawRect(tmprect);
 			    }
 			    // if N+d <= timestamp < E
 			    else if( time < ( (sentence[i]->timestamp)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap ) {
@@ -260,9 +280,13 @@ void CScreenSing::draw( void )
 				    int begin = (int) (currentBpm*bpmPixelUnit);
 				    int end   = (int) ((currentBpm+sentence[i]->length)*bpmPixelUnit);
 				    strcat(sentenceFuture,sentence[i]->syllable);
-				    boxRGBA(sm->getSDLScreen(),105+begin,y-5,
-			                	                   100+end,y+5,
-			                        	           200,200,200,255);
+				    tmprect.x = 105 + begin;
+                                    tmprect.y = y - 5;
+                                    tmprect.width = 100 + end - tmprect.x;
+                                    tmprect.fill_col.r = 200;
+                                    tmprect.fill_col.g = 200;
+                                    tmprect.fill_col.b = 200;
+                                    theme->theme->DrawRect(tmprect);
 			    }
 			    else {
 				    strcat(sentenceNow,sentence[i]->syllable);
@@ -273,14 +297,22 @@ void CScreenSing::draw( void )
 				    float note_start = (time - ( (sentence[i]->timestamp)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) - song->gap);
 				    float note_total = (sentence[i]->length)  * 60 * 1000 / ( song->bpm[0].bpm * 4 );
 				    int current = (int) ((currentBpm + note_start*sentence[i]->length/note_total)*bpmPixelUnit);
-				    boxRGBA(sm->getSDLScreen(),105+begin,y-5,
-			        	                       100+current,y+5,
-			                        	       0,0,255,255);
-
-				    boxRGBA(sm->getSDLScreen(),100+current,y-5,
-			        	                       100+end,y+5,
-			                	               200,200,200,255);
-
+				    tmprect.x = 105 + begin;
+                                    tmprect.y = y - 5;
+                                    tmprect.width = 100 + current - tmprect.x;
+                                    tmprect.fill_col.r = 0;
+                                    tmprect.fill_col.g = 0;
+                                    tmprect.fill_col.b = 255;
+                                    theme->theme->DrawRect(tmprect);
+				    
+                                    tmprect.x = 100 + current;
+                                    tmprect.y = y - 5;
+                                    tmprect.width = 100 + end - tmprect.x;
+                                    tmprect.fill_col.r = 200;
+                                    tmprect.fill_col.g = 200;
+                                    tmprect.fill_col.b = 200;
+                                    theme->theme->DrawRect(tmprect);
+    	
 				    // Lets find the nearest note from the song
 				    int diff =  sentence[i]->note%12 - note%12;
 
@@ -296,14 +328,14 @@ void CScreenSing::draw( void )
 				    if(freq != 0.0) {
 					    pitchGraph.renderPitch(
 						    (sm->getHeight() - record->getNoteFreq(noteSingFinal))/sm->getHeight(),
-						    ((double)current)/sm->getWidth());
+						    ((double)current + 100)/sm->getWidth());
                                                     if (record->getNoteFreq(noteSingFinal) == record->getNoteFreq(noteFinal)) {
                                                         song->score[0].score += (10000 / song->maxScore) * sentence[i]->type;
                                                     }
                                     } else {
 					    pitchGraph.renderPitch(
 						    0.0,
-						    ((double)current)/sm->getWidth());
+						    ((double)current + 100)/sm->getWidth());
 				    }
 				    if( time < ( (sentence[i]->timestamp+sentence[i]->length)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap )
 					    pos=i;
@@ -350,15 +382,24 @@ void CScreenSing::draw( void )
                         theme->lyricsnextsentence.x = (theme->lyricsnextsentence.svg_width - theme->lyricsnextsentence.extents.width)/2;
                         theme->theme->PrintText(&theme->lyricsnextsentence);
                 }
-		SDL_Surface* pitchGraphSurf = CairoToSdl::BlitToSdl(pitchGraph.getCurrent());
-		position.x = 100;
-		position.y = 0;
-		SDL_BlitSurface(pitchGraphSurf,	NULL, sm->getSDLScreen(), &position);
+#ifdef USE_OPENGL
+                SDL_GL::draw_func(  CScreenManager::getSingletonPtr()->getWidth(), 
+                                    CScreenManager::getSingletonPtr()->getHeight(), 
+                                    cairo_image_surface_get_data(theme->theme->getCurrent()), 
+                                    theme_texture, GL_BGRA);
+                SDL_GL::draw_func(  CScreenManager::getSingletonPtr()->getWidth(), 
+                                    CScreenManager::getSingletonPtr()->getHeight(), 
+                                    cairo_image_surface_get_data(pitchGraph.getCurrent()), 
+                                    pitchgraph_texture, GL_BGRA);
+#else
+                SDL_Surface* pitchGraphSurf = CairoToSdl::BlitToSdl(pitchGraph.getCurrent());
+		SDL_BlitSurface(pitchGraphSurf,	NULL, sm->getSDLScreen(), NULL);
 		SDL_FreeSurface(pitchGraphSurf);
 
                 SDL_Surface *themeSurf = CairoToSdl::BlitToSdl(theme->theme->getCurrent());
                 SDL_BlitSurface(themeSurf, NULL,sm->getSDLScreen(),NULL);
                 SDL_FreeSurface(themeSurf);
+#endif
 	}
  
 }

@@ -14,6 +14,9 @@ class CScreenIntro : public CScreen {
 	void draw(void);
 	private:
 	CairoSVG * cairo_svg;
+#ifdef USE_OPENGL
+        unsigned int texture;
+#endif
 };
 
 #endif

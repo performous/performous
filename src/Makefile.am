@@ -12,11 +12,12 @@ ultrastarng_SOURCES = main.cpp \
 	cairotosdl.cpp \
 	pitch_graph.cpp \
 	cairosvg.cpp \
-	theme.cpp
+	theme.cpp \
+	sdl_gl.cpp
 
 INCLUDES = -I../include \
 	@CAIRO_FLAGS@ @XML_FLAGS@ @SDL_FLAGS@ @FFT_FLAGS@ @ALSA_FLAGS@ \
 	@VIDEO_FLAGS@ @SVG_FLAGS@ @AUDIO_FLAGS@ \
 	-DTHEMES_DIR="\"@THEMES_DIR@\""
 LDADD   = @CAIRO_LIBS@ @XML_LIBS@ @SDL_LIBS@ @FFT_LIBS@ @ALSA_LIBS@ \
-	@VIDEO_LIBS@ @SVG_LIBS@ @AUDIO_LIBS@
+	@VIDEO_LIBS@ @SVG_LIBS@ @AUDIO_LIBS@ @GL_LIBS@

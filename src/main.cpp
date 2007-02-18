@@ -4,7 +4,9 @@
 #include <screen_intro.h>
 #include <screen_songs.h>
 #include <screen_sing.h>
-
+#ifdef USE_OPENGL
+#include <sdl_gl.h>
+#endif
 unsigned int width=800;
 unsigned int height=600;
 
@@ -38,15 +40,25 @@ void init( void )
 	const SDL_VideoInfo * videoInf = SDL_GetVideoInfo();
 
 	unsigned SDL_videoFlags  = 0;
-	if ( videoInf->hw_available )
+#ifdef USE_OPENGL
+        SDL_videoFlags |= SDL_OPENGL;
+        SDL_videoFlags |= SDL_DOUBLEBUF;
+        SDL_GL_SetAttribute( SDL_GL_RED_SIZE, 5 );
+        SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, 5 );
+        SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, 5 );
+        SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 16 );
+        SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
+        screenSDL = SDL_SetVideoMode(width, height, videoInf->vfmt->BitsPerPixel, SDL_videoFlags );
+        SDL_GL::init_gl();
+#else	
+ 	if ( videoInf->hw_available )
 		SDL_videoFlags |= SDL_HWSURFACE;
 	else
 		SDL_videoFlags |= SDL_SWSURFACE;
 	if ( videoInf->blit_hw )
 		SDL_videoFlags |= SDL_HWACCEL;
-
-	screenSDL = SDL_SetVideoMode(width, height, videoInf->vfmt->BitsPerPixel, SDL_videoFlags );
-
+       screenSDL = SDL_SetVideoMode(width, height, videoInf->vfmt->BitsPerPixel, SDL_videoFlags );
+#endif
 
 	SDL_ShowCursor(SDL_DISABLE);
 	SDL_EnableUNICODE(SDL_ENABLE);
@@ -156,12 +168,17 @@ int main( int argc, char ** argv )
 		thread = SDL_CreateThread(thread_func, NULL);
 
 	while( !screenManager->isFinished() ) {
-		SDL_FillRect(screenSDL,NULL,0xffffff);
 		checkEvents();
+#ifdef USE_OPENGL
+                screenManager->getCurrentScreen()->draw();
+                SDL_GL_SwapBuffers();
+#else
+                SDL_FillRect(screenSDL,NULL,0xffffff);
 		screenManager->getCurrentScreen()->draw();
 		SDL_Flip(screenSDL);
-		SDL_Delay(50);
-	}
+#endif    
+                SDL_Delay(50);
+        }
 
 	if( capture )
 		SDL_WaitThread(thread, NULL);
