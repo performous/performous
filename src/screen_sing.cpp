@@ -64,9 +64,9 @@ void CScreenSing::manageEvent( SDL_Event event )
                         if(song->backgroundSurf)
                                 SDL_FreeSurface(song->backgroundSurf);
                         
-	                static Uint32 rmask = 0x00ff0000;
+	                static Uint32 rmask = 0x000000ff;
                         static Uint32 gmask = 0x0000ff00;
-                        static Uint32 bmask = 0x000000ff;
+                        static Uint32 bmask = 0x00ff0000;
                         static Uint32 amask = 0xff000000;
 	
 	                song->backgroundSurf = SDL_CreateRGBSurfaceFrom((void *) theme->bg->getSDLSurface()->pixels,
