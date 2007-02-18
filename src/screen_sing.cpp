@@ -55,6 +55,12 @@ void CScreenSing::manageEvent( SDL_Event event )
 	if( !play ) {
 		char buff[1024];
 		CSong * song = sm->getSong();
+	        
+		static Uint32 rmask = sm->getSDLScreen()->format->Rmask;
+                static Uint32 gmask = sm->getSDLScreen()->format->Gmask;
+                static Uint32 bmask = sm->getSDLScreen()->format->Bmask;
+                static Uint32 amask = sm->getSDLScreen()->format->Amask;
+                static Uint32 bpp = sm->getSDLScreen()->format->BitsPerPixel;
 		
 		if( song->video != NULL ) {
 			snprintf(buff,1024,"%s/%s",song->path,song->video);
@@ -64,15 +70,10 @@ void CScreenSing::manageEvent( SDL_Event event )
                         if(song->backgroundSurf)
                                 SDL_FreeSurface(song->backgroundSurf);
                         
-	                static Uint32 rmask = 0x000000ff;
-                        static Uint32 gmask = 0x0000ff00;
-                        static Uint32 bmask = 0x00ff0000;
-                        static Uint32 amask = 0xff000000;
-	
 	                song->backgroundSurf = SDL_CreateRGBSurfaceFrom((void *) theme->bg->getSDLSurface()->pixels,
 		                                                        theme->bg->getSDLSurface()->w,
 		                                                        theme->bg->getSDLSurface()->h,
-		                                                        32, 
+		                                                        bpp, 
 		                                                        theme->bg->getSDLSurface()->w*4, 
 		                                                        rmask, gmask, bmask, amask);
 	
@@ -85,11 +86,8 @@ void CScreenSing::manageEvent( SDL_Event event )
                         SDL_BlitSurface(theme->p1box->getSDLSurface(),NULL,song->backgroundSurf,NULL);
 
                 } else {
-                        song->backgroundSurf = SDL_CreateRGBSurface(    SDL_SRCALPHA, sm->getWidth(), sm->getHeight(), 32, 
-                                                                        0x000000ff, 
-                                                                        0x0000ff00,
-                                                                        0x00ff0000,
-                                                                        0xff000000);
+                        song->backgroundSurf = SDL_CreateRGBSurface(    SDL_SRCALPHA, sm->getWidth(), sm->getHeight(), bpp, 
+                                                                        rmask, gmask, bmask, amask);
                         SDL_FillRect(song->backgroundSurf,NULL,SDL_MapRGB(song->backgroundSurf->format, 255, 255, 255));
                         SDL_BlitSurface(theme->bg->getSDLSurface(),NULL,song->backgroundSurf,NULL);
                         SDL_BlitSurface(theme->p1box->getSDLSurface(),NULL,song->backgroundSurf,NULL);
