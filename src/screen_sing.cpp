@@ -54,11 +54,11 @@ void CScreenSing::manageEvent( SDL_Event event )
 	}
 	if( !play ) {
 		char buff[1024];
-		CSong * song = CScreenManager::getSingletonPtr()->getSong();
+		CSong * song = sm->getSong();
 		
 		if( song->video != NULL ) {
 			snprintf(buff,1024,"%s/%s",song->path,song->video);
-			fprintf(stdout,"Now playing: (%d) : %s\n",CScreenManager::getSingletonPtr()->getSongId(),buff);
+			fprintf(stdout,"Now playing: (%d) : %s\n",sm->getSongId(),buff);
 			video->loadVideo(buff,videoSurf,sm->getWidth(),sm->getHeight());
 
                         if(song->backgroundSurf)
@@ -96,14 +96,14 @@ void CScreenSing::manageEvent( SDL_Event event )
                }
 
 #ifdef USE_OPENGL
-                SDL_GL::draw_func(CScreenManager::getSingletonPtr()->getWidth(),CScreenManager::getSingletonPtr()->getHeight(), (unsigned char *) song->backgroundSurf->pixels, bg_texture, GL_RGBA);
+                SDL_GL::draw_func(sm->getWidth(),sm->getHeight(), (unsigned char *) song->backgroundSurf->pixels, bg_texture, GL_RGBA);
 #else
                 SDL_BlitSurface(song->backgroundSurf,NULL,sm->getSDLScreen(), NULL);
 #endif
 
 		snprintf(buff,1024,"%s/%s",song->path,song->mp3);
-		fprintf(stdout,"Now playing : (%d) : %s\n",CScreenManager::getSingletonPtr()->getSongId(),buff);
-		CScreenManager::getSingletonPtr()->getAudio()->playMusic(buff);
+		fprintf(stdout,"Now playing : (%d) : %s\n",sm->getSongId(),buff);
+		sm->getAudio()->playMusic(buff);
 		sentenceNextSentence[0] = '\n';
                 start = SDL_GetTicks();
 		play = true;
@@ -128,14 +128,14 @@ void CScreenSing::draw( void )
 	}
 
 	if(finished) {
-                CScreenManager::getSingletonPtr()->getAudio()->stopMusic();
+                sm->getAudio()->stopMusic();
 		video->unloadVideo();
 		SDL_FillRect(videoSurf,NULL,0xffffff);
 		play = false;
 		finished = false;
 		sentence.clear();
 		pitchGraph.clear();
-		CScreenManager::getSingletonPtr()->activateScreen("Songs");
+		sm->activateScreen("Songs");
 	}
 
 	//record->compute();
@@ -154,12 +154,15 @@ void CScreenSing::draw( void )
 		if( video->isPlaying() ) {
 			position.x=0;
 			position.y=0;
+#ifdef USE_OPENGL
+#else
 			SDL_BlitSurface(videoSurf, NULL,  sm->getSDLScreen(), &position);
+#endif
 		}
 
                if (song->backgroundSurf) {
 #ifdef USE_OPENGL
-                    SDL_GL::draw_func(CScreenManager::getSingletonPtr()->getWidth(),CScreenManager::getSingletonPtr()->getHeight(), NULL, bg_texture, GL_RGBA);
+                    SDL_GL::draw_func(sm->getWidth(),sm->getHeight(), NULL, bg_texture, GL_RGBA);
 #else
                     SDL_BlitSurface(song->backgroundSurf,NULL,sm->getSDLScreen(), NULL);
 #endif
@@ -383,12 +386,12 @@ void CScreenSing::draw( void )
                         theme->theme->PrintText(&theme->lyricsnextsentence);
                 }
 #ifdef USE_OPENGL
-                SDL_GL::draw_func(  CScreenManager::getSingletonPtr()->getWidth(), 
-                                    CScreenManager::getSingletonPtr()->getHeight(), 
+                SDL_GL::draw_func(  sm->getWidth(), 
+                                    sm->getHeight(), 
                                     cairo_image_surface_get_data(theme->theme->getCurrent()), 
                                     theme_texture, GL_BGRA);
-                SDL_GL::draw_func(  CScreenManager::getSingletonPtr()->getWidth(), 
-                                    CScreenManager::getSingletonPtr()->getHeight(), 
+                SDL_GL::draw_func(  sm->getWidth(), 
+                                    sm->getHeight(), 
                                     cairo_image_surface_get_data(pitchGraph.getCurrent()), 
                                     pitchgraph_texture, GL_BGRA);
 #else

@@ -24,53 +24,55 @@ CScreenSongs::~CScreenSongs()
 void CScreenSongs::manageEvent( SDL_Event event )
 {
 	int keypressed;
+	CScreenManager * sm = CScreenManager::getSingletonPtr();
+
 	switch(event.type) {
 		case SDL_KEYDOWN:
 			keypressed = event.key.keysym.sym;
 			if( keypressed == SDLK_ESCAPE || keypressed == SDLK_q ) {
-				CScreenManager::getSingletonPtr()->activateScreen("Intro");
+				sm->activateScreen("Intro");
 			} else if( keypressed == SDLK_LEFT ) {
-				if(CScreenManager::getSingletonPtr()->getSongId() >0 )
-					CScreenManager::getSingletonPtr()->setSongId(CScreenManager::getSingletonPtr()->getSongId()-1);
+				if(sm->getSongId() >0 )
+					sm->setSongId(sm->getSongId()-1);
 				else
-					CScreenManager::getSingletonPtr()->setSongId(CScreenManager::getSingletonPtr()->getSongs()->nbSongs()-1);
+					sm->setSongId(sm->getSongs()->nbSongs()-1);
 			} else if( keypressed == SDLK_RIGHT ) {
-				if(CScreenManager::getSingletonPtr()->getSongId() > CScreenManager::getSingletonPtr()->getSongs()->nbSongs()-2 )
-					CScreenManager::getSingletonPtr()->setSongId(0);
+				if(sm->getSongId() > sm->getSongs()->nbSongs()-2 )
+					sm->setSongId(0);
 				else
-					CScreenManager::getSingletonPtr()->setSongId(CScreenManager::getSingletonPtr()->getSongId()+1);
+					sm->setSongId(sm->getSongId()+1);
 			} else if( keypressed == SDLK_UP ) {
-				switch(CScreenManager::getSingletonPtr()->getSongs()->getOrder()) {
+				switch(sm->getSongs()->getOrder()) {
 					case 0:
-						CScreenManager::getSingletonPtr()->getSongs()->sortByArtist();
+						sm->getSongs()->sortByArtist();
 						break;
 					case 1:
-						CScreenManager::getSingletonPtr()->getSongs()->sortByEdition();
+						sm->getSongs()->sortByEdition();
 						break;
 					case 2:
-						CScreenManager::getSingletonPtr()->getSongs()->sortByGenre();
+						sm->getSongs()->sortByGenre();
 						break;
 					case 3:
-						CScreenManager::getSingletonPtr()->getSongs()->sortByTitle();
+						sm->getSongs()->sortByTitle();
 						break;
 				}
 			} else if( keypressed == SDLK_DOWN ) {
-				switch(CScreenManager::getSingletonPtr()->getSongs()->getOrder()) {
+				switch(sm->getSongs()->getOrder()) {
 					case 0:
-						CScreenManager::getSingletonPtr()->getSongs()->sortByGenre();
+						sm->getSongs()->sortByGenre();
 						break;
 					case 1:
-						CScreenManager::getSingletonPtr()->getSongs()->sortByTitle();
+						sm->getSongs()->sortByTitle();
 						break;
 					case 2:
-						CScreenManager::getSingletonPtr()->getSongs()->sortByArtist();
+						sm->getSongs()->sortByArtist();
 						break;
 					case 3:
-						CScreenManager::getSingletonPtr()->getSongs()->sortByEdition();
+						sm->getSongs()->sortByEdition();
 						break;
 				}
 			} else if( keypressed == SDLK_RETURN ) {
-				CScreenManager::getSingletonPtr()->activateScreen("Sing");
+				sm->activateScreen("Sing");
 			}
 	}
 }
@@ -120,7 +122,6 @@ void CScreenSongs::draw( void )
 	// Draw the cover
 	{
 	SDL_Rect position;
-	SDL_Rect size;
 	position.x=(sm->getWidth()-sm->getSong()->coverSurf->w)/2;
 	position.y=(sm->getHeight()-sm->getSong()->coverSurf->h)/2;
 #ifdef USE_OPENGL
