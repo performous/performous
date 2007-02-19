@@ -6,14 +6,12 @@
 
 CScreenSongs::CScreenSongs(char * name)
 {
+	CScreenManager * sm = CScreenManager::getSingletonPtr();
 	screenName = name;
 	songId=0;
 
 	theme = new CThemeSongs();
-#ifdef USE_OPENGL
-        SDL_GL::initTexture (CScreenManager::getSingletonPtr()->getWidth(),CScreenManager::getSingletonPtr()->getHeight(), &bg_texture, GL_BGRA);
-        SDL_GL::initTexture (CScreenManager::getSingletonPtr()->getWidth(),CScreenManager::getSingletonPtr()->getHeight(), &theme_texture, GL_BGRA);
-#endif
+	bg_texture = sm->getVideoDriver()->initSurface(theme->bg->getSDLSurface());
 }
 
 CScreenSongs::~CScreenSongs()
@@ -130,19 +128,6 @@ void CScreenSongs::draw( void )
         SDL_BlitSurface(sm->getSong()->coverSurf,NULL,sm->getSDLScreen(), &position);
 #endif
 	}
-#ifdef USE_OPENGL
-	SDL_GL::draw_func(  sm->getWidth(),
-                            sm->getHeight(),
-                            (unsigned char *) virtSurf->pixels,
-                            bg_texture, GL_BGRA);
-
-        SDL_GL::draw_func(  sm->getWidth(),
-                            sm->getHeight(),
-                            cairo_image_surface_get_data(theme->theme->getCurrent()),
-                            theme_texture, GL_BGRA);
-#else
-	SDL_Surface *themeSurf = CairoToSdl::BlitToSdl(theme->theme->getCurrent());
-	SDL_BlitSurface(themeSurf, NULL,sm->getSDLScreen(),NULL);
-	SDL_FreeSurface(themeSurf);
-#endif
+	sm->getVideoDriver()->drawSurface(bg_texture);
+	sm->getVideoDriver()->drawSurface(theme->theme->getCurrent());
 }

@@ -16,10 +16,7 @@ class CScreenSongs : public CScreen {
 	private:
 	CThemeSongs * theme;
 	int songId;
-#ifdef USE_OPENGL
-        unsigned int theme_texture;
         unsigned int bg_texture;
-#endif
 };
 
 #endif
