@@ -135,6 +135,7 @@ int main( int argc, char ** argv )
 	screenManager->setSDLScreen(screenSDL);
 	screenManager->setAudio( new CAudio() );
 	screenManager->setRecord( new CRecord() );
+	screenManager->setVideoDriver( videoDriver );
 	
 	screen = new CScreenIntro("Intro");
 	screenManager->addScreen(screen);
