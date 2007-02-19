@@ -34,15 +34,8 @@ void SDL_GL::draw_func (int _width,int _height, unsigned char* surfacedata, unsi
 }
 
 void SDL_GL::initTexture (int _width,int _height,unsigned int* textureid, GLenum format) {
-        
-        glViewport (0, 0, _width, _height);
-        glMatrixMode (GL_PROJECTION);
-        glLoadIdentity ();
-        glOrtho (0.0f, 1.0f, 1.0f, 0.0f, -1.0f, 1.0f);
 
-        glClear (GL_COLOR_BUFFER_BIT);
-
-        glGenTextures (1, textureid);
+	glGenTextures (1, textureid);
         glBindTexture (GL_TEXTURE_RECTANGLE_ARB, *textureid);
         glTexImage2D (GL_TEXTURE_RECTANGLE_ARB,
                                   0,

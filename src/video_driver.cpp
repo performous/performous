@@ -56,6 +56,10 @@ SDL_Surface * CVideoDriver::init(int width, int height)
 void CVideoDriver::blank( void )
 {
 #ifdef USE_OPENGL
+	glViewport (0, 0, screen->w, screen->h);
+	glMatrixMode (GL_PROJECTION);
+	glLoadIdentity ();
+	glOrtho (0.0f, 1.0f, 1.0f, 0.0f, -1.0f, 1.0f);
 	glClear (GL_COLOR_BUFFER_BIT);
 #else
 	SDL_FillRect(screen,NULL,0xffffff);
