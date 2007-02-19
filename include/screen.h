@@ -7,6 +7,7 @@
 #include <audio.h>
 #include <record.h>
 #include <songs.h>
+#include <video_driver.h>
 
 class CScreen {
 	public:
@@ -50,6 +51,9 @@ class CScreenManager : public CSingleton <CScreenManager>{
 
 	CRecord * getRecord( void ) {return record;};
 	void setRecord( CRecord * _record ) {record=_record;};
+	
+	CVideoDriver * getVideoDriver( void ) {return videoDriver;};
+	void setVideoDriver( CVideoDriver * _videoDriver ) {videoDriver=_videoDriver;};
 
 	CSongs * getSongs( void ) {return songs;};
 	void setSongs( CSongs * _songs ) {
@@ -76,6 +80,7 @@ class CScreenManager : public CSingleton <CScreenManager>{
 	CAudio * audio;
 	CRecord * record;
 	CSongs * songs;
+	CVideoDriver * videoDriver;
 	int songId;
 	bool m_finished;
 	int width;
