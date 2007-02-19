@@ -56,10 +56,10 @@ void CScreenSing::manageEvent( SDL_Event event )
 		char buff[1024];
 		CSong * song = sm->getSong();
 	        
-		static Uint32 rmask = sm->getSDLScreen()->format->Rmask;
-                static Uint32 gmask = sm->getSDLScreen()->format->Gmask;
-                static Uint32 bmask = sm->getSDLScreen()->format->Bmask;
-                static Uint32 amask = sm->getSDLScreen()->format->Amask;
+		static Uint32 rmask = 0x000000ff;
+                static Uint32 gmask = 0x0000ff00;
+                static Uint32 bmask = 0x00ff0000;
+                static Uint32 amask = 0xff000000;
                 static Uint32 bpp = sm->getSDLScreen()->format->BitsPerPixel;
 		
 		if( song->video != NULL ) {
