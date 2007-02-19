@@ -9,7 +9,7 @@ CScreenIntro::CScreenIntro(char * name)
 	sm->getThemePathFile(theme_path,"intro.svg");
 	cairo_svg = new CairoSVG(theme_path,sm->getWidth(),sm->getHeight());
 	delete[] theme_path;
-        video_driver = new CVideoDriver;
+	texture = sm->getVideoDriver()->initSurface(cairo_svg->getSDLSurface());
 }
 
 CScreenIntro::~CScreenIntro()
@@ -37,5 +37,5 @@ void CScreenIntro::manageEvent( SDL_Event event )
 void CScreenIntro::draw( void )
 {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
-        video_driver->drawSurface(cairo_svg->getSDLSurface(), 0, 0);
+	sm->getVideoDriver()->drawSurface(texture);
 }
