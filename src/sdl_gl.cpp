@@ -1,6 +1,6 @@
 #include <sdl_gl.h>
 #ifdef USE_OPENGL
-void SDL_GL::draw_func (int _width,int _height, unsigned char* surfacedata, unsigned int textureid, GLenum format) {
+void SDL_GL::draw_func (int _width,int _height, unsigned char* surfacedata, unsigned int textureid, GLenum format, int x, int y) {
 
         glMatrixMode (GL_MODELVIEW);
         glLoadIdentity ();
@@ -19,13 +19,13 @@ void SDL_GL::draw_func (int _width,int _height, unsigned char* surfacedata, unsi
                                   surfacedata);
 
         glBegin (GL_QUADS);
-        glTexCoord2f (0.0f, 0.0f);
+        glTexCoord2f ((GLfloat)x, (GLfloat)y);
         glVertex2f (0, 0);
-        glTexCoord2f ((GLfloat) _width, 0.0f);
+        glTexCoord2f ((GLfloat) _width, (GLfloat)y);
         glVertex2f (1.0f, 0.0f);
         glTexCoord2f ((GLfloat) _width, (GLfloat) _height);
         glVertex2f (1.0f, 1.0f);
-        glTexCoord2f (0.0f, (GLfloat) _height);
+        glTexCoord2f ((GLfloat)x, (GLfloat) _height);
         glVertex2f (0.0f, 1.0f);
 
         glEnd ();
@@ -42,7 +42,6 @@ void SDL_GL::initTexture (int _width,int _height,unsigned int* textureid, GLenum
 
         glClear (GL_COLOR_BUFFER_BIT);
 
-        glDeleteTextures (1, textureid);
         glGenTextures (1, textureid);
         glBindTexture (GL_TEXTURE_RECTANGLE_ARB, *textureid);
         glTexImage2D (GL_TEXTURE_RECTANGLE_ARB,
@@ -54,5 +53,10 @@ void SDL_GL::initTexture (int _width,int _height,unsigned int* textureid, GLenum
                                   format,
                                   GL_UNSIGNED_BYTE,
                                   NULL);
+}
+
+void SDL_GL::freeTexture (unsigned int textureid)
+{
+        glDeleteTextures (1, &textureid);
 }
 #endif
