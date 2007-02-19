@@ -1,4 +1,10 @@
 #include <video_driver.h>
+#include <screen.h>
+#ifdef USE_OPENGL
+#include <sdl_gl.h>
+#else
+#include <cairotosdl.h>
+#endif
 
 CVideoDriver::CVideoDriver()
 {
@@ -64,4 +70,65 @@ void CVideoDriver::swap( void )
 	SDL_Flip(screen);
 #endif
 
+}
+
+unsigned int CVideoDriver::initSurface(SDL_Surface * _surf)
+{
+	unsigned int texture;
+#ifdef USE_OPENGL
+	SDL_GL::initTexture (_surf->w,_surf->h, &texture, GL_BGRA);
+#else
+	texture = 0;
+#endif
+	surface_list.push_back(_surf);
+	texture_list.push_back(texture);
+	return surface_list.size()-1;
+}
+
+void CVideoDriver::drawSurface(unsigned int _id, int _x, int _y)
+{
+#ifdef USE_OPENGL
+	SDL_GL::draw_func(surface_list[_id]->w,surface_list[_id]->h,(unsigned char*)surface_list[_id]->pixels,texture_list[_id], GL_BGRA, _x, _y);
+#else
+	CScreenManager * sm = CScreenManager::getSingletonPtr();
+	SDL_Rect position;
+	position.x=_x;
+	position.y=_y;
+	SDL_BlitSurface(surface_list[_id],NULL,sm->getSDLScreen(),&position);
+#endif
+}
+
+void CVideoDriver::drawSurface(SDL_Surface* _surf, int _x, int _y)
+{
+#ifdef USE_OPENGL
+	unsigned int texture;
+	SDL_GL::initTexture (_surf->w,_surf->h, &texture, GL_BGRA);
+	SDL_GL::draw_func(_surf->w,_surf->h,(unsigned char*)_surf->pixels,texture, GL_BGRA, _x, _y);
+	SDL_GL::freeTexture(texture);
+#else
+	CScreenManager * sm = CScreenManager::getSingletonPtr();
+	SDL_Rect position;
+	position.x=_x;
+	position.y=_y;
+	SDL_BlitSurface(_surf,NULL,sm->getSDLScreen(),&position);
+#endif
+}
+void CVideoDriver::drawSurface(cairo_surface_t* _surf, int _x, int _y)
+{
+#ifdef USE_OPENGL
+	unsigned int texture;
+	int w = cairo_image_surface_get_width(_surf);
+	int h = cairo_image_surface_get_height(_surf);
+	SDL_GL::initTexture (w,h, &texture, GL_BGRA);
+	SDL_GL::draw_func(w,h,cairo_image_surface_get_data(_surf),texture, GL_BGRA, _x, _y);
+	SDL_GL::freeTexture(texture);
+#else
+	CScreenManager * sm = CScreenManager::getSingletonPtr();
+	SDL_Rect position;
+	position.x=_x;
+	position.y=_y;
+	SDL_Surface * SDL_surf = CairoToSdl::BlitToSdl(_surf);
+	SDL_BlitSurface(SDL_surf,NULL,sm->getSDLScreen(),&position);
+	SDL_FreeSurface(SDL_surf);
+#endif
 }
