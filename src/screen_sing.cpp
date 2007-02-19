@@ -2,9 +2,7 @@
 #include <songs.h>
 #include <pitch_graph.h>
 #include <cairotosdl.h>
-#ifdef USE_OPENGL
-#include <sdl_gl.h>
-#endif
+
 CScreenSing::CScreenSing(char * name)
 : pitchGraph(CScreenManager::getSingletonPtr()->getWidth(), CScreenManager::getSingletonPtr()->getHeight())
 {
