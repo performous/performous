@@ -16,6 +16,7 @@ class CScreenSing : public CScreen {
 	void draw(void);
 	private:
 	SDL_Surface * videoSurf;
+	SDL_Surface * backgroundSurf;
 	// Keeps the pitch tracking graphics
 	// in separate surface
 	PitchGraph pitchGraph;
@@ -27,11 +28,6 @@ class CScreenSing : public CScreen {
 	char sentenceNextSentence[128];
 	CVideo * video;
         CThemeSing *theme;
-#ifdef USE_OPENGL
-        unsigned int theme_texture;
-        unsigned int pitchgraph_texture;
-        unsigned int bg_texture;
-#endif
 };
 
 #endif

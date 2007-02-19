@@ -14,23 +14,30 @@ CScreenSing::CScreenSing(char * name)
 	video = new CVideo();
 	SDL_Surface *screen;
 
-	screen = CScreenManager::getSingletonPtr()->getSDLScreen();
+	CScreenManager * sm = CScreenManager::getSingletonPtr();
+	screen = sm->getSDLScreen();
 
 	videoSurf = SDL_AllocSurface( screen->flags,
-			CScreenManager::getSingletonPtr()->getWidth(),
-			CScreenManager::getSingletonPtr()->getHeight(),
+			sm->getWidth(),
+			sm->getHeight(),
 			screen->format->BitsPerPixel,
 			screen->format->Rmask,
 			screen->format->Gmask,
 			screen->format->Bmask,
 			screen->format->Amask);
-	SDL_FillRect(videoSurf,NULL,0xffffff);
+	SDL_SetAlpha(videoSurf, SDL_SRCALPHA, SDL_ALPHA_OPAQUE);
+	//SDL_FillRect(videoSurf,NULL,0xffffff);
+	backgroundSurf = SDL_AllocSurface( screen->flags,
+			sm->getWidth(),
+			sm->getHeight(),
+			screen->format->BitsPerPixel,
+			0x000000ff,
+			0x0000ff00,
+			0x00ff0000,
+			0xff000000);
+	SDL_SetAlpha(backgroundSurf, SDL_SRCALPHA, SDL_ALPHA_OPAQUE);
+	//SDL_FillRect(backgroundSurf,NULL,0xffffff);
         theme = new CThemeSing();
-#ifdef USE_OPENGL
-        SDL_GL::initTexture (CScreenManager::getSingletonPtr()->getWidth(),CScreenManager::getSingletonPtr()->getHeight(), &theme_texture, GL_BGRA); 
-        SDL_GL::initTexture (CScreenManager::getSingletonPtr()->getWidth(),CScreenManager::getSingletonPtr()->getHeight(), &pitchgraph_texture, GL_BGRA); 
-        SDL_GL::initTexture (CScreenManager::getSingletonPtr()->getWidth(),CScreenManager::getSingletonPtr()->getHeight(), &bg_texture, GL_RGBA); 
-#endif
 }
 
 CScreenSing::~CScreenSing()
@@ -56,48 +63,11 @@ void CScreenSing::manageEvent( SDL_Event event )
 		char buff[1024];
 		CSong * song = sm->getSong();
 	        
-		static Uint32 rmask = 0x000000ff;
-                static Uint32 gmask = 0x0000ff00;
-                static Uint32 bmask = 0x00ff0000;
-                static Uint32 amask = 0xff000000;
-                static Uint32 bpp = sm->getSDLScreen()->format->BitsPerPixel;
-		
 		if( song->video != NULL ) {
 			snprintf(buff,1024,"%s/%s",song->path,song->video);
 			fprintf(stdout,"Now playing: (%d) : %s\n",sm->getSongId(),buff);
 			video->loadVideo(buff,videoSurf,sm->getWidth(),sm->getHeight());
-
-                        if(song->backgroundSurf)
-                                SDL_FreeSurface(song->backgroundSurf);
-                        
-	                song->backgroundSurf = SDL_CreateRGBSurfaceFrom((void *) theme->bg->getSDLSurface()->pixels,
-		                                                        theme->bg->getSDLSurface()->w,
-		                                                        theme->bg->getSDLSurface()->h,
-		                                                        bpp, 
-		                                                        theme->bg->getSDLSurface()->w*4, 
-		                                                        rmask, gmask, bmask, amask);
-	
-	                SDL_SetAlpha(song->backgroundSurf, SDL_SRCALPHA, SDL_ALPHA_OPAQUE);
-
-                        SDL_BlitSurface(theme->bg->getSDLSurface(),NULL,song->backgroundSurf,NULL);
-                        SDL_BlitSurface(theme->p1box->getSDLSurface(),NULL,song->backgroundSurf,NULL);
-                } else if (song->backgroundSurf != NULL ) {
-                        SDL_BlitSurface(theme->bg->getSDLSurface(),NULL,song->backgroundSurf,NULL);
-                        SDL_BlitSurface(theme->p1box->getSDLSurface(),NULL,song->backgroundSurf,NULL);
-
-                } else {
-                        song->backgroundSurf = SDL_CreateRGBSurface(    SDL_SRCALPHA, sm->getWidth(), sm->getHeight(), bpp, 
-                                                                        rmask, gmask, bmask, amask);
-                        SDL_FillRect(song->backgroundSurf,NULL,SDL_MapRGB(song->backgroundSurf->format, 255, 255, 255));
-                        SDL_BlitSurface(theme->bg->getSDLSurface(),NULL,song->backgroundSurf,NULL);
-                        SDL_BlitSurface(theme->p1box->getSDLSurface(),NULL,song->backgroundSurf,NULL);
-               }
-
-#ifdef USE_OPENGL
-                SDL_GL::draw_func(sm->getWidth(),sm->getHeight(), (unsigned char *) song->backgroundSurf->pixels, bg_texture, GL_RGBA);
-#else
-                SDL_BlitSurface(song->backgroundSurf,NULL,sm->getSDLScreen(), NULL);
-#endif
+		}
 
 		snprintf(buff,1024,"%s/%s",song->path,song->mp3);
 		fprintf(stdout,"Now playing : (%d) : %s\n",sm->getSongId(),buff);
@@ -115,7 +85,6 @@ void CScreenSing::draw( void )
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
 	CRecord * record    = sm->getRecord();
 	CSong   * song      = sm->getSong();
-	SDL_Rect position;
         float freq;
 	int note;
 
@@ -149,24 +118,17 @@ void CScreenSing::draw( void )
 		// Draw the video
 		if( !video->isPlaying() && time > song->videoGap )
 			video->play();
-		if( video->isPlaying() ) {
-			position.x=0;
-			position.y=0;
-#ifdef USE_OPENGL
-#else
-			SDL_BlitSurface(videoSurf, NULL,  sm->getSDLScreen(), &position);
-#endif
-		}
 
-               if (song->backgroundSurf) {
-#ifdef USE_OPENGL
-                    SDL_GL::draw_func(sm->getWidth(),sm->getHeight(), NULL, bg_texture, GL_RGBA);
-#else
-                    SDL_BlitSurface(song->backgroundSurf,NULL,sm->getSDLScreen(), NULL);
-#endif
-                }
- 
- 
+		if (song->backgroundSurf != NULL) {
+			sm->getVideoDriver()->drawSurface(song->backgroundSurf);
+		}
+		if( video->isPlaying() ) {
+			sm->getVideoDriver()->drawSurface(videoSurf);
+		}
+                
+		sm->getVideoDriver()->drawSurface(theme->bg->getSDLSurface());
+		sm->getVideoDriver()->drawSurface(theme->p1box->getSDLSurface());
+
 		// Compute and draw the timer and the progressbar
 		{
 		char dateStr[32];
@@ -385,24 +347,8 @@ void CScreenSing::draw( void )
                         theme->lyricsnextsentence.x = (theme->lyricsnextsentence.svg_width - theme->lyricsnextsentence.extents.width)/2;
                         theme->theme->PrintText(&theme->lyricsnextsentence);
                 }
-#ifdef USE_OPENGL
-                SDL_GL::draw_func(  sm->getWidth(), 
-                                    sm->getHeight(), 
-                                    cairo_image_surface_get_data(theme->theme->getCurrent()), 
-                                    theme_texture, GL_BGRA);
-                SDL_GL::draw_func(  sm->getWidth(), 
-                                    sm->getHeight(), 
-                                    cairo_image_surface_get_data(pitchGraph.getCurrent()), 
-                                    pitchgraph_texture, GL_BGRA);
-#else
-                SDL_Surface* pitchGraphSurf = CairoToSdl::BlitToSdl(pitchGraph.getCurrent());
-		SDL_BlitSurface(pitchGraphSurf,	NULL, sm->getSDLScreen(), NULL);
-		SDL_FreeSurface(pitchGraphSurf);
-
-                SDL_Surface *themeSurf = CairoToSdl::BlitToSdl(theme->theme->getCurrent());
-                SDL_BlitSurface(themeSurf, NULL,sm->getSDLScreen(),NULL);
-                SDL_FreeSurface(themeSurf);
-#endif
+		sm->getVideoDriver()->drawSurface(theme->theme->getCurrent());
+		sm->getVideoDriver()->drawSurface(pitchGraph.getCurrent());
 	}
  
 }
