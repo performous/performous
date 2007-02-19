@@ -15,7 +15,6 @@ CScreenIntro::CScreenIntro(char * name)
 CScreenIntro::~CScreenIntro()
 {
 	delete cairo_svg;
-        delete video_driver;
 }
 
 void CScreenIntro::manageEvent( SDL_Event event )

@@ -14,10 +14,6 @@ class CVideoDriver {
 	void drawSurface(SDL_Surface* _surf, int _x=0, int _y=0);
 	void blank( void );
 	void swap( void );
-	unsigned int initSurface(SDL_Surface * _surf);
-        void drawSurface(unsigned int _id, int _x, int _y);
-        void drawSurface(SDL_Surface* _surf, int _x, int _y); 
-        void drawSurface(cairo_surface_t* _surf, int _x, int _y);
         private:
 	SDL_Surface * screen;
 	std::vector <unsigned int> texture_list;
