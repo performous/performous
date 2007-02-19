@@ -5,6 +5,7 @@
 
 #include <screen.h>
 #include <cairosvg.h>
+#include <video_driver.h>
 
 class CScreenIntro : public CScreen {
 	public:
@@ -14,9 +15,7 @@ class CScreenIntro : public CScreen {
 	void draw(void);
 	private:
 	CairoSVG * cairo_svg;
-#ifdef USE_OPENGL
-        unsigned int texture;
-#endif
+        CVideoDriver * video_driver;
 };
 
 #endif

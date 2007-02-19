@@ -1,7 +1,4 @@
 #include <screen_intro.h>
-#ifdef USE_OPENGL
-#include <sdl_gl.h>
-#endif
 
 CScreenIntro::CScreenIntro(char * name)
 {
@@ -12,14 +9,13 @@ CScreenIntro::CScreenIntro(char * name)
 	sm->getThemePathFile(theme_path,"intro.svg");
 	cairo_svg = new CairoSVG(theme_path,sm->getWidth(),sm->getHeight());
 	delete[] theme_path;
-#ifdef USE_OPENGL
-        SDL_GL::initTexture (sm->getWidth(),sm->getHeight(), &texture, GL_BGRA);
-#endif
+        video_driver = new CVideoDriver;
 }
 
 CScreenIntro::~CScreenIntro()
 {
 	delete cairo_svg;
+        delete video_driver;
 }
 
 void CScreenIntro::manageEvent( SDL_Event event )
@@ -41,13 +37,5 @@ void CScreenIntro::manageEvent( SDL_Event event )
 void CScreenIntro::draw( void )
 {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
-#ifdef USE_OPENGL
-        SDL_GL::draw_func(  sm->getWidth(),
-                            sm->getHeight(),
-                            (unsigned char *) cairo_svg->getSDLSurface()->pixels,
-                            texture, GL_BGRA);
-
-#else
-	SDL_BlitSurface(cairo_svg->getSDLSurface(),NULL,sm->getSDLScreen(),NULL);
-#endif
+        video_driver->drawSurface(cairo_svg->getSDLSurface(), 0, 0);
 }
