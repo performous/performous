@@ -1,8 +1,5 @@
 #include <screen_songs.h>
 #include <cairotosdl.h>
-#ifdef USE_OPENGL
-#include <sdl_gl.h>
-#endif
 
 CScreenSongs::CScreenSongs(char * name)
 {
@@ -93,11 +90,8 @@ void CScreenSongs::draw( void )
 	}
 
 	theme->theme->clear();
-#ifdef USE_OPENGL
         SDL_Surface *virtSurf = theme->bg->getSDLSurface();
-#else
-	SDL_BlitSurface(theme->bg->getSDLSurface(),NULL,sm->getSDLScreen(),NULL);
-#endif	
+
 	// Draw the "Order by" text
 	{
 	char * orderStr = order[sm->getSongs()->getOrder()];
@@ -122,11 +116,7 @@ void CScreenSongs::draw( void )
 	SDL_Rect position;
 	position.x=(sm->getWidth()-sm->getSong()->coverSurf->w)/2;
 	position.y=(sm->getHeight()-sm->getSong()->coverSurf->h)/2;
-#ifdef USE_OPENGL
         SDL_BlitSurface(sm->getSong()->coverSurf,NULL, virtSurf, &position);
-#else
-        SDL_BlitSurface(sm->getSong()->coverSurf,NULL,sm->getSDLScreen(), &position);
-#endif
 	}
 	sm->getVideoDriver()->drawSurface(bg_texture);
 	sm->getVideoDriver()->drawSurface(theme->theme->getCurrent());
