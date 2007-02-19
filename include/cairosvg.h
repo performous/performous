@@ -9,6 +9,7 @@ class CairoSVG {
   	CairoSVG( const char * data , size_t data_len ,unsigned int _width , unsigned int _height );
  	~CairoSVG( void );
 	SDL_Surface * getSDLSurface(void) {return sdl_svg;};
+	cairo_surface_t * getCairoSurface(void) {return surface;};
 	private:
 	cairo_surface_t* surface;
 	SDL_Surface *  sdl_svg;
