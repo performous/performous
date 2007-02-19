@@ -12,7 +12,7 @@ LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~x86 ~amd64"
 
-IUSE="deprecated_cairo_svg novideo xine gstreamer"
+IUSE="deprecated_cairo_svg novideo xine gstreamer opengl"
 
 ECVS_SERVER="ultrastar-ng.cvs.sourceforge.net:/cvsroot/ultrastar-ng"
 ECVS_MODULE="UltraStar-ng"
@@ -50,6 +50,9 @@ pkg_setup() {
 		ewarn "Since both xine and gstreamer audio support has been"
 		ewarn "enabled, only xine will be used as default"
 	fi
+	if use opengl && ! built_with_use media-libs/libsdl opengl; then
+		eerror "opengl flag set, but libsdl wasn't build with opengl support"
+	fi
 }
 
 src_compile() {
@@ -73,6 +76,12 @@ src_compile() {
 		myconf="${myconf} --with-audio=xine"
 	else
 		myconf="${myconf} --with-audio=gstreamer"
+	fi
+
+	if use opengl ; then
+		myconf="${myconf} --with-graphics_driver=opengl"
+	else
+		myconf="${myconf} --with-graphics_driver=sdl"
 	fi
 
 	egamesconf ${myconf} || die
