@@ -83,6 +83,39 @@ void CAudio::playMusic( char * filename )
 #endif
 }
 
+
+
+void CAudio::playPreview( char * filename )
+{
+        if (isPlaying()) 
+            stopMusic();
+
+#ifdef USE_LIBXINE
+        int pos_stream;
+	int pos_time;
+
+        if (!xine_open(stream, filename) || !xine_play(stream, 0, 30000)) {
+            printf("could not open %s\n", filename);
+        }
+
+	if( !xine_get_pos_length(stream, &pos_stream, &pos_time, &length) )
+		length = LENGTH_ERROR;
+
+        xine_playing = 1;
+#endif
+#ifdef USE_GSTREAMER
+	g_object_set (G_OBJECT (music), "uri", g_strconcat("file://",filename,NULL), NULL);
+	gst_element_set_state (music, GST_STATE_PLAYING);
+	gst_element_seek_simple (music, GST_FORMAT_TIME, GST_SEEK_FLAG_NONE, 30*GST_SECOND);
+	GstFormat fmt = GST_FORMAT_TIME;
+	gint64 len;
+	if (!gst_element_query_duration (music, &fmt, &len))
+		length = LENGTH_ERROR;
+	else
+		length = (int) (len/1000000);
+#endif
+}
+
 int CAudio::getLength( void )
 {
 	if( length == LENGTH_ERROR ) {

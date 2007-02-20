@@ -16,6 +16,7 @@ class CScreenSongs : public CScreen {
 	private:
 	CThemeSongs * theme;
 	int songId;
+	bool play;
         unsigned int bg_texture;
 };
 

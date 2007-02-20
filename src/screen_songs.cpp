@@ -6,7 +6,7 @@ CScreenSongs::CScreenSongs(char * name)
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
 	screenName = name;
 	songId=0;
-
+	play = false;
 	theme = new CThemeSongs();
 	bg_texture = sm->getVideoDriver()->initSurface(theme->bg->getSDLSurface());
 }
@@ -23,6 +23,11 @@ void CScreenSongs::manageEvent( SDL_Event event )
 
 	switch(event.type) {
 		case SDL_KEYDOWN:
+			
+			//Stop song preview on keystroke
+			sm->getAudio()->stopMusic();
+			play = false;
+
 			keypressed = event.key.keysym.sym;
 			if( keypressed == SDLK_ESCAPE || keypressed == SDLK_q ) {
 				sm->activateScreen("Intro");
@@ -118,6 +123,25 @@ void CScreenSongs::draw( void )
 	position.y=(sm->getHeight()-sm->getSong()->coverSurf->h)/2;
         SDL_BlitSurface(sm->getSong()->coverSurf,NULL, virtSurf, &position);
 	}
+
+	//Play a preview of the song (0:30-1:00, and loop)
+	{
+	if (!play) {
+		char buff[1024];
+		CSong * song = sm->getSong();
+		if (song!=NULL) {
+			snprintf(buff,1024,"%s/%s",song->path,song->mp3);
+			sm->getAudio()->playPreview(buff);
+			play = true;
+		}
+	}
+	if (play && sm->getAudio()->isPlaying() && (sm->getAudio()->getPosition()-30000)>30000) {
+		sm->getAudio()->stopMusic();
+		play=false;
+	}
+	
+	}
+	
 	sm->getVideoDriver()->drawSurface(bg_texture);
 	sm->getVideoDriver()->drawSurface(theme->theme->getCurrent());
 }

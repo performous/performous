@@ -26,6 +26,13 @@ class CAudio {
 	 */
 	void playMusic( char * filename );
 	/**
+	 * This method starts the audio playback at 30sec from the beginning of the track.
+	 * If a track is already playing it is
+	 * stopped. It also computes the length variable.
+	 * @param filename the track filename
+	 */
+	void playPreview( char * filename );
+	/**
 	 * This method stop the audio playback
 	 */
 	void stopMusic( void );
