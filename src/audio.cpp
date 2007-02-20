@@ -79,7 +79,7 @@ void CAudio::playMusic( char * filename )
 	if (!gst_element_query_duration (music, &fmt, &len))
 		length = LENGTH_ERROR;
 	else
-		length = (int) (len/1000000);
+		length = (int) (len/GST_MSECOND);
 #endif
 }
 
@@ -105,14 +105,17 @@ void CAudio::playPreview( char * filename )
 #endif
 #ifdef USE_GSTREAMER
 	g_object_set (G_OBJECT (music), "uri", g_strconcat("file://",filename,NULL), NULL);
+	if( !gst_element_seek(music, 1.0, GST_FORMAT_TIME, GST_SEEK_FLAG_KEY_UNIT,
+		GST_SEEK_TYPE_SET, 30*GST_SECOND,
+		GST_SEEK_TYPE_END, 30*GST_SECOND))
+		g_print("playPreview() seek failed\n");
 	gst_element_set_state (music, GST_STATE_PLAYING);
-	gst_element_seek_simple (music, GST_FORMAT_TIME, GST_SEEK_FLAG_NONE, 30*GST_SECOND);
 	GstFormat fmt = GST_FORMAT_TIME;
 	gint64 len;
 	if (!gst_element_query_duration (music, &fmt, &len))
 		length = LENGTH_ERROR;
 	else
-		length = (int) (len/1000000);
+		length = (int) (len/GST_MSECOND);
 #endif
 }
 
@@ -131,7 +134,7 @@ int CAudio::getLength( void )
 		if (!gst_element_query_duration (music, &fmt, &len))
 			length = LENGTH_ERROR;
 		else
-			length = (int) (len/1000000);
+			length = (int) (len/GST_MSECOND);
 #endif
 	}
 
@@ -205,7 +208,7 @@ int CAudio::getPosition( void )
   if (!gst_element_query_position (music, &fmt, &pos))
     position = 0;
   else
-    position = (int) (pos/1000000);
+    position = (int) (pos/GST_MSECOND);
 #endif
 
   return position;
