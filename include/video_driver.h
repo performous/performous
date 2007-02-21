@@ -9,7 +9,8 @@ class CVideoDriver {
 	~CVideoDriver();
 	SDL_Surface * init(int width, int height);
 	unsigned int initSurface(SDL_Surface * _surf);
-	void drawSurface(unsigned int _id, int _x=0, int _y=0);
+	void updateSurface(unsigned int _id, SDL_Surface * _surf);
+        void drawSurface(unsigned int _id, int _x=0, int _y=0);
 	void drawSurface(cairo_surface_t* _surf, int _x=0, int _y=0);
 	void drawSurface(SDL_Surface* _surf, int _x=0, int _y=0);
 	void blank( void );

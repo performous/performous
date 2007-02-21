@@ -17,7 +17,8 @@ class CScreenSing : public CScreen {
 	private:
 	SDL_Surface * videoSurf;
 	SDL_Surface * backgroundSurf;
-	// Keeps the pitch tracking graphics
+	unsigned int backgroundSurf_id;
+        // Keeps the pitch tracking graphics
 	// in separate surface
 	PitchGraph pitchGraph;
 	std::vector <TNote *> sentence;

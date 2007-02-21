@@ -88,11 +88,21 @@ unsigned int CVideoDriver::initSurface(SDL_Surface * _surf)
 	texture_list.push_back(texture);
 	return surface_list.size()-1;
 }
-
+void CVideoDriver::updateSurface(unsigned int _id, SDL_Surface * _surf) {
+#ifdef USE_OPENGL
+        surface_list[_id] = _surf;
+#else
+        if (_surf != NULL)
+            surface_list[_id] = _surf;
+#endif
+}
 void CVideoDriver::drawSurface(unsigned int _id, int _x, int _y)
 {
 #ifdef USE_OPENGL
-	SDL_GL::draw_func(surface_list[_id]->w,surface_list[_id]->h,(unsigned char*)surface_list[_id]->pixels,texture_list[_id], GL_BGRA, _x, _y);
+        if (surface_list[_id] != NULL)
+            SDL_GL::draw_func(surface_list[_id]->w,surface_list[_id]->h,(unsigned char*)surface_list[_id]->pixels,texture_list[_id], GL_BGRA, _x, _y);
+        else
+            SDL_GL::draw_func(screen->w,screen->h,NULL,texture_list[_id], GL_BGRA, _x, _y);
 #else
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
 	SDL_Rect position;

@@ -29,12 +29,12 @@ CScreenSing::CScreenSing(char * name)
 			sm->getWidth(),
 			sm->getHeight(),
 			screen->format->BitsPerPixel,
-			0x000000ff,
-			0x0000ff00,
 			0x00ff0000,
+			0x0000ff00,
+			0x000000ff,
 			0xff000000);
 	SDL_SetAlpha(backgroundSurf, SDL_SRCALPHA, SDL_ALPHA_OPAQUE);
-	//SDL_FillRect(backgroundSurf,NULL,0xffffff);
+        SDL_FillRect(backgroundSurf,NULL,SDL_MapRGB(backgroundSurf->format, 255, 255, 255));
         theme = new CThemeSing();
 }
 
@@ -42,6 +42,9 @@ CScreenSing::~CScreenSing()
 {
 	if(videoSurf)
             SDL_FreeSurface(videoSurf);
+       	if(videoSurf)
+            SDL_FreeSurface(backgroundSurf);
+            
 	delete video;
         delete theme;
 }
@@ -65,8 +68,16 @@ void CScreenSing::manageEvent( SDL_Event event )
 			snprintf(buff,1024,"%s/%s",song->path,song->video);
 			fprintf(stdout,"Now playing: (%d) : %s\n",sm->getSongId(),buff);
 			video->loadVideo(buff,videoSurf,sm->getWidth(),sm->getHeight());
-		}
-
+		} else if ( song->background != NULL) {
+                        SDL_BlitSurface(song->backgroundSurf,NULL,backgroundSurf,NULL);
+                        SDL_BlitSurface(theme->bg->getSDLSurface(),NULL,backgroundSurf,NULL);
+                        SDL_BlitSurface(theme->p1box->getSDLSurface(),NULL,backgroundSurf,NULL);
+                } else {
+                        SDL_FillRect(backgroundSurf,NULL,SDL_MapRGB(backgroundSurf->format, 255, 255, 255));
+                        SDL_BlitSurface(theme->bg->getSDLSurface(),NULL,backgroundSurf,NULL);
+                        SDL_BlitSurface(theme->p1box->getSDLSurface(),NULL,backgroundSurf,NULL);
+                }
+                backgroundSurf_id = sm->getVideoDriver()->initSurface(backgroundSurf);
 		snprintf(buff,1024,"%s/%s",song->path,song->mp3);
 		fprintf(stdout,"Now playing : (%d) : %s\n",sm->getSongId(),buff);
 		sm->getAudio()->playMusic(buff);
@@ -117,16 +128,15 @@ void CScreenSing::draw( void )
 		if( !video->isPlaying() && time > song->videoGap )
 			video->play();
 
-		if (song->backgroundSurf != NULL) {
-			sm->getVideoDriver()->drawSurface(song->backgroundSurf);
-		}
 		if( video->isPlaying() ) {
-			sm->getVideoDriver()->drawSurface(videoSurf);
-		}
+		        sm->getVideoDriver()->drawSurface(videoSurf);
+			sm->getVideoDriver()->drawSurface(theme->bg->getSDLSurface());
+		        sm->getVideoDriver()->drawSurface(theme->p1box->getSDLSurface());
+		} else {
+        		sm->getVideoDriver()->drawSurface(backgroundSurf_id);
+                        sm->getVideoDriver()->updateSurface(backgroundSurf_id ,NULL);
+                }
                 
-		sm->getVideoDriver()->drawSurface(theme->bg->getSDLSurface());
-		sm->getVideoDriver()->drawSurface(theme->p1box->getSDLSurface());
-
 		// Compute and draw the timer and the progressbar
 		{
 		char dateStr[32];
