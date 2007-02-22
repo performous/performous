@@ -132,8 +132,8 @@ void CVideoDriver::drawSurface(unsigned int _id, int _x, int _y)
 {
 #ifdef USE_OPENGL
         if (cairo_list[_id] != NULL) {
-            int w = cairo_image_surface_get_width(_surf);
-            int h = cairo_image_surface_get_height(_surf);
+            int w = cairo_image_surface_get_width(cairo_list[_id]);
+            int h = cairo_image_surface_get_height(cairo_list[_id]);
 	    SDL_GL::draw_func(w,h,cairo_image_surface_get_data(cairo_list[_id]),texture_list[_id], GL_BGRA, _x, _y);
         } else if (surface_list[_id] != NULL)
             SDL_GL::draw_func(surface_list[_id]->w,surface_list[_id]->h,(unsigned char*)surface_list[_id]->pixels,texture_list[_id], GL_BGRA, _x, _y);
