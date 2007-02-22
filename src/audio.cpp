@@ -105,15 +105,15 @@ void CAudio::playPreview( char * filename )
 #endif
 #ifdef USE_GSTREAMER
 	g_object_set (G_OBJECT (music), "uri", g_strconcat("file://",filename,NULL), NULL);
-	gst_element_set_state (music, GST_STATE_PLAYING);
-	// gst_element_seek fails a lot because it is called too quickely
-	// playPreview could be called more than once to avoid this
-	// If state is set to playing after seek, seek could not be already achieve
-	// and then fails too.
+	gst_element_set_state (music, GST_STATE_PAUSED);
+	gst_element_get_state (music, NULL,NULL,GST_CLOCK_TIME_NONE);
 	if( !gst_element_seek(music, 1.0, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH,
 		GST_SEEK_TYPE_SET, 30*GST_SECOND,
 		GST_SEEK_TYPE_SET, 60*GST_SECOND))
 		g_print("playPreview() seek failed\n");
+	else
+		gst_element_get_state (music, NULL, NULL, GST_CLOCK_TIME_NONE);
+	gst_element_set_state (music, GST_STATE_PLAYING);
 	GstFormat fmt = GST_FORMAT_TIME;
 	gint64 len;
 	if (!gst_element_query_duration (music, &fmt, &len))
