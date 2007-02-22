@@ -121,6 +121,9 @@ void CScreenSongs::draw( void )
 	SDL_Rect position;
 	position.x=(sm->getWidth()-sm->getSong()->coverSurf->w)/2;
 	position.y=(sm->getHeight()-sm->getSong()->coverSurf->h)/2;
+        position.w=sm->getSong()->coverSurf->w;
+        position.h=sm->getSong()->coverSurf->h;
+        SDL_FillRect(virtSurf,&position,SDL_MapRGB(virtSurf->format, 255, 255, 255));
         SDL_BlitSurface(sm->getSong()->coverSurf,NULL, virtSurf, &position);
 	}
 
