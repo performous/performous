@@ -78,7 +78,9 @@ void CScreenSing::manageEvent( SDL_Event event )
                         SDL_BlitSurface(theme->p1box->getSDLSurface(),NULL,backgroundSurf,NULL);
                 }
                 backgroundSurf_id = sm->getVideoDriver()->initSurface(backgroundSurf);
-		snprintf(buff,1024,"%s/%s",song->path,song->mp3);
+		theme_id = sm->getVideoDriver()->initSurface(theme->theme->getCurrent());
+                pitchGraph_id = sm->getVideoDriver()->initSurface(pitchGraph.getCurrent());
+                snprintf(buff,1024,"%s/%s",song->path,song->mp3);
 		fprintf(stdout,"Now playing : (%d) : %s\n",sm->getSongId(),buff);
 		sm->getAudio()->playMusic(buff);
 		sentenceNextSentence[0] = '\n';
@@ -134,7 +136,7 @@ void CScreenSing::draw( void )
 		        sm->getVideoDriver()->drawSurface(theme->p1box->getSDLSurface());
 		} else {
         		sm->getVideoDriver()->drawSurface(backgroundSurf_id);
-                        sm->getVideoDriver()->updateSurface(backgroundSurf_id ,NULL);
+                        sm->getVideoDriver()->updateSurface(backgroundSurf_id , (SDL_Surface *) NULL);
                 }
                 
 		// Compute and draw the timer and the progressbar
@@ -355,8 +357,11 @@ void CScreenSing::draw( void )
                         theme->lyricsnextsentence.x = (theme->lyricsnextsentence.svg_width - theme->lyricsnextsentence.extents.width)/2;
                         theme->theme->PrintText(&theme->lyricsnextsentence);
                 }
-		sm->getVideoDriver()->drawSurface(theme->theme->getCurrent());
-		sm->getVideoDriver()->drawSurface(pitchGraph.getCurrent());
+
+                sm->getVideoDriver()->updateSurface(theme_id, theme->theme->getCurrent());
+		sm->getVideoDriver()->drawSurface(theme_id);
+                sm->getVideoDriver()->updateSurface(pitchGraph_id, pitchGraph.getCurrent());
+		sm->getVideoDriver()->drawSurface(pitchGraph_id);
 	}
  
 }

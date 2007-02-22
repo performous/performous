@@ -86,20 +86,56 @@ unsigned int CVideoDriver::initSurface(SDL_Surface * _surf)
 #endif
 	surface_list.push_back(_surf);
 	texture_list.push_back(texture);
-	return surface_list.size()-1;
+	cairo_list.push_back(NULL);
+        return surface_list.size()-1;
 }
+
+unsigned int CVideoDriver::initSurface(cairo_surface_t * _surf)
+{
+	unsigned int texture;
+#ifdef USE_OPENGL
+	SDL_GL::initTexture (cairo_image_surface_get_width(_surf),cairo_image_surface_get_height(_surf), &texture, GL_BGRA);
+#else
+	texture = 0;
+#endif
+	surface_list.push_back(NULL);
+	texture_list.push_back(texture);
+	cairo_list.push_back(_surf);
+        return surface_list.size()-1;
+}
+
 void CVideoDriver::updateSurface(unsigned int _id, SDL_Surface * _surf) {
 #ifdef USE_OPENGL
         surface_list[_id] = _surf;
+        cairo_list[_id] = NULL;
 #else
-        if (_surf != NULL)
+        if (_surf != NULL) {
             surface_list[_id] = _surf;
+            cairo_list[_id] = NULL;
+        }
 #endif
 }
+
+void CVideoDriver::updateSurface(unsigned int _id, cairo_surface_t * _surf) {
+#ifdef USE_OPENGL
+        cairo_list[_id] = _surf;
+        surface_list[_id] = NULL;
+#else
+        if (_surf != NULL) {
+            cairo_list[_id] = _surf;
+            surface_list[_id] = NULL;
+        }
+#endif
+}
+
 void CVideoDriver::drawSurface(unsigned int _id, int _x, int _y)
 {
 #ifdef USE_OPENGL
-        if (surface_list[_id] != NULL)
+        if (cairo_list[_id] != NULL) {
+            int w = cairo_image_surface_get_width(_surf);
+            int h = cairo_image_surface_get_height(_surf);
+	    SDL_GL::draw_func(w,h,cairo_image_surface_get_data(cairo_list[_id]),texture_list[_id], GL_BGRA, _x, _y);
+        } else if (surface_list[_id] != NULL)
             SDL_GL::draw_func(surface_list[_id]->w,surface_list[_id]->h,(unsigned char*)surface_list[_id]->pixels,texture_list[_id], GL_BGRA, _x, _y);
         else
             SDL_GL::draw_func(screen->w,screen->h,NULL,texture_list[_id], GL_BGRA, _x, _y);
@@ -108,7 +144,11 @@ void CVideoDriver::drawSurface(unsigned int _id, int _x, int _y)
 	SDL_Rect position;
 	position.x=_x;
 	position.y=_y;
-	SDL_BlitSurface(surface_list[_id],NULL,sm->getSDLScreen(),&position);
+	if (cairo_list[_id] != NULL) {
+ 	    SDL_Surface * SDL_surf = CairoToSdl::BlitToSdl(cairo_list[_id]);
+	    SDL_BlitSurface(SDL_surf,NULL,sm->getSDLScreen(),&position);
+	} else if (surface_list[_id] != NULL)
+	    SDL_BlitSurface(surface_list[_id],NULL,sm->getSDLScreen(),&position);
 #endif
 }
 

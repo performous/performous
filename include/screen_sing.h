@@ -18,6 +18,8 @@ class CScreenSing : public CScreen {
 	SDL_Surface * videoSurf;
 	SDL_Surface * backgroundSurf;
 	unsigned int backgroundSurf_id;
+        unsigned int theme_id;
+        unsigned int pitchGraph_id;
         // Keeps the pitch tracking graphics
 	// in separate surface
 	PitchGraph pitchGraph;
