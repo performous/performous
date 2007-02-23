@@ -68,7 +68,7 @@ void CScreenSing::manageEvent( SDL_Event event )
 			snprintf(buff,1024,"%s/%s",song->path,song->video);
 			fprintf(stdout,"Now playing: (%d) : %s\n",sm->getSongId(),buff);
 			video->loadVideo(buff,videoSurf,sm->getWidth(),sm->getHeight());
-		} else if ( song->background != NULL) {
+                } else if ( song->background != NULL) {
                         SDL_BlitSurface(song->backgroundSurf,NULL,backgroundSurf,NULL);
                         SDL_BlitSurface(theme->bg->getSDLSurface(),NULL,backgroundSurf,NULL);
                         SDL_BlitSurface(theme->p1box->getSDLSurface(),NULL,backgroundSurf,NULL);
@@ -131,8 +131,10 @@ void CScreenSing::draw( void )
 			video->play();
 
 		if( video->isPlaying() ) {
-		        sm->getVideoDriver()->drawSurface(videoSurf);
-			sm->getVideoDriver()->drawSurface(theme->bg->getSDLSurface());
+	                /* FIXME: make video work with opengl, SMPEG sets alpha channel to zero */
+                        SDL_BlitSurface(videoSurf,NULL,backgroundSurf,NULL);
+                        sm->getVideoDriver()->drawSurface(backgroundSurf);
+                        sm->getVideoDriver()->drawSurface(theme->bg->getSDLSurface());
 		        sm->getVideoDriver()->drawSurface(theme->p1box->getSDLSurface());
 		} else {
         		sm->getVideoDriver()->drawSurface(backgroundSurf_id);
