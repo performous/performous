@@ -219,6 +219,12 @@ void CScreenSing::draw( void )
 		char sentenceNow[128]    ; sentenceNow[0]    = '\0';
 		char sentenceFuture[128] ; sentenceFuture[0] = '\0';
                 char sentenceWhole[128]  ; sentenceWhole[0]  = '\0';
+		// FIXME: The following example crash UltraStar-NG
+		//    : 2478 5 69 -
+		//    -2493
+		//    -2754
+		//    E
+		// on the following line
         	totalBpm = sentence[sentence.size()-1]->length + sentence[sentence.size()-1]->timestamp - sentence[0]->timestamp;
 		
 		float bpmPixelUnit = (sm->getWidth() - 100. - 100.)/(totalBpm*1.0);
