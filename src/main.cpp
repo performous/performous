@@ -54,7 +54,7 @@ int thread_func(void *)
 
 void usage( char * progname )
 {
-	fprintf(stdout,"Usage: %s [options] song_directory\n", progname);
+	fprintf(stdout,"Usage: %s [options] [song_directory]\n", progname);
 	fprintf(stdout,"Options:\n");
 	fprintf(stdout,"--------\n");
 	fprintf(stdout,"-h, --help\n");
@@ -116,14 +116,18 @@ int main( int argc, char ** argv )
 	}
 
 	if( optind == argc ) {
-		usage(argv[0]);
+		// Using default songs directory
+		const char default_songs_directory[] = DATA_DIR "/songs";
+		fprintf(stdout,"Using %s as default songs directory\n",default_songs_directory);
+		songs_directory = new char[strlen(default_songs_directory)+2];
+		sprintf(songs_directory,"%s/",default_songs_directory); // safe sprintf
+	} else {
+		// Add the trailing slash
+		songs_directory = new char[strlen(argv[optind])+2];
+		sprintf(songs_directory,"%s/",argv[optind]); // safe sprintf
 	}
 
 	videoDriver = new CVideoDriver();
-
-	// Add the trailing slash
-	songs_directory = new char[strlen(argv[optind])+2];
-	sprintf(songs_directory,"%s/",argv[optind]); // safe sprintf
 
 	init();
 

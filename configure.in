@@ -27,6 +27,9 @@ AC_PROG_INSTALL
 THEMES_DIR="${datadir}/ultrastar-ng/themes/"
 AC_SUBST(THEMES_DIR)
 
+DATA_DIR="${datadir}/ultrastar-ng/"
+AC_SUBST(DATA_DIR)
+
 # Processing configure input configuration flags
 AC_ARG_WITH(audio,
 	AC_HELP_STRING(--with-audio[={xine|gstreamer}],
