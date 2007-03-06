@@ -205,7 +205,7 @@ bool CSongs::parseFile( CSong * tmp )
                 } else if(!strncmp("#VIDEOGAP:",buff,10)) {
 			sscanf(buff+10,"%f",&tmp->videoGap);
 		} else if(!strncmp("#RELATIVE:",buff,10)) {
-			if( buff[10] == 'y' )
+			if( buff[10] == 'y'  || buff[10] == 'Y' )
 				tmp->relative = true;
 			else
 				tmp->relative = false;
