@@ -3,12 +3,41 @@
 
 #include "../config.h"
 
+/**
+ * SVG to Cairo context loading class. This class enables SVG loading into a cairo context with
+ *  both libsvg-cairo and librsvg. Rendering is way better with librsvg and libsvg-cairo is not
+ *  maintained anymore
+ */
 class CairoSVG {
 	public:
+	/**
+	 * Constructor
+	 * This constructor builds the cairo and the SDL surface according to an SVG file.
+	 * @param filename SVG filename
+	 * @param width destination surfaces width
+	 * @param height destination surfaces heigth
+	 */
         CairoSVG( const char * filename , unsigned int _width , unsigned int _height );
+	/**
+	 * Constructor
+	 * This constructor builds the cairo and the SDL surface according to an SVG stream (buffer).
+	 * @param data SVG buffer
+	 * @param data_len buffer length
+	 * @param width destination surfaces width
+	 * @param height destination surfaces heigth
+	 */
   	CairoSVG( const char * data , size_t data_len ,unsigned int _width , unsigned int _height );
+	/**
+	 * Destructor
+	 */
  	~CairoSVG( void );
+	/**
+	 * This method returns the SDL surface
+	 */
 	SDL_Surface * getSDLSurface(void) {return sdl_svg;};
+	/**
+	 * This method returns the cairo surface
+	 */
 	cairo_surface_t * getCairoSurface(void) {return surface;};
 	private:
 	cairo_surface_t* surface;
