@@ -88,11 +88,21 @@ void CSong::parseFile( void )
 			case '-' : {
 				TNote * tmp = new TNote();
 				int timestamp;
+				int sleep_end;
 				tmp->type = TYPE_NOTE_SLEEP;
-				sscanf(buff+1,"%d",&timestamp);
+				int nbInt = sscanf(buff+1,"%d %d",&timestamp, &sleep_end);
 				tmp->timestamp = relativeShift + timestamp;
+				if( nbInt == 1 ) {
+					tmp->length = 0;
+				} else {
+					tmp->length = sleep_end - timestamp;
+				}
 				if(relative)
-					relativeShift += timestamp;
+					if( nbInt == 1 ) {
+						relativeShift += timestamp;
+					} else {
+						relativeShift += sleep_end;
+					}
 				notes.push_back(tmp);
 				break;
 			}
