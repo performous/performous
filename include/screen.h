@@ -22,7 +22,7 @@ class CScreen {
 
 class CScreenManager : public CSingleton <CScreenManager>{
 	public:
-	CScreenManager( int width , int height , char * songs_dir , char * theme_name="default");
+	CScreenManager( int width , int height , char * songs_dir , char * theme_name="lima");
 	~CScreenManager();
 	void addScreen( CScreen * screen ) { 
 		screens.push_back(screen);
