@@ -14,10 +14,10 @@ CVideoDriver::~CVideoDriver()
 {
 }
 
-SDL_Surface * CVideoDriver::init(int width, int height)
+SDL_Surface * CVideoDriver::init(int width, int height, int fullscreen)
 {
 	const SDL_VideoInfo * videoInf = SDL_GetVideoInfo();
-	unsigned SDL_videoFlags  = 0;
+	unsigned SDL_videoFlags  = SDL_RLEACCEL;
 #ifdef USE_OPENGL
 	SDL_videoFlags |= SDL_OPENGL;
 	SDL_videoFlags |= SDL_DOUBLEBUF;
@@ -34,7 +34,8 @@ SDL_Surface * CVideoDriver::init(int width, int height)
 	if ( videoInf->blit_hw )
 		SDL_videoFlags |= SDL_HWACCEL;
 #endif
-
+	if ( fullscreen )
+		SDL_videoFlags |= SDL_FULLSCREEN;
 	screen = SDL_SetVideoMode(width, height, videoInf->vfmt->BitsPerPixel, SDL_videoFlags );
 
 #ifdef USE_OPENGL

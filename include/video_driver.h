@@ -7,7 +7,7 @@ class CVideoDriver {
 	public:
 	CVideoDriver();
 	~CVideoDriver();
-	SDL_Surface * init(int width, int height);
+	SDL_Surface * init(int width, int height, int fullscreen);
 	unsigned int initSurface(SDL_Surface * _surf);
 	unsigned int initSurface(cairo_surface_t * _surf);
         void updateSurface(unsigned int _id, SDL_Surface * _surf);
