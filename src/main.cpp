@@ -77,7 +77,7 @@ int main( int argc, char ** argv )
 	char * songs_directory = NULL;
 	char * theme_name      = NULL;
 	CScreen * screen       = NULL;
-	char ch                = 0;
+	int ch                = 0;
 	SDL_Thread *thread     = NULL;
 
 	static struct option long_options[] =
