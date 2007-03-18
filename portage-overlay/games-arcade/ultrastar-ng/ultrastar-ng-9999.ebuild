@@ -79,9 +79,9 @@ src_compile() {
 	fi
 
 	if use opengl ; then
-		myconf="${myconf} --with-graphics_driver=opengl"
+		myconf="${myconf} --with-graphic-driver=opengl"
 	else
-		myconf="${myconf} --with-graphics_driver=sdl"
+		myconf="${myconf} --with-graphic-driver=sdl"
 	fi
 
 	egamesconf ${myconf} || die

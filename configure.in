@@ -55,13 +55,13 @@ AC_ARG_WITH(video,
 )
 if test $video_layer = yes ; then video_layer="autodetect" ; fi
 
-AC_ARG_WITH(graphics_driver,
-        AC_HELP_STRING(--with-graphics_driver[={sdl|opengl}],
-                graphics driver selection (default: sdl)),
-        [graphics_driver="$withval"],
-        [graphics_driver="sdl"]
+AC_ARG_WITH(graphic-driver,
+        AC_HELP_STRING(--with-graphic-driver[={sdl|opengl}],
+                graphic driver selection (default: sdl)),
+        [graphic_driver="$withval"],
+        [graphic_driver="sdl"]
 )
-if test $graphics_driver = yes; then graphics_driver="sdl"; fi
+if test $graphic_driver = yes; then graphic_driver="sdl"; fi
 
 # Check for the standard headers
 AC_HEADER_STDC
@@ -323,12 +323,12 @@ esac
 AC_SUBST(SVG_FLAGS)
 AC_SUBST(SVG_LIBS)
 
-case $graphics_driver in
+case $graphic_driver in
 	sdl*)
 		GL_LIBS=""
 		ac_includes_default=$(cat <<-USNG_EOF
 		$ac_includes_default
-		/* graphics driver */
+		/* graphic driver */
 		#define USE_SDL 1
 		USNG_EOF)
 		;;
@@ -336,7 +336,7 @@ case $graphics_driver in
 		GL_LIBS="-lGL -lGLU"
 		ac_includes_default=$(cat <<-USNG_EOF
 		$ac_includes_default
-		/* graphics driver */
+		/* graphic driver */
 		#define USE_OPENGL 1 
 		#include <SDL/SDL_opengl.h>
 		USNG_EOF)
@@ -362,5 +362,5 @@ echo "------------------------------------------------------------------"
 echo "audio            | --with-audio           | $audio_layer          "
 echo "video            | --with-video           | $video_layer          "
 echo "svg              | --with-svg             | $svg_layer            "
-echo "graphics driver  | --with-graphics_driver | $graphics_driver      "
+echo "graphic driver   | --with-graphic-driver  | $graphic_driver      "
 echo ""
