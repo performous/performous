@@ -45,6 +45,9 @@ class CScreenManager : public CSingleton <CScreenManager>{
 
 	int getWidth( void ) {return width;};
 	int getHeight( void ) {return height;};
+	
+	void setDifficulty( unsigned int _difficulty ) { difficulty=_difficulty;};
+	unsigned int getDifficulty( void ) {return difficulty;};
 
 	CAudio * getAudio( void ) {return audio;};
 	void setAudio( CAudio * _audio ) {audio=_audio;};
@@ -85,6 +88,7 @@ class CScreenManager : public CSingleton <CScreenManager>{
 	bool m_finished;
 	int width;
 	int height;
+	unsigned int difficulty;
 };
 
 #endif

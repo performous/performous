@@ -66,7 +66,7 @@ void CScreenSing::manageEvent( SDL_Event event )
 	        
 		if( song->video != NULL ) {
 			snprintf(buff,1024,"%s/%s",song->path,song->video);
-			fprintf(stdout,"Now playing: (%d) : %s\n",sm->getSongId(),buff);
+			fprintf(stdout,"Now playing: (%d): %s\n",sm->getSongId(),buff);
 			video->loadVideo(buff,videoSurf,sm->getWidth(),sm->getHeight());
                 } else if ( song->background != NULL) {
                         SDL_BlitSurface(song->backgroundSurf,NULL,backgroundSurf,NULL);
@@ -81,7 +81,7 @@ void CScreenSing::manageEvent( SDL_Event event )
 		theme_id = sm->getVideoDriver()->initSurface(theme->theme->getCurrent());
                 pitchGraph_id = sm->getVideoDriver()->initSurface(pitchGraph.getCurrent());
                 snprintf(buff,1024,"%s/%s",song->path,song->mp3);
-		fprintf(stdout,"Now playing : (%d) : %s\n",sm->getSongId(),buff);
+		fprintf(stdout,"Now playing: (%d): %s\n",sm->getSongId(),buff);
 		sm->getAudio()->playMusic(buff);
 		sentenceNextSentence[0] = '\n';
                 start = SDL_GetTicks();
@@ -119,6 +119,46 @@ void CScreenSing::draw( void )
 	//record->compute();
 	freq = record->getFreq();
 	note = record->getNoteId();
+
+
+	int numOctaves = (song->noteMax+11)/12-song->noteMin/12;
+	if (numOctaves<3) numOctaves=3;
+	int lowestC=(song->noteMin/12)*12;  // the C below noteMin
+
+	// draw lines across the screen
+	// Theme this
+	TThemeRect linerect;
+	linerect.stroke_col.r = linerect.stroke_col.g = linerect.stroke_col.b = 0;
+	linerect.stroke_col.a = 0.9;
+	linerect.stroke_width = 1;
+	linerect.svg_width = sm->getWidth();
+	linerect.svg_height = sm->getHeight();
+	linerect.height = 1;
+	linerect.fill_col.a = 0.5;
+	linerect.x = 0;
+	linerect.width = sm->getWidth();
+	linerect.fill_col.r = 50;
+	linerect.fill_col.g = 50;
+	linerect.fill_col.b = 50;
+	// draw lines for the C notes (thick)
+	for (int i=0;i<=numOctaves;i++){
+	  if (i<=(song->noteMax-lowestC)/12){
+	    linerect.y=sm->getHeight()*3/4-i*sm->getHeight()/2/numOctaves;
+	    theme->theme->DrawRect(linerect);
+	  }
+	}
+	linerect.stroke_width = 0;
+
+	// draw the other lines in between
+	for (int i=0;i<numOctaves;i++){
+	  for (int j=1;j<12;j++){
+	    if (i*12+j+(lowestC/12)*12<=song->noteMax){
+	      linerect.y=sm->getHeight()*3/4-(i*12+j)*sm->getHeight()/24/numOctaves;
+	      theme->theme->DrawRect(linerect);
+	    }
+	  }
+	}      
+  
 
 	if(play) {
 		// Get the time in the song
@@ -189,7 +229,7 @@ void CScreenSing::draw( void )
                                 break;
                         }
                         while(song->notes[song_pos]->type != TYPE_NOTE_SLEEP) {
-                            sentence.push_back(song->notes[song_pos]);
+			    sentence.push_back(song->notes[song_pos]);
                             if (song_pos < song->notes.size() - 1)
                                 song_pos++;
                             else 
@@ -228,6 +268,7 @@ void CScreenSing::draw( void )
         	totalBpm = sentence[sentence.size()-1]->length + sentence[sentence.size()-1]->timestamp - sentence[0]->timestamp;
 		
 		float bpmPixelUnit = (sm->getWidth() - 100. - 100.)/(totalBpm*1.0);
+		// Theme this
                 TThemeRect tmprect;
                 tmprect.stroke_col.r = tmprect.stroke_col.g = tmprect.stroke_col.b = 0;
 		tmprect.stroke_col.a = 255;
@@ -241,10 +282,11 @@ void CScreenSing::draw( void )
                 if (time <= ((song->notes[song->notes.size() - 1]->timestamp + song->notes[song->notes.size()-1]->length)*60*1000) / ( song->bpm[0].bpm * 4 ) + song->gap) {
                     for( i = 0 ; i < sentence.size() ; i ++ ) {
 			    int currentBpm = sentence[i]->timestamp - sentence[0]->timestamp;
+			    int noteHeight=sm->getHeight()*3/4-((sentence[i]->note-lowestC)*sm->getHeight()/2/numOctaves/12);
+
 			    // if C <= timestamp < N
 			    if( time > ( (sentence[i]->timestamp+sentence[i]->length)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap ) {
-			            int noteFinal = sentence[i]->note - (song->noteMin/12)*12;
-				    int y = sm->getHeight()-(int)record->getNoteFreq(noteFinal);
+			      int y = noteHeight;
 				    int begin = (int) (currentBpm*bpmPixelUnit);
 				    int end   = (int) ((currentBpm+sentence[i]->length)*bpmPixelUnit);
 				    strcat(sentencePast,sentence[i]->syllable);
@@ -258,8 +300,7 @@ void CScreenSing::draw( void )
 			    }
 			    // if N+d <= timestamp < E
 			    else if( time < ( (sentence[i]->timestamp)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap ) {
-				    int noteFinal = sentence[i]->note - (song->noteMin/12)*12;
-				    int y = sm->getHeight()-(int)record->getNoteFreq(noteFinal);
+			      int y = noteHeight;
 				    int begin = (int) (currentBpm*bpmPixelUnit);
 				    int end   = (int) ((currentBpm+sentence[i]->length)*bpmPixelUnit);
 				    strcat(sentenceFuture,sentence[i]->syllable);
@@ -273,8 +314,7 @@ void CScreenSing::draw( void )
 			    }
 			    else {
 				    strcat(sentenceNow,sentence[i]->syllable);
-				    int noteFinal = sentence[i]->note - (song->noteMin/12)*12;
-				    int y = sm->getHeight()-(int)record->getNoteFreq(noteFinal);
+				    int y = noteHeight;
 				    int begin   = (int) (currentBpm*bpmPixelUnit);
 				    int end     = (int) ((currentBpm+sentence[i]->length)*bpmPixelUnit);
 				    float note_start = (time - ( (sentence[i]->timestamp)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) - song->gap);
@@ -296,30 +336,23 @@ void CScreenSing::draw( void )
                                     tmprect.fill_col.b = 200;
                                     theme->theme->DrawRect(tmprect);
     	
-				    // Lets find the nearest note from the song
-				    int diff =  sentence[i]->note%12 - note%12;
-
-				    if( diff > 6 )
-					    diff -= 12;
-				    if( diff < -6 )
-					    diff += 12;
-
-				    int noteSingFinal = noteFinal - diff ;
-				    if( noteSingFinal < 0 )
-					    noteSingFinal +=12;
-
+    	
+				    // Lets find the nearest note from the song (diff in [-6,5])
+				    int diff =  (66+sentence[i]->note - note)%12-6;
+				    int noteSingFinal = sentence[i]->note - diff;
+				    int noteheight=sm->getHeight()*3/4-((noteSingFinal-lowestC)*sm->getHeight()/2/numOctaves/12);
 				    if(freq != 0.0) {
-					    pitchGraph.renderPitch(
-						    (sm->getHeight() - record->getNoteFreq(noteSingFinal))/sm->getHeight(),
-						    ((double)current + 100)/sm->getWidth());
-                                                    if (record->getNoteFreq(noteSingFinal) == record->getNoteFreq(noteFinal)) {
-                                                        song->score[0].score += (10000 / song->maxScore) * sentence[i]->type;
-                                                    }
+				      pitchGraph.renderPitch(
+							     ((float)noteheight/sm->getHeight()),
+							     ((double)current + 100)/sm->getWidth());
+				      if( abs(diff) <= sm->getDifficulty() )
+					song->score[0].score += (10000 / song->maxScore) * sentence[i]->type;
                                     } else {
-					    pitchGraph.renderPitch(
-						    0.0,
-						    ((double)current + 100)/sm->getWidth());
+				      pitchGraph.renderPitch(
+							     0.0,
+							     ((double)current + 100)/sm->getWidth());
 				    }
+				    
 				    if( time < ( (sentence[i]->timestamp+sentence[i]->length)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap )
 					    pos=i;
 			    }

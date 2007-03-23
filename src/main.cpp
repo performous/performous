@@ -8,7 +8,6 @@
 unsigned int width=800;
 unsigned int height=600;
 unsigned int fullscreen=0;
-unsigned int difficulty=2;
 
 SDL_Event event;
 SDL_Surface * screenSDL;
@@ -83,8 +82,9 @@ int main( int argc, char ** argv )
 	char * songs_directory = NULL;
 	char * theme_name      = NULL;
 	CScreen * screen       = NULL;
-	int ch                = 0;
+	int ch                 = 0;
 	SDL_Thread *thread     = NULL;
+	unsigned int difficulty= 2;
 
 	static struct option long_options[] =
 		{
@@ -154,6 +154,7 @@ int main( int argc, char ** argv )
 	screenManager->setAudio( new CAudio() );
 	screenManager->setRecord( new CRecord() );
 	screenManager->setVideoDriver( videoDriver );
+	screenManager->setDifficulty( difficulty );
 	
 	screen = new CScreenIntro("Intro");
 	screenManager->addScreen(screen);
