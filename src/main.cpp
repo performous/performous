@@ -8,6 +8,7 @@
 unsigned int width=800;
 unsigned int height=600;
 unsigned int fullscreen=0;
+unsigned int difficulty=2;
 
 SDL_Event event;
 SDL_Surface * screenSDL;
@@ -70,6 +71,8 @@ void usage( char * progname )
 	fprintf(stdout,"\tDisable sound capture thread\n");
 	fprintf(stdout,"-f, --fullscreen\n");
 	fprintf(stdout,"\tEnable fullscreen video output\n");
+	fprintf(stdout,"-d, --difficulty\n");
+	fprintf(stdout,"\tSet difficulty level (0: easy, 1:medium, 2:hard (default))\n");
 	fprintf(stdout,"-v, --version\n");
 	fprintf(stdout,"\tDisplay version number and exit\n");
 	exit(EXIT_SUCCESS);
@@ -91,11 +94,12 @@ int main( int argc, char ** argv )
 		{"help",no_argument,NULL,'h'},
 		{"no-capture",no_argument,NULL,'c'},
 		{"version",no_argument,NULL,'v'},
+		{"difficulty",required_argument,NULL,'d'},
 		{"fullscreen",no_argument,NULL,'f'},
 		{0, 0, 0, 0}
 	};
 
-	while ((ch = getopt_long(argc, argv, "t:W:H:hcfv", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "t:W:H:hcfd:v", long_options, NULL)) != -1) {
 		switch(ch) {
 			case 't':
 				theme_name = optarg;
@@ -114,6 +118,9 @@ int main( int argc, char ** argv )
 				break;
 			case 'f':
 				fullscreen = 1;
+				break;
+			case 'd':
+				difficulty = atoi(optarg);
 				break;
 			case 'v':
 				fprintf(stdout,"%s %s\n",PACKAGE, VERSION);
