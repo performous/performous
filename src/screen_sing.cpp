@@ -345,7 +345,7 @@ void CScreenSing::draw( void )
 				      pitchGraph.renderPitch(
 							     ((float)noteheight/sm->getHeight()),
 							     ((double)current + 100)/sm->getWidth());
-				      if( abs(diff) <= sm->getDifficulty() )
+				      if( abs(diff) <= 2 - sm->getDifficulty() )
 					song->score[0].score += (10000 / song->maxScore) * sentence[i]->type;
                                     } else {
 				      pitchGraph.renderPitch(
