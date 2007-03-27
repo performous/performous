@@ -42,7 +42,7 @@ CScreenSing::~CScreenSing()
 {
 	if(videoSurf)
             SDL_FreeSurface(videoSurf);
-       	if(videoSurf)
+       	if(backgroundSurf)
             SDL_FreeSurface(backgroundSurf);
             
 	delete video;
