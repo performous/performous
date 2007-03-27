@@ -77,6 +77,12 @@ void CSong::parseFile( void )
 				tmp->timestamp += relativeShift;
 				snprintf(syllable,16,"%s",buff+shift+2);
 				tmp->syllable = syllable;
+				// Avoid ":1 0 0" to mess noteMin
+				if( tmp->length == 0 ) {
+					delete[] tmp->syllable;
+					delete tmp;
+					break;
+				}
 				if( tmp->note <= noteMin )
 					noteMin = tmp->note;
 				if( tmp->note >= noteMax )
