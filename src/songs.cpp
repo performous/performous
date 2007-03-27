@@ -316,8 +316,9 @@ CSongs::CSongs()
 			    int w = CScreenManager::getSingletonPtr()->getWidth()*256/800;
 			    int h = CScreenManager::getSingletonPtr()->getHeight()*256/600;
 			    tmp->coverSurf = zoomSurface(coverSurface,(double) w/coverSurface->w,(double) h/coverSurface->h,1);
-			    SDL_FreeRW(rwop);
+			    SDL_FreeSurface(coverSurface);
 		        }
+			SDL_FreeRW(rwop);
 		        
                         snprintf(buff,1024,"%s/%s/%s",songs_dir,dirEntry->d_name,tmp->background);
                         rwop = SDL_RWFromFile(buff, "rb");
@@ -335,9 +336,11 @@ CSongs::CSongs()
 			    	int w = CScreenManager::getSingletonPtr()->getWidth();
 			    	int h = CScreenManager::getSingletonPtr()->getHeight();
                                 tmp->backgroundSurf = zoomSurface(backgroundSurface,(double)w/backgroundSurface->w,(double)h/backgroundSurface->h,1);
-                                SDL_FreeRW(rwop);
+				SDL_FreeSurface(backgroundSurface);
                             }
                         }
+                        
+			SDL_FreeRW(rwop);
                         
                         tmp->parseFile();
 			songs.push_back(tmp);
@@ -358,6 +361,7 @@ CSongs::~CSongs()
 		delete[] songs[i]->edition;
 		delete[] songs[i]->creator;
 		delete[] songs[i]->video;
+		delete[] songs[i]->background;
 		for(unsigned int j = 0; j < songs[i]->notes.size(); j++) {
 			delete[] songs[i]->notes[j]->syllable;
 			delete songs[i]->notes[j];
