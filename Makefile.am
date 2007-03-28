@@ -15,6 +15,7 @@ themesdef_DATA = themes/default/no_cover.png \
 	themes/default/sing_p2box.svg \
 	themes/default/sing_p2score.svg \
 	themes/default/sing_progressfg.svg \
+	themes/default/sing_tostartfg.svg \
 	themes/default/sing_timetxt.svg
 
 themeslimadir   = @THEMES_DIR@/lima
@@ -32,6 +33,7 @@ themeslima_DATA = themes/lima/no_cover.png \
 	themes/lima/sing_p2box.svg \
 	themes/lima/sing_p2score.svg \
 	themes/lima/sing_progressfg.svg \
+	themes/lima/sing_tostartfg.svg \
 	themes/lima/sing_timetxt.svg
 
 includes = include/audio.h \

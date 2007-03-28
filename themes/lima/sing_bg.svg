@@ -14,9 +14,11 @@
    height="600"
    id="svg3465"
    sodipodi:version="0.32"
-   inkscape:version="0.44.1"
+   inkscape:version="0.45"
    sodipodi:docname="sing_bg.svg"
-   sodipodi:docbase="/home/jesusda/docs/curro/yo/ultrastar-ng/base/theme-pod/themes/default">
+   sodipodi:docbase="/home/yoda/UltraStar/sf/UltraStar-ng/themes/lima"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   sodipodi:modified="true">
   <metadata
      id="metadata30">
     <rdf:RDF>
@@ -44,7 +46,7 @@
      pagecolor="#ffffff"
      id="base"
      inkscape:window-x="0"
-     inkscape:window-y="30"
+     inkscape:window-y="185"
      inkscape:current-layer="svg3465" />
   <defs
      id="defs3467">
@@ -367,4 +369,11 @@
        style="opacity:0.22790701;color:black;fill:white;fill-opacity:1;fill-rule:nonzero;stroke:white;stroke-width:1.98281369;stroke-linecap:round;stroke-linejoin:round;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:block;overflow:visible"
        sodipodi:type="star" />
   </g>
+  <rect
+     width="29.287586"
+     height="74.28759"
+     x="10.356207"
+     y="495.35623"
+     style="fill:#ffffff;fill-opacity:0.24313725;stroke:#ffffff;stroke-width:0.71241343;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
+     id="rect2246" />
 </svg>

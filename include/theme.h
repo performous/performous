@@ -86,6 +86,7 @@ class CThemeSing {
         TThemeTxt lyricshighlight;
         TThemeTxt lyricsnextsentence;
         TThemeRect progressfg;
+        TThemeRect tostartfg;
         CTheme *theme;
         private:
 };

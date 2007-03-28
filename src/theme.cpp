@@ -347,6 +347,8 @@ CThemeSing::CThemeSing() {
         theme->ParseSVGForText(theme_path, &lyricsnextsentence);
 	sm->getThemePathFile(theme_path,"sing_progressfg.svg");
         theme->ParseSVGForRect(theme_path, &progressfg);
+	sm->getThemePathFile(theme_path,"sing_tostartfg.svg");
+        theme->ParseSVGForRect(theme_path, &tostartfg);
 
 	delete[] theme_path;
 }

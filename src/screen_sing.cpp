@@ -278,6 +278,20 @@ void CScreenSing::draw( void )
                 tmprect.height = 10;
 		tmprect.fill_col.a = 255;
 
+		// Compute and draw the "to start" cursor
+		{
+		if (sentence.size()>0 && time < (sentence[0]->timestamp * 60 * 1000) / (song->bpm[0].bpm * 4 ) + song->gap){
+			float waitLen = sentence[0]->timestamp - (time - song->gap) * (song->bpm[0].bpm * 4) / 60 / 1000;
+			if( theme->tostartfg.final_height - waitLen * 5 < 0 )
+				waitLen = theme->tostartfg.final_height;
+			else
+				waitLen = theme->tostartfg.final_height - waitLen * 5;
+			
+                	theme->tostartfg.height = theme->tostartfg.final_height - waitLen;
+                	theme->theme->DrawRect(theme->tostartfg); 
+		}
+		}
+
                 int pos = -1;
                 if (time <= ((song->notes[song->notes.size() - 1]->timestamp + song->notes[song->notes.size()-1]->length)*60*1000) / ( song->bpm[0].bpm * 4 ) + song->gap) {
                     for( i = 0 ; i < sentence.size() ; i ++ ) {
