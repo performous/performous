@@ -109,7 +109,7 @@ void CScreenSongs::draw( void )
 	// Draw the "Song informations"
 	{
 	char informationStr[1024];
-	snprintf(informationStr,1024,"%s - %s",sm->getSong()->artist, sm->getSong()->title);
+	snprintf(informationStr,1024,"(%d/%d) %s - %s",sm->getSongId()+1,sm->getSongs()->nbSongs(),sm->getSong()->artist, sm->getSong()->title);
 	theme->song.text = informationStr;
 	cairo_text_extents_t extents = theme->theme->GetTextExtents(theme->song);
 	theme->song.x = (theme->song.svg_width - extents.width)/2;
