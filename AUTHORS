@@ -6,11 +6,13 @@ Vincent Le Ligeour      <yoda-jm at users.sourceforge.net>
 	* core developer
 Stefan Kristiansson     <stekern at users.sourceforge.net>
 	* core developer
-Ignacio Casal Quinteiro <nacho.resa at gmail.com>
-	* gstreamer implementation
+Jami Pekkanen           <jami.pekkanen at ateco.fi>
+	* cairotosdl and pitchgraph class
 Sebastian Sproesser     <sebastian at sproesser.org>
 	* background management
 	* song sync improvement
 	* current position in the track
-Jami Pekkanen           <jami.pekkanen at ateco.fi>
-	* cairotosdl and pitchgraph class
+Matias Holte <matiasholte at users.sourceforge.net>
+	* screen sing propositions and patchs
+Ignacio Casal Quinteiro <nacho.resa at gmail.com>
+	* gstreamer implementation
