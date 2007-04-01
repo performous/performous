@@ -5,6 +5,7 @@ ultrastarng_SOURCES = main.cpp \
 	video.cpp \
 	record.cpp \
 	songs.cpp \
+	lyrics.cpp \
 	screenmanager.cpp \
 	screen_intro.cpp \
 	screen_songs.cpp \
