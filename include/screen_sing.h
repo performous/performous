@@ -7,6 +7,7 @@
 #include <pitch_graph.h>
 #include <theme.h>
 #include <video.h>
+#include <lyrics.h>
 
 class CScreenSing : public CScreen {
 	public:
@@ -28,9 +29,10 @@ class CScreenSing : public CScreen {
 	bool finished;
 	unsigned int start;
         unsigned int song_pos;
-	char sentenceNextSentence[128];
+	int previousFirstTimestamp;
 	CVideo * video;
         CThemeSing *theme;
+	CLyrics * lyrics;
 };
 
 #endif
