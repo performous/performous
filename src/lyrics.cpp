@@ -118,13 +118,14 @@ void CLyrics::updateSentences( unsigned int timestamp )
 				sentenceNow[0]    = '\0';
 				sentenceFuture[0] = '\0';
 				sentenceNext[0]   = '\0';
+				sentenceWhole[0]  = '\0';
 				lastSentenceIndex = i;
-				break;
 				// If we're not before the first song
 				if( i != 0 ) {
 					for( unsigned int j = 0 ; j < formatedLyrics[i+1].size() ; j++ ) {
 						strcat( sentenceFuture , formatedLyrics[i+1][j]->syllable );
 					}
+					strcat( sentenceWhole , sentenceFuture );
 					if( i != formatedLyrics.size() - 2 ) {
 						for( unsigned int j = 0 ; j < formatedLyrics[i+2].size() ; j++ ) {
 							strcat( sentenceNext , formatedLyrics[i+2][j]->syllable );
