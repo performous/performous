@@ -82,8 +82,8 @@ void CLyrics::updateSentences( unsigned int timestamp )
 		// For all the detected sentences
 		for(  ; i < formatedLyrics.size() ; i++ ) {
 			// If we're localized in this sentence ( first_note < timestamp <= last_note+length )
-			if( timestamp > getTimestampFromBeat( formatedLyrics[i][0]->timestamp )
-				&& timestamp < getTimestampFromBeat( formatedLyrics[i][formatedLyrics[i].size()-1]->timestamp + formatedLyrics[i][formatedLyrics[i].size()-1]->length ) ) {
+			if( timestamp >= getTimestampFromBeat( formatedLyrics[i][0]->timestamp )
+				&& timestamp <= getTimestampFromBeat( formatedLyrics[i][formatedLyrics[i].size()-1]->timestamp + formatedLyrics[i][formatedLyrics[i].size()-1]->length ) ) {
 				sentencePast[0]   = '\0';
 				sentenceNow[0]    = '\0';
 				sentenceFuture[0] = '\0';
@@ -113,6 +113,24 @@ void CLyrics::updateSentences( unsigned int timestamp )
 				}
 				// No need to go further in the song
 				break;
+			// If we're localized before the first sentence
+			} else if( i == 0 && timestamp < getTimestampFromBeat( formatedLyrics[0][0]->timestamp ) ) {
+				sentencePast[0]   = '\0';
+				sentenceNow[0]    = '\0';
+				sentenceFuture[0] = '\0';
+				sentenceNext[0]   = '\0';
+				sentenceWhole[0]  = '\0';
+				lastSentenceIndex = 0;
+				for( unsigned int j = 0 ; j < formatedLyrics[0].size() ; j++ ) {
+					strcat( sentenceFuture , formatedLyrics[0][j]->syllable );
+				}
+				strcat( sentenceWhole , sentenceFuture );
+				for( unsigned int j = 0 ; j < formatedLyrics[1].size() ; j++ ) {
+					strcat( sentenceNext , formatedLyrics[1][j]->syllable );
+				}
+				// No need to go further in the song
+				break;
+			// If we're localized between two sentences
 			} else if( i != formatedLyrics.size() - 1 && timestamp < getTimestampFromBeat( formatedLyrics[i+1][0]->timestamp ) ) {
 				sentencePast[0]   = '\0';
 				sentenceNow[0]    = '\0';
@@ -121,25 +139,16 @@ void CLyrics::updateSentences( unsigned int timestamp )
 				sentenceWhole[0]  = '\0';
 				lastSentenceIndex = i;
 				// If we're not before the first song
-				if( i != 0 ) {
-					for( unsigned int j = 0 ; j < formatedLyrics[i+1].size() ; j++ ) {
-						strcat( sentenceFuture , formatedLyrics[i+1][j]->syllable );
-					}
-					strcat( sentenceWhole , sentenceFuture );
-					if( i != formatedLyrics.size() - 2 ) {
-						for( unsigned int j = 0 ; j < formatedLyrics[i+2].size() ; j++ ) {
-							strcat( sentenceNext , formatedLyrics[i+2][j]->syllable );
-						}
-					}
-				} else {
-					for( unsigned int j = 0 ; j < formatedLyrics[0].size() ; j++ ) {
-						strcat( sentenceFuture , formatedLyrics[0][j]->syllable );
-					}
-					strcat( sentenceWhole , sentenceFuture );
-					for( unsigned int j = 0 ; j < formatedLyrics[1].size() ; j++ ) {
-						strcat( sentenceNext , formatedLyrics[1][j]->syllable );
+				for( unsigned int j = 0 ; j < formatedLyrics[i+1].size() ; j++ ) {
+					strcat( sentenceFuture , formatedLyrics[i+1][j]->syllable );
+				}
+				strcat( sentenceWhole , sentenceFuture );
+				if( i != formatedLyrics.size() - 2 ) {
+					for( unsigned int j = 0 ; j < formatedLyrics[i+2].size() ; j++ ) {
+						strcat( sentenceNext , formatedLyrics[i+2][j]->syllable );
 					}
 				}
+				// No need to go further in the song
 				break;
 			}
 
