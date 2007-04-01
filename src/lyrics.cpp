@@ -32,29 +32,39 @@ CLyrics::~CLyrics( )
 	formatedLyrics.clear();
 }
 
-char * CLyrics::getSentencePast( unsigned int timestamp )
+char * CLyrics::getSentencePast()
 {
-	updateSentences(timestamp);
 	return sentencePast;
 }
 
-char * CLyrics::getSentenceNow( unsigned int timestamp )
+char * CLyrics::getSentenceNow()
 {
-	updateSentences(timestamp);
 	return sentenceNow;
-
 }
 
-char * CLyrics::getSentenceFuture( unsigned int timestamp )
+char * CLyrics::getSentenceFuture()
 {
-	updateSentences(timestamp);
 	return sentenceFuture;
 }
 
-char * CLyrics::getSentenceNext( unsigned int timestamp )
+char * CLyrics::getSentenceNext()
 {
-	updateSentences(timestamp);
 	return sentenceNext;
+}
+
+char * CLyrics::getSentenceWhole()
+{
+	return sentenceWhole;
+}
+
+std::vector <TNote *> CLyrics::getCurrentSentence()
+{
+	return formatedLyrics[lastSentenceIndex];
+}
+
+TNote * CLyrics::getCurrentNote()
+{
+	return formatedLyrics[lastSentenceIndex][lastSyllableIndex];
 }
 
 void CLyrics::updateSentences( unsigned int timestamp )
@@ -91,10 +101,14 @@ void CLyrics::updateSentences( unsigned int timestamp )
 				if( lastSentenceIndex == -1 || (unsigned int)lastSentenceIndex != i ) {
 					lastSentenceIndex = i;
 					sentenceNext[0]   = '\0';
+					sentenceWhole[0]  = '\0';
 					if( i != formatedLyrics.size() - 1 ) {
 						for( unsigned int j = 0 ; j < formatedLyrics[i+1].size() ; j++ ) {
 							strcat( sentenceNext , formatedLyrics[i+1][j]->syllable );
 						}
+					}
+					for( unsigned int j = 0 ; j < formatedLyrics[i].size() ; j++ ) {
+						strcat( sentenceWhole , formatedLyrics[i][j]->syllable );
 					}
 				}
 				// No need to go further in the song
@@ -104,6 +118,8 @@ void CLyrics::updateSentences( unsigned int timestamp )
 				sentenceNow[0]    = '\0';
 				sentenceFuture[0] = '\0';
 				sentenceNext[0]   = '\0';
+				lastSentenceIndex = i;
+				break;
 				// If we're not before the first song
 				if( i != 0 ) {
 					for( unsigned int j = 0 ; j < formatedLyrics[i+1].size() ; j++ ) {
@@ -118,6 +134,7 @@ void CLyrics::updateSentences( unsigned int timestamp )
 					for( unsigned int j = 0 ; j < formatedLyrics[0].size() ; j++ ) {
 						strcat( sentenceFuture , formatedLyrics[0][j]->syllable );
 					}
+					strcat( sentenceWhole , sentenceFuture );
 					for( unsigned int j = 0 ; j < formatedLyrics[1].size() ; j++ ) {
 						strcat( sentenceNext , formatedLyrics[1][j]->syllable );
 					}
