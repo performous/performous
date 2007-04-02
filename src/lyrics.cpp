@@ -21,8 +21,10 @@ CLyrics::CLyrics( std::vector <TNote *> _lyrics , float _gap , float _bpm )
 			tmp.push_back(lyrics[i]);
 			i++;
 		}
-		formatedLyrics.push_back(tmp);
-		tmp.clear();
+		if(formatedLyrics.size()) {
+			formatedLyrics.push_back(tmp);
+			tmp.clear();
+		}
 	}
 }
 

@@ -222,12 +222,6 @@ void CScreenSing::draw( void )
                 }
 
 		// compute and draw the text
-		// FIXME: The following example crash UltraStar-NG
-		//    : 2478 5 69 -
-		//    -2493
-		//    -2754
-		//    E
-		// on the following line
         	unsigned int totalBpm = sentence[sentence.size()-1]->length + sentence[sentence.size()-1]->timestamp - sentence[0]->timestamp;
 		float bpmPixelUnit = (sm->getWidth() - 100. - 100.)/(totalBpm*1.0);
 		// Theme this
