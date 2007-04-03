@@ -21,10 +21,10 @@ CLyrics::CLyrics( std::vector <TNote *> _lyrics , float _gap , float _bpm )
 			tmp.push_back(lyrics[i]);
 			i++;
 		}
-		if(formatedLyrics.size()) {
+		if(tmp.size()) {
 			formatedLyrics.push_back(tmp);
-			tmp.clear();
 		}
+		tmp.clear();
 	}
 }
 
@@ -61,12 +61,20 @@ char * CLyrics::getSentenceWhole()
 
 std::vector <TNote *> CLyrics::getCurrentSentence()
 {
-	return formatedLyrics[lastSentenceIndex];
+	if( lastSentenceIndex != -1 ) {
+		return formatedLyrics[lastSentenceIndex];
+	} else {
+		std::vector <TNote *> tmp;
+		return tmp;
+	}
 }
 
 TNote * CLyrics::getCurrentNote()
 {
-	return formatedLyrics[lastSentenceIndex][lastSyllableIndex];
+	if( lastSentenceIndex != -1 && lastSyllableIndex != -1 )
+		return formatedLyrics[lastSentenceIndex][lastSyllableIndex];
+	else
+		return NULL;
 }
 
 void CLyrics::updateSentences( unsigned int timestamp )

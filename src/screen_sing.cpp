@@ -222,8 +222,15 @@ void CScreenSing::draw( void )
                 }
 
 		// compute and draw the text
-        	unsigned int totalBpm = sentence[sentence.size()-1]->length + sentence[sentence.size()-1]->timestamp - sentence[0]->timestamp;
-		float bpmPixelUnit = (sm->getWidth() - 100. - 100.)/(totalBpm*1.0);
+		unsigned int totalBpm;
+		float bpmPixelUnit;
+		if(sentence.size() ) {
+        		totalBpm = sentence[sentence.size()-1]->length + sentence[sentence.size()-1]->timestamp - sentence[0]->timestamp;
+			bpmPixelUnit = (sm->getWidth() - 100. - 100.)/(totalBpm*1.0);
+		} else {
+			totalBpm=0;
+			bpmPixelUnit=0;
+		}
 		// Theme this
                 TThemeRect tmprect;
                 tmprect.stroke_col.r = tmprect.stroke_col.g = tmprect.stroke_col.b = 0;
