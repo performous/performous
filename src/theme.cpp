@@ -112,9 +112,13 @@ void CTheme::walk_tree(xmlNode * a_node, TThemeTxt *text)
                 while (attr != NULL) {
                    if (!strcasecmp((char *) cur_node->name, "text")) {
                         if (!strcasecmp((char *) attr->name, "x")) {
-                            sscanf((char *) xmlGetProp(cur_node, attr->name),"%lf",&(text->x));
+			    string = (char *) xmlGetProp(cur_node, attr->name);
+                            sscanf(string,"%lf",&(text->x));
+			    xmlFree(string);
                         } else if (!strcasecmp((char *) attr->name, "y")) {
-                            sscanf((char *) xmlGetProp(cur_node, attr->name),"%lf",&(text->y));
+			    string = (char *) xmlGetProp(cur_node, attr->name);
+                            sscanf(string,"%lf",&(text->y));
+			    xmlFree(string);
                         } else if (!strcasecmp((char *) attr->name, "transform")) {
                             double x_trans, y_trans;
                             char tmp_string[10], *p; 
@@ -133,6 +137,7 @@ void CTheme::walk_tree(xmlNode * a_node, TThemeTxt *text)
                                 text->x += x_trans;
                                 text->y += y_trans;
                             }
+			    xmlFree(string);
                         } else if (!strcasecmp((char *) attr->name, "style")) {
                            string = strtok((char *) xmlGetProp(cur_node, attr->name), ";");
                            while (string != NULL) {
@@ -168,14 +173,19 @@ void CTheme::walk_tree(xmlNode * a_node, TThemeTxt *text)
                                 }
                                 string = strtok(NULL, ";");
                            }
+			   xmlFree(string);
 
                         }
 
                     } else if (!strcasecmp((char *) cur_node->name, "svg")) {
                          if (!strcasecmp((char *) attr->name, "width")) {
-                            sscanf((char *) xmlGetProp(cur_node, attr->name),"%lf",&(text->svg_width));
+			    string = (char *) xmlGetProp(cur_node, attr->name);
+                            sscanf(string,"%lf",&(text->svg_width));
+			    xmlFree(string);
                         } else if (!strcasecmp((char *) attr->name, "height")) {
-                            sscanf((char *) xmlGetProp(cur_node, attr->name),"%lf",&(text->svg_height));
+			    string = (char *) xmlGetProp(cur_node, attr->name);
+                            sscanf(string,"%lf",&(text->svg_height));
+			    xmlFree(string);
                         } 
                     }
                     attr = attr->next;
@@ -197,39 +207,53 @@ void CTheme::walk_tree(xmlNode * a_node, TThemeRect *rect)
                 while (attr != NULL) {
                     if (!strcasecmp((char *) cur_node->name, "rect")) {
                         if (!strcasecmp((char *) attr->name, "x")) {
-                            sscanf((char *) xmlGetProp(cur_node, attr->name),"%lf",&(rect->x));
+			    string = (char *) xmlGetProp(cur_node, attr->name);
+                            sscanf(string,"%lf",&(rect->x));
+			    xmlFree(string);
                         } else if (!strcasecmp((char *) attr->name, "y")) {
-                            sscanf((char *) xmlGetProp(cur_node, attr->name),"%lf",&(rect->y));
+			    string = (char *) xmlGetProp(cur_node, attr->name);
+                            sscanf(string,"%lf",&(rect->y));
+			    xmlFree(string);
                         } else if (!strcasecmp((char *) attr->name, "width")) {
-                            sscanf((char *) xmlGetProp(cur_node, attr->name),"%lf",&(rect->final_width));
+			    string = (char *) xmlGetProp(cur_node, attr->name);
+                            sscanf(string,"%lf",&(rect->final_width));
+			    xmlFree(string);
                             rect->width = rect->final_width;
                         } else if (!strcasecmp((char *) attr->name, "height")) {
-                            sscanf((char *) xmlGetProp(cur_node, attr->name),"%lf",&(rect->final_height));
+			    string = (char *) xmlGetProp(cur_node, attr->name);
+                            sscanf(string,"%lf",&(rect->final_height));
+			    xmlFree(string);
                             rect->height = rect->final_height;
                         } else if (!strcasecmp((char *) attr->name, "style")) {
-                           string = strtok((char *) xmlGetProp(cur_node, attr->name), ";");
-                           while (string != NULL) {
-                                if (!strncasecmp(string, "fill:", 5)) {
-                                    getcolor((string + 5), &(rect->fill_col));
-                                } else if (!strncasecmp(string, "fill-opacity:", 13)) {
-                                    sscanf((string + 13), "%lf", &(rect->fill_col.a));
-                                } else if (!strncasecmp(string, "stroke:", 7)) {
-                                    getcolor((string + 7), &(rect->stroke_col));
-                                } else if (!strncasecmp(string, "stroke-opacity:", 15)) {
-                                    sscanf((string + 15), "%lf", &(rect->stroke_col.a));
-                                } else if (!strncasecmp(string, "stroke-width:", 13)) {
-                                    sscanf((string + 13),"%lf", &(rect->stroke_width));
+			   string = (char *) xmlGetProp(cur_node, attr->name);
+                           char * string_tmp = strtok(string, ";");
+                           while (string_tmp != NULL) {
+                                if (!strncasecmp(string_tmp, "fill:", 5)) {
+                                    getcolor((string_tmp + 5), &(rect->fill_col));
+                                } else if (!strncasecmp(string_tmp, "fill-opacity:", 13)) {
+                                    sscanf((string_tmp + 13), "%lf", &(rect->fill_col.a));
+                                } else if (!strncasecmp(string_tmp, "stroke:", 7)) {
+                                    getcolor((string_tmp + 7), &(rect->stroke_col));
+                                } else if (!strncasecmp(string_tmp, "stroke-opacity:", 15)) {
+                                    sscanf((string_tmp + 15), "%lf", &(rect->stroke_col.a));
+                                } else if (!strncasecmp(string_tmp, "stroke-width:", 13)) {
+                                    sscanf((string_tmp + 13),"%lf", &(rect->stroke_width));
                                 }
-                                string = strtok(NULL, ";");
+                                string_tmp = strtok(NULL, ";");
                            }
+			   xmlFree(string);
 
                         }
 
                     } else if (!strcasecmp((char *) cur_node->name, "svg")) {
                         if (!strcasecmp((char *) attr->name, "width")) {
-                            sscanf((char *) xmlGetProp(cur_node, attr->name),"%lf",&(rect->svg_width));
+			    string = (char *) xmlGetProp(cur_node, attr->name);
+                            sscanf(string,"%lf",&(rect->svg_width));
+			    xmlFree(string);
                         } else if (!strcasecmp((char *) attr->name, "height")) {
-                            sscanf((char *) xmlGetProp(cur_node, attr->name),"%lf",&(rect->svg_height));
+			    string = (char *) xmlGetProp(cur_node, attr->name);
+                            sscanf(string,"%lf",&(rect->svg_height));
+			    xmlFree(string);
                         } 
                     }
                     attr = attr->next;
