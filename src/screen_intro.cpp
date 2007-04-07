@@ -26,6 +26,9 @@ void CScreenIntro::manageEvent( SDL_Event event )
 			if( keypressed == SDLK_ESCAPE || keypressed == SDLK_q ) {
 				CScreenManager::getSingletonPtr()->finished();
 			} else if( keypressed == SDLK_s ) {
+				if( CScreenManager::getSingletonPtr()->getSongs() != NULL ) {
+					delete CScreenManager::getSingletonPtr()->getSongs();
+				}
 				CScreenManager::getSingletonPtr()->setSongs(new CSongs() );
 				CScreenManager::getSingletonPtr()->getSongs()->sortByArtist();
 				CScreenManager::getSingletonPtr()->activateScreen("Songs");

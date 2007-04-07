@@ -60,8 +60,6 @@ class CScreenManager : public CSingleton <CScreenManager>{
 
 	CSongs * getSongs( void ) {return songs;};
 	void setSongs( CSongs * _songs ) {
-		if(songs)
-			delete songs;
 		songs=_songs;
 	};
 	void setSongId( int _id ) {songId = _id; };
