@@ -41,6 +41,7 @@ CairoSVG::CairoSVG( const char * filename , unsigned int _width , unsigned int _
 	rsvg_handle_render_cairo (svgHandle,dc);
 	sdl_svg=CairoToSdl::BlitToSdl(surface);
 	rsvg_handle_free (svgHandle);
+	rsvg_term();
 #endif
 	cairo_destroy (dc);
 }
@@ -85,6 +86,7 @@ CairoSVG::CairoSVG( const char * data , size_t data_len ,unsigned int _width , u
 	rsvg_handle_render_cairo (svgHandle,dc);
 	sdl_svg=CairoToSdl::BlitToSdl(surface);
 	rsvg_handle_free (svgHandle);
+	rsvg_term();
 #endif
 	cairo_destroy (dc);
 }

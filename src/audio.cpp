@@ -11,6 +11,7 @@ CAudio::CAudio()
         ao_port = xine_open_audio_driver(xine , "auto", NULL);
         stream = xine_stream_new(xine, ao_port, vo_port);
         event_queue = xine_event_new_queue(stream);
+	xine_playing = 0;
 #endif
 #ifdef USE_GSTREAMER
 	/* init GStreamer */
