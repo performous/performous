@@ -258,7 +258,7 @@ CSongs::CSongs()
 	surface_nocover = IMG_LoadPNG_RW(rwop_nocover);
 	SDL_FreeRW(rwop_nocover);
 
-	if( !surface_nocover ) {
+	if( surface_nocover == NULL ) {
 		printf("IMG_LoadPNG_RW: %s\n", IMG_GetError());
 		return;
 	}
@@ -308,6 +308,7 @@ CSongs::CSongs()
                             coverSurface = IMG_LoadPNG_RW(rwop);
 		        else if(strstr(tmp->cover, ".jpg"))
                             coverSurface = IMG_LoadJPG_RW(rwop);
+			SDL_FreeRW(rwop);
 	                           
                         if( coverSurface == NULL )
 			    tmp->coverSurf = surface_nocover;
@@ -318,17 +319,23 @@ CSongs::CSongs()
 			    tmp->coverSurf = zoomSurface(coverSurface,(double) w/coverSurface->w,(double) h/coverSurface->h,1);
 			    SDL_FreeSurface(coverSurface);
 		        }
-			SDL_FreeRW(rwop);
 		        
-                        snprintf(buff,1024,"%s/%s/%s",songs_dir,dirEntry->d_name,tmp->background);
-                        rwop = SDL_RWFromFile(buff, "rb");
                         
                         if (tmp->background) {
                             SDL_Surface * backgroundSurface = NULL;
-                            if(strstr(tmp->background, ".png"))
+
+                            if(strstr(tmp->background, ".png")) {
+                                snprintf(buff,1024,"%s/%s/%s",songs_dir,dirEntry->d_name,tmp->background);
+                                rwop = SDL_RWFromFile(buff, "rb");
                                 backgroundSurface = IMG_LoadPNG_RW(rwop);
-                            else if(strstr(tmp->background, ".jpg"))
+			        SDL_FreeRW(rwop);
+                            } else if(strstr(tmp->background, ".jpg")) {
+                                snprintf(buff,1024,"%s/%s/%s",songs_dir,dirEntry->d_name,tmp->background);
+                                rwop = SDL_RWFromFile(buff, "rb");
                                 backgroundSurface = IMG_LoadJPG_RW(rwop);
+			        SDL_FreeRW(rwop);
+		            }
+                        
                                                  
                             if( backgroundSurface == NULL )
                                 tmp->backgroundSurf = NULL;
@@ -339,8 +346,6 @@ CSongs::CSongs()
 				SDL_FreeSurface(backgroundSurface);
                             }
                         }
-                        
-			SDL_FreeRW(rwop);
                         
                         tmp->parseFile();
 			songs.push_back(tmp);
@@ -372,7 +377,7 @@ CSongs::~CSongs()
                         SDL_FreeSurface(songs[i]->backgroundSurf);
                 delete songs[i];
 	}
-	delete surface_nocover;
+	SDL_FreeSurface(surface_nocover);
 
 }
 
