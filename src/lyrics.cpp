@@ -79,94 +79,77 @@ TNote * CLyrics::getCurrentNote()
 
 void CLyrics::updateSentences( unsigned int timestamp )
 {
-	// If the sentences should change, lets re-compute it
-	if( lastSyllableIndex == -1 || lastSentenceIndex == -1
-		|| timestamp < getTimestampFromBeat( formatedLyrics[lastSentenceIndex][lastSyllableIndex]->timestamp )
-		|| timestamp > getTimestampFromBeat( formatedLyrics[lastSentenceIndex][lastSyllableIndex]->timestamp + formatedLyrics[lastSentenceIndex][lastSyllableIndex]->length ) ) {
-		unsigned int i;
-		// If we are further than the last time (no rewind) (optimisation)
-		if( lastSentenceIndex != -1 && timestamp > getTimestampFromBeat( formatedLyrics[lastSentenceIndex][0]->timestamp ) )
-			i = lastSentenceIndex;
-		else
-			i = 0;
-		// For all the detected sentences
-		for(  ; i < formatedLyrics.size() ; i++ ) {
-			// If we're localized in this sentence ( first_note < timestamp <= last_note+length )
-			if( timestamp >= getTimestampFromBeat( formatedLyrics[i][0]->timestamp )
-				&& timestamp <= getTimestampFromBeat( formatedLyrics[i][formatedLyrics[i].size()-1]->timestamp + formatedLyrics[i][formatedLyrics[i].size()-1]->length ) ) {
-				sentencePast[0]   = '\0';
-				sentenceNow[0]    = '\0';
-				sentenceFuture[0] = '\0';
-				for( unsigned int j = 0 ; j < formatedLyrics[i].size() ; j++ ) {
-					if( timestamp > getTimestampFromBeat( formatedLyrics[i][j]->timestamp + formatedLyrics[i][j]->length ) ) {
-						strcat( sentencePast , formatedLyrics[i][j]->syllable );
-					} else if( timestamp < getTimestampFromBeat( formatedLyrics[i][j]->timestamp ) ) {
-						strcat( sentenceFuture , formatedLyrics[i][j]->syllable );
-					} else {
-						lastSyllableIndex = j;
-						strcat( sentenceNow , formatedLyrics[i][j]->syllable );
-					}
-				}
-				// If we have change of sentence, we rebuild the next sentence
-				if( lastSentenceIndex == -1 || (unsigned int)lastSentenceIndex != i ) {
-					lastSentenceIndex = i;
-					sentenceNext[0]   = '\0';
-					sentenceWhole[0]  = '\0';
-					if( i != formatedLyrics.size() - 1 ) {
-						for( unsigned int j = 0 ; j < formatedLyrics[i+1].size() ; j++ ) {
-							strcat( sentenceNext , formatedLyrics[i+1][j]->syllable );
-						}
-					}
-					for( unsigned int j = 0 ; j < formatedLyrics[i].size() ; j++ ) {
-						strcat( sentenceWhole , formatedLyrics[i][j]->syllable );
-					}
-				}
-				// No need to go further in the song
-				break;
-			// If we're localized before the first sentence
-			} else if( i == 0 && timestamp < getTimestampFromBeat( formatedLyrics[0][0]->timestamp ) ) {
-				sentencePast[0]   = '\0';
-				sentenceNow[0]    = '\0';
-				sentenceFuture[0] = '\0';
-				sentenceNext[0]   = '\0';
-				sentenceWhole[0]  = '\0';
-				lastSentenceIndex = 0;
-				for( unsigned int j = 0 ; j < formatedLyrics[0].size() ; j++ ) {
-					strcat( sentenceFuture , formatedLyrics[0][j]->syllable );
-				}
-				strcat( sentenceWhole , sentenceFuture );
-				for( unsigned int j = 0 ; j < formatedLyrics[1].size() ; j++ ) {
-					strcat( sentenceNext , formatedLyrics[1][j]->syllable );
-				}
-				// No need to go further in the song
-				break;
-			// If we're localized between two sentences
-			} else if( i != formatedLyrics.size() - 1 && timestamp < getTimestampFromBeat( formatedLyrics[i+1][0]->timestamp ) ) {
-				sentencePast[0]   = '\0';
-				sentenceNow[0]    = '\0';
-				sentenceFuture[0] = '\0';
-				sentenceNext[0]   = '\0';
-				sentenceWhole[0]  = '\0';
-				lastSentenceIndex = i;
-				// If we're not before the first song
-				for( unsigned int j = 0 ; j < formatedLyrics[i+1].size() ; j++ ) {
-					strcat( sentenceFuture , formatedLyrics[i+1][j]->syllable );
-				}
-				strcat( sentenceWhole , sentenceFuture );
-				if( i != formatedLyrics.size() - 2 ) {
-					for( unsigned int j = 0 ; j < formatedLyrics[i+2].size() ; j++ ) {
-						strcat( sentenceNext , formatedLyrics[i+2][j]->syllable );
-					}
-				}
-				// No need to go further in the song
-				break;
-			}
+	// If the sentences shouldn't change, do nothing
+	if( lastSyllableIndex != -1 && lastSentenceIndex != -1
+	    && lastSentenceIndex < (int) formatedLyrics.size()
+	    && lastSyllableIndex < (int) formatedLyrics[lastSentenceIndex].size()
+	    && timestamp >= getTimestampFromBeat( formatedLyrics[lastSentenceIndex][lastSyllableIndex]->timestamp )
+	    && timestamp <= getTimestampFromBeat( formatedLyrics[lastSentenceIndex][lastSyllableIndex]->timestamp + formatedLyrics[lastSentenceIndex][lastSyllableIndex]->length ) ) {
+		return;
+	}
+	// sentence changed, recompute it
+	unsigned int i;
+	
+	// If we are further than the last time (no rewind) (optimisation)
+	if( lastSentenceIndex != -1 && timestamp > getStartTime(lastSentenceIndex))
+		i = lastSentenceIndex;
+	else
+		i = 0;
 
+	// For all the detected sentences, find the first that have not yet ended
+	for(  ; i < formatedLyrics.size() ; i++ ) {
+		// If we're between the end of the last sentence and the end of the current sentence
+		if( timestamp > getEndTime(i-1) && timestamp <= getEndTime(i) ) {
+			sentencePast[0]   = '\0';
+			sentenceNow[0]    = '\0';
+			sentenceFuture[0] = '\0';
+			for( unsigned int j = 0 ; j < formatedLyrics[i].size() ; j++ ) {
+				if( timestamp > getTimestampFromBeat( formatedLyrics[i][j]->timestamp + formatedLyrics[i][j]->length ) ) {
+					strcat( sentencePast , formatedLyrics[i][j]->syllable );
+				} else if( timestamp < getTimestampFromBeat( formatedLyrics[i][j]->timestamp ) ) {
+					strcat( sentenceFuture , formatedLyrics[i][j]->syllable );
+				} else {
+					lastSyllableIndex = j;
+					strcat( sentenceNow , formatedLyrics[i][j]->syllable );
+				}
+			}
+			// If we have change of sentence, we rebuild the next sentence
+			if( lastSentenceIndex == -1 || (unsigned int)lastSentenceIndex != i ) {
+				lastSentenceIndex = i;
+				sentenceNext[0]   = '\0';
+				sentenceWhole[0]  = '\0';
+				if( i != formatedLyrics.size() - 1 )
+					for( unsigned int j = 0 ; j < formatedLyrics[i+1].size() ; j++ )
+						strcat( sentenceNext , formatedLyrics[i+1][j]->syllable );
+				for( unsigned int j = 0 ; j < formatedLyrics[i].size() ; j++ )
+					strcat( sentenceWhole , formatedLyrics[i][j]->syllable );
+			}
+			// No need to go further in the song
+			break;
 		}
 	}
+
 }
 
 unsigned int CLyrics::getTimestampFromBeat( unsigned int beat )
 {
 	return (unsigned int) ((beat * 60 * 1000) / ( bpm * 4 ) + gap);
+}
+
+unsigned int CLyrics::getStartTime( int sentence )
+{
+	if( sentence < 0 )
+		return 0;
+	if( (unsigned int) sentence >= formatedLyrics.size() )
+		return UINT_MAX;
+	return getTimestampFromBeat( formatedLyrics[sentence][0]->timestamp );
+}
+
+unsigned int CLyrics::getEndTime( int sentence )
+{
+	if( sentence < 0 )
+		return 0;
+	if( (unsigned int) sentence >= formatedLyrics.size() )
+		return UINT_MAX;
+	return getTimestampFromBeat( formatedLyrics[sentence][formatedLyrics[sentence].size()-1]->timestamp + formatedLyrics[sentence][formatedLyrics[sentence].size()-1]->length );
 }
