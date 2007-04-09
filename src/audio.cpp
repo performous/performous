@@ -193,27 +193,79 @@ void CAudio::stopMusic( void )
 
 int CAudio::getPosition( void )
 {
-  int position = 0;
+	int position = 0;
 
 #ifdef USE_LIBXINE
-  int pos_stream;
-  int length_time;
-  int pos_time;
+	int pos_stream;
+	int length_time;
+	int pos_time;
 
-  if (xine_get_pos_length(stream, &pos_stream, &pos_time, &length_time)) {
-    position = pos_time;
-  } else {
-    position = 0;
-  }
+	if (xine_get_pos_length(stream, &pos_stream, &pos_time, &length_time)) {
+		position = pos_time;
+	} else {
+	position = 0;
+	}
 #endif
 #ifdef USE_GSTREAMER
-  GstFormat fmt = GST_FORMAT_TIME;
-  gint64 pos;
-  if (!gst_element_query_position (music, &fmt, &pos))
-    position = 0;
-  else
-    position = (int) (pos/GST_MSECOND);
+	GstFormat fmt = GST_FORMAT_TIME;
+	gint64 pos;
+	if (!gst_element_query_position (music, &fmt, &pos))
+		position = 0;
+	else
+		position = (int) (pos/GST_MSECOND);
 #endif
 
-  return position;
+	return position;
 }
+
+bool CAudio::isPaused( void ) {
+#ifdef USE_LIBXINE
+	if (isPlaying()){
+		int speed = xine_get_param(stream,XINE_PARAM_SPEED);
+		if (speed == XINE_SPEED_PAUSE)
+			return true;
+		return false;
+	}
+	else
+		return false;
+#endif
+#ifdef USE_GSTREAMER
+	return false;
+#endif
+}
+
+void CAudio::togglePause( void ){
+#ifdef USE_LIBXINE
+	if (isPlaying()){
+		if (isPaused())
+			xine_set_param(stream,XINE_PARAM_SPEED,XINE_SPEED_NORMAL);
+		else
+			xine_set_param(stream,XINE_PARAM_SPEED,XINE_SPEED_PAUSE);
+	}
+#endif
+#ifdef USE_GSTREAMER
+	fprintf(stdout,"Toggle pause not yet implemented with Gstreamer\n");
+	return;
+#endif
+}
+void CAudio::seek( int seek_dist ){
+	if (isPlaying()){
+		int position = getPosition()+seek_dist;
+		if ( position < 0) position = 0;
+		if ( position > getLength() - 1000){
+			fprintf(stdout,"seeking too far ahead\n");
+			return;
+		}
+		fprintf(stdout,"seeking from %d to %d\n",getPosition(),position);
+#ifdef USE_LIBXINE
+		xine_play(stream,0,position);
+#endif
+#ifdef USE_GSTREAMER
+		fprintf(stdout,"Seek not yet implemented with Gstreamer\n");
+		return;
+#endif
+	}
+}
+
+
+

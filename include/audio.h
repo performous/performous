@@ -33,6 +33,16 @@ class CAudio {
 	 */
 	void playPreview( char * filename );
 	/**
+	 * This method returns true if music is playing, but paused.
+	 * Otherwise it returns false
+	 */
+	bool isPaused( void );
+	/**
+	 * This methods toggles pause. If paused, it starts playing
+	 * normally. If it is playing, the music is paused
+	 */
+	void togglePause( void );
+	/**
 	 * This method stop the audio playback
 	 */
 	void stopMusic( void );
@@ -42,6 +52,12 @@ class CAudio {
 	 * (for any reason) it is computed again.
 	 */
 	int getLength( void );
+	/**
+	 * This methods seek forward in the stream (backwards if
+	 * argument is negative), and continues playing.
+	 * @param seek_dist number of milliseconds to seek from current position
+	 */
+	void seek(int seek_dist);
 	/**
 	 * This method returns wether or not the track is playing
 	 */
