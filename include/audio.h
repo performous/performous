@@ -77,7 +77,7 @@ class CAudio {
         xine_event_queue_t   *event_queue;
         bool xine_playing;
 #endif
-#ifdef USE_GSTREAMER
+#ifdef USE_GSTREAMER_AUDIO
 	GstElement *music;
 #endif
 };

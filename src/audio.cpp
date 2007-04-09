@@ -13,7 +13,7 @@ CAudio::CAudio()
         event_queue = xine_event_new_queue(stream);
 	xine_playing = 0;
 #endif
-#ifdef USE_GSTREAMER
+#ifdef USE_GSTREAMER_AUDIO
 	/* init GStreamer */
 	gst_init (NULL, NULL);
 	/* set up */
@@ -49,7 +49,7 @@ CAudio::~CAudio()
         xine_close_video_driver(xine, vo_port);   
         xine_exit(xine);
 #endif
-#ifdef USE_GSTREAMER
+#ifdef USE_GSTREAMER_AUDIO
 	gst_object_unref (GST_OBJECT (music));
 #endif
 }
@@ -72,7 +72,7 @@ void CAudio::playMusic( char * filename )
 
         xine_playing = 1;
 #endif
-#ifdef USE_GSTREAMER
+#ifdef USE_GSTREAMER_AUDIO
 	g_object_set (G_OBJECT (music), "uri", g_strconcat("file://",filename,NULL), NULL);
 	gst_element_set_state (music, GST_STATE_PLAYING);
 	GstFormat fmt = GST_FORMAT_TIME;
@@ -104,7 +104,7 @@ void CAudio::playPreview( char * filename )
 
         xine_playing = 1;
 #endif
-#ifdef USE_GSTREAMER
+#ifdef USE_GSTREAMER_AUDIO
 	g_object_set (G_OBJECT (music), "uri", g_strconcat("file://",filename,NULL), NULL);
 	gst_element_set_state (music, GST_STATE_PAUSED);
 	GstState state_paused = GST_STATE_PAUSED;
@@ -132,7 +132,7 @@ int CAudio::getLength( void )
 		if( !xine_get_pos_length(stream, &pos_stream, &pos_time, &length) )
 			length = LENGTH_ERROR;
 #endif
-#ifdef USE_GSTREAMER
+#ifdef USE_GSTREAMER_AUDIO
 		GstFormat fmt = GST_FORMAT_TIME;
 		gint64 len;
 		if (!gst_element_query_duration (music, &fmt, &len))
@@ -166,7 +166,7 @@ bool CAudio::isPlaying( void )
 		return false;
 	}
 #endif
-#ifdef USE_GSTREAMER
+#ifdef USE_GSTREAMER_AUDIO
 	// If the length cannot be computed, we assume that the song is playing
 	// (happening in the first fex seconds)
 	if( getLength()==0 )
@@ -186,7 +186,7 @@ void CAudio::stopMusic( void )
 #ifdef USE_LIBXINE
         xine_stop(stream);
 #endif
-#ifdef USE_GSTREAMER
+#ifdef USE_GSTREAMER_AUDIO
 	gst_element_set_state (music, GST_STATE_NULL);
 #endif
 }
@@ -206,7 +206,7 @@ int CAudio::getPosition( void )
 	position = 0;
 	}
 #endif
-#ifdef USE_GSTREAMER
+#ifdef USE_GSTREAMER_AUDIO
 	GstFormat fmt = GST_FORMAT_TIME;
 	gint64 pos;
 	if (!gst_element_query_position (music, &fmt, &pos))
@@ -229,7 +229,7 @@ bool CAudio::isPaused( void ) {
 	else
 		return false;
 #endif
-#ifdef USE_GSTREAMER
+#ifdef USE_GSTREAMER_AUDIO
 	return GST_STATE(music) ==  GST_STATE_PAUSED;
 #endif
 }
@@ -242,7 +242,7 @@ void CAudio::togglePause( void ){
 		else
 			xine_set_param(stream,XINE_PARAM_SPEED,XINE_SPEED_PAUSE);
 #endif
-#ifdef USE_GSTREAMER
+#ifdef USE_GSTREAMER_AUDIO
 		if (isPaused())
 			gst_element_set_state(music, GST_STATE_PLAYING);
 		else
@@ -262,7 +262,7 @@ void CAudio::seek( int seek_dist ){
 #ifdef USE_LIBXINE
 		xine_play(stream,0,position);
 #endif
-#ifdef USE_GSTREAMER
+#ifdef USE_GSTREAMER_AUDIO
 		gst_element_set_state (music, GST_STATE_PAUSED);
 		GstState state_paused = GST_STATE_PAUSED;
 		gst_element_get_state (music, NULL, &state_paused, GST_CLOCK_TIME_NONE);

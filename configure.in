@@ -48,7 +48,7 @@ AC_ARG_WITH(svg,
 if test $svg_layer = yes ; then svg_layer="librsvg" ; fi
 
 AC_ARG_WITH(video,
-	 AC_HELP_STRING(--with-video[={smpeg|disable}],
+	 AC_HELP_STRING(--with-video[={gstreamer|smpeg|disable}],
 	 	implementation of the video rendering layer (default: autodetect)),
 	[video_layer="$withval"],
 	[video_layer="autodetect"]
@@ -98,7 +98,7 @@ PKG_CHECK_MODULES(gstreamer, gstreamer-0.10 , [gst_detected=yes] , [gst_detected
 AC_CHECK_PROGS(SDLCONFIG, sdl-config, AC_MSG_ERROR(Cannot find sdl-config))
 AC_CHECK_LIB(SDL_image, IMG_LoadPNG_RW,,AC_MSG_ERROR(Cannot find SDL_image))
 AC_CHECK_LIB(SDL_gfx, zoomSurface,,AC_MSG_ERROR(Cannot find SDL_gfx))
-AC_CHECK_LIB(smpeg,SMPEG_new,[video_detected="yes"],[video_detected="no"])
+AC_CHECK_LIB(smpeg,SMPEG_new,[smpeg_detected="yes"],[smpeg_detected="no"])
 
 dnl ###########################################################################
 dnl #### processing things
@@ -185,27 +185,55 @@ AC_SUBST(ALSA_FLAGS)
 AC_SUBST(ALSA_LIBS)
 
 # Do things for video
-if test $video_detected = yes ; then
-	case $video_layer in
-		smpeg*|autodetect*) 
+case $video_layer in
+	gstreamer*)
+		if test $gst_detected = yes ; then
+			video_layer="gstreamer"
+		else
+			video_layer="no"
+		fi
+		;;
+	smpeg*)
+		if test $smpeg_detected = yes ; then
 			video_layer="smpeg"
-			VIDEO_FLAGS=""
-			VIDEO_LIBS="-lsmpeg"
-			ac_includes_default=$(cat <<-USNG_EOF
-			$ac_includes_default
-			/* video headers */
-			#define USE_SMPEG 1
-			#include <smpeg/smpeg.h>
-			USNG_EOF)
-			;;
-		*) ;;
-	esac
-else
-	case $video_layer in
-		smpeg*) AC_MSG_ERROR(Cannot find smpeg but was explicitly enable) ;;
-		*) video_layer="disable" ;;
-	esac
-fi
+		else
+			video_layer="no"
+		fi
+		;;
+	autodetect*)
+		if test $gst_detected = yes ; then
+			video_layer="gstreamer"
+		else if test $smpeg_detected = yes ; then
+			video_layer="smpeg"
+		else
+			video_layer="no"
+		fi ; fi
+		;;
+esac
+case $video_layer in
+	gstreamer*)
+		AUDIO_FLAGS=`pkg-config --cflags gstreamer-0.10`
+		AUDIO_LIBS=`pkg-config --libs gstreamer-0.10`
+		ac_includes_default=$(cat <<-USNG_EOF
+		$ac_includes_default
+		/* video headers */
+		#define USE_GSTREAMER_VIDEO 1
+		#include <gst/gst.h>
+		USNG_EOF)
+		;;
+	smpeg*)
+		VIDEO_FLAGS=""
+		VIDEO_LIBS="-lsmpeg"
+		ac_includes_default=$(cat <<-USNG_EOF
+		$ac_includes_default
+		/* video headers */
+		#define USE_SMPEG 1
+		#include <smpeg/smpeg.h>
+		USNG_EOF)
+		;;
+	no*)
+		;;
+esac
 AC_SUBST(VIDEO_FLAGS)
 AC_SUBST(VIDEO_LIBS)
 
@@ -253,7 +281,7 @@ case $audio_layer in
 		ac_includes_default=$(cat <<-USNG_EOF
 		$ac_includes_default
 		/* video headers */
-		#define USE_GSTREAMER 1
+		#define USE_GSTREAMER_AUDIO 1
 		#include <gst/gst.h>
 		USNG_EOF)
 		;;
