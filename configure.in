@@ -381,14 +381,14 @@ AC_OUTPUT(
 	src/Makefile
 )
 
-echo ""
-echo "Ultrastar-ng is now configured to your system with the following"
-echo "user-defined options."
-echo ""
+echo "                                                                  "
+echo "Ultrastar-ng is now configured to your system with the following  "
+echo "user-defined options.                                             "
+echo "                                                                  "
 echo "Option           | Flag                   | Chosen implementation "
 echo "------------------------------------------------------------------"
 echo "audio            | --with-audio           | $audio_layer          "
 echo "video            | --with-video           | $video_layer          "
 echo "svg              | --with-svg             | $svg_layer            "
-echo "graphic driver   | --with-graphic-driver  | $graphic_driver      "
-echo ""
+echo "graphic driver   | --with-graphic-driver  | $graphic_driver       "
+echo "                                                                  "
