@@ -266,8 +266,7 @@ void CAudio::seek( int seek_dist ){
 		gst_element_set_state (music, GST_STATE_PAUSED);
 		GstState state_paused = GST_STATE_PAUSED;
 		gst_element_get_state (music, NULL, &state_paused, GST_CLOCK_TIME_NONE);
-		//here i have a problem, i need time not the position
-		if( !gst_element_seek_simple(music, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH, position*GST_SECOND))
+		if( !gst_element_seek_simple(music, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH, position*GST_MSECOND))
 			g_print("playPreview() seek failed\n");
 		gst_element_set_state (music, GST_STATE_PLAYING);
 #endif
