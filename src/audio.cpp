@@ -230,23 +230,25 @@ bool CAudio::isPaused( void ) {
 		return false;
 #endif
 #ifdef USE_GSTREAMER
-	return false;
+	return GST_STATE(music) ==  GST_STATE_PAUSED;
 #endif
 }
 
 void CAudio::togglePause( void ){
-#ifdef USE_LIBXINE
 	if (isPlaying()){
+#ifdef USE_LIBXINE
 		if (isPaused())
 			xine_set_param(stream,XINE_PARAM_SPEED,XINE_SPEED_NORMAL);
 		else
 			xine_set_param(stream,XINE_PARAM_SPEED,XINE_SPEED_PAUSE);
-	}
 #endif
 #ifdef USE_GSTREAMER
-	fprintf(stdout,"Toggle pause not yet implemented with Gstreamer\n");
-	return;
+		if (isPaused())
+			gst_element_set_state(music, GST_STATE_PLAYING);
+		else
+			gst_element_set_state(music, GST_STATE_PAUSED);
 #endif
+	}
 }
 void CAudio::seek( int seek_dist ){
 	if (isPlaying()){
@@ -261,8 +263,13 @@ void CAudio::seek( int seek_dist ){
 		xine_play(stream,0,position);
 #endif
 #ifdef USE_GSTREAMER
-		fprintf(stdout,"Seek not yet implemented with Gstreamer\n");
-		return;
+		gst_element_set_state (music, GST_STATE_PAUSED);
+		GstState state_paused = GST_STATE_PAUSED;
+		gst_element_get_state (music, NULL, &state_paused, GST_CLOCK_TIME_NONE);
+		//here i have a problem, i need time not the position
+		if( !gst_element_seek_simple(music, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH, position*GST_SECOND))
+			g_print("playPreview() seek failed\n");
+		gst_element_set_state (music, GST_STATE_PLAYING);
 #endif
 	}
 }
