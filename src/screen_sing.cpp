@@ -59,6 +59,20 @@ void CScreenSing::manageEvent( SDL_Event event )
 			keypressed = event.key.keysym.sym;
 			if( keypressed == SDLK_ESCAPE || keypressed == SDLK_q ) {
 				finished = true;
+			} else if( keypressed == SDLK_SPACE || keypressed == SDLK_p ) {
+				sm->getAudio()->togglePause();
+			} else if( keypressed == SDLK_PLUS ) {
+				playOffset += 20;
+			} else if( keypressed == SDLK_MINUS ) {
+				playOffset -= 20;
+			} else if( keypressed == SDLK_LEFT ) {
+				sm->getAudio()->seek(-5000);
+			} else if( keypressed == SDLK_RIGHT ) {
+				sm->getAudio()->seek(5000);
+			} else if( keypressed == SDLK_UP ) {
+				sm->getAudio()->seek(30000);
+			} else if( keypressed == SDLK_DOWN ) {
+				sm->getAudio()->seek(-30000);
 			}
 	}
 	if( !play ) {
@@ -85,10 +99,9 @@ void CScreenSing::manageEvent( SDL_Event event )
 		fprintf(stdout,"Now playing: (%d): %s\n",sm->getSongId(),buff);
 		sm->getAudio()->playMusic(buff);
 		lyrics = new CLyrics( song->notes, song->gap, song->bpm[0].bpm );
-                start = SDL_GetTicks();
 		play = true;
 	        song->score[0].score = 0;
-                song_pos = 0;
+		playOffset = 0;
         }
 }
 
@@ -162,7 +175,7 @@ void CScreenSing::draw( void )
 
 	if(play) {
 		// Get the time in the song
-                unsigned int time = sm->getAudio()->getPosition();
+                unsigned int time = sm->getAudio()->getPosition() + playOffset;
 		double songPercent = (double)time / (double)sm->getAudio()->getLength();
 		// Here we compute all about the lyrics
 		lyrics->updateSentences( time );

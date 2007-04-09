@@ -27,8 +27,7 @@ class CScreenSing : public CScreen {
 	std::vector <TNote *> sentence;
         bool play;
 	bool finished;
-	unsigned int start;
-        unsigned int song_pos;
+	int playOffset;
 	int previousFirstTimestamp;
 	CVideo * video;
         CThemeSing *theme;
