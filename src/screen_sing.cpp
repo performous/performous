@@ -359,6 +359,8 @@ void CScreenSing::draw( void )
 			float started_ms = time - timestamp_ms;
 			float factor = 1.2 - 0.2*started_ms/length_ms;
 
+			if( factor < 1.0 ) factor = 1.0;
+			if( factor > 1.2 ) factor = 1.2;
 	                theme->lyricshighlight.x = theme->lyricspast.x + theme->lyricspast.extents.x_advance;
                         theme->lyricshighlight.text = sentenceNow;
                         theme->lyricshighlight.scale = factor;
