@@ -175,9 +175,13 @@ void CScreenSing::draw( void )
 
 	if(play) {
 		// Get the time in the song
-                unsigned int time = sm->getAudio()->getPosition() + playOffset;
-		if( time < 0 )
+                unsigned int time = sm->getAudio()->getPosition();
+		// Test is playOffset + time > 0
+		if( playOffset < 0 && time < playOffset*-1  )
 			time = 0;
+		else
+			time += playOffset;
+
 		double songPercent = (double)time / (double)sm->getAudio()->getLength();
 		// Here we compute all about the lyrics
 		lyrics->updateSentences( time );
