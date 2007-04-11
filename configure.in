@@ -212,8 +212,8 @@ case $video_layer in
 esac
 case $video_layer in
 	gstreamer*)
-		AUDIO_FLAGS=`pkg-config --cflags gstreamer-0.10`
-		AUDIO_LIBS=`pkg-config --libs gstreamer-0.10`
+		VIDEO_FLAGS=`pkg-config --cflags gstreamer-0.10`
+		VIDEO_LIBS=`pkg-config --libs gstreamer-0.10`
 		ac_includes_default=$(cat <<-USNG_EOF
 		$ac_includes_default
 		/* video headers */
