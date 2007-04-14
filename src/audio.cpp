@@ -4,7 +4,7 @@
 
 CAudio::CAudio()
 {
-#ifdef USE_LIBXINE
+#ifdef USE_LIBXINE_AUDIO
 	xine = xine_new();
         xine_init(xine);
         vo_port = xine_open_video_driver ( xine, NULL, XINE_VISUAL_TYPE_NONE, NULL);    /*Create a fake vo_port*/ 
@@ -40,7 +40,7 @@ CAudio::CAudio()
 
 CAudio::~CAudio()
 {
-#ifdef USE_LIBXINE
+#ifdef USE_LIBXINE_AUDIO
         xine_close(stream);
         xine_event_dispose_queue(event_queue);
         xine_dispose(stream);
@@ -59,7 +59,7 @@ void CAudio::playMusic( char * filename )
         if (isPlaying()) 
             stopMusic();
 
-#ifdef USE_LIBXINE
+#ifdef USE_LIBXINE_AUDIO
         int pos_stream;
 	int pos_time;
 
@@ -91,7 +91,7 @@ void CAudio::playPreview( char * filename )
         if (isPlaying()) 
             stopMusic();
 
-#ifdef USE_LIBXINE
+#ifdef USE_LIBXINE_AUDIO
         int pos_stream;
 	int pos_time;
 
@@ -126,7 +126,7 @@ void CAudio::playPreview( char * filename )
 int CAudio::getLength( void )
 {
 	if( length == LENGTH_ERROR ) {
-#ifdef USE_LIBXINE
+#ifdef USE_LIBXINE_AUDIO
         	int pos_stream;
 		int pos_time;
 		if( !xine_get_pos_length(stream, &pos_stream, &pos_time, &length) )
@@ -150,7 +150,7 @@ int CAudio::getLength( void )
 
 bool CAudio::isPlaying( void )
 {
-#ifdef USE_LIBXINE
+#ifdef USE_LIBXINE_AUDIO
         xine_event_t *event; 
         while((event = xine_event_get(event_queue))) {
             switch(event->type) {
@@ -183,7 +183,7 @@ bool CAudio::isPlaying( void )
 
 void CAudio::stopMusic( void )
 {
-#ifdef USE_LIBXINE
+#ifdef USE_LIBXINE_AUDIO
         xine_stop(stream);
 #endif
 #ifdef USE_GSTREAMER_AUDIO
@@ -195,7 +195,7 @@ int CAudio::getPosition( void )
 {
 	int position = 0;
 
-#ifdef USE_LIBXINE
+#ifdef USE_LIBXINE_AUDIO
 	int pos_stream;
 	int length_time;
 	int pos_time;
@@ -219,7 +219,7 @@ int CAudio::getPosition( void )
 }
 
 bool CAudio::isPaused( void ) {
-#ifdef USE_LIBXINE
+#ifdef USE_LIBXINE_AUDIO
 	if (isPlaying()){
 		int speed = xine_get_param(stream,XINE_PARAM_SPEED);
 		if (speed == XINE_SPEED_PAUSE)
@@ -236,7 +236,7 @@ bool CAudio::isPaused( void ) {
 
 void CAudio::togglePause( void ){
 	if (isPlaying()){
-#ifdef USE_LIBXINE
+#ifdef USE_LIBXINE_AUDIO
 		if (isPaused())
 			xine_set_param(stream,XINE_PARAM_SPEED,XINE_SPEED_NORMAL);
 		else
@@ -259,7 +259,7 @@ void CAudio::seek( int seek_dist ){
 			return;
 		}
 		fprintf(stdout,"seeking from %d to %d\n",getPosition(),position);
-#ifdef USE_LIBXINE
+#ifdef USE_LIBXINE_AUDIO
 		xine_play(stream,0,position);
 #endif
 #ifdef USE_GSTREAMER_AUDIO

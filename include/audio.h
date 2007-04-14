@@ -69,7 +69,7 @@ class CAudio {
 	int getPosition( void );
         private:
 	int length;
-#ifdef USE_LIBXINE
+#ifdef USE_LIBXINE_AUDIO
         xine_t               *xine;
         xine_stream_t        *stream;
         xine_video_port_t    *vo_port;

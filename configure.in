@@ -48,7 +48,7 @@ AC_ARG_WITH(svg,
 if test $svg_layer = yes ; then svg_layer="librsvg" ; fi
 
 AC_ARG_WITH(video,
-	 AC_HELP_STRING(--with-video[={gstreamer|smpeg|disable}],
+	 AC_HELP_STRING(--with-video[={gstreamer|xine|smpeg|disable}],
 	 	implementation of the video rendering layer (default: autodetect)),
 	[video_layer="$withval"],
 	[video_layer="autodetect"]
@@ -193,6 +193,13 @@ case $video_layer in
 			video_layer="no"
 		fi
 		;;
+	xine*)
+		if test $xine_detected = yes ; then
+			video_layer="xine"
+		else
+			video_layer="no"
+		fi
+		;;
 	smpeg*)
 		if test $smpeg_detected = yes ; then
 			video_layer="smpeg"
@@ -219,6 +226,16 @@ case $video_layer in
 		/* video headers */
 		#define USE_GSTREAMER_VIDEO 1
 		#include <gst/gst.h>
+		USNG_EOF)
+		;;
+	xine*)
+		VIDEO_FLAGS=`xine-config --cflags`
+		VIDEO_LIBS=`xine-config --libs`
+		ac_includes_default=$(cat <<-USNG_EOF
+		$ac_includes_default
+		/* video headers */
+		#define USE_LIBXINE_VIDEO 1
+		#include <xine.h>
 		USNG_EOF)
 		;;
 	smpeg*)
@@ -271,7 +288,7 @@ case $audio_layer in
 		ac_includes_default=$(cat <<-USNG_EOF
 		$ac_includes_default
 		/* video headers */
-		#define USE_LIBXINE 1
+		#define USE_LIBXINE_AUDIO 1
 		#include <xine.h>
 		USNG_EOF)
 		;;
