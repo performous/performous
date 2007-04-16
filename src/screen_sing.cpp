@@ -177,7 +177,7 @@ void CScreenSing::draw( void )
 		// Get the time in the song
                 unsigned int time = sm->getAudio()->getPosition();
 		// Test is playOffset + time > 0
-		if( playOffset < 0 && time < playOffset*-1  )
+		if( playOffset < 0 && time < (unsigned int)(playOffset*-1)  )
 			time = 0;
 		else
 			time += playOffset;
