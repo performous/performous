@@ -17,7 +17,8 @@ CAudio::CAudio()
 	/* init GStreamer */
 	gst_init (NULL, NULL);
 	/* set up */
-	GstElement *sink,*fakesink;
+	GstElement *sink=NULL;
+	GstElement *fakesink=NULL;
 	music = gst_element_factory_make ("playbin", "play");
 	/*If you don't want play video with gstreamer*/
 	fakesink = gst_element_factory_make ("fakesink", "fakesink");
@@ -32,8 +33,6 @@ CAudio::CAudio()
 
                 g_object_set (G_OBJECT (music), "audio-sink", sink, NULL);
         }
-	//gst_object_unref (GST_OBJECT (sink));
-	//gst_object_unref (GST_OBJECT (fakesink));
 #endif
 	length = 0;
 }
@@ -73,7 +72,10 @@ void CAudio::playMusic( char * filename )
         xine_playing = 1;
 #endif
 #ifdef USE_GSTREAMER_AUDIO
-	g_object_set (G_OBJECT (music), "uri", g_strconcat("file://",filename,NULL), NULL);
+	if( filename[0] == '/' )
+		g_object_set (G_OBJECT (music), "uri", g_strconcat("file://",filename,NULL), NULL);
+	else
+		g_object_set (G_OBJECT (music), "uri", g_strconcat("file://",get_current_dir_name(),"/",filename,NULL), NULL);
 	gst_element_set_state (music, GST_STATE_PLAYING);
 	GstFormat fmt = GST_FORMAT_TIME;
 	gint64 len;
@@ -105,7 +107,10 @@ void CAudio::playPreview( char * filename )
         xine_playing = 1;
 #endif
 #ifdef USE_GSTREAMER_AUDIO
-	g_object_set (G_OBJECT (music), "uri", g_strconcat("file://",filename,NULL), NULL);
+	if( filename[0] == '/' )
+		g_object_set (G_OBJECT (music), "uri", g_strconcat("file://",filename,NULL), NULL);
+	else
+		g_object_set (G_OBJECT (music), "uri", g_strconcat("file://",get_current_dir_name(),"/",filename,NULL), NULL);
 	gst_element_set_state (music, GST_STATE_PAUSED);
 	GstState state_paused = GST_STATE_PAUSED;
 	gst_element_get_state (music, NULL, &state_paused, GST_CLOCK_TIME_NONE);
