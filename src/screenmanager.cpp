@@ -39,6 +39,7 @@ CScreen * CScreenManager::getScreen(char * name) {
 	for( unsigned int i = 0 ; i < screens.size() ; i++ )
 		if( !strcmp(screens[i]->getName(),name) )
 			return screens[i];
+	return NULL;
 }
 
 void CScreenManager::getThemePathFile( char * dest , char * file)
