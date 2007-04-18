@@ -15,6 +15,8 @@ class CScreen {
 	virtual ~CScreen() {};
 	virtual void manageEvent( SDL_Event event )=0;
 	virtual void draw( void )=0;
+	virtual void enter( void )=0;
+	virtual void exit( void )=0;
 	char * getName( void ) {return screenName;};
 	protected:
 	char * screenName; // Must be set by each constructor
@@ -30,8 +32,11 @@ class CScreenManager : public CSingleton <CScreenManager>{
 	};
 	void activateScreen(char * name) {
 		for( unsigned int i = 0 ; i < screens.size() ; i++ )
-			if( !strcmp(screens[i]->getName(),name) )
+			if( !strcmp(screens[i]->getName(),name) ) {
+				currentScreen->exit();
 				currentScreen=screens[i];
+				currentScreen->enter();
+			}
 	};
 	CScreen * getCurrentScreen( void ) {return currentScreen;};
 	CScreen * getScreen(char * name) {

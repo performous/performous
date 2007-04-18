@@ -50,6 +50,14 @@ CScreenSing::~CScreenSing()
         delete theme;
 }
 
+void CScreenSing::enter( void )
+{
+}
+
+void CScreenSing::exit( void )
+{
+}
+
 void CScreenSing::manageEvent( SDL_Event event )
 {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();

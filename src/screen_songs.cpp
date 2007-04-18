@@ -16,6 +16,14 @@ CScreenSongs::~CScreenSongs()
 	delete theme;
 }
 
+void CScreenSongs::enter( void )
+{
+}
+
+void CScreenSongs::exit( void )
+{
+}
+
 void CScreenSongs::manageEvent( SDL_Event event )
 {
 	int keypressed;

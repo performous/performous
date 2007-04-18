@@ -17,6 +17,14 @@ CScreenIntro::~CScreenIntro()
 	delete cairo_svg;
 }
 
+void CScreenIntro::enter( void )
+{
+}
+
+void CScreenIntro::exit( void )
+{
+}
+
 void CScreenIntro::manageEvent( SDL_Event event )
 {
 	int keypressed;

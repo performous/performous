@@ -13,6 +13,8 @@ class CScreenSing : public CScreen {
 	public:
 	CScreenSing( char * name );
 	~CScreenSing();
+	void enter(void);
+	void exit(void);
 	void manageEvent( SDL_Event event );
 	void draw(void);
 	private:

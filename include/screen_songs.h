@@ -11,6 +11,8 @@ class CScreenSongs : public CScreen {
 	public:
 	CScreenSongs( char * name );
 	~CScreenSongs();
+	void enter(void);
+	void exit(void);
 	void manageEvent( SDL_Event event );
 	void draw(void);
 	private:

@@ -10,6 +10,8 @@ class CScreenIntro : public CScreen {
 	public:
 	CScreenIntro( char * name );
 	~CScreenIntro();
+	void enter(void);
+	void exit(void);
 	void manageEvent( SDL_Event event );
 	void draw(void);
 	private:
