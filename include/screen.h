@@ -30,20 +30,9 @@ class CScreenManager : public CSingleton <CScreenManager>{
 		screens.push_back(screen);
 		fprintf(stdout,"Adding screen \"%s\" to screen manager\n",screen->getName());
 	};
-	void activateScreen(char * name) {
-		for( unsigned int i = 0 ; i < screens.size() ; i++ )
-			if( !strcmp(screens[i]->getName(),name) ) {
-				currentScreen->exit();
-				currentScreen=screens[i];
-				currentScreen->enter();
-			}
-	};
+	void activateScreen(char * name);
 	CScreen * getCurrentScreen( void ) {return currentScreen;};
-	CScreen * getScreen(char * name) {
-		for( unsigned int i = 0 ; i < screens.size() ; i++ )
-			if( !strcmp(screens[i]->getName(),name) )
-				return screens[i];
-	}
+	CScreen * getScreen(char * name);
 
 	void setSDLScreen( SDL_Surface * _screen ) { screen = _screen;};
 	SDL_Surface * getSDLScreen( void ) { return screen;};

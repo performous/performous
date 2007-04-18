@@ -8,6 +8,7 @@ CScreenManager::CScreenManager( int _width , int _height , char * _songs_dir , c
 	audio = NULL;
 	record = NULL;
 	songs = NULL;
+	currentScreen = NULL;
 	songId = 0;
 	width = _width;
 	height = _height;
@@ -22,6 +23,22 @@ CScreenManager::~CScreenManager()
 	delete songs;
 	for( unsigned int i = 0 ; i < screens.size() ; i++ )
 		delete screens[i];
+}
+
+void CScreenManager::activateScreen(char * name) {
+	for( unsigned int i = 0 ; i < screens.size() ; i++ )
+		if( !strcmp(screens[i]->getName(),name) ) {
+			if( currentScreen != NULL )
+				currentScreen->exit();
+			currentScreen=screens[i];
+			currentScreen->enter();
+		}
+}
+
+CScreen * CScreenManager::getScreen(char * name) {
+	for( unsigned int i = 0 ; i < screens.size() ; i++ )
+		if( !strcmp(screens[i]->getName(),name) )
+			return screens[i];
 }
 
 void CScreenManager::getThemePathFile( char * dest , char * file)
