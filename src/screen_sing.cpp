@@ -127,6 +127,7 @@ void CScreenSing::draw( void )
 
 	if( !sm->getAudio()->isPlaying() ) {
 		sm->activateScreen("Songs");
+		return;
 	}
 
 	//record->compute();
