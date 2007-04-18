@@ -18,6 +18,10 @@ CScreenSongs::~CScreenSongs()
 
 void CScreenSongs::enter( void )
 {
+	if( CScreenManager::getSingletonPtr()->getSongs() == NULL ) {
+		CScreenManager::getSingletonPtr()->setSongs(new CSongs() );
+		CScreenManager::getSingletonPtr()->getSongs()->sortByArtist();
+	}
 }
 
 void CScreenSongs::exit( void )
@@ -39,6 +43,11 @@ void CScreenSongs::manageEvent( SDL_Event event )
 			keypressed = event.key.keysym.sym;
 			if( keypressed == SDLK_ESCAPE || keypressed == SDLK_q ) {
 				sm->activateScreen("Intro");
+			} else if( keypressed == SDLK_r ) {
+				if( CScreenManager::getSingletonPtr()->getSongs() != NULL )
+					delete CScreenManager::getSingletonPtr()->getSongs();
+				CScreenManager::getSingletonPtr()->setSongs(new CSongs() );
+				CScreenManager::getSingletonPtr()->getSongs()->sortByArtist();
 			} else if( keypressed == SDLK_LEFT ) {
 				if(sm->getSongId() >0 )
 					sm->setSongId(sm->getSongId()-1);
