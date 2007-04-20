@@ -154,6 +154,8 @@ void CScreenSing::draw( void )
 	linerect.fill_col.r = 50;
 	linerect.fill_col.g = 50;
 	linerect.fill_col.b = 50;
+	linerect.final_height = 0;
+	linerect.final_width  = 0;
 	// draw lines for the C notes (thick)
 	for( unsigned int i = 0 ; i <= numOctaves ; i++ ) {
 		if( i <= (song->noteMax-lowestC)/12 ) {
@@ -257,6 +259,8 @@ void CScreenSing::draw( void )
         tmprect.svg_height = sm->getHeight();
         tmprect.height = 10;
 	tmprect.fill_col.a = 255;
+	tmprect.final_height = 0;
+	tmprect.final_width  = 0;
 
 	// Compute and draw the "to start" cursor
 	if (sentence.size()>0 && time < (sentence[0]->timestamp * 60 * 1000) / (song->bpm[0].bpm * 4 ) + song->gap){
@@ -329,7 +333,7 @@ void CScreenSing::draw( void )
 	    	        	pitchGraph.renderPitch(
 	    					((float)noteheight/sm->getHeight()),
 	    					((double)current + 100)/sm->getWidth());
-	    	        	if( abs(diff) <= 2 - sm->getDifficulty() )
+	    	        	if( abs(diff) <= abs(2 - sm->getDifficulty()) )
 	    				song->score[0].score += (10000 / song->maxScore) * sentence[i]->type;
                         } else {
 	    	      		pitchGraph.renderPitch( 0.0, ((double)current + 100)/sm->getWidth());
