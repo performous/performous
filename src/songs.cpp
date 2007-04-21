@@ -31,7 +31,7 @@ bool compareSongs( CSong * left , CSong * right)
 	}
 	// VERY IMPORTANT, if equal compareSongs MUST return false
 	if(ordering1 == NULL && ordering2 == NULL)
-		return false;
+		return (left->idx < right->idx);
 	if(ordering1 == NULL)
 		return true;
 	if(ordering2 == NULL)
