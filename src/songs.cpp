@@ -117,6 +117,15 @@ void CSong::parseFile( void )
 		}
 	}
 	fclose(fp);
+	// Adjust negativ notes
+	if( noteMin <= 0 ) {
+		unsigned int shift = (((noteMin*-1)%12)+1)*12;
+		noteMin+= shift;
+		noteMax+= shift;
+		
+		for( unsigned int i = 0 ; i < notes.size() ; i++ )
+			notes[i]->note+=shift;
+	}
 }
 
 CSong::CSong()
