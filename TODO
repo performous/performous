@@ -1,8 +1,6 @@
 Features:
 
-- Add scoring/analysis
-- Add difficulty
-- Add song pre-"view" in songs screen
+- Add analysis
 
 
 Fixes/Enhancement:
@@ -13,11 +11,7 @@ Fixes/Enhancement:
 - Add the drawing resolution (draw small surfaces and then zoom to the
   rendering bigger surface)
 - Add binary dump of the songs (to speed up directory browsing)
-- Add "To start" cursor before sentence beginning in more than 'n' beat
-- Draw "to be sung" notes with cairo instead of SDLRectangle
-  This should enable "sing" notes strech in a themed rectangle
 - Use a cross platform input sound library (portAudio ?)
-- Fixe install things (add a secondary theme directoryn)
 - Add an in-game configuration screen (with config file in 
   $HOME/.ultrastar-ng)
 
