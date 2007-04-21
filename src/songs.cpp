@@ -253,10 +253,17 @@ CSongs::CSongs()
 	CScreenManager::getSingletonPtr()->getThemePathFile(theme_path,"no_cover.png");
 	SDL_RWops *rwop_nocover = SDL_RWFromFile(theme_path, "rb");
 	delete[] theme_path;
+			    	
 
-	surface_nocover = NULL;
-	surface_nocover = IMG_LoadPNG_RW(rwop_nocover);
+	{
+	SDL_Surface * surface_nocover_tmp = NULL;
+	surface_nocover_tmp = IMG_LoadPNG_RW(rwop_nocover);
+	int w = CScreenManager::getSingletonPtr()->getWidth()*256/800;
+	int h = CScreenManager::getSingletonPtr()->getHeight()*256/600;
+	surface_nocover = zoomSurface(surface_nocover_tmp,(double)w/surface_nocover_tmp->w,(double)h/surface_nocover_tmp->h,1);
+	SDL_FreeSurface(surface_nocover_tmp);
 	SDL_FreeRW(rwop_nocover);
+	}
 
 	if( surface_nocover == NULL ) {
 		printf("IMG_LoadPNG_RW: %s\n", IMG_GetError());
