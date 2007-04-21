@@ -122,6 +122,9 @@ void CScreenSing::draw( void )
 	CSong   * song      = sm->getSong();
         float freq;
 	int note;
+	float resFactorX = sm->getWidth()/800.;
+	float resFactorY = sm->getHeight()/600.;
+	float resFactorAvg = (resFactorX + resFactorY)/2.;
 
         theme->theme->clear();
 
@@ -144,10 +147,10 @@ void CScreenSing::draw( void )
 	TThemeRect linerect;
 	linerect.stroke_col.r = linerect.stroke_col.g = linerect.stroke_col.b = 0;
 	linerect.stroke_col.a = 0.9;
-	linerect.stroke_width = 1;
+	linerect.stroke_width = 1.*resFactorAvg;
 	linerect.svg_width = sm->getWidth();
 	linerect.svg_height = sm->getHeight();
-	linerect.height = 1;
+	linerect.height = 1.*resFactorY;
 	linerect.fill_col.a = 0.5;
 	linerect.x = 0;
 	linerect.width = sm->getWidth();
@@ -245,7 +248,7 @@ void CScreenSing::draw( void )
 	float bpmPixelUnit;
 	if(sentence.size() ) {
 		totalBpm = sentence[sentence.size()-1]->length + sentence[sentence.size()-1]->timestamp - sentence[0]->timestamp;
-		bpmPixelUnit = (sm->getWidth() - 100. - 100.)/(totalBpm*1.0);
+		bpmPixelUnit = (sm->getWidth() - 100.*resFactorX - 100.*resFactorX)/(totalBpm*1.0);
 	} else {
 		totalBpm=0;
 		bpmPixelUnit=0;
@@ -254,10 +257,10 @@ void CScreenSing::draw( void )
         TThemeRect tmprect;
         tmprect.stroke_col.r = tmprect.stroke_col.g = tmprect.stroke_col.b = 0;
 	tmprect.stroke_col.a = 255;
-	tmprect.stroke_width = 2;
+	tmprect.stroke_width = 2.*resFactorAvg;
         tmprect.svg_width = sm->getWidth();
         tmprect.svg_height = sm->getHeight();
-        tmprect.height = 10;
+        tmprect.height = 10.*resFactorY;
 	tmprect.fill_col.a = 255;
 	tmprect.final_height = 0;
 	tmprect.final_width  = 0;
@@ -283,9 +286,9 @@ void CScreenSing::draw( void )
 	        	int y = noteHeight;
 	    		int begin = (int) (currentBpm*bpmPixelUnit);
 	    		int end   = (int) ((currentBpm+sentence[i]->length)*bpmPixelUnit);
-	    		tmprect.x = 105 + begin;
-                        tmprect.y = y - 5;
-                        tmprect.width = 100 + end - tmprect.x;
+	    		tmprect.x = 105.*resFactorX + begin;
+                        tmprect.y = y - 5.*resFactorY;
+                        tmprect.width = 100.*resFactorX + end - tmprect.x;
                         tmprect.fill_col.r = 0;
                         tmprect.fill_col.g = 0;
                         tmprect.fill_col.b = 255;
@@ -295,9 +298,9 @@ void CScreenSing::draw( void )
 	        	int y = noteHeight;
 	    		int begin = (int) (currentBpm*bpmPixelUnit);
 	    		int end   = (int) ((currentBpm+sentence[i]->length)*bpmPixelUnit);
-	    		tmprect.x = 105 + begin;
-                        tmprect.y = y - 5;
-                        tmprect.width = 100 + end - tmprect.x;
+	    		tmprect.x = 105.*resFactorX + begin;
+                        tmprect.y = y - 5.*resFactorY;
+                        tmprect.width = 100.*resFactorX + end - tmprect.x;
                         tmprect.fill_col.r = 200;
                         tmprect.fill_col.g = 200;
                         tmprect.fill_col.b = 200;
@@ -309,17 +312,17 @@ void CScreenSing::draw( void )
 	    		float note_start = (time - ( (sentence[i]->timestamp)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) - song->gap);
 	    		float note_total = (sentence[i]->length)  * 60 * 1000 / ( song->bpm[0].bpm * 4 );
 	    		int current = (int) ((currentBpm + note_start*sentence[i]->length/note_total)*bpmPixelUnit);
-	    		tmprect.x = 105 + begin;
-                        tmprect.y = y - 5;
-                        tmprect.width = 100 + current - tmprect.x;
+	    		tmprect.x = 105.*resFactorX + begin;
+                        tmprect.y = y - 5.*resFactorY;
+                        tmprect.width = 100.*resFactorX + current - tmprect.x;
                         tmprect.fill_col.r = 0;
                         tmprect.fill_col.g = 0;
                         tmprect.fill_col.b = 255;
                         theme->theme->DrawRect(tmprect);
 	    	    
-                        tmprect.x = 100 + current;
-                        tmprect.y = y - 5;
-                        tmprect.width = 100 + end - tmprect.x;
+                        tmprect.x = 100.*resFactorX + current;
+                        tmprect.y = y - 5.*resFactorY;
+                        tmprect.width = 100.*resFactorX + end - tmprect.x;
                         tmprect.fill_col.r = 200;
                         tmprect.fill_col.g = 200;
                         tmprect.fill_col.b = 200;
