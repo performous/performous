@@ -31,7 +31,7 @@ bool compareSongs( CSong * left , CSong * right)
 	}
 	// VERY IMPORTANT, if equal compareSongs MUST return false
 	if(ordering1 == NULL && ordering2 == NULL)
-		return (left->idx < right->idx);
+		return (left->index < right->index);
 	if(ordering1 == NULL)
 		return true;
 	if(ordering2 == NULL)
@@ -39,8 +39,10 @@ bool compareSongs( CSong * left , CSong * right)
 	int cmp = strcmp(ordering1,ordering2);
 	if( cmp < 0 )
 		return true;
-	else
+	else if( cmp > 0 )
 		return false;
+	else
+		return (left->index < right->index);
 }
 
 void CSong::parseFile( void )
@@ -355,6 +357,7 @@ CSongs::CSongs()
                         }
                         
                         tmp->parseFile();
+			tmp->index = songs.size();
 			songs.push_back(tmp);
 		}
 	}

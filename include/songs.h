@@ -32,7 +32,8 @@ class CSong {
 	CSong();
 	~CSong() {};
 	void parseFile( void );
-	
+
+	unsigned int index;
 	char * path;
 	char * filename;
 	std::vector <char *> category;
