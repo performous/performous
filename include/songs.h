@@ -10,6 +10,8 @@ typedef struct _SBpm {
 
 typedef struct _SScore {
 	char * name;
+	int hits;
+	int total;
 	int score;
 	char * length;
 } TScore ;
@@ -24,6 +26,7 @@ typedef struct _SNote {
 	int timestamp;
 	int length;
 	int note;
+	int curMaxScore;
 	char * syllable;
 } TNote;
 

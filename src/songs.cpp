@@ -89,8 +89,9 @@ void CSong::parseFile( void )
 					noteMin = tmp->note;
 				if( tmp->note >= noteMax )
 					noteMax = tmp->note;
-				notes.push_back(tmp);
 				maxScore += tmp->length * tmp->type;
+				tmp->curMaxScore = maxScore;
+				notes.push_back(tmp);
                                 break;
 			}
 			case '-' : {
@@ -105,12 +106,14 @@ void CSong::parseFile( void )
 				} else {
 					tmp->length = sleep_end - timestamp;
 				}
-				if(relative)
+				if(relative) {
 					if( nbInt == 1 ) {
 						relativeShift += timestamp;
 					} else {
 						relativeShift += sleep_end;
 					}
+				}
+				tmp->curMaxScore = maxScore;
 				notes.push_back(tmp);
 				break;
 			}

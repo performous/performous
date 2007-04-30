@@ -75,6 +75,8 @@ void CScreenSing::enter( void )
 	sm->getAudio()->playMusic(buff);
 	lyrics = new CLyrics( song->notes, song->gap, song->bpm[0].bpm );
         song->score[0].score = 0;
+        song->score[0].hits = 0;
+        song->score[0].total = 0;
 	playOffset = 0;
 }
 
@@ -331,16 +333,21 @@ void CScreenSing::draw( void )
 	    	        // Lets find the nearest note from the song (diff in [-6,5])
 	    	        int diff =  (66+sentence[i]->note - note)%12-6;
 	    	        int noteSingFinal = sentence[i]->note - diff;
-	    	        int noteheight=sm->getHeight()*3/4-((noteSingFinal-lowestC)*sm->getHeight()/2/numOctaves/12);
+			int noteheight=((18*numOctaves-noteSingFinal+lowestC)*sm->getHeight()/2/numOctaves/12);
 	    	        if(freq != 0.0) {
 	    	        	pitchGraph.renderPitch(
 	    					((float)noteheight/sm->getHeight()),
 	    					((double)current + 100)/sm->getWidth());
-	    	        	if( abs(diff) <= abs(2 - sm->getDifficulty()) )
-	    				song->score[0].score += (10000 / song->maxScore) * sentence[i]->type;
+	    	        	if( abs(diff) <= abs( 2 - sm->getDifficulty() ) )
+					song->score[0].hits++;
                         } else {
 	    	      		pitchGraph.renderPitch( 0.0, ((double)current + 100)/sm->getWidth());
 	    		}
+			song->score[0].total++;
+			float factor = ((float) sentence[i]->curMaxScore)/song->maxScore;
+			if( factor >= 0 && factor <= 1){
+				song->score[0].score = (int)(10000*factor * song->score[0].hits/song->score[0].total);
+			}
 	        }
 	}
         
