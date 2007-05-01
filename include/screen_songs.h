@@ -19,6 +19,8 @@ class CScreenSongs : public CScreen {
 	CThemeSongs * theme;
 	int songId;
 	bool play;
+	bool searchMode;
+	char * searchExpr;
         unsigned int bg_texture;
 };
 

@@ -25,8 +25,9 @@ void checkEvents( void )
 				screenManager->finished();
 				break;
 		case SDL_KEYDOWN:
-			int keypressed = event.key.keysym.sym;
-			if( keypressed == SDLK_f ) {
+			int keypressed  = event.key.keysym.sym;
+			SDLMod modifier = event.key.keysym.mod;
+			if( keypressed == SDLK_f && modifier&KMOD_ALT ) {
 				SDL_WM_ToggleFullScreen(screenSDL);
 				break;
 			}

@@ -18,6 +18,9 @@ CScreenSongs::~CScreenSongs()
 
 void CScreenSongs::enter( void )
 {
+	searchMode = false;
+	searchExpr = new char[256];
+	searchExpr[0] = '\0';
 	if( CScreenManager::getSingletonPtr()->getSongs() == NULL ) {
 		CScreenManager::getSingletonPtr()->setSongs(new CSongs() );
 		CScreenManager::getSingletonPtr()->getSongs()->sortByArtist();
@@ -26,70 +29,125 @@ void CScreenSongs::enter( void )
 
 void CScreenSongs::exit( void )
 {
+	delete[] searchExpr;
 }
 
 void CScreenSongs::manageEvent( SDL_Event event )
 {
 	int keypressed;
+	SDLMod modifier;
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
 
 	switch(event.type) {
 		case SDL_KEYDOWN:
-			
-			//Stop song preview on keystroke
-			sm->getAudio()->stopMusic();
-			play = false;
-
 			keypressed = event.key.keysym.sym;
-			if( keypressed == SDLK_ESCAPE || keypressed == SDLK_q ) {
-				sm->activateScreen("Intro");
-			} else if( keypressed == SDLK_r ) {
-				if( CScreenManager::getSingletonPtr()->getSongs() != NULL )
-					delete CScreenManager::getSingletonPtr()->getSongs();
-				CScreenManager::getSingletonPtr()->setSongs(new CSongs() );
-				CScreenManager::getSingletonPtr()->getSongs()->sortByArtist();
-			} else if( keypressed == SDLK_LEFT ) {
-				if(sm->getSongId() >0 )
-					sm->setSongId(sm->getSongId()-1);
-				else
-					sm->setSongId(sm->getSongs()->nbSongs()-1);
-			} else if( keypressed == SDLK_RIGHT ) {
-				if(sm->getSongId() > sm->getSongs()->nbSongs()-2 )
-					sm->setSongId(0);
-				else
-					sm->setSongId(sm->getSongId()+1);
-			} else if( keypressed == SDLK_UP ) {
-				switch(sm->getSongs()->getOrder()) {
-					case 0:
-						sm->getSongs()->sortByArtist();
-						break;
-					case 1:
-						sm->getSongs()->sortByEdition();
-						break;
-					case 2:
-						sm->getSongs()->sortByGenre();
-						break;
-					case 3:
-						sm->getSongs()->sortByTitle();
-						break;
+			modifier   = event.key.keysym.mod;
+
+			if( !searchMode && modifier & KMOD_CTRL && keypressed == SDLK_f ) {
+				fprintf(stdout,"Entering search mode\n");
+				searchMode = true;
+				searchExpr[0] = '\0';
+			}
+
+			if( searchMode ) {
+				if( keypressed == SDLK_ESCAPE ) {
+					fprintf(stdout,"Exiting search mode\n");
+					searchMode = false;
+					searchExpr[0] = '\0';
+					// Here filter
+				} else if( keypressed == SDLK_RETURN ) {
+					fprintf(stdout,"Exiting search mode\n");
+					searchMode = false;
+				} else if( keypressed >= SDLK_a && keypressed <= SDLK_z ) {
+					int n = strlen(searchExpr);
+					if ( n < 255 ){
+						if( modifier & KMOD_SHIFT )
+							searchExpr[n] = 'A' + keypressed - SDLK_a;
+						else
+							searchExpr[n] = 'a' + keypressed - SDLK_a;
+						searchExpr[n+1] = '\0';
+						// Here filter
+					}
+				} else if( keypressed == SDLK_BACKSPACE ) {
+					int n = strlen(searchExpr);
+					if( n > 0 ) {
+						searchExpr[n-1] = '\0';
+						// Here filter
+					}
+				} else if(( keypressed >= SDLK_SPACE && keypressed <= SDLK_BACKQUOTE) || (keypressed >= SDLK_WORLD_0 && keypressed <= SDLK_WORLD_95 )) {
+					int n = strlen(searchExpr);
+					if( n < 255 ) {
+						// using the fact that ascii == SDLK_keys
+						searchExpr[n] = keypressed;
+						searchExpr[n+1] = '\0';
+						// Here filter
+					}
 				}
-			} else if( keypressed == SDLK_DOWN ) {
-				switch(sm->getSongs()->getOrder()) {
-					case 0:
-						sm->getSongs()->sortByGenre();
-						break;
-					case 1:
-						sm->getSongs()->sortByTitle();
-						break;
-					case 2:
-						sm->getSongs()->sortByArtist();
-						break;
-					case 3:
-						sm->getSongs()->sortByEdition();
-						break;
+			} else {
+				if( keypressed == SDLK_ESCAPE || keypressed == SDLK_q ) {
+					sm->getAudio()->stopMusic();
+					play = false;
+					sm->activateScreen("Intro");
+				} else if( keypressed == SDLK_r ) {
+					sm->getAudio()->stopMusic();
+					play = false;
+					if( CScreenManager::getSingletonPtr()->getSongs() != NULL )
+						delete CScreenManager::getSingletonPtr()->getSongs();
+					CScreenManager::getSingletonPtr()->setSongs(new CSongs() );
+					CScreenManager::getSingletonPtr()->getSongs()->sortByArtist();
+				} else if( keypressed == SDLK_LEFT ) {
+					sm->getAudio()->stopMusic();
+					play = false;
+					if(sm->getSongId() >0 )
+						sm->setSongId(sm->getSongId()-1);
+					else
+						sm->setSongId(sm->getSongs()->nbSongs()-1);
+				} else if( keypressed == SDLK_RIGHT ) {
+					sm->getAudio()->stopMusic();
+					play = false;
+					if(sm->getSongId() > sm->getSongs()->nbSongs()-2 )
+						sm->setSongId(0);
+					else
+						sm->setSongId(sm->getSongId()+1);
+				} else if( keypressed == SDLK_UP ) {
+					sm->getAudio()->stopMusic();
+					play = false;
+					switch(sm->getSongs()->getOrder()) {
+						case 0:
+							sm->getSongs()->sortByArtist();
+							break;
+						case 1:
+							sm->getSongs()->sortByEdition();
+							break;
+						case 2:
+							sm->getSongs()->sortByGenre();
+							break;
+						case 3:
+							sm->getSongs()->sortByTitle();
+							break;
+					}
+				} else if( keypressed == SDLK_DOWN ) {
+					sm->getAudio()->stopMusic();
+					play = false;
+					switch(sm->getSongs()->getOrder()) {
+						case 0:
+							sm->getSongs()->sortByGenre();
+							break;
+						case 1:
+							sm->getSongs()->sortByTitle();
+							break;
+						case 2:
+							sm->getSongs()->sortByArtist();
+							break;
+						case 3:
+							sm->getSongs()->sortByEdition();
+							break;
+					}
+				} else if( keypressed == SDLK_RETURN ) {
+					sm->getAudio()->stopMusic();
+					play = false;
+					sm->activateScreen("Sing");
 				}
-			} else if( keypressed == SDLK_RETURN ) {
-				sm->activateScreen("Sing");
 			}
 	}
 }
