@@ -56,6 +56,8 @@ class CScreenManager : public CSingleton <CScreenManager>{
 	void setSongs( CSongs * _songs ) {
 		songs=_songs;
 	};
+	void setNextSongId( void );
+	void setPreviousSongId( void );
 	void setSongId( int _id ) {songId = _id; };
 	int getSongId( void ) {return songId; };
 	CSong * getSong( void ) {return songs->getSong(songId);};

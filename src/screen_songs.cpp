@@ -98,17 +98,11 @@ void CScreenSongs::manageEvent( SDL_Event event )
 				} else if( keypressed == SDLK_LEFT ) {
 					sm->getAudio()->stopMusic();
 					play = false;
-					if(sm->getSongId() >0 )
-						sm->setSongId(sm->getSongId()-1);
-					else
-						sm->setSongId(sm->getSongs()->nbSongs()-1);
+					sm->setPreviousSongId();
 				} else if( keypressed == SDLK_RIGHT ) {
 					sm->getAudio()->stopMusic();
 					play = false;
-					if(sm->getSongId() > sm->getSongs()->nbSongs()-2 )
-						sm->setSongId(0);
-					else
-						sm->setSongId(sm->getSongId()+1);
+					sm->setNextSongId();
 				} else if( keypressed == SDLK_UP ) {
 					sm->getAudio()->stopMusic();
 					play = false;

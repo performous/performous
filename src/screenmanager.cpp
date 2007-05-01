@@ -49,3 +49,19 @@ void CScreenManager::getThemePathFile( char * dest , char * file)
 	else
 		sprintf(dest,"%s/%s/%s",THEMES_DIR,m_theme_name,file);
 }
+
+void CScreenManager::setPreviousSongId( void )
+{
+	if( songId >0 )
+		songId--;
+	else
+		songId = songs->nbSongs()-1;
+}
+
+void CScreenManager::setNextSongId( void )
+{
+	if( songId > songs->nbSongs()-2 )
+		songId = 0;
+	else
+		songId++;
+}
