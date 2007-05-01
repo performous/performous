@@ -84,11 +84,11 @@ void CScreenSongs::manageEvent( SDL_Event event )
 					}
 				}
 			} else {
-				if( keypressed == SDLK_ESCAPE || keypressed == SDLK_q ) {
+				if( keypressed == SDLK_ESCAPE ) {
 					sm->getAudio()->stopMusic();
 					play = false;
 					sm->activateScreen("Intro");
-				} else if( keypressed == SDLK_r ) {
+				} else if( keypressed == SDLK_r && modifier & KMOD_CTRL) {
 					sm->getAudio()->stopMusic();
 					play = false;
 					if( CScreenManager::getSingletonPtr()->getSongs() != NULL )
