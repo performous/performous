@@ -12,7 +12,7 @@ LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~x86 ~amd64"
 
-IUSE="deprecated_cairo_svg novideo xine gstreamer opengl"
+IUSE="deprecated_cairo_svg novideo xine gstreamer opengl debug"
 
 ECVS_SERVER="ultrastar-ng.cvs.sourceforge.net:/cvsroot/ultrastar-ng"
 ECVS_MODULE="UltraStar-ng"
@@ -82,6 +82,11 @@ src_compile() {
 		myconf="${myconf} --with-graphic-driver=opengl"
 	else
 		myconf="${myconf} --with-graphic-driver=sdl"
+	fi
+	if use debug ; then
+		myconf="${myconf} --enable-debug"
+	else
+		myconf="${myconf} --disable-debug"
 	fi
 
 	egamesconf ${myconf} || die
