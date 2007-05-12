@@ -1,4 +1,4 @@
-SUBDIRS = src
+SUBDIRS = src docs
 
 themesdefdir   = @THEMES_DIR@/default
 themesdef_DATA = themes/default/no_cover.png \
