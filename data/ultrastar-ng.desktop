@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=UltraStar NG
+Comment=A karaoke game
+Comment[de]=Ein Karaoke Spiel
+Comment[ro]=Un joc de tip karaoke
+Comment[fr]=Un jeu de Karaoké
+Exec=ultrastarng
+Icon=ultrastar-ng64bis.xpm
+Terminal=false
+Type=Application
+Categories=Game;ArcadeGame;

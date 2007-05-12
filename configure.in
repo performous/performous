@@ -409,6 +409,7 @@ AC_OUTPUT(
 	Makefile
 	src/Makefile
 	docs/Makefile
+	data/Makefile
 )
 
 echo "                                                                    "

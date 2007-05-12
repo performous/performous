@@ -1,4 +1,4 @@
-SUBDIRS = src docs
+SUBDIRS = src docs data
 
 themesdefdir   = @THEMES_DIR@/default
 themesdef_DATA = themes/default/no_cover.png \
@@ -53,7 +53,4 @@ includes = include/audio.h \
 	include/sdl_gl.h \
 	include/video_driver.h
 
-util_DATA = ultrastar-ng.desktop
-utildir = $(datadir)/applications
-
-EXTRA_DIST = $(themesdef_DATA) $(themeslima_DATA) $(includes) $(util_DATA)
+EXTRA_DIST = $(themesdef_DATA) $(themeslima_DATA) $(includes)
