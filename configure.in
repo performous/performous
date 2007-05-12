@@ -407,9 +407,10 @@ dnl #### generation of the outputs
 
 AC_OUTPUT(
 	Makefile
-	src/Makefile
-	docs/Makefile
 	data/Makefile
+	docs/Makefile
+	src/Makefile
+	themes/Makefile
 )
 
 echo "                                                                    "
