@@ -53,4 +53,7 @@ includes = include/audio.h \
 	include/sdl_gl.h \
 	include/video_driver.h
 
-EXTRA_DIST = $(themesdef_DATA) $(themeslima_DATA) $(includes)
+util_DATA = ultrastar-ng.desktop
+utildir = $(datadir)/applications
+
+EXTRA_DIST = $(themesdef_DATA) $(themeslima_DATA) $(includes) $(util_DATA)
