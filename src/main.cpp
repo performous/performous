@@ -64,23 +64,17 @@ void usage( char * progname )
 {
 	fprintf(stdout,"Usage: %s [options] [song_directory]\n", progname);
 	fprintf(stdout,"Options:\n");
-	fprintf(stdout,"--------\n");
-	fprintf(stdout,"-h, --help\n");
-	fprintf(stdout,"\tDisplay this text and exit\n");
-	fprintf(stdout,"-W, --width (Default: 640)\n");
-	fprintf(stdout,"\tSet window width\n");
-	fprintf(stdout,"-H, --height (Default: 480)\n");
-	fprintf(stdout,"\tSet window height\n");
-	fprintf(stdout,"-t, --theme\n");
-	fprintf(stdout,"\tSet theme (theme name or absolute path to the theme)\n");
-	fprintf(stdout,"-c, --no-capture\n");
-	fprintf(stdout,"\tDisable sound capture thread\n");
-	fprintf(stdout,"-f, --fullscreen\n");
-	fprintf(stdout,"\tEnable fullscreen video output\n");
-	fprintf(stdout,"-d, --difficulty\n");
-	fprintf(stdout,"\tSet difficulty level (0: easy, 1:medium, 2:hard (default))\n");
-	fprintf(stdout,"-v, --version\n");
-	fprintf(stdout,"\tDisplay version number and exit\n");
+	fprintf(stdout,"\n");
+	fprintf(stdout,   "-W, --width (default: 640)  set window width\n");
+	fprintf(stdout,   "-H, --height (default: 480) set window height\n");
+	fprintf(stdout,   "-t, --theme                 set theme (theme name or absolute path to the\n");
+	fprintf(stdout,   "                            theme)\n");
+	fprintf(stdout,   "-c, --no-capture            disable sound capture thread\n");
+	fprintf(stdout,   "-f, --fullscreen            enable fullscreen video output\n");
+	fprintf(stdout,   "-d, --difficulty            set difficulty level\n");
+	fprintf(stdout,   "                            (0: easy, 1:medium, 2:hard (default))\n");
+	fprintf(stdout,   "-h, --help                  display this text and exit\n");
+	fprintf(stdout,   "-v, --version               display version number and exit\n");
 	exit(EXIT_SUCCESS);
 }
 
