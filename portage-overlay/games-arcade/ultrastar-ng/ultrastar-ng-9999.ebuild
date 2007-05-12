@@ -97,5 +97,7 @@ src_compile() {
 
 src_install() {
 	make DESTDIR="${D}" install || die "make install failed"
+	doicon data/ultrastar-ng.xpm
+	domenu data/ultrastar-ng.desktop
 	prepgamesdirs
 }
