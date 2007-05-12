@@ -32,7 +32,9 @@ DEPEND="
 	!novideo? ( media-libs/smpeg )
 
 	>sci-libs/fftw-3
-	media-libs/alsa-lib"
+	media-libs/alsa-lib
+	
+	sys-apps/help2man"
 
 S=${WORKDIR}/${ECVS_MODULE}
 
