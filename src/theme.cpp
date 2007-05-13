@@ -348,6 +348,23 @@ CThemeSongs::~CThemeSongs() {
 	delete bg;
 	delete theme;
 }
+CThemePractice::CThemePractice() {
+	char * theme_path = new char[1024];
+	CScreenManager * sm = CScreenManager::getSingletonPtr();
+
+	sm->getThemePathFile(theme_path,"practice_bg.svg");
+	bg = new CairoSVG(theme_path, sm->getWidth(), sm->getHeight());
+
+        theme = new CTheme(sm->getWidth(), sm->getHeight());
+	sm->getThemePathFile(theme_path,"practice_txt.svg");
+	theme->ParseSVGForText(theme_path, &notetxt);
+	
+	delete[] theme_path;
+}
+CThemePractice::~CThemePractice() {
+	delete bg;
+	delete theme;
+}
 CThemeSing::CThemeSing() {
 	char * theme_path = new char[1024];
 	CScreenManager * sm = CScreenManager::getSingletonPtr();

@@ -5,6 +5,7 @@
 
 #include <screen.h>
 #include <cairosvg.h>
+#include <theme.h>
 
 class CScreenPractice : public CScreen {
 	public:
@@ -15,8 +16,10 @@ class CScreenPractice : public CScreen {
 	void manageEvent( SDL_Event event );
 	void draw(void);
 	private:
-	CairoSVG * cairo_svg;
-        unsigned int texture;
+        CThemePractice *theme;
+	CairoSVG * cairo_svg_note;
+        unsigned int texture_note;
+        unsigned int bg_texture;
 };
 
 #endif

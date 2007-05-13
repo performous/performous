@@ -73,6 +73,16 @@ class CThemeSongs {
 	private:
 };
 
+class CThemePractice {
+	public:
+	CThemePractice();
+	~CThemePractice();
+	CairoSVG *bg;
+	TThemeTxt notetxt;
+        CTheme *theme;
+	private:
+};
+
 class CThemeSing {
         public:
         CThemeSing();
