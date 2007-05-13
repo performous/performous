@@ -10,6 +10,7 @@ ultrastarng_SOURCES = main.cpp \
 	screen_intro.cpp \
 	screen_songs.cpp \
 	screen_sing.cpp \
+	screen_practice.cpp \
 	cairotosdl.cpp \
 	pitch_graph.cpp \
 	cairosvg.cpp \

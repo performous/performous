@@ -12,6 +12,7 @@ includes = include/audio.h \
 	include/record.h \
 	include/screen_intro.h \
 	include/screen_songs.h \
+	include/screen_practice.h \
 	include/songs.h \
 	include/lyrics.h \
 	include/sdl_gl.h \
