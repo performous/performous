@@ -6,7 +6,6 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.0"
@@ -50,52 +49,7 @@
      inkscape:window-y="0"
      inkscape:current-layer="svg559" />
   <defs
-     id="defs561">
-    <linearGradient
-       id="linearGradient6499"
-       inkscape:collect="always">
-      <stop
-         id="stop6501"
-         offset="0"
-         style="stop-color:white;stop-opacity:1;" />
-      <stop
-         id="stop6503"
-         offset="1"
-         style="stop-color:white;stop-opacity:0;" />
-    </linearGradient>
-    <linearGradient
-       id="linearGradient3751"
-       inkscape:collect="always">
-      <stop
-         id="stop3753"
-         offset="0"
-         style="stop-color:black;stop-opacity:1;" />
-      <stop
-         id="stop3755"
-         offset="1"
-         style="stop-color:black;stop-opacity:0;" />
-    </linearGradient>
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient3751"
-       id="linearGradient2325"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.755727,0,0,0.755727,4.33502,31.78829)"
-       x1="665.12128"
-       y1="684.16162"
-       x2="381.28015"
-       y2="449.80624" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient6499"
-       id="linearGradient5410"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.755727,0,0,0.755727,219.75996,52.251196)"
-       x1="370.92285"
-       y1="100.34026"
-       x2="372.94315"
-       y2="219.56401" />
-  </defs>
+     id="defs561" />
   <text
      x="542.14923"
      y="372.01218"
