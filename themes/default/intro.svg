@@ -16,9 +16,10 @@
    height="600.000000"
    id="svg559"
    sodipodi:version="0.32"
-   inkscape:version="0.44.1"
+   inkscape:version="0.45.1"
    sodipodi:docname="intro.svg"
-   sodipodi:docbase="/home/yoda/UltraStar/sf/UltraStar-ng/themes/default">
+   sodipodi:docbase="/home/yoda/UltraStar/sf/UltraStar-ng/themes/default"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <metadata
      id="metadata35">
     <rdf:RDF>
@@ -808,4 +809,15 @@
        id="tspan2002"
        x="545.26099"
        y="333.98251">NG</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-size:51.20622635px;font-style:normal;font-weight:bold;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Courier New"
+     x="375.35431"
+     y="351.44962"
+     id="text2302"
+     transform="scale(0.6249248,1.6001925)"><tspan
+       sodipodi:role="line"
+       id="tspan2304"
+       x="375.35431"
+       y="351.44962">Push P to practice</tspan></text>
 </svg>

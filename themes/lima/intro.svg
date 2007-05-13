@@ -16,9 +16,10 @@
    height="600.000000"
    id="svg559"
    sodipodi:version="0.32"
-   inkscape:version="0.44.1"
+   inkscape:version="0.45.1"
    sodipodi:docname="intro.svg"
-   sodipodi:docbase="/home/jesusda/docs/curro/yo/ultrastar-ng/base/theme-pod/themes/default">
+   sodipodi:docbase="/home/yoda/UltraStar/sf/UltraStar-ng/themes/lima"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <metadata
      id="metadata35">
     <rdf:RDF>
@@ -43,7 +44,7 @@
      pagecolor="#ffffff"
      id="base"
      inkscape:zoom="1.26"
-     inkscape:cx="582.26013"
+     inkscape:cx="321.29194"
      inkscape:cy="303.64421"
      inkscape:window-x="63"
      inkscape:window-y="30"
@@ -239,4 +240,14 @@
        id="tspan1894"
        x="761.07501"
        y="593.94653">0.1.0</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-size:33.91344452px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Trebuchet MS"
+     x="78.109444"
+     y="297.87573"
+     id="text2306"><tspan
+       sodipodi:role="line"
+       id="tspan2308"
+       x="78.109444"
+       y="297.87573">Press &quot;P&quot; to Practice</tspan></text>
 </svg>
