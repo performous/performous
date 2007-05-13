@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="41.164017"
+   height="24.95426"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.45.1"
+   version="1.0"
+   sodipodi:docbase="/home/yoda/UltraStar/sf/UltraStar-ng/themes/lima"
+   sodipodi:docname="practice_note.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="15.147714"
+     inkscape:cx="20.582008"
+     inkscape:cy="12.47713"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     inkscape:window-width="794"
+     inkscape:window-height="590"
+     inkscape:window-x="0"
+     inkscape:window-y="0" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Calque 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-247.7219,-621.15445)">
+    <path
+       style="fill:#000000"
+       d="M 257.93205,644.94733 C 250.5932,642.21139 247.76864,639.01713 247.72224,633.40116 C 247.66172,626.07614 255.74752,621.14199 267.79144,621.15447 C 275.56608,621.16252 280.73649,622.78585 285.04978,626.57297 C 291.40113,632.14952 289.72912,639.39746 281.047,643.92461 C 276.49931,646.29591 263.13552,646.8872 257.93205,644.94733 z M 274.56682,642.79121 C 277.28295,640.80483 277.07962,632.46118 274.22091,628.59619 C 269.82715,622.65581 262.24454,621.83935 260.24765,627.09161 C 256.7307,636.34189 267.39603,648.03541 274.56682,642.79121 z "
+       id="path2266" />
+  </g>
+</svg>
