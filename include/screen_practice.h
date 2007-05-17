@@ -18,7 +18,9 @@ class CScreenPractice : public CScreen {
 	private:
         CThemePractice *theme;
 	CairoSVG * cairo_svg_note;
+	CairoSVG * cairo_svg_sharp;
         unsigned int texture_note;
+        unsigned int texture_sharp;
         unsigned int bg_texture;
 };
 

@@ -17,7 +17,8 @@ themesdef_DATA = default/no_cover.png \
 	default/sing_timetxt.svg \
 	default/practice_bg.svg \
 	default/practice_txt.svg \
-	default/practice_note.svg
+	default/practice_note.svg \
+	default/practice_sharp.svg
 
 themeslimadir   = @THEMES_DIR@/lima
 themeslima_DATA = lima/no_cover.png \
@@ -38,6 +39,7 @@ themeslima_DATA = lima/no_cover.png \
 	lima/sing_timetxt.svg \
 	lima/practice_bg.svg \
 	lima/practice_txt.svg \
-	lima/practice_note.svg
+	lima/practice_note.svg \
+	lima/practice_sharp.svg
 
 EXTRA_DIST = $(themesdef_DATA) $(themeslima_DATA)
