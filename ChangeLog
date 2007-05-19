@@ -1,3 +1,709 @@
+2007-05-19 11:09  yoda-jm
+
+	* configure.in, src/screen_songs.cpp: Prepared release
+
+2007-05-17 16:11  yoda-jm
+
+	* include/screen_practice.h, src/screen_practice.cpp,
+	  themes/Makefile.am, themes/default/practice_sharp.svg,
+	  themes/lima/practice_sharp.svg: Added fully functionnal practice
+	  screen
+
+2007-05-13 17:19  yoda-jm
+
+	* themes/: default/intro.svg, lima/intro.svg: Added practice link
+
+2007-05-13 17:15  yoda-jm
+
+	* themes/: default/practice_txt.svg, lima/practice_txt.svg: Removed
+	  unneeded defs
+
+2007-05-13 16:54  yoda-jm
+
+	* include/screen_practice.h, include/theme.h,
+	  src/screen_practice.cpp, src/theme.cpp: Practice screen begins to
+	  work
+
+2007-05-13 16:53  yoda-jm
+
+	* themes/: Makefile.am, default/practice_txt.svg,
+	  lima/practice_txt.svg: Added practice theme text
+
+2007-05-13 14:02  yoda-jm
+
+	* themes/: lima/practice_note.svg, default/practice_note.svg: Added
+	  note
+
+2007-05-13 02:24  yoda-jm
+
+	* themes/default/practice_bg.svg: Removed old glyphs
+
+2007-05-13 02:23  yoda-jm
+
+	* Makefile.am, include/screen_practice.h, src/Makefile.am,
+	  src/main.cpp, src/screen_intro.cpp, src/screen_practice.cpp,
+	  themes/Makefile.am: Added practice screen (not yet functional)
+
+2007-05-13 02:04  yoda-jm
+
+	* themes/: default/practice_bg.svg, lima/practice_bg.svg: Added
+	  practice screen
+
+2007-05-12 16:58  yoda-jm
+
+	* docs/: Makefile.am, ultrastarng.h2m, ultrastarng.h2m.in: Used
+	  datadir in man page
+
+2007-05-12 16:03  yoda-jm
+
+	* data/ultrastar-ng.desktop,
+	  portage-overlay/games-arcade/ultrastar-ng/ultrastar-ng-9999.ebuild:
+	  Fixed some things in ebuild
+
+2007-05-12 15:45  yoda-jm
+
+	* data/: Makefile.am, ultrastar-ng.xpm: Added pixmap
+
+2007-05-12 14:48  yoda-jm
+
+	* Makefile.am, configure.in, themes/Makefile.am: Used subdirs for
+	  themes directory
+
+2007-05-12 14:43  yoda-jm
+
+	* Makefile.am, configure.in, ultrastar-ng.desktop,
+	  data/Makefile.am, data/ultrastar-ng.desktop: Moved desktop file
+
+2007-05-12 14:16  yoda-jm
+
+	* Makefile.am, ultrastar-ng.desktop: Added desktop file from Debian
+	  project
+
+2007-05-12 14:09  yoda-jm
+
+	*
+	  portage-overlay/games-arcade/ultrastar-ng/ultrastar-ng-9999.ebuild:
+	  Updated to add help2man dependency
+
+2007-05-12 13:51  yoda-jm
+
+	* docs/Makefile.am, Makefile.am, configure.in,
+	  docs/ultrastarng.h2m: Added help page (thanks Debian project and
+	  Miriam Ruiz)
+
+2007-05-12 13:07  yoda-jm
+
+	* src/main.cpp: Updated
+
+2007-05-12 12:25  yoda-jm
+
+	* src/main.cpp: Updated help screen
+
+2007-05-06 02:23  yoda-jm
+
+	*
+	  portage-overlay/games-arcade/ultrastar-ng/ultrastar-ng-9999.ebuild,
+	  configure.in: Added debug configure flag (fed up of modifying the
+	  configure.in)
+
+2007-05-01 13:09  yoda-jm
+
+	* src/screen_songs.cpp: Prepared for rapid song seeking
+
+2007-05-01 11:11  yoda-jm
+
+	* include/screen.h, src/screen_songs.cpp, src/screenmanager.cpp:
+	  Added helper methods
+
+2007-05-01 10:22  yoda-jm
+
+	* include/screen_songs.h, src/main.cpp, src/screen_songs.cpp:
+	  Prepared CVS for search/filter feature
+
+2007-04-30 19:56  yoda-jm
+
+	* include/songs.h, src/screen_sing.cpp, src/songs.cpp: Applied
+	  Matias patch (score correction)
+
+2007-04-30 19:42  yoda-jm
+
+	* src/record.cpp: Increased FFT detection width
+
+2007-04-21 23:38  yoda-jm
+
+	* src/songs.cpp: Fixed bug quoted by Matias
+
+2007-04-21 22:15  yoda-jm
+
+	* TODO: Updated TODO things
+
+2007-04-21 19:14  yoda-jm
+
+	* include/songs.h, src/songs.cpp: Applied a part of Matias patch
+
+2007-04-21 19:06  yoda-jm
+
+	* src/songs.cpp: Fixed compare function not returning always the
+	  same order depending on the initial order
+
+2007-04-21 17:34  yoda-jm
+
+	* src/screen_sing.cpp: Improved rendering when resolution is
+	  overridden
+
+2007-04-21 16:34  yoda-jm
+
+	* src/songs.cpp: Fixed non-resized no_cover surface
+
+2007-04-20 23:38  yoda-jm
+
+	* src/screen_sing.cpp: Removed some warnings
+
+2007-04-19 00:55  yoda-jm
+
+	* src/screen_sing.cpp: Fixed segfault at the end of a song
+
+2007-04-18 23:36  yoda-jm
+
+	* src/: screen_intro.cpp, screen_songs.cpp: Used new screen API
+
+2007-04-18 23:02  yoda-jm
+
+	* src/screen_sing.cpp: Updated to the new screen API
+
+2007-04-18 23:00  yoda-jm
+
+	* src/screenmanager.cpp: Removed warning
+
+2007-04-18 22:35  yoda-jm
+
+	* src/screenmanager.cpp, include/screen.h: Fixed the crashOnLoad
+	  feature
+
+2007-04-18 18:56  yoda-jm
+
+	* include/screen.h, include/screen_intro.h, include/screen_sing.h,
+	  include/screen_songs.h, src/screen_intro.cpp,
+	  src/screen_sing.cpp, src/screen_songs.cpp: Added new screen API
+	  (including enter and exit screen for finest management)
+
+2007-04-16 23:19  yoda-jm
+
+	* src/audio.cpp: Removed comments Fixed problems when playing
+	  relative song
+
+2007-04-16 23:07  yoda-jm
+
+	* src/screen_sing.cpp: Removed one warning
+
+2007-04-14 09:51  yoda-jm
+
+	* configure.in, include/audio.h, src/audio.cpp: Added xine video
+	  autoconf support
+
+2007-04-11 21:44  yoda-jm
+
+	* src/screen_sing.cpp: Added factor patch (Matias)
+
+2007-04-11 20:18  yoda-jm
+
+	* src/screen_sing.cpp: Fixed the patch to have a usefull patch
+
+2007-04-11 17:25  yoda-jm
+
+	* configure.in: Fixed copy/paste (thanks jean-marc)
+
+2007-04-11 07:49  yoda-jm
+
+	* src/screen_sing.cpp: Patched negative time bug (Matias)
+
+2007-04-09 23:41  yoda-jm
+
+	* src/audio.cpp: Fixed gstreamer seek feature
+
+2007-04-09 22:45  yoda-jm
+
+	* configure.in: Added some space
+
+2007-04-09 22:31  yoda-jm
+
+	* configure.in, src/audio.cpp, include/audio.h: Prepared video
+	  gstreamer support
+
+2007-04-09 20:25  yoda-jm
+
+	* src/audio.cpp: Added first gstreamer pause/seek features
+
+2007-04-09 12:50  yoda-jm
+
+	* include/screen_sing.h, src/screen_sing.cpp: Added togglePause and
+	  seeking features, cleanup some code
+
+2007-04-09 12:49  yoda-jm
+
+	* include/audio.h, src/audio.cpp: Added togglePause and seek API
+
+2007-04-08 15:57  yoda-jm
+
+	* include/lyrics.h, src/lyrics.cpp: Applied Matias
+	  patch/fix/comment
+
+2007-04-07 16:06  yoda-jm
+
+	* src/songs.cpp: Fixed latest huge memleak
+
+2007-04-07 16:05  yoda-jm
+
+	* include/screen.h, src/screen_intro.cpp: Fixed song loading (now
+	  CSongs object is deleted before being rebuild)
+
+2007-04-07 16:03  yoda-jm
+
+	* src/theme.cpp: Fixed libxml2 use (memleak)
+
+2007-04-07 14:59  yoda-jm
+
+	* src/: audio.cpp, cairosvg.cpp: Fixed a few things (thanks
+	  valgrind)
+
+2007-04-03 07:36  yoda-jm
+
+	* src/: lyrics.cpp, screen_sing.cpp: Fixed drunk commit
+
+2007-04-02 07:33  yoda-jm
+
+	* src/: lyrics.cpp, screen_sing.cpp: Fixed end-of-file double
+	  sleep/empty sentence lyrics bug
+
+2007-04-02 00:01  yoda-jm
+
+	* src/screen_sing.cpp, include/screen_sing.h: Updated to the new
+	  CLyrics class
+
+2007-04-01 23:39  yoda-jm
+
+	* src/lyrics.cpp: Fixed latest things
+
+2007-04-01 22:52  yoda-jm
+
+	* src/lyrics.cpp: Fixed bug
+
+2007-04-01 19:53  yoda-jm
+
+	* include/lyrics.h, src/lyrics.cpp: Changed CLyrics API
+
+2007-04-01 18:16  yoda-jm
+
+	* src/lyrics.cpp, src/Makefile.am, include/lyrics.h, Makefile.am:
+	  Added first lyrics abstraction
+
+2007-03-31 11:49  yoda-jm
+
+	* src/main.cpp: Added in-game fullscreen switch
+
+2007-03-28 23:33  yoda-jm
+
+	* AUTHORS: Added Matias
+
+2007-03-28 22:44  yoda-jm
+
+	* Makefile.am, include/theme.h, src/screen_sing.cpp, src/theme.cpp,
+	  themes/lima/sing_bg.svg, themes/lima/sing_tostartfg.svg,
+	  themes/default/sing_tostartfg.svg: Added "to start" cursor
+
+2007-03-28 21:25  yoda-jm
+
+	* src/screen_songs.cpp: Added song id and songs number
+
+2007-03-27 20:45  yoda-jm
+
+	* src/songs.cpp: Fixed several memory leaks
+
+2007-03-27 07:46  yoda-jm
+
+	* src/songs.cpp: Added patch for misformated songs
+
+2007-03-27 07:39  yoda-jm
+
+	* src/screen_sing.cpp: Fixed buggy copy-paste
+
+2007-03-23 14:49  yoda-jm
+
+	* src/screen_sing.cpp: Fixed :)
+
+2007-03-23 14:48  yoda-jm
+
+	* include/screen.h, src/main.cpp, src/screen_sing.cpp: Added
+	  difficulty (Matias) Updated to new linear note display (Matias)
+
+2007-03-23 12:37  yoda-jm
+
+	* src/main.cpp: Prepared difficulty support
+
+2007-03-18 23:30  yoda-jm
+
+	* configure.in: Updated to new version
+
+2007-03-18 14:03  yoda-jm
+
+	* portage-overlay/games-arcade/ultrastar-ng/:
+	  ultrastar-ng-0.1.2.ebuild, ultrastar-ng-0.1.3.ebuild: Updated
+	  stable ebuild
+
+2007-03-18 13:55  yoda-jm
+
+	* configure.in,
+	  portage-overlay/games-arcade/ultrastar-ng/ultrastar-ng-9999.ebuild:
+	  Updated graphic driver configure flag
+
+2007-03-18 12:34  yoda-jm
+
+	* include/video_driver.h, src/main.cpp, src/video_driver.cpp: Added
+	  fullscreen support
+
+2007-03-18 12:23  yoda-jm
+
+	* src/main.cpp: Fixed getopt return type
+
+2007-03-18 12:20  yoda-jm
+
+	* include/screen.h: Used lima as default theme
+
+2007-03-09 11:20  yoda-jm
+
+	* include/cairosvg.h: Added some doc
+
+2007-03-09 08:54  yoda-jm
+
+	* src/songs.cpp: Fixed relative songs not synching well
+
+2007-03-06 11:38  yoda-jm
+
+	* src/songs.cpp: Fixed first half of the #1674543 sf.net bug
+
+2007-03-03 16:04  yoda-jm
+
+	* src/audio.cpp: Fixed gstreamer audio layer
+
+2007-02-28 01:53  yoda-jm
+
+	* configure.in, src/Makefile.am, src/main.cpp: Applied modified
+	  Miriam Ruiz (Debian) patch
+
+2007-02-26 15:53  yoda-jm
+
+	* src/screen_sing.cpp: Added FIXME (crashing feature)
+
+2007-02-23 06:19  stekern
+
+	* src/screen_sing.cpp: video support in opengl mode
+
+2007-02-22 19:51  stekern
+
+	* src/video_driver.cpp: Fix bug introduced when doing optimisations
+
+2007-02-22 19:40  stekern
+
+	* src/screen_songs.cpp: Fix cover not showing bug
+
+2007-02-22 06:30  stekern
+
+	* include/screen_sing.h, include/video_driver.h,
+	  src/screen_sing.cpp, src/video_driver.cpp: more optimisation
+
+2007-02-22 01:03  yoda-jm
+
+	* src/audio.cpp: Applied Jean-Marc patch (gstreamer preview now
+	  runs ok)
+
+2007-02-21 19:07  stekern
+
+	* include/screen_sing.h, include/video_driver.h,
+	  src/screen_sing.cpp, src/video_driver.cpp: Optimisations
+
+2007-02-21 01:26  yoda-jm
+
+	* src/audio.cpp: Added todo things
+
+2007-02-20 23:59  yoda-jm
+
+	* src/audio.cpp: Used some gstreamer #defines
+
+2007-02-20 21:05  yoda-jm
+
+	* include/audio.h, include/screen_songs.h, src/audio.cpp,
+	  src/screen_songs.cpp: Added song preview (thanks Touff-Ray)
+
+2007-02-19 15:27  yoda-jm
+
+	*
+	  portage-overlay/games-arcade/ultrastar-ng/ultrastar-ng-9999.ebuild:
+	  Added opengl flag
+
+2007-02-19 15:05  yoda-jm
+
+	* src/screen_sing.cpp: Removed video driver specific code
+
+2007-02-19 14:41  yoda-jm
+
+	* src/screen_songs.cpp: Fixed sdl rendering regression
+
+2007-02-19 06:44  yoda-jm
+
+	* include/screen_sing.h, src/screen_sing.cpp: Updated to new video
+	  driver interface
+
+2007-02-19 06:41  yoda-jm
+
+	* include/video_driver.h, src/screen_intro.cpp: Fixed: commit fight
+
+2007-02-19 06:34  yoda-jm
+
+	* include/screen_songs.h, src/screen_songs.cpp: Updated to
+	  videoDriver interface
+
+2007-02-19 06:33  yoda-jm
+
+	* src/main.cpp: Fixed videoDriver use
+
+2007-02-19 06:31  yoda-jm
+
+	* src/sdl_gl.cpp, src/video_driver.cpp, include/video_driver.h:
+	  Fixed glClear misplaced
+
+2007-02-19 06:28  yoda-jm
+
+	* include/screen_intro.h, src/screen_intro.cpp: Commited back my
+	  version
+
+2007-02-19 06:20  stekern
+
+	* include/screen_intro.h, src/screen_intro.cpp: Updated to use
+	  video_driver
+
+2007-02-19 05:47  stekern
+
+	* include/video_driver.h: Added the new functions and vectors
+
+2007-02-19 05:43  stekern
+
+	* src/screen_sing.cpp: revert back to old color masks until better
+	  solution is found
+
+2007-02-19 04:33  yoda-jm
+
+	* src/video_driver.cpp: Fixed : now compile
+
+2007-02-19 04:28  yoda-jm
+
+	* include/screen.h: Added video driver
+
+2007-02-19 04:28  yoda-jm
+
+	* include/sdl_gl.h, src/sdl_gl.cpp: Added texture freeing and
+	  texture placing
+
+2007-02-19 04:26  yoda-jm
+
+	* include/cairosvg.h: Added cairo surface getter
+
+2007-02-18 19:12  yoda-jm
+
+	* TODO: Updated
+
+2007-02-18 18:57  yoda-jm
+
+	* src/screen_sing.cpp: Used screen rgb mask
+
+2007-02-18 18:19  stekern
+
+	* src/screen_sing.cpp: Fixed colorbug when in opengl mode and video
+	  is present
+
+2007-02-18 18:12  stekern
+
+	* src/screen_songs.cpp: Fixed drawing order when in opengl mode
+
+2007-02-18 16:37  yoda-jm
+
+	* src/screen_sing.cpp: Added stroke
+
+2007-02-18 16:17  yoda-jm
+
+	* configure.in: Removed gfxPrimitives.h include (not needed
+	  anymore)
+
+2007-02-18 16:03  yoda-jm
+
+	* src/: screen_sing.cpp, screen_songs.cpp: Enhanced typo
+
+2007-02-18 15:47  yoda-jm
+
+	* src/screen_songs.cpp: Removed glClear call
+
+2007-02-18 15:35  yoda-jm
+
+	* src/screen_intro.cpp: Removed opengl clearing call
+
+2007-02-18 15:11  yoda-jm
+
+	* Makefile.am, include/sdl_gl.h, include/video_driver.h,
+	  src/Makefile.am, src/main.cpp, src/sdl_gl.cpp,
+	  src/video_driver.cpp: Started abstracting the video driver
+
+2007-02-18 13:55  stekern
+
+	* include/sdl_gl.h, src/sdl_gl.cpp: opengl support (forgot some
+	  files)
+
+2007-02-18 13:45  stekern
+
+	* Makefile.am, configure.in, include/screen_intro.h,
+	  include/screen_sing.h, include/screen_songs.h, src/Makefile.am,
+	  src/main.cpp, src/screen_intro.cpp, src/screen_sing.cpp,
+	  src/screen_songs.cpp: opengl support
+
+2007-02-17 14:12  yoda-jm
+
+	* TODO: Added some TODO things
+
+2007-02-16 18:33  yoda-jm
+
+	*
+	  portage-overlay/games-arcade/ultrastar-ng/ultrastar-ng-9999.ebuild:
+	  Added ~amd64 keyword
+
+2007-02-16 06:11  stekern
+
+	* src/theme.cpp: Fixed text-not-centered bug
+
+2007-02-15 12:56  yoda-jm
+
+	*
+	  portage-overlay/games-arcade/ultrastar-ng/ultrastar-ng-0.1.2.ebuild:
+	  Added amd64 keyword
+
+2007-02-15 11:40  yoda-jm
+
+	* portage-overlay/games-arcade/ultrastar-ng/:
+	  ultrastar-ng-0.1.1.ebuild, ultrastar-ng-0.1.2.ebuild: Added new
+	  ebuild release
+
+2007-02-15 11:24  yoda-jm
+
+	* configure.in: Updated version
+
+2007-02-14 11:31  yoda-jm
+
+	* src/main.cpp: Added "disable sound capture" command line switch
+
+2007-02-14 10:33  yoda-jm
+
+	* src/: main.cpp, screenmanager.cpp: Added absolute path management
+
+2007-02-13 18:47  yoda-jm
+
+	* src/main.cpp: Removed non-needed SDL audio support
+
+2007-02-13 18:44  yoda-jm
+
+	* src/songs.cpp: Fixed possible segfault when SDL_image is compiled
+	  without png/jpeg support
+
+2007-02-13 08:48  yoda-jm
+
+	* themes/lima/intro.svg, themes/lima/no_cover.png,
+	  themes/lima/no_cover.svg, themes/lima/readme.txt,
+	  themes/lima/sing_bg.svg, themes/lima/sing_lyricscurrent.svg,
+	  themes/lima/sing_lyricshighlight.svg,
+	  themes/lima/sing_lyricsnext.svg, themes/lima/sing_p1box.svg,
+	  themes/lima/sing_p1score.svg, themes/lima/sing_p2box.svg,
+	  themes/lima/sing_p2score.svg, themes/lima/sing_progressfg.svg,
+	  themes/lima/sing_timetxt.svg, themes/lima/songs_bg.svg,
+	  themes/lima/songs_order.svg, themes/lima/songs_song.svg,
+	  Makefile.am, configure.in, images/no_cover.png, src/Makefile.am,
+	  src/songs.cpp, themes/default/no_cover.png: Added new theme,
+	  removed old one, added no_cover.png image to the theme
+
+2007-02-13 04:43  yoda-jm
+
+	* src/pitch_graph.cpp: Fixed pitch graph behavior
+
+2007-02-13 04:43  yoda-jm
+
+	* src/screen_sing.cpp: Fixed typo
+
+2007-02-12 00:46  yoda-jm
+
+	* configure.in: Appended cvs instead of dev to the cvs version
+
+2007-02-11 14:30  yoda-jm
+
+	* src/main.cpp: Fixed typo in usage
+
+2007-02-09 17:59  yoda-jm
+
+	* TODO: Imported TODO features from sourceforge tracker
+
+2007-02-06 20:34  yoda-jm
+
+	* src/: main.cpp, screen_sing.cpp, screen_songs.cpp, songs.cpp:
+	  Secured sprintf use
+
+2007-02-05 22:40  yoda-jm
+
+	* README: Updated README
+
+2007-02-05 22:33  yoda-jm
+
+	* TODO: Updated TODO things
+
+2007-02-05 22:25  yoda-jm
+
+	* src/screen_intro.cpp: Fixed som typos
+
+2007-02-05 22:07  yoda-jm
+
+	* include/audio.h, src/audio.cpp: Added comments Removed deprecated
+	  methods
+
+2007-02-03 14:48  yoda-jm
+
+	* src/songs.cpp: Replaced sprintf with snprintf
+
+2007-02-03 13:12  yoda-jm
+
+	* Makefile.am: Fixed bug in theme installation
+
+2007-02-03 12:06  yoda-jm
+
+	* Makefile.am, include/screen.h, src/main.cpp,
+	  src/screen_intro.cpp, src/screenmanager.cpp, src/theme.cpp: Added
+	  theme selection
+
+2007-02-03 02:22  yoda-jm
+
+	* configure.in, src/main.cpp: Added some options to command line
+
+2007-02-02 23:31  yoda-jm
+
+	* src/screen_songs.cpp, src/songs.cpp, include/songs.h: Fixed
+	  recuring segfault when no song is found
+
+2007-02-02 23:16  yoda-jm
+
+	* src/songs.cpp: Fixed null pointer use
+
+2007-02-01 19:55  yoda-jm
+
+	* portage-overlay/games-arcade/ultrastar-ng/:
+	  ultrastar-ng-0.1.0.ebuild, ultrastar-ng-0.1.1.ebuild: Updated
+	  UltraStar-NG gentoo stable package
+
+2007-02-01 19:44  yoda-jm
+
+	* ChangeLog, configure.in: Updated version
+
 2007-01-30 15:31  yoda-jm
 
 	*
@@ -76,8 +782,8 @@
 2007-01-19 19:15  yoda-jm
 
 	* portage-overlay/games-arcade/ultrastar-ng/:
-	  ultrastar-ng-0.1.0.ebuild, ultrastar-ng-9999.ebuild (utags:
-	  ULTRASTAR-NG-0_1_0): Added new ebuilds
+	  ultrastar-ng-0.1.0.ebuild, ultrastar-ng-9999.ebuild: Added new
+	  ebuilds
 
 2007-01-19 19:14  yoda-jm
 
@@ -97,8 +803,8 @@
 
 	* Makefile.am, configure.in, include/screen.h, src/Makefile.am,
 	  src/main.cpp, src/screen_intro.cpp, src/screen_songs.cpp,
-	  src/screenmanager.cpp, src/songs.cpp, src/theme.cpp (utags:
-	  ULTRASTAR-NG-0_1_0): Updated to the installable version
+	  src/screenmanager.cpp, src/songs.cpp, src/theme.cpp: Updated to
+	  the installable version
 
 2007-01-18 18:28  yoda-jm
 
@@ -110,32 +816,22 @@
 
 2007-01-17 21:07  yoda-jm
 
-	* AUTHORS (tags: ULTRASTAR-NG-0_1_0): Updated
+	* AUTHORS: Updated
 
 2007-01-17 20:40  yoda-jm
 
-	* README, TODO (utags: ULTRASTAR-NG-0_1_0): Updated to autoconf
-	  release
+	* README, TODO: Updated to autoconf release
 
 2007-01-17 20:35  yoda-jm
 
-	* Makefile, configure.in, include/audio.h (tags:
-	  ULTRASTAR-NG-0_1_0), include/cairosvg.h (tags:
-	  ULTRASTAR-NG-0_1_0), include/cairotosdl.h (tags:
-	  ULTRASTAR-NG-0_1_0), include/pitch_graph.h (tags:
-	  ULTRASTAR-NG-0_1_0), include/record.h (tags: ULTRASTAR-NG-0_1_0),
-	  include/screen.h, include/screen_intro.h (tags:
-	  ULTRASTAR-NG-0_1_0), include/screen_sing.h (tags:
-	  ULTRASTAR-NG-0_1_0), include/screen_songs.h (tags:
-	  ULTRASTAR-NG-0_1_0), include/singleton.h (tags:
-	  ULTRASTAR-NG-0_1_0), include/songs.h (tags: ULTRASTAR-NG-0_1_0),
-	  include/theme.h (tags: ULTRASTAR-NG-0_1_0), src/audio.cpp (tags:
-	  ULTRASTAR-NG-0_1_0), src/cairosvg.cpp (tags: ULTRASTAR-NG-0_1_0),
-	  src/cairotosdl.cpp (tags: ULTRASTAR-NG-0_1_0), src/main.cpp,
-	  src/pitch_graph.cpp (tags: ULTRASTAR-NG-0_1_0), src/record.cpp
-	  (tags: ULTRASTAR-NG-0_1_0), src/screen_sing.cpp (tags:
-	  ULTRASTAR-NG-0_1_0), src/screen_songs.cpp, src/songs.cpp,
-	  src/theme.cpp: Updated to automake
+	* Makefile, configure.in, include/audio.h, include/cairosvg.h,
+	  include/cairotosdl.h, include/pitch_graph.h, include/record.h,
+	  include/screen.h, include/screen_intro.h, include/screen_sing.h,
+	  include/screen_songs.h, include/singleton.h, include/songs.h,
+	  include/theme.h, src/audio.cpp, src/cairosvg.cpp,
+	  src/cairotosdl.cpp, src/main.cpp, src/pitch_graph.cpp,
+	  src/record.cpp, src/screen_sing.cpp, src/screen_songs.cpp,
+	  src/songs.cpp, src/theme.cpp: Updated to automake
 
 2007-01-17 02:33  yoda-jm
 
@@ -151,15 +847,13 @@
 
 2007-01-16 17:43  yoda-jm
 
-	* AUTHORS, COPYING (tags: ULTRASTAR-NG-0_1_0), ChangeLog (tags:
-	  ULTRASTAR-NG-0_1_0), LICENSE, NEWS (tags: ULTRASTAR-NG-0_1_0):
-	  Added mandatory automake files
+	* AUTHORS, COPYING, ChangeLog, LICENSE, NEWS: Added mandatory
+	  automake files
 
 2007-01-16 17:34  yoda-jm
 
-	* Makefile.am, autogen.sh (tags: ULTRASTAR-NG-0_1_0), configure.in,
-	  src/Makefile.am: Added first autotools support (not yet
-	  functionnal)
+	* Makefile.am, autogen.sh, configure.in, src/Makefile.am: Added
+	  first autotools support (not yet functionnal)
 
 2007-01-16 09:36  yoda-jm
 
@@ -203,11 +897,10 @@
 2007-01-10 07:41  stekern
 
 	* include/screen_sing.h, include/theme.h, src/screen_sing.cpp,
-	  src/theme.cpp, themes/default/sing_lyricscurrent.svg (tags:
-	  ULTRASTAR-NG-0_1_0), themes/default/sing_lyricshighlight.svg
-	  (tags: ULTRASTAR-NG-0_1_0), themes/default/sing_lyricsnext.svg
-	  (tags: ULTRASTAR-NG-0_1_0), themes/default/sing_whole.svg (tags:
-	  ULTRASTAR-NG-0_1_0): Two text lines
+	  src/theme.cpp, themes/default/sing_lyricscurrent.svg,
+	  themes/default/sing_lyricshighlight.svg,
+	  themes/default/sing_lyricsnext.svg,
+	  themes/default/sing_whole.svg: Two text lines
 
 2007-01-09 14:23  yoda-jm
 
@@ -244,13 +937,11 @@
 2007-01-07 20:11  stekern
 
 	* include/songs.h, src/screen_sing.cpp, src/songs.cpp,
-	  themes/default/sing_bg.svg (tags: ULTRASTAR-NG-0_1_0),
-	  themes/default/sing_p1box.svg (tags: ULTRASTAR-NG-0_1_0),
-	  themes/default/sing_p1score.svg (tags: ULTRASTAR-NG-0_1_0),
-	  themes/default/sing_p2box.svg (tags: ULTRASTAR-NG-0_1_0),
-	  themes/default/sing_p2score.svg (tags: ULTRASTAR-NG-0_1_0),
-	  themes/default/sing_whole.svg: Applying background+video patch
-	  (thanks Sebastian) + theme improvements
+	  themes/default/sing_bg.svg, themes/default/sing_p1box.svg,
+	  themes/default/sing_p1score.svg, themes/default/sing_p2box.svg,
+	  themes/default/sing_p2score.svg, themes/default/sing_whole.svg:
+	  Applying background+video patch (thanks Sebastian) + theme
+	  improvements
 
 2007-01-07 17:56  stekern
 
@@ -261,9 +952,9 @@
 	  themes/default/sing_lyricsnext.svg,
 	  themes/default/sing_p1box.svg, themes/default/sing_p1score.svg,
 	  themes/default/sing_p2box.svg, themes/default/sing_p2score.svg,
-	  themes/default/sing_progressfg.svg (tags: ULTRASTAR-NG-0_1_0),
-	  themes/default/sing_timetxt.svg (tags: ULTRASTAR-NG-0_1_0),
-	  themes/default/sing_whole.svg: Improved theme support
+	  themes/default/sing_progressfg.svg,
+	  themes/default/sing_timetxt.svg, themes/default/sing_whole.svg:
+	  Improved theme support
 
 2007-01-04 00:54  yoda-jm
 
@@ -403,8 +1094,7 @@
 2006-11-02 01:32  yoda-jm
 
 	* include/screen_songs.h, src/screen_songs.cpp,
-	  themes/default/songs.svg (tags: ULTRASTAR-NG-0_1_0): Added theme
-	  for screen_songs
+	  themes/default/songs.svg: Added theme for screen_songs
 
 2006-11-01 10:52  yoda-jm
 
@@ -433,8 +1123,7 @@
 
 2006-10-31 02:03  yoda-jm
 
-	* themes/default/intro.svg (tags: ULTRASTAR-NG-0_1_0): Updated
-	  theme for use of librsvg
+	* themes/default/intro.svg: Updated theme for use of librsvg
 
 2006-10-31 01:54  yoda-jm
 
@@ -511,7 +1200,7 @@
 
 2006-10-26 02:45  yoda-jm
 
-	* songs/.cvsignore (tags: ULTRASTAR-NG-0_1_0): Added cvsignore file
+	* songs/.cvsignore: Added cvsignore file
 
 2006-10-26 02:43  yoda-jm
 
@@ -675,20 +1364,17 @@
 	  src/main.cpp, src/record.cpp, src/screen_intro.cpp,
 	  src/screen_sing.cpp, src/screen_songs.cpp, src/screenmanager.cpp,
 	  src/songs.cpp, src/texture.cpp, songs/Jamelia - Superstar
-	  (Demo)/Jamelia - Superstar (Demo).png (tags: ULTRASTAR-NG-0_1_0),
-	  songs/Jamelia - Superstar (Demo)/Jamelia - Superstar (Demo).sco
-	  (tags: ULTRASTAR-NG-0_1_0), songs/Jamelia - Superstar
-	  (Demo)/Jamelia - Superstar (Demo).txt (tags: ULTRASTAR-NG-0_1_0),
-	  images/no_cover.png (tags: ULTRASTAR-NG-0_1_0), sounds/shot.wav
-	  (tags: ULTRASTAR-NG-0_1_0), sounds/change.mp3, sounds/explose.wav
-	  (tags: ULTRASTAR-NG-0_1_0), include/audio.h, include/display.h,
-	  include/graphics.h, include/ini.h, include/light.h,
-	  include/record.h, include/screen.h, include/screen_intro.h,
-	  include/screen_sing.h, include/screen_songs.h,
-	  include/singleton.h, include/songs.h, include/texture.h,
+	  (Demo)/Jamelia - Superstar (Demo).png, songs/Jamelia - Superstar
+	  (Demo)/Jamelia - Superstar (Demo).sco, songs/Jamelia - Superstar
+	  (Demo)/Jamelia - Superstar (Demo).txt, images/no_cover.png,
+	  sounds/shot.wav, sounds/change.mp3, sounds/explose.wav,
+	  include/audio.h, include/display.h, include/graphics.h,
+	  include/ini.h, include/light.h, include/record.h,
+	  include/screen.h, include/screen_intro.h, include/screen_sing.h,
+	  include/screen_songs.h, include/singleton.h, include/songs.h,
+	  include/texture.h,
 	  portage-overlay/games-arcade/ultrastar-ng/ultrastar-ng-0.0.3.ebuild,
-	  sounds/change.wav (tags: ULTRASTAR-NG-0_1_0) (utags: start):
-	  Initial import
+	  sounds/change.wav: Initial import
 
 2006-10-15 13:52  yoda-jm
 
