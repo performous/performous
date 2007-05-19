@@ -47,6 +47,9 @@ void CScreenSongs::manageEvent( SDL_Event event )
 				fprintf(stdout,"Entering search mode\n");
 				searchMode = true;
 				searchExpr[0] = '\0';
+				fprintf(stdout,"Search mode not yet available\n");
+				fprintf(stdout,"Exiting search mode\n");
+				searchMode = false;
 			}
 
 			if( searchMode ) {

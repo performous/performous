@@ -200,14 +200,14 @@ AC_SUBST(ALSA_LIBS)
 case $video_layer in
 	gstreamer*)
 		if test $gst_detected = yes ; then
-			video_layer="gstreamer"
+			video_layer="no"
 		else
 			video_layer="no"
 		fi
 		;;
 	xine*)
 		if test $xine_detected = yes ; then
-			video_layer="xine"
+			video_layer="no"
 		else
 			video_layer="no"
 		fi
@@ -220,13 +220,11 @@ case $video_layer in
 		fi
 		;;
 	autodetect*)
-		if test $gst_detected = yes ; then
-			video_layer="gstreamer"
-		else if test $smpeg_detected = yes ; then
+		if test $smpeg_detected = yes ; then
 			video_layer="smpeg"
 		else
 			video_layer="no"
-		fi ; fi
+		fi
 		;;
 esac
 case $video_layer in
