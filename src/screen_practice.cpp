@@ -71,8 +71,8 @@ void CScreenPractice::draw( void )
 		int posXsharp;
 		int posYsharp;
 		int octave = note/12;
-		bool sharp;
-		unsigned char noteOffset;
+		bool sharp=false;
+		unsigned char noteOffset=0;
 		switch(note%12) {
 			case 0:
 				sharp=false;
