@@ -5,6 +5,7 @@
 #include <screen_songs.h>
 #include <screen_sing.h>
 #include <screen_practice.h>
+#include <screen_score.h>
 #include <video_driver.h>
 unsigned int width=800;
 unsigned int height=600;
@@ -165,6 +166,8 @@ int main( int argc, char ** argv )
 	screen = new CScreenSing("Sing");
 	screenManager->addScreen(screen);
 	screen = new CScreenPractice("Practice");
+	screenManager->addScreen(screen);
+	screen = new CScreenScore("Score");
 	screenManager->addScreen(screen);
 
 	screenManager->activateScreen("Intro");

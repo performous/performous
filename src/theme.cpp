@@ -398,3 +398,23 @@ CThemeSing::~CThemeSing() {
         delete p1box;
         delete theme;
 }
+CThemeScore::CThemeScore() {
+	char * theme_path = new char[1024];
+	CScreenManager * sm = CScreenManager::getSingletonPtr();
+
+	sm->getThemePathFile(theme_path,"score_bg.svg");
+	bg = new CairoSVG(theme_path, sm->getWidth(), sm->getHeight());
+
+	theme = new CTheme(sm->getWidth(), sm->getHeight());
+	sm->getThemePathFile(theme_path,"score_txt.svg");
+	theme->ParseSVGForText(theme_path, &normal_score);
+
+	sm->getThemePathFile(theme_path,"score_rank.svg");
+	theme->ParseSVGForText(theme_path, &rank);
+	
+	delete[] theme_path;
+}
+CThemeScore::~CThemeScore() {
+	delete bg;
+	delete theme;
+}

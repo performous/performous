@@ -98,7 +98,7 @@ void CScreenSing::manageEvent( SDL_Event event )
 		case SDL_KEYDOWN:
 			keypressed = event.key.keysym.sym;
 			if( keypressed == SDLK_ESCAPE || keypressed == SDLK_q ) {
-				sm->activateScreen("Songs");
+				sm->activateScreen("Score");
 			} else if( keypressed == SDLK_SPACE || keypressed == SDLK_p ) {
 				sm->getAudio()->togglePause();
 			} else if( keypressed == SDLK_PLUS ) {
@@ -131,7 +131,7 @@ void CScreenSing::draw( void )
         theme->theme->clear();
 
 	if( !sm->getAudio()->isPlaying() ) {
-		sm->activateScreen("Songs");
+		sm->activateScreen("Score");
 		return;
 	}
 

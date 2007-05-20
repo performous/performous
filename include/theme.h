@@ -101,4 +101,15 @@ class CThemeSing {
         private:
 };
 
+class CThemeScore {
+	public:
+	CThemeScore();
+	~CThemeScore();
+	CairoSVG *bg;
+	TThemeTxt normal_score;
+	TThemeTxt rank;
+	CTheme *theme;
+	private:
+};
+
 #endif
