@@ -412,6 +412,9 @@ CThemeScore::CThemeScore() {
 	sm->getThemePathFile(theme_path,"score_rank.svg");
 	theme->ParseSVGForText(theme_path, &rank);
 	
+	sm->getThemePathFile(theme_path,"score_level.svg");
+        theme->ParseSVGForRect(theme_path, &level);
+
 	delete[] theme_path;
 }
 CThemeScore::~CThemeScore() {

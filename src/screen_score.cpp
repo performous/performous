@@ -46,6 +46,7 @@ void CScreenScore::draw( void )
 			int score = song->score[0].score/10*10;
 			char scoreStr[32];
 			char rankStr[32];
+			float scorePercent;
 			sprintf(scoreStr,"%4d",int(score));
 			theme->normal_score.text = scoreStr;
 			
@@ -60,10 +61,18 @@ void CScreenScore::draw( void )
 			else
 				sprintf(rankStr,"Hit singer");
 
+			double oldY = theme->level.y;
+			scorePercent = score/10000.;
+			theme->level.y = theme->level.y + theme->level.final_height * (1.-scorePercent);
+			theme->level.height = theme->level.final_height * scorePercent;
+
 			theme->rank.text = rankStr;
 			
 			theme->theme->PrintText(&theme->normal_score);
 			theme->theme->PrintText(&theme->rank);
+			theme->theme->DrawRect(theme->level);
+
+			theme->level.y = oldY;
 		}
 	}
 

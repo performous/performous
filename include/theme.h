@@ -108,6 +108,7 @@ class CThemeScore {
 	CairoSVG *bg;
 	TThemeTxt normal_score;
 	TThemeTxt rank;
+        TThemeRect level;
 	CTheme *theme;
 	private:
 };

@@ -43,6 +43,7 @@ themeslima_DATA = lima/no_cover.png \
 	lima/practice_sharp.svg \
 	lima/score_bg.svg \
 	lima/score_rank.svg \
+	lima/score_level.svg \
 	lima/score_txt.svg
 
 EXTRA_DIST = $(themesdef_DATA) $(themeslima_DATA)
