@@ -14,11 +14,9 @@
    height="600"
    id="svg3465"
    sodipodi:version="0.32"
-   inkscape:version="0.45"
+   inkscape:version="0.44.1"
    sodipodi:docname="sing_bg.svg"
-   sodipodi:docbase="/home/yoda/UltraStar/sf/UltraStar-ng/themes/lima"
-   inkscape:output_extension="org.inkscape.output.svg.inkscape"
-   sodipodi:modified="true">
+   sodipodi:docbase="/home/jesusda/docs/curro/yo/ultrastar-ng/lima_0.1.4">
   <metadata
      id="metadata30">
     <rdf:RDF>
@@ -50,17 +48,6 @@
      inkscape:current-layer="svg3465" />
   <defs
      id="defs3467">
-    <linearGradient
-       id="linearGradient16183">
-      <stop
-         id="stop16185"
-         offset="0"
-         style="stop-color:white;stop-opacity:1;" />
-      <stop
-         id="stop16187"
-         offset="1"
-         style="stop-color:white;stop-opacity:0;" />
-    </linearGradient>
     <linearGradient
        inkscape:collect="always"
        id="linearGradient3667">
@@ -374,6 +361,6 @@
      height="74.28759"
      x="10.356207"
      y="495.35623"
-     style="fill:#ffffff;fill-opacity:0.24313725;stroke:#ffffff;stroke-width:0.71241343;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
+     style="fill:white;fill-opacity:0.24313725;stroke:white;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline;opacity:1;color:black;fill-rule:nonzero;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-dashoffset:0;visibility:visible;overflow:visible"
      id="rect2246" />
 </svg>

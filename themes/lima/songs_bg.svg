@@ -444,62 +444,6 @@
          offset="1"
          style="stop-color:#747474;stop-opacity:1;" />
     </linearGradient>
-    <pattern
-       patternTransform="translate(-1617.143,1084.094)"
-       inkscape:collect="always"
-       patternUnits="userSpaceOnUse"
-       width="480"
-       height="360"
-       id="pattern6660">
-      <image
-         xlink:href="vlcsnap-9026435.png"
-         sodipodi:absref="/home/jesusda/vlcsnap-9026435.png"
-         width="480"
-         height="360"
-         id="image6662" />
-    </pattern>
-    <pattern
-       patternTransform="translate(-1680,1701.237)"
-       inkscape:collect="always"
-       patternUnits="userSpaceOnUse"
-       width="480"
-       height="360"
-       id="pattern6644">
-      <image
-         xlink:href="vlcsnap-9023967.png"
-         sodipodi:absref="/home/jesusda/vlcsnap-9023967.png"
-         width="480"
-         height="360"
-         id="image6646" />
-    </pattern>
-    <pattern
-       patternTransform="translate(-1415.727,265.713)"
-       inkscape:collect="always"
-       patternUnits="userSpaceOnUse"
-       width="480"
-       height="360"
-       id="pattern2837">
-      <image
-         xlink:href="vlcsnap-9024504.png"
-         sodipodi:absref="/home/jesusda/vlcsnap-9024504.png"
-         width="480"
-         height="360"
-         id="image2839" />
-    </pattern>
-    <pattern
-       patternTransform="matrix(1.880952,0,0,1.880952,-1217.204,150.4855)"
-       inkscape:collect="always"
-       patternUnits="userSpaceOnUse"
-       width="480"
-       height="360"
-       id="pattern1930">
-      <image
-         xlink:href="vlcsnap-9024504b.png"
-         sodipodi:absref="/home/jesusda/vlcsnap-9024504b.png"
-         width="480"
-         height="360"
-         id="image1932" />
-    </pattern>
     <linearGradient
        id="linearGradient3751"
        inkscape:collect="always">
