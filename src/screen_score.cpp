@@ -24,7 +24,6 @@ void CScreenScore::exit( void )
 
 void CScreenScore::manageEvent( SDL_Event event )
 {
-	int keypressed;
 	switch(event.type) {
 		case SDL_KEYDOWN:
 			CScreenManager::getSingletonPtr()->activateScreen("Songs");
