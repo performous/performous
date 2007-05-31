@@ -35,6 +35,8 @@ void CScreenIntro::manageEvent( SDL_Event event )
 				CScreenManager::getSingletonPtr()->finished();
 			} else if( keypressed == SDLK_s ) {
 				CScreenManager::getSingletonPtr()->activateScreen("Songs");
+			} else if( keypressed == SDLK_c ) {
+				CScreenManager::getSingletonPtr()->activateScreen("Configuration");
 			} else if( keypressed == SDLK_p ) {
 				CScreenManager::getSingletonPtr()->activateScreen("Practice");
 			}

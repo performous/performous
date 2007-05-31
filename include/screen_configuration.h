@@ -1,0 +1,22 @@
+#ifndef __SCREENCONFIGURATION_H__
+#define __SCREENCONFIGURATION_H__
+
+#include "../config.h"
+
+#include <screen.h>
+#include <cairosvg.h>
+#include <configuration.h>
+
+class CScreenConfiguration : public CScreen {
+	public:
+	CScreenConfiguration( char * name );
+	~CScreenConfiguration();
+	void enter(void);
+	void exit(void);
+	void manageEvent( SDL_Event event );
+	void draw(void);
+	private:
+	std::vector <CConfiguration *> configuration;
+};
+
+#endif
