@@ -4,6 +4,7 @@
 CConfigurationFullscreen::CConfigurationFullscreen()
 {
 	fullscreen=false;
+	description="Fullscreen mode";
 }
 CConfigurationFullscreen::~CConfigurationFullscreen()
 {
