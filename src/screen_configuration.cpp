@@ -4,6 +4,7 @@ CScreenConfiguration::CScreenConfiguration(char * name)
 {
 	screenName = name;
 	configuration.push_back(new CConfigurationFullscreen());
+	selected=0;
 }
 
 CScreenConfiguration::~CScreenConfiguration()
@@ -32,6 +33,16 @@ void CScreenConfiguration::manageEvent( SDL_Event event )
 
 			if( keypressed == SDLK_ESCAPE ) {
 				CScreenManager::getSingletonPtr()->activateScreen("Intro");
+			} else if( keypressed == SDLK_LEFT ) {
+				configuration[selected]->setPrevious();
+			} else if( keypressed == SDLK_RIGHT ) {
+				configuration[selected]->setNext();
+			} else if( keypressed == SDLK_UP ) {
+				if( selected > 0 )
+					selected--;
+			} else if( keypressed == SDLK_DOWN ) {
+				if( selected < configuration.size() - 1  )
+					selected++;
 			}
 	}
 }

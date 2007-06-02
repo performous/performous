@@ -10,6 +10,7 @@ CScreenManager::CScreenManager( int _width , int _height , char * _songs_dir , c
 	songs = NULL;
 	currentScreen = NULL;
 	songId = 0;
+	fullscreen=false;
 	width = _width;
 	height = _height;
 	m_songs_dir = _songs_dir;

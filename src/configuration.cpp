@@ -35,4 +35,9 @@ char * CConfigurationFullscreen::getValue()
 }
 void CConfigurationFullscreen::apply()
 {
+	CScreenManager * sm = CScreenManager::getSingletonPtr();
+	if( sm->getFullscreenStatus() != fullscreen ) {
+		SDL_WM_ToggleFullScreen(sm->getSDLScreen());
+		sm->setFullscreenStatus(fullscreen);
+	}
 }

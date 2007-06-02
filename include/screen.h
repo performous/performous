@@ -51,6 +51,9 @@ class CScreenManager : public CSingleton <CScreenManager>{
 	
 	CVideoDriver * getVideoDriver( void ) {return videoDriver;};
 	void setVideoDriver( CVideoDriver * _videoDriver ) {videoDriver=_videoDriver;};
+	
+	bool getFullscreenStatus( void ) {return fullscreen;};
+	void setFullscreenStatus( bool _fullscreen ) {fullscreen=_fullscreen;};
 
 	CSongs * getSongs( void ) {return songs;};
 	void setSongs( CSongs * _songs ) {
@@ -78,6 +81,7 @@ class CScreenManager : public CSingleton <CScreenManager>{
 	CRecord * record;
 	CSongs * songs;
 	CVideoDriver * videoDriver;
+	bool fullscreen;
 	int songId;
 	bool m_finished;
 	int width;

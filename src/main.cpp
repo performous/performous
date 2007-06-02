@@ -10,7 +10,6 @@
 #include <video_driver.h>
 unsigned int width=800;
 unsigned int height=600;
-unsigned int fullscreen=0;
 
 SDL_Event event;
 SDL_Surface * screenSDL;
@@ -32,6 +31,7 @@ void checkEvents( void )
 			SDLMod modifier = event.key.keysym.mod;
 			if( keypressed == SDLK_f && modifier&KMOD_ALT ) {
 				SDL_WM_ToggleFullScreen(screenSDL);
+				screenManager->setFullscreenStatus(!screenManager->getFullscreenStatus());
 				break;
 			}
 		}
@@ -48,7 +48,7 @@ void init( void )
 	
 	SDL_WM_SetCaption(PACKAGE" - "VERSION, "WM_DEFAULT");
 
-	screenSDL = videoDriver->init( width, height, fullscreen );
+	screenSDL = videoDriver->init( width, height, screenManager->getFullscreenStatus() );
 
 	SDL_ShowCursor(SDL_DISABLE);
 	SDL_EnableUNICODE(SDL_ENABLE);
@@ -121,7 +121,7 @@ int main( int argc, char ** argv )
 				capture=false;
 				break;
 			case 'f':
-				fullscreen = 1;
+				screenManager->setFullscreenStatus(true);
 				break;
 			case 'd':
 				difficulty = atoi(optarg);
@@ -147,12 +147,12 @@ int main( int argc, char ** argv )
 
 	videoDriver = new CVideoDriver();
 
-	init();
-
 	if( theme_name != NULL )
 		screenManager = new CScreenManager( width, height , songs_directory , theme_name );
 	else
 		screenManager = new CScreenManager( width, height , songs_directory );
+
+	init();
 
 	screenManager->setSDLScreen(screenSDL);
 	screenManager->setAudio( new CAudio() );
