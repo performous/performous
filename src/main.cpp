@@ -89,6 +89,7 @@ int main( int argc, char ** argv )
 	int ch                 = 0;
 	SDL_Thread *thread     = NULL;
 	unsigned int difficulty= 2;
+	bool fullscreen        = false;
 
 	static struct option long_options[] =
 		{
@@ -121,7 +122,7 @@ int main( int argc, char ** argv )
 				capture=false;
 				break;
 			case 'f':
-				screenManager->setFullscreenStatus(true);
+				fullscreen=true;
 				break;
 			case 'd':
 				difficulty = atoi(optarg);
@@ -151,6 +152,8 @@ int main( int argc, char ** argv )
 		screenManager = new CScreenManager( width, height , songs_directory , theme_name );
 	else
 		screenManager = new CScreenManager( width, height , songs_directory );
+	
+	screenManager->setFullscreenStatus(fullscreen);
 
 	init();
 
