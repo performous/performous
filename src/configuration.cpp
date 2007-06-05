@@ -3,7 +3,8 @@
 
 CConfigurationFullscreen::CConfigurationFullscreen()
 {
-	fullscreen=false;
+	CScreenManager * sm = CScreenManager::getSingletonPtr();
+	fullscreen = sm->getFullscreenStatus();
 	description="Fullscreen mode";
 }
 CConfigurationFullscreen::~CConfigurationFullscreen()
@@ -41,4 +42,56 @@ void CConfigurationFullscreen::apply()
 		SDL_WM_ToggleFullScreen(sm->getSDLScreen());
 		sm->setFullscreenStatus(fullscreen);
 	}
+}
+
+/****************************************************************************/
+
+CConfigurationDifficulty::CConfigurationDifficulty()
+{
+	CScreenManager * sm = CScreenManager::getSingletonPtr();
+	difficulty = sm->getDifficulty();
+	description="Difficulty";
+}
+CConfigurationDifficulty::~CConfigurationDifficulty()
+{
+}
+bool CConfigurationDifficulty::isLast()
+{
+	return (difficulty>=2);
+}
+bool CConfigurationDifficulty::isFirst()
+{
+	return (difficulty<=0);
+}
+void CConfigurationDifficulty::setNext()
+{
+	difficulty++;
+	apply();
+}
+void CConfigurationDifficulty::setPrevious()
+{
+	difficulty--;
+	apply();
+}
+char * CConfigurationDifficulty::getValue()
+{
+	switch(difficulty) {
+		case 0:
+			return "Easy";
+			break;
+		case 1:
+			return "Medium";
+			break;
+		case 2:
+			return "Hard";
+			break;
+		default:
+			return "Error";
+			break;
+	}
+}
+void CConfigurationDifficulty::apply()
+{
+	CScreenManager * sm = CScreenManager::getSingletonPtr();
+	sm->setDifficulty(difficulty);
 }

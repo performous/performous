@@ -4,6 +4,7 @@ CScreenConfiguration::CScreenConfiguration(char * name)
 {
 	screenName = name;
 	configuration.push_back(new CConfigurationFullscreen());
+	configuration.push_back(new CConfigurationDifficulty());
 	selected=0;
 }
 

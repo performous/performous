@@ -17,7 +17,7 @@ class CScreenConfiguration : public CScreen {
 	void draw(void);
 	private:
 	std::vector <CConfiguration *> configuration;
-	int selected;
+	unsigned int selected;
 };
 
 #endif
