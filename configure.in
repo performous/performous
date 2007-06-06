@@ -102,6 +102,9 @@ PKG_CHECK_MODULES(fftw3f, fftw3f , ,
 PKG_CHECK_MODULES(alsa, alsa , ,
 	AC_MSG_ERROR(This game connot be build without alsa))
 
+PKG_CHECK_MODULES(pangocairo, pangocairo , ,
+	AC_MSG_ERROR(This game connot be build without pango for cairo))
+
 PKG_CHECK_MODULES(librsvg, librsvg-2.0 , [librsvg_detected=yes] , [librsvg_detected=no])
 PKG_CHECK_MODULES(cairosvg, cairo-svg , [cairosvg_detected=yes] , [cairosvg_detected=no])
 PKG_CHECK_MODULES(xine, libxine , [xine_detected=yes] , [xine_detected=no])
@@ -195,6 +198,17 @@ $ac_includes_default
 USNG_EOF)
 AC_SUBST(ALSA_FLAGS)
 AC_SUBST(ALSA_LIBS)
+
+# Do things for alsa
+PANGOCAIRO_FLAGS=`pkg-config --cflags pangocairo`
+PANGOCAIRO_LIBS=`pkg-config --libs pangocairo`
+ac_includes_default=$(cat <<USNG_EOF
+$ac_includes_default
+/* pango cairo headers */
+#include <pango/pangocairo.h>
+USNG_EOF)
+AC_SUBST(PANGOCAIRO_FLAGS)
+AC_SUBST(PANGOCAIRO_LIBS)
 
 # Do things for video
 case $video_layer in
