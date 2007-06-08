@@ -265,7 +265,8 @@ CSongs::CSongs()
 
 	char * theme_path = new char[1024];
 	CScreenManager::getSingletonPtr()->getThemePathFile(theme_path,"no_cover.png");
-	SDL_RWops *rwop_nocover = SDL_RWFromFile(theme_path, "rb");
+	SDL_RWops *rwop_nocover = NULL;
+	rwop_nocover = SDL_RWFromFile(theme_path, "rb");
 	delete[] theme_path;
 			    	
 
@@ -276,7 +277,8 @@ CSongs::CSongs()
 	int h = CScreenManager::getSingletonPtr()->getHeight()*256/600;
 	surface_nocover = zoomSurface(surface_nocover_tmp,(double)w/surface_nocover_tmp->w,(double)h/surface_nocover_tmp->h,1);
 	SDL_FreeSurface(surface_nocover_tmp);
-	SDL_FreeRW(rwop_nocover);
+	if( rwop_nocover != NULL )
+		SDL_RWclose(rwop_nocover);
 	}
 
 	if( surface_nocover == NULL ) {
@@ -323,22 +325,24 @@ CSongs::CSongs()
                         }
 
 		        snprintf(buff,1024,"%s/%s/%s",songs_dir,dirEntry->d_name,tmp->cover);
-		        SDL_RWops *rwop = SDL_RWFromFile(buff, "rb");
+		        SDL_RWops *rwop = NULL;
+			rwop = SDL_RWFromFile(buff, "rb");
 		        SDL_Surface * coverSurface = NULL;
                         if(strstr(tmp->cover, ".png"))
-                            coverSurface = IMG_LoadPNG_RW(rwop);
+                        	coverSurface = IMG_LoadPNG_RW(rwop);
 		        else if(strstr(tmp->cover, ".jpg"))
-                            coverSurface = IMG_LoadJPG_RW(rwop);
-			SDL_FreeRW(rwop);
+                        	coverSurface = IMG_LoadJPG_RW(rwop);
+			if( rwop != NULL )
+				SDL_RWclose(rwop);
 	                           
                         if( coverSurface == NULL )
-			    tmp->coverSurf = surface_nocover;
+				tmp->coverSurf = surface_nocover;
 		        else {
-			    // Here we want to have cover of 256x256 in 800x600 and scale it if the resolution is different
-			    int w = CScreenManager::getSingletonPtr()->getWidth()*256/800;
-			    int h = CScreenManager::getSingletonPtr()->getHeight()*256/600;
-			    tmp->coverSurf = zoomSurface(coverSurface,(double) w/coverSurface->w,(double) h/coverSurface->h,1);
-			    SDL_FreeSurface(coverSurface);
+				// Here we want to have cover of 256x256 in 800x600 and scale it if the resolution is different
+				int w = CScreenManager::getSingletonPtr()->getWidth()*256/800;
+				int h = CScreenManager::getSingletonPtr()->getHeight()*256/600;
+				tmp->coverSurf = zoomSurface(coverSurface,(double) w/coverSurface->w,(double) h/coverSurface->h,1);
+				SDL_FreeSurface(coverSurface);
 		        }
 		        
                         
@@ -346,15 +350,19 @@ CSongs::CSongs()
                             SDL_Surface * backgroundSurface = NULL;
 
                             if(strstr(tmp->background, ".png")) {
+			    	rwop = NULL;
                                 snprintf(buff,1024,"%s/%s/%s",songs_dir,dirEntry->d_name,tmp->background);
                                 rwop = SDL_RWFromFile(buff, "rb");
                                 backgroundSurface = IMG_LoadPNG_RW(rwop);
-			        SDL_FreeRW(rwop);
+				if( rwop != NULL )
+			        	SDL_RWclose(rwop);
                             } else if(strstr(tmp->background, ".jpg")) {
+			    	rwop = NULL;
                                 snprintf(buff,1024,"%s/%s/%s",songs_dir,dirEntry->d_name,tmp->background);
                                 rwop = SDL_RWFromFile(buff, "rb");
                                 backgroundSurface = IMG_LoadJPG_RW(rwop);
-			        SDL_FreeRW(rwop);
+				if( rwop != NULL )
+			        	SDL_RWclose(rwop);
 		            }
                         
                                                  
