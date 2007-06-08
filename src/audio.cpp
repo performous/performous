@@ -53,6 +53,26 @@ CAudio::~CAudio()
 #endif
 }
 
+unsigned int CAudio::getVolume()
+{
+#ifdef USE_LIBXINE_AUDIO
+	return xine_get_param( stream, XINE_PARAM_AUDIO_VOLUME );
+#endif
+#ifdef USE_GSTREAMER_AUDIO
+	return 100;
+#endif
+}
+
+void CAudio::setVolume( unsigned int _volume )
+{
+#ifdef USE_LIBXINE_AUDIO
+	xine_set_param( stream, XINE_PARAM_AUDIO_VOLUME, _volume );
+#endif
+#ifdef USE_GSTREAMER_AUDIO
+	_volume = _volume;
+#endif
+}
+
 void CAudio::playMusic( char * filename )
 {
         if (isPlaying()) 

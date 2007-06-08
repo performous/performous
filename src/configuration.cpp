@@ -95,3 +95,43 @@ void CConfigurationDifficulty::apply()
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
 	sm->setDifficulty(difficulty);
 }
+
+/****************************************************************************/
+
+CConfigurationAudioVolume::CConfigurationAudioVolume()
+{
+	CScreenManager * sm = CScreenManager::getSingletonPtr();
+	audioVolume = sm->getAudio()->getVolume();
+	description="Audio Volume";
+}
+CConfigurationAudioVolume::~CConfigurationAudioVolume()
+{
+}
+bool CConfigurationAudioVolume::isLast()
+{
+	return (audioVolume>=100);
+}
+bool CConfigurationAudioVolume::isFirst()
+{
+	return (audioVolume<=0);
+}
+void CConfigurationAudioVolume::setNext()
+{
+	audioVolume++;
+	apply();
+}
+void CConfigurationAudioVolume::setPrevious()
+{
+	audioVolume--;
+	apply();
+}
+char * CConfigurationAudioVolume::getValue()
+{
+	sprintf(value,"%d%%",audioVolume);
+	return value;
+}
+void CConfigurationAudioVolume::apply()
+{
+	CScreenManager * sm = CScreenManager::getSingletonPtr();
+	sm->getAudio()->setVolume(audioVolume);
+}

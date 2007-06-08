@@ -67,8 +67,11 @@ class CAudio {
 	 * position cannot be computed, 0 is returned.
 	 */
 	int getPosition( void );
+	unsigned int getVolume( void );
+	void setVolume( unsigned int _volume );
         private:
 	int length;
+	unsigned int audioVolume;
 #ifdef USE_LIBXINE_AUDIO
         xine_t               *xine;
         xine_stream_t        *stream;

@@ -46,4 +46,18 @@ class CConfigurationDifficulty : public CConfiguration {
 		unsigned int difficulty;
 };
 
+class CConfigurationAudioVolume : public CConfiguration {
+	public:
+		CConfigurationAudioVolume();
+		~CConfigurationAudioVolume();
+		bool isLast();
+		bool isFirst();
+		void setNext();
+		void setPrevious();
+		char * getValue();
+	protected:
+		void apply();
+		unsigned int audioVolume;
+		char value[32];
+};
 #endif
