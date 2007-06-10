@@ -82,6 +82,10 @@ class CSongs {
 		void sortByTitle( void );
 		void sortByArtist( void );
 		int getOrder( void ) {return order;};
+		void loadCover( unsigned int i);
+		void loadBackground( unsigned int i);
+		void unloadCover( unsigned int i);
+		void unloadBackground( unsigned int i);
 	private:
 		std::vector <CSong*> songs;
 		int selected;

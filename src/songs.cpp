@@ -145,6 +145,7 @@ CSong::CSong()
 	mp3 = NULL;
 	background = NULL;
 	backgroundSurf = NULL;
+	coverSurf = NULL;
         video = NULL;
 	noteMin = 256;
 	noteMax = -256;
@@ -253,6 +254,78 @@ bool CSongs::parseFile( CSong * tmp )
 	return true;
 }
 
+void CSongs::loadCover( unsigned int i)
+{
+	if( songs[i]->coverSurf == NULL ) {
+		CSong * song = songs[i];
+		char buff[1024];
+		snprintf(buff,1024,"%s/%s",song->path,song->cover);
+		SDL_RWops *rwop = NULL;
+		rwop = SDL_RWFromFile(buff, "rb");
+		SDL_Surface* coverSurface = NULL;
+		if(strstr(song->cover, ".png"))
+			coverSurface = IMG_LoadPNG_RW(rwop);
+		else if(strstr(song->cover, ".jpg"))
+			coverSurface = IMG_LoadJPG_RW(rwop);
+		if( rwop != NULL )
+			SDL_RWclose(rwop);
+
+		if( coverSurface == NULL )
+			song->coverSurf = surface_nocover;
+		else {
+			// Here we want to have cover of 256x256 in 800x600 and scale it if the resolution is different
+			int w = CScreenManager::getSingletonPtr()->getWidth()*256/800;
+			int h = CScreenManager::getSingletonPtr()->getHeight()*256/600;
+			song->coverSurf = zoomSurface(coverSurface,(double) w/coverSurface->w,(double) h/coverSurface->h,1);
+			SDL_FreeSurface(coverSurface);
+		}
+	}
+}
+
+void CSongs::loadBackground( unsigned int i)
+{
+	if( songs[i]->backgroundSurf == NULL && songs[i]->background != NULL ) {
+		CSong * song = songs[i];
+		char buff[1024];
+		snprintf(buff,1024,"%s/%s",song->path,song->background);
+		SDL_RWops *rwop = NULL;
+		rwop = SDL_RWFromFile(buff, "rb");
+		SDL_Surface* backgroundSurface = NULL;
+		if(strstr(song->background, ".png"))
+			backgroundSurface = IMG_LoadPNG_RW(rwop);
+		else if(strstr(song->background, ".jpg"))
+			backgroundSurface = IMG_LoadJPG_RW(rwop);
+		if( rwop != NULL )
+			SDL_RWclose(rwop);
+
+		if( backgroundSurface == NULL )
+			song->backgroundSurf = NULL;
+		else {
+			// Here we want to have cover of 256x256 in 800x600 and scale it if the resolution is different
+			int w = CScreenManager::getSingletonPtr()->getWidth();
+			int h = CScreenManager::getSingletonPtr()->getHeight();
+			song->backgroundSurf = zoomSurface(backgroundSurface,(double) w/backgroundSurface->w,(double) h/backgroundSurface->h,1);
+			SDL_FreeSurface(backgroundSurface);
+		}
+	}
+}
+
+void CSongs::unloadCover( unsigned int i)
+{
+	if( songs[i]->coverSurf != NULL && songs[i]->coverSurf != surface_nocover ) {
+		SDL_FreeSurface(songs[i]->coverSurf);
+	}
+	songs[i]->coverSurf = NULL;
+}
+
+void CSongs::unloadBackground( unsigned int i)
+{
+	if( songs[i]->backgroundSurf != NULL ) {
+		SDL_FreeSurface(songs[i]->backgroundSurf);
+	}
+	songs[i]->backgroundSurf = NULL;
+}
+
 CSongs::CSongs()
 {
 	DIR * dir=NULL;
@@ -323,58 +396,6 @@ CSongs::CSongs()
 		            sprintf(cover,"%s.png",dirEntry->d_name); // safe sprintf
 		            tmp->cover = cover;
                         }
-
-		        snprintf(buff,1024,"%s/%s/%s",songs_dir,dirEntry->d_name,tmp->cover);
-		        SDL_RWops *rwop = NULL;
-			rwop = SDL_RWFromFile(buff, "rb");
-		        SDL_Surface * coverSurface = NULL;
-                        if(strstr(tmp->cover, ".png"))
-                        	coverSurface = IMG_LoadPNG_RW(rwop);
-		        else if(strstr(tmp->cover, ".jpg"))
-                        	coverSurface = IMG_LoadJPG_RW(rwop);
-			if( rwop != NULL )
-				SDL_RWclose(rwop);
-	                           
-                        if( coverSurface == NULL )
-				tmp->coverSurf = surface_nocover;
-		        else {
-				// Here we want to have cover of 256x256 in 800x600 and scale it if the resolution is different
-				int w = CScreenManager::getSingletonPtr()->getWidth()*256/800;
-				int h = CScreenManager::getSingletonPtr()->getHeight()*256/600;
-				tmp->coverSurf = zoomSurface(coverSurface,(double) w/coverSurface->w,(double) h/coverSurface->h,1);
-				SDL_FreeSurface(coverSurface);
-		        }
-		        
-                        
-                        if (tmp->background) {
-                            SDL_Surface * backgroundSurface = NULL;
-
-                            if(strstr(tmp->background, ".png")) {
-			    	rwop = NULL;
-                                snprintf(buff,1024,"%s/%s/%s",songs_dir,dirEntry->d_name,tmp->background);
-                                rwop = SDL_RWFromFile(buff, "rb");
-                                backgroundSurface = IMG_LoadPNG_RW(rwop);
-				if( rwop != NULL )
-			        	SDL_RWclose(rwop);
-                            } else if(strstr(tmp->background, ".jpg")) {
-			    	rwop = NULL;
-                                snprintf(buff,1024,"%s/%s/%s",songs_dir,dirEntry->d_name,tmp->background);
-                                rwop = SDL_RWFromFile(buff, "rb");
-                                backgroundSurface = IMG_LoadJPG_RW(rwop);
-				if( rwop != NULL )
-			        	SDL_RWclose(rwop);
-		            }
-                        
-                                                 
-                            if( backgroundSurface == NULL )
-                                tmp->backgroundSurf = NULL;
-                            else {
-			    	int w = CScreenManager::getSingletonPtr()->getWidth();
-			    	int h = CScreenManager::getSingletonPtr()->getHeight();
-                                tmp->backgroundSurf = zoomSurface(backgroundSurface,(double)w/backgroundSurface->w,(double)h/backgroundSurface->h,1);
-				SDL_FreeSurface(backgroundSurface);
-                            }
-                        }
                         
                         tmp->parseFile();
 			tmp->index = songs.size();
@@ -382,6 +403,11 @@ CSongs::CSongs()
 		}
 	}
 	closedir(dir);
+
+	for(unsigned int i = 0; i < songs.size(); i++) {
+		loadCover(i);
+		loadBackground(i);
+	}
 }
 
 CSongs::~CSongs()
@@ -401,10 +427,8 @@ CSongs::~CSongs()
 			delete[] songs[i]->notes[j]->syllable;
 			delete songs[i]->notes[j];
 		}
-		if( surface_nocover != songs[i]->coverSurf )
-			SDL_FreeSurface(songs[i]->coverSurf);
-		if( songs[i]->backgroundSurf )
-                        SDL_FreeSurface(songs[i]->backgroundSurf);
+		unloadCover(i);
+		unloadBackground(i);
                 delete songs[i];
 	}
 	SDL_FreeSurface(surface_nocover);
