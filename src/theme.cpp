@@ -99,8 +99,8 @@ cairo_text_extents_t CTheme::GetTextExtents(TThemeTxt text) {
 	extents.x_advance = rec.width;
 	extents.y_advance = rec.height;
 
-	pango_font_description_free (desc);
 	g_object_unref (layout);
+	pango_font_description_free (desc);
 	g_object_unref (ctx);
 
         return extents;
