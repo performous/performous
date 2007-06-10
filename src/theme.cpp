@@ -87,17 +87,19 @@ cairo_text_extents_t CTheme::GetTextExtents(TThemeTxt text) {
 	PangoFontDescription *desc = pango_font_description_new();
 	PangoLayout *layout = pango_layout_new(ctx);
 	PangoRectangle rec;
+
 	pango_layout_set_text (layout, text.text, -1);
 	pango_font_description_set_family(desc, text.fontfamily);
 	pango_font_description_set_style (desc,PANGO_STYLE_NORMAL);
 	pango_font_description_set_absolute_size (desc,text.fontsize * PANGO_SCALE);
 	pango_layout_set_font_description (layout, desc);
-	pango_font_description_free (desc);
 	pango_layout_get_pixel_extents (layout,NULL,&rec);
 	extents.width = rec.width;
 	extents.height = rec.height;
 	extents.x_advance = rec.width;
 	extents.y_advance = rec.height;
+
+	pango_font_description_free (desc);
 	g_object_unref (layout);
 	g_object_unref (ctx);
 
@@ -172,7 +174,8 @@ void CTheme::walk_tree(xmlNode * a_node, TThemeTxt *text)
                             }
 			    xmlFree(string);
                         } else if (!strcasecmp((char *) attr->name, "style")) {
-                           string = strtok((char *) xmlGetProp(cur_node, attr->name), ";");
+			   char * orig = (char *) xmlGetProp(cur_node, attr->name);
+                           string = strtok(orig, ";");
                            while (string != NULL) {
                                 if (!strncasecmp(string, "font-size:", 10)) {
                                     sscanf((string + 10),"%lf", &(text->fontsize));
@@ -206,7 +209,7 @@ void CTheme::walk_tree(xmlNode * a_node, TThemeTxt *text)
                                 }
                                 string = strtok(NULL, ";");
                            }
-			   xmlFree(string);
+			   xmlFree(orig);
 
                         }
 

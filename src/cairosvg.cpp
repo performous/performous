@@ -18,6 +18,10 @@ CairoSVG::CairoSVG( const char * filename , unsigned int _width , unsigned int _
 	RsvgDimensionData svgDimension;
 	rsvg_init();
 	svgHandle = rsvg_handle_new_from_file(filename,&pError);
+	if( pError != NULL ) {
+		fprintf (stderr, "CairoSVG::CairoSVG: %s\n", pError->message);
+		g_error_free(pError);
+	}
 	rsvg_handle_get_dimensions (svgHandle, &svgDimension);
 	width  = svgDimension.width;
 	height = svgDimension.height;
