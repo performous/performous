@@ -59,7 +59,9 @@ unsigned int CAudio::getVolume()
 	return xine_get_param( stream, XINE_PARAM_AUDIO_VOLUME );
 #endif
 #ifdef USE_GSTREAMER_AUDIO
-	return 100;
+	gdouble vol;
+	g_object_get (music, "volume", &vol, NULL);
+	return (unsigned int)(vol*100);
 #endif
 }
 
@@ -69,7 +71,8 @@ void CAudio::setVolume( unsigned int _volume )
 	xine_set_param( stream, XINE_PARAM_AUDIO_VOLUME, _volume );
 #endif
 #ifdef USE_GSTREAMER_AUDIO
-	_volume = _volume;
+	gdouble vol = _volume/100.;
+	g_object_set (music, "volume", vol, NULL);
 #endif
 }
 
