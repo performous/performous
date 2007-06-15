@@ -6,6 +6,7 @@
 #include <screen.h>
 #include <cairosvg.h>
 #include <configuration.h>
+#include <theme.h>
 
 class CScreenConfiguration : public CScreen {
 	public:
@@ -16,6 +17,8 @@ class CScreenConfiguration : public CScreen {
 	void manageEvent( SDL_Event event );
 	void draw(void);
 	private:
+        CThemeConfiguration *theme;
+        unsigned int bg_texture;
 	std::vector <CConfiguration *> configuration;
 	unsigned int selected;
 };

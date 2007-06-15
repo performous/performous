@@ -113,4 +113,15 @@ class CThemeScore {
 	private:
 };
 
+class CThemeConfiguration {
+	public:
+	CThemeConfiguration();
+	~CThemeConfiguration();
+	CairoSVG *bg;
+	TThemeTxt item;
+	TThemeTxt value;
+	CTheme *theme;
+	private:
+};
+
 #endif

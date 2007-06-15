@@ -5,6 +5,7 @@ CScreenConfiguration::CScreenConfiguration(char * name)
 	screenName = name;
 	configuration.push_back(new CConfigurationFullscreen());
 	configuration.push_back(new CConfigurationDifficulty());
+	configuration.push_back(new CConfigurationAudioVolume());
 	selected=0;
 }
 
@@ -16,10 +17,14 @@ CScreenConfiguration::~CScreenConfiguration()
 
 void CScreenConfiguration::enter( void )
 {
+	CScreenManager * sm = CScreenManager::getSingletonPtr();
+        theme = new CThemeConfiguration();
+	bg_texture = sm->getVideoDriver()->initSurface(theme->bg->getSDLSurface());
 }
 
 void CScreenConfiguration::exit( void )
 {
+	delete theme;
 }
 
 void CScreenConfiguration::manageEvent( SDL_Event event )
@@ -35,9 +40,11 @@ void CScreenConfiguration::manageEvent( SDL_Event event )
 			if( keypressed == SDLK_ESCAPE ) {
 				CScreenManager::getSingletonPtr()->activateScreen("Intro");
 			} else if( keypressed == SDLK_LEFT ) {
-				configuration[selected]->setPrevious();
+				if( !configuration[selected]->isFirst() )
+					configuration[selected]->setPrevious();
 			} else if( keypressed == SDLK_RIGHT ) {
-				configuration[selected]->setNext();
+				if( !configuration[selected]->isLast() )
+					configuration[selected]->setNext();
 			} else if( keypressed == SDLK_UP ) {
 				if( selected > 0 )
 					selected--;
@@ -50,4 +57,23 @@ void CScreenConfiguration::manageEvent( SDL_Event event )
 
 void CScreenConfiguration::draw( void )
 {
+	CScreenManager * sm = CScreenManager::getSingletonPtr();
+	theme->theme->clear();
+	cairo_text_extents_t extents;
+
+	// Draw the "Order by" text
+	{
+	theme->item.text = configuration[selected]->getDescription();
+	extents = theme->theme->GetTextExtents(theme->item);
+	theme->item.x = (theme->item.svg_width - extents.width)/2;
+	theme->theme->PrintText(&theme->item);
+
+	theme->value.text = configuration[selected]->getValue();
+	extents = theme->theme->GetTextExtents(theme->value);
+	theme->value.x = (theme->value.svg_width - extents.width)/2;
+	theme->theme->PrintText(&theme->value);
+	}
+
+	sm->getVideoDriver()->drawSurface(bg_texture);
+	sm->getVideoDriver()->drawSurface(theme->theme->getCurrent());
 }

@@ -457,3 +457,24 @@ CThemeScore::~CThemeScore() {
 	delete bg;
 	delete theme;
 }
+
+CThemeConfiguration::CThemeConfiguration() {
+	char * theme_path = new char[1024];
+	CScreenManager * sm = CScreenManager::getSingletonPtr();
+
+	sm->getThemePathFile(theme_path,"configuration_bg.svg");
+	bg = new CairoSVG(theme_path, sm->getWidth(), sm->getHeight());
+
+	theme = new CTheme(sm->getWidth(), sm->getHeight());
+	sm->getThemePathFile(theme_path,"configuration_item.svg");
+	theme->ParseSVGForText(theme_path, &item);
+
+	sm->getThemePathFile(theme_path,"configuration_value.svg");
+	theme->ParseSVGForText(theme_path, &value);
+	
+	delete[] theme_path;
+}
+CThemeConfiguration::~CThemeConfiguration() {
+	delete bg;
+	delete theme;
+}
