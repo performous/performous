@@ -18,7 +18,10 @@ themesdef_DATA = default/no_cover.png \
 	default/practice_bg.svg \
 	default/practice_txt.svg \
 	default/practice_note.svg \
-	default/practice_sharp.svg
+	default/practice_sharp.svg \
+	default/configuration_bg.svg \
+	default/configuration_item.svg \
+	default/configuration_value.svg
 
 themeslimadir   = @THEMES_DIR@/lima
 themeslima_DATA = lima/no_cover.png \
@@ -44,6 +47,9 @@ themeslima_DATA = lima/no_cover.png \
 	lima/score_bg.svg \
 	lima/score_rank.svg \
 	lima/score_level.svg \
-	lima/score_txt.svg
+	lima/score_txt.svg \
+	lima/configuration_bg.svg \
+	lima/configuration_item.svg \
+	lima/configuration_value.svg
 
 EXTRA_DIST = $(themesdef_DATA) $(themeslima_DATA)
