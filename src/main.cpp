@@ -72,7 +72,7 @@ void usage( char * progname )
 	fprintf(stdout," -H, --height (default: 480) set window height\n");
 	fprintf(stdout," -t, --theme                 set theme (theme name or absolute path to the\n");
 	fprintf(stdout,"                             theme)\n");
-	fprintf(stdout," -c, --no-capture            disable sound capture thread\n");
+	fprintf(stdout," -c, --capture-device        sound capture device (none to disable)\n");
 	fprintf(stdout," -f, --fullscreen            enable fullscreen video output\n");
 	fprintf(stdout," -d, --difficulty            set difficulty level\n");
 	fprintf(stdout,"                             (0: easy, 1:medium, 2:hard (default))\n");
@@ -85,6 +85,7 @@ int main( int argc, char ** argv )
 {
 	char * songs_directory = NULL;
 	char * theme_name      = NULL;
+	char * capture_device  = "default";
 	CScreen * screen       = NULL;
 	int ch                 = 0;
 	SDL_Thread *thread     = NULL;
@@ -97,14 +98,14 @@ int main( int argc, char ** argv )
 		{"height",required_argument,NULL,'H'},
 		{"theme",required_argument,NULL,'t'},
 		{"help",no_argument,NULL,'h'},
-		{"no-capture",no_argument,NULL,'c'},
+		{"capture-device",required_argument,NULL,'c'},
 		{"version",no_argument,NULL,'v'},
 		{"difficulty",required_argument,NULL,'d'},
 		{"fullscreen",no_argument,NULL,'f'},
 		{0, 0, 0, 0}
 	};
 
-	while ((ch = getopt_long(argc, argv, "t:W:H:hcfd:v", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "t:W:H:hc:fd:v", long_options, NULL)) != -1) {
 		switch(ch) {
 			case 't':
 				theme_name = optarg;
@@ -119,7 +120,10 @@ int main( int argc, char ** argv )
 				usage(argv[0]);
 				break;
 			case 'c':
-				capture=false;
+				if(!strncmp("none",optarg,5))
+					capture=false;
+				else
+					capture_device=optarg;
 				break;
 			case 'f':
 				fullscreen=true;
@@ -159,7 +163,7 @@ int main( int argc, char ** argv )
 
 	screenManager->setSDLScreen(screenSDL);
 	screenManager->setAudio( new CAudio() );
-	screenManager->setRecord( new CRecord() );
+	screenManager->setRecord( new CRecord(capture_device) );
 	screenManager->setVideoDriver( videoDriver );
 	screenManager->setDifficulty( difficulty );
 	
