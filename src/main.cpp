@@ -72,7 +72,7 @@ void usage( char * progname )
 	fprintf(stdout," -H, --height (default: 480) set window height\n");
 	fprintf(stdout," -t, --theme                 set theme (theme name or absolute path to the\n");
 	fprintf(stdout,"                             theme)\n");
-	fprintf(stdout," -c, --capture-device        sound capture device (none to disable)\n");
+	fprintf(stdout," -c, --capture-device        set sound capture device (none to disable)\n");
 	fprintf(stdout," -f, --fullscreen            enable fullscreen video output\n");
 	fprintf(stdout," -d, --difficulty            set difficulty level\n");
 	fprintf(stdout,"                             (0: easy, 1:medium, 2:hard (default))\n");
