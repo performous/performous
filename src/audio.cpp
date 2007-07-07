@@ -120,7 +120,7 @@ void CAudio::playPreview( char * filename )
         int pos_stream;
 	int pos_time;
 
-        if (!xine_open(stream, filename) || !xine_play(stream, 0, 30000)) {
+        if (!xine_open(stream, filename) || !xine_play(stream, 0, 0) || !xine_play(stream, 0, 30000)) {
             printf("could not open %s\n", filename);
         }
 
