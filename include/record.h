@@ -20,7 +20,7 @@ class CFft {
 	fftwf_complex *fftOut;
 	fftwf_plan fftPlan;
 	float m_freq;
-
+	double *window;
 };
 
 class CRecord {

@@ -21,6 +21,10 @@ CFft::CFft(int size)
 	memset(fftSampleBuffer, 0, fftSize*sizeof(float));
 	memset(fftLastPhase, 0, (fftSize/2+1)*sizeof(float));
 	fftFrameCount = 0;
+	window = (double *)malloc(fftSize * sizeof(double));
+	for (int i=0; i<fftSize; i++)
+	  window[i] = -.5*cos(2.*M_PI*(double)i/(double)fftSize)+.5;
+
 }
 CFft::~CFft()
 {
@@ -28,6 +32,7 @@ CFft::~CFft()
 	fftwf_free(fftIn);
 	free(fftSampleBuffer);
 	free(fftLastPhase);
+	free(window);
 }
 
 void CFft::measure(int nframes, int overlap, float *indata)
@@ -51,8 +56,7 @@ void CFft::measure(int nframes, int overlap, float *indata)
 			fftSample = fftSampleBuffer + (fftSize-stepSize);
 
 			for (k=0; k<fftSize; k++) {
-				double window = -.5*cos(2.*M_PI*(double)k/(double)fftSize)+.5;
-				fftIn[k] = fftSampleBuffer[k] * window;
+				fftIn[k] = fftSampleBuffer[k] * window[k];
 			}
 			fftwf_execute(fftPlan);
 
