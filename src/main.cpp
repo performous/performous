@@ -50,6 +50,12 @@ void init( void )
 
 	screenSDL = videoDriver->init( width, height, screenManager->getFullscreenStatus() );
 
+	if( screenSDL == NULL ) {
+		fprintf(stderr,"Cannot initialize screen\n");
+		SDL_Quit();
+		exit(EXIT_FAILURE);
+	}
+
 	SDL_ShowCursor(SDL_DISABLE);
 	SDL_EnableUNICODE(SDL_ENABLE);
 	SDL_EnableKeyRepeat(125, 125);
