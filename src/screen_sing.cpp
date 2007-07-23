@@ -127,6 +127,7 @@ void CScreenSing::draw( void )
 	float resFactorX = sm->getWidth()/800.;
 	float resFactorY = sm->getHeight()/600.;
 	float resFactorAvg = (resFactorX + resFactorY)/2.;
+	double oldfontsize;
 
         theme->theme->clear();
 
@@ -355,8 +356,18 @@ void CScreenSing::draw( void )
         tmptxt.text = sentenceWhole;
         cairo_text_extents_t extents = theme->theme->GetTextExtents(tmptxt);
         theme->lyricspast.x = (theme->lyricspast.svg_width - extents.width)/2;
-        theme->lyricspast.extents.x_advance = 0;
-        theme->lyricshighlight.extents.x_advance= 0;
+	oldfontsize = theme->lyricspast.fontsize;
+	while (theme->lyricspast.x < 0) {
+		theme->lyricspast.fontsize -= 2;
+		theme->lyricshighlight.fontsize -= 2;
+		theme->lyricsfuture.fontsize -= 2;
+		tmptxt = theme->lyricspast;
+		tmptxt.text = sentenceWhole;
+		cairo_text_extents_t extents = theme->theme->GetTextExtents(tmptxt);
+		theme->lyricspast.x = (theme->lyricspast.svg_width - extents.width)/2;
+	}
+	theme->lyricspast.extents.x_advance = 0;
+	theme->lyricshighlight.extents.x_advance= 0;
         
         if( sentencePast[0] ) {
                 theme->lyricspast.text = sentencePast;
@@ -389,11 +400,21 @@ void CScreenSing::draw( void )
                 theme->lyricsnextsentence.text = sentenceNextSentence;
                 theme->lyricsnextsentence.extents = theme->theme->GetTextExtents(theme->lyricsnextsentence);
                 theme->lyricsnextsentence.x = (theme->lyricsnextsentence.svg_width - theme->lyricsnextsentence.extents.width)/2;
+                while (theme->lyricsnextsentence.x < 0) {
+			theme->lyricsnextsentence.fontsize -= 2;
+			theme->lyricsnextsentence.extents = theme->theme->GetTextExtents(theme->lyricsnextsentence);
+			theme->lyricsnextsentence.x = (theme->lyricsnextsentence.svg_width - theme->lyricsnextsentence.extents.width)/2;
+		}
                 theme->theme->PrintText(&theme->lyricsnextsentence);
         }
 
-        sm->getVideoDriver()->updateSurface(theme_id, theme->theme->getCurrent());
+	theme->lyricspast.fontsize = oldfontsize;
+	theme->lyricshighlight.fontsize = oldfontsize;
+	theme->lyricsfuture.fontsize = oldfontsize;
+	theme->lyricsnextsentence.fontsize = oldfontsize;
+
+	sm->getVideoDriver()->updateSurface(theme_id, theme->theme->getCurrent());
 	sm->getVideoDriver()->drawSurface(theme_id);
-        sm->getVideoDriver()->updateSurface(pitchGraph_id, pitchGraph.getCurrent());
+	sm->getVideoDriver()->updateSurface(pitchGraph_id, pitchGraph.getCurrent());
 	sm->getVideoDriver()->drawSurface(pitchGraph_id);
 }
