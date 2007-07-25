@@ -29,7 +29,7 @@ class CRecord {
 	~CRecord();
 	void compute();
 	float getFreq( void ) { return fft->getFreq(); }
-	char * getNoteStr( int id);
+	const char * getNoteStr( int id);
 	int getNoteId(void);
 	float getNoteFreq(int id);
 	private:

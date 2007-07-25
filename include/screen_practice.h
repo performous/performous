@@ -9,7 +9,7 @@
 
 class CScreenPractice : public CScreen {
 	public:
-	CScreenPractice( char * name );
+	CScreenPractice( const char * name );
 	~CScreenPractice();
 	void enter(void);
 	void exit(void);

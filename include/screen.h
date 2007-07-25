@@ -17,22 +17,22 @@ class CScreen {
 	virtual void draw( void )=0;
 	virtual void enter( void )=0;
 	virtual void exit( void )=0;
-	char * getName( void ) {return screenName;};
+	const char * getName( void ) {return screenName;};
 	protected:
-	char * screenName; // Must be set by each constructor
+	const char * screenName; // Must be set by each constructor
 };
 
 class CScreenManager : public CSingleton <CScreenManager>{
 	public:
-	CScreenManager( int width , int height , char * songs_dir , char * theme_name="lima");
+	CScreenManager( int width , int height , const char * songs_dir , const char * theme_name="lima");
 	~CScreenManager();
 	void addScreen( CScreen * screen ) { 
 		screens.push_back(screen);
 		fprintf(stdout,"Adding screen \"%s\" to screen manager\n",screen->getName());
 	};
-	void activateScreen(char * name);
+	void activateScreen(const char * name);
 	CScreen * getCurrentScreen( void ) {return currentScreen;};
-	CScreen * getScreen(char * name);
+	CScreen * getScreen(const char * name);
 
 	void setSDLScreen( SDL_Surface * _screen ) { screen = _screen;};
 	SDL_Surface * getSDLScreen( void ) { return screen;};
@@ -68,12 +68,12 @@ class CScreenManager : public CSingleton <CScreenManager>{
 	void finished(void) { m_finished=true; };
 	bool isFinished(void) { return m_finished; };
 
-	char * getSongsDirectory( void ) { return m_songs_dir; };
-	char * getThemeName( void ) { return m_theme_name; };
-	void getThemePathFile( char * dest , char * file);
+	const char * getSongsDirectory( void ) { return m_songs_dir; };
+	const char * getThemeName( void ) { return m_theme_name; };
+	void getThemePathFile( char * dest , const char * file);
 	private:
-	char * m_songs_dir;
-	char * m_theme_name;
+	const char * m_songs_dir;
+	const char * m_theme_name;
 	std::vector <CScreen *> screens;
 	CScreen * currentScreen;
 	SDL_Surface * screen;

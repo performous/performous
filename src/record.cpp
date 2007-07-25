@@ -206,9 +206,10 @@ float gameSep[12] = {
 	116.540*QUARTER_TONE,
 	123.470*QUARTER_TONE
 };
-char * note[12] = {"C ","C#","D ","D#","E ","F ","F#","G ","G#","A ","A#","B "};
 
-char * CRecord::getNoteStr( int id )
+const char * note[12] = {"C ","C#","D ","D#","E ","F ","F#","G ","G#","A ","A#","B "};
+
+const char * CRecord::getNoteStr( int id )
 {
 	if( id == -1 )
 		return "  ";

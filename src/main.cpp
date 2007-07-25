@@ -91,7 +91,7 @@ int main( int argc, char ** argv )
 {
 	char * songs_directory = NULL;
 	char * theme_name      = NULL;
-	char * capture_device  = "default";
+	char * capture_device  = (char*)"default";
 	CScreen * screen       = NULL;
 	int ch                 = 0;
 	SDL_Thread *thread     = NULL;

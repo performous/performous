@@ -2,7 +2,7 @@
 
 template<> CScreenManager* CSingleton<CScreenManager>::ms_CSingleton = NULL;
 
-CScreenManager::CScreenManager( int _width , int _height , char * _songs_dir , char * _theme_name )
+CScreenManager::CScreenManager( int _width , int _height , const char * _songs_dir , const char * _theme_name )
 {
 	m_finished=false;
 	audio = NULL;
@@ -26,7 +26,7 @@ CScreenManager::~CScreenManager()
 		delete screens[i];
 }
 
-void CScreenManager::activateScreen(char * name) {
+void CScreenManager::activateScreen(const char * name) {
 	for( unsigned int i = 0 ; i < screens.size() ; i++ )
 		if( !strcmp(screens[i]->getName(),name) ) {
 			if( currentScreen != NULL )
@@ -36,14 +36,14 @@ void CScreenManager::activateScreen(char * name) {
 		}
 }
 
-CScreen * CScreenManager::getScreen(char * name) {
+CScreen * CScreenManager::getScreen(const char * name) {
 	for( unsigned int i = 0 ; i < screens.size() ; i++ )
 		if( !strcmp(screens[i]->getName(),name) )
 			return screens[i];
 	return NULL;
 }
 
-void CScreenManager::getThemePathFile( char * dest , char * file)
+void CScreenManager::getThemePathFile( char * dest , const char * file)
 {
 	if( m_theme_name[0] == '/' )
 		sprintf(dest,"%s/%s",m_theme_name,file);

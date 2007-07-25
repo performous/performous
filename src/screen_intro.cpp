@@ -1,6 +1,6 @@
 #include <screen_intro.h>
 
-CScreenIntro::CScreenIntro(char * name)
+CScreenIntro::CScreenIntro(const char * name)
 {
 	screenName = name;
 	CScreenManager * sm = CScreenManager::getSingletonPtr();

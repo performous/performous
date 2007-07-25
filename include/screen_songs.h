@@ -9,7 +9,7 @@
 
 class CScreenSongs : public CScreen {
 	public:
-	CScreenSongs( char * name );
+	CScreenSongs( const char * name );
 	~CScreenSongs();
 	void enter(void);
 	void exit(void);

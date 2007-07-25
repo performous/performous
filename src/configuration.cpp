@@ -31,9 +31,9 @@ void CConfigurationFullscreen::setPrevious()
 char * CConfigurationFullscreen::getValue()
 {
 	if(fullscreen)
-		return "Fullscreen";
+		return (char*)"Fullscreen";
 	else
-		return "Windowed";
+		return (char*)"Windowed";
 }
 void CConfigurationFullscreen::apply()
 {
@@ -77,16 +77,16 @@ char * CConfigurationDifficulty::getValue()
 {
 	switch(difficulty) {
 		case 0:
-			return "Easy";
+			return (char*)"Easy";
 			break;
 		case 1:
-			return "Medium";
+			return (char*)"Medium";
 			break;
 		case 2:
-			return "Hard";
+			return (char*)"Hard";
 			break;
 		default:
-			return "Error";
+			return (char*)"Error";
 			break;
 	}
 }

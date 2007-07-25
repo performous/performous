@@ -11,11 +11,11 @@ class CConfiguration {
 		virtual bool isFirst()=0;
 		virtual void setNext()=0;
 		virtual void setPrevious()=0;
-		char * getDescription() {return description;};
+		const char * getDescription() {return description;};
 		virtual char * getValue()=0;
 	protected:
 		virtual void apply()=0;
-		char * description;
+		const char * description;
 };
 
 class CConfigurationFullscreen : public CConfiguration {

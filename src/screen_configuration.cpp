@@ -1,6 +1,6 @@
 #include <screen_configuration.h>
 
-CScreenConfiguration::CScreenConfiguration(char * name)
+CScreenConfiguration::CScreenConfiguration(const char * name)
 {
 	screenName = name;
 	configuration.push_back(new CConfigurationFullscreen());
@@ -63,7 +63,7 @@ void CScreenConfiguration::draw( void )
 
 	// Draw the "Order by" text
 	{
-	theme->item.text = configuration[selected]->getDescription();
+	theme->item.text = (char*)configuration[selected]->getDescription();
 	extents = theme->theme->GetTextExtents(theme->item);
 	theme->item.x = (theme->item.svg_width - extents.width)/2;
 	theme->theme->PrintText(&theme->item);

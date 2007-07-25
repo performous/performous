@@ -1,6 +1,6 @@
 #include <screen_practice.h>
 
-CScreenPractice::CScreenPractice(char * name)
+CScreenPractice::CScreenPractice(const char * name)
 {
 	screenName = name;
 }
@@ -123,7 +123,7 @@ void CScreenPractice::draw( void )
 				noteOffset=6;
 				break;
 		}
-        	theme->notetxt.text = record->getNoteStr(note);
+        	theme->notetxt.text = (char*)record->getNoteStr(note);
         	theme->theme->PrintText(&theme->notetxt);
 
 		noteOffset += octave*7;

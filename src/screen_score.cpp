@@ -1,6 +1,6 @@
 #include <screen_score.h>
 
-CScreenScore::CScreenScore(char * name)
+CScreenScore::CScreenScore(const char * name)
 {
 	screenName = name;
 }

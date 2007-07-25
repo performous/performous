@@ -3,7 +3,7 @@
 #include <pitch_graph.h>
 #include <cairotosdl.h>
 
-CScreenSing::CScreenSing(char * name)
+CScreenSing::CScreenSing(const char * name)
 : pitchGraph(CScreenManager::getSingletonPtr()->getWidth(), CScreenManager::getSingletonPtr()->getHeight())
 {
 	screenName = name;
@@ -239,7 +239,7 @@ void CScreenSing::draw( void )
         TThemeTxt tmptxt;
         {
 	tmptxt = theme->timertxt;       // use timertxt as template
-	tmptxt.text = record->getNoteStr(note);
+	tmptxt.text = (char*)record->getNoteStr(note);
 	tmptxt.x=0;
 	tmptxt.y=sm->getHeight();
 	tmptxt.fontsize = 25;

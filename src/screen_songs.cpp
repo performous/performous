@@ -1,7 +1,7 @@
 #include <screen_songs.h>
 #include <cairotosdl.h>
 
-CScreenSongs::CScreenSongs(char * name)
+CScreenSongs::CScreenSongs(const char * name)
 {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
 	screenName = name;
@@ -149,7 +149,7 @@ void CScreenSongs::manageEvent( SDL_Event event )
 	}
 }
 
-char * order[4] = {
+const char * order[4] = {
 	"Order by edition",
 	"Order by genre",
 	"Order by title",
@@ -171,8 +171,7 @@ void CScreenSongs::draw( void )
 
 	// Draw the "Order by" text
 	{
-	char * orderStr = order[sm->getSongs()->getOrder()];
-	theme->order.text = orderStr;
+	theme->order.text = (char*)order[sm->getSongs()->getOrder()];
 	cairo_text_extents_t extents = theme->theme->GetTextExtents(theme->order);
 	theme->order.x = (theme->order.svg_width - extents.width)/2;
 	theme->theme->PrintText(&theme->order);
