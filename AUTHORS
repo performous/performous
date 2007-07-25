@@ -12,9 +12,13 @@ Sebastian Sproesser     <sebastian at sproesser.org>
 	* background management
 	* song sync improvement
 	* current position in the track
-Matias Holte <matiasholte at users.sourceforge.net>
+Matias Holte            <matiasholte at users.sourceforge.net>
 	* screen sing propositions and patchs
 Ignacio Casal Quinteiro <nacho.resa at gmail.com>
 	* gstreamer implementation
-jEsuSdA <info at jesusda.com>
+jEsuSdA                 <info at jesusda.com>
 	* SVG design (lima theme)
+Sylvain Henry           <hsyl20 at yahoo.fr>
+	* Long sentence display patch
+Tobias Gehrig           <tgehrig at users.sourceforge.net>
+	* pre-calculate fft window patch
