@@ -7,7 +7,7 @@ class CVideo {
 	public:
 	CVideo();
 	~CVideo();
-	void loadVideo(char * videoFile, SDL_Surface * videoSurf, int width , int height );
+	bool loadVideo(char * videoFile, SDL_Surface * videoSurf, int width , int height );
 	void unloadVideo();
 	bool isPlaying();
 	void play(void);

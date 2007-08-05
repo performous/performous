@@ -157,6 +157,7 @@ CSong::CSong()
 bool CSongs::parseFile( CSong * tmp )
 {
 	char buff[256];
+	int score = 0;
 	snprintf(buff,256,"%s/%s",tmp->path,tmp->filename);
 	FILE * fp = fopen(buff,"r");
 	if(!fp) {
@@ -174,6 +175,7 @@ bool CSongs::parseFile( CSong * tmp )
 			buff[len-1]='\0'; // Replace the \n or \r with a \0
 			memcpy(title,buff+7,len - 7);
 			tmp->title = title;
+			score++;
 		} else if(!strncmp("#EDITION:",buff,9)) {
 			int len = strlen(buff);
 			char * edition = new char[len - 9];
@@ -182,6 +184,7 @@ bool CSongs::parseFile( CSong * tmp )
 			buff[len-1]='\0'; // Replace the \n or \r with a \0
 			memcpy(edition,buff+9,len - 9);
 			tmp->edition = edition;
+			score++;
 		} else if(!strncmp("#ARTIST:",buff,8)) {
 			int len = strlen(buff);
 			char * artist = new char[len - 8];
@@ -190,6 +193,7 @@ bool CSongs::parseFile( CSong * tmp )
 			buff[len-1]='\0'; // Replace the \n or \r with a \0
 			memcpy(artist,buff+8,len - 8);
 			tmp->artist = artist;
+			score++;
 		} else if(!strncmp("#MP3:",buff,5)) {
 			int len = strlen(buff);
 			char * mp3 = new char[len - 5];
@@ -198,6 +202,7 @@ bool CSongs::parseFile( CSong * tmp )
 			buff[len-1]='\0'; // Replace the \n or \r with a \0
 			memcpy(mp3,buff+5,len - 5);
 			tmp->mp3 = mp3;
+			score++;
 		} else if(!strncmp("#CREATOR:",buff,9)) {
 			int len = strlen(buff);
 			char * creator = new char[len - 9];
@@ -206,8 +211,10 @@ bool CSongs::parseFile( CSong * tmp )
 			buff[len-1]='\0'; // Replace the \n or \r with a \0
 			memcpy(creator,buff+9,len - 9);
 			tmp->creator = creator;
+			score++;
 		} else if(!strncmp("#GAP:",buff,5)) {
 			sscanf(buff+5,"%f",&tmp->gap);
+			score++;
 		} else if(!strncmp("#BPM:",buff,5)) {
 			TBpm bpm;
 			bpm.start = 0.0;
@@ -217,6 +224,7 @@ bool CSongs::parseFile( CSong * tmp )
 				*comma = '.';
 			sscanf(buff+5,"%f",&bpm.bpm);
 			tmp->bpm.push_back(bpm);
+			score++;
 		} else if(!strncmp("#VIDEO:",buff,7)) {
 			int len = strlen(buff);
 			char * video = new char[len - 7];
@@ -225,6 +233,7 @@ bool CSongs::parseFile( CSong * tmp )
 			buff[len-1]='\0'; // Replace the \n or \r with a \0
 			memcpy(video,buff+7,len - 7);
 			tmp->video = video;
+			score++;
                 } else if(!strncmp("#BACKGROUND:",buff,12)) {
                         int len = strlen(buff);
                         char * background = new char[len - 12];
@@ -233,13 +242,16 @@ bool CSongs::parseFile( CSong * tmp )
                         buff[len-1]='\0'; // Replace the \n or \r with a \0
                         memcpy(background,buff+12,len - 12);
                         tmp->background = background;
+			score++;
                 } else if(!strncmp("#VIDEOGAP:",buff,10)) {
 			sscanf(buff+10,"%f",&tmp->videoGap);
+			score++;
 		} else if(!strncmp("#RELATIVE:",buff,10)) {
 			if( buff[10] == 'y'  || buff[10] == 'Y' )
 				tmp->relative = true;
 			else
 				tmp->relative = false;
+			score++;
 		} else if(!strncmp("#COVER:",buff,7)) {
  			int len = strlen(buff);
 			char * cover = new char[len - 7];
@@ -248,10 +260,14 @@ bool CSongs::parseFile( CSong * tmp )
 			buff[len-1]='\0'; // Replace the \n or \r with a \0
 			memcpy(cover,buff+7,len - 7);
 			tmp->cover = cover;
+			score++;
                 }
 	}
 	fclose(fp);
-	return true;
+	if( score == 0 )
+		return false;
+	else
+		return true;
 }
 
 void CSongs::loadCover( unsigned int i)
@@ -263,9 +279,9 @@ void CSongs::loadCover( unsigned int i)
 		SDL_RWops *rwop = NULL;
 		rwop = SDL_RWFromFile(buff, "rb");
 		SDL_Surface* coverSurface = NULL;
-		if(strstr(song->cover, ".png"))
+		if(song->cover != NULL && strstr(song->cover, ".png"))
 			coverSurface = IMG_LoadPNG_RW(rwop);
-		else if(strstr(song->cover, ".jpg"))
+		else if(song->cover != NULL && strstr(song->cover, ".jpg"))
 			coverSurface = IMG_LoadJPG_RW(rwop);
 		if( rwop != NULL )
 			SDL_RWclose(rwop);
@@ -328,12 +344,9 @@ void CSongs::unloadBackground( unsigned int i)
 
 CSongs::CSongs()
 {
-	DIR * dir=NULL;
-	struct dirent* dirEntry;
-	struct stat    info;
-	char buff[1024];
-	char * songs_dir = CScreenManager::getSingletonPtr()->getSongsDirectory();
-	dir = opendir(songs_dir);
+	const char * songs_dir = CScreenManager::getSingletonPtr()->getSongsDirectory();
+	char pattern[1024];
+	glob_t _glob;
 	order = 2;
 
 	char * theme_path = new char[1024];
@@ -359,50 +372,39 @@ CSongs::CSongs()
 		return;
 	}
 
-	if( dir == NULL )
-		return;
+	sprintf(pattern,"%s*/*.[tT][xX][tT]",songs_dir);
+	fprintf(stdout,"Scanning song directory...\n");
+	glob ( pattern, GLOB_NOSORT, NULL, &_glob);
+	fprintf(stdout,"Found %d possible song file%s ...\n",_glob.gl_pathc,(_glob.gl_pathc>1)?"s":"");
 
-	while( (dirEntry = readdir(dir)) != NULL ) {
-		if( dirEntry->d_name[0] == '.' )
-			continue;
-		if( !strcmp(dirEntry->d_name,"CVS") )
-			continue;
-		
+	for( unsigned int i = 0 ; i < _glob.gl_pathc ; i++ ) {
 		char * path = new char[1024];
-		snprintf(path,1024,"%s%s",songs_dir,dirEntry->d_name);
-		stat(path,&info);
-		if ( !S_ISDIR(info.st_mode) ) {
-			delete[] path;
-			continue;
-		}
-
-		fprintf(stdout,"Song directory \"%s\" detected\n",dirEntry->d_name);
-
+		char * txtfilename;
+		txtfilename = strrchr(_glob.gl_pathv[i],'/'); txtfilename[0] = '\0'; txtfilename++;
+		sprintf(path,"%s",_glob.gl_pathv[i]);
+		fprintf(stdout,"Loading song: \"%s\"... ",strrchr(_glob.gl_pathv[i],'/')+1);
 		CSong * tmp = new CSong();
 
 		// Set default orderType to title
 		tmp->orderType = 2;
 		tmp->path = path;
-		char * txt = new char[strlen(dirEntry->d_name)+4+1];
-		sprintf(txt,"%s.txt",dirEntry->d_name); // safe sprintf
+		char * txt = new char[strlen(txtfilename)+1];
+		sprintf(txt,"%s",txtfilename); // safe sprintf
 		tmp->filename = txt;
 		if( !parseFile(tmp) ) {
+			fprintf(stdout,"FAILED\n");
 			delete[] path;
 			delete[] txt;
 			delete tmp;
 		} else {
-			if(!tmp->cover) {
-                            char * cover = new char[strlen(dirEntry->d_name)+4+1];
-		            sprintf(cover,"%s.png",dirEntry->d_name); // safe sprintf
-		            tmp->cover = cover;
-                        }
-                        
+			fprintf(stdout,"OK\n");
                         tmp->parseFile();
 			tmp->index = songs.size();
 			songs.push_back(tmp);
 		}
 	}
-	closedir(dir);
+
+	globfree(&_glob);
 
 	for(unsigned int i = 0; i < songs.size(); i++) {
 		loadCover(i);

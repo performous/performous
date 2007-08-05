@@ -50,23 +50,30 @@ CScreenSing::~CScreenSing()
 void CScreenSing::enter( void )
 {
 	char buff[1024];
+	bool video_ok=false;
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
 	CSong * song = sm->getSong();
         
 	SDL_FillRect(backgroundSurf,NULL,SDL_MapRGB(backgroundSurf->format, 255, 255, 255));
+
 	if( song->video != NULL ) {
 		snprintf(buff,1024,"%s/%s",song->path,song->video);
 		fprintf(stdout,"Now playing: (%d): %s\n",sm->getSongId(),buff);
-		video->loadVideo(buff,videoSurf,sm->getWidth(),sm->getHeight());
-		SDL_BlitSurface(theme->bg->getSDLSurface(),NULL,backgroundSurf,NULL);
-		SDL_BlitSurface(theme->p1box->getSDLSurface(),NULL,backgroundSurf,NULL);
-	} else if ( song->background != NULL) {
-		SDL_BlitSurface(song->backgroundSurf,NULL,backgroundSurf,NULL);
+		video_ok = video->loadVideo(buff,videoSurf,sm->getWidth(),sm->getHeight());
+	}
+
+	if ( video_ok ) {
 		SDL_BlitSurface(theme->bg->getSDLSurface(),NULL,backgroundSurf,NULL);
 		SDL_BlitSurface(theme->p1box->getSDLSurface(),NULL,backgroundSurf,NULL);
 	} else {
-		SDL_BlitSurface(theme->bg->getSDLSurface(),NULL,backgroundSurf,NULL);
-		SDL_BlitSurface(theme->p1box->getSDLSurface(),NULL,backgroundSurf,NULL);
+		if ( song->background != NULL) {
+			SDL_BlitSurface(song->backgroundSurf,NULL,backgroundSurf,NULL);
+			SDL_BlitSurface(theme->bg->getSDLSurface(),NULL,backgroundSurf,NULL);
+			SDL_BlitSurface(theme->p1box->getSDLSurface(),NULL,backgroundSurf,NULL);
+		} else {
+			SDL_BlitSurface(theme->bg->getSDLSurface(),NULL,backgroundSurf,NULL);
+			SDL_BlitSurface(theme->p1box->getSDLSurface(),NULL,backgroundSurf,NULL);
+		}
 	}
 	backgroundSurf_id = sm->getVideoDriver()->initSurface(backgroundSurf);
 	theme_id = sm->getVideoDriver()->initSurface(theme->theme->getCurrent());
