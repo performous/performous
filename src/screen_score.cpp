@@ -41,11 +41,11 @@ void CScreenScore::draw( void )
 	// Draw some numbers
 	{
 		if (song != NULL) {
-			int score = song->score[0].score/10*10;
+			int score = (int) song->score[0].score;
 			char scoreStr[32];
 			char rankStr[32];
 			float scorePercent;
-			sprintf(scoreStr,"%4d",int(score));
+			sprintf(scoreStr,"%4d",score);
 			theme->normal_score.text = scoreStr;
 			
 			if (score < 2000)
