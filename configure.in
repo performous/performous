@@ -59,6 +59,14 @@ AC_ARG_WITH(svg,
 )
 if test $svg_layer = yes ; then svg_layer="librsvg" ; fi
 
+AC_ARG_WITH(record,
+	AC_HELP_STRING(--with-record[={alsa|portaudio}],
+		implementation of the record layer (default: autodetect)),
+	[record_layer="$withval"],
+	[record_layer="autodetect"]
+)
+if test $record_layer = yes ; then record_layer="autodetect" ; fi
+
 AC_ARG_WITH(video,
 	 AC_HELP_STRING(--with-video[={gstreamer|xine|smpeg|disable}],
 	 	implementation of the video rendering layer (default: autodetect)),
@@ -99,21 +107,21 @@ PKG_CHECK_MODULES(libxml, libxml-2.0 , ,
 PKG_CHECK_MODULES(fftw3f, fftw3f , ,
 	AC_MSG_ERROR(This game connot be build without fftw3f))
 
-PKG_CHECK_MODULES(alsa, alsa , ,
-	AC_MSG_ERROR(This game connot be build without alsa))
-
 PKG_CHECK_MODULES(pangocairo, pangocairo , ,
 	AC_MSG_ERROR(This game connot be build without pango for cairo))
 
-PKG_CHECK_MODULES(librsvg, librsvg-2.0 , [librsvg_detected=yes] , [librsvg_detected=no])
-PKG_CHECK_MODULES(cairosvg, cairo-svg , [cairosvg_detected=yes] , [cairosvg_detected=no])
-PKG_CHECK_MODULES(xine, libxine , [xine_detected=yes] , [xine_detected=no])
-PKG_CHECK_MODULES(gstreamer, gstreamer-0.10 , [gst_detected=yes] , [gst_detected=no])
+PKG_CHECK_MODULES(librsvg, librsvg-2.0 , [librsvg_detected="yes"] , [librsvg_detected="no"])
+PKG_CHECK_MODULES(portaudio19, portaudio-2.0 , [portaudio19_detected="yes"] , [portaudio19_detected="no"])
+PKG_CHECK_MODULES(alsa, alsa , [alsa_detected="yes"], [alsa_detected="no"])
+PKG_CHECK_MODULES(cairosvg, cairo-svg , [cairosvg_detected="yes"] , [cairosvg_detected="no"])
+PKG_CHECK_MODULES(xine, libxine , [xine_detected="yes"] , [xine_detected="no"])
+PKG_CHECK_MODULES(gstreamer, gstreamer-0.10 , [gst_detected="yes"] , [gst_detected="no"])
 
 AC_CHECK_PROGS(SDLCONFIG, sdl-config, AC_MSG_ERROR(Cannot find sdl-config))
 AC_CHECK_LIB(SDL_image, IMG_LoadPNG_RW,,AC_MSG_ERROR(Cannot find SDL_image))
 AC_CHECK_LIB(SDL_gfx, zoomSurface,,AC_MSG_ERROR(Cannot find SDL_gfx))
 AC_CHECK_LIB(smpeg,SMPEG_new,[smpeg_detected="yes"],[smpeg_detected="no"])
+AC_CHECK_LIB(portaudio, Pa_Initialize, [portaudio18_detected="yes"] , [portaudio18_detected="no"])
 
 dnl ###########################################################################
 dnl #### processing things
@@ -188,17 +196,6 @@ $ac_includes_default
 USNG_EOF)
 AC_SUBST(FFT_FLAGS)
 AC_SUBST(FFT_LIBS)
-
-# Do things for alsa
-ALSA_FLAGS=`pkg-config --cflags alsa`
-ALSA_LIBS=`pkg-config --libs alsa`
-ac_includes_default=$(cat <<USNG_EOF
-$ac_includes_default
-/* alsa headers */
-#include <alsa/asoundlib.h>
-USNG_EOF)
-AC_SUBST(ALSA_FLAGS)
-AC_SUBST(ALSA_LIBS)
 
 # Do things for alsa
 PANGOCAIRO_FLAGS=`pkg-config --cflags pangocairo`
@@ -335,6 +332,78 @@ esac
 AC_SUBST(AUDIO_FLAGS)
 AC_SUBST(AUDIO_LIBS)
 
+# Do things for record
+case $record_layer in
+	alsa*)
+		if test $alsa_detected = yes ; then
+			record_layer="alsa"
+		else
+			record_layer="no"
+		fi
+		;;
+	portaudio*)
+		if test $portaudio18_detected = yes ; then
+			record_layer="portaudio18"
+		else if test $portaudio19_detected = yes ; then
+			record_layer="portaudio19"
+		else
+			record_layer="no"
+		fi ; fi
+		;;
+	autodetect*)
+		if test $portaudio19_detected = yes ; then
+			record_layer="portaudio19"
+		else if test $portaudio18_detected = yes ; then
+			record_layer="portaudio18"
+		else if test $alsa_detected = yes ; then
+			record_layer="alsa"
+		else
+			record_layer="no"
+		fi ; fi ; fi
+		;;
+esac
+
+case $record_layer in
+	alsa*)
+		RECORD_FLAGS=`pkg-config --cflags alsa`
+		RECORD_LIBS=`pkg-config --libs alsa`
+		ac_includes_default=$(cat <<-USNG_EOF
+		$ac_includes_default
+		/* record headers */
+		#define USE_ALSA_RECORD 1
+		#include <alsa/asoundlib.h>
+		USNG_EOF)
+		;;
+	portaudio18*)
+		RECORD_FLAGS=""
+		RECORD_LIBS="-lportaudio"
+		ac_includes_default=$(cat <<-USNG_EOF
+		$ac_includes_default
+		/* portaudio v.18 headers */
+		#define USE_PORTAUDIO18_RECORD 1
+		#define USE_PORTAUDIO_RECORD 1
+		#include <portaudio/portaudio.h>
+		USNG_EOF)
+		;;
+	portaudio19*)
+		RECORD_FLAGS=`pkg-config --cflags portaudio-2.0`
+		RECORD_LIBS=`pkg-config --libs portaudio-2.0`
+		ac_includes_default=$(cat <<-USNG_EOF
+		$ac_includes_default
+		/* portaudio v.19 headers */
+		#define USE_PORTAUDIO19_RECORD 1
+		#define USE_PORTAUDIO_RECORD 1
+		#include <portaudio.h>
+		USNG_EOF)
+		;;
+	*)
+		AC_MSG_ERROR("Ultrstar-ng doesn't support no record")
+		;;
+esac
+
+AC_SUBST(RECORD_FLAGS)
+AC_SUBST(RECORD_LIBS)
+
 # Do things for svg
 case $svg_layer in
 	librsvg*)
@@ -434,6 +503,7 @@ echo "Option           | Flag                     | Chosen implementation "
 echo "--------------------------------------------------------------------"
 echo "debug            | --{enable,disable}-debug | $debug                "
 echo "audio            | --with-audio             | $audio_layer          "
+echo "record           | --with-record            | $record_layer         "
 echo "video            | --with-video             | $video_layer          "
 echo "svg              | --with-svg               | $svg_layer            "
 echo "graphic driver   | --with-graphic-driver    | $graphic_driver       "

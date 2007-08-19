@@ -61,14 +61,6 @@ void init( void )
 	SDL_EnableKeyRepeat(125, 125);
 }
 
-int thread_func(void *)
-{
-	while( !screenManager->isFinished() ) {
-		screenManager->getRecord()->compute();
-	}
-	return 1;
-}
-
 void usage( char * progname )
 {
 	fprintf(stdout,"Usage: %s [OPTIONS] [SONG_DIRECTORY]\n", progname);
@@ -94,7 +86,6 @@ int main( int argc, char ** argv )
 	char * capture_device  = (char*)"default";
 	CScreen * screen       = NULL;
 	int ch                 = 0;
-	SDL_Thread *thread     = NULL;
 	unsigned int difficulty= 2;
 	bool fullscreen        = false;
 
@@ -189,7 +180,7 @@ int main( int argc, char ** argv )
 	screenManager->activateScreen("Intro");
 
 	if( capture )
-		thread = SDL_CreateThread(thread_func, NULL);
+		screenManager->getRecord()->startThread();
 
 	while( !screenManager->isFinished() ) {
 		checkEvents();
@@ -200,7 +191,7 @@ int main( int argc, char ** argv )
         }
 
 	if( capture )
-		SDL_WaitThread(thread, NULL);
+		screenManager->getRecord()->stopThread();
 
 	delete videoDriver;
 	delete screenManager;

@@ -1,4 +1,5 @@
 #include <record.h>
+#include <screen.h>
 
 #define MAX_FFT_LENGTH 48000
 #define MAX_PEAKS 4
@@ -133,11 +134,63 @@ void CFft::compute(int nframes,signed short int *indata)
 CRecord::CRecord( char * deviceName )
 {
 	fft = new CFft(10);
+	captureDevice = deviceName;
+}
+
+CRecord::~CRecord()
+{
+	delete fft;
+}
+
+#ifdef USE_ALSA_RECORD
+int thread_func(void * _alsaHandle)
+{
+	signed short int buf[4096];
+	int frames  = 1;
+	int nFrames;
+	snd_pcm_t *alsaHandle = (snd_pcm_t *)_alsaHandle;
+
+	while( !CScreenManager::getSingletonPtr()->isFinished() ) {
+		nFrames = 0;
+		nFrames = snd_pcm_readi(alsaHandle, buf, frames);
+	
+		if(nFrames == -EPIPE)
+			snd_pcm_prepare(alsaHandle);
+		else if(nFrames < 0)
+			fprintf(stderr,"error from read: %s\n",snd_strerror(nFrames));
+		else if(nFrames != frames)
+			fprintf(stderr, "short read, read %d frames\n", nFrames);
+		CScreenManager::getSingletonPtr()->getRecord()->getFft()->compute(nFrames, buf);
+	}
+	return 1;
+}
+#endif
+
+#ifdef USE_PORTAUDIO19_RECORD
+static int recordCallback( const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
+			const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void *userData )
+{
+	CScreenManager::getSingletonPtr()->getRecord()->getFft()->compute(framesPerBuffer,(signed short int *)inputBuffer);
+	return paContinue;
+}
+#endif
+#ifdef USE_PORTAUDIO18_RECORD
+static int recordCallback( void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
+			PaTimestamp outTime, void *userData )
+{
+	CScreenManager::getSingletonPtr()->getRecord()->getFft()->compute(framesPerBuffer,(signed short int *)inputBuffer);
+	return 0;
+}
+#endif
+
+void CRecord::startThread()
+{
+#ifdef USE_ALSA_RECORD
 	int result;
 	snd_pcm_hw_params_t *hw_params;
 
-	if ((result = snd_pcm_open(&alsaHandle, deviceName, SND_PCM_STREAM_CAPTURE, 0)) < 0) {
-		fprintf(stderr, "Cannot open audio device %s: %s\n",deviceName, snd_strerror(result));
+	if ((result = snd_pcm_open(&alsaHandle, captureDevice, SND_PCM_STREAM_CAPTURE, 0)) < 0) {
+		fprintf(stderr, "Cannot open audio device %s: %s\n",captureDevice, snd_strerror(result));
 		exit(EXIT_FAILURE);
 	}
 
@@ -152,28 +205,56 @@ CRecord::CRecord( char * deviceName )
 	snd_pcm_hw_params(alsaHandle, hw_params);
 	snd_pcm_hw_params_free(hw_params);
 	snd_pcm_prepare(alsaHandle);
+
+	thread = SDL_CreateThread(thread_func, (void *)alsaHandle);
+#endif
+#ifdef USE_PORTAUDIO_RECORD
+	PaError err = paNoError;
+
+	err = Pa_Initialize();
+	if( err != paNoError ) {
+		fprintf(stderr, "Cannot open audio device %s\n",captureDevice);
+		exit(EXIT_FAILURE);
+	}
+
+	#ifdef USE_PORTAUDIO19_RECORD
+	PaStreamParameters inputParameters;
+
+	inputParameters.device = Pa_GetDefaultInputDevice();
+	inputParameters.channelCount = 1;
+	inputParameters.sampleFormat = paInt16;
+	inputParameters.suggestedLatency = Pa_GetDeviceInfo( inputParameters.device )->defaultLowInputLatency;
+	inputParameters.hostApiSpecificStreamInfo = NULL;
+
+	err = Pa_OpenStream( &stream, &inputParameters, NULL, MAX_FFT_LENGTH, 50, paClipOff, recordCallback, NULL );
+	#endif
+	#ifdef USE_PORTAUDIO18_RECORD
+	err = Pa_OpenStream( &stream, Pa_GetDefaultInputDeviceID(), 1, paInt16, NULL, paNoDevice, 0, paInt16, NULL, MAX_FFT_LENGTH, 50, 0, 0, recordCallback, NULL);
+	#endif
+	if( err != paNoError ) {
+		fprintf(stderr, "Cannot open audio device %s\n",captureDevice);
+		exit(EXIT_FAILURE);
+	}
+
+	err = Pa_StartStream( stream );
+	if( err != paNoError ) {
+		fprintf(stderr, "Cannot open audio device %s\n",captureDevice);
+		exit(EXIT_FAILURE);
+	}
+#endif
 }
 
-CRecord::~CRecord()
+void CRecord::stopThread()
 {
-	delete fft;
+#ifdef USE_ALSA_RECORD
+	SDL_WaitThread(thread, NULL);
 	snd_pcm_drain(alsaHandle);
 	snd_pcm_close(alsaHandle);
-}
-
-void CRecord::compute( void )
-{
-	int frames  = 1;
-	int nFrames = 0;
-	nFrames = snd_pcm_readi(alsaHandle, buf, frames);
-
-	if(nFrames == -EPIPE)
-		snd_pcm_prepare(alsaHandle);
-	else if(nFrames < 0)
-		fprintf(stderr,"error from read: %s\n",snd_strerror(nFrames));
-	else if(nFrames != frames)
-		fprintf(stderr, "short read, read %d frames\n", nFrames);
-	fft->compute(nFrames, buf);
+#endif
+#ifdef USE_PORTAUDIO_RECORD
+	Pa_CloseStream( stream );
+	Pa_Terminate();
+#endif
 }
 
 #define QUARTER_TONE 1.029302236643

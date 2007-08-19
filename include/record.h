@@ -27,15 +27,23 @@ class CRecord {
 	public:
 	CRecord(char * captureDevice = "default");
 	~CRecord();
-	void compute();
 	float getFreq( void ) { return fft->getFreq(); }
 	const char * getNoteStr( int id);
 	int getNoteId(void);
 	float getNoteFreq(int id);
+	void startThread();
+	void stopThread();
+	CFft *getFft() {return fft;};
 	private:
 	CFft * fft;
+	char * captureDevice;
+#ifdef USE_ALSA_RECORD
 	snd_pcm_t *alsaHandle;
-	signed short int buf[4096];
+	SDL_Thread *thread;
+#endif
+#ifdef USE_PORTAUDIO_RECORD
+	PaStream *stream;
+#endif
 };
 
 #endif
