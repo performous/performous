@@ -31,9 +31,9 @@ CFft::~CFft()
 {
 	fftwf_destroy_plan(fftPlan);
 	fftwf_free(fftIn);
-	free(fftSampleBuffer);
-	free(fftLastPhase);
-	free(window);
+	delete[] fftSampleBuffer;
+	delete[] fftLastPhase;
+	delete[] window;
 }
 
 void CFft::measure(int nframes, int overlap, float *indata)
