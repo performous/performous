@@ -60,7 +60,7 @@ AC_ARG_WITH(svg,
 if test $svg_layer = yes ; then svg_layer="librsvg" ; fi
 
 AC_ARG_WITH(record,
-	AC_HELP_STRING(--with-record[={alsa|portaudio}],
+	AC_HELP_STRING(--with-record[={alsa|gstreamer|portaudio}],
 		implementation of the record layer (default: autodetect)),
 	[record_layer="$withval"],
 	[record_layer="autodetect"]
@@ -341,6 +341,13 @@ case $record_layer in
 			record_layer="no"
 		fi
 		;;
+	gstreamer*)
+		if test $gst_detected = yes ; then
+			record_layer="gstreamer"
+		else
+			record_layer="no"
+		fi
+		;;
 	portaudio*)
 		if test $portaudio18_detected = yes ; then
 			record_layer="portaudio18"
@@ -357,9 +364,11 @@ case $record_layer in
 			record_layer="portaudio18"
 		else if test $alsa_detected = yes ; then
 			record_layer="alsa"
+		else if test $gst_detected = yes ; then
+			record_layer="gstreamer"
 		else
 			record_layer="no"
-		fi ; fi ; fi
+		fi ; fi ; fi ; fi
 		;;
 esac
 
@@ -372,6 +381,16 @@ case $record_layer in
 		/* record headers */
 		#define USE_ALSA_RECORD 1
 		#include <alsa/asoundlib.h>
+		USNG_EOF)
+		;;
+	gstreamer*)
+		RECORD_FLAGS=`pkg-config --cflags gstreamer-0.10`
+		RECORD_LIBS=`pkg-config --libs gstreamer-0.10`
+		ac_includes_default=$(cat <<-USNG_EOF
+		$ac_includes_default
+		/* record headers */
+		#define USE_GSTREAMER_RECORD 1
+		#include <gst/gst.h>
 		USNG_EOF)
 		;;
 	portaudio18*)

@@ -182,6 +182,14 @@ static int recordCallback( void *inputBuffer, void *outputBuffer, unsigned long 
 }
 #endif
 
+#ifdef USE_GSTREAMER_RECORD
+static void _handoff_cb(GstElement *fakesink, GstBuffer *buffer, GstPad *pad, gpointer user_data)
+{
+	CScreenManager::getSingletonPtr()->getRecord()->getFft()->compute(GST_BUFFER_SIZE(buffer)/2,(signed short int *)GST_BUFFER_DATA(buffer));
+	return;
+}
+#endif
+
 void CRecord::startThread()
 {
 #ifdef USE_ALSA_RECORD
@@ -241,6 +249,55 @@ void CRecord::startThread()
 		exit(EXIT_FAILURE);
 	}
 #endif
+#ifdef USE_GSTREAMER_RECORD
+	GstElement *source, *audioconvert, *audioresample, *sink;
+	GstCaps *caps;
+
+	gst_init (NULL, NULL);
+	pipeline = gst_pipeline_new("record-pipeline");
+
+	if (!(source = gst_element_factory_make("alsasrc", "record-source"))) {
+		fprintf(stderr, "[Error] Failed to create GStreamer element: 'alsasrc'\n");
+		exit(EXIT_FAILURE);
+	}
+	if (!(audioconvert = gst_element_factory_make("audioconvert", NULL))) {
+		fprintf(stderr, "[Error] Failed to create GStreamer element: 'audioconvert'\n");
+		exit(EXIT_FAILURE);
+	}
+	if (!(audioresample = gst_element_factory_make("audioresample", NULL))) {
+		fprintf(stderr, "[Error] Failed to create GStreamer element: 'audioresample'\n");
+		exit(EXIT_FAILURE);
+	}
+	if (!(sink = gst_element_factory_make("fakesink", "record-sink"))) {
+		fprintf(stderr, "[Error] Failed to create GStreamer element: 'fakesink'\n");
+		exit(EXIT_FAILURE);
+	}
+	
+	gst_bin_add_many(GST_BIN(pipeline), source, audioconvert, audioresample, sink, NULL);
+	g_object_set(G_OBJECT(sink), "sync", TRUE, NULL);
+	g_object_set(G_OBJECT(sink), "signal-handoffs", TRUE, NULL);
+	g_signal_connect(G_OBJECT(sink), "handoff", G_CALLBACK(_handoff_cb), NULL);
+	
+	/* Link the elements together */
+	caps = gst_caps_new_simple("audio/x-raw-int",
+		"rate", G_TYPE_INT, MAX_FFT_LENGTH,
+		"width", G_TYPE_INT, 16,
+		"depth", G_TYPE_INT, 16,
+		"channels", G_TYPE_INT, 1, NULL);
+	
+	if (!gst_element_link_many(source, audioconvert, audioresample, NULL)) {
+		fprintf(stderr, "[Error] Failed to link the GStreamer elements together: 'alsasrc' -> 'audioconvert' -> 'audioresample'\n");
+		exit(EXIT_FAILURE);
+	}
+	if (!gst_element_link_filtered(audioresample, sink, caps)) {
+		fprintf(stderr, "[Error] Failed to link the GStreamer elements: 'audioresample' -> 'fakesink'\n");
+		exit(EXIT_FAILURE);
+	}
+	gst_caps_unref(caps);
+	
+	/* TODO: gst_element_set_state(_pipeline, GST_STATE_PAUSED); */
+	gst_element_set_state(pipeline, GST_STATE_PLAYING);
+#endif
 }
 
 void CRecord::stopThread()
@@ -253,6 +310,14 @@ void CRecord::stopThread()
 #ifdef USE_PORTAUDIO_RECORD
 	Pa_CloseStream( stream );
 	Pa_Terminate();
+#endif
+#ifdef USE_GSTREAMER_RECORD
+	if( pipeline == NULL )
+		return;
+
+	gst_element_set_state(pipeline, GST_STATE_NULL);
+	gst_object_unref(GST_OBJECT(pipeline));
+	pipeline = NULL;
 #endif
 }
 

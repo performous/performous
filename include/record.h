@@ -44,6 +44,9 @@ class CRecord {
 #ifdef USE_PORTAUDIO_RECORD
 	PaStream *stream;
 #endif
+#ifdef USE_GSTREAMER_RECORD
+	GstElement *pipeline;
+#endif
 };
 
 #endif
