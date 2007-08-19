@@ -16,13 +16,13 @@ CFft::CFft(int size)
 	fftIn = (float*)fftwf_malloc(sizeof(float) * 2 * (fftSize/2+1));
 	fftOut = (fftwf_complex *)fftIn;
 	fftPlan = fftwf_plan_dft_r2c_1d(fftSize, fftIn, fftOut, FFTW_MEASURE);
-	fftSampleBuffer = (float *)malloc(fftSize * sizeof(float));
+	fftSampleBuffer = new float[fftSize];
 	fftSample = NULL;
-	fftLastPhase = (float *)malloc((fftSize/2+1) * sizeof(float));
+	fftLastPhase = new float[fftSize/2+1];
 	memset(fftSampleBuffer, 0, fftSize*sizeof(float));
 	memset(fftLastPhase, 0, (fftSize/2+1)*sizeof(float));
 	fftFrameCount = 0;
-	window = (double *)malloc(fftSize * sizeof(double));
+	window = new double[fftSize];
 	for (int i=0; i<fftSize; i++)
 	  window[i] = -.5*cos(2.*M_PI*(double)i/(double)fftSize)+.5;
 
