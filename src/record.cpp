@@ -38,12 +38,12 @@ CFft::~CFft()
 
 void CFft::measure(int nframes, int overlap, float *indata)
 {
-	int i, stepSize = fftSize/overlap;
+	int stepSize = fftSize/overlap;
 	double freqPerBin = rate/(double)fftSize, phaseDifference = 2.*M_PI*(double)stepSize/(double)fftSize;
 
 	if (!fftSample) fftSample = fftSampleBuffer + (fftSize-stepSize);
 
-	for (i=0; i<nframes; i++) {
+	for (int i=0; i<nframes; i++) {
 		*fftSample++ = indata[i];
 		if (fftSample-fftSampleBuffer >= fftSize) {
 			int k;
@@ -123,8 +123,7 @@ void CFft::measure(int nframes, int overlap, float *indata)
 void CFft::compute(int nframes,signed short int *indata)
 {
 	float buf[nframes];
-	int i;
-	for (i=0; i<nframes; i++) {
+	for (int i = 0 ; i<nframes ; i++) {
 		buf[i] = indata[i]/32768.;
 	}
 	if( nframes > 0 )
