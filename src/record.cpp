@@ -257,8 +257,12 @@ void CRecord::startThread()
 	pipeline = gst_pipeline_new("record-pipeline");
 
 	if (!(source = gst_element_factory_make("alsasrc", "record-source"))) {
-		fprintf(stderr, "[Error] Failed to create GStreamer element: 'alsasrc'\n");
-		exit(EXIT_FAILURE);
+		if (!(source = gst_element_factory_make("osssrc", "record-source"))) {
+			if (!(source = gst_element_factory_make("osxaudiosrc", "record-source"))) {
+				fprintf(stderr, "[Error] Failed to create GStreamer element: 'record-source'\n");
+				exit(EXIT_FAILURE);
+			}
+		}
 	}
 	if (!(audioconvert = gst_element_factory_make("audioconvert", NULL))) {
 		fprintf(stderr, "[Error] Failed to create GStreamer element: 'audioconvert'\n");
