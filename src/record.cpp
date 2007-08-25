@@ -283,7 +283,7 @@ static int recordCallback( void *inputBuffer, void *outputBuffer, unsigned long 
 #endif
 
 #ifdef USE_GSTREAMER_RECORD
-static void _handoff_cb(GstElement *fakesink, GstBuffer *buffer, GstPad *pad, gpointer user_data)
+static void _handoff_cb(GstElement *fakesink, GstBuffer *buffer, GstPad *pad, gpointer userData)
 {
 	((CRecord*)userData)->callback().process(GST_BUFFER_SIZE(buffer)/2,(signed short int *)GST_BUFFER_DATA(buffer));
 }
@@ -316,8 +316,7 @@ void CRecord::startThread()
 
 	err = Pa_Initialize();
 	if( err != paNoError ) {
-		fprintf(stderr, "Cannot open audio device %s\n",captureDevice);
-		exit(EXIT_FAILURE);
+		throw std::runtime_error("Cannot open audio device " + captureDevice + ": " + Pa_GetErrorText(err));
 	}
 
 	#ifdef USE_PORTAUDIO19_RECORD
@@ -337,14 +336,12 @@ void CRecord::startThread()
 	err = Pa_OpenStream( &stream, Pa_GetDefaultInputDeviceID(), 1, paInt16, NULL, paNoDevice, 0, paInt16, NULL, DEFAULT_RATE, 50, 0, 0, recordCallback, this);
 	#endif
 	if( err != paNoError ) {
-		fprintf(stderr, "Cannot open audio device %s\n",captureDevice);
-		exit(EXIT_FAILURE);
+		throw std::runtime_error("Cannot open audio stream " + captureDevice + ": " + Pa_GetErrorText(err));
 	}
 
 	err = Pa_StartStream( stream );
 	if( err != paNoError ) {
-		fprintf(stderr, "Cannot open audio device %s\n",captureDevice);
-		exit(EXIT_FAILURE);
+		throw std::runtime_error("Cannot start audio stream " + captureDevice + ": " + Pa_GetErrorText(err));
 	}
 #endif
 #ifdef USE_GSTREAMER_RECORD
