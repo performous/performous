@@ -1,6 +1,6 @@
 #include <screen_practice.h>
 
-CScreenPractice::CScreenPractice(const char * name)
+CScreenPractice::CScreenPractice(const char* name, CFft const& fft): m_fft(fft)
 {
 	screenName = name;
 }
@@ -52,27 +52,34 @@ void CScreenPractice::manageEvent( SDL_Event event )
 	}
 }
 
-void CScreenPractice::draw( void )
+void CScreenPractice::draw()
 {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
 	float resFactorX = sm->getWidth()/800.;
 	float resFactorY = sm->getHeight()/600.;
 
-	CRecord * record    = sm->getRecord();
-	float freq = record->getFreq();
-	int note = record->getNoteId();
+	float freq = m_fft.getFreq();
+	MusicalScale scale;
 
-        theme->theme->clear();
+	theme->theme->clear();
 	sm->getVideoDriver()->drawSurface(bg_texture);
 
 	if(freq != 0.0) {
+		std::string text = scale.getNoteStr(freq);
+    	theme->notetxt.text = const_cast<char*>(text.c_str());
+    	theme->theme->PrintText(&theme->notetxt);
+	}
+	std::vector<Tone> tones = m_fft.getTones();
+	for (size_t i = 0; i < tones.size(); ++i) {
+		int note = scale.getNoteId(tones[i].freq());
+		if (note == -1) continue;
 		int posXnote;
 		int posYnote;
 		int posXsharp;
 		int posYsharp;
-		int octave = note/12;
+		int octave = note/12 - 1;
 		bool sharp=false;
-		unsigned char noteOffset=0;
+		double noteOffset=0;
 		switch(note%12) {
 			case 0:
 				sharp=false;
@@ -123,16 +130,15 @@ void CScreenPractice::draw( void )
 				noteOffset=6;
 				break;
 		}
-        	theme->notetxt.text = (char*)record->getNoteStr(note);
-        	theme->theme->PrintText(&theme->notetxt);
 
 		noteOffset += octave*7;
-
-		posXnote = (int) ((sm->getWidth()-40.*resFactorX)/2.);
+		noteOffset += 0.4 * scale.getNoteOffset(tones[i].freq());
+		double noteOffsetX = -600.0 - 10.0 * tones[i].db();
+		posXnote = (int) ((sm->getWidth()-noteOffsetX*resFactorX)/2.);
 		posYnote = (int) ((340.-noteOffset*12.5)*resFactorY);
 		sm->getVideoDriver()->drawSurface(texture_note,posXnote,posYnote);
 		if( sharp ) {
-			posXsharp = (int) ((sm->getWidth()-100.*resFactorX)/2.);
+			posXsharp = (int) ((sm->getWidth()-(noteOffsetX + 60.0)*resFactorX)/2.);
 			posYsharp = (int) ((315.-noteOffset*12.5)*resFactorY);
 			sm->getVideoDriver()->drawSurface(texture_sharp,posXsharp,posYsharp);
 		}

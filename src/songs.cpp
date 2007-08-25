@@ -375,7 +375,7 @@ CSongs::CSongs()
 	sprintf(pattern,"%s*/*.[tT][xX][tT]",songs_dir);
 	fprintf(stdout,"Scanning song directory...\n");
 	glob ( pattern, GLOB_NOSORT, NULL, &_glob);
-	fprintf(stdout,"Found %zu possible song file%s ...\n",_glob.gl_pathc,(_glob.gl_pathc>1)?"s":"");
+	fprintf(stdout,"Found %u possible song file%s ...\n",_glob.gl_pathc,(_glob.gl_pathc>1)?"s":"");
 
 	for( unsigned int i = 0 ; i < _glob.gl_pathc ; i++ ) {
 		char * path = new char[1024];

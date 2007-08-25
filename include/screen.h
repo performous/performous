@@ -46,9 +46,6 @@ class CScreenManager : public CSingleton <CScreenManager>{
 	CAudio * getAudio( void ) {return audio;};
 	void setAudio( CAudio * _audio ) {audio=_audio;};
 
-	CRecord * getRecord( void ) {return record;};
-	void setRecord( CRecord * _record ) {record=_record;};
-	
 	CVideoDriver * getVideoDriver( void ) {return videoDriver;};
 	void setVideoDriver( CVideoDriver * _videoDriver ) {videoDriver=_videoDriver;};
 	
@@ -78,7 +75,6 @@ class CScreenManager : public CSingleton <CScreenManager>{
 	CScreen * currentScreen;
 	SDL_Surface * screen;
 	CAudio * audio;
-	CRecord * record;
 	CSongs * songs;
 	CVideoDriver * videoDriver;
 	bool fullscreen;

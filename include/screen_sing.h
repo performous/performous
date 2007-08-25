@@ -10,29 +10,30 @@
 #include <lyrics.h>
 
 class CScreenSing : public CScreen {
-	public:
-	CScreenSing( const char * name );
+  public:
+	CScreenSing(const char* name, CFft const& fft);
 	~CScreenSing();
 	void enter(void);
 	void exit(void);
 	void manageEvent( SDL_Event event );
 	void draw(void);
-	private:
+  private:
+	CFft const& m_fft;
 	SDL_Surface * videoSurf;
 	SDL_Surface * backgroundSurf;
 	unsigned int backgroundSurf_id;
-        unsigned int theme_id;
-        unsigned int pitchGraph_id;
-        // Keeps the pitch tracking graphics
+	unsigned int theme_id;
+	unsigned int pitchGraph_id;
+	// Keeps the pitch tracking graphics
 	// in separate surface
 	PitchGraph pitchGraph;
 	std::vector <TNote *> sentence;
-        bool play;
+	bool play;
 	bool finished;
 	int playOffset;
 	int previousFirstTimestamp;
 	CVideo * video;
-        CThemeSing *theme;
+	CThemeSing *theme;
 	CLyrics * lyrics;
 };
 

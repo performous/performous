@@ -157,10 +157,12 @@ int main( int argc, char ** argv )
 	screenManager->setFullscreenStatus(fullscreen);
 
 	init();
+	
+	// FIXME: captureDevice and capture variables not used
+	Capture captureObj(48000);
 
 	screenManager->setSDLScreen(screenSDL);
 	screenManager->setAudio( new CAudio() );
-	screenManager->setRecord( new CRecord(capture_device) );
 	screenManager->setVideoDriver( videoDriver );
 	screenManager->setDifficulty( difficulty );
 	
@@ -168,9 +170,9 @@ int main( int argc, char ** argv )
 	screenManager->addScreen(screen);
 	screen = new CScreenSongs("Songs");
 	screenManager->addScreen(screen);
-	screen = new CScreenSing("Sing");
+	screen = new CScreenSing("Sing", captureObj.fft());
 	screenManager->addScreen(screen);
-	screen = new CScreenPractice("Practice");
+	screen = new CScreenPractice("Practice", captureObj.fft());
 	screenManager->addScreen(screen);
 	screen = new CScreenScore("Score");
 	screenManager->addScreen(screen);
@@ -179,19 +181,13 @@ int main( int argc, char ** argv )
 
 	screenManager->activateScreen("Intro");
 
-	if( capture )
-		screenManager->getRecord()->startThread();
-
 	while( !screenManager->isFinished() ) {
 		checkEvents();
 		videoDriver->blank();
-                screenManager->getCurrentScreen()->draw();
+        screenManager->getCurrentScreen()->draw();
 		videoDriver->swap();
-                SDL_Delay(50);
-        }
-
-	if( capture )
-		screenManager->getRecord()->stopThread();
+		SDL_Delay(10);
+    }
 
 	delete videoDriver;
 	delete screenManager;

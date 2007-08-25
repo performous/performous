@@ -6,7 +6,6 @@ CScreenManager::CScreenManager( int _width , int _height , const char * _songs_d
 {
 	m_finished=false;
 	audio = NULL;
-	record = NULL;
 	songs = NULL;
 	currentScreen = NULL;
 	songId = 0;
@@ -20,7 +19,7 @@ CScreenManager::CScreenManager( int _width , int _height , const char * _songs_d
 CScreenManager::~CScreenManager()
 {
 	delete audio;
-	delete record;
+	// delete record;
 	delete songs;
 	for( unsigned int i = 0 ; i < screens.size() ; i++ )
 		delete screens[i];
