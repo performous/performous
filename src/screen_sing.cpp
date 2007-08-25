@@ -167,15 +167,6 @@ void CScreenSing::draw( void )
 	linerect.final_height = 0;
 	linerect.final_width  = 0;
 
-	// Draw the note sung... (DEBUG)
-	if (freq > 0.0) {
-		double note = 12.0 * log(freq / 440.0) / log(2.0) + 33.0;
-		for(int i = -2; i <= 2; i++ ) {
-			linerect.y = sm->getHeight() * 3 / 4 - (note + 12.0 * i) * sm->getHeight() / 24 / numOctaves;
-			theme->theme->DrawRect(linerect);
-		}
-	}
-	
 	// draw lines for the C notes (thick)
 	for( unsigned int i = 0 ; i <= numOctaves ; i++ ) {
 		if( i <= (song->noteMax-lowestC)/12 ) {
