@@ -1,5 +1,6 @@
 #include <songs.h>
 #include <screen.h>
+#include <iostream>
 
 bool compareSongs( CSong * left , CSong * right)
 {
@@ -373,16 +374,16 @@ CSongs::CSongs()
 	}
 
 	sprintf(pattern,"%s*/*.[tT][xX][tT]",songs_dir);
-	fprintf(stdout,"Scanning song directory...\n");
+	std::cout << "Scanning song directory..." << std::endl;
 	glob ( pattern, GLOB_NOSORT, NULL, &_glob);
-	fprintf(stdout,"Found %u possible song file%s ...\n",_glob.gl_pathc,(_glob.gl_pathc>1)?"s":"");
+	std::cout << "Found " << _glob.gl_pathc << " possible song file(s)..." << std::endl;
 
 	for( unsigned int i = 0 ; i < _glob.gl_pathc ; i++ ) {
 		char * path = new char[1024];
 		char * txtfilename;
 		txtfilename = strrchr(_glob.gl_pathv[i],'/'); txtfilename[0] = '\0'; txtfilename++;
 		sprintf(path,"%s",_glob.gl_pathv[i]);
-		fprintf(stdout,"Loading song: \"%s\"... ",strrchr(_glob.gl_pathv[i],'/')+1);
+		std::cout << "Loading song: \"" << strrchr(_glob.gl_pathv[i],'/') + 1 << "\"... ";
 		CSong * tmp = new CSong();
 
 		// Set default orderType to title
@@ -392,13 +393,13 @@ CSongs::CSongs()
 		sprintf(txt,"%s",txtfilename); // safe sprintf
 		tmp->filename = txt;
 		if( !parseFile(tmp) ) {
-			fprintf(stdout,"FAILED\n");
+			std::cout << "FAILED" << std::endl;
 			delete[] path;
 			delete[] txt;
 			delete tmp;
 		} else {
-			fprintf(stdout,"OK\n");
-                        tmp->parseFile();
+			std::cout << "OK" << std::endl;
+			tmp->parseFile();
 			tmp->index = songs.size();
 			songs.push_back(tmp);
 		}
