@@ -184,10 +184,10 @@ int main( int argc, char ** argv )
 	while( !screenManager->isFinished() ) {
 		checkEvents();
 		videoDriver->blank();
-        screenManager->getCurrentScreen()->draw();
+		screenManager->getCurrentScreen()->draw();
 		videoDriver->swap();
 		SDL_Delay(10);
-    }
+	}
 
 	delete videoDriver;
 	delete screenManager;
