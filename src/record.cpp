@@ -205,7 +205,7 @@ void CFft::process(size_t nframes, signed short* indata)
 	}
 }
 
-CRecord::CRecord(RecordCallback& callback, size_t rate, std::string deviceName):
+CRecord::CRecord(RecordCallback& callback, unsigned int rate, std::string deviceName):
   m_callback(callback),
   m_rate(rate),
   captureDevice(deviceName),
@@ -226,7 +226,7 @@ int thread_func(void* userData)
 		int nFrames;
 		snd_pcm_t *alsaHandle = rec.getAlsaHandle();
 
-		while( rec->isRecording() ) {
+		while( rec.isRecording() ) {
 			nFrames = 0;
 			nFrames = snd_pcm_readi(alsaHandle, buf, frames);
 		
