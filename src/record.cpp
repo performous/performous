@@ -352,20 +352,20 @@ void CRecord::startThread()
 	pipeline = gst_pipeline_new("record-pipeline");
 
 	if (!(source = gst_element_factory_make("alsasrc", "record-source"))) {
-		fprintf(stderr, "[Error] Failed to create GStreamer element: 'alsasrc'\n");
-		exit(EXIT_FAILURE);
+		if (!(source = gst_element_factory_make("osssrc", "record-source"))) {
+			if (!(source = gst_element_factory_make("osxaudiosrc", "record-source"))) {
+				throw std::runtime_error("Cannot create record source");
+			}
+		}
 	}
 	if (!(audioconvert = gst_element_factory_make("audioconvert", NULL))) {
-		fprintf(stderr, "[Error] Failed to create GStreamer element: 'audioconvert'\n");
-		exit(EXIT_FAILURE);
+		throw std::runtime_error("Cannot create audioconvert");
 	}
 	if (!(audioresample = gst_element_factory_make("audioresample", NULL))) {
-		fprintf(stderr, "[Error] Failed to create GStreamer element: 'audioresample'\n");
-		exit(EXIT_FAILURE);
+		throw std::runtime_error("Cannot create audioresample");
 	}
 	if (!(sink = gst_element_factory_make("fakesink", "record-sink"))) {
-		fprintf(stderr, "[Error] Failed to create GStreamer element: 'fakesink'\n");
-		exit(EXIT_FAILURE);
+		throw std::runtime_error("Cannot create fakesink");
 	}
 	
 	gst_bin_add_many(GST_BIN(pipeline), source, audioconvert, audioresample, sink, NULL);
@@ -382,12 +382,10 @@ void CRecord::startThread()
 		"channels", G_TYPE_INT, 1, NULL);
 	
 	if (!gst_element_link_many(source, audioconvert, audioresample, NULL)) {
-		fprintf(stderr, "[Error] Failed to link the GStreamer elements together: 'alsasrc' -> 'audioconvert' -> 'audioresample'\n");
-		exit(EXIT_FAILURE);
+		throw std::runtime_error("Cannot link the GStreamer elements together ('src' -> 'audioconvert' -> 'audioresample')");
 	}
 	if (!gst_element_link_filtered(audioresample, sink, caps)) {
-		fprintf(stderr, "[Error] Failed to link the GStreamer elements: 'audioresample' -> 'fakesink'\n");
-		exit(EXIT_FAILURE);
+		throw std::runtime_error("Cannot link the GStreamer elements together ('audioresample' -> 'fakesink')");
 	}
 	gst_caps_unref(caps);
 	
