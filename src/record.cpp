@@ -1,5 +1,4 @@
 #include <record.h>
-#include <screen.h>
 #include <algorithm>
 #include <functional>
 #include <iomanip>
@@ -209,7 +208,8 @@ void CFft::process(size_t nframes, signed short* indata)
 CRecord::CRecord(RecordCallback& callback, size_t rate, std::string deviceName):
   m_callback(callback),
   m_rate(rate),
-  captureDevice(deviceName)
+  captureDevice(deviceName),
+  record(true)
 {}
 
 CRecord::~CRecord()
@@ -226,7 +226,7 @@ int thread_func(void* userData)
 		int nFrames;
 		snd_pcm_t *alsaHandle = rec.getAlsaHandle();
 
-		while( !CScreenManager::getSingletonPtr()->isFinished() ) {
+		while( rec->isRecording() ) {
 			nFrames = 0;
 			nFrames = snd_pcm_readi(alsaHandle, buf, frames);
 		
@@ -394,10 +394,12 @@ void CRecord::startThread()
 	/* TODO: gst_element_set_state(_pipeline, GST_STATE_PAUSED); */
 	gst_element_set_state(pipeline, GST_STATE_PLAYING);
 #endif
+	record = true;
 }
 
 void CRecord::stopThread()
 {
+	record = false;
 #ifdef USE_ALSA_RECORD
 	SDL_WaitThread(thread, NULL);
 	snd_pcm_drain(alsaHandle);
@@ -417,6 +419,10 @@ void CRecord::stopThread()
 #endif
 }
 
+bool CRecord::isRecording()
+{
+	return record;
+}
 
 std::string MusicalScale::getNoteStr(double freq) const {
 	int id = getNoteId(freq);

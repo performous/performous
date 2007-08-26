@@ -109,6 +109,7 @@ class CRecord {
 	~CRecord();
 	void startThread();
 	void stopThread();
+	bool isRecording();
 	RecordCallback& callback() { return m_callback; }
 #ifdef USE_ALSA_RECORD
 	snd_pcm_t* getAlsaHandle() { return alsaHandle; }
@@ -117,6 +118,7 @@ class CRecord {
 	RecordCallback& m_callback;
 	size_t m_rate;
 	std::string captureDevice;
+	bool record;
 #ifdef USE_ALSA_RECORD
 	snd_pcm_t *alsaHandle;
 	SDL_Thread *thread;
