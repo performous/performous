@@ -87,7 +87,7 @@ static int match(std::vector<Peak> const& peaks, int pos, double freq) {
 	return best;
 }
 
-void CFft::process(size_t nframes, signed short* indata)
+void CFft::process(unsigned int nframes, signed short* indata)
 {
 	if (m_rate == 0.0) throw std::logic_error("Rate not set before calling CFft::process");
 	// Precalculated constants

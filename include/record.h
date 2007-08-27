@@ -44,11 +44,11 @@ class Record;
 class RecordCallback {
 	friend class Record;
   protected:
-	size_t m_rate;
+	unsigned int m_rate;
   public:
-	RecordCallback(): m_rate(0.0) {}
-  	void setRate(size_t rate) { m_rate = rate; }
-	virtual void process(size_t nframes, signed short* indata) = 0;
+	RecordCallback(): m_rate(0) {}
+  	void setRate(unsigned int rate) { m_rate = rate; }
+	virtual void process(unsigned int nframes, signed short* indata) = 0;
 };
 
 /** @short A wrapper for SDL mutex. **/
@@ -77,7 +77,7 @@ class CFft: public RecordCallback {
   public:
 	CFft(size_t fftSize = 4096, size_t fftStep = 1500);
 	~CFft();
-	void process(size_t nframes, signed short* indata);
+	void process(unsigned int nframes, signed short* indata);
 	/** Get the peak level in dB (negative value, 0.0 = clipping). **/
 	double getPeak() const { return m_peak; }
 	/** Get the primary (singing) frequency. **/
@@ -105,7 +105,7 @@ class CFft: public RecordCallback {
 
 class CRecord {
   public:
-	CRecord(RecordCallback& callback, size_t rate, std::string captureDevice = "default");
+	CRecord(RecordCallback& callback, unsigned int rate, std::string captureDevice = "default");
 	~CRecord();
 	void startThread();
 	void stopThread();
@@ -116,7 +116,7 @@ class CRecord {
 #endif
   private:
 	RecordCallback& m_callback;
-	size_t m_rate;
+	unsigned int m_rate;
 	std::string captureDevice;
 	bool record;
 #ifdef USE_ALSA_RECORD
@@ -135,7 +135,7 @@ class Capture {
 	CFft m_fft;
 	CRecord m_record;
   public:
-	Capture(size_t rate = DEFAULT_RATE): m_record(m_fft, rate) {
+	Capture(unsigned int rate = DEFAULT_RATE): m_record(m_fft, rate) {
 		m_record.startThread();
 	}
 	~Capture() {
