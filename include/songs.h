@@ -82,8 +82,8 @@ class CSongs {
 		void sortByTitle( void );
 		void sortByArtist( void );
 		int getOrder( void ) {return order;};
-		void loadCover( unsigned int i);
-		void loadBackground( unsigned int i);
+		void loadCover( unsigned int i, unsigned int width, unsigned int height);
+		void loadBackground( unsigned int i, unsigned int width, unsigned int height);
 		void unloadCover( unsigned int i);
 		void unloadBackground( unsigned int i);
 	private:

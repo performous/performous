@@ -271,7 +271,7 @@ bool CSongs::parseFile( CSong * tmp )
 		return true;
 }
 
-void CSongs::loadCover( unsigned int i)
+void CSongs::loadCover( unsigned int i, unsigned int width, unsigned int height)
 {
 	if( songs[i]->coverSurf == NULL ) {
 		CSong * song = songs[i];
@@ -291,15 +291,15 @@ void CSongs::loadCover( unsigned int i)
 			song->coverSurf = surface_nocover;
 		else {
 			// Here we want to have cover of 256x256 in 800x600 and scale it if the resolution is different
-			int w = CScreenManager::getSingletonPtr()->getWidth()*256/800;
-			int h = CScreenManager::getSingletonPtr()->getHeight()*256/600;
+			int w = width*256/800;
+			int h = height*256/600;
 			song->coverSurf = zoomSurface(coverSurface,(double) w/coverSurface->w,(double) h/coverSurface->h,1);
 			SDL_FreeSurface(coverSurface);
 		}
 	}
 }
 
-void CSongs::loadBackground( unsigned int i)
+void CSongs::loadBackground( unsigned int i, unsigned int width, unsigned int height)
 {
 	if( songs[i]->backgroundSurf == NULL && songs[i]->background != NULL ) {
 		CSong * song = songs[i];
@@ -318,10 +318,7 @@ void CSongs::loadBackground( unsigned int i)
 		if( backgroundSurface == NULL )
 			song->backgroundSurf = NULL;
 		else {
-			// Here we want to have cover of 256x256 in 800x600 and scale it if the resolution is different
-			int w = CScreenManager::getSingletonPtr()->getWidth();
-			int h = CScreenManager::getSingletonPtr()->getHeight();
-			song->backgroundSurf = zoomSurface(backgroundSurface,(double) w/backgroundSurface->w,(double) h/backgroundSurface->h,1);
+			song->backgroundSurf = zoomSurface(backgroundSurface,(double) width/backgroundSurface->w,(double) height/backgroundSurface->h,1);
 			SDL_FreeSurface(backgroundSurface);
 		}
 	}
@@ -408,8 +405,8 @@ CSongs::CSongs()
 	globfree(&_glob);
 
 	for(unsigned int i = 0; i < songs.size(); i++) {
-		loadCover(i);
-		loadBackground(i);
+		loadCover(i,CScreenManager::getSingletonPtr()->getWidth(),CScreenManager::getSingletonPtr()->getHeight());
+		loadBackground(i,CScreenManager::getSingletonPtr()->getWidth(),CScreenManager::getSingletonPtr()->getHeight());
 	}
 }
 

@@ -37,8 +37,8 @@ class CScreenManager : public CSingleton <CScreenManager>{
 	void setSDLScreen( SDL_Surface * _screen ) { screen = _screen;};
 	SDL_Surface * getSDLScreen( void ) { return screen;};
 
-	int getWidth( void ) {return width;};
-	int getHeight( void ) {return height;};
+	unsigned int getWidth( void ) {return width;};
+	unsigned int getHeight( void ) {return height;};
 	
 	void setDifficulty( unsigned int _difficulty ) { difficulty=_difficulty;};
 	unsigned int getDifficulty( void ) {return difficulty;};
@@ -80,8 +80,8 @@ class CScreenManager : public CSingleton <CScreenManager>{
 	bool fullscreen;
 	int songId;
 	bool m_finished;
-	int width;
-	int height;
+	unsigned int width;
+	unsigned int height;
 	unsigned int difficulty;
 };
 
