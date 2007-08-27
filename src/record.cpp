@@ -441,7 +441,7 @@ double MusicalScale::getNoteFreq(int id) const
 int MusicalScale::getNoteId(double freq) const
 {
 	if (freq < 1.0) return -1;
-	int id = baseId + 12.0 * log(freq / baseFreq) / log(2) + 0.5;
+	int id = (int) (baseId + 12.0 * log(freq / baseFreq) / log(2) + 0.5);
 	return id < 0 ? -1 : id;
 }
 

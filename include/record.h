@@ -47,6 +47,7 @@ class RecordCallback {
 	unsigned int m_rate;
   public:
 	RecordCallback(): m_rate(0) {}
+	virtual ~RecordCallback() {}
   	void setRate(unsigned int rate) { m_rate = rate; }
 	virtual void process(unsigned int nframes, signed short* indata) = 0;
 };
