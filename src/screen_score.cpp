@@ -12,7 +12,7 @@ void CScreenScore::enter( void )
 {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
 
-  	theme = new CThemeScore();
+  	theme = new CThemeScore(width,height);
 	bg_texture = sm->getVideoDriver()->initSurface(theme->bg->getSDLSurface());
 }
 

@@ -27,7 +27,7 @@ void CScreenPractice::enter( void )
 
 	delete[] theme_path;
 
-        theme = new CThemePractice();
+        theme = new CThemePractice(width,height);
 	bg_texture = sm->getVideoDriver()->initSurface(theme->bg->getSDLSurface());
 }
 

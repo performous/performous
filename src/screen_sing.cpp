@@ -32,7 +32,6 @@ CScreenSing::CScreenSing(const char* name, unsigned int width, unsigned int heig
 			0xff000000);
 	SDL_SetAlpha(backgroundSurf, SDL_SRCALPHA, SDL_ALPHA_OPAQUE);
 	SDL_FillRect(backgroundSurf,NULL,SDL_MapRGB(backgroundSurf->format, 255, 255, 255));
-	theme = new CThemeSing();
 }
 
 CScreenSing::~CScreenSing()
@@ -40,7 +39,6 @@ CScreenSing::~CScreenSing()
 	if (videoSurf) SDL_FreeSurface(videoSurf);
 	if (backgroundSurf) SDL_FreeSurface(backgroundSurf);
 	delete video;
-	delete theme;
 }
 
 void CScreenSing::enter( void )
@@ -50,6 +48,8 @@ void CScreenSing::enter( void )
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
 	CSong * song = sm->getSong();
 	
+	theme = new CThemeSing(width,height);
+
 	SDL_FillRect(backgroundSurf,NULL,SDL_MapRGB(backgroundSurf->format, 255, 255, 255));
 
 	if( song->video != NULL ) {
@@ -91,6 +91,7 @@ void CScreenSing::exit( void )
 	SDL_FillRect(videoSurf,NULL,0xffffff);
 	sentence.clear();
 	delete lyrics;
+	delete theme;
 	pitchGraph.clear();
 }
 

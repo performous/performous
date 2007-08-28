@@ -3,16 +3,10 @@
 
 CScreenSongs::CScreenSongs(const char * name, unsigned int width, unsigned int height):CScreen(name,width,height)
 {
-	CScreenManager * sm = CScreenManager::getSingletonPtr();
-	songId=0;
-	play = false;
-	theme = new CThemeSongs();
-	bg_texture = sm->getVideoDriver()->initSurface(theme->bg->getSDLSurface());
 }
 
 CScreenSongs::~CScreenSongs()
 {
-	delete theme;
 }
 
 void CScreenSongs::enter( void )
@@ -20,6 +14,12 @@ void CScreenSongs::enter( void )
 	searchMode = false;
 	searchExpr = new char[256];
 	searchExpr[0] = '\0';
+	songId=0;
+	play = false;
+
+	CScreenManager * sm = CScreenManager::getSingletonPtr();
+	theme = new CThemeSongs(width,height);
+	bg_texture = sm->getVideoDriver()->initSurface(theme->bg->getSDLSurface());
 	if( CScreenManager::getSingletonPtr()->getSongs() == NULL ) {
 		CScreenManager::getSingletonPtr()->setSongs(new CSongs() );
 		CScreenManager::getSingletonPtr()->getSongs()->sortByArtist();
@@ -28,6 +28,7 @@ void CScreenSongs::enter( void )
 
 void CScreenSongs::exit( void )
 {
+	delete theme;
 	delete[] searchExpr;
 }
 

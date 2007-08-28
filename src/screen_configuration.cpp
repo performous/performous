@@ -17,7 +17,7 @@ CScreenConfiguration::~CScreenConfiguration()
 void CScreenConfiguration::enter( void )
 {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
-        theme = new CThemeConfiguration();
+        theme = new CThemeConfiguration(width,height);
 	bg_texture = sm->getVideoDriver()->initSurface(theme->bg->getSDLSurface());
 }
 

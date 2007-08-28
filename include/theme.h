@@ -64,7 +64,7 @@ class CTheme {
 
 class CThemeSongs {
 	public:
-	CThemeSongs();
+	CThemeSongs(unsigned int width, unsigned int height);
 	~CThemeSongs();
 	CairoSVG *bg;
 	TThemeTxt song;
@@ -75,7 +75,7 @@ class CThemeSongs {
 
 class CThemePractice {
 	public:
-	CThemePractice();
+	CThemePractice(unsigned int width, unsigned int height);
 	~CThemePractice();
 	CairoSVG *bg;
 	TThemeTxt notetxt;
@@ -85,7 +85,7 @@ class CThemePractice {
 
 class CThemeSing {
         public:
-        CThemeSing();
+        CThemeSing(unsigned int width, unsigned int height);
         ~CThemeSing();
         CairoSVG *bg;
         CairoSVG *p1box;
@@ -103,7 +103,7 @@ class CThemeSing {
 
 class CThemeScore {
 	public:
-	CThemeScore();
+	CThemeScore(unsigned int width, unsigned int height);
 	~CThemeScore();
 	CairoSVG *bg;
 	TThemeTxt normal_score;
@@ -115,7 +115,7 @@ class CThemeScore {
 
 class CThemeConfiguration {
 	public:
-	CThemeConfiguration();
+	CThemeConfiguration(unsigned int width, unsigned int height);
 	~CThemeConfiguration();
 	CairoSVG *bg;
 	TThemeTxt item;
