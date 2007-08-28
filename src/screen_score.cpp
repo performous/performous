@@ -1,8 +1,7 @@
 #include <screen_score.h>
 
-CScreenScore::CScreenScore(const char * name)
+CScreenScore::CScreenScore(const char * name, unsigned int width, unsigned int height):CScreen(name,width,height)
 {
-	screenName = name;
 }
 
 CScreenScore::~CScreenScore()

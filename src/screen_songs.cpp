@@ -1,10 +1,9 @@
 #include <screen_songs.h>
 #include <cairotosdl.h>
 
-CScreenSongs::CScreenSongs(const char * name)
+CScreenSongs::CScreenSongs(const char * name, unsigned int width, unsigned int height):CScreen(name,width,height)
 {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
-	screenName = name;
 	songId=0;
 	play = false;
 	theme = new CThemeSongs();
@@ -190,8 +189,8 @@ void CScreenSongs::draw( void )
 	// Draw the cover
 	{
 	SDL_Rect position;
-	position.x=(sm->getWidth()-sm->getSong()->coverSurf->w)/2;
-	position.y=(sm->getHeight()-sm->getSong()->coverSurf->h)/2;
+	position.x=(width-sm->getSong()->coverSurf->w)/2;
+	position.y=(height-sm->getSong()->coverSurf->h)/2;
         position.w=sm->getSong()->coverSurf->w;
         position.h=sm->getSong()->coverSurf->h;
         SDL_FillRect(virtSurf,&position,SDL_MapRGB(virtSurf->format, 255, 255, 255));

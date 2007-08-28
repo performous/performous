@@ -10,7 +10,7 @@
 
 class CScreenConfiguration : public CScreen {
 	public:
-	CScreenConfiguration( const char * name );
+	CScreenConfiguration( const char * name, unsigned int width, unsigned int height );
 	~CScreenConfiguration();
 	void enter(void);
 	void exit(void);

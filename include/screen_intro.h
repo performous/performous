@@ -8,7 +8,7 @@
 
 class CScreenIntro : public CScreen {
 	public:
-	CScreenIntro( const char * name );
+	CScreenIntro( const char * name, unsigned int width, unsigned int height );
 	~CScreenIntro();
 	void enter(void);
 	void exit(void);

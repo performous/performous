@@ -1,13 +1,12 @@
 #include <screen_intro.h>
 
-CScreenIntro::CScreenIntro(const char * name)
+CScreenIntro::CScreenIntro(const char * name, unsigned int width, unsigned int height):CScreen(name,width,height)
 {
-	screenName = name;
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
 
 	char * theme_path = new char[1024];
 	sm->getThemePathFile(theme_path,"intro.svg");
-	cairo_svg = new CairoSVG(theme_path,sm->getWidth(),sm->getHeight());
+	cairo_svg = new CairoSVG(theme_path,width,height);
 	delete[] theme_path;
 	texture = sm->getVideoDriver()->initSurface(cairo_svg->getSDLSurface());
 }

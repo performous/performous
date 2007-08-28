@@ -1,8 +1,7 @@
 #include <screen_practice.h>
 
-CScreenPractice::CScreenPractice(const char* name, CFft const& fft): m_fft(fft)
+CScreenPractice::CScreenPractice(const char* name, unsigned int width, unsigned int height, CFft const& fft): CScreen(name,width,height), m_fft(fft)
 {
-	screenName = name;
 }
 
 CScreenPractice::~CScreenPractice()
@@ -14,8 +13,8 @@ void CScreenPractice::enter( void )
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
 
 	char * theme_path = new char[1024];
-	float resFactorX = sm->getWidth()/800.;
-	float resFactorY = sm->getHeight()/600.;
+	float resFactorX = width/800.;
+	float resFactorY = height/600.;
 
 
 	sm->getThemePathFile(theme_path,"practice_note.svg");
@@ -55,8 +54,8 @@ void CScreenPractice::manageEvent( SDL_Event event )
 void CScreenPractice::draw()
 {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
-	float resFactorX = sm->getWidth()/800.;
-	float resFactorY = sm->getHeight()/600.;
+	float resFactorX = width/800.;
+	float resFactorY = height/600.;
 
 	float freq = m_fft.getFreq();
 	MusicalScale scale;
@@ -134,11 +133,11 @@ void CScreenPractice::draw()
 		noteOffset += octave*7;
 		noteOffset += 0.4 * scale.getNoteOffset(tones[i].freq());
 		double noteOffsetX = -600.0 - 10.0 * tones[i].db();
-		posXnote = (int) ((sm->getWidth()-noteOffsetX*resFactorX)/2.);
+		posXnote = (int) ((width-noteOffsetX*resFactorX)/2.);
 		posYnote = (int) ((340.-noteOffset*12.5)*resFactorY);
 		sm->getVideoDriver()->drawSurface(texture_note,posXnote,posYnote);
 		if( sharp ) {
-			posXsharp = (int) ((sm->getWidth()-(noteOffsetX + 60.0)*resFactorX)/2.);
+			posXsharp = (int) ((width-(noteOffsetX + 60.0)*resFactorX)/2.);
 			posYsharp = (int) ((315.-noteOffset*12.5)*resFactorY);
 			sm->getVideoDriver()->drawSurface(texture_sharp,posXsharp,posYsharp);
 		}

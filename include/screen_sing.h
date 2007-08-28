@@ -11,7 +11,7 @@
 
 class CScreenSing : public CScreen {
   public:
-	CScreenSing(const char* name, CFft const& fft);
+	CScreenSing(const char* name, unsigned int width, unsigned int height, CFft const& fft);
 	~CScreenSing();
 	void enter(void);
 	void exit(void);

@@ -11,7 +11,8 @@
 
 class CScreen {
 	public:
-	CScreen(){};
+	CScreen() {};
+	CScreen(const char * name, unsigned int width, unsigned int height):screenName(name),width(width),height(height) {};
 	virtual ~CScreen() {};
 	virtual void manageEvent( SDL_Event event )=0;
 	virtual void draw( void )=0;
@@ -20,6 +21,8 @@ class CScreen {
 	const char * getName( void ) {return screenName;};
 	protected:
 	const char * screenName; // Must be set by each constructor
+	unsigned int width; // Must be set by each constructor
+	unsigned int height; // Must be set by each constructor
 };
 
 class CScreenManager : public CSingleton <CScreenManager>{

@@ -166,17 +166,17 @@ int main( int argc, char ** argv )
 	screenManager->setVideoDriver( videoDriver );
 	screenManager->setDifficulty( difficulty );
 	
-	screen = new CScreenIntro("Intro");
+	screen = new CScreenIntro("Intro", width, height);
 	screenManager->addScreen(screen);
-	screen = new CScreenSongs("Songs");
+	screen = new CScreenSongs("Songs", width, height);
 	screenManager->addScreen(screen);
-	screen = new CScreenSing("Sing", captureObj.fft());
+	screen = new CScreenSing("Sing", width, height, captureObj.fft());
 	screenManager->addScreen(screen);
-	screen = new CScreenPractice("Practice", captureObj.fft());
+	screen = new CScreenPractice("Practice", width, height, captureObj.fft());
 	screenManager->addScreen(screen);
-	screen = new CScreenScore("Score");
+	screen = new CScreenScore("Score", width, height);
 	screenManager->addScreen(screen);
-	screen = new CScreenConfiguration("Configuration");
+	screen = new CScreenConfiguration("Configuration", width, height);
 	screenManager->addScreen(screen);
 
 	screenManager->activateScreen("Intro");

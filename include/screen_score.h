@@ -9,7 +9,7 @@
 
 class CScreenScore : public CScreen {
 	public:
-	CScreenScore( const char * name );
+	CScreenScore( const char * name, unsigned int width, unsigned int height );
 	~CScreenScore();
 	void enter(void);
 	void exit(void);
