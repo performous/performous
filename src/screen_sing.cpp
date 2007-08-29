@@ -247,7 +247,7 @@ void CScreenSing::draw( void )
 		std::string text = scale.getNoteStr(freq);
 		tmptxt.text = const_cast<char*>(text.c_str());
 		tmptxt.x=0;
-		tmptxt.y=sm->getHeight();
+		tmptxt.y=height;
 		tmptxt.fontsize = 25;
 		theme->theme->PrintText(&tmptxt);
 	}
@@ -288,7 +288,7 @@ void CScreenSing::draw( void )
 
 	for( unsigned int i = 0 ; i < sentence.size() ; i ++ ) {
 		int currentBpm = sentence[i]->timestamp - sentence[0]->timestamp;
-		int noteHeight=sm->getHeight()*3/4-((sentence[i]->note-lowestC)*sm->getHeight()/2/numOctaves/12);
+		int noteHeight=height*3/4-((sentence[i]->note-lowestC)*height/2/numOctaves/12);
 
 		// if C <= timestamp < N
 		if( time > ( (sentence[i]->timestamp+sentence[i]->length)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap ) {
@@ -340,7 +340,7 @@ void CScreenSing::draw( void )
 			// Lets find the nearest note from the song (diff in [-6,5])
 			int diff =  (66+sentence[i]->note - note)%12-6;
 			int noteSingFinal = sentence[i]->note - diff;
-			int noteheight=((18*numOctaves-noteSingFinal+lowestC)*sm->getHeight()/2/numOctaves/12);
+			int noteheight=((18*numOctaves-noteSingFinal+lowestC)*height/2/numOctaves/12);
 			if(freq != 0.0) {
 				pitchGraph.renderPitch(
 						(float)noteheight / height,
