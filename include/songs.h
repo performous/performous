@@ -32,42 +32,42 @@ typedef struct _SNote {
 
 class CSong {
 	public:
-	CSong();
-	~CSong() {};
-	void parseFile( void );
+		CSong();
+		~CSong() {};
+		void parseFile( void );
 
-	unsigned int index;
-	char * path;
-	char * filename;
-	std::vector <char *> category;
-	char * genre;
-	char * edition;
-	char * title;
-	char * artist;
-	char * text;
-	char * creator;
-	char * cover;
-	SDL_Surface * coverSurf;
-	char * mp3;
-	char * background;
-         SDL_Surface * backgroundSurf;	
-        char * video;
-	float videoGap;
-	int noteGap;
-	float start;
-	int end;
-	bool relative;
-	std::vector <TBpm> bpm;
-	float gap;
-	TScore score[3];
-	int noteMin;
-	int noteMax;
-	std::vector <TNote *> notes;
-	bool visible;
-	bool main;
-	int orderNum;
-	int orderType;
-        int maxScore;
+		unsigned int index;
+		char * path;
+		char * filename;
+		std::vector <char *> category;
+		char * genre;
+		char * edition;
+		char * title;
+		char * artist;
+		char * text;
+		char * creator;
+		char * cover;
+		SDL_Surface * coverSurf;
+		char * mp3;
+		char * background;
+		SDL_Surface * backgroundSurf;	
+		char * video;
+		float videoGap;
+		int noteGap;
+		float start;
+		int end;
+		bool relative;
+		std::vector <TBpm> bpm;
+		float gap;
+		TScore score[3];
+		int noteMin;
+		int noteMax;
+		std::vector <TNote *> notes;
+		bool visible;
+		bool main;
+		int orderNum;
+		int orderType;
+		int maxScore;
 };
 
 class CSongs {
