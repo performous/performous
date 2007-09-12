@@ -42,12 +42,13 @@ CScreen * CScreenManager::getScreen(const char * name) {
 	return NULL;
 }
 
-void CScreenManager::getThemePathFile( char * dest , const char * file)
+char * CScreenManager::getThemePathFile( char * dest , const char * file)
 {
 	if( m_theme_name[0] == '/' )
 		sprintf(dest,"%s/%s",m_theme_name,file);
 	else
 		sprintf(dest,"%s/%s/%s",THEMES_DIR,m_theme_name,file);
+	return dest;
 }
 
 void CScreenManager::setPreviousSongId( void )

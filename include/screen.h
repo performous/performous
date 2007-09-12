@@ -70,7 +70,7 @@ class CScreenManager : public CSingleton <CScreenManager>{
 
 	const char * getSongsDirectory( void ) { return m_songs_dir; };
 	const char * getThemeName( void ) { return m_theme_name; };
-	void getThemePathFile( char * dest , const char * file);
+	char * getThemePathFile( char * dest , const char * file);
 	private:
 	const char * m_songs_dir;
 	const char * m_theme_name;
