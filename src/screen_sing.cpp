@@ -290,7 +290,7 @@ void CScreenSing::draw( void )
 		int currentBpm = sentence[i]->timestamp - sentence[0]->timestamp;
 		int noteHeight=height*3/4-((sentence[i]->note-lowestC)*height/2/numOctaves/12);
 
-		// if C <= timestamp < N
+		// if C <= timestamp < N; note already ended
 		if( time > ( (sentence[i]->timestamp+sentence[i]->length)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap ) {
 			int y = noteHeight;
 				int begin = (int) (currentBpm*bpmPixelUnit);
@@ -302,18 +302,19 @@ void CScreenSing::draw( void )
 			tmprect.fill_col.g = 0;
 			tmprect.fill_col.b = 255;
 			theme->theme->DrawRect(tmprect);
-		// if N+d <= timestamp < E
+		// if N+d <= timestamp < E; note hasn't begun yet
 		} else if( time < ( (sentence[i]->timestamp)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap ) {
 			int y = noteHeight;
-				int begin = (int) (currentBpm*bpmPixelUnit);
-				int end   = (int) ((currentBpm+sentence[i]->length)*bpmPixelUnit);
-				tmprect.x = 105.*resFactorX + begin;
+			int begin = (int) (currentBpm*bpmPixelUnit);
+			int end   = (int) ((currentBpm+sentence[i]->length)*bpmPixelUnit);
+			tmprect.x = 105.*resFactorX + begin;
 			tmprect.y = y - 5.*resFactorY;
 			tmprect.width = 100.*resFactorX + end - tmprect.x;
 			tmprect.fill_col.r = 200;
 			tmprect.fill_col.g = 200;
 			tmprect.fill_col.b = 200;
 			theme->theme->DrawRect(tmprect);
+		// note currently playing
 		} else {
 			int y = noteHeight;
 			int begin   = (int) (currentBpm*bpmPixelUnit);
@@ -337,22 +338,33 @@ void CScreenSing::draw( void )
 			tmprect.fill_col.b = 200;
 			theme->theme->DrawRect(tmprect);
 
+			float factor = ((float) sentence[i]->curMaxScore)/song->maxScore;
+			if( factor >= 0 && factor <= 1){
+				song->score[0].score = (int)(10000*factor * song->score[0].hits/song->score[0].total);
+			}
+		}
+	}
+
+	if (!sentence.empty()) {
+		double graphTime = (((time - song->gap) / 60000.0 - sentence[0]->timestamp / (song->bpm[0].bpm * 4)) * (song->bpm[0].bpm * 4) * bpmPixelUnit + 100.0) / sm->getWidth();
+		if (freq == 0.0) {
+			pitchGraph.renderPitch(0.0, graphTime);
+		} else {
+			unsigned int i = 0;
+			// Find the currently playing note or the next playing note (or the last note?)
+			while (i < sentence.size() && time > ( (sentence[i]->timestamp+sentence[i]->length)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap) ++i;
 			// Lets find the nearest note from the song (diff in [-6,5])
 			int diff =  (66+sentence[i]->note - note)%12-6;
 			int noteSingFinal = sentence[i]->note - diff;
 			int noteheight=((18*numOctaves-noteSingFinal+lowestC)*height/2/numOctaves/12);
-			if(freq != 0.0) {
-				pitchGraph.renderPitch(
-						(float)noteheight / height,
-						((double)current + 100) / width);
-				if (abs(diff) <= abs(2 - sm->getDifficulty())) song->score[0].hits++;
-			} else {
-				pitchGraph.renderPitch( 0.0, ((double)current + 100)/width);
-			}
-			song->score[0].total++;
-			float factor = ((float) sentence[i]->curMaxScore)/song->maxScore;
-			if( factor >= 0 && factor <= 1){
-				song->score[0].score = (int)(10000*factor * song->score[0].hits/song->score[0].total);
+			pitchGraph.renderPitch(double(noteheight) / height, graphTime);
+			// Is the note currently playing?
+			if (time >= ( (sentence[i]->timestamp)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap &&
+			  time <= ( (sentence[i]->timestamp+sentence[i]->length)  * 60 * 1000) / ( song->bpm[0].bpm * 4 ) + song->gap) {
+				song->score[0].total += 2;
+				int error = abs(diff);
+				if (error == 0) song->score[0].hits += 2;
+				if (error == 1) song->score[0].hits += 1;
 			}
 		}
 	}
