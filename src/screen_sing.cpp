@@ -340,7 +340,7 @@ void CScreenSing::draw( void )
 
 			float factor = ((float) sentence[i]->curMaxScore)/song->maxScore;
 			if( factor >= 0 && factor <= 1){
-				song->score[0].score = (int)(10000*factor * song->score[0].hits/song->score[0].total);
+				song->score[0].score = (int)(10000*factor * song->score[0].hits/(song->score[0].total + 1));
 			}
 		}
 	}
