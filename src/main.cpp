@@ -83,7 +83,8 @@ int main( int argc, char ** argv )
 {
 	char * songs_directory = NULL;
 	char * theme_name      = NULL;
-	char * capture_device  = (char*)"default";
+	char const* capture_device = "default";
+	unsigned long capture_rate = 48000;
 	CScreen * screen       = NULL;
 	int ch                 = 0;
 	unsigned int difficulty= 2;
@@ -96,13 +97,14 @@ int main( int argc, char ** argv )
 		{"theme",required_argument,NULL,'t'},
 		{"help",no_argument,NULL,'h'},
 		{"capture-device",required_argument,NULL,'c'},
+		{"capture-rate",required_argument,NULL,'r'},
 		{"version",no_argument,NULL,'v'},
 		{"difficulty",required_argument,NULL,'d'},
 		{"fullscreen",no_argument,NULL,'f'},
 		{0, 0, 0, 0}
 	};
 
-	while ((ch = getopt_long(argc, argv, "t:W:H:hc:fd:v", long_options, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "t:W:H:hc:r:fd:v", long_options, NULL)) != -1) {
 		switch(ch) {
 			case 't':
 				theme_name = optarg;
@@ -121,6 +123,9 @@ int main( int argc, char ** argv )
 					capture=false;
 				else
 					capture_device=optarg;
+				break;
+			case 'r':
+				capture_rate=atoi(optarg);
 				break;
 			case 'f':
 				fullscreen=true;
@@ -158,8 +163,8 @@ int main( int argc, char ** argv )
 
 	init();
 	
-	// FIXME: captureDevice and capture variables not used
-	Capture captureObj(48000);
+	// FIXME: capture variable not used
+	Capture captureObj(capture_rate, capture_device);
 
 	screenManager->setSDLScreen(screenSDL);
 	screenManager->setAudio( new CAudio() );

@@ -136,7 +136,7 @@ class Capture {
 	CFft m_fft;
 	CRecord m_record;
   public:
-	Capture(unsigned int rate = DEFAULT_RATE): m_record(m_fft, rate) {
+	Capture(unsigned int rate = DEFAULT_RATE, std::string const& device = "default"): m_record(m_fft, rate, device) {
 		m_record.startThread();
 	}
 	~Capture() {
