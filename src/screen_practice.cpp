@@ -63,6 +63,10 @@ void CScreenPractice::draw()
 	theme->theme->clear();
 	sm->getVideoDriver()->drawSurface(bg_texture);
 
+	// FIXME: proper VU bar instead of a note sign...
+	// getPeak returns 0.0 when clipping, negative values when not that loud. -40.0 can be considered silent, goes down to about -80 dB with high quality sound card when mic is muted.
+	sm->getVideoDriver()->drawSurface(texture_note, (800.0 + 20.0 * m_fft.getPeak()) * resFactorX, 0);
+
 	if(freq != 0.0) {
 		std::string text = scale.getNoteStr(freq);
     	theme->notetxt.text = const_cast<char*>(text.c_str());
