@@ -1,4 +1,4 @@
-SUBDIRS = src docs data themes
+SUBDIRS = audio src docs data themes
 
 includes = include/audio.h \
 	include/video.h \

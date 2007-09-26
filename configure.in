@@ -59,14 +59,6 @@ AC_ARG_WITH(svg,
 )
 if test $svg_layer = yes ; then svg_layer="librsvg" ; fi
 
-AC_ARG_WITH(record,
-	AC_HELP_STRING(--with-record[={alsa|gstreamer|portaudio}],
-		implementation of the record layer (default: autodetect)),
-	[record_layer="$withval"],
-	[record_layer="autodetect"]
-)
-if test $record_layer = yes ; then record_layer="autodetect" ; fi
-
 AC_ARG_WITH(video,
 	 AC_HELP_STRING(--with-video[={gstreamer|xine|smpeg|disable}],
 	 	implementation of the video rendering layer (default: autodetect)),
@@ -332,97 +324,6 @@ esac
 AC_SUBST(AUDIO_FLAGS)
 AC_SUBST(AUDIO_LIBS)
 
-# Do things for record
-case $record_layer in
-	alsa*)
-		if test $alsa_detected = yes ; then
-			record_layer="alsa"
-		else
-			record_layer="no"
-		fi
-		;;
-	gstreamer*)
-		if test $gst_detected = yes ; then
-			record_layer="gstreamer"
-		else
-			record_layer="no"
-		fi
-		;;
-	portaudio*)
-		if test $portaudio18_detected = yes ; then
-			record_layer="portaudio18"
-		else if test $portaudio19_detected = yes ; then
-			record_layer="portaudio19"
-		else
-			record_layer="no"
-		fi ; fi
-		;;
-	autodetect*)
-		if test $portaudio19_detected = yes ; then
-			record_layer="portaudio19"
-		else if test $portaudio18_detected = yes ; then
-			record_layer="portaudio18"
-		else if test $alsa_detected = yes ; then
-			record_layer="alsa"
-		else if test $gst_detected = yes ; then
-			record_layer="gstreamer"
-		else
-			record_layer="no"
-		fi ; fi ; fi ; fi
-		;;
-esac
-
-case $record_layer in
-	alsa*)
-		RECORD_FLAGS=`pkg-config --cflags alsa`
-		RECORD_LIBS=`pkg-config --libs alsa`
-		ac_includes_default=$(cat <<-USNG_EOF
-		$ac_includes_default
-		/* record headers */
-		#define USE_ALSA_RECORD 1
-		#include <alsa/asoundlib.h>
-		USNG_EOF)
-		;;
-	gstreamer*)
-		RECORD_FLAGS=`pkg-config --cflags gstreamer-0.10`
-		RECORD_LIBS=`pkg-config --libs gstreamer-0.10`
-		ac_includes_default=$(cat <<-USNG_EOF
-		$ac_includes_default
-		/* record headers */
-		#define USE_GSTREAMER_RECORD 1
-		#include <gst/gst.h>
-		USNG_EOF)
-		;;
-	portaudio18*)
-		RECORD_FLAGS=""
-		RECORD_LIBS="-lportaudio"
-		ac_includes_default=$(cat <<-USNG_EOF
-		$ac_includes_default
-		/* portaudio v.18 headers */
-		#define USE_PORTAUDIO18_RECORD 1
-		#define USE_PORTAUDIO_RECORD 1
-		#include <portaudio/portaudio.h>
-		USNG_EOF)
-		;;
-	portaudio19*)
-		RECORD_FLAGS=`pkg-config --cflags portaudio-2.0`
-		RECORD_LIBS=`pkg-config --libs portaudio-2.0`
-		ac_includes_default=$(cat <<-USNG_EOF
-		$ac_includes_default
-		/* portaudio v.19 headers */
-		#define USE_PORTAUDIO19_RECORD 1
-		#define USE_PORTAUDIO_RECORD 1
-		#include <portaudio.h>
-		USNG_EOF)
-		;;
-	*)
-		AC_MSG_ERROR("Ultrstar-ng doesn't support no record")
-		;;
-esac
-
-AC_SUBST(RECORD_FLAGS)
-AC_SUBST(RECORD_LIBS)
-
 # Do things for svg
 case $svg_layer in
 	librsvg*)
@@ -522,7 +423,6 @@ echo "Option           | Flag                     | Chosen implementation "
 echo "--------------------------------------------------------------------"
 echo "debug            | --{enable,disable}-debug | $debug                "
 echo "audio            | --with-audio             | $audio_layer          "
-echo "record           | --with-record            | $record_layer         "
 echo "video            | --with-video             | $video_layer          "
 echo "svg              | --with-svg               | $svg_layer            "
 echo "graphic driver   | --with-graphic-driver    | $graphic_driver       "

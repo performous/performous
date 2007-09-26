@@ -76,10 +76,6 @@ CFft::~CFft()
 	fftwf_free(fftIn);
 }
 
-static float sampleConvert(signed short sample) {
-	return sample / 32768.0f;
-}
-
 static int match(std::vector<Peak> const& peaks, int pos, double freq) {
 	int best = pos;
 	if (fabs(peaks[pos-1].freq - freq) < fabs(peaks[best].freq - freq)) best = pos-1;
@@ -87,17 +83,16 @@ static int match(std::vector<Peak> const& peaks, int pos, double freq) {
 	return best;
 }
 
-void CFft::process(unsigned int nframes, signed short* indata)
+void CFft::operator()(audio::pcm_data& indata, audio::settings const& s)
 {
-	if (m_rate == 0.0) throw std::logic_error("Rate not set before calling CFft::process");
 	// Precalculated constants
-	const double freqPerBin = m_rate/(double)fftSize;
+	const double freqPerBin = s.rate/(double)fftSize;
 	const double phaseStep = 2.*M_PI*(double)fftStep/(double)fftSize;
 	const double normCoeff = 4.0 / ((double)fftSize * fftSize);
 	const double minMagnitude = pow(10, -60.0 / 10.0) / normCoeff;
-	
-	std::transform(indata, indata + nframes, std::back_inserter(sampleBuffer), sampleConvert);
 
+	std::copy(indata.begin(0), indata.end(0), std::back_inserter(sampleBuffer));
+	
 	while (sampleBuffer.size() >= fftSize) {
 		float peak = 0.0;
 		for (size_t k=0; k<fftSize; k++) {
@@ -203,223 +198,6 @@ void CFft::process(unsigned int nframes, signed short* indata)
 
 		m_oldTones = tones;
 	}
-}
-
-CRecord::CRecord(RecordCallback& callback, unsigned int rate, std::string deviceName):
-  m_callback(callback),
-  m_rate(rate),
-  captureDevice(deviceName),
-  record(true)
-{}
-
-CRecord::~CRecord()
-{
-}
-
-#ifdef USE_ALSA_RECORD
-int thread_func(void* userData)
-{
-	CRecord& rec = *(CRecord*)userData;
-	try {
-		signed short int buf[4096];
-		int frames = 256;
-		int nFrames;
-		snd_pcm_t *alsaHandle = rec.getAlsaHandle();
-
-		while( rec.isRecording() ) {
-			nFrames = 0;
-			nFrames = snd_pcm_readi(alsaHandle, buf, frames);
-		
-			if(nFrames < 0) {
-				snd_pcm_state_t s = snd_pcm_state(alsaHandle);
-				switch (s) {
-				  case SND_PCM_STATE_OPEN:
-					throw std::runtime_error("ALSA device in open state - configuration failed");
-				  case SND_PCM_STATE_PREPARED:
-				  case SND_PCM_STATE_RUNNING:
-				  case SND_PCM_STATE_DRAINING:
-					throw std::runtime_error("ALSA snd_pcm_readi failed with no apparent reason");
-				  case SND_PCM_STATE_SETUP:
-				  case SND_PCM_STATE_XRUN:
-					if (snd_pcm_prepare(alsaHandle) < 0) throw std::runtime_error("ALSA prepare failed");
-					break;
-				  case SND_PCM_STATE_PAUSED:
-					throw std::runtime_error("ALSA device is paused, but it shouldn't be");
-				  case SND_PCM_STATE_SUSPENDED:
-					if (snd_pcm_resume(alsaHandle) < 0 && snd_pcm_prepare(alsaHandle) < 0 && snd_pcm_reset(alsaHandle) < 0) {
-						throw std::runtime_error("ALSA resume from suspend failed");
-					}
-					break;
-				  case SND_PCM_STATE_DISCONNECTED:
-					throw std::runtime_error("ALSA device disconnected");
-				};
-				nFrames = snd_pcm_readi(alsaHandle, buf, frames);
-				if (nFrames < 0) throw std::runtime_error("ALSA read failure, unable to recover");
-			}
-			if (nFrames > 0) rec.callback().process(nFrames, buf);
-		}
-	} catch (std::exception& e) {
-		std::cerr << "FATAL ERROR: " << e.what() << std::endl;
-	}
-	return 1;
-}
-#endif
-
-#ifdef USE_PORTAUDIO19_RECORD
-static int recordCallback( const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
-			const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void *userData )
-{
-	((CRecord*)userData)->callback().process(framesPerBuffer,(signed short int *)inputBuffer);
-	return paContinue;
-}
-#endif
-#ifdef USE_PORTAUDIO18_RECORD
-static int recordCallback( void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
-			PaTimestamp outTime, void *userData )
-{
-	((CRecord*)userData)->callback().process(framesPerBuffer,(signed short int *)inputBuffer);
-	return 0;
-}
-#endif
-
-#ifdef USE_GSTREAMER_RECORD
-static void _handoff_cb(GstElement *fakesink, GstBuffer *buffer, GstPad *pad, gpointer userData)
-{
-	((CRecord*)userData)->callback().process(GST_BUFFER_SIZE(buffer)/2,(signed short int *)GST_BUFFER_DATA(buffer));
-}
-#endif
-
-void CRecord::startThread()
-{
-#ifdef USE_ALSA_RECORD
-	int result;
-	snd_pcm_hw_params_t *hw_params;
-
-	if ((result = snd_pcm_open(&alsaHandle, captureDevice.c_str(), SND_PCM_STREAM_CAPTURE, 0)) < 0) {
-		throw std::runtime_error("Cannot open audio device " + captureDevice + ": " + snd_strerror(result));
-	}
-
-	snd_pcm_hw_params_malloc(&hw_params);
-	snd_pcm_hw_params_any(alsaHandle, hw_params);
-	snd_pcm_hw_params_set_access(alsaHandle, hw_params,SND_PCM_ACCESS_RW_INTERLEAVED);
-	snd_pcm_hw_params_set_format(alsaHandle, hw_params,SND_PCM_FORMAT_S16_LE);
-	snd_pcm_hw_params_set_rate_near(alsaHandle, hw_params, &m_rate, 0);
-	snd_pcm_hw_params_set_channels(alsaHandle, hw_params, 1);
-	snd_pcm_hw_params(alsaHandle, hw_params);
-	snd_pcm_hw_params_free(hw_params);
-	snd_pcm_prepare(alsaHandle);
-	m_callback.setRate(m_rate);
-	thread = SDL_CreateThread(thread_func, this);
-#endif
-#ifdef USE_PORTAUDIO_RECORD
-	PaError err = paNoError;
-
-	err = Pa_Initialize();
-	if( err != paNoError ) {
-		throw std::runtime_error("Cannot open audio device " + captureDevice + ": " + Pa_GetErrorText(err));
-	}
-
-	#ifdef USE_PORTAUDIO19_RECORD
-	PaStreamParameters inputParameters;
-
-	inputParameters.device = Pa_GetDefaultInputDevice();
-	inputParameters.channelCount = 1;
-	inputParameters.sampleFormat = paInt16;
-	inputParameters.suggestedLatency = Pa_GetDeviceInfo( inputParameters.device )->defaultLowInputLatency;
-	inputParameters.hostApiSpecificStreamInfo = NULL;
-	m_callback.setRate(DEFAULT_RATE);
-
-	err = Pa_OpenStream( &stream, &inputParameters, NULL, DEFAULT_RATE, 50, paClipOff, recordCallback, this);
-	#endif
-	#ifdef USE_PORTAUDIO18_RECORD
-	m_callback.setRate(DEFAULT_RATE);
-	err = Pa_OpenStream( &stream, Pa_GetDefaultInputDeviceID(), 1, paInt16, NULL, paNoDevice, 0, paInt16, NULL, DEFAULT_RATE, 50, 0, 0, recordCallback, this);
-	#endif
-	if( err != paNoError ) {
-		throw std::runtime_error("Cannot open audio stream " + captureDevice + ": " + Pa_GetErrorText(err));
-	}
-
-	err = Pa_StartStream( stream );
-	if( err != paNoError ) {
-		throw std::runtime_error("Cannot start audio stream " + captureDevice + ": " + Pa_GetErrorText(err));
-	}
-#endif
-#ifdef USE_GSTREAMER_RECORD
-	GstElement *source, *audioconvert, *audioresample, *sink;
-	GstCaps *caps;
-
-	gst_init (NULL, NULL);
-	pipeline = gst_pipeline_new("record-pipeline");
-
-	if (!(source = gst_element_factory_make("alsasrc", "record-source"))) {
-		if (!(source = gst_element_factory_make("osssrc", "record-source"))) {
-			if (!(source = gst_element_factory_make("osxaudiosrc", "record-source"))) {
-				throw std::runtime_error("Cannot create record source");
-			}
-		}
-	}
-	if (!(audioconvert = gst_element_factory_make("audioconvert", NULL))) {
-		throw std::runtime_error("Cannot create audioconvert");
-	}
-	if (!(audioresample = gst_element_factory_make("audioresample", NULL))) {
-		throw std::runtime_error("Cannot create audioresample");
-	}
-	if (!(sink = gst_element_factory_make("fakesink", "record-sink"))) {
-		throw std::runtime_error("Cannot create fakesink");
-	}
-	
-	gst_bin_add_many(GST_BIN(pipeline), source, audioconvert, audioresample, sink, NULL);
-	g_object_set(G_OBJECT(sink), "sync", TRUE, NULL);
-	g_object_set(G_OBJECT(sink), "signal-handoffs", TRUE, NULL);
-	g_signal_connect(G_OBJECT(sink), "handoff", G_CALLBACK(_handoff_cb), this);
-	m_callback.setRate(DEFAULT_RATE);
-	
-	/* Link the elements together */
-	caps = gst_caps_new_simple("audio/x-raw-int",
-		"rate", G_TYPE_INT, DEFAULT_RATE,
-		"width", G_TYPE_INT, 16,
-		"depth", G_TYPE_INT, 16,
-		"channels", G_TYPE_INT, 1, NULL);
-	
-	if (!gst_element_link_many(source, audioconvert, audioresample, NULL)) {
-		throw std::runtime_error("Cannot link the GStreamer elements together ('src' -> 'audioconvert' -> 'audioresample')");
-	}
-	if (!gst_element_link_filtered(audioresample, sink, caps)) {
-		throw std::runtime_error("Cannot link the GStreamer elements together ('audioresample' -> 'fakesink')");
-	}
-	gst_caps_unref(caps);
-	
-	/* TODO: gst_element_set_state(_pipeline, GST_STATE_PAUSED); */
-	gst_element_set_state(pipeline, GST_STATE_PLAYING);
-#endif
-	record = true;
-}
-
-void CRecord::stopThread()
-{
-	record = false;
-#ifdef USE_ALSA_RECORD
-	SDL_WaitThread(thread, NULL);
-	snd_pcm_drain(alsaHandle);
-	snd_pcm_close(alsaHandle);
-#endif
-#ifdef USE_PORTAUDIO_RECORD
-	Pa_CloseStream( stream );
-	Pa_Terminate();
-#endif
-#ifdef USE_GSTREAMER_RECORD
-	if( pipeline == NULL )
-		return;
-
-	gst_element_set_state(pipeline, GST_STATE_NULL);
-	gst_object_unref(GST_OBJECT(pipeline));
-	pipeline = NULL;
-#endif
-}
-
-bool CRecord::isRecording()
-{
-	return record;
 }
 
 std::string MusicalScale::getNoteStr(double freq) const {

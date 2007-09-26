@@ -1,6 +1,7 @@
 #ifndef __RECORD_H_
 #define __RECORD_H_
 
+#include "/root/audio-test/audio.hpp"
 #include "../config.h"
 #include <deque>
 #include <vector>
@@ -40,18 +41,6 @@ static inline bool operator>(Tone const& lhs, Tone const& rhs) { return lhs.freq
 
 class Record;
 
-/** @short A callback interface. The caller sets the rate field before calling process. **/
-class RecordCallback {
-	friend class Record;
-  protected:
-	unsigned int m_rate;
-  public:
-	RecordCallback(): m_rate(0) {}
-	virtual ~RecordCallback() {}
-  	void setRate(unsigned int rate) { m_rate = rate; }
-	virtual void process(unsigned int nframes, signed short* indata) = 0;
-};
-
 /** @short A wrapper for SDL mutex. **/
 class Mutex {
 	SDL_mutex* mutex;
@@ -74,11 +63,11 @@ class ScopedLock {
 	~ScopedLock() { mutex.unlock(); }
 };
 
-class CFft: public RecordCallback {
+class CFft {
   public:
 	CFft(size_t fftSize = 4096, size_t fftStep = 1500);
 	~CFft();
-	void process(unsigned int nframes, signed short* indata);
+	void operator()(audio::pcm_data& data, audio::settings const& s);
 	/** Get the peak level in dB (negative value, 0.0 = clipping). **/
 	double getPeak() const { return m_peak; }
 	/** Get the primary (singing) frequency. **/
@@ -104,46 +93,21 @@ class CFft: public RecordCallback {
 	std::vector<Tone> m_oldTones;
 };
 
-class CRecord {
-  public:
-	CRecord(RecordCallback& callback, unsigned int rate, std::string captureDevice = "default");
-	~CRecord();
-	void startThread();
-	void stopThread();
-	bool isRecording();
-	RecordCallback& callback() { return m_callback; }
-#ifdef USE_ALSA_RECORD
-	snd_pcm_t* getAlsaHandle() { return alsaHandle; }
-#endif
-  private:
-	RecordCallback& m_callback;
-	unsigned int m_rate;
-	std::string captureDevice;
-	bool record;
-#ifdef USE_ALSA_RECORD
-	snd_pcm_t *alsaHandle;
-	SDL_Thread *thread;
-#endif
-#ifdef USE_PORTAUDIO_RECORD
-	PaStream *stream;
-#endif
-#ifdef USE_GSTREAMER_RECORD
-	GstElement *pipeline;
-#endif
-};
-
 class Capture {
 	CFft m_fft;
-	CRecord m_record;
+	audio::settings m_rs;
+	audio::record m_record;
   public:
-	Capture(unsigned int rate = DEFAULT_RATE, std::string const& device = "default"): m_record(m_fft, rate, device) {
-		m_record.startThread();
-	}
-	~Capture() {
-		m_record.stopThread();
-	}
+	Capture(std::string const& device = "", std::size_t rate = DEFAULT_RATE):
+	  m_rs(audio::settings(device)
+	  .set_callback(boost::ref(m_fft))
+	  .set_channels(1)
+	  .set_rate(rate)
+	  .set_debug(std::cerr)),
+	  m_record(m_rs)
+	{}
+	~Capture() {}
 	CFft& fft() { return m_fft; }
-	CRecord& rec() { return m_record; }
 };
 
 class MusicalScale {

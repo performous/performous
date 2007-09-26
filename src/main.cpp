@@ -16,8 +16,6 @@ SDL_Surface * screenSDL;
 CScreenManager *screenManager;
 CVideoDriver *videoDriver;
 
-bool capture = true;
-
 void checkEvents( void )
 {
 	while(SDL_PollEvent( &event ) == 1) {
@@ -83,7 +81,7 @@ int main( int argc, char ** argv )
 {
 	char * songs_directory = NULL;
 	char * theme_name      = NULL;
-	char const* capture_device = "default";
+	char const* capture_device = "";
 	unsigned long capture_rate = 48000;
 	CScreen * screen       = NULL;
 	int ch                 = 0;
@@ -119,10 +117,7 @@ int main( int argc, char ** argv )
 				usage(argv[0]);
 				break;
 			case 'c':
-				if(!strncmp("none",optarg,5))
-					capture=false;
-				else
-					capture_device=optarg;
+				capture_device=optarg;
 				break;
 			case 'r':
 				capture_rate=atoi(optarg);
@@ -163,8 +158,7 @@ int main( int argc, char ** argv )
 
 	init();
 	
-	// FIXME: capture variable not used
-	Capture captureObj(capture_rate, capture_device);
+	Capture capture(capture_device, capture_rate);
 
 	screenManager->setSDLScreen(screenSDL);
 	screenManager->setAudio( new CAudio() );
@@ -175,9 +169,9 @@ int main( int argc, char ** argv )
 	screenManager->addScreen(screen);
 	screen = new CScreenSongs("Songs", width, height);
 	screenManager->addScreen(screen);
-	screen = new CScreenSing("Sing", width, height, captureObj.fft());
+	screen = new CScreenSing("Sing", width, height, capture.fft());
 	screenManager->addScreen(screen);
-	screen = new CScreenPractice("Practice", width, height, captureObj.fft());
+	screen = new CScreenPractice("Practice", width, height, capture.fft());
 	screenManager->addScreen(screen);
 	screen = new CScreenScore("Score", width, height);
 	screenManager->addScreen(screen);
