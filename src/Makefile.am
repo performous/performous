@@ -21,7 +21,7 @@ ultrastarng_SOURCES = main.cpp \
 	sdl_gl.cpp \
 	video_driver.cpp
 
-INCLUDES = -I../include \
+INCLUDES = -I../include -I../audio\
 	-O2 -Wall -Wextra -std=c++98 -pedantic -ansi \
 	@CAIRO_FLAGS@ @XML_FLAGS@ @SDL_FLAGS@ @FFT_FLAGS@ \
 	@VIDEO_FLAGS@ @SVG_FLAGS@ @AUDIO_FLAGS@ @PANGOCAIRO_FLAGS@\

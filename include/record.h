@@ -1,7 +1,7 @@
 #ifndef __RECORD_H_
 #define __RECORD_H_
 
-#include "/root/audio-test/audio.hpp"
+#include <audio.hpp>
 #include "../config.h"
 #include <deque>
 #include <vector>
