@@ -169,9 +169,9 @@ int main( int argc, char ** argv )
 	screenManager->addScreen(screen);
 	screen = new CScreenSongs("Songs", width, height);
 	screenManager->addScreen(screen);
-	screen = new CScreenSing("Sing", width, height, capture.fft());
+	screen = new CScreenSing("Sing", width, height, capture.analyzer());
 	screenManager->addScreen(screen);
-	screen = new CScreenPractice("Practice", width, height, capture.fft());
+	screen = new CScreenPractice("Practice", width, height, capture.analyzer());
 	screenManager->addScreen(screen);
 	screen = new CScreenScore("Score", width, height);
 	screenManager->addScreen(screen);

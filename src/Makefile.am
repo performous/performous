@@ -23,9 +23,9 @@ ultrastarng_SOURCES = main.cpp \
 
 INCLUDES = -I../include -I../audio\
 	-O2 -Wall -Wextra -std=c++98 -pedantic -ansi \
-	@CAIRO_FLAGS@ @XML_FLAGS@ @SDL_FLAGS@ @FFT_FLAGS@ \
+	@CAIRO_FLAGS@ @XML_FLAGS@ @SDL_FLAGS@ \
 	@VIDEO_FLAGS@ @SVG_FLAGS@ @AUDIO_FLAGS@ @PANGOCAIRO_FLAGS@\
 	-DTHEMES_DIR="\"@THEMES_DIR@\"" -DDATA_DIR="\"@DATA_DIR@\""
-LDADD   = @CAIRO_LIBS@ @XML_LIBS@ @SDL_LIBS@ @FFT_LIBS@ \
+LDADD   = @CAIRO_LIBS@ @XML_LIBS@ @SDL_LIBS@ \
 	@VIDEO_LIBS@ @SVG_LIBS@ @AUDIO_LIBS@ @GL_LIBS@ @PANGOCAIRO_LIBS@ \
 	-L../audio -laudio

@@ -11,14 +11,14 @@
 
 class CScreenSing : public CScreen {
   public:
-	CScreenSing(const char* name, unsigned int width, unsigned int height, CFft const& fft);
+	CScreenSing(const char* name, unsigned int width, unsigned int height, Analyzer const& analyzer);
 	~CScreenSing();
 	void enter(void);
 	void exit(void);
 	void manageEvent( SDL_Event event );
 	void draw(void);
   private:
-	CFft const& m_fft;
+	Analyzer const& m_analyzer;
 	SDL_Surface * videoSurf;
 	SDL_Surface * backgroundSurf;
 	unsigned int backgroundSurf_id;

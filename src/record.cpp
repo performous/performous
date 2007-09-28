@@ -1,4 +1,6 @@
 #include <record.h>
+
+#include <fft.hpp>
 #include <algorithm>
 #include <functional>
 #include <iomanip>
@@ -53,27 +55,17 @@ Tone& Tone::operator+=(Tone const& t) {
 	return *this;
 }
 
-CFft::CFft(size_t fftSize, size_t fftStep):
-  fftSize(fftSize),
-  fftStep(fftStep),
-  fftIn((float*)fftwf_malloc(sizeof(float) * 2 * (fftSize/2+1))),
-  fftOut((fftwf_complex *)fftIn),
-  fftPlan(fftwf_plan_dft_r2c_1d(fftSize, fftIn, fftOut, FFTW_MEASURE)),
-  fftLastPhase(fftSize/2+1),
-  window(fftSize),
+Analyzer::Analyzer(size_t step):
+  step(step),
+  fftLastPhase(FFT_N / 2),
+  window(FFT_N),
   m_peak(-std::numeric_limits<double>::infinity()),
   m_freq(0.0)
 {
   	// Hamming window
-	for (size_t i=0; i<fftSize; i++) {
-		window[i] = 0.53836f - 0.46164f * cos(2.0f * M_PI * i / (fftSize - 1));
+	for (size_t i=0; i < FFT_N; i++) {
+		window[i] = 0.53836 - 0.46164 * std::cos(2.0 * M_PI * i / FFT_N - 1);
 	}
-}
-
-CFft::~CFft()
-{
-	fftwf_destroy_plan(fftPlan);
-	fftwf_free(fftIn);
 }
 
 static int match(std::vector<Peak> const& peaks, int pos, double freq) {
@@ -83,38 +75,30 @@ static int match(std::vector<Peak> const& peaks, int pos, double freq) {
 	return best;
 }
 
-void CFft::operator()(audio::pcm_data& indata, audio::settings const& s)
+void Analyzer::operator()(audio::pcm_data& indata, audio::settings const& s)
 {
 	// Precalculated constants
-	const double freqPerBin = s.rate/(double)fftSize;
-	const double phaseStep = 2.*M_PI*(double)fftStep/(double)fftSize;
-	const double normCoeff = 4.0 / ((double)fftSize * fftSize);
+	const double freqPerBin = s.rate/(double)FFT_N;
+	const double phaseStep = 2.*M_PI*(double)step/(double)FFT_N;
+	const double normCoeff = 1.0 / FFT_N; // WTF? 4.0 / ((double)FFT_N * FFT_N);
 	const double minMagnitude = pow(10, -60.0 / 10.0) / normCoeff;
 
-	std::copy(indata.begin(0), indata.end(0), std::back_inserter(sampleBuffer));
+	std::copy(indata.begin(0), indata.end(0), std::back_inserter(m_buf));
 	
-	while (sampleBuffer.size() >= fftSize) {
-		float peak = 0.0;
-		for (size_t k=0; k<fftSize; k++) {
-			float sample = sampleBuffer[k];
-			peak = std::max(peak, sample * sample);
-			fftIn[k] = sample * window[k];
-		}
-		m_peak = 10.0 * log10(peak); // Critical: atomic write
-		
-		sampleBuffer.erase(sampleBuffer.begin(), sampleBuffer.begin() + fftStep);
-
-		fftwf_execute(fftPlan);
-
+	while (m_buf.size() >= FFT_N) {
+		// Calculate peak
+		m_peak = 20.0 * log10(*std::max_element(m_buf.begin(), m_buf.begin() + FFT_N)); // Critical: atomic write
+		// Calculate FFT
+		std::vector<std::complex<double> > data = audio::fft<FFT_P>(m_buf.begin(), window);
+		// Erase one step of samples
+		m_buf.erase(m_buf.begin(), m_buf.begin() + step);
 		// Process only up to 3000 Hz
-		size_t kMax = std::min(fftSize / 2, (size_t)(3000.0 / freqPerBin));
+		size_t kMax = std::min(FFT_N / 2, (size_t)(3000.0 / freqPerBin));
 		std::vector<Peak> peaks(kMax + 1);
 
 		for (size_t k = 0; k <= kMax; ++k) {
-			double real = fftOut[k][0];
-			double imag = fftOut[k][1];
-			double magnitude = real*real + imag*imag;
-			double phase = atan2(imag, real);
+			double magnitude = std::abs(data[k]);
+			double phase = std::arg(data[k]);
 			
 			// process phase difference
 			double delta = phase - fftLastPhase[k];
@@ -124,7 +108,7 @@ void CFft::operator()(audio::pcm_data& indata, audio::settings const& s)
 			// map delta phase into +/- M_PI interval
 			delta = remainder(delta, 2.0 * M_PI);
 			// calculate diff from bin center frequency
-			delta /= phaseStep; // ((double)fftSize / fftStep) / (2.0 * M_PI);
+			delta /= phaseStep; // ((double)FFT_N / step) / (2.0 * M_PI);
 			// process the k-th partials' true frequency
 			double freq = (k + delta) * freqPerBin;
 			
@@ -182,7 +166,7 @@ void CFft::operator()(audio::pcm_data& indata, audio::settings const& s)
 			std::set_union(tones.begin(), tones.end(), m_oldTones.begin(), m_oldTones.end(), std::back_inserter(un));
 			// Take from m_tones only those that have played recently, into tmp (use the one from union)
 			std::set_intersection(un.begin(), un.end(), m_tones.begin(), m_tones.end(), std::back_inserter(tmp));
-			ScopedLock l(m_mutex); // Critical section: writing to m_tones
+			boost::mutex::scoped_lock l(m_mutex); // Critical section: writing to m_tones
 			m_tones.clear();
 			// Combine tmp with the stable new tones (the intersection), into m_tones.
 			std::set_union(tmp.begin(), tmp.end(), is.begin(), is.end(), back_inserter(m_tones));

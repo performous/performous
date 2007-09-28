@@ -1,6 +1,6 @@
 #include <screen_practice.h>
 
-CScreenPractice::CScreenPractice(const char* name, unsigned int width, unsigned int height, CFft const& fft): CScreen(name,width,height), m_fft(fft)
+CScreenPractice::CScreenPractice(const char* name, unsigned int width, unsigned int height, Analyzer const& analyzer): CScreen(name,width,height), m_analyzer(analyzer)
 {
 }
 
@@ -57,7 +57,7 @@ void CScreenPractice::draw()
 	float resFactorX = width/800.;
 	float resFactorY = height/600.;
 
-	float freq = m_fft.getFreq();
+	float freq = m_analyzer.getFreq();
 	MusicalScale scale;
 
 	theme->theme->clear();
@@ -65,14 +65,14 @@ void CScreenPractice::draw()
 
 	// FIXME: proper VU bar instead of a note sign...
 	// getPeak returns 0.0 when clipping, negative values when not that loud. -40.0 can be considered silent, goes down to about -80 dB with high quality sound card when mic is muted.
-	sm->getVideoDriver()->drawSurface(texture_note, (800.0 + 20.0 * m_fft.getPeak()) * resFactorX, 0);
+	sm->getVideoDriver()->drawSurface(texture_note, (800.0 + 20.0 * m_analyzer.getPeak()) * resFactorX, 0);
 
 	if(freq != 0.0) {
 		std::string text = scale.getNoteStr(freq);
     	theme->notetxt.text = const_cast<char*>(text.c_str());
     	theme->theme->PrintText(&theme->notetxt);
 	}
-	std::vector<Tone> tones = m_fft.getTones();
+	std::vector<Tone> tones = m_analyzer.getTones();
 	for (size_t i = 0; i < tones.size(); ++i) {
 		int note = scale.getNoteId(tones[i].freq());
 		if (note == -1) continue;

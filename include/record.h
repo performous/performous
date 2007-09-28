@@ -1,12 +1,13 @@
 #ifndef __RECORD_H_
 #define __RECORD_H_
 
+#include <boost/thread/mutex.hpp>
 #include <audio.hpp>
-#include "../config.h"
+#include <cstddef>
 #include <deque>
+#include <iostream>
+#include <limits>
 #include <vector>
-
-static const unsigned int DEFAULT_RATE = 48000;
 
 struct Peak {
 	double freq;
@@ -39,34 +40,11 @@ static inline bool operator>=(Tone const& lhs, Tone const& rhs) { return lhs.fre
 static inline bool operator<(Tone const& lhs, Tone const& rhs) { return lhs.freq() < rhs.freq() && lhs != rhs; }
 static inline bool operator>(Tone const& lhs, Tone const& rhs) { return lhs.freq() > rhs.freq() && lhs != rhs; }
 
-class Record;
-
-/** @short A wrapper for SDL mutex. **/
-class Mutex {
-	SDL_mutex* mutex;
-	Mutex(Mutex const&); // Prevent copying
-	Mutex& operator=(Mutex const&); // ... and assignment
+class Analyzer {
+	static const unsigned FFT_P = 12;
+	static const std::size_t FFT_N = 1 << FFT_P;
   public:
-	Mutex(): mutex(SDL_CreateMutex()) {}
-	~Mutex() { SDL_DestroyMutex(mutex); }
-	void lock() { SDL_mutexP(mutex); }
-	void unlock() { SDL_mutexV(mutex); }
-};
-
-/** @short A scoped RAII wrapper for mutex locking. **/
-class ScopedLock {
-	Mutex& mutex;
-	ScopedLock(ScopedLock const&); // Prevent copying
-	ScopedLock& operator=(ScopedLock const&); // ... and assignment
-  public:
-	ScopedLock(Mutex& mutex): mutex(mutex) { mutex.lock(); }
-	~ScopedLock() { mutex.unlock(); }
-};
-
-class CFft {
-  public:
-	CFft(size_t fftSize = 4096, size_t fftStep = 1500);
-	~CFft();
+	Analyzer(std::size_t step = 1500);
 	void operator()(audio::pcm_data& data, audio::settings const& s);
 	/** Get the peak level in dB (negative value, 0.0 = clipping). **/
 	double getPeak() const { return m_peak; }
@@ -74,40 +52,37 @@ class CFft {
 	double getFreq() const { return m_freq; }
 	/** Get a list of all tones detected. **/
 	std::vector<Tone> getTones() const {
-		ScopedLock l(m_mutex);
+		boost::mutex::scoped_lock l(m_mutex);
 		return m_tones;
 	}
   private:
-	mutable Mutex m_mutex;
-	size_t fftSize;
-	size_t fftStep;
-	float *fftIn;
-	fftwf_complex *fftOut;
-	fftwf_plan fftPlan;
+	mutable boost::mutex m_mutex;
+	std::size_t step;
 	std::vector<float> fftLastPhase;
 	std::vector<float> window;
 	volatile double m_peak;
 	volatile double m_freq;
-	std::deque<float> sampleBuffer;
+	std::deque<float> m_buf; // Sample buffer
 	std::vector<Tone> m_tones; // Synchronized access only!
 	std::vector<Tone> m_oldTones;
 };
 
 class Capture {
-	CFft m_fft;
+	static const std::size_t DEFAULT_RATE = 48000;
+	Analyzer m_analyzer;
 	audio::settings m_rs;
 	audio::record m_record;
   public:
 	Capture(std::string const& device = "", std::size_t rate = DEFAULT_RATE):
 	  m_rs(audio::settings(device)
-	  .set_callback(boost::ref(m_fft))
+	  .set_callback(boost::ref(m_analyzer))
 	  .set_channels(1)
 	  .set_rate(rate)
 	  .set_debug(std::cerr)),
 	  m_record(m_rs)
 	{}
 	~Capture() {}
-	CFft& fft() { return m_fft; }
+	Analyzer const& analyzer() const { return m_analyzer; }
 };
 
 class MusicalScale {

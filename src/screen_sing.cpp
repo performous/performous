@@ -3,8 +3,8 @@
 #include <pitch_graph.h>
 #include <cairotosdl.h>
 
-CScreenSing::CScreenSing(const char* name, unsigned int width, unsigned int height, CFft const& fft)
-: CScreen(name,width,height), m_fft(fft), pitchGraph(width, height)
+CScreenSing::CScreenSing(const char* name, unsigned int width, unsigned int height, Analyzer const& analyzer)
+: CScreen(name,width,height), m_analyzer(analyzer), pitchGraph(width, height)
 {
 	video = new CVideo();
 	SDL_Surface *screen;
@@ -140,7 +140,7 @@ void CScreenSing::draw( void )
 		return;
 	}
 
-	freq = m_fft.getFreq();
+	freq = m_analyzer.getFreq();
 	MusicalScale scale;
 	note = scale.getNoteId(freq);
 

@@ -9,14 +9,14 @@
 
 class CScreenPractice : public CScreen {
   public:
-	CScreenPractice(const char* name, unsigned int width, unsigned int height, CFft const& fft);
+	CScreenPractice(const char* name, unsigned int width, unsigned int height, Analyzer const& analyzer);
 	~CScreenPractice();
 	void enter(void);
 	void exit(void);
 	void manageEvent( SDL_Event event );
 	void draw(void);
   private:
-	CFft const& m_fft;
+	Analyzer const& m_analyzer;
 	CThemePractice *theme;
 	CairoSVG * cairo_svg_note;
 	CairoSVG * cairo_svg_sharp;
