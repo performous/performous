@@ -1,3 +1,4 @@
+#include <glob.h>
 #include <songs.h>
 #include <screen.h>
 #include <iostream>

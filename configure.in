@@ -19,10 +19,7 @@ CFLAGS="-W -Wall $CFLAGS"
 CXXFLAGS="-W -Wall $CXXFLAGS"
 
 # standard programs
-AC_PROG_CC
 AC_PROG_CXX
-AC_PROG_RANLIB
-AC_PROG_INSTALL
 AC_PATH_PROG(HELP2MAN, help2man, AC_MSG_ERROR(Cannot find help2man))
 
 THEMES_DIR="${datadir}/ultrastar-ng/themes/"
@@ -76,19 +73,19 @@ AC_ARG_WITH(graphic-driver,
 if test $graphic_driver = yes; then graphic_driver="sdl"; fi
 
 # Check for the standard headers
-AC_HEADER_STDC
-AC_HEADER_DIRENT
+#AC_HEADER_STDC
+#AC_HEADER_DIRENT
 
-AC_LANG_SAVE
-	AC_LANG_CPLUSPLUS
-	AC_CHECK_HEADERS([algorithm],
-		have_stdpp_headers=yes, 
-		AC_MSG_ERROR([You need to have the libstdc++ headers installed]))
-AC_LANG_RESTORE
+#AC_LANG_SAVE
+#	AC_LANG_CPLUSPLUS
+#	AC_CHECK_HEADERS([algorithm],
+#		have_stdpp_headers=yes, 
+#		AC_MSG_ERROR([You need to have the libstdc++ headers installed]))
+#AC_LANG_RESTORE
 
-AC_CHECK_HEADERS([fcntl.h math.h glob.h getopt.h dirent.h sys/ioctl.h sys/types.h sys/stat.h ],
-	have_std_headers=yes,
-	AC_MSG_ERROR(You need to have the standard c headers installed) )
+#AC_CHECK_HEADERS([fcntl.h math.h glob.h getopt.h dirent.h sys/ioctl.h sys/types.h sys/stat.h ],
+#	have_std_headers=yes,
+#	AC_MSG_ERROR(You need to have the standard c headers installed) )
 
 PKG_CHECK_MODULES(cairo, cairo >= 1.2 , ,
 	AC_MSG_ERROR(This game cannot be built without cairo >= 1.2 ))
@@ -113,26 +110,6 @@ dnl ###########################################################################
 dnl #### processing things
 
 # standard headers are installed, we include them in the config.h file
-
-ac_includes_default=$(cat <<USNG_EOF
-$ac_includes_default
-/* libstd++ headers */
-#include <algorithm>
-#include <string>
-#include <vector>
-#include <iostream>
-/* libc headers */
-#include <getopt.h>
-#include <fcntl.h>
-#include <math.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <dirent.h>
-#include <glob.h>
-#include <sys/ioctl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-USNG_EOF)
 
 # Do things for cairo
 CAIRO_FLAGS=`pkg-config --cflags cairo`

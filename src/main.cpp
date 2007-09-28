@@ -1,5 +1,6 @@
 #include "../config.h"
 
+#include <getopt.h>
 #include <screen.h>
 #include <screen_intro.h>
 #include <screen_songs.h>
@@ -8,6 +9,8 @@
 #include <screen_score.h>
 #include <screen_configuration.h>
 #include <video_driver.h>
+#include <boost/thread.hpp>
+
 unsigned int width=800;
 unsigned int height=600;
 
@@ -185,7 +188,7 @@ int main( int argc, char ** argv )
 		videoDriver->blank();
 		screenManager->getCurrentScreen()->draw();
 		videoDriver->swap();
-		SDL_Delay(10);
+		boost::thread::yield();
 	}
 
 	delete videoDriver;

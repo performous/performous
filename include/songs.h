@@ -2,6 +2,7 @@
 #define __SONGS_H__
 
 #include "../config.h"
+#include <vector>
 
 typedef struct _SBpm {
 	float bpm;
