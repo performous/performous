@@ -12,7 +12,7 @@ LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~x86 ~amd64"
 
-IUSE="deprecated_cairo_svg novideo xine gstreamer opengl debug"
+IUSE="deprecated_cairo_svg novideo xine gstreamer opengl debug alsa"
 
 ECVS_SERVER="ultrastar-ng.cvs.sourceforge.net:/cvsroot/ultrastar-ng"
 ECVS_MODULE="UltraStar-ng"
@@ -22,6 +22,8 @@ ECVS_PASS=""
 
 DEPEND="
 	>=x11-libs/cairo-1.2
+	x11-libs/pango
+
 	xine? ( media-libs/xine-lib )
 	gstreamer? ( >=media-libs/gstreamer-0.10 )
 	!deprecated_cairo_svg? ( >=gnome-base/librsvg-2 )
@@ -31,8 +33,8 @@ DEPEND="
 	media-libs/sdl-gfx
 	!novideo? ( media-libs/smpeg )
 
-	>sci-libs/fftw-3
-	media-libs/alsa-lib
+	dev-libs/boost
+	alsa? (media-libs/alsa-lib)
 	
 	sys-apps/help2man"
 
