@@ -1,3 +1,5 @@
+EXTRA_DIST = alsa/alsa.hpp audio.hpp audio_dev.hpp fft.hpp
+
 lib_LTLIBRARIES = libultrastarngrecord.la
 
 flags = -I../

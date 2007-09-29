@@ -6,13 +6,14 @@ includes = include/audio.h \
 	include/pitch_graph.h \
 	include/configuration.h \
 	include/screen.h \
-	include/screen_sing.h \
 	include/singleton.h \
 	include/theme.h \
 	include/cairosvg.h \
 	include/record.h \
 	include/screen_intro.h \
 	include/screen_songs.h \
+	include/screen_sing.h \
+	include/screen_score.h \
 	include/screen_practice.h \
 	include/screen_configuration.h \
 	include/songs.h \
