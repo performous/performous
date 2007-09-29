@@ -5,3 +5,4 @@ aclocal.m4
 configure
 autom4te.cache
 stamp-h1
+libtool

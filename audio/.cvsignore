@@ -2,4 +2,5 @@ Makefile
 Makefile.in
 .deps
 .libs
-ultrastarng
+libultrastarngrecord.la
+*.lo
