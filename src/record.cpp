@@ -123,7 +123,7 @@ void Analyzer::operator()(audio::pcm_data& indata, audio::settings const& s)
 		double db = -std::numeric_limits<double>::infinity();
 		for (size_t k = 2; k < kMax; ++k) {
 			// Prefilter out too low freqs, too silent bins and bins that are weaker than their neighbors
-			if (peaks[k].freq < 80.0 || peaks[k].db < -60.0 || peaks[k].db < peaks[k-1].db || peaks[k].db < peaks[k+1].db) continue;
+			if (peaks[k].freq < 80.0 || peaks[k].freq > 700.0 || peaks[k].db < -30.0 || peaks[k].db < peaks[k-1].db || peaks[k].db < peaks[k+1].db) continue;
 			// Find the base peak (fundamental frequency)
 			int harmonic = 1;
 			int misses = 0;
@@ -131,7 +131,7 @@ void Analyzer::operator()(audio::pcm_data& indata, audio::settings const& s)
 				double freq = peaks[k].freq / h;
 				if (freq < 40.0 || ++misses > 3) break;
 				int best = match(peaks, k / h, freq);
-				if (peaks[best].db < -60.0 || fabs(peaks[best].freq / freq - 1.0) > .03) continue;
+				if (peaks[best].db < -30.0 || fabs(peaks[best].freq / freq - 1.0) > .03) continue;
 				misses = 0;
 				harmonic = h;
 			}

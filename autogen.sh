@@ -14,5 +14,7 @@ autoheader
 test -f "config.h.in:config.h.incl" && mv "config.h.in:config.h.incl" config.h.in
 echo "### Running autoconf"
 autoconf
+echo "### Running libtoolize"
+libtoolize --force
 echo "### Running automake"
 automake -a

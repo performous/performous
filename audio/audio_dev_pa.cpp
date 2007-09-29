@@ -30,27 +30,27 @@ namespace audio {
 		} initialize;
 		struct strm {
 			PaStream* handle;
-			strm(settings& s, PaCallback callback) {
+			strm( pa19_record* rec) {
 				PaStreamParameters p;
-				if (s.subdev.empty()) {
+				if (rec->s.subdev.empty()) {
 					p.device = Pa_GetDefaultInputDevice();
 				} else {
-					std::istringstream iss(s.subdev);
+					std::istringstream iss(rec->s.subdev);
 					iss >> p.device;
 					if (!iss.eof() || p.device < 0 || p.device > Pa_GetDeviceCount() - 1) throw std::invalid_argument("Invalid PortAudio device number");
 				}
-				p.channelCount = s.channels;
+				p.channelCount = rec->s.channels;
 				p.sampleFormat = paInt16;
-				if (s.frames != settings::high) p.suggestedLatency = Pa_GetDeviceInfo(p.device)->defaultLowInputLatency;
+				if (rec->s.frames != settings::high) p.suggestedLatency = Pa_GetDeviceInfo(p.device)->defaultLowInputLatency;
 				else p.suggestedLatency = Pa_GetDeviceInfo(p.device)->defaultHighInputLatency;
 				p.hostApiSpecificStreamInfo = NULL;
-				PaError err = Pa_OpenStream(&stream, &p, NULL, s.rate, 50, paClipOff, c_callback, this);
-				if (err != paNoError) throw std::runtime_error("Cannot open PortAudio audio stream " + s.subdev + ": " + Pa_GetErrorText(err));
+				PaError err = Pa_OpenStream(&stream, &p, NULL, rec->s.rate, 50, paClipOff, rec->c_callback, rec);
+				if (err != paNoError) throw std::runtime_error("Cannot open PortAudio audio stream " + rec->s.subdev + ": " + Pa_GetErrorText(err));
 			}
 			~strm() { Pa_CloseStream(handle); }
 		} stream;
 	  public:
-		pa19_record(settings& s_orig): s(s_orig), initialize(), stream(s, c_callback) {
+		pa19_record(settings& s_orig): s(s_orig), initialize(), stream(this) {
 			PaError err = Pa_StartStream(stream.handle);
 			if( err != paNoError ) throw std::runtime_error("Cannot start PortAudio audio stream " + s.subdev + ": " + Pa_GetErrorText(err));
 			s_orig = s;

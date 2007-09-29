@@ -20,6 +20,8 @@ CXXFLAGS="-W -Wall $CXXFLAGS"
 
 # standard programs
 AC_PROG_CXX
+AC_PROG_INSTALL
+AC_PROG_LIBTOOL
 AC_PATH_PROG(HELP2MAN, help2man, AC_MSG_ERROR(Cannot find help2man))
 
 THEMES_DIR="${datadir}/ultrastar-ng/themes/"
@@ -29,6 +31,7 @@ DATA_DIR="${datadir}/ultrastar-ng/"
 AC_SUBST(DATA_DIR)
 
 # Processing configure input configuration flags
+	
 AC_ARG_ENABLE(debug,
 	AC_HELP_STRING(--enable-debug,
 		Enable debugging support),
@@ -73,19 +76,21 @@ AC_ARG_WITH(graphic-driver,
 if test $graphic_driver = yes; then graphic_driver="sdl"; fi
 
 # Check for the standard headers
-#AC_HEADER_STDC
-#AC_HEADER_DIRENT
+AC_HEADER_STDC
+AC_HEADER_DIRENT
 
-#AC_LANG_SAVE
-#	AC_LANG_CPLUSPLUS
-#	AC_CHECK_HEADERS([algorithm],
-#		have_stdpp_headers=yes, 
-#		AC_MSG_ERROR([You need to have the libstdc++ headers installed]))
-#AC_LANG_RESTORE
+AC_LANG_SAVE
+	AC_LANG_CPLUSPLUS
+	AC_CHECK_HEADERS([algorithm],
+		have_stdpp_headers=yes, 
+		AC_MSG_ERROR([You need to have the libstdc++ headers installed]))
+	AC_CHECK_HEADERS([boost/thread.hpp],, 
+		AC_MSG_ERROR([You need to have the boost thread headers installed]))
+AC_LANG_RESTORE
 
-#AC_CHECK_HEADERS([fcntl.h math.h glob.h getopt.h dirent.h sys/ioctl.h sys/types.h sys/stat.h ],
-#	have_std_headers=yes,
-#	AC_MSG_ERROR(You need to have the standard c headers installed) )
+AC_CHECK_HEADERS([fcntl.h math.h glob.h getopt.h dirent.h sys/ioctl.h sys/types.h sys/stat.h ],
+	have_std_headers=yes,
+	AC_MSG_ERROR(You need to have the standard c headers installed) )
 
 PKG_CHECK_MODULES(cairo, cairo >= 1.2 , ,
 	AC_MSG_ERROR(This game cannot be built without cairo >= 1.2 ))
@@ -100,6 +105,10 @@ PKG_CHECK_MODULES(librsvg, librsvg-2.0 , [librsvg_detected="yes"] , [librsvg_det
 PKG_CHECK_MODULES(cairosvg, cairo-svg , [cairosvg_detected="yes"] , [cairosvg_detected="no"])
 PKG_CHECK_MODULES(xine, libxine , [xine_detected="yes"] , [xine_detected="no"])
 PKG_CHECK_MODULES(gstreamer, gstreamer-0.10 , [gst_detected="yes"] , [gst_detected="no"])
+
+PKG_CHECK_MODULES(alsa, alsa , [record_alsa="yes"] , [record_alsa="no"])
+PKG_CHECK_MODULES(portAudioV19, portaudio-2.0 , [record_pa19="yes"] , [record_pa19="no"])
+AC_CHECK_LIB(portaudio, Pa_Initialize, [record_pa18="yes"] , [record_pa18="no"])
 
 AC_CHECK_PROGS(SDLCONFIG, sdl-config, AC_MSG_ERROR(Cannot find sdl-config))
 AC_CHECK_LIB(SDL_image, IMG_LoadPNG_RW,,AC_MSG_ERROR(Cannot find SDL_image))
@@ -159,6 +168,54 @@ $ac_includes_default
 USNG_EOF)
 AC_SUBST(PANGOCAIRO_FLAGS)
 AC_SUBST(PANGOCAIRO_LIBS)
+
+if test $record_alsa = yes ; then
+	RECORD_ALSA_FLAGS=`pkg-config --cflags alsa`
+	RECORD_ALSA_LIBS=`pkg-config --libs alsa`
+	AM_CONDITIONAL(RECORD_ALSA, true)
+else
+	RECORD_ALSA_FLAGS=""
+	RECORD_ALSA_LIBS=""
+	AM_CONDITIONAL(RECORD_ALSA, false)
+fi
+AC_SUBST(RECORD_ALSA_FLAGS)
+AC_SUBST(RECORD_ALSA_LIBS)
+
+if test $record_pa18 = yes ; then
+	RECORD_PA18_FLAGS=""
+	RECORD_PA18_LIBS="-lportaudio"
+	AM_CONDITIONAL(RECORD_PA18, true)
+else
+	RECORD_PA18_FLAGS=""
+	RECORD_PA18_LIBS=""
+	AM_CONDITIONAL(RECORD_PA18, false)
+fi
+AC_SUBST(RECORD_PA18_FLAGS)
+AC_SUBST(RECORD_PA18_LIBS)
+
+if test $record_pa19 = yes ; then
+	RECORD_PA19_FLAGS=`pkg-config --cflags portaudio-2.0`
+	RECORD_PA19_LIBS=`pkg-config --libs portaudio-2.0`
+	AM_CONDITIONAL(RECORD_PA19, true)
+else
+	RECORD_PA19_FLAGS=""
+	RECORD_PA19_LIBS=""
+	AM_CONDITIONAL(RECORD_PA19, false)
+fi
+AC_SUBST(RECORD_PA19_FLAGS)
+AC_SUBST(RECORD_PA19_LIBS)
+
+if test $gst_detected = yes ; then
+	RECORD_GST_FLAGS=`pkg-config --cflags gstreamer-0.10`
+	RECORD_GST_LIBS=`pkg-config --libs gstreamer-0.10`
+	AM_CONDITIONAL(RECORD_GST, true)
+else
+	RECORD_GST_FLAGS=""
+	RECORD_GST_LIBS=""
+	AM_CONDITIONAL(RECORD_GST, false)
+fi
+AC_SUBST(RECORD_GST_FLAGS)
+AC_SUBST(RECORD_GST_LIBS)
 
 # Do things for video
 case $video_layer in
@@ -369,6 +426,7 @@ dnl #### generation of the outputs
 
 AC_OUTPUT(
 	Makefile
+	audio/Makefile
 	data/Makefile
 	docs/Makefile
 	src/Makefile
