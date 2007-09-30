@@ -19,6 +19,7 @@ themesdef_DATA = default/no_cover.png \
 	default/practice_txt.svg \
 	default/practice_note.svg \
 	default/practice_sharp.svg \
+	default/practice_peak.svg \
 	default/configuration_bg.svg \
 	default/configuration_item.svg \
 	default/configuration_value.svg
@@ -44,6 +45,7 @@ themeslima_DATA = lima/no_cover.png \
 	lima/practice_txt.svg \
 	lima/practice_note.svg \
 	lima/practice_sharp.svg \
+	lima/practice_peak.svg \
 	lima/score_bg.svg \
 	lima/score_rank.svg \
 	lima/score_level.svg \

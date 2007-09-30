@@ -75,6 +75,10 @@ static int match(std::vector<Peak> const& peaks, int pos, double freq) {
 	return best;
 }
 
+namespace {
+	bool sqrLT(float a, float b) { return a * a < b * b; }
+}
+
 void Analyzer::operator()(da::pcm_data& indata, da::settings const& s)
 {
 	// Precalculated constants
@@ -87,7 +91,10 @@ void Analyzer::operator()(da::pcm_data& indata, da::settings const& s)
 
 	while (m_buf.size() >= FFT_N) {
 		// Calculate peak
-		m_peak = 20.0 * log10(*std::max_element(m_buf.begin(), m_buf.begin() + FFT_N)); // Critical: atomic write
+		{
+			double tmp = *std::max_element(m_buf.begin(), m_buf.begin() + FFT_N, sqrLT);
+			m_peak = 10.0 * log10(tmp * tmp); // Critical: atomic write
+		}
 		// Calculate FFT
 		std::vector<std::complex<double> > data = da::fft<FFT_P>(m_buf.begin(), window);
 		// Erase one step of samples

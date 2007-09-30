@@ -25,6 +25,10 @@ void CScreenPractice::enter( void )
 	cairo_svg_sharp = new CairoSVG(theme_path,(int)(25.*resFactorX),(int)(75.*resFactorY));
 	texture_sharp = sm->getVideoDriver()->initSurface(cairo_svg_sharp->getSDLSurface());
 
+	sm->getThemePathFile(theme_path,"practice_peak.svg");
+	cairo_svg_note = new CairoSVG(theme_path,(int)(800.0*resFactorX),(int)(10.0*resFactorY));
+	texture_peak = sm->getVideoDriver()->initSurface(cairo_svg_note->getSDLSurface());
+
 	delete[] theme_path;
 
         theme = new CThemePractice(width,height);
@@ -63,9 +67,10 @@ void CScreenPractice::draw()
 	theme->theme->clear();
 	sm->getVideoDriver()->drawSurface(bg_texture);
 
-	// FIXME: proper VU bar instead of a note sign...
-	// getPeak returns 0.0 when clipping, negative values when not that loud. -40.0 can be considered silent, goes down to about -80 dB with high quality sound card when mic is muted.
-	//sm->getVideoDriver()->drawSurface(texture_note, (800.0 + 20.0 * m_analyzer.getPeak()) * resFactorX, 0);
+	// getPeak returns 0.0 when clipping, negative values when not that loud.
+	// Normalizing to [-1.0, 0.0], where -1.0 is -40 dB or less.
+	double peak = std::min(0.0, std::max(-1.0, m_analyzer.getPeak() / 40.0));
+	sm->getVideoDriver()->drawSurface(texture_peak, peak * 800 * resFactorX, 590.0 * resFactorY);
 
 	if(freq != 0.0) {
 		std::string text = scale.getNoteStr(freq);

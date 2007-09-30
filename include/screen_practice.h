@@ -22,6 +22,7 @@ class CScreenPractice : public CScreen {
 	CairoSVG * cairo_svg_sharp;
 	unsigned int texture_note;
 	unsigned int texture_sharp;
+	unsigned int texture_peak;
 	unsigned int bg_texture;
 };
 
