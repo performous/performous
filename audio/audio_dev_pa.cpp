@@ -1,6 +1,7 @@
 #include "audio_dev.hpp"
 #include <portaudio.h>
 #include <ostream>
+#include <sstream>
 
 namespace da {
 	class pa19_record: public record::dev {
@@ -44,7 +45,7 @@ namespace da {
 				if (rec->s.frames != settings::high) p.suggestedLatency = Pa_GetDeviceInfo(p.device)->defaultLowInputLatency;
 				else p.suggestedLatency = Pa_GetDeviceInfo(p.device)->defaultHighInputLatency;
 				p.hostApiSpecificStreamInfo = NULL;
-				PaError err = Pa_OpenStream(&stream, &p, NULL, rec->s.rate, 50, paClipOff, rec->c_callback, rec);
+				PaError err = Pa_OpenStream(&handle, &p, NULL, rec->s.rate, 50, paClipOff, rec->c_callback, rec);
 				if (err != paNoError) throw std::runtime_error("Cannot open PortAudio audio stream " + rec->s.subdev + ": " + Pa_GetErrorText(err));
 			}
 			~strm() { Pa_CloseStream(handle); }
