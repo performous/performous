@@ -197,7 +197,9 @@ std::string MusicalScale::getNoteStr(double freq) const {
 	static const char * note[12] = {"C ","C#","D ","D#","E ","F ","F#","G ","G#","A ","A#","B "};
 	std::ostringstream oss;
 	// Acoustical Society of America Octave Designation System
-	oss << note[id%12] << 2 + id / 12 << " (" << (int)round(freq) << " Hz)";
+	//int octave = 2 + id / 12;
+	
+	oss << note[id%12] << " " << (int)round(freq) << " Hz";
 	return oss.str();
 }
 
