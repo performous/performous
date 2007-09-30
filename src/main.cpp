@@ -14,6 +14,10 @@
 unsigned int width=800;
 unsigned int height=600;
 
+#ifndef DATA_DIR
+#define DATA_DIR "/usr/local/share/ultrastar-ng"
+#endif
+
 SDL_Event event;
 SDL_Surface * screenSDL;
 CScreenManager *screenManager;
@@ -46,7 +50,7 @@ void init( void )
 		SDL_Quit();
 		exit(EXIT_FAILURE);
 	}
-	
+
 	SDL_WM_SetCaption(PACKAGE" - "VERSION, "WM_DEFAULT");
 
 	screenSDL = videoDriver->init( width, height, screenManager->getFullscreenStatus() );
@@ -156,18 +160,18 @@ int main( int argc, char ** argv )
 		screenManager = new CScreenManager( width, height , songs_directory , theme_name );
 	else
 		screenManager = new CScreenManager( width, height , songs_directory );
-	
+
 	screenManager->setFullscreenStatus(fullscreen);
 
 	init();
-	
+
 	Capture capture(capture_device, capture_rate);
 
 	screenManager->setSDLScreen(screenSDL);
 	screenManager->setAudio( new CAudio() );
 	screenManager->setVideoDriver( videoDriver );
 	screenManager->setDifficulty( difficulty );
-	
+
 	screen = new CScreenIntro("Intro", width, height);
 	screenManager->addScreen(screen);
 	screen = new CScreenSongs("Songs", width, height);

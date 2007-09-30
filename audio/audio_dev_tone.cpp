@@ -12,7 +12,7 @@
 #include <signal.h>
 #include <sstream>
 
-namespace audio {
+namespace da {
 
 	namespace {
 		// Boost WTF time format, directly from C...

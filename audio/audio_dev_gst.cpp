@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-namespace audio {
+namespace da {
 	class gst_record: public record::dev {
 		static reg_dev reg;
 		static dev* create(settings& s) { return new gst_record(s); }

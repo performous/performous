@@ -3,7 +3,7 @@
 #include <ostream>
 #include <stdint.h>
 
-namespace audio {
+namespace da {
 	class pa18_record: public record::dev {
 		static reg_dev reg;
 		static dev* create(settings& s) { return new pa18_record(s); }

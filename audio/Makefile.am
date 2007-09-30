@@ -1,6 +1,6 @@
 EXTRA_DIST = alsa/alsa.hpp audio.hpp audio_dev.hpp fft.hpp
 
-lib_LTLIBRARIES = libultrastarngrecord.la
+lib_LTLIBRARIES = libda.la
 
 flags = -I../
 lib = -lboost_thread
@@ -30,6 +30,7 @@ flags +=  @RECORD_GST_FLAGS@
 lib += @RECORD_GST_LIBS@
 endif
 
-libultrastarngrecord_la_SOURCES = $(sources)
+libda_la_SOURCES = $(sources)
 INCLUDES = $(flags)
-libultrastarngrecord_la_LIBADD  = $(lib)
+libda_la_LIBADD  = $(lib)
+

@@ -75,7 +75,7 @@ static int match(std::vector<Peak> const& peaks, int pos, double freq) {
 	return best;
 }
 
-void Analyzer::operator()(audio::pcm_data& indata, audio::settings const& s)
+void Analyzer::operator()(da::pcm_data& indata, da::settings const& s)
 {
 	// Precalculated constants
 	const double freqPerBin = s.rate/(double)FFT_N;
@@ -84,12 +84,12 @@ void Analyzer::operator()(audio::pcm_data& indata, audio::settings const& s)
 	const double minMagnitude = pow(10, -60.0 / 10.0) / normCoeff;
 
 	std::copy(indata.begin(0), indata.end(0), std::back_inserter(m_buf));
-	
+
 	while (m_buf.size() >= FFT_N) {
 		// Calculate peak
 		m_peak = 20.0 * log10(*std::max_element(m_buf.begin(), m_buf.begin() + FFT_N)); // Critical: atomic write
 		// Calculate FFT
-		std::vector<std::complex<double> > data = audio::fft<FFT_P>(m_buf.begin(), window);
+		std::vector<std::complex<double> > data = da::fft<FFT_P>(m_buf.begin(), window);
 		// Erase one step of samples
 		m_buf.erase(m_buf.begin(), m_buf.begin() + step);
 		// Process only up to 3000 Hz
@@ -99,7 +99,7 @@ void Analyzer::operator()(audio::pcm_data& indata, audio::settings const& s)
 		for (size_t k = 0; k <= kMax; ++k) {
 			double magnitude = std::abs(data[k]);
 			double phase = std::arg(data[k]);
-			
+
 			// process phase difference
 			double delta = phase - fftLastPhase[k];
 			fftLastPhase[k] = phase;
@@ -111,7 +111,7 @@ void Analyzer::operator()(audio::pcm_data& indata, audio::settings const& s)
 			delta /= phaseStep; // ((double)FFT_N / step) / (2.0 * M_PI);
 			// process the k-th partials' true frequency
 			double freq = (k + delta) * freqPerBin;
-			
+
 			if (magnitude > minMagnitude) {
 				peaks[k].freq = freq;
 				peaks[k].db = 10.0 * log10(normCoeff * magnitude);

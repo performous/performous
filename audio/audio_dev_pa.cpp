@@ -2,7 +2,7 @@
 #include <portaudio.h>
 #include <ostream>
 
-namespace audio {
+namespace da {
 	class pa19_record: public record::dev {
 		static reg_dev reg;
 		static dev* create(settings& s) { return new pa19_record(s); }

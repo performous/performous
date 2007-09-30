@@ -2,7 +2,7 @@
 #include <ostream>
 #include <limits>
 
-namespace audio {
+namespace da {
 	const std::size_t settings::low = std::numeric_limits<std::size_t>::min();
 	const std::size_t settings::high = std::numeric_limits<std::size_t>::max();
 

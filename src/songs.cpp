@@ -74,7 +74,7 @@ void CSong::parseFile( void )
                                     tmp->type = TYPE_NOTE_GOLDEN;
                                 if (buff[0] == ':')
                                     tmp->type = TYPE_NOTE_NORMAL;
-			        
+
                                 if (buff[len-2] == '\r') len--;
 				buff[len-1] = '\0'; // Replace the \n or \r with a \0
 				sscanf(buff+1,"%d %d %d%n",&tmp->timestamp, &tmp->length , &tmp->note , &shift);
@@ -127,14 +127,14 @@ void CSong::parseFile( void )
 		unsigned int shift = (((noteMin*-1)%12)+1)*12;
 		noteMin+= shift;
 		noteMax+= shift;
-		
+
 		for( unsigned int i = 0 ; i < notes.size() ; i++ )
 			notes[i]->note+=shift;
 	}
 }
 
 CSong::CSong()
-{	
+{
 	path = NULL;
 	filename = NULL;
 	genre = NULL;
@@ -353,7 +353,7 @@ CSongs::CSongs()
 	SDL_RWops *rwop_nocover = NULL;
 	rwop_nocover = SDL_RWFromFile(theme_path, "rb");
 	delete[] theme_path;
-			    	
+
 
 	{
 	SDL_Surface * surface_nocover_tmp = NULL;

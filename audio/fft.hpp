@@ -1,10 +1,16 @@
 #ifndef AUDIO_FFT_HPP_INCLUDED
 #define AUDIO_FFT_HPP_INCLUDED
 
+/**
+@file fft.hpp FFT and related facilities.
+
+Header only, no need to link with libda.
+**/
+
 #include <complex>
 #include <cstddef>
 
-namespace audio {
+namespace da {
 
 	namespace math {
 

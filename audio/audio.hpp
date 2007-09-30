@@ -1,6 +1,18 @@
-#ifndef AUDIO_HPP_INCLUDED
-#define AUDIO_HPP_INCLUDED
+#ifndef LIBDA_AUDIO_HPP_INCLUDED
+#define LIBDA_AUDIO_HPP_INCLUDED
 
+/**
+@file audio.hpp LibDA public interface.
+
+Link with libda when you use this.
+**/
+
+// Library version number, may be used to test whether a certain function is
+// available. Incremented by one each time a new release is done.
+
+#define LIBDA_VERSION 0
+
+#include "sample.hpp"
 #include <boost/function.hpp>
 #include <cmath>
 #include <cstddef>
@@ -10,29 +22,7 @@
 #include <vector>
 #include <stdint.h>
 
-namespace audio {
-	class settings;
-	class pcm_data;
-
-	// Can be changed to double, but there REALLY should be no need.
-	typedef float sample_t;
-
-	// The following conversions provide lossless conversions between floats
-	// and integers. Negative minimum integer value produces sample_t value
-	// slightly smaller than -1.0 but this is necessary in order to prevent
-	// clipping in the float-to-int conversions while still staying lossless.
-	// The roundf part is strictly not necessary, but it improves the rounding
-	// error tolerance.
-	const sample_t max_s16 = 32767.0;
-	const sample_t max_s24 = 8388607.0;
-	static inline sample_t conv_from_s16(int s) { return s / max_s16; }
-	static inline sample_t conv_from_s24(int s) { return s / max_s24; }
-	static inline int conv_to_s16(float s) { return int(roundf(s * max_s16)); }
-	static inline int conv_to_s24(float s) { return int(roundf(s * max_s24)); }
-	static inline int conv_to_s16(double s) { return int(round(s * max_s16)); }
-	static inline int conv_to_s24(double s) { return int(round(s * max_s24)); }
-
-	typedef boost::function<void (pcm_data& it, settings const&)> callback_t;
+namespace da {
 
 	/** Provides various access iterators to a multich interleaved sample buffer. **/
 	class pcm_data {
@@ -60,22 +50,9 @@ namespace audio {
 		iter_by_ch end(std::size_t ch) { return iter_by_ch(buf, ch, channels) + frames; }
 	};
 
-	/*
-	* Rather portable version that supports non-interleaved data as well...
-	* Abandoned because it is too complex :/
-	class pcm_data {
-		std::vector<sample_t*> bufs;
-		std::size_t step;
-	  public:
-		std::size_t frames;
-		std::size_t channels;
-		pcm_data(std::vector<sample_t*> const& bufs, std::size_t frames, std::size_t step):
-		  bufs(bufs), step(step), frames(frames), channels(bufs.size()) {}
-		sample_t& operator()(std::size_t frame, std::size_t channel) { return bufs[channel][frame * step]; }
-		sample_t operator()(std::size_t frame, std::size_t channel) const { return bufs[channel][frame * step]; }
-		// TODO: iterator classes
-	};
-	*/
+	class settings;
+	class pcm_data;
+	typedef boost::function<void (pcm_data& it, settings const&)> callback_t;
 
 	struct settings {
 		callback_t callback;

@@ -6,7 +6,7 @@
 #include <ostream>
 #include <stdint.h>
 
-namespace audio {
+namespace da {
 	class alsa_record: public record::dev {
 		static reg_dev reg;
 		static dev* create(settings& s) { return new alsa_record(s); }

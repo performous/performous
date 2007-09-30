@@ -5,7 +5,7 @@
 #include <map>
 #include <stdexcept>
 
-namespace audio {
+namespace da {
 	class record::dev {
 		friend class record;
 		typedef dev* (*create_func_t)(settings& s);

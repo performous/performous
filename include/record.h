@@ -45,7 +45,7 @@ class Analyzer {
 	static const std::size_t FFT_N = 1 << FFT_P;
   public:
 	Analyzer(std::size_t step = 1500);
-	void operator()(audio::pcm_data& data, audio::settings const& s);
+	void operator()(da::pcm_data& data, da::settings const& s);
 	/** Get the peak level in dB (negative value, 0.0 = clipping). **/
 	double getPeak() const { return m_peak; }
 	/** Get the primary (singing) frequency. **/
@@ -70,11 +70,11 @@ class Analyzer {
 class Capture {
 	static const std::size_t DEFAULT_RATE = 48000;
 	Analyzer m_analyzer;
-	audio::settings m_rs;
-	audio::record m_record;
+	da::settings m_rs;
+	da::record m_record;
   public:
 	Capture(std::string const& device = "", std::size_t rate = DEFAULT_RATE):
-	  m_rs(audio::settings(device)
+	  m_rs(da::settings(device)
 	  .set_callback(boost::ref(m_analyzer))
 	  .set_channels(1)
 	  .set_rate(rate)

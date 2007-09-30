@@ -1,5 +1,10 @@
 #include <screen.h>
 
+#ifndef THEMES_DIR
+#define THEMES_DIR "/usr/local/share/ultrastar-ng/themes"
+#endif
+
+
 template<> CScreenManager* CSingleton<CScreenManager>::ms_CSingleton = NULL;
 
 CScreenManager::CScreenManager( int _width , int _height , const char * _songs_dir , const char * _theme_name )
