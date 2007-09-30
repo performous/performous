@@ -1,24 +1,37 @@
 DEVELOPERS
 ----------
 
-Vincent Le Ligeour      <yoda-jm at users.sourceforge.net>
+Vincent Le Ligeour  <yoda-jm at users.sourceforge.net>
 	* Original author
-	* core developer
-Stefan Kristiansson     <stekern at users.sourceforge.net>
-	* core developer
-Jami Pekkanen           <jami.pekkanen at ateco.fi>
-	* cairotosdl and pitchgraph class
-Sebastian Sproesser     <sebastian at sproesser.org>
-	* background management
-	* song sync improvement
-	* current position in the track
-Matias Holte            <matiasholte at users.sourceforge.net>
-	* screen sing propositions and patchs
-Ignacio Casal Quinteiro <nacho.resa at gmail.com>
-	* gstreamer implementation
-jEsuSdA                 <info at jesusda.com>
+	* Core developer
+
+Stefan Kristiansson  <stekern at users.sourceforge.net>
+	* Core developer
+
+Lasse Kärkkäinen  <tronic+ndrm at trn.iki.fi>
+    * Core developer
+    * FFT/Analyzer and LibDA
+
+Jami Pekkanen  <jami.pekkanen at ateco.fi>
+	* Cairotosdl and pitchgraph class
+
+Sebastian Sproesser  <sebastian at sproesser.org>
+	* Background management
+	* Song sync improvement
+	* Current position in the track
+
+Matias Holte  <matiasholte at users.sourceforge.net>
+	* Screen sing propositions and patchs
+
+Ignacio Casal Quinteiro  <nacho.resa at gmail.com>
+	* GStreamer implementation
+
+jEsuSdA  <info at jesusda.com>
 	* SVG design (lima theme)
+
 Sylvain Henry           <hsyl20 at yahoo.fr>
 	* Long sentence display patch
-Tobias Gehrig           <tgehrig at users.sourceforge.net>
-	* pre-calculate fft window patch
+
+Tobias Gehrig  <tgehrig at users.sourceforge.net>
+	* Pre-calculate FFT window patch
+
