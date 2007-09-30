@@ -18,13 +18,12 @@ CScreenManager::CScreenManager( int _width , int _height , const char * _songs_d
 	width = _width;
 	height = _height;
 	m_songs_dir = _songs_dir;
-	m_theme_name = _theme_name;
+	m_theme_name = _theme_name ? _theme_name : "lima";
 }
 
 CScreenManager::~CScreenManager()
 {
 	delete audio;
-	// delete record;
 	delete songs;
 	for( unsigned int i = 0 ; i < screens.size() ; i++ )
 		delete screens[i];

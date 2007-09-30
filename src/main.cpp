@@ -10,6 +10,7 @@
 #include <screen_configuration.h>
 #include <video_driver.h>
 #include <boost/thread.hpp>
+#include <cstdlib>
 
 unsigned int width=800;
 unsigned int height=600;
@@ -18,56 +19,40 @@ unsigned int height=600;
 #define DATA_DIR "/usr/local/share/ultrastar-ng"
 #endif
 
-SDL_Event event;
 SDL_Surface * screenSDL;
-CScreenManager *screenManager;
-CVideoDriver *videoDriver;
 
-void checkEvents( void )
-{
-	while(SDL_PollEvent( &event ) == 1) {
-		screenManager->getCurrentScreen()->manageEvent(event);
+void checkEvents_SDL(CScreenManager& sm) {
+	SDL_Event event;
+	while(SDL_PollEvent(&event) == 1) {
+		sm.getCurrentScreen()->manageEvent(event);
 		switch(event.type) {
-			case SDL_QUIT:
-				screenManager->finished();
-				break;
-		case SDL_KEYDOWN:
+		  case SDL_QUIT:
+			sm.finished();
+			break;
+		  case SDL_KEYDOWN:
 			int keypressed  = event.key.keysym.sym;
 			SDLMod modifier = event.key.keysym.mod;
-			if( keypressed == SDLK_f && modifier&KMOD_ALT ) {
+			if( keypressed == SDLK_f && modifier & KMOD_ALT ) {
 				SDL_WM_ToggleFullScreen(screenSDL);
-				screenManager->setFullscreenStatus(!screenManager->getFullscreenStatus());
+				sm.setFullscreenStatus(!sm.getFullscreenStatus());
 				break;
 			}
 		}
 	}
 }
 
-void init( void )
-{
-	if( SDL_Init(SDL_INIT_VIDEO) ==  -1 ) {
-		fprintf(stderr,"SDL_Init Error\n");
-		SDL_Quit();
-		exit(EXIT_FAILURE);
-	}
-
+static void init_SDL(CScreenManager& sm, CVideoDriver& vd) {
+	std::atexit(SDL_Quit);
+	if( SDL_Init(SDL_INIT_VIDEO) ==  -1 ) throw std::runtime_error("SDL_Init failed");
 	SDL_WM_SetCaption(PACKAGE" - "VERSION, "WM_DEFAULT");
-
-	screenSDL = videoDriver->init( width, height, screenManager->getFullscreenStatus() );
-
-	if( screenSDL == NULL ) {
-		fprintf(stderr,"Cannot initialize screen\n");
-		SDL_Quit();
-		exit(EXIT_FAILURE);
-	}
-
+	screenSDL = vd.init(width, height, sm.getFullscreenStatus());
+	if (!screenSDL) throw std::runtime_error("Cannot initialize screen");
 	SDL_ShowCursor(SDL_DISABLE);
 	SDL_EnableUNICODE(SDL_ENABLE);
 	SDL_EnableKeyRepeat(125, 125);
 }
 
-void usage( char * progname )
-{
+void usage(char* progname ) {
 	fprintf(stdout,"Usage: %s [OPTIONS] [SONG_DIRECTORY]\n", progname);
 	fprintf(stdout,"Options:\n");
 	fprintf(stdout,"\n");
@@ -81,22 +66,18 @@ void usage( char * progname )
 	fprintf(stdout,"                             (0: easy, 1:medium, 2:hard (default))\n");
 	fprintf(stdout," -h, --help                  display this text and exit\n");
 	fprintf(stdout," -v, --version               display version number and exit\n");
-	exit(EXIT_SUCCESS);
+	std::exit(EXIT_SUCCESS);
 }
 
-int main( int argc, char ** argv )
-{
-	char * songs_directory = NULL;
+int main(int argc, char** argv) {
 	char * theme_name      = NULL;
 	char const* capture_device = "";
 	unsigned long capture_rate = 48000;
-	CScreen * screen       = NULL;
 	int ch                 = 0;
 	unsigned int difficulty= 2;
 	bool fullscreen        = false;
 
-	static struct option long_options[] =
-		{
+	static struct option long_options[] = {
 		{"width",required_argument,NULL,'W'},
 		{"height",required_argument,NULL,'H'},
 		{"theme",required_argument,NULL,'t'},
@@ -142,63 +123,40 @@ int main( int argc, char ** argv )
 		}
 	}
 
-	if( optind == argc ) {
-		// Using default songs directory
-		const char default_songs_directory[] = DATA_DIR "/songs";
-		fprintf(stdout,"Using %s as default songs directory\n",default_songs_directory);
-		songs_directory = new char[strlen(default_songs_directory)+2];
-		sprintf(songs_directory,"%s/",default_songs_directory); // safe sprintf
-	} else {
-		// Add the trailing slash
-		songs_directory = new char[strlen(argv[optind])+2];
-		sprintf(songs_directory,"%s/",argv[optind]); // safe sprintf
+	std::string songdir = DATA_DIR "songs/";
+	if (optind != argc) {
+		songdir = argv[optind];
+		if (*songdir.rbegin() != '/') songdir += '/';
 	}
-
-	videoDriver = new CVideoDriver();
-
-	if( theme_name != NULL )
-		screenManager = new CScreenManager( width, height , songs_directory , theme_name );
-	else
-		screenManager = new CScreenManager( width, height , songs_directory );
-
-	screenManager->setFullscreenStatus(fullscreen);
-
-	init();
-
-	Capture capture(capture_device, capture_rate);
-
-	screenManager->setSDLScreen(screenSDL);
-	screenManager->setAudio( new CAudio() );
-	screenManager->setVideoDriver( videoDriver );
-	screenManager->setDifficulty( difficulty );
-
-	screen = new CScreenIntro("Intro", width, height);
-	screenManager->addScreen(screen);
-	screen = new CScreenSongs("Songs", width, height);
-	screenManager->addScreen(screen);
-	screen = new CScreenSing("Sing", width, height, capture.analyzer());
-	screenManager->addScreen(screen);
-	screen = new CScreenPractice("Practice", width, height, capture.analyzer());
-	screenManager->addScreen(screen);
-	screen = new CScreenScore("Score", width, height);
-	screenManager->addScreen(screen);
-	screen = new CScreenConfiguration("Configuration", width, height);
-	screenManager->addScreen(screen);
-
-	screenManager->activateScreen("Intro");
-
-	while( !screenManager->isFinished() ) {
-		checkEvents();
-		videoDriver->blank();
-		screenManager->getCurrentScreen()->draw();
-		videoDriver->swap();
-		boost::thread::yield();
+	std::cout << "Using song directory " << songdir << std::endl;
+	// Initialize everything
+	try {
+		CScreenManager sm(width, height, songdir.c_str(), theme_name);
+		sm.setFullscreenStatus(fullscreen);
+		CVideoDriver vd;
+		init_SDL(sm, vd);
+		sm.setSDLScreen(screenSDL);
+		sm.setAudio(new CAudio());
+		sm.setVideoDriver(&vd);
+		sm.setDifficulty(difficulty);
+		Capture capture(capture_device, capture_rate);
+		sm.addScreen(new CScreenIntro("Intro", width, height));
+		sm.addScreen(new CScreenSongs("Songs", width, height));
+		sm.addScreen(new CScreenSing("Sing", width, height, capture.analyzer()));
+		sm.addScreen(new CScreenPractice("Practice", width, height, capture.analyzer()));
+		sm.addScreen(new CScreenScore("Score", width, height));
+		sm.addScreen(new CScreenConfiguration("Configuration", width, height));
+		sm.activateScreen("Intro");
+		// Main loop
+		while (!sm.isFinished()) {
+			checkEvents_SDL(sm);
+			vd.blank();
+			sm.getCurrentScreen()->draw();
+			vd.swap();
+			boost::thread::yield();
+		}
+	} catch (std::exception& e) {
+		std::cout << "FATAL ERROR: " << e.what() << std::endl;
 	}
-
-	delete videoDriver;
-	delete screenManager;
-	delete[] songs_directory;
-
-	SDL_Quit();
-	return EXIT_SUCCESS;
 }
+
