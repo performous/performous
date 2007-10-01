@@ -1,57 +1,44 @@
 #include <video.h>
 
-CVideo::CVideo()
-{
+CVideo::CVideo() {
 #ifdef USE_SMPEG
 	mpeg=NULL;
 #endif
 }
 
-CVideo::~CVideo()
-{
-#ifdef USE_SMPEG
-	if(mpeg != NULL)
-		unloadVideo();
-#endif
+CVideo::~CVideo() {
+	unloadVideo();
 }
 
-bool CVideo::isPlaying()
-{
+bool CVideo::isPlaying() {
 #ifdef USE_SMPEG
-	if(mpeg != NULL)
-		return (SMPEG_status(mpeg) == SMPEG_PLAYING);
-	else
-		return false;
+	if (mpeg) return (SMPEG_status(mpeg) == SMPEG_PLAYING);
 #endif
 	return false;
 }
 
-void CVideo::play(void)
-{
+void CVideo::play() {
 #ifdef USE_SMPEG
-	if(mpeg != NULL)
-		SMPEG_play(mpeg);
+	if (mpeg) SMPEG_play(mpeg);
 #endif
 }
 
-void CVideo::unloadVideo( void )
-{
+void CVideo::unloadVideo() {
 #ifdef USE_SMPEG
-	if( mpeg != NULL ) {
+	if (mpeg) {
 		SMPEG_delete(mpeg);
 		mpeg=NULL;
 	}
 #endif
 }
 
-bool CVideo::loadVideo( char * _videoFile, SDL_Surface * _videoSurf, int _width , int _height )
-{
+bool CVideo::loadVideo(std::string const& _videoFile, SDL_Surface* _videoSurf, int _width , int _height) {
 #ifdef USE_SMPEG
 	unloadVideo();
-	mpeg = SMPEG_new(_videoFile, &info, 0);
-	if( SMPEG_error( mpeg ) ) {
-		fprintf( stderr, "SMPEG error: %s\n", SMPEG_error( mpeg ) );
-		SMPEG_delete( mpeg );
+	mpeg = SMPEG_new(_videoFile.c_str(), &info, 0);
+	if(SMPEG_error(mpeg)) {
+		fprintf(stderr, "SMPEG error: %s\n", SMPEG_error(mpeg));
+		SMPEG_delete(mpeg);
 		mpeg = NULL;
 		return false;
 	} else {
@@ -59,7 +46,7 @@ bool CVideo::loadVideo( char * _videoFile, SDL_Surface * _videoSurf, int _width 
 		SMPEG_enablevideo(mpeg, 1);
 		SMPEG_enableaudio(mpeg, 0);
 		SMPEG_setvolume(mpeg, 0);
-		SMPEG_scaleXY(mpeg, _width , _height );
+		SMPEG_scaleXY(mpeg, _width , _height);
 		return true;
 	}
 #else

@@ -3,6 +3,7 @@
 
 #include "../config.h"
 #include <set>
+#include <string>
 #include <vector>
 
 typedef struct _SBpm {
@@ -33,67 +34,69 @@ typedef struct _SNote {
 } TNote;
 
 class CSong {
-	public:
-		CSong();
-		~CSong() {};
-		void parseFile();
-
-		unsigned int index;
-		char* path;
-		char* filename;
-		std::vector<char*> category;
-		char* genre;
-		char* edition;
-		char* title;
-		char* artist;
-		char* text;
-		char* creator;
-		char* cover;
-		SDL_Surface * coverSurf;
-		char* mp3;
-		char* background;
-		SDL_Surface * backgroundSurf;	
-		char* video;
-		float videoGap;
-		int noteGap;
-		float start;
-		int end;
-		bool relative;
-		std::vector<TBpm> bpm;
-		float gap;
-		TScore score[3];
-		int noteMin;
-		int noteMax;
-		std::vector<TNote *> notes;
-		bool visible;
-		bool main;
-		int orderNum;
-		int orderType;
-		int maxScore;
+  public:
+	CSong();
+	~CSong() {
+		unloadBackground();
+		unloadCover();
+	}
+	void parseFile();
+	unsigned int index;
+	std::string path;
+	std::string filename;
+	std::vector<std::string> category;
+	std::string genre;
+	std::string edition;
+	std::string title;
+	std::string artist;
+	std::string text;
+	std::string creator;
+	std::string cover;
+	SDL_Surface* coverSurf;
+	std::string mp3;
+	std::string background;
+	SDL_Surface* backgroundSurf;
+	std::string video;
+	float videoGap;
+	int noteGap;
+	float start;
+	int end;
+	bool relative;
+	std::vector<TBpm> bpm;
+	float gap;
+	TScore score[3];
+	int noteMin;
+	int noteMax;
+	std::vector<TNote *> notes;
+	bool visible;
+	bool main;
+	int orderNum;
+	int orderType;
+	int maxScore;
+	void loadBackground(double width, double height);
+	void loadCover(double width, double height);
+	void unloadBackground();
+	void unloadCover();
 };
 
 class CSongs {
-	public:
-		CSongs(std::set<std::string> const& songdirs);
-		~CSongs();
-		CSong * getSong(unsigned int i);
-		int nbSongs() {return songs.size();};
-		bool parseFile(CSong * tmp);
-		void sortByEdition();
-		void sortByGenre();
-		void sortByTitle();
-		void sortByArtist();
-		int getOrder() {return order;};
-		void loadCover(unsigned int i, unsigned int width, unsigned int height);
-		void loadBackground(unsigned int i, unsigned int width, unsigned int height);
-		void unloadCover(unsigned int i);
-		void unloadBackground(unsigned int i);
-	private:
-		std::vector<CSong*> songs;
-		int selected;
-		int order;
-		int category;
-		SDL_Surface * surface_nocover;
+  public:
+	CSongs(std::set<std::string> const& songdirs);
+	~CSongs();
+	CSong* getSong(unsigned int i);
+	int nbSongs() { return songs.size(); };
+	bool parseFile(CSong * tmp);
+	void sortByEdition();
+	void sortByGenre();
+	void sortByTitle();
+	void sortByArtist();
+	int getOrder() { return order; };
+  private:
+	std::vector<CSong*> songs;
+	int selected;
+	int order;
+	int category;
+	SDL_Surface* surface_nocover;
 };
 
 #endif

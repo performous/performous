@@ -105,12 +105,12 @@ int main(int argc, char** argv) {
 				char const* home = getenv("HOME");
 				if (home) songdirs.insert(std::string(home) + "/.ultrastar/songs/");
 			}
-			songdirs.insert("/usr/games/share/ultrastar/songs/");
-			songdirs.insert("/usr/games/share/ultrastar-ng/songs/");
+			songdirs.insert("/usr/share/games/ultrastar/songs/");
+			songdirs.insert("/usr/share/games/ultrastar-ng/songs/");
 			songdirs.insert("/usr/share/ultrastar/songs/");
 			songdirs.insert("/usr/share/ultrastar-ng/songs/");
-			songdirs.insert("/usr/local/games/share/ultrastar/songs/");
-			songdirs.insert("/usr/local/games/share/ultrastar-ng/songs/");
+			songdirs.insert("/usr/local/share/games/ultrastar/songs/");
+			songdirs.insert("/usr/local/share/games/ultrastar-ng/songs/");
 			songdirs.insert("/usr/local/share/ultrastar/songs/");
 			songdirs.insert("/usr/local/share/ultrastar-ng/songs/");
 		}

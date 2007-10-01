@@ -1,6 +1,7 @@
 #include <screen_songs.h>
 #include <cairotosdl.h>
 #include <iostream>
+#include <sstream>
 
 CScreenSongs::CScreenSongs(const char * name, unsigned int width, unsigned int height, std::set<std::string> const& songdirs):
   CScreen(name,width,height)
@@ -89,7 +90,8 @@ void CScreenSongs::manageEvent(SDL_Event event)
 			play = false;
 			sm->activateScreen("Intro");
 		}
-		/* no Ctrl+R for now } else if(keypressed == SDLK_r && modifier & KMOD_CTRL) {
+		/* FIXME: no Ctrl+R for now
+		} else if(keypressed == SDLK_r && modifier & KMOD_CTRL) {
 			sm->getAudio()->stopMusic();
 			play = false;
 			if(CScreenManager::getSingletonPtr()->getSongs() != NULL)
@@ -172,19 +174,20 @@ void CScreenSongs::draw() {
 
 		// Draw the "Song information"
 		{
-			char informationStr[1024];
-			snprintf(informationStr,1024,"(%d/%d) %s - %s",sm->getSongId()+1,sm->getSongs()->nbSongs(),sm->getSong()->artist, sm->getSong()->title);
-			theme->song.text = informationStr;
+			std::ostringstream oss;
+			oss << "(" << sm->getSongId()+1 << "/" << sm->getSongs()->nbSongs() << ") "
+			  << sm->getSong()->artist << " - " << sm->getSong()->title;
+			theme->song.text = oss.str().c_str();
 			cairo_text_extents_t extents = theme->theme->GetTextExtents(theme->song);
 			theme->song.x = (theme->song.svg_width - extents.width)/2;
 			theme->theme->PrintText(&theme->song);
 		}
 
 		// Draw the cover
-		{
+		if (sm->getSong()->coverSurf) {
 			SDL_Rect position;
-			position.x=(width-sm->getSong()->coverSurf->w)/2;
-			position.y=(height-sm->getSong()->coverSurf->h)/2;
+			position.x=(width - sm->getSong()->coverSurf->w)/2;
+			position.y=(height - sm->getSong()->coverSurf->h)/2;
 			position.w=sm->getSong()->coverSurf->w;
 			position.h=sm->getSong()->coverSurf->h;
 			SDL_FillRect(virtSurf,&position,SDL_MapRGB(virtSurf->format, 255, 255, 255));
@@ -194,11 +197,10 @@ void CScreenSongs::draw() {
 		//Play a preview of the song (0:30-1:00, and loop)
 		{
 			if (!play) {
-				char buff[1024];
 				CSong * song = sm->getSong();
 				if (song!=NULL) {
-					snprintf(buff,1024,"%s/%s",song->path,song->mp3);
-					sm->getAudio()->playPreview(buff);
+					std::string file = song->path + "/" + song->mp3;
+					sm->getAudio()->playPreview(file.c_str());
 					play = true;
 				}
 			}
