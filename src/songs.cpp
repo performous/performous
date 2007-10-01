@@ -341,19 +341,13 @@ void CSongs::unloadBackground( unsigned int i)
 	songs[i]->backgroundSurf = NULL;
 }
 
-CSongs::CSongs()
+CSongs::CSongs(std::set<std::string> const& songdirs)
 {
-	const char * songs_dir = CScreenManager::getSingletonPtr()->getSongsDirectory();
-	char pattern[1024];
 	glob_t _glob;
 	order = 2;
 
-	char * theme_path = new char[1024];
-	CScreenManager::getSingletonPtr()->getThemePathFile(theme_path,"no_cover.png");
 	SDL_RWops *rwop_nocover = NULL;
-	rwop_nocover = SDL_RWFromFile(theme_path, "rb");
-	delete[] theme_path;
-
+	rwop_nocover = SDL_RWFromFile(CScreenManager::getSingletonPtr()->getThemePathFile("no_cover.png").c_str(), "rb");
 
 	{
 	SDL_Surface * surface_nocover_tmp = NULL;
@@ -371,40 +365,39 @@ CSongs::CSongs()
 		return;
 	}
 
-	sprintf(pattern,"%s*/*.[tT][xX][tT]",songs_dir);
-	std::cout << "Scanning song directory..." << std::endl;
-	glob ( pattern, GLOB_NOSORT, NULL, &_glob);
-	std::cout << "Found " << _glob.gl_pathc << " possible song file(s)..." << std::endl;
-
-	for( unsigned int i = 0 ; i < _glob.gl_pathc ; i++ ) {
-		char * path = new char[1024];
-		char * txtfilename;
-		txtfilename = strrchr(_glob.gl_pathv[i],'/'); txtfilename[0] = '\0'; txtfilename++;
-		sprintf(path,"%s",_glob.gl_pathv[i]);
-		std::cout << "Loading song: \"" << strrchr(_glob.gl_pathv[i],'/') + 1 << "\"... ";
-		CSong * tmp = new CSong();
-
-		// Set default orderType to title
-		tmp->orderType = 2;
-		tmp->path = path;
-		char * txt = new char[strlen(txtfilename)+1];
-		sprintf(txt,"%s",txtfilename); // safe sprintf
-		tmp->filename = txt;
-		if( !parseFile(tmp) ) {
-			std::cout << "FAILED" << std::endl;
-			delete[] path;
-			delete[] txt;
-			delete tmp;
-		} else {
-			std::cout << "OK" << std::endl;
-			tmp->parseFile();
-			tmp->index = songs.size();
-			songs.push_back(tmp);
+	for (std::set<std::string>::const_iterator it = songdirs.begin(); it != songdirs.end(); ++it) {
+		std::string pattern = *it + "/*/*.[tT][xX][tT]";
+		std::cout << "Scanning " << *it << " for songs" << std::endl;
+		glob ( pattern.c_str(), GLOB_NOSORT, NULL, &_glob);
+		std::cout << "Found " << _glob.gl_pathc << " possible song file(s)..." << std::endl;
+		for( unsigned int i = 0 ; i < _glob.gl_pathc ; i++ ) {
+			char * path = new char[1024];
+			char * txtfilename;
+			txtfilename = strrchr(_glob.gl_pathv[i],'/'); txtfilename[0] = '\0'; txtfilename++;
+			sprintf(path,"%s",_glob.gl_pathv[i]);
+			std::cout << "Loading song: \"" << strrchr(_glob.gl_pathv[i],'/') + 1 << "\"... ";
+			CSong * tmp = new CSong();
+			// Set default orderType to title
+			tmp->orderType = 2;
+			tmp->path = path;
+			char * txt = new char[strlen(txtfilename)+1];
+			sprintf(txt,"%s",txtfilename); // safe sprintf
+			tmp->filename = txt;
+			if( !parseFile(tmp) ) {
+				std::cout << "FAILED" << std::endl;
+				delete[] path;
+				delete[] txt;
+				delete tmp;
+			} else {
+				std::cout << "OK" << std::endl;
+				tmp->parseFile();
+				tmp->index = songs.size();
+				songs.push_back(tmp);
+			}
 		}
+		globfree(&_glob);
 	}
-
-	globfree(&_glob);
-
+	
 	for(unsigned int i = 0; i < songs.size(); i++) {
 		loadCover(i,CScreenManager::getSingletonPtr()->getWidth(),CScreenManager::getSingletonPtr()->getHeight());
 		loadBackground(i,CScreenManager::getSingletonPtr()->getWidth(),CScreenManager::getSingletonPtr()->getHeight());

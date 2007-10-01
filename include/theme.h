@@ -25,7 +25,7 @@ typedef struct _SThemeTxt {
         cairo_font_slant_t fontstyle;
         cairo_font_weight_t fontweight;
         double scale;
-        char *text;
+        char const* text;
 
 } TThemeTxt;
 typedef struct _SThemeRect {
@@ -49,8 +49,8 @@ class CTheme {
         cairo_surface_t *DrawRect(TThemeRect rect);
         cairo_text_extents_t GetTextExtents(TThemeTxt text);
         cairo_surface_t* getCurrent() {return this->surface;}
-        void ParseSVGForText(char *filename, TThemeTxt *text);
-        void ParseSVGForRect(char *filename, TThemeRect *rect);
+        void ParseSVGForText(char const* filename, TThemeTxt *text);
+        void ParseSVGForRect(char const* filename, TThemeRect *rect);
         void clear();
         private: 
         int width;

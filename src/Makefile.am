@@ -28,5 +28,5 @@ INCLUDES = -I../include -I../audio\
 	-DTHEMES_DIR="\"@THEMES_DIR@\"" -DDATA_DIR="\"@DATA_DIR@\""
 LDADD   = @CAIRO_LIBS@ @XML_LIBS@ @SDL_LIBS@ \
 	@VIDEO_LIBS@ @SVG_LIBS@ @AUDIO_LIBS@ @GL_LIBS@ @PANGOCAIRO_LIBS@ \
-	-L../audio/.libs/ -lda
+	-L../audio/.libs/ -lda -lboost_program_options
 	

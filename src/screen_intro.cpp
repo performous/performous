@@ -4,10 +4,7 @@ CScreenIntro::CScreenIntro(const char * name, unsigned int width, unsigned int h
 {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
 
-	char * theme_path = new char[1024];
-	sm->getThemePathFile(theme_path,"intro.svg");
-	cairo_svg = new CairoSVG(theme_path,width,height);
-	delete[] theme_path;
+	cairo_svg = new CairoSVG(sm->getThemePathFile("intro.svg").c_str(), width, height);
 	texture = sm->getVideoDriver()->initSurface(cairo_svg->getSDLSurface());
 }
 

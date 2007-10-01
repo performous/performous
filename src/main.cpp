@@ -1,6 +1,5 @@
 #include "../config.h"
 
-#include <getopt.h>
 #include <screen.h>
 #include <screen_intro.h>
 #include <screen_songs.h>
@@ -12,16 +11,13 @@
 #include <boost/thread.hpp>
 #include <cstdlib>
 
-unsigned int width=800;
-unsigned int height=600;
-
 #ifndef DATA_DIR
 #define DATA_DIR "/usr/local/share/ultrastar-ng"
 #endif
 
 SDL_Surface * screenSDL;
 
-void checkEvents_SDL(CScreenManager& sm) {
+static void checkEvents_SDL(CScreenManager& sm) {
 	SDL_Event event;
 	while(SDL_PollEvent(&event) == 1) {
 		sm.getCurrentScreen()->manageEvent(event);
@@ -35,13 +31,13 @@ void checkEvents_SDL(CScreenManager& sm) {
 			if( keypressed == SDLK_f && modifier & KMOD_ALT ) {
 				SDL_WM_ToggleFullScreen(screenSDL);
 				sm.setFullscreenStatus(!sm.getFullscreenStatus());
-				break;
 			}
+			break;
 		}
 	}
 }
 
-static void init_SDL(CScreenManager& sm, CVideoDriver& vd) {
+static void init_SDL(CScreenManager& sm, CVideoDriver& vd, unsigned int width, unsigned int height) {
 	std::atexit(SDL_Quit);
 	if( SDL_Init(SDL_INIT_VIDEO) ==  -1 ) throw std::runtime_error("SDL_Init failed");
 	SDL_WM_SetCaption(PACKAGE" - "VERSION, "WM_DEFAULT");
@@ -52,96 +48,86 @@ static void init_SDL(CScreenManager& sm, CVideoDriver& vd) {
 	SDL_EnableKeyRepeat(125, 125);
 }
 
-void usage(char* progname ) {
-	fprintf(stdout,"Usage: %s [OPTIONS] [SONG_DIRECTORY]\n", progname);
-	fprintf(stdout,"Options:\n");
-	fprintf(stdout,"\n");
-	fprintf(stdout," -W, --width (default: 640)  set window width\n");
-	fprintf(stdout," -H, --height (default: 480) set window height\n");
-	fprintf(stdout," -t, --theme                 set theme (theme name or absolute path to the\n");
-	fprintf(stdout,"                             theme)\n");
-	fprintf(stdout," -c, --capture-device        set sound capture device (none to disable)\n");
-	fprintf(stdout," -f, --fullscreen            enable fullscreen video output\n");
-	fprintf(stdout," -d, --difficulty            set difficulty level\n");
-	fprintf(stdout,"                             (0: easy, 1:medium, 2:hard (default))\n");
-	fprintf(stdout," -h, --help                  display this text and exit\n");
-	fprintf(stdout," -v, --version               display version number and exit\n");
-	std::exit(EXIT_SUCCESS);
-}
+#include <boost/program_options.hpp>
 
 int main(int argc, char** argv) {
-	char * theme_name      = NULL;
-	char const* capture_device = "";
-	unsigned long capture_rate = 48000;
-	int ch                 = 0;
-	unsigned int difficulty= 2;
-	bool fullscreen        = false;
-
-	static struct option long_options[] = {
-		{"width",required_argument,NULL,'W'},
-		{"height",required_argument,NULL,'H'},
-		{"theme",required_argument,NULL,'t'},
-		{"help",no_argument,NULL,'h'},
-		{"capture-device",required_argument,NULL,'c'},
-		{"capture-rate",required_argument,NULL,'r'},
-		{"version",no_argument,NULL,'v'},
-		{"difficulty",required_argument,NULL,'d'},
-		{"fullscreen",no_argument,NULL,'f'},
-		{0, 0, 0, 0}
-	};
-
-	while ((ch = getopt_long(argc, argv, "t:W:H:hc:r:fd:v", long_options, NULL)) != -1) {
-		switch(ch) {
-			case 't':
-				theme_name = optarg;
-				break;
-			case 'W':
-				width=atoi(optarg);
-				break;
-			case 'H':
-				height=atoi(optarg);
-				break;
-			case 'h':
-				usage(argv[0]);
-				break;
-			case 'c':
-				capture_device=optarg;
-				break;
-			case 'r':
-				capture_rate=atoi(optarg);
-				break;
-			case 'f':
-				fullscreen=true;
-				break;
-			case 'd':
-				difficulty = atoi(optarg);
-				break;
-			case 'v':
-				fprintf(stdout,"%s %s\n",PACKAGE, VERSION);
-				exit(EXIT_SUCCESS);
-				break;
+	unsigned int difficulty = 2;
+	bool fullscreen = false;
+	unsigned int width, height;
+	std::string theme;
+	std::set<std::string> songdirs;
+	std::string cdev;
+	std::size_t crate;
+	{
+		std::vector<std::string> songdirstmp;
+		namespace po = boost::program_options;
+		po::options_description desc("Available options");
+		desc.add_options()
+		  ("help,h", "you are viewing it")
+		  ("theme,t", po::value<std::string>(&theme)->default_value("lima"), "set theme (name or absolute path)")
+		  ("songdir,s", po::value<std::vector<std::string> >(&songdirstmp)->composing(), "additional song folders to scan\n  -s none to disable built-in defaults")
+		  ("fs,f", "enable full screen mode")
+		  ("width,W", po::value<unsigned int>(&width)->default_value(640), "set horizontal resolution")
+		  ("height,H", po::value<unsigned int>(&height)->default_value(480), "set vertical resolution")
+		  ("cdev", po::value<std::string>(&cdev), "set capture device, dev[:settings], e.g.\n  alsa:hw:Intel\n  gst\n  portaudio\n  ~tone:300.amplitude(-20):440\n  none")
+		  ("crate", po::value<std::size_t>(&crate)->default_value(48000), "set capture frequency\n  44100 and 48000 Hz are optimal")
+		  ("version,v", "display version number");
+		po::variables_map vm;
+		try {
+			po::store(po::parse_command_line(argc, argv, desc), vm);
+			po::notify(vm);
+		} catch (std::exception& e) {
+			std::cout << desc << std::endl;
+			std::cout << "ERROR: " << e.what() << std::endl;
+			return 1;
+		}
+		if (vm.count("help")) {
+			std::cout << desc << std::endl;
+			return 0;
+		}
+		if (vm.count("version")) {
+			std::cout << PACKAGE << ' ' << VERSION << std::endl;
+			return 0;
+		}
+		if (vm.count("fs")) fullscreen = true;
+		std::set<std::string>::iterator it;
+		// Copy songdirstmp into songdirs
+		bool defaultdirs = true;
+		for (std::vector<std::string>::const_iterator it = songdirstmp.begin(); it != songdirstmp.end(); ++it) {
+			std::string str = *it;
+			if (str == "none") { defaultdirs = false; continue; }
+			if (*str.rbegin() != '/') str += '/';
+			songdirs.insert(str);
+		}
+		if (defaultdirs) {
+			songdirs.insert(DATA_DIR "songs/");
+			{
+				char const* home = getenv("HOME");
+				if (home) songdirs.insert(std::string(home) + "/.ultrastar/songs/");
+			}
+			songdirs.insert("/usr/games/share/ultrastar/songs/");
+			songdirs.insert("/usr/games/share/ultrastar-ng/songs/");
+			songdirs.insert("/usr/share/ultrastar/songs/");
+			songdirs.insert("/usr/share/ultrastar-ng/songs/");
+			songdirs.insert("/usr/local/games/share/ultrastar/songs/");
+			songdirs.insert("/usr/local/games/share/ultrastar-ng/songs/");
+			songdirs.insert("/usr/local/share/ultrastar/songs/");
+			songdirs.insert("/usr/local/share/ultrastar-ng/songs/");
 		}
 	}
-
-	std::string songdir = DATA_DIR "songs/";
-	if (optind != argc) {
-		songdir = argv[optind];
-		if (*songdir.rbegin() != '/') songdir += '/';
-	}
-	std::cout << "Using song directory " << songdir << std::endl;
-	// Initialize everything
 	try {
-		CScreenManager sm(width, height, songdir.c_str(), theme_name);
+		// Initialize everything
+		CScreenManager sm(width, height, theme);
 		sm.setFullscreenStatus(fullscreen);
 		CVideoDriver vd;
-		init_SDL(sm, vd);
+		init_SDL(sm, vd, width, height);
 		sm.setSDLScreen(screenSDL);
 		sm.setAudio(new CAudio());
 		sm.setVideoDriver(&vd);
 		sm.setDifficulty(difficulty);
-		Capture capture(capture_device, capture_rate);
+		Capture capture(cdev, crate);
 		sm.addScreen(new CScreenIntro("Intro", width, height));
-		sm.addScreen(new CScreenSongs("Songs", width, height));
+		sm.addScreen(new CScreenSongs("Songs", width, height, songdirs));
 		sm.addScreen(new CScreenSing("Sing", width, height, capture.analyzer()));
 		sm.addScreen(new CScreenPractice("Practice", width, height, capture.analyzer()));
 		sm.addScreen(new CScreenScore("Score", width, height));

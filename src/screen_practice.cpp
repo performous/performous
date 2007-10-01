@@ -8,48 +8,40 @@ CScreenPractice::~CScreenPractice()
 {
 }
 
-void CScreenPractice::enter( void )
-{
-	CScreenManager * sm = CScreenManager::getSingletonPtr();
+static int loadSVG(std::string const& filename, double w, double h, CairoSVG*& ptr) {
+	CScreenManager* sm = CScreenManager::getSingletonPtr();
+	ptr = new CairoSVG(sm->getThemePathFile(filename).c_str(), w, h);
+	return sm->getVideoDriver()->initSurface(ptr->getSDLSurface());
+}
 
-	char * theme_path = new char[1024];
-	float resFactorX = width/800.;
-	float resFactorY = height/600.;
+void CScreenPractice::enter() {
+	CScreenManager* sm = CScreenManager::getSingletonPtr();
+	double unitX = width/800.;
+	double unitY = height/600.;
+	texture_note = loadSVG("practice_note.svg", 40 * unitX, 25 * unitY, cairo_svg_note);
+	texture_sharp = loadSVG("practice_sharp.svg", 25 * unitX, 75 * unitY, cairo_svg_sharp);
+	texture_peak = loadSVG("practice_peak.svg", 800 * unitX, 10 * unitY, cairo_svg_peak);
 
-
-	sm->getThemePathFile(theme_path,"practice_note.svg");
-	cairo_svg_note = new CairoSVG(theme_path,(int)(40.*resFactorX),(int)(25.*resFactorY));
-	texture_note = sm->getVideoDriver()->initSurface(cairo_svg_note->getSDLSurface());
-
-	sm->getThemePathFile(theme_path,"practice_sharp.svg");
-	cairo_svg_sharp = new CairoSVG(theme_path,(int)(25.*resFactorX),(int)(75.*resFactorY));
-	texture_sharp = sm->getVideoDriver()->initSurface(cairo_svg_sharp->getSDLSurface());
-
-	sm->getThemePathFile(theme_path,"practice_peak.svg");
-	cairo_svg_note = new CairoSVG(theme_path,(int)(800.0*resFactorX),(int)(10.0*resFactorY));
-	texture_peak = sm->getVideoDriver()->initSurface(cairo_svg_note->getSDLSurface());
-
-	delete[] theme_path;
-
-        theme = new CThemePractice(width,height);
+	theme = new CThemePractice(width, height);
 	bg_texture = sm->getVideoDriver()->initSurface(theme->bg->getSDLSurface());
 }
 
-void CScreenPractice::exit( void )
+void CScreenPractice::exit()
 {
 	delete theme;
 	delete cairo_svg_note;
 	delete cairo_svg_sharp;
+	delete cairo_svg_peak;
 }
 
-void CScreenPractice::manageEvent( SDL_Event event )
+void CScreenPractice::manageEvent(SDL_Event event)
 {
 	int keypressed;
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
 	switch(event.type) {
 		case SDL_KEYDOWN:
 			keypressed = event.key.keysym.sym;
-			if( keypressed == SDLK_ESCAPE || keypressed == SDLK_q ) {
+			if(keypressed == SDLK_ESCAPE || keypressed == SDLK_q) {
 				sm->activateScreen("Intro");
 			}
 	}
@@ -78,7 +70,7 @@ void CScreenPractice::draw()
 		theme->theme->PrintText(&theme->notetxt);
 		std::vector<Tone> tones = m_analyzer.getTones();
 		for (size_t i = 0; i < tones.size(); ++i) {
-			if( tones[i].freq() == 0.0 )
+			if(tones[i].freq() == 0.0)
 				continue;
 			int note = scale.getNoteId(tones[i].freq());
 			int posXnote;
@@ -145,7 +137,7 @@ void CScreenPractice::draw()
 			posXnote = (int) ((width-noteOffsetX*resFactorX)/2.);
 			posYnote = (int) ((340.-noteOffset*12.5)*resFactorY);
 			sm->getVideoDriver()->drawSurface(texture_note,posXnote,posYnote);
-			if( sharp ) {
+			if(sharp) {
 				posXsharp = (int) ((width-(noteOffsetX + 60.0)*resFactorX)/2.);
 				posYsharp = (int) ((315.-noteOffset*12.5)*resFactorY);
 				sm->getVideoDriver()->drawSurface(texture_sharp,posXsharp,posYsharp);
