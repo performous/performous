@@ -29,9 +29,12 @@ Ignacio Casal Quinteiro  <nacho.resa at gmail.com>
 jEsuSdA  <info at jesusda.com>
 	* SVG design (lima theme)
 
-Sylvain Henry           <hsyl20 at yahoo.fr>
+Sylvain Henry <hsyl20 at yahoo.fr>
 	* Long sentence display patch
 
-Tobias Gehrig  <tgehrig at users.sourceforge.net>
+Tobias Gehrig <tgehrig at users.sourceforge.net>
 	* Pre-calculate FFT window patch
+
+Oxetti choir <http://www.oxetti.info/>
+    * Menu background vocalization
 
