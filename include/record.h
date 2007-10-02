@@ -13,11 +13,11 @@ struct Peak {
 	double m_freq;
 	double m_db;
   public:
-	Peak(double freq = 0.0, double db = -std::numeric_limits<double>::infinity()): m_freq(freq), m_db(db) {}
+	Peak(double _freq = 0.0, double _db = -std::numeric_limits<double>::infinity()): m_freq(_freq), m_db(_db) {}
 	double db() const {return m_db;};
 	double freq() const {return m_freq;};
-	void db(double db) {m_db = db;};
-	void freq(double freq) {m_freq = freq;};
+	void db(double _db) {m_db = _db;};
+	void freq(double _freq) {m_freq = _freq;};
 };
 
 class Tone {
