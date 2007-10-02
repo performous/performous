@@ -149,7 +149,7 @@ void CScreenSongs::manageEvent(SDL_Event event)
 	}
 }
 
-const char * order[4] = {
+const char* order[4] = {
 	"Order by edition",
 	"Order by genre",
 	"Order by title",
@@ -184,6 +184,7 @@ void CScreenSongs::draw() {
 		}
 
 		// Draw the cover
+		std::cout << sm->getSong()->coverSurf << std::endl;
 		if (sm->getSong()->coverSurf) {
 			SDL_Rect position;
 			position.x=(width - sm->getSong()->coverSurf->w)/2;

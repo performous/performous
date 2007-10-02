@@ -1,19 +1,20 @@
 #include <theme.h>
 #include <screen.h>
 
-CTheme::CTheme(int _width, int _height) 
-		:width(_width),
-		height(_height),
-		surface(NULL),
-		dc(NULL) {
-		clear();
+CTheme::CTheme(int _width, int _height):
+  width(_width),
+  height(_height),
+  surface(NULL),
+  dc(NULL)
+{
+	clear();
 }
 
 void CTheme::clear() {
-		if (dc) cairo_destroy(dc);
-		if (surface) cairo_surface_destroy(surface);
-		surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
-		dc = cairo_create(surface);
+	if (dc) cairo_destroy(dc);
+	if (surface) cairo_surface_destroy(surface);
+	surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
+	dc = cairo_create(surface);
 }
 
 cairo_surface_t *CTheme::PrintText(TThemeTxt *text) {
@@ -407,9 +408,9 @@ CThemeSing::CThemeSing(unsigned int width, unsigned int height) {
 }
 
 CThemeSing::~CThemeSing() {
-		delete bg;
-		delete p1box;
-		delete theme;
+	delete bg;
+	delete p1box;
+	delete theme;
 }
 
 CThemeScore::CThemeScore(unsigned int width, unsigned int height) {

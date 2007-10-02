@@ -43,7 +43,6 @@ CScreenSing::~CScreenSing()
 
 void CScreenSing::enter()
 {
-	char buff[1024];
 	bool video_ok=false;
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
 	CSong * song = sm->getSong();
@@ -73,7 +72,7 @@ void CScreenSing::enter()
 	pitchGraph_id = sm->getVideoDriver()->initSurface(pitchGraph.getCurrent());
 	std::string file = song->path + "/" + song->mp3;
 	std::cout << "Now playing: (" << sm->getSongId() << "): " << file << std::endl;
-	sm->getAudio()->playMusic(buff);
+	sm->getAudio()->playMusic(file.c_str());
 	lyrics = new CLyrics(song->notes, song->gap, song->bpm[0].bpm);
 	song->score[0].score = 0;
 	song->score[0].hits = 0;
