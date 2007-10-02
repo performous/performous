@@ -13,13 +13,13 @@ struct TBpm {
 	float start;
 };
 
-typedef struct _SScore {
-	char* name;
+struct TScore {
+	std::string name;
 	int hits;
 	int total;
 	int score;
-	char* length;
-} TScore ;
+	std::string length;
+};
 
 #define TYPE_NOTE_FREESTYLE 0
 #define TYPE_NOTE_NORMAL  1
