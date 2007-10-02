@@ -10,9 +10,14 @@
 #include <vector>
 
 struct Peak {
-	double freq;
-	double db;
-	Peak(double freq = 0.0, double db = -std::numeric_limits<double>::infinity()): freq(freq), db(db) {}
+	double m_freq;
+	double m_db;
+  public:
+	Peak(double freq = 0.0, double db = -std::numeric_limits<double>::infinity()): m_freq(freq), m_db(db) {}
+	double db() const {return m_db;};
+	double freq() const {return m_freq;};
+	void db(double db) {m_db = db;};
+	void freq(double freq) {m_freq = freq;};
 };
 
 class Tone {
@@ -86,10 +91,10 @@ class Capture {
 };
 
 class MusicalScale {
-	double baseFreq;
-	static const int baseId = 33;
+	double m_baseFreq;
+	static const int m_baseId = 33;
   public:
-	MusicalScale(double baseFreq = 440.0): baseFreq(baseFreq) {}
+	MusicalScale(double baseFreq = 440.0): m_baseFreq(baseFreq) {}
 	std::string getNoteStr(double freq) const;
 	double getNoteFreq(int id) const;
 	int getNoteId(double freq) const;

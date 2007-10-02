@@ -23,12 +23,12 @@ void Tone::print() const {
 }
 
 void Tone::combine(Peak& p, unsigned int h) {
-	m_freqSum += p.freq / h;
+	m_freqSum += p.freq() / h;
 	++m_harmonics;
 	if (h % 2 == 0) ++m_hEven;
 	if (h > m_hHighest) m_hHighest = h;
-	if (p.db > m_dbHighest) {
-		m_dbHighest = p.db;
+	if (p.db() > m_dbHighest) {
+		m_dbHighest = p.db();
 		m_dbHighestH = h;
 	}
 }
@@ -70,8 +70,8 @@ Analyzer::Analyzer(size_t step):
 
 static int match(std::vector<Peak> const& peaks, int pos, double freq) {
 	int best = pos;
-	if (fabs(peaks[pos-1].freq - freq) < fabs(peaks[best].freq - freq)) best = pos - 1;
-	if (fabs(peaks[pos+1].freq - freq) < fabs(peaks[best].freq - freq)) best = pos + 1;
+	if (fabs(peaks[pos-1].freq() - freq) < fabs(peaks[best].freq() - freq)) best = pos - 1;
+	if (fabs(peaks[pos+1].freq() - freq) < fabs(peaks[best].freq() - freq)) best = pos + 1;
 	return best;
 }
 
@@ -120,8 +120,8 @@ void Analyzer::operator()(da::pcm_data& indata, da::settings const& s)
 			double freq = (k + delta) * freqPerBin;
 
 			if (magnitude > minMagnitude) {
-				peaks[k].freq = freq;
-				peaks[k].db = 10.0 * log10(normCoeff * magnitude);
+				peaks[k].freq(freq);
+				peaks[k].db(10.0 * log10(normCoeff * magnitude));
 			}
 		}
 		// Find the tones (collections of harmonics) from the array of peaks
@@ -130,19 +130,19 @@ void Analyzer::operator()(da::pcm_data& indata, da::settings const& s)
 		double db = -std::numeric_limits<double>::infinity();
 		for (size_t k = 2; k < kMax; ++k) {
 			// Prefilter out too low freqs, too silent bins and bins that are weaker than their neighbors
-			if (peaks[k].freq < 80.0 || peaks[k].freq > 700.0 || peaks[k].db < -30.0 || peaks[k].db < peaks[k-1].db || peaks[k].db < peaks[k+1].db) continue;
+			if (peaks[k].freq() < 80.0 || peaks[k].freq() > 700.0 || peaks[k].db() < -30.0 || peaks[k].db() < peaks[k-1].db() || peaks[k].db() < peaks[k+1].db()) continue;
 			// Find the base peak (fundamental frequency)
 			int harmonic = 1;
 			int misses = 0;
 			for (int h = 2; k / h > 2; ++h) {
-				double freq = peaks[k].freq / h;
+				double freq = peaks[k].freq() / h;
 				if (freq < 40.0 || ++misses > 3) break;
 				int best = match(peaks, k / h, freq);
-				if (peaks[best].db < -30.0 || fabs(peaks[best].freq / freq - 1.0) > .03) continue;
+				if (peaks[best].db() < -30.0 || fabs(peaks[best].freq() / freq - 1.0) > .03) continue;
 				misses = 0;
 				harmonic = h;
 			}
-			std::vector<Tone>::iterator it = std::find(tones.begin(), tones.end(), peaks[k].freq / harmonic);
+			std::vector<Tone>::iterator it = std::find(tones.begin(), tones.end(), peaks[k].freq() / harmonic);
 			if (it == tones.end()) {
 				tones.push_back(Tone());
 				it = tones.end() - 1;
@@ -206,13 +206,13 @@ std::string MusicalScale::getNoteStr(double freq) const {
 double MusicalScale::getNoteFreq(int id) const
 {
 	if (id == -1) return 0.0;
-	return baseFreq * pow(2.0, (id - baseId) / 12.0);
+	return m_baseFreq * pow(2.0, (id - m_baseId) / 12.0);
 }
 
 int MusicalScale::getNoteId(double freq) const
 {
 	if (freq < 1.0) return -1;
-	int id = (int) (baseId + 12.0 * log(freq / baseFreq) / log(2) + 0.5);
+	int id = (int) (m_baseId + 12.0 * log(freq / m_baseFreq) / log(2) + 0.5);
 	return id < 0 ? -1 : id;
 }
 
