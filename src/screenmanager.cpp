@@ -35,9 +35,11 @@ void CScreenManager::activateScreen(std::string const& name) {
 }
 
 CScreen* CScreenManager::getScreen(std::string const& name) {
-	screenmap_t::iterator it = screens.find(name);
-	if (it != screens.end()) return it->second;
-	throw std::invalid_argument("Screen " + name + " does not exist");
+	try {
+		return &screens.at(name);
+	} catch (boost::bad_ptr_container_operation&) {
+		throw std::invalid_argument("Screen " + name + " does not exist");
+	}
 }
 
 std::string CScreenManager::getThemePathFile(std::string const& file)
