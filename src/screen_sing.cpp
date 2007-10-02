@@ -128,6 +128,11 @@ void CScreenSing::draw() {
 	double oldfontsize;
 	theme->theme->clear();
 
+	if(!sm->getAudio()->isPlaying()) {
+		sm->activateScreen("Score");
+		return;
+	}
+
 	// draw lines across the screen
 	// Theme this
 	unsigned int numOctaves = (song->noteMax+11)/12 - song->noteMin/12;
