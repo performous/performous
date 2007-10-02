@@ -6,6 +6,9 @@
 #include <stdexcept>
 
 namespace da {
+	template<typename> class register_pattern {
+	};
+
 	class record::dev {
 		friend class record;
 		typedef dev* (*create_func_t)(settings& s);

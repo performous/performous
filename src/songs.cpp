@@ -289,7 +289,7 @@ void CSong::unloadBackground() {
 	backgroundSurf = NULL;
 }
 
-CSongs::CSongs(std::set<std::string> const& songdirs) {
+CSongs::CSongs(std::set<std::string> const& songdirs): m_current() {
 	glob_t _glob;
 	order = 2;
 
@@ -306,15 +306,15 @@ CSongs::CSongs(std::set<std::string> const& songdirs) {
 	}
 	for (std::set<std::string>::const_iterator it = songdirs.begin(); it != songdirs.end(); ++it) {
 		std::string pattern = *it + "/*/*.[tT][xX][tT]";
-		std::cout << "Scanning " << *it << " for songs" << std::endl;
+		std::cout << ">>> Scanning " << *it << ": " << std::flush;
 		glob (pattern.c_str(), GLOB_NOSORT, NULL, &_glob);
-		std::cout << "Found " << _glob.gl_pathc << " possible song file(s)..." << std::endl;
-		for(unsigned int i = 0 ; i < _glob.gl_pathc ; i++) {
+		std::cout << _glob.gl_pathc << " song files found." << std::endl;
+		for (unsigned int i = 0 ; i < _glob.gl_pathc ; i++) {
 			char * path = new char[1024];
 			char * txtfilename;
 			txtfilename = strrchr(_glob.gl_pathv[i],'/'); txtfilename[0] = '\0'; txtfilename++;
 			sprintf(path,"%s",_glob.gl_pathv[i]);
-			std::cout << "Loading song: \"" << strrchr(_glob.gl_pathv[i],'/') + 1 << "\"... ";
+			std::cout << "\r  " << strrchr(_glob.gl_pathv[i],'/') + 1 << "  \x1B[K" << std::flush;
 			CSong* tmp = new CSong();
 			// Set default orderType to title
 			tmp->orderType = 2;
@@ -323,17 +323,18 @@ CSongs::CSongs(std::set<std::string> const& songdirs) {
 			sprintf(txt,"%s",txtfilename); // safe sprintf
 			tmp->filename = txt;
 			if(!parseFile(*tmp)) {
-				std::cout << "FAILED" << std::endl;
+				std::cout << "failed to load" << std::endl;
 				delete[] path;
 				delete[] txt;
 				delete tmp;
 			} else {
-				std::cout << "OK" << std::endl;
+				std::cout << "OK" << std::flush;
 				tmp->parseFile();
 				tmp->index = songs.size();
 				songs.push_back(tmp);
 			}
 		}
+		std::cout << "\r\x1B[K" << std::flush;
 		globfree(&_glob);
 	}
 	boost::progress_display progress(songs.size());

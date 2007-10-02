@@ -55,11 +55,7 @@ class CScreenManager: public CSingleton <CScreenManager> {
 
 	CSongs* getSongs() { return songs; };
 	void setSongs(CSongs* _songs) { songs = _songs; };
-	void setNextSongId();
-	void setPreviousSongId();
-	void setSongId(int _id) { songId = _id; };
-	int getSongId() { return songId; };
-	CSong* getSong() { return &(*songs)[songId]; };
+	CSong* getSong() { return &songs->current(); };
 
 	void finished() { m_finished=true; };
 	bool isFinished() { return m_finished; };
@@ -74,7 +70,6 @@ class CScreenManager: public CSingleton <CScreenManager> {
 	SDL_Surface* screen;
 	CAudio* audio;
 	CSongs* songs;
-	int songId;
 	CVideoDriver* videoDriver;
 	bool m_fullscreen;
 	unsigned int m_width;

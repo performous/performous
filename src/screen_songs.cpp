@@ -102,44 +102,36 @@ void CScreenSongs::manageEvent(SDL_Event event)
 		if (keypressed == SDLK_LEFT) {
 			sm->getAudio()->stopMusic();
 			play = false;
-			sm->setPreviousSongId();
+			sm->getSongs()->advance(-1);
 		} else if (keypressed == SDLK_RIGHT) {
 			sm->getAudio()->stopMusic();
 			play = false;
-			sm->setNextSongId();
+			sm->getSongs()->advance(1);
+		} else if (keypressed == SDLK_PAGEUP) {
+			sm->getAudio()->stopMusic();
+			play = false;
+			sm->getSongs()->advance(-10);
+		} else if (keypressed == SDLK_PAGEDOWN) {
+			sm->getAudio()->stopMusic();
+			play = false;
+			sm->getSongs()->advance(10);
 		} else if (keypressed == SDLK_UP) {
 			sm->getAudio()->stopMusic();
 			play = false;
 			switch(sm->getSongs()->getOrder()) {
-				case 0:
-					sm->getSongs()->sortByArtist();
-					break;
-				case 1:
-					sm->getSongs()->sortByEdition();
-					break;
-				case 2:
-					sm->getSongs()->sortByGenre();
-					break;
-				case 3:
-					sm->getSongs()->sortByTitle();
-					break;
+				case 0: sm->getSongs()->sortByArtist(); break;
+				case 1: sm->getSongs()->sortByEdition(); break;
+				case 2: sm->getSongs()->sortByGenre(); break;
+				case 3: sm->getSongs()->sortByTitle(); break;
 			}
 		} else if (keypressed == SDLK_DOWN) {
 			sm->getAudio()->stopMusic();
 			play = false;
 			switch(sm->getSongs()->getOrder()) {
-				case 0:
-					sm->getSongs()->sortByGenre();
-					break;
-				case 1:
-					sm->getSongs()->sortByTitle();
-					break;
-				case 2:
-					sm->getSongs()->sortByArtist();
-					break;
-				case 3:
-					sm->getSongs()->sortByEdition();
-					break;
+				case 0: sm->getSongs()->sortByGenre(); break;
+				case 1: sm->getSongs()->sortByTitle(); break;
+				case 2: sm->getSongs()->sortByArtist(); break;
+				case 3: sm->getSongs()->sortByEdition(); break;
 			}
 		} else if (keypressed == SDLK_RETURN) {
 			sm->getAudio()->stopMusic();
@@ -175,7 +167,7 @@ void CScreenSongs::draw() {
 		// Draw the "Song information"
 		{
 			std::ostringstream oss;
-			oss << "(" << sm->getSongId()+1 << "/" << sm->getSongs()->nbSongs() << ") "
+			oss << "(" << sm->getSongs()->currentId() + 1 << "/" << sm->getSongs()->size() << ") "
 			  << sm->getSong()->artist << " - " << sm->getSong()->title;
 			theme->song.text = oss.str().c_str();
 			cairo_text_extents_t extents = theme->theme->GetTextExtents(theme->song);

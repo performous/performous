@@ -86,7 +86,13 @@ class CSongs {
 	CSongs(std::set<std::string> const& songdirs);
 	~CSongs();
 	CSong& operator[](std::vector<CSong*>::size_type pos) { return songs[pos]; }
-	int nbSongs() { return songs.size(); };
+	int size() { return songs.size(); };
+	void advance(int diff) {
+		m_current = (m_current + diff) % songs.size();
+		if (m_current < 0) m_current += songs.size();
+	}
+	int currentId() const { return m_current; }
+	CSong& current() { return songs[m_current]; }
 	bool parseFile(CSong& tmp);
 	void sortByEdition();
 	void sortByGenre();
@@ -97,7 +103,7 @@ class CSongs {
   private:
 	typedef boost::ptr_vector<CSong> songlist_t;
 	songlist_t songs;
-	int selected;
+	int m_current;
 	int order;
 	int category;
 	SDL_Surface* surface_nocover;

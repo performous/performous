@@ -14,7 +14,6 @@ CScreenManager::CScreenManager(unsigned int width, unsigned int height, std::str
   screen(),
   audio(),
   songs(),
-  songId(),
   videoDriver(),
   m_fullscreen(),
   m_width(width),
@@ -47,12 +46,3 @@ std::string CScreenManager::getThemePathFile(std::string const& file)
 	return (*m_theme.rbegin() == '/' ? m_theme : THEMES_DIR + m_theme + "/") + file;
 }
 
-void CScreenManager::setPreviousSongId()
-{
-	songId = (songId > 0 ? songId : songs->nbSongs()) - 1;
-}
-
-void CScreenManager::setNextSongId()
-{
-	songId = (songId + 1) % songs->nbSongs();
-}

@@ -45,7 +45,7 @@ static void init_SDL(CScreenManager& sm, CVideoDriver& vd, unsigned int width, u
 	if (!screenSDL) throw std::runtime_error("Cannot initialize screen");
 	SDL_ShowCursor(SDL_DISABLE);
 	SDL_EnableUNICODE(SDL_ENABLE);
-	SDL_EnableKeyRepeat(125, 125);
+	SDL_EnableKeyRepeat(80, 80);
 }
 
 #include <boost/program_options.hpp>

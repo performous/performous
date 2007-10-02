@@ -19,7 +19,6 @@ namespace da {
 		return v;
 	}
 
-
 	record::record(settings& s): handle() {
 		if (s.device == none) { s.device = none; return; }
 		dev::map_t& m = dev::map();

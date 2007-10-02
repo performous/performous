@@ -51,7 +51,7 @@ void CScreenSing::enter()
 	song->loadBackground();
 	if (!song->video.empty()) {
 		std::string file = song->path + "/" + song->video;
-		std::cout << "Now playing: (" << sm->getSongId() << "): " << file << std::endl;
+		std::cout << "Now playing: (" << sm->getSongs()->currentId() + 1 << "): " << file << std::endl;
 		video_ok = video->loadVideo(file, videoSurf, m_width, m_height);
 	}
 	if (video_ok) {
@@ -69,7 +69,7 @@ void CScreenSing::enter()
 	theme_id = sm->getVideoDriver()->initSurface(theme->theme->getCurrent());
 	pitchGraph_id = sm->getVideoDriver()->initSurface(pitchGraph.getCurrent());
 	std::string file = song->path + "/" + song->mp3;
-	std::cout << "Now playing: (" << sm->getSongId() << "): " << file << std::endl;
+	std::cout << "Now playing: (" << sm->getSongs()->currentId() + 1 << "): " << file << std::endl;
 	sm->getAudio()->playMusic(file.c_str());
 	lyrics = new CLyrics(song->notes, song->gap, song->bpm[0].bpm);
 	song->score[0].score = 0;
