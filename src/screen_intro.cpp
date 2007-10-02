@@ -13,16 +13,17 @@ CScreenIntro::~CScreenIntro()
 	delete cairo_svg;
 }
 
-void CScreenIntro::enter( void )
-{
+void CScreenIntro::enter() {
+	CScreenManager* sm = CScreenManager::getSingletonPtr();
+	sm->getAudio()->playMusic(sm->getThemePathFile("menu.ogg"));
 }
 
-void CScreenIntro::exit( void )
-{
+void CScreenIntro::exit() {
+	CScreenManager* sm = CScreenManager::getSingletonPtr();
+	sm->getAudio()->stopMusic();
 }
 
-void CScreenIntro::manageEvent( SDL_Event event )
-{
+void CScreenIntro::manageEvent(SDL_Event event) {
 	int keypressed;
 	switch(event.type) {
 		case SDL_KEYDOWN:
@@ -39,8 +40,7 @@ void CScreenIntro::manageEvent( SDL_Event event )
 	}
 }
 
-void CScreenIntro::draw( void )
-{
-	CScreenManager * sm = CScreenManager::getSingletonPtr();
+void CScreenIntro::draw() {
+	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	sm->getVideoDriver()->drawSurface(texture);
 }

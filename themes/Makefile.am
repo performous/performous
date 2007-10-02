@@ -52,6 +52,7 @@ themeslima_DATA = lima/no_cover.png \
 	lima/score_txt.svg \
 	lima/configuration_bg.svg \
 	lima/configuration_item.svg \
-	lima/configuration_value.svg
+	lima/configuration_value.svg \
+	lima/menu.ogg
 
 EXTRA_DIST = $(themesdef_DATA) $(themeslima_DATA)
