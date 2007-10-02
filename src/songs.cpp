@@ -6,33 +6,33 @@
 #include <iostream>
 #include <stdexcept>
 
-bool compareSongs(CSong const* left , CSong const* right) {
-	if(left->orderType != right->orderType) throw std::logic_error("compareSongs: order mismatch");
+bool compareSongs(CSong const& left , CSong const& right) {
+	if(left.orderType != right.orderType) throw std::logic_error("compareSongs: order mismatch");
 	std::string ordering1;
 	std::string ordering2;
-	switch(left->orderType) {
+	switch(left.orderType) {
 	  case 0: //edition
-		ordering1 = left->edition;
-		ordering2 = right->edition;
+		ordering1 = left.edition;
+		ordering2 = right.edition;
 		break;
 	  case 1: //genre
-		ordering1 = left->genre;
-		ordering2 = right->genre;
+		ordering1 = left.genre;
+		ordering2 = right.genre;
 		break;
 	  case 2: //title
-		ordering1 = left->title;
-		ordering2 = right->title;
+		ordering1 = left.title;
+		ordering2 = right.title;
 		break;
 	  case 3: //artist
-		ordering1 = left->artist;
-		ordering2 = right->artist;
+		ordering1 = left.artist;
+		ordering2 = right.artist;
 		break;
 	  default:
-		ordering1 = left->title;
-		ordering2 = right->title;
+		ordering1 = left.title;
+		ordering2 = right.title;
 		break;
 	}
-	if (ordering1 == ordering2) return left->index < right->index;
+	if (ordering1 == ordering2) return left.index < right.index;
 	return ordering1 < ordering2;
 }
 
@@ -50,46 +50,42 @@ void CSong::parseFile() {
 		  case ':':
 		  case '*':
 			{
-				TNote * tmp = new TNote();
+				TNote tmp;
 				int shift;
 				int len = strlen(buff);
 				char * syllable = new char[16];
 
-				if (buff[0] == 'F') tmp->type = TYPE_NOTE_FREESTYLE;
-				if (buff[0] == '*') tmp->type = TYPE_NOTE_GOLDEN;
-				if (buff[0] == ':') tmp->type = TYPE_NOTE_NORMAL;
+				if (buff[0] == 'F') tmp.type = TYPE_NOTE_FREESTYLE;
+				if (buff[0] == '*') tmp.type = TYPE_NOTE_GOLDEN;
+				if (buff[0] == ':') tmp.type = TYPE_NOTE_NORMAL;
 
 				if (buff[len-2] == '\r') len--;
 				buff[len-1] = '\0'; // Replace the \n or \r with a \0
-				sscanf(buff+1,"%d %d %d%n",&tmp->timestamp, &tmp->length , &tmp->note , &shift);
-				tmp->timestamp += relativeShift;
+				sscanf(buff+1,"%d %d %d%n",&tmp.timestamp, &tmp.length , &tmp.note , &shift);
+				tmp.timestamp += relativeShift;
 				snprintf(syllable,16,"%s",buff+shift+2);
-				tmp->syllable = syllable;
+				tmp.syllable = syllable;
 				// Avoid ":1 0 0" to mess noteMin
-				if(tmp->length == 0) {
-					delete[] tmp->syllable;
-					delete tmp;
-					break;
-				}
-				noteMin = std::min(noteMin, tmp->note);
-				noteMax = std::max(noteMax, tmp->note);
-				maxScore += tmp->length * tmp->type;
-				tmp->curMaxScore = maxScore;
+				if(tmp.length == 0) break;
+				noteMin = std::min(noteMin, tmp.note);
+				noteMax = std::max(noteMax, tmp.note);
+				maxScore += tmp.length * tmp.type;
+				tmp.curMaxScore = maxScore;
 				notes.push_back(tmp);
 				break;
 			}
 		  case '-':
 			{
-				TNote * tmp = new TNote();
+				TNote tmp;
 				int timestamp;
 				int sleep_end;
-				tmp->type = TYPE_NOTE_SLEEP;
+				tmp.type = TYPE_NOTE_SLEEP;
 				int nbInt = sscanf(buff+1,"%d %d",&timestamp, &sleep_end);
-				tmp->timestamp = relativeShift + timestamp;
+				tmp.timestamp = relativeShift + timestamp;
 				if(nbInt == 1) {
-					tmp->length = 0;
+					tmp.length = 0;
 				} else {
-					tmp->length = sleep_end - timestamp;
+					tmp.length = sleep_end - timestamp;
 				}
 				if(relative) {
 					if(nbInt == 1) {
@@ -98,7 +94,7 @@ void CSong::parseFile() {
 						relativeShift += sleep_end;
 					}
 				}
-				tmp->curMaxScore = maxScore;
+				tmp.curMaxScore = maxScore;
 				notes.push_back(tmp);
 				break;
 			}
@@ -110,7 +106,7 @@ void CSong::parseFile() {
 		unsigned int shift = (((noteMin*-1)%12)+1)*12;
 		noteMin += shift;
 		noteMax += shift;
-		for(unsigned i = 0; i < notes.size(); ++i) notes[i]->note+=shift;
+		for(unsigned i = 0; i < notes.size(); ++i) notes[i].note += shift;
 	}
 }
 
@@ -136,10 +132,9 @@ CSong::CSong():
 	noteMax(-256)
 {}
 
-bool CSongs::parseFile(CSong * tmp)
-{
+bool CSongs::parseFile(CSong& tmp) {
 	int score = 0;
-	std::string file = std::string(tmp->path) + "/" + tmp->filename;
+	std::string file = std::string(tmp.path) + "/" + tmp.filename;
 	FILE * fp = fopen(file.c_str(), "r");
 	if (!fp) {
 		std::cout << "Cannot open " << file << std::endl;
@@ -155,7 +150,7 @@ bool CSongs::parseFile(CSong * tmp)
 			if (buff[len-2] == '\r') len--;
 			buff[len-1]='\0'; // Replace the \n or \r with a \0
 			memcpy(title,buff+7,len - 7);
-			tmp->title = title;
+			tmp.title = title;
 			score++;
 		} else if (!strncmp("#EDITION:",buff,9)) {
 			int len = strlen(buff);
@@ -164,7 +159,7 @@ bool CSongs::parseFile(CSong * tmp)
 			if (buff[len-2] == '\r') len--;
 			buff[len-1]='\0'; // Replace the \n or \r with a \0
 			memcpy(edition,buff+9,len - 9);
-			tmp->edition = edition;
+			tmp.edition = edition;
 			score++;
 		} else if (!strncmp("#ARTIST:",buff,8)) {
 			int len = strlen(buff);
@@ -173,7 +168,7 @@ bool CSongs::parseFile(CSong * tmp)
 			if (buff[len-2] == '\r') len--;
 			buff[len-1]='\0'; // Replace the \n or \r with a \0
 			memcpy(artist,buff+8,len - 8);
-			tmp->artist = artist;
+			tmp.artist = artist;
 			score++;
 		} else if (!strncmp("#MP3:",buff,5)) {
 			int len = strlen(buff);
@@ -182,7 +177,7 @@ bool CSongs::parseFile(CSong * tmp)
 			if (buff[len-2] == '\r') len--;
 			buff[len-1]='\0'; // Replace the \n or \r with a \0
 			memcpy(mp3,buff+5,len - 5);
-			tmp->mp3 = mp3;
+			tmp.mp3 = mp3;
 			score++;
 		} else if (!strncmp("#CREATOR:",buff,9)) {
 			int len = strlen(buff);
@@ -191,10 +186,10 @@ bool CSongs::parseFile(CSong * tmp)
 			if (buff[len-2] == '\r') len--;
 			buff[len-1]='\0'; // Replace the \n or \r with a \0
 			memcpy(creator,buff+9,len - 9);
-			tmp->creator = creator;
+			tmp.creator = creator;
 			score++;
 		} else if (!strncmp("#GAP:",buff,5)) {
-			sscanf(buff+5,"%f",&tmp->gap);
+			sscanf(buff+5,"%f",&tmp.gap);
 			score++;
 		} else if (!strncmp("#BPM:",buff,5)) {
 			TBpm bpm;
@@ -203,7 +198,7 @@ bool CSongs::parseFile(CSong * tmp)
 			char * comma = strchr(buff,',');
 			if(comma) *comma = '.';
 			sscanf(buff+5,"%f",&bpm.bpm);
-			tmp->bpm.push_back(bpm);
+			tmp.bpm.push_back(bpm);
 			score++;
 		} else if (!strncmp("#VIDEO:",buff,7)) {
 			int len = strlen(buff);
@@ -211,7 +206,7 @@ bool CSongs::parseFile(CSong * tmp)
 			if (buff[len-2] == '\r') len--;
 			buff[len-1]='\0'; // Replace the \n or \r with a \0
 			memcpy(video,buff+7,len - 7);
-			tmp->video = video;
+			tmp.video = video;
 			score++;
 			} else if(!strncmp("#BACKGROUND:",buff,12)) {
 				int len = strlen(buff);
@@ -219,13 +214,13 @@ bool CSongs::parseFile(CSong * tmp)
 				if (buff[len-2] == '\r') len--;
 				buff[len-1]='\0'; // Replace the \n or \r with a \0
 				memcpy(background,buff+12,len - 12);
-				tmp->background = background;
+				tmp.background = background;
 				score++;
 			} else if(!strncmp("#VIDEOGAP:",buff,10)) {
-				sscanf(buff+10,"%f",&tmp->videoGap);
+				sscanf(buff+10,"%f",&tmp.videoGap);
 				score++;
 			} else if(!strncmp("#RELATIVE:",buff,10)) {
-				tmp->relative = (buff[10] == 'y' || buff[10] == 'Y');
+				tmp.relative = (buff[10] == 'y' || buff[10] == 'Y');
 				score++;
 		} else if(!strncmp("#COVER:",buff,7)) {
  			int len = strlen(buff);
@@ -233,7 +228,7 @@ bool CSongs::parseFile(CSong * tmp)
 			if (buff[len-2] == '\r') len--;
 			buff[len-1]='\0'; // Replace the \n or \r with a \0
 			memcpy(cover,buff+7,len - 7);
-			tmp->cover = cover;
+			tmp.cover = cover;
 			score++;
 		}
 	}
@@ -320,14 +315,14 @@ CSongs::CSongs(std::set<std::string> const& songdirs) {
 			txtfilename = strrchr(_glob.gl_pathv[i],'/'); txtfilename[0] = '\0'; txtfilename++;
 			sprintf(path,"%s",_glob.gl_pathv[i]);
 			std::cout << "Loading song: \"" << strrchr(_glob.gl_pathv[i],'/') + 1 << "\"... ";
-			CSong * tmp = new CSong();
+			CSong* tmp = new CSong();
 			// Set default orderType to title
 			tmp->orderType = 2;
 			tmp->path = path;
-			char * txt = new char[strlen(txtfilename)+1];
+			char* txt = new char[strlen(txtfilename)+1];
 			sprintf(txt,"%s",txtfilename); // safe sprintf
 			tmp->filename = txt;
-			if(!parseFile(tmp)) {
+			if(!parseFile(*tmp)) {
 				std::cout << "FAILED" << std::endl;
 				delete[] path;
 				delete[] txt;
@@ -342,54 +337,35 @@ CSongs::CSongs(std::set<std::string> const& songdirs) {
 		globfree(&_glob);
 	}
 	boost::progress_display progress(songs.size());
-	for(unsigned int i = 0; i < songs.size(); i++) {
-		CSong& song = *getSong(i);
-		song.loadCover();
-		++progress;
-		// Is now loaded only when needed: song.loadBackground();
-	}
+	for (songlist_t::iterator it = songs.begin(); it != songs.end(); ++it, ++progress)
+	  it->loadCover();
 }
 
 CSongs::~CSongs() {
-	for(unsigned int i = 0; i < songs.size(); i++) {
-		for(unsigned int j = 0; j < songs[i]->notes.size(); j++) {
-			delete[] songs[i]->notes[j]->syllable;
-			delete songs[i]->notes[j];
-		}
-		delete songs[i];
-	}
 	SDL_FreeSurface(surface_nocover);
-}
-
-CSong* CSongs::getSong(unsigned int i) {
-	return songs.at(i);
 }
 
 void CSongs::sortByEdition()
 {
 	order = 0;
-	for(unsigned int i = 0; i < songs.size(); i++)
-		songs[i]->orderType = 0;
-	sort(songs.begin(), songs.end(),compareSongs);
+	for(unsigned int i = 0; i < songs.size(); i++) songs[i].orderType = 0;
+	songs.sort(compareSongs);
 }
 void CSongs::sortByGenre()
 {
 	order = 1;
-	for(unsigned int i = 0; i < songs.size(); i++)
-		songs[i]->orderType = 1;
-	sort(songs.begin(), songs.end(),compareSongs);
+	for(unsigned int i = 0; i < songs.size(); i++) songs[i].orderType = 1;
+	songs.sort(compareSongs);
 }
 void CSongs::sortByTitle()
 {
 	order = 2;
-	for(unsigned int i = 0; i < songs.size(); i++)
-		songs[i]->orderType = 2;
-	sort(songs.begin(), songs.end(),compareSongs);
+	for(unsigned int i = 0; i < songs.size(); i++) songs[i].orderType = 2;
+	songs.sort(compareSongs);
 }
 void CSongs::sortByArtist()
 {
 	order = 3;
-	for(unsigned int i = 0; i < songs.size(); i++)
-		songs[i]->orderType = 3;
-	sort(songs.begin(), songs.end(),compareSongs);
+	for(unsigned int i = 0; i < songs.size(); i++) songs[i].orderType = 3;
+	songs.sort(compareSongs);
 }

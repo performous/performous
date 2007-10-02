@@ -27,7 +27,7 @@ class CScreenSing : public CScreen {
 	// Keeps the pitch tracking graphics
 	// in separate surface
 	PitchGraph pitchGraph;
-	std::vector <TNote *> sentence;
+	std::vector<TNote> m_sentence;
 	bool play;
 	bool finished;
 	int playOffset;

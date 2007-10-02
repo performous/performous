@@ -3,6 +3,7 @@
 
 #include "../config.h"
 
+#include <boost/ptr_container/ptr_map.hpp>
 #include <singleton.h>
 #include <audio.h>
 #include <record.h>
@@ -32,10 +33,7 @@ class CScreenManager: public CSingleton <CScreenManager> {
   public:
 	CScreenManager(unsigned int width, unsigned int height, std::string const& theme);
 	~CScreenManager();
-	void addScreen(CScreen* s) { 
-		screens.push_back(s);
-		std::cout << "Adding screen " << s->getName() << " to screen manager" << std::endl;
-	};
+	void addScreen(CScreen* s) { std::string tmp = s->getName(); screens.insert(tmp, s); };
 	void activateScreen(std::string const& name);
 	CScreen* getCurrentScreen() { return currentScreen; };
 	CScreen* getScreen(std::string const& name);
@@ -64,16 +62,17 @@ class CScreenManager: public CSingleton <CScreenManager> {
 	void setPreviousSongId();
 	void setSongId(int _id) { songId = _id; };
 	int getSongId() { return songId; };
-	CSong* getSong() { return songs->getSong(songId); };
+	CSong* getSong() { return &(*songs)[songId]; };
 
-	void finished(void) { m_finished=true; };
-	bool isFinished(void) { return m_finished; };
+	void finished() { m_finished=true; };
+	bool isFinished() { return m_finished; };
 
 	std::string getThemeName() { return m_theme; };
 	std::string getThemePathFile(std::string const& file);
   private:
 	bool m_finished;
-	std::vector<CScreen*> screens;
+	typedef boost::ptr_map<std::string, CScreen> screenmap_t;
+	screenmap_t screens;
 	CScreen* currentScreen;
 	SDL_Surface* screen;
 	CAudio* audio;

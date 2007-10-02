@@ -17,7 +17,7 @@ void CScreenScore::exit() {
 }
 
 void CScreenScore::manageEvent(SDL_Event event) {
-	if (event.type = SDL_KEYDOWN) CScreenManager::getSingletonPtr()->activateScreen("Songs");
+	if (event.type == SDL_KEYDOWN) CScreenManager::getSingletonPtr()->activateScreen("Songs");
 }
 
 void CScreenScore::draw() {

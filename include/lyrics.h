@@ -10,65 +10,61 @@
  * Song lyrics class. Stores the lyrics, and finds out when they should be sung
  */
 class CLyrics {
-	public:
-	CLyrics( std::vector <TNote *> _lyrics , float _gap , float _bpm );
-	~CLyrics();
+  public:
+	CLyrics(std::vector<TNote> const& lyrics, float gap, float bpm);
 	/** 
 	 * Return what has been sung in the current sentence
 	 */
-	char * getSentencePast();
+	std::string getSentencePast() { return m_past; }
 	/**
 	 * Return the current syllable to be sung now
 	 */
-	char * getSentenceNow();
+	std::string getSentenceNow() { return m_now; }
 	/**
 	 * Return the rest of the syllables in the current sentence
 	 */
-	char * getSentenceFuture();
+	std::string getSentenceFuture() { return m_future; }
 	/**
 	 * Return the next sentence to be displayed under the current sentence
 	 */
-	char * getSentenceNext();
+	std::string getSentenceNext() { return m_next; }
 	/**
 	 * Return the whole current sentence (Past + Now + Future)
 	 */
-	char * getSentenceWhole();
+	std::string getSentenceWhole() { return m_past + m_now + m_future; }
 	/**
 	 * Return the current sang note
 	 */
-	TNote * getCurrentNote();
+	TNote getCurrentNote();
 	/**
 	 * Return the current sang sentence structure
 	 */
-	std::vector <TNote *> getCurrentSentence();
+	std::vector<TNote> getCurrentSentence();
 	/** 
 	 * update the content of the sentence strings
 	 */
-	void updateSentences( unsigned int timestamp );
-	private:
+	void updateSentences(unsigned int timestamp);
+  private:
 	/**
 	 * Convert a beat number to a timestamp (according to GAP and BPM)
 	 */
-	unsigned int getTimestampFromBeat( unsigned int beat );
+	unsigned int getTimestampFromBeat(unsigned int beat);
 	/**
 	 * Get the start timestamp of a sentence
 	 */
-	unsigned int getStartTime( int sentence );
+	unsigned int getStartTime(int sentence);
 	/**
 	 * Get the end timestamp of a sentence
 	 */
-	unsigned int getEndTime( int sentence );
-	std::vector <TNote *> lyrics;
-	std::vector < std::vector <TNote *> > formatedLyrics;
-	char sentencePast[1024];
-	char sentenceNow[1024];
-	char sentenceFuture[1024];
-	char sentenceNext[1024];
-	char sentenceWhole[1024];
-	int lastSyllableIndex;
-	int lastSentenceIndex;
-	float gap;
-	float bpm;
+	unsigned int getEndTime(int sentence);
+	
+	std::string m_past, m_now, m_future, m_next;
+	std::vector<TNote> m_lyrics;
+	std::vector<std::vector<TNote> > m_formatted;
+	int m_lastSyllableIdx;
+	int m_lastSentenceIdx;
+	float m_gap;
+	float m_bpm;
 };
 
 #endif

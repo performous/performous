@@ -27,8 +27,6 @@ CScreenManager::~CScreenManager()
 {
 	delete audio;
 	delete songs;
-	for (unsigned int i = 0; i < screens.size(); i++)
-		delete screens[i];
 }
 
 void CScreenManager::activateScreen(std::string const& name) {
@@ -39,9 +37,8 @@ void CScreenManager::activateScreen(std::string const& name) {
 }
 
 CScreen* CScreenManager::getScreen(std::string const& name) {
-	// TODO: use std::map
-	for (unsigned int i = 0; i < screens.size(); i++)
-	  if (screens[i]->getName() == name.c_str()) return screens[i];
+	screenmap_t::iterator it = screens.find(name);
+	if (it != screens.end()) return it->second;
 	throw std::invalid_argument("Screen " + name + " does not exist");
 }
 

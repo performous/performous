@@ -2,14 +2,16 @@
 #define __SONGS_H__
 
 #include "../config.h"
+#include <boost/noncopyable.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
 #include <set>
 #include <string>
 #include <vector>
 
-typedef struct _SBpm {
+struct TBpm {
 	float bpm;
 	float start;
-} TBpm ;
+};
 
 typedef struct _SScore {
 	char* name;
@@ -24,16 +26,16 @@ typedef struct _SScore {
 #define TYPE_NOTE_GOLDEN 2
 #define TYPE_NOTE_SLEEP 3
 
-typedef struct _SNote {
+struct TNote {
 	int type;
 	int timestamp;
 	int length;
 	int note;
 	int curMaxScore;
-	char* syllable;
-} TNote;
+	std::string syllable;
+};
 
-class CSong {
+class CSong: boost::noncopyable {
   public:
 	CSong();
 	~CSong() {
@@ -67,7 +69,7 @@ class CSong {
 	TScore score[3];
 	int noteMin;
 	int noteMax;
-	std::vector<TNote *> notes;
+	std::vector<TNote> notes;
 	bool visible;
 	bool main;
 	int orderNum;
@@ -83,9 +85,9 @@ class CSongs {
   public:
 	CSongs(std::set<std::string> const& songdirs);
 	~CSongs();
-	CSong* getSong(unsigned int i);
+	CSong& operator[](std::vector<CSong*>::size_type pos) { return songs[pos]; }
 	int nbSongs() { return songs.size(); };
-	bool parseFile(CSong * tmp);
+	bool parseFile(CSong& tmp);
 	void sortByEdition();
 	void sortByGenre();
 	void sortByTitle();
@@ -93,7 +95,8 @@ class CSongs {
 	int getOrder() { return order; };
 	SDL_Surface* getEmptyCover() { return surface_nocover; }
   private:
-	std::vector<CSong*> songs;
+	typedef boost::ptr_vector<CSong> songlist_t;
+	songlist_t songs;
 	int selected;
 	int order;
 	int category;
