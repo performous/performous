@@ -254,8 +254,8 @@ void CSong::loadCover(double width, double height) {
 	if (surf == NULL) coverSurf = NULL;
 	else {
 		// Here we want to have cover of 256x256 in 800x600 and scale it if the resolution is different
-		int w = width * 256 / 800;
-		int h = height * 256 / 600;
+		double w = width * 256 / 800;
+		double h = height * 256 / 600;
 		coverSurf = zoomSurface(surf, w / surf->w, h / surf->h, 1);
 		SDL_FreeSurface(surf);
 	}
@@ -294,14 +294,13 @@ CSongs::CSongs(std::set<std::string> const& songdirs) {
 	order = 2;
 
 	SDL_RWops* rwop_nocover = SDL_RWFromFile(CScreenManager::getSingletonPtr()->getThemePathFile("no_cover.png").c_str(), "rb");
-	SDL_Surface * surface_nocover_tmp = NULL;
-	surface_nocover_tmp = IMG_LoadPNG_RW(rwop_nocover);
+	SDL_Surface* surface_nocover_tmp = IMG_LoadPNG_RW(rwop_nocover);
 	int w = CScreenManager::getSingletonPtr()->getWidth()*256/800;
 	int h = CScreenManager::getSingletonPtr()->getHeight()*256/600;
 	surface_nocover = zoomSurface(surface_nocover_tmp,(double)w/surface_nocover_tmp->w,(double)h/surface_nocover_tmp->h,1);
 	SDL_FreeSurface(surface_nocover_tmp);
-	if(rwop_nocover) SDL_RWclose(rwop_nocover);
-	if(surface_nocover == NULL) {
+	if (rwop_nocover) SDL_RWclose(rwop_nocover);
+	if (surface_nocover == NULL) {
 		printf("IMG_LoadPNG_RW: %s\n", IMG_GetError());
 		return;
 	}
@@ -357,8 +356,7 @@ CSongs::~CSongs() {
 	SDL_FreeSurface(surface_nocover);
 }
 
-CSong * CSongs::getSong(unsigned int i)
-{
+CSong* CSongs::getSong(unsigned int i) {
 	return i < songs.size() ? songs[i] : NULL;
 }
 

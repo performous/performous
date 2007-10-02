@@ -27,25 +27,22 @@ CScreenManager::~CScreenManager()
 {
 	delete audio;
 	delete songs;
-	for(unsigned int i = 0 ; i < screens.size() ; i++)
+	for (unsigned int i = 0; i < screens.size(); i++)
 		delete screens[i];
 }
 
-void CScreenManager::activateScreen(const char * name) {
-	for(unsigned int i = 0 ; i < screens.size() ; i++)
-		if(!strcmp(screens[i]->getName(),name)) {
-			if(currentScreen != NULL)
-				currentScreen->exit();
-			currentScreen=screens[i];
-			currentScreen->enter();
-		}
+void CScreenManager::activateScreen(std::string const& name) {
+	CScreen* s = getScreen(name);
+	if (currentScreen) currentScreen->exit();
+	currentScreen = s;
+	currentScreen->enter();
 }
 
-CScreen * CScreenManager::getScreen(const char * name) {
-	for(unsigned int i = 0 ; i < screens.size() ; i++)
-		if(!strcmp(screens[i]->getName(),name))
-			return screens[i];
-	return NULL;
+CScreen* CScreenManager::getScreen(std::string const& name) {
+	// TODO: use std::map
+	for (unsigned int i = 0; i < screens.size(); i++)
+	  if (screens[i]->getName() == name.c_str()) return screens[i];
+	throw std::invalid_argument("Screen " + name + " does not exist");
 }
 
 std::string CScreenManager::getThemePathFile(std::string const& file)

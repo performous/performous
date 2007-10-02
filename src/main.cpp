@@ -90,7 +90,6 @@ int main(int argc, char** argv) {
 			return 0;
 		}
 		if (vm.count("fs")) fullscreen = true;
-		std::set<std::string>::iterator it;
 		// Copy songdirstmp into songdirs
 		bool defaultdirs = true;
 		for (std::vector<std::string>::const_iterator it = songdirstmp.begin(); it != songdirstmp.end(); ++it) {

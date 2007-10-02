@@ -10,23 +10,23 @@ CScreenConfiguration::CScreenConfiguration(const char * name, unsigned int width
 
 CScreenConfiguration::~CScreenConfiguration()
 {
-	for( unsigned int i = 0 ; i < configuration.size() ; i++ )
-		delete configuration[i];
+	for(unsigned int i = 0; i < configuration.size(); i++)
+	  delete configuration[i];
 }
 
-void CScreenConfiguration::enter( void )
+void CScreenConfiguration::enter()
 {
-	CScreenManager * sm = CScreenManager::getSingletonPtr();
-        theme = new CThemeConfiguration(width,height);
+	CScreenManager* sm = CScreenManager::getSingletonPtr();
+	theme = new CThemeConfiguration(m_width, m_height);
 	bg_texture = sm->getVideoDriver()->initSurface(theme->bg->getSDLSurface());
 }
 
-void CScreenConfiguration::exit( void )
+void CScreenConfiguration::exit()
 {
 	delete theme;
 }
 
-void CScreenConfiguration::manageEvent( SDL_Event event )
+void CScreenConfiguration::manageEvent(SDL_Event event)
 {
 	int keypressed;
 	SDLMod modifier;
@@ -36,41 +36,41 @@ void CScreenConfiguration::manageEvent( SDL_Event event )
 			keypressed = event.key.keysym.sym;
 			modifier   = event.key.keysym.mod;
 
-			if( keypressed == SDLK_ESCAPE ) {
+			if(keypressed == SDLK_ESCAPE) {
 				CScreenManager::getSingletonPtr()->activateScreen("Intro");
-			} else if( keypressed == SDLK_LEFT ) {
-				if( !configuration[selected]->isFirst() )
+			} else if(keypressed == SDLK_LEFT) {
+				if(!configuration[selected]->isFirst())
 					configuration[selected]->setPrevious();
-			} else if( keypressed == SDLK_RIGHT ) {
-				if( !configuration[selected]->isLast() )
+			} else if(keypressed == SDLK_RIGHT) {
+				if(!configuration[selected]->isLast())
 					configuration[selected]->setNext();
-			} else if( keypressed == SDLK_UP ) {
-				if( selected > 0 )
+			} else if(keypressed == SDLK_UP) {
+				if(selected > 0)
 					selected--;
-			} else if( keypressed == SDLK_DOWN ) {
-				if( selected < configuration.size() - 1  )
+			} else if(keypressed == SDLK_DOWN) {
+				if(selected < configuration.size() - 1 )
 					selected++;
 			}
 	}
 }
 
-void CScreenConfiguration::draw( void )
+void CScreenConfiguration::draw()
 {
-	CScreenManager * sm = CScreenManager::getSingletonPtr();
+	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	theme->theme->clear();
 	cairo_text_extents_t extents;
 
 	// Draw the "Order by" text
 	{
-	theme->item.text = (char*)configuration[selected]->getDescription();
-	extents = theme->theme->GetTextExtents(theme->item);
-	theme->item.x = (theme->item.svg_width - extents.width)/2;
-	theme->theme->PrintText(&theme->item);
+		theme->item.text = (char*)configuration[selected]->getDescription();
+		extents = theme->theme->GetTextExtents(theme->item);
+		theme->item.x = (theme->item.svg_width - extents.width)/2;
+		theme->theme->PrintText(&theme->item);
 
-	theme->value.text = configuration[selected]->getValue();
-	extents = theme->theme->GetTextExtents(theme->value);
-	theme->value.x = (theme->value.svg_width - extents.width)/2;
-	theme->theme->PrintText(&theme->value);
+		theme->value.text = configuration[selected]->getValue();
+		extents = theme->theme->GetTextExtents(theme->value);
+		theme->value.x = (theme->value.svg_width - extents.width)/2;
+		theme->theme->PrintText(&theme->value);
 	}
 
 	sm->getVideoDriver()->drawSurface(bg_texture);

@@ -47,14 +47,14 @@ void CScreenSing::enter()
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
 	CSong * song = sm->getSong();
 	
-	theme = new CThemeSing(width,height);
+	theme = new CThemeSing(m_width, m_height);
 
 	SDL_FillRect(backgroundSurf,NULL,SDL_MapRGB(backgroundSurf->format, 255, 255, 255));
 
 	if (!song->video.empty()) {
 		std::string file = song->path + "/" + song->video;
 		std::cout << "Now playing: (" << sm->getSongId() << "): " << file << std::endl;
-		video_ok = video->loadVideo(file, videoSurf, width, height);
+		video_ok = video->loadVideo(file, videoSurf, m_width, m_height);
 	}
 	if (video_ok) {
 		SDL_BlitSurface(theme->bg->getSDLSurface(),NULL,backgroundSurf,NULL);
@@ -118,15 +118,14 @@ void CScreenSing::manageEvent(SDL_Event event)
 	}
 }
 
-void CScreenSing::draw()
-{
-	CScreenManager * sm = CScreenManager::getSingletonPtr();
-	CSong   * song	  = sm->getSong();
+void CScreenSing::draw() {
+	CScreenManager* sm = CScreenManager::getSingletonPtr();
+	CSong* song = sm->getSong();
 	float freq;
 	int note;
-	float resFactorX = width/800.;
-	float resFactorY = height/600.;
-	float resFactorAvg = (resFactorX + resFactorY)/2.;
+	float resFactorX = m_width / 800.0;
+	float resFactorY = m_height / 600.0;
+	float resFactorAvg = (resFactorX + resFactorY) / 2.0;
 	double oldfontsize;
 
 	theme->theme->clear();
@@ -151,12 +150,12 @@ void CScreenSing::draw()
 	linerect.stroke_col.r = linerect.stroke_col.g = linerect.stroke_col.b = 0;
 	linerect.stroke_col.a = 0.9;
 	linerect.stroke_width = 1.*resFactorAvg;
-	linerect.svg_width = width;
-	linerect.svg_height = height;
+	linerect.svg_width = m_width;
+	linerect.svg_height = m_height;
 	linerect.height = 1.*resFactorY;
 	linerect.fill_col.a = 0.5;
 	linerect.x = 0;
-	linerect.width = width;
+	linerect.width = m_width;
 	linerect.fill_col.r = 50;
 	linerect.fill_col.g = 50;
 	linerect.fill_col.b = 50;
@@ -166,7 +165,7 @@ void CScreenSing::draw()
 	// draw lines for the C notes (thick)
 	for(unsigned int i = 0 ; i <= numOctaves ; i++) {
 		if(i <= (song->noteMax-lowestC)/12) {
-			linerect.y = height * 3 / 4 - i * height / 2 / numOctaves;
+			linerect.y = m_height * 3 / 4 - i * m_height / 2 / numOctaves;
 			theme->theme->DrawRect(linerect);
 		}
 	}
@@ -175,7 +174,7 @@ void CScreenSing::draw()
 	for(unsigned int i = 0 ; i < numOctaves ; i++) {
 		for(int j = 1 ; j < 12 ; j++) {
 			if(i * 12 + j + (lowestC/12) * 12 <= (unsigned int)song->noteMax){
-				linerect.y = height * 3 / 4 - (i * 12 + j) * height / 24 / numOctaves;
+				linerect.y = m_height * 3 / 4 - (i * 12 + j) * m_height / 24 / numOctaves;
 				theme->theme->DrawRect(linerect);
 			}
 		}
@@ -242,8 +241,8 @@ void CScreenSing::draw()
 		tmptxt = theme->timertxt;	   // use timertxt as template
 		std::string text = scale.getNoteStr(freq);
 		tmptxt.text = const_cast<char*>(text.c_str());
-		tmptxt.x=0;
-		tmptxt.y=height;
+		tmptxt.x = 0;
+		tmptxt.y = m_height;
 		tmptxt.fontsize = 25;
 		theme->theme->PrintText(&tmptxt);
 	}
@@ -253,7 +252,7 @@ void CScreenSing::draw()
 	float bpmPixelUnit;
 	if(sentence.size()) {
 		totalBpm = sentence[sentence.size()-1]->length + sentence[sentence.size()-1]->timestamp - sentence[0]->timestamp;
-		bpmPixelUnit = (width - 100.*resFactorX - 100.*resFactorX)/(totalBpm*1.0);
+		bpmPixelUnit = (m_width - 100.*resFactorX - 100.*resFactorX)/(totalBpm*1.0);
 	} else {
 		totalBpm=0;
 		bpmPixelUnit=0;
@@ -263,8 +262,8 @@ void CScreenSing::draw()
 	tmprect.stroke_col.r = tmprect.stroke_col.g = tmprect.stroke_col.b = 0;
 	tmprect.stroke_col.a = 255;
 	tmprect.stroke_width = 2.*resFactorAvg;
-	tmprect.svg_width = width;
-	tmprect.svg_height = height;
+	tmprect.svg_width = m_width;
+	tmprect.svg_height = m_height;
 	tmprect.height = 10.*resFactorY;
 	tmprect.fill_col.a = 255;
 	tmprect.final_height = 0;
@@ -284,7 +283,7 @@ void CScreenSing::draw()
 
 	for(unsigned int i = 0 ; i < sentence.size() ; i ++) {
 		int currentBpm = sentence[i]->timestamp - sentence[0]->timestamp;
-		int noteHeight=height*3/4-((sentence[i]->note-lowestC)*height/2/numOctaves/12);
+		int noteHeight=m_height*3/4-((sentence[i]->note-lowestC)*m_height/2/numOctaves/12);
 
 		// if C <= timestamp < N; note already ended
 		if(time > ((sentence[i]->timestamp+sentence[i]->length)  * 60 * 1000) / (song->bpm[0].bpm * 4) + song->gap) {
@@ -352,8 +351,8 @@ void CScreenSing::draw()
 			// Lets find the nearest note from the song (diff in [-6,5])
 			int diff =  (66+sentence[i]->note - note)%12-6;
 			int noteSingFinal = sentence[i]->note - diff;
-			int noteheight=((18*numOctaves-noteSingFinal+lowestC)*height/2/numOctaves/12);
-			pitchGraph.renderPitch(double(noteheight) / height, graphTime);
+			int noteheight=((18*numOctaves-noteSingFinal+lowestC)*m_height/2/numOctaves/12);
+			pitchGraph.renderPitch(double(noteheight) / m_height, graphTime);
 			// Is the note currently playing?
 			if (time >= ((sentence[i]->timestamp)  * 60 * 1000) / (song->bpm[0].bpm * 4) + song->gap &&
 			  time <= ((sentence[i]->timestamp+sentence[i]->length)  * 60 * 1000) / (song->bpm[0].bpm * 4) + song->gap) {
@@ -367,8 +366,10 @@ void CScreenSing::draw()
 	
 	tmptxt = theme->lyricspast;
 	tmptxt.text = sentenceWhole;
-	cairo_text_extents_t extents = theme->theme->GetTextExtents(tmptxt);
-	theme->lyricspast.x = (theme->lyricspast.svg_width - extents.width)/2;
+	{
+		cairo_text_extents_t extents = theme->theme->GetTextExtents(tmptxt);
+		theme->lyricspast.x = (theme->lyricspast.svg_width - extents.width)/2;
+	}
 	oldfontsize = theme->lyricspast.fontsize;
 	while (theme->lyricspast.x < 0) {
 		theme->lyricspast.fontsize -= 2;

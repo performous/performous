@@ -1,24 +1,23 @@
 #include <cairosvg.h>
 #include <cairotosdl.h>
 
-CairoSVG::CairoSVG( const char * filename , unsigned int _width , unsigned int _height )
-{
-	cairo_t * dc;
+CairoSVG::CairoSVG(std::string const& filename, unsigned int _width, unsigned int _height) {
+	cairo_t* dc;
 	unsigned int height,width;
 
 #ifdef USE_LIBSVG_CAIRO
 	svg_cairo_t *scr;
 	svg_cairo_create(&scr);
-	svg_cairo_parse (scr, filename);
+	svg_cairo_parse (scr, filename.c_str());
 	svg_cairo_get_size (scr, &width, &height);
 #endif
 #ifdef USE_LIBRSVG
-	RsvgHandle * svgHandle=NULL;
+	RsvgHandle* svgHandle=NULL;
 	GError* pError = NULL;
 	RsvgDimensionData svgDimension;
 	rsvg_init();
-	svgHandle = rsvg_handle_new_from_file(filename,&pError);
-	if( pError != NULL ) {
+	svgHandle = rsvg_handle_new_from_file(filename.c_str(), &pError);
+	if(pError != NULL) {
 		fprintf (stderr, "CairoSVG::CairoSVG: %s\n", pError->message);
 		g_error_free(pError);
 	}
@@ -27,10 +26,8 @@ CairoSVG::CairoSVG( const char * filename , unsigned int _width , unsigned int _
 	height = svgDimension.height;
 #endif
 
-	if( _width == 0 )
-		_width = width;
-	if( _height == 0 )
-		_height = height;
+	if(_width == 0) _width = width;
+	if(_height == 0) _height = height;
 
 	surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, _width, _height);
 	dc = cairo_create(surface);
@@ -50,9 +47,8 @@ CairoSVG::CairoSVG( const char * filename , unsigned int _width , unsigned int _
 	cairo_destroy (dc);
 }
 
-CairoSVG::CairoSVG( const char * data , size_t data_len ,unsigned int _width , unsigned int _height )
-{
-	cairo_t * dc;
+CairoSVG::CairoSVG(const char* data, size_t data_len, unsigned int _width, unsigned int _height) {
+	cairo_t* dc;
 	unsigned int height,width;
 
 #ifdef USE_LIBSVG_CAIRO
@@ -62,7 +58,7 @@ CairoSVG::CairoSVG( const char * data , size_t data_len ,unsigned int _width , u
 	svg_cairo_get_size (scr, &width, &height);
 #endif
 #ifdef USE_LIBRSVG
-	RsvgHandle * svgHandle=NULL;
+	RsvgHandle* svgHandle=NULL;
 	GError* pError = NULL;
 	RsvgDimensionData svgDimension;
 	rsvg_init();
@@ -72,10 +68,8 @@ CairoSVG::CairoSVG( const char * data , size_t data_len ,unsigned int _width , u
 	height = svgDimension.height;
 #endif
 
-	if( _width == 0 )
-		_width = width;
-	if( _height == 0 )
-		_height = height;
+	if(_width == 0) _width = width;
+	if(_height == 0) _height = height;
 
 	surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, _width, _height);
 	dc = cairo_create(surface);
@@ -95,10 +89,8 @@ CairoSVG::CairoSVG( const char * data , size_t data_len ,unsigned int _width , u
 	cairo_destroy (dc);
 }
 
-CairoSVG::~CairoSVG( void )
-{
-	if (sdl_svg)
-                SDL_FreeSurface(sdl_svg);
-	if(surface)
-		cairo_surface_destroy(surface);
+CairoSVG::~CairoSVG() {
+	if (sdl_svg) SDL_FreeSurface(sdl_svg);
+	if (surface) cairo_surface_destroy(surface);
 }
+

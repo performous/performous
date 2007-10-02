@@ -4,7 +4,7 @@
 #include <sstream>
 
 CScreenSongs::CScreenSongs(const char * name, unsigned int width, unsigned int height, std::set<std::string> const& songdirs):
-  CScreen(name,width,height)
+  CScreen(name, width, height)
 {
 	if(CScreenManager::getSingletonPtr()->getSongs() == NULL) {
 		CScreenManager::getSingletonPtr()->setSongs(new CSongs(songdirs));
@@ -20,8 +20,8 @@ void CScreenSongs::enter()
 	songId=0;
 	play = false;
 
-	CScreenManager * sm = CScreenManager::getSingletonPtr();
-	theme = new CThemeSongs(width,height);
+	CScreenManager* sm = CScreenManager::getSingletonPtr();
+	theme = new CThemeSongs(m_width, m_height);
 	bg_texture = sm->getVideoDriver()->initSurface(theme->bg->getSDLSurface());
 }
 
@@ -35,7 +35,7 @@ void CScreenSongs::manageEvent(SDL_Event event)
 {
 	int keypressed;
 	SDLMod modifier;
-	CScreenManager * sm = CScreenManager::getSingletonPtr();
+	CScreenManager* sm = CScreenManager::getSingletonPtr();
 
 	if (event.type != SDL_KEYDOWN) return;
 	keypressed = event.key.keysym.sym;
@@ -157,7 +157,7 @@ const char* order[4] = {
 };
 
 void CScreenSongs::draw() {
-	CScreenManager * sm = CScreenManager::getSingletonPtr();
+	CScreenManager* sm = CScreenManager::getSingletonPtr();
 
 	theme->theme->clear();
 	SDL_Surface *virtSurf = theme->bg->getSDLSurface();
@@ -184,15 +184,17 @@ void CScreenSongs::draw() {
 		}
 
 		// Draw the cover
-		std::cout << sm->getSong()->coverSurf << std::endl;
-		if (sm->getSong()->coverSurf) {
+		{
+			SDL_Surface* surf = sm->getSong()->coverSurf;
+			if (!surf) surf = sm->getSongs()->getEmptyCover();
+			if (!surf) throw std::runtime_error("No cover image and no empty cover image");
 			SDL_Rect position;
-			position.x=(width - sm->getSong()->coverSurf->w)/2;
-			position.y=(height - sm->getSong()->coverSurf->h)/2;
-			position.w=sm->getSong()->coverSurf->w;
-			position.h=sm->getSong()->coverSurf->h;
-			SDL_FillRect(virtSurf,&position,SDL_MapRGB(virtSurf->format, 255, 255, 255));
-			SDL_BlitSurface(sm->getSong()->coverSurf,NULL, virtSurf, &position);
+			position.x = (m_width - surf->w) / 2;
+			position.y = (m_height - surf->h) / 2;
+			position.w = surf->w;
+			position.h = surf->h;
+			SDL_FillRect(virtSurf, &position, SDL_MapRGB(virtSurf->format, 255, 255, 255));
+			SDL_BlitSurface(surf, NULL, virtSurf, &position);
 		}
 
 		//Play a preview of the song (0:30-1:00, and loop)

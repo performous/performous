@@ -56,22 +56,22 @@ Tone& Tone::operator+=(Tone const& t) {
 }
 
 Analyzer::Analyzer(size_t step):
-  step(step),
-  fftLastPhase(FFT_N / 2),
-  window(FFT_N),
+  m_step(step),
+  m_fftLastPhase(FFT_N / 2),
+  m_window(FFT_N),
   m_peak(-std::numeric_limits<double>::infinity()),
   m_freq(0.0)
 {
   	// Hamming window
 	for (size_t i=0; i < FFT_N; i++) {
-		window[i] = 0.53836 - 0.46164 * std::cos(2.0 * M_PI * i / FFT_N - 1);
+		m_window[i] = 0.53836 - 0.46164 * std::cos(2.0 * M_PI * i / FFT_N - 1);
 	}
 }
 
 static int match(std::vector<Peak> const& peaks, int pos, double freq) {
 	int best = pos;
-	if (fabs(peaks[pos-1].freq - freq) < fabs(peaks[best].freq - freq)) best = pos-1;
-	if (fabs(peaks[pos+1].freq - freq) < fabs(peaks[best].freq - freq)) best = pos+1;
+	if (fabs(peaks[pos-1].freq - freq) < fabs(peaks[best].freq - freq)) best = pos - 1;
+	if (fabs(peaks[pos+1].freq - freq) < fabs(peaks[best].freq - freq)) best = pos + 1;
 	return best;
 }
 
@@ -82,9 +82,9 @@ namespace {
 void Analyzer::operator()(da::pcm_data& indata, da::settings const& s)
 {
 	// Precalculated constants
-	const double freqPerBin = s.rate/(double)FFT_N;
-	const double phaseStep = 2.*M_PI*(double)step/(double)FFT_N;
-	const double normCoeff = 1.0 / FFT_N; // WTF? 4.0 / ((double)FFT_N * FFT_N);
+	const double freqPerBin = double(s.rate) / FFT_N;
+	const double phaseStep = 2.0 * M_PI * m_step / FFT_N;
+	const double normCoeff = 1.0 / FFT_N; // WTF? This was: 4.0 / ((double)FFT_N * FFT_N);
 	const double minMagnitude = pow(10, -60.0 / 10.0) / normCoeff;
 
 	std::copy(indata.begin(0), indata.end(0), std::back_inserter(m_buf));
@@ -96,9 +96,9 @@ void Analyzer::operator()(da::pcm_data& indata, da::settings const& s)
 			m_peak = 10.0 * log10(tmp * tmp); // Critical: atomic write
 		}
 		// Calculate FFT
-		std::vector<std::complex<double> > data = da::fft<FFT_P>(m_buf.begin(), window);
+		std::vector<std::complex<double> > data = da::fft<FFT_P>(m_buf.begin(), m_window);
 		// Erase one step of samples
-		m_buf.erase(m_buf.begin(), m_buf.begin() + step);
+		m_buf.erase(m_buf.begin(), m_buf.begin() + m_step);
 		// Process only up to 3000 Hz
 		size_t kMax = std::min(FFT_N / 2, (size_t)(3000.0 / freqPerBin));
 		std::vector<Peak> peaks(kMax + 1);
@@ -108,8 +108,8 @@ void Analyzer::operator()(da::pcm_data& indata, da::settings const& s)
 			double phase = std::arg(data[k]);
 
 			// process phase difference
-			double delta = phase - fftLastPhase[k];
-			fftLastPhase[k] = phase;
+			double delta = phase - m_fftLastPhase[k];
+			m_fftLastPhase[k] = phase;
 			// subtract expected phase difference
 			delta -= k * phaseStep;
 			// map delta phase into +/- M_PI interval

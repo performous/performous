@@ -16,13 +16,13 @@ static int loadSVG(std::string const& filename, double w, double h, CairoSVG*& p
 
 void CScreenPractice::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
-	double unitX = width/800.;
-	double unitY = height/600.;
+	double unitX = m_width/800.;
+	double unitY = m_height/600.;
 	texture_note = loadSVG("practice_note.svg", 40 * unitX, 25 * unitY, cairo_svg_note);
 	texture_sharp = loadSVG("practice_sharp.svg", 25 * unitX, 75 * unitY, cairo_svg_sharp);
 	texture_peak = loadSVG("practice_peak.svg", 800 * unitX, 10 * unitY, cairo_svg_peak);
 
-	theme = new CThemePractice(width, height);
+	theme = new CThemePractice(m_width, m_height);
 	bg_texture = sm->getVideoDriver()->initSurface(theme->bg->getSDLSurface());
 }
 
@@ -50,8 +50,8 @@ void CScreenPractice::manageEvent(SDL_Event event)
 void CScreenPractice::draw()
 {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
-	float resFactorX = width/800.;
-	float resFactorY = height/600.;
+	float resFactorX = m_width/800.;
+	float resFactorY = m_height/600.;
 
 	float freq = m_analyzer.getFreq();
 	MusicalScale scale;
@@ -134,11 +134,11 @@ void CScreenPractice::draw()
 			noteOffset += octave*7;
 			noteOffset += 0.4 * scale.getNoteOffset(tones[i].freq());
 			double noteOffsetX = -600.0 - 10.0 * tones[i].db();
-			posXnote = (int) ((width-noteOffsetX*resFactorX)/2.);
+			posXnote = (int) ((m_width-noteOffsetX*resFactorX)/2.);
 			posYnote = (int) ((340.-noteOffset*12.5)*resFactorY);
 			sm->getVideoDriver()->drawSurface(texture_note,posXnote,posYnote);
 			if(sharp) {
-				posXsharp = (int) ((width-(noteOffsetX + 60.0)*resFactorX)/2.);
+				posXsharp = (int) ((m_width-(noteOffsetX + 60.0)*resFactorX)/2.);
 				posYsharp = (int) ((315.-noteOffset*12.5)*resFactorY);
 				sm->getVideoDriver()->drawSurface(texture_sharp,posXsharp,posYsharp);
 			}
