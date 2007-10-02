@@ -57,9 +57,9 @@ class Analyzer {
 	}
   private:
 	mutable boost::mutex m_mutex;
-	std::size_t step;
-	std::vector<float> fftLastPhase;
-	std::vector<float> window;
+	std::size_t m_step;
+	std::vector<float> m_fftLastPhase;
+	std::vector<float> m_window;
 	volatile double m_peak;
 	volatile double m_freq;
 	std::deque<float> m_buf; // Sample buffer

@@ -1,10 +1,12 @@
 #include <audio.h>
 
 #include <iostream>
+#include <boost/thread/xtime.hpp>
+#include <cmath>
 
 #define LENGTH_ERROR -1
 
-CAudio::CAudio() {
+CAudio::CAudio(): m_type() {
 #ifdef USE_LIBXINE_AUDIO
 	xine = xine_new();
 	xine_init(xine);
@@ -35,9 +37,16 @@ CAudio::CAudio() {
 	}
 #endif
 	length = 0;
+	m_thread.reset(new boost::thread(boost::ref(*this)));
 }
 
 CAudio::~CAudio() {
+	{
+		boost::mutex::scoped_lock l(m_mutex);
+		m_type = QUIT;
+		m_cond.notify_one();
+	}
+	m_thread->join();
 #ifdef USE_LIBXINE_AUDIO
 	xine_close(stream);
 	xine_event_dispose_queue(event_queue);
@@ -52,7 +61,56 @@ CAudio::~CAudio() {
 #endif
 }
 
-unsigned int CAudio::getVolume() {
+namespace {
+	// Boost WTF time format, directly from C...
+	boost::xtime& operator+=(boost::xtime& time, double seconds) {
+		double nsec = 1e9 * (time.sec + seconds) + time.nsec;
+		time.sec = boost::xtime::xtime_sec_t(nsec / 1e9);
+		time.nsec = boost::xtime::xtime_nsec_t(std::fmod(nsec, 1e9));
+		return time;
+	}
+	boost::xtime operator+(boost::xtime const& left, double seconds) {
+		boost::xtime time = left;
+		return time += seconds;
+	}
+	boost::xtime now() {
+		boost::xtime time;
+		boost::xtime_get(&time, boost::TIME_UTC);
+		return time;
+	}
+}
+
+void CAudio::operator()() {
+	for (;;) {
+		Type type;
+		std::string filename;
+		{
+			boost::mutex::scoped_lock l(m_mutex);
+			while (m_type == NONE) m_cond.wait(l);
+			type = m_type;
+			m_type = NONE;
+			filename = m_filename;
+		}
+		switch (type) {
+		  case NONE: // Should not get here...
+		  case QUIT: return;
+		  case STOP: stopMusic_internal(); break;
+		  case PREVIEW:
+			// Wait a little while before actually starting
+			boost::thread::sleep(now() + 0.4);
+			{
+				boost::mutex::scoped_lock l(m_mutex);
+				// Did we receive another event already?
+				if (m_type != NONE) continue;
+			}
+			playPreview_internal(filename);
+			break;
+		  case PLAY: playMusic_internal(filename); break;
+		}
+	}
+}
+
+unsigned int CAudio::getVolume_internal() {
 #ifdef USE_LIBXINE_AUDIO
 	return xine_get_param(stream, XINE_PARAM_AUDIO_VOLUME);
 #endif
@@ -63,7 +121,7 @@ unsigned int CAudio::getVolume() {
 #endif
 }
 
-void CAudio::setVolume(unsigned int _volume) {
+void CAudio::setVolume_internal(unsigned int _volume) {
 #ifdef USE_LIBXINE_AUDIO
 	xine_set_param(stream, XINE_PARAM_AUDIO_VOLUME, _volume);
 #endif
@@ -73,8 +131,8 @@ void CAudio::setVolume(unsigned int _volume) {
 #endif
 }
 
-void CAudio::playMusic(std::string const& filename) {
-	stopMusic();
+void CAudio::playMusic_internal(std::string const& filename) {
+	stopMusic_internal();
 #ifdef USE_LIBXINE_AUDIO
 	int pos_stream;
 	int pos_time;
@@ -94,22 +152,7 @@ void CAudio::playMusic(std::string const& filename) {
 #endif
 }
 
-void CAudio::playPreview(std::string const& filename) {
-	stopMusic();
-#ifdef USE_PREVIEW_THREAD
-	thread.reset(new boost::thread(Thread(filename, *this)));
-#else
-	playPreview_internal(filename);
-#endif
-}
-
-#ifdef USE_PREVIEW_THREAD
-void CAudio::Thread::operator()() {
-	self.playPreview_internal(filename);
-}
-#endif
-
-void CAudio::playPreview_internal(std::string filename) {
+void CAudio::playPreview_internal(std::string const& filename) {
 #ifdef USE_LIBXINE_AUDIO
 	int pos_stream;
 	int pos_time;
@@ -127,10 +170,9 @@ void CAudio::playPreview_internal(std::string filename) {
 	gst_element_set_state (music, GST_STATE_PAUSED);
 	GstState state_paused = GST_STATE_PAUSED;
 	gst_element_get_state (music, NULL, &state_paused, GST_CLOCK_TIME_NONE);
-	if (!gst_element_seek(music, 1.0, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH,
-		GST_SEEK_TYPE_SET, 30*GST_SECOND,
-		GST_SEEK_TYPE_SET, 60*GST_SECOND))
-		g_print("playPreview() seek failed\n");
+	if (!gst_element_seek_internal(music, 1.0, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH,
+	  GST_SEEK_TYPE_SET, 30*GST_SECOND, GST_SEEK_TYPE_SET, 60*GST_SECOND))
+	  g_print("playPreview() seek failed\n");
 	gst_element_set_state (music, GST_STATE_PLAYING);
 	GstFormat fmt = GST_FORMAT_TIME;
 	gint64 len;
@@ -139,9 +181,8 @@ void CAudio::playPreview_internal(std::string filename) {
 #endif
 }
 
-int CAudio::getLength()
-{
-	if (length == LENGTH_ERROR) {
+int CAudio::getLength_internal() {
+	if (length != LENGTH_ERROR) return length;
 #ifdef USE_LIBXINE_AUDIO
 	int pos_stream;
 	int pos_time;
@@ -152,11 +193,10 @@ int CAudio::getLength()
 	gint64 len;
 	length = gst_element_query_duration (music, &fmt, &len) ? int(len/GST:MSECOND) : LENGTH_ERROR;
 #endif
-	}
 	return length == LENGTH_ERROR ? 0 : length;
 }
 
-bool CAudio::isPlaying() {
+bool CAudio::isPlaying_internal() {
 #ifdef USE_LIBXINE_AUDIO
 	xine_event_t *event; 
 	while((event = xine_event_get(event_queue))) {
@@ -168,28 +208,28 @@ bool CAudio::isPlaying() {
 #ifdef USE_GSTREAMER_AUDIO
 	// If the length cannot be computed, we assume that the song is playing
 	// (happening in the first fex seconds)
-	if (getLength() == 0) return true;
-
+	if (getLength_internal() == 0) return true;
 	// If we are not in the last second, then we are not at the end of the song 
-	return getLength() - getPosition() > 1000;
+	return getLength_internal() - getPosition_internal() > 1000;
 #endif
 	return true;
 }
 
-void CAudio::stopMusic() {
+void CAudio::stopMusic_internal() {
+	if (!isPlaying_internal()) return;
 #ifdef USE_PREVIEW_THREAD
-	thread->join();
+	if (thread) { thread->join(); thread.reset(); }
 #endif
-	if (!isPlaying()) return;
 #ifdef USE_LIBXINE_AUDIO
 	xine_stop(stream);
 #endif
 #ifdef USE_GSTREAMER_AUDIO
 	gst_element_set_state (music, GST_STATE_NULL);
 #endif
+	std::cout << "Stopped" << std::endl;
 }
 
-int CAudio::getPosition() {
+int CAudio::getPosition_internal() {
 	int position = 0;
 
 #ifdef USE_LIBXINE_AUDIO
@@ -215,34 +255,34 @@ int CAudio::getPosition() {
 	return position;
 }
 
-bool CAudio::isPaused() {
+bool CAudio::isPaused_internal() {
 #ifdef USE_LIBXINE_AUDIO
-	return isPlaying() && xine_get_param(stream,XINE_PARAM_SPEED) == XINE_SPEED_PAUSE;
+	return isPlaying_internal() && xine_get_param(stream,XINE_PARAM_SPEED) == XINE_SPEED_PAUSE;
 #endif
 #ifdef USE_GSTREAMER_AUDIO
 	return GST_STATE(music) == GST_STATE_PAUSED;
 #endif
 }
 
-void CAudio::togglePause(){
-	if (!isPlaying()) return;
+void CAudio::togglePause_internal() {
+	if (!isPlaying_internal()) return;
 #ifdef USE_LIBXINE_AUDIO
-	xine_set_param(stream, XINE_PARAM_SPEED, isPaused() ? XINE_SPEED_NORMAL : XINE_SPEED_PAUSE);
+	xine_set_param(stream, XINE_PARAM_SPEED, isPaused_internal() ? XINE_SPEED_NORMAL : XINE_SPEED_PAUSE);
 #endif
 #ifdef USE_GSTREAMER_AUDIO
-	gst_element_set_state(music, isPaused() ? GST_STATE_PLAYING : GST_STATE_PAUSED);
+	gst_element_set_state(music, isPaused_internal() ? GST_STATE_PLAYING : GST_STATE_PAUSED);
 #endif
 }
 
-void CAudio::seek(int seek_dist){
-	if (!isPlaying()) return;
-	int position = getPosition()+seek_dist;
+void CAudio::seek_internal(int seek_dist) {
+	if (!isPlaying_internal()) return;
+	int position = getPosition_internal()+seek_dist;
 	if (position < 0) position = 0;
-	if (position > getLength() - 1000) {
+	if (position > getLength_internal() - 1000) {
 		fprintf(stdout,"seeking too far ahead\n");
 		return;
 	}
-	fprintf(stdout,"seeking from %d to %d\n",getPosition(),position);
+	fprintf(stdout,"seeking from %d to %d\n",getPosition_internal(),position);
 #ifdef USE_LIBXINE_AUDIO
 	xine_play(stream,0,position);
 #endif

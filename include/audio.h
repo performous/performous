@@ -3,10 +3,11 @@
 
 #include "../config.h"
 #include <string>
-#ifdef USE_PREVIEW_THREAD
+
 #include <boost/scoped_ptr.hpp>
+#include <boost/thread/condition.hpp>
+#include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
-#endif
 
 /**
  * Audio playback class. This class enables the audio playback using several
@@ -29,68 +30,85 @@ class CAudio {
 	 * stopped. It also compute the length variable.
 	 * @param filename the track filename
 	 */
-	void playMusic(std::string const& filename);
+	void playMusic(std::string const& filename) {
+		boost::mutex::scoped_lock l(m_mutex);
+		m_filename = filename;
+		m_type = PLAY;
+		m_cond.notify_one();
+	}
 	/**
 	 * This method starts the audio playback at 30sec from the beginning of the track.
 	 * If a track is already playing it is
 	 * stopped. It also computes the length variable.
 	 * @param filename the track filename
 	 */
-	void playPreview(std::string const& filename);
+	void playPreview(std::string const& filename) {
+		boost::mutex::scoped_lock l(m_mutex);
+		m_filename = filename;
+		m_type = PREVIEW;
+		m_cond.notify_one();
+	}
 	/**
 	 * This method returns true if music is playing, but paused.
 	 * Otherwise it returns false
 	 */
-	bool isPaused();
+	bool isPaused() { return isPaused_internal(); }
 	/**
 	 * This methods toggles pause. If paused, it starts playing
 	 * normally. If it is playing, the music is paused
 	 */
-	void togglePause();
+	void togglePause() { togglePause_internal(); }
 	/**
 	 * This method stop the audio playback
 	 */
-	void stopMusic();
+	void stopMusic() {
+		boost::mutex::scoped_lock l(m_mutex);
+		m_type = STOP;
+		m_cond.notify_one();
+	}
 	/**
 	 * This method returns the length of the current track stored in the
 	 * length varialble. If the length variable hasn't be already computed
 	 * (for any reason) it is computed again.
 	 */
-	int getLength();
+	int getLength() { return getLength_internal(); }
 	/**
 	 * This methods seek forward in the stream (backwards if
 	 * argument is negative), and continues playing.
 	 * @param seek_dist number of milliseconds to seek from current position
 	 */
-	void seek(int seek_dist);
+	void seek(int seek_dist) { seek_internal(seek_dist); }
 	/**
 	 * This method returns wether or not the track is playing
 	 */
-	bool isPlaying();
+	bool isPlaying() { return isPlaying_internal(); }
 	/**
 	 * This method returns the current position into the playing track. If the
 	 * position cannot be computed, 0 is returned.
 	 */
-	int getPosition();
-	unsigned int getVolume();
-	void setVolume(unsigned int _volume);
+	int getPosition() { return getPosition_internal(); }
+	unsigned int getVolume() { return getVolume_internal(); }
+	void setVolume(unsigned int volume) { setVolume_internal(volume); }
+	void operator()(); // Thread runs here, don't call directly
   private:
-	/** Does the actual playback. **/
-	void playPreview_internal(std::string filename);
-#ifdef USE_PREVIEW_THREAD
-	class Thread {
-		std::string filename;
-		CAudio& self;
-	  public:
-		Thread(std::string const& filename, CAudio& self): filename(filename), self(self) {}
-		void operator()();
-	};
-#endif
+	enum Type { NONE, STOP, PREVIEW, PLAY, QUIT } m_type;
+	std::string m_filename;
+	boost::mutex m_mutex;
+	boost::condition m_cond;
+	boost::scoped_ptr<boost::thread> m_thread;
 	int length;
 	unsigned int audioVolume;
-#ifdef USE_PREVIEW_THREAD
-	boost::scoped_ptr<boost::thread> thread;
-#endif
+	void playMusic_internal(std::string const& filename);
+	void playPreview_internal(std::string const& filename);
+	bool isPaused_internal();
+	void togglePause_internal();
+	void stopMusic_internal();
+	int getLength_internal();
+	void seek_internal(int seek_dist);
+	bool isPlaying_internal();
+	int getPosition_internal();
+	unsigned int getVolume_internal();
+	void setVolume_internal(unsigned int _volume);
 #ifdef USE_LIBXINE_AUDIO
     xine_t               *xine;
     xine_stream_t        *stream;

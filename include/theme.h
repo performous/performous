@@ -53,8 +53,8 @@ class CTheme: boost::noncopyable {
 	cairo_surface_t *DrawRect(TThemeRect rect);
 	cairo_text_extents_t GetTextExtents(TThemeTxt text);
 	cairo_surface_t* getCurrent() {return this->surface;}
-	void ParseSVGForText(char const* filename, TThemeTxt *text);
-	void ParseSVGForRect(char const* filename, TThemeRect *rect);
+	void ParseSVGForText(std::string const& filename, TThemeTxt *text);
+	void ParseSVGForRect(std::string const& filename, TThemeRect *rect);
 	void clear();
   private: 
 	int width;

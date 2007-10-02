@@ -73,8 +73,8 @@ class CSong {
 	int orderNum;
 	int orderType;
 	int maxScore;
-	void loadBackground(double width, double height);
-	void loadCover(double width, double height);
+	void loadBackground();
+	void loadCover();
 	void unloadBackground();
 	void unloadCover();
 };
@@ -91,6 +91,7 @@ class CSongs {
 	void sortByTitle();
 	void sortByArtist();
 	int getOrder() { return order; };
+	SDL_Surface* getEmptyCover() { return surface_nocover; }
   private:
 	std::vector<CSong*> songs;
 	int selected;

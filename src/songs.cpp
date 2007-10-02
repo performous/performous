@@ -1,3 +1,4 @@
+#include <boost/progress.hpp>
 #include <glob.h>
 #include <songs.h>
 #include <screen.h>
@@ -240,8 +241,10 @@ bool CSongs::parseFile(CSong * tmp)
 	return score != 0;
 }
 
-void CSong::loadCover(double width, double height) {
+void CSong::loadCover() {
 	if (coverSurf || cover.empty()) return;
+	double width = CScreenManager::getSingletonPtr()->getWidth();
+	double height = CScreenManager::getSingletonPtr()->getHeight();
 	std::string file = std::string(path) + "/" + cover;
 	std::string::size_type extpos = file.rfind('.');
 	std::string ext = (extpos == std::string::npos) ? "" : file.substr(extpos);
@@ -249,7 +252,7 @@ void CSong::loadCover(double width, double height) {
 	SDL_Surface* surf = NULL;
 	if (ext == ".jpg" || ext == ".JPG" || ext == ".jpeg") surf = IMG_LoadJPG_RW(rwop);
 	else if (ext == ".png" || ext == ".PNG") surf = IMG_LoadPNG_RW(rwop);
-	else std::cout << "Cover image file " << file << " has unknown extension" << std::endl;
+	//else std::cout << "Cover image file " << file << " has unknown extension" << std::endl;
 	if (rwop) SDL_RWclose(rwop);
 	if (surf == NULL) coverSurf = NULL;
 	else {
@@ -261,8 +264,10 @@ void CSong::loadCover(double width, double height) {
 	}
 }
 
-void CSong::loadBackground(double width, double height) {
+void CSong::loadBackground() {
 	if (backgroundSurf || background.empty()) return;
+	double width = CScreenManager::getSingletonPtr()->getWidth();
+	double height = CScreenManager::getSingletonPtr()->getHeight();
 	std::string file = std::string(path) + "/" + background;
 	std::string::size_type extpos = file.rfind('.');
 	std::string ext = (extpos == std::string::npos) ? "" : file.substr(extpos);
@@ -270,7 +275,7 @@ void CSong::loadBackground(double width, double height) {
 	SDL_Surface* surf = NULL;
 	if (ext == ".jpg" || ext == ".JPG" || ext == ".jpeg") surf = IMG_LoadJPG_RW(rwop);
 	else if (ext == ".png" || ext == ".PNG") surf = IMG_LoadPNG_RW(rwop);
-	else std::cout << "Background image file " << file << " has unknown extension" << std::endl;
+	//else std::cout << "Background image file " << file << " has unknown extension" << std::endl;
 	if (rwop) SDL_RWclose(rwop);
 	if (surf == NULL) backgroundSurf = NULL;
 	else {
@@ -336,12 +341,12 @@ CSongs::CSongs(std::set<std::string> const& songdirs) {
 		}
 		globfree(&_glob);
 	}
+	boost::progress_display progress(songs.size());
 	for(unsigned int i = 0; i < songs.size(); i++) {
 		CSong& song = *getSong(i);
-		double width = CScreenManager::getSingletonPtr()->getWidth();
-		double height = CScreenManager::getSingletonPtr()->getHeight();
-		song.loadCover(width, height);
-		song.loadBackground(width, height);
+		song.loadCover();
+		++progress;
+		// Is now loaded only when needed: song.loadBackground();
 	}
 }
 
@@ -357,7 +362,7 @@ CSongs::~CSongs() {
 }
 
 CSong* CSongs::getSong(unsigned int i) {
-	return i < songs.size() ? songs[i] : NULL;
+	return songs.at(i);
 }
 
 void CSongs::sortByEdition()

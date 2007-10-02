@@ -8,37 +8,37 @@
 #include <record.h>
 #include <songs.h>
 #include <video_driver.h>
+#include <iostream>
 #include <string>
 #include <vector>
 
 class CScreen {
   public:
-	CScreen() {}
 	CScreen(const char* name, unsigned int width, unsigned int height):
-	  screenName(name), width(width), height(height) {}
+	  m_name(name), m_width(width), m_height(height) {}
 	virtual ~CScreen() {}
 	virtual void manageEvent(SDL_Event event) = 0;
 	virtual void draw() = 0;
 	virtual void enter() = 0;
 	virtual void exit() = 0;
-	const char* getName() { return screenName; }
+	std::string getName() const { return m_name; }
   protected:
-	const char* screenName; // Must be set by each constructor
-	unsigned int width; // Must be set by each constructor
-	unsigned int height; // Must be set by each constructor
+	std::string m_name; // Must be set by each constructor
+	unsigned int m_width; // Must be set by each constructor
+	unsigned int m_height; // Must be set by each constructor
 };
 
-class CScreenManager : public CSingleton <CScreenManager> {
+class CScreenManager: public CSingleton <CScreenManager> {
   public:
 	CScreenManager(unsigned int width, unsigned int height, std::string const& theme);
 	~CScreenManager();
-	void addScreen(CScreen* screen) { 
-		screens.push_back(screen);
-		fprintf(stdout,"Adding screen \"%s\" to screen manager\n",screen->getName());
+	void addScreen(CScreen* s) { 
+		screens.push_back(s);
+		std::cout << "Adding screen " << s->getName() << " to screen manager" << std::endl;
 	};
-	void activateScreen(const char* name);
+	void activateScreen(std::string const& name);
 	CScreen* getCurrentScreen() { return currentScreen; };
-	CScreen* getScreen(const char* name);
+	CScreen* getScreen(std::string const& name);
 
 	void setSDLScreen(SDL_Surface* _screen) { screen = _screen; };
 	SDL_Surface* getSDLScreen() { return screen; };

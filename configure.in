@@ -88,7 +88,7 @@ AC_LANG_SAVE
 		AC_MSG_ERROR([You need to have the boost thread headers installed]))
 AC_LANG_RESTORE
 
-AC_CHECK_HEADERS([fcntl.h math.h glob.h getopt.h dirent.h sys/ioctl.h sys/types.h sys/stat.h ],
+AC_CHECK_HEADERS([fcntl.h glob.h dirent.h sys/ioctl.h sys/types.h sys/stat.h ],
 	have_std_headers=yes,
 	AC_MSG_ERROR(You need to have the standard c headers installed) )
 
