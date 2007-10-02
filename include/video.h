@@ -11,8 +11,7 @@ class CVideo {
 	bool loadVideo(std::string const& videoFile, SDL_Surface* videoSurf, int width, int height );
 	void unloadVideo();
 	bool isPlaying();
-	void play(void);
-
+	void play();
   private:
 #ifdef USE_SMPEG
 	SMPEG *mpeg;

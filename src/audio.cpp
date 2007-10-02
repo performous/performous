@@ -73,20 +73,15 @@ void CAudio::setVolume(unsigned int _volume) {
 #endif
 }
 
-void CAudio::playMusic(std::string const& filename)
-{
-	if (isPlaying()) stopMusic();
+void CAudio::playMusic(std::string const& filename) {
+	stopMusic();
 #ifdef USE_LIBXINE_AUDIO
 	int pos_stream;
 	int pos_time;
-
 	if (!xine_open(stream, filename.c_str()) || !xine_play(stream, 0, 0)) {
 		std::cout << "Could not open " << filename << std::endl;
 	}
-
-	if (!xine_get_pos_length(stream, &pos_stream, &pos_time, &length))
-	  length = LENGTH_ERROR;
-
+	if (!xine_get_pos_length(stream, &pos_stream, &pos_time, &length)) length = LENGTH_ERROR;
 	xine_playing = 1;
 #endif
 #ifdef USE_GSTREAMER_AUDIO
@@ -95,17 +90,26 @@ void CAudio::playMusic(std::string const& filename)
 	gst_element_set_state (music, GST_STATE_PLAYING);
 	GstFormat fmt = GST_FORMAT_TIME;
 	gint64 len;
-	if (!gst_element_query_duration (music, &fmt, &len)) length = LENGTH_ERROR;
-	else length = int(len/GST_MSECOND);
+	length = gst_element_query_duration(music, &fmt, &len) ? int(len/GST_MSECOND) : LENGTH_ERROR;
 #endif
 }
 
+void CAudio::playPreview(std::string const& filename) {
+	stopMusic();
+#ifdef USE_PREVIEW_THREAD
+	thread.reset(new boost::thread(Thread(filename, *this)));
+#else
+	playPreview_internal(filename);
+#endif
+}
 
+#ifdef USE_PREVIEW_THREAD
+void CAudio::Thread::operator()() {
+	self.playPreview_internal(filename);
+}
+#endif
 
-void CAudio::playPreview(std::string const& filename)
-{
-	if (isPlaying()) stopMusic();
-
+void CAudio::playPreview_internal(std::string filename) {
 #ifdef USE_LIBXINE_AUDIO
 	int pos_stream;
 	int pos_time;
@@ -173,6 +177,10 @@ bool CAudio::isPlaying() {
 }
 
 void CAudio::stopMusic() {
+#ifdef USE_PREVIEW_THREAD
+	thread->join();
+#endif
+	if (!isPlaying()) return;
 #ifdef USE_LIBXINE_AUDIO
 	xine_stop(stream);
 #endif

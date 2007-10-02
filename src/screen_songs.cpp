@@ -162,15 +162,15 @@ void CScreenSongs::draw() {
 	theme->theme->clear();
 	SDL_Surface *virtSurf = theme->bg->getSDLSurface();
 
-	if (sm->getSong()) {
+	// Draw the "Order by" text
+	{
+		theme->order.text = (char*)order[sm->getSongs()->getOrder()];
+		cairo_text_extents_t extents = theme->theme->GetTextExtents(theme->order);
+		theme->order.x = (theme->order.svg_width - extents.width)/2;
+		theme->theme->PrintText(&theme->order);
+	}
 
-		// Draw the "Order by" text
-		{
-			theme->order.text = (char*)order[sm->getSongs()->getOrder()];
-			cairo_text_extents_t extents = theme->theme->GetTextExtents(theme->order);
-			theme->order.x = (theme->order.svg_width - extents.width)/2;
-			theme->theme->PrintText(&theme->order);
-		}
+	if (sm->getSong()) {
 
 		// Draw the "Song information"
 		{
@@ -197,7 +197,7 @@ void CScreenSongs::draw() {
 		//Play a preview of the song (0:30-1:00, and loop)
 		{
 			if (!play) {
-				CSong * song = sm->getSong();
+				CSong* song = sm->getSong();
 				if (song!=NULL) {
 					std::string file = song->path + "/" + song->mp3;
 					sm->getAudio()->playPreview(file.c_str());

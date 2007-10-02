@@ -3,125 +3,119 @@
 
 #include "../config.h"
 
+#include <boost/noncopyable.hpp>
 #include <cairosvg.h>
+#include <string>
 
-typedef struct _SRGBA {
-        double r;
-        double g;
-        double b;
-        double a;
-} TRGBA;
-typedef struct _SThemeTxt {
-        double x;
-        double y;
-        double svg_width;
-        double svg_height;
-        cairo_text_extents_t extents;
-        TRGBA fill_col;
-        TRGBA stroke_col;
-        double stroke_width;
-        double fontsize;
-        char fontfamily[32];
-        cairo_font_slant_t fontstyle;
-        cairo_font_weight_t fontweight;
-        double scale;
-        char const* text;
-
-} TThemeTxt;
-typedef struct _SThemeRect {
-        double x;
-        double y;
-        double svg_width;
-        double svg_height;
-        double final_width;
-        double final_height;
-        double width;
-        double height;
-        TRGBA fill_col;
-        TRGBA stroke_col;
-        double stroke_width;
-} TThemeRect;
-class CTheme {
-        public:
-        CTheme(int width, int height);
-        ~CTheme();
-        cairo_surface_t *PrintText(TThemeTxt *text); 
-        cairo_surface_t *DrawRect(TThemeRect rect);
-        cairo_text_extents_t GetTextExtents(TThemeTxt text);
-        cairo_surface_t* getCurrent() {return this->surface;}
-        void ParseSVGForText(char const* filename, TThemeTxt *text);
-        void ParseSVGForRect(char const* filename, TThemeRect *rect);
-        void clear();
-        private: 
-        int width;
-        int height;
-        cairo_surface_t *surface;
-        cairo_t *dc;
-        void walk_tree(xmlNode * a_node, TThemeTxt *text);
-        void walk_tree(xmlNode * a_node, TThemeRect *rect);
-        void getcolor(char *string, TRGBA *col);
+struct TRGBA {
+	double r;
+	double g;
+	double b;
+	double a;
 };
 
-class CThemeSongs {
-	public:
+struct TThemeTxt {
+	double x;
+	double y;
+	double svg_width;
+	double svg_height;
+	cairo_text_extents_t extents;
+	TRGBA fill_col;
+	TRGBA stroke_col;
+	double stroke_width;
+	double fontsize;
+	char fontfamily[32];
+	cairo_font_slant_t fontstyle;
+	cairo_font_weight_t fontweight;
+	double scale;
+	std::string text;
+};
+
+struct TThemeRect {
+	double x;
+	double y;
+	double svg_width;
+	double svg_height;
+	double final_width;
+	double final_height;
+	double width;
+	double height;
+	TRGBA fill_col;
+	TRGBA stroke_col;
+	double stroke_width;
+};
+
+class CTheme: boost::noncopyable {
+  public:
+	CTheme(int width, int height);
+	~CTheme();
+	cairo_surface_t *PrintText(TThemeTxt *text); 
+	cairo_surface_t *DrawRect(TThemeRect rect);
+	cairo_text_extents_t GetTextExtents(TThemeTxt text);
+	cairo_surface_t* getCurrent() {return this->surface;}
+	void ParseSVGForText(char const* filename, TThemeTxt *text);
+	void ParseSVGForRect(char const* filename, TThemeRect *rect);
+	void clear();
+  private: 
+	int width;
+	int height;
+	cairo_surface_t *surface;
+	cairo_t *dc;
+	void walk_tree(xmlNode * a_node, TThemeTxt *text);
+	void walk_tree(xmlNode * a_node, TThemeRect *rect);
+	void getcolor(char *string, TRGBA *col);
+};
+
+struct CThemeSongs: boost::noncopyable {
 	CThemeSongs(unsigned int width, unsigned int height);
 	~CThemeSongs();
 	CairoSVG *bg;
 	TThemeTxt song;
 	TThemeTxt order;
-        CTheme *theme;
-	private:
+	CTheme *theme;
 };
 
-class CThemePractice {
-	public:
+struct CThemePractice: boost::noncopyable {
 	CThemePractice(unsigned int width, unsigned int height);
 	~CThemePractice();
 	CairoSVG *bg;
 	TThemeTxt notetxt;
-        CTheme *theme;
-	private:
+	CTheme *theme;
 };
 
-class CThemeSing {
-        public:
-        CThemeSing(unsigned int width, unsigned int height);
-        ~CThemeSing();
-        CairoSVG *bg;
-        CairoSVG *p1box;
-        TThemeTxt timertxt; 
-        TThemeTxt p1score;
-        TThemeTxt lyricspast;
-        TThemeTxt lyricsfuture;  
-        TThemeTxt lyricshighlight;
-        TThemeTxt lyricsnextsentence;
-        TThemeRect progressfg;
-        TThemeRect tostartfg;
-        CTheme *theme;
-        private:
+struct CThemeSing: boost::noncopyable {
+	CThemeSing(unsigned int width, unsigned int height);
+	~CThemeSing();
+	CairoSVG *bg;
+	CairoSVG *p1box;
+	TThemeTxt timertxt; 
+	TThemeTxt p1score;
+	TThemeTxt lyricspast;
+	TThemeTxt lyricsfuture;  
+	TThemeTxt lyricshighlight;
+	TThemeTxt lyricsnextsentence;
+	TThemeRect progressfg;
+	TThemeRect tostartfg;
+	CTheme *theme;
 };
 
-class CThemeScore {
-	public:
+struct CThemeScore: boost::noncopyable {
 	CThemeScore(unsigned int width, unsigned int height);
 	~CThemeScore();
 	CairoSVG *bg;
 	TThemeTxt normal_score;
 	TThemeTxt rank;
-        TThemeRect level;
+	TThemeRect level;
 	CTheme *theme;
-	private:
 };
 
-class CThemeConfiguration {
-	public:
+struct CThemeConfiguration: boost::noncopyable {
 	CThemeConfiguration(unsigned int width, unsigned int height);
 	~CThemeConfiguration();
 	CairoSVG *bg;
 	TThemeTxt item;
 	TThemeTxt value;
 	CTheme *theme;
-	private:
 };
 
 #endif

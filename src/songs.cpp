@@ -207,34 +207,28 @@ bool CSongs::parseFile(CSong * tmp)
 		} else if (!strncmp("#VIDEO:",buff,7)) {
 			int len = strlen(buff);
 			char * video = new char[len - 7];
-
 			if (buff[len-2] == '\r') len--;
 			buff[len-1]='\0'; // Replace the \n or \r with a \0
 			memcpy(video,buff+7,len - 7);
 			tmp->video = video;
 			score++;
-                } else if(!strncmp("#BACKGROUND:",buff,12)) {
-                        int len = strlen(buff);
-                        char * background = new char[len - 12];
-
-                        if (buff[len-2] == '\r') len--;
-                        buff[len-1]='\0'; // Replace the \n or \r with a \0
-                        memcpy(background,buff+12,len - 12);
-                        tmp->background = background;
-			score++;
-                } else if(!strncmp("#VIDEOGAP:",buff,10)) {
-			sscanf(buff+10,"%f",&tmp->videoGap);
-			score++;
-		} else if(!strncmp("#RELATIVE:",buff,10)) {
-			if(buff[10] == 'y'  || buff[10] == 'Y')
-				tmp->relative = true;
-			else
-				tmp->relative = false;
-			score++;
+			} else if(!strncmp("#BACKGROUND:",buff,12)) {
+				int len = strlen(buff);
+				char * background = new char[len - 12];
+				if (buff[len-2] == '\r') len--;
+				buff[len-1]='\0'; // Replace the \n or \r with a \0
+				memcpy(background,buff+12,len - 12);
+				tmp->background = background;
+				score++;
+			} else if(!strncmp("#VIDEOGAP:",buff,10)) {
+				sscanf(buff+10,"%f",&tmp->videoGap);
+				score++;
+			} else if(!strncmp("#RELATIVE:",buff,10)) {
+				tmp->relative = (buff[10] == 'y' || buff[10] == 'Y');
+				score++;
 		} else if(!strncmp("#COVER:",buff,7)) {
  			int len = strlen(buff);
 			char * cover = new char[len - 7];
-
 			if (buff[len-2] == '\r') len--;
 			buff[len-1]='\0'; // Replace the \n or \r with a \0
 			memcpy(cover,buff+7,len - 7);
@@ -249,7 +243,8 @@ bool CSongs::parseFile(CSong * tmp)
 void CSong::loadCover(double width, double height) {
 	if (coverSurf || cover.empty()) return;
 	std::string file = std::string(path) + "/" + cover;
-	std::string ext = file.substr(file.rfind('.'));
+	std::string::size_type extpos = file.rfind('.');
+	std::string ext = (extpos == std::string::npos) ? "" : file.substr(extpos);
 	SDL_RWops* rwop = SDL_RWFromFile(file.c_str(), "rb");
 	SDL_Surface* surf = NULL;
 	if (ext == ".jpg" || ext == ".JPG" || ext == ".jpeg") surf = IMG_LoadJPG_RW(rwop);
@@ -269,7 +264,8 @@ void CSong::loadCover(double width, double height) {
 void CSong::loadBackground(double width, double height) {
 	if (backgroundSurf || background.empty()) return;
 	std::string file = std::string(path) + "/" + background;
-	std::string ext = file.substr(file.rfind('.'));
+	std::string::size_type extpos = file.rfind('.');
+	std::string ext = (extpos == std::string::npos) ? "" : file.substr(extpos);
 	SDL_RWops* rwop = SDL_RWFromFile(file.c_str(), "rb");
 	SDL_Surface* surf = NULL;
 	if (ext == ".jpg" || ext == ".JPG" || ext == ".jpeg") surf = IMG_LoadJPG_RW(rwop);
@@ -341,11 +337,13 @@ CSongs::CSongs(std::set<std::string> const& songdirs) {
 		}
 		globfree(&_glob);
 	}
-	/* SLOW AS HELL
 	for(unsigned int i = 0; i < songs.size(); i++) {
-		loadCover(i,CScreenManager::getSingletonPtr()->getWidth(),CScreenManager::getSingletonPtr()->getHeight());
-		loadBackground(i,CScreenManager::getSingletonPtr()->getWidth(),CScreenManager::getSingletonPtr()->getHeight());
-	}*/
+		CSong& song = *getSong(i);
+		double width = CScreenManager::getSingletonPtr()->getWidth();
+		double height = CScreenManager::getSingletonPtr()->getHeight();
+		song.loadCover(width, height);
+		song.loadBackground(width, height);
+	}
 }
 
 CSongs::~CSongs() {

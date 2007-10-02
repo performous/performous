@@ -3,6 +3,10 @@
 
 #include "../config.h"
 #include <string>
+#ifdef USE_PREVIEW_THREAD
+#include <boost/scoped_ptr.hpp>
+#include <boost/thread/thread.hpp>
+#endif
 
 /**
  * Audio playback class. This class enables the audio playback using several
@@ -71,8 +75,22 @@ class CAudio {
 	unsigned int getVolume();
 	void setVolume(unsigned int _volume);
   private:
+	/** Does the actual playback. **/
+	void playPreview_internal(std::string filename);
+#ifdef USE_PREVIEW_THREAD
+	class Thread {
+		std::string filename;
+		CAudio& self;
+	  public:
+		Thread(std::string const& filename, CAudio& self): filename(filename), self(self) {}
+		void operator()();
+	};
+#endif
 	int length;
 	unsigned int audioVolume;
+#ifdef USE_PREVIEW_THREAD
+	boost::scoped_ptr<boost::thread> thread;
+#endif
 #ifdef USE_LIBXINE_AUDIO
     xine_t               *xine;
     xine_stream_t        *stream;
