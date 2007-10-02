@@ -86,7 +86,7 @@ void CScreenSongs::manageEvent(SDL_Event event)
 		}
 	} else {
 		if (keypressed == SDLK_ESCAPE) {
-			if (sm->getSong()) sm->getAudio()->stopMusic();
+			if (sm->getSongs()->size() > 0) sm->getAudio()->stopMusic();
 			play = false;
 			sm->activateScreen("Intro");
 		}
@@ -98,7 +98,8 @@ void CScreenSongs::manageEvent(SDL_Event event)
 				delete CScreenManager::getSingletonPtr()->getSongs();
 			CScreenManager::getSingletonPtr()->setSongs(new CSongs(songdirs));
 			CScreenManager::getSingletonPtr()->getSongs()->sortByArtist();*/
-		if (!sm->getSong()) return;
+		// If there are no songs, stop now.
+		if (sm->getSongs()->size() == 0) return;
 		if (keypressed == SDLK_LEFT) {
 			sm->getAudio()->stopMusic();
 			play = false;
@@ -161,9 +162,16 @@ void CScreenSongs::draw() {
 		theme->order.x = (theme->order.svg_width - extents.width)/2;
 		theme->theme->PrintText(&theme->order);
 	}
-
-	if (sm->getSong()) {
-
+	// Test if there are no songs
+	if (sm->getSongs()->size() == 0) {
+		// Draw the "Song information"
+		{
+			theme->song.text = "No songs found";
+			cairo_text_extents_t extents = theme->theme->GetTextExtents(theme->song);
+			theme->song.x = (theme->song.svg_width - extents.width)/2;
+			theme->theme->PrintText(&theme->song);
+		}
+	} else {
 		// Draw the "Song information"
 		{
 			std::ostringstream oss;
@@ -203,14 +211,6 @@ void CScreenSongs::draw() {
 				sm->getAudio()->stopMusic();
 				play=false;
 			}
-		}
-	} else { // No songs
-		// Draw the "Song information"
-		{
-			theme->song.text = "No songs found";
-			cairo_text_extents_t extents = theme->theme->GetTextExtents(theme->song);
-			theme->song.x = (theme->song.svg_width - extents.width)/2;
-			theme->theme->PrintText(&theme->song);
 		}
 	}
 	sm->getVideoDriver()->drawSurface(bg_texture);
