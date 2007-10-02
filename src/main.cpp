@@ -28,7 +28,7 @@ static void checkEvents_SDL(CScreenManager& sm) {
 		  case SDL_KEYDOWN:
 			int keypressed  = event.key.keysym.sym;
 			SDLMod modifier = event.key.keysym.mod;
-			if( keypressed == SDLK_f && modifier & KMOD_ALT ) {
+			if( keypressed == SDLK_RETURN && modifier & KMOD_ALT ) {
 				SDL_WM_ToggleFullScreen(screenSDL);
 				sm.setFullscreenStatus(!sm.getFullscreenStatus());
 			}
