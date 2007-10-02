@@ -19,7 +19,6 @@ CScreenManager::CScreenManager(unsigned int width, unsigned int height, std::str
   m_fullscreen(),
   m_width(width),
   m_height(height),
-  m_difficulty(),
   m_theme(theme)
 {}
 

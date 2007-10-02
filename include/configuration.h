@@ -32,20 +32,6 @@ class CConfigurationFullscreen : public CConfiguration {
 		bool fullscreen;
 };
 
-class CConfigurationDifficulty : public CConfiguration {
-	public:
-		CConfigurationDifficulty();
-		~CConfigurationDifficulty();
-		bool isLast();
-		bool isFirst();
-		void setNext();
-		void setPrevious();
-		char * getValue();
-	protected:
-		void apply();
-		unsigned int difficulty;
-};
-
 class CConfigurationAudioVolume : public CConfiguration {
 	public:
 		CConfigurationAudioVolume();

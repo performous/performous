@@ -44,9 +44,6 @@ class CScreenManager: public CSingleton <CScreenManager> {
 	unsigned int getWidth() { return m_width; };
 	unsigned int getHeight() { return m_height; };
 	
-	void setDifficulty(unsigned int difficulty) { m_difficulty = difficulty; };
-	unsigned int getDifficulty() { return m_difficulty; };
-
 	CAudio* getAudio() { return audio; };
 	void setAudio(CAudio* _audio) {audio=_audio; };
 
@@ -82,7 +79,6 @@ class CScreenManager: public CSingleton <CScreenManager> {
 	bool m_fullscreen;
 	unsigned int m_width;
 	unsigned int m_height;
-	unsigned int m_difficulty;
 	std::string m_theme;
 };
 

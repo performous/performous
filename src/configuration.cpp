@@ -46,58 +46,6 @@ void CConfigurationFullscreen::apply()
 
 /****************************************************************************/
 
-CConfigurationDifficulty::CConfigurationDifficulty()
-{
-	CScreenManager * sm = CScreenManager::getSingletonPtr();
-	difficulty = sm->getDifficulty();
-	description="Difficulty";
-}
-CConfigurationDifficulty::~CConfigurationDifficulty()
-{
-}
-bool CConfigurationDifficulty::isLast()
-{
-	return (difficulty>=2);
-}
-bool CConfigurationDifficulty::isFirst()
-{
-	return (difficulty<=0);
-}
-void CConfigurationDifficulty::setNext()
-{
-	difficulty++;
-	apply();
-}
-void CConfigurationDifficulty::setPrevious()
-{
-	difficulty--;
-	apply();
-}
-char * CConfigurationDifficulty::getValue()
-{
-	switch(difficulty) {
-		case 0:
-			return (char*)"Easy";
-			break;
-		case 1:
-			return (char*)"Medium";
-			break;
-		case 2:
-			return (char*)"Hard";
-			break;
-		default:
-			return (char*)"Error";
-			break;
-	}
-}
-void CConfigurationDifficulty::apply()
-{
-	CScreenManager * sm = CScreenManager::getSingletonPtr();
-	sm->setDifficulty(difficulty);
-}
-
-/****************************************************************************/
-
 CConfigurationAudioVolume::CConfigurationAudioVolume()
 {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();

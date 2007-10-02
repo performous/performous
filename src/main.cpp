@@ -51,7 +51,6 @@ static void init_SDL(CScreenManager& sm, CVideoDriver& vd, unsigned int width, u
 #include <boost/program_options.hpp>
 
 int main(int argc, char** argv) {
-	unsigned int difficulty = 2;
 	bool fullscreen = false;
 	unsigned int width, height;
 	std::string theme;
@@ -123,7 +122,6 @@ int main(int argc, char** argv) {
 		sm.setSDLScreen(screenSDL);
 		sm.setAudio(new CAudio());
 		sm.setVideoDriver(&vd);
-		sm.setDifficulty(difficulty);
 		Capture capture(cdev, crate);
 		sm.addScreen(new CScreenIntro("Intro", width, height));
 		sm.addScreen(new CScreenSongs("Songs", width, height, songdirs));
