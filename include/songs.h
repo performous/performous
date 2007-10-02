@@ -81,6 +81,7 @@ class CSong: boost::noncopyable {
 	void unloadCover();
 };
 
+#include <iostream>
 class CSongs {
   public:
 	CSongs(std::set<std::string> const& songdirs);
@@ -88,7 +89,7 @@ class CSongs {
 	CSong& operator[](std::vector<CSong*>::size_type pos) { return songs[pos]; }
 	int size() { return songs.size(); };
 	void advance(int diff) {
-		m_current = (m_current + diff) % songs.size();
+		m_current = (m_current + diff) % int(songs.size());
 		if (m_current < 0) m_current += songs.size();
 	}
 	int currentId() const { return m_current; }
