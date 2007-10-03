@@ -3,7 +3,9 @@
 
 #include "../config.h"
 #include <boost/noncopyable.hpp>
+#include <boost/progress.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
+#include <boost/thread/mutex.hpp>
 #include <set>
 #include <string>
 #include <vector>
@@ -55,7 +57,7 @@ class CSong: boost::noncopyable {
 	std::string text;
 	std::string creator;
 	std::string cover;
-	SDL_Surface* coverSurf;
+	SDL_Surface* volatile coverSurf;
 	std::string mp3;
 	std::string background;
 	SDL_Surface* backgroundSurf;
@@ -85,6 +87,7 @@ bool operator<(CSong const& l, CSong const& r);
 class CSongs {
 	std::set<std::string> m_songdirs;
   public:
+	class SongLoader;
 	CSongs(std::set<std::string> const& songdirs);
 	~CSongs();
 	void reload();
@@ -104,6 +107,7 @@ class CSongs {
 	void parseFile(CSong& tmp);
 	SDL_Surface* getEmptyCover() { return surface_nocover; }
   private:
+	boost::mutex m_mutex;
 	class RestoreSel;
 	typedef boost::ptr_vector<CSong> songlist_t;
 	songlist_t m_songs;

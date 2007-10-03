@@ -1,5 +1,5 @@
 #include <boost/lexical_cast.hpp>
-#include <boost/progress.hpp>
+#include <boost/thread/thread.hpp>
 #include <glob.h>
 #include <songs.h>
 #include <screen.h>
@@ -162,8 +162,20 @@ CSongs::~CSongs() {
 	SDL_FreeSurface(surface_nocover);
 }
 
+class CSongs::SongLoader {
+	CSongs& m_self;
+  public:
+	SongLoader(CSongs& self): m_self(self) {}
+	void operator()() {
+		boost::mutex::scoped_lock l(m_self.m_mutex);
+		songlist_t& s = m_self.m_songs;
+		boost::progress_display pd(s.size() + 1);
+		for (songlist_t::iterator it = s.begin(); ++pd, it != s.end(); ++it) it->loadCover();
+	}
+};
+
 void CSongs::reload() {
-	m_songs.clear();
+	songlist_t songs;
 	for (std::set<std::string>::const_iterator it = m_songdirs.begin(); it != m_songdirs.end(); ++it) {
 		glob_t _glob;
 		std::string pattern = *it + "*/*.[tT][xX][tT]";
@@ -182,7 +194,7 @@ void CSongs::reload() {
 				tmp->filename = txtfilename;
 				parseFile(*tmp);
 				tmp->parseFile();
-				m_songs.push_back(tmp);
+				songs.push_back(tmp);
 			}
 			catch (...) {
 				std::cout << "FAIL" << std::endl;
@@ -192,10 +204,10 @@ void CSongs::reload() {
 		std::cout << "\r\x1B[K" << std::flush;
 		globfree(&_glob);
 	}
-	boost::progress_display pd(m_songs.size() + 1);
-	for (songlist_t::iterator it = m_songs.begin(); it != m_songs.end(); ++it, ++pd) it->loadCover();
+	boost::mutex::scoped_lock l(m_mutex);
+	m_songs.swap(songs);
 	setFilter("");
-	++pd;
+	boost::thread(SongLoader(*this));
 }
 
 namespace {
@@ -203,7 +215,6 @@ namespace {
 		std::replace(str.begin(), str.end(), ',', '.'); // Fix decimal separators
 		return boost::lexical_cast<double>(str);
 	}
-
 	bool toBool(std::string const& str) {
 		char c = str.empty() ? 0 : str[0];
 		return c == 'y' || c == 'Y' || c == '1';
