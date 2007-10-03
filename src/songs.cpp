@@ -1,4 +1,5 @@
 #include <boost/lexical_cast.hpp>
+#include <boost/regex.hpp>
 #include <boost/thread/thread.hpp>
 #include <glob.h>
 #include <songs.h>
@@ -271,7 +272,7 @@ void CSongs::setFilter(std::string const& val) {
 	RestoreSel restore(*this);
 	m_filtered.clear();
 	for (songlist_t::iterator it = m_songs.begin(); it != m_songs.end(); ++it) {
-		if (val.empty() || it->str().find(val) != std::string::npos) m_filtered.push_back(&*it);
+		if (val.empty() || regex_search(it->str(), boost::regex(val))) m_filtered.push_back(&*it);
 	}
 	sortChange(0);
 	m_current = 0;

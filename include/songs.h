@@ -101,7 +101,7 @@ class CSongs {
 	int currentId() const { return m_current; }
 	CSong& current() { return *m_filtered[m_current]; }
 	CSong const& current() const { return *m_filtered[m_current]; }
-	void setFilter(std::string const& val);
+	void setFilter(std::string const& regex);
 	std::string sortDesc() const;
 	void sortChange(int diff);
 	void parseFile(CSong& tmp);

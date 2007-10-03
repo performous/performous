@@ -48,8 +48,8 @@ void CScreenSing::enter() {
 	SDL_FillRect(backgroundSurf,NULL,SDL_MapRGB(backgroundSurf->format, 255, 255, 255));
 	song.loadBackground();
 	if (!song.video.empty()) {
-		std::string file = song.path + "/" + song.video;
-		std::cout << "Now playing: (" << sm->getSongs()->currentId() + 1 << "): " << file << std::endl;
+		std::string file = song.path + song.video;
+		std::cout << "Now playing: " << file << std::endl;
 		video_ok = video->loadVideo(file, videoSurf, m_width, m_height);
 	}
 	if (video_ok) {
