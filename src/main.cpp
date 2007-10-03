@@ -122,9 +122,9 @@ int main(int argc, char** argv) {
 		sm.setSDLScreen(screenSDL);
 		sm.setAudio(new CAudio());
 		sm.setVideoDriver(&vd);
-		Capture capture(cdev, crate);
 		sm.addScreen(new CScreenIntro("Intro", width, height));
 		sm.addScreen(new CScreenSongs("Songs", width, height, songdirs));
+		Capture capture(cdev, crate);
 		sm.addScreen(new CScreenSing("Sing", width, height, capture.analyzer()));
 		sm.addScreen(new CScreenPractice("Practice", width, height, capture.analyzer()));
 		sm.addScreen(new CScreenScore("Score", width, height));

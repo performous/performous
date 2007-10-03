@@ -153,6 +153,7 @@ void CAudio::playMusic_internal(std::string const& filename) {
 }
 
 void CAudio::playPreview_internal(std::string const& filename) {
+	stopMusic_internal();
 #ifdef USE_LIBXINE_AUDIO
 	int pos_stream;
 	int pos_time;
@@ -171,7 +172,7 @@ void CAudio::playPreview_internal(std::string const& filename) {
 	GstState state_paused = GST_STATE_PAUSED;
 	gst_element_get_state (music, NULL, &state_paused, GST_CLOCK_TIME_NONE);
 	if (!gst_element_seek(music, 1.0, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH,
-	  GST_SEEK_TYPE_SET, 30*GST_SECOND, GST_SEEK_TYPE_SET, 60*GST_SECOND))
+	  GST_SEEK_TYPE_SET, 30*GST_SECOND, GST_SEEK_TYPE_NONE, 0))
 	  g_print("playPreview() seek failed\n");
 	gst_element_set_state (music, GST_STATE_PLAYING);
 	GstFormat fmt = GST_FORMAT_TIME;
@@ -216,10 +217,7 @@ bool CAudio::isPlaying_internal() {
 }
 
 void CAudio::stopMusic_internal() {
-	if (!isPlaying_internal()) return;
-#ifdef USE_PREVIEW_THREAD
-	if (thread) { thread->join(); thread.reset(); }
-#endif
+	// if (!isPlaying_internal()) return;
 #ifdef USE_LIBXINE_AUDIO
 	xine_stop(stream);
 #endif
@@ -245,12 +243,8 @@ int CAudio::getPosition_internal() {
 #ifdef USE_GSTREAMER_AUDIO
 	GstFormat fmt = GST_FORMAT_TIME;
 	gint64 pos;
-	if (!gst_element_query_position (music, &fmt, &pos))
-		position = 0;
-	else
-		position = (int) (pos/GST_MSECOND);
+	position = gst_element_query_position(music, &fmt, &pos) ? int(pos / GST_MSECOND) : 0;
 #endif
-
 	return position;
 }
 
@@ -275,13 +269,7 @@ void CAudio::togglePause_internal() {
 
 void CAudio::seek_internal(int seek_dist) {
 	if (!isPlaying_internal()) return;
-	int position = getPosition_internal()+seek_dist;
-	if (position < 0) position = 0;
-	if (position > getLength_internal() - 1000) {
-		fprintf(stdout,"seeking too far ahead\n");
-		return;
-	}
-	fprintf(stdout,"seeking from %d to %d\n",getPosition_internal(),position);
+	int position = std::max(0, std::min(getLength_internal() - 1000, getPosition_internal() + seek_dist));
 #ifdef USE_LIBXINE_AUDIO
 	xine_play(stream,0,position);
 #endif
@@ -290,7 +278,7 @@ void CAudio::seek_internal(int seek_dist) {
 	GstState state_paused = GST_STATE_PAUSED;
 	gst_element_get_state (music, NULL, &state_paused, GST_CLOCK_TIME_NONE);
 	if (!gst_element_seek_simple(music, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH, position*GST_MSECOND))
-	  g_print("playPreview() seek failed\n");
+	  throw std::runtime_error("CAudio::seek_internal() failed");
 	gst_element_set_state (music, GST_STATE_PLAYING);
 #endif
 }

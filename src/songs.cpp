@@ -166,7 +166,7 @@ void CSongs::reload() {
 	m_songs.clear();
 	for (std::set<std::string>::const_iterator it = m_songdirs.begin(); it != m_songdirs.end(); ++it) {
 		glob_t _glob;
-		std::string pattern = *it + "/*/*.[tT][xX][tT]";
+		std::string pattern = *it + "*/*.[tT][xX][tT]";
 		std::cout << ">>> Scanning " << *it << ": " << std::flush;
 		glob (pattern.c_str(), GLOB_NOSORT, NULL, &_glob);
 		std::cout << _glob.gl_pathc << " song files found." << std::endl;
@@ -178,7 +178,7 @@ void CSongs::reload() {
 			std::cout << "\r  " << std::setiosflags(std::ios::left) << std::setw(70) << path.substr(pos, 70) << "\x1B[K" << std::flush;
 			CSong* tmp = new CSong();
 			try {
-				tmp->path = path;
+				tmp->path = path + "/";
 				tmp->filename = txtfilename;
 				parseFile(*tmp);
 				tmp->parseFile();
@@ -211,7 +211,7 @@ namespace {
 }
 
 void CSongs::parseFile(CSong& tmp) {
-	std::string file = std::string(tmp.path) + "/" + tmp.filename;
+	std::string file = tmp.path + tmp.filename;
 	std::ifstream f(file.c_str());
 	if (!f.is_open()) throw std::runtime_error("Cannot open " + file);
 	std::string line;

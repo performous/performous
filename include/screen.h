@@ -55,7 +55,6 @@ class CScreenManager: public CSingleton <CScreenManager> {
 
 	CSongs* getSongs() { return songs; };
 	void setSongs(CSongs* _songs) { songs = _songs; };
-	CSong* getSong() { return &songs->current(); };
 
 	void finished() { m_finished=true; };
 	bool isFinished() { return m_finished; };
