@@ -43,6 +43,7 @@ class CSong: boost::noncopyable {
 		unloadCover();
 	}
 	void parseFile();
+	std::string str() const { return title + " by " + artist; }
 	unsigned int index;
 	std::string path;
 	std::string filename;
@@ -72,8 +73,6 @@ class CSong: boost::noncopyable {
 	std::vector<TNote> notes;
 	bool visible;
 	bool main;
-	int orderNum;
-	int orderType;
 	int maxScore;
 	void loadBackground();
 	void loadCover();
@@ -81,33 +80,39 @@ class CSong: boost::noncopyable {
 	void unloadCover();
 };
 
-#include <iostream>
+bool operator<(CSong const& l, CSong const& r);
+
 class CSongs {
+	std::set<std::string> m_songdirs;
   public:
 	CSongs(std::set<std::string> const& songdirs);
 	~CSongs();
-	CSong& operator[](std::vector<CSong*>::size_type pos) { return songs[pos]; }
-	int size() { return songs.size(); };
+	void reload();
+	CSong& operator[](std::vector<CSong*>::size_type pos) { return *m_filtered[pos]; }
+	int size() const { return m_filtered.size(); };
+	int empty() const { return m_filtered.empty(); };
 	void advance(int diff) {
-		m_current = (m_current + diff) % int(songs.size());
-		if (m_current < 0) m_current += songs.size();
+		m_current = (m_current + diff) % int(m_filtered.size());
+		if (m_current < 0) m_current += m_filtered.size();
 	}
 	int currentId() const { return m_current; }
-	CSong& current() { return songs[m_current]; }
-	bool parseFile(CSong& tmp);
-	void sortByEdition();
-	void sortByGenre();
-	void sortByTitle();
-	void sortByArtist();
-	int getOrder() { return order; };
+	CSong& current() { return *m_filtered[m_current]; }
+	CSong const& current() const { return *m_filtered[m_current]; }
+	void setFilter(std::string const& val);
+	std::string sortDesc() const;
+	void sortChange(int diff);
+	void parseFile(CSong& tmp);
 	SDL_Surface* getEmptyCover() { return surface_nocover; }
   private:
+	class RestoreSel;
 	typedef boost::ptr_vector<CSong> songlist_t;
-	songlist_t songs;
+	songlist_t m_songs;
+	typedef std::vector<CSong*> filtered_t;
+	filtered_t m_filtered;
 	int m_current;
-	int order;
-	int category;
+	int m_order;
 	SDL_Surface* surface_nocover;
 };
 
 #endif
+

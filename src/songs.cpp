@@ -1,72 +1,37 @@
+#include <boost/lexical_cast.hpp>
 #include <boost/progress.hpp>
 #include <glob.h>
 #include <songs.h>
 #include <screen.h>
 #include <algorithm>
+#include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <stdexcept>
-
-bool compareSongs(CSong const& left , CSong const& right) {
-	if(left.orderType != right.orderType) throw std::logic_error("compareSongs: order mismatch");
-	std::string ordering1;
-	std::string ordering2;
-	switch(left.orderType) {
-	  case 0: //edition
-		ordering1 = left.edition;
-		ordering2 = right.edition;
-		break;
-	  case 1: //genre
-		ordering1 = left.genre;
-		ordering2 = right.genre;
-		break;
-	  case 2: //title
-		ordering1 = left.title;
-		ordering2 = right.title;
-		break;
-	  case 3: //artist
-		ordering1 = left.artist;
-		ordering2 = right.artist;
-		break;
-	  default:
-		ordering1 = left.title;
-		ordering2 = right.title;
-		break;
-	}
-	if (ordering1 == ordering2) return left.index < right.index;
-	return ordering1 < ordering2;
-}
 
 void CSong::parseFile() {
 	int relativeShift = 0;
 	maxScore = 0;
 	std::string file = std::string(path) + "/" + filename;
-	FILE * fp = fopen(file.c_str(), "r");
-	char buff[256];
-	while(fgets(buff,256,fp)) {
-		switch(buff[0]) {
-		  case '#': continue;
-		  case 'E': break;
+	std::ifstream f(file.c_str());
+	for (std::string line; std::getline(f, line); ) {
+		if (!line.empty() && line[line.size() - 1] == '\r') line.erase(line.size() - 1);
+		if (line.empty() || line[0] == '#') continue;
+		if (line[0] == 'E') break;
+		std::istringstream iss(line);
+		switch (iss.get()) {
 		  case 'F':
 		  case ':':
 		  case '*':
 			{
 				TNote tmp;
-				int shift;
-				int len = strlen(buff);
-				char * syllable = new char[16];
-
-				if (buff[0] == 'F') tmp.type = TYPE_NOTE_FREESTYLE;
-				if (buff[0] == '*') tmp.type = TYPE_NOTE_GOLDEN;
-				if (buff[0] == ':') tmp.type = TYPE_NOTE_NORMAL;
-
-				if (buff[len-2] == '\r') len--;
-				buff[len-1] = '\0'; // Replace the \n or \r with a \0
-				sscanf(buff+1,"%d %d %d%n",&tmp.timestamp, &tmp.length , &tmp.note , &shift);
+				if (line[0] == 'F') tmp.type = TYPE_NOTE_FREESTYLE;
+				if (line[0] == '*') tmp.type = TYPE_NOTE_GOLDEN;
+				if (line[0] == ':') tmp.type = TYPE_NOTE_NORMAL;
+				if (!(iss >> tmp.timestamp >> tmp.length >> tmp.note)) throw std::runtime_error("Invalid note line format");
+				if (tmp.length == 0) break; // 0-length notes are ignored
 				tmp.timestamp += relativeShift;
-				snprintf(syllable,16,"%s",buff+shift+2);
-				tmp.syllable = syllable;
-				// Avoid ":1 0 0" to mess noteMin
-				if(tmp.length == 0) break;
+				if (iss.get() == ' ') std::getline(iss, tmp.syllable);
 				noteMin = std::min(noteMin, tmp.note);
 				noteMax = std::max(noteMax, tmp.note);
 				maxScore += tmp.length * tmp.type;
@@ -77,32 +42,20 @@ void CSong::parseFile() {
 		  case '-':
 			{
 				TNote tmp;
-				int timestamp;
+				int timestamp = 0;
 				int sleep_end;
 				tmp.type = TYPE_NOTE_SLEEP;
-				int nbInt = sscanf(buff+1,"%d %d",&timestamp, &sleep_end);
+				if (iss >> timestamp) tmp.length = (iss >> sleep_end) ? sleep_end - timestamp : 0;
 				tmp.timestamp = relativeShift + timestamp;
-				if(nbInt == 1) {
-					tmp.length = 0;
-				} else {
-					tmp.length = sleep_end - timestamp;
-				}
-				if(relative) {
-					if(nbInt == 1) {
-						relativeShift += timestamp;
-					} else {
-						relativeShift += sleep_end;
-					}
-				}
+				if (relative) relativeShift += timestamp + tmp.length;
 				tmp.curMaxScore = maxScore;
 				notes.push_back(tmp);
 				break;
 			}
 		}
 	}
-	fclose(fp);
 	// Adjust negative notes
-	if(noteMin <= 0) {
+	if (noteMin <= 0) {
 		unsigned int shift = (((noteMin*-1)%12)+1)*12;
 		noteMin += shift;
 		noteMax += shift;
@@ -131,110 +84,6 @@ CSong::CSong():
 	noteMin(256),
 	noteMax(-256)
 {}
-
-bool CSongs::parseFile(CSong& tmp) {
-	int score = 0;
-	std::string file = std::string(tmp.path) + "/" + tmp.filename;
-	FILE * fp = fopen(file.c_str(), "r");
-	if (!fp) {
-		std::cout << "Cannot open " << file << std::endl;
-		return false;
-	}
-	char buff[256];
-	while (fgets(buff,256,fp)) {
-		if (buff[0] != '#') continue;
-		if (!strncmp("#TITLE:",buff,7)) {
-			int len = strlen(buff);
-			char * title = new char[len - 7];
-
-			if (buff[len-2] == '\r') len--;
-			buff[len-1]='\0'; // Replace the \n or \r with a \0
-			memcpy(title,buff+7,len - 7);
-			tmp.title = title;
-			score++;
-		} else if (!strncmp("#EDITION:",buff,9)) {
-			int len = strlen(buff);
-			char * edition = new char[len - 9];
-
-			if (buff[len-2] == '\r') len--;
-			buff[len-1]='\0'; // Replace the \n or \r with a \0
-			memcpy(edition,buff+9,len - 9);
-			tmp.edition = edition;
-			score++;
-		} else if (!strncmp("#ARTIST:",buff,8)) {
-			int len = strlen(buff);
-			char * artist = new char[len - 8];
-
-			if (buff[len-2] == '\r') len--;
-			buff[len-1]='\0'; // Replace the \n or \r with a \0
-			memcpy(artist,buff+8,len - 8);
-			tmp.artist = artist;
-			score++;
-		} else if (!strncmp("#MP3:",buff,5)) {
-			int len = strlen(buff);
-			char * mp3 = new char[len - 5];
-
-			if (buff[len-2] == '\r') len--;
-			buff[len-1]='\0'; // Replace the \n or \r with a \0
-			memcpy(mp3,buff+5,len - 5);
-			tmp.mp3 = mp3;
-			score++;
-		} else if (!strncmp("#CREATOR:",buff,9)) {
-			int len = strlen(buff);
-			char * creator = new char[len - 9];
-
-			if (buff[len-2] == '\r') len--;
-			buff[len-1]='\0'; // Replace the \n or \r with a \0
-			memcpy(creator,buff+9,len - 9);
-			tmp.creator = creator;
-			score++;
-		} else if (!strncmp("#GAP:",buff,5)) {
-			sscanf(buff+5,"%f",&tmp.gap);
-			score++;
-		} else if (!strncmp("#BPM:",buff,5)) {
-			TBpm bpm;
-			bpm.start = 0.0;
-			// We replace ',' by '.' for internationalization
-			char * comma = strchr(buff,',');
-			if(comma) *comma = '.';
-			sscanf(buff+5,"%f",&bpm.bpm);
-			tmp.bpm.push_back(bpm);
-			score++;
-		} else if (!strncmp("#VIDEO:",buff,7)) {
-			int len = strlen(buff);
-			char * video = new char[len - 7];
-			if (buff[len-2] == '\r') len--;
-			buff[len-1]='\0'; // Replace the \n or \r with a \0
-			memcpy(video,buff+7,len - 7);
-			tmp.video = video;
-			score++;
-			} else if(!strncmp("#BACKGROUND:",buff,12)) {
-				int len = strlen(buff);
-				char * background = new char[len - 12];
-				if (buff[len-2] == '\r') len--;
-				buff[len-1]='\0'; // Replace the \n or \r with a \0
-				memcpy(background,buff+12,len - 12);
-				tmp.background = background;
-				score++;
-			} else if(!strncmp("#VIDEOGAP:",buff,10)) {
-				sscanf(buff+10,"%f",&tmp.videoGap);
-				score++;
-			} else if(!strncmp("#RELATIVE:",buff,10)) {
-				tmp.relative = (buff[10] == 'y' || buff[10] == 'Y');
-				score++;
-		} else if(!strncmp("#COVER:",buff,7)) {
- 			int len = strlen(buff);
-			char * cover = new char[len - 7];
-			if (buff[len-2] == '\r') len--;
-			buff[len-1]='\0'; // Replace the \n or \r with a \0
-			memcpy(cover,buff+7,len - 7);
-			tmp.cover = cover;
-			score++;
-		}
-	}
-	fclose(fp);
-	return score != 0;
-}
 
 void CSong::loadCover() {
 	if (coverSurf || cover.empty()) return;
@@ -289,84 +138,175 @@ void CSong::unloadBackground() {
 	backgroundSurf = NULL;
 }
 
-CSongs::CSongs(std::set<std::string> const& songdirs): m_current() {
-	glob_t _glob;
-	order = 2;
+bool operator<(CSong const& l, CSong const& r) {
+	if (l.artist != r.artist) return l.artist < r.artist;
+	if (l.title != r.title) return l.title < r.title;
+	return l.filename < r.filename;
+	// If filenames are identical, too, the songs are considered the same.
+}
 
-	SDL_RWops* rwop_nocover = SDL_RWFromFile(CScreenManager::getSingletonPtr()->getThemePathFile("no_cover.png").c_str(), "rb");
+CSongs::CSongs(std::set<std::string> const& songdirs): m_songdirs(songdirs), m_current(), m_order() {
+	std::string file = CScreenManager::getSingletonPtr()->getThemePathFile("no_cover.png");
+	SDL_RWops* rwop_nocover = SDL_RWFromFile(file.c_str(), "rb");
 	SDL_Surface* surface_nocover_tmp = IMG_LoadPNG_RW(rwop_nocover);
 	int w = CScreenManager::getSingletonPtr()->getWidth()*256/800;
 	int h = CScreenManager::getSingletonPtr()->getHeight()*256/600;
 	surface_nocover = zoomSurface(surface_nocover_tmp,(double)w/surface_nocover_tmp->w,(double)h/surface_nocover_tmp->h,1);
 	SDL_FreeSurface(surface_nocover_tmp);
 	if (rwop_nocover) SDL_RWclose(rwop_nocover);
-	if (surface_nocover == NULL) {
-		printf("IMG_LoadPNG_RW: %s\n", IMG_GetError());
-		return;
-	}
-	for (std::set<std::string>::const_iterator it = songdirs.begin(); it != songdirs.end(); ++it) {
-		std::string pattern = *it + "/*/*.[tT][xX][tT]";
-		std::cout << ">>> Scanning " << *it << ": " << std::flush;
-		glob (pattern.c_str(), GLOB_NOSORT, NULL, &_glob);
-		std::cout << _glob.gl_pathc << " song files found." << std::endl;
-		for (unsigned int i = 0 ; i < _glob.gl_pathc ; i++) {
-			char * path = new char[1024];
-			char * txtfilename;
-			txtfilename = strrchr(_glob.gl_pathv[i],'/'); txtfilename[0] = '\0'; txtfilename++;
-			sprintf(path,"%s",_glob.gl_pathv[i]);
-			std::cout << "\r  " << strrchr(_glob.gl_pathv[i],'/') + 1 << "  \x1B[K" << std::flush;
-			CSong* tmp = new CSong();
-			// Set default orderType to title
-			tmp->orderType = 2;
-			tmp->path = path;
-			char* txt = new char[strlen(txtfilename)+1];
-			sprintf(txt,"%s",txtfilename); // safe sprintf
-			tmp->filename = txt;
-			if(!parseFile(*tmp)) {
-				std::cout << "failed to load" << std::endl;
-				delete[] path;
-				delete[] txt;
-				delete tmp;
-			} else {
-				std::cout << "OK" << std::flush;
-				tmp->parseFile();
-				tmp->index = songs.size();
-				songs.push_back(tmp);
-			}
-		}
-		std::cout << "\r\x1B[K" << std::flush;
-		globfree(&_glob);
-	}
-	boost::progress_display progress(songs.size());
-	for (songlist_t::iterator it = songs.begin(); it != songs.end(); ++it, ++progress)
-	  it->loadCover();
+	if (surface_nocover == NULL) throw std::runtime_error("Cannot load " + file);
+	reload();
 }
 
 CSongs::~CSongs() {
 	SDL_FreeSurface(surface_nocover);
 }
 
-void CSongs::sortByEdition()
-{
-	order = 0;
-	for(unsigned int i = 0; i < songs.size(); i++) songs[i].orderType = 0;
-	songs.sort(compareSongs);
+void CSongs::reload() {
+	m_songs.clear();
+	for (std::set<std::string>::const_iterator it = m_songdirs.begin(); it != m_songdirs.end(); ++it) {
+		glob_t _glob;
+		std::string pattern = *it + "/*/*.[tT][xX][tT]";
+		std::cout << ">>> Scanning " << *it << ": " << std::flush;
+		glob (pattern.c_str(), GLOB_NOSORT, NULL, &_glob);
+		std::cout << _glob.gl_pathc << " song files found." << std::endl;
+		for (unsigned int i = 0 ; i < _glob.gl_pathc ; i++) {
+			char* txtfilename = strrchr(_glob.gl_pathv[i],'/'); txtfilename[0] = '\0'; txtfilename++;
+			std::string path = _glob.gl_pathv[i];
+			std::string::size_type pos = path.rfind('/');
+			if (pos < path.size() - 1) pos += 1; else pos = 0;
+			std::cout << "\r  " << std::setiosflags(std::ios::left) << std::setw(70) << path.substr(pos, 70) << "\x1B[K" << std::flush;
+			CSong* tmp = new CSong();
+			try {
+				tmp->path = path;
+				tmp->filename = txtfilename;
+				parseFile(*tmp);
+				tmp->parseFile();
+				m_songs.push_back(tmp);
+			}
+			catch (...) {
+				std::cout << "FAIL" << std::endl;
+				delete tmp;
+			}
+		}
+		std::cout << "\r\x1B[K" << std::flush;
+		globfree(&_glob);
+	}
+	boost::progress_display pd(m_songs.size() + 1);
+	for (songlist_t::iterator it = m_songs.begin(); it != m_songs.end(); ++it, ++pd) it->loadCover();
+	setFilter("");
+	++pd;
 }
-void CSongs::sortByGenre()
-{
-	order = 1;
-	for(unsigned int i = 0; i < songs.size(); i++) songs[i].orderType = 1;
-	songs.sort(compareSongs);
+
+namespace {
+	double toDouble(std::string str) {
+		std::replace(str.begin(), str.end(), ',', '.'); // Fix decimal separators
+		return boost::lexical_cast<double>(str);
+	}
+
+	bool toBool(std::string const& str) {
+		char c = str.empty() ? 0 : str[0];
+		return c == 'y' || c == 'Y' || c == '1';
+	}
 }
-void CSongs::sortByTitle()
-{
-	order = 2;
-	for(unsigned int i = 0; i < songs.size(); i++) songs[i].orderType = 2;
-	songs.sort(compareSongs);
+
+void CSongs::parseFile(CSong& tmp) {
+	std::string file = std::string(tmp.path) + "/" + tmp.filename;
+	std::ifstream f(file.c_str());
+	if (!f.is_open()) throw std::runtime_error("Cannot open " + file);
+	std::string line;
+	while (std::getline(f, line)) {
+		if (line.empty() || line[0] != '#') continue;
+		std::string::size_type pos = line.find(':');
+		if (pos == std::string::npos) throw std::runtime_error("Invalid format in " + file);
+		std::string key = line.substr(1, pos - 1);
+		std::string value = line.substr(pos + 1);
+		if (key == "TITLE") tmp.title = value;
+		else if (key == "ARTIST") tmp.artist = value;
+		else if (key == "EDITION") tmp.edition = value;
+		else if (key == "GENRE") tmp.genre = value;
+		else if (key == "CREATOR") tmp.creator = value;
+		else if (key == "COVER") tmp.cover = value;
+		else if (key == "MP3") tmp.mp3 = value;
+		else if (key == "VIDEO") tmp.video = value;
+		else if (key == "BACKGROUND") tmp.background = value;
+		else if (key == "VIDEOGAP") tmp.videoGap = toDouble(value);
+		else if (key == "RELATIVE") tmp.relative = toBool(value);
+		else if (key == "GAP") tmp.gap = toDouble(value);
+		else if (key == "BPM") {
+			TBpm bpm;
+			bpm.start = 0.0;
+			bpm.bpm = toDouble(value);
+			tmp.bpm.push_back(bpm);
+		}
+	}
+	if (tmp.title.empty() || tmp.artist.empty()) throw std::runtime_error("Required fields missing in " + file);
 }
-void CSongs::sortByArtist()
-{
-	order = 3;
-	for(unsigned int i = 0; i < songs.size(); i++) songs[i].orderType = 3;
-	songs.sort(compareSongs);
+
+class CSongs::RestoreSel {
+	CSongs& m_s;
+	CSong* m_sel;
+  public:
+	RestoreSel(CSongs& s): m_s(s), m_sel(s.empty() ? NULL : &s.current()) {}
+	~RestoreSel() {
+		if (!m_sel) return;
+		filtered_t& f = m_s.m_filtered;
+		filtered_t::iterator it = std::find(f.begin(), f.end(), m_sel);
+		if (it != f.end()) m_s.m_current = it - f.begin();
+	}
+};
+
+void CSongs::setFilter(std::string const& val) {
+	RestoreSel restore(*this);
+	m_filtered.clear();
+	for (songlist_t::iterator it = m_songs.begin(); it != m_songs.end(); ++it) {
+		if (val.empty() || it->str().find(val) != std::string::npos) m_filtered.push_back(&*it);
+	}
+	sortChange(0);
+	m_current = 0;
 }
+
+class CmpByField {
+	std::string CSong::* m_field;
+  public:
+	CmpByField(std::string CSong::* field): m_field(field) {}
+	bool operator()(CSong const& left , CSong const& right) {
+		if (left.*m_field == right.*m_field) return left < right;
+		return left.*m_field < right.*m_field;
+	}
+	bool operator()(CSong const* left , CSong const* right) {
+		return operator()(*left, *right);
+	}
+};
+
+static char const* order[] = {
+	"by song",
+	"by artist",
+	"by edition",
+	"by genre",
+};
+
+static const int orders = sizeof(order) / sizeof(*order);
+
+std::string CSongs::sortDesc() const {
+	std::string str = order[m_order];
+	if (!empty()) {
+		if (m_order == 2) str += " (" + current().edition + ")";
+		if (m_order == 3) str += " (" + current().genre + ")";
+	}
+	return str;
+}
+
+void CSongs::sortChange(int diff) {
+	m_order = (m_order + diff) % orders;
+	if (m_order < 0) m_order += orders;
+	RestoreSel restore(*this);
+	switch (m_order) {
+	  case 0: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&CSong::title)); break;
+	  case 1: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&CSong::artist)); break;
+	  case 2: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&CSong::edition)); break;
+	  case 3: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&CSong::genre)); break;
+	  default: throw std::logic_error("Internal error: unknown sort order in CSongs::sortChange");
+	}
+}
+

@@ -14,10 +14,9 @@ class CScreenSongs : public CScreen {
 	void draw();
   private:
 	CThemeSongs* theme;
-	int songId;
-	bool play;
-	bool searchMode;
-	char* searchExpr;
+	std::string m_playing;
+	bool m_searching;
+	std::string m_search;
 	unsigned int bg_texture;
 };
 
