@@ -4,7 +4,7 @@
 #include "../config.h"
 #include <boost/noncopyable.hpp>
 #include <boost/progress.hpp>
-#include <boost/ptr_container/ptr_vector.hpp>
+#include <boost/ptr_container/ptr_set.hpp>
 #include <boost/thread/mutex.hpp>
 #include <set>
 #include <string>
@@ -109,7 +109,7 @@ class CSongs {
   private:
 	boost::mutex m_mutex;
 	class RestoreSel;
-	typedef boost::ptr_vector<CSong> songlist_t;
+	typedef boost::ptr_set<CSong> songlist_t;
 	songlist_t m_songs;
 	typedef std::vector<CSong*> filtered_t;
 	filtered_t m_filtered;

@@ -194,7 +194,7 @@ void CSongs::reload() {
 				tmp->filename = txtfilename;
 				parseFile(*tmp);
 				tmp->parseFile();
-				songs.push_back(tmp);
+				songs.insert(tmp);
 			}
 			catch (...) {
 				std::cout << "FAIL" << std::endl;
