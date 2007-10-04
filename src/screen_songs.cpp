@@ -25,38 +25,34 @@ void CScreenSongs::exit() {
 void CScreenSongs::manageEvent(SDL_Event event) {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	if (event.type != SDL_KEYDOWN) return;
-	int key = event.key.keysym.sym;
+	SDL_keysym keysym = event.key.keysym;
+	int key = keysym.sym;
 	SDLMod mod = event.key.keysym.mod;
-
-	if (m_searching) {
-		if (key == SDLK_ESCAPE) {
-			m_searching = false;
-			m_search.clear();
-		} else if (mod & KMOD_CTRL && key == SDLK_f) m_search.clear();
-		else if (key == SDLK_BACKSPACE && !m_search.empty()) m_search.erase(m_search.size() - 1);
-		else if (!(mod & KMOD_CTRL) && key >= SDLK_a && key <= SDLK_z) m_search += (mod & KMOD_SHIFT ? 'A' : 'a') + key - SDLK_a;
-		else if ((key >= SDLK_SPACE && key <= SDLK_BACKQUOTE) || (key >= SDLK_WORLD_0 && key <= SDLK_WORLD_95)) m_search += key;
-		sm->getSongs()->setFilter(m_search);
-	} else if (key == SDLK_ESCAPE) {
-		if (sm->getSongs()->size() > 0) sm->getAudio()->stopMusic();
-		sm->activateScreen("Intro");
-	}
 	if (key == SDLK_r && mod & KMOD_CTRL) { sm->getSongs()->reload(); m_searching = false; }
-	if (sm->getSongs()->empty()) return;
-	if (key == SDLK_s && mod & KMOD_CTRL) sm->getAudio()->stopMusic();
-	else if (!m_searching && key == SDLK_SPACE) sm->getAudio()->togglePause();
+	else if (m_searching) {
+		if (key == SDLK_ESCAPE) { m_searching = false; m_search.clear(); }
+		else if (key == SDLK_BACKSPACE && !m_search.empty()) m_search.erase(m_search.size() - 1);
+		else if (keysym.unicode >= 0x20 && keysym.unicode < 0x7F) m_search += keysym.unicode;
+		sm->getSongs()->setFilter(m_search);
+	}
+	else if (key == SDLK_ESCAPE) sm->activateScreen("Intro");
+	// The rest are only available when there are songs available
+	else if (sm->getSongs()->empty()) return;
+	else if (key == SDLK_SPACE) sm->getAudio()->togglePause();
+	else if (key == SDLK_r) sm->getSongs()->random();
+	else if (key == SDLK_f || keysym.unicode == '/') {
+		m_searching = true;
+		m_search.clear();
+		sm->getSongs()->setFilter(m_search);
+	}
+	// These are available in both modes (search and normal)
+	if (key == SDLK_RETURN && !(mod & KMOD_ALT)) sm->activateScreen("Sing");
 	else if (key == SDLK_LEFT) sm->getSongs()->advance(-1);
 	else if (key == SDLK_RIGHT) sm->getSongs()->advance(1);
 	else if (key == SDLK_PAGEUP) sm->getSongs()->advance(-10);
 	else if (key == SDLK_PAGEDOWN) sm->getSongs()->advance(10);
 	else if (key == SDLK_UP) sm->getSongs()->sortChange(-1);
 	else if (key == SDLK_DOWN) sm->getSongs()->sortChange(1);
-	else if (key == SDLK_RETURN && !(mod & KMOD_ALT)) sm->activateScreen("Sing");
-	else if (!m_searching && mod & KMOD_CTRL && key == SDLK_f) {
-		m_searching = true;
-		m_search.clear();
-		sm->getSongs()->setFilter(m_search);
-	}
 }
 
 void CScreenSongs::draw() {
@@ -93,7 +89,7 @@ void CScreenSongs::draw() {
 		}
 		// Draw the cover
 		{
-			SDL_Surface* surf = song.coverSurf;
+			SDL_Surface* surf = song.getCover();
 			if (!surf) surf = sm->getSongs()->getEmptyCover();
 			if (!surf) throw std::runtime_error("No cover image and no empty cover image");
 			SDL_Rect position;

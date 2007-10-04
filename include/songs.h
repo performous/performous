@@ -5,8 +5,6 @@
 #include <boost/noncopyable.hpp>
 #include <boost/ptr_container/ptr_set.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
 #include <set>
 #include <string>
 #include <vector>
@@ -58,6 +56,7 @@ class CSong: boost::noncopyable {
 	std::string text;
 	std::string creator;
 	std::string cover;
+	SDL_Surface* getCover() { loadCover(); return coverSurf; }
 	SDL_Surface* volatile coverSurf;
 	std::string mp3;
 	std::string background;
@@ -88,7 +87,6 @@ bool operator<(CSong const& l, CSong const& r);
 class CSongs {
 	std::set<std::string> m_songdirs;
   public:
-	class SongLoader;
 	CSongs(std::set<std::string> const& songdirs);
 	~CSongs();
 	void reload();
@@ -104,12 +102,11 @@ class CSongs {
 	CSong const& current() const { return *m_filtered[m_current]; }
 	void setFilter(std::string const& regex);
 	std::string sortDesc() const;
+	void random();
 	void sortChange(int diff);
 	void parseFile(CSong& tmp);
 	SDL_Surface* getEmptyCover() { return surface_nocover; }
   private:
-	boost::scoped_ptr<boost::thread> m_thread;
-	boost::mutex m_mutex;
 	class RestoreSel;
 	typedef boost::ptr_set<CSong> songlist_t;
 	songlist_t m_songs;

@@ -4,6 +4,7 @@
 #include <songs.h>
 #include <screen.h>
 #include <algorithm>
+#include <cstdlib>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -106,6 +107,8 @@ void CSong::loadCover() {
 		coverSurf = zoomSurface(surf, w / surf->w, h / surf->h, 1);
 		SDL_FreeSurface(surf);
 	}
+	// Prevent trying to reload the same cover
+	if (!coverSurf) cover.clear();
 }
 
 void CSong::loadBackground() {
@@ -159,23 +162,10 @@ CSongs::CSongs(std::set<std::string> const& songdirs): m_songdirs(songdirs), m_c
 }
 
 CSongs::~CSongs() {
-	if (m_thread) m_thread->join(); // Wait until cover loading is done...
 	SDL_FreeSurface(surface_nocover);
 }
 
-class CSongs::SongLoader {
-	CSongs& m_self;
-  public:
-	SongLoader(CSongs& self): m_self(self) {}
-	void operator()() {
-		boost::mutex::scoped_lock l(m_self.m_mutex);
-		songlist_t& s = m_self.m_songs;
-		for (songlist_t::iterator it = s.begin(); it != s.end(); ++it) it->loadCover();
-	}
-};
-
 void CSongs::reload() {
-	if (m_thread) return; // Prevent doing more reloads until the previous one has finished.
 	songlist_t songs;
 	for (std::set<std::string>::const_iterator it = m_songdirs.begin(); it != m_songdirs.end(); ++it) {
 		glob_t _glob;
@@ -205,10 +195,8 @@ void CSongs::reload() {
 		std::cout << "\r\x1B[K" << std::flush;
 		globfree(&_glob);
 	}
-	boost::mutex::scoped_lock l(m_mutex);
 	m_songs.swap(songs);
 	setFilter("");
-	m_thread.reset(new boost::thread(SongLoader(*this)));
 }
 
 namespace {
@@ -261,6 +249,7 @@ class CSongs::RestoreSel {
   public:
 	RestoreSel(CSongs& s): m_s(s), m_sel(s.empty() ? NULL : &s.current()) {}
 	~RestoreSel() {
+		m_s.random();
 		if (!m_sel) return;
 		filtered_t& f = m_s.m_filtered;
 		filtered_t::iterator it = std::find(f.begin(), f.end(), m_sel);
@@ -268,14 +257,25 @@ class CSongs::RestoreSel {
 	}
 };
 
+void CSongs::random() {
+	m_current = empty() ? 0 : std::rand() % m_filtered.size();
+}
+
 void CSongs::setFilter(std::string const& val) {
 	RestoreSel restore(*this);
-	m_filtered.clear();
-	for (songlist_t::iterator it = m_songs.begin(); it != m_songs.end(); ++it) {
-		if (val.empty() || regex_search(it->str(), boost::regex(val))) m_filtered.push_back(&*it);
+	filtered_t filtered;
+	try {
+		for (songlist_t::iterator it = m_songs.begin(); it != m_songs.end(); ++it) {
+			if (regex_search(it->str(), boost::regex(val))) filtered.push_back(&*it);
+		}
+	} catch (...) {
+		filtered.clear();
+		for (songlist_t::iterator it = m_songs.begin(); it != m_songs.end(); ++it) {
+			filtered.push_back(&*it);
+		}
 	}
+	m_filtered.swap(filtered);
 	sortChange(0);
-	m_current = 0;
 }
 
 class CmpByField {

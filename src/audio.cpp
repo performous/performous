@@ -97,7 +97,7 @@ void CAudio::operator()() {
 		  case STOP: stopMusic_internal(); break;
 		  case PREVIEW:
 			// Wait a little while before actually starting
-			boost::thread::sleep(now() + 0.4);
+			boost::thread::sleep(now() + 0.2);
 			{
 				boost::mutex::scoped_lock l(m_mutex);
 				// Did we receive another event already?

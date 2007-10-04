@@ -8,6 +8,7 @@
 #include <screen_score.h>
 #include <screen_configuration.h>
 #include <video_driver.h>
+#include <boost/program_options.hpp>
 #include <boost/thread.hpp>
 #include <cstdlib>
 
@@ -48,9 +49,8 @@ static void init_SDL(CScreenManager& sm, CVideoDriver& vd, unsigned int width, u
 	SDL_EnableKeyRepeat(80, 80);
 }
 
-#include <boost/program_options.hpp>
-
 int main(int argc, char** argv) {
+	std::srand(std::time(NULL)); // Seed rand (used for choosing random songs)
 	bool fullscreen = false;
 	unsigned int width, height;
 	std::string theme;
