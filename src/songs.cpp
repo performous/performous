@@ -13,7 +13,7 @@
 void CSong::parseFile() {
 	int relativeShift = 0;
 	maxScore = 0;
-	std::string file = std::string(path) + "/" + filename;
+	std::string file = path + filename;
 	std::ifstream f(file.c_str());
 	for (std::string line; std::getline(f, line); ) {
 		if (!line.empty() && line[line.size() - 1] == '\r') line.erase(line.size() - 1);
@@ -90,7 +90,7 @@ void CSong::loadCover() {
 	if (coverSurf || cover.empty()) return;
 	double width = CScreenManager::getSingletonPtr()->getWidth();
 	double height = CScreenManager::getSingletonPtr()->getHeight();
-	std::string file = std::string(path) + "/" + cover;
+	std::string file = path + cover;
 	std::string::size_type extpos = file.rfind('.');
 	std::string ext = (extpos == std::string::npos) ? "" : file.substr(extpos);
 	SDL_RWops* rwop = SDL_RWFromFile(file.c_str(), "rb");
@@ -113,7 +113,7 @@ void CSong::loadBackground() {
 	if (backgroundSurf || background.empty()) return;
 	double width = CScreenManager::getSingletonPtr()->getWidth();
 	double height = CScreenManager::getSingletonPtr()->getHeight();
-	std::string file = std::string(path) + "/" + background;
+	std::string file = path + background;
 	std::string::size_type extpos = file.rfind('.');
 	std::string ext = (extpos == std::string::npos) ? "" : file.substr(extpos);
 	SDL_RWops* rwop = SDL_RWFromFile(file.c_str(), "rb");

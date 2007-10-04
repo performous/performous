@@ -1,12 +1,10 @@
 #include <screen_practice.h>
 
-CScreenPractice::CScreenPractice(const char* name, unsigned int width, unsigned int height, Analyzer const& analyzer): CScreen(name,width,height), m_analyzer(analyzer)
-{
-}
+CScreenPractice::CScreenPractice(std::string const& name, unsigned int width, unsigned int height, Analyzer const& analyzer):
+  CScreen(name,width,height), m_analyzer(analyzer)
+{}
 
-CScreenPractice::~CScreenPractice()
-{
-}
+CScreenPractice::~CScreenPractice() {}
 
 static int loadSVG(std::string const& filename, double w, double h, CairoSVG*& ptr) {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();

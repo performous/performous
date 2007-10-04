@@ -9,7 +9,7 @@
 
 class CScreenPractice : public CScreen {
   public:
-	CScreenPractice(const char* name, unsigned int width, unsigned int height, Analyzer const& analyzer);
+	CScreenPractice(std::string const& name, unsigned int width, unsigned int height, Analyzer const& analyzer);
 	~CScreenPractice();
 	void enter();
 	void exit();

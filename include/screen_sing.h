@@ -9,18 +9,18 @@
 #include <video.h>
 #include <lyrics.h>
 
-class CScreenSing : public CScreen {
+class CScreenSing: public CScreen {
   public:
-	CScreenSing(const char* name, unsigned int width, unsigned int height, Analyzer const& analyzer);
+	CScreenSing(std::string const& name, unsigned int width, unsigned int height, Analyzer const& analyzer);
 	~CScreenSing();
-	void enter(void);
-	void exit(void);
-	void manageEvent( SDL_Event event );
-	void draw(void);
+	void enter();
+	void exit();
+	void manageEvent(SDL_Event event);
+	void draw();
   private:
 	Analyzer const& m_analyzer;
-	SDL_Surface * videoSurf;
-	SDL_Surface * backgroundSurf;
+	SDL_Surface* videoSurf;
+	SDL_Surface* backgroundSurf;
 	unsigned int backgroundSurf_id;
 	unsigned int theme_id;
 	unsigned int pitchGraph_id;
@@ -32,9 +32,9 @@ class CScreenSing : public CScreen {
 	bool finished;
 	int playOffset;
 	int previousFirstTimestamp;
-	CVideo * video;
-	CThemeSing *theme;
-	CLyrics * lyrics;
+	CVideo* video;
+	CThemeSing* theme;
+	CLyrics* lyrics;
 };
 
 #endif

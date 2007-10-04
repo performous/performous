@@ -7,17 +7,17 @@
 #include <cairosvg.h>
 #include <theme.h>
 
-class CScreenScore : public CScreen {
-	public:
-	CScreenScore( const char * name, unsigned int width, unsigned int height );
+class CScreenScore: public CScreen {
+  public:
+	CScreenScore(std::string const& name, unsigned int width, unsigned int height);
 	~CScreenScore();
-	void enter(void);
-	void exit(void);
-	void manageEvent( SDL_Event event );
-	void draw(void);
-	private:
-	CairoSVG * cairo_svg;
-	CThemeScore *theme;
+	void enter();
+	void exit();
+	void manageEvent(SDL_Event event);
+	void draw();
+  private:
+	CairoSVG* cairo_svg;
+	CThemeScore* theme;
 	unsigned int bg_texture;
 };
 

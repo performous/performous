@@ -3,7 +3,7 @@
 #include <pitch_graph.h>
 #include <cairotosdl.h>
 
-CScreenSing::CScreenSing(const char* name, unsigned int width, unsigned int height, Analyzer const& analyzer):
+CScreenSing::CScreenSing(std::string const& name, unsigned int width, unsigned int height, Analyzer const& analyzer):
   CScreen(name,width,height), m_analyzer(analyzer), pitchGraph(width, height)
 {
 	video = new CVideo();
@@ -306,7 +306,7 @@ void CScreenSing::draw() {
 	}
 
 	if (!m_sentence.empty()) {
-		double graphTime = (((time - song.gap) / 60000.0 - m_sentence[0].timestamp / (song.bpm[0].bpm * 4))* (song.bpm[0].bpm * 4)* bpmPixelUnit + 100.0) / sm->getWidth();
+		double graphTime = (((time - song.gap) / 60000.0 - m_sentence[0].timestamp / (song.bpm[0].bpm * 4)) * (song.bpm[0].bpm * 4) * bpmPixelUnit + 100.0 * resFactorX) / sm->getWidth();
 		if (freq == 0.0) {
 			pitchGraph.renderPitch(0.0, graphTime);
 		} else {
@@ -314,7 +314,7 @@ void CScreenSing::draw() {
 			// Find the currently playing note or the next playing note (or the last note?)
 			while (i < m_sentence.size() && time > ((m_sentence[i].timestamp+m_sentence[i].length) * 60 * 1000) / (song.bpm[0].bpm * 4) + song.gap) ++i;
 			// Lets find the nearest note from the song (diff in [-6,5])
-			int diff =  (66+m_sentence[i].note - note)%12-6;
+			int diff = (66 + m_sentence[i].note - note) % 12 - 6;
 			int noteSingFinal = m_sentence[i].note - diff;
 			int noteheight=((18*numOctaves-noteSingFinal+lowestC)*m_height/2/numOctaves/12);
 			pitchGraph.renderPitch(double(noteheight) / m_height, graphTime);

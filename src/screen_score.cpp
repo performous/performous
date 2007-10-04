@@ -1,6 +1,6 @@
 #include <screen_score.h>
 
-CScreenScore::CScreenScore(const char* name, unsigned int width, unsigned int height):
+CScreenScore::CScreenScore(std::string const& name, unsigned int width, unsigned int height):
   CScreen(name, width, height)
 {}
 

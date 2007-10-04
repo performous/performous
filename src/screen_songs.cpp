@@ -3,7 +3,7 @@
 #include <iostream>
 #include <sstream>
 
-CScreenSongs::CScreenSongs(const char * name, unsigned int width, unsigned int height, std::set<std::string> const& songdirs):
+CScreenSongs::CScreenSongs(std::string const& name, unsigned int width, unsigned int height, std::set<std::string> const& songdirs):
   CScreen(name, width, height), m_searching()
 {
 	if (CScreenManager::getSingletonPtr()->getSongs() == NULL) {
@@ -44,6 +44,7 @@ void CScreenSongs::manageEvent(SDL_Event event) {
 	if (key == SDLK_r && mod & KMOD_CTRL) { sm->getSongs()->reload(); m_searching = false; }
 	if (sm->getSongs()->empty()) return;
 	if (key == SDLK_s && mod & KMOD_CTRL) sm->getAudio()->stopMusic();
+	else if (!m_searching && key == SDLK_SPACE) sm->getAudio()->togglePause();
 	else if (key == SDLK_LEFT) sm->getSongs()->advance(-1);
 	else if (key == SDLK_RIGHT) sm->getSongs()->advance(1);
 	else if (key == SDLK_PAGEUP) sm->getSongs()->advance(-10);

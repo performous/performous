@@ -1,6 +1,7 @@
 #include <screen_configuration.h>
 
-CScreenConfiguration::CScreenConfiguration(const char * name, unsigned int width, unsigned int height):CScreen(name,width,height)
+CScreenConfiguration::CScreenConfiguration(std::string const& name, unsigned int width, unsigned int height):
+  CScreen(name, width, height)
 {
 	configuration.push_back(new CConfigurationFullscreen());
 	configuration.push_back(new CConfigurationAudioVolume());

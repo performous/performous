@@ -15,7 +15,7 @@
 
 class CScreen {
   public:
-	CScreen(const char* name, unsigned int width, unsigned int height):
+	CScreen(std::string const& name, unsigned int width, unsigned int height):
 	  m_name(name), m_width(width), m_height(height) {}
 	virtual ~CScreen() {}
 	virtual void manageEvent(SDL_Event event) = 0;
