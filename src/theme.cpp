@@ -41,18 +41,16 @@ cairo_surface_t *CTheme::PrintText(TThemeTxt *text) {
 	cairo_move_to(dc,text->x - (rec.width-rec.width/text->scale)/2,text->y-text->fontsize * text->scale);
 	pango_cairo_show_layout (dc, layout);
 	pango_cairo_layout_path(dc,layout);
-		if (text->fill_col.r != -1 && text->fill_col.g != -1 && text->fill_col.b != -1) {
-			cairo_set_source_rgba(dc, text->fill_col.r, text->fill_col.g, text->fill_col.b, text->fill_col.a);
-			if (text->stroke_col.r != -1 && text->stroke_col.g != -1 && text->stroke_col.b != -1)
-				cairo_fill_preserve(dc);
-			else
-				cairo_fill(dc);
-		}
-		if (text->stroke_col.r != -1 && text->stroke_col.g != -1 && text->stroke_col.b != -1) {
-			cairo_set_line_width(dc, text->stroke_width);
-			cairo_set_source_rgba(dc, text->stroke_col.r, text->stroke_col.b, text->stroke_col.g, text->stroke_col.a);
-			cairo_stroke(dc);
-		}
+	if (text->fill_col.r != -1 && text->fill_col.g != -1 && text->fill_col.b != -1) {
+		cairo_set_source_rgba(dc, text->fill_col.r, text->fill_col.g, text->fill_col.b, text->fill_col.a);
+		if (text->stroke_col.r != -1 && text->stroke_col.g != -1 && text->stroke_col.b != -1) cairo_fill_preserve(dc);
+		else cairo_fill(dc);
+	}
+	if (text->stroke_col.r != -1 && text->stroke_col.g != -1 && text->stroke_col.b != -1) {
+		cairo_set_line_width(dc, text->stroke_width);
+		cairo_set_source_rgba(dc, text->stroke_col.r, text->stroke_col.b, text->stroke_col.g, text->stroke_col.a);
+		cairo_stroke(dc);
+	}
 	cairo_restore(dc);
 
 	g_object_unref(layout);
@@ -66,10 +64,8 @@ cairo_surface_t *CTheme::DrawRect(TThemeRect rect) {
 	cairo_rectangle(dc, rect.x, rect.y, rect.width, rect.height);
 	if (rect.fill_col.r != -1 && rect.fill_col.g != -1 && rect.fill_col.b != -1) {
 		cairo_set_source_rgba(dc, rect.fill_col.r, rect.fill_col.g, rect.fill_col.b, rect.fill_col.a);
-		if (rect.stroke_col.r != -1 && rect.stroke_col.g != -1 && rect.stroke_col.b != -1)
-			cairo_fill_preserve(dc);
-		else
-			cairo_fill(dc);
+		if (rect.stroke_col.r != -1 && rect.stroke_col.g != -1 && rect.stroke_col.b != -1) cairo_fill_preserve(dc);
+		else cairo_fill(dc);
 	}
 	if (rect.stroke_col.r != -1 && rect.stroke_col.g != -1 && rect.stroke_col.b != -1) {
 		cairo_set_line_width(dc, rect.stroke_width);
