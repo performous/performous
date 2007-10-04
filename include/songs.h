@@ -3,9 +3,10 @@
 
 #include "../config.h"
 #include <boost/noncopyable.hpp>
-#include <boost/progress.hpp>
 #include <boost/ptr_container/ptr_set.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <boost/thread/mutex.hpp>
+#include <boost/thread/thread.hpp>
 #include <set>
 #include <string>
 #include <vector>
@@ -107,6 +108,7 @@ class CSongs {
 	void parseFile(CSong& tmp);
 	SDL_Surface* getEmptyCover() { return surface_nocover; }
   private:
+	boost::scoped_ptr<boost::thread> m_thread;
 	boost::mutex m_mutex;
 	class RestoreSel;
 	typedef boost::ptr_set<CSong> songlist_t;

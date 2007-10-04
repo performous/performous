@@ -1,6 +1,5 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
-#include <boost/thread/thread.hpp>
 #include <glob.h>
 #include <songs.h>
 #include <screen.h>
@@ -97,7 +96,7 @@ void CSong::loadCover() {
 	SDL_Surface* surf = NULL;
 	if (ext == ".jpg" || ext == ".JPG" || ext == ".jpeg") surf = IMG_LoadJPG_RW(rwop);
 	else if (ext == ".png" || ext == ".PNG") surf = IMG_LoadPNG_RW(rwop);
-	//else std::cout << "Cover image file " << file << " has unknown extension" << std::endl;
+	else std::cout << "Cover image file " << file << " has unknown extension" << std::endl;
 	if (rwop) SDL_RWclose(rwop);
 	if (surf == NULL) coverSurf = NULL;
 	else {
@@ -120,7 +119,7 @@ void CSong::loadBackground() {
 	SDL_Surface* surf = NULL;
 	if (ext == ".jpg" || ext == ".JPG" || ext == ".jpeg") surf = IMG_LoadJPG_RW(rwop);
 	else if (ext == ".png" || ext == ".PNG") surf = IMG_LoadPNG_RW(rwop);
-	//else std::cout << "Background image file " << file << " has unknown extension" << std::endl;
+	else std::cout << "Background image file " << file << " has unknown extension" << std::endl;
 	if (rwop) SDL_RWclose(rwop);
 	if (surf == NULL) backgroundSurf = NULL;
 	else {
@@ -160,6 +159,7 @@ CSongs::CSongs(std::set<std::string> const& songdirs): m_songdirs(songdirs), m_c
 }
 
 CSongs::~CSongs() {
+	if (m_thread) m_thread->join(); // Wait until cover loading is done...
 	SDL_FreeSurface(surface_nocover);
 }
 
@@ -170,12 +170,12 @@ class CSongs::SongLoader {
 	void operator()() {
 		boost::mutex::scoped_lock l(m_self.m_mutex);
 		songlist_t& s = m_self.m_songs;
-		boost::progress_display pd(s.size() + 1);
-		for (songlist_t::iterator it = s.begin(); ++pd, it != s.end(); ++it) it->loadCover();
+		for (songlist_t::iterator it = s.begin(); it != s.end(); ++it) it->loadCover();
 	}
 };
 
 void CSongs::reload() {
+	if (m_thread) return; // Prevent doing more reloads until the previous one has finished.
 	songlist_t songs;
 	for (std::set<std::string>::const_iterator it = m_songdirs.begin(); it != m_songdirs.end(); ++it) {
 		glob_t _glob;
@@ -208,7 +208,7 @@ void CSongs::reload() {
 	boost::mutex::scoped_lock l(m_mutex);
 	m_songs.swap(songs);
 	setFilter("");
-	boost::thread(SongLoader(*this));
+	m_thread.reset(new boost::thread(SongLoader(*this)));
 }
 
 namespace {
