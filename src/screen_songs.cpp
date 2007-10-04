@@ -75,6 +75,7 @@ void CScreenSongs::draw() {
 		cairo_text_extents_t extents = theme->theme->GetTextExtents(theme->song);
 		theme->song.x = (theme->song.svg_width - extents.width)/2;
 		theme->theme->PrintText(&theme->song);
+		if (!m_playing.empty()) { sm->getAudio()->stopMusic(); m_playing.clear(); }
 	} else {
 		CSong& song = sm->getSongs()->current();
 		// Draw the "Song information"
