@@ -96,7 +96,7 @@ void Analyzer::operator()(da::pcm_data& indata, da::settings const& s)
 			m_peak = 10.0 * log10(tmp * tmp); // Critical: atomic write
 		}
 		// Calculate FFT
-		std::vector<std::complex<double> > data = da::fft<FFT_P>(m_buf.begin(), m_window);
+		std::vector<std::complex<float> > data = da::fft<FFT_P>(m_buf.begin(), m_window);
 		// Erase one step of samples
 		m_buf.erase(m_buf.begin(), m_buf.begin() + m_step);
 		// Process only up to 3000 Hz

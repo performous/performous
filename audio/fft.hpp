@@ -54,10 +54,10 @@ namespace da {
 				// Combine the results
 				using math::sqr;
 				using math::sin;
-				const std::complex<double> wp(-2.0 * sqr(sin<1, N>()), -sin<2, N>());
-				std::complex<double> w(1.0);
+				const std::complex<T> wp(-2.0 * sqr(sin<1, N>()), -sin<2, N>());
+				std::complex<T> w(1.0);
 				for (std::size_t i = 0; i < M; ++i) {
-					std::complex<double> temp = data[i + M] * w;
+					std::complex<T> temp = data[i + M] * w;
 					data[M + i] = data[i] - temp;
 					data[i] += temp;
 					w += w * wp;
@@ -84,8 +84,8 @@ namespace da {
 	}
 
 	/** Perform FFT on data from floating point iterator, windowing the input. **/
-	template<unsigned P, typename InIt, typename Window> std::vector<std::complex<double> > fft(InIt begin, Window window) {
-		std::vector<std::complex<double> > data(1 << P);
+	template<unsigned P, typename InIt, typename Window> std::vector<std::complex<float> > fft(InIt begin, Window window) {
+		std::vector<std::complex<float> > data(1 << P);
 		// Perform bit-reversal sorting of sample data.
 		const std::size_t N = 1 << P;
 		std::size_t j = 0;
@@ -96,7 +96,7 @@ namespace da {
 			j += m;
 		}
 		// Do the actual calculation
-		fourier::DanielsonLanczos<P, double>::apply(&data[0]);
+		fourier::DanielsonLanczos<P, float>::apply(&data[0]);
 		return data;
 	}
 
