@@ -20,6 +20,7 @@ void CTheme::clear() {
 cairo_surface_t *CTheme::PrintText(TThemeTxt *text) {
 	PangoFontDescription *desc = pango_font_description_new();
 	PangoLayout *layout = pango_cairo_create_layout(dc);
+	pango_layout_set_alignment(layout, PANGO_ALIGN_CENTER );
 	PangoRectangle rec;
 
 	cairo_save(dc);

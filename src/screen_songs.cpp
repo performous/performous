@@ -82,7 +82,7 @@ void CScreenSongs::draw() {
 		{
 			std::ostringstream oss;
 			CSongs& s = *sm->getSongs();
-			oss << "(" << s.currentId() + 1 << "/" << s.size() << ") " << song.str();
+			oss << "(" << s.currentId() + 1 << "/" << s.size() << ")\n" << song.str();
 			theme->song.text = oss.str();
 			cairo_text_extents_t extents = theme->theme->GetTextExtents(theme->song);
 			theme->song.x = (theme->song.svg_width - extents.width)/2;
