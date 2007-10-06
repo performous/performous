@@ -67,7 +67,7 @@ void CScreenSing::enter() {
 	theme_id = sm->getVideoDriver()->initSurface(theme->theme->getCurrent());
 	pitchGraph_id = sm->getVideoDriver()->initSurface(pitchGraph.getCurrent());
 	std::string file = song.path + song.mp3;
-	std::cout << "Now playing " << file << std::endl;
+	std::cout << "Now playing: " << file << std::endl;
 	sm->getAudio()->playMusic(file.c_str());
 	lyrics = new CLyrics(song.notes, song.gap, song.bpm[0].bpm);
 	song.score[0].score = 0;
