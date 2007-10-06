@@ -308,6 +308,7 @@ static char const* order[] = {
 	"by artist",
 	"by edition",
 	"by genre",
+	"by path"
 };
 
 static const int orders = sizeof(order) / sizeof(*order);
@@ -317,6 +318,7 @@ std::string CSongs::sortDesc() const {
 	if (!empty()) {
 		if (m_order == 2) str += " (" + current().edition + ")";
 		if (m_order == 3) str += " (" + current().genre + ")";
+		if (m_order == 4) str += " (" + current().path + ")";
 	}
 	return str;
 }
@@ -330,6 +332,7 @@ void CSongs::sortChange(int diff) {
 	  case 1: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&CSong::artist)); break;
 	  case 2: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&CSong::edition)); break;
 	  case 3: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&CSong::genre)); break;
+	  case 4: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&CSong::path)); break;
 	  default: throw std::logic_error("Internal error: unknown sort order in CSongs::sortChange");
 	}
 }
