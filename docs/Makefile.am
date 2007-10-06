@@ -1,10 +1,7 @@
 dist_man_MANS = ultrastarng.6
 
-edit = sed -e 's,\@DATA_DIR\@,@DATA_DIR@,g'
+ultrastarng.6: $(top_srcdir)/src/main.cpp $(top_srcdir)/configure.in Makefile.am
+	LD_LIBRARY_PATH="../audio/.libs/:$$LD_LIBRARY_PATH" help2man --no-info --section=6 --include=ultrastarng.h2m ./$(top_srcdir)/src/ultrastarng$(EXEEXT) > ultrastarng.6
 
-ultrastarng.6: $(top_srcdir)/src/main.cpp $(top_srcdir)/configure.in ultrastarng.h2m.in Makefile.am Makefile
-	$(edit) ultrastarng.h2m.in > ultrastarng.h2m
-	chmod +x ./$<
-	LD_LIBRARY_PATH="../audio/.libs/:$$LD_LIBRARY_PATH" $(HELP2MAN) --no-info --section=6 --include=ultrastarng.h2m ./$(top_srcdir)/src/ultrastarng$(EXEEXT) > $@
-
-EXTRA_DIST = ultrastarng.h2m.in
+dist-hook:
+	LD_LIBRARY_PATH="../audio/.libs/:$$LD_LIBRARY_PATH" help2man --no-info --section=6 --include=ultrastarng.h2m ./$(top_srcdir)/src/ultrastarng$(EXEEXT) > ultrastarng.6

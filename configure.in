@@ -22,7 +22,6 @@ CXXFLAGS="-W -Wall $CXXFLAGS"
 AC_PROG_CXX
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL
-AC_PATH_PROG(HELP2MAN, help2man, AC_MSG_ERROR(Cannot find help2man))
 
 THEMES_DIR="${datadir}/ultrastar-ng/themes/"
 AC_SUBST(THEMES_DIR)

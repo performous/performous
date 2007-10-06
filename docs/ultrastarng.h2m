@@ -1,0 +1,65 @@
+Include file for Ultrastar NG man page
+
+[name]
+ultrastarng \- The free Linux karaoke game
+
+[description]
+Ultrastar Next Generation is a karaoke game which is based off and looks
+similar to Singstar for PS2. UltraStar-NG is based on UltraStar and allows
+you to add your own songs in different formats (e.g. ogg, mp3, m4a...) along
+with a song text and a music video file or an image file.
+
+If you have trouble with the program (no songs found, audio not working, etc),
+try running it on a terminal. Some useful debug information such a list of
+the song folders is printed there.
+
+[navigation]
+In-game navigation uses the following keys:
+.SS "Global shortcuts:"
+.TP
+\fBEsc\fR
+Exit the current screen
+.TP
+\fBAlt+Enter\fR
+Switch between full screen and windowed modes
+.SS "Main menu:"
+.TP
+\fBS\fR
+Sing: single player game
+.TP
+\fBP\fR
+Practice: displays the tones detected and a VU meter for checking microphone recording levels
+.TP
+\fBC\fR
+Configuration: adjust settings
+
+.SS "Song selection:"
+.TP
+\fBEnter\fR
+Choose the currently selected song
+.TP
+\fBLeft\fR/\fBRight\fR/\fBPgUp\fR/\fBPgDn\fR
+Browse the list of songs
+.TP
+\fBUp\fR/\fBDown\fR
+Switch the sort order (song name, artist, edition, genre or song folder path)
+.TP
+\fBF\fR or \fB/\fR
+Search for songs (input text to find, uses regexp format)
+.TP
+\fBSpace\fR
+Pause song preview (not in search mode)
+.TP
+\fBR\fR
+Pick random song (not in search mode)
+.TP
+\fBCtrl+R\fR
+Refresh song list (reload from disk)
+.TP
+\fBEsc\fR
+Exit to main menu or quit search mode
+
+[see also]
+You can find more information at http://ultrastar-ng.sourceforge.net/ or
+http://sourceforge.net/projects/ultrastar-ng/
+
