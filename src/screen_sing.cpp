@@ -210,7 +210,7 @@ void CScreenSing::draw() {
 		tmptxt = theme->timertxt;	   // use timertxt as template
 		tmptxt.text = scale.getNoteStr(freq);
 		tmptxt.x = 0;
-		tmptxt.y = m_height;
+		tmptxt.y = 600;
 		tmptxt.fontsize = 25;
 		theme->theme->PrintText(&tmptxt);
 	}
