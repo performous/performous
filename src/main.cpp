@@ -66,8 +66,8 @@ int main(int argc, char** argv) {
 		  ("theme,t", po::value<std::string>(&theme)->default_value("lima"), "set theme (name or absolute path)")
 		  ("songdir,s", po::value<std::vector<std::string> >(&songdirstmp)->composing(), "additional song folders to scan\n  -s none to disable built-in defaults")
 		  ("fs,f", "enable full screen mode")
-		  ("width,W", po::value<unsigned int>(&width)->default_value(640), "set horizontal resolution")
-		  ("height,H", po::value<unsigned int>(&height)->default_value(480), "set vertical resolution")
+		  ("width,W", po::value<unsigned int>(&width)->default_value(800), "set horizontal resolution")
+		  ("height,H", po::value<unsigned int>(&height)->default_value(600), "set vertical resolution")
 		  ("cdev", po::value<std::string>(&cdev), "set capture device, dev[:settings], e.g.\n  alsa:hw:Intel\n  gst\n  portaudio\n  ~tone:300.amplitude(-20):440\n  none")
 		  ("crate", po::value<std::size_t>(&crate)->default_value(48000), "set capture frequency\n  44100 and 48000 Hz are optimal")
 		  ("version,v", "display version number");
