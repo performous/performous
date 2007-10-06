@@ -18,6 +18,7 @@ void CScreenSongs::enter() {
 }
 
 void CScreenSongs::exit() {
+	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	m_playing.clear();
 	delete theme;
 }
@@ -97,7 +98,7 @@ void CScreenSongs::draw() {
 		{
 			SDL_Surface* surf = song.getCover();
 			if (!surf) surf = sm->getSongs()->getEmptyCover();
-			if (!surf) throw std::runtime_error("No cover image and no empty cover image");
+			if (!surf) throw std::logic_error("No cover image and no empty cover image");
 			SDL_Rect position;
 			position.x = (m_width - surf->w) / 2;
 			position.y = (m_height - surf->h) / 2;

@@ -11,6 +11,9 @@
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
 #include <cstdlib>
+#include <set>
+#include <string>
+#include <vector>
 
 #ifndef DATA_DIR
 #define DATA_DIR "/usr/local/share/ultrastar-ng"
