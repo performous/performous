@@ -25,7 +25,6 @@ cairo_surface_t *CTheme::PrintText(TThemeTxt *text) {
 
 	cairo_save(dc);
 
-	cairo_scale(dc, width/text->svg_width, height/text->svg_height);
 	pango_font_description_set_family(desc, text->fontfamily);
 	pango_font_description_set_style (desc,PANGO_STYLE_NORMAL);
 	pango_font_description_set_absolute_size (desc,text->fontsize * PANGO_SCALE);
@@ -39,6 +38,7 @@ cairo_surface_t *CTheme::PrintText(TThemeTxt *text) {
 	pango_font_description_set_absolute_size (desc,text->fontsize * text->scale * PANGO_SCALE);
 	pango_layout_set_font_description (layout, desc);
 	pango_cairo_update_layout (dc, layout);
+	cairo_scale(dc, width/text->svg_width, height/text->svg_height);
 	cairo_move_to(dc,text->x - (rec.width-rec.width/text->scale)/2,text->y-text->fontsize * text->scale);
 	pango_cairo_show_layout (dc, layout);
 	pango_cairo_layout_path(dc,layout);
