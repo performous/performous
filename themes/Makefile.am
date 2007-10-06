@@ -20,6 +20,10 @@ themesdef_DATA = default/no_cover.png \
 	default/practice_note.svg \
 	default/practice_sharp.svg \
 	default/practice_peak.svg \
+	default/score_bg.svg \
+	default/score_rank.svg \
+	default/score_level.svg \
+	default/score_txt.svg \
 	default/configuration_bg.svg \
 	default/configuration_item.svg \
 	default/configuration_value.svg
