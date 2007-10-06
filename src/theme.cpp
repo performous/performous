@@ -34,8 +34,8 @@ cairo_surface_t *CTheme::PrintText(TThemeTxt *text) {
 	pango_layout_get_pixel_extents (layout,NULL,&rec);
 	text->extents.width = rec.width;
 	text->extents.height = rec.height;
-	text->extents.x_advance = rec.width;
-	text->extents.y_advance = rec.height;
+	text->extents.x_advance = rec.width+rec.x;
+	text->extents.y_advance = rec.height+rec.y;
 	pango_font_description_set_absolute_size (desc,text->fontsize * text->scale * PANGO_SCALE);
 	pango_layout_set_font_description (layout, desc);
 	pango_cairo_update_layout (dc, layout);
@@ -84,18 +84,19 @@ cairo_text_extents_t CTheme::GetTextExtents(TThemeTxt text) {
 	ctx = pango_cairo_font_map_create_context ((PangoCairoFontMap*)pango_cairo_font_map_get_default());
 	PangoFontDescription *desc = pango_font_description_new();
 	PangoLayout *layout = pango_layout_new(ctx);
+	pango_layout_set_alignment(layout, PANGO_ALIGN_CENTER );
 	PangoRectangle rec;
 
-	pango_layout_set_text (layout, text.text.c_str(), -1);
 	pango_font_description_set_family(desc, text.fontfamily);
 	pango_font_description_set_style (desc,PANGO_STYLE_NORMAL);
 	pango_font_description_set_absolute_size (desc,text.fontsize * PANGO_SCALE);
 	pango_layout_set_font_description (layout, desc);
+	pango_layout_set_text (layout, text.text.c_str(), -1);
 	pango_layout_get_pixel_extents (layout,NULL,&rec);
 	extents.width = rec.width;
 	extents.height = rec.height;
-	extents.x_advance = rec.width;
-	extents.y_advance = rec.height;
+	extents.x_advance = rec.width+rec.x;
+	extents.y_advance = rec.height+rec.y;
 
 	g_object_unref (layout);
 	pango_font_description_free (desc);

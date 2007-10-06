@@ -84,9 +84,14 @@ void CScreenSongs::draw() {
 			CSongs& s = *sm->getSongs();
 			oss << "(" << s.currentId() + 1 << "/" << s.size() << ")\n" << song.str();
 			theme->song.text = oss.str();
-			cairo_text_extents_t extents = theme->theme->GetTextExtents(theme->song);
-			theme->song.x = (theme->song.svg_width - extents.width)/2;
+			double oldfontsize = theme->song.fontsize;
+			do {
+				cairo_text_extents_t extents = theme->theme->GetTextExtents(theme->song);
+				theme->song.x = (theme->song.svg_width - extents.width)/2;
+			} while (theme->song.x < 0 && (theme->song.fontsize -= 2) > 0);
 			theme->theme->PrintText(&theme->song);
+			theme->song.fontsize = oldfontsize;
+
 		}
 		// Draw the cover
 		{
