@@ -204,6 +204,13 @@ namespace {
 		std::replace(str.begin(), str.end(), ',', '.'); // Fix decimal separators
 		return boost::lexical_cast<double>(str);
 	}
+	int toInt(std::string str) {
+		return boost::lexical_cast<int>(str);
+	}
+	float toFloat(std::string str) {
+		std::replace(str.begin(), str.end(), ',', '.'); // Fix decimal separators
+		return boost::lexical_cast<float>(str);
+	}
 	bool toBool(std::string const& str) {
 		char c = str.empty() ? 0 : str[0];
 		return c == 'y' || c == 'Y' || c == '1';
@@ -217,10 +224,13 @@ void CSongs::parseFile(CSong& tmp) {
 	std::string line;
 	while (std::getline(f, line)) {
 		if (line.empty() || line[0] != '#') continue;
+		if (line[line.size() - 1] == '\r') line.erase(line.size() - 1);
 		std::string::size_type pos = line.find(':');
 		if (pos == std::string::npos) throw std::runtime_error("Invalid format in " + file);
 		std::string key = line.substr(1, pos - 1);
 		std::string value = line.substr(pos + 1);
+		if( value.empty() )
+			throw std::runtime_error("Invalid format in " + file + "(" + key + " empty)");
 		if (key == "TITLE") tmp.title = value;
 		else if (key == "ARTIST") tmp.artist = value;
 		else if (key == "EDITION") tmp.edition = value;
@@ -230,13 +240,14 @@ void CSongs::parseFile(CSong& tmp) {
 		else if (key == "MP3") tmp.mp3 = value;
 		else if (key == "VIDEO") tmp.video = value;
 		else if (key == "BACKGROUND") tmp.background = value;
-		else if (key == "VIDEOGAP") tmp.videoGap = toDouble(value);
+		else if (key == "START") tmp.start = toInt(value);
+		else if (key == "VIDEOGAP") tmp.videoGap = toFloat(value);
 		else if (key == "RELATIVE") tmp.relative = toBool(value);
-		else if (key == "GAP") tmp.gap = toDouble(value);
+		else if (key == "GAP") tmp.gap = toFloat(value);
 		else if (key == "BPM") {
 			TBpm bpm;
 			bpm.start = 0.0;
-			bpm.bpm = toDouble(value);
+			bpm.bpm = toFloat(value);
 			tmp.bpm.push_back(bpm);
 		}
 	}
