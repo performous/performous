@@ -84,8 +84,8 @@ AC_LANG_SAVE
 	AC_CHECK_HEADERS([algorithm],
 		have_stdpp_headers=yes, 
 		AC_MSG_ERROR([You need to have the libstdc++ headers installed]))
-	AC_CHECK_HEADERS([boost/thread.hpp],, 
-		AC_MSG_ERROR([You need to have the boost thread headers installed]))
+	AC_CHECK_HEADERS([boost/thread.hpp boost/scoped_ptr.hpp boost/thread/condition.hpp boost/thread/mutex.hpp boost/thread/thread.hpp boost/ptr_container/ptr_map.hpp boost/noncopyable.hpp boost/progress.hpp boost/ptr_container/ptr_set.hpp boost/thread/xtime.hpp boost/program_options.hpp boost/lexical_cast.hpp boost/regex.hpp boost/function.hpp boost/scoped_ptr.hpp boost/lambda/lambda.hpp boost/lambda/bind.hpp boost/spirit/core.hpp boost/thread/xtime.hpp],, 
+		AC_MSG_ERROR([You need to have the boost headers installed]))
 AC_LANG_RESTORE
 
 AC_CHECK_HEADERS([fcntl.h glob.h dirent.h sys/ioctl.h sys/types.h sys/stat.h ],
