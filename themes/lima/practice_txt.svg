@@ -46,19 +46,19 @@
      inkscape:cx="400"
      inkscape:cy="300"
      inkscape:window-x="296"
-     inkscape:window-y="0"
+     inkscape:window-y="2"
      inkscape:current-layer="svg559" />
   <defs
      id="defs561" />
   <text
-     x="542.14923"
-     y="372.01218"
-     style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;opacity:1;fill:#ffd100;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:inline;font-family:Arial Black"
+     x="350.87939"
+     y="480.74234"
+     style="font-size:40px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;opacity:1;fill:#ffd100;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:inline;font-family:DejaVu Sans Mono"
      id="text10203"
      xml:space="preserve"
      sodipodi:linespacing="125%"><tspan
-       x="542.14923"
-       y="372.01218"
+       x="350.87939"
+       y="480.74234"
        id="tspan10205"
-       style="fill:#ffd100;fill-opacity:1">A#</tspan></text>
+       style="fill:#ffd100;fill-opacity:1;font-family:DejaVu Sans Mono;font-weight:bold">A#</tspan></text>
 </svg>

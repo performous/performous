@@ -46,8 +46,8 @@
      inkscape:zoom="1.26"
      inkscape:cx="480.09031"
      inkscape:cy="285.52028"
-     inkscape:window-x="291"
-     inkscape:window-y="0"
+     inkscape:window-x="405"
+     inkscape:window-y="24"
      inkscape:current-layer="svg559" />
   <defs
      id="defs561">
@@ -200,16 +200,6 @@
        id="tspan6527"
        x="105.2536"
        y="261.2139">Score:</tspan></text>
-  <text
-     xml:space="preserve"
-     x="761.07501"
-     y="593.94653"
-     id="text1892"
-     style="fill:white;fill-opacity:1"><tspan
-       sodipodi:role="line"
-       id="tspan1894"
-       x="761.07501"
-       y="593.94653">0.1.0</tspan></text>
   <rect
      style="opacity:1;fill:#000000;fill-opacity:0.14025975;stroke:#323232;stroke-width:2;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
      id="rect2174"
