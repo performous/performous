@@ -8,83 +8,150 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <limits>
 #include <stdexcept>
 
-void CSong::parseFile() {
-	int relativeShift = 0;
-	maxScore = 0;
-	std::string file = path + filename;
-	std::ifstream f(file.c_str());
-	for (std::string line; std::getline(f, line); ) {
-		if (!line.empty() && line[line.size() - 1] == '\r') line.erase(line.size() - 1);
-		if (line.empty() || line[0] == '#') continue;
-		if (line[0] == 'E') break;
-		std::istringstream iss(line);
-		switch (iss.get()) {
-		  case 'F':
-		  case ':':
-		  case '*':
-			{
-				TNote tmp;
-				if (line[0] == 'F') tmp.type = TYPE_NOTE_FREESTYLE;
-				if (line[0] == '*') tmp.type = TYPE_NOTE_GOLDEN;
-				if (line[0] == ':') tmp.type = TYPE_NOTE_NORMAL;
-				if (!(iss >> tmp.timestamp >> tmp.length >> tmp.note)) throw std::runtime_error("Invalid note line format");
-				if (tmp.length == 0) break; // 0-length notes are ignored
-				tmp.timestamp += relativeShift;
-				if (iss.get() == ' ') std::getline(iss, tmp.syllable);
-				noteMin = std::min(noteMin, tmp.note);
-				noteMax = std::max(noteMax, tmp.note);
-				maxScore += tmp.length * tmp.type;
-				tmp.curMaxScore = maxScore;
-				notes.push_back(tmp);
-				break;
-			}
-		  case '-':
-			{
-				TNote tmp;
-				int timestamp = 0;
-				int sleep_end;
-				tmp.type = TYPE_NOTE_SLEEP;
-				if (iss >> timestamp) tmp.length = (iss >> sleep_end) ? sleep_end - timestamp : 0;
-				tmp.timestamp = relativeShift + timestamp;
-				if (relative) relativeShift += timestamp + tmp.length;
-				tmp.curMaxScore = maxScore;
-				notes.push_back(tmp);
-				break;
-			}
-		}
-	}
-	// Adjust negative notes
-	if (noteMin <= 0) {
-		unsigned int shift = (((noteMin*-1)%12)+1)*12;
-		noteMin += shift;
-		noteMax += shift;
-		for(unsigned i = 0; i < notes.size(); ++i) notes[i].note += shift;
+Note::Note(std::string const& line, int* relShift) {
+	std::istringstream iss(line);
+	type = Type(iss.get());
+	switch (type) {
+	  case NORMAL:
+	  case FREESTYLE:
+	  case GOLDEN:
+		if (!(iss >> timestamp >> length >> note)) throw std::runtime_error("Invalid note line format");
+		if (iss.get() == ' ') std::getline(iss, syllable);
+		if (relShift) timestamp += *relShift;
+		break;
+	  case SLEEP:
+		if (iss >> timestamp) length = (iss >> length) ? length - timestamp : 0;
+		if (relShift) *relShift = (timestamp += *relShift) + length;
+		break;
+	  default: throw std::runtime_error("Unknown note type");
 	}
 }
 
-CSong::CSong():
-	path(),
-	filename(),
-	genre(),
-	edition(),
-	title(),
-	artist(),
-	text(),
-	creator(),
-	cover(),
-	coverSurf(),
-	mp3(),
-	background(),
-	backgroundSurf(),
-	video(),
-	videoGap(),
-	relative(),
-	gap(),
-	noteMin(256),
-	noteMax(-256)
-{}
+CSong::CSong(std::string const& _path, std::string const& _filename):
+  path(_path),
+  filename(_filename),
+  genre(),
+  edition(),
+  title(),
+  artist(),
+  text(),
+  creator(),
+  cover(),
+  coverSurf(),
+  mp3(),
+  background(),
+  backgroundSurf(),
+  video(),
+  videoGap(),
+  relative(),
+  gap(),
+  noteMin(std::numeric_limits<int>::max()),
+  noteMax(std::numeric_limits<int>::min())
+{
+	std::ifstream f((path + filename).c_str());
+	if (!f.is_open()) throw std::runtime_error(filename + ": Cannot open file");
+	std::string line;
+	std::size_t linenum = 0;
+	try {
+		while (++linenum, std::getline(f, line) && parseField(line));
+		int relativeShift = 0;
+		int prevtime = 0;
+		do {
+			if (line.empty() || line == "\r") continue;
+			if (line[0] == '#') throw std::runtime_error("Key found in the middle of notes");
+			if (line[line.size() - 1] == '\r') line.erase(line.size() - 1);
+			if (line[0] == 'E') break;
+			notes.push_back(Note(line, relative ? &relativeShift : NULL));
+			Note& n = notes.back();
+			if (notes.size() == 1 && n.type == Note::SLEEP) throw std::runtime_error("Song cannot begin with sleep");
+			if (n.timestamp < prevtime) {
+				// Oh no, overlapping notes (b0rked file)
+				// Can't do this because too many songs are b0rked: throw std::runtime_error("Note overlaps with previous note");
+				if (notes.size() >= 2) {
+					Note& p = notes[notes.size() - 2];
+					// Workaround for songs that use semi-random timestamps for sleep
+					if (p.type == Note::SLEEP) {
+						p.length = 0;
+						Note& p2 = notes[notes.size() - 3];
+						if (p2.timestamp + p2.length < n.timestamp) p.timestamp = n.timestamp;
+					}
+					// Can we just make the previous note shorter?
+					if (p.timestamp <= n.timestamp) p.length = n.timestamp - p.timestamp;
+					else throw std::runtime_error("Note overlaps with earlier notes");
+				} else throw std::runtime_error("The first note has negative timestamp");
+			}
+			prevtime = n.timestamp + n.length;
+			if (n.type != Note::SLEEP && n.length > 0) {
+				noteMin = std::min(noteMin, n.note);
+				noteMax = std::max(noteMax, n.note);
+			}
+		} while (++linenum, std::getline(f, line));
+		if (notes.empty()) throw std::runtime_error("No notes");
+		// Workaround for terminating : 1 0 0 line, written by some converters
+		if (notes.back().type != Note::SLEEP && notes.back().length == 0) notes.pop_back();
+		// Adjust negative notes
+		if (noteMin <= 0) {
+			unsigned int shift = (1 - noteMin / 12) * 12;
+			noteMin += shift;
+			noteMax += shift;
+			for(unsigned i = 0; i < notes.size(); ++i) notes[i].note += shift;
+		}
+	} catch (std::exception& e) {
+		std::ostringstream oss;
+		oss << filename << " line " << linenum << ": " << e.what();
+		throw std::runtime_error(oss.str());
+	}
+	if (title.empty() || artist.empty()) throw std::runtime_error(filename + ": Required fields missing");
+}
+
+namespace {
+	void assign(int& var, std::string const& str) {
+		var = boost::lexical_cast<int>(str);
+	}
+	void assign(float& var, std::string str) {
+		std::replace(str.begin(), str.end(), ',', '.'); // Fix decimal separators
+		var = boost::lexical_cast<float>(str);
+	}
+	void assign(bool& var, std::string const& str) {
+		if (str == "YES" || str == "yes" || str == "1") var = true;
+		else if (str == "NO" || str == "no" || str == "0") var = false;
+		else throw std::logic_error("Invalid boolean value: " + str);
+	}
+}
+
+bool CSong::parseField(std::string const& line) {
+	if (line.empty()) return true;
+	if (line[0] != '#') return false;
+	std::string::size_type pos = line.find(':');
+	if (pos == std::string::npos) throw std::runtime_error("Invalid format, should be #key=value");
+	std::string key = line.substr(1, pos - 1);
+	std::string::size_type pos2 = line.find_last_not_of(" \t\r");
+	std::string value = line.substr(pos + 1, pos2 - pos);
+	if (value.empty()) throw std::runtime_error("Value missing from key " + key);
+	if (key == "TITLE") title = value;
+	else if (key == "ARTIST") artist = value;
+	else if (key == "EDITION") edition = value;
+	else if (key == "GENRE") genre = value;
+	else if (key == "CREATOR") creator = value;
+	else if (key == "COVER") cover = value;
+	else if (key == "MP3") mp3 = value;
+	else if (key == "VIDEO") video = value;
+	else if (key == "BACKGROUND") background = value;
+	else if (key == "START") assign(start, value);
+	else if (key == "VIDEOGAP") assign(videoGap, value);
+	else if (key == "RELATIVE") assign(relative, value);
+	else if (key == "GAP") assign(gap, value);
+	else if (key == "BPM") {
+		TBpm tmp;
+		tmp.start = 0.0;
+		assign(tmp.bpm, value);
+		bpm.push_back(tmp);
+	}
+	return true;
+}
 
 void CSong::loadCover() {
 	if (coverSurf || cover.empty()) return;
@@ -180,17 +247,10 @@ void CSongs::reload() {
 			std::string::size_type pos = path.rfind('/');
 			if (pos < path.size() - 1) pos += 1; else pos = 0;
 			std::cout << "\r  " << std::setiosflags(std::ios::left) << std::setw(70) << path.substr(pos, 70) << "\x1B[K" << std::flush;
-			CSong* tmp = new CSong();
 			try {
-				tmp->path = path + "/";
-				tmp->filename = txtfilename;
-				parseFile(*tmp);
-				tmp->parseFile();
-				songs.insert(tmp);
-			}
-			catch (...) {
-				std::cout << "FAIL" << std::endl;
-				delete tmp;
+				songs.insert(new CSong(path + "/", txtfilename));
+			} catch (std::exception& e) {
+				std::cout << "FAIL\n    " << e.what() << std::endl;
 			}
 		}
 		std::cout << "\r\x1B[K" << std::flush;
@@ -198,61 +258,6 @@ void CSongs::reload() {
 	}
 	m_songs.swap(songs);
 	setFilter("");
-}
-
-namespace {
-	double toDouble(std::string str) {
-		std::replace(str.begin(), str.end(), ',', '.'); // Fix decimal separators
-		return boost::lexical_cast<double>(str);
-	}
-	int toInt(std::string str) {
-		return boost::lexical_cast<int>(str);
-	}
-	float toFloat(std::string str) {
-		std::replace(str.begin(), str.end(), ',', '.'); // Fix decimal separators
-		return boost::lexical_cast<float>(str);
-	}
-	bool toBool(std::string const& str) {
-		char c = str.empty() ? 0 : str[0];
-		return c == 'y' || c == 'Y' || c == '1';
-	}
-}
-
-void CSongs::parseFile(CSong& tmp) {
-	std::string file = tmp.path + tmp.filename;
-	std::ifstream f(file.c_str());
-	if (!f.is_open()) throw std::runtime_error("Cannot open " + file);
-	std::string line;
-	while (std::getline(f, line)) {
-		if (line.empty() || line[0] != '#') continue;
-		if (line[line.size() - 1] == '\r') line.erase(line.size() - 1);
-		std::string::size_type pos = line.find(':');
-		if (pos == std::string::npos) throw std::runtime_error("Invalid format in " + file);
-		std::string key = line.substr(1, pos - 1);
-		std::string value = line.substr(pos + 1);
-		if( value.empty() )
-			throw std::runtime_error("Invalid format in " + file + "(" + key + " empty)");
-		if (key == "TITLE") tmp.title = value;
-		else if (key == "ARTIST") tmp.artist = value;
-		else if (key == "EDITION") tmp.edition = value;
-		else if (key == "GENRE") tmp.genre = value;
-		else if (key == "CREATOR") tmp.creator = value;
-		else if (key == "COVER") tmp.cover = value;
-		else if (key == "MP3") tmp.mp3 = value;
-		else if (key == "VIDEO") tmp.video = value;
-		else if (key == "BACKGROUND") tmp.background = value;
-		else if (key == "START") tmp.start = toInt(value);
-		else if (key == "VIDEOGAP") tmp.videoGap = toFloat(value);
-		else if (key == "RELATIVE") tmp.relative = toBool(value);
-		else if (key == "GAP") tmp.gap = toFloat(value);
-		else if (key == "BPM") {
-			TBpm bpm;
-			bpm.start = 0.0;
-			bpm.bpm = toFloat(value);
-			tmp.bpm.push_back(bpm);
-		}
-	}
-	if (tmp.title.empty() || tmp.artist.empty()) throw std::runtime_error("Required fields missing in " + file);
 }
 
 class CSongs::RestoreSel {

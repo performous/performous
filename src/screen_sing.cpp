@@ -218,7 +218,7 @@ void CScreenSing::draw() {
 	unsigned int totalBpm;
 	float bpmPixelUnit;
 	if (m_sentence.size()) {
-		TNote const& n = m_sentence[m_sentence.size()-1];
+		Note const& n = m_sentence[m_sentence.size()-1];
 		totalBpm = n.length + n.timestamp - m_sentence[0].timestamp;
 		bpmPixelUnit = (m_width - 100.*resFactorX - 100.*resFactorX)/(totalBpm * 1.0);
 	} else {
@@ -354,8 +354,9 @@ void CScreenSing::draw() {
 	}
 	
 	if (sentenceNow[0]) {
-		unsigned int length = lyrics->getCurrentNote().length;
-		unsigned int timestamp = lyrics->getCurrentNote().timestamp;
+		Note* n = lyrics->getCurrentNote();
+		unsigned int length = n ? n->length : 0; // FIXME: what should we really do if n == NULL?
+		unsigned int timestamp = n ? n->timestamp : 0; // FIXME: what should we really do if n == NULL?
 		float length_ms = length* 60 * 1000 / (song.bpm[0].bpm * 4);
 		float timestamp_ms = timestamp* 60 * 1000 / (song.bpm[0].bpm * 4) + song.gap;
 		float started_ms = time - timestamp_ms;

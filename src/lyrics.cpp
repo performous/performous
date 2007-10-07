@@ -1,17 +1,17 @@
 #include <lyrics.h>
 
-CLyrics::CLyrics(std::vector<TNote> const& lyrics, float gap ,float bpm):
+CLyrics::CLyrics(std::vector<Note> const& lyrics, float gap ,float bpm):
   m_lyrics(lyrics),
   m_lastSyllableIdx(-1),
   m_lastSentenceIdx(-1),
   m_gap(gap),
   m_bpm(bpm)
 {
-	std::vector<TNote> tmp;
+	std::vector<Note> tmp;
 	unsigned int size = lyrics.size();
 	for (unsigned int i = 0; i < size; ++i) {
-		while(i < size && lyrics[i].type == TYPE_NOTE_SLEEP) i++;
-		while(i < size && lyrics[i].type != TYPE_NOTE_SLEEP) {
+		while(i < size && lyrics[i].type == Note::SLEEP) i++;
+		while(i < size && lyrics[i].type != Note::SLEEP) {
 			tmp.push_back(lyrics[i]);
 			i++;
 		}
@@ -20,13 +20,13 @@ CLyrics::CLyrics(std::vector<TNote> const& lyrics, float gap ,float bpm):
 	}
 }
 
-std::vector<TNote> CLyrics::getCurrentSentence() {
-	return m_lastSentenceIdx != -1 ? m_formatted[m_lastSentenceIdx] : std::vector<TNote>();
+std::vector<Note> CLyrics::getCurrentSentence() {
+	return m_lastSentenceIdx != -1 ? m_formatted[m_lastSentenceIdx] : std::vector<Note>();
 }
 
-TNote CLyrics::getCurrentNote() {
+Note* CLyrics::getCurrentNote() {
 	return (m_lastSentenceIdx != -1 && m_lastSyllableIdx != -1) ?
-	  m_formatted[m_lastSentenceIdx][m_lastSyllableIdx] : TNote();
+	  &m_formatted[m_lastSentenceIdx][m_lastSyllableIdx] : NULL;
 }
 
 void CLyrics::updateSentences(unsigned int timestamp) {

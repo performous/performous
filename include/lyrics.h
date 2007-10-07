@@ -11,7 +11,7 @@
  */
 class CLyrics {
   public:
-	CLyrics(std::vector<TNote> const& lyrics, float gap, float bpm);
+	CLyrics(std::vector<Note> const& lyrics, float gap, float bpm);
 	/** 
 	 * Return what has been sung in the current sentence
 	 */
@@ -35,11 +35,11 @@ class CLyrics {
 	/**
 	 * Return the current sang note
 	 */
-	TNote getCurrentNote();
+	Note* getCurrentNote();
 	/**
 	 * Return the current sang sentence structure
 	 */
-	std::vector<TNote> getCurrentSentence();
+	std::vector<Note> getCurrentSentence();
 	/** 
 	 * update the content of the sentence strings
 	 */
@@ -59,8 +59,8 @@ class CLyrics {
 	unsigned int getEndTime(int sentence);
 	
 	std::string m_past, m_now, m_future, m_next;
-	std::vector<TNote> m_lyrics;
-	std::vector<std::vector<TNote> > m_formatted;
+	std::vector<Note> m_lyrics;
+	std::vector<std::vector<Note> > m_formatted;
 	int m_lastSyllableIdx;
 	int m_lastSentenceIdx;
 	float m_gap;

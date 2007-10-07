@@ -22,13 +22,9 @@ struct TScore {
 	std::string length;
 };
 
-#define TYPE_NOTE_FREESTYLE 0
-#define TYPE_NOTE_NORMAL  1
-#define TYPE_NOTE_GOLDEN 2
-#define TYPE_NOTE_SLEEP 3
-
-struct TNote {
-	int type;
+struct Note {
+	Note(std::string const& line, int* relShift);
+	enum Type { FREESTYLE = 'F', NORMAL = ':', GOLDEN = '*', SLEEP = '-'} type;
 	int timestamp;
 	int length;
 	int note;
@@ -38,12 +34,12 @@ struct TNote {
 
 class CSong: boost::noncopyable {
   public:
-	CSong();
+	CSong(std::string const& path, std::string const& filename);
 	~CSong() {
 		unloadBackground();
 		unloadCover();
 	}
-	void parseFile();
+	bool parseField(std::string const& line);
 	std::string str() const { return title + " by " + artist; }
 	unsigned int index;
 	std::string path;
@@ -72,7 +68,7 @@ class CSong: boost::noncopyable {
 	TScore score[3];
 	int noteMin;
 	int noteMax;
-	std::vector<TNote> notes;
+	std::vector<Note> notes;
 	bool visible;
 	bool main;
 	int maxScore;
