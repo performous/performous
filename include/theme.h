@@ -80,6 +80,7 @@ struct CThemePractice: boost::noncopyable {
 	~CThemePractice();
 	CairoSVG *bg;
 	TThemeTxt notetxt;
+	TThemeRect peak;
 	CTheme *theme;
 };
 

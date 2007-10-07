@@ -18,7 +18,7 @@
    sodipodi:version="0.32"
    inkscape:version="0.45.1"
    sodipodi:docname="practice_bg.svg"
-   sodipodi:docbase="/usr/share/games/ultrastar-ng/themes/lima"
+   sodipodi:docbase="/home/yoda/UltraStar/sf/UltraStar-ng/themes/lima"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <metadata
      id="metadata35">
@@ -33,7 +33,7 @@
   </metadata>
   <sodipodi:namedview
      inkscape:window-height="958"
-     inkscape:window-width="1680"
+     inkscape:window-width="1672"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      guidetolerance="10.0"
@@ -43,11 +43,11 @@
      bordercolor="#666666"
      pagecolor="#ffffff"
      id="base"
-     inkscape:zoom="2"
-     inkscape:cx="419.10041"
-     inkscape:cy="298.10329"
+     inkscape:zoom="1.7583389"
+     inkscape:cx="400"
+     inkscape:cy="-21.06711"
      inkscape:window-x="0"
-     inkscape:window-y="28"
+     inkscape:window-y="0"
      inkscape:current-layer="svg559" />
   <defs
      id="defs561">
@@ -105,6 +105,51 @@
        x2="-119.44304"
        y2="458.88043"
        gradientTransform="translate(51.94021,36.59109)" />
+    <linearGradient
+       gradientTransform="matrix(1.0014872,0,0,0.7683075,246.12035,623.06034)"
+       spreadMethod="pad"
+       gradientUnits="userSpaceOnUse"
+       y2="16.037733"
+       x2="3.5220373"
+       y1="-144.46541"
+       x1="439.74841"
+       id="linearGradient3138"
+       xlink:href="#linearGradient4175"
+       inkscape:collect="always" />
+    <linearGradient
+       id="linearGradient3132">
+      <stop
+         id="stop3134"
+         offset="0"
+         style="stop-color:#000000;stop-opacity:1" />
+      <stop
+         style="stop-color:#c0c0c0;stop-opacity:1;"
+         offset="0.2"
+         id="stop3142" />
+      <stop
+         id="stop3144"
+         offset="0.80000001"
+         style="stop-color:#c0c0c0;stop-opacity:1;" />
+      <stop
+         id="stop3136"
+         offset="1"
+         style="stop-color:#6e6e6e;stop-opacity:1;" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4175">
+      <stop
+         style="stop-color:#00fe00;stop-opacity:0.39215687;"
+         offset="0"
+         id="stop4181" />
+      <stop
+         id="stop4187"
+         offset="0.84615386"
+         style="stop-color:#fefe00;stop-opacity:0.39215687;" />
+      <stop
+         style="stop-color:#fe0000;stop-opacity:0.39215687;"
+         offset="1"
+         id="stop4183" />
+    </linearGradient>
   </defs>
   <rect
      style="color:black;fill:#81d000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:block;overflow:visible"
@@ -474,5 +519,16 @@
          style="fill:#000000;fill-opacity:1"
          d="M 243.979,540.86798 C 244.02398,543.69258 242.7636,546.43815 240.76469,548.40449 C 238.27527,550.89277 235.01791,552.47534 231.69762,553.53261 C 231.2559,553.77182 230.5897,553.45643 231.2855,553.13144 C 232.62346,552.52289 234.01319,552.0005 235.24564,551.1808 C 237.96799,549.4975 240.26523,546.84674 240.82279,543.61854 C 241.14771,541.65352 241.05724,539.60795 240.56484,537.67852 C 240.20352,536.25993 239.22033,534.7955 237.66352,534.58587 C 236.25068,534.36961 234.74885,534.85905 233.74057,535.88093 C 233.47541,536.14967 232.95916,536.89403 233.04435,537.74747 C 233.64637,537.27468 233.60528,537.32732 234.099,537.10717 C 235.23573,536.60031 236.74349,537.32105 237.027,538.57272 C 237.32909,539.72295 237.09551,541.18638 235.96036,541.7996 C 234.77512,542.44413 233.02612,542.17738 232.3645,540.90866 C 231.26916,538.95418 231.87147,536.28193 233.64202,534.92571 C 235.44514,533.42924 238.07609,533.37089 240.19963,534.13862 C 242.38419,534.95111 243.68629,537.21483 243.89691,539.45694 C 243.95419,539.92492 243.97896,540.39668 243.979,540.86798 z " />
     </g>
+  </g>
+  <g
+     id="g2498"
+     inkscape:label="Calque 1">
+    <rect
+       y="590"
+       x="0"
+       height="10"
+       width="800"
+       id="rect2159"
+       style="fill:url(#linearGradient3138);fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
   </g>
 </svg>

@@ -18,7 +18,6 @@ void CScreenPractice::enter() {
 	double unitY = m_height/600.;
 	texture_note = loadSVG("practice_note.svg", 40 * unitX, 25 * unitY, cairo_svg_note);
 	texture_sharp = loadSVG("practice_sharp.svg", 25 * unitX, 75 * unitY, cairo_svg_sharp);
-	texture_peak = loadSVG("practice_peak.svg", 800 * unitX, 10 * unitY, cairo_svg_peak);
 
 	theme = new CThemePractice(m_width, m_height);
 	bg_texture = sm->getVideoDriver()->initSurface(theme->bg->getSDLSurface());
@@ -29,7 +28,6 @@ void CScreenPractice::exit()
 	delete theme;
 	delete cairo_svg_note;
 	delete cairo_svg_sharp;
-	delete cairo_svg_peak;
 }
 
 void CScreenPractice::manageEvent(SDL_Event event)
@@ -59,8 +57,10 @@ void CScreenPractice::draw()
 
 	// getPeak returns 0.0 when clipping, negative values when not that loud.
 	// Normalizing to [-1.0, 0.0], where -1.0 is -40 dB or less.
-	double peak = std::min(0.0, std::max(-1.0, m_analyzer.getPeak() / 40.0));
-	sm->getVideoDriver()->drawSurface(texture_peak, peak * 800 * resFactorX, 590.0 * resFactorY);
+	double peak = std::min(0.0, std::max(-1.0, m_analyzer.getPeak() / 40.0))+1.0;
+
+	theme->peak.width = theme->peak.final_width* peak;
+	theme->theme->DrawRect(theme->peak); 
 
 	if(freq != 0.0) {
 		std::string text = scale.getNoteStr(freq);

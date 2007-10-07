@@ -383,6 +383,7 @@ CThemePractice::CThemePractice(unsigned int width, unsigned int height) {
 	bg = new CairoSVG(sm->getThemePathFile("practice_bg.svg"), width, height);
 	theme = new CTheme(width, height);
 	theme->ParseSVGForText(sm->getThemePathFile("practice_txt.svg"), &notetxt);
+	theme->ParseSVGForRect(sm->getThemePathFile("practice_peak.svg"), &peak);
 }
 
 CThemePractice::~CThemePractice() {
