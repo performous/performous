@@ -18,7 +18,6 @@ void CScreenSongs::enter() {
 }
 
 void CScreenSongs::exit() {
-	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	m_playing.clear();
 	delete theme;
 }
