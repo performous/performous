@@ -13,6 +13,7 @@ CScreenSongs::CScreenSongs(std::string const& name, unsigned int width, unsigned
 
 void CScreenSongs::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
+	sm->getAudio()->stopMusic();
 	theme = new CThemeSongs(m_width, m_height);
 	bg_texture = sm->getVideoDriver()->initSurface(theme->bg->getSDLSurface());
 }
@@ -35,7 +36,7 @@ void CScreenSongs::manageEvent(SDL_Event event) {
 		else if (keysym.unicode >= 0x20 && keysym.unicode < 0x7F) m_search += keysym.unicode;
 		sm->getSongs()->setFilter(m_search);
 	}
-	else if (key == SDLK_ESCAPE) sm->activateScreen("Intro");
+	else if (key == SDLK_ESCAPE || key == SDLK_q) sm->activateScreen("Intro");
 	// The rest are only available when there are songs available
 	else if (sm->getSongs()->empty()) return;
 	else if (key == SDLK_SPACE) sm->getAudio()->togglePause();

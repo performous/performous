@@ -15,10 +15,6 @@
 #include <string>
 #include <vector>
 
-#ifndef DATA_DIR
-#define DATA_DIR "/usr/local/share/ultrastar-ng"
-#endif
-
 SDL_Surface * screenSDL;
 
 static void checkEvents_SDL(CScreenManager& sm) {

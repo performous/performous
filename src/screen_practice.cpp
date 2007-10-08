@@ -32,14 +32,11 @@ void CScreenPractice::exit()
 
 void CScreenPractice::manageEvent(SDL_Event event)
 {
-	int keypressed;
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
-	switch(event.type) {
-		case SDL_KEYDOWN:
-			keypressed = event.key.keysym.sym;
-			if(keypressed == SDLK_ESCAPE || keypressed == SDLK_q) {
-				sm->activateScreen("Intro");
-			}
+	if (event.type == SDL_KEYDOWN) {
+		int key = event.key.keysym.sym;
+		if (key == SDLK_ESCAPE || key == SDLK_q) sm->activateScreen("Intro");
+		else if (key == SDLK_SPACE) sm->getAudio()->togglePause();
 	}
 }
 
@@ -68,8 +65,7 @@ void CScreenPractice::draw()
 		theme->theme->PrintText(&theme->notetxt);
 		std::vector<Tone> tones = m_analyzer.getTones();
 		for (size_t i = 0; i < tones.size(); ++i) {
-			if(tones[i].freq() == 0.0)
-				continue;
+			if(tones[i].freq() == 0.0) continue;
 			int note = scale.getNoteId(tones[i].freq());
 			int posXnote;
 			int posYnote;

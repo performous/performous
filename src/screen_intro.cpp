@@ -17,7 +17,6 @@ void CScreenIntro::enter() {
 
 void CScreenIntro::exit() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
-	sm->getAudio()->stopMusic();
 }
 
 void CScreenIntro::manageEvent(SDL_Event event) {

@@ -28,29 +28,16 @@ void CScreenConfiguration::exit()
 
 void CScreenConfiguration::manageEvent(SDL_Event event)
 {
-	int keypressed;
+	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	SDLMod modifier;
-
-	switch(event.type) {
-		case SDL_KEYDOWN:
-			keypressed = event.key.keysym.sym;
-			modifier   = event.key.keysym.mod;
-
-			if(keypressed == SDLK_ESCAPE) {
-				CScreenManager::getSingletonPtr()->activateScreen("Intro");
-			} else if(keypressed == SDLK_LEFT) {
-				if(!configuration[selected]->isFirst())
-					configuration[selected]->setPrevious();
-			} else if(keypressed == SDLK_RIGHT) {
-				if(!configuration[selected]->isLast())
-					configuration[selected]->setNext();
-			} else if(keypressed == SDLK_UP) {
-				if(selected > 0)
-					selected--;
-			} else if(keypressed == SDLK_DOWN) {
-				if(selected < configuration.size() - 1 )
-					selected++;
-			}
+	if (event.type == SDL_KEYDOWN) {
+		int key = event.key.keysym.sym;
+		if (key == SDLK_ESCAPE || key == SDLK_q) CScreenManager::getSingletonPtr()->activateScreen("Intro");
+		else if (key == SDLK_SPACE) sm->getAudio()->togglePause();
+		else if (key == SDLK_UP && selected > 0) --selected;
+		else if (key == SDLK_DOWN && selected + 1 < configuration.size()) ++selected;
+		else if (key == SDLK_LEFT && !configuration[selected]->isFirst()) configuration[selected]->setPrevious();
+		else if (key == SDLK_RIGHT && !configuration[selected]->isLast()) configuration[selected]->setNext();
 	}
 }
 
