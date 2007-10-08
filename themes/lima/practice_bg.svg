@@ -44,11 +44,11 @@
      pagecolor="#ffffff"
      id="base"
      inkscape:zoom="2.4866667"
-     inkscape:cx="470.02393"
+     inkscape:cx="518.50204"
      inkscape:cy="125.40666"
      inkscape:window-x="0"
      inkscape:window-y="0"
-     inkscape:current-layer="g2498" />
+     inkscape:current-layer="svg559" />
   <defs
      id="defs561">
     <linearGradient
@@ -143,12 +143,20 @@
          id="stop4181" />
       <stop
          id="stop3194"
-         offset="0.42307693"
+         offset="0.36658654"
          style="stop-color:#7ffe00;stop-opacity:0.39215686;" />
       <stop
          id="stop4187"
-         offset="0.92788464"
-         style="stop-color:#fefe00;stop-opacity:0.7525773;" />
+         offset="0.78887218"
+         style="stop-color:#fefe00;stop-opacity:1;" />
+      <stop
+         style="stop-color:#feff00;stop-opacity:1;"
+         offset="0.8442241"
+         id="stop4188" />
+      <stop
+         style="stop-color:#fe0000;stop-opacity:1;"
+         offset="0.95492792"
+         id="stop4185" />
       <stop
          style="stop-color:#fe0000;stop-opacity:1;"
          offset="1"
