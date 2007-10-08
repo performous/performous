@@ -1,49 +1,40 @@
 #ifndef __CONFIGURATION_H__
 #define __CONFIGURATION_H__
 
-#include "../config.h"
+#include <string>
 
 class CConfiguration {
-	public:
-		CConfiguration() {};
-		virtual ~CConfiguration() {};
-		virtual bool isLast()=0;
-		virtual bool isFirst()=0;
-		virtual void setNext()=0;
-		virtual void setPrevious()=0;
-		const char * getDescription() {return description;};
-		virtual char * getValue()=0;
-	protected:
-		virtual void apply()=0;
-		const char * description;
+  public:
+	CConfiguration(std::string const& description): m_description(description) {};
+	virtual ~CConfiguration() {};
+	virtual void setNext() = 0;
+	virtual void setPrevious() = 0;
+	std::string const& getDescription() const { return m_description; };
+	virtual std::string getValue() const = 0;
+  private:
+	std::string m_description;
 };
 
-class CConfigurationFullscreen : public CConfiguration {
-	public:
-		CConfigurationFullscreen();
-		~CConfigurationFullscreen();
-		bool isLast();
-		bool isFirst();
-		void setNext();
-		void setPrevious();
-		char * getValue();
-	protected:
-		void apply();
-		bool fullscreen;
+class CConfigurationFullscreen: public CConfiguration {
+  public:
+	CConfigurationFullscreen();
+	void setNext() { m_fs = !m_fs; apply(); }
+	void setPrevious() { setNext(); }
+	std::string getValue() const;
+  private:
+	void apply();
+	bool m_fs;
 };
 
-class CConfigurationAudioVolume : public CConfiguration {
-	public:
-		CConfigurationAudioVolume();
-		~CConfigurationAudioVolume();
-		bool isLast();
-		bool isFirst();
-		void setNext();
-		void setPrevious();
-		char * getValue();
-	protected:
-		void apply();
-		unsigned int audioVolume;
-		char value[32];
+class CConfigurationAudioVolume: public CConfiguration {
+  public:
+	CConfigurationAudioVolume();
+	void setNext();
+	void setPrevious();
+	std::string getValue() const;
+  private:
+	void apply();
+	unsigned int m_volume;
 };
+
 #endif

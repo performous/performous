@@ -1,85 +1,35 @@
 #include <configuration.h>
 #include <screen.h>
+#include <boost/lexical_cast.hpp>
 
-CConfigurationFullscreen::CConfigurationFullscreen()
-{
-	CScreenManager * sm = CScreenManager::getSingletonPtr();
-	fullscreen = sm->getFullscreenStatus();
-	description="Fullscreen mode";
+CConfigurationFullscreen::CConfigurationFullscreen():
+  CConfiguration("Fullscreen Mode"), m_fs(CScreenManager::getSingletonPtr()->getFullscreenStatus())
+{}
+std::string CConfigurationFullscreen::getValue() const {
+	return m_fs ? "Fullscreen" : "Windowed";
 }
-CConfigurationFullscreen::~CConfigurationFullscreen()
-{
-}
-bool CConfigurationFullscreen::isLast()
-{
-	return false;
-}
-bool CConfigurationFullscreen::isFirst()
-{
-	return false;
-}
-void CConfigurationFullscreen::setNext()
-{
-	fullscreen = !fullscreen;
-	apply();
-}
-void CConfigurationFullscreen::setPrevious()
-{
-	fullscreen = !fullscreen;
-	apply();
-}
-char * CConfigurationFullscreen::getValue()
-{
-	if(fullscreen)
-		return (char*)"Fullscreen";
-	else
-		return (char*)"Windowed";
-}
-void CConfigurationFullscreen::apply()
-{
-	CScreenManager * sm = CScreenManager::getSingletonPtr();
-	if( sm->getFullscreenStatus() != fullscreen ) {
+void CConfigurationFullscreen::apply() {
+	CScreenManager* sm = CScreenManager::getSingletonPtr();
+	if( sm->getFullscreenStatus() != m_fs ) {
 		SDL_WM_ToggleFullScreen(sm->getSDLScreen());
-		sm->setFullscreenStatus(fullscreen);
+		sm->setFullscreenStatus(m_fs);
 	}
 }
 
-/****************************************************************************/
-
-CConfigurationAudioVolume::CConfigurationAudioVolume()
-{
-	CScreenManager * sm = CScreenManager::getSingletonPtr();
-	audioVolume = sm->getAudio()->getVolume();
-	description="Audio Volume";
+CConfigurationAudioVolume::CConfigurationAudioVolume():
+  CConfiguration("Audio Volume"), m_volume(CScreenManager::getSingletonPtr()->getAudio()->getVolume())
+{}
+void CConfigurationAudioVolume::setNext() {
+	if (m_volume >= 100) return;
+	m_volume++; apply();
 }
-CConfigurationAudioVolume::~CConfigurationAudioVolume()
-{
+void CConfigurationAudioVolume::setPrevious() {
+	if (m_volume <= 0) return;
+	m_volume--; apply();
 }
-bool CConfigurationAudioVolume::isLast()
-{
-	return (audioVolume>=100);
+std::string CConfigurationAudioVolume::getValue() const {
+	return boost::lexical_cast<std::string>(m_volume);
 }
-bool CConfigurationAudioVolume::isFirst()
-{
-	return (audioVolume<=0);
-}
-void CConfigurationAudioVolume::setNext()
-{
-	audioVolume++;
-	apply();
-}
-void CConfigurationAudioVolume::setPrevious()
-{
-	audioVolume--;
-	apply();
-}
-char * CConfigurationAudioVolume::getValue()
-{
-	sprintf(value,"%d%%",audioVolume);
-	return value;
-}
-void CConfigurationAudioVolume::apply()
-{
-	CScreenManager * sm = CScreenManager::getSingletonPtr();
-	sm->getAudio()->setVolume(audioVolume);
+void CConfigurationAudioVolume::apply() {
+	CScreenManager::getSingletonPtr()->getAudio()->setVolume(m_volume);
 }
