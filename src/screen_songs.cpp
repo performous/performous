@@ -56,26 +56,26 @@ void CScreenSongs::manageEvent(SDL_Event event) {
 	else if (key == SDLK_DOWN) sm->getSongs()->sortChange(1);
 }
 
+namespace {
+	void print(CThemeSongs* theme, TThemeTxt t, std::string const& text) {
+		t.text = text;
+		do {
+			cairo_text_extents_t extents = theme->theme->GetTextExtents(t);
+			t.x = (t.svg_width - extents.width)/2;
+		} while (t.x < 0 && (t.fontsize -= 2) > 0);
+		theme->theme->PrintText(&t);
+	}
+}
+
 void CScreenSongs::draw() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
-
 	theme->theme->clear();
 	SDL_Surface *virtSurf = theme->bg->getSDLSurface();
-
 	// Draw the "Order by" text
-	{
-		theme->order.text = (m_searching ? "find: " + m_search : sm->getSongs()->sortDesc());
-		cairo_text_extents_t extents = theme->theme->GetTextExtents(theme->order);
-		theme->order.x = (theme->order.svg_width - extents.width)/2;
-		theme->theme->PrintText(&theme->order);
-	}
+	print(theme, theme->order, (m_searching ? "find: " + m_search : sm->getSongs()->sortDesc()));
 	// Test if there are no songs
 	if (sm->getSongs()->empty()) {
-		// Draw the "Song information"
-		theme->song.text = "no songs found";
-		cairo_text_extents_t extents = theme->theme->GetTextExtents(theme->song);
-		theme->song.x = (theme->song.svg_width - extents.width)/2;
-		theme->theme->PrintText(&theme->song);
+		print(theme, theme->song, "no songs found");
 		if (!m_playing.empty()) { sm->getAudio()->stopMusic(); m_playing.clear(); }
 	} else {
 		CSong& song = sm->getSongs()->current();
@@ -83,16 +83,8 @@ void CScreenSongs::draw() {
 		{
 			std::ostringstream oss;
 			CSongs& s = *sm->getSongs();
-			oss << "(" << s.currentId() + 1 << "/" << s.size() << ")\n" << song.str();
-			theme->song.text = oss.str();
-			double oldfontsize = theme->song.fontsize;
-			do {
-				cairo_text_extents_t extents = theme->theme->GetTextExtents(theme->song);
-				theme->song.x = (theme->song.svg_width - extents.width)/2;
-			} while (theme->song.x < 0 && (theme->song.fontsize -= 2) > 0);
-			theme->theme->PrintText(&theme->song);
-			theme->song.fontsize = oldfontsize;
-
+			oss << song.str() << "\n(" << s.currentId() + 1 << "/" << s.size() << ")";
+			print(theme, theme->song, oss.str());
 		}
 		// Draw the cover
 		{
@@ -107,7 +99,7 @@ void CScreenSongs::draw() {
 			SDL_FillRect(virtSurf, &position, SDL_MapRGB(virtSurf->format, 255, 255, 255));
 			SDL_BlitSurface(surf, NULL, virtSurf, &position);
 		}
-		// Play a preview of the song starting from 0:30 (no loop anymore)
+		// Play a preview of the song
 		std::string file = song.path + song.mp3;
 		if (file != m_playing) sm->getAudio()->playPreview(m_playing = file);
 	}

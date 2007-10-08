@@ -57,6 +57,7 @@ CSong::CSong(std::string const& _path, std::string const& _filename):
 	std::size_t linenum = 0;
 	try {
 		while (++linenum, std::getline(f, line) && parseField(line));
+		if (title.empty() || artist.empty()) throw std::runtime_error("Required header fields missing");
 		int relativeShift = 0;
 		int prevtime = 0;
 		do {
@@ -104,7 +105,6 @@ CSong::CSong(std::string const& _path, std::string const& _filename):
 		oss << filename << " line " << linenum << ": " << e.what();
 		throw std::runtime_error(oss.str());
 	}
-	if (title.empty() || artist.empty()) throw std::runtime_error(filename + ": Required fields missing");
 }
 
 namespace {
