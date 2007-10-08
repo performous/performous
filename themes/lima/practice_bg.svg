@@ -18,7 +18,7 @@
    sodipodi:version="0.32"
    inkscape:version="0.45.1"
    sodipodi:docname="practice_bg.svg"
-   sodipodi:docbase="/home/yoda/UltraStar/sf/UltraStar-ng/themes/lima"
+   sodipodi:docbase="/root/UltraStar-ng/themes/lima"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <metadata
      id="metadata35">
@@ -32,8 +32,8 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="958"
-     inkscape:window-width="1672"
+     inkscape:window-height="1149"
+     inkscape:window-width="1920"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      guidetolerance="10.0"
@@ -43,12 +43,12 @@
      bordercolor="#666666"
      pagecolor="#ffffff"
      id="base"
-     inkscape:zoom="1.7583389"
-     inkscape:cx="400"
-     inkscape:cy="-21.06711"
+     inkscape:zoom="2.4866667"
+     inkscape:cx="470.02393"
+     inkscape:cy="125.40666"
      inkscape:window-x="0"
      inkscape:window-y="0"
-     inkscape:current-layer="svg559" />
+     inkscape:current-layer="g2498" />
   <defs
      id="defs561">
     <linearGradient
@@ -106,13 +106,13 @@
        y2="458.88043"
        gradientTransform="translate(51.94021,36.59109)" />
     <linearGradient
-       gradientTransform="matrix(1.0014872,0,0,0.7683075,246.12035,623.06034)"
+       gradientTransform="matrix(1.0016226,0,0,0.6174366,246.09954,616.51887)"
        spreadMethod="pad"
        gradientUnits="userSpaceOnUse"
-       y2="16.037733"
-       x2="3.5220373"
-       y1="-144.46541"
-       x1="439.74841"
+       y2="-29.392153"
+       x2="553.57922"
+       y1="-29.392153"
+       x1="-246.27696"
        id="linearGradient3138"
        xlink:href="#linearGradient4175"
        inkscape:collect="always" />
@@ -138,15 +138,19 @@
     <linearGradient
        id="linearGradient4175">
       <stop
-         style="stop-color:#00fe00;stop-opacity:0.39215687;"
+         style="stop-color:#00fe00;stop-opacity:0;"
          offset="0"
          id="stop4181" />
       <stop
-         id="stop4187"
-         offset="0.84615386"
-         style="stop-color:#fefe00;stop-opacity:0.39215687;" />
+         id="stop3194"
+         offset="0.42307693"
+         style="stop-color:#7ffe00;stop-opacity:0.39215686;" />
       <stop
-         style="stop-color:#fe0000;stop-opacity:0.39215687;"
+         id="stop4187"
+         offset="0.92788464"
+         style="stop-color:#fefe00;stop-opacity:0.7525773;" />
+      <stop
+         style="stop-color:#fe0000;stop-opacity:1;"
          offset="1"
          id="stop4183" />
     </linearGradient>
@@ -522,13 +526,74 @@
   </g>
   <g
      id="g2498"
-     inkscape:label="Calque 1">
+     inkscape:label="Calque 1"
+     transform="matrix(1.0085196,0,0,1.1028963,-3.9766077,-60.654593)">
     <rect
-       y="590"
-       x="0"
-       height="10"
-       width="800"
+       y="589.9505"
+       x="-0.054108903"
+       height="8.0363207"
+       width="800.10822"
        id="rect2159"
-       style="fill:url(#linearGradient3138);fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+       style="fill:url(#linearGradient3138);fill-opacity:1;stroke:#000000;stroke-width:0.89651597;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <text
+       xml:space="preserve"
+       style="font-size:7.58543634px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Verdana"
+       x="375.28482"
+       y="623.34161"
+       id="text3196"
+       transform="scale(1.0457435,0.9562575)"
+       sodipodi:linespacing="100%"><tspan
+         sodipodi:role="line"
+         id="tspan3198"
+         x="375.28482"
+         y="623.34161">-20</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:7.58543777px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Verdana"
+       x="565.71143"
+       y="623.45697"
+       id="text3200"
+       transform="scale(1.0457435,0.9562575)"
+       sodipodi:linespacing="100%"><tspan
+         sodipodi:role="line"
+         id="tspan3202"
+         x="565.71143"
+         y="623.45697">-10</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:7.5854373px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Verdana"
+       x="4.4299479"
+       y="623.45697"
+       id="text3204"
+       transform="scale(1.0457435,0.9562575)"
+       sodipodi:linespacing="100%"><tspan
+         sodipodi:role="line"
+         id="tspan3206"
+         x="4.4299479"
+         y="623.45697">Peak dB meter</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:7.5854373px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Verdana"
+       x="186.69392"
+       y="623.45697"
+       id="text3208"
+       transform="scale(1.0457435,0.9562575)"
+       sodipodi:linespacing="100%"><tspan
+         sodipodi:role="line"
+         id="tspan3210"
+         x="186.69392"
+         y="623.45697">-30</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:7.58543777px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Verdana"
+       x="721.66534"
+       y="623.45697"
+       id="text3212"
+       transform="scale(1.0457435,0.9562575)"
+       sodipodi:linespacing="100%"><tspan
+         sodipodi:role="line"
+         id="tspan3214"
+         x="721.66534"
+         y="623.45697">Clipping→</tspan></text>
   </g>
 </svg>
