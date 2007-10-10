@@ -25,7 +25,7 @@ void CScreenScore::draw() {
 	CSong& song = sm->getSongs()->current();
 	theme->theme->clear();
 	// Draw some numbers
-	int score = (int) song.score[0].score;
+	int score = song.getScore();
 	char scoreStr[32];
 	char rankStr[32];
 	float scorePercent;

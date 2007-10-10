@@ -70,10 +70,8 @@ void CScreenSing::enter() {
 	std::cout << "Now playing: " << file << std::endl;
 	sm->getAudio()->playMusic(file.c_str());
 	lyrics = new CLyrics(song.notes, song.gap, song.bpm[0].bpm);
-	song.score[0].score = 0;
-	song.score[0].hits = 0;
-	song.score[0].total = 0;
 	playOffset = 0;
+	song.reset();
 }
 
 void CScreenSing::exit() {
@@ -157,6 +155,8 @@ void CScreenSing::draw() {
 	}
 	// Get the time in the song
 	unsigned int time = sm->getAudio()->getPosition();
+	song.update(time, note);
+
 	// Test is playOffset + time > 0
 	if (playOffset < 0 && time < (unsigned int)(playOffset*-1)) time = 0;
 	else time += playOffset;
@@ -199,7 +199,7 @@ void CScreenSing::draw() {
 	//draw score		
 	{
 		char scoreStr[32];
-		sprintf(scoreStr,"%04d",int(song.score[0].score/10)*10);
+		sprintf(scoreStr,"%04d", song.getScore());
 		theme->p1score.text = scoreStr;
 		theme->theme->PrintText(&theme->p1score);
 	}
@@ -294,11 +294,6 @@ void CScreenSing::draw() {
 			tmprect.fill_col.g = 200;
 			tmprect.fill_col.b = 200;
 			theme->theme->DrawRect(tmprect);
-
-			float factor = ((float) m_sentence[i].curMaxScore)/song.maxScore;
-			if (factor >= 0 && factor <= 1){
-				song.score[0].score = (int)(10000*factor* song.score[0].hits/(song.score[0].total + 1));
-			}
 		}
 	}
 
@@ -315,14 +310,6 @@ void CScreenSing::draw() {
 			int noteSingFinal = m_sentence[i].note - diff;
 			int noteheight=((18*numOctaves-noteSingFinal+lowestC)*m_height/2/numOctaves/12);
 			pitchGraph.renderPitch(double(noteheight) / m_height, graphTime);
-			// Is the note currently playing?
-			if (time >= ((m_sentence[i].timestamp) * 60 * 1000) / (song.bpm[0].bpm * 4) + song.gap &&
-			  time <= ((m_sentence[i].timestamp+m_sentence[i].length) * 60 * 1000) / (song.bpm[0].bpm * 4) + song.gap) {
-				song.score[0].total += 2;
-				int error = abs(diff);
-				if (error == 0) song.score[0].hits += 2;
-				if (error == 1) song.score[0].hits += 1;
-			}
 		}
 	}
 	

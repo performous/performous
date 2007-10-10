@@ -14,14 +14,6 @@ struct TBpm {
 	float start;
 };
 
-struct TScore {
-	std::string name;
-	int hits;
-	int total;
-	int score;
-	std::string length;
-};
-
 struct Note {
 	Note(std::string const& line, int* relShift);
 	enum Type { FREESTYLE = 'F', NORMAL = ':', GOLDEN = '*', SLEEP = '-'} type;
@@ -39,6 +31,17 @@ class CSong: boost::noncopyable {
 		unloadBackground();
 		unloadCover();
 	}
+	// Temporary score calculation system
+	void reset() { m_score = 0.0; m_time = 0.0; }
+	void update(double time, int note) {
+		if (time <= m_time) return;
+		if (note != -1) m_score += (time - m_time) / 100000.0;
+		if (m_score > 1.0) m_score = 1.0;
+		m_time = time;
+	}
+	int getScore() const { return 10000 * m_score; }
+	double m_score;
+	double m_time;
 	bool parseField(std::string const& line);
 	std::string str() const { return title + " by " + artist; }
 	unsigned int index;
@@ -65,13 +68,11 @@ class CSong: boost::noncopyable {
 	bool relative;
 	std::vector<TBpm> bpm;
 	float gap;
-	TScore score[3];
 	int noteMin;
 	int noteMax;
 	std::vector<Note> notes;
 	bool visible;
 	bool main;
-	int maxScore;
 	void loadBackground();
 	void loadCover();
 	void unloadBackground();
