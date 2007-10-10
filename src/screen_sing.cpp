@@ -179,7 +179,6 @@ void CScreenSing::draw() {
 	if (!video->isPlaying() && time > song.videoGap) video->play();
 
 	if (video->isPlaying()) {
-		/* FIXME: make video work with opengl, SMPEG sets alpha channel to zero */
 		SDL_BlitSurface(videoSurf,NULL,backgroundSurf,NULL);
 		sm->getVideoDriver()->drawSurface(backgroundSurf);
 		sm->getVideoDriver()->drawSurface(theme->bg->getSDLSurface());
@@ -205,12 +204,10 @@ void CScreenSing::draw() {
 		theme->theme->PrintText(&theme->p1score);
 	}
 	// draw the sang note TODO: themed sang note
-	TThemeTxt tmptxt;
 	{
-		tmptxt = theme->timertxt;	   // use timertxt as template
+		TThemeTxt tmptxt = theme->timertxt; // use timertxt as template
 		tmptxt.text = scale.getNoteStr(freq);
-		tmptxt.x = 0;
-		tmptxt.y = 600;
+		tmptxt.x = 600;
 		tmptxt.fontsize = 25;
 		theme->theme->PrintText(&tmptxt);
 	}
@@ -329,7 +326,7 @@ void CScreenSing::draw() {
 		}
 	}
 	
-	tmptxt = theme->lyricspast;
+	TThemeTxt tmptxt = theme->lyricspast;
 	tmptxt.text = sentenceWhole;
 	{
 		cairo_text_extents_t extents = theme->theme->GetTextExtents(tmptxt);

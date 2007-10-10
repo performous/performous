@@ -361,8 +361,8 @@ void CTheme::getcolor(char *string, TRGBA *col) {
 }
 
 CTheme::~CTheme() {
-		if (dc) cairo_destroy(dc);
-		if (surface) cairo_surface_destroy(surface);
+	if (dc) cairo_destroy(dc);
+	if (surface) cairo_surface_destroy(surface);
 }
 
 CThemeSongs::CThemeSongs(unsigned int width, unsigned int height) {
