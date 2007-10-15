@@ -131,11 +131,11 @@ bool CSong::parseField(std::string const& line) {
 	std::string::size_type pos2 = line.find_last_not_of(" \t\r");
 	std::string value = line.substr(pos + 1, pos2 - pos);
 	if (value.empty()) throw std::runtime_error("Value missing from key " + key);
-	if (key == "TITLE") title = value;
-	else if (key == "ARTIST") artist = value;
-	else if (key == "EDITION") edition = value;
-	else if (key == "GENRE") genre = value;
-	else if (key == "CREATOR") creator = value;
+	if (key == "TITLE") title = value.substr(value.find_first_not_of(" :"));
+	else if (key == "ARTIST") artist = value.substr(value.find_first_not_of(" "));
+	else if (key == "EDITION") edition = value.substr(value.find_first_not_of(" "));
+	else if (key == "GENRE") genre = value.substr(value.find_first_not_of(" "));
+	else if (key == "CREATOR") creator = value.substr(value.find_first_not_of(" "));
 	else if (key == "COVER") cover = value;
 	else if (key == "MP3") mp3 = value;
 	else if (key == "VIDEO") video = value;
