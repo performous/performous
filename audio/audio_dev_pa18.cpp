@@ -5,8 +5,6 @@
 
 namespace da {
 	class pa18_record: public record::dev {
-		static reg_dev reg;
-		static dev* create(settings& s) { return new pa18_record(s); }
 		static int c_callback(void* input, void*, unsigned long frames, PaTimestamp, void* userdata)
 		{
 			pa18_record& self = *static_cast<pa18_record*>(userdata);
@@ -44,6 +42,7 @@ namespace da {
 			if( err != paNoError ) throw std::runtime_error("Cannot start PortAudio audio stream " + s.subdev + ": " + Pa_GetErrorText(err));
 		}
 	};
-
-	pa18_record::reg_dev pa18_record::reg("pa18", pa18_record::create);
+	namespace {
+		record_plugin::reg<pa18_record> r(info("pa18", "PortAudio v18 PCM capture. Settings are not used."));
+	}
 }

@@ -15,9 +15,7 @@ void CScreenIntro::enter() {
 	sm->getAudio()->playMusic(sm->getThemePathFile("menu.ogg"));
 }
 
-void CScreenIntro::exit() {
-	CScreenManager* sm = CScreenManager::getSingletonPtr();
-}
+void CScreenIntro::exit() {}
 
 void CScreenIntro::manageEvent(SDL_Event event) {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();

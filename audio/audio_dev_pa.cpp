@@ -5,8 +5,6 @@
 
 namespace da {
 	class pa19_record: public record::dev {
-		static reg_dev reg;
-		static dev* create(settings& s) { return new pa19_record(s); }
 		static int c_callback(const void* input, void*, unsigned long frames, const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags, void* userdata)
 		{
 			pa19_record& self = *static_cast<pa19_record*>(userdata);
@@ -57,7 +55,8 @@ namespace da {
 			s_orig = s;
 		}
 	};
-
-	pa19_record::reg_dev pa19_record::reg("pa", pa19_record::create);
+	namespace {
+		record_plugin::reg<pa19_record> r(info("pa", "PortAudio v19 PCM capture. Device number as settings (otherwise PA default)."));
+	}
 }
 

@@ -14,6 +14,7 @@ Link with libda when you use this.
 
 #include "sample.hpp"
 #include <boost/function.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <cmath>
 #include <cstddef>
 #include <iosfwd>
@@ -26,28 +27,28 @@ namespace da {
 
 	/** Provides various access iterators to a multich interleaved sample buffer. **/
 	class pcm_data {
-		sample_t* buf;
+		sample_t* m_buf;
 	  public:
 		const std::size_t frames;
 		const std::size_t channels;
-		pcm_data(sample_t* buf, std::size_t frames, std::size_t channels): buf(buf), frames(frames), channels(channels) {}
-		sample_t& operator()(std::size_t frame, std::size_t channel) { return buf[frame * channels + channel]; }
-		sample_t& operator[](std::size_t idx) { return buf[idx]; }
+		pcm_data(sample_t* buf, std::size_t _frames, std::size_t _channels): m_buf(buf), frames(_frames), channels(_channels) {}
+		sample_t& operator()(std::size_t frame, std::size_t channel) { return m_buf[frame * channels + channel]; }
+		sample_t& operator[](std::size_t idx) { return m_buf[idx]; }
 		class iter_by_ch: public std::iterator<std::random_access_iterator_tag, sample_t> {
-			sample_t* buf;
-			std::size_t pos;
-			std::size_t channels;
+			sample_t* m_buf;
+			std::size_t m_pos;
+			std::size_t m_channels;
 		  public:
-			iter_by_ch(value_type* buf, std::size_t ch, std::size_t channels): buf(buf), pos(ch), channels(channels) {}
-			value_type& operator*() { return buf[pos]; }
-			iter_by_ch operator+(int rhs) { return iter_by_ch(buf, pos + channels * rhs, channels); }
-			iter_by_ch& operator++() { pos += channels; return *this; }
-			bool operator!=(iter_by_ch const& rhs) const { return pos != rhs.pos; }
-			std::ptrdiff_t operator-(iter_by_ch const& rhs) const { return (pos - rhs.pos) / channels; }
+			iter_by_ch(value_type* buf, std::size_t ch, std::size_t channels): m_buf(buf), m_pos(ch), m_channels(channels) {}
+			value_type& operator*() { return m_buf[m_pos]; }
+			iter_by_ch operator+(int rhs) { return iter_by_ch(m_buf, m_pos + m_channels * rhs, m_channels); }
+			iter_by_ch& operator++() { m_pos += m_channels; return *this; }
+			bool operator!=(iter_by_ch const& rhs) const { return m_pos != rhs.m_pos; }
+			std::ptrdiff_t operator-(iter_by_ch const& rhs) const { return (m_pos - rhs.m_pos) / m_channels; }
 			// TODO: more operators
 		};
-		iter_by_ch begin(std::size_t ch) { return iter_by_ch(buf, ch, channels); }
-		iter_by_ch end(std::size_t ch) { return iter_by_ch(buf, ch, channels) + frames; }
+		iter_by_ch begin(std::size_t ch) { return iter_by_ch(m_buf, ch, channels); }
+		iter_by_ch end(std::size_t ch) { return iter_by_ch(m_buf, ch, channels) + frames; }
 	};
 
 	class settings;
@@ -55,44 +56,67 @@ namespace da {
 	typedef boost::function<void (pcm_data& it, settings const&)> callback_t;
 
 	struct settings {
-		callback_t callback;
 		static const std::size_t low;
 		static const std::size_t high;
-		std::string device;
-		std::string subdev;
-		std::size_t channels;
-		bool channels_near; // Allow non-exact channel counts
-		std::size_t rate;
-		bool rate_near; // Allow non-exact rates
-		std::size_t frames; // Frames per block (requested)
-		std::ostream* debug;
 		settings(std::string const& devstr = ""):
-		  channels(high),
-		  channels_near(true),
-		  rate(high),
-		  rate_near(true),
-		  frames(low),
-		  debug()
+		  m_channels(high),
+		  m_channels_near(true),
+		  m_rate(high),
+		  m_rate_near(true),
+		  m_frames(low),
+		  m_debug()
 		{
 	 		std::string::size_type pos = devstr.find(':');
-			device = devstr.substr(0, pos);
-			if (pos != std::string::npos) subdev = devstr.substr(pos + 1);
+			m_device = devstr.substr(0, pos);
+			if (pos != std::string::npos) m_subdev = devstr.substr(pos + 1);
 		}
-		settings& set_callback(callback_t val) { callback = val; return *this; }
-		settings& set_channels(std::size_t val, bool near = true) { channels = val; channels_near = near; return *this; }
-		settings& set_rate(std::size_t val, bool near = true) { rate = val; rate_near = near; return *this; }
-		settings& set_debug(std::ostream& val) { debug = &val; return *this; }
-		settings& set_debug() { debug = NULL; return *this; }
+		void debug(std::string const& msg) { if (m_debug) *m_debug << msg << std::endl; }
+		std::string const& device() const { return m_device; }
+		std::string const& subdev() const { return m_subdev; }
+		std::size_t const& frames() const { return m_frames; }
+		std::size_t const& rate() const { return m_rate; }
+		bool rate_near() const { return m_rate_near; }
+		std::size_t const& channels() const { return m_channels; }
+		bool channels_near() const { return m_channels_near; }
+		callback_t callback() const { return m_callback; }
+		settings& set_device(std::string const& val) { m_device = val; return *this; }
+		settings& set_callback(callback_t val) { m_callback = val; return *this; }
+		settings& set_frames(std::size_t val) { m_frames = val; return *this; }
+		settings& set_channels(std::size_t val, bool near = true) { m_channels = val; m_channels_near = near; return *this; }
+		settings& set_rate(std::size_t val, bool near = true) { m_rate = val; m_rate_near = near; return *this; }
+		settings& set_debug(std::ostream& val) { m_debug = &val; return *this; }
+		settings& set_debug() { m_debug = NULL; return *this; }
+	  private:
+		callback_t m_callback;
+		std::string m_device;
+		std::string m_subdev;
+		std::size_t m_channels;
+		bool m_channels_near; // Allow non-exact channel counts
+		std::size_t m_rate;
+		bool m_rate_near; // Allow non-exact rates
+		std::size_t m_frames; // Frames per block (requested)
+		std::ostream* m_debug;
 	};
 
+	class devinfo {
+		std::string m_name, m_desc;
+	  public:
+		devinfo(std::string const& _name, std::string const& _desc = ""): m_name(_name), m_desc(_desc) {}
+		bool operator<(devinfo const& other) const { return name() < other.name(); }
+		std::string const& name() const { return m_name; }
+		std::string const& desc() const { return m_desc; }
+		bool special() const { return !m_name.empty() && m_name[0] == '~'; }
+	};
+	
 	class record {
 	  public:
-		static std::vector<std::string> devices();
+		typedef std::vector<devinfo> devlist_t;
+		static devlist_t devices();
 		record(settings& s);
 		~record();
 		class dev;
 	  private:
-		dev* handle;
+		dev* m_handle;
 	};
 
 }

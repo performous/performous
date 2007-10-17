@@ -82,7 +82,7 @@ namespace {
 void Analyzer::operator()(da::pcm_data& indata, da::settings const& s)
 {
 	// Precalculated constants
-	const double freqPerBin = double(s.rate) / FFT_N;
+	const double freqPerBin = double(s.rate()) / FFT_N;
 	const double phaseStep = 2.0 * M_PI * m_step / FFT_N;
 	const double normCoeff = 1.0 / FFT_N; // WTF? This was: 4.0 / ((double)FFT_N * FFT_N);
 	const double minMagnitude = pow(10, -60.0 / 10.0) / normCoeff;

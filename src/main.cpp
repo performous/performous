@@ -1,5 +1,6 @@
 #include "../config.h"
 
+#include <audio.hpp>
 #include <screen.h>
 #include <screen_intro.h>
 #include <screen_songs.h>
@@ -8,6 +9,7 @@
 #include <screen_score.h>
 #include <screen_configuration.h>
 #include <video_driver.h>
+#include <boost/format.hpp>
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
 #include <cstdlib>
@@ -67,7 +69,7 @@ int main(int argc, char** argv) {
 		  ("fs,f", "enable full screen mode")
 		  ("width,W", po::value<unsigned int>(&width)->default_value(800), "set horizontal resolution")
 		  ("height,H", po::value<unsigned int>(&height)->default_value(600), "set vertical resolution")
-		  ("cdev", po::value<std::string>(&cdev), "set capture device, dev[:settings], e.g.\n  alsa:hw:Intel\n  gst\n  portaudio\n  ~tone:300.amplitude(-20):440\n  none")
+		  ("cdev", po::value<std::string>(&cdev), "set capture device (disable autodetection)\n  --cdev dev[:settings]\n  --cdev help for list of devices")
 		  ("crate", po::value<std::size_t>(&crate)->default_value(48000), "set capture frequency\n  44100 and 48000 Hz are optimal")
 		  ("version,v", "display version number");
 		po::variables_map vm;
@@ -81,6 +83,14 @@ int main(int argc, char** argv) {
 		}
 		if (vm.count("help")) {
 			std::cout << desc << std::endl;
+			return 0;
+		}
+		if (cdev == "help") {
+			da::record::devlist_t l = da::record::devices();
+			std::cout << "Recording devices:" << std::endl;
+			for (da::record::devlist_t::const_iterator it = l.begin(); it != l.end(); ++it) {
+				std::cout << boost::format("  %1% %|10t|%2%\n") % it->name() % it->desc();
+			}
 			return 0;
 		}
 		if (vm.count("version")) {

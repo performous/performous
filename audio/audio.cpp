@@ -7,45 +7,42 @@ namespace da {
 	const std::size_t settings::high = std::numeric_limits<std::size_t>::max();
 
 	namespace {
-		template <typename T> std::string get_first(T const& pair) { return pair.first; }
-		char const* none = "none";
+		std::string none = "none";
 	}
 
-	std::vector<std::string> record::devices() {
-		dev::map_t& m = dev::map();
-		std::vector<std::string> v(m.size());
-		std::transform(m.begin(), m.end(), v.begin(), get_first<dev::map_t::value_type>);
-		v.push_back(none);
-		return v;
+	record::devlist_t record::devices() {
+		devlist_t l(record_plugin::begin(), record_plugin::end());
+		l.push_back(devinfo(none, "No device. Will not receive any audio data."));
+		return l;
 	}
 
-	record::record(settings& s): handle() {
-		if (s.device == none) { s.device = none; return; }
-		dev::map_t& m = dev::map();
-		if (m.empty()) throw std::runtime_error("No recording devices installed");
-		dev::map_t::const_iterator it;
-		if (s.device.empty()) {
+	record::record(settings& s): m_handle() {
+		if (s.device() == none) return;
+		if (record_plugin::empty()) throw std::runtime_error("No recording devices installed");
+		if (s.device().empty()) {
 			// Try all normal devices
-			for (it = m.begin(); it != m.end() && !it->first.empty() && it->first[0] != '~'; ++it) {
+			for (record_plugin::iterator it = record_plugin::begin(); it != record_plugin::end(); ++it) {
+				if (it->special()) continue;
 				try {
-					if (s.debug) *s.debug << ">>> Recording from " << it->first << std::endl;
-					handle = it->second(s);
-					s.device = it->first;
+					s.debug(">>> Recording from " + it->name());
+					m_handle = it(s);
+					s.set_device(it->name());
 					return;
 				} catch (std::exception& e) {
-					if (s.debug) *s.debug << "-!- " << e.what() << std::endl;
+					s.debug(std::string("-!- ") + e.what());
 				}
 			}
 			throw std::runtime_error("No recording devices could be used");
 		} else {
-			it = m.find(s.device);
-			if (it == m.end()) throw std::runtime_error("Recording device " + s.device + " not found");
-			if (s.debug) *s.debug << ">>> Using recording device " << it->first << std::endl;
-			handle = it->second(s);
+			s.debug(">>> Using recording device " + s.device());
+			try {
+				m_handle = record_plugin::find(s.device())(s);
+			} catch (record_plugin::invalid_key_error&) {
+				throw std::runtime_error("Recording device " + s.device() + " not found");
+			}
 		}
 	}
 
-	record::~record() {	delete handle; }
-
+	record::~record() { delete m_handle; }
 }
 

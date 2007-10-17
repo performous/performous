@@ -47,33 +47,35 @@ namespace da {
 				return val;
 			}
 		};
-		static reg_dev reg;
-		static dev* create(settings& s) { return new tonegen(s); }
 		std::vector<sin_generator> gen;
 		settings s;
 		volatile bool quit;
 		boost::scoped_ptr<boost::thread> thread;
 		boost::xtime time;
 		void add(std::string const& tonestr) {
-			double freq = 440.0, amplitude = 0.3, phase = 0.0;
+			double freq = 440.0, amplitude = 0.1, phase = 0.0;
 			using namespace boost::spirit;
 			using namespace boost::lambda;
 			if (!parse(tonestr.c_str(),
-			  !(limit_d(1.0, s.rate / 2.0)[real_p][assign_a(freq)]) >> *(!ch_p('.') >> (
+			  !(limit_d(1.0, s.rate() / 2.0)[real_p][assign_a(freq)]) >> *(!ch_p('.') >> (
 			  str_p("amplitude(") >> (max_limit_d(0.0)[real_p][var(amplitude) = bind(static_cast<double(*)(double, double)>(std::pow), 10.0, _1 / 20.0)] | real_p[assign_a(amplitude)]) |
 			  str_p("phase(") >> limit_d(0.0, 1.0)[real_p][assign_a(phase)]
 			  ) >> ')')
 			  ).full)
 			  throw std::invalid_argument("Invalid parameters for tonegen. See help for more information.");
-			if (s.debug) *s.debug << "  " << freq << ".amplitude(" << amplitude << ").phase(" << phase << ")" << std::endl;
-			gen.push_back(sin_generator(freq, s.rate, amplitude, phase));
+			{
+				std::ostringstream oss;
+				oss << "  " << freq << ".amplitude(" << amplitude << ").phase(" << phase << ")";
+				s.debug(oss.str());
+			}
+			gen.push_back(sin_generator(freq, s.rate(), amplitude, phase));
 		}
 	  public:
 		tonegen(settings& s_orig): s(s_orig), quit(false) {
-			if (s.frames == settings::low) s.frames = 256;
-			if (s.frames == settings::high) s.frames = 16384;
-			std::istringstream iss(s.subdev);
-			if (s.debug) *s.debug << "Tone generator:" << std::endl;
+			if (s.frames() == settings::low) s.set_frames(256);
+			if (s.frames() == settings::high) s.set_frames(16384);
+			std::istringstream iss(s.subdev());
+			s.debug("Tone generator:");
 			for (std::string tmp; std::getline(iss, tmp, ':') || gen.empty();) add(tmp);
 			boost::xtime_get(&time, boost::TIME_UTC); // Get current time
 			thread.reset(new boost::thread(boost::ref(*this)));
@@ -85,20 +87,20 @@ namespace da {
 		}
 		void operator()(void) {
 			while (!quit) {
-				boost::thread::sleep(time += double(s.frames)/s.rate);
+				boost::thread::sleep(time += double(s.frames())/s.rate());
 				try {
-					std::vector<sample_t> buf(s.frames * s.channels);
-					std::generate(buf.begin(), buf.end(), accumgen(gen, s.channels));
-					pcm_data data(&buf[0], s.frames, s.channels);
-					s.callback(data, s);
+					std::vector<sample_t> buf(s.frames() * s.channels());
+					std::generate(buf.begin(), buf.end(), accumgen(gen, s.channels()));
+					pcm_data data(&buf[0], s.frames(), s.channels());
+					s.callback()(data, s);
 				} catch (std::exception& e) {
-					if (s.debug) *s.debug << "Exception from recording callback: " << e.what() << std::endl;
+					s.debug(std::string("Exception from recording callback: ") + e.what());
 				}
 			}
 		}
 	};
-
-	tonegen::reg_dev tonegen::reg("~tone", tonegen::create);
-	
+	namespace {
+		record_plugin::reg<tonegen> r(devinfo("~tone", "Tone generator. Settings format: tone1:tone2:..., where each tone is specified as frequency in Hz, optionally followed by amplitude or phase settings, e.g. 440.amplitude(-20).phase(0.25). Amplitude values <= 0 are taken as decibels and > 0 are taken as absolute values. If no parameters are given, a 440 Hz tone will be generated."));
+	}
 }
 

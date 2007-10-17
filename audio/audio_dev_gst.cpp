@@ -7,18 +7,17 @@
 
 namespace da {
 	class gst_record: public record::dev {
-		static reg_dev reg;
-		static dev* create(settings& s) { return new gst_record(s); }
 		static void c_callback(GstElement*, GstBuffer* buffer, GstPad*, gpointer userdata) {
 			gst_record& self = *static_cast<gst_record*>(userdata);
 			int16_t const* iptr = reinterpret_cast<int16_t const*>(GST_BUFFER_DATA(buffer));
 			try {
 				std::vector<sample_t> buf(GST_BUFFER_SIZE(buffer));
 				std::transform(iptr, iptr + buf.size(), buf.begin(), conv_from_s16);
-				pcm_data data(&buf[0], GST_BUFFER_SIZE(buffer) / self.s.channels, self.s.channels);
-				self.s.callback(data, self.s);
+				std::size_t channels = self.s.channels();
+				pcm_data data(&buf[0], GST_BUFFER_SIZE(buffer) / channels, channels);
+				self.s.callback()(data, self.s);
 			} catch (std::exception& e) {
-				if (self.s.debug) *self.s.debug << "Exception from recording callback: " << e.what() << std::endl;
+				self.s.debug(std::string("Exception from recording callback: ") + e.what());
 			}
 		}
 		settings s;
@@ -66,10 +65,10 @@ namespace da {
 			/* Link the elements together */
 			GstCaps* caps = gst_caps_new_simple(
 			  "audio/x-raw-int",
-			  "rate", G_TYPE_INT, s.rate,
+			  "rate", G_TYPE_INT, s.rate(),
 			  "width", G_TYPE_INT, 16,
 			  "depth", G_TYPE_INT, 16,
-			  "channels", G_TYPE_INT, s.channels, NULL);
+			  "channels", G_TYPE_INT, s.channels(), NULL);
 			
 			if (!gst_element_link_many(source, audioconvert, audioresample, NULL))
 			  throw std::runtime_error("Cannot link the GStreamer elements together ('src' -> 'audioconvert' -> 'audioresample')");
@@ -88,7 +87,8 @@ namespace da {
 			gst_object_unref(GST_OBJECT(pipeline));
 		}
 	};
-
-	gst_record::reg_dev gst_record::reg("gst", gst_record::create);
+	namespace {
+		record_plugin::reg<gst_record> r(devinfo("gst", "GStreamer PCM capture. Settings are not used."));
+	}
 }
 
