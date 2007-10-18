@@ -31,7 +31,7 @@ namespace da {
 			PaStream* handle;
 			strm(pa18_record* rec) {
 				// TODO: Use more settings from s
-				PaError err = Pa_OpenStream(&handle, Pa_GetDefaultInputDeviceID(), rec->s.channels(), paInt16, NULL, paNoDevice, 0, paInt16, NULL, rec->s.rate, 50, 0, 0, rec->c_callback, rec);
+				PaError err = Pa_OpenStream(&handle, Pa_GetDefaultInputDeviceID(), rec->s.channels(), paInt16, NULL, paNoDevice, 0, paInt16, NULL, rec->s.rate(), 50, 0, 0, rec->c_callback, rec);
 				if (err != paNoError) throw std::runtime_error("Cannot open PortAudio audio stream " + rec->s.subdev() + ": " + Pa_GetErrorText(err));
 			}
 			~strm() { Pa_CloseStream(handle); }
