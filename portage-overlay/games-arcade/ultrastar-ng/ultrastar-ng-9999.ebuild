@@ -86,7 +86,7 @@ src_compile() {
 	fi
 
 	myconf="${myconf} $(use_enable debug)"
-	myconf="${myconf} $(use_enable portaudio record-pa18)"
+	myconf="${myconf} $(use_enable portaudio record-portaudio)"
 	myconf="${myconf} $(use_enable gstreamer record-gst)"
 	myconf="${myconf} $(use_enable alsa record-alsa)"
 

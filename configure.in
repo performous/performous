@@ -83,7 +83,7 @@ AC_ARG_ENABLE(record-alsa,
 		no)  enable_record_alsa="no" ;;
 		*) AC_MSG_ERROR(bad value ${enableval} for --enable-record-alsa) ;;
  	esac],
-	enable_record_alsa="yes")
+	enable_record_alsa="autodetect")
 AC_ARG_ENABLE(record-pa18,
 	AC_HELP_STRING(--enable-record-pa18,
 		Enable PortAudioV18 record backend [[[default=autodetect]]]),
@@ -92,7 +92,7 @@ AC_ARG_ENABLE(record-pa18,
 		no)  enable_record_pa18="no" ;;
 		*) AC_MSG_ERROR(bad value ${enableval} for --enable-record-pa18) ;;
  	esac],
-	enable_record_pa18="yes")
+	enable_record_pa18="autodetect")
 AC_ARG_ENABLE(record-pa19,
 	AC_HELP_STRING(--enable-record-pa19,
 		Enable PortAudioV19 record backend [[[default=autodetect]]]),
@@ -101,7 +101,26 @@ AC_ARG_ENABLE(record-pa19,
 		no)  enable_record_pa19="no" ;;
 		*) AC_MSG_ERROR(bad value ${enableval} for --enable-record-pa19) ;;
  	esac],
-	enable_record_pa19="yes")
+	enable_record_pa19="autodetect")
+AC_ARG_ENABLE(record-portaudio,
+	AC_HELP_STRING(--enable-record-portaudio,
+		Enable at least one PortAudio record backend (override pa18 and pa19) [[[default=autodetect]]]),
+	[case "${enableval}" in
+		yes) enable_record_pa="yes" ;;
+		no)  enable_record_pa="no" ;;
+		*) AC_MSG_ERROR(bad value ${enableval} for --enable-record-portaudio) ;;
+ 	esac],
+	enable_record_pa="autodetect")
+
+if test enable_record_pa = no ; then
+	enable_record_pa18="no"
+	enable_record_pa19="no"
+fi
+if test enable_record_pa = yes ; then
+	enable_record_pa18="autodetect"
+	enable_record_pa19="autodetect"
+fi
+
 AC_ARG_ENABLE(record-gst,
 	AC_HELP_STRING(--enable-record-gst,
 		Enable GStreamer record backend [[[default=autodetect]]]),
@@ -214,11 +233,21 @@ USNG_EOF)
 AC_SUBST(PANGOCAIRO_FLAGS)
 AC_SUBST(PANGOCAIRO_LIBS)
 
-if test $record_alsa = yes -a $enable_record_alsa = yes ; then
-	RECORD_ALSA_FLAGS=`pkg-config --cflags alsa`
-	RECORD_ALSA_LIBS=`pkg-config --libs alsa`
-	AM_CONDITIONAL(RECORD_ALSA, true)
+# Configure alsa record backend
+if test $record_alsa = yes ; then
+	if test $enable_record_alsa = no ; then
+		RECORD_ALSA_FLAGS=""
+		RECORD_ALSA_LIBS=""
+		AM_CONDITIONAL(RECORD_ALSA, false)
+	else
+		RECORD_ALSA_FLAGS=`pkg-config --cflags alsa`
+		RECORD_ALSA_LIBS=`pkg-config --libs alsa`
+		AM_CONDITIONAL(RECORD_ALSA, true)
+	fi
 else
+	if test $enable_record_alsa = yes ; then
+		AC_MSG_ERROR(Cannot find alsa, but explicitly required)
+	fi
 	RECORD_ALSA_FLAGS=""
 	RECORD_ALSA_LIBS=""
 	AM_CONDITIONAL(RECORD_ALSA, false)
@@ -226,35 +255,67 @@ fi
 AC_SUBST(RECORD_ALSA_FLAGS)
 AC_SUBST(RECORD_ALSA_LIBS)
 
-if test $record_pa18 = yes -a $enable_record_pa18 = yes ; then
-	RECORD_PA18_FLAGS=""
-	RECORD_PA18_LIBS="-lportaudio"
-	AM_CONDITIONAL(RECORD_PA18, true)
+# Configure portaudio record backend
+if test $record_pa18 = no -a $record_pa19 = no -a $enable_record_pa = yes ; then
+	AC_MSG_ERROR(Cannot find PortAudio (V18 or V19), but explicitly required)
+fi
+if test $record_pa18 = yes ; then
+	if test $enable_record_pa18 = no ; then
+		RECORD_PA18_FLAGS=""
+		RECORD_PA18_LIBS=""
+		AM_CONDITIONAL(RECORD_PA18, false)
+	else
+		RECORD_PA18_FLAGS=""
+		RECORD_PA18_LIBS="-lportaudio"
+		AM_CONDITIONAL(RECORD_PA18, true)
+	fi
 else
+	if test $enable_record_pa18 = yes ; then
+		AC_MSG_ERROR(Cannot find PortAudioV18, but explicitly required)
+	fi
 	RECORD_PA18_FLAGS=""
 	RECORD_PA18_LIBS=""
 	AM_CONDITIONAL(RECORD_PA18, false)
 fi
 AC_SUBST(RECORD_PA18_FLAGS)
 AC_SUBST(RECORD_PA18_LIBS)
-
-if test $record_pa19 = yes -a $enable_record_pa19 = yes ; then
-	RECORD_PA19_FLAGS=`pkg-config --cflags portaudio-2.0`
-	RECORD_PA19_LIBS=`pkg-config --libs portaudio-2.0`
-	AM_CONDITIONAL(RECORD_PA19, true)
+if test $record_pa19 = yes ; then
+	if test $enable_record_pa19 = no ; then
+		RECORD_PA19_FLAGS=""
+		RECORD_PA19_LIBS=""
+		AM_CONDITIONAL(RECORD_PA19, false)
+	else
+		RECORD_PA19_FLAGS=`pkg-config --cflags portaudio-2.0`
+		RECORD_PA19_LIBS=`pkg-config --libs portaudio-2.0`
+		AM_CONDITIONAL(RECORD_PA19, true)
+	fi
 else
-	RECORD_PA19_FLAGS=""
-	RECORD_PA19_LIBS=""
+	if test $enable_record_pa19 = yes ; then
+		AC_MSG_ERROR(Cannot find PortAudioV19, but explicitly required)
+	fi
+	RECORD_PA18_FLAGS=""
+	RECORD_PA18_LIBS=""
 	AM_CONDITIONAL(RECORD_PA19, false)
 fi
 AC_SUBST(RECORD_PA19_FLAGS)
 AC_SUBST(RECORD_PA19_LIBS)
 
-if test $gst_detected = yes -a $enable_record_gst = yes ; then
-	RECORD_GST_FLAGS=`pkg-config --cflags gstreamer-0.10`
-	RECORD_GST_LIBS=`pkg-config --libs gstreamer-0.10`
-	AM_CONDITIONAL(RECORD_GST, true)
+
+# Configure gstreamer record backend
+if test $gst_detected = yes ; then
+	if test $enable_record_gst = no ; then
+		RECORD_GST_FLAGS=""
+		RECORD_GST_LIBS=""
+		AM_CONDITIONAL(RECORD_GST, false)
+	else
+		RECORD_GST_FLAGS=`pkg-config --cflags gstreamer-0.10`
+		RECORD_GST_LIBS=`pkg-config --libs gstreamer-0.10`
+		AM_CONDITIONAL(RECORD_GST, true)
+	fi
 else
+	if test $enable_record_gst = yes ; then
+		AC_MSG_ERROR(Cannot find GStreamer, but explicitly required)
+	fi
 	RECORD_GST_FLAGS=""
 	RECORD_GST_LIBS=""
 	AM_CONDITIONAL(RECORD_GST, false)
