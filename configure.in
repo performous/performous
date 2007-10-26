@@ -33,7 +33,7 @@ AC_SUBST(DATA_DIR)
 	
 AC_ARG_ENABLE(debug,
 	AC_HELP_STRING(--enable-debug,
-		Enable debugging support),
+		Enable debugging support [[[default=no]]]),
 	[case "${enableval}" in
 		yes) debug="yes" ;;
 		no)  debug="no" ;;
@@ -44,7 +44,7 @@ if test $debug = yes ; then CFLAGS="-g $CFLAGS" ; CXXFLAGS="-g $CXXFLAGS" ; fi
 
 AC_ARG_WITH(audio,
 	AC_HELP_STRING(--with-audio[={xine|gstreamer}],
-		implementation of the audio layer (default: autodetect)),
+		 implementation of the audio layer [[[default=autodetect]]]),
 	[audio_layer="$withval"],
 	[audio_layer="autodetect"]
 )
@@ -52,7 +52,7 @@ if test $audio_layer = yes ; then audio_layer="autodetect" ; fi
 
 AC_ARG_WITH(svg,
 	AC_HELP_STRING(--with-svg[={cairo|librsvg}],
-		implementation of the svg rendering layer (default: librsvg)),
+		implementation of the svg rendering layer [[[default=librsvg]]]),
 	[svg_layer="$withval"],
 	[svg_layer="librsvg"]
 )
@@ -60,7 +60,7 @@ if test $svg_layer = yes ; then svg_layer="librsvg" ; fi
 
 AC_ARG_WITH(video,
 	 AC_HELP_STRING(--with-video[={gstreamer|xine|smpeg|disable}],
-	 	implementation of the video rendering layer (default: autodetect)),
+	 	implementation of the video rendering layer [[[default=autodetect]]]),
 	[video_layer="$withval"],
 	[video_layer="autodetect"]
 )
@@ -68,11 +68,49 @@ if test $video_layer = yes ; then video_layer="autodetect" ; fi
 
 AC_ARG_WITH(graphic-driver,
         AC_HELP_STRING(--with-graphic-driver[={sdl|opengl}],
-                graphic driver selection (default: sdl)),
+                graphic driver selection [[[default=sdl]]]),
         [graphic_driver="$withval"],
         [graphic_driver="sdl"]
 )
 if test $graphic_driver = yes; then graphic_driver="sdl"; fi
+
+
+AC_ARG_ENABLE(record-alsa,
+	AC_HELP_STRING(--enable-record-alsa,
+		Enable alsa record backend [[[default=autodetect]]]),
+	[case "${enableval}" in
+		yes) enable_record_alsa="yes" ;;
+		no)  enable_record_alsa="no" ;;
+		*) AC_MSG_ERROR(bad value ${enableval} for --enable-record-alsa) ;;
+ 	esac],
+	enable_record_alsa="yes")
+AC_ARG_ENABLE(record-pa18,
+	AC_HELP_STRING(--enable-record-pa18,
+		Enable PortAudioV18 record backend [[[default=autodetect]]]),
+	[case "${enableval}" in
+		yes) enable_record_pa18="yes" ;;
+		no)  enable_record_pa18="no" ;;
+		*) AC_MSG_ERROR(bad value ${enableval} for --enable-record-pa18) ;;
+ 	esac],
+	enable_record_pa18="yes")
+AC_ARG_ENABLE(record-pa19,
+	AC_HELP_STRING(--enable-record-pa19,
+		Enable PortAudioV19 record backend [[[default=autodetect]]]),
+	[case "${enableval}" in
+		yes) enable_record_pa19="yes" ;;
+		no)  enable_record_pa19="no" ;;
+		*) AC_MSG_ERROR(bad value ${enableval} for --enable-record-pa19) ;;
+ 	esac],
+	enable_record_pa19="yes")
+AC_ARG_ENABLE(record-gst,
+	AC_HELP_STRING(--enable-record-gst,
+		Enable GStreamer record backend [[[default=autodetect]]]),
+	[case "${enableval}" in
+		yes) enable_record_gst="yes" ;;
+		no)  enable_record_gst="no" ;;
+		*) AC_MSG_ERROR(bad value ${enableval} for --enable-record-gst) ;;
+ 	esac],
+	enable_record_gst="yes")
 
 # Check for the standard headers
 AC_HEADER_STDC
@@ -115,9 +153,11 @@ else
 fi
 
 AC_CHECK_PROGS(SDLCONFIG, sdl-config, AC_MSG_ERROR(Cannot find sdl-config))
+saved_LIBS=$LIBS
 AC_CHECK_LIB(SDL_image, IMG_LoadPNG_RW,,AC_MSG_ERROR(Cannot find SDL_image))
 AC_CHECK_LIB(SDL_gfx, zoomSurface,,AC_MSG_ERROR(Cannot find SDL_gfx))
 AC_CHECK_LIB(smpeg,SMPEG_new,[smpeg_detected="yes"],[smpeg_detected="no"])
+LIBS=$saved_LIBS
 
 dnl ###########################################################################
 dnl #### processing things
@@ -150,6 +190,7 @@ AC_SUBST(XML_LIBS)
 # Do things for libsdl
 SDL_FLAGS=`$SDLCONFIG --cflags`
 SDL_LIBS=`$SDLCONFIG --libs`
+SDL_LIBS="$SDL_LIBS -lSDL_image -lSDL_gfx"
 ac_includes_default=$(cat <<USNG_EOF
 $ac_includes_default
 /* libsdl headers */
@@ -173,7 +214,7 @@ USNG_EOF)
 AC_SUBST(PANGOCAIRO_FLAGS)
 AC_SUBST(PANGOCAIRO_LIBS)
 
-if test $record_alsa = yes ; then
+if test $record_alsa = yes -a $enable_record_alsa = yes ; then
 	RECORD_ALSA_FLAGS=`pkg-config --cflags alsa`
 	RECORD_ALSA_LIBS=`pkg-config --libs alsa`
 	AM_CONDITIONAL(RECORD_ALSA, true)
@@ -185,7 +226,7 @@ fi
 AC_SUBST(RECORD_ALSA_FLAGS)
 AC_SUBST(RECORD_ALSA_LIBS)
 
-if test $record_pa18 = yes ; then
+if test $record_pa18 = yes -a $enable_record_pa18 = yes ; then
 	RECORD_PA18_FLAGS=""
 	RECORD_PA18_LIBS="-lportaudio"
 	AM_CONDITIONAL(RECORD_PA18, true)
@@ -197,7 +238,7 @@ fi
 AC_SUBST(RECORD_PA18_FLAGS)
 AC_SUBST(RECORD_PA18_LIBS)
 
-if test $record_pa19 = yes ; then
+if test $record_pa19 = yes -a $enable_record_pa19 = yes ; then
 	RECORD_PA19_FLAGS=`pkg-config --cflags portaudio-2.0`
 	RECORD_PA19_LIBS=`pkg-config --libs portaudio-2.0`
 	AM_CONDITIONAL(RECORD_PA19, true)
@@ -209,7 +250,7 @@ fi
 AC_SUBST(RECORD_PA19_FLAGS)
 AC_SUBST(RECORD_PA19_LIBS)
 
-if test $gst_detected = yes ; then
+if test $gst_detected = yes -a $enable_record_gst = yes ; then
 	RECORD_GST_FLAGS=`pkg-config --cflags gstreamer-0.10`
 	RECORD_GST_LIBS=`pkg-config --libs gstreamer-0.10`
 	AM_CONDITIONAL(RECORD_GST, true)
