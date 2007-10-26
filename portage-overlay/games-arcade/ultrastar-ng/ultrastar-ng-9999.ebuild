@@ -12,7 +12,7 @@ LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~x86 ~amd64"
 
-IUSE="deprecated_cairo_svg novideo xine gstreamer opengl debug alsa"
+IUSE="deprecated_cairo_svg novideo xine gstreamer opengl debug alsa portaudio"
 
 ECVS_SERVER="ultrastar-ng.cvs.sourceforge.net:/cvsroot/ultrastar-ng"
 ECVS_MODULE="UltraStar-ng"
@@ -35,6 +35,7 @@ DEPEND="
 
 	dev-libs/boost
 	alsa? (media-libs/alsa-lib)
+	portaudio? (media-libs/portaudio)
 	
 	sys-apps/help2man"
 
@@ -49,10 +50,6 @@ pkg_setup() {
 	fi
 	if ! use xine && ! use gstreamer ; then
 		eerror "You must choose either xine or gstreamer audio support"
-	fi
-	if use xine && use gstreamer ; then
-		ewarn "Since both xine and gstreamer audio support has been"
-		ewarn "enabled, only xine will be used as default"
 	fi
 	if use opengl && ! built_with_use media-libs/libsdl opengl; then
 		eerror "opengl flag set, but libsdl wasn't build with opengl support"
@@ -87,11 +84,11 @@ src_compile() {
 	else
 		myconf="${myconf} --with-graphic-driver=sdl"
 	fi
-	if use debug ; then
-		myconf="${myconf} --enable-debug"
-	else
-		myconf="${myconf} --disable-debug"
-	fi
+
+	myconf="${myconf} $(use_enable debug)"
+	myconf="${myconf} $(use_enable portaudio record-pa18)"
+	myconf="${myconf} $(use_enable gstreamer record-gst)"
+	myconf="${myconf} $(use_enable alsa record-alsa)"
 
 	egamesconf ${myconf} || die
 	emake || die "emake failed"
