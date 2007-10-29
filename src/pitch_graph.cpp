@@ -26,7 +26,7 @@ void PitchGraph::clear() {
 	cairo_set_line_width(dc, 0.01);
 	cairo_new_path(dc);
 	clearPage = 1;
-	cairo_set_source_rgba(this->dc, 1, 0, 0, 1.0);
+	cairo_set_source_rgba(this->dc, 52.0/255.0, 101.0/255.0, 164.0/255.0, 1.0);
 }
 
 

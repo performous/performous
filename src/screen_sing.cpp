@@ -129,23 +129,6 @@ void CScreenSing::draw() {
 	linerect.final_height = 0;
 	linerect.final_width  = 0;
 
-	// draw lines for the C notes (thick)
-	for(unsigned int i = 0 ; i <= numOctaves ; i++) {
-		if (i <= (song.noteMax-lowestC)/12) {
-			linerect.y = m_height* 3 / 4 - i* m_height / 2 / numOctaves;
-			theme->theme->DrawRect(linerect);
-		}
-	}
-	linerect.stroke_width = 0;
-	// draw the other lines in between
-	for(unsigned int i = 0 ; i < numOctaves ; i++) {
-		for(int j = 1 ; j < 12 ; j++) {
-			if (i* 12 + j + (lowestC/12)* 12 <= (unsigned int)song.noteMax){
-				linerect.y = m_height* 3 / 4 - (i* 12 + j)* m_height / 24 / numOctaves;
-				theme->theme->DrawRect(linerect);
-			}
-		}
-	}
 	// Get the time in the song
 	double time = sm->getAudio()->getPosition();
 	time = std::max(0.0, time + playOffset);
@@ -207,17 +190,6 @@ void CScreenSing::draw() {
 		sentenceDuration = m_sentence.back().end - sentenceBegin;
 		pixUnit = (m_width - 200.0 * resFactorX) / (sentenceDuration * 1.0);
 	}
-	// Theme this
-	TThemeRect tmprect;
-	tmprect.stroke_col.r = tmprect.stroke_col.g = tmprect.stroke_col.b = 0;
-	tmprect.stroke_col.a = 255;
-	tmprect.stroke_width = 2.*resFactorAvg;
-	tmprect.svg_width = m_width;
-	tmprect.svg_height = m_height;
-	tmprect.height = 10.*resFactorY;
-	tmprect.fill_col.a = 255;
-	tmprect.final_height = 0;
-	tmprect.final_width  = 0;
 	// Compute and draw the "to start" cursor
 	if (time < sentenceBegin) {
 		double wait = sentenceBegin - time;
@@ -226,21 +198,39 @@ void CScreenSing::draw() {
 		theme->tostartfg.height = theme->tostartfg.final_height * value;
 		theme->theme->DrawRect(theme->tostartfg);
 	}
-
+	double noteUnit = -0.5 * m_height / numOctaves / 12.0;
+	double baseY = 0.75 * m_height - lowestC * noteUnit;
+	// Draw note lines
+	for (int n = song.noteMin; n <= song.noteMax; ++n) {
+		linerect.stroke_width = (n % 12 ? 0.2 * resFactorAvg : resFactorAvg);
+		linerect.y = baseY + n * noteUnit;
+		theme->theme->DrawRect(linerect);
+	}
+	// Theme this
+	TThemeRect tmprect;
+	tmprect.stroke_col.r = tmprect.stroke_col.g = tmprect.stroke_col.b = 0;
+	tmprect.stroke_col.a = 255;
+	tmprect.stroke_width = 2.*resFactorAvg;
+	tmprect.svg_width = m_width;
+	tmprect.svg_height = m_height;
+	tmprect.height = -noteUnit;
+	tmprect.fill_col.a = 255;
+	tmprect.final_height = 0;
+	tmprect.final_width  = 0;
 	int state = 0;
+	double baseX = 100.0 * resFactorX - sentenceBegin * pixUnit;
 	for (unsigned int i = 0; i < m_sentence.size(); ++i) {
 		if (m_sentence[i].begin > time) state = 3;
 		if (state == 0 && m_sentence[i].end > time) state = 1;
-		int noteHeight=m_height*3/4-((m_sentence[i].note-lowestC)*m_height/2/numOctaves/12);
-		tmprect.y = noteHeight - 5.*resFactorY;
-		double begin = (state == 2 ? time : m_sentence[i].begin) - sentenceBegin;
-		double end = (state == 1 ? time : m_sentence[i].end) - sentenceBegin;
-		tmprect.x = 100.0 * resFactorX + begin * pixUnit;
-		tmprect.width = 100.0 * resFactorX + end * pixUnit - tmprect.x;
+		tmprect.y = baseY + m_sentence[i].note * noteUnit - 0.5 * tmprect.height;
+		double begin = (state == 2 ? time : m_sentence[i].begin);
+		double end = (state == 1 ? time : m_sentence[i].end);
+		tmprect.x = baseX + begin * pixUnit;
+		tmprect.width = (end - begin) * pixUnit;
 		if (state < 2) {
 			tmprect.fill_col.r = 0.0;
 			tmprect.fill_col.g = 0.0;
-			tmprect.fill_col.b = 1.0;
+			tmprect.fill_col.b = 0.0;
 		} else {
 			switch (m_sentence[i].type) {
 			  case Note::FREESTYLE:
@@ -254,8 +244,8 @@ void CScreenSing::draw() {
 				tmprect.fill_col.b = 0.0;
 				break;
 			  default:
-				tmprect.fill_col.r = 0.8;
-				tmprect.fill_col.g = 0.8;
+				tmprect.fill_col.r = 0.9;
+				tmprect.fill_col.g = 0.9;
 				tmprect.fill_col.b = 1.0;
 			}
 		}
@@ -264,17 +254,15 @@ void CScreenSing::draw() {
 	}
 
 	if (!m_sentence.empty()) {
-		double graphTime = (100.0 * resFactorX + (time - sentenceBegin) * pixUnit) / m_width;
+		double graphTime = (baseX + time * pixUnit) / m_width;
 		if (freq == 0.0) {
 			pitchGraph.renderPitch(0.0, graphTime);
 		} else {
 			unsigned int i = 0;
 			// Find the currently playing note or the next playing note (or the last note?)
 			while (i < m_sentence.size() && time > m_sentence[i].end) ++i;
-			// Lets find the nearest note from the song (diff in [-6,5])
-			int noteSingFinal = m_sentence[i].note + m_sentence[i].diff(note);
-			int noteheight=((18*numOctaves-noteSingFinal+lowestC)*m_height/2/numOctaves/12);
-			pitchGraph.renderPitch(double(noteheight) / m_height, graphTime);
+			Note const& n = m_sentence[i];
+			pitchGraph.renderPitch((baseY + (n.note + n.diff(note)) * noteUnit) / m_height, graphTime);
 		}
 	}
 	
