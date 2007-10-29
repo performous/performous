@@ -118,6 +118,14 @@ class SongParser {
 		if (line[line.size() - 1] == '\r') line.erase(line.size() - 1);
 		if (line[0] == 'E') return false;
 		std::istringstream iss(line);
+		if (line[0] == 'B') {
+			unsigned int ts;
+			double bpm;
+			iss.ignore();
+			if (!(iss >> ts >> bpm)) throw std::runtime_error("Invalid BPM line format");
+			addBPM(ts, bpm);
+			return true;
+		}
 		Note n;
 		n.type = Note::Type(iss.get());
 		unsigned int ts = m_prevts;
