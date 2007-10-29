@@ -81,7 +81,7 @@ void CScreenSing::manageEvent(SDL_Event event) {
 	if (event.type == SDL_KEYDOWN) {
 		CScreenManager* sm = CScreenManager::getSingletonPtr();
 		int key = event.key.keysym.sym;
-		if (key == SDLK_ESCAPE || key == SDLK_q) sm->activateScreen("Score");
+		if (key == SDLK_ESCAPE || key == SDLK_q) sm->activateScreen(sm->getAudio()->getPosition() / sm->getAudio()->getLength() > 0.5 ? "Score" : "Songs");
 		else if (key == SDLK_SPACE || key == SDLK_p) sm->getAudio()->togglePause();
 		else if (key == SDLK_PLUS) playOffset += 0.02;
 		else if (key == SDLK_MINUS) playOffset -= 0.02;
@@ -107,14 +107,9 @@ void CScreenSing::draw() {
 	float resFactorAvg = (resFactorX + resFactorY) / 2.0;
 	double oldfontsize;
 	theme->theme->clear();
-	// draw lines across the screen
 	// Theme this
-	unsigned int numOctaves = (song.noteMax+11)/12 - song.noteMin/12;
-	unsigned int lowestC = (song.noteMin/12)* 12;  // the C below noteMin
-	if (numOctaves < 3) numOctaves = 3;
-
 	TThemeRect linerect;
-	linerect.stroke_col.r = linerect.stroke_col.g = linerect.stroke_col.b = 0;
+	linerect.stroke_col.r = linerect.stroke_col.g = linerect.stroke_col.b = 0.5;
 	linerect.stroke_col.a = 0.9;
 	linerect.stroke_width = 1.*resFactorAvg;
 	linerect.svg_width = m_width;
@@ -198,19 +193,21 @@ void CScreenSing::draw() {
 		theme->tostartfg.height = theme->tostartfg.final_height * value;
 		theme->theme->DrawRect(theme->tostartfg);
 	}
-	double noteUnit = -0.5 * m_height / numOctaves / 12.0;
-	double baseY = 0.75 * m_height - lowestC * noteUnit;
+	int min = song.noteMin - 7;
+	int max = song.noteMax + 7;
+	double noteUnit = -0.5 * m_height / std::max(32, max - min);
+	double baseY = 0.5 * m_height - 0.5 * (min + max) * noteUnit;
 	// Draw note lines
 	for (int n = song.noteMin; n <= song.noteMax; ++n) {
-		linerect.stroke_width = (n % 12 ? 0.2 * resFactorAvg : resFactorAvg);
+		linerect.stroke_width = (n % 12 ? 0.4 * resFactorAvg : 1.5 * resFactorAvg);
 		linerect.y = baseY + n * noteUnit;
 		theme->theme->DrawRect(linerect);
 	}
 	// Theme this
 	TThemeRect tmprect;
-	tmprect.stroke_col.r = tmprect.stroke_col.g = tmprect.stroke_col.b = 0;
+	tmprect.stroke_col.r = tmprect.stroke_col.g = tmprect.stroke_col.b = 0.5;
 	tmprect.stroke_col.a = 255;
-	tmprect.stroke_width = 2.*resFactorAvg;
+	tmprect.stroke_width = resFactorAvg;
 	tmprect.svg_width = m_width;
 	tmprect.svg_height = m_height;
 	tmprect.height = -noteUnit;

@@ -16,6 +16,8 @@ class SongParser {
 	struct Exception: public std::runtime_error {
 		Exception(std::string const& msg, unsigned int linenum):
 		  runtime_error(msg), m_linenum(linenum) {}
+		unsigned int line() const { return m_linenum; }
+	  private:
 		unsigned int m_linenum;
 	};
 	SongParser(Song& s):
@@ -328,8 +330,10 @@ void Songs::reload() {
 			std::cout << "\r  " << std::setiosflags(std::ios::left) << std::setw(70) << path.substr(pos, 70) << "\x1B[K" << std::flush;
 			try {
 				songs.insert(new Song(path + "/", txtfilename));
-			} catch (std::exception& e) {
-				std::cout << "FAIL\n    " << e.what() << std::endl;
+			} catch (SongParser::Exception& e) {
+				std::cout << "FAIL\n    " << txtfilename;
+				if (e.line()) std::cout << " line " << e.line();
+				std::cout << ": " << e.what() << std::endl;
 			}
 		}
 		std::cout << "\r\x1B[K" << std::flush;
