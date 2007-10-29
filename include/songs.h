@@ -9,42 +9,65 @@
 #include <string>
 #include <vector>
 
-struct TBpm {
-	float bpm;
-	float start;
-};
-
 struct Note {
-	Note(std::string const& line, int* relShift);
+	double begin, end;
 	enum Type { FREESTYLE = 'F', NORMAL = ':', GOLDEN = '*', SLEEP = '-'} type;
-	int timestamp;
-	int length;
 	int note;
-	int curMaxScore;
 	std::string syllable;
+	int diff(int n) const {
+		int d = (6 + n - note) % 12;
+		if (d < 0) d += 12;
+		return d - 6;
+	}
+	double maxScore() const {
+		return scoreMultiplier(note) * (end - begin);
+	}
+	double score(int n, double b, double e) const {
+		double len = std::min(e, end) - std::max(b, begin);
+		if (len <= 0.0) return 0.0;
+		return scoreMultiplier(n) * len;
+	}
+  private:
+	double scoreMultiplier(int n) const {
+		double max = 0.0;
+		switch (type) {
+		  case FREESTYLE: return 1.0;
+		  case NORMAL: max = 1.0; break;
+		  case GOLDEN: max = 2.0; break;
+		  case SLEEP: break;
+		}
+		int error = abs(diff(n));
+		if (error == 0) return max;
+		if (error == 1) return 0.5 * max;
+		return 0.0;
+	}
 };
 
-class CSong: boost::noncopyable {
+class SongParser;
+
+class Song: boost::noncopyable {
   public:
-	CSong(std::string const& path, std::string const& filename);
-	~CSong() {
+	friend class SongParser;
+	Song(std::string const& path, std::string const& filename);
+	~Song() {
 		unloadBackground();
 		unloadCover();
 	}
 	// Temporary score calculation system
-	void reset() { m_score = 0.0; m_time = 0.0; }
-	void update(double time, int note) {
-		if (time <= m_time) return;
-		if (note != -1) m_score += (time - m_time) / 100000.0;
-		if (m_score > 1.0) m_score = 1.0;
-		m_time = time;
-	}
+	void reset();
+	void update(double time, int note);
 	int getScore() const { return 10000 * m_score; }
-	double m_score;
-	double m_time;
 	bool parseField(std::string const& line);
 	std::string str() const { return title + " by " + artist; }
-	unsigned int index;
+	SDL_Surface* getCover() { loadCover(); return m_coverSurf; }
+	SDL_Surface* getBackground() { loadBackground(); return m_backgroundSurf; }
+	void loadBackground();
+	void loadCover();
+	void unloadBackground();
+	void unloadCover();
+	typedef std::vector<Note> notes_t;
+	notes_t notes;
+	int noteMin, noteMax;
 	std::string path;
 	std::string filename;
 	std::vector<std::string> category;
@@ -54,40 +77,31 @@ class CSong: boost::noncopyable {
 	std::string artist;
 	std::string text;
 	std::string creator;
-	std::string cover;
-	SDL_Surface* getCover() { loadCover(); return coverSurf; }
-	SDL_Surface* volatile coverSurf;
 	std::string mp3;
+	std::string cover;
 	std::string background;
-	SDL_Surface* backgroundSurf;
 	std::string video;
-	float videoGap;
-	int noteGap;
-	float start;
-	int end;
-	bool relative;
-	std::vector<TBpm> bpm;
-	float gap;
-	int noteMin;
-	int noteMax;
-	std::vector<Note> notes;
-	bool visible;
-	bool main;
-	void loadBackground();
-	void loadCover();
-	void unloadBackground();
-	void unloadCover();
+	double videoGap;
+	double start;
+  private:
+	SDL_Surface* m_coverSurf;
+	SDL_Surface* m_backgroundSurf;
+	double m_scoreFactor; // Normalization factor for the scoring system
+	// Temporary score calculation system
+	double m_score;
+	double m_scoreTime;
+	notes_t::const_iterator m_scoreIt;
 };
 
-bool operator<(CSong const& l, CSong const& r);
+bool operator<(Song const& l, Song const& r);
 
-class CSongs {
+class Songs {
 	std::set<std::string> m_songdirs;
   public:
-	CSongs(std::set<std::string> const& songdirs);
-	~CSongs();
+	Songs(std::set<std::string> const& songdirs);
+	~Songs();
 	void reload();
-	CSong& operator[](std::vector<CSong*>::size_type pos) { return *m_filtered[pos]; }
+	Song& operator[](std::vector<Song*>::size_type pos) { return *m_filtered[pos]; }
 	int size() const { return m_filtered.size(); };
 	int empty() const { return m_filtered.empty(); };
 	void advance(int diff) {
@@ -95,19 +109,19 @@ class CSongs {
 		if (m_current < 0) m_current += m_filtered.size();
 	}
 	int currentId() const { return m_current; }
-	CSong& current() { return *m_filtered[m_current]; }
-	CSong const& current() const { return *m_filtered[m_current]; }
+	Song& current() { return *m_filtered[m_current]; }
+	Song const& current() const { return *m_filtered[m_current]; }
 	void setFilter(std::string const& regex);
 	std::string sortDesc() const;
 	void random();
 	void sortChange(int diff);
-	void parseFile(CSong& tmp);
+	void parseFile(Song& tmp);
 	SDL_Surface* getEmptyCover() { return surface_nocover; }
   private:
 	class RestoreSel;
-	typedef boost::ptr_set<CSong> songlist_t;
+	typedef boost::ptr_set<Song> songlist_t;
 	songlist_t m_songs;
-	typedef std::vector<CSong*> filtered_t;
+	typedef std::vector<Song*> filtered_t;
 	filtered_t m_filtered;
 	int m_current;
 	int m_order;

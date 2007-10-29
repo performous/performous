@@ -187,8 +187,8 @@ void CAudio::playPreview_internal(std::string const& filename) {
 	setVolume_internal(volume);
 }
 
-int CAudio::getLength_internal() {
-	if (length != LENGTH_ERROR) return length;
+double CAudio::getLength_internal() {
+	if (length != LENGTH_ERROR) return 1e-3 * length;
 #ifdef USE_LIBXINE_AUDIO
 	int pos_stream;
 	int pos_time;
@@ -199,7 +199,7 @@ int CAudio::getLength_internal() {
 	gint64 len;
 	length = gst_element_query_duration (music, &fmt, &len) ? int(len/GST_MSECOND) : LENGTH_ERROR;
 #endif
-	return length == LENGTH_ERROR ? 0 : length;
+	return length == LENGTH_ERROR ? 0.0 : 1e-3 * length;
 }
 
 bool CAudio::isPlaying_internal() {
@@ -216,7 +216,7 @@ bool CAudio::isPlaying_internal() {
 	// (happening in the first fex seconds)
 	if (getLength_internal() == 0) return true;
 	// If we are not in the last second, then we are not at the end of the song 
-	return getLength_internal() - getPosition_internal() > 1000;
+	return getLength_internal() - getPosition_internal() > 1.0;
 #endif
 	return true;
 }
@@ -231,18 +231,18 @@ void CAudio::stopMusic_internal() {
 #endif
 }
 
-int CAudio::getPosition_internal() {
-	int position = 0;
+double CAudio::getPosition_internal() {
+	double position = 0.0;
 #ifdef USE_LIBXINE_AUDIO
 	int pos_stream;
 	int length_time;
 	int pos_time;
-	position = xine_get_pos_length(stream, &pos_stream, &pos_time, &length_time) ? pos_time : 0;
+	position = xine_get_pos_length(stream, &pos_stream, &pos_time, &length_time) ? 1e-3 * pos_time : 0.0;
 #endif
 #ifdef USE_GSTREAMER_AUDIO
 	GstFormat fmt = GST_FORMAT_TIME;
 	gint64 pos;
-	position = gst_element_query_position(music, &fmt, &pos) ? int(pos / GST_MSECOND) : 0;
+	position = gst_element_query_position(music, &fmt, &pos) ? double(pos) / GST_SECOND : 0.0;
 #endif
 	return position;
 }
@@ -266,17 +266,17 @@ void CAudio::togglePause_internal() {
 #endif
 }
 
-void CAudio::seek_internal(int seek_dist) {
+void CAudio::seek_internal(double seek_dist) {
 	if (!isPlaying_internal()) return;
-	int position = std::max(0, std::min(getLength_internal() - 1000, getPosition_internal() + seek_dist));
+	int position = std::max(0.0, std::min(getLength_internal() - 1.0, getPosition_internal() + seek_dist));
 #ifdef USE_LIBXINE_AUDIO
-	xine_play(stream, 0, position);
+	xine_play(stream, 0, 1e3 * position);
 #endif
 #ifdef USE_GSTREAMER_AUDIO
 	gst_element_set_state(music, GST_STATE_PAUSED);
 	GstState state_paused = GST_STATE_PAUSED;
 	gst_element_get_state(music, NULL, &state_paused, GST_CLOCK_TIME_NONE);
-	if (!gst_element_seek_simple(music, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH, position*GST_MSECOND))
+	if (!gst_element_seek_simple(music, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH, position*GST_SECOND))
 	  throw std::runtime_error("CAudio::seek_internal() failed");
 	gst_element_set_state(music, GST_STATE_PLAYING);
 #endif

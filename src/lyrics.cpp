@@ -1,11 +1,10 @@
 #include <lyrics.h>
+#include <limits>
 
-CLyrics::CLyrics(std::vector<Note> const& lyrics, float gap ,float bpm):
+Lyrics::Lyrics(std::vector<Note> const& lyrics):
   m_lyrics(lyrics),
   m_lastSyllableIdx(-1),
-  m_lastSentenceIdx(-1),
-  m_gap(gap),
-  m_bpm(bpm)
+  m_lastSentenceIdx(-1)
 {
 	std::vector<Note> tmp;
 	unsigned int size = lyrics.size();
@@ -20,22 +19,22 @@ CLyrics::CLyrics(std::vector<Note> const& lyrics, float gap ,float bpm):
 	}
 }
 
-std::vector<Note> CLyrics::getCurrentSentence() {
+std::vector<Note> Lyrics::getCurrentSentence() {
 	return m_lastSentenceIdx != -1 ? m_formatted[m_lastSentenceIdx] : std::vector<Note>();
 }
 
-Note* CLyrics::getCurrentNote() {
+Note* Lyrics::getCurrentNote() {
 	return (m_lastSentenceIdx != -1 && m_lastSyllableIdx != -1) ?
 	  &m_formatted[m_lastSentenceIdx][m_lastSyllableIdx] : NULL;
 }
 
-void CLyrics::updateSentences(unsigned int timestamp) {
+void Lyrics::updateSentences(double timestamp) {
 	// If the sentences shouldn't change, do nothing
 	if (m_lastSyllableIdx != -1 && m_lastSentenceIdx != -1
 	  && m_lastSentenceIdx < (int) m_formatted.size()
 	  && m_lastSyllableIdx < (int) m_formatted[m_lastSentenceIdx].size()
-	  && timestamp >= getTimestampFromBeat(m_formatted[m_lastSentenceIdx][m_lastSyllableIdx].timestamp)
-	  && timestamp <= getTimestampFromBeat(m_formatted[m_lastSentenceIdx][m_lastSyllableIdx].timestamp + m_formatted[m_lastSentenceIdx][m_lastSyllableIdx].length)) return;
+	  && timestamp >= m_formatted[m_lastSentenceIdx][m_lastSyllableIdx].begin
+	  && timestamp <= m_formatted[m_lastSentenceIdx][m_lastSyllableIdx].end) return;
 	// sentence changed, recompute it
 	// If we are further than the m_last time (no rewind) (optimisation)
 	unsigned int i = (m_lastSentenceIdx != -1 && timestamp > getStartTime(m_lastSentenceIdx)) ? m_lastSentenceIdx : 0;
@@ -48,9 +47,9 @@ void CLyrics::updateSentences(unsigned int timestamp) {
 			m_now.clear();
 			m_future.clear();
 			for (unsigned int j = 0; j < m_formatted[i].size(); ++j) {
-				if (timestamp > getTimestampFromBeat(m_formatted[i][j].timestamp + m_formatted[i][j].length)) {
+				if (timestamp > m_formatted[i][j].end) {
 					m_past += m_formatted[i][j].syllable;
-				} else if (timestamp < getTimestampFromBeat(m_formatted[i][j].timestamp)) {
+				} else if (timestamp < m_formatted[i][j].begin) {
 					m_future += m_formatted[i][j].syllable;
 				} else {
 					m_lastSyllableIdx = j;
@@ -73,19 +72,15 @@ void CLyrics::updateSentences(unsigned int timestamp) {
 
 }
 
-unsigned int CLyrics::getTimestampFromBeat(unsigned int beat) {
-	return (unsigned int) ((beat * 60 * 1000) / (m_bpm * 4) + m_gap);
+double Lyrics::getStartTime(int sentence) {
+	if (sentence < 0) return 0.0;
+	if (std::size_t(sentence) >= m_formatted.size()) return std::numeric_limits<double>::max();
+	return m_formatted[sentence][0].begin;
 }
 
-unsigned int CLyrics::getStartTime(int sentence) {
-	if (sentence < 0) return 0;
-	if ((unsigned int)sentence >= m_formatted.size()) return UINT_MAX;
-	return getTimestampFromBeat(m_formatted[sentence][0].timestamp);
-}
-
-unsigned int CLyrics::getEndTime(int sentence) {
-	if (sentence < 0) return 0;
-	if ((unsigned int) sentence >= m_formatted.size()) return UINT_MAX;
-	return getTimestampFromBeat(m_formatted[sentence][m_formatted[sentence].size()-1].timestamp + m_formatted[sentence][m_formatted[sentence].size()-1].length);
+double Lyrics::getEndTime(int sentence) {
+	if (sentence < 0) return 0.0;
+	if (std::size_t(sentence) >= m_formatted.size()) return std::numeric_limits<double>::max();
+	return m_formatted[sentence][m_formatted[sentence].size()-1].end;
 }
 

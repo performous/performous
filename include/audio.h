@@ -67,26 +67,24 @@ class CAudio {
 		m_cond.notify_one();
 	}
 	/**
-	 * This method returns the length of the current track stored in the
-	 * length varialble. If the length variable hasn't be already computed
-	 * (for any reason) it is computed again.
+	 * This method returns the length of the current track.
 	 */
-	int getLength() { return getLength_internal(); }
+	double getLength() { return getLength_internal(); }
 	/**
 	 * This methods seek forward in the stream (backwards if
 	 * argument is negative), and continues playing.
-	 * @param seek_dist number of milliseconds to seek from current position
+	 * @param seek_dist number of seconds to seek from current position
 	 */
-	void seek(int seek_dist) { seek_internal(seek_dist); }
+	void seek(double seek_dist) { seek_internal(seek_dist); }
 	/**
-	 * This method returns wether or not the track is playing
+	 * This method returns whether or not the track is playing
 	 */
 	bool isPlaying() { return isPlaying_internal(); }
 	/**
 	 * This method returns the current position into the playing track. If the
 	 * position cannot be computed, 0 is returned.
 	 */
-	int getPosition() { return getPosition_internal(); }
+	double getPosition() { return getPosition_internal(); }
 	unsigned int getVolume() { return getVolume_internal(); }
 	void setVolume(unsigned int volume) { setVolume_internal(volume); }
 	void operator()(); // Thread runs here, don't call directly
@@ -103,10 +101,10 @@ class CAudio {
 	bool isPaused_internal();
 	void togglePause_internal();
 	void stopMusic_internal();
-	int getLength_internal();
-	void seek_internal(int seek_dist);
+	double getLength_internal();
+	void seek_internal(double seek_dist);
 	bool isPlaying_internal();
-	int getPosition_internal();
+	double getPosition_internal();
 	unsigned int getVolume_internal();
 	void setVolume_internal(unsigned int _volume);
 #ifdef USE_LIBXINE_AUDIO

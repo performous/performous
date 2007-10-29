@@ -9,9 +9,9 @@
 /**
  * Song lyrics class. Stores the lyrics, and finds out when they should be sung
  */
-class CLyrics {
+class Lyrics {
   public:
-	CLyrics(std::vector<Note> const& lyrics, float gap, float bpm);
+	Lyrics(std::vector<Note> const& lyrics);
 	/** 
 	 * Return what has been sung in the current sentence
 	 */
@@ -43,28 +43,22 @@ class CLyrics {
 	/** 
 	 * update the content of the sentence strings
 	 */
-	void updateSentences(unsigned int timestamp);
+	void updateSentences(double timestamp);
   private:
-	/**
-	 * Convert a beat number to a timestamp (according to GAP and BPM)
-	 */
-	unsigned int getTimestampFromBeat(unsigned int beat);
 	/**
 	 * Get the start timestamp of a sentence
 	 */
-	unsigned int getStartTime(int sentence);
+	double getStartTime(int sentence);
 	/**
 	 * Get the end timestamp of a sentence
 	 */
-	unsigned int getEndTime(int sentence);
+	double getEndTime(int sentence);
 	
 	std::string m_past, m_now, m_future, m_next;
 	std::vector<Note> m_lyrics;
 	std::vector<std::vector<Note> > m_formatted;
 	int m_lastSyllableIdx;
 	int m_lastSentenceIdx;
-	float m_gap;
-	float m_bpm;
 };
 
 #endif

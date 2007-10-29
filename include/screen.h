@@ -53,8 +53,8 @@ class CScreenManager: public CSingleton <CScreenManager> {
 	bool getFullscreenStatus() { return m_fullscreen; };
 	void setFullscreenStatus(bool fullscreen) { m_fullscreen = fullscreen; };
 
-	CSongs* getSongs() { return songs; };
-	void setSongs(CSongs* _songs) { songs = _songs; };
+	Songs* getSongs() { return songs; };
+	void setSongs(Songs* _songs) { songs = _songs; };
 
 	void finished() { m_finished=true; };
 	bool isFinished() { return m_finished; };
@@ -68,7 +68,7 @@ class CScreenManager: public CSingleton <CScreenManager> {
 	CScreen* currentScreen;
 	SDL_Surface* screen;
 	CAudio* audio;
-	CSongs* songs;
+	Songs* songs;
 	CVideoDriver* videoDriver;
 	bool m_fullscreen;
 	unsigned int m_width;

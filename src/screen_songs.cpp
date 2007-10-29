@@ -7,7 +7,7 @@ CScreenSongs::CScreenSongs(std::string const& name, unsigned int width, unsigned
   CScreen(name, width, height), m_searching()
 {
 	if (CScreenManager::getSingletonPtr()->getSongs() == NULL) {
-		CScreenManager::getSingletonPtr()->setSongs(new CSongs(songdirs));
+		CScreenManager::getSingletonPtr()->setSongs(new Songs(songdirs));
 	}
 }
 
@@ -78,11 +78,11 @@ void CScreenSongs::draw() {
 		print(theme, theme->song, "no songs found");
 		if (!m_playing.empty()) { sm->getAudio()->stopMusic(); m_playing.clear(); }
 	} else {
-		CSong& song = sm->getSongs()->current();
+		Song& song = sm->getSongs()->current();
 		// Draw the "Song information"
 		{
 			std::ostringstream oss;
-			CSongs& s = *sm->getSongs();
+			Songs& s = *sm->getSongs();
 			oss << song.str() << "\n(" << s.currentId() + 1 << "/" << s.size() << ")";
 			print(theme, theme->song, oss.str());
 		}

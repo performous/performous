@@ -22,7 +22,7 @@ void CScreenScore::manageEvent(SDL_Event event) {
 
 void CScreenScore::draw() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
-	CSong& song = sm->getSongs()->current();
+	Song& song = sm->getSongs()->current();
 	theme->theme->clear();
 	// Draw some numbers
 	int score = song.getScore();

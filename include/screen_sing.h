@@ -30,11 +30,10 @@ class CScreenSing: public CScreen {
 	std::vector<Note> m_sentence;
 	bool play;
 	bool finished;
-	int playOffset;
-	int previousFirstTimestamp;
+	double playOffset;
 	CVideo* video;
 	CThemeSing* theme;
-	CLyrics* lyrics;
+	Lyrics* lyrics;
 };
 
 #endif

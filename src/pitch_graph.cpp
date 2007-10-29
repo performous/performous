@@ -8,7 +8,7 @@ PitchGraph::PitchGraph(int _width, int _height):
 
 cairo_surface_t* PitchGraph::renderPitch(double pitch, double time) {
 	double lastPitch,lastTime;
-	cairo_get_current_point(dc,&lastTime , &lastPitch);
+	cairo_get_current_point(dc, &lastTime ,&lastPitch);
 	if (pitch == 0.0);
 	else if (clearPage) clearPage = 0;
 	else if (lastPitch != 0) cairo_line_to(dc, time, lastPitch);
