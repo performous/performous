@@ -28,5 +28,5 @@ INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/audio\
 	-DTHEMES_DIR="\"@THEMES_DIR@\"" -DDATA_DIR="\"@DATA_DIR@\""
 LDADD   = @CAIRO_LIBS@ @XML_LIBS@ @SDL_LIBS@ \
 	@VIDEO_LIBS@ @SVG_LIBS@ @AUDIO_LIBS@ @GL_LIBS@ @PANGOCAIRO_LIBS@ \
-	-L$(top_srcdir)/audio/.libs/ -ldausng -lboost_program_options -lboost_regex
+	-L../audio/.libs/ -ldausng -lboost_program_options -lboost_regex
 	
