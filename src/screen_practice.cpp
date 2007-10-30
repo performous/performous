@@ -74,58 +74,8 @@ void CScreenPractice::draw()
 			int posYsharp;
 			int octave = note/12 - 1;
 			bool sharp=false;
-			double noteOffset=0;
-			switch(note%12) {
-				case 0:
-					sharp=false;
-					noteOffset=0;
-					break;
-				case 1:
-					sharp=true;
-					noteOffset=0;
-					break;
-				case 2:
-					sharp=false;
-					noteOffset=1;
-					break;
-				case 3:
-					sharp=true;
-					noteOffset=1;
-					break;
-				case 4:
-					sharp=false;
-					noteOffset=2;
-					break;
-				case 5:
-					sharp=false;
-					noteOffset=3;
-					break;
-				case 6:
-					sharp=true;
-					noteOffset=3;
-					break;
-				case 7:
-					sharp=false;
-					noteOffset=4;
-					break;
-				case 8:
-					sharp=true;
-					noteOffset=4;
-					break;
-				case 9:
-					sharp=false;
-					noteOffset=5;
-					break;
-				case 10:
-					sharp=true;
-					noteOffset=5;
-					break;
-				case 11:
-					sharp=false;
-					noteOffset=6;
-					break;
-			}
-		
+			double noteOffset = scale.getNoteNum(note);
+			sharp = scale.isSharp(note);
 			noteOffset += octave*7;
 			noteOffset += 0.4 * scale.getNoteOffset(tones[i].freq());
 			double noteOffsetX = -600.0 - 10.0 * tones[i].db();

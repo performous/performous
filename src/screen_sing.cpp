@@ -205,8 +205,18 @@ void CScreenSing::draw() {
 	double noteUnit = -0.5 * m_height / std::max(32, max - min);
 	double baseY = 0.5 * m_height - 0.5 * (min + max) * noteUnit;
 	// Draw note lines
+	linerect.stroke_col.r = linerect.stroke_col.g = linerect.stroke_col.b = 0.5;
 	for (int n = song.noteMin; n <= song.noteMax; ++n) {
-		linerect.stroke_width = (n % 12 ? 0.4 * resFactorAvg : 1.5 * resFactorAvg);
+		linerect.stroke_width = (scale.isSharp(n) ? 0.05 : 1.2) * resFactorAvg;
+		if (n % 12) {
+			linerect.stroke_col.r = 0.5;
+			linerect.stroke_col.g = 0.5;
+			linerect.stroke_col.b = 0.5;
+		} else {
+			linerect.stroke_col.r = 0.8;
+			linerect.stroke_col.g = 0.3;
+			linerect.stroke_col.b = 0.8;
+		}
 		linerect.y = baseY + n * noteUnit;
 		theme->theme->DrawRect(linerect);
 	}
@@ -232,9 +242,9 @@ void CScreenSing::draw() {
 		tmprect.x = baseX + begin * pixUnit;
 		tmprect.width = (end - begin) * pixUnit;
 		if (state < 2) {
-			tmprect.fill_col.r = 0.0;
-			tmprect.fill_col.g = 0.0;
-			tmprect.fill_col.b = 0.0;
+			tmprect.fill_col.r = 0.5;
+			tmprect.fill_col.g = 0.5;
+			tmprect.fill_col.b = 0.5;
 		} else {
 			switch (m_sentence[i].type) {
 			  case Note::FREESTYLE:

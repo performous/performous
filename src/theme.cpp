@@ -49,7 +49,7 @@ cairo_surface_t *CTheme::PrintText(TThemeTxt *text) {
 	}
 	if (text->stroke_col.r != -1 && text->stroke_col.g != -1 && text->stroke_col.b != -1) {
 		cairo_set_line_width(dc, text->stroke_width);
-		cairo_set_source_rgba(dc, text->stroke_col.r, text->stroke_col.b, text->stroke_col.g, text->stroke_col.a);
+		cairo_set_source_rgba(dc, text->stroke_col.r, text->stroke_col.g, text->stroke_col.b, text->stroke_col.a);
 		cairo_stroke(dc);
 	}
 	cairo_restore(dc);
@@ -70,7 +70,7 @@ cairo_surface_t *CTheme::DrawRect(TThemeRect rect) {
 	}
 	if (rect.stroke_col.r != -1 && rect.stroke_col.g != -1 && rect.stroke_col.b != -1) {
 		cairo_set_line_width(dc, rect.stroke_width);
-		cairo_set_source_rgba(dc, rect.stroke_col.r, rect.stroke_col.b, rect.stroke_col.g, rect.stroke_col.a);
+		cairo_set_source_rgba(dc, rect.stroke_col.r, rect.stroke_col.g, rect.stroke_col.b, rect.stroke_col.a);
 		cairo_stroke(dc);
 	}
 	cairo_restore(dc);
