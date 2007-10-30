@@ -20,22 +20,31 @@
 SDL_Surface * screenSDL;
 
 static void checkEvents_SDL(CScreenManager& sm) {
+	static bool esc = false;
 	SDL_Event event;
 	while(SDL_PollEvent(&event) == 1) {
-		sm.getCurrentScreen()->manageEvent(event);
 		switch(event.type) {
 		  case SDL_QUIT:
 			sm.finished();
 			break;
+		  case SDL_KEYUP:
+			if (event.key.keysym.sym == SDLK_ESCAPE) esc = false;
+			break;
 		  case SDL_KEYDOWN:
 			int keypressed  = event.key.keysym.sym;
 			SDLMod modifier = event.key.keysym.mod;
-			if( keypressed == SDLK_RETURN && modifier & KMOD_ALT ) {
+			// Workaround for key repeat on escape
+			if (keypressed == SDLK_ESCAPE) {
+				if (esc) return;
+				esc = true;
+			}
+			if (keypressed == SDLK_RETURN && modifier & KMOD_ALT ) {
 				SDL_WM_ToggleFullScreen(screenSDL);
 				sm.setFullscreenStatus(!sm.getFullscreenStatus());
 			}
 			break;
 		}
+		sm.getCurrentScreen()->manageEvent(event);
 	}
 }
 
