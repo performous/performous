@@ -38,38 +38,32 @@ void Lyrics::updateSentences(double timestamp) {
 	// sentence changed, recompute it
 	// If we are further than the m_last time (no rewind) (optimisation)
 	unsigned int i = (m_lastSentenceIdx != -1 && timestamp > getStartTime(m_lastSentenceIdx)) ? m_lastSentenceIdx : 0;
-
 	// For all the detected sentences, find the first that have not yet ended
-	for (; i < m_formatted.size(); ++i) {
-		// If we're between the end of the m_last sentence and the end of the current sentence
-		if (timestamp > getEndTime(i-1) && timestamp <= getEndTime(i)) {
-			m_past.clear();
-			m_now.clear();
-			m_future.clear();
-			for (unsigned int j = 0; j < m_formatted[i].size(); ++j) {
-				if (timestamp > m_formatted[i][j].end) {
-					m_past += m_formatted[i][j].syllable;
-				} else if (timestamp < m_formatted[i][j].begin) {
-					m_future += m_formatted[i][j].syllable;
-				} else {
-					m_lastSyllableIdx = j;
-					m_now += m_formatted[i][j].syllable;
-				}
-			}
-			// If we have change of sentence, we rebuild the next sentence
-			if (m_lastSentenceIdx == -1 || (unsigned int)m_lastSentenceIdx != i) {
-				m_lastSentenceIdx = i;
-				m_next.clear();
-				if (i != m_formatted.size() - 1) {
-					for (unsigned int j = 0; j < m_formatted[i+1].size(); ++j)
-					  m_next += m_formatted[i+1][j].syllable;
-				}
-			}
-			// No need to go further in the song
-			break;
+	for (; i < m_formatted.size(); ++i) if (timestamp <= getEndTime(i)) break;
+	// If we're between the end of the m_last sentence and the end of the current sentence
+	m_past.clear();
+	m_now.clear();
+	m_future.clear();
+	if (i >= m_formatted.size()) return;
+	for (unsigned int j = 0; j < m_formatted[i].size(); ++j) {
+		if (timestamp > m_formatted[i][j].end) {
+			m_past += m_formatted[i][j].syllable;
+		} else if (timestamp < m_formatted[i][j].begin) {
+			m_future += m_formatted[i][j].syllable;
+		} else {
+			m_lastSyllableIdx = j;
+			m_now += m_formatted[i][j].syllable;
 		}
 	}
-
+	// If we have change of sentence, we rebuild the next sentence
+	if (m_lastSentenceIdx == -1 || (unsigned int)m_lastSentenceIdx != i) {
+		m_lastSentenceIdx = i;
+		m_next.clear();
+		if (i < m_formatted.size() - 1) {
+			for (unsigned int j = 0; j < m_formatted[i+1].size(); ++j)
+			  m_next += m_formatted[i+1][j].syllable;
+		}
+	}
 }
 
 double Lyrics::getStartTime(int sentence) {
