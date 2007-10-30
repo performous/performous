@@ -44,7 +44,10 @@ void Lyrics::updateSentences(double timestamp) {
 	m_past.clear();
 	m_now.clear();
 	m_future.clear();
-	if (i >= m_formatted.size()) return;
+	if (i >= m_formatted.size()) {
+		m_lastSentenceIdx = -1;
+		return;
+	}
 	for (unsigned int j = 0; j < m_formatted[i].size(); ++j) {
 		if (timestamp > m_formatted[i][j].end) {
 			m_past += m_formatted[i][j].syllable;

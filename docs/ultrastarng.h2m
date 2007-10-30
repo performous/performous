@@ -22,6 +22,10 @@ Exit the current screen
 .TP
 \fBAlt+Enter\fR
 Switch between full screen and windowed modes
+.TP
+\fBSpace\fR
+Pause song/preview
+
 .SS "Main menu:"
 .TP
 \fBS\fR
@@ -58,6 +62,17 @@ Refresh song list (reload from disk)
 .TP
 \fBEsc\fR
 Exit to main menu or quit search mode
+
+.SS "Singing screen:"
+.TP
+\fBLeft\fR/\fBRight\fR/\fBUp\fR/\fBDown\fR
+Fast forward or rewind the song
+.TP
+\fBHome\fR
+Skip long solos (jump to the beginning of next sentence)
+.TP
+\fB+\fR/\fB-\fR
+Adjust audio delay. Use to correct synchronization issues.
 
 [see also]
 You can find more information at http://ultrastar-ng.sourceforge.net/ or

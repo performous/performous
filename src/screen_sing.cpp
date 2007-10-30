@@ -81,10 +81,15 @@ void CScreenSing::manageEvent(SDL_Event event) {
 	if (event.type == SDL_KEYDOWN) {
 		CScreenManager* sm = CScreenManager::getSingletonPtr();
 		int key = event.key.keysym.sym;
-		if (key == SDLK_ESCAPE || key == SDLK_q) sm->activateScreen(sm->getAudio()->getPosition() / sm->getAudio()->getLength() > 0.5 ? "Score" : "Songs");
+		if (key == SDLK_ESCAPE || key == SDLK_q) sm->activateScreen(m_sentence.empty() ? "Score" : "Songs");
 		else if (key == SDLK_SPACE || key == SDLK_p) sm->getAudio()->togglePause();
 		else if (key == SDLK_PLUS) playOffset += 0.02;
 		else if (key == SDLK_MINUS) playOffset -= 0.02;
+		else if (key == SDLK_HOME && !m_sentence.empty()) {
+			CAudio& a = *sm->getAudio();
+			double diff = m_sentence[0].begin - 1.0 - a.getPosition();
+			if (diff > 0.0) a.seek(diff); // TODO: implement absolute seeking
+		}
 		else if (key == SDLK_LEFT) sm->getAudio()->seek(-5.0);
 		else if (key == SDLK_RIGHT) sm->getAudio()->seek(5.0);
 		else if (key == SDLK_UP) sm->getAudio()->seek(30.0);
