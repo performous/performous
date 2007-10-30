@@ -189,6 +189,8 @@ void CScreenSing::draw() {
 		}
 		sentenceDuration = m_sentence.back().end - sentenceBegin;
 		pixUnit = (m_width - 200.0 * resFactorX) / (sentenceDuration * 1.0);
+	} else {
+		pitchGraph.clear();
 	}
 	// Compute and draw the "to start" cursor
 	if (time < sentenceBegin) {
