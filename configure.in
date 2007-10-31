@@ -168,7 +168,12 @@ PKG_CHECK_MODULES(alsa, alsa , [record_alsa="yes"] , [record_alsa="no"])
 PKG_CHECK_MODULES(portAudioV19, portaudio-2.0 , [record_pa19="yes"] , [record_pa19="no"])
 
 saved_LIBS=$LIBS
-AC_CHECK_LIB(portaudio, Pa_Initialize, [record_pa18="yes"] , [record_pa18="no"])
+# Only detect pa18 if pa19 is not found (pa19 is detected as pa18 else)
+if test $record_pa19 = no ; then
+	AC_CHECK_LIB(portaudio, Pa_Initialize, [record_pa18="yes"] , [record_pa18="no"])
+else
+	record_pa18="no"
+fi
 AC_CHECK_LIB(SDL_image, IMG_LoadPNG_RW,,AC_MSG_ERROR(Cannot find SDL_image))
 AC_CHECK_LIB(SDL_gfx, zoomSurface,,AC_MSG_ERROR(Cannot find SDL_gfx))
 AC_CHECK_LIB(smpeg,SMPEG_new,[smpeg_detected="yes"],[smpeg_detected="no"])
