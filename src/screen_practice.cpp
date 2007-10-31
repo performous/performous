@@ -66,8 +66,8 @@ void CScreenPractice::draw()
 		theme->theme->PrintText(&theme->notetxt);
 		std::vector<Tone> tones = m_analyzer.getTones();
 		for (size_t i = 0; i < tones.size(); ++i) {
-			if(tones[i].freq() == 0.0) continue;
 			int note = scale.getNoteId(tones[i].freq());
+			if (note < 0) continue;
 			int posXnote;
 			int posYnote;
 			int posXsharp;
