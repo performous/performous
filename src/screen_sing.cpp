@@ -206,19 +206,21 @@ void CScreenSing::draw() {
 	double baseY = 0.5 * m_height - 0.5 * (min + max) * noteUnit;
 	// Draw note lines
 	linerect.stroke_col.r = linerect.stroke_col.g = linerect.stroke_col.b = 0.5;
-	for (int n = song.noteMin; n <= song.noteMax; ++n) {
-		linerect.stroke_width = (scale.isSharp(n) ? 0.05 : 1.2) * resFactorAvg;
-		if (n % 12) {
-			linerect.stroke_col.r = 0.5;
-			linerect.stroke_col.g = 0.5;
-			linerect.stroke_col.b = 0.5;
-		} else {
-			linerect.stroke_col.r = 0.8;
-			linerect.stroke_col.g = 0.3;
-			linerect.stroke_col.b = 0.8;
+	if (!m_sentence.empty()) {
+		for (int n = song.noteMin; n <= song.noteMax; ++n) {
+			linerect.stroke_width = (scale.isSharp(n) ? 0.05 : 1.2) * resFactorAvg;
+			if (n % 12) {
+				linerect.stroke_col.r = 0.5;
+				linerect.stroke_col.g = 0.5;
+				linerect.stroke_col.b = 0.5;
+			} else {
+				linerect.stroke_col.r = 0.8;
+				linerect.stroke_col.g = 0.3;
+				linerect.stroke_col.b = 0.8;
+			}
+			linerect.y = baseY + n * noteUnit;
+			theme->theme->DrawRect(linerect);
 		}
-		linerect.y = baseY + n * noteUnit;
-		theme->theme->DrawRect(linerect);
 	}
 	// Theme this
 	TThemeRect tmprect;
