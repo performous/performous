@@ -11,10 +11,11 @@ namespace da {
 			gst_record& self = *static_cast<gst_record*>(userdata);
 			int16_t const* iptr = reinterpret_cast<int16_t const*>(GST_BUFFER_DATA(buffer));
 			try {
-				std::vector<sample_t> buf(GST_BUFFER_SIZE(buffer));
+				// Warning GST_BUFFER_SIZE returns a size in byte and not in frames
+				std::vector<sample_t> buf(GST_BUFFER_SIZE(buffer)/sizeof(int16_t));
 				std::transform(iptr, iptr + buf.size(), buf.begin(), conv_from_s16);
 				std::size_t channels = self.s.channels();
-				pcm_data data(&buf[0], GST_BUFFER_SIZE(buffer) / channels, channels);
+				pcm_data data(&buf[0], (GST_BUFFER_SIZE(buffer) /sizeof(int16_t)) / channels, channels);
 				self.s.callback()(data, self.s);
 			} catch (std::exception& e) {
 				self.s.debug(std::string("Exception from recording callback: ") + e.what());
