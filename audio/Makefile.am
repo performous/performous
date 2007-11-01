@@ -1,4 +1,4 @@
-EXTRA_DIST = alsa/alsa.hpp audio.hpp audio_dev.hpp fft.hpp sample.hpp
+EXTRA_DIST = alsa/alsa.hpp audio.hpp audio_dev.hpp fft.hpp sample.hpp plugin.hpp
 
 lib_LTLIBRARIES = libdausng.la
 
