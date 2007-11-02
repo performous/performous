@@ -61,10 +61,12 @@ void CScreenSing::enter() {
 	pitchGraph_id = sm->getVideoDriver()->initSurface(pitchGraph.getCurrent());
 	std::string file = song.path + song.mp3;
 	std::cout << "Now playing: " << file << std::endl;
-	sm->getAudio()->playMusic(file.c_str());
+	CAudio& audio = *sm->getAudio();
+	audio.playMusic(file.c_str());
 	lyrics = new Lyrics(song.notes);
 	playOffset = 0.0;
 	song.reset();
+	audio.wait(); // Until playback starts
 }
 
 void CScreenSing::exit() {

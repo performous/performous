@@ -88,12 +88,18 @@ class CAudio {
 	unsigned int getVolume() { return getVolume_internal(); }
 	void setVolume(unsigned int volume) { setVolume_internal(volume); }
 	void operator()(); // Thread runs here, don't call directly
+	void wait() {
+		boost::mutex::scoped_lock l(m_mutex);
+		while (!m_ready) m_condready.wait(l);
+	}
   private:
 	enum Type { NONE, STOP, PREVIEW, PLAY, QUIT } m_type;
 	std::string m_filename;
 	boost::mutex m_mutex;
 	boost::condition m_cond;
+	boost::condition m_condready;
 	boost::scoped_ptr<boost::thread> m_thread;
+	bool m_ready;
 	int length;
 	unsigned int audioVolume;
 	void playMusic_internal(std::string const& filename);

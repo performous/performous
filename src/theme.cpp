@@ -25,7 +25,7 @@ cairo_surface_t *CTheme::PrintText(TThemeTxt *text) {
 
 	cairo_save(dc);
 
-	pango_font_description_set_family(desc, text->fontfamily);
+	pango_font_description_set_family(desc, text->fontfamily.c_str());
 	pango_font_description_set_style (desc,PANGO_STYLE_NORMAL);
 	pango_font_description_set_absolute_size (desc,text->fontsize * PANGO_SCALE);
 	pango_layout_set_font_description (layout, desc);
@@ -87,7 +87,7 @@ cairo_text_extents_t CTheme::GetTextExtents(TThemeTxt text) {
 	pango_layout_set_alignment(layout, PANGO_ALIGN_CENTER );
 	PangoRectangle rec;
 
-	pango_font_description_set_family(desc, text.fontfamily);
+	pango_font_description_set_family(desc, text.fontfamily.c_str());
 	pango_font_description_set_style (desc,PANGO_STYLE_NORMAL);
 	pango_font_description_set_absolute_size (desc,text.fontsize * PANGO_SCALE);
 	pango_layout_set_font_description (layout, desc);
@@ -113,8 +113,7 @@ void CTheme::ParseSVGForText(std::string const& filename, TThemeTxt *text) {
 
 	/* set some defaults */
 	text->scale = 1.0;
-	text->fontfamily[0]  ='\0';
-	strncat(text->fontfamily,"Sans",4);
+	text->fontfamily = "Sans";
 	text->fontstyle = CAIRO_FONT_SLANT_NORMAL;
 	text->fontweight = CAIRO_FONT_WEIGHT_NORMAL;
 	text->stroke_width = 0;
@@ -181,8 +180,7 @@ void CTheme::walk_tree(xmlNode * a_node, TThemeTxt *text) {
 								if (!strncasecmp(string, "font-size:", 10)) {
 									sscanf((string + 10),"%lf", &(text->fontsize));
 								} else if (!strncasecmp(string, "font-family:", 12)) {
-									text->fontfamily[0]  ='\0';
-									strncat((*text).fontfamily, (string + 12), 31);	 /* copy no more than 31 bytes to not caue buffer overrun */
+									text->fontfamily = string + 12;
 								} else if (!strncasecmp(string, "font-style:", 11)) {
 									if (!strncasecmp((string + 11), "normal", 6)) {
 										text->fontstyle = CAIRO_FONT_SLANT_NORMAL;

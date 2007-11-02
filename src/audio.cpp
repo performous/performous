@@ -86,7 +86,10 @@ void CAudio::operator()() {
 		std::string filename;
 		{
 			boost::mutex::scoped_lock l(m_mutex);
+			m_ready = true;
+			m_condready.notify_all();
 			while (m_type == NONE) m_cond.wait(l);
+			m_ready = false;
 			type = m_type;
 			m_type = NONE;
 			filename = m_filename;

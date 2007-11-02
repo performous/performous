@@ -126,6 +126,7 @@ class Songs {
 	int m_current;
 	int m_order;
 	SDL_Surface* surface_nocover;
+	void sort_internal();
 };
 
 #endif

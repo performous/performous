@@ -12,6 +12,7 @@ struct TRGBA {
 	double g;
 	double b;
 	double a;
+	TRGBA(): r(), g(), b(), a() {}
 };
 
 struct TThemeTxt {
@@ -24,11 +25,12 @@ struct TThemeTxt {
 	TRGBA stroke_col;
 	double stroke_width;
 	double fontsize;
-	char fontfamily[32];
+	std::string fontfamily;
 	cairo_font_slant_t fontstyle;
 	cairo_font_weight_t fontweight;
 	double scale;
 	std::string text;
+	TThemeTxt(): x(), y(), svg_width(), svg_height(), stroke_width(), fontsize(), scale() {}
 };
 
 struct TThemeRect {
@@ -43,6 +45,7 @@ struct TThemeRect {
 	TRGBA fill_col;
 	TRGBA stroke_col;
 	double stroke_width;
+	TThemeRect(): x(), y(), svg_width(), svg_height(), final_width(), final_height(), width(), height(), stroke_width() {}
 };
 
 class CTheme: boost::noncopyable {

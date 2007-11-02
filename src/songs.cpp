@@ -219,6 +219,7 @@ void Song::reset() {
 	m_score = 0.0;
 	m_scoreTime = 0.0;
 	m_scoreIt = notes.begin();
+	std::cout << "reset" << std::endl;
 }
 
 void Song::update(double time, int note) {
@@ -375,7 +376,7 @@ void Songs::setFilter(std::string const& val) {
 		}
 	}
 	m_filtered.swap(filtered);
-	sortChange(0);
+	sort_internal();
 }
 
 class CmpByField {
@@ -415,6 +416,10 @@ void Songs::sortChange(int diff) {
 	m_order = (m_order + diff) % orders;
 	if (m_order < 0) m_order += orders;
 	RestoreSel restore(*this);
+	sort_internal();
+}
+
+void Songs::sort_internal() {
 	switch (m_order) {
 	  case 0: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&Song::title)); break;
 	  case 1: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&Song::artist)); break;
