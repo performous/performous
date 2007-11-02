@@ -1,9 +1,10 @@
 Features:
 
 - Add analysis
+- Add compose screen (using features discussed on mailing list)
+- Add configurable microphone latency (to avoid current latency)
 
 
 Fixes/Enhancement:
 
-- Have a try with SGE instead of SDL_gfx (benchmark both)
 - Use cairo_surface_create_for_image instead of SDL_image
