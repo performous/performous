@@ -41,6 +41,7 @@ static void checkEvents_SDL(CScreenManager& sm) {
 			if (keypressed == SDLK_RETURN && modifier & KMOD_ALT ) {
 				SDL_WM_ToggleFullScreen(screenSDL);
 				sm.setFullscreenStatus(!sm.getFullscreenStatus());
+				continue; // Already handled here...
 			}
 			break;
 		}

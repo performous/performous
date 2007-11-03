@@ -47,7 +47,7 @@ void CScreenSongs::manageEvent(SDL_Event event) {
 		sm->getSongs()->setFilter(m_search);
 	}
 	// These are available in both modes (search and normal)
-	if (key == SDLK_RETURN && !(mod & KMOD_ALT)) sm->activateScreen("Sing");
+	if (key == SDLK_RETURN) sm->activateScreen("Sing");
 	else if (key == SDLK_LEFT) sm->getSongs()->advance(-1);
 	else if (key == SDLK_RIGHT) sm->getSongs()->advance(1);
 	else if (key == SDLK_PAGEUP) sm->getSongs()->advance(-10);

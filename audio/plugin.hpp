@@ -1,78 +1,127 @@
-#ifndef PLUGIN_HPP_INCLUDED
-#define PLUGIN_HPP_INCLUDED
+//  boost/plugin.hpp - plugin registration framework
+
+//  Copyright Lasse Karkkainen 2007
+
+//  Use, modification, and distribution is subject to the Boost Software
+//  License, Version 1.0 or later. (See accompanying file LICENSE_1_0.txt or
+//  copy at http://www.boost.org/LICENSE_1_0.txt)
+
+//  See library home page at http://www.boost.org/libs/plugin
+
+#ifndef BOOST_PLUGIN_HPP_INCLUDED
+#define BOOST_PLUGIN_HPP_INCLUDED
 
 #include <map>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
-namespace da {
-	namespace util {
-		namespace {
-			template <typename T> typename T::first_type get_first(T const& pair) { return pair.first; }
-		}
-		template <typename Base, typename Arg = std::string, typename Key = std::string> class plugin {
-		  public:
-			struct invalid_key_error: public std::logic_error {
-				invalid_key_error(std::string const& msg): logic_error(msg) {}
-			};
-			class regbase;
-		  private:
-			typedef std::map<Key, regbase*> map_t;
-			// Important: the map has to be wrapped inside a function instead of it
-			// being a static member variable of this class to ensure that it gets
-			// initialized when it is used the first time. If it were static member,
-			// the initialization (on program startup) might occur too late.
-			static map_t& map() {
-				static map_t m;
-				return m;
-			}
-		  public:
-			class iterator: public std::iterator<std::bidirectional_iterator_tag, Key> {
-				typename map_t::const_iterator m_it;
-			  public:
-				iterator(typename map_t::iterator it): m_it(it) {}
-				iterator(typename map_t::const_iterator it): m_it(it) {}
-				Key const& operator*() const { return m_it->first; }
-				Key const* operator->() const { return &m_it->first; }
-				Base* operator()(Arg arg) { return (*m_it->second)(arg); }
-				bool operator==(iterator const& other) const { return m_it == other.m_it; }
-				bool operator!=(iterator const& other) const { return m_it != other.m_it; }
-				iterator& operator++() { ++m_it; return *this; }
-				iterator& operator--() { --m_it; return *this; }
-				iterator operator++(int) { return iterator(m_it++); }
-				iterator operator--(int) { return iterator(m_it--); }
-			};
-			static iterator begin() { return map().begin(); }
-			static iterator end() { return map().end(); }
-			static iterator find(Key const& key) {
-				map_t const& m = map();
-				typename map_t::const_iterator it = m.find(key);
-				if (it == m.end()) throw invalid_key_error("plugin::find: Requested key not found");
-				return it;
-			}
-			static typename map_t::size_type size() { return map().size(); }
-			static bool empty() { return map().empty(); }
-			/** @short An abstract base for classes that can create Base*. **/
-			class regbase {
-				typename map_t::iterator m_it;
-			  public:
-				regbase(Key const& key) {
-					std::pair<typename map_t::iterator, bool> p = map().insert(std::pair<Key, regbase*>(key, this));
-					// Note: throwing normally crashes the application.
-					if (!p.second) throw invalid_key_error("plugin::regbase: Key already used");
-					m_it = p.first;
-				}
-				virtual ~regbase() { map().erase(m_it); }
-				virtual Base* operator()(Arg) const = 0;
-			};
-			/** @short A construct implementation that passes arg to the constructor of Class. **/
-			template <typename Class> struct reg: public regbase {
-				reg(Key const& key): regbase(key) {}
-				Base* operator()(Arg arg) const { return new Class(arg); }
-			};
-		};
-	}
+namespace boost {
+    /**
+    * @short A polymorphic plugin factory.
+    *
+    * This class provides facilities for registering implementations of Base
+    * and for requesting instances of implementations by their names (of
+    * type Key), passing an argument of type Arg to the constructor of the
+    * implementation.
+    *
+    * More generically, a Base* is returned using a handler previously
+    * registered with a specific Key, calling handler's operator()(Arg arg).
+    *
+    * See documentation for usage examples.
+    **/
+    template <typename Base,
+      typename Arg = std::string const&,
+      typename Key = std::string>
+    class plugin {
+      public:
+        typedef Base base_type;
+        typedef Arg arg_type;
+        typedef Key key_type;
+        struct invalid_key_error: public std::logic_error {
+            invalid_key_error(std::string const& msg): logic_error(msg) {}
+        };
+        class reg_base;
+      private:
+        typedef std::multimap<Key, reg_base*> map_t;
+        // Important: the map has to be wrapped inside a function instead of it
+        // being a static member variable of this class to ensure that it gets
+        // initialized when it is used the first time. If it were static member,
+        // the initialization (on program startup) might occur too late.
+        static map_t& map() {
+            static map_t m;
+            return m;
+        }
+      public:
+        /** An iterator for browsing the available keys. **/
+        class iterator:
+          public std::iterator<std::bidirectional_iterator_tag, Key>
+        {
+            typename map_t::const_iterator m_it;
+          public:
+            iterator(typename map_t::iterator it): m_it(it) {}
+            iterator(typename map_t::const_iterator it): m_it(it) {}
+            /** Access the key. **/
+            Key const& operator*() const { return m_it->first; }
+            /** Access a member of the key. **/
+            Key const* operator->() const { return &m_it->first; }
+            /**
+            * Activate the handler attached to the current key.
+            * Normally new's an object passing arg to its constructor.
+            **/
+            Base* operator()(Arg arg) { return (*m_it->second)(arg); }
+            bool operator==(iterator const& r) const { return m_it == r.m_it; }
+            bool operator!=(iterator const& r) const { return m_it != r.m_it; }
+            iterator& operator++() { ++m_it; return *this; }
+            iterator& operator--() { --m_it; return *this; }
+            iterator operator++(int) { return iterator(m_it++); }
+            iterator operator--(int) { return iterator(m_it--); }
+        };
+        /** Get an iterator to the first key. **/
+        static iterator begin() { return map().begin(); }
+        /** Get the end iterator. **/
+        static iterator end() { return map().end(); }
+        /**
+        * Find a specific key.
+        * @throw plugin::invalid_key_error if the key is not found
+        * @return iterator to the option matching the key
+        **/
+        static iterator find(Key const& key) {
+            map_t const& m = map();
+            typename map_t::const_iterator it = m.find(key);
+            if (it == m.end())
+              throw invalid_key_error("plugin::find: Requested key not found");
+            return it;
+        }
+        /** Get the number of options. **/
+        static typename map_t::size_type size() { return map().size(); }
+        /** Test if there are any options. **/
+        static bool empty() { return map().empty(); }
+        /** @short An abstract base for classes that can emit Base*. **/
+        class reg_base {
+            typename map_t::iterator m_it;
+          public:
+        	/**
+        	* Adds self as an option to the plugin class, with the given key.
+        	**/
+            reg_base(Key const& key):
+              m_it(map().insert(std::pair<Key, reg_base*>(key, this)))
+            {}
+            virtual ~reg_base() { map().erase(m_it); }
+            virtual Base* operator()(Arg) const = 0;
+        };
+        /**
+        * @short A reg_base implementation that returns new Class(arg).
+        * An instance of this class is normally created as a static (file scope)
+        * variable so that the constructor gets called on program startup and
+        * that the destructor gets called on program exit, or similarly on
+        * dynamic library load/unload.
+        **/
+        template <typename Class> struct reg: public reg_base {
+            reg(Key const& key): reg_base(key) {}
+            Base* operator()(Arg arg) const { return new Class(arg); }
+        };
+    };
 }
 
 #endif

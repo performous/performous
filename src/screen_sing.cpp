@@ -1,4 +1,6 @@
 #include <screen_sing.h>
+
+#include <boost/format.hpp>
 #include <songs.h>
 #include <pitch_graph.h>
 #include <cairotosdl.h>
@@ -82,20 +84,21 @@ void CScreenSing::exit() {
 void CScreenSing::manageEvent(SDL_Event event) {
 	if (event.type == SDL_KEYDOWN) {
 		CScreenManager* sm = CScreenManager::getSingletonPtr();
+		CAudio& audio = *sm->getAudio();
 		int key = event.key.keysym.sym;
 		if (key == SDLK_ESCAPE || key == SDLK_q) sm->activateScreen(m_sentence.empty() ? "Score" : "Songs");
 		else if (key == SDLK_SPACE || key == SDLK_p) sm->getAudio()->togglePause();
 		else if (key == SDLK_PLUS) playOffset += 0.02;
 		else if (key == SDLK_MINUS) playOffset -= 0.02;
-		else if (key == SDLK_HOME && !m_sentence.empty()) {
-			CAudio& a = *sm->getAudio();
-			double diff = m_sentence[0].begin - 1.0 - a.getPosition();
-			if (diff > 0.0) a.seek(diff); // TODO: implement absolute seeking
+		else if (key == SDLK_HOME) audio.seek(-audio.getPosition());
+		else if (key == SDLK_RETURN && !m_sentence.empty()) {
+			double diff = m_sentence[0].begin - 1.0 - audio.getPosition();
+			if (diff > 0.0) audio.seek(diff);
 		}
-		else if (key == SDLK_LEFT) sm->getAudio()->seek(-5.0);
-		else if (key == SDLK_RIGHT) sm->getAudio()->seek(5.0);
-		else if (key == SDLK_UP) sm->getAudio()->seek(30.0);
-		else if (key == SDLK_DOWN) sm->getAudio()->seek(-30.0);
+		else if (key == SDLK_LEFT) audio.seek(-5.0);
+		else if (key == SDLK_RIGHT) audio.seek(5.0);
+		else if (key == SDLK_UP) audio.seek(30.0);
+		else if (key == SDLK_DOWN) audio.seek(-30.0);
 	}
 }
 
@@ -112,23 +115,6 @@ void CScreenSing::draw() {
 	float resFactorAvg = (resFactorX + resFactorY) / 2.0;
 	double oldfontsize;
 	theme->theme->clear();
-	// Theme this
-	TThemeRect linerect;
-	linerect.stroke_col.r = linerect.stroke_col.g = linerect.stroke_col.b = 0.5;
-	linerect.stroke_col.a = 0.9;
-	linerect.stroke_width = 1.*resFactorAvg;
-	linerect.svg_width = m_width;
-	linerect.svg_height = m_height;
-	linerect.height = 1.*resFactorY;
-	linerect.fill_col.a = 0.5;
-	linerect.x = 0;
-	linerect.width = m_width;
-	linerect.fill_col.r = 50;
-	linerect.fill_col.g = 50;
-	linerect.fill_col.b = 50;
-	linerect.final_height = 0;
-	linerect.final_width  = 0;
-
 	// Get the time in the song
 	double time = sm->getAudio()->getPosition();
 	time = std::max(0.0, time + playOffset);
@@ -154,21 +140,13 @@ void CScreenSing::draw() {
 		sm->getVideoDriver()->updateSurface(backgroundSurf_id , (SDL_Surface *) NULL);
 	}
 	// Compute and draw the timer and the progressbar
-	{
-		char dateStr[32];
-		sprintf(dateStr,"%.2u:%.2u", unsigned(time) / 60, unsigned(time) % 60);
-		theme->timertxt.text = dateStr;
-		theme->theme->PrintText(&theme->timertxt);
-		theme->progressfg.width = theme->progressfg.final_width * songPercent;
-		theme->theme->DrawRect(theme->progressfg); 
-	}
-	//draw score	
-	{
-		char scoreStr[32];
-		sprintf(scoreStr,"%04d", song.getScore());
-		theme->p1score.text = scoreStr;
-		theme->theme->PrintText(&theme->p1score);
-	}
+	theme->timertxt.text = (boost::format("%02u:%02u") % (unsigned(time) / 60) % (unsigned(time) % 60)).str();
+	theme->theme->PrintText(&theme->timertxt);
+	theme->progressfg.width = theme->progressfg.final_width * songPercent;
+	theme->theme->DrawRect(theme->progressfg); 
+	//draw score
+	theme->p1score.text = (boost::format("%04d") % song.getScore()).str();
+	theme->theme->PrintText(&theme->p1score);
 	// draw the sang note TODO: themed sang note
 	{
 		TThemeTxt tmptxt = theme->timertxt; // use timertxt as template
@@ -204,11 +182,24 @@ void CScreenSing::draw() {
 	int max = song.noteMax + 7;
 	double noteUnit = -0.5 * m_height / std::max(32, max - min);
 	double baseY = 0.5 * m_height - 0.5 * (min + max) * noteUnit;
+	// Theme this
+	TThemeRect linerect;
+	linerect.svg_width = m_width;
+	linerect.svg_height = m_height;
+	linerect.x = 0;
+	linerect.width = m_width;
+	linerect.height = 0.0;
+	linerect.fill_col.r = 0.0;
+	linerect.fill_col.g = 0.0;
+	linerect.fill_col.b = 0.0;
+	linerect.fill_col.a = 0.0;
+	linerect.final_height = 0;
+	linerect.final_width  = 0;
+	linerect.stroke_col.a = 0.7;
 	// Draw note lines
-	linerect.stroke_col.r = linerect.stroke_col.g = linerect.stroke_col.b = 0.5;
 	if (!m_sentence.empty()) {
 		for (int n = song.noteMin; n <= song.noteMax; ++n) {
-			linerect.stroke_width = (song.scale.isSharp(n) ? 0.05 : 1.2) * resFactorAvg;
+			linerect.stroke_width = (song.scale.isSharp(n) ? 0.5 : 1.5) * resFactorAvg;
 			if (n % 12) {
 				linerect.stroke_col.r = 0.5;
 				linerect.stroke_col.g = 0.5;
@@ -225,12 +216,11 @@ void CScreenSing::draw() {
 	// Theme this
 	TThemeRect tmprect;
 	tmprect.stroke_col.r = tmprect.stroke_col.g = tmprect.stroke_col.b = 0.5;
-	tmprect.stroke_col.a = 255;
+	tmprect.stroke_col.a = 0.8;
 	tmprect.stroke_width = resFactorAvg;
 	tmprect.svg_width = m_width;
 	tmprect.svg_height = m_height;
 	tmprect.height = -noteUnit;
-	tmprect.fill_col.a = 255;
 	tmprect.final_height = 0;
 	tmprect.final_width  = 0;
 	int state = 0;
@@ -244,25 +234,29 @@ void CScreenSing::draw() {
 		tmprect.x = baseX + begin * pixUnit;
 		tmprect.width = (end - begin) * pixUnit;
 		if (state < 2) {
-			tmprect.fill_col.r = 0.5;
-			tmprect.fill_col.g = 0.5;
-			tmprect.fill_col.b = 0.5;
+			tmprect.fill_col.r = 0.7;
+			tmprect.fill_col.g = 0.7;
+			tmprect.fill_col.b = 0.7;
+			tmprect.fill_col.a = 1.0;
 		} else {
 			switch (m_sentence[i].type) {
 			  case Note::FREESTYLE:
 				tmprect.fill_col.r = 0.6;
 				tmprect.fill_col.g = 1.0;
 				tmprect.fill_col.b = 0.6;
+				tmprect.fill_col.a = 1.0;
 				break;
 			  case Note::GOLDEN:
 				tmprect.fill_col.r = 1.0;
 				tmprect.fill_col.g = 0.8;
 				tmprect.fill_col.b = 0.0;
+				tmprect.fill_col.a = 1.0;
 				break;
 			  default:
-				tmprect.fill_col.r = 0.9;
-				tmprect.fill_col.g = 0.9;
+				tmprect.fill_col.r = 0.8;
+				tmprect.fill_col.g = 0.8;
 				tmprect.fill_col.b = 1.0;
+				tmprect.fill_col.a = 1.0;
 			}
 		}
 		theme->theme->DrawRect(tmprect);

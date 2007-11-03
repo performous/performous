@@ -8,7 +8,7 @@ namespace da {
 	struct record::dev {
 		virtual ~dev() {}
 	};
-	typedef util::plugin<record::dev, settings&, devinfo> record_plugin;
+	typedef boost::plugin<record::dev, settings&, devinfo> record_plugin;
 }
 
 #endif

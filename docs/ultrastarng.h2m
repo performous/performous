@@ -40,7 +40,7 @@ Configuration: adjust settings
 .SS "Song selection:"
 .TP
 \fBEnter\fR
-Choose the currently selected song
+Pick the currently selected song
 .TP
 \fBLeft\fR/\fBRight\fR/\fBPgUp\fR/\fBPgDn\fR
 Browse the list of songs
@@ -65,10 +65,10 @@ Exit to main menu or quit search mode
 
 .SS "Singing screen:"
 .TP
-\fBLeft\fR/\fBRight\fR/\fBUp\fR/\fBDown\fR
+\fBLeft\fR/\fBRight\fR/\fBUp\fR/\fBDown\fR/\fBHome\fR
 Fast forward or rewind the song
 .TP
-\fBHome\fR
+\fBEnter\fR
 Skip long solos (jump to the beginning of next sentence)
 .TP
 \fB+\fR/\fB-\fR
