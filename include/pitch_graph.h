@@ -8,7 +8,7 @@ class PitchGraph
 	public:
 	PitchGraph(int width, int height);
 
-	cairo_surface_t* renderPitch(double pitch, double time);
+	cairo_surface_t* renderPitch(double pitch, double time, double volume);
 	cairo_surface_t* getCurrent() {return this->surface;}
 	
 	void clear();

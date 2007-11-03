@@ -107,8 +107,6 @@ void CScreenSing::draw() {
 	}
 	Song& song = sm->getSongs()->current();
 	float freq = m_analyzer.getFreq();
-	MusicalScale scale;
-	int note = scale.getNoteId(freq);
 	float resFactorX = m_width / 800.0;
 	float resFactorY = m_height / 600.0;
 	float resFactorAvg = (resFactorX + resFactorY) / 2.0;
@@ -136,7 +134,7 @@ void CScreenSing::draw() {
 	time = std::max(0.0, time + playOffset);
 	double songPercent = time / sm->getAudio()->getLength();
 	// Update scoring
-	song.update(time, note);
+	song.update(time, freq);
 	// Here we compute all about the lyrics
 	lyrics->updateSentences(time);
 	std::string sentenceNextSentence = lyrics->getSentenceNext();
@@ -174,7 +172,7 @@ void CScreenSing::draw() {
 	// draw the sang note TODO: themed sang note
 	{
 		TThemeTxt tmptxt = theme->timertxt; // use timertxt as template
-		tmptxt.text = scale.getNoteStr(freq);
+		tmptxt.text = song.scale.getNoteStr(freq);
 		tmptxt.x = 600;
 		tmptxt.fontsize = 25;
 		theme->theme->PrintText(&tmptxt);
@@ -210,7 +208,7 @@ void CScreenSing::draw() {
 	linerect.stroke_col.r = linerect.stroke_col.g = linerect.stroke_col.b = 0.5;
 	if (!m_sentence.empty()) {
 		for (int n = song.noteMin; n <= song.noteMax; ++n) {
-			linerect.stroke_width = (scale.isSharp(n) ? 0.05 : 1.2) * resFactorAvg;
+			linerect.stroke_width = (song.scale.isSharp(n) ? 0.05 : 1.2) * resFactorAvg;
 			if (n % 12) {
 				linerect.stroke_col.r = 0.5;
 				linerect.stroke_col.g = 0.5;
@@ -274,13 +272,14 @@ void CScreenSing::draw() {
 	if (!m_sentence.empty()) {
 		double graphTime = (baseX + time * pixUnit) / m_width;
 		if (freq == 0.0) {
-			pitchGraph.renderPitch(0.0, graphTime);
+			pitchGraph.renderPitch(0.0, graphTime, 0.0);
 		} else {
 			unsigned int i = 0;
 			// Find the currently playing note or the next playing note (or the last note?)
 			while (i < m_sentence.size() && time > m_sentence[i].end) ++i;
 			Note const& n = m_sentence[i];
-			pitchGraph.renderPitch((baseY + (n.note + n.diff(note)) * noteUnit) / m_height, graphTime);
+			double volume = std::max(0.0, 1.0 + m_analyzer.getPeak() / 40.0);
+			pitchGraph.renderPitch((baseY + (n.note + n.diff(song.scale.getNote(freq))) * noteUnit) / m_height, graphTime, volume);
 		}
 	}
 	

@@ -90,17 +90,4 @@ class Capture {
 	Analyzer const& analyzer() const { return m_analyzer; }
 };
 
-class MusicalScale {
-	double m_baseFreq;
-	static const int m_baseId = 33;
-  public:
-	MusicalScale(double baseFreq = 440.0): m_baseFreq(baseFreq) {}
-	std::string getNoteStr(double freq) const;
-	unsigned int getNoteNum(int id) const;
-	bool isSharp(int id) const;
-	double getNoteFreq(int id) const;
-	int getNoteId(double freq) const;
-	double getNoteOffset(double freq) const;
-};
-
 #endif

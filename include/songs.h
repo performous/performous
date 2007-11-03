@@ -9,38 +9,30 @@
 #include <string>
 #include <vector>
 
+class MusicalScale {
+	double m_baseFreq;
+	static const int m_baseId = 33;
+  public:
+	MusicalScale(double baseFreq = 440.0): m_baseFreq(baseFreq) {}
+	std::string getNoteStr(double freq) const;
+	unsigned int getNoteNum(int id) const;
+	bool isSharp(int id) const;
+	double getNoteFreq(int id) const;
+	int getNoteId(double freq) const;
+	double getNote(double freq) const;
+	double getNoteOffset(double freq) const;
+};
+
 struct Note {
 	double begin, end;
 	enum Type { FREESTYLE = 'F', NORMAL = ':', GOLDEN = '*', SLEEP = '-'} type;
 	int note;
 	std::string syllable;
-	int diff(int n) const {
-		int d = (6 + n - note) % 12;
-		if (d < 0) d += 12;
-		return d - 6;
-	}
-	double maxScore() const {
-		return scoreMultiplier(note) * (end - begin);
-	}
-	double score(int n, double b, double e) const {
-		double len = std::min(e, end) - std::max(b, begin);
-		if (len <= 0.0) return 0.0;
-		return scoreMultiplier(n) * len;
-	}
+	double diff(double n) const;
+	double maxScore() const;
+	double score(double freq, double b, double e) const;
   private:
-	double scoreMultiplier(int n) const {
-		double max = 0.0;
-		switch (type) {
-		  case FREESTYLE: return 1.0;
-		  case NORMAL: max = 1.0; break;
-		  case GOLDEN: max = 2.0; break;
-		  case SLEEP: break;
-		}
-		int error = abs(diff(n));
-		if (error == 0) return max;
-		if (error == 1) return 0.5 * max;
-		return 0.0;
-	}
+	double scoreMultiplier(double n) const;
 };
 
 class SongParser;
@@ -55,7 +47,7 @@ class Song: boost::noncopyable {
 	}
 	// Temporary score calculation system
 	void reset();
-	void update(double time, int note);
+	void update(double time, double freq);
 	int getScore() const { return 10000 * m_score; }
 	bool parseField(std::string const& line);
 	std::string str() const { return title + " by " + artist; }
@@ -83,6 +75,7 @@ class Song: boost::noncopyable {
 	std::string video;
 	double videoGap;
 	double start;
+	MusicalScale scale;
   private:
 	SDL_Surface* m_coverSurf;
 	SDL_Surface* m_backgroundSurf;

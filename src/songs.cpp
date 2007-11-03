@@ -3,13 +3,108 @@
 #include <glob.h>
 #include <songs.h>
 #include <screen.h>
+// math.h needed for C99 stuff
+#include <math.h>
 #include <algorithm>
+#include <cmath>
 #include <cstdlib>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <limits>
 #include <stdexcept>
+
+std::string MusicalScale::getNoteStr(double freq) const {
+	int id = getNoteId(freq);
+	if (id == -1) return std::string();
+	static const char * note[12] = {"C ","C#","D ","D#","E ","F ","F#","G ","G#","A ","A#","B "};
+	std::ostringstream oss;
+	// Acoustical Society of America Octave Designation System
+	//int octave = 2 + id / 12;
+	oss << note[id%12] << " " << (int)round(freq) << " Hz";
+	return oss.str();
+}
+
+unsigned int MusicalScale::getNoteNum(int id) const {
+	switch (id % 12) {
+	  case 0: return 0;
+	  case 1: return 0;
+	  case 2: return 1;
+	  case 3: return 1;
+	  case 4: return 2;
+	  case 5: return 3;
+	  case 6: return 3;
+	  case 7: return 4;
+	  case 8: return 4;
+	  case 9: return 5;
+	  case 10: return 5;
+	  default: return 6;
+	}
+}
+
+bool MusicalScale::isSharp(int id) const {
+	if (id < 0) throw std::logic_error("MusicalScale::isSharp: Invalid note ID");
+	id %= 12;
+	switch (id) {
+	  case 1: case 3: case 6: case 8: case 10: return true;
+	}
+	return false;
+}
+
+double MusicalScale::getNoteFreq(int id) const {
+	if (id == -1) return 0.0;
+	return m_baseFreq * pow(2.0, (id - m_baseId) / 12.0);
+}
+
+int MusicalScale::getNoteId(double freq) const {
+	double note = getNote(freq);
+	if (note >= 0.0 && note < 100.0) return int(note + 0.5);
+	return -1;
+}
+
+double MusicalScale::getNote(double freq) const {
+	if (freq < 1.0) return std::numeric_limits<double>::quiet_NaN();
+	return m_baseId + 12.0 * log(freq / m_baseFreq) / log(2);
+}
+
+double MusicalScale::getNoteOffset(double freq) const {
+	double frac = freq / getNoteFreq(getNoteId(freq));
+	return 12.0 * log(frac) / log(2);
+}
+
+double Note::diff(double n) const {
+	return remainder(n - note, 12.0);
+	/*
+	int d = (6 + n - note) % 12;
+	if (d < 0) d += 12;
+	return d - 6;
+	*/
+}
+
+double Note::maxScore() const {
+	return scoreMultiplier(note) * (end - begin);
+}
+
+double Note::score(double n, double b, double e) const {
+	double len = std::min(e, end) - std::max(b, begin);
+	if (len <= 0.0) return 0.0;
+	return scoreMultiplier(n) * len;
+}
+
+double Note::scoreMultiplier(double n) const {
+	double max = 0.0;
+	switch (type) {
+	  case FREESTYLE: return 1.0;
+	  case NORMAL: max = 1.0; break;
+	  case GOLDEN: max = 2.0; break;
+	  case SLEEP: break;
+	}
+	if (!(n > 0.0)) return 0.0;
+	double error = std::abs(diff(n));
+	if (error < 0.5) return max;
+	return std::max(0.0, 1.5 - error) * max;
+}
+
 
 class SongParser {
   public:
@@ -222,10 +317,10 @@ void Song::reset() {
 	std::cout << "reset" << std::endl;
 }
 
-void Song::update(double time, int note) {
+void Song::update(double time, double freq) {
 	if (time <= m_scoreTime) return;
 	while (m_scoreIt != notes.end()) {
-		if (note != -1) m_score += m_scoreFactor * m_scoreIt->score(note, m_scoreTime, time);
+		if (freq > 0.0) m_score += m_scoreFactor * m_scoreIt->score(scale.getNote(freq), m_scoreTime, time);
 		if (time < m_scoreIt->end) break;
 		++m_scoreIt;
 	}
