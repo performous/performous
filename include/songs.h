@@ -32,7 +32,7 @@ struct Note {
 	double maxScore() const;
 	double score(double freq, double b, double e) const;
   private:
-	double scoreMultiplier(double n) const;
+	double scoreMultiplier(double error) const;
 };
 
 class SongParser;

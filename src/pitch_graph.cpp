@@ -12,6 +12,7 @@ cairo_surface_t* PitchGraph::renderPitch(double pitch, double time, double volum
 	if (pitch == 0.0);
 	else if (clearPage) clearPage = 0;
 	else if (lastTime < time) {
+		cairo_new_path(dc);
 		cairo_move_to(dc, lastTime, pitch);
 		cairo_set_line_width(dc, 0.01 * volume);
 		cairo_line_to(dc, time, pitch);

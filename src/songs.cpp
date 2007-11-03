@@ -72,26 +72,16 @@ double MusicalScale::getNoteOffset(double freq) const {
 	return 12.0 * log(frac) / log(2);
 }
 
-double Note::diff(double n) const {
-	return remainder(n - note, 12.0);
-	/*
-	int d = (6 + n - note) % 12;
-	if (d < 0) d += 12;
-	return d - 6;
-	*/
-}
-
-double Note::maxScore() const {
-	return scoreMultiplier(note) * (end - begin);
-}
+double Note::diff(double n) const {	return remainder(n - note, 12.0); }
+double Note::maxScore() const { return scoreMultiplier(0.0) * (end - begin); }
 
 double Note::score(double n, double b, double e) const {
 	double len = std::min(e, end) - std::max(b, begin);
-	if (len <= 0.0) return 0.0;
-	return scoreMultiplier(n) * len;
+	if (len <= 0.0 || !(n > 0.0)) return 0.0;
+	return scoreMultiplier(std::abs(diff(n))) * len;
 }
 
-double Note::scoreMultiplier(double n) const {
+double Note::scoreMultiplier(double error) const {
 	double max = 0.0;
 	switch (type) {
 	  case FREESTYLE: return 1.0;
@@ -99,8 +89,6 @@ double Note::scoreMultiplier(double n) const {
 	  case GOLDEN: max = 2.0; break;
 	  case SLEEP: break;
 	}
-	if (!(n > 0.0)) return 0.0;
-	double error = std::abs(diff(n));
 	if (error < 0.5) return max;
 	return std::max(0.0, 1.5 - error) * max;
 }
@@ -314,7 +302,6 @@ void Song::reset() {
 	m_score = 0.0;
 	m_scoreTime = 0.0;
 	m_scoreIt = notes.begin();
-	std::cout << "reset" << std::endl;
 }
 
 void Song::update(double time, double freq) {
