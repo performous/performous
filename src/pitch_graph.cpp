@@ -11,7 +11,7 @@ cairo_surface_t* PitchGraph::renderPitch(double pitch, double time) {
 	cairo_get_current_point(dc, &lastTime ,&lastPitch);
 	if (pitch == 0.0);
 	else if (clearPage) clearPage = 0;
-	else if (lastPitch != 0) cairo_line_to(dc, time, lastPitch);
+	else if (lastPitch != 0 && lastTime < time) cairo_line_to(dc, time, lastPitch);
 	cairo_move_to(dc, time, pitch);
 	cairo_stroke_preserve(dc);
 	return surface;
