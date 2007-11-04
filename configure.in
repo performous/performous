@@ -129,7 +129,7 @@ AC_ARG_ENABLE(record-gst,
 		no)  enable_record_gst="no" ;;
 		*) AC_MSG_ERROR(bad value ${enableval} for --enable-record-gst) ;;
  	esac],
-	enable_record_gst="yes")
+	enable_record_gst="autodetect")
 
 # Check for the standard headers
 AC_HEADER_STDC
