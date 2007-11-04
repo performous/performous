@@ -3,7 +3,8 @@
 #include <ostream>
 #include <sstream>
 
-namespace da {
+namespace {
+	using namespace da;
 	class pa19_record: public record::dev {
 		static int c_callback(const void* input, void*, unsigned long frames, const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags, void* userdata)
 		{
@@ -55,8 +56,6 @@ namespace da {
 			s_orig = s;
 		}
 	};
-	namespace {
-		record_plugin::reg<pa19_record> r(devinfo("pa", "PortAudio v19 PCM capture. Device number as settings (otherwise PA default)."));
-	}
+	boost::plugin::simple<record_plugin, pa19_record> r(devinfo("pa", "PortAudio v19 PCM capture. Device number as settings (otherwise PA default)."));
 }
 

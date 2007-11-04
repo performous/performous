@@ -6,7 +6,8 @@
 #include <ostream>
 #include <stdint.h>
 
-namespace da {
+namespace {
+	using namespace da;
 	class alsa_record: public record::dev {
 		settings m_s;
 		alsa::pcm m_pcm;
@@ -92,9 +93,7 @@ namespace da {
 			}
 		}
 	};
-	namespace {
-		record_plugin::reg<alsa_record> r(devinfo("alsa", "ALSA PCM capture. Device string can be given as settings (default is \"default\")."));
-	}
+	boost::plugin::simple<record_plugin, alsa_record> r(devinfo("alsa", "ALSA PCM capture. Device string can be given as settings (default is \"default\")."));
 }
 
 

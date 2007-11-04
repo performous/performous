@@ -12,16 +12,14 @@
 #include <signal.h>
 #include <sstream>
 
-namespace da {
-
-	namespace {
-		// Boost WTF time format, directly from C...
-		boost::xtime& operator+=(boost::xtime& time, double seconds) {
-			double nsec = 1e9 * (time.sec + seconds) + time.nsec;
-			time.sec = boost::xtime::xtime_sec_t(nsec / 1e9);
-			time.nsec = boost::xtime::xtime_nsec_t(std::fmod(nsec, 1e9));
-			return time;
-		}
+namespace {
+	using namespace da;
+	// Boost WTF time format, directly from C...
+	boost::xtime& operator+=(boost::xtime& time, double seconds) {
+		double nsec = 1e9 * (time.sec + seconds) + time.nsec;
+		time.sec = boost::xtime::xtime_sec_t(nsec / 1e9);
+		time.nsec = boost::xtime::xtime_nsec_t(std::fmod(nsec, 1e9));
+		return time;
 	}
 
 	class tonegen: public record::dev {
@@ -99,8 +97,6 @@ namespace da {
 			}
 		}
 	};
-	namespace {
-		record_plugin::reg<tonegen> r(devinfo("~tone", "Tone generator. Settings format: tone1:tone2:..., where each tone is specified as frequency in Hz, optionally followed by amplitude or phase settings, e.g. 440.amplitude(-20).phase(0.25). Amplitude values <= 0 are taken as decibels and > 0 are taken as absolute values. If no parameters are given, a 440 Hz tone will be generated."));
-	}
+	boost::plugin::simple<record_plugin, tonegen> r(devinfo("~tone", "Tone generator. Settings format: tone1:tone2:..., where each tone is specified as frequency in Hz, optionally followed by amplitude or phase settings, e.g. 440.amplitude(-20).phase(0.25). Amplitude values <= 0 are taken as decibels and > 0 are taken as absolute values. If no parameters are given, a 440 Hz tone will be generated."));
 }
 

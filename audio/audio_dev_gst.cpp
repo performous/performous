@@ -5,7 +5,8 @@
 
 #include <iostream>
 
-namespace da {
+namespace {
+	using namespace da;
 	class gst_record: public record::dev {
 		static void c_callback(GstElement*, GstBuffer* buffer, GstPad*, gpointer userdata) {
 			gst_record& self = *static_cast<gst_record*>(userdata);
@@ -88,8 +89,6 @@ namespace da {
 			gst_object_unref(GST_OBJECT(pipeline));
 		}
 	};
-	namespace {
-		record_plugin::reg<gst_record> r(devinfo("gst", "GStreamer PCM capture. Settings are not used."));
-	}
+	boost::plugin::simple<record_plugin, gst_record> r(devinfo("gst", "GStreamer PCM capture. Settings are not used."));
 }
 

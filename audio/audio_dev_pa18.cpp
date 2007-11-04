@@ -3,7 +3,8 @@
 #include <ostream>
 #include <stdint.h>
 
-namespace da {
+namespace {
+	using namespace da;
 	class pa18_record: public record::dev {
 		static int c_callback(void* input, void*, unsigned long frames, PaTimestamp, void* userdata)
 		{
@@ -42,7 +43,5 @@ namespace da {
 			if( err != paNoError ) throw std::runtime_error("Cannot start PortAudio audio stream " + s.subdev() + ": " + Pa_GetErrorText(err));
 		}
 	};
-	namespace {
-		record_plugin::reg<pa18_record> r(devinfo("pa18", "PortAudio v18 PCM capture. Settings are not used."));
-	}
+	boost::plugin::simple<record_plugin, pa18_record> r(devinfo("pa18", "PortAudio v18 PCM capture. Settings are not used."));
 }
