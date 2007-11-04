@@ -21,31 +21,20 @@ std::string MusicalScale::getNoteStr(double freq) const {
 	std::ostringstream oss;
 	// Acoustical Society of America Octave Designation System
 	//int octave = 2 + id / 12;
-	oss << note[id%12] << " " << (int)round(freq) << " Hz";
+	oss << note[id%12] << " " << int(round(freq)) << " Hz";
 	return oss.str();
 }
 
 unsigned int MusicalScale::getNoteNum(int id) const {
-	switch (id % 12) {
-	  case 0: return 0;
-	  case 1: return 0;
-	  case 2: return 1;
-	  case 3: return 1;
-	  case 4: return 2;
-	  case 5: return 3;
-	  case 6: return 3;
-	  case 7: return 4;
-	  case 8: return 4;
-	  case 9: return 5;
-	  case 10: return 5;
-	  default: return 6;
-	}
+	// C major scale
+	int n = id % 12;
+	return (n + (n > 4)) / 2;
 }
 
 bool MusicalScale::isSharp(int id) const {
 	if (id < 0) throw std::logic_error("MusicalScale::isSharp: Invalid note ID");
-	id %= 12;
-	switch (id) {
+	// C major scale
+	switch (id % 12) {
 	  case 1: case 3: case 6: case 8: case 10: return true;
 	}
 	return false;
@@ -89,8 +78,7 @@ double Note::scoreMultiplier(double error) const {
 	  case GOLDEN: max = 2.0; break;
 	  case SLEEP: break;
 	}
-	if (error < 0.5) return max;
-	return std::max(0.0, 1.5 - error) * max;
+	return std::min(1.0, std::max(0.0, 1.5 - error)) * max;
 }
 
 
