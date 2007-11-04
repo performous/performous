@@ -14,7 +14,6 @@ static int loadSVG(std::string const& filename, double w, double h, CairoSVG*& p
 
 void CScreenPractice::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
-	sm->getAudio()->stopMusic();
 	double unitX = m_width/800.;
 	double unitY = m_height/600.;
 	texture_note = loadSVG("practice_note.svg", 40 * unitX, 25 * unitY, cairo_svg_note);
