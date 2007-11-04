@@ -90,7 +90,7 @@ class CAudio {
 	void operator()(); // Thread runs here, don't call directly
 	void wait() {
 		boost::mutex::scoped_lock l(m_mutex);
-		while (!m_ready) m_condready.wait(l);
+		while (!m_ready || m_type != NONE) m_condready.wait(l);
 	}
   private:
 	enum Type { NONE, STOP, PREVIEW, PLAY, QUIT } m_type;
