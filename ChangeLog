@@ -1,3 +1,76 @@
+2007-11-04 06:20  tronic
+
+	* audio/: audio_dev.hpp, audio_dev_alsa.cpp, audio_dev_gst.cpp,
+	  audio_dev_pa.cpp, audio_dev_pa18.cpp, audio_dev_tone.cpp,
+	  plugin.hpp: LibDA plugin system proposed to be added to Boost,
+	  updated it to latest version
+
+2007-11-04 04:18  tronic
+
+	* include/audio.h: Fix to the CAudio::wait function that I added
+
+2007-11-04 04:12  tronic
+
+	* src/screen_practice.cpp: Reverted the addition of stopMusic in
+	  practice screen. The menu music is supposed to keep playing
+	  there. It can be paused with Space if silence is preferred.
+
+2007-11-04 04:10  tronic
+
+	* src/songs.cpp: Cleanup
+
+2007-11-04 01:13  yoda-jm
+
+	* configure.in: Fixed build process (record-gst was not properly
+	  set to autodetect)
+
+2007-11-03 22:25  tronic
+
+	* audio/audio_dev.hpp, audio/plugin.hpp, docs/ultrastarng.h2m,
+	  src/main.cpp, src/screen_sing.cpp, src/screen_songs.cpp: Singing
+	  screen cleanup/improvements. Home now goes to the beginning of
+	  the song, Enter skips solos. Line styles etc. fine-tuned.
+
+2007-11-03 05:13  tronic
+
+	* include/songs.h, src/pitch_graph.cpp, src/songs.cpp: Fixed score
+	  calculation bug, negative notes were skipped previously
+
+2007-11-03 02:47  tronic
+
+	* include/pitch_graph.h, include/record.h, include/songs.h,
+	  src/pitch_graph.cpp, src/record.cpp, src/screen_sing.cpp,
+	  src/songs.cpp: Dynamic pitch graph (not quantized anymore and
+	  adapts to volume level), scoring changed accordinly, MusicalScale
+	  now belongs to Song
+
+2007-11-03 01:45  tronic
+
+	* src/pitch_graph.cpp: Made pitchgraph match the score calculation
+	  (reducing pitchgraph lag too)
+
+2007-11-03 01:03  tronic
+
+	* src/pitch_graph.cpp: Fix pitchgraph drawing lines backward when
+	  rewinding while singing
+
+2007-11-03 00:23  tronic
+
+	* configure.in, include/audio.h, include/songs.h, include/theme.h,
+	  src/audio.cpp, src/screen_sing.cpp, src/songs.cpp, src/theme.cpp:
+	  Bugfixes: ThemeTxt uninitialized fields, score calculator issue.
+	  Added -O0 compile option when in debug build.
+
+2007-11-02 14:06  yoda-jm
+
+	*
+	  portage-overlay/games-arcade/ultrastar-ng/ultrastar-ng-0.2.0.ebuild:
+	  Added new ebuild
+
+2007-11-02 13:49  yoda-jm
+
+	* ChangeLog: Updated changelog
+
 2007-11-02 13:48  yoda-jm
 
 	* configure.in: Updated to new version

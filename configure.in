@@ -3,7 +3,7 @@ AC_INIT(Makefile.am)
 echo "Configure launch with the following arguments: $*"
 dnl #  ########################################################################
 
-AM_INIT_AUTOMAKE(UltraStar-ng,[0.2.0])
+AM_INIT_AUTOMAKE(UltraStar-ng,[0.2.1])
 AC_PREFIX_DEFAULT(/usr/local)
 
 AC_CONFIG_HEADERS([config.h:config.h.in:config.h.incl],,[[
