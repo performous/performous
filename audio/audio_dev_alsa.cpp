@@ -27,7 +27,7 @@ namespace {
 			snd_pcm_uframes_t period_size = m_s.frames();
 			snd_pcm_uframes_t buffer_size = 0;
 			alsa::hw_config hw(m_pcm);
-			hw.set(SND_PCM_ACCESS_MMAP_INTERLEAVED).set(SND_PCM_FORMAT_S16_LE);
+			hw.set(SND_PCM_ACCESS_MMAP_INTERLEAVED).set(SND_PCM_FORMAT_S16);
 			if (m_s.rate() == settings::high) hw.rate_last(rate);
 			else if (m_s.rate() == settings::low) hw.rate_first(rate);
 			else if (m_s.rate_near()) hw.rate_near(rate);
