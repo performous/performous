@@ -1,5 +1,8 @@
 To install from SVN:
 
+	# Checkout the svn
+	svn co https://ultrastar-ng.svn.sourceforge.net/svnroot/ultrastar-ng/trunk/UltraStar-ng/
+	# generate configure and so on
 	./autogen.sh
 	# use --help for a complete list of configure options
 	./configure --with-audio=gstreamer --enable-debug
