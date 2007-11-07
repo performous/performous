@@ -1,32 +1,44 @@
-To install from CVS :
+To install from SVN:
 
-  ./autogen.sh
-  # use --help for a complete list of configure options
-  ./configure --with-a-lot-of-options
-  make
-  make install
-
-To run the game :
-
-  # $prefix is generaly set to /usr or /usr/local/
-  $prefix/bin/ultrastarng
+	./autogen.sh
+	# use --help for a complete list of configure options
+	./configure --with-audio=gstreamer --enable-debug
+	make
+	# install into system prefix /usr/local/
+	sudo make install
 
 Dependencies:
-	- SDL : for window management
-	- SDL_image SDL_gfx : for image and zoom of SDL surface
-	- cairo >= 1.2 : for scalable graphical support
-	- cairo-svg (deprecated) or librsvg : for svg rendering (themes=
-	- smpeg (optional) : for video playback
-	- fftw3 : for captured note computation
-	- libalsa : capturing API used
-	- xine or gstreamer : for audio playback
+
+	- Boost : threads, parsers/conversions, pointer containers, ...
+
+	- SDL : window management (GUI engine)
+		* SDL_image : loading PNG and JPEG images
+		* SDL_gfx : zooming images to right size
+
+	- Cairo >= 1.2 : scalable graphical support
+	- Cairo-SVG (deprecated) or librsvg : svg rendering (themes)
 	- libxml2 : used as librsvg hack for theming
 
-If you need Jamelia MP3 for test download it with UlstraStar (pascal/windows
-version).
+	- SMPEG (optional) : video playback
 
-If your song is not UTF-8 encoded please do :
-	iconv --from-code=ISO-8859-1 --to-code=UTF-8 source.txt dest.txt
+	- Xine or GStreamer (recommended) : audio playback
+		* gstreamer-mad needed for decoding MP3 files!
 
+	- One or more of the following for audio capture
+		* ALSA
+		* GStreamer
+		* PortAudio v18 or v19
+
+
+You can find songs online by Google or at your favorite Torrent sites. We
+recommend starting with the ultrastar-songs package that can be download from
+our project website. You need to extract that tarball into ~/.ultrastar/ or to
+one of the other folders that the game searches songs for. Run ultrastar from
+a terminal to see a list of folders.
+
+If your songs are not UTF-8 coded, please do:
+	recode ISO-8859-1..UTF-8 songs/*/*.txt
+	
 If you want to send a patch :
-	cvs diff -NuF^f > mypatch.patch
+	svn diff > mypatch.patch
+

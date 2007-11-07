@@ -1,10 +1,32 @@
+Structural:
+
+- LibDA as a separate project
+	* Also playback and Vorbis + MP3 decoding
+	* Get rid of CAudio along with Xine/GStreamer playback deps
+
+- Game logic in a separate thread (not in GUI thread)	
+
+- Modular UI?
+
+
+Big features:
+
+- OpenGL-based UI?
+	* Much faster
+	* Runtime resolution switching / resizable window
+
+- Video decoding with libavformat
+
+- Add compose screen (using features discussed on mailing list)
+
+
 Features:
 
-- Add analysis
-- Add compose screen (using features discussed on mailing list)
-- Add configurable microphone latency (to avoid current latency)
+- Configurable audio latency (delay between screen and audio output)
+- Auto-calibration of acoustic loop latency (playback + capture)
 
 
 Fixes/Enhancement:
 
 - Use cairo_surface_create_for_image instead of SDL_image
+
