@@ -1,4 +1,5 @@
 #include <pitch_graph.h>
+#include <cmath>
 
 PitchGraph::PitchGraph(int _width, int _height):
   width(_width), height(_height), clearPage(1), surface(), dc()
@@ -14,11 +15,19 @@ cairo_surface_t* PitchGraph::renderPitch(double pitch, double time, double volum
 	else if (lastTime < time) {
 		cairo_new_path(dc);
 		cairo_move_to(dc, lastTime, pitch);
-		cairo_set_line_width(dc, 0.01 * volume);
 		cairo_line_to(dc, time, pitch);
+		cairo_set_line_width(dc, 0.015);
+		cairo_set_source_rgba(this->dc, 52.0/255.0, 101.0/255.0, 164.0/255.0, 0.6);
+		cairo_stroke_preserve(dc);
+		double oldPitch = (std::abs(lastPitch - pitch) < 0.005 ? lastPitch : pitch);
+		cairo_new_path(dc);
+		cairo_move_to(dc, lastTime, oldPitch);
+		cairo_line_to(dc, time, pitch);
+		cairo_set_line_width(dc, 0.003 * volume);
+		cairo_set_source_rgba(this->dc, 0.0, 0.0, 0.0, 1.0);
+		cairo_stroke_preserve(dc);
 	}
 	cairo_move_to(dc, time, pitch);
-	cairo_stroke_preserve(dc);
 	return surface;
 }
 
@@ -30,7 +39,6 @@ void PitchGraph::clear() {
 	cairo_scale(dc, width, height);
 	cairo_new_path(dc);
 	clearPage = 1;
-	cairo_set_source_rgba(this->dc, 52.0/255.0, 101.0/255.0, 164.0/255.0, 1.0);
 }
 
 
