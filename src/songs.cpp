@@ -302,7 +302,9 @@ void Song::reload() {
 	videoGap = 0.0;
 	start = 0.0;
 	m_scoreFactor = 0.0;
-	SongParser(*this);
+	try {
+		SongParser(*this);
+	} catch (...) {}
 	reset();
 }
 
