@@ -33,6 +33,7 @@ static inline bool operator>(Tone const& lhs, Tone const& rhs) { return lhs.freq
 
 class Analyzer {
   public:
+	typedef std::list<Tone> tones_t;
 	Analyzer(std::size_t step = 500);
 	void operator()(da::pcm_data& data, da::settings const& s);
 	/** Get the peak level in dB (negative value, 0.0 = clipping). **/
@@ -40,7 +41,7 @@ class Analyzer {
 	/** Get the primary (singing) frequency. **/
 	double getFreq() const { return m_freq; }
 	/** Get a list of all tones detected. **/
-	std::list<Tone> getTones() const {
+	tones_t getTones() const {
 		boost::mutex::scoped_lock l(m_mutex);
 		return m_tones;
 	}
@@ -52,8 +53,7 @@ class Analyzer {
 	volatile double m_peak;
 	volatile double m_freq;
 	std::deque<float> m_buf; // Sample buffer
-	std::list<Tone> m_tones; // Synchronized access only!
-	std::list<Tone> m_oldTones;
+	tones_t m_tones; // Synchronized access only!
 };
 
 class Capture {

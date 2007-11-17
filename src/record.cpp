@@ -132,7 +132,7 @@ void Analyzer::operator()(da::pcm_data& indata, da::settings const& s)
 			prevdb = db;
 		}
 		// Find the tones (collections of harmonics) from the array of peaks
-		std::list<Tone> tones;
+		tones_t tones;
 		double db = -std::numeric_limits<double>::infinity();
 		for (size_t k = kMax - 1; k >= kMin; --k) {
 			if (peaks[k].db < -70.0) continue;
@@ -178,8 +178,8 @@ void Analyzer::operator()(da::pcm_data& indata, da::settings const& s)
 		tones.sort();
 		// Merge old and new tones
 		{
-			std::list<Tone>::iterator it = tones.begin();
-			for (std::list<Tone>::const_iterator oldit = m_tones.begin(); oldit != m_tones.end(); ++oldit) {
+			tones_t::iterator it = tones.begin();
+			for (tones_t::const_iterator oldit = m_tones.begin(); oldit != m_tones.end(); ++oldit) {
 				while (it != tones.end() && *it < *oldit) ++it;
 				if (it == tones.end() || *it != *oldit) {
 					if (oldit->db > -80.0) {
@@ -201,7 +201,7 @@ void Analyzer::operator()(da::pcm_data& indata, da::settings const& s)
 
 		// Find the singing frequency
 		double freq = 0.0;
-		for (std::list<Tone>::const_iterator it = m_tones.begin(); it != m_tones.end(); ++it) {
+		for (tones_t::const_iterator it = m_tones.begin(); it != m_tones.end(); ++it) {
 			if (it->db < db - 20.0 || it->freq < 70.0 || it->age < Tone::MINAGE) continue;
 			if (it->freq > 600.0) break;
 			freq = it->freq;
@@ -222,7 +222,7 @@ void Analyzer::operator()(da::pcm_data& indata, da::settings const& s)
 			oss << "dump-" << m_frame << ".dat";
 			std::ofstream f(oss.str().c_str());
 			f << std::setprecision(3) << "# Freqs:\n";
-			for (std::list<Tone>::const_iterator it = m_tones.begin(); it != m_tones.end(); ++it) {
+			for (tones_t::const_iterator it = m_tones.begin(); it != m_tones.end(); ++it) {
 				f << "# " << it->freq() << " Hz, " << it->db() << " dB" << std::endl;
 			}
 			for (size_t k = 0; k <= kMax; ++k) {

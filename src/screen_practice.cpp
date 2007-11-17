@@ -63,8 +63,8 @@ void CScreenPractice::draw()
 		std::string text = scale.getNoteStr(freq);
 		theme->notetxt.text = const_cast<char*>(text.c_str());
 		theme->theme->PrintText(&theme->notetxt);
-		std::list<Tone> tones = m_analyzer.getTones();
-		for (std::list<Tone>::const_iterator t = tones.begin(); t != tones.end(); ++t) {
+		Analyzer::tones_t tones = m_analyzer.getTones();
+		for (Analyzer::tones_t::const_iterator t = tones.begin(); t != tones.end(); ++t) {
 			if (t->age < Tone::MINAGE) continue;
 			int note = scale.getNoteId(t->freq);
 			if (note < 0) continue;
