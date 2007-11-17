@@ -34,6 +34,7 @@ class CScreenSing: public CScreen {
 	CVideo* video;
 	CThemeSing* theme;
 	Lyrics* lyrics;
+	Song::notes_t::const_iterator m_songit;
 };
 
 #endif

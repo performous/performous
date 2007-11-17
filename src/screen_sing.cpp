@@ -69,6 +69,7 @@ void CScreenSing::enter() {
 	lyrics = new Lyrics(song.notes);
 	playOffset = 0.0;
 	song.reset();
+	m_songit = song.notes.begin();
 	audio.wait(); // Until playback starts
 }
 
@@ -128,6 +129,15 @@ void CScreenSing::draw() {
 	// Get the time in the song
 	double time = sm->getAudio()->getPosition();
 	time = std::max(0.0, time + playOffset);
+	if (m_songit != song.notes.end() && time > m_songit->end) {
+		Analyzer::tones_t const& tones = m_analyzer.getTones();
+		std::cout << ": " << m_songit->begin << " " << m_songit->end - m_songit->begin << " (";
+		for (Analyzer::tones_t::const_iterator it = tones.begin(); it != tones.end(); ++it) {
+			std::cout << song.scale.getNoteId(it->freq) << " ";
+		}
+		std::cout << ") " << m_songit->syllable << std::endl;
+		do { ++m_songit; } while (m_songit != song.notes.end() && m_songit->type == Note::SLEEP);
+	}
 	double songPercent = time / sm->getAudio()->getLength();
 	// Update scoring
 	song.update(time, freq);
