@@ -8,51 +8,34 @@
 #include <limits>
 #include <sstream>
 #include <stdexcept>
+#include <fstream>
+
+static const unsigned FFT_P = 11;
+static const std::size_t FFT_N = 1 << FFT_P;
+
+// Limit the range to avoid noise and useless computation
+static const double FFT_MINFREQ = 50.0;
+static const double FFT_MAXFREQ = 3000.0;
 
 Tone::Tone():
-  m_freqSum(0.0),
-  m_harmonics(0),
-  m_hEven(0),
-  m_hHighest(0),
-  m_dbHighest(-std::numeric_limits<double>::infinity()),
-  m_dbHighestH(0)
-{}
+  freq(0.0),
+  db(-std::numeric_limits<double>::infinity()),
+  stabledb(-std::numeric_limits<double>::infinity()),
+  age()
+{
+	for (std::size_t i = 0; i < MAXHARM; ++i)
+	  harmonics[i] = -std::numeric_limits<double>::infinity();
+}
 
 void Tone::print() const {
-	std::cout << freq() << " Hz, " << m_harmonics << " harmonics (" << m_hEven << " are even), strongest is x" << m_dbHighestH << " @ " << m_dbHighest << " dB, highest is x" << m_hHighest << std::endl;
-}
-
-void Tone::combine(Peak& p, unsigned int h) {
-	m_freqSum += p.freq() / h;
-	++m_harmonics;
-	if (h % 2 == 0) ++m_hEven;
-	if (h > m_hHighest) m_hHighest = h;
-	if (p.db() > m_dbHighest) {
-		m_dbHighest = p.db();
-		m_dbHighestH = h;
-	}
-}
-
-bool Tone::isWeak() const {
-	if (m_harmonics > 2) return db() < -45.0;
-	if (m_harmonics > 1) return db() < -35.0;
-	return db() < -25.0;
+	if (age < Tone::MINAGE) return;
+	std::cout << std::fixed << std::setprecision(1) << freq << " Hz, age " << age << ", " << db << " dB:";
+	for (std::size_t i = 0; i < 8; ++i) std::cout << " " << harmonics[i];
+	std::cout << std::endl;
 }
 
 bool Tone::operator==(double f) const {
-	return fabs(freq() / f - 1.0) < 0.03;
-}
-
-Tone& Tone::operator+=(Tone const& t) {
-	m_freqSum += t.m_freqSum;
-	m_harmonics += t.m_harmonics;
-	m_hEven += t.m_hEven;
-	if (t.m_hHighest > m_hHighest) m_hHighest = t.m_hHighest;
-	if (t.m_dbHighest > m_dbHighest) {
-		m_dbHighest = t.m_dbHighest;
-		m_dbHighestH = t.m_dbHighestH;
-	}
-	return *this;
+	return std::abs(freq / f - 1.0) < 0.05;
 }
 
 Analyzer::Analyzer(size_t step):
@@ -68,15 +51,31 @@ Analyzer::Analyzer(size_t step):
 	}
 }
 
-static int match(std::vector<Peak> const& peaks, int pos, double freq) {
-	int best = pos;
-	if (fabs(peaks[pos-1].freq() - freq) < fabs(peaks[best].freq() - freq)) best = pos - 1;
-	if (fabs(peaks[pos+1].freq() - freq) < fabs(peaks[best].freq() - freq)) best = pos + 1;
-	return best;
-}
-
 namespace {
 	bool sqrLT(float a, float b) { return a * a < b * b; }
+
+	struct Peak {
+		double freq;
+		double db;
+		bool harm[Tone::MAXHARM];
+		Peak(double _freq = 0.0, double _db = -std::numeric_limits<double>::infinity()):
+		  freq(_freq), db(_db)
+		{
+			for (std::size_t i = 0; i < Tone::MAXHARM; ++i) harm[i] = false;
+		}
+		void clear() {
+			freq = 0.0;
+			db = -std::numeric_limits<double>::infinity();
+		}
+	};
+
+	static Peak& match(std::vector<Peak>& peaks, std::size_t pos) {
+		std::size_t best = pos;
+		if (peaks[pos - 1].db > peaks[best].db) best = pos - 1;
+		if (peaks[pos + 1].db > peaks[best].db) best = pos + 1;
+		return peaks[best];
+	}
+
 }
 
 void Analyzer::operator()(da::pcm_data& indata, da::settings const& s)
@@ -84,8 +83,8 @@ void Analyzer::operator()(da::pcm_data& indata, da::settings const& s)
 	// Precalculated constants
 	const double freqPerBin = double(s.rate()) / FFT_N;
 	const double phaseStep = 2.0 * M_PI * m_step / FFT_N;
-	const double normCoeff = 1.0 / FFT_N; // WTF? This was: 4.0 / ((double)FFT_N * FFT_N);
-	const double minMagnitude = pow(10, -60.0 / 10.0) / normCoeff;
+	const double normCoeff = 1.0 / FFT_N;
+	const double minMagnitude = pow(10, -100.0 / 20.0) / normCoeff; // -100 dB
 
 	std::copy(indata.begin(0), indata.end(0), std::back_inserter(m_buf));
 
@@ -99,11 +98,11 @@ void Analyzer::operator()(da::pcm_data& indata, da::settings const& s)
 		std::vector<std::complex<float> > data = da::fft<FFT_P>(m_buf.begin(), m_window);
 		// Erase one step of samples
 		m_buf.erase(m_buf.begin(), m_buf.begin() + m_step);
-		// Process only up to 3000 Hz
-		size_t kMax = std::min(FFT_N / 2, (size_t)(3000.0 / freqPerBin));
-		std::vector<Peak> peaks(kMax + 1);
-
-		for (size_t k = 0; k <= kMax; ++k) {
+		// Limit frequency range of processing
+		size_t kMin = std::max(size_t(1), size_t(FFT_MINFREQ / freqPerBin));
+		size_t kMax = std::min(FFT_N / 2, size_t(FFT_MAXFREQ / freqPerBin));
+		std::vector<Peak> peaks(kMax + 1); // One extra to simplify loops
+		for (size_t k = 1; k <= kMax; ++k) {
 			double magnitude = std::abs(data[k]);
 			double phase = std::arg(data[k]);
 
@@ -119,75 +118,121 @@ void Analyzer::operator()(da::pcm_data& indata, da::settings const& s)
 			// process the k-th partials' true frequency
 			double freq = (k + delta) * freqPerBin;
 
-			if (magnitude > minMagnitude) {
-				peaks[k].freq(freq);
-				peaks[k].db(10.0 * log10(normCoeff * magnitude));
+			if (freq > 1.0 && magnitude > minMagnitude) {
+				peaks[k].freq = freq;
+				peaks[k].db = 20.0 * log10(normCoeff * magnitude);
 			}
+		}
+		// Prefilter raw data
+		double prevdb = peaks[0].db;
+		for (size_t k = 1; k < kMax; ++k) {
+			double db = peaks[k].db;
+			if (db > prevdb) peaks[k - 1].clear();
+			if (db < prevdb) peaks[k].clear();
+			prevdb = db;
 		}
 		// Find the tones (collections of harmonics) from the array of peaks
-		// TODO: proper handling of tones with "missing fundamental" (is this needed?)
-		std::vector<Tone> tones;
+		std::list<Tone> tones;
 		double db = -std::numeric_limits<double>::infinity();
-		for (size_t k = 2; k < kMax; ++k) {
-			// Prefilter out too low freqs, too silent bins and bins that are weaker than their neighbors
-			if (peaks[k].freq() < 80.0 || peaks[k].freq() > 700.0 || peaks[k].db() < -30.0 || peaks[k].db() < peaks[k-1].db() || peaks[k].db() < peaks[k+1].db()) continue;
-			// Find the base peak (fundamental frequency)
-			int harmonic = 1;
-			int misses = 0;
-			for (int h = 2; k / h > 2; ++h) {
-				double freq = peaks[k].freq() / h;
-				if (freq < 40.0 || ++misses > 3) break;
-				int best = match(peaks, k / h, freq);
-				if (peaks[best].db() < -30.0 || fabs(peaks[best].freq() / freq - 1.0) > .03) continue;
-				misses = 0;
-				harmonic = h;
+		for (size_t k = kMax - 1; k >= kMin; --k) {
+			if (peaks[k].db < -70.0) continue;
+			std::size_t bestDiv = 1;
+			int bestScore = 0;
+			for (std::size_t div = 2; div <= Tone::MAXHARM && k / div > 1; ++div) {
+				double freq = peaks[k].freq / div; // Fundamental
+				int score = 0;
+				for (std::size_t n = 1; n < div && n < 8; ++n) {
+					Peak& p = match(peaks, k * n / div);
+					--score;
+					if (p.db < -90.0 || std::abs(p.freq / n / freq - 1.0) > .03) continue;
+					if (n == 1) score += 4; // Extra for fundamental
+					score += 2;
+				}
+				if (score > bestScore) {
+					bestScore = score;
+					bestDiv = div;
+				}
 			}
-			std::vector<Tone>::iterator it = std::find(tones.begin(), tones.end(), peaks[k].freq() / harmonic);
-			if (it == tones.end()) {
-				tones.push_back(Tone());
-				it = tones.end() - 1;
+			Tone t;
+			std::size_t count = 0;
+			double freq = peaks[k].freq / bestDiv;
+			t.db = peaks[k].db;
+			for (std::size_t n = 1; n <= bestDiv; ++n) {
+				Peak& p = match(peaks, k * n / bestDiv);
+				if (std::abs(p.freq / n / freq - 1.0) > .03) continue;
+				if (p.db > t.db - 10.0) {
+					t.db = std::max(t.db, p.db);
+					++count;
+					t.freq += p.freq / n;
+				}
+				t.harmonics[n - 1] = p.db;
+				p.clear();
 			}
-			it->combine(peaks[k], harmonic);
-			db = std::max(db, it->db());
+			t.freq /= count;
+			if (t.db > -50.0 - 3.0 * count) {
+				db = std::max(db, t.db);
+				t.stabledb = t.db;
+				tones.push_back(t);
+			}
 		}
-		// Remove weak tones
-		tones.erase(std::remove_if(tones.begin(), tones.end(), std::mem_fun_ref(&Tone::isWeak)), tones.end());
-
-		/* Debug printout
-		if (!tones.empty()) {
-			std::cerr << "\x1B[2J\x1B[1;1H" << tones.size() << " tones\n" << std::fixed << std::setprecision(1);
-			std::for_each(tones.begin(), tones.end(), std::mem_fun_ref(&Tone::print));
-		}
-		*/
-
-		// The following block controls the tones list output.
-		// - A tone is only enabled if it is found in old (m_oldTones) and current (tones) list.
-		// - A tone is disabled if it is not found in either of these lists
-		// In addition, a tone is always updated with the latest information, if it is found in
-		// either of these two internal lists.
+		tones.sort();
+		// Merge old and new tones
 		{
-			std::vector<Tone> is, un, tmp;
-			// Calculate intersection: only those that are in both the old and the current tones (use the current one)
-			std::set_intersection(tones.begin(), tones.end(), m_oldTones.begin(), m_oldTones.end(), std::back_inserter(is));
-			// Calculate union: all those that are either tones (use the most recent one if both are available)
-			std::set_union(tones.begin(), tones.end(), m_oldTones.begin(), m_oldTones.end(), std::back_inserter(un));
-			// Take from m_tones only those that have played recently, into tmp (use the one from union)
-			std::set_intersection(un.begin(), un.end(), m_tones.begin(), m_tones.end(), std::back_inserter(tmp));
+			std::list<Tone>::iterator it = tones.begin();
+			for (std::list<Tone>::const_iterator oldit = m_tones.begin(); oldit != m_tones.end(); ++oldit) {
+				while (it != tones.end() && *it < *oldit) ++it;
+				if (it == tones.end() || *it != *oldit) {
+					if (oldit->db > -80.0) {
+						Tone& t = *tones.insert(it, *oldit);
+						t.db -= 5.0;
+						t.stabledb -= 0.1;
+					}
+				} else if (*it == *oldit) {
+					it->age = oldit->age + 1;
+					it->stabledb = 0.8 * oldit->stabledb + 0.2 * it->db;
+					it->freq = 0.5 * oldit->freq + 0.5 * it->freq;
+				}
+			}
+		}
+		{
 			boost::mutex::scoped_lock l(m_mutex); // Critical section: writing to m_tones
-			m_tones.clear();
-			// Combine tmp with the stable new tones (the intersection), into m_tones.
-			std::set_union(tmp.begin(), tmp.end(), is.begin(), is.end(), back_inserter(m_tones));
+			m_tones.swap(tones);
 		}
 
 		// Find the singing frequency
 		double freq = 0.0;
-		for (size_t i = 0; i < m_tones.size(); ++i) {
-			if (m_tones[i].db() < db - 4.0) continue;
-			freq = m_tones[i].freq();
+		for (std::list<Tone>::const_iterator it = m_tones.begin(); it != m_tones.end(); ++it) {
+			if (it->db < db - 20.0 || it->freq < 70.0 || it->age < Tone::MINAGE) continue;
+			if (it->freq > 600.0) break;
+			freq = it->freq;
+			break;
 		}
 		m_freq = freq; // Critical: atomic modification
 
-		m_oldTones = tones;
+		/*
+		if (!m_tones.empty()) {
+			std::cerr << "\x1B[2J\x1B[1;1H" << m_tones.size() << " tones\n" << std::fixed << std::setprecision(1);
+			std::for_each(m_tones.begin(), m_tones.end(), std::mem_fun_ref(&Tone::print));
+		}
+
+		{
+			static int m_frame = 0;
+			++m_frame;
+			std::ostringstream oss;
+			oss << "dump-" << m_frame << ".dat";
+			std::ofstream f(oss.str().c_str());
+			f << std::setprecision(3) << "# Freqs:\n";
+			for (std::list<Tone>::const_iterator it = m_tones.begin(); it != m_tones.end(); ++it) {
+				f << "# " << it->freq() << " Hz, " << it->db() << " dB" << std::endl;
+			}
+			for (size_t k = 0; k <= kMax; ++k) {
+				double magnitude = std::abs(data[k]);
+				double phase = std::arg(data[k]);
+				double fr = k * freqPerBin;
+				f << fr << '\t' << magnitude << '\t' << phase << std::endl;
+			}
+		}
+		*/
 	}
 }
 

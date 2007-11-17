@@ -59,31 +59,27 @@ void CScreenPractice::draw()
 	theme->peak.width = theme->peak.final_width* peak;
 	theme->theme->DrawRect(theme->peak); 
 
-	if(freq != 0.0) {
+	if (freq != 0.0) {
 		std::string text = scale.getNoteStr(freq);
 		theme->notetxt.text = const_cast<char*>(text.c_str());
 		theme->theme->PrintText(&theme->notetxt);
-		std::vector<Tone> tones = m_analyzer.getTones();
-		for (size_t i = 0; i < tones.size(); ++i) {
-			int note = scale.getNoteId(tones[i].freq());
+		std::list<Tone> tones = m_analyzer.getTones();
+		for (std::list<Tone>::const_iterator t = tones.begin(); t != tones.end(); ++t) {
+			if (t->age < Tone::MINAGE) continue;
+			int note = scale.getNoteId(t->freq);
 			if (note < 0) continue;
-			int posXnote;
-			int posYnote;
-			int posXsharp;
-			int posYsharp;
-			int octave = note/12 - 1;
-			bool sharp=false;
+			int octave = note / 12 - 1;
 			double noteOffset = scale.getNoteNum(note);
-			sharp = scale.isSharp(note);
+			bool sharp = scale.isSharp(note);
 			noteOffset += octave*7;
-			noteOffset += 0.4 * scale.getNoteOffset(tones[i].freq());
-			double noteOffsetX = -600.0 - 10.0 * tones[i].db();
-			posXnote = (int) ((m_width-noteOffsetX*resFactorX)/2.);
-			posYnote = (int) ((340.-noteOffset*12.5)*resFactorY);
+			noteOffset += 0.4 * scale.getNoteOffset(t->freq);
+			double noteOffsetX = -600.0 - 10.0 * t->stabledb;
+			int posXnote = (m_width-noteOffsetX*resFactorX) / 2.0;
+			int posYnote = (340.-noteOffset*12.5)*resFactorY;
 			sm->getVideoDriver()->drawSurface(texture_note,posXnote,posYnote);
-			if(sharp) {
-				posXsharp = (int) ((m_width-(noteOffsetX + 60.0)*resFactorX)/2.);
-				posYsharp = (int) ((315.-noteOffset*12.5)*resFactorY);
+			if (sharp) {
+				int posXsharp = (m_width-(noteOffsetX + 60.0)*resFactorX) / 2.0;
+				int posYsharp = (315.-noteOffset*12.5)*resFactorY;
 				sm->getVideoDriver()->drawSurface(texture_sharp,posXsharp,posYsharp);
 			}
 		}

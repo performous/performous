@@ -7,56 +7,40 @@
 #include <deque>
 #include <iostream>
 #include <limits>
+#include <list>
 #include <vector>
 
-struct Peak {
-	double m_freq;
-	double m_db;
-  public:
-	Peak(double _freq = 0.0, double _db = -std::numeric_limits<double>::infinity()): m_freq(_freq), m_db(_db) {}
-	double db() const {return m_db;};
-	double freq() const {return m_freq;};
-	void db(double _db) {m_db = _db;};
-	void freq(double _freq) {m_freq = _freq;};
-};
-
-class Tone {
-	double m_freqSum; // Sum of the fundamental frequencies of all harmonics
-	unsigned int m_harmonics;
-	unsigned int m_hEven;
-	unsigned int m_hHighest;
-	double m_dbHighest;
-	unsigned int m_dbHighestH;
-  public:
+struct Tone {
+	static const std::size_t MAXHARM = 48;
+	static const std::size_t MINAGE = 2;
+	double freq;
+	double db;
+	double stabledb;
+	double harmonics[MAXHARM];
+	std::size_t age;
 	Tone();
 	void print() const;
-	void combine(Peak& p, unsigned int h);
-	bool isWeak() const;
-	double db() const { return m_dbHighest; }
-	double freq() const { return m_freqSum / m_harmonics; }
 	bool operator==(double f) const;
-	Tone& operator+=(Tone const& t);
+	void update(Tone const& t);
 };
 
-static inline bool operator==(Tone const& lhs, Tone const& rhs) { return lhs == rhs.freq(); }
+static inline bool operator==(Tone const& lhs, Tone const& rhs) { return lhs == rhs.freq; }
 static inline bool operator!=(Tone const& lhs, Tone const& rhs) { return !(lhs == rhs); }
-static inline bool operator<=(Tone const& lhs, Tone const& rhs) { return lhs.freq() < rhs.freq() || lhs == rhs; }
-static inline bool operator>=(Tone const& lhs, Tone const& rhs) { return lhs.freq() > rhs.freq() || lhs == rhs; }
-static inline bool operator<(Tone const& lhs, Tone const& rhs) { return lhs.freq() < rhs.freq() && lhs != rhs; }
-static inline bool operator>(Tone const& lhs, Tone const& rhs) { return lhs.freq() > rhs.freq() && lhs != rhs; }
+static inline bool operator<=(Tone const& lhs, Tone const& rhs) { return lhs.freq < rhs.freq || lhs == rhs; }
+static inline bool operator>=(Tone const& lhs, Tone const& rhs) { return lhs.freq > rhs.freq || lhs == rhs; }
+static inline bool operator<(Tone const& lhs, Tone const& rhs) { return lhs.freq < rhs.freq && lhs != rhs; }
+static inline bool operator>(Tone const& lhs, Tone const& rhs) { return lhs.freq > rhs.freq && lhs != rhs; }
 
 class Analyzer {
-	static const unsigned FFT_P = 12;
-	static const std::size_t FFT_N = 1 << FFT_P;
   public:
-	Analyzer(std::size_t step = 1500);
+	Analyzer(std::size_t step = 500);
 	void operator()(da::pcm_data& data, da::settings const& s);
 	/** Get the peak level in dB (negative value, 0.0 = clipping). **/
 	double getPeak() const { return m_peak; }
 	/** Get the primary (singing) frequency. **/
 	double getFreq() const { return m_freq; }
 	/** Get a list of all tones detected. **/
-	std::vector<Tone> getTones() const {
+	std::list<Tone> getTones() const {
 		boost::mutex::scoped_lock l(m_mutex);
 		return m_tones;
 	}
@@ -68,8 +52,8 @@ class Analyzer {
 	volatile double m_peak;
 	volatile double m_freq;
 	std::deque<float> m_buf; // Sample buffer
-	std::vector<Tone> m_tones; // Synchronized access only!
-	std::vector<Tone> m_oldTones;
+	std::list<Tone> m_tones; // Synchronized access only!
+	std::list<Tone> m_oldTones;
 };
 
 class Capture {
