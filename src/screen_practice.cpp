@@ -46,6 +46,7 @@ void CScreenPractice::draw()
 	float resFactorX = m_width/800.;
 	float resFactorY = m_height/600.;
 
+	const_cast<Analyzer&>(m_analyzer).process(); // FIXME: do in game engine thread
 	Tone const* tone = m_analyzer.findTone();
 	double freq = (tone ? tone->freq : 0.0);
 	MusicalScale scale;

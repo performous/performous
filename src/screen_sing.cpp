@@ -110,6 +110,7 @@ void CScreenSing::draw() {
 		return;
 	}
 	Song& song = sm->getSongs()->current();
+	const_cast<Analyzer&>(m_analyzer).process(); // FIXME: do in game engine thread
 	Tone const* tone = m_analyzer.findTone();
 	double freq = (tone ? tone->freq : 0.0);
 	float resFactorX = m_width / 800.0;
