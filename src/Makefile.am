@@ -3,7 +3,7 @@ bin_PROGRAMS = ultrastarng
 ultrastarng_SOURCES = main.cpp \
 	audio.cpp \
 	video.cpp \
-	record.cpp \
+	pitch.cpp \
 	songs.cpp \
 	lyrics.cpp \
 	configuration.cpp \

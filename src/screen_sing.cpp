@@ -109,7 +109,8 @@ void CScreenSing::draw() {
 		return;
 	}
 	Song& song = sm->getSongs()->current();
-	float freq = m_analyzer.getFreq();
+	Tone const* tone = m_analyzer.findTone();
+	double freq = (tone ? tone->freq : 0.0);
 	float resFactorX = m_width / 800.0;
 	float resFactorY = m_height / 600.0;
 	float resFactorAvg = (resFactorX + resFactorY) / 2.0;

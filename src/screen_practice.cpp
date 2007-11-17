@@ -46,7 +46,8 @@ void CScreenPractice::draw()
 	float resFactorX = m_width/800.;
 	float resFactorY = m_height/600.;
 
-	float freq = m_analyzer.getFreq();
+	Tone const* tone = m_analyzer.findTone();
+	double freq = (tone ? tone->freq : 0.0);
 	MusicalScale scale;
 
 	theme->theme->clear();
