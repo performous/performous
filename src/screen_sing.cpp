@@ -5,6 +5,8 @@
 #include <songs.h>
 #include <pitch_graph.h>
 #include <cairotosdl.h>
+#include <iostream>
+#include <iomanip>
 
 CScreenSing::CScreenSing(std::string const& name, unsigned int width, unsigned int height, Analyzer const& analyzer):
   CScreen(name,width,height), m_analyzer(analyzer), pitchGraph(width, height)
@@ -129,14 +131,20 @@ void CScreenSing::draw() {
 	// Get the time in the song
 	double time = sm->getAudio()->getPosition();
 	time = std::max(0.0, time + playOffset);
-	if (m_songit != song.notes.end() && time > m_songit->end) {
-		Analyzer::tones_t const& tones = m_analyzer.getTones();
-		std::cout << ": " << m_songit->begin << " " << m_songit->end - m_songit->begin << " (";
-		for (Analyzer::tones_t::const_iterator it = tones.begin(); it != tones.end(); ++it) {
-			std::cout << song.scale.getNoteId(it->freq) << " ";
+	while (m_songit != song.notes.end() && time > 0.3 * m_songit->begin + 0.7 * m_songit->end) {
+		if (m_songit->type == Note::SLEEP) {
+			std::cout << "# ---" << std::endl;
+		} else {
+			Analyzer::tones_t const& tones = m_analyzer.getTones();
+			std::cout << "# " << m_songit->syllable << ":" << std::fixed << std::setprecision(0);
+			for (Analyzer::tones_t::const_iterator it = tones.begin(); it != tones.end(); ++it) {
+				if (it->freq < 70.0) continue;
+				if (it->freq > 600.0) break;
+				std::cout << " " << song.scale.getNoteId(it->freq) << "(" << it->db << ")";
+			}
+			std::cout << std::endl;
 		}
-		std::cout << ") " << m_songit->syllable << std::endl;
-		do { ++m_songit; } while (m_songit != song.notes.end() && m_songit->type == Note::SLEEP);
+		++m_songit;
 	}
 	double songPercent = time / sm->getAudio()->getLength();
 	// Update scoring
