@@ -284,6 +284,28 @@ Song::Song(std::string const& _path, std::string const& _filename):
 	SongParser(*this);
 }
 
+void Song::reload() {
+	notes.clear();
+	category.clear();
+	genre.clear();
+	edition.clear();
+	title.clear();
+	artist.clear();
+	text.clear();
+	creator.clear();
+	mp3.clear();
+	cover.clear();
+	background.clear();
+	video.clear();
+	noteMin = std::numeric_limits<int>::max();
+	noteMax = std::numeric_limits<int>::min();
+	videoGap = 0.0;
+	start = 0.0;
+	m_scoreFactor = 0.0;
+	SongParser(*this);
+	reset();
+}
+
 void Song::reset() {
 	m_score = 0.0;
 	m_scoreTime = 0.0;

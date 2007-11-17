@@ -100,6 +100,13 @@ void CScreenSing::manageEvent(SDL_Event event) {
 		else if (key == SDLK_RIGHT) audio.seek(5.0);
 		else if (key == SDLK_UP) audio.seek(30.0);
 		else if (key == SDLK_DOWN) audio.seek(-30.0);
+		else if (key == SDLK_r && event.key.keysym.mod & KMOD_CTRL) {
+			double pos = audio.getPosition();
+			if (!m_sentence.empty()) pos = std::min(pos, m_sentence[0].begin - 1.0);
+			sm->getSongs()->current().reload();
+			exit(); enter();
+			audio.seek(pos);
+		}
 	}
 }
 

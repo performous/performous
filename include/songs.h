@@ -40,6 +40,7 @@ class Song: boost::noncopyable {
   public:
 	friend class SongParser;
 	Song(std::string const& path, std::string const& filename);
+	void reload();
 	// Temporary score calculation system
 	void reset();
 	void update(double time, double freq);
