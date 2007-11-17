@@ -1,7 +1,6 @@
 #ifndef __SONGS_H__
 #define __SONGS_H__
 
-#include "../config.h"
 #include <boost/noncopyable.hpp>
 #include <boost/ptr_container/ptr_set.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -41,22 +40,12 @@ class Song: boost::noncopyable {
   public:
 	friend class SongParser;
 	Song(std::string const& path, std::string const& filename);
-	~Song() {
-		unloadBackground();
-		unloadCover();
-	}
 	// Temporary score calculation system
 	void reset();
 	void update(double time, double freq);
 	int getScore() const { return 10000 * m_score; }
 	bool parseField(std::string const& line);
 	std::string str() const { return title + " by " + artist; }
-	SDL_Surface* getCover() { loadCover(); return m_coverSurf; }
-	SDL_Surface* getBackground() { loadBackground(); return m_backgroundSurf; }
-	void loadBackground();
-	void loadCover();
-	void unloadBackground();
-	void unloadCover();
 	typedef std::vector<Note> notes_t;
 	notes_t notes;
 	int noteMin, noteMax;
@@ -77,8 +66,6 @@ class Song: boost::noncopyable {
 	double start;
 	MusicalScale scale;
   private:
-	SDL_Surface* m_coverSurf;
-	SDL_Surface* m_backgroundSurf;
 	double m_scoreFactor; // Normalization factor for the scoring system
 	// Temporary score calculation system
 	double m_score;
@@ -92,7 +79,6 @@ class Songs {
 	std::set<std::string> m_songdirs;
   public:
 	Songs(std::set<std::string> const& songdirs);
-	~Songs();
 	void reload();
 	Song& operator[](std::vector<Song*>::size_type pos) { return *m_filtered[pos]; }
 	int size() const { return m_filtered.size(); };
@@ -109,7 +95,6 @@ class Songs {
 	void random();
 	void sortChange(int diff);
 	void parseFile(Song& tmp);
-	SDL_Surface* getEmptyCover() { return surface_nocover; }
   private:
 	class RestoreSel;
 	typedef boost::ptr_set<Song> songlist_t;
@@ -118,7 +103,6 @@ class Songs {
 	filtered_t m_filtered;
 	int m_current;
 	int m_order;
-	SDL_Surface* surface_nocover;
 	void sort_internal();
 };
 

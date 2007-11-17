@@ -4,7 +4,9 @@
 #include <sstream>
 
 CScreenSongs::CScreenSongs(std::string const& name, unsigned int width, unsigned int height, std::set<std::string> const& songdirs):
-  CScreen(name, width, height), m_searching()
+  CScreen(name, width, height),
+  m_searching(),
+  m_emptyCover(CScreenManager::getSingletonPtr()->getThemePathFile("no_cover.png"), CScreenManager::getSingletonPtr()->getWidth() / 800.0 * 256.0, CScreenManager::getSingletonPtr()->getHeight() / 600.0 * 256.0)
 {
 	if (CScreenManager::getSingletonPtr()->getSongs() == NULL) {
 		CScreenManager::getSingletonPtr()->setSongs(new Songs(songdirs));
@@ -19,6 +21,7 @@ void CScreenSongs::enter() {
 }
 
 void CScreenSongs::exit() {
+	m_cover.clear();
 	m_playing.clear();
 	delete theme;
 }
@@ -71,7 +74,6 @@ namespace {
 void CScreenSongs::draw() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	theme->theme->clear();
-	SDL_Surface *virtSurf = theme->bg->getSDLSurface();
 	// Draw the "Order by" text
 	print(theme, theme->order, (m_searching ? "find: " + m_search : sm->getSongs()->sortDesc()));
 	// Test if there are no songs
@@ -88,17 +90,24 @@ void CScreenSongs::draw() {
 			print(theme, theme->song, oss.str());
 		}
 		// Draw the cover
-		{
-			SDL_Surface* surf = song.getCover();
-			if (!surf) surf = sm->getSongs()->getEmptyCover();
-			if (!surf) throw std::logic_error("No cover image and no empty cover image");
-			SDL_Rect position;
-			position.x = (m_width - surf->w) / 2;
-			position.y = (m_height - surf->h) / 2;
-			position.w = surf->w;
-			position.h = surf->h;
-			SDL_FillRect(virtSurf, &position, SDL_MapRGB(virtSurf->format, 255, 255, 255));
-			SDL_BlitSurface(surf, NULL, virtSurf, &position);
+		std::string cover = song.path + song.cover;
+		if (cover != m_cover) {
+			m_cover = cover;
+			double width = CScreenManager::getSingletonPtr()->getWidth();
+			double height = CScreenManager::getSingletonPtr()->getHeight();
+			SDLSurf coverSurf(cover, width / 800.0 * 256, height / 600.0 * 256.0);
+			SDL_Surface* surf = (coverSurf ? coverSurf : m_emptyCover);
+			sm->getVideoDriver()->drawSurface(surf);
+			SDL_Surface *virtSurf = theme->bg->getSDLSurface();
+			if (surf) {
+				SDL_Rect position;
+				position.x = (m_width - surf->w) / 2;
+				position.y = (m_height - surf->h) / 2;
+				position.w = surf->w;
+				position.h = surf->h;
+				SDL_FillRect(virtSurf, &position, SDL_MapRGB(virtSurf->format, 255, 255, 255));
+				SDL_BlitSurface(surf, NULL, virtSurf, &position);
+			}
 		}
 		// Play a preview of the song
 		std::string file = song.path + song.mp3;

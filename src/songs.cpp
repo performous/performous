@@ -277,8 +277,6 @@ Song::Song(std::string const& _path, std::string const& _filename):
   filename(_filename),
   videoGap(),
   start(),
-  m_coverSurf(),
-  m_backgroundSurf(),
   m_scoreFactor(),
   m_score(),
   m_scoreTime()
@@ -303,63 +301,6 @@ void Song::update(double time, double freq) {
 	m_score = std::min(1.0, std::max(0.0, m_score));
 }
 
-void Song::loadCover() {
-	if (m_coverSurf || cover.empty()) return;
-	double width = CScreenManager::getSingletonPtr()->getWidth();
-	double height = CScreenManager::getSingletonPtr()->getHeight();
-	std::string file = path + cover;
-	std::string::size_type extpos = file.rfind('.');
-	std::string ext = (extpos == std::string::npos) ? "" : file.substr(extpos);
-	SDL_RWops* rwop = SDL_RWFromFile(file.c_str(), "rb");
-	SDL_Surface* surf = NULL;
-	if (ext == ".jpg" || ext == ".JPG" || ext == ".jpeg") surf = IMG_LoadJPG_RW(rwop);
-	else if (ext == ".png" || ext == ".PNG") surf = IMG_LoadPNG_RW(rwop);
-	else std::cout << "Cover image file " << file << " has unknown extension" << std::endl;
-	if (rwop) SDL_RWclose(rwop);
-	if (surf == NULL) m_coverSurf = NULL;
-	else {
-		// Here we want to have cover of 256x256 in 800x600 and scale it if the resolution is different
-		double w = width * 256.0 / 800.0;
-		double h = height * 256.0 / 600.0;
-		m_coverSurf = zoomSurface(surf, w / surf->w, h / surf->h, 1);
-		SDL_FreeSurface(surf);
-	}
-	// Prevent trying to reload the same cover
-	if (!m_coverSurf) cover.clear();
-}
-
-void Song::loadBackground() {
-	if (m_backgroundSurf || background.empty()) return;
-	double width = CScreenManager::getSingletonPtr()->getWidth();
-	double height = CScreenManager::getSingletonPtr()->getHeight();
-	std::string file = path + background;
-	std::string::size_type extpos = file.rfind('.');
-	std::string ext = (extpos == std::string::npos) ? "" : file.substr(extpos);
-	SDL_RWops* rwop = SDL_RWFromFile(file.c_str(), "rb");
-	SDL_Surface* surf = NULL;
-	if (ext == ".jpg" || ext == ".JPG" || ext == ".jpeg") surf = IMG_LoadJPG_RW(rwop);
-	else if (ext == ".png" || ext == ".PNG") surf = IMG_LoadPNG_RW(rwop);
-	else std::cout << "Background image file " << file << " has unknown extension" << std::endl;
-	if (rwop) SDL_RWclose(rwop);
-	if (!surf) m_backgroundSurf = NULL;
-	else {
-		m_backgroundSurf = zoomSurface(surf, width / surf->w, height / surf->h, 1);
-		SDL_FreeSurface(surf);
-	}
-	// Prevent trying to reload the same cover
-	if (!m_backgroundSurf) background.clear();
-}
-
-void Song::unloadCover() {
-	if (m_coverSurf) SDL_FreeSurface(m_coverSurf);
-	m_coverSurf = NULL;
-}
-
-void Song::unloadBackground() {
-	if (m_backgroundSurf) SDL_FreeSurface(m_backgroundSurf);
-	m_backgroundSurf = NULL;
-}
-
 bool operator<(Song const& l, Song const& r) {
 	if (l.artist != r.artist) return l.artist < r.artist;
 	if (l.title != r.title) return l.title < r.title;
@@ -368,21 +309,7 @@ bool operator<(Song const& l, Song const& r) {
 }
 
 Songs::Songs(std::set<std::string> const& songdirs): m_songdirs(songdirs), m_current(), m_order() {
-	std::string file = CScreenManager::getSingletonPtr()->getThemePathFile("no_cover.png");
-	SDL_RWops* rwop_nocover = SDL_RWFromFile(file.c_str(), "rb");
-	SDL_Surface* tmp = IMG_LoadPNG_RW(rwop_nocover);
-	if (!tmp) throw std::runtime_error("Could not load " + file);
-	double w = CScreenManager::getSingletonPtr()->getWidth() * 256.0 / 800.0;
-	double h = CScreenManager::getSingletonPtr()->getHeight() * 256.0 / 600.0;
-	surface_nocover = zoomSurface(tmp, w / tmp->w, h / tmp->h, 1);
-	SDL_FreeSurface(tmp);
-	if (rwop_nocover) SDL_RWclose(rwop_nocover);
-	if (surface_nocover == NULL) throw std::runtime_error("Cannot load " + file);
 	reload();
-}
-
-Songs::~Songs() {
-	SDL_FreeSurface(surface_nocover);
 }
 
 void Songs::reload() {

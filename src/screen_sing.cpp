@@ -1,6 +1,7 @@
 #include <screen_sing.h>
 
 #include <boost/format.hpp>
+#include <sdl_helper.h>
 #include <songs.h>
 #include <pitch_graph.h>
 #include <cairotosdl.h>
@@ -53,7 +54,7 @@ void CScreenSing::enter() {
 		video_ok = video->loadVideo(file, videoSurf, m_width, m_height);
 	}
 	if (!video_ok) {
-		SDL_Surface* bg = song.getBackground();
+		SDLSurf bg(song.path + song.background, sm->getWidth(), sm->getHeight());
 		if (bg) SDL_BlitSurface(bg, NULL, backgroundSurf, NULL);
 	}
 	SDL_BlitSurface(theme->bg->getSDLSurface(),NULL,backgroundSurf,NULL);
