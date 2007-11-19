@@ -4,6 +4,8 @@ includes = include/audio.h \
 	include/video.h \
 	include/cairotosdl.h \
 	include/pitch_graph.h \
+	include/sdl_helper.h \
+	include/pitch.h \
 	include/configuration.h \
 	include/screen.h \
 	include/singleton.h \
