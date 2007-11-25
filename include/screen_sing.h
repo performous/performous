@@ -12,15 +12,14 @@
 class CScreenSing: public CScreen {
   public:
 	CScreenSing(std::string const& name, unsigned int width, unsigned int height, Analyzer const& analyzer);
-	~CScreenSing();
 	void enter();
 	void exit();
 	void manageEvent(SDL_Event event);
 	void draw();
   private:
 	Analyzer const& m_analyzer;
-	SDL_Surface* videoSurf;
-	SDL_Surface* backgroundSurf;
+	SDLSurf videoSurf;
+	SDLSurf backgroundSurf;
 	unsigned int backgroundSurf_id;
 	unsigned int theme_id;
 	unsigned int pitchGraph_id;
@@ -31,7 +30,7 @@ class CScreenSing: public CScreen {
 	bool play;
 	bool finished;
 	double playOffset;
-	CVideo* video;
+	CVideo video;
 	CThemeSing* theme;
 	Lyrics* lyrics;
 	Song::notes_t::const_iterator m_songit;

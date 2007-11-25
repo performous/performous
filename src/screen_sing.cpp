@@ -11,37 +11,12 @@
 CScreenSing::CScreenSing(std::string const& name, unsigned int width, unsigned int height, Analyzer const& analyzer):
   CScreen(name,width,height), m_analyzer(analyzer), pitchGraph(width, height)
 {
-	video = new CVideo();
-	SDL_Surface *screen;
-
-	CScreenManager* sm = CScreenManager::getSingletonPtr();
-	screen = sm->getSDLScreen();
-
-	videoSurf = SDL_AllocSurface(screen->flags,
-			width,
-			height,
-			screen->format->BitsPerPixel,
-			screen->format->Rmask,
-			screen->format->Gmask,
-			screen->format->Bmask,
-			screen->format->Amask);
+	screen = CScreenManager::getSingletonPtr()->getSDLScreen();
+	videoSurf.reset(SDL_AllocSurface(screen->flags, width, height, screen->format->BitsPerPixel, screen->format->Rmask, screen->format->Gmask, screen->format->Bmask, screen->format->Amask));
+	backgroundSurf.reset(SDL_AllocSurface(screen->flags, width, height, screen->format->BitsPerPixel, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000));
 	SDL_SetAlpha(videoSurf, SDL_SRCALPHA, SDL_ALPHA_OPAQUE);
-	backgroundSurf = SDL_AllocSurface(screen->flags,
-			width,
-			height,
-			screen->format->BitsPerPixel,
-			0x00ff0000,
-			0x0000ff00,
-			0x000000ff,
-			0xff000000);
 	SDL_SetAlpha(backgroundSurf, SDL_SRCALPHA, SDL_ALPHA_OPAQUE);
 	SDL_FillRect(backgroundSurf,NULL,SDL_MapRGB(backgroundSurf->format, 255, 255, 255));
-}
-
-CScreenSing::~CScreenSing() {
-	if (videoSurf) SDL_FreeSurface(videoSurf);
-	if (backgroundSurf) SDL_FreeSurface(backgroundSurf);
-	delete video;
 }
 
 void CScreenSing::enter() {
@@ -53,7 +28,7 @@ void CScreenSing::enter() {
 	if (!song.video.empty()) {
 		std::string file = song.path + song.video;
 		std::cout << "Now playing: " << file << std::endl;
-		video_ok = video->loadVideo(file, videoSurf, m_width, m_height);
+		video_ok = video.loadVideo(file, videoSurf, m_width, m_height);
 	}
 	if (!video_ok) {
 		SDLSurf bg(song.path + song.background, sm->getWidth(), sm->getHeight());
@@ -77,7 +52,7 @@ void CScreenSing::enter() {
 
 void CScreenSing::exit() {
 	CScreenManager::getSingletonPtr()->getAudio()->stopMusic();
-	video->unloadVideo();
+	video.unloadVideo();
 	SDL_FillRect(videoSurf,NULL,0xffffff);
 	m_sentence.clear();
 	delete lyrics;
@@ -157,8 +132,8 @@ void CScreenSing::draw() {
 	std::string sentenceFuture = lyrics->getSentenceFuture();
 	std::string sentenceWhole = lyrics->getSentenceWhole();
 	// Draw the video
-	if (!video->isPlaying() && time > song.videoGap) video->play();
-	if (video->isPlaying()) {
+	if (!video.isPlaying() && time > song.videoGap) video.play();
+	if (video.isPlaying()) {
 		SDL_BlitSurface(videoSurf,NULL,backgroundSurf,NULL);
 		sm->getVideoDriver()->drawSurface(backgroundSurf);
 		sm->getVideoDriver()->drawSurface(theme->bg->getSDLSurface());
