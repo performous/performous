@@ -16,8 +16,8 @@ cairo_surface_t* PitchGraph::renderPitch(double pitch, double time, double volum
 		cairo_new_path(dc);
 		cairo_move_to(dc, lastTime, pitch);
 		cairo_line_to(dc, time, pitch);
-		cairo_set_line_width(dc, 0.015);
-		cairo_set_source_rgba(this->dc, 52.0/255.0, 101.0/255.0, 164.0/255.0, 0.6);
+		cairo_set_line_width(dc, 0.02);
+		cairo_set_source_rgba(this->dc, 52.0/255.0, 101.0/255.0, 164.0/255.0, 0.9);
 		cairo_stroke_preserve(dc);
 		double oldPitch = (std::abs(lastPitch - pitch) < 0.005 ? lastPitch : pitch);
 		cairo_new_path(dc);
