@@ -9,9 +9,9 @@
 #include <iomanip>
 
 CScreenSing::CScreenSing(std::string const& name, unsigned int width, unsigned int height, Analyzer const& analyzer):
-  CScreen(name,width,height), m_analyzer(analyzer), pitchGraph(width, height)
+  CScreen(name,width,height), m_analyzer(analyzer), videoSurf(NULL), backgroundSurf(NULL), pitchGraph(width, height)
 {
-	screen = CScreenManager::getSingletonPtr()->getSDLScreen();
+	SDL_Surface * screen = CScreenManager::getSingletonPtr()->getSDLScreen();
 	videoSurf.reset(SDL_AllocSurface(screen->flags, width, height, screen->format->BitsPerPixel, screen->format->Rmask, screen->format->Gmask, screen->format->Bmask, screen->format->Amask));
 	backgroundSurf.reset(SDL_AllocSurface(screen->flags, width, height, screen->format->BitsPerPixel, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000));
 	SDL_SetAlpha(videoSurf, SDL_SRCALPHA, SDL_ALPHA_OPAQUE);

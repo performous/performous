@@ -8,6 +8,7 @@
 #include <theme.h>
 #include <video.h>
 #include <lyrics.h>
+#include <sdl_helper.h>
 
 class CScreenSing: public CScreen {
   public:
