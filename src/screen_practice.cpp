@@ -6,28 +6,26 @@ CScreenPractice::CScreenPractice(std::string const& name, unsigned int width, un
 
 CScreenPractice::~CScreenPractice() {}
 
-static int loadSVG(std::string const& filename, double w, double h, CairoSVG*& ptr) {
-	CScreenManager* sm = CScreenManager::getSingletonPtr();
-	ptr = new CairoSVG(sm->getThemePathFile(filename).c_str(), w, h);
-	return sm->getVideoDriver()->initSurface(ptr->getSDLSurface());
-}
-
 void CScreenPractice::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	double unitX = m_width/800.;
 	double unitY = m_height/600.;
-	texture_note = loadSVG("practice_note.svg", 40 * unitX, 25 * unitY, cairo_svg_note);
-	texture_sharp = loadSVG("practice_sharp.svg", 25 * unitX, 75 * unitY, cairo_svg_sharp);
 
-	theme = new CThemePractice(m_width, m_height);
+	cairo_svg_note.reset(new CairoSVG(sm->getThemePathFile("practice_note.svg").c_str(),40 * unitX, 25 * unitY));
+	texture_note = sm->getVideoDriver()->initSurface(cairo_svg_note->getSDLSurface());
+
+	cairo_svg_sharp.reset(new CairoSVG(sm->getThemePathFile("practice_sharp.svg").c_str(),25 * unitX, 75 * unitY));
+	texture_sharp = sm->getVideoDriver()->initSurface(cairo_svg_sharp->getSDLSurface());
+
+	theme.reset(new CThemePractice(m_width, m_height));
 	bg_texture = sm->getVideoDriver()->initSurface(theme->bg->getSDLSurface());
 }
 
 void CScreenPractice::exit()
 {
-	delete theme;
-	delete cairo_svg_note;
-	delete cairo_svg_sharp;
+	theme.reset();
+	cairo_svg_note.reset();
+	cairo_svg_sharp.reset();
 }
 
 void CScreenPractice::manageEvent(SDL_Event event)

@@ -3,6 +3,7 @@
 
 #include "../config.h"
 
+#include <boost/scoped_ptr.hpp>
 #include <screen.h>
 #include <cairosvg.h>
 #include <theme.h>
@@ -17,10 +18,9 @@ class CScreenPractice : public CScreen {
 	void draw();
   private:
 	Analyzer const& m_analyzer;
-	CThemePractice *theme;
-	CairoSVG* cairo_svg_note;
-	CairoSVG* cairo_svg_sharp;
-	CairoSVG* cairo_svg_peak;
+	boost::scoped_ptr<CThemePractice> theme;
+	boost::scoped_ptr<CairoSVG> cairo_svg_note;
+	boost::scoped_ptr<CairoSVG> cairo_svg_sharp;
 	unsigned int texture_note;
 	unsigned int texture_sharp;
 	unsigned int bg_texture;

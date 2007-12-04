@@ -3,6 +3,7 @@
 
 #include "../config.h"
 
+#include <boost/scoped_ptr.hpp>
 #include <screen.h>
 #include <pitch_graph.h>
 #include <theme.h>
@@ -32,8 +33,8 @@ class CScreenSing: public CScreen {
 	bool finished;
 	double playOffset;
 	CVideo video;
-	CThemeSing* theme;
-	Lyrics* lyrics;
+	boost::scoped_ptr<CThemeSing> theme;
+	boost::scoped_ptr<Lyrics> lyrics;
 	Song::notes_t::const_iterator m_songit;
 };
 

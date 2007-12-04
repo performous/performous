@@ -16,14 +16,14 @@ CScreenSongs::CScreenSongs(std::string const& name, unsigned int width, unsigned
 void CScreenSongs::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	sm->getAudio()->stopMusic();
-	theme = new CThemeSongs(m_width, m_height);
+	theme.reset(new CThemeSongs(m_width, m_height));
 	bg_texture = sm->getVideoDriver()->initSurface(theme->bg->getSDLSurface());
 }
 
 void CScreenSongs::exit() {
 	m_cover.clear();
 	m_playing.clear();
-	delete theme;
+	theme.reset();
 }
 
 void CScreenSongs::manageEvent(SDL_Event event) {
@@ -75,10 +75,10 @@ void CScreenSongs::draw() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	theme->theme->clear();
 	// Draw the "Order by" text
-	print(theme, theme->order, (m_searching ? "find: " + m_search : sm->getSongs()->sortDesc()));
+	print(theme.get(), theme->order, (m_searching ? "find: " + m_search : sm->getSongs()->sortDesc()));
 	// Test if there are no songs
 	if (sm->getSongs()->empty()) {
-		print(theme, theme->song, "no songs found");
+		print(theme.get(), theme->song, "no songs found");
 		if (!m_playing.empty()) { sm->getAudio()->stopMusic(); m_playing.clear(); }
 	} else {
 		Song& song = sm->getSongs()->current();
@@ -87,7 +87,7 @@ void CScreenSongs::draw() {
 			std::ostringstream oss;
 			Songs& s = *sm->getSongs();
 			oss << song.str() << "\n(" << s.currentId() + 1 << "/" << s.size() << ")";
-			print(theme, theme->song, oss.str());
+			print(theme.get(), theme->song, oss.str());
 		}
 		// Draw the cover
 		std::string cover = song.path + song.cover;

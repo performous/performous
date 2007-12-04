@@ -3,6 +3,7 @@
 
 #include "../config.h"
 
+#include <boost/scoped_ptr.hpp>
 #include <screen.h>
 #include <cairosvg.h>
 #include <theme.h>
@@ -16,8 +17,7 @@ class CScreenScore: public CScreen {
 	void manageEvent(SDL_Event event);
 	void draw();
   private:
-	CairoSVG* cairo_svg;
-	CThemeScore* theme;
+	boost::scoped_ptr<CThemeScore> theme;
 	unsigned int bg_texture;
 };
 

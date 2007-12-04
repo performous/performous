@@ -4,6 +4,7 @@
 #include "../config.h"
 
 #include <boost/noncopyable.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <cairosvg.h>
 #include <string>
 
@@ -72,26 +73,27 @@ class CTheme: boost::noncopyable {
 struct CThemeSongs: boost::noncopyable {
 	CThemeSongs(unsigned int width, unsigned int height);
 	~CThemeSongs();
-	CairoSVG *bg;
+	boost::scoped_ptr<CairoSVG> bg;
+	boost::scoped_ptr<CTheme> theme;
 	TThemeTxt song;
 	TThemeTxt order;
-	CTheme *theme;
 };
 
 struct CThemePractice: boost::noncopyable {
 	CThemePractice(unsigned int width, unsigned int height);
 	~CThemePractice();
-	CairoSVG *bg;
+	boost::scoped_ptr<CairoSVG> bg;
+	boost::scoped_ptr<CTheme> theme;
 	TThemeTxt notetxt;
 	TThemeRect peak;
-	CTheme *theme;
 };
 
 struct CThemeSing: boost::noncopyable {
 	CThemeSing(unsigned int width, unsigned int height);
 	~CThemeSing();
-	CairoSVG *bg;
-	CairoSVG *p1box;
+	boost::scoped_ptr<CairoSVG> bg;
+	boost::scoped_ptr<CairoSVG> p1box;
+	boost::scoped_ptr<CTheme> theme;
 	TThemeTxt timertxt; 
 	TThemeTxt p1score;
 	TThemeTxt lyricspast;
@@ -100,26 +102,25 @@ struct CThemeSing: boost::noncopyable {
 	TThemeTxt lyricsnextsentence;
 	TThemeRect progressfg;
 	TThemeRect tostartfg;
-	CTheme *theme;
 };
 
 struct CThemeScore: boost::noncopyable {
 	CThemeScore(unsigned int width, unsigned int height);
 	~CThemeScore();
-	CairoSVG *bg;
+	boost::scoped_ptr<CairoSVG> bg;
+	boost::scoped_ptr<CTheme> theme;
 	TThemeTxt normal_score;
 	TThemeTxt rank;
 	TThemeRect level;
-	CTheme *theme;
 };
 
 struct CThemeConfiguration: boost::noncopyable {
 	CThemeConfiguration(unsigned int width, unsigned int height);
 	~CThemeConfiguration();
-	CairoSVG *bg;
+	boost::scoped_ptr<CairoSVG> bg;
+	boost::scoped_ptr<CTheme> theme;
 	TThemeTxt item;
 	TThemeTxt value;
-	CTheme *theme;
 };
 
 #endif

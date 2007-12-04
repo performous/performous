@@ -23,7 +23,7 @@ void CScreenSing::enter() {
 	bool video_ok = false;
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	Song& song = sm->getSongs()->current();
-	theme = new CThemeSing(m_width, m_height);
+	theme.reset(new CThemeSing(m_width, m_height));
 	SDL_FillRect(backgroundSurf,NULL,SDL_MapRGB(backgroundSurf->format, 255, 255, 255));
 	if (!song.video.empty()) {
 		std::string file = song.path + song.video;
@@ -43,7 +43,7 @@ void CScreenSing::enter() {
 	std::cout << "Now playing: " << file << std::endl;
 	CAudio& audio = *sm->getAudio();
 	audio.playMusic(file.c_str());
-	lyrics = new Lyrics(song.notes);
+	lyrics.reset(new Lyrics(song.notes));
 	playOffset = 0.0;
 	song.reset();
 	m_songit = song.notes.begin();
@@ -55,8 +55,8 @@ void CScreenSing::exit() {
 	video.unloadVideo();
 	SDL_FillRect(videoSurf,NULL,0xffffff);
 	m_sentence.clear();
-	delete lyrics;
-	delete theme;
+	lyrics.reset();
+	theme.reset();
 	pitchGraph.clear();
 }
 

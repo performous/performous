@@ -8,12 +8,12 @@ CScreenScore::~CScreenScore() {}
 
 void CScreenScore::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
-  	theme = new CThemeScore(m_width, m_height);
+  	theme.reset(new CThemeScore(m_width, m_height));
 	bg_texture = sm->getVideoDriver()->initSurface(theme->bg->getSDLSurface());
 }
 
 void CScreenScore::exit() {
-	delete theme;
+	theme.reset();
 }
 
 void CScreenScore::manageEvent(SDL_Event event) {

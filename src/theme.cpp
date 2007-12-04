@@ -365,35 +365,29 @@ CTheme::~CTheme() {
 
 CThemeSongs::CThemeSongs(unsigned int width, unsigned int height) {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
-	bg = new CairoSVG(sm->getThemePathFile("songs_bg.svg"), width, height);
-	theme = new CTheme(width, height);
+	bg.reset(new CairoSVG(sm->getThemePathFile("songs_bg.svg"), width, height));
+	theme.reset(new CTheme(width, height));
 	theme->ParseSVGForText(sm->getThemePathFile("songs_song.svg"), &song);
 	theme->ParseSVGForText(sm->getThemePathFile("songs_order.svg"), &order);
 }
 
-CThemeSongs::~CThemeSongs() {
-	delete bg;
-	delete theme;
-}
+CThemeSongs::~CThemeSongs() {}
 
 CThemePractice::CThemePractice(unsigned int width, unsigned int height) {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
-	bg = new CairoSVG(sm->getThemePathFile("practice_bg.svg"), width, height);
-	theme = new CTheme(width, height);
+	bg.reset(new CairoSVG(sm->getThemePathFile("practice_bg.svg"), width, height));
+	theme.reset(new CTheme(width, height));
 	theme->ParseSVGForText(sm->getThemePathFile("practice_txt.svg"), &notetxt);
 	theme->ParseSVGForRect(sm->getThemePathFile("practice_peak.svg"), &peak);
 }
 
-CThemePractice::~CThemePractice() {
-	delete bg;
-	delete theme;
-}
+CThemePractice::~CThemePractice() {}
 
 CThemeSing::CThemeSing(unsigned int width, unsigned int height) {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
-	bg = new CairoSVG(sm->getThemePathFile("sing_bg.svg"), width, height);	
-	p1box = new CairoSVG(sm->getThemePathFile("sing_p1box.svg"), width, height);
-	theme = new CTheme(width, height);
+	bg.reset(new CairoSVG(sm->getThemePathFile("sing_bg.svg"), width, height));
+	p1box.reset(new CairoSVG(sm->getThemePathFile("sing_p1box.svg"), width, height));
+	theme.reset(new CTheme(width, height));
 	theme->ParseSVGForText(sm->getThemePathFile("sing_timetxt.svg"), &timertxt);
 	theme->ParseSVGForText(sm->getThemePathFile("sing_p1score.svg"), &p1score);
 	theme->ParseSVGForText(sm->getThemePathFile("sing_lyricscurrent.svg"), &lyricspast);
@@ -404,36 +398,25 @@ CThemeSing::CThemeSing(unsigned int width, unsigned int height) {
 	theme->ParseSVGForRect(sm->getThemePathFile("sing_tostartfg.svg"), &tostartfg);
 }
 
-CThemeSing::~CThemeSing() {
-	delete bg;
-	delete p1box;
-	delete theme;
-}
+CThemeSing::~CThemeSing() {}
 
 CThemeScore::CThemeScore(unsigned int width, unsigned int height) {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
-	bg = new CairoSVG(sm->getThemePathFile("score_bg.svg"), width, height);
-	theme = new CTheme(width, height);
+	bg.reset(new CairoSVG(sm->getThemePathFile("score_bg.svg"), width, height));
+	theme.reset(new CTheme(width, height));
 	theme->ParseSVGForText(sm->getThemePathFile("score_txt.svg"), &normal_score);
 	theme->ParseSVGForText(sm->getThemePathFile("score_rank.svg"), &rank);
 	theme->ParseSVGForRect(sm->getThemePathFile("score_level.svg"), &level);
 }
 
-CThemeScore::~CThemeScore() {
-	delete bg;
-	delete theme;
-}
+CThemeScore::~CThemeScore() {}
 
 CThemeConfiguration::CThemeConfiguration(unsigned int width, unsigned int height) {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
-	bg = new CairoSVG(sm->getThemePathFile("configuration_bg.svg"), width, height);
-	theme = new CTheme(width, height);
+	bg.reset(new CairoSVG(sm->getThemePathFile("configuration_bg.svg"), width, height));
+	theme.reset(new CTheme(width, height));
 	theme->ParseSVGForText(sm->getThemePathFile("configuration_item.svg"), &item);
 	theme->ParseSVGForText(sm->getThemePathFile("configuration_value.svg"), &value);
 }
 
-CThemeConfiguration::~CThemeConfiguration() {
-	delete bg;
-	delete theme;
-}
-
+CThemeConfiguration::~CThemeConfiguration() {}

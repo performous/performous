@@ -1,6 +1,7 @@
 #ifndef __SCREENSONGS_H__
 #define __SCREENSONGS_H__
 
+#include <boost/scoped_ptr.hpp>
 #include <screen.h>
 #include <sdl_helper.h>
 #include <songs.h>
@@ -14,7 +15,7 @@ class CScreenSongs : public CScreen {
 	void manageEvent(SDL_Event event);
 	void draw();
   private:
-	CThemeSongs* theme;
+	boost::scoped_ptr<CThemeSongs> theme;
 	std::string m_cover;
 	std::string m_playing;
 	bool m_searching;

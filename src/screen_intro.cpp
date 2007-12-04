@@ -2,13 +2,11 @@
 
 CScreenIntro::CScreenIntro(std::string const& name, unsigned int width, unsigned int height): CScreen(name, width, height) {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
-	cairo_svg = new CairoSVG(sm->getThemePathFile("intro.svg"), width, height);
+	cairo_svg.reset(new CairoSVG(sm->getThemePathFile("intro.svg"), width, height));
 	texture = sm->getVideoDriver()->initSurface(cairo_svg->getSDLSurface());
 }
 
-CScreenIntro::~CScreenIntro() {
-	delete cairo_svg;
-}
+CScreenIntro::~CScreenIntro() {}
 
 void CScreenIntro::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
