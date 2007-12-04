@@ -21,12 +21,6 @@ CScreenManager::CScreenManager(unsigned int width, unsigned int height, std::str
   m_theme(theme)
 {}
 
-CScreenManager::~CScreenManager()
-{
-	delete audio;
-	delete songs;
-}
-
 void CScreenManager::activateScreen(std::string const& name) {
 	CScreen* s = getScreen(name);
 	if (currentScreen) currentScreen->exit();

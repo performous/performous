@@ -4,6 +4,7 @@
 #include "../config.h"
 
 #include <boost/ptr_container/ptr_map.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <singleton.h>
 #include <audio.h>
 #include <record.h>
@@ -32,7 +33,6 @@ class CScreen {
 class CScreenManager: public CSingleton <CScreenManager> {
   public:
 	CScreenManager(unsigned int width, unsigned int height, std::string const& theme);
-	~CScreenManager();
 	void addScreen(CScreen* s) { std::string tmp = s->getName(); screens.insert(tmp, s); };
 	void activateScreen(std::string const& name);
 	CScreen* getCurrentScreen() { return currentScreen; };
@@ -44,8 +44,8 @@ class CScreenManager: public CSingleton <CScreenManager> {
 	unsigned int getWidth() { return m_width; };
 	unsigned int getHeight() { return m_height; };
 	
-	CAudio* getAudio() { return audio; };
-	void setAudio(CAudio* _audio) {audio=_audio; };
+	CAudio* getAudio() { return audio.get(); };
+	void setAudio(CAudio* _audio) { audio.reset(_audio); };
 
 	CVideoDriver* getVideoDriver() { return videoDriver; };
 	void setVideoDriver(CVideoDriver* _videoDriver) {videoDriver=_videoDriver; };
@@ -53,8 +53,8 @@ class CScreenManager: public CSingleton <CScreenManager> {
 	bool getFullscreenStatus() { return m_fullscreen; };
 	void setFullscreenStatus(bool fullscreen) { m_fullscreen = fullscreen; };
 
-	Songs* getSongs() { return songs; };
-	void setSongs(Songs* _songs) { songs = _songs; };
+	Songs* getSongs() { return songs.get(); };
+	void setSongs(Songs* _songs) { songs.reset(_songs); };
 
 	void finished() { m_finished=true; };
 	bool isFinished() { return m_finished; };
@@ -67,8 +67,8 @@ class CScreenManager: public CSingleton <CScreenManager> {
 	screenmap_t screens;
 	CScreen* currentScreen;
 	SDL_Surface* screen;
-	CAudio* audio;
-	Songs* songs;
+	boost::scoped_ptr<CAudio> audio;
+	boost::scoped_ptr<Songs> songs;
 	CVideoDriver* videoDriver;
 	bool m_fullscreen;
 	unsigned int m_width;
