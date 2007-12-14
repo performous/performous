@@ -44,7 +44,7 @@ Analyzer::Analyzer(size_t step):
 {
   	// Hamming window
 	for (size_t i=0; i < FFT_N; i++) {
-		m_window[i] = 0.53836 - 0.46164 * std::cos(2.0 * M_PI * i / FFT_N - 1);
+		m_window[i] = 0.53836 - 0.46164 * std::cos(2.0 * M_PI * i / (FFT_N - 1));
 	}
 }
 
