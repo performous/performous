@@ -11,6 +11,7 @@ class SDLSurf: boost::noncopyable {
 	/** Takes ownership of an existing surface. **/
 	explicit SDLSurf(SDL_Surface* surf): m_surf(surf) {}
 	explicit SDLSurf(std::string const& filename): m_surf(IMG_Load(filename.c_str())) {
+		if (filename.empty() || filename[filename.size() - 1] == '/') return; // Suppress useless warnings
 		if (!m_surf) std::cout << "Unable to load " << filename << std::endl;
 	}
 	SDLSurf(std::string const& filename, double width, double height): m_surf() {
