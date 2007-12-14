@@ -6,7 +6,8 @@
 CScreenSongs::CScreenSongs(std::string const& name, unsigned int width, unsigned int height, std::set<std::string> const& songdirs):
   CScreen(name, width, height),
   m_searching(),
-  m_emptyCover(CScreenManager::getSingletonPtr()->getThemePathFile("no_cover.png"), CScreenManager::getSingletonPtr()->getWidth() / 800.0 * 256.0, CScreenManager::getSingletonPtr()->getHeight() / 600.0 * 256.0)
+  m_emptyCover(CScreenManager::getSingletonPtr()->getThemePathFile("no_cover.png"), CScreenManager::getSingletonPtr()->getWidth() / 800.0 * 256.0, CScreenManager::getSingletonPtr()->getHeight() / 600.0 * 256.0),
+  m_currentCover(NULL)
 {
 	if (CScreenManager::getSingletonPtr()->getSongs() == NULL) {
 		CScreenManager::getSingletonPtr()->setSongs(new Songs(songdirs));
@@ -96,24 +97,22 @@ void CScreenSongs::draw() {
 			double width = CScreenManager::getSingletonPtr()->getWidth();
 			double height = CScreenManager::getSingletonPtr()->getHeight();
 			SDLSurf coverSurf(cover, width / 800.0 * 256, height / 600.0 * 256.0);
-			SDL_Surface* surf = (coverSurf ? coverSurf : m_emptyCover);
-			sm->getVideoDriver()->drawSurface(surf);
-			SDL_Surface *virtSurf = theme->bg->getSDLSurface();
-			if (surf) {
-				SDL_Rect position;
-				position.x = (m_width - surf->w) / 2;
-				position.y = (m_height - surf->h) / 2;
-				position.w = surf->w;
-				position.h = surf->h;
-				SDL_FillRect(virtSurf, &position, SDL_MapRGB(virtSurf->format, 255, 255, 255));
-				SDL_BlitSurface(surf, NULL, virtSurf, &position);
-			}
+			m_currentCover = (coverSurf ? coverSurf : m_emptyCover);
+			m_currentCover->refcount++;
 		}
 		// Play a preview of the song
 		std::string file = song.path + song.mp3;
 		if (file != m_playing) sm->getAudio()->playPreview(m_playing = file);
 	}
 	sm->getVideoDriver()->drawSurface(bg_texture);
+	if (m_currentCover) {
+		SDL_Rect position;
+		position.x = (m_width - m_currentCover->w) / 2;
+		position.y = (m_height - m_currentCover->h) / 2;
+		position.w = m_currentCover->w;
+		position.h = m_currentCover->h;
+		sm->getVideoDriver()->drawSurface(m_currentCover, position.x, position.y);
+	}
 	sm->getVideoDriver()->drawSurface(theme->theme->getCurrent());
 }
 
