@@ -98,6 +98,10 @@ void CScreenSongs::draw() {
 			double height = CScreenManager::getSingletonPtr()->getHeight();
 			SDLSurf coverSurf(cover, width / 800.0 * 256, height / 600.0 * 256.0);
 			if( coverSurf ) {
+				// Free the last cached surface
+				if(m_currentCover != m_emptyCover) SDL_FreeSurface(m_currentCover);
+				// Increment SDL refcount to avoid to free the structure when coverSurf will
+				// be destroy
 				coverSurf->refcount++;
 				m_currentCover = coverSurf;
 			} else
