@@ -97,8 +97,11 @@ void CScreenSongs::draw() {
 			double width = CScreenManager::getSingletonPtr()->getWidth();
 			double height = CScreenManager::getSingletonPtr()->getHeight();
 			SDLSurf coverSurf(cover, width / 800.0 * 256, height / 600.0 * 256.0);
-			m_currentCover = (coverSurf ? coverSurf : m_emptyCover);
-			m_currentCover->refcount++;
+			if( coverSurf ) {
+				coverSurf->refcount++;
+				m_currentCover = coverSurf;
+			} else
+				m_currentCover = m_emptyCover;
 		}
 		// Play a preview of the song
 		std::string file = song.path + song.mp3;
