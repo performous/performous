@@ -9,6 +9,16 @@ extern "C" {
 
 #include <queue>
 
+class queuedIterator {
+	public:
+		queuedIterator() {};
+		queuedIterator& operator++() { av_free(frames.front()); frames.pop(); return *this; };
+		AVFrame& operator*() { return *frames.front();};
+		AVFrame* operator->() { return frames.front();};
+		std::queue<AVFrame*> frames;
+	private:
+};
+
 class CFfmpeg {
 	public:
 		CFfmpeg(bool decodeVideo=false, bool decodeAudio=false);
@@ -25,8 +35,8 @@ class CFfmpeg {
 		AVCodec         *pVideoCodec;
 		AVCodec         *pAudioCodec;
 
-		AVFrame         * pVideoFrame;
-		AVFrame         * pAudioFrame;
+		queuedIterator  videoQueue;
+		queuedIterator  audioQueue;
 
 		int             videoStream;
 		int             audioStream;

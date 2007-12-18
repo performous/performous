@@ -51,9 +51,6 @@ bool CFfmpeg::open( const char * _filename ) {
 				pVideoCodecCtx->flags|=CODEC_FLAG_TRUNCATED;
 			if(avcodec_open(pVideoCodecCtx, pVideoCodec)<0)
 				throw std::runtime_error("Cannot open video stream");
-			pVideoFrame=avcodec_alloc_frame();
-			if( pVideoFrame==NULL )
-				throw std::runtime_error("Cannot allocate video memory");
 		}
 	} catch (std::runtime_error& e) {
 		// TODO: clean memory
@@ -70,9 +67,6 @@ bool CFfmpeg::open( const char * _filename ) {
 				pAudioCodecCtx->flags|=CODEC_FLAG_TRUNCATED;
 			if(avcodec_open(pAudioCodecCtx, pAudioCodec)<0)
 				throw std::runtime_error("Cannot open audio stream");
-			pAudioFrame=avcodec_alloc_frame();
-			if( pAudioFrame==NULL )
-				throw std::runtime_error("Cannot allocate audio memory");
 		}
 	} catch (std::runtime_error& e) {
 		// TODO: clean memory
@@ -83,11 +77,9 @@ bool CFfmpeg::open( const char * _filename ) {
 
 void CFfmpeg::close( void ) {
 	if( videoStream != -1 && decodeVideo ) {
-		av_free(pVideoFrame);
 		avcodec_close(pVideoCodecCtx);
 	}
 	if( audioStream != -1 && decodeAudio ) {
-		av_free(pAudioFrame);
 		avcodec_close(pAudioCodecCtx);
 	}
 	av_close_input_file(pFormatCtx);
@@ -115,12 +107,13 @@ namespace {
 	}
 }
 
+
 void CFfmpeg::_run() {
 	for(;;) {
 		// TODO: Here we wait if queues are full (video or audio)
 		// sleepd for 10ms
-		if( true )
-			boost::thread::sleep(now() + 0.001);
+		while( videoQueue.frames.size() >= 100 || audioQueue.frames.size() >= 100 )
+			boost::thread::sleep(now() + 0.01);
 		// if decode fails, we exit the thread
 		if( !decodeNextFrame() )
 			break;
@@ -133,7 +126,11 @@ bool CFfmpeg::decodeNextFrame( void ) {
 
 	while(av_read_frame(pFormatCtx, &packet)>=0) {
 		if(packet.stream_index==videoStream && decodeVideo) {
-			avcodec_decode_video(pVideoCodecCtx, pVideoFrame, &frameFinished, packet.data, packet.size);
+			AVFrame * tmp=avcodec_alloc_frame();
+
+			avcodec_decode_video(pVideoCodecCtx, tmp, &frameFinished, packet.data, packet.size);
+			videoQueue.frames.push(tmp);
+
 			float time = av_q2d(pFormatCtx->streams[videoStream]->time_base) * packet.pts;
 			std::cout << "Video time: " << time << std::endl;
 			av_free_packet(&packet);
