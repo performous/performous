@@ -19,6 +19,11 @@ class queuedIterator {
 	private:
 };
 
+#include <boost/scoped_ptr.hpp>
+#include <boost/thread/condition.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/thread.hpp>
+
 class CFfmpeg {
 	public:
 		CFfmpeg(bool decodeVideo=false, bool decodeAudio=false);
@@ -26,8 +31,25 @@ class CFfmpeg {
 		bool open( const char * _filename );
 		void close( void );
 		bool decodeNextFrame(void);
-		void _run();
+		void operator()(); // Thread runs here, don't call directly
+		void stop() {
+			boost::mutex::scoped_lock l(m_mutex);
+			m_type = STOP;
+			m_cond.notify_one();
+		}
+		void start() {
+			boost::mutex::scoped_lock l(m_mutex);
+			m_type = PLAY;
+			m_cond.notify_one();
+		}
 	private:
+		enum Type { STOP, PLAY, SEEK, PAUSE, QUIT } m_type;
+		boost::mutex m_mutex;
+		boost::condition m_cond;
+		boost::condition m_condready;
+		boost::scoped_ptr<boost::thread> m_thread;
+		bool m_ready;
+
 		AVFormatContext *pFormatCtx;
 
 		AVCodecContext  *pVideoCodecCtx;

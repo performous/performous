@@ -2,15 +2,23 @@
 #include <stdexcept>
 #include <iostream>
 
-CFfmpeg::CFfmpeg(bool _decodeVideo, bool _decodeAudio) {
+CFfmpeg::CFfmpeg(bool _decodeVideo, bool _decodeAudio) : m_type() {
 	av_register_all();
 	videoStream=-1;
 	audioStream=-1;
 	decodeVideo=_decodeVideo;
 	decodeAudio=_decodeAudio;
+	m_thread.reset(new boost::thread(boost::ref(*this)));
 }
 
-CFfmpeg::~CFfmpeg() {}
+CFfmpeg::~CFfmpeg() {
+	{
+		boost::mutex::scoped_lock l(m_mutex);
+		m_type = QUIT;
+		m_cond.notify_all();
+	}
+	m_thread->join();
+}
 
 bool CFfmpeg::open( const char * _filename ) {
 	if(av_open_input_file(&pFormatCtx, _filename, NULL, 0, NULL)!=0)
@@ -76,6 +84,7 @@ bool CFfmpeg::open( const char * _filename ) {
 }
 
 void CFfmpeg::close( void ) {
+	stop();
 	if( videoStream != -1 && decodeVideo ) {
 		avcodec_close(pVideoCodecCtx);
 	}
@@ -108,15 +117,37 @@ namespace {
 }
 
 
-void CFfmpeg::_run() {
+void CFfmpeg::operator()() {
 	for(;;) {
+		Type type;
+		{
+			boost::mutex::scoped_lock l(m_mutex);
+			m_ready = true;
+			m_condready.notify_all();
+			while (m_type == STOP) m_cond.wait(l);
+			m_ready = false;
+			type = m_type;
+		}
 		// TODO: Here we wait if queues are full (video or audio)
 		// sleepd for 10ms
-		while( videoQueue.frames.size() >= 100 || audioQueue.frames.size() >= 100 )
-			boost::thread::sleep(now() + 0.01);
-		// if decode fails, we exit the thread
-		if( !decodeNextFrame() )
-			break;
+		switch( type ) {
+			case STOP:
+				break;
+			case QUIT:
+				return;
+			case PLAY:
+				if( videoQueue.frames.size() >= 10 || audioQueue.frames.size() >= 10 ) {
+					boost::thread::sleep(now() + 0.01);
+					break;
+				} else {
+					if( !decodeNextFrame() ) {
+						throw std::runtime_error("Unfinished frame found");
+					}
+				}
+				break;
+			default:
+				break;
+		}
 	}
 }
 
@@ -165,7 +196,10 @@ int main(int argc, char** argv) {
 	// Choose to decode both audio and video
 	CFfmpeg test(true,true);
 	test.open(argv[1]);
-	test._run();
+	boost::thread::sleep(now() + 0.5 );
+	test.start();
+	boost::thread::sleep(now() + 1.0 );
 	test.close();
+	boost::thread::sleep(now() + 1.0 );
 	return EXIT_SUCCESS;
 }
