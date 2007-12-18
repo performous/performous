@@ -120,7 +120,7 @@ void CFfmpeg::_run() {
 		// TODO: Here we wait if queues are full (video or audio)
 		// sleepd for 10ms
 		if( true )
-			boost::thread::sleep(now() + 0.01);
+			boost::thread::sleep(now() + 0.001);
 		// if decode fails, we exit the thread
 		if( !decodeNextFrame() )
 			break;
@@ -134,14 +134,14 @@ bool CFfmpeg::decodeNextFrame( void ) {
 	while(av_read_frame(pFormatCtx, &packet)>=0) {
 		if(packet.stream_index==videoStream && decodeVideo) {
 			avcodec_decode_video(pVideoCodecCtx, pVideoFrame, &frameFinished, packet.data, packet.size);
-			float time = av_q2d(pVideoCodecCtx->time_base) *  packet.pts;
+			float time = av_q2d(pFormatCtx->streams[videoStream]->time_base) * packet.pts;
 			std::cout << "Video time: " << time << std::endl;
 			av_free_packet(&packet);
 			if(!frameFinished)
 				throw std::runtime_error("Unfinished frame (this should not happen)");
 			return true;
 		} else if(packet.stream_index==audioStream && decodeAudio) {
-			float time = av_q2d(pAudioCodecCtx->time_base) * packet.pts;
+			float time = av_q2d(pFormatCtx->streams[audioStream]->time_base) * packet.pts;
 			std::cout << "Audio time: " << time << std::endl;
 			av_free_packet(&packet);
 			return true;
@@ -159,7 +159,6 @@ bool CFfmpeg::decodeNextFrame( void ) {
  g++ -g -o test src/ffmpeg.cpp -Iinclude -DDEBUG -lavutil -lavformat -lavcodec -lboost_thread
 */
 
-/*
 int main(int argc, char** argv) {
 
 	if( argc != 2 ) {
@@ -173,4 +172,3 @@ int main(int argc, char** argv) {
 	test.close();
 	return EXIT_SUCCESS;
 }
-*/
