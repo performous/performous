@@ -169,17 +169,20 @@ void CFfmpeg::decodeNextFrame( void ) {
 			int decodeSize = avcodec_decode_video(pVideoCodecCtx, videoFrame, &frameFinished, packet.data, packet.size);
 
 			if( decodeSize < 0 ) {
+				av_free(videoFrame);
 				av_free_packet(&packet);
-				throw std::runtime_error("cannot decode frame");
+				throw std::runtime_error("cannot decode video frame");
 			}
 
 			if(frameFinished) {
 				float time;
 
-				if( packet.pts == AV_NOPTS_VALUE ) {
+				if( packet.pts != AV_NOPTS_VALUE ) {
+					time = av_q2d(pFormatCtx->streams[videoStream]->time_base) * packet.pts;
+				} else if( packet.dts != AV_NOPTS_VALUE ) {
 					time = av_q2d(pFormatCtx->streams[videoStream]->time_base) * packet.dts;
 				} else {
-					time = av_q2d(pFormatCtx->streams[videoStream]->time_base) * packet.pts;
+					time = 0.0;
 				}
 
 				std::cout << "Video time: " << time << std::endl;
@@ -192,15 +195,39 @@ void CFfmpeg::decodeNextFrame( void ) {
 
 			av_free_packet(&packet);
 		} else if(packet.stream_index==audioStream && decodeAudio) {
-			float time = av_q2d(pFormatCtx->streams[audioStream]->time_base) * packet.pts;
+			int16_t * audioFrames = new int16_t[AVCODEC_MAX_AUDIO_FRAME_SIZE];
+			int outsize = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+			float time;
+
+			int decodeSize = avcodec_decode_audio2( pAudioCodecCtx, audioFrames, &outsize, packet.data, packet.size);
+
+			if( decodeSize < 0 ) {
+				av_free_packet(&packet);
+				delete[] audioFrames;
+				throw std::runtime_error("cannot decode audio rame");
+			}
+
+			if( packet.pts != AV_NOPTS_VALUE ) {
+				time = av_q2d(pFormatCtx->streams[audioStream]->time_base) * packet.pts;
+			} else if( packet.dts != AV_NOPTS_VALUE ) {
+				time = av_q2d(pFormatCtx->streams[audioStream]->time_base) * packet.dts;
+			} else {
+				time = 0.0;
+			}
+
 			std::cout << "Audio time: " << time << std::endl;
+			
+			audioQueue.push(audioFrames);
+
 			av_free_packet(&packet);
+			return;
 		} else {
 			// Not the first audio streamer nor the first video stream
 			// Could be a second stream or a subtitle stream
 			av_free_packet(&packet);
 		}
 	}
+	return;
 }
 
 /*

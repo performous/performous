@@ -9,16 +9,27 @@ extern "C" {
 
 #include <queue>
 
-class queuedIterator {
+class queuedIteratorVideo {
 	public:
-		queuedIterator() {};
-		queuedIterator& operator++() { av_free(frames.front()); frames.pop(); return *this; };
+		queuedIteratorVideo() {};
+		queuedIteratorVideo& operator++() { av_free(frames.front()); frames.pop(); return *this; };
 		AVFrame& operator*() { return *frames.front();};
 		AVFrame* operator->() { return frames.front();};
 		const unsigned int size() {return frames.size();};
 		void push(AVFrame* f) {frames.push(f);};
 	private:
 		std::queue<AVFrame*> frames;
+};
+class queuedIteratorAudio {
+	public:
+		queuedIteratorAudio() {};
+		queuedIteratorAudio& operator++() { delete[] frames.front(); frames.pop(); return *this; };
+		int16_t& operator*() { return *frames.front();};
+		int16_t* operator->() { return frames.front();};
+		const unsigned int size() {return frames.size();};
+		void push(int16_t* f) {frames.push(f);};
+	private:
+		std::queue<int16_t*> frames;
 };
 
 #include <boost/scoped_ptr.hpp>
@@ -59,8 +70,8 @@ class CFfmpeg {
 		AVCodec         *pVideoCodec;
 		AVCodec         *pAudioCodec;
 
-		queuedIterator  videoQueue;
-		queuedIterator  audioQueue;
+		queuedIteratorVideo  videoQueue;
+		queuedIteratorAudio  audioQueue;
 
 		int             videoStream;
 		int             audioStream;
