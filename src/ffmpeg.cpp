@@ -140,8 +140,10 @@ void CFfmpeg::operator()() {
 					boost::thread::sleep(now() + 0.01);
 					break;
 				} else {
-					if( !decodeNextFrame() ) {
-						throw std::runtime_error("Unfinished frame found");
+					try {
+						decodeNextFrame();
+					} catch (std::exception& e) {
+						std::cerr << "ffmpeg error: " << e.what() << std::endl;
 					}
 				}
 				break;
@@ -151,36 +153,51 @@ void CFfmpeg::operator()() {
 	}
 }
 
-bool CFfmpeg::decodeNextFrame( void ) {
+void CFfmpeg::decodeNextFrame( void ) {
 	AVPacket packet;
 	int frameFinished=0;
+	bool newVideoFrame = true;
+	AVFrame * videoFrame;
+	std::cout << "ENTERING DECODE FRAME ---" << std::endl;
 
 	while(av_read_frame(pFormatCtx, &packet)>=0) {
 		if(packet.stream_index==videoStream && decodeVideo) {
-			AVFrame * tmp=avcodec_alloc_frame();
+			if( newVideoFrame ) {
+				std::cout << "Allocate new frame" << std::endl;
+				videoFrame=avcodec_alloc_frame();
+				newVideoFrame = false;
+			}
 
-			avcodec_decode_video(pVideoCodecCtx, tmp, &frameFinished, packet.data, packet.size);
-			videoQueue.frames.push(tmp);
+			int decodeSize = avcodec_decode_video(pVideoCodecCtx, videoFrame, &frameFinished, packet.data, packet.size);
 
-			float time = av_q2d(pFormatCtx->streams[videoStream]->time_base) * packet.pts;
-			std::cout << "Video time: " << time << std::endl;
+			std::cerr << "decodeSize x frameFinished: " << decodeSize << " x " << frameFinished << std::endl;
+
+			if( decodeSize <= 0 ) {
+				av_free_packet(&packet);
+				throw std::runtime_error("cannot decode frame");
+			}
+
+			if(frameFinished) {
+				float time = av_q2d(pFormatCtx->streams[videoStream]->time_base) * packet.pts;
+				std::cout << "Video time: " << time << std::endl;
+
+				videoQueue.frames.push(videoFrame);
+
+				av_free_packet(&packet);
+				return;
+			}
+
 			av_free_packet(&packet);
-			if(!frameFinished)
-				throw std::runtime_error("Unfinished frame (this should not happen)");
-			return true;
 		} else if(packet.stream_index==audioStream && decodeAudio) {
 			float time = av_q2d(pFormatCtx->streams[audioStream]->time_base) * packet.pts;
 			std::cout << "Audio time: " << time << std::endl;
 			av_free_packet(&packet);
-			return true;
 		} else {
 			// Not the first audio streamer nor the first video stream
 			// Could be a second stream or a subtitle stream
 			av_free_packet(&packet);
-			return true;
 		}
 	}
-	return false;
 }
 
 /*

@@ -30,7 +30,7 @@ class CFfmpeg {
 		~CFfmpeg();
 		bool open( const char * _filename );
 		void close( void );
-		bool decodeNextFrame(void);
+		void decodeNextFrame(void);
 		void operator()(); // Thread runs here, don't call directly
 		void stop() {
 			boost::mutex::scoped_lock l(m_mutex);
