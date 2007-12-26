@@ -158,27 +158,30 @@ void CFfmpeg::decodeNextFrame( void ) {
 	int frameFinished=0;
 	bool newVideoFrame = true;
 	AVFrame * videoFrame;
-	std::cout << "ENTERING DECODE FRAME ---" << std::endl;
 
 	while(av_read_frame(pFormatCtx, &packet)>=0) {
 		if(packet.stream_index==videoStream && decodeVideo) {
 			if( newVideoFrame ) {
-				std::cout << "Allocate new frame" << std::endl;
 				videoFrame=avcodec_alloc_frame();
 				newVideoFrame = false;
 			}
 
 			int decodeSize = avcodec_decode_video(pVideoCodecCtx, videoFrame, &frameFinished, packet.data, packet.size);
 
-			std::cerr << "decodeSize x frameFinished: " << decodeSize << " x " << frameFinished << std::endl;
-
-			if( decodeSize <= 0 ) {
+			if( decodeSize < 0 ) {
 				av_free_packet(&packet);
 				throw std::runtime_error("cannot decode frame");
 			}
 
 			if(frameFinished) {
-				float time = av_q2d(pFormatCtx->streams[videoStream]->time_base) * packet.pts;
+				float time;
+
+				if( packet.pts == AV_NOPTS_VALUE ) {
+					time = av_q2d(pFormatCtx->streams[videoStream]->time_base) * packet.dts;
+				} else {
+					time = av_q2d(pFormatCtx->streams[videoStream]->time_base) * packet.pts;
+				}
+
 				std::cout << "Video time: " << time << std::endl;
 
 				videoQueue.frames.push(videoFrame);
