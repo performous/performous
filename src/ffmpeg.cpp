@@ -187,7 +187,10 @@ void CFfmpeg::decodeNextFrame( void ) {
 
 				std::cout << "Video time: " << time << std::endl;
 
-				videoQueue.push(videoFrame);
+				VideoFrame * tmp = new VideoFrame();
+				tmp->frame = videoFrame;
+				tmp->timestamp = time;
+				videoQueue.push(tmp);
 
 				av_free_packet(&packet);
 				return;
@@ -217,7 +220,10 @@ void CFfmpeg::decodeNextFrame( void ) {
 
 			std::cout << "Audio time: " << time << std::endl;
 			
-			audioQueue.push(audioFrames);
+			AudioFrame * tmp = new AudioFrame();
+			tmp->frame = audioFrames;
+			tmp->timestamp = time;
+			audioQueue.push(tmp);
 
 			av_free_packet(&packet);
 			return;

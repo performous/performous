@@ -9,27 +9,32 @@ extern "C" {
 
 #include <queue>
 
-class queuedIteratorVideo {
+class AudioFrame {
 	public:
-		queuedIteratorVideo() {};
-		queuedIteratorVideo& operator++() { av_free(frames.front()); frames.pop(); return *this; };
-		AVFrame& operator*() { return *frames.front();};
-		AVFrame* operator->() { return frames.front();};
-		const unsigned int size() {return frames.size();};
-		void push(AVFrame* f) {frames.push(f);};
-	private:
-		std::queue<AVFrame*> frames;
+		AudioFrame() {};
+		~AudioFrame() {delete[] frame;};
+		int16_t * frame;
+		float timestamp;
 };
-class queuedIteratorAudio {
+
+class VideoFrame {
 	public:
-		queuedIteratorAudio() {};
-		queuedIteratorAudio& operator++() { delete[] frames.front(); frames.pop(); return *this; };
-		int16_t& operator*() { return *frames.front();};
-		int16_t* operator->() { return frames.front();};
+		VideoFrame() {};
+		~VideoFrame() {av_free(frame);};
+		AVFrame * frame;
+		float timestamp;
+};
+
+template <class T> class queuedIterator {
+	public:
+		queuedIterator() {};
+		queuedIterator& operator++() { frames.pop(); return *this; };
+		T& operator*() { return *frames.front();};
+		T* operator->() { return frames.front();};
 		const unsigned int size() {return frames.size();};
-		void push(int16_t* f) {frames.push(f);};
+		void push(T f) {frames.push(f);};
 	private:
-		std::queue<int16_t*> frames;
+		std::queue<T> frames;
 };
 
 #include <boost/scoped_ptr.hpp>
@@ -70,8 +75,8 @@ class CFfmpeg {
 		AVCodec         *pVideoCodec;
 		AVCodec         *pAudioCodec;
 
-		queuedIteratorVideo  videoQueue;
-		queuedIteratorAudio  audioQueue;
+		queuedIterator<VideoFrame*>  videoQueue;
+		queuedIterator<AudioFrame*>  audioQueue;
 
 		int             videoStream;
 		int             audioStream;
