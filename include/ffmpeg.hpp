@@ -15,8 +15,10 @@ class queuedIterator {
 		queuedIterator& operator++() { av_free(frames.front()); frames.pop(); return *this; };
 		AVFrame& operator*() { return *frames.front();};
 		AVFrame* operator->() { return frames.front();};
-		std::queue<AVFrame*> frames;
+		const unsigned int size() {return frames.size();};
+		void push(AVFrame* f) {frames.push(f);};
 	private:
+		std::queue<AVFrame*> frames;
 };
 
 #include <boost/scoped_ptr.hpp>

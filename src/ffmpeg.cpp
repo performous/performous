@@ -136,7 +136,7 @@ void CFfmpeg::operator()() {
 			case QUIT:
 				return;
 			case PLAY:
-				if( videoQueue.frames.size() >= 10 || audioQueue.frames.size() >= 10 ) {
+				if( videoQueue.size() >= 10 || audioQueue.size() >= 10 ) {
 					boost::thread::sleep(now() + 0.01);
 					break;
 				} else {
@@ -184,7 +184,7 @@ void CFfmpeg::decodeNextFrame( void ) {
 
 				std::cout << "Video time: " << time << std::endl;
 
-				videoQueue.frames.push(videoFrame);
+				videoQueue.push(videoFrame);
 
 				av_free_packet(&packet);
 				return;
