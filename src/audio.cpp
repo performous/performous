@@ -4,6 +4,10 @@
 #include <boost/thread/xtime.hpp>
 #include <cmath>
 
+#ifdef __FREEBSD__
+#  define       get_current_dir_name()  getcwd(NULL, PATH_MAX)
+#endif
+
 #define LENGTH_ERROR -1
 
 CAudio::CAudio(): m_type() {
