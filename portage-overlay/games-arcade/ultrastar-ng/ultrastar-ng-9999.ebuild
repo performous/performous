@@ -1,76 +1,75 @@
 # Copyright 1999-2006 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header$
+# $Header: /cvsroot/ultrastar-ng/UltraStar-ng/portage-overlay/games-arcade/ultrastar-ng/ultrastar-ng-9999.ebuild,v 1.10 2007/09/29 13:04:19 yoda-jm Exp $
 
-inherit cvs games
+inherit games subversion
+
+RESTRICT="nostrip"
+
+SONGS_PN=ultrastar-songs
+SONGS_P=${SONGS_PN}-1
 
 DESCRIPTION="SingStar GPL clone"
 HOMEPAGE="http://sourceforge.net/projects/ultrastar-ng/"
-SRC_URI=""
+SRC_URI="songs? ( mirror://sourceforge/${PN}/${SONGS_P}.tar.bz2 )"
 
-LICENSE="GPL-2"
+ESVN_REPO_URI="https://ultrastar-ng.svn.sourceforge.net/svnroot/ultrastar-ng/trunk"
+ESVN_PROJECT="UltraStar-NG"
+
+LICENSE="GPL-2
+	songs? (
+		CCPL-Attribution-ShareAlike-NonCommercial-2.5
+		CCPL-Attribution-NonCommercial-NoDerivs-2.5
+	)"
 SLOT="0"
 KEYWORDS="~x86 ~amd64"
 
-IUSE="deprecated_cairo_svg novideo xine gstreamer opengl debug alsa portaudio"
+IUSE="novideo opengl xine gstreamer debug alsa portaudio songs"
 
-ECVS_SERVER="ultrastar-ng.cvs.sourceforge.net:/cvsroot/ultrastar-ng"
-ECVS_MODULE="UltraStar-ng"
-ECVS_AUTH="pserver"
-ECVS_USER="anonymous"
-ECVS_PASS=""
-
-DEPEND="
-	>=x11-libs/cairo-1.2
+RDEPEND="gnome-base/librsvg
+	dev-libs/boost
 	x11-libs/pango
-
-	xine? ( media-libs/xine-lib )
-	gstreamer? ( >=media-libs/gstreamer-0.10 )
-	!deprecated_cairo_svg? ( >=gnome-base/librsvg-2 )
-
-	media-libs/libsdl
 	media-libs/sdl-image
 	media-libs/sdl-gfx
+	xine? ( media-libs/xine-lib )
+	!xine? ( media-libs/gstreamer )
+	opengl? (
+		virtual/opengl
+		virtual/glu
+	)
+	alsa? ( media-libs/alsa-lib )
+	portaudio? ( media-libs/portaudio )
+	gstreamer? ( >=media-libs/gstreamer-0.10 )
 	!novideo? ( media-libs/smpeg )
-
-	dev-libs/boost
-	alsa? (media-libs/alsa-lib)
-	portaudio? (media-libs/portaudio)
-	
 	sys-apps/help2man"
-
-S=${WORKDIR}/${ECVS_MODULE}
+DEPEND="${RDEPEND}
+    dev-util/pkgconfig"
 
 pkg_setup() {
-	if use deprecated_cairo_svg ; then
-		ewarn "librsvg flag is not used, please be aware that"
-		ewarn "compiling ultrastar-ng with the deprecated_cairo_svg use flag"
-		ewarn "will compile the game with the old, deprecated, ugly"
-		ewarn "cairo-svg rendering engine"
-	fi
-	if ! use xine && ! use gstreamer ; then
-		eerror "You must choose either xine or gstreamer audio support"
-	fi
+	games_pkg_setup
 	if use opengl && ! built_with_use media-libs/libsdl opengl; then
 		eerror "opengl flag set, but libsdl wasn't build with opengl support"
+	fi
+	if ! built_with_use --missing true dev-libs/boost threads ; then
+		eerror "Please emerge dev-libs/boost with USE=threads"
+	fi
+}
+
+src_unpack() {
+	subversion_src_unpack
+	if use songs; then
+		unpack "${SONGS_P}.tar.bz2"
 	fi
 }
 
 src_compile() {
-	cd "${S}"
 	./autogen.sh
-	local myconf=
+	local myconf
 
 	if use novideo ; then
 		myconf="${myconf} --with-video=disable"
 	else
 		myconf="${myconf} --with-video=smpeg"
-	fi
-
-	if use deprecated_cairo_svg ; then
-		myconf="${myconf} --with-svg=cairo"
-	else
-		myconf="${myconf} --with-svg=librsvg"
 	fi
 
 	if use xine ; then
@@ -85,18 +84,25 @@ src_compile() {
 		myconf="${myconf} --with-graphic-driver=sdl"
 	fi
 
-	myconf="${myconf} $(use_enable debug)"
-	myconf="${myconf} $(use_enable portaudio record-portaudio)"
-	myconf="${myconf} $(use_enable gstreamer record-gst)"
-	myconf="${myconf} $(use_enable alsa record-alsa)"
+	egamesconf \
+		${myconf} \
+		$(use_enable debug) \
+		$(use_enable portaudio record-portaudio) \
+		$(use_enable gstreamer record-gst) \
+		$(use_enable alsa record-alsa) \
+		|| die
 
-	egamesconf ${myconf} || die
 	emake || die "emake failed"
 }
 
 src_install() {
-	make DESTDIR="${D}" install || die "make install failed"
-	doicon data/ultrastar-ng.xpm
-	domenu data/ultrastar-ng.desktop
+	emake DESTDIR="${D}" install || die "make install failed"
+	keepdir "${GAMES_DATADIR}"/${PN}/songs
+	if use songs; then
+		insinto "${GAMES_DATADIR}"/${PN}
+		doins -r songs || die "doins songs failed"
+	fi
+	mv "${D}${GAMES_DATADIR}"/{applications,pixmaps} "${D}"/usr/share/
+	dodoc AUTHORS ChangeLog README TODO
 	prepgamesdirs
 }
