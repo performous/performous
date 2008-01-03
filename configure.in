@@ -239,11 +239,11 @@ if test $record_alsa = yes ; then
 	if test $enable_record_alsa = no ; then
 		RECORD_ALSA_FLAGS=""
 		RECORD_ALSA_LIBS=""
-		AM_CONDITIONAL(RECORD_ALSA, false)
+		RECORD_ALSA=false
 	else
 		RECORD_ALSA_FLAGS=`pkg-config --cflags alsa`
 		RECORD_ALSA_LIBS=`pkg-config --libs alsa`
-		AM_CONDITIONAL(RECORD_ALSA, true)
+		RECORD_ALSA=true
 	fi
 else
 	if test $enable_record_alsa = yes ; then
@@ -251,8 +251,9 @@ else
 	fi
 	RECORD_ALSA_FLAGS=""
 	RECORD_ALSA_LIBS=""
-	AM_CONDITIONAL(RECORD_ALSA, false)
+	RECORD_ALSA=false
 fi
+AM_CONDITIONAL(RECORD_ALSA, ${RECORD_ALSA})
 AC_SUBST(RECORD_ALSA_FLAGS)
 AC_SUBST(RECORD_ALSA_LIBS)
 
@@ -264,11 +265,11 @@ if test $record_pa18 = yes ; then
 	if test $enable_record_pa18 = no ; then
 		RECORD_PA18_FLAGS=""
 		RECORD_PA18_LIBS=""
-		AM_CONDITIONAL(RECORD_PA18, false)
+		RECORD_PA18=false
 	else
 		RECORD_PA18_FLAGS=""
 		RECORD_PA18_LIBS="-lportaudio"
-		AM_CONDITIONAL(RECORD_PA18, true)
+		RECORD_PA18=true
 	fi
 else
 	if test $enable_record_pa18 = yes ; then
@@ -276,19 +277,20 @@ else
 	fi
 	RECORD_PA18_FLAGS=""
 	RECORD_PA18_LIBS=""
-	AM_CONDITIONAL(RECORD_PA18, false)
+	RECORD_PA18=false
 fi
+AM_CONDITIONAL(RECORD_PA18, ${RECORD_PA18})
 AC_SUBST(RECORD_PA18_FLAGS)
 AC_SUBST(RECORD_PA18_LIBS)
 if test $record_pa19 = yes ; then
 	if test $enable_record_pa19 = no ; then
 		RECORD_PA19_FLAGS=""
 		RECORD_PA19_LIBS=""
-		AM_CONDITIONAL(RECORD_PA19, false)
+		RECORD_PA19=false
 	else
 		RECORD_PA19_FLAGS=`pkg-config --cflags portaudio-2.0`
 		RECORD_PA19_LIBS=`pkg-config --libs portaudio-2.0`
-		AM_CONDITIONAL(RECORD_PA19, true)
+		RECORD_PA19=true
 	fi
 else
 	if test $enable_record_pa19 = yes ; then
@@ -296,8 +298,9 @@ else
 	fi
 	RECORD_PA19_FLAGS=""
 	RECORD_PA19_LIBS=""
-	AM_CONDITIONAL(RECORD_PA19, false)
+	RECORD_PA19=false
 fi
+AM_CONDITIONAL(RECORD_PA19, ${RECORD_PA19})
 AC_SUBST(RECORD_PA19_FLAGS)
 AC_SUBST(RECORD_PA19_LIBS)
 
@@ -307,11 +310,11 @@ if test $gst_detected = yes ; then
 	if test $enable_record_gst = no ; then
 		RECORD_GST_FLAGS=""
 		RECORD_GST_LIBS=""
-		AM_CONDITIONAL(RECORD_GST, false)
+		RECORD_GST=false
 	else
 		RECORD_GST_FLAGS=`pkg-config --cflags gstreamer-0.10`
 		RECORD_GST_LIBS=`pkg-config --libs gstreamer-0.10`
-		AM_CONDITIONAL(RECORD_GST, true)
+		RECORD_GST=true
 	fi
 else
 	if test $enable_record_gst = yes ; then
@@ -319,8 +322,9 @@ else
 	fi
 	RECORD_GST_FLAGS=""
 	RECORD_GST_LIBS=""
-	AM_CONDITIONAL(RECORD_GST, false)
+	RECORD_GST=false
 fi
+AM_CONDITIONAL(RECORD_GST, ${RECORD_GST})
 AC_SUBST(RECORD_GST_FLAGS)
 AC_SUBST(RECORD_GST_LIBS)
 
@@ -551,4 +555,18 @@ echo "audio            | --with-audio             | $audio_layer          "
 echo "video            | --with-video             | $video_layer          "
 echo "svg              | --with-svg               | $svg_layer            "
 echo "graphic driver   | --with-graphic-driver    | $graphic_driver       "
+echo "record           | --with-record-{}         | none                  "
+echo "                 |                          | ~tone                 "
+if test ${RECORD_ALSA} = true ; then
+	echo "                 |                          | alsa                  "
+fi
+if test ${RECORD_PA18} = true ; then
+	echo "                 |                          | portaudio V18         "
+fi
+if test ${RECORD_PA19} = true ; then
+	echo "                 |                          | portaudio V19         "
+fi
+if test ${RECORD_GST} = true ; then
+	echo "                 |                          | gstreamer             "
+fi
 echo "                                                                    "
