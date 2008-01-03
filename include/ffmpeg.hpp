@@ -32,6 +32,7 @@ template <class T> class queuedIterator {
 		T& operator*() { return *frames.front();};
 		T* operator->() { return frames.front();};
 		const unsigned int size() {return frames.size();};
+		const bool isFull() { return (size() >= 10);};
 		void push(T f) {frames.push(f);};
 	private:
 		std::queue<T> frames;

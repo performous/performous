@@ -136,7 +136,7 @@ void CFfmpeg::operator()() {
 			case QUIT:
 				return;
 			case PLAY:
-				if( videoQueue.size() >= 10 || audioQueue.size() >= 10 ) {
+				if( videoQueue.isFull() || audioQueue.isFull()  ) {
 					boost::thread::sleep(now() + 0.01);
 					break;
 				} else {
