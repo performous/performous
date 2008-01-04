@@ -6,6 +6,13 @@
 #include <ostream>
 #include <stdint.h>
 
+#if SND_LIB_VERSION < (1<<16 | 0<<8 | 11)
+#  error "######################################################"
+#  error "###  Please install at least alsa-lib 1.0.11"
+#  error "######################################################"
+#endif
+
+
 namespace {
 	using namespace da;
 	class alsa_record: public record::dev {
