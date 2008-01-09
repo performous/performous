@@ -160,7 +160,8 @@ PKG_CHECK_MODULES(pangocairo, pangocairo , ,
 PKG_CHECK_MODULES(librsvg, librsvg-2.0 , [librsvg_detected="yes"] , [librsvg_detected="no"])
 PKG_CHECK_MODULES(cairosvg, cairo-svg , [cairosvg_detected="yes"] , [cairosvg_detected="no"])
 PKG_CHECK_MODULES(xine, libxine , [xine_detected="yes"] , [xine_detected="no"])
-PKG_CHECK_MODULES(gstreamer, gstreamer-0.10 , [gst_detected="yes"] , [gst_detected="no"])
+PKG_CHECK_MODULES(gstreamer_0_10, gstreamer-0.10, [gst_detected="yes"] , [gst_detected="no"])
+PKG_CHECK_MODULES(gstreamer_0_10_7, gstreamer-0.10 >= 0.10.7 , [gst_detected_seek_simple="yes"] , [gst_detected_seek_simple="no"])
 AC_CHECK_PROGS(SDLCONFIG, sdl-config, AC_MSG_ERROR(Cannot find sdl-config))
 
 # Record backend detection
@@ -443,6 +444,12 @@ case $audio_layer in
 		#define USE_GSTREAMER_AUDIO 1
 		#include <gst/gst.h>
 		USNG_EOF)
+		if test $gst_detected_seek_simple = yes ; then
+			ac_includes_default=$(cat <<-USNG_EOF
+			$ac_includes_default
+			#define GSTREAMER_HAS_SEEK_SIMPLE 1
+			USNG_EOF)
+		fi
 		;;
 	no*)
 		AC_MSG_ERROR("I'm sure you wish audio in this game please install eather xine or gstreamer")
