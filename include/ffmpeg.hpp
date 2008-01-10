@@ -14,6 +14,7 @@ class AudioFrame {
 		AudioFrame() {};
 		~AudioFrame() {delete[] frame;};
 		int16_t * frame;
+		unsigned long bufferSize;
 		float timestamp;
 };
 
@@ -34,8 +35,8 @@ template <class T> class queuedIterator {
 		const unsigned int size() {return frames.size();};
 		const bool isFull() { return (size() >= 10);};
 		void push(T f) {frames.push(f);};
-	private:
 		std::queue<T> frames;
+	private:
 };
 
 #include <boost/scoped_ptr.hpp>
@@ -61,6 +62,8 @@ class CFfmpeg {
 			m_type = PLAY;
 			m_cond.notify_one();
 		}
+		queuedIterator<VideoFrame*>  videoQueue;
+		queuedIterator<AudioFrame*>  audioQueue;
 	private:
 		enum Type { STOP, PLAY, SEEK, PAUSE, QUIT } m_type;
 		boost::mutex m_mutex;
@@ -70,14 +73,13 @@ class CFfmpeg {
 		bool m_ready;
 
 		AVFormatContext *pFormatCtx;
+		ReSampleContext *pResampleCtx;
 
 		AVCodecContext  *pVideoCodecCtx;
 		AVCodecContext  *pAudioCodecCtx;
 		AVCodec         *pVideoCodec;
 		AVCodec         *pAudioCodec;
 
-		queuedIterator<VideoFrame*>  videoQueue;
-		queuedIterator<AudioFrame*>  audioQueue;
 
 		int             videoStream;
 		int             audioStream;

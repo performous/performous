@@ -75,6 +75,8 @@ bool CFfmpeg::open( const char * _filename ) {
 				pAudioCodecCtx->flags|=CODEC_FLAG_TRUNCATED;
 			if(avcodec_open(pAudioCodecCtx, pAudioCodec)<0)
 				throw std::runtime_error("Cannot open audio stream");
+			if( (pResampleCtx = audio_resample_init(2,pAudioCodecCtx->channels,48000,pAudioCodecCtx->sample_rate)) == NULL )
+				throw std::runtime_error("Cannot create resampling context");
 		}
 	} catch (std::runtime_error& e) {
 		// TODO: clean memory
@@ -90,6 +92,7 @@ void CFfmpeg::close( void ) {
 	}
 	if( audioStream != -1 && decodeAudio ) {
 		avcodec_close(pAudioCodecCtx);
+		audio_resample_close(pResampleCtx);
 	}
 	av_close_input_file(pFormatCtx);
 }
@@ -218,11 +221,17 @@ void CFfmpeg::decodeNextFrame( void ) {
 				time = 0.0;
 			}
 
+			int16_t * audioFramesResampled = new int16_t[AVCODEC_MAX_AUDIO_FRAME_SIZE];
+			int nb_sample = audio_resample(pResampleCtx, audioFramesResampled, audioFrames, outsize/(pAudioCodecCtx->channels*2));
+			delete[] audioFrames;
+
 			std::cout << "Audio time: " << time << std::endl;
+			std::cout << "Audio time: " << nb_sample << std::endl;
 			
 			AudioFrame * tmp = new AudioFrame();
-			tmp->frame = audioFrames;
+			tmp->frame = audioFramesResampled;
 			tmp->timestamp = time;
+			tmp->bufferSize = outsize;
 			audioQueue.push(tmp);
 
 			av_free_packet(&packet);
@@ -237,8 +246,38 @@ void CFfmpeg::decodeNextFrame( void ) {
 }
 
 /*
- g++ -g -o test src/ffmpeg.cpp -Iinclude -DDEBUG -lavutil -lavformat -lavcodec -lboost_thread
+ * For PA18:
+ g++ -g -o test src/ffmpeg.cpp -Iinclude -DDEBUG -lavutil -lavformat -lavcodec -lboost_thread -lportaudio
+ * For PA19:
+ g++ -g -o test src/ffmpeg.cpp -Iinclude -DDEBUG -lavutil -lavformat -lavcodec -lboost_thread `pkg-config --cflags --libs portaudio-2.0`
 */
+
+#include <portaudio.h>
+
+// Send number of channels through userdata, as well as the deocing audio
+static int c_callback(void*, void* output, unsigned long framesPerBuffer, PaTimestamp, void* userdata) {
+
+	queuedIterator<AudioFrame*>& audioQueue = *static_cast<queuedIterator<AudioFrame*>*>(userdata);
+
+	if( false ) {
+		std::cerr << "DEBUG: bypass audio output to let my girlfirend sleep" << std::endl;
+		memset(output,0x00, framesPerBuffer*2*sizeof(short));
+		if(audioQueue.size() > 0 ) {
+			++audioQueue;
+		}
+		return 0;
+	}
+
+	if( audioQueue.size() > 0 ) {
+		memcpy(output,audioQueue.frames.front()->frame,framesPerBuffer*2*sizeof(short));
+		++audioQueue;
+	} else {
+		std::cerr << "Decoder underrun" << std::endl;
+		memset(output,0x00, framesPerBuffer*2*sizeof(short));
+	}
+
+	return 0;
+}
 
 int main(int argc, char** argv) {
 
@@ -246,13 +285,49 @@ int main(int argc, char** argv) {
 		std::cerr << "Usage: " << argv[0] << " video_file" << std::endl;
 		return EXIT_FAILURE;
 	}
+
+	PaError pa_err=Pa_Initialize();
+	if( pa_err != paNoError) {
+		std::cerr << "PortAudio error: " << Pa_GetErrorText(pa_err) << std::endl;
+		return EXIT_FAILURE;
+	}
+
 	// Choose to decode both audio and video
-	CFfmpeg test(true,true);
+	CFfmpeg test(false,true);
 	test.open(argv[1]);
 	boost::thread::sleep(now() + 0.5 );
 	test.start();
-	boost::thread::sleep(now() + 1.0 );
+
+
+	PaStream *stream;
+	pa_err = Pa_OpenStream(&stream, paNoDevice, 0, paInt16, NULL, \
+			Pa_GetDefaultOutputDeviceID(), \
+			2, paInt16, NULL, 48000, 1254, 0, 0, \
+			c_callback, &test.audioQueue);
+	if( pa_err != paNoError ) {
+		std::cerr << "PortAudio error: " << Pa_GetErrorText(pa_err) << std::endl;
+		return EXIT_FAILURE;
+	}
+	pa_err=Pa_StartStream(stream);
+	if( pa_err != paNoError ) {
+		std::cerr << "PortAudio error: " << Pa_GetErrorText(pa_err) << std::endl;
+		return EXIT_FAILURE;
+	}
+
+
+	boost::thread::sleep(now() + 100.0 );
 	test.close();
 	boost::thread::sleep(now() + 1.0 );
+
+	pa_err=Pa_CloseStream(stream);
+	if( pa_err != paNoError ) {
+		std::cerr << "PortAudio error: " << Pa_GetErrorText(pa_err) << std::endl;
+		return EXIT_FAILURE;
+	}
+	pa_err=Pa_Terminate();
+	if( pa_err != paNoError ) {
+		std::cerr << "PortAudio error: " << Pa_GetErrorText(pa_err) << std::endl;
+		return EXIT_FAILURE;
+	}
 	return EXIT_SUCCESS;
 }
