@@ -192,6 +192,7 @@ void CFfmpeg::decodeNextFrame( void ) {
 
 				VideoFrame * tmp = new VideoFrame();
 				tmp->frame = videoFrame;
+				tmp->bufferSize = 0;
 				tmp->timestamp = time;
 				videoQueue.push(tmp);
 
@@ -210,7 +211,7 @@ void CFfmpeg::decodeNextFrame( void ) {
 			if( decodeSize < 0 ) {
 				av_free_packet(&packet);
 				delete[] audioFrames;
-				throw std::runtime_error("cannot decode audio rame");
+				throw std::runtime_error("cannot decode audio frame");
 			}
 
 			if( packet.pts != AV_NOPTS_VALUE ) {
@@ -226,12 +227,11 @@ void CFfmpeg::decodeNextFrame( void ) {
 			delete[] audioFrames;
 
 			std::cout << "Audio time: " << time << std::endl;
-			std::cout << "Audio time: " << nb_sample << std::endl;
 			
 			AudioFrame * tmp = new AudioFrame();
 			tmp->frame = audioFramesResampled;
 			tmp->timestamp = time;
-			tmp->bufferSize = outsize;
+			tmp->nbFrames = nb_sample;
 			audioQueue.push(tmp);
 
 			av_free_packet(&packet);
@@ -257,25 +257,14 @@ void CFfmpeg::decodeNextFrame( void ) {
 // Send number of channels through userdata, as well as the deocing audio
 static int c_callback(void*, void* output, unsigned long framesPerBuffer, PaTimestamp, void* userdata) {
 
-	queuedIterator<AudioFrame*>& audioQueue = *static_cast<queuedIterator<AudioFrame*>*>(userdata);
-
-	if( false ) {
-		std::cerr << "DEBUG: bypass audio output to let my girlfirend sleep" << std::endl;
-		memset(output,0x00, framesPerBuffer*2*sizeof(short));
-		if(audioQueue.size() > 0 ) {
-			++audioQueue;
-		}
-		return 0;
+	audioFifo* audioQueue = static_cast<audioFifo*>(userdata);
+	unsigned long size = 0;
+	unsigned char channels = 2;
+	while(size < framesPerBuffer) {
+		int16_t* buf = (int16_t*)output;
+		buf+=channels*size;
+		size+=audioQueue->copypop(buf, framesPerBuffer-size, channels);
 	}
-
-	if( audioQueue.size() > 0 ) {
-		memcpy(output,audioQueue.frames.front()->frame,framesPerBuffer*2*sizeof(short));
-		++audioQueue;
-	} else {
-		std::cerr << "Decoder underrun" << std::endl;
-		memset(output,0x00, framesPerBuffer*2*sizeof(short));
-	}
-
 	return 0;
 }
 
