@@ -50,8 +50,11 @@ class audioFifo {
 		void push(AudioFrame* f) {queue.push(f);};
 		unsigned long copypop(void * buffer, unsigned long size, unsigned char channels, float * timestamp=NULL, bool blocking=false) {
 			if( this->size() == 0 ) {
+				if( timestamp != NULL )
+					*timestamp = -1;
+				memset(buffer,0x00, channels * size * sizeof(short));
 				std::cerr << "Empty audio queue" << std::endl;
-				return 0;
+				return size;
 			}
 			AudioFrame * tmp = queue.front();
 
