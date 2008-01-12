@@ -48,12 +48,15 @@ class audioFifo {
 		const unsigned int size() {return queue.size();};
 		const bool isFull() { return (size() >= 10);};
 		void push(AudioFrame* f) {queue.push(f);};
-		unsigned long copypop(void * buffer, unsigned long size=0, unsigned char channels=2, bool blocking=false) {
+		unsigned long copypop(void * buffer, unsigned long size, unsigned char channels, float * timestamp=NULL, bool blocking=false) {
 			if( this->size() == 0 ) {
 				std::cerr << "Empty audio queue" << std::endl;
 				return 0;
 			}
 			AudioFrame * tmp = queue.front();
+
+			if( timestamp != NULL )
+				*timestamp = tmp->timestamp;
 
 			unsigned long currentBufferPosition = currentFramePosition * channels;
 

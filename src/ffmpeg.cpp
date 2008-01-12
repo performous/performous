@@ -188,8 +188,6 @@ void CFfmpeg::decodeNextFrame( void ) {
 					time = 0.0;
 				}
 
-				std::cout << "Video time: " << time << std::endl;
-
 				VideoFrame * tmp = new VideoFrame();
 				tmp->frame = videoFrame;
 				tmp->bufferSize = 0;
@@ -226,8 +224,6 @@ void CFfmpeg::decodeNextFrame( void ) {
 			int nb_sample = audio_resample(pResampleCtx, audioFramesResampled, audioFrames, outsize/(pAudioCodecCtx->channels*2));
 			delete[] audioFrames;
 
-			std::cout << "Audio time: " << time << std::endl;
-			
 			AudioFrame * tmp = new AudioFrame();
 			tmp->frame = audioFramesResampled;
 			tmp->timestamp = time;
@@ -260,10 +256,12 @@ static int c_callback(void*, void* output, unsigned long framesPerBuffer, PaTime
 	audioFifo* audioQueue = static_cast<audioFifo*>(userdata);
 	unsigned long size = 0;
 	unsigned char channels = 2;
+	float timestamp;
 	while(size < framesPerBuffer) {
 		int16_t* buf = (int16_t*)output;
 		buf+=channels*size;
-		size+=audioQueue->copypop(buf, framesPerBuffer-size, channels);
+		size+=audioQueue->copypop(buf, framesPerBuffer-size, channels,&timestamp);
+		std::cout << "Now playing @"<< timestamp << std::endl;
 	}
 	return 0;
 }
