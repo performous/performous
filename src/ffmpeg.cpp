@@ -201,10 +201,17 @@ void CFfmpeg::decodeNextFrame( void ) {
 			av_free_packet(&packet);
 		} else if(packet.stream_index==audioStream && decodeAudio) {
 			int16_t * audioFrames = new int16_t[AVCODEC_MAX_AUDIO_FRAME_SIZE];
-			int outsize = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+			int outsize = AVCODEC_MAX_AUDIO_FRAME_SIZE*sizeof(int16_t);
 			float time;
 
 			int decodeSize = avcodec_decode_audio2( pAudioCodecCtx, audioFrames, &outsize, packet.data, packet.size);
+
+			// No data decoded
+			if( outsize == 0 ) {
+				av_free_packet(&packet);
+				delete[] audioFrames;
+				return;
+			}
 
 			if( decodeSize < 0 ) {
 				av_free_packet(&packet);
