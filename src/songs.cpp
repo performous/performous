@@ -388,7 +388,7 @@ void Songs::setFilter(std::string const& val) {
 	filtered_t filtered;
 	try {
 		for (songlist_t::iterator it = m_songs.begin(); it != m_songs.end(); ++it) {
-			if (regex_search(it->str(), boost::regex(val))) filtered.push_back(&*it);
+			if (regex_search(it->str(), boost::regex(val,boost::regex_constants::icase))) filtered.push_back(&*it);
 		}
 	} catch (...) {
 		filtered.clear();
