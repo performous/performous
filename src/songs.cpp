@@ -332,7 +332,7 @@ bool operator<(Song const& l, Song const& r) {
 	// If filenames are identical, too, the songs are considered the same.
 }
 
-Songs::Songs(std::set<std::string> const& songdirs): m_songdirs(songdirs), m_current(), m_order() {
+Songs::Songs(std::set<std::string> const& songdirs): m_songdirs(songdirs), math_cover(), m_order() {
 	reload();
 }
 
@@ -375,12 +375,12 @@ class Songs::RestoreSel {
 		if (!m_sel) return;
 		filtered_t& f = m_s.m_filtered;
 		filtered_t::iterator it = std::find(f.begin(), f.end(), m_sel);
-		if (it != f.end()) m_s.m_current = it - f.begin();
+		if (it != f.end()) m_s.math_cover.setTarget( it - f.begin() );
 	}
 };
 
 void Songs::random() {
-	m_current = empty() ? 0 : std::rand() % m_filtered.size();
+	math_cover.setTarget( empty() ? 0 : std::rand() % m_filtered.size() );
 }
 
 void Songs::setFilter(std::string const& val) {

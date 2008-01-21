@@ -76,6 +76,26 @@ class Song: boost::noncopyable {
 
 bool operator<(Song const& l, Song const& r);
 
+class coverMath {
+	public:
+		coverMath(){};
+		~coverMath(){};
+		virtual float getPosition() = 0;
+		virtual unsigned int getTarget() = 0;
+		virtual void setTarget( unsigned int ) = 0;
+};
+
+class coverMathSimple {
+	public:
+		coverMathSimple(){m_position=0;};
+		~coverMathSimple(){};
+		float getPosition() const { return m_position;};
+		unsigned int getTarget() const { return m_position;};
+		void setTarget( unsigned int _target ) {m_position=_target;};
+	private:
+		unsigned int m_position;
+};
+
 class Songs {
 	std::set<std::string> m_songdirs;
   public:
@@ -85,12 +105,14 @@ class Songs {
 	int size() const { return m_filtered.size(); };
 	int empty() const { return m_filtered.empty(); };
 	void advance(int diff) {
-		m_current = (m_current + diff) % int(m_filtered.size());
-		if (m_current < 0) m_current += m_filtered.size();
+		int _current = (math_cover.getTarget() + diff) % int(m_filtered.size());
+		if (_current < 0) _current += m_filtered.size();
+		math_cover.setTarget(_current);
 	}
-	int currentId() const { return m_current; }
-	Song& current() { return *m_filtered[m_current]; }
-	Song const& current() const { return *m_filtered[m_current]; }
+	int currentId() const { return math_cover.getTarget(); }
+	float currentPosition() const { return math_cover.getPosition(); };
+	Song& current() { return *m_filtered[math_cover.getTarget()]; }
+	Song const& current() const { return *m_filtered[math_cover.getTarget()]; }
 	void setFilter(std::string const& regex);
 	std::string sortDesc() const;
 	void random();
@@ -102,7 +124,7 @@ class Songs {
 	songlist_t m_songs;
 	typedef std::vector<Song*> filtered_t;
 	filtered_t m_filtered;
-	int m_current;
+	coverMathSimple math_cover;
 	int m_order;
 	void sort_internal();
 };
