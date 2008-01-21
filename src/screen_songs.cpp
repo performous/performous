@@ -83,6 +83,7 @@ void CScreenSongs::draw() {
 		if (!m_playing.empty()) { sm->getAudio()->stopMusic(); m_playing.clear(); }
 	} else {
 		Song& song = sm->getSongs()->current();
+		std::cout<<sm->getSongs()->currentPosition()<<std::endl;
 		// Draw the "Song information"
 		{
 			std::ostringstream oss;

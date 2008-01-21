@@ -4,6 +4,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/ptr_container/ptr_set.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <boost/thread/xtime.hpp>
 #include <set>
 #include <string>
 #include <vector>
@@ -96,6 +97,25 @@ class coverMathSimple {
 		unsigned int m_position;
 };
 
+class coverMathAdvanced {
+	public:
+		coverMathAdvanced(){
+			m_position=0;
+			boost::xtime_get(&m_time, boost::TIME_UTC);
+		};
+		~coverMathAdvanced(){};
+		float getPosition();
+		unsigned int getTarget() const { return m_target;};
+		void setTarget( unsigned int _target, unsigned int _songNumber = 6760 ) {m_target=_target; songNumber=_songNumber;};
+	private:
+		boost::xtime m_time;
+		float m_position;
+		unsigned int m_target;
+		unsigned int songNumber;
+};
+
+#include <iostream>
+
 class Songs {
 	std::set<std::string> m_songdirs;
   public:
@@ -105,12 +125,12 @@ class Songs {
 	int size() const { return m_filtered.size(); };
 	int empty() const { return m_filtered.empty(); };
 	void advance(int diff) {
-		int _current = (math_cover.getTarget() + diff) % int(m_filtered.size());
+		int _current = (int(math_cover.getTarget()) + diff) % int(m_filtered.size());
 		if (_current < 0) _current += m_filtered.size();
 		math_cover.setTarget(_current);
 	}
 	int currentId() const { return math_cover.getTarget(); }
-	float currentPosition() const { return math_cover.getPosition(); };
+	float currentPosition() { return math_cover.getPosition(); };
 	Song& current() { return *m_filtered[math_cover.getTarget()]; }
 	Song const& current() const { return *m_filtered[math_cover.getTarget()]; }
 	void setFilter(std::string const& regex);
@@ -124,7 +144,8 @@ class Songs {
 	songlist_t m_songs;
 	typedef std::vector<Song*> filtered_t;
 	filtered_t m_filtered;
-	coverMathSimple math_cover;
+	//coverMathSimple math_cover;
+	coverMathAdvanced math_cover;
 	int m_order;
 	void sort_internal();
 };

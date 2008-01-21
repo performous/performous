@@ -14,6 +14,41 @@
 #include <limits>
 #include <stdexcept>
 
+float coverMathAdvanced::getPosition(){
+	boost::xtime curtime;
+	boost::xtime_get(&curtime, boost::TIME_UTC);
+	if (m_position > songNumber ) m_position = m_target; // if too high, jump
+	if (m_position == (float) m_target) return m_position;
+	
+	unsigned int timeDifference = (curtime.sec-m_time.sec)*1000000000;
+	timeDifference += (curtime.nsec-m_time.nsec);
+	timeDifference/=1000000; // convert to ms
+	m_time = curtime;
+	if (timeDifference>1000) // too much, just move a little
+		timeDifference = 1;
+	float timefactor = timeDifference/50.0; // default 50 ms
+	float threshold = 0.5; 
+	float stepsize = 0.05*timefactor;
+	float factor = 1-pow(0.9f,timefactor);
+	float distance = m_target-m_position;
+	if (distance*distance*4>songNumber*songNumber)
+		distance = m_position-m_target;
+	if (distance*distance>threshold*threshold) // abs(distance)>threshold
+		m_position+=distance*factor;
+	else if (distance*distance>=stepsize*stepsize) // abs(distance)>=stepsize
+		if (distance>0)
+			m_position+=stepsize;
+		else
+			 m_position-=stepsize;
+	else
+		m_position = m_target;
+	// make sure position is between 0 and songNumber
+	if (m_position<0) m_position+=songNumber;
+	if (m_position>songNumber) m_position-=songNumber;
+	return m_position;
+}
+
+
 std::string MusicalScale::getNoteStr(double freq) const {
 	int id = getNoteId(freq);
 	if (id == -1) return std::string();
