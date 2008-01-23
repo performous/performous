@@ -106,7 +106,11 @@ class coverMathAdvanced {
 		~coverMathAdvanced(){};
 		float getPosition();
 		unsigned int getTarget() const { return m_target;};
-		void setTarget( unsigned int _target, unsigned int _songNumber = 6760 ) {m_target=_target; songNumber=_songNumber;};
+		void setTarget( unsigned int _target, unsigned int _songNumber = 6760 ) {
+			boost::xtime_get(&m_time,boost::TIME_UTC);
+			m_target=_target;
+			songNumber=_songNumber;
+		};
 	private:
 		boost::xtime m_time;
 		float m_position;
