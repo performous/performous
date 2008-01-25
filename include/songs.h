@@ -92,7 +92,7 @@ class coverMathSimple {
 		~coverMathSimple(){};
 		float getPosition() const { return m_position;};
 		unsigned int getTarget() const { return m_position;};
-		void setTarget( unsigned int _target ) {m_position=_target;};
+		void setTarget( unsigned int _target, unsigned int ) {m_position=_target;};
 	private:
 		unsigned int m_position;
 };
@@ -125,13 +125,13 @@ class Songs {
   public:
 	Songs(std::set<std::string> const& songdirs);
 	void reload();
-	Song& operator[](std::vector<Song*>::size_type pos) { return *m_filtered[pos]; }
+	Song& operator[](std::vector<Song*>::size_type pos) { return *m_filtered[pos%this->size()]; }
 	int size() const { return m_filtered.size(); };
 	int empty() const { return m_filtered.empty(); };
 	void advance(int diff) {
 		int _current = (int(math_cover.getTarget()) + diff) % int(m_filtered.size());
 		if (_current < 0) _current += m_filtered.size();
-		math_cover.setTarget(_current);
+		math_cover.setTarget(_current,this->size());
 	}
 	int currentId() const { return math_cover.getTarget(); }
 	float currentPosition() { return math_cover.getPosition(); };

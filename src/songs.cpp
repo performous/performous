@@ -14,10 +14,25 @@
 #include <limits>
 #include <stdexcept>
 
+float distance2( float a, float b, unsigned int size ) {
+	float diff = b - a;
+	float distance;
+	if( fabs(diff) > size / 2 ) {
+		if( diff < 0 )
+			distance = (size + diff);
+		else
+			distance = (diff - size);
+	} else {
+		distance = diff;
+	}
+	return distance;
+	
+}
+
 float coverMathAdvanced::getPosition(){
 	boost::xtime curtime;
 	boost::xtime_get(&curtime, boost::TIME_UTC);
-	if (m_position > songNumber ) m_position = m_target; // if too high, jump
+
 	if (m_position == (float) m_target) return m_position;
 	
 	unsigned int timeDifference = (curtime.sec-m_time.sec)*1000000000;
@@ -30,9 +45,7 @@ float coverMathAdvanced::getPosition(){
 	float threshold = 0.5; 
 	float stepsize = 0.05*timefactor;
 	float factor = 1-pow(0.9f,timefactor);
-	float distance = m_target-m_position;
-	if (distance*distance*4>songNumber*songNumber)
-		distance = m_position-m_target;
+	float distance = distance2(m_position,m_target,songNumber);
 	if (distance*distance>threshold*threshold) // abs(distance)>threshold
 		m_position+=distance*factor;
 	else if (distance*distance>=stepsize*stepsize) // abs(distance)>=stepsize
@@ -42,9 +55,8 @@ float coverMathAdvanced::getPosition(){
 			 m_position-=stepsize;
 	else
 		m_position = m_target;
-	// make sure position is between 0 and songNumber
-	if (m_position<0) m_position+=songNumber;
-	if (m_position>songNumber) m_position-=songNumber;
+	if( m_position < 0 )
+		m_position += songNumber;
 	return m_position;
 }
 
@@ -410,12 +422,12 @@ class Songs::RestoreSel {
 		if (!m_sel) return;
 		filtered_t& f = m_s.m_filtered;
 		filtered_t::iterator it = std::find(f.begin(), f.end(), m_sel);
-		if (it != f.end()) m_s.math_cover.setTarget( it - f.begin() );
+		if (it != f.end()) m_s.math_cover.setTarget( it - f.begin(), m_s.size() );
 	}
 };
 
 void Songs::random() {
-	math_cover.setTarget( empty() ? 0 : std::rand() % m_filtered.size() );
+	math_cover.setTarget( empty() ? 0 : std::rand() % m_filtered.size(), this->size() );
 }
 
 void Songs::setFilter(std::string const& val) {

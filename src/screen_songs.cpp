@@ -83,7 +83,6 @@ void CScreenSongs::draw() {
 		if (!m_playing.empty()) { sm->getAudio()->stopMusic(); m_playing.clear(); }
 	} else {
 		Song& song = sm->getSongs()->current();
-		std::cout<<sm->getSongs()->currentPosition()<<std::endl;
 		// Draw the "Song information"
 		{
 			std::ostringstream oss;
@@ -92,7 +91,17 @@ void CScreenSongs::draw() {
 			print(theme.get(), theme->song, oss.str());
 		}
 		// Draw the cover
-		std::string cover = song.path + song.cover;
+		float f_position = sm->getSongs()->currentPosition();
+		int i_position;
+		if( f_position - floor(f_position) > 0.5 )
+			i_position = floor(f_position) + 1;
+		else
+			i_position = floor(f_position);
+
+		Songs& songs = *sm->getSongs();
+		Song& song_display = songs[i_position];
+
+		std::string cover = song_display.path + song_display.cover;
 		if (cover != m_cover) {
 			m_cover = cover;
 			double width = CScreenManager::getSingletonPtr()->getWidth();
@@ -115,7 +124,11 @@ void CScreenSongs::draw() {
 	sm->getVideoDriver()->drawSurface(bg_texture);
 	if (m_currentCover) {
 		SDL_Rect position;
-		position.x = (m_width - m_currentCover->w) / 2;
+		float _position = sm->getSongs()->currentPosition();
+		float shift = (_position - floor(_position));
+		if( shift > 0.5 )
+			shift -= 1;
+		position.x = (m_width - m_currentCover->w) / 2 - shift * 1056;
 		position.y = (m_height - m_currentCover->h) / 2;
 		position.w = m_currentCover->w;
 		position.h = m_currentCover->h;
