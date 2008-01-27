@@ -157,8 +157,8 @@ void CVideoDriver::drawSurface(SDL_Surface* _surf, int _x, int _y)
 {
 #ifdef USE_OPENGL
 	unsigned int texture;
-	SDL_GL::initTexture (_surf->w,_surf->h, &texture, GL_BGRA);
-	SDL_GL::draw_func(_surf->w,_surf->h,(unsigned char*)_surf->pixels,texture, GL_BGRA, _x, _y);
+	SDL_GL::initTexture (_surf->w,_surf->h, &texture, GL_RGBA);
+	SDL_GL::draw_func(_surf->w,_surf->h,(unsigned char*)_surf->pixels,texture, GL_RGBA, _x, _y);
 	SDL_GL::freeTexture(texture);
 #else
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
