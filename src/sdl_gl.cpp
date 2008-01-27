@@ -19,14 +19,14 @@ void SDL_GL::draw_func (int _width,int _height, unsigned char* surfacedata, unsi
                                   surfacedata);
 
         glBegin (GL_QUADS);
-        glTexCoord2f ((GLfloat)x, (GLfloat)y);
-        glVertex2f (0, 0);
-        glTexCoord2f ((GLfloat) _width, (GLfloat)y);
-        glVertex2f (1.0f, 0.0f);
+        glTexCoord2f (0.0f, 0.0f);
+        glVertex2f ((GLfloat) x, (GLfloat) y);
+        glTexCoord2f ((GLfloat) _width, 0.0f);
+        glVertex2f ((GLfloat) (x+_width), (GLfloat) y);
         glTexCoord2f ((GLfloat) _width, (GLfloat) _height);
-        glVertex2f (1.0f, 1.0f);
-        glTexCoord2f ((GLfloat)x, (GLfloat) _height);
-        glVertex2f (0.0f, 1.0f);
+        glVertex2f ((GLfloat) (x+_width), (GLfloat) (y+_height));
+        glTexCoord2f (0.0f, (GLfloat) _height);
+        glVertex2f ((GLfloat) x, (GLfloat) (y+_height));
 
         glEnd ();
 
