@@ -74,13 +74,15 @@ namespace {
 
 void CScreenSongs::draw() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
+	Songs& songs = *sm->getSongs();
 	theme->theme->clear();
 	// Draw the "Order by" text
 	print(theme.get(), theme->order, (m_searching ? "find: " + m_search : sm->getSongs()->sortDesc()));
 	// Test if there are no songs
-	if (sm->getSongs()->empty()) {
+	if (songs.empty()) {
 		print(theme.get(), theme->song, "no songs found");
 		if (!m_playing.empty()) { sm->getAudio()->stopMusic(); m_playing.clear(); }
+		m_currentCover = NULL;
 	} else {
 		Song& song = sm->getSongs()->current();
 		// Draw the "Song information"
@@ -91,15 +93,7 @@ void CScreenSongs::draw() {
 			print(theme.get(), theme->song, oss.str());
 		}
 		// Draw the cover
-		float f_position = sm->getSongs()->currentPosition();
-		int i_position;
-		if( f_position - floor(f_position) > 0.5 )
-			i_position = floor(f_position) + 1;
-		else
-			i_position = floor(f_position);
-
-		Songs& songs = *sm->getSongs();
-		Song& song_display = songs[i_position];
+		Song& song_display = songs.near(songs.currentPosition());
 
 		std::string cover = song_display.path + song_display.cover;
 		if (cover != m_cover) {
@@ -124,11 +118,8 @@ void CScreenSongs::draw() {
 	sm->getVideoDriver()->drawSurface(bg_texture);
 	if (m_currentCover) {
 		SDL_Rect position;
-		float _position = sm->getSongs()->currentPosition();
-		float shift = (_position - floor(_position));
-		if( shift > 0.5 )
-			shift -= 1;
-		position.x = (m_width - m_currentCover->w) / 2 - shift * 1056;
+		double shift = remainder(sm->getSongs()->currentPosition(), 1.0);
+		position.x = round((m_width - m_currentCover->w) / 2 - shift * 1056);
 		position.y = (m_height - m_currentCover->h) / 2;
 		position.w = m_currentCover->w;
 		position.h = m_currentCover->h;

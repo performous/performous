@@ -90,42 +90,42 @@ class coverMathSimple {
 	public:
 		coverMathSimple(){m_position=0;};
 		~coverMathSimple(){};
-		float getPosition() const { return m_position;};
-		unsigned int getTarget() const { return m_position;};
-		void setTarget( unsigned int _target, unsigned int ) {m_position=_target;};
+		double getPosition() const { return m_position; }
+		unsigned int getTarget() const { return m_position; }
+		void setTarget( unsigned int _target, unsigned int ) { m_position=_target; }
 	private:
 		unsigned int m_position;
 };
 
 class coverMathAdvanced {
-	public:
-		coverMathAdvanced(){
-			m_position=0;
-			boost::xtime_get(&m_time, boost::TIME_UTC);
-		};
-		~coverMathAdvanced(){};
-		float getPosition();
-		unsigned int getTarget() const { return m_target;};
-		void setTarget( unsigned int _target, unsigned int _songNumber = 6760 ) {
-			boost::xtime_get(&m_time,boost::TIME_UTC);
-			m_target=_target;
-			songNumber=_songNumber;
-		};
-	private:
-		boost::xtime m_time;
-		float m_position;
-		unsigned int m_target;
-		unsigned int songNumber;
+  public:
+	coverMathAdvanced(): m_target(), m_songs(), m_position(), m_velocity() {
+		boost::xtime_get(&m_time, boost::TIME_UTC);
+	}
+	double getPosition();
+	unsigned int getTarget() const { return m_target; };
+	void setTarget(unsigned int target, unsigned int songs) {
+		boost::xtime_get(&m_time, boost::TIME_UTC);
+		m_target = target;
+		if (m_songs == songs) return;
+		m_songs = songs;
+		m_position = target;
+	};
+  private:
+	boost::xtime m_time;
+	unsigned int m_target;
+	unsigned int m_songs;
+	double m_position;
+	double m_velocity;
 };
-
-#include <iostream>
 
 class Songs {
 	std::set<std::string> m_songdirs;
   public:
 	Songs(std::set<std::string> const& songdirs);
 	void reload();
-	Song& operator[](std::vector<Song*>::size_type pos) { return *m_filtered[pos%this->size()]; }
+	Song& near(double pos);
+	Song& operator[](std::size_t pos) { return *m_filtered[pos]; }
 	int size() const { return m_filtered.size(); };
 	int empty() const { return m_filtered.empty(); };
 	void advance(int diff) {
@@ -134,7 +134,7 @@ class Songs {
 		math_cover.setTarget(_current,this->size());
 	}
 	int currentId() const { return math_cover.getTarget(); }
-	float currentPosition() { return math_cover.getPosition(); };
+	double currentPosition() { return math_cover.getPosition(); };
 	Song& current() { return *m_filtered[math_cover.getTarget()]; }
 	Song const& current() const { return *m_filtered[math_cover.getTarget()]; }
 	void setFilter(std::string const& regex);

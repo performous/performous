@@ -14,50 +14,27 @@
 #include <limits>
 #include <stdexcept>
 
-float distance2( float a, float b, unsigned int size ) {
-	float diff = b - a;
-	float distance;
-	if( fabs(diff) > size / 2 ) {
-		if( diff < 0 )
-			distance = (size + diff);
-		else
-			distance = (diff - size);
-	} else {
-		distance = diff;
-	}
-	return distance;
-	
-}
-
-float coverMathAdvanced::getPosition(){
+double coverMathAdvanced::getPosition(){
+	const double acceleration = 80.0; // the coefficient of velocity changes (animation speed)
+	const double overshoot = 0.99; // Over 1.0 decelerates too late, less than 1.0 decelerates too early
 	boost::xtime curtime;
 	boost::xtime_get(&curtime, boost::TIME_UTC);
-
-	if (m_position == (float) m_target) return m_position;
-	
-	unsigned int timeDifference = (curtime.sec-m_time.sec)*1000000000;
-	timeDifference += (curtime.nsec-m_time.nsec);
-	timeDifference/=1000000; // convert to ms
+	double duration = curtime.sec - m_time.sec;
+	duration += 1e-9 * (curtime.nsec - m_time.nsec);
+	if (duration > 1.0) duration = 1.0; // No more than one second per frame
 	m_time = curtime;
-	if (timeDifference>1000) // too much, just move a little
-		timeDifference = 1;
-	float timefactor = timeDifference/50.0; // default 50 ms
-	float threshold = 0.5; 
-	float stepsize = 0.05*timefactor;
-	float factor = 1-pow(0.9f,timefactor);
-	float distance = distance2(m_position,m_target,songNumber);
-	if (distance*distance>threshold*threshold) // abs(distance)>threshold
-		m_position+=distance*factor;
-	else if (distance*distance>=stepsize*stepsize) // abs(distance)>=stepsize
-		if (distance>0)
-			m_position+=stepsize;
-		else
-			 m_position-=stepsize;
-	else
-		m_position = m_target;
-	if( m_position < 0 )
-		m_position += songNumber;
-	return m_position;
+	std::size_t rounds = 1.0 + 1000.0 * duration; // 1 ms or shorter timesteps
+	double t = duration / rounds;
+	for (std::size_t i = 0; i < rounds; ++i) {
+		double d = remainder(m_target - m_position, m_songs); // Distance (via the shorter way)
+		double a = (d > 0.0 ? 1.0 : -1.0) * acceleration; // Acceleration vector
+		// Are we going to right direction && can we stop in time if we start decelerating now?
+		if (d * m_velocity > 0.0 && std::abs(m_velocity) > 2.0 * overshoot * acceleration * d / m_velocity) a *= -1.0;
+		// Apply Newtonian mechanics
+		m_velocity += t * a;
+		m_position += t * m_velocity;
+	}
+	return m_position = remainder(m_position, m_songs); // Return & store normalized position
 }
 
 
@@ -418,13 +395,19 @@ class Songs::RestoreSel {
   public:
 	RestoreSel(Songs& s): m_s(s), m_sel(s.empty() ? NULL : &s.current()) {}
 	~RestoreSel() {
-		m_s.random();
-		if (!m_sel) return;
+		if (!m_sel) { m_s.random(); return; }
 		filtered_t& f = m_s.m_filtered;
 		filtered_t::iterator it = std::find(f.begin(), f.end(), m_sel);
-		if (it != f.end()) m_s.math_cover.setTarget( it - f.begin(), m_s.size() );
+		if (it == f.end()) { m_s.random(); return; }
+		m_s.math_cover.setTarget(it - f.begin(), m_s.size());
 	}
 };
+
+Song& Songs::near(double pos) {
+	std::size_t s = m_filtered.size();
+	pos = round(remainder(pos, s) + s);
+	return (*this)[std::size_t(pos) % s];
+}
 
 void Songs::random() {
 	math_cover.setTarget( empty() ? 0 : std::rand() % m_filtered.size(), this->size() );
@@ -444,6 +427,7 @@ void Songs::setFilter(std::string const& val) {
 		}
 	}
 	m_filtered.swap(filtered);
+	math_cover.setTarget(0, 0);
 	sort_internal();
 }
 
