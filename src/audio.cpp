@@ -1,7 +1,7 @@
 #include <audio.h>
+#include <xtime.h>
 
 #include <iostream>
-#include <boost/thread/xtime.hpp>
 #include <cmath>
 
 #ifdef __FREEBSD__
@@ -63,25 +63,6 @@ CAudio::~CAudio() {
 #ifdef USE_GSTREAMER_AUDIO
 	gst_object_unref (GST_OBJECT (music));
 #endif
-}
-
-namespace {
-	// Boost WTF time format, directly from C...
-	boost::xtime& operator+=(boost::xtime& time, double seconds) {
-		double nsec = 1e9 * (time.sec + seconds) + time.nsec;
-		time.sec = boost::xtime::xtime_sec_t(nsec / 1e9);
-		time.nsec = boost::xtime::xtime_nsec_t(std::fmod(nsec, 1e9));
-		return time;
-	}
-	boost::xtime operator+(boost::xtime const& left, double seconds) {
-		boost::xtime time = left;
-		return time += seconds;
-	}
-	boost::xtime now() {
-		boost::xtime time;
-		boost::xtime_get(&time, boost::TIME_UTC);
-		return time;
-	}
 }
 
 void CAudio::operator()() {

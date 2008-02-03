@@ -3,6 +3,7 @@
 #include <glob.h>
 #include <songs.h>
 #include <screen.h>
+#include <xtime.h>
 // math.h needed for C99 stuff
 #include <math.h>
 #include <algorithm>
@@ -17,12 +18,11 @@
 double coverMathAdvanced::getPosition(){
 	const double acceleration = 80.0; // the coefficient of velocity changes (animation speed)
 	const double overshoot = 0.99; // Over 1.0 decelerates too late, less than 1.0 decelerates too early
-	boost::xtime curtime;
-	boost::xtime_get(&curtime, boost::TIME_UTC);
-	double duration = curtime.sec - m_time.sec;
-	duration += 1e-9 * (curtime.nsec - m_time.nsec);
-	if (duration > 1.0) duration = 1.0; // No more than one second per frame
+	boost::xtime curtime = now();
+	double duration = seconds(curtime) - seconds(m_time);
 	m_time = curtime;
+	if (!(duration > 0.0)) return m_position; // Negative value or NaN - skip processing
+	if (duration > 1.0) duration = 1.0; // No more than one second per frame
 	std::size_t rounds = 1.0 + 1000.0 * duration; // 1 ms or shorter timesteps
 	double t = duration / rounds;
 	for (std::size_t i = 0; i < rounds; ++i) {

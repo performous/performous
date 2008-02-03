@@ -1,4 +1,5 @@
 #include <screen_sing.h>
+#include <xtime.h>
 
 #include <boost/format.hpp>
 #include <sdl_helper.h>
@@ -80,9 +81,10 @@ void CScreenSing::manageEvent(SDL_Event event) {
 		else if (key == SDLK_DOWN) audio.seek(-30.0);
 		else if (key == SDLK_r && event.key.keysym.mod & KMOD_CTRL) {
 			double pos = audio.getPosition();
-			if (!m_sentence.empty()) pos = std::min(pos, m_sentence[0].begin - 1.0);
+			if (!m_sentence.empty()) pos = std::min(pos, m_sentence[0].begin - 0.4);
 			sm->getSongs()->current().reload();
 			exit(); enter();
+			boost::thread::sleep(now() + 0.3); // HACK: Wait until the song is loaded
 			audio.seek(pos);
 		}
 	}
