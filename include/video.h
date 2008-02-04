@@ -12,6 +12,7 @@ class CVideo {
 	void unloadVideo();
 	bool isPlaying();
 	void play();
+	void seek(double seek_pos);
   private:
 #ifdef USE_SMPEG
 	SMPEG *mpeg;

@@ -30,6 +30,9 @@ void CScreenSing::enter() {
 		std::string file = song.path + song.video;
 		std::cout << "Now playing: " << file << std::endl;
 		video_ok = video.loadVideo(file, videoSurf, m_width, m_height);
+		if(video_ok && song.videoGap < 0) {
+			video.seek(-1*song.videoGap);
+		}
 	}
 	if (!video_ok) {
 		SDLSurf bg(song.path + song.background, sm->getWidth(), sm->getHeight());
