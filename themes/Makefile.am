@@ -29,7 +29,8 @@ themesdef_DATA = default/no_cover.png \
 	default/configuration_value.svg
 
 themeslimadir   = @THEMES_DIR@/lima
-themeslima_DATA = lima/no_cover.png \
+themeslima_DATA = lima/icon.png \
+	lima/no_cover.png \
 	lima/intro.svg \
 	lima/songs_bg.svg \
 	lima/songs_order.svg \

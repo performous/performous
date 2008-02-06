@@ -4,6 +4,7 @@
 #include <boost/noncopyable.hpp>
 #include <SDL/SDL_image.h>
 #include <algorithm>
+#include <iostream>
 
 class SDLSurf: boost::noncopyable {
 	SDL_Surface* m_surf;

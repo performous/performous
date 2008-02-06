@@ -1,6 +1,7 @@
 #include "../config.h"
 
 #include <audio.hpp>
+#include <sdl_helper.h>
 #include <screen.h>
 #include <screen_intro.h>
 #include <screen_songs.h>
@@ -12,7 +13,6 @@
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
-#include <cstdlib>
 #include <set>
 #include <string>
 #include <vector>
@@ -53,6 +53,8 @@ static void init_SDL(CScreenManager& sm, CVideoDriver& vd, unsigned int width, u
 	std::atexit(SDL_Quit);
 	if( SDL_Init(SDL_INIT_VIDEO) ==  -1 ) throw std::runtime_error("SDL_Init failed");
 	SDL_WM_SetCaption(PACKAGE" - "VERSION, "WM_DEFAULT");
+	SDLSurf icon(sm.getThemePathFile("icon.png"));
+	SDL_WM_SetIcon(icon, NULL);
 	screenSDL = vd.init(width, height, sm.getFullscreenStatus());
 	if (!screenSDL) throw std::runtime_error("Cannot initialize screen");
 	SDL_ShowCursor(SDL_DISABLE);
@@ -61,7 +63,6 @@ static void init_SDL(CScreenManager& sm, CVideoDriver& vd, unsigned int width, u
 }
 
 int main(int argc, char** argv) {
-	std::srand(std::time(NULL)); // Seed rand (used for choosing random songs)
 	bool fullscreen = false;
 	unsigned int width, height;
 	std::string theme;
