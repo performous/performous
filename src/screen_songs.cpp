@@ -49,7 +49,7 @@ void CScreenSongs::manageEvent(SDL_Event event) {
 	// The rest are only available when there are songs available
 	else if (sm->getSongs()->empty()) return;
 	else if (key == SDLK_SPACE) sm->getAudio()->togglePause();
-	else if (key == SDLK_r) sm->getSongs()->random();
+	else if (key == SDLK_r) sm->getSongs()->random(mod & KMOD_SHIFT);
 	else if (key == SDLK_f || keysym.unicode == '/') {
 		m_searching = true;
 		m_search.clear();

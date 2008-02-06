@@ -54,8 +54,8 @@ Search for songs (input text to find, uses regexp format)
 \fBSpace\fR
 Pause song preview (not in search mode)
 .TP
-\fBR\fR
-Pick random song (not in search mode)
+\fBR\fR/\fBShift+R\fR
+Pick next/previous random song (not in search mode)
 .TP
 \fBCtrl+R\fR
 Refresh song list (reload from disk)
@@ -73,6 +73,9 @@ Skip long solos (jump to the beginning of next sentence)
 .TP
 \fB+\fR/\fB-\fR
 Adjust audio delay. Use to correct synchronization issues.
+.TP
+\fBCtrl+R\fR
+Hot reload song from disk (useful for making or repairing songs)
 
 [see also]
 You can find more information at http://ultrastar-ng.sourceforge.net/ or

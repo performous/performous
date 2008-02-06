@@ -141,7 +141,7 @@ class Songs {
 	void setFilter(std::string const& regex);
 	std::string sortDesc() const;
 	void randomize();
-	void random();
+	void random(bool reverse = false);
 	void sortChange(int diff);
 	void parseFile(Song& tmp);
   private:

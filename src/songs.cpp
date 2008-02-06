@@ -415,11 +415,21 @@ void Songs::randomize() {
 	std::random_shuffle(m_randomlist.begin(), m_randomlist.end());
 }
 
-void Songs::random() {
-	if (m_randomlist.empty()) return;
-	std::size_t num = m_randomlist.front();
-	m_randomlist.pop_front();
-	m_randomlist.push_back(num);
+void Songs::random(bool reverse) {
+	if (m_randomlist.size() < 2) return;
+	std::size_t cur = math_cover.getTarget();
+	std::size_t num;
+	do {
+		if (reverse) {
+			num = m_randomlist.front();
+			m_randomlist.pop_front();
+			m_randomlist.push_back(num);
+		} else {
+			num = m_randomlist.back();
+			m_randomlist.pop_back();
+			m_randomlist.push_front(num);
+		}
+	} while (num == cur);
 	math_cover.setTarget( empty() ? 0 : num, this->size() );
 }
 
