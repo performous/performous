@@ -409,8 +409,18 @@ Song& Songs::near(double pos) {
 	return (*this)[std::size_t(pos) % s];
 }
 
+void Songs::randomize() {
+	m_randomlist.resize(m_filtered.size());
+	for (std::size_t i = 0; i < m_filtered.size(); ++i) m_randomlist[i] = i;
+	std::random_shuffle(m_randomlist.begin(), m_randomlist.end());
+}
+
 void Songs::random() {
-	math_cover.setTarget( empty() ? 0 : std::rand() % m_filtered.size(), this->size() );
+	if (m_randomlist.empty()) return;
+	std::size_t num = m_randomlist.front();
+	m_randomlist.pop_front();
+	m_randomlist.push_back(num);
+	math_cover.setTarget( empty() ? 0 : num, this->size() );
 }
 
 void Songs::setFilter(std::string const& val) {
@@ -427,6 +437,7 @@ void Songs::setFilter(std::string const& val) {
 		}
 	}
 	m_filtered.swap(filtered);
+	randomize();
 	math_cover.setTarget(0, 0);
 	sort_internal();
 }

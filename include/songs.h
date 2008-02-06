@@ -5,6 +5,7 @@
 #include <boost/ptr_container/ptr_set.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/xtime.hpp>
+#include <deque>
 #include <set>
 #include <string>
 #include <vector>
@@ -139,6 +140,7 @@ class Songs {
 	Song const& current() const { return *m_filtered[math_cover.getTarget()]; }
 	void setFilter(std::string const& regex);
 	std::string sortDesc() const;
+	void randomize();
 	void random();
 	void sortChange(int diff);
 	void parseFile(Song& tmp);
@@ -148,6 +150,7 @@ class Songs {
 	songlist_t m_songs;
 	typedef std::vector<Song*> filtered_t;
 	filtered_t m_filtered;
+	std::deque<std::size_t> m_randomlist;
 	//coverMathSimple math_cover;
 	coverMathAdvanced math_cover;
 	int m_order;

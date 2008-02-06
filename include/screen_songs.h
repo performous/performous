@@ -16,6 +16,7 @@ class CScreenSongs : public CScreen {
 	void draw();
   private:
 	boost::scoped_ptr<CThemeSongs> theme;
+	double m_time;
 	std::string m_cover;
 	std::string m_playing;
 	bool m_searching;

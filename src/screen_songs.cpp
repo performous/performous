@@ -1,7 +1,10 @@
 #include <screen_songs.h>
 #include <cairotosdl.h>
+#include <xtime.h>
 #include <iostream>
 #include <sstream>
+
+static const double IDLE_TIMEOUT = 45.0; // seconds
 
 CScreenSongs::CScreenSongs(std::string const& name, unsigned int width, unsigned int height, std::set<std::string> const& songdirs):
   CScreen(name, width, height),
@@ -19,6 +22,7 @@ void CScreenSongs::enter() {
 	sm->getAudio()->stopMusic();
 	theme.reset(new CThemeSongs(m_width, m_height));
 	bg_texture = sm->getVideoDriver()->initSurface(theme->bg->getSDLSurface());
+	m_time = seconds(now());
 }
 
 void CScreenSongs::exit() {
@@ -30,6 +34,7 @@ void CScreenSongs::exit() {
 void CScreenSongs::manageEvent(SDL_Event event) {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	if (event.type != SDL_KEYDOWN) return;
+	m_time = seconds(now());
 	SDL_keysym keysym = event.key.keysym;
 	int key = keysym.sym;
 	SDLMod mod = event.key.keysym.mod;
@@ -126,5 +131,6 @@ void CScreenSongs::draw() {
 		sm->getVideoDriver()->drawSurface(m_currentCover, position.x, position.y);
 	}
 	sm->getVideoDriver()->drawSurface(theme->theme->getCurrent());
+	if (!sm->getAudio()->isPaused() && seconds(now()) - m_time > IDLE_TIMEOUT) { m_time = seconds(now()); songs.random(); }
 }
 
