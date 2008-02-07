@@ -17,6 +17,7 @@ class CScreenScore: public CScreen {
 	void manageEvent(SDL_Event event);
 	void draw();
   private:
+	double m_time;
 	boost::scoped_ptr<CThemeScore> theme;
 	unsigned int bg_texture;
 };

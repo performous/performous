@@ -1,4 +1,6 @@
 #include <screen_score.h>
+#include <xtime.h>
+#include <limits>
 
 CScreenScore::CScreenScore(std::string const& name, unsigned int width, unsigned int height):
   CScreen(name, width, height)
@@ -10,6 +12,7 @@ void CScreenScore::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
   	theme.reset(new CThemeScore(m_width, m_height));
 	bg_texture = sm->getVideoDriver()->initSurface(theme->bg->getSDLSurface());
+	m_time = seconds(now());
 }
 
 void CScreenScore::exit() {
@@ -17,11 +20,14 @@ void CScreenScore::exit() {
 }
 
 void CScreenScore::manageEvent(SDL_Event event) {
-	if (event.type == SDL_KEYDOWN) CScreenManager::getSingletonPtr()->activateScreen("Songs");
+	if (event.type != SDL_KEYDOWN) return;
+	if (event.key.keysym.sym == SDLK_PAUSE) m_time = std::numeric_limits<double>::infinity();
+	else CScreenManager::getSingletonPtr()->activateScreen("Songs");
 }
 
 void CScreenScore::draw() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
+	if (seconds(now()) - m_time > 10.0) { sm->activateScreen("Songs"); return; }
 	Song& song = sm->getSongs()->current();
 	theme->theme->clear();
 	// Draw some numbers
