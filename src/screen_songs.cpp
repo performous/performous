@@ -8,7 +8,6 @@ static const double IDLE_TIMEOUT = 45.0; // seconds
 
 CScreenSongs::CScreenSongs(std::string const& name, unsigned int width, unsigned int height, std::set<std::string> const& songdirs):
   CScreen(name, width, height),
-  m_searching(),
   m_emptyCover(CScreenManager::getSingletonPtr()->getThemePathFile("no_cover.png"), CScreenManager::getSingletonPtr()->getWidth() / 800.0 * 256.0, CScreenManager::getSingletonPtr()->getHeight() / 600.0 * 256.0),
   m_currentCover(NULL)
 {
@@ -60,37 +59,31 @@ namespace {
 
 void CScreenSongs::manageEvent(SDL_Event event) {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
+	Songs& songs = *sm->getSongs();
 	if (event.type != SDL_KEYDOWN) return;
 	m_time = seconds(now());
 	SDL_keysym keysym = event.key.keysym;
 	int key = keysym.sym;
 	SDLMod mod = event.key.keysym.mod;
-	if (key == SDLK_r && mod & KMOD_CTRL) { sm->getSongs()->reload(); m_searching = false; }
-	else if (m_searching) {
-		if (key == SDLK_ESCAPE) { m_searching = false; m_search.clear(); }
-		else if (key == SDLK_BACKSPACE && !m_search.empty()) backspace(m_search);
-		else if (keysym.unicode >= 0x20 && keysym.unicode < 0x7F || keysym.unicode >= 0xA0) m_search += utf8(keysym.unicode);
-		sm->getSongs()->setFilter(m_search);
+	if (key == SDLK_r && mod & KMOD_CTRL) songs.reload();
+	else if (key == SDLK_BACKSPACE && !m_search.empty()) backspace(m_search);
+	else if (m_search.size() < 100 && keysym.unicode >= 0x20 && (keysym.unicode < 0x7F || keysym.unicode >= 0xA0)) m_search += utf8(keysym.unicode);
+	else if (key == SDLK_ESCAPE) {
+		if (m_search.empty()) sm->activateScreen("Intro");
+		else m_search.clear();
 	}
-	else if (key == SDLK_ESCAPE || key == SDLK_q) sm->activateScreen("Intro");
 	// The rest are only available when there are songs available
-	else if (sm->getSongs()->empty()) return;
+	else if (songs.empty()) return;
 	else if (key == SDLK_SPACE) sm->getAudio()->togglePause();
-	else if (key == SDLK_r) sm->getSongs()->random(mod & KMOD_SHIFT);
-	else if (key == SDLK_f || keysym.unicode == '/') {
-		m_searching = true;
-		m_search.clear();
-		sm->getSongs()->setFilter(m_search);
-	}
-	// These are available in both modes (search and normal), if there are songs
-	if (sm->getSongs()->empty()) return;
+	else if (key == SDLK_TAB) songs.random(mod & KMOD_SHIFT);
 	else if (key == SDLK_RETURN) sm->activateScreen("Sing");
-	else if (key == SDLK_LEFT) sm->getSongs()->advance(-1);
-	else if (key == SDLK_RIGHT) sm->getSongs()->advance(1);
-	else if (key == SDLK_PAGEUP) sm->getSongs()->advance(-10);
-	else if (key == SDLK_PAGEDOWN) sm->getSongs()->advance(10);
-	else if (key == SDLK_UP) sm->getSongs()->sortChange(-1);
-	else if (key == SDLK_DOWN) sm->getSongs()->sortChange(1);
+	else if (key == SDLK_LEFT) songs.advance(-1);
+	else if (key == SDLK_RIGHT) songs.advance(1);
+	else if (key == SDLK_PAGEUP) songs.advance(-10);
+	else if (key == SDLK_PAGEDOWN) songs.advance(10);
+	else if (key == SDLK_UP) songs.sortChange(-1);
+	else if (key == SDLK_DOWN) songs.sortChange(1);
+	songs.setFilter(m_search);
 }
 
 namespace {
@@ -106,17 +99,18 @@ namespace {
 
 void CScreenSongs::draw() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
+	CAudio& audio = *sm->getAudio();
 	Songs& songs = *sm->getSongs();
 	theme->theme->clear();
 	// Draw the "Order by" text
-	print(theme.get(), theme->order, (m_searching ? "find: " + m_search : sm->getSongs()->sortDesc()));
+	print(theme.get(), theme->order, (m_search.empty() ? songs.sortDesc() : m_search));
 	// Test if there are no songs
 	if (songs.empty()) {
 		print(theme.get(), theme->song, "no songs found");
-		if (!m_playing.empty()) { sm->getAudio()->stopMusic(); m_playing.clear(); }
+		if (!m_playing.empty()) { audio.stopMusic(); m_playing.clear(); }
 		m_currentCover = NULL;
 	} else {
-		Song& song = sm->getSongs()->current();
+		Song& song = songs.current();
 		// Draw the "Song information"
 		{
 			std::ostringstream oss;
@@ -145,12 +139,12 @@ void CScreenSongs::draw() {
 		}
 		// Play a preview of the song
 		std::string file = song.path + song.mp3;
-		if (file != m_playing) sm->getAudio()->playPreview(m_playing = file);
+		if (file != m_playing) audio.playPreview(m_playing = file);
 	}
 	sm->getVideoDriver()->drawSurface(bg_texture);
 	if (m_currentCover) {
 		SDL_Rect position;
-		double shift = remainder(sm->getSongs()->currentPosition(), 1.0);
+		double shift = remainder(songs.currentPosition(), 1.0);
 		position.x = round((m_width - m_currentCover->w) / 2 - shift * 1056);
 		position.y = (m_height - m_currentCover->h) / 2;
 		position.w = m_currentCover->w;
@@ -158,6 +152,11 @@ void CScreenSongs::draw() {
 		sm->getVideoDriver()->drawSurface(m_currentCover, position.x, position.y);
 	}
 	sm->getVideoDriver()->drawSurface(theme->theme->getCurrent());
-	if (!sm->getAudio()->isPaused() && seconds(now()) - m_time > IDLE_TIMEOUT) { m_time = seconds(now()); songs.random(); }
+	if (!audio.isPaused() && seconds(now()) - m_time > IDLE_TIMEOUT) {
+		m_time = seconds(now());
+		m_search.clear();
+		songs.setFilter(m_search);
+		songs.random();
+	}
 }
 

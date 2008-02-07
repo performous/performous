@@ -19,7 +19,6 @@ class CScreenSongs : public CScreen {
 	double m_time;
 	std::string m_cover;
 	std::string m_playing;
-	bool m_searching;
 	std::string m_search;
 	unsigned int bg_texture;
 	SDLSurf m_emptyCover;
