@@ -23,7 +23,7 @@ void CScreenIntro::manageEvent(SDL_Event event) {
 		else if (key == SDLK_s) sm->activateScreen("Songs");
 		else if (key == SDLK_c) sm->activateScreen("Configuration");
 		else if (key == SDLK_p) sm->activateScreen("Practice");
-		else if (key == SDLK_SPACE) sm->getAudio()->togglePause();
+		else if (key == SDLK_SPACE || key == SDLK_PAUSE) sm->getAudio()->togglePause();
 	}
 }
 

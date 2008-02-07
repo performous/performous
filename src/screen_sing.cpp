@@ -70,7 +70,7 @@ void CScreenSing::manageEvent(SDL_Event event) {
 		CAudio& audio = *sm->getAudio();
 		int key = event.key.keysym.sym;
 		if (key == SDLK_ESCAPE || key == SDLK_q) sm->activateScreen(m_sentence.empty() ? "Score" : "Songs");
-		else if (key == SDLK_SPACE || key == SDLK_p) sm->getAudio()->togglePause();
+		else if (key == SDLK_SPACE || key == SDLK_PAUSE) sm->getAudio()->togglePause();
 		else if (key == SDLK_PLUS) playOffset += 0.02;
 		else if (key == SDLK_MINUS) playOffset -= 0.02;
 		else if (key == SDLK_HOME) audio.seek(-audio.getPosition());

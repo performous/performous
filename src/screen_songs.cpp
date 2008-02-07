@@ -66,15 +66,16 @@ void CScreenSongs::manageEvent(SDL_Event event) {
 	int key = keysym.sym;
 	SDLMod mod = event.key.keysym.mod;
 	if (key == SDLK_r && mod & KMOD_CTRL) songs.reload();
-	else if (key == SDLK_BACKSPACE && !m_search.empty()) backspace(m_search);
-	else if (m_search.size() < 100 && keysym.unicode >= 0x20 && (keysym.unicode < 0x7F || keysym.unicode >= 0xA0)) m_search += utf8(keysym.unicode);
+	else if (key == SDLK_BACKSPACE && !m_search.empty()) { backspace(m_search); songs.setFilter(m_search); }
+	else if (m_search.size() < 100 && keysym.unicode >= 0x20 && (keysym.unicode < 0x7F || keysym.unicode >= 0xA0))
+	  songs.setFilter(m_search += utf8(keysym.unicode));
 	else if (key == SDLK_ESCAPE) {
 		if (m_search.empty()) sm->activateScreen("Intro");
-		else m_search.clear();
+		else { m_search.clear(); songs.setFilter(m_search); }
 	}
 	// The rest are only available when there are songs available
 	else if (songs.empty()) return;
-	else if (key == SDLK_SPACE) sm->getAudio()->togglePause();
+	else if (key == SDLK_PAUSE || (key == SDLK_p && mod && KMOD_CTRL)) sm->getAudio()->togglePause();
 	else if (key == SDLK_TAB) songs.random(mod & KMOD_SHIFT);
 	else if (key == SDLK_RETURN) sm->activateScreen("Sing");
 	else if (key == SDLK_LEFT) songs.advance(-1);
@@ -83,7 +84,6 @@ void CScreenSongs::manageEvent(SDL_Event event) {
 	else if (key == SDLK_PAGEDOWN) songs.advance(10);
 	else if (key == SDLK_UP) songs.sortChange(-1);
 	else if (key == SDLK_DOWN) songs.sortChange(1);
-	songs.setFilter(m_search);
 }
 
 namespace {
@@ -154,8 +154,7 @@ void CScreenSongs::draw() {
 	sm->getVideoDriver()->drawSurface(theme->theme->getCurrent());
 	if (!audio.isPaused() && seconds(now()) - m_time > IDLE_TIMEOUT) {
 		m_time = seconds(now());
-		m_search.clear();
-		songs.setFilter(m_search);
+		m_search.clear(); songs.setFilter(m_search);
 		songs.random();
 	}
 }

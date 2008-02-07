@@ -21,7 +21,7 @@ void CScreenConfiguration::manageEvent(SDL_Event event) {
 	if (event.type == SDL_KEYDOWN) {
 		int key = event.key.keysym.sym;
 		if (key == SDLK_ESCAPE || key == SDLK_q) CScreenManager::getSingletonPtr()->activateScreen("Intro");
-		else if (key == SDLK_SPACE) sm->getAudio()->togglePause();
+		else if (key == SDLK_SPACE || key == SDLK_PAUSE) sm->getAudio()->togglePause();
 		else if (key == SDLK_UP && selected > 0) --selected;
 		else if (key == SDLK_DOWN && selected + 1 < configuration.size()) ++selected;
 		else if (key == SDLK_LEFT) configuration[selected].setPrevious();

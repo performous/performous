@@ -34,7 +34,7 @@ void CScreenPractice::manageEvent(SDL_Event event)
 	if (event.type == SDL_KEYDOWN) {
 		int key = event.key.keysym.sym;
 		if (key == SDLK_ESCAPE || key == SDLK_q) sm->activateScreen("Intro");
-		else if (key == SDLK_SPACE) sm->getAudio()->togglePause();
+		else if (key == SDLK_SPACE || key == SDLK_PAUSE) sm->getAudio()->togglePause();
 	}
 }
 

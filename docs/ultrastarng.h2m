@@ -22,9 +22,6 @@ Exit the current screen
 .TP
 \fBAlt+Enter\fR
 Switch between full screen and windowed modes
-.TP
-\fBSpace\fR
-Pause song/preview
 
 .SS "Main menu:"
 .TP
@@ -48,14 +45,14 @@ Browse the list of songs
 \fBUp\fR/\fBDown\fR
 Switch the sort order (song name, artist, edition, genre or song folder path)
 .TP
-\fBF\fR or \fB/\fR
-Search for songs (input text to find, uses regexp format)
+\fBAny text\fR
+Search for songs (write the text to find, uses regexp format)
 .TP
-\fBSpace\fR
-Pause song preview (not in search mode)
+\fBPause\fR or \fBCtrl+P\fR
+Pause song preview and automatic song switching
 .TP
-\fBR\fR/\fBShift+R\fR
-Pick next/previous random song (not in search mode)
+\fBTab\fR/\fBShift+Tab\fR
+Pick next/previous random song
 .TP
 \fBCtrl+R\fR
 Refresh song list (reload from disk)
@@ -69,7 +66,10 @@ Exit to main menu or quit search mode
 Fast forward or rewind the song
 .TP
 \fBEnter\fR
-Skip long solos (jump to the beginning of next sentence)
+Skip long solos (jump to the beginning of the next sentence)
+.TP
+\fBPause\fR or \fBSpace\fR
+Pause the game
 .TP
 \fB+\fR/\fB-\fR
 Adjust audio delay. Use to correct synchronization issues.
