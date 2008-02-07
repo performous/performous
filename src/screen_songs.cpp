@@ -31,6 +31,36 @@ void CScreenSongs::exit() {
 	theme.reset();
 }
 
+namespace {
+	std::string utf8(unsigned int ucs) {
+		std::string utf8;
+		if (ucs < 0x80) {
+			utf8 += ucs;
+		} else if (ucs < 0x800) {
+			utf8 += 0xC0 | (ucs >> 6);
+			utf8 += 0x80 | ucs & 0x3F;
+		} else if (ucs < 0x10000) {
+			utf8 += 0xE0 | (ucs >> 12);
+			utf8 += 0x80 | (ucs >> 6) & 0x3F;
+			utf8 += 0x80 | ucs & 0x3F;
+		} else {
+			utf8 += 0xF0 | (ucs >> 18);
+			utf8 += 0x80 | (ucs >> 12) & 0x3F;
+			utf8 += 0x80 | (ucs >> 6) & 0x3F;
+			utf8 += 0x80 | ucs & 0x3F;
+		}
+		return utf8;
+	}
+	unsigned char utf8Type(char ch) { return static_cast<unsigned char>(ch) & 0xC0; }
+	void backspace(std::string& str) {
+		std::string::size_type pos = str.size() - 1;
+		if (utf8Type(str[pos]) == 0x80) {
+			while (--pos > 0 && utf8Type(str[pos]) == 0x80);
+		}
+		str.erase(pos);
+	}
+}
+
 void CScreenSongs::manageEvent(SDL_Event event) {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	if (event.type != SDL_KEYDOWN) return;
@@ -41,8 +71,8 @@ void CScreenSongs::manageEvent(SDL_Event event) {
 	if (key == SDLK_r && mod & KMOD_CTRL) { sm->getSongs()->reload(); m_searching = false; }
 	else if (m_searching) {
 		if (key == SDLK_ESCAPE) { m_searching = false; m_search.clear(); }
-		else if (key == SDLK_BACKSPACE && !m_search.empty()) m_search.erase(m_search.size() - 1);
-		else if (keysym.unicode >= 0x20 && keysym.unicode < 0x7F) m_search += keysym.unicode;
+		else if (key == SDLK_BACKSPACE && !m_search.empty()) backspace(m_search);
+		else if (keysym.unicode >= 0x20 && keysym.unicode < 0x7F || keysym.unicode >= 0xA0) m_search += utf8(keysym.unicode);
 		sm->getSongs()->setFilter(m_search);
 	}
 	else if (key == SDLK_ESCAPE || key == SDLK_q) sm->activateScreen("Intro");
