@@ -400,6 +400,7 @@ class Songs::RestoreSel {
 		filtered_t& f = m_s.m_filtered;
 		filtered_t::iterator it = std::find(f.begin(), f.end(), m_sel);
 		if (it == f.end()) { m_s.random(); return; }
+		m_s.math_cover.setTarget(0, 0);
 		m_s.math_cover.setTarget(it - f.begin(), m_s.size());
 	}
 };
