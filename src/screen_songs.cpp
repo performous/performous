@@ -51,12 +51,9 @@ namespace {
 		}
 		return utf8;
 	}
-	unsigned char utf8Type(char ch) { return static_cast<unsigned char>(ch) & 0xC0; }
 	void backspace(std::string& str) {
 		std::string::size_type pos = str.size() - 1;
-		if (utf8Type(str[pos]) == 0x80) {
-			while (--pos > 0 && utf8Type(str[pos]) == 0x80);
-		}
+		while ((str[pos] & 0xC0) == 0x80) --pos;
 		str.erase(pos);
 	}
 }
