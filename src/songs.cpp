@@ -18,15 +18,16 @@
 double coverMathAdvanced::getPosition(){
 	const double acceleration = 80.0; // the coefficient of velocity changes (animation speed)
 	const double overshoot = 0.99; // Over 1.0 decelerates too late, less than 1.0 decelerates too early
+	if (m_songs == 0) return m_target;
 	boost::xtime curtime = now();
 	double duration = seconds(curtime) - seconds(m_time);
 	m_time = curtime;
-	if (!(duration > 0.0)) return m_position; // Negative value or NaN - skip processing
+	if (!(duration > 0.0)) return m_position; // Negative value or NaN, or no songs - skip processing
 	if (duration > 1.0) duration = 1.0; // No more than one second per frame
 	std::size_t rounds = 1.0 + 1000.0 * duration; // 1 ms or shorter timesteps
 	double t = duration / rounds;
 	for (std::size_t i = 0; i < rounds; ++i) {
-		double d = remainder(m_target - m_position, m_songs); // Distance (via the shorter way)
+		double d = remainder(m_target - m_position, m_songs); // Distance (via shortest way)
 		double a = (d > 0.0 ? 1.0 : -1.0) * acceleration; // Acceleration vector
 		// Are we going to right direction && can we stop in time if we start decelerating now?
 		if (d * m_velocity > 0.0 && std::abs(m_velocity) > 2.0 * overshoot * acceleration * d / m_velocity) a *= -1.0;
