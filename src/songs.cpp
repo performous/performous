@@ -16,8 +16,8 @@
 #include <stdexcept>
 
 double coverMathAdvanced::getPosition(){
-	const double acceleration = 80.0; // the coefficient of velocity changes (animation speed)
-	const double overshoot = 0.99; // Over 1.0 decelerates too late, less than 1.0 decelerates too early
+	const double acceleration = 50.0; // the coefficient of velocity changes (animation speed)
+	const double overshoot = 0.95; // Over 1.0 decelerates too late, less than 1.0 decelerates too early
 	if (m_songs == 0) return m_target;
 	boost::xtime curtime = now();
 	double duration = seconds(curtime) - seconds(m_time);
