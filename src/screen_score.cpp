@@ -1,5 +1,6 @@
 #include <screen_score.h>
 #include <xtime.h>
+#include <boost/lexical_cast.hpp>
 #include <limits>
 
 CScreenScore::CScreenScore(std::string const& name, unsigned int width, unsigned int height):
@@ -32,25 +33,22 @@ void CScreenScore::draw() {
 	theme->theme->clear();
 	// Draw some numbers
 	int score = song.getScore();
-	char scoreStr[32];
-	char rankStr[32];
-	float scorePercent;
-	sprintf(scoreStr,"%4d",score);
-	theme->normal_score.text = scoreStr;			
-	if (score < 2000) sprintf(rankStr,"Tone deaf");
-	else if (score < 4000) sprintf(rankStr,"Amateur");
-	else if (score < 6000) sprintf(rankStr,"Rising star");
-	else if (score < 8000) sprintf(rankStr,"Lead singer");
-	else sprintf(rankStr,"Hit singer");
+	char const* rank;
+	if (score > 8000) rank = "Hit singer";
+	else if (score > 6000) rank = "Lead singer";
+	else if (score > 4000) rank = "Rising star";
+	else if (score > 2000) rank = "Amateur";
+	else rank = "Tone deaf";
 	double oldY = theme->level.y;
-	scorePercent = score/10000.;
+	double scorePercent = score / 10000.0;
 	theme->level.y = theme->level.y + theme->level.final_height * (1.-scorePercent);
 	theme->level.height = theme->level.final_height* scorePercent;
-	theme->rank.text = rankStr;
+	theme->rank.text = rank;
 	theme->theme->PrintText(&theme->normal_score);
 	theme->theme->PrintText(&theme->rank);
 	theme->theme->DrawRect(theme->level);
 	theme->level.y = oldY;
+	theme->normal_score.text = boost::lexical_cast<std::string>(score);
 	sm->getVideoDriver()->drawSurface(bg_texture);
 	sm->getVideoDriver()->drawSurface(theme->theme->getCurrent());
 }
