@@ -22,7 +22,7 @@ class CScreenSongs : public CScreen {
 	std::string m_search;
 	unsigned int bg_texture;
 	SDLSurf m_emptyCover;
-	SDL_Surface* m_currentCover;
+	SDLSurf m_currentCover;
 };
 
 #endif

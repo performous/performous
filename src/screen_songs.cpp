@@ -104,11 +104,11 @@ void CScreenSongs::draw() {
 	theme->theme->clear();
 	// Draw the "Order by" text
 	print(theme.get(), theme->order, (m_search.empty() ? songs.sortDesc() : m_search));
+	sm->getVideoDriver()->drawSurface(bg_texture);
 	// Test if there are no songs
 	if (songs.empty()) {
 		print(theme.get(), theme->song, "no songs found");
 		if (!m_playing.empty()) { audio.stopMusic(); m_playing.clear(); }
-		m_currentCover = NULL;
 	} else {
 		Song& song = songs.current();
 		// Draw the "Song information"
@@ -120,36 +120,27 @@ void CScreenSongs::draw() {
 		}
 		// Draw the cover
 		Song& song_display = songs.near(songs.currentPosition());
-
 		std::string cover = song_display.path + song_display.cover;
 		if (cover != m_cover) {
 			m_cover = cover;
 			double width = CScreenManager::getSingletonPtr()->getWidth();
 			double height = CScreenManager::getSingletonPtr()->getHeight();
 			SDLSurf coverSurf(cover, width / 800.0 * 256, height / 600.0 * 256.0);
-			if( coverSurf ) {
-				// Free the last cached surface
-				if(m_currentCover != m_emptyCover) SDL_FreeSurface(m_currentCover);
-				// Increment SDL refcount to avoid to free the structure when coverSurf will
-				// be destroy
-				coverSurf->refcount++;
-				m_currentCover = coverSurf;
-			} else
-				m_currentCover = m_emptyCover;
+			m_currentCover.swap(coverSurf);
+		}
+		SDL_Surface* coverSurf = m_currentCover ? m_currentCover : m_emptyCover;
+		if (coverSurf) {
+			SDL_Rect position;
+			double shift = remainder(songs.currentPosition(), 1.0);
+			position.x = round((m_width - coverSurf->w) / 2 - shift * 1056);
+			position.y = (m_height - coverSurf->h) / 2;
+			position.w = coverSurf->w;
+			position.h = coverSurf->h;
+			sm->getVideoDriver()->drawSurface(coverSurf, position.x, position.y);
 		}
 		// Play a preview of the song
 		std::string file = song.path + song.mp3;
 		if (file != m_playing) audio.playPreview(m_playing = file);
-	}
-	sm->getVideoDriver()->drawSurface(bg_texture);
-	if (m_currentCover) {
-		SDL_Rect position;
-		double shift = remainder(songs.currentPosition(), 1.0);
-		position.x = round((m_width - m_currentCover->w) / 2 - shift * 1056);
-		position.y = (m_height - m_currentCover->h) / 2;
-		position.w = m_currentCover->w;
-		position.h = m_currentCover->h;
-		sm->getVideoDriver()->drawSurface(m_currentCover, position.x, position.y);
 	}
 	sm->getVideoDriver()->drawSurface(theme->theme->getCurrent());
 	if (!audio.isPaused() && seconds(now()) - m_time > IDLE_TIMEOUT) {

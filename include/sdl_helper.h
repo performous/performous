@@ -25,6 +25,11 @@ class SDLSurf: boost::noncopyable {
 	operator SDL_Surface*() { return m_surf; }
 	SDL_Surface* operator->() { return m_surf; }
 	SDL_Surface& operator*() { return *m_surf; }
+	void swap(SDLSurf& other) {
+		SDL_Surface* tmp = other.m_surf;
+		other.m_surf = m_surf;
+		m_surf = tmp;
+	}
 	void reset(SDL_Surface* surf = NULL) {
 		SDL_FreeSurface(m_surf);
 		m_surf = surf;
