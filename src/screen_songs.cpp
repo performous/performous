@@ -145,7 +145,7 @@ void CScreenSongs::draw() {
 	sm->getVideoDriver()->drawSurface(theme->theme->getCurrent());
 	if (!audio.isPaused() && seconds(now()) - m_time > IDLE_TIMEOUT) {
 		m_time = seconds(now());
-		m_search.clear(); songs.setFilter(m_search);
+		if (!m_search.empty()) { m_search.clear(); songs.setFilter(m_search); }
 		songs.random();
 	}
 }
