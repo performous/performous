@@ -56,6 +56,8 @@ bool CVideo::loadVideo(std::string const& _videoFile, SDL_Surface* _videoSurf, i
 }
 
 void CVideo::seek(double seek_pos) {
+#ifdef USE_SMPEG
 	SMPEG_rewind( mpeg );
 	SMPEG_skip( mpeg, seek_pos );
+#endif
 }
