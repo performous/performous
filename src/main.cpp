@@ -13,6 +13,7 @@
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
+#include <fstream>
 #include <set>
 #include <string>
 #include <vector>
@@ -69,31 +70,51 @@ int main(int argc, char** argv) {
 	std::set<std::string> songdirs;
 	std::string cdev;
 	std::size_t crate;
+	std::string homedir;
+	{
+		char const* home = getenv("HOME");
+		if (home) homedir = std::string(home) + '/';
+	}
 	{
 		std::vector<std::string> songdirstmp;
 		namespace po = boost::program_options;
-		po::options_description desc("Available options");
-		desc.add_options()
+		po::options_description opt1("Generic options");
+		opt1.add_options()
 		  ("help,h", "you are viewing it")
+		  ("version,v", "display version number");
+		po::options_description opt2("Configuration options");
+		opt2.add_options()
 		  ("theme,t", po::value<std::string>(&theme)->default_value("lima"), "set theme (name or absolute path)")
-		  ("songdir,s", po::value<std::vector<std::string> >(&songdirstmp)->composing(), "additional song folders to scan\n  -s none to disable built-in defaults")
 		  ("fs,f", "enable full screen mode")
 		  ("width,W", po::value<unsigned int>(&width)->default_value(800), "set horizontal resolution")
 		  ("height,H", po::value<unsigned int>(&height)->default_value(600), "set vertical resolution")
 		  ("cdev", po::value<std::string>(&cdev), "set capture device (disable autodetection)\n  --cdev dev[:settings]\n  --cdev help for list of devices")
 		  ("crate", po::value<std::size_t>(&crate)->default_value(48000), "set capture frequency\n  44100 and 48000 Hz are optimal")
-		  ("version,v", "display version number");
+		  ("clean,c", "disable internal default song folders")
+		  ("songdir,s", po::value<std::vector<std::string> >(&songdirstmp)->composing(), "additional song folders to scan\n  may be specified without -s or -songdir too");
+		po::positional_options_description p;
+		p.add("songdir", -1);
+		po::options_description cmdline;
+		cmdline.add(opt1).add(opt2);
 		po::variables_map vm;
 		try {
-			po::store(po::parse_command_line(argc, argv, desc), vm);
+			po::store(po::command_line_parser(argc, argv).options(cmdline).positional(p).run(), vm);
+			if (!homedir.empty()) {
+				std::ifstream conf((homedir + ".ultrastar/ultrastarng.conf").c_str());
+				po::store(po::parse_config_file(conf, opt2), vm);
+			}
+			{
+				std::ifstream conf("/etc/ultrastarng.conf");
+				po::store(po::parse_config_file(conf, opt2), vm);
+			}
 			po::notify(vm);
 		} catch (std::exception& e) {
-			std::cout << desc << std::endl;
+			std::cout << cmdline << std::endl;
 			std::cout << "ERROR: " << e.what() << std::endl;
 			return 1;
 		}
 		if (vm.count("help")) {
-			std::cout << desc << std::endl;
+			std::cout << cmdline << std::endl;
 			return 0;
 		}
 		if (cdev == "help") {
@@ -110,19 +131,15 @@ int main(int argc, char** argv) {
 		}
 		if (vm.count("fs")) fullscreen = true;
 		// Copy songdirstmp into songdirs
-		bool defaultdirs = true;
 		for (std::vector<std::string>::const_iterator it = songdirstmp.begin(); it != songdirstmp.end(); ++it) {
 			std::string str = *it;
-			if (str == "none") { defaultdirs = false; continue; }
 			if (*str.rbegin() != '/') str += '/';
 			songdirs.insert(str);
 		}
-		if (defaultdirs) {
+		// Insert default dirs
+		if (!vm.count("clean")) {
 			songdirs.insert(DATA_DIR "songs/");
-			{
-				char const* home = getenv("HOME");
-				if (home) songdirs.insert(std::string(home) + "/.ultrastar/songs/");
-			}
+			if (!homedir.empty()) songdirs.insert(homedir + ".ultrastar/songs/");
 			songdirs.insert("/usr/share/games/ultrastar/songs/");
 			songdirs.insert("/usr/share/games/ultrastar-ng/songs/");
 			songdirs.insert("/usr/share/ultrastar/songs/");
