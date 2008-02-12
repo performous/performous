@@ -21,21 +21,11 @@ SDL_Surface * CVideoDriver::init(int width, int height, int fullscreen)
 #ifdef USE_OPENGL
 	SDL_videoFlags |= SDL_OPENGL;
 	SDL_videoFlags |= SDL_DOUBLEBUF;
-	SDL_GL_SetAttribute( SDL_GL_RED_SIZE, 5 );
-	SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, 5 );
-	SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, 5 );
-	SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 16 );
-	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 #else
-	if ( videoInf->hw_available )
-		SDL_videoFlags |= SDL_HWSURFACE;
-	else
-		SDL_videoFlags |= SDL_SWSURFACE;
-	if ( videoInf->blit_hw )
-		SDL_videoFlags |= SDL_HWACCEL;
+	SDL_videoFlags |= videoInf->hw_available ? SDL_HWSURFACE : SDL_SWSURFACE;
+	if (videoInf->blit_hw) SDL_videoFlags |= SDL_HWACCEL;
 #endif
-	if ( fullscreen )
-		SDL_videoFlags |= SDL_FULLSCREEN;
+	if (fullscreen) SDL_videoFlags |= SDL_FULLSCREEN;
 	screen = SDL_SetVideoMode(width, height, videoInf->vfmt->BitsPerPixel, SDL_videoFlags );
 
 #ifdef USE_OPENGL
@@ -54,20 +44,20 @@ SDL_Surface * CVideoDriver::init(int width, int height, int fullscreen)
 	return screen;
 }
 
-void CVideoDriver::blank( void )
+void CVideoDriver::blank()
 {
 #ifdef USE_OPENGL
-	glViewport (0, 0, screen->w, screen->h);
-	glMatrixMode (GL_PROJECTION);
-	glLoadIdentity ();
-	glOrtho (0.0f, screen->w, screen->h, 0.0f, -1.0f, 1.0f);
-	glClear (GL_COLOR_BUFFER_BIT);
+	glViewport(0, 0, screen->w, screen->h);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0.0f, screen->w, screen->h, 0.0f, -1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
 #else
 	SDL_FillRect(screen,NULL,0xffffff);
 #endif
 }
 
-void CVideoDriver::swap( void )
+void CVideoDriver::swap()
 {
 #ifdef USE_OPENGL
 	SDL_GL_SwapBuffers();
@@ -81,79 +71,79 @@ unsigned int CVideoDriver::initSurface(SDL_Surface * _surf)
 {
 	unsigned int texture;
 #ifdef USE_OPENGL
-	SDL_GL::initTexture (_surf->w,_surf->h, &texture, GL_BGRA);
+	SDL_GL::initTexture (_surf->w,_surf->h, &texture, GL_RGBA);
 #else
 	texture = 0;
 #endif
 	surface_list.push_back(_surf);
 	texture_list.push_back(texture);
 	cairo_list.push_back(NULL);
-        return surface_list.size()-1;
+	return surface_list.size()-1;
 }
 
 unsigned int CVideoDriver::initSurface(cairo_surface_t * _surf)
 {
 	unsigned int texture;
 #ifdef USE_OPENGL
-	SDL_GL::initTexture (cairo_image_surface_get_width(_surf),cairo_image_surface_get_height(_surf), &texture, GL_BGRA);
+	SDL_GL::initTexture (cairo_image_surface_get_width(_surf),cairo_image_surface_get_height(_surf), &texture, GL_RGBA);
 #else
 	texture = 0;
 #endif
 	surface_list.push_back(NULL);
 	texture_list.push_back(texture);
 	cairo_list.push_back(_surf);
-        return surface_list.size()-1;
+	return surface_list.size()-1;
 }
 
 void CVideoDriver::updateSurface(unsigned int _id, SDL_Surface * _surf) {
 #ifdef USE_OPENGL
-        surface_list[_id] = _surf;
-        cairo_list[_id] = NULL;
+	surface_list[_id] = _surf;
+	cairo_list[_id] = NULL;
 #else
-        if (_surf != NULL) {
-            surface_list[_id] = _surf;
-            cairo_list[_id] = NULL;
-        }
+	if (_surf != NULL) {
+		surface_list[_id] = _surf;
+		cairo_list[_id] = NULL;
+	}
 #endif
 }
 
 void CVideoDriver::updateSurface(unsigned int _id, cairo_surface_t * _surf) {
 #ifdef USE_OPENGL
-        cairo_list[_id] = _surf;
-        surface_list[_id] = NULL;
+	cairo_list[_id] = _surf;
+	surface_list[_id] = NULL;
 #else
-        if (_surf != NULL) {
-            cairo_list[_id] = _surf;
-            surface_list[_id] = NULL;
-        }
+	if (_surf != NULL) {
+		cairo_list[_id] = _surf;
+		surface_list[_id] = NULL;
+	}
 #endif
 }
 
-void CVideoDriver::drawSurface(unsigned int _id, int _x, int _y)
+void CVideoDriver::drawSurface(unsigned int _id, int _x, int _y) // Used for lyrics and pitch bars
 {
 #ifdef USE_OPENGL
-        if (cairo_list[_id] != NULL) {
-            int w = cairo_image_surface_get_width(cairo_list[_id]);
-            int h = cairo_image_surface_get_height(cairo_list[_id]);
-	    SDL_GL::draw_func(w,h,cairo_image_surface_get_data(cairo_list[_id]),texture_list[_id], GL_BGRA, _x, _y);
-        } else if (surface_list[_id] != NULL)
-            SDL_GL::draw_func(surface_list[_id]->w,surface_list[_id]->h,(unsigned char*)surface_list[_id]->pixels,texture_list[_id], GL_BGRA, _x, _y);
-        else
-            SDL_GL::draw_func(screen->w,screen->h,NULL,texture_list[_id], GL_BGRA, _x, _y);
+	if (cairo_list[_id] != NULL) {
+		int w = cairo_image_surface_get_width(cairo_list[_id]);
+		int h = cairo_image_surface_get_height(cairo_list[_id]);
+		SDL_GL::draw_func(w,h,cairo_image_surface_get_data(cairo_list[_id]),texture_list[_id], GL_BGRA, _x, _y);
+	} else if (surface_list[_id] != NULL)
+	  SDL_GL::draw_func(surface_list[_id]->w,surface_list[_id]->h,(unsigned char*)surface_list[_id]->pixels,texture_list[_id], GL_BGRA, _x, _y);
+	else
+	  SDL_GL::draw_func(screen->w,screen->h,NULL,texture_list[_id], GL_BGRA, _x, _y);
 #else
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
 	SDL_Rect position;
 	position.x=_x;
 	position.y=_y;
 	if (cairo_list[_id] != NULL) {
- 	    SDL_Surface * SDL_surf = CairoToSdl::BlitToSdl(cairo_list[_id]);
-	    SDL_BlitSurface(SDL_surf,NULL,sm->getSDLScreen(),&position);
+ 		SDL_Surface * SDL_surf = CairoToSdl::BlitToSdl(cairo_list[_id]);
+		SDL_BlitSurface(SDL_surf,NULL,sm->getSDLScreen(),&position);
 	} else if (surface_list[_id] != NULL)
-	    SDL_BlitSurface(surface_list[_id],NULL,sm->getSDLScreen(),&position);
+		SDL_BlitSurface(surface_list[_id],NULL,sm->getSDLScreen(),&position);
 #endif
 }
 
-void CVideoDriver::drawSurface(SDL_Surface* _surf, int _x, int _y)
+void CVideoDriver::drawSurface(SDL_Surface* _surf, int _x, int _y) // Used for rendering cover images
 {
 #ifdef USE_OPENGL
 	unsigned int texture;
@@ -168,7 +158,8 @@ void CVideoDriver::drawSurface(SDL_Surface* _surf, int _x, int _y)
 	SDL_BlitSurface(_surf,NULL,sm->getSDLScreen(),&position);
 #endif
 }
-void CVideoDriver::drawSurface(cairo_surface_t* _surf, int _x, int _y)
+
+void CVideoDriver::drawSurface(cairo_surface_t* _surf, int _x, int _y) // Used for some texts (song selector, grade)
 {
 #ifdef USE_OPENGL
 	unsigned int texture;

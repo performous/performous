@@ -65,7 +65,7 @@ void CScreenSongs::manageEvent(SDL_Event event) {
 	SDL_keysym keysym = event.key.keysym;
 	int key = keysym.sym;
 	SDLMod mod = event.key.keysym.mod;
-	if (key == SDLK_r && mod & KMOD_CTRL) songs.reload();
+	if (key == SDLK_r && mod & KMOD_CTRL) { songs.reload(); songs.setFilter(m_search); }
 	else if (key == SDLK_BACKSPACE && !m_search.empty()) { backspace(m_search); songs.setFilter(m_search); }
 	else if (m_search.size() < 100 && keysym.unicode >= 0x20 && (keysym.unicode < 0x7F || keysym.unicode >= 0xA0))
 	  songs.setFilter(m_search += utf8(keysym.unicode));

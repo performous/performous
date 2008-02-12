@@ -97,28 +97,9 @@ void CFfmpeg::close( void ) {
 	av_close_input_file(pFormatCtx);
 }
 
-#include <boost/thread/xtime.hpp>
+#include <xtime.h>
 #include <boost/thread/thread.hpp>
 #include <cmath>
-
-namespace {
-	boost::xtime& operator+=(boost::xtime& time, double seconds) {
-		double nsec = 1e9 * (time.sec + seconds) + time.nsec;
-		time.sec = boost::xtime::xtime_sec_t(nsec / 1e9);
-		time.nsec = boost::xtime::xtime_nsec_t(std::fmod(nsec, 1e9));
-		return time;
-	}
-	boost::xtime operator+(boost::xtime const& left, double seconds) {
-		boost::xtime time = left;
-		return time += seconds;
-	}
-	boost::xtime now() {
-		boost::xtime time;
-		boost::xtime_get(&time, boost::TIME_UTC);
-		return time;
-	}
-}
-
 
 void CFfmpeg::operator()() {
 	for(;;) {
