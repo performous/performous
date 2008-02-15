@@ -138,7 +138,9 @@ void CScreenSing::draw() {
 	std::string sentenceWhole = lyrics->getSentenceWhole();
 	// Draw the video
 	if (!video.isPlaying() && time > song.videoGap) video.play();
+#ifdef USE_OPENGL
 	glClear(GL_COLOR_BUFFER_BIT);
+#endif
 	if (video.isPlaying()) {
 		SDL_BlitSurface(videoSurf,NULL,backgroundSurf,NULL);
 		sm->getVideoDriver()->drawSurface(backgroundSurf);
