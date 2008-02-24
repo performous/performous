@@ -22,6 +22,8 @@ void CScreenSongs::enter() {
 	theme.reset(new CThemeSongs(m_width, m_height));
 	bg_texture = sm->getVideoDriver()->initSurface(theme->bg->getSDLSurface());
 	m_time = seconds(now());
+	m_search.clear();
+	sm->getSongs()->setFilter(m_search);
 }
 
 void CScreenSongs::exit() {

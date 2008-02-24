@@ -69,13 +69,13 @@ void CScreenSing::manageEvent(SDL_Event event) {
 		CScreenManager* sm = CScreenManager::getSingletonPtr();
 		CAudio& audio = *sm->getAudio();
 		int key = event.key.keysym.sym;
-		if (key == SDLK_ESCAPE || key == SDLK_q) sm->activateScreen(m_sentence.empty() ? "Score" : "Songs");
+		if (key == SDLK_ESCAPE || key == SDLK_q || (key == SDLK_RETURN && m_sentence.empty())) sm->activateScreen(m_sentence.empty() ? "Score" : "Songs");
 		else if (key == SDLK_SPACE || key == SDLK_PAUSE) sm->getAudio()->togglePause();
 		else if (key == SDLK_PLUS) playOffset += 0.02;
 		else if (key == SDLK_MINUS) playOffset -= 0.02;
 		else if (key == SDLK_HOME) audio.seek(-audio.getPosition());
 		else if (key == SDLK_RETURN && !m_sentence.empty()) {
-			double diff = m_sentence[0].begin - 1.0 - audio.getPosition();
+			double diff = m_sentence[0].begin - 3.0 - audio.getPosition();
 			if (diff > 0.0) audio.seek(diff);
 		}
 		else if (key == SDLK_LEFT) audio.seek(-5.0);
