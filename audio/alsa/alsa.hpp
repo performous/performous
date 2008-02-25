@@ -5,7 +5,7 @@
 
 @file alsa.hpp
 @brief An experimental low-level C++ API to ALSA.
-@version 0.4
+@version 0.5
 @author Lasse Kärkkäinen <tronic>
 @license GNU LGPL 2.1 or later
 
@@ -403,7 +403,6 @@ namespace alsa {
 		ALSA_HPP_RANGEVARDIR(period_size, snd_pcm_uframes_t)
 		ALSA_HPP_RANGEVARDIR(periods, unsigned int)
 		ALSA_HPP_RANGEVARDIR(buffer_time, unsigned int)
-		ALSA_HPP_RANGEVARDIR(tick_time, unsigned int)
 #undef ALSA_HPP_TEMPLATE
 #undef ALSA_HPP_CLASS
 	};
@@ -426,13 +425,12 @@ namespace alsa {
 		typedef snd_pcm_tstamp_t snd_pcm_tstamp_mode_t; // Workaround for inconsistent naming in asound
 		ALSA_HPP_ENUMVARMINIMAL(tstamp_mode)
 		// Simple variable functions
-		ALSA_HPP_VAR(sleep_min, unsigned int)
 		ALSA_HPP_VAR(avail_min, snd_pcm_uframes_t)
-		ALSA_HPP_VAR(xfer_align, snd_pcm_uframes_t)
 		ALSA_HPP_VAR(start_threshold, snd_pcm_uframes_t)
 		ALSA_HPP_VAR(stop_threshold, snd_pcm_uframes_t)
 		ALSA_HPP_VAR(silence_threshold, snd_pcm_uframes_t)
 		ALSA_HPP_VAR(silence_size, snd_pcm_uframes_t)
+		ALSA_HPP_VAR(tstamp_mode, snd_pcm_tstamp_t)
 		// Get-only variable
 		ALSA_HPP_VARGET(boundary, snd_pcm_uframes_t)
 #undef ALSA_HPP_TEMPLATE
