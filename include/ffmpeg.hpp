@@ -1,8 +1,8 @@
 #ifndef __FFMEG_HPP__
 #define __FFMEG_HPP__
 
-#include "../config.h"
-
+#include <ffmpeg/avformat.h>
+#include <ffmpeg/swscale.h>
 #include <queue>
 
 class AudioFrame {
