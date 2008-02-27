@@ -18,7 +18,11 @@ CScreenSongs::CScreenSongs(std::string const& name, unsigned int width, unsigned
 
 void CScreenSongs::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
-	sm->getAudio()->stopMusic();
+	CAudio& audio = *sm->getAudio();
+	audio.stopMusic();
+	static unsigned int m_volume;
+	m_volume = audio.getVolume();
+	audio.setVolume(m_volume);
 	theme.reset(new CThemeSongs(m_width, m_height));
 	bg_texture = sm->getVideoDriver()->initSurface(theme->bg->getSDLSurface());
 	m_time = seconds(now());
@@ -67,13 +71,11 @@ void CScreenSongs::manageEvent(SDL_Event event) {
 	SDL_keysym keysym = event.key.keysym;
 	int key = keysym.sym;
 	SDLMod mod = event.key.keysym.mod;
-	if (key == SDLK_r && mod & KMOD_CTRL) { songs.reload(); songs.setFilter(m_search); }
-	else if (key == SDLK_BACKSPACE && !m_search.empty()) { backspace(m_search); songs.setFilter(m_search); }
-	else if (m_search.size() < 100 && keysym.unicode >= 0x20 && (keysym.unicode < 0x7F || keysym.unicode >= 0xA0))
-	  songs.setFilter(m_search += utf8(keysym.unicode));
+	if (key == SDLK_r && mod & KMOD_CTRL) { songs.reload(); songs.setFilter(m_search.text); }
+	if (m_search.process(keysym)) songs.setFilter(m_search.text);
 	else if (key == SDLK_ESCAPE) {
-		if (m_search.empty()) sm->activateScreen("Intro");
-		else { m_search.clear(); songs.setFilter(m_search); }
+		if (m_search.text.empty()) sm->activateScreen("Intro");
+		else { m_search.text.clear(); songs.setFilter(m_search.text); }
 	}
 	// The rest are only available when there are songs available
 	else if (songs.empty()) return;
@@ -105,7 +107,7 @@ void CScreenSongs::draw() {
 	Songs& songs = *sm->getSongs();
 	theme->theme->clear();
 	// Draw the "Order by" text
-	print(theme.get(), theme->order, (m_search.empty() ? songs.sortDesc() : m_search));
+	print(theme.get(), theme->order, (m_search.text.empty() ? songs.sortDesc() : m_search.text));
 	sm->getVideoDriver()->drawSurface(bg_texture);
 	// Test if there are no songs
 	if (songs.empty()) {
@@ -147,7 +149,7 @@ void CScreenSongs::draw() {
 	sm->getVideoDriver()->drawSurface(theme->theme->getCurrent());
 	if (!audio.isPaused() && seconds(now()) - m_time > IDLE_TIMEOUT) {
 		m_time = seconds(now());
-		if (!m_search.empty()) { m_search.clear(); songs.setFilter(m_search); }
+		if (!m_search.text.empty()) { m_search.text.clear(); songs.setFilter(m_search.text); }
 		songs.random();
 	}
 }

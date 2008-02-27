@@ -1,6 +1,7 @@
 #ifndef __SCREENSONGS_H__
 #define __SCREENSONGS_H__
 
+#include <textinput.h>
 #include <boost/scoped_ptr.hpp>
 #include <screen.h>
 #include <sdl_helper.h>
@@ -19,7 +20,7 @@ class CScreenSongs : public CScreen {
 	double m_time;
 	std::string m_cover;
 	std::string m_playing;
-	std::string m_search;
+	TextInput m_search;
 	unsigned int bg_texture;
 	SDLSurf m_emptyCover;
 	SDLSurf m_currentCover;
