@@ -26,41 +26,14 @@ void CScreenSongs::enter() {
 	theme.reset(new CThemeSongs(m_width, m_height));
 	bg_texture = sm->getVideoDriver()->initSurface(theme->bg->getSDLSurface());
 	m_time = seconds(now());
-	m_search.clear();
-	sm->getSongs()->setFilter(m_search);
+	m_search.text.clear();
+	sm->getSongs()->setFilter(m_search.text);
 }
 
 void CScreenSongs::exit() {
 	m_cover.clear();
 	m_playing.clear();
 	theme.reset();
-}
-
-namespace {
-	std::string utf8(unsigned int ucs) {
-		std::string utf8;
-		if (ucs < 0x80) {
-			utf8 += ucs;
-		} else if (ucs < 0x800) {
-			utf8 += 0xC0 | (ucs >> 6);
-			utf8 += 0x80 | ucs & 0x3F;
-		} else if (ucs < 0x10000) {
-			utf8 += 0xE0 | (ucs >> 12);
-			utf8 += 0x80 | (ucs >> 6) & 0x3F;
-			utf8 += 0x80 | ucs & 0x3F;
-		} else {
-			utf8 += 0xF0 | (ucs >> 18);
-			utf8 += 0x80 | (ucs >> 12) & 0x3F;
-			utf8 += 0x80 | (ucs >> 6) & 0x3F;
-			utf8 += 0x80 | ucs & 0x3F;
-		}
-		return utf8;
-	}
-	void backspace(std::string& str) {
-		std::string::size_type pos = str.size() - 1;
-		while ((str[pos] & 0xC0) == 0x80) --pos;
-		str.erase(pos);
-	}
 }
 
 void CScreenSongs::manageEvent(SDL_Event event) {
