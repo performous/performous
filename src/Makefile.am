@@ -19,10 +19,11 @@ ultrastarng_SOURCES = main.cpp \
 	cairosvg.cpp \
 	theme.cpp \
 	sdl_gl.cpp \
+	ffmpeg.cpp \
 	video_driver.cpp
 
 INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/audio\
-	-O2 -Wall -Wextra -Wshadow \
+	-O2 -Wall -Wextra -Wshadow -D__STDC_CONSTANT_MACROS\
 	@CAIRO_FLAGS@ @XML_FLAGS@ @SDL_FLAGS@ \
 	@VIDEO_FLAGS@ @SVG_FLAGS@ @AUDIO_FLAGS@ @PANGOCAIRO_FLAGS@\
 	-DTHEMES_DIR="\"@THEMES_DIR@\"" -DDATA_DIR="\"@DATA_DIR@\""

@@ -1,11 +1,7 @@
 #ifndef __FFMEG_HPP__
 #define __FFMEG_HPP__
 
-extern "C" {
-	#define __STDC_CONSTANT_MACROS 
-	#include <ffmpeg/avcodec.h>
-	#include <ffmpeg/avformat.h>
-}
+#include "../config.h"
 
 #include <queue>
 
@@ -21,10 +17,12 @@ class AudioFrame {
 class VideoFrame {
 	public:
 		VideoFrame() {};
-		~VideoFrame() {av_free(frame);};
-		AVFrame * frame;
+		~VideoFrame() {delete[] buffer;};
 		float timestamp;
+		uint8_t *buffer; 
 		unsigned long bufferSize;
+		int width;
+		int height;
 };
 
 class videoFifo {
@@ -33,10 +31,11 @@ class videoFifo {
 		~videoFifo() {};
 		VideoFrame& operator*() { return *queue.front();};
 		VideoFrame* operator->() { return queue.front();};
-		videoFifo& operator++() { queue.pop(); return *this; };
+		videoFifo& operator++() { delete queue.front();queue.pop(); return *this; };
 		const unsigned int size() {return queue.size();};
 		const bool isFull() { return (size() >= 10);};
 		void push(VideoFrame* f) {queue.push(f);};
+		VideoFrame* front() { return queue.front();};
 	private:
 		std::queue<VideoFrame*> queue;
 };
@@ -48,13 +47,14 @@ class audioFifo {
 		const unsigned int size() {return queue.size();};
 		const bool isFull() { return (size() >= 10);};
 		void push(AudioFrame* f) {queue.push(f);};
-		unsigned long copypop(void * buffer, unsigned long size, unsigned char channels, float * timestamp=NULL, bool blocking=false) {
+		unsigned long copypop(void * buffer, unsigned long _size, unsigned char channels, float * timestamp=NULL, bool blocking=false) {
+			blocking=blocking;
 			if( this->size() == 0 ) {
 				if( timestamp != NULL )
 					*timestamp = -1;
-				memset(buffer,0x00, channels * size * sizeof(short));
+				memset(buffer,0x00, channels * _size * sizeof(short));
 				std::cerr << "Empty audio queue" << std::endl;
-				return size;
+				return _size;
 			}
 			AudioFrame * tmp = queue.front();
 
@@ -63,19 +63,19 @@ class audioFifo {
 
 			unsigned long currentBufferPosition = currentFramePosition * channels;
 
-			if( size == 0 || (tmp->nbFrames - currentFramePosition) == size ) {
+			if( _size == 0 || (tmp->nbFrames - currentFramePosition) == _size ) {
 				// Fill the output buffer with the rest of the current frame
-				if( size == 0 )
+				if( _size == 0 )
 					memcpy(buffer, tmp->frame+currentBufferPosition, channels * (tmp->nbFrames - currentFramePosition) * sizeof(short));
 				else
-					memcpy(buffer, tmp->frame+currentBufferPosition, channels * size * sizeof(short));
+					memcpy(buffer, tmp->frame+currentBufferPosition, channels * _size * sizeof(short));
 				queue.pop();
-				return size;
-			} else if( tmp->nbFrames - currentFramePosition > size ) {
-				memcpy(buffer, tmp->frame+currentBufferPosition, channels * size * sizeof(int16_t));
-				currentFramePosition+=size;
-				return size;
-			} else if( tmp->nbFrames - currentFramePosition < size ) {
+				return _size;
+			} else if( tmp->nbFrames - currentFramePosition > _size ) {
+				memcpy(buffer, tmp->frame+currentBufferPosition, channels * _size * sizeof(int16_t));
+				currentFramePosition+=_size;
+				return _size;
+			} else if( tmp->nbFrames - currentFramePosition < _size ) {
 				unsigned long result = (tmp->nbFrames - currentFramePosition);
 				memcpy(buffer, tmp->frame+currentBufferPosition, channels * (tmp->nbFrames - currentFramePosition) * sizeof(int16_t));
 				currentFramePosition=0;
@@ -97,7 +97,7 @@ class CFfmpeg {
 	public:
 		CFfmpeg(bool decodeVideo=false, bool decodeAudio=false);
 		~CFfmpeg();
-		bool open( const char * _filename );
+		void open( const char * _filename, double _width=0, double _height=0 );
 		void close( void );
 		void decodeNextFrame(void);
 		void operator()(); // Thread runs here, don't call directly
@@ -105,6 +105,10 @@ class CFfmpeg {
 			boost::mutex::scoped_lock l(m_mutex);
 			m_type = STOP;
 			m_cond.notify_one();
+		}
+		bool isPlaying() {
+			boost::mutex::scoped_lock l(m_mutex);
+			return m_type == PLAY;
 		}
 		void start() {
 			boost::mutex::scoped_lock l(m_mutex);
@@ -134,6 +138,8 @@ class CFfmpeg {
 		int             audioStream;
 		bool            decodeVideo;
 		bool            decodeAudio;
+		double		width;
+		double		height;
 };
 
 #endif

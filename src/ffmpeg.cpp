@@ -20,12 +20,14 @@ CFfmpeg::~CFfmpeg() {
 	m_thread->join();
 }
 
-bool CFfmpeg::open( const char * _filename ) {
+void CFfmpeg::open( const char * _filename, double _width, double _height ) {
 	if(av_open_input_file(&pFormatCtx, _filename, NULL, 0, NULL)!=0)
-		return false;
+		throw std::runtime_error("Cannot open input file");
 	if(av_find_stream_info(pFormatCtx)<0)
-		return false;
+		throw std::runtime_error("Cannot find stream informations");
 
+	width = _width;
+	height = _height;
 #ifdef DEBUG
 	dump_format(pFormatCtx, 0, _filename, false);
 	std::cerr << "Decode Video: " << decodeVideo << std::endl;
@@ -35,14 +37,14 @@ bool CFfmpeg::open( const char * _filename ) {
 	videoStream=-1;
 	audioStream=-1;
 	// Take the first video stream
-	for(int i=0; i<pFormatCtx->nb_streams; i++) {
+	for(unsigned int i=0; i<pFormatCtx->nb_streams; i++) {
 		if(pFormatCtx->streams[i]->codec->codec_type==CODEC_TYPE_VIDEO) {
 			videoStream=i;
 			break;
 		}
 	}
 	// Take the first audio stream
-	for(int i=0; i<pFormatCtx->nb_streams; i++) {
+	for(unsigned int i=0; i<pFormatCtx->nb_streams; i++) {
 		if(pFormatCtx->streams[i]->codec->codec_type==CODEC_TYPE_AUDIO) {
 			audioStream=i;
 			break;
@@ -59,6 +61,8 @@ bool CFfmpeg::open( const char * _filename ) {
 				pVideoCodecCtx->flags|=CODEC_FLAG_TRUNCATED;
 			if(avcodec_open(pVideoCodecCtx, pVideoCodec)<0)
 				throw std::runtime_error("Cannot open video stream");
+			if( width == 0 ) width = pVideoCodecCtx->width;
+			if( height == 0 ) height = pVideoCodecCtx->height;
 		}
 	} catch (std::runtime_error& e) {
 		// TODO: clean memory
@@ -161,17 +165,38 @@ void CFfmpeg::decodeNextFrame( void ) {
 			if(frameFinished) {
 				float time;
 
-				if( packet.pts != AV_NOPTS_VALUE ) {
+				if( (uint64_t)packet.pts != AV_NOPTS_VALUE ) {
 					time = av_q2d(pFormatCtx->streams[videoStream]->time_base) * packet.pts;
-				} else if( packet.dts != AV_NOPTS_VALUE ) {
+				} else if( (uint64_t)packet.dts != AV_NOPTS_VALUE ) {
 					time = av_q2d(pFormatCtx->streams[videoStream]->time_base) * packet.dts;
 				} else {
 					time = 0.0;
 				}
 
+				AVFrame * videoFrameRGB = avcodec_alloc_frame();
+				int numBytes=avpicture_get_size(PIX_FMT_RGB24, width, height);
+				uint8_t *buffer=new uint8_t[numBytes];
+				avpicture_fill((AVPicture *)videoFrameRGB,buffer,PIX_FMT_RGB24,width, height);
+				static struct SwsContext *img_convert_ctx;
+				if(img_convert_ctx == NULL) {
+					int w = pVideoCodecCtx->width;
+					int h = pVideoCodecCtx->height;
+					img_convert_ctx = sws_getContext(
+						w, h, pVideoCodecCtx->pix_fmt,
+						width, height, PIX_FMT_RGB24,
+						SWS_BICUBIC, NULL,NULL,NULL);
+				}
+				sws_scale(img_convert_ctx, videoFrame->data, videoFrame->linesize, 0, pVideoCodecCtx->height,
+					videoFrameRGB->data,videoFrameRGB->linesize);
+				av_free(videoFrame);
+				av_free(videoFrameRGB);
+
+
 				VideoFrame * tmp = new VideoFrame();
-				tmp->frame = videoFrame;
-				tmp->bufferSize = 0;
+				tmp->buffer = buffer;
+				tmp->bufferSize = numBytes;
+				tmp->height = pVideoCodecCtx->height;
+				tmp->width = pVideoCodecCtx->width;
 				tmp->timestamp = time;
 				videoQueue.push(tmp);
 
@@ -191,6 +216,7 @@ void CFfmpeg::decodeNextFrame( void ) {
 			if( outsize == 0 ) {
 				av_free_packet(&packet);
 				delete[] audioFrames;
+				std::cout << "Empty audio frame" << std::endl;
 				return;
 			}
 
@@ -200,9 +226,9 @@ void CFfmpeg::decodeNextFrame( void ) {
 				throw std::runtime_error("cannot decode audio frame");
 			}
 
-			if( packet.pts != AV_NOPTS_VALUE ) {
+			if( (uint64_t)packet.pts != AV_NOPTS_VALUE ) {
 				time = av_q2d(pFormatCtx->streams[audioStream]->time_base) * packet.pts;
-			} else if( packet.dts != AV_NOPTS_VALUE ) {
+			} else if( (uint64_t)packet.dts != AV_NOPTS_VALUE ) {
 				time = av_q2d(pFormatCtx->streams[audioStream]->time_base) * packet.dts;
 			} else {
 				time = 0.0;
@@ -229,80 +255,3 @@ void CFfmpeg::decodeNextFrame( void ) {
 	return;
 }
 
-/*
- * For PA18:
- g++ -g -o test src/ffmpeg.cpp -Iinclude -DDEBUG -lavutil -lavformat -lavcodec -lboost_thread -lportaudio
- * For PA19:
- g++ -g -o test src/ffmpeg.cpp -Iinclude -DDEBUG -lavutil -lavformat -lavcodec -lboost_thread `pkg-config --cflags --libs portaudio-2.0`
-*/
-
-#include <portaudio.h>
-
-// Send number of channels through userdata, as well as the deocing audio
-static int c_callback(void*, void* output, unsigned long framesPerBuffer, PaTimestamp, void* userdata) {
-
-	audioFifo* audioQueue = static_cast<audioFifo*>(userdata);
-	unsigned long size = 0;
-	unsigned char channels = 2;
-	float timestamp;
-	while(size < framesPerBuffer) {
-		int16_t* buf = (int16_t*)output;
-		buf+=channels*size;
-		size+=audioQueue->copypop(buf, framesPerBuffer-size, channels,&timestamp);
-		std::cout << "Now playing @"<< timestamp << std::endl;
-	}
-	return 0;
-}
-
-int main(int argc, char** argv) {
-
-	if( argc != 2 ) {
-		std::cerr << "Usage: " << argv[0] << " video_file" << std::endl;
-		return EXIT_FAILURE;
-	}
-
-	PaError pa_err=Pa_Initialize();
-	if( pa_err != paNoError) {
-		std::cerr << "PortAudio error: " << Pa_GetErrorText(pa_err) << std::endl;
-		return EXIT_FAILURE;
-	}
-
-	// Choose to decode both audio and video
-	CFfmpeg test(false,true);
-	test.open(argv[1]);
-	boost::thread::sleep(now() + 0.5 );
-	test.start();
-
-
-	PaStream *stream;
-	pa_err = Pa_OpenStream(&stream, paNoDevice, 0, paInt16, NULL, \
-			Pa_GetDefaultOutputDeviceID(), \
-			2, paInt16, NULL, 48000, 1254, 0, 0, \
-			c_callback, &test.audioQueue);
-	if( pa_err != paNoError ) {
-		std::cerr << "PortAudio error: " << Pa_GetErrorText(pa_err) << std::endl;
-		return EXIT_FAILURE;
-	}
-	pa_err=Pa_StartStream(stream);
-	if( pa_err != paNoError ) {
-		std::cerr << "PortAudio error: " << Pa_GetErrorText(pa_err) << std::endl;
-		return EXIT_FAILURE;
-	}
-
-
-	boost::thread::sleep(now() + 100.0 );
-	test.close();
-	boost::thread::sleep(now() + 1.0 );
-
-	pa_err=Pa_CloseStream(stream);
-	if( pa_err != paNoError ) {
-		std::cerr << "PortAudio error: " << Pa_GetErrorText(pa_err) << std::endl;
-		return EXIT_FAILURE;
-	}
-	pa_err=Pa_Terminate();
-	if( pa_err != paNoError ) {
-		std::cerr << "PortAudio error: " << Pa_GetErrorText(pa_err) << std::endl;
-		return EXIT_FAILURE;
-	}
-	return EXIT_SUCCESS;
-}

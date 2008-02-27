@@ -59,7 +59,7 @@ AC_ARG_WITH(svg,
 if test $svg_layer = yes ; then svg_layer="librsvg" ; fi
 
 AC_ARG_WITH(video,
-	 AC_HELP_STRING(--with-video[={gstreamer|xine|smpeg|disable}],
+	 AC_HELP_STRING(--with-video[={ffmpeg|smpeg|disable}],
 	 	implementation of the video rendering layer [[[default=autodetect]]]),
 	[video_layer="$withval"],
 	[video_layer="autodetect"]
@@ -167,6 +167,8 @@ AC_CHECK_PROGS(SDLCONFIG, sdl-config, AC_MSG_ERROR(Cannot find sdl-config))
 # Record backend detection
 PKG_CHECK_MODULES(alsa, alsa , [record_alsa="yes"] , [record_alsa="no"])
 PKG_CHECK_MODULES(portAudioV19, portaudio-2.0 , [record_pa19="yes"] , [record_pa19="no"])
+
+PKG_CHECK_MODULES(ffmpeg, libavutil libavformat libavcodec libswscale, [ffmpeg_detected="yes"],[ffmpeg_detected="no"])
 
 saved_LIBS=$LIBS
 # Only detect pa18 if pa19 is not found (pa19 is detected as pa18 else)
@@ -331,16 +333,9 @@ AC_SUBST(RECORD_GST_LIBS)
 
 # Do things for video
 case $video_layer in
-	gstreamer*)
-		if test $gst_detected = yes ; then
-			video_layer="no"
-		else
-			video_layer="no"
-		fi
-		;;
-	xine*)
-		if test $xine_detected = yes ; then
-			video_layer="no"
+	ffmpeg*)
+		if test $ffmpeg_detected = yes ; then
+			video_layer="ffmpeg"
 		else
 			video_layer="no"
 		fi
@@ -361,24 +356,22 @@ case $video_layer in
 		;;
 esac
 case $video_layer in
-	gstreamer*)
-		VIDEO_FLAGS=`pkg-config --cflags gstreamer-0.10`
-		VIDEO_LIBS=`pkg-config --libs gstreamer-0.10`
+	ffmpeg*)
+		VIDEO_FLAGS=`pkg-config --cflags libavutil libavformat libavcodec libswscale`
+		VIDEO_LIBS=`pkg-config --libs libavutil libavformat libavcodec libswscale`
 		ac_includes_default=$(cat <<-USNG_EOF
 		$ac_includes_default
 		/* video headers */
-		#define USE_GSTREAMER_VIDEO 1
-		#include <gst/gst.h>
-		USNG_EOF)
-		;;
-	xine*)
-		VIDEO_FLAGS=`xine-config --cflags`
-		VIDEO_LIBS=`xine-config --libs`
-		ac_includes_default=$(cat <<-USNG_EOF
-		$ac_includes_default
-		/* video headers */
-		#define USE_LIBXINE_VIDEO 1
-		#include <xine.h>
+		#define USE_FFMPEG_VIDEO 1
+		#ifdef __cplusplus
+		extern \"C\" {
+		#endif
+		#include <ffmpeg/avcodec.h>
+		#include <ffmpeg/avformat.h>
+		#include <ffmpeg/swscale.h>
+		#ifdef __cplusplus
+		}
+		#endif
 		USNG_EOF)
 		;;
 	smpeg*)

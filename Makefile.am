@@ -21,6 +21,7 @@ includes = include/audio.h \
 	include/songs.h \
 	include/lyrics.h \
 	include/sdl_gl.h \
+	include/ffmpeg.hpp \
 	include/video_driver.h
 
 EXTRA_DIST = $(themesdef_DATA) $(themeslima_DATA) $(includes)
