@@ -49,23 +49,15 @@ void CVideo::unloadVideo() {
 
 void CVideo::update(double time) {
 #ifdef USE_FFMPEG_VIDEO
-	VideoFrame* fr=NULL;
 	while( mpeg->videoQueue.size() > 0 ) {
-		fr = mpeg->videoQueue.front();
-		if( fr->timestamp > time )
-			break;
-		else
-			++mpeg->videoQueue;
+		VideoFrame& fr = mpeg->videoQueue.front();
+		if (fr.timestamp > time) {
+			SDL_LockSurface(m_videoSurf);
+			memcpy(m_videoSurf->pixels, &fr.data[0], fr.data.size());
+			SDL_UnlockSurface(m_videoSurf);
+		}
+		++mpeg->videoQueue;
 	}
-
-	if( fr == NULL )
-		return;
-	else {
-		SDL_LockSurface( m_videoSurf );
-		memcpy( m_videoSurf->pixels, fr->buffer , fr->bufferSize);
-		SDL_UnlockSurface( m_videoSurf );
-	}
-	
 #endif
 #ifdef USE_SMPEG
 	return;

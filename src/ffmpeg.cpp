@@ -18,6 +18,15 @@ CFfmpeg::~CFfmpeg() {
 		m_cond.notify_all();
 	}
 	m_thread->join();
+	stop();
+	if( videoStream != -1 && decodeVideo ) {
+		avcodec_close(pVideoCodecCtx);
+	}
+	if( audioStream != -1 && decodeAudio ) {
+		avcodec_close(pAudioCodecCtx);
+		audio_resample_close(pResampleCtx);
+	}
+	av_close_input_file(pFormatCtx);
 }
 
 void CFfmpeg::open( const char * _filename, double _width, double _height ) {
@@ -89,16 +98,8 @@ void CFfmpeg::open( const char * _filename, double _width, double _height ) {
 	}
 }
 
-void CFfmpeg::close( void ) {
-	stop();
-	if( videoStream != -1 && decodeVideo ) {
-		avcodec_close(pVideoCodecCtx);
-	}
-	if( audioStream != -1 && decodeAudio ) {
-		avcodec_close(pAudioCodecCtx);
-		audio_resample_close(pResampleCtx);
-	}
-	av_close_input_file(pFormatCtx);
+void CFfmpeg::close() {
+	// Contents moved to destructor for now (to avoid segfaults)
 }
 
 #include <xtime.h>
@@ -118,6 +119,7 @@ void CFfmpeg::operator()() {
 		}
 		// TODO: Here we wait if queues are full (video or audio)
 		// sleepd for 10ms
+		// FIXME: Use boost::condition for waiting instead of sleep
 		switch( type ) {
 			case STOP:
 				break;
@@ -141,11 +143,11 @@ void CFfmpeg::operator()() {
 	}
 }
 
-void CFfmpeg::decodeNextFrame( void ) {
+void CFfmpeg::decodeNextFrame() {
 	AVPacket packet;
 	int frameFinished=0;
 	bool newVideoFrame = true;
-	AVFrame * videoFrame;
+	AVFrame* videoFrame = NULL;
 
 	while(av_read_frame(pFormatCtx, &packet)>=0) {
 		if(packet.stream_index==videoStream && decodeVideo) {
@@ -175,8 +177,8 @@ void CFfmpeg::decodeNextFrame( void ) {
 
 				AVFrame * videoFrameRGB = avcodec_alloc_frame();
 				int numBytes=avpicture_get_size(PIX_FMT_RGB24, width, height);
-				uint8_t *buffer=new uint8_t[numBytes];
-				avpicture_fill((AVPicture *)videoFrameRGB,buffer,PIX_FMT_RGB24,width, height);
+				std::vector<uint8_t> buffer(numBytes);
+				avpicture_fill((AVPicture *)videoFrameRGB, &buffer[0], PIX_FMT_RGB24, width, height);
 				static struct SwsContext *img_convert_ctx;
 				if(img_convert_ctx == NULL) {
 					int w = pVideoCodecCtx->width;
@@ -187,14 +189,13 @@ void CFfmpeg::decodeNextFrame( void ) {
 						SWS_BICUBIC, NULL,NULL,NULL);
 				}
 				sws_scale(img_convert_ctx, videoFrame->data, videoFrame->linesize, 0, pVideoCodecCtx->height,
-					videoFrameRGB->data,videoFrameRGB->linesize);
+				videoFrameRGB->data,videoFrameRGB->linesize);
 				av_free(videoFrame);
 				av_free(videoFrameRGB);
 
 
 				VideoFrame * tmp = new VideoFrame();
-				tmp->buffer = buffer;
-				tmp->bufferSize = numBytes;
+				tmp->data.swap(buffer);
 				tmp->height = pVideoCodecCtx->height;
 				tmp->width = pVideoCodecCtx->width;
 				tmp->timestamp = time;
@@ -204,9 +205,9 @@ void CFfmpeg::decodeNextFrame( void ) {
 				return;
 			}
 
-			av_free_packet(&packet);
+			av_free_packet(&packet); // TODO: This is repeated in every branch of execution, so it clearly needs RAII wrapping
 		} else if(packet.stream_index==audioStream && decodeAudio) {
-			int16_t * audioFrames = new int16_t[AVCODEC_MAX_AUDIO_FRAME_SIZE];
+			int16_t audioFrames[AVCODEC_MAX_AUDIO_FRAME_SIZE];
 			int outsize = AVCODEC_MAX_AUDIO_FRAME_SIZE*sizeof(int16_t);
 			float time;
 
@@ -215,14 +216,12 @@ void CFfmpeg::decodeNextFrame( void ) {
 			// No data decoded
 			if( outsize == 0 ) {
 				av_free_packet(&packet);
-				delete[] audioFrames;
 				std::cout << "Empty audio frame" << std::endl;
 				return;
 			}
 
 			if( decodeSize < 0 ) {
 				av_free_packet(&packet);
-				delete[] audioFrames;
 				throw std::runtime_error("cannot decode audio frame");
 			}
 
@@ -234,14 +233,14 @@ void CFfmpeg::decodeNextFrame( void ) {
 				time = 0.0;
 			}
 
-			int16_t * audioFramesResampled = new int16_t[AVCODEC_MAX_AUDIO_FRAME_SIZE];
-			int nb_sample = audio_resample(pResampleCtx, audioFramesResampled, audioFrames, outsize/(pAudioCodecCtx->channels*2));
-			delete[] audioFrames;
+			std::vector<int16_t> audioFramesResampled(AVCODEC_MAX_AUDIO_FRAME_SIZE);
+			int nb_sample = audio_resample(pResampleCtx, &audioFramesResampled[0], audioFrames, outsize/(pAudioCodecCtx->channels*2));
 
-			AudioFrame * tmp = new AudioFrame();
-			tmp->frame = audioFramesResampled;
+			audioFramesResampled.resize(nb_sample);
+
+			AudioFrame* tmp = new AudioFrame();
+			tmp->data.swap(audioFramesResampled);
 			tmp->timestamp = time;
-			tmp->nbFrames = nb_sample;
 			audioQueue.push(tmp);
 
 			av_free_packet(&packet);
