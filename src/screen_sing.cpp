@@ -30,11 +30,10 @@ void CScreenSing::enter() {
 		std::string file = song.path + song.video;
 		std::cout << "Now playing: " << file << std::endl;
 		video_ok = video.loadVideo(file, videoSurf, m_width, m_height);
-		if(video_ok && song.videoGap < 0) {
-			video.seek(-1*song.videoGap);
-		}
 	}
-	if (!video_ok) {
+	if (video_ok) {
+		video.play();
+	} else {
 		SDLSurf bg(song.path + song.background, sm->getWidth(), sm->getHeight());
 		if (bg) SDL_BlitSurface(bg, NULL, backgroundSurf, NULL);
 	}
@@ -136,8 +135,6 @@ void CScreenSing::draw() {
 	std::string sentenceNow = lyrics->getSentenceNow();
 	std::string sentenceFuture = lyrics->getSentenceFuture();
 	std::string sentenceWhole = lyrics->getSentenceWhole();
-	// Draw the video
-	if (!video.isPlaying() && time > song.videoGap) video.play();
 #ifdef USE_OPENGL
 	glClear(GL_COLOR_BUFFER_BIT);
 #endif

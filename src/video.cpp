@@ -33,14 +33,14 @@ void CVideo::unloadVideo() {
 
 void CVideo::update(double time) {
 #ifdef USE_FFMPEG_VIDEO
-	while( mpeg->videoQueue.size() > 0 ) {
+	if (mpeg->videoQueue.size() > 0) {
 		VideoFrame& fr = mpeg->videoQueue.front();
-		if (fr.timestamp > time) {
+		if (fr.timestamp <= time) {
 			SDL_LockSurface(m_videoSurf);
 			memcpy(m_videoSurf->pixels, &fr.data[0], fr.data.size());
 			SDL_UnlockSurface(m_videoSurf);
+			++mpeg->videoQueue;
 		}
-		++mpeg->videoQueue;
 	}
 #endif
 #ifdef USE_SMPEG
