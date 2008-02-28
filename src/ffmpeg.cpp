@@ -88,6 +88,13 @@ void CFfmpeg::open( const char * _filename, double _width, double _height ) {
 		std::cerr << "Failed to load audio (" <<  e.what() << ")" <<std::endl;
 		audioStream = -1;
 	}
+	// Setup software scaling context
+	int w = pVideoCodecCtx->width;
+	int h = pVideoCodecCtx->height;
+	img_convert_ctx = sws_getContext(
+	  w, h, pVideoCodecCtx->pix_fmt,
+	  width, height, PIX_FMT_RGB32,
+	  SWS_BICUBIC, NULL, NULL, NULL);
 }
 
 void CFfmpeg::close() {
@@ -175,29 +182,18 @@ void CFfmpeg::decodeNextFrame() {
 					time = 0.0;
 				}
 
-				AVFrame * videoFrameRGB = avcodec_alloc_frame();
-				int numBytes=avpicture_get_size(PIX_FMT_RGB24, width, height);
-				std::vector<uint8_t> buffer(numBytes);
-				avpicture_fill((AVPicture *)videoFrameRGB, &buffer[0], PIX_FMT_RGB24, width, height);
-				static struct SwsContext *img_convert_ctx;
-				if(img_convert_ctx == NULL) {
-					int w = pVideoCodecCtx->width;
-					int h = pVideoCodecCtx->height;
-					img_convert_ctx = sws_getContext(
-						w, h, pVideoCodecCtx->pix_fmt,
-						width, height, PIX_FMT_RGB24,
-						SWS_BICUBIC, NULL,NULL,NULL);
+				std::vector<uint8_t> buffer(width * height * 4);
+				{
+					uint8_t* data[] = { &buffer[0] };
+					int linesize[] = { width * 4 };
+					sws_scale(img_convert_ctx, videoFrame->data, videoFrame->linesize, 0, pVideoCodecCtx->height,
+					  data, linesize);
+					av_free(videoFrame);
 				}
-				sws_scale(img_convert_ctx, videoFrame->data, videoFrame->linesize, 0, pVideoCodecCtx->height,
-				videoFrameRGB->data,videoFrameRGB->linesize);
-				av_free(videoFrame);
-				av_free(videoFrameRGB);
-
-
 				VideoFrame * tmp = new VideoFrame();
 				tmp->data.swap(buffer);
-				tmp->height = pVideoCodecCtx->height;
-				tmp->width = pVideoCodecCtx->width;
+				tmp->height = height;
+				tmp->width = width;
 				tmp->timestamp = time;
 				videoQueue.push(tmp);
 

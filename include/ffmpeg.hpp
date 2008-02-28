@@ -120,6 +120,7 @@ class CFfmpeg {
 
 	AVFormatContext* pFormatCtx;
 	ReSampleContext* pResampleCtx;
+	SwsContext* img_convert_ctx;
 
 	AVCodecContext* pVideoCodecCtx;
 	AVCodecContext* pAudioCodecCtx;

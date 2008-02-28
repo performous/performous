@@ -140,8 +140,7 @@ void CScreenSing::draw() {
 #endif
 	if (video.isPlaying()) {
 		video.update(time - song.videoGap);
-		SDL_BlitSurface(videoSurf,NULL,backgroundSurf,NULL);
-		sm->getVideoDriver()->drawSurface(backgroundSurf);
+		sm->getVideoDriver()->drawSurface(videoSurf);
 //		sm->getVideoDriver()->drawSurface(theme->bg->getSDLSurface());
 //		sm->getVideoDriver()->drawSurface(theme->p1box->getSDLSurface());
 	} else {
