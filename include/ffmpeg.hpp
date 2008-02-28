@@ -88,10 +88,8 @@ class AudioFifo {
 
 class CFfmpeg {
   public:
-	CFfmpeg(bool decodeVideo=false, bool decodeAudio=false);
+	CFfmpeg(bool decodeVideo, bool decodeAudio, std::string const& file, double width, double height);
 	~CFfmpeg();
-	void open(const char * _filename, double _width=0, double _height=0);
-	void close();
 	void decodeNextFrame();
 	void operator()(); // Thread runs here, don't call directly
 	void stop() {
@@ -111,6 +109,8 @@ class CFfmpeg {
 	VideoFifo  videoQueue;
 	AudioFifo  audioQueue;
   private:
+	void open(const char * _filename, double _width=0, double _height=0);
+	void close();
 	enum Type { STOP, PLAY, SEEK, PAUSE, QUIT } m_type;
 	boost::mutex m_mutex;
 	boost::condition m_cond;

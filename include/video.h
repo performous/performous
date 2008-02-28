@@ -11,7 +11,7 @@
 class CVideo {
   public:
 	CVideo();
-	~CVideo();
+	~CVideo() { unloadVideo(); }
 	bool loadVideo(std::string const& videoFile, SDL_Surface* videoSurf, int width, int height );
 	void unloadVideo();
 	bool isPlaying();

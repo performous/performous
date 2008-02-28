@@ -1,20 +1,6 @@
 #include <video.h>
 
-CVideo::CVideo() {
-#ifdef USE_SMPEG
-	mpeg=NULL;
-#endif
-#ifdef USE_FFMPEG_VIDEO
-	mpeg = new CFfmpeg(true,false);
-#endif
-}
-
-CVideo::~CVideo() {
-	unloadVideo();
-#ifdef USE_FFMPEG_VIDEO
-	delete mpeg;
-#endif
-}
+CVideo::CVideo(): mpeg() {}
 
 bool CVideo::isPlaying() {
 #ifdef USE_SMPEG
@@ -37,14 +23,12 @@ void CVideo::play() {
 
 void CVideo::unloadVideo() {
 #ifdef USE_FFMPEG_VIDEO
-	if (mpeg) mpeg->close();
+	if (mpeg) delete mpeg;
 #endif
 #ifdef USE_SMPEG
-	if (mpeg) {
-		SMPEG_delete(mpeg);
-		mpeg=NULL;
-	}
+	if (mpeg) SMPEG_delete(mpeg);
 #endif
+	mpeg = NULL;
 }
 
 void CVideo::update(double time) {
@@ -65,13 +49,13 @@ void CVideo::update(double time) {
 }
 
 bool CVideo::loadVideo(std::string const& _videoFile, SDL_Surface* _videoSurf, int _width , int _height) {
+	unloadVideo();
 #ifdef USE_FFMPEG_VIDEO
-	mpeg->open(_videoFile.c_str(), _width, _height);
+	mpeg = new CFfmpeg(true, false, _videoFile, _width, _height);
 	m_videoSurf = _videoSurf;
 	return true;
 #endif
 #ifdef USE_SMPEG
-	unloadVideo();
 	mpeg = SMPEG_new(_videoFile.c_str(), &info, 0);
 	if(SMPEG_error(mpeg)) {
 		fprintf(stderr, "SMPEG error: %s\n", SMPEG_error(mpeg));

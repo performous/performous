@@ -2,12 +2,13 @@
 #include <stdexcept>
 #include <iostream>
 
-CFfmpeg::CFfmpeg(bool _decodeVideo, bool _decodeAudio) : m_type() {
+CFfmpeg::CFfmpeg(bool _decodeVideo, bool _decodeAudio, std::string const& _filename, double _width, double _height) : m_type() {
 	av_register_all();
 	videoStream=-1;
 	audioStream=-1;
 	decodeVideo=_decodeVideo;
 	decodeAudio=_decodeAudio;
+	open(_filename.c_str(), _width, _height);
 	m_thread.reset(new boost::thread(boost::ref(*this)));
 }
 
@@ -18,22 +19,13 @@ CFfmpeg::~CFfmpeg() {
 		m_cond.notify_all();
 	}
 	m_thread->join();
-	stop();
-	if( videoStream != -1 && decodeVideo ) {
-		avcodec_close(pVideoCodecCtx);
-	}
-	if( audioStream != -1 && decodeAudio ) {
-		avcodec_close(pAudioCodecCtx);
-		audio_resample_close(pResampleCtx);
-	}
-	av_close_input_file(pFormatCtx);
 }
 
 void CFfmpeg::open( const char * _filename, double _width, double _height ) {
-	if(av_open_input_file(&pFormatCtx, _filename, NULL, 0, NULL)!=0)
-		throw std::runtime_error("Cannot open input file");
-	if(av_find_stream_info(pFormatCtx)<0)
-		throw std::runtime_error("Cannot find stream informations");
+	if(av_open_input_file(&pFormatCtx, _filename, NULL, 0, NULL))
+	  throw std::runtime_error("Cannot open input file");
+	if(av_find_stream_info(pFormatCtx) < 0)
+	  throw std::runtime_error("Cannot find stream information");
 
 	width = _width;
 	height = _height;
@@ -99,7 +91,15 @@ void CFfmpeg::open( const char * _filename, double _width, double _height ) {
 }
 
 void CFfmpeg::close() {
-	// Contents moved to destructor for now (to avoid segfaults)
+	stop();
+	if( videoStream != -1 && decodeVideo ) {
+		avcodec_close(pVideoCodecCtx);
+	}
+	if( audioStream != -1 && decodeAudio ) {
+		avcodec_close(pAudioCodecCtx);
+		audio_resample_close(pResampleCtx);
+	}
+	av_close_input_file(pFormatCtx);
 }
 
 #include <xtime.h>
