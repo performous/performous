@@ -363,15 +363,6 @@ case $video_layer in
 		$ac_includes_default
 		/* video headers */
 		#define USE_FFMPEG_VIDEO 1
-		#ifdef __cplusplus
-		extern \"C\" {
-		#endif
-		#include <ffmpeg/avcodec.h>
-		#include <ffmpeg/avformat.h>
-		#include <ffmpeg/swscale.h>
-		#ifdef __cplusplus
-		}
-		#endif
 		USNG_EOF)
 		;;
 	smpeg*)

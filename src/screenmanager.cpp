@@ -18,7 +18,9 @@ CScreenManager::CScreenManager(unsigned int width, unsigned int height, std::str
   m_fullscreen(),
   m_width(width),
   m_height(height),
-  m_theme(theme)
+  m_theme(theme),
+  m_ingameVolume(100),
+  m_menuVolume(30)
 {}
 
 void CScreenManager::activateScreen(std::string const& name) {

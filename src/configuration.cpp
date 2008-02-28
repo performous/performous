@@ -16,8 +16,8 @@ void CConfigurationFullscreen::apply() {
 	}
 }
 
-CConfigurationAudioVolume::CConfigurationAudioVolume():
-  CConfiguration("Audio Volume"), m_volume(CScreenManager::getSingletonPtr()->getAudio()->getVolume())
+CConfigurationAudioVolume::CConfigurationAudioVolume(std::string const& title, unsigned int& volume):
+  CConfiguration(title), m_volume(volume)
 {}
 void CConfigurationAudioVolume::setNext() {
 	if (m_volume >= 100) return;
@@ -33,3 +33,4 @@ std::string CConfigurationAudioVolume::getValue() const {
 void CConfigurationAudioVolume::apply() {
 	CScreenManager::getSingletonPtr()->getAudio()->setVolume(m_volume);
 }
+

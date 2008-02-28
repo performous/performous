@@ -3,8 +3,10 @@
 CScreenConfiguration::CScreenConfiguration(std::string const& name, unsigned int width, unsigned int height):
   CScreen(name, width, height)
 {
+	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	configuration.push_back(new CConfigurationFullscreen());
-	configuration.push_back(new CConfigurationAudioVolume());
+	configuration.push_back(new CConfigurationAudioVolume("Ingame Audio Volume", sm->m_ingameVolume));
+	configuration.push_back(new CConfigurationAudioVolume("Menu Audio Volume", sm->m_menuVolume));
 	selected=0;
 }
 
@@ -20,7 +22,7 @@ void CScreenConfiguration::manageEvent(SDL_Event event) {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	if (event.type == SDL_KEYDOWN) {
 		int key = event.key.keysym.sym;
-		if (key == SDLK_ESCAPE || key == SDLK_q) CScreenManager::getSingletonPtr()->activateScreen("Intro");
+		if (key == SDLK_ESCAPE || key == SDLK_q) sm->activateScreen("Intro");
 		else if (key == SDLK_SPACE || key == SDLK_PAUSE) sm->getAudio()->togglePause();
 		else if (key == SDLK_UP && selected > 0) --selected;
 		else if (key == SDLK_DOWN && selected + 1 < configuration.size()) ++selected;
@@ -48,3 +50,4 @@ void CScreenConfiguration::draw() {
 	sm->getVideoDriver()->drawSurface(bg_texture);
 	sm->getVideoDriver()->drawSurface(theme->theme->getCurrent());
 }
+

@@ -74,6 +74,8 @@ class CScreenManager: public CSingleton <CScreenManager> {
 	unsigned int m_width;
 	unsigned int m_height;
 	std::string m_theme;
+  public:
+	unsigned int m_ingameVolume, m_menuVolume;
 };
 
 #endif

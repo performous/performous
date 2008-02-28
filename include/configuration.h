@@ -28,13 +28,13 @@ class CConfigurationFullscreen: public CConfiguration {
 
 class CConfigurationAudioVolume: public CConfiguration {
   public:
-	CConfigurationAudioVolume();
+	CConfigurationAudioVolume(std::string const& title, unsigned int& volume);
 	void setNext();
 	void setPrevious();
 	std::string getValue() const;
   private:
 	void apply();
-	unsigned int m_volume;
+	unsigned int& m_volume;
 };
 
 #endif
