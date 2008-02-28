@@ -147,7 +147,7 @@ void CVideoDriver::drawSurface(SDL_Surface* _surf, int _x, int _y) // Used for r
 {
 #ifdef USE_OPENGL
 	unsigned int texture;
-	GLenum format = (_surf->format->Rmask == 0xFF ? GL_RGBA : GL_BGRA);
+	GLenum format = (_surf->format->Rmask == 0xFF0000 ? GL_BGRA : GL_RGBA);
 	SDL_GL::initTexture (_surf->w,_surf->h, &texture, format);
 	SDL_GL::draw_func(_surf->w,_surf->h,(unsigned char*)_surf->pixels,texture, format, _x, _y);
 	SDL_GL::freeTexture(texture);
