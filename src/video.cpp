@@ -71,7 +71,7 @@ bool CVideo::loadVideo(std::string const& _videoFile, SDL_Surface* _videoSurf, i
 		return true;
 	}
 #else
-	fprintf(stdout,"Video file was found, but Ultrastar-ng was compile without video support\n");
+	std::cerr << "Video file available, but USNG was compiled without video support" << std::endl;
 	return false;
 #endif
 }
