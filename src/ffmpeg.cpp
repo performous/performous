@@ -155,6 +155,8 @@ void CFfmpeg::decodeNextFrame() {
 	int frameFinished=0;
 	bool newVideoFrame = true;
 	AVFrame* videoFrame = NULL;
+	int videoBytesRemaining=0;
+	uint8_t *videoRawData=NULL;
 
 	while(av_read_frame(pFormatCtx, &packet)>=0) {
 		if(packet.stream_index==videoStream && decodeVideo) {
@@ -163,17 +165,27 @@ void CFfmpeg::decodeNextFrame() {
 				newVideoFrame = false;
 			}
 
-			int decodeSize = avcodec_decode_video(pVideoCodecCtx, videoFrame, &frameFinished, packet.data, packet.size);
+			videoBytesRemaining=packet.size;
+			videoRawData=packet.data;
+			int decodeSize;
 
+			while(videoBytesRemaining>0) {
+				decodeSize = avcodec_decode_video(pVideoCodecCtx, videoFrame, &frameFinished, videoRawData, videoBytesRemaining);
+				videoRawData+=decodeSize;
+				videoBytesRemaining-=decodeSize;
+				if(frameFinished)
+					break;
+			}
 			if( decodeSize < 0 ) {
 				av_free(videoFrame);
 				av_free_packet(&packet);
+				newVideoFrame = true;
 				throw std::runtime_error("cannot decode video frame");
 			}
 
 			if(frameFinished) {
 				float time;
-
+		
 				if( (uint64_t)packet.pts != AV_NOPTS_VALUE ) {
 					time = av_q2d(pFormatCtx->streams[videoStream]->time_base) * packet.pts;
 				} else if( (uint64_t)packet.dts != AV_NOPTS_VALUE ) {
@@ -181,7 +193,7 @@ void CFfmpeg::decodeNextFrame() {
 				} else {
 					time = 0.0;
 				}
-
+		
 				std::vector<uint8_t> buffer(width * height * 4);
 				{
 					uint8_t* data[] = { &buffer[0] };
@@ -189,6 +201,7 @@ void CFfmpeg::decodeNextFrame() {
 					sws_scale(img_convert_ctx, videoFrame->data, videoFrame->linesize, 0, pVideoCodecCtx->height,
 					  data, linesize);
 					av_free(videoFrame);
+					newVideoFrame = true;
 				}
 				VideoFrame * tmp = new VideoFrame();
 				tmp->data.swap(buffer);
@@ -196,8 +209,6 @@ void CFfmpeg::decodeNextFrame() {
 				tmp->width = width;
 				tmp->timestamp = time;
 				videoQueue.push(tmp);
-
-				av_free_packet(&packet);
 				return;
 			}
 
