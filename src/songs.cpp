@@ -396,12 +396,14 @@ class Songs::RestoreSel {
   public:
 	RestoreSel(Songs& s): m_s(s), m_sel(s.empty() ? NULL : &s.current()) {}
 	~RestoreSel() {
-		if (!m_sel) { m_s.random(); return; }
-		filtered_t& f = m_s.m_filtered;
-		filtered_t::iterator it = std::find(f.begin(), f.end(), m_sel);
-		if (it == f.end()) { m_s.random(); return; }
-		m_s.math_cover.setTarget(0, 0);
-		m_s.math_cover.setTarget(it - f.begin(), m_s.size());
+		int pos = 0;
+		if (m_sel) {
+			filtered_t& f = m_s.m_filtered;
+			filtered_t::iterator it = std::find(f.begin(), f.end(), m_sel);
+			m_s.math_cover.setTarget(0, 0);
+			if (it != f.end()) pos = it - f.begin();
+		}
+		m_s.math_cover.setTarget(pos, m_s.size());
 	}
 };
 
@@ -412,27 +414,8 @@ Song& Songs::near(double pos) {
 }
 
 void Songs::randomize() {
-	m_randomlist.resize(m_filtered.size());
-	for (std::size_t i = 0; i < m_filtered.size(); ++i) m_randomlist[i] = i;
-	std::random_shuffle(m_randomlist.begin(), m_randomlist.end());
-}
-
-void Songs::random(bool reverse) {
-	if (m_randomlist.size() < 2) return;
-	std::size_t cur = math_cover.getTarget();
-	std::size_t num;
-	do {
-		if (reverse) {
-			num = m_randomlist.front();
-			m_randomlist.pop_front();
-			m_randomlist.push_back(num);
-		} else {
-			num = m_randomlist.back();
-			m_randomlist.pop_back();
-			m_randomlist.push_front(num);
-		}
-	} while (num == cur);
-	math_cover.setTarget( empty() ? 0 : num, this->size() );
+	m_order = 0;
+	sort_internal();
 }
 
 void Songs::setFilter(std::string const& val) {
@@ -468,6 +451,7 @@ class CmpByField {
 };
 
 static char const* order[] = {
+	"random order",
 	"by song",
 	"by artist",
 	"by edition",
@@ -480,9 +464,9 @@ static const int orders = sizeof(order) / sizeof(*order);
 std::string Songs::sortDesc() const {
 	std::string str = order[m_order];
 	if (!empty()) {
-		if (m_order == 2) str += " (" + current().edition + ")";
-		if (m_order == 3) str += " (" + current().genre + ")";
-		if (m_order == 4) str += " (" + current().path + ")";
+		if (m_order == 3) str += " (" + current().edition + ")";
+		if (m_order == 4) str += " (" + current().genre + ")";
+		if (m_order == 5) str += " (" + current().path + ")";
 	}
 	return str;
 }
@@ -496,11 +480,12 @@ void Songs::sortChange(int diff) {
 
 void Songs::sort_internal() {
 	switch (m_order) {
-	  case 0: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&Song::title)); break;
-	  case 1: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&Song::artist)); break;
-	  case 2: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&Song::edition)); break;
-	  case 3: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&Song::genre)); break;
-	  case 4: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&Song::path)); break;
+	  case 0: std::random_shuffle(m_filtered.begin(), m_filtered.end()); break;
+	  case 1: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&Song::title)); break;
+	  case 2: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&Song::artist)); break;
+	  case 3: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&Song::edition)); break;
+	  case 4: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&Song::genre)); break;
+	  case 5: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&Song::path)); break;
 	  default: throw std::logic_error("Internal error: unknown sort order in Songs::sortChange");
 	}
 }

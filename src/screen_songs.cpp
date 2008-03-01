@@ -53,7 +53,7 @@ void CScreenSongs::manageEvent(SDL_Event event) {
 	// The rest are only available when there are songs available
 	else if (songs.empty()) return;
 	else if (key == SDLK_PAUSE || (key == SDLK_p && mod && KMOD_CTRL)) sm->getAudio()->togglePause();
-	else if (key == SDLK_TAB && !(mod & KMOD_ALT)) songs.random(mod & KMOD_SHIFT);
+	else if (key == SDLK_TAB && !(mod & KMOD_ALT)) songs.randomize();
 	else if (key == SDLK_RETURN) sm->activateScreen("Sing");
 	else if (key == SDLK_LEFT) songs.advance(-1);
 	else if (key == SDLK_RIGHT) songs.advance(1);

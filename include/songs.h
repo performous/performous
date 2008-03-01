@@ -141,7 +141,7 @@ class Songs {
 	void setFilter(std::string const& regex);
 	std::string sortDesc() const;
 	void randomize();
-	void random(bool reverse = false);
+	void random() { if (m_order) randomize(); advance(1); }
 	void sortChange(int diff);
 	void parseFile(Song& tmp);
   private:
@@ -150,7 +150,6 @@ class Songs {
 	songlist_t m_songs;
 	typedef std::vector<Song*> filtered_t;
 	filtered_t m_filtered;
-	std::deque<std::size_t> m_randomlist;
 	//coverMathSimple math_cover;
 	coverMathAdvanced math_cover;
 	int m_order;
