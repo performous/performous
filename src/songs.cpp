@@ -451,6 +451,16 @@ class CmpByField {
 	}
 };
 
+namespace {
+	std::string pathtrim(std::string path) {
+		std::string::size_type pos = path.rfind('/', path.size() - 1);
+		pos = path.rfind('/', pos - 1);
+		pos = path.rfind('/', pos - 1);
+		if (pos == std::string::npos) pos = 0; else ++pos;
+		return path.substr(pos, path.size() - pos - 1);
+	}
+}
+
 static char const* order[] = {
 	"random order",
 	"by song",
@@ -467,7 +477,7 @@ std::string Songs::sortDesc() const {
 	if (!empty()) {
 		if (m_order == 3) str += " (" + current().edition + ")";
 		if (m_order == 4) str += " (" + current().genre + ")";
-		if (m_order == 5) str += " (" + current().path + ")";
+		if (m_order == 5) str += " (" + pathtrim(current().path) + ")";
 	}
 	return str;
 }
