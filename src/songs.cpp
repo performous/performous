@@ -414,6 +414,7 @@ Song& Songs::near(double pos) {
 }
 
 void Songs::randomize() {
+	RestoreSel restore(*this);
 	m_order = 0;
 	sort_internal();
 }

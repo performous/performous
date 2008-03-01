@@ -5,7 +5,7 @@ struct TextInput {
 	std::string text;
 	bool process(SDL_keysym const& key) {
 		unsigned int ucs = key.unicode;
-		if (key.sym == SDLK_BACKSPACE) backspace();
+		if (key.sym == SDLK_BACKSPACE && !text.empty()) backspace();
 		else if (ucs >= 0x20 && (ucs < 0x7F || ucs >= 0xA0)) *this += ucs;
 		else return false;
 		return true;
