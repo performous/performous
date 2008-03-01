@@ -2,7 +2,8 @@ EXTRA_DIST = alsa/alsa.hpp audio.hpp audio_dev.hpp fft.hpp sample.hpp plugin.hpp
 
 lib_LTLIBRARIES = libdausng.la
 
-flags = -I$(top_srcdir)/
+flags = -Wshadow -Wextra -Wall -O2
+
 lib = -lboost_thread
 sources = audio.cpp audio_dev_tone.cpp
 

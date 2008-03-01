@@ -36,7 +36,7 @@ namespace {
 		} initialize;
 		GstElement* pipeline;
 	  public:
-		gst_record(settings& s): s(s), initialize() {
+		gst_record(settings& s_): s(s_), initialize() {
 			// FIXME: this code probably has cleanup trouble in case of exceptions
 
 			pipeline = gst_pipeline_new("record-pipeline");

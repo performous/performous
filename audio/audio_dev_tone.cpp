@@ -24,25 +24,25 @@ namespace {
 
 	class tonegen: public record::dev {
 		class sin_generator {
-			double phase, step;
-			sample_t amplitude;
+			double m_phase, m_step;
+			sample_t m_amplitude;
 		  public:
 			sin_generator(double freq, double rate, double amplitude, double phase):
-			  phase(2.0 * M_PI * phase), step(2.0 * M_PI * freq / rate), amplitude(amplitude) {}
-			sample_t operator()() { return amplitude * std::sin(phase = fmod(phase + step, 2.0 * M_PI)); }
+			  m_phase(2.0 * M_PI * phase), m_step(2.0 * M_PI * freq / rate), m_amplitude(amplitude) {}
+			sample_t operator()() { return m_amplitude * std::sin(m_phase = fmod(m_phase + m_step, 2.0 * M_PI)); }
 			operator sample_t() { return (*this)(); }
 		};
 		class accumgen {
-			std::vector<sin_generator>& gen;
-			std::size_t channels;
-			std::size_t ch;
-			double val;
+			std::vector<sin_generator>& m_gen;
+			std::size_t m_channels;
+			std::size_t m_ch;
+			double m_val;
 		  public:
-			accumgen(std::vector<sin_generator>& gen, std::size_t channels): gen(gen), channels(channels), ch(), val() {}
+			accumgen(std::vector<sin_generator>& gen, std::size_t channels): m_gen(gen), m_channels(channels), m_ch(), m_val() {}
 			sample_t operator()() {
-				if (ch % channels == 0) val = std::accumulate(gen.begin(), gen.end(), sample_t());
-				ch = (ch + 1) % channels;
-				return val;
+				if (m_ch % m_channels == 0) m_val = std::accumulate(m_gen.begin(), m_gen.end(), sample_t());
+				m_ch = (m_ch + 1) % m_channels;
+				return m_val;
 			}
 		};
 		std::vector<sin_generator> gen;

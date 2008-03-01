@@ -69,21 +69,22 @@ namespace {
 					{
 						ALSA_CHECKED(snd_pcm_avail_update, (m_pcm));
 						alsa::mmap mmap(m_pcm, m_s.frames());
-						buf.resize(mmap.frames * m_s.channels());
+						buf.resize(mmap.frames() * m_s.channels());
 						// TODO: bytewise copy (when needed, e.g. 24 bit samples)
 						const unsigned int samplebits = 8 * sizeof(int16_t);
 						for (std::size_t ch = 0; ch < channels; ++ch) {
-							snd_pcm_channel_area_t const& a = mmap.areas[ch];
+							snd_pcm_channel_area_t const& a = mmap.area(ch);
 							if (a.first % samplebits || a.step % samplebits)
 							  throw std::runtime_error("The sample alignment used by snd_pcm_mmap not supported by audio::alsa_record");
 						}
-						for (snd_pcm_uframes_t fr = 0; fr < mmap.frames; ++fr) {
+						for (snd_pcm_uframes_t fr = 0; fr < mmap.frames(); ++fr) {
 							for (std::size_t ch = 0; ch < channels; ++ch) {
-								snd_pcm_channel_area_t const& a = mmap.areas[ch];
-								const int sample = static_cast<int16_t*>(a.addr)[(a.first + fr * a.step) / samplebits + mmap.offset * channels];
+								snd_pcm_channel_area_t const& a = mmap.area(ch);
+								const int sample = static_cast<int16_t*>(a.addr)[(a.first + fr * a.step) / samplebits + mmap.offset() * channels];
 								buf[fr * channels + ch] = conv_from_s16(sample);
 							}
 						}
+						mmap.commit();
 					}
 					pcm_data data(&buf[0], buf.size() / channels, channels);
 					try {
