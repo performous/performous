@@ -40,7 +40,6 @@ void CVideo::update(double time) {
 			SDL_LockSurface(m_videoSurf);
 			memcpy(m_videoSurf->pixels, &fr.data[0], fr.data.size());
 			SDL_UnlockSurface(m_videoSurf);
-			++mpeg->videoQueue;
 			break;
 		} else {
 			++mpeg->videoQueue;
