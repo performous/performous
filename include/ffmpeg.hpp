@@ -98,7 +98,6 @@ class CFfmpeg {
 		m_cond.notify_one();
 	}
 	bool isPlaying() {
-		boost::mutex::scoped_lock l(m_mutex);
 		return m_type == PLAY;
 	}
 	void start() {
