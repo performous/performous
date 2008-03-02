@@ -157,6 +157,7 @@ void CFfmpeg::decodeNextFrame() {
 	AVFrame* videoFrame = NULL;
 	int videoBytesRemaining=0;
 	uint8_t *videoRawData=NULL;
+	unsigned int i = 0;
 
 	while(av_read_frame(pFormatCtx, &packet)>=0) {
 		// If we have a video frame we want to decode
@@ -174,6 +175,14 @@ void CFfmpeg::decodeNextFrame() {
 				videoFrame=avcodec_alloc_frame();
 				newVideoFrame = false;
 			}
+
+			if( i > 10 ) {
+				av_free_packet(&packet);
+				newVideoFrame = true;
+				throw std::runtime_error("Avoiding possible lock");
+			}
+	
+			i++;
 
 			videoBytesRemaining=packet.size;
 			videoRawData=packet.data;
