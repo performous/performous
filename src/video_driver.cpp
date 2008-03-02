@@ -138,6 +138,7 @@ void CVideoDriver::drawSurface(unsigned int _id, int _x, int _y) // Used for lyr
 	if (cairo_list[_id] != NULL) {
  		SDL_Surface * SDL_surf = CairoToSdl::BlitToSdl(cairo_list[_id]);
 		SDL_BlitSurface(SDL_surf,NULL,sm->getSDLScreen(),&position);
+		SDL_FreeSurface(SDL_surf);
 	} else if (surface_list[_id] != NULL)
 		SDL_BlitSurface(surface_list[_id],NULL,sm->getSDLScreen(),&position);
 #endif
