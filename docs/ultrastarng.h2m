@@ -51,8 +51,8 @@ Search for songs (write the text to find, uses regexp format)
 \fBPause\fR or \fBCtrl+P\fR
 Pause song preview and automatic song switching
 .TP
-\fBTab\fR/\fBShift+Tab\fR
-Pick next/previous random song
+\fBTab\fR
+Randomize songs (sort them again)
 .TP
 \fBCtrl+R\fR
 Refresh song list (reload from disk)
