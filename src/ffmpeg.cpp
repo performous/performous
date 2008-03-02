@@ -166,8 +166,10 @@ void CFfmpeg::decodeNextFrame() {
 		//  - we have more frame in the packet
 		//  - we have decoded an unfinished frame at the end of the packet
 		if(packet.stream_index==videoStream) {
-			if( !decodeVideo )
+			if( !decodeVideo ) {
+				av_free_packet(&packet);
 				return;
+			}
 			if( newVideoFrame ) {
 				videoFrame=avcodec_alloc_frame();
 				newVideoFrame = false;
@@ -181,13 +183,6 @@ void CFfmpeg::decodeNextFrame() {
 				decodeSize = avcodec_decode_video(pVideoCodecCtx, videoFrame, &frameFinished, videoRawData, videoBytesRemaining);
 				videoRawData+=decodeSize;
 				videoBytesRemaining-=decodeSize;
-				std::string frameType;
-				if(videoFrame->pict_type == FF_B_TYPE)
-					frameType = "B";
-				else if(videoFrame->pict_type == FF_I_TYPE)
-					frameType = "I";
-				else
-					frameType = "P";
 
 				if(frameFinished) {
 					float time;
@@ -215,7 +210,6 @@ void CFfmpeg::decodeNextFrame() {
 					tmp->width = width;
 					tmp->timestamp = time;
 					videoQueue.push(tmp);
-					av_free_packet(&packet);
 				}
 			}
 			if( decodeSize < 0 ) {
@@ -226,13 +220,16 @@ void CFfmpeg::decodeNextFrame() {
 			}
 
 			if(frameFinished) {
+				av_free_packet(&packet);
 				return;
 			}
 
 			av_free_packet(&packet); // TODO: This is repeated in every branch of execution, so it clearly needs RAII wrapping
 		} else if(packet.stream_index==audioStream) {
-			if( !decodeAudio )
+			if( !decodeAudio ) {
+				av_free_packet(&packet);
 				return;
+			}
 			int16_t audioFrames[AVCODEC_MAX_AUDIO_FRAME_SIZE];
 			int outsize = AVCODEC_MAX_AUDIO_FRAME_SIZE*sizeof(int16_t);
 			float time;
