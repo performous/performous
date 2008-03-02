@@ -159,7 +159,15 @@ void CFfmpeg::decodeNextFrame() {
 	uint8_t *videoRawData=NULL;
 
 	while(av_read_frame(pFormatCtx, &packet)>=0) {
-		if(packet.stream_index==videoStream && decodeVideo) {
+		// If we have a video frame we want to decode
+		// we decode all the video frame from this paket
+		// and only return when we decode a complete frame AND a complete packet
+		// we do not return if
+		//  - we have more frame in the packet
+		//  - we have decoded an unfinished frame at the end of the packet
+		if(packet.stream_index==videoStream) {
+			if( !decodeVideo )
+				return;
 			if( newVideoFrame ) {
 				videoFrame=avcodec_alloc_frame();
 				newVideoFrame = false;
@@ -173,8 +181,42 @@ void CFfmpeg::decodeNextFrame() {
 				decodeSize = avcodec_decode_video(pVideoCodecCtx, videoFrame, &frameFinished, videoRawData, videoBytesRemaining);
 				videoRawData+=decodeSize;
 				videoBytesRemaining-=decodeSize;
-				if(frameFinished)
-					break;
+				std::string frameType;
+				if(videoFrame->pict_type == FF_B_TYPE)
+					frameType = "B";
+				else if(videoFrame->pict_type == FF_I_TYPE)
+					frameType = "I";
+				else
+					frameType = "P";
+
+				if(frameFinished) {
+					float time;
+				
+					if( (uint64_t)packet.pts != AV_NOPTS_VALUE ) {
+						time = av_q2d(pFormatCtx->streams[videoStream]->time_base) * packet.pts;
+					} else if( (uint64_t)packet.dts != AV_NOPTS_VALUE ) {
+						time = av_q2d(pFormatCtx->streams[videoStream]->time_base) * packet.dts;
+					} else {
+						time = 0.0;
+					}
+				
+					std::vector<uint8_t> buffer(width * height * 4);
+					{
+						uint8_t* data[] = { &buffer[0] };
+						int linesize[] = { width * 4 };
+						sws_scale(img_convert_ctx, videoFrame->data, videoFrame->linesize, 0, pVideoCodecCtx->height,
+						  data, linesize);
+						av_free(videoFrame);
+						newVideoFrame = true;
+					}
+					VideoFrame * tmp = new VideoFrame();
+					tmp->data.swap(buffer);
+					tmp->height = height;
+					tmp->width = width;
+					tmp->timestamp = time;
+					videoQueue.push(tmp);
+					av_free_packet(&packet);
+				}
 			}
 			if( decodeSize < 0 ) {
 				av_free(videoFrame);
@@ -184,36 +226,13 @@ void CFfmpeg::decodeNextFrame() {
 			}
 
 			if(frameFinished) {
-				float time;
-		
-				if( (uint64_t)packet.pts != AV_NOPTS_VALUE ) {
-					time = av_q2d(pFormatCtx->streams[videoStream]->time_base) * packet.pts;
-				} else if( (uint64_t)packet.dts != AV_NOPTS_VALUE ) {
-					time = av_q2d(pFormatCtx->streams[videoStream]->time_base) * packet.dts;
-				} else {
-					time = 0.0;
-				}
-		
-				std::vector<uint8_t> buffer(width * height * 4);
-				{
-					uint8_t* data[] = { &buffer[0] };
-					int linesize[] = { width * 4 };
-					sws_scale(img_convert_ctx, videoFrame->data, videoFrame->linesize, 0, pVideoCodecCtx->height,
-					  data, linesize);
-					av_free(videoFrame);
-					newVideoFrame = true;
-				}
-				VideoFrame * tmp = new VideoFrame();
-				tmp->data.swap(buffer);
-				tmp->height = height;
-				tmp->width = width;
-				tmp->timestamp = time;
-				videoQueue.push(tmp);
 				return;
 			}
 
 			av_free_packet(&packet); // TODO: This is repeated in every branch of execution, so it clearly needs RAII wrapping
-		} else if(packet.stream_index==audioStream && decodeAudio) {
+		} else if(packet.stream_index==audioStream) {
+			if( !decodeAudio )
+				return;
 			int16_t audioFrames[AVCODEC_MAX_AUDIO_FRAME_SIZE];
 			int outsize = AVCODEC_MAX_AUDIO_FRAME_SIZE*sizeof(int16_t);
 			float time;

@@ -35,7 +35,6 @@ void CVideo::update(double time) {
 #ifdef USE_FFMPEG_VIDEO
 	while (mpeg->videoQueue.size() > 0) {
 		VideoFrame& fr = mpeg->videoQueue.front();
-		std::cout << fr.timestamp << " <= " << time << std::endl;
 		if (fr.timestamp >= time) {
 			SDL_LockSurface(m_videoSurf);
 			memcpy(m_videoSurf->pixels, &fr.data[0], fr.data.size());
