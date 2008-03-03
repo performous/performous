@@ -434,7 +434,6 @@ void Songs::setFilter(std::string const& val) {
 		}
 	}
 	m_filtered.swap(filtered);
-	randomize();
 	math_cover.setTarget(0, 0);
 	sort_internal();
 }
