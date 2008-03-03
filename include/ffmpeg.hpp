@@ -1,6 +1,10 @@
 #ifndef __FFMEG_HPP__
 #define __FFMEG_HPP__
 
+#include <../config.h>
+
+#ifdef USE_FFMPEG_VIDEO
+
 extern "C" {
 #include <ffmpeg/avcodec.h>
 #include <ffmpeg/avformat.h>
@@ -88,7 +92,7 @@ class AudioFifo {
 
 class CFfmpeg {
   public:
-	CFfmpeg(bool decodeVideo, bool decodeAudio, std::string const& file, double width, double height);
+	CFfmpeg(bool decodeVideo, bool decodeAudio, std::string const& file);
 	~CFfmpeg();
 	void decodeNextFrame();
 	void operator()(); // Thread runs here, don't call directly
@@ -108,7 +112,7 @@ class CFfmpeg {
 	VideoFifo  videoQueue;
 	AudioFifo  audioQueue;
   private:
-	void open(const char * _filename, double _width=0, double _height=0);
+	void open(const char* _filename);
 	void close();
 	enum Type { STOP, PLAY, SEEK, PAUSE, QUIT } m_type;
 	boost::mutex m_mutex;
@@ -130,7 +134,7 @@ class CFfmpeg {
 	int audioStream;
 	bool decodeVideo;
 	bool decodeAudio;
-	double width, height;
 };
 
+#endif
 #endif

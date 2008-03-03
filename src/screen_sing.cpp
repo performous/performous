@@ -29,7 +29,7 @@ void CScreenSing::enter() {
 	if (!song.video.empty()) {
 		std::string file = song.path + song.video;
 		std::cout << "Now playing: " << file << std::endl;
-		video_ok = video.loadVideo(file, videoSurf, m_width, m_height);
+		video_ok = video.loadVideo(file, videoSurf);
 	}
 	if (video_ok) {
 		video.play();

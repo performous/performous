@@ -1,14 +1,17 @@
 #include "ffmpeg.hpp"
+
+#ifdef USE_FFMPEG_VIDEO
+
 #include <stdexcept>
 #include <iostream>
 
-CFfmpeg::CFfmpeg(bool _decodeVideo, bool _decodeAudio, std::string const& _filename, double _width, double _height) : m_type() {
+CFfmpeg::CFfmpeg(bool _decodeVideo, bool _decodeAudio, std::string const& _filename): m_type() {
 	av_register_all();
 	videoStream=-1;
 	audioStream=-1;
 	decodeVideo=_decodeVideo;
 	decodeAudio=_decodeAudio;
-	open(_filename.c_str(), _width, _height);
+	open(_filename.c_str());
 	m_thread.reset(new boost::thread(boost::ref(*this)));
 }
 
@@ -21,14 +24,12 @@ CFfmpeg::~CFfmpeg() {
 	m_thread->join();
 }
 
-void CFfmpeg::open( const char * _filename, double _width, double _height ) {
+void CFfmpeg::open(const char* _filename) {
 	if(av_open_input_file(&pFormatCtx, _filename, NULL, 0, NULL))
 	  throw std::runtime_error("Cannot open input file");
 	if(av_find_stream_info(pFormatCtx) < 0)
 	  throw std::runtime_error("Cannot find stream information");
 
-	width = _width;
-	height = _height;
 #ifdef DEBUG
 	dump_format(pFormatCtx, 0, _filename, false);
 	std::cerr << "Decode Video: " << decodeVideo << std::endl;
@@ -62,8 +63,6 @@ void CFfmpeg::open( const char * _filename, double _width, double _height ) {
 				pVideoCodecCtx->flags|=CODEC_FLAG_TRUNCATED;
 			if(avcodec_open(pVideoCodecCtx, pVideoCodec)<0)
 				throw std::runtime_error("Cannot open video stream");
-			if( width == 0 ) width = pVideoCodecCtx->width;
-			if( height == 0 ) height = pVideoCodecCtx->height;
 		}
 	} catch (std::runtime_error& e) {
 		// TODO: clean memory
@@ -93,7 +92,7 @@ void CFfmpeg::open( const char * _filename, double _width, double _height ) {
 	int h = pVideoCodecCtx->height;
 	img_convert_ctx = sws_getContext(
 	  w, h, pVideoCodecCtx->pix_fmt,
-	  width, height, PIX_FMT_RGB32,
+	  w, h, PIX_FMT_RGB32,
 	  SWS_BICUBIC, NULL, NULL, NULL);
 }
 
@@ -151,119 +150,83 @@ void CFfmpeg::operator()() {
 }
 
 void CFfmpeg::decodeNextFrame() {
-	AVPacket packet;
-	int frameFinished=0;
-	bool newVideoFrame = true;
-	AVFrame* videoFrame = NULL;
-	int videoBytesRemaining=0;
-	uint8_t *videoRawData=NULL;
-	unsigned int i = 0;
+	struct ReadFramePacket: public AVPacket {
+		AVFormatContext* m_s;
+		ReadFramePacket(AVFormatContext* s): m_s(s) {
+			if (av_read_frame(s, this) < 0) throw std::runtime_error("End of file");
+		}
+		~ReadFramePacket() { av_free_packet(this); }
+		double time() {
+			double t = 0.0;
+			if (uint64_t(pts) != AV_NOPTS_VALUE) t = pts;
+			else if (uint64_t(dts) != AV_NOPTS_VALUE ) t = dts;
+			return t ? t * av_q2d(m_s->streams[stream_index]->time_base) : 0.0;
+		}
+	};
 
-	while(av_read_frame(pFormatCtx, &packet)>=0) {
+	struct AVFrameWrapper {
+		AVFrame* m_frame;
+		AVFrameWrapper(): m_frame(avcodec_alloc_frame()) {
+			if (!m_frame) throw std::runtime_error("Unable to allocate AVFrame");
+		}
+		~AVFrameWrapper() { av_free(m_frame); }
+		operator AVFrame*() { return m_frame; }
+		AVFrame* operator->() { return m_frame; }
+	} videoFrame;
+
+	int frameFinished=0;
+	while (!frameFinished) {
+		ReadFramePacket packet(pFormatCtx);
 		// If we have a video frame we want to decode
 		// we decode all the video frame from this paket
 		// and only return when we decode a complete frame AND a complete packet
 		// we do not return if
 		//  - we have more frame in the packet
 		//  - we have decoded an unfinished frame at the end of the packet
-		if(packet.stream_index==videoStream) {
-			if( !decodeVideo ) {
-				av_free_packet(&packet);
-				return;
-			}
-			if( newVideoFrame ) {
-				videoFrame=avcodec_alloc_frame();
-				newVideoFrame = false;
-			}
+		if (packet.stream_index == videoStream) {
+			if (!decodeVideo) return;
+			uint8_t* packetData = packet.data;
+			int packetSize = packet.size;
+			while (packetSize) {
+				if (packetSize < 0) throw std::logic_error("negative video packet size?!");
+				int decodeSize = avcodec_decode_video(pVideoCodecCtx, videoFrame, &frameFinished, packetData, packetSize);
+				if (decodeSize < 0) throw std::runtime_error("cannot decode video frame");
+				packetData += decodeSize;
+				packetSize -= decodeSize;
+				std::cout << "b0rk? " << frameFinished << ": " << decodeSize << ", " << packetSize << "/" << packet.size << std::endl;
 
-			if( i > 10 ) {
-				av_free_packet(&packet);
-				newVideoFrame = true;
-				throw std::runtime_error("Avoiding possible lock");
-			}
-	
-			i++;
-
-			videoBytesRemaining=packet.size;
-			videoRawData=packet.data;
-			int decodeSize;
-
-			while(videoBytesRemaining>0) {
-				decodeSize = avcodec_decode_video(pVideoCodecCtx, videoFrame, &frameFinished, videoRawData, videoBytesRemaining);
-				videoRawData+=decodeSize;
-				videoBytesRemaining-=decodeSize;
-
-				if(frameFinished) {
-					float time;
-				
-					if( (uint64_t)packet.pts != AV_NOPTS_VALUE ) {
-						time = av_q2d(pFormatCtx->streams[videoStream]->time_base) * packet.pts;
-					} else if( (uint64_t)packet.dts != AV_NOPTS_VALUE ) {
-						time = av_q2d(pFormatCtx->streams[videoStream]->time_base) * packet.dts;
-					} else {
-						time = 0.0;
-					}
-				
-					std::vector<uint8_t> buffer(width * height * 4);
+				if (frameFinished) {
+					// Convert into RGB and scale the data
+					int w = pVideoCodecCtx->width;
+					int h = pVideoCodecCtx->height;
+					std::vector<uint8_t> buffer(w * h * 4);
 					{
-						uint8_t* data[] = { &buffer[0] };
-						int linesize[] = { width * 4 };
-						sws_scale(img_convert_ctx, videoFrame->data, videoFrame->linesize, 0, pVideoCodecCtx->height,
-						  data, linesize);
-						av_free(videoFrame);
-						newVideoFrame = true;
+						uint8_t* data = &buffer[0];
+						int linesize = w * 4;
+						sws_scale(img_convert_ctx, videoFrame->data, videoFrame->linesize, 0, h, &data, &linesize);
 					}
-					VideoFrame * tmp = new VideoFrame();
+					VideoFrame* tmp = new VideoFrame();
 					tmp->data.swap(buffer);
-					tmp->height = height;
-					tmp->width = width;
-					tmp->timestamp = time;
+					tmp->height = h;
+					tmp->width = w;
+					tmp->timestamp = packet.time();
+					// TODO: lock
 					videoQueue.push(tmp);
 				}
 			}
-			if( decodeSize < 0 ) {
-				av_free(videoFrame);
-				av_free_packet(&packet);
-				newVideoFrame = true;
-				throw std::runtime_error("cannot decode video frame");
-			}
-
-			if(frameFinished) {
-				av_free_packet(&packet);
-				return;
-			}
-
-			av_free_packet(&packet); // TODO: This is repeated in every branch of execution, so it clearly needs RAII wrapping
 		} else if(packet.stream_index==audioStream) {
-			if( !decodeAudio ) {
-				av_free_packet(&packet);
-				return;
-			}
+			if (!decodeAudio) return;
 			int16_t audioFrames[AVCODEC_MAX_AUDIO_FRAME_SIZE];
 			int outsize = AVCODEC_MAX_AUDIO_FRAME_SIZE*sizeof(int16_t);
-			float time;
-
 			int decodeSize = avcodec_decode_audio2( pAudioCodecCtx, audioFrames, &outsize, packet.data, packet.size);
 
 			// No data decoded
-			if( outsize == 0 ) {
-				av_free_packet(&packet);
+			if (outsize == 0) {
 				std::cout << "Empty audio frame" << std::endl;
 				return;
 			}
 
-			if( decodeSize < 0 ) {
-				av_free_packet(&packet);
-				throw std::runtime_error("cannot decode audio frame");
-			}
-
-			if( (uint64_t)packet.pts != AV_NOPTS_VALUE ) {
-				time = av_q2d(pFormatCtx->streams[audioStream]->time_base) * packet.pts;
-			} else if( (uint64_t)packet.dts != AV_NOPTS_VALUE ) {
-				time = av_q2d(pFormatCtx->streams[audioStream]->time_base) * packet.dts;
-			} else {
-				time = 0.0;
-			}
+			if (decodeSize < 0) throw std::runtime_error("cannot decode audio frame");
 
 			std::vector<int16_t> audioFramesResampled(AVCODEC_MAX_AUDIO_FRAME_SIZE);
 			int nb_sample = audio_resample(pResampleCtx, &audioFramesResampled[0], audioFrames, outsize/(pAudioCodecCtx->channels*2));
@@ -272,17 +235,10 @@ void CFfmpeg::decodeNextFrame() {
 
 			AudioFrame* tmp = new AudioFrame();
 			tmp->data.swap(audioFramesResampled);
-			tmp->timestamp = time;
+			tmp->timestamp = packet.time();
 			audioQueue.push(tmp);
-
-			av_free_packet(&packet);
-			return;
-		} else {
-			// Not the first audio streamer nor the first video stream
-			// Could be a second stream or a subtitle stream
-			av_free_packet(&packet);
 		}
 	}
-	return;
 }
 
+#endif

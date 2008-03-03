@@ -1,11 +1,12 @@
 #include <video.h>
 
-CVideo::CVideo(): mpeg() {}
+CVideo::CVideo()
+#ifdef USE_FFMPEG_VIDEO
+  : mpeg()
+#endif
+{}
 
 bool CVideo::isPlaying() {
-#ifdef USE_SMPEG
-	if (mpeg) return (SMPEG_status(mpeg) == SMPEG_PLAYING);
-#endif
 #ifdef USE_FFMPEG_VIDEO
 	if (mpeg) return mpeg->isPlaying();
 #endif
@@ -16,19 +17,13 @@ void CVideo::play() {
 #ifdef USE_FFMPEG_VIDEO
 	if (mpeg) mpeg->start();
 #endif
-#ifdef USE_SMPEG
-	if (mpeg) SMPEG_play(mpeg);
-#endif
 }
 
 void CVideo::unloadVideo() {
 #ifdef USE_FFMPEG_VIDEO
 	if (mpeg) delete mpeg;
-#endif
-#ifdef USE_SMPEG
-	if (mpeg) SMPEG_delete(mpeg);
-#endif
 	mpeg = NULL;
+#endif
 }
 
 void CVideo::update(double time) {
@@ -44,46 +39,27 @@ void CVideo::update(double time) {
 			++mpeg->videoQueue;
 		}
 	}
-#endif
-#ifdef USE_SMPEG
-	return;
+#else
+	(void)time;
 #endif
 }
 
-bool CVideo::loadVideo(std::string const& _videoFile, SDL_Surface* _videoSurf, int _width , int _height) {
+bool CVideo::loadVideo(std::string const& _videoFile, SDL_Surface* _videoSurf) {
 	unloadVideo();
 #ifdef USE_FFMPEG_VIDEO
-	mpeg = new CFfmpeg(true, false, _videoFile, _width, _height);
+	mpeg = new CFfmpeg(true, false, _videoFile);
 	m_videoSurf = _videoSurf;
 	return true;
-#endif
-#ifdef USE_SMPEG
-	mpeg = SMPEG_new(_videoFile.c_str(), &info, 0);
-	if(SMPEG_error(mpeg)) {
-		fprintf(stderr, "SMPEG error: %s\n", SMPEG_error(mpeg));
-		SMPEG_delete(mpeg);
-		mpeg = NULL;
-		return false;
-	} else {
-		SMPEG_setdisplay(mpeg, _videoSurf, NULL, NULL);
-		SMPEG_enablevideo(mpeg, 1);
-		SMPEG_enableaudio(mpeg, 0);
-		SMPEG_setvolume(mpeg, 0);
-		SMPEG_scaleXY(mpeg, _width , _height);
-		return true;
-	}
 #else
-	std::cerr << "Video file available, but USNG was compiled without video support" << std::endl;
+	(void)_videoFile; (void)_videoSurf;
 	return false;
 #endif
 }
 
 void CVideo::seek(double seek_pos) {
-#ifdef USE_SMPEG
-	SMPEG_rewind( mpeg );
-	SMPEG_skip( mpeg, seek_pos );
-#endif
 #ifdef USE_FFMPEG_VIDEO
 	seek_pos = seek_pos;
+#else
+	(void)seek_pos;
 #endif
 }

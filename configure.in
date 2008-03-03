@@ -59,7 +59,7 @@ AC_ARG_WITH(svg,
 if test $svg_layer = yes ; then svg_layer="librsvg" ; fi
 
 AC_ARG_WITH(video,
-	 AC_HELP_STRING(--with-video[={ffmpeg|smpeg|disable}],
+	 AC_HELP_STRING(--with-video[={ffmpeg|disable}],
 	 	implementation of the video rendering layer [[[default=autodetect]]]),
 	[video_layer="$withval"],
 	[video_layer="autodetect"]
@@ -179,7 +179,6 @@ else
 fi
 AC_CHECK_LIB(SDL_image, IMG_LoadPNG_RW,,AC_MSG_ERROR(Cannot find SDL_image))
 AC_CHECK_LIB(SDL_gfx, zoomSurface,,AC_MSG_ERROR(Cannot find SDL_gfx))
-AC_CHECK_LIB(smpeg,SMPEG_new,[smpeg_detected="yes"],[smpeg_detected="no"])
 LIBS=$saved_LIBS
 
 dnl ###########################################################################
@@ -340,16 +339,9 @@ case $video_layer in
 			video_layer="no"
 		fi
 		;;
-	smpeg*)
-		if test $smpeg_detected = yes ; then
-			video_layer="smpeg"
-		else
-			video_layer="no"
-		fi
-		;;
 	autodetect*)
-		if test $smpeg_detected = yes ; then
-			video_layer="smpeg"
+		if test $ffmpeg_detected = yes ; then
+			video_layer="ffmpeg"
 		else
 			video_layer="no"
 		fi
@@ -363,16 +355,6 @@ case $video_layer in
 		$ac_includes_default
 		/* video headers */
 		#define USE_FFMPEG_VIDEO 1
-		USNG_EOF)
-		;;
-	smpeg*)
-		VIDEO_FLAGS=""
-		VIDEO_LIBS="-lsmpeg"
-		ac_includes_default=$(cat <<-USNG_EOF
-		$ac_includes_default
-		/* video headers */
-		#define USE_SMPEG 1
-		#include <smpeg/smpeg.h>
 		USNG_EOF)
 		;;
 	no*)
