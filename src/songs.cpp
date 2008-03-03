@@ -267,7 +267,8 @@ class SongParser {
 				// Workaround for songs that use semi-random timestamps for sleep
 				if (p.type == Note::SLEEP) {
 					p.end = p.begin;
-					Note& p2 = notes[notes.size() - 2];
+					Song::notes_t::reverse_iterator it = notes.rbegin();
+					Note& p2 = *++it;
 					if (p2.end < n.begin) p.begin = p.end = n.begin;
 				}
 				// Can we just make the previous note shorter?

@@ -1,22 +1,17 @@
 #include <lyrics.h>
 #include <limits>
 
-Lyrics::Lyrics(std::vector<Note> const& lyrics):
+Lyrics::Lyrics(Song::notes_t const& lyrics):
   m_lyrics(lyrics),
   m_lastSyllableIdx(-1),
   m_lastSentenceIdx(-1)
 {
 	std::vector<Note> tmp;
-	unsigned int size = lyrics.size();
-	for (unsigned int i = 0; i < size; ++i) {
-		while(i < size && lyrics[i].type == Note::SLEEP) i++;
-		while(i < size && lyrics[i].type != Note::SLEEP) {
-			tmp.push_back(lyrics[i]);
-			i++;
-		}
-		if (!tmp.empty()) m_formatted.push_back(tmp);
-		tmp.clear();
+	for (Song::notes_t::const_iterator it = lyrics.begin(); it != lyrics.end(); ++it) {
+		if (it->type != Note::SLEEP) { tmp.push_back(*it); continue; }
+		if (!tmp.empty()) { m_formatted.push_back(tmp); tmp.clear(); }
 	}
+	if (!tmp.empty()) m_formatted.push_back(tmp);
 }
 
 std::vector<Note> Lyrics::getCurrentSentence() {

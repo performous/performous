@@ -11,7 +11,7 @@
  */
 class Lyrics {
   public:
-	Lyrics(std::vector<Note> const& lyrics);
+	Lyrics(Song::notes_t const& lyrics);
 	/** 
 	 * Return what has been sung in the current sentence
 	 */
@@ -55,7 +55,7 @@ class Lyrics {
 	double getEndTime(int sentence);
 	
 	std::string m_past, m_now, m_future, m_next;
-	std::vector<Note> m_lyrics;
+	Song::notes_t m_lyrics;
 	std::vector<std::vector<Note> > m_formatted;
 	int m_lastSyllableIdx;
 	int m_lastSentenceIdx;
