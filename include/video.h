@@ -10,18 +10,14 @@
        
 class CVideo {
   public:
-	CVideo();
-	~CVideo() { unloadVideo(); }
-	bool loadVideo(std::string const& videoFile, SDL_Surface* videoSurf);
+	bool loadVideo(std::string const& videoFile);
 	void unloadVideo();
-	bool isPlaying();
-	void update(double time);
-	void play();
-	void seek(double seek_pos);
+	void render(double time);
   private:
 #ifdef USE_FFMPEG_VIDEO
-	CFfmpeg *mpeg;
-	SDL_Surface *m_videoSurf;
+	boost::scoped_ptr<CFfmpeg> mpeg;
+	VideoFrame m_videoFrame;
+	double m_time;
 #endif
 };
 

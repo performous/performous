@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <iostream>
 
-CFfmpeg::CFfmpeg(bool _decodeVideo, bool _decodeAudio, std::string const& _filename): m_type() {
+CFfmpeg::CFfmpeg(bool _decodeVideo, bool _decodeAudio, std::string const& _filename): m_quit() {
 	av_register_all();
 	videoStream=-1;
 	audioStream=-1;
@@ -16,25 +16,23 @@ CFfmpeg::CFfmpeg(bool _decodeVideo, bool _decodeAudio, std::string const& _filen
 }
 
 CFfmpeg::~CFfmpeg() {
-	{
-		boost::mutex::scoped_lock l(m_mutex);
-		m_type = QUIT;
-		m_cond.notify_all();
-	}
+	m_quit = true;
+	videoQueue.reset();
+	// audioQueue.reset();
 	m_thread->join();
+	if( videoStream != -1 && decodeVideo ) avcodec_close(pVideoCodecCtx);
+	if( audioStream != -1 && decodeAudio ) {
+		avcodec_close(pAudioCodecCtx);
+		audio_resample_close(pResampleCtx);
+	}
+	av_close_input_file(pFormatCtx);
 }
 
 void CFfmpeg::open(const char* _filename) {
-	if(av_open_input_file(&pFormatCtx, _filename, NULL, 0, NULL))
+	if (av_open_input_file(&pFormatCtx, _filename, NULL, 0, NULL))
 	  throw std::runtime_error("Cannot open input file");
-	if(av_find_stream_info(pFormatCtx) < 0)
+	if (av_find_stream_info(pFormatCtx) < 0)
 	  throw std::runtime_error("Cannot find stream information");
-
-#ifdef DEBUG
-	dump_format(pFormatCtx, 0, _filename, false);
-	std::cerr << "Decode Video: " << decodeVideo << std::endl;
-	std::cerr << "Decode Audio: " << decodeAudio << std::endl;
-#endif
 
 	videoStream=-1;
 	audioStream=-1;
@@ -96,55 +94,12 @@ void CFfmpeg::open(const char* _filename) {
 	  SWS_BICUBIC, NULL, NULL, NULL);
 }
 
-void CFfmpeg::close() {
-	stop();
-	if( videoStream != -1 && decodeVideo ) {
-		avcodec_close(pVideoCodecCtx);
-	}
-	if( audioStream != -1 && decodeAudio ) {
-		avcodec_close(pAudioCodecCtx);
-		audio_resample_close(pResampleCtx);
-	}
-	av_close_input_file(pFormatCtx);
-}
-
-#include <xtime.h>
-#include <boost/thread/thread.hpp>
-#include <cmath>
-
 void CFfmpeg::operator()() {
-	for(;;) {
-		Type type;
-		{
-			boost::mutex::scoped_lock l(m_mutex);
-			m_ready = true;
-			m_condready.notify_all();
-			while (m_type == STOP) m_cond.wait(l);
-			m_ready = false;
-			type = m_type;
-		}
-		// TODO: Here we wait if queues are full (video or audio)
-		// sleepd for 10ms
-		// FIXME: Use boost::condition for waiting instead of sleep
-		switch( type ) {
-			case STOP:
-				break;
-			case QUIT:
-				return;
-			case PLAY:
-				if( videoQueue.isFull() || audioQueue.isFull()  ) {
-					boost::thread::sleep(now() + 0.01);
-					break;
-				} else {
-					try {
-						decodeNextFrame();
-					} catch (std::exception& e) {
-						std::cerr << "ffmpeg error: " << e.what() << std::endl;
-					}
-				}
-				break;
-			default:
-				break;
+	while (!m_quit) {
+		try {
+			decodeNextFrame();
+		} catch (std::exception& e) {
+			std::cerr << "ffmpeg error: " << e.what() << std::endl;
 		}
 	}
 }
@@ -193,8 +148,6 @@ void CFfmpeg::decodeNextFrame() {
 				if (decodeSize < 0) throw std::runtime_error("cannot decode video frame");
 				packetData += decodeSize;
 				packetSize -= decodeSize;
-				std::cout << "b0rk? " << frameFinished << ": " << decodeSize << ", " << packetSize << "/" << packet.size << std::endl;
-
 				if (frameFinished) {
 					// Convert into RGB and scale the data
 					int w = pVideoCodecCtx->width;
@@ -210,8 +163,8 @@ void CFfmpeg::decodeNextFrame() {
 					tmp->height = h;
 					tmp->width = w;
 					tmp->timestamp = packet.time();
-					// TODO: lock
 					videoQueue.push(tmp);
+					if (m_quit) return;
 				}
 			}
 		} else if(packet.stream_index==audioStream) {
@@ -237,6 +190,7 @@ void CFfmpeg::decodeNextFrame() {
 			tmp->data.swap(audioFramesResampled);
 			tmp->timestamp = packet.time();
 			audioQueue.push(tmp);
+			if (m_quit) return;
 		}
 	}
 }

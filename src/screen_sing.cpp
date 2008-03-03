@@ -29,14 +29,10 @@ void CScreenSing::enter() {
 	if (!song.video.empty()) {
 		std::string file = song.path + song.video;
 		std::cout << "Now playing: " << file << std::endl;
-		video_ok = video.loadVideo(file, videoSurf);
+		video_ok = video.loadVideo(file);
 	}
-	if (video_ok) {
-		video.play();
-	} else {
-		SDLSurf bg(song.path + song.background, sm->getWidth(), sm->getHeight());
-		if (bg) SDL_BlitSurface(bg, NULL, backgroundSurf, NULL);
-	}
+	SDLSurf bg(song.path + song.background, sm->getWidth(), sm->getHeight());
+	if (bg) SDL_BlitSurface(bg, NULL, backgroundSurf, NULL);
 	SDL_BlitSurface(theme->bg->getSDLSurface(),NULL,backgroundSurf,NULL);
 	SDL_BlitSurface(theme->p1box->getSDLSurface(),NULL,backgroundSurf,NULL);
 	backgroundSurf_id = sm->getVideoDriver()->initSurface(backgroundSurf);
@@ -138,15 +134,12 @@ void CScreenSing::draw() {
 #ifdef USE_OPENGL
 	glClear(GL_COLOR_BUFFER_BIT);
 #endif
-	if (video.isPlaying()) {
-		video.update(time - song.videoGap);
-		sm->getVideoDriver()->drawSurface(videoSurf);
+	sm->getVideoDriver()->drawSurface(videoSurf);
 //		sm->getVideoDriver()->drawSurface(theme->bg->getSDLSurface());
 //		sm->getVideoDriver()->drawSurface(theme->p1box->getSDLSurface());
-	} else {
-		sm->getVideoDriver()->drawSurface(backgroundSurf_id);
-	}
+	sm->getVideoDriver()->drawSurface(backgroundSurf_id);
 	sm->getVideoDriver()->updateSurface(backgroundSurf_id , (SDL_Surface *) NULL);
+	video.render(time - song.videoGap);
 	// Compute and draw the timer and the progressbar
 	theme->timertxt.text = (boost::format("%02u:%02u") % (unsigned(time) / 60) % (unsigned(time) % 60)).str();
 	theme->theme->PrintText(&theme->timertxt);

@@ -12,6 +12,8 @@ extern "C" {
 }
 
 #include <boost/ptr_container/ptr_deque.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/condition.hpp>
 #include <iostream>
 #include <vector>
 
@@ -24,23 +26,41 @@ struct VideoFrame {
 	double timestamp;
 	std::vector<uint8_t> data; 
 	int width, height;
+	void swap(VideoFrame& f) {
+		std::swap(timestamp, f.timestamp);
+		data.swap(f.data);
+		std::swap(width, f.width);
+		std::swap(height, f.height);
+	}
 };
 
 class VideoFifo {
   public:
-	VideoFifo() {}
-	~VideoFifo() {}
-	VideoFrame& operator*() { return queue.front(); }
-	VideoFrame* operator->() { return &queue.front(); }
-	VideoFifo& operator++() { queue.pop_front(); return *this; }
-	const unsigned int size() { return queue.size(); }
-	const bool isFull() { return size() >= 10; }
-	void push(VideoFrame* f) { queue.push_back(f); }
-	VideoFrame& front() { return queue.front(); }
+	bool tryPop(VideoFrame& f) {
+		boost::mutex::scoped_lock l(m_mutex);
+		if (m_queue.empty()) return false;
+		f.swap(m_queue.front());
+		m_queue.pop_front();
+		m_cond.notify_one();
+		return true;
+	}
+	void push(VideoFrame* f) {
+		boost::mutex::scoped_lock l(m_mutex);
+		while (m_queue.size() > 10) m_cond.wait(l);
+		m_queue.push_back(f);
+	}
+	void reset() {
+		boost::mutex::scoped_lock l(m_mutex);
+		m_queue.clear();
+		m_cond.notify_all();
+	}
   private:
-	boost::ptr_deque<VideoFrame> queue;
+	boost::ptr_deque<VideoFrame> m_queue;
+	boost::mutex m_mutex;
+	boost::condition m_cond;
 };
 
+// TODO: fix this to work similarly to VideoFifo
 class AudioFifo {
   public:
 	AudioFifo() { currentFramePosition=0; }
@@ -94,32 +114,15 @@ class CFfmpeg {
   public:
 	CFfmpeg(bool decodeVideo, bool decodeAudio, std::string const& file);
 	~CFfmpeg();
-	void decodeNextFrame();
 	void operator()(); // Thread runs here, don't call directly
-	void stop() {
-		boost::mutex::scoped_lock l(m_mutex);
-		m_type = STOP;
-		m_cond.notify_one();
-	}
-	bool isPlaying() {
-		return m_type == PLAY;
-	}
-	void start() {
-		boost::mutex::scoped_lock l(m_mutex);
-		m_type = PLAY;
-		m_cond.notify_one();
-	}
 	VideoFifo  videoQueue;
 	AudioFifo  audioQueue;
   private:
 	void open(const char* _filename);
 	void close();
-	enum Type { STOP, PLAY, SEEK, PAUSE, QUIT } m_type;
-	boost::mutex m_mutex;
-	boost::condition m_cond;
-	boost::condition m_condready;
+	void decodeNextFrame();
 	boost::scoped_ptr<boost::thread> m_thread;
-	bool m_ready;
+	volatile bool m_quit;
 
 	AVFormatContext* pFormatCtx;
 	ReSampleContext* pResampleCtx;
