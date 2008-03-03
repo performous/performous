@@ -134,12 +134,11 @@ void CScreenSing::draw() {
 #ifdef USE_OPENGL
 	glClear(GL_COLOR_BUFFER_BIT);
 #endif
-	sm->getVideoDriver()->drawSurface(videoSurf);
 //		sm->getVideoDriver()->drawSurface(theme->bg->getSDLSurface());
 //		sm->getVideoDriver()->drawSurface(theme->p1box->getSDLSurface());
 	sm->getVideoDriver()->drawSurface(backgroundSurf_id);
-	sm->getVideoDriver()->updateSurface(backgroundSurf_id , (SDL_Surface *) NULL);
-	video.render(time - song.videoGap);
+	//sm->getVideoDriver()->updateSurface(backgroundSurf_id , (SDL_Surface *) NULL);
+	video.render(time - song.videoGap, m_width, m_height);
 	// Compute and draw the timer and the progressbar
 	theme->timertxt.text = (boost::format("%02u:%02u") % (unsigned(time) / 60) % (unsigned(time) % 60)).str();
 	theme->theme->PrintText(&theme->timertxt);
