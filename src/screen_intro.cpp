@@ -2,11 +2,12 @@
 
 CScreenIntro::CScreenIntro(std::string const& name, unsigned int width, unsigned int height): CScreen(name, width, height) {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
-	cairo_svg.reset(new CairoSVG(sm->getThemePathFile("intro.svg"), width, height));
-	texture = sm->getVideoDriver()->initSurface(cairo_svg->getSDLSurface());
+	back = new Surface(sm->getThemePathFile("intro.svg"),FILE_SVG);
 }
 
-CScreenIntro::~CScreenIntro() {}
+CScreenIntro::~CScreenIntro() {
+	delete back;
+}
 
 void CScreenIntro::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
@@ -28,7 +29,6 @@ void CScreenIntro::manageEvent(SDL_Event event) {
 }
 
 void CScreenIntro::draw() {
-	CScreenManager* sm = CScreenManager::getSingletonPtr();
-	sm->getVideoDriver()->drawSurface(texture);
+	back->draw(0.5,0.5,m_width+0.5,m_height+0.5);
 }
 

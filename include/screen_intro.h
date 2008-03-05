@@ -4,7 +4,7 @@
 #include "../config.h"
 
 #include <screen.h>
-#include <cairosvg.h>
+#include <surface.h>
 #include <boost/scoped_ptr.hpp>
 
 class CScreenIntro : public CScreen {
@@ -16,8 +16,7 @@ class CScreenIntro : public CScreen {
 	void manageEvent(SDL_Event event);
 	void draw();
   private:
-	boost::scoped_ptr<CairoSVG> cairo_svg;
-	unsigned int texture;
+	Surface* back;
 };
 
 #endif

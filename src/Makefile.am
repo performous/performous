@@ -20,6 +20,7 @@ ultrastarng_SOURCES = main.cpp \
 	theme.cpp \
 	sdl_gl.cpp \
 	ffmpeg.cpp \
+	surface.cpp \
 	video_driver.cpp
 
 INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/audio\
