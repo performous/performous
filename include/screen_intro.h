@@ -16,7 +16,7 @@ class CScreenIntro : public CScreen {
 	void manageEvent(SDL_Event event);
 	void draw();
   private:
-	Surface* back;
+	boost::scoped_ptr<Surface> background;
 };
 
 #endif

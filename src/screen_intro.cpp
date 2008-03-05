@@ -2,12 +2,10 @@
 
 CScreenIntro::CScreenIntro(std::string const& name, unsigned int width, unsigned int height): CScreen(name, width, height) {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
-	back = new Surface(sm->getThemePathFile("intro.svg"),FILE_SVG);
+	background.reset(new Surface(sm->getThemePathFile("intro.svg"),FILE_SVG));
 }
 
-CScreenIntro::~CScreenIntro() {
-	delete back;
-}
+CScreenIntro::~CScreenIntro() {}
 
 void CScreenIntro::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
@@ -29,6 +27,6 @@ void CScreenIntro::manageEvent(SDL_Event event) {
 }
 
 void CScreenIntro::draw() {
-	back->draw(0.5,0.5,m_width+0.5,m_height+0.5);
+	background->draw(0.5,0.5,m_width+0.5,m_height+0.5);
 }
 
