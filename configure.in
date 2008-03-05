@@ -157,6 +157,9 @@ PKG_CHECK_MODULES(libxml, libxml-2.0 , ,
 PKG_CHECK_MODULES(pangocairo, pangocairo , ,
 	AC_MSG_ERROR(This game cannot be built without pango for cairo))
 
+PKG_CHECK_MODULES([ImageMagick], [ImageMagick++] , ,
+	AC_MSG_ERROR(This game cannot be built without imagemagick))
+
 PKG_CHECK_MODULES(librsvg, librsvg-2.0 , [librsvg_detected="yes"] , [librsvg_detected="no"])
 PKG_CHECK_MODULES(cairosvg, cairo-svg , [cairosvg_detected="yes"] , [cairosvg_detected="no"])
 PKG_CHECK_MODULES(xine, libxine , [xine_detected="yes"] , [xine_detected="no"])
@@ -196,6 +199,17 @@ $ac_includes_default
 USNG_EOF)
 AC_SUBST(CAIRO_FLAGS)
 AC_SUBST(CAIRO_LIBS)
+
+#Do things for Magick++
+MAGICKPP_FLAGS=`Magick++-config --cxxflags`
+MAGICKPP_LIBS=`Magick++-config --libs`
+ac_includes_default=$(cat <<USNG_EOF
+$ac_includes_default
+/* Magick++ headers */
+#include <Magick++.h>
+USNG_EOF)
+AC_SUBST(MAGICKPP_FLAGS)
+AC_SUBST(MAGICKPP_LIBS)
 
 # Do things for libxml
 XML_FLAGS=`xml2-config --cflags`

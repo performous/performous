@@ -5,7 +5,6 @@
 
 #include <boost/scoped_ptr.hpp>
 #include <screen.h>
-#include <cairosvg.h>
 #include <theme.h>
 
 class CScreenPractice : public CScreen {
@@ -23,7 +22,6 @@ class CScreenPractice : public CScreen {
 	boost::scoped_ptr<CairoSVG> cairo_svg_sharp;
 	unsigned int texture_note;
 	unsigned int texture_sharp;
-	unsigned int bg_texture;
 };
 
 #endif

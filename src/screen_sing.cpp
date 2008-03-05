@@ -10,14 +10,8 @@
 #include <iomanip>
 
 CScreenSing::CScreenSing(std::string const& name, unsigned int width, unsigned int height, Analyzer const& analyzer):
-  CScreen(name,width,height), m_analyzer(analyzer), videoSurf(NULL), backgroundSurf(NULL), pitchGraph(width, height)
+  CScreen(name,width,height), m_analyzer(analyzer), pitchGraph(width, height)
 {
-	SDL_Surface * screen = CScreenManager::getSingletonPtr()->getSDLScreen();
-	videoSurf.reset(SDL_AllocSurface(screen->flags, width, height, screen->format->BitsPerPixel, screen->format->Rmask, screen->format->Gmask, screen->format->Bmask, screen->format->Amask));
-	backgroundSurf.reset(SDL_AllocSurface(screen->flags, width, height, screen->format->BitsPerPixel, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000));
-	SDL_SetAlpha(videoSurf, SDL_SRCALPHA, SDL_ALPHA_OPAQUE);
-	SDL_SetAlpha(backgroundSurf, SDL_SRCALPHA, SDL_ALPHA_OPAQUE);
-	SDL_FillRect(backgroundSurf,NULL,SDL_MapRGB(backgroundSurf->format, 255, 255, 255));
 }
 
 void CScreenSing::enter() {
@@ -25,17 +19,12 @@ void CScreenSing::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	Song& song = sm->getSongs()->current();
 	theme.reset(new CThemeSing(m_width, m_height));
-	SDL_FillRect(backgroundSurf,NULL,SDL_MapRGB(backgroundSurf->format, 255, 255, 255));
 	if (!song.video.empty()) {
 		std::string file = song.path + song.video;
 		std::cout << "Now playing: " << file << std::endl;
 		video_ok = video.loadVideo(file);
 	}
-	SDLSurf bg(song.path + song.background, sm->getWidth(), sm->getHeight());
-	if (bg) SDL_BlitSurface(bg, NULL, backgroundSurf, NULL);
-	SDL_BlitSurface(theme->bg->getSDLSurface(),NULL,backgroundSurf,NULL);
-	SDL_BlitSurface(theme->p1box->getSDLSurface(),NULL,backgroundSurf,NULL);
-	backgroundSurf_id = sm->getVideoDriver()->initSurface(backgroundSurf);
+	background.reset(new Surface(song.path + song.background,FILE_MAGICK));
 	theme_id = sm->getVideoDriver()->initSurface(theme->theme->getCurrent());
 	pitchGraph_id = sm->getVideoDriver()->initSurface(pitchGraph.getCurrent());
 	std::string file = song.path + song.mp3;
@@ -52,7 +41,6 @@ void CScreenSing::enter() {
 void CScreenSing::exit() {
 	CScreenManager::getSingletonPtr()->getAudio()->stopMusic();
 	video.unloadVideo();
-	SDL_FillRect(videoSurf,NULL,0xffffff);
 	m_sentence.clear();
 	lyrics.reset();
 	theme.reset();
@@ -134,11 +122,9 @@ void CScreenSing::draw() {
 #ifdef USE_OPENGL
 	glClear(GL_COLOR_BUFFER_BIT);
 #endif
-//		sm->getVideoDriver()->drawSurface(theme->bg->getSDLSurface());
-//		sm->getVideoDriver()->drawSurface(theme->p1box->getSDLSurface());
-	sm->getVideoDriver()->drawSurface(backgroundSurf_id);
-	//sm->getVideoDriver()->updateSurface(backgroundSurf_id , (SDL_Surface *) NULL);
 	video.render(time - song.videoGap, m_width, m_height);
+	background->draw(0.5,0.5,0.5+m_width,0.5+m_height);
+	theme->bg->draw(0.5,0.5,0.5+m_width,0.5+m_height);
 	// Compute and draw the timer and the progressbar
 	theme->timertxt.text = (boost::format("%02u:%02u") % (unsigned(time) / 60) % (unsigned(time) % 60)).str();
 	theme->theme->PrintText(&theme->timertxt);

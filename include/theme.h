@@ -6,6 +6,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <cairosvg.h>
+#include <surface.h>
 #include <string>
 
 struct TRGBA {
@@ -73,7 +74,7 @@ class CTheme: boost::noncopyable {
 struct CThemeSongs: boost::noncopyable {
 	CThemeSongs(unsigned int width, unsigned int height);
 	~CThemeSongs();
-	boost::scoped_ptr<CairoSVG> bg;
+	boost::scoped_ptr<Surface> bg;
 	boost::scoped_ptr<CTheme> theme;
 	TThemeTxt song;
 	TThemeTxt order;
@@ -82,7 +83,7 @@ struct CThemeSongs: boost::noncopyable {
 struct CThemePractice: boost::noncopyable {
 	CThemePractice(unsigned int width, unsigned int height);
 	~CThemePractice();
-	boost::scoped_ptr<CairoSVG> bg;
+	boost::scoped_ptr<Surface> bg;
 	boost::scoped_ptr<CTheme> theme;
 	TThemeTxt notetxt;
 	TThemeRect peak;
@@ -91,7 +92,7 @@ struct CThemePractice: boost::noncopyable {
 struct CThemeSing: boost::noncopyable {
 	CThemeSing(unsigned int width, unsigned int height);
 	~CThemeSing();
-	boost::scoped_ptr<CairoSVG> bg;
+	boost::scoped_ptr<Surface> bg;
 	boost::scoped_ptr<CairoSVG> p1box;
 	boost::scoped_ptr<CTheme> theme;
 	TThemeTxt timertxt; 
@@ -117,7 +118,7 @@ struct CThemeScore: boost::noncopyable {
 struct CThemeConfiguration: boost::noncopyable {
 	CThemeConfiguration(unsigned int width, unsigned int height);
 	~CThemeConfiguration();
-	boost::scoped_ptr<CairoSVG> bg;
+	boost::scoped_ptr<Surface> bg;
 	boost::scoped_ptr<CTheme> theme;
 	TThemeTxt item;
 	TThemeTxt value;

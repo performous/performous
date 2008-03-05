@@ -1,4 +1,5 @@
 #include "surface.h"
+#include <iostream>
 
 Surface::Surface(double width, double height, unsigned int format, unsigned char * buffer):
 	m_width(width),m_height(height),m_format(format),texture_id(0) {
@@ -64,7 +65,7 @@ Surface::Surface( std::string filename, unsigned int type ):texture_id(0) {
 		rsvg_init();
 		svgHandle = rsvg_handle_new_from_file(filename.c_str(), &pError);
 		if(pError != NULL) {
-			fprintf (stderr, "CairoSVG::CairoSVG: %s\n", pError->message);
+			std::cerr << "Surace::Surface " << pError->message << std::endl;
 			g_error_free(pError);
 		}
 		rsvg_handle_get_dimensions (svgHandle, &svgDimension);
@@ -81,5 +82,20 @@ Surface::Surface( std::string filename, unsigned int type ):texture_id(0) {
 		rsvg_term();
 		cairo_destroy (dc);
 	} else if( type == FILE_MAGICK ) {
+		Magick::Image image;
+		Magick::Blob blob;
+		try {
+			image.read(filename);
+			image.magick("RGBA");
+			image.write(&blob);
+		} catch( Magick::Exception &error_ ) {
+			std::cerr << "Caught exception: " << error_.what() << std::endl;
+			return;
+		} 
+	
+		m_width = image.columns();
+		m_height = image.rows();
+		m_format = SURFACE_RGBA;
+		glLoad((unsigned char *)blob.data());
 	}
 }

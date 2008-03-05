@@ -12,8 +12,6 @@ CScreenConfiguration::CScreenConfiguration(std::string const& name, unsigned int
 
 void CScreenConfiguration::enter() {
 	theme.reset(new CThemeConfiguration(m_width, m_height));
-	CScreenManager* sm = CScreenManager::getSingletonPtr();
-	bg_texture = sm->getVideoDriver()->initSurface(theme->bg->getSDLSurface());
 }
 
 void CScreenConfiguration::exit() { theme.reset(); }
@@ -35,7 +33,6 @@ void CScreenConfiguration::draw() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	theme->theme->clear();
 	cairo_text_extents_t extents;
-	// Draw the "Order by" text
 	{
 		theme->item.text = configuration[selected].getDescription();
 		extents = theme->theme->GetTextExtents(theme->item);
@@ -47,7 +44,7 @@ void CScreenConfiguration::draw() {
 		theme->value.x = (theme->value.svg_width - extents.width)/2;
 		theme->theme->PrintText(&theme->value);
 	}
-	sm->getVideoDriver()->drawSurface(bg_texture);
+	theme->bg->draw(0.5,0.5,0.5+m_width,0.5+m_height);
 	sm->getVideoDriver()->drawSurface(theme->theme->getCurrent());
 }
 

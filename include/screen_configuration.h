@@ -4,7 +4,6 @@
 #include "../config.h"
 
 #include <screen.h>
-#include <cairosvg.h>
 #include <configuration.h>
 #include <theme.h>
 #include <boost/scoped_ptr.hpp>
@@ -19,7 +18,6 @@ class CScreenConfiguration: public CScreen {
 	void draw();
   private:
 	boost::scoped_ptr<CThemeConfiguration> theme;
-	unsigned int bg_texture;
 	boost::ptr_vector<CConfiguration> configuration;
 	unsigned int selected;
 };

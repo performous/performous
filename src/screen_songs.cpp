@@ -7,13 +7,12 @@
 static const double IDLE_TIMEOUT = 45.0; // seconds
 
 CScreenSongs::CScreenSongs(std::string const& name, unsigned int width, unsigned int height, std::set<std::string> const& songdirs):
-  CScreen(name, width, height),
-  m_emptyCover(CScreenManager::getSingletonPtr()->getThemePathFile("no_cover.png"), CScreenManager::getSingletonPtr()->getWidth() / 800.0 * 256.0, CScreenManager::getSingletonPtr()->getHeight() / 600.0 * 256.0),
-  m_currentCover(NULL)
+  CScreen(name, width, height)
 {
-	if (CScreenManager::getSingletonPtr()->getSongs() == NULL) {
-		CScreenManager::getSingletonPtr()->setSongs(new Songs(songdirs));
-	}
+	CScreenManager* sm = CScreenManager::getSingletonPtr();
+	if (sm->getSongs() == NULL)
+		sm->setSongs(new Songs(songdirs));
+	m_emptyCover.reset(new Surface(sm)->getThemePathFile("no_cover.png"),FILE_MAGICK));
 }
 
 void CScreenSongs::enter() {
@@ -24,7 +23,6 @@ void CScreenSongs::enter() {
 	m_volume = audio.getVolume();
 	audio.setVolume(m_volume);
 	theme.reset(new CThemeSongs(m_width, m_height));
-	bg_texture = sm->getVideoDriver()->initSurface(theme->bg->getSDLSurface());
 	m_time = seconds(now());
 	m_search.text.clear();
 	sm->getSongs()->setFilter(m_search.text);
@@ -81,7 +79,7 @@ void CScreenSongs::draw() {
 	theme->theme->clear();
 	// Draw the "Order by" text
 	print(theme.get(), theme->order, (m_search.text.empty() ? songs.sortDesc() : m_search.text));
-	sm->getVideoDriver()->drawSurface(bg_texture);
+	theme->bg->draw(0.5,0.5,0.5+m_width,0.5+m_height);
 	// Test if there are no songs
 	if (songs.empty()) {
 		print(theme.get(), theme->song, "no songs found");
@@ -100,21 +98,13 @@ void CScreenSongs::draw() {
 		std::string cover = song_display.path + song_display.cover;
 		if (cover != m_cover) {
 			m_cover = cover;
-			double width = CScreenManager::getSingletonPtr()->getWidth();
-			double height = CScreenManager::getSingletonPtr()->getHeight();
-			SDLSurf coverSurf(cover, width / 800.0 * 256, height / 600.0 * 256.0);
-			m_currentCover.swap(coverSurf);
+			m_currentCover.reset( new Surface(cover,FILE_MAGICK) );
 		}
-		SDL_Surface* coverSurf = m_currentCover ? m_currentCover : m_emptyCover;
-		if (coverSurf) {
-			SDL_Rect position;
-			double shift = remainder(songs.currentPosition(), 1.0);
-			position.x = round((m_width - coverSurf->w) / 2 - shift * 1056);
-			position.y = (m_height - coverSurf->h) / 2;
-			position.w = coverSurf->w;
-			position.h = coverSurf->h;
-			sm->getVideoDriver()->drawSurface(coverSurf, position.x, position.y);
-		}
+		double shift = remainder(songs.currentPosition(), 1.0);
+		float x = round((800 - 256) / 2 - shift * 1056);
+		float y = (600 - 256) / 2;
+		m_emptyCover->draw(m_width*x/800., m_height*y/600.,m_width*256./800.,m_height*256./600.);
+		m_currentCover->draw(m_width*x/800., m_height*y/600.,m_width*256./800.,m_height*256./600.);
 		// Play a preview of the song
 		std::string file = song.path + song.mp3;
 		if (file != m_playing) audio.playPreview(m_playing = file);

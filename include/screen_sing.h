@@ -10,6 +10,7 @@
 #include <video.h>
 #include <lyrics.h>
 #include <sdl_helper.h>
+#include <surface.h>
 
 class CScreenSing: public CScreen {
   public:
@@ -20,9 +21,7 @@ class CScreenSing: public CScreen {
 	void draw();
   private:
 	Analyzer const& m_analyzer;
-	SDLSurf videoSurf;
-	SDLSurf backgroundSurf;
-	unsigned int backgroundSurf_id;
+	boost::scoped_ptr<Surface> background;
 	unsigned int theme_id;
 	unsigned int pitchGraph_id;
 	// Keeps the pitch tracking graphics

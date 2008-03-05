@@ -4,6 +4,7 @@
 #include <textinput.h>
 #include <boost/scoped_ptr.hpp>
 #include <screen.h>
+#include <surface.h>
 #include <sdl_helper.h>
 #include <songs.h>
 #include <theme.h>
@@ -21,9 +22,8 @@ class CScreenSongs : public CScreen {
 	std::string m_cover;
 	std::string m_playing;
 	TextInput m_search;
-	unsigned int bg_texture;
-	SDLSurf m_emptyCover;
-	SDLSurf m_currentCover;
+	boost::scoped_ptr<Surface> m_emptyCover;
+	boost::scoped_ptr<Surface> m_currentCover;
 };
 
 #endif

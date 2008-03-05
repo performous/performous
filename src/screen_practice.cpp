@@ -18,7 +18,6 @@ void CScreenPractice::enter() {
 	texture_sharp = sm->getVideoDriver()->initSurface(cairo_svg_sharp->getSDLSurface());
 
 	theme.reset(new CThemePractice(m_width, m_height));
-	bg_texture = sm->getVideoDriver()->initSurface(theme->bg->getSDLSurface());
 }
 
 void CScreenPractice::exit()
@@ -50,7 +49,7 @@ void CScreenPractice::draw()
 	MusicalScale scale;
 
 	theme->theme->clear();
-	sm->getVideoDriver()->drawSurface(bg_texture);
+	theme->bg->draw(0.5,0.5,0.5+m_width,0.5+m_height);
 
 	// getPeak returns 0.0 when clipping, negative values when not that loud.
 	// Normalizing to [-1.0, 0.0], where -1.0 is -40 dB or less.
