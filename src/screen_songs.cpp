@@ -12,7 +12,7 @@ CScreenSongs::CScreenSongs(std::string const& name, unsigned int width, unsigned
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	if (sm->getSongs() == NULL)
 		sm->setSongs(new Songs(songdirs));
-	m_emptyCover.reset(new Surface(sm)->getThemePathFile("no_cover.png"),FILE_MAGICK));
+	m_emptyCover.reset(new Surface(sm->getThemePathFile("no_cover.png"),FILE_MAGICK));
 }
 
 void CScreenSongs::enter() {

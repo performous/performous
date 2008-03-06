@@ -122,8 +122,8 @@ void CScreenSing::draw() {
 #ifdef USE_OPENGL
 	glClear(GL_COLOR_BUFFER_BIT);
 #endif
-	video.render(time - song.videoGap, m_width, m_height);
 	background->draw(0.5,0.5,0.5+m_width,0.5+m_height);
+	video.render(time - song.videoGap, m_width, m_height);
 	theme->bg->draw(0.5,0.5,0.5+m_width,0.5+m_height);
 	// Compute and draw the timer and the progressbar
 	theme->timertxt.text = (boost::format("%02u:%02u") % (unsigned(time) / 60) % (unsigned(time) % 60)).str();
