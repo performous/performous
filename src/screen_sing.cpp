@@ -319,8 +319,9 @@ void CScreenSing::draw() {
 	theme->lyricsfuture.fontsize = oldfontsize;
 	theme->lyricsnextsentence.fontsize = oldfontsize;
 
-	sm->getVideoDriver()->updateSurface(theme_id, theme->theme->getCurrent());
-	sm->getVideoDriver()->drawSurface(theme_id);
-	sm->getVideoDriver()->updateSurface(pitchGraph_id, pitchGraph.getCurrent());
-	sm->getVideoDriver()->drawSurface(pitchGraph_id);
+	CVideoDriver& v = *sm->getVideoDriver();
+	v.updateSurface(theme_id, theme->theme->getCurrent());
+	v.drawSurface(theme_id);
+	v.updateSurface(pitchGraph_id, pitchGraph.getCurrent());
+	v.drawSurface(pitchGraph_id);
 }

@@ -10,6 +10,7 @@
 #include <screen_score.h>
 #include <screen_configuration.h>
 #include <video_driver.h>
+#include <xtime.h>
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
@@ -65,6 +66,7 @@ static void init_SDL(CScreenManager& sm, CVideoDriver& vd, unsigned int width, u
 
 int main(int argc, char** argv) {
 	bool fullscreen = false;
+	bool fps = false;
 	unsigned int width, height;
 	std::string theme;
 	std::set<std::string> songdirs;
@@ -86,6 +88,7 @@ int main(int argc, char** argv) {
 		opt2.add_options()
 		  ("theme,t", po::value<std::string>(&theme)->default_value("lima"), "set theme (name or absolute path)")
 		  ("fs,f", "enable full screen mode")
+		  ("fps", "benchmark rendering speed\n  also disable 100 FPS limit")
 		  ("width,W", po::value<unsigned int>(&width)->default_value(800), "set horizontal resolution")
 		  ("height,H", po::value<unsigned int>(&height)->default_value(600), "set vertical resolution")
 		  ("cdev", po::value<std::string>(&cdev), "set capture device (disable autodetection)\n  --cdev dev[:settings]\n  --cdev help for list of devices")
@@ -130,6 +133,7 @@ int main(int argc, char** argv) {
 			return 0;
 		}
 		if (vm.count("fs")) fullscreen = true;
+		if (vm.count("fps")) fps = true;
 		// Copy songdirstmp into songdirs
 		for (std::vector<std::string>::const_iterator it = songdirstmp.begin(); it != songdirstmp.end(); ++it) {
 			std::string str = *it;
@@ -168,12 +172,24 @@ int main(int argc, char** argv) {
 		sm.addScreen(new CScreenConfiguration("Configuration", width, height));
 		sm.activateScreen("Intro");
 		// Main loop
+		boost::xtime time = now();
+		int frames = 0;
 		while (!sm.isFinished()) {
 			checkEvents_SDL(sm);
 			vd.blank();
 			sm.getCurrentScreen()->draw();
 			vd.swap();
-			boost::thread::yield();
+			++frames;
+			if (fps) {
+				if (now() - time > 1.0) {
+					std::cout << frames << " FPS" << std::endl;
+					time += 1.0;
+					frames = 0;
+				}
+			} else {
+				boost::thread::sleep(time + 0.01); // Max 100 FPS
+				time = now();
+			}
 		}
 	} catch (std::exception& e) {
 		std::cout << "FATAL ERROR: " << e.what() << std::endl;

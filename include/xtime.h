@@ -16,6 +16,9 @@ namespace {
 		boost::xtime time = left;
 		return time += seconds;
 	}
+	double operator-(boost::xtime const& a, boost::xtime const& b) {
+		return a.sec - b.sec + 1e-9 * (a.nsec - b.nsec);
+	}
 	boost::xtime now() {
 		boost::xtime time;
 		boost::xtime_get(&time, boost::TIME_UTC);
