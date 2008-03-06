@@ -19,6 +19,7 @@ class CVideo {
 	boost::scoped_ptr<CFfmpeg> mpeg;
 	VideoFrame m_videoFrame;
 	double m_time;
+	double m_lastTime;
 #endif
 };
 

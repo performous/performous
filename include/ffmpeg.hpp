@@ -117,6 +117,7 @@ class CFfmpeg {
 	void operator()(); // Thread runs here, don't call directly
 	VideoFifo  videoQueue;
 	AudioFifo  audioQueue;
+	void seek(double time) {} // TODO
   private:
 	void open(const char* _filename);
 	void close();
