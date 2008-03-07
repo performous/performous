@@ -35,7 +35,7 @@ void CVideo::render(double time, double w, double h) {
 	// Preload the next future frame
 	if (fr.data.empty()) while (mpeg->videoQueue.tryPop(fr) && fr.timestamp < time);
 #else
-	void(time);
+	(void)time; (void)w; (void)h;
 #endif
 }
 
@@ -46,7 +46,7 @@ bool CVideo::loadVideo(std::string const& _videoFile) {
 	m_lastTime = 0.0;
 	return true;
 #else
-	void(_videoFile); void(_videoSurf);
+	(void)_videoFile;
 	return false;
 #endif
 }
