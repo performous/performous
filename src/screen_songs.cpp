@@ -110,7 +110,7 @@ void CScreenSongs::draw() {
 		std::string file = song.path + song.mp3;
 		if (file != m_playing) audio.playPreview(m_playing = file);
 	}
-	sm->getVideoDriver()->drawSurface(theme->theme->getCurrent());
+	Surface(theme->theme->getCurrent()).draw(0, 0, 0);
 	if (!audio.isPaused() && seconds(now()) - m_time > IDLE_TIMEOUT) {
 		m_time = seconds(now());
 		if (!m_search.text.empty()) { m_search.text.clear(); songs.setFilter(m_search.text); }

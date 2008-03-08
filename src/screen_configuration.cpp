@@ -45,6 +45,6 @@ void CScreenConfiguration::draw() {
 		theme->theme->PrintText(&theme->value);
 	}
 	theme->bg->draw(0.5,0.5,0.5+m_width,0.5+m_height);
-	sm->getVideoDriver()->drawSurface(theme->theme->getCurrent());
+	Surface(theme->theme->getCurrent()).draw(0, 0, 0);
 }
 

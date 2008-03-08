@@ -50,6 +50,5 @@ void CScreenScore::draw() {
 	theme->theme->DrawRect(theme->level);
 	theme->level.y = oldY;
 	theme->normal_score.text = boost::lexical_cast<std::string>(score);
-	//sm->getVideoDriver()->drawSurface(bg_texture);
-	sm->getVideoDriver()->drawSurface(theme->theme->getCurrent());
+	Surface(theme->theme->getCurrent()).draw(0, 0, 0);
 }

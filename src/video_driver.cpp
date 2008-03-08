@@ -61,8 +61,4 @@ void CVideoDriver::drawSurface(unsigned int _id, int _x, int _y) // Used for lyr
 	texture_list[_id].draw(_x, _y, 0.0f);
 }
 
-void CVideoDriver::drawSurface(cairo_surface_t* _surf, int _x, int _y) // Used for some texts (song selector, grade)
-{
-	Surface(_surf).draw(_x, _y, 0.0f);
-}
 
