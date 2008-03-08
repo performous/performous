@@ -31,6 +31,7 @@ void CScreenScore::draw() {
 	if (seconds(now()) - m_time > 10.0) { sm->activateScreen("Songs"); return; }
 	Song& song = sm->getSongs()->current();
 	theme->theme->clear();
+	theme->bg->draw(0.5,0.5,0.5+m_width,0.5+m_height);
 	// Draw some numbers
 	int score = song.getScore();
 	char const* rank;

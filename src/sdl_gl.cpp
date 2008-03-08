@@ -1,5 +1,4 @@
 #include <sdl_gl.h>
-#ifdef USE_OPENGL
 
 void SDL_GL::draw_func(float w, float h, unsigned char* surfacedata, unsigned int textureid, GLenum format, float x, float y) {
 	glMatrixMode(GL_MODELVIEW);
@@ -28,4 +27,3 @@ void SDL_GL::freeTexture (unsigned int textureid)
 	glDeleteTextures (1, &textureid);
 }
 
-#endif

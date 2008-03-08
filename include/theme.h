@@ -108,7 +108,7 @@ struct CThemeSing: boost::noncopyable {
 struct CThemeScore: boost::noncopyable {
 	CThemeScore(unsigned int width, unsigned int height);
 	~CThemeScore();
-	boost::scoped_ptr<CairoSVG> bg;
+	boost::scoped_ptr<Surface> bg;
 	boost::scoped_ptr<CTheme> theme;
 	TThemeTxt normal_score;
 	TThemeTxt rank;

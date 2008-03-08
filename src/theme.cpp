@@ -402,7 +402,7 @@ CThemeSing::~CThemeSing() {}
 
 CThemeScore::CThemeScore(unsigned int width, unsigned int height) {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
-	bg.reset(new CairoSVG(sm->getThemePathFile("score_bg.svg"), width, height));
+	bg.reset(new Surface(sm->getThemePathFile("score_bg.svg")));
 	theme.reset(new CTheme(width, height));
 	theme->ParseSVGForText(sm->getThemePathFile("score_txt.svg"), &normal_score);
 	theme->ParseSVGForText(sm->getThemePathFile("score_rank.svg"), &rank);

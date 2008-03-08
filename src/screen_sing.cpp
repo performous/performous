@@ -115,9 +115,8 @@ void CScreenSing::draw() {
 	std::string sentenceNow = lyrics->getSentenceNow();
 	std::string sentenceFuture = lyrics->getSentenceFuture();
 	std::string sentenceWhole = lyrics->getSentenceWhole();
-#ifdef USE_OPENGL
+	// Rendering starts
 	glClear(GL_COLOR_BUFFER_BIT);
-#endif
 	if (m_background) m_background->draw(0.5,0.5,0.5+m_width,0.5+m_height);
 	if (m_video) m_video->render(time - song.videoGap, m_width, m_height);
 	theme->bg->draw(0.5,0.5,0.5+m_width,0.5+m_height);
