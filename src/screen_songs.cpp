@@ -19,6 +19,7 @@ void CScreenSongs::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	CAudio& audio = *sm->getAudio();
 	audio.stopMusic();
+	audio.wait();
 	static unsigned int m_volume;
 	m_volume = audio.getVolume();
 	audio.setVolume(m_volume);
