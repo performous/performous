@@ -18,8 +18,10 @@ void CScreenSing::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	Song& song = sm->getSongs()->current();
 	theme.reset(new CThemeSing(m_width, m_height));
-	try { m_video.reset(new Video(song.path + song.video)); } catch (std::exception& e) { std::cout << e.what() << std::endl; }
-	try { m_background.reset(new Surface(song.path + song.background)); } catch (std::exception& e) { std::cout << e.what() << std::endl; }
+#define TRYLOAD(field, class) if (!song.field.empty()) { try { m_##field.reset(new class(song.path + song.field)); } catch (std::exception& e) { std::cerr << e.what() << std::endl; } }
+	TRYLOAD(background, Surface)
+	TRYLOAD(video, Video)
+#undef TRYLOAD
 	theme_id = sm->getVideoDriver()->initSurface(theme->theme->getCurrent());
 	pitchGraph_id = sm->getVideoDriver()->initSurface(pitchGraph.getCurrent());
 	std::string file = song.path + song.mp3;
