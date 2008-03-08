@@ -1,6 +1,5 @@
 #include <video_driver.h>
 #include <screen.h>
-#include <sdl_gl.h>
 
 CVideoDriver::CVideoDriver()
 {
@@ -47,32 +46,23 @@ void CVideoDriver::swap()
 
 unsigned int CVideoDriver::initSurface(cairo_surface_t * _surf)
 {
-	unsigned int texture;
-	SDL_GL::initTexture (cairo_image_surface_get_width(_surf),cairo_image_surface_get_height(_surf), &texture, GL_RGBA);
-	texture_list.push_back(texture);
-	cairo_list.push_back(_surf);
-	return cairo_list.size()-1;
+	int w = cairo_image_surface_get_width(_surf);
+	int h = cairo_image_surface_get_height(_surf);
+	texture_list.push_back(new Surface(w, h, Surface::RGBA, cairo_image_surface_get_data(_surf)));
+	return texture_list.size() - 1;
 }
 
-void CVideoDriver::updateSurface(unsigned int _id, cairo_surface_t * _surf) {
-	cairo_list[_id] = _surf;
+void CVideoDriver::updateSurface(unsigned int _id, cairo_surface_t* _surf) {
+	texture_list.replace(_id, new Surface(_surf));
 }
 
 void CVideoDriver::drawSurface(unsigned int _id, int _x, int _y) // Used for lyrics and pitch bars
 {
-	if (cairo_list[_id] != NULL) {
-		int w = cairo_image_surface_get_width(cairo_list[_id]);
-		int h = cairo_image_surface_get_height(cairo_list[_id]);
-		SDL_GL::draw_func(w,h,cairo_image_surface_get_data(cairo_list[_id]),texture_list[_id], GL_BGRA, _x, _y);
-	} else SDL_GL::draw_func(screen->w,screen->h,NULL,texture_list[_id], GL_BGRA, _x, _y);
+	texture_list[_id].draw(_x, _y, 0.0f);
 }
 
 void CVideoDriver::drawSurface(cairo_surface_t* _surf, int _x, int _y) // Used for some texts (song selector, grade)
 {
-	unsigned int texture;
-	int w = cairo_image_surface_get_width(_surf);
-	int h = cairo_image_surface_get_height(_surf);
-	SDL_GL::initTexture (w,h, &texture, GL_BGRA);
-	SDL_GL::draw_func(w,h,cairo_image_surface_get_data(_surf),texture, GL_BGRA, _x, _y);
-	SDL_GL::freeTexture(texture);
+	Surface(_surf).draw(_x, _y, 0.0f);
 }
+

@@ -2,7 +2,9 @@
 #define __VIDEODRIVER_H__
 
 #include "../config.h"
+#include <boost/ptr_container/ptr_vector.hpp>
 #include <vector>
+#include <surface.h>
 
 class CVideoDriver {
   public:
@@ -17,8 +19,7 @@ class CVideoDriver {
 	void swap();
   private:
 	SDL_Surface* screen;
-	std::vector<unsigned int> texture_list;
-	std::vector<cairo_surface_t*> cairo_list;
+	boost::ptr_vector<Surface> texture_list;
 };
 
 #endif
