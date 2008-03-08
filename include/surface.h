@@ -7,7 +7,7 @@
 
 class Surface: boost::noncopyable {
   public:
-	enum Format { RGBA = 1, ARGB = 2 };
+	enum Format { RGBA = 1, ARGB = 2, RGB = 3, BGR = 4 };
 	Surface(unsigned width, unsigned height, Format format, unsigned char* buffer);
 	Surface(cairo_surface_t* _surf);
 	Surface(std::string filename);

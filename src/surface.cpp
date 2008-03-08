@@ -20,13 +20,21 @@ void Surface::load(unsigned int width, unsigned int height, Format format, unsig
 	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texture_id);
 	unsigned int fmt;
 	bool swap;
-	switch (format) {
+	switch(m_format) {
+	  case RGB:
+		format = GL_RGB;
+		swap = false;
+		break;
+	  case BGR:
+		format = GL_RGB;
+		swap = true;
+		break;
 	  case RGBA:
-		fmt = GL_RGBA;
+		format = GL_RGBA;
 		swap = false;
 		break;
 	  case ARGB:
-		fmt = GL_BGRA;
+		format = GL_BGRA;
 		swap = true;
 		break;
 	}

@@ -90,7 +90,7 @@ void CFfmpeg::open(const char* _filename) {
 	int h = pVideoCodecCtx->height;
 	img_convert_ctx = sws_getContext(
 	  w, h, pVideoCodecCtx->pix_fmt,
-	  w, h, PIX_FMT_RGB32,
+	  w, h, PIX_FMT_RGB24,
 	  SWS_BICUBIC, NULL, NULL, NULL);
 }
 
@@ -152,10 +152,10 @@ void CFfmpeg::decodeNextFrame() {
 					// Convert into RGB and scale the data
 					int w = pVideoCodecCtx->width;
 					int h = pVideoCodecCtx->height;
-					std::vector<uint8_t> buffer(w * h * 4);
+					std::vector<uint8_t> buffer(w * h * 3);
 					{
 						uint8_t* data = &buffer[0];
-						int linesize = w * 4;
+						int linesize = w * 3;
 						sws_scale(img_convert_ctx, videoFrame->data, videoFrame->linesize, 0, h, &data, &linesize);
 					}
 					VideoFrame* tmp = new VideoFrame();

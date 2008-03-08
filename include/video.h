@@ -4,6 +4,8 @@
 #include "../config.h"
 #include <string>
 
+#include "surface.h"
+
 #ifdef USE_FFMPEG_VIDEO
 #include "ffmpeg.hpp"
 #endif
@@ -16,7 +18,7 @@ class Video {
   private:
 #ifdef USE_FFMPEG_VIDEO
 	CFfmpeg m_mpeg;
-	GLuint m_texture;
+	boost::scoped_ptr<Surface> surface;
 	VideoFrame m_videoFrame;
 	double m_time;
 	double m_lastTime;
