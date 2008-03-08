@@ -66,15 +66,6 @@ AC_ARG_WITH(video,
 )
 if test $video_layer = yes ; then video_layer="autodetect" ; fi
 
-AC_ARG_WITH(graphic-driver,
-        AC_HELP_STRING(--with-graphic-driver[={sdl|opengl}],
-                graphic driver selection [[[default=sdl]]]),
-        [graphic_driver="$withval"],
-        [graphic_driver="sdl"]
-)
-if test $graphic_driver = yes; then graphic_driver="sdl"; fi
-
-
 AC_ARG_ENABLE(record-alsa,
 	AC_HELP_STRING(--enable-record-alsa,
 		Enable alsa record backend [[[default=autodetect]]]),
@@ -497,25 +488,11 @@ esac
 AC_SUBST(SVG_FLAGS)
 AC_SUBST(SVG_LIBS)
 
-case $graphic_driver in
-	sdl*)
-		GL_LIBS=""
-		ac_includes_default=$(cat <<-USNG_EOF
-		$ac_includes_default
-		/* graphic driver */
-		#define USE_SDL 1
-		USNG_EOF)
-		;;
-        opengl*)
-		GL_LIBS="-lGL -lGLU"
-		ac_includes_default=$(cat <<-USNG_EOF
-		$ac_includes_default
-		/* graphic driver */
-		#define USE_OPENGL 1 
-		#include <SDL/SDL_opengl.h>
-		USNG_EOF)
-		;;
-esac
+GL_LIBS="-lGL -lGLU"
+ac_includes_default=$(cat <<-USNG_EOF
+$ac_includes_default
+#include <SDL/SDL_opengl.h>
+USNG_EOF)
 
 AC_SUBST(GL_LIBS)
 
@@ -541,7 +518,6 @@ echo "debug            | --{enable,disable}-debug | $debug                "
 echo "audio            | --with-audio             | $audio_layer          "
 echo "video            | --with-video             | $video_layer          "
 echo "svg              | --with-svg               | $svg_layer            "
-echo "graphic driver   | --with-graphic-driver    | $graphic_driver       "
 echo "record           | --with-record-{}         | none                  "
 echo "                 |                          | ~tone                 "
 if test ${RECORD_ALSA} = true ; then
