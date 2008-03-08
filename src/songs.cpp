@@ -501,3 +501,14 @@ void Songs::sort_internal() {
 	}
 }
 
+void Songs::dump(std::ostream& os) {
+	m_order = 1;
+	RestoreSel restore(*this);
+	sort_internal();
+	os << m_filtered.size() << " songs:" << std::endl;
+	for (filtered_t::const_iterator it = m_filtered.begin(); it != m_filtered.end(); ++it) {
+		//os << "  " << (*it)->artist << " - " << (*it)->title << std::endl;
+		os << "  " << (*it)->title << " - " << (*it)->artist << std::endl;
+	}
+}
+

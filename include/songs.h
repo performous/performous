@@ -144,6 +144,7 @@ class Songs {
 	void random() { if (m_order) randomize(); advance(1); }
 	void sortChange(int diff);
 	void parseFile(Song& tmp);
+	void dump(std::ostream& os);
   private:
 	class RestoreSel;
 	typedef boost::ptr_set<Song> songlist_t;
