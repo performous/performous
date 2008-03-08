@@ -1,5 +1,6 @@
 #include "surface.h"
 #include <iostream>
+#include <stdexcept>
 
 Surface::Surface(double width, double height, unsigned int format, unsigned char * buffer):
 	m_width(width),m_height(height),m_format(format),texture_id(0) {
@@ -8,11 +9,13 @@ Surface::Surface(double width, double height, unsigned int format, unsigned char
 
 Surface::~Surface() {
 	glUnload();
+	std::cout << "~Surf: " << texture_id << std::endl;
+	glDeleteTextures(1, &texture_id);
 }
 
 void Surface::glLoad(unsigned char * buffer) {
-	glUnload();
 	glGenTextures(1, &texture_id);
+	std::cout << "Surf: " << texture_id << std::endl;
 	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texture_id);
 	unsigned int format;
 	bool swap;
@@ -31,16 +34,9 @@ void Surface::glLoad(unsigned char * buffer) {
 }
 
 void Surface::glUnload() {
-	if( texture_id ) {
-		glDeleteTextures (1, &texture_id);
-		texture_id = 0;
-	}
 }
 
 void Surface::draw( float x, float y, float w, float h) {
-	if( texture_id == 0 ) {
-		return;
-	}
 	glMatrixMode(GL_MODELVIEW);
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texture_id);
@@ -65,7 +61,7 @@ Surface::Surface( std::string filename, unsigned int type ):texture_id(0) {
 		rsvg_init();
 		svgHandle = rsvg_handle_new_from_file(filename.c_str(), &pError);
 		if(pError != NULL) {
-			std::cerr << "Surace::Surface " << pError->message << std::endl;
+			std::cerr << "Surface::Surface " << pError->message << std::endl;
 			g_error_free(pError);
 		}
 		rsvg_handle_get_dimensions (svgHandle, &svgDimension);
@@ -82,20 +78,18 @@ Surface::Surface( std::string filename, unsigned int type ):texture_id(0) {
 		rsvg_term();
 		cairo_destroy (dc);
 	} else if( type == FILE_MAGICK ) {
-		Magick::Image image;
-		Magick::Blob blob;
 		try {
+			Magick::Image image;
+			Magick::Blob blob;
 			image.read(filename);
 			image.magick("RGBA");
 			image.write(&blob);
-		} catch( Magick::Exception &error_ ) {
-			std::cerr << "Caught exception: " << error_.what() << std::endl;
-			return;
-		} 
-	
-		m_width = image.columns();
-		m_height = image.rows();
-		m_format = SURFACE_RGBA;
-		glLoad((unsigned char *)blob.data());
+			m_width = image.columns();
+			m_height = image.rows();
+			m_format = SURFACE_RGBA;
+			glLoad((unsigned char *)blob.data());
+		} catch (Magick::Exception&) {
+			throw std::runtime_error("Cannot load " + filename);
+		}
 	}
 }

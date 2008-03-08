@@ -24,7 +24,11 @@ void CScreenSing::enter() {
 		std::cout << "Now playing: " << file << std::endl;
 		video_ok = video.loadVideo(file);
 	}
-	background.reset(new Surface(song.path + song.background,FILE_MAGICK));
+	try {
+		background.reset(new Surface(song.path + song.background,FILE_MAGICK));
+	} catch (std::exception& e) {
+		std::cout << e.what() << std::endl;
+	}
 	theme_id = sm->getVideoDriver()->initSurface(theme->theme->getCurrent());
 	pitchGraph_id = sm->getVideoDriver()->initSurface(pitchGraph.getCurrent());
 	std::string file = song.path + song.mp3;
@@ -122,7 +126,7 @@ void CScreenSing::draw() {
 #ifdef USE_OPENGL
 	glClear(GL_COLOR_BUFFER_BIT);
 #endif
-	background->draw(0.5,0.5,0.5+m_width,0.5+m_height);
+	if (background) background->draw(0.5,0.5,0.5+m_width,0.5+m_height);
 	video.render(time - song.videoGap, m_width, m_height);
 	theme->bg->draw(0.5,0.5,0.5+m_width,0.5+m_height);
 	// Compute and draw the timer and the progressbar

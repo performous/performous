@@ -98,13 +98,16 @@ void CScreenSongs::draw() {
 		std::string cover = song_display.path + song_display.cover;
 		if (cover != m_cover) {
 			m_cover = cover;
-			m_currentCover.reset( new Surface(cover,FILE_MAGICK) );
+			try {
+				m_currentCover.reset( new Surface(cover,FILE_MAGICK) );
+			} catch (std::exception& e) {
+				m_currentCover.reset();
+			}
 		}
 		double shift = remainder(songs.currentPosition(), 1.0);
 		float x = round((800 - 256) / 2 - shift * 1056);
 		float y = (600 - 256) / 2;
-		m_emptyCover->draw(m_width*x/800., m_height*y/600.,m_width*256./800.,m_height*256./600.);
-		m_currentCover->draw(m_width*x/800., m_height*y/600.,m_width*256./800.,m_height*256./600.);
+		(m_currentCover ? m_currentCover : m_emptyCover)->draw(m_width*x/800., m_height*y/600.,m_width*256./800.,m_height*256./600.);
 		// Play a preview of the song
 		std::string file = song.path + song.mp3;
 		if (file != m_playing) audio.playPreview(m_playing = file);
