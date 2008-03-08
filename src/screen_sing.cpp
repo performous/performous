@@ -15,14 +15,13 @@ CScreenSing::CScreenSing(std::string const& name, unsigned int width, unsigned i
 }
 
 void CScreenSing::enter() {
-	bool video_ok = false;
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	Song& song = sm->getSongs()->current();
 	theme.reset(new CThemeSing(m_width, m_height));
 	if (!song.video.empty()) {
 		std::string file = song.path + song.video;
 		std::cout << "Now playing: " << file << std::endl;
-		video_ok = video.loadVideo(file);
+		video.loadVideo(file);
 	}
 	try {
 		background.reset(new Surface(song.path + song.background,FILE_MAGICK));
