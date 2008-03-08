@@ -1,7 +1,6 @@
 #include "surface.h"
 
 #include <boost/filesystem.hpp>
-#include <iostream>
 #include <stdexcept>
 
 Surface::Surface(unsigned int width, unsigned int height, Surface::Format format, unsigned char* buffer) {
@@ -9,32 +8,30 @@ Surface::Surface(unsigned int width, unsigned int height, Surface::Format format
 }
 
 Surface::~Surface() {
-	std::cout << "~Surf: " << texture_id << std::endl;
 	glDeleteTextures(1, &texture_id);
 }
 
 void Surface::load(unsigned int width, unsigned int height, Format format, unsigned char* buffer) {
 	m_width = width; m_height = height;
 	glGenTextures(1, &texture_id);
-	std::cout << "Surf: " << texture_id << std::endl;
 	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texture_id);
 	unsigned int fmt;
 	bool swap;
-	switch(m_format) {
+	switch(format) {
 	  case RGB:
-		format = GL_RGB;
+		fmt = GL_RGB;
 		swap = false;
 		break;
 	  case BGR:
-		format = GL_RGB;
+		fmt = GL_RGB;
 		swap = true;
 		break;
 	  case RGBA:
-		format = GL_RGBA;
+		fmt = GL_RGBA;
 		swap = false;
 		break;
 	  case ARGB:
-		format = GL_BGRA;
+		fmt = GL_BGRA;
 		swap = true;
 		break;
 	}
