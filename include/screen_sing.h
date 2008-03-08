@@ -21,7 +21,8 @@ class CScreenSing: public CScreen {
 	void draw();
   private:
 	Analyzer const& m_analyzer;
-	boost::scoped_ptr<Surface> background;
+	boost::scoped_ptr<Surface> m_background;
+	boost::scoped_ptr<Video> m_video;
 	unsigned int theme_id;
 	unsigned int pitchGraph_id;
 	// Keeps the pitch tracking graphics
@@ -31,7 +32,6 @@ class CScreenSing: public CScreen {
 	bool play;
 	bool finished;
 	double playOffset;
-	CVideo video;
 	boost::scoped_ptr<CThemeSing> theme;
 	boost::scoped_ptr<Lyrics> lyrics;
 	Song::notes_t::const_iterator m_songit;

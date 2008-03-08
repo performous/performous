@@ -1,16 +1,22 @@
 #include <video.h>
 
-void CVideo::unloadVideo() {
+#ifdef USE_FFMPEG_VIDEO
+Video::Video(std::string const& _videoFile): m_mpeg(true, false, _videoFile), m_lastTime()
+{
+	glGenTextures(1, &m_texture);
+}
+#else
+Video::Video(std::string const&) {}
+#endif
+
+Video::~Video() {
 #ifdef USE_FFMPEG_VIDEO
 	glDeleteTextures(1, &m_texture);
-	mpeg.reset();
-	m_videoFrame = VideoFrame();
 #endif
 }
 
-void CVideo::render(double time, double w, double h) {
+void Video::render(double time, double w, double h) {
 #ifdef USE_FFMPEG_VIDEO
-	if (!mpeg) return;
 	VideoFrame& fr = m_videoFrame;
 	// Time to switch frame?
 	if (!fr.data.empty() && time >= fr.timestamp) {
@@ -30,24 +36,12 @@ void CVideo::render(double time, double w, double h) {
 	glTexCoord2f(0.0, fr.height); glVertex2f(-0.5, 0.5);
 	glEnd();
 	glPopMatrix();
-	if (time < m_lastTime) mpeg->seek(time);
+	if (time < m_lastTime) m_mpeg.seek(time);
 	m_lastTime = time;
 	// Preload the next future frame
-	if (fr.data.empty()) while (mpeg->videoQueue.tryPop(fr) && fr.timestamp < time);
+	if (fr.data.empty()) while (m_mpeg.videoQueue.tryPop(fr) && fr.timestamp < time);
 #else
 	(void)time; (void)w; (void)h;
-#endif
-}
-
-bool CVideo::loadVideo(std::string const& _videoFile) {
-#ifdef USE_FFMPEG_VIDEO
-	glGenTextures(1, &m_texture);
-	mpeg.reset(new CFfmpeg(true, false, _videoFile));
-	m_lastTime = 0.0;
-	return true;
-#else
-	(void)_videoFile;
-	return false;
 #endif
 }
 

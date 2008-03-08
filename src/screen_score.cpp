@@ -12,7 +12,7 @@ CScreenScore::~CScreenScore() {}
 void CScreenScore::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
   	theme.reset(new CThemeScore(m_width, m_height));
-	bg_texture = sm->getVideoDriver()->initSurface(theme->bg->getSDLSurface());
+	//bg_texture = sm->getVideoDriver()->initSurface(theme->bg->getSDLSurface());
 	m_time = seconds(now());
 }
 
@@ -49,6 +49,6 @@ void CScreenScore::draw() {
 	theme->theme->DrawRect(theme->level);
 	theme->level.y = oldY;
 	theme->normal_score.text = boost::lexical_cast<std::string>(score);
-	sm->getVideoDriver()->drawSurface(bg_texture);
+	//sm->getVideoDriver()->drawSurface(bg_texture);
 	sm->getVideoDriver()->drawSurface(theme->theme->getCurrent());
 }

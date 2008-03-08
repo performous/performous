@@ -8,15 +8,15 @@
 #include "ffmpeg.hpp"
 #endif
        
-class CVideo {
+class Video {
   public:
-	bool loadVideo(std::string const& videoFile);
-	void unloadVideo();
+	Video(std::string const& videoFile);
+	~Video();
 	void render(double time, double screenWidth, double screenHeight);
   private:
 #ifdef USE_FFMPEG_VIDEO
+	CFfmpeg m_mpeg;
 	GLuint m_texture;
-	boost::scoped_ptr<CFfmpeg> mpeg;
 	VideoFrame m_videoFrame;
 	double m_time;
 	double m_lastTime;

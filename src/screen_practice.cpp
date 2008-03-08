@@ -8,23 +8,16 @@ CScreenPractice::~CScreenPractice() {}
 
 void CScreenPractice::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
-	double unitX = m_width/800.;
-	double unitY = m_height/600.;
-
-	cairo_svg_note.reset(new CairoSVG(sm->getThemePathFile("practice_note.svg").c_str(),40 * unitX, 25 * unitY));
-	texture_note = sm->getVideoDriver()->initSurface(cairo_svg_note->getSDLSurface());
-
-	cairo_svg_sharp.reset(new CairoSVG(sm->getThemePathFile("practice_sharp.svg").c_str(),25 * unitX, 75 * unitY));
-	texture_sharp = sm->getVideoDriver()->initSurface(cairo_svg_sharp->getSDLSurface());
-
+	m_surf_note.reset(new Surface(sm->getThemePathFile("practice_note.svg")));
+	m_surf_sharp.reset(new Surface(sm->getThemePathFile("practice_sharp.svg")));
 	theme.reset(new CThemePractice(m_width, m_height));
 }
 
 void CScreenPractice::exit()
 {
 	theme.reset();
-	cairo_svg_note.reset();
-	cairo_svg_sharp.reset();
+	m_surf_note.reset();
+	m_surf_sharp.reset();
 }
 
 void CScreenPractice::manageEvent(SDL_Event event)
@@ -75,13 +68,12 @@ void CScreenPractice::draw()
 			double noteOffsetX = -600.0 - 10.0 * t->stabledb;
 			int posXnote = (m_width-noteOffsetX*resFactorX) / 2.0;
 			int posYnote = (340.-noteOffset*12.5)*resFactorY;
-			sm->getVideoDriver()->drawSurface(texture_note,posXnote,posYnote);
+			m_surf_note->draw(posXnote, posYnote, 40 * resFactorX, 25 * resFactorY);
 			if (sharp) {
 				int posXsharp = (m_width-(noteOffsetX + 60.0)*resFactorX) / 2.0;
 				int posYsharp = (315.-noteOffset*12.5)*resFactorY;
-				sm->getVideoDriver()->drawSurface(texture_sharp,posXsharp,posYsharp);
+				m_surf_sharp->draw(posXsharp, posYsharp, 25 * resFactorX, 75 * resFactorY);
 			}
 		}
 	}
-	sm->getVideoDriver()->drawSurface(theme->theme->getCurrent());
 }

@@ -18,10 +18,8 @@ class CScreenPractice : public CScreen {
   private:
 	Analyzer const& m_analyzer;
 	boost::scoped_ptr<CThemePractice> theme;
-	boost::scoped_ptr<CairoSVG> cairo_svg_note;
-	boost::scoped_ptr<CairoSVG> cairo_svg_sharp;
-	unsigned int texture_note;
-	unsigned int texture_sharp;
+	boost::scoped_ptr<Surface> m_surf_note;
+	boost::scoped_ptr<Surface> m_surf_sharp;
 };
 
 #endif

@@ -27,4 +27,5 @@ void SDL_GL::freeTexture (unsigned int textureid)
 {
 	glDeleteTextures (1, &textureid);
 }
+
 #endif
