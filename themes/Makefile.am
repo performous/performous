@@ -1,5 +1,5 @@
 themesdefdir   = @THEMES_DIR@/default
-themesdef_DATA = default/no_cover.png \
+themesdef_DATA = default/no_cover.svg \
 	default/intro.svg \
 	default/songs_bg.svg \
 	default/songs_order.svg \
@@ -30,7 +30,7 @@ themesdef_DATA = default/no_cover.png \
 
 themeslimadir   = @THEMES_DIR@/lima
 themeslima_DATA = lima/icon.png \
-	lima/no_cover.png \
+	lima/no_cover.svg \
 	lima/intro.svg \
 	lima/songs_bg.svg \
 	lima/songs_order.svg \
