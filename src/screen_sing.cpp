@@ -5,7 +5,6 @@
 #include <sdl_helper.h>
 #include <songs.h>
 #include <pitch_graph.h>
-#include <cairotosdl.h>
 #include <iostream>
 #include <iomanip>
 
@@ -120,6 +119,7 @@ void CScreenSing::draw() {
 	if (m_background) m_background->draw(0.5,0.5,0.5+m_width,0.5+m_height);
 	if (m_video) m_video->render(time - song.videoGap, m_width, m_height);
 	theme->bg->draw(0.5,0.5,0.5+m_width,0.5+m_height);
+	theme->p1box->draw(0.5,0.5,0.5+m_width,0.5+m_height);
 	// Compute and draw the timer and the progressbar
 	theme->timertxt.text = (boost::format("%02u:%02u") % (unsigned(time) / 60) % (unsigned(time) % 60)).str();
 	theme->theme->PrintText(&theme->timertxt);

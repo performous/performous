@@ -14,9 +14,7 @@ ultrastarng_SOURCES = main.cpp \
 	screen_practice.cpp \
 	screen_score.cpp \
 	screen_configuration.cpp \
-	cairotosdl.cpp \
 	pitch_graph.cpp \
-	cairosvg.cpp \
 	theme.cpp \
 	ffmpeg.cpp \
 	surface.cpp \

@@ -5,7 +5,6 @@
 
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <cairosvg.h>
 #include <surface.h>
 #include <string>
 
@@ -93,7 +92,7 @@ struct CThemeSing: boost::noncopyable {
 	CThemeSing(unsigned int width, unsigned int height);
 	~CThemeSing();
 	boost::scoped_ptr<Surface> bg;
-	boost::scoped_ptr<CairoSVG> p1box;
+	boost::scoped_ptr<Surface> p1box;
 	boost::scoped_ptr<CTheme> theme;
 	TThemeTxt timertxt; 
 	TThemeTxt p1score;

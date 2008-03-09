@@ -386,7 +386,7 @@ CThemePractice::~CThemePractice() {}
 CThemeSing::CThemeSing(unsigned int width, unsigned int height) {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
 	bg.reset(new Surface(sm->getThemePathFile("sing_bg.svg"),Surface::SVG));
-	p1box.reset(new CairoSVG(sm->getThemePathFile("sing_p1box.svg"), width, height));
+	p1box.reset(new Surface(sm->getThemePathFile("sing_p1box.svg"),Surface::SVG));
 	theme.reset(new CTheme(width, height));
 	theme->ParseSVGForText(sm->getThemePathFile("sing_timetxt.svg"), &timertxt);
 	theme->ParseSVGForText(sm->getThemePathFile("sing_p1score.svg"), &p1score);

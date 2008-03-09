@@ -50,14 +50,6 @@ AC_ARG_WITH(audio,
 )
 if test $audio_layer = yes ; then audio_layer="autodetect" ; fi
 
-AC_ARG_WITH(svg,
-	AC_HELP_STRING(--with-svg[={cairo|librsvg}],
-		implementation of the svg rendering layer [[[default=librsvg]]]),
-	[svg_layer="$withval"],
-	[svg_layer="librsvg"]
-)
-if test $svg_layer = yes ; then svg_layer="librsvg" ; fi
-
 AC_ARG_WITH(video,
 	 AC_HELP_STRING(--with-video[={ffmpeg|disable}],
 	 	implementation of the video rendering layer [[[default=autodetect]]]),
@@ -151,8 +143,9 @@ PKG_CHECK_MODULES(pangocairo, pangocairo , ,
 PKG_CHECK_MODULES([ImageMagick], [ImageMagick++] , ,
 	AC_MSG_ERROR(This game cannot be built without imagemagick))
 
-PKG_CHECK_MODULES(librsvg, librsvg-2.0 , [librsvg_detected="yes"] , [librsvg_detected="no"])
-PKG_CHECK_MODULES(cairosvg, cairo-svg , [cairosvg_detected="yes"] , [cairosvg_detected="no"])
+PKG_CHECK_MODULES(librsvg, librsvg-2.0 , , 
+	AC_MSG_ERROR(This game cannot be built without librsvg))
+
 PKG_CHECK_MODULES(xine, libxine , [xine_detected="yes"] , [xine_detected="no"])
 PKG_CHECK_MODULES(gstreamer_0_10, gstreamer-0.10, [gst_detected="yes"] , [gst_detected="no"])
 PKG_CHECK_MODULES(gstreamer_0_10_7, gstreamer-0.10 >= 0.10.7 , [gst_detected_seek_simple="yes"] , [gst_detected_seek_simple="no"])
@@ -240,6 +233,18 @@ $ac_includes_default
 USNG_EOF)
 AC_SUBST(PANGOCAIRO_FLAGS)
 AC_SUBST(PANGOCAIRO_LIBS)
+
+# Do things for librsvg
+SVG_FLAGS=`pkg-config --cflags librsvg-2.0`
+SVG_LIBS=`pkg-config --libs librsvg-2.0`
+ac_includes_default=$(cat <<-USNG_EOF
+$ac_includes_default
+/* svg headers */
+#include <librsvg/rsvg.h>
+#include <librsvg/rsvg-cairo.h>
+USNG_EOF)
+AC_SUBST(SVG_FLAGS)
+AC_SUBST(SVG_LIBS)
 
 # Configure alsa record backend
 if test $record_alsa = yes ; then
@@ -430,64 +435,6 @@ esac
 AC_SUBST(AUDIO_FLAGS)
 AC_SUBST(AUDIO_LIBS)
 
-# Do things for svg
-case $svg_layer in
-	librsvg*)
-		if test $librsvg_detected = yes ; then
-			svg_layer="librsvg"
-		else
-			svg_layer="no"
-		fi
-		;;
-	cairo*)
-		if test $cairosvg_detected = yes ; then
-			svg_layer="cairo"
-		else
-			svg_layer="no"
-		fi
-		;;
-	autodetect*)
-		if test $librsvg_detected = yes ; then
-			svg_layer="librsvg"
-		else if test $cairosvg_detected = yes ; then
-			svg_layer="cairo"
-		else
-			svg_layer="no"
-		fi ; fi
-		;;
-esac
-
-case $svg_layer in
-	librsvg*)
-		SVG_FLAGS=`pkg-config --cflags librsvg-2.0`
-		SVG_LIBS=`pkg-config --libs librsvg-2.0`
-		ac_includes_default=$(cat <<-USNG_EOF
-		$ac_includes_default
-		/* svg headers */
-		#define USE_LIBRSVG 1
-		#include <librsvg/rsvg.h>
-		#include <librsvg/rsvg-cairo.h>
-		USNG_EOF)
-		;;
-	cairo*)
-		SVG_FLAGS=`pkg-config --cflags libsvg-cairo`
-		SVG_LIBS=`pkg-config --libs libsvg-cairo`
-		ac_includes_default=$(cat <<-USNG_EOF
-		$ac_includes_default
-		/* svg headers */
-		#define USE_LIBSVG_CAIRO 1
-		#include <svg.h>
-		#include <svg-cairo.h>
-		USNG_EOF)
-		;;
-	no*)
-		AC_MSG_ERROR("Ultrstar-ng doesn't support non svg rendering please install eather cairo-svg or librsvg")
-		;;
-esac
-
-AC_SUBST(SVG_FLAGS)
-AC_SUBST(SVG_LIBS)
-
 GL_LIBS="-lGL -lGLU"
 ac_includes_default=$(cat <<-USNG_EOF
 $ac_includes_default
@@ -517,7 +464,6 @@ echo "--------------------------------------------------------------------"
 echo "debug            | --{enable,disable}-debug | $debug                "
 echo "audio            | --with-audio             | $audio_layer          "
 echo "video            | --with-video             | $video_layer          "
-echo "svg              | --with-svg               | $svg_layer            "
 echo "record           | --with-record-{}         | none                  "
 echo "                 |                          | ~tone                 "
 if test ${RECORD_ALSA} = true ; then

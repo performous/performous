@@ -5,7 +5,6 @@
 
 #include <boost/scoped_ptr.hpp>
 #include <screen.h>
-#include <cairosvg.h>
 #include <theme.h>
 
 class CScreenScore: public CScreen {
