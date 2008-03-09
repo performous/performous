@@ -1,6 +1,6 @@
 #include "surface.h"
 
-#include <boost/filesystem.hpp>
+// Disabling temporarily: #include <boost/filesystem.hpp>
 #include <stdexcept>
 
 Surface::Surface(unsigned int width, unsigned int height, Surface::Format format, unsigned char* buffer) {
@@ -59,7 +59,7 @@ void Surface::draw(float x, float y, float w, float h) {
 }
 
 Surface::Surface(std::string filename, Filetype filetype) {
-	if (!boost::filesystem::is_regular(filename)) throw std::runtime_error("File not found: " + filename);
+	// Disabling temporarily to get rid of Boost.Filesystem dep: if (!boost::filesystem::is_regular(filename)) throw std::runtime_error("File not found: " + filename);
 	switch( filetype ) {
 	  case MAGICK: 
 	  	{
