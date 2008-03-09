@@ -12,7 +12,6 @@ CScreenScore::~CScreenScore() {}
 void CScreenScore::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
   	theme.reset(new CThemeScore(m_width, m_height));
-	//bg_texture = sm->getVideoDriver()->initSurface(theme->bg->getSDLSurface());
 	m_time = seconds(now());
 }
 

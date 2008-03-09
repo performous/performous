@@ -19,7 +19,6 @@ class CScreenScore: public CScreen {
   private:
 	double m_time;
 	boost::scoped_ptr<CThemeScore> theme;
-	unsigned int bg_texture;
 };
 
 #endif
