@@ -43,22 +43,3 @@ void CVideoDriver::swap()
 {
 	SDL_GL_SwapBuffers();
 }
-
-unsigned int CVideoDriver::initSurface(cairo_surface_t * _surf)
-{
-	int w = cairo_image_surface_get_width(_surf);
-	int h = cairo_image_surface_get_height(_surf);
-	texture_list.push_back(new Surface(w, h, Surface::RGBA, cairo_image_surface_get_data(_surf)));
-	return texture_list.size() - 1;
-}
-
-void CVideoDriver::updateSurface(unsigned int _id, cairo_surface_t* _surf) {
-	texture_list.replace(_id, new Surface(_surf));
-}
-
-void CVideoDriver::drawSurface(unsigned int _id, int _x, int _y) // Used for lyrics and pitch bars
-{
-	texture_list[_id].draw(_x, _y, 0.0f);
-}
-
-

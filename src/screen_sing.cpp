@@ -22,8 +22,6 @@ void CScreenSing::enter() {
 #define TRYLOAD(field, class) if (!song.field.empty()) { try { m_##field.reset(new class(song.path + song.field)); } catch (std::exception& e) { std::cerr << e.what() << std::endl; } }
 	TRYLOAD(video, Video)
 #undef TRYLOAD
-	theme_id = sm->getVideoDriver()->initSurface(theme->theme->getCurrent());
-	pitchGraph_id = sm->getVideoDriver()->initSurface(pitchGraph.getCurrent());
 	std::string file = song.path + song.mp3;
 	std::cout << "Now playing: " << file << std::endl;
 	CAudio& audio = *sm->getAudio();
@@ -316,9 +314,6 @@ void CScreenSing::draw() {
 	theme->lyricsfuture.fontsize = oldfontsize;
 	theme->lyricsnextsentence.fontsize = oldfontsize;
 
-	CVideoDriver& v = *sm->getVideoDriver();
-	v.updateSurface(theme_id, theme->theme->getCurrent());
-	v.drawSurface(theme_id);
-	v.updateSurface(pitchGraph_id, pitchGraph.getCurrent());
-	v.drawSurface(pitchGraph_id);
+	Surface(theme->theme->getCurrent()).draw(0, 0, 0);
+	Surface(pitchGraph.getCurrent()).draw(0, 0, 0);
 }
