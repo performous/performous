@@ -58,16 +58,21 @@ void Surface::draw(float x, float y, float w, float h) {
 	glPopMatrix();
 }
 
-Surface::Surface(std::string filename) {
+Surface::Surface(std::string filename, Filetype filetype) {
 	if (!boost::filesystem::is_regular(filename)) throw std::runtime_error("File not found: " + filename);
-	try {
+	switch( filetype ) {
+	  case MAGICK: 
+	  	{
 		Magick::Image image;
 		Magick::Blob blob;
 		image.read(filename);
 		image.magick("RGBA");
 		image.write(&blob);
 		load(image.columns(), image.rows(), RGBA, (unsigned char*)blob.data());
-	} catch (Magick::Exception&) {
+		break;
+		}
+	  case SVG:
+	  	{
 		rsvg_init();
 		GError* pError = NULL;
 		// FIXME: this does not detect errors (file missing/invalid)
@@ -85,6 +90,8 @@ Surface::Surface(std::string filename) {
 		rsvg_handle_free(svgHandle);
 		rsvg_term();
 		cairo_destroy(dc);
+		break;
+		}
 	}
 }
 

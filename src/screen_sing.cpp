@@ -18,8 +18,8 @@ void CScreenSing::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	Song& song = sm->getSongs()->current();
 	theme.reset(new CThemeSing(m_width, m_height));
+	if (!song.background.empty()) { try { m_background.reset(new Surface(song.path + song.background,Surface::MAGICK)); } catch (std::exception& e) { std::cerr << e.what() << std::endl; } }
 #define TRYLOAD(field, class) if (!song.field.empty()) { try { m_##field.reset(new class(song.path + song.field)); } catch (std::exception& e) { std::cerr << e.what() << std::endl; } }
-	TRYLOAD(background, Surface)
 	TRYLOAD(video, Video)
 #undef TRYLOAD
 	theme_id = sm->getVideoDriver()->initSurface(theme->theme->getCurrent());

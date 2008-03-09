@@ -8,8 +8,8 @@ CScreenPractice::~CScreenPractice() {}
 
 void CScreenPractice::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
-	m_surf_note.reset(new Surface(sm->getThemePathFile("practice_note.svg")));
-	m_surf_sharp.reset(new Surface(sm->getThemePathFile("practice_sharp.svg")));
+	m_surf_note.reset(new Surface(sm->getThemePathFile("practice_note.svg"),Surface::SVG));
+	m_surf_sharp.reset(new Surface(sm->getThemePathFile("practice_sharp.svg"),Surface::SVG));
 	theme.reset(new CThemePractice(m_width, m_height));
 }
 

@@ -12,7 +12,7 @@ CScreenSongs::CScreenSongs(std::string const& name, unsigned int width, unsigned
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	if (sm->getSongs() == NULL)
 		sm->setSongs(new Songs(songdirs));
-	m_emptyCover.reset(new Surface(sm->getThemePathFile("no_cover.png")));
+	m_emptyCover.reset(new Surface(sm->getThemePathFile("no_cover.png"),Surface::MAGICK));
 }
 
 void CScreenSongs::enter() {
@@ -100,7 +100,7 @@ void CScreenSongs::draw() {
 		if (cover != m_cover) {
 			m_cover = cover;
 			m_currentCover.reset();
-			try { m_currentCover.reset(new Surface(cover)); } catch (std::exception& e) {}
+			try { m_currentCover.reset(new Surface(cover,Surface::MAGICK)); } catch (std::exception& e) {}
 		}
 		double shift = remainder(songs.currentPosition(), 1.0);
 		float x = round((800 - 256) / 2 - shift * 1056);

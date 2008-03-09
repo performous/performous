@@ -8,9 +8,10 @@
 class Surface: boost::noncopyable {
   public:
 	enum Format { RGBA = 1, ARGB = 2, RGB = 3, BGR = 4 };
+	enum Filetype { MAGICK = 1, SVG = 2 };
 	Surface(unsigned width, unsigned height, Format format, unsigned char* buffer);
 	Surface(cairo_surface_t* _surf);
-	Surface(std::string filename);
+	Surface(std::string filename, Filetype filetype);
 	~Surface();
 	void draw( float x=-0.5f, float y=-0.5f, float w=1.0f, float h=1.0f );
   private:
