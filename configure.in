@@ -346,7 +346,7 @@ case $video_layer in
 		if test $ffmpeg_detected = yes ; then
 			video_layer="ffmpeg"
 		else
-			video_layer="no"
+			AC_MSG_ERROR(Cannot find ffmpeg, but explicitly required)
 		fi
 		;;
 	autodetect*)
