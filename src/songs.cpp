@@ -388,7 +388,7 @@ void Songs::reload() {
 		globfree(&_glob);
 	}
 	m_songs.swap(songs);
-	setFilter("");
+	filter_internal();
 }
 
 class Songs::RestoreSel {
@@ -421,11 +421,17 @@ void Songs::randomize() {
 }
 
 void Songs::setFilter(std::string const& val) {
+	if (m_filter == val) return;
+	m_filter = val;
+	filter_internal();
+}
+
+void Songs::filter_internal() {
 	RestoreSel restore(*this);
 	filtered_t filtered;
 	try {
 		for (songlist_t::iterator it = m_songs.begin(); it != m_songs.end(); ++it) {
-			if (regex_search(it->str(), boost::regex(val,boost::regex_constants::icase))) filtered.push_back(&*it);
+			if (regex_search(it->str(), boost::regex(m_filter ,boost::regex_constants::icase))) filtered.push_back(&*it);
 		}
 	} catch (...) {
 		filtered.clear();
@@ -501,14 +507,17 @@ void Songs::sort_internal() {
 	}
 }
 
-void Songs::dump(std::ostream& os) {
-	m_order = 1;
+void Songs::dump(std::ostream& os, std::string const& sort) {
+	os << m_filtered.size() << " songs, ";
+	if (sort == "title") m_order = 1;
+	else if (sort == "artist") m_order = 2;
+	else if (sort == "path") m_order = 5;
+	else { os << "invalid sort order specified" << std::endl; return; }
+	os << order[m_order] << '\n' << std::string(40, '-') << '\n';
 	RestoreSel restore(*this);
 	sort_internal();
-	os << m_filtered.size() << " songs:" << std::endl;
 	for (filtered_t::const_iterator it = m_filtered.begin(); it != m_filtered.end(); ++it) {
-		//os << "  " << (*it)->artist << " - " << (*it)->title << std::endl;
-		os << "  " << (*it)->title << " - " << (*it)->artist << std::endl;
+		os << "  " << (*it)->str() << std::endl;
 	}
 }
 

@@ -48,7 +48,7 @@ class Song: boost::noncopyable {
 	void update(double time, double freq);
 	int getScore() const { return 10000 * m_score; }
 	bool parseField(std::string const& line);
-	std::string str() const { return title + " by " + artist; }
+	std::string str() const { return title + "  by  " + artist; }
 	typedef std::vector<Note> notes_t;
 	notes_t notes;
 	int noteMin, noteMax;
@@ -144,7 +144,7 @@ class Songs {
 	void random() { if (m_order) randomize(); advance(1); }
 	void sortChange(int diff);
 	void parseFile(Song& tmp);
-	void dump(std::ostream& os);
+	void dump(std::ostream& os, std::string const& sort);
   private:
 	class RestoreSel;
 	typedef boost::ptr_set<Song> songlist_t;
@@ -153,7 +153,9 @@ class Songs {
 	filtered_t m_filtered;
 	//coverMathSimple math_cover;
 	coverMathAdvanced math_cover;
+	std::string m_filter;
 	int m_order;
+	void filter_internal();
 	void sort_internal();
 };
 

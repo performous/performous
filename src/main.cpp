@@ -66,9 +66,9 @@ static void init_SDL(CScreenManager& sm, CVideoDriver& vd, unsigned int width, u
 
 int main(int argc, char** argv) {
 	bool fullscreen = false;
-	bool songlist = false;
 	bool fps = false;
 	unsigned int width, height;
+	std::string songlist;
 	std::string theme;
 	std::set<std::string> songdirs;
 	std::string cdev;
@@ -90,10 +90,10 @@ int main(int argc, char** argv) {
 		  ("theme,t", po::value<std::string>(&theme)->default_value("lima"), "set theme (name or absolute path)")
 		  ("fs,f", "enable full screen mode")
 		  ("fps", "benchmark rendering speed\n  also disable 100 FPS limit")
-		  ("songlist", "print list of songs to console")
+		  ("songlist", po::value<std::string>(&songlist), "print list of songs to console\n  --songlist=[title|artist|path]")
 		  ("width,W", po::value<unsigned int>(&width)->default_value(800), "set horizontal resolution")
 		  ("height,H", po::value<unsigned int>(&height)->default_value(600), "set vertical resolution")
-		  ("cdev", po::value<std::string>(&cdev), "set capture device (disable autodetection)\n  --cdev dev[:settings]\n  --cdev help for list of devices")
+		  ("cdev", po::value<std::string>(&cdev), "set capture device (disable autodetection)\n  --cdev=dev[:settings]\n  --cdev=help for list of devices")
 		  ("crate", po::value<std::size_t>(&crate)->default_value(48000), "set capture frequency\n  44100 and 48000 Hz are optimal")
 		  ("clean,c", "disable internal default song folders")
 		  ("songdir,s", po::value<std::vector<std::string> >(&songdirstmp)->composing(), "additional song folders to scan\n  may be specified without -s or -songdir too");
@@ -136,7 +136,6 @@ int main(int argc, char** argv) {
 		}
 		if (vm.count("fs")) fullscreen = true;
 		if (vm.count("fps")) fps = true;
-		if (vm.count("songlist")) songlist = true;
 		// Copy songdirstmp into songdirs
 		for (std::vector<std::string>::const_iterator it = songdirstmp.begin(); it != songdirstmp.end(); ++it) {
 			std::string str = *it;
@@ -175,7 +174,7 @@ int main(int argc, char** argv) {
 		sm.addScreen(new CScreenConfiguration("Configuration", width, height));
 		sm.activateScreen("Intro");
 		// Main loop
-		if (songlist) sm.getSongs()->dump(std::cout);
+		if (!songlist.empty()) sm.getSongs()->dump(std::cout, songlist);
 		boost::xtime time = now();
 		int frames = 0;
 		while (!sm.isFinished()) {
