@@ -60,49 +60,38 @@ class VideoFifo {
 	boost::condition m_cond;
 };
 
-// TODO: fix this to work similarly to VideoFifo
 class AudioFifo {
   public:
-	AudioFifo() { currentFramePosition=0; }
-	const unsigned int size() { return queue.size(); }
-	const bool isFull() { return (size() >= 10); }
-	void push(AudioFrame* f) { queue.push_back(f); }
-	unsigned long copypop(void * buffer, unsigned long _size, unsigned char channels, float * timestamp=NULL, bool blocking=false) {
-		blocking=blocking;
-		if (this->size() == 0) {
-			if (timestamp != NULL) *timestamp = -1;
-			memset(buffer,0x00, channels * _size * sizeof(short));
-			std::cerr << "Empty audio queue" << std::endl;
-			return _size;
-		}
-		AudioFrame& tmp = queue.front();
+	std::size_t tryPop(std::vector<int16_t>& buffer,std::size_t _size = 0) {
+		boost::mutex::scoped_lock l(m_mutex);
+		if (m_queue.empty()) return 0;
 
-		if (timestamp) *timestamp = tmp.timestamp;
-
-		unsigned long currentBufferPosition = currentFramePosition * channels;
-
-		std::size_t frames = tmp.data.size();
-		if (_size == 0 || (frames - currentFramePosition) == _size) {
-			// Fill the output buffer with the rest of the current frame
-			size_t s = (_size == 0 ? frames - currentFramePosition : _size);
-			memcpy(buffer, &tmp.data[currentBufferPosition], channels * s * sizeof(short));
-			queue.pop_front();
+		AudioFrame& tmp = m_queue.front();
+		std::size_t size = tmp.data.size();
+		if( _size == 0 || tmp.data.size() <= _size ) {
+			buffer.insert( buffer.begin(), tmp.data.begin(), tmp.data.end() );
+			m_queue.pop_front();
+			m_cond.notify_one();
+			return size;
+		} else {
+			buffer.insert( buffer.begin(), tmp.data.begin(), tmp.data.begin() + _size );
 			return _size;
-		} else if (frames - currentFramePosition > _size) {
-			memcpy(buffer, &tmp.data[currentBufferPosition], channels * _size * sizeof(int16_t));
-			currentFramePosition+=_size;
-			return _size;
-		} else if (frames - currentFramePosition < _size) {
-			unsigned long result = (frames - currentFramePosition);
-			memcpy(buffer, &tmp.data[currentBufferPosition], channels * (frames - currentFramePosition) * sizeof(int16_t));
-			currentFramePosition=0;
-			queue.pop_front();
-			return result;
 		}
 	}
+	void push(AudioFrame* f) {
+		boost::mutex::scoped_lock l(m_mutex);
+		while (m_queue.size() > 10) m_cond.wait(l);
+		m_queue.push_back(f);
+	}
+	void reset() {
+		boost::mutex::scoped_lock l(m_mutex);
+		m_queue.clear();
+		m_cond.notify_all();
+	}
   private:
-	boost::ptr_deque<AudioFrame> queue;
-	unsigned long currentFramePosition;
+	boost::ptr_deque<AudioFrame> m_queue;
+	boost::mutex m_mutex;
+	boost::condition m_cond;
 };
 
 #include <boost/scoped_ptr.hpp>
@@ -117,7 +106,7 @@ class CFfmpeg {
 	void operator()(); // Thread runs here, don't call directly
 	VideoFifo  videoQueue;
 	AudioFifo  audioQueue;
-	void seek(double time) {} // TODO
+	void seek(double time) { (void)time; } // TODO
   private:
 	void open(const char* _filename);
 	void close();
