@@ -75,6 +75,7 @@ class AudioFifo {
 			return size;
 		} else {
 			buffer.insert( buffer.begin(), tmp.data.begin(), tmp.data.begin() + _size );
+			tmp.data.erase(tmp.data.begin(), tmp.data.begin() + _size );
 			return _size;
 		}
 	}
