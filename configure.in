@@ -185,8 +185,8 @@ AC_SUBST(CAIRO_FLAGS)
 AC_SUBST(CAIRO_LIBS)
 
 #Do things for Magick++
-MAGICKPP_FLAGS=`Magick++-config --cxxflags`
-MAGICKPP_LIBS=`Magick++-config --libs`
+MAGICKPP_FLAGS=`pkg-config --cflags ImageMagick++`
+MAGICKPP_LIBS=`pkg-config --libs ImageMagick++`
 ac_includes_default=$(cat <<USNG_EOF
 $ac_includes_default
 /* Magick++ headers */
