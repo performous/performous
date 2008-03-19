@@ -76,4 +76,5 @@ void CScreenPractice::draw()
 			}
 		}
 	}
+	Surface(theme->theme->getCurrent()).draw(0, 0, 0);
 }
