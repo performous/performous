@@ -16,27 +16,32 @@ void Surface::load(unsigned int width, unsigned int height, Format format, unsig
 	glGenTextures(1, &texture_id);
 	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texture_id);
 	unsigned int fmt;
+	unsigned int buffer_fmt;
 	bool swap;
 	switch(format) {
 	  case RGB:
 		fmt = GL_RGB;
+		buffer_fmt = GL_UNSIGNED_BYTE;
 		swap = false;
 		break;
 	  case BGR:
 		fmt = GL_RGB;
+		buffer_fmt = GL_UNSIGNED_BYTE;
 		swap = true;
 		break;
 	  case RGBA:
 		fmt = GL_RGBA;
-		swap = false;
+		buffer_fmt = GL_UNSIGNED_INT_8_8_8_8;
+		swap = true;
 		break;
 	  case ARGB:
 		fmt = GL_BGRA;
+		buffer_fmt = GL_UNSIGNED_INT_8_8_8_8;
 		swap = true;
 		break;
 	}
 	glPixelStorei(GL_UNPACK_SWAP_BYTES, swap );
-	glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA, width, height, 0, fmt, GL_UNSIGNED_BYTE, buffer);
+	glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA, width, height, 0, fmt, buffer_fmt, buffer);
 }
 
 void Surface::draw(float x, float y, float w, float h) {
