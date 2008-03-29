@@ -29,16 +29,18 @@ void Surface::load(unsigned int width, unsigned int height, Format format, unsig
 		buffer_fmt = GL_UNSIGNED_BYTE;
 		swap = true;
 		break;
-	  case RGBA:
-		fmt = GL_RGBA;
+	  case INT_ARGB:
 		buffer_fmt = GL_UNSIGNED_INT_8_8_8_8;
-		swap = true;
-		break;
-	  case ARGB:
 		fmt = GL_BGRA;
-		buffer_fmt = GL_UNSIGNED_INT_8_8_8_8;
 		swap = true;
 		break;
+	  case CHAR_RGBA:
+		fmt = GL_RGBA;
+		buffer_fmt = GL_UNSIGNED_BYTE;
+		swap = false;
+		break;
+	  default:
+		throw std::runtime_error("Unknown pixel format");
 	}
 	glPixelStorei(GL_UNPACK_SWAP_BYTES, swap );
 	glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA, width, height, 0, fmt, buffer_fmt, buffer);
@@ -73,7 +75,7 @@ Surface::Surface(std::string filename, Filetype filetype) {
 		image.read(filename);
 		image.magick("RGBA");
 		image.write(&blob);
-		load(image.columns(), image.rows(), RGBA, (unsigned char*)blob.data());
+		load(image.columns(), image.rows(), CHAR_RGBA, (unsigned char*)blob.data());
 		break;
 		}
 	  case SVG:
@@ -91,7 +93,7 @@ Surface::Surface(std::string filename, Filetype filetype) {
 		cairo_surface_t* surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, svgDimension.width, svgDimension.height);
 		cairo_t* dc = cairo_create(surface);
 		rsvg_handle_render_cairo(svgHandle, dc);
-		load(svgDimension.width, svgDimension.height, ARGB, cairo_image_surface_get_data(surface));
+		load(svgDimension.width, svgDimension.height, INT_ARGB, cairo_image_surface_get_data(surface));
 		rsvg_handle_free(svgHandle);
 		rsvg_term();
 		cairo_destroy(dc);
@@ -103,6 +105,6 @@ Surface::Surface(std::string filename, Filetype filetype) {
 Surface::Surface(cairo_surface_t* _surf) {
 	unsigned int w = cairo_image_surface_get_width(_surf);
 	unsigned int h = cairo_image_surface_get_height(_surf);
-	load(w, h, ARGB, cairo_image_surface_get_data(_surf));
+	load(w, h, INT_ARGB, cairo_image_surface_get_data(_surf));
 }
 

@@ -7,7 +7,11 @@
 
 class Surface: boost::noncopyable {
   public:
-	enum Format { RGBA = 1, ARGB = 2, RGB = 3, BGR = 4 };
+	enum Format { 
+		INT_ARGB = 0,
+		CHAR_RGBA,
+		RGB,
+		BGR};
 	enum Filetype { MAGICK = 1, SVG = 2 };
 	Surface(unsigned width, unsigned height, Format format, unsigned char* buffer);
 	Surface(cairo_surface_t* _surf);
