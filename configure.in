@@ -164,8 +164,7 @@ if test $record_pa19 = no ; then
 else
 	record_pa18="no"
 fi
-AC_CHECK_LIB(SDL_image, IMG_LoadPNG_RW,,AC_MSG_ERROR(Cannot find SDL_image))
-AC_CHECK_LIB(SDL_gfx, zoomSurface,,AC_MSG_ERROR(Cannot find SDL_gfx))
+AC_CHECK_LIB(SDL_image, IMG_LoadPNG_RW,[sdl_image="yes"],[sdl_image="no"])
 LIBS=$saved_LIBS
 
 dnl ###########################################################################
@@ -210,16 +209,21 @@ AC_SUBST(XML_LIBS)
 # Do things for libsdl
 SDL_FLAGS=`$SDLCONFIG --cflags`
 SDL_LIBS=`$SDLCONFIG --libs`
-SDL_LIBS="$SDL_LIBS -lSDL_image -lSDL_gfx"
 ac_includes_default=$(cat <<USNG_EOF
 $ac_includes_default
 /* libsdl headers */
 #include <SDL/SDL.h>
 #include <SDL/SDL_thread.h>
-/* other SDL headers */
-#include <SDL/SDL_image.h>
-#include <SDL/SDL_rotozoom.h>    
 USNG_EOF)
+if test $sdl_image = yes ; then
+	ac_includes_default=$(cat <<-USNG_EOF
+	$ac_includes_default
+	/* other SDL headers */
+	#include <SDL/SDL_image.h>
+	#include <SDL/SDL_rotozoom.h>    
+	USNG_EOF)
+	SDL_LIBS="$SDL_LIBS -lSDL_image"
+fi
 AC_SUBST(SDL_FLAGS)
 AC_SUBST(SDL_LIBS)
 

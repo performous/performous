@@ -2,9 +2,11 @@
 #define USNG_SDL_HELPER_H_INCLUDED
 
 #include <boost/noncopyable.hpp>
-#include <SDL/SDL_image.h>
 #include <algorithm>
 #include <iostream>
+
+#ifdef HAVE_LIBSDL_IMAGE
+#include <SDL/SDL_image.h>
 
 class SDLSurf: boost::noncopyable {
 	SDL_Surface* m_surf;
@@ -35,6 +37,7 @@ class SDLSurf: boost::noncopyable {
 		m_surf = surf;
 	}
 };
+#endif
 
 #endif
 

@@ -55,8 +55,10 @@ static void init_SDL(CScreenManager& sm, CVideoDriver& vd, unsigned int width, u
 	std::atexit(SDL_Quit);
 	if( SDL_Init(SDL_INIT_VIDEO) ==  -1 ) throw std::runtime_error("SDL_Init failed");
 	SDL_WM_SetCaption(PACKAGE" - "VERSION, "WM_DEFAULT");
+#ifdef HAVE_LIBSDL_IMAGE
 	SDLSurf icon(sm.getThemePathFile("icon.png"));
 	SDL_WM_SetIcon(icon, NULL);
+#endif
 	screenSDL = vd.init(width, height, sm.getFullscreenStatus());
 	if (!screenSDL) throw std::runtime_error("Cannot initialize screen");
 	SDL_ShowCursor(SDL_DISABLE);
