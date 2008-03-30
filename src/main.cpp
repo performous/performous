@@ -74,7 +74,9 @@ int main(int argc, char** argv) {
 	std::string theme;
 	std::set<std::string> songdirs;
 	std::string cdev;
+	std::string pdev;
 	std::size_t crate;
+	std::size_t prate;
 	std::string homedir;
 	{
 		char const* home = getenv("HOME");
@@ -96,7 +98,9 @@ int main(int argc, char** argv) {
 		  ("width,W", po::value<unsigned int>(&width)->default_value(800), "set horizontal resolution")
 		  ("height,H", po::value<unsigned int>(&height)->default_value(600), "set vertical resolution")
 		  ("cdev", po::value<std::string>(&cdev), "set capture device (disable autodetection)\n  --cdev=dev[:settings]\n  --cdev=help for list of devices")
+		  ("pdev", po::value<std::string>(&pdev), "set playback device (disable autodetection)\n  --pdev=dev[:settings]\n  --pdev=help for list of devices")
 		  ("crate", po::value<std::size_t>(&crate)->default_value(48000), "set capture frequency\n  44100 and 48000 Hz are optimal")
+		  ("prate", po::value<std::size_t>(&prate)->default_value(48000), "set playback frequency\n  44100 and 48000 Hz are optimal")
 		  ("clean,c", "disable internal default song folders")
 		  ("songdir,s", po::value<std::vector<std::string> >(&songdirstmp)->composing(), "additional song folders to scan\n  may be specified without -s or -songdir too");
 		po::positional_options_description p;
@@ -122,6 +126,14 @@ int main(int argc, char** argv) {
 		}
 		if (vm.count("help")) {
 			std::cout << cmdline << std::endl;
+			return 0;
+		}
+		if (pdev == "help") {
+			da::playback::devlist_t l = da::playback::devices();
+			std::cout << "Playback devices:" << std::endl;
+			for (da::playback::devlist_t::const_iterator it = l.begin(); it != l.end(); ++it) {
+				std::cout << boost::format("  %1% %|10t|%2%\n") % it->name() % it->desc();
+			}
 			return 0;
 		}
 		if (cdev == "help") {

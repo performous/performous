@@ -44,5 +44,40 @@ namespace da {
 	}
 
 	record::~record() { delete m_handle; }
+
+	playback::devlist_t playback::devices() {
+		devlist_t l(playback_plugin::begin(), playback_plugin::end());
+		l.push_back(devinfo(none, "No device. Will not emit any audio data."));
+		return l;
+	}
+
+	playback::playback(settings& s): m_handle() {
+		if (s.device() == none) return;
+		if (playback_plugin::empty()) throw std::runtime_error("No playback devices installed");
+		if (s.device().empty()) {
+			// Try all normal devices
+			for (playback_plugin::iterator it = playback_plugin::begin(); it != playback_plugin::end(); ++it) {
+				if (it->special()) continue;
+				try {
+					s.debug(">>> Recording from " + it->name());
+					m_handle = it(s);
+					s.set_device(it->name());
+					return;
+				} catch (std::exception& e) {
+					s.debug(std::string("-!- ") + e.what());
+				}
+			}
+			throw std::runtime_error("No playback devices could be used");
+		} else {
+			s.debug(">>> Using playback device " + s.device());
+			try {
+				m_handle = playback_plugin::find(s.device())(s);
+			} catch (record_plugin::invalid_key_error&) {
+				throw std::runtime_error("Playback device " + s.device() + " not found");
+			}
+		}
+	}
+
+	playback::~playback() { delete m_handle; }
 }
 

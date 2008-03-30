@@ -119,6 +119,16 @@ namespace da {
 		dev* m_handle;
 	};
 
+	class playback {
+	  public:
+		typedef std::vector<devinfo> devlist_t;
+		static devlist_t devices();
+		playback(settings& s);
+		~playback();
+		class dev;
+	  private:
+		dev* m_handle;
+	};
 }
 
 #endif
