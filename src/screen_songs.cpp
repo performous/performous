@@ -102,7 +102,7 @@ void CScreenSongs::draw() {
 			try { m_currentCover.reset(new Surface(cover,Surface::MAGICK)); } catch (std::exception& e) {}
 		}
 		double shift = remainder(songs.currentPosition(), 1.0);
-		(m_currentCover ? m_currentCover : m_emptyCover)->draw(shift, 0.0, 0.3);
+		(m_currentCover ? m_currentCover : m_emptyCover)->draw(-1.3 * shift, 0.0, 0.3);
 		// Play a preview of the song
 		std::string file = song.path + song.mp3;
 		if (file != m_playing) audio.playPreview(m_playing = file);
