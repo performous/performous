@@ -19,7 +19,7 @@ void Video::render(double time, double w, double h) {
 		surface.reset(new Surface(fr.width, fr.height, Surface::RGB, &fr.data[0]));
 		fr.data.clear();
 	}
-	if( surface ) surface->draw(0.5,0.5,w,h);
+	if (surface) surface->draw();
 	if (time < m_lastTime) m_mpeg.seek(time);
 	m_lastTime = time;
 	// Preload the next future frame

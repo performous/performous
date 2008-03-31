@@ -116,10 +116,10 @@ void CScreenSing::draw() {
 	std::string sentenceWhole = lyrics->getSentenceWhole();
 	// Rendering starts
 	glClear(GL_COLOR_BUFFER_BIT);
-	if (m_background) m_background->draw(0.5,0.5,0.5+m_width,0.5+m_height);
+	if (m_background) m_background->draw();
 	if (m_video) m_video->render(time - song.videoGap, m_width, m_height);
-	theme->bg->draw(0.5,0.5,0.5+m_width,0.5+m_height);
-	theme->p1box->draw(0.5,0.5,0.5+m_width,0.5+m_height);
+	theme->bg->draw();
+	theme->p1box->draw();
 	// Compute and draw the timer and the progressbar
 	theme->timertxt.text = (boost::format("%02u:%02u") % (unsigned(time) / 60) % (unsigned(time) % 60)).str();
 	theme->theme->PrintText(&theme->timertxt);
@@ -314,6 +314,6 @@ void CScreenSing::draw() {
 	theme->lyricsfuture.fontsize = oldfontsize;
 	theme->lyricsnextsentence.fontsize = oldfontsize;
 
-	Surface(theme->theme->getCurrent()).draw(0, 0, 0);
-	Surface(pitchGraph.getCurrent()).draw(0, 0, 0);
+	Surface(theme->theme->getCurrent()).draw();
+	Surface(pitchGraph.getCurrent()).draw();
 }

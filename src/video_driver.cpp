@@ -35,7 +35,8 @@ void CVideoDriver::blank()
 	glViewport(0, 0, screen->w, screen->h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0.0f, screen->w, screen->h, 0.0f, -1.0f, 1.0f);
+	float ar = float(screen->w) / screen->h;
+	glOrtho(-0.5f, 0.5f, 0.5f / ar, -0.5f / ar, -1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 

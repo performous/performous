@@ -27,6 +27,6 @@ void CScreenIntro::manageEvent(SDL_Event event) {
 }
 
 void CScreenIntro::draw() {
-	background->draw(0.5,0.5,m_width+0.5,m_height+0.5);
+	background->draw();
 }
 

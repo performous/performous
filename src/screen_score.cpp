@@ -30,7 +30,7 @@ void CScreenScore::draw() {
 	if (seconds(now()) - m_time > 10.0) { sm->activateScreen("Songs"); return; }
 	Song& song = sm->getSongs()->current();
 	theme->theme->clear();
-	theme->bg->draw(0.5,0.5,0.5+m_width,0.5+m_height);
+	theme->bg->draw();
 	// Draw some numbers
 	int score = song.getScore();
 	char const* rank;
@@ -49,5 +49,5 @@ void CScreenScore::draw() {
 	theme->theme->DrawRect(theme->level);
 	theme->level.y = oldY;
 	theme->normal_score.text = boost::lexical_cast<std::string>(score);
-	Surface(theme->theme->getCurrent()).draw(0, 0, 0);
+	Surface(theme->theme->getCurrent()).draw();
 }

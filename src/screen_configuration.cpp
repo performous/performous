@@ -44,7 +44,7 @@ void CScreenConfiguration::draw() {
 		theme->value.x = (theme->value.svg_width - extents.width)/2;
 		theme->theme->PrintText(&theme->value);
 	}
-	theme->bg->draw(0.5,0.5,0.5+m_width,0.5+m_height);
-	Surface(theme->theme->getCurrent()).draw(0, 0, 0);
+	theme->bg->draw();
+	Surface(theme->theme->getCurrent()).draw();
 }
 

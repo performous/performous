@@ -79,7 +79,7 @@ void CScreenSongs::draw() {
 	theme->theme->clear();
 	// Draw the "Order by" text
 	print(theme.get(), theme->order, (m_search.text.empty() ? songs.sortDesc() : m_search.text));
-	theme->bg->draw(0.5,0.5,0.5+m_width,0.5+m_height);
+	theme->bg->draw();
 	// Test if there are no songs
 	if (songs.empty()) {
 		print(theme.get(), theme->song, "no songs found");
@@ -102,14 +102,12 @@ void CScreenSongs::draw() {
 			try { m_currentCover.reset(new Surface(cover,Surface::MAGICK)); } catch (std::exception& e) {}
 		}
 		double shift = remainder(songs.currentPosition(), 1.0);
-		float x = round((800 - 256) / 2 - shift * 1056);
-		float y = (600 - 256) / 2;
-		(m_currentCover ? m_currentCover : m_emptyCover)->draw(m_width*x/800., m_height*y/600.,m_width*256./800.,m_height*256./600.);
+		(m_currentCover ? m_currentCover : m_emptyCover)->draw(shift, 0.0, 0.3);
 		// Play a preview of the song
 		std::string file = song.path + song.mp3;
 		if (file != m_playing) audio.playPreview(m_playing = file);
 	}
-	Surface(theme->theme->getCurrent()).draw(0, 0, 0);
+	Surface(theme->theme->getCurrent()).draw();
 	if (!audio.isPaused() && seconds(now()) - m_time > IDLE_TIMEOUT) {
 		m_time = seconds(now());
 		if (!m_search.text.empty()) { m_search.text.clear(); songs.setFilter(m_search.text); }

@@ -42,7 +42,7 @@ void CScreenPractice::draw()
 	MusicalScale scale;
 
 	theme->theme->clear();
-	theme->bg->draw(0.5,0.5,0.5+m_width,0.5+m_height);
+	theme->bg->draw();
 
 	// getPeak returns 0.0 when clipping, negative values when not that loud.
 	// Normalizing to [-1.0, 0.0], where -1.0 is -40 dB or less.
@@ -76,5 +76,5 @@ void CScreenPractice::draw()
 			}
 		}
 	}
-	Surface(theme->theme->getCurrent()).draw(0, 0, 0);
+	Surface(theme->theme->getCurrent()).draw();
 }
