@@ -17,11 +17,11 @@ class Surface: boost::noncopyable {
 	Surface(cairo_surface_t* _surf);
 	Surface(std::string filename, Filetype filetype);
 	~Surface();
-	void draw( float x=-0.5f, float y=-0.5f, float w=1.0f, float h=1.0f );
+	void draw(float x = 0.0f, float y = 0.0f, float w = 1.0f, float h = 0.0f);
   private:
 	void load(unsigned int width, unsigned int height, Format format, unsigned char* buffer);
-	double m_width;
-	double m_height;
+	float m_width;
+	float m_height;
 	unsigned int texture_id;
 };
 
