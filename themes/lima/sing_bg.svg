@@ -16,7 +16,7 @@
    sodipodi:version="0.32"
    inkscape:version="0.45.1"
    sodipodi:docname="sing_bg.svg"
-   sodipodi:docbase="/root/UltraStar-ng/themes/lima"
+   sodipodi:docbase="/root/USNG/trunk/themes/lima"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <metadata
      id="metadata30">
@@ -30,7 +30,7 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:cy="298.54361"
+     inkscape:cy="390.67589"
      inkscape:cx="281.09948"
      inkscape:zoom="0.86831672"
      inkscape:window-height="1149"
@@ -68,7 +68,7 @@
        id="linearGradient3995"
        xlink:href="#linearGradient3667"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.99967,0,0,0.802521,-800,-599.9999)" />
+       gradientTransform="matrix(0.99967,0,0,0.5885618,-800,-599.99992)" />
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient3667"
@@ -77,16 +77,17 @@
        y1="121.63737"
        x2="365.07416"
        y2="151.1951"
-       gradientUnits="userSpaceOnUse" />
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="scale(1,0.7333912)" />
   </defs>
   <g
      id="layer11">
     <rect
        width="800"
-       height="151.18733"
+       height="110.87946"
        x="0"
        y="0"
-       style="opacity:1;fill:url(#linearGradient3673);fill-opacity:1.0;fill-rule:nonzero;stroke:none;stroke-width:17;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="opacity:1;fill:url(#linearGradient3673);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:17;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect3040" />
     <g
        transform="translate(6.959225e-4,2.180869e-4)"
@@ -141,11 +142,11 @@
     </g>
     <rect
        width="800"
-       height="151.18733"
+       height="110.87946"
        x="-800"
        y="-600"
        transform="scale(-1,-1)"
-       style="opacity:1;fill:url(#linearGradient3995);fill-opacity:1.0;fill-rule:nonzero;stroke:none;stroke-width:17;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="opacity:1;fill:url(#linearGradient3995);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:17;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect3993" />
   </g>
   <g
