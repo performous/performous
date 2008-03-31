@@ -52,14 +52,15 @@ void Surface::draw(float x, float y, float w, float h) {
 	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texture_id);
 	glPushMatrix();
 	glTranslatef(x, y, 0.0f);
-	if (w == 0.0f) w = 1.0f;
-	if (h == 0.0f) h = w * (m_height / m_width);
+	float ar = m_width / m_height;
+	if (w == 0.0f) w = ar;
+	if (h == 0.0f) h = w / ar;
 	glScalef(w, h, 1.0);
 	glBegin(GL_QUADS);
 	glTexCoord2f(0.0f, 0.0f); glVertex2f(-0.5f, -0.5f);
-	glTexCoord2f(m_width, 0.0f); glVertex2f(+0.5f, -0.5f);
-	glTexCoord2f(m_width, m_height); glVertex2f(+0.5f, +0.5f);
-	glTexCoord2f(0.0f, m_height); glVertex2f(-0.5f, +0.5f);
+	glTexCoord2f(m_width, 0.0f); glVertex2f(0.5f, -0.5f);
+	glTexCoord2f(m_width, m_height); glVertex2f(0.5f, 0.5f);
+	glTexCoord2f(0.0f, m_height); glVertex2f(-0.5f, 0.5f);
 	glEnd();
 	glPopMatrix();
 }
