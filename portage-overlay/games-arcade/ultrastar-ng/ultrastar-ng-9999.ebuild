@@ -24,31 +24,31 @@ LICENSE="GPL-2
 SLOT="0"
 KEYWORDS="~x86 ~amd64"
 
-IUSE="novideo opengl xine gstreamer debug alsa portaudio songs"
+IUSE="ffmpeg xine gstreamer debug alsa portaudio songs"
 
 RDEPEND="gnome-base/librsvg
 	dev-libs/boost
 	x11-libs/pango
-	media-libs/sdl-image
-	media-libs/sdl-gfx
+	media-libs/libsdl
+	media-gfx/imagemagick
 	xine? ( media-libs/xine-lib )
 	!xine? ( media-libs/gstreamer )
-	opengl? (
+	(
 		virtual/opengl
 		virtual/glu
 	)
+	ffmpeg? (media-video/ffmpeg)
 	alsa? ( media-libs/alsa-lib )
 	portaudio? ( media-libs/portaudio )
 	gstreamer? ( >=media-libs/gstreamer-0.10 )
-	!novideo? ( media-libs/smpeg )
 	sys-apps/help2man"
 DEPEND="${RDEPEND}
     dev-util/pkgconfig"
 
 pkg_setup() {
 	games_pkg_setup
-	if use opengl && ! built_with_use media-libs/libsdl opengl; then
-		eerror "opengl flag set, but libsdl wasn't build with opengl support"
+	if ! built_with_use media-libs/libsdl opengl; then
+		eerror "libsdl wasn't build with opengl support"
 	fi
 	if ! built_with_use --missing true dev-libs/boost threads ; then
 		eerror "Please emerge dev-libs/boost with USE=threads"
@@ -66,22 +66,16 @@ src_compile() {
 	./autogen.sh
 	local myconf
 
-	if use novideo ; then
-		myconf="${myconf} --with-video=disable"
+	if use ffmpeg ; then
+		myconf="${myconf} --with-video=ffmpeg"
 	else
-		myconf="${myconf} --with-video=smpeg"
+		myconf="${myconf} --with-video=disable"
 	fi
 
 	if use xine ; then
 		myconf="${myconf} --with-audio=xine"
 	else
 		myconf="${myconf} --with-audio=gstreamer"
-	fi
-
-	if use opengl ; then
-		myconf="${myconf} --with-graphic-driver=opengl"
-	else
-		myconf="${myconf} --with-graphic-driver=sdl"
 	fi
 
 	egamesconf \
