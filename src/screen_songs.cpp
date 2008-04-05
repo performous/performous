@@ -5,12 +5,11 @@
 
 static const double IDLE_TIMEOUT = 45.0; // seconds
 
-CScreenSongs::CScreenSongs(std::string const& name, unsigned int width, unsigned int height, std::set<std::string> const& songdirs):
-  CScreen(name, width, height)
+CScreenSongs::CScreenSongs(std::string const& name, std::set<std::string> const& songdirs):
+  CScreen(name)
 {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
-	if (sm->getSongs() == NULL)
-		sm->setSongs(new Songs(songdirs));
+	if (!sm->getSongs()) sm->setSongs(new Songs(songdirs));
 	m_emptyCover.reset(new Surface(sm->getThemePathFile("no_cover.svg"),Surface::SVG));
 }
 
@@ -22,7 +21,7 @@ void CScreenSongs::enter() {
 	static unsigned int m_volume;
 	m_volume = audio.getVolume();
 	audio.setVolume(m_volume);
-	theme.reset(new CThemeSongs(m_width, m_height));
+	theme.reset(new CThemeSongs());
 	m_time = seconds(now());
 	m_search.text.clear();
 	sm->getSongs()->setFilter(m_search.text);

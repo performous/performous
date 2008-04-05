@@ -9,8 +9,7 @@
 
 class CScreenIntro : public CScreen {
   public:
-	CScreenIntro(std::string const& name, unsigned int width, unsigned int height);
-	~CScreenIntro();
+	CScreenIntro(std::string const& name);
 	void enter();
 	void exit();
 	void manageEvent(SDL_Event event);

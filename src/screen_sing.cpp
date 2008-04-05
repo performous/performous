@@ -8,15 +8,10 @@
 #include <iostream>
 #include <iomanip>
 
-CScreenSing::CScreenSing(std::string const& name, unsigned int width, unsigned int height, Analyzer const& analyzer):
-  CScreen(name,width,height), m_analyzer(analyzer), pitchGraph(width, height)
-{
-}
-
 void CScreenSing::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	Song& song = sm->getSongs()->current();
-	theme.reset(new CThemeSing(m_width, m_height));
+	theme.reset(new CThemeSing());
 	if (!song.background.empty()) { try { m_background.reset(new Surface(song.path + song.background,Surface::MAGICK)); } catch (std::exception& e) { std::cerr << e.what() << std::endl; } }
 #define TRYLOAD(field, class) if (!song.field.empty()) { try { m_##field.reset(new class(song.path + song.field)); } catch (std::exception& e) { std::cerr << e.what() << std::endl; } }
 	TRYLOAD(video, Video)
@@ -81,8 +76,8 @@ void CScreenSing::draw() {
 	const_cast<Analyzer&>(m_analyzer).process(); // FIXME: do in game engine thread
 	Tone const* tone = m_analyzer.findTone();
 	double freq = (tone ? tone->freq : 0.0);
-	float resFactorX = m_width / 800.0;
-	float resFactorY = m_height / 600.0;
+	float resFactorX = 800.0 / 800.0; // FIXME!!
+	float resFactorY = 600.0 / 600.0; // FIXME!!
 	float resFactorAvg = (resFactorX + resFactorY) / 2.0;
 	double oldfontsize;
 	theme->theme->clear();
@@ -147,7 +142,7 @@ void CScreenSing::draw() {
 			sentenceBegin = m_sentence[0].begin;
 		}
 		sentenceDuration = m_sentence.back().end - sentenceBegin;
-		pixUnit = (m_width - 200.0 * resFactorX) / (sentenceDuration * 1.0);
+		pixUnit = (600.0 * resFactorX) / (sentenceDuration * 1.0);
 	} else {
 		pitchGraph.clear();
 	}
@@ -161,6 +156,7 @@ void CScreenSing::draw() {
 	}
 	int min = song.noteMin - 7;
 	int max = song.noteMax + 7;
+	double m_width = 800.0, m_height = 600.0; // FIXME!!!
 	double noteUnit = -0.5 * m_height / std::max(32, max - min);
 	double baseY = 0.5 * m_height - 0.5 * (min + max) * noteUnit;
 	// Theme this

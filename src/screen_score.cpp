@@ -3,15 +3,8 @@
 #include <boost/lexical_cast.hpp>
 #include <limits>
 
-CScreenScore::CScreenScore(std::string const& name, unsigned int width, unsigned int height):
-  CScreen(name, width, height)
-{}
-
-CScreenScore::~CScreenScore() {}
-
 void CScreenScore::enter() {
-	CScreenManager* sm = CScreenManager::getSingletonPtr();
-  	theme.reset(new CThemeScore(m_width, m_height));
+  	theme.reset(new CThemeScore());
 	m_time = seconds(now());
 }
 

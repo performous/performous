@@ -16,23 +16,20 @@
 
 class CScreen {
   public:
-	CScreen(std::string const& name, unsigned int width, unsigned int height):
-	  m_name(name), m_width(width), m_height(height) {}
+	CScreen(std::string const& name): m_name(name) {}
 	virtual ~CScreen() {}
 	virtual void manageEvent(SDL_Event event) = 0;
 	virtual void draw() = 0;
 	virtual void enter() = 0;
 	virtual void exit() = 0;
 	std::string getName() const { return m_name; }
-  protected:
-	std::string m_name; // Must be set by each constructor
-	unsigned int m_width; // Must be set by each constructor
-	unsigned int m_height; // Must be set by each constructor
+  private:
+	std::string m_name;
 };
 
 class CScreenManager: public CSingleton <CScreenManager> {
   public:
-	CScreenManager(unsigned int width, unsigned int height, std::string const& theme);
+	CScreenManager(std::string const& theme);
 	void addScreen(CScreen* s) { std::string tmp = s->getName(); screens.insert(tmp, s); };
 	void activateScreen(std::string const& name);
 	CScreen* getCurrentScreen() { return currentScreen; };
@@ -41,9 +38,6 @@ class CScreenManager: public CSingleton <CScreenManager> {
 	void setSDLScreen(SDL_Surface* _screen) { screen = _screen; };
 	SDL_Surface* getSDLScreen() { return screen; };
 
-	unsigned int getWidth() { return m_width; };
-	unsigned int getHeight() { return m_height; };
-	
 	CAudio* getAudio() { return audio.get(); };
 	void setAudio(CAudio* _audio) { audio.reset(_audio); };
 
@@ -71,8 +65,6 @@ class CScreenManager: public CSingleton <CScreenManager> {
 	boost::scoped_ptr<Songs> songs;
 	CVideoDriver* videoDriver;
 	bool m_fullscreen;
-	unsigned int m_width;
-	unsigned int m_height;
 	std::string m_theme;
   public:
 	unsigned int m_ingameVolume, m_menuVolume;

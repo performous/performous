@@ -1,11 +1,9 @@
 #include <screen_intro.h>
 
-CScreenIntro::CScreenIntro(std::string const& name, unsigned int width, unsigned int height): CScreen(name, width, height) {
+CScreenIntro::CScreenIntro(std::string const& name): CScreen(name) {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	background.reset(new Surface(sm->getThemePathFile("intro.svg"),Surface::SVG));
 }
-
-CScreenIntro::~CScreenIntro() {}
 
 void CScreenIntro::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();

@@ -1,14 +1,6 @@
 #include <video_driver.h>
 #include <screen.h>
 
-CVideoDriver::CVideoDriver()
-{
-}
-
-CVideoDriver::~CVideoDriver()
-{
-}
-
 SDL_Surface* CVideoDriver::init(int width, int height, int fs)
 {
 	m_videoFlags = SDL_OPENGL | SDL_DOUBLEBUF | SDL_RESIZABLE | (fs ? SDL_FULLSCREEN : 0);

@@ -11,7 +11,7 @@
 
 class CScreenConfiguration: public CScreen {
   public:
-	CScreenConfiguration(std::string const& name, unsigned int width, unsigned int height);
+	CScreenConfiguration(std::string const& name);
 	void enter();
 	void exit();
 	void manageEvent(SDL_Event event);

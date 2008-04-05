@@ -14,7 +14,9 @@
 
 class CScreenSing: public CScreen {
   public:
-	CScreenSing(std::string const& name, unsigned int width, unsigned int height, Analyzer const& analyzer);
+	CScreenSing(std::string const& name, Analyzer const& analyzer):
+	  CScreen(name), m_analyzer(analyzer)
+	{}
 	void enter();
 	void exit();
 	void manageEvent(SDL_Event event);

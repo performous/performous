@@ -1,16 +1,14 @@
 #include <screen_practice.h>
 
-CScreenPractice::CScreenPractice(std::string const& name, unsigned int width, unsigned int height, Analyzer const& analyzer):
-  CScreen(name,width,height), m_analyzer(analyzer)
+CScreenPractice::CScreenPractice(std::string const& name, Analyzer const& analyzer):
+  CScreen(name), m_analyzer(analyzer)
 {}
-
-CScreenPractice::~CScreenPractice() {}
 
 void CScreenPractice::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	m_surf_note.reset(new Surface(sm->getThemePathFile("practice_note.svg"),Surface::SVG));
 	m_surf_sharp.reset(new Surface(sm->getThemePathFile("practice_sharp.svg"),Surface::SVG));
-	theme.reset(new CThemePractice(m_width, m_height));
+	theme.reset(new CThemePractice());
 }
 
 void CScreenPractice::exit()
@@ -33,6 +31,7 @@ void CScreenPractice::manageEvent(SDL_Event event)
 void CScreenPractice::draw()
 {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
+	double m_width = 800.0, m_height = 600.0; // FIXME!!!
 	float resFactorX = m_width/800.;
 	float resFactorY = m_height/600.;
 

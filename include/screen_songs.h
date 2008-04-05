@@ -11,7 +11,7 @@
 
 class CScreenSongs : public CScreen {
   public:
-	CScreenSongs(std::string const& name, unsigned int width, unsigned int height, std::set<std::string> const& songdirs);
+	CScreenSongs(std::string const& name, std::set<std::string> const& songdirs);
 	void enter();
 	void exit();
 	void manageEvent(SDL_Event event);

@@ -1,16 +1,8 @@
 #include <theme.h>
 #include <screen.h>
 
-CTheme::CTheme(int _width, int _height):
-  width(_width),
-  height(_height),
-  surface(NULL),
-  dc(NULL)
-{
-	clear();
-}
-
 void CTheme::clear() {
+	double width = 800.0, height = 600.0; // FIXME!
 	if (dc) cairo_destroy(dc);
 	if (surface) cairo_surface_destroy(surface);
 	surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
@@ -38,6 +30,7 @@ cairo_surface_t *CTheme::PrintText(TThemeTxt *text) {
 	pango_font_description_set_absolute_size (desc,text->fontsize * text->scale * PANGO_SCALE);
 	pango_layout_set_font_description (layout, desc);
 	pango_cairo_update_layout (dc, layout);
+	double width = 800.0, height = 600.0; // FIXME!
 	cairo_scale(dc, width/text->svg_width, height/text->svg_height);
 	cairo_move_to(dc,text->x - (rec.width-rec.width/text->scale)/2,text->y-text->fontsize * text->scale);
 	pango_cairo_show_layout (dc, layout);
@@ -61,6 +54,7 @@ cairo_surface_t *CTheme::PrintText(TThemeTxt *text) {
 
 cairo_surface_t *CTheme::DrawRect(TThemeRect rect) {
 	cairo_save(dc);
+	double width = 800.0, height = 600.0; // FIXME!
 	cairo_scale(dc, width/rect.svg_width, height/rect.svg_height);
 	cairo_rectangle(dc, rect.x, rect.y, rect.width, rect.height);
 	if (rect.fill_col.r != -1 && rect.fill_col.g != -1 && rect.fill_col.b != -1) {
@@ -363,31 +357,27 @@ CTheme::~CTheme() {
 	if (surface) cairo_surface_destroy(surface);
 }
 
-CThemeSongs::CThemeSongs(unsigned int width, unsigned int height) {
+CThemeSongs::CThemeSongs() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	bg.reset(new Surface(sm->getThemePathFile("songs_bg.svg"),Surface::SVG));
-	theme.reset(new CTheme(width, height));
+	theme.reset(new CTheme());
 	theme->ParseSVGForText(sm->getThemePathFile("songs_song.svg"), &song);
 	theme->ParseSVGForText(sm->getThemePathFile("songs_order.svg"), &order);
 }
 
-CThemeSongs::~CThemeSongs() {}
-
-CThemePractice::CThemePractice(unsigned int width, unsigned int height) {
+CThemePractice::CThemePractice() {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
 	bg.reset(new Surface(sm->getThemePathFile("practice_bg.svg"),Surface::SVG));
-	theme.reset(new CTheme(width, height));
+	theme.reset(new CTheme());
 	theme->ParseSVGForText(sm->getThemePathFile("practice_txt.svg"), &notetxt);
 	theme->ParseSVGForRect(sm->getThemePathFile("practice_peak.svg"), &peak);
 }
 
-CThemePractice::~CThemePractice() {}
-
-CThemeSing::CThemeSing(unsigned int width, unsigned int height) {
+CThemeSing::CThemeSing() {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
 	bg.reset(new Surface(sm->getThemePathFile("sing_bg.svg"),Surface::SVG));
 	p1box.reset(new Surface(sm->getThemePathFile("sing_p1box.svg"),Surface::SVG));
-	theme.reset(new CTheme(width, height));
+	theme.reset(new CTheme());
 	theme->ParseSVGForText(sm->getThemePathFile("sing_timetxt.svg"), &timertxt);
 	theme->ParseSVGForText(sm->getThemePathFile("sing_p1score.svg"), &p1score);
 	theme->ParseSVGForText(sm->getThemePathFile("sing_lyricscurrent.svg"), &lyricspast);
@@ -398,25 +388,20 @@ CThemeSing::CThemeSing(unsigned int width, unsigned int height) {
 	theme->ParseSVGForRect(sm->getThemePathFile("sing_tostartfg.svg"), &tostartfg);
 }
 
-CThemeSing::~CThemeSing() {}
-
-CThemeScore::CThemeScore(unsigned int width, unsigned int height) {
+CThemeScore::CThemeScore() {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
 	bg.reset(new Surface(sm->getThemePathFile("score_bg.svg"),Surface::SVG));
-	theme.reset(new CTheme(width, height));
+	theme.reset(new CTheme());
 	theme->ParseSVGForText(sm->getThemePathFile("score_txt.svg"), &normal_score);
 	theme->ParseSVGForText(sm->getThemePathFile("score_rank.svg"), &rank);
 	theme->ParseSVGForRect(sm->getThemePathFile("score_level.svg"), &level);
 }
 
-CThemeScore::~CThemeScore() {}
-
-CThemeConfiguration::CThemeConfiguration(unsigned int width, unsigned int height) {
+CThemeConfiguration::CThemeConfiguration() {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
 	bg.reset(new Surface(sm->getThemePathFile("configuration_bg.svg"),Surface::SVG));
-	theme.reset(new CTheme(width, height));
+	theme.reset(new CTheme());
 	theme->ParseSVGForText(sm->getThemePathFile("configuration_item.svg"), &item);
 	theme->ParseSVGForText(sm->getThemePathFile("configuration_value.svg"), &value);
 }
 
-CThemeConfiguration::~CThemeConfiguration() {}

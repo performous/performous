@@ -1,7 +1,6 @@
 #include <screen_configuration.h>
 
-CScreenConfiguration::CScreenConfiguration(std::string const& name, unsigned int width, unsigned int height):
-  CScreen(name, width, height)
+CScreenConfiguration::CScreenConfiguration(std::string const& name): CScreen(name)
 {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	configuration.push_back(new CConfigurationFullscreen());
@@ -11,7 +10,7 @@ CScreenConfiguration::CScreenConfiguration(std::string const& name, unsigned int
 }
 
 void CScreenConfiguration::enter() {
-	theme.reset(new CThemeConfiguration(m_width, m_height));
+	theme.reset(new CThemeConfiguration());
 }
 
 void CScreenConfiguration::exit() { theme.reset(); }
@@ -30,7 +29,6 @@ void CScreenConfiguration::manageEvent(SDL_Event event) {
 }
 
 void CScreenConfiguration::draw() {
-	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	theme->theme->clear();
 	cairo_text_extents_t extents;
 	{

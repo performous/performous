@@ -175,20 +175,20 @@ int main(int argc, char** argv) {
 	}
 	try {
 		// Initialize everything
-		CScreenManager sm(width, height, theme);
+		CScreenManager sm(theme);
 		sm.setFullscreenStatus(fullscreen);
 		CVideoDriver vd;
 		init_SDL(sm, vd, width, height);
 		sm.setSDLScreen(screenSDL);
 		sm.setAudio(new CAudio());
 		sm.setVideoDriver(&vd);
-		sm.addScreen(new CScreenIntro("Intro", width, height));
-		sm.addScreen(new CScreenSongs("Songs", width, height, songdirs));
+		sm.addScreen(new CScreenIntro("Intro"));
+		sm.addScreen(new CScreenSongs("Songs", songdirs));
 		Capture capture(cdev, crate);
-		sm.addScreen(new CScreenSing("Sing", width, height, capture.analyzer()));
-		sm.addScreen(new CScreenPractice("Practice", width, height, capture.analyzer()));
-		sm.addScreen(new CScreenScore("Score", width, height));
-		sm.addScreen(new CScreenConfiguration("Configuration", width, height));
+		sm.addScreen(new CScreenSing("Sing", capture.analyzer()));
+		sm.addScreen(new CScreenPractice("Practice", capture.analyzer()));
+		sm.addScreen(new CScreenScore("Score"));
+		sm.addScreen(new CScreenConfiguration("Configuration"));
 		sm.activateScreen("Intro");
 		// Main loop
 		if (!songlist.empty()) sm.getSongs()->dump(std::cout, songlist);

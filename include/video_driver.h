@@ -8,10 +8,7 @@
 
 class CVideoDriver {
   public:
-	CVideoDriver();
-	~CVideoDriver();
 	SDL_Surface* init(int width, int height, int fullscreen);
-
 	// eventually kill this class?
 	void blank();
 	void swap();

@@ -51,7 +51,7 @@ struct TThemeRect {
 
 class CTheme: boost::noncopyable {
   public:
-	CTheme(int width, int height);
+	CTheme(): surface(), dc() { clear(); }
 	~CTheme();
 	cairo_surface_t *PrintText(TThemeTxt *text); 
 	cairo_surface_t *DrawRect(TThemeRect rect);
@@ -61,8 +61,6 @@ class CTheme: boost::noncopyable {
 	void ParseSVGForRect(std::string const& filename, TThemeRect *rect);
 	void clear();
   private: 
-	int width;
-	int height;
 	cairo_surface_t *surface;
 	cairo_t *dc;
 	void walk_tree(xmlNode * a_node, TThemeTxt *text);
@@ -71,8 +69,7 @@ class CTheme: boost::noncopyable {
 };
 
 struct CThemeSongs: boost::noncopyable {
-	CThemeSongs(unsigned int width, unsigned int height);
-	~CThemeSongs();
+	CThemeSongs();
 	boost::scoped_ptr<Surface> bg;
 	boost::scoped_ptr<CTheme> theme;
 	TThemeTxt song;
@@ -80,8 +77,7 @@ struct CThemeSongs: boost::noncopyable {
 };
 
 struct CThemePractice: boost::noncopyable {
-	CThemePractice(unsigned int width, unsigned int height);
-	~CThemePractice();
+	CThemePractice();
 	boost::scoped_ptr<Surface> bg;
 	boost::scoped_ptr<CTheme> theme;
 	TThemeTxt notetxt;
@@ -89,8 +85,7 @@ struct CThemePractice: boost::noncopyable {
 };
 
 struct CThemeSing: boost::noncopyable {
-	CThemeSing(unsigned int width, unsigned int height);
-	~CThemeSing();
+	CThemeSing();
 	boost::scoped_ptr<Surface> bg;
 	boost::scoped_ptr<Surface> p1box;
 	boost::scoped_ptr<CTheme> theme;
@@ -105,8 +100,7 @@ struct CThemeSing: boost::noncopyable {
 };
 
 struct CThemeScore: boost::noncopyable {
-	CThemeScore(unsigned int width, unsigned int height);
-	~CThemeScore();
+	CThemeScore();
 	boost::scoped_ptr<Surface> bg;
 	boost::scoped_ptr<CTheme> theme;
 	TThemeTxt normal_score;
@@ -115,8 +109,7 @@ struct CThemeScore: boost::noncopyable {
 };
 
 struct CThemeConfiguration: boost::noncopyable {
-	CThemeConfiguration(unsigned int width, unsigned int height);
-	~CThemeConfiguration();
+	CThemeConfiguration();
 	boost::scoped_ptr<Surface> bg;
 	boost::scoped_ptr<CTheme> theme;
 	TThemeTxt item;

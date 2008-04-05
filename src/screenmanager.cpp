@@ -8,7 +8,7 @@
 
 template<> CScreenManager* CSingleton<CScreenManager>::ms_CSingleton = NULL;
 
-CScreenManager::CScreenManager(unsigned int width, unsigned int height, std::string const& theme):
+CScreenManager::CScreenManager(std::string const& theme):
   m_finished(false),
   currentScreen(),
   screen(),
@@ -16,8 +16,6 @@ CScreenManager::CScreenManager(unsigned int width, unsigned int height, std::str
   songs(),
   videoDriver(),
   m_fullscreen(),
-  m_width(width),
-  m_height(height),
   m_theme(theme),
   m_ingameVolume(100),
   m_menuVolume(30)

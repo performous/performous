@@ -9,8 +9,7 @@
 
 class CScreenPractice : public CScreen {
   public:
-	CScreenPractice(std::string const& name, unsigned int width, unsigned int height, Analyzer const& analyzer);
-	~CScreenPractice();
+	CScreenPractice(std::string const& name, Analyzer const& analyzer);
 	void enter();
 	void exit();
 	void manageEvent( SDL_Event event );

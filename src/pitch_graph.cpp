@@ -1,12 +1,6 @@
 #include <pitch_graph.h>
 #include <cmath>
 
-PitchGraph::PitchGraph(int _width, int _height):
-  width(_width), height(_height), clearPage(1), surface(), dc()
-{
-	clear();
-}
-
 cairo_surface_t* PitchGraph::renderPitch(double pitch, double time, double volume) {
 	double lastPitch,lastTime;
 	cairo_get_current_point(dc, &lastTime ,&lastPitch);
@@ -34,13 +28,13 @@ cairo_surface_t* PitchGraph::renderPitch(double pitch, double time, double volum
 void PitchGraph::clear() {
 	if (dc) cairo_destroy(dc);
 	if (surface) cairo_surface_destroy(surface);
+	double width = 800.0, height = 600.0; // FIXME!
 	surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
 	dc = cairo_create(surface);
 	cairo_scale(dc, width, height);
 	cairo_new_path(dc);
 	clearPage = 1;
 }
-
 
 PitchGraph::~PitchGraph() {
 	if (dc) cairo_destroy(dc);
