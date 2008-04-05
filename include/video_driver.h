@@ -15,9 +15,14 @@ class CVideoDriver {
 	// eventually kill this class?
 	void blank();
 	void swap();
+	void resize(int width, int height) {
+		const SDL_VideoInfo* videoInf = SDL_GetVideoInfo();
+		screen = SDL_SetVideoMode(width, height, videoInf->vfmt->BitsPerPixel, m_videoFlags);
+	}
   private:
 	SDL_Surface* screen;
 	boost::ptr_vector<Surface> texture_list;
+	unsigned int m_videoFlags;
 };
 
 #endif

@@ -29,6 +29,9 @@ static void checkEvents_SDL(CScreenManager& sm) {
 		  case SDL_QUIT:
 			sm.finished();
 			break;
+		  case SDL_VIDEORESIZE:
+			sm.getVideoDriver()->resize(event.resize.w, event.resize.h);
+			break;
 		  case SDL_KEYUP:
 			if (event.key.keysym.sym == SDLK_ESCAPE) esc = false;
 			break;

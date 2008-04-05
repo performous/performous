@@ -9,13 +9,10 @@ CVideoDriver::~CVideoDriver()
 {
 }
 
-SDL_Surface * CVideoDriver::init(int width, int height, int fullscreen)
+SDL_Surface* CVideoDriver::init(int width, int height, int fs)
 {
-	const SDL_VideoInfo * videoInf = SDL_GetVideoInfo();
-	unsigned SDL_videoFlags  = SDL_RLEACCEL | SDL_OPENGL | SDL_DOUBLEBUF;
-	if (fullscreen) SDL_videoFlags |= SDL_FULLSCREEN;
-	screen = SDL_SetVideoMode(width, height, videoInf->vfmt->BitsPerPixel, SDL_videoFlags );
-
+	m_videoFlags = SDL_OPENGL | SDL_DOUBLEBUF | SDL_RESIZABLE | (fs ? SDL_FULLSCREEN : 0);
+	resize(width, height);
 	#ifdef DEBUG
 	printf ("OpenGL version: %s\n", glGetString (GL_VERSION));
 	printf ("OpenGL vendor: %s\n", glGetString (GL_VENDOR));
