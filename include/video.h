@@ -18,10 +18,12 @@ class Video {
   private:
 #ifdef USE_FFMPEG_VIDEO
 	CFfmpeg m_mpeg;
-	boost::scoped_ptr<Surface> surface;
 	VideoFrame m_videoFrame;
+	boost::scoped_ptr<Surface> m_surface;
+	double m_surfaceTime;
 	double m_time;
 	double m_lastTime;
+	float m_alpha;
 #endif
 };
 

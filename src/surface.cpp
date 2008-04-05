@@ -48,7 +48,7 @@ void Surface::load(unsigned int width, unsigned int height, Format format, unsig
 
 void Surface::draw(float x, float y, float w, float h) {
 	glMatrixMode(GL_MODELVIEW);
-	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+//	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texture_id);
 	glPushMatrix();
 	glTranslatef(x, y, 0.0f);

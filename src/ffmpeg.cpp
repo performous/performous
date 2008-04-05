@@ -95,11 +95,14 @@ void CFfmpeg::open(const char* _filename) {
 }
 
 void CFfmpeg::operator()() {
+	int errors = 0;
 	while (!m_quit) {
 		try {
 			decodeNextFrame();
+			errors = 0;
 		} catch (std::exception& e) {
 			std::cerr << "ffmpeg error: " << e.what() << std::endl;
+			if (++errors > 2) break;
 		}
 	}
 }
