@@ -4,6 +4,7 @@
 
 #include <stdexcept>
 #include <iostream>
+#include <stdio.h>
 
 CFfmpeg::CFfmpeg(bool _decodeVideo, bool _decodeAudio, std::string const& _filename): m_quit() {
 	av_register_all();
@@ -29,13 +30,11 @@ CFfmpeg::~CFfmpeg() {
 }
 
 void CFfmpeg::open(const char* _filename) {
-	if (av_open_input_file(&pFormatCtx, _filename, NULL, 0, NULL))
-	  throw std::runtime_error("Cannot open input file");
-	if (av_find_stream_info(pFormatCtx) < 0)
-	  throw std::runtime_error("Cannot find stream information");
-
-	videoStream=-1;
-	audioStream=-1;
+	if (av_open_input_file(&pFormatCtx, _filename, NULL, 0, NULL)) throw std::runtime_error("Cannot open input file");
+	if (av_find_stream_info(pFormatCtx) < 0) throw std::runtime_error("Cannot find stream information");
+	dump_format(pFormatCtx, 0, _filename, false);
+	videoStream = -1;
+	audioStream = -1;
 	// Take the first video stream
 	for(unsigned int i=0; i<pFormatCtx->nb_streams; i++) {
 		if(pFormatCtx->streams[i]->codec->codec_type==CODEC_TYPE_VIDEO) {
@@ -50,17 +49,12 @@ void CFfmpeg::open(const char* _filename) {
 			break;
 		}
 	}
-
 	try {	
 		if( videoStream != -1 && decodeVideo ) {
-			pVideoCodecCtx=pFormatCtx->streams[videoStream]->codec;
-			pVideoCodec=avcodec_find_decoder(pVideoCodecCtx->codec_id);
-			if( pVideoCodec == NULL )
-				throw std::runtime_error("Cannot find video codec");
-			if(pVideoCodec->capabilities & CODEC_CAP_TRUNCATED)
-				pVideoCodecCtx->flags|=CODEC_FLAG_TRUNCATED;
-			if(avcodec_open(pVideoCodecCtx, pVideoCodec)<0)
-				throw std::runtime_error("Cannot open video stream");
+			pVideoCodecCtx = pFormatCtx->streams[videoStream]->codec;
+			pVideoCodec = avcodec_find_decoder(pVideoCodecCtx->codec_id);
+			if (!pVideoCodec) throw std::runtime_error("Cannot find video codec");
+			if (avcodec_open(pVideoCodecCtx, pVideoCodec) < 0) throw std::runtime_error("Cannot open video codec");
 		}
 	} catch (std::runtime_error& e) {
 		// TODO: clean memory
@@ -71,14 +65,10 @@ void CFfmpeg::open(const char* _filename) {
 		if( audioStream != -1 && decodeAudio ) {
 			pAudioCodecCtx=pFormatCtx->streams[audioStream]->codec;
 			pAudioCodec=avcodec_find_decoder(pAudioCodecCtx->codec_id);
-			if( pAudioCodec == NULL )
-				throw std::runtime_error("Cannot find audio codec");
-			if(pAudioCodec->capabilities & CODEC_CAP_TRUNCATED)
-				pAudioCodecCtx->flags|=CODEC_FLAG_TRUNCATED;
-			if(avcodec_open(pAudioCodecCtx, pAudioCodec)<0)
-				throw std::runtime_error("Cannot open audio stream");
-			if( (pResampleCtx = audio_resample_init(2,pAudioCodecCtx->channels,48000,pAudioCodecCtx->sample_rate)) == NULL )
-				throw std::runtime_error("Cannot create resampling context");
+			if (!pAudioCodec) throw std::runtime_error("Cannot find audio codec");
+			if (avcodec_open(pAudioCodecCtx, pAudioCodec) < 0) throw std::runtime_error("Cannot open audio codec");
+			pResampleCtx = audio_resample_init(2,pAudioCodecCtx->channels,48000,pAudioCodecCtx->sample_rate);
+			if (!pResampleCtx) throw std::runtime_error("Cannot create resampling context");
 		}
 	} catch (std::runtime_error& e) {
 		// TODO: clean memory
@@ -135,12 +125,6 @@ void CFfmpeg::decodeNextFrame() {
 	int frameFinished=0;
 	while (!frameFinished) {
 		ReadFramePacket packet(pFormatCtx);
-		// If we have a video frame we want to decode
-		// we decode all the video frame from this paket
-		// and only return when we decode a complete frame AND a complete packet
-		// we do not return if
-		//  - we have more frame in the packet
-		//  - we have decoded an unfinished frame at the end of the packet
 		if (packet.stream_index == videoStream) {
 			if (!decodeVideo) return;
 			uint8_t* packetData = packet.data;
@@ -166,9 +150,12 @@ void CFfmpeg::decodeNextFrame() {
 					tmp->height = h;
 					tmp->width = w;
 					tmp->timestamp = packet.time();
+					static double prev = 0.0;
+					std::cout << "Video frame duration " << tmp->timestamp - prev << std::endl;
+					prev = tmp->timestamp;
 					videoQueue.push(tmp);
-					if (m_quit) return;
 				}
+				if (m_quit) return;
 			}
 		} else if(packet.stream_index==audioStream) {
 			if (!decodeAudio) return;
