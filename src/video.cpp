@@ -13,7 +13,7 @@ void Video::render(double time) {
 	}
 	if (m_surface) {
 		double tdist = std::abs(m_surfaceTime - time);
-		m_alpha += (tdist < 0.2 ? 0.02f : -0.02f);
+		m_alpha += (tdist < 0.4 ? 0.02f : -0.02f);
 		if (m_alpha <= 0.0f) m_alpha = 0.0f;
 		else {
 			if (m_alpha > 1.2f) m_alpha = 1.2f;
@@ -25,8 +25,8 @@ void Video::render(double time) {
 	// Preload the next future frame
 	if (fr.data.empty()) while (m_mpeg.videoQueue.tryPop(fr) && fr.timestamp < time);
 	// Do a seek before next render, if required
-	if (time < m_lastTime || (!fr.data.empty() && time > fr.timestamp + 2.0)) {
-		m_mpeg.seek(time);
+	if (time < m_lastTime - 0.4 || (!fr.data.empty() && time > fr.timestamp + 2.0)) {
+		m_mpeg.seek(time - 0.3);
 		fr.data.clear();
 	}
 	m_lastTime = time;
