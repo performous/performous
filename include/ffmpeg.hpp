@@ -12,6 +12,7 @@ extern "C" {
 }
 
 #include <boost/ptr_container/ptr_deque.hpp>
+#include <boost/ptr_container/ptr_set.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
 #include <iostream>
@@ -34,20 +35,24 @@ struct VideoFrame {
 	}
 };
 
+static bool operator<(VideoFrame const& a, VideoFrame const& b) {
+	return a.timestamp < b.timestamp;
+}
+
 class VideoFifo {
   public:
 	bool tryPop(VideoFrame& f) {
 		boost::mutex::scoped_lock l(m_mutex);
-		if (m_queue.empty()) return false;
-		f.swap(m_queue.front());
-		m_queue.pop_front();
+		if (m_queue.size() < 3) return false; // Must keep a certain minimum size for B-frame reordering
+		f.swap(*m_queue.begin());
+		m_queue.erase(m_queue.begin());
 		m_cond.notify_one();
 		return true;
 	}
 	void push(VideoFrame* f) {
 		boost::mutex::scoped_lock l(m_mutex);
 		while (m_queue.size() > 10) m_cond.wait(l);
-		m_queue.push_back(f);
+		m_queue.insert(f);
 	}
 	void reset() {
 		boost::mutex::scoped_lock l(m_mutex);
@@ -55,7 +60,7 @@ class VideoFifo {
 		m_cond.notify_all();
 	}
   private:
-	boost::ptr_deque<VideoFrame> m_queue;
+	boost::ptr_set<VideoFrame> m_queue;
 	boost::mutex m_mutex;
 	boost::condition m_cond;
 };
@@ -107,14 +112,15 @@ class CFfmpeg {
 	void operator()(); // Thread runs here, don't call directly
 	VideoFifo  videoQueue;
 	AudioFifo  audioQueue;
-	void seek(double time) { (void)time; } // TODO
+	void seek(double time) { m_seekTarget = time; videoQueue.reset(); audioQueue.reset(); }
   private:
+	void seek_internal();
 	void open(const char* _filename);
 	void close();
 	void decodeNextFrame();
 	boost::scoped_ptr<boost::thread> m_thread;
 	volatile bool m_quit;
-
+	volatile double m_seekTarget;
 	AVFormatContext* pFormatCtx;
 	ReSampleContext* pResampleCtx;
 	SwsContext* img_convert_ctx;

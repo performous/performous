@@ -1,19 +1,9 @@
 #include <video.h>
 #include <cmath>
 
-#ifdef USE_FFMPEG_VIDEO
-Video::Video(std::string const& _videoFile): m_mpeg(true, false, _videoFile), m_lastTime(), m_alpha()
-{
-}
-#else
-Video::Video(std::string const&) {}
-#endif
-
-Video::~Video() {
-}
+Video::Video(std::string const& _videoFile): m_mpeg(true, false, _videoFile), m_lastTime(), m_alpha() {}
 
 void Video::render(double time) {
-#ifdef USE_FFMPEG_VIDEO
 	VideoFrame& fr = m_videoFrame;
 	// Time to switch frame?
 	if (!fr.data.empty() && time >= fr.timestamp) {
@@ -32,12 +22,13 @@ void Video::render(double time) {
 			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		}
 	}
-	if (time < m_lastTime) m_mpeg.seek(time);
-	m_lastTime = time;
 	// Preload the next future frame
 	if (fr.data.empty()) while (m_mpeg.videoQueue.tryPop(fr) && fr.timestamp < time);
-#else
-	(void)time; (void)w; (void)h;
-#endif
+	// Do a seek before next render, if required
+	if (time < m_lastTime || (!fr.data.empty() && time > fr.timestamp + 2.0)) {
+		m_mpeg.seek(time);
+		fr.data.clear();
+	}
+	m_lastTime = time;
 }
 

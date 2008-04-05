@@ -35,6 +35,7 @@ void CFfmpeg::open(const char* _filename) {
 	dump_format(pFormatCtx, 0, _filename, false);
 	videoStream = -1;
 	audioStream = -1;
+	m_seekTarget = std::numeric_limits<double>::quiet_NaN();
 	// Take the first video stream
 	for(unsigned int i=0; i<pFormatCtx->nb_streams; i++) {
 		if(pFormatCtx->streams[i]->codec->codec_type==CODEC_TYPE_VIDEO) {
@@ -88,6 +89,7 @@ void CFfmpeg::operator()() {
 	int errors = 0;
 	while (!m_quit) {
 		try {
+			if (m_seekTarget == m_seekTarget) seek_internal();
 			decodeNextFrame();
 			errors = 0;
 		} catch (std::exception& e) {
@@ -95,6 +97,13 @@ void CFfmpeg::operator()() {
 			if (++errors > 2) break;
 		}
 	}
+}
+
+void CFfmpeg::seek_internal() {
+	audioQueue.reset();
+	videoQueue.reset();
+	av_seek_frame(pFormatCtx, -1, m_seekTarget * AV_TIME_BASE, 0);
+	m_seekTarget = std::numeric_limits<double>::quiet_NaN();
 }
 
 void CFfmpeg::decodeNextFrame() {
@@ -106,8 +115,7 @@ void CFfmpeg::decodeNextFrame() {
 		~ReadFramePacket() { av_free_packet(this); }
 		double time() {
 			double t = 0.0;
-			if (uint64_t(pts) != AV_NOPTS_VALUE) t = pts;
-			else if (uint64_t(dts) != AV_NOPTS_VALUE ) t = dts;
+			if (uint64_t(dts) != AV_NOPTS_VALUE ) t = dts;
 			return t ? t * av_q2d(m_s->streams[stream_index]->time_base) : 0.0;
 		}
 	};
@@ -150,9 +158,6 @@ void CFfmpeg::decodeNextFrame() {
 					tmp->height = h;
 					tmp->width = w;
 					tmp->timestamp = packet.time();
-					static double prev = 0.0;
-					std::cout << "Video frame duration " << tmp->timestamp - prev << std::endl;
-					prev = tmp->timestamp;
 					videoQueue.push(tmp);
 				}
 				if (m_quit) return;

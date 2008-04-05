@@ -12,9 +12,13 @@
        
 class Video {
   public:
+#ifdef USE_FFMPEG_VIDEO
 	Video(std::string const& videoFile);
-	~Video();
 	void render(double time);
+#else
+	Video(std::string const&) {}
+	void render(double) {}
+#endif
   private:
 #ifdef USE_FFMPEG_VIDEO
 	CFfmpeg m_mpeg;
