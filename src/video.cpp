@@ -12,7 +12,7 @@ Video::Video(std::string const&) {}
 Video::~Video() {
 }
 
-void Video::render(double time, double w, double h) {
+void Video::render(double time) {
 #ifdef USE_FFMPEG_VIDEO
 	VideoFrame& fr = m_videoFrame;
 	// Time to switch frame?

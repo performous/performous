@@ -14,7 +14,7 @@ class Video {
   public:
 	Video(std::string const& videoFile);
 	~Video();
-	void render(double time, double screenWidth, double screenHeight);
+	void render(double time);
   private:
 #ifdef USE_FFMPEG_VIDEO
 	CFfmpeg m_mpeg;

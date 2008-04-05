@@ -117,7 +117,7 @@ void CScreenSing::draw() {
 	// Rendering starts
 	glClear(GL_COLOR_BUFFER_BIT);
 	if (m_background) m_background->draw();
-	if (m_video) m_video->render(time - song.videoGap, m_width, m_height);
+	if (m_video) m_video->render(time - song.videoGap);
 	theme->bg->draw();
 	theme->p1box->draw();
 	// Compute and draw the timer and the progressbar
