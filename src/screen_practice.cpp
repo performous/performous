@@ -66,12 +66,20 @@ void CScreenPractice::draw()
 			noteOffset += 0.4 * scale.getNoteOffset(t->freq);
 			double noteOffsetX = -600.0 - 10.0 * t->stabledb;
 			int posXnote = (m_width-noteOffsetX*resFactorX) / 2.0;
-			int posYnote = (340.-noteOffset*12.5)*resFactorY;
-			m_surf_note->draw(posXnote, posYnote, 40 * resFactorX, 25 * resFactorY);
+			int posYnote = (320.-noteOffset*12.5)*resFactorY;
+			m_surf_note->draw(
+				(posXnote*1.)/m_width-0.5,
+				(posYnote*1.)/m_height-0.5,
+				40./m_width,
+				0);
 			if (sharp) {
 				int posXsharp = (m_width-(noteOffsetX + 60.0)*resFactorX) / 2.0;
-				int posYsharp = (315.-noteOffset*12.5)*resFactorY;
-				m_surf_sharp->draw(posXsharp, posYsharp, 25 * resFactorX, 75 * resFactorY);
+				int posYsharp = (320.-noteOffset*12.5)*resFactorY;
+				m_surf_sharp->draw(
+					(posXsharp*1.)/m_width-0.5,
+					(posYsharp*1.)/m_height-0.5,
+					20./m_width,
+					0);
 			}
 		}
 	}
