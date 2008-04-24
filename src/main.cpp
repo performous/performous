@@ -21,7 +21,7 @@
 
 SDL_Surface * screenSDL;
 
-static void checkEvents_SDL(CScreenManager& sm, Window& window) {
+static void checkEvents_SDL(CScreenManager& sm) {
 	static bool esc = false;
 	SDL_Event event;
 	while(SDL_PollEvent(&event) == 1) {
@@ -30,7 +30,7 @@ static void checkEvents_SDL(CScreenManager& sm, Window& window) {
 			sm.finished();
 			break;
 		  case SDL_VIDEORESIZE:
-			window.resize(event.resize.w, event.resize.h);
+			sm.getVideoDriver()->resize(event.resize.w, event.resize.h);
 			break;
 		  case SDL_KEYUP:
 			if (event.key.keysym.sym == SDLK_ESCAPE) esc = false;
@@ -44,13 +44,29 @@ static void checkEvents_SDL(CScreenManager& sm, Window& window) {
 				esc = true;
 			}
 			if (keypressed == SDLK_RETURN && modifier & KMOD_ALT ) {
-				window.fullscreen();
+				SDL_WM_ToggleFullScreen(screenSDL);
+				sm.setFullscreenStatus(!sm.getFullscreenStatus());
 				continue; // Already handled here...
 			}
 			break;
 		}
 		sm.getCurrentScreen()->manageEvent(event);
 	}
+}
+
+static void init_SDL(CScreenManager& sm, CVideoDriver& vd, unsigned int width, unsigned int height) {
+	std::atexit(SDL_Quit);
+	if( SDL_Init(SDL_INIT_VIDEO) ==  -1 ) throw std::runtime_error("SDL_Init failed");
+	SDL_WM_SetCaption(PACKAGE" - "VERSION, "WM_DEFAULT");
+#ifdef HAVE_LIBSDL_IMAGE
+	SDLSurf icon(sm.getThemePathFile("icon.png"));
+	SDL_WM_SetIcon(icon, NULL);
+#endif
+	screenSDL = vd.init(width, height, sm.getFullscreenStatus());
+	if (!screenSDL) throw std::runtime_error("Cannot initialize screen");
+	SDL_ShowCursor(SDL_DISABLE);
+	SDL_EnableUNICODE(SDL_ENABLE);
+	SDL_EnableKeyRepeat(80, 80);
 }
 
 int main(int argc, char** argv) {
@@ -160,9 +176,12 @@ int main(int argc, char** argv) {
 	try {
 		// Initialize everything
 		CScreenManager sm(theme);
-		Window window(width, height, fullscreen);
+		sm.setFullscreenStatus(fullscreen);
+		CVideoDriver vd;
+		init_SDL(sm, vd, width, height);
 		sm.setSDLScreen(screenSDL);
 		sm.setAudio(new CAudio());
+		sm.setVideoDriver(&vd);
 		sm.addScreen(new CScreenIntro("Intro"));
 		sm.addScreen(new CScreenSongs("Songs", songdirs));
 		Capture capture(cdev, crate);
@@ -176,10 +195,10 @@ int main(int argc, char** argv) {
 		boost::xtime time = now();
 		int frames = 0;
 		while (!sm.isFinished()) {
-			checkEvents_SDL(sm, window);
-			window.blank();
+			checkEvents_SDL(sm);
+			vd.blank();
 			sm.getCurrentScreen()->draw();
-			window.swap();
+			vd.swap();
 			++frames;
 			if (fps) {
 				if (now() - time > 1.0) {

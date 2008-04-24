@@ -76,6 +76,9 @@ void CScreenSing::draw() {
 	const_cast<Analyzer&>(m_analyzer).process(); // FIXME: do in game engine thread
 	Tone const* tone = m_analyzer.findTone();
 	double freq = (tone ? tone->freq : 0.0);
+	float resFactorX = 800.0 / 800.0; // FIXME!!
+	float resFactorY = 600.0 / 600.0; // FIXME!!
+	float resFactorAvg = (resFactorX + resFactorY) / 2.0;
 	double oldfontsize;
 	theme->theme->clear();
 	// Get the time in the song
@@ -108,30 +111,23 @@ void CScreenSing::draw() {
 	std::string sentenceWhole = lyrics->getSentenceWhole();
 	// Rendering starts
 	glClear(GL_COLOR_BUFFER_BIT);
-	float bg_h = 0.5f * virtH() - 0.25f;
-	if (m_background) m_background->draw(0.0, bg_h);
-	if (m_video) m_video->render(time - song.videoGap, 0.0, bg_h);
-	float title_h = bg_h - 0.250f + 0.1f;
-	theme->bg->draw(0.0, title_h);
+	if (m_background) m_background->draw();
+	if (m_video) m_video->render(time - song.videoGap);
+	theme->bg->draw();
+	theme->p1box->draw();
 	// Compute and draw the timer and the progressbar
 	theme->timertxt.text = (boost::format("%02u:%02u") % (unsigned(time) / 60) % (unsigned(time) % 60)).str();
-	theme->timertxt.y = title_h * 600.0 + 147.0;
 	theme->theme->PrintText(&theme->timertxt);
 	theme->progressfg.width = theme->progressfg.final_width * songPercent;
-	theme->progressfg.x = 189;
-	theme->progressfg.y = title_h * 300.0 + 100.0;
 	theme->theme->DrawRect(theme->progressfg); 
 	//draw score
-	theme->p1box->draw(0.0, title_h + 0.16);
 	theme->p1score.text = (boost::format("%04d") % song.getScore()).str();
-	theme->p1score.y = title_h * 600.0 + 200.0;
 	theme->theme->PrintText(&theme->p1score);
 	// draw the sang note TODO: themed sang note
 	{
 		TThemeTxt tmptxt = theme->timertxt; // use timertxt as template
 		tmptxt.text = song.scale.getNoteStr(freq);
 		tmptxt.x = 600;
-		tmptxt.y = title_h * 600.0 + 140.0;
 		tmptxt.fontsize = 25;
 		theme->theme->PrintText(&tmptxt);
 	}
@@ -146,9 +142,17 @@ void CScreenSing::draw() {
 			sentenceBegin = m_sentence[0].begin;
 		}
 		sentenceDuration = m_sentence.back().end - sentenceBegin;
-		pixUnit = 600.0 / (sentenceDuration * 1.0);
+		pixUnit = (600.0 * resFactorX) / (sentenceDuration * 1.0);
 	} else {
 		pitchGraph.clear();
+	}
+	// Compute and draw the "to start" cursor
+	if (time < sentenceBegin) {
+		double wait = sentenceBegin - time;
+		double value = 4.0 * wait / sentenceDuration;
+		if (value > 1.0) value = wait > 1.0 ? 0.0 : 1.0;
+		theme->tostartfg.height = theme->tostartfg.final_height * value;
+		theme->theme->DrawRect(theme->tostartfg);
 	}
 	int min = song.noteMin - 7;
 	int max = song.noteMax + 7;
@@ -170,9 +174,9 @@ void CScreenSing::draw() {
 	linerect.final_width  = 0;
 	linerect.stroke_col.a = 0.7;
 	// Draw note lines
-	if (!m_sentence.empty() && time + 3.0 > sentenceBegin) {
+	if (!m_sentence.empty()) {
 		for (int n = song.noteMin; n <= song.noteMax; ++n) {
-			linerect.stroke_width = (song.scale.isSharp(n) ? 0.5 : 1.5);
+			linerect.stroke_width = (song.scale.isSharp(n) ? 0.5 : 1.5) * resFactorAvg;
 			if (n % 12) {
 				linerect.stroke_col.r = 0.5;
 				linerect.stroke_col.g = 0.5;
@@ -190,15 +194,15 @@ void CScreenSing::draw() {
 	TThemeRect tmprect;
 	tmprect.stroke_col.r = tmprect.stroke_col.g = tmprect.stroke_col.b = 0.5;
 	tmprect.stroke_col.a = 0.8;
-	tmprect.stroke_width = 1.0;
+	tmprect.stroke_width = resFactorAvg;
 	tmprect.svg_width = m_width;
 	tmprect.svg_height = m_height;
 	tmprect.height = -noteUnit;
 	tmprect.final_height = 0;
 	tmprect.final_width  = 0;
 	int state = 0;
-	double baseX = 100.0 - sentenceBegin * pixUnit;
-	if (time + 3.0 > sentenceBegin) for (unsigned int i = 0; i < m_sentence.size(); ++i) {
+	double baseX = 100.0 * resFactorX - sentenceBegin * pixUnit;
+	for (unsigned int i = 0; i < m_sentence.size(); ++i) {
 		if (m_sentence[i].begin > time) state = 3;
 		if (state == 0 && m_sentence[i].end > time) state = 1;
 		tmprect.y = baseY + m_sentence[i].note * noteUnit - 0.5 * tmprect.height;
@@ -236,7 +240,7 @@ void CScreenSing::draw() {
 		if (state == 1) { --i; state = 2; }
 	}
 
-	if (!m_sentence.empty() && time + 3.0 > sentenceBegin) {
+	if (!m_sentence.empty()) {
 		double graphTime = (baseX + time * pixUnit) / m_width;
 		if (freq == 0.0) {
 			pitchGraph.renderPitch(0.0, graphTime, 0.0);
@@ -269,30 +273,27 @@ void CScreenSing::draw() {
 	theme->lyricspast.extents.x_advance = 0;
 	theme->lyricshighlight.extents.x_advance= 0;
 	
-	if (!sentencePast.empty() && time + 3.0 > sentenceBegin) {
+	if (!sentencePast.empty()) {
 		theme->lyricspast.text = sentencePast;
-		theme->lyricspast.y = 470.0;
 		theme->theme->PrintText(&theme->lyricspast);
 	}
-	if (!sentenceNow.empty() && time + 3.0 > sentenceBegin) {
+	if (!sentenceNow.empty()) {
 		Note* n = lyrics->getCurrentNote();
 		if (!n) throw std::logic_error("sentenceNow is not empty but current note is NULL");
 		double phase = (time - n->begin) / (n->end - n->begin);
 		double factor = std::min(1.2, std::max(1.0, 1.2 - 0.2 * phase));
 		theme->lyricshighlight.x = theme->lyricspast.x + theme->lyricspast.extents.x_advance;
-		theme->lyricshighlight.y = 470.0;
 		theme->lyricshighlight.text = sentenceNow;
 		theme->lyricshighlight.scale = factor;
 		theme->theme->PrintText(&theme->lyricshighlight);
 	}
-	if (!sentenceFuture.empty() && time + 3.0 > sentenceBegin) {
+	if (!sentenceFuture.empty()) {
 		theme->lyricsfuture.text = sentenceFuture;
 		theme->lyricsfuture.x = theme->lyricspast.x + theme->lyricspast.extents.x_advance + theme->lyricshighlight.extents.x_advance;
-		theme->lyricsfuture.y = 470.0;
 		theme->theme->PrintText(&theme->lyricsfuture);
 	}
 
-	if (!sentenceNextSentence.empty() && time + 3.0 > sentenceBegin) {
+	if (!sentenceNextSentence.empty()) {
 		theme->lyricsnextsentence.text = sentenceNextSentence;
 		theme->lyricsnextsentence.extents = theme->theme->GetTextExtents(theme->lyricsnextsentence);
 		theme->lyricsnextsentence.x = (theme->lyricsnextsentence.svg_width - theme->lyricsnextsentence.extents.width)/2;
@@ -301,7 +302,6 @@ void CScreenSing::draw() {
 			theme->lyricsnextsentence.extents = theme->theme->GetTextExtents(theme->lyricsnextsentence);
 			theme->lyricsnextsentence.x = (theme->lyricsnextsentence.svg_width - theme->lyricsnextsentence.extents.width)/2;
 		}
-		theme->lyricsnextsentence.y = 520.0;
 		theme->theme->PrintText(&theme->lyricsnextsentence);
 	}
 

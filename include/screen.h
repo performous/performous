@@ -41,6 +41,9 @@ class CScreenManager: public CSingleton <CScreenManager> {
 	CAudio* getAudio() { return audio.get(); };
 	void setAudio(CAudio* _audio) { audio.reset(_audio); };
 
+	CVideoDriver* getVideoDriver() { return videoDriver; };
+	void setVideoDriver(CVideoDriver* _videoDriver) {videoDriver=_videoDriver; };
+	
 	bool getFullscreenStatus() { return m_fullscreen; };
 	void setFullscreenStatus(bool fullscreen) { m_fullscreen = fullscreen; };
 
@@ -60,6 +63,7 @@ class CScreenManager: public CSingleton <CScreenManager> {
 	SDL_Surface* screen;
 	boost::scoped_ptr<CAudio> audio;
 	boost::scoped_ptr<Songs> songs;
+	CVideoDriver* videoDriver;
 	bool m_fullscreen;
 	std::string m_theme;
   public:

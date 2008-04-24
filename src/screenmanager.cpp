@@ -14,6 +14,7 @@ CScreenManager::CScreenManager(std::string const& theme):
   screen(),
   audio(),
   songs(),
+  videoDriver(),
   m_fullscreen(),
   m_theme(theme),
   m_ingameVolume(100),

@@ -3,7 +3,6 @@
 #ifdef USE_FFMPEG_VIDEO
 
 #include <stdexcept>
-#include <iomanip>
 #include <iostream>
 #include <stdio.h>
 
@@ -159,9 +158,6 @@ void CFfmpeg::decodeNextFrame() {
 					tmp->height = h;
 					tmp->width = w;
 					tmp->timestamp = packet.time();
-					static double oldtime = 0.0;
-					std::cout << std::setprecision(3) << tmp->timestamp << " duration " << tmp->timestamp - oldtime << std::endl;
-					oldtime = tmp->timestamp;
 					videoQueue.push(tmp);
 				}
 				if (m_quit) return;
