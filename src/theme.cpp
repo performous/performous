@@ -2,17 +2,16 @@
 #include <screen.h>
 
 void CTheme::clear() {
-	double width = 800.0, height = 600.0; // FIXME!
 	if (dc) cairo_destroy(dc);
 	if (surface) cairo_surface_destroy(surface);
-	surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
+	surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, screenW(), screenW()*10/16);
 	dc = cairo_create(surface);
 }
 
 cairo_surface_t *CTheme::PrintText(TThemeTxt *text) {
 	PangoFontDescription *desc = pango_font_description_new();
 	PangoLayout *layout = pango_cairo_create_layout(dc);
-	pango_layout_set_alignment(layout, PANGO_ALIGN_CENTER );
+	pango_layout_set_alignment(layout, PANGO_ALIGN_CENTER);
 	PangoRectangle rec;
 
 	cairo_save(dc);
@@ -30,8 +29,7 @@ cairo_surface_t *CTheme::PrintText(TThemeTxt *text) {
 	pango_font_description_set_absolute_size (desc,text->fontsize * text->scale * PANGO_SCALE);
 	pango_layout_set_font_description (layout, desc);
 	pango_cairo_update_layout (dc, layout);
-	double width = 800.0, height = 600.0; // FIXME!
-	cairo_scale(dc, width/text->svg_width, height/text->svg_height);
+	cairo_scale(dc, cairo_image_surface_get_width(surface)/text->svg_width, cairo_image_surface_get_height(surface)/text->svg_height);
 	cairo_move_to(dc,text->x - (rec.width-rec.width/text->scale)/2,text->y-text->fontsize * text->scale);
 	pango_cairo_show_layout (dc, layout);
 	pango_cairo_layout_path(dc,layout);
@@ -54,8 +52,7 @@ cairo_surface_t *CTheme::PrintText(TThemeTxt *text) {
 
 cairo_surface_t *CTheme::DrawRect(TThemeRect rect) {
 	cairo_save(dc);
-	double width = 800.0, height = 600.0; // FIXME!
-	cairo_scale(dc, width/rect.svg_width, height/rect.svg_height);
+	cairo_scale(dc, cairo_image_surface_get_width(surface)/rect.svg_width, cairo_image_surface_get_height(surface)/rect.svg_height);
 	cairo_rectangle(dc, rect.x, rect.y, rect.width, rect.height);
 	if (rect.fill_col.r != -1 && rect.fill_col.g != -1 && rect.fill_col.b != -1) {
 		cairo_set_source_rgba(dc, rect.fill_col.r, rect.fill_col.g, rect.fill_col.b, rect.fill_col.a);

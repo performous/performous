@@ -3,7 +3,7 @@
 
 Video::Video(std::string const& _videoFile): m_mpeg(true, false, _videoFile), m_lastTime(), m_alpha() {}
 
-void Video::render(double time) {
+void Video::render(double time, double x, double y, double w, double h) {
 	VideoFrame& fr = m_videoFrame;
 	// Time to switch frame?
 	if (!fr.data.empty() && time >= fr.timestamp) {
@@ -18,7 +18,7 @@ void Video::render(double time) {
 		else {
 			if (m_alpha > 1.2f) m_alpha = 1.2f;
 			if (m_alpha < 1.0f) glColor4f(1.0f, 1.0f, 1.0f, m_alpha);
-			m_surface->draw();
+			m_surface->draw(x, y, w, h);
 			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		}
 	}

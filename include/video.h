@@ -14,10 +14,10 @@ class Video {
   public:
 #ifdef USE_FFMPEG_VIDEO
 	Video(std::string const& videoFile);
-	void render(double time);
+	void render(double time, double = 0.0, double = 0.0, double = 1.0, double = 0.0);
 #else
 	Video(std::string const&) {}
-	void render(double) {}
+	void render(double, double, double, double, double) {}
 #endif
   private:
 #ifdef USE_FFMPEG_VIDEO

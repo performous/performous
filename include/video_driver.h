@@ -2,23 +2,24 @@
 #define __VIDEODRIVER_H__
 
 #include "../config.h"
-#include <boost/ptr_container/ptr_vector.hpp>
 #include <vector>
 #include <surface.h>
 
-class CVideoDriver {
+unsigned int screenW();
+unsigned int screenH();
+static inline float virtH() { return float(screenH()) / screenW(); }
+
+class Window {
   public:
-	SDL_Surface* init(int width, int height, int fullscreen);
-	// eventually kill this class?
+	Window(unsigned int width, unsigned int height, int fullscreen);
 	void blank();
 	void swap();
-	void resize(int width, int height) {
-		const SDL_VideoInfo* videoInf = SDL_GetVideoInfo();
-		screen = SDL_SetVideoMode(width, height, videoInf->vfmt->BitsPerPixel, m_videoFlags);
+	void resize(unsigned int width, unsigned int height);
+	void fullscreen() {
+		SDL_WM_ToggleFullScreen(screen);
 	}
   private:
 	SDL_Surface* screen;
-	boost::ptr_vector<Surface> texture_list;
 	unsigned int m_videoFlags;
 };
 

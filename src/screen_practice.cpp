@@ -30,7 +30,6 @@ void CScreenPractice::manageEvent(SDL_Event event)
 
 void CScreenPractice::draw()
 {
-	CScreenManager * sm = CScreenManager::getSingletonPtr();
 	double m_width = 800.0, m_height = 600.0; // FIXME!!!
 	float resFactorX = m_width/800.;
 	float resFactorY = m_height/600.;

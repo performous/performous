@@ -14,9 +14,10 @@
    height="600"
    id="svg3465"
    sodipodi:version="0.32"
-   inkscape:version="0.44.1"
+   inkscape:version="0.45.1"
    sodipodi:docname="sing_lyricscurrent.svg"
-   sodipodi:docbase="/home/jesusda/docs/curro/yo/ultrastar-ng/base/theme-pod/themes/default">
+   sodipodi:docbase="/root/USNG/trunk/themes/lima"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <metadata
      id="metadata19">
     <rdf:RDF>
@@ -29,8 +30,8 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="579"
-     inkscape:window-width="922"
+     inkscape:window-height="1149"
+     inkscape:window-width="1920"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      guidetolerance="10.0"
@@ -40,12 +41,14 @@
      bordercolor="#666666"
      pagecolor="#ffffff"
      id="base"
-     inkscape:zoom="3.5826744"
-     inkscape:cx="186.78984"
-     inkscape:cy="97.453862"
-     inkscape:window-x="101"
-     inkscape:window-y="418"
-     inkscape:current-layer="svg3465" />
+     inkscape:zoom="1.5416667"
+     inkscape:cx="400"
+     inkscape:cy="144.32432"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:current-layer="svg3465"
+     width="1000px"
+     height="800px" />
   <defs
      id="defs3467">
     <linearGradient
