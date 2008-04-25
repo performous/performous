@@ -1,6 +1,7 @@
 #include <video.h>
 #include <cmath>
 
+#ifdef USE_FFMPEG_VIDEO
 Video::Video(std::string const& _videoFile): m_mpeg(true, false, _videoFile), m_lastTime(), m_alpha() {}
 
 void Video::render(double time) {
@@ -31,4 +32,4 @@ void Video::render(double time) {
 	}
 	m_lastTime = time;
 }
-
+#endif
