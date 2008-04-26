@@ -157,6 +157,9 @@ PKG_CHECK_MODULES(portAudioV19, portaudio-2.0 , [record_pa19="yes"] , [record_pa
 
 PKG_CHECK_MODULES(ffmpeg, libavutil libavformat libavcodec libswscale, [ffmpeg_detected="yes"],[ffmpeg_detected="no"])
 
+AC_CHECK_HEADERS([ffmpeg/avcodec.h ffmpeg/avformat.h ffmpeg/swscale.h], have_old_ffmpeg_headers=yes, have_old_ffmpeg_headers=no)
+AC_CHECK_HEADERS([libavcodec/avcodec.h libavformat/avformat libswscale/swscale.h], have_new_ffmpeg_headers=yes, have_new_ffmpeg_headers=no)
+
 saved_LIBS=$LIBS
 # Only detect pa18 if pa19 is not found (pa19 is detected as pa18 else)
 if test $record_pa19 = no ; then
@@ -370,6 +373,21 @@ case $video_layer in
 		/* video headers */
 		#define USE_FFMPEG_VIDEO 1
 		USNG_EOF)
+		if test $have_new_ffmpeg_headers = yes ; then
+			ac_includes_default=$(cat <<-USNG_EOF
+			$ac_includes_default
+			#define USE_NEW_FFMPEG_VIDEO 1
+			USNG_EOF)
+		else
+			if test $have_old_ffmpeg_headers = yes ; then
+				ac_includes_default=$(cat <<-USNG_EOF
+				$ac_includes_default
+				#define USE_OLD_FFMPEG_VIDEO 1
+				USNG_EOF)
+			else
+				AC_MSG_ERROR(configure found ffmpeg libraries but not the headers)
+			fi
+		fi
 		;;
 	no*)
 		;;

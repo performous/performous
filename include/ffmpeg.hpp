@@ -5,11 +5,21 @@
 
 #ifdef USE_FFMPEG_VIDEO
 
+#ifdef USE_NEW_FFMPEG_VIDEO
+extern "C" {
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+#include <libswscale/swscale.h>
+}
+#endif
+
+#ifdef USE_OLD_FFMPEG_VIDEO
 extern "C" {
 #include <ffmpeg/avcodec.h>
 #include <ffmpeg/avformat.h>
 #include <ffmpeg/swscale.h>
 }
+#endif
 
 #include <boost/ptr_container/ptr_deque.hpp>
 #include <boost/ptr_container/ptr_set.hpp>
