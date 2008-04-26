@@ -254,9 +254,11 @@ void CAudio::togglePause_internal() {
 #endif
 }
 
-#ifndef GSTREAMER_HAS_SEEK_SIMPLE
-#  define gst_element_seek_simple(element,format,flag,pos) (gst_element_seek(element,1.0,format,flag,GST_SEEK_TYPE_SET,pos,GST_SEEK_TYPE_NONE,0))
-#  warning "gstreamer < 0.10.7 support is obsolete, please update your gstreamer version"
+#ifdef USE_GSTREAMER_AUDIO
+#  ifndef GSTREAMER_HAS_SEEK_SIMPLE
+#    define gst_element_seek_simple(element,format,flag,pos) (gst_element_seek(element,1.0,format,flag,GST_SEEK_TYPE_SET,pos,GST_SEEK_TYPE_NONE,0))
+#    warning "gstreamer < 0.10.7 support is obsolete, please update your gstreamer version"
+#  endif
 #endif
 
 void CAudio::seek_internal(double seek_dist) {
