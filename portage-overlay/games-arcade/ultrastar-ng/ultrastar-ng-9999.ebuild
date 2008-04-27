@@ -7,7 +7,7 @@ inherit games subversion
 RESTRICT="nostrip"
 
 SONGS_PN=ultrastar-songs
-SONGS_P=${SONGS_PN}-1
+SONGS_P=${SONGS_PN}-2
 
 DESCRIPTION="SingStar GPL clone"
 HOMEPAGE="http://sourceforge.net/projects/ultrastar-ng/"
@@ -37,7 +37,7 @@ RDEPEND="gnome-base/librsvg
 		virtual/opengl
 		virtual/glu
 	)
-	ffmpeg? (media-video/ffmpeg)
+	ffmpeg? ( media-video/ffmpeg )
 	alsa? ( media-libs/alsa-lib )
 	portaudio? ( media-libs/portaudio )
 	gstreamer? ( >=media-libs/gstreamer-0.10 )
