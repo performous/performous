@@ -1,32 +1,3 @@
-themesdefdir   = @THEMES_DIR@/default
-themesdef_DATA = default/no_cover.svg \
-	default/intro.svg \
-	default/songs_bg.svg \
-	default/songs_order.svg \
-	default/songs_song.svg \
-	default/sing_bg.svg \
-	default/sing_lyricscurrent.svg \
-	default/sing_lyricshighlight.svg \
-	default/sing_lyricsnext.svg \
-	default/sing_p1box.svg \
-	default/sing_p1score.svg \
-	default/sing_p2box.svg \
-	default/sing_p2score.svg \
-	default/sing_progressfg.svg \
-	default/sing_tostartfg.svg \
-	default/sing_timetxt.svg \
-	default/practice_bg.svg \
-	default/practice_txt.svg \
-	default/practice_note.svg \
-	default/practice_sharp.svg \
-	default/practice_peak.svg \
-	default/score_bg.svg \
-	default/score_rank.svg \
-	default/score_level.svg \
-	default/score_txt.svg \
-	default/configuration_bg.svg \
-	default/configuration_item.svg \
-	default/configuration_value.svg
 
 themeslimadir   = @THEMES_DIR@/lima
 themeslima_DATA = lima/icon.png \
@@ -60,4 +31,4 @@ themeslima_DATA = lima/icon.png \
 	lima/configuration_value.svg \
 	lima/menu.ogg
 
-EXTRA_DIST = $(themesdef_DATA) $(themeslima_DATA)
+EXTRA_DIST = $(themeslima_DATA)
