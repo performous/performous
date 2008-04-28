@@ -28,6 +28,12 @@ double coverMathAdvanced::getPosition(){
 	double t = duration / rounds;
 	for (std::size_t i = 0; i < rounds; ++i) {
 		double d = remainder(m_target - m_position, m_songs); // Distance (via shortest way)
+		// Allow it to stop nicely, without jitter
+		if (std::abs(m_velocity) < 0.1 && std::abs(d) < 0.001) {
+			m_velocity = 0.0;
+			m_position = m_target;
+			break;
+		}
 		double a = d > 0.0 ? acceleration : -acceleration; // Acceleration vector
 		// Are we going to right direction && can we stop in time if we start decelerating now?
 		if (d * m_velocity > 0.0 && std::abs(m_velocity) > 2.0 * overshoot * acceleration * d / m_velocity) a *= -1.0;

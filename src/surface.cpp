@@ -13,6 +13,7 @@ Surface::~Surface() {
 
 void Surface::load(unsigned int width, unsigned int height, Format format, unsigned char* buffer) {
 	m_width = width; m_height = height;
+	dimensions = Dimensions(float(width) / height).fixedWidth(1.0f);
 	glGenTextures(1, &texture_id);
 	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texture_id);
 	unsigned int fmt;
@@ -46,23 +47,18 @@ void Surface::load(unsigned int width, unsigned int height, Format format, unsig
 	glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA, width, height, 0, fmt, buffer_fmt, buffer);
 }
 
-void Surface::draw(float x, float y, float w, float h) {
-	glMatrixMode(GL_MODELVIEW);
-//	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+void Surface::draw() {
 	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texture_id);
-	glPushMatrix();
-	glTranslatef(x, y, 0.0f);
-	float ar = m_width / m_height;
-	if (w == 0.0f) w = ar;
-	if (h == 0.0f) h = w / ar;
-	glScalef(w, h, 1.0);
 	glBegin(GL_QUADS);
-	glTexCoord2f(0.0f, 0.0f); glVertex2f(-0.5f, -0.5f);
-	glTexCoord2f(m_width, 0.0f); glVertex2f(0.5f, -0.5f);
-	glTexCoord2f(m_width, m_height); glVertex2f(0.5f, 0.5f);
-	glTexCoord2f(0.0f, m_height); glVertex2f(-0.5f, 0.5f);
+	float x1 = dimensions.x1();
+	float x2 = dimensions.x2();
+	float y1 = dimensions.y1();
+	float y2 = dimensions.y2();
+	glTexCoord2f(0.0f, 0.0f); glVertex2f(x1, y1);
+	glTexCoord2f(m_width, 0.0f); glVertex2f(x2, y1);
+	glTexCoord2f(m_width, m_height); glVertex2f(x2, y2);
+	glTexCoord2f(0.0f, m_height); glVertex2f(x1, y2);
 	glEnd();
-	glPopMatrix();
 }
 
 Surface::Surface(std::string filename, Filetype filetype) {
