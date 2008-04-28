@@ -70,6 +70,7 @@ static void init_SDL(CScreenManager& sm, CVideoDriver& vd, unsigned int width, u
 }
 
 int main(int argc, char** argv) {
+	std::ios::sync_with_stdio(false);  // We do not use C stdio
 	bool fullscreen = false;
 	bool fps = false;
 	unsigned int width, height;
