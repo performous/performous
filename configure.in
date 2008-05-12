@@ -412,10 +412,10 @@ case $audio_layer in
 		fi
 		;;
 	autodetect*)
-		if test $xine_detected = yes ; then
-			audio_layer="xine"
-		else if test $gst_detected = yes ; then
+		if test $gst_detected = yes ; then
 			audio_layer="gstreamer"
+		else if test $xine_detected = yes ; then
+			audio_layer="xine"
 		else
 			audio_layer="no"
 		fi ; fi
