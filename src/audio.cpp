@@ -19,6 +19,7 @@ CAudio::CAudio(): m_type() {
 	stream = xine_stream_new(xine, ao_port, vo_port);
 	event_queue = xine_event_new_queue(stream);
 	xine_playing = 0;
+	std::cout << ">>> Using playback device Xine" << std::endl;
 #endif
 #ifdef USE_GSTREAMER_AUDIO
 	/* init GStreamer */
@@ -39,6 +40,7 @@ CAudio::CAudio(): m_type() {
 		  g_object_set (G_OBJECT (sink), "profile", 1, NULL);
 		g_object_set (G_OBJECT (music), "audio-sink", sink, NULL);
 	}
+	std::cout << ">>> Using playback device Gstreamer" << std::endl;
 #endif
 	length = 0;
 	m_thread.reset(new boost::thread(boost::ref(*this)));
