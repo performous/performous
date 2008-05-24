@@ -123,6 +123,7 @@ class CFfmpeg {
 	VideoFifo  videoQueue;
 	AudioFifo  audioQueue;
 	void seek(double time) { m_seekTarget = time; videoQueue.reset(); audioQueue.reset(); }
+	double duration();
   private:
 	void seek_internal();
 	void open(const char* _filename);

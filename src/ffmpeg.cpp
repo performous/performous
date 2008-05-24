@@ -29,6 +29,18 @@ CFfmpeg::~CFfmpeg() {
 	av_close_input_file(pFormatCtx);
 }
 
+double CFfmpeg::duration() {
+	double result=0.;
+	if( audioStream != -1 && decodeAudio ) {
+		result = pFormatCtx->duration / (AV_TIME_BASE*1.);
+	} else if( videoStream != -1 && decodeVideo ) {
+		result = pFormatCtx->duration / (AV_TIME_BASE*1.);
+	} else {
+		result = -1.0;
+	}
+	return result;
+}
+
 void CFfmpeg::open(const char* _filename) {
 	if (av_open_input_file(&pFormatCtx, _filename, NULL, 0, NULL)) throw std::runtime_error("Cannot open input file");
 	if (av_find_stream_info(pFormatCtx) < 0) throw std::runtime_error("Cannot find stream information");
