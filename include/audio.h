@@ -9,6 +9,11 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
 
+#ifdef USE_FFMPEG_VIDEO
+#include "ffmpeg.hpp"
+#include <boost/scoped_ptr.hpp>
+#endif
+
 /**
  * Audio playback class. This class enables the audio playback using several
  * audio APIs (Xine or GStreamer)
@@ -123,6 +128,10 @@ class CAudio {
 #endif
 #ifdef USE_GSTREAMER_AUDIO
 	GstElement *music;
+#endif
+#ifdef USE_FFMPEG_AUDIO
+	boost::scoped_ptr<CFfmpeg> m_mpeg;
+	bool xine_playing;
 #endif
 };
 

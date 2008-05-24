@@ -11,6 +11,10 @@
 #define LENGTH_ERROR -1
 
 CAudio::CAudio(): m_type() {
+#ifdef USE_FFMPEG_AUDIO
+	m_mpeg.reset();
+	ffmpeg_playing = false;
+#endif
 #ifdef USE_LIBXINE_AUDIO
 	xine = xine_new();
 	xine_init(xine);
@@ -18,7 +22,7 @@ CAudio::CAudio(): m_type() {
 	ao_port = xine_open_audio_driver(xine , "auto", NULL);
 	stream = xine_stream_new(xine, ao_port, vo_port);
 	event_queue = xine_event_new_queue(stream);
-	xine_playing = 0;
+	xine_playing = false;
 	std::cout << ">>> Using playback device Xine" << std::endl;
 #endif
 #ifdef USE_GSTREAMER_AUDIO
@@ -65,6 +69,9 @@ CAudio::~CAudio() {
 #ifdef USE_GSTREAMER_AUDIO
 	gst_object_unref (GST_OBJECT (music));
 #endif
+#ifdef USE_FFMPEG_AUDIO
+	m_mpeg.reset();
+#endif
 }
 
 void CAudio::operator()() {
@@ -101,6 +108,9 @@ void CAudio::operator()() {
 }
 
 unsigned int CAudio::getVolume_internal() {
+#ifdef USE_FFMPEG_AUDIO
+	return 100;
+#endif
 #ifdef USE_LIBXINE_AUDIO
 	return xine_get_param(stream, XINE_PARAM_AUDIO_VOLUME);
 #endif
@@ -112,6 +122,9 @@ unsigned int CAudio::getVolume_internal() {
 }
 
 void CAudio::setVolume_internal(unsigned int _volume) {
+#ifdef USE_FFMPEG_AUDIO
+	void(100);
+#endif
 #ifdef USE_LIBXINE_AUDIO
 	xine_set_param(stream, XINE_PARAM_AUDIO_VOLUME, _volume);
 #endif
@@ -123,6 +136,12 @@ void CAudio::setVolume_internal(unsigned int _volume) {
 
 void CAudio::playMusic_internal(std::string const& filename) {
 	stopMusic_internal();
+#ifdef USE_FFMPEG_AUDIO
+	m_mpeg(new Ffmpeg(false, true, filename));
+	if( (length = m_mpeg->duration()) == -1. )
+		length = LENGTH_ERROR;
+	ffmpeg_playing = true;
+#endif
 #ifdef USE_LIBXINE_AUDIO
 	int pos_stream;
 	int pos_time;
@@ -130,7 +149,7 @@ void CAudio::playMusic_internal(std::string const& filename) {
 		std::cout << "Could not open " << filename << std::endl;
 	}
 	if (!xine_get_pos_length(stream, &pos_stream, &pos_time, &length)) length = LENGTH_ERROR;
-	xine_playing = 1;
+	xine_playing = true;
 #endif
 #ifdef USE_GSTREAMER_AUDIO
 	if (filename[0] == '/') g_object_set (G_OBJECT (music), "uri", g_strconcat("file://",filename.c_str(),NULL), NULL);
@@ -146,6 +165,13 @@ void CAudio::playPreview_internal(std::string const& filename) {
 	unsigned int volume = getVolume_internal();
 	setVolume_internal(0);
 	stopMusic_internal();
+#ifdef USE_FFMPEG_AUDIO
+	m_mpeg(new Ffmpeg(false, true, filename));
+	m_mpeg->seek(30.);
+	if( (length = m_mpeg->duration()) == -1. )
+		length = LENGTH_ERROR;
+	ffmpeg_playing = true;
+#endif
 #ifdef USE_LIBXINE_AUDIO
 	int pos_stream;
 	int pos_time;
@@ -155,7 +181,7 @@ void CAudio::playPreview_internal(std::string const& filename) {
 	}
 
 	if (!xine_get_pos_length(stream, &pos_stream, &pos_time, &length)) length = LENGTH_ERROR;
-	xine_playing = 1;
+	xine_playing = true;
 #endif
 #ifdef USE_GSTREAMER_AUDIO
 	if (filename[0] == '/') g_object_set (G_OBJECT (music), "uri", g_strconcat("file://",filename.c_str(),NULL), NULL);
@@ -179,6 +205,10 @@ void CAudio::playPreview_internal(std::string const& filename) {
 
 double CAudio::getLength_internal() {
 	if (length != LENGTH_ERROR) return 1e-3 * length;
+#ifdef USE_FFMPEG_AUDIO
+	if( (length = m_mpeg->duration()) == -1. )
+		length = LENGTH_ERROR;
+#endif
 #ifdef USE_LIBXINE_AUDIO
 	int pos_stream;
 	int pos_time;
@@ -194,9 +224,12 @@ double CAudio::getLength_internal() {
 
 bool CAudio::isPlaying_internal() {
 #ifdef USE_LIBXINE_AUDIO
+	return ffmpeg_playing;
+#endif
+#ifdef USE_LIBXINE_AUDIO
 	xine_event_t *event; 
 	while((event = xine_event_get(event_queue))) {
-		if (event->type == XINE_EVENT_UI_PLAYBACK_FINISHED) xine_playing = 0;
+		if (event->type == XINE_EVENT_UI_PLAYBACK_FINISHED) xine_playing = false;
 		xine_event_free(event);
 	}
 	return xine_playing;
@@ -213,6 +246,10 @@ bool CAudio::isPlaying_internal() {
 
 void CAudio::stopMusic_internal() {
 	// if (!isPlaying_internal()) return;
+#ifdef USE_FFMPEG_AUDIO
+	m_mpeg.reset();
+	ffmpeg_playing = false;
+#endif
 #ifdef USE_LIBXINE_AUDIO
 	xine_stop(stream);
 #endif
@@ -223,6 +260,9 @@ void CAudio::stopMusic_internal() {
 
 double CAudio::getPosition_internal() {
 	double position = 0.0;
+#ifdef USE_FFMPEG_AUDIO
+	position = m_mpeg->position();
+#endif
 #ifdef USE_LIBXINE_AUDIO
 	int pos_stream;
 	int length_time;
@@ -266,6 +306,9 @@ void CAudio::togglePause_internal() {
 void CAudio::seek_internal(double seek_dist) {
 	if (!isPlaying_internal()) return;
 	int position = std::max(0.0, std::min(getLength_internal() - 1.0, getPosition_internal() + seek_dist));
+#ifdef USE_FFMPEG_AUDIO
+	position = m_mpeg->seek(0, position);
+#endif
 #ifdef USE_LIBXINE_AUDIO
 	xine_play(stream, 0, 1e3 * position);
 #endif
