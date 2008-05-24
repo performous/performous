@@ -69,6 +69,17 @@ class VideoFifo {
 		m_queue.clear();
 		m_cond.notify_all();
 	}
+	double position() {
+		boost::mutex::scoped_lock l(m_mutex);
+		double result;
+		if (m_queue.empty()) {
+			result = 0.;
+		} else {
+			VideoFrame& tmp = *m_queue.begin();
+			result = tmp.timestamp;
+		}
+		return result;
+	}
   private:
 	boost::ptr_set<VideoFrame> m_queue;
 	boost::mutex m_mutex;
@@ -104,6 +115,17 @@ class AudioFifo {
 		m_queue.clear();
 		m_cond.notify_all();
 	}
+	double position() {
+		boost::mutex::scoped_lock l(m_mutex);
+		double result;
+		if (m_queue.empty()) {
+			result = 0.;
+		} else {
+			AudioFrame& tmp = m_queue.front();
+			result = tmp.timestamp;
+		}
+		return result;
+	}
   private:
 	boost::ptr_deque<AudioFrame> m_queue;
 	boost::mutex m_mutex;
@@ -124,6 +146,7 @@ class CFfmpeg {
 	AudioFifo  audioQueue;
 	void seek(double time) { m_seekTarget = time; videoQueue.reset(); audioQueue.reset(); }
 	double duration();
+	double position() {return std::max(audioQueue.position(),videoQueue.position());};
   private:
 	void seek_internal();
 	void open(const char* _filename);
@@ -145,6 +168,7 @@ class CFfmpeg {
 	int audioStream;
 	bool decodeVideo;
 	bool decodeAudio;
+	double m_position;
 };
 
 #endif
