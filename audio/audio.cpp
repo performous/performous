@@ -59,7 +59,7 @@ namespace da {
 			for (playback_plugin::iterator it = playback_plugin::begin(); it != playback_plugin::end(); ++it) {
 				if (it->special()) continue;
 				try {
-					s.debug(">>> Recording from " + it->name());
+					s.debug(">>> Playing with " + it->name());
 					m_handle = it(s);
 					s.set_device(it->name());
 					return;

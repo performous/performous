@@ -11,6 +11,7 @@
 
 #ifdef USE_FFMPEG_VIDEO
 #include "ffmpeg.hpp"
+#include <audio.hpp>
 #include <boost/scoped_ptr.hpp>
 #endif
 
@@ -24,7 +25,7 @@ class CAudio {
 	 * Constructor
 	 * This constructor initialise the API audio drivers
 	 */
-	CAudio();
+	CAudio(std::string const& pdev);
 	/**
 	 * Destructor
 	 * This destructor close the API audio drivers
@@ -93,6 +94,7 @@ class CAudio {
 	unsigned int getVolume() { return getVolume_internal(); }
 	void setVolume(unsigned int volume) { setVolume_internal(volume); }
 	void operator()(); // Thread runs here, don't call directly
+	void operator()(da::pcm_data& areas, da::settings const&);
 	void wait() {
 		boost::mutex::scoped_lock l(m_mutex);
 		while (!m_ready || m_type != NONE) m_condready.wait(l);
@@ -132,6 +134,8 @@ class CAudio {
 #ifdef USE_FFMPEG_AUDIO
 	boost::scoped_ptr<CFfmpeg> m_mpeg;
 	bool ffmpeg_playing;
+	da::settings m_rs;
+	da::playback m_playback;
 #endif
 };
 

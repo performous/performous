@@ -19,7 +19,7 @@ CFfmpeg::CFfmpeg(bool _decodeVideo, bool _decodeAudio, std::string const& _filen
 CFfmpeg::~CFfmpeg() {
 	m_quit = true;
 	videoQueue.reset();
-	// audioQueue.reset();
+	audioQueue.reset();
 	m_thread->join();
 	if( videoStream != -1 && decodeVideo ) avcodec_close(pVideoCodecCtx);
 	if( audioStream != -1 && decodeAudio ) {

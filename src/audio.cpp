@@ -10,7 +10,18 @@
 
 #define LENGTH_ERROR -1
 
-CAudio::CAudio(): m_type() {
+CAudio::CAudio(std::string const& pdev):
+#ifdef USE_FFMPEG_AUDIO
+	m_type(),
+	m_rs(da::settings(pdev)
+	.set_callback(boost::ref(*this))
+	.set_channels(2)
+	.set_rate(48000)
+	.set_debug(std::cerr)),
+	m_playback(m_rs) {
+#else
+	m_type() {
+#endif
 #ifdef USE_FFMPEG_AUDIO
 	m_mpeg.reset();
 	ffmpeg_playing = false;
@@ -72,6 +83,9 @@ CAudio::~CAudio() {
 #ifdef USE_FFMPEG_AUDIO
 	m_mpeg.reset();
 #endif
+}
+
+void CAudio::operator()(da::pcm_data& areas, da::settings const&) {
 }
 
 void CAudio::operator()() {
@@ -140,6 +154,8 @@ void CAudio::playMusic_internal(std::string const& filename) {
 	m_mpeg.reset(new CFfmpeg(false, true, filename));
 	if( (length = m_mpeg->duration()) == -1. )
 		length = LENGTH_ERROR;
+	else
+		length *= 1e3;
 	ffmpeg_playing = true;
 #endif
 #ifdef USE_LIBXINE_AUDIO
@@ -170,6 +186,8 @@ void CAudio::playPreview_internal(std::string const& filename) {
 	m_mpeg->seek(30.);
 	if( (length = m_mpeg->duration()) == -1. )
 		length = LENGTH_ERROR;
+	else
+		length *= 1e3;
 	ffmpeg_playing = true;
 #endif
 #ifdef USE_LIBXINE_AUDIO
@@ -208,6 +226,8 @@ double CAudio::getLength_internal() {
 #ifdef USE_FFMPEG_AUDIO
 	if( (length = m_mpeg->duration()) == -1. )
 		length = LENGTH_ERROR;
+	else
+		length *= 1e3;
 #endif
 #ifdef USE_LIBXINE_AUDIO
 	int pos_stream;

@@ -181,7 +181,7 @@ int main(int argc, char** argv) {
 		CVideoDriver vd;
 		init_SDL(sm, vd, width, height);
 		sm.setSDLScreen(screenSDL);
-		sm.setAudio(new CAudio());
+		sm.setAudio(new CAudio(pdev));
 		sm.setVideoDriver(&vd);
 		sm.addScreen(new CScreenIntro("Intro"));
 		sm.addScreen(new CScreenSongs("Songs", songdirs));
