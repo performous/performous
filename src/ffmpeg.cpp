@@ -199,6 +199,8 @@ void CFfmpeg::decodeNextFrame() {
 			tmp->data.swap(audioFramesResampled);
 			tmp->timestamp = packet.time();
 			audioQueue.push(tmp);
+			// Audio frame are always finished
+			frameFinished = 1;
 			if (m_quit) return;
 		}
 	}
