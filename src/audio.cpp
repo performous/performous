@@ -123,7 +123,7 @@ unsigned int CAudio::getVolume_internal() {
 
 void CAudio::setVolume_internal(unsigned int _volume) {
 #ifdef USE_FFMPEG_AUDIO
-	void(100);
+	(void)_volume;
 #endif
 #ifdef USE_LIBXINE_AUDIO
 	xine_set_param(stream, XINE_PARAM_AUDIO_VOLUME, _volume);
@@ -137,7 +137,7 @@ void CAudio::setVolume_internal(unsigned int _volume) {
 void CAudio::playMusic_internal(std::string const& filename) {
 	stopMusic_internal();
 #ifdef USE_FFMPEG_AUDIO
-	m_mpeg(new Ffmpeg(false, true, filename));
+	m_mpeg.reset(new CFfmpeg(false, true, filename));
 	if( (length = m_mpeg->duration()) == -1. )
 		length = LENGTH_ERROR;
 	ffmpeg_playing = true;
@@ -166,7 +166,7 @@ void CAudio::playPreview_internal(std::string const& filename) {
 	setVolume_internal(0);
 	stopMusic_internal();
 #ifdef USE_FFMPEG_AUDIO
-	m_mpeg(new Ffmpeg(false, true, filename));
+	m_mpeg.reset(new CFfmpeg(false, true, filename));
 	m_mpeg->seek(30.);
 	if( (length = m_mpeg->duration()) == -1. )
 		length = LENGTH_ERROR;
@@ -278,6 +278,9 @@ double CAudio::getPosition_internal() {
 }
 
 bool CAudio::isPaused_internal() {
+#ifdef USE_FFMPEG_AUDIO
+	return (ffmpeg_playing==false);
+#endif
 #ifdef USE_LIBXINE_AUDIO
 	return isPlaying_internal() && xine_get_param(stream,XINE_PARAM_SPEED) == XINE_SPEED_PAUSE;
 #endif
@@ -288,6 +291,10 @@ bool CAudio::isPaused_internal() {
 
 void CAudio::togglePause_internal() {
 	if (!isPlaying_internal()) return;
+#ifdef USE_FFMPEG_AUDIO
+	// TODO: send order to ffmpeg class
+	ffmpeg_playing=!ffmpeg_playing;
+#endif
 #ifdef USE_LIBXINE_AUDIO
 	xine_set_param(stream, XINE_PARAM_SPEED, isPaused_internal() ? XINE_SPEED_NORMAL : XINE_SPEED_PAUSE);
 #endif
@@ -307,7 +314,7 @@ void CAudio::seek_internal(double seek_dist) {
 	if (!isPlaying_internal()) return;
 	int position = std::max(0.0, std::min(getLength_internal() - 1.0, getPosition_internal() + seek_dist));
 #ifdef USE_FFMPEG_AUDIO
-	position = m_mpeg->seek(0, position);
+	m_mpeg->seek(position);
 #endif
 #ifdef USE_LIBXINE_AUDIO
 	xine_play(stream, 0, 1e3 * position);

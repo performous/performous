@@ -43,7 +43,7 @@ AC_ARG_ENABLE(debug,
 if test $debug = yes ; then CFLAGS="-g -O0 $CFLAGS" ; CXXFLAGS="-g -O0 $CXXFLAGS" ; fi
 
 AC_ARG_WITH(audio,
-	AC_HELP_STRING(--with-audio[={xine|gstreamer}],
+	AC_HELP_STRING(--with-audio[={xine|gstreamer|ffmpeg}],
 		 implementation of the audio layer [[[default=autodetect]]]),
 	[audio_layer="$withval"],
 	[audio_layer="autodetect"]
@@ -397,18 +397,25 @@ AC_SUBST(VIDEO_LIBS)
 
 # Do things for audio
 case $audio_layer in
+	ffmpeg*)
+		if test $ffmpeg_detected = yes ; then
+			audio_layer="ffmpeg"
+		else
+			AC_MSG_ERROR(Cannot find ffmpeg, but explicitly required)
+		fi
+		;;
 	xine*)
 		if test $xine_detected = yes ; then
 			audio_layer="xine"
 		else
-			audio_layer="no"
+			AC_MSG_ERROR(Cannot find xine, but explicitly required)
 		fi
 		;;	
 	gstreamer*)
 		if test $gst_detected = yes ; then
 			audio_layer="gstreamer"
 		else
-			audio_layer="no"
+			AC_MSG_ERROR(Cannot find gstreamer, but explicitly required)
 		fi
 		;;
 	autodetect*)
@@ -416,19 +423,45 @@ case $audio_layer in
 			audio_layer="gstreamer"
 		else if test $xine_detected = yes ; then
 			audio_layer="xine"
+		else if test $ffmpeg_detected = yes ; then
+			audio_layer="ffmpeg"
 		else
 			audio_layer="no"
-		fi ; fi
+		fi ; fi ; fi
 		;;
 esac
 
 case $audio_layer in
+	ffmpeg*)
+		AUDIO_FLAGS=`pkg-config --cflags libavutil libavformat libavcodec libswscale`
+		AUDIO_LIBS=`pkg-config --libs libavutil libavformat libavcodec libswscale`
+		ac_includes_default=$(cat <<-USNG_EOF
+		$ac_includes_default
+		/* audio headers */
+		#define USE_FFMPEG_AUDIO 1
+		USNG_EOF)
+		if test $have_new_ffmpeg_headers = yes ; then
+			ac_includes_default=$(cat <<-USNG_EOF
+			$ac_includes_default
+			#define USE_NEW_FFMPEG_AUDIO 1
+			USNG_EOF)
+		else
+			if test $have_old_ffmpeg_headers = yes ; then
+				ac_includes_default=$(cat <<-USNG_EOF
+				$ac_includes_default
+				#define USE_OLD_FFMPEG_AUDIO 1
+				USNG_EOF)
+			else
+				AC_MSG_ERROR(configure found ffmpeg libraries but not the headers)
+			fi
+		fi
+		;;
 	xine*)
 		AUDIO_FLAGS=`xine-config --cflags`
 		AUDIO_LIBS=`xine-config --libs`
 		ac_includes_default=$(cat <<-USNG_EOF
 		$ac_includes_default
-		/* video headers */
+		/* audio headers */
 		#define USE_LIBXINE_AUDIO 1
 		#include <xine.h>
 		USNG_EOF)
@@ -438,7 +471,7 @@ case $audio_layer in
 		AUDIO_LIBS=`pkg-config --libs gstreamer-0.10`
 		ac_includes_default=$(cat <<-USNG_EOF
 		$ac_includes_default
-		/* video headers */
+		/* audio headers */
 		#define USE_GSTREAMER_AUDIO 1
 		#include <gst/gst.h>
 		USNG_EOF)

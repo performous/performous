@@ -119,19 +119,19 @@ class CAudio {
 	unsigned int getVolume_internal();
 	void setVolume_internal(unsigned int _volume);
 #ifdef USE_LIBXINE_AUDIO
-    xine_t               *xine;
-    xine_stream_t        *stream;
-    xine_video_port_t    *vo_port;
-    xine_audio_port_t    *ao_port;
-    xine_event_queue_t   *event_queue;
-    bool xine_playing;
+	xine_t               *xine;
+	xine_stream_t        *stream;
+	xine_video_port_t    *vo_port;
+	xine_audio_port_t    *ao_port;
+	xine_event_queue_t   *event_queue;
+	bool xine_playing;
 #endif
 #ifdef USE_GSTREAMER_AUDIO
 	GstElement *music;
 #endif
 #ifdef USE_FFMPEG_AUDIO
 	boost::scoped_ptr<CFfmpeg> m_mpeg;
-	bool xine_playing;
+	bool ffmpeg_playing;
 #endif
 };
 

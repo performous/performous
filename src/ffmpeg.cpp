@@ -89,12 +89,14 @@ void CFfmpeg::open(const char* _filename) {
 		audioStream = -1;
 	}
 	// Setup software scaling context
-	int w = pVideoCodecCtx->width;
-	int h = pVideoCodecCtx->height;
-	img_convert_ctx = sws_getContext(
-	  w, h, pVideoCodecCtx->pix_fmt,
-	  w, h, PIX_FMT_RGB24,
-	  SWS_BICUBIC, NULL, NULL, NULL);
+	if( videoStream != -1 && decodeVideo ) {
+		int w = pVideoCodecCtx->width;
+		int h = pVideoCodecCtx->height;
+		img_convert_ctx = sws_getContext(
+		  w, h, pVideoCodecCtx->pix_fmt,
+		  w, h, PIX_FMT_RGB24,
+		  SWS_BICUBIC, NULL, NULL, NULL);
+	}
 }
 
 void CFfmpeg::operator()() {
