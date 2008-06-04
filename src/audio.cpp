@@ -86,6 +86,21 @@ CAudio::~CAudio() {
 }
 
 void CAudio::operator()(da::pcm_data& areas, da::settings const&) {
+	boost::mutex::scoped_lock l(m_mutex);
+	if( m_mpeg.get() == NULL )
+		return;
+
+	unsigned long size = 0;
+	std::size_t channels = areas.channels;
+	std::size_t frames = areas.frames;
+	std::vector<int16_t> buf;
+
+	while(size < frames*channels) {
+		size+=m_mpeg->audioQueue.tryPop(buf, frames*channels-size);
+	}
+
+	for( unsigned int i = 0 ; i < frames*channels ; i++ )
+		areas.m_buf[i] = buf[i];
 }
 
 void CAudio::operator()() {

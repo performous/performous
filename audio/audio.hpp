@@ -27,8 +27,8 @@ namespace da {
 
 	/** Provides various access iterators to a multich interleaved sample buffer. **/
 	class pcm_data {
-		sample_t* m_buf;
 	  public:
+		sample_t* m_buf;
 		const std::size_t frames;
 		const std::size_t channels;
 		pcm_data(sample_t* buf, std::size_t _frames, std::size_t _channels): m_buf(buf), frames(_frames), channels(_channels) {}

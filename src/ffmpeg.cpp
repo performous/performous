@@ -191,7 +191,7 @@ void CFfmpeg::decodeNextFrame() {
 			if (decodeSize < 0) throw std::runtime_error("cannot decode audio frame");
 
 			std::vector<int16_t> audioFramesResampled(AVCODEC_MAX_AUDIO_FRAME_SIZE);
-			int nb_sample = audio_resample(pResampleCtx, &audioFramesResampled[0], audioFrames, outsize/(pAudioCodecCtx->channels*2));
+			int nb_sample = audio_resample(pResampleCtx, &audioFramesResampled[0], audioFrames, outsize/(pAudioCodecCtx->channels));
 
 			audioFramesResampled.resize(nb_sample);
 
