@@ -86,6 +86,7 @@ CAudio::~CAudio() {
 }
 
 void CAudio::operator()(da::pcm_data& areas, da::settings const&) {
+#ifdef USE_FFMPEG_AUDIO
 	boost::mutex::scoped_lock l(m_mutex);
 	if( m_mpeg.get() == NULL )
 		return;
@@ -101,6 +102,7 @@ void CAudio::operator()(da::pcm_data& areas, da::settings const&) {
 
 	for( unsigned int i = 0 ; i < frames*channels ; i++ )
 		areas.m_buf[i] = buf[i];
+#endif
 }
 
 void CAudio::operator()() {
