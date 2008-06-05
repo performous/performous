@@ -88,12 +88,14 @@ CAudio::~CAudio() {
 void CAudio::operator()(da::pcm_data& areas, da::settings const&) {
 #ifdef USE_FFMPEG_AUDIO
 	boost::mutex::scoped_lock l(m_mutex);
-	if( m_mpeg.get() == NULL )
-		return;
-
-	unsigned long size = 0;
 	std::size_t channels = areas.channels;
 	std::size_t frames = areas.frames;
+	if (!m_mpeg.get()) {
+		for (unsigned int i = 0; i < frames*channels; ++i)
+		  areas.m_buf[i] = 0.0f;
+		return;
+	}
+	unsigned long size = 0;
 	std::vector<int16_t> buf;
 
 	while(size < frames*channels) {
@@ -101,7 +103,7 @@ void CAudio::operator()(da::pcm_data& areas, da::settings const&) {
 	}
 
 	for( unsigned int i = 0 ; i < frames*channels ; i++ )
-		areas.m_buf[i] = da::conv_from_s16(buf[i]);
+	  areas.m_buf[i] = da::conv_from_s16(buf[i]);
 #endif
 }
 
