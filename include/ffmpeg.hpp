@@ -95,12 +95,12 @@ class AudioFifo {
 		AudioFrame& tmp = m_queue.front();
 		std::size_t size = tmp.data.size();
 		if( _size == 0 || tmp.data.size() <= _size ) {
-			buffer.insert( buffer.begin(), tmp.data.begin(), tmp.data.end() );
+			buffer.insert( buffer.end(), tmp.data.begin(), tmp.data.end() );
 			m_queue.pop_front();
 			m_cond.notify_one();
 			return size;
 		} else {
-			buffer.insert( buffer.begin(), tmp.data.begin(), tmp.data.begin() + _size );
+			buffer.insert( buffer.end(), tmp.data.begin(), tmp.data.begin() + _size );
 			tmp.data.erase(tmp.data.begin(), tmp.data.begin() + _size );
 			return _size;
 		}
