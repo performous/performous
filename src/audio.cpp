@@ -24,7 +24,7 @@ CAudio::CAudio(std::string const& pdev):
 #endif
 #ifdef USE_FFMPEG_AUDIO
 	m_mpeg.reset();
-	ffmpeg_playing = false;
+	ffmpeg_paused = false;
 #endif
 #ifdef USE_LIBXINE_AUDIO
 	xine = xine_new();
@@ -90,7 +90,7 @@ void CAudio::operator()(da::pcm_data& areas, da::settings const&) {
 	boost::mutex::scoped_lock l(m_mutex);
 	std::size_t channels = areas.channels;
 	std::size_t frames = areas.frames;
-	if (!m_mpeg.get()) {
+	if (!m_mpeg || ffmpeg_paused) {
 		for (unsigned int i = 0; i < frames*channels; ++i)
 		  areas.m_buf[i] = 0.0f;
 		return;
@@ -109,33 +109,37 @@ void CAudio::operator()(da::pcm_data& areas, da::settings const&) {
 
 void CAudio::operator()() {
 	for (;;) {
-		Type type;
-		std::string filename;
-		{
-			boost::mutex::scoped_lock l(m_mutex);
-			m_ready = true;
-			m_condready.notify_all();
-			while (m_type == NONE) m_cond.wait(l);
-			m_ready = false;
-			type = m_type;
-			m_type = NONE;
-			filename = m_filename;
-		}
-		switch (type) {
-		  case NONE: // Should not get here...
-		  case QUIT: return;
-		  case STOP: stopMusic_internal(); break;
-		  case PREVIEW:
-			// Wait a little while before actually starting
-			boost::thread::sleep(now() + 0.35);
+		try {
+			Type type;
+			std::string filename;
 			{
 				boost::mutex::scoped_lock l(m_mutex);
-				// Did we receive another event already?
-				if (m_type != NONE) continue;
+				m_ready = true;
+				m_condready.notify_all();
+				while (m_type == NONE) m_cond.wait(l);
+				m_ready = false;
+				type = m_type;
+				m_type = NONE;
+				filename = m_filename;
 			}
-			playPreview_internal(filename);
-			break;
-		  case PLAY: playMusic_internal(filename); break;
+			switch (type) {
+			  case NONE: // Should not get here...
+			  case QUIT: return;
+			  case STOP: stopMusic_internal(); break;
+			  case PREVIEW:
+				// Wait a little while before actually starting
+				boost::thread::sleep(now() + 0.35);
+				{
+					boost::mutex::scoped_lock l(m_mutex);
+					// Did we receive another event already?
+					if (m_type != NONE) continue;
+				}
+				playPreview_internal(filename);
+				break;
+			  case PLAY: playMusic_internal(filename); break;
+			}
+		} catch (std::exception& e) {
+			std::cerr << "Audio error: " << e.what() << std::endl;
 		}
 	}
 }
@@ -170,12 +174,11 @@ void CAudio::setVolume_internal(unsigned int _volume) {
 void CAudio::playMusic_internal(std::string const& filename) {
 	stopMusic_internal();
 #ifdef USE_FFMPEG_AUDIO
+	length = LENGTH_ERROR;
 	m_mpeg.reset(new CFfmpeg(false, true, filename));
-	if( (length = m_mpeg->duration()) == -1. )
-		length = LENGTH_ERROR;
-	else
-		length *= 1e3;
-	ffmpeg_playing = true;
+	if (m_mpeg->duration() < 0) return;
+	length = 1e3 * m_mpeg->duration();
+	ffmpeg_paused = false;
 #endif
 #ifdef USE_LIBXINE_AUDIO
 	int pos_stream;
@@ -201,13 +204,12 @@ void CAudio::playPreview_internal(std::string const& filename) {
 	setVolume_internal(0);
 	stopMusic_internal();
 #ifdef USE_FFMPEG_AUDIO
+	length = LENGTH_ERROR;
 	m_mpeg.reset(new CFfmpeg(false, true, filename));
 	m_mpeg->seek(30.);
-	if( (length = m_mpeg->duration()) == -1. )
-		length = LENGTH_ERROR;
-	else
-		length *= 1e3;
-	ffmpeg_playing = true;
+	if (m_mpeg->duration() < 0) return;
+	length = 1e3 * m_mpeg->duration();
+	ffmpeg_paused = false;
 #endif
 #ifdef USE_LIBXINE_AUDIO
 	int pos_stream;
@@ -243,10 +245,7 @@ void CAudio::playPreview_internal(std::string const& filename) {
 double CAudio::getLength_internal() {
 	if (length != LENGTH_ERROR) return 1e-3 * length;
 #ifdef USE_FFMPEG_AUDIO
-	if( (length = m_mpeg->duration()) == -1. )
-		length = LENGTH_ERROR;
-	else
-		length *= 1e3;
+	return 0.0;
 #endif
 #ifdef USE_LIBXINE_AUDIO
 	int pos_stream;
@@ -262,8 +261,8 @@ double CAudio::getLength_internal() {
 }
 
 bool CAudio::isPlaying_internal() {
-#ifdef USE_LIBXINE_AUDIO
-	return ffmpeg_playing;
+#ifdef USE_FFMPEG_AUDIO
+	return m_mpeg;
 #endif
 #ifdef USE_LIBXINE_AUDIO
 	xine_event_t *event; 
@@ -287,7 +286,6 @@ void CAudio::stopMusic_internal() {
 	// if (!isPlaying_internal()) return;
 #ifdef USE_FFMPEG_AUDIO
 	m_mpeg.reset();
-	ffmpeg_playing = false;
 #endif
 #ifdef USE_LIBXINE_AUDIO
 	xine_stop(stream);
@@ -318,7 +316,7 @@ double CAudio::getPosition_internal() {
 
 bool CAudio::isPaused_internal() {
 #ifdef USE_FFMPEG_AUDIO
-	return (ffmpeg_playing==false);
+	return ffmpeg_paused;
 #endif
 #ifdef USE_LIBXINE_AUDIO
 	return isPlaying_internal() && xine_get_param(stream,XINE_PARAM_SPEED) == XINE_SPEED_PAUSE;
@@ -331,8 +329,7 @@ bool CAudio::isPaused_internal() {
 void CAudio::togglePause_internal() {
 	if (!isPlaying_internal()) return;
 #ifdef USE_FFMPEG_AUDIO
-	// TODO: send order to ffmpeg class
-	ffmpeg_playing=!ffmpeg_playing;
+	ffmpeg_paused = !ffmpeg_paused;
 #endif
 #ifdef USE_LIBXINE_AUDIO
 	xine_set_param(stream, XINE_PARAM_SPEED, isPaused_internal() ? XINE_SPEED_NORMAL : XINE_SPEED_PAUSE);

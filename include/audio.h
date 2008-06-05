@@ -133,7 +133,7 @@ class CAudio {
 #endif
 #ifdef USE_FFMPEG_AUDIO
 	boost::scoped_ptr<CFfmpeg> m_mpeg;
-	bool ffmpeg_playing;
+	bool ffmpeg_paused;
 	da::settings m_rs;
 	da::playback m_playback;
 #endif
