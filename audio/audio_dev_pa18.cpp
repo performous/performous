@@ -49,11 +49,15 @@ namespace {
 		static int c_callback(void*, void* output, unsigned long frames, PaTimestamp, void* userdata)
 		{
 			pa18_playback& self = *static_cast<pa18_playback*>(userdata);
-			da::sample_t* iptr = static_cast<da::sample_t*>(output);
-			memset(iptr,0x00,frames * self.s.channels()*sizeof(da::sample_t) );
+			int16_t* iptr = static_cast<int16_t*>(output);
+			for(unsigned int i = 0 ; i < frames * self.s.channels() ; i++)
+				iptr[i] = 0;
 			try {
-				pcm_data data(iptr, frames, self.s.channels());
+				std::vector<sample_t> buf(frames * self.s.channels());
+				pcm_data data(&buf[0], frames, self.s.channels());
 				self.s.callback()(data, self.s);
+				for( unsigned int i = 0 ; i < frames*self.s.channels() ; i++ )
+					iptr[i] = da::conv_to_s16(data[i]);
 			} catch (std::exception& e) {
 				self.s.debug(std::string("Exception from playback callback: ") + e.what());
 			}
@@ -71,7 +75,7 @@ namespace {
 			PaStream* handle;
 			strm(pa18_playback* pb) {
 				// TODO: Use more settings from s
-				PaError err = Pa_OpenStream(&handle, paNoDevice, 0, paInt16, NULL, Pa_GetDefaultOutputDeviceID(), pb->s.channels(), paInt16, NULL, pb->s.rate(), 50, 0, 0, pb->c_callback, pb);
+				PaError err = Pa_OpenStream(&handle, paNoDevice, 0, paInt16, NULL, Pa_GetDefaultOutputDeviceID(), pb->s.channels(), paInt16, NULL, pb->s.rate(), 10, 0, 0, pb->c_callback, pb);
 				if (err != paNoError) throw std::runtime_error("Cannot open PortAudio audio stream " + pb->s.subdev() + ": " + Pa_GetErrorText(err));
 			}
 			~strm() { Pa_CloseStream(handle); }

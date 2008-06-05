@@ -101,7 +101,7 @@ void CAudio::operator()(da::pcm_data& areas, da::settings const&) {
 	}
 
 	for( unsigned int i = 0 ; i < frames*channels ; i++ )
-		areas.m_buf[i] = buf[i];
+		areas.m_buf[i] = da::conv_from_s16(buf[i]);
 #endif
 }
 
