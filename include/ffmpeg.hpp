@@ -51,10 +51,12 @@ static bool operator<(VideoFrame const& a, VideoFrame const& b) {
 
 class VideoFifo {
   public:
+	VideoFifo(): m_timestamp() {}
 	bool tryPop(VideoFrame& f) {
 		boost::mutex::scoped_lock l(m_mutex);
 		if (m_queue.size() < 3) return false; // Must keep a certain minimum size for B-frame reordering
 		f.swap(*m_queue.begin());
+		m_timestamp = m_queue.begin()->timestamp;
 		m_queue.erase(m_queue.begin());
 		m_cond.notify_one();
 		return true;
@@ -69,40 +71,34 @@ class VideoFifo {
 		m_queue.clear();
 		m_cond.notify_all();
 	}
-	double position() {
-		boost::mutex::scoped_lock l(m_mutex);
-		double result;
-		if (m_queue.empty()) {
-			result = 0.;
-		} else {
-			VideoFrame& tmp = *m_queue.begin();
-			result = tmp.timestamp;
-		}
-		return result;
-	}
+	double position() { return m_timestamp; }
   private:
 	boost::ptr_set<VideoFrame> m_queue;
 	boost::mutex m_mutex;
 	boost::condition m_cond;
+	double m_timestamp;
 };
 
 class AudioFifo {
   public:
-	std::size_t tryPop(std::vector<int16_t>& buffer,std::size_t _size = 0) {
+	AudioFifo(): m_timestamp(), m_eof() {}
+	void tryPop(std::vector<int16_t>& buffer, std::size_t size = 0) {
+		if (size == 0) size = std::numeric_limits<std::size_t>::max();
 		boost::mutex::scoped_lock l(m_mutex);
-		if (m_queue.empty()) return 0;
-
-		AudioFrame& tmp = m_queue.front();
-		std::size_t size = tmp.data.size();
-		if( _size == 0 || tmp.data.size() <= _size ) {
-			buffer.insert( buffer.end(), tmp.data.begin(), tmp.data.end() );
-			m_queue.pop_front();
-			m_cond.notify_one();
-			return size;
-		} else {
-			buffer.insert( buffer.end(), tmp.data.begin(), tmp.data.begin() + _size );
-			tmp.data.erase(tmp.data.begin(), tmp.data.begin() + _size );
-			return _size;
+		while (!m_queue.empty() && size > 0) {
+			std::vector<int16_t>& data = m_queue.front().data;
+			if (data.empty()) { m_eof = true; break; } // Empty frames are EOF markers
+			if (data.size() <= size) {
+				buffer.insert(buffer.end(), data.begin(), data.end());
+				size -= data.size();
+				m_timestamp = m_queue.front().timestamp; // TODO: + data.size() / samplerate
+				m_queue.pop_front();
+				m_cond.notify_one();
+			} else {
+				buffer.insert(buffer.end(), data.begin(), data.begin() + size);
+				data.erase(data.begin(), data.begin() + size);
+				size = 0;
+			}
 		}
 	}
 	void push(AudioFrame* f) {
@@ -115,21 +111,14 @@ class AudioFifo {
 		m_queue.clear();
 		m_cond.notify_all();
 	}
-	double position() {
-		boost::mutex::scoped_lock l(m_mutex);
-		double result;
-		if (m_queue.empty()) {
-			result = 0.;
-		} else {
-			AudioFrame& tmp = m_queue.front();
-			result = tmp.timestamp;
-		}
-		return result;
-	}
+	double position() { return m_timestamp; }
+	double eof() { return m_eof; }
   private:
 	boost::ptr_deque<AudioFrame> m_queue;
 	boost::mutex m_mutex;
 	boost::condition m_cond;
+	double m_timestamp;
+	bool m_eof;
 };
 
 #include <boost/scoped_ptr.hpp>
@@ -148,12 +137,14 @@ class CFfmpeg {
 	double duration();
 	double position() {return std::max(audioQueue.position(),videoQueue.position());};
   private:
+	class eof_error: public std::exception {};
 	void seek_internal();
 	void open(const char* _filename);
 	void close();
 	void decodeNextFrame();
 	boost::scoped_ptr<boost::thread> m_thread;
 	volatile bool m_quit;
+	volatile bool m_eof;
 	volatile double m_seekTarget;
 	AVFormatContext* pFormatCtx;
 	ReSampleContext* pResampleCtx;

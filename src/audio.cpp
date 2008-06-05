@@ -88,22 +88,15 @@ CAudio::~CAudio() {
 void CAudio::operator()(da::pcm_data& areas, da::settings const&) {
 #ifdef USE_FFMPEG_AUDIO
 	boost::mutex::scoped_lock l(m_mutex);
-	std::size_t channels = areas.channels;
-	std::size_t frames = areas.frames;
-	if (!m_mpeg || ffmpeg_paused) {
-		for (unsigned int i = 0; i < frames*channels; ++i)
-		  areas.m_buf[i] = 0.0f;
-		return;
+	std::size_t samples = areas.channels * areas.frames;
+	unsigned int size = 0;
+	if (m_mpeg && !ffmpeg_paused) {
+		std::vector<int16_t> buf;
+		m_mpeg->audioQueue.tryPop(buf, samples);
+		std::transform(buf.begin(), buf.end(), areas.m_buf, da::conv_from_s16);
+		size = buf.size();
 	}
-	unsigned long size = 0;
-	std::vector<int16_t> buf;
-
-	while(size < frames*channels) {
-		size+=m_mpeg->audioQueue.tryPop(buf, frames*channels-size);
-	}
-
-	for( unsigned int i = 0 ; i < frames*channels ; i++ )
-	  areas.m_buf[i] = da::conv_from_s16(buf[i]);
+	std::fill(areas.m_buf + size, areas.m_buf + samples, 0.0f);
 #endif
 }
 
@@ -262,7 +255,7 @@ double CAudio::getLength_internal() {
 
 bool CAudio::isPlaying_internal() {
 #ifdef USE_FFMPEG_AUDIO
-	return m_mpeg;
+	return m_mpeg && !m_mpeg->audioQueue.eof();
 #endif
 #ifdef USE_LIBXINE_AUDIO
 	xine_event_t *event; 

@@ -2,6 +2,7 @@
 
 #ifdef USE_FFMPEG_VIDEO
 
+#include <xtime.h>
 #include <stdexcept>
 #include <iostream>
 #include <stdio.h>
@@ -105,9 +106,14 @@ void CFfmpeg::operator()() {
 		try {
 			if (m_seekTarget == m_seekTarget) seek_internal();
 			decodeNextFrame();
+			m_eof = false;
 			errors = 0;
+		} catch (eof_error&) {
+			m_eof = true;
+			audioQueue.push(new AudioFrame()); // EOF marker
+			boost::thread::sleep(now() + 0.1);
 		} catch (std::exception& e) {
-			std::cerr << "ffmpeg error: " << e.what() << std::endl;
+			std::cerr << "FFMPEG error: " << e.what() << std::endl;
 			if (++errors > 2) break;
 		}
 	}
@@ -124,7 +130,7 @@ void CFfmpeg::decodeNextFrame() {
 	struct ReadFramePacket: public AVPacket {
 		AVFormatContext* m_s;
 		ReadFramePacket(AVFormatContext* s): m_s(s) {
-			if (av_read_frame(s, this) < 0) throw std::runtime_error("End of file");
+			if (av_read_frame(s, this) < 0) throw eof_error();
 		}
 		~ReadFramePacket() { av_free_packet(this); }
 		double time() {
