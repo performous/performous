@@ -130,6 +130,7 @@ class CFfmpeg {
   public:
 	CFfmpeg(bool decodeVideo, bool decodeAudio, std::string const& file);
 	~CFfmpeg();
+	void crash();
 	void operator()(); // Thread runs here, don't call directly
 	VideoFifo  videoQueue;
 	AudioFifo  audioQueue;
@@ -139,10 +140,11 @@ class CFfmpeg {
   private:
 	class eof_error: public std::exception {};
 	void seek_internal();
-	void open(const char* _filename);
+	void open();
 	void close();
 	void decodeNextFrame();
 	boost::scoped_ptr<boost::thread> m_thread;
+	std::string m_filename;
 	volatile bool m_quit;
 	volatile bool m_eof;
 	volatile double m_seekTarget;

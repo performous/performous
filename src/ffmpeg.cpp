@@ -7,20 +7,24 @@
 #include <iostream>
 #include <stdio.h>
 
-CFfmpeg::CFfmpeg(bool _decodeVideo, bool _decodeAudio, std::string const& _filename): m_quit() {
+CFfmpeg::CFfmpeg(bool _decodeVideo, bool _decodeAudio, std::string const& _filename): m_filename(_filename), m_quit() {
 	av_register_all();
 	videoStream=-1;
 	audioStream=-1;
 	decodeVideo=_decodeVideo;
 	decodeAudio=_decodeAudio;
-	open(_filename.c_str());
-	m_thread.reset(new boost::thread(boost::ref(*this)));
+	open();
 }
 
 CFfmpeg::~CFfmpeg() {
 	m_quit = true;
 	videoQueue.reset();
 	audioQueue.reset();
+	if (!m_thread) {
+		std::cerr << "FFMPEG crashed at some point, decoding " << m_filename << std::endl;
+		std::cerr << "Please restart USNG to avoid resource leaks and program crashes!" << std::endl;
+		return;
+	}
 	m_thread->join();
 	if( videoStream != -1 && decodeVideo ) avcodec_close(pVideoCodecCtx);
 	if( audioStream != -1 && decodeAudio ) {
@@ -42,10 +46,10 @@ double CFfmpeg::duration() {
 	return result;
 }
 
-void CFfmpeg::open(const char* _filename) {
-	if (av_open_input_file(&pFormatCtx, _filename, NULL, 0, NULL)) throw std::runtime_error("Cannot open input file");
+void CFfmpeg::open() {
+	if (av_open_input_file(&pFormatCtx, m_filename.c_str(), NULL, 0, NULL)) throw std::runtime_error("Cannot open input file");
 	if (av_find_stream_info(pFormatCtx) < 0) throw std::runtime_error("Cannot find stream information");
-	dump_format(pFormatCtx, 0, _filename, false);
+	dump_format(pFormatCtx, 0, m_filename.c_str(), false);
 	videoStream = -1;
 	audioStream = -1;
 	m_seekTarget = std::numeric_limits<double>::quiet_NaN();
@@ -98,9 +102,28 @@ void CFfmpeg::open(const char* _filename) {
 		  w, h, PIX_FMT_RGB24,
 		  SWS_BICUBIC, NULL, NULL, NULL);
 	}
+	m_thread.reset(new boost::thread(boost::ref(*this)));
+}
+
+#include <signal.h>
+#include <boost/thread/tss.hpp>
+
+boost::thread_specific_ptr<CFfmpeg*> ffmpeg_ptr;
+
+extern "C" void usng_ffmpeg_crash_hack(int) {
+	if (ffmpeg_ptr.get()) (*ffmpeg_ptr)->crash();
+}
+
+void CFfmpeg::crash() {
+	m_thread.reset();
+	sleep(1000000000);
 }
 
 void CFfmpeg::operator()() {
+	// A hack to restore from ffmpeg crashes :)
+	ffmpeg_ptr.reset(new CFfmpeg*);
+	*ffmpeg_ptr = this;
+	signal(SIGABRT, usng_ffmpeg_crash_hack);
 	int errors = 0;
 	while (!m_quit) {
 		try {
