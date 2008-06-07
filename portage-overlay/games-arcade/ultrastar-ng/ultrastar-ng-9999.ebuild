@@ -24,7 +24,7 @@ LICENSE="GPL-2
 SLOT="0"
 KEYWORDS="~x86 ~amd64"
 
-IUSE="ffmpeg xine gstreamer debug alsa portaudio songs"
+IUSE="ffmpeg xine debug alsa gstreamer portaudio songs"
 
 RDEPEND="gnome-base/librsvg
 	dev-libs/boost
@@ -32,7 +32,10 @@ RDEPEND="gnome-base/librsvg
 	media-libs/libsdl
 	media-gfx/imagemagick
 	xine? ( media-libs/xine-lib )
-	!xine? ( media-libs/gstreamer )
+	!xine?
+	(
+		!ffmpeg? ( media-libs/gstreamer )
+	)
 	(
 		virtual/opengl
 		virtual/glu
@@ -40,7 +43,7 @@ RDEPEND="gnome-base/librsvg
 	ffmpeg? ( media-video/ffmpeg )
 	alsa? ( media-libs/alsa-lib )
 	portaudio? ( media-libs/portaudio )
-	gstreamer? ( >=media-libs/gstreamer-0.10 )
+	gstreamer? ( media-libs/gstreamer )
 	sys-apps/help2man"
 DEPEND="${RDEPEND}
     dev-util/pkgconfig"
@@ -72,10 +75,14 @@ src_compile() {
 		myconf="${myconf} --with-video=disable"
 	fi
 
-	if use xine ; then
-		myconf="${myconf} --with-audio=xine"
+	if use ffmpeg ; then
+		myconf="${myconf} --with-audio=ffmpeg"
 	else
-		myconf="${myconf} --with-audio=gstreamer"
+		if use xine ; then
+			myconf="${myconf} --with-audio=xine"
+		else
+			myconf="${myconf} --with-audio=gstreamer"
+		fi
 	fi
 
 	egamesconf \
