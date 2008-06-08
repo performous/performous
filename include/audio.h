@@ -9,7 +9,7 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
 
-#ifdef USE_FFMPEG_VIDEO
+#ifdef USE_FFMPEG_AUDIO
 #include "ffmpeg.hpp"
 #include <audio.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -94,7 +94,9 @@ class CAudio {
 	unsigned int getVolume() { return getVolume_internal(); }
 	void setVolume(unsigned int volume) { setVolume_internal(volume); }
 	void operator()(); // Thread runs here, don't call directly
+#ifdef USE_FFMPEG_AUDIO
 	void operator()(da::pcm_data& areas, da::settings const&);
+#endif
 	void wait() {
 		boost::mutex::scoped_lock l(m_mutex);
 		while (!m_ready || m_type != NONE) m_condready.wait(l);

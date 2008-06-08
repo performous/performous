@@ -218,15 +218,6 @@ $ac_includes_default
 #include <SDL/SDL.h>
 #include <SDL/SDL_thread.h>
 USNG_EOF)
-if test $sdl_image = yes ; then
-	ac_includes_default=$(cat <<-USNG_EOF
-	$ac_includes_default
-	/* other SDL headers */
-	#include <SDL/SDL_image.h>
-	#include <SDL/SDL_rotozoom.h>    
-	USNG_EOF)
-	SDL_LIBS="$SDL_LIBS -lSDL_image"
-fi
 AC_SUBST(SDL_FLAGS)
 AC_SUBST(SDL_LIBS)
 

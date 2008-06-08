@@ -21,6 +21,7 @@ CAudio::CAudio(std::string const& pdev):
 	m_playback(m_rs) {
 #else
 	m_type() {
+	(void)pdev; // Disable warning about unused argument
 #endif
 #ifdef USE_FFMPEG_AUDIO
 	m_mpeg.reset();
@@ -85,8 +86,8 @@ CAudio::~CAudio() {
 #endif
 }
 
-void CAudio::operator()(da::pcm_data& areas, da::settings const&) {
 #ifdef USE_FFMPEG_AUDIO
+void CAudio::operator()(da::pcm_data& areas, da::settings const&) {
 	boost::mutex::scoped_lock l(m_mutex);
 	std::size_t samples = areas.channels * areas.frames;
 	unsigned int size = 0;
@@ -98,8 +99,8 @@ void CAudio::operator()(da::pcm_data& areas, da::settings const&) {
 		if (size < samples && !m_mpeg->audioQueue.eof() && m_mpeg->position() > 1.0) std::cerr << "Warning: audio decoding too slow (buffer underrun)" << std::endl;
 	}
 	std::fill(areas.m_buf + size, areas.m_buf + samples, 0.0f);
-#endif
 }
+#endif
 
 void CAudio::operator()() {
 	for (;;) {

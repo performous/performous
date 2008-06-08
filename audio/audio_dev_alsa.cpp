@@ -15,6 +15,34 @@
 
 namespace {
 	using namespace da;
+	/** Configure a pcm by the settings, store actual values back to s. **/
+	void config(alsa::pcm& pcm, settings& s) {
+		// Convert settings into types used by ALSA
+		unsigned int rate = s.rate();
+		unsigned int channels = s.channels();
+		if (s.frames() == settings::low) s.set_frames(256);
+		else if (s.frames() == settings::high) s.set_frames(16384);
+		snd_pcm_uframes_t period_size = s.frames();
+		snd_pcm_uframes_t buffer_size = 0;
+		alsa::hw_config hw(pcm);
+		hw.set(SND_PCM_ACCESS_MMAP_INTERLEAVED).set(SND_PCM_FORMAT_S16);
+		if (s.rate() == settings::high) hw.rate_last(rate);
+		else if (s.rate() == settings::low) hw.rate_first(rate);
+		else if (s.rate_near()) hw.rate_near(rate);
+		else hw.rate(rate);
+		if (s.channels() == settings::high) hw.channels_last(channels);
+		else if (s.channels() == settings::low) hw.channels_first(channels);
+		else if (s.channels_near()) hw.channels_near(channels);
+		else hw.channels(channels);
+		hw.period_size_near(period_size)
+		  .buffer_size_near(buffer_size = 4 * period_size)
+		  .commit();
+		// Assign the changed settings back
+		s.set_channels(channels);
+		s.set_rate(rate);
+		s.set_frames(period_size);
+	}
+	
 	class alsa_record: public record::dev {
 		settings m_s;
 		alsa::pcm m_pcm;
@@ -26,30 +54,7 @@ namespace {
 		  m_pcm(s.subdev().empty() ? "default" : m_s.subdev().c_str(), SND_PCM_STREAM_CAPTURE, SND_PCM_NONBLOCK),
 		  m_quit(false)
 		{
-			// Convert settings into types used by ALSA
-			unsigned int rate = m_s.rate();
-			unsigned int channels = m_s.channels();
-			if (m_s.frames() == settings::low) m_s.set_frames(256);
-			else if (m_s.frames() == settings::high) m_s.set_frames(16384);
-			snd_pcm_uframes_t period_size = m_s.frames();
-			snd_pcm_uframes_t buffer_size = 0;
-			alsa::hw_config hw(m_pcm);
-			hw.set(SND_PCM_ACCESS_MMAP_INTERLEAVED).set(SND_PCM_FORMAT_S16);
-			if (m_s.rate() == settings::high) hw.rate_last(rate);
-			else if (m_s.rate() == settings::low) hw.rate_first(rate);
-			else if (m_s.rate_near()) hw.rate_near(rate);
-			else hw.rate(rate);
-			if (m_s.channels() == settings::high) hw.channels_last(channels);
-			else if (m_s.channels() == settings::low) hw.channels_first(channels);
-			else if (m_s.channels_near()) hw.channels_near(channels);
-			else hw.channels(channels);
-			hw.period_size_near(period_size)
-			  .buffer_size_near(buffer_size = 4 * period_size)
-			  .commit();
-			// Assign the changed settings back
-			m_s.set_channels(channels);
-			m_s.set_rate(rate);
-			m_s.set_frames(period_size);
+			config(m_pcm, m_s);
 			m_thread.reset(new boost::thread(boost::ref(*this)));
 			ALSA_CHECKED(snd_pcm_start, (m_pcm));
 			s = m_s;
@@ -114,30 +119,7 @@ namespace {
 		  m_pcm(s.subdev().empty() ? "default" : m_s.subdev().c_str(), SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK),
 		  m_quit(false)
 		{
-			// Convert settings into types used by ALSA
-			unsigned int rate = m_s.rate();
-			unsigned int channels = m_s.channels();
-			if (m_s.frames() == settings::low) m_s.set_frames(256);
-			else if (m_s.frames() == settings::high) m_s.set_frames(16384);
-			snd_pcm_uframes_t period_size = m_s.frames();
-			snd_pcm_uframes_t buffer_size = 0;
-			alsa::hw_config hw(m_pcm);
-			hw.set(SND_PCM_ACCESS_MMAP_INTERLEAVED).set(SND_PCM_FORMAT_S16);
-			if (m_s.rate() == settings::high) hw.rate_last(rate);
-			else if (m_s.rate() == settings::low) hw.rate_first(rate);
-			else if (m_s.rate_near()) hw.rate_near(rate);
-			else hw.rate(rate);
-			if (m_s.channels() == settings::high) hw.channels_last(channels);
-			else if (m_s.channels() == settings::low) hw.channels_first(channels);
-			else if (m_s.channels_near()) hw.channels_near(channels);
-			else hw.channels(channels);
-			hw.period_size_near(period_size)
-			  .buffer_size_near(buffer_size = 4 * period_size)
-			  .commit();
-			// Assign the changed settings back
-			m_s.set_channels(channels);
-			m_s.set_rate(rate);
-			m_s.set_frames(period_size);
+			config(m_pcm, m_s);
 			m_thread.reset(new boost::thread(boost::ref(*this)));
 			ALSA_CHECKED(snd_pcm_start, (m_pcm));
 			s = m_s;
@@ -162,10 +144,11 @@ namespace {
 					// Sleep until samples are available
 					ALSA_CHECKED(snd_pcm_wait, (m_pcm, 1000));
 					// Request samples by MMAP, convert and copy them to buf
-					{
+					for (unsigned int pos = 0; pos < m_s.frames();) {
 						ALSA_CHECKED(snd_pcm_avail_update, (m_pcm));
 						alsa::mmap mmap(m_pcm, m_s.frames());
-						if (mmap.frames() != m_s.frames()) throw std::runtime_error("MMAP frame count != requested");
+						// How many frames can we send = min(mmap size, input buffer left)
+						unsigned int frames = std::min(mmap.frames(), pos - m_s.frames());
 						// TODO: bytewise copy (when needed, e.g. 24 bit samples)
 						const unsigned int samplebits = 8 * sizeof(int16_t);
 						for (std::size_t ch = 0; ch < channels; ++ch) {
@@ -173,19 +156,22 @@ namespace {
 							if (a.first % samplebits || a.step % samplebits)
 							  throw std::runtime_error("The sample alignment used by snd_pcm_mmap not supported by audio::alsa_record");
 						}
-						for (snd_pcm_uframes_t fr = 0; fr < mmap.frames(); ++fr) {
+						for (snd_pcm_uframes_t fr = 0; fr < frames; ++fr) {
 							for (std::size_t ch = 0; ch < channels; ++ch) {
 								snd_pcm_channel_area_t const& a = mmap.area(ch);
-								static_cast<int16_t*>(a.addr)[(a.first + fr * a.step) / samplebits + mmap.offset() * channels] = conv_to_s16(buf[fr * channels + ch]);
+								static_cast<int16_t*>(a.addr)[(a.first + fr * a.step) / samplebits + mmap.offset() * channels] = conv_to_s16(buf[(pos + fr) * channels + ch]);
 							}
 						}
-						mmap.commit();
+						mmap.commit(frames);
+						pos += frames;
 					}
 				} catch (alsa::error& e) {
 					if (e.code() != -EPIPE) m_s.debug(std::string("Recording error: ") + e.what());
 					int err = snd_pcm_recover(m_pcm, e.code(), 0);
 					if (err < 0) m_s.debug(std::string("ALSA snd_pcm_recover failed: ") + snd_strerror(err));
 					if (snd_pcm_start(m_pcm) < 0) m_s.debug("Unable to restart the recording stream!");
+				} catch (std::exception& e) {
+					m_s.debug(std::string("Recording error: ") + e.what());
 				}
 			}
 		}
