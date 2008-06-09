@@ -27,7 +27,9 @@ cairo_surface_t *CTheme::PrintText(TThemeTxt *text) {
 	text->extents.height = rec.height;
 	text->extents.x_advance = rec.width+rec.x;
 	text->extents.y_advance = rec.height+rec.y;
-	pango_font_description_set_absolute_size (desc,text->fontsize * text->scale * PANGO_SCALE);
+	// FIXME: pango seems to cache glyph with different font size
+	// pango_font_description_set_absolute_size (desc,text->fontsize * text->scale * PANGO_SCALE);
+	pango_font_description_set_absolute_size (desc,text->fontsize * PANGO_SCALE);
 	pango_layout_set_font_description (layout, desc);
 	pango_cairo_update_layout (dc, layout);
 	double width = 800.0, height = 600.0; // FIXME!
