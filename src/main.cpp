@@ -14,6 +14,7 @@
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
+#include <cstdlib>
 #include <fstream>
 #include <set>
 #include <string>
@@ -71,6 +72,7 @@ static void init_SDL(CScreenManager& sm, CVideoDriver& vd, unsigned int width, u
 
 int main(int argc, char** argv) {
 	std::ios::sync_with_stdio(false);  // We do not use C stdio
+	srand(time(NULL));  // Seed for std::random_shuffle (used by song selector)
 	bool fullscreen = false;
 	bool fps = false;
 	unsigned int width, height;
