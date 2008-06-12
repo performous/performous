@@ -90,6 +90,7 @@ Surface::Surface(std::string filename, Filetype filetype) {
 		cairo_t* dc = cairo_create(surface);
 		rsvg_handle_render_cairo(svgHandle, dc);
 		load(svgDimension.width, svgDimension.height, INT_ARGB, cairo_image_surface_get_data(surface));
+		cairo_surface_destroy(surface);
 		rsvg_handle_free(svgHandle);
 		rsvg_term();
 		cairo_destroy(dc);
