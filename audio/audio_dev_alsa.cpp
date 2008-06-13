@@ -145,6 +145,7 @@ namespace {
 					ALSA_CHECKED(snd_pcm_wait, (m_pcm, 1000));
 					// Request samples by MMAP, convert and copy them to buf
 					for (unsigned int pos = 0; pos < m_s.frames();) {
+						if (m_quit) return;
 						ALSA_CHECKED(snd_pcm_avail_update, (m_pcm));
 						alsa::mmap mmap(m_pcm, m_s.frames());
 						// How many frames can we send = min(mmap size, input buffer left)
@@ -166,12 +167,12 @@ namespace {
 						pos += frames;
 					}
 				} catch (alsa::error& e) {
-					if (e.code() != -EPIPE) m_s.debug(std::string("Recording error: ") + e.what());
+					if (e.code() != -EPIPE) m_s.debug(std::string("Playback error: ") + e.what());
 					int err = snd_pcm_recover(m_pcm, e.code(), 0);
 					if (err < 0) m_s.debug(std::string("ALSA snd_pcm_recover failed: ") + snd_strerror(err));
-					if (snd_pcm_start(m_pcm) < 0) m_s.debug("Unable to restart the recording stream!");
+					if (snd_pcm_start(m_pcm) < 0) m_s.debug("Unable to restart the playback stream!");
 				} catch (std::exception& e) {
-					m_s.debug(std::string("Recording error: ") + e.what());
+					m_s.debug(std::string("Playback error: ") + e.what());
 				}
 			}
 		}
