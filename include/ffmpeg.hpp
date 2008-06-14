@@ -130,7 +130,12 @@ class CFfmpeg {
   public:
 	CFfmpeg(bool decodeVideo, bool decodeAudio, std::string const& file);
 	~CFfmpeg();
-	void crash();
+	/**
+	* This function is called by the crash handler to indicate that FFMPEG has
+	* crashed or has gotten stuck, and that the destructor should not wait for
+	* it to finish before exiting.
+	**/
+	void crash() { m_thread.reset(); }
 	void operator()(); // Thread runs here, don't call directly
 	VideoFifo  videoQueue;
 	AudioFifo  audioQueue;

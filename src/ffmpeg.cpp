@@ -106,6 +106,7 @@ void CFfmpeg::open() {
 
 #ifdef USE_FFMPEG_CRASH_RECOVERY
 #include <boost/thread/tss.hpp>
+#include <unistd.h>
 #include <csignal>
 
 namespace {
@@ -113,13 +114,8 @@ namespace {
 }
 
 extern "C" void usng_ffmpeg_crash_hack(int) {
-	if (ffmpeg_ptr.get()) (*ffmpeg_ptr)->crash();
+	if (ffmpeg_ptr.get()) { (*ffmpeg_ptr)->crash(); sleep(1000000000); }
 	else std::abort(); // Crash from another thread
-}
-
-void CFfmpeg::crash() {
-	m_thread.reset();
-	sleep(1000000000);
 }
 #endif
 
