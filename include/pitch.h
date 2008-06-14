@@ -55,7 +55,7 @@ class Analyzer {
 		if (m_tones.empty()) return NULL;
 		double db = std::max_element(m_tones.begin(), m_tones.end(), Tone::dbCompare)->db;
 		Tone const* best = NULL;
-		double bestscore;
+		double bestscore = 0;
 		for (tones_t::const_iterator it = m_tones.begin(); it != m_tones.end(); ++it) {
 			if (it->db < db - 20.0 || it->freq < minfreq || it->age < Tone::MINAGE) continue;
 			if (it->freq > maxfreq) break;

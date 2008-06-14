@@ -38,7 +38,7 @@ namespace {
 			~strm() { Pa_CloseStream(handle); }
 		} stream;
 	  public:
-		pa18_record(settings& s): s(s), initialize(), stream(this) {
+		pa18_record(settings& _s): s(_s), initialize(), stream(this) {
 			PaError err = Pa_StartStream(stream.handle);
 			if( err != paNoError ) throw std::runtime_error("Cannot start PortAudio audio stream " + s.subdev() + ": " + Pa_GetErrorText(err));
 		}
@@ -81,7 +81,7 @@ namespace {
 			~strm() { Pa_CloseStream(handle); }
 		} stream;
 	  public:
-		pa18_playback(settings& s): s(s), initialize(), stream(this) {
+		pa18_playback(settings& _s): s(_s), initialize(), stream(this) {
 			PaError err = Pa_StartStream(stream.handle);
 			if( err != paNoError ) throw std::runtime_error("Cannot start PortAudio audio stream " + s.subdev() + ": " + Pa_GetErrorText(err));
 		}
