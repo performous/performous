@@ -3,8 +3,6 @@
 #ifdef USE_FFMPEG_VIDEO
 
 #include <xtime.h>
-#include <boost/thread/tss.hpp>
-#include <csignal>
 #include <iostream>
 #include <stdexcept>
 
@@ -106,7 +104,13 @@ void CFfmpeg::open() {
 	m_thread.reset(new boost::thread(boost::ref(*this)));
 }
 
-boost::thread_specific_ptr<CFfmpeg*> ffmpeg_ptr;
+#ifdef USE_FFMPEG_CRASH_RECOVERY
+#include <boost/thread/tss.hpp>
+#include <csignal>
+
+namespace {
+	boost::thread_specific_ptr<CFfmpeg*> ffmpeg_ptr;
+}
 
 extern "C" void usng_ffmpeg_crash_hack(int) {
 	if (ffmpeg_ptr.get()) (*ffmpeg_ptr)->crash();
@@ -117,13 +121,16 @@ void CFfmpeg::crash() {
 	m_thread.reset();
 	sleep(1000000000);
 }
+#endif
 
 void CFfmpeg::operator()() {
+#ifdef USE_FFMPEG_CRASH_RECOVERY
 	// A hack to avoid ffmpeg crashing USNG :)
 	ffmpeg_ptr.reset(new CFfmpeg*);
 	*ffmpeg_ptr = this;
 	std::signal(SIGABRT, usng_ffmpeg_crash_hack);
 	std::signal(SIGSEGV, usng_ffmpeg_crash_hack);
+#endif
 	int errors = 0;
 	while (!m_quit) {
 		try {
