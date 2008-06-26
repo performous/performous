@@ -57,5 +57,60 @@ namespace {
 		}
 	};
 	boost::plugin::simple<record_plugin, pa19_record> r(devinfo("pa", "PortAudio v19 PCM capture. Device number as settings (otherwise PA default)."));
+
+	class pa19_playback: public playback::dev {
+		static int c_callback(const void*, void* output, unsigned long frames, const PaStreamCallbackTimeInfo*,PaStreamCallbackFlags, void* userdata)
+		{
+			pa19_playback& self = *static_cast<pa19_playback*>(userdata);
+			int16_t* iptr = static_cast<int16_t*>(output);
+			for(unsigned int i = 0 ; i < frames * self.s.channels() ; i++)
+				iptr[i] = 0;
+			try {
+				std::vector<sample_t> buf(frames * self.s.channels());
+				pcm_data data(&buf[0], frames, self.s.channels());
+				self.s.callback()(data, self.s);
+				for( unsigned int i = 0 ; i < frames*self.s.channels() ; i++ )
+					iptr[i] = da::conv_to_s16(data[i]);
+			} catch (std::exception& e) {
+				self.s.debug(std::string("Exception from playback callback: ") + e.what());
+			}
+			return 0;
+		}
+		settings s;
+		struct init {
+			init() {
+				PaError err = Pa_Initialize();
+				if( err != paNoError ) throw std::runtime_error(std::string("Cannot initialize PortAudio: ") + Pa_GetErrorText(err));
+			}
+			~init() { Pa_Terminate(); }
+		} initialize;
+		struct strm {
+			PaStream* handle;
+			strm(pa19_playback* pb) {
+				PaStreamParameters p;
+				if (pb->s.subdev().empty()) {
+					p.device = Pa_GetDefaultOutputDevice();
+				} else {
+					std::istringstream iss(pb->s.subdev());
+					iss >> p.device;
+					if (!iss.eof() || p.device < 0 || p.device > Pa_GetDeviceCount() - 1) throw std::invalid_argument("Invalid PortAudio device number");
+				}
+				p.channelCount = pb->s.channels();
+				p.sampleFormat = paInt16;
+				if (pb->s.frames() != settings::high) p.suggestedLatency = Pa_GetDeviceInfo(p.device)->defaultLowOutputLatency;
+				else p.suggestedLatency = Pa_GetDeviceInfo(p.device)->defaultHighInputLatency;
+				p.hostApiSpecificStreamInfo = NULL;
+				PaError err = Pa_OpenStream(&handle, NULL, &p, pb->s.rate(), 100, paClipOff, pb->c_callback, pb);
+				if (err != paNoError) throw std::runtime_error("Cannot open PortAudio audio stream " + pb->s.subdev() + ": " + Pa_GetErrorText(err));
+			}
+			~strm() { Pa_CloseStream(handle); }
+		} stream;
+	  public:
+		pa19_playback(settings& _s): s(_s), initialize(), stream(this) {
+			PaError err = Pa_StartStream(stream.handle);
+			if( err != paNoError ) throw std::runtime_error("Cannot start PortAudio audio stream " + s.subdev() + ": " + Pa_GetErrorText(err));
+		}
+	};
+	boost::plugin::simple<playback_plugin, pa19_playback> p(devinfo("pa", "PortAudio v19 PCM playback. Settings are not used."));
 }
 
