@@ -31,6 +31,12 @@ flags +=  @RECORD_GST_FLAGS@
 lib += @RECORD_GST_LIBS@
 endif
 
+if RECORD_JACK
+sources += audio_dev_jack.cpp
+flags +=  @RECORD_JACK_FLAGS@
+lib += @RECORD_JACK_LIBS@
+endif
+
 libdausng_la_SOURCES = $(sources)
 INCLUDES = $(flags)
 libdausng_la_LIBADD  = $(lib)
