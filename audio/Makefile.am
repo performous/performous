@@ -7,34 +7,34 @@ flags = -Wshadow -Wextra -Wall -O2
 lib = -lboost_thread
 sources = audio.cpp audio_dev_tone.cpp
 
-if RECORD_ALSA
+if LIBDA_ALSA
 sources += audio_dev_alsa.cpp
-flags +=  @RECORD_ALSA_FLAGS@
-lib += @RECORD_ALSA_LIBS@
+flags +=  @LIBDA_ALSA_FLAGS@
+lib += @LIBDA_ALSA_LIBS@
 endif
 
-if RECORD_PA18
+if LIBDA_PA18
 sources += audio_dev_pa18.cpp
-flags +=  @RECORD_PA18_FLAGS@
-lib += @RECORD_PA18_LIBS@
+flags +=  @LIBDA_PA18_FLAGS@
+lib += @LIBDA_PA18_LIBS@
 endif
 
-if RECORD_PA19
+if LIBDA_PA19
 sources += audio_dev_pa.cpp
-flags +=  @RECORD_PA19_FLAGS@
-lib += @RECORD_PA19_LIBS@
+flags +=  @LIBDA_PA19_FLAGS@
+lib += @LIBDA_PA19_LIBS@
 endif
 
-if RECORD_GST
+if LIBDA_GST
 sources += audio_dev_gst.cpp
-flags +=  @RECORD_GST_FLAGS@
-lib += @RECORD_GST_LIBS@
+flags +=  @LIBDA_GST_FLAGS@
+lib += @LIBDA_GST_LIBS@
 endif
 
-if RECORD_JACK
+if LIBDA_JACK
 sources += audio_dev_jack.cpp
-flags +=  @RECORD_JACK_FLAGS@
-lib += @RECORD_JACK_LIBS@
+flags +=  @LIBDA_JACK_FLAGS@
+lib += @LIBDA_JACK_LIBS@
 endif
 
 libdausng_la_SOURCES = $(sources)
