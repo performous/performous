@@ -18,9 +18,10 @@ includes = include/audio.h \
 	include/screen_configuration.h \
 	include/songs.h \
 	include/lyrics.h \
-	include/sdl_gl.h \
 	include/ffmpeg.hpp \
 	include/surface.h \
+	include/textinput.h \
+	include/xtime.h \
 	include/video_driver.h
 
 EXTRA_DIST = $(themesdef_DATA) $(themeslima_DATA) $(includes)
