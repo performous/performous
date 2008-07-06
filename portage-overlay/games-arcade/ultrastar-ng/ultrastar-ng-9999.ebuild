@@ -24,7 +24,7 @@ LICENSE="GPL-2
 SLOT="0"
 KEYWORDS="~x86 ~amd64"
 
-IUSE="ffmpeg xine debug alsa gstreamer portaudio songs"
+IUSE="ffmpeg xine debug alsa gstreamer portaudio jack songs"
 
 RDEPEND="gnome-base/librsvg
 	dev-libs/boost
@@ -42,6 +42,7 @@ RDEPEND="gnome-base/librsvg
 	)
 	ffmpeg? ( media-video/ffmpeg )
 	alsa? ( media-libs/alsa-lib )
+	jack? ( >=media-sound/jack-audio-connection-kit )
 	portaudio? ( media-libs/portaudio )
 	gstreamer? ( media-libs/gstreamer )
 	sys-apps/help2man"
@@ -88,9 +89,10 @@ src_compile() {
 	egamesconf \
 		${myconf} \
 		$(use_enable debug) \
-		$(use_enable portaudio record-portaudio) \
-		$(use_enable gstreamer record-gst) \
-		$(use_enable alsa record-alsa) \
+		$(use_enable portaudio libda-portaudio) \
+		$(use_enable gstreamer libda-gst) \
+		$(use_enable alsa libda-alsa) \
+		$(use_enable jack libda-jack) \
 		|| die
 
 	emake || die "emake failed"
