@@ -179,6 +179,7 @@ PKG_CHECK_MODULES(jack, jack , [libda_jack="yes"] , [libda_jack="no"])
 PKG_CHECK_MODULES(portAudioV19, portaudio-2.0 , [libda_pa19="yes"] , [libda_pa19="no"])
 
 PKG_CHECK_MODULES(ffmpeg, libavutil libavformat libavcodec libswscale, [ffmpeg_detected="yes"],[ffmpeg_detected="no"])
+PKG_CHECK_MODULES(libsamplerate,samplerate,[libsamplerate_detected="yes"],[libsamplerate_detected="no"])
 
 AC_CHECK_HEADERS([ffmpeg/avcodec.h ffmpeg/avformat.h ffmpeg/swscale.h], have_old_ffmpeg_headers=yes, have_old_ffmpeg_headers=no)
 AC_CHECK_HEADERS([libavcodec/avcodec.h libavformat/avformat libswscale/swscale.h], have_new_ffmpeg_headers=yes, have_new_ffmpeg_headers=no)
@@ -436,7 +437,11 @@ AC_SUBST(VIDEO_LIBS)
 case $audio_layer in
 	ffmpeg*)
 		if test $ffmpeg_detected = yes ; then
-			audio_layer="ffmpeg"
+			if test $libsamplerate_detected = yes ; then
+				audio_layer="ffmpeg"
+			else
+				AC_MSG_ERROR(ffmpeg audio playback also required libsamplerate installed)
+			fi
 		else
 			AC_MSG_ERROR(Cannot find ffmpeg, but explicitly required)
 		fi
@@ -470,8 +475,8 @@ esac
 
 case $audio_layer in
 	ffmpeg*)
-		AUDIO_FLAGS=`pkg-config --cflags libavutil libavformat libavcodec libswscale`
-		AUDIO_LIBS=`pkg-config --libs libavutil libavformat libavcodec libswscale`
+		AUDIO_FLAGS=`pkg-config --cflags libavutil libavformat libavcodec libswscale samplerate`
+		AUDIO_LIBS=`pkg-config --libs libavutil libavformat libavcodec libswscale samplerate`
 		ac_includes_default=$(cat <<-USNG_EOF
 		$ac_includes_default
 		/* audio headers */
