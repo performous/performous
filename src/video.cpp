@@ -24,7 +24,7 @@ void Video::render(double time) {
 		}
 	}
 	// Preload the next future frame
-	if (fr.data.empty()) while (m_mpeg.videoQueue.tryPop(fr) && fr.timestamp < time);
+	if (fr.data.empty()) while (m_mpeg.videoQueue.tryPop(fr) && fr.timestamp < time) {};
 	// Do a seek before next render, if required
 	if (time < m_lastTime - 0.4 || (!fr.data.empty() && time > fr.timestamp + 2.0)) {
 		m_mpeg.seek(time - 0.3);

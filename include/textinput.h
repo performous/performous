@@ -15,16 +15,16 @@ struct TextInput {
 			text += ucs;
 		} else if (ucs < 0x800) {
 			text += 0xC0 | (ucs >> 6);
-			text += 0x80 | ucs & 0x3F;
+			text += 0x80 | (ucs & 0x3F);
 		} else if (ucs < 0x10000) {
 			text += 0xE0 | (ucs >> 12);
-			text += 0x80 | (ucs >> 6) & 0x3F;
-			text += 0x80 | ucs & 0x3F;
+			text += 0x80 | ((ucs >> 6) & 0x3F);
+			text += 0x80 | (ucs & 0x3F);
 		} else {
 			text += 0xF0 | (ucs >> 18);
-			text += 0x80 | (ucs >> 12) & 0x3F;
-			text += 0x80 | (ucs >> 6) & 0x3F;
-			text += 0x80 | ucs & 0x3F;
+			text += 0x80 | ((ucs >> 12) & 0x3F);
+			text += 0x80 | ((ucs >> 6) & 0x3F);
+			text += 0x80 | (ucs & 0x3F);
 		}
 		return *this;
 	}

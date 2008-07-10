@@ -136,10 +136,10 @@ class SongParser {
 		if (!m_f.is_open()) throw Exception("Could not open TXT file", 0);
 		std::string line;
 		try {
-			while (getline(line) && parseField(line));
+			while (getline(line) && parseField(line)) {};
 			if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
 			if (m_bpm != 0.0) addBPM(0, m_bpm);
-			while (parseNote(line) && getline(line));
+			while (parseNote(line) && getline(line)) {};
 		} catch (std::runtime_error& e) {
 			throw Exception(e.what(), m_linenum);
 		}
