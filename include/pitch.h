@@ -6,6 +6,7 @@
 #include <deque>
 #include <list>
 #include <vector>
+#include <algorithm>
 
 struct Tone {
 	static const std::size_t MAXHARM = 48;
