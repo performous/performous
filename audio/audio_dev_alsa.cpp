@@ -149,7 +149,7 @@ namespace {
 						ALSA_CHECKED(snd_pcm_avail_update, (m_pcm));
 						alsa::mmap mmap(m_pcm, m_s.frames());
 						// How many frames can we send = min(mmap size, input buffer left)
-						unsigned int frames = std::min(static_cast<long unsigned int>(mmap.frames()), pos - m_s.frames());
+						unsigned int frames = std::min(static_cast<unsigned long>(mmap.frames()), pos - m_s.frames());
 						// TODO: bytewise copy (when needed, e.g. 24 bit samples)
 						const unsigned int samplebits = 8 * sizeof(int16_t);
 						for (std::size_t ch = 0; ch < channels; ++ch) {
