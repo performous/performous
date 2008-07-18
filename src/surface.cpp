@@ -48,6 +48,7 @@ void Surface::load(unsigned int width, unsigned int height, Format format, unsig
 }
 
 void Surface::draw() {
+	glEnable (GL_TEXTURE_RECTANGLE_ARB);
 	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texture_id);
 	glBegin(GL_QUADS);
 	float x1 = dimensions.x1();
@@ -59,6 +60,7 @@ void Surface::draw() {
 	glTexCoord2f(m_width, m_height); glVertex2f(x2, y2);
 	glTexCoord2f(0.0f, m_height); glVertex2f(x1, y2);
 	glEnd();
+	glDisable (GL_TEXTURE_RECTANGLE_ARB);
 }
 
 Surface::Surface(std::string filename, Filetype filetype) {

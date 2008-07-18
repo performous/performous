@@ -66,6 +66,25 @@ void CScreenSing::manageEvent(SDL_Event event) {
 	}
 }
 
+void drawRectangleOpenGL( double _x, double _y, double _w, double _h, float _r, float _g, float _b, float _a) {
+	static float r=-1,g=-1,b=-1,a=-1;
+	double m_width = 800.;
+	double m_height = 600.;
+
+	double x = _x/(m_width*1.0)-0.5;
+	double y = (_y/(m_height*1.0)-0.5)*((m_height*1.0)/(m_width*1.0));
+	double w = _w/(m_width*1.0);
+	double h = _h/(m_width*1.0);
+	if( !(_r == r && _g == g && _b == b && _a == a)) {
+		glColor4f(_r, _g, _b, _a);
+		r = _r; g = _g; b = _b; a = _a;
+	}
+	glBegin(GL_QUADS);
+	glVertex2f(x  ,y  ); glVertex2f(x  ,y+h);
+	glVertex2f(x+w,y+h); glVertex2f(x+w,y  );
+	glEnd();
+}
+
 void CScreenSing::draw() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	if (!sm->getAudio()->isPlaying()) {
@@ -110,7 +129,6 @@ void CScreenSing::draw() {
 	std::string sentenceFuture = lyrics->getSentenceFuture();
 	std::string sentenceWhole = lyrics->getSentenceWhole();
 	// Rendering starts
-	glClear(GL_COLOR_BUFFER_BIT);
 	if (m_background) m_background->draw();
 	if (m_video) m_video->render(time - song.videoGap);
 	theme->bg->draw();
@@ -119,7 +137,10 @@ void CScreenSing::draw() {
 	theme->timertxt.text = (boost::format("%02u:%02u") % (unsigned(time) / 60) % (unsigned(time) % 60)).str();
 	theme->theme->PrintText(&theme->timertxt);
 	theme->progressfg.width = theme->progressfg.final_width * songPercent;
-	theme->theme->DrawRect(theme->progressfg); 
+	drawRectangleOpenGL(
+		theme->progressfg.x,theme->progressfg.y,
+		theme->progressfg.width,theme->progressfg.height,
+		theme->progressfg.fill_col.r, theme->progressfg.fill_col.g, theme->progressfg.fill_col.b, theme->progressfg.fill_col.a);
 	//draw score
 	theme->p1score.text = (boost::format("%04d") % song.getScore()).str();
 	theme->theme->PrintText(&theme->p1score);
@@ -152,93 +173,66 @@ void CScreenSing::draw() {
 		double value = 4.0 * wait / sentenceDuration;
 		if (value > 1.0) value = wait > 1.0 ? 0.0 : 1.0;
 		theme->tostartfg.height = theme->tostartfg.final_height * value;
-		theme->theme->DrawRect(theme->tostartfg);
+		drawRectangleOpenGL(
+			theme->tostartfg.x,theme->tostartfg.y,
+			theme->tostartfg.width,theme->tostartfg.height,
+			theme->tostartfg.fill_col.r, theme->tostartfg.fill_col.g, theme->tostartfg.fill_col.b, theme->tostartfg.fill_col.a);
 	}
 	int min = song.noteMin - 7;
 	int max = song.noteMax + 7;
 	double m_width = 800.0, m_height = 600.0; // FIXME!!!
 	double noteUnit = -0.5 * m_height / std::max(32, max - min);
 	double baseY = 0.5 * m_height - 0.5 * (min + max) * noteUnit;
-	// Theme this
-	TThemeRect linerect;
-	linerect.svg_width = m_width;
-	linerect.svg_height = m_height;
-	linerect.x = 0;
-	linerect.width = m_width;
-	linerect.height = 0.0;
-	linerect.fill_col.r = 0.0;
-	linerect.fill_col.g = 0.0;
-	linerect.fill_col.b = 0.0;
-	linerect.fill_col.a = 0.0;
-	linerect.final_height = 0;
-	linerect.final_width  = 0;
-	linerect.stroke_col.a = 0.7;
 	// Draw note lines
 	if (!m_sentence.empty()) {
+		float r,g,b,a;
+		double y_pixel,x_pixel,h_pixel,w_pixel;
 		for (int n = song.noteMin; n <= song.noteMax; ++n) {
-			linerect.stroke_width = (song.scale.isSharp(n) ? 0.5 : 1.5) * resFactorAvg;
 			if (n % 12) {
-				linerect.stroke_col.r = 0.5;
-				linerect.stroke_col.g = 0.5;
-				linerect.stroke_col.b = 0.5;
+				r = 0.5; g = 0.5; b = 0.5; a = 0.5;
 			} else {
-				linerect.stroke_col.r = 0.8;
-				linerect.stroke_col.g = 0.3;
-				linerect.stroke_col.b = 0.8;
+				r = 0.8; g = 0.3; b = 0.8; a = 0.5;
 			}
-			linerect.y = baseY + n * noteUnit;
-			theme->theme->DrawRect(linerect);
+			y_pixel = baseY + n * noteUnit;
+			x_pixel = 0;
+			w_pixel = m_width;
+			h_pixel = (song.scale.isSharp(n) ? 0.5 : 1.5) * resFactorAvg;
+			drawRectangleOpenGL(x_pixel,y_pixel,w_pixel,h_pixel,r, g, b, a);
 		}
 	}
-	// Theme this
-	TThemeRect tmprect;
-	tmprect.stroke_col.r = tmprect.stroke_col.g = tmprect.stroke_col.b = 0.5;
-	tmprect.stroke_col.a = 0.8;
-	tmprect.stroke_width = resFactorAvg;
-	tmprect.svg_width = m_width;
-	tmprect.svg_height = m_height;
-	tmprect.height = -noteUnit;
-	tmprect.final_height = 0;
-	tmprect.final_width  = 0;
 	int state = 0;
 	double baseX = 100.0 * resFactorX - sentenceBegin * pixUnit;
 	for (unsigned int i = 0; i < m_sentence.size(); ++i) {
+		float r,g,b,a;
+		double y_pixel,x_pixel,h_pixel,w_pixel;
+		h_pixel = -noteUnit;
+
 		if (m_sentence[i].begin > time) state = 3;
 		if (state == 0 && m_sentence[i].end > time) state = 1;
-		tmprect.y = baseY + m_sentence[i].note * noteUnit - 0.5 * tmprect.height;
+		y_pixel = baseY + m_sentence[i].note * noteUnit - 0.5 * h_pixel;
 		double begin = (state == 2 ? time : m_sentence[i].begin);
 		double end = (state == 1 ? time : m_sentence[i].end);
-		tmprect.x = baseX + begin * pixUnit;
-		tmprect.width = (end - begin) * pixUnit;
+		x_pixel = baseX + begin * pixUnit;
+		w_pixel = (end - begin) * pixUnit;
 		if (state < 2) {
-			tmprect.fill_col.r = 0.7;
-			tmprect.fill_col.g = 0.7;
-			tmprect.fill_col.b = 0.7;
-			tmprect.fill_col.a = 1.0;
+			r = 0.7; g = 0.7; b = 0.7; a = 1.0;
 		} else {
 			switch (m_sentence[i].type) {
 			  case Note::FREESTYLE:
-				tmprect.fill_col.r = 0.6;
-				tmprect.fill_col.g = 1.0;
-				tmprect.fill_col.b = 0.6;
-				tmprect.fill_col.a = 1.0;
+				r = 0.6; g = 1.0; b = 0.6; a = 1.0;
 				break;
 			  case Note::GOLDEN:
-				tmprect.fill_col.r = 1.0;
-				tmprect.fill_col.g = 0.8;
-				tmprect.fill_col.b = 0.0;
-				tmprect.fill_col.a = 1.0;
+				r = 1.0; g = 0.8; b = 0.0; a = 1.0;
 				break;
 			  default:
-				tmprect.fill_col.r = 0.8;
-				tmprect.fill_col.g = 0.8;
-				tmprect.fill_col.b = 1.0;
-				tmprect.fill_col.a = 1.0;
+				r = 0.8; g = 0.8; b = 1.0; a = 1.0;
 			}
 		}
-		theme->theme->DrawRect(tmprect);
+		drawRectangleOpenGL(x_pixel,y_pixel,w_pixel,h_pixel,r, g, b, a);
+
 		if (state == 1) { --i; state = 2; }
 	}
+	glColor3f(1.0, 1.0, 1.0);
 
 	if (!m_sentence.empty()) {
 		double graphTime = (baseX + time * pixUnit) / m_width;
