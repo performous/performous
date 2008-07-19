@@ -75,14 +75,12 @@ void drawRectangleOpenGL( double _x, double _y, double _w, double _h, float _r, 
 	double y = (_y/(m_height*1.0)-0.5)*((m_height*1.0)/(m_width*1.0));
 	double w = _w/(m_width*1.0);
 	double h = _h/(m_width*1.0);
-	if( !(_r == r && _g == g && _b == b && _a == a)) {
-		glColor4f(_r, _g, _b, _a);
-		r = _r; g = _g; b = _b; a = _a;
-	}
+	glColor4f(_r, _g, _b, _a);
 	glBegin(GL_QUADS);
 	glVertex2f(x  ,y  ); glVertex2f(x  ,y+h);
 	glVertex2f(x+w,y+h); glVertex2f(x+w,y  );
 	glEnd();
+	glColor4f(1.0, 1.0, 1.0, 1.0);
 }
 
 void CScreenSing::draw() {
