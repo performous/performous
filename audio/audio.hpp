@@ -80,6 +80,7 @@ namespace da {
 		bool channels_near() const { return m_channels_near; }
 		callback_t callback() const { return m_callback; }
 		settings& set_device(std::string const& val) { m_device = val; return *this; }
+		settings& set_subdev(std::string const& val) { m_subdev = val; return *this; }
 		settings& set_callback(callback_t val) { m_callback = val; return *this; }
 		settings& set_frames(std::size_t val) { m_frames = val; return *this; }
 		settings& set_channels(std::size_t val, bool near = true) { m_channels = val; m_channels_near = near; return *this; }
