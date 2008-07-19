@@ -144,12 +144,12 @@ namespace {
 					// Sleep until samples are available
 					ALSA_CHECKED(snd_pcm_wait, (m_pcm, 1000));
 					// Request samples by MMAP, convert and copy them to buf
-					for (unsigned int pos = 0; pos < m_s.frames();) {
+					for (size_t pos = 0; pos < m_s.frames();) {
 						if (m_quit) return;
 						ALSA_CHECKED(snd_pcm_avail_update, (m_pcm));
 						alsa::mmap mmap(m_pcm, m_s.frames());
 						// How many frames can we send = min(mmap size, input buffer left)
-						unsigned int frames = std::min(static_cast<unsigned long>(mmap.frames()), pos - m_s.frames());
+						size_t frames = std::min<size_t>(mmap.frames(), pos - m_s.frames());
 						// TODO: bytewise copy (when needed, e.g. 24 bit samples)
 						const unsigned int samplebits = 8 * sizeof(int16_t);
 						for (std::size_t ch = 0; ch < channels; ++ch) {
