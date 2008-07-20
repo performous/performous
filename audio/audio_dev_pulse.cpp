@@ -67,7 +67,7 @@ namespace {
 		  m_s(s),
 		  m_quit(false)
 		{
-			m_s.set_subdev(m_s.subdev().empty() ? "libda_pulse_record" : m_s.subdev());
+			m_s.set_subdev(m_s.subdev().empty() ? "libda_pulse_playback" : m_s.subdev());
 			pa_sample_spec ss;
 			{
 				int val = 1; bool little_endian = *reinterpret_cast<char*>(&val);
@@ -98,9 +98,8 @@ namespace {
 				} catch (std::exception& e) {
 					m_s.debug(std::string("Exception from recording callback: ") + e.what());
 				}
-				int pos = 0, size = buf.size() * sizeof(sample_t);
 				int e;
-				if (pa_simple_write(m_stream, &buf[0], size, &e) < 0) m_s.debug(pa_strerror(e));
+				if (pa_simple_write(m_stream, &buf[0], buf.size() * sizeof(sample_t), &e) < 0) m_s.debug(pa_strerror(e));
 			}
 		}
 	};
