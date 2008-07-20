@@ -136,6 +136,16 @@ AC_ARG_ENABLE(libda-jack,
  	esac],
 	enable_libda_jack="autodetect")
 
+AC_ARG_ENABLE(libda-pulse,
+	AC_HELP_STRING(--enable-libda-pulse,
+		Enable PulseAudio libda backend [[[default=autodetect]]]),
+	[case "${enableval}" in
+		yes) enable_libda_pulse="yes" ;;
+		no)  enable_libda_pulse="no" ;;
+		*) AC_MSG_ERROR(bad value ${enableval} for --enable-libda-pulse) ;;
+ 	esac],
+	enable_libda_pulse="autodetect")
+
 # Check for the standard headers
 AC_HEADER_STDC
 AC_HEADER_DIRENT
@@ -176,6 +186,7 @@ AC_CHECK_PROGS(SDLCONFIG, sdl-config, AC_MSG_ERROR(Cannot find sdl-config))
 # Record backend detection
 PKG_CHECK_MODULES(alsa, alsa , [libda_alsa="yes"] , [libda_alsa="no"])
 PKG_CHECK_MODULES(jack, jack , [libda_jack="yes"] , [libda_jack="no"])
+PKG_CHECK_MODULES(pulse, libpulse-simple, [libda_pulse="yes"] , [libda_pulse="no"])
 PKG_CHECK_MODULES(portAudioV19, portaudio-2.0 , [libda_pa19="yes"] , [libda_pa19="no"])
 
 PKG_CHECK_MODULES(ffmpeg, libavutil libavformat libavcodec libswscale, [ffmpeg_detected="yes"],[ffmpeg_detected="no"])
@@ -313,6 +324,29 @@ fi
 AM_CONDITIONAL(LIBDA_JACK, ${LIBDA_JACK})
 AC_SUBST(LIBDA_JACK_FLAGS)
 AC_SUBST(LIBDA_JACK_LIBS)
+
+# Configure pulse libda backend
+if test $libda_pulse = yes ; then
+	if test $enable_libda_pulse = no ; then
+		LIBDA_PULSE_FLAGS=""
+		LIBDA_PULSE_LIBS=""
+		LIBDA_PULSE=false
+	else
+		LIBDA_PULSE_FLAGS=`pkg-config --cflags libpulse-simple`
+		LIBDA_PULSE_LIBS=`pkg-config --libs libpulse-simple`
+		LIBDA_PULSE=true
+	fi
+else
+	if test $enable_libda_pulse = yes ; then
+		AC_MSG_ERROR(Cannot find libpulse-simple, but explicitly required)
+	fi
+	LIBDA_PULSE_FLAGS=""
+	LIBDA_PULSE_LIBS=""
+	LIBDA_PULSE=false
+fi
+AM_CONDITIONAL(LIBDA_PULSE, ${LIBDA_PULSE})
+AC_SUBST(LIBDA_PULSE_FLAGS)
+AC_SUBST(LIBDA_PULSE_LIBS)
 
 # Configure portaudio libda backend
 if test $libda_pa18 = no -a $libda_pa19 = no -a $enable_libda_pa = yes ; then
@@ -577,5 +611,8 @@ if test ${LIBDA_GST} = true ; then
 fi
 if test ${LIBDA_JACK} = true ; then
 	echo "                 |                          | jack                  "
+fi
+if test ${LIBDA_PULSE} = true ; then
+	echo "                 |                          | pulseaudio            "
 fi
 echo "                                                                    "

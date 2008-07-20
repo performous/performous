@@ -37,6 +37,12 @@ flags +=  @LIBDA_JACK_FLAGS@
 lib += @LIBDA_JACK_LIBS@
 endif
 
+if LIBDA_PULSE
+sources += audio_dev_pulse.cpp
+flags +=  @LIBDA_PULSE_FLAGS@
+lib += @LIBDA_PULSE_LIBS@
+endif
+
 libdausng_la_SOURCES = $(sources)
 INCLUDES = $(flags)
 libdausng_la_LIBADD  = $(lib)
