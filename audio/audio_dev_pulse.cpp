@@ -75,7 +75,7 @@ namespace {
 				ss.rate = m_s.rate();
 				ss.channels = m_s.channels();
 			}
-			m_stream = pa_simple_new(NULL, m_s.subdev().c_str(), PA_STREAM_PLAYBACK, NULL, "record", &ss, NULL, NULL, NULL);
+			m_stream = pa_simple_new(NULL, m_s.subdev().c_str(), PA_STREAM_PLAYBACK, NULL, "playback", &ss, NULL, NULL, NULL);
 			if (!m_stream) throw std::runtime_error("PulseAudio pa_simple_new returned NULL.");
 			if (m_s.frames() == settings::low) m_s.set_frames(256);
 			else if (m_s.frames() == settings::high) m_s.set_frames(16384);
