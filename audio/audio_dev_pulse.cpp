@@ -3,6 +3,9 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/thread.hpp>
 #include <pulse/simple.h>
+#include <pulse/error.h>
+
+#include <iostream>
 
 namespace {
 	using namespace da;
@@ -96,10 +99,8 @@ namespace {
 					m_s.debug(std::string("Exception from recording callback: ") + e.what());
 				}
 				int pos = 0, size = buf.size() * sizeof(sample_t);
-				for (int ret; size > 0 && (ret = pa_simple_write(m_stream, &buf[0], size, NULL)) < size; size -= ret, pos += ret) {
-					if (m_quit) break;
-					if (ret < 0) ret = 0;
-				}
+				int e;
+				if (pa_simple_write(m_stream, &buf[0], size, &e) < 0) m_s.debug(pa_strerror(e));
 			}
 		}
 	};
