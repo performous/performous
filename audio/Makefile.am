@@ -20,7 +20,7 @@ lib += @LIBDA_PA18_LIBS@
 endif
 
 if LIBDA_PA19
-sources += audio_dev_pa.cpp
+sources += audio_dev_pa19.cpp
 flags +=  @LIBDA_PA19_FLAGS@
 lib += @LIBDA_PA19_LIBS@
 endif
