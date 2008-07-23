@@ -27,8 +27,8 @@ echo '<?xml version="1.0" encoding="UTF-8"?>
 sed -i.bak -e "s/VERSION/0.2.1/" Info.plist
 rm Info.plist.bak
 
-cp ../../data/ultrastar-ng.icns Resources/
-cp ../../data/usng-mac_script MacOS/usng
+cp ../../osx-utils/ultrastar-ng.icns Resources/
+cp ../../osx-utils/usng-mac_script MacOS/usng
 chmod +x MacOS/usng
 
 cd Resources
