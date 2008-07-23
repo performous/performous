@@ -41,7 +41,6 @@ namespace {
 		s.set_channels(channels);
 		s.set_rate(rate);
 		s.set_frames(period_size);
-		ALSA_CHECKED(snd_pcm_start, (pcm));
 	}
 	
 	class alsa_record: public record::dev {
@@ -65,6 +64,7 @@ namespace {
 		}
 		void operator()() {
 			std::vector<sample_t> buf;
+			bool first = true;
 			while (!m_quit) {
 				try {
 					const std::size_t channels = m_s.channels();
@@ -97,6 +97,7 @@ namespace {
 					} catch (std::exception& e) {
 						m_s.debug(std::string("Exception from recording callback: ") + e.what());
 					}
+					if (first) { ALSA_CHECKED(snd_pcm_start, (m_pcm)); first = false; }
 				} catch (alsa::error& e) {
 					if (e.code() != -EPIPE) m_s.debug(std::string("Recording error: ") + e.what());
 					int err = snd_pcm_recover(m_pcm, e.code(), 0);
@@ -129,6 +130,7 @@ namespace {
 		}
 		void operator()() {
 			std::vector<sample_t> buf;
+			bool first = true;
 			while (!m_quit) {
 				const std::size_t channels = m_s.channels();
 				// Request data from application
@@ -165,6 +167,7 @@ namespace {
 						mmap.commit(frames);
 						pos += frames;
 					}
+					if (first) { ALSA_CHECKED(snd_pcm_start, (m_pcm)); first = false; }
 				} catch (alsa::error& e) {
 					if (e.code() != -EPIPE) m_s.debug(std::string("Playback error: ") + e.what());
 					int err = snd_pcm_recover(m_pcm, e.code(), 0);
