@@ -41,6 +41,7 @@ namespace {
 		s.set_channels(channels);
 		s.set_rate(rate);
 		s.set_frames(period_size);
+		ALSA_CHECKED(snd_pcm_start, (pcm));
 	}
 	
 	class alsa_record: public record::dev {
@@ -56,7 +57,6 @@ namespace {
 		{
 			config(m_pcm, m_s);
 			m_thread.reset(new boost::thread(boost::ref(*this)));
-			ALSA_CHECKED(snd_pcm_start, (m_pcm));
 			s = m_s;
 		}
 		~alsa_record() {
@@ -121,7 +121,6 @@ namespace {
 		{
 			config(m_pcm, m_s);
 			m_thread.reset(new boost::thread(boost::ref(*this)));
-			ALSA_CHECKED(snd_pcm_start, (m_pcm));
 			s = m_s;
 		}
 		~alsa_playback() {
