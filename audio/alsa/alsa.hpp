@@ -281,6 +281,23 @@ namespace alsa {
 	};
 
 	// RAII wrapper for snd_pcm_hw/sw_params_t types.
+
+	class status {
+		snd_pcm_status_t* m_handle;
+		void init() { ALSA_CHECKED(snd_pcm_status_malloc, (&m_handle)); }
+	  public:
+		status(): m_handle() { init(); }
+		~status() { snd_pcm_status_free(m_handle); }
+		status(status const& orig): m_handle() { init(); *this = orig; }
+		status(snd_pcm_status_t const* orig): m_handle() { init(); *this = orig; }
+		status& operator=(status const& params) { *this = params.m_handle; return *this; }
+		status& operator=(snd_pcm_status_t const* params) {
+			if (m_handle != params) snd_pcm_status_copy(m_handle, params);
+			return *this;
+		}
+		operator snd_pcm_status_t*() { return m_handle; }
+		operator snd_pcm_status_t const*() const { return m_handle; }
+	};
 	
 #define ALSA_HPP_PARAMWRAPPER(type) \
 	class type##_params {\

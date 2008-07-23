@@ -42,7 +42,21 @@ namespace {
 		s.set_rate(rate);
 		s.set_frames(period_size);
 	}
-	
+
+	void status(alsa::pcm& pcm) {
+		switch (snd_pcm_state(m_pcm)) {
+		  case SND_PCM_STATE_OPEN: std::cout << "ALSA pcm state: OPEN" << std::endl; break;
+		  case SND_PCM_STATE_SETUP: std::cout << "ALSA pcm state: SETUP" << std::endl; break;
+		  case SND_PCM_STATE_PREPARED: std::cout << "ALSA pcm state: PREPARED" << std::endl; break;
+		  case SND_PCM_STATE_RUNNING: std::cout << "ALSA pcm state: RUNNING" << std::endl; break;
+		  case SND_PCM_STATE_XRUN: std::cout << "ALSA pcm state: XRUN" << std::endl; break;
+		  case SND_PCM_STATE_DRAINING: std::cout << "ALSA pcm state: DRAINING" << std::endl; break;
+		  case SND_PCM_STATE_PAUSED: std::cout << "ALSA pcm state: PAUSED" << std::endl; break;
+		  case SND_PCM_STATE_SUSPENDED: std::cout << "ALSA pcm state: SUSPENDED" << std::endl; break;
+		  case SND_PCM_STATE_DISCONNECTED: std::cout << "ALSA pcm state: DISCONNECTED" << std::endl; break;
+		}
+	}
+		
 	class alsa_record: public record::dev {
 		settings m_s;
 		alsa::pcm m_pcm;
@@ -55,6 +69,7 @@ namespace {
 		  m_quit(false)
 		{
 			config(m_pcm, m_s);
+			ALSA_CHECKED(snd_pcm_start, (m_pcm));  // For recording this must be done before starting
 			m_thread.reset(new boost::thread(boost::ref(*this)));
 			s = m_s;
 		}
@@ -97,7 +112,6 @@ namespace {
 					} catch (std::exception& e) {
 						m_s.debug(std::string("Exception from recording callback: ") + e.what());
 					}
-					if (first) { ALSA_CHECKED(snd_pcm_start, (m_pcm)); first = false; }
 				} catch (alsa::error& e) {
 					if (e.code() != -EPIPE) m_s.debug(std::string("Recording error: ") + e.what());
 					int err = snd_pcm_recover(m_pcm, e.code(), 0);
@@ -167,12 +181,12 @@ namespace {
 						mmap.commit(frames);
 						pos += frames;
 					}
-					if (first) { ALSA_CHECKED(snd_pcm_start, (m_pcm)); first = false; }
+					if (first) { ALSA_CHECKED(snd_pcm_start, (m_pcm)); first = false; } // For playback, this must be done after filling the buffer
 				} catch (alsa::error& e) {
 					if (e.code() != -EPIPE) m_s.debug(std::string("Playback error: ") + e.what());
 					int err = snd_pcm_recover(m_pcm, e.code(), 0);
 					if (err < 0) m_s.debug(std::string("ALSA snd_pcm_recover failed: ") + snd_strerror(err));
-					if (snd_pcm_start(m_pcm) < 0) m_s.debug("Unable to restart the playback stream!");
+					first = true;
 				} catch (std::exception& e) {
 					m_s.debug(std::string("Playback error: ") + e.what());
 				}
