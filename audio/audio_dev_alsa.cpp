@@ -44,7 +44,7 @@ namespace {
 	}
 
 	void status(alsa::pcm& pcm) {
-		switch (snd_pcm_state(m_pcm)) {
+		switch (snd_pcm_state(pcm)) {
 		  case SND_PCM_STATE_OPEN: std::cout << "ALSA pcm state: OPEN" << std::endl; break;
 		  case SND_PCM_STATE_SETUP: std::cout << "ALSA pcm state: SETUP" << std::endl; break;
 		  case SND_PCM_STATE_PREPARED: std::cout << "ALSA pcm state: PREPARED" << std::endl; break;

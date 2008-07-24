@@ -103,7 +103,7 @@ class AudioFifo {
 	}
 	void push(AudioFrame* f) {
 		boost::mutex::scoped_lock l(m_mutex);
-		while (m_queue.size() > 10) m_cond.wait(l);
+		while (m_queue.size() > 100) m_cond.wait(l);
 		m_queue.push_back(f);
 	}
 	void reset() {

@@ -96,7 +96,7 @@ void CAudio::operator()(da::pcm_data& areas, da::settings const&) {
 		m_mpeg->audioQueue.tryPop(buf, samples);
 		std::transform(buf.begin(), buf.end(), areas.m_buf, da::conv_from_s16);
 		size = buf.size();
-		if (size < samples && !m_mpeg->audioQueue.eof() && m_mpeg->position() > 1.0) std::cerr << "Warning: audio decoding too slow (buffer underrun)" << std::endl;
+		if (size < samples && !m_mpeg->audioQueue.eof() && m_mpeg->position() > 1.0) std::cerr << "Warning: audio decoding too slow (buffer underrun): " << std::endl;
 	}
 	std::fill(areas.m_buf + size, areas.m_buf + samples, 0.0f);
 }
