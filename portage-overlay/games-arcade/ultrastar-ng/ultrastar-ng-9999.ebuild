@@ -24,7 +24,7 @@ LICENSE="GPL-2
 SLOT="0"
 KEYWORDS="~x86 ~amd64"
 
-IUSE="ffmpeg xine debug alsa gstreamer portaudio jack songs"
+IUSE="ffmpeg xine debug alsa gstreamer portaudio pulseaudio jack songs"
 
 RDEPEND="gnome-base/librsvg
 	dev-libs/boost
@@ -45,6 +45,7 @@ RDEPEND="gnome-base/librsvg
 	jack? ( >=media-sound/jack-audio-connection-kit )
 	portaudio? ( media-libs/portaudio )
 	gstreamer? ( media-libs/gstreamer )
+	pulseaudio? ( media-sound/pulseaudio )
 	sys-apps/help2man"
 DEPEND="${RDEPEND}
     dev-util/pkgconfig"
@@ -90,6 +91,7 @@ src_compile() {
 		${myconf} \
 		$(use_enable debug) \
 		$(use_enable portaudio libda-portaudio) \
+		$(use_enable pulseaudio libda-pulse) \
 		$(use_enable gstreamer libda-gst) \
 		$(use_enable alsa libda-alsa) \
 		$(use_enable jack libda-jack) \
