@@ -43,6 +43,7 @@ namespace {
 		s.set_frames(period_size);
 	}
 
+	/*
 	void status(alsa::pcm& pcm) {
 		switch (snd_pcm_state(pcm)) {
 		  case SND_PCM_STATE_OPEN: std::cout << "ALSA pcm state: OPEN" << std::endl; break;
@@ -56,7 +57,8 @@ namespace {
 		  case SND_PCM_STATE_DISCONNECTED: std::cout << "ALSA pcm state: DISCONNECTED" << std::endl; break;
 		}
 	}
-		
+	*/
+	
 	class alsa_record: public record::dev {
 		settings m_s;
 		alsa::pcm m_pcm;
@@ -79,7 +81,6 @@ namespace {
 		}
 		void operator()() {
 			std::vector<sample_t> buf;
-			bool first = true;
 			while (!m_quit) {
 				try {
 					const std::size_t channels = m_s.channels();
