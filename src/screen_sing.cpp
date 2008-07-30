@@ -66,8 +66,9 @@ void CScreenSing::manageEvent(SDL_Event event) {
 	}
 }
 
-void drawRectangleOpenGL( double _x, double _y, double _w, double _h, float _r, float _g, float _b, float _a) {
-	static float r=-1,g=-1,b=-1,a=-1;
+void drawRectangleOpenGL( double _x, double _y, double _w, double _h,
+		float _r, float _g, float _b, float _a,
+		double s_size=0.0, float _sr=0.0, float _sg=0.0, float _sb=0.0, float _sa=0.0) {
 	double m_width = 800.;
 	double m_height = 600.;
 
@@ -80,6 +81,15 @@ void drawRectangleOpenGL( double _x, double _y, double _w, double _h, float _r, 
 	glVertex2f(x  ,y  ); glVertex2f(x  ,y+h);
 	glVertex2f(x+w,y+h); glVertex2f(x+w,y  );
 	glEnd();
+	if( s_size != 0.0 ) {
+		double sx = s_size;
+		double sy = s_size;
+		std::cout << sx << "x" << sy << std::endl;
+		drawRectangleOpenGL( _x   , _y   , -sx, _h , _sr, _sg, _sb, _sa);
+		drawRectangleOpenGL( _x+_w, _y   , sx , _h , _sr, _sg, _sb, _sa);
+		drawRectangleOpenGL( _x   , _y   , _w , -sy, _sr, _sg, _sb, _sa);
+		drawRectangleOpenGL( _x   , _y+_h, _w , sy , _sr, _sg, _sb, _sa);
+	}
 	glColor4f(1.0, 1.0, 1.0, 1.0);
 }
 
@@ -226,7 +236,7 @@ void CScreenSing::draw() {
 				r = 0.8; g = 0.8; b = 1.0; a = 1.0;
 			}
 		}
-		drawRectangleOpenGL(x_pixel,y_pixel,w_pixel,h_pixel,r, g, b, a);
+		drawRectangleOpenGL(x_pixel,y_pixel,w_pixel,h_pixel,r, g, b, a,2.0,0.0,0.0,0.0,0.5);
 
 		if (state == 1) { --i; state = 2; }
 	}
