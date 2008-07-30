@@ -84,7 +84,6 @@ void drawRectangleOpenGL( double _x, double _y, double _w, double _h,
 	if( s_size != 0.0 ) {
 		double sx = s_size;
 		double sy = s_size;
-		std::cout << sx << "x" << sy << std::endl;
 		drawRectangleOpenGL( _x   , _y   , -sx, _h , _sr, _sg, _sb, _sa);
 		drawRectangleOpenGL( _x+_w, _y   , sx , _h , _sr, _sg, _sb, _sa);
 		drawRectangleOpenGL( _x   , _y   , _w , -sy, _sr, _sg, _sb, _sa);
