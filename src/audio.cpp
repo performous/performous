@@ -4,7 +4,7 @@
 #include <iostream>
 #include <cmath>
 
-#ifdef __FREEBSD__
+#if defined(__FREEBSD__) || defined(__MACOSX__) 
 #  define       get_current_dir_name()  getcwd(NULL, PATH_MAX)
 #endif
 
