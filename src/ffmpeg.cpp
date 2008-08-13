@@ -6,6 +6,9 @@
 #include <iostream>
 #include <stdexcept>
 
+#define FFMPEG_OUTPUT_NUMBER_OF_CHANNELS 2
+#define FFMPEG_OUTPUT_SAMPLE_RATE 48000
+
 CFfmpeg::CFfmpeg(bool _decodeVideo, bool _decodeAudio, std::string const& _filename): m_filename(_filename), m_quit() {
 	av_register_all();
 	videoStream=-1;
@@ -84,8 +87,11 @@ void CFfmpeg::open() {
 			pAudioCodec=avcodec_find_decoder(pAudioCodecCtx->codec_id);
 			if (!pAudioCodec) throw std::runtime_error("Cannot find audio codec");
 			if (avcodec_open(pAudioCodecCtx, pAudioCodec) < 0) throw std::runtime_error("Cannot open audio codec");
-			pResampleCtx = audio_resample_init(2,pAudioCodecCtx->channels,48000,pAudioCodecCtx->sample_rate);
+			pResampleCtx = audio_resample_init(FFMPEG_OUTPUT_NUMBER_OF_CHANNELS,pAudioCodecCtx->channels,
+						FFMPEG_OUTPUT_SAMPLE_RATE,pAudioCodecCtx->sample_rate);
 			if (!pResampleCtx) throw std::runtime_error("Cannot create resampling context");
+			std::cout << "Resampling audio from " << pAudioCodecCtx->channels << " channel(s) at " << pAudioCodecCtx->sample_rate << "Hz";
+			std::cout << " to " << FFMPEG_OUTPUT_NUMBER_OF_CHANNELS << " channels at " << FFMPEG_OUTPUT_SAMPLE_RATE << "Hz" << std::endl;
 		}
 	} catch (std::runtime_error& e) {
 		// TODO: clean memory
@@ -222,14 +228,16 @@ void CFfmpeg::decodeNextFrame() {
 
 			if (decodeSize < 0) throw std::runtime_error("cannot decode audio frame");
 
-			//std::vector<int16_t> audioFramesResampled(AVCODEC_MAX_AUDIO_FRAME_SIZE);
-			//int nb_sample = audio_resample(pResampleCtx, &audioFramesResampled[0], audioFrames, outsize/(pAudioCodecCtx->channels));
+			outsize /= (sizeof(int16_t)*pAudioCodecCtx->channels); // Outsize is givent in bytes, we want a number of sample
+			std::vector<int16_t> audioFramesResampled(AVCODEC_MAX_AUDIO_FRAME_SIZE);
+			int nb_sample = audio_resample(pResampleCtx, &audioFramesResampled[0], audioFrames, outsize);
+			nb_sample *= FFMPEG_OUTPUT_NUMBER_OF_CHANNELS; // We have multiple channels
 
-			//audioFramesResampled.resize(nb_sample);
+			audioFramesResampled.resize(nb_sample);
 
 			AudioFrame* tmp = new AudioFrame();
-			//tmp->data.swap(audioFramesResampled);
-			tmp->data = std::vector<int16_t>(audioFrames, audioFrames + outsize / sizeof(int16_t));
+			tmp->data.swap(audioFramesResampled);
+			//tmp->data = std::vector<int16_t>(audioFrames, audioFrames + outsize / sizeof(int16_t));
 			tmp->timestamp = packet.time();
 			audioQueue.push(tmp);
 			// Audio frame are always finished
