@@ -559,7 +559,7 @@ case $audio_layer in
 		fi
 		;;
 	no*)
-		AC_MSG_ERROR("I'm sure you wish audio in this game please install eather xine or gstreamer")
+		AC_MSG_ERROR("I'm sure you wish audio in this game please install eather ffmpeg or xine or gstreamer")
 		;;
 esac
 
