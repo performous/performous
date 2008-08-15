@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# portAudioV19_CFLAGS=-I/opt/local/include portAudioV19_LIBS=-L/opt/local/lib CPPFLAGS=-I/opt/local/include LDFLAGS=-L/opt/local/lib ./configure --prefix=/apps/ultrastar-ng --enable-libda-pa19 --with-audio=ffmpeg --with-video=ffmpeg --disable-libda-gstreamer
+# sudo port install autoconf automake libtool subversion help2man libsdl cairo librsvg portaudio libxm2 boost +complete imagemagick ffmpeg +avfilter
+# ./autogen.sh
+# portAudioV19_CFLAGS=-I/opt/local/include portAudioV19_LIBS=-L/opt/local/lib CPPFLAGS=-I/opt/local/include LDFLAGS=-L/opt/local/lib ffmpeg_CFLAGS=-I/opt/local/include ffmpeg_LIBS=-L/opt/local/lib ./configure --prefix=/apps/ultrastar-ng --enable-libda-pa19 --with-audio=ffmpeg --with-video=ffmpeg
 # make
 
 mkdir -p Ultrastar-ng.app/Contents/{MacOS,Resources}
