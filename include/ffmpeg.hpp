@@ -27,6 +27,7 @@ extern "C" {
 #include <boost/thread/condition.hpp>
 #include <iostream>
 #include <vector>
+#include <limits>
 
 struct AudioFrame {
 	double timestamp;
