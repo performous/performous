@@ -59,7 +59,7 @@ class Surface: boost::noncopyable {
   private:
 	void load(unsigned int width, unsigned int height, Format format, unsigned char* buffer);
 	unsigned int m_width, m_height;
-	unsigned int texture_id;
+	GLuint texture_id;
 };
 
 #endif
