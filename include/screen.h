@@ -43,7 +43,7 @@ class CScreenManager: public CSingleton <CScreenManager> {
 
 	CVideoDriver* getVideoDriver() { return videoDriver; };
 	void setVideoDriver(CVideoDriver* _videoDriver) {videoDriver=_videoDriver; };
-	
+
 	bool getFullscreenStatus() { return m_fullscreen; };
 	void setFullscreenStatus(bool fullscreen) { m_fullscreen = fullscreen; };
 

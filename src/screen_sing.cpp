@@ -92,6 +92,23 @@ void drawRectangleOpenGL( double _x, double _y, double _w, double _h,
 	glColor4f(1.0, 1.0, 1.0, 1.0);
 }
 
+void drawLineOpenGL( double _start_x, double _start_y, double _end_x, double _end_y,
+		float _r, float _g, float _b, float _a,
+		double s_size=0.0) {
+	double m_width = 800.;
+	double m_height = 600.;
+
+	double sx = _start_x/(m_width*1.0)-0.5;
+	double sy = (_start_y/(m_height*1.0)-0.5)*((m_height*1.0)/(m_width*1.0));
+	double ex = _end_x/(m_width*1.0)-0.5;
+	double ey = (_end_y/(m_height*1.0)-0.5)*((m_height*1.0)/(m_width*1.0));
+	glColor4f(_r, _g, _b, _a);
+	glBegin(GL_LINE_STRIP);
+	glVertex2f(sx, sy); 
+	glVertex2f(ex, ey);
+	glEnd();
+}
+
 void CScreenSing::draw() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	if (!sm->getAudio()->isPlaying()) {
@@ -167,11 +184,13 @@ void CScreenSing::draw() {
 	if (!m_sentence.empty()) {
 		if (sentenceBegin != m_sentence[0].begin) {
 			pitchGraph.clear();
+			song.resetPitchGraph();
 			sentenceBegin = m_sentence[0].begin;
 		}
 		sentenceDuration = m_sentence.back().end - sentenceBegin;
 		pixUnit = (600.0 * resFactorX) / (sentenceDuration * 1.0);
 	} else {
+		song.resetPitchGraph();
 		pitchGraph.clear();
 	}
 	// Compute and draw the "to start" cursor
@@ -243,18 +262,49 @@ void CScreenSing::draw() {
 
 	if (!m_sentence.empty()) {
 		double graphTime = (baseX + time * pixUnit) / m_width;
+		double graphTime2 = (baseX + time * pixUnit);// / m_width;
 		if (freq == 0.0) {
 			pitchGraph.renderPitch(0.0, graphTime, 0.0);
+			if (song.pitchPitchGraph.size() > 1){
+				double pitch=song.pitchPitchGraph[song.pitchPitchGraph.size()-1];
+				double volume = std::max(0.0, 1.0 + m_analyzer.getPeak() / 40.0);
+				song.updatePitchGraph(graphTime2, pitch, volume, 0);
+			}
 		} else {
 			unsigned int i = 0;
 			// Find the currently playing note or the next playing note (or the last note?)
 			while (i < m_sentence.size() && time > m_sentence[i].end) ++i;
 			Note const& n = m_sentence[i];
 			double volume = std::max(0.0, 1.0 + m_analyzer.getPeak() / 40.0);
+			//double pitch = (baseY + (n.note + n.diff(song.scale.getNote(freq))) * noteUnit);// / m_height;
+			double pitch = (baseY + (n.note + n.diff(song.scale.getNote(freq))) * noteUnit);
 			pitchGraph.renderPitch((baseY + (n.note + n.diff(song.scale.getNote(freq))) * noteUnit) / m_height, graphTime, volume);
+			//drawRectangleOpenGL(graphTime2+5, pitch-5, 20, 20, 0.2, 52.0/255.0, 181.0/255.0, 164.0/255.0, 1.0);
+			song.updatePitchGraph(graphTime2, pitch, volume, 1);
 		}
 	}
-	
+
+
+	unsigned int ii;
+	for(ii=1; ii < song.timePitchGraph.size(); ii++)
+	{
+		double volume = 10+(5*song.volumePitchGraph[ii]);
+		if ((song.drawPitchGraph[ii-1] || song.drawPitchGraph[ii])){
+			double graphWidth = song.timePitchGraph[ii]-song.timePitchGraph[ii-1];
+			drawRectangleOpenGL(song.timePitchGraph[ii]-graphWidth, song.pitchPitchGraph[ii]-(volume/2)+10, graphWidth, volume, 0.2, 52.0/255.0, 101.0/255.0, 164.0/255.0, 1.0);
+//			drawRectangleOpenGL(song.timePitchGraph[ii]-graphWidth, song.pitchPitchGraph[ii]+10, graphWidth, 1, 0.2, 2.0/255.0, 254.0/255.0, 254.0/255.0, 1.0);
+			if ((ii+1) < song.timePitchGraph.size()){
+				if (song.pitchPitchGraph[ii] < song.pitchPitchGraph[ii+1]){
+					double graphHeight = (song.pitchPitchGraph[ii+1]-song.pitchPitchGraph[ii])/50;
+					drawLineOpenGL(song.timePitchGraph[ii]-graphWidth, song.pitchPitchGraph[ii]+10, song.timePitchGraph[ii], song.pitchPitchGraph[ii]+10+graphHeight, 0.2, 2.0/255.0, 254.0/255.0, 254.0/255.0, 1.0);
+				} else {
+					double graphHeight = (song.pitchPitchGraph[ii]-song.pitchPitchGraph[ii+1])/50;
+					drawLineOpenGL(song.timePitchGraph[ii]-graphWidth, song.pitchPitchGraph[ii]+10, song.timePitchGraph[ii], song.pitchPitchGraph[ii]+10-graphHeight, 0.2, 2.0/255.0, 254.0/255.0, 254.0/255.0, 1.0);
+				}
+			}
+		}
+	}
+
 	TThemeTxt tmptxt = theme->lyricspast;
 	tmptxt.text = sentenceWhole;
 	{

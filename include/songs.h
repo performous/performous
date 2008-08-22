@@ -45,6 +45,9 @@ class Song: boost::noncopyable {
 	void reload();
 	// Temporary score calculation system
 	void reset();
+	// Temporary sentence end refresh
+	void resetPitchGraph();
+	void updatePitchGraph(double time, double pitch, double volume, bool draw);
 	void update(double time, double freq);
 	int getScore() const { return 10000 * m_score; }
 	bool parseField(std::string const& line);
@@ -68,6 +71,10 @@ class Song: boost::noncopyable {
 	double videoGap;
 	double start;
 	MusicalScale scale;
+        std::vector<double> timePitchGraph;
+        std::vector<double> pitchPitchGraph;
+        std::vector<double> volumePitchGraph;
+        std::vector<bool> drawPitchGraph;
   private:
 	double m_scoreFactor; // Normalization factor for the scoring system
 	// Temporary score calculation system

@@ -346,6 +346,19 @@ void Song::reset() {
 	m_scoreIt = notes.begin();
 }
 
+void Song::resetPitchGraph() {
+	timePitchGraph.clear();
+	pitchPitchGraph.clear();	
+	volumePitchGraph.clear();	
+}
+
+void Song::updatePitchGraph(double time, double pitch, double volume, bool draw) {
+	timePitchGraph.push_back(time);
+	pitchPitchGraph.push_back(pitch);
+	volumePitchGraph.push_back(volume);
+	drawPitchGraph.push_back(draw);
+}
+
 void Song::update(double time, double freq) {
 	if (time <= m_scoreTime) return;
 	while (m_scoreIt != notes.end()) {
