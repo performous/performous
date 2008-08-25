@@ -1,3 +1,8 @@
+Overall
+
+- game name change (related to new project golas)
+
+
 Structural:
 
 - LibDA as a separate project
@@ -8,25 +13,42 @@ Structural:
 
 - Modular UI?
 
+- Player stucture seperate from song etc.
 
 Big features:
 
 - OpenGL-based UI?
 	* Much faster
 	* Runtime resolution switching / resizable window
+	* OpenGL rectangle pitch graph
 
 - Video decoding with libavformat
 
 - Add compose screen (using features discussed on mailing list)
 
+- Multiplayer modes
+
+- Ingame Singstar DVD support
+
+- adding new game mode (using USB guitar, USB drums, USB carpet) to make a game more like RockBand
+
 
 Features:
 
 - Configurable audio latency (delay between screen and audio output)
+
 - Auto-calibration of acoustic loop latency (playback + capture)
+
+- libda device chooser/configuration for all backend
 
 
 Fixes/Enhancement:
 
 - Use cairo_surface_create_for_image instead of SDL_image
 
+- get rid of cairo
+
+- switch to cmake
+
+Platform
+ - Windows binary build
