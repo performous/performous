@@ -50,5 +50,15 @@ Fixes/Enhancement:
 
 - switch to cmake
 
+Ripper
+
+- remove hyphens (intelligently)
+
+- rewrite video code
+
+- ripping code (should be much faster)
+
+- try to figure out what causes clicks on adpcm decoding.
+
 Platform
  - Windows binary build
