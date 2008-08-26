@@ -4,7 +4,6 @@
 #include <boost/format.hpp>
 #include <sdl_helper.h>
 #include <songs.h>
-#include <pitch_graph.h>
 #include <iostream>
 #include <iomanip>
 
@@ -34,7 +33,6 @@ void CScreenSing::exit() {
 	m_sentence.clear();
 	lyrics.reset();
 	theme.reset();
-	pitchGraph.clear();
 }
 
 void CScreenSing::manageEvent(SDL_Event event) {
@@ -81,6 +79,7 @@ void drawRectangleOpenGL( double _x, double _y, double _w, double _h,
 	glVertex2f(x  ,y  ); glVertex2f(x  ,y+h);
 	glVertex2f(x+w,y+h); glVertex2f(x+w,y  );
 	glEnd();
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	if( s_size != 0.0 ) {
 		double sx = s_size;
 		double sy = s_size;
@@ -95,7 +94,7 @@ void drawRectangleOpenGL( double _x, double _y, double _w, double _h,
 void drawLineOpenGL( double _start_x, double _start_y, double _end_x, double _end_y,
 		float _r, float _g, float _b, float _a,
 		double s_size=0.0) {
-	double m_width = 800.;
+	/*double m_width = 800.;
 	double m_height = 600.;
 
 	double sx = _start_x/(m_width*1.0)-0.5;
@@ -106,7 +105,7 @@ void drawLineOpenGL( double _start_x, double _start_y, double _end_x, double _en
 	glBegin(GL_LINE_STRIP);
 	glVertex2f(sx, sy); 
 	glVertex2f(ex, ey);
-	glEnd();
+	glEnd();*/
 }
 
 void CScreenSing::draw() {
@@ -291,7 +290,7 @@ void CScreenSing::draw() {
 		double volume = 10+(5*song.volumePitchGraph[ii]);
 		if ((song.drawPitchGraph[ii-1] || song.drawPitchGraph[ii])){
 			double graphWidth = song.timePitchGraph[ii]-song.timePitchGraph[ii-1];
-			drawRectangleOpenGL(song.timePitchGraph[ii]-graphWidth, song.pitchPitchGraph[ii]-(volume/2)+10, graphWidth, volume, 0.2, 52.0/255.0, 101.0/255.0, 164.0/255.0, 1.0);
+			//drawRectangleOpenGL(song.timePitchGraph[ii]-graphWidth, song.pitchPitchGraph[ii]-(volume/2)+10, graphWidth, volume, 0.2, 52.0/255.0, 101.0/255.0, 164.0/255.0, 1.0);
 //			drawRectangleOpenGL(song.timePitchGraph[ii]-graphWidth, song.pitchPitchGraph[ii]+10, graphWidth, 1, 0.2, 2.0/255.0, 254.0/255.0, 254.0/255.0, 1.0);
 			if ((ii+1) < song.timePitchGraph.size()){
 				if (song.pitchPitchGraph[ii] < song.pitchPitchGraph[ii+1]){
