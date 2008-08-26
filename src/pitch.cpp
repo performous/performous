@@ -124,6 +124,7 @@ void Analyzer::calcTones() {
 	tones_t tones;
 	for (size_t k = kMax - 1; k >= kMin; --k) {
 		if (peaks[k].db < -70.0) continue;
+		// Find the best divider for getting the fundamental from peaks[k]
 		std::size_t bestDiv = 1;
 		int bestScore = 0;
 		for (std::size_t div = 2; div <= Tone::MAXHARM && k / div > 1; ++div) {
@@ -141,13 +142,15 @@ void Analyzer::calcTones() {
 				bestDiv = div;
 			}
 		}
+		// Construct a Tone by combining the fundamental frequency (freq) and all harmonics
 		Tone t;
 		std::size_t count = 0;
 		double freq = peaks[k].freq / bestDiv;
 		t.db = peaks[k].db;
 		for (std::size_t n = 1; n <= bestDiv; ++n) {
+			// Find the peak for n'th harmonic
 			Peak& p = match(peaks, k * n / bestDiv);
-			if (std::abs(p.freq / n / freq - 1.0) > .03) continue;
+			if (std::abs(p.freq / n / freq - 1.0) > .03) continue; // Does it match the fundamental freq?
 			if (p.db > t.db - 10.0) {
 				t.db = std::max(t.db, p.db);
 				++count;
@@ -157,6 +160,7 @@ void Analyzer::calcTones() {
 			p.clear();
 		}
 		t.freq /= count;
+		// If the tone seems strong enough, add it (-3 dB compensation for each harmonic)
 		if (t.db > -50.0 - 3.0 * count) {
 			t.stabledb = t.db;
 			tones.push_back(t);
