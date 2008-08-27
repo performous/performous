@@ -66,16 +66,9 @@ void CScreenSing::manageEvent(SDL_Event event) {
 	}
 }
 
-void drawRectangleOpenGL( double _x, double _y, double _w, double _h,
+void drawRectangleOpenGL( double x, double y, double w, double h,
 		float _r, float _g, float _b, float _a,
 		double s_size=0.0, float _sr=0.0, float _sg=0.0, float _sb=0.0, float _sa=0.0) {
-	double m_width = 800.;
-	double m_height = 600.;
-
-	double x = _x/(m_width*1.0)-0.5;
-	double y = (_y/(m_height*1.0)-0.5)*((m_height*1.0)/(m_width*1.0));
-	double w = _w/(m_width*1.0);
-	double h = _h/(m_width*1.0);
 	glColor4f(_r, _g, _b, _a);
 	glBegin(GL_QUADS);
 	glVertex2f(x  ,y  ); glVertex2f(x  ,y+h);
@@ -84,29 +77,8 @@ void drawRectangleOpenGL( double _x, double _y, double _w, double _h,
 	if( s_size != 0.0 ) {
 		double sx = s_size;
 		double sy = s_size;
-		drawRectangleOpenGL( _x   , _y   , -sx, _h , _sr, _sg, _sb, _sa);
-		drawRectangleOpenGL( _x+_w, _y   , sx , _h , _sr, _sg, _sb, _sa);
-		drawRectangleOpenGL( _x   , _y   , _w , -sy, _sr, _sg, _sb, _sa);
-		drawRectangleOpenGL( _x   , _y+_h, _w , sy , _sr, _sg, _sb, _sa);
 	}
 	glColor4f(1.0, 1.0, 1.0, 1.0);
-}
-
-void drawLineOpenGL( double _start_x, double _start_y, double _end_x, double _end_y,
-		float _r, float _g, float _b, float _a,
-		double s_size=0.0) {
-	double m_width = 800.;
-	double m_height = 600.;
-
-	double sx = _start_x/(m_width*1.0)-0.5;
-	double sy = (_start_y/(m_height*1.0)-0.5)*((m_height*1.0)/(m_width*1.0));
-	double ex = _end_x/(m_width*1.0)-0.5;
-	double ey = (_end_y/(m_height*1.0)-0.5)*((m_height*1.0)/(m_width*1.0));
-	glColor4f(_r, _g, _b, _a);
-	glBegin(GL_LINE_STRIP);
-	glVertex2f(sx, sy); 
-	glVertex2f(ex, ey);
-	glEnd();
 }
 
 void CScreenSing::draw() {
@@ -119,9 +91,6 @@ void CScreenSing::draw() {
 	const_cast<Analyzer&>(m_analyzer).process(); // FIXME: do in game engine thread
 	Tone const* tone = m_analyzer.findTone();
 	double freq = (tone ? tone->freq : 0.0);
-	float resFactorX = 800.0 / 800.0; // FIXME!!
-	float resFactorY = 600.0 / 600.0; // FIXME!!
-	float resFactorAvg = (resFactorX + resFactorY) / 2.0;
 	double oldfontsize;
 	theme->theme->clear();
 	// Get the time in the song
@@ -188,7 +157,7 @@ void CScreenSing::draw() {
 			sentenceBegin = m_sentence[0].begin;
 		}
 		sentenceDuration = m_sentence.back().end - sentenceBegin;
-		pixUnit = (600.0 * resFactorX) / (sentenceDuration * 1.0);
+		pixUnit = 0.8 / (sentenceDuration * 1.0);
 	} else {
 		song.resetPitchGraph();
 		pitchGraph.clear();
@@ -206,28 +175,18 @@ void CScreenSing::draw() {
 	}
 	int min = song.noteMin - 7;
 	int max = song.noteMax + 7;
-	double m_width = 800.0, m_height = 600.0; // FIXME!!!
-	double noteUnit = -0.5 * m_height / std::max(32, max - min);
-	double baseY = 0.5 * m_height - 0.5 * (min + max) * noteUnit;
+	double noteUnit = -0.5 / std::max(32, max - min);
+	double baseY = -0.5 * (min + max) * noteUnit;
 	// Draw note lines
 	if (!m_sentence.empty()) {
-		float r,g,b,a;
-		double y_pixel,x_pixel,h_pixel,w_pixel;
-		for (int n = song.noteMin; n <= song.noteMax; ++n) {
-			if (n % 12) {
-				r = 0.5; g = 0.5; b = 0.5; a = 0.5;
-			} else {
-				r = 0.8; g = 0.3; b = 0.8; a = 0.5;
-			}
-			y_pixel = baseY + n * noteUnit;
-			x_pixel = 0;
-			w_pixel = m_width;
-			h_pixel = (song.scale.isSharp(n) ? 0.5 : 1.5) * resFactorAvg;
-			drawRectangleOpenGL(x_pixel,y_pixel,w_pixel,h_pixel,r, g, b, a);
-		}
+		Surface notelines(sm->getThemePathFile("notelines.svg"),Surface::SVG);
+		notelines.dimensions.stretch(1.0, (max - min - 13) * noteUnit);
+		notelines.tex.y2 = (-max + 6.0) / 12.0f;
+		notelines.tex.y1 = (-min - 7.0) / 12.0f;
+		notelines.draw();
 	}
 	int state = 0;
-	double baseX = 100.0 * resFactorX - sentenceBegin * pixUnit;
+	double baseX = -.4 - sentenceBegin * pixUnit;
 	for (unsigned int i = 0; i < m_sentence.size(); ++i) {
 		float r,g,b,a;
 		double y_pixel,x_pixel,h_pixel,w_pixel;
@@ -261,8 +220,8 @@ void CScreenSing::draw() {
 	glColor3f(1.0, 1.0, 1.0);
 
 	if (!m_sentence.empty()) {
-		double graphTime = (baseX + time * pixUnit) / m_width;
-		double graphTime2 = (baseX + time * pixUnit);// / m_width;
+		double graphTime = (baseX + time * pixUnit);
+		double graphTime2 = (baseX + time * pixUnit);
 		if (freq == 0.0) {
 			pitchGraph.renderPitch(0.0, graphTime, 0.0);
 			if (song.pitchPitchGraph.size() > 1){
@@ -278,7 +237,7 @@ void CScreenSing::draw() {
 			double volume = std::max(0.0, 1.0 + m_analyzer.getPeak() / 40.0);
 			//double pitch = (baseY + (n.note + n.diff(song.scale.getNote(freq))) * noteUnit);// / m_height;
 			double pitch = (baseY + (n.note + n.diff(song.scale.getNote(freq))) * noteUnit);
-			pitchGraph.renderPitch((baseY + (n.note + n.diff(song.scale.getNote(freq))) * noteUnit) / m_height, graphTime, volume);
+			pitchGraph.renderPitch(0.5 + (baseY + (n.note + n.diff(song.scale.getNote(freq))) * noteUnit), 0.5 + graphTime, volume);
 			//drawRectangleOpenGL(graphTime2+5, pitch-5, 20, 20, 0.2, 52.0/255.0, 181.0/255.0, 164.0/255.0, 1.0);
 			song.updatePitchGraph(graphTime2, pitch, volume, 1);
 		}
@@ -296,10 +255,8 @@ void CScreenSing::draw() {
 			if ((ii+1) < song.timePitchGraph.size()){
 				if (song.pitchPitchGraph[ii] < song.pitchPitchGraph[ii+1]){
 					double graphHeight = (song.pitchPitchGraph[ii+1]-song.pitchPitchGraph[ii])/50;
-					drawLineOpenGL(song.timePitchGraph[ii]-graphWidth, song.pitchPitchGraph[ii]+10, song.timePitchGraph[ii], song.pitchPitchGraph[ii]+10+graphHeight, 0.2, 2.0/255.0, 254.0/255.0, 254.0/255.0, 1.0);
 				} else {
 					double graphHeight = (song.pitchPitchGraph[ii]-song.pitchPitchGraph[ii+1])/50;
-					drawLineOpenGL(song.timePitchGraph[ii]-graphWidth, song.pitchPitchGraph[ii]+10, song.timePitchGraph[ii], song.pitchPitchGraph[ii]+10-graphHeight, 0.2, 2.0/255.0, 254.0/255.0, 254.0/255.0, 1.0);
 				}
 			}
 		}

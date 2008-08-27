@@ -10,12 +10,11 @@ SDL_Surface* CVideoDriver::init(int width, int height, int fs)
 	printf ("OpenGL vendor: %s\n", glGetString (GL_VENDOR));
 	printf ("OpenGL renderer: %s\n", glGetString (GL_RENDERER));
 	#endif
-	glClearColor (1.0f, 1.0f, 1.0f, 1.0f);
+	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
 	glDisable (GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable (GL_BLEND);
-	glEnable (GL_TEXTURE_RECTANGLE_ARB);
 	return screen;
 }
 

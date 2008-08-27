@@ -58,6 +58,7 @@ static void checkEvents_SDL(CScreenManager& sm) {
 			break;
 		}
 		sm.getCurrentScreen()->manageEvent(event);
+		if (glGetError() != GL_NO_ERROR) throw std::runtime_error("OpenGL error");
 	}
 }
 

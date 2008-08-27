@@ -11,11 +11,34 @@ Surface::~Surface() {
 	glDeleteTextures(1, &texture_id);
 }
 
-void Surface::load(unsigned int width, unsigned int height, Format format, unsigned char* buffer) {
+namespace {
+	bool ispow2(unsigned int val) {
+		unsigned int count = 0;
+		do { if (val & 1) ++count; } while (val >>= 1);
+		return val == 1;
+	}
+}
+
+void Surface::load(unsigned int width, unsigned int height, Format format, unsigned char* buffer, float ar) {
 	m_width = width; m_height = height;
-	dimensions = Dimensions(float(width) / height).fixedWidth(1.0f);
+	dimensions = Dimensions(ar != 0.0f ? ar : float(width) / height).fixedWidth(1.0f);
+	tex.x1 = tex.y1 = 0.0f;
+	tex.x2 = tex.y2 = 1.0f;
 	glGenTextures(1, &texture_id);
-	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texture_id);
+	glBindTexture(GL_TEXTURE_2D, texture_id);
+
+	// when texture area is small, bilinear filter the closest mipmap
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST );
+	// when texture area is large, bilinear filter the original
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0 );
+
+	// the texture wraps over at the edges (repeat)
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+	glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+
+
 	unsigned int fmt;
 	unsigned int buffer_fmt;
 	bool swap;
@@ -44,27 +67,31 @@ void Surface::load(unsigned int width, unsigned int height, Format format, unsig
 		throw std::runtime_error("Unknown pixel format");
 	}
 	glPixelStorei(GL_UNPACK_SWAP_BYTES, swap );
-	glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA, width, height, 0, fmt, buffer_fmt, buffer);
+	//if (ispow2(width) && ispow2(height)) gluBuild2DMipmaps(GL_TEXTURE_2D, 3, width, height, fmt, buffer_fmt, buffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, fmt, buffer_fmt, buffer);
 }
 
 void Surface::draw() {
-	glEnable (GL_TEXTURE_RECTANGLE_ARB);
-	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texture_id);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texture_id);
 	glBegin(GL_QUADS);
 	float x1 = dimensions.x1();
 	float x2 = dimensions.x2();
 	float y1 = dimensions.y1();
 	float y2 = dimensions.y2();
-	glTexCoord2f(0.0f, 0.0f); glVertex2f(x1, y1);
-	glTexCoord2f(m_width, 0.0f); glVertex2f(x2, y1);
-	glTexCoord2f(m_width, m_height); glVertex2f(x2, y2);
-	glTexCoord2f(0.0f, m_height); glVertex2f(x1, y2);
+	glTexCoord2f(tex.x1, tex.y1); glVertex2f(x1, y1);
+	glTexCoord2f(tex.x2, tex.y1); glVertex2f(x2, y1);
+	glTexCoord2f(tex.x2, tex.y2); glVertex2f(x2, y2);
+	glTexCoord2f(tex.x1, tex.y2); glVertex2f(x1, y2);
 	glEnd();
-	glDisable (GL_TEXTURE_RECTANGLE_ARB);
+	glDisable(GL_TEXTURE_2D);
 }
+
+#include <fstream>
 
 Surface::Surface(std::string filename, Filetype filetype) {
 	// Disabling temporarily to get rid of Boost.Filesystem dep: if (!boost::filesystem::is_regular(filename)) throw std::runtime_error("File not found: " + filename);
+	if (!std::ifstream(filename.c_str()).is_open()) throw std::runtime_error("File not found: " + filename);
 	switch( filetype ) {
 	  case MAGICK: 
 	  	{
@@ -80,7 +107,7 @@ Surface::Surface(std::string filename, Filetype filetype) {
 	  	{
 		rsvg_init();
 		GError* pError = NULL;
-		// FIXME: this does not detect errors (file missing/invalid)
+		// Find SVG dimensions (in pixels)
 		RsvgHandle* svgHandle = rsvg_handle_new_from_file(filename.c_str(), &pError);
 		if (pError) {
 			g_error_free(pError);
@@ -88,14 +115,19 @@ Surface::Surface(std::string filename, Filetype filetype) {
 		}
 		RsvgDimensionData svgDimension;
 		rsvg_handle_get_dimensions (svgHandle, &svgDimension);
-		cairo_surface_t* surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, svgDimension.width, svgDimension.height);
-		cairo_t* dc = cairo_create(surface);
-		rsvg_handle_render_cairo(svgHandle, dc);
-		load(svgDimension.width, svgDimension.height, INT_ARGB, cairo_image_surface_get_data(surface));
-		cairo_surface_destroy(surface);
 		rsvg_handle_free(svgHandle);
+		unsigned int w = 1, h = 1;
+		while (w < svgDimension.width) w *= 2;
+		while (h < svgDimension.height) h *= 2;
+		// Load and raster the SVG
+		GdkPixbuf* pb = rsvg_pixbuf_from_file_at_size(filename.c_str(), w, h, &pError);
+		if (pError) {
+			g_error_free(pError);
+			throw std::runtime_error("Unable to load " + filename);
+		}
+		load(w, h, CHAR_RGBA, gdk_pixbuf_get_pixels(pb), float(svgDimension.width)/svgDimension.height);
+		gdk_pixbuf_unref(pb);
 		rsvg_term();
-		cairo_destroy(dc);
 		break;
 		}
 	}

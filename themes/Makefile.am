@@ -2,6 +2,7 @@
 themeslimadir   = @THEMES_DIR@/lima
 themeslima_DATA = lima/icon.png \
 	lima/no_cover.svg \
+	lima/notelines.svg \
 	lima/intro.svg \
 	lima/songs_bg.svg \
 	lima/songs_order.svg \

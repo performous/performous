@@ -46,9 +46,14 @@ class Dimensions {
 	enum YAnchor { CENTER, TOP, BOTTOM } m_yAnchor;
 };
 
+struct TexCoords {
+	float x1, y1, x2, y2;
+};
+
 class Surface: boost::noncopyable {
   public:
   	Dimensions dimensions;
+	TexCoords tex;
 	enum Format { INT_ARGB, CHAR_RGBA, RGB, BGR };
 	enum Filetype { MAGICK = 1, SVG = 2 };
 	Surface(unsigned width, unsigned height, Format format, unsigned char* buffer);
@@ -57,7 +62,7 @@ class Surface: boost::noncopyable {
 	~Surface();
 	void draw();
   private:
-	void load(unsigned int width, unsigned int height, Format format, unsigned char* buffer);
+	void load(unsigned int width, unsigned int height, Format format, unsigned char* buffer, float ar = 0.0f);
 	unsigned int m_width, m_height;
 	GLuint texture_id;
 };
