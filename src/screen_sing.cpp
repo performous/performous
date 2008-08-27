@@ -16,6 +16,7 @@ void CScreenSing::enter() {
 #define TRYLOAD(field, class) if (!song.field.empty()) { try { m_##field.reset(new class(song.path + song.field)); } catch (std::exception& e) { std::cerr << e.what() << std::endl; } }
 	TRYLOAD(video, Video)
 #undef TRYLOAD
+	if (!m_notelines) m_notelines.reset(new Surface(sm->getThemePathFile("notelines.svg"),Surface::SVG));
 	std::string file = song.path + song.mp3;
 	std::cout << "Now playing: " << file << std::endl;
 	CAudio& audio = *sm->getAudio();
@@ -35,6 +36,7 @@ void CScreenSing::exit() {
 	lyrics.reset();
 	theme.reset();
 	pitchGraph.clear();
+	m_notelines.reset();
 }
 
 void CScreenSing::manageEvent(SDL_Event event) {
@@ -179,11 +181,10 @@ void CScreenSing::draw() {
 	double baseY = -0.5 * (min + max) * noteUnit;
 	// Draw note lines
 	if (!m_sentence.empty()) {
-		Surface notelines(sm->getThemePathFile("notelines.svg"),Surface::SVG);
-		notelines.dimensions.stretch(1.0, (max - min - 13) * noteUnit);
-		notelines.tex.y2 = (-max + 6.0) / 12.0f;
-		notelines.tex.y1 = (-min - 7.0) / 12.0f;
-		notelines.draw();
+		m_notelines->dimensions.stretch(1.0, (max - min - 13) * noteUnit);
+		m_notelines->tex.y2 = (-max + 6.0) / 12.0f;
+		m_notelines->tex.y1 = (-min - 7.0) / 12.0f;
+		m_notelines->draw();
 	}
 	int state = 0;
 	double baseX = -.2 - time * pixUnit;
@@ -218,7 +219,7 @@ void CScreenSing::draw() {
 		if (state == 1) { --i; state = 2; }
 	}
 	glColor3f(1.0, 1.0, 1.0);
-
+/* Doesn't work correctly with scrolling notes, multiplayer, etc (old pitch graph stuff), to be removed
 	if (!m_sentence.empty()) {
 		double graphTime = (baseX + time * pixUnit);
 		double graphTime2 = (baseX + time * pixUnit);
@@ -242,8 +243,9 @@ void CScreenSing::draw() {
 			song.updatePitchGraph(graphTime2, pitch, volume, 1);
 		}
 	}
+*/
 
-
+/*  Not currently functional (pitch graph code)
 	unsigned int ii;
 	for(ii=1; ii < song.timePitchGraph.size(); ii++)
 	{
@@ -261,7 +263,9 @@ void CScreenSing::draw() {
 			}
 		}
 	}
+*/
 
+	// Render the lyrics - OPTIMIZE: This part is very slow and needs to be optimized
 	TThemeTxt tmptxt = theme->lyricspast;
 	tmptxt.text = sentenceWhole;
 	{
@@ -318,6 +322,5 @@ void CScreenSing::draw() {
 	theme->lyricsfuture.fontsize = oldfontsize;
 	theme->lyricsnextsentence.fontsize = oldfontsize;
 
-	Surface(theme->theme->getCurrent()).draw();
-	Surface(pitchGraph.getCurrent()).draw();
+	Surface(theme->theme->getCurrent()).draw(); // Render progress bar, score calculator, time, etc. - OPTIMIZE: This part is very slow and needs to be optimized
 }
