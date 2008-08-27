@@ -10,7 +10,7 @@ struct TextInput {
 		if (key.sym == SDLK_UP) return false;
 		if (key.sym == SDLK_DOWN) return false;
 		if (key.sym == SDLK_BACKSPACE && !text.empty()) backspace();
-		else if (ucs >= 0x20 && (ucs < 0x7F || ucs >= 0xA0)) *this += ucs;
+		else if ((ucs == 0x20 && !text.empty()) || (ucs > 0x20 && (ucs < 0x7F || ucs >= 0xA0))) *this += ucs;
 		else return false;
 		return true;
 	}
