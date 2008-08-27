@@ -157,7 +157,7 @@ void CScreenSing::draw() {
 			sentenceBegin = m_sentence[0].begin;
 		}
 		sentenceDuration = m_sentence.back().end - sentenceBegin;
-		pixUnit = 0.8 / (sentenceDuration * 1.0);
+		pixUnit = 0.5;
 	} else {
 		song.resetPitchGraph();
 		pitchGraph.clear();
@@ -186,7 +186,7 @@ void CScreenSing::draw() {
 		notelines.draw();
 	}
 	int state = 0;
-	double baseX = -.4 - sentenceBegin * pixUnit;
+	double baseX = -.2 - time * pixUnit;
 	for (unsigned int i = 0; i < m_sentence.size(); ++i) {
 		float r,g,b,a;
 		double y_pixel,x_pixel,h_pixel,w_pixel;
