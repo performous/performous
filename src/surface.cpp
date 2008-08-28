@@ -12,10 +12,16 @@ Surface::~Surface() {
 }
 
 namespace {
-	bool ispow2(unsigned int val) {
+	bool isPow2(unsigned int val) {
 		unsigned int count = 0;
 		do { if (val & 1) ++count; } while (val >>= 1);
 		return val == 1;
+	}
+
+	unsigned int nextPow2(unsigned int val) {
+		unsigned int ret = 1;
+		while (ret < val) ret *= 2;
+		return ret;
 	}
 }
 
@@ -67,7 +73,8 @@ void Surface::load(unsigned int width, unsigned int height, Format format, unsig
 		throw std::runtime_error("Unknown pixel format");
 	}
 	glPixelStorei(GL_UNPACK_SWAP_BYTES, swap );
-	//if (ispow2(width) && ispow2(height)) gluBuild2DMipmaps(GL_TEXTURE_2D, 3, width, height, fmt, buffer_fmt, buffer);
+	//if (isPow2(width) && isPow2(height)) gluBuild2DMipmaps(GL_TEXTURE_2D, 3, width, height, fmt, buffer_fmt, buffer);
+	// TODO: Test for OpenGL extension GL_ARB_texture_non_power_of_two and if not found, use gluScaleImage to upscale the texture to nextPow2 dimensions before calling glTexImage2D (if it isn't pow2 already).
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, fmt, buffer_fmt, buffer);
 }
 
@@ -116,9 +123,8 @@ Surface::Surface(std::string filename, Filetype filetype) {
 		RsvgDimensionData svgDimension;
 		rsvg_handle_get_dimensions (svgHandle, &svgDimension);
 		rsvg_handle_free(svgHandle);
-		unsigned int w = 1, h = 1;
-		while (w < svgDimension.width) w *= 2;
-		while (h < svgDimension.height) h *= 2;
+		unsigned int w = nextPow2(svgDimension.width);
+		unsigned int h = nextPow2(svgDimension.height);
 		// Load and raster the SVG
 		GdkPixbuf* pb = rsvg_pixbuf_from_file_at_size(filename.c_str(), w, h, &pError);
 		if (pError) {
