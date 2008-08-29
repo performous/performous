@@ -5,11 +5,11 @@
 
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <singleton.h>
-#include <audio.h>
-#include <record.h>
-#include <songs.h>
-#include <video_driver.h>
+#include "singleton.hh"
+#include "audio.hh"
+#include "record.hh"
+#include "songs.hh"
+#include "video_driver.hh"
 #include <iostream>
 #include <string>
 #include <vector>

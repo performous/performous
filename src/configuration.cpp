@@ -1,5 +1,5 @@
-#include <configuration.h>
-#include <screen.h>
+#include "configuration.hh"
+#include "screen.hh"
 #include <boost/lexical_cast.hpp>
 
 CConfigurationFullscreen::CConfigurationFullscreen():

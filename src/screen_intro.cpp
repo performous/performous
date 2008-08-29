@@ -1,4 +1,4 @@
-#include <screen_intro.h>
+#include "screen_intro.hh"
 
 CScreenIntro::CScreenIntro(std::string const& name): CScreen(name) {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();

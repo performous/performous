@@ -1,10 +1,10 @@
-#include <screen_sing.h>
-#include <xtime.h>
+#include "screen_sing.hh"
+#include "xtime.hh"
 
 #include <boost/format.hpp>
-#include <sdl_helper.h>
-#include <songs.h>
-#include <pitch_graph.h>
+#include "sdl_helper.hh"
+#include "songs.hh"
+#include "pitch_graph.hh"
 #include <iostream>
 #include <iomanip>
 

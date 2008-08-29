@@ -4,13 +4,13 @@
 #include "../config.h"
 
 #include <boost/scoped_ptr.hpp>
-#include <screen.h>
-#include <pitch_graph.h>
-#include <theme.h>
-#include <video.h>
-#include <lyrics.h>
-#include <sdl_helper.h>
-#include <surface.h>
+#include "screen.hh"
+#include "pitch_graph.hh"
+#include "theme.hh"
+#include "video.hh"
+#include "lyrics.hh"
+#include "sdl_helper.hh"
+#include "surface.hh"
 
 class CScreenSing: public CScreen {
   public:

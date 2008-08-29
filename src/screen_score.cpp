@@ -1,5 +1,5 @@
-#include <screen_score.h>
-#include <xtime.h>
+#include "screen_score.hh"
+#include "xtime.hh"
 #include <boost/lexical_cast.hpp>
 #include <limits>
 

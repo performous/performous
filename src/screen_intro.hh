@@ -3,8 +3,8 @@
 
 #include "../config.h"
 
-#include <screen.h>
-#include <surface.h>
+#include "screen.hh"
+#include "surface.hh"
 #include <boost/scoped_ptr.hpp>
 
 class CScreenIntro : public CScreen {

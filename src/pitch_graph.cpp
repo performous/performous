@@ -1,4 +1,4 @@
-#include <pitch_graph.h>
+#include "pitch_graph.hh"
 #include <cmath>
 
 cairo_surface_t* PitchGraph::renderPitch(double pitch, double time, double volume) {

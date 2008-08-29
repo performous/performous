@@ -1,5 +1,5 @@
-#include <screen_songs.h>
-#include <xtime.h>
+#include "screen_songs.hh"
+#include "xtime.hh"
 #include <iostream>
 #include <sstream>
 

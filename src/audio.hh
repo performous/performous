@@ -10,7 +10,7 @@
 #include <boost/thread/thread.hpp>
 
 #ifdef USE_FFMPEG_AUDIO
-#include "ffmpeg.hpp"
+#include "ffmpeg.hh"
 #include <audio.hpp>
 #include <boost/scoped_ptr.hpp>
 #endif

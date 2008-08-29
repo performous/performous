@@ -1,13 +1,13 @@
 #ifndef __SCREENSONGS_H__
 #define __SCREENSONGS_H__
 
-#include <textinput.h>
+#include "textinput.hh"
 #include <boost/scoped_ptr.hpp>
-#include <screen.h>
-#include <surface.h>
-#include <sdl_helper.h>
-#include <songs.h>
-#include <theme.h>
+#include "screen.hh"
+#include "surface.hh"
+#include "sdl_helper.hh"
+#include "songs.hh"
+#include "theme.hh"
 
 class CScreenSongs : public CScreen {
   public:

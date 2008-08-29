@@ -5,7 +5,7 @@
 
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <surface.h>
+#include "surface.hh"
 #include <string>
 
 struct TRGBA {

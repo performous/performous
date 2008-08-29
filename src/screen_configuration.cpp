@@ -1,4 +1,4 @@
-#include <screen_configuration.h>
+#include "screen_configuration.hh"
 
 CScreenConfiguration::CScreenConfiguration(std::string const& name): CScreen(name)
 {

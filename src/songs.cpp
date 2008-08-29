@@ -1,9 +1,9 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
 #include <glob.h>
-#include <songs.h>
-#include <screen.h>
-#include <xtime.h>
+#include "songs.hh"
+#include "screen.hh"
+#include "xtime.hh"
 // math.h needed for C99 stuff
 #include <math.h>
 #include <algorithm>

@@ -1,8 +1,8 @@
-#include "ffmpeg.hpp"
+#include "ffmpeg.hh"
 
 #ifdef USE_FFMPEG_VIDEO
 
-#include <xtime.h>
+#include "xtime.hh"
 #include <iostream>
 #include <stdexcept>
 

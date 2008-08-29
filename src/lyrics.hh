@@ -3,7 +3,7 @@
 
 #include <../config.h>
 
-#include <songs.h>
+#include "songs.hh"
 
 
 /**

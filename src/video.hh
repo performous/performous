@@ -4,10 +4,10 @@
 #include "../config.h"
 #include <string>
 
-#include "surface.h"
+#include "surface.hh"
 
 #ifdef USE_FFMPEG_VIDEO
-#include "ffmpeg.hpp"
+#include "ffmpeg.hh"
 #endif
        
 class Video {

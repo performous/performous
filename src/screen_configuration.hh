@@ -3,9 +3,9 @@
 
 #include "../config.h"
 
-#include <screen.h>
-#include <configuration.h>
-#include <theme.h>
+#include "screen.hh"
+#include "configuration.hh"
+#include "theme.hh"
 #include <boost/scoped_ptr.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 

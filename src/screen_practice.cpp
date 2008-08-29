@@ -1,4 +1,4 @@
-#include <screen_practice.h>
+#include "screen_practice.hh"
 
 CScreenPractice::CScreenPractice(std::string const& name, Analyzer const& analyzer):
   CScreen(name), m_analyzer(analyzer)

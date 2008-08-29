@@ -1,4 +1,4 @@
-#include <video.h>
+#include "video.hh"
 #include <cmath>
 
 #ifdef USE_FFMPEG_VIDEO

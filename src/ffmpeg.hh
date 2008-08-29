@@ -1,7 +1,7 @@
 #ifndef __FFMEG_HPP__
 #define __FFMEG_HPP__
 
-#include <../config.h>
+#include "../config.h"
 
 #ifdef USE_FFMPEG_VIDEO
 

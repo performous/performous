@@ -1,5 +1,5 @@
-#include <audio.h>
-#include <xtime.h>
+#include "audio.hh"
+#include "xtime.hh"
 
 #include <iostream>
 #include <cmath>

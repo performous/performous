@@ -4,8 +4,8 @@
 #include "../config.h"
 
 #include <boost/scoped_ptr.hpp>
-#include <screen.h>
-#include <theme.h>
+#include "screen.hh"
+#include "theme.hh"
 
 class CScreenScore: public CScreen {
   public:

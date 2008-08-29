@@ -1,4 +1,4 @@
-#include "surface.h"
+#include "surface.hh"
 
 // Disabling temporarily: #include <boost/filesystem.hpp>
 #include <stdexcept>

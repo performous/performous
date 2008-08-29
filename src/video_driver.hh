@@ -4,7 +4,7 @@
 #include "../config.h"
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <vector>
-#include <surface.h>
+#include "surface.hh"
 
 class CVideoDriver {
   public:

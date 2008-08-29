@@ -1,5 +1,5 @@
-#include <video_driver.h>
-#include <screen.h>
+#include "video_driver.hh"
+#include "screen.hh"
 
 SDL_Surface* CVideoDriver::init(int width, int height, int fs)
 {

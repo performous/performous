@@ -7,16 +7,16 @@
 #endif
 
 #include <audio.hpp>
-#include <sdl_helper.h>
-#include <screen.h>
-#include <screen_intro.h>
-#include <screen_songs.h>
-#include <screen_sing.h>
-#include <screen_practice.h>
-#include <screen_score.h>
-#include <screen_configuration.h>
-#include <video_driver.h>
-#include <xtime.h>
+#include "sdl_helper.hh"
+#include "screen.hh"
+#include "screen_intro.hh"
+#include "screen_songs.hh"
+#include "screen_sing.hh"
+#include "screen_practice.hh"
+#include "screen_score.hh"
+#include "screen_configuration.hh"
+#include "video_driver.hh"
+#include "xtime.hh"
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>

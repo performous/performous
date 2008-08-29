@@ -1,4 +1,4 @@
-#include <lyrics.h>
+#include "lyrics.hh"
 #include <limits>
 
 Lyrics::Lyrics(Song::notes_t const& lyrics):

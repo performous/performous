@@ -1,5 +1,5 @@
-#include <theme.h>
-#include <screen.h>
+#include "theme.hh"
+#include "screen.hh"
 
 void CTheme::clear() {
 	double width = 800.0, height = 600.0; // FIXME!

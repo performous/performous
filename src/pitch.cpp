@@ -1,4 +1,4 @@
-#include <pitch.h>
+#include "pitch.hh"
 
 #include <fft.hpp>
 #include <algorithm>

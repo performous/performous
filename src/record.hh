@@ -2,7 +2,7 @@
 #define __RECORD_H_
 
 #include <audio.hpp>
-#include <pitch.h>
+#include "pitch.hh"
 #include <iostream>
 
 class Capture {

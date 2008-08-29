@@ -1,4 +1,4 @@
-#include <screen.h>
+#include "screen.hh"
 #include <stdexcept>
 
 #ifndef THEMES_DIR
