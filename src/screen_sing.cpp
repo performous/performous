@@ -175,9 +175,9 @@ void CScreenSing::draw() {
 			theme->tostartfg.width,theme->tostartfg.height,
 			theme->tostartfg.fill_col.r, theme->tostartfg.fill_col.g, theme->tostartfg.fill_col.b, theme->tostartfg.fill_col.a);
 	}
-	int min = song.noteMin - 7;
-	int max = song.noteMax + 7;
-	double noteUnit = -0.5 / std::max(32, max - min);
+	double min = song.noteMin - 7.0;
+	double max = song.noteMax + 7.0;
+	double noteUnit = -0.5 / std::max(32.0, max - min);
 	double baseY = -0.5 * (min + max) * noteUnit;
 	// Draw note lines
 	if (!m_sentence.empty()) {
