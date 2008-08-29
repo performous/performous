@@ -1,5 +1,5 @@
 #include "audio_dev.hpp"
-#include <portaudio/portaudio.h>
+#include <portaudio.h>
 #include <ostream>
 #include <stdint.h>
 
