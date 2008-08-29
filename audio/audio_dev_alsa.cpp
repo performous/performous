@@ -1,5 +1,5 @@
 #include "audio_dev.hpp"
-#include <alsa/alsa.hpp>
+#include "alsa/alsa.hpp"
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/thread.hpp>
 #include <algorithm>
