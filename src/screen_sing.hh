@@ -33,6 +33,7 @@ class CScreenSing: public CScreen {
 	bool play;
 	bool finished;
 	double playOffset;
+	float m_notealpha;
 	boost::scoped_ptr<CThemeSing> theme;
 	boost::scoped_ptr<Lyrics> lyrics;
 	Song::notes_t::const_iterator m_songit;

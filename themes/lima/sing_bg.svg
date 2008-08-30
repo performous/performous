@@ -2,7 +2,7 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
@@ -14,7 +14,7 @@
    height="600"
    id="svg3465"
    sodipodi:version="0.32"
-   inkscape:version="0.45.1"
+   inkscape:version="0.46"
    sodipodi:docname="sing_bg.svg"
    sodipodi:docbase="/root/USNG/trunk/themes/lima"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
@@ -33,8 +33,8 @@
      inkscape:cy="390.67589"
      inkscape:cx="281.09948"
      inkscape:zoom="0.86831672"
-     inkscape:window-height="1149"
-     inkscape:window-width="1920"
+     inkscape:window-height="1125"
+     inkscape:window-width="1919"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      guidetolerance="10.0"
@@ -44,11 +44,19 @@
      bordercolor="#666666"
      pagecolor="#ffffff"
      id="base"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
-     inkscape:current-layer="layer11" />
+     inkscape:window-x="1"
+     inkscape:window-y="49"
+     inkscape:current-layer="svg3465"
+     showgrid="false" />
   <defs
      id="defs3467">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 300 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="800 : 300 : 1"
+       inkscape:persp3d-origin="400 : 200 : 1"
+       id="perspective41" />
     <linearGradient
        id="linearGradient3667">
       <stop
@@ -357,11 +365,4 @@
        style="opacity:0.22790701;color:black;fill:white;fill-opacity:1;fill-rule:nonzero;stroke:white;stroke-width:1.98281369;stroke-linecap:round;stroke-linejoin:round;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:block;overflow:visible"
        sodipodi:type="star" />
   </g>
-  <rect
-     width="29.287586"
-     height="74.28759"
-     x="10.356207"
-     y="495.35623"
-     style="fill:white;fill-opacity:0.24313725;stroke:white;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline;opacity:1;color:black;fill-rule:nonzero;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-dashoffset:0;visibility:visible;overflow:visible"
-     id="rect2246" />
 </svg>

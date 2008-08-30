@@ -26,6 +26,7 @@ void CScreenSing::enter() {
 	song.reset();
 	m_songit = song.notes.begin();
 	audio.wait(); // Until playback starts
+	m_notealpha = 0.0f;
 }
 
 void CScreenSing::exit() {
@@ -65,6 +66,7 @@ void CScreenSing::manageEvent(SDL_Event event) {
 			boost::thread::sleep(now() + 0.3); // HACK: Wait until the song is loaded
 			audio.seek(pos);
 		}
+		m_songit = sm->getSongs()->current().notes.begin(); // Must be done after seeking backwards, doesn't hurt to do it always
 	}
 }
 
@@ -98,6 +100,7 @@ void CScreenSing::draw() {
 	// Get the time in the song
 	double time = sm->getAudio()->getPosition();
 	time = std::max(0.0, time + playOffset);
+	/* Auto-analysis code
 	while (m_songit != song.notes.end() && time > 0.3 * m_songit->begin + 0.7 * m_songit->end) {
 		if (m_songit->type == Note::SLEEP) {
 			std::cout << "# ---" << std::endl;
@@ -113,6 +116,8 @@ void CScreenSing::draw() {
 		}
 		++m_songit;
 	}
+	*/
+
 	double songPercent = time / sm->getAudio()->getLength();
 	// Update scoring
 	song.update(time, freq);
@@ -147,78 +152,47 @@ void CScreenSing::draw() {
 		tmptxt.fontsize = 25;
 		theme->theme->PrintText(&tmptxt);
 	}
-	// compute and draw the text
 	double sentenceBegin = m_sentence.empty() ? 0.0 : m_sentence[0].begin;
-	double sentenceDuration = 0.0;
-	double pixUnit = 0.0;
-	m_sentence = lyrics->getCurrentSentence();
-	if (!m_sentence.empty()) {
-		if (sentenceBegin != m_sentence[0].begin) {
-			pitchGraph.clear();
-			song.resetPitchGraph();
-			sentenceBegin = m_sentence[0].begin;
-		}
-		sentenceDuration = m_sentence.back().end - sentenceBegin;
-		pixUnit = 0.5;
-	} else {
-		song.resetPitchGraph();
-		pitchGraph.clear();
-	}
-	// Compute and draw the "to start" cursor
-	if (time < sentenceBegin) {
-		double wait = sentenceBegin - time;
-		double value = 4.0 * wait / sentenceDuration;
-		if (value > 1.0) value = wait > 1.0 ? 0.0 : 1.0;
-		theme->tostartfg.height = theme->tostartfg.final_height * value;
-		drawRectangleOpenGL(
-			theme->tostartfg.x,theme->tostartfg.y,
-			theme->tostartfg.width,theme->tostartfg.height,
-			theme->tostartfg.fill_col.r, theme->tostartfg.fill_col.g, theme->tostartfg.fill_col.b, theme->tostartfg.fill_col.a);
-	}
+	double pixUnit = 0.3;
 	double min = song.noteMin - 7.0;
 	double max = song.noteMax + 7.0;
 	double noteUnit = -0.5 / std::max(32.0, max - min);
 	double baseY = -0.5 * (min + max) * noteUnit;
+	const double baseLine = -0.2;
+	double baseX = baseLine - time * pixUnit;
+	// Update m_songit (which note to start the rendering from)
+	while (m_songit != song.notes.end() && (m_songit->type == Note::SLEEP || m_songit->end < time - (baseLine + 0.5) / pixUnit)) ++m_songit;
 	// Draw note lines
-	if (!m_sentence.empty()) {
-		m_notelines->dimensions.stretch(1.0, (max - min - 13) * noteUnit);
-		m_notelines->tex.y2 = (-max + 6.0) / 12.0f;
-		m_notelines->tex.y1 = (-min - 7.0) / 12.0f;
-		m_notelines->draw();
-	}
-	int state = 0;
-	double baseX = -.2 - time * pixUnit;
-	for (unsigned int i = 0; i < m_sentence.size(); ++i) {
-		float r,g,b,a;
-		double y_pixel,x_pixel,h_pixel,w_pixel;
-		h_pixel = -noteUnit;
-
-		if (m_sentence[i].begin > time) state = 3;
-		if (state == 0 && m_sentence[i].end > time) state = 1;
-		y_pixel = baseY + m_sentence[i].note * noteUnit - 0.5 * h_pixel;
-		double begin = (state == 2 ? time : m_sentence[i].begin);
-		double end = (state == 1 ? time : m_sentence[i].end);
-		x_pixel = baseX + begin * pixUnit;
-		w_pixel = (end - begin) * pixUnit;
-		if (state < 2) {
-			r = 0.7; g = 0.7; b = 0.7; a = 1.0;
-		} else {
-			switch (m_sentence[i].type) {
-			  case Note::FREESTYLE:
-				r = 0.6; g = 1.0; b = 0.6; a = 1.0;
-				break;
-			  case Note::GOLDEN:
-				r = 1.0; g = 0.8; b = 0.0; a = 1.0;
-				break;
-			  default:
-				r = 0.8; g = 0.8; b = 1.0; a = 1.0;
-			}
+	if (m_songit == song.notes.end() || m_songit->begin > time + 3.0) m_notealpha -= 0.02f;
+	else if (m_notealpha < 1.0f) m_notealpha += 0.02f;
+	if (m_notealpha <= 0.0f) {
+		m_notealpha = 0.0f;
+	} else {
+		glColor4f(1.0, 1.0, 1.0, m_notealpha);
+		if (!m_sentence.empty()) {
+			m_notelines->dimensions.stretch(1.0, (max - min - 13) * noteUnit);
+			m_notelines->tex.y2 = (-max + 6.0) / 12.0f;
+			m_notelines->tex.y1 = (-min - 7.0) / 12.0f;
+			m_notelines->draw();
 		}
-		drawRectangleOpenGL(x_pixel,y_pixel,w_pixel,h_pixel,r, g, b, a,2.0,0.0,0.0,0.0,0.5);
-
-		if (state == 1) { --i; state = 2; }
+		// Draw notes
+		for (Song::notes_t::const_iterator it = m_songit; it != song.notes.end() && it->begin < time - (baseLine - 0.5) / pixUnit; ++it) {
+			if (it->type == Note::SLEEP) continue;
+			float r,g,b,a;
+			switch (it->type) {
+			  case Note::FREESTYLE: r = 0.6; g = 1.0; b = 0.6; a = 1.0; break;
+			  case Note::GOLDEN: r = 1.0; g = 0.8; b = 0.0; a = 1.0; break;
+			  default: r = 0.8; g = 0.8; b = 1.0; a = 1.0;
+			}
+			double y_pixel,x_pixel,h_pixel,w_pixel;
+			h_pixel = -noteUnit;
+			y_pixel = baseY + it->note * noteUnit - 0.5 * h_pixel;
+			x_pixel = baseX + it->begin * pixUnit;
+			w_pixel = (it->end - it->begin) * pixUnit;
+			drawRectangleOpenGL(x_pixel,y_pixel,w_pixel,h_pixel,r, g, b, a,2.0,0.0,0.0,0.0,0.5);
+		}
+		glColor3f(1.0, 1.0, 1.0);
 	}
-	glColor3f(1.0, 1.0, 1.0);
 /* Doesn't work correctly with scrolling notes, multiplayer, etc (old pitch graph stuff), to be removed
 	if (!m_sentence.empty()) {
 		double graphTime = (baseX + time * pixUnit);
