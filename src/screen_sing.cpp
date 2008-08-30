@@ -70,18 +70,14 @@ void CScreenSing::manageEvent(SDL_Event event) {
 	}
 }
 
-void drawRectangleOpenGL( double x, double y, double w, double h,
-		float _r, float _g, float _b, float _a,
-		double s_size=0.0, float _sr=0.0, float _sg=0.0, float _sb=0.0, float _sa=0.0) {
+void drawRectangleOpenGL(double x, double y, double w, double h,
+  float _r, float _g, float _b, float _a)
+{
 	glColor4f(_r, _g, _b, _a);
 	glBegin(GL_QUADS);
 	glVertex2f(x  ,y  ); glVertex2f(x  ,y+h);
 	glVertex2f(x+w,y+h); glVertex2f(x+w,y  );
 	glEnd();
-	if( s_size != 0.0 ) {
-		double sx = s_size;
-		double sy = s_size;
-	}
 	glColor4f(1.0, 1.0, 1.0, 1.0);
 }
 
@@ -152,8 +148,8 @@ void CScreenSing::draw() {
 		tmptxt.fontsize = 25;
 		theme->theme->PrintText(&tmptxt);
 	}
-	double sentenceBegin = m_sentence.empty() ? 0.0 : m_sentence[0].begin;
 	double pixUnit = 0.3;
+	m_sentence = lyrics->getCurrentSentence();
 	double min = song.noteMin - 7.0;
 	double max = song.noteMax + 7.0;
 	double noteUnit = -0.5 / std::max(32.0, max - min);
@@ -189,7 +185,7 @@ void CScreenSing::draw() {
 			y_pixel = baseY + it->note * noteUnit - 0.5 * h_pixel;
 			x_pixel = baseX + it->begin * pixUnit;
 			w_pixel = (it->end - it->begin) * pixUnit;
-			drawRectangleOpenGL(x_pixel,y_pixel,w_pixel,h_pixel,r, g, b, a,2.0,0.0,0.0,0.0,0.5);
+			drawRectangleOpenGL(x_pixel,y_pixel,w_pixel,h_pixel,r, g, b, a);
 		}
 		glColor3f(1.0, 1.0, 1.0);
 	}
