@@ -61,6 +61,10 @@ class Surface: boost::noncopyable {
 	Surface(std::string filename, Filetype filetype);
 	~Surface();
 	void draw();
+	struct Use {
+		Use(Surface& s);
+		~Use();
+	};
   private:
 	void load(unsigned int width, unsigned int height, Format format, unsigned char* buffer, float ar = 0.0f);
 	unsigned int m_width, m_height;

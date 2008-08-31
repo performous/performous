@@ -26,6 +26,7 @@ class CScreenSing: public CScreen {
 	boost::scoped_ptr<Surface> m_background;
 	boost::scoped_ptr<Video> m_video;
 	boost::scoped_ptr<Surface> m_notelines;
+	boost::scoped_ptr<Surface> m_wave;
 	// Keeps the pitch tracking graphics
 	// in separate surface
 	PitchGraph pitchGraph;

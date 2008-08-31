@@ -78,9 +78,17 @@ void Surface::load(unsigned int width, unsigned int height, Format format, unsig
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, fmt, buffer_fmt, buffer);
 }
 
-void Surface::draw() {
+Surface::Use::Use(Surface& s) {
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, texture_id);
+	glBindTexture(GL_TEXTURE_2D, s.texture_id);
+}
+
+Surface::Use::~Use() {
+	glDisable(GL_TEXTURE_2D);
+}
+
+void Surface::draw() {
+	Use texture(*this);
 	glBegin(GL_QUADS);
 	float x1 = dimensions.x1();
 	float x2 = dimensions.x2();
@@ -91,7 +99,6 @@ void Surface::draw() {
 	glTexCoord2f(tex.x2, tex.y2); glVertex2f(x2, y2);
 	glTexCoord2f(tex.x1, tex.y2); glVertex2f(x1, y2);
 	glEnd();
-	glDisable(GL_TEXTURE_2D);
 }
 
 #include <fstream>
@@ -102,39 +109,39 @@ Surface::Surface(std::string filename, Filetype filetype) {
 	switch( filetype ) {
 	  case MAGICK: 
 	  	{
-		Magick::Image image;
-		Magick::Blob blob;
-		image.read(filename);
-		image.magick("RGBA");
-		image.write(&blob);
-		load(image.columns(), image.rows(), CHAR_RGBA, (unsigned char*)blob.data());
-		break;
+			Magick::Image image;
+			Magick::Blob blob;
+			image.read(filename);
+			image.magick("RGBA");
+			image.write(&blob);
+			load(image.columns(), image.rows(), CHAR_RGBA, (unsigned char*)blob.data());
+			break;
 		}
 	  case SVG:
 	  	{
-		rsvg_init();
-		GError* pError = NULL;
-		// Find SVG dimensions (in pixels)
-		RsvgHandle* svgHandle = rsvg_handle_new_from_file(filename.c_str(), &pError);
-		if (pError) {
-			g_error_free(pError);
-			throw std::runtime_error("Unable to load " + filename);
-		}
-		RsvgDimensionData svgDimension;
-		rsvg_handle_get_dimensions (svgHandle, &svgDimension);
-		rsvg_handle_free(svgHandle);
-		unsigned int w = nextPow2(svgDimension.width);
-		unsigned int h = nextPow2(svgDimension.height);
-		// Load and raster the SVG
-		GdkPixbuf* pb = rsvg_pixbuf_from_file_at_size(filename.c_str(), w, h, &pError);
-		if (pError) {
-			g_error_free(pError);
-			throw std::runtime_error("Unable to load " + filename);
-		}
-		load(w, h, CHAR_RGBA, gdk_pixbuf_get_pixels(pb), float(svgDimension.width)/svgDimension.height);
-		gdk_pixbuf_unref(pb);
-		rsvg_term();
-		break;
+			rsvg_init();
+			GError* pError = NULL;
+			// Find SVG dimensions (in pixels)
+			RsvgHandle* svgHandle = rsvg_handle_new_from_file(filename.c_str(), &pError);
+			if (pError) {
+				g_error_free(pError);
+				throw std::runtime_error("Unable to load " + filename);
+			}
+			RsvgDimensionData svgDimension;
+			rsvg_handle_get_dimensions (svgHandle, &svgDimension);
+			rsvg_handle_free(svgHandle);
+			unsigned int w = nextPow2(svgDimension.width);
+			unsigned int h = nextPow2(svgDimension.height);
+			// Load and raster the SVG
+			GdkPixbuf* pb = rsvg_pixbuf_from_file_at_size(filename.c_str(), w, h, &pError);
+			if (pError) {
+				g_error_free(pError);
+				throw std::runtime_error("Unable to load " + filename);
+			}
+			load(w, h, CHAR_RGBA, gdk_pixbuf_get_pixels(pb), float(svgDimension.width)/svgDimension.height);
+			gdk_pixbuf_unref(pb);
+			rsvg_term();
+			break;
 		}
 	}
 }

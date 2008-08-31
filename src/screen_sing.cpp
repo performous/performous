@@ -17,6 +17,7 @@ void CScreenSing::enter() {
 	TRYLOAD(video, Video)
 #undef TRYLOAD
 	if (!m_notelines) m_notelines.reset(new Surface(sm->getThemePathFile("notelines.svg"),Surface::SVG));
+	if (!m_wave) m_wave.reset(new Surface(sm->getThemePathFile("wave.png"),Surface::MAGICK));
 	std::string file = song.path + song.mp3;
 	std::cout << "Now playing: " << file << std::endl;
 	CAudio& audio = *sm->getAudio();
@@ -38,6 +39,7 @@ void CScreenSing::exit() {
 	theme.reset();
 	pitchGraph.clear();
 	m_notelines.reset();
+	m_wave.reset();
 }
 
 void CScreenSing::manageEvent(SDL_Event event) {
@@ -187,8 +189,38 @@ void CScreenSing::draw() {
 			w_pixel = (it->end - it->begin) * pixUnit;
 			drawRectangleOpenGL(x_pixel,y_pixel,w_pixel,h_pixel,r, g, b, a);
 		}
-		glColor3f(1.0, 1.0, 1.0);
 	}
+	// Pitch graph (draft)
+	{
+		glColor3f(52/255.0, 101/255.0, 164/255.0);
+		Surface::Use texture(*m_wave);
+		double oldy = std::numeric_limits<double>::quiet_NaN();
+		for (double x = -0.5; x < -0.2; x += 0.01 * pixUnit) {
+			if (x + 0.01 * pixUnit >= -0.2) x = -0.2;
+			double t = x + 0.2 + time * pixUnit;
+			double y = sin(remainder(t, 8.0) * 5.0) * 0.1;
+			//double thickness = (std::min(0.0, std::max(-1.0, (tone ? tone->stabledb : -100.0) / 40.0))+1.0) * 0.01;
+			double thickness = 0.005;
+			if (thickness == 0.0 || std::abs(oldy - y) > 0.01) {
+				if (oldy == oldy) {
+					glEnd();
+					oldy = std::numeric_limits<double>::quiet_NaN();
+				}
+			}
+			if (thickness > 0.0) {
+				if (oldy != oldy) {
+					glBegin(GL_TRIANGLE_STRIP);
+					glTexCoord2f(100.0 * t, 0.5f); glVertex2f(x, y);
+				} else {
+					glTexCoord2f(100.0 * t, 0.0f); glVertex2f(x, y - thickness);
+					glTexCoord2f(100.0 * t, 1.0f); glVertex2f(x, y + thickness);
+				}
+				oldy = y;
+			}
+		}
+		if (oldy == oldy) glEnd();
+	}
+	glColor3f(1.0, 1.0, 1.0);
 /* Doesn't work correctly with scrolling notes, multiplayer, etc (old pitch graph stuff), to be removed
 	if (!m_sentence.empty()) {
 		double graphTime = (baseX + time * pixUnit);
