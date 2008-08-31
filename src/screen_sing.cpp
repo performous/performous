@@ -167,12 +167,10 @@ void CScreenSing::draw() {
 		m_notealpha = 0.0f;
 	} else {
 		glColor4f(1.0, 1.0, 1.0, m_notealpha);
-		if (!m_sentence.empty()) {
-			m_notelines->dimensions.stretch(1.0, (max - min - 13) * noteUnit);
-			m_notelines->tex.y2 = (-max + 6.0) / 12.0f;
-			m_notelines->tex.y1 = (-min - 7.0) / 12.0f;
-			m_notelines->draw();
-		}
+		m_notelines->dimensions.stretch(1.0, (max - min - 13) * noteUnit);
+		m_notelines->tex.y2 = (-max + 6.0) / 12.0f;
+		m_notelines->tex.y1 = (-min - 7.0) / 12.0f;
+		m_notelines->draw();
 		// Draw notes
 		for (Song::notes_t::const_iterator it = m_songit; it != song.notes.end() && it->begin < time - (baseLine - 0.5) / pixUnit; ++it) {
 			if (it->type == Note::SLEEP) continue;
@@ -189,10 +187,8 @@ void CScreenSing::draw() {
 			w_pixel = (it->end - it->begin) * pixUnit;
 			drawRectangleOpenGL(x_pixel,y_pixel,w_pixel,h_pixel,r, g, b, a);
 		}
-	}
-	// Pitch graph (draft)
-	{
-		glColor3f(52/255.0, 101/255.0, 164/255.0);
+		// Pitch graph (draft)
+		glColor4f(52/255.0, 101/255.0, 164/255.0, m_notealpha);
 		Surface::Use texture(*m_wave);
 		double oldy = std::numeric_limits<double>::quiet_NaN();
 		for (double x = -0.5; x < -0.2; x += 0.01 * pixUnit) {
