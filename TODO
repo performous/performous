@@ -17,12 +17,12 @@ Structural:
 
 Big features:
 
-- OpenGL-based UI?
+- OpenGL-based UI?  [DONE]
 	* Much faster
 	* Runtime resolution switching / resizable window
 	* OpenGL rectangle pitch graph
 
-- Video decoding with libavformat
+- Video decoding with libavformat [DONE]
 
 - Add compose screen (using features discussed on mailing list)
 
@@ -41,6 +41,7 @@ Features:
 
 - libda device chooser/configuration for all backend
 
+- real aspect ratio support (redesign screens and themes)
 
 Fixes/Enhancement:
 
@@ -48,17 +49,22 @@ Fixes/Enhancement:
 
 - get rid of cairo
 
-- switch to cmake
+- switch to cmake [WIP]
+
+- scale non-pow2-textures to pow2 on older hardware
+
+- optimize text rendering
 
 Ripper
 
-- remove hyphens (intelligently)
+- remove hyphens (intelligently) [DONE]
 
-- rewrite video code
-
-- ripping code (should be much faster)
+- rewrite video code [DONE, but can be done better]
 
 - try to figure out what causes clicks on adpcm decoding.
 
+- compress into Ogg Vorbis
+
 Platform
  - Windows binary build
+ 
