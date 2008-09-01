@@ -25,25 +25,61 @@ namespace {
 	}
 }
 
+bool checkExtension(const char *extension)
+{
+	const GLubyte *extensions = NULL;
+	const GLubyte *start;
+	GLubyte *where, *terminator;
+	
+	/* Extension names should not have spaces. */
+	where = (GLubyte *) strchr(extension, ' ');
+	if (where || *extension == '\0')
+		return false;
+	extensions = glGetString(GL_EXTENSIONS);
+	/* It takes a bit of care to be fool-proof about parsing the
+		 OpenGL extensions string. Don't be fooled by sub-strings,
+		 etc. */
+	start = extensions;
+	for (;;) {
+		where = (GLubyte *) strstr((const char *) start, extension);
+		if (!where)
+			break;
+		terminator = where + strlen(extension);
+		if (where == start || *(where - 1) == ' ')
+			if (*terminator == ' ' || *terminator == '\0')
+				return true;
+		start = terminator;
+	}
+	return false;
+}
+
 void Surface::load(unsigned int width, unsigned int height, Format format, unsigned char* buffer, float ar) {
 	m_width = width; m_height = height;
 	dimensions = Dimensions(ar != 0.0f ? ar : float(width) / height).fixedWidth(1.0f);
 	tex.x1 = tex.y1 = 0.0f;
 	tex.x2 = tex.y2 = 1.0f;
 	glGenTextures(1, &texture_id);
-	glBindTexture(GL_TEXTURE_2D, texture_id);
 
-	// when texture area is small, bilinear filter the closest mipmap
-	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST );
-	// when texture area is large, bilinear filter the original
-	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0 );
+	int gl2Supported = atof((char*)glGetString(GL_VERSION)) >= 2.0;
+	bool hasTexture_non_power_of_two = checkExtension("GL_ARB_texture_non_power_of_two");
 
-	// the texture wraps over at the edges (repeat)
-	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-	glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+	if (gl2Supported && hasTexture_non_power_of_two) { // Use OpenGL 2.0 functionality 
+		glBindTexture(GL_TEXTURE_2D, texture_id);
 
+		// when texture area is small, bilinear filter the closest mipmap
+		glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST );
+		// when texture area is large, bilinear filter the original
+		glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+		glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0 );
+	
+		// the texture wraps over at the edges (repeat)
+		glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+		glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+		glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+
+	}else {
+		glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texture_id);
+	}
 
 	unsigned int fmt;
 	unsigned int buffer_fmt;
@@ -72,19 +108,42 @@ void Surface::load(unsigned int width, unsigned int height, Format format, unsig
 	  default:
 		throw std::runtime_error("Unknown pixel format");
 	}
-	glPixelStorei(GL_UNPACK_SWAP_BYTES, swap );
-	//if (isPow2(width) && isPow2(height)) gluBuild2DMipmaps(GL_TEXTURE_2D, 3, width, height, fmt, buffer_fmt, buffer);
-	// TODO: Test for OpenGL extension GL_ARB_texture_non_power_of_two and if not found, use gluScaleImage to upscale the texture to nextPow2 dimensions before calling glTexImage2D (if it isn't pow2 already).
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, fmt, buffer_fmt, buffer);
+       	glPixelStorei(GL_UNPACK_SWAP_BYTES, swap );
+
+	if (gl2Supported && hasTexture_non_power_of_two) { // Use OpenGL 2.0 functionality 
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, fmt, buffer_fmt, buffer);	
+	}
+	else {
+		//if (isPow2(width) && isPow2(height)) gluBuild2DMipmaps(GL_TEXTURE_2D, 3, width, height, fmt, buffer_fmt, buffer);
+		// TODO: Test for OpenGL extension GL_ARB_texture_non_power_of_two and if not found, use gluScaleImage to upscale the texture to nextPow2 dimensions before calling glTexImage2D (if it isn't pow2 already).
+	        glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA, width, height, 0, fmt, buffer_fmt, buffer);	
+//		gluScaleImage(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA, width, height, 0, fmt, buffer_fmt, buffer);
+	}
 }
 
 Surface::Use::Use(Surface& s) {
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, s.texture_id);
+	int gl2Supported = atof((char*)glGetString(GL_VERSION)) >= 2.0;
+	bool hasTexture_non_power_of_two = checkExtension("GL_ARB_texture_non_power_of_two");
+
+	if (gl2Supported && hasTexture_non_power_of_two) { // Use OpenGL 2.0 functionality 
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, s.texture_id);
+	} else {
+		glEnable(GL_TEXTURE_RECTANGLE_ARB);
+		glBindTexture(GL_TEXTURE_RECTANGLE_ARB, s.texture_id);
+	}
 }
 
 Surface::Use::~Use() {
-	glDisable(GL_TEXTURE_2D);
+	int gl2Supported = atof((char*)glGetString(GL_VERSION)) >= 2.0;
+	bool hasTexture_non_power_of_two = checkExtension("GL_ARB_texture_non_power_of_two");
+
+	if (gl2Supported && hasTexture_non_power_of_two) { // Use OpenGL 2.0 functionality 
+		glDisable(GL_TEXTURE_2D);
+	} else {
+//		glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
+		glDisable(GL_TEXTURE_RECTANGLE_ARB);	
+	}
 }
 
 void Surface::draw() {

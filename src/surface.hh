@@ -71,4 +71,6 @@ class Surface: boost::noncopyable {
 	GLuint texture_id;
 };
 
+bool checkExtension(const char* extension);
+
 #endif
