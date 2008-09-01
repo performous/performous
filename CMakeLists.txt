@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 2.6)
 add_subdirectory(audio)
 
 FILE(GLOB SOURCE_FILES "src/*.cpp")
-FILE(GLOB HEADER_FILES "src/*.h")
+FILE(GLOB HEADER_FILES "src/*.hh")
 
 set(SOURCES ${SOURCE_FILES} ${HEADER_FILES})
 
