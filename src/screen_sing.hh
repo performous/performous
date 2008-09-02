@@ -3,6 +3,7 @@
 
 #include "../config.h"
 
+#include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/scoped_ptr.hpp>
 #include "screen.hh"
 #include "pitch_graph.hh"
@@ -14,15 +15,15 @@
 
 class CScreenSing: public CScreen {
   public:
-	CScreenSing(std::string const& name, Analyzer const& analyzer):
-	  CScreen(name), m_analyzer(analyzer)
+	CScreenSing(std::string const& name, boost::ptr_vector<Analyzer> const& analyzers):
+	  CScreen(name), m_analyzers(analyzers)
 	{}
 	void enter();
 	void exit();
 	void manageEvent(SDL_Event event);
 	void draw();
   private:
-	Analyzer const& m_analyzer;
+	boost::ptr_vector<Analyzer> const& m_analyzers;
 	boost::scoped_ptr<Surface> m_background;
 	boost::scoped_ptr<Video> m_video;
 	boost::scoped_ptr<Surface> m_notelines;

@@ -90,9 +90,6 @@ void CScreenSing::draw() {
 		return;
 	}
 	Song& song = sm->getSongs()->current();
-	const_cast<Analyzer&>(m_analyzer).process(); // FIXME: do in game engine thread
-	Tone const* tone = m_analyzer.findTone();
-	double freq = (tone ? tone->freq : 0.0);
 	double oldfontsize;
 	theme->theme->clear();
 	// Get the time in the song
@@ -118,7 +115,7 @@ void CScreenSing::draw() {
 
 	double songPercent = time / sm->getAudio()->getLength();
 	// Update scoring
-	song.update(time, freq);
+	// XXX: song.update(time, freq);
 	// Here we compute all about the lyrics
 	lyrics->updateSentences(time);
 	std::string sentenceNextSentence = lyrics->getSentenceNext();
@@ -142,6 +139,7 @@ void CScreenSing::draw() {
 	//draw score
 	theme->p1score.text = (boost::format("%04d") % song.getScore()).str();
 	theme->theme->PrintText(&theme->p1score);
+	/*
 	// draw the sang note TODO: themed sang note
 	{
 		TThemeTxt tmptxt = theme->timertxt; // use timertxt as template
@@ -150,6 +148,7 @@ void CScreenSing::draw() {
 		tmptxt.fontsize = 25;
 		theme->theme->PrintText(&tmptxt);
 	}
+	*/
 	double pixUnit = 0.3;
 	m_sentence = lyrics->getCurrentSentence();
 	double min = song.noteMin - 7.0;

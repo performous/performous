@@ -200,9 +200,9 @@ int main(int argc, char** argv) {
 		sm.setVideoDriver(&vd);
 		sm.addScreen(new CScreenIntro("Intro"));
 		sm.addScreen(new CScreenSongs("Songs", songdirs));
-		Capture capture(cdev, crate);
-		sm.addScreen(new CScreenSing("Sing", capture.analyzer()));
-		sm.addScreen(new CScreenPractice("Practice", capture.analyzer()));
+		Capture capture(2, cdev, crate);
+		sm.addScreen(new CScreenSing("Sing", capture.analyzers()));
+		sm.addScreen(new CScreenPractice("Practice", capture.analyzers()[0])); // TODO: multiple analyzers for practice
 		sm.addScreen(new CScreenScore("Score"));
 		sm.addScreen(new CScreenConfiguration("Configuration"));
 		sm.activateScreen("Intro");

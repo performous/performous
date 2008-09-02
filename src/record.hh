@@ -3,28 +3,31 @@
 
 #include <audio.hpp>
 #include "pitch.hh"
-#include <iostream>
+#include <boost/ptr_container/ptr_vector.hpp>
 
 class Capture {
 	static const std::size_t DEFAULT_RATE = 48000;
-	Analyzer m_analyzer;
+	// The order of the following variables is important!
+	boost::ptr_vector<Analyzer> m_analyzers;
 	da::settings m_rs;
 	da::record m_record;
   public:
-	Capture(std::string const& device = "", std::size_t rate = DEFAULT_RATE):
+	Capture(std::size_t channels = 2, std::string const& device = "", std::size_t rate = DEFAULT_RATE):
 	  m_rs(da::settings(device)
 	  .set_callback(boost::ref(*this))
-	  .set_channels(1)
+	  .set_channels(channels)
 	  .set_rate(rate)
 	  .set_debug(std::cerr)),
 	  m_record(m_rs)
 	{
-		m_analyzer.setRate(m_rs.rate());
+		for (std::size_t ch = 0; ch < channels; ++ch) {
+			m_analyzers.push_back(new Analyzer(m_rs.rate()));
+		}
 	}
 	void operator()(da::pcm_data& areas, da::settings const&) {
-		m_analyzer.input(areas.begin(0), areas.end(0));
+		for (std::size_t ch = 0; ch < m_analyzers.size(); ++ch) m_analyzers[ch].input(areas.begin(ch), areas.end(ch));
 	}
-	Analyzer const& analyzer() const { return m_analyzer; }
+	boost::ptr_vector<Analyzer> const& analyzers() const { return m_analyzers; }
 };
 
 #endif

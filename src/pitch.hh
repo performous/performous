@@ -34,8 +34,7 @@ class Analyzer {
   public:
 	typedef std::vector<std::complex<float> > fft_t;
 	typedef std::list<Tone> tones_t;
-	Analyzer(std::size_t step = 500);
-	void setRate(double rate) { m_rate = rate; }
+	Analyzer(double rate, std::size_t step = 500);
 	/** Add input data to buffer. This is thread-safe (against other functions). **/
 	template <typename InIt> void input(InIt begin, InIt end) {
 		boost::mutex::scoped_lock l(m_mutex);

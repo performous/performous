@@ -35,9 +35,9 @@ bool Tone::operator==(double f) const {
 	return std::abs(freq / f - 1.0) < 0.05;
 }
 
-Analyzer::Analyzer(size_t step):
+Analyzer::Analyzer(double rate, size_t step):
   m_step(step),
-  m_rate(std::numeric_limits<double>::quiet_NaN()),
+  m_rate(rate),
   m_window(FFT_N),
   m_fftLastPhase(FFT_N / 2),
   m_peak(-std::numeric_limits<double>::infinity())
