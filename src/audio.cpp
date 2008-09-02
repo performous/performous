@@ -293,7 +293,7 @@ void CAudio::stopMusic_internal() {
 double CAudio::getPosition_internal() {
 	double position = 0.0;
 #ifdef USE_FFMPEG_AUDIO
-	position = m_mpeg->position();
+	if (m_mpeg) position = m_mpeg->position();
 #endif
 #ifdef USE_LIBXINE_AUDIO
 	int pos_stream;

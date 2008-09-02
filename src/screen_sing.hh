@@ -5,6 +5,7 @@
 
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/scoped_ptr.hpp>
+#include "engine.hh"
 #include "screen.hh"
 #include "pitch_graph.hh"
 #include "theme.hh"
@@ -15,7 +16,7 @@
 
 class CScreenSing: public CScreen {
   public:
-	CScreenSing(std::string const& name, boost::ptr_vector<Analyzer> const& analyzers):
+	CScreenSing(std::string const& name, boost::ptr_vector<Analyzer>& analyzers):
 	  CScreen(name), m_analyzers(analyzers)
 	{}
 	void enter();
@@ -23,11 +24,12 @@ class CScreenSing: public CScreen {
 	void manageEvent(SDL_Event event);
 	void draw();
   private:
-	boost::ptr_vector<Analyzer> const& m_analyzers;
+	boost::ptr_vector<Analyzer>& m_analyzers;
 	boost::scoped_ptr<Surface> m_background;
 	boost::scoped_ptr<Video> m_video;
 	boost::scoped_ptr<Surface> m_notelines;
 	boost::scoped_ptr<Surface> m_wave;
+	boost::scoped_ptr<Engine> m_engine;
 	// Keeps the pitch tracking graphics
 	// in separate surface
 	PitchGraph pitchGraph;

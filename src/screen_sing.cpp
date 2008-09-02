@@ -8,6 +8,8 @@
 #include <iostream>
 #include <iomanip>
 
+const double Engine::TIMESTEP = 0.01; // FIXME: Move this elsewhere
+
 void CScreenSing::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	Song& song = sm->getSongs()->current();
@@ -22,6 +24,7 @@ void CScreenSing::enter() {
 	std::cout << "Now playing: " << file << std::endl;
 	CAudio& audio = *sm->getAudio();
 	audio.playMusic(file.c_str());
+	m_engine.reset(new Engine(audio, m_analyzers.begin(), m_analyzers.end()));
 	lyrics.reset(new Lyrics(song.notes));
 	playOffset = 0.0;
 	song.reset();
@@ -40,6 +43,7 @@ void CScreenSing::exit() {
 	pitchGraph.clear();
 	m_notelines.reset();
 	m_wave.reset();
+	m_engine.reset();
 }
 
 void CScreenSing::manageEvent(SDL_Event event) {
@@ -186,34 +190,41 @@ void CScreenSing::draw() {
 			w_pixel = (it->end - it->begin) * pixUnit;
 			drawRectangleOpenGL(x_pixel,y_pixel,w_pixel,h_pixel,r, g, b, a);
 		}
-		// Pitch graph (draft)
-		glColor4f(52/255.0, 101/255.0, 164/255.0, m_notealpha);
+		// Pitch graph
 		Surface::Use texture(*m_wave);
-		double oldy = std::numeric_limits<double>::quiet_NaN();
-		for (double x = -0.5; x < -0.2; x += 0.01 * pixUnit) {
-			if (x + 0.01 * pixUnit >= -0.2) x = -0.2;
-			double t = x + 0.2 + time * pixUnit;
-			double y = sin(remainder(t, 8.0) * 5.0) * 0.1;
-			//double thickness = (std::min(0.0, std::max(-1.0, (tone ? tone->stabledb : -100.0) / 40.0))+1.0) * 0.01;
-			double thickness = 0.005;
-			if (thickness == 0.0 || std::abs(oldy - y) > 0.01) {
-				if (oldy == oldy) {
-					glEnd();
-					oldy = std::numeric_limits<double>::quiet_NaN();
+		std::list<Player> players = m_engine->getPlayers();
+		for (std::list<Player>::const_iterator p = players.begin(); p != players.end(); ++p) {
+			glColor4f(p->m_color.r, p->m_color.g, p->m_color.b, m_notealpha);
+			double oldy = std::numeric_limits<double>::quiet_NaN();
+			Player::pitch_t::const_reverse_iterator it = p->m_pitch.rbegin();
+			for (double x = -0.2; x > -0.5 && it != p->m_pitch.rend(); x -= Engine::TIMESTEP * pixUnit, ++it) {
+				double t = time + (x + 0.2) / pixUnit;
+				// Find the currently playing note or the next playing note (or the last note?)
+				std::size_t i = 0;
+				while (i < song.notes.size() && t > song.notes[i].end) ++i;
+				Note const& n = song.notes[i];
+				double y = baseY + (n.note + n.diff(song.scale.getNote(it->first))) * noteUnit;
+				double thickness = (y != y) ? 0.0 : (std::max(0.0, std::min(1.0, 1.0 + it->second / 60.0))) + 0.5;
+				thickness *= -noteUnit;
+				if (thickness == 0.0 || std::abs(oldy - y) > 0.01) {
+					if (oldy == oldy) {
+						glEnd();
+						oldy = std::numeric_limits<double>::quiet_NaN();
+					}
+				}
+				if (thickness > 0.0) {
+					if (oldy != oldy) {
+						glBegin(GL_TRIANGLE_STRIP);
+						glTexCoord2f(30.0 * t, 0.5f); glVertex2f(x, y);
+					} else {
+						glTexCoord2f(30.0 * t, 0.0f); glVertex2f(x, y - thickness);
+						glTexCoord2f(30.0 * t, 1.0f); glVertex2f(x, y + thickness);
+					}
+					oldy = y;
 				}
 			}
-			if (thickness > 0.0) {
-				if (oldy != oldy) {
-					glBegin(GL_TRIANGLE_STRIP);
-					glTexCoord2f(100.0 * t, 0.5f); glVertex2f(x, y);
-				} else {
-					glTexCoord2f(100.0 * t, 0.0f); glVertex2f(x, y - thickness);
-					glTexCoord2f(100.0 * t, 1.0f); glVertex2f(x, y + thickness);
-				}
-				oldy = y;
-			}
+			if (oldy == oldy) glEnd();
 		}
-		if (oldy == oldy) glEnd();
 	}
 	glColor3f(1.0, 1.0, 1.0);
 /* Doesn't work correctly with scrolling notes, multiplayer, etc (old pitch graph stuff), to be removed

@@ -27,7 +27,7 @@ class Capture {
 	void operator()(da::pcm_data& areas, da::settings const&) {
 		for (std::size_t ch = 0; ch < m_analyzers.size(); ++ch) m_analyzers[ch].input(areas.begin(ch), areas.end(ch));
 	}
-	boost::ptr_vector<Analyzer> const& analyzers() const { return m_analyzers; }
+	boost::ptr_vector<Analyzer>& analyzers() { return m_analyzers; }
 };
 
 #endif
