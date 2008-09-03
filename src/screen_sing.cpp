@@ -97,7 +97,7 @@ void CScreenSing::draw() {
 	double oldfontsize;
 	theme->theme->clear();
 	// Get the time in the song
-	double time = sm->getAudio()->getPosition();
+	double time = sm->getAudio()->getPosition() + 0.02; // Compensate avg. lag to display
 	time = std::max(0.0, time + playOffset);
 	/* Auto-analysis code
 	while (m_songit != song.notes.end() && time > 0.3 * m_songit->begin + 0.7 * m_songit->end) {
@@ -118,8 +118,6 @@ void CScreenSing::draw() {
 	*/
 
 	double songPercent = time / sm->getAudio()->getLength();
-	// Update scoring
-	// XXX: song.update(time, freq);
 	// Here we compute all about the lyrics
 	lyrics->updateSentences(time);
 	std::string sentenceNextSentence = lyrics->getSentenceNext();

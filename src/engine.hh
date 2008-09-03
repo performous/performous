@@ -62,7 +62,7 @@ class Engine {
 	void operator()() {
 		while (!m_quit) {
 			std::for_each(m_players.begin(), m_players.end(), boost::bind(&Player::prepare, _1));
-			double t = m_audio.getPosition();
+			double t = m_audio.getPosition() - 0.05; // Compensate avg. audio input lag
 			double timeLeft = m_time * TIMESTEP - t;
 			if (timeLeft > 0.0) { boost::thread::sleep(now() + std::min(TIMESTEP, timeLeft * 0.1)); continue; }
 			boost::mutex::scoped_lock l(m_mutex);
