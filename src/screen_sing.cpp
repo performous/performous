@@ -89,7 +89,7 @@ void drawRectangleOpenGL(double x, double y, double w, double h,
 void CScreenSing::draw() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	if (!sm->getAudio()->isPlaying()) {
-		sm->activateScreen("Score");
+		sm->activateScreen("Songs"/* FIXME:"Score"*/);
 		return;
 	}
 	Song& song = sm->getSongs()->current();
@@ -160,6 +160,7 @@ void CScreenSing::draw() {
 	// Draw note lines
 	if (m_songit == song.notes.end() || m_songit->begin > time + 3.0) m_notealpha -= 0.02f;
 	else if (m_notealpha < 1.0f) m_notealpha += 0.02f;
+	std::list<Player> players = m_engine->getPlayers();
 	if (m_notealpha <= 0.0f) {
 		m_notealpha = 0.0f;
 	} else {
@@ -186,7 +187,6 @@ void CScreenSing::draw() {
 		}
 		// Pitch graph
 		Surface::Use texture(*m_wave);
-		std::list<Player> players = m_engine->getPlayers();
 		for (std::list<Player>::const_iterator p = players.begin(); p != players.end(); ++p) {
 			glColor4f(p->m_color.r, p->m_color.g, p->m_color.b, m_notealpha);
 			float tex = 0.0;
@@ -225,10 +225,10 @@ void CScreenSing::draw() {
 			}
 		}
 		glColor3f(1.0, 1.0, 1.0);
-		//draw score
-		theme->p1score.text = (boost::format("%04d, %04d") % players.begin()->getScore() % players.rbegin()->getScore()).str();
-		theme->theme->PrintText(&theme->p1score);
 	}
+	//draw score
+	theme->p1score.text = (boost::format("%04d, %04d") % players.begin()->getScore() % players.rbegin()->getScore()).str();
+	theme->theme->PrintText(&theme->p1score);
 
 	// Render the lyrics - OPTIMIZE: This part is very slow and needs to be optimized
 	TThemeTxt tmptxt = theme->lyricspast;
