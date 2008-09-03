@@ -71,10 +71,10 @@ class Song: boost::noncopyable {
 	double videoGap;
 	double start;
 	MusicalScale scale;
-        std::vector<double> timePitchGraph;
-        std::vector<double> pitchPitchGraph;
-        std::vector<double> volumePitchGraph;
-        std::vector<bool> drawPitchGraph;
+	std::vector<double> timePitchGraph;
+	std::vector<double> pitchPitchGraph;
+	std::vector<double> volumePitchGraph;
+	std::vector<bool> drawPitchGraph;
   private:
 	double m_scoreFactor; // Normalization factor for the scoring system
 	// Temporary score calculation system
