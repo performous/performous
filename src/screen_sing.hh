@@ -29,6 +29,7 @@ class CScreenSing: public CScreen {
 	boost::scoped_ptr<Video> m_video;
 	boost::scoped_ptr<Surface> m_notelines;
 	boost::scoped_ptr<Surface> m_wave;
+	boost::scoped_ptr<Surface> m_notebar;
 	boost::scoped_ptr<Engine> m_engine;
 	// Keeps the pitch tracking graphics
 	// in separate surface
@@ -38,6 +39,7 @@ class CScreenSing: public CScreen {
 	bool finished;
 	double playOffset;
 	float m_notealpha;
+	double min, max;
 	boost::scoped_ptr<CThemeSing> theme;
 	boost::scoped_ptr<Lyrics> lyrics;
 	Song::notes_t::const_iterator m_songit;

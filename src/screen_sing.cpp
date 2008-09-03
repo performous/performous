@@ -19,6 +19,7 @@ void CScreenSing::enter() {
 	TRYLOAD(video, Video)
 #undef TRYLOAD
 	if (!m_notelines) m_notelines.reset(new Surface(sm->getThemePathFile("notelines.svg"),Surface::SVG));
+	if (!m_notebar) m_notebar.reset(new Surface(sm->getThemePathFile("notebar.svg"),Surface::SVG));
 	if (!m_wave) m_wave.reset(new Surface(sm->getThemePathFile("wave.png"),Surface::MAGICK));
 	std::string file = song.path + song.mp3;
 	std::cout << "Now playing: " << file << std::endl;
@@ -30,6 +31,8 @@ void CScreenSing::enter() {
 	m_songit = song.notes.begin();
 	audio.wait(); // Until playback starts
 	m_notealpha = 0.0f;
+	min = song.noteMin - 7.0;
+	max = song.noteMax + 7.0;
 }
 
 void CScreenSing::exit() {
@@ -147,16 +150,28 @@ void CScreenSing::draw() {
 		theme->theme->PrintText(&tmptxt);
 	}
 	*/
-	double pixUnit = 0.3;
-	m_sentence = lyrics->getCurrentSentence();
-	double min = song.noteMin - 7.0;
-	double max = song.noteMax + 7.0;
-	double noteUnit = -0.5 / std::max(32.0, max - min);
-	double baseY = -0.5 * (min + max) * noteUnit;
 	const double baseLine = -0.2;
-	double baseX = baseLine - time * pixUnit;
+	const double pixUnit = 0.2;
 	// Update m_songit (which note to start the rendering from)
 	while (m_songit != song.notes.end() && (m_songit->type == Note::SLEEP || m_songit->end < time - (baseLine + 0.5) / pixUnit)) ++m_songit;
+	{
+		int low = song.noteMax;
+		int high = song.noteMin;
+		for (Song::notes_t::const_iterator it = m_songit; it != song.notes.end() && it->begin < time + 5.0; ++it) {
+			if (it->note < low) low = it->note;
+			if (it->note > high) high = it->note;
+		}
+		if (low <= high) {
+			if (low < min + 7.0) min -= 0.1;
+			else if (low > min + 8.0) min += 0.1;
+			if (high > max - 7.0) max += 0.1;
+			else if (high < max - 8.0) max -= 0.1;
+		}
+	}
+	m_sentence = lyrics->getCurrentSentence();
+	double noteUnit = -0.5 / std::max(16.0, max - min);
+	double baseY = -0.5 * (min + max) * noteUnit;
+	double baseX = baseLine - time * pixUnit;
 	// Draw note lines
 	if (m_songit == song.notes.end() || m_songit->begin > time + 3.0) m_notealpha -= 0.02f;
 	else if (m_notealpha < 1.0f) m_notealpha += 0.02f;
@@ -170,20 +185,41 @@ void CScreenSing::draw() {
 		m_notelines->tex.y1 = (-min - 7.0) / 12.0f;
 		m_notelines->draw();
 		// Draw notes
-		for (Song::notes_t::const_iterator it = m_songit; it != song.notes.end() && it->begin < time - (baseLine - 0.5) / pixUnit; ++it) {
-			if (it->type == Note::SLEEP) continue;
-			float r,g,b,a;
-			switch (it->type) {
-			  case Note::FREESTYLE: r = 0.6; g = 1.0; b = 0.6; a = 1.0; break;
-			  case Note::GOLDEN: r = 1.0; g = 0.8; b = 0.0; a = 1.0; break;
-			  default: r = 0.8; g = 0.8; b = 1.0; a = 1.0;
+		{
+			Surface::Use texture(*m_notebar);
+			for (Song::notes_t::const_iterator it = m_songit; it != song.notes.end() && it->begin < time - (baseLine - 0.5) / pixUnit; ++it) {
+				if (it->type == Note::SLEEP) continue;
+				float r,g,b,a;
+				switch (it->type) {
+				  case Note::FREESTYLE: r = 0.6; g = 1.0; b = 0.6; a = 1.0; break;
+				  case Note::GOLDEN: r = 1.0; g = 0.8; b = 0.0; a = 1.0; break;
+				  default: r = 0.8; g = 0.8; b = 1.0; a = 1.0;
+				}
+				double y_pixel,x_pixel,h_pixel,w_pixel;
+				h_pixel = -noteUnit;
+				y_pixel = baseY + it->note * noteUnit - 0.5 * h_pixel;
+				x_pixel = baseX + it->begin * pixUnit;
+				w_pixel = (it->end - it->begin) * pixUnit;
+				glBegin(GL_TRIANGLE_STRIP);
+				glTexCoord2f(0.0f, 0.0f); glVertex2f(x_pixel, y_pixel);
+				glTexCoord2f(0.0f, 1.0f); glVertex2f(x_pixel, y_pixel + h_pixel);
+				if (w_pixel >= 2.0 * h_pixel) {
+					glTexCoord2f(0.5f, 0.0f); glVertex2f(x_pixel + h_pixel, y_pixel);
+					glTexCoord2f(0.5f, 1.0f); glVertex2f(x_pixel + h_pixel, y_pixel + h_pixel);
+					glTexCoord2f(0.5f, 0.0f); glVertex2f(x_pixel + w_pixel - h_pixel, y_pixel);
+					glTexCoord2f(0.5f, 1.0f); glVertex2f(x_pixel + w_pixel - h_pixel, y_pixel + h_pixel);
+				} else {
+					float crop = 0.5f * h_pixel / w_pixel;
+					glTexCoord2f(crop, 0.0f); glVertex2f(x_pixel + 0.5 * w_pixel, y_pixel);
+					glTexCoord2f(crop, 1.0f); glVertex2f(x_pixel + 0.5 * w_pixel, y_pixel + h_pixel);
+					glTexCoord2f(1.0f - crop, 0.0f); glVertex2f(x_pixel + 0.5 * w_pixel, y_pixel);
+					glTexCoord2f(1.0f - crop, 1.0f); glVertex2f(x_pixel + 0.5 * w_pixel, y_pixel + h_pixel);
+				}
+				glTexCoord2f(1.0f, 0.0f); glVertex2f(x_pixel + w_pixel, y_pixel);
+				glTexCoord2f(1.0f, 1.0f); glVertex2f(x_pixel + w_pixel, y_pixel + h_pixel);
+				glEnd();
+				//drawRectangleOpenGL(x_pixel,y_pixel,w_pixel,h_pixel,r, g, b, a);
 			}
-			double y_pixel,x_pixel,h_pixel,w_pixel;
-			h_pixel = -noteUnit;
-			y_pixel = baseY + it->note * noteUnit - 0.5 * h_pixel;
-			x_pixel = baseX + it->begin * pixUnit;
-			w_pixel = (it->end - it->begin) * pixUnit;
-			drawRectangleOpenGL(x_pixel,y_pixel,w_pixel,h_pixel,r, g, b, a);
 		}
 		// Pitch graph
 		Surface::Use texture(*m_wave);
