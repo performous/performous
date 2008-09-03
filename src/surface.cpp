@@ -60,10 +60,9 @@ void Surface::load(unsigned int width, unsigned int height, Format format, unsig
 	tex.x2 = tex.y2 = 1.0f;
 	glGenTextures(1, &texture_id);
 
-	int gl2Supported = atof((char*)glGetString(GL_VERSION)) >= 2.0;
 	bool hasTexture_non_power_of_two = checkExtension("GL_ARB_texture_non_power_of_two");
 
-	if (gl2Supported && hasTexture_non_power_of_two) { // Use OpenGL 2.0 functionality 
+	if (hasTexture_non_power_of_two) {
 		glBindTexture(GL_TEXTURE_2D, texture_id);
 
 		// when texture area is small, bilinear filter the closest mipmap
@@ -77,7 +76,7 @@ void Surface::load(unsigned int width, unsigned int height, Format format, unsig
 		glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
 		glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 
-	}else {
+	} else {
 		glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texture_id);
 	}
 
@@ -110,7 +109,7 @@ void Surface::load(unsigned int width, unsigned int height, Format format, unsig
 	}
        	glPixelStorei(GL_UNPACK_SWAP_BYTES, swap );
 
-	if (gl2Supported && hasTexture_non_power_of_two) { // Use OpenGL 2.0 functionality 
+	if (hasTexture_non_power_of_two) { // Use OpenGL 2.0 functionality 
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, fmt, buffer_fmt, buffer);	
 	}
 	else {
@@ -122,28 +121,12 @@ void Surface::load(unsigned int width, unsigned int height, Format format, unsig
 }
 
 Surface::Use::Use(Surface& s) {
-	int gl2Supported = atof((char*)glGetString(GL_VERSION)) >= 2.0;
-	bool hasTexture_non_power_of_two = checkExtension("GL_ARB_texture_non_power_of_two");
-
-	if (gl2Supported && hasTexture_non_power_of_two) { // Use OpenGL 2.0 functionality 
-		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, s.texture_id);
-	} else {
-		glEnable(GL_TEXTURE_RECTANGLE_ARB);
-		glBindTexture(GL_TEXTURE_RECTANGLE_ARB, s.texture_id);
-	}
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, s.texture_id);
 }
 
 Surface::Use::~Use() {
-	int gl2Supported = atof((char*)glGetString(GL_VERSION)) >= 2.0;
-	bool hasTexture_non_power_of_two = checkExtension("GL_ARB_texture_non_power_of_two");
-
-	if (gl2Supported && hasTexture_non_power_of_two) { // Use OpenGL 2.0 functionality 
-		glDisable(GL_TEXTURE_2D);
-	} else {
-//		glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
-		glDisable(GL_TEXTURE_RECTANGLE_ARB);	
-	}
+	glDisable(GL_TEXTURE_2D);
 }
 
 void Surface::draw() {
