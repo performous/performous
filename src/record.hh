@@ -4,6 +4,7 @@
 #include <audio.hpp>
 #include "pitch.hh"
 #include <boost/ptr_container/ptr_vector.hpp>
+#include <iostream>
 
 class Capture {
 	static const std::size_t DEFAULT_RATE = 48000;
