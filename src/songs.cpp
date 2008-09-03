@@ -309,9 +309,7 @@ Song::Song(std::string const& _path, std::string const& _filename):
   filename(_filename),
   videoGap(),
   start(),
-  m_scoreFactor(),
-  m_score(),
-  m_scoreTime()
+  m_scoreFactor()
 {
 	SongParser(*this);
 }
@@ -337,37 +335,6 @@ void Song::reload() {
 	try {
 		SongParser(*this);
 	} catch (...) {}
-	reset();
-}
-
-void Song::reset() {
-	m_score = 0.0;
-	m_scoreTime = 0.0;
-	m_scoreIt = notes.begin();
-}
-
-void Song::resetPitchGraph() {
-	timePitchGraph.clear();
-	pitchPitchGraph.clear();	
-	volumePitchGraph.clear();	
-}
-
-void Song::updatePitchGraph(double time, double pitch, double volume, bool draw) {
-	timePitchGraph.push_back(time);
-	pitchPitchGraph.push_back(pitch);
-	volumePitchGraph.push_back(volume);
-	drawPitchGraph.push_back(draw);
-}
-
-void Song::update(double time, double freq) {
-	if (time <= m_scoreTime) return;
-	while (m_scoreIt != notes.end()) {
-		if (freq > 0.0) m_score += m_scoreFactor * m_scoreIt->score(scale.getNote(freq), m_scoreTime, time);
-		if (time < m_scoreIt->end) break;
-		++m_scoreIt;
-	}
-	m_scoreTime = time;
-	m_score = std::min(1.0, std::max(0.0, m_score));
 }
 
 bool operator<(Song const& l, Song const& r) {

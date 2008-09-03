@@ -25,7 +25,7 @@ void CScreenScore::draw() {
 	theme->theme->clear();
 	theme->bg->draw();
 	// Draw some numbers
-	int score = song.getScore();
+	int score = 0; //FIXME: song.getScore();
 	char const* rank;
 	if (score > 8000) rank = "Hit singer";
 	else if (score > 6000) rank = "Lead singer";

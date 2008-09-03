@@ -1,6 +1,8 @@
 #include "audio.hh"
 #include "pitch.hh"
 #include "xtime.hh"
+#include "songs.hh"
+#include "screen.hh"
 #include <boost/bind.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
@@ -16,15 +18,28 @@ struct Player {
 	typedef std::vector<std::pair<double, double> > pitch_t;
 	pitch_t m_pitch;
 	double m_score;
+	Song::notes_t::const_iterator m_scoreIt;
 	Player(Analyzer& analyzer): m_analyzer(analyzer), m_score() {}
 	void prepare() { m_analyzer.process(); }
 	void update() {
 		Tone const* t = m_analyzer.findTone();
-		if (t) m_pitch.push_back(std::make_pair(t->freq, t->stabledb));
+		if (t) {
+			Song const& s = CScreenManager::getSingletonPtr()->getSongs()->current(); // XXX: Kill ScreenManager
+			m_scoreIt = s.notes.begin(); // TODO: optimize
+			m_pitch.push_back(std::make_pair(t->freq, t->stabledb));
+			double beginTime = 0.01 * (m_pitch.size() - 1);  // XXX: 0.01 = Engine::TIMESTEP
+			double endTime = beginTime + 0.01;
+			while (m_scoreIt != s.notes.end()) {
+				m_score += s.m_scoreFactor * m_scoreIt->score(s.scale.getNote(t->freq), beginTime, endTime);
+				if (endTime < m_scoreIt->end) break;
+				++m_scoreIt;
+			}
+			m_score = std::min(1.0, std::max(0.0, m_score));
+		}
 		else m_pitch.push_back(std::make_pair(std::numeric_limits<double>::quiet_NaN(), -std::numeric_limits<double>::infinity()));
 	}
-	double score() const {
-		return m_score;
+	int getScore() const {
+		return 10000.0 * m_score;
 	}
 
 };

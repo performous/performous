@@ -27,7 +27,6 @@ void CScreenSing::enter() {
 	m_engine.reset(new Engine(audio, m_analyzers.begin(), m_analyzers.end()));
 	lyrics.reset(new Lyrics(song.notes));
 	playOffset = 0.0;
-	song.reset();
 	m_songit = song.notes.begin();
 	audio.wait(); // Until playback starts
 	m_notealpha = 0.0f;
@@ -51,7 +50,7 @@ void CScreenSing::manageEvent(SDL_Event event) {
 		CScreenManager* sm = CScreenManager::getSingletonPtr();
 		CAudio& audio = *sm->getAudio();
 		int key = event.key.keysym.sym;
-		if (key == SDLK_ESCAPE || key == SDLK_q || (key == SDLK_RETURN && m_sentence.empty())) sm->activateScreen(m_sentence.empty() ? "Score" : "Songs");
+		if (key == SDLK_ESCAPE || key == SDLK_q || (key == SDLK_RETURN && m_sentence.empty())) sm->activateScreen(m_sentence.empty() ? /*FIXME:"Score"*/ "Songs" : "Songs");
 		else if (key == SDLK_SPACE || key == SDLK_PAUSE) sm->getAudio()->togglePause();
 		else if (key == SDLK_PLUS) playOffset += 0.02;
 		else if (key == SDLK_MINUS) playOffset -= 0.02;
@@ -138,9 +137,6 @@ void CScreenSing::draw() {
 		theme->progressfg.x,theme->progressfg.y,
 		theme->progressfg.width,theme->progressfg.height,
 		theme->progressfg.fill_col.r, theme->progressfg.fill_col.g, theme->progressfg.fill_col.b, theme->progressfg.fill_col.a);
-	//draw score
-	theme->p1score.text = (boost::format("%04d") % song.getScore()).str();
-	theme->theme->PrintText(&theme->p1score);
 	/*
 	// draw the sang note TODO: themed sang note
 	{
@@ -228,8 +224,11 @@ void CScreenSing::draw() {
 				if (!next) glEnd();
 			}
 		}
+		glColor3f(1.0, 1.0, 1.0);
+		//draw score
+		theme->p1score.text = (boost::format("%04d, %04d") % players.begin()->getScore() % players.rbegin()->getScore()).str();
+		theme->theme->PrintText(&theme->p1score);
 	}
-	glColor3f(1.0, 1.0, 1.0);
 
 	// Render the lyrics - OPTIMIZE: This part is very slow and needs to be optimized
 	TThemeTxt tmptxt = theme->lyricspast;

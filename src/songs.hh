@@ -43,13 +43,6 @@ class Song: boost::noncopyable {
 	friend class SongParser;
 	Song(std::string const& path, std::string const& filename);
 	void reload();
-	// Temporary score calculation system
-	void reset();
-	// Temporary sentence end refresh
-	void resetPitchGraph();
-	void updatePitchGraph(double time, double pitch, double volume, bool draw);
-	void update(double time, double freq);
-	int getScore() const { return 10000 * m_score; }
 	bool parseField(std::string const& line);
 	std::string str() const { return title + "  by  " + artist; }
 	typedef std::vector<Note> notes_t;
@@ -75,12 +68,8 @@ class Song: boost::noncopyable {
 	std::vector<double> pitchPitchGraph;
 	std::vector<double> volumePitchGraph;
 	std::vector<bool> drawPitchGraph;
-  private:
 	double m_scoreFactor; // Normalization factor for the scoring system
-	// Temporary score calculation system
-	double m_score;
-	double m_scoreTime;
-	notes_t::const_iterator m_scoreIt;
+  private:
 };
 
 bool operator<(Song const& l, Song const& r);
