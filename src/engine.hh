@@ -13,7 +13,7 @@ struct Color { float r, g, b; };
 struct Player {
 	Analyzer& m_analyzer;
 	Color m_color;
-	typedef std::list<std::pair<double, double> > pitch_t;
+	typedef std::vector<std::pair<double, double> > pitch_t;
 	pitch_t m_pitch;
 	double m_score;
 	Player(Analyzer& analyzer): m_analyzer(analyzer), m_score() {}
@@ -32,7 +32,7 @@ struct Player {
 namespace {
 	Color playerColors[] = {
 		{ 52/255.0, 101/255.0, 164/255.0 },
-		{ 1.0, 0.3, 0.3 }
+		{ 0.8, 0.3, 0.3 }
 	};
 }
 
@@ -64,7 +64,7 @@ class Engine {
 			std::for_each(m_players.begin(), m_players.end(), boost::bind(&Player::prepare, _1));
 			double t = m_audio.getPosition();
 			double timeLeft = m_time * TIMESTEP - t;
-			if (timeLeft > 0.0) { boost::thread::sleep(now() + std::min(TIMESTEP, timeLeft * 0.6)); continue; }
+			if (timeLeft > 0.0) { boost::thread::sleep(now() + std::min(TIMESTEP, timeLeft * 0.1)); continue; }
 			boost::mutex::scoped_lock l(m_mutex);
 			std::for_each(m_players.begin(), m_players.end(), boost::bind(&Player::update, _1));
 			++m_time;

@@ -195,83 +195,43 @@ void CScreenSing::draw() {
 		std::list<Player> players = m_engine->getPlayers();
 		for (std::list<Player>::const_iterator p = players.begin(); p != players.end(); ++p) {
 			glColor4f(p->m_color.r, p->m_color.g, p->m_color.b, m_notealpha);
-			double oldy = std::numeric_limits<double>::quiet_NaN();
-			Player::pitch_t::const_reverse_iterator it = p->m_pitch.rbegin();
-			for (double x = -0.2; x > -0.5 && it != p->m_pitch.rend(); x -= Engine::TIMESTEP * pixUnit, ++it) {
-				double t = time + (x + 0.2) / pixUnit;
+			float tex = 0.0;
+			double t = std::max(0.0, time - 0.5 / pixUnit);
+			Player::pitch_t const& pitch = p->m_pitch;
+			size_t beginIdx = t / Engine::TIMESTEP;
+			size_t endIdx = pitch.size();
+			for (size_t idx = beginIdx; idx < endIdx; ++idx, t += Engine::TIMESTEP) {
+				if (pitch[idx] != pitch[idx]) continue;
+				bool prev = idx > beginIdx && pitch[idx - 1].first > 0.0;
+				bool next = idx < endIdx - 1 && pitch[idx + 1].first > 0.0;
+				if (!prev && !next) break;
+				double x = -0.2 + (t - time) * pixUnit;
 				// Find the currently playing note or the next playing note (or the last note?)
 				std::size_t i = 0;
 				while (i < song.notes.size() && t > song.notes[i].end) ++i;
 				Note const& n = song.notes[i];
-				double y = baseY + (n.note + n.diff(song.scale.getNote(it->first))) * noteUnit;
-				double thickness = (y != y) ? 0.0 : (std::max(0.0, std::min(1.0, 1.0 + it->second / 60.0))) + 0.5;
+				double freq = pitch[idx].first;
+				double y = baseY + (n.note + n.diff(song.scale.getNote(freq))) * noteUnit;
+				double thickness = (std::max(0.0, std::min(1.0, 1.0 + pitch[idx].second / 60.0))) + 0.5;
 				thickness *= -noteUnit;
-				if (thickness == 0.0 || std::abs(oldy - y) > 0.01) {
-					if (oldy == oldy) {
-						glEnd();
-						oldy = std::numeric_limits<double>::quiet_NaN();
-					}
+				tex += freq * 0.001;
+				// If pitch change is too fast, terminate and begin a new one
+				if (prev && std::abs(pitch[idx - 1].first / pitch[idx].first - 1.0) > 0.02) {
+					glEnd();
+					prev = false;
 				}
-				if (thickness > 0.0) {
-					if (oldy != oldy) {
-						glBegin(GL_TRIANGLE_STRIP);
-						glTexCoord2f(30.0 * t, 0.5f); glVertex2f(x, y);
-					} else {
-						glTexCoord2f(30.0 * t, 0.0f); glVertex2f(x, y - thickness);
-						glTexCoord2f(30.0 * t, 1.0f); glVertex2f(x, y + thickness);
-					}
-					oldy = y;
+				if (!prev) { tex = 0.0; glBegin(GL_TRIANGLE_STRIP); }
+				if (prev && next) {
+					glTexCoord2f(tex, 0.0f); glVertex2f(x, y - thickness);
+					glTexCoord2f(tex, 1.0f); glVertex2f(x, y + thickness);
+				} else {
+					glTexCoord2f(tex, 0.0f); glVertex2f(x, y);
 				}
+				if (!next) glEnd();
 			}
-			if (oldy == oldy) glEnd();
 		}
 	}
 	glColor3f(1.0, 1.0, 1.0);
-/* Doesn't work correctly with scrolling notes, multiplayer, etc (old pitch graph stuff), to be removed
-	if (!m_sentence.empty()) {
-		double graphTime = (baseX + time * pixUnit);
-		double graphTime2 = (baseX + time * pixUnit);
-		if (freq == 0.0) {
-			pitchGraph.renderPitch(0.0, graphTime, 0.0);
-			if (song.pitchPitchGraph.size() > 1){
-				double pitch=song.pitchPitchGraph[song.pitchPitchGraph.size()-1];
-				double volume = std::max(0.0, 1.0 + m_analyzer.getPeak() / 40.0);
-				song.updatePitchGraph(graphTime2, pitch, volume, 0);
-			}
-		} else {
-			unsigned int i = 0;
-			// Find the currently playing note or the next playing note (or the last note?)
-			while (i < m_sentence.size() && time > m_sentence[i].end) ++i;
-			Note const& n = m_sentence[i];
-			double volume = std::max(0.0, 1.0 + m_analyzer.getPeak() / 40.0);
-			//double pitch = (baseY + (n.note + n.diff(song.scale.getNote(freq))) * noteUnit);// / m_height;
-			double pitch = (baseY + (n.note + n.diff(song.scale.getNote(freq))) * noteUnit);
-			pitchGraph.renderPitch(0.5 + (baseY + (n.note + n.diff(song.scale.getNote(freq))) * noteUnit), 0.5 + graphTime, volume);
-			//drawRectangleOpenGL(graphTime2+5, pitch-5, 20, 20, 0.2, 52.0/255.0, 181.0/255.0, 164.0/255.0, 1.0);
-			song.updatePitchGraph(graphTime2, pitch, volume, 1);
-		}
-	}
-*/
-
-/*  Not currently functional (pitch graph code)
-	unsigned int ii;
-	for(ii=1; ii < song.timePitchGraph.size(); ii++)
-	{
-		double volume = 10+(5*song.volumePitchGraph[ii]);
-		if ((song.drawPitchGraph[ii-1] || song.drawPitchGraph[ii])){
-			double graphWidth = song.timePitchGraph[ii]-song.timePitchGraph[ii-1];
-			drawRectangleOpenGL(song.timePitchGraph[ii]-graphWidth, song.pitchPitchGraph[ii]-(volume/2)+10, graphWidth, volume, 0.2, 52.0/255.0, 101.0/255.0, 164.0/255.0, 1.0);
-//			drawRectangleOpenGL(song.timePitchGraph[ii]-graphWidth, song.pitchPitchGraph[ii]+10, graphWidth, 1, 0.2, 2.0/255.0, 254.0/255.0, 254.0/255.0, 1.0);
-			if ((ii+1) < song.timePitchGraph.size()){
-				if (song.pitchPitchGraph[ii] < song.pitchPitchGraph[ii+1]){
-					double graphHeight = (song.pitchPitchGraph[ii+1]-song.pitchPitchGraph[ii])/50;
-				} else {
-					double graphHeight = (song.pitchPitchGraph[ii]-song.pitchPitchGraph[ii+1])/50;
-				}
-			}
-		}
-	}
-*/
 
 	// Render the lyrics - OPTIMIZE: This part is very slow and needs to be optimized
 	TThemeTxt tmptxt = theme->lyricspast;
