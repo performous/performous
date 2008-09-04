@@ -32,6 +32,7 @@ themeslima_DATA = lima/icon.png \
 	lima/configuration_value.svg \
 	lima/wave.png \
 	lima/notebar.svg \
+	lima/notebar.png \
 	lima/menu.ogg
 
 EXTRA_DIST = $(themeslima_DATA)

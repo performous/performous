@@ -120,7 +120,7 @@ void Surface::load(unsigned int width, unsigned int height, Format format, unsig
 	}
 }
 
-Surface::Use::Use(Surface& s) {
+Surface::Use::Use(Surface const& s) {
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, s.texture_id);
 }

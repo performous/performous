@@ -30,6 +30,7 @@ class CScreenSing: public CScreen {
 	boost::scoped_ptr<Surface> m_notelines;
 	boost::scoped_ptr<Surface> m_wave;
 	boost::scoped_ptr<Surface> m_notebar;
+	boost::scoped_ptr<Surface> m_notebar_hl;
 	boost::scoped_ptr<Engine> m_engine;
 	// Keeps the pitch tracking graphics
 	// in separate surface

@@ -62,7 +62,7 @@ class Surface: boost::noncopyable {
 	~Surface();
 	void draw();
 	struct Use {
-		Use(Surface& s);
+		Use(Surface const& s);
 		~Use();
 	};
   private:

@@ -20,6 +20,7 @@ void CScreenSing::enter() {
 #undef TRYLOAD
 	if (!m_notelines) m_notelines.reset(new Surface(sm->getThemePathFile("notelines.svg"),Surface::SVG));
 	if (!m_notebar) m_notebar.reset(new Surface(sm->getThemePathFile("notebar.svg"),Surface::SVG));
+	if (!m_notebar_hl) m_notebar_hl.reset(new Surface(sm->getThemePathFile("notebar.png"),Surface::MAGICK));
 	if (!m_wave) m_wave.reset(new Surface(sm->getThemePathFile("wave.png"),Surface::MAGICK));
 	std::string file = song.path + song.mp3;
 	std::cout << "Now playing: " << file << std::endl;
@@ -78,15 +79,39 @@ void CScreenSing::manageEvent(SDL_Event event) {
 	}
 }
 
-void drawRectangleOpenGL(double x, double y, double w, double h,
-  float _r, float _g, float _b, float _a)
-{
-	glColor4f(_r, _g, _b, _a);
-	glBegin(GL_QUADS);
-	glVertex2f(x  ,y  ); glVertex2f(x  ,y+h);
-	glVertex2f(x+w,y+h); glVertex2f(x+w,y  );
-	glEnd();
-	glColor4f(1.0, 1.0, 1.0, 1.0);
+namespace {
+	void drawRectangleOpenGL(double x, double y, double w, double h,
+	  float _r, float _g, float _b, float _a)
+	{
+		glColor4f(_r, _g, _b, _a);
+		glBegin(GL_QUADS);
+		glVertex2f(x  ,y  ); glVertex2f(x  ,y+h);
+		glVertex2f(x+w,y+h); glVertex2f(x+w,y  );
+		glEnd();
+		glColor4f(1.0, 1.0, 1.0, 1.0);
+	}
+
+	void drawNotebar(Surface const& surf, double x, double y, double w, double h) {
+		Surface::Use texture(surf);
+		glBegin(GL_TRIANGLE_STRIP);
+		glTexCoord2f(0.0f, 0.0f); glVertex2f(x, y);
+		glTexCoord2f(0.0f, 1.0f); glVertex2f(x, y + h);
+		if (w >= 2.0 * h) {
+			glTexCoord2f(0.5f, 0.0f); glVertex2f(x + h, y);
+			glTexCoord2f(0.5f, 1.0f); glVertex2f(x + h, y + h);
+			glTexCoord2f(0.5f, 0.0f); glVertex2f(x + w - h, y);
+			glTexCoord2f(0.5f, 1.0f); glVertex2f(x + w - h, y + h);
+		} else {
+			float crop = 0.25f * w / h;
+			glTexCoord2f(crop, 0.0f); glVertex2f(x + 0.5 * w, y);
+			glTexCoord2f(crop, 1.0f); glVertex2f(x + 0.5 * w, y + h);
+			glTexCoord2f(1.0f - crop, 0.0f); glVertex2f(x + 0.5 * w, y);
+			glTexCoord2f(1.0f - crop, 1.0f); glVertex2f(x + 0.5 * w, y + h);
+		}
+		glTexCoord2f(1.0f, 0.0f); glVertex2f(x + w, y);
+		glTexCoord2f(1.0f, 1.0f); glVertex2f(x + w, y + h);
+		glEnd();
+	}
 }
 
 void CScreenSing::draw() {
@@ -169,7 +194,7 @@ void CScreenSing::draw() {
 		}
 	}
 	m_sentence = lyrics->getCurrentSentence();
-	double noteUnit = -0.5 / std::max(16.0, max - min);
+	double noteUnit = -0.5 / std::max(24.0, max - min);
 	double baseY = -0.5 * (min + max) * noteUnit;
 	double baseX = baseLine - time * pixUnit;
 	// Draw note lines
@@ -186,7 +211,6 @@ void CScreenSing::draw() {
 		m_notelines->draw();
 		// Draw notes
 		{
-			Surface::Use texture(*m_notebar);
 			for (Song::notes_t::const_iterator it = m_songit; it != song.notes.end() && it->begin < time - (baseLine - 0.5) / pixUnit; ++it) {
 				if (it->type == Note::SLEEP) continue;
 				float r,g,b,a;
@@ -196,28 +220,19 @@ void CScreenSing::draw() {
 				  default: r = 0.8; g = 0.8; b = 1.0; a = 1.0;
 				}
 				double y_pixel,x_pixel,h_pixel,w_pixel;
-				h_pixel = -noteUnit;
+				h_pixel = -noteUnit * 2.0; // Times two for borders
 				y_pixel = baseY + it->note * noteUnit - 0.5 * h_pixel;
-				x_pixel = baseX + it->begin * pixUnit;
-				w_pixel = (it->end - it->begin) * pixUnit;
-				glBegin(GL_TRIANGLE_STRIP);
-				glTexCoord2f(0.0f, 0.0f); glVertex2f(x_pixel, y_pixel);
-				glTexCoord2f(0.0f, 1.0f); glVertex2f(x_pixel, y_pixel + h_pixel);
-				if (w_pixel >= 2.0 * h_pixel) {
-					glTexCoord2f(0.5f, 0.0f); glVertex2f(x_pixel + h_pixel, y_pixel);
-					glTexCoord2f(0.5f, 1.0f); glVertex2f(x_pixel + h_pixel, y_pixel + h_pixel);
-					glTexCoord2f(0.5f, 0.0f); glVertex2f(x_pixel + w_pixel - h_pixel, y_pixel);
-					glTexCoord2f(0.5f, 1.0f); glVertex2f(x_pixel + w_pixel - h_pixel, y_pixel + h_pixel);
-				} else {
-					float crop = 0.5f * h_pixel / w_pixel;
-					glTexCoord2f(crop, 0.0f); glVertex2f(x_pixel + 0.5 * w_pixel, y_pixel);
-					glTexCoord2f(crop, 1.0f); glVertex2f(x_pixel + 0.5 * w_pixel, y_pixel + h_pixel);
-					glTexCoord2f(1.0f - crop, 0.0f); glVertex2f(x_pixel + 0.5 * w_pixel, y_pixel);
-					glTexCoord2f(1.0f - crop, 1.0f); glVertex2f(x_pixel + 0.5 * w_pixel, y_pixel + h_pixel);
+				x_pixel = baseX + it->begin * pixUnit - 0.5 * h_pixel; // h_pixel for borders
+				w_pixel = (it->end - it->begin) * pixUnit + h_pixel; // h_pixel for borders
+				drawNotebar(*m_notebar, x_pixel, y_pixel, w_pixel, h_pixel);
+				if (it->begin < time) {
+					double alpha = 1.0 - (time - it->begin) / (it->end - it->begin);
+					if (alpha > 0.0) {
+						glColor4f(1.0f, 1.0f, 1.0f, alpha * m_notealpha);
+						drawNotebar(*m_notebar_hl, x_pixel, y_pixel, w_pixel, h_pixel);
+						glColor4f(1.0f, 1.0f, 1.0f, m_notealpha);
+					}
 				}
-				glTexCoord2f(1.0f, 0.0f); glVertex2f(x_pixel + w_pixel, y_pixel);
-				glTexCoord2f(1.0f, 1.0f); glVertex2f(x_pixel + w_pixel, y_pixel + h_pixel);
-				glEnd();
 				//drawRectangleOpenGL(x_pixel,y_pixel,w_pixel,h_pixel,r, g, b, a);
 			}
 		}
