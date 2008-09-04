@@ -14,14 +14,14 @@ void CScreenSing::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	Song& song = sm->getSongs()->current();
 	theme.reset(new CThemeSing());
-	if (!song.background.empty()) { try { m_background.reset(new Surface(song.path + song.background,Surface::MAGICK)); } catch (std::exception& e) { std::cerr << e.what() << std::endl; } }
+	if (!song.background.empty()) { try { m_background.reset(new Surface(song.path + song.background)); } catch (std::exception& e) { std::cerr << e.what() << std::endl; } }
 #define TRYLOAD(field, class) if (!song.field.empty()) { try { m_##field.reset(new class(song.path + song.field)); } catch (std::exception& e) { std::cerr << e.what() << std::endl; } }
 	TRYLOAD(video, Video)
 #undef TRYLOAD
-	if (!m_notelines) m_notelines.reset(new Surface(sm->getThemePathFile("notelines.svg"),Surface::SVG));
-	if (!m_notebar) m_notebar.reset(new Surface(sm->getThemePathFile("notebar.svg"),Surface::SVG));
-	if (!m_notebar_hl) m_notebar_hl.reset(new Surface(sm->getThemePathFile("notebar.png"),Surface::MAGICK));
-	if (!m_wave) m_wave.reset(new Surface(sm->getThemePathFile("wave.png"),Surface::MAGICK));
+	if (!m_notelines) m_notelines.reset(new Surface(sm->getThemePathFile("notelines.svg")));
+	if (!m_notebar) m_notebar.reset(new Surface(sm->getThemePathFile("notebar.svg")));
+	if (!m_notebar_hl) m_notebar_hl.reset(new Surface(sm->getThemePathFile("notebar.png")));
+	if (!m_wave) m_wave.reset(new Surface(sm->getThemePathFile("wave.png")));
 	std::string file = song.path + song.mp3;
 	std::cout << "Now playing: " << file << std::endl;
 	CAudio& audio = *sm->getAudio();

@@ -6,8 +6,8 @@ CScreenPractice::CScreenPractice(std::string const& name, Analyzer const& analyz
 
 void CScreenPractice::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
-	m_surf_note.reset(new Surface(sm->getThemePathFile("practice_note.svg"),Surface::SVG));
-	m_surf_sharp.reset(new Surface(sm->getThemePathFile("practice_sharp.svg"),Surface::SVG));
+	m_surf_note.reset(new Surface(sm->getThemePathFile("practice_note.svg")));
+	m_surf_sharp.reset(new Surface(sm->getThemePathFile("practice_sharp.svg")));
 	m_surf_note->dimensions.fixedHeight(0.03);
 	m_surf_sharp->dimensions.fixedHeight(0.09);
 	theme.reset(new CThemePractice());

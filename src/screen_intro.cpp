@@ -2,7 +2,7 @@
 
 CScreenIntro::CScreenIntro(std::string const& name): CScreen(name) {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
-	background.reset(new Surface(sm->getThemePathFile("intro.svg"),Surface::SVG));
+	background.reset(new Surface(sm->getThemePathFile("intro.svg")));
 }
 
 void CScreenIntro::enter() {

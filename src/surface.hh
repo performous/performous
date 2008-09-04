@@ -55,10 +55,9 @@ class Surface: boost::noncopyable {
   	Dimensions dimensions;
 	TexCoords tex;
 	enum Format { INT_ARGB, CHAR_RGBA, RGB, BGR };
-	enum Filetype { MAGICK = 1, SVG = 2 };
 	Surface(unsigned width, unsigned height, Format format, unsigned char* buffer);
 	Surface(cairo_surface_t* _surf);
-	Surface(std::string filename, Filetype filetype);
+	Surface(std::string const& filename);
 	~Surface();
 	void draw();
 	struct Use {

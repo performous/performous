@@ -357,7 +357,7 @@ CTheme::~CTheme() {
 
 CThemeSongs::CThemeSongs() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
-	bg.reset(new Surface(sm->getThemePathFile("songs_bg.svg"),Surface::SVG));
+	bg.reset(new Surface(sm->getThemePathFile("songs_bg.svg")));
 	theme.reset(new CTheme());
 	theme->ParseSVGForText(sm->getThemePathFile("songs_song.svg"), &song);
 	theme->ParseSVGForText(sm->getThemePathFile("songs_order.svg"), &order);
@@ -365,7 +365,7 @@ CThemeSongs::CThemeSongs() {
 
 CThemePractice::CThemePractice() {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
-	bg.reset(new Surface(sm->getThemePathFile("practice_bg.svg"),Surface::SVG));
+	bg.reset(new Surface(sm->getThemePathFile("practice_bg.svg")));
 	theme.reset(new CTheme());
 	theme->ParseSVGForText(sm->getThemePathFile("practice_txt.svg"), &notetxt);
 	theme->ParseSVGForRect(sm->getThemePathFile("practice_peak.svg"), &peak);
@@ -373,8 +373,8 @@ CThemePractice::CThemePractice() {
 
 CThemeSing::CThemeSing() {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
-	bg.reset(new Surface(sm->getThemePathFile("sing_bg.svg"),Surface::SVG));
-	p1box.reset(new Surface(sm->getThemePathFile("sing_p1box.svg"),Surface::SVG));
+	bg.reset(new Surface(sm->getThemePathFile("sing_bg.svg")));
+	p1box.reset(new Surface(sm->getThemePathFile("sing_p1box.svg")));
 	theme.reset(new CTheme());
 	theme->ParseSVGForText(sm->getThemePathFile("sing_timetxt.svg"), &timertxt);
 	theme->ParseSVGForText(sm->getThemePathFile("sing_p1score.svg"), &p1score);
@@ -388,7 +388,7 @@ CThemeSing::CThemeSing() {
 
 CThemeScore::CThemeScore() {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
-	bg.reset(new Surface(sm->getThemePathFile("score_bg.svg"),Surface::SVG));
+	bg.reset(new Surface(sm->getThemePathFile("score_bg.svg")));
 	theme.reset(new CTheme());
 	theme->ParseSVGForText(sm->getThemePathFile("score_txt.svg"), &normal_score);
 	theme->ParseSVGForText(sm->getThemePathFile("score_rank.svg"), &rank);
@@ -397,7 +397,7 @@ CThemeScore::CThemeScore() {
 
 CThemeConfiguration::CThemeConfiguration() {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
-	bg.reset(new Surface(sm->getThemePathFile("configuration_bg.svg"),Surface::SVG));
+	bg.reset(new Surface(sm->getThemePathFile("configuration_bg.svg")));
 	theme.reset(new CTheme());
 	theme->ParseSVGForText(sm->getThemePathFile("configuration_item.svg"), &item);
 	theme->ParseSVGForText(sm->getThemePathFile("configuration_value.svg"), &value);
