@@ -81,6 +81,8 @@ class Engine {
 			double timeLeft = m_time * TIMESTEP - t;
 			if (timeLeft > 0.0) { boost::thread::sleep(now() + std::min(TIMESTEP, timeLeft * 0.1)); continue; }
 			boost::mutex::scoped_lock l(m_mutex);
+			Song::notes_t const& n = CScreenManager::getSingletonPtr()->getSongs()->current().notes; // XXX: Kill ScreenManager
+			for (Song::notes_t::const_iterator it = n.begin(); it != n.end(); ++it) it->power = 0.0f;
 			std::for_each(m_players.begin(), m_players.end(), boost::bind(&Player::update, _1));
 			++m_time;
 		}

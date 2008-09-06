@@ -26,6 +26,7 @@ class MusicalScale {
 
 struct Note {
 	double begin, end;
+	mutable double power;
 	enum Type { FREESTYLE = 'F', NORMAL = ':', GOLDEN = '*', SLEEP = '-'} type;
 	int note;
 	std::string syllable;

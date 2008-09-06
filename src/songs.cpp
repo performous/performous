@@ -104,14 +104,15 @@ double Note::score(double n, double b, double e) const {
 double Note::scoreMultiplier(double error) const {
 	double max = 0.0;
 	switch (type) {
-	  case FREESTYLE: return 1.0;
+	  case FREESTYLE: power += 1.0; return 1.0;
 	  case NORMAL: max = 1.0; break;
 	  case GOLDEN: max = 2.0; break;
 	  case SLEEP: break;
 	}
-	return std::min(1.0, std::max(0.0, 1.5 - error)) * max;
+	double accuracy = std::min(1.0, std::max(0.0, 1.5 - error));
+	power += accuracy;
+	return accuracy * max;
 }
-
 
 class SongParser {
   public:

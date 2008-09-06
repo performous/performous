@@ -180,6 +180,7 @@ void CScreenSing::draw() {
 	// Update m_songit (which note to start the rendering from)
 	while (m_songit != song.notes.end() && (m_songit->type == Note::SLEEP || m_songit->end < time - (baseLine + 0.5) / pixUnit)) ++m_songit;
 	{
+		// Automatically zooming notelines
 		int low = song.noteMax;
 		int high = song.noteMin;
 		for (Song::notes_t::const_iterator it = m_songit; it != song.notes.end() && it->begin < time + 5.0; ++it) {
@@ -187,10 +188,12 @@ void CScreenSing::draw() {
 			if (it->note > high) high = it->note;
 		}
 		if (low <= high) {
-			if (low < min + 7.0) min -= 0.1;
-			else if (low > min + 8.0) min += 0.1;
-			if (high > max - 7.0) max += 0.1;
-			else if (high < max - 8.0) max -= 0.1;
+			double err = min + 7.0 - low;
+			if (err > 0.0) min -= err * 0.007 + 0.02;
+			else if (err < -3.0) min += 0.04;
+			err = max - 7.0 - high;
+			if (err < 0.0) max += -err * 0.007 + 0.02;
+			else if (err > 3.0) max -= 0.04;
 		}
 	}
 	m_sentence = lyrics->getCurrentSentence();
@@ -225,13 +228,11 @@ void CScreenSing::draw() {
 				x_pixel = baseX + it->begin * pixUnit - 0.5 * h_pixel; // h_pixel for borders
 				w_pixel = (it->end - it->begin) * pixUnit + h_pixel; // h_pixel for borders
 				drawNotebar(*m_notebar, x_pixel, y_pixel, w_pixel, h_pixel);
-				if (it->begin < time) {
-					double alpha = 1.0 - (time - it->begin) / (it->end - it->begin);
-					if (alpha > 0.0) {
-						glColor4f(1.0f, 1.0f, 1.0f, alpha * m_notealpha);
-						drawNotebar(*m_notebar_hl, x_pixel, y_pixel, w_pixel, h_pixel);
-						glColor4f(1.0f, 1.0f, 1.0f, m_notealpha);
-					}
+				double alpha = it->power;
+				if (alpha > 0.0) {
+					glColor4f(1.0f, 1.0f, 1.0f, alpha * m_notealpha);
+					drawNotebar(*m_notebar_hl, x_pixel, y_pixel, w_pixel, h_pixel);
+					glColor4f(1.0f, 1.0f, 1.0f, m_notealpha);
 				}
 				//drawRectangleOpenGL(x_pixel,y_pixel,w_pixel,h_pixel,r, g, b, a);
 			}
@@ -245,23 +246,26 @@ void CScreenSing::draw() {
 			Player::pitch_t const& pitch = p->m_pitch;
 			size_t beginIdx = t / Engine::TIMESTEP;
 			size_t endIdx = pitch.size();
+			double oldval = std::numeric_limits<double>::quiet_NaN();
 			for (size_t idx = beginIdx; idx < endIdx; ++idx, t += Engine::TIMESTEP) {
-				if (pitch[idx] != pitch[idx]) continue;
+				if (pitch[idx] != pitch[idx]) { oldval = std::numeric_limits<double>::quiet_NaN(); continue; }
 				bool prev = idx > beginIdx && pitch[idx - 1].first > 0.0;
 				bool next = idx < endIdx - 1 && pitch[idx + 1].first > 0.0;
-				if (!prev && !next) break;
+				if (!prev && !next) { oldval = std::numeric_limits<double>::quiet_NaN(); continue; }
 				double x = -0.2 + (t - time) * pixUnit;
 				// Find the currently playing note or the next playing note (or the last note?)
 				std::size_t i = 0;
 				while (i < song.notes.size() && t > song.notes[i].end) ++i;
 				Note const& n = song.notes[i];
 				double freq = pitch[idx].first;
-				double y = baseY + (n.note + n.diff(song.scale.getNote(freq))) * noteUnit;
+				double diff = n.diff(song.scale.getNote(freq));
+				double val = n.note + diff;
+				double y = baseY + val * noteUnit;
 				double thickness = (std::max(0.0, std::min(1.0, 1.0 + pitch[idx].second / 60.0))) + 0.5;
 				thickness *= -noteUnit;
 				tex += freq * 0.001;
 				// If pitch change is too fast, terminate and begin a new one
-				if (prev && std::abs(pitch[idx - 1].first / pitch[idx].first - 1.0) > 0.02) {
+				if (prev && std::abs(oldval - val) > 1.0) {
 					glEnd();
 					prev = false;
 				}
@@ -273,6 +277,7 @@ void CScreenSing::draw() {
 					glTexCoord2f(tex, 0.0f); glVertex2f(x, y);
 				}
 				if (!next) glEnd();
+				oldval = val;
 			}
 		}
 		glColor3f(1.0, 1.0, 1.0);
