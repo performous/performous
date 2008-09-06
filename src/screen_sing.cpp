@@ -21,6 +21,10 @@ void CScreenSing::enter() {
 	if (!m_notelines) m_notelines.reset(new Surface(sm->getThemePathFile("notelines.svg")));
 	if (!m_notebar) m_notebar.reset(new Surface(sm->getThemePathFile("notebar.svg")));
 	if (!m_notebar_hl) m_notebar_hl.reset(new Surface(sm->getThemePathFile("notebar.png")));
+	if (!m_notebarfs) m_notebarfs.reset(new Surface(sm->getThemePathFile("notebarfs.svg")));
+	if (!m_notebarfs_hl) m_notebarfs_hl.reset(new Surface(sm->getThemePathFile("notebarfs-hl.svg")));
+	if (!m_notebargold) m_notebargold.reset(new Surface(sm->getThemePathFile("notebargold.svg")));
+	if (!m_notebargold_hl) m_notebargold_hl.reset(new Surface(sm->getThemePathFile("notebargold.png")));
 	if (!m_wave) m_wave.reset(new Surface(sm->getThemePathFile("wave.png")));
 	std::string file = song.path + song.mp3;
 	std::cout << "Now playing: " << file << std::endl;
@@ -216,25 +220,25 @@ void CScreenSing::draw() {
 		{
 			for (Song::notes_t::const_iterator it = m_songit; it != song.notes.end() && it->begin < time - (baseLine - 0.5) / pixUnit; ++it) {
 				if (it->type == Note::SLEEP) continue;
-				float r,g,b,a;
+				Surface* s1;
+				Surface* s2;
 				switch (it->type) {
-				  case Note::FREESTYLE: r = 0.6; g = 1.0; b = 0.6; a = 1.0; break;
-				  case Note::GOLDEN: r = 1.0; g = 0.8; b = 0.0; a = 1.0; break;
-				  default: r = 0.8; g = 0.8; b = 1.0; a = 1.0;
+				  case Note::FREESTYLE: s1 = m_notebarfs.get(); s2 = m_notebarfs_hl.get(); break;
+				  case Note::GOLDEN: s1 = m_notebargold.get(); s2 = m_notebargold_hl.get(); break;
+				  default: s1 = m_notebar.get(); s2 = m_notebar_hl.get(); break;
 				}
 				double y_pixel,x_pixel,h_pixel,w_pixel;
 				h_pixel = -noteUnit * 2.0; // Times two for borders
 				y_pixel = baseY + it->note * noteUnit - 0.5 * h_pixel;
 				x_pixel = baseX + it->begin * pixUnit - 0.5 * h_pixel; // h_pixel for borders
 				w_pixel = (it->end - it->begin) * pixUnit + h_pixel; // h_pixel for borders
-				drawNotebar(*m_notebar, x_pixel, y_pixel, w_pixel, h_pixel);
+				drawNotebar(*s1, x_pixel, y_pixel, w_pixel, h_pixel);
 				double alpha = it->power;
 				if (alpha > 0.0) {
 					glColor4f(1.0f, 1.0f, 1.0f, alpha * m_notealpha);
-					drawNotebar(*m_notebar_hl, x_pixel, y_pixel, w_pixel, h_pixel);
+					drawNotebar(*s2, x_pixel, y_pixel, w_pixel, h_pixel);
 					glColor4f(1.0f, 1.0f, 1.0f, m_notealpha);
 				}
-				//drawRectangleOpenGL(x_pixel,y_pixel,w_pixel,h_pixel,r, g, b, a);
 			}
 		}
 		// Pitch graph
