@@ -7,6 +7,7 @@ Generic
   - Clean up Tronic's hacks (fixed number of players, etc)
   - Clean all FIXMEs and XXXs
   - Write progress bar class to be used for all progress bars
+  - Configurable audio roundtrip lag and A/V lag?
 
 Song list
   - Background loading in a separate thread
@@ -22,8 +23,8 @@ Singing screen
   - Player 2 score meter (theme etc)
   - Widescreen support (not even the first line of lyrics or score calculators fit)
   - Optimized text rendering
-  - Pitch wave phase fix
   - Autozoom notelines improvement?
+  - Textured (repeating) freestyle notes
 
 Practice screen
   - VU meter (position it so that it fits on widescreen)

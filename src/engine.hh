@@ -45,10 +45,11 @@ struct Player {
 };
 
 namespace {
-	Color playerColors[] = {
+	const Color playerColors[] = {
 		{ 52/255.0, 101/255.0, 164/255.0 },
 		{ 0.8, 0.3, 0.3 }
 	};
+	size_t playerColorsSize = sizeof(playerColors) / sizeof(*playerColors);
 }
 
 class Engine {
@@ -70,18 +71,18 @@ class Engine {
 	  m_audio(audio), m_players(anBegin, anEnd), m_time(), m_quit(), m_thread(boost::ref(*this))
 	{
 		size_t player = 0;
-		for (std::list<Player>::iterator it = m_players.begin(); it != m_players.end(); ++it, ++player) it->m_color = playerColors[player]; // FIXME: don't segfault with more than two players
+		for (std::list<Player>::iterator it = m_players.begin(); it != m_players.end(); ++it, ++player) it->m_color = playerColors[player % playerColorsSize];
 	}
 	~Engine() { m_quit = true; m_thread.join(); }
 	/** Used internally for boost::thread. Do not call this yourself. (boost::thread requires this to be public). **/
 	void operator()() {
 		while (!m_quit) {
 			std::for_each(m_players.begin(), m_players.end(), boost::bind(&Player::prepare, _1));
-			double t = m_audio.getPosition() - 0.05; // Compensate avg. audio input lag
+			double t = m_audio.getPosition() - 0.05;  // FIXME: Make audio I/O lag (0.05) configurable
 			double timeLeft = m_time * TIMESTEP - t;
 			if (timeLeft > 0.0) { boost::thread::sleep(now() + std::min(TIMESTEP, timeLeft * 0.1)); continue; }
 			boost::mutex::scoped_lock l(m_mutex);
-			Song::notes_t const& n = CScreenManager::getSingletonPtr()->getSongs()->current().notes; // XXX: Kill ScreenManager
+			Song::notes_t const& n = CScreenManager::getSingletonPtr()->getSongs()->current().notes; // TODO: Kill ScreenManager
 			for (Song::notes_t::const_iterator it = n.begin(); it != n.end(); ++it) it->power = 0.0f;
 			std::for_each(m_players.begin(), m_players.end(), boost::bind(&Player::update, _1));
 			++m_time;

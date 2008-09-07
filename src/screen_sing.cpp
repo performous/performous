@@ -246,13 +246,17 @@ void CScreenSing::draw() {
 		for (std::list<Player>::const_iterator p = players.begin(); p != players.end(); ++p) {
 			glColor4f(p->m_color.r, p->m_color.g, p->m_color.b, m_notealpha);
 			float tex = 0.0;
-			double t = std::max(0.0, time - 0.5 / pixUnit);
 			Player::pitch_t const& pitch = p->m_pitch;
-			size_t beginIdx = t / Engine::TIMESTEP;
+			size_t beginIdx = std::max(0.0, time - 0.5 / pixUnit) / Engine::TIMESTEP; // At which pitch idx to start displaying the wave
 			size_t endIdx = pitch.size();
 			double oldval = std::numeric_limits<double>::quiet_NaN();
-			for (size_t idx = beginIdx; idx < endIdx; ++idx, t += Engine::TIMESTEP) {
-				if (pitch[idx] != pitch[idx]) { oldval = std::numeric_limits<double>::quiet_NaN(); continue; }
+			double t = 0.0;
+			// The loop starts at the beginning instead of beginIdx to calculate the right phase for the wave.
+			for (size_t idx = 0; idx < endIdx; ++idx, t += Engine::TIMESTEP) {
+				if (pitch[idx].first != pitch[idx].first) { oldval = std::numeric_limits<double>::quiet_NaN(); continue; }
+				double freq = pitch[idx].first;
+				tex += freq * 0.001; // Wave phase (texture coordinate)
+				if (idx < beginIdx) continue; // Skip graphics rendering if out of screen
 				bool prev = idx > beginIdx && pitch[idx - 1].first > 0.0;
 				bool next = idx < endIdx - 1 && pitch[idx + 1].first > 0.0;
 				if (!prev && !next) { oldval = std::numeric_limits<double>::quiet_NaN(); continue; }
@@ -261,13 +265,11 @@ void CScreenSing::draw() {
 				std::size_t i = 0;
 				while (i < song.notes.size() && t > song.notes[i].end) ++i;
 				Note const& n = song.notes[i];
-				double freq = pitch[idx].first;
 				double diff = n.diff(song.scale.getNote(freq));
 				double val = n.note + diff;
 				double y = baseY + val * noteUnit;
 				double thickness = (std::max(0.0, std::min(1.0, 1.0 + pitch[idx].second / 60.0))) + 0.5;
 				thickness *= -noteUnit;
-				tex += freq * 0.001;
 				// If pitch change is too fast, terminate and begin a new one
 				if (prev && std::abs(oldval - val) > 1.0) {
 					glEnd();
