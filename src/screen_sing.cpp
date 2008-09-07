@@ -4,7 +4,6 @@
 #include <boost/format.hpp>
 #include "sdl_helper.hh"
 #include "songs.hh"
-#include "pitch_graph.hh"
 #include <iostream>
 #include <iomanip>
 
@@ -47,7 +46,6 @@ void CScreenSing::exit() {
 	m_sentence.clear();
 	lyrics.reset();
 	theme.reset();
-	pitchGraph.clear();
 	m_notelines.reset();
 	m_wave.reset();
 	m_engine.reset();

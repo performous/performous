@@ -14,7 +14,6 @@ ultrastarng_SOURCES = main.cpp \
 	screen_practice.cpp \
 	screen_score.cpp \
 	screen_configuration.cpp \
-	pitch_graph.cpp \
 	theme.cpp \
 	ffmpeg.cpp \
 	surface.cpp \

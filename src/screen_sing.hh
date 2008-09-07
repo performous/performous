@@ -7,7 +7,6 @@
 #include <boost/scoped_ptr.hpp>
 #include "engine.hh"
 #include "screen.hh"
-#include "pitch_graph.hh"
 #include "theme.hh"
 #include "video.hh"
 #include "lyrics.hh"
@@ -36,9 +35,6 @@ class CScreenSing: public CScreen {
 	boost::scoped_ptr<Surface> m_notebargold;
 	boost::scoped_ptr<Surface> m_notebargold_hl;
 	boost::scoped_ptr<Engine> m_engine;
-	// Keeps the pitch tracking graphics
-	// in separate surface
-	PitchGraph pitchGraph;
 	std::vector<Note> m_sentence;
 	bool play;
 	bool finished;
