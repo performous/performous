@@ -1,0 +1,28 @@
+Blockers for 0.3 release:
+
+Generic
+  - Need to port AR limitation from hacking branch
+  - Remove dead code
+  - Replace XML walk tree functions with libxml++ and XPath?
+  - Clean up Tronic's hacks (fixed number of players, etc)
+  - Clean all FIXMEs and XXXs
+
+Songs screen
+  - Widescreen support (sort order & find don't fit)
+
+Score screen
+  - Two players
+
+Singing screen
+  - Player 2 score meter (theme etc)
+  - Widescreen support (not even the first line of lyrics or score calculators fit)
+  - Optimized text rendering
+  - Pitch wave phase fix
+  - Autozoom notelines improvement?
+
+Practice screen
+  - VU meter (position it so that it fits on widescreen)
+
+Engine
+  - Number of players autodetection
+
