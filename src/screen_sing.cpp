@@ -188,6 +188,7 @@ void CScreenSing::draw() {
 		int low = song.noteMax;
 		int high = song.noteMin;
 		for (Song::notes_t::const_iterator it = m_songit; it != song.notes.end() && it->begin < time + 5.0; ++it) {
+			if (it->type == Note::SLEEP) continue;
 			if (it->note < low) low = it->note;
 			if (it->note > high) high = it->note;
 		}
