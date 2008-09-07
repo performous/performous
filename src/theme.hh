@@ -88,9 +88,11 @@ struct CThemeSing: boost::noncopyable {
 	CThemeSing();
 	boost::scoped_ptr<Surface> bg;
 	boost::scoped_ptr<Surface> p1box;
+	boost::scoped_ptr<Surface> p2box;
 	boost::scoped_ptr<CTheme> theme;
 	TThemeTxt timertxt; 
 	TThemeTxt p1score;
+	TThemeTxt p2score;
 	TThemeTxt lyricspast;
 	TThemeTxt lyricsfuture;  
 	TThemeTxt lyricshighlight;

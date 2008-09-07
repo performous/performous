@@ -161,6 +161,7 @@ void CScreenSing::draw() {
 	if (m_video) m_video->render(time - song.videoGap);
 	theme->bg->draw();
 	theme->p1box->draw();
+	theme->p2box->draw();
 	// Compute and draw the timer and the progressbar
 	theme->timertxt.text = (boost::format("%02u:%02u") % (unsigned(time) / 60) % (unsigned(time) % 60)).str();
 	theme->theme->PrintText(&theme->timertxt);
@@ -288,8 +289,10 @@ void CScreenSing::draw() {
 		glColor3f(1.0, 1.0, 1.0);
 	}
 	//draw score
-	theme->p1score.text = (boost::format("%04d, %04d") % players.begin()->getScore() % players.rbegin()->getScore()).str();
+	theme->p1score.text = (boost::format("%04d") % players.begin()->getScore()).str();
 	theme->theme->PrintText(&theme->p1score);
+	theme->p2score.text = (boost::format("%04d") % players.rbegin()->getScore()).str();
+	theme->theme->PrintText(&theme->p2score);
 
 	// Render the lyrics - OPTIMIZE: This part is very slow and needs to be optimized
 	TThemeTxt tmptxt = theme->lyricspast;

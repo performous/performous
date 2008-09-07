@@ -375,9 +375,11 @@ CThemeSing::CThemeSing() {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
 	bg.reset(new Surface(sm->getThemePathFile("sing_bg.svg")));
 	p1box.reset(new Surface(sm->getThemePathFile("sing_p1box.svg")));
+	p2box.reset(new Surface(sm->getThemePathFile("sing_p2box.svg")));
 	theme.reset(new CTheme());
 	theme->ParseSVGForText(sm->getThemePathFile("sing_timetxt.svg"), &timertxt);
 	theme->ParseSVGForText(sm->getThemePathFile("sing_p1score.svg"), &p1score);
+	theme->ParseSVGForText(sm->getThemePathFile("sing_p2score.svg"), &p2score);
 	theme->ParseSVGForText(sm->getThemePathFile("sing_lyricscurrent.svg"), &lyricspast);
 	theme->ParseSVGForText(sm->getThemePathFile("sing_lyricscurrent.svg"), &lyricsfuture);
 	theme->ParseSVGForText(sm->getThemePathFile("sing_lyricshighlight.svg"), &lyricshighlight);
