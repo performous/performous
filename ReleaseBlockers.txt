@@ -31,3 +31,7 @@ Practice screen
 Engine
   - Number of players autodetection
 
+Build
+  - CMake build
+  - Make Ubuntu packages (Hardy and Intrepid, i386 and amd64)
+
