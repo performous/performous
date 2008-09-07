@@ -10,6 +10,10 @@ Generic
   - Write progress bar class to be used for all progress bars
   - Configurable audio roundtrip lag and A/V lag?
 
+Surface
+  - Scale non-pow2-surfaces on older hardware
+  - Create mipmaps?
+
 Song list
   - Background loading in a separate thread
 
