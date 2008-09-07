@@ -6,6 +6,10 @@ Generic
   - Replace XML walk tree functions with libxml++ and XPath?
   - Clean up Tronic's hacks (fixed number of players, etc)
   - Clean all FIXMEs and XXXs
+  - Write progress bar class to be used for all progress bars
+
+Song list
+  - Background loading in a separate thread
 
 Songs screen
   - Widescreen support (sort order & find don't fit)
@@ -14,6 +18,7 @@ Score screen
   - Two players
 
 Singing screen
+  - Song progress bar
   - Player 2 score meter (theme etc)
   - Widescreen support (not even the first line of lyrics or score calculators fit)
   - Optimized text rendering
