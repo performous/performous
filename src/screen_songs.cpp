@@ -76,8 +76,13 @@ void CScreenSongs::draw() {
 	CAudio& audio = *sm->getAudio();
 	Songs& songs = *sm->getSongs();
 	theme->theme->clear();
-	// Draw the "Order by" text
-	print(theme.get(), theme->order, (m_search.text.empty() ? songs.sortDesc() : m_search.text));
+	// Draw the song number + order by / find text
+	{
+		std::ostringstream oss;
+		oss << "(" << songs.currentId() + 1 << "/" << songs.size() << ")\n";
+		oss << (m_search.text.empty() ? songs.sortDesc() : m_search.text);
+		print(theme.get(), theme->order, oss.str());
+	}
 	theme->bg->draw();
 	// Test if there are no songs
 	if (songs.empty()) {
@@ -86,12 +91,7 @@ void CScreenSongs::draw() {
 	} else {
 		Song& song = songs.current();
 		// Draw the "Song information"
-		{
-			std::ostringstream oss;
-			Songs& s = *sm->getSongs();
-			oss << song.str() << "\n(" << s.currentId() + 1 << "/" << s.size() << ")";
-			print(theme.get(), theme->song, oss.str());
-		}
+		print(theme.get(), theme->song, song.str());
 		// Draw the cover
 		Song& song_display = songs.near(songs.currentPosition());
 		std::string cover = song_display.path + song_display.cover;

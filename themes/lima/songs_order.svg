@@ -2,7 +2,7 @@
 <!-- Created with Sodipodi ("http://www.sodipodi.com/") -->
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
@@ -16,9 +16,10 @@
    height="600.000000"
    id="svg559"
    sodipodi:version="0.32"
-   inkscape:version="0.44.1"
+   inkscape:version="0.46"
    sodipodi:docname="songs_order.svg"
-   sodipodi:docbase="/home/yoda/UltraStar/sf/UltraStar-ng/themes/default">
+   sodipodi:docbase="/home/yoda/UltraStar/sf/UltraStar-ng/themes/default"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <metadata
      id="metadata35">
     <rdf:RDF>
@@ -47,9 +48,17 @@
      inkscape:cy="249.62029"
      inkscape:window-x="239"
      inkscape:window-y="30"
-     inkscape:current-layer="svg559" />
+     inkscape:current-layer="svg559"
+     showgrid="false" />
   <defs
      id="defs561">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 300 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="800 : 300 : 1"
+       inkscape:persp3d-origin="400 : 200 : 1"
+       id="perspective94" />
     <linearGradient
        inkscape:collect="always"
        id="linearGradient2822">
@@ -599,12 +608,12 @@
   </defs>
   <text
      xml:space="preserve"
-     style="font-size:24px;font-style:normal;font-weight:normal;fill:black;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+     style="font-size:24px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
      x="351.30859"
-     y="571.94019"
+     y="512.45343"
      id="text1990"><tspan
        sodipodi:role="line"
        id="tspan1992"
        x="351.30859"
-       y="571.94019">Order by</tspan></text>
+       y="512.45343">Order by</tspan></text>
 </svg>

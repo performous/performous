@@ -13,9 +13,6 @@ Generic
 Song list
   - Background loading in a separate thread
 
-Songs screen
-  - Widescreen support (sort order & find don't fit)
-
 Score screen
   - Two players
 
