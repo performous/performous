@@ -15,17 +15,6 @@ class CConfiguration {
 	std::string m_description;
 };
 
-class CConfigurationFullscreen: public CConfiguration {
-  public:
-	CConfigurationFullscreen();
-	void setNext() { m_fs = !m_fs; apply(); }
-	void setPrevious() { setNext(); }
-	std::string getValue() const;
-  private:
-	void apply();
-	bool m_fs;
-};
-
 class CConfigurationAudioVolume: public CConfiguration {
   public:
 	CConfigurationAudioVolume(std::string const& title, unsigned int& volume);

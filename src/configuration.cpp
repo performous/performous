@@ -2,20 +2,6 @@
 #include "screen.hh"
 #include <boost/lexical_cast.hpp>
 
-CConfigurationFullscreen::CConfigurationFullscreen():
-  CConfiguration("Fullscreen Mode"), m_fs(CScreenManager::getSingletonPtr()->getFullscreenStatus())
-{}
-std::string CConfigurationFullscreen::getValue() const {
-	return m_fs ? "Fullscreen" : "Windowed";
-}
-void CConfigurationFullscreen::apply() {
-	CScreenManager* sm = CScreenManager::getSingletonPtr();
-	if( sm->getFullscreenStatus() != m_fs ) {
-		SDL_WM_ToggleFullScreen(sm->getSDLScreen());
-		sm->setFullscreenStatus(m_fs);
-	}
-}
-
 CConfigurationAudioVolume::CConfigurationAudioVolume(std::string const& title, unsigned int& volume):
   CConfiguration(title), m_volume(volume)
 {}

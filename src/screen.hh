@@ -9,7 +9,6 @@
 #include "audio.hh"
 #include "record.hh"
 #include "songs.hh"
-#include "video_driver.hh"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -35,14 +34,8 @@ class CScreenManager: public CSingleton <CScreenManager> {
 	CScreen* getCurrentScreen() { return currentScreen; };
 	CScreen* getScreen(std::string const& name);
 
-	void setSDLScreen(SDL_Surface* _screen) { screen = _screen; };
-	SDL_Surface* getSDLScreen() { return screen; };
-
 	CAudio* getAudio() { return audio.get(); };
 	void setAudio(CAudio* _audio) { audio.reset(_audio); };
-
-	CVideoDriver* getVideoDriver() { return videoDriver; };
-	void setVideoDriver(CVideoDriver* _videoDriver) {videoDriver=_videoDriver; };
 
 	bool getFullscreenStatus() { return m_fullscreen; };
 	void setFullscreenStatus(bool fullscreen) { m_fullscreen = fullscreen; };
@@ -60,10 +53,8 @@ class CScreenManager: public CSingleton <CScreenManager> {
 	typedef boost::ptr_map<std::string, CScreen> screenmap_t;
 	screenmap_t screens;
 	CScreen* currentScreen;
-	SDL_Surface* screen;
 	boost::scoped_ptr<CAudio> audio;
 	boost::scoped_ptr<Songs> songs;
-	CVideoDriver* videoDriver;
 	bool m_fullscreen;
 	std::string m_theme;
   public:

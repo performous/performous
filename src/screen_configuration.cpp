@@ -3,7 +3,6 @@
 CScreenConfiguration::CScreenConfiguration(std::string const& name): CScreen(name)
 {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
-	configuration.push_back(new CConfigurationFullscreen());
 	configuration.push_back(new CConfigurationAudioVolume("Ingame Audio Volume", sm->m_ingameVolume));
 	configuration.push_back(new CConfigurationAudioVolume("Menu Audio Volume", sm->m_menuVolume));
 	selected=0;
