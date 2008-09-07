@@ -1,6 +1,7 @@
 Blockers for 0.3 release:
 
 Generic
+  - Decide a name and rebrand the game accordingly
   - Need to port AR limitation from hacking branch
   - Remove dead code
   - Replace XML walk tree functions with libxml++ and XPath?
