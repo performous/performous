@@ -1,5 +1,5 @@
 #include "surface.hh"
-
+#include <vector>
 // Disabling temporarily: #include <boost/filesystem.hpp>
 #include <stdexcept>
 
@@ -21,6 +21,12 @@ namespace {
 	unsigned int nextPow2(unsigned int val) {
 		unsigned int ret = 1;
 		while (ret < val) ret *= 2;
+		return ret;
+	}
+
+	unsigned int prevPow2(unsigned int val) {
+		unsigned int ret = 1;
+		while ((ret*2) < val) ret *= 2;
 		return ret;
 	}
 }
@@ -62,23 +68,18 @@ void Surface::load(unsigned int width, unsigned int height, Format format, unsig
 
 	bool hasTexture_non_power_of_two = checkExtension("GL_ARB_texture_non_power_of_two");
 
-	if (hasTexture_non_power_of_two) {
-		glBindTexture(GL_TEXTURE_2D, texture_id);
+	glBindTexture(GL_TEXTURE_2D, texture_id);
 
 		// when texture area is small, bilinear filter the closest mipmap
-		glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST );
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST );
 		// when texture area is large, bilinear filter the original
-		glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-		glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0 );
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0 );
 	
 		// the texture wraps over at the edges (repeat)
-		glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-		glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-		glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-
-	} else {
-		glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texture_id);
-	}
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+	glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 
 	unsigned int fmt;
 	unsigned int buffer_fmt;
@@ -115,8 +116,16 @@ void Surface::load(unsigned int width, unsigned int height, Format format, unsig
 	else {
 		//if (isPow2(width) && isPow2(height)) gluBuild2DMipmaps(GL_TEXTURE_2D, 3, width, height, fmt, buffer_fmt, buffer);
 		// TODO: Test for OpenGL extension GL_ARB_texture_non_power_of_two and if not found, use gluScaleImage to upscale the texture to nextPow2 dimensions before calling glTexImage2D (if it isn't pow2 already).
-	        glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA, width, height, 0, fmt, buffer_fmt, buffer);	
-//		gluScaleImage(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA, width, height, 0, fmt, buffer_fmt, buffer);
+	//	int newWidth = nextPow2(width);
+	//	int newHeight = nextPow2(height);
+	// speeds it up... trust me you need it for now at least! :P
+	// TODO: remove when cairo is fixed.
+		int newWidth = prevPow2(width);
+		int newHeight = prevPow2(height);
+		std::vector<uint32_t> outBuf(newWidth * newHeight);
+		gluScaleImage(fmt, width, height, buffer_fmt, buffer, newWidth, newHeight, buffer_fmt, &outBuf[0]);
+		
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, newWidth, newHeight, 0, fmt, buffer_fmt, &outBuf[0]);
 	}
 }
 
@@ -174,10 +183,16 @@ Surface::Surface(std::string const& filename) {
 	} else {
 		Magick::Image image;
 		Magick::Blob blob;
-		image.read(filename);
-		image.magick("RGBA");
-		image.write(&blob);
-		load(image.columns(), image.rows(), CHAR_RGBA, (unsigned char*)blob.data());
+		try {
+			image.read(filename);
+			image.magick("RGBA");
+			image.write(&blob);
+			load(image.columns(),image.rows(), CHAR_RGBA, (unsigned char*)blob.data());
+		}
+		catch( Magick::Exception &error_ ) // add error handling
+		{
+			throw std::runtime_error("Image Error");
+		} 
 	}
 }
 
