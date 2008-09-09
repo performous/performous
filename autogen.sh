@@ -1,3 +1,4 @@
+#!/bin/sh
 # cleanup
 rm -f config.cache
 rm -f config.log
