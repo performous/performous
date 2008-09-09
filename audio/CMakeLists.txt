@@ -7,6 +7,7 @@ find_package(Boost 1.34 REQUIRED COMPONENTS thread filesystem)
 
 find_package(Alsa)
 find_package(GStreamer)
+find_package(Jack)
 find_package(Portaudio)
 find_package(PulseAudio)
 
@@ -27,6 +28,13 @@ if (GSTREAMER_LIBRARIES)
 	target_link_libraries(da_audio_dev_gst ${GSTREAMER_LIBRARIES})
 	install(TARGETS da_audio_dev_gst DESTINATION lib/da)
 endif (GSTREAMER_LIBRARIES)
+
+if (JACK_LIBRARIES)
+	include_directories(${JACK_INCLUDE_DIRS})
+	add_library(da_audio_dev_jack SHARED audio_dev_jack.cpp)
+	target_link_libraries(da_audio_dev_jack ${JACK_LIBRARIES})
+	install(TARGETS da_audio_dev_jack DESTINATION lib/da)
+endif (JACK_LIBRARIES)
 
 # TODO: fix FindPortaudio.cmake to report the version and build the right version
 if (PORTAUDIO_FOUND)
