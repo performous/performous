@@ -418,7 +418,7 @@ void Songs::filter_internal() {
 	filtered_t filtered;
 	try {
 		for (songlist_t::iterator it = m_songs.begin(); it != m_songs.end(); ++it) {
-			if (regex_search(it->str(), boost::regex(m_filter ,boost::regex_constants::icase))) filtered.push_back(&*it);
+			if (regex_search(it->strFull(), boost::regex(m_filter ,boost::regex_constants::icase))) filtered.push_back(&*it);
 		}
 	} catch (...) {
 		filtered.clear();

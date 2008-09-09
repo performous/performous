@@ -161,16 +161,11 @@ int main(int argc, char** argv) {
 		}
 		// Insert default dirs
 		if (!vm.count("clean")) {
-			songdirs.insert(DATA_DIR "songs/");
 			if (!homedir.empty()) songdirs.insert(homedir + ".ultrastar/songs/");
 			songdirs.insert("/usr/share/games/ultrastar/songs/");
-			songdirs.insert("/usr/share/games/ultrastar-ng/songs/");
 			songdirs.insert("/usr/share/ultrastar/songs/");
-			songdirs.insert("/usr/share/ultrastar-ng/songs/");
 			songdirs.insert("/usr/local/share/games/ultrastar/songs/");
-			songdirs.insert("/usr/local/share/games/ultrastar-ng/songs/");
 			songdirs.insert("/usr/local/share/ultrastar/songs/");
-			songdirs.insert("/usr/local/share/ultrastar-ng/songs/");
 		}
 	}
 	try {

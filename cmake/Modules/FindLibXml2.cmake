@@ -1,62 +1,90 @@
-# - Try to find LibXml2
+# - Try to find libxml2
 # Once done this will define
 #
-#  LIBXML2_FOUND - system has LibXml2
-#  LIBXML2_INCLUDE_DIR - the LibXml2 include directory
-#  LIBXML2_LIBRARIES - the libraries needed to use LibXml2
-#  LIBXML2_DEFINITIONS - Compiler switches required for using LibXml2
-
-# Copyright (c) 2006, Alexander Neundorf, <neundorf@kde.org>
+#  LIBXML2_FOUND - system has xml2
+#  LIBXML2_INCLUDE_DIRS - the xml2 include directory
+#  LIBXML2_LIBRARIES - Link these to use xml2
+#  LIBXML2_DEFINITIONS - Compiler switches required for using xml2
 #
-# Redistribution and use is allowed according to the terms of the BSD license.
-# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
+#  Copyright (c) 2008 Andreas Schneider <mail@cynapses.org>
+#  Modified for other libraries by Lasse Kärkkäinen <tronic>
+#
+#  Redistribution and use is allowed according to the terms of the New
+#  BSD license.
+#  For details see the accompanying COPYING-CMAKE-SCRIPTS file.
+#
 
 
-IF (LIBXML2_INCLUDE_DIR AND LIBXML2_LIBRARIES)
-   # in cache already
-   SET(LibXml2_FIND_QUIETLY TRUE)
-ENDIF (LIBXML2_INCLUDE_DIR AND LIBXML2_LIBRARIES)
+if (LIBXML2_LIBRARIES AND LIBXML2_INCLUDE_DIRS)
+  # in cache already
+  set(LIBXML2_FOUND TRUE)
+else (LIBXML2_LIBRARIES AND LIBXML2_INCLUDE_DIRS)
+  # use pkg-config to get the directories and then use these values
+  # in the FIND_PATH() and FIND_LIBRARY() calls
+  if (${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 4)
+    include(UsePkgConfig)
+    pkgconfig(libxml-2.0 _LIBXML2_INCLUDEDIR _LIBXML2_LIBDIR _LIBXML2_LDFLAGS _LIBXML2_CFLAGS)
+  else (${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 4)
+    find_package(PkgConfig)
+    if (PKG_CONFIG_FOUND)
+      pkg_check_modules(_LIBXML2 libxml-2.0)
+    endif (PKG_CONFIG_FOUND)
+  endif (${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 4)
+  find_path(LIBXML2_INCLUDE_DIR
+    NAMES
+      libxml/xpath.h
+    PATHS
+      ${_LIBXML2_INCLUDEDIR}
+      /usr/include
+      /usr/local/include
+      /opt/local/include
+      /sw/include
+    PATH_SUFFIXES
+      libxml2
+  )
+  
+  find_library(LIBXML2_LIBRARY
+    NAMES
+      xml2
+    PATHS
+      ${_LIBXML2_LIBDIR}
+      /usr/lib
+      /usr/local/lib
+      /opt/local/lib
+      /sw/lib
+  )
 
-IF (NOT WIN32)
-   # use pkg-config to get the directories and then use these values
-   # in the FIND_PATH() and FIND_LIBRARY() calls
-   INCLUDE(UsePkgConfig)
-   PKGCONFIG(libxml-2.0 _LibXml2IncDir _LibXml2LinkDir _LibXml2LinkFlags _LibXml2Cflags)
-   SET(LIBXML2_DEFINITIONS ${_LibXml2Cflags})
-ENDIF (NOT WIN32)
+  if (LIBXML2_LIBRARY)
+    set(LIBXML2_FOUND TRUE)
+  endif (LIBXML2_LIBRARY)
 
-FIND_PATH(LIBXML2_INCLUDE_DIR libxml/xpath.h
-   PATHS
-   ${_LibXml2IncDir}
-   PATH_SUFFIXES libxml2
-   )
+  set(LIBXML2_INCLUDE_DIRS
+    ${LIBXML2_INCLUDE_DIR}
+  )
 
-FIND_LIBRARY(LIBXML2_LIBRARIES NAMES xml2 libxml2
-   PATHS
-   ${_LibXml2LinkDir}
-   )
+  if (LIBXML2_FOUND)
+    set(LIBXML2_LIBRARIES
+      ${LIBXML2_LIBRARIES}
+      ${LIBXML2_LIBRARY}
+    )
+  endif (LIBXML2_FOUND)
 
-IF (LIBXML2_INCLUDE_DIR AND LIBXML2_LIBRARIES)
-   SET(LIBXML2_FOUND TRUE)
-ELSE (LIBXML2_INCLUDE_DIR AND LIBXML2_LIBRARIES)
-   SET(LIBXML2_FOUND FALSE)
-ENDIF (LIBXML2_INCLUDE_DIR AND LIBXML2_LIBRARIES)
+  if (LIBXML2_INCLUDE_DIRS AND LIBXML2_LIBRARIES)
+     set(LIBXML2_FOUND TRUE)
+  endif (LIBXML2_INCLUDE_DIRS AND LIBXML2_LIBRARIES)
 
-FIND_PROGRAM(XMLLINT_EXECUTABLE xmllint)
+  if (LIBXML2_FOUND)
+    if (NOT LIBXML2_FIND_QUIETLY)
+      message(STATUS "Found libxml2: ${LIBXML2_LIBRARY}")
+    endif (NOT LIBXML2_FIND_QUIETLY)
+  else (LIBXML2_FOUND)
+    if (LIBXML2_FIND_REQUIRED)
+      message(FATAL_ERROR "Could not find libxml2")
+    endif (LIBXML2_FIND_REQUIRED)
+  endif (LIBXML2_FOUND)
 
-if( NOT XMLLINT_EXECUTABLE )
-   MESSAGE(STATUS "xmllint program not found. Install it if you want validate generated doc file.")
-endif(NOT XMLLINT_EXECUTABLE )
+  # show the LIBXML2_INCLUDE_DIRS and LIBXML2_LIBRARIES variables only in the advanced view
+  mark_as_advanced(LIBXML2_INCLUDE_DIRS LIBXML2_LIBRARIES)
 
-IF (LIBXML2_FOUND)
-   IF (NOT LibXml2_FIND_QUIETLY)
-      MESSAGE(STATUS "Found LibXml2: ${LIBXML2_LIBRARIES}")
-   ENDIF (NOT LibXml2_FIND_QUIETLY)
-ELSE (LIBXML2_FOUND)
-   IF (LibXml2_FIND_REQUIRED)
-      MESSAGE(SEND_ERROR "Could NOT find LibXml2")
-   ENDIF (LibXml2_FIND_REQUIRED)
-ENDIF (LIBXML2_FOUND)
-
-MARK_AS_ADVANCED(LIBXML2_INCLUDE_DIR LIBXML2_LIBRARIES XMLLINT_EXECUTABLE)
+endif (LIBXML2_LIBRARIES AND LIBXML2_INCLUDE_DIRS)
 

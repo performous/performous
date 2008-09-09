@@ -45,7 +45,10 @@ class Song: boost::noncopyable {
 	Song(std::string const& path, std::string const& filename);
 	void reload();
 	bool parseField(std::string const& line);
+	/** Get formatted song label. **/
 	std::string str() const { return title + "  by  " + artist; }
+	/** Get full song information (used by the search function). **/
+	std::string strFull() const { return title + "\n" + artist + "\n" + genre + "\n" + edition + "\n" + path; }
 	typedef std::vector<Note> notes_t;
 	notes_t notes;
 	int noteMin, noteMax;
