@@ -63,9 +63,11 @@ namespace boost {
           public:
             loader(fs::path const& folder) {
                 std::set<fs::path> paths;
-                parse(paths, "/usr/lib/da:/usr/local/lib/da");
                 parse(paths, std::getenv("PLUGIN_PATH"));
-                if (!folder.empty()) parse(paths, std::getenv("LD_LIBRARY_PATH"), folder);
+                if (!folder.empty()) {
+                    parse(paths, std::getenv("LD_LIBRARY_PATH"), folder);
+                    parse(paths, "/usr/lib:/usr/local/lib", folder);
+                }
                 for (std::set<fs::path>::const_iterator it = paths.begin(); it != paths.end(); ++it) load(*it);
                 if (dlls.empty()) std::cerr << "No plugins found. Try setting PLUGIN_PATH or LD_LIBRARY_PATH." << std::endl;
             }    

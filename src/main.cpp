@@ -72,7 +72,7 @@ static void checkEvents_SDL(CScreenManager& sm, Window& window) {
 int main(int argc, char** argv) {
 	std::ios::sync_with_stdio(false);  // We do not use C stdio
 	srand(time(NULL));  // Seed for std::random_shuffle (used by song selector)
-	boost::plugin::loader libda("/home/tronic/libda");
+	boost::plugin::loader libda("da");
 	bool fullscreen = false;
 	bool fps = false;
 	unsigned int width, height;
