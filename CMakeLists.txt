@@ -13,7 +13,7 @@ set(SOURCES ${SOURCE_FILES} ${HEADER_FILES})
 
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREAD ON)
-find_package(Boost 1.34 REQUIRED COMPONENTS thread)
+find_package(Boost 1.34 REQUIRED COMPONENTS thread program_options regex)
 include_directories(${Boost_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${Boost_LIBRARIES})
 
@@ -37,7 +37,17 @@ find_package(LibXml++ REQUIRED)
 include_directories(${LIBXMLPP_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${LIBXMLPP_LIBRARIES})
 
-message("${LIBS}")
+find_package(Magick++ REQUIRED)
+include_directories(${MAGICKPP_INCLUDE_DIRS})
+set(LIBS ${LIBS} ${MAGICKPP_LIBRARIES})
+
+find_package(OpenGL REQUIRED)
+include_directories(${OPENGL_INCLUDE_DIR})
+set(LIBS ${LIBS} ${OPENGL_LIBRARIES})
+
+find_package(FFmpeg REQUIRED)
+include_directories(${FFMPEG_INCLUDE_DIR})
+set(LIBS ${LIBS} ${FFMPEG_LIBRARIES})
 
 add_executable(ultrastarng ${SOURCES})
 target_link_libraries(ultrastarng da ${LIBS})

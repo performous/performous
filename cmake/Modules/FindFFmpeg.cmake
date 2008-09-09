@@ -6,6 +6,7 @@
 #  FFMPEG_DEFINITIONS - Compiler switches required for using ffmpeg
 
 # Copyright (c) 2006, Matthias Kretz, <kretz@kde.org>
+# Modified by Lasse Kärkkäinen <tronic>
 #
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
@@ -50,6 +51,12 @@ ENDIF (NOT WIN32)
     NO_DEFAULT_PATH
   )
 
+  find_library(SWSCALE_LIBRARIES NAMES swscale
+    PATHS
+    ${_FFMPEGLinkDir}
+    NO_DEFAULT_PATH
+  )
+
   set(FFMPEG_LIBRARIES )
   if (AVCODEC_LIBRARIES)
     set(FFMPEG_LIBRARIES ${FFMPEG_LIBRARIES} ${AVCODEC_LIBRARIES})
@@ -62,6 +69,10 @@ ENDIF (NOT WIN32)
   if (AVUTIL_LIBRARIES)
     set(FFMPEG_LIBRARIES ${FFMPEG_LIBRARIES} ${AVUTIL_LIBRARIES})
   endif (AVUTIL_LIBRARIES)
+
+  if (SWSCALE_LIBRARIES)
+    set(FFMPEG_LIBRARIES ${FFMPEG_LIBRARIES} ${SWSCALE_LIBRARIES})
+  endif (SWSCALE_LIBRARIES)
 
   if (FFMPEG_LIBRARIES)
      set(FFMPEG_FOUND TRUE)
