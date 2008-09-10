@@ -30,19 +30,19 @@ else (FFMPEG_LIBRARIES AND FFMPEG_INCLUDE_DIRS)
   find_path(FFMPEG_AVCODEC_INCLUDE_DIR
     NAMES avcodec.h
     PATHS ${_FFMPEG_AVCODEC_INCLUDE_DIRS} /usr/include /usr/local/include /opt/local/include /sw/include
-    PATH_SUFFIXES ffmpeg avcodec
+    PATH_SUFFIXES ffmpeg libavcodec
   )
 
   find_path(FFMPEG_AVFORMAT_INCLUDE_DIR
     NAMES avformat.h
     PATHS ${_FFMPEG_AVFORMAT_INCLUDE_DIRS} /usr/include /usr/local/include /opt/local/include /sw/include
-    PATH_SUFFIXES ffmpeg avformat
+    PATH_SUFFIXES ffmpeg libavformat
   )
 
   find_path(FFMPEG_SWSCALE_INCLUDE_DIR
     NAMES swscale.h
     PATHS ${_FFMPEG_SWSCALE_INCLUDE_DIRS} /usr/include /usr/local/include /opt/local/include /sw/include
-    PATH_SUFFIXES ffmpeg swscale
+    PATH_SUFFIXES ffmpeg libswscale
   )
   
   find_library(FFMPEG_AVCODEC_LIBRARY

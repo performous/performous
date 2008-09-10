@@ -1,8 +1,6 @@
 #ifndef __SCREEN_H__
 #define __SCREEN_H__
 
-#include "../config.h"
-
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/scoped_ptr.hpp>
 #include "singleton.hh"
