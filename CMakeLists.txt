@@ -11,4 +11,5 @@ endif(DATA_INSTALL_DIR)
 add_subdirectory(src)
 add_subdirectory(audio)
 add_subdirectory(themes)
+add_subdirectory(data)
 
