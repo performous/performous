@@ -24,6 +24,7 @@ endif (ALSA_FOUND)
 
 if (GSTREAMER_LIBRARIES)
 	include_directories(${GSTREAMER_INCLUDE_DIRS})
+	add_definitions(${GSTREAMER_DEFINITIONS})
 	add_library(da_audio_dev_gst SHARED audio_dev_gst.cpp)
 	target_link_libraries(da_audio_dev_gst ${GSTREAMER_LIBRARIES})
 	install(TARGETS da_audio_dev_gst DESTINATION lib/da)
