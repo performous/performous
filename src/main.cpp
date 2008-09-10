@@ -1,11 +1,4 @@
-#include "../config.h"
-
-// Patch Mac OS X not defining VERSION and PACKAGE
-#ifdef __MACOSX__
-#  define PACKAGE "ultrastar-ng"
-#  define VERSION "Mac OS X"
-#endif
-
+#include "version.hh"
 #include <audio.hpp>
 #include "sdl_helper.hh"
 #include "screen.hh"

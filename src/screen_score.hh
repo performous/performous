@@ -1,8 +1,6 @@
 #ifndef __SCREENSCORE_H__
 #define __SCREENSCORE_H__
 
-#include "../config.h"
-
 #include <boost/scoped_ptr.hpp>
 #include "screen.hh"
 #include "theme.hh"

@@ -2,6 +2,10 @@
 #include <vector>
 // Disabling temporarily: #include <boost/filesystem.hpp>
 #include <stdexcept>
+#include <Magick++.h>
+
+// TODO: get rid of this and use C++ std::string instead
+#include <string.h>
 
 Surface::Surface(unsigned int width, unsigned int height, Surface::Format format, unsigned char* buffer) {
 	load(width, height, format, buffer);

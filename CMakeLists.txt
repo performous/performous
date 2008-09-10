@@ -46,7 +46,7 @@ include_directories(${OPENGL_INCLUDE_DIR})
 set(LIBS ${LIBS} ${OPENGL_LIBRARIES})
 
 find_package(FFmpeg REQUIRED)
-include_directories(${FFMPEG_INCLUDE_DIR})
+include_directories(${FFMPEG_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${FFMPEG_LIBRARIES})
 
 add_executable(ultrastarng ${SOURCES})

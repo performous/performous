@@ -1,5 +1,6 @@
 #include "video_driver.hh"
 #include "screen.hh"
+#include "version.hh"
 #include <cmath>
 
 unsigned s_width;

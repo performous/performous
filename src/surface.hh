@@ -1,10 +1,13 @@
 #ifndef __SURFACE_H__
 #define __SURFACE_H__
 
-#include "../config.h"
 #include <stdexcept>
 #include <string>
 #include <boost/noncopyable.hpp>
+#include <SDL/SDL_opengl.h>
+#include <librsvg/rsvg.h>
+#include <librsvg/rsvg-cairo.h>
+#include <cairo.h>
 
 class Dimensions {
   public:

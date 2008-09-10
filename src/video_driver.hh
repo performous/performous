@@ -1,10 +1,10 @@
 #ifndef __VIDEODRIVER_H__
 #define __VIDEODRIVER_H__
 
-#include "../config.h"
+#include "surface.hh"
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <vector>
-#include "surface.hh"
+#include <SDL/SDL.h>
 
 unsigned int screenW();
 unsigned int screenH();

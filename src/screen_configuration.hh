@@ -1,8 +1,6 @@
 #ifndef __SCREENCONFIGURATION_H__
 #define __SCREENCONFIGURATION_H__
 
-#include "../config.h"
-
 #include "screen.hh"
 #include "configuration.hh"
 #include "theme.hh"

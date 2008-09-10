@@ -1,12 +1,12 @@
 #ifndef __THEME_H__
 #define __THEME_H__
 
-#include "../config.h"
-
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 #include "surface.hh"
 #include <string>
+#include <libxml/parser.h>
+#include <libxml/tree.h>
 
 struct TRGBA {
 	double r;

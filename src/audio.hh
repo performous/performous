@@ -1,19 +1,15 @@
 #ifndef __AUDIO_H_
 #define __AUDIO_H_
 
-#include "../config.h"
 #include <string>
 
+#include "ffmpeg.hh"
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
-
-#ifdef USE_FFMPEG_AUDIO
-#include "ffmpeg.hh"
 #include <audio.hpp>
 #include <boost/scoped_ptr.hpp>
-#endif
 
 /**
  * Audio playback class. This class enables the audio playback using several
@@ -94,9 +90,7 @@ class CAudio {
 	unsigned int getVolume() { return getVolume_internal(); }
 	void setVolume(unsigned int volume) { setVolume_internal(volume); }
 	void operator()(); // Thread runs here, don't call directly
-#ifdef USE_FFMPEG_AUDIO
 	void operator()(da::pcm_data& areas, da::settings const&);
-#endif
 	void wait() {
 		boost::mutex::scoped_lock l(m_mutex);
 		while (!m_ready || m_type != NONE) m_condready.wait(l);
@@ -122,23 +116,10 @@ class CAudio {
 	double getPosition_internal();
 	unsigned int getVolume_internal();
 	void setVolume_internal(unsigned int _volume);
-#ifdef USE_LIBXINE_AUDIO
-	xine_t               *xine;
-	xine_stream_t        *stream;
-	xine_video_port_t    *vo_port;
-	xine_audio_port_t    *ao_port;
-	xine_event_queue_t   *event_queue;
-	bool xine_playing;
-#endif
-#ifdef USE_GSTREAMER_AUDIO
-	GstElement *music;
-#endif
-#ifdef USE_FFMPEG_AUDIO
 	boost::scoped_ptr<CFfmpeg> m_mpeg;
 	bool ffmpeg_paused;
 	da::settings m_rs;
 	da::playback m_playback;
-#endif
 };
 
 #endif

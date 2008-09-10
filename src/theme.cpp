@@ -1,5 +1,7 @@
 #include "theme.hh"
 #include "screen.hh"
+#include <cairo.h>
+#include <pango/pangocairo.h>
 
 void CTheme::clear() {
 	double width = 800.0, height = 600.0; // FIXME!

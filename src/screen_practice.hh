@@ -1,8 +1,6 @@
 #ifndef __SCREENPRACTICE_H__
 #define __SCREENPRACTICE_H__
 
-#include "../config.h"
-
 #include <boost/scoped_ptr.hpp>
 #include "screen.hh"
 #include "theme.hh"

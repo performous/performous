@@ -1,7 +1,5 @@
 #include "ffmpeg.hh"
 
-#ifdef USE_FFMPEG_VIDEO
-
 #include "xtime.hh"
 #include <iostream>
 #include <stdexcept>
@@ -247,4 +245,3 @@ void CFfmpeg::decodeNextFrame() {
 	}
 }
 
-#endif

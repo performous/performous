@@ -1,8 +1,6 @@
 #ifndef __LYRICS_H__
 #define __LYRICS_H__
 
-#include <../config.h>
-
 #include "songs.hh"
 
 

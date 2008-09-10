@@ -1,8 +1,6 @@
 #ifndef __SCREENSING_H__
 #define __SCREENSING_H__
 
-#include "../config.h"
-
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/scoped_ptr.hpp>
 #include "engine.hh"

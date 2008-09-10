@@ -9,9 +9,11 @@
 #include "audio.hh"
 #include "record.hh"
 #include "songs.hh"
+#include <SDL/SDL.h>
 #include <iostream>
 #include <string>
 #include <vector>
+
 
 class CScreen {
   public:
