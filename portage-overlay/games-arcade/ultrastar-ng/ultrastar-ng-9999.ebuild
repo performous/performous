@@ -24,23 +24,18 @@ LICENSE="GPL-2
 SLOT="0"
 KEYWORDS="~x86 ~amd64"
 
-IUSE="ffmpeg xine debug alsa gstreamer portaudio pulseaudio jack songs"
+IUSE="debug alsa portaudio pulseaudio jack songs"
 
 RDEPEND="gnome-base/librsvg
 	dev-libs/boost
 	x11-libs/pango
 	media-libs/libsdl
 	media-gfx/imagemagick
-	xine? ( media-libs/xine-lib )
-	!xine?
-	(
-		!ffmpeg? ( media-libs/gstreamer )
-	)
 	(
 		virtual/opengl
 		virtual/glu
 	)
-	ffmpeg? ( media-video/ffmpeg )
+	media-video/ffmpeg
 	alsa? ( media-libs/alsa-lib )
 	jack? ( >=media-sound/jack-audio-connection-kit )
 	portaudio? ( media-libs/portaudio )
@@ -48,7 +43,7 @@ RDEPEND="gnome-base/librsvg
 	pulseaudio? ( media-sound/pulseaudio )
 	sys-apps/help2man"
 DEPEND="${RDEPEND}
-    dev-util/pkgconfig"
+    >=dev-util/cmake-2.4.4"
 
 pkg_setup() {
 	games_pkg_setup
@@ -68,35 +63,12 @@ src_unpack() {
 }
 
 src_compile() {
-	./autogen.sh
-	local myconf
-
-	if use ffmpeg ; then
-		myconf="${myconf} --with-video=ffmpeg"
-	else
-		myconf="${myconf} --with-video=disable"
-	fi
-
-	if use ffmpeg ; then
-		myconf="${myconf} --with-audio=ffmpeg"
-	else
-		if use xine ; then
-			myconf="${myconf} --with-audio=xine"
-		else
-			myconf="${myconf} --with-audio=gstreamer"
-		fi
-	fi
-
-	egamesconf \
-		${myconf} \
-		$(use_enable debug) \
-		$(use_enable portaudio libda-portaudio) \
-		$(use_enable pulseaudio libda-pulse) \
-		$(use_enable gstreamer libda-gst) \
-		$(use_enable alsa libda-alsa) \
-		$(use_enable jack libda-jack) \
-		|| die
-
+	cmake \
+		-DCMAKE_MODULE_PATH="${S}/cmake/Modules/" \
+		-DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
+		-DCMAKE_INSTALL_PREFIX="${GAMES_PREFIX}" \
+		-DDATA_INSTALL_DIR="${GAMES_DATADIR}/${PN}" \
+		. || die "cmake failed"
 	emake || die "emake failed"
 }
 
@@ -107,7 +79,7 @@ src_install() {
 		insinto "${GAMES_DATADIR}"/${PN}
 		doins -r songs || die "doins songs failed"
 	fi
-	mv "${D}${GAMES_DATADIR}"/{applications,pixmaps} "${D}"/usr/share/
+	mv "${D}${GAMES_DATADIR}/${PN}"/{applications,pixmaps} "${D}"/usr/share/
 	dodoc AUTHORS ChangeLog README TODO
 	prepgamesdirs
 }
