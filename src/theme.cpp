@@ -4,10 +4,9 @@
 #include <pango/pangocairo.h>
 
 void CTheme::clear() {
-	double width = 800.0, height = 600.0; // FIXME!
 	if (dc) cairo_destroy(dc);
 	if (surface) cairo_surface_destroy(surface);
-	surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
+	surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 1024, 1024);
 	dc = cairo_create(surface);
 }
 
@@ -49,25 +48,6 @@ cairo_surface_t *CTheme::PrintText(TThemeTxt *text) {
 
 	g_object_unref(layout);
 	pango_font_description_free(desc);
-	return surface;
-}
-
-cairo_surface_t *CTheme::DrawRect(TThemeRect rect) {
-	cairo_save(dc);
-	double width = 800.0, height = 600.0; // FIXME!
-	cairo_scale(dc, width/rect.svg_width, height/rect.svg_height);
-	cairo_rectangle(dc, rect.x, rect.y, rect.width, rect.height);
-	if (rect.fill_col.r != -1 && rect.fill_col.g != -1 && rect.fill_col.b != -1) {
-		cairo_set_source_rgba(dc, rect.fill_col.r, rect.fill_col.g, rect.fill_col.b, rect.fill_col.a);
-		if (rect.stroke_col.r != -1 && rect.stroke_col.g != -1 && rect.stroke_col.b != -1) cairo_fill_preserve(dc);
-		else cairo_fill(dc);
-	}
-	if (rect.stroke_col.r != -1 && rect.stroke_col.g != -1 && rect.stroke_col.b != -1) {
-		cairo_set_line_width(dc, rect.stroke_width);
-		cairo_set_source_rgba(dc, rect.stroke_col.r, rect.stroke_col.g, rect.stroke_col.b, rect.stroke_col.a);
-		cairo_stroke(dc);
-	}
-	cairo_restore(dc);
 	return surface;
 }
 

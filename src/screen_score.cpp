@@ -39,7 +39,7 @@ void CScreenScore::draw() {
 	theme->rank.text = rank;
 	theme->theme->PrintText(&theme->normal_score);
 	theme->theme->PrintText(&theme->rank);
-	theme->theme->DrawRect(theme->level);
+	// FIXME (progress bar) theme->theme->DrawRect(theme->level);
 	theme->level.y = oldY;
 	theme->normal_score.text = boost::lexical_cast<std::string>(score);
 	Surface(theme->theme->getCurrent()).draw();
