@@ -50,7 +50,7 @@ set(LIBS ${LIBS} ${FFMPEG_LIBRARIES})
 add_executable(ultrastarng ${SOURCES})
 target_link_libraries(ultrastarng da ${LIBS})
 
-add_definitions("-DTHEMES_DIR=\\\"${SHARE_INSTALL_PREFIX}\\\"")
+add_definitions("-DTHEMES_DIR=\\\"${SHARE_INSTALL_PREFIX}/themes/\\\"")
 
 install(TARGETS ultrastarng DESTINATION bin)
 
