@@ -6,7 +6,7 @@
 void CTheme::clear() {
 	if (dc) cairo_destroy(dc);
 	if (surface) cairo_surface_destroy(surface);
-	surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 1024, 1024);
+	surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 800, 600);
 	dc = cairo_create(surface);
 }
 
