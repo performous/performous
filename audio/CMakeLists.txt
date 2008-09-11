@@ -57,7 +57,6 @@ if (PULSEAUDIO_FOUND)
 	include_directories(${PULSEAUDIO_INCLUDE_DIR})
 	add_library(da_audio_dev_pulse SHARED audio_dev_pulse.cpp)
 	target_link_libraries(da_audio_dev_pulse ${PULSEAUDIO_LIBRARIES})
-	message("PA: ${PULSEAUDIO_LIBRARIES}")
 	install(TARGETS da_audio_dev_pulse DESTINATION lib/da)
 endif (PULSEAUDIO_FOUND)
 

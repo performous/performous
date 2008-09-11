@@ -51,6 +51,17 @@ else (PULSEAUDIO_LIBRARIES AND PULSEAUDIO_INCLUDE_DIRS)
       /sw/lib
   )
 
+  find_library(PULSEAUDIO_SIMPLE_LIBRARY
+    NAMES
+      pulse-simple
+    PATHS
+      ${_PULSEAUDIO_LIBDIR}
+      /usr/lib
+      /usr/local/lib
+      /opt/local/lib
+      /sw/lib
+  )
+
   if (PULSEAUDIO_LIBRARY)
     set(PULSEAUDIO_FOUND TRUE)
   endif (PULSEAUDIO_LIBRARY)
@@ -62,6 +73,7 @@ else (PULSEAUDIO_LIBRARIES AND PULSEAUDIO_INCLUDE_DIRS)
   if (PULSEAUDIO_FOUND)
     set(PULSEAUDIO_LIBRARIES
       ${PULSEAUDIO_LIBRARIES}
+      ${PULSEAUDIO_SIMPLE_LIBRARY}
       ${PULSEAUDIO_LIBRARY}
     )
   endif (PULSEAUDIO_FOUND)
