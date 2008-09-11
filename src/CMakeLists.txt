@@ -11,7 +11,7 @@ include_directories(../audio)
 
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREAD ON)
-find_package(Boost 1.34 REQUIRED COMPONENTS thread program_options regex filesystem system)
+find_package(Boost 1.34.0 REQUIRED COMPONENTS thread program_options regex filesystem)
 include_directories(${Boost_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${Boost_LIBRARIES})
 
