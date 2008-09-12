@@ -171,7 +171,7 @@ void CFfmpeg::decodeNextFrame() {
 		~ReadFramePacket() { av_free_packet(this); }
 		double time() {
 			double t = 0.0;
-			if (uint64_t(dts) != AV_NOPTS_VALUE ) t = dts;
+			if (dts != AV_NOPTS_VALUE ) t = dts;
 			return t ? t * av_q2d(m_s->streams[stream_index]->time_base) : 0.0;
 		}
 	};
