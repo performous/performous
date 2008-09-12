@@ -1,64 +1,89 @@
-# Alsa check, based on libkmid/configure.in.in.
-# Only the support for Alsa >= 0.9.x was included; 0.5.x was dropped (but feel free to re-add it if you need it)
-# It defines ...
-# It offers the following macros:
-# ALSA_CONFIGURE_FILE(config_header) - generate a config.h, typical usage: 
-#                                      ALSA_CONFIGURE_FILE(${CMAKE_BINARY_DIR}/config-alsa.h)
-# ALSA_VERSION_STRING(version_string)  looks for alsa/version.h and reads the version string into
-#                                      the first argument passed to the macro
-
-# Copyright (c) 2006, David Faure, <faure@kde.org>
-# Copyright (c) 2007, Matthias Kretz <kretz@kde.org>
+# - Try to find alsa
+# Once done this will define
 #
-# Redistribution and use is allowed according to the terms of the BSD license.
-# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
+#  ALSA_FOUND - system has ALSA
+#  ALSA_INCLUDE_DIRS - the ALSA include directory
+#  ALSA_LIBRARIES - Link these to use ALSA
+#  ALSA_DEFINITIONS - Compiler switches required for using ALSA
+#
+#  Copyright (c) 2008 Andreas Schneider <mail@cynapses.org>
+#  Modified for other libraries by Lasse Kärkkäinen <tronic>
+#
+#  Redistribution and use is allowed according to the terms of the New
+#  BSD license.
+#  For details see the accompanying COPYING-CMAKE-SCRIPTS file.
+#
 
-include(CheckIncludeFiles)
-include(CheckIncludeFileCXX)
-include(CheckLibraryExists)
+if (ALSA_LIBRARIES AND ALSA_INCLUDE_DIRS)
+  # in cache already
+  set(ALSA_FOUND TRUE)
+else (ALSA_LIBRARIES AND ALSA_INCLUDE_DIRS)
+  # use pkg-config to get the directories and then use these values
+  # in the FIND_PATH() and FIND_LIBRARY() calls
+  if (${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 4)
+    include(UsePkgConfig)
+    pkgconfig(alsa _ALSA_INCLUDEDIR _ALSA_LIBDIR _ALSA_LDFLAGS _ALSA_CFLAGS)
+  else (${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 4)
+    find_package(PkgConfig)
+    if (PKG_CONFIG_FOUND)
+      pkg_check_modules(_ALSA alsa)
+    endif (PKG_CONFIG_FOUND)
+  endif (${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 4)
+  find_path(ALSA_INCLUDE_DIR
+    NAMES
+      alsa/asoundlib.h
+    PATHS
+      ${_ALSA_INCLUDEDIR}
+      /usr/include
+      /usr/local/include
+      /opt/local/include
+      /sw/include
+    SUFFIXES
+      ..
+  )
+  
+  find_library(ALSA_LIBRARY
+    NAMES
+      asound
+    PATHS
+      ${_ALSA_LIBDIR}
+      /usr/lib
+      /usr/local/lib
+      /opt/local/lib
+      /sw/lib
+  )
 
-# Already done by toplevel
-find_library(ASOUND_LIBRARY asound)
-check_library_exists(asound snd_seq_create_simple_port ${ASOUND_LIBRARY} HAVE_LIBASOUND2)
-if(HAVE_LIBASOUND2)
-    message(STATUS "Found ALSA: ${ASOUND_LIBRARY}")
-else(HAVE_LIBASOUND2)
-    message(STATUS "ALSA not found")
-endif(HAVE_LIBASOUND2)
-set(ALSA_FOUND ${HAVE_LIBASOUND2})
+  if (ALSA_LIBRARY)
+    set(ALSA_FOUND TRUE)
+  endif (ALSA_LIBRARY)
 
-find_path(ALSA_INCLUDES alsa/version.h)
+  set(ALSA_INCLUDE_DIRS
+    ${ALSA_INCLUDE_DIR}
+  )
 
-macro(ALSA_VERSION_STRING _result)
-    # check for version in alsa/version.h
-    if(ALSA_INCLUDES)
-        file(READ "${ALSA_INCLUDES}/alsa/version.h" _ALSA_VERSION_CONTENT)
-        string(REGEX REPLACE ".*SND_LIB_VERSION_STR.*\"(.*)\".*" "\\1" ${_result} ${_ALSA_VERSION_CONTENT})
-    else(ALSA_INCLUDES)
-        message(STATUS "ALSA version not known. ALSA output will probably not work correctly.")
-    endif(ALSA_INCLUDES)
-endmacro(ALSA_VERSION_STRING _result)
+  if (ALSA_FOUND)
+    set(ALSA_LIBRARIES
+      ${ALSA_LIBRARIES}
+      ${ALSA_LIBRARY}
+    )
+  endif (ALSA_FOUND)
 
+  if (ALSA_INCLUDE_DIRS AND ALSA_LIBRARIES)
+     set(ALSA_FOUND TRUE)
+  endif (ALSA_INCLUDE_DIRS AND ALSA_LIBRARIES)
 
-get_filename_component(_FIND_ALSA_MODULE_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
-macro(ALSA_CONFIGURE_FILE _destFile)
-    check_include_files(sys/soundcard.h HAVE_SYS_SOUNDCARD_H)
-    check_include_files(machine/soundcard.h HAVE_MACHINE_SOUNDCARD_H)
+  if (ALSA_FOUND)
+    if (NOT ALSA_FIND_QUIETLY)
+      message(STATUS "Found ALSA: ${ALSA_LIBRARY}")
+    endif (NOT ALSA_FIND_QUIETLY)
+  else (ALSA_FOUND)
+    if (ALSA_FIND_REQUIRED)
+      message(FATAL_ERROR "Could not find ALSA")
+    endif (ALSA_FIND_REQUIRED)
+  endif (ALSA_FOUND)
 
-    check_include_files(linux/awe_voice.h HAVE_LINUX_AWE_VOICE_H)
-    check_include_files(awe_voice.h HAVE_AWE_VOICE_H)
-    check_include_files(/usr/src/sys/i386/isa/sound/awe_voice.h HAVE__USR_SRC_SYS_I386_ISA_SOUND_AWE_VOICE_H)
-    check_include_files(/usr/src/sys/gnu/i386/isa/sound/awe_voice.h HAVE__USR_SRC_SYS_GNU_I386_ISA_SOUND_AWE_VOICE_H)
+  # show the ALSA_INCLUDE_DIRS and ALSA_LIBRARIES variables only in the advanced view
+  mark_as_advanced(ALSA_INCLUDE_DIRS ALSA_LIBRARIES)
 
-    check_include_file_cxx(sys/asoundlib.h HAVE_SYS_ASOUNDLIB_H)
-    check_include_file_cxx(alsa/asoundlib.h HAVE_ALSA_ASOUNDLIB_H)
+endif (ALSA_LIBRARIES AND ALSA_INCLUDE_DIRS)
 
-    check_library_exists(asound snd_pcm_resume ${ASOUND_LIBRARY} ASOUND_HAS_SND_PCM_RESUME)
-    if(ASOUND_HAS_SND_PCM_RESUME)
-        set(HAVE_SND_PCM_RESUME 1)
-    endif(ASOUND_HAS_SND_PCM_RESUME)
-
-    configure_file(${_FIND_ALSA_MODULE_DIR}/config-alsa.h.cmake ${_destFile})
-endmacro(ALSA_CONFIGURE_FILE _destFile)
-
-mark_as_advanced(ALSA_INCLUDES ASOUND_LIBRARY)

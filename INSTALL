@@ -1,6 +1,0 @@
-mkdir build
-cd build
-cmake .. -DCMAKE_MODULE_PATH=../cmake/Modules/
-make
-sudo make install
-

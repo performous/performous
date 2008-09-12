@@ -1,16 +1,12 @@
 #ifndef __FFMEG_HPP__
 #define __FFMEG_HPP__
 
-extern "C" {
-#include <avcodec.h>
-#include <avformat.h>
-#include <swscale.h>
-}
-
 #include <boost/ptr_container/ptr_deque.hpp>
 #include <boost/ptr_container/ptr_set.hpp>
-#include <boost/thread/mutex.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <boost/thread/condition.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/thread.hpp>
 #include <iostream>
 #include <vector>
 #include <limits>
@@ -108,10 +104,14 @@ class AudioFifo {
 	bool m_eof;
 };
 
-#include <boost/scoped_ptr.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
+// ffmpeg forward declarations
+extern "C" {
+  struct AVCodec;
+  struct AVCodecContext;
+  struct AVFormatContext;
+  struct ReSampleContext;
+  struct SwsContext;
+}
 
 class CFfmpeg {
   public:

@@ -7,9 +7,6 @@ Generic
   - Write progress bar class to be used for all progress bars
   - Configurable audio roundtrip lag and A/V lag?
 
-libda
-  - Remaining build issues (alsa, pulse, pa19)
-
 Audio
   - Resampling should check sound card rate instead of assuming 48000 Hz
   

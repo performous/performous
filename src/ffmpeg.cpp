@@ -4,6 +4,12 @@
 #include <iostream>
 #include <stdexcept>
 
+extern "C" {
+#include <avcodec.h>
+#include <avformat.h>
+#include <swscale.h>
+}
+
 #define FFMPEG_OUTPUT_NUMBER_OF_CHANNELS 2
 #define FFMPEG_OUTPUT_SAMPLE_RATE 48000
 
