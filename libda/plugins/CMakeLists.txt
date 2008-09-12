@@ -1,0 +1,56 @@
+set(LIBDA_PLUGIN_DIR lib/libda)
+
+find_package(Alsa)
+find_package(GStreamer)
+find_package(Jack)
+find_package(Portaudio)
+find_package(PulseAudio)
+
+add_library(da_audio_dev_tone MODULE audio_dev_tone.cpp)
+
+if (ALSA_FOUND)
+	include_directories(${ALSA_INCLUDE_DIR})
+	include_directories(.) # for alsa/alsa.hpp
+	add_library(da_audio_dev_alsa MODULE audio_dev_alsa.cpp)
+	target_link_libraries(da_audio_dev_alsa ${ALSA_LIBRARIES})
+	install(TARGETS da_audio_dev_alsa DESTINATION ${LIBDA_PLUGIN_DIR})
+endif (ALSA_FOUND)
+
+if (GSTREAMER_LIBRARIES)
+	include_directories(${GSTREAMER_INCLUDE_DIRS})
+	add_definitions(${GSTREAMER_DEFINITIONS})
+	add_library(da_audio_dev_gst MODULE audio_dev_gst.cpp)
+	target_link_libraries(da_audio_dev_gst ${GSTREAMER_LIBRARIES})
+	install(TARGETS da_audio_dev_gst DESTINATION ${LIBDA_PLUGIN_DIR})
+endif (GSTREAMER_LIBRARIES)
+
+if (JACK_LIBRARIES)
+	include_directories(${JACK_INCLUDE_DIRS})
+	add_library(da_audio_dev_jack MODULE audio_dev_jack.cpp)
+	target_link_libraries(da_audio_dev_jack ${JACK_LIBRARIES})
+	install(TARGETS da_audio_dev_jack DESTINATION ${LIBDA_PLUGIN_DIR})
+endif (JACK_LIBRARIES)
+
+# TODO: fix FindPortaudio.cmake to report the version and build the right version
+if (PORTAUDIO_FOUND)
+	if( ${PORTAUDIO_VERSION} EQUAL 18 )
+		include_directories(${PORTAUDIO_INCLUDE_DIRS})
+		add_library(da_audio_dev_pa18 MODULE audio_dev_pa18.cpp)
+		target_link_libraries(da_audio_dev_pa18 ${PORTAUDIO_LIBRARIES})
+		install(TARGETS da_audio_dev_pa18 DESTINATION ${LIBDA_PLUGIN_DIR})
+	endif( ${PORTAUDIO_VERSION} EQUAL 18 )
+	if( ${PORTAUDIO_VERSION} EQUAL 19 )
+		include_directories(${PORTAUDIO_INCLUDE_DIRS})
+		add_library(da_audio_dev_pa19 MODULE audio_dev_pa19.cpp)
+		target_link_libraries(da_audio_dev_pa19 ${PORTAUDIO_LIBRARIES})
+		install(TARGETS da_audio_dev_pa19 DESTINATION ${LIBDA_PLUGIN_DIR})
+	endif( ${PORTAUDIO_VERSION} EQUAL 19 )
+endif (PORTAUDIO_FOUND)
+
+if (PULSEAUDIO_FOUND)
+	include_directories(${PULSEAUDIO_INCLUDE_DIR})
+	add_library(da_audio_dev_pulse MODULE audio_dev_pulse.cpp)
+	target_link_libraries(da_audio_dev_pulse ${PULSEAUDIO_LIBRARIES})
+	install(TARGETS da_audio_dev_pulse DESTINATION ${LIBDA_PLUGIN_DIR})
+endif (PULSEAUDIO_FOUND)
+
