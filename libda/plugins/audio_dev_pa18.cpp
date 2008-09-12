@@ -1,4 +1,4 @@
-#include "audio_dev.hpp"
+#include <libda/plugins/audio_dev.hpp>
 #include <portaudio.h>
 #include <ostream>
 #include <stdint.h>
@@ -43,7 +43,7 @@ namespace {
 			if( err != paNoError ) throw std::runtime_error("Cannot start PortAudio audio stream " + s.subdev() + ": " + Pa_GetErrorText(err));
 		}
 	};
-	boost::plugin::simple<record_plugin, pa18_record> r(devinfo("pa18", "PortAudio v18 PCM capture. Settings are not used."));
+	plugin::simple<record_plugin, pa18_record> r(devinfo("pa18", "PortAudio v18 PCM capture. Settings are not used."));
 
 	class pa18_playback: public playback::dev {
 		static int c_callback(void*, void* output, unsigned long frames, PaTimestamp, void* userdata)
@@ -86,5 +86,5 @@ namespace {
 			if( err != paNoError ) throw std::runtime_error("Cannot start PortAudio audio stream " + s.subdev() + ": " + Pa_GetErrorText(err));
 		}
 	};
-	boost::plugin::simple<playback_plugin, pa18_playback> p(devinfo("pa18", "PortAudio v18 PCM playback. Settings are not used."));
+	plugin::simple<playback_plugin, pa18_playback> p(devinfo("pa18", "PortAudio v18 PCM playback. Settings are not used."));
 }

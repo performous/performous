@@ -1,4 +1,4 @@
-#include "audio_dev.hpp"
+#include <libda/plugins/audio_dev.hpp>
 #include <portaudio.h>
 #include <ostream>
 #include <sstream>
@@ -56,7 +56,7 @@ namespace {
 			s_orig = s;
 		}
 	};
-	boost::plugin::simple<record_plugin, pa19_record> r(devinfo("pa19", "PortAudio v19 PCM capture. Device number as settings (otherwise PA default)."));
+	plugin::simple<record_plugin, pa19_record> r(devinfo("pa19", "PortAudio v19 PCM capture. Device number as settings (otherwise PA default)."));
 
 	class pa19_playback: public playback::dev {
 		static int c_callback(const void*, void* output, unsigned long frames, const PaStreamCallbackTimeInfo*,PaStreamCallbackFlags, void* userdata)
@@ -111,6 +111,6 @@ namespace {
 			if( err != paNoError ) throw std::runtime_error("Cannot start PortAudio audio stream " + s.subdev() + ": " + Pa_GetErrorText(err));
 		}
 	};
-	boost::plugin::simple<playback_plugin, pa19_playback> p(devinfo("pa19", "PortAudio v19 PCM playback. Settings are not used."));
+	plugin::simple<playback_plugin, pa19_playback> p(devinfo("pa19", "PortAudio v19 PCM playback. Settings are not used."));
 }
 

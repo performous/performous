@@ -7,7 +7,7 @@ set(SOURCES ${SOURCE_FILES} ${HEADER_FILES})
 
 # Libraries
 
-include_directories(../audio)
+include_directories(${CMAKE_SOURCE_DIR}/libda)
 
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREAD ON)

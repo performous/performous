@@ -1,10 +1,19 @@
-#include "audio_dev.hpp"
+#include <libda/plugins/audio_dev.hpp>
 #include <ostream>
 #include <limits>
 
 namespace da {
 	const std::size_t settings::low = std::numeric_limits<std::size_t>::min();
 	const std::size_t settings::high = std::numeric_limits<std::size_t>::max();
+
+	class init_impl {
+		plugin::loader m_loader;
+	  public:
+		init_impl(): m_loader("libda") {}
+	};
+
+	initialize::initialize(): m_impl(new init_impl) {}
+	initialize::~initialize() { delete m_impl; }
 
 	namespace {
 		std::string none = "none";

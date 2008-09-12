@@ -1,4 +1,4 @@
-#include "audio_dev.hpp"
+#include <libda/plugins/audio_dev.hpp>
 #include <boost/lexical_cast.hpp>
 #include <jack/jack.h>
 #include <algorithm>
@@ -48,7 +48,7 @@ namespace {
 	};
 	extern "C" int libda_jack_record_callback(jack_nframes_t frames, void* arg) { return static_cast<jack_record*>(arg)->callback(frames); }
 	extern "C" void libda_jack_record_shutdown(void* arg) { static_cast<jack_record*>(arg)->shutdown(); }
-	boost::plugin::simple<record_plugin, jack_record> r(devinfo("jack", "JACK PCM input. JACK client name may be given as settings (default is \"libda_jack_record\")."));
+	plugin::simple<record_plugin, jack_record> r(devinfo("jack", "JACK PCM input. JACK client name may be given as settings (default is \"libda_jack_record\")."));
 
 	extern "C" int libda_jack_playback_callback(jack_nframes_t frames, void* arg);
 	extern "C" void libda_jack_playback_shutdown(void* arg);
@@ -91,7 +91,7 @@ namespace {
 	};
 	extern "C" int libda_jack_playback_callback(jack_nframes_t frames, void* arg) { return static_cast<jack_playback*>(arg)->callback(frames); }
 	extern "C" void libda_jack_playback_shutdown(void* arg) { static_cast<jack_playback*>(arg)->shutdown(); }
-	boost::plugin::simple<playback_plugin, jack_playback> p(devinfo("jack", "JACK PCM output. JACK client name may be given as settings (default is \"libda_jack_playback\")."));
+	plugin::simple<playback_plugin, jack_playback> p(devinfo("jack", "JACK PCM output. JACK client name may be given as settings (default is \"libda_jack_playback\")."));
 }
 
 

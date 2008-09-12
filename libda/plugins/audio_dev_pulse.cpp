@@ -1,5 +1,4 @@
-#include "audio_dev.hpp"
-
+#include <libda/plugins/audio_dev.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/thread.hpp>
 #include <pulse/simple.h>
@@ -62,7 +61,7 @@ namespace {
 			}
 		}
 	};
-	boost::plugin::simple<record_plugin, pulse_record> r(devinfo("pulse", "PulseAudio capture. Client (application) name can be given as settings."));
+	plugin::simple<record_plugin, pulse_record> r(devinfo("pulse", "PulseAudio capture. Client (application) name can be given as settings."));
 
 	class pulse_playback: public playback::dev {
 		settings m_s;
@@ -117,7 +116,7 @@ namespace {
 			}
 		}
 	};
-	boost::plugin::simple<playback_plugin, pulse_playback> p(devinfo("pulse", "PulseAudio playback. Client (application) name can be given as settings."));
+	plugin::simple<playback_plugin, pulse_playback> p(devinfo("pulse", "PulseAudio playback. Client (application) name can be given as settings."));
 }
 
 

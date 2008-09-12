@@ -1,5 +1,5 @@
-#include "audio_dev.hpp"
-#include "alsa/alsa.hpp"
+#include <libda/plugins/audio_dev.hpp>
+#include <alsa/alsa.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/thread.hpp>
 #include <algorithm>
@@ -122,7 +122,7 @@ namespace {
 			}
 		}
 	};
-	boost::plugin::simple<record_plugin, alsa_record> r(devinfo("alsa", "ALSA PCM capture. Device string can be given as settings (default is \"default\")."));
+	plugin::simple<record_plugin, alsa_record> r(devinfo("alsa", "ALSA PCM capture. Device string can be given as settings (default is \"default\")."));
 
 	class alsa_playback: public playback::dev {
 		settings m_s;
@@ -194,7 +194,7 @@ namespace {
 			}
 		}
 	};
-	boost::plugin::simple<playback_plugin, alsa_playback> p(devinfo("alsa", "ALSA PCM playback. Device string can be given as settings (default is \"default\")."));
+	plugin::simple<playback_plugin, alsa_playback> p(devinfo("alsa", "ALSA PCM playback. Device string can be given as settings (default is \"default\")."));
 }
 
 

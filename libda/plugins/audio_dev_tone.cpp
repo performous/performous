@@ -1,4 +1,4 @@
-#include "audio_dev.hpp"
+#include <libda/plugins/audio_dev.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
@@ -97,6 +97,6 @@ namespace {
 			}
 		}
 	};
-	boost::plugin::simple<record_plugin, tonegen> r(devinfo("~tone", "Tone generator. Settings format: tone1:tone2:..., where each tone is specified as frequency in Hz, optionally followed by amplitude or phase settings, e.g. 440.amplitude(-20).phase(0.25). Amplitude values <= 0 are taken as decibels and > 0 are taken as absolute values. If no parameters are given, a 440 Hz tone will be generated."));
+	plugin::simple<record_plugin, tonegen> r(devinfo("~tone", "Tone generator. Settings format: tone1:tone2:..., where each tone is specified as frequency in Hz, optionally followed by amplitude or phase settings, e.g. 440.amplitude(-20).phase(0.25). Amplitude values <= 0 are taken as decibels and > 0 are taken as absolute values. If no parameters are given, a 440 Hz tone will be generated."));
 }
 

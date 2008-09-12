@@ -25,6 +25,20 @@ Link with libda when you use this.
 
 namespace da {
 
+	class init_impl;
+	
+	/** A RAII object for loading libda plugins. Create an object of this type
+	* before you try to open audio devices. Reference counting is used internally
+	* so that you can create multiple da::initialize objects.
+	* Do not, however, destroy the object while audio devices are still in use!
+	**/
+	class initialize {
+		init_impl* m_impl;
+	  public:
+		initialize();
+		~initialize();
+	};
+
 	/** Provides various access iterators to a multich interleaved sample buffer. **/
 	class pcm_data {
 	  public:
