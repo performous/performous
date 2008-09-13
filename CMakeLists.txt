@@ -1,7 +1,8 @@
 project(ultrastar-ng)
 cmake_minimum_required(VERSION 2.6)
 
-set(CPACK_SOURCE_GENERATOR "TBZ2")
+set(CPACK_GENERATOR "TBZ2;TGZ")
+set(CPACK_SOURCE_GENERATOR "TBZ2;TGZ")
 set(CPACK_PACKAGE_NAME "UltraStar-NG")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A karaoke game with pitch detection and scoring, similar to Singstar games. Supports songs in Ultrastar format.")
 set(CPACK_PACKAGE_CONTACT "http://ultrastar-ng.sf.net/")
