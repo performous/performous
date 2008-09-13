@@ -22,7 +22,6 @@ Score screen
 
 Singing screen
   - Song progress bar
-  - Player 2 score meter (theme etc)
   - Widescreen support (not even the first line of lyrics or score calculators fit)
   - Optimized text rendering
   - Autozoom notelines improvement?
