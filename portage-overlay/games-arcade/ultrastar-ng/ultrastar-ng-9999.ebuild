@@ -64,7 +64,6 @@ src_unpack() {
 
 src_compile() {
 	cmake \
-		-DCMAKE_MODULE_PATH="${S}/cmake/Modules/" \
 		-DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
 		-DCMAKE_INSTALL_PREFIX="${GAMES_PREFIX}" \
 		-DDATA_INSTALL_DIR="${GAMES_DATADIR}/${PN}" \
@@ -74,9 +73,9 @@ src_compile() {
 
 src_install() {
 	emake DESTDIR="${D}" install || die "make install failed"
-	keepdir "${GAMES_DATADIR}"/${PN}/songs
+	keepdir "${GAMES_DATADIR}"/ultrastar/songs
 	if use songs; then
-		insinto "${GAMES_DATADIR}"/${PN}
+		insinto "${GAMES_DATADIR}"/ultrastar
 		doins -r songs || die "doins songs failed"
 	fi
 	mv "${D}${GAMES_DATADIR}/${PN}"/{applications,pixmaps} "${D}"/usr/share/
