@@ -11,6 +11,10 @@ include(CPack)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake/Modules/)
 
+if(NOT INSTALL_LIBRARY_DIR)
+  set(INSTALL_LIBRARY_DIR ${CMAKE_INSTALL_PREFIX}/lib/ CACHE PATH "Base directory for libraries" FORCE)
+endif(NOT INSTALL_LIBRARY_DIR)
+
 if(DATA_INSTALL_DIR)
   set(SHARE_INSTALL_PREFIX ${DATA_INSTALL_DIR} CACHE PATH "Base directory for files which go to share/" FORCE)
 else(DATA_INSTALL_DIR)

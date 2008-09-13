@@ -1,5 +1,3 @@
-set(LIBDA_PLUGIN_DIR lib/libda)
-
 find_package(Alsa)
 find_package(GStreamer)
 find_package(Jack)
@@ -53,4 +51,3 @@ if (PULSEAUDIO_FOUND)
 	target_link_libraries(da_audio_dev_pulse ${PULSEAUDIO_LIBRARIES})
 	install(TARGETS da_audio_dev_pulse DESTINATION ${LIBDA_PLUGIN_DIR})
 endif (PULSEAUDIO_FOUND)
-
