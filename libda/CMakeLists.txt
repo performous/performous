@@ -9,9 +9,9 @@ set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREAD ON)
 find_package(Boost 1.34 REQUIRED COMPONENTS thread filesystem)
 
-include_directories(${BOOST_INCLUDE_DIR})
+include_directories(${Boost_INCLUDE_DIR})
 add_library(da audio.cpp)
-target_link_libraries(da ${BOOST_LIBRARIES})
+target_link_libraries(da ${Boost_LIBRARIES})
 install(TARGETS da DESTINATION lib)
 
 add_subdirectory(plugins)
