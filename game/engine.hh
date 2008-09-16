@@ -89,6 +89,7 @@ class Engine {
 		}
 	}
 	std::list<Player> getPlayers() {
+		boost::thread::yield(); // Try to let engine perform its run right before getting the data
 		boost::mutex::scoped_lock l(m_mutex);
 		return m_players;
 	}
