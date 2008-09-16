@@ -66,9 +66,6 @@ namespace plugin {
             if (!folder.empty()) {
                 parse(paths, std::getenv("LD_LIBRARY_PATH"), folder);
                 parse(paths, "/usr/lib:/usr/local/lib", folder);
-#ifdef LIBDA_PLUGIN_DIR
-		parse(paths, LIBDA_PLUGIN_DIR, folder);
-#endif
             }
             for (std::set<fs::path>::const_iterator it = paths.begin(); it != paths.end(); ++it) load(*it);
             if (dlls.empty()) std::cerr << "No plugins found. Try setting PLUGIN_PATH or LD_LIBRARY_PATH." << std::endl;
