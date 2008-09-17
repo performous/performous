@@ -30,6 +30,9 @@ else (PORTAUDIO_LIBRARIES AND PORTAUDIO_INCLUDE_DIRS)
     set(PORTAUDIO_LIBRARIES
       ${PORTAUDIO2_LIBRARIES}
     )
+    set(PORTAUDIO_LIBRARY_DIRS
+      ${PORTAUDIO2_LIBRARY_DIRS}
+    )
     set(PORTAUDIO_VERSION
       19
     )
@@ -55,11 +58,25 @@ else (PORTAUDIO_LIBRARIES AND PORTAUDIO_INCLUDE_DIRS)
         /sw/lib
     )
    
+    find_path(PORTAUDIO_LIBRARY_DIR
+      NAMES
+        portaudio
+      PATHS
+        /usr/lib
+        /usr/local/lib
+        /opt/local/lib
+        /sw/lib
+    )
+   
     set(PORTAUDIO_INCLUDE_DIRS
       ${PORTAUDIO_INCLUDE_DIR}
     )
     set(PORTAUDIO_LIBRARIES
       ${PORTAUDIO_LIBRARY}
+    )
+   
+    set(PORTAUDIO_LIBRARY_DIRS
+      ${PORTAUDIO_LIBRARY_DIR}
     )
    
     set(PORTAUDIO_VERSION
