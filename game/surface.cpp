@@ -128,7 +128,13 @@ void Surface::load(unsigned int width, unsigned int height, Format format, unsig
 		int newHeight = prevPow2(height);
 		std::vector<uint32_t> outBuf(newWidth * newHeight);
 		gluScaleImage(fmt, width, height, buffer_fmt, buffer, newWidth, newHeight, buffer_fmt, &outBuf[0]);
-		
+
+		// BIG FAT WARNING: Do not even think of using ARB_texture_rectangle here!
+		// Every developer of the game so far has tried doing so, but it just cannot work.
+		// (1) no repeat => cannot texture
+		// (2) coordinates not normalized => would require special hackery elsewhere		
+		// Just don't do it in Surface class, thanks. -Tronic
+
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, newWidth, newHeight, 0, fmt, buffer_fmt, &outBuf[0]);
 	}
 }
