@@ -19,6 +19,8 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL _text) {
 	PangoStyle style;
 	PangoLayout *layout;
 
+	if( _text.fontfamily.empty() )
+		_text.fontfamily = std::string("Sans");
 	if( _text.fontalign == std::string("start") ) {
 		alignment = PANGO_ALIGN_LEFT;
 	} else if( _text.fontalign == std::string("center") ) {
