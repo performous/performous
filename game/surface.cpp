@@ -7,14 +7,6 @@
 // TODO: get rid of this and use C++ std::string instead
 #include <string.h>
 
-Surface::Surface(unsigned int width, unsigned int height, Surface::Format format, unsigned char* buffer) {
-	load(width, height, format, buffer);
-}
-
-Surface::~Surface() {
-	glDeleteTextures(1, &texture_id);
-}
-
 namespace {
 	bool isPow2(unsigned int val) {
 		unsigned int count = 0;
@@ -63,24 +55,20 @@ bool checkExtension(const char *extension)
 	return false;
 }
 
-void Surface::load(unsigned int width, unsigned int height, Format format, unsigned char* buffer, float ar) {
-	m_width = width; m_height = height;
-	dimensions = Dimensions(ar != 0.0f ? ar : float(width) / height).fixedWidth(1.0f);
-	tex.x1 = tex.y1 = 0.0f;
-	tex.x2 = tex.y2 = 1.0f;
-	glGenTextures(1, &texture_id);
+OpenGLTexture::OpenGLTexture(unsigned int width, unsigned int height, Format format, unsigned char* buffer) {
+	glGenTextures(1, &m_texture_id);
 
 	bool hasTexture_non_power_of_two = checkExtension("GL_ARB_texture_non_power_of_two");
 
-	glBindTexture(GL_TEXTURE_2D, texture_id);
+	glBindTexture(GL_TEXTURE_2D, m_texture_id);
 
-		// when texture area is small, bilinear filter the closest mipmap
+	// when texture area is small, bilinear filter the closest mipmap
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST );
-		// when texture area is large, bilinear filter the original
+	// when texture area is large, bilinear filter the original
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0 );
 	
-		// the texture wraps over at the edges (repeat)
+	// the texture wraps over at the edges (repeat)
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
 	glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
@@ -116,50 +104,75 @@ void Surface::load(unsigned int width, unsigned int height, Format format, unsig
 
 	if (hasTexture_non_power_of_two) { // Use OpenGL 2.0 functionality 
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, fmt, buffer_fmt, buffer);	
-	}
-	else {
-		//if (isPow2(width) && isPow2(height)) gluBuild2DMipmaps(GL_TEXTURE_2D, 3, width, height, fmt, buffer_fmt, buffer);
-		// TODO: Test for OpenGL extension GL_ARB_texture_non_power_of_two and if not found, use gluScaleImage to upscale the texture to nextPow2 dimensions before calling glTexImage2D (if it isn't pow2 already).
-	//	int newWidth = nextPow2(width);
-	//	int newHeight = nextPow2(height);
-	// speeds it up... trust me you need it for now at least! :P
-	// TODO: remove when cairo is fixed.
+	} else {
+		// TODO: Test for OpenGL extension GL_ARB_texture_non_power_of_two and if not found, 
+		// use gluScaleImage to upscale the texture to nextPow2 dimensions before calling 
+		// glTexImage2D (if it isn't pow2 already).
+		// speeds it up... trust me you need it for now at least! :P
+		// TODO: remove when cairo is fixed.
+		//
+		//if (isPow2(width) && isPow2(height))
+		//  gluBuild2DMipmaps(GL_TEXTURE_2D, 3, width, height, fmt, buffer_fmt, buffer);
+		//	int newWidth = nextPow2(width);
+		//	int newHeight = nextPow2(height);
 		int newWidth = prevPow2(width);
 		int newHeight = prevPow2(height);
 		std::vector<uint32_t> outBuf(newWidth * newHeight);
 		gluScaleImage(fmt, width, height, buffer_fmt, buffer, newWidth, newHeight, buffer_fmt, &outBuf[0]);
-
 		// BIG FAT WARNING: Do not even think of using ARB_texture_rectangle here!
 		// Every developer of the game so far has tried doing so, but it just cannot work.
 		// (1) no repeat => cannot texture
 		// (2) coordinates not normalized => would require special hackery elsewhere		
 		// Just don't do it in Surface class, thanks. -Tronic
-
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, newWidth, newHeight, 0, fmt, buffer_fmt, &outBuf[0]);
 	}
 }
 
-Surface::Use::Use(Surface const& s) {
+Use::Use(OpenGLTexture const& s) {
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, s.texture_id);
+	glBindTexture(GL_TEXTURE_2D, s.id());
 }
 
-Surface::Use::~Use() {
+Use::Use(Surface const& s) {
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, s.texture()->id());
+}
+
+Use::~Use() {
 	glDisable(GL_TEXTURE_2D);
 }
 
-void Surface::draw() {
+
+void OpenGLTexture::draw(Dimensions &dim, TexCoords &tex) {
 	Use texture(*this);
 	glBegin(GL_QUADS);
-	float x1 = dimensions.x1();
-	float x2 = dimensions.x2();
-	float y1 = dimensions.y1();
-	float y2 = dimensions.y2();
-	glTexCoord2f(tex.x1, tex.y1); glVertex2f(x1, y1);
-	glTexCoord2f(tex.x2, tex.y1); glVertex2f(x2, y1);
-	glTexCoord2f(tex.x2, tex.y2); glVertex2f(x2, y2);
-	glTexCoord2f(tex.x1, tex.y2); glVertex2f(x1, y2);
+	glTexCoord2f(tex.x1, tex.y1); glVertex2f(dim.x1(), dim.y1());
+	glTexCoord2f(tex.x2, tex.y1); glVertex2f(dim.x2(), dim.y1());
+	glTexCoord2f(tex.x2, tex.y2); glVertex2f(dim.x2(), dim.y2());
+	glTexCoord2f(tex.x1, tex.y2); glVertex2f(dim.x1(), dim.y2());
 	glEnd();
+}
+
+OpenGLTexture::~OpenGLTexture() {
+	glDeleteTextures(1, &m_texture_id);
+}
+
+Surface::Surface(unsigned int width, unsigned int height, OpenGLTexture::Format format, unsigned char* buffer) {
+	load(width, height, format, buffer);
+}
+
+Surface::~Surface() { }
+
+void Surface::load(unsigned int width, unsigned int height, OpenGLTexture::Format format, unsigned char* buffer, float ar) {
+	m_texture.reset(new OpenGLTexture(width,height,format,buffer));
+	m_width = width; m_height = height;
+	dimensions = Dimensions(ar != 0.0f ? ar : float(width) / height).fixedWidth(1.0f);
+	tex.x1 = tex.y1 = 0.0f;
+	tex.x2 = tex.y2 = 1.0f;
+}
+
+void Surface::draw() {
+	m_texture->draw(dimensions,tex);
 }
 
 #include <fstream>
@@ -187,7 +200,7 @@ Surface::Surface(std::string const& filename) {
 			g_error_free(pError);
 			throw std::runtime_error("Unable to load " + filename);
 		}
-		load(w, h, CHAR_RGBA, gdk_pixbuf_get_pixels(pb), float(svgDimension.width)/svgDimension.height);
+		load(w, h, OpenGLTexture::CHAR_RGBA, gdk_pixbuf_get_pixels(pb), float(svgDimension.width)/svgDimension.height);
 		gdk_pixbuf_unref(pb);
 		rsvg_term();
 	} else {
@@ -197,7 +210,7 @@ Surface::Surface(std::string const& filename) {
 			image.read(filename);
 			image.magick("RGBA");
 			image.write(&blob);
-			load(image.columns(),image.rows(), CHAR_RGBA, (unsigned char*)blob.data());
+			load(image.columns(),image.rows(), OpenGLTexture::CHAR_RGBA, (unsigned char*)blob.data());
 		}
 		catch( Magick::Exception &error_ ) // add error handling
 		{
@@ -209,6 +222,6 @@ Surface::Surface(std::string const& filename) {
 Surface::Surface(cairo_surface_t* _surf) {
 	unsigned int w = cairo_image_surface_get_width(_surf);
 	unsigned int h = cairo_image_surface_get_height(_surf);
-	load(w, h, INT_ARGB, cairo_image_surface_get_data(_surf));
+	load(w, h, OpenGLTexture::INT_ARGB, cairo_image_surface_get_data(_surf));
 }
 

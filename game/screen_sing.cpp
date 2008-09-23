@@ -94,7 +94,7 @@ namespace {
 	}
 
 	void drawNotebar(Surface const& surf, double x, double y, double w, double h) {
-		Surface::Use texture(surf);
+		Use texture(surf);
 		glBegin(GL_TRIANGLE_STRIP);
 		glTexCoord2f(0.0f, 0.0f); glVertex2f(x, y);
 		glTexCoord2f(0.0f, 1.0f); glVertex2f(x, y + h);
@@ -242,7 +242,7 @@ void CScreenSing::draw() {
 			}
 		}
 		// Pitch graph
-		Surface::Use texture(*m_wave);
+		Use texture(*m_wave);
 		for (std::list<Player>::const_iterator p = players.begin(); p != players.end(); ++p) {
 			glColor4f(p->m_color.r, p->m_color.g, p->m_color.b, m_notealpha);
 			float tex = 0.0;

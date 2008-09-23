@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <string>
 #include <boost/noncopyable.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <SDL/SDL_opengl.h>
 #include <librsvg/rsvg.h>
 #include <librsvg/rsvg-cairo.h>
@@ -53,24 +54,38 @@ struct TexCoords {
 	float x1, y1, x2, y2;
 };
 
+class OpenGLTexture {
+  public:
+	enum Format { INT_ARGB, CHAR_RGBA, RGB, BGR };
+	OpenGLTexture(unsigned int width, unsigned int height, Format format, unsigned char* buffer);
+	~OpenGLTexture();
+	GLuint id(void) const {return m_texture_id;};
+	void draw(Dimensions &dim, TexCoords &tex);
+  private:
+	GLuint m_texture_id;
+};
+
+
 class Surface: boost::noncopyable {
   public:
   	Dimensions dimensions;
 	TexCoords tex;
-	enum Format { INT_ARGB, CHAR_RGBA, RGB, BGR };
-	Surface(unsigned width, unsigned height, Format format, unsigned char* buffer);
+	Surface(unsigned width, unsigned height, OpenGLTexture::Format format, unsigned char* buffer);
 	Surface(cairo_surface_t* _surf);
 	Surface(std::string const& filename);
 	~Surface();
 	void draw();
-	struct Use {
-		Use(Surface const& s);
-		~Use();
-	};
+	OpenGLTexture* texture(void) const {return m_texture.get();};
   private:
-	void load(unsigned int width, unsigned int height, Format format, unsigned char* buffer, float ar = 0.0f);
+	void load(unsigned int width, unsigned int height, OpenGLTexture::Format format, unsigned char* buffer, float ar = 0.0f);
 	unsigned int m_width, m_height;
-	GLuint texture_id;
+	boost::scoped_ptr<OpenGLTexture> m_texture;
+};
+
+struct Use {
+	Use(OpenGLTexture const& s);
+	Use(Surface const& s);
+	~Use();
 };
 
 bool checkExtension(const char* extension);

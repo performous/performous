@@ -7,7 +7,7 @@ void Video::render(double time) {
 	VideoFrame& fr = m_videoFrame;
 	// Time to switch frame?
 	if (!fr.data.empty() && time >= fr.timestamp) {
-		m_surface.reset(new Surface(fr.width, fr.height, Surface::RGB, &fr.data[0]));
+		m_surface.reset(new Surface(fr.width, fr.height, OpenGLTexture::RGB, &fr.data[0]));
 		fr.data.clear();
 		m_surfaceTime = fr.timestamp;
 	}
