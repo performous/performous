@@ -97,7 +97,14 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL _text) {
 	}
 	g_object_unref(layout);
 
-	m_surf.reset(new Surface(surface));
+	m_texture.reset(
+		new OpenGLTexture(
+			cairo_image_surface_get_width(surface),
+			cairo_image_surface_get_height(surface),
+			OpenGLTexture::INT_ARGB,
+			cairo_image_surface_get_data(surface)
+		)
+	);
 
 	// delete surface
 	cairo_destroy(dc);
@@ -106,8 +113,8 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL _text) {
 	pango_font_description_free(desc);
 }
 
-void OpenGLText::draw(void) {
-	m_surf->draw();
+void OpenGLText::draw(Dimensions &_dim, TexCoords &_tex) {
+	m_texture->draw(_dim,_tex);
 }
 
 OpenGLText::~OpenGLText() {

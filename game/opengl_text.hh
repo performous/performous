@@ -31,7 +31,7 @@ class OpenGLText {
 	public:
 	OpenGLText(TThemeTxtOpenGL _text);
 	~OpenGLText();
-	void draw(void);
+	void draw(Dimensions &_dim, TexCoords &_tex);
 	private:
 	unsigned int x_power_of_two;
 	unsigned int y_power_of_two;
@@ -41,7 +41,7 @@ class OpenGLText {
 	double y_advance;
 	// TODO: only have a texture id uploaded here
 	// because Surface do way too much things (global positionning for example)
-	boost::scoped_ptr<Surface> m_surf;
+	boost::scoped_ptr<OpenGLTexture> m_texture;
 };
 
 #endif // __OPENGL_TEXT_H__
