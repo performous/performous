@@ -29,6 +29,7 @@ IUSE="debug alsa portaudio pulseaudio jack songs"
 RDEPEND="gnome-base/librsvg
 	dev-libs/boost
 	x11-libs/pango
+	dev-cpp/libxmlpp
 	media-libs/libsdl
 	media-gfx/imagemagick
 	(
@@ -43,7 +44,7 @@ RDEPEND="gnome-base/librsvg
 	pulseaudio? ( media-sound/pulseaudio )
 	sys-apps/help2man"
 DEPEND="${RDEPEND}
-    >=dev-util/cmake-2.4.4"
+    >=dev-util/cmake-2.6.0"
 
 pkg_setup() {
 	games_pkg_setup
