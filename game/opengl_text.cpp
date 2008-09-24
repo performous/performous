@@ -114,6 +114,8 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL _text) {
 }
 
 void OpenGLText::draw(Dimensions &_dim, TexCoords &_tex) {
+	_tex.x2 = _tex.x2 * x / x_power_of_two;
+	_tex.y2 = _tex.y2 * y / y_power_of_two;
 	m_texture->draw(_dim,_tex);
 }
 
