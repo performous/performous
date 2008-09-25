@@ -70,9 +70,6 @@ class CTheme: boost::noncopyable {
 struct CThemeSongs: boost::noncopyable {
 	CThemeSongs();
 	boost::scoped_ptr<Surface> bg;
-	boost::scoped_ptr<CTheme> theme;
-	TThemeTxt song;
-	TThemeTxt order;
 };
 
 struct CThemePractice: boost::noncopyable {

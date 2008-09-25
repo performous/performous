@@ -340,9 +340,6 @@ CTheme::~CTheme() {
 CThemeSongs::CThemeSongs() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	bg.reset(new Surface(sm->getThemePathFile("songs_bg.svg")));
-	theme.reset(new CTheme());
-	theme->ParseSVGForText(sm->getThemePathFile("songs_song.svg"), &song);
-	theme->ParseSVGForText(sm->getThemePathFile("songs_order.svg"), &order);
 }
 
 CThemePractice::CThemePractice() {

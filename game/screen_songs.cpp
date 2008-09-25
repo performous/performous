@@ -11,6 +11,8 @@ CScreenSongs::CScreenSongs(std::string const& name, std::set<std::string> const&
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	if (!sm->getSongs()) sm->setSongs(new Songs(songdirs));
 	m_emptyCover.reset(new Surface(sm->getThemePathFile("no_cover.svg")));
+	m_theme_song.reset(new SvgTxtTheme(sm->getThemePathFile("songs_song.svg")));
+	m_theme_order.reset(new SvgTxtTheme(sm->getThemePathFile("songs_order.svg")));
 }
 
 void CScreenSongs::enter() {
@@ -60,38 +62,22 @@ void CScreenSongs::manageEvent(SDL_Event event) {
 	else if (key == SDLK_DOWN) songs.sortChange(1);
 }
 
-namespace {
-	void print(CThemeSongs* theme, TThemeTxt t, std::string const& text) {
-		t.text = text;
-		do {
-			cairo_text_extents_t extents = theme->theme->GetTextExtents(t);
-			t.x = (t.svg_width - extents.width)/2;
-		} while (t.x < 0 && (t.fontsize -= 2) > 0);
-		theme->theme->PrintText(&t);
-	}
-}
-
 void CScreenSongs::draw() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	CAudio& audio = *sm->getAudio();
 	Songs& songs = *sm->getSongs();
-	theme->theme->clear();
-	// Draw the song number + order by / find text
-	{
-		std::ostringstream oss;
-		oss << "(" << songs.currentId() + 1 << "/" << songs.size() << ")\n";
-		oss << (m_search.text.empty() ? songs.sortDesc() : m_search.text);
-		print(theme.get(), theme->order, oss.str());
-	}
 	theme->bg->draw();
+	std::ostringstream oss_song, oss_order;
 	// Test if there are no songs
 	if (songs.empty()) {
-		print(theme.get(), theme->song, "no songs found");
+		oss_song << "no songs found";
 		if (!m_playing.empty()) { audio.stopMusic(); m_playing.clear(); }
 	} else {
 		Song& song = songs.current();
 		// Draw the "Song information"
-		print(theme.get(), theme->song, song.str());
+		oss_song << song.str() << "\n";
+		oss_song << "(" << songs.currentId() + 1 << "/" << songs.size() << ")";
+		oss_order << (m_search.text.empty() ? songs.sortDesc() : m_search.text);
 		// Draw the cover
 		Song& song_display = songs.near(songs.currentPosition());
 		std::string cover = song_display.path + song_display.cover;
@@ -108,7 +94,8 @@ void CScreenSongs::draw() {
 		std::string file = song.path + song.mp3;
 		if (file != m_playing) audio.playPreview(m_playing = file);
 	}
-	Surface(theme->theme->getCurrent()).draw();
+	m_theme_song->draw(oss_song.str());
+	m_theme_order->draw(oss_order.str());
 	if (!audio.isPaused() && seconds(now()) - m_time > IDLE_TIMEOUT) {
 		m_time = seconds(now());
 		if (!m_search.text.empty()) { m_search.text.clear(); songs.setFilter(m_search.text); }
