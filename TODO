@@ -51,9 +51,9 @@ Fixes/Enhancement:
 
 - switch to cmake [WIP]
 
-- scale non-pow2-textures to pow2 on older hardware
+- scale non-pow2-textures to pow2 on older hardware [WIP]
 
-- optimize text rendering
+- optimize text rendering [WIP]
 
 Ripper
 
@@ -67,4 +67,4 @@ Ripper
 
 Platform
  - Windows binary build
- 
+ - OSX binary build
