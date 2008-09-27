@@ -6,8 +6,6 @@
 #include "surface.hh"
 #include "opengl_text.hh"
 #include <string>
-#include <libxml/parser.h>
-#include <libxml/tree.h>
 
 struct CThemeSongs: boost::noncopyable {
 	CThemeSongs();
