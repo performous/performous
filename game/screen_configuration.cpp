@@ -28,20 +28,8 @@ void CScreenConfiguration::manageEvent(SDL_Event event) {
 }
 
 void CScreenConfiguration::draw() {
-	theme->theme->clear();
-	cairo_text_extents_t extents;
-	{
-		theme->item.text = configuration[selected].getDescription();
-		extents = theme->theme->GetTextExtents(theme->item);
-		theme->item.x = (theme->item.svg_width - extents.width)/2;
-		theme->theme->PrintText(&theme->item);
-
-		theme->value.text = configuration[selected].getValue();
-		extents = theme->theme->GetTextExtents(theme->value);
-		theme->value.x = (theme->value.svg_width - extents.width)/2;
-		theme->theme->PrintText(&theme->value);
-	}
 	theme->bg->draw();
-	Surface(theme->theme->getCurrent()).draw();
+	theme->item->draw(configuration[selected].getDescription());
+	theme->value->draw(configuration[selected].getValue());
 }
 

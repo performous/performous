@@ -25,8 +25,6 @@ class CScreenSongs : public CScreen {
 	TextInput m_search;
 	boost::scoped_ptr<Surface> m_emptyCover;
 	boost::scoped_ptr<Surface> m_currentCover;
-	boost::scoped_ptr<SvgTxtTheme> m_theme_song;
-	boost::scoped_ptr<SvgTxtTheme> m_theme_order;
 };
 
 #endif

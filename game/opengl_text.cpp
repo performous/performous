@@ -84,6 +84,8 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL &_text) {
 	pango_layout_set_font_description (layout, desc);
 	pango_layout_set_text (layout, _text.text.c_str(), -1);
 	cairo_save(dc);
+	pango_cairo_show_layout (dc, layout);
+	pango_cairo_layout_path(dc,layout);
 	if (_text.fill_col.r != -1 && _text.fill_col.g != -1 && _text.fill_col.b != -1) {
 		cairo_set_source_rgba(dc, _text.fill_col.r, _text.fill_col.g, _text.fill_col.b, _text.fill_col.a);
 		if (_text.stroke_col.r != -1 && _text.stroke_col.g != -1 && _text.stroke_col.b != -1) cairo_fill_preserve(dc);
@@ -95,7 +97,6 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL &_text) {
 		cairo_stroke(dc);
 	}
 	pango_cairo_update_layout (dc, layout);
-	pango_cairo_show_layout (dc, layout);
 	cairo_restore(dc);
 	g_object_unref(layout);
 
@@ -137,73 +138,56 @@ void getcolor(const char *string, TRGBA *col) {
 			col->g = (double) g / 255;
 			col->b = (double) b / 255;
 		}
-		col->a = 1.0;
 	} else if (!strcasecmp(string, "red")) {
 		col->r = 1;
 		col->g = col->b = 0;
-		col->a = 1.0;
 	} else if (!strcasecmp(string, "lime")) {
 		col->g = 1;
 		col->r = col->b = 0;
-		col->a = 1.0;
 	} else if (!strcasecmp(string, "blue")) {
 		col->b = 1;
 		col->r = col->g = 0;
-		col->a = 1.0;
 	} else if (!strcasecmp(string, "black")) {
 		col->r = col->g = col->b = 0;
-		col->a = 1.0;
 	} else if (!strcasecmp(string, "silver")) {
 		col->r = col->g = col->b = 0.75;
-		col->a = 1.0;
 	} else if (!strcasecmp(string, "gray")) {
 		col->r = col->g = col->b = 0.5;
-		col->a = 1.0;
 	} else if (!strcasecmp(string, "white")) {
 		col->r = col->g = col->b = 1;
-		col->a = 1.0;
 	} else if (!strcasecmp(string, "maroon")) {
 		col->r = 0.5;
 		col->g = col->b = 0;
-		col->a = 1.0;
 	} else if (!strcasecmp(string, "purple")) {
 		col->g = 0.5;
 		col->r = col->b = 0.5;
-		col->a = 1.0;
 	} else if (!strcasecmp(string, "fuchsia")) {
 		col->g = 0.5;
 		col->r = col->b = 1;
-		col->a = 1.0;
 	} else if (!strcasecmp(string, "green")) {
 		col->g = 0.5;
 		col->r = col->b = 0;
-		col->a = 1.0;
 	} else if (!strcasecmp(string, "olive")) {
 		col->b = 0;
 		col->r = col->g = 0.5;
-		col->a = 1.0;
 	} else if (!strcasecmp(string, "yellow")) {
 		col->b = 0;
 		col->r = col->g = 1;
-		col->a = 1.0;
 	} else if (!strcasecmp(string, "navy")) {
 		col->b = 0.5;
 		col->r = col->g = 0;
-		col->a = 1.0;
 	} else if (!strcasecmp(string, "teal")) {
 		col->r = 0;
 		col->g = col->b = 0.5;
-		col->a = 1.0;
 	} else if (!strcasecmp(string, "aqua")) {
 		col->r = 0;
 		col->g = col->b = 1;
-		col->a = 1.0;
 	} else if (!strcasecmp((string), "none")) {
-		col->r = col->g = col->b = col->a = -1;
+		col->r = col->g = col->b = -1;
 	}
 }
 
-SvgTxtTheme::SvgTxtTheme(std::string _theme_file, Gravity _g, Align _a, VAlign _v, Fitting _f) : m_gravity(_g), m_fitting(_f), m_valign(_v), m_align(_a) {
+SvgTxtTheme::SvgTxtTheme(std::string _theme_file, Align _a, VAlign _v, Gravity _g, Fitting _f) : m_gravity(_g), m_fitting(_f), m_valign(_v), m_align(_a) {
 	// this should stay here for the moment
 	m_text.fontalign = "center";
 
@@ -213,16 +197,16 @@ SvgTxtTheme::SvgTxtTheme(std::string _theme_file, Gravity _g, Align _a, VAlign _
 	xmlpp::NodeSet n;
 
 	n = dom.get_document()->get_root_node()->find("/svg:svg/@width",nsmap);
-	if (n.empty()) throw std::runtime_error("Unable to find text theme info in "+_theme_file);
+	if (n.empty()) throw std::runtime_error("Unable to find text theme info width in "+_theme_file);
 	xmlpp::Attribute& width = dynamic_cast<xmlpp::Attribute&>(*n[0]);
 	m_width = boost::lexical_cast<double>(width.get_value());
 	n = dom.get_document()->get_root_node()->find("/svg:svg/@height",nsmap);
-	if (n.empty()) throw std::runtime_error("Unable to find text theme info in "+_theme_file);
+	if (n.empty()) throw std::runtime_error("Unable to find text theme info height in "+_theme_file);
 	xmlpp::Attribute& height = dynamic_cast<xmlpp::Attribute&>(*n[0]);
 	m_height = boost::lexical_cast<double>(height.get_value());
 
-	n = dom.get_document()->get_root_node()->find("/svg:svg/svg:text/@style",nsmap);
-	if (n.empty()) throw std::runtime_error("Unable to find text theme info in "+_theme_file);
+	n = dom.get_document()->get_root_node()->find("/svg:svg//svg:text/@style",nsmap);
+	if (n.empty()) throw std::runtime_error("Unable to find text theme info style in "+_theme_file);
 	xmlpp::Attribute& style = dynamic_cast<xmlpp::Attribute&>(*n[0]);
 	std::string s_style = style.get_value();
 	std::vector<std::string> vec ;
@@ -238,6 +222,10 @@ SvgTxtTheme::SvgTxtTheme(std::string _theme_file, Gravity _g, Align _a, VAlign _
 			m_text.fontweight = vec[2*i+1];
 		} else if ( vec[2*i] == std::string("stroke-width") ) {
 			sscanf(vec[2*i+1].c_str(),"%lf", &(m_text.stroke_width));
+		} else if ( vec[2*i] == std::string("stroke-opacity") ) {
+			sscanf(vec[2*i+1].c_str(),"%lf", &(m_text.stroke_col.a));
+		} else if ( vec[2*i] == std::string("fill-opacity") ) {
+			sscanf(vec[2*i+1].c_str(),"%lf", &(m_text.fill_col.a));
 		} else if ( vec[2*i] == std::string("fill") ) {
 			getcolor(vec[2*i+1].c_str(), &(m_text.fill_col));
 		} else if ( vec[2*i] == std::string("stroke") ) {
@@ -246,12 +234,12 @@ SvgTxtTheme::SvgTxtTheme(std::string _theme_file, Gravity _g, Align _a, VAlign _
 	}
 
 
-	n = dom.get_document()->get_root_node()->find("/svg:svg/svg:text/@x",nsmap);
-	if (n.empty()) throw std::runtime_error("Unable to find text theme info in "+_theme_file);
+	n = dom.get_document()->get_root_node()->find("/svg:svg//svg:text/@x",nsmap);
+	if (n.empty()) throw std::runtime_error("Unable to find text theme info x in "+_theme_file);
 	xmlpp::Attribute& x = dynamic_cast<xmlpp::Attribute&>(*n[0]);
 	m_x = boost::lexical_cast<double>(x.get_value());
-	n = dom.get_document()->get_root_node()->find("/svg:svg/svg:text/@y",nsmap);
-	if (n.empty()) throw std::runtime_error("Unable to find text theme info in "+_theme_file);
+	n = dom.get_document()->get_root_node()->find("/svg:svg//svg:text/@y",nsmap);
+	if (n.empty()) throw std::runtime_error("Unable to find text theme info y in "+_theme_file);
 	xmlpp::Attribute& y = dynamic_cast<xmlpp::Attribute&>(*n[0]);
 	m_y = boost::lexical_cast<double>(y.get_value());
 };
@@ -272,7 +260,12 @@ void SvgTxtTheme::draw(std::string _text) {
 	double svg_width = m_width;
 	double svg_heigh = m_height;
 	double texture_y = -screen_height/2. + (m_y-m_text.fontsize) * screen_height / svg_heigh;
-	Dimensions dim = Dimensions(texture_ar).top(texture_y).middle().fixedHeight(texture_height);
+	double texture_x = -screen_width/2. + (m_x) * screen_width / svg_width;
+	Dimensions dim = Dimensions(texture_ar).top(texture_y).fixedHeight(texture_height);
+	if( m_align == CENTER)
+		dim.middle();
+	else
+		dim.left(texture_x);
 
 	TexCoords tex;
 	tex.x1 = tex.y1 = 0.0f;

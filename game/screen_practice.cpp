@@ -6,18 +6,12 @@ CScreenPractice::CScreenPractice(std::string const& name, Analyzer const& analyz
 
 void CScreenPractice::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
-	m_surf_note.reset(new Surface(sm->getThemePathFile("practice_note.svg")));
-	m_surf_sharp.reset(new Surface(sm->getThemePathFile("practice_sharp.svg")));
-	m_surf_note->dimensions.fixedHeight(0.03);
-	m_surf_sharp->dimensions.fixedHeight(0.09);
 	theme.reset(new CThemePractice());
 }
 
 void CScreenPractice::exit()
 {
 	theme.reset();
-	m_surf_note.reset();
-	m_surf_sharp.reset();
 }
 
 void CScreenPractice::manageEvent(SDL_Event event)
@@ -40,10 +34,6 @@ void CScreenPractice::draw() {
 	// Normalizing to [-1.0, 0.0], where -1.0 is -40 dB or less.
 	// FIXME: m_peak->draw(std::min(0.0, std::max(-1.0, m_analyzer.getPeak() / 40.0))+1.0);
 	if (freq != 0.0) {
-		theme->theme->clear();
-		std::string text = scale.getNoteStr(freq);
-		theme->notetxt.text = const_cast<char*>(text.c_str());
-		theme->theme->PrintText(&theme->notetxt);
 		Analyzer::tones_t tones = m_analyzer.getTones();
 		for (Analyzer::tones_t::const_iterator t = tones.begin(); t != tones.end(); ++t) {
 			if (t->age < Tone::MINAGE) continue;
@@ -56,13 +46,14 @@ void CScreenPractice::draw() {
 			noteOffset += 0.4 * scale.getNoteOffset(t->freq);
 			float posXnote = 0.7 + 0.01 * t->stabledb;
 			float posYnote = .075-noteOffset*0.015;
-			m_surf_note->dimensions.left(posXnote).center(posYnote);
-			m_surf_note->draw();
+
+			theme->note->dimensions.left(posXnote).center(posYnote);
+			theme->note->draw();
 			if (sharp) {
-				m_surf_sharp->dimensions.right(posXnote).center(posYnote);
-				m_surf_sharp->draw();
+				theme->sharp->dimensions.right(posXnote).center(posYnote);
+				theme->sharp->draw();
 			}
 		}
-		Surface(theme->theme->getCurrent()).draw();
+		theme->note_txt->draw(scale.getNoteStr(freq));
 	}
 }

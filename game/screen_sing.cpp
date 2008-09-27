@@ -124,7 +124,6 @@ void CScreenSing::draw() {
 	}
 	Song& song = sm->getSongs()->current();
 	double oldfontsize;
-	theme->theme->clear();
 	// Get the time in the song
 	double time = sm->getAudio()->getPosition() + 0.02; // Compensate avg. lag to display
 	time = std::max(0.0, time + playOffset);
@@ -161,22 +160,13 @@ void CScreenSing::draw() {
 	theme->p1box->draw();
 	theme->p2box->draw();
 	// Compute and draw the timer and the progressbar
-	theme->timertxt.text = (boost::format("%02u:%02u") % (unsigned(time) / 60) % (unsigned(time) % 60)).str();
-	theme->theme->PrintText(&theme->timertxt);
+	theme->timer->draw((boost::format("%02u:%02u") % (unsigned(time) / 60) % (unsigned(time) % 60)).str());
+	/*
 	theme->progressfg.width = theme->progressfg.final_width * songPercent;
 	drawRectangleOpenGL(
 		theme->progressfg.x,theme->progressfg.y,
 		theme->progressfg.width,theme->progressfg.height,
 		theme->progressfg.fill_col.r, theme->progressfg.fill_col.g, theme->progressfg.fill_col.b, theme->progressfg.fill_col.a);
-	/*
-	// draw the sang note TODO: themed sang note
-	{
-		TThemeTxt tmptxt = theme->timertxt; // use timertxt as template
-		tmptxt.text = song.scale.getNoteStr(freq);
-		tmptxt.x = 600;
-		tmptxt.fontsize = 25;
-		theme->theme->PrintText(&tmptxt);
-	}
 	*/
 	const double baseLine = -0.2;
 	const double pixUnit = 0.2;
@@ -288,68 +278,11 @@ void CScreenSing::draw() {
 		}
 		glColor3f(1.0, 1.0, 1.0);
 	}
+	// draw sentences
+	theme->lyrics_now->draw(sentenceWhole);
+	theme->lyrics_next->draw(sentenceNextSentence);
 	//draw score
-	theme->p1score.text = (boost::format("%04d") % players.begin()->getScore()).str();
-	theme->theme->PrintText(&theme->p1score);
-	theme->p2score.text = (boost::format("%04d") % players.rbegin()->getScore()).str();
-	theme->theme->PrintText(&theme->p2score);
-
-	// Render the lyrics - OPTIMIZE: This part is very slow and needs to be optimized
-	TThemeTxt tmptxt = theme->lyricspast;
-	tmptxt.text = sentenceWhole;
-	{
-		cairo_text_extents_t extents = theme->theme->GetTextExtents(tmptxt);
-		theme->lyricspast.x = (theme->lyricspast.svg_width - extents.width)/2;
-	}
-	oldfontsize = theme->lyricspast.fontsize;
-	while (theme->lyricspast.x < 0) {
-		theme->lyricspast.fontsize -= 2;
-		theme->lyricshighlight.fontsize -= 2;
-		theme->lyricsfuture.fontsize -= 2;
-		tmptxt = theme->lyricspast;
-		tmptxt.text = sentenceWhole;
-		cairo_text_extents_t extents = theme->theme->GetTextExtents(tmptxt);
-		theme->lyricspast.x = (theme->lyricspast.svg_width - extents.width)/2;
-	}
-	theme->lyricspast.extents.x_advance = 0;
-	theme->lyricshighlight.extents.x_advance= 0;
-	
-	if (!sentencePast.empty()) {
-		theme->lyricspast.text = sentencePast;
-		theme->theme->PrintText(&theme->lyricspast);
-	}
-	if (!sentenceNow.empty()) {
-		Note* n = lyrics->getCurrentNote();
-		if (!n) throw std::logic_error("sentenceNow is not empty but current note is NULL");
-		double phase = (time - n->begin) / (n->end - n->begin);
-		double factor = std::min(1.2, std::max(1.0, 1.2 - 0.2 * phase));
-		theme->lyricshighlight.x = theme->lyricspast.x + theme->lyricspast.extents.x_advance;
-		theme->lyricshighlight.text = sentenceNow;
-		theme->lyricshighlight.scale = factor;
-		theme->theme->PrintText(&theme->lyricshighlight);
-	}
-	if (!sentenceFuture.empty()) {
-		theme->lyricsfuture.text = sentenceFuture;
-		theme->lyricsfuture.x = theme->lyricspast.x + theme->lyricspast.extents.x_advance + theme->lyricshighlight.extents.x_advance;
-		theme->theme->PrintText(&theme->lyricsfuture);
-	}
-
-	if (!sentenceNextSentence.empty()) {
-		theme->lyricsnextsentence.text = sentenceNextSentence;
-		theme->lyricsnextsentence.extents = theme->theme->GetTextExtents(theme->lyricsnextsentence);
-		theme->lyricsnextsentence.x = (theme->lyricsnextsentence.svg_width - theme->lyricsnextsentence.extents.width)/2;
-		while (theme->lyricsnextsentence.x < 0) {
-			theme->lyricsnextsentence.fontsize -= 2;
-			theme->lyricsnextsentence.extents = theme->theme->GetTextExtents(theme->lyricsnextsentence);
-			theme->lyricsnextsentence.x = (theme->lyricsnextsentence.svg_width - theme->lyricsnextsentence.extents.width)/2;
-		}
-		theme->theme->PrintText(&theme->lyricsnextsentence);
-	}
-
-	theme->lyricspast.fontsize = oldfontsize;
-	theme->lyricshighlight.fontsize = oldfontsize;
-	theme->lyricsfuture.fontsize = oldfontsize;
-	theme->lyricsnextsentence.fontsize = oldfontsize;
-
-	Surface(theme->theme->getCurrent()).draw(); // Render progress bar, score calculator, time, etc. - OPTIMIZE: This part is very slow and needs to be optimized
+	theme->score1->draw((boost::format("%04d") % players.begin()->getScore()).str());
+	theme->score2->draw((boost::format("%04d") % players.rbegin()->getScore()).str());
+	// Surface(theme->theme->getCurrent()).draw(); // Render progress bar, score calculator, time, etc. - OPTIMIZE: This part is very slow and needs to be optimized
 }

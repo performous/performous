@@ -1,9 +1,16 @@
 #ifndef __OPENGL_THEME_H__
 #define __OPENGL_THEME_H__
 
-#include "theme.hh"
 #include "surface.hh"
 #include <boost/scoped_ptr.hpp>
+
+struct TRGBA {
+	double r;
+	double g;
+	double b;
+	double a;
+	TRGBA(): r(), g(), b(), a() {}
+};
 
 // Special theme for creating opengl themed surfaces
 // this structure does not include:
@@ -91,7 +98,7 @@ class SvgTxtTheme {
 	enum VAlign {V_ASIS, TOP, MIDDLE, BOTTOM};
 	enum Align {A_ASIS, LEFT, CENTER, RIGHT};
 	//
-  	SvgTxtTheme(std::string _theme_file, Gravity _g=NW, Align _a=A_ASIS, VAlign _v=V_ASIS, Fitting _f=F_ASIS);
+  	SvgTxtTheme(std::string _theme_file, Align _a=A_ASIS, VAlign _v=V_ASIS, Gravity _g=NW, Fitting _f=F_ASIS);
 	void draw(std::string _text);
 	void setGravity(Gravity _g) {m_gravity=_g;};
 	void setFitting(Fitting _f) {m_fitting=_f;};

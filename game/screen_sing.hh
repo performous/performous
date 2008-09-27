@@ -10,6 +10,7 @@
 #include "lyrics.hh"
 #include "sdl_helper.hh"
 #include "surface.hh"
+#include "opengl_text.hh"
 
 class CScreenSing: public CScreen {
   public:

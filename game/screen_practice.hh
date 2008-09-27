@@ -4,6 +4,7 @@
 #include <boost/scoped_ptr.hpp>
 #include "screen.hh"
 #include "theme.hh"
+#include "opengl_text.hh"
 
 class CScreenPractice : public CScreen {
   public:
@@ -15,8 +16,6 @@ class CScreenPractice : public CScreen {
   private:
 	Analyzer const& m_analyzer;
 	boost::scoped_ptr<CThemePractice> theme;
-	boost::scoped_ptr<Surface> m_surf_note;
-	boost::scoped_ptr<Surface> m_surf_sharp;
 };
 
 #endif

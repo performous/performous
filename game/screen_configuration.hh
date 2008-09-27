@@ -6,6 +6,7 @@
 #include "theme.hh"
 #include <boost/scoped_ptr.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
+#include "opengl_text.hh"
 
 class CScreenConfiguration: public CScreen {
   public:

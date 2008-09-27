@@ -11,8 +11,6 @@ CScreenSongs::CScreenSongs(std::string const& name, std::set<std::string> const&
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	if (!sm->getSongs()) sm->setSongs(new Songs(songdirs));
 	m_emptyCover.reset(new Surface(sm->getThemePathFile("no_cover.svg")));
-	m_theme_song.reset(new SvgTxtTheme(sm->getThemePathFile("songs_song.svg")));
-	m_theme_order.reset(new SvgTxtTheme(sm->getThemePathFile("songs_order.svg")));
 }
 
 void CScreenSongs::enter() {
@@ -94,8 +92,8 @@ void CScreenSongs::draw() {
 		std::string file = song.path + song.mp3;
 		if (file != m_playing) audio.playPreview(m_playing = file);
 	}
-	m_theme_song->draw(oss_song.str());
-	m_theme_order->draw(oss_order.str());
+	theme->song->draw(oss_song.str());
+	theme->order->draw(oss_order.str());
 	if (!audio.isPaused() && seconds(now()) - m_time > IDLE_TIMEOUT) {
 		m_time = seconds(now());
 		if (!m_search.text.empty()) { m_search.text.clear(); songs.setFilter(m_search.text); }
