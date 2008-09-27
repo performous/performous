@@ -69,6 +69,7 @@ void CScreenSongs::draw() {
 	// Test if there are no songs
 	if (songs.empty()) {
 		oss_song << "no songs found";
+		theme->song->draw(oss_song.str());
 		if (!m_playing.empty()) { audio.stopMusic(); m_playing.clear(); }
 	} else {
 		Song& song = songs.current();
@@ -76,6 +77,8 @@ void CScreenSongs::draw() {
 		oss_song << song.str() << "\n";
 		oss_song << "(" << songs.currentId() + 1 << "/" << songs.size() << ")";
 		oss_order << (m_search.text.empty() ? songs.sortDesc() : m_search.text);
+		theme->song->draw(oss_song.str());
+		theme->order->draw(oss_order.str());
 		// Draw the cover
 		Song& song_display = songs.near(songs.currentPosition());
 		std::string cover = song_display.path + song_display.cover;
@@ -92,8 +95,6 @@ void CScreenSongs::draw() {
 		std::string file = song.path + song.mp3;
 		if (file != m_playing) audio.playPreview(m_playing = file);
 	}
-	theme->song->draw(oss_song.str());
-	theme->order->draw(oss_order.str());
 	if (!audio.isPaused() && seconds(now()) - m_time > IDLE_TIMEOUT) {
 		m_time = seconds(now());
 		if (!m_search.text.empty()) { m_search.text.clear(); songs.setFilter(m_search.text); }
