@@ -10,6 +10,7 @@
 #include "screen_configuration.hh"
 #include "video_driver.hh"
 #include "xtime.hh"
+#include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
@@ -18,6 +19,8 @@
 #include <set>
 #include <string>
 #include <vector>
+
+namespace fs = boost::filesystem;
 
 SDL_Surface * screenSDL;
 
@@ -108,11 +111,11 @@ int main(int argc, char** argv) {
 		try {
 			po::store(po::command_line_parser(argc, argv).options(cmdline).positional(p).run(), vm);
 			if (!homedir.empty()) {
-				std::ifstream conf((homedir + ".ultrastar/ultrastarng.conf").c_str());
+				std::ifstream conf((homedir + ".config/performous.conf").c_str());
 				po::store(po::parse_config_file(conf, opt2), vm);
 			}
 			{
-				std::ifstream conf("/etc/ultrastarng.conf");
+				std::ifstream conf("/etc/performous.conf");
 				po::store(po::parse_config_file(conf, opt2), vm);
 			}
 			po::notify(vm);
@@ -161,6 +164,24 @@ int main(int argc, char** argv) {
 			songdirs.insert("/usr/local/share/games/ultrastar/songs/");
 			songdirs.insert("/usr/local/share/ultrastar/songs/");
 		}
+		std::cout << theme << std::endl;
+		// Figure out theme folder
+		if (theme.find('/') == std::string::npos) {
+			char const* envthemepath = getenv("PERFORMOUS_THEME_PATH");
+			std::string themepath;
+			if (envthemepath) themepath = envthemepath;
+			else themepath = "/usr/share/performous/themes:/usr/share/games/performous/themes:/usr/local/share/performous/themes:/usr/local/share/games/performous/themes";
+			std::istringstream iss(themepath);
+			std::string elem;
+			while (std::getline(iss, elem, ':')) {
+				if (elem.empty()) continue;
+				fs::path p = elem;
+				p /= theme;
+				if (fs::is_directory(p)) { theme = p.string(); break; }
+			}
+        }
+		if (*theme.rbegin() == '/') theme.erase(theme.size() - 1); // Remove trailing slash
+		std::cout << theme << std::endl;
 	}
 	try {
 		// Initialize everything

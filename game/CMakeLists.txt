@@ -1,4 +1,8 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.4)
+
+if(COMMAND cmake_policy)
+  cmake_policy(SET CMP0003 NEW)
+endif(COMMAND cmake_policy)
 
 FILE(GLOB SOURCE_FILES "*.cpp")
 FILE(GLOB HEADER_FILES "*.hh")
@@ -58,10 +62,8 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   set(LIBS ${LIBS} "/opt/local/lib/libpangocairo-1.0.dylib" "/opt/local/lib/libavutil.dylib")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
-add_executable(ultrastarng ${SOURCES})
-target_link_libraries(ultrastarng da ${LIBS})
+add_executable(performous ${SOURCES})
+target_link_libraries(performous da ${LIBS})
 
-# Escaped incorrectly: add_definitions("-DTHEMES_DIR=\\\"${SHARE_INSTALL_PREFIX}/themes/\\\"")
-
-install(TARGETS ultrastarng DESTINATION bin)
+install(TARGETS performous DESTINATION bin)
 

@@ -1,11 +1,6 @@
 #include "screen.hh"
 #include <stdexcept>
 
-#ifndef THEMES_DIR
-#define THEMES_DIR "/usr/local/share/ultrastar-ng/themes/"
-#endif
-
-
 template<> CScreenManager* CSingleton<CScreenManager>::ms_CSingleton = NULL;
 
 CScreenManager::CScreenManager(std::string const& theme):
@@ -37,9 +32,6 @@ CScreen* CScreenManager::getScreen(std::string const& name) {
 std::string CScreenManager::getThemePathFile(std::string const& file)
 {
 	if (m_theme.empty()) throw std::logic_error("CScreenManager::getThemePathFile(): m_theme is empty");
-	if( getenv("USNG_THEME_PATH") != NULL )
-		return (*m_theme.rbegin() == '/' ? m_theme : getenv("USNG_THEME_PATH") + m_theme + "/") + file;
-	else
-		return (*m_theme.rbegin() == '/' ? m_theme : THEMES_DIR + m_theme + "/") + file;
+	return m_theme + "/" + file;
 }
 
