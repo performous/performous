@@ -1,11 +1,11 @@
-Include file for Ultrastar NG man page
+Include file for Performous man page
 
 [name]
-ultrastarng \- The free Linux karaoke game
+performous \- The free Linux karaoke game
 
 [description]
-Ultrastar Next Generation is a karaoke game which is based off and looks
-similar to Singstar for PS2. UltraStar-NG is based on UltraStar and allows
+Performous is a karaoke game which is based off and looks
+similar to Singstar for PS2. Performous is based on UltraStar and allows
 you to add your own songs in different formats (e.g. ogg, mp3, m4a...) along
 with a song text and a music video file or an image file.
 
@@ -78,6 +78,6 @@ Adjust audio delay. Use to correct synchronization issues.
 Hot reload song from disk (useful for making or repairing songs)
 
 [see also]
-You can find more information at http://ultrastar-ng.sourceforge.net/ or
-http://sourceforge.net/projects/ultrastar-ng/
+You can find more information at http://performous.org/ or
+http://sourceforge.net/projects/performous/
 
