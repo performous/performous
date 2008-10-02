@@ -2,11 +2,10 @@
 <!-- Created with Sodipodi ("http://www.sodipodi.com/") -->
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.0"
@@ -16,10 +15,12 @@
    height="600.000000"
    id="svg559"
    sodipodi:version="0.32"
-   inkscape:version="0.45.1"
+   inkscape:version="0.46"
    sodipodi:docname="configuration_item.svg"
    sodipodi:docbase="/home/yoda/UltraStar/sf/UltraStar-ng/themes/lima"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
+  <defs
+     id="defs2513" />
   <metadata
      id="metadata35">
     <rdf:RDF>
@@ -32,7 +33,7 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="851"
+     inkscape:window-height="797"
      inkscape:window-width="1081"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
@@ -46,9 +47,10 @@
      inkscape:zoom="0.63"
      inkscape:cx="382.28027"
      inkscape:cy="304.78209"
-     inkscape:window-x="251"
-     inkscape:window-y="0"
-     inkscape:current-layer="svg559" />
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:current-layer="svg559"
+     showgrid="false" />
   <text
      xml:space="preserve"
      style="font-size:32px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"

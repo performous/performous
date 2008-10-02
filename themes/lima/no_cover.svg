@@ -2,7 +2,7 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
@@ -13,7 +13,7 @@
    height="256"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.45.1"
+   inkscape:version="0.46"
    sodipodi:docbase="/home/yoda/UltraStar/sf/svn/UltraStar-ng/themes/lima"
    sodipodi:docname="no_cover.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
@@ -58,12 +58,13 @@
      inkscape:window-width="1144"
      inkscape:window-height="785"
      inkscape:window-x="184"
-     inkscape:window-y="68"
+     inkscape:window-y="37"
      showguides="true"
      inkscape:guide-bbox="true"
      width="256px"
      height="256px"
-     borderlayer="false" />
+     borderlayer="false"
+     showgrid="false" />
   <metadata
      id="metadata7">
     <rdf:RDF>

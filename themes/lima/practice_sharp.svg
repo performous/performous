@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 <svg
-   xmlns:ns="http://creativecommons.org/ns#"
    xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
@@ -11,7 +10,7 @@
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.45.1"
+   inkscape:version="0.46"
    width="50"
    height="150"
    version="1.0"
@@ -21,12 +20,12 @@
   <metadata
      id="metadata7">
     <rdf:RDF>
-      <ns:Work
+      <cc:Work
          rdf:about="">
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-      </ns:Work>
+      </cc:Work>
       <cc:Work
          rdf:about="">
         <dc:format>image/svg+xml</dc:format>
@@ -36,18 +35,10 @@
     </rdf:RDF>
   </metadata>
   <defs
-     id="defs5">
-    <inkscape:perspective
-       sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="0 : 37.381836 : 1"
-       inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_z="21.507355 : 37.381836 : 1"
-       inkscape:persp3d-origin="10.753677 : 24.921224 : 1"
-       id="perspective7" />
-  </defs>
+     id="defs5" />
   <sodipodi:namedview
-     inkscape:window-height="1149"
-     inkscape:window-width="1920"
+     inkscape:window-height="801"
+     inkscape:window-width="1439"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      guidetolerance="10.0"
@@ -61,7 +52,7 @@
      inkscape:cx="20"
      inkscape:cy="75.341373"
      inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:window-y="25"
      inkscape:current-layer="svg2"
      showgrid="false"
      width="50px"

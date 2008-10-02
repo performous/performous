@@ -2,7 +2,7 @@
 <!-- Created with Sodipodi ("http://www.sodipodi.com/") -->
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
@@ -15,7 +15,7 @@
    height="600.000000"
    id="svg559"
    sodipodi:version="0.32"
-   inkscape:version="0.45.1"
+   inkscape:version="0.46"
    sodipodi:docname="practice_txt.svg"
    sodipodi:docbase="/home/yoda/UltraStar/sf/UltraStar-ng/themes/lima"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
@@ -31,7 +31,7 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="968"
+     inkscape:window-height="797"
      inkscape:window-width="1376"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
@@ -45,9 +45,10 @@
      inkscape:zoom="1.26"
      inkscape:cx="400"
      inkscape:cy="300"
-     inkscape:window-x="296"
-     inkscape:window-y="2"
-     inkscape:current-layer="svg559" />
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:current-layer="svg559"
+     showgrid="false" />
   <defs
      id="defs561" />
   <text

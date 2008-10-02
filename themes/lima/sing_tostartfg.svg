@@ -2,11 +2,10 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.0"
@@ -14,8 +13,8 @@
    height="600"
    id="svg3465"
    sodipodi:version="0.32"
-   inkscape:version="0.45"
-   sodipodi:docname="sing_bg.svg"
+   inkscape:version="0.46"
+   sodipodi:docname="sing_tostartfg.svg"
    sodipodi:docbase="/home/yoda/UltraStar/sf/UltraStar-ng/themes/lima"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    sodipodi:modified="true">
@@ -46,43 +45,11 @@
      pagecolor="#ffffff"
      id="base"
      inkscape:window-x="0"
-     inkscape:window-y="185"
-     inkscape:current-layer="svg3465" />
+     inkscape:window-y="25"
+     inkscape:current-layer="svg3465"
+     showgrid="false" />
   <defs
-     id="defs3467">
-    <linearGradient
-       id="linearGradient16183">
-      <stop
-         id="stop16185"
-         offset="0"
-         style="stop-color:white;stop-opacity:1;" />
-      <stop
-         id="stop16187"
-         offset="1"
-         style="stop-color:white;stop-opacity:0;" />
-    </linearGradient>
-    <linearGradient
-       inkscape:collect="always"
-       id="linearGradient3667">
-      <stop
-         style="stop-color:#81d000;stop-opacity:1;"
-         offset="0"
-         id="stop3669" />
-      <stop
-         style="stop-color:#81d000;stop-opacity:0;"
-         offset="1"
-         id="stop3671" />
-    </linearGradient>
-    <linearGradient
-       x1="400.52771"
-       y1="152.58272"
-       x2="400.52771"
-       y2="188.39091"
-       id="linearGradient3995"
-       xlink:href="#linearGradient3667"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.99967,0,0,0.802521,-800,-599.9999)" />
-  </defs>
+     id="defs3467" />
   <rect
      style="opacity:1;color:black;fill:white;fill-opacity:0.39215686;fill-rule:nonzero;stroke:none;stroke-width:0.93757653;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:block;overflow:visible"
      id="rect10068"

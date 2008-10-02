@@ -42,23 +42,6 @@
          offset="1"
          id="stop3160" />
     </linearGradient>
-    <inkscape:perspective
-       sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="0 : 526.18109 : 1"
-       inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_z="744.09448 : 526.18109 : 1"
-       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
-       id="perspective7" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient3156"
-       id="linearGradient3162"
-       x1="350.289"
-       y1="437.49847"
-       x2="350.289"
-       y2="540.36218"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.3166404,0,0,1.3298051,177.08432,-173.81982)" />
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient3156"

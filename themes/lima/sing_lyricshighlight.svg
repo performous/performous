@@ -2,7 +2,7 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
@@ -13,9 +13,10 @@
    height="600"
    id="svg3465"
    sodipodi:version="0.32"
-   inkscape:version="0.44.1"
+   inkscape:version="0.46"
    sodipodi:docname="sing_lyricshighlight.svg"
-   sodipodi:docbase="/home/jesusda/docs/curro/yo/ultrastar-ng/base/theme-pod/themes/default">
+   sodipodi:docbase="/home/jesusda/docs/curro/yo/ultrastar-ng/base/theme-pod/themes/default"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <metadata
      id="metadata19">
     <rdf:RDF>
@@ -28,7 +29,7 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="579"
+     inkscape:window-height="722"
      inkscape:window-width="922"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
@@ -43,8 +44,9 @@
      inkscape:cx="400"
      inkscape:cy="298.42105"
      inkscape:window-x="258"
-     inkscape:window-y="215"
-     inkscape:current-layer="layer10" />
+     inkscape:window-y="100"
+     inkscape:current-layer="layer10"
+     showgrid="false" />
   <defs
      id="defs3467" />
   <g

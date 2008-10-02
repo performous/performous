@@ -2,7 +2,7 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
@@ -12,11 +12,13 @@
    height="600"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.45.1"
+   inkscape:version="0.46"
    version="1.0"
    sodipodi:docbase="/home/yoda/UltraStar/sf/UltraStar-ng/themes/lima"
    sodipodi:docname="practice_peak.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
+  <defs
+     id="defs2881" />
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"
@@ -29,12 +31,13 @@
      inkscape:cy="86.866397"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
-     inkscape:window-width="1672"
-     inkscape:window-height="958"
+     inkscape:window-width="1439"
+     inkscape:window-height="801"
      inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:window-y="25"
      width="800px"
-     height="600px" />
+     height="600px"
+     showgrid="false" />
   <metadata
      id="metadata7">
     <rdf:RDF>
