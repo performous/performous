@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.4)
 
 set(CPACK_GENERATOR "TBZ2;TGZ")
 set(CPACK_SOURCE_GENERATOR "TBZ2;TGZ")
-set(CPACK_PACKAGE_NAME "Performous")
+set(CPACK_PACKAGE_NAME "performous")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A karaoke game with pitch detection and scoring, similar to Singstar games. Supports songs in Ultrastar format.")
 set(CPACK_PACKAGE_CONTACT "http://performous.org/")
 set(CPACK_PACKAGE_VERSION_MAJOR 0)
