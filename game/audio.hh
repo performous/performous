@@ -12,8 +12,7 @@
 #include <boost/scoped_ptr.hpp>
 
 /**
- * Audio playback class. This class enables the audio playback using several
- * audio APIs (Xine or GStreamer)
+ * Audio playback class. This class enables the audio playback using ffmpeg
  */
 class CAudio {
   public:
