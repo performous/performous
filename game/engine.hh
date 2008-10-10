@@ -1,4 +1,5 @@
 #include "audio.hh"
+#include "color.hh"
 #include "pitch.hh"
 #include "xtime.hh"
 #include "songs.hh"
@@ -9,8 +10,6 @@
 #include <limits>
 #include <list>
 #include <utility>
-
-struct Color { float r, g, b; };
 
 struct Player {
 	Analyzer& m_analyzer;
@@ -46,8 +45,8 @@ struct Player {
 
 namespace {
 	const Color playerColors[] = {
-		{ 52/255.0, 101/255.0, 164/255.0 },
-		{ 0.8, 0.3, 0.3 }
+		Color(52/255.0, 101/255.0, 164/255.0),
+		Color(0.8, 0.3, 0.3)
 	};
 	size_t playerColorsSize = sizeof(playerColors) / sizeof(*playerColors);
 }

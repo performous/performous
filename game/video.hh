@@ -1,5 +1,5 @@
-#ifndef __VIDEO_H_
-#define __VIDEO_H_
+#ifndef PERFORMOUS_VIDEO_HH
+#define PERFORMOUS_VIDEO_HH
 
 #include "surface.hh"
 #include "ffmpeg.hh"

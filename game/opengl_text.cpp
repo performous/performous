@@ -1,4 +1,5 @@
 #include "opengl_text.hh"
+#include <boost/lexical_cast.hpp>
 #include <pango/pangocairo.h>
 #include <math.h>
 #include <iostream>
@@ -123,26 +124,18 @@ void OpenGLText::draw(Dimensions &_dim, TexCoords &_tex) {
 	m_texture->draw(_dim,_tex);
 }
 
-OpenGLText::~OpenGLText() {
-}
-
 #include <libxml++/libxml++.h>
-#include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/classification.hpp>
-TRGBA getcolor(std::istream& is) {
-	std::string tmp;
-	std::getline(is, tmp);
-	char const* string = tmp.c_str(); // XXX: fix the parsing code to use stream instead
-	TRGBA col;
-	if (string[0] == '#') {
-		if (strlen(string) == 7) {
-			unsigned int r,g,b;
-			sscanf((string+1), "%02x %02x %02x", &r, &g, &b);
-			col.r = (double) r / 255;
-			col.g = (double) g / 255;
-			col.b = (double) b / 255;
-		}
+
+Color getcolor(std::istream& is) {
+	std::string str;
+	if (!std::getline(is, str)) return Color();
+	if (str[0] == '#') {
+		unsigned int r = 0, g = 0, b = 0;
+		if (str.size() == 7) sscanf(str.c_str() + 1, "%02x %02x %02x", &r, &g, &b);
+		return Color(r / 255.0, g / 255.0, b / 255.0);
+	}
+	return Color();
+	/*
 	} else if (!strcasecmp(string, "red")) {
 		col.r = 1;
 		col.g = col.b = 0;
@@ -191,6 +184,7 @@ TRGBA getcolor(std::istream& is) {
 		col.r = col.g = col.b = -1;
 	}
 	return col;
+	*/
 }
 
 SvgTxtTheme::SvgTxtTheme(std::string _theme_file, Align _a, VAlign _v, Gravity _g, Fitting _f) : m_gravity(_g), m_fitting(_f), m_valign(_v), m_align(_a) {
@@ -229,7 +223,6 @@ SvgTxtTheme::SvgTxtTheme(std::string _theme_file, Align _a, VAlign _v, Gravity _
 		else if (token == "fill") m_text.fill_col = getcolor(iss2);
 		else if (token == "stroke") m_text.stroke_col = getcolor(iss2);
 	}
-
 
 	n = dom.get_document()->get_root_node()->find("/svg:svg//svg:text/@x",nsmap);
 	if (n.empty()) throw std::runtime_error("Unable to find text theme info x in "+_theme_file);

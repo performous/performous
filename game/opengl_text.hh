@@ -1,16 +1,9 @@
 #ifndef __OPENGL_THEME_H__
 #define __OPENGL_THEME_H__
 
+#include "color.hh"
 #include "surface.hh"
 #include <boost/scoped_ptr.hpp>
-
-struct TRGBA {
-	double r;
-	double g;
-	double b;
-	double a;
-	TRGBA(): r(), g(), b(), a() {}
-};
 
 // Special theme for creating opengl themed surfaces
 // this structure does not include:
@@ -18,8 +11,8 @@ struct TRGBA {
 //  - global positionning
 // the font{family,style,weight,align} are the one found into SVGs
 struct TThemeTxtOpenGL {
-	TRGBA fill_col;
-	TRGBA stroke_col;
+	Color fill_col;
+	Color stroke_col;
 	double stroke_width;
 	double fontsize;
 	std::string fontfamily;
@@ -37,7 +30,6 @@ struct TThemeTxtOpenGL {
 class OpenGLText {
   public:
 	OpenGLText(TThemeTxtOpenGL &_text);
-	~OpenGLText();
 	void draw(Dimensions &_dim, TexCoords &_tex);
 	double x(void) {return m_x;};
 	double y(void) {return m_y;};
