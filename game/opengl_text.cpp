@@ -1,5 +1,6 @@
 #include "opengl_text.hh"
 #include <boost/lexical_cast.hpp>
+#include <libxml++/libxml++.h>
 #include <pango/pangocairo.h>
 #include <math.h>
 #include <iostream>
@@ -124,69 +125,6 @@ void OpenGLText::draw(Dimensions &_dim, TexCoords &_tex) {
 	m_texture->draw(_dim,_tex);
 }
 
-#include <libxml++/libxml++.h>
-
-Color getcolor(std::istream& is) {
-	std::string str;
-	if (!std::getline(is, str)) return Color();
-	if (str[0] == '#') {
-		unsigned int r = 0, g = 0, b = 0;
-		if (str.size() == 7) sscanf(str.c_str() + 1, "%02x %02x %02x", &r, &g, &b);
-		return Color(r / 255.0, g / 255.0, b / 255.0);
-	}
-	return Color();
-	/*
-	} else if (!strcasecmp(string, "red")) {
-		col.r = 1;
-		col.g = col.b = 0;
-	} else if (!strcasecmp(string, "lime")) {
-		col.g = 1;
-		col.r = col.b = 0;
-	} else if (!strcasecmp(string, "blue")) {
-		col.b = 1;
-		col.r = col.g = 0;
-	} else if (!strcasecmp(string, "black")) {
-		col.r = col.g = col.b = 0;
-	} else if (!strcasecmp(string, "silver")) {
-		col.r = col.g = col.b = 0.75;
-	} else if (!strcasecmp(string, "gray")) {
-		col.r = col.g = col.b = 0.5;
-	} else if (!strcasecmp(string, "white")) {
-		col.r = col.g = col.b = 1;
-	} else if (!strcasecmp(string, "maroon")) {
-		col.r = 0.5;
-		col.g = col.b = 0;
-	} else if (!strcasecmp(string, "purple")) {
-		col.g = 0.5;
-		col.r = col.b = 0.5;
-	} else if (!strcasecmp(string, "fuchsia")) {
-		col.g = 0.5;
-		col.r = col.b = 1;
-	} else if (!strcasecmp(string, "green")) {
-		col.g = 0.5;
-		col.r = col.b = 0;
-	} else if (!strcasecmp(string, "olive")) {
-		col.b = 0;
-		col.r = col.g = 0.5;
-	} else if (!strcasecmp(string, "yellow")) {
-		col.b = 0;
-		col.r = col.g = 1;
-	} else if (!strcasecmp(string, "navy")) {
-		col.b = 0.5;
-		col.r = col.g = 0;
-	} else if (!strcasecmp(string, "teal")) {
-		col.r = 0;
-		col.g = col.b = 0.5;
-	} else if (!strcasecmp(string, "aqua")) {
-		col.r = 0;
-		col.g = col.b = 1;
-	} else if (!strcasecmp((string), "none")) {
-		col.r = col.g = col.b = -1;
-	}
-	return col;
-	*/
-}
-
 SvgTxtTheme::SvgTxtTheme(std::string _theme_file, Align _a, VAlign _v, Gravity _g, Fitting _f) : m_gravity(_g), m_fitting(_f), m_valign(_v), m_align(_a) {
 	// this should stay here for the moment
 	m_text.fontalign = "center";
@@ -220,8 +158,8 @@ SvgTxtTheme::SvgTxtTheme(std::string _theme_file, Align _a, VAlign _v, Gravity _
 		else if (token == "stroke-width") iss2 >> m_text.stroke_width;
 		else if (token == "stroke-opacity") iss2 >> m_text.stroke_col.a;
 		else if (token == "fill-opacity") iss2 >> m_text.fill_col.a;
-		else if (token == "fill") m_text.fill_col = getcolor(iss2);
-		else if (token == "stroke") m_text.stroke_col = getcolor(iss2);
+		else if (token == "fill") m_text.fill_col = getColor(iss2);
+		else if (token == "stroke") m_text.stroke_col = getColor(iss2);
 	}
 
 	n = dom.get_document()->get_root_node()->find("/svg:svg//svg:text/@x",nsmap);
