@@ -135,7 +135,7 @@ Use::Use(OpenGLTexture const& s) {
 
 Use::Use(Surface const& s) {
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, s.texture()->id());
+	glBindTexture(GL_TEXTURE_2D, s.texture().id());
 }
 
 Use::~Use() {

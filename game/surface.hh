@@ -59,7 +59,7 @@ class OpenGLTexture {
 	enum Format { INT_ARGB, CHAR_RGBA, RGB, BGR };
 	OpenGLTexture(unsigned int width, unsigned int height, Format format, unsigned char* buffer);
 	~OpenGLTexture();
-	GLuint id(void) const {return m_texture_id;};
+	GLuint id() const {return m_texture_id;};
 	void draw(Dimensions &dim, TexCoords &tex);
   private:
 	GLuint m_texture_id;
@@ -75,7 +75,7 @@ class Surface: boost::noncopyable {
 	Surface(std::string const& filename);
 	~Surface();
 	void draw();
-	OpenGLTexture* texture(void) const {return m_texture.get();};
+	OpenGLTexture const& texture() const { return *m_texture.get(); };
   private:
 	void load(unsigned int width, unsigned int height, OpenGLTexture::Format format, unsigned char* buffer, float ar = 0.0f);
 	unsigned int m_width, m_height;
