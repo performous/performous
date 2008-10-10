@@ -2,6 +2,7 @@
 #include <pango/pangocairo.h>
 #include <math.h>
 #include <iostream>
+#include <sstream>
 
 namespace {
 	unsigned int nextPow2(double _val) {
@@ -129,62 +130,67 @@ OpenGLText::~OpenGLText() {
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
-void getcolor(const char *string, TRGBA *col) {
-	unsigned int r,g,b;
+TRGBA getcolor(std::istream& is) {
+	std::string tmp;
+	std::getline(is, tmp);
+	char const* string = tmp.c_str(); // XXX: fix the parsing code to use stream instead
+	TRGBA col;
 	if (string[0] == '#') {
 		if (strlen(string) == 7) {
+			unsigned int r,g,b;
 			sscanf((string+1), "%02x %02x %02x", &r, &g, &b);
-			col->r = (double) r / 255;
-			col->g = (double) g / 255;
-			col->b = (double) b / 255;
+			col.r = (double) r / 255;
+			col.g = (double) g / 255;
+			col.b = (double) b / 255;
 		}
 	} else if (!strcasecmp(string, "red")) {
-		col->r = 1;
-		col->g = col->b = 0;
+		col.r = 1;
+		col.g = col.b = 0;
 	} else if (!strcasecmp(string, "lime")) {
-		col->g = 1;
-		col->r = col->b = 0;
+		col.g = 1;
+		col.r = col.b = 0;
 	} else if (!strcasecmp(string, "blue")) {
-		col->b = 1;
-		col->r = col->g = 0;
+		col.b = 1;
+		col.r = col.g = 0;
 	} else if (!strcasecmp(string, "black")) {
-		col->r = col->g = col->b = 0;
+		col.r = col.g = col.b = 0;
 	} else if (!strcasecmp(string, "silver")) {
-		col->r = col->g = col->b = 0.75;
+		col.r = col.g = col.b = 0.75;
 	} else if (!strcasecmp(string, "gray")) {
-		col->r = col->g = col->b = 0.5;
+		col.r = col.g = col.b = 0.5;
 	} else if (!strcasecmp(string, "white")) {
-		col->r = col->g = col->b = 1;
+		col.r = col.g = col.b = 1;
 	} else if (!strcasecmp(string, "maroon")) {
-		col->r = 0.5;
-		col->g = col->b = 0;
+		col.r = 0.5;
+		col.g = col.b = 0;
 	} else if (!strcasecmp(string, "purple")) {
-		col->g = 0.5;
-		col->r = col->b = 0.5;
+		col.g = 0.5;
+		col.r = col.b = 0.5;
 	} else if (!strcasecmp(string, "fuchsia")) {
-		col->g = 0.5;
-		col->r = col->b = 1;
+		col.g = 0.5;
+		col.r = col.b = 1;
 	} else if (!strcasecmp(string, "green")) {
-		col->g = 0.5;
-		col->r = col->b = 0;
+		col.g = 0.5;
+		col.r = col.b = 0;
 	} else if (!strcasecmp(string, "olive")) {
-		col->b = 0;
-		col->r = col->g = 0.5;
+		col.b = 0;
+		col.r = col.g = 0.5;
 	} else if (!strcasecmp(string, "yellow")) {
-		col->b = 0;
-		col->r = col->g = 1;
+		col.b = 0;
+		col.r = col.g = 1;
 	} else if (!strcasecmp(string, "navy")) {
-		col->b = 0.5;
-		col->r = col->g = 0;
+		col.b = 0.5;
+		col.r = col.g = 0;
 	} else if (!strcasecmp(string, "teal")) {
-		col->r = 0;
-		col->g = col->b = 0.5;
+		col.r = 0;
+		col.g = col.b = 0.5;
 	} else if (!strcasecmp(string, "aqua")) {
-		col->r = 0;
-		col->g = col->b = 1;
+		col.r = 0;
+		col.g = col.b = 1;
 	} else if (!strcasecmp((string), "none")) {
-		col->r = col->g = col->b = -1;
+		col.r = col.g = col.b = -1;
 	}
+	return col;
 }
 
 SvgTxtTheme::SvgTxtTheme(std::string _theme_file, Align _a, VAlign _v, Gravity _g, Fitting _f) : m_gravity(_g), m_fitting(_f), m_valign(_v), m_align(_a) {
@@ -208,29 +214,20 @@ SvgTxtTheme::SvgTxtTheme(std::string _theme_file, Align _a, VAlign _v, Gravity _
 	n = dom.get_document()->get_root_node()->find("/svg:svg//svg:text/@style",nsmap);
 	if (n.empty()) throw std::runtime_error("Unable to find text theme info style in "+_theme_file);
 	xmlpp::Attribute& style = dynamic_cast<xmlpp::Attribute&>(*n[0]);
-	std::string s_style = style.get_value();
-	std::vector<std::string> vec ;
-	boost::algorithm::split( vec, s_style, boost::is_any_of(":;"));
-	for(unsigned int i = 0 ; i < vec.size()/2 ; i++) {
-		if( vec[2*i] == std::string("font-size") ) {
-			sscanf(vec[2*i+1].c_str(),"%lf",&(m_text.fontsize));
-		} else if( vec[2*i] == std::string("font-family") ) {
-			m_text.fontfamily = vec[2*i+1];
-		} else if( vec[2*i] == std::string("font-style") ) {
-			m_text.fontstyle = vec[2*i+1];
-		} else if( vec[2*i] == std::string("font-weight") ) {
-			m_text.fontweight = vec[2*i+1];
-		} else if ( vec[2*i] == std::string("stroke-width") ) {
-			sscanf(vec[2*i+1].c_str(),"%lf", &(m_text.stroke_width));
-		} else if ( vec[2*i] == std::string("stroke-opacity") ) {
-			sscanf(vec[2*i+1].c_str(),"%lf", &(m_text.stroke_col.a));
-		} else if ( vec[2*i] == std::string("fill-opacity") ) {
-			sscanf(vec[2*i+1].c_str(),"%lf", &(m_text.fill_col.a));
-		} else if ( vec[2*i] == std::string("fill") ) {
-			getcolor(vec[2*i+1].c_str(), &(m_text.fill_col));
-		} else if ( vec[2*i] == std::string("stroke") ) {
-			getcolor(vec[2*i+1].c_str(), &(m_text.stroke_col));
-		}
+	std::istringstream iss(style.get_value());
+	std::string token;
+	while (std::getline(iss, token, ';')) {
+		std::istringstream iss2(token);
+		std::getline(iss2, token, ':');
+		if (token == "font-size") iss2 >> m_text.fontsize;
+		else if (token == "font-family") std::getline(iss2, m_text.fontfamily);
+		else if (token == "font-style") std::getline(iss2, m_text.fontstyle);
+		else if (token == "font-weight") std::getline(iss2, m_text.fontweight);
+		else if (token == "stroke-width") iss2 >> m_text.stroke_width;
+		else if (token == "stroke-opacity") iss2 >> m_text.stroke_col.a;
+		else if (token == "fill-opacity") iss2 >> m_text.fill_col.a;
+		else if (token == "fill") m_text.fill_col = getcolor(iss2);
+		else if (token == "stroke") m_text.stroke_col = getcolor(iss2);
 	}
 
 
@@ -262,10 +259,7 @@ void SvgTxtTheme::draw(std::string _text) {
 	double texture_y = -screen_height/2. + (m_y-m_text.fontsize) * screen_height / svg_heigh;
 	double texture_x = -screen_width/2. + (m_x) * screen_width / svg_width;
 	Dimensions dim = Dimensions(texture_ar).top(texture_y).fixedHeight(texture_height);
-	if( m_align == CENTER)
-		dim.middle();
-	else
-		dim.left(texture_x);
+	if (m_align == CENTER) dim.middle(); else dim.left(texture_x);
 
 	TexCoords tex;
 	tex.x1 = tex.y1 = 0.0f;
