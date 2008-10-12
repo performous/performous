@@ -270,12 +270,15 @@ void CScreenSing::draw() {
 			double t = 0.0;
 			// The loop starts at the beginning instead of beginIdx to calculate the right phase for the wave.
 			for (size_t idx = 0; idx < endIdx; ++idx, t += Engine::TIMESTEP) {
-				if (pitch[idx].first != pitch[idx].first) { oldval = std::numeric_limits<double>::quiet_NaN(); continue; }
 				double freq = pitch[idx].first;
+				// If freq is NaN, we have nothing to process
+				if (freq != freq) { oldval = std::numeric_limits<double>::quiet_NaN(); continue; }
 				tex += freq * 0.001; // Wave phase (texture coordinate)
+				while (tex >= 1.0) tex -= 1.0; // Normalize to 0-1 range
 				if (idx < beginIdx) continue; // Skip graphics rendering if out of screen
 				bool prev = idx > beginIdx && pitch[idx - 1].first > 0.0;
 				bool next = idx < endIdx - 1 && pitch[idx + 1].first > 0.0;
+				// If neither previous or next frames have proper frequency, ignore this one too
 				if (!prev && !next) { oldval = std::numeric_limits<double>::quiet_NaN(); continue; }
 				double x = -0.2 + (t - time) * pixUnit;
 				// Find the currently playing note or the next playing note (or the last note?)
@@ -292,7 +295,7 @@ void CScreenSing::draw() {
 					glEnd();
 					prev = false;
 				}
-				if (!prev) { tex = 0.0; glBegin(GL_TRIANGLE_STRIP); }
+				if (!prev) glBegin(GL_TRIANGLE_STRIP);
 				if (prev && next) {
 					glTexCoord2f(tex, 0.0f); glVertex2f(x, y - thickness);
 					glTexCoord2f(tex, 1.0f); glVertex2f(x, y + thickness);
