@@ -38,10 +38,10 @@ class OpenGLText {
   public:
 	OpenGLText(TThemeTxtOpenGL &_text);
 	void draw(Dimensions &_dim, TexCoords &_tex);
-	double x(void) {return m_x;};
-	double y(void) {return m_y;};
-	double x_advance(void) {return m_x_advance;};
-	double y_advance(void) {return m_y_advance;};
+	double x() {return m_x;};
+	double y() {return m_y;};
+	double x_advance() {return m_x_advance;};
+	double y_advance() {return m_y_advance;};
   private:
 	unsigned int m_x_power_of_two;
 	unsigned int m_y_power_of_two;

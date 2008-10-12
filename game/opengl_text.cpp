@@ -15,48 +15,32 @@ namespace {
 	}
 }
 
-OpenGLText::OpenGLText(TThemeTxtOpenGL &_text) {
-	// set some pango values
-	PangoAlignment alignment;
-	PangoWeight weight;
-	PangoStyle style;
+OpenGLText::OpenGLText(TThemeTxtOpenGL& _text) {
 	PangoLayout *layout;
 
-	if( _text.fontfamily.empty() )
-		_text.fontfamily = std::string("Sans");
-	if( _text.fontalign == std::string("start") ) {
-		alignment = PANGO_ALIGN_LEFT;
-	} else if( _text.fontalign == std::string("center") ) {
-		alignment = PANGO_ALIGN_CENTER;
-	} else if( _text.fontalign == std::string("end") ) {
-		alignment = PANGO_ALIGN_RIGHT;
-	} else {
-		alignment = PANGO_ALIGN_LEFT;
-	}
-	if( _text.fontweight == std::string("normal") ) {
-		weight = PANGO_WEIGHT_NORMAL;
-	} else if( _text.fontweight == std::string("bold") ) {
-		weight = PANGO_WEIGHT_BOLD;
-	} else if( _text.fontweight == std::string("bolder") ) {
-		weight = PANGO_WEIGHT_ULTRABOLD;
-	} else {
-		weight = PANGO_WEIGHT_NORMAL;
-	}
-	if( _text.fontstyle == std::string("normal") ) {
-		style = PANGO_STYLE_NORMAL;
-	} else if( _text.fontstyle == std::string("italic") ) {
-		style = PANGO_STYLE_ITALIC;
-	} else if( _text.fontstyle == std::string("oblique") ) {
-		style = PANGO_STYLE_OBLIQUE;
-	} else {
-		style = PANGO_STYLE_NORMAL;
-	}
+	if (_text.fontfamily.empty()) _text.fontfamily = "Sans";
+
+	PangoAlignment alignment = PANGO_ALIGN_LEFT;
+	if (_text.fontalign == "start") alignment = PANGO_ALIGN_LEFT;
+	else if (_text.fontalign == "center") alignment = PANGO_ALIGN_CENTER;
+	else if (_text.fontalign == "end") alignment = PANGO_ALIGN_RIGHT;
+
+	PangoWeight weight = PANGO_WEIGHT_NORMAL;
+	if (_text.fontweight == "normal") weight = PANGO_WEIGHT_NORMAL;
+	else if (_text.fontweight == "bold") weight = PANGO_WEIGHT_BOLD;
+	else if (_text.fontweight == "bolder") weight = PANGO_WEIGHT_ULTRABOLD;
+
+	PangoStyle style = PANGO_STYLE_NORMAL;
+	if (_text.fontstyle == "normal") style = PANGO_STYLE_NORMAL;
+	else if (_text.fontstyle == "italic") style = PANGO_STYLE_ITALIC;
+	else if (_text.fontstyle == "oblique") style = PANGO_STYLE_OBLIQUE;
+
 	// set font description
 	PangoFontDescription *desc = pango_font_description_new();
 	pango_font_description_set_weight(desc, weight);
 	pango_font_description_set_style(desc, style);
 	pango_font_description_set_family(desc, _text.fontfamily.c_str());
-	pango_font_description_set_absolute_size (desc,_text.fontsize * PANGO_SCALE);
+	pango_font_description_set_absolute_size(desc,_text.fontsize * PANGO_SCALE);
 
 	// compute text extents
 	PangoRectangle rec1, rec2;
@@ -89,12 +73,12 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL &_text) {
 	cairo_save(dc);
 	pango_cairo_show_layout (dc, layout);
 	pango_cairo_layout_path(dc,layout);
-	if (_text.fill_col.r != -1 && _text.fill_col.g != -1 && _text.fill_col.b != -1) {
+	if (_text.fill_col.a > 0.0) {
 		cairo_set_source_rgba(dc, _text.fill_col.r, _text.fill_col.g, _text.fill_col.b, _text.fill_col.a);
 		if (_text.stroke_col.r != -1 && _text.stroke_col.g != -1 && _text.stroke_col.b != -1) cairo_fill_preserve(dc);
 		else cairo_fill(dc);
 	}
-	if (_text.stroke_col.r != -1 && _text.stroke_col.g != -1 && _text.stroke_col.b != -1) {
+	if (_text.stroke_col.a > 0.0) {
 		cairo_set_line_width(dc, _text.stroke_width);
 		cairo_set_source_rgba(dc, _text.stroke_col.r, _text.stroke_col.g, _text.stroke_col.b, _text.stroke_col.a);
 		cairo_stroke(dc);
@@ -122,7 +106,7 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL &_text) {
 void OpenGLText::draw(Dimensions &_dim, TexCoords &_tex) {
 	_tex.x2 = _tex.x2 * m_x / m_x_power_of_two;
 	_tex.y2 = _tex.y2 * m_y / m_y_power_of_two;
-	m_texture->draw(_dim,_tex);
+	m_texture->draw(_dim, _tex);
 }
 
 SvgTxtTheme::SvgTxtTheme(std::string _theme_file, Align _a, VAlign _v, Gravity _g, Fitting _f) : m_gravity(_g), m_fitting(_f), m_valign(_v), m_align(_a) {
@@ -187,15 +171,12 @@ void SvgTxtTheme::draw(std::string _text) {
 }
 
 void SvgTxtTheme::draw(std::vector<std::string> _text) {
-	std::string tmp = std::string("");
+	std::string tmp;
+	for (unsigned int i = 0 ; i < _text.size(); i++ ) tmp += _text[i];
 
-	for (unsigned int i = 0 ; i < _text.size(); i++ ) {
-		tmp += _text[i];
-	}
-
-	if( m_cache_text != tmp ) {
+	if (m_cache_text != tmp) {
 		m_cache_text = tmp;
-		for (unsigned int i = 0 ; i < _text.size(); i++ ) {
+		for (unsigned int i = 0; i < _text.size(); i++ ) {
 			m_text.text = _text[i];
 			m_opengl_text[i].reset(new OpenGLText(m_text));
 		}
@@ -203,12 +184,11 @@ void SvgTxtTheme::draw(std::vector<std::string> _text) {
 
 	double text_x = 0.0;
 	double text_y = 0.0;
-	for (unsigned int i = 0 ; i < _text.size(); i++ ) {
+	for (unsigned int i = 0; i < _text.size(); i++ ) {
 		text_x += m_opengl_text[i]->x();
-		text_y = std::max(text_y,m_opengl_text[i]->y());
+		text_y = std::max(text_y, m_opengl_text[i]->y());
 	}
 
-	
 	// 1.0 is the width
 	double screen_width = 1.0;
 	double screen_height = 600./800.;
@@ -217,8 +197,8 @@ void SvgTxtTheme::draw(std::vector<std::string> _text) {
 	double texture_height = texture_width / texture_ar;
 	double svg_ar = m_width/m_height;
 	double svg_width = m_width;
-	double svg_heigh = m_height;
-	double texture_y = -screen_height/2. + (m_y-m_text.fontsize) * screen_height / svg_heigh;
+	double svg_height = m_height;
+	double texture_y = -screen_height/2. + (m_y-m_text.fontsize) * screen_height / svg_height;
 	double texture_x = -screen_width/2. + (m_x) * screen_width / svg_width;
 	Dimensions dim = Dimensions(texture_ar).top(texture_y).fixedHeight(texture_height);
 	if (m_align == CENTER) dim.middle(); else dim.left(texture_x);
@@ -226,7 +206,6 @@ void SvgTxtTheme::draw(std::vector<std::string> _text) {
 	TexCoords tex;
 	tex.x1 = tex.y1 = 0.0f;
 	tex.x2 = tex.y2 = 1.0f;
-	for (unsigned int i = 0; i < _text.size() ; i++)
-		m_opengl_text[i]->draw(dim,tex);
+	for (unsigned int i = 0; i < _text.size(); i++) m_opengl_text[i]->draw(dim, tex);
 };
 
