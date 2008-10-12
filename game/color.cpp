@@ -27,21 +27,15 @@ namespace {
 	} colors;
 }
 
-Color::Color(std::string const& str): r(0.0), g(0.0), b(0.0), a(0.0) { /* Default to transparent/none */
-	if (str.empty()) return;
-	if (str[0] == '#') {
-		unsigned int r = 0, g = 0, b = 0;
-		if (str.size() == 7 && sscanf(str.c_str() + 1, "%02x %02x %02x", &r, &g, &b) == 3) {
-			*this = Color(r / 255.0, g / 255.0, b / 255.0);
-			return;
-		}
-		std::cerr << "WARNING: Unknown color format: " << str << " (only color names and #rrggbb are supported; using magenta to hilight)" << std::endl;
-		*this = Color(1.0, 0.0, 1.0);
+Color::Color(std::string const& str) {
+	unsigned int r = 0, g = 0, b = 0;
+	if (str.size() == 7 && str[0] == '#' && sscanf(str.c_str() + 1, "%02x %02x %02x", &r, &g, &b) == 3) {
+		*this = Color(r / 255.0, g / 255.0, b / 255.0);
 		return;
 	}
 	ColorNames::Map::const_iterator it = colors.m.find(str);
 	if (it != colors.m.end()) { *this = it->second; return; }
-	std::cerr << "WARNING: Unknown color name: " << str << " (using magenta to hilight)" << std::endl;
+	std::cerr << "WARNING: Unknown color: " << str << " (using magenta to hilight)" << std::endl;
 	*this = Color(1.0, 0.0, 1.0);
 }
 
