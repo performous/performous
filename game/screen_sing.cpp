@@ -148,11 +148,38 @@ void CScreenSing::draw() {
 	double songPercent = time / sm->getAudio()->getLength();
 	// Here we compute all about the lyrics
 	lyrics->updateSentences(time);
-	std::string sentenceNextSentence = lyrics->getSentenceNext();
-	std::string sentencePast = lyrics->getSentencePast();
-	std::string sentenceNow = lyrics->getSentenceNow();
-	std::string sentenceFuture = lyrics->getSentenceFuture();
-	std::string sentenceWhole = lyrics->getSentenceWhole();
+	std::vector<std::string> sentenceNextSentence = lyrics->getSentenceNext();
+	std::vector<std::string> sentencePast = lyrics->getSentencePast();
+	std::vector<std::string> sentenceNow = lyrics->getSentenceNow();
+	std::vector<std::string> sentenceFuture = lyrics->getSentenceFuture();
+
+	std::vector<TZoomText> sentenceNextSentenceZ;
+	std::vector<TZoomText> sentenceWholeZ;
+
+	for (unsigned int i = 0 ; i < sentenceNextSentence.size(); i++) {
+		TZoomText tmp;
+		tmp.factor = 1.0;
+		tmp.string = sentenceNextSentence[i];
+		sentenceNextSentenceZ.push_back(tmp);
+	}
+	for (unsigned int i = 0 ; i < sentencePast.size(); i++) {
+		TZoomText tmp;
+		tmp.factor = 1.0;
+		tmp.string = sentencePast[i];
+		sentenceWholeZ.push_back(tmp);
+	}
+	for (unsigned int i = 0 ; i < sentenceNow.size(); i++) {
+		TZoomText tmp;
+		tmp.factor = 1.5;
+		tmp.string = sentenceNow[i];
+		sentenceWholeZ.push_back(tmp);
+	}
+	for (unsigned int i = 0 ; i < sentenceFuture.size(); i++) {
+		TZoomText tmp;
+		tmp.factor = 1.0;
+		tmp.string = sentenceFuture[i];
+		sentenceWholeZ.push_back(tmp);
+	}
 	// Rendering starts
 	if (m_background) m_background->draw();
 	if (m_video) m_video->render(time - song.videoGap);
@@ -165,7 +192,7 @@ void CScreenSing::draw() {
 	theme->progressfg.width = theme->progressfg.final_width * songPercent;
 	drawRectangleOpenGL(
 		theme->progressfg.x,theme->progressfg.y,
-		theme->progressfg.width,theme->progressfg.height,
+		theme->progressfg.width/800.,theme->progressfg.height/600.,
 		theme->progressfg.fill_col.r, theme->progressfg.fill_col.g, theme->progressfg.fill_col.b, theme->progressfg.fill_col.a);
 	*/
 	const double baseLine = -0.2;
@@ -279,8 +306,8 @@ void CScreenSing::draw() {
 		glColor3f(1.0, 1.0, 1.0);
 	}
 	// draw sentences
-	theme->lyrics_now->draw(sentenceWhole);
-	theme->lyrics_next->draw(sentenceNextSentence);
+	theme->lyrics_now->draw(sentenceWholeZ);
+	theme->lyrics_next->draw(sentenceNextSentenceZ);
 	//draw score
 	theme->score1->draw((boost::format("%04d") % players.begin()->getScore()).str());
 	theme->score2->draw((boost::format("%04d") % players.rbegin()->getScore()).str());

@@ -172,17 +172,48 @@ SvgTxtTheme::SvgTxtTheme(std::string _theme_file, Align _a, VAlign _v, Gravity _
 	m_y = boost::lexical_cast<double>(y.get_value());
 };
 
+void SvgTxtTheme::draw(std::vector<TZoomText> _text) {
+	std::vector<std::string> tmp;
+
+	for (std::vector<TZoomText>::iterator it = _text.begin(); it != _text.end(); ++it) tmp.push_back(it->string);
+
+	draw(tmp);
+}
+
 void SvgTxtTheme::draw(std::string _text) {
-	if( m_text.text != _text ) {
-		m_text.text = _text;
-		m_opengl_text.reset(new OpenGLText(m_text));
+	std::vector<std::string> tmp;
+	tmp.push_back(_text);
+	draw(tmp);
+}
+
+void SvgTxtTheme::draw(std::vector<std::string> _text) {
+	std::string tmp = std::string("");
+
+	for (unsigned int i = 0 ; i < _text.size(); i++ ) {
+		tmp += _text[i];
 	}
+
+	if( m_cache_text != tmp ) {
+		m_cache_text = tmp;
+		for (unsigned int i = 0 ; i < _text.size(); i++ ) {
+			m_text.text = _text[i];
+			m_opengl_text[i].reset(new OpenGLText(m_text));
+		}
+	}
+
+	double text_x = 0.0;
+	double text_y = 0.0;
+	for (unsigned int i = 0 ; i < _text.size(); i++ ) {
+		text_x += m_opengl_text[i]->x();
+		text_y = std::max(text_y,m_opengl_text[i]->y());
+	}
+
 	
 	// 1.0 is the width
 	double screen_width = 1.0;
 	double screen_height = 600./800.;
-	double texture_ar = m_opengl_text->x()/m_opengl_text->y();
-	double texture_width = std::min(1.0, m_opengl_text->x()/800.);
+	double texture_ar = text_x/text_y;
+	double texture_width = std::min(1.0, text_x/800.);
 	double texture_height = texture_width / texture_ar;
 	double svg_ar = m_width/m_height;
 	double svg_width = m_width;
@@ -195,6 +226,7 @@ void SvgTxtTheme::draw(std::string _text) {
 	TexCoords tex;
 	tex.x1 = tex.y1 = 0.0f;
 	tex.x2 = tex.y2 = 1.0f;
-	m_opengl_text->draw(dim,tex);
+	for (unsigned int i = 0; i < _text.size() ; i++)
+		m_opengl_text[i]->draw(dim,tex);
 };
 

@@ -39,18 +39,22 @@ void Lyrics::updateSentences(double timestamp) {
 	m_past.clear();
 	m_now.clear();
 	m_future.clear();
+	m_whole.clear();
 	if (i >= m_formatted.size()) {
 		m_lastSentenceIdx = -1;
 		return;
 	}
 	for (unsigned int j = 0; j < m_formatted[i].size(); ++j) {
 		if (timestamp > m_formatted[i][j].end) {
-			m_past += m_formatted[i][j].syllable;
+			m_past.push_back(m_formatted[i][j].syllable);
+			m_whole.push_back(m_formatted[i][j].syllable);
 		} else if (timestamp < m_formatted[i][j].begin) {
-			m_future += m_formatted[i][j].syllable;
+			m_future.push_back(m_formatted[i][j].syllable);
+			m_whole.push_back(m_formatted[i][j].syllable);
 		} else {
 			m_lastSyllableIdx = j;
-			m_now += m_formatted[i][j].syllable;
+			m_now.push_back(m_formatted[i][j].syllable);
+			m_whole.push_back(m_formatted[i][j].syllable);
 		}
 	}
 	// If we have change of sentence, we rebuild the next sentence
@@ -59,7 +63,7 @@ void Lyrics::updateSentences(double timestamp) {
 		m_next.clear();
 		if (i < m_formatted.size() - 1) {
 			for (unsigned int j = 0; j < m_formatted[i+1].size(); ++j)
-			  m_next += m_formatted[i+1][j].syllable;
+			  m_next.push_back(m_formatted[i+1][j].syllable);
 		}
 	}
 }

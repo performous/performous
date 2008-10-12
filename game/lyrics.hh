@@ -2,6 +2,7 @@
 #define __LYRICS_H__
 
 #include "songs.hh"
+#include <vector>
 
 
 /**
@@ -13,23 +14,23 @@ class Lyrics {
 	/** 
 	 * Return what has been sung in the current sentence
 	 */
-	std::string getSentencePast() { return m_past; }
+	std::vector<std::string> getSentencePast() { return m_past; }
 	/**
 	 * Return the current syllable to be sung now
 	 */
-	std::string getSentenceNow() { return m_now; }
+	std::vector<std::string> getSentenceNow() { return m_now; }
 	/**
 	 * Return the rest of the syllables in the current sentence
 	 */
-	std::string getSentenceFuture() { return m_future; }
+	std::vector<std::string> getSentenceFuture() { return m_future; }
 	/**
 	 * Return the next sentence to be displayed under the current sentence
 	 */
-	std::string getSentenceNext() { return m_next; }
+	std::vector<std::string> getSentenceNext() { return m_next; }
 	/**
 	 * Return the whole current sentence (Past + Now + Future)
 	 */
-	std::string getSentenceWhole() { return m_past + m_now + m_future; }
+	std::vector<std::string> getSentenceWhole() { return m_whole; }
 	/**
 	 * Return the current sang note
 	 */
@@ -52,7 +53,7 @@ class Lyrics {
 	 */
 	double getEndTime(int sentence);
 	
-	std::string m_past, m_now, m_future, m_next;
+	std::vector<std::string> m_past, m_now, m_future, m_next, m_whole;
 	Song::notes_t m_lyrics;
 	std::vector<std::vector<Note> > m_formatted;
 	int m_lastSyllableIdx;

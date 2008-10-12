@@ -4,6 +4,13 @@
 #include "color.hh"
 #include "surface.hh"
 #include <boost/scoped_ptr.hpp>
+#include <vector>
+
+struct TZoomText {
+	std::string string;
+	double factor;
+	TZoomText(): string(),factor() {};
+};
 
 // Special theme for creating opengl themed surfaces
 // this structure does not include:
@@ -91,11 +98,13 @@ class SvgTxtTheme {
 	enum Align {A_ASIS, LEFT, CENTER, RIGHT};
 	//
   	SvgTxtTheme(std::string _theme_file, Align _a=A_ASIS, VAlign _v=V_ASIS, Gravity _g=NW, Fitting _f=F_ASIS);
+	void draw(std::vector<TZoomText> _text);
+	void draw(std::vector<std::string> _text);
 	void draw(std::string _text);
 	void setGravity(Gravity _g) {m_gravity=_g;};
 	void setFitting(Fitting _f) {m_fitting=_f;};
   private:
-  	boost::scoped_ptr<OpenGLText> m_opengl_text;
+  	boost::scoped_ptr<OpenGLText> m_opengl_text[50];
 	Gravity m_gravity;
 	Fitting m_fitting;
 	VAlign m_valign;
@@ -104,6 +113,7 @@ class SvgTxtTheme {
 	double m_y;
 	double m_width;
 	double m_height;
+	std::string m_cache_text;
 	TThemeTxtOpenGL m_text;
 };
 
