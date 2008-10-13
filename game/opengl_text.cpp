@@ -109,7 +109,7 @@ void OpenGLText::draw(Dimensions &_dim, TexCoords &_tex) {
 	m_texture->draw(_dim, _tex);
 }
 
-SvgTxtTheme::SvgTxtTheme(std::string _theme_file, Align _a, VAlign _v, Gravity _g, Fitting _f) : m_gravity(_g), m_fitting(_f), m_valign(_v), m_align(_a) {
+SvgTxtTheme::SvgTxtTheme(std::string _theme_file, Align _a, VAlign _v, Gravity _g, Fitting _f) : m_gravity(_g), m_fitting(_f), m_valign(_v), m_align(_a), m_cache_text("XXX FIXME: Use something else. This text must never appear in lyrics!") {
 	// this should stay here for the moment
 	m_text.fontalign = "center";
 
@@ -181,7 +181,6 @@ void SvgTxtTheme::draw(std::vector<std::string> _text) {
 			m_opengl_text[i].reset(new OpenGLText(m_text));
 		}
 	}
-
 	double text_x = 0.0;
 	double text_y = 0.0;
 	for (unsigned int i = 0; i < _text.size(); i++ ) {
