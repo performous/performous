@@ -228,19 +228,22 @@ void CScreenSing::draw() {
 		Use texture(*m_wave);
 		for (std::list<Player>::const_iterator p = players.begin(); p != players.end(); ++p) {
 			glColor4f(p->m_color.r, p->m_color.g, p->m_color.b, m_notealpha);
-			float tex = 0.0;
+			float const texOffset = 2.0 * time; // Offset for animating the wave texture
 			Player::pitch_t const& pitch = p->m_pitch;
-			size_t beginIdx = std::max(0.0, time - 0.5 / pixUnit) / Engine::TIMESTEP; // At which pitch idx to start displaying the wave
-			size_t endIdx = pitch.size();
+			size_t const beginIdx = std::max(0.0, time - 0.5 / pixUnit) / Engine::TIMESTEP; // At which pitch idx to start displaying the wave
+			size_t const endIdx = pitch.size();
 			double oldval = std::numeric_limits<double>::quiet_NaN();
-			double t = 0.0;
-			// The loop starts at the beginning instead of beginIdx to calculate the right phase for the wave.
-			for (size_t idx = 0; idx < endIdx; ++idx, t += Engine::TIMESTEP) {
-				double freq = pitch[idx].first;
+			size_t idx = beginIdx;
+			// Go back until silence (NaN freq) to allow proper wave phase to be calculated
+			while (idx > 0 && pitch[idx].first == pitch[idx].first) --idx;
+			// Start processing
+			float tex = texOffset;
+			double t = idx * Engine::TIMESTEP;
+			for (; idx < endIdx; ++idx, t += Engine::TIMESTEP) {
+				double const freq = pitch[idx].first;
 				// If freq is NaN, we have nothing to process
-				if (freq != freq) { oldval = std::numeric_limits<double>::quiet_NaN(); continue; }
-				tex += freq * 0.001; // Wave phase (texture coordinate)
-				while (tex >= 1.0) tex -= 1.0; // Normalize to 0-1 range
+				if (freq != freq) { tex = texOffset; oldval = std::numeric_limits<double>::quiet_NaN(); continue; }
+				tex = tex + freq * 0.001; // Wave phase (texture coordinate)
 				if (idx < beginIdx) continue; // Skip graphics rendering if out of screen
 				bool prev = idx > beginIdx && pitch[idx - 1].first > 0.0;
 				bool next = idx < endIdx - 1 && pitch[idx + 1].first > 0.0;
@@ -255,6 +258,7 @@ void CScreenSing::draw() {
 				double val = n.note + diff;
 				double y = baseY + val * noteUnit;
 				double thickness = (std::max(0.0, std::min(1.0, 1.0 + pitch[idx].second / 60.0))) + 0.5;
+				thickness *= 1.0 + 0.2 * std::sin(tex - 2.0 * texOffset); // Further animation :)
 				thickness *= -noteUnit;
 				// If pitch change is too fast, terminate and begin a new one
 				if (prev && std::abs(oldval - val) > 1.0) {
