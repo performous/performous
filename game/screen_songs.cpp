@@ -64,6 +64,7 @@ void CScreenSongs::draw() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	CAudio& audio = *sm->getAudio();
 	Songs& songs = *sm->getSongs();
+	songs.update(); // Poll for new songs
 	theme->bg->draw();
 	std::ostringstream oss_song, oss_order;
 	// Test if there are no songs

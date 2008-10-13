@@ -8,9 +8,6 @@ Generic
 Surface
   - Create mipmaps?
 
-Song list
-  - Background loading in a separate thread
-
 Score screen
   - Two players
 

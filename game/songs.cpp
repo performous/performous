@@ -1,3 +1,4 @@
+#include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
 #include <glob.h>
@@ -345,12 +346,24 @@ bool operator<(Song const& l, Song const& r) {
 	// If filenames are identical, too, the songs are considered the same.
 }
 
-Songs::Songs(std::set<std::string> const& songdirs): m_songdirs(songdirs), math_cover(), m_order() {
+Songs::Songs(std::set<std::string> const& songdirs): m_songdirs(songdirs), math_cover(), m_order(), m_dirty(false) {
 	reload();
 }
 
+Songs::~Songs() {
+	m_thread->join();
+}
+
 void Songs::reload() {
-	songlist_t songs;
+	if (!m_thread.get()) m_thread.reset(new boost::thread(boost::bind(&Songs::reload_internal, boost::ref(*this))));
+}
+
+void Songs::reload_internal() {
+	{
+		boost::mutex::scoped_lock l(m_mutex);
+		m_songs.clear();
+		m_dirty = true;
+	}	
 	for (std::set<std::string>::const_iterator it = m_songdirs.begin(); it != m_songdirs.end(); ++it) {
 		glob_t _glob;
 		std::string pattern = *it + "*/*.[tT][xX][tT]";
@@ -364,7 +377,10 @@ void Songs::reload() {
 			if (pos < path.size() - 1) pos += 1; else pos = 0;
 			std::cout << "\r  " << std::setiosflags(std::ios::left) << std::setw(70) << path.substr(pos, 70) << "\x1B[K" << std::flush;
 			try {
-				songs.insert(new Song(path + "/", txtfilename));
+				Song* s = new Song(path + "/", txtfilename);
+				boost::mutex::scoped_lock l(m_mutex);
+				m_songs.insert(s);
+				m_dirty = true;
 			} catch (SongParser::Exception& e) {
 				std::cout << "FAIL\n    " << txtfilename;
 				if (e.line()) std::cout << " line " << e.line();
@@ -374,8 +390,6 @@ void Songs::reload() {
 		std::cout << "\r\x1B[K" << std::flush;
 		globfree(&_glob);
 	}
-	m_songs.swap(songs);
-	filter_internal();
 }
 
 class Songs::RestoreSel {
@@ -414,6 +428,7 @@ void Songs::setFilter(std::string const& val) {
 }
 
 void Songs::filter_internal() {
+	boost::mutex::scoped_lock l(m_mutex);
 	RestoreSel restore(*this);
 	filtered_t filtered;
 	try {
@@ -429,6 +444,7 @@ void Songs::filter_internal() {
 	m_filtered.swap(filtered);
 	math_cover.setTarget(0, 0);
 	sort_internal();
+	m_dirty = false;
 }
 
 class CmpByField {

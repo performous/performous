@@ -4,6 +4,8 @@
 #include <boost/noncopyable.hpp>
 #include <boost/ptr_container/ptr_set.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/thread.hpp>
 #include <boost/thread/xtime.hpp>
 #include <deque>
 #include <set>
@@ -120,10 +122,12 @@ class coverMathAdvanced {
 	double m_velocity;
 };
 
-class Songs {
+class Songs: boost::noncopyable {
 	std::set<std::string> m_songdirs;
   public:
 	Songs(std::set<std::string> const& songdirs);
+	~Songs();
+	void update() { if (m_dirty) filter_internal(); }
 	void reload();
 	Song& near(double pos);
 	Song& operator[](std::size_t pos) { return *m_filtered[pos]; }
@@ -155,8 +159,12 @@ class Songs {
 	coverMathAdvanced math_cover;
 	std::string m_filter;
 	int m_order;
+	void reload_internal();
 	void filter_internal();
 	void sort_internal();
+	volatile bool m_dirty;
+	boost::scoped_ptr<boost::thread> m_thread;
+	boost::mutex m_mutex;
 };
 
 #endif
