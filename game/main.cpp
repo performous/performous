@@ -187,7 +187,7 @@ int main(int argc, char** argv) {
 		// Initialize everything
 		CScreenManager sm(theme);
 		Window window(width, height, fullscreen);
-		sm.setAudio(new CAudio(pdev));
+		sm.setAudio(new CAudio(pdev, prate));
 		sm.addScreen(new CScreenIntro("Intro"));
 		sm.addScreen(new CScreenSongs("Songs", songdirs));
 		Capture capture(2, cdev, crate);

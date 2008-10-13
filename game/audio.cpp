@@ -6,12 +6,12 @@
 
 #define LENGTH_ERROR -1
 
-CAudio::CAudio(std::string const& pdev):
+CAudio::CAudio(std::string const& pdev, unsigned int rate):
 	m_type(),
 	m_rs(da::settings(pdev)
 	.set_callback(boost::ref(*this))
 	.set_channels(2)
-	.set_rate(48000)
+	.set_rate(rate)
 	.set_debug(std::cerr)),
 	m_playback(m_rs) {
 	m_mpeg.reset();
@@ -92,7 +92,7 @@ void CAudio::setVolume_internal(unsigned int _volume) {
 void CAudio::playMusic_internal(std::string const& filename) {
 	stopMusic_internal();
 	length = LENGTH_ERROR;
-	m_mpeg.reset(new CFfmpeg(false, true, filename));
+	m_mpeg.reset(new CFfmpeg(false, true, filename, m_rs.rate()));
 	if (m_mpeg->duration() < 0) return;
 	length = 1e3 * m_mpeg->duration();
 	ffmpeg_paused = false;
@@ -103,7 +103,7 @@ void CAudio::playPreview_internal(std::string const& filename) {
 	setVolume_internal(0);
 	stopMusic_internal();
 	length = LENGTH_ERROR;
-	m_mpeg.reset(new CFfmpeg(false, true, filename));
+	m_mpeg.reset(new CFfmpeg(false, true, filename, m_rs.rate()));
 	m_mpeg->seek(30.);
 	if (m_mpeg->duration() < 0) return;
 	length = 1e3 * m_mpeg->duration();

@@ -11,9 +11,8 @@ extern "C" {
 }
 
 #define FFMPEG_OUTPUT_NUMBER_OF_CHANNELS 2
-#define FFMPEG_OUTPUT_SAMPLE_RATE 48000
 
-CFfmpeg::CFfmpeg(bool _decodeVideo, bool _decodeAudio, std::string const& _filename): m_filename(_filename), m_quit() {
+CFfmpeg::CFfmpeg(bool _decodeVideo, bool _decodeAudio, std::string const& _filename, unsigned int rate): m_filename(_filename), m_rate(rate), m_quit() {
 	av_register_all();
 	videoStream=-1;
 	audioStream=-1;
@@ -91,11 +90,10 @@ void CFfmpeg::open() {
 			pAudioCodec=avcodec_find_decoder(pAudioCodecCtx->codec_id);
 			if (!pAudioCodec) throw std::runtime_error("Cannot find audio codec");
 			if (avcodec_open(pAudioCodecCtx, pAudioCodec) < 0) throw std::runtime_error("Cannot open audio codec");
-			pResampleCtx = audio_resample_init(FFMPEG_OUTPUT_NUMBER_OF_CHANNELS,pAudioCodecCtx->channels,
-						FFMPEG_OUTPUT_SAMPLE_RATE,pAudioCodecCtx->sample_rate);
+			pResampleCtx = audio_resample_init(FFMPEG_OUTPUT_NUMBER_OF_CHANNELS, pAudioCodecCtx->channels, m_rate, pAudioCodecCtx->sample_rate);
 			if (!pResampleCtx) throw std::runtime_error("Cannot create resampling context");
 			std::cout << "Resampling audio from " << pAudioCodecCtx->channels << " channel(s) at " << pAudioCodecCtx->sample_rate << "Hz";
-			std::cout << " to " << FFMPEG_OUTPUT_NUMBER_OF_CHANNELS << " channels at " << FFMPEG_OUTPUT_SAMPLE_RATE << "Hz" << std::endl;
+			std::cout << " to " << FFMPEG_OUTPUT_NUMBER_OF_CHANNELS << " channels at " << m_rate << "Hz" << std::endl;
 		}
 	} catch (std::runtime_error& e) {
 		// TODO: clean memory

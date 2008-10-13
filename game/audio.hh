@@ -20,7 +20,7 @@ class CAudio {
 	 * Constructor
 	 * This constructor initialise the API audio drivers
 	 */
-	CAudio(std::string const& pdev);
+	CAudio(std::string const& pdev, unsigned int rate);
 	/**
 	 * Destructor
 	 * This destructor close the API audio drivers

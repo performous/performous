@@ -1,17 +1,11 @@
 Blockers for 0.3 release:
 
 Generic
-  - Decide a name and rebrand the game accordingly
-  - Replace XML walk tree functions with libxml++ and XPath?
   - Clean all FIXMEs and XXXs
   - Write progress bar class to be used for all progress bars
   - Configurable audio roundtrip lag and A/V lag?
 
-Audio
-  - Resampling should check sound card rate instead of assuming 48000 Hz
-  
 Surface
-  - Scale non-pow2-surfaces on older hardware
   - Create mipmaps?
 
 Song list
@@ -23,7 +17,6 @@ Score screen
 Singing screen
   - Song progress bar
   - Widescreen support (not even the first line of lyrics or score calculators fit)
-  - Optimized text rendering
   - Autozoom notelines improvement?
   - Textured (repeating) freestyle notes
 

@@ -115,7 +115,7 @@ extern "C" {
 
 class CFfmpeg {
   public:
-	CFfmpeg(bool decodeVideo, bool decodeAudio, std::string const& file);
+	CFfmpeg(bool decodeVideo, bool decodeAudio, std::string const& file, unsigned int rate = 48000);
 	~CFfmpeg();
 	/**
 	* This function is called by the crash handler to indicate that FFMPEG has
@@ -137,6 +137,7 @@ class CFfmpeg {
 	void decodeNextFrame();
 	boost::scoped_ptr<boost::thread> m_thread;
 	std::string m_filename;
+	unsigned int m_rate;
 	volatile bool m_quit;
 	volatile bool m_eof;
 	volatile double m_seekTarget;
