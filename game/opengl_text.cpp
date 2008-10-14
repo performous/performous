@@ -6,15 +6,6 @@
 #include <iostream>
 #include <sstream>
 
-namespace {
-	unsigned int nextPow2(double _val) {
-		unsigned int ret = 1;
-		unsigned int val = ceil(_val);
-		while (ret < val) ret *= 2;
-		return ret;
-	}
-}
-
 OpenGLText::OpenGLText(TThemeTxtOpenGL& _text) {
 	PangoLayout *layout;
 
@@ -55,14 +46,12 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL& _text) {
 	m_y = rec2.height;
 	m_x_advance = rec1.x;
 	m_y_advance = rec1.y;
-	m_x_power_of_two = nextPow2(m_x);
-	m_y_power_of_two = nextPow2(m_y);
 
 	g_object_unref (layout);
 	g_object_unref (ctx);
 
 	// create surface
-	cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, m_x_power_of_two, m_y_power_of_two);
+	cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, m_x, m_y);
 	cairo_t *dc = cairo_create(surface);
 
 	// draw the surface
@@ -87,14 +76,7 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL& _text) {
 	cairo_restore(dc);
 	g_object_unref(layout);
 
-	m_texture.reset(
-		new OpenGLTexture(
-			cairo_image_surface_get_width(surface),
-			cairo_image_surface_get_height(surface),
-			OpenGLTexture::INT_ARGB,
-			cairo_image_surface_get_data(surface)
-		)
-	);
+	m_surface.reset(new Surface(cairo_image_surface_get_width(surface), cairo_image_surface_get_height(surface), Surface::INT_ARGB, cairo_image_surface_get_data(surface)));
 
 	// delete surface
 	cairo_destroy(dc);
@@ -104,9 +86,9 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL& _text) {
 }
 
 void OpenGLText::draw(Dimensions &_dim, TexCoords &_tex) {
-	_tex.x2 = _tex.x2 * m_x / m_x_power_of_two;
-	_tex.y2 = _tex.y2 * m_y / m_y_power_of_two;
-	m_texture->draw(_dim, _tex);
+	m_surface->dimensions = _dim;
+	m_surface->tex = _tex;
+	m_surface->draw();
 }
 
 SvgTxtTheme::SvgTxtTheme(std::string _theme_file, Align _a, VAlign _v, Gravity _g, Fitting _f) : m_gravity(_g), m_fitting(_f), m_valign(_v), m_align(_a), m_cache_text("XXX FIXME: Use something else. This text must never appear in lyrics!") {

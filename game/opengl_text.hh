@@ -43,15 +43,11 @@ class OpenGLText {
 	double x_advance() {return m_x_advance;};
 	double y_advance() {return m_y_advance;};
   private:
-	unsigned int m_x_power_of_two;
-	unsigned int m_y_power_of_two;
 	double m_x;
 	double m_y;
 	double m_x_advance;
 	double m_y_advance;
-	// TODO: only have a texture id uploaded here
-	// because Surface do way too much things (global positionning for example)
-	boost::scoped_ptr<OpenGLTexture> m_texture;
+	boost::scoped_ptr<Surface> m_surface;
 };
 
 // Gravity:

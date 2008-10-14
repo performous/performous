@@ -54,38 +54,63 @@ struct TexCoords {
 	float x1, y1, x2, y2;
 };
 
-class OpenGLTexture {
+/** @short A RAII wrapper for allocating/deallocating OpenGL texture ID **/
+template <GLenum Type> class OpenGLTexture: boost::noncopyable {
+  public:
+	static GLenum type() { return Type; };
+	OpenGLTexture() { glGenTextures(1, &m_id); }
+	~OpenGLTexture() { glDeleteTextures(1, &m_id); }
+	GLuint id() const { return m_id; };
+	void draw(Dimensions const& dim, TexCoords const& tex);
+  private:
+	GLuint m_id;
+};
+
+/*
+class Texture {
+  public:
+	Texture(std::string const& filename);
+	operator OpenGLTexture<GL_TEXTURE_2D>
+  private:
+	OpenGLTexture<GL_TEXTURE_2D> texture;
+};
+*/
+
+/** @short A RAII wrapper for binding to a texture (using it, modifying it) **/
+class UseTexture: boost::noncopyable {
+  public:
+	template <GLenum Type> UseTexture(OpenGLTexture<Type> const& s): m_type(s.type()) {
+		glEnable(m_type);
+		glBindTexture(m_type, s.id());
+	}
+	~UseTexture() { glDisable(m_type); }
+  private:
+	GLenum m_type;
+};
+
+template <GLenum Type> void OpenGLTexture<Type>::draw(Dimensions const& dim, TexCoords const& tex) {
+	UseTexture texture(*this);
+	glBegin(GL_QUADS);
+	glTexCoord2f(tex.x1, tex.y1); glVertex2f(dim.x1(), dim.y1());
+	glTexCoord2f(tex.x2, tex.y1); glVertex2f(dim.x2(), dim.y1());
+	glTexCoord2f(tex.x2, tex.y2); glVertex2f(dim.x2(), dim.y2());
+	glTexCoord2f(tex.x1, tex.y2); glVertex2f(dim.x1(), dim.y2());
+	glEnd();
+}
+
+class Surface {
   public:
 	enum Format { INT_ARGB, CHAR_RGBA, RGB, BGR };
-	OpenGLTexture(unsigned int width, unsigned int height, Format format, unsigned char* buffer);
-	~OpenGLTexture();
-	GLuint id() const {return m_texture_id;};
-	void draw(Dimensions &dim, TexCoords &tex);
-  private:
-	GLuint m_texture_id;
-};
-
-
-class Surface: boost::noncopyable {
-  public:
   	Dimensions dimensions;
 	TexCoords tex;
-	Surface(unsigned width, unsigned height, OpenGLTexture::Format format, unsigned char* buffer);
+	Surface(unsigned width, unsigned height, Format format, unsigned char* buffer);
 	Surface(cairo_surface_t* _surf);
 	Surface(std::string const& filename);
-	~Surface();
 	void draw();
-	OpenGLTexture const& texture() const { return *m_texture.get(); };
+	void load(unsigned int width, unsigned int height, Format format, unsigned char* buffer, float ar = 0.0f);
   private:
-	void load(unsigned int width, unsigned int height, OpenGLTexture::Format format, unsigned char* buffer, float ar = 0.0f);
 	unsigned int m_width, m_height;
-	boost::scoped_ptr<OpenGLTexture> m_texture;
-};
-
-struct Use {
-	Use(OpenGLTexture const& s);
-	Use(Surface const& s);
-	~Use();
+	OpenGLTexture<GL_TEXTURE_RECTANGLE_ARB> m_texture;
 };
 
 bool checkExtension(const char* extension);
