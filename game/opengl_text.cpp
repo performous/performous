@@ -76,7 +76,7 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL& _text) {
 	cairo_restore(dc);
 	g_object_unref(layout);
 
-	m_surface.reset(new Surface(cairo_image_surface_get_width(surface), cairo_image_surface_get_height(surface), Surface::INT_ARGB, cairo_image_surface_get_data(surface)));
+	m_surface.reset(new Surface(cairo_image_surface_get_width(surface), cairo_image_surface_get_height(surface), pix::INT_ARGB, cairo_image_surface_get_data(surface)));
 
 	// delete surface
 	cairo_destroy(dc);

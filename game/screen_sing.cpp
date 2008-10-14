@@ -17,14 +17,14 @@ void CScreenSing::enter() {
 #define TRYLOAD(field, class) if (!song.field.empty()) { try { m_##field.reset(new class(song.path + song.field)); } catch (std::exception& e) { std::cerr << e.what() << std::endl; } }
 	TRYLOAD(video, Video)
 #undef TRYLOAD
-	if (!m_notelines) m_notelines.reset(new Surface(sm->getThemePathFile("notelines.svg")));
+	if (!m_wave) m_wave.reset(new Texture(sm->getThemePathFile("wave.png")));
+	if (!m_notelines) m_notelines.reset(new Texture(sm->getThemePathFile("notelines.svg")));
 	if (!m_notebar) m_notebar.reset(new Surface(sm->getThemePathFile("notebar.svg")));
 	if (!m_notebar_hl) m_notebar_hl.reset(new Surface(sm->getThemePathFile("notebar.png")));
 	if (!m_notebarfs) m_notebarfs.reset(new Surface(sm->getThemePathFile("notebarfs.svg")));
 	if (!m_notebarfs_hl) m_notebarfs_hl.reset(new Surface(sm->getThemePathFile("notebarfs-hl.svg")));
 	if (!m_notebargold) m_notebargold.reset(new Surface(sm->getThemePathFile("notebargold.svg")));
 	if (!m_notebargold_hl) m_notebargold_hl.reset(new Surface(sm->getThemePathFile("notebargold.png")));
-	if (!m_wave) m_wave.reset(new Surface(sm->getThemePathFile("wave.png")));
 	std::string file = song.path + song.mp3;
 	std::cout << "Now playing: " << file << std::endl;
 	CAudio& audio = *sm->getAudio();
@@ -195,10 +195,10 @@ void CScreenSing::draw() {
 		m_notealpha = 0.0f;
 	} else {
 		glColor4f(1.0, 1.0, 1.0, m_notealpha);
-		m_notelines->dimensions.stretch(1.0, (max - min - 13) * noteUnit);
-		m_notelines->tex.y2 = (-max + 6.0) / 12.0f;
-		m_notelines->tex.y1 = (-min - 7.0) / 12.0f;
-		m_notelines->draw();
+		TexCoords tex;
+		tex.y2 = (-max + 6.0) / 12.0f;
+		tex.y1 = (-min - 7.0) / 12.0f;
+		m_notelines->draw(Dimensions().stretch(1.0, (max - min - 13) * noteUnit), tex);
 		// Draw notes
 		{
 			for (Song::notes_t::const_iterator it = m_songit; it != song.notes.end() && it->begin < time - (baseLine - 0.5) / pixUnit; ++it) {
@@ -225,7 +225,7 @@ void CScreenSing::draw() {
 			}
 		}
 		// Pitch graph
-		// XXX: UseTexture texture(*m_wave);
+		UseTexture texture(*m_wave);
 		for (std::list<Player>::const_iterator p = players.begin(); p != players.end(); ++p) {
 			glColor4f(p->m_color.r, p->m_color.g, p->m_color.b, m_notealpha);
 			float const texOffset = 2.0 * time; // Offset for animating the wave texture

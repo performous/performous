@@ -25,8 +25,8 @@ class CScreenSing: public CScreen {
 	boost::ptr_vector<Analyzer>& m_analyzers;
 	boost::scoped_ptr<Surface> m_background;
 	boost::scoped_ptr<Video> m_video;
-	boost::scoped_ptr<Surface> m_notelines;
-	boost::scoped_ptr<Surface> m_wave;
+	boost::scoped_ptr<Texture> m_notelines;
+	boost::scoped_ptr<Texture> m_wave;
 	boost::scoped_ptr<Surface> m_notebar;
 	boost::scoped_ptr<Surface> m_notebar_hl;
 	boost::scoped_ptr<Surface> m_notebarfs;

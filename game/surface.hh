@@ -52,6 +52,8 @@ class Dimensions {
 
 struct TexCoords {
 	float x1, y1, x2, y2;
+	TexCoords(float x1_ = 0.0, float y1_ = 0.0, float x2_ = 1.0, float y2_ = 1.0):
+	  x1(x1_), y1(y1_), x2(x2_), y2(y2_) {}
 };
 
 /** @short A RAII wrapper for allocating/deallocating OpenGL texture ID **/
@@ -61,20 +63,10 @@ template <GLenum Type> class OpenGLTexture: boost::noncopyable {
 	OpenGLTexture() { glGenTextures(1, &m_id); }
 	~OpenGLTexture() { glDeleteTextures(1, &m_id); }
 	GLuint id() const { return m_id; };
-	void draw(Dimensions const& dim, TexCoords const& tex);
+	void draw(Dimensions const& dim, TexCoords const& tex) const;
   private:
 	GLuint m_id;
 };
-
-/*
-class Texture {
-  public:
-	Texture(std::string const& filename);
-	operator OpenGLTexture<GL_TEXTURE_2D>
-  private:
-	OpenGLTexture<GL_TEXTURE_2D> texture;
-};
-*/
 
 /** @short A RAII wrapper for binding to a texture (using it, modifying it) **/
 class UseTexture: boost::noncopyable {
@@ -88,7 +80,8 @@ class UseTexture: boost::noncopyable {
 	GLenum m_type;
 };
 
-template <GLenum Type> void OpenGLTexture<Type>::draw(Dimensions const& dim, TexCoords const& tex) {
+/** Draw the texture using the specified dimensions and texture coordinates. **/
+template <GLenum Type> void OpenGLTexture<Type>::draw(Dimensions const& dim, TexCoords const& tex) const {
 	UseTexture texture(*this);
 	glBegin(GL_QUADS);
 	glTexCoord2f(tex.x1, tex.y1); glVertex2f(dim.x1(), dim.y1());
@@ -98,16 +91,37 @@ template <GLenum Type> void OpenGLTexture<Type>::draw(Dimensions const& dim, Tex
 	glEnd();
 }
 
+namespace pix { enum Format { INT_ARGB, CHAR_RGBA, RGB, BGR }; }
+
+/**
+* @short Texture wrapper.
+* Textures with non-power-of-two dimensions may be slow to load.
+* If you don't need texturing, use Surface instead.
+**/
+class Texture: public OpenGLTexture<GL_TEXTURE_2D> {
+  public:
+	/** Initialize from SVG or PNG file **/
+	Texture(std::string const& filename);
+	/** Get aspect ratio (1.0 for square, > 1.0 for wider). **/
+	float ar() const { return m_ar; }
+	void load(unsigned int width, unsigned int height, pix::Format format, unsigned char const* buffer, float ar = 0.0f);
+  private:
+	float m_ar;
+};
+
+/**
+* @short High level surface/image wrapper.
+* Supports non-power-of-two dimensions, but does not support texturing, so keep tex within [0, 1].
+**/
 class Surface {
   public:
-	enum Format { INT_ARGB, CHAR_RGBA, RGB, BGR };
   	Dimensions dimensions;
 	TexCoords tex;
-	Surface(unsigned width, unsigned height, Format format, unsigned char* buffer);
+	Surface(unsigned width, unsigned height, pix::Format format, unsigned char const* buffer);
 	Surface(cairo_surface_t* _surf);
 	Surface(std::string const& filename);
 	void draw();
-	void load(unsigned int width, unsigned int height, Format format, unsigned char* buffer, float ar = 0.0f);
+	void load(unsigned int width, unsigned int height, pix::Format format, unsigned char const* buffer, float ar = 0.0f);
   private:
 	unsigned int m_width, m_height;
 	OpenGLTexture<GL_TEXTURE_RECTANGLE_ARB> m_texture;
