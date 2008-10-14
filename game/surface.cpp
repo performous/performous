@@ -106,38 +106,35 @@ Surface::Surface(unsigned int width, unsigned int height, pix::Format format, un
 	load(width, height, format, buffer);
 }
 
-void Texture::load(unsigned int width, unsigned int height, pix::Format format, unsigned char const* buffer, float ar) {
-	m_ar = ar ? ar : double(width) / height;
-
-	unsigned int fmt;
-	unsigned int buffer_fmt;
-	bool swap;
-	using namespace pix;
-	switch(format) {
-	  case RGB:
-		fmt = GL_RGB;
-		buffer_fmt = GL_UNSIGNED_BYTE;
-		swap = false;
-		break;
-	  case BGR:
-		fmt = GL_RGB;
-		buffer_fmt = GL_UNSIGNED_BYTE;
-		swap = true;
-		break;
-	  case INT_ARGB:
-		buffer_fmt = GL_UNSIGNED_INT_8_8_8_8;
-		fmt = GL_BGRA;
-		swap = true;
-		break;
-	  case CHAR_RGBA:
-		fmt = GL_RGBA;
-		buffer_fmt = GL_UNSIGNED_BYTE;
-		swap = false;
-		break;
-	  default:
+// Stuff for converting pix::Format into OpenGL enum values
+namespace {
+	struct PixFmt {
+		PixFmt() {} // Required by std::map
+		PixFmt(GLenum f, GLenum t, bool s): format(f), type(t), swap(s) {}
+		GLenum format;
+		GLenum type;
+		bool swap;
+	};
+	struct PixFormats {
+		typedef std::map<pix::Format, PixFmt> Map;
+		Map m;
+		PixFormats() {
+			using namespace pix;
+			m[RGB] = PixFmt(GL_RGB, GL_UNSIGNED_BYTE, false);
+			m[BGR] = PixFmt(GL_RGB, GL_UNSIGNED_BYTE, true);
+			m[CHAR_RGBA] = PixFmt(GL_RGBA, GL_UNSIGNED_BYTE, false);
+			m[INT_ARGB] = PixFmt(GL_BGRA, GL_UNSIGNED_INT_8_8_8_8, true);
+		}
+	} pixFormats;
+	PixFmt const& getPixFmt(pix::Format format) {
+		PixFormats::Map::const_iterator it = pixFormats.m.find(format);
+		if (it != pixFormats.m.end()) return it->second;
 		throw std::logic_error("Unknown pixel format");
 	}
+}
 
+void Texture::load(unsigned int width, unsigned int height, pix::Format format, unsigned char const* buffer, float ar) {
+	m_ar = ar ? ar : double(width) / height;
 	UseTexture texture(*this);
 	// When texture area is small, bilinear filter the closest mipmap
 	glTexParameterf(type(), GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
@@ -147,10 +144,11 @@ void Texture::load(unsigned int width, unsigned int height, pix::Format format, 
 	// The texture wraps over at the edges (repeat)
 	glTexParameterf(type(), GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameterf(type(), GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glPixelStorei(GL_UNPACK_SWAP_BYTES, swap );
+	PixFmt const& f = getPixFmt(format);
+	glPixelStorei(GL_UNPACK_SWAP_BYTES, f.swap);
 	// Load the data into texture
 	if (checkExtension("GL_ARB_texture_non_power_of_two")) { // Use OpenGL 2.0 functionality 
-		glTexImage2D(type(), 0, GL_RGBA, width, height, 0, fmt, buffer_fmt, buffer);	
+		glTexImage2D(type(), 0, GL_RGBA, width, height, 0, f.format, f.type, buffer);	
 	} else {
 		// TODO: Test for OpenGL extension GL_ARB_texture_non_power_of_two and if not found, 
 		// use gluScaleImage to upscale the texture to nextPow2 dimensions before calling 
@@ -165,13 +163,13 @@ void Texture::load(unsigned int width, unsigned int height, pix::Format format, 
 		int newWidth = prevPow2(width);
 		int newHeight = prevPow2(height);
 		std::vector<uint32_t> outBuf(newWidth * newHeight);
-		gluScaleImage(fmt, width, height, buffer_fmt, buffer, newWidth, newHeight, buffer_fmt, &outBuf[0]);
+		gluScaleImage(f.format, width, height, f.type, buffer, newWidth, newHeight, f.type, &outBuf[0]);
 		// BIG FAT WARNING: Do not even think of using ARB_texture_rectangle here!
 		// Every developer of the game so far has tried doing so, but it just cannot work.
 		// (1) no repeat => cannot texture
 		// (2) coordinates not normalized => would require special hackery elsewhere		
 		// Just don't do it in Surface class, thanks. -Tronic
-		glTexImage2D(type(), 0, GL_RGBA, newWidth, newHeight, 0, fmt, buffer_fmt, &outBuf[0]);
+		glTexImage2D(type(), 0, GL_RGBA, newWidth, newHeight, 0, f.format, f.type, &outBuf[0]);
 	}
 }
 
@@ -180,38 +178,11 @@ void Surface::load(unsigned int width, unsigned int height, pix::Format format, 
 	// Initialize dimensions
 	m_width = width; m_height = height;
 	dimensions = Dimensions(ar != 0.0f ? ar : float(width) / height).fixedWidth(1.0f);
-	unsigned int fmt;
-	unsigned int buffer_fmt;
-	bool swap;
-	using namespace pix;
-	switch(format) {
-	  case RGB:
-		fmt = GL_RGB;
-		buffer_fmt = GL_UNSIGNED_BYTE;
-		swap = false;
-		break;
-	  case BGR:
-		fmt = GL_RGB;
-		buffer_fmt = GL_UNSIGNED_BYTE;
-		swap = true;
-		break;
-	  case INT_ARGB:
-		buffer_fmt = GL_UNSIGNED_INT_8_8_8_8;
-		fmt = GL_BGRA;
-		swap = true;
-		break;
-	  case CHAR_RGBA:
-		fmt = GL_RGBA;
-		buffer_fmt = GL_UNSIGNED_BYTE;
-		swap = false;
-		break;
-	  default:
-		throw std::logic_error("Unknown pixel format");
-	}
 	// Load the data into texture
 	UseTexture texture(m_texture);
-	glPixelStorei(GL_UNPACK_SWAP_BYTES, swap );
-	glTexImage2D(m_texture.type(), 0, GL_RGBA, width, height, 0, fmt, buffer_fmt, buffer);	
+	PixFmt const& f = getPixFmt(format);
+	glPixelStorei(GL_UNPACK_SWAP_BYTES, f.swap);
+	glTexImage2D(m_texture.type(), 0, GL_RGBA, width, height, 0, f.format, f.type, buffer);	
 }
 
 void Surface::draw() {
