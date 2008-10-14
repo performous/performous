@@ -186,18 +186,7 @@ void Surface::load(unsigned int width, unsigned int height, pix::Format format, 
 }
 
 void Surface::draw() {
-	UseTexture texture(m_texture);
-	glBegin(GL_QUADS);
-	Dimensions const& dim = dimensions;
-	float x1 = tex.x1 * m_width;
-	float x2 = tex.x2 * m_width;
-	float y1 = tex.y1 * m_height;
-	float y2 = tex.y2 * m_height;
-	glTexCoord2f(x1, y1); glVertex2f(dim.x1(), dim.y1());
-	glTexCoord2f(x2, y1); glVertex2f(dim.x2(), dim.y1());
-	glTexCoord2f(x2, y2); glVertex2f(dim.x2(), dim.y2());
-	glTexCoord2f(x1, y2); glVertex2f(dim.x1(), dim.y2());
-	glEnd();
+	m_texture.draw(dimensions, TexCoords(tex.x1 * m_width, tex.y1 * m_height, tex.x2 * m_width, tex.y2 * m_height));
 }
 
 Surface::Surface(cairo_surface_t* _surf) {
