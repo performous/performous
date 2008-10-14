@@ -19,12 +19,12 @@ void CScreenSing::enter() {
 #undef TRYLOAD
 	if (!m_wave) m_wave.reset(new Texture(sm->getThemePathFile("wave.png")));
 	if (!m_notelines) m_notelines.reset(new Texture(sm->getThemePathFile("notelines.svg")));
-	if (!m_notebar) m_notebar.reset(new Surface(sm->getThemePathFile("notebar.svg")));
-	if (!m_notebar_hl) m_notebar_hl.reset(new Surface(sm->getThemePathFile("notebar.png")));
-	if (!m_notebarfs) m_notebarfs.reset(new Surface(sm->getThemePathFile("notebarfs.svg")));
-	if (!m_notebarfs_hl) m_notebarfs_hl.reset(new Surface(sm->getThemePathFile("notebarfs-hl.svg")));
-	if (!m_notebargold) m_notebargold.reset(new Surface(sm->getThemePathFile("notebargold.svg")));
-	if (!m_notebargold_hl) m_notebargold_hl.reset(new Surface(sm->getThemePathFile("notebargold.png")));
+	if (!m_notebar) m_notebar.reset(new Texture(sm->getThemePathFile("notebar.svg")));
+	if (!m_notebar_hl) m_notebar_hl.reset(new Texture(sm->getThemePathFile("notebar.png")));
+	if (!m_notebarfs) m_notebarfs.reset(new Texture(sm->getThemePathFile("notebarfs.svg")));
+	if (!m_notebarfs_hl) m_notebarfs_hl.reset(new Texture(sm->getThemePathFile("notebarfs-hl.svg")));
+	if (!m_notebargold) m_notebargold.reset(new Texture(sm->getThemePathFile("notebargold.svg")));
+	if (!m_notebargold_hl) m_notebargold_hl.reset(new Texture(sm->getThemePathFile("notebargold.png")));
 	std::string file = song.path + song.mp3;
 	std::cout << "Now playing: " << file << std::endl;
 	CAudio& audio = *sm->getAudio();
@@ -93,8 +93,8 @@ namespace {
 		glColor4f(1.0, 1.0, 1.0, 1.0);
 	}
 
-	void drawNotebar(Surface const& surf, double x, double y, double w, double h) {
-		/* XXX: UseTexture texture(surf);*/
+	void drawNotebar(Texture const& texture, double x, double y, double w, double h) {
+		UseTexture tblock(texture);
 		glBegin(GL_TRIANGLE_STRIP);
 		glTexCoord2f(0.0f, 0.0f); glVertex2f(x, y);
 		glTexCoord2f(0.0f, 1.0f); glVertex2f(x, y + h);
@@ -195,37 +195,34 @@ void CScreenSing::draw() {
 		m_notealpha = 0.0f;
 	} else {
 		glColor4f(1.0, 1.0, 1.0, m_notealpha);
-		TexCoords tex;
-		tex.y2 = (-max + 6.0) / 12.0f;
-		tex.y1 = (-min - 7.0) / 12.0f;
-		m_notelines->draw(Dimensions().stretch(1.0, (max - min - 13) * noteUnit), tex);
+		m_notelines->draw(Dimensions().stretch(1.0, (max - min - 13) * noteUnit), TexCoords(0.0, (-min - 7.0) / 12.0f, 1.0, (-max + 6.0) / 12.0f));
 		// Draw notes
 		{
 			for (Song::notes_t::const_iterator it = m_songit; it != song.notes.end() && it->begin < time - (baseLine - 0.5) / pixUnit; ++it) {
 				if (it->type == Note::SLEEP) continue;
-				Surface* s1;
-				Surface* s2;
+				Texture* t1;
+				Texture* t2;
 				switch (it->type) {
-				  case Note::FREESTYLE: s1 = m_notebarfs.get(); s2 = m_notebarfs_hl.get(); break;
-				  case Note::GOLDEN: s1 = m_notebargold.get(); s2 = m_notebargold_hl.get(); break;
-				  default: s1 = m_notebar.get(); s2 = m_notebar_hl.get(); break;
+				  case Note::FREESTYLE: t1 = m_notebarfs.get(); t2 = m_notebarfs_hl.get(); break;
+				  case Note::GOLDEN: t1 = m_notebargold.get(); t2 = m_notebargold_hl.get(); break;
+				  default: t1 = m_notebar.get(); t2 = m_notebar_hl.get(); break;
 				}
 				double y_pixel,x_pixel,h_pixel,w_pixel;
 				h_pixel = -noteUnit * 2.0; // Times two for borders
 				y_pixel = baseY + it->note * noteUnit - 0.5 * h_pixel;
 				x_pixel = baseX + it->begin * pixUnit - 0.5 * h_pixel; // h_pixel for borders
 				w_pixel = (it->end - it->begin) * pixUnit + h_pixel; // h_pixel for borders
-				drawNotebar(*s1, x_pixel, y_pixel, w_pixel, h_pixel);
+				drawNotebar(*t1, x_pixel, y_pixel, w_pixel, h_pixel);
 				double alpha = it->power;
 				if (alpha > 0.0) {
 					glColor4f(1.0f, 1.0f, 1.0f, alpha * m_notealpha);
-					drawNotebar(*s2, x_pixel, y_pixel, w_pixel, h_pixel);
+					drawNotebar(*t2, x_pixel, y_pixel, w_pixel, h_pixel);
 					glColor4f(1.0f, 1.0f, 1.0f, m_notealpha);
 				}
 			}
 		}
 		// Pitch graph
-		UseTexture texture(*m_wave);
+		UseTexture tblock(*m_wave);
 		for (std::list<Player>::const_iterator p = players.begin(); p != players.end(); ++p) {
 			glColor4f(p->m_color.r, p->m_color.g, p->m_color.b, m_notealpha);
 			float const texOffset = 2.0 * time; // Offset for animating the wave texture
