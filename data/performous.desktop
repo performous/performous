@@ -1,12 +1,12 @@
 [Desktop Entry]
 Encoding=UTF-8
-Name=UltraStar NG
+Name=Performous
 Comment=A karaoke game
 Comment[de]=Ein Karaoke Spiel
 Comment[ro]=Un joc de tip karaoke
 Comment[fr]=Un jeu de Karaoké
-Exec=ultrastarng
-Icon=ultrastar-ng.xpm
+Exec=performous
+Icon=performous.xpm
 Terminal=false
 Type=Application
 Categories=Application;Game;ArcadeGame;
