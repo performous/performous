@@ -224,7 +224,7 @@ void CScreenSing::draw() {
 			double oldval = std::numeric_limits<double>::quiet_NaN();
 			size_t idx = beginIdx;
 			// Go back until silence (NaN freq) to allow proper wave phase to be calculated
-			while (idx > 0 && pitch[idx].first == pitch[idx].first) --idx;
+			if (beginIdx < endIdx) while (idx > 0 && pitch[idx].first == pitch[idx].first) --idx;
 			// Start processing
 			float tex = texOffset;
 			double t = idx * Engine::TIMESTEP;
