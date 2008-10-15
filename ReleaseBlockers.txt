@@ -15,7 +15,6 @@ Singing screen
   - Song progress bar
   - Widescreen support (not even the first line of lyrics or score calculators fit)
   - Autozoom notelines improvement?
-  - Textured (repeating) freestyle notes
 
 Practice screen
   - VU meter (position it so that it fits on widescreen)

@@ -22,11 +22,10 @@ void CScreenSing::enter() {
 	if (!m_notebar) m_notebar.reset(new Texture(sm->getThemePathFile("notebar.svg")));
 	if (!m_notebar_hl) m_notebar_hl.reset(new Texture(sm->getThemePathFile("notebar.png")));
 	if (!m_notebarfs) m_notebarfs.reset(new Texture(sm->getThemePathFile("notebarfs.svg")));
-	if (!m_notebarfs_hl) m_notebarfs_hl.reset(new Texture(sm->getThemePathFile("notebarfs-hl.svg")));
+	if (!m_notebarfs_hl) m_notebarfs_hl.reset(new Texture(sm->getThemePathFile("notebarfs-hl.png")));
 	if (!m_notebargold) m_notebargold.reset(new Texture(sm->getThemePathFile("notebargold.svg")));
 	if (!m_notebargold_hl) m_notebargold_hl.reset(new Texture(sm->getThemePathFile("notebargold.png")));
 	std::string file = song.path + song.mp3;
-	std::cout << "Now playing: " << file << std::endl;
 	CAudio& audio = *sm->getAudio();
 	audio.playMusic(file.c_str());
 	m_engine.reset(new Engine(audio, m_analyzers.begin(), m_analyzers.end()));
@@ -127,24 +126,6 @@ void CScreenSing::draw() {
 	// Get the time in the song
 	double time = sm->getAudio()->getPosition() + 0.02; // Compensate avg. lag to display
 	time = std::max(0.0, time + playOffset);
-	/* Auto-analysis code
-	while (m_songit != song.notes.end() && time > 0.3 * m_songit->begin + 0.7 * m_songit->end) {
-		if (m_songit->type == Note::SLEEP) {
-			std::cout << "# ---" << std::endl;
-		} else {
-			Analyzer::tones_t const& tones = m_analyzer.getTones();
-			std::cout << "# " << m_songit->syllable << ":" << std::fixed << std::setprecision(0);
-			for (Analyzer::tones_t::const_iterator it = tones.begin(); it != tones.end(); ++it) {
-				if (it->freq < 70.0) continue;
-				if (it->freq > 600.0) break;
-				std::cout << " " << song.scale.getNoteId(it->freq) << "(" << it->db << ")";
-			}
-			std::cout << std::endl;
-		}
-		++m_songit;
-	}
-	*/
-
 	double songPercent = time / sm->getAudio()->getLength();
 	// Rendering starts
 	if (m_background) m_background->draw();
@@ -200,23 +181,34 @@ void CScreenSing::draw() {
 		{
 			for (Song::notes_t::const_iterator it = m_songit; it != song.notes.end() && it->begin < time - (baseLine - 0.5) / pixUnit; ++it) {
 				if (it->type == Note::SLEEP) continue;
+				double alpha = it->power;
 				Texture* t1;
 				Texture* t2;
 				switch (it->type) {
-				  case Note::FREESTYLE: t1 = m_notebarfs.get(); t2 = m_notebarfs_hl.get(); break;
+				  case Note::NORMAL: t1 = m_notebar.get(); t2 = m_notebar_hl.get(); break;
 				  case Note::GOLDEN: t1 = m_notebargold.get(); t2 = m_notebargold_hl.get(); break;
-				  default: t1 = m_notebar.get(); t2 = m_notebar_hl.get(); break;
+				  case Note::FREESTYLE:  // Freestyle notes use custom handling
+					{
+						Dimensions dim;
+						dim.middle(baseX + 0.5 * (it->begin + it->end) * pixUnit).center(baseY + it->note * noteUnit).stretch((it->end - it->begin) * pixUnit, -noteUnit * 12.0);
+						float xoffset = 0.1 * time / m_notebarfs->ar();
+						m_notebarfs->draw(dim, TexCoords(xoffset, 0.0, xoffset + dim.ar() / m_notebarfs->ar(), 1.0));
+						if (alpha > 0.0) {
+							float xoffset = rand() / double(RAND_MAX);
+							m_notebarfs_hl->draw(dim, TexCoords(xoffset, 0.0, xoffset + dim.ar() / m_notebarfs_hl->ar(), 1.0));
+						}
+					}
+					continue;
+				  default: throw std::logic_error("Unknown note type: don't know how to render");
 				}
-				double y_pixel,x_pixel,h_pixel,w_pixel;
-				h_pixel = -noteUnit * 2.0; // Times two for borders
-				y_pixel = baseY + it->note * noteUnit - 0.5 * h_pixel;
-				x_pixel = baseX + it->begin * pixUnit - 0.5 * h_pixel; // h_pixel for borders
-				w_pixel = (it->end - it->begin) * pixUnit + h_pixel; // h_pixel for borders
-				drawNotebar(*t1, x_pixel, y_pixel, w_pixel, h_pixel);
-				double alpha = it->power;
+				double x = baseX + it->begin * pixUnit + noteUnit; // left x coordinate: begin minus border (side borders -noteUnit wide)
+				double y = baseY + (it->note + 1) * noteUnit; // top y coordinate (on the one higher note line)
+				double w = (it->end - it->begin) * pixUnit - noteUnit * 2.0; // width: including borders on both sides
+				double h = -noteUnit * 2.0; // height: 0.5 border + 1.0 bar + 0.5 border = 2.0
+				drawNotebar(*t1, x, y, w, h);
 				if (alpha > 0.0) {
 					glColor4f(1.0f, 1.0f, 1.0f, alpha * m_notealpha);
-					drawNotebar(*t2, x_pixel, y_pixel, w_pixel, h_pixel);
+					drawNotebar(*t2, x, y, w, h);
 					glColor4f(1.0f, 1.0f, 1.0f, m_notealpha);
 				}
 			}

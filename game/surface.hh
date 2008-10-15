@@ -21,9 +21,9 @@ class Dimensions {
 	Dimensions& bottom(float y = 0.0f) { m_y = y; m_yAnchor = BOTTOM; return *this; }
 	Dimensions& fixedWidth(float w) { m_w = w; m_h = w / m_ar; return *this; }
 	Dimensions& fixedHeight(float h) { m_w = h * m_ar; m_h = h; return *this; }
-	Dimensions& fitInside(float w, float h) { if (w/h > m_ar) fixedHeight(h); else fixedWidth(w); return *this; }
-	Dimensions& fitOutside(float w, float h) { if (w/h > m_ar) fixedWidth(w); else fixedHeight(h); return *this; }
-	Dimensions& stretch(float w, float h) { m_w = w; m_h = h; return *this; }
+	Dimensions& fitInside(float w, float h) { if (w / h > m_ar) fixedHeight(h); else fixedWidth(w); return *this; }
+	Dimensions& fitOutside(float w, float h) { if (w / h > m_ar) fixedWidth(w); else fixedHeight(h); return *this; }
+	Dimensions& stretch(float w, float h) { m_w = w; m_h = h; m_ar = w / h; return *this; }
 	float ar() const { return m_ar; }
 	float x1() const {
 		switch (m_xAnchor) {
