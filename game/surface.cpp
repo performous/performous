@@ -1,12 +1,22 @@
 #include "surface.hh"
-#include <vector>
-// Disabling temporarily: #include <boost/filesystem.hpp>
-#include <stdexcept>
+
+#include "video_driver.hh"
 #include <Magick++.h>
 #include <boost/bind.hpp>
+#include <stdexcept>
+#include <vector>
 
 // TODO: get rid of this and use C++ std::string instead
 #include <string.h>
+
+float Dimensions::screenY() const {
+	switch (m_screenAnchor) {
+	  case CENTER: return 0.0;
+	  case TOP: return -0.5 * virtH();
+	  case BOTTOM: return 0.5 * virtH();
+	}
+	throw std::logic_error("Dimensions::screenY(): unknown m_screenAnchor value");
+}
 
 namespace {
 	bool isPow2(unsigned int val) {

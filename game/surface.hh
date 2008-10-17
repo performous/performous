@@ -12,7 +12,7 @@
 
 class Dimensions {
   public:
-	Dimensions(float ar_ = 0.0f): m_ar(ar_), m_x(), m_y(), m_w(), m_h(), m_xAnchor(), m_yAnchor() {}
+	Dimensions(float ar_ = 0.0f): m_ar(ar_), m_x(), m_y(), m_w(), m_h(), m_xAnchor(), m_yAnchor(), m_screenAnchor() {}
 	Dimensions& middle(float x = 0.0f) { m_x = x; m_xAnchor = MIDDLE; return *this; }
 	Dimensions& left(float x = 0.0f) { m_x = x; m_xAnchor = LEFT; return *this; }
 	Dimensions& right(float x = 0.0f) { m_x = x; m_xAnchor = RIGHT; return *this; }
@@ -24,6 +24,9 @@ class Dimensions {
 	Dimensions& fitInside(float w, float h) { if (w / h > m_ar) fixedHeight(h); else fixedWidth(w); return *this; }
 	Dimensions& fitOutside(float w, float h) { if (w / h > m_ar) fixedWidth(w); else fixedHeight(h); return *this; }
 	Dimensions& stretch(float w, float h) { m_w = w; m_h = h; m_ar = w / h; return *this; }
+	Dimensions& screenCenter(float y = 0.0f) { m_screenAnchor = CENTER; center(y); return *this; }
+	Dimensions& screenTop(float y = 0.0f) { m_screenAnchor = TOP; top(y); return *this; }
+	Dimensions& screenBottom(float y = 0.0f) { m_screenAnchor = BOTTOM; bottom(y); return *this; }
 	float ar() const { return m_ar; }
 	float x1() const {
 		switch (m_xAnchor) {
@@ -35,19 +38,20 @@ class Dimensions {
 	}
 	float y1() const {
 		switch (m_yAnchor) {
-		  case TOP: return m_y;
-		  case CENTER: return m_y - 0.5 * m_h;
-		  case BOTTOM: return m_y - m_h;
+		  case TOP: return screenY() + m_y;
+		  case CENTER: return screenY() + m_y - 0.5 * m_h;
+		  case BOTTOM: return screenY() + m_y - m_h;
 		}
 		throw std::logic_error("Unknown value in Dimensions::m_yAnchor");
 	}
 	float x2() const { return x1() + m_w; }
 	float y2() const { return y1() + m_h; }
   private:
+	float screenY() const;
 	float m_ar;
 	float m_x, m_y, m_w, m_h;
 	enum XAnchor { MIDDLE, LEFT, RIGHT } m_xAnchor;
-	enum YAnchor { CENTER, TOP, BOTTOM } m_yAnchor;
+	enum YAnchor { CENTER, TOP, BOTTOM } m_yAnchor, m_screenAnchor;
 };
 
 struct TexCoords {
