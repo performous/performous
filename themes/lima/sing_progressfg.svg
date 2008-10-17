@@ -31,7 +31,7 @@
   </metadata>
   <sodipodi:namedview
      inkscape:cy="20"
-     inkscape:cx="330.09197"
+     inkscape:cx="295.33507"
      inkscape:zoom="2.086"
      inkscape:window-height="785"
      inkscape:window-width="1144"
@@ -117,5 +117,16 @@
        y="17.810637"
        style="opacity:1;fill:url(#linearGradient5199);fill-opacity:1;stroke:none;stroke-width:1.00015113000000011;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect4721" />
+    <text
+       xml:space="preserve"
+       style="font-size:13px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Arial Black;-inkscape-font-specification:Arial Black"
+       x="329.33844"
+       y="24.180248"
+       id="text5747"
+       transform="matrix(0.6921476,0,0,0.4812109,120.53586,15.404582)"><tspan
+         sodipodi:role="line"
+         id="tspan5749"
+         x="329.33844"
+         y="24.180248">Song progress</tspan></text>
   </g>
 </svg>

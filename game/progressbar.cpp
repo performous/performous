@@ -5,22 +5,25 @@
 
 void ProgressBar::draw(float value) {
 	value = std::min(std::max(0.0f, value), 1.0f);
-	value = m_begin + value * (m_end - m_begin);
+	float scale = 1.0 - m_begin - m_end;
 	m_bg.draw(dimensions);
 	float w = dimensions.w();
 	float h = dimensions.h();
 	switch (m_mode) {
 	  case HORIZONTAL:
 		{
-			Dimensions d(dimensions.x1(), dimensions.y1(), value * dimensions.w(), dimensions.h());
-			m_bar.draw(d, TexCoords(0.0, 0.0, value, 1.0));
+			TexCoords tex;
+			if (m_sliding) { tex.x2 = 1.0f - m_end; tex.x1 = tex.x2 - value * scale; }
+			else { tex.x1 = m_begin; tex.x2 = tex.x1 + value * scale; }
+			m_bar.draw(Dimensions(dimensions.x1() + m_begin * w, dimensions.y1(), value * scale * w, h), tex);
 		}
 		return;
 	  case VERTICAL:
 		{
-			float h = dimensions.h();
-			Dimensions d(dimensions.x1(), dimensions.y1() + (1.0f - value) * h, dimensions.w(), value * h);
-			m_bar.draw(d, TexCoords(0.0, 0.0, 1.0, value));
+			TexCoords tex;
+			if (m_sliding) { tex.y1 = 1.0f - m_end; tex.y2 = tex.y1 + value * scale; }
+			else { tex.y2 = m_begin; tex.y1 = tex.y2 - value * scale; }
+			m_bar.draw(Dimensions(dimensions.x1(), 0.0f, w, value * scale * h).bottom(dimensions.y2() - m_begin * h), tex);
 		}
 		return;
 	  case CIRCULAR:
