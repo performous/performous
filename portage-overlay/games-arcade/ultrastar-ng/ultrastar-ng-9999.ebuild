@@ -36,7 +36,7 @@ RDEPEND="gnome-base/librsvg
 		virtual/opengl
 		virtual/glu
 	)
-	media-video/ffmpeg
+	>=media-video/ffmpeg-0.4.9_p20070616-r20
 	alsa? ( media-libs/alsa-lib )
 	jack? ( >=media-sound/jack-audio-connection-kit )
 	portaudio? ( media-libs/portaudio )
