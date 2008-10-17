@@ -25,6 +25,8 @@ void CScreenSing::enter() {
 	if (!m_notebarfs_hl) m_notebarfs_hl.reset(new Texture(sm->getThemePathFile("notebarfs-hl.png")));
 	if (!m_notebargold) m_notebargold.reset(new Texture(sm->getThemePathFile("notebargold.svg")));
 	if (!m_notebargold_hl) m_notebargold_hl.reset(new Texture(sm->getThemePathFile("notebargold.png")));
+	if (!m_progress) m_progress.reset(new ProgressBar(sm->getThemePathFile("sing_progressbg.svg"), sm->getThemePathFile("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.2, 0.99));
+	m_progress->dimensions.fixedWidth(0.5).screenTop();
 	std::string file = song.path + song.mp3;
 	CAudio& audio = *sm->getAudio();
 	audio.playMusic(file.c_str());
@@ -135,13 +137,6 @@ void CScreenSing::draw() {
 	theme->p2box->draw();
 	// Compute and draw the timer and the progressbar
 	theme->timer->draw((boost::format("%02u:%02u") % (unsigned(time) / 60) % (unsigned(time) % 60)).str());
-	/*
-	theme->progressfg.width = theme->progressfg.final_width * songPercent;
-	drawRectangleOpenGL(
-		theme->progressfg.x,theme->progressfg.y,
-		theme->progressfg.width/800.,theme->progressfg.height/600.,
-		theme->progressfg.fill_col.r, theme->progressfg.fill_col.g, theme->progressfg.fill_col.b, theme->progressfg.fill_col.a);
-	*/
 	const double baseLine = -0.2;
 	const double pixUnit = 0.2;
 	// Update m_songit (which note to start the rendering from)
@@ -309,4 +304,5 @@ void CScreenSing::draw() {
 	theme->score1->draw((boost::format("%04d") % players.begin()->getScore()).str());
 	theme->score2->draw((boost::format("%04d") % players.rbegin()->getScore()).str());
 	// Surface(theme->theme->getCurrent()).draw(); // Render progress bar, score calculator, time, etc. - OPTIMIZE: This part is very slow and needs to be optimized
+	m_progress->draw(songPercent);
 }

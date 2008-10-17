@@ -11,6 +11,7 @@
 #include "sdl_helper.hh"
 #include "surface.hh"
 #include "opengl_text.hh"
+#include "progressbar.hh"
 
 class CScreenSing: public CScreen {
   public:
@@ -23,6 +24,7 @@ class CScreenSing: public CScreen {
 	void draw();
   private:
 	boost::ptr_vector<Analyzer>& m_analyzers;
+	boost::scoped_ptr<ProgressBar> m_progress;
 	boost::scoped_ptr<Surface> m_background;
 	boost::scoped_ptr<Video> m_video;
 	boost::scoped_ptr<Texture> m_notelines;

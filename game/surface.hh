@@ -12,7 +12,10 @@
 
 class Dimensions {
   public:
+	/** Initialize with aspect ratio but no size, centered at screen center. **/
 	Dimensions(float ar_ = 0.0f): m_ar(ar_), m_x(), m_y(), m_w(), m_h(), m_xAnchor(), m_yAnchor(), m_screenAnchor() {}
+	/** Initialize with top-left corner and width & height **/
+	Dimensions(float x1, float y1, float w, float h): m_x(x1), m_y(y1), m_w(w), m_h(h), m_xAnchor(LEFT), m_yAnchor(TOP), m_screenAnchor() {}
 	Dimensions& middle(float x = 0.0f) { m_x = x; m_xAnchor = MIDDLE; return *this; }
 	Dimensions& left(float x = 0.0f) { m_x = x; m_xAnchor = LEFT; return *this; }
 	Dimensions& right(float x = 0.0f) { m_x = x; m_xAnchor = RIGHT; return *this; }
@@ -44,8 +47,10 @@ class Dimensions {
 		}
 		throw std::logic_error("Unknown value in Dimensions::m_yAnchor");
 	}
-	float x2() const { return x1() + m_w; }
-	float y2() const { return y1() + m_h; }
+	float x2() const { return x1() + w(); }
+	float y2() const { return y1() + h(); }
+	float w() const { return m_w; }
+	float h() const { return m_h; }
   private:
 	float screenY() const;
 	float m_ar;
@@ -85,7 +90,7 @@ class UseTexture: boost::noncopyable {
 };
 
 /** Draw the texture using the specified dimensions and texture coordinates. **/
-template <GLenum Type> void OpenGLTexture<Type>::draw(Dimensions const& dim, TexCoords const& tex) const {
+template <GLenum Type> void OpenGLTexture<Type>::draw(Dimensions const& dim, TexCoords const& tex = TexCoords()) const {
 	UseTexture texture(*this);
 	glBegin(GL_QUADS);
 	glTexCoord2f(tex.x1, tex.y1); glVertex2f(dim.x1(), dim.y1());

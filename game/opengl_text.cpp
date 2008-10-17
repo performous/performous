@@ -185,8 +185,6 @@ void SvgTxtTheme::draw(std::vector<std::string> _text) {
 	if (m_align == CENTER) dim.middle(); else dim.left(texture_x);
 
 	TexCoords tex;
-	tex.x1 = tex.y1 = 0.0f;
-	tex.x2 = tex.y2 = 1.0f;
 	for (unsigned int i = 0; i < _text.size(); i++) m_opengl_text[i]->draw(dim, tex);
 };
 
