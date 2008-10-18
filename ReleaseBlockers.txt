@@ -4,7 +4,10 @@ Generic
   - Clean all FIXMEs and XXXs
   - Configurable audio roundtrip lag and A/V lag?
 
-Surface
+Audio
+  - Make the volume settings actually do something (software volume control)
+
+Texture
   - Create mipmaps?
 
 Score screen
@@ -13,9 +16,6 @@ Score screen
 Singing screen
   - Widescreen support (not even the first line of lyrics or score calculators fit)
   - Autozoom notelines improvement?
-
-Practice screen
-  - VU meter (position it so that it fits on widescreen)
 
 Build
   - Make Ubuntu packages (Hardy and Intrepid, i386 and amd64)

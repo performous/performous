@@ -55,7 +55,7 @@ void CScreenSing::manageEvent(SDL_Event event) {
 		CScreenManager* sm = CScreenManager::getSingletonPtr();
 		CAudio& audio = *sm->getAudio();
 		int key = event.key.keysym.sym;
-		if (key == SDLK_ESCAPE || key == SDLK_q || (key == SDLK_RETURN && m_sentence.empty())) sm->activateScreen(m_sentence.empty() ? /*FIXME:"Score"*/ "Songs" : "Songs");
+		if (key == SDLK_ESCAPE || key == SDLK_q || (key == SDLK_RETURN && m_sentence.empty())) sm->activateScreen(m_sentence.empty() ? "Score" : "Songs");
 		else if (key == SDLK_SPACE || key == SDLK_PAUSE) sm->getAudio()->togglePause();
 		else if (key == SDLK_PLUS) playOffset += 0.02;
 		else if (key == SDLK_MINUS) playOffset -= 0.02;
@@ -118,7 +118,7 @@ namespace {
 void CScreenSing::draw() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	if (!sm->getAudio()->isPlaying()) {
-		sm->activateScreen("Songs"/* FIXME:"Score"*/);
+		sm->activateScreen("Score");
 		return;
 	}
 	Song& song = sm->getSongs()->current();
@@ -275,6 +275,12 @@ void CScreenSing::draw() {
 	}
 	// Compute and draw lyrics
 	{
+		double factor = 1.0;
+		for (Song::notes_t::const_iterator it = m_songit; it != song.notes.end() && it->begin <= time; ++it) {
+			if (it->type == Note::SLEEP) continue;
+			if (it->end > time) factor = 1.5 - 0.5 * (time - it->begin) / (it->end - it->begin);
+		}
+
 		lyrics->updateSentences(time);
 		std::vector<std::string> sentenceNextSentence = lyrics->getSentenceNext();
 		std::vector<std::string> sentencePast = lyrics->getSentencePast();
@@ -298,7 +304,7 @@ void CScreenSing::draw() {
 		}
 		for (unsigned int i = 0 ; i < sentenceNow.size(); i++) {
 			TZoomText tmp;
-			tmp.factor = 1.5;
+			tmp.factor = factor;
 			tmp.string = sentenceNow[i];
 			sentenceWholeZ.push_back(tmp);
 		}
