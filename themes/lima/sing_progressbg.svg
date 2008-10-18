@@ -32,8 +32,8 @@
      inkscape:cy="20"
      inkscape:cx="193.56512"
      inkscape:zoom="2.086"
-     inkscape:window-height="1125"
-     inkscape:window-width="1920"
+     inkscape:window-height="801"
+     inkscape:window-width="1439"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      guidetolerance="10.0"
@@ -63,23 +63,9 @@
        inkscape:persp3d-origin="400 : 200 : 1"
        id="perspective8" />
   </defs>
-  <rect
+  <path
+     style="fill:#ffffff;fill-opacity:0.59130435;stroke:#000000;stroke-width:2.06842041;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1"
+     d="M 4.2617511,4.9929833 L 480.48054,4.9929833 C 489.06001,4.9929833 495.96695,11.899922 495.96695,20.479393 C 495.96695,29.058863 489.06001,35.965802 480.48054,35.965802 L 4.2617511,35.965802 C 4.2617511,12.45424 4.2617511,24.168503 4.2617511,4.9929833 z"
      id="rect4721"
-     style="fill:#ffffff;fill-opacity:0.59130435;stroke:#000000;stroke-width:2.06842041;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     y="4.0342107"
-     x="99.03421"
-     height="31.93158"
-     width="396.93158" />
-  <text
-     xml:space="preserve"
-     style="font-size:25.03479576000000151px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Arial Black;-inkscape-font-specification:Arial Black"
-     x="4.7228541"
-     y="31.522989"
-     id="text2381"
-     transform="scale(1.0499556,0.9524212)"><tspan
-       sodipodi:role="line"
-       id="tspan2383"
-       x="4.7228541"
-       y="31.522989"
-       style="font-size:30.04175568000000141px;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-opacity:1">Time</tspan></text>
+     sodipodi:nodetypes="ccsccc" />
 </svg>

@@ -212,6 +212,9 @@ void SvgTxtTheme::draw(std::vector<TZoomText> _text) {
 			glColor3f(1.0, 0.8, 0.0);
 			dim.fixedWidth(dim.w() * factor);
 		}
+		if (m_valign == TOP) {
+			dim.screenTop();
+		}
 		m_opengl_text[i]->draw(dim, tex);
 		if (factor != 1.0) glColor3f(1.0, 1.0, 1.0);
 		position_x += syllable_width;

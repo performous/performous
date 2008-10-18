@@ -28,8 +28,8 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="722"
-     inkscape:window-width="642"
+     inkscape:window-height="801"
+     inkscape:window-width="1439"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      guidetolerance="10.0"
@@ -40,25 +40,32 @@
      pagecolor="#ffffff"
      id="base"
      showgrid="false"
-     inkscape:zoom="0.67625"
+     inkscape:zoom="1.3525"
      inkscape:cx="400"
-     inkscape:cy="300"
+     inkscape:cy="477.44917"
      inkscape:window-x="0"
      inkscape:window-y="25"
      inkscape:current-layer="svg3465" />
   <defs
-     id="defs3467" />
-  <g
-     id="layer4">
-    <text
-       x="102.95294"
+     id="defs3467">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 300 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="800 : 300 : 1"
+       inkscape:persp3d-origin="400 : 200 : 1"
+       id="perspective9" />
+  </defs>
+  <text
+     sodipodi:linespacing="125%"
+     xml:space="preserve"
+     id="timer_text"
+     style="font-size:25px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;text-anchor:start;display:inline;font-family:DejaVu Sans Mono;stroke:#000000;stroke-opacity:1;fill:#ffffff;fill-opacity:1;stroke-width:1.5;stroke-miterlimit:4;stroke-dasharray:none"
+     y="30"
+     x="350"><tspan
+       id="tspan4717"
        y="33.976608"
-       style="font-size:25px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;text-anchor:start;display:inline;font-family:DejaVu Sans Mono"
-       id="timer_text"
-       xml:space="preserve"><tspan
-         x="102.95294"
-         y="33.976608"
-         id="tspan4717">00:00</tspan></text>
-  </g>
+       x="102.95294"
+       style="stroke:#000000;stroke-opacity:1;fill:#ffffff;fill-opacity:1;stroke-width:1.5;stroke-miterlimit:4;stroke-dasharray:none">00:00</tspan></text>
 <!--       style="font-size:25px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;opacity:1;fill:black;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.56078384;display:inline;font-family:Arial Black"
 --></svg>
