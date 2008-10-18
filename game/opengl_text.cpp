@@ -138,10 +138,15 @@ SvgTxtTheme::SvgTxtTheme(std::string _theme_file, Align _a, VAlign _v, Gravity _
 	m_y = boost::lexical_cast<double>(y.get_value());
 };
 
-void SvgTxtTheme::draw(std::vector<TZoomText> _text) {
-	std::vector<std::string> tmp;
+void SvgTxtTheme::draw(std::vector<std::string> _text) {
+	std::vector<TZoomText> tmp;
 
-	for (std::vector<TZoomText>::iterator it = _text.begin(); it != _text.end(); ++it) tmp.push_back(it->string);
+	for (std::vector<std::string>::iterator it = _text.begin(); it != _text.end(); ++it) {
+		TZoomText t;
+		t.string = *it;
+		t.factor = 1.0;
+		tmp.push_back(t);
+	}
 
 	draw(tmp);
 }
@@ -152,14 +157,14 @@ void SvgTxtTheme::draw(std::string _text) {
 	draw(tmp);
 }
 
-void SvgTxtTheme::draw(std::vector<std::string> _text) {
+void SvgTxtTheme::draw(std::vector<TZoomText> _text) {
 	std::string tmp;
-	for (unsigned int i = 0 ; i < _text.size(); i++ ) tmp += _text[i];
+	for (unsigned int i = 0 ; i < _text.size(); i++ ) tmp += _text[i].string;
 
 	if (m_cache_text != tmp) {
 		m_cache_text = tmp;
 		for (unsigned int i = 0; i < _text.size(); i++ ) {
-			m_text.text = _text[i];
+			m_text.text = _text[i].string;
 			m_opengl_text[i].reset(new OpenGLText(m_text));
 		}
 	}
