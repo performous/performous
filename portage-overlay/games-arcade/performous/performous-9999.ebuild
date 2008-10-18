@@ -42,7 +42,8 @@ RDEPEND="gnome-base/librsvg
 	portaudio? ( media-libs/portaudio )
 	gstreamer? ( media-libs/gstreamer )
 	pulseaudio? ( media-sound/pulseaudio )
-	sys-apps/help2man"
+	sys-apps/help2man
+	!games-arcade/ultrastar-ng"
 DEPEND="${RDEPEND}
     >=dev-util/cmake-2.6.0"
 
