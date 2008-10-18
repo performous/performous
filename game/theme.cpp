@@ -26,6 +26,7 @@ CThemeSing::CThemeSing() {
 	p1box.reset(new Surface(sm->getThemePathFile("sing_p1box.svg")));
 	p2box.reset(new Surface(sm->getThemePathFile("sing_p2box.svg")));
 	lyrics_now.reset(new SvgTxtTheme(sm->getThemePathFile("sing_lyricscurrent.svg"),SvgTxtTheme::CENTER));
+	lyrics_now->setHighlight(sm->getThemePathFile("sing_lyricshighlight.svg"));
 	lyrics_next.reset(new SvgTxtTheme(sm->getThemePathFile("sing_lyricsnext.svg"),SvgTxtTheme::CENTER));
 	score1.reset(new SvgTxtTheme(sm->getThemePathFile("sing_p1score.svg")));
 	score2.reset(new SvgTxtTheme(sm->getThemePathFile("sing_p2score.svg")));
