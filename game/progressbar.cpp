@@ -22,7 +22,7 @@ void ProgressBar::draw(float value) {
 		{
 			TexCoords tex;
 			if (m_sliding) { tex.y1 = 1.0f - m_end; tex.y2 = tex.y1 + value * scale; }
-			else { tex.y2 = m_begin; tex.y1 = tex.y2 - value * scale; }
+			else { tex.y2 = 1.0f - m_begin; tex.y1 = tex.y2 - value * scale; }
 			m_bar.draw(Dimensions(dimensions.x1(), 0.0f, w, value * scale * h).bottom(dimensions.y2() - m_begin * h), tex);
 		}
 		return;

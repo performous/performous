@@ -5,16 +5,18 @@
 #include "screen.hh"
 #include "theme.hh"
 #include "opengl_text.hh"
+#include "progressbar.hh"
 
 class CScreenPractice : public CScreen {
   public:
-	CScreenPractice(std::string const& name, Analyzer const& analyzer);
+	CScreenPractice(std::string const& name, boost::ptr_vector<Analyzer>& analyzers);
 	void enter();
 	void exit();
 	void manageEvent( SDL_Event event );
 	void draw();
   private:
-	Analyzer const& m_analyzer;
+	boost::ptr_vector<Analyzer>& m_analyzers;
+	boost::ptr_vector<ProgressBar> m_vumeters;
 	boost::scoped_ptr<CThemePractice> theme;
 };
 

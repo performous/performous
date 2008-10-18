@@ -192,7 +192,7 @@ int main(int argc, char** argv) {
 		sm.addScreen(new CScreenSongs("Songs", songdirs));
 		Capture capture(2, cdev, crate);
 		sm.addScreen(new CScreenSing("Sing", capture.analyzers()));
-		sm.addScreen(new CScreenPractice("Practice", capture.analyzers()[0])); // TODO: multiple analyzers for practice
+		sm.addScreen(new CScreenPractice("Practice", capture.analyzers())); // TODO: multiple analyzers for practice
 		sm.addScreen(new CScreenScore("Score"));
 		sm.addScreen(new CScreenConfiguration("Configuration"));
 		sm.activateScreen("Intro");
