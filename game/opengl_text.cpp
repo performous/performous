@@ -165,26 +165,45 @@ void SvgTxtTheme::draw(std::vector<std::string> _text) {
 	}
 	double text_x = 0.0;
 	double text_y = 0.0;
+	// first compute maximum height and whole length
 	for (unsigned int i = 0; i < _text.size(); i++ ) {
 		text_x += m_opengl_text[i]->x();
 		text_y = std::max(text_y, m_opengl_text[i]->y());
 	}
 
-	// 1.0 is the width
 	double screen_width = 1.0;
 	double screen_height = 600./800.;
 	double texture_ar = text_x/text_y;
 	double texture_width = std::min(1.0, text_x/800.);
 	double texture_height = texture_width / texture_ar;
+
 	double svg_ar = m_width/m_height;
 	double svg_width = m_width;
 	double svg_height = m_height;
-	double texture_y = -screen_height/2. + (m_y-m_text.fontsize) * screen_height / svg_height;
-	double texture_x = -screen_width/2. + (m_x) * screen_width / svg_width;
-	Dimensions dim = Dimensions(texture_ar).top(texture_y).fixedHeight(texture_height);
-	if (m_align == CENTER) dim.middle(); else dim.left(texture_x);
 
-	TexCoords tex;
-	for (unsigned int i = 0; i < _text.size(); i++) m_opengl_text[i]->draw(dim, tex);
-};
+	double position_x;
+	double position_y;
+
+	if (m_align == CENTER) {
+		position_x = -texture_width/2.;
+		position_y = -screen_height/2. + (m_y-m_text.fontsize) * screen_height / svg_height;
+	} else {
+		position_x = -screen_width/2. + (m_x) * screen_width / svg_width;
+		position_y = -screen_height/2. + (m_y-m_text.fontsize) * screen_height / svg_height;
+	}
+
+	for (unsigned int i = 0; i < _text.size(); i++ ) {
+		double syllable_x = m_opengl_text[i]->x();
+		double syllable_y = text_y;
+		double syllable_width = syllable_x *  texture_width / text_x;
+		double syllable_height = texture_height;
+		double syllable_ar = syllable_width / syllable_height;
+		Dimensions dim = Dimensions(syllable_ar).top(position_y).fixedHeight(texture_height);
+
+		TexCoords tex;
+		dim.left(position_x);
+		m_opengl_text[i]->draw(dim, tex);
+		position_x += syllable_width;
+	}
+}
 
