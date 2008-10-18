@@ -203,11 +203,17 @@ void SvgTxtTheme::draw(std::vector<TZoomText> _text) {
 		double syllable_width = syllable_x *  texture_width / text_x;
 		double syllable_height = texture_height;
 		double syllable_ar = syllable_width / syllable_height;
-		Dimensions dim = Dimensions(syllable_ar).top(position_y).fixedHeight(texture_height);
-
+		Dimensions dim(syllable_ar);
+		dim.fixedHeight(texture_height).center(position_y + 0.5 * texture_height);
+		dim.middle(position_x + 0.5 * dim.w());
 		TexCoords tex;
-		dim.left(position_x);
+		double factor = _text[i].factor;
+		if (factor != 1.0) {
+			glColor3f(1.0, 0.8, 0.0);
+			dim.fixedWidth(dim.w() * factor);
+		}
 		m_opengl_text[i]->draw(dim, tex);
+		if (factor != 1.0) glColor3f(1.0, 1.0, 1.0);
 		position_x += syllable_width;
 	}
 }

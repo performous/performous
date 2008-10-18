@@ -278,7 +278,7 @@ void CScreenSing::draw() {
 		double factor = 1.0;
 		for (Song::notes_t::const_iterator it = m_songit; it != song.notes.end() && it->begin <= time; ++it) {
 			if (it->type == Note::SLEEP) continue;
-			if (it->end > time) factor = 1.5 - 0.5 * (time - it->begin) / (it->end - it->begin);
+			if (it->end > time) factor = 1.2 - 0.2 * (time - it->begin) / (it->end - it->begin);
 		}
 
 		lyrics->updateSentences(time);
