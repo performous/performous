@@ -2,7 +2,6 @@ Blockers for 0.3 release:
 
 Generic
   - Clean all FIXMEs and XXXs
-  - Write progress bar class to be used for all progress bars
   - Configurable audio roundtrip lag and A/V lag?
 
 Surface
@@ -12,15 +11,11 @@ Score screen
   - Two players
 
 Singing screen
-  - Song progress bar
   - Widescreen support (not even the first line of lyrics or score calculators fit)
   - Autozoom notelines improvement?
 
 Practice screen
   - VU meter (position it so that it fits on widescreen)
-
-Engine
-  - Number of players autodetection
 
 Build
   - Make Ubuntu packages (Hardy and Intrepid, i386 and amd64)
