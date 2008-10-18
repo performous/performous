@@ -1,6 +1,6 @@
 # Copyright 1999-2006 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /cvsroot/ultrastar-ng/UltraStar-ng/portage-overlay/games-arcade/ultrastar-ng/ultrastar-ng-9999.ebuild,v 1.10 2007/09/29 13:04:19 yoda-jm Exp $
+# $Header: /cvsroot/ultrastar-ng/UltraStar-ng/portage-overlay/games-arcade/performous/performous-9999.ebuild,v 1.10 2007/09/29 13:04:19 yoda-jm Exp $
 
 inherit games subversion
 
@@ -10,11 +10,11 @@ SONGS_PN=ultrastar-songs
 SONGS_P=${SONGS_PN}-2
 
 DESCRIPTION="SingStar GPL clone"
-HOMEPAGE="http://sourceforge.net/projects/ultrastar-ng/"
-SRC_URI="songs? ( mirror://sourceforge/${PN}/${SONGS_P}.tar.bz2 )"
+HOMEPAGE="http://performous.org"
+SRC_URI="songs? ( mirror://sourceforge/ultrastar-ng/${SONGS_P}.tar.bz2 )"
 
 ESVN_REPO_URI="https://ultrastar-ng.svn.sourceforge.net/svnroot/ultrastar-ng/trunk"
-ESVN_PROJECT="UltraStar-NG"
+ESVN_PROJECT="Performous"
 
 LICENSE="GPL-2
 	songs? (
@@ -67,7 +67,6 @@ src_compile() {
 	cmake \
 		-DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
 		-DCMAKE_INSTALL_PREFIX="${GAMES_PREFIX}" \
-		-DDATA_INSTALL_DIR="${GAMES_DATADIR}/${PN}" \
 		. || die "cmake failed"
 	emake || die "emake failed"
 }
@@ -79,7 +78,9 @@ src_install() {
 		insinto "${GAMES_DATADIR}"/ultrastar
 		doins -r songs || die "doins songs failed"
 	fi
-	mv "${D}${GAMES_DATADIR}/${PN}"/{applications,pixmaps} "${D}"/usr/share/
-	dodoc AUTHORS ChangeLog README TODO
+	rm -rf "${D}${GAMES_PREFIX}"/share/"${PN}"/{applications,pixmaps}
+	doicon data/${PN}.xpm
+	domenu data/${PN}.desktop
+	dodoc AUTHORS README TODO
 	prepgamesdirs
 }
