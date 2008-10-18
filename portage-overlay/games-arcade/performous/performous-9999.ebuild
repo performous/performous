@@ -22,7 +22,7 @@ LICENSE="GPL-2
 		CCPL-Attribution-NonCommercial-NoDerivs-2.5
 	)"
 SLOT="0"
-KEYWORDS="~x86 ~amd64"
+KEYWORDS="~x86 ~amd64 ~ppc ~ppc64"
 
 IUSE="debug alsa portaudio pulseaudio jack songs"
 
