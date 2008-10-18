@@ -129,7 +129,7 @@ class Surface {
 	Surface(unsigned width, unsigned height, pix::Format format, unsigned char const* buffer);
 	Surface(cairo_surface_t* _surf);
 	Surface(std::string const& filename);
-	void draw();
+	void draw() const;
 	void load(unsigned int width, unsigned int height, pix::Format format, unsigned char const* buffer, float ar = 0.0f);
   private:
 	unsigned int m_width, m_height;

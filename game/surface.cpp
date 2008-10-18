@@ -195,7 +195,7 @@ void Surface::load(unsigned int width, unsigned int height, pix::Format format, 
 	glTexImage2D(m_texture.type(), 0, GL_RGBA, width, height, 0, f.format, f.type, buffer);	
 }
 
-void Surface::draw() {
+void Surface::draw() const {
 	m_texture.draw(dimensions, TexCoords(tex.x1 * m_width, tex.y1 * m_height, tex.x2 * m_width, tex.y2 * m_height));
 }
 

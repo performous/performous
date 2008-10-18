@@ -7,8 +7,6 @@
 #include <iostream>
 #include <iomanip>
 
-const double Engine::TIMESTEP = 0.01; // FIXME: Move this elsewhere
-
 void CScreenSing::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	Song& song = sm->getSongs()->current();
@@ -133,8 +131,6 @@ void CScreenSing::draw() {
 	if (m_background) m_background->draw();
 	if (m_video) m_video->render(time - song.videoGap);
 	theme->bg->draw();
-	theme->p1box->draw();
-	theme->p2box->draw();
 	// Compute and draw the timer and the progressbar
 	theme->timer->draw((boost::format("%02u:%02u") % (unsigned(time) / 60) % (unsigned(time) % 60)).str());
 	const double baseLine = -0.2;
@@ -167,6 +163,21 @@ void CScreenSing::draw() {
 	if (m_songit == song.notes.end() || m_songit->begin > time + 3.0) m_notealpha -= 0.02f;
 	else if (m_notealpha < 1.0f) m_notealpha += 0.02f;
 	std::list<Player> players = m_engine->getPlayers();
+	// Score display
+	{
+		for (std::list<Player>::const_iterator p = players.begin(); p != players.end(); ++p) {
+			float act = p->activity();
+			if (act == 0.0f) continue;
+			if (act < 1.0f) glColor4f(1.0, 1.0, 1.0, act);
+			Surface const* scorebox;
+			SvgTxtTheme* scoretxt;
+			if (p == players.begin()) { scorebox = theme->p1box.get(); scoretxt = theme->score1.get(); }
+			else { scorebox = theme->p2box.get(); scoretxt = theme->score2.get(); }
+			scorebox->draw();
+			scoretxt->draw((boost::format("%04d") % p->getScore()).str());
+			if (act < 1.0f) glColor4f(1.0, 1.0, 1.0, 1.0);
+		}
+	}
 	if (m_notealpha <= 0.0f) {
 		m_notealpha = 0.0f;
 	} else {
@@ -300,9 +311,5 @@ void CScreenSing::draw() {
 		theme->lyrics_now->draw(sentenceWholeZ);
 		theme->lyrics_next->draw(sentenceNextSentenceZ);
 	}
-	//draw score
-	theme->score1->draw((boost::format("%04d") % players.begin()->getScore()).str());
-	theme->score2->draw((boost::format("%04d") % players.rbegin()->getScore()).str());
-	// Surface(theme->theme->getCurrent()).draw(); // Render progress bar, score calculator, time, etc. - OPTIMIZE: This part is very slow and needs to be optimized
 	m_progress->draw(songPercent);
 }

@@ -17,26 +17,12 @@ struct Player {
 	typedef std::vector<std::pair<double, double> > pitch_t;
 	pitch_t m_pitch;
 	double m_score;
+	unsigned m_activitytimer;
 	Song::notes_t::const_iterator m_scoreIt;
-	Player(Analyzer& analyzer): m_analyzer(analyzer), m_score() {}
+	Player(Analyzer& analyzer): m_analyzer(analyzer), m_score(), m_activitytimer() {}
 	void prepare() { m_analyzer.process(); }
-	void update() {
-		Tone const* t = m_analyzer.findTone();
-		if (t) {
-			Song const& s = CScreenManager::getSingletonPtr()->getSongs()->current(); // XXX: Kill ScreenManager
-			m_scoreIt = s.notes.begin(); // TODO: optimize
-			m_pitch.push_back(std::make_pair(t->freq, t->stabledb));
-			double beginTime = 0.01 * (m_pitch.size() - 1);  // XXX: 0.01 = Engine::TIMESTEP
-			double endTime = beginTime + 0.01;
-			while (m_scoreIt != s.notes.end()) {
-				m_score += s.m_scoreFactor * m_scoreIt->score(s.scale.getNote(t->freq), beginTime, endTime);
-				if (endTime < m_scoreIt->end) break;
-				++m_scoreIt;
-			}
-			m_score = std::min(1.0, std::max(0.0, m_score));
-		}
-		else m_pitch.push_back(std::make_pair(std::numeric_limits<double>::quiet_NaN(), -std::numeric_limits<double>::infinity()));
-	}
+	void update();
+	float activity() const { return m_activitytimer / 300.0; }
 	int getScore() const {
 		return 10000.0 * m_score;
 	}
