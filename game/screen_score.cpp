@@ -26,7 +26,7 @@ void CScreenScore::manageEvent(SDL_Event event) {
 void CScreenScore::draw() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	if (seconds(now()) - m_time > 10.0) { sm->activateScreen("Songs"); return; }
-	Song& song = sm->getSongs()->current();
+	//Song& song = sm->getSongs()->current();
 	theme->bg->draw();
 	// Draw some numbers
 	int score = 0; //FIXME: song.getScore();
@@ -36,7 +36,7 @@ void CScreenScore::draw() {
 	else if (score > 4000) rank = "Rising star";
 	else if (score > 2000) rank = "Amateur";
 	else rank = "Tone deaf";
-	double scorePercent = score / 10000.0;
+	//double scorePercent = score / 10000.0;
 	m_rank->draw(rank);
 	m_text->draw(boost::lexical_cast<std::string>(score));
 }

@@ -122,7 +122,6 @@ void CScreenSing::draw() {
 		return;
 	}
 	Song& song = sm->getSongs()->current();
-	double oldfontsize;
 	// Get the time in the song
 	double time = sm->getAudio()->getPosition() + 0.02; // Compensate avg. lag to display
 	time = std::max(0.0, time + playOffset);

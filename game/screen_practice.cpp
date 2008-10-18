@@ -7,7 +7,7 @@ CScreenPractice::CScreenPractice(std::string const& name, boost::ptr_vector<Anal
 void CScreenPractice::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	theme.reset(new CThemePractice());
-	for (int i = 0; i < m_analyzers.size(); ++i) {
+	for (unsigned int i = 0; i < m_analyzers.size(); ++i) {
 		ProgressBar* b;
 		m_vumeters.push_back(b = new ProgressBar(sm->getThemePathFile("vumeter_bg.svg"), sm->getThemePathFile("vumeter_fg.svg"), ProgressBar::VERTICAL, 0.136, 0.023));
 		b->dimensions.screenBottom().left(-0.4 + i * 0.3).fixedWidth(0.04);
@@ -33,7 +33,7 @@ void CScreenPractice::manageEvent(SDL_Event event)
 void CScreenPractice::draw() {
 	theme->bg->draw();
 	bool text = false;
-	for (int i = 0; i < m_analyzers.size(); ++i) {
+	for (unsigned int i = 0; i < m_analyzers.size(); ++i) {
 		Analyzer& analyzer = m_analyzers[i];
 		analyzer.process();
 		Tone const* tone = analyzer.findTone();

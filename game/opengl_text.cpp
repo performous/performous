@@ -194,7 +194,6 @@ void SvgTxtTheme::draw(std::vector<TZoomText> _text) {
 	double texture_width = std::min(1.0, text_x/800.);
 	double texture_height = texture_width / texture_ar;
 
-	double svg_ar = m_width/m_height;
 	double svg_width = m_width;
 	double svg_height = m_height;
 
@@ -211,7 +210,6 @@ void SvgTxtTheme::draw(std::vector<TZoomText> _text) {
 
 	for (unsigned int i = 0; i < _text.size(); i++ ) {
 		double syllable_x = m_opengl_text[i]->x();
-		double syllable_y = text_y;
 		double syllable_width = syllable_x *  texture_width / text_x;
 		double syllable_height = texture_height;
 		double syllable_ar = syllable_width / syllable_height;
