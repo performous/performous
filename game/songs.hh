@@ -2,7 +2,7 @@
 #define __SONGS_H__
 
 #include <boost/noncopyable.hpp>
-#include <boost/ptr_container/ptr_set.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
@@ -151,10 +151,8 @@ class Songs: boost::noncopyable {
 	void dump(std::ostream& os, std::string const& sort);
   private:
 	class RestoreSel;
-	typedef boost::ptr_set<Song> songlist_t;
-	songlist_t m_songs;
-	typedef std::vector<Song*> filtered_t;
-	filtered_t m_filtered;
+	typedef std::vector<boost::shared_ptr<Song> > SongVector;
+	SongVector m_songs, m_filtered;
 	//coverMathSimple math_cover;
 	coverMathAdvanced math_cover;
 	std::string m_filter;
@@ -163,6 +161,7 @@ class Songs: boost::noncopyable {
 	void filter_internal();
 	void sort_internal();
 	volatile bool m_dirty;
+	volatile bool m_loading;
 	boost::scoped_ptr<boost::thread> m_thread;
 	boost::mutex m_mutex;
 };

@@ -346,7 +346,7 @@ bool operator<(Song const& l, Song const& r) {
 	// If filenames are identical, too, the songs are considered the same.
 }
 
-Songs::Songs(std::set<std::string> const& songdirs): m_songdirs(songdirs), math_cover(), m_order(), m_dirty(false) {
+Songs::Songs(std::set<std::string> const& songdirs): m_songdirs(songdirs), math_cover(), m_order(), m_dirty(false), m_loading(false) {
 	reload();
 }
 
@@ -355,7 +355,9 @@ Songs::~Songs() {
 }
 
 void Songs::reload() {
-	if (!m_thread.get()) m_thread.reset(new boost::thread(boost::bind(&Songs::reload_internal, boost::ref(*this))));
+	if (m_loading) return;
+	m_loading = true;
+	m_thread.reset(new boost::thread(boost::bind(&Songs::reload_internal, boost::ref(*this))));
 }
 
 void Songs::reload_internal() {
@@ -379,7 +381,7 @@ void Songs::reload_internal() {
 			try {
 				Song* s = new Song(path + "/", txtfilename);
 				boost::mutex::scoped_lock l(m_mutex);
-				m_songs.insert(s);
+				m_songs.push_back(boost::shared_ptr<Song>(s));
 				m_dirty = true;
 			} catch (SongParser::Exception& e) {
 				std::cout << "FAIL\n    " << txtfilename;
@@ -390,18 +392,24 @@ void Songs::reload_internal() {
 		std::cout << "\r\x1B[K" << std::flush;
 		globfree(&_glob);
 	}
+	m_loading = false;
+	m_dirty = true;  // Force shuffle
 }
+
+// Make std::find work with shared_ptrs and regular pointers
+static bool operator==(boost::shared_ptr<Song> const& a, Song const* b) { return a.get() == b; }
 
 class Songs::RestoreSel {
 	Songs& m_s;
-	Song* m_sel;
+	Song const* m_sel;
   public:
 	RestoreSel(Songs& s): m_s(s), m_sel(s.empty() ? NULL : &s.current()) {}
+	void reset(Song const* song = NULL) { m_sel = song; }
 	~RestoreSel() {
 		int pos = 0;
 		if (m_sel) {
-			filtered_t& f = m_s.m_filtered;
-			filtered_t::iterator it = std::find(f.begin(), f.end(), m_sel);
+			SongVector& f = m_s.m_filtered;
+			SongVector::iterator it = std::find(f.begin(), f.end(), m_sel);
 			m_s.math_cover.setTarget(0, 0);
 			if (it != f.end()) pos = it - f.begin();
 		}
@@ -430,20 +438,18 @@ void Songs::setFilter(std::string const& val) {
 void Songs::filter_internal() {
 	boost::mutex::scoped_lock l(m_mutex);
 	RestoreSel restore(*this);
-	filtered_t filtered;
 	try {
-		for (songlist_t::iterator it = m_songs.begin(); it != m_songs.end(); ++it) {
-			if (regex_search(it->strFull(), boost::regex(m_filter ,boost::regex_constants::icase))) filtered.push_back(&*it);
+		SongVector filtered;
+		for (SongVector::iterator it = m_songs.begin(); it != m_songs.end(); ++it) {
+			if (regex_search(it->get()->strFull(), boost::regex(m_filter ,boost::regex_constants::icase))) filtered.push_back(*it);
 		}
+		m_filtered.swap(filtered);
 	} catch (...) {
-		filtered.clear();
-		for (songlist_t::iterator it = m_songs.begin(); it != m_songs.end(); ++it) {
-			filtered.push_back(&*it);
-		}
+		SongVector(m_songs.begin(), m_songs.end()).swap(m_filtered);  // Invalid regex => copy everything
 	}
-	m_filtered.swap(filtered);
 	math_cover.setTarget(0, 0);
 	sort_internal();
+	if (m_dirty && !m_loading) restore.reset();
 	m_dirty = false;
 }
 
@@ -455,7 +461,7 @@ class CmpByField {
 		if (left.*m_field == right.*m_field) return left < right;
 		return left.*m_field < right.*m_field;
 	}
-	bool operator()(Song const* left , Song const* right) {
+	bool operator()(boost::shared_ptr<Song> const& left, boost::shared_ptr<Song> const& right) {
 		return operator()(*left, *right);
 	}
 };
@@ -500,7 +506,7 @@ void Songs::sortChange(int diff) {
 
 void Songs::sort_internal() {
 	switch (m_order) {
-	  case 0: std::random_shuffle(m_filtered.begin(), m_filtered.end()); break;
+	  case 0: if (!m_loading) std::random_shuffle(m_filtered.begin(), m_filtered.end()); break;
 	  case 1: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&Song::title)); break;
 	  case 2: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&Song::artist)); break;
 	  case 3: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&Song::edition)); break;
@@ -519,7 +525,7 @@ void Songs::dump(std::ostream& os, std::string const& sort) {
 	os << order[m_order] << '\n' << std::string(40, '-') << '\n';
 	RestoreSel restore(*this);
 	sort_internal();
-	for (filtered_t::const_iterator it = m_filtered.begin(); it != m_filtered.end(); ++it) {
+	for (SongVector::const_iterator it = m_filtered.begin(); it != m_filtered.end(); ++it) {
 		os << "  " << (*it)->str() << std::endl;
 	}
 }
