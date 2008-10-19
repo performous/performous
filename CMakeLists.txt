@@ -20,6 +20,11 @@ include(CPack)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake/Modules/)
 
+IF(NOT CMAKE_BUILD_TYPE)
+  SET(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
+ENDIF(NOT CMAKE_BUILD_TYPE)
+
+
 set(INSTALL_LIBRARY_DIR ${CMAKE_INSTALL_PREFIX}/lib/ CACHE PATH "Library installation directory")
 set(SHARE_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX}/share/performous/ CACHE PATH "Data file installation directory")
 
