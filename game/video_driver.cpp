@@ -13,20 +13,14 @@ Window::Window(unsigned int width, unsigned int height, int fs) {
 	std::atexit(SDL_Quit);
 	if( SDL_Init(SDL_INIT_VIDEO) ==  -1 ) throw std::runtime_error("SDL_Init failed");
 	SDL_WM_SetCaption(PACKAGE" - "VERSION, "WM_DEFAULT");
-#ifdef HAVE_LIBSDL_IMAGE
-	SDLSurf icon(sm.getThemePathFile("icon.png"));
+	SDL_Surface* icon = SDL_LoadBMP(CScreenManager::getSingletonPtr()->getThemePathFile("icon.bmp").c_str());
 	SDL_WM_SetIcon(icon, NULL);
-#endif
+	SDL_FreeSurface(icon);
 	m_videoFlags = SDL_OPENGL | SDL_DOUBLEBUF | SDL_RESIZABLE | (fs ? SDL_FULLSCREEN : 0);
 	resize(width, height);
 	SDL_ShowCursor(SDL_DISABLE);
 	SDL_EnableUNICODE(SDL_ENABLE);
 	SDL_EnableKeyRepeat(80, 80);
-#ifdef DEBUG
-	printf ("OpenGL version: %s\n", glGetString (GL_VERSION));
-	printf ("OpenGL vendor: %s\n", glGetString (GL_VENDOR));
-	printf ("OpenGL renderer: %s\n", glGetString (GL_RENDERER));
-#endif
 	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
 	glDisable (GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
