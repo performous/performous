@@ -10,6 +10,9 @@
 void CScreenSing::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	Song& song = sm->getSongs()->current();
+	std::string file = song.path + song.mp3;
+	CAudio& audio = *sm->getAudio();
+	audio.playMusic(file.c_str());
 	theme.reset(new CThemeSing());
 	if (!song.background.empty()) { try { m_background.reset(new Surface(song.path + song.background)); } catch (std::exception& e) { std::cerr << e.what() << std::endl; } }
 #define TRYLOAD(field, class) if (!song.field.empty()) { try { m_##field.reset(new class(song.path + song.field)); } catch (std::exception& e) { std::cerr << e.what() << std::endl; } }
@@ -25,20 +28,18 @@ void CScreenSing::enter() {
 	if (!m_notebargold_hl) m_notebargold_hl.reset(new Texture(sm->getThemePathFile("notebargold.png")));
 	if (!m_progress) m_progress.reset(new ProgressBar(sm->getThemePathFile("sing_progressbg.svg"), sm->getThemePathFile("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01, 0.01, true));
 	m_progress->dimensions.fixedWidth(0.4).screenTop();
-	std::string file = song.path + song.mp3;
-	CAudio& audio = *sm->getAudio();
-	audio.playMusic(file.c_str());
-	m_engine.reset(new Engine(audio, m_analyzers.begin(), m_analyzers.end()));
 	lyrics.reset(new Lyrics(song.notes));
 	playOffset = 0.0;
 	m_songit = song.notes.begin();
-	audio.wait(); // Until playback starts
 	m_notealpha = 0.0f;
 	min = song.noteMin - 7.0;
 	max = song.noteMax + 7.0;
+	audio.wait(); // Until playback starts
+	m_engine.reset(new Engine(audio, m_analyzers.begin(), m_analyzers.end()));
 }
 
 void CScreenSing::exit() {
+	m_engine.reset();
 	CScreenManager::getSingletonPtr()->getAudio()->stopMusic();
 	m_video.reset();
 	m_background.reset();
@@ -47,7 +48,6 @@ void CScreenSing::exit() {
 	theme.reset();
 	m_notelines.reset();
 	m_wave.reset();
-	m_engine.reset();
 }
 
 void CScreenSing::manageEvent(SDL_Event event) {

@@ -1,22 +1,16 @@
 #include "configuration.hh"
 #include "screen.hh"
 #include <boost/lexical_cast.hpp>
+#include <algorithm>
 
-CConfigurationAudioVolume::CConfigurationAudioVolume(std::string const& title, unsigned int& volume):
-  CConfiguration(title), m_volume(volume)
+CConfigurationAudioVolume::CConfigurationAudioVolume(std::string const& title, CAudio& audio, GetFunc get, SetFunc set):
+  CConfiguration(title), m_audio(audio), m_get(get), m_set(set)
 {}
-void CConfigurationAudioVolume::setNext() {
-	if (m_volume >= 100) return;
-	m_volume++; apply();
-}
-void CConfigurationAudioVolume::setPrevious() {
-	if (m_volume <= 0) return;
-	m_volume--; apply();
-}
+void CConfigurationAudioVolume::setNext() { (m_audio.*m_set)(std::min(100u, (m_audio.*m_get)() + 1)); }
+void CConfigurationAudioVolume::setPrevious() { (m_audio.*m_set)(std::max(0, int((m_audio.*m_get)()) - 1)); }
+
 std::string CConfigurationAudioVolume::getValue() const {
-	return boost::lexical_cast<std::string>(m_volume);
-}
-void CConfigurationAudioVolume::apply() {
-	CScreenManager::getSingletonPtr()->getAudio()->setVolume(m_volume);
+	(m_audio.*m_set)((m_audio.*m_get)());  // Hack to have the volume set when the control is entered
+	return boost::lexical_cast<std::string>((m_audio.*m_get)());
 }
 

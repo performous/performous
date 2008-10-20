@@ -3,8 +3,9 @@
 CScreenConfiguration::CScreenConfiguration(std::string const& name): CScreen(name)
 {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
-	configuration.push_back(new CConfigurationAudioVolume("Ingame Audio Volume", sm->m_ingameVolume));
-	configuration.push_back(new CConfigurationAudioVolume("Menu Audio Volume", sm->m_menuVolume));
+	CAudio& a = *sm->getAudio();
+	configuration.push_back(new CConfigurationAudioVolume("Music Volume", a, &CAudio::getVolumeMusic, &CAudio::setVolumeMusic));
+	configuration.push_back(new CConfigurationAudioVolume("Song Preview Volume", a, &CAudio::getVolumePreview, &CAudio::setVolumePreview));
 	selected=0;
 }
 
@@ -17,6 +18,7 @@ void CScreenConfiguration::exit() { theme.reset(); }
 void CScreenConfiguration::manageEvent(SDL_Event event) {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	if (event.type == SDL_KEYDOWN) {
+		sm->getAudio()->setVolumeMusic(sm->getAudio()->getVolumeMusic()); // Hack to reset the volume after preview volume adjustment
 		int key = event.key.keysym.sym;
 		if (key == SDLK_ESCAPE || key == SDLK_q) sm->activateScreen("Intro");
 		else if (key == SDLK_SPACE || key == SDLK_PAUSE) sm->getAudio()->togglePause();

@@ -86,8 +86,10 @@ class CAudio {
 	 * position cannot be computed, 0 is returned.
 	 */
 	double getPosition() { return getPosition_internal(); }
-	unsigned int getVolume() { return getVolume_internal(); }
-	void setVolume(unsigned int volume) { setVolume_internal(volume); }
+	unsigned int getVolumeMusic() { return m_volumeMusic; }
+	unsigned int getVolumePreview() { return m_volumePreview; }
+	void setVolumeMusic(unsigned int volume) { setVolume_internal(m_volumeMusic = volume); }
+	void setVolumePreview(unsigned int volume) { setVolume_internal(m_volumePreview = volume); }
 	void operator()(); // Thread runs here, don't call directly
 	void operator()(da::pcm_data& areas, da::settings const&);
 	void wait() {
@@ -103,7 +105,8 @@ class CAudio {
 	boost::scoped_ptr<boost::thread> m_thread;
 	bool m_ready;
 	int length;
-	unsigned int audioVolume;
+	double m_volume;
+	unsigned m_volumeMusic, m_volumePreview;
 	void playMusic_internal(std::string const& filename);
 	void playPreview_internal(std::string const& filename);
 	bool isPaused_internal();
@@ -113,8 +116,7 @@ class CAudio {
 	void seek_internal(double seek_dist);
 	bool isPlaying_internal();
 	double getPosition_internal();
-	unsigned int getVolume_internal();
-	void setVolume_internal(unsigned int _volume);
+	void setVolume_internal(unsigned int volume);
 	boost::scoped_ptr<CFfmpeg> m_mpeg;
 	bool ffmpeg_paused;
 	da::settings m_rs;

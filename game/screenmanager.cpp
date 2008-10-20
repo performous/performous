@@ -9,9 +9,7 @@ CScreenManager::CScreenManager(std::string const& theme):
   audio(),
   songs(),
   m_fullscreen(),
-  m_theme(theme),
-  m_ingameVolume(100),
-  m_menuVolume(30)
+  m_theme(theme)
 {}
 
 void CScreenManager::activateScreen(std::string const& name) {

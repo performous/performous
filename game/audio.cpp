@@ -1,6 +1,7 @@
 #include "audio.hh"
-#include "xtime.hh"
 
+#include "xtime.hh"
+#include <functional>
 #include <iostream>
 #include <cmath>
 
@@ -13,7 +14,11 @@ CAudio::CAudio(std::string const& pdev, unsigned int rate):
 	.set_channels(2)
 	.set_rate(rate)
 	.set_debug(std::cerr)),
-	m_playback(m_rs) {
+	m_playback(m_rs),
+	m_volume(1.0),
+	m_volumePreview(60),
+	m_volumeMusic(100)
+{
 	m_mpeg.reset();
 	ffmpeg_paused = false;
 	length = 0;
@@ -41,6 +46,7 @@ void CAudio::operator()(da::pcm_data& areas, da::settings const&) {
 		size = buf.size();
 		if (size < samples && !m_mpeg->audioQueue.eof() && m_mpeg->position() > 1.0) std::cerr << "Warning: audio decoding too slow (buffer underrun): " << std::endl;
 	}
+	if (m_volume != 1.0) std::transform(areas.m_buf, areas.m_buf + size, areas.m_buf, std::bind1st(std::multiplies<double>(), m_volume));
 	std::fill(areas.m_buf + size, areas.m_buf + samples, 0.0f);
 }
 
@@ -81,16 +87,13 @@ void CAudio::operator()() {
 	}
 }
 
-unsigned int CAudio::getVolume_internal() {
-	return 100;
-}
-
-void CAudio::setVolume_internal(unsigned int _volume) {
-	(void)_volume;
+void CAudio::setVolume_internal(unsigned int volume) {
+	if (volume == 0) { m_volume = 0.0; return; }
+	m_volume = std::pow(10.0, (volume - 100.0) / 100.0 * 2.0);
 }
 
 void CAudio::playMusic_internal(std::string const& filename) {
-	stopMusic_internal();
+	setVolume_internal(m_volumeMusic);
 	length = LENGTH_ERROR;
 	m_mpeg.reset(new CFfmpeg(false, true, filename, m_rs.rate()));
 	if (m_mpeg->duration() < 0) return;
@@ -99,18 +102,13 @@ void CAudio::playMusic_internal(std::string const& filename) {
 }
 
 void CAudio::playPreview_internal(std::string const& filename) {
-	unsigned int volume = getVolume_internal();
-	setVolume_internal(0);
-	stopMusic_internal();
+	setVolume_internal(m_volumePreview);
 	length = LENGTH_ERROR;
 	m_mpeg.reset(new CFfmpeg(false, true, filename, m_rs.rate()));
-	m_mpeg->seek(30.);
+	m_mpeg->seek(30.0);
 	if (m_mpeg->duration() < 0) return;
 	length = 1e3 * m_mpeg->duration();
 	ffmpeg_paused = false;
-	// Wait a little while before restoring volume to prevent clicks
-	boost::thread::sleep(now() + 0.05);
-	setVolume_internal(volume);
 }
 
 double CAudio::getLength_internal() {

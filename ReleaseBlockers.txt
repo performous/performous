@@ -4,9 +4,6 @@ Generic
   - Clean all FIXMEs and XXXs
   - Configurable audio roundtrip lag and A/V lag?
 
-Audio
-  - Make the volume settings actually do something (software volume control)
-
 Texture
   - Create mipmaps?
 

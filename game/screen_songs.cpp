@@ -18,9 +18,6 @@ void CScreenSongs::enter() {
 	CAudio& audio = *sm->getAudio();
 	audio.stopMusic();
 	audio.wait();
-	static unsigned int m_volume;
-	m_volume = audio.getVolume();
-	audio.setVolume(m_volume);
 	theme.reset(new CThemeSongs());
 	m_time = seconds(now());
 	m_search.text.clear();

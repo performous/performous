@@ -57,8 +57,6 @@ class CScreenManager: public CSingleton <CScreenManager> {
 	boost::scoped_ptr<Songs> songs;
 	bool m_fullscreen;
 	std::string m_theme;
-  public:
-	unsigned int m_ingameVolume, m_menuVolume;
 };
 
 #endif

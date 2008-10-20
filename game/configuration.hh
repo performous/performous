@@ -1,6 +1,7 @@
 #ifndef __CONFIGURATION_H__
 #define __CONFIGURATION_H__
 
+#include "audio.hh"
 #include <string>
 
 class CConfiguration {
@@ -17,13 +18,16 @@ class CConfiguration {
 
 class CConfigurationAudioVolume: public CConfiguration {
   public:
-	CConfigurationAudioVolume(std::string const& title, unsigned int& volume);
+	typedef unsigned int (CAudio::*GetFunc)();
+	typedef void (CAudio::*SetFunc)(unsigned int);
+	CConfigurationAudioVolume(std::string const& title, CAudio& audio, GetFunc get, SetFunc set);
 	void setNext();
 	void setPrevious();
 	std::string getValue() const;
   private:
-	void apply();
-	unsigned int& m_volume;
+	CAudio& m_audio;
+  	GetFunc m_get;
+  	SetFunc m_set;
 };
 
 #endif
