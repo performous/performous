@@ -7,8 +7,6 @@
 #include <sstream>
 
 OpenGLText::OpenGLText(TThemeTxtOpenGL& _text) {
-	PangoLayout *layout;
-
 	if (_text.fontfamily.empty()) _text.fontfamily = "Sans";
 
 	PangoAlignment alignment = PANGO_ALIGN_LEFT;
@@ -31,37 +29,37 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL& _text) {
 	pango_font_description_set_weight(desc, weight);
 	pango_font_description_set_style(desc, style);
 	pango_font_description_set_family(desc, _text.fontfamily.c_str());
-	pango_font_description_set_absolute_size(desc,_text.fontsize * PANGO_SCALE);
+	pango_font_description_set_absolute_size(desc, _text.fontsize * PANGO_SCALE);
 
 	// compute text extents
-	PangoRectangle rec1, rec2;
-	PangoContext* ctx=NULL;
-	ctx = pango_cairo_font_map_create_context ((PangoCairoFontMap*)pango_cairo_font_map_get_default());
-	layout = pango_layout_new(ctx);
-	pango_layout_set_alignment(layout, alignment);
-	pango_layout_set_font_description (layout, desc);
-	pango_layout_set_text (layout, _text.text.c_str(), -1);
-	pango_layout_get_pixel_extents (layout,&rec1,&rec2);
-	m_x = rec2.width;
-	m_y = rec2.height;
-	m_x_advance = rec1.x;
-	m_y_advance = rec1.y;
-
-	g_object_unref (layout);
-	g_object_unref (ctx);
+	{
+		PangoContext* ctx = pango_cairo_font_map_create_context ((PangoCairoFontMap*)pango_cairo_font_map_get_default());
+		PangoLayout* layout = pango_layout_new(ctx);
+		pango_layout_set_alignment(layout, alignment);
+		pango_layout_set_font_description (layout, desc);
+		pango_layout_set_text (layout, _text.text.c_str(), -1);
+		PangoRectangle rec1, rec2;
+		pango_layout_get_pixel_extents (layout,&rec1,&rec2);
+		m_x = rec2.width;
+		m_y = rec2.height;
+		m_x_advance = rec1.x;
+		m_y_advance = rec1.y;
+		g_object_unref (layout);
+		g_object_unref (ctx);
+	}
 
 	// create surface
 	cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, m_x, m_y);
 	cairo_t *dc = cairo_create(surface);
 
 	// draw the surface
-	layout = pango_cairo_create_layout(dc);
+	PangoLayout* layout = pango_cairo_create_layout(dc);
 	pango_layout_set_alignment(layout, alignment);
-	pango_layout_set_font_description (layout, desc);
-	pango_layout_set_text (layout, _text.text.c_str(), -1);
+	pango_layout_set_font_description(layout, desc);
+	pango_layout_set_text(layout, _text.text.c_str(), -1);
 	cairo_save(dc);
 	pango_cairo_show_layout (dc, layout);
-	pango_cairo_layout_path(dc,layout);
+	pango_cairo_layout_path(dc, layout);
 	if (_text.fill_col.a > 0.0) {
 		cairo_set_source_rgba(dc, _text.fill_col.r, _text.fill_col.g, _text.fill_col.b, _text.fill_col.a);
 		if (_text.stroke_col.r != -1 && _text.stroke_col.g != -1 && _text.stroke_col.b != -1) cairo_fill_preserve(dc);

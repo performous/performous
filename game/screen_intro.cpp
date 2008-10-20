@@ -1,16 +1,16 @@
 #include "screen_intro.hh"
 
-CScreenIntro::CScreenIntro(std::string const& name): CScreen(name) {
-	CScreenManager* sm = CScreenManager::getSingletonPtr();
-	background.reset(new Surface(sm->getThemePathFile("intro.svg")));
-}
+CScreenIntro::CScreenIntro(std::string const& name): CScreen(name) {}
 
 void CScreenIntro::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	sm->getAudio()->playMusic(sm->getThemePathFile("menu.ogg"));
+	background.reset(new Surface(sm->getThemePathFile("intro.svg")));
 }
 
-void CScreenIntro::exit() {}
+void CScreenIntro::exit() {
+	background.reset();
+}
 
 void CScreenIntro::manageEvent(SDL_Event event) {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();

@@ -19,19 +19,19 @@ void CScreenSing::enter() {
 #define TRYLOAD(field, class) if (!song.field.empty()) { try { m_##field.reset(new class(song.path + song.field)); } catch (std::exception& e) { std::cerr << e.what() << std::endl; } }
 	TRYLOAD(video, Video)
 #undef TRYLOAD
-	if (!m_wave) m_wave.reset(new Texture(sm->getThemePathFile("wave.png")));
-	if (!m_notelines) m_notelines.reset(new Texture(sm->getThemePathFile("notelines.svg")));
-	if (!m_notebar) m_notebar.reset(new Texture(sm->getThemePathFile("notebar.svg")));
-	if (!m_notebar_hl) m_notebar_hl.reset(new Texture(sm->getThemePathFile("notebar.png")));
-	if (!m_notebarfs) m_notebarfs.reset(new Texture(sm->getThemePathFile("notebarfs.svg")));
-	if (!m_notebarfs_hl) m_notebarfs_hl.reset(new Texture(sm->getThemePathFile("notebarfs-hl.png")));
-	if (!m_pause_icon) m_pause_icon.reset(new Surface(sm->getThemePathFile("sing_pause.svg")));
-	if (!m_score_window) m_score_window.reset(new Surface(sm->getThemePathFile("score_window.svg")));
-	if (!m_score_text) m_score_text.reset(new SvgTxtTheme(sm->getThemePathFile("score_txt.svg"),SvgTxtTheme::CENTER));
-	if (!m_score_rank) m_score_rank.reset(new SvgTxtTheme(sm->getThemePathFile("score_rank.svg"),SvgTxtTheme::CENTER));
-	if (!m_notebargold) m_notebargold.reset(new Texture(sm->getThemePathFile("notebargold.svg")));
-	if (!m_notebargold_hl) m_notebargold_hl.reset(new Texture(sm->getThemePathFile("notebargold.png")));
-	if (!m_progress) m_progress.reset(new ProgressBar(sm->getThemePathFile("sing_progressbg.svg"), sm->getThemePathFile("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01, 0.01, true));
+	m_wave.reset(new Texture(sm->getThemePathFile("wave.png")));
+	m_notelines.reset(new Texture(sm->getThemePathFile("notelines.svg")));
+	m_notebar.reset(new Texture(sm->getThemePathFile("notebar.svg")));
+	m_notebar_hl.reset(new Texture(sm->getThemePathFile("notebar.png")));
+	m_notebarfs.reset(new Texture(sm->getThemePathFile("notebarfs.svg")));
+	m_notebarfs_hl.reset(new Texture(sm->getThemePathFile("notebarfs-hl.png")));
+	m_pause_icon.reset(new Surface(sm->getThemePathFile("sing_pause.svg")));
+	m_score_window.reset(new Surface(sm->getThemePathFile("score_window.svg")));
+	m_score_text.reset(new SvgTxtTheme(sm->getThemePathFile("score_txt.svg"),SvgTxtTheme::CENTER));
+	m_score_rank.reset(new SvgTxtTheme(sm->getThemePathFile("score_rank.svg"),SvgTxtTheme::CENTER));
+	m_notebargold.reset(new Texture(sm->getThemePathFile("notebargold.svg")));
+	m_notebargold_hl.reset(new Texture(sm->getThemePathFile("notebargold.png")));
+	m_progress.reset(new ProgressBar(sm->getThemePathFile("sing_progressbg.svg"), sm->getThemePathFile("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01, 0.01, true));
 	m_progress->dimensions.fixedWidth(0.4).screenTop();
 	lyrics.reset(new Lyrics(song.notes));
 	playOffset = 0.0;
@@ -45,19 +45,25 @@ void CScreenSing::enter() {
 }
 
 void CScreenSing::exit() {
+	lyrics.reset();
 	m_engine.reset();
 	CScreenManager::getSingletonPtr()->getAudio()->stopMusic();
-	m_video.reset();
-	m_background.reset();
 	m_sentence.clear();
-	lyrics.reset();
-	theme.reset();
+	m_notebargold_hl.reset();
+	m_notebargold.reset();
+	m_score_rank.reset();
+	m_score_text.reset();
+	m_score_window.reset();
+	m_pause_icon.reset();
+	m_notebarfs_hl.reset();
+	m_notebarfs.reset();
+	m_notebar_hl.reset();
+	m_notebar.reset();
 	m_notelines.reset();
 	m_wave.reset();
-	m_pause_icon.reset();
-	m_score_window.reset();
-	m_score_text.reset();
-	m_score_rank.reset();
+	m_video.reset();
+	m_background.reset();
+	theme.reset();
 }
 
 void CScreenSing::manageEvent(SDL_Event event) {
