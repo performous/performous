@@ -13,9 +13,11 @@ Window::Window(unsigned int width, unsigned int height, int fs) {
 	std::atexit(SDL_Quit);
 	if( SDL_Init(SDL_INIT_VIDEO) ==  -1 ) throw std::runtime_error("SDL_Init failed");
 	SDL_WM_SetCaption(PACKAGE" - "VERSION, "WM_DEFAULT");
-	SDL_Surface* icon = SDL_LoadBMP(CScreenManager::getSingletonPtr()->getThemePathFile("icon.bmp").c_str());
-	SDL_WM_SetIcon(icon, NULL);
-	SDL_FreeSurface(icon);
+	{
+		SDL_Surface* icon = SDL_LoadBMP(CScreenManager::getSingletonPtr()->getThemePathFile("icon.bmp").c_str());
+		SDL_WM_SetIcon(icon, NULL);
+		SDL_FreeSurface(icon);
+	}
 	m_videoFlags = SDL_OPENGL | SDL_DOUBLEBUF | SDL_RESIZABLE | (fs ? SDL_FULLSCREEN : 0);
 	resize(width, height);
 	SDL_ShowCursor(SDL_DISABLE);
