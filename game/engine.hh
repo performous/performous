@@ -65,7 +65,7 @@ class Engine {
 			std::for_each(m_players.begin(), m_players.end(), boost::bind(&Player::prepare, _1));
 			double t = m_audio.getPosition() - 0.05;  // FIXME: Make audio I/O lag (0.05) configurable
 			double timeLeft = m_time * TIMESTEP - t;
-			if (timeLeft > 0.0) { boost::thread::sleep(now() + std::min(TIMESTEP, timeLeft * 0.1)); continue; }
+			if (timeLeft > 0.0) { boost::thread::sleep(now() + std::min(TIMESTEP, timeLeft)); continue; }
 			boost::mutex::scoped_lock l(m_mutex);
 			Song::notes_t const& n = CScreenManager::getSingletonPtr()->getSongs()->current().notes; // TODO: Kill ScreenManager
 			for (Song::notes_t::const_iterator it = n.begin(); it != n.end(); ++it) it->power = 0.0f;
