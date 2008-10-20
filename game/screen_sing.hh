@@ -23,6 +23,10 @@ class CScreenSing: public CScreen {
 	void manageEvent(SDL_Event event);
 	void draw();
   private:
+	boost::scoped_ptr<Surface> m_score_window;
+	boost::scoped_ptr<SvgTxtTheme> m_score_text;
+	boost::scoped_ptr<SvgTxtTheme> m_score_rank;
+
 	boost::ptr_vector<Analyzer>& m_analyzers;
 	boost::scoped_ptr<ProgressBar> m_progress;
 	boost::scoped_ptr<Surface> m_background;
@@ -38,6 +42,7 @@ class CScreenSing: public CScreen {
 	boost::scoped_ptr<Texture> m_notebargold_hl;
 	boost::scoped_ptr<Engine> m_engine;
 	std::vector<Note> m_sentence;
+	bool m_display_score;
 	bool play;
 	bool finished;
 	double playOffset;

@@ -33,11 +33,6 @@ CThemeSing::CThemeSing() {
 	timer.reset(new SvgTxtTheme(sm->getThemePathFile("sing_timetxt.svg"),SvgTxtTheme::CENTER,SvgTxtTheme::TOP));
 }
 
-CThemeScore::CThemeScore() {
-	CScreenManager * sm = CScreenManager::getSingletonPtr();
-	bg.reset(new Surface(sm->getThemePathFile("score_bg.svg")));
-}
-
 CThemeConfiguration::CThemeConfiguration() {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
 	bg.reset(new Surface(sm->getThemePathFile("configuration_bg.svg")));

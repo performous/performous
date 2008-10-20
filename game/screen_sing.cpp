@@ -2,6 +2,7 @@
 #include "xtime.hh"
 
 #include <boost/format.hpp>
+#include <boost/lexical_cast.hpp>
 #include "sdl_helper.hh"
 #include "songs.hh"
 #include <iostream>
@@ -25,6 +26,9 @@ void CScreenSing::enter() {
 	if (!m_notebarfs) m_notebarfs.reset(new Texture(sm->getThemePathFile("notebarfs.svg")));
 	if (!m_notebarfs_hl) m_notebarfs_hl.reset(new Texture(sm->getThemePathFile("notebarfs-hl.png")));
 	if (!m_pause_icon) m_pause_icon.reset(new Surface(sm->getThemePathFile("sing_pause.svg")));
+	if (!m_score_window) m_score_window.reset(new Surface(sm->getThemePathFile("score_window.svg")));
+	if (!m_score_text) m_score_text.reset(new SvgTxtTheme(sm->getThemePathFile("score_txt.svg"),SvgTxtTheme::CENTER));
+	if (!m_score_rank) m_score_rank.reset(new SvgTxtTheme(sm->getThemePathFile("score_rank.svg"),SvgTxtTheme::CENTER));
 	if (!m_notebargold) m_notebargold.reset(new Texture(sm->getThemePathFile("notebargold.svg")));
 	if (!m_notebargold_hl) m_notebargold_hl.reset(new Texture(sm->getThemePathFile("notebargold.png")));
 	if (!m_progress) m_progress.reset(new ProgressBar(sm->getThemePathFile("sing_progressbg.svg"), sm->getThemePathFile("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01, 0.01, true));
@@ -35,6 +39,7 @@ void CScreenSing::enter() {
 	m_notealpha = 0.0f;
 	min = song.noteMin - 7.0;
 	max = song.noteMax + 7.0;
+	m_display_score = false;
 	audio.wait(); // Until playback starts
 	m_engine.reset(new Engine(audio, m_analyzers.begin(), m_analyzers.end()));
 }
@@ -50,6 +55,9 @@ void CScreenSing::exit() {
 	m_notelines.reset();
 	m_wave.reset();
 	m_pause_icon.reset();
+	m_score_window.reset();
+	m_score_text.reset();
+	m_score_rank.reset();
 }
 
 void CScreenSing::manageEvent(SDL_Event event) {
@@ -57,7 +65,17 @@ void CScreenSing::manageEvent(SDL_Event event) {
 		CScreenManager* sm = CScreenManager::getSingletonPtr();
 		CAudio& audio = *sm->getAudio();
 		int key = event.key.keysym.sym;
-		if (key == SDLK_ESCAPE || key == SDLK_q || (key == SDLK_RETURN && m_sentence.empty())) sm->activateScreen(m_sentence.empty() ? "Score" : "Songs");
+		if (key == SDLK_ESCAPE || key == SDLK_q || (key == SDLK_RETURN && m_sentence.empty())) {
+			if( m_sentence.empty() ) {
+				if( m_display_score = true ) {
+					sm->activateScreen("Songs");
+				} else {
+					m_display_score = true;
+				}
+			} else {
+				sm->activateScreen("Songs");
+			}
+		}
 		else if (key == SDLK_SPACE || key == SDLK_PAUSE) sm->getAudio()->togglePause();
 		else if (key == SDLK_PLUS) playOffset += 0.02;
 		else if (key == SDLK_MINUS) playOffset -= 0.02;
@@ -120,8 +138,7 @@ namespace {
 void CScreenSing::draw() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	if (!sm->getAudio()->isPlaying()) {
-		sm->activateScreen("Score");
-		return;
+		m_display_score = true;
 	}
 	Song& song = sm->getSongs()->current();
 	// Get the time in the song
@@ -323,5 +340,23 @@ void CScreenSing::draw() {
 	if( sm->getAudio()->isPaused() ) {
 		m_pause_icon->dimensions.middle().center().fixedWidth(.25);
 		m_pause_icon->draw();
+	}
+
+	if( m_display_score ) {
+		m_score_window->dimensions.middle().center();
+		m_score_window->draw();
+		for (std::list<Player>::const_iterator p = players.begin(); p != players.end(); ++p) {
+			int score = p->getScore();
+			char const* rank;
+			if (score > 8000) rank = "Hit singer";
+			else if (score > 6000) rank = "Lead singer";
+			else if (score > 4000) rank = "Rising star";
+			else if (score > 2000) rank = "Amateur";
+			else rank = "Tone deaf";
+			//double scorePercent = score / 10000.0;
+			m_score_rank->draw(rank);
+			m_score_text->draw(boost::lexical_cast<std::string>(score));
+			break; // FIXME: render all scores
+		}
 	}
 }

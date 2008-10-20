@@ -34,11 +34,6 @@ struct CThemeSing: boost::noncopyable {
 	boost::scoped_ptr<SvgTxtTheme> timer;
 };
 
-struct CThemeScore: boost::noncopyable {
-	CThemeScore();
-	boost::scoped_ptr<Surface> bg;
-};
-
 struct CThemeConfiguration: boost::noncopyable {
 	CThemeConfiguration();
 	boost::scoped_ptr<Surface> bg;

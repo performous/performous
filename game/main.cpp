@@ -6,7 +6,6 @@
 #include "screen_songs.hh"
 #include "screen_sing.hh"
 #include "screen_practice.hh"
-#include "screen_score.hh"
 #include "screen_configuration.hh"
 #include "video_driver.hh"
 #include "xtime.hh"
@@ -193,7 +192,6 @@ int main(int argc, char** argv) {
 		Capture capture(2, cdev, crate);
 		sm.addScreen(new CScreenSing("Sing", capture.analyzers()));
 		sm.addScreen(new CScreenPractice("Practice", capture.analyzers())); // TODO: multiple analyzers for practice
-		sm.addScreen(new CScreenScore("Score"));
 		sm.addScreen(new CScreenConfiguration("Configuration"));
 		sm.activateScreen("Intro");
 		// Main loop
