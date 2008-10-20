@@ -107,17 +107,6 @@ void CScreenSing::manageEvent(SDL_Event event) {
 }
 
 namespace {
-	void drawRectangleOpenGL(double x, double y, double w, double h,
-	  float _r, float _g, float _b, float _a)
-	{
-		glColor4f(_r, _g, _b, _a);
-		glBegin(GL_QUADS);
-		glVertex2f(x  ,y  ); glVertex2f(x  ,y+h);
-		glVertex2f(x+w,y+h); glVertex2f(x+w,y  );
-		glEnd();
-		glColor4f(1.0, 1.0, 1.0, 1.0);
-	}
-
 	void drawNotebar(Texture const& texture, double x, double y, double w, double h) {
 		UseTexture tblock(texture);
 		glBegin(GL_TRIANGLE_STRIP);
