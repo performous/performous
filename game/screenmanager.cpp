@@ -27,7 +27,7 @@ CScreen* CScreenManager::getScreen(std::string const& name) {
 	}
 }
 
-std::string CScreenManager::getThemePathFile(std::string const& file)
+std::string CScreenManager::getThemePathFile(std::string const& file) const
 {
 	if (m_theme.empty()) throw std::logic_error("CScreenManager::getThemePathFile(): m_theme is empty");
 	return m_theme + "/" + file;

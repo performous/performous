@@ -101,7 +101,7 @@ class SvgTxtTheme {
 	void setFitting(Fitting _f) {m_fitting=_f;};
 	void setHighlight(std::string _theme_file);
   private:
-        void parseTheme(std::string file, TThemeTxtOpenGL& theme, double& width, double& height, double& x, double& y);
+	void parseTheme(std::string file, TThemeTxtOpenGL& theme, double& width, double& height, double& x, double& y);
   	boost::scoped_ptr<OpenGLText> m_opengl_text[50];
 	Gravity m_gravity;
 	Fitting m_fitting;

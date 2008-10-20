@@ -13,6 +13,18 @@
 #include "opengl_text.hh"
 #include "progressbar.hh"
 
+class ScoreWindow {
+  public:
+	ScoreWindow(CScreenManager const* sm, Engine const& e);
+	void draw();
+  private:
+	Surface m_bg;
+	ProgressBar m_scoreBar;
+	SvgTxtTheme m_score_text;
+	SvgTxtTheme m_score_rank;
+	std::list<Player> m_players;
+};
+
 class CScreenSing: public CScreen {
   public:
 	CScreenSing(std::string const& name, boost::ptr_vector<Analyzer>& analyzers):
@@ -23,10 +35,7 @@ class CScreenSing: public CScreen {
 	void manageEvent(SDL_Event event);
 	void draw();
   private:
-	boost::scoped_ptr<Surface> m_score_window;
-	boost::scoped_ptr<SvgTxtTheme> m_score_text;
-	boost::scoped_ptr<SvgTxtTheme> m_score_rank;
-
+	boost::scoped_ptr<ScoreWindow> m_score_window;
 	boost::ptr_vector<Analyzer>& m_analyzers;
 	boost::scoped_ptr<ProgressBar> m_progress;
 	boost::scoped_ptr<Surface> m_background;
@@ -42,7 +51,6 @@ class CScreenSing: public CScreen {
 	boost::scoped_ptr<Texture> m_notebargold_hl;
 	boost::scoped_ptr<Engine> m_engine;
 	std::vector<Note> m_sentence;
-	bool m_display_score;
 	bool play;
 	bool finished;
 	double playOffset;

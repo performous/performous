@@ -46,8 +46,8 @@ class CScreenManager: public CSingleton <CScreenManager> {
 	void finished() { m_finished=true; };
 	bool isFinished() { return m_finished; };
 
-	std::string getThemeName() { return m_theme; };
-	std::string getThemePathFile(std::string const& file);
+	std::string getThemeName() const { return m_theme; };
+	std::string getThemePathFile(std::string const& file) const;
   private:
 	bool m_finished;
 	typedef boost::ptr_map<std::string, CScreen> screenmap_t;

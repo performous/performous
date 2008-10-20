@@ -42,7 +42,7 @@ class Engine {
 	std::list<Player> m_players;
 	size_t m_time;
 	volatile bool m_quit;
-	boost::mutex m_mutex;
+	mutable boost::mutex m_mutex;
 	boost::thread m_thread;  // IMPORTANT: This must be the last variable
   public:
 	static const double TIMESTEP;
@@ -73,7 +73,7 @@ class Engine {
 			++m_time;
 		}
 	}
-	std::list<Player> getPlayers() {
+	std::list<Player> getPlayers() const {
 		boost::thread::yield(); // Try to let engine perform its run right before getting the data
 		boost::mutex::scoped_lock l(m_mutex);
 		return m_players;
