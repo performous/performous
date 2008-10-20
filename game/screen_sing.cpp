@@ -24,6 +24,7 @@ void CScreenSing::enter() {
 	if (!m_notebar_hl) m_notebar_hl.reset(new Texture(sm->getThemePathFile("notebar.png")));
 	if (!m_notebarfs) m_notebarfs.reset(new Texture(sm->getThemePathFile("notebarfs.svg")));
 	if (!m_notebarfs_hl) m_notebarfs_hl.reset(new Texture(sm->getThemePathFile("notebarfs-hl.png")));
+	if (!m_pause_icon) m_pause_icon.reset(new Surface(sm->getThemePathFile("sing_pause.svg")));
 	if (!m_notebargold) m_notebargold.reset(new Texture(sm->getThemePathFile("notebargold.svg")));
 	if (!m_notebargold_hl) m_notebargold_hl.reset(new Texture(sm->getThemePathFile("notebargold.png")));
 	if (!m_progress) m_progress.reset(new ProgressBar(sm->getThemePathFile("sing_progressbg.svg"), sm->getThemePathFile("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01, 0.01, true));
@@ -48,6 +49,7 @@ void CScreenSing::exit() {
 	theme.reset();
 	m_notelines.reset();
 	m_wave.reset();
+	m_pause_icon.reset();
 }
 
 void CScreenSing::manageEvent(SDL_Event event) {
@@ -317,4 +319,9 @@ void CScreenSing::draw() {
 	}
 	m_progress->draw(songPercent);
 	theme->timer->draw((boost::format("%02u:%02u") % (unsigned(time) / 60) % (unsigned(time) % 60)).str());
+
+	if( sm->getAudio()->isPaused() ) {
+		m_pause_icon->dimensions.middle().center().fixedWidth(.25);
+		m_pause_icon->draw();
+	}
 }

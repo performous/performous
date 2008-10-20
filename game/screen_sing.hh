@@ -27,6 +27,7 @@ class CScreenSing: public CScreen {
 	boost::scoped_ptr<ProgressBar> m_progress;
 	boost::scoped_ptr<Surface> m_background;
 	boost::scoped_ptr<Video> m_video;
+	boost::scoped_ptr<Surface> m_pause_icon;
 	boost::scoped_ptr<Texture> m_notelines;
 	boost::scoped_ptr<Texture> m_wave;
 	boost::scoped_ptr<Texture> m_notebar;
