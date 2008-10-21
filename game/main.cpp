@@ -163,7 +163,6 @@ int main(int argc, char** argv) {
 			songdirs.insert("/usr/local/share/games/ultrastar/songs/");
 			songdirs.insert("/usr/local/share/ultrastar/songs/");
 		}
-		std::cout << theme << std::endl;
 		// Figure out theme folder
 		if (theme.find('/') == std::string::npos) {
 			char const* envthemepath = getenv("PERFORMOUS_THEME_PATH");
@@ -180,7 +179,6 @@ int main(int argc, char** argv) {
 			}
         }
 		if (*theme.rbegin() == '/') theme.erase(theme.size() - 1); // Remove trailing slash
-		std::cout << theme << std::endl;
 	}
 	try {
 		// Initialize everything
