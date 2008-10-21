@@ -168,7 +168,7 @@ void CScreenSing::draw() {
 			float act = p->activity();
 			if (act == 0.0f) continue;
 			glColor4f(p->m_color.r, p->m_color.g, p->m_color.b,act);
-			m_player_icon->dimensions.middle(-0.25 + 0.20 * i).fixedWidth(0.075).screenTop(0.055);
+			m_player_icon->dimensions.left(-0.5 + 0.25 * i).fixedWidth(0.075).screenTop(0.055);
 			m_player_icon->draw();
 			SvgTxtTheme* scoretxt;
 			if (p == players.begin())
