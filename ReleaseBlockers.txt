@@ -7,9 +7,6 @@ Generic
 Texture
   - Create mipmaps?
 
-Score screen
-  - Two players
-
 Singing screen
   - Widescreen support (not even the first line of lyrics or score calculators fit)
   - Autozoom notelines improvement?
