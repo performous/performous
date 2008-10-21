@@ -26,6 +26,7 @@ void CScreenSing::enter() {
 	m_notebarfs.reset(new Texture(sm->getThemePathFile("notebarfs.svg")));
 	m_notebarfs_hl.reset(new Texture(sm->getThemePathFile("notebarfs-hl.png")));
 	m_pause_icon.reset(new Surface(sm->getThemePathFile("sing_pause.svg")));
+	m_player_icon.reset(new Surface(sm->getThemePathFile("sing_pbox.svg")));
 	m_notebargold.reset(new Texture(sm->getThemePathFile("notebargold.svg")));
 	m_notebargold_hl.reset(new Texture(sm->getThemePathFile("notebargold.png")));
 	m_progress.reset(new ProgressBar(sm->getThemePathFile("sing_progressbg.svg"), sm->getThemePathFile("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01, 0.01, true));
@@ -49,6 +50,7 @@ void CScreenSing::exit() {
 	m_notebargold_hl.reset();
 	m_notebargold.reset();
 	m_pause_icon.reset();
+	m_player_icon.reset();
 	m_notebarfs_hl.reset();
 	m_notebarfs.reset();
 	m_notebar_hl.reset();
@@ -161,17 +163,20 @@ void CScreenSing::draw() {
 	std::list<Player> players = m_engine->getPlayers();
 	// Score display
 	{
-		for (std::list<Player>::const_iterator p = players.begin(); p != players.end(); ++p) {
+		unsigned int i = 0;
+		for (std::list<Player>::const_iterator p = players.begin(); p != players.end(); ++p, ++i) {
 			float act = p->activity();
 			if (act == 0.0f) continue;
-			if (act < 1.0f) glColor4f(1.0, 1.0, 1.0, act);
-			Surface const* scorebox;
+			glColor4f(p->m_color.r, p->m_color.g, p->m_color.b,act);
+			m_player_icon->dimensions.middle(-0.25 + 0.20 * i).fixedWidth(0.075).screenTop(0.055);
+			m_player_icon->draw();
 			SvgTxtTheme* scoretxt;
-			if (p == players.begin()) { scorebox = theme->p1box.get(); scoretxt = theme->score1.get(); }
-			else { scorebox = theme->p2box.get(); scoretxt = theme->score2.get(); }
-			scorebox->draw();
+			if (p == players.begin())
+				scoretxt = theme->score1.get();
+			else
+				scoretxt = theme->score2.get();
 			scoretxt->draw((boost::format("%04d") % p->getScore()).str());
-			if (act < 1.0f) glColor4f(1.0, 1.0, 1.0, 1.0);
+			glColor4f(1.0, 1.0, 1.0, 1.0);
 		}
 	}
 	if (m_notealpha <= 0.0f) {
@@ -315,7 +320,7 @@ void CScreenSing::draw() {
 	}
 	m_progress->draw(songPercent);
 	theme->timer->draw((boost::format("%02u:%02u") % (unsigned(time) / 60) % (unsigned(time) % 60)).str());
-
+	
 	if( sm->getAudio()->isPaused() ) {
 		m_pause_icon->dimensions.middle().center().fixedWidth(.25);
 		m_pause_icon->draw();
