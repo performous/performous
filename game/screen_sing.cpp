@@ -357,9 +357,9 @@ void ScoreWindow::draw() {
 		glColor3f(p->m_color.r, p->m_color.g, p->m_color.b);
 		m_scoreBar.dimensions.middle(-0.25 + 0.15 * i).bottom(0.25);
 		m_scoreBar.draw(score / 10000.0);
-		glColor3f(1.0f, 1.0f, 1.0f);
 		// FIXME: m_score_text.dimensions.middle(-0.25 + 0.15 * i).top(0.25);
 		m_score_text.draw(boost::lexical_cast<std::string>(score));
+		glColor3f(1.0f, 1.0f, 1.0f);
 	}
 	m_score_rank.draw(m_rank);
 }
