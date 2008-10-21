@@ -22,7 +22,10 @@ CThemePractice::CThemePractice() {
 
 CThemeSing::CThemeSing() {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
-	bg.reset(new Surface(sm->getThemePathFile("sing_bg.svg")));
+	bg_top.reset(new Surface(sm->getThemePathFile("sing_bg_top.svg")));
+	bg_top->dimensions.fixedWidth(1.0).screenTop();
+	bg_bottom.reset(new Surface(sm->getThemePathFile("sing_bg_bottom.svg")));
+	bg_bottom->dimensions.fixedWidth(1.0).screenBottom();
 	lyrics_now.reset(new SvgTxtTheme(sm->getThemePathFile("sing_lyricscurrent.svg"),SvgTxtTheme::CENTER));
 	lyrics_now->setHighlight(sm->getThemePathFile("sing_lyricshighlight.svg"));
 	lyrics_next.reset(new SvgTxtTheme(sm->getThemePathFile("sing_lyricsnext.svg"),SvgTxtTheme::CENTER));

@@ -24,7 +24,8 @@ struct CThemePractice: boost::noncopyable {
 
 struct CThemeSing: boost::noncopyable {
 	CThemeSing();
-	boost::scoped_ptr<Surface> bg;
+	boost::scoped_ptr<Surface> bg_top;
+	boost::scoped_ptr<Surface> bg_bottom;
 	boost::scoped_ptr<SvgTxtTheme> lyrics_now;
 	boost::scoped_ptr<SvgTxtTheme> lyrics_next;
 	boost::scoped_ptr<SvgTxtTheme> timer;

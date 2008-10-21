@@ -133,7 +133,8 @@ void CScreenSing::draw() {
 	// Rendering starts
 	if (m_background) m_background->draw();
 	if (m_video) m_video->render(time - song.videoGap);
-	theme->bg->draw();
+	theme->bg_top->draw();
+	theme->bg_bottom->draw();
 	// Compute and draw the timer and the progressbar
 	const double baseLine = -0.2;
 	const double pixUnit = 0.2;
@@ -172,10 +173,10 @@ void CScreenSing::draw() {
 			float act = p->activity();
 			if (act == 0.0f) continue;
 			glColor4f(p->m_color.r, p->m_color.g, p->m_color.b,act);
-			m_player_icon->dimensions.left(-0.5 + 0.25 * i).fixedWidth(0.075).screenTop(0.055);
+			m_player_icon->dimensions.left(-0.5 + 0.01 + 0.25 * i).fixedWidth(0.075).screenTop(0.055);
 			m_player_icon->draw();
 			m_score_text[i%2]->render((boost::format("%04d") % p->getScore()).str());
-			m_score_text[i%2]->surface()->dimensions.middle(-0.350 + 0.25 * i).fixedHeight(0.075).screenTop(0.055);
+			m_score_text[i%2]->surface()->dimensions.middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.075).screenTop(0.055);
 			m_score_text[i%2]->draw();
 			glColor4f(1.0, 1.0, 1.0, 1.0);
 		}
