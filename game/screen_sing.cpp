@@ -124,7 +124,6 @@ void CScreenSing::draw() {
 	double time = sm->getAudio()->getPosition() + 0.02; // Compensate avg. lag to display
 	time = std::max(0.0, time + playOffset);
 	double songPercent = time / sm->getAudio()->getLength();
-	if (!sm->getAudio()->isPlaying() || (m_songit == song.notes.end() && sm->getAudio()->getLength() - time < 10.0)) m_score_window.reset(new ScoreWindow(sm, *m_engine));
 	// Rendering starts
 	if (m_background) m_background->draw();
 	if (m_video) m_video->render(time - song.videoGap);
@@ -323,11 +322,12 @@ void CScreenSing::draw() {
 	}
 
 	if (m_score_window.get()) m_score_window->draw();
+	else if (!sm->getAudio()->isPlaying() || (m_songit == song.notes.end() && sm->getAudio()->getLength() - time < 10.0)) m_score_window.reset(new ScoreWindow(sm, *m_engine));
 }
 
 ScoreWindow::ScoreWindow(CScreenManager const* sm, Engine const& e):
   m_bg(sm->getThemePathFile("score_window.svg")),
-  m_scoreBar(sm->getThemePathFile("sing_progressbg.svg"), sm->getThemePathFile("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01, 0.01, true),
+  m_scoreBar(sm->getThemePathFile("score_bar_bg.svg"), sm->getThemePathFile("score_bar_fg.svg"), ProgressBar::VERTICAL, 0.0, 0.0, false),
   m_score_text(sm->getThemePathFile("score_txt.svg"), SvgTxtTheme::CENTER),
   m_score_rank(sm->getThemePathFile("score_rank.svg"), SvgTxtTheme::CENTER),
   m_players(e.getPlayers())
@@ -339,22 +339,28 @@ ScoreWindow::ScoreWindow(CScreenManager const* sm, Engine const& e):
 		if (score > topScore) topScore = score;
 		++p;
 	}
+	if (m_players.empty()) m_rank = "No singer!";
+	else if (topScore > 8000) m_rank = "Hit singer";
+	else if (topScore > 6000) m_rank = "Lead singer";
+	else if (topScore > 4000) m_rank = "Rising star";
+	else if (topScore > 2000) m_rank = "Amateur";
+	else m_rank = "Tone deaf";
 	m_bg.dimensions.middle().center();
+	m_scoreBar.dimensions.fixedWidth(0.1);
 }
 
 void ScoreWindow::draw() {
 	m_bg.draw();
-	for (std::list<Player>::const_iterator p = m_players.begin(); p != m_players.end(); ++p) {
+	unsigned i = 0;
+	for (std::list<Player>::const_iterator p = m_players.begin(); p != m_players.end(); ++p, ++i) {
 		int score = p->getScore();
-		std::string rank;
-		if (score > 8000) rank = "Hit singer";
-		else if (score > 6000) rank = "Lead singer";
-		else if (score > 4000) rank = "Rising star";
-		else if (score > 2000) rank = "Amateur";
-		else rank = "Tone deaf";
-		//double scorePercent = score / 10000.0;
-		m_score_rank.draw(rank);
+		glColor3f(p->m_color.r, p->m_color.g, p->m_color.b);
+		m_scoreBar.dimensions.middle(-0.25 + 0.15 * i).bottom(0.25);
+		m_scoreBar.draw(score / 10000.0);
+		glColor3f(1.0f, 1.0f, 1.0f);
+		// FIXME: m_score_text.dimensions.middle(-0.25 + 0.15 * i).top(0.25);
 		m_score_text.draw(boost::lexical_cast<std::string>(score));
 	}
+	m_score_rank.draw(m_rank);
 }
 

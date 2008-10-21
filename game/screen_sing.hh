@@ -23,6 +23,7 @@ class ScoreWindow {
 	SvgTxtTheme m_score_text;
 	SvgTxtTheme m_score_rank;
 	std::list<Player> m_players;
+	std::string m_rank;
 };
 
 class CScreenSing: public CScreen {
