@@ -17,4 +17,4 @@ Singing screen
 Build
   - Make Ubuntu packages (Hardy and Intrepid, i386 and amd64)
   - Make Gentoo package
-  - Make launcher script that set libda plugin dir and theme dir
+

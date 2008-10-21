@@ -25,11 +25,28 @@ IF(NOT CMAKE_BUILD_TYPE)
 ENDIF(NOT CMAKE_BUILD_TYPE)
 
 
-set(INSTALL_LIBRARY_DIR ${CMAKE_INSTALL_PREFIX}/lib/ CACHE PATH "Library installation directory")
-set(SHARE_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX}/share/performous/ CACHE PATH "Data file installation directory")
+set(INSTALL_LIBRARY_DIR ${CMAKE_INSTALL_PREFIX}/lib)
+set(SHARE_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX}/share/performous)
 
 add_subdirectory(libda)
 add_subdirectory(themes)
 add_subdirectory(data)
 add_subdirectory(game)
+
+if("${CMAKE_INSTALL_PREFIX}" STREQUAL "/usr/local")
+	set(STDPREFIX 1)
+endif("${CMAKE_INSTALL_PREFIX}" STREQUAL "/usr/local")
+
+if("${CMAKE_INSTALL_PREFIX}" STREQUAL "/usr")
+	set(STDPREFIX 1)
+endif("${CMAKE_INSTALL_PREFIX}" STREQUAL "/usr")
+
+if(NOT STDPREFIX)
+	set(PERFORMOUS_THEME_PATH "${SHARE_INSTALL_PREFIX}/themes")
+	set(PERFORMOUS_PLUGIN_PATH "${INSTALL_LIBRARY_DIR}/libda")
+	set(PERFORMOUS_EXECUTABLE "${CMAKE_INSTALL_PREFIX}/bin/performous")
+	configure_file("${PROJECT_SOURCE_DIR}/cmake/performous.sh.cmake" "${PROJECT_BINARY_DIR}/performous.sh" ESCAPE_QUOTES @ONLY)
+	install(PROGRAMS ${PROJECT_BINARY_DIR}/performous.sh DESTINATION bin)
+	install(SCRIPT "${PROJECT_SOURCE_DIR}/cmake/performous-launcher.cmake")
+endif(NOT STDPREFIX)
 
