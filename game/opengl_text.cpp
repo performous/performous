@@ -40,8 +40,8 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL& _text) {
 		pango_layout_set_text (layout, _text.text.c_str(), -1);
 		PangoRectangle rec1, rec2;
 		pango_layout_get_pixel_extents (layout,&rec1,&rec2);
-		m_x = rec2.width;
-		m_y = rec2.height;
+		m_x = rec2.width + 2 * _text.stroke_width;
+		m_y = rec2.height + 2 * _text.stroke_width;
 		m_x_advance = rec1.x;
 		m_y_advance = rec1.y;
 		g_object_unref (layout);
