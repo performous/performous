@@ -26,8 +26,6 @@ CThemeSing::CThemeSing() {
 	lyrics_now.reset(new SvgTxtTheme(sm->getThemePathFile("sing_lyricscurrent.svg"),SvgTxtTheme::CENTER));
 	lyrics_now->setHighlight(sm->getThemePathFile("sing_lyricshighlight.svg"));
 	lyrics_next.reset(new SvgTxtTheme(sm->getThemePathFile("sing_lyricsnext.svg"),SvgTxtTheme::CENTER));
-	score1.reset(new SvgTxtTheme(sm->getThemePathFile("sing_p1score.svg")));
-	score2.reset(new SvgTxtTheme(sm->getThemePathFile("sing_p2score.svg")));
 	timer.reset(new SvgTxtTheme(sm->getThemePathFile("sing_timetxt.svg"),SvgTxtTheme::CENTER,SvgTxtTheme::TOP));
 }
 

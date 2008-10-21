@@ -38,16 +38,34 @@ class OpenGLText {
   public:
 	OpenGLText(TThemeTxtOpenGL &_text);
 	void draw(Dimensions &_dim, TexCoords &_tex);
+	void draw();
 	double x() {return m_x;};
 	double y() {return m_y;};
 	double x_advance() {return m_x_advance;};
 	double y_advance() {return m_y_advance;};
+	Surface *surface() {return m_surface.get();};
   private:
 	double m_x;
 	double m_y;
 	double m_x_advance;
 	double m_y_advance;
 	boost::scoped_ptr<Surface> m_surface;
+};
+
+class SvgTxtThemeSimple {
+  public:
+  	SvgTxtThemeSimple(std::string _theme_file);
+	Surface *surface() {return m_opengl_text->surface();};
+	void render(std::string _text);
+	void draw();
+  private:
+  	boost::scoped_ptr<OpenGLText> m_opengl_text;
+	std::string m_cache_text;
+	TThemeTxtOpenGL m_text;
+	double m_x;
+	double m_y;
+	double m_width;
+	double m_height;
 };
 
 // Gravity:
@@ -101,7 +119,6 @@ class SvgTxtTheme {
 	void setFitting(Fitting _f) {m_fitting=_f;};
 	void setHighlight(std::string _theme_file);
   private:
-	void parseTheme(std::string file, TThemeTxtOpenGL& theme, double& width, double& height, double& x, double& y);
   	boost::scoped_ptr<OpenGLText> m_opengl_text[50];
 	Gravity m_gravity;
 	Fitting m_fitting;

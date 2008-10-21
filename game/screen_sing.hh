@@ -20,7 +20,7 @@ class ScoreWindow {
   private:
 	Surface m_bg;
 	ProgressBar m_scoreBar;
-	SvgTxtTheme m_score_text;
+	SvgTxtThemeSimple m_score_text;
 	SvgTxtTheme m_score_rank;
 	std::list<Player> m_players;
 	std::string m_rank;
@@ -43,6 +43,7 @@ class CScreenSing: public CScreen {
 	boost::scoped_ptr<Video> m_video;
 	boost::scoped_ptr<Surface> m_pause_icon;
 	boost::scoped_ptr<Surface> m_player_icon;
+	boost::scoped_ptr<SvgTxtThemeSimple> m_score_text[2];
 	boost::scoped_ptr<Texture> m_notelines;
 	boost::scoped_ptr<Texture> m_wave;
 	boost::scoped_ptr<Texture> m_notebar;

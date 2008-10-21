@@ -83,13 +83,17 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL& _text) {
 	pango_font_description_free(desc);
 }
 
+void OpenGLText::draw() {
+	m_surface->draw();
+}
+
 void OpenGLText::draw(Dimensions &_dim, TexCoords &_tex) {
 	m_surface->dimensions = _dim;
 	m_surface->tex = _tex;
 	m_surface->draw();
 }
 
-void SvgTxtTheme::parseTheme( std::string _theme_file, TThemeTxtOpenGL &_theme, double &_width, double &_height, double &_x, double &_y ) {
+void parseTheme( std::string _theme_file, TThemeTxtOpenGL &_theme, double &_width, double &_height, double &_x, double &_y ) {
 	// this should stay here for the moment
 	_theme.fontalign = "center";
 
@@ -134,6 +138,21 @@ void SvgTxtTheme::parseTheme( std::string _theme_file, TThemeTxtOpenGL &_theme, 
 	if (n.empty()) throw std::runtime_error("Unable to find text theme info y in "+_theme_file);
 	xmlpp::Attribute& y = dynamic_cast<xmlpp::Attribute&>(*n[0]);
 	_y = boost::lexical_cast<double>(y.get_value());
+}
+
+SvgTxtThemeSimple::SvgTxtThemeSimple(std::string _theme_file) : m_cache_text("XXX FIXME: Use something else. This text must never appear in lyrics!") {
+	parseTheme(_theme_file, m_text, m_width, m_height, m_x, m_y);
+};
+
+void SvgTxtThemeSimple::render(std::string _text) {
+	if (m_cache_text != _text) {
+		m_cache_text = _text;
+		m_text.text = _text;
+		m_opengl_text.reset(new OpenGLText(m_text));
+	}
+}
+void SvgTxtThemeSimple::draw() {
+	m_opengl_text->draw();
 }
 
 void SvgTxtTheme::setHighlight(std::string _theme_file) {

@@ -26,6 +26,8 @@ void CScreenSing::enter() {
 	m_notebarfs.reset(new Texture(sm->getThemePathFile("notebarfs.svg")));
 	m_notebarfs_hl.reset(new Texture(sm->getThemePathFile("notebarfs-hl.png")));
 	m_pause_icon.reset(new Surface(sm->getThemePathFile("sing_pause.svg")));
+	m_score_text[0].reset(new SvgTxtThemeSimple(sm->getThemePathFile("sing_score_text.svg")));
+	m_score_text[1].reset(new SvgTxtThemeSimple(sm->getThemePathFile("sing_score_text.svg")));
 	m_player_icon.reset(new Surface(sm->getThemePathFile("sing_pbox.svg")));
 	m_notebargold.reset(new Texture(sm->getThemePathFile("notebargold.svg")));
 	m_notebargold_hl.reset(new Texture(sm->getThemePathFile("notebargold.png")));
@@ -59,6 +61,8 @@ void CScreenSing::exit() {
 	m_wave.reset();
 	m_video.reset();
 	m_background.reset();
+	m_score_text[0].reset();
+	m_score_text[1].reset();
 	theme.reset();
 }
 
@@ -170,12 +174,9 @@ void CScreenSing::draw() {
 			glColor4f(p->m_color.r, p->m_color.g, p->m_color.b,act);
 			m_player_icon->dimensions.left(-0.5 + 0.25 * i).fixedWidth(0.075).screenTop(0.055);
 			m_player_icon->draw();
-			SvgTxtTheme* scoretxt;
-			if (p == players.begin())
-				scoretxt = theme->score1.get();
-			else
-				scoretxt = theme->score2.get();
-			scoretxt->draw((boost::format("%04d") % p->getScore()).str());
+			m_score_text[i%2]->render((boost::format("%04d") % p->getScore()).str());
+			m_score_text[i%2]->surface()->dimensions.middle(-0.350 + 0.25 * i).fixedHeight(0.075).screenTop(0.055);
+			m_score_text[i%2]->draw();
 			glColor4f(1.0, 1.0, 1.0, 1.0);
 		}
 	}
@@ -333,7 +334,7 @@ void CScreenSing::draw() {
 ScoreWindow::ScoreWindow(CScreenManager const* sm, Engine const& e):
   m_bg(sm->getThemePathFile("score_window.svg")),
   m_scoreBar(sm->getThemePathFile("score_bar_bg.svg"), sm->getThemePathFile("score_bar_fg.svg"), ProgressBar::VERTICAL, 0.0, 0.0, false),
-  m_score_text(sm->getThemePathFile("score_txt.svg"), SvgTxtTheme::CENTER),
+  m_score_text(sm->getThemePathFile("score_txt.svg")),
   m_score_rank(sm->getThemePathFile("score_rank.svg"), SvgTxtTheme::CENTER),
   m_players(e.getPlayers())
 {
@@ -362,8 +363,9 @@ void ScoreWindow::draw() {
 		glColor3f(p->m_color.r, p->m_color.g, p->m_color.b);
 		m_scoreBar.dimensions.middle(-0.25 + 0.15 * i).bottom(0.25);
 		m_scoreBar.draw(score / 10000.0);
-		// FIXME: m_score_text.dimensions.middle(-0.25 + 0.15 * i).top(0.25);
-		m_score_text.draw(boost::lexical_cast<std::string>(score));
+		m_score_text.render(boost::lexical_cast<std::string>(score));
+		m_score_text.surface()->dimensions.middle(-0.25 + 0.15 * i).top(0.25).fixedHeight(0.05);
+		m_score_text.draw();
 		glColor3f(1.0f, 1.0f, 1.0f);
 	}
 	m_score_rank.draw(m_rank);
