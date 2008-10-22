@@ -1,3 +1,7 @@
+GNU GPLv2 or later. Some parts of the project may have more liberal licenses.
+See Authors.txt for information on copyright holders and licenses of specific
+parts.
+
 		    GNU GENERAL PUBLIC LICENSE
 		       Version 2, June 1991
 
