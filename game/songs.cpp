@@ -1,7 +1,6 @@
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
-#include <glob.h>
 #include "songs.hh"
 #include "screen.hh"
 #include "xtime.hh"
@@ -365,35 +364,46 @@ void Songs::reload_internal() {
 		boost::mutex::scoped_lock l(m_mutex);
 		m_songs.clear();
 		m_dirty = true;
-	}	
+	}
 	for (std::set<std::string>::const_iterator it = m_songdirs.begin(); it != m_songdirs.end(); ++it) {
-		glob_t _glob;
-		std::string pattern = *it + "*/*.[tT][xX][tT]";
-		std::cout << ">>> Scanning " << *it << ": " << std::flush;
-		glob (pattern.c_str(), GLOB_NOSORT, NULL, &_glob);
-		std::cout << _glob.gl_pathc << " song files found." << std::endl;
-		for (unsigned int i = 0 ; i < _glob.gl_pathc ; i++) {
-			char* txtfilename = strrchr(_glob.gl_pathv[i],'/'); txtfilename[0] = '\0'; txtfilename++;
-			std::string path = _glob.gl_pathv[i];
-			std::string::size_type pos = path.rfind('/');
-			if (pos < path.size() - 1) pos += 1; else pos = 0;
-			std::cout << "\r  " << std::setiosflags(std::ios::left) << std::setw(70) << path.substr(pos, 70) << "\x1B[K" << std::flush;
+		if (!boost::filesystem::is_directory(*it)) { std::cout << ">>> Not scanning: " << *it << " (no such directory)" << std::endl; continue; }
+		std::cout << ">>> Scanning " << *it << std::endl;
+		size_t count = m_songs.size();
+		reload_internal(*it);
+		size_t diff = m_songs.size() - count;
+		if (diff > 0) std::cout << diff << " songs loaded" << std::endl;
+	}
+	m_loading = false;
+	m_dirty = true;  // Force shuffle
+}
+
+void Songs::reload_internal(boost::filesystem::path const& parent) {
+	namespace fs = boost::filesystem;
+	if (std::distance(parent.begin(), parent.end()) > 20) { std::cout << ">>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)" << std::endl; return; }
+	try {
+		for (fs::directory_iterator dirIt(parent), dirEnd; dirIt != dirEnd; ++dirIt) {
+			fs::path p = dirIt->path();
+			if (fs::is_directory(p)) { reload_internal(p); continue; }
+			std::string name = p.leaf(); // File basename (notes.txt)
+			std::string path = p.directory_string(); // Path without filename
+			path.erase(path.size() - name.size());
+			if (name.size() < 5 || name.substr(name.size() - 4) != ".txt") continue;
+			std::cout << "\r  " << std::setiosflags(std::ios::left) << std::setw(70) << path.substr(0, 70) << " \x1B[K" << std::flush;
 			try {
-				Song* s = new Song(path + "/", txtfilename);
+				Song* s = new Song(path, name);
 				boost::mutex::scoped_lock l(m_mutex);
 				m_songs.push_back(boost::shared_ptr<Song>(s));
 				m_dirty = true;
 			} catch (SongParser::Exception& e) {
-				std::cout << "FAIL\n    " << txtfilename;
+				std::cout << "FAIL\n    " << name;
 				if (e.line()) std::cout << " line " << e.line();
 				std::cout << ": " << e.what() << std::endl;
 			}
 		}
-		std::cout << "\r\x1B[K" << std::flush;
-		globfree(&_glob);
+	} catch (std::exception const& e) {
+		std::cout << "Error accessing " << parent << std::endl;
 	}
-	m_loading = false;
-	m_dirty = true;  // Force shuffle
+	std::cout << "\r\x1B[K" << std::flush;
 }
 
 // Make std::find work with shared_ptrs and regular pointers

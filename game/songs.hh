@@ -1,6 +1,7 @@
 #ifndef __SONGS_H__
 #define __SONGS_H__
 
+#include <boost/filesystem.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -134,7 +135,9 @@ class Songs: boost::noncopyable {
 	int size() const { return m_filtered.size(); };
 	int empty() const { return m_filtered.empty(); };
 	void advance(int diff) {
-		int _current = (int(math_cover.getTarget()) + diff) % int(m_filtered.size());
+		// FIXME: This is a quick fix to avoid divide by zero, but should check what really needs to be done here...
+		int size = m_filtered.size();
+		int _current = size ? (int(math_cover.getTarget()) + diff) % size : 0;
 		if (_current < 0) _current += m_filtered.size();
 		math_cover.setTarget(_current,this->size());
 	}
@@ -158,6 +161,7 @@ class Songs: boost::noncopyable {
 	std::string m_filter;
 	int m_order;
 	void reload_internal();
+	void reload_internal(boost::filesystem::path const& p);
 	void filter_internal();
 	void sort_internal();
 	volatile bool m_dirty;
