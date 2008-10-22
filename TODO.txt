@@ -27,7 +27,6 @@ Fixes/Enhancement:
 - Cross-fading in song browser
 - Difficulty setting for hiding pitch graph (won't affect scoring)
 - More animation and eyecandy in UI
-- New menu background music (keep moimoimoi in practice)
 
 
 Ripper

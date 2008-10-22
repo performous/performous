@@ -6,6 +6,7 @@ CScreenPractice::CScreenPractice(std::string const& name, boost::ptr_vector<Anal
 
 void CScreenPractice::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
+	sm->getAudio()->playMusic(sm->getThemePathFile("practice.ogg"));
 	theme.reset(new CThemePractice());
 	for (unsigned int i = 0; i < m_analyzers.size(); ++i) {
 		ProgressBar* b;

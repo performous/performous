@@ -48,8 +48,11 @@ GUEST DEVELOPERS
 These guys have provided some important part for the game, but have never been
 directly involved in the project.
 
+Tryad <http://tryad.org/>
+	* The menu song (CC-by-sa 2.5)
+
 Oxetti choir <http://www.oxetti.info/>
-    * Menu background vocalization
+    * Practice background vocalization (recorded for this project)
 
 Joonas Kerttula / Frets on Fire <http://fretsonfire.sourceforge.net/>
 	* SVGs borrowed from FoF under GNU GPL :)
