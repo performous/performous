@@ -1,0 +1,56 @@
+To install from SVN:
+
+	# Checkout the svn
+	svn co https://ultrastar-ng.svn.sourceforge.net/svnroot/ultrastar-ng/trunk/ Performous
+	# Create separate build folder under trunk to avoid polluting the source three
+	mkdir Performous/build
+	cd Performous/build
+	# Configure and build with CMake
+	cmake ..
+	make
+	# Install into system prefix /usr/local/
+	sudo make install
+	# Run the game
+	performous
+	
+	# Should you need to change building settings (e.g. installation prefix)
+	ccmake .
+	
+Dependencies:
+
+	- Boost : threads, parsers/conversions, pointer containers, ...
+
+	- SDL : window management and input
+
+	- FFMpeg : A/V decoding
+	
+	- Cairo >= 1.2 : scalable graphical support
+	- librsvg : svg rendering (themes)
+
+	- libxml++ : XML parser, used for themes etc.
+	
+	- One or more of the following for audio capture and playback
+		* ALSA
+		* GStreamer
+		* JACK
+		* PortAudio v18 or v19
+		* Pulseaudio
+
+	Please refer to http://performous.org/develop.html for packages to install.
+	
+
+You can find songs online by Google or at your favorite Torrent sites. We
+recommend starting with the ultrastar-songs package that can be download from
+our project website. You need to extract that tarball into ~/.ultrastar/ or to
+one of the other folders that the game searches songs for. Run ultrastar from
+a terminal to see the list of folders.
+
+If your songs are not in UTF-8 (most songs aren't yet), please do:
+	recode CP1252..UTF-8 songs/*/*.txt
+
+After that make sure that all the characters display correctly. If they don't,
+you need to guess which charset the original used (instead of CP1252) and retry.
+
+If you want to improve the game, join our IRC channel #Performous (Freenode) and
+you'll get SVN write access.
+

@@ -1,0 +1,81 @@
+ACTIVE DEVELOPERS
+-----------------
+
+Vincent Le Ligeour  <yoda-jm at users.sourceforge.net>
+	* Original author
+	* Core developer
+
+Lasse Kärkkäinen  <tronic+ndrm at trn.iki.fi>
+	* Core developer
+	* FFT/Analyzer, LibDA and a lot of other things
+
+Topnob <topnob at users.sourceforge.net>
+	* Non-power-of-two texture loading on older hardware
+	* Many other fixes
+	* SVG design (tux theme)
+
+Jack_MD <jack-md at users.sourceforge.net>
+	* OSX build fixes and testing
+
+zarrn <zarrn at users.sourceforge.net>
+	* OSX build fixes and testing
+
+knittl <knittl at users.sourceforge.net>
+	* SVG design
+
+dex7 <dex7 at users.sourceforge.net>
+	* Website layout
+
+	
+INACTIVE DEVELOPERS
+-------------------
+
+No commits for a long time, but their stuff is still used.
+
+Stefan Kristiansson  <stekern at users.sourceforge.net>
+	* Core developer
+
+jEsuSdA  <info at jesusda.com>
+	* SVG design (the original lima theme)
+
+Tobias Gehrig <tgehrig at users.sourceforge.net>
+	* Pre-calculate FFT window patch
+
+
+GUEST DEVELOPERS
+----------------
+
+These guys have provided some important part for the game, but have never been
+directly involved in the project.
+
+Oxetti choir <http://www.oxetti.info/>
+    * Menu background vocalization
+
+Joonas Kerttula / Frets on Fire <http://fretsonfire.sourceforge.net/>
+	* SVGs borrowed from FoF under GNU GPL :)
+
+
+PAST DEVELOPERS
+---------------
+
+Cool guys who have contributed to the project in the past, but whose
+contributions have been superceded and are no longer part of the distribution.
+
+Jami Pekkanen  <jami.pekkanen at ateco.fi>
+	* Cairotosdl and pitchgraph class
+
+Sebastian Sproesser  <sebastian at sproesser.org>
+	* Background management
+	* Song sync improvement
+	* Current position in the track
+
+Matias Holte  <matiasholte at users.sourceforge.net>
+	* Screen sing propositions and patchs
+
+Ignacio Casal Quinteiro  <nacho.resa at gmail.com>
+	* GStreamer implementation
+
+Sylvain Henry <hsyl20 at yahoo.fr>
+	* Long sentence display patch
+
+
