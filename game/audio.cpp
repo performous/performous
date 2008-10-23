@@ -93,22 +93,24 @@ void CAudio::setVolume_internal(unsigned int volume) {
 }
 
 void CAudio::playMusic_internal(std::string const& filename) {
-	setVolume_internal(m_volumeMusic);
+	setVolume_internal(0);
 	length = LENGTH_ERROR;
 	m_mpeg.reset(new CFfmpeg(false, true, filename, m_rs.rate()));
 	if (m_mpeg->duration() < 0) return;
 	length = 1e3 * m_mpeg->duration();
 	ffmpeg_paused = false;
+	setVolume_internal(m_volumeMusic);
 }
 
 void CAudio::playPreview_internal(std::string const& filename) {
-	setVolume_internal(m_volumePreview);
+	setVolume_internal(0);
 	length = LENGTH_ERROR;
 	m_mpeg.reset(new CFfmpeg(false, true, filename, m_rs.rate()));
 	m_mpeg->seek(30.0);
 	if (m_mpeg->duration() < 0) return;
 	length = 1e3 * m_mpeg->duration();
 	ffmpeg_paused = false;
+	setVolume_internal(m_volumePreview);
 }
 
 double CAudio::getLength_internal() {
