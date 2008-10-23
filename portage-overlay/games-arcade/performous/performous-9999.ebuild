@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /cvsroot/ultrastar-ng/UltraStar-ng/portage-overlay/games-arcade/performous/performous-9999.ebuild,v 1.10 2007/09/29 13:04:19 yoda-jm Exp $
 
-inherit games subversion
+inherit games subversion cmake-utils
 
 RESTRICT="nostrip"
 
@@ -24,7 +24,7 @@ LICENSE="GPL-2
 SLOT="0"
 KEYWORDS="~x86 ~amd64 ~ppc ~ppc64"
 
-IUSE="debug alsa portaudio pulseaudio jack songs"
+IUSE="debug alsa portaudio pulseaudio jack songs gstreamer"
 
 RDEPEND="gnome-base/librsvg
 	dev-libs/boost
@@ -68,6 +68,11 @@ src_compile() {
 	cmake \
 		-DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
 		-DCMAKE_INSTALL_PREFIX="${GAMES_PREFIX}" \
+		$(cmake-utils_use_with alsa ALSA) \
+		$(cmake-utils_use_with jack JACK) \
+		$(cmake-utils_use_with pulseaudio PUSEAUDIO) \
+		$(cmake-utils_use_with portaudio PORTAUDIO) \
+		$(cmake-utils_use_with gstreamer GSTREAMER) \
 		. || die "cmake failed"
 	emake || die "emake failed"
 }
