@@ -14,6 +14,8 @@ set(CPACK_SOURCE_IGNORE_FILES
    "/songs/"
    "/build/"
    "/.svn/"
+   "/portage-overlay/"
+   "/themes/tux/"
 )
 set(CPACK_DEBIAN_PACKAGE_DEPENDS libsdl1.2 libsdl-image1.2 libcairo2 librsvg2 libasound2 libjack libboost-thread libboost-serialization libboost-program-options libboost-regex libboost-filesystem libavcodec libavformat libswscale libmagick++9 libsamplerate0 libpulse libxml++2.6)
 include(CPack)
