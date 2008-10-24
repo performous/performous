@@ -9,12 +9,13 @@ class Video {
   public:
 	Video(std::string const& videoFile);
 	void render(double time);
+	Dimensions& dimensions() { return m_surface.dimensions; }
+	Dimensions const& dimensions() const { return m_surface.dimensions; }
   private:
 	CFfmpeg m_mpeg;
 	VideoFrame m_videoFrame;
-	boost::scoped_ptr<Surface> m_surface;
+	Surface m_surface;
 	double m_surfaceTime;
-	double m_time;
 	double m_lastTime;
 	float m_alpha;
 };

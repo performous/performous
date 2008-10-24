@@ -11,7 +11,7 @@
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.0"
    width="1000"
-   height="186.73863"
+   height="230"
    id="svg3465"
    sodipodi:version="0.32"
    inkscape:version="0.46"
@@ -30,11 +30,11 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:cy="39.367766"
-     inkscape:cx="493.59809"
-     inkscape:zoom="1.0562001"
-     inkscape:window-height="801"
-     inkscape:window-width="1439"
+     inkscape:cy="93.369316"
+     inkscape:cx="498.16821"
+     inkscape:zoom="0.85529109"
+     inkscape:window-height="726"
+     inkscape:window-width="960"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      guidetolerance="10.0"
@@ -44,10 +44,16 @@
      bordercolor="#666666"
      pagecolor="#ffffff"
      id="base"
-     inkscape:window-x="0"
+     inkscape:window-x="179"
      inkscape:window-y="25"
      inkscape:current-layer="svg3465"
-     showgrid="false" />
+     showgrid="true">
+    <inkscape:grid
+       type="xygrid"
+       id="grid2392"
+       visible="true"
+       enabled="true" />
+  </sodipodi:namedview>
   <defs
      id="defs3467">
     <inkscape:perspective
@@ -73,11 +79,11 @@
        xlink:href="#linearGradient3667"
        id="linearGradient2549"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="scale(1.2504205,1.1424679)"
-       x1="365.07416"
-       y1="121.63737"
-       x2="365.07416"
-       y2="151.1951" />
+       gradientTransform="scale(1.2504205,1.5212915)"
+       x1="367.87625"
+       y1="131.46724"
+       x2="367.87625"
+       y2="151.18733" />
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient3667"
@@ -104,11 +110,11 @@
      style="fill:url(#linearGradient2549);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:17;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
      y="0"
      x="0"
-     height="172.72667"
+     height="230"
      width="1000.3364" />
   <g
      id="g10046"
-     transform="matrix(0.3236326,1.2078137,-1.2078137,0.3236326,297.36298,-198.26054)">
+     transform="matrix(0.3236326,1.2078137,-1.2078137,0.3236326,300.76337,-154.11351)">
     <path
        sodipodi:type="star"
        style="opacity:0.22790701;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#ffffff;stroke-width:1.70000005;stroke-linecap:round;stroke-linejoin:round;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:block;overflow:visible"

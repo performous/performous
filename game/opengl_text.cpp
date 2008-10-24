@@ -74,7 +74,7 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL& _text) {
 	cairo_restore(dc);
 	g_object_unref(layout);
 
-	m_surface.reset(new Surface(cairo_image_surface_get_width(surface), cairo_image_surface_get_height(surface), pix::INT_ARGB, cairo_image_surface_get_data(surface)));
+	m_surface.load(cairo_image_surface_get_width(surface), cairo_image_surface_get_height(surface), pix::INT_ARGB, cairo_image_surface_get_data(surface));
 
 	// delete surface
 	cairo_destroy(dc);
@@ -84,13 +84,13 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL& _text) {
 }
 
 void OpenGLText::draw() {
-	m_surface->draw();
+	m_surface.draw();
 }
 
 void OpenGLText::draw(Dimensions &_dim, TexCoords &_tex) {
-	m_surface->dimensions = _dim;
-	m_surface->tex = _tex;
-	m_surface->draw();
+	m_surface.dimensions = _dim;
+	m_surface.tex = _tex;
+	m_surface.draw();
 }
 
 void parseTheme( std::string _theme_file, TThemeTxtOpenGL &_theme, double &_width, double &_height, double &_x, double &_y ) {

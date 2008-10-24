@@ -112,10 +112,6 @@ template <typename T> void loader(T& target, std::string const& filename) {
 Texture::Texture(std::string const& filename) { loader(*this, filename); }
 Surface::Surface(std::string const& filename) { loader(*this, filename); }
 
-Surface::Surface(unsigned int width, unsigned int height, pix::Format format, unsigned char const* buffer) {
-	load(width, height, format, buffer);
-}
-
 // Stuff for converting pix::Format into OpenGL enum values
 namespace {
 	struct PixFmt {

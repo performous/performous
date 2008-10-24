@@ -126,7 +126,7 @@ class Surface {
   public:
   	Dimensions dimensions;
 	TexCoords tex;
-	Surface(unsigned width, unsigned height, pix::Format format, unsigned char const* buffer);
+	Surface(): m_width(0), m_height(0) {}
 	Surface(cairo_surface_t* _surf);
 	Surface(std::string const& filename);
 	void draw() const;

@@ -43,21 +43,21 @@ class OpenGLText {
 	double y() {return m_y;};
 	double x_advance() {return m_x_advance;};
 	double y_advance() {return m_y_advance;};
-	Surface *surface() {return m_surface.get();};
+	Dimensions& dimensions() { return m_surface.dimensions; }
   private:
 	double m_x;
 	double m_y;
 	double m_x_advance;
 	double m_y_advance;
-	boost::scoped_ptr<Surface> m_surface;
+	Surface m_surface;
 };
 
 class SvgTxtThemeSimple {
   public:
   	SvgTxtThemeSimple(std::string _theme_file);
-	Surface *surface() {return m_opengl_text->surface();};
 	void render(std::string _text);
 	void draw();
+	Dimensions& dimensions() { return m_opengl_text->dimensions(); }
   private:
   	boost::scoped_ptr<OpenGLText> m_opengl_text;
 	std::string m_cache_text;

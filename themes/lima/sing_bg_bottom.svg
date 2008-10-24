@@ -11,7 +11,7 @@
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.0"
    width="1000"
-   height="235.21001"
+   height="230"
    id="svg3465"
    sodipodi:version="0.32"
    inkscape:version="0.46"
@@ -30,11 +30,11 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:cy="161.18683"
-     inkscape:cx="493.59809"
-     inkscape:zoom="1.0562001"
-     inkscape:window-height="801"
-     inkscape:window-width="1439"
+     inkscape:cy="115"
+     inkscape:cx="500"
+     inkscape:zoom="0.859"
+     inkscape:window-height="726"
+     inkscape:window-width="960"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      guidetolerance="10.0"
@@ -44,10 +44,16 @@
      bordercolor="#666666"
      pagecolor="#ffffff"
      id="base"
-     inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:window-x="155"
+     inkscape:window-y="63"
      inkscape:current-layer="svg3465"
-     showgrid="false" />
+     showgrid="true">
+    <inkscape:grid
+       type="xygrid"
+       id="grid2419"
+       visible="true"
+       enabled="true" />
+  </sodipodi:namedview>
   <defs
      id="defs3467">
     <inkscape:perspective
@@ -93,19 +99,19 @@
        xlink:href="#linearGradient3667"
        id="linearGradient3212"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(1.2504205,0,0,1.1424679,0,-235.20553)"
-       x1="365.07416"
-       y1="121.63737"
-       x2="365.07416"
-       y2="151.1951" />
+       gradientTransform="matrix(1.25042,0,0,1.5212915,-9.8590088e-8,-230.00001)"
+       x1="367.8764"
+       y1="131.46725"
+       x2="367.8764"
+       y2="151.18733" />
   </defs>
   <rect
      id="rect3210"
      style="fill:url(#linearGradient3212);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:17;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     y="-235.20552"
+     y="-230"
      x="0"
-     height="172.72667"
-     width="1000.3364"
+     height="230"
+     width="1000.336"
      transform="scale(1,-1)" />
   <g
      transform="matrix(-0.3617166,1.3499465,1.3499465,0.3617166,696.26722,-241.97004)"

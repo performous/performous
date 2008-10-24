@@ -131,10 +131,16 @@ void CScreenSing::draw() {
 	time = std::max(0.0, time + playOffset);
 	double songPercent = time / sm->getAudio()->getLength();
 	// Rendering starts
-	if (m_background) m_background->draw();
-	if (m_video) m_video->render(time - song.videoGap);
-	theme->bg_top->draw();
-	theme->bg_bottom->draw();
+	{
+		double ar = 2.0;
+		if (m_background) { m_background->draw(); ar = m_background->dimensions.ar(); }
+		if (m_video) { m_video->render(time - song.videoGap); double tmp = m_video->dimensions().ar(); if (tmp > 0.0) ar = tmp; }
+		double offset = 0.5 / ar + 0.2;
+		theme->bg_bottom->dimensions.fixedWidth(1.0).bottom(offset);
+		theme->bg_bottom->draw();
+		theme->bg_top->dimensions.fixedWidth(1.0).top(-offset);
+		theme->bg_top->draw();
+	}
 	// Compute and draw the timer and the progressbar
 	const double baseLine = -0.2;
 	const double pixUnit = 0.2;
@@ -176,7 +182,7 @@ void CScreenSing::draw() {
 			m_player_icon->dimensions.left(-0.5 + 0.01 + 0.25 * i).fixedWidth(0.075).screenTop(0.055);
 			m_player_icon->draw();
 			m_score_text[i%2]->render((boost::format("%04d") % p->getScore()).str());
-			m_score_text[i%2]->surface()->dimensions.middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.075).screenTop(0.055);
+			m_score_text[i%2]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.075).screenTop(0.055);
 			m_score_text[i%2]->draw();
 			glColor4f(1.0, 1.0, 1.0, 1.0);
 		}
@@ -365,7 +371,7 @@ void ScoreWindow::draw() {
 		m_scoreBar.dimensions.middle(-0.25 + 0.15 * i).bottom(0.25);
 		m_scoreBar.draw(score / 10000.0);
 		m_score_text.render(boost::lexical_cast<std::string>(score));
-		m_score_text.surface()->dimensions.middle(-0.25 + 0.15 * i).top(0.25).fixedHeight(0.05);
+		m_score_text.dimensions().middle(-0.25 + 0.15 * i).top(0.25).fixedHeight(0.05);
 		m_score_text.draw();
 		glColor3f(1.0f, 1.0f, 1.0f);
 	}
