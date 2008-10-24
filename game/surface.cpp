@@ -192,7 +192,7 @@ void Surface::load(unsigned int width, unsigned int height, pix::Format format, 
 }
 
 void Surface::draw() const {
-	m_texture.draw(dimensions, TexCoords(tex.x1 * m_width, tex.y1 * m_height, tex.x2 * m_width, tex.y2 * m_height));
+	if (m_width * m_height > 0.0) m_texture.draw(dimensions, TexCoords(tex.x1 * m_width, tex.y1 * m_height, tex.x2 * m_width, tex.y2 * m_height));
 }
 
 Surface::Surface(cairo_surface_t* _surf) {
