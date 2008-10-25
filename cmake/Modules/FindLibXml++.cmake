@@ -33,6 +33,7 @@ else (LIBXMLPP_LIBRARIES AND LIBXMLPP_INCLUDE_DIRS)
         pkg_check_modules(_LIBXMLPP libxml++-2.6)
       endif (PKG_CONFIG_FOUND)
     endif (${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 4)
+
     find_path(LIBXMLPP_INCLUDE_DIR
       NAMES
         libxml++/libxml++.h
@@ -44,6 +45,20 @@ else (LIBXMLPP_LIBRARIES AND LIBXMLPP_INCLUDE_DIRS)
         /sw/include
       PATH_SUFFIXES
         libxml++-2.6
+    )
+    
+    find_path(LIBXMLPPCONFIG_INCLUDE_DIR
+      NAMES
+        libxml++config.h
+      PATHS
+        ${_LIBXMLPP_INCLUDEDIR}
+        /usr/lib
+        /usr/include
+        /usr/local/include
+        /opt/local/include
+        /sw/include
+      PATH_SUFFIXES
+        libxml++-2.6/include
     )
     
     find_library(LIBXMLPP_LIBRARY
@@ -64,6 +79,7 @@ else (LIBXMLPP_LIBRARIES AND LIBXMLPP_INCLUDE_DIRS)
     set(LIBXMLPP_INCLUDE_DIRS
       ${_LIBXMLPP_INCLUDE_DIRS}
       ${LIBXMLPP_INCLUDE_DIR}
+      ${LIBXMLPPCONFIG_INCLUDE_DIR}
       ${LIBXML2_INCLUDE_DIRS}
       ${GLIBMM_INCLUDE_DIRS}
       ${_GLIBMM_INCLUDEDIR}
