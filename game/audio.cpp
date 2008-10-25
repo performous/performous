@@ -9,15 +9,15 @@
 
 CAudio::CAudio(std::string const& pdev, unsigned int rate):
 	m_type(),
+	m_volume(1.0),
+	m_volumeMusic(100),
+	m_volumePreview(60),
 	m_rs(da::settings(pdev)
 	.set_callback(boost::ref(*this))
 	.set_channels(2)
 	.set_rate(rate)
 	.set_debug(std::cerr)),
-	m_playback(m_rs),
-	m_volume(1.0),
-	m_volumePreview(60),
-	m_volumeMusic(100)
+	m_playback(m_rs)
 {
 	m_mpeg.reset();
 	ffmpeg_paused = false;

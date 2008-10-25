@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.4)
 
 if(COMMAND cmake_policy)
-  cmake_policy(SET CMP0003 NEW)
+	cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 
 FILE(GLOB SOURCE_FILES "*.cpp")
@@ -13,22 +13,22 @@ set(SOURCES ${SOURCE_FILES} ${HEADER_FILES})
 
 include_directories(${CMAKE_SOURCE_DIR}/libda)
 
-set(Boost_USE_STATIC_LIBS ON)
+set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREAD ON)
-IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-  find_package(Boost 1.34 REQUIRED COMPONENTS thread program_options regex filesystem system)
-ELSE(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-  find_package(Boost 1.34 REQUIRED COMPONENTS thread program_options regex filesystem)
-ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+if(APPLE)
+	find_package(Boost 1.34 REQUIRED COMPONENTS thread program_options regex filesystem system)
+else(APPLE)
+	find_package(Boost 1.34 REQUIRED COMPONENTS thread program_options regex filesystem)
+endif(APPLE)
 include_directories(${Boost_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${Boost_LIBRARIES})
 
 find_package(SDL REQUIRED)
 include_directories(${SDL_INCLUDE_DIR})
 set(LIBS ${LIBS} ${SDL_LIBRARY})
-if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin" AND ${CMAKE_SYSTEM_VERSION} LESS "9.0.0")
-  set(LIBS ${LIBS} SDLmain)
-endif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin" AND ${CMAKE_SYSTEM_VERSION} LESS "9.0.0")
+if(APPLE AND ${CMAKE_SYSTEM_VERSION} LESS "9.0.0")
+	set(LIBS ${LIBS} SDLmain)
+endif(APPLE AND ${CMAKE_SYSTEM_VERSION} LESS "9.0.0")
 
 find_package(LibRSVG REQUIRED)
 include_directories(${LIBRSVG_INCLUDE_DIRS})
@@ -59,8 +59,15 @@ include_directories(${FFMPEG_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${FFMPEG_LIBRARIES})
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-  set(LIBS ${LIBS} "/opt/local/lib/libpangocairo-1.0.dylib" "/opt/local/lib/libavutil.dylib")
+	set(LIBS ${LIBS} "/opt/local/lib/libpangocairo-1.0.dylib" "/opt/local/lib/libavutil.dylib")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+
+# Set default compile flags for GCC
+if(CMAKE_COMPILER_IS_GNUCXX)
+	message(STATUS "GCC detected, enabling warnings")
+	# -pedantic cannot be used because ffmpeg headers are b0rked
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++98 -Wall -Wextra")
+endif(CMAKE_COMPILER_IS_GNUCXX)
 
 add_executable(performous ${SOURCES})
 target_link_libraries(performous da ${LIBS})

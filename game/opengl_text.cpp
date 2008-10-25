@@ -142,7 +142,7 @@ void parseTheme( std::string _theme_file, TThemeTxtOpenGL &_theme, double &_widt
 
 SvgTxtThemeSimple::SvgTxtThemeSimple(std::string _theme_file) : m_cache_text("XXX FIXME: Use something else. This text must never appear in lyrics!") {
 	parseTheme(_theme_file, m_text, m_width, m_height, m_x, m_y);
-};
+}
 
 void SvgTxtThemeSimple::render(std::string _text) {
 	if (m_cache_text != _text) {
@@ -162,7 +162,7 @@ void SvgTxtTheme::setHighlight(std::string _theme_file) {
 
 SvgTxtTheme::SvgTxtTheme(std::string _theme_file, Align _a, VAlign _v, Gravity _g, Fitting _f) : m_gravity(_g), m_fitting(_f), m_valign(_v), m_align(_a), m_cache_text("XXX FIXME: Use something else. This text must never appear in lyrics!") {
 	parseTheme(_theme_file, m_text, m_width, m_height, m_x, m_y);
-};
+}
 
 void SvgTxtTheme::draw(std::vector<std::string> _text) {
 	std::vector<TZoomText> tmp;
