@@ -34,9 +34,11 @@ else (GLIBMM_LIBRARIES AND GLIBMM_INCLUDE_DIRS)
         pkg_check_modules(_GLIBMM glibmm-2.4)
       endif (PKG_CONFIG_FOUND)
     endif (${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 4)
+
     find_path(GLIBMM_INCLUDE_DIR
       NAMES
         glibmm/main.h
+        glib
       PATHS
         ${_GLIBMM_INCLUDEDIR}
         /usr/include
@@ -45,6 +47,20 @@ else (GLIBMM_LIBRARIES AND GLIBMM_INCLUDE_DIRS)
         /sw/include
       PATH_SUFFIXES
         glibmm-2.4
+    )
+
+    find_path(GLIBMMCONFIG_INCLUDE_DIR
+      NAMES
+        glibmmconfig.h
+      PATHS
+        ${_GLIBMM_INCLUDEDIR}
+        /usr/lib
+        /usr/include
+        /usr/local/include
+        /opt/local/include
+        /sw/include
+      PATH_SUFFIXES
+        glibmm-2.4/include
     )
     
     find_library(GLIBMM_LIBRARY
@@ -66,6 +82,7 @@ else (GLIBMM_LIBRARIES AND GLIBMM_INCLUDE_DIRS)
       ${_GLIBMM_INCLUDEDIR}
       ${_GLIBMM_INCLUDE_DIRS}
       ${GLIBMM_INCLUDE_DIR}
+      ${GLIBMMCONFIG_INCLUDE_DIR}
     )
 
     if (GLIBMM_FOUND)
