@@ -50,8 +50,8 @@ class Analyzer {
 	double getPeak() const { return m_peak; }
 	/** Get a list of all tones detected. **/
 	tones_t const& getTones() const { return m_tones; }
-	/** Find a tone within the singing range; prefers strong tones around 250 Hz. **/
-	Tone const* findTone(double minfreq = 70.0, double maxfreq = 600.0) const {
+	/** Find a tone within the singing range; prefers strong tones around 200-400 Hz. **/
+	Tone const* findTone(double minfreq = 70.0, double maxfreq = 700.0) const {
 		if (m_tones.empty()) return NULL;
 		double db = std::max_element(m_tones.begin(), m_tones.end(), Tone::dbCompare)->db;
 		Tone const* best = NULL;
@@ -59,7 +59,7 @@ class Analyzer {
 		for (tones_t::const_iterator it = m_tones.begin(); it != m_tones.end(); ++it) {
 			if (it->db < db - 20.0 || it->freq < minfreq || it->age < Tone::MINAGE) continue;
 			if (it->freq > maxfreq) break;
-			double score = it->db - std::abs(it->freq - 250.0) / 10.0;
+			double score = it->db - std::max(100.0, std::abs(it->freq - 350.0)) / 10.0;
 			if (best && bestscore > score) break;
 			best = &*it;
 			bestscore = score;

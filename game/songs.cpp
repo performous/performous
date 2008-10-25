@@ -350,6 +350,7 @@ Songs::Songs(std::set<std::string> const& songdirs): m_songdirs(songdirs), math_
 }
 
 Songs::~Songs() {
+	m_loading = false; // Terminate song loading if currently in progress
 	m_thread->join();
 }
 
@@ -365,7 +366,7 @@ void Songs::reload_internal() {
 		m_songs.clear();
 		m_dirty = true;
 	}
-	for (std::set<std::string>::const_iterator it = m_songdirs.begin(); it != m_songdirs.end(); ++it) {
+	for (std::set<std::string>::const_iterator it = m_songdirs.begin(); m_loading && it != m_songdirs.end(); ++it) {
 		if (!boost::filesystem::is_directory(*it)) { std::cout << ">>> Not scanning: " << *it << " (no such directory)" << std::endl; continue; }
 		std::cout << ">>> Scanning " << *it << std::endl;
 		size_t count = m_songs.size();
@@ -381,7 +382,7 @@ void Songs::reload_internal(boost::filesystem::path const& parent) {
 	namespace fs = boost::filesystem;
 	if (std::distance(parent.begin(), parent.end()) > 20) { std::cout << ">>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)" << std::endl; return; }
 	try {
-		for (fs::directory_iterator dirIt(parent), dirEnd; dirIt != dirEnd; ++dirIt) {
+		for (fs::directory_iterator dirIt(parent), dirEnd; m_loading && dirIt != dirEnd; ++dirIt) {
 			fs::path p = dirIt->path();
 			if (fs::is_directory(p)) { reload_internal(p); continue; }
 			std::string name = p.leaf(); // File basename (notes.txt)
