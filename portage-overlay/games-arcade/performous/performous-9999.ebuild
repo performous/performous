@@ -65,28 +65,31 @@ src_unpack() {
 }
 
 src_compile() {
+	mkdir build
+	cd build
 	cmake \
 		-DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
 		-DCMAKE_INSTALL_PREFIX="${GAMES_PREFIX}" \
 		$(cmake-utils_use_with alsa ALSA) \
 		$(cmake-utils_use_with jack JACK) \
-		$(cmake-utils_use_with pulseaudio PUSEAUDIO) \
+		$(cmake-utils_use_with pulseaudio PULSEAUDIO) \
 		$(cmake-utils_use_with portaudio PORTAUDIO) \
 		$(cmake-utils_use_with gstreamer GSTREAMER) \
-		. || die "cmake failed"
+		.. || die "cmake failed"
 	emake || die "emake failed"
 }
 
 src_install() {
+	cd build
 	emake DESTDIR="${D}" install || die "make install failed"
 	keepdir "${GAMES_DATADIR}"/ultrastar/songs
 	if use songs; then
 		insinto "${GAMES_DATADIR}"/ultrastar
-		doins -r songs || die "doins songs failed"
+		doins -r ../songs || die "doins songs failed"
 	fi
 	rm -rf "${D}${GAMES_PREFIX}"/share/"${PN}"/{applications,pixmaps}
 	doicon data/${PN}.xpm
 	domenu data/${PN}.desktop
-	dodoc AUTHORS README TODO
+	dodoc ../docs/*.txt
 	prepgamesdirs
 }
