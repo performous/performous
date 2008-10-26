@@ -11,7 +11,7 @@ include(LibFindMacros)
 libfind_package(Pango Freetype)
 
 # Use pkg-config to get hints about paths
-libfind_pkg_check_modules(Pango_PKGCONF Pango2)
+libfind_pkg_check_modules(Pango_PKGCONF pango)
 
 # Include dir
 find_path(Pango_INCLUDE_DIR
