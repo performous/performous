@@ -40,7 +40,7 @@ void Window::blank() {
 	glLoadIdentity();
 	float h = virtH();
 	glOrtho(-0.5f, 0.5f, 0.5f * h, -0.5f * h, -1.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
+	// Not needed for now (optimization): glClear(GL_COLOR_BUFFER_BIT);
 }
 
 void Window::swap() {
@@ -51,5 +51,6 @@ void Window::resize(unsigned int width, unsigned int height) {
 	const SDL_VideoInfo* videoInf = SDL_GetVideoInfo();
 	screen = SDL_SetVideoMode(width, height, videoInf->vfmt->BitsPerPixel, m_videoFlags);
 	if (!screen) throw std::runtime_error("SDL_SetVideoMode failed");
+	glClear(GL_COLOR_BUFFER_BIT);
 }
 

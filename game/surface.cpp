@@ -36,6 +36,15 @@ namespace {
 		while ((ret*2) < val) ret *= 2;
 		return ret;
 	}
+
+	bool diffRGBA(uint32_t a, uint32_t b, unsigned threshold = 5) {
+		for (unsigned byte = 0; byte < 4; ++byte) {
+			int aByte = (a >> (byte * 8)) & 0xFF;
+			int bByte = (b >> (byte * 8)) & 0xFF;
+			if (unsigned(std::abs(aByte - bByte)) > threshold) return true;
+		}
+		return false;
+	}
 }
 
 bool checkExtension(const char *extension)
@@ -68,7 +77,7 @@ bool checkExtension(const char *extension)
 
 #include <fstream>
 
-template <typename T> void loader(T& target, std::string const& filename) {
+template <typename T> void loader(T& target, std::string const& filename, bool autocrop) {
 	if (!std::ifstream(filename.c_str()).is_open()) throw std::runtime_error("File not found: " + filename);
 	if (filename.size() > 4 && filename.substr(filename.size() - 4) == ".svg") {
 		rsvg_init();
@@ -100,7 +109,22 @@ template <typename T> void loader(T& target, std::string const& filename) {
 			image.read(filename);
 			image.magick("RGBA");
 			image.write(&blob);
-			target.load(image.columns(),image.rows(), pix::CHAR_RGBA, static_cast<unsigned char const*>(blob.data()));
+			unsigned w = image.columns();
+			unsigned ybegin = 0, yend = image.rows();
+			uint32_t const* buf = static_cast<uint32_t const*>(blob.data());
+			if (autocrop) {
+				uint32_t bordercol = buf[0];
+				for (bool mismatch = false; ybegin < yend; ++ybegin) {
+					for (unsigned x = 0; x < w; ++x) if (diffRGBA(buf[ybegin * w + x], bordercol)) { mismatch = true; break; }
+					if (mismatch) break;
+				}
+				for (bool mismatch = false; yend > ybegin; --yend) {
+					unsigned y = yend - 1;
+					for (unsigned x = 0; x < w; ++x) if (diffRGBA(buf[y * w + x], bordercol)) { mismatch = true; break; }
+					if (mismatch) break;
+				}
+			}
+			target.load(w, yend - ybegin, pix::CHAR_RGBA, reinterpret_cast<unsigned char const*>(buf + ybegin * w));
 		}
 		catch( Magick::Exception &error_ ) // add error handling
 		{
@@ -109,8 +133,8 @@ template <typename T> void loader(T& target, std::string const& filename) {
 	}
 }
 
-Texture::Texture(std::string const& filename) { loader(*this, filename); }
-Surface::Surface(std::string const& filename) { loader(*this, filename); }
+Texture::Texture(std::string const& filename) { loader(*this, filename, false); }
+Surface::Surface(std::string const& filename, bool autocrop) { loader(*this, filename, autocrop); }
 
 // Stuff for converting pix::Format into OpenGL enum values
 namespace {

@@ -15,7 +15,7 @@ void CScreenSing::enter() {
 	CAudio& audio = *sm->getAudio();
 	audio.playMusic(file.c_str());
 	theme.reset(new CThemeSing());
-	if (!song.background.empty()) { try { m_background.reset(new Surface(song.path + song.background)); } catch (std::exception& e) { std::cerr << e.what() << std::endl; } }
+	if (!song.background.empty()) { try { m_background.reset(new Surface(song.path + song.background, true)); } catch (std::exception& e) { std::cerr << e.what() << std::endl; } }
 #define TRYLOAD(field, class) if (!song.field.empty()) { try { m_##field.reset(new class(song.path + song.field)); } catch (std::exception& e) { std::cerr << e.what() << std::endl; } }
 	TRYLOAD(video, Video)
 #undef TRYLOAD
@@ -121,6 +121,25 @@ namespace {
 		glTexCoord2f(1.0f, 1.0f); glVertex2f(x + w, y + h);
 		glEnd();
 	}
+
+	const double arMin = 1.33;
+	const double arMax = 2.35;
+
+	void fillBG() {
+		Dimensions dim(arMin);
+		dim.fixedWidth(1.0);
+		glBegin(GL_QUADS);
+		glVertex2f(dim.x1(), dim.y1());
+		glVertex2f(dim.x2(), dim.y1());
+		glVertex2f(dim.x2(), dim.y2());
+		glVertex2f(dim.x1(), dim.y2());
+		glEnd();		
+	}
+
+}
+
+
+namespace {
 }
 
 void CScreenSing::draw() {
@@ -132,9 +151,14 @@ void CScreenSing::draw() {
 	double songPercent = time / sm->getAudio()->getLength();
 	// Rendering starts
 	{
-		double ar = 2.0;
-		if (m_background) { m_background->draw(); ar = m_background->dimensions.ar(); }
+		double ar = arMax;
+		if (m_background) {
+			ar = m_background->dimensions.ar();
+			if (ar > arMax || (m_video && ar > arMin)) fillBG();  // Fill white background to avoid black borders
+			m_background->draw();
+		} else fillBG();
 		if (m_video) { m_video->render(time - song.videoGap); double tmp = m_video->dimensions().ar(); if (tmp > 0.0) ar = tmp; }
+		ar = std::min(arMax, std::max(arMin, ar));
 		double offset = 0.5 / ar + 0.2;
 		theme->bg_bottom->dimensions.fixedWidth(1.0).bottom(offset);
 		theme->bg_bottom->draw();

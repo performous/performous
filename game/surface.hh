@@ -128,7 +128,7 @@ class Surface {
 	TexCoords tex;
 	Surface(): m_width(0), m_height(0) {}
 	Surface(cairo_surface_t* _surf);
-	Surface(std::string const& filename);
+	Surface(std::string const& filename, bool autocrop = false);
 	void draw() const;
 	void load(unsigned int width, unsigned int height, pix::Format format, unsigned char const* buffer, float ar = 0.0f);
   private:
