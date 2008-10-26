@@ -18,7 +18,7 @@ find_path(Magick_INCLUDE_DIR
 
 # Finally the library itself
 find_library(Magick_LIBRARY
-  NAMES Magick
+  NAMES Magick MagickCore
   PATHS ${Magick_PKGCONF_LIBRARY_DIRS}
 )
 
