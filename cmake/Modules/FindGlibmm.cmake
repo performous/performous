@@ -55,10 +55,9 @@ else (GLIBMM_LIBRARIES AND GLIBMM_INCLUDE_DIRS)
       PATHS
         ${_GLIBMM_INCLUDE_DIRS}
         /usr/lib
-        /usr/include
-        /usr/local/include
-        /opt/local/include
-        /sw/include
+        /usr/local/lib
+        /opt/local/lib
+        /sw/lib
       PATH_SUFFIXES
         glibmm-2.4/include
     )
@@ -74,9 +73,9 @@ else (GLIBMM_LIBRARIES AND GLIBMM_INCLUDE_DIRS)
         /sw/lib
     )
 
-    if (GLIBMM_LIBRARY)
+    if (GLIBMM_INCLUDE_DIR AND GLIBMMCONFIG_INCLUDE_DIR AND GLIBMM_LIBRARY)
       set(GLIBMM_FOUND TRUE)
-    endif (GLIBMM_LIBRARY)
+    endif (GLIBMM_INCLUDE_DIR AND GLIBMMCONFIG_INCLUDE_DIR AND GLIBMM_LIBRARY)
 
     set(GLIBMM_INCLUDE_DIRS
       ${GLIBMM_INCLUDE_DIR}
@@ -85,7 +84,6 @@ else (GLIBMM_LIBRARIES AND GLIBMM_INCLUDE_DIRS)
 
     if (GLIBMM_FOUND)
       set(GLIBMM_LIBRARIES
-        ${GLIBMM_LIBRARIES}
         ${GLIBMM_LIBRARY}
       )
     endif (GLIBMM_FOUND)

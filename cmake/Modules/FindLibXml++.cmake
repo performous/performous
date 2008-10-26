@@ -39,6 +39,10 @@ else (LIBXMLPP_LIBRARIES AND LIBXMLPP_INCLUDE_DIRS)
         libxml++/libxml++.h
       PATHS
         ${_LIBXMLPP_INCLUDEDIR}
+        /usr/include
+        /usr/local/include
+        /opt/local/include
+        /sw/include
       PATH_SUFFIXES
         libxml++-2.6
     )
@@ -48,6 +52,10 @@ else (LIBXMLPP_LIBRARIES AND LIBXMLPP_INCLUDE_DIRS)
         libxml++config.h
       PATHS
         ${_LIBXMLPP_INCLUDE_DIRS}
+        /usr/lib
+        /usr/local/lib
+        /opt/local/lib
+        /sw/lib
       PATH_SUFFIXES
         libxml++-2.6/include
     )
@@ -57,11 +65,15 @@ else (LIBXMLPP_LIBRARIES AND LIBXMLPP_INCLUDE_DIRS)
         xml++-2.6
       PATHS
         ${_LIBXMLPP_LIBRARY_DIRS}
+        /usr/lib
+        /usr/local/lib
+        /opt/local/lib
+        /sw/lib
     )
 
-    if (LIBXMLPP_LIBRARY)
+    if (LIBXMLPP_INCLUDE_DIR AND LIBXMLPPCONFIG_INCLUDE_DIR AND LIBXMLPP_LIBRARY)
       set(LIBXMLPP_FOUND TRUE)
-    endif (LIBXMLPP_LIBRARY)
+    endif (LIBXMLPP_INCLUDE_DIR AND LIBXMLPPCONFIG_INCLUDE_DIR AND LIBXMLPP_LIBRARY)
 
     set(LIBXMLPP_INCLUDE_DIRS
       ${LIBXMLPP_INCLUDE_DIR}
