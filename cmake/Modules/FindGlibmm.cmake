@@ -7,6 +7,7 @@
 
 # Dependencies
 find_package(Glib REQUIRED)
+find_package(SigC++ REQUIRED)
 
 include(LibFindMacros)
 
