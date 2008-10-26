@@ -1,111 +1,41 @@
-# - Try to find glibmm-2.4
-# Once done this will define
+# - Try to find Glibmm-2.4
+# Once done, this will define
 #
-#  GLIBMM_FOUND - system has glibmm
-#  GLIBMM_INCLUDE_DIRS - the glibmm include directory
-#  GLIBMM_LIBRARIES - Link these to use glibmm
-#  GLIBMM_DEFINITIONS - Compiler switches required for using glibmm
-#
-#  Copyright (c) 2008 Andreas Schneider <mail@cynapses.org>
-#  Modified for other libraries by Lasse Kärkkäinen <tronic>
-#
-#  Redistribution and use is allowed according to the terms of the New
-#  BSD license.
-#  For details see the accompanying COPYING-CMAKE-SCRIPTS file.
-#
+#  Glibmm_FOUND - system has Glibmm
+#  Glibmm_INCLUDE_DIRS - the Glibmm include directories
+#  Glibmm_LIBRARIES - Link these to use Glibmm
 
-if (GLIBMM_LIBRARIES AND GLIBMM_INCLUDE_DIRS)
-  # in cache already
-  set(GLIBMM_FOUND TRUE)
-else (GLIBMM_LIBRARIES AND GLIBMM_INCLUDE_DIRS)
-  # Find the libraries that glibmm depends on
-  find_package(Glib)
-  if (Glib_FOUND)
-    set(${GLIBMM_INCLUDE_DIRS} ${GLIBMM_INCLUDE_DIRS} ${Glib_INCLUDE_DIRS})
-    set(${GLIBMM_LIBRARIES} ${GLIBMM_LIBRARIES} ${Glib_LIBRARIES})
-    # use pkg-config to get the directories and then use these values
-    # in the FIND_PATH() and FIND_LIBRARY() calls
-    if (${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 4)
-      include(UsePkgConfig)
-      pkgconfig(glibmm-2.4 _GLIBMM_INCLUDE_DIRS _GLIBMM_LIBRARY_DIRS _GLIBMM_LDFLAGS _GLIBMM_CFLAGS)
-    else (${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 4)
-      find_package(PkgConfig)
-      if (PKG_CONFIG_FOUND)
-        pkg_check_modules(_GLIBMM glibmm-2.4)
-      endif (PKG_CONFIG_FOUND)
-    endif (${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 4)
+# Dependencies
+find_package(Glib REQUIRED)
 
-    find_path(GLIBMM_INCLUDE_DIR
-      NAMES
-        glibmm/main.h
-        glib
-      PATHS
-        ${_GLIBMM_INCLUDE_DIRS}
-        /usr/include
-        /usr/local/include
-        /opt/local/include
-        /sw/include
-      PATH_SUFFIXES
-        glibmm-2.4
-    )
+include(LibFindMacros)
 
-    find_path(GLIBMMCONFIG_INCLUDE_DIR
-      NAMES
-        glibmmconfig.h
-      PATHS
-        ${_GLIBMM_INCLUDE_DIRS}
-        /usr/lib
-        /usr/local/lib
-        /opt/local/lib
-        /sw/lib
-      PATH_SUFFIXES
-        glibmm-2.4/include
-    )
-    
-    find_library(GLIBMM_LIBRARY
-      NAMES
-        glibmm-2.4
-      PATHS
-        ${_GLIBMM_LIBRARY_DIRS}
-        /usr/lib
-        /usr/local/lib
-        /opt/local/lib
-        /sw/lib
-    )
+# Use pkg-config to get hints about paths
+libfind_pkg_check_modules(Glibmm_PKGCONF glibmm-2.4)
 
-    if (GLIBMM_INCLUDE_DIR AND GLIBMMCONFIG_INCLUDE_DIR AND GLIBMM_LIBRARY)
-      set(GLIBMM_FOUND TRUE)
-    endif (GLIBMM_INCLUDE_DIR AND GLIBMMCONFIG_INCLUDE_DIR AND GLIBMM_LIBRARY)
+# Main include dir
+find_path(Glibmm_INCLUDE_DIR
+  NAMES glibmm/main.h
+  PATHS ${Glibmm_PKGCONF_INCLUDE_DIRS}
+  PATH_SUFFIXES glibmm-2.4
+)
 
-    set(GLIBMM_INCLUDE_DIRS
-      ${GLIBMM_INCLUDE_DIR}
-      ${GLIBMMCONFIG_INCLUDE_DIR}
-    )
+# Glib-related libraries also use a separate config header, which is in lib dir
+find_path(GlibmmConfig_INCLUDE_DIR
+  NAMES glibmmconfig.h
+  PATHS ${Glibmm_PKGCONF_INCLUDE_DIRS}
+  PATH_SUFFIXES lib/glibmm-2.4/include
+)
 
-    if (GLIBMM_FOUND)
-      set(GLIBMM_LIBRARIES
-        ${GLIBMM_LIBRARY}
-      )
-    endif (GLIBMM_FOUND)
+# Finally the library itself
+find_library(Glibmm_LIBRARY
+  NAMES glibmm-2.4
+  PATHS ${Glibmm_PKGCONF_LIBRARY_DIRS}
+)
 
-  endif (Glib_FOUND)
-
-  if (GLIBMM_INCLUDE_DIRS AND GLIBMM_LIBRARIES)
-     set(GLIBMM_FOUND TRUE)
-  endif (GLIBMM_INCLUDE_DIRS AND GLIBMM_LIBRARIES)
-
-  if (GLIBMM_FOUND)
-    if (NOT GLIBMM_FIND_QUIETLY)
-      message(STATUS "Found glibmm: ${GLIBMM_LIBRARIES}")
-    endif (NOT GLIBMM_FIND_QUIETLY)
-  else (GLIBMM_FOUND)
-    if (GLIBMM_FIND_REQUIRED)
-      message(FATAL_ERROR "Could not find glibmm or its dependencies")
-    endif (GLIBMM_FIND_REQUIRED)
-  endif (GLIBMM_FOUND)
-
-  # show the GLIBMM_INCLUDE_DIRS and GLIBMM_LIBRARIES variables only in the advanced view
-  mark_as_advanced(GLIBMM_INCLUDE_DIRS GLIBMM_LIBRARIES)
-
-endif (GLIBMM_LIBRARIES AND GLIBMM_INCLUDE_DIRS)
+# Set the include dir variables and the libraries and let libfind_process do the rest.
+# NOTE: Singular variables for this library, plural for libraries this this lib depends on.
+set(Glibmm_PROCESS_INCLUDES Glibmm_INCLUDE_DIR GlibmmConfig_INCLUDE_DIR Glib_INCLUDE_DIRS)
+set(Glibmm_PROCESS_LIBS Glibmm_LIBRARY Glib_LIBRARIES)
+libfind_process(Glibmm)
 

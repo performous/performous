@@ -42,9 +42,9 @@ find_package(Pango REQUIRED)
 include_directories(${PANGO_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${PANGO_LIBRARIES})
 
-find_package(LibXml++ REQUIRED)
-include_directories(${LIBXMLPP_INCLUDE_DIRS})
-set(LIBS ${LIBS} ${LIBXMLPP_LIBRARIES})
+find_package(LibXML++ REQUIRED)
+include_directories(${LibXML++_INCLUDE_DIRS})
+set(LIBS ${LIBS} ${LibXML++_LIBRARIES})
 
 find_package(Magick++ REQUIRED)
 include_directories(${MAGICKPP_INCLUDE_DIRS})

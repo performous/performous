@@ -22,7 +22,7 @@ else (ALSA_LIBRARIES AND ALSA_INCLUDE_DIRS)
   # in the FIND_PATH() and FIND_LIBRARY() calls
   if (${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 4)
     include(UsePkgConfig)
-    pkgconfig(alsa _ALSA_INCLUDEDIR _ALSA_LIBDIR _ALSA_LDFLAGS _ALSA_CFLAGS)
+    pkgconfig(alsa _ALSA_INCLUDE_DIRS _ALSA_LIBRARY_DIRS _ALSA_LDFLAGS _ALSA_CFLAGS)
   else (${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 4)
     find_package(PkgConfig)
     if (PKG_CONFIG_FOUND)
@@ -33,46 +33,31 @@ else (ALSA_LIBRARIES AND ALSA_INCLUDE_DIRS)
     NAMES
       alsa/asoundlib.h
     PATHS
-      ${_ALSA_INCLUDEDIR}
+      ${_ALSA_INCLUDE_DIRS}
       /usr/include
       /usr/local/include
       /opt/local/include
       /sw/include
-    SUFFIXES
-      ..
   )
   
   find_library(ALSA_LIBRARY
     NAMES
       asound
     PATHS
-      ${_ALSA_LIBDIR}
+      ${_ALSA_LIBRARY_DIRS}
       /usr/lib
       /usr/local/lib
       /opt/local/lib
       /sw/lib
   )
 
-  if (ALSA_LIBRARY)
+  if (ALSA_INCLUDE_DIR AND ALSA_LIBRARY)
     set(ALSA_FOUND TRUE)
-  endif (ALSA_LIBRARY)
-
-  set(ALSA_INCLUDE_DIRS
-    ${ALSA_INCLUDE_DIR}
-  )
+  endif (ALSA_INCLUDE_DIR AND ALSA_LIBRARY)
 
   if (ALSA_FOUND)
-    set(ALSA_LIBRARIES
-      ${ALSA_LIBRARIES}
-      ${ALSA_LIBRARY}
-    )
-  endif (ALSA_FOUND)
-
-  if (ALSA_INCLUDE_DIRS AND ALSA_LIBRARIES)
-     set(ALSA_FOUND TRUE)
-  endif (ALSA_INCLUDE_DIRS AND ALSA_LIBRARIES)
-
-  if (ALSA_FOUND)
+    set(ALSA_INCLUDE_DIRS ${ALSA_INCLUDE_DIR})
+    set(ALSA_LIBRARIES ${ALSA_LIBRARY})
     if (NOT ALSA_FIND_QUIETLY)
       message(STATUS "Found ALSA: ${ALSA_LIBRARY}")
     endif (NOT ALSA_FIND_QUIETLY)
@@ -81,9 +66,6 @@ else (ALSA_LIBRARIES AND ALSA_INCLUDE_DIRS)
       message(FATAL_ERROR "Could not find ALSA")
     endif (ALSA_FIND_REQUIRED)
   endif (ALSA_FOUND)
-
-  # show the ALSA_INCLUDE_DIRS and ALSA_LIBRARIES variables only in the advanced view
-  mark_as_advanced(ALSA_INCLUDE_DIRS ALSA_LIBRARIES)
 
 endif (ALSA_LIBRARIES AND ALSA_INCLUDE_DIRS)
 
