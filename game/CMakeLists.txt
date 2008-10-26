@@ -39,16 +39,16 @@ include_directories(${CAIRO_INCLUDE_DIR})
 set(LIBS ${LIBS} ${CAIRO_LIBRARIES})
 
 find_package(Pango REQUIRED)
-include_directories(${PANGO_INCLUDE_DIRS})
-set(LIBS ${LIBS} ${PANGO_LIBRARIES})
+include_directories(${Pango_INCLUDE_DIRS})
+set(LIBS ${LIBS} ${Pango_LIBRARIES})
 
 find_package(LibXML++ REQUIRED)
 include_directories(${LibXML++_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${LibXML++_LIBRARIES})
 
 find_package(Magick++ REQUIRED)
-include_directories(${MAGICKPP_INCLUDE_DIRS})
-set(LIBS ${LIBS} ${MAGICKPP_LIBRARIES})
+include_directories(${Magick++_INCLUDE_DIRS})
+set(LIBS ${LIBS} ${Magick++_LIBRARIES})
 
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
