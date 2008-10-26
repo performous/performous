@@ -1,5 +1,3 @@
-find_package(Boost 1.34 REQUIRED COMPONENTS thread filesystem)
-
 project(libda)
 cmake_minimum_required(VERSION 2.6)
 

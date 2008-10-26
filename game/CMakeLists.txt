@@ -58,8 +58,8 @@ find_package(FFmpeg REQUIRED)
 include_directories(${FFMPEG_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${FFMPEG_LIBRARIES})
 
-IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-	set(LIBS ${LIBS} "/opt/local/lib/libpangocairo-1.0.dylib" "/opt/local/lib/libavutil.dylib")
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin") # FIXME: this won't work if you use fink on Darwin
+	set(LIBS ${LIBS} "/opt/local/lib/libpangocairo-1.0.dylib" "/opt/local/lib/libavutil.dylib") # instead of this use find_library etc
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 # Set default compile flags for GCC

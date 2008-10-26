@@ -98,13 +98,17 @@ MACRO (_Boost_ADJUST_LIB_VARS basename)
     IF (Boost_${basename}_LIBRARY_DEBUG AND Boost_${basename}_LIBRARY_RELEASE)
       # if the generator supports configuration types then set
       # optimized and debug libraries, or if the CMAKE_BUILD_TYPE has a value
-      IF (CMAKE_CONFIGURATION_TYPES OR CMAKE_BUILD_TYPE)
-        SET(Boost_${basename}_LIBRARY optimized ${Boost_${basename}_LIBRARY_RELEASE} debug ${Boost_${basename}_LIBRARY_DEBUG})
-      ELSE(CMAKE_CONFIGURATION_TYPES OR CMAKE_BUILD_TYPE)
-        # if there are no configuration types and CMAKE_BUILD_TYPE has no value
-        # then just use the release libraries
-        SET(Boost_${basename}_LIBRARY ${Boost_${basename}_LIBRARY_RELEASE} )
-      ENDIF(CMAKE_CONFIGURATION_TYPES OR CMAKE_BUILD_TYPE)
+      IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+        SET(Boost_${basename}_LIBRARY ${Boost_SYSTEM_LIBRARY} ${Boost_${basename}_LIBRARY_RELEASE} )
+      ELSE(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+        IF (CMAKE_CONFIGURATION_TYPES OR CMAKE_BUILD_TYPE)
+          SET(Boost_${basename}_LIBRARY optimized ${Boost_${basename}_LIBRARY_RELEASE} debug ${Boost_${basename}_LIBRARY_DEBUG})
+        ELSE(CMAKE_CONFIGURATION_TYPES OR CMAKE_BUILD_TYPE)
+          # if there are no configuration types and CMAKE_BUILD_TYPE has no value
+          # then just use the release libraries
+          SET(Boost_${basename}_LIBRARY ${Boost_${basename}_LIBRARY_RELEASE} )
+        ENDIF(CMAKE_CONFIGURATION_TYPES OR CMAKE_BUILD_TYPE)
+      ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
       SET(Boost_${basename}_LIBRARIES optimized ${Boost_${basename}_LIBRARY_RELEASE} debug ${Boost_${basename}_LIBRARY_DEBUG})
     ENDIF (Boost_${basename}_LIBRARY_DEBUG AND Boost_${basename}_LIBRARY_RELEASE)
 
@@ -171,12 +175,14 @@ ELSE (_boost_IN_CACHE)
     # cdrom inserted it will popup a very annoying dialog
     #D:/boost/include
     /sw/local/include
+    /opt/local/include
   )
 
   SET(_boost_LIBRARIES_SEARCH_DIRS
     C:/boost/lib
     "C:/Program Files/boost/boost_${Boost_REQUIRED_VERSION}/lib"
     /sw/local/lib
+    /opt/local/lib
   )
 
   IF( NOT $ENV{Boost_ROOT} STREQUAL "" )
