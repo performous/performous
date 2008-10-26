@@ -26,7 +26,7 @@ else (LIBXMLPP_LIBRARIES AND LIBXMLPP_INCLUDE_DIRS)
     # in the FIND_PATH() and FIND_LIBRARY() calls
     if (${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 4)
       include(UsePkgConfig)
-      pkgconfig(libxml++-2.6 _LIBXMLPP_INCLUDEDIR _LIBXMLPP_LIBDIR _LIBXMLPP_LDFLAGS _LIBXMLPP_CFLAGS)
+      pkgconfig(libxml++-2.6 _LIBXMLPP_INCLUDE_DIRS _LIBXMLPP_LIBRARY_DIRS _LIBXMLPP_LDFLAGS _LIBXMLPP_CFLAGS)
     else (${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 4)
       find_package(PkgConfig)
       if (PKG_CONFIG_FOUND)
@@ -51,7 +51,7 @@ else (LIBXMLPP_LIBRARIES AND LIBXMLPP_INCLUDE_DIRS)
       NAMES
         libxml++config.h
       PATHS
-        ${_LIBXMLPP_INCLUDEDIR}
+        ${_LIBXMLPP_INCLUDE_DIRS}
         /usr/lib
         /usr/include
         /usr/local/include
@@ -65,7 +65,7 @@ else (LIBXMLPP_LIBRARIES AND LIBXMLPP_INCLUDE_DIRS)
       NAMES
         xml++-2.6
       PATHS
-        ${_LIBXMLPP_LIBDIR}
+        ${_LIBXMLPP_LIBRARY_DIRS}
         /usr/lib
         /usr/local/lib
         /opt/local/lib
@@ -77,18 +77,14 @@ else (LIBXMLPP_LIBRARIES AND LIBXMLPP_INCLUDE_DIRS)
     endif (LIBXMLPP_LIBRARY)
 
     set(LIBXMLPP_INCLUDE_DIRS
-      ${_LIBXMLPP_INCLUDE_DIRS}
       ${LIBXMLPP_INCLUDE_DIR}
       ${LIBXMLPPCONFIG_INCLUDE_DIR}
       ${LIBXML2_INCLUDE_DIRS}
       ${GLIBMM_INCLUDE_DIRS}
-      ${_GLIBMM_INCLUDEDIR}
-      ${_LIBXMLPP_INCLUDEDIR}
     )
 
     if (LIBXMLPP_FOUND)
       set(LIBXMLPP_LIBRARIES
-        ${LIBXMLPP_LIBRARIES}
         ${LIBXMLPP_LIBRARY}
         ${LIBXML2_LIBRARIES}
         ${GLIBMM_LIBRARIES}

@@ -27,7 +27,7 @@ else (GLIBMM_LIBRARIES AND GLIBMM_INCLUDE_DIRS)
     # in the FIND_PATH() and FIND_LIBRARY() calls
     if (${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 4)
       include(UsePkgConfig)
-      pkgconfig(glibmm-2.4 _GLIBMM_INCLUDEDIR _GLIBMM_LIBDIR _GLIBMM_LDFLAGS _GLIBMM_CFLAGS)
+      pkgconfig(glibmm-2.4 _GLIBMM_INCLUDE_DIRS _GLIBMM_LIBRARY_DIRS _GLIBMM_LDFLAGS _GLIBMM_CFLAGS)
     else (${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 4)
       find_package(PkgConfig)
       if (PKG_CONFIG_FOUND)
@@ -40,7 +40,7 @@ else (GLIBMM_LIBRARIES AND GLIBMM_INCLUDE_DIRS)
         glibmm/main.h
         glib
       PATHS
-        ${_GLIBMM_INCLUDEDIR}
+        ${_GLIBMM_INCLUDE_DIRS}
         /usr/include
         /usr/local/include
         /opt/local/include
@@ -53,7 +53,7 @@ else (GLIBMM_LIBRARIES AND GLIBMM_INCLUDE_DIRS)
       NAMES
         glibmmconfig.h
       PATHS
-        ${_GLIBMM_INCLUDEDIR}
+        ${_GLIBMM_INCLUDE_DIRS}
         /usr/lib
         /usr/include
         /usr/local/include
@@ -67,7 +67,7 @@ else (GLIBMM_LIBRARIES AND GLIBMM_INCLUDE_DIRS)
       NAMES
         glibmm-2.4
       PATHS
-        ${_GLIBMM_LIBDIR}
+        ${_GLIBMM_LIBRARY_DIRS}
         /usr/lib
         /usr/local/lib
         /opt/local/lib
@@ -79,8 +79,6 @@ else (GLIBMM_LIBRARIES AND GLIBMM_INCLUDE_DIRS)
     endif (GLIBMM_LIBRARY)
 
     set(GLIBMM_INCLUDE_DIRS
-      ${_GLIBMM_INCLUDEDIR}
-      ${_GLIBMM_INCLUDE_DIRS}
       ${GLIBMM_INCLUDE_DIR}
       ${GLIBMMCONFIG_INCLUDE_DIR}
     )
