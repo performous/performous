@@ -1,72 +1,33 @@
-include(CheckIncludeFile)
+# - Try to find ImageMagick++
+# Once done, this will define
+#
+#  Magick++_FOUND - system has Magick++
+#  Magick++_INCLUDE_DIRS - the Magick++ include directories
+#  Magick++_LIBRARIES - link these to use Magick++
 
-find_package ( PkgConfig )
+include(LibFindMacros)
 
-if ( PKG_CONFIG_FOUND )
-  pkg_check_modules ( PKGCONFIG_MAGICKPP ImageMagick++ )
-endif ( PKG_CONFIG_FOUND )
+# Dependencies
+libfind_package(Magick++ Magick)
 
-if ( PKGCONFIG_MAGICKPP_FOUND )
-  set ( MAGICKPP_FOUND ${PKGCONFIG_MAGICKPP_FOUND} )
-  set ( MAGICKPP_INCLUDE_DIRS ${PKGCONFIG_MAGICKPP_INCLUDE_DIRS} )
-  foreach ( i ${PKGCONFIG_MAGICKPP_LIBRARIES} )
-    find_library ( ${i}_LIBRARY
-      NAMES ${i}
-      PATHS ${PKGCONFIG_MAGICKPP_LIBRARY_DIRS}
-    )
-    if ( ${i}_LIBRARY )
-      list ( APPEND MAGICKPP_LIBRARIES ${${i}_LIBRARY} )
-    endif ( ${i}_LIBRARY )
-    mark_as_advanced ( ${i}_LIBRARY )
-  endforeach ( i )
-  set ( MAGICKPP_LIBRARIES "${MAGICKPP_LIBRARIES}" CACHE STRING "" )
-  mark_as_advanced ( MAGICKPP_LIBRARIES )
+# Use pkg-config to get hints about paths
+libfind_pkg_check_modules(Magick++_PKGCONF ImageMagick++)
 
-else ( PKGCONFIG_MAGICKPP_FOUND )
-  find_path ( MAGICKPP_INCLUDE_PATH
-    NAMES
-      librsvg/rsvg.h
-    PATHS
-      $ENV{MAGICKPP_ROOT_DIR}/include
-    PATH_SUFFIXES
-      librsvg-2
-  )
-  mark_as_advanced ( MAGICKPP_INCLUDE_PATH )
+# Include dir
+find_path(Magick++_INCLUDE_DIR
+  NAMES Magick++.h
+  PATHS ${Magick++_PKGCONF_INCLUDE_DIRS}
+)
 
-  foreach ( i ${MAGICKPP_COMPONENTS} )
-    find_library ( ${i}_LIBRARY
-      NAMES
-        ${i}
-      PATHS
-        $ENV{MAGICKPP_ROOT_DIR}/lib
-    )
-    if ( ${i}_LIBRARY )
-      list ( APPEND MAGICKPP_LIBRARIES ${${i}_LIBRARY} )
-    endif ( ${i}_LIBRARY )
-    mark_as_advanced ( ${i}_LIBRARY )
-  endforeach ( i )
-  mark_as_advanced ( MAGICKPP_LIBRARIES )
+# Finally the library itself
+find_library(Magick++_LIBRARY
+  NAMES Magick++
+  PATHS ${Magick++_PKGCONF_LIBRARY_DIRS}
+)
 
-  set ( MAGICKPP_INCLUDE_DIRS 
-    ${MAGICKPP_INCLUDE_PATH}
-  )
-
-  if ( MAGICKPP_INCLUDE_DIRS AND MAGICKPP_LIBRARIES )
-    set ( MAGICKPP_FOUND true )
-  endif ( MAGICKPP_INCLUDE_DIRS AND MAGICKPP_LIBRARIES )
-endif ( PKGCONFIG_MAGICKPP_FOUND )
-
-if ( MAGICKPP_FOUND )
-  set ( CMAKE_REQUIRED_INCLUDES "${MAGICKPP_INCLUDE_DIRS}" )
-  check_include_file ( librsvg/rsvg.h MAGICKPP_FOUND )
-endif ( MAGICKPP_FOUND )
-
-if ( NOT MAGICKPP_FOUND )
-  if ( NOT MAGICKPP_FIND_QUIETLY )
-    message ( STATUS "MAGICKPP not found, try setting MAGICKPP_ROOT_DIR environment variable." )
-  endif ( NOT MAGICKPP_FIND_QUIETLY )
-  if ( MAGICKPP_FIND_REQUIRED )
-    message ( FATAL_ERROR "" )
-  endif ( MAGICKPP_FIND_REQUIRED )
-endif ( NOT MAGICKPP_FOUND )
+# Set the include dir variables and the libraries and let libfind_process do the rest.
+# NOTE: Singular variables for this library, plural for libraries this this lib depends on.
+set(Magick++_PROCESS_INCLUDES Magick++_INCLUDE_DIR Magick_INCLUDE_DIRS)
+set(Magick++_PROCESS_LIBS Magick++_LIBRARY Magick_LIBRARIES)
+libfind_process(Magick++)
 
