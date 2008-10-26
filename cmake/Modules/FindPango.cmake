@@ -1,72 +1,34 @@
-include(CheckIncludeFile)
+# - Try to find Pango
+# Once done, this will define
+#
+#  Pango_FOUND - system has Pango
+#  Pango_INCLUDE_DIRS - the Pango include directories
+#  Pango_LIBRARIES - link these to use Pango
 
-find_package ( PkgConfig )
+include(LibFindMacros)
 
-if ( PKG_CONFIG_FOUND )
-  pkg_check_modules ( PKGCONFIG_PANGO pango )
-endif ( PKG_CONFIG_FOUND )
+# Dependencies
+libfind_package(Pango Freetype)
 
-if ( PKGCONFIG_PANGO_FOUND )
-  set ( PANGO_FOUND ${PKGCONFIG_PANGO_FOUND} )
-  set ( PANGO_INCLUDE_DIRS ${PKGCONFIG_PANGO_INCLUDE_DIRS} )
-  foreach ( i ${PKGCONFIG_PANGO_LIBRARIES} )
-    find_library ( ${i}_LIBRARY
-      NAMES ${i}
-      PATHS ${PKGCONFIG_PANGO_LIBRARY_DIRS}
-    )
-    if ( ${i}_LIBRARY )
-      list ( APPEND PANGO_LIBRARIES ${${i}_LIBRARY} )
-    endif ( ${i}_LIBRARY )
-    mark_as_advanced ( ${i}_LIBRARY )
-  endforeach ( i )
-  set ( PANGO_LIBRARIES "${PANGO_LIBRARIES}" CACHE STRING "" )
-  mark_as_advanced ( PANGO_LIBRARIES )
+# Use pkg-config to get hints about paths
+libfind_pkg_check_modules(Pango_PKGCONF Pango2)
 
-else ( PKGCONFIG_PANGO_FOUND )
-  find_path ( PANGO_INCLUDE_PATH
-    NAMES
-      pango/pango.h
-    PATHS
-      $ENV{PANGO_ROOT_DIR}/include
-    PATH_SUFFIXES
-      pango-1.0
-  )
-  mark_as_advanced ( PANGO_INCLUDE_PATH )
+# Include dir
+find_path(Pango_INCLUDE_DIR
+  NAMES pango/pango.h
+  PATHS ${Pango_PKGCONF_INCLUDE_DIRS}
+  PATH_SUFFIXES pango-1.0
+)
 
-  foreach ( i ${PANGO_COMPONENTS} )
-    find_library ( ${i}_LIBRARY
-      NAMES
-        ${i}
-      PATHS
-        $ENV{PANGO_ROOT_DIR}/lib
-    )
-    if ( ${i}_LIBRARY )
-      list ( APPEND PANGO_LIBRARIES ${${i}_LIBRARY} )
-    endif ( ${i}_LIBRARY )
-    mark_as_advanced ( ${i}_LIBRARY )
-  endforeach ( i )
-  mark_as_advanced ( PANGO_LIBRARIES )
+# Finally the library itself
+find_library(Pango_LIBRARY
+  NAMES pango-1.0
+  PATHS ${Pango_PKGCONF_LIBRARY_DIRS}
+)
 
-  set ( PANGO_INCLUDE_DIRS 
-    ${PANGO_INCLUDE_PATH}
-  )
-
-  if ( PANGO_INCLUDE_DIRS AND PANGO_LIBRARIES )
-    set ( PANGO_FOUND true )
-  endif ( PANGO_INCLUDE_DIRS AND PANGO_LIBRARIES )
-endif ( PKGCONFIG_PANGO_FOUND )
-
-if ( PANGO_FOUND )
-  set ( CMAKE_REQUIRED_INCLUDES "${PANGO_INCLUDE_DIRS}" )
-  check_include_file ( pango/pango.h PANGO_FOUND )
-endif ( PANGO_FOUND )
-
-if ( NOT PANGO_FOUND )
-  if ( NOT PANGO_FIND_QUIETLY )
-    message ( STATUS "PANGO not found, try setting PANGO_ROOT_DIR environment variable." )
-  endif ( NOT PANGO_FIND_QUIETLY )
-  if ( PANGO_FIND_REQUIRED )
-    message ( FATAL_ERROR "" )
-  endif ( PANGO_FIND_REQUIRED )
-endif ( NOT PANGO_FOUND )
+# Set the include dir variables and the libraries and let libfind_process do the rest.
+# NOTE: Singular variables for this library, plural for libraries this this lib depends on.
+set(Pango_PROCESS_INCLUDES Pango_INCLUDE_DIR Freetype_INCLUDE_DIRS)
+set(Pango_PROCESS_LIBS Pango_LIBRARY Freetype_LIBRARIES)
+libfind_process(Pango)
 
