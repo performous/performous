@@ -3,13 +3,13 @@
 #
 #  Glibmm_FOUND - system has Glibmm
 #  Glibmm_INCLUDE_DIRS - the Glibmm include directories
-#  Glibmm_LIBRARIES - Link these to use Glibmm
-
-# Dependencies
-find_package(Glib REQUIRED)
-find_package(SigC++ REQUIRED)
+#  Glibmm_LIBRARIES - link these to use Glibmm
 
 include(LibFindMacros)
+
+# Dependencies
+libfind_package(Glibmm Glib)
+libfind_package(Glibmm SigC++)
 
 # Use pkg-config to get hints about paths
 libfind_pkg_check_modules(Glibmm_PKGCONF glibmm-2.4)

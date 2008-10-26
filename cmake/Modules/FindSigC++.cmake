@@ -1,9 +1,9 @@
-# - Try to find SigC++-2.4
+# - Try to find SigC++-2.0
 # Once done, this will define
 #
 #  SigC++_FOUND - system has SigC++
 #  SigC++_INCLUDE_DIRS - the SigC++ include directories
-#  SigC++_LIBRARIES - Link these to use SigC++
+#  SigC++_LIBRARIES - link these to use SigC++
 
 include(LibFindMacros)
 

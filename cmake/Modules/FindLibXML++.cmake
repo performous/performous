@@ -3,13 +3,13 @@
 #
 #  LibXML++_FOUND - system has LibXML++
 #  LibXML++_INCLUDE_DIRS - the LibXML++ include directories
-#  LibXML++_LIBRARIES - Link these to use LibXML++
-
-# Dependencies
-find_package(LibXML2 REQUIRED)
-find_package(Glibmm REQUIRED)
+#  LibXML++_LIBRARIES - link these to use LibXML++
 
 include(LibFindMacros)
+
+# Dependencies
+libfind_package(LibXML++ LibXML2)
+libfind_package(LibXML++ Glibmm)
 
 # Use pkg-config to get hints about paths
 libfind_pkg_check_modules(LibXML++_PKGCONF libxml++-2.6)
