@@ -4,7 +4,7 @@ if(COMMAND cmake_policy)
 	cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 
-FILE(GLOB SOURCE_FILES "*.cpp")
+FILE(GLOB SOURCE_FILES "*.cc")
 FILE(GLOB HEADER_FILES "*.hh")
 
 set(SOURCES ${SOURCE_FILES} ${HEADER_FILES})
