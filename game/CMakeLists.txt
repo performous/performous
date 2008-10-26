@@ -31,12 +31,12 @@ if(APPLE AND ${CMAKE_SYSTEM_VERSION} LESS "9.0.0")
 endif(APPLE AND ${CMAKE_SYSTEM_VERSION} LESS "9.0.0")
 
 find_package(LibRSVG REQUIRED)
-include_directories(${LIBRSVG_INCLUDE_DIRS})
-set(LIBS ${LIBS} ${LIBRSVG_LIBRARIES})
+include_directories(${LibRSVG_INCLUDE_DIRS})
+set(LIBS ${LIBS} ${LibRSVG_LIBRARIES})
 
 find_package(Cairo REQUIRED)
-include_directories(${CAIRO_INCLUDE_DIR})
-set(LIBS ${LIBS} ${CAIRO_LIBRARIES})
+include_directories(${Cairo_INCLUDE_DIR})
+set(LIBS ${LIBS} ${Cairo_LIBRARIES})
 
 find_package(Pango REQUIRED)
 include_directories(${Pango_INCLUDE_DIRS})

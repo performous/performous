@@ -1,72 +1,35 @@
-include(CheckIncludeFile)
+# - Try to find LibRSVG
+# Once done, this will define
+#
+#  LibRSVG_FOUND - system has LibRSVG
+#  LibRSVG_INCLUDE_DIRS - the LibRSVG include directories
+#  LibRSVG_LIBRARIES - link these to use LibRSVG
 
-find_package ( PkgConfig )
+include(LibFindMacros)
 
-if ( PKG_CONFIG_FOUND )
-  pkg_check_modules ( PKGCONFIG_LIBRSVG librsvg-2.0 )
-endif ( PKG_CONFIG_FOUND )
+# Dependencies
+libfind_package(LibRSVG Cairo)
+libfind_package(LibRSVG GDK-PixBuf)
 
-if ( PKGCONFIG_LIBRSVG_FOUND )
-  set ( LIBRSVG_FOUND ${PKGCONFIG_LIBRSVG_FOUND} )
-  set ( LIBRSVG_INCLUDE_DIRS ${PKGCONFIG_LIBRSVG_INCLUDE_DIRS} )
-  foreach ( i ${PKGCONFIG_LIBRSVG_LIBRARIES} )
-    find_library ( ${i}_LIBRARY
-      NAMES ${i}
-      PATHS ${PKGCONFIG_LIBRSVG_LIBRARY_DIRS}
-    )
-    if ( ${i}_LIBRARY )
-      list ( APPEND LIBRSVG_LIBRARIES ${${i}_LIBRARY} )
-    endif ( ${i}_LIBRARY )
-    mark_as_advanced ( ${i}_LIBRARY )
-  endforeach ( i )
-  set ( LIBRSVG_LIBRARIES "${LIBRSVG_LIBRARIES}" CACHE STRING "" )
-  mark_as_advanced ( LIBRSVG_LIBRARIES )
+# Use pkg-config to get hints about paths
+libfind_pkg_check_modules(LibRSVG_PKGCONF librsvg-2.0)
 
-else ( PKGCONFIG_LIBRSVG_FOUND )
-  find_path ( LIBRSVG_INCLUDE_PATH
-    NAMES
-      librsvg/rsvg.h
-    PATHS
-      $ENV{LIBRSVG_ROOT_DIR}/include
-    PATH_SUFFIXES
-      librsvg-2
-  )
-  mark_as_advanced ( LIBRSVG_INCLUDE_PATH )
+# Include dir
+find_path(LibRSVG_INCLUDE_DIR
+  NAMES librsvg/rsvg.h
+  PATHS ${LibRSVG_PKGCONF_INCLUDE_DIRS}
+  PATH_SUFFIXES librsvg-2
+)
 
-  foreach ( i ${LIBRSVG_COMPONENTS} )
-    find_library ( ${i}_LIBRARY
-      NAMES
-        ${i}
-      PATHS
-        $ENV{LIBRSVG_ROOT_DIR}/lib
-    )
-    if ( ${i}_LIBRARY )
-      list ( APPEND LIBRSVG_LIBRARIES ${${i}_LIBRARY} )
-    endif ( ${i}_LIBRARY )
-    mark_as_advanced ( ${i}_LIBRARY )
-  endforeach ( i )
-  mark_as_advanced ( LIBRSVG_LIBRARIES )
+# Finally the library itself
+find_library(LibRSVG_LIBRARY
+  NAMES rsvg-2
+  PATHS ${LibRSVG_PKGCONF_LIBRARY_DIRS}
+)
 
-  set ( LIBRSVG_INCLUDE_DIRS 
-    ${LIBRSVG_INCLUDE_PATH}
-  )
-
-  if ( LIBRSVG_INCLUDE_DIRS AND LIBRSVG_LIBRARIES )
-    set ( LIBRSVG_FOUND true )
-  endif ( LIBRSVG_INCLUDE_DIRS AND LIBRSVG_LIBRARIES )
-endif ( PKGCONFIG_LIBRSVG_FOUND )
-
-if ( LIBRSVG_FOUND )
-  set ( CMAKE_REQUIRED_INCLUDES "${LIBRSVG_INCLUDE_DIRS}" )
-  check_include_file ( librsvg/rsvg.h LIBRSVG_FOUND )
-endif ( LIBRSVG_FOUND )
-
-if ( NOT LIBRSVG_FOUND )
-  if ( NOT LIBRSVG_FIND_QUIETLY )
-    message ( STATUS "LIBRSVG not found, try setting LIBRSVG_ROOT_DIR environment variable." )
-  endif ( NOT LIBRSVG_FIND_QUIETLY )
-  if ( LIBRSVG_FIND_REQUIRED )
-    message ( FATAL_ERROR "" )
-  endif ( LIBRSVG_FIND_REQUIRED )
-endif ( NOT LIBRSVG_FOUND )
+# Set the include dir variables and the libraries and let libfind_process do the rest.
+# NOTE: Singular variables for this library, plural for libraries this this lib depends on.
+set(LibRSVG_PROCESS_INCLUDES LibRSVG_INCLUDE_DIR Cairo_INCLUDE_DIRS GDK-PixBuf_INCLUDE_DIRS)
+set(LibRSVG_PROCESS_LIBS LibRSVG_LIBRARY Cairo_LIBRARIES GDK-PixBuf_LIBRARIES)
+libfind_process(LibRSVG)
 
