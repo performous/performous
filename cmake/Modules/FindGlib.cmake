@@ -24,6 +24,9 @@ find_path(GlibConfig_INCLUDE_DIR
   PATH_SUFFIXES ../lib/glib-2.0/include
 )
 
+message("DEBUG1: ${Glib_PKGCONF_INCLUDE_DIRS}")
+message("DEBUG2: ${GlibConfig_INCLUDE_DIR}")
+
 # Finally the library itself
 find_library(Glib_LIBRARY
   NAMES glib-2.0
