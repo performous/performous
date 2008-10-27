@@ -28,7 +28,7 @@ find_path(GTKmm_INCLUDE_DIR
 # Glib-related libraries also use a separate config header, which is in lib dir
 find_path(GTKmmConfig_INCLUDE_DIR
   NAMES gtkmmconfig.h
-  PATHS ${GTKmm_PKGCONF_INCLUDE_DIRS}
+  PATHS ${GTKmm_PKGCONF_INCLUDE_DIRS} /usr
   PATH_SUFFIXES lib/gtkmm-2.4/include
 )
 

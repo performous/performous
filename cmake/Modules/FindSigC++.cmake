@@ -20,7 +20,7 @@ find_path(SigC++_INCLUDE_DIR
 # Glib-related libraries also use a separate config header, which is in lib dir
 find_path(SigC++Config_INCLUDE_DIR
   NAMES sigc++config.h
-  PATHS ${SigC++_PKGCONF_INCLUDE_DIRS}
+  PATHS ${SigC++_PKGCONF_INCLUDE_DIRS} /usr
   PATH_SUFFIXES lib/sigc++-2.0/include
 )
 

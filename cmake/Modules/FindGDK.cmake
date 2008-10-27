@@ -25,7 +25,7 @@ find_path(GDK_INCLUDE_DIR
 # Glib-related libraries also use a separate config header, which is in lib dir
 find_path(GDKConfig_INCLUDE_DIR
   NAMES gdkconfig.h
-  PATHS ${GDK_PKGCONF_INCLUDE_DIRS}
+  PATHS ${GDK_PKGCONF_INCLUDE_DIRS} /usr
   PATH_SUFFIXES lib/gtk-2.0/include
 )
 

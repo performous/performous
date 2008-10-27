@@ -24,7 +24,7 @@ find_path(LibXML++_INCLUDE_DIR
 # Glib-related libraries also use a separate config header, which is in lib dir
 find_path(LibXML++Config_INCLUDE_DIR
   NAMES libxml++config.h
-  PATHS ${LibXML++_PKGCONF_INCLUDE_DIRS}
+  PATHS ${LibXML++_PKGCONF_INCLUDE_DIRS} /usr
   PATH_SUFFIXES lib/libxml++-2.6/include
 )
 
