@@ -36,7 +36,7 @@ find_library(Glibmm_LIBRARY
 
 # Set the include dir variables and the libraries and let libfind_process do the rest.
 # NOTE: Singular variables for this library, plural for libraries this this lib depends on.
-set(Glibmm_PROCESS_INCLUDES Glibmm_INCLUDE_DIR GlibmmConfig_INCLUDE_DIR Glib_INCLUDE_DIRS)
-set(Glibmm_PROCESS_LIBS Glibmm_LIBRARY Glib_LIBRARIES)
+set(Glibmm_PROCESS_INCLUDES Glibmm_INCLUDE_DIR GlibmmConfig_INCLUDE_DIR Glib_INCLUDE_DIRS SigC++_INCLUDE_DIRS)
+set(Glibmm_PROCESS_LIBS Glibmm_LIBRARY Glib_LIBRARIES SigC++_LIBRARIES)
 libfind_process(Glibmm)
 
