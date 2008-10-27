@@ -17,13 +17,6 @@ find_path(GDK-PixBuf_INCLUDE_DIR
   PATH_SUFFIXES gtk-2.0
 )
 
-# GDK-PixBuf-related libraries also use a separate config header, which is in lib dir
-find_path(GDK-PixBufConfig_INCLUDE_DIR
-  NAMES gdkconfig.h
-  PATHS ${GDK-PixBuf_PKGCONF_INCLUDE_DIRS}
-  PATH_SUFFIXES lib/gtk-2.0/include
-)
-
 # Finally the library itself
 find_library(GDK-PixBuf_LIBRARY
   NAMES gdk_pixbuf-2.0
@@ -32,7 +25,7 @@ find_library(GDK-PixBuf_LIBRARY
 
 # Set the include dir variables and the libraries and let libfind_process do the rest.
 # NOTE: Singular variables for this library, plural for libraries this this lib depends on.
-set(GDK-PixBuf_PROCESS_INCLUDES GDK-PixBuf_INCLUDE_DIR GDK-PixBufConfig_INCLUDE_DIR)
+set(GDK-PixBuf_PROCESS_INCLUDES GDK-PixBuf_INCLUDE_DIR)
 set(GDK-PixBuf_PROCESS_LIBS GDK-PixBuf_LIBRARY)
 libfind_process(GDK-PixBuf)
 
