@@ -20,12 +20,9 @@ find_path(Glib_INCLUDE_DIR
 # Glib-related libraries also use a separate config header, which is in lib dir
 find_path(GlibConfig_INCLUDE_DIR
   NAMES glibconfig.h
-  PATHS ${Glib_PKGCONF_INCLUDE_DIRS}
-  PATH_SUFFIXES ../lib/glib-2.0/include
+  PATHS ${Glib_PKGCONF_INCLUDE_DIRS} /usr
+  PATH_SUFFIXES lib/glib-2.0/include
 )
-
-message("DEBUG1: ${Glib_PKGCONF_INCLUDE_DIRS}")
-message("DEBUG2: ${GlibConfig_INCLUDE_DIR}")
 
 # Finally the library itself
 find_library(Glib_LIBRARY
