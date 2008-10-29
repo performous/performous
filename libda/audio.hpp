@@ -80,9 +80,7 @@ namespace da {
 		  m_frames(low),
 		  m_debug()
 		{
-	 		std::string::size_type pos = devstr.find(':');
-			m_device = devstr.substr(0, pos);
-			if (pos != std::string::npos) m_subdev = devstr.substr(pos + 1);
+			set_devstr(devstr);
 		}
 		void debug(std::string const& msg) { if (m_debug) *m_debug << msg << std::endl; }
 		std::string const& device() const { return m_device; }
@@ -93,6 +91,12 @@ namespace da {
 		std::size_t const& channels() const { return m_channels; }
 		bool channels_near() const { return m_channels_near; }
 		callback_t callback() const { return m_callback; }
+		settings& set_devstr(std::string const& devstr = "") {
+	 		std::string::size_type pos = devstr.find(':');
+			m_device = devstr.substr(0, pos);
+			if (pos != std::string::npos) m_subdev = devstr.substr(pos + 1);
+			return *this;
+		}
 		settings& set_device(std::string const& val) { m_device = val; return *this; }
 		settings& set_subdev(std::string const& val) { m_subdev = val; return *this; }
 		settings& set_callback(callback_t val) { m_callback = val; return *this; }
