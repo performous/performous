@@ -44,21 +44,29 @@
      id="base"
      inkscape:zoom="0.89095454"
      inkscape:cx="340.62116"
-     inkscape:cy="339.41162"
+     inkscape:cy="294.51595"
      inkscape:window-x="349"
      inkscape:window-y="25"
      inkscape:current-layer="svg559"
      showgrid="false" />
   <defs
-     id="defs561" />
+     id="defs561">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 300 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="800 : 300 : 1"
+       inkscape:persp3d-origin="400 : 200 : 1"
+       id="perspective8" />
+  </defs>
   <text
      xml:space="preserve"
-     style="font-size:32px;font-style:normal;font-weight:normal;fill:black;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+     style="font-size:32px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
      x="285.08749"
-     y="480"
+     y="469.89853"
      id="text1990"><tspan
        sodipodi:role="line"
        id="tspan1992"
        x="285.08749"
-       y="480">Artist - Songs</tspan></text>
+       y="469.89853">Artist - Songs</tspan></text>
 </svg>
