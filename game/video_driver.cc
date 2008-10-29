@@ -40,7 +40,7 @@ void Window::blank() {
 	glLoadIdentity();
 	float h = virtH();
 	glOrtho(-0.5f, 0.5f, 0.5f * h, -0.5f * h, -1.0f, 1.0f);
-	// Not needed for now (optimization): glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);  // Shouldn't be needed, but missing this seems to cause problems on some setups.
 }
 
 void Window::swap() {
