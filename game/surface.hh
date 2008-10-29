@@ -93,10 +93,10 @@ class UseTexture: boost::noncopyable {
 template <GLenum Type> void OpenGLTexture<Type>::draw(Dimensions const& dim, TexCoords const& tex = TexCoords()) const {
 	UseTexture texture(*this);
 	glBegin(GL_QUADS);
-	glTexCoord2f(tex.x1, tex.y1); glVertex3f(dim.x1(), dim.y1(), -0.5f);
-	glTexCoord2f(tex.x2, tex.y1); glVertex3f(dim.x2(), dim.y1(), -0.5f);
-	glTexCoord2f(tex.x2, tex.y2); glVertex3f(dim.x2(), dim.y2(), -0.5f);
-	glTexCoord2f(tex.x1, tex.y2); glVertex3f(dim.x1(), dim.y2(), -0.5f);
+	glTexCoord2f(tex.x1, tex.y1); glVertex2f(dim.x1(), dim.y1());
+	glTexCoord2f(tex.x2, tex.y1); glVertex2f(dim.x2(), dim.y1());
+	glTexCoord2f(tex.x2, tex.y2); glVertex2f(dim.x2(), dim.y2());
+	glTexCoord2f(tex.x1, tex.y2); glVertex2f(dim.x1(), dim.y2());
 	glEnd();
 }
 
