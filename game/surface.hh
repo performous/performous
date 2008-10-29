@@ -69,7 +69,7 @@ struct TexCoords {
 template <GLenum Type> class OpenGLTexture: boost::noncopyable {
   public:
 	static GLenum type() { return Type; };
-	OpenGLTexture() { glGenTextures(1, &m_id); }
+	OpenGLTexture(): m_id() { glGenTextures(1, &m_id); }
 	~OpenGLTexture() { glDeleteTextures(1, &m_id); }
 	GLuint id() const { return m_id; };
 	void draw(Dimensions const& dim, TexCoords const& tex) const;
