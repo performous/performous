@@ -51,8 +51,8 @@ include_directories(${Magick++_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${Magick++_LIBRARIES})
 
 find_package(OpenGL REQUIRED)
-include_directories(${OPENGL_INCLUDE_DIR})
-set(LIBS ${LIBS} ${OPENGL_LIBRARIES})
+include_directories(${OpenGL_INCLUDE_DIRS})
+set(LIBS ${LIBS} ${OpenGL_LIBRARIES})
 
 find_package(FFmpeg REQUIRED)
 include_directories(${FFMPEG_INCLUDE_DIRS})
