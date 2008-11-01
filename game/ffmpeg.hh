@@ -20,6 +20,7 @@ struct VideoFrame {
 	double timestamp;
 	std::vector<uint8_t> data; 
 	int width, height;
+	VideoFrame(): timestamp(), width(), height() {}
 	void swap(VideoFrame& f) {
 		std::swap(timestamp, f.timestamp);
 		data.swap(f.data);
@@ -37,28 +38,36 @@ class VideoFifo {
 	VideoFifo(): m_timestamp() {}
 	bool tryPop(VideoFrame& f) {
 		boost::mutex::scoped_lock l(m_mutex);
-		if (m_queue.size() < 3) return false; // Must keep a certain minimum size for B-frame reordering
+		if (m_queue.size() < m_min) return false; // Must keep a certain minimum size for B-frame reordering
 		f.swap(*m_queue.begin());
-		m_timestamp = m_queue.begin()->timestamp;
 		m_queue.erase(m_queue.begin());
-		m_cond.notify_one();
+		m_cond.notify_all();
+		m_timestamp = f.timestamp;
+		statsUpdate();
 		return true;
 	}
 	void push(VideoFrame* f) {
 		boost::mutex::scoped_lock l(m_mutex);
-		while (m_queue.size() > 10) m_cond.wait(l);
+		while (m_queue.size() > m_max) m_cond.wait(l);
 		m_queue.insert(f);
+		statsUpdate();
 	}
+	void statsUpdate() { m_available = std::max(0, int(m_queue.size()) - int(m_min)); }
 	void reset() {
 		boost::mutex::scoped_lock l(m_mutex);
 		m_queue.clear();
 		m_cond.notify_all();
+		statsUpdate();
 	}
 	double position() { return m_timestamp; }
+	double percentage() const { return double(m_available) / m_max; }
   private:
 	boost::ptr_set<VideoFrame> m_queue;
 	boost::mutex m_mutex;
 	boost::condition m_cond;
+	volatile unsigned m_available;
+	static const unsigned m_min = 3;
+	static const unsigned m_max = 50;
 	double m_timestamp;
 };
 
@@ -74,19 +83,20 @@ class AudioFifo {
 			if (data.size() <= size) {
 				buffer.insert(buffer.end(), data.begin(), data.end());
 				size -= data.size();
-				m_timestamp = m_queue.front().timestamp; // TODO: + data.size() / samplerate
 				m_queue.pop_front();
 				m_cond.notify_one();
 			} else {
 				buffer.insert(buffer.end(), data.begin(), data.begin() + size);
 				data.erase(data.begin(), data.begin() + size);
+				m_queue.front().timestamp += size / (2.0 * 48000.0); // FIXME: don't hardcode samples/s
 				size = 0;
 			}
 		}
+		m_timestamp = m_queue.front().timestamp;
 	}
 	void push(AudioFrame* f) {
 		boost::mutex::scoped_lock l(m_mutex);
-		while (m_queue.size() > 100) m_cond.wait(l);
+		while (m_queue.size() > m_max) m_cond.wait(l);
 		m_queue.push_back(f);
 	}
 	void reset() {
@@ -96,12 +106,17 @@ class AudioFifo {
 	}
 	double position() { return m_timestamp; }
 	double eof() { return m_eof; }
+	double percentage() {
+		boost::mutex::scoped_lock l(m_mutex);
+		return double(m_queue.size()) / m_max;
+	}
   private:
 	boost::ptr_deque<AudioFrame> m_queue;
 	boost::mutex m_mutex;
 	boost::condition m_cond;
 	double m_timestamp;
 	bool m_eof;
+	static const unsigned m_max = 100;
 };
 
 // ffmpeg forward declarations
@@ -124,11 +139,13 @@ class CFfmpeg {
 	**/
 	void crash() { m_thread.reset(); }
 	void operator()(); // Thread runs here, don't call directly
+	unsigned width, height;
 	VideoFifo  videoQueue;
 	AudioFifo  audioQueue;
-	void seek(double time) { m_seekTarget = time; videoQueue.reset(); audioQueue.reset(); }
+	/** Seek to the chosen time. May block for a short while until the seek is done. **/
+	void seek(double time);
 	double duration();
-	double position() {return std::max(audioQueue.position(),videoQueue.position());};
+	double position() { return std::max(audioQueue.position(),videoQueue.position()); };
   private:
 	class eof_error: public std::exception {};
 	void seek_internal();

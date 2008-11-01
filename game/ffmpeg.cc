@@ -102,11 +102,11 @@ void CFfmpeg::open() {
 	}
 	// Setup software scaling context
 	if( videoStream != -1 && decodeVideo ) {
-		int w = pVideoCodecCtx->width;
-		int h = pVideoCodecCtx->height;
+		width = pVideoCodecCtx->width;
+		height = pVideoCodecCtx->height;
 		img_convert_ctx = sws_getContext(
-		  w, h, pVideoCodecCtx->pix_fmt,
-		  w, h, PIX_FMT_RGB24,
+		  width, height, pVideoCodecCtx->pix_fmt,
+		  width, height, PIX_FMT_RGB24,
 		  SWS_BICUBIC, NULL, NULL, NULL);
 	}
 	m_thread.reset(new boost::thread(boost::ref(*this)));
@@ -151,6 +151,12 @@ void CFfmpeg::operator()() {
 			if (++errors > 2) break;
 		}
 	}
+}
+
+void CFfmpeg::seek(double time) {
+	m_seekTarget = time;
+	videoQueue.reset(); audioQueue.reset(); // Empty these to unblock the internals in case buffers were full
+	while (m_seekTarget == m_seekTarget) boost::thread::sleep(now() + 0.01); // Wait until seek_internal is done
 }
 
 void CFfmpeg::seek_internal() {
