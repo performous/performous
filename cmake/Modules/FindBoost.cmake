@@ -10,12 +10,15 @@
 # when new boost versions are released.
 #
 # Currently this module searches for the following version numbers:
-# 1.33, 1.33.0, 1.33.1, 1.34, 1.34.0, 1.34.1
+# 1.33, 1.33.0, 1.33.1, 1.34, 1.34.0, 1.34.1, 1.35, 1.36
 #
 # The components list needs to be the actual names of boost libraries, that is
 # the part of the actual library files that differ on different libraries. So
 # its "date_time" for "libboost_date_time...". Anything else will result in
 # errors
+#
+# Component "filesystem" will automatically also enable "system" on 1.35 and
+# later versions, where it depends on that.
 #
 # Variables used by this module, they can change the default behaviour:
 #  Boost_USE_NONMULTITHREAD      Can be set to TRUE to use the non-multithreaded
@@ -78,7 +81,7 @@
 
 # MESSAGE(STATUS "Finding Boost libraries.... ")
 
-SET( _boost_TEST_VERSIONS ${Boost_ADDITIONAL_VERSIONS} "1.33" "1.33.0" "1.33.1" "1.34" "1.34.0" "1.34.1" )
+SET( _boost_TEST_VERSIONS ${Boost_ADDITIONAL_VERSIONS} "1.33" "1.33.0" "1.33.1" "1.34" "1.34.0" "1.34.1" "1.35" "1.35.0" "1.36" "1.36.0" )
 
 ############################################
 #
@@ -161,7 +164,6 @@ IF (_boost_IN_CACHE)
   # in cache already
   SET(Boost_FOUND TRUE)
   FOREACH(COMPONENT ${Boost_FIND_COMPONENTS})
-    STRING(TOUPPER ${COMPONENT} COMPONENT)
     _Boost_ADJUST_LIB_VARS( ${COMPONENT} )
   ENDFOREACH(COMPONENT)
   SET(Boost_INCLUDE_DIRS ${Boost_INCLUDE_DIR})
@@ -232,23 +234,17 @@ ELSE (_boost_IN_CACHE)
       # Extract Boost_VERSION and Boost_LIB_VERSION from version.hpp
       # Read the whole file:
       #
-      SET(BOOST_VERSION 0)
-      SET(BOOST_LIB_VERSION "")
       FILE(READ "${Boost_INCLUDE_DIR}/boost/version.hpp" _boost_VERSION_HPP_CONTENTS)
 
-      STRING(REGEX REPLACE ".*#define BOOST_VERSION ([0-9]+).*" "\\1" Boost_VERSION "${_boost_VERSION_HPP_CONTENTS}")
+      STRING(REGEX REPLACE ".*#define BOOST_VERSION ([0-9]+).*" "\\1" Boost_VERSION_NUMERIC "${_boost_VERSION_HPP_CONTENTS}")
       STRING(REGEX REPLACE ".*#define BOOST_LIB_VERSION \"([0-9_]+)\".*" "\\1" Boost_LIB_VERSION "${_boost_VERSION_HPP_CONTENTS}")
 
-      SET(Boost_LIB_VERSION ${Boost_LIB_VERSION} CACHE STRING "The library version string for boost libraries")
-      SET(Boost_VERSION ${Boost_VERSION} CACHE STRING "The version number for boost libraries")
-      
-      IF(NOT "${Boost_VERSION}" STREQUAL "0")
-        MATH(EXPR Boost_MAJOR_VERSION "${Boost_VERSION} / 100000")
-        MATH(EXPR Boost_MINOR_VERSION "${Boost_VERSION} / 100 % 1000")
-        MATH(EXPR Boost_SUBMINOR_VERSION "${Boost_VERSION} % 100")
-      ENDIF(NOT "${Boost_VERSION}" STREQUAL "0")
-
-
+      IF(Boost_VERSION_NUMERIC GREATER 0)
+        MATH(EXPR Boost_MAJOR_VERSION "${Boost_VERSION_NUMERIC} / 100000")
+        MATH(EXPR Boost_MINOR_VERSION "${Boost_VERSION_NUMERIC} / 100 % 1000")
+        MATH(EXPR Boost_SUBMINOR_VERSION "${Boost_VERSION_NUMERIC} % 100")
+        SET(Boost_VERSION "${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}")
+      ENDIF(Boost_VERSION_NUMERIC GREATER 0)
     ENDIF( NOT Boost_INCLUDE_DIR )
   ENDFOREACH(_boost_VER)
 
@@ -303,15 +299,19 @@ ELSE (_boost_IN_CACHE)
   ENDIF(WIN32)
   SET (_boost_ABI_TAG "${_boost_ABI_TAG}d")
 
+  # The filesystem library depends on system library on 1.35 and later versions
+  IF(Boost_MAJOR_VERSION EQUAL 1 AND Boost_MINOR_VERSION GREATER 34 AND Boost_FIND_COMPONENTS MATCHES filesystem)
+    SET(Boost_FIND_COMPONENTS ${Boost_FIND_COMPONENTS} system)
+  ENDIF(Boost_MAJOR_VERSION EQUAL 1 AND Boost_MINOR_VERSION GREATER 34 AND Boost_FIND_COMPONENTS MATCHES filesystem)
+
   # ------------------------------------------------------------------------
   #  Begin finding boost libraries
   # ------------------------------------------------------------------------
   FOREACH(COMPONENT ${Boost_FIND_COMPONENTS})
-    STRING(TOUPPER ${COMPONENT} UPPERCOMPONENT)
-    SET( Boost_{UPPERCOMPONENT}_LIBRARY FALSE)
-    SET( Boost_{UPPERCOMPONENT}_LIBRARY_RELEASE FALSE)
-    SET( Boost_{UPPERCOMPONENT}_LIBRARY_DEBUG FALSE)
-    FIND_LIBRARY(Boost_${UPPERCOMPONENT}_LIBRARY_RELEASE
+    SET( Boost_{COMPONENT}_LIBRARY FALSE)
+    SET( Boost_{COMPONENT}_LIBRARY_RELEASE FALSE)
+    SET( Boost_{COMPONENT}_LIBRARY_DEBUG FALSE)
+    FIND_LIBRARY(Boost_${COMPONENT}_LIBRARY_RELEASE
         NAMES  ${Boost_LIB_PREFIX}boost_${COMPONENT}${_boost_COMPILER}${_boost_MULTITHREADED}-${Boost_LIB_VERSION}
                ${Boost_LIB_PREFIX}boost_${COMPONENT}${_boost_COMPILER}${_boost_MULTITHREADED}${_boost_STATIC_TAG}-${Boost_LIB_VERSION}
                ${Boost_LIB_PREFIX}boost_${COMPONENT}${_boost_MULTITHREADED}
@@ -321,17 +321,17 @@ ELSE (_boost_IN_CACHE)
 	NO_DEFAULT_PATH
     )
 
-    IF( NOT ${Boost_${UPPERCOMPONENT}_LIBRARY_RELEASE} )
-      FIND_LIBRARY(Boost_${UPPERCOMPONENT}_LIBRARY_RELEASE
+    IF( NOT ${Boost_${COMPONENT}_LIBRARY_RELEASE} )
+      FIND_LIBRARY(Boost_${COMPONENT}_LIBRARY_RELEASE
           NAMES  ${Boost_LIB_PREFIX}boost_${COMPONENT}${_boost_COMPILER}${_boost_MULTITHREADED}-${Boost_LIB_VERSION}
                  ${Boost_LIB_PREFIX}boost_${COMPONENT}${_boost_COMPILER}${_boost_MULTITHREADED}${_boost_STATIC_TAG}-${Boost_LIB_VERSION}
                  ${Boost_LIB_PREFIX}boost_${COMPONENT}${_boost_MULTITHREADED}
                  ${Boost_LIB_PREFIX}boost_${COMPONENT}${_boost_MULTITHREADED}${_boost_STATIC_TAG}
                  ${Boost_LIB_PREFIX}boost_${COMPONENT}
       )
-    ENDIF( NOT ${Boost_${UPPERCOMPONENT}_LIBRARY_RELEASE} )
+    ENDIF( NOT ${Boost_${COMPONENT}_LIBRARY_RELEASE} )
 
-    FIND_LIBRARY(Boost_${UPPERCOMPONENT}_LIBRARY_DEBUG
+    FIND_LIBRARY(Boost_${COMPONENT}_LIBRARY_DEBUG
         NAMES  ${Boost_LIB_PREFIX}boost_${COMPONENT}${_boost_COMPILER}${_boost_MULTITHREADED}-${_boost_ABI_TAG}-${Boost_LIB_VERSION}
                ${Boost_LIB_PREFIX}boost_${COMPONENT}${_boost_COMPILER}${_boost_MULTITHREADED}${_boost_STATIC_TAG}${_boost_ABI_TAG}-${Boost_LIB_VERSION}
                ${Boost_LIB_PREFIX}boost_${COMPONENT}${_boost_MULTITHREADED}-${_boost_ABI_TAG}
@@ -341,68 +341,40 @@ ELSE (_boost_IN_CACHE)
 	NO_DEFAULT_PATH
     )
 
-    IF( NOT ${Boost_${UPPERCOMPONENT}_LIBRARY_DEBUG} )
-      FIND_LIBRARY(Boost_${UPPERCOMPONENT}_LIBRARY_DEBUG
+    IF( NOT ${Boost_${COMPONENT}_LIBRARY_DEBUG} )
+      FIND_LIBRARY(Boost_${COMPONENT}_LIBRARY_DEBUG
           NAMES  ${Boost_LIB_PREFIX}boost_${COMPONENT}${_boost_COMPILER}${_boost_MULTITHREADED}-${_boost_ABI_TAG}-${Boost_LIB_VERSION}
                ${Boost_LIB_PREFIX}boost_${COMPONENT}${_boost_COMPILER}${_boost_MULTITHREADED}${_boost_STATIC_TAG}${_boost_ABI_TAG}-${Boost_LIB_VERSION}
                ${Boost_LIB_PREFIX}boost_${COMPONENT}${_boost_MULTITHREADED}-${_boost_ABI_TAG}
                ${Boost_LIB_PREFIX}boost_${COMPONENT}${_boost_MULTITHREADED}${_boost_STATIC_TAG}${_boost_ABI_TAG}
                ${Boost_LIB_PREFIX}boost_${COMPONENT}-${_boost_ABI_TAG}
       )
-    ENDIF( NOT ${Boost_${UPPERCOMPONENT}_LIBRARY_DEBUG} )
-    _Boost_ADJUST_LIB_VARS(${UPPERCOMPONENT})
+    ENDIF( NOT ${Boost_${COMPONENT}_LIBRARY_DEBUG} )
+    _Boost_ADJUST_LIB_VARS(${COMPONENT})
   ENDFOREACH(COMPONENT)
   # ------------------------------------------------------------------------
   #  End finding boost libraries
   # ------------------------------------------------------------------------
 
-  SET(Boost_INCLUDE_DIRS
-    ${Boost_INCLUDE_DIR}
-  )
+  # libfind_process setup variables
+  SET(Boost_PROCESS_INCLUDES Boost_INCLUDE_DIR)
+
+  FOREACH ( COMPONENT  ${Boost_FIND_COMPONENTS} )
+    SET(Boost_PROCESS_LIBS ${Boost_PROCESS_LIBS} Boost_${COMPONENT}_LIBRARY)
+  ENDFOREACH(COMPONENT)
+  
+  INCLUDE(LibFindMacros)
+  
+  # Check that everything was found correctly and do other processing
+  libfind_process(Boost)
 
   # MESSAGE(STATUS "Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
   # MESSAGE(STATUS "Boost_LIBRARIES: ${Boost_LIBRARIES}")
-
-  SET(Boost_FOUND FALSE)
-  IF(Boost_INCLUDE_DIR)
-    SET( Boost_FOUND TRUE )
-    FOREACH(COMPONENT ${Boost_FIND_COMPONENTS})
-      STRING(TOUPPER ${COMPONENT} COMPONENT)
-      IF(NOT Boost_${COMPONENT}_FOUND)
-        SET( Boost_FOUND FALSE)
-      ENDIF(NOT Boost_${COMPONENT}_FOUND)
-    ENDFOREACH(COMPONENT)
-  ELSE(Boost_INCLUDE_DIR)
-    SET( Boost_FOUND FALSE)
-  ENDIF(Boost_INCLUDE_DIR)
-
-  IF (Boost_FOUND)
-      IF (NOT Boost_FIND_QUIETLY)
-        MESSAGE(STATUS "Found The Following Boost Libraries:")
-        FOREACH ( COMPONENT  ${Boost_FIND_COMPONENTS} )
-          STRING( TOUPPER ${COMPONENT} UPPERCOMPONENT )
-          IF ( Boost_${UPPERCOMPONENT}_FOUND )
-            MESSAGE (STATUS "  ${COMPONENT}")
-	    SET(Boost_LIBRARIES ${Boost_LIBRARIES} ${Boost_${UPPERCOMPONENT}_LIBRARY})
-          ENDIF ( Boost_${UPPERCOMPONENT}_FOUND )
-        ENDFOREACH(COMPONENT)
-	MESSAGE(STATUS "Boost Version: ${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}")
-      ENDIF(NOT Boost_FIND_QUIETLY)
-  ELSE (Boost_FOUND)
-      IF (Boost_FIND_REQUIRED)
-        MESSAGE(FATAL_ERROR "Please install the Boost libraries AND development packages")
-      ENDIF(Boost_FIND_REQUIRED)
-  ENDIF(Boost_FOUND)
 
   # Under Windows, automatic linking is performed, so no need to specify the libraries.
   IF (WIN32)
       SET(Boost_LIBRARIES "")
   ENDIF(WIN32)
 
-  # show the Boost_INCLUDE_DIRS AND Boost_LIBRARIES variables only in the advanced view
-  MARK_AS_ADVANCED(Boost_INCLUDE_DIRS
-      Boost_LIBRARIES
-      Boost_LIBRARY_DIRS
-  )
 ENDIF(_boost_IN_CACHE)
 

@@ -26,7 +26,7 @@ find_library(ALSA_LIBRARY
 
 # Extract the version number
 file(READ "${ALSA_INCLUDE_DIR}/alsa/version.h" _ALSA_VERSION_H_CONTENTS)
-string(REGEX REPLACE ".*#define SND_LIB_VERSION_STR[ \t]*\"(.*)\".*" "\\1" ALSA_VERSION "${_ALSA_VERSION_H_CONTENTS}")
+string(REGEX REPLACE ".*#define SND_LIB_VERSION_STR[ \t]*\"([^\n]*)\".*" "\\1" ALSA_VERSION "${_ALSA_VERSION_H_CONTENTS}")
 
 set(ALSA_PROCESS_INCLUDES ALSA_INCLUDE_DIR)
 set(ALSA_PROCESS_LIBS ALSA_LIBRARY)

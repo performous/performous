@@ -13,13 +13,7 @@ set(SOURCES ${SOURCE_FILES} ${HEADER_FILES})
 
 include_directories(${CMAKE_SOURCE_DIR}/libda)
 
-set(Boost_USE_STATIC_LIBS OFF)
-set(Boost_USE_MULTITHREAD ON)
-if(APPLE)
-	find_package(Boost 1.34 REQUIRED COMPONENTS thread program_options regex filesystem system)
-else(APPLE)
-	find_package(Boost 1.34 REQUIRED COMPONENTS thread program_options regex filesystem)
-endif(APPLE)
+find_package(Boost 1.34 REQUIRED COMPONENTS thread program_options regex filesystem)
 include_directories(${Boost_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${Boost_LIBRARIES})
 
