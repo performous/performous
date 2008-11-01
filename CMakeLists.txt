@@ -23,6 +23,9 @@ set(CPACK_SOURCE_IGNORE_FILES
 )
 set(CPACK_DEBIAN_PACKAGE_DEPENDS libsdl1.2 libsdl-image1.2 libcairo2 librsvg2 libasound2 libjack libboost-thread libboost-serialization libboost-program-options libboost-regex libboost-filesystem libavcodec libavformat libswscale libmagick++9 libsamplerate0 libpulse libxml++2.6)
 include(CPack)
+set(CPACK_DEBIAN_PACKAGE_PRIORITY extra)
+set(CPACK_DEBIAN_PACKAGE_SECTION universe/games)
+set(CPACK_DEBIAN_PACKAGE_RECOMMENDS ultrastar-songs)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 

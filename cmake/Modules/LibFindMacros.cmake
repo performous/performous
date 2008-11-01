@@ -64,7 +64,7 @@ macro (libfind_process PREFIX)
     # Print message and/or exit on fatal error
     if (${PREFIX}_FOUND)
       if (NOT ${PREFIX}_FIND_QUIETLY)
-        message (STATUS "Found ${PREFIX}")
+        message (STATUS "Found ${PREFIX} ${${PREFIX}_VERSION}")
       endif (NOT ${PREFIX}_FIND_QUIETLY)
     else (${PREFIX}_FOUND)
       if (${PREFIX}_FIND_REQUIRED)
