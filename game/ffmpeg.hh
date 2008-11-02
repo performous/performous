@@ -174,6 +174,7 @@ class CFfmpeg {
 	bool decodeVideo;
 	bool decodeAudio;
 	double m_position;
+	static boost::mutex s_avcodec_mutex; // Used for avcodec_open/close (which use some static crap and are thus not thread-safe)
 };
 
 #endif

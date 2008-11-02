@@ -12,6 +12,8 @@ extern "C" {
 
 #define FFMPEG_OUTPUT_NUMBER_OF_CHANNELS 2
 
+/*static*/ boost::mutex CFfmpeg::s_avcodec_mutex;
+
 CFfmpeg::CFfmpeg(bool _decodeVideo, bool _decodeAudio, std::string const& _filename, unsigned int rate): m_filename(_filename), m_rate(rate), m_quit() {
 	av_register_all();
 	videoStream=-1;
@@ -33,6 +35,7 @@ CFfmpeg::~CFfmpeg() {
 	m_thread->join();
 	if( videoStream != -1 && decodeVideo ) avcodec_close(pVideoCodecCtx);
 	if( audioStream != -1 && decodeAudio ) {
+		boost::mutex::scoped_lock l(s_avcodec_mutex);
 		avcodec_close(pAudioCodecCtx);
 		audio_resample_close(pResampleCtx);
 	}
@@ -77,6 +80,7 @@ void CFfmpeg::open() {
 			pVideoCodecCtx = pFormatCtx->streams[videoStream]->codec;
 			pVideoCodec = avcodec_find_decoder(pVideoCodecCtx->codec_id);
 			if (!pVideoCodec) throw std::runtime_error("Cannot find video codec");
+			boost::mutex::scoped_lock l(s_avcodec_mutex);
 			if (avcodec_open(pVideoCodecCtx, pVideoCodec) < 0) throw std::runtime_error("Cannot open video codec");
 		}
 	} catch (std::runtime_error& e) {
