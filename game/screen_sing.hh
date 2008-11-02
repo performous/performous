@@ -30,7 +30,7 @@ class ScoreWindow {
 class CScreenSing: public CScreen {
   public:
 	CScreenSing(std::string const& name, boost::ptr_vector<Analyzer>& analyzers):
-	  CScreen(name), m_analyzers(analyzers), m_nlTop(0.0, 3.0), m_nlBottom(0.0, 3.0)
+	  CScreen(name), m_analyzers(analyzers), m_nlTop(0.0, 2.0), m_nlBottom(0.0, 2.0)
 	{}
 	void enter();
 	void exit();

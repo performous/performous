@@ -180,7 +180,7 @@ void CScreenSing::draw() {
 			if (it->type == Note::SLEEP) continue;
 			if (it->note < low) low = it->note;
 			if (it->note > high) high = it->note;
-			if (it->begin > time + 6.0) continue;
+			if (it->begin > time + 8.0) continue;
 			if (it->note < low2) low2 = it->note;
 			if (it->note > high2) high2 = it->note;
 		}
