@@ -20,7 +20,15 @@
    sodipodi:docbase="/home/yoda/UltraStar/sf/UltraStar-ng/themes/lima"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
-     id="defs2522" />
+     id="defs2522">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 300 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="800 : 300 : 1"
+       inkscape:persp3d-origin="400 : 200 : 1"
+       id="perspective8" />
+  </defs>
   <metadata
      id="metadata35">
     <rdf:RDF>
@@ -47,19 +55,19 @@
      inkscape:zoom="0.63"
      inkscape:cx="382.28027"
      inkscape:cy="304.78209"
-     inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:window-x="5"
+     inkscape:window-y="73"
      inkscape:current-layer="svg559"
      showgrid="false" />
   <text
-     x="311.79999"
-     y="347.02805"
-     style="font-size:56px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;opacity:1;fill:#ffd100;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:inline;font-family:Arial Black"
+     x="400"
+     y="330"
+     style="font-size:56px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;writing-mode:lr-tb;text-anchor:middle;opacity:1;fill:#ffd100;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:inline;font-family:Arial Black"
      id="text10203"
      xml:space="preserve"
      sodipodi:linespacing="125%"><tspan
-       x="311.79999"
-       y="347.02805"
+       x="400"
+       y="330"
        id="tspan10205"
-       style="font-size:56px;fill:#ffd100;fill-opacity:1">value</tspan></text>
+       style="font-size:56px;fill:#ffd100;fill-opacity:1;text-anchor:middle;text-align:center">value</tspan></text>
 </svg>

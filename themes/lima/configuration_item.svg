@@ -20,7 +20,15 @@
    sodipodi:docbase="/home/yoda/UltraStar/sf/UltraStar-ng/themes/lima"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
-     id="defs2513" />
+     id="defs2513">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 300 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="800 : 300 : 1"
+       inkscape:persp3d-origin="400 : 200 : 1"
+       id="perspective8" />
+  </defs>
   <metadata
      id="metadata35">
     <rdf:RDF>
@@ -47,18 +55,18 @@
      inkscape:zoom="0.63"
      inkscape:cx="382.28027"
      inkscape:cy="304.78209"
-     inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:window-x="5"
+     inkscape:window-y="73"
      inkscape:current-layer="svg559"
      showgrid="false" />
   <text
      xml:space="preserve"
-     style="font-size:32px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
-     x="328.60684"
-     y="222.08141"
+     style="font-size:32px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans;text-anchor:middle;text-align:center"
+     x="400"
+     y="213"
      id="text1990"><tspan
        sodipodi:role="line"
        id="tspan1992"
-       x="328.60684"
-       y="222.08141">item</tspan></text>
+       x="400"
+       y="213">item</tspan></text>
 </svg>
