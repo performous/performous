@@ -37,8 +37,8 @@ void CScreenSing::enter() {
 	playOffset = 0.0;
 	m_songit = song.notes.begin();
 	m_notealpha = 0.0f;
-	min = song.noteMin - 7.0;
-	max = song.noteMax + 7.0;
+	m_nlTop.set(song.noteMax, true);
+	m_nlBottom.set(song.noteMin, true);
 	audio.wait(); // Until playback starts
 	m_engine.reset(new Engine(audio, m_analyzers.begin(), m_analyzers.end()));
 }
@@ -170,24 +170,27 @@ void CScreenSing::draw() {
 	const double pixUnit = 0.2;
 	// Update m_songit (which note to start the rendering from)
 	while (m_songit != song.notes.end() && (m_songit->type == Note::SLEEP || m_songit->end < time - (baseLine + 0.5) / pixUnit)) ++m_songit;
+	// Automatically zooming notelines
 	{
-		// Automatically zooming notelines
 		int low = song.noteMax;
 		int high = song.noteMin;
-		for (Song::notes_t::const_iterator it = m_songit; it != song.notes.end() && it->begin < time + 5.0; ++it) {
+		int low2 = song.noteMax;
+		int high2 = song.noteMin;
+		for (Song::notes_t::const_iterator it = m_songit; it != song.notes.end() && it->begin < time + 15.0; ++it) {
 			if (it->type == Note::SLEEP) continue;
 			if (it->note < low) low = it->note;
 			if (it->note > high) high = it->note;
+			if (it->begin > time + 6.0) continue;
+			if (it->note < low2) low2 = it->note;
+			if (it->note > high2) high2 = it->note;
 		}
-		if (low <= high) {
-			double err = min + 7.0 - low;
-			if (err > 0.0) min -= err * 0.007 + 0.02;
-			else if (err < -3.0) min += 0.04;
-			err = max - 7.0 - high;
-			if (err < 0.0) max += -err * 0.007 + 0.02;
-			else if (err > 3.0) max -= 0.04;
+		if (low2 <= high2) {
+			m_nlTop.setRange(high2, high);
+			m_nlBottom.setRange(low, low2);
 		}
 	}
+	double max = m_nlTop.get() + 7.0;
+	double min = m_nlBottom.get() - 7.0;
 	m_sentence = lyrics->getCurrentSentence();
 	double noteUnit = -0.5 / std::max(24.0, max - min);
 	double baseY = -0.5 * (min + max) * noteUnit;

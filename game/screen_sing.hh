@@ -3,6 +3,7 @@
 
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/scoped_ptr.hpp>
+#include "animvalue.hh"
 #include "engine.hh"
 #include "screen.hh"
 #include "theme.hh"
@@ -29,7 +30,7 @@ class ScoreWindow {
 class CScreenSing: public CScreen {
   public:
 	CScreenSing(std::string const& name, boost::ptr_vector<Analyzer>& analyzers):
-	  CScreen(name), m_analyzers(analyzers)
+	  CScreen(name), m_analyzers(analyzers), m_nlTop(0.0, 3.0), m_nlBottom(0.0, 3.0)
 	{}
 	void enter();
 	void exit();
@@ -58,10 +59,10 @@ class CScreenSing: public CScreen {
 	bool finished;
 	double playOffset;
 	float m_notealpha;
-	double min, max;
 	boost::scoped_ptr<CThemeSing> theme;
 	boost::scoped_ptr<Lyrics> lyrics;
 	Song::notes_t::const_iterator m_songit;
+	AnimValue m_nlTop, m_nlBottom;
 };
 
 #endif
