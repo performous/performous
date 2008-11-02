@@ -6,9 +6,9 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
 	message(FATAL_ERROR "In-source builds are not permitted. Make a separate folder for building:\nmkdir build; cd build; cmake ..\nBefore that, remove the files already created:\nrm -rf CMakeCache.txt CMakeFiles")
 endif(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
 
-set(CPACK_GENERATOR "TBZ2;TGZ")
-set(CPACK_SOURCE_GENERATOR "TBZ2;TGZ")
-set(CPACK_PACKAGE_NAME "performous")
+set(CPACK_GENERATOR "TBZ2;DEB")
+set(CPACK_SOURCE_GENERATOR "TBZ2")
+set(CPACK_PACKAGE_NAME "Performous")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A karaoke game with pitch detection and scoring, similar to Singstar games. Previously known as UltraStar-NG. Supports songs in Ultrastar format.")
 set(CPACK_PACKAGE_CONTACT "http://performous.org/")
 set(CPACK_PACKAGE_VERSION_MAJOR 0)
@@ -21,11 +21,12 @@ set(CPACK_SOURCE_IGNORE_FILES
    "/.svn/"
    "/portage-overlay/"
 )
-set(CPACK_DEBIAN_PACKAGE_DEPENDS libsdl1.2 libsdl-image1.2 libcairo2 librsvg2 libasound2 libjack libboost-thread libboost-serialization libboost-program-options libboost-regex libboost-filesystem libavcodec libavformat libswscale libmagick++9 libsamplerate0 libpulse libxml++2.6)
-include(CPack)
+# These deps are for Ubuntu 8.10
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsdl1.2debian, libsdl-image1.2, libcairo2, librsvg2-2, libasound2, libjack0, libboost-thread1.34.1, libboost-serialization1.34.1, libboost-program-options1.34.1, libboost-regex1.34.1, libboost-filesystem1.34.1, libavcodec51, libavformat52, libswscale0, libmagick++10, libsamplerate0, libpulse0, libxml++2.6-2")
 set(CPACK_DEBIAN_PACKAGE_PRIORITY extra)
 set(CPACK_DEBIAN_PACKAGE_SECTION universe/games)
 set(CPACK_DEBIAN_PACKAGE_RECOMMENDS ultrastar-songs)
+include(CPack)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
