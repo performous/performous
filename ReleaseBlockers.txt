@@ -3,14 +3,12 @@ Blockers for 0.3 release:
 Generic
   - Clean all FIXMEs and XXXs
   - Configurable audio roundtrip lag and A/V lag
-  - Animated values helper
 
 Texture
   - Create mipmaps?
 
 Singing screen
   - Widescreen support (not even the first line of lyrics or score calculators fit)
-  - Autozoom notelines improvement (uses animated values)
 
 Build
   - Make Ubuntu packages (Hardy and Intrepid, i386 and amd64)
