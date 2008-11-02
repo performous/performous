@@ -32,8 +32,8 @@
      inkscape:cy="417.84947"
      inkscape:cx="305.25953"
      inkscape:zoom="0.43415836"
-     inkscape:window-height="722"
-     inkscape:window-width="642"
+     inkscape:window-height="726"
+     inkscape:window-width="645"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      guidetolerance="10.0"
@@ -44,22 +44,30 @@
      pagecolor="#ffffff"
      id="base"
      showgrid="false"
-     inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:window-x="10"
+     inkscape:window-y="97"
      inkscape:current-layer="svg3465" />
   <defs
-     id="defs3467" />
+     id="defs3467">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 300 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="800 : 300 : 1"
+       inkscape:persp3d-origin="400 : 200 : 1"
+       id="perspective2397" />
+  </defs>
   <g
      id="layer17">
     <text
-       x="137.82422"
+       x="400"
        y="575.25488"
-       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#d3d7cf;fill-opacity:1;stroke:black;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:inline;font-family:Arial Black"
+       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;writing-mode:lr-tb;text-anchor:middle;fill:#d3d7cf;fill-opacity:1;stroke:black;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:inline;font-family:Arial Black"
        id="text6611"
        xml:space="preserve"><tspan
-         x="137.82422"
+         x="400"
          y="575.25488"
          id="tspan6613"
-         style="fill:#d3d7cf">lyrics</tspan></text>
+         style="fill:#d3d7cf;text-anchor:middle;text-align:center">lyrics</tspan></text>
   </g>
 </svg>

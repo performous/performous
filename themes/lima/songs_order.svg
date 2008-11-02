@@ -45,7 +45,7 @@
      inkscape:zoom="0.89095454"
      inkscape:cx="340.62116"
      inkscape:cy="249.62029"
-     inkscape:window-x="239"
+     inkscape:window-x="235"
      inkscape:window-y="25"
      inkscape:current-layer="svg559"
      showgrid="false" />
@@ -61,12 +61,12 @@
   </defs>
   <text
      xml:space="preserve"
-     style="font-size:24px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
-     x="350"
-     y="536.53125"
+     style="font-size:24px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans;text-anchor:middle;text-align:center"
+     x="400"
+     y="522"
      id="text1990"><tspan
        sodipodi:role="line"
        id="tspan1992"
-       x="350"
-       y="536.53125">Order by</tspan></text>
+       x="400"
+       y="522">Order by</tspan></text>
 </svg>

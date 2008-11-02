@@ -54,12 +54,12 @@ class OpenGLText {
 
 class SvgTxtThemeSimple {
   public:
-  	SvgTxtThemeSimple(std::string _theme_file);
+	SvgTxtThemeSimple(std::string _theme_file);
 	void render(std::string _text);
 	void draw();
 	Dimensions& dimensions() { return m_opengl_text->dimensions(); }
   private:
-  	boost::scoped_ptr<OpenGLText> m_opengl_text;
+	boost::scoped_ptr<OpenGLText> m_opengl_text;
 	std::string m_cache_text;
 	TThemeTxtOpenGL m_text;
 	double m_x;
@@ -105,24 +105,20 @@ class SvgTxtThemeSimple {
 //   SE: (x1,y1)
 class SvgTxtTheme {
   public:
-  	// enum declaration
+	// enum declaration
 	enum Gravity {NW,N,NE,W,C,E,SW,S,SE};
 	enum Fitting {F_ASIS, INSIDE, OUTSIDE, FORCE_INSIDE, FORCE_OUTSIDE};
 	enum VAlign {V_ASIS, TOP, MIDDLE, BOTTOM};
 	enum Align {A_ASIS, LEFT, CENTER, RIGHT};
 	//
-  	SvgTxtTheme(std::string _theme_file, Align _a=A_ASIS, VAlign _v=V_ASIS, Gravity _g=NW, Fitting _f=F_ASIS);
+	Dimensions dimensions;
+  	SvgTxtTheme(std::string _theme_file);
 	void draw(std::vector<TZoomText> _text);
 	void draw(std::vector<std::string> _text);
 	void draw(std::string _text);
-	void setGravity(Gravity _g) {m_gravity=_g;};
-	void setFitting(Fitting _f) {m_fitting=_f;};
 	void setHighlight(std::string _theme_file);
   private:
-  	boost::scoped_ptr<OpenGLText> m_opengl_text[50];
-	Gravity m_gravity;
-	Fitting m_fitting;
-	VAlign m_valign;
+	boost::scoped_ptr<OpenGLText> m_opengl_text[50]; // FIXME: "large enough value"
 	Align m_align;
 	double m_x;
 	double m_y;

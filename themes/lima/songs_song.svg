@@ -45,8 +45,8 @@
      inkscape:zoom="0.89095454"
      inkscape:cx="340.62116"
      inkscape:cy="294.51595"
-     inkscape:window-x="349"
-     inkscape:window-y="25"
+     inkscape:window-x="756"
+     inkscape:window-y="148"
      inkscape:current-layer="svg559"
      showgrid="false" />
   <defs
@@ -61,12 +61,16 @@
   </defs>
   <text
      xml:space="preserve"
-     style="font-size:32px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
-     x="285.08749"
+     style="font-size:32px;font-style:normal;font-weight:normal;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+     x="400"
      y="469.89853"
      id="text1990"><tspan
        sodipodi:role="line"
        id="tspan1992"
-       x="285.08749"
-       y="469.89853">Artist - Songs</tspan></text>
+       x="400"
+       y="469.89853">Artist - Song</tspan><tspan
+       sodipodi:role="line"
+       x="400"
+       y="509.89853"
+       id="tspan2387">(1/100)</tspan></text>
 </svg>

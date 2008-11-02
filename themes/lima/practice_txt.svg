@@ -60,14 +60,14 @@
        id="perspective8" />
   </defs>
   <text
-     x="455.6413"
-     y="453.75821"
+     x="450"
+     y="430"
      style="font-size:40px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;opacity:1;fill:#ffd100;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:inline;font-family:DejaVu Sans Mono"
      id="text10203"
      xml:space="preserve"
      sodipodi:linespacing="125%"><tspan
-       x="455.6413"
-       y="453.75821"
+       x="450"
+       y="430"
        id="tspan10205"
        style="font-weight:bold;fill:#ffd100;fill-opacity:1;font-family:DejaVu Sans Mono">A#</tspan></text>
 </svg>

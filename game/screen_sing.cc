@@ -32,7 +32,8 @@ void CScreenSing::enter() {
 	m_notebargold.reset(new Texture(sm->getThemePathFile("notebargold.svg")));
 	m_notebargold_hl.reset(new Texture(sm->getThemePathFile("notebargold.png")));
 	m_progress.reset(new ProgressBar(sm->getThemePathFile("sing_progressbg.svg"), sm->getThemePathFile("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01, 0.01, true));
-	m_progress->dimensions.fixedWidth(0.4).screenTop();
+	m_progress->dimensions.fixedWidth(0.4).left(-0.5).screenTop();
+	theme->timer->dimensions.screenTop(0.5 * m_progress->dimensions.h());
 	lyrics.reset(new Lyrics(song.notes));
 	playOffset = 0.0;
 	m_songit = song.notes.begin();
@@ -165,7 +166,6 @@ void CScreenSing::draw() {
 		theme->bg_top->dimensions.fixedWidth(1.0).top(-offset);
 		theme->bg_top->draw();
 	}
-	// Compute and draw the timer and the progressbar
 	const double baseLine = -0.2;
 	const double pixUnit = 0.2;
 	// Update m_songit (which note to start the rendering from)
@@ -353,23 +353,29 @@ void CScreenSing::draw() {
 		theme->lyrics_now->draw(sentenceWholeZ);
 		theme->lyrics_next->draw(sentenceNextSentenceZ);
 	}
-	m_progress->draw(songPercent);
-	theme->timer->draw((boost::format("%02u:%02u") % (unsigned(time) / 60) % (unsigned(time) % 60)).str());
-	
+	// Compute and draw the timer and the progressbar
+	{
+		m_progress->draw(songPercent);
+		std::string status = (boost::format("%02u:%02u") % (unsigned(time) / 60) % (unsigned(time) % 60)).str();
+		if (m_songit != song.notes.end() && m_songit->begin > time + 20.0) status += "   ENTER to skip instrumental break";
+		if (m_songit == song.notes.end() && !m_score_window.get()) status += "   Remember to wait for grading!";
+		theme->timer->draw(status);
+	}
+		
 	if( sm->getAudio()->isPaused() ) {
 		m_pause_icon->dimensions.middle().center().fixedWidth(.25);
 		m_pause_icon->draw();
 	}
 
 	if (m_score_window.get()) m_score_window->draw();
-	else if (!sm->getAudio()->isPlaying() || (m_songit == song.notes.end() && sm->getAudio()->getLength() - time < 10.0)) m_score_window.reset(new ScoreWindow(sm, *m_engine));
+	else if (!sm->getAudio()->isPlaying() || (m_songit == song.notes.end() && sm->getAudio()->getLength() - time < 3.0)) m_score_window.reset(new ScoreWindow(sm, *m_engine));
 }
 
 ScoreWindow::ScoreWindow(CScreenManager const* sm, Engine const& e):
   m_bg(sm->getThemePathFile("score_window.svg")),
   m_scoreBar(sm->getThemePathFile("score_bar_bg.svg"), sm->getThemePathFile("score_bar_fg.svg"), ProgressBar::VERTICAL, 0.0, 0.0, false),
   m_score_text(sm->getThemePathFile("score_txt.svg")),
-  m_score_rank(sm->getThemePathFile("score_rank.svg"), SvgTxtTheme::CENTER),
+  m_score_rank(sm->getThemePathFile("score_rank.svg")),
   m_players(e.getPlayers())
 {
 	unsigned int topScore = 0;

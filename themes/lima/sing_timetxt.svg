@@ -9,8 +9,8 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.0"
-   width="800"
-   height="600"
+   width="1000"
+   height="800"
    id="svg3465"
    sodipodi:version="0.32"
    inkscape:version="0.46"
@@ -40,11 +40,11 @@
      pagecolor="#ffffff"
      id="base"
      showgrid="false"
-     inkscape:zoom="1.3525"
-     inkscape:cx="268.76155"
+     inkscape:zoom="0.95636192"
+     inkscape:cx="394.87412"
      inkscape:cy="477.44917"
-     inkscape:window-x="0"
-     inkscape:window-y="49"
+     inkscape:window-x="20"
+     inkscape:window-y="145"
      inkscape:current-layer="svg3465" />
   <defs
      id="defs3467">
@@ -60,13 +60,12 @@
      sodipodi:linespacing="125%"
      xml:space="preserve"
      id="timer_text"
-     style="font-size:21.90407562000000041px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;text-anchor:start;fill:#ffcc00;fill-opacity:1;stroke:#ffcc00;stroke-width:0.99999998;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline;font-family:DejaVu Sans Mono"
-     y="103.14099"
-     x="621.74298"
-     transform="scale(1.0040291,0.9959871)"><tspan
+     style="font-size:18px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.50000000000000000;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline;font-family:Arial Black"
+     y="21.253304"
+     x="400"><tspan
        id="tspan4717"
-       y="106.62513"
-       x="405.28949"
-       style="fill:#ffcc00;fill-opacity:1;stroke:#ffcc00;stroke-width:0.99999998;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">00:00</tspan></text>
+       y="24.737442"
+       x="400"
+       style="font-size:20px;text-align:start;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.50000000000000000;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">00:00</tspan></text>
 <!--       style="font-size:25px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;opacity:1;fill:black;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.56078384;display:inline;font-family:Arial Black"
 --></svg>

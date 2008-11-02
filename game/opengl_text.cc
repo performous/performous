@@ -93,7 +93,7 @@ void OpenGLText::draw(Dimensions &_dim, TexCoords &_tex) {
 	m_surface.draw();
 }
 
-void parseTheme( std::string _theme_file, TThemeTxtOpenGL &_theme, double &_width, double &_height, double &_x, double &_y ) {
+void parseTheme( std::string _theme_file, TThemeTxtOpenGL &_theme, double &_width, double &_height, double &_x, double &_y, SvgTxtTheme::Align& _align) {
 	// this should stay here for the moment
 	_theme.fontalign = "center";
 
@@ -128,6 +128,13 @@ void parseTheme( std::string _theme_file, TThemeTxtOpenGL &_theme, double &_widt
 		else if (token == "fill-opacity") iss2 >> _theme.fill_col.a;
 		else if (token == "fill") _theme.fill_col = getColor(iss2);
 		else if (token == "stroke") _theme.stroke_col = getColor(iss2);
+		else if (token == "text-anchor") {
+			std::string value;
+			std::getline(iss2, value);
+			if (value == "start") _align = SvgTxtTheme::LEFT;
+			else if (value == "middle") _align = SvgTxtTheme::CENTER;
+			else if (value == "end") _align = SvgTxtTheme::RIGHT;
+		}
 	}
 
 	n = dom.get_document()->get_root_node()->find("/svg:svg//svg:text/@x",nsmap);
@@ -141,7 +148,8 @@ void parseTheme( std::string _theme_file, TThemeTxtOpenGL &_theme, double &_widt
 }
 
 SvgTxtThemeSimple::SvgTxtThemeSimple(std::string _theme_file) : m_cache_text("XXX FIXME: Use something else. This text must never appear in lyrics!") {
-	parseTheme(_theme_file, m_text, m_width, m_height, m_x, m_y);
+	SvgTxtTheme::Align a;
+	parseTheme(_theme_file, m_text, m_width, m_height, m_x, m_y, a);
 }
 
 void SvgTxtThemeSimple::render(std::string _text) {
@@ -151,17 +159,20 @@ void SvgTxtThemeSimple::render(std::string _text) {
 		m_opengl_text.reset(new OpenGLText(m_text));
 	}
 }
+
 void SvgTxtThemeSimple::draw() {
 	m_opengl_text->draw();
 }
 
-void SvgTxtTheme::setHighlight(std::string _theme_file) {
-	double a,b,c,d;
-	parseTheme(_theme_file, m_text_highlight, a, b, c, d);
+SvgTxtTheme::SvgTxtTheme(std::string _theme_file): m_align(), m_cache_text("XXX FIXME: Use something else. This text must never appear in lyrics!") {
+	parseTheme(_theme_file, m_text, m_width, m_height, m_x, m_y, m_align);
+	dimensions.stretch(0.0, 0.0).middle(-0.5 + m_x / m_width).center((m_y - 0.5 * m_height) / m_width);
 }
 
-SvgTxtTheme::SvgTxtTheme(std::string _theme_file, Align _a, VAlign _v, Gravity _g, Fitting _f) : m_gravity(_g), m_fitting(_f), m_valign(_v), m_align(_a), m_cache_text("XXX FIXME: Use something else. This text must never appear in lyrics!") {
-	parseTheme(_theme_file, m_text, m_width, m_height, m_x, m_y);
+void SvgTxtTheme::setHighlight(std::string _theme_file) {
+	double a,b,c,d;
+	Align e;
+	parseTheme(_theme_file, m_text_highlight, a, b, c, d, e);
 }
 
 void SvgTxtTheme::draw(std::vector<std::string> _text) {
@@ -205,25 +216,13 @@ void SvgTxtTheme::draw(std::vector<TZoomText> _text) {
 		text_y = std::max(text_y, m_opengl_text[i]->y());
 	}
 
-	double screen_width = 1.0;
-	double screen_height = 600./800.;
 	double texture_ar = text_x/text_y;
-	double texture_width = std::min(1.0, text_x/800.);
+	double texture_width = std::min(0.96, text_x/800.);
 	double texture_height = texture_width / texture_ar;
 
-	double svg_width = m_width;
-	double svg_height = m_height;
-
-	double position_x;
-	double position_y;
-
-	if (m_align == CENTER) {
-		position_x = -texture_width/2.;
-		position_y = -screen_height/2. + (m_y-m_text.fontsize) * screen_height / svg_height;
-	} else {
-		position_x = -screen_width/2. + (m_x) * screen_width / svg_width;
-		position_y = -screen_height/2. + (m_y-m_text.fontsize) * screen_height / svg_height;
-	}
+	double position_x = dimensions.x1();
+	if (m_align == CENTER) position_x -= 0.5 * texture_width;
+	if (m_align == RIGHT) position_x -= texture_width;
 
 	for (unsigned int i = 0; i < _text.size(); i++ ) {
 		double syllable_x = m_opengl_text[i]->x();
@@ -231,16 +230,13 @@ void SvgTxtTheme::draw(std::vector<TZoomText> _text) {
 		double syllable_height = texture_height;
 		double syllable_ar = syllable_width / syllable_height;
 		Dimensions dim(syllable_ar);
-		dim.fixedHeight(texture_height).center(position_y + 0.5 * texture_height);
+		dim.fixedHeight(texture_height).center(dimensions.y1());
 		dim.middle(position_x + 0.5 * dim.w());
 		TexCoords tex;
 		double factor = _text[i].factor;
 		if (factor != 1.0) {
 			glColor3f(m_text_highlight.fill_col.r, m_text_highlight.fill_col.g, m_text_highlight.fill_col.b);
 			dim.fixedWidth(dim.w() * factor);
-		}
-		if (m_valign == TOP) {
-			dim.screenTop();
 		}
 		m_opengl_text[i]->draw(dim, tex);
 		if (factor != 1.0) glColor3f(1.0, 1.0, 1.0);

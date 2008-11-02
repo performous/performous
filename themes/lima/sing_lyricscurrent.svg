@@ -29,7 +29,7 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="722"
+     inkscape:window-height="726"
      inkscape:window-width="922"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
@@ -40,26 +40,32 @@
      bordercolor="#666666"
      pagecolor="#ffffff"
      id="base"
-     inkscape:zoom="3.5826744"
-     inkscape:cx="186.78984"
-     inkscape:cy="97.453862"
+     inkscape:zoom="0.43596296"
+     inkscape:cx="458.84961"
+     inkscape:cy="340.50263"
      inkscape:window-x="101"
      inkscape:window-y="100"
      inkscape:current-layer="svg3465"
      showgrid="false" />
   <defs
-     id="defs3467" />
-  <g
-     id="layer16">
-    <text
-       x="137.82422"
+     id="defs3467">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 300 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="800 : 300 : 1"
+       inkscape:persp3d-origin="400 : 200 : 1"
+       id="perspective9" />
+  </defs>
+  <text
+     sodipodi:linespacing="125%"
+     xml:space="preserve"
+     id="text3481"
+     style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;writing-mode:lr-tb;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:inline;font-family:Arial Black"
+     y="527.65424"
+     x="400"><tspan
+       style="font-size:40px;text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1"
+       id="tspan2921"
        y="527.65424"
-       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:white;fill-opacity:1;stroke:black;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:inline;font-family:Arial Black"
-       id="text3481"
-       xml:space="preserve"><tspan
-         x="137.82422"
-         y="527.65424"
-         id="tspan2921"
-         style="fill:white;fill-opacity:1">lyrics</tspan></text>
-  </g>
+       x="400">lyrics</tspan></text>
 </svg>
