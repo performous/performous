@@ -94,6 +94,7 @@ void CFfmpeg::open() {
 			if (!pResampleCtx) throw std::runtime_error("Cannot create resampling context");
 			std::cout << "Resampling audio from " << pAudioCodecCtx->channels << " channel(s) at " << pAudioCodecCtx->sample_rate << "Hz";
 			std::cout << " to " << FFMPEG_OUTPUT_NUMBER_OF_CHANNELS << " channels at " << m_rate << "Hz" << std::endl;
+			audioQueue.setSamplesPerSecond(FFMPEG_OUTPUT_NUMBER_OF_CHANNELS * m_rate);
 		}
 	} catch (std::runtime_error& e) {
 		// TODO: clean memory

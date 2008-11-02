@@ -73,22 +73,23 @@ class VideoFifo {
 
 class AudioFifo {
   public:
-	AudioFifo(): m_timestamp(), m_eof() {}
+	AudioFifo(): m_sps(), m_timestamp(), m_eof() {}
+	void setSamplesPerSecond(unsigned sps) { m_sps = sps; }
 	void tryPop(std::vector<int16_t>& buffer, std::size_t size = 0) {
 		if (size == 0) size = std::numeric_limits<std::size_t>::max();
 		boost::mutex::scoped_lock l(m_mutex);
 		while (!m_queue.empty() && size > 0) {
-			std::vector<int16_t>& data = m_queue.front().data;
-			if (data.empty()) { m_eof = true; break; } // Empty frames are EOF markers
-			if (data.size() <= size) {
-				buffer.insert(buffer.end(), data.begin(), data.end());
-				size -= data.size();
+			AudioFrame& f = m_queue.front();
+			if (f.data.empty()) { m_eof = true; break; } // Empty frames are EOF markers
+			if (f.data.size() <= size) {
+				buffer.insert(buffer.end(), f.data.begin(), f.data.end());
+				size -= f.data.size();
 				m_queue.pop_front();
 				m_cond.notify_one();
 			} else {
-				buffer.insert(buffer.end(), data.begin(), data.begin() + size);
-				data.erase(data.begin(), data.begin() + size);
-				m_queue.front().timestamp += size / (2.0 * 48000.0); // FIXME: don't hardcode samples/s
+				buffer.insert(buffer.end(), f.data.begin(), f.data.begin() + size);
+				f.data.erase(f.data.begin(), f.data.begin() + size);
+				if (m_sps > 0) f.timestamp += double(size) / m_sps; // Samples of the package used, increment timestamp
 				size = 0;
 			}
 		}
@@ -114,6 +115,7 @@ class AudioFifo {
 	boost::ptr_deque<AudioFrame> m_queue;
 	boost::mutex m_mutex;
 	boost::condition m_cond;
+	unsigned m_sps;
 	double m_timestamp;
 	bool m_eof;
 	static const unsigned m_max = 100;
