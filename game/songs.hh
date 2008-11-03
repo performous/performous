@@ -135,8 +135,8 @@ class Songs: boost::noncopyable {
 	int size() const { return m_filtered.size(); };
 	int empty() const { return m_filtered.empty(); };
 	void advance(int diff) {
-		// FIXME: This is a quick fix to avoid divide by zero, but should check what really needs to be done here...
 		int size = m_filtered.size();
+		if (size == 0) return;  // Do nothing if no songs are available
 		int _current = size ? (int(math_cover.getTarget()) + diff) % size : 0;
 		if (_current < 0) _current += m_filtered.size();
 		math_cover.setTarget(_current,this->size());

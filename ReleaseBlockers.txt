@@ -1,11 +1,7 @@
 Blockers for 0.3 release:
 
 Generic
-  - Clean all FIXMEs and XXXs
   - Configurable audio roundtrip lag and A/V lag
-
-Texture
-  - Create mipmaps?
 
 Build
   - Make Ubuntu packages (Hardy and Intrepid, i386 and amd64)

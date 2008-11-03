@@ -6,7 +6,7 @@ void Player::update() {
 	Tone const* t = m_analyzer.findTone();
 	if (t) {
 		m_activitytimer = 1000;
-		Song const& s = CScreenManager::getSingletonPtr()->getSongs()->current(); // XXX: Kill ScreenManager
+		Song const& s = CScreenManager::getSingletonPtr()->getSongs()->current(); // TODO: Kill ScreenManager
 		m_scoreIt = s.notes.begin(); // TODO: optimize
 		m_pitch.push_back(std::make_pair(t->freq, t->stabledb));
 		double beginTime = Engine::TIMESTEP * (m_pitch.size() - 1);

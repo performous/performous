@@ -147,13 +147,13 @@ void parseTheme( std::string _theme_file, TThemeTxtOpenGL &_theme, double &_widt
 	_y = boost::lexical_cast<double>(y.get_value());
 }
 
-SvgTxtThemeSimple::SvgTxtThemeSimple(std::string _theme_file) : m_cache_text("XXX FIXME: Use something else. This text must never appear in lyrics!") {
+SvgTxtThemeSimple::SvgTxtThemeSimple(std::string _theme_file) {
 	SvgTxtTheme::Align a;
 	parseTheme(_theme_file, m_text, m_width, m_height, m_x, m_y, a);
 }
 
 void SvgTxtThemeSimple::render(std::string _text) {
-	if (m_cache_text != _text) {
+	if (!m_opengl_text.get() || m_cache_text != _text) {
 		m_cache_text = _text;
 		m_text.text = _text;
 		m_opengl_text.reset(new OpenGLText(m_text));
@@ -164,7 +164,7 @@ void SvgTxtThemeSimple::draw() {
 	m_opengl_text->draw();
 }
 
-SvgTxtTheme::SvgTxtTheme(std::string _theme_file): m_align(), m_cache_text("XXX FIXME: Use something else. This text must never appear in lyrics!") {
+SvgTxtTheme::SvgTxtTheme(std::string _theme_file): m_align() {
 	parseTheme(_theme_file, m_text, m_width, m_height, m_x, m_y, m_align);
 	dimensions.stretch(0.0, 0.0).middle(-0.5 + m_x / m_width).center((m_y - 0.5 * m_height) / m_width);
 }
@@ -175,10 +175,10 @@ void SvgTxtTheme::setHighlight(std::string _theme_file) {
 	parseTheme(_theme_file, m_text_highlight, a, b, c, d, e);
 }
 
-void SvgTxtTheme::draw(std::vector<std::string> _text) {
+void SvgTxtTheme::draw(std::vector<std::string> const& _text) {
 	std::vector<TZoomText> tmp;
 
-	for (std::vector<std::string>::iterator it = _text.begin(); it != _text.end(); ++it) {
+	for (std::vector<std::string>::const_iterator it = _text.begin(); it != _text.end(); ++it) {
 		TZoomText t;
 		t.string = *it;
 		t.factor = 1.0;
@@ -197,23 +197,25 @@ void SvgTxtTheme::draw(std::string _text) {
 	draw(tmp);
 }
 
-void SvgTxtTheme::draw(std::vector<TZoomText> _text, float alpha) {
+void SvgTxtTheme::draw(std::vector<TZoomText> const& _text, float alpha) {
 	std::string tmp;
 	for (unsigned int i = 0 ; i < _text.size(); i++ ) tmp += _text[i].string;
 
-	if (m_cache_text != tmp) {
+	if (m_opengl_text.empty() || m_cache_text != tmp) {
 		m_cache_text = tmp;
+		m_opengl_text.clear();
 		for (unsigned int i = 0; i < _text.size(); i++ ) {
+			if (_text[i].string.empty()) continue;
 			m_text.text = _text[i].string;
-			m_opengl_text[i].reset(new OpenGLText(m_text));
+			m_opengl_text.push_back(new OpenGLText(m_text));
 		}
 	}
 	double text_x = 0.0;
 	double text_y = 0.0;
 	// first compute maximum height and whole length
 	for (unsigned int i = 0; i < _text.size(); i++ ) {
-		text_x += m_opengl_text[i]->x();
-		text_y = std::max(text_y, m_opengl_text[i]->y());
+		text_x += m_opengl_text[i].x();
+		text_y = std::max(text_y, m_opengl_text[i].y());
 	}
 
 	double texture_ar = text_x/text_y;
@@ -225,7 +227,7 @@ void SvgTxtTheme::draw(std::vector<TZoomText> _text, float alpha) {
 	if (m_align == RIGHT) position_x -= texture_width;
 
 	for (unsigned int i = 0; i < _text.size(); i++ ) {
-		double syllable_x = m_opengl_text[i]->x();
+		double syllable_x = m_opengl_text[i].x();
 		double syllable_width = syllable_x *  texture_width / text_x;
 		double syllable_height = texture_height;
 		double syllable_ar = syllable_width / syllable_height;
@@ -239,7 +241,7 @@ void SvgTxtTheme::draw(std::vector<TZoomText> _text, float alpha) {
 			glColor4f(m_text_highlight.fill_col.r, m_text_highlight.fill_col.g, m_text_highlight.fill_col.b, alpha);
 			dim.fixedWidth(dim.w() * factor);
 		}
-		m_opengl_text[i]->draw(dim, tex);
+		m_opengl_text[i].draw(dim, tex);
 		glColor3f(1.0, 1.0, 1.0);
 		position_x += syllable_width;
 	}

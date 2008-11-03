@@ -4,6 +4,7 @@
 #include "color.hh"
 #include "surface.hh"
 #include <boost/scoped_ptr.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
 #include <vector>
 
 struct TZoomText {
@@ -113,12 +114,12 @@ class SvgTxtTheme {
 	//
 	Dimensions dimensions;
   	SvgTxtTheme(std::string _theme_file);
-	void draw(std::vector<TZoomText> _text, float alpha = 1.0f);
-	void draw(std::vector<std::string> _text);
+	void draw(std::vector<TZoomText> const& _text, float alpha = 1.0f);
+	void draw(std::vector<std::string> const& _text);
 	void draw(std::string _text);
 	void setHighlight(std::string _theme_file);
   private:
-	boost::scoped_ptr<OpenGLText> m_opengl_text[50]; // FIXME: "large enough value"
+	boost::ptr_vector<OpenGLText> m_opengl_text;
 	Align m_align;
 	double m_x;
 	double m_y;
