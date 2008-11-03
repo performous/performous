@@ -7,9 +7,6 @@ Generic
 Texture
   - Create mipmaps?
 
-Singing screen
-  - Widescreen support (not even the first line of lyrics or score calculators fit)
-
 Build
   - Make Ubuntu packages (Hardy and Intrepid, i386 and amd64)
   - Make Gentoo package

@@ -9,7 +9,7 @@
 struct TZoomText {
 	std::string string;
 	double factor;
-	TZoomText(): string(),factor() {};
+	TZoomText(std::string const& str = std::string()): string(str), factor(1.0) {}
 };
 
 // Special theme for creating opengl themed surfaces
@@ -113,7 +113,7 @@ class SvgTxtTheme {
 	//
 	Dimensions dimensions;
   	SvgTxtTheme(std::string _theme_file);
-	void draw(std::vector<TZoomText> _text);
+	void draw(std::vector<TZoomText> _text, float alpha = 1.0f);
 	void draw(std::vector<std::string> _text);
 	void draw(std::string _text);
 	void setHighlight(std::string _theme_file);

@@ -8,18 +8,19 @@
 class AnimValue {
   public:
 	AnimValue(double value = 0.0, double rate = 1.0): m_value(value), m_target(value), m_rate(rate) {}
-	void set(double target, bool step = false) { m_target = target; if (step) m_value = target; }
+	void move(double diff) { m_value += diff; }
+	double getTarget() const { return m_target; }
+	void setTarget(double target, bool step = false) { m_target = target; if (step) m_value = target; }
 	void setRange(double tmin, double tmax) {
 		if (tmin > tmax) throw std::logic_error("AnimValue range is reversed");
 		m_target = std::min(std::max(tmin, m_target), tmax);
 	}
 	void setValue(double value) { m_value = value; }
 	double get() const {
-		for (double t = m_rate * duration(); t > 0.0; t -= 0.001) {
-			double diff = m_value - m_target;
-			if (std::abs(diff) < 0.001) { m_value = m_target; break; }
-			if (diff > 0.0) m_value -= 0.001; else m_value += 0.001;
-		}
+		double maxadj = m_rate * duration();
+		double diff = m_value - m_target;
+		double adj = std::min(maxadj, std::fabs(diff));
+		if (diff > 0.0) m_value -= adj; else m_value += adj;
 		return m_value;
 	}
   private:

@@ -8,6 +8,14 @@
 #include <iostream>
 #include <iomanip>
 
+CScreenSing::SongStatus CScreenSing::songStatus() const {
+	CScreenManager* sm = CScreenManager::getSingletonPtr();
+	Song& song = sm->getSongs()->current();
+	if (m_songit == song.notes.end()) return FINISHED;
+	if (m_lyrics.empty()) return INSTRUMENTAL_BREAK;
+	return NORMAL;
+}
+
 void CScreenSing::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	Song& song = sm->getSongs()->current();
@@ -34,22 +42,20 @@ void CScreenSing::enter() {
 	m_progress.reset(new ProgressBar(sm->getThemePathFile("sing_progressbg.svg"), sm->getThemePathFile("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01, 0.01, true));
 	m_progress->dimensions.fixedWidth(0.4).left(-0.5).screenTop();
 	theme->timer->dimensions.screenTop(0.5 * m_progress->dimensions.h());
-	lyrics.reset(new Lyrics(song.notes));
 	playOffset = 0.0;
-	m_songit = song.notes.begin();
+	m_lyricit = m_songit = song.notes.begin();
 	m_notealpha = 0.0f;
-	m_nlTop.set(song.noteMax, true);
-	m_nlBottom.set(song.noteMin, true);
+	m_nlTop.setTarget(song.noteMax, true);
+	m_nlBottom.setTarget(song.noteMin, true);
 	audio.wait(); // Until playback starts
 	m_engine.reset(new Engine(audio, m_analyzers.begin(), m_analyzers.end()));
 }
 
 void CScreenSing::exit() {
 	m_score_window.reset();
-	lyrics.reset();
+	m_lyrics.clear();
 	m_engine.reset();
 	CScreenManager::getSingletonPtr()->getAudio()->stopMusic();
-	m_sentence.clear();
 	m_notebargold_hl.reset();
 	m_notebargold.reset();
 	m_pause_icon.reset();
@@ -72,16 +78,17 @@ void CScreenSing::manageEvent(SDL_Event event) {
 		CScreenManager* sm = CScreenManager::getSingletonPtr();
 		CAudio& audio = *sm->getAudio();
 		int key = event.key.keysym.sym;
-		if (key == SDLK_ESCAPE || key == SDLK_q || (key == SDLK_RETURN && m_sentence.empty())) {
-			if (!m_sentence.empty() ||m_score_window.get()) sm->activateScreen("Songs");
+		if (key == SDLK_ESCAPE || key == SDLK_q || (key == SDLK_RETURN && songStatus() == FINISHED)) {
+			// Enter at end of song display score window, except if score window is already displayed
+			if (key != SDLK_RETURN || m_score_window.get()) sm->activateScreen("Songs");
 			else m_score_window.reset(new ScoreWindow(sm, *m_engine));
 		}
 		else if (key == SDLK_SPACE || key == SDLK_PAUSE) sm->getAudio()->togglePause();
 		else if (key == SDLK_PLUS) playOffset += 0.02;
 		else if (key == SDLK_MINUS) playOffset -= 0.02;
 		else if (key == SDLK_HOME) audio.seek(-audio.getPosition());
-		else if (key == SDLK_RETURN && !m_sentence.empty()) {
-			double diff = m_sentence[0].begin - 3.0 - audio.getPosition();
+		else if (key == SDLK_RETURN && songStatus() == INSTRUMENTAL_BREAK) {
+			double diff = m_songit->begin - 3.0 - audio.getPosition();
 			if (diff > 0.0) audio.seek(diff);
 		}
 		else if (key == SDLK_LEFT) audio.seek(-5.0);
@@ -90,13 +97,13 @@ void CScreenSing::manageEvent(SDL_Event event) {
 		else if (key == SDLK_DOWN) audio.seek(-30.0);
 		else if (key == SDLK_r && event.key.keysym.mod & KMOD_CTRL) {
 			double pos = audio.getPosition();
-			if (!m_sentence.empty()) pos = std::min(pos, m_sentence[0].begin - 0.4);
 			sm->getSongs()->current().reload();
 			exit(); enter();
-			boost::thread::sleep(now() + 0.3); // HACK: Wait until the song is loaded
 			audio.seek(pos);
 		}
-		m_songit = sm->getSongs()->current().notes.begin(); // Must be done after seeking backwards, doesn't hurt to do it always
+		// Some things must be reset after seeking backwards, doesn't much hurt to do it on every keystroke (TODO: optimize)
+		m_lyricit = m_songit = sm->getSongs()->current().notes.begin();
+		m_lyrics.clear();
 	}
 }
 
@@ -191,7 +198,6 @@ void CScreenSing::draw() {
 	}
 	double max = m_nlTop.get() + 7.0;
 	double min = m_nlBottom.get() - 7.0;
-	m_sentence = lyrics->getCurrentSentence();
 	double noteUnit = -0.5 / std::max(24.0, max - min);
 	double baseY = -0.5 * (min + max) * noteUnit;
 	double baseX = baseLine - time * pixUnit;
@@ -311,54 +317,38 @@ void CScreenSing::draw() {
 	}
 	// Compute and draw lyrics
 	{
-		double factor = 1.0;
-		for (Song::notes_t::const_iterator it = m_songit; it != song.notes.end() && it->begin <= time; ++it) {
-			if (it->type == Note::SLEEP) continue;
-			if (it->end > time) factor = 1.2 - 0.2 * (time - it->begin) / (it->end - it->begin);
+		const double basepos = -0.1;
+		const double linespacing = 0.06;
+		bool dirty;
+		do {
+			dirty = false;
+			if (!m_lyrics.empty() && m_lyrics[0].expired(time)) {
+				// Add extra spacing to replace the removed row
+				if (m_lyrics.size() > 1) m_lyrics[1].extraspacing.move(m_lyrics[0].extraspacing.get() + 1.0);
+				m_lyrics.pop_front();
+				dirty = true;
+			}
+			if (!dirty && m_lyricit != song.notes.end() && m_lyricit->begin < time + 10.0) {
+				m_lyrics.push_back(LyricRow(m_lyricit, song.notes.end()));
+				dirty = true;
+			}
+		} while (dirty);
+		double pos = basepos;
+		for (size_t i = 0; i < m_lyrics.size(); ++i, pos += linespacing) {
+			pos += m_lyrics[i].extraspacing.get() * linespacing;
+			if (i == 0) m_lyrics[0].draw(*theme->lyrics_now, time, pos);
+			else if (i == 1) m_lyrics[1].draw(*theme->lyrics_next, time, pos);
 		}
-
-		lyrics->updateSentences(time);
-		std::vector<std::string> sentenceNextSentence = lyrics->getSentenceNext();
-		std::vector<std::string> sentencePast = lyrics->getSentencePast();
-		std::vector<std::string> sentenceNow = lyrics->getSentenceNow();
-		std::vector<std::string> sentenceFuture = lyrics->getSentenceFuture();
-
-		std::vector<TZoomText> sentenceNextSentenceZ;
-		std::vector<TZoomText> sentenceWholeZ;
-
-		for (unsigned int i = 0 ; i < sentenceNextSentence.size(); i++) {
-			TZoomText tmp;
-			tmp.factor = 1.0;
-			tmp.string = sentenceNextSentence[i];
-			sentenceNextSentenceZ.push_back(tmp);
-		}
-		for (unsigned int i = 0 ; i < sentencePast.size(); i++) {
-			TZoomText tmp;
-			tmp.factor = 1.0;
-			tmp.string = sentencePast[i];
-			sentenceWholeZ.push_back(tmp);
-		}
-		for (unsigned int i = 0 ; i < sentenceNow.size(); i++) {
-			TZoomText tmp;
-			tmp.factor = factor;
-			tmp.string = sentenceNow[i];
-			sentenceWholeZ.push_back(tmp);
-		}
-		for (unsigned int i = 0 ; i < sentenceFuture.size(); i++) {
-			TZoomText tmp;
-			tmp.factor = 1.0;
-			tmp.string = sentenceFuture[i];
-			sentenceWholeZ.push_back(tmp);
-		}
-		theme->lyrics_now->draw(sentenceWholeZ);
-		theme->lyrics_next->draw(sentenceNextSentenceZ);
 	}
 	// Compute and draw the timer and the progressbar
 	{
 		m_progress->draw(songPercent);
 		std::string status = (boost::format("%02u:%02u") % (unsigned(time) / 60) % (unsigned(time) % 60)).str();
-		if (m_songit != song.notes.end() && m_songit->begin > time + 20.0) status += "   ENTER to skip instrumental break";
-		if (m_songit == song.notes.end() && !m_score_window.get()) status += "   Remember to wait for grading!";
+		if (!m_score_window.get()) {
+			SongStatus s = songStatus();
+			if (s == INSTRUMENTAL_BREAK) status += "   ENTER to skip instrumental break";
+			if (s == FINISHED) status += "   Remember to wait for grading!";
+		}
 		theme->timer->draw(status);
 	}
 		

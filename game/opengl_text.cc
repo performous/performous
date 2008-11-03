@@ -197,7 +197,7 @@ void SvgTxtTheme::draw(std::string _text) {
 	draw(tmp);
 }
 
-void SvgTxtTheme::draw(std::vector<TZoomText> _text) {
+void SvgTxtTheme::draw(std::vector<TZoomText> _text, float alpha) {
 	std::string tmp;
 	for (unsigned int i = 0 ; i < _text.size(); i++ ) tmp += _text[i].string;
 
@@ -234,12 +234,13 @@ void SvgTxtTheme::draw(std::vector<TZoomText> _text) {
 		dim.middle(position_x + 0.5 * dim.w());
 		TexCoords tex;
 		double factor = _text[i].factor;
-		if (factor != 1.0) {
-			glColor3f(m_text_highlight.fill_col.r, m_text_highlight.fill_col.g, m_text_highlight.fill_col.b);
+		if (factor == 1.0) glColor4f(1.0f, 1.0f, 1.0f, alpha);
+		else {
+			glColor4f(m_text_highlight.fill_col.r, m_text_highlight.fill_col.g, m_text_highlight.fill_col.b, alpha);
 			dim.fixedWidth(dim.w() * factor);
 		}
 		m_opengl_text[i]->draw(dim, tex);
-		if (factor != 1.0) glColor3f(1.0, 1.0, 1.0);
+		glColor3f(1.0, 1.0, 1.0);
 		position_x += syllable_width;
 	}
 }

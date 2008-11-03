@@ -3,6 +3,7 @@
 
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <deque>
 #include "animvalue.hh"
 #include "engine.hh"
 #include "screen.hh"
@@ -27,6 +28,37 @@ class ScoreWindow {
 	std::string m_rank;
 };
 
+class LyricRow {
+  public:
+	AnimValue extraspacing, fade;
+	typedef Song::notes_t::const_iterator Iterator;
+	LyricRow(Iterator& it, Iterator const& eof): extraspacing(0.0, 2.0), fade(0.0, 0.6) {
+		fade.setTarget(1.0);
+		m_begin = it;
+		while (it != eof && it->type != Note::SLEEP) ++it;
+		m_end = it;
+		if (it != eof) ++it;
+		if (m_begin == m_end) throw std::logic_error("Empty sentence");
+	}
+	bool expired(double time) const {
+		double lastTime = 0.0;
+		for (Iterator it = m_begin; it != m_end; ++it) lastTime = it->end;
+		return time > lastTime;
+	}
+	void draw(SvgTxtTheme& txt, double time, double pos) const {
+		std::vector<TZoomText> sentence;
+		for (Iterator it = m_begin; it != m_end; ++it) {
+			sentence.push_back(TZoomText(it->syllable));
+			bool current = (time >= it->begin && time < it->end);
+			sentence.back().factor = current ? 1.2 - 0.2 * (time - it->begin) / (it->end - it->begin) : 1.0;
+		}
+		txt.dimensions.screenBottom(pos);
+		txt.draw(sentence, fade.get());
+	}
+  private:
+	Iterator m_begin, m_end;
+};
+
 class CScreenSing: public CScreen {
   public:
 	CScreenSing(std::string const& name, boost::ptr_vector<Analyzer>& analyzers):
@@ -36,6 +68,8 @@ class CScreenSing: public CScreen {
 	void exit();
 	void manageEvent(SDL_Event event);
 	void draw();
+	enum SongStatus { NORMAL, INSTRUMENTAL_BREAK, FINISHED };
+	SongStatus songStatus() const;
   private:
 	boost::scoped_ptr<ScoreWindow> m_score_window;
 	boost::ptr_vector<Analyzer>& m_analyzers;
@@ -54,15 +88,14 @@ class CScreenSing: public CScreen {
 	boost::scoped_ptr<Texture> m_notebargold;
 	boost::scoped_ptr<Texture> m_notebargold_hl;
 	boost::scoped_ptr<Engine> m_engine;
-	std::vector<Note> m_sentence;
 	bool play;
-	bool finished;
 	double playOffset;
 	float m_notealpha;
 	boost::scoped_ptr<CThemeSing> theme;
-	boost::scoped_ptr<Lyrics> lyrics;
 	Song::notes_t::const_iterator m_songit;
+	Song::notes_t::const_iterator m_lyricit;
 	AnimValue m_nlTop, m_nlBottom;
+	std::deque<LyricRow> m_lyrics;
 };
 
 #endif
