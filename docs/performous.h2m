@@ -4,10 +4,16 @@ Include file for Performous man page
 performous \- The free Linux karaoke game
 
 [description]
-Performous is a karaoke game which is based off and looks
-similar to Singstar for PS2. Performous is based on UltraStar and allows
-you to add your own songs in different formats (e.g. ogg, mp3, m4a...) along
-with a song text and a music video file or an image file.
+Performous is a free cross-platform clone of the Playstation 2 game Singstar.
+
+While Performous might be classified as a karaoke program, it is actually much
+more than that. Instead of just displaying the lyrics, notes are also displayed
+and the performance is scored based on how well you hit the notes and you can
+see your own singing pitch on screen.
+
+Performous was previously known as UltraStar Next Generation (USNG) because it
+supports the UltraStar song format. It is not a fork of the Delphi-based
+UltraStar games, as Performous is rewritten from scratch in C++.
 
 If you have trouble with the program (no songs found, audio not working, etc),
 try running it on a terminal. Some useful debug information such a list of
@@ -48,7 +54,7 @@ Switch the sort order (song name, artist, edition, genre or song folder path)
 \fBAny text\fR
 Search for songs (write the text to find, uses regexp format)
 .TP
-\fBPause\fR or \fBCtrl+P\fR
+\fBPause\fR or \fBSpace\fR
 Pause song preview and automatic song switching
 .TP
 \fBTab\fR
@@ -66,13 +72,16 @@ Exit to main menu or quit search mode
 Fast forward or rewind the song
 .TP
 \fBEnter\fR
-Skip long solos (jump to the beginning of the next sentence)
+Skip long instrumental breaks, or get the grading instantly at the end of song.
 .TP
 \fBPause\fR or \fBSpace\fR
 Pause the game
 .TP
-\fB+\fR/\fB-\fR
-Adjust audio delay. Use to correct synchronization issues.
+\fBF5\fR/\fBF6\fR
+Adjust audio/video sync. Use if the notes pass the black line at incorrect time.
+.TP
+\fBF7\fR/\fBF8\fR
+Adjust audio roundtrip latency. Use if the pitch wave does not match the notes, when you match your timing to what you hear.
 .TP
 \fBCtrl+R\fR
 Hot reload song from disk (useful for making or repairing songs)
