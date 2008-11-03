@@ -9,7 +9,6 @@
 #include "screen.hh"
 #include "theme.hh"
 #include "video.hh"
-#include "lyrics.hh"
 #include "sdl_helper.hh"
 #include "surface.hh"
 #include "opengl_text.hh"
