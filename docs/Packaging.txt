@@ -1,0 +1,35 @@
+Notes about packaging, for future reference:
+
+- If packaging a release, make sure that game/version.hh defines the version
+- Make sure that the version numbers in CMakeLists.txt agree
+- Preferrably you should use a LiveCD or a clean install as build platform
+- If smaller binary packages are preferred, use
+   -DCMAKE_BUILD_TYPE=Release -DCPACK_STRIP_FILES=TRUE
+
+Source:
+
+- Remove any extra files in source tree (the ones from SVN and build folder can be kept)
+
+cmake ../
+make package_source
+
+
+Ubuntu 8.04:
+
+- CMake 2.4 cannot package for Debian, so install 2.6 from backports
+- Be sure not to install anything else from backports if you intend plain 8.04 package
+- Uncomment the proper dependency line in CMakeLists.txt
+
+cmake -DCPACK_PACKAGE_FILE_NAME="Performous-X.Y.Z-Ubuntu8.04-i386" ../
+cmake -DCPACK_PACKAGE_FILE_NAME="Performous-X.Y.Z-Ubuntu8.04-amd64" ../
+make package
+
+
+Ubuntu 8.10:
+
+- Uncomment the proper dependency line in CMakeLists.txt
+
+cmake -DCPACK_PACKAGE_FILE_NAME="Performous-X.Y.Z-Ubuntu8.10-i386" ../
+cmake -DCPACK_PACKAGE_FILE_NAME="Performous-X.Y.Z-Ubuntu8.10-amd64" ../
+make package
+

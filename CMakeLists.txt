@@ -23,9 +23,9 @@ set(CPACK_SOURCE_IGNORE_FILES
    "/portage-overlay/"
 )
 # These deps are for Ubuntu 8.04
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsdl1.2debian, libsdl-image1.2, libcairo2, librsvg2-2, libasound2, libjack0, libboost-thread1.34.1, libboost-serialization1.34.1, libboost-program-options1.34.1, libboost-regex1.34.1, libboost-filesystem1.34.1, libavcodec1d, libavformat1d, libswscale1d, libmagick++10, libsamplerate0, libpulse0, libxml++2.6c2a")
+#set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsdl1.2debian, libsdl-image1.2, libcairo2, librsvg2-2, libboost-thread1.34.1, libboost-serialization1.34.1, libboost-program-options1.34.1, libboost-regex1.34.1, libboost-filesystem1.34.1, libavcodec1d, libavformat1d, libswscale1d, libmagick++10, libsamplerate0, libxml++2.6c2a")
 # These deps are for Ubuntu 8.10
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsdl1.2debian, libsdl-image1.2, libcairo2, librsvg2-2, libasound2, libjack0, libboost-thread1.34.1, libboost-serialization1.34.1, libboost-program-options1.34.1, libboost-regex1.34.1, libboost-filesystem1.34.1, libavcodec51, libavformat52, libswscale0, libmagick++10, libsamplerate0, libpulse0, libxml++2.6-2")
+#set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsdl1.2debian, libsdl-image1.2, libcairo2, librsvg2-2, libboost-thread1.34.1, libboost-serialization1.34.1, libboost-program-options1.34.1, libboost-regex1.34.1, libboost-filesystem1.34.1, libavcodec51, libavformat52, libswscale0, libmagick++10, libsamplerate0, libxml++2.6-2")
 set(CPACK_DEBIAN_PACKAGE_PRIORITY extra)
 set(CPACK_DEBIAN_PACKAGE_SECTION universe/games)
 set(CPACK_DEBIAN_PACKAGE_RECOMMENDS ultrastar-songs)
