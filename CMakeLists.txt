@@ -19,6 +19,7 @@ set(CPACK_SOURCE_IGNORE_FILES
    "/songs/"
    "/build/"
    "/.svn/"
+   "/osx-utils/"
    "/portage-overlay/"
 )
 # These deps are for Ubuntu 8.10

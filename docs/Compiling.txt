@@ -54,3 +54,5 @@ you need to guess which charset the original used (instead of CP1252) and retry.
 If you want to improve the game, join our IRC channel #Performous (Freenode) and
 you'll get SVN write access.
 
+For more (up to date) information, see http://performous.org/
+

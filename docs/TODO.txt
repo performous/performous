@@ -17,8 +17,7 @@ Big features:
 
 Features:
 
-- Configurable audio latency (delay between screen and audio output)
-- Auto-calibration of acoustic loop latency (playback + capture)
+- Auto-calibration of acoustic roundtrip latency (playback + capture)
 - Better audio card configuration ingame (needs libda support for listing cards)
 
 
@@ -34,10 +33,4 @@ Ripper
 - Rewrite video code [DONE, but can be done better]
 - Try to figure out what causes clicks on adpcm decoding.
 
-
-Platform
-
-- Windows binary build
-- OSX binary build
-- Debian and Gentoo packages
 

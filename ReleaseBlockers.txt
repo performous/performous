@@ -1,6 +1,0 @@
-Blockers for 0.3 release:
-
-Build
-  - Make Ubuntu packages (Hardy and Intrepid, i386 and amd64)
-  - Make Gentoo package
-
