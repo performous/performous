@@ -26,6 +26,9 @@ knittl <knittl at users.sourceforge.net>
 dex7 <dex7 at users.sourceforge.net>
 	* Website layout
 
+Fabian Fingerle  <fabian at datensalat.eu>
+        * dependency testing
+
 	
 INACTIVE DEVELOPERS
 -------------------
