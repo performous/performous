@@ -205,7 +205,6 @@ void SvgTxtTheme::draw(std::vector<TZoomText> const& _text, float alpha) {
 		m_cache_text = tmp;
 		m_opengl_text.clear();
 		for (unsigned int i = 0; i < _text.size(); i++ ) {
-			if (_text[i].string.empty()) continue;
 			m_text.text = _text[i].string;
 			m_opengl_text.push_back(new OpenGLText(m_text));
 		}
