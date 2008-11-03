@@ -12,7 +12,7 @@ CScreenSing::SongStatus CScreenSing::songStatus() const {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	Song& song = sm->getSongs()->current();
 	if (m_songit == song.notes.end()) return FINISHED;
-	if (m_lyrics.empty()) return INSTRUMENTAL_BREAK;
+	if (m_lyrics.empty() && m_lyricit != song.notes.end()) return INSTRUMENTAL_BREAK;
 	return NORMAL;
 }
 
@@ -75,6 +75,7 @@ void CScreenSing::exit() {
 
 void CScreenSing::manageEvent(SDL_Event event) {
 	if (event.type == SDL_KEYDOWN) {
+		bool seekback = false;
 		CScreenManager* sm = CScreenManager::getSingletonPtr();
 		CAudio& audio = *sm->getAudio();
 		int key = event.key.keysym.sym;
@@ -84,26 +85,30 @@ void CScreenSing::manageEvent(SDL_Event event) {
 			else m_score_window.reset(new ScoreWindow(sm, *m_engine));
 		}
 		else if (key == SDLK_SPACE || key == SDLK_PAUSE) sm->getAudio()->togglePause();
-		else if (key == SDLK_PLUS) playOffset += 0.02;
-		else if (key == SDLK_MINUS) playOffset -= 0.02;
-		else if (key == SDLK_HOME) audio.seek(-audio.getPosition());
-		else if (key == SDLK_RETURN && songStatus() == INSTRUMENTAL_BREAK) {
+		if (m_score_window.get()) return;
+		// The rest are only available when score window is not displayed
+		if (key == SDLK_RETURN && songStatus() == INSTRUMENTAL_BREAK) {
 			double diff = m_songit->begin - 3.0 - audio.getPosition();
 			if (diff > 0.0) audio.seek(diff);
 		}
-		else if (key == SDLK_LEFT) audio.seek(-5.0);
+		else if (key == SDLK_PLUS) playOffset += 0.02;
+		else if (key == SDLK_MINUS) playOffset -= 0.02;
+		else if (key == SDLK_HOME) audio.seek(-audio.getPosition());
+		else if (key == SDLK_LEFT) { audio.seek(-5.0); seekback = true; }
 		else if (key == SDLK_RIGHT) audio.seek(5.0);
 		else if (key == SDLK_UP) audio.seek(30.0);
-		else if (key == SDLK_DOWN) audio.seek(-30.0);
+		else if (key == SDLK_DOWN) { audio.seek(-30.0); seekback = true; }
 		else if (key == SDLK_r && event.key.keysym.mod & KMOD_CTRL) {
 			double pos = audio.getPosition();
 			sm->getSongs()->current().reload();
 			exit(); enter();
 			audio.seek(pos);
 		}
-		// Some things must be reset after seeking backwards, doesn't much hurt to do it on every keystroke (TODO: optimize)
-		m_lyricit = m_songit = sm->getSongs()->current().notes.begin();
-		m_lyrics.clear();
+		// Some things must be reset after seeking backwards
+		if (seekback) {
+			m_lyricit = m_songit = sm->getSongs()->current().notes.begin();
+			m_lyrics.clear();
+		}
 	}
 }
 
@@ -205,21 +210,6 @@ void CScreenSing::draw() {
 	if (m_songit == song.notes.end() || m_songit->begin > time + 3.0) m_notealpha -= 0.02f;
 	else if (m_notealpha < 1.0f) m_notealpha += 0.02f;
 	std::list<Player> players = m_engine->getPlayers();
-	// Score display
-	{
-		unsigned int i = 0;
-		for (std::list<Player>::const_iterator p = players.begin(); p != players.end(); ++p, ++i) {
-			float act = p->activity();
-			if (act == 0.0f) continue;
-			glColor4f(p->m_color.r, p->m_color.g, p->m_color.b,act);
-			m_player_icon->dimensions.left(-0.5 + 0.01 + 0.25 * i).fixedWidth(0.075).screenTop(0.055);
-			m_player_icon->draw();
-			m_score_text[i%2]->render((boost::format("%04d") % p->getScore()).str());
-			m_score_text[i%2]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.075).screenTop(0.055);
-			m_score_text[i%2]->draw();
-			glColor4f(1.0, 1.0, 1.0, 1.0);
-		}
-	}
 	if (m_notealpha <= 0.0f) {
 		m_notealpha = 0.0f;
 	} else {
@@ -315,6 +305,21 @@ void CScreenSing::draw() {
 		}
 		glColor3f(1.0, 1.0, 1.0);
 	}
+	// Score display
+	{
+		unsigned int i = 0;
+		for (std::list<Player>::const_iterator p = players.begin(); p != players.end(); ++p, ++i) {
+			float act = p->activity();
+			if (act == 0.0f) continue;
+			glColor4f(p->m_color.r, p->m_color.g, p->m_color.b,act);
+			m_player_icon->dimensions.left(-0.5 + 0.01 + 0.25 * i).fixedWidth(0.075).screenTop(0.055);
+			m_player_icon->draw();
+			m_score_text[i%2]->render((boost::format("%04d") % p->getScore()).str());
+			m_score_text[i%2]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.075).screenTop(0.055);
+			m_score_text[i%2]->draw();
+			glColor4f(1.0, 1.0, 1.0, 1.0);
+		}
+	}
 	// Compute and draw lyrics
 	{
 		const double basepos = -0.1;
@@ -328,7 +333,7 @@ void CScreenSing::draw() {
 				m_lyrics.pop_front();
 				dirty = true;
 			}
-			if (!dirty && m_lyricit != song.notes.end() && m_lyricit->begin < time + 10.0) {
+			if (!dirty && m_lyricit != song.notes.end() && m_lyricit->begin < time + 4.0) {
 				m_lyrics.push_back(LyricRow(m_lyricit, song.notes.end()));
 				dirty = true;
 			}
