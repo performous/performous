@@ -27,7 +27,7 @@ dex7 <dex7 at users.sourceforge.net>
 	* Website layout
 
 Fabian Fingerle  <fabian at datensalat.eu>
-        * dependency testing
+	* dependency testing
 
 	
 INACTIVE DEVELOPERS
@@ -55,7 +55,7 @@ Tryad <http://tryad.org/>
 	* The menu song (CC-by-sa)
 
 Oxetti choir <http://www.oxetti.info/>
-    * Practice background vocalization (recorded for this project)
+        * Practice background vocalization (recorded for this project)
 
 Joonas Kerttula / Frets on Fire <http://fretsonfire.sourceforge.net/>
 	* SVGs borrowed from FoF under GNU GPL :)
