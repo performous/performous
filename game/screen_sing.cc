@@ -42,7 +42,6 @@ void CScreenSing::enter() {
 	m_progress.reset(new ProgressBar(sm->getThemePathFile("sing_progressbg.svg"), sm->getThemePathFile("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01, 0.01, true));
 	m_progress->dimensions.fixedWidth(0.4).left(-0.5).screenTop();
 	theme->timer->dimensions.screenTop(0.5 * m_progress->dimensions.h());
-	playOffset = 0.0;
 	m_lyricit = m_songit = song.notes.begin();
 	m_notealpha = 0.0f;
 	m_nlTop.setTarget(song.noteMax, true);
@@ -91,8 +90,10 @@ void CScreenSing::manageEvent(SDL_Event event) {
 			double diff = m_songit->begin - 3.0 - audio.getPosition();
 			if (diff > 0.0) audio.seek(diff);
 		}
-		else if (key == SDLK_PLUS) playOffset += 0.02;
-		else if (key == SDLK_MINUS) playOffset -= 0.02;
+		else if (key == SDLK_F5) m_latencyAV += 0.02;
+		else if (key == SDLK_F6) m_latencyAV -= 0.02;
+		else if (key == SDLK_F7) m_engine->setLatencyAR(m_engine->getLatencyAR() - 0.02);
+		else if (key == SDLK_F8) m_engine->setLatencyAR(m_engine->getLatencyAR() + 0.02);
 		else if (key == SDLK_HOME) audio.seek(-audio.getPosition());
 		else if (key == SDLK_LEFT) { audio.seek(-5.0); seekback = true; }
 		else if (key == SDLK_RIGHT) audio.seek(5.0);
@@ -104,6 +105,8 @@ void CScreenSing::manageEvent(SDL_Event event) {
 			exit(); enter();
 			audio.seek(pos);
 		}
+		if (m_latencyAV < -0.5) m_latencyAV = -0.5;
+		if (m_latencyAV > 0.5) m_latencyAV = 0.5;
 		// Some things must be reset after seeking backwards
 		if (seekback) {
 			m_lyricit = m_songit = sm->getSongs()->current().notes.begin();
@@ -151,17 +154,13 @@ namespace {
 
 }
 
-
-namespace {
-}
-
 void CScreenSing::draw() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	Song& song = sm->getSongs()->current();
 	// Get the time in the song
-	double time = sm->getAudio()->getPosition() + 0.02; // Compensate avg. lag to display
-	time = std::max(0.0, time + playOffset);
-	double songPercent = time / sm->getAudio()->getLength();
+	double length = sm->getAudio()->getLength();
+	double time = std::min(length, std::max(0.0, sm->getAudio()->getPosition() + m_latencyAV));
+	double songPercent = time / length;
 	// Rendering starts
 	{
 		double ar = arMax;

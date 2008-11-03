@@ -40,6 +40,7 @@ namespace {
 class Engine {
 	CAudio& m_audio;
 	std::list<Player> m_players;
+	volatile double m_latencyAR;  // Audio roundtrip latency (don't confuse with latencyAV)
 	size_t m_time;
 	volatile bool m_quit;
 	mutable boost::mutex m_mutex;
@@ -53,17 +54,19 @@ class Engine {
 	* @param anBegin Analyzers to use (ending iterator)
 	**/
 	template <typename FwdIt> Engine(CAudio& audio, FwdIt anBegin, FwdIt anEnd):
-	  m_audio(audio), m_players(anBegin, anEnd), m_time(), m_quit(), m_thread(boost::ref(*this))
+	  m_audio(audio), m_players(anBegin, anEnd), m_latencyAR(0.05), m_time(), m_quit(), m_thread(boost::ref(*this))
 	{
 		size_t player = 0;
 		for (std::list<Player>::iterator it = m_players.begin(); it != m_players.end(); ++it, ++player) it->m_color = playerColors[player % playerColorsSize];
 	}
 	~Engine() { m_quit = true; m_thread.join(); }
+	void setLatencyAR(double value) { m_latencyAR = std::min(std::max(0.0, value), 0.5); }
+	double getLatencyAR() const { return m_latencyAR; }
 	/** Used internally for boost::thread. Do not call this yourself. (boost::thread requires this to be public). **/
 	void operator()() {
 		while (!m_quit) {
 			std::for_each(m_players.begin(), m_players.end(), boost::bind(&Player::prepare, _1));
-			double t = m_audio.getPosition() - 0.05;  // TODO: Make audio I/O lag (0.05) configurable
+			double t = m_audio.getPosition() - m_latencyAR;
 			double timeLeft = m_time * TIMESTEP - t;
 			if (timeLeft > 0.0) { boost::thread::sleep(now() + std::min(TIMESTEP, timeLeft)); continue; }
 			boost::mutex::scoped_lock l(m_mutex);

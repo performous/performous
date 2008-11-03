@@ -61,7 +61,7 @@ class LyricRow {
 class CScreenSing: public CScreen {
   public:
 	CScreenSing(std::string const& name, boost::ptr_vector<Analyzer>& analyzers):
-	  CScreen(name), m_analyzers(analyzers), m_nlTop(0.0, 2.0), m_nlBottom(0.0, 2.0)
+	  CScreen(name), m_analyzers(analyzers), m_latencyAV(), m_nlTop(0.0, 2.0), m_nlBottom(0.0, 2.0)
 	{}
 	void enter();
 	void exit();
@@ -87,8 +87,7 @@ class CScreenSing: public CScreen {
 	boost::scoped_ptr<Texture> m_notebargold;
 	boost::scoped_ptr<Texture> m_notebargold_hl;
 	boost::scoped_ptr<Engine> m_engine;
-	bool play;
-	double playOffset;
+	double m_latencyAV;  // Latency between audio and video output (do not confuse with latencyAR)
 	float m_notealpha;
 	boost::scoped_ptr<CThemeSing> theme;
 	Song::notes_t::const_iterator m_songit;
