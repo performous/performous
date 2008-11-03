@@ -10,6 +10,7 @@ extern "C" {
 #include <swscale.h>
 }
 
+#define USE_FFMPEG_CRASH_RECOVERY
 #define FFMPEG_OUTPUT_NUMBER_OF_CHANNELS 2
 
 /*static*/ boost::mutex CFfmpeg::s_avcodec_mutex;
