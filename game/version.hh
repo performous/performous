@@ -2,8 +2,8 @@
 #define USNG_VERSION_HH
 
 #define PACKAGE "Performous"
-// #define VERSION __DATE__
-#define VERSION "0.3.0"
+#define VERSION __DATE__
+// #define VERSION "0.3.0"
 
 #endif
 
