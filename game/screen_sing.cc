@@ -3,7 +3,6 @@
 
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
-#include "sdl_helper.hh"
 #include "songs.hh"
 #include <iostream>
 #include <iomanip>

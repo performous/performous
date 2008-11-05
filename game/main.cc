@@ -1,6 +1,5 @@
 #include "version.hh"
 #include <audio.hpp>
-#include "sdl_helper.hh"
 #include "screen.hh"
 #include "screen_intro.hh"
 #include "screen_songs.hh"

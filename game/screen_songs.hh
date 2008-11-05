@@ -5,7 +5,6 @@
 #include <boost/scoped_ptr.hpp>
 #include "screen.hh"
 #include "surface.hh"
-#include "sdl_helper.hh"
 #include "songs.hh"
 #include "theme.hh"
 #include "opengl_text.hh"
