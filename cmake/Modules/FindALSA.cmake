@@ -24,9 +24,11 @@ find_library(ALSA_LIBRARY
   PATHS ${ALSA_PKGCONF_LIBRARY_DIRS}
 )
 
-# Extract the version number
-file(READ "${ALSA_INCLUDE_DIR}/alsa/version.h" _ALSA_VERSION_H_CONTENTS)
-string(REGEX REPLACE ".*#define SND_LIB_VERSION_STR[ \t]*\"([^\n]*)\".*" "\\1" ALSA_VERSION "${_ALSA_VERSION_H_CONTENTS}")
+if(ALSA_INCLUDE_DIR)
+  # Extract the version number
+  file(READ "${ALSA_INCLUDE_DIR}/alsa/version.h" _ALSA_VERSION_H_CONTENTS)
+  string(REGEX REPLACE ".*#define SND_LIB_VERSION_STR[ \t]*\"([^\n]*)\".*" "\\1" ALSA_VERSION "${_ALSA_VERSION_H_CONTENTS}")
+endif(ALSA_INCLUDE_DIR)
 
 set(ALSA_PROCESS_INCLUDES ALSA_INCLUDE_DIR)
 set(ALSA_PROCESS_LIBS ALSA_LIBRARY)
