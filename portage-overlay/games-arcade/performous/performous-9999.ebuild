@@ -38,7 +38,7 @@ RDEPEND="gnome-base/librsvg
 	)
 	>=media-video/ffmpeg-0.4.9_p20070616-r20
 	alsa? ( media-libs/alsa-lib )
-	jack? ( >=media-sound/jack-audio-connection-kit )
+	jack? ( media-sound/jack-audio-connection-kit )
 	portaudio? ( media-libs/portaudio )
 	gstreamer? ( media-libs/gstreamer )
 	pulseaudio? ( media-sound/pulseaudio )
@@ -83,11 +83,13 @@ src_install() {
 	cd build
 	emake DESTDIR="${D}" install || die "make install failed"
 	keepdir "${GAMES_DATADIR}"/ultrastar/songs
+	rm -rf "${D}${GAMES_PREFIX}/share/${PN}"/{applications,pixmaps}
+	mv "${D}/${GAMES_PREFIX}/share/${PN}" "${D}/${GAMES_DATADIR}/"
+	mv "${D}/${GAMES_PREFIX}/lib" "${D}/usr/"
 	if use songs; then
 		insinto "${GAMES_DATADIR}"/ultrastar
 		doins -r ../songs || die "doins songs failed"
 	fi
-	rm -rf "${D}${GAMES_PREFIX}"/share/"${PN}"/{applications,pixmaps}
 	doicon data/${PN}.xpm
 	domenu data/${PN}.desktop
 	dodoc ../docs/*.txt
