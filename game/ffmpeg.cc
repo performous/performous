@@ -180,7 +180,7 @@ void CFfmpeg::decodeNextFrame() {
 		}
 		~ReadFramePacket() { av_free_packet(this); }
 		double time() {
-			if( uint64_t(dts) == AV_NOPTS_VALUE )
+			if( uint64_t(dts) == uint64_t(AV_NOPTS_VALUE) )
 				return double(-1);
 			else
 				return double(dts) * av_q2d(m_s->streams[stream_index]->time_base);
