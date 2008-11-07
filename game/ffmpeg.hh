@@ -75,6 +75,7 @@ class AudioFifo {
   public:
 	AudioFifo(): m_sps(), m_timestamp(), m_eof() {}
 	void setSamplesPerSecond(unsigned sps) { m_sps = sps; }
+	unsigned getSamplesPerSecond() { return m_sps; }
 	void tryPop(std::vector<int16_t>& buffer, std::size_t size = 0) {
 		if (size == 0) size = std::numeric_limits<std::size_t>::max();
 		boost::mutex::scoped_lock l(m_mutex);

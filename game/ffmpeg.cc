@@ -180,7 +180,10 @@ void CFfmpeg::decodeNextFrame() {
 		}
 		~ReadFramePacket() { av_free_packet(this); }
 		double time() {
-			return double(dts) * av_q2d(m_s->streams[stream_index]->time_base);
+			if( uint64_t(dts) == AV_NOPTS_VALUE )
+				return double(-1);
+			else
+				return double(dts) * av_q2d(m_s->streams[stream_index]->time_base);
 		}
 	};
 
@@ -221,7 +224,10 @@ void CFfmpeg::decodeNextFrame() {
 					tmp->data.swap(buffer);
 					tmp->height = h;
 					tmp->width = w;
-					tmp->timestamp = packet.time();
+					if( packet.time() != -1 ) {
+						m_position = packet.time();
+					}
+					tmp->timestamp = m_position;
 					videoQueue.push(tmp);
 				}
 				if (m_quit) return;
@@ -250,7 +256,12 @@ void CFfmpeg::decodeNextFrame() {
 			AudioFrame* tmp = new AudioFrame();
 			tmp->data.swap(audioFramesResampled);
 			//tmp->data = std::vector<int16_t>(audioFrames, audioFrames + outsize / sizeof(int16_t));
-			tmp->timestamp = packet.time();
+			if( packet.time() != -1 ) {
+				m_position = packet.time();
+			} else {
+				m_position += double(tmp->data.size())/double(audioQueue.getSamplesPerSecond());
+			}
+			tmp->timestamp = m_position;
 			audioQueue.push(tmp);
 			// Audio frame are always finished
 			frameFinished = 1;
