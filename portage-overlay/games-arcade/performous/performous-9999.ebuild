@@ -11,7 +11,7 @@ SONGS_P=${SONGS_PN}-2
 
 DESCRIPTION="SingStar GPL clone"
 HOMEPAGE="http://performous.org"
-SRC_URI="songs? ( mirror://sourceforge/ultrastar-ng/${SONGS_P}.tar.bz2 )"
+SRC_URI="songs? ( mirror://sourceforge/${PN}/${SONGS_P}.tar.bz2 )"
 
 ESVN_REPO_URI="https://ultrastar-ng.svn.sourceforge.net/svnroot/ultrastar-ng/trunk"
 ESVN_PROJECT="Performous"

@@ -14,7 +14,7 @@ SONGS_P=${SONGS_PN}-2
 DESCRIPTION="SingStar GPL clone"
 HOMEPAGE="http://performous.org"
 SRC_URI=" mirror://sourceforge/${PN}/${MY_P}.tar.bz2
-	songs? ( mirror://sourceforge/ultrastar-ng/${SONGS_P}.tar.bz2 )"
+	songs? ( mirror://sourceforge/${PN}/${SONGS_P}.tar.bz2 )"
 
 LICENSE="GPL-2
 	songs? (
