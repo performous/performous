@@ -9,9 +9,6 @@
 # actual filename for the libraries, so this might be needed in the future
 # when new boost versions are released.
 #
-# Currently this module searches for the following version numbers:
-# 1.33, 1.33.0, 1.33.1, 1.34, 1.34.0, 1.34.1, 1.35, 1.36
-#
 # The components list needs to be the actual names of boost libraries, that is
 # the part of the actual library files that differ on different libraries. So
 # its "date_time" for "libboost_date_time...". Anything else will result in
@@ -24,12 +21,10 @@
 #  Boost_USE_NONMULTITHREAD      Can be set to TRUE to use the non-multithreaded
 #                                boost libraries.
 #  Boost_ADDITIONAL_VERSIONS     A list of version numbers to use for searching
-#                                the boost include directory. The default list
-#                                of version numbers is:
-#                                1.33, 1.33.0, 1.33.1, 1.34, 1.34.0, 1.34.1
-#                                If you want to look for an older or newer
-#                                version set this variable to a list of
-#                                strings, where each string contains a number, i.e.
+#                                the boost include directory. If you want to look
+#                                for an older or newer version set this variable
+#                                to a list of strings, where each string
+#                                contains a number, i.e.
 #                                SET(Boost_ADDITIONAL_VERSIONS "0.99.0" "1.35.0")
 #  Boost_ROOT                    Preferred installation prefix for searching for Boost,
 #                                set this if the module has problems finding the proper Boost installation
@@ -81,7 +76,7 @@
 
 # MESSAGE(STATUS "Finding Boost libraries.... ")
 
-SET( _boost_TEST_VERSIONS ${Boost_ADDITIONAL_VERSIONS} "1.33" "1.33.0" "1.33.1" "1.34" "1.34.0" "1.34.1" "1.35" "1.35.0" "1.36" "1.36.0" )
+SET( _boost_TEST_VERSIONS ${Boost_ADDITIONAL_VERSIONS} "1.37.0" "1.37" "1.36.0" "1.36" "1.34.1" "1.34.0" "1.34" "1.33.1" "1.33.0" "1.33")
 
 ############################################
 #
@@ -197,22 +192,23 @@ ELSE (_boost_IN_CACHE)
   ENDIF( NOT $ENV{Boost_INCLUDEDIR} STREQUAL "" )
 
   IF( NOT $ENV{Boost_LIBRARYDIR} STREQUAL "" )
-    SET(_boost_LIBRARIES_SEARCH_DIRS $ENV{Boost_LIBRARYDIR} ${_boost_INCLUDE_SEARCH_DIRS})
+    SET(_boost_LIBRARIES_SEARCH_DIRS $ENV{Boost_LIBRARYDIR} ${_boost_LIBRARIES_SEARCH_DIRS})
   ENDIF( NOT $ENV{Boost_LIBRARYDIR} STREQUAL "" )
 
   IF( Boost_ROOT )
-    SET(_boost_INCLUDE_SEARCH_DIRS ${Boost_ROOT}/include ${_boost_INCLUDE_SEARCH_DIRS})
-    SET(_boost_LIBRARIES_SEARCH_DIRS ${Boost_ROOT}/lib ${_boost_LIBRARIES_SEARCH_DIRS})
+    SET(_boost_INCLUDE_SEARCH_DIRS ${Boost_ROOT}/include)
+    SET(_boost_LIBRARIES_SEARCH_DIRS ${Boost_ROOT}/lib)
   ENDIF( Boost_ROOT )
 
   IF( Boost_INCLUDEDIR )
-    SET(_boost_INCLUDE_SEARCH_DIRS ${Boost_INCLUDEDIR}/include ${_boost_INCLUDE_SEARCH_DIRS})
+    SET(_boost_INCLUDE_SEARCH_DIRS ${Boost_INCLUDEDIR})
   ENDIF( Boost_INCLUDEDIR )
 
   IF( Boost_LIBRARYDIR )
-    SET(_boost_LIBRARIES_SEARCH_DIRS ${Boost_LIBRARYDIR}/include ${_boost_LIBRARIES_SEARCH_DIRS})
+    SET(_boost_LIBRARIES_SEARCH_DIRS ${Boost_LIBRARYDIR})
   ENDIF( Boost_LIBRARYDIR )
 
+  # Search for include/boost_VERSION/boost/config.hpp (all these must be done first)
   FOREACH(_boost_VER ${_boost_TEST_VERSIONS})
     IF( NOT Boost_INCLUDE_DIR )
 
@@ -222,32 +218,56 @@ ELSE (_boost_IN_CACHE)
       SET(_boost_PATH_SUFFIX
         boost-${_boost_VER}
       )
-      STRING(REGEX REPLACE "([0-9]+)\\.([0-9]+)\\.([0-9]+)" "\\1_\\2_\\3" _boost_PATH_SUFFIX ${_boost_PATH_SUFFIX})
+      STRING(REGEX REPLACE "\\." "_" _boost_PATH_SUFFIX ${_boost_PATH_SUFFIX})
 
+      FIND_PATH(Boost_INCLUDE_DIR
+          NAMES         ${_boost_PATH_SUFFIX}/boost/config.hpp
+          PATHS         ${_boost_INCLUDE_SEARCH_DIRS}
+      )
+
+      # Add boost_VERSION to the path
+      IF( Boost_INCLUDE_DIR )
+        SET(Boost_INCLUDE_DIR "${Boost_INCLUDE_DIR}/${_boost_PATH_SUFFIX}" CACHE PATH "The Boost include path" FORCE)
+      ENDIF( Boost_INCLUDE_DIR )
+
+    ENDIF( NOT Boost_INCLUDE_DIR )
+  ENDFOREACH(_boost_VER)
+
+  # Search for include/boost/config.hpp
+  FOREACH(_boost_VER ${_boost_TEST_VERSIONS})
+    IF( NOT Boost_INCLUDE_DIR )
+
+      # Add in a path suffix, based on the required version, ideally we could
+      # read this from version.hpp, but for that to work we'd need to know the include
+      # dir already
+      SET(_boost_PATH_SUFFIX
+        boost-${_boost_VER}
+      )
+      STRING(REGEX REPLACE "\\." "_" _boost_PATH_SUFFIX ${_boost_PATH_SUFFIX})
 
       FIND_PATH(Boost_INCLUDE_DIR
           NAMES         boost/config.hpp
           PATHS         ${_boost_INCLUDE_SEARCH_DIRS}
-          PATH_SUFFIXES ${_boost_PATH_SUFFIX}
       )
-
-      # Extract Boost_VERSION and Boost_LIB_VERSION from version.hpp
-      # Read the whole file:
-      #
-      FILE(READ "${Boost_INCLUDE_DIR}/boost/version.hpp" _boost_VERSION_HPP_CONTENTS)
-
-      STRING(REGEX REPLACE ".*#define BOOST_VERSION ([0-9]+).*" "\\1" Boost_VERSION_NUMERIC "${_boost_VERSION_HPP_CONTENTS}")
-      STRING(REGEX REPLACE ".*#define BOOST_LIB_VERSION \"([0-9_]+)\".*" "\\1" Boost_LIB_VERSION "${_boost_VERSION_HPP_CONTENTS}")
-
-      IF(Boost_VERSION_NUMERIC GREATER 0)
-        MATH(EXPR Boost_MAJOR_VERSION "${Boost_VERSION_NUMERIC} / 100000")
-        MATH(EXPR Boost_MINOR_VERSION "${Boost_VERSION_NUMERIC} / 100 % 1000")
-        MATH(EXPR Boost_SUBMINOR_VERSION "${Boost_VERSION_NUMERIC} % 100")
-        SET(Boost_VERSION "${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}")
-      ENDIF(Boost_VERSION_NUMERIC GREATER 0)
     ENDIF( NOT Boost_INCLUDE_DIR )
   ENDFOREACH(_boost_VER)
 
+  IF( Boost_INCLUDE_DIR )
+    # Extract Boost_VERSION and Boost_LIB_VERSION from version.hpp
+    # Read the whole file:
+    #
+    FILE(READ "${Boost_INCLUDE_DIR}/boost/version.hpp" _boost_VERSION_HPP_CONTENTS)
+
+    STRING(REGEX REPLACE ".*#define BOOST_VERSION ([0-9]+).*" "\\1" Boost_VERSION_NUMERIC "${_boost_VERSION_HPP_CONTENTS}")
+    STRING(REGEX REPLACE ".*#define BOOST_LIB_VERSION \"([0-9_]+)\".*" "\\1" Boost_LIB_VERSION "${_boost_VERSION_HPP_CONTENTS}")
+
+    IF(Boost_VERSION_NUMERIC GREATER 0)
+      MATH(EXPR Boost_MAJOR_VERSION "${Boost_VERSION_NUMERIC} / 100000")
+      MATH(EXPR Boost_MINOR_VERSION "${Boost_VERSION_NUMERIC} / 100 % 1000")
+      MATH(EXPR Boost_SUBMINOR_VERSION "${Boost_VERSION_NUMERIC} % 100")
+      SET(Boost_VERSION "${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}")
+    ENDIF(Boost_VERSION_NUMERIC GREATER 0)
+  ENDIF( Boost_INCLUDE_DIR )
   #Setting some more suffixes for the library
   SET (Boost_LIB_PREFIX "")
   IF ( WIN32 )
@@ -276,7 +296,7 @@ ELSE (_boost_IN_CACHE)
       ELSE (NOT CMAKE_COMPILER_IS_GNUCC)
         #find out the version of gcc being used.
         EXEC_PROGRAM(${CMAKE_CXX_COMPILER}
-            ARGS --version
+            ARGS -\#\#\#
             OUTPUT_VARIABLE _boost_COMPILER_VERSION
         )
         STRING(REGEX REPLACE ".* ([0-9])\\.([0-9])\\.[0-9] .*" "\\1\\2"
