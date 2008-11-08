@@ -32,8 +32,8 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="764"
-     inkscape:window-width="887"
+     inkscape:window-height="1125"
+     inkscape:window-width="1920"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      guidetolerance="10.0"
@@ -45,8 +45,8 @@
      id="base"
      inkscape:zoom="1.26"
      inkscape:cx="285.76321"
-     inkscape:cy="490.47619"
-     inkscape:window-x="253"
+     inkscape:cy="363.49206"
+     inkscape:window-x="0"
      inkscape:window-y="25"
      inkscape:current-layer="svg559"
      showgrid="false" />
@@ -62,13 +62,13 @@
   </defs>
   <text
      x="400"
-     y="145.48291"
+     y="104.21307"
      style="font-size:90px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;writing-mode:lr-tb;text-anchor:middle;opacity:1;fill:#ffd100;fill-opacity:1;stroke:#000000;stroke-width:1.58534133;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:inline;font-family:Arial Black"
      id="text10203"
      xml:space="preserve"
      sodipodi:linespacing="125%"><tspan
        x="400"
-       y="145.48291"
+       y="104.21307"
        id="tspan10205"
        style="font-size:90px;text-align:center;text-anchor:middle;fill:#ffd100;fill-opacity:1;stroke-width:1.58534133">Lead Singer</tspan></text>
 </svg>
