@@ -1,3 +1,4 @@
+// CMake uses config.cmake.hh to generate config.hh within the build folder.
 #ifndef PERFORMOUS_CONFIG_HH
 #define PERFORMOUS_CONFIG_HH
 

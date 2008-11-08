@@ -5,7 +5,7 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 # Generate config.hh
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.hh.in" "${CMAKE_CURRENT_BINARY_DIR}/config.hh" @ONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.cmake.hh" "${CMAKE_CURRENT_BINARY_DIR}/config.hh" @ONLY)
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
 FILE(GLOB SOURCE_FILES "*.cc")
