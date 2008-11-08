@@ -237,15 +237,16 @@ void CFfmpeg::decodeNextFrame() {
 			int packetsize = packet.size;
 			uint8_t *packetbuffer = packet.data;
 
-			while( packetsize ) {
+			while( packetsize > 0 ) {
 				int16_t audioFrames[AVCODEC_MAX_AUDIO_FRAME_SIZE];
 				int outsize = AVCODEC_MAX_AUDIO_FRAME_SIZE*sizeof(int16_t);
 				int decodeSize = avcodec_decode_audio2( pAudioCodecCtx, audioFrames, &outsize, packetbuffer, packetsize);
 
 				// No data decoded
-				if (outsize == 0) {
+				if (decodeSize == 0)
 					break;
-				}
+				if ( outsize == 0 )
+					continue;
 
 				if (decodeSize < 0) throw std::runtime_error("cannot decode audio frame");
 	
