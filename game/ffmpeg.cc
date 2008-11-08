@@ -234,35 +234,43 @@ void CFfmpeg::decodeNextFrame() {
 			}
 		} else if(packet.stream_index==audioStream) {
 			if (!decodeAudio) return;
-			int16_t audioFrames[AVCODEC_MAX_AUDIO_FRAME_SIZE];
-			int outsize = AVCODEC_MAX_AUDIO_FRAME_SIZE*sizeof(int16_t);
-			int decodeSize = avcodec_decode_audio2( pAudioCodecCtx, audioFrames, &outsize, packet.data, packet.size);
+			int packetsize = packet.size;
+			uint8_t *packetbuffer = packet.data;
 
-			// No data decoded
-			if (outsize == 0) {
-				std::cout << "Empty audio frame" << std::endl;
-				return;
+			while( packetsize ) {
+				int16_t audioFrames[AVCODEC_MAX_AUDIO_FRAME_SIZE];
+				int outsize = AVCODEC_MAX_AUDIO_FRAME_SIZE*sizeof(int16_t);
+				int decodeSize = avcodec_decode_audio2( pAudioCodecCtx, audioFrames, &outsize, packetbuffer, packetsize);
+
+				// No data decoded
+				if (outsize == 0) {
+					break;
+				}
+
+				if (decodeSize < 0) throw std::runtime_error("cannot decode audio frame");
+	
+				outsize /= (sizeof(int16_t)*pAudioCodecCtx->channels); // Outsize is givent in bytes, we want a number of sample
+				std::vector<int16_t> audioFramesResampled(AVCODEC_MAX_AUDIO_FRAME_SIZE);
+				int nb_sample = audio_resample(pResampleCtx, &audioFramesResampled[0], audioFrames, outsize);
+				nb_sample *= FFMPEG_OUTPUT_NUMBER_OF_CHANNELS; // We have multiple channels
+	
+				audioFramesResampled.resize(nb_sample);
+
+				AudioFrame* tmp = new AudioFrame();
+				tmp->data.swap(audioFramesResampled);
+				//tmp->data = std::vector<int16_t>(audioFrames, audioFrames + outsize / sizeof(int16_t));
+				if( packet.time() != -1 ) {
+					m_position = packet.time();
+				} else {
+					m_position += double(tmp->data.size())/double(audioQueue.getSamplesPerSecond());
+				}
+				tmp->timestamp = m_position;
+				audioQueue.push(tmp);
+
+				// advance into the buffer
+				packetsize -= decodeSize;
+				packetbuffer += decodeSize;
 			}
-
-			if (decodeSize < 0) throw std::runtime_error("cannot decode audio frame");
-
-			outsize /= (sizeof(int16_t)*pAudioCodecCtx->channels); // Outsize is givent in bytes, we want a number of sample
-			std::vector<int16_t> audioFramesResampled(AVCODEC_MAX_AUDIO_FRAME_SIZE);
-			int nb_sample = audio_resample(pResampleCtx, &audioFramesResampled[0], audioFrames, outsize);
-			nb_sample *= FFMPEG_OUTPUT_NUMBER_OF_CHANNELS; // We have multiple channels
-
-			audioFramesResampled.resize(nb_sample);
-
-			AudioFrame* tmp = new AudioFrame();
-			tmp->data.swap(audioFramesResampled);
-			//tmp->data = std::vector<int16_t>(audioFrames, audioFrames + outsize / sizeof(int16_t));
-			if( packet.time() != -1 ) {
-				m_position = packet.time();
-			} else {
-				m_position += double(tmp->data.size())/double(audioQueue.getSamplesPerSecond());
-			}
-			tmp->timestamp = m_position;
-			audioQueue.push(tmp);
 			// Audio frame are always finished
 			frameFinished = 1;
 			if (m_quit) return;
