@@ -1,4 +1,4 @@
-#include "version.hh"
+#include "config.hh"
 #include <audio.hpp>
 #include "screen.hh"
 #include "screen_intro.hh"

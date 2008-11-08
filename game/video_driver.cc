@@ -1,6 +1,6 @@
 #include "video_driver.hh"
 #include "screen.hh"
-#include "version.hh"
+#include "config.hh"
 #include <cmath>
 
 unsigned s_width;
@@ -12,7 +12,7 @@ unsigned int screenH() { return s_height; }
 Window::Window(unsigned int width, unsigned int height, int fs) {
 	std::atexit(SDL_Quit);
 	if( SDL_Init(SDL_INIT_VIDEO) ==  -1 ) throw std::runtime_error("SDL_Init failed");
-	SDL_WM_SetCaption(PACKAGE" - "VERSION, PACKAGE);
+	SDL_WM_SetCaption(PACKAGE " " VERSION, PACKAGE);
 	{
 		SDL_Surface* icon = SDL_LoadBMP(CScreenManager::getSingletonPtr()->getThemePathFile("icon.bmp").c_str());
 		SDL_WM_SetIcon(icon, NULL);
