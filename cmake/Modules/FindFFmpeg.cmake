@@ -25,6 +25,7 @@ else (FFMPEG_LIBRARIES AND FFMPEG_INCLUDE_DIRS)
     pkg_check_modules(_FFMPEG_AVCODEC libavcodec)
     pkg_check_modules(_FFMPEG_AVFORMAT libavformat)
     pkg_check_modules(_FFMPEG_SWSCALE libswscale)
+    pkg_check_modules(_FFMPEG_AVUTIL libavutil)
   endif (PKG_CONFIG_FOUND)
 
   find_path(FFMPEG_AVCODEC_INCLUDE_DIR
@@ -45,6 +46,12 @@ else (FFMPEG_LIBRARIES AND FFMPEG_INCLUDE_DIRS)
     PATH_SUFFIXES ffmpeg libswscale
   )
   
+  find_path(FFMPEG_AVUTIL_INCLUDE_DIR
+    NAMES avutil.h
+    PATHS ${_FFMPEG_AVUTIL_INCLUDE_DIRS} /usr/include /usr/local/include /opt/local/include /sw/include
+    PATH_SUFFIXES ffmpeg libavutil
+  )
+
   find_library(FFMPEG_AVCODEC_LIBRARY
     NAMES avcodec
     PATHS ${_FFMPEG_AVCODEC_LIBRARY_DIRS} /usr/lib /usr/local/lib /opt/local/lib /sw/lib
@@ -60,9 +67,14 @@ else (FFMPEG_LIBRARIES AND FFMPEG_INCLUDE_DIRS)
     PATHS ${_FFMPEG_SWSCALE_LIBRARY_DIRS} /usr/lib /usr/local/lib /opt/local/lib /sw/lib
   )
 
-  if (FFMPEG_AVCODEC_LIBRARY AND FFMPEG_AVFORMAT_LIBRARY AND FFMPEG_SWSCALE_LIBRARY)
+  find_library(FFMPEG_AVUTIL_LIBRARY
+    NAMES avutil
+    PATHS ${_FFMPEG_AVUTIL_LIBRARY_DIRS} /usr/lib /usr/local/lib /opt/local/lib /sw/lib
+  )
+
+  if (FFMPEG_AVCODEC_LIBRARY AND FFMPEG_AVFORMAT_LIBRARY AND FFMPEG_SWSCALE_LIBRARY AND FFMPEG_AVUTIL_LIBRARY)
     set(FFMPEG_FOUND TRUE)
-  endif (FFMPEG_AVCODEC_LIBRARY AND FFMPEG_AVFORMAT_LIBRARY AND FFMPEG_SWSCALE_LIBRARY)
+  endif (FFMPEG_AVCODEC_LIBRARY AND FFMPEG_AVFORMAT_LIBRARY AND FFMPEG_SWSCALE_LIBRARY AND FFMPEG_AVUTIL_LIBRARY)
 
   if (FFMPEG_FOUND)
 
@@ -70,12 +82,14 @@ else (FFMPEG_LIBRARIES AND FFMPEG_INCLUDE_DIRS)
       ${FFMPEG_AVCODEC_INCLUDE_DIR}
       ${FFMPEG_AVFORMAT_INCLUDE_DIR}
       ${FFMPEG_SWSCALE_INCLUDE_DIR}
+      ${FFMPEG_AVUTIL_INCLUDE_DIR}
     )
 
     set(FFMPEG_LIBRARIES
       ${FFMPEG_AVCODEC_LIBRARY}
       ${FFMPEG_AVFORMAT_LIBRARY}
       ${FFMPEG_SWSCALE_LIBRARY}
+      ${FFMPEG_AVUTIL_LIBRARY}
     )
 
   endif (FFMPEG_FOUND)
@@ -86,7 +100,7 @@ else (FFMPEG_LIBRARIES AND FFMPEG_INCLUDE_DIRS)
     endif (NOT FFMPEG_FIND_QUIETLY)
   else (FFMPEG_FOUND)
     if (FFMPEG_FIND_REQUIRED)
-      message(FATAL_ERROR "Could not find FFMPEG libavcodec, libavformat or libswscale")
+      message(FATAL_ERROR "Could not find FFMPEG libavcodec, libavformat, libswscale or libavutil")
     endif (FFMPEG_FIND_REQUIRED)
   endif (FFMPEG_FOUND)
 
