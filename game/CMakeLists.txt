@@ -32,9 +32,9 @@ find_package(Cairo REQUIRED)
 include_directories(${Cairo_INCLUDE_DIR})
 set(LIBS ${LIBS} ${Cairo_LIBRARIES})
 
-find_package(Pango REQUIRED)
-include_directories(${Pango_INCLUDE_DIRS})
-set(LIBS ${LIBS} ${Pango_LIBRARIES})
+find_package(PangoCairo REQUIRED)
+include_directories(${PangoCairo_INCLUDE_DIRS})
+set(LIBS ${LIBS} ${PangoCairo_LIBRARIES})
 
 find_package(LibXML++ REQUIRED)
 include_directories(${LibXML++_INCLUDE_DIRS})
