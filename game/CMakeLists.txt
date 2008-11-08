@@ -28,10 +28,6 @@ find_package(LibRSVG REQUIRED)
 include_directories(${LibRSVG_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${LibRSVG_LIBRARIES})
 
-find_package(Cairo REQUIRED)
-include_directories(${Cairo_INCLUDE_DIR})
-set(LIBS ${LIBS} ${Cairo_LIBRARIES})
-
 find_package(PangoCairo REQUIRED)
 include_directories(${PangoCairo_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${PangoCairo_LIBRARIES})
