@@ -74,16 +74,6 @@
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient3751"
-       id="linearGradient3484"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.755727,0,0,0.755727,-21.47999,-8.9739627e-2)"
-       x1="665.12128"
-       y1="684.16162"
-       x2="381.28015"
-       y2="449.80624" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient3751"
        id="linearGradient2391"
        gradientUnits="userSpaceOnUse"
        gradientTransform="matrix(0.755727,0,0,0.755727,-21.47999,-8.9739627e-2)"
@@ -99,8 +89,8 @@
      height="477.55289"
      x="67.345825"
      y="61.223568"
-     rx="42.428925"
-     ry="38.727219" />
+     rx="30"
+     ry="30" />
   <g
      id="g2386"
      transform="translate(64.263217,-10.146824)">
