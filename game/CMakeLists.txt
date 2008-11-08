@@ -44,6 +44,10 @@ find_package(OpenGL REQUIRED)
 include_directories(${OpenGL_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${OpenGL_LIBRARIES})
 
+find_package(GObject REQUIRED)
+include_directories(${GObject_INCLUDE_DIRS})
+set(LIBS ${LIBS} ${GObject_LIBRARIES})
+
 find_package(FFmpeg REQUIRED)
 include_directories(${FFMPEG_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${FFMPEG_LIBRARIES})
