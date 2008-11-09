@@ -3,6 +3,7 @@
 
 #include <audio.hpp>
 #include "pitch.hh"
+#include <boost/lexical_cast.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <iostream>
 
