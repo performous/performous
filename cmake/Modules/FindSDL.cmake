@@ -16,8 +16,8 @@ libfind_pkg_check_modules(SDL_PKGCONF sdl)
 
 find_path(SDL_INCLUDE_DIR
   NAMES SDL.h
-  HINTS ${SDL_PKGCONF_INCLUDE_DIRS}
   PATH_SUFFIXES SDL
+  HINTS ${SDL_PKGCONF_INCLUDE_DIRS}
 )
 
 find_library(SDL_SDL_LIBRARY
