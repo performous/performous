@@ -17,7 +17,7 @@ libfind_pkg_check_modules(AVFormat_PKGCONF libavformat)
 find_path(AVFormat_INCLUDE_DIR
   NAMES avformat.h
   PATHS ${AVFormat_PKGCONF_INCLUDE_DIRS}
-  PATH_SUFFIXES ffmpeg ffmpeg/avformat avformat
+  PATH_SUFFIXES ffmpeg ffmpeg/avformat avformat libavformat
 )
 
 find_library(AVFormat_LIBRARY
