@@ -22,7 +22,19 @@ namespace fs = boost::filesystem;
 
 SDL_Surface * screenSDL;
 
+volatile bool g_quit = false;
+
+extern "C" void quit(int) {
+	g_quit = true;
+}
+
+struct QuitNow {};
+
 static void checkEvents_SDL(CScreenManager& sm, Window& window) {
+	if (g_quit) {
+		std::cout << "Terminating, please wait... (or kill the process)" << std::endl;
+		throw QuitNow();
+	}
 	static bool esc = false;
 	SDL_Event event;
 	while(SDL_PollEvent(&event) == 1) {
@@ -62,6 +74,9 @@ static void checkEvents_SDL(CScreenManager& sm, Window& window) {
 }
 
 int main(int argc, char** argv) {
+	signal(SIGINT, quit);
+	signal(SIGQUIT, quit);
+	signal(SIGTERM, quit);
 	std::ios::sync_with_stdio(false);  // We do not use C stdio
 	srand(time(NULL));  // Seed for std::random_shuffle (used by song selector)
 	da::initialize libda;
@@ -181,12 +196,12 @@ int main(int argc, char** argv) {
 	}
 	try {
 		// Initialize everything
+		Capture capture(2, cdev, crate);
 		CScreenManager sm(theme);
 		Window window(width, height, fullscreen);
 		sm.setAudio(new CAudio(pdev, prate));
 		sm.addScreen(new CScreenIntro("Intro"));
 		sm.addScreen(new CScreenSongs("Songs", songdirs));
-		Capture capture(2, cdev, crate);
 		sm.addScreen(new CScreenSing("Sing", capture.analyzers()));
 		sm.addScreen(new CScreenPractice("Practice", capture.analyzers())); // TODO: multiple analyzers for practice
 		sm.addScreen(new CScreenConfiguration("Configuration"));
@@ -214,6 +229,8 @@ int main(int argc, char** argv) {
 		}
 	} catch (std::exception& e) {
 		std::cout << "FATAL ERROR: " << e.what() << std::endl;
+	} catch (QuitNow&) {
+		std::cout << "Terminated." << std::endl;
 	}
 }
 
