@@ -118,7 +118,8 @@ class CAudio {
 	double getPosition_internal();
 	void setVolume_internal(unsigned int volume);
 	boost::scoped_ptr<CFfmpeg> m_mpeg;
-	bool ffmpeg_paused;
+	volatile bool m_paused;
+	volatile bool m_prebuffering;
 	da::settings m_rs;
 	da::playback m_playback;
 };

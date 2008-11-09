@@ -49,6 +49,7 @@ class VideoFifo {
 	void push(VideoFrame* f) {
 		boost::mutex::scoped_lock l(m_mutex);
 		while (m_queue.size() > m_max) m_cond.wait(l);
+		if (m_queue.empty()) m_timestamp = f->timestamp;
 		m_queue.insert(f);
 		statsUpdate();
 	}
@@ -100,6 +101,7 @@ class AudioFifo {
 	void push(AudioFrame* f) {
 		boost::mutex::scoped_lock l(m_mutex);
 		while (m_queue.size() > m_max) m_cond.wait(l);
+		if (m_queue.empty()) m_timestamp = f->timestamp;
 		m_queue.push_back(f);
 	}
 	void reset() {

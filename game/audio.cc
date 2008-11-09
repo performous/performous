@@ -12,6 +12,8 @@ CAudio::CAudio(std::string const& pdev, unsigned int rate):
 	m_volume(1.0),
 	m_volumeMusic(100),
 	m_volumePreview(60),
+	m_paused(false),
+	m_prebuffering(false),
 	m_rs(da::settings(pdev)
 	.set_callback(boost::ref(*this))
 	.set_channels(2)
@@ -20,7 +22,6 @@ CAudio::CAudio(std::string const& pdev, unsigned int rate):
 	m_playback(m_rs)
 {
 	m_mpeg.reset();
-	ffmpeg_paused = false;
 	length = 0;
 	m_thread.reset(new boost::thread(boost::ref(*this)));
 }
@@ -39,14 +40,17 @@ void CAudio::operator()(da::pcm_data& areas, da::settings const&) {
 	boost::mutex::scoped_lock l(m_mutex);
 	std::size_t samples = areas.channels * areas.frames;
 	unsigned int size = 0;
-	if (m_mpeg && !ffmpeg_paused) {
-		std::vector<int16_t> buf;
-		m_mpeg->audioQueue.tryPop(buf, samples);
-		std::transform(buf.begin(), buf.end(), areas.m_buf, da::conv_from_s16);
-		size = buf.size();
-		if (size < samples && !m_mpeg->audioQueue.eof() && m_mpeg->position() > 1.0) std::cerr << "Warning: audio decoding too slow (buffer underrun): " << std::endl;
+	if (m_mpeg && !m_paused) {
+		if (m_prebuffering && m_mpeg->audioQueue.percentage() > 0.9) m_prebuffering = false;
+		if (!m_prebuffering) {
+			std::vector<int16_t> buf;
+			m_mpeg->audioQueue.tryPop(buf, samples);
+			std::transform(buf.begin(), buf.end(), areas.m_buf, da::conv_from_s16);
+			size = buf.size();
+			if (size < samples && !m_mpeg->audioQueue.eof() && m_mpeg->position() > 1.0) std::cerr << "Warning: audio decoding too slow (buffer underrun): " << std::endl;
+			if (m_volume != 1.0) std::transform(areas.m_buf, areas.m_buf + size, areas.m_buf, std::bind1st(std::multiplies<double>(), m_volume));
+		}
 	}
-	if (m_volume != 1.0) std::transform(areas.m_buf, areas.m_buf + size, areas.m_buf, std::bind1st(std::multiplies<double>(), m_volume));
 	std::fill(areas.m_buf + size, areas.m_buf + samples, 0.0f);
 }
 
@@ -95,21 +99,25 @@ void CAudio::setVolume_internal(unsigned int volume) {
 void CAudio::playMusic_internal(std::string const& filename) {
 	setVolume_internal(0);
 	length = LENGTH_ERROR;
+	m_mpeg.reset();
+	m_prebuffering = true;
 	m_mpeg.reset(new CFfmpeg(false, true, filename, m_rs.rate()));
 	if (m_mpeg->duration() < 0) return;
 	length = 1e3 * m_mpeg->duration();
-	ffmpeg_paused = false;
+	m_paused = false;
 	setVolume_internal(m_volumeMusic);
 }
 
 void CAudio::playPreview_internal(std::string const& filename) {
 	setVolume_internal(0);
 	length = LENGTH_ERROR;
+	m_mpeg.reset();
+	m_prebuffering = true;
 	m_mpeg.reset(new CFfmpeg(false, true, filename, m_rs.rate()));
 	m_mpeg->seek(30.0);
 	if (m_mpeg->duration() < 0) return;
 	length = 1e3 * m_mpeg->duration();
-	ffmpeg_paused = false;
+	m_paused = false;
 	setVolume_internal(m_volumePreview);
 }
 
@@ -133,17 +141,20 @@ double CAudio::getPosition_internal() {
 }
 
 bool CAudio::isPaused_internal() {
-	return ffmpeg_paused;
+	return m_paused;
 }
 
 void CAudio::togglePause_internal() {
 	if (!isPlaying_internal()) return;
-	ffmpeg_paused = !ffmpeg_paused;
+	m_paused = !m_paused;
 }
 
 void CAudio::seek_internal(double seek_dist) {
 	if (!isPlaying_internal()) return;
 	int position = std::max(0.0, std::min(getLength_internal() - 1.0, getPosition_internal() + seek_dist));
+	m_paused = true;
+	m_prebuffering = true;
 	m_mpeg->seek(position);
+	m_paused = false;
 }
 
