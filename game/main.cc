@@ -10,6 +10,7 @@
 #include "xtime.hh"
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
 #include <cstdlib>
@@ -93,6 +94,7 @@ int main(int argc, char** argv) {
 	std::string cdev2;
 	std::string cdev3;
 	std::string cdev4;
+	std::vector<std::string> mics;
 	std::string pdev;
 	std::size_t crate;
 	std::size_t prate;
@@ -121,6 +123,7 @@ int main(int argc, char** argv) {
 		  ("cdev2", po::value<std::string>(&cdev2), "configure capture device for player 2")
 		  ("cdev3", po::value<std::string>(&cdev2), "configure capture device for player 3")
 		  ("cdev4", po::value<std::string>(&cdev2), "configure capture device for player 4\n   --cdev1=dev:settings%channel   example: --cdev1=alsa:hw:0,0%0  --cdev1=alsa:hw:0,0%1")
+		  ("mics", po::value<std::vector<std::string> >(&mics)->composing(), "specify microphones with --mics=channels[,rate][@devstr]")
 		  ("pdev", po::value<std::string>(&pdev), "set playback device (disable autodetection)\n  --pdev=dev[:settings]\n  --pdev=help for list of devices")
 		  ("crate", po::value<std::size_t>(&crate)->default_value(48000), "set capture frequency\n  44100 and 48000 Hz are optimal")
 		  ("prate", po::value<std::size_t>(&prate)->default_value(48000), "set playback frequency\n  44100 and 48000 Hz are optimal")
@@ -206,12 +209,47 @@ int main(int argc, char** argv) {
 	}
 	try {
 		// Initialize everything
+		Capture capture;
+
+		if(mics.size()==0){
+			// insert the default: 2 channels on device ""
+			mics.push_back("2");
+		}
+		for(std::size_t i=0;i<mics.size();i++){
+			// --mics=channels[,rate][@devstr]
+			std::string rest;
+			std::string device;
+			std::size_t channels;
+			std::size_t rate;
+			std::size_t at = mics[i].find('@');
+			if(at==std::string::npos){
+				device = std::string("");
+				rest = mics[i];
+			}
+			else{
+				device = mics[i].substr(at+1);
+				rest = mics[i].substr(0,at);
+			}
+			std::size_t comma = rest.find(',');
+			if(comma==std::string::npos){
+				rate = 48000;
+			}
+			else{
+				rate = boost::lexical_cast<int>(rest.substr(comma+1));
+				rest = rest.substr(0,comma);
+			}
+			channels = boost::lexical_cast<int>(rest);
+			//std::cout << "mics: " << mics[i] << std::endl;
+			//std::cout << "  device=" << device << " rate=" << rate << " channels=" << channels << std::endl;
+			capture.addMics(channels,rate,device);
+		}
+		//std::cout << "num mics: " << cap.analyzers().size() << std::endl;
+
 		CScreenManager sm(theme);
 		Window window(width, height, fullscreen);
 		sm.setAudio(new CAudio(pdev, prate));
 		sm.addScreen(new CScreenIntro("Intro"));
 		sm.addScreen(new CScreenSongs("Songs", songdirs));
-		Capture capture(cdev1,cdev2,cdev3,cdev4,crate);
 		sm.addScreen(new CScreenSing("Sing", capture.analyzers()));
 		sm.addScreen(new CScreenPractice("Practice", capture.analyzers())); // TODO: multiple analyzers for practice
 		sm.addScreen(new CScreenConfiguration("Configuration"));
