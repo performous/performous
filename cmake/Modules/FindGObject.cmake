@@ -15,6 +15,12 @@ find_library(GObject_LIBRARY
   PATHS ${GObject_PKGCONF_LIBRARY_DIRS}
 )
 
+find_path(GObject_INCLUDE_DIR
+  NAMES gobject/gobject.h
+  PATHS ${GObject_PKGCONF_INCLUDE_DIRS}
+)
+
+set(GObject_PROCESS_INCLUDES GObject_INCLUDE_DIR)
 set(GObject_PROCESS_LIBS GObject_LIBRARY Glib_LIBRARIES)
 libfind_process(GObject)
 
