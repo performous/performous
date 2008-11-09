@@ -15,7 +15,7 @@ libfind_pkg_check_modules(AVUtil_PKGCONF libavutil)
 find_path(AVUtil_INCLUDE_DIR
   NAMES avutil.h
   PATHS ${AVUtil_PKGCONF_INCLUDE_DIRS}
-  PATH_SUFFIXES ffmpeg ffmpeg/avutil avutil
+  PATH_SUFFIXES ffmpeg ffmpeg/avutil avutil libavutil
 )
 
 find_library(AVUtil_LIBRARY
