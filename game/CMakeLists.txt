@@ -23,10 +23,7 @@ set(LIBS ${LIBS} ${Boost_LIBRARIES})
 
 find_package(SDL REQUIRED)
 include_directories(${SDL_INCLUDE_DIR})
-set(LIBS ${LIBS} ${SDL_LIBRARY})
-if(APPLE AND ${CMAKE_SYSTEM_VERSION} LESS "9.0.0")
-	set(LIBS ${LIBS} SDLmain)
-endif(APPLE AND ${CMAKE_SYSTEM_VERSION} LESS "9.0.0")
+set(LIBS ${LIBS} ${SDL_LIBRARIES})
 
 find_package(LibRSVG REQUIRED)
 include_directories(${LibRSVG_INCLUDE_DIRS})
