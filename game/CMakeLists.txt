@@ -22,7 +22,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${Boost_LIBRARIES})
 
 find_package(SDL REQUIRED)
-include_directories(${SDL_INCLUDE_DIR})
+include_directories(${SDL_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${SDL_LIBRARIES})
 
 find_package(LibRSVG REQUIRED)
