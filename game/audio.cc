@@ -11,7 +11,7 @@ CAudio::CAudio(std::string const& pdev, unsigned int rate):
 	m_type(),
 	m_volume(1.0),
 	m_volumeMusic(100),
-	m_volumePreview(60),
+	m_volumePreview(70),
 	m_paused(false),
 	m_prebuffering(false),
 	m_rs(da::settings(pdev)
