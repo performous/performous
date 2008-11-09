@@ -9,6 +9,8 @@ include(LibFindMacros)
 
 # Dependencies
 libfind_package(Pango Freetype)
+libfind_package(Pango Glib)
+libfind_package(Pango GObject)
 
 # Use pkg-config to get hints about paths
 libfind_pkg_check_modules(Pango_PKGCONF pango)

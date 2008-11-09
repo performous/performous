@@ -1,0 +1,29 @@
+# - Try to find FFMPEG libavutil
+# Once done, this will define
+#
+#  AVUtil_FOUND - the library is available
+#  AVUtil_INCLUDE_DIRS - the include directories
+#  AVUtil_LIBRARIES - the libraries
+#
+# See documentation on how to write CMake scripts at
+# http://www.cmake.org/Wiki/CMake:How_To_Find_Libraries
+
+include(LibFindMacros)
+
+libfind_pkg_check_modules(AVUtil_PKGCONF libavutil)
+
+find_path(AVUtil_INCLUDE_DIR
+  NAMES avutil.h
+  PATHS ${AVUtil_PKGCONF_INCLUDE_DIRS}
+  PATH_SUFFIXES ffmpeg ffmpeg/avutil avutil
+)
+
+find_library(AVUtil_LIBRARY
+  NAMES avutil
+  PATHS ${AVUtil_PKGCONF_LIBRARY_DIRS}
+)
+
+set(AVUtil_PROCESS_INCLUDES AVUtil_INCLUDE_DIR)
+set(AVUtil_PROCESS_LIBS AVUtil_LIBRARY)
+libfind_process(AVUtil)
+

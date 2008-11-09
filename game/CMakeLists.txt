@@ -21,37 +21,12 @@ find_package(Boost 1.34 REQUIRED COMPONENTS thread program_options regex filesys
 include_directories(${Boost_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${Boost_LIBRARIES})
 
-find_package(SDL REQUIRED)
-include_directories(${SDL_INCLUDE_DIRS})
-set(LIBS ${LIBS} ${SDL_LIBRARIES})
-
-find_package(LibRSVG REQUIRED)
-include_directories(${LibRSVG_INCLUDE_DIRS})
-set(LIBS ${LIBS} ${LibRSVG_LIBRARIES})
-
-find_package(PangoCairo REQUIRED)
-include_directories(${PangoCairo_INCLUDE_DIRS})
-set(LIBS ${LIBS} ${PangoCairo_LIBRARIES})
-
-find_package(LibXML++ REQUIRED)
-include_directories(${LibXML++_INCLUDE_DIRS})
-set(LIBS ${LIBS} ${LibXML++_LIBRARIES})
-
-find_package(Magick++ REQUIRED)
-include_directories(${Magick++_INCLUDE_DIRS})
-set(LIBS ${LIBS} ${Magick++_LIBRARIES})
-
-find_package(OpenGL REQUIRED)
-include_directories(${OpenGL_INCLUDE_DIRS})
-set(LIBS ${LIBS} ${OpenGL_LIBRARIES})
-
-find_package(GObject REQUIRED)
-include_directories(${GObject_INCLUDE_DIRS})
-set(LIBS ${LIBS} ${GObject_LIBRARIES})
-
-find_package(FFmpeg REQUIRED)
-include_directories(${FFMPEG_INCLUDE_DIRS})
-set(LIBS ${LIBS} ${FFMPEG_LIBRARIES})
+# Find all the libs that don't require extra parameters
+foreach(lib SDL LibRSVG PangoCairo LibXML++ Magick++ OpenGL AVFormat SWScale)
+	find_package(${lib} REQUIRED)
+	include_directories(${${lib}_INCLUDE_DIRS})
+	set(LIBS ${LIBS} ${${lib}_LIBRARIES})
+endforeach(lib)
 
 # Set default compile flags for GCC
 if(CMAKE_COMPILER_IS_GNUCXX)

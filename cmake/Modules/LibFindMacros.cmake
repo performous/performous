@@ -1,12 +1,9 @@
-# Works the same as find_package, but forwards the "REQUIRED" and "QUIET" arguments
-# used for the current package. For this to work, the first parameter must be the
-# prefix of the current package, then the prefix of the new package etc, which are
-# passed to find_package.
+# Works the same as find_package, but forwards the "REQUIRED" argument used for
+# the current package and always uses the "QUIET" flag. For this to work, the
+# first parameter must be the prefix of the current package, then the prefix of
+# the new package etc, which are passed to find_package.
 macro (libfind_package PREFIX)
-  set (LIBFIND_PACKAGE_ARGS ${ARGN})
-  if (${PREFIX}_FIND_QUIETLY)
-    set (LIBFIND_PACKAGE_ARGS ${LIBFIND_PACKAGE_ARGS} QUIET)
-  endif (${PREFIX}_FIND_QUIETLY)
+  set (LIBFIND_PACKAGE_ARGS ${ARGN} QUIET)
   if (${PREFIX}_FIND_REQUIRED)
     set (LIBFIND_PACKAGE_ARGS ${LIBFIND_PACKAGE_ARGS} REQUIRED)
   endif (${PREFIX}_FIND_REQUIRED)

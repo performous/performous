@@ -1,4 +1,4 @@
-# - Try to find Glib-2.0 (with gobject)
+# - Try to find Glib-2.0
 # Once done, this will define
 #
 #  Glib_FOUND - system has Glib
