@@ -9,6 +9,7 @@ include(LibFindMacros)
 
 # Dependencies
 libfind_package(GStreamer GObject)
+libfind_package(GStreamer LibXML2)
 
 # Use pkg-config to get hints about paths
 libfind_pkg_check_modules(GStreamer_PKGCONF gstreamer-0.10)
@@ -27,6 +28,6 @@ find_library(GStreamer_LIBRARY
 
 # Set the include dir variables and the libraries and let libfind_process do the rest.
 # NOTE: Singular variables for this library, plural for libraries this this lib depends on.
-set(GStreamer_PROCESS_INCLUDES GStreamer_INCLUDE_DIR GObject_INCLUDE_DIRS)
-set(GStreamer_PROCESS_LIBS GStreamer_LIBRARY GObject_LIBRARIES)
+set(GStreamer_PROCESS_INCLUDES GStreamer_INCLUDE_DIR GObject_INCLUDE_DIRS LibXML2_INCLUDE_DIRS)
+set(GStreamer_PROCESS_LIBS GStreamer_LIBRARY GObject_LIBRARIES LibXML2_LIBRARIES)
 libfind_process(GStreamer)
