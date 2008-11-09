@@ -25,6 +25,10 @@ find_library(SDL_SDL_LIBRARY
   PATHS ${SDL_PKGCONF_LIBRARY_DIRS}
 )
 
+if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  set(SDL_SDL_LIBRARY ${SDL_SDL_LIBRARY} "-framework Cocoa")
+endif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+
 find_library(SDL_SDLmain_LIBRARY
   NAMES SDLmain
   PATHS ${SDL_PKGCONF_LIBRARY_DIRS}
