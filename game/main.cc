@@ -73,6 +73,8 @@ static void checkEvents_SDL(CScreenManager& sm, Window& window) {
 	}
 }
 
+#include <signal.h>
+
 int main(int argc, char** argv) {
 	signal(SIGINT, quit);
 	signal(SIGQUIT, quit);
