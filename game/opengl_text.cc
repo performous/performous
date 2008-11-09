@@ -58,6 +58,7 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL& _text) {
 	pango_layout_set_font_description(layout, desc);
 	pango_layout_set_text(layout, _text.text.c_str(), -1);
 	cairo_save(dc);
+	cairo_move_to(dc, _text.stroke_width, _text.stroke_width);
 	pango_cairo_show_layout (dc, layout);
 	pango_cairo_layout_path(dc, layout);
 	if (_text.fill_col.a > 0.0) {
