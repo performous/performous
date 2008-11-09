@@ -26,7 +26,7 @@ find_library(SDL_SDL_LIBRARY
 )
 
 find_library(SDL_SDLmain_LIBRARY
-  NAMES SDLmain
+  NAMES libSDLmain.a SDLmain
   HINTS ${SDL_PKGCONF_LIBRARY_DIRS}
 )
 

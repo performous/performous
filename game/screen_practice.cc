@@ -11,7 +11,7 @@ void CScreenPractice::enter() {
 	for (unsigned int i = 0; i < m_analyzers.size(); ++i) {
 		ProgressBar* b;
 		m_vumeters.push_back(b = new ProgressBar(sm->getThemePathFile("vumeter_bg.svg"), sm->getThemePathFile("vumeter_fg.svg"), ProgressBar::VERTICAL, 0.136, 0.023));
-		b->dimensions.screenBottom().left(-0.4 + i * 0.3).fixedWidth(0.04);
+		b->dimensions.screenBottom().left(-0.4 + i * 0.2).fixedWidth(0.04);
 	}
 }
 
@@ -54,7 +54,7 @@ void CScreenPractice::draw() {
 				bool sharp = scale.isSharp(note);
 				noteOffset += octave*7;
 				noteOffset += 0.4 * scale.getNoteOffset(t->freq);
-				float posXnote = -0.25 + 0.3 * i + 0.002 * t->stabledb;
+				float posXnote = -0.25 + 0.2 * i + 0.002 * t->stabledb;
 				float posYnote = .075-noteOffset*0.015;
 
 				theme->note->dimensions.left(posXnote).center(posYnote);
