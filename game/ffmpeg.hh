@@ -85,16 +85,17 @@ class AudioFifo {
 			if (f.data.size() <= size) {
 				buffer.insert(buffer.end(), f.data.begin(), f.data.end());
 				size -= f.data.size();
+				m_timestamp = f.timestamp + double(size) / m_sps;
 				m_queue.pop_front();
 				m_cond.notify_one();
 			} else {
 				buffer.insert(buffer.end(), f.data.begin(), f.data.begin() + size);
 				f.data.erase(f.data.begin(), f.data.begin() + size);
 				if (m_sps > 0) f.timestamp += double(size) / m_sps; // Samples of the package used, increment timestamp
+				m_timestamp = f.timestamp;
 				size = 0;
 			}
 		}
-		m_timestamp = m_queue.front().timestamp;
 	}
 	void push(AudioFrame* f) {
 		boost::mutex::scoped_lock l(m_mutex);
