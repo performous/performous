@@ -1,11 +1,9 @@
 # - Try to find ALSA
 # Once done, this will define
 #
-#  ALSA_FOUND - system has ALSA (GL and GLU)
+#  ALSA_FOUND - system has ALSA
 #  ALSA_INCLUDE_DIRS - the ALSA include directories
 #  ALSA_LIBRARIES - link these to use ALSA
-#  ALSA_GL_LIBRARY - only GL
-#  ALSA_GLU_LIBRARY - only GLU
 #
 # See documentation on how to write CMake scripts at
 # http://www.cmake.org/Wiki/CMake:How_To_Find_Libraries
