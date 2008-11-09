@@ -22,7 +22,11 @@ namespace {
 			for (jack_nframes_t fr = 0; fr < frames; ++fr) for (size_t ch = 0; ch < m_ports.size(); ++ch) buf.push_back(*samples[ch]++);
 			pcm_data data(&buf[0], frames, m_ports.size());
 			m_s.set_frames(frames);
-			m_s.callback()(data, m_s);
+			try {
+				m_s.callback()(data, m_s);
+			} catch (std::exception& e) {
+				m_s.debug(std::string("Exception from recording callback: ") + e.what());
+			}
 			return 0;
 		}
 		void shutdown() { m_client = NULL; m_s.debug("da::jack_record: JACK server shutdown; processing terminated."); }
@@ -63,7 +67,11 @@ namespace {
 			std::vector<sample_t> buf(frames * m_s.channels());
 			pcm_data data(&buf[0], frames, m_ports.size());
 			m_s.set_frames(frames);
-			m_s.callback()(data, m_s);
+			try {
+				m_s.callback()(data, m_s);
+			} catch (std::exception& e) {
+				m_s.debug(std::string("Exception from playback callback: ") + e.what());
+			}
 			std::vector<jack_default_audio_sample_t*> samples(m_ports.size());
 			for (size_t ch = 0; ch < m_ports.size(); ++ch) samples[ch] = static_cast<jack_default_audio_sample_t*>(jack_port_get_buffer(m_ports[ch], frames));
 			for (jack_nframes_t fr = 0; fr < frames; ++fr) for (size_t ch = 0; ch < m_ports.size(); ++ch) *samples[ch]++ = buf[fr * m_ports.size() + ch];

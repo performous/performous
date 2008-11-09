@@ -109,7 +109,7 @@ namespace {
 				try {
 						m_s.callback()(data, m_s);
 				} catch (std::exception& e) {
-					m_s.debug(std::string("Exception from recording callback: ") + e.what());
+					m_s.debug(std::string("Exception from playback callback: ") + e.what());
 				}
 				int e;
 				if (pa_simple_write(m_stream, &buf[0], buf.size() * sizeof(sample_t), &e) < 0) m_s.debug(pa_strerror(e));

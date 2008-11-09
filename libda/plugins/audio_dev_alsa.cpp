@@ -154,7 +154,7 @@ namespace {
 				try {
 					m_s.callback()(data, m_s);
 				} catch (std::exception& e) {
-					m_s.debug(std::string("Exception from recording callback: ") + e.what());
+					m_s.debug(std::string("Exception from playback callback: ") + e.what());
 				}
 				try {
 					// Sleep until samples are available
