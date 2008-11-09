@@ -1,6 +1,0 @@
-#!/bin/bash
-
-export PATH=$PATH:"$(dirname "$0")/../Resources/ultrastar-ng/bin"
-export DYLD_LIBRARY_PATH=$LD_LIBRARY_PATH:"$(dirname "$0")/../Resources/ultrastar-ng/lib"
-
-ultrastarng
