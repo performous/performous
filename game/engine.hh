@@ -31,7 +31,7 @@ struct Player {
 
 namespace {
 	const Color playerColors[] = {
-		Color(52/255.0, 101/255.0, 164/255.0),
+		Color(0.1, 0.6, 0.7),
 		Color(0.8, 0.3, 0.3),
 		Color(0.3, 1.0, 0.3),
 		Color(1.0, 0.6, 0.0)
