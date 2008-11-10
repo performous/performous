@@ -89,14 +89,8 @@ int main(int argc, char** argv) {
 	std::string songlist;
 	std::string theme;
 	std::set<std::string> songdirs;
-	std::string cdev;
-	std::string cdev1;
-	std::string cdev2;
-	std::string cdev3;
-	std::string cdev4;
 	std::vector<std::string> mics;
 	std::string pdev;
-	std::size_t crate;
 	std::size_t prate;
 	std::string homedir;
 	{
@@ -118,14 +112,9 @@ int main(int argc, char** argv) {
 		  ("songlist", po::value<std::string>(&songlist), "print list of songs to console\n  --songlist=[title|artist|path]")
 		  ("width,W", po::value<unsigned int>(&width)->default_value(800), "set horizontal resolution")
 		  ("height,H", po::value<unsigned int>(&height)->default_value(600), "set vertical resolution")
-		  ("cdev", po::value<std::string>(&cdev), "configure stereo capture device (disable autodetection)\n  --cdev=dev[:settings]\n  --cdev=help for list of devices [DEFUNCT]")
-		  ("cdev1", po::value<std::string>(&cdev1), "configure capture device for player 1")
-		  ("cdev2", po::value<std::string>(&cdev2), "configure capture device for player 2")
-		  ("cdev3", po::value<std::string>(&cdev2), "configure capture device for player 3")
-		  ("cdev4", po::value<std::string>(&cdev2), "configure capture device for player 4\n   --cdev1=dev:settings%channel   example: --cdev1=alsa:hw:0,0%0  --cdev1=alsa:hw:0,0%1")
+		  ("michelp", "get the list of possible devices to be used as mic devstr")
 		  ("mics", po::value<std::vector<std::string> >(&mics)->composing(), "specify microphones with --mics=channels[,rate][@devstr]")
 		  ("pdev", po::value<std::string>(&pdev), "set playback device (disable autodetection)\n  --pdev=dev[:settings]\n  --pdev=help for list of devices")
-		  ("crate", po::value<std::size_t>(&crate)->default_value(48000), "set capture frequency\n  44100 and 48000 Hz are optimal")
 		  ("prate", po::value<std::size_t>(&prate)->default_value(48000), "set playback frequency\n  44100 and 48000 Hz are optimal")
 		  ("clean,c", "disable internal default song folders")
 		  ("songdir,s", po::value<std::vector<std::string> >(&songdirstmp)->composing(), "additional song folders to scan\n  may be specified without -s or -songdir too");
@@ -162,7 +151,7 @@ int main(int argc, char** argv) {
 			}
 			return 0;
 		}
-		if (cdev == "help") {
+		if (vm.count("michelp")) {
 			da::record::devlist_t l = da::record::devices();
 			std::cout << "Recording devices:" << std::endl;
 			for (da::record::devlist_t::const_iterator it = l.begin(); it != l.end(); ++it) {
