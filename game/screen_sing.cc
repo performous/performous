@@ -390,14 +390,16 @@ ScoreWindow::ScoreWindow(CScreenManager const* sm, Engine const& e):
 
 void ScoreWindow::draw() {
 	m_bg.draw();
+	const double spacing = 0.1 + 0.1 / m_players.size();
 	unsigned i = 0;
 	for (std::list<Player>::const_iterator p = m_players.begin(); p != m_players.end(); ++p, ++i) {
 		int score = p->getScore();
 		glColor3f(p->m_color.r, p->m_color.g, p->m_color.b);
-		m_scoreBar.dimensions.middle(-0.25 + 0.15 * i).bottom(0.25);
+		double x = -0.12 + spacing * (0.5 + i - 0.5 * m_players.size());
+		m_scoreBar.dimensions.middle(x).bottom(0.25);
 		m_scoreBar.draw(score / 10000.0);
 		m_score_text.render(boost::lexical_cast<std::string>(score));
-		m_score_text.dimensions().middle(-0.25 + 0.15 * i).top(0.25).fixedHeight(0.05);
+		m_score_text.dimensions().middle(x).top(0.25).fixedHeight(0.05);
 		m_score_text.draw();
 		glColor3f(1.0f, 1.0f, 1.0f);
 	}
