@@ -5,5 +5,10 @@
 #define PACKAGE "@CMAKE_PROJECT_NAME@"
 #define VERSION "@PROJECT_VERSION@"
 
+// FFMPEG libraries use changing include file names... Get them from CMake.
+#define AVCODEC_INCLUDE <@AVCodec_INCLUDE@>
+#define AVFORMAT_INCLUDE <@AVFormat_INCLUDE@>
+#define SWSCALE_INCLUDE <@SWScale_INCLUDE@>
+
 #endif
 

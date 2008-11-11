@@ -4,6 +4,7 @@
 #  AVCodec_FOUND - the library is available
 #  AVCodec_INCLUDE_DIRS - the include directories
 #  AVCodec_LIBRARIES - the libraries
+#  AVCodec_INCLUDE - the file to #include (may be used in config.h)
 #
 # See documentation on how to write CMake scripts at
 # http://www.cmake.org/Wiki/CMake:How_To_Find_Libraries
@@ -17,10 +18,22 @@ libfind_package(AVCodec AVUtil)
 libfind_pkg_check_modules(AVCodec_PKGCONF libavcodec)
 
 find_path(AVCodec_INCLUDE_DIR
-  NAMES avcodec.h
+  NAMES libavcodec/avcodec.h ffmpeg/avcodec.h avcodec.h
   PATHS ${AVCodec_PKGCONF_INCLUDE_DIRS}
-  PATH_SUFFIXES ffmpeg ffmpeg/avcodec avcodec libavcodec ffmpeg/libavcodec
+  PATH_SUFFIXES ffmpeg
 )
+
+foreach(suffix libavcodec/ ffmpeg/ "")
+  if(NOT AVCodec_INCLUDE)
+    if(EXISTS "${AVCodec_INCLUDE_DIR}/${suffix}avcodec.h")
+      set(AVCodec_INCLUDE "${suffix}avcodec.h")
+    endif(EXISTS "${AVCodec_INCLUDE_DIR}/${suffix}avcodec.h")
+  endif(NOT AVCodec_INCLUDE)
+endforeach(suffix)
+
+if(NOT AVCodec_INCLUDE)
+  message(FATAL_ERROR "Found avcodec.h include dir, but not the header file. This is an internal error in FindAVCodec.h")
+endif(NOT AVCodec_INCLUDE)
 
 find_library(AVCodec_LIBRARY
   NAMES avcodec

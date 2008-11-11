@@ -4,10 +4,12 @@
 #include <iostream>
 #include <stdexcept>
 
+#include "config.hh"
+
 extern "C" {
-#include <avcodec.h>
-#include <avformat.h>
-#include <swscale.h>
+#include AVCODEC_INCLUDE
+#include AVFORMAT_INCLUDE
+#include SWSCALE_INCLUDE
 }
 
 #define USE_FFMPEG_CRASH_RECOVERY

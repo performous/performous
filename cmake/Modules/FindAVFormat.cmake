@@ -4,6 +4,7 @@
 #  AVFormat_FOUND - the library is available
 #  AVFormat_INCLUDE_DIRS - the include directories
 #  AVFormat_LIBRARIES - the libraries
+#  AVFormat_INCLUDE - the file to include (may be used in config.h)
 #
 # See documentation on how to write CMake scripts at
 # http://www.cmake.org/Wiki/CMake:How_To_Find_Libraries
@@ -15,10 +16,22 @@ libfind_package(AVFormat AVCodec)
 libfind_pkg_check_modules(AVFormat_PKGCONF libavformat)
 
 find_path(AVFormat_INCLUDE_DIR
-  NAMES avformat.h
+  NAMES libavformat/avformat.h ffmpeg/avformat.h avformat.h
   PATHS ${AVFormat_PKGCONF_INCLUDE_DIRS}
-  PATH_SUFFIXES ffmpeg ffmpeg/avformat avformat libavformat ffmpeg/libavformat
+  PATH_SUFFIXES ffmpeg
 )
+
+foreach(suffix /libavformat /ffmpeg "")
+  if(NOT AVFormat_INCLUDE)
+    if(EXISTS "${AVFormat_INCLUDE_DIR}/${suffix}avformat.h")
+      set(AVFormat_INCLUDE "${suffix}avformat.h")
+    endif(EXISTS "${AVFormat_INCLUDE_DIR}/${suffix}avformat.h")
+  endif(NOT AVFormat_INCLUDE)
+endforeach(suffix)
+
+if(NOT AVFormat_INCLUDE)
+  message(FATAL_ERROR "Found avformat.h include dir, but not the header file. This is an internal error in FindAVFormat.h")
+endif(NOT AVFormat_INCLUDE)
 
 find_library(AVFormat_LIBRARY
   NAMES avformat

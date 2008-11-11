@@ -4,10 +4,6 @@ if(COMMAND cmake_policy)
 	cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 
-# Generate config.hh
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.cmake.hh" "${CMAKE_CURRENT_BINARY_DIR}/config.hh" @ONLY)
-include_directories("${CMAKE_CURRENT_BINARY_DIR}")
-
 FILE(GLOB SOURCE_FILES "*.cc")
 FILE(GLOB HEADER_FILES "*.hh")
 
@@ -26,6 +22,7 @@ foreach(lib SDL LibRSVG PangoCairo LibXML++ Magick++ OpenGL AVFormat SWScale)
 	find_package(${lib} REQUIRED)
 	include_directories(${${lib}_INCLUDE_DIRS})
 	set(LIBS ${LIBS} ${${lib}_LIBRARIES})
+	add_definitions(${${lib}_DEFINITIONS})
 endforeach(lib)
 
 # Set default compile flags for GCC
@@ -39,6 +36,10 @@ endif(CMAKE_COMPILER_IS_GNUCXX)
 
 add_executable(performous ${SOURCES})
 target_link_libraries(performous da ${LIBS})
+
+# Generate config.hh
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.cmake.hh" "${CMAKE_CURRENT_BINARY_DIR}/config.hh" @ONLY)
+include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
 install(TARGETS performous DESTINATION bin)
 
