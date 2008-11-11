@@ -23,17 +23,19 @@ find_path(AVCodec_INCLUDE_DIR
   PATH_SUFFIXES ffmpeg
 )
 
-foreach(suffix libavcodec/ ffmpeg/ "")
-  if(NOT AVCodec_INCLUDE)
-    if(EXISTS "${AVCodec_INCLUDE_DIR}/${suffix}avcodec.h")
-      set(AVCodec_INCLUDE "${suffix}avcodec.h")
-    endif(EXISTS "${AVCodec_INCLUDE_DIR}/${suffix}avcodec.h")
-  endif(NOT AVCodec_INCLUDE)
-endforeach(suffix)
+if(AVCodec_INCLUDE_DIR)
+  foreach(suffix libavcodec/ ffmpeg/ "")
+    if(NOT AVCodec_INCLUDE)
+      if(EXISTS "${AVCodec_INCLUDE_DIR}/${suffix}avcodec.h")
+        set(AVCodec_INCLUDE "${suffix}avcodec.h")
+      endif(EXISTS "${AVCodec_INCLUDE_DIR}/${suffix}avcodec.h")
+    endif(NOT AVCodec_INCLUDE)
+  endforeach(suffix)
 
-if(NOT AVCodec_INCLUDE)
-  message(FATAL_ERROR "Found avcodec.h include dir, but not the header file. This is an internal error in FindAVCodec.cmake")
-endif(NOT AVCodec_INCLUDE)
+  if(NOT AVCodec_INCLUDE)
+    message(FATAL_ERROR "Found avcodec.h include dir, but not the header file. This is an internal error in FindAVCodec.cmake")
+  endif(NOT AVCodec_INCLUDE)
+endif(AVCodec_INCLUDE_DIR)
 
 find_library(AVCodec_LIBRARY
   NAMES avcodec

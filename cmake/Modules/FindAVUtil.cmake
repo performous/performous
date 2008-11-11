@@ -19,17 +19,19 @@ find_path(AVUtil_INCLUDE_DIR
   PATH_SUFFIXES ffmpeg
 )
 
-foreach(suffix libavutil/ ffmpeg/ "")
-  if(NOT AVUtil_INCLUDE)
-    if(EXISTS "${AVUtil_INCLUDE_DIR}/${suffix}avutil.h")
-      set(AVUtil_INCLUDE "${suffix}avutil.h")
-    endif(EXISTS "${AVUtil_INCLUDE_DIR}/${suffix}avutil.h")
-  endif(NOT AVUtil_INCLUDE)
-endforeach(suffix)
+if(AVUtil_INCLUDE_DIR)
+  foreach(suffix libavutil/ ffmpeg/ "")
+    if(NOT AVUtil_INCLUDE)
+      if(EXISTS "${AVUtil_INCLUDE_DIR}/${suffix}avutil.h")
+        set(AVUtil_INCLUDE "${suffix}avutil.h")
+      endif(EXISTS "${AVUtil_INCLUDE_DIR}/${suffix}avutil.h")
+    endif(NOT AVUtil_INCLUDE)
+  endforeach(suffix)
 
-if(NOT AVUtil_INCLUDE)
-  message(FATAL_ERROR "Found avutil.h include dir, but not the header file. This is an internal error in FindAVUtil.cmake")
-endif(NOT AVUtil_INCLUDE)
+  if(NOT AVUtil_INCLUDE)
+    message(FATAL_ERROR "Found avutil.h include dir, but not the header file. This is an internal error in FindAVUtil.cmake")
+  endif(NOT AVUtil_INCLUDE)
+endif(AVUtil_INCLUDE_DIR)
 
 find_library(AVUtil_LIBRARY
   NAMES avutil

@@ -21,17 +21,19 @@ find_path(AVFormat_INCLUDE_DIR
   PATH_SUFFIXES ffmpeg
 )
 
-foreach(suffix /libavformat /ffmpeg "")
-  if(NOT AVFormat_INCLUDE)
-    if(EXISTS "${AVFormat_INCLUDE_DIR}/${suffix}avformat.h")
-      set(AVFormat_INCLUDE "${suffix}avformat.h")
-    endif(EXISTS "${AVFormat_INCLUDE_DIR}/${suffix}avformat.h")
-  endif(NOT AVFormat_INCLUDE)
-endforeach(suffix)
+if(AVFormat_INCLUDE_DIR)
+  foreach(suffix /libavformat /ffmpeg "")
+    if(NOT AVFormat_INCLUDE)
+      if(EXISTS "${AVFormat_INCLUDE_DIR}/${suffix}avformat.h")
+        set(AVFormat_INCLUDE "${suffix}avformat.h")
+      endif(EXISTS "${AVFormat_INCLUDE_DIR}/${suffix}avformat.h")
+    endif(NOT AVFormat_INCLUDE)
+  endforeach(suffix)
 
-if(NOT AVFormat_INCLUDE)
-  message(FATAL_ERROR "Found avformat.h include dir, but not the header file. This is an internal error in FindAVFormat.cmake")
-endif(NOT AVFormat_INCLUDE)
+  if(NOT AVFormat_INCLUDE)
+    message(FATAL_ERROR "Found avformat.h include dir, but not the header file. This is an internal error in FindAVFormat.cmake")
+  endif(NOT AVFormat_INCLUDE)
+endif(AVFormat_INCLUDE_DIR)
 
 find_library(AVFormat_LIBRARY
   NAMES avformat
