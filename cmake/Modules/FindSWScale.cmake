@@ -17,7 +17,7 @@ libfind_pkg_check_modules(SWScale_PKGCONF libswscale)
 find_path(SWScale_INCLUDE_DIR
   NAMES swscale.h
   PATHS ${SWScale_PKGCONF_INCLUDE_DIRS}
-  PATH_SUFFIXES ffmpeg ffmpeg/swscale swscale libswscale
+  PATH_SUFFIXES ffmpeg ffmpeg/swscale swscale libswscale ffmpeg/libswscale
 )
 
 find_library(SWScale_LIBRARY

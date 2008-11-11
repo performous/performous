@@ -19,7 +19,7 @@ libfind_pkg_check_modules(AVCodec_PKGCONF libavcodec)
 find_path(AVCodec_INCLUDE_DIR
   NAMES avcodec.h
   PATHS ${AVCodec_PKGCONF_INCLUDE_DIRS}
-  PATH_SUFFIXES ffmpeg ffmpeg/avcodec avcodec libavcodec
+  PATH_SUFFIXES ffmpeg ffmpeg/avcodec avcodec libavcodec ffmpeg/libavcodec
 )
 
 find_library(AVCodec_LIBRARY
