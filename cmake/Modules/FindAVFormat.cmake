@@ -22,7 +22,7 @@ find_path(AVFormat_INCLUDE_DIR
 )
 
 if(AVFormat_INCLUDE_DIR)
-  foreach(suffix /libavformat /ffmpeg "")
+  foreach(suffix libavformat/ ffmpeg/ "")
     if(NOT AVFormat_INCLUDE)
       if(EXISTS "${AVFormat_INCLUDE_DIR}/${suffix}avformat.h")
         set(AVFormat_INCLUDE "${suffix}avformat.h")
