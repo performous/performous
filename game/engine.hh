@@ -56,7 +56,7 @@ class Engine {
 	* @param anBegin Analyzers to use (ending iterator)
 	**/
 	template <typename FwdIt> Engine(CAudio& audio, FwdIt anBegin, FwdIt anEnd):
-	  m_audio(audio), m_players(anBegin, anEnd), m_latencyAR(0.05), m_time(), m_quit(), m_thread(boost::ref(*this))
+	  m_audio(audio), m_players(anBegin, anEnd), m_latencyAR(0.1), m_time(), m_quit(), m_thread(boost::ref(*this))
 	{
 		size_t player = 0;
 		for (std::list<Player>::iterator it = m_players.begin(); it != m_players.end(); ++it, ++player) it->m_color = playerColors[player % playerColorsSize];

@@ -56,6 +56,7 @@ void CAudio::operator()(da::pcm_data& areas, da::settings const&) {
 		}
 	}
 	std::fill(areas.m_buf + size, areas.m_buf + samples, 0.0f);
+	// Synthesize tones
 	if (m_synth && m_mpeg && !m_paused) {
 		Songs const& s = *CScreenManager::getSingletonPtr()->getSongs(); // TODO: Kill ScreenManager
 		if (s.empty()) return;
@@ -69,7 +70,7 @@ void CAudio::operator()(da::pcm_data& areas, da::settings const&) {
 		for (size_t i = 0; i < samples; ++i) {
 			if (i % areas.channels == 0) {
 				value = 0.3 * std::sin(phase) + 0.3 * std::sin(2 * phase) + 0.1 * std::sin(3 * phase);
-				phase += 2.0 * M_PI * freq / 48000.0;
+				phase += 2.0 * M_PI * freq / m_rs.rate();
 			}
 			areas.m_buf[i] += value;
 		}
