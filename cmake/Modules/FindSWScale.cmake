@@ -30,7 +30,7 @@ foreach(suffix libswscale/ ffmpeg/ "")
 endforeach(suffix)
 
 if(NOT SWScale_INCLUDE)
-  message(FATAL_ERROR "Found swscale.h include dir, but not the header file. This is an internal error in FindSWScale.h")
+  message(FATAL_ERROR "Found swscale.h include dir, but not the header file. This is an internal error in FindSWScale.cmake")
 endif(NOT SWScale_INCLUDE)
 
 find_library(SWScale_LIBRARY

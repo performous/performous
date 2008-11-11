@@ -30,7 +30,7 @@ foreach(suffix /libavformat /ffmpeg "")
 endforeach(suffix)
 
 if(NOT AVFormat_INCLUDE)
-  message(FATAL_ERROR "Found avformat.h include dir, but not the header file. This is an internal error in FindAVFormat.h")
+  message(FATAL_ERROR "Found avformat.h include dir, but not the header file. This is an internal error in FindAVFormat.cmake")
 endif(NOT AVFormat_INCLUDE)
 
 find_library(AVFormat_LIBRARY

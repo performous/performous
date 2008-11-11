@@ -32,7 +32,7 @@ foreach(suffix libavcodec/ ffmpeg/ "")
 endforeach(suffix)
 
 if(NOT AVCodec_INCLUDE)
-  message(FATAL_ERROR "Found avcodec.h include dir, but not the header file. This is an internal error in FindAVCodec.h")
+  message(FATAL_ERROR "Found avcodec.h include dir, but not the header file. This is an internal error in FindAVCodec.cmake")
 endif(NOT AVCodec_INCLUDE)
 
 find_library(AVCodec_LIBRARY

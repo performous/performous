@@ -28,7 +28,7 @@ foreach(suffix libavutil/ ffmpeg/ "")
 endforeach(suffix)
 
 if(NOT AVUtil_INCLUDE)
-  message(FATAL_ERROR "Found avutil.h include dir, but not the header file. This is an internal error in FindAVUtil.h")
+  message(FATAL_ERROR "Found avutil.h include dir, but not the header file. This is an internal error in FindAVUtil.cmake")
 endif(NOT AVUtil_INCLUDE)
 
 find_library(AVUtil_LIBRARY
