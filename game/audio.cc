@@ -4,6 +4,8 @@
 #include <functional>
 #include <iostream>
 #include <cmath>
+#include "screen.hh"
+#include "songs.hh"
 
 #define LENGTH_ERROR -1
 
@@ -40,6 +42,8 @@ void CAudio::operator()(da::pcm_data& areas, da::settings const&) {
 	boost::mutex::scoped_lock l(m_mutex);
 	std::size_t samples = areas.channels * areas.frames;
 	unsigned int size = 0;
+	static double phase = 0.0;
+	double volume = m_volume * (m_synth ? 0.3 : 1.0);
 	if (m_mpeg && !m_paused) {
 		if (m_prebuffering && m_mpeg->audioQueue.percentage() > 0.9) m_prebuffering = false;
 		if (!m_prebuffering) {
@@ -48,10 +52,28 @@ void CAudio::operator()(da::pcm_data& areas, da::settings const&) {
 			std::transform(buf.begin(), buf.end(), areas.m_buf, da::conv_from_s16);
 			size = buf.size();
 			if (size < samples && !m_mpeg->audioQueue.eof() && m_mpeg->position() > 1.0) std::cerr << "Warning: audio decoding too slow (buffer underrun): " << std::endl;
-			if (m_volume != 1.0) std::transform(areas.m_buf, areas.m_buf + size, areas.m_buf, std::bind1st(std::multiplies<double>(), m_volume));
+			if (volume != 1.0) std::transform(areas.m_buf, areas.m_buf + size, areas.m_buf, std::bind1st(std::multiplies<double>(), volume));
 		}
 	}
 	std::fill(areas.m_buf + size, areas.m_buf + samples, 0.0f);
+	if (m_synth && m_mpeg && !m_paused) {
+		Songs const& s = *CScreenManager::getSingletonPtr()->getSongs(); // TODO: Kill ScreenManager
+		if (s.empty()) return;
+		Song::notes_t const& n = s.current().notes; // TODO: Kill ScreenManager
+		double t = m_mpeg->position();
+		Song::notes_t::const_iterator it = n.begin();
+		while (it != n.end() && it->end < t) ++it;
+		if (it == n.end() || it->begin > t) { phase = 0.0; return; }
+		double freq = MusicalScale().getNoteFreq(it->note - (s.current().noteMin / 12 * 12) + 12);
+		double value = 0.0;
+		for (size_t i = 0; i < samples; ++i) {
+			if (i % areas.channels == 0) {
+				value = 0.3 * std::sin(phase) + 0.3 * std::sin(2 * phase) + 0.1 * std::sin(3 * phase);
+				phase += 2.0 * M_PI * freq / 48000.0;
+			}
+			areas.m_buf[i] += value;
+		}
+	}
 }
 
 void CAudio::operator()() {
@@ -97,6 +119,7 @@ void CAudio::setVolume_internal(unsigned int volume) {
 }
 
 void CAudio::playMusic_internal(std::string const& filename) {
+	m_synth = false;
 	setVolume_internal(0);
 	length = LENGTH_ERROR;
 	m_mpeg.reset();
@@ -109,6 +132,7 @@ void CAudio::playMusic_internal(std::string const& filename) {
 }
 
 void CAudio::playPreview_internal(std::string const& filename) {
+	m_synth = false;
 	setVolume_internal(0);
 	length = LENGTH_ERROR;
 	m_mpeg.reset();
@@ -131,6 +155,7 @@ bool CAudio::isPlaying_internal() {
 }
 
 void CAudio::stopMusic_internal() {
+	m_synth = false;
 	m_mpeg.reset();
 }
 

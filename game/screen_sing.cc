@@ -89,10 +89,11 @@ void CScreenSing::manageEvent(SDL_Event event) {
 			double diff = m_songit->begin - 3.0 - audio.getPosition();
 			if (diff > 0.0) audio.seek(diff);
 		}
-		else if (key == SDLK_F5) m_latencyAV += 0.02;
-		else if (key == SDLK_F6) m_latencyAV -= 0.02;
-		else if (key == SDLK_F7) m_engine->setLatencyAR(m_engine->getLatencyAR() - 0.02);
-		else if (key == SDLK_F8) m_engine->setLatencyAR(m_engine->getLatencyAR() + 0.02);
+		else if (key == SDLK_F4) audio.toggleSynth();
+		else if (key == SDLK_F5) { m_latencyAV -= 0.02; std::cout << "AV latency = " << m_latencyAV << std::endl; }
+		else if (key == SDLK_F6) { m_latencyAV += 0.02; std::cout << "AV latency = " << m_latencyAV << std::endl; }
+		else if (key == SDLK_F7) { double l = m_engine->getLatencyAR() - 0.02; m_engine->setLatencyAR(l); std::cout << "AR latency = " << l << std::endl; }
+		else if (key == SDLK_F8) { double l = m_engine->getLatencyAR() + 0.02; m_engine->setLatencyAR(l); std::cout << "AR latency = " << l << std::endl; }
 		else if (key == SDLK_HOME) audio.seek(-audio.getPosition());
 		else if (key == SDLK_LEFT) { audio.seek(-5.0); seekback = true; }
 		else if (key == SDLK_RIGHT) audio.seek(5.0);
@@ -158,7 +159,7 @@ void CScreenSing::draw() {
 	Song& song = sm->getSongs()->current();
 	// Get the time in the song
 	double length = sm->getAudio()->getLength();
-	double time = std::min(length, std::max(0.0, sm->getAudio()->getPosition() + m_latencyAV));
+	double time = std::min(length, std::max(0.0, sm->getAudio()->getPosition() - m_latencyAV));
 	double songPercent = time / length;
 	// Rendering starts
 	{

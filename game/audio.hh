@@ -96,6 +96,7 @@ class CAudio {
 		boost::mutex::scoped_lock l(m_mutex);
 		while (!m_ready || m_type != NONE) m_condready.wait(l);
 	}
+	void toggleSynth() { m_synth = !m_synth; }
   private:
 	enum Type { NONE, STOP, PREVIEW, PLAY, QUIT } m_type;
 	std::string m_filename;
@@ -119,6 +120,7 @@ class CAudio {
 	void setVolume_internal(unsigned int volume);
 	boost::scoped_ptr<CFfmpeg> m_mpeg;
 	volatile bool m_paused;
+	volatile bool m_synth;
 	volatile bool m_prebuffering;
 	da::settings m_rs;
 	da::playback m_playback;
