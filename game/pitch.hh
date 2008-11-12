@@ -30,6 +30,10 @@ static inline bool operator>=(Tone const& lhs, Tone const& rhs) { return lhs.fre
 static inline bool operator<(Tone const& lhs, Tone const& rhs) { return lhs.freq < rhs.freq && lhs != rhs; }
 static inline bool operator>(Tone const& lhs, Tone const& rhs) { return lhs.freq > rhs.freq && lhs != rhs; }
 
+static const unsigned FFT_P = 10;
+static const std::size_t FFT_N = 1 << FFT_P;
+static const std::size_t BUF_N = 2 * FFT_N;
+
 class Analyzer {
   public:
 	typedef std::vector<std::complex<float> > fft_t;
@@ -37,17 +41,26 @@ class Analyzer {
 	Analyzer(double rate, std::size_t step = 500);
 	/** Add input data to buffer. This is thread-safe (against other functions). **/
 	template <typename InIt> void input(InIt begin, InIt end) {
-		boost::mutex::scoped_lock l(m_mutex);
-		std::copy(begin, end, std::back_inserter(m_buf));
-		// Avoid running out of memory even if process() never gets called
-		if (m_buf.size() > 10000) m_buf.erase(m_buf.begin(), m_buf.begin() + 10000);
+		while (begin != end) {
+			float s = *begin;
+			++begin;
+			m_peak *= 0.999;
+			float p = s * s;
+			if (p > m_peak) m_peak = p;
+			size_t w = m_bufWrite;
+			size_t w2 = (m_bufWrite + 1) % BUF_N;
+			size_t r = m_bufRead;
+			if (w2 == r) m_bufRead = (r + 1) % BUF_N;
+			m_buf[w] = s;
+			m_bufWrite = w2;
+		}
 	}
 	/** Call this to process all data input so far. **/
 	void process();
 	/** Get the raw FFT. **/
 	fft_t const& getFFT() const { return m_fft; }
 	/** Get the peak level in dB (negative value, 0.0 = clipping). **/
-	double getPeak() const { return m_peak; }
+	double getPeak() const { return 10.0 * log10(m_peak); }
 	/** Get a list of all tones detected. **/
 	tones_t const& getTones() const { return m_tones; }
 	/** Find a tone within the singing range; prefers strong tones around 200-400 Hz. **/
@@ -59,7 +72,7 @@ class Analyzer {
 		for (tones_t::const_iterator it = m_tones.begin(); it != m_tones.end(); ++it) {
 			if (it->db < db - 20.0 || it->freq < minfreq || it->age < Tone::MINAGE) continue;
 			if (it->freq > maxfreq) break;
-			double score = it->db - std::max(100.0, std::abs(it->freq - 350.0)) / 10.0;
+			double score = it->db - std::max(180.0, std::abs(it->freq - 300.0)) / 20.0;
 			if (best && bestscore > score) break;
 			best = &*it;
 			bestscore = score;
@@ -70,8 +83,8 @@ class Analyzer {
 	std::size_t m_step;
 	double m_rate;
 	std::vector<float> m_window;
-	mutable boost::mutex m_mutex;
-	std::deque<float> m_buf;
+	float m_buf[2 * BUF_N];
+	volatile size_t m_bufRead, m_bufWrite;
 	fft_t m_fft;
 	std::vector<float> m_fftLastPhase;
 	double m_peak;

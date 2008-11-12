@@ -7,12 +7,9 @@
 #include <iostream>
 #include <limits>
 
-static const unsigned FFT_P = 11;
-static const std::size_t FFT_N = 1 << FFT_P;
-
 // Limit the range to avoid noise and useless computation
-static const double FFT_MINFREQ = 50.0;
-static const double FFT_MAXFREQ = 3000.0;
+static const double FFT_MINFREQ = 45.0;
+static const double FFT_MAXFREQ = 2000.0;
 
 Tone::Tone():
   freq(0.0),
@@ -39,8 +36,10 @@ Analyzer::Analyzer(double rate, size_t step):
   m_step(step),
   m_rate(rate),
   m_window(FFT_N),
+  m_bufRead(0),
+  m_bufWrite(0),
   m_fftLastPhase(FFT_N / 2),
-  m_peak(-std::numeric_limits<double>::infinity())
+  m_peak(0.0)
 {
   	// Hamming window
 	for (size_t i=0; i < FFT_N; i++) {
@@ -75,15 +74,16 @@ namespace {
 }
 
 bool Analyzer::calcFFT() {
-	boost::mutex::scoped_lock l(m_mutex);
-	if (m_buf.size() < FFT_N) return false;
-	// Calculate peak
-	double tmp = *std::max_element(m_buf.begin(), m_buf.begin() + FFT_N, sqrLT);
-	m_peak = 10.0 * log10(tmp * tmp);
+	float pcm[FFT_N];
+	size_t r = m_bufRead;
+	if ((BUF_N + m_bufWrite - r) % BUF_N <= FFT_N) return false;
+	for (size_t i = 0; i < FFT_N; ++i) {
+		pcm[i] = m_buf[(r + i) % BUF_N];
+	}
+	m_bufRead = (r + m_step) % BUF_N;
+	std::cerr << "FFT" << std::endl;
 	// Calculate FFT
-	m_fft = da::fft<FFT_P>(m_buf.begin(), m_window);
-	// Erase one step of samples
-	m_buf.erase(m_buf.begin(), m_buf.begin() + m_step);
+	m_fft = da::fft<FFT_P>(pcm, m_window);
 	return true;
 }
 
