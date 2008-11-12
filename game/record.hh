@@ -4,49 +4,39 @@
 #include <audio.hpp>
 #include "pitch.hh"
 #include <boost/ptr_container/ptr_vector.hpp>
-#include <iostream>
-
-class CaptureDeviceCallback {
-  private:
-	std::size_t channels;
-	da::settings *settings;
-	da::record *record;
-	boost::ptr_vector<Analyzer> myanalyzers;
-  public:
-	CaptureDeviceCallback(std::size_t ch, std::size_t rate, std::string device){
-		channels = ch;
-		settings = new da::settings(device);
-		settings->set_callback(boost::ref(*this));
-		settings->set_channels(ch);
-		settings->set_rate(rate);
-		settings->set_debug(std::cerr);
-		record = new da::record(*settings);
-		for(std::size_t i=0;i<ch;i++){
-			myanalyzers.push_back(new Analyzer(settings->rate()));
-		}
-		//std::cout << "CaptureDeviceCallback constructed, channels=" << channels << std::endl;
-	}
-	void operator()(da::pcm_data& areas, da::settings const&) {
-		for(std::size_t ch = 0; ch < channels; ++ch){
-			myanalyzers[ch].input(areas.begin(ch), areas.end(ch));
-		}
-	}
-	boost::ptr_vector<Analyzer>& analyzers() { return myanalyzers; }
-};
 
 class Capture {
   private:
-	boost::ptr_vector<Analyzer> all_analyzers;
-  public:
-	Capture(){}
-	void addMics(std::size_t channels, std::size_t rate, std::string device){
-		CaptureDeviceCallback *cdc = new CaptureDeviceCallback(channels,rate,device);
-		boost::ptr_vector<Analyzer>& lyzer = cdc->analyzers();
-		for(std::size_t i=0;i<lyzer.size();i++){
-			all_analyzers.push_back(&lyzer[i]);
+	class Device {
+	  private:
+		std::vector<Analyzer*> m_channels;
+		da::settings m_settings;
+		da::record m_record;
+	  public:
+		Device(Capture& c, std::size_t channels, std::size_t rate, std::string device):
+		  m_channels(channels),
+		  m_settings(device),
+		  m_record(m_settings.set_callback(boost::ref(*this)).set_channels(channels).set_rate(rate).set_debug(std::cerr))
+		{
+			for(std::size_t ch = 0; ch < channels; ++ch) {
+				c.addAnalyzer(m_channels[ch] = new Analyzer(m_settings.rate()));
+			}
 		}
+		void operator()(da::pcm_data& areas, da::settings const&) {
+			for(std::size_t ch = 0; ch < m_channels.size(); ++ch) {
+				if (m_channels[ch]) m_channels[ch]->input(areas.begin(ch), areas.end(ch));
+			}
+		}
+	};
+	boost::ptr_vector<Analyzer> m_analyzers;  // This must come before the devices for correct destruction order
+	boost::ptr_vector<Device> m_devices;
+	void addAnalyzer(Analyzer* a) { m_analyzers.push_back(a); }	
+
+  public:
+	void addMics(std::size_t channels, std::size_t rate, std::string device){
+		m_devices.push_back(new Device(*this, channels, rate, device));
 	}
-	boost::ptr_vector<Analyzer>& analyzers() { return all_analyzers; }
+	boost::ptr_vector<Analyzer>& analyzers() { return m_analyzers; }
 };
 
 #endif
