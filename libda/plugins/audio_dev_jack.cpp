@@ -39,6 +39,7 @@ namespace {
 				std::string name = "capture_" + boost::lexical_cast<std::string>(i + 1);
 				jack_port_t* p = jack_port_register(m_client, name.c_str(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
 				if (!p) throw std::runtime_error("Unable to register JACK port");
+				jack_connect(m_client, ("system:" + name).c_str(), (s.subdev() + ":" + name).c_str());
 				m_ports.push_back(p);
 			}
 			s.set_rate(jack_get_sample_rate(m_client));
@@ -47,8 +48,16 @@ namespace {
 			jack_set_process_callback(m_client, libda_jack_record_callback, this);
 			jack_on_shutdown(m_client, libda_jack_record_shutdown, this);
 			jack_activate(m_client);
+			connect();
 		}
 		~jack_record() { if (m_client) jack_client_close(m_client); }
+		void connect() {
+			for (size_t i = 0; i < m_ports.size(); ++i) {
+				std::string name = jack_port_name(m_ports[i]);
+				size_t pos = name.find(':');
+				jack_connect(m_client, ("system" + name.substr(pos)).c_str(), name.c_str());
+			}
+		}
 	};
 	extern "C" int libda_jack_record_callback(jack_nframes_t frames, void* arg) { return static_cast<jack_record*>(arg)->callback(frames); }
 	extern "C" void libda_jack_record_shutdown(void* arg) { static_cast<jack_record*>(arg)->shutdown(); }
@@ -94,8 +103,16 @@ namespace {
 			jack_set_process_callback(m_client, libda_jack_playback_callback, this);
 			jack_on_shutdown(m_client, libda_jack_playback_shutdown, this);
 			jack_activate(m_client);
+			connect();
 		}
 		~jack_playback() { if (m_client) jack_client_close(m_client); }
+		void connect() {
+			for (size_t i = 0; i < m_ports.size(); ++i) {
+				std::string name = jack_port_name(m_ports[i]);
+				size_t pos = name.find(':');
+				jack_connect(m_client, name.c_str(), ("system" + name.substr(pos)).c_str());
+			}
+		}
 	};
 	extern "C" int libda_jack_playback_callback(jack_nframes_t frames, void* arg) { return static_cast<jack_playback*>(arg)->callback(frames); }
 	extern "C" void libda_jack_playback_shutdown(void* arg) { static_cast<jack_playback*>(arg)->shutdown(); }
