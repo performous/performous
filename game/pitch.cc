@@ -81,7 +81,6 @@ bool Analyzer::calcFFT() {
 		pcm[i] = m_buf[(r + i) % BUF_N];
 	}
 	m_bufRead = (r + m_step) % BUF_N;
-	std::cerr << "FFT" << std::endl;
 	// Calculate FFT
 	m_fft = da::fft<FFT_P>(pcm, m_window);
 	return true;
