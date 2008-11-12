@@ -60,11 +60,11 @@ void CAudio::operator()(da::pcm_data& areas, da::settings const&) {
 	if (m_synth && m_mpeg && !m_paused) {
 		Songs const& s = *CScreenManager::getSingletonPtr()->getSongs(); // TODO: Kill ScreenManager
 		if (s.empty()) return;
-		Song::notes_t const& n = s.current().notes; // TODO: Kill ScreenManager
+		Song::notes_t const& n = s.current().notes;
 		double t = m_mpeg->position();
 		Song::notes_t::const_iterator it = n.begin();
 		while (it != n.end() && it->end < t) ++it;
-		if (it == n.end() || it->begin > t) { phase = 0.0; return; }
+		if (it == n.end() || it->type == Note::SLEEP || it->begin > t) { phase = 0.0; return; }
 		double freq = MusicalScale().getNoteFreq(it->note - (s.current().noteMin / 12 * 12) + 12);
 		double value = 0.0;
 		for (size_t i = 0; i < samples; ++i) {
