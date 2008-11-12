@@ -19,7 +19,7 @@ class Capture {
 		  m_record(m_settings.set_callback(boost::ref(*this)).set_channels(channels).set_rate(rate).set_debug(std::cerr))
 		{
 			for(std::size_t ch = 0; ch < channels; ++ch) {
-				c.m_analyzers.push_back(m_channels[ch] = new Analyzer(m_settings.rate()));
+				if (c.m_analyzers.size() < 4) c.m_analyzers.push_back(m_channels[ch] = new Analyzer(m_settings.rate()));
 			}
 		}
 		void operator()(da::pcm_data& areas, da::settings const&) {
