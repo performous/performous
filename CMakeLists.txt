@@ -1,6 +1,6 @@
 project(Performous CXX)
 cmake_minimum_required(VERSION 2.4)
-set(PROJECT_VERSION "0.3.0-svn")
+set(PROJECT_VERSION "0.3.0svn")
 
 # Avoid source tree pollution
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
