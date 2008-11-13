@@ -31,9 +31,9 @@ struct Player {
 
 namespace {
 	const Color playerColors[] = {
-		Color(0.1, 0.6, 0.7),
+		Color(0.2, 0.5, 0.7),
 		Color(0.8, 0.3, 0.3),
-		Color(0.3, 1.0, 0.3),
+		Color(0.2, 0.9, 0.2),
 		Color(1.0, 0.6, 0.0)
 	};
 	size_t playerColorsSize = sizeof(playerColors) / sizeof(*playerColors);
