@@ -97,46 +97,5 @@ class Analyzer {
 	void mergeWithOld(tones_t& tones) const;
 };
 
-/*
-class Player {
-	Song& m_song;
-	Analyzer& m_analyzer;
-  public:
-	Player(Song& song, Analyzer& analyzer): m_song(song), m_analyzer(analyzer) {}
-	void process(double time) {
-		CScreenManager* sm = CScreenManager::getSingletonPtr();
-		Song& song = sm->getSongs()->current();
-		m_analyzer.process();
-	}
-	double score() const {
-		return 0;
-	}
-};
-
-class GameEngine {
-	typedef std::vector<Player> players_t;
-	players_t m_players;
-	boost::shared_ptr<boost::thread> m_thread;
-	volatile bool m_quit;
-  public:
-	GameEngine(): m_quit() {
-		m_thread.reset(new boost::thread(boost::ref(*this)));
-	}
-	~GameEngine() {
-		m_quit = true;
-		m_thread->join();
-	}
-	operator()() {
-		while (!m_quit) {
-			CScreenManager* sm = CScreenManager::getSingletonPtr();
-			double time = sm->getAudio()->getTime();
-			for (players_t::iterator it = m_players.begin(); it != m_players.end(); ++it) {
-				it->process(time);
-			}
-		}
-	}
-};
-*/
-
 #endif
 
