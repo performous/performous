@@ -10,8 +10,8 @@
 #include "xtime.hh"
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
+#include <boost/spirit/core.hpp>
 #include <boost/thread.hpp>
 #include <cstdlib>
 #include <fstream>
@@ -199,39 +199,22 @@ int main(int argc, char** argv) {
 	try {
 		// Initialize everything
 		Capture capture;
-
-		if(mics.size()==0){
-			// insert the default: 2 channels on device ""
-			mics.push_back("2");
+		for(std::size_t i = 0; i < mics.size(); ++i) {
+			unsigned channels = 0;
+			unsigned rate = 48000;
+			std::string devstr;
+			using namespace boost::spirit;
+			if (!parse(mics[i].c_str(), uint_p[assign_a(channels)] >> !(ch_p(',') >> uint_p[assign_a(rate)]) >> !(ch_p('@') >> (*anychar_p)[assign_a(devstr)])).full)
+			  throw std::runtime_error("Invalid syntax in mics=" + mics[i]);
+			try {
+				capture.addMics(channels, rate, devstr);
+			} catch (std::runtime_error const& e) {
+				std::cerr << "Capture device mics=" << mics[i] << " failed and will be ignored:\n  " << e.what() << std::endl;
+			}
 		}
-		for(std::size_t i=0;i<mics.size();i++){
-			// --mics=channels[,rate][@devstr]
-			std::string rest;
-			std::string device;
-			std::size_t channels;
-			std::size_t rate;
-			std::size_t at = mics[i].find('@');
-			if(at==std::string::npos){
-				device = std::string("");
-				rest = mics[i];
-			}
-			else{
-				device = mics[i].substr(at+1);
-				rest = mics[i].substr(0,at);
-			}
-			std::size_t comma = rest.find(',');
-			if(comma==std::string::npos){
-				rate = 48000;
-			}
-			else{
-				rate = boost::lexical_cast<int>(rest.substr(comma+1));
-				rest = rest.substr(0,comma);
-			}
-			channels = boost::lexical_cast<int>(rest);
-			//std::cout << "mics: " << mics[i] << std::endl;
-			//std::cout << "  device=" << device << " rate=" << rate << " channels=" << channels << std::endl;
-			capture.addMics(channels,rate,device);
-		}
+		if (capture.analyzers().empty()) try { std::cout << "No capture devices configured. Trying built-in defaults." << std::endl; capture.addMics(2, 48000, "alsa:hw:default"); } catch(...) {}
+		if (capture.analyzers().empty()) try { capture.addMics(2, 48000, ""); } catch(...) {} // Anything goes...
+		if (capture.analyzers().empty()) std::cerr << "No capture devices could be used. Please use --mics to define some." << std::endl;
 		//std::cout << "num mics: " << cap.analyzers().size() << std::endl;
 
 		CScreenManager sm(theme);
