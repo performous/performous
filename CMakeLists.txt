@@ -18,7 +18,8 @@ if(NOT CMAKE_BUILD_TYPE)
 endif(NOT CMAKE_BUILD_TYPE)
 
 
-set(SHARE_INSTALL "share/games/performous")
+set(SHARE_INSTALL "share/games/performous" CACHE STRING "Data file install path. Must be a relative path (from CMAKE_INSTALL_PREFIX).")
+mark_as_advanced(SHARE_INSTALL)
 
 add_subdirectory(libda)
 add_subdirectory(themes)
