@@ -15,8 +15,8 @@
 
 namespace {
 	using namespace da;
-	/** Configure a pcm by the settings, store actual values back to s. **/
-	void config(alsa::pcm& pcm, settings& s) {
+	/** Configure a pcm by the settings, store actual values back to s. Return the chose sample format. **/
+	snd_pcm_format_t config(alsa::pcm& pcm, settings& s) {
 		// Convert settings into types used by ALSA
 		unsigned int rate = s.rate();
 		unsigned int channels = s.channels();
@@ -25,7 +25,7 @@ namespace {
 		snd_pcm_uframes_t period_size = s.frames();
 		snd_pcm_uframes_t buffer_size = 0;
 		alsa::hw_config hw(pcm);
-		hw.set(SND_PCM_ACCESS_MMAP_INTERLEAVED).set(SND_PCM_FORMAT_S16);
+		hw.set(SND_PCM_ACCESS_MMAP_INTERLEAVED);
 		if (s.rate() == settings::high) hw.rate_last(rate);
 		else if (s.rate() == settings::low) hw.rate_first(rate);
 		else if (s.rate_near()) hw.rate_near(rate);
@@ -34,13 +34,20 @@ namespace {
 		else if (s.channels() == settings::low) hw.channels_first(channels);
 		else if (s.channels_near()) hw.channels_near(channels);
 		else hw.channels(channels);
-		hw.period_size_near(period_size)
-		  .buffer_size_near(buffer_size = 4 * period_size)
-		  .commit();
+		hw.period_size_near(period_size).buffer_size_near(buffer_size = 4 * period_size);
+		snd_pcm_format_t fmt[] = { SND_PCM_FORMAT_FLOAT, SND_PCM_FORMAT_S24_3LE, SND_PCM_FORMAT_S16 };
+		size_t fmt_size = sizeof(fmt) / sizeof(*fmt);
+		size_t i = 0;
+		alsa::hw_params backup = hw;
+		while (i < fmt_size) {
+			try { hw.set(fmt[i]).commit(); break; } catch (alsa::error const&) { if (++i == fmt_size) throw; hw.load(backup); }
+		}
 		// Assign the changed settings back
 		s.set_channels(channels);
 		s.set_rate(rate);
 		s.set_frames(period_size);
+		if (s.subdev().empty()) s.set_subdev("default");
+		return fmt[i];
 	}
 
 	/*
@@ -64,13 +71,14 @@ namespace {
 		alsa::pcm m_pcm;
 		volatile bool m_quit;
 		boost::scoped_ptr<boost::thread> m_thread;
+		snd_pcm_format_t m_fmt;
 	  public:
 		alsa_record(settings& s):
 		  m_s(s),
 		  m_pcm(s.subdev().empty() ? "default" : m_s.subdev().c_str(), SND_PCM_STREAM_CAPTURE, SND_PCM_NONBLOCK),
-		  m_quit(false)
+		  m_quit(false),
+		  m_fmt(config(m_pcm, m_s))
 		{
-			config(m_pcm, m_s);
 			ALSA_CHECKED(snd_pcm_start, (m_pcm));  // For recording this must be done before starting
 			m_thread.reset(new boost::thread(boost::ref(*this)));
 			s = m_s;
@@ -91,18 +99,24 @@ namespace {
 						ALSA_CHECKED(snd_pcm_avail_update, (m_pcm));
 						alsa::mmap mmap(m_pcm, m_s.frames());
 						buf.resize(mmap.frames() * channels);
-						// TODO: bytewise copy (when needed, e.g. 24 bit samples)
-						const unsigned int samplebits = 8 * sizeof(int16_t);
+						const unsigned int samplebits = snd_pcm_format_width(m_fmt);
 						for (std::size_t ch = 0; ch < channels; ++ch) {
 							snd_pcm_channel_area_t const& a = mmap.area(ch);
-							if (a.first % samplebits || a.step % samplebits)
-							  throw std::runtime_error("The sample alignment used by snd_pcm_mmap not supported by audio::alsa_record");
+							if (a.first % samplebits || a.step % samplebits) throw std::runtime_error("The sample alignment used by snd_pcm_mmap not supported by audio::alsa_record");
 						}
 						for (snd_pcm_uframes_t fr = 0; fr < mmap.frames(); ++fr) {
 							for (std::size_t ch = 0; ch < channels; ++ch) {
 								snd_pcm_channel_area_t const& a = mmap.area(ch);
-								const int sample = static_cast<int16_t*>(a.addr)[(a.first + fr * a.step) / samplebits + mmap.offset() * channels];
-								buf[fr * channels + ch] = conv_from_s16(sample);
+								if (m_fmt == SND_PCM_FORMAT_FLOAT) {
+									buf[fr * channels + ch] = static_cast<float*>(a.addr)[(a.first + fr * a.step) / samplebits + mmap.offset() * channels];
+								} else if (m_fmt == SND_PCM_FORMAT_S16) {
+									const int sample = static_cast<int16_t*>(a.addr)[(a.first + fr * a.step) / samplebits + mmap.offset() * channels];
+									buf[fr * channels + ch] = conv_from_s16(sample);
+								} else if (m_fmt == SND_PCM_FORMAT_S24_3LE) {
+									unsigned char* data = static_cast<unsigned char*>(a.addr) + 3 * ((a.first + fr * a.step) / samplebits + mmap.offset() * channels);
+									int32_t s = data[0] << 8 | data[1] << 16 | data[2] << 24;
+									buf[fr * channels + ch] = conv_from_s24(s >> 8);
+								} else throw std::logic_error("The sample format chosen is not supported by alsa_record (internal error)");
 							}
 						}
 						mmap.commit();
@@ -113,11 +127,13 @@ namespace {
 					} catch (std::exception& e) {
 						m_s.debug(std::string("Exception from recording callback: ") + e.what());
 					}
-				} catch (alsa::error& e) {
+				} catch (alsa::error const& e) {
 					if (e.code() != -EPIPE) m_s.debug(std::string("Recording error: ") + e.what());
 					int err = snd_pcm_recover(m_pcm, e.code(), 0);
 					if (err < 0) m_s.debug(std::string("ALSA snd_pcm_recover failed: ") + snd_strerror(err));
 					if (snd_pcm_start(m_pcm) < 0) m_s.debug("Unable to restart the recording stream!");
+				} catch (std::exception const& e) {
+					m_s.debug(std::string("Recording error: ") + e.what());
 				}
 			}
 		}
@@ -129,13 +145,14 @@ namespace {
 		alsa::pcm m_pcm;
 		volatile bool m_quit;
 		boost::scoped_ptr<boost::thread> m_thread;
+		snd_pcm_format_t m_fmt;
 	  public:
 		alsa_playback(settings& s):
 		  m_s(s),
 		  m_pcm(s.subdev().empty() ? "default" : m_s.subdev().c_str(), SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK),
-		  m_quit(false)
+		  m_quit(false),
+		  m_fmt(config(m_pcm, m_s))
 		{
-			config(m_pcm, m_s);
 			m_thread.reset(new boost::thread(boost::ref(*this)));
 			s = m_s;
 		}
@@ -167,7 +184,7 @@ namespace {
 						// How many frames can we send = min(mmap size, input buffer left)
 						size_t frames = std::min<size_t>(mmap.frames(), pos - m_s.frames());
 						// TODO: bytewise copy (when needed, e.g. 24 bit samples)
-						const unsigned int samplebits = 8 * sizeof(int16_t);
+						const unsigned int samplebits = snd_pcm_format_width(m_fmt);
 						for (std::size_t ch = 0; ch < channels; ++ch) {
 							snd_pcm_channel_area_t const& a = mmap.area(ch);
 							if (a.first % samplebits || a.step % samplebits)
@@ -176,19 +193,27 @@ namespace {
 						for (snd_pcm_uframes_t fr = 0; fr < frames; ++fr) {
 							for (std::size_t ch = 0; ch < channels; ++ch) {
 								snd_pcm_channel_area_t const& a = mmap.area(ch);
-								static_cast<int16_t*>(a.addr)[(a.first + fr * a.step) / samplebits + mmap.offset() * channels] = conv_to_s16(buf[(pos + fr) * channels + ch]);
+								if (m_fmt == SND_PCM_FORMAT_FLOAT) {
+									static_cast<float*>(a.addr)[(a.first + fr * a.step) / samplebits + mmap.offset() * channels] = buf[(pos + fr) * channels + ch];
+								} else if (m_fmt == SND_PCM_FORMAT_S16) {
+									static_cast<int16_t*>(a.addr)[(a.first + fr * a.step) / samplebits + mmap.offset() * channels] = conv_to_s16(buf[(pos + fr) * channels + ch]);
+								} else if (m_fmt == SND_PCM_FORMAT_S24_3LE) {
+									unsigned char* data = static_cast<unsigned char*>(a.addr) + 3 * ((a.first + fr * a.step) / samplebits + mmap.offset() * channels);
+									const uint32_t s = conv_to_s24(buf[(pos + fr) * channels + ch]);
+									data[0] = s; data[1] = s >> 8; data[2] = s >> 16;
+								} else throw std::logic_error("The sample format chosen is not supported by alsa_playback (internal error)");
 							}
 						}
 						mmap.commit(frames);
 						pos += frames;
 					}
 					if (first) { ALSA_CHECKED(snd_pcm_start, (m_pcm)); first = false; } // For playback, this must be done after filling the buffer
-				} catch (alsa::error& e) {
+				} catch (alsa::error const& e) {
 					if (e.code() != -EPIPE) m_s.debug(std::string("Playback error: ") + e.what());
 					int err = snd_pcm_recover(m_pcm, e.code(), 0);
 					if (err < 0) m_s.debug(std::string("ALSA snd_pcm_recover failed: ") + snd_strerror(err));
 					first = true;
-				} catch (std::exception& e) {
+				} catch (std::exception const& e) {
 					m_s.debug(std::string("Playback error: ") + e.what());
 				}
 			}

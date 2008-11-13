@@ -5,7 +5,7 @@
 
 @file alsa.hpp
 @brief An experimental low-level C++ API to ALSA.
-@version 0.6
+@version 0.7
 @author Lasse Kärkkäinen <tronic>
 @license GNU LGPL 2.1 or later
 
@@ -403,6 +403,8 @@ namespace alsa {
 		}
 		/** Construct a new config object, initialized with a copy from given parameters **/
 		hw_config(snd_pcm_t* pcm, snd_pcm_hw_params_t const* params): m_pcm(pcm), m_params(params) {}
+		/** Load settings from hw_params **/
+		hw_config& load(hw_params const& params) { m_params = params; return *this; }
 		operator hw_params&() { return m_params; }
 		operator hw_params const&() const { return m_params; }
 #define ALSA_HPP_CLASS hw_config
@@ -438,6 +440,8 @@ namespace alsa {
 		sw_config(snd_pcm_t* pcm): m_pcm(pcm), m_params() { current(); }
 		/** Construct a new config object, initialized with a copy from given parameters **/
 		sw_config(snd_pcm_t* pcm, snd_pcm_sw_params_t const* params): m_pcm(pcm), m_params(params) {}
+		/** Load settings from hw_params **/
+		sw_config& load(snd_pcm_sw_params_t const* params) { m_params = params; return *this; }
 		operator sw_params&() { return m_params; }
 		operator sw_params const&() const { return m_params; }
 #define ALSA_HPP_CLASS sw_config
