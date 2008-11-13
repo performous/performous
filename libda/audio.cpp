@@ -33,9 +33,10 @@ namespace da {
 			for (record_plugin::iterator it = record_plugin::begin(); it != record_plugin::end(); ++it) {
 				if (it->special()) continue;
 				try {
-					s.debug(">>> Recording from " + it->name());
+					s.debug(">>> Trying recording device " + it->name());
 					m_handle = it(s);
 					s.set_device(it->name());
+					s.debug_dump();
 					return;
 				} catch (std::exception& e) {
 					s.debug(std::string("-!- ") + e.what());
@@ -43,9 +44,10 @@ namespace da {
 			}
 			throw std::runtime_error("No recording devices could be used");
 		} else {
-			s.debug(">>> Using recording device " + s.device());
+			s.debug(">>> Trying recording device " + s.devstr());
 			try {
 				m_handle = record_plugin::find(s.device())(s);
+				s.debug_dump();
 			} catch (record_plugin::invalid_key_error&) {
 				throw std::runtime_error("Recording device " + s.device() + " not found");
 			}
@@ -68,9 +70,10 @@ namespace da {
 			for (playback_plugin::iterator it = playback_plugin::begin(); it != playback_plugin::end(); ++it) {
 				if (it->special()) continue;
 				try {
-					s.debug(">>> Playing with " + it->name());
+					s.debug(">>> Trying playback device " + it->name());
 					m_handle = it(s);
 					s.set_device(it->name());
+					s.debug_dump();
 					return;
 				} catch (std::exception& e) {
 					s.debug(std::string("-!- ") + e.what());
@@ -78,9 +81,10 @@ namespace da {
 			}
 			throw std::runtime_error("No playback devices could be used");
 		} else {
-			s.debug(">>> Using playback device " + s.device());
+			s.debug(">>> Trying playback device " + s.devstr());
 			try {
 				m_handle = playback_plugin::find(s.device())(s);
+				s.debug_dump();
 			} catch (record_plugin::invalid_key_error&) {
 				throw std::runtime_error("Playback device " + s.device() + " not found");
 			}

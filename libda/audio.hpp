@@ -83,8 +83,16 @@ namespace da {
 			set_devstr(devstr);
 		}
 		void debug(std::string const& msg) { if (m_debug) *m_debug << msg << std::endl; }
+		void debug_dump() {
+			if (!m_debug) return;
+			*m_debug << "    Device:       " << devstr() << '\n';
+			*m_debug << "    Channels:     "; print_numeric(m_channels); *m_debug << '\n';
+			*m_debug << "    Rate:         "; print_numeric(m_rate, " Hz"); *m_debug << '\n';
+			*m_debug << "    Buffer size:  "; print_numeric(m_frames, " frames"); *m_debug << std::endl;
+		}
 		std::string const& device() const { return m_device; }
 		std::string const& subdev() const { return m_subdev; }
+		std::string devstr() const { return (m_device.empty() ? "<any>" : m_device) + (m_subdev.empty() ? "" : ":" + m_subdev); }
 		std::size_t const& frames() const { return m_frames; }
 		std::size_t const& rate() const { return m_rate; }
 		bool rate_near() const { return m_rate_near; }
@@ -106,6 +114,11 @@ namespace da {
 		settings& set_debug(std::ostream& val) { m_debug = &val; return *this; }
 		settings& set_debug() { m_debug = NULL; return *this; }
 	  private:
+		void print_numeric(std::size_t value, std::string const& unit = std::string()) {
+			if (value == low) *m_debug << "low";
+			else if (value == high) *m_debug << "high";
+			else *m_debug << value << unit;
+		}
 		callback_t m_callback;
 		std::string m_device;
 		std::string m_subdev;
