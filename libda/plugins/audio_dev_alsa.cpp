@@ -35,7 +35,7 @@ namespace {
 		else if (s.channels_near()) hw.channels_near(channels);
 		else hw.channels(channels);
 		hw.period_size_near(period_size).buffer_size_near(buffer_size = 4 * period_size);
-		snd_pcm_format_t fmt[] = { SND_PCM_FORMAT_FLOAT, SND_PCM_FORMAT_S24_3LE, SND_PCM_FORMAT_S16 };
+		snd_pcm_format_t fmt[] = { SND_PCM_FORMAT_FLOAT, SND_PCM_FORMAT_S32, SND_PCM_FORMAT_S24_3LE, SND_PCM_FORMAT_S16 };
 		size_t fmt_size = sizeof(fmt) / sizeof(*fmt);
 		size_t i = 0;
 		alsa::hw_params backup = hw;
@@ -112,6 +112,9 @@ namespace {
 								} else if (m_fmt == SND_PCM_FORMAT_S16) {
 									const int sample = static_cast<int16_t*>(a.addr)[(a.first + fr * a.step) / samplebits + mmap.offset() * channels];
 									buf[fr * channels + ch] = conv_from_s16(sample);
+								} else if (m_fmt == SND_PCM_FORMAT_S32) {
+									const int sample = static_cast<int32_t*>(a.addr)[(a.first + fr * a.step) / samplebits + mmap.offset() * channels];
+									buf[fr * channels + ch] = conv_from_s32(sample);
 								} else if (m_fmt == SND_PCM_FORMAT_S24_3LE) {
 									unsigned char* data = static_cast<unsigned char*>(a.addr) + 3 * ((a.first + fr * a.step) / samplebits + mmap.offset() * channels);
 									int32_t s = data[0] << 8 | data[1] << 16 | data[2] << 24;
@@ -197,6 +200,8 @@ namespace {
 									static_cast<float*>(a.addr)[(a.first + fr * a.step) / samplebits + mmap.offset() * channels] = buf[(pos + fr) * channels + ch];
 								} else if (m_fmt == SND_PCM_FORMAT_S16) {
 									static_cast<int16_t*>(a.addr)[(a.first + fr * a.step) / samplebits + mmap.offset() * channels] = conv_to_s16(buf[(pos + fr) * channels + ch]);
+								} else if (m_fmt == SND_PCM_FORMAT_S32) {
+									static_cast<int32_t*>(a.addr)[(a.first + fr * a.step) / samplebits + mmap.offset() * channels] = conv_to_s32(buf[(pos + fr) * channels + ch]);
 								} else if (m_fmt == SND_PCM_FORMAT_S24_3LE) {
 									unsigned char* data = static_cast<unsigned char*>(a.addr) + 3 * ((a.first + fr * a.step) / samplebits + mmap.offset() * channels);
 									const uint32_t s = conv_to_s24(buf[(pos + fr) * channels + ch]);
