@@ -9,7 +9,7 @@
 
 // Limit the range to avoid noise and useless computation
 static const double FFT_MINFREQ = 45.0;
-static const double FFT_MAXFREQ = 2000.0;
+static const double FFT_MAXFREQ = 5000.0;
 
 Tone::Tone():
   freq(0.0),
@@ -39,7 +39,8 @@ Analyzer::Analyzer(double rate, size_t step):
   m_bufRead(0),
   m_bufWrite(0),
   m_fftLastPhase(FFT_N / 2),
-  m_peak(0.0)
+  m_peak(0.0),
+  m_oldfreq(0.0)
 {
   	// Hamming window
 	for (size_t i=0; i < FFT_N; i++) {
