@@ -18,7 +18,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif(NOT CMAKE_BUILD_TYPE)
 
 
-set(SHARE_INSTALL "share/performous")
+set(SHARE_INSTALL "share/games/performous")
 
 add_subdirectory(libda)
 add_subdirectory(themes)
