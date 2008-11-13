@@ -37,9 +37,9 @@ if(UNIX)
 	# For Debian-based distros we want to create DEB packages.
 	if("${LSB_DISTRIB}" MATCHES "Ubuntu|Debian")
 		set(CPACK_GENERATOR "DEB")
-		set(CPACK_DEBIAN_PACKAGE_PRIORITY extra)
-		set(CPACK_DEBIAN_PACKAGE_SECTION universe/games)
-		set(CPACK_DEBIAN_PACKAGE_RECOMMENDS ultrastar-songs)
+		set(CPACK_DEBIAN_PACKAGE_PRIORITY "extra")
+		set(CPACK_DEBIAN_PACKAGE_SECTION "universe/games")
+		set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "ultrastar-songs, ultrastar-songs-restricted")
 		# We need to alter the architecture names as per distro rules
 		if("${CPACK_PACKAGE_ARCHITECTURE}" MATCHES "i[3-6]86")
 			set(CPACK_PACKAGE_ARCHITECTURE i386)
