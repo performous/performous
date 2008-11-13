@@ -84,7 +84,7 @@ src_install() {
 	emake DESTDIR="${D}" install || die "make install failed"
 	keepdir "${GAMES_DATADIR}"/ultrastar/songs
 	rm -rf "${D}${GAMES_PREFIX}/share/${PN}"/{applications,pixmaps}
-	mv "${D}/${GAMES_PREFIX}/share/${PN}" "${D}/${GAMES_DATADIR}/"
+	mv "${D}/${GAMES_PREFIX}/share/games/${PN}" "${D}/${GAMES_DATADIR}/"
 	mv "${D}/${GAMES_PREFIX}/lib" "${D}/usr/"
 	if use songs; then
 		insinto "${GAMES_DATADIR}"/ultrastar
