@@ -13,6 +13,13 @@ namespace da {
 	// WARNING: changing this breaks binary compatibility on the library!
 	typedef float sample_t;
 
+	// A helper function for clamping a value to a certain range
+	template <typename T> T clamp(T val, T min, T max) {
+		if (val < min) val = min;
+		if (val > max) val = max;
+		return val;
+	}
+	
 	// The following conversions provide lossless conversions between floats
 	// and integers. Be sure to use only these conversions or otherwise the
 	// conversions may not be lossless, due to different scaling factors being
@@ -29,8 +36,8 @@ namespace da {
 	static inline sample_t conv_from_s24(int s) { return s / max_s24; }
 	// The rounding is strictly not necessary, but it greatly improves
 	// the error tolerance if any floating point calculations are done.
-	static inline int conv_to_s16(sample_t s) { return int(roundf(s * max_s16)); }
-	static inline int conv_to_s24(sample_t s) { return int(roundf(s * max_s24)); }
+	static inline int conv_to_s16(sample_t s) { return clamp<int>(roundf(s * max_s16), -max_s16, max_s16); }
+	static inline int conv_to_s24(sample_t s) { return clamp<int>(roundf(s * max_s24), -max_s24, max_s24); }
 }
 
 #endif
