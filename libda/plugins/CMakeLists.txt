@@ -199,6 +199,7 @@ message(" Jack      : ${CMAKE_JACK_SUPPORT}")
 message("------------------------------------------------------------------")
 
 add_library(da_audio_dev_tone MODULE audio_dev_tone.cpp)
+install(TARGETS da_audio_dev_tone DESTINATION ${LIBDA_PLUGIN_DIR})
 if(APPLE)
 	target_link_libraries(da_audio_dev_tone da ${Boost_thread_LIBRARY})
 endif(APPLE)
