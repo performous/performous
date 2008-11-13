@@ -18,7 +18,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif(NOT CMAKE_BUILD_TYPE)
 
 
-set(SHARE_INSTALL "share/games/performous" CACHE STRING "Data file install path. Must be a relative path (from CMAKE_INSTALL_PREFIX).")
+set(SHARE_INSTALL "share/games/performous" CACHE STRING "Data file install path. Must be a relative path (from CMAKE_INSTALL_PREFIX), with no trailing slash.")
 mark_as_advanced(SHARE_INSTALL)
 
 add_subdirectory(libda)
@@ -26,12 +26,22 @@ add_subdirectory(themes)
 add_subdirectory(data)
 add_subdirectory(game)
 
-if(NOT "${CMAKE_INSTALL_PREFIX}" MATCHES "^/usr/")
+if(NOT "${CMAKE_INSTALL_PREFIX}" MATCHES "^(/usr|/usr/local)$")
+	message(STATUS "Non-standard installation prefix. Configuring performous.sh.")
+	set(LAUNCHER_SCRIPT TRUE)
+endif(NOT "${CMAKE_INSTALL_PREFIX}" MATCHES "^(/usr|/usr/local)$")
+
+if(NOT "${SHARE_INSTALL}" MATCHES "^(share/performous|share/games/performous)$")
+	message(STATUS "Non-standard data file install path. Configuring performous.sh.")
+	set(LAUNCHER_SCRIPT TRUE)
+endif(NOT "${SHARE_INSTALL}" MATCHES "^(share/performous|share/games/performous)$")
+
+if(LAUNCHER_SCRIPT)
 	set(PERFORMOUS_THEME_PATH "${CMAKE_INSTALL_PREFIX}/${SHARE_INSTALL}/themes")
 	set(PERFORMOUS_PLUGIN_PATH "${CMAKE_INSTALL_PREFIX}/lib/libda")
 	set(PERFORMOUS_EXECUTABLE "${CMAKE_INSTALL_PREFIX}/bin/performous")
 	configure_file("${PROJECT_SOURCE_DIR}/cmake/performous.sh.cmake" "${PROJECT_BINARY_DIR}/performous.sh" ESCAPE_QUOTES @ONLY)
 	install(PROGRAMS "${PROJECT_BINARY_DIR}/performous.sh" DESTINATION bin)
 	install(SCRIPT "${PROJECT_SOURCE_DIR}/cmake/performous-launcher.cmake")
-endif(NOT "${CMAKE_INSTALL_PREFIX}" MATCHES "^/usr/")
+endif(LAUNCHER_SCRIPT)
 
