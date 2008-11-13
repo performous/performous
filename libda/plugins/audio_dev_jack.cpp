@@ -31,24 +31,24 @@ namespace {
 		}
 		void shutdown() { m_client = NULL; m_s.debug("da::jack_record: JACK server shutdown; processing terminated."); }
 	  public:
-		jack_record(settings& s) {
-			s.set_subdev(s.subdev().empty() ? "libda_jack_record" : s.subdev());
-			m_client = jack_client_new(s.subdev().c_str());
-			if (!m_client) throw std::runtime_error("Unable to register JACK client (jackd not running or name " + s.subdev() + " already used?)");
-			for (size_t i = 0; i < s.channels(); ++i) {
+		jack_record(settings& s): m_s(s) {
+			m_s.set_subdev(m_s.subdev().empty() ? "libda_jack_record" : m_s.subdev());
+			m_client = jack_client_new(m_s.subdev().c_str());
+			if (!m_client) throw std::runtime_error("Unable to register JACK client (jackd not running or name " + m_s.subdev() + " already used?)");
+			for (size_t i = 0; i < m_s.channels(); ++i) {
 				std::string name = "capture_" + boost::lexical_cast<std::string>(i + 1);
 				jack_port_t* p = jack_port_register(m_client, name.c_str(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
 				if (!p) throw std::runtime_error("Unable to register JACK port");
-				jack_connect(m_client, ("system:" + name).c_str(), (s.subdev() + ":" + name).c_str());
+				jack_connect(m_client, ("system:" + name).c_str(), (m_s.subdev() + ":" + name).c_str());
 				m_ports.push_back(p);
 			}
-			s.set_rate(jack_get_sample_rate(m_client));
-			s.set_frames(jack_get_buffer_size(m_client));
-			m_s = s;
+			m_s.set_rate(jack_get_sample_rate(m_client));
+			m_s.set_frames(jack_get_buffer_size(m_client));
 			jack_set_process_callback(m_client, libda_jack_record_callback, this);
 			jack_on_shutdown(m_client, libda_jack_record_shutdown, this);
 			jack_activate(m_client);
 			connect();
+			s = m_s;
 		}
 		~jack_record() { if (m_client) jack_client_close(m_client); }
 		void connect() {
@@ -87,23 +87,23 @@ namespace {
 			return 0;
 		}
 	  public:
-		jack_playback(settings& s) {
-			s.set_subdev(s.subdev().empty() ? "libda_jack_playback" : s.subdev());
-			m_client = jack_client_new(s.subdev().c_str());
-			if (!m_client) throw std::runtime_error("Unable to register JACK client (jackd not running or name " + s.subdev() + " already used?)");
-			for (size_t i = 0; i < s.channels(); ++i) {
+		jack_playback(settings& s): m_s(s) {
+			m_s.set_subdev(m_s.subdev().empty() ? "libda_jack_playback" : m_s.subdev());
+			m_client = jack_client_new(m_s.subdev().c_str());
+			if (!m_client) throw std::runtime_error("Unable to register JACK client (jackd not running or name " + m_s.subdev() + " already used?)");
+			for (size_t i = 0; i < m_s.channels(); ++i) {
 				std::string name = "playback_" + boost::lexical_cast<std::string>(i + 1);
 				jack_port_t* p = jack_port_register(m_client, name.c_str(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
 				if (!p) throw std::runtime_error("Unable to register JACK port");
 				m_ports.push_back(p);
 			}
-			s.set_rate(jack_get_sample_rate(m_client));
-			s.set_frames(jack_get_buffer_size(m_client));
-			m_s = s;
+			m_s.set_rate(jack_get_sample_rate(m_client));
+			m_s.set_frames(jack_get_buffer_size(m_client));
 			jack_set_process_callback(m_client, libda_jack_playback_callback, this);
 			jack_on_shutdown(m_client, libda_jack_playback_shutdown, this);
 			jack_activate(m_client);
 			connect();
+			s = m_s;
 		}
 		~jack_playback() { if (m_client) jack_client_close(m_client); }
 		void connect() {
