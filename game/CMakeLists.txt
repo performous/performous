@@ -34,7 +34,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 	add_definitions("-D__STDC_CONSTANT_MACROS")
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
-add_executable(performous ${SOURCES})
+add_executable(performous ${SOURCES} ${SDL_SOURCES})
 target_link_libraries(performous da ${LIBS})
 
 # Generate config.hh
