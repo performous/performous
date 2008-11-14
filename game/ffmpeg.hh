@@ -14,13 +14,16 @@
 struct AudioFrame {
 	double timestamp;
 	std::vector<int16_t> data;
+	template <typename InIt> AudioFrame(double ts, InIt begin, InIt end): timestamp(ts), data(begin, end) {}
+	AudioFrame(): timestamp(std::numeric_limits<double>::infinity()) {} // EOF marker
 };
 
 struct VideoFrame {
 	double timestamp;
-	std::vector<uint8_t> data; 
 	int width, height;
-	VideoFrame(): timestamp(), width(), height() {}
+	std::vector<uint8_t> data; 
+	VideoFrame(double ts, int w, int h): timestamp(ts), width(w), height(h) {}
+	VideoFrame(): timestamp(std::numeric_limits<double>::infinity()) {} // EOF marker (not used ATM)
 	void swap(VideoFrame& f) {
 		std::swap(timestamp, f.timestamp);
 		data.swap(f.data);
