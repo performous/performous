@@ -41,6 +41,6 @@ set(SDL_PROCESS_INCLUDES SDL_INCLUDE_DIR)
 libfind_process(SDL)
 
 if(APPLE)
-  set(SDL_LIBRARIES ${SDL_LIBRARIES} -framework SDL -framework Cocoa)
+  set(SDL_LIBRARIES ${SDL_LIBRARIES} "-framework Cocoa")
 endif(APPLE)
 
