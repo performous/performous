@@ -252,5 +252,6 @@ int main(int argc, char** argv) {
 	} catch (QuitNow&) {
 		std::cout << "Terminated." << std::endl;
 	}
+	return 0; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
 }
 
