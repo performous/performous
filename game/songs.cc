@@ -15,36 +15,6 @@
 #include <limits>
 #include <stdexcept>
 
-double coverMathAdvanced::getPosition(){
-	const double acceleration = 50.0; // the coefficient of velocity changes (animation speed)
-	const double overshoot = 0.95; // Over 1.0 decelerates too late, less than 1.0 decelerates too early
-	if (m_songs == 0) return m_target;
-	boost::xtime curtime = now();
-	double duration = seconds(curtime) - seconds(m_time);
-	m_time = curtime;
-	if (!(duration > 0.0)) return m_position; // Negative value or NaN, or no songs - skip processing
-	if (duration > 1.0) duration = 1.0; // No more than one second per frame
-	std::size_t rounds = 1.0 + 1000.0 * duration; // 1 ms or shorter timesteps
-	double t = duration / rounds;
-	for (std::size_t i = 0; i < rounds; ++i) {
-		double d = remainder(m_target - m_position, m_songs); // Distance (via shortest way)
-		// Allow it to stop nicely, without jitter
-		if (std::abs(m_velocity) < 0.1 && std::abs(d) < 0.001) {
-			m_velocity = 0.0;
-			m_position = m_target;
-			break;
-		}
-		double a = d > 0.0 ? acceleration : -acceleration; // Acceleration vector
-		// Are we going to right direction && can we stop in time if we start decelerating now?
-		if (d * m_velocity > 0.0 && std::abs(m_velocity) > 2.0 * overshoot * acceleration * d / m_velocity) a *= -1.0;
-		// Apply Newtonian mechanics
-		m_velocity += t * a;
-		m_position += t * m_velocity;
-	}
-	return m_position = remainder(m_position, m_songs); // Return & store normalized position
-}
-
-
 std::string MusicalScale::getNoteStr(double freq) const {
 	int id = getNoteId(freq);
 	if (id == -1) return std::string();

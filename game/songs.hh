@@ -12,6 +12,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include "animvalue.hh"
 
 class MusicalScale {
 	double m_baseFreq;
@@ -81,48 +82,6 @@ class Song: boost::noncopyable {
 
 bool operator<(Song const& l, Song const& r);
 
-class coverMath {
-	public:
-		coverMath(){};
-		~coverMath(){};
-		virtual float getPosition() = 0;
-		virtual unsigned int getTarget() = 0;
-		virtual void setTarget( unsigned int ) = 0;
-};
-
-class coverMathSimple {
-	public:
-		coverMathSimple(){m_position=0;};
-		~coverMathSimple(){};
-		double getPosition() const { return m_position; }
-		unsigned int getTarget() const { return m_position; }
-		void setTarget( unsigned int _target, unsigned int ) { m_position=_target; }
-	private:
-		unsigned int m_position;
-};
-
-class coverMathAdvanced {
-  public:
-	coverMathAdvanced(): m_target(), m_songs(), m_position(), m_velocity() {
-		boost::xtime_get(&m_time, boost::TIME_UTC);
-	}
-	double getPosition();
-	unsigned int getTarget() const { return m_target; };
-	void setTarget(unsigned int target, unsigned int songs) {
-		boost::xtime_get(&m_time, boost::TIME_UTC);
-		m_target = target;
-		if (m_songs == songs) return;
-		m_songs = songs;
-		m_position = target;
-	};
-  private:
-	boost::xtime m_time;
-	unsigned int m_target;
-	unsigned int m_songs;
-	double m_position;
-	double m_velocity;
-};
-
 class Songs: boost::noncopyable {
 	std::set<std::string> m_songdirs;
   public:
@@ -142,7 +101,7 @@ class Songs: boost::noncopyable {
 		math_cover.setTarget(_current,this->size());
 	}
 	int currentId() const { return math_cover.getTarget(); }
-	double currentPosition() { return math_cover.getPosition(); };
+	double currentPosition() { return math_cover.getValue(); };
 	Song& current() { return *m_filtered[math_cover.getTarget()]; }
 	Song const& current() const { return *m_filtered[math_cover.getTarget()]; }
 	void setFilter(std::string const& regex);
@@ -157,7 +116,7 @@ class Songs: boost::noncopyable {
 	typedef std::vector<boost::shared_ptr<Song> > SongVector;
 	SongVector m_songs, m_filtered;
 	//coverMathSimple math_cover;
-	coverMathAdvanced math_cover;
+	AnimAcceleration math_cover;
 	std::string m_filter;
 	int m_order;
 	void reload_internal();
