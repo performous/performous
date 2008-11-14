@@ -40,6 +40,7 @@ libfind_process(SDL)
 
 # Special processing for OSX native SDL
 if("${SDL_SDL_LIBRARY}" MATCHES "framework")
+  set(SDL_SOURCES "osx/SDLmain.m")
   set(SDL_LIBRARIES "-framework SDL" "-framework Cocoa")
 endif("${SDL_SDL_LIBRARY}" MATCHES "framework")
 
