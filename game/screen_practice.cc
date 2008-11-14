@@ -33,6 +33,11 @@ void CScreenPractice::manageEvent(SDL_Event event)
 
 void CScreenPractice::draw() {
 	theme->bg->draw();
+	if (m_analyzers.empty()) {
+		theme->note_txt->dimensions.left(-0.3).screenBottom(-0.1);
+		theme->note_txt->draw("No microphones\nconfigured");
+		return;
+	}
 	bool text = false;
 	for (unsigned int i = 0; i < m_analyzers.size(); ++i) {
 		Analyzer& analyzer = m_analyzers[i];
