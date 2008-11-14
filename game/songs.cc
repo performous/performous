@@ -389,16 +389,17 @@ void Songs::reload_internal(boost::filesystem::path const& parent) {
 			std::string path = p.directory_string(); // Path without filename
 			path.erase(path.size() - name.size());
 			if (name.size() < 5 || name.substr(name.size() - 4) != ".txt") continue;
-			std::cout << "\r  " << std::setiosflags(std::ios::left) << std::setw(70) << path.substr(0, 70) << " \x1B[K" << std::flush;
 			try {
 				Song* s = new Song(path, name);
 				boost::mutex::scoped_lock l(m_mutex);
 				m_songs.push_back(boost::shared_ptr<Song>(s));
 				m_dirty = true;
 			} catch (SongParser::Exception& e) {
-				std::cout << "FAIL\n    " << name;
-				if (e.line()) std::cout << " line " << e.line();
-				std::cout << ": " << e.what() << std::endl;
+				std::ostringstream oss;
+				oss << "-!- Error in " << path << "\n    " << name;
+				if (e.line()) oss << " line " << e.line();
+				oss << ": " << e.what() << std::endl;
+				std::cerr << oss.str(); // More likely to be atomic when written as one string
 			}
 		}
 	} catch (std::exception const& e) {
