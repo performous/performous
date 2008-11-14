@@ -100,7 +100,8 @@ void CFfmpeg::open() {
 
 namespace {
 	boost::thread_specific_ptr<CFfmpeg*> ffmpeg_ptr;
-	sighandler_t sigabrt, sigsegv;
+	typedef void (*sighandler)(int);
+	sighandler sigabrt, sigsegv;
 }
 
 extern "C" void usng_ffmpeg_crash_hack(int sig) {
@@ -109,7 +110,7 @@ extern "C" void usng_ffmpeg_crash_hack(int sig) {
 		signal(SIGSEGV, sigsegv);
 		(*ffmpeg_ptr)->crash(); sleep(1000000000);
 	} // Uh-oh, FFMPEG goes again; wait here until eternity
-	sighandler_t h = (sig == SIGABRT ? sigabrt : sigsegv);
+	sighandler h = (sig == SIGABRT ? sigabrt : sigsegv);
 	if (h && h != usng_ffmpeg_crash_hack) h(sig); // From another thread, call original handler
 	std::abort();
 }
