@@ -26,21 +26,20 @@ find_library(SDL_SDL_LIBRARY
   HINTS ${SDL_PKGCONF_LIBRARY_DIRS}
 )
 
-if(APPLE)
-  set(SDL_SOURCES SDLmain.m)
-  set(SDL_PROCESS_LIBS SDL_SDL_LIBRARY)
-else(APPLE)
+# Process others than OSX with native SDL normally
+if(NOT "${SDL_SDL_LIBRARY}" MATCHES "framework")
   find_library(SDL_SDLmain_LIBRARY
     NAMES libSDLmain.a SDLmain
     HINTS ${SDL_PKGCONF_LIBRARY_DIRS}
   )
   set(SDL_PROCESS_LIBS SDL_SDL_LIBRARY SDL_SDLmain_LIBRARY)
-endif(APPLE)
+endif(NOT "${SDL_SDL_LIBRARY}" MATCHES "framework")
 
 set(SDL_PROCESS_INCLUDES SDL_INCLUDE_DIR)
 libfind_process(SDL)
 
-if(APPLE)
-  set(SDL_LIBRARIES ${SDL_LIBRARIES} "-framework Cocoa")
-endif(APPLE)
+# Special processing for OSX native SDL
+if("${SDL_SDL_LIBRARY}" MATCHES "framework")
+  set(SDL_LIBRARIES "-framework SDL" "-framework Cocoa")
+endif("${SDL_SDL_LIBRARY}" MATCHES "framework")
 
