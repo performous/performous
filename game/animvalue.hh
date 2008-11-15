@@ -1,3 +1,4 @@
+#pragma once
 #ifndef PERFOURMOUS_ANIMVALUE_HH
 #define PERFOURMOUS_ANIMVALUE_HH
 
@@ -7,7 +8,7 @@
 
 class AnimValue {
   public:
-	AnimValue(double value = 0.0, double rate = 1.0): m_value(value), m_target(value), m_rate(rate) {}
+	AnimValue(double value = 0.0, double rate = 1.0): m_value(value), m_target(value), m_rate(rate), m_time(now()) {}
 	void move(double diff) { m_value += diff; }
 	double getTarget() const { return m_target; }
 	void setTarget(double target, bool step = false) { m_target = target; if (step) m_value = target; }
@@ -39,9 +40,7 @@ class AnimValue {
 
 class AnimAcceleration {
   public:
-	AnimAcceleration(): m_target(), m_songs(), m_position(), m_velocity() {
-		boost::xtime_get(&m_time, boost::TIME_UTC);
-	}
+	AnimAcceleration(): m_target(), m_songs(), m_position(), m_velocity(), m_time() {}
 	double getValue() {
 		const double acceleration = 50.0; // the coefficient of velocity changes (animation speed)
 		const double overshoot = 0.95; // Over 1.0 decelerates too late, less than 1.0 decelerates too early
@@ -72,18 +71,18 @@ class AnimAcceleration {
 	}
 	unsigned int getTarget() const { return m_target; };
 	void setTarget(unsigned int target, unsigned int songs) {
-		boost::xtime_get(&m_time, boost::TIME_UTC);
+		m_time = now();
 		m_target = target;
 		if (m_songs == songs) return;
 		m_songs = songs;
 		m_position = target;
 	};
   private:
-	boost::xtime m_time;
 	unsigned int m_target;
 	unsigned int m_songs;
 	double m_position;
 	double m_velocity;
+	boost::xtime m_time;
 };
 
 #endif
