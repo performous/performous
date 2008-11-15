@@ -15,6 +15,7 @@ CAudio::CAudio(std::string const& pdev, unsigned int rate):
 	m_volumeMusic(100),
 	m_volumePreview(70),
 	m_paused(false),
+	m_synth(false),
 	m_prebuffering(false),
 	m_rs(da::settings(pdev)
 	.set_callback(boost::ref(*this))
