@@ -7,12 +7,13 @@
 
 class CScreenIntro : public CScreen {
   public:
-	CScreenIntro(std::string const& name);
+	CScreenIntro(std::string const& name, Audio& audio);
 	void enter();
 	void exit();
 	void manageEvent(SDL_Event event);
 	void draw();
   private:
+	Audio& m_audio;
 	boost::scoped_ptr<Surface> background;
 };
 

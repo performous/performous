@@ -34,15 +34,6 @@ class CScreenManager: public CSingleton <CScreenManager> {
 	CScreen* getCurrentScreen() { return currentScreen; };
 	CScreen* getScreen(std::string const& name);
 
-	CAudio* getAudio() { return audio.get(); };
-	void setAudio(CAudio* _audio) { audio.reset(_audio); };
-
-	bool getFullscreenStatus() { return m_fullscreen; };
-	void setFullscreenStatus(bool fullscreen) { m_fullscreen = fullscreen; };
-
-	Songs* getSongs() { return songs.get(); };
-	void setSongs(Songs* _songs) { songs.reset(_songs); };
-
 	void finished() { m_finished=true; };
 	bool isFinished() { return m_finished; };
 
@@ -53,9 +44,6 @@ class CScreenManager: public CSingleton <CScreenManager> {
 	typedef boost::ptr_map<std::string, CScreen> screenmap_t;
 	screenmap_t screens;
 	CScreen* currentScreen;
-	boost::scoped_ptr<CAudio> audio;
-	boost::scoped_ptr<Songs> songs;
-	bool m_fullscreen;
 	std::string m_theme;
 };
 

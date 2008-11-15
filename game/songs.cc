@@ -1,321 +1,15 @@
-#include <boost/bind.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/regex.hpp>
 #include "songs.hh"
+
 #include "screen.hh"
-#include "xtime.hh"
-// math.h needed for C99 stuff
-#include <math.h>
+#include <boost/bind.hpp>
+#include <boost/regex.hpp>
+#include <libxml++/libxml++.h>
 #include <algorithm>
-#include <cmath>
-#include <cstdlib>
 #include <fstream>
-#include <iomanip>
 #include <iostream>
-#include <limits>
 #include <stdexcept>
 
-std::string MusicalScale::getNoteStr(double freq) const {
-	int id = getNoteId(freq);
-	if (id == -1) return std::string();
-	static const char * note[12] = {"C ","C#","D ","D#","E ","F ","F#","G ","G#","A ","A#","B "};
-	std::ostringstream oss;
-	// Acoustical Society of America Octave Designation System
-	//int octave = 2 + id / 12;
-	oss << note[id%12] << " " << int(round(freq)) << " Hz";
-	return oss.str();
-}
-
-unsigned int MusicalScale::getNoteNum(int id) const {
-	// C major scale
-	int n = id % 12;
-	return (n + (n > 4)) / 2;
-}
-
-bool MusicalScale::isSharp(int id) const {
-	if (id < 0) throw std::logic_error("MusicalScale::isSharp: Invalid note ID");
-	// C major scale
-	switch (id % 12) {
-	  case 1: case 3: case 6: case 8: case 10: return true;
-	}
-	return false;
-}
-
-double MusicalScale::getNoteFreq(int id) const {
-	if (id == -1) return 0.0;
-	return m_baseFreq * pow(2.0, (id - m_baseId) / 12.0);
-}
-
-int MusicalScale::getNoteId(double freq) const {
-	double note = getNote(freq);
-	if (note >= 0.0 && note < 100.0) return int(note + 0.5);
-	return -1;
-}
-
-double MusicalScale::getNote(double freq) const {
-	if (freq < 1.0) return std::numeric_limits<double>::quiet_NaN();
-	return m_baseId + 12.0 * log(freq / m_baseFreq) / log(2);
-}
-
-double MusicalScale::getNoteOffset(double freq) const {
-	double frac = freq / getNoteFreq(getNoteId(freq));
-	return 12.0 * log(frac) / log(2);
-}
-
-double Note::diff(double n) const {	return remainder(n - note, 12.0); }
-double Note::maxScore() const { return scoreMultiplier(0.0) * (end - begin); }
-
-double Note::score(double n, double b, double e) const {
-	double len = std::min(e, end) - std::max(b, begin);
-	if (len <= 0.0 || !(n > 0.0)) return 0.0;
-	return scoreMultiplier(std::abs(diff(n))) * len;
-}
-
-double Note::scoreMultiplier(double error) const {
-	double max = 0.0;
-	switch (type) {
-	  case FREESTYLE: power += 1.0; return 1.0;
-	  case NORMAL: max = 1.0; break;
-	  case GOLDEN: max = 2.0; break;
-	  case SLEEP: break;
-	}
-	double accuracy = std::min(1.0, std::max(0.0, 1.5 - error));
-	power += accuracy;
-	return accuracy * max;
-}
-
-class SongParser {
-  public:
-	struct Exception: public std::runtime_error {
-		Exception(std::string const& msg, unsigned int linenum):
-		  runtime_error(msg), m_linenum(linenum) {}
-		unsigned int line() const { return m_linenum; }
-	  private:
-		unsigned int m_linenum;
-	};
-	SongParser(Song& s):
-	  m_song(s),
-	  m_f((s.path + s.filename).c_str()),
-	  m_linenum(),
-	  m_relative(),
-	  m_gap(),
-	  m_bpm(),
-	  m_prevts(),
-	  m_relativeShift(),
-	  m_maxScore()
-	{
-		if (!m_f.is_open()) throw Exception("Could not open TXT file", 0);
-		std::string line;
-		try {
-			while (getline(line) && parseField(line)) {};
-			if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
-			if (m_bpm != 0.0) addBPM(0, m_bpm);
-			while (parseNote(line) && getline(line)) {};
-		} catch (std::runtime_error& e) {
-			throw Exception(e.what(), m_linenum);
-		}
-		if (s.notes.empty()) throw Exception("No notes", m_linenum);
-		// Workaround for the terminating : 1 0 0 line, written by some converters
-		if (s.notes.back().type != Note::SLEEP && s.notes.back().begin == s.notes.back().end) s.notes.pop_back();
-		// Adjust negative notes
-		if (m_song.noteMin <= 0) {
-			unsigned int shift = (1 - m_song.noteMin / 12) * 12;
-			m_song.noteMin += shift;
-			m_song.noteMax += shift;
-			for (Song::notes_t::iterator it = s.notes.begin(); it != s.notes.end(); ++it) it->note += shift;
-		}
-		m_song.m_scoreFactor = 1.0 / m_maxScore;
-	}
-  private:
-	Song& m_song;
-	std::ifstream m_f;
-	unsigned int m_linenum;
-	bool getline(std::string& line) { ++m_linenum; return std::getline(m_f, line); }
-	bool m_relative;
-	double m_gap;
-	double m_bpm;
-	void assign(int& var, std::string const& str) {
-		var = boost::lexical_cast<int>(str);
-	}
-	void assign(double& var, std::string str) {
-		std::replace(str.begin(), str.end(), ',', '.'); // Fix decimal separators
-		var = boost::lexical_cast<double>(str);
-	}
-	void assign(bool& var, std::string const& str) {
-		if (str == "YES" || str == "yes" || str == "1") var = true;
-		else if (str == "NO" || str == "no" || str == "0") var = false;
-		else throw std::logic_error("Invalid boolean value: " + str);
-	}
-	bool parseField(std::string const& line) {
-		if (line.empty()) return true;
-		if (line[0] != '#') return false;
-		std::string::size_type pos = line.find(':');
-		if (pos == std::string::npos) throw std::runtime_error("Invalid format, should be #key=value");
-		std::string key = line.substr(1, pos - 1);
-		std::string::size_type pos2 = line.find_last_not_of(" \t\r");
-		std::string value = line.substr(pos + 1, pos2 - pos);
-		if (value.empty()) throw std::runtime_error("Value missing from key " + key);
-		if (key == "TITLE") m_song.title = value.substr(value.find_first_not_of(" :"));
-		else if (key == "ARTIST") m_song.artist = value.substr(value.find_first_not_of(" "));
-		else if (key == "EDITION") m_song.edition = value.substr(value.find_first_not_of(" "));
-		else if (key == "GENRE") m_song.genre = value.substr(value.find_first_not_of(" "));
-		else if (key == "CREATOR") m_song.creator = value.substr(value.find_first_not_of(" "));
-		else if (key == "COVER") m_song.cover = value;
-		else if (key == "MP3") m_song.mp3 = value;
-		else if (key == "VIDEO") m_song.video = value;
-		else if (key == "BACKGROUND") m_song.background = value;
-		else if (key == "START") assign(m_song.start, value);
-		else if (key == "VIDEOGAP") assign(m_song.videoGap, value);
-		else if (key == "RELATIVE") assign(m_relative, value);
-		else if (key == "GAP") { assign(m_gap, value); m_gap *= 1e-3; }
-		else if (key == "BPM") assign(m_bpm, value);
-		return true;
-	}
-	unsigned int m_prevts;
-	unsigned int m_relativeShift;
-	double m_maxScore;
-	struct BPM {
-		BPM(double _begin, unsigned int _ts, double bpm): begin(_begin), step(0.25 * 60.0 / bpm), ts(_ts) {}
-		double begin; // Time in seconds
-		double step; // Seconds per quarter note
-		unsigned int ts;
-	};
-	typedef std::vector<BPM> bpms_t;
-	bpms_t m_bpms;
-	void addBPM(unsigned int ts, double bpm) {
-		if (!m_bpms.empty() && m_bpms.back().ts >= ts) throw std::runtime_error("Invalid BPM timestamp");
-		if (!(bpm >= 1.0 && bpm < 1e12)) throw std::runtime_error("Invalid BPM value");
-		m_bpms.push_back(BPM(tsTime(ts), ts, bpm));
-	}
-	bool parseNote(std::string line) {
-		if (line.empty() || line == "\r") return true;
-		if (line[0] == '#') throw std::runtime_error("Key found in the middle of notes");
-		if (line[line.size() - 1] == '\r') line.erase(line.size() - 1);
-		if (line[0] == 'E') return false;
-		std::istringstream iss(line);
-		if (line[0] == 'B') {
-			unsigned int ts;
-			double bpm;
-			iss.ignore();
-			if (!(iss >> ts >> bpm)) throw std::runtime_error("Invalid BPM line format");
-			addBPM(ts, bpm);
-			return true;
-		}
-		Note n;
-		n.type = Note::Type(iss.get());
-		unsigned int ts = m_prevts;
-		switch (n.type) {
-		  case Note::NORMAL:
-		  case Note::FREESTYLE:
-		  case Note::GOLDEN:
-			{
-				unsigned int length = 0;
-				if (!(iss >> ts >> length >> n.note)) throw std::runtime_error("Invalid note line format");
-				if (m_relative) ts += m_relativeShift;
-				if (iss.get() == ' ') std::getline(iss, n.syllable);
-				n.end = tsTime(ts + length);
-			}
-			break;
-		  case Note::SLEEP:
-			{
-				unsigned int end;
-				if (!(iss >> ts >> end)) end = ts;
-				if (m_relative) {
-					ts += m_relativeShift;
-					end += m_relativeShift;
-					m_relativeShift = end;
-				}
-				n.end = tsTime(end);
-			}
-			break;
-		  default: throw std::runtime_error("Unknown note type");
-		}
-		n.begin = tsTime(ts);
-		Song::notes_t& notes = m_song.notes;
-		if (m_relative && m_song.notes.empty()) m_relativeShift = ts;
-		if (notes.empty() && n.type == Note::SLEEP) throw std::runtime_error("Song cannot begin with sleep");
-		m_prevts = ts;
-		double prevtime = notes.empty() ? 0.0 : notes.back().end;
-		if (n.begin < prevtime) {
-			// Oh no, overlapping notes (b0rked file)
-			// Can't do this because too many songs are b0rked: throw std::runtime_error("Note overlaps with previous note");
-			if (notes.size() >= 1) {
-				Note& p = notes.back();
-				// Workaround for songs that use semi-random timestamps for sleep
-				if (p.type == Note::SLEEP) {
-					p.end = p.begin;
-					Song::notes_t::reverse_iterator it = notes.rbegin();
-					Note& p2 = *++it;
-					if (p2.end < n.begin) p.begin = p.end = n.begin;
-				}
-				// Can we just make the previous note shorter?
-				if (p.begin <= n.begin) p.end = n.begin;
-				else throw std::runtime_error("Note overlaps with earlier notes");
-			} else throw std::runtime_error("The first note has negative timestamp");
-		}
-		if (n.type != Note::SLEEP && n.end > n.begin) {
-			m_song.noteMin = std::min(m_song.noteMin, n.note);
-			m_song.noteMax = std::max(m_song.noteMax, n.note);
-			m_maxScore += n.maxScore();
-		}
-		notes.push_back(n);
-		return true;
-	}
-	double tsTime(unsigned int ts) const {
-		if (m_bpms.empty()) {
-			if (ts != 0) throw std::runtime_error("BPM data missing");
-			return m_gap;
-		}
-		for (std::vector<BPM>::const_reverse_iterator it = m_bpms.rbegin(); it != m_bpms.rend(); ++it) {
-			if (it->ts <= ts) return it->begin + (ts - it->ts) * it->step;
-		}
-		throw std::logic_error("INTERNAL ERROR: BPM data invalid");
-	}
-};
-
-Song::Song(std::string const& _path, std::string const& _filename):
-  noteMin(std::numeric_limits<int>::max()),
-  noteMax(std::numeric_limits<int>::min()),
-  path(_path),
-  filename(_filename),
-  videoGap(),
-  start(),
-  m_scoreFactor()
-{
-	SongParser(*this);
-}
-
-void Song::reload() {
-	notes.clear();
-	category.clear();
-	genre.clear();
-	edition.clear();
-	title.clear();
-	artist.clear();
-	text.clear();
-	creator.clear();
-	mp3.clear();
-	cover.clear();
-	background.clear();
-	video.clear();
-	noteMin = std::numeric_limits<int>::max();
-	noteMax = std::numeric_limits<int>::min();
-	videoGap = 0.0;
-	start = 0.0;
-	m_scoreFactor = 0.0;
-	try {
-		SongParser(*this);
-	} catch (...) {}
-}
-
-bool operator<(Song const& l, Song const& r) {
-	if (l.artist != r.artist) return l.artist < r.artist;
-	if (l.title != r.title) return l.title < r.title;
-	return l.filename < r.filename;
-	// If filenames are identical, too, the songs are considered the same.
-}
-
-Songs::Songs(std::set<std::string> const& songdirs): m_songdirs(songdirs), math_cover(), m_order(), m_dirty(false), m_loading(false) {
+Songs::Songs(std::set<std::string> const& songdirs, std::string const& songlist): m_songdirs(songdirs), m_songlist(songlist), math_cover(), m_order(), m_dirty(false), m_loading(false) {
 	reload();
 }
 
@@ -344,6 +38,7 @@ void Songs::reload_internal() {
 		size_t diff = m_songs.size() - count;
 		if (diff > 0) std::cout << diff << " songs loaded" << std::endl;
 	}
+	dumpSongs_internal(); // Dump the songlist to file (if requested)
 	m_loading = false;
 	m_dirty = true;  // Force shuffle
 }
@@ -364,7 +59,7 @@ void Songs::reload_internal(boost::filesystem::path const& parent) {
 				boost::mutex::scoped_lock l(m_mutex);
 				m_songs.push_back(boost::shared_ptr<Song>(s));
 				m_dirty = true;
-			} catch (SongParser::Exception& e) {
+			} catch (SongParserException& e) {
 				std::ostringstream oss;
 				oss << "-!- Error in " << path << "\n    " << name;
 				if (e.line()) oss << " line " << e.line();
@@ -375,7 +70,6 @@ void Songs::reload_internal(boost::filesystem::path const& parent) {
 	} catch (std::exception const& e) {
 		std::cout << "Error accessing " << parent << std::endl;
 	}
-	std::cout << "\r\x1B[K" << std::flush;
 }
 
 // Make std::find work with shared_ptrs and regular pointers
@@ -422,7 +116,7 @@ void Songs::filter_internal() {
 	RestoreSel restore(*this);
 	try {
 		SongVector filtered;
-		for (SongVector::iterator it = m_songs.begin(); it != m_songs.end(); ++it) {
+		for (SongVector::const_iterator it = m_songs.begin(); it != m_songs.end(); ++it) {
 			if (regex_search(it->get()->strFull(), boost::regex(m_filter ,boost::regex_constants::icase))) filtered.push_back(*it);
 		}
 		m_filtered.swap(filtered);
@@ -435,18 +129,20 @@ void Songs::filter_internal() {
 	m_dirty = false;
 }
 
+#define STRLT_RET(lhs, rhs) { std::string l_ = Glib::ustring(lhs).casefold_collate_key(), r_ = Glib::ustring(rhs).casefold_collate_key(); if (l_ != r_) return l_ < r_; }
 class CmpByField {
 	std::string Song::* m_field;
   public:
 	CmpByField(std::string Song::* field): m_field(field) {}
 	bool operator()(Song const& left , Song const& right) {
-		if (left.*m_field == right.*m_field) return left < right;
-		return left.*m_field < right.*m_field;
+		STRLT_RET(left.*m_field, right.*m_field);
+		return false;
 	}
 	bool operator()(boost::shared_ptr<Song> const& left, boost::shared_ptr<Song> const& right) {
 		return operator()(*left, *right);
 	}
 };
+#undef STRLT_RET
 
 namespace {
 	std::string pathtrim(std::string path) {
@@ -498,17 +194,32 @@ void Songs::sort_internal() {
 	}
 }
 
-void Songs::dump(std::ostream& os, std::string const& sort) {
-	os << m_filtered.size() << " songs, ";
-	if (sort == "title") m_order = 1;
-	else if (sort == "artist") m_order = 2;
-	else if (sort == "path") m_order = 5;
-	else { os << "invalid sort order specified" << std::endl; return; }
-	os << order[m_order] << '\n' << std::string(40, '-') << '\n';
-	RestoreSel restore(*this);
-	sort_internal();
-	for (SongVector::const_iterator it = m_filtered.begin(); it != m_filtered.end(); ++it) {
-		os << "  " << (*it)->str() << std::endl;
+namespace {
+	template <typename SongVector> void dumpXML(SongVector const& s, std::string const& title, std::string const& filename) {
+		xmlpp::Document doc;
+		doc.set_internal_subset("html", "-//W3C//DTD XHTML 1.1//EN", "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd");
+		xmlpp::Element* html = doc.create_root_node("html", "http://www.w3.org/1999/xhtml");
+		xmlpp::Element* head = html->add_child("head");
+		head->add_child("title")->set_child_text(title);
+		xmlpp::Element* body = html->add_child("body");
+		xmlpp::Element* table = body->add_child("table");
+		xmlpp::Element* headtr = table->add_child("tr");
+		headtr->add_child("th")->set_child_text("Artist");
+		headtr->add_child("th")->set_child_text("Title");
+		for (typename SongVector::const_iterator it = s.begin(); it != s.end(); ++it) {
+			xmlpp::Element* tr = table->add_child("tr");
+			tr->add_child("td")->set_child_text((*it)->artist);
+			tr->add_child("td")->set_child_text((*it)->title);
+		}
+		doc.write_to_file_formatted(filename);
 	}
+}
+
+void Songs::dumpSongs_internal() const {
+	if (m_songlist.empty()) return;
+	boost::mutex::scoped_lock l(m_mutex);
+	SongVector s = m_songs;
+	std::sort(s.begin(), s.end(), CmpByField(&Song::title)); dumpXML(s, "Songlist by song name", m_songlist + "/songs-by-title.xhtml");
+	std::sort(s.begin(), s.end(), CmpByField(&Song::artist)); dumpXML(s, "Songlist by artist", m_songlist + "/songs-by-artist.xhtml");
 }
 

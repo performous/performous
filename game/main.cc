@@ -109,11 +109,11 @@ int main(int argc, char** argv) {
 		  ("theme,t", po::value<std::string>(&theme)->default_value("lima"), "set theme (name or absolute path)")
 		  ("fs,f", "enable full screen mode")
 		  ("fps", "benchmark rendering speed\n  also disable 100 FPS limit")
-		  ("songlist", po::value<std::string>(&songlist), "print list of songs to console\n  --songlist=[title|artist|path]")
+		  ("songlist", po::value<std::string>(&songlist), "save a list of songs in the specified folder")
 		  ("width,W", po::value<unsigned int>(&width)->default_value(800), "set horizontal resolution")
 		  ("height,H", po::value<unsigned int>(&height)->default_value(600), "set vertical resolution")
-		  ("michelp", "get the list of possible devices to be used as mic devstr")
-		  ("mics", po::value<std::vector<std::string> >(&mics)->composing(), "specify microphones with --mics=channels[,rate][@devstr]")
+		  ("michelp", "detailed help for --mics and a list of available audio devices")
+		  ("mics", po::value<std::vector<std::string> >(&mics)->composing(), "specify microphones to use")
 		  ("pdev", po::value<std::string>(&pdev), "set playback device (disable autodetection)\n  --pdev=dev[:settings]\n  --pdev=help for list of devices")
 		  ("prate", po::value<std::size_t>(&prate)->default_value(48000), "set playback frequency\n  44100 and 48000 Hz are optimal")
 		  ("clean,c", "disable internal default song folders")
@@ -153,7 +153,15 @@ int main(int argc, char** argv) {
 		}
 		if (vm.count("michelp")) {
 			da::record::devlist_t l = da::record::devices();
-			std::cout << "Recording devices:" << std::endl;
+			std::cout << "Specify with --mics channels[,rate][@dev[:settings]]. For example:\n"
+			  "  --mics 2                 cTwo mics on any sound device\n"
+			  "  --mics 2@jack            Two mics on JACK\n"
+			  "  --mics 18@alsa:hw:M16DX  18 input channels on ALSA device \"hw:M16DX\"\n"
+			  "                           Note: only the first four at most will be used\n"
+			  "  --mics 1,44100           One mic; will try to get 44100 Hz if available\n\n"
+			  "Multiple --mics options may be specified and all the successfully opened inputs\n"
+			  "are be assigned as players until the maximum of four players are configured.\n" << std::endl;
+			std::cout << "Capture devices available:" << std::endl;
 			for (da::record::devlist_t::const_iterator it = l.begin(); it != l.end(); ++it) {
 				std::cout << boost::format("  %1% %|10t|%2%\n") % it->name() % it->desc();
 			}
@@ -217,17 +225,17 @@ int main(int argc, char** argv) {
 		if (capture.analyzers().empty()) std::cerr << "No capture devices could be used. Please use --mics to define some." << std::endl;
 		//std::cout << "num mics: " << cap.analyzers().size() << std::endl;
 
+		Audio audio(pdev, prate);
+		Songs songs(songdirs, songlist);
 		CScreenManager sm(theme);
 		Window window(width, height, fullscreen);
-		sm.setAudio(new CAudio(pdev, prate));
-		sm.addScreen(new CScreenIntro("Intro"));
-		sm.addScreen(new CScreenSongs("Songs", songdirs));
-		sm.addScreen(new CScreenSing("Sing", capture.analyzers()));
-		sm.addScreen(new CScreenPractice("Practice", capture.analyzers())); // TODO: multiple analyzers for practice
-		sm.addScreen(new CScreenConfiguration("Configuration"));
+		sm.addScreen(new CScreenIntro("Intro", audio));
+		sm.addScreen(new CScreenSongs("Songs", audio, songs));
+		sm.addScreen(new CScreenSing("Sing", audio, songs, capture.analyzers()));
+		sm.addScreen(new CScreenPractice("Practice", audio, capture.analyzers()));
+		sm.addScreen(new CScreenConfiguration("Configuration", audio));
 		sm.activateScreen("Intro");
 		// Main loop
-		if (!songlist.empty()) sm.getSongs()->dump(std::cout, songlist);
 		boost::xtime time = now();
 		int frames = 0;
 		while (!sm.isFinished()) {

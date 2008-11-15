@@ -6,13 +6,12 @@ void Player::update() {
 	Tone const* t = m_analyzer.findTone();
 	if (t) {
 		m_activitytimer = 1000;
-		Song const& s = CScreenManager::getSingletonPtr()->getSongs()->current(); // TODO: Kill ScreenManager
-		m_scoreIt = s.notes.begin(); // TODO: optimize
+		m_scoreIt = m_song.notes.begin(); // TODO: optimize
 		m_pitch.push_back(std::make_pair(t->freq, t->stabledb));
 		double beginTime = Engine::TIMESTEP * (m_pitch.size() - 1);
 		double endTime = beginTime + 0.01;
-		while (m_scoreIt != s.notes.end()) {
-			m_score += s.m_scoreFactor * m_scoreIt->score(s.scale.getNote(t->freq), beginTime, endTime);
+		while (m_scoreIt != m_song.notes.end()) {
+			m_score += m_song.m_scoreFactor * m_scoreIt->score(m_song.scale.getNote(t->freq), beginTime, endTime);
 			if (endTime < m_scoreIt->end) break;
 			++m_scoreIt;
 		}

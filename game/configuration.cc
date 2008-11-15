@@ -3,7 +3,7 @@
 #include <boost/lexical_cast.hpp>
 #include <algorithm>
 
-CConfigurationAudioVolume::CConfigurationAudioVolume(std::string const& title, CAudio& audio, GetFunc get, SetFunc set):
+CConfigurationAudioVolume::CConfigurationAudioVolume(std::string const& title, Audio& audio, GetFunc get, SetFunc set):
   CConfiguration(title), m_audio(audio), m_get(get), m_set(set)
 {}
 void CConfigurationAudioVolume::setNext() { (m_audio.*m_set)(std::min(100u, (m_audio.*m_get)() + 1)); }

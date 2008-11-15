@@ -6,9 +6,6 @@ template<> CScreenManager* CSingleton<CScreenManager>::ms_CSingleton = NULL;
 CScreenManager::CScreenManager(std::string const& theme):
   m_finished(false),
   currentScreen(),
-  audio(),
-  songs(),
-  m_fullscreen(),
   m_theme(theme)
 {}
 

@@ -1,12 +1,12 @@
 #include "screen_practice.hh"
 
-CScreenPractice::CScreenPractice(std::string const& name, boost::ptr_vector<Analyzer>& analyzers):
-  CScreen(name), m_analyzers(analyzers)
+CScreenPractice::CScreenPractice(std::string const& name, Audio& audio, boost::ptr_vector<Analyzer>& analyzers):
+  CScreen(name), m_audio(audio), m_analyzers(analyzers)
 {}
 
 void CScreenPractice::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
-	sm->getAudio()->playMusic(sm->getThemePathFile("practice.ogg"));
+	m_audio.playMusic(sm->getThemePathFile("practice.ogg"));
 	theme.reset(new CThemePractice());
 	for (unsigned int i = 0; i < m_analyzers.size(); ++i) {
 		ProgressBar* b;
@@ -27,7 +27,7 @@ void CScreenPractice::manageEvent(SDL_Event event)
 	if (event.type == SDL_KEYDOWN) {
 		int key = event.key.keysym.sym;
 		if (key == SDLK_ESCAPE || key == SDLK_q) sm->activateScreen("Intro");
-		else if (key == SDLK_SPACE || key == SDLK_PAUSE) sm->getAudio()->togglePause();
+		else if (key == SDLK_SPACE || key == SDLK_PAUSE) m_audio.togglePause();
 	}
 }
 

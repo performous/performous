@@ -12,14 +12,15 @@
 #include <utility>
 
 struct Player {
+	Song& m_song;
 	Analyzer& m_analyzer;
 	Color m_color;
 	typedef std::vector<std::pair<double, double> > pitch_t;
 	pitch_t m_pitch;
 	double m_score;
 	unsigned m_activitytimer;
-	Song::notes_t::const_iterator m_scoreIt;
-	Player(Analyzer& analyzer): m_analyzer(analyzer), m_score(), m_activitytimer() {}
+	Notes::const_iterator m_scoreIt;
+	Player(Song& song, Analyzer& analyzer): m_song(song), m_analyzer(analyzer), m_score(), m_activitytimer() {}
 	void prepare() { m_analyzer.process(); }
 	void update();
 	float activity() const { return m_activitytimer / 300.0; }
@@ -40,7 +41,8 @@ namespace {
 }
 
 class Engine {
-	CAudio& m_audio;
+	Audio& m_audio;
+	Song& m_song;
 	std::list<Player> m_players;
 	volatile double m_latencyAR;  // Audio roundtrip latency (don't confuse with latencyAV)
 	size_t m_time;
@@ -55,9 +57,10 @@ class Engine {
 	* @param anBegin Analyzers to use (beginning iterator)
 	* @param anBegin Analyzers to use (ending iterator)
 	**/
-	template <typename FwdIt> Engine(CAudio& audio, FwdIt anBegin, FwdIt anEnd):
-	  m_audio(audio), m_players(anBegin, anEnd), m_latencyAR(0.1), m_time(), m_quit(), m_thread(boost::ref(*this))
+	template <typename FwdIt> Engine(Audio& audio, Song& song, FwdIt anBegin, FwdIt anEnd):
+	  m_audio(audio), m_song(song), m_latencyAR(0.1), m_time(), m_quit(), m_thread(boost::ref(*this))
 	{
+		while (anBegin != anEnd) m_players.push_back(Player(song, *anBegin++));
 		size_t player = 0;
 		for (std::list<Player>::iterator it = m_players.begin(); it != m_players.end(); ++it, ++player) it->m_color = playerColors[player % playerColorsSize];
 	}
@@ -72,8 +75,7 @@ class Engine {
 			double timeLeft = m_time * TIMESTEP - t;
 			if (timeLeft > 0.0) { boost::thread::sleep(now() + std::min(TIMESTEP, timeLeft)); continue; }
 			boost::mutex::scoped_lock l(m_mutex);
-			Song::notes_t const& n = CScreenManager::getSingletonPtr()->getSongs()->current().notes; // TODO: Kill ScreenManager
-			for (Song::notes_t::const_iterator it = n.begin(); it != n.end(); ++it) it->power = 0.0f;
+			for (Notes::const_iterator it = m_song.notes.begin(); it != m_song.notes.end(); ++it) it->power = 0.0f;
 			std::for_each(m_players.begin(), m_players.end(), boost::bind(&Player::update, _1));
 			++m_time;
 		}

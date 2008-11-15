@@ -29,7 +29,7 @@ class ScoreWindow {
 class LyricRow {
   public:
 	AnimValue extraspacing, fade;
-	typedef Song::notes_t::const_iterator Iterator;
+	typedef Notes::const_iterator Iterator;
 	LyricRow(Iterator& it, Iterator const& eof): extraspacing(0.0, 2.0), fade(0.0, 0.6) {
 		fade.setTarget(1.0);
 		m_begin = it;
@@ -59,8 +59,8 @@ class LyricRow {
 
 class CScreenSing: public CScreen {
   public:
-	CScreenSing(std::string const& name, boost::ptr_vector<Analyzer>& analyzers):
-	  CScreen(name), m_analyzers(analyzers), m_latencyAV(), m_nlTop(0.0, 2.0), m_nlBottom(0.0, 2.0)
+	CScreenSing(std::string const& name, Audio& audio, Songs& songs, boost::ptr_vector<Analyzer>& analyzers):
+	  CScreen(name), m_audio(audio), m_songs(songs), m_analyzers(analyzers), m_latencyAV(), m_nlTop(0.0, 2.0), m_nlBottom(0.0, 2.0)
 	{}
 	void enter();
 	void exit();
@@ -69,6 +69,8 @@ class CScreenSing: public CScreen {
 	enum SongStatus { NORMAL, INSTRUMENTAL_BREAK, FINISHED };
 	SongStatus songStatus() const;
   private:
+	Audio& m_audio;
+	Songs& m_songs;  // TODO: take song instead of all of them
 	boost::scoped_ptr<ScoreWindow> m_score_window;
 	boost::ptr_vector<Analyzer>& m_analyzers;
 	boost::scoped_ptr<ProgressBar> m_progress;
@@ -89,8 +91,8 @@ class CScreenSing: public CScreen {
 	double m_latencyAV;  // Latency between audio and video output (do not confuse with latencyAR)
 	float m_notealpha;
 	boost::scoped_ptr<CThemeSing> theme;
-	Song::notes_t::const_iterator m_songit;
-	Song::notes_t::const_iterator m_lyricit;
+	Notes::const_iterator m_songit;
+	Notes::const_iterator m_lyricit;
 	AnimValue m_nlTop, m_nlBottom;
 	std::deque<LyricRow> m_lyrics;
 };

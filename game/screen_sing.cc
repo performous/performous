@@ -8,8 +8,7 @@
 #include <iomanip>
 
 CScreenSing::SongStatus CScreenSing::songStatus() const {
-	CScreenManager* sm = CScreenManager::getSingletonPtr();
-	Song& song = sm->getSongs()->current();
+	Song& song = m_songs.current();
 	if (m_songit == song.notes.end()) return FINISHED;
 	if (m_lyrics.empty() && m_lyricit != song.notes.end()) return INSTRUMENTAL_BREAK;
 	return NORMAL;
@@ -17,10 +16,9 @@ CScreenSing::SongStatus CScreenSing::songStatus() const {
 
 void CScreenSing::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
-	Song& song = sm->getSongs()->current();
+	Song& song = m_songs.current();
 	std::string file = song.path + song.mp3;
-	CAudio& audio = *sm->getAudio();
-	audio.playMusic(file.c_str());
+	m_audio.playMusic(file.c_str());
 	theme.reset(new CThemeSing());
 	if (!song.background.empty()) { try { m_background.reset(new Surface(song.path + song.background, true)); } catch (std::exception& e) { std::cerr << e.what() << std::endl; } }
 #define TRYLOAD(field, class) if (!song.field.empty()) { try { m_##field.reset(new class(song.path + song.field)); } catch (std::exception& e) { std::cerr << e.what() << std::endl; } }
@@ -45,15 +43,14 @@ void CScreenSing::enter() {
 	m_notealpha = 0.0f;
 	m_nlTop.setTarget(song.noteMax, true);
 	m_nlBottom.setTarget(song.noteMin, true);
-	audio.wait(); // Until playback starts
-	m_engine.reset(new Engine(audio, m_analyzers.begin(), m_analyzers.end()));
+	m_engine.reset(new Engine(m_audio, m_songs.current(), m_analyzers.begin(), m_analyzers.end()));
 }
 
 void CScreenSing::exit() {
 	m_score_window.reset();
 	m_lyrics.clear();
 	m_engine.reset();
-	CScreenManager::getSingletonPtr()->getAudio()->stopMusic();
+	m_audio.stopMusic();
 	m_notebargold_hl.reset();
 	m_notebargold.reset();
 	m_pause_icon.reset();
@@ -75,41 +72,40 @@ void CScreenSing::manageEvent(SDL_Event event) {
 	if (event.type == SDL_KEYDOWN) {
 		bool seekback = false;
 		CScreenManager* sm = CScreenManager::getSingletonPtr();
-		CAudio& audio = *sm->getAudio();
 		int key = event.key.keysym.sym;
 		if (key == SDLK_ESCAPE || key == SDLK_q || (key == SDLK_RETURN && songStatus() == FINISHED)) {
 			// Enter at end of song display score window, except if score window is already displayed
 			if (key != SDLK_RETURN || m_score_window.get()) sm->activateScreen("Songs");
 			else m_score_window.reset(new ScoreWindow(sm, *m_engine));
 		}
-		else if (key == SDLK_SPACE || key == SDLK_PAUSE) sm->getAudio()->togglePause();
+		else if (key == SDLK_SPACE || key == SDLK_PAUSE) m_audio.togglePause();
 		if (m_score_window.get()) return;
 		// The rest are only available when score window is not displayed
 		if (key == SDLK_RETURN && songStatus() == INSTRUMENTAL_BREAK) {
-			double diff = m_songit->begin - 3.0 - audio.getPosition();
-			if (diff > 0.0) audio.seek(diff);
+			double diff = m_songit->begin - 3.0 - m_audio.getPosition();
+			if (diff > 0.0) m_audio.seek(diff);
 		}
-		else if (key == SDLK_F4) audio.toggleSynth();
+		else if (key == SDLK_F4) m_audio.toggleSynth(m_songs.current().notes);
 		else if (key == SDLK_F5) { m_latencyAV -= 0.02; std::cout << "AV latency = " << m_latencyAV << std::endl; }
 		else if (key == SDLK_F6) { m_latencyAV += 0.02; std::cout << "AV latency = " << m_latencyAV << std::endl; }
 		else if (key == SDLK_F7) { double l = m_engine->getLatencyAR() - 0.02; m_engine->setLatencyAR(l); std::cout << "AR latency = " << l << std::endl; }
 		else if (key == SDLK_F8) { double l = m_engine->getLatencyAR() + 0.02; m_engine->setLatencyAR(l); std::cout << "AR latency = " << l << std::endl; }
-		else if (key == SDLK_HOME) audio.seek(-audio.getPosition());
-		else if (key == SDLK_LEFT) { audio.seek(-5.0); seekback = true; }
-		else if (key == SDLK_RIGHT) audio.seek(5.0);
-		else if (key == SDLK_UP) audio.seek(30.0);
-		else if (key == SDLK_DOWN) { audio.seek(-30.0); seekback = true; }
+		else if (key == SDLK_HOME) m_audio.seek(-m_audio.getPosition());
+		else if (key == SDLK_LEFT) { m_audio.seek(-5.0); seekback = true; }
+		else if (key == SDLK_RIGHT) m_audio.seek(5.0);
+		else if (key == SDLK_UP) m_audio.seek(30.0);
+		else if (key == SDLK_DOWN) { m_audio.seek(-30.0); seekback = true; }
 		else if (key == SDLK_r && event.key.keysym.mod & KMOD_CTRL) {
-			double pos = audio.getPosition();
-			sm->getSongs()->current().reload();
+			double pos = m_audio.getPosition();
+			m_songs.current().reload();
 			exit(); enter();
-			audio.seek(pos);
+			m_audio.seek(pos);
 		}
 		if (m_latencyAV < -0.5) m_latencyAV = -0.5;
 		if (m_latencyAV > 0.5) m_latencyAV = 0.5;
 		// Some things must be reset after seeking backwards
 		if (seekback) {
-			m_lyricit = m_songit = sm->getSongs()->current().notes.begin();
+			m_lyricit = m_songit = m_songs.current().notes.begin();
 			m_lyrics.clear();
 		}
 	}
@@ -156,10 +152,10 @@ namespace {
 
 void CScreenSing::draw() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
-	Song& song = sm->getSongs()->current();
+	Song& song = m_songs.current();
 	// Get the time in the song
-	double length = sm->getAudio()->getLength();
-	double time = std::min(length, std::max(0.0, sm->getAudio()->getPosition() - m_latencyAV));
+	double length = m_audio.getLength();
+	double time = std::min(length, std::max(0.0, m_audio.getPosition() - m_latencyAV));
 	double songPercent = time / length;
 	// Rendering starts
 	{
@@ -187,7 +183,7 @@ void CScreenSing::draw() {
 		int high = song.noteMin;
 		int low2 = song.noteMax;
 		int high2 = song.noteMin;
-		for (Song::notes_t::const_iterator it = m_songit; it != song.notes.end() && it->begin < time + 15.0; ++it) {
+		for (Notes::const_iterator it = m_songit; it != song.notes.end() && it->begin < time + 15.0; ++it) {
 			if (it->type == Note::SLEEP) continue;
 			if (it->note < low) low = it->note;
 			if (it->note > high) high = it->note;
@@ -216,7 +212,7 @@ void CScreenSing::draw() {
 		m_notelines->draw(Dimensions().stretch(1.0, (max - min - 13) * noteUnit), TexCoords(0.0, (-min - 7.0) / 12.0f, 1.0, (-max + 6.0) / 12.0f));
 		// Draw notes
 		{
-			for (Song::notes_t::const_iterator it = m_songit; it != song.notes.end() && it->begin < time - (baseLine - 0.5) / pixUnit; ++it) {
+			for (Notes::const_iterator it = m_songit; it != song.notes.end() && it->begin < time - (baseLine - 0.5) / pixUnit; ++it) {
 				if (it->type == Note::SLEEP) continue;
 				double alpha = it->power;
 				Texture* t1;
@@ -356,13 +352,13 @@ void CScreenSing::draw() {
 		theme->timer->draw(status);
 	}
 		
-	if( sm->getAudio()->isPaused() ) {
+	if (m_audio.isPaused()) {
 		m_pause_icon->dimensions.middle().center().fixedWidth(.25);
 		m_pause_icon->draw();
 	}
 
 	if (m_score_window.get()) m_score_window->draw();
-	else if (!sm->getAudio()->isPlaying() || (m_songit == song.notes.end() && sm->getAudio()->getLength() - time < 3.0)) m_score_window.reset(new ScoreWindow(sm, *m_engine));
+	else if (!m_audio.isPlaying() || (m_songit == song.notes.end() && m_audio.getLength() - time < 3.0)) m_score_window.reset(new ScoreWindow(sm, *m_engine));
 }
 
 ScoreWindow::ScoreWindow(CScreenManager const* sm, Engine const& e):

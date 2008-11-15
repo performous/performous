@@ -18,14 +18,14 @@ class CConfiguration {
 
 class CConfigurationAudioVolume: public CConfiguration {
   public:
-	typedef unsigned int (CAudio::*GetFunc)();
-	typedef void (CAudio::*SetFunc)(unsigned int);
-	CConfigurationAudioVolume(std::string const& title, CAudio& audio, GetFunc get, SetFunc set);
+	typedef unsigned int (Audio::*GetFunc)();
+	typedef void (Audio::*SetFunc)(unsigned int);
+	CConfigurationAudioVolume(std::string const& title, Audio& audio, GetFunc get, SetFunc set);
 	void setNext();
 	void setPrevious();
 	std::string getValue() const;
   private:
-	CAudio& m_audio;
+	Audio& m_audio;
   	GetFunc m_get;
   	SetFunc m_set;
 };
