@@ -202,7 +202,7 @@ void CFfmpeg::decodeNextFrame() {
 						int linesize = w * 3;
 						sws_scale(img_convert_ctx, videoFrame->data, videoFrame->linesize, 0, h, &data, &linesize);
 					}
-					if (packet.time() >= 0.0) m_position = packet.time();
+					if ( !isnan(packet.time()) ) m_position = packet.time();
 					VideoFrame* tmp = new VideoFrame(m_position, w, h);
 					tmp->data.swap(buffer);
 					videoQueue.push(tmp);
@@ -229,7 +229,7 @@ void CFfmpeg::decodeNextFrame() {
 				// Construct AudioFrame and add it to the queue
 				AudioFrame* tmp = new AudioFrame();
 				std::copy(resampled, resampled + frames * AUDIO_CHANNELS, std::back_inserter(tmp->data));
-				if (packet.time() != -1) m_position = packet.time();
+				if (!isnan(packet.time()) ) m_position = packet.time();
 				else m_position += double(tmp->data.size())/double(audioQueue.getSamplesPerSecond());
 				tmp->timestamp = m_position;
 				audioQueue.push(tmp);
