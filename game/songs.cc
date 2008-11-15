@@ -185,8 +185,8 @@ void Songs::sortChange(int diff) {
 void Songs::sort_internal() {
 	switch (m_order) {
 	  case 0: if (!m_loading) std::random_shuffle(m_filtered.begin(), m_filtered.end()); break;
-	  case 1: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&Song::title)); break;
-	  case 2: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&Song::artist)); break;
+	  case 1: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&Song::collateByTitle)); break;
+	  case 2: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&Song::collateByArtist)); break;
 	  case 3: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&Song::edition)); break;
 	  case 4: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&Song::genre)); break;
 	  case 5: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&Song::path)); break;
@@ -217,9 +217,8 @@ namespace {
 
 void Songs::dumpSongs_internal() const {
 	if (m_songlist.empty()) return;
-	boost::mutex::scoped_lock l(m_mutex);
 	SongVector s = m_songs;
-	std::sort(s.begin(), s.end(), CmpByField(&Song::title)); dumpXML(s, "Songlist by song name", m_songlist + "/songs-by-title.xhtml");
-	std::sort(s.begin(), s.end(), CmpByField(&Song::artist)); dumpXML(s, "Songlist by artist", m_songlist + "/songs-by-artist.xhtml");
+	std::sort(s.begin(), s.end(), CmpByField(&Song::collateByTitle)); dumpXML(s, "Songlist by song name", m_songlist + "/songs-by-title.xhtml");
+	std::sort(s.begin(), s.end(), CmpByField(&Song::collateByArtist)); dumpXML(s, "Songlist by artist", m_songlist + "/songs-by-artist.xhtml");
 }
 

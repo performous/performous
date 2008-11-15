@@ -187,25 +187,15 @@ class SongParser {
 	}
 };
 
-Song::Song(std::string const& _path, std::string const& _filename):
-  noteMin(std::numeric_limits<int>::max()),
-  noteMax(std::numeric_limits<int>::min()),
-  path(_path),
-  filename(_filename),
-  videoGap(),
-  start(),
-  m_scoreFactor()
-{
-	SongParser(*this);
-}
-
-void Song::reload() {
+void Song::reload(bool errorIgnore) {
 	notes.clear();
 	category.clear();
 	genre.clear();
 	edition.clear();
 	title.clear();
 	artist.clear();
+	collateByTitle.clear();
+	collateByArtist.clear();
 	text.clear();
 	creator.clear();
 	mp3.clear();
@@ -217,16 +207,22 @@ void Song::reload() {
 	videoGap = 0.0;
 	start = 0.0;
 	m_scoreFactor = 0.0;
-	try {
-		SongParser(*this);
-	} catch (...) {}
+	try { SongParser(*this); } catch (...) { if (!errorIgnore) throw; }
+	collateUpdate();
+}
+#include <iostream>
+void Song::collateUpdate() {
+	collateByTitle = collate(title + artist) + '\0' + filename;
+	collateByArtist = collate(artist + title) + '\0' + filename;
 }
 
-#define STRLT_RET(lhs, rhs) { std::string l_ = Glib::ustring(lhs).casefold_collate_key(), r_ = Glib::ustring(rhs).casefold_collate_key(); if (l_ != r_) return l_ < r_; }
-bool operator<(Song const& l, Song const& r) {
-	STRLT_RET(l.artist, r.artist)
-	STRLT_RET(l.title, r.title)
-	return l.filename < r.filename; // If filenames are identical, too, the songs are considered the same.
+std::string Song::collate(std::string const& str) {
+	Glib::ustring ustr = str, ustr2;
+	// Remove all non-alnum characters
+	for (Glib::ustring::iterator it = ustr.begin(), end = ustr.end(); it != end; ++it) {
+		if (Glib::Unicode::isalnum(*it)) ustr2 += Glib::Unicode::tolower(*it);
+	}
+	return ustr2;
+	// Should use ustr2.casefold_collate_key() instead of tolower, but it seems to be crashing...
 }
-#undef STRLT_RET
 

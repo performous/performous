@@ -18,8 +18,8 @@ class SongParser;
 class Song: boost::noncopyable {
   public:
 	friend class SongParser;
-	Song(std::string const& path, std::string const& filename);
-	void reload();
+	Song(std::string const& path_, std::string const& filename_): path(path_), filename(filename_) { reload(false); }
+	void reload(bool errorIgnore = true);
 	bool parseField(std::string const& line);
 	/** Get formatted song label. **/
 	std::string str() const { return title + "  by  " + artist; }
@@ -40,6 +40,13 @@ class Song: boost::noncopyable {
 	std::string cover;
 	std::string background;
 	std::string video;
+	// Variables used for comparisons (sorting)
+	std::string collateByTitle;
+	std::string collateByArtist;
+	/** Rebuild collate variables from other strings **/
+	void collateUpdate();
+	/** Convert a string to its collate form **/
+	static std::string collate(std::string const& str);
 	double videoGap;
 	double start;
 	MusicalScale scale;
@@ -51,6 +58,6 @@ class Song: boost::noncopyable {
   private:
 };
 
-bool operator<(Song const& l, Song const& r);
+static inline bool operator<(Song const& l, Song const& r) { return l.collateByArtist < r.collateByArtist; }
 
 #endif
