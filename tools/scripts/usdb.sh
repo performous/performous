@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# this is revision 0
+# this is revision 1
 #
 
 [ -z "$USDB_DEST_DIR" ] && USDB_DEST_DIR="${HOME}/.ultrastar/songs"
@@ -212,8 +212,8 @@ FIRST=`grep -E '[\\:F\\*] [0-9]+ [0-9]+ [0-9]+ ' "$TXT" | head -n 1 | cut -d " "
 SUBSTRACT=`echo "$FIRST / $BPM / 4 * 60000" | bc -l | cut -d . -f 1`
 
 # all done, move files to destination
-if [ "`cd .. ; pwd`" != "${DEST_DIR}" ] ; then
-  DIR="${DEST_DIR}/$ARTIST - $TITLE"
+if [ "`cd .. ; pwd`" != "${USDB_DEST_DIR}" ] ; then
+  DIR="${USDB_DEST_DIR}/$ARTIST - $TITLE"
   echo
   echo " >>> moving files to ..."
   echo " >>> $DIR/"
