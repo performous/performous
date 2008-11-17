@@ -2,6 +2,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <glibmm/ustring.h>
+#include <glibmm/convert.h>
 #include <algorithm>
 #include <fstream>
 
@@ -217,10 +218,20 @@ void Song::collateUpdate() {
 }
 
 std::string Song::collate(std::string const& str) {
-	Glib::ustring ustr = str, ustr2;
+	std::string last("ZZZZZZZZZZZZZZZ");
+	Glib::ustring ustr, ustr2;
+	try {
+		ustr = Glib::convert(str, "UTF-8", "UTF-8");
+	} catch( ... ) {
+		std::cerr << "Song::collate: input string is not valid UTF-8" << std::endl;
+		return last;
+	}
 	// Remove all non-alnum characters
 	for (Glib::ustring::iterator it = ustr.begin(), end = ustr.end(); it != end; ++it) {
-		if (Glib::Unicode::isalnum(*it)) ustr2 += Glib::Unicode::tolower(*it);
+		if (Glib::Unicode::isalnum(*it))
+			ustr2 += Glib::Unicode::tolower(*it);
+		else
+			ustr2 += "z";
 	}
 	return ustr2;
 	// Should use ustr2.casefold_collate_key() instead of tolower, but it seems to be crashing...
