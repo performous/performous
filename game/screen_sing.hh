@@ -15,7 +15,7 @@
 
 class ScoreWindow {
   public:
-	ScoreWindow(CScreenManager const* sm, Engine const& e);
+	ScoreWindow(CScreenManager const* sm, Engine & e);
 	void draw();
   private:
 	Surface m_bg;

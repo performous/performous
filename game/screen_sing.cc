@@ -361,7 +361,7 @@ void CScreenSing::draw() {
 	else if (!m_audio.isPlaying() || (m_songit == song.notes.end() && m_audio.getLength() - time < 3.0)) m_score_window.reset(new ScoreWindow(sm, *m_engine));
 }
 
-ScoreWindow::ScoreWindow(CScreenManager const* sm, Engine const& e):
+ScoreWindow::ScoreWindow(CScreenManager const* sm, Engine& e):
   m_bg(sm->getThemePathFile("score_window.svg")),
   m_scoreBar(sm->getThemePathFile("score_bar_bg.svg"), sm->getThemePathFile("score_bar_fg.svg"), ProgressBar::VERTICAL, 0.0, 0.0, false),
   m_score_text(sm->getThemePathFile("score_txt.svg")),
@@ -369,6 +369,7 @@ ScoreWindow::ScoreWindow(CScreenManager const* sm, Engine const& e):
   m_players(e.getPlayers())
 {
 	unsigned int topScore = 0;
+	e.kill(); // kill the engine thread (to avoid consuming memory)
 	for (std::list<Player>::iterator p = m_players.begin(); p != m_players.end();) {
 		unsigned int score = p->getScore();
 		if (score < 500) { p = m_players.erase(p); continue; }

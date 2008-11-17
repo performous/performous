@@ -65,6 +65,7 @@ class Engine {
 		for (std::list<Player>::iterator it = m_players.begin(); it != m_players.end(); ++it, ++player) it->m_color = playerColors[player % playerColorsSize];
 	}
 	~Engine() { m_quit = true; m_thread.join(); }
+	void kill() { m_quit = true; }
 	void setLatencyAR(double value) { m_latencyAR = std::min(std::max(0.0, value), 0.5); }
 	double getLatencyAR() const { return m_latencyAR; }
 	/** Used internally for boost::thread. Do not call this yourself. (boost::thread requires this to be public). **/
