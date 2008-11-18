@@ -143,6 +143,8 @@ void CFfmpeg::operator()() {
 	}
 }
 
+#include <cmath>
+
 void CFfmpeg::seek(double time) {
 	m_seekTarget = time;
 	videoQueue.reset(); audioQueue.reset(); // Empty these to unblock the internals in case buffers were full
@@ -202,7 +204,7 @@ void CFfmpeg::decodeNextFrame() {
 						int linesize = w * 3;
 						sws_scale(img_convert_ctx, videoFrame->data, videoFrame->linesize, 0, h, &data, &linesize);
 					}
-					if ( !isnan(packet.time()) ) m_position = packet.time();
+					if ( !std::isnan(packet.time()) ) m_position = packet.time();
 					VideoFrame* tmp = new VideoFrame(m_position, w, h);
 					tmp->data.swap(buffer);
 					videoQueue.push(tmp);
@@ -229,7 +231,7 @@ void CFfmpeg::decodeNextFrame() {
 				// Construct AudioFrame and add it to the queue
 				AudioFrame* tmp = new AudioFrame();
 				std::copy(resampled, resampled + frames * AUDIO_CHANNELS, std::back_inserter(tmp->data));
-				if (!isnan(packet.time()) ) m_position = packet.time();
+				if (!std::isnan(packet.time()) ) m_position = packet.time();
 				else m_position += double(tmp->data.size())/double(audioQueue.getSamplesPerSecond());
 				tmp->timestamp = m_position;
 				audioQueue.push(tmp);
