@@ -1,5 +1,14 @@
 Blockers for 0.3.1 release
 
+Entries ending with question mark are optional (and not really blockers).
+
+Build
+- Rewrite Find modules for the rest of the libraries (mostly audio libs)?
+- OSX fixes?
+
+LibDA
+- GStreamer playback?
+
 General
 - Do not fail when playback device cannot be used (use "none" device?)?
 - Issue warning dialog about capture/playback failure?
