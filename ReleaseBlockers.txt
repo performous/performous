@@ -1,0 +1,22 @@
+Blockers for 0.3.1 release
+
+General
+- Do not fail when playback device cannot be used (use "none" device?)?
+- Issue warning dialog about capture/playback failure?
+   * In this case the capture missing warning in practice should be removed
+
+Audio
+- Crossfade on playPreview?
+   * Read 0.4 ms from old file into a mixing buffer
+   * Let playback callback mix with the crossfade buffer if there is anything there
+
+Song screen / songs
+- Delay on song switch before playPreview is called (to allow fast browsing)
+- Sort out charset conversion issues
+- Issue a warning on song loading if charset != UTF-8
+
+Configuration
+- New config menu (several items visible at once, etc)
+- Saving config to XML file?
+   * Needs to store the settings within Configuration when the program is running
+
