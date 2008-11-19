@@ -13,6 +13,8 @@ CScreenSongs::CScreenSongs(std::string const& name, Audio& audio, Songs& songs):
 void CScreenSongs::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	m_audio.stopMusic();
+	m_playing.clear();
+	m_playReq.clear();
 	theme.reset(new CThemeSongs());
 	m_emptyCover.reset(new Surface(sm->getThemePathFile("no_cover.svg")));
 	m_time = seconds(now());
@@ -22,7 +24,6 @@ void CScreenSongs::enter() {
 
 void CScreenSongs::exit() {
 	m_cover.clear();
-	m_playing.clear();
 	m_emptyCover.reset();
 	theme.reset();
 }
@@ -56,6 +57,7 @@ void CScreenSongs::manageEvent(SDL_Event event) {
 void CScreenSongs::draw() {
 	m_songs.update(); // Poll for new songs
 	theme->bg->draw();
+	std::string music;
 	std::ostringstream oss_song, oss_order;
 	// Test if there are no songs
 	if (m_songs.empty()) {
@@ -65,7 +67,6 @@ void CScreenSongs::draw() {
 			oss_song << "no songs match search";
 			oss_order << m_search.text;
 		}
-		if (!m_playing.empty()) { m_audio.stopMusic(); m_playing.clear(); }
 	} else {
 		Song& song = m_songs.current();
 		// Format the song information text
@@ -84,9 +85,7 @@ void CScreenSongs::draw() {
 		Surface& s = *(m_currentCover ? m_currentCover : m_emptyCover);
 		s.dimensions.middle(-1.3 * shift).fitInside(0.3, 0.3);
 		s.draw();
-		// Play a preview of the song
-		std::string file = song.path + song.mp3;
-		if (file != m_playing) m_audio.playPreview(m_playing = file);
+		music = song.path + song.mp3;
 	}
 	// Draw song and order texts
 	theme->song->draw(oss_song.str());
@@ -95,6 +94,13 @@ void CScreenSongs::draw() {
 		m_time = seconds(now());
 		if (!m_search.text.empty()) { m_search.text.clear(); m_songs.setFilter(m_search.text); }
 		m_songs.random();
+	}
+	// Schedule playback change if the chosen song has changed
+	if (music != m_playReq) { m_playReq = music; m_playTimer.setValue(0.4); }
+	// Play/stop preview playback (if it is the time)
+	if (music != m_playing && m_playTimer.get() == 0.0) {
+		if (music.empty()) m_audio.stopMusic(); else m_audio.playPreview(music);
+		m_playing = music;
 	}
 }
 

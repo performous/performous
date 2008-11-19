@@ -20,7 +20,6 @@ Audio
    * Let playback callback mix with the crossfade buffer if there is anything there
 
 Song screen / songs
-- Delay on song switch before playPreview is called (to allow fast browsing)
 - Sort out charset conversion issues
 - Issue a warning on song loading if charset != UTF-8
 
