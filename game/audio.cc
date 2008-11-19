@@ -1,5 +1,6 @@
 #include "audio.hh"
 
+#include "util.hh"
 #include "xtime.hh"
 #include <functional>
 #include <iostream>
@@ -89,13 +90,13 @@ void Audio::stopMusic() {
 	m_notes = NULL;
 	setVolume_internal(0);
 	m_mpeg.reset();
-	m_length = std::numeric_limits<double>::quiet_NaN();
+	m_length = getNaN();
 	m_prebuffering = true; // For the next song
 	m_paused = false;
 }
 
 double Audio::getPosition() const {
-	if (!m_mpeg) return std::numeric_limits<double>::quiet_NaN();
+	if (!m_mpeg) return getNaN();
 	return m_mpeg->position();
 }
 
@@ -103,7 +104,7 @@ bool Audio::isPlaying() const { return m_mpeg && !m_mpeg->audioQueue.eof(); }
 
 void Audio::seek(double seek_dist) {
 	if (!isPlaying()) return;
-	int position = std::max(0.0, std::min(m_length - 1.0, getPosition() + seek_dist));
+	int position = clamp(getPosition() + seek_dist, 0.0, m_length - 1.0);
 	m_paused = true;
 	m_prebuffering = true;
 	m_mpeg->seek(position);

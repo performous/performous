@@ -1,6 +1,7 @@
 #include "screen_sing.hh"
-#include "xtime.hh"
 
+#include "util.hh"
+#include "xtime.hh"
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 #include "songs.hh"
@@ -155,7 +156,7 @@ void CScreenSing::draw() {
 	Song& song = m_songs.current();
 	// Get the time in the song
 	double length = m_audio.getLength();
-	double time = std::min(length, std::max(0.0, m_audio.getPosition() - m_latencyAV));
+	double time = clamp(m_audio.getPosition() - m_latencyAV, 0.0, length);
 	double songPercent = time / length;
 	// Rendering starts
 	{
@@ -166,7 +167,7 @@ void CScreenSing::draw() {
 			m_background->draw();
 		} else fillBG();
 		if (m_video) { m_video->render(time - song.videoGap); double tmp = m_video->dimensions().ar(); if (tmp > 0.0) ar = tmp; }
-		ar = std::min(arMax, std::max(arMin, ar));
+		ar = clamp(ar, arMin, arMax);
 		double offset = 0.5 / ar + 0.2;
 		theme->bg_bottom->dimensions.fixedWidth(1.0).bottom(offset);
 		theme->bg_bottom->draw();
@@ -254,7 +255,7 @@ void CScreenSing::draw() {
 			Player::pitch_t const& pitch = p->m_pitch;
 			size_t const beginIdx = std::max(0.0, time - 0.5 / pixUnit) / Engine::TIMESTEP; // At which pitch idx to start displaying the wave
 			size_t const endIdx = pitch.size();
-			double oldval = std::numeric_limits<double>::quiet_NaN();
+			double oldval = getNaN();
 			size_t idx = beginIdx;
 			// Go back until silence (NaN freq) to allow proper wave phase to be calculated
 			if (beginIdx < endIdx) while (idx > 0 && pitch[idx].first == pitch[idx].first) --idx;
@@ -264,13 +265,13 @@ void CScreenSing::draw() {
 			for (; idx < endIdx; ++idx, t += Engine::TIMESTEP) {
 				double const freq = pitch[idx].first;
 				// If freq is NaN, we have nothing to process
-				if (freq != freq) { tex = texOffset; oldval = std::numeric_limits<double>::quiet_NaN(); continue; }
+				if (freq != freq) { tex = texOffset; oldval = getNaN(); continue; }
 				tex = tex + freq * 0.001; // Wave phase (texture coordinate)
 				if (idx < beginIdx) continue; // Skip graphics rendering if out of screen
 				bool prev = idx > beginIdx && pitch[idx - 1].first > 0.0;
 				bool next = idx < endIdx - 1 && pitch[idx + 1].first > 0.0;
 				// If neither previous or next frames have proper frequency, ignore this one too
-				if (!prev && !next) { oldval = std::numeric_limits<double>::quiet_NaN(); continue; }
+				if (!prev && !next) { oldval = getNaN(); continue; }
 				double x = -0.2 + (t - time) * pixUnit;
 				// Find the currently playing note or the next playing note (or the last note?)
 				std::size_t i = 0;
@@ -279,7 +280,7 @@ void CScreenSing::draw() {
 				double diff = n.diff(song.scale.getNote(freq));
 				double val = n.note + diff;
 				double y = baseY + val * noteUnit;
-				double thickness = (std::max(0.0, std::min(1.0, 1.0 + pitch[idx].second / 60.0))) + 0.5;
+				double thickness = clamp(1.0 + pitch[idx].second / 60.0) + 0.5;
 				thickness *= 1.0 + 0.2 * std::sin(tex - 2.0 * texOffset); // Further animation :)
 				thickness *= -noteUnit;
 				// If pitch change is too fast, terminate and begin a new one

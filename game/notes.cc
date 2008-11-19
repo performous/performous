@@ -1,5 +1,6 @@
 #include "notes.hh"
 
+#include "util.hh"
 // math.h needed for C99 stuff
 #include <math.h>
 #include <cmath>
@@ -46,7 +47,7 @@ int MusicalScale::getNoteId(double freq) const {
 }
 
 double MusicalScale::getNote(double freq) const {
-	if (freq < 1.0) return std::numeric_limits<double>::quiet_NaN();
+	if (freq < 1.0) return getNaN();
 	return m_baseId + 12.0 * log(freq / m_baseFreq) / log(2);
 }
 
@@ -72,7 +73,7 @@ double Note::scoreMultiplier(double error) const {
 	  case GOLDEN: max = 2.0; break;
 	  case SLEEP: break;
 	}
-	double accuracy = std::min(1.0, std::max(0.0, 1.5 - error));
+	double accuracy = clamp(1.5 - error, 0.0, 1.0);
 	power += accuracy;
 	return accuracy * max;
 }

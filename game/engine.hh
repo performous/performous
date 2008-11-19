@@ -1,9 +1,14 @@
+#pragma once
+#ifndef PERFORMOUS_ENGINE_HH
+#define PERFORMOUS_ENGINE_HH
+
 #include "audio.hh"
 #include "color.hh"
 #include "pitch.hh"
-#include "xtime.hh"
-#include "songs.hh"
 #include "screen.hh"
+#include "songs.hh"
+#include "util.hh"
+#include "xtime.hh"
 #include <boost/bind.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
@@ -88,3 +93,4 @@ class Engine {
 	}
 };
 
+#endif

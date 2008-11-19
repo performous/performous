@@ -1,10 +1,10 @@
 #include "ffmpeg.hh"
 
+#include "config.hh"
+#include "util.hh"
 #include "xtime.hh"
 #include <iostream>
 #include <stdexcept>
-
-#include "config.hh"
 
 extern "C" {
 #include AVCODEC_INCLUDE
@@ -49,7 +49,7 @@ CFfmpeg::~CFfmpeg() {
 
 double CFfmpeg::duration() {
 	if (decodeVideo || decodeAudio) return pFormatCtx->duration / double(AV_TIME_BASE);
-	return std::numeric_limits<double>::quiet_NaN();
+	return getNaN();
 }
 
 void CFfmpeg::open() {
@@ -58,7 +58,7 @@ void CFfmpeg::open() {
 	if (av_find_stream_info(pFormatCtx) < 0) throw std::runtime_error("Cannot find stream information");
 	videoStream = -1;
 	audioStream = -1;
-	m_seekTarget = std::numeric_limits<double>::quiet_NaN();
+	m_seekTarget = getNaN();
 	// Take the first video/audio streams
 	for (unsigned int i=0; i<pFormatCtx->nb_streams; i++) {
 		if (videoStream == -1 && pFormatCtx->streams[i]->codec->codec_type==CODEC_TYPE_VIDEO) videoStream = i;
@@ -156,7 +156,7 @@ void CFfmpeg::seek_internal() {
 	audioQueue.reset();
 	videoQueue.reset();
 	av_seek_frame(pFormatCtx, -1, m_seekTarget * AV_TIME_BASE, 0);
-	m_seekTarget = std::numeric_limits<double>::quiet_NaN();
+	m_seekTarget = getNaN();
 }
 
 void CFfmpeg::decodeNextFrame() {
@@ -168,7 +168,7 @@ void CFfmpeg::decodeNextFrame() {
 		~ReadFramePacket() { av_free_packet(this); }
 		double time() {
 			return uint64_t(dts) == uint64_t(AV_NOPTS_VALUE) ?
-			  std::numeric_limits<double>::quiet_NaN() : double(dts) * av_q2d(m_s->streams[stream_index]->time_base);
+			  getNaN() : double(dts) * av_q2d(m_s->streams[stream_index]->time_base);
 		}
 	};
 

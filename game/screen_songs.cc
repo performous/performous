@@ -1,4 +1,5 @@
 #include "screen_songs.hh"
+#include "util.hh"
 #include "xtime.hh"
 #include <iostream>
 #include <sstream>

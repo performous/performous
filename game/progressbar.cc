@@ -1,10 +1,11 @@
 #include "progressbar.hh"
 
+#include "util.hh"
 #include <iostream>
 #include <stdexcept>
 
 void ProgressBar::draw(float value) {
-	value = std::min(std::max(0.0f, value), 1.0f);
+	value = clamp(value);
 	float scale = 1.0 - m_begin - m_end;
 	m_bg.draw(dimensions);
 	float w = dimensions.w();

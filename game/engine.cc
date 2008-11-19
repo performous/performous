@@ -15,10 +15,10 @@ void Player::update() {
 			if (endTime < m_scoreIt->end) break;
 			++m_scoreIt;
 		}
-		m_score = std::min(1.0, std::max(0.0, m_score));
+		m_score = clamp(m_score, 0.0, 1.0);
 	} else {
 		if (m_activitytimer > 0) --m_activitytimer;
-		m_pitch.push_back(std::make_pair(std::numeric_limits<double>::quiet_NaN(), -std::numeric_limits<double>::infinity()));
+		m_pitch.push_back(std::make_pair(getNaN(), -std::numeric_limits<double>::infinity()));
 	}
 }
 

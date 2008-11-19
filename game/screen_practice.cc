@@ -1,5 +1,7 @@
 #include "screen_practice.hh"
 
+#include "util.hh"
+
 CScreenPractice::CScreenPractice(std::string const& name, Audio& audio, boost::ptr_vector<Analyzer>& analyzers):
   CScreen(name), m_audio(audio), m_analyzers(analyzers)
 {}
@@ -47,7 +49,7 @@ void CScreenPractice::draw() {
 		MusicalScale scale;
 		// getPeak returns 0.0 when clipping, negative values when not that loud.
 		// Normalizing to [0,1], where 0 is -43 dB or less (to match the vumeter graphic)
-		m_vumeters[i].draw(std::min(0.0, std::max(-1.0, analyzer.getPeak() / 43.0))+1.0);
+		m_vumeters[i].draw(analyzer.getPeak() / 43.0 + 1.0);
 		if (freq != 0.0) {
 			Analyzer::tones_t tones = analyzer.getTones();
 			for (Analyzer::tones_t::const_iterator t = tones.begin(); t != tones.end(); ++t) {
