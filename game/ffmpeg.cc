@@ -53,6 +53,7 @@ double CFfmpeg::duration() {
 }
 
 void CFfmpeg::open() {
+	av_log_set_level(AV_LOG_QUIET);
 	if (av_open_input_file(&pFormatCtx, m_filename.c_str(), NULL, 0, NULL)) throw std::runtime_error("Cannot open input file");
 	if (av_find_stream_info(pFormatCtx) < 0) throw std::runtime_error("Cannot find stream information");
 	videoStream = -1;
