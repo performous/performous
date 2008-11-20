@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# this is revision 1
+# this is revision 2
 #
 
 [ -z "$USDB_DEST_DIR" ] && USDB_DEST_DIR="${HOME}/.ultrastar/songs"
@@ -9,12 +9,19 @@
 set -eu
 
 if [ $# != 1 ] ; then
-  echo usage: $0 [songfile.txt]
+  echo " >>> This script should help you to import .txt files into your"
+  echo " >>> song repository or update .txt files currently in the repository"
+  echo " >>> by adding a video, cover or background image."
+  echo " >>> It will guide you to youtube/google image search, insert the"
+  echo " >>> proper tags and copy everything to your USDB_DEST_DIR."
+  echo " >>> "
+  echo " >>> usage: "`basename $0`" [songfile.txt]"
+  echo " >>> "
   exit
 fi
 
 if [ ! -e "$1" ] ; then
-  echo " >>> error: file does not exist."
+  echo " >>> error: file \"$1\" does not exist."
   exit 1
 fi
 
@@ -36,6 +43,8 @@ fi
 function escape {
   perl -MCGI -e \ 'print CGI->escape(@ARGV), "\n"' "$1"
 }
+
+echo " >>> USDB_DEST_DIR = $USDB_DEST_DIR"
 
 WORK_DIR=`dirname "$1"`
 
@@ -60,6 +69,20 @@ if grep -q $'\r' "$TXT" ; then
   sed -e s:\\\r::g -- "$TMP" > "$TXT"
   rm "$TMP"
 fi
+
+while file "$TXT" | grep -q ISO ; do
+  echo
+  echo " >>> the files is not UTF-8, it will be opened in gedit for inspection."
+  echo " >>> Save it as UTF-8, press return to continue, type 'no' to cancel."
+  echo -n " >>> any key ... "
+  read REPLY
+  if [ "x$REPLY" = "xno" ] ; then
+    break
+  else
+    gedit "$TXT"
+    [ -e "${TXT}~" ] && rm "${TXT}~"
+  fi
+done
 
 ARTIST=`grep     "#ARTIST:"     "$TXT" | cut -d : -f 2`
 TITLE=`grep      "#TITLE:"      "$TXT" | cut -d : -f 2`
@@ -108,7 +131,7 @@ if [ $GET_VIDEO = yes ] ; then
   URL="http://www.youtube.com/results?search_query=$ESCAPED"
   echo " >>> Please look for the song here, then enter the desired video url below"
   echo " >>> $URL"
-  echo -n " >>> video url: "
+  echo -n " >>> youtube url: "
   read YOUTUBE_URL
   [ -z "$YOUTUBE_URL" ] && echo " >>> canceled." && exit
   MP3="${PREFIX}.mp4"
@@ -195,18 +218,6 @@ if test -z "$BACKGROUND" || test ! -e "$BACKGROUND" ; then
 
 fi
 
-if file "$TXT" | grep -q ISO ; then
-  echo
-  echo " >>> the files is not UTF-8, it will be opened in gedit for inspection."
-  echo " >>> Save it as UTF-8, press return to continue, type \'no\' to cancel."
-  echo -n " >>> any key ... "
-  read REPLY
-  if [ "x$REPLY" != "xno" ] ; then
-    gedit "$TXT"
-    [ -e "${TXT}~" ] && rm "${TXT}~"
-  fi
-fi
-
 # calculate first note offset
 FIRST=`grep -E '[\\:F\\*] [0-9]+ [0-9]+ [0-9]+ ' "$TXT" | head -n 1 | cut -d " " -f 2`
 SUBSTRACT=`echo "$FIRST / $BPM / 4 * 60000" | bc -l | cut -d . -f 1`
@@ -227,13 +238,12 @@ else
 fi
 
 echo
-echo " >>> Now you might wanto to do this:"
+echo " >>> To get the timing right, you might want to do this:"
 echo
-echo "gedit \"$DIR/$TXT\" & mplayer -ao pcm:fast:file=/tmp/dump.wav -vo null -really-quiet \"$DIR/$MP3\" && audacity /tmp/dump.wav"
+echo "mplayer -ao pcm:file=/tmp/dump.wav -vo null \"$DIR/$MP3\" && ( gedit \"$DIR/$TXT\" & audacity /tmp/dump.wav ) && rm /tmp/dump.wav"
 echo
 if [ x$SUBSTRACT != x0 ] ; then
   echo " >>> Note that the first note does not start at zero."
   echo " >>> You have to substract ${SUBSTRACT}ms from the #GAP meassured with audacity."
 fi
-
 
