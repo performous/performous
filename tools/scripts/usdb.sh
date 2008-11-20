@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# this is revision 2
+# this is revision 3
 #
 
 [ -z "$USDB_DEST_DIR" ] && USDB_DEST_DIR="${HOME}/.ultrastar/songs"
@@ -220,7 +220,21 @@ fi
 
 # calculate first note offset
 FIRST=`grep -E '[\\:F\\*] [0-9]+ [0-9]+ [0-9]+ ' "$TXT" | head -n 1 | cut -d " " -f 2`
+BPM=`echo $BPM | sed -e s/,/./g`
 SUBSTRACT=`echo "$FIRST / $BPM / 4 * 60000" | bc -l | cut -d . -f 1`
+
+# check for overlapping notes
+ERRORLINES=""
+LASTTIME="-1000000"
+LINENUM="1"
+while read LINE ;do
+  TIME=`echo "$LINE" | grep -E '[\\:F\\*\\-] [0-9]+' | cut -d " " -f 2`
+  if [ -n "$TIME" ] ; then
+    [ $LASTTIME -gt $TIME ] && ERRORLINES="${ERRORLINES}${LINENUM} "
+    LASTTIME="$TIME"
+  fi
+  let "LINENUM++"
+done < "$TXT"
 
 # all done, move files to destination
 if [ "`cd .. ; pwd`" != "${USDB_DEST_DIR}" ] ; then
@@ -240,10 +254,19 @@ fi
 echo
 echo " >>> To get the timing right, you might want to do this:"
 echo
-echo "mplayer -ao pcm:file=/tmp/dump.wav -vo null \"$DIR/$MP3\" && ( gedit \"$DIR/$TXT\" & audacity /tmp/dump.wav ) && rm /tmp/dump.wav"
+echo "mplayer -ao pcm:file=/tmp/dump.wav -vo null \"$DIR/$MP3\""
+echo "audacity /tmp/dump.wav && rm /tmp/dump.wav"
+echo "gedit \"$DIR/$TXT\""
 echo
-if [ x$SUBSTRACT != x0 ] ; then
+
+if [ "x$SUBSTRACT" != "x0" ] ; then
   echo " >>> Note that the first note does not start at zero."
   echo " >>> You have to substract ${SUBSTRACT}ms from the #GAP meassured with audacity."
+  echo
 fi
 
+if [ -n "$ERRORLINES" ] ; then
+  echo " >>> Warning: This song will not work in Performous, because there are overlapping notes."
+  echo " >>> Please have a look at these lines: $ERRORLINES"
+  echo
+fi
