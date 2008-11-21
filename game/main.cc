@@ -212,7 +212,7 @@ int main(int argc, char** argv) {
 			unsigned rate = 48000;
 			std::string devstr;
 			using namespace boost::spirit;
-			if (!parse(mics[i].c_str(), uint_p[assign_a(channels)] >> !(ch_p(',') >> uint_p[assign_a(rate)]) >> !(ch_p('@') >> (*anychar_p)[assign_a(devstr)])).full)
+			if (!parse(mics[i].c_str(), uint_p[assign_a(channels)] >> !(',' >> uint_p[assign_a(rate)]) >> !('@' >> (*anychar_p)[assign_a(devstr)])).full)
 			  throw std::runtime_error("Invalid syntax in mics=" + mics[i]);
 			try {
 				capture.addMics(channels, rate, devstr);
