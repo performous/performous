@@ -95,6 +95,7 @@ class CScreenSing: public CScreen {
 	Notes::const_iterator m_lyricit;
 	AnimValue m_nlTop, m_nlBottom;
 	std::deque<LyricRow> m_lyrics;
+	AnimValue m_quitTimer;
 };
 
 #endif

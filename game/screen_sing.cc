@@ -8,6 +8,10 @@
 #include <iostream>
 #include <iomanip>
 
+namespace {
+	static const double QUIT_TIMEOUT = 30.0; // Return to songs screen after 30 seconds in score screen
+}
+
 CScreenSing::SongStatus CScreenSing::songStatus() const {
 	Song& song = m_songs.current();
 	if (m_songit == song.notes.end()) return FINISHED;
@@ -71,6 +75,7 @@ void CScreenSing::exit() {
 
 void CScreenSing::manageEvent(SDL_Event event) {
 	if (event.type == SDL_KEYDOWN) {
+		m_quitTimer.setValue(QUIT_TIMEOUT);
 		bool seekback = false;
 		CScreenManager* sm = CScreenManager::getSingletonPtr();
 		int key = event.key.keysym.sym;
@@ -352,14 +357,20 @@ void CScreenSing::draw() {
 		}
 		theme->timer->draw(status);
 	}
+
+	if (m_score_window.get()) {
+		if (m_quitTimer.get() == 0.0 && !m_audio.isPaused()) { sm->activateScreen("Songs"); return; }
+		m_score_window->draw();
+	}
+	else if (!m_audio.isPlaying() || (m_songit == song.notes.end() && m_audio.getLength() - time < 3.0)) {
+		m_quitTimer.setValue(QUIT_TIMEOUT);
+		m_score_window.reset(new ScoreWindow(sm, *m_engine));
+	}
 		
 	if (m_audio.isPaused()) {
 		m_pause_icon->dimensions.middle().center().fixedWidth(.25);
 		m_pause_icon->draw();
 	}
-
-	if (m_score_window.get()) m_score_window->draw();
-	else if (!m_audio.isPlaying() || (m_songit == song.notes.end() && m_audio.getLength() - time < 3.0)) m_score_window.reset(new ScoreWindow(sm, *m_engine));
 }
 
 ScoreWindow::ScoreWindow(CScreenManager const* sm, Engine& e):
