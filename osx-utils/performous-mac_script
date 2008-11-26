@@ -2,5 +2,5 @@
 
 export PATH=$PATH:"$(dirname "$0")/../Resources/performous/bin"
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"$(dirname "$0")/../Resources/performous/lib"
-cd "$(dirname "$0")/../Resources/performous/share/performous/themes"
+cd "$(dirname "$0")/../Resources/performous/share/games/performous/themes"
 performous
