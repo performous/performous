@@ -8,6 +8,8 @@
 #include "screen.hh"
 
 Audio::Audio(std::string const& pdev, unsigned int rate):
+	m_crossfade(0),
+	m_crossbuf(0.4 * 48000 * 2), // 0.4 seconds at 48 kHz, 2 ch
 	m_volume(1.0),
 	m_volumeMusic(100),
 	m_volumePreview(70),
@@ -55,6 +57,16 @@ void Audio::operator()(da::pcm_data& areas, da::settings const&) {
 			areas.m_buf[i] += value;
 		}
 	}
+	// Need to crossfade?
+	if (m_crossfade < m_crossbuf.size()) {
+		size_t cf = m_crossfade;
+		double f = 0.0;
+		for (size_t i = 0; i < samples && cf < m_crossbuf.size(); ++i) {
+			if (i % areas.channels == 0) f = double(cf)/m_crossbuf.size();
+			areas.m_buf[i] = f * areas.m_buf[i] + (1.0 - f) * m_crossbuf[cf++];
+		}
+		m_crossfade = cf;
+	}
 }
 
 void Audio::setVolume_internal(unsigned int volume) {
@@ -75,7 +87,7 @@ void Audio::playMusic(std::string const& filename) {
 }
 
 void Audio::playPreview(std::string const& filename) {
-	// TODO: fadeout();
+	fadeout();
 	try {
 		m_mpeg.reset(new CFfmpeg(false, true, filename, m_rs.rate()));
 		m_mpeg->seek(30.0);
@@ -93,6 +105,18 @@ void Audio::stopMusic() {
 	m_length = getNaN();
 	m_prebuffering = true; // For the next song
 	m_paused = false;
+}
+
+void Audio::fadeout() {
+	if (m_crossfade == m_crossbuf.size() && m_mpeg) {
+		// Read audio into crossfade buffer
+		std::vector<int16_t> buf;
+		m_mpeg->audioQueue.tryPop(buf, m_crossbuf.size());
+		std::transform(buf.begin(), buf.end(), m_crossbuf.begin(), da::conv_from_s16);
+		if (m_volume != 1.0) std::transform(m_crossbuf.begin(), m_crossbuf.end(), m_crossbuf.begin(), std::bind1st(std::multiplies<double>(), m_volume));
+		m_crossfade = 0;
+	}
+	stopMusic();
 }
 
 double Audio::getPosition() const {

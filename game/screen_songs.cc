@@ -12,7 +12,6 @@ CScreenSongs::CScreenSongs(std::string const& name, Audio& audio, Songs& songs):
 
 void CScreenSongs::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
-	m_audio.stopMusic();
 	m_playing.clear();
 	m_playReq.clear();
 	theme.reset(new CThemeSongs());

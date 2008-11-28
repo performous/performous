@@ -23,6 +23,7 @@ class Audio {
 	void playPreview(std::string const& filename);
 	bool isPaused() { return m_paused; }
 	void stopMusic();
+	void fadeout();
 	/** Get the length of the currently playing song, in seconds. **/
 	double getLength() { return m_length; }
 	/**
@@ -44,6 +45,8 @@ class Audio {
 	void togglePause() { m_paused = !m_paused; }
 	void toggleSynth(Notes const& notes) { m_notes = (m_notes ? NULL : &notes); }
   private:
+	volatile size_t m_crossfade; // Position within m_crossbuf
+	std::vector<float> m_crossbuf; // Crossfading buffer
 	std::string m_filename;
 	double m_length;
 	double m_volume;
