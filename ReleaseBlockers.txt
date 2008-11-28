@@ -7,6 +7,7 @@ Build
 
 LibDA
 - GStreamer playback?
+- Tonegen with Boost 1.36+
 
 General
 - Do not fail when playback device cannot be used (use "none" device?)?
@@ -15,7 +16,7 @@ General
 
 Audio
 - Crossfade on playPreview?
-   * Read 0.4 ms from old file into a mixing buffer
+   * Read 0.4 s from old file into a mixing buffer
    * Let playback callback mix with the crossfade buffer if there is anything there
 
 Song screen / songs
