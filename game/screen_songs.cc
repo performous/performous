@@ -101,15 +101,12 @@ void CScreenSongs::draw() {
 	// Play/stop preview playback (if it is the time)
 	if (music != m_playing && m_playTimer.get() > 0.4) {
 		if (music.empty()) m_audio.stopMusic(); else m_audio.playPreview(music);
-		m_playing = music;
-	}
-	if (video != m_playingVideo && m_playTimer.get() > 1.0) {
 		try {
 			if (video.empty()) m_video.reset(); else m_video.reset(new Video(video));
 		} catch (std::exception const& e) {
 			std::cerr << "Error loading preview video: " << e.what() << std::endl;
 		}
-		m_playingVideo = video;
+		m_playing = music;
 	}
 	// Switch songs if idle for too long
 	if (!m_audio.isPaused() && m_playTimer.get() > IDLE_TIMEOUT) {
