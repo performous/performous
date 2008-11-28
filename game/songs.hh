@@ -18,7 +18,6 @@ class Songs: boost::noncopyable {
 	~Songs();
 	void update() { if (m_dirty) filter_internal(); }
 	void reload();
-	Song& near(double pos);
 	Song& operator[](std::size_t pos) { return *m_filtered[pos]; }
 	int size() const { return m_filtered.size(); };
 	int empty() const { return m_filtered.empty(); };

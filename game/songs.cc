@@ -93,12 +93,6 @@ class Songs::RestoreSel {
 	}
 };
 
-Song& Songs::near(double pos) {
-	std::size_t s = m_filtered.size();
-	pos = round(remainder(pos, s) + s);
-	return (*this)[std::size_t(pos) % s];
-}
-
 void Songs::randomize() {
 	RestoreSel restore(*this);
 	m_order = 0;

@@ -61,12 +61,12 @@
   </defs>
   <text
      xml:space="preserve"
-     style="font-size:24px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans;text-anchor:middle;text-align:center"
+     style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
      x="400"
-     y="522"
+     y="374.96667"
      id="text1990"><tspan
        sodipodi:role="line"
        id="tspan1992"
        x="400"
-       y="522">Order by</tspan></text>
+       y="374.96667">Order by</tspan></text>
 </svg>

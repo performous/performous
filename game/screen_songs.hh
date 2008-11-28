@@ -2,6 +2,7 @@
 #define __SCREENSONGS_H__
 
 #include "animvalue.hh"
+#include "cachemap.hh"
 #include "textinput.hh"
 #include <boost/scoped_ptr.hpp>
 #include "screen.hh"
@@ -24,13 +25,12 @@ class CScreenSongs : public CScreen {
 	Songs& m_songs;
 	boost::scoped_ptr<CThemeSongs> theme;
 	double m_time;
-	std::string m_cover;
 	std::string m_playing;
 	std::string m_playReq;
 	AnimValue m_playTimer;
 	TextInput m_search;
 	boost::scoped_ptr<Surface> m_emptyCover;
-	boost::scoped_ptr<Surface> m_currentCover;
+	Cachemap<std::string, Surface> m_covers;
 };
 
 #endif

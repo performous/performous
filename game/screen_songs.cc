@@ -7,7 +7,7 @@
 static const double IDLE_TIMEOUT = 45.0; // seconds
 
 CScreenSongs::CScreenSongs(std::string const& name, Audio& audio, Songs& songs):
-  CScreen(name), m_audio(audio), m_songs(songs)
+  CScreen(name), m_audio(audio), m_songs(songs), m_covers(20)
 {}
 
 void CScreenSongs::enter() {
@@ -22,7 +22,7 @@ void CScreenSongs::enter() {
 }
 
 void CScreenSongs::exit() {
-	m_cover.clear();
+	m_covers.clear();
 	m_emptyCover.reset();
 	theme.reset();
 }
@@ -72,18 +72,26 @@ void CScreenSongs::draw() {
 		oss_song << song.str() << "\n";
 		oss_song << "(" << m_songs.currentId() + 1 << "/" << m_songs.size() << ")";
 		oss_order << (m_search.text.empty() ? m_songs.sortDesc() : m_search.text);
-		// Draw the cover
-		Song& song_display = m_songs.near(m_songs.currentPosition());
-		std::string cover = song_display.path + song_display.cover;
-		if (cover != m_cover) {
-			m_cover = cover;
-			m_currentCover.reset();
-			try { m_currentCover.reset(new Surface(cover)); } catch (std::exception& e) {}
-		}
+		// Draw the covers
 		double shift = remainder(m_songs.currentPosition(), 1.0);
-		Surface& s = *(m_currentCover ? m_currentCover : m_emptyCover);
-		s.dimensions.middle(-1.3 * shift).fitInside(0.3, 0.3);
-		s.draw();
+		std::size_t ss = m_songs.size();
+		for (int i = -2; i < 5; ++i) {
+			Song& song_display = m_songs[std::size_t(round(m_songs.currentPosition() - shift) + i + 2 * ss) % ss];
+			Surface* cover = NULL;
+			// Fetch cover image from cache or try loading it
+			try { cover = &m_covers[song_display.path + song_display.cover]; } catch (std::exception const&) {}
+			Surface& s = (cover ? *cover : *m_emptyCover);
+			double diff = 0.0;
+			if (i == 0) diff = (0.5 - fabs(shift)) * 0.04;
+			s.dimensions.middle(-0.2 + 0.17 * (i - shift)).bottom(0.3 + 0.5 * diff).fitInside(0.15 + diff, 0.15 + diff);
+			s.draw();
+			s.dimensions.top(0.3 + 0.5 * diff);
+			s.tex = TexCoords(0, 1, 1, 0);
+			glColor4f(1.0, 1.0, 1.0, 0.4);
+			s.draw();
+			s.tex = TexCoords();
+			glColor3f(1.0, 1.0, 1.0);
+		}
 		music = song.path + song.mp3;
 	}
 	// Draw song and order texts
