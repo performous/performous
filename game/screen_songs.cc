@@ -55,9 +55,10 @@ void CScreenSongs::manageEvent(SDL_Event event) {
 
 void CScreenSongs::draw() {
 	m_songs.update(); // Poll for new songs
-	if (m_video.get()) m_video->render(m_audio.getPosition());
+	if (m_songbg.get()) m_songbg->draw();
+	if (m_video.get()) m_video->render(m_audio.getPosition());  // FIXME: Compensate AV delay here too
 	theme->bg->draw();
-	std::string music, video;
+	std::string music, songbg, video;
 	std::ostringstream oss_song, oss_order;
 	// Test if there are no songs
 	if (m_songs.empty()) {
@@ -91,6 +92,7 @@ void CScreenSongs::draw() {
 			s.tex = TexCoords(); glColor3f(1.0, 1.0, 1.0); // Restore default attributes
 		}
 		music = song.path + song.mp3;
+		songbg = song.path + song.background;
 		video = song.path + song.video;
 	}
 	// Draw song and order texts
@@ -100,12 +102,10 @@ void CScreenSongs::draw() {
 	if (music != m_playReq) { m_playReq = music; m_playTimer.setValue(0.0); }
 	// Play/stop preview playback (if it is the time)
 	if (music != m_playing && m_playTimer.get() > 0.4) {
-		if (music.empty()) m_audio.stopMusic(); else m_audio.playPreview(music);
-		try {
-			if (video.empty()) m_video.reset(); else m_video.reset(new Video(video));
-		} catch (std::exception const& e) {
-			std::cerr << "Error loading preview video: " << e.what() << std::endl;
-		}
+		if (music.empty()) m_audio.fadeout(); else m_audio.playPreview(music);
+		m_songbg.reset(); m_video.reset();
+		if (!songbg.empty()) try { m_songbg.reset(new Surface(songbg)); } catch (std::exception const& e) { std::cerr << e.what() << std::endl; }
+		if (!video.empty()) try { m_video.reset(new Video(video)); } catch (std::exception const& e) { std::cerr << e.what() << std::endl; }
 		m_playing = music;
 	}
 	// Switch songs if idle for too long

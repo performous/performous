@@ -24,6 +24,7 @@ class CScreenSongs : public CScreen {
   private:
 	Audio& m_audio;
 	Songs& m_songs;
+	boost::scoped_ptr<Surface> m_songbg;
 	boost::scoped_ptr<Video> m_video;
 	boost::scoped_ptr<CThemeSongs> theme;
 	std::string m_playing;
