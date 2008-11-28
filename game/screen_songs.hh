@@ -1,15 +1,16 @@
-#ifndef __SCREENSONGS_H__
-#define __SCREENSONGS_H__
+#ifndef PERFORMOUS_SCREEN_SONGS_HH
+#define PERFORMOUS_SCREEN_SONGS_HH
 
+#include <boost/scoped_ptr.hpp>
 #include "animvalue.hh"
 #include "cachemap.hh"
-#include "textinput.hh"
-#include <boost/scoped_ptr.hpp>
+#include "opengl_text.hh"
 #include "screen.hh"
 #include "surface.hh"
 #include "songs.hh"
+#include "textinput.hh"
 #include "theme.hh"
-#include "opengl_text.hh"
+#include "video.hh"
 
 class CAudio;
 
@@ -23,9 +24,10 @@ class CScreenSongs : public CScreen {
   private:
 	Audio& m_audio;
 	Songs& m_songs;
+	boost::scoped_ptr<Video> m_video;
 	boost::scoped_ptr<CThemeSongs> theme;
-	double m_time;
 	std::string m_playing;
+	std::string m_playingVideo;
 	std::string m_playReq;
 	AnimValue m_playTimer;
 	TextInput m_search;

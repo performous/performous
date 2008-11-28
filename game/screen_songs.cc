@@ -8,7 +8,9 @@ static const double IDLE_TIMEOUT = 45.0; // seconds
 
 CScreenSongs::CScreenSongs(std::string const& name, Audio& audio, Songs& songs):
   CScreen(name), m_audio(audio), m_songs(songs), m_covers(20)
-{}
+{
+	m_playTimer.setTarget(std::numeric_limits<double>::infinity()); // Using this as a simple timer counting seconds
+}
 
 void CScreenSongs::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
@@ -16,7 +18,6 @@ void CScreenSongs::enter() {
 	m_playReq.clear();
 	theme.reset(new CThemeSongs());
 	m_emptyCover.reset(new Surface(sm->getThemePathFile("no_cover.svg")));
-	m_time = seconds(now());
 	m_search.text.clear();
 	m_songs.setFilter(m_search.text);
 }
@@ -30,7 +31,6 @@ void CScreenSongs::exit() {
 void CScreenSongs::manageEvent(SDL_Event event) {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	if (event.type != SDL_KEYDOWN) return;
-	m_time = seconds(now());
 	SDL_keysym keysym = event.key.keysym;
 	int key = keysym.sym;
 	SDLMod mod = event.key.keysym.mod;
@@ -55,8 +55,9 @@ void CScreenSongs::manageEvent(SDL_Event event) {
 
 void CScreenSongs::draw() {
 	m_songs.update(); // Poll for new songs
+	if (m_video.get()) m_video->render(m_audio.getPosition());
 	theme->bg->draw();
-	std::string music;
+	std::string music, video;
 	std::ostringstream oss_song, oss_order;
 	// Test if there are no songs
 	if (m_songs.empty()) {
@@ -83,31 +84,37 @@ void CScreenSongs::draw() {
 			Surface& s = (cover ? *cover : *m_emptyCover);
 			double diff = 0.0;
 			if (i == 0) diff = (0.5 - fabs(shift)) * 0.04;
-			s.dimensions.middle(-0.2 + 0.17 * (i - shift)).bottom(0.3 + 0.5 * diff).fitInside(0.15 + diff, 0.15 + diff);
-			s.draw();
-			s.dimensions.top(0.3 + 0.5 * diff);
-			s.tex = TexCoords(0, 1, 1, 0);
-			glColor4f(1.0, 1.0, 1.0, 0.4);
-			s.draw();
-			s.tex = TexCoords();
-			glColor3f(1.0, 1.0, 1.0);
+			// Draw the cover
+			s.dimensions.middle(-0.2 + 0.17 * (i - shift)).bottom(0.3 + 0.5 * diff).fitInside(0.15 + diff, 0.15 + diff); s.draw();
+			// Draw the reflection
+			s.dimensions.top(0.3 + 0.5 * diff); s.tex = TexCoords(0, 1, 1, 0); glColor4f(1.0, 1.0, 1.0, 0.4); s.draw();
+			s.tex = TexCoords(); glColor3f(1.0, 1.0, 1.0); // Restore default attributes
 		}
 		music = song.path + song.mp3;
+		video = song.path + song.video;
 	}
 	// Draw song and order texts
 	theme->song->draw(oss_song.str());
 	theme->order->draw(oss_order.str());
-	if (!m_audio.isPaused() && seconds(now()) - m_time > IDLE_TIMEOUT) {
-		m_time = seconds(now());
-		if (!m_search.text.empty()) { m_search.text.clear(); m_songs.setFilter(m_search.text); }
-		m_songs.random();
-	}
 	// Schedule playback change if the chosen song has changed
-	if (music != m_playReq) { m_playReq = music; m_playTimer.setValue(0.4); }
+	if (music != m_playReq) { m_playReq = music; m_playTimer.setValue(0.0); }
 	// Play/stop preview playback (if it is the time)
-	if (music != m_playing && m_playTimer.get() == 0.0) {
+	if (music != m_playing && m_playTimer.get() > 0.4) {
 		if (music.empty()) m_audio.stopMusic(); else m_audio.playPreview(music);
 		m_playing = music;
+	}
+	if (video != m_playingVideo && m_playTimer.get() > 1.0) {
+		try {
+			if (video.empty()) m_video.reset(); else m_video.reset(new Video(video));
+		} catch (std::exception const& e) {
+			std::cerr << "Error loading preview video: " << e.what() << std::endl;
+		}
+		m_playingVideo = video;
+	}
+	// Switch songs if idle for too long
+	if (!m_audio.isPaused() && m_playTimer.get() > IDLE_TIMEOUT) {
+		if (!m_search.text.empty()) { m_search.text.clear(); m_songs.setFilter(m_search.text); }
+		m_songs.random();
 	}
 }
 
