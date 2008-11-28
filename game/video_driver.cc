@@ -11,14 +11,15 @@ unsigned int screenH() { return s_height; }
 
 Window::Window(unsigned int width, unsigned int height, int fs) {
 	std::atexit(SDL_Quit);
-	if( SDL_Init(SDL_INIT_VIDEO) ==  -1 ) throw std::runtime_error("SDL_Init failed");
+	if( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK) ==  -1 ) throw std::runtime_error("SDL_Init failed");
 	SDL_WM_SetCaption(PACKAGE " " VERSION, PACKAGE);
 	{
 		SDL_Surface* icon = SDL_LoadBMP(CScreenManager::getSingletonPtr()->getThemePathFile("icon.bmp").c_str());
 		SDL_WM_SetIcon(icon, NULL);
 		SDL_FreeSurface(icon);
 	}
-	m_videoFlags = SDL_OPENGL | SDL_DOUBLEBUF | SDL_RESIZABLE | (fs ? SDL_FULLSCREEN : 0);
+	m_fullscreen = (fs != 0);
+	m_videoFlags = SDL_OPENGL | SDL_DOUBLEBUF | SDL_RESIZABLE;
 	resize(width, height);
 	SDL_ShowCursor(SDL_DISABLE);
 	SDL_EnableUNICODE(SDL_ENABLE);
@@ -49,7 +50,7 @@ void Window::swap() {
 
 void Window::resize(unsigned int width, unsigned int height) {
 	const SDL_VideoInfo* videoInf = SDL_GetVideoInfo();
-	screen = SDL_SetVideoMode(width, height, videoInf->vfmt->BitsPerPixel, m_videoFlags);
+	screen = SDL_SetVideoMode(width, height, videoInf->vfmt->BitsPerPixel, m_videoFlags | (m_fullscreen ? SDL_FULLSCREEN : 0));
 	if (!screen) throw std::runtime_error("SDL_SetVideoMode failed");
 }
 

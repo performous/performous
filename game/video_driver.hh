@@ -18,10 +18,12 @@ class Window {
 	void resize(unsigned int width, unsigned int height);
 	void fullscreen() {
 		SDL_WM_ToggleFullScreen(screen);
+		m_fullscreen = !m_fullscreen;
 	}
   private:
 	SDL_Surface* screen;
 	unsigned int m_videoFlags;
+	bool m_fullscreen;
 };
 
 #endif
