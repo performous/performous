@@ -19,6 +19,7 @@ void CScreenSongs::enter() {
 	m_emptyCover.reset(new Surface(sm->getThemePathFile("no_cover.svg")));
 	m_search.text.clear();
 	m_songs.setFilter(m_search.text);
+	m_audio.fadeout();
 }
 
 void CScreenSongs::exit() {
@@ -30,6 +31,7 @@ void CScreenSongs::exit() {
 	m_playing.clear();
 	m_playReq.clear();
 	m_videoReq.clear();
+	m_audio.fadeout();
 }
 
 void CScreenSongs::manageEvent(SDL_Event event) {

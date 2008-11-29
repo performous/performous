@@ -35,7 +35,7 @@ CFfmpeg::~CFfmpeg() {
 	audioQueue.reset();
 	if (!m_thread) {
 		std::cerr << "FFMPEG crashed at some point, decoding " << m_filename << std::endl;
-		std::cerr << "Please restart USNG to avoid resource leaks and program crashes!" << std::endl;
+		std::cerr << "Please restart Performous to avoid resource leaks and program crashes!" << std::endl;
 		return;
 	}
 	m_thread->join();
