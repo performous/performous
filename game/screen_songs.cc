@@ -15,8 +15,6 @@ CScreenSongs::CScreenSongs(std::string const& name, Audio& audio, Songs& songs):
 
 void CScreenSongs::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
-	m_playing.clear();
-	m_playReq.clear();
 	theme.reset(new CThemeSongs());
 	m_emptyCover.reset(new Surface(sm->getThemePathFile("no_cover.svg")));
 	m_search.text.clear();
@@ -27,6 +25,11 @@ void CScreenSongs::exit() {
 	m_covers.clear();
 	m_emptyCover.reset();
 	theme.reset();
+	m_video.reset();
+	m_songbg.reset();
+	m_playing.clear();
+	m_playReq.clear();
+	m_videoReq.clear();
 }
 
 void CScreenSongs::manageEvent(SDL_Event event) {
@@ -67,14 +70,14 @@ void CScreenSongs::draw() {
 		if (m_search.text.empty()) oss_song << "no songs found";
 		else {
 			oss_song << "no songs match search";
-			oss_order << m_search.text;
+			oss_order << m_search.text << '\n';
 		}
 	} else {
 		Song& song = m_songs.current();
 		// Format the song information text
-		oss_song << song.title << '\n' << song.artist << "\n\n";
-		oss_song << "(" << m_songs.currentId() + 1 << "/" << m_songs.size() << ")";
-		oss_order << (m_search.text.empty() ? m_songs.sortDesc() : m_search.text);
+		oss_song << song.title << '\n' << song.artist;
+		oss_order << (m_search.text.empty() ? m_songs.sortDesc() : m_search.text) << '\n';
+		oss_order << "(" << m_songs.currentId() + 1 << "/" << m_songs.size() << ")";
 		// Draw the covers
 		std::size_t ss = m_songs.size();
 		double spos = m_songs.currentPosition();
@@ -109,8 +112,12 @@ void CScreenSongs::draw() {
 		if (music.empty()) m_audio.fadeout(); else m_audio.playPreview(music);
 		m_songbg.reset(); m_video.reset();
 		if (!songbg.empty()) try { m_songbg.reset(new Surface(songbg)); } catch (std::exception const&) {}
-		if (!video.empty()) try { m_video.reset(new Video(video)); } catch (std::exception const&) {}
 		m_playing = music;
+		m_videoReq = video;
+	}
+	if (!m_videoReq.empty() && m_playTimer.get() > 0.6) {
+		try { m_video.reset(new Video(video)); } catch (std::exception const&) {}
+		m_videoReq.clear();
 	}
 	// Switch songs if idle for too long
 	if (!m_audio.isPaused() && m_playTimer.get() > IDLE_TIMEOUT) {
