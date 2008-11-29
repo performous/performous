@@ -9,6 +9,7 @@ static const double IDLE_TIMEOUT = 45.0; // seconds
 CScreenSongs::CScreenSongs(std::string const& name, Audio& audio, Songs& songs):
   CScreen(name), m_audio(audio), m_songs(songs), m_covers(20)
 {
+	m_songs.setAnimMargins(5.0, 5.0);
 	m_playTimer.setTarget(std::numeric_limits<double>::infinity()); // Using this as a simple timer counting seconds
 }
 
@@ -75,10 +76,13 @@ void CScreenSongs::draw() {
 		oss_song << "(" << m_songs.currentId() + 1 << "/" << m_songs.size() << ")";
 		oss_order << (m_search.text.empty() ? m_songs.sortDesc() : m_search.text);
 		// Draw the covers
-		double shift = remainder(m_songs.currentPosition(), 1.0);
 		std::size_t ss = m_songs.size();
-		for (int i = -2; i < 5; ++i) {
-			Song& song_display = m_songs[std::size_t(round(m_songs.currentPosition() - shift) + i + 2 * ss) % ss];
+		double spos = m_songs.currentPosition();
+		int baseidx = spos + 0.5;
+		double shift = spos - baseidx;
+		for (int i = -3; i < 6; ++i) {
+			if (baseidx + i < 0 || baseidx + i >= int(ss)) continue;
+			Song& song_display = m_songs[baseidx + i];
 			Surface* cover = NULL;
 			// Fetch cover image from cache or try loading it
 			try { cover = &m_covers[song_display.path + song_display.cover]; } catch (std::exception const&) {}
@@ -104,8 +108,8 @@ void CScreenSongs::draw() {
 	if (music != m_playing && m_playTimer.get() > 0.4) {
 		if (music.empty()) m_audio.fadeout(); else m_audio.playPreview(music);
 		m_songbg.reset(); m_video.reset();
-		if (!songbg.empty()) try { m_songbg.reset(new Surface(songbg)); } catch (std::exception const& e) { std::cerr << e.what() << std::endl; }
-		if (!video.empty()) try { m_video.reset(new Video(video)); } catch (std::exception const& e) { std::cerr << e.what() << std::endl; }
+		if (!songbg.empty()) try { m_songbg.reset(new Surface(songbg)); } catch (std::exception const&) {}
+		if (!video.empty()) try { m_video.reset(new Video(video)); } catch (std::exception const&) {}
 		m_playing = music;
 	}
 	// Switch songs if idle for too long

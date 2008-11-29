@@ -41,11 +41,13 @@ class AnimValue {
 
 class AnimAcceleration {
   public:
-	AnimAcceleration(): m_target(), m_songs(), m_position(), m_velocity(), m_time() {}
+	AnimAcceleration(): m_target(), m_songs(), m_position(), m_velocity(), m_marginLeft(), m_marginRight(), m_time() {}
+	void setMargins(double left, double right) { m_marginLeft = left; m_marginRight = right; }
 	double getValue() {
 		const double acceleration = 50.0; // the coefficient of velocity changes (animation speed)
 		const double overshoot = 0.95; // Over 1.0 decelerates too late, less than 1.0 decelerates too early
 		if (m_songs == 0) return m_target;
+		double num = m_marginLeft + m_songs + m_marginRight;
 		boost::xtime curtime = now();
 		double duration = seconds(curtime) - seconds(m_time);
 		m_time = curtime;
@@ -54,7 +56,7 @@ class AnimAcceleration {
 		std::size_t rounds = 1.0 + 1000.0 * duration; // 1 ms or shorter timesteps
 		double t = duration / rounds;
 		for (std::size_t i = 0; i < rounds; ++i) {
-			double d = remainder(m_target - m_position, m_songs); // Distance (via shortest way)
+			double d = remainder(m_target - m_position, num); // Distance (via shortest way)
 			// Allow it to stop nicely, without jitter
 			if (std::abs(m_velocity) < 0.1 && std::abs(d) < 0.001) {
 				m_velocity = 0.0;
@@ -68,7 +70,9 @@ class AnimAcceleration {
 			m_velocity += t * a;
 			m_position += t * m_velocity;
 		}
-		return m_position = remainder(m_position, m_songs); // Return & store normalized position
+		if ((m_position = fmod(m_position, num)) < 0.0) m_position += num; // Normalize to [0, num]
+		if (m_position > m_marginLeft + m_songs) m_position -= num; // Normalize to [-m_marginLeft, songs + m_marginRight]
+		return m_position;
 	}
 	unsigned int getTarget() const { return m_target; };
 	void setTarget(unsigned int target, unsigned int songs) {
@@ -83,6 +87,8 @@ class AnimAcceleration {
 	unsigned int m_songs;
 	double m_position;
 	double m_velocity;
+	double m_marginLeft;
+	double m_marginRight;
 	boost::xtime m_time;
 };
 
