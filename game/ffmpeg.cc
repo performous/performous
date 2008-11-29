@@ -21,12 +21,11 @@ CFfmpeg::CFfmpeg(bool _decodeVideo, bool _decodeAudio, std::string const& _filen
   m_filename(_filename), m_rate(rate), m_quit(),
   pFormatCtx(), pResampleCtx(), img_convert_ctx(), pVideoCodecCtx(), pAudioCodecCtx(), pVideoCodec(), pAudioCodec()
 {
-	av_register_all();
 	videoStream=-1;
 	audioStream=-1;
 	decodeVideo=_decodeVideo;
 	decodeAudio=_decodeAudio;
-	open();
+	m_thread.reset(new boost::thread(boost::ref(*this)));
 }
 
 CFfmpeg::~CFfmpeg() {
@@ -48,11 +47,12 @@ CFfmpeg::~CFfmpeg() {
 }
 
 double CFfmpeg::duration() {
-	if (decodeVideo || decodeAudio) return pFormatCtx->duration / double(AV_TIME_BASE);
+	if (pFormatCtx) return pFormatCtx->duration / double(AV_TIME_BASE);
 	return getNaN();
 }
 
 void CFfmpeg::open() {
+	av_register_all();
 	av_log_set_level(AV_LOG_QUIET);
 	if (av_open_input_file(&pFormatCtx, m_filename.c_str(), NULL, 0, NULL)) throw std::runtime_error("Cannot open input file");
 	if (av_find_stream_info(pFormatCtx) < 0) throw std::runtime_error("Cannot find stream information");
@@ -91,7 +91,6 @@ void CFfmpeg::open() {
 		  width, height, PIX_FMT_RGB24,
 		  SWS_POINT, NULL, NULL, NULL);
 	}
-	m_thread.reset(new boost::thread(boost::ref(*this)));
 }
 
 #ifdef USE_FFMPEG_CRASH_RECOVERY
@@ -125,6 +124,7 @@ void CFfmpeg::operator()() {
 	sigabrt = std::signal(SIGABRT, usng_ffmpeg_crash_hack);
 	sigsegv = std::signal(SIGSEGV, usng_ffmpeg_crash_hack);
 #endif
+	try { open(); } catch (std::exception const& e) { std::cerr << "FFMPEG failed to open " << m_filename << ": " << e.what() << std::endl; }
 	int errors = 0;
 	while (!m_quit) {
 		try {
@@ -143,8 +143,6 @@ void CFfmpeg::operator()() {
 		}
 	}
 }
-
-#include <cmath>
 
 void CFfmpeg::seek(double time) {
 	m_seekTarget = time;
