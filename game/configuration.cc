@@ -3,6 +3,8 @@
 #include <boost/lexical_cast.hpp>
 #include <algorithm>
 
+std::map<std::string, boost::any> config;
+
 CConfigurationAudioVolume::CConfigurationAudioVolume(std::string const& title, Audio& audio, GetFunc get, SetFunc set):
   CConfiguration(title), m_audio(audio), m_get(get), m_set(set)
 {}

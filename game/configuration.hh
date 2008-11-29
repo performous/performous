@@ -1,8 +1,25 @@
-#ifndef __CONFIGURATION_H__
-#define __CONFIGURATION_H__
+#pragma once
+#ifndef PERFORMOUS_CONFIGURATION_HH
+#define PERFORMOUS_CONFIGURATION_HH
 
 #include "audio.hh"
+#include "util.hh"
+#include <boost/any.hpp>
+#include <map>
 #include <string>
+
+extern std::map<std::string, boost::any> config;
+
+template<int min, int max> class Integer {
+  public:
+	Integer(int value): m_value(clamp(value, min, max)) {}
+	Integer& operator=(int value) { m_value = clamp(value, min, max); return *this; }
+	int val() const { return m_value; }
+	int& val() { return m_value; }
+  private:
+	int m_value;
+};
+
 
 class CConfiguration {
   public:
