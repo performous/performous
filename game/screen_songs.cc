@@ -71,7 +71,7 @@ void CScreenSongs::draw() {
 	} else {
 		Song& song = m_songs.current();
 		// Format the song information text
-		oss_song << song.str() << "\n";
+		oss_song << song.title << '\n' << song.artist << "\n\n";
 		oss_song << "(" << m_songs.currentId() + 1 << "/" << m_songs.size() << ")";
 		oss_order << (m_search.text.empty() ? m_songs.sortDesc() : m_search.text);
 		// Draw the covers
@@ -83,12 +83,12 @@ void CScreenSongs::draw() {
 			// Fetch cover image from cache or try loading it
 			try { cover = &m_covers[song_display.path + song_display.cover]; } catch (std::exception const&) {}
 			Surface& s = (cover ? *cover : *m_emptyCover);
-			double diff = 0.0;
-			if (i == 0) diff = (0.5 - fabs(shift)) * 0.04;
+			double diff = (i == 0 ? (0.5 - fabs(shift)) * 0.07 : 0.0);
+			double y = 0.28 + 0.5 * diff;
 			// Draw the cover
-			s.dimensions.middle(-0.2 + 0.17 * (i - shift)).bottom(0.3 + 0.5 * diff).fitInside(0.15 + diff, 0.15 + diff); s.draw();
+			s.dimensions.middle(-0.2 + 0.17 * (i - shift)).bottom(y).fitInside(0.15 + diff, 0.15 + diff); s.draw();
 			// Draw the reflection
-			s.dimensions.top(0.3 + 0.5 * diff); s.tex = TexCoords(0, 1, 1, 0); glColor4f(1.0, 1.0, 1.0, 0.4); s.draw();
+			s.dimensions.top(y); s.tex = TexCoords(0, 1, 1, 0); glColor4f(1.0, 1.0, 1.0, 0.4); s.draw();
 			s.tex = TexCoords(); glColor3f(1.0, 1.0, 1.0); // Restore default attributes
 		}
 		music = song.path + song.mp3;

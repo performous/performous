@@ -43,7 +43,7 @@
      pagecolor="#ffffff"
      id="base"
      inkscape:zoom="0.89095454"
-     inkscape:cx="340.62116"
+     inkscape:cx="141.39663"
      inkscape:cy="249.62029"
      inkscape:window-x="235"
      inkscape:window-y="25"
@@ -61,12 +61,12 @@
   </defs>
   <text
      xml:space="preserve"
-     style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+     style="font-size:24px;font-style:normal;font-weight:bold;text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Verdana;-inkscape-font-specification:Verdana Bold;font-stretch:normal;font-variant:normal"
      x="400"
-     y="374.96667"
+     y="345.78448"
      id="text1990"><tspan
        sodipodi:role="line"
        id="tspan1992"
        x="400"
-       y="374.96667">Order by</tspan></text>
+       y="345.78448">Order by</tspan></text>
 </svg>
