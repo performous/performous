@@ -1,11 +1,12 @@
-#ifndef __AUDIO_H_
-#define __AUDIO_H_
+#ifndef PERFORMOUS_AUDIO_HH
+#define PERFORMOUS_AUDIO_HH
 
 #include <string>
 
 #include "ffmpeg.hh"
 #include "notes.hh"
 #include <boost/scoped_ptr.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 #include <audio.hpp>
 
 /** @short High level audio playback API **/
@@ -45,7 +46,8 @@ class Audio {
 	void togglePause() { m_paused = !m_paused; }
 	void toggleSynth(Notes const& notes) { m_notes = (m_notes ? NULL : &notes); }
   private:
-	volatile size_t m_crossfade; // Position within m_crossbuf
+	boost::recursive_mutex m_mutex;
+	size_t m_crossfade; // Position within m_crossbuf
 	std::vector<float> m_crossbuf; // Crossfading buffer
 	std::string m_filename;
 	double m_length;
@@ -53,8 +55,8 @@ class Audio {
 	unsigned m_volumeMusic, m_volumePreview;
 	void setVolume_internal(unsigned int volume);
 	boost::scoped_ptr<CFfmpeg> m_mpeg;
-	volatile bool m_paused;
-	volatile bool m_prebuffering;
+	bool m_paused;
+	bool m_prebuffering;
 	Notes const* volatile m_notes;
 	da::settings m_rs;
 	da::playback m_playback;

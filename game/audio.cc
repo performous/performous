@@ -24,6 +24,7 @@ Audio::Audio(std::string const& pdev, unsigned int rate):
 {}
 
 void Audio::operator()(da::pcm_data& areas, da::settings const&) {
+	boost::recursive_mutex::scoped_lock l(m_mutex);
 	std::size_t samples = areas.channels * areas.frames;
 	unsigned int size = 0;
 	static double phase = 0.0;
@@ -70,11 +71,13 @@ void Audio::operator()(da::pcm_data& areas, da::settings const&) {
 }
 
 void Audio::setVolume_internal(unsigned int volume) {
+	boost::recursive_mutex::scoped_lock l(m_mutex);
 	if (volume == 0) { m_volume = 0.0; return; }
 	m_volume = std::pow(10.0, (volume - 100.0) / 100.0 * 2.0);
 }
 
 void Audio::playMusic(std::string const& filename) {
+	boost::recursive_mutex::scoped_lock l(m_mutex);
 	stopMusic();
 	try {
 		m_mpeg.reset(new CFfmpeg(false, true, filename, m_rs.rate()));
@@ -87,6 +90,7 @@ void Audio::playMusic(std::string const& filename) {
 }
 
 void Audio::playPreview(std::string const& filename) {
+	boost::recursive_mutex::scoped_lock l(m_mutex);
 	fadeout();
 	try {
 		m_mpeg.reset(new CFfmpeg(false, true, filename, m_rs.rate()));
@@ -99,6 +103,7 @@ void Audio::playPreview(std::string const& filename) {
 }
 
 void Audio::stopMusic() {
+	boost::recursive_mutex::scoped_lock l(m_mutex);
 	m_notes = NULL;
 	setVolume_internal(0);
 	m_mpeg.reset();
@@ -108,6 +113,7 @@ void Audio::stopMusic() {
 }
 
 void Audio::fadeout() {
+	boost::recursive_mutex::scoped_lock l(m_mutex);
 	if (m_crossfade == m_crossbuf.size() && m_mpeg) {
 		// Read audio into crossfade buffer
 		std::vector<int16_t> buf;
@@ -127,6 +133,7 @@ double Audio::getPosition() const {
 bool Audio::isPlaying() const { return m_mpeg && !m_mpeg->audioQueue.eof(); }
 
 void Audio::seek(double seek_dist) {
+	boost::recursive_mutex::scoped_lock l(m_mutex);
 	if (!isPlaying()) return;
 	int position = clamp(getPosition() + seek_dist, 0.0, m_length - 1.0);
 	m_paused = true;
