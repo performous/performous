@@ -25,6 +25,7 @@ CFfmpeg::CFfmpeg(bool _decodeVideo, bool _decodeAudio, std::string const& _filen
 	audioStream=-1;
 	decodeVideo=_decodeVideo;
 	decodeAudio=_decodeAudio;
+	m_seekTarget = getNaN();
 	m_thread.reset(new boost::thread(boost::ref(*this)));
 }
 
@@ -58,7 +59,6 @@ void CFfmpeg::open() {
 	if (av_find_stream_info(pFormatCtx) < 0) throw std::runtime_error("Cannot find stream information");
 	videoStream = -1;
 	audioStream = -1;
-	m_seekTarget = getNaN();
 	// Take the first video/audio streams
 	for (unsigned int i=0; i<pFormatCtx->nb_streams; i++) {
 		if (videoStream == -1 && pFormatCtx->streams[i]->codec->codec_type==CODEC_TYPE_VIDEO) videoStream = i;
@@ -104,14 +104,14 @@ namespace {
 	sighandler sigabrt, sigsegv;
 }
 
-extern "C" void usng_ffmpeg_crash_hack(int sig) {
+extern "C" void performous_ffmpeg_crash_hack(int sig) {
 	if (ffmpeg_ptr.get()) {
 		signal(SIGABRT, sigabrt);
 		signal(SIGSEGV, sigsegv);
 		(*ffmpeg_ptr)->crash(); sleep(1000000000);
 	} // Uh-oh, FFMPEG goes again; wait here until eternity
 	sighandler h = (sig == SIGABRT ? sigabrt : sigsegv);
-	if (h && h != usng_ffmpeg_crash_hack) h(sig); // From another thread, call original handler
+	if (h && h != performous_ffmpeg_crash_hack) h(sig); // From another thread, call original handler
 	std::abort();
 }
 #endif
@@ -121,8 +121,8 @@ void CFfmpeg::operator()() {
 	// A hack to avoid ffmpeg crashing the program :)
 	ffmpeg_ptr.reset(new CFfmpeg*);
 	*ffmpeg_ptr = this;
-	sigabrt = std::signal(SIGABRT, usng_ffmpeg_crash_hack);
-	sigsegv = std::signal(SIGSEGV, usng_ffmpeg_crash_hack);
+	sigabrt = std::signal(SIGABRT, performous_ffmpeg_crash_hack);
+	sigsegv = std::signal(SIGSEGV, performous_ffmpeg_crash_hack);
 #endif
 	try { open(); } catch (std::exception const& e) { std::cerr << "FFMPEG failed to open " << m_filename << ": " << e.what() << std::endl; return; }
 	int errors = 0;
