@@ -91,7 +91,6 @@ void Audio::playMusic(std::string const& filename, bool preview) {
 	boost::recursive_mutex::scoped_lock l(m_mutex);
 	fadeout();
 	m_mpeg.reset(mpeg.release());
-	if (m_mpeg->duration() < 0) return;
 	setVolume_internal(preview ? m_volumePreview : m_volumeMusic);
 	m_prebuffering = true;
 	if (!preview) m_paused = false;
