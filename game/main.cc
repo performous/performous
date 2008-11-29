@@ -13,7 +13,6 @@
 #include <boost/program_options.hpp>
 #include <boost/spirit/core.hpp>
 #include <boost/thread.hpp>
-#include <cstdlib>
 #include <fstream>
 #include <set>
 #include <string>
@@ -81,7 +80,6 @@ int main(int argc, char** argv) {
 	signal(SIGQUIT, quit);
 	signal(SIGTERM, quit);
 	std::ios::sync_with_stdio(false);  // We do not use C stdio
-	srand(time(NULL));  // Seed for std::random_shuffle (used by song selector)
 	da::initialize libda;
 	bool fullscreen = false;
 	bool fps = false;

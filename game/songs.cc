@@ -176,9 +176,18 @@ void Songs::sortChange(int diff) {
 	sort_internal();
 }
 
+namespace {
+	int rnd(int n) { return rand() % n; }
+}
+
 void Songs::sort_internal() {
 	switch (m_order) {
-	  case 0: if (!m_loading) std::random_shuffle(m_filtered.begin(), m_filtered.end()); break;
+	  case 0:
+		if (!m_loading) {
+			srand(time(NULL));
+			std::random_shuffle(m_filtered.begin(), m_filtered.end(), rnd);
+		}
+		break;
 	  case 1: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&Song::collateByTitle)); break;
 	  case 2: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&Song::collateByArtist)); break;
 	  case 3: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&Song::edition)); break;
