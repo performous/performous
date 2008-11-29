@@ -1,11 +1,12 @@
 #include "audio.hh"
 
-#include "util.hh"
-#include "xtime.hh"
+#include <cmath>
 #include <functional>
 #include <iostream>
-#include <cmath>
+#include <memory>
 #include "screen.hh"
+#include "util.hh"
+#include "xtime.hh"
 
 Audio::Audio(std::string const& pdev, unsigned int rate):
 	m_crossfade(0),
@@ -76,30 +77,24 @@ void Audio::setVolume_internal(unsigned int volume) {
 	m_volume = std::pow(10.0, (volume - 100.0) / 100.0 * 2.0);
 }
 
-void Audio::playMusic(std::string const& filename) {
-	boost::recursive_mutex::scoped_lock l(m_mutex);
-	stopMusic();
+void Audio::playMusic(std::string const& filename, bool preview) {
+	// First construct the new stream
+	std::auto_ptr<CFfmpeg> mpeg;
 	try {
-		m_mpeg.reset(new CFfmpeg(false, true, filename, m_rs.rate()));
-		if (m_mpeg->duration() < 0) return;
-		m_length = m_mpeg->duration();
-		setVolume_internal(m_volumeMusic);
+		mpeg.reset(new CFfmpeg(false, true, filename, m_rs.rate()));
+		if (preview) mpeg->seek(30.0);
 	} catch (std::runtime_error& e) {
 		std::cerr << "Error loading " << filename << " (" << e.what() << ")" << std::endl;
+		return;
 	}
-}
-
-void Audio::playPreview(std::string const& filename) {
+	// Then quickly replace the old one
 	boost::recursive_mutex::scoped_lock l(m_mutex);
 	fadeout();
-	try {
-		m_mpeg.reset(new CFfmpeg(false, true, filename, m_rs.rate()));
-		m_mpeg->seek(30.0);
-		m_length = m_mpeg->duration();
-		setVolume_internal(m_volumePreview);
-	} catch (std::runtime_error& e) {
-		std::cerr << "Error loading " << filename << " (" << e.what() << ")" << std::endl;
-	}
+	m_mpeg.reset(mpeg.release());
+	if (m_mpeg->duration() < 0) return;
+	setVolume_internal(preview ? m_volumePreview : m_volumeMusic);
+	m_prebuffering = true;
+	if (!preview) m_paused = false;
 }
 
 void Audio::stopMusic() {
@@ -107,14 +102,11 @@ void Audio::stopMusic() {
 	m_notes = NULL;
 	setVolume_internal(0);
 	m_mpeg.reset();
-	m_length = getNaN();
-	m_prebuffering = true; // For the next song
-	m_paused = false;
 }
 
 void Audio::fadeout() {
 	boost::recursive_mutex::scoped_lock l(m_mutex);
-	if (m_crossfade == m_crossbuf.size() && m_mpeg) {
+	if (m_crossfade == m_crossbuf.size() && m_mpeg && !m_paused) {
 		// Read audio into crossfade buffer
 		std::vector<int16_t> buf;
 		m_mpeg->audioQueue.tryPop(buf, m_crossbuf.size());
@@ -125,20 +117,16 @@ void Audio::fadeout() {
 	stopMusic();
 }
 
-double Audio::getPosition() const {
-	if (!m_mpeg) return getNaN();
-	return m_mpeg->position();
-}
-
+double Audio::getPosition() const { return m_mpeg ? m_mpeg->position() : getNaN(); }
+double Audio::getLength() const { return m_mpeg ? m_mpeg->duration() : getNaN(); }
 bool Audio::isPlaying() const { return m_mpeg && !m_mpeg->audioQueue.eof(); }
 
 void Audio::seek(double seek_dist) {
 	boost::recursive_mutex::scoped_lock l(m_mutex);
 	if (!isPlaying()) return;
-	int position = clamp(getPosition() + seek_dist, 0.0, m_length - 1.0);
-	m_paused = true;
-	m_prebuffering = true;
+	int position = clamp(getPosition() + seek_dist, 0.0, m_mpeg->duration() - 1.0);
 	m_mpeg->seek(position);
+	m_prebuffering = true;
 	m_paused = false;
 }
 

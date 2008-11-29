@@ -17,16 +17,16 @@ class Audio {
 	/** Play a song from the beginning
 	 * @param filename the track filename
 	 */
-	void playMusic(std::string const& filename);
-	/** Play/crossfade (TODO) a preview of the song, starting at 30 seconds
+	void playMusic(std::string const& filename, bool preview = false);
+	/** Play a preview of the song, starting at 30 seconds
 	 * @param filename the track filename
 	 */
-	void playPreview(std::string const& filename);
+	void playPreview(std::string const& filename) { playMusic(filename, true); }
 	bool isPaused() { return m_paused; }
 	void stopMusic();
 	void fadeout();
 	/** Get the length of the currently playing song, in seconds. **/
-	double getLength() { return m_length; }
+	double getLength() const;
 	/**
 	 * This methods seek forward in the stream (backwards if
 	 * argument is negative), and continues playing.
@@ -50,7 +50,6 @@ class Audio {
 	size_t m_crossfade; // Position within m_crossbuf
 	std::vector<float> m_crossbuf; // Crossfading buffer
 	std::string m_filename;
-	double m_length;
 	double m_volume;
 	unsigned m_volumeMusic, m_volumePreview;
 	void setVolume_internal(unsigned int volume);
