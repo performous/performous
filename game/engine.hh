@@ -53,7 +53,7 @@ class Engine {
 	size_t m_time;
 	volatile bool m_quit;
 	mutable boost::mutex m_mutex;
-	boost::thread m_thread;  // IMPORTANT: This must be the last variable
+	boost::scoped_ptr<boost::thread> m_thread;
   public:
 	static const double TIMESTEP;
 	/** Construct a new Engine with the players that go with it.
@@ -63,15 +63,16 @@ class Engine {
 	* @param anBegin Analyzers to use (ending iterator)
 	**/
 	template <typename FwdIt> Engine(Audio& audio, Song& song, FwdIt anBegin, FwdIt anEnd):
-	  m_audio(audio), m_song(song), m_latencyAR(0.1), m_time(), m_quit(), m_thread(boost::ref(*this))
+	  m_audio(audio), m_song(song), m_latencyAR(0.1), m_time(), m_quit()
 	{
 		while (anBegin != anEnd) m_players.push_back(Player(song, *anBegin++));
 		size_t player = 0;
 		for (std::list<Player>::iterator it = m_players.begin(); it != m_players.end(); ++it, ++player) it->m_color = playerColors[player % playerColorsSize];
+		m_thread.reset(new boost::thread(boost::ref(*this)));
 	}
-	~Engine() { m_quit = true; m_thread.join(); }
+	~Engine() { m_quit = true; m_thread->join(); }
 	void kill() { m_quit = true; }
-	void setLatencyAR(double value) { m_latencyAR = std::min(std::max(0.0, value), 0.5); }
+	void setLatencyAR(double value) { m_latencyAR = clamp(round(value * 1000.0) / 1000.0, 0.0, 0.5); }
 	double getLatencyAR() const { return m_latencyAR; }
 	/** Used internally for boost::thread. Do not call this yourself. (boost::thread requires this to be public). **/
 	void operator()() {
