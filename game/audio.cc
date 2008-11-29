@@ -82,7 +82,7 @@ void Audio::playMusic(std::string const& filename, bool preview) {
 	std::auto_ptr<CFfmpeg> mpeg;
 	try {
 		mpeg.reset(new CFfmpeg(false, true, filename, m_rs.rate()));
-		if (preview) mpeg->seek(30.0);
+		if (preview) mpeg->seek(30.0, false);
 	} catch (std::runtime_error& e) {
 		std::cerr << "Error loading " << filename << " (" << e.what() << ")" << std::endl;
 		return;

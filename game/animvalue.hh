@@ -82,6 +82,7 @@ class AnimAcceleration {
 		m_songs = songs;
 		m_position = target;
 	};
+	double getVelocity() const { return m_velocity; }
   private:
 	unsigned int m_target;
 	unsigned int m_songs;

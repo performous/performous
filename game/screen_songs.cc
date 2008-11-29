@@ -30,7 +30,6 @@ void CScreenSongs::exit() {
 	m_songbg.reset();
 	m_playing.clear();
 	m_playReq.clear();
-	m_videoReq.clear();
 	m_audio.fadeout();
 }
 
@@ -83,7 +82,7 @@ void CScreenSongs::draw() {
 		// Draw the covers
 		std::size_t ss = m_songs.size();
 		double spos = m_songs.currentPosition();
-		int baseidx = spos + 0.5;
+		int baseidx = spos + 1.5; --baseidx; // Round correctly
 		double shift = spos - baseidx;
 		for (int i = -3; i < 6; ++i) {
 			if (baseidx + i < 0 || baseidx + i >= int(ss)) continue;
@@ -95,9 +94,9 @@ void CScreenSongs::draw() {
 			double diff = (i == 0 ? (0.5 - fabs(shift)) * 0.07 : 0.0);
 			double y = 0.28 + 0.5 * diff;
 			// Draw the cover
-			s.dimensions.middle(-0.2 + 0.17 * (i - shift)).bottom(y).fitInside(0.15 + diff, 0.15 + diff); s.draw();
+			s.dimensions.middle(-0.2 + 0.17 * (i - shift)).bottom(y - 0.2 * diff).fitInside(0.14 + diff, 0.14 + diff); s.draw();
 			// Draw the reflection
-			s.dimensions.top(y); s.tex = TexCoords(0, 1, 1, 0); glColor4f(1.0, 1.0, 1.0, 0.4); s.draw();
+			s.dimensions.top(y + 0.2 * diff); s.tex = TexCoords(0, 1, 1, 0); glColor4f(1.0, 1.0, 1.0, 0.4); s.draw();
 			s.tex = TexCoords(); glColor3f(1.0, 1.0, 1.0); // Restore default attributes
 		}
 		music = song.path + song.mp3;
@@ -111,15 +110,11 @@ void CScreenSongs::draw() {
 	if (music != m_playReq) { m_playReq = music; m_playTimer.setValue(0.0); }
 	// Play/stop preview playback (if it is the time)
 	if (music != m_playing && m_playTimer.get() > 0.4) {
-		if (music.empty()) m_audio.fadeout(); else m_audio.playPreview(music);
 		m_songbg.reset(); m_video.reset();
+		if (music.empty()) m_audio.fadeout(); else m_audio.playPreview(music);
 		if (!songbg.empty()) try { m_songbg.reset(new Surface(songbg)); } catch (std::exception const&) {}
-		m_playing = music;
-		m_videoReq = video;
-	}
-	if (!m_videoReq.empty() && m_playTimer.get() > 0.6) {
 		try { m_video.reset(new Video(video)); } catch (std::exception const&) {}
-		m_videoReq.clear();
+		m_playing = music;
 	}
 	// Switch songs if idle for too long
 	if (!m_audio.isPaused() && m_playTimer.get() > IDLE_TIMEOUT) {

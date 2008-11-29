@@ -151,8 +151,8 @@ class CFfmpeg {
 	unsigned width, height;
 	VideoFifo  videoQueue;
 	AudioFifo  audioQueue;
-	/** Seek to the chosen time. May block for a short while until the seek is done. **/
-	void seek(double time);
+	/** Seek to the chosen time. Will block until the seek is done, if wait is true. **/
+	void seek(double time, bool wait = true);
 	double duration();
 	double position() { return std::max(audioQueue.position(),videoQueue.position()); };
   private:

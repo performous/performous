@@ -26,9 +26,7 @@ void CScreenSing::enter() {
 	m_audio.playMusic(file.c_str());
 	theme.reset(new CThemeSing());
 	if (!song.background.empty()) { try { m_background.reset(new Surface(song.path + song.background, true)); } catch (std::exception& e) { std::cerr << e.what() << std::endl; } }
-#define TRYLOAD(field, class) if (!song.field.empty()) { try { m_##field.reset(new class(song.path + song.field)); } catch (std::exception const& e) { std::cerr << e.what() << std::endl; } }
-	TRYLOAD(video, Video)
-#undef TRYLOAD
+	if (!song.video.empty()) m_video.reset(new Video(song.path + song.video));
 	m_wave.reset(new Texture(sm->getThemePathFile("wave.png")));
 	m_notelines.reset(new Texture(sm->getThemePathFile("notelines.svg")));
 	m_notebar.reset(new Texture(sm->getThemePathFile("notebar.svg")));

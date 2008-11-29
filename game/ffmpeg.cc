@@ -124,7 +124,7 @@ void CFfmpeg::operator()() {
 	sigabrt = std::signal(SIGABRT, usng_ffmpeg_crash_hack);
 	sigsegv = std::signal(SIGSEGV, usng_ffmpeg_crash_hack);
 #endif
-	try { open(); } catch (std::exception const& e) { std::cerr << "FFMPEG failed to open " << m_filename << ": " << e.what() << std::endl; }
+	try { open(); } catch (std::exception const& e) { std::cerr << "FFMPEG failed to open " << m_filename << ": " << e.what() << std::endl; return; }
 	int errors = 0;
 	while (!m_quit) {
 		try {
@@ -144,10 +144,10 @@ void CFfmpeg::operator()() {
 	}
 }
 
-void CFfmpeg::seek(double time) {
+void CFfmpeg::seek(double time, bool wait) {
 	m_seekTarget = time;
 	videoQueue.reset(); audioQueue.reset(); // Empty these to unblock the internals in case buffers were full
-	while (m_thread && m_seekTarget == m_seekTarget) boost::thread::sleep(now() + 0.01); // Wait until seek_internal is done
+	if (wait) while (m_thread && m_seekTarget == m_seekTarget) boost::thread::sleep(now() + 0.01);
 }
 
 void CFfmpeg::seek_internal() {

@@ -29,7 +29,6 @@ class CScreenSongs : public CScreen {
 	boost::scoped_ptr<CThemeSongs> theme;
 	std::string m_playing;
 	std::string m_playReq;
-	std::string m_videoReq;
 	AnimValue m_playTimer;
 	TextInput m_search;
 	boost::scoped_ptr<Surface> m_emptyCover;

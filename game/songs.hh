@@ -30,6 +30,7 @@ class Songs: boost::noncopyable {
 	}
 	int currentId() const { return math_cover.getTarget(); }
 	double currentPosition() { return math_cover.getValue(); }
+	double currentVelocity() const { return math_cover.getVelocity(); }
 	void setAnimMargins(double left, double right) { math_cover.setMargins(left, right); }
 	Song& current() { return *m_filtered[math_cover.getTarget()]; }
 	Song const& current() const { return *m_filtered[math_cover.getTarget()]; }
