@@ -161,7 +161,6 @@ class CFfmpeg {
 	void open();
 	void close();
 	void decodeNextFrame();
-	boost::scoped_ptr<boost::thread> m_thread;
 	std::string m_filename;
 	unsigned int m_rate;
 	volatile bool m_quit;
@@ -181,6 +180,7 @@ class CFfmpeg {
 	bool decodeVideo;
 	bool decodeAudio;
 	double m_position;
+	boost::scoped_ptr<boost::thread> m_thread;
 	static boost::mutex s_avcodec_mutex; // Used for avcodec_open/close (which use some static crap and are thus not thread-safe)
 };
 

@@ -18,16 +18,11 @@ extern "C" {
 /*static*/ boost::mutex CFfmpeg::s_avcodec_mutex;
 
 CFfmpeg::CFfmpeg(bool _decodeVideo, bool _decodeAudio, std::string const& _filename, unsigned int rate):
-  m_filename(_filename), m_rate(rate), m_quit(),
-  pFormatCtx(), pResampleCtx(), img_convert_ctx(), pVideoCodecCtx(), pAudioCodecCtx(), pVideoCodec(), pAudioCodec()
-{
-	videoStream=-1;
-	audioStream=-1;
-	decodeVideo=_decodeVideo;
-	decodeAudio=_decodeAudio;
-	m_seekTarget = getNaN();
-	m_thread.reset(new boost::thread(boost::ref(*this)));
-}
+  m_filename(_filename), m_rate(rate), m_quit(), m_seekTarget(getNaN()),
+  pFormatCtx(), pResampleCtx(), img_convert_ctx(), pVideoCodecCtx(), pAudioCodecCtx(), pVideoCodec(), pAudioCodec(),
+  videoStream(-1), audioStream(-1), decodeVideo(_decodeVideo), decodeAudio(_decodeAudio),
+  m_thread(new boost::thread(boost::ref(*this)))
+{}
 
 CFfmpeg::~CFfmpeg() {
 	m_quit = true;
@@ -53,6 +48,7 @@ double CFfmpeg::duration() {
 }
 
 void CFfmpeg::open() {
+	boost::mutex::scoped_lock l(s_avcodec_mutex);
 	av_register_all();
 	av_log_set_level(AV_LOG_QUIET);
 	if (av_open_input_file(&pFormatCtx, m_filename.c_str(), NULL, 0, NULL)) throw std::runtime_error("Cannot open input file");
@@ -70,7 +66,6 @@ void CFfmpeg::open() {
 		pVideoCodecCtx = pFormatCtx->streams[videoStream]->codec;
 		pVideoCodec = avcodec_find_decoder(pVideoCodecCtx->codec_id);
 		if (!pVideoCodec) throw std::runtime_error("Cannot find video codec");
-		boost::mutex::scoped_lock l(s_avcodec_mutex);
 		if (avcodec_open(pVideoCodecCtx, pVideoCodec) < 0) throw std::runtime_error("Cannot open video codec");
 	}
 	if (decodeAudio) {

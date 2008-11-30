@@ -110,6 +110,7 @@ void Audio::fadeout() {
 		std::vector<int16_t> buf;
 		m_mpeg->audioQueue.tryPop(buf, m_crossbuf.size());
 		std::transform(buf.begin(), buf.end(), m_crossbuf.begin(), da::conv_from_s16);
+		std::fill(m_crossbuf.begin() + buf.size(), m_crossbuf.end(), 0.0f);
 		if (m_volume != 1.0) std::transform(m_crossbuf.begin(), m_crossbuf.end(), m_crossbuf.begin(), std::bind1st(std::multiplies<double>(), m_volume));
 		m_crossfade = 0;
 	}
