@@ -163,7 +163,7 @@ class CFfmpeg {
 	/** Seek to the chosen time. Will block until the seek is done, if wait is true. **/
 	void seek(double time, bool wait = true);
 	double duration();
-	double position() { return m_position; }
+	double position() { return std::max(videoQueue.position(), audioQueue.position()); }
   private:
 	class eof_error: public std::exception {};
 	void seek_internal();
