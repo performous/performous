@@ -5,12 +5,12 @@
 #include <glibmm/convert.h>
 #include <algorithm>
 #include <fstream>
+#include <iostream>
 
 class SongParser {
   public:
 	SongParser(Song& s):
 	  m_song(s),
-	  m_f((s.path + s.filename).c_str()),
 	  m_linenum(),
 	  m_relative(),
 	  m_gap(),
@@ -19,7 +19,18 @@ class SongParser {
 	  m_relativeShift(),
 	  m_maxScore()
 	{
-		if (!m_f.is_open()) throw SongParserException("Could not open TXT file", 0);
+		{
+			std::ifstream f((s.path + s.filename).c_str());
+			if (!f.is_open()) throw SongParserException("Could not open TXT file", 0);
+			m_ss << f.rdbuf();
+		}
+		// Character set conversion needed?
+		try {
+			Glib::convert(m_ss.str(), "UTF-8", "UTF-8"); // Test if input is UTF-8
+		} catch(...) {
+			std::cerr << "WARNING: " << s.path + s.filename << " is not UTF-8.\n  Assuming CP1252 for now. Use recode CP1252..UTF-8 */*.txt to convert your song files." << std::endl;
+			m_ss.str(Glib::convert(m_ss.str(), "UTF-8", "CP1252")); // Convert from Microsoft CP1252
+		}
 		std::string line;
 		try {
 			while (getline(line) && parseField(line)) {};
@@ -43,9 +54,9 @@ class SongParser {
 	}
   private:
 	Song& m_song;
-	std::ifstream m_f;
+	std::stringstream m_ss;
 	unsigned int m_linenum;
-	bool getline(std::string& line) { ++m_linenum; return std::getline(m_f, line); }
+	bool getline(std::string& line) { ++m_linenum; return std::getline(m_ss, line); }
 	bool m_relative;
 	double m_gap;
 	double m_bpm;
@@ -211,27 +222,17 @@ void Song::reload(bool errorIgnore) {
 	try { SongParser(*this); } catch (...) { if (!errorIgnore) throw; }
 	collateUpdate();
 }
-#include <iostream>
+
 void Song::collateUpdate() {
 	collateByTitle = collate(title + artist) + '\0' + filename;
 	collateByArtist = collate(artist + title) + '\0' + filename;
 }
 
 std::string Song::collate(std::string const& str) {
-	std::string last("ZZZZZZZZZZZZZZZ");
-	Glib::ustring ustr, ustr2;
-	try {
-		ustr = Glib::convert(str, "UTF-8", "UTF-8");
-	} catch( ... ) {
-		std::cerr << "Song::collate: input string is not valid UTF-8" << std::endl;
-		return last;
-	}
+	Glib::ustring ustr = str, ustr2;
 	// Remove all non-alnum characters
 	for (Glib::ustring::iterator it = ustr.begin(), end = ustr.end(); it != end; ++it) {
-		if (Glib::Unicode::isalnum(*it))
-			ustr2 += Glib::Unicode::tolower(*it);
-		else
-			ustr2 += "z";
+		if (Glib::Unicode::isalnum(*it)) ustr2 += Glib::Unicode::tolower(*it);
 	}
 	return ustr2;
 	// Should use ustr2.casefold_collate_key() instead of tolower, but it seems to be crashing...

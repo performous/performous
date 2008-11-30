@@ -9,10 +9,7 @@ General
 - Do not fail when playback device cannot be used (use "none" device?)?
 - Issue warning dialog about capture/playback failure?
    * In this case the capture missing warning in practice should be removed
-
-Song screen / songs
-- Sort out charset conversion issues
-- Issue a warning on song loading if charset != UTF-8
+- Redo themes in the black/grey theme and rename it to default
 
 Configuration
 - New config menu (several items visible at once, etc)
