@@ -155,7 +155,7 @@ class CFfmpeg {
 	* crashed or has gotten stuck, and that the destructor should not wait for
 	* it to finish before exiting.
 	**/
-	void crash() { m_thread.reset(); }
+	void crash() { m_thread.reset(); m_quit = true; }
 	void operator()(); // Thread runs here, don't call directly
 	unsigned width, height;
 	VideoFifo  videoQueue;
