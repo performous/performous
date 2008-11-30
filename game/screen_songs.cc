@@ -99,9 +99,9 @@ void CScreenSongs::draw() {
 			s.dimensions.top(y + 0.2 * diff); s.tex = TexCoords(0, 1, 1, 0); glColor4f(1.0, 1.0, 1.0, 0.4); s.draw();
 			s.tex = TexCoords(); glColor3f(1.0, 1.0, 1.0); // Restore default attributes
 		}
-		music = song.path + song.mp3;
-		songbg = song.path + song.background;
-		video = song.path + song.video;
+		if (!song.mp3.empty()) music = song.path + song.mp3;
+		if (!song.background.empty()) songbg = song.path + song.background;
+		if (!song.video.empty()) video = song.path + song.video;
 	}
 	// Draw song and order texts
 	theme->song->draw(oss_song.str());
@@ -113,7 +113,7 @@ void CScreenSongs::draw() {
 		m_songbg.reset(); m_video.reset();
 		if (music.empty()) m_audio.fadeout(); else m_audio.playPreview(music);
 		if (!songbg.empty()) try { m_songbg.reset(new Surface(songbg)); } catch (std::exception const&) {}
-		try { m_video.reset(new Video(video)); } catch (std::exception const&) {}
+		m_video.reset(new Video(video));
 		m_playing = music;
 	}
 	// Switch songs if idle for too long
