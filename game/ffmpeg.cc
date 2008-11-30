@@ -36,9 +36,9 @@ CFfmpeg::~CFfmpeg() {
 	m_thread->join();
 	// TODO: use RAII for freeing resources (to prevent memory leaks)
 	boost::mutex::scoped_lock l(s_avcodec_mutex); // avcodec_close is not thread-safe
-	if (pVideoCodecCtx) avcodec_close(pVideoCodecCtx);
-	if (pAudioCodecCtx) avcodec_close(pAudioCodecCtx);
 	if (pResampleCtx) audio_resample_close(pResampleCtx);
+	if (pAudioCodecCtx) avcodec_close(pAudioCodecCtx);
+	if (pVideoCodecCtx) avcodec_close(pVideoCodecCtx);
 	if (pFormatCtx) av_close_input_file(pFormatCtx);
 }
 
