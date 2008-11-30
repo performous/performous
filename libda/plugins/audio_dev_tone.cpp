@@ -54,9 +54,10 @@ namespace {
 			double freq = 440.0, amplitude = 0.1, phase = 0.0;
 			using namespace boost::spirit;
 			using namespace boost::lambda;
+			placeholder1_type arg1;
 			if (!parse(tonestr.c_str(),
 			  !(limit_d(1.0, s.rate() / 2.0)[real_p][assign_a(freq)]) >> *(!ch_p('.') >> (
-			  str_p("amplitude(") >> (max_limit_d(0.0)[real_p][var(amplitude) = bind(static_cast<double(*)(double, double)>(std::pow), 10.0, _1 / 20.0)] | real_p[assign_a(amplitude)]) |
+			  str_p("amplitude(") >> (max_limit_d(0.0)[real_p][var(amplitude) = bind(static_cast<double(*)(double, double)>(std::pow), 10.0, arg1 / 20.0)] | real_p[assign_a(amplitude)]) |
 			  str_p("phase(") >> limit_d(0.0, 1.0)[real_p][assign_a(phase)]
 			  ) >> ')')
 			  ).full)
