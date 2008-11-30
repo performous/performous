@@ -84,7 +84,7 @@ void CScreenSongs::draw() {
 		double spos = m_songs.currentPosition();
 		int baseidx = spos + 1.5; --baseidx; // Round correctly
 		double shift = spos - baseidx;
-		for (int i = -3; i < 6; ++i) {
+		for (int i = -2; i < 5; ++i) {
 			if (baseidx + i < 0 || baseidx + i >= int(ss)) continue;
 			Song& song_display = m_songs[baseidx + i];
 			Surface* cover = NULL;
