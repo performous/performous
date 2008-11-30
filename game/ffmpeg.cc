@@ -130,7 +130,7 @@ void CFfmpeg::operator()() {
 		} catch (eof_error&) {
 			m_eof = true;
 			audioQueue.push(new AudioFrame()); // EOF marker
-			audioQueue.push(new AudioFrame()); // EOF marker
+			videoQueue.push(new VideoFrame()); // EOF marker
 			boost::thread::sleep(now() + 0.1);
 		} catch (std::exception& e) {
 			std::cerr << "FFMPEG error: " << e.what() << std::endl;

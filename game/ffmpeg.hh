@@ -23,7 +23,7 @@ struct VideoFrame {
 	int width, height;
 	std::vector<uint8_t> data; 
 	VideoFrame(double ts, int w, int h): timestamp(ts), width(w), height(h) {}
-	VideoFrame(): timestamp(std::numeric_limits<double>::infinity()) {} // EOF marker (not used ATM)
+	VideoFrame(): timestamp(std::numeric_limits<double>::infinity()) {} // EOF marker
 	void swap(VideoFrame& f) {
 		std::swap(timestamp, f.timestamp);
 		data.swap(f.data);
@@ -38,10 +38,12 @@ static bool operator<(VideoFrame const& a, VideoFrame const& b) {
 
 class VideoFifo {
   public:
-	VideoFifo(): m_timestamp() {}
+	VideoFifo(): m_available(), m_timestamp(), m_eof() {}
 	bool tryPop(VideoFrame& f) {
 		boost::mutex::scoped_lock l(m_mutex);
-		if (m_queue.size() < m_min) return false; // Must keep a certain minimum size for B-frame reordering
+		if (!m_queue.empty() && m_queue.begin()->data.empty()) { m_eof = true; return false; }
+		statsUpdate();
+		if (m_available == 0) return false; // Nothing to deliver
 		f.swap(*m_queue.begin());
 		m_queue.erase(m_queue.begin());
 		m_cond.notify_all();
@@ -56,23 +58,29 @@ class VideoFifo {
 		m_queue.insert(f);
 		statsUpdate();
 	}
-	void statsUpdate() { m_available = std::max(0, int(m_queue.size()) - int(m_min)); }
+	void statsUpdate() {
+		m_available = std::max(0, int(m_queue.size()) - int(m_min));
+		if (m_available == 0 && !m_queue.empty() && m_queue.rbegin()->data.empty()) m_available = m_queue.size() - 1;
+	}
 	void reset() {
 		boost::mutex::scoped_lock l(m_mutex);
 		m_queue.clear();
 		m_cond.notify_all();
 		statsUpdate();
+		m_eof = false;
 	}
-	double position() { return m_timestamp; }
+	double position() const { return m_timestamp; }
 	double percentage() const { return double(m_available) / m_max; }
+	double eof() const { return m_eof; }
   private:
 	boost::ptr_set<VideoFrame> m_queue;
-	boost::mutex m_mutex;
+	mutable boost::mutex m_mutex;
 	boost::condition m_cond;
 	volatile unsigned m_available;
+	double m_timestamp;
+	bool m_eof;
 	static const unsigned m_min = 3;
 	static const unsigned m_max = 50;
-	double m_timestamp;
 };
 
 class AudioFifo {
@@ -111,16 +119,17 @@ class AudioFifo {
 		boost::mutex::scoped_lock l(m_mutex);
 		m_queue.clear();
 		m_cond.notify_all();
+		m_eof = false;
 	}
-	double position() { return m_timestamp; }
-	double eof() { return m_eof; }
-	double percentage() {
+	double position() const { return m_timestamp; }
+	double eof() const { return m_eof; }
+	double percentage() const {
 		boost::mutex::scoped_lock l(m_mutex);
 		return double(m_queue.size()) / m_max;
 	}
   private:
 	boost::ptr_deque<AudioFrame> m_queue;
-	boost::mutex m_mutex;
+	mutable boost::mutex m_mutex;
 	boost::condition m_cond;
 	unsigned m_sps;
 	double m_timestamp;
