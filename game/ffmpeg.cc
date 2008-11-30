@@ -221,11 +221,11 @@ void CFfmpeg::decodeNextFrame() {
 				packetData += decodeSize;
 				// Convert outsize from bytes into number of frames (samples)
 				outsize /= sizeof(int16_t) * pAudioCodecCtx->channels;
-				int16_t resampled[AVCODEC_MAX_AUDIO_FRAME_SIZE];
-				int frames = audio_resample(pResampleCtx, resampled, audioFrames, outsize);
+				std::vector<int16_t> resampled(AVCODEC_MAX_AUDIO_FRAME_SIZE);
+				int frames = audio_resample(pResampleCtx, &resampled[0], audioFrames, outsize);
 				// Construct AudioFrame and add it to the queue
 				AudioFrame* tmp = new AudioFrame();
-				std::copy(resampled, resampled + frames * AUDIO_CHANNELS, std::back_inserter(tmp->data));
+				std::copy(resampled.begin(), resampled.begin() + frames * AUDIO_CHANNELS, std::back_inserter(tmp->data));
 				if (!std::isnan(packet.time()) ) m_position = packet.time();
 				else m_position += double(tmp->data.size())/double(audioQueue.getSamplesPerSecond());
 				tmp->timestamp = m_position;
