@@ -32,8 +32,8 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="801"
-     inkscape:window-width="1440"
+     inkscape:window-height="1125"
+     inkscape:window-width="1920"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      guidetolerance="10.0"
@@ -45,7 +45,7 @@
      id="base"
      inkscape:zoom="1.1098204"
      inkscape:cx="487.32843"
-     inkscape:cy="757.06061"
+     inkscape:cy="396.64193"
      inkscape:window-x="0"
      inkscape:window-y="25"
      inkscape:current-layer="svg559"
@@ -102,24 +102,7 @@
        y1="-116.67703"
        x2="311.95688"
        y2="-276.41519" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient6053"
-       id="linearGradient2395"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(3.8007102,0,0,3.0361472,-1025.6914,1497.1483)"
-       x1="410.25833"
-       y1="-446.23236"
-       x2="410.25833"
-       y2="-496.73999" />
   </defs>
-  <rect
-     y="-11.027356"
-     x="-134.12112"
-     height="153.3486"
-     width="1241.3727"
-     id="rect2393"
-     style="fill:url(#linearGradient2395);fill-opacity:1" />
   <rect
      y="-1.4079988"
      x="-0.074667335"
@@ -127,6 +110,14 @@
      width="1000.6992"
      id="rect3308"
      style="fill:#81d000;fill-opacity:0;fill-rule:nonzero;stroke:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:block;overflow:visible" />
+  <rect
+     style="fill:#ffffff;fill-opacity:0.2739131;stroke:none;stroke-width:5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     id="rect6085"
+     width="1004.5031"
+     height="51.692097"
+     x="-2.0912662"
+     y="121.37787"
+     ry="0" />
   <rect
      style="fill:#ffffff;fill-opacity:0.2739131"
      id="rect3394"
