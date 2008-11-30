@@ -154,16 +154,16 @@ class CFfmpeg {
 	/** Seek to the chosen time. Will block until the seek is done, if wait is true. **/
 	void seek(double time, bool wait = true);
 	double duration();
-	double position() { return std::max(audioQueue.position(),videoQueue.position()); };
+	double position() { return m_position; }
   private:
 	class eof_error: public std::exception {};
 	void seek_internal();
 	void open();
-	void close();
 	void decodeNextFrame();
 	std::string m_filename;
 	unsigned int m_rate;
 	volatile bool m_quit;
+	volatile bool m_running;
 	volatile bool m_eof;
 	volatile double m_seekTarget;
 	AVFormatContext* pFormatCtx;

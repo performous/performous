@@ -18,9 +18,9 @@ extern "C" {
 /*static*/ boost::mutex CFfmpeg::s_avcodec_mutex;
 
 CFfmpeg::CFfmpeg(bool _decodeVideo, bool _decodeAudio, std::string const& _filename, unsigned int rate):
-  m_filename(_filename), m_rate(rate), m_quit(), m_seekTarget(getNaN()),
+  m_filename(_filename), m_rate(rate), m_quit(), m_running(), m_eof(), m_seekTarget(getNaN()),
   pFormatCtx(), pResampleCtx(), img_convert_ctx(), pVideoCodecCtx(), pAudioCodecCtx(), pVideoCodec(), pAudioCodec(),
-  videoStream(-1), audioStream(-1), decodeVideo(_decodeVideo), decodeAudio(_decodeAudio),
+  videoStream(-1), audioStream(-1), decodeVideo(_decodeVideo), decodeAudio(_decodeAudio), m_position(),
   m_thread(new boost::thread(boost::ref(*this)))
 {}
 
@@ -43,8 +43,7 @@ CFfmpeg::~CFfmpeg() {
 }
 
 double CFfmpeg::duration() {
-	if (pFormatCtx) return pFormatCtx->duration / double(AV_TIME_BASE);
-	return getNaN();
+	return m_running ? pFormatCtx->duration / double(AV_TIME_BASE) : getNaN();
 }
 
 void CFfmpeg::open() {
@@ -120,6 +119,7 @@ void CFfmpeg::operator()() {
 	sigsegv = std::signal(SIGSEGV, performous_ffmpeg_crash_hack);
 #endif
 	try { open(); } catch (std::exception const& e) { std::cerr << "FFMPEG failed to open " << m_filename << ": " << e.what() << std::endl; return; }
+	m_running = true;
 	int errors = 0;
 	while (!m_quit) {
 		try {
@@ -137,6 +137,7 @@ void CFfmpeg::operator()() {
 			if (++errors > 2) break;
 		}
 	}
+	m_running = false;
 }
 
 void CFfmpeg::seek(double time, bool wait) {
