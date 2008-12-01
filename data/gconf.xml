@@ -1,8 +1,13 @@
 <?xml version="1.0"?>
 <gconf>
         <entry name="graphic_w" mtime="1227884395" schema="/schemas/apps/performous/graphic/width" type="int" value="640" />
-        <entry name="graphic_h" mtime="1227884395" schema="/schemas/apps/performous/graphic/width" type="int" value="480" />
+        <entry name="graphic_h" mtime="1227884395" schema="/schemas/apps/performous/graphic/height" type="int" value="480" />
+        <entry name="graphic_fs_w" mtime="1227884395" schema="/schemas/apps/performous/graphic/fullscreen_width" type="int" value="640" />
+        <entry name="graphic_fs_h" mtime="1227884395" schema="/schemas/apps/performous/graphic/fullscreen_height" type="int" value="480" />
         <entry name="graphic_fs" mtime="1227884395" schema="/schemas/apps/performous/graphic/fullscreen" type="bool" value="false" />
+        <entry name="graphic_video" mtime="1227884395" schema="/schemas/apps/performous/graphic/video" type="bool" value="true" />
+        <entry name="graphic_svg_lod" mtime="1227884395" schema="/schemas/apps/performous/graphic/svg_lod" type="int" value="1" />
+        <entry name="graphic_text_lod" mtime="1227884395" schema="/schemas/apps/performous/graphic/text_lod" type="int" value="1" />
         <entry name="graphic_fps" mtime="1227884395" schema="/schemas/apps/performous/graphic/show_fps" type="bool" value="false" />
         <entry name="themes_override" mtime="1227884395" schema="/schemas/apps/performous/themes/override" type="bool" value="false" />
         <entry name="themes_default" mtime="1227884395" schema="/schemas/apps/performous/themes/default" type="string">
