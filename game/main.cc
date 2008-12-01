@@ -180,17 +180,15 @@ int main(int argc, char** argv) {
 		// Insert default dirs
 		if (!vm.count("clean")) {
 			if (!homedir.empty()) songdirs.insert(homedir + ".ultrastar/songs/");
-			songdirs.insert("/usr/share/games/ultrastar/songs/");
-			songdirs.insert("/usr/share/ultrastar/songs/");
 			songdirs.insert("/usr/local/share/games/ultrastar/songs/");
-			songdirs.insert("/usr/local/share/ultrastar/songs/");
+			songdirs.insert("/usr/share/games/ultrastar/songs/");
 		}
 		// Figure out theme folder
 		if (theme.find('/') == std::string::npos) {
 			char const* envthemepath = getenv("PERFORMOUS_THEME_PATH");
 			std::string themepath;
 			if (envthemepath) themepath = envthemepath;
-			else themepath = "/usr/share/performous/themes:/usr/share/games/performous/themes:/usr/local/share/performous/themes:/usr/local/share/games/performous/themes";
+			else themepath = "/usr/local/share/games/performous/themes:/usr/share/games/performous/themes";
 			std::istringstream iss(themepath);
 			std::string elem;
 			while (std::getline(iss, elem, ':')) {
