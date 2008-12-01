@@ -34,16 +34,18 @@
         <entry name="audio_vd" mtime="1227884395" schema="/schemas/apps/performous/audio/video_delay" type="float" value="0.0" />
 	<entry name="capture_list" mtime="1227884395" schema="/schemas/apps/performous/audio/capture" type="list" ltype="string">
 		<li type="string">
-			<stringvalue>2</stringvalue>
+			<stringvalue>channels=2</stringvalue>
 		</li>
 		<li type="string">
-			<stringvalue>1,44100@alsa:hw:M16DX</stringvalue>
+			<stringvalue>channels=1,rate=44100,backend=alsa,settings=hw:M16DX,frames=256</stringvalue>
 		</li>
 	</entry>
+        <entry name="playback_rate" mtime="1227884395" schema="/schemas/apps/performous/audio/playback/rate" type="int" value="48000" />
+        <entry name="playback_frames" mtime="1227884395" schema="/schemas/apps/performous/audio/playback/frames" type="int" value="256" />
 	<entry name="playback_backend" mtime="1227884395" schema="/schemas/apps/performous/audio/playback/backend" type="string">
 		<stringvalue>alsa</stringvalue>
 	</entry>
-	<entry name="capture_alsa" mtime="1227884395" schema="/schemas/apps/performous/audio/playback/alsa" type="string">
+	<entry name="playback_alsa" mtime="1227884395" schema="/schemas/apps/performous/audio/playback/alsa" type="string">
 		<li type="string">
 			<stringvalue>hw:0</stringvalue>
 		</li>
