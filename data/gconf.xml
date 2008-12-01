@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<gconf>
+        <entry name="graphic_w" mtime="1227884395" schema="/schemas/apps/performous/graphic/width" type="int" value="640" />
+        <entry name="graphic_h" mtime="1227884395" schema="/schemas/apps/performous/graphic/width" type="int" value="480" />
+        <entry name="graphic_fs" mtime="1227884395" schema="/schemas/apps/performous/graphic/fullscreen" type="bool" value="false" />
+        <entry name="graphic_fps" mtime="1227884395" schema="/schemas/apps/performous/graphic/show_fps" type="bool" value="false" />
+        <entry name="themes_override" mtime="1227884395" schema="/schemas/apps/performous/themes/override" type="bool" value="false" />
+        <entry name="themes_default" mtime="1227884395" schema="/schemas/apps/performous/themes/default" type="string">
+			<stringvalue>lima</stringvalue>
+	</entry>
+        <entry name="themes_path" mtime="1227884395" schema="/schemas/apps/performous/themes/path" type="list" ltype="string">
+		<li type="string">
+			<stringvalue>/usr/share/themes/</stringvalue>
+		</li>
+		<li type="string">
+			<stringvalue>/home/songs/themes/</stringvalue>
+		</li>
+	</entry>
+        <entry name="songs_override" mtime="1227884395" schema="/schemas/apps/performous/songs/override" type="bool" value="false" />
+        <entry name="songs_path" mtime="1227884395" schema="/schemas/apps/performous/songs/path" type="list" ltype="string">
+		<li type="string">
+			<stringvalue>/usr/share/songs/</stringvalue>
+		</li>
+		<li type="string">
+			<stringvalue>/home/songs/</stringvalue>
+		</li>
+	</entry>
+        <entry name="audio_rt" mtime="1227884395" schema="/schemas/apps/performous/audio/round_trip" type="float" value="0.0" />
+        <entry name="audio_vd" mtime="1227884395" schema="/schemas/apps/performous/audio/video_delay" type="float" value="0.0" />
+	<entry name="capture_list" mtime="1227884395" schema="/schemas/apps/performous/audio/capture" type="list" ltype="string">
+		<li type="string">
+			<stringvalue>2</stringvalue>
+		</li>
+		<li type="string">
+			<stringvalue>1,44100@alsa:hw:M16DX</stringvalue>
+		</li>
+	</entry>
+	<entry name="playback_backend" mtime="1227884395" schema="/schemas/apps/performous/audio/playback/backend" type="string">
+		<stringvalue>alsa</stringvalue>
+	</entry>
+	<entry name="capture_alsa" mtime="1227884395" schema="/schemas/apps/performous/audio/playback/alsa" type="string">
+		<li type="string">
+			<stringvalue>hw:0</stringvalue>
+		</li>
+	</entry>
+        <entry name="volume_menu" mtime="1227884395" schema="/schemas/apps/performous/audio/volume/menu" type="int" value="70" />
+        <entry name="volume_songs" mtime="1227884395" schema="/schemas/apps/performous/audio/volume/songs" type="int" value="70" />
+        <entry name="volume_sing" mtime="1227884395" schema="/schemas/apps/performous/audio/volume/sing" type="int" value="100" />
+</gconf>
