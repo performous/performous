@@ -17,7 +17,7 @@
       <fps enable="false" />
       <video enable="true" />
     </graphic>
-    <audio round-trip="0.0">
+    <audio round-trip="0.0" video-delay="0.0">
       <capture>
         <mics number="2" />
         <mics number="2" backend="jack"/>
