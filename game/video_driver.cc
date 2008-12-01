@@ -34,7 +34,7 @@ Window::Window(unsigned int width, unsigned int height, int fs) {
 void Window::blank() {
 	s_width = screen->w;
 	s_height = screen->h;
-	if (s_height < 0.6f * s_width) s_width = roundf(s_height / 0.6f);
+	if (s_height < 0.56f * s_width) s_width = roundf(s_height / 0.56f);
 	if (s_height > 0.8f * s_width) s_height = roundf(0.8f * s_width);
 	glViewport(0.5f * (screen->w - s_width), 0.5f * (screen->h - s_height), s_width, s_height);
 	glMatrixMode(GL_PROJECTION);
