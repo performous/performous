@@ -1,0 +1,33 @@
+<performous>
+  <config version="1">
+    <songs>
+      <songs-directories method="override">
+        <directory path="/usr/share/songs/" />
+        <directory path="/home/songs/" />
+      </songs-directories>
+    </songs>
+    <themes default="lima">
+      <themes-directories method="append">
+        <directory path="/usr/share/themes/" />
+      </themes-directories>
+    </themes>
+    <video>
+      <resolution width="800" height="600" />
+      <fullscreen value="true" />
+      <fps value="false" />
+    </video>
+    <audio round-trip="0.0">
+      <capture>
+        <mics number="2" />
+        <mics number="2" backend="jack"/>
+        <mics number="18" backend="alsa" settings="hw:M16DX"/>
+        <mics number="1" rate="44100" />
+      </captude>
+      <playback backend="default" rate="48000">
+        <device name="alsa" settings="hw:0" />
+        <device name="jack" />
+      <playback>
+      <volumes menu="70" songs="70" sing="100" />
+    </audio>
+  </config>
+</performous>
