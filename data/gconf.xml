@@ -37,7 +37,7 @@
 			<stringvalue>channels=2</stringvalue>
 		</li>
 		<li type="string">
-			<stringvalue>channels=1,rate=44100,backend=alsa,settings=hw:M16DX,frames=256</stringvalue>
+			<stringvalue>channels=1,rate=44100,frames=256@alsa:hw:M16DX</stringvalue>
 		</li>
 	</entry>
         <entry name="playback_rate" mtime="1227884395" schema="/schemas/apps/performous/audio/playback/rate" type="int" value="48000" />
