@@ -11,11 +11,12 @@
         <directory path="/usr/share/themes/" />
       </themes-directories>
     </themes>
-    <video>
+    <graphic>
       <resolution width="800" height="600" />
-      <fullscreen value="true" />
-      <fps value="false" />
-    </video>
+      <fullscreen enable="true" />
+      <fps enable="false" />
+      <video enable="true" />
+    </graphic>
     <audio round-trip="0.0">
       <capture>
         <mics number="2" />
