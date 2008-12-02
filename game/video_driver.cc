@@ -2,6 +2,7 @@
 #include "screen.hh"
 #include "config.hh"
 #include <cmath>
+#include <SDL/SDL.h>
 
 unsigned s_width;
 unsigned s_height;
@@ -9,7 +10,7 @@ unsigned s_height;
 unsigned int screenW() { return s_width; }
 unsigned int screenH() { return s_height; }
 
-Window::Window(unsigned int width, unsigned int height, int fs) {
+Window::Window(unsigned int width, unsigned int height, int fs): m_windowW(width), m_windowH(height), m_fsW(width), m_fsH(height) {
 	std::atexit(SDL_Quit);
 	if( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK) ==  -1 ) throw std::runtime_error("SDL_Init failed");
 	SDL_WM_SetCaption(PACKAGE " " VERSION, PACKAGE);
@@ -20,7 +21,7 @@ Window::Window(unsigned int width, unsigned int height, int fs) {
 	}
 	m_fullscreen = (fs != 0);
 	m_videoFlags = SDL_OPENGL | SDL_DOUBLEBUF | SDL_RESIZABLE;
-	resize(width, height);
+	resize();
 	SDL_ShowCursor(SDL_DISABLE);
 	SDL_EnableUNICODE(SDL_ENABLE);
 	SDL_EnableKeyRepeat(80, 80);
@@ -48,7 +49,14 @@ void Window::swap() {
 	SDL_GL_SwapBuffers();
 }
 
-void Window::resize(unsigned int width, unsigned int height) {
+void Window::fullscreen() {
+	m_fullscreen = !m_fullscreen;
+	resize();
+}
+
+void Window::resize() {
+	unsigned width = m_fullscreen ? m_fsW : m_windowW;
+	unsigned height = m_fullscreen ? m_fsH : m_windowH;
 	const SDL_VideoInfo* videoInf = SDL_GetVideoInfo();
 	screen = SDL_SetVideoMode(width, height, videoInf->vfmt->BitsPerPixel, m_videoFlags | (m_fullscreen ? SDL_FULLSCREEN : 0));
 	if (!screen) throw std::runtime_error("SDL_SetVideoMode failed");
