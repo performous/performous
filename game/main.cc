@@ -211,14 +211,13 @@ int main(int argc, char** argv) {
 		// argument_list ::= !(integer ",") argument % "," | integer
 		// backend       ::= anychar+
 		// device        ::= argument_list "@" backend | argument_list | backend
-		rule<> channels_r = str_p("channels=") >> uint_p[assign_a(channels)];
-		rule<> rate_r = str_p("rate=") >> uint_p[assign_a(rate)];
-		rule<> frames_r = str_p("frames=") >> uint_p[assign_a(frames)];
+		rule<> channels_r = "channels=" >> uint_p[assign_a(channels)];
+		rule<> rate_r = "rate=" >> uint_p[assign_a(rate)];
+		rule<> frames_r = "frames=" >> uint_p[assign_a(frames)];
 		rule<> argument = channels_r | rate_r | frames_r;
-		rule<> argument_list = 
-			(!(uint_p[assign_a(channels)] >> ch_p(',')) >> (argument % ch_p(','))) | (uint_p[assign_a(channels)]);
+		rule<> argument_list = (!(uint_p[assign_a(channels)] >> ',') >> (argument % ',')) | (uint_p[assign_a(channels)]);
 		rule<> backend = (+anychar_p)[assign_a(devstr)];
-		rule<> device = (argument_list >> ch_p('@') >> backend) | argument_list | backend;
+		rule<> device = (argument_list >> '@' >> backend) | argument_list | backend;
 		// Initialize everything
 		Capture capture;
 		for(std::size_t i = 0; i < mics.size(); ++i) {
