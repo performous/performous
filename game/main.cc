@@ -89,7 +89,6 @@ int main(int argc, char** argv) {
 	std::set<std::string> songdirs;
 	std::vector<std::string> mics;
 	std::string pdev;
-	std::size_t prate;
 	std::string homedir;
 	{
 		char const* home = getenv("HOME");
@@ -112,8 +111,7 @@ int main(int argc, char** argv) {
 		  ("height,H", po::value<unsigned int>(&height)->default_value(600), "set vertical resolution")
 		  ("michelp", "detailed help for --mics and a list of available audio devices")
 		  ("mics", po::value<std::vector<std::string> >(&mics)->composing(), "specify microphones to use")
-		  ("pdev", po::value<std::string>(&pdev), "set playback device (disable autodetection)\n  --pdev=dev[:settings]\n  --pdev=help for list of devices")
-		  ("prate", po::value<std::size_t>(&prate)->default_value(48000), "set playback frequency\n  44100 and 48000 Hz are optimal")
+		  ("pdev", po::value<std::string>(&pdev), "set playback device (disable autodetection)\n  --pdev=[OPTIONS@]dev[:settings]\n  --pdev=help for list of devices")
 		  ("clean,c", "disable internal default song folders")
 		  ("songdir,s", po::value<std::vector<std::string> >(&songdirstmp)->composing(), "additional song folders to scan\n  may be specified without -s or -songdir too");
 		po::positional_options_description p;
@@ -151,12 +149,12 @@ int main(int argc, char** argv) {
 		}
 		if (vm.count("michelp")) {
 			da::record::devlist_t l = da::record::devices();
-			std::cout << "Specify with --mics channels[,rate][@dev[:settings]]. For example:\n"
-			  "  --mics 2                 cTwo mics on any sound device\n"
-			  "  --mics 2@jack            Two mics on JACK\n"
-			  "  --mics 18@alsa:hw:M16DX  18 input channels on ALSA device \"hw:M16DX\"\n"
-			  "                           Note: only the first four at most will be used\n"
-			  "  --mics 1,44100           One mic; will try to get 44100 Hz if available\n\n"
+			std::cout << "Specify with --mics [OPTIONS@]dev[:settings]]. For example:\n"
+			  "  --mics channels=2                 Two mics on any sound device\n"
+			  "  --mics channels=2@jack            Two mics on JACK\n"
+			  "  --mics channels=18@alsa:hw:M16DX  18 input channels on ALSA device \"hw:M16DX\"\n"
+			  "                                    Note: only the first four at most will be used\n"
+			  "  --mics channels=1,rate=44100      One mic; will try to get 44100 Hz if available\n\n"
 			  "Multiple --mics options may be specified and all the successfully opened inputs\n"
 			  "are be assigned as players until the maximum of four players are configured.\n" << std::endl;
 			std::cout << "Capture devices available:" << std::endl;
@@ -204,12 +202,29 @@ int main(int argc, char** argv) {
 		// Initialize everything
 		Capture capture;
 		for(std::size_t i = 0; i < mics.size(); ++i) {
-			unsigned channels = 0;
+			unsigned channels = 2;
 			unsigned rate = 48000;
+			unsigned frames = 256;
 			std::string devstr;
+			// channel       ::= "channel=" integer
+			// rate          ::= "rate=" integer
+			// frame         ::= "frame=" integer
+			// argument      ::= channel | rate | frame
+			// argument_list ::= argument ("," argument)* "@" | empty
+			// device_string ::= any
+			// mic           ::= argument_list device_string
 			using namespace boost::spirit;
-			if (!parse(mics[i].c_str(), uint_p[assign_a(channels)] >> !(',' >> uint_p[assign_a(rate)]) >> !('@' >> (*anychar_p)[assign_a(devstr)])).full)
+			boost::spirit::rule<> r_mic, r_argument_list, r_argument, r_channel, r_rate, r_frame, r_devstr;
+			r_channel = str_p("channels=") >> uint_p[assign_a(channels)];
+			r_rate = str_p("rate=") >> uint_p[assign_a(rate)];
+			r_frame = str_p("frames=") >> uint_p[assign_a(frames)];
+			r_argument = r_channel | r_rate | r_frame;
+			r_argument_list = !(r_argument >> *(ch_p(',') >> r_argument));
+			r_devstr = (*anychar_p)[assign_a(devstr)];
+			r_mic = !(r_argument_list >> ch_p('@') >> r_devstr | r_argument_list | r_devstr );
+			if (!parse(mics[i].c_str(), r_mic).full ) {
 			  throw std::runtime_error("Invalid syntax in mics=" + mics[i]);
+			}
 			try {
 				capture.addMics(channels, rate, devstr);
 			} catch (std::runtime_error const& e) {
@@ -219,9 +234,33 @@ int main(int argc, char** argv) {
 		if (capture.analyzers().empty()) try { std::cout << "No capture devices configured. Trying built-in defaults." << std::endl; capture.addMics(2, 48000, "alsa:hw:default"); } catch(...) {}
 		if (capture.analyzers().empty()) try { capture.addMics(2, 48000, ""); } catch(...) {} // Anything goes...
 		if (capture.analyzers().empty()) std::cerr << "No capture devices could be used. Please use --mics to define some." << std::endl;
-		//std::cout << "num mics: " << cap.analyzers().size() << std::endl;
 
-		Audio audio(pdev, prate);
+		std::size_t prate = 48000;
+		std::string pdevstr("");
+		{
+			unsigned channels = 2;
+			unsigned frames = 256;
+			// channel       ::= "channel=" integer
+			// rate          ::= "rate=" integer
+			// frame         ::= "frame=" integer
+			// argument      ::= channel | rate | frame
+			// argument_list ::= argument ("," argument)* "@" | empty
+			// device_string ::= any
+			// mic           ::= argument_list device_string
+			using namespace boost::spirit;
+			boost::spirit::rule<> r_pdev, r_argument_list, r_argument, r_channel, r_rate, r_frame, r_devstr;
+			r_channel = str_p("channels=") >> uint_p[assign_a(channels)];
+			r_rate = str_p("rate=") >> uint_p[assign_a(prate)];
+			r_frame = str_p("frames=") >> uint_p[assign_a(frames)];
+			r_argument = r_channel | r_rate | r_frame;
+			r_argument_list = !(r_argument >> *(ch_p(',') >> r_argument));
+			r_devstr = (*anychar_p)[assign_a(pdevstr)];
+			r_pdev = !(r_argument_list >> ch_p('@') >> r_devstr | r_argument_list | r_devstr );
+			if (!parse(pdev.c_str(), r_pdev).full ) {
+			  throw std::runtime_error("Invalid syntax in pdev=" + pdev);
+			}
+		}
+		Audio audio(pdevstr, prate);
 		Songs songs(songdirs, songlist);
 		CScreenManager sm(theme);
 		Window window(width, height, fullscreen);
