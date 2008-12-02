@@ -219,9 +219,9 @@ int main(int argc, char** argv) {
 			r_rate = str_p("rate=") >> uint_p[assign_a(rate)];
 			r_frame = str_p("frames=") >> uint_p[assign_a(frames)];
 			r_argument = r_channel | r_rate | r_frame;
-			r_argument_list = !(r_argument >> *(ch_p(',') >> r_argument));
-			r_devstr = (*anychar_p)[assign_a(devstr)];
-			r_mic = !(r_argument_list >> ch_p('@') >> r_devstr | r_argument_list | r_devstr );
+			r_argument_list = r_argument % ch_p(',');
+			r_devstr = (+anychar_p)[assign_a(devstr)];
+			r_mic = (r_argument_list >> ch_p('@') >> r_devstr) | r_argument_list | r_devstr;
 			if (!parse(mics[i].c_str(), r_mic).full ) {
 			  throw std::runtime_error("Invalid syntax in mics=" + mics[i]);
 			}
@@ -253,9 +253,9 @@ int main(int argc, char** argv) {
 			r_rate = str_p("rate=") >> uint_p[assign_a(prate)];
 			r_frame = str_p("frames=") >> uint_p[assign_a(frames)];
 			r_argument = r_channel | r_rate | r_frame;
-			r_argument_list = !(r_argument >> *(ch_p(',') >> r_argument));
-			r_devstr = (*anychar_p)[assign_a(pdevstr)];
-			r_pdev = !(r_argument_list >> ch_p('@') >> r_devstr | r_argument_list | r_devstr );
+			r_argument_list = r_argument % ch_p(',');
+			r_devstr = (+anychar_p)[assign_a(pdevstr)];
+			r_pdev = !((r_argument_list >> ch_p('@') >> r_devstr) | r_argument_list | r_devstr);
 			if (!parse(pdev.c_str(), r_pdev).full ) {
 			  throw std::runtime_error("Invalid syntax in pdev=" + pdev);
 			}
