@@ -208,14 +208,15 @@ int main(int argc, char** argv) {
 		// rate          ::= "rate=" integer
 		// frame         ::= "frame=" integer
 		// argument      ::= channel | rate | frame
-		// argument_list ::= argument % ","
+		// argument_list ::= !(integer ",") argument % "," | integer
 		// backend       ::= anychar+
 		// device        ::= argument_list "@" backend | argument_list | backend
 		rule<> channels_r = str_p("channels=") >> uint_p[assign_a(channels)];
 		rule<> rate_r = str_p("rate=") >> uint_p[assign_a(rate)];
 		rule<> frames_r = str_p("frames=") >> uint_p[assign_a(frames)];
 		rule<> argument = channels_r | rate_r | frames_r;
-		rule<> argument_list = argument % ch_p(',');
+		rule<> argument_list = 
+			(!(uint_p[assign_a(channels)] >> ch_p(',')) >> (argument % ch_p(','))) | (uint_p[assign_a(channels)]);
 		rule<> backend = (+anychar_p)[assign_a(devstr)];
 		rule<> device = (argument_list >> ch_p('@') >> backend) | argument_list | backend;
 		// Initialize everything
@@ -243,7 +244,7 @@ int main(int argc, char** argv) {
 			frames = 256;
 			rate = 48000;
 			devstr = "";
-			if (!parse(pdev.c_str(), device).full ) {
+			if (!pdev.empty() && !parse(pdev.c_str(), device).full ) {
 			  throw std::runtime_error("Invalid syntax in pdev=" + pdev);
 			}
 		}
