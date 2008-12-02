@@ -199,30 +199,33 @@ int main(int argc, char** argv) {
 		if (*theme.rbegin() == '/') theme.erase(theme.size() - 1); // Remove trailing slash
 	}
 	try {
+		// initialize audio argument parser
+		using namespace boost::spirit;
+		unsigned channels, rate, frames;
+		std::string devstr;
+
+		// channel       ::= "channel=" integer
+		// rate          ::= "rate=" integer
+		// frame         ::= "frame=" integer
+		// argument      ::= channel | rate | frame
+		// argument_list ::= argument % ","
+		// backend       ::= anychar+
+		// device        ::= argument_list "@" backend | argument_list | backend
+		rule<> channels_r = str_p("channels=") >> uint_p[assign_a(channels)];
+		rule<> rate_r = str_p("rate=") >> uint_p[assign_a(rate)];
+		rule<> frames_r = str_p("frames=") >> uint_p[assign_a(frames)];
+		rule<> argument = channels_r | rate_r | frames_r;
+		rule<> argument_list = argument % ch_p(',');
+		rule<> backend = (+anychar_p)[assign_a(devstr)];
+		rule<> device = (argument_list >> ch_p('@') >> backend) | argument_list | backend;
 		// Initialize everything
 		Capture capture;
 		for(std::size_t i = 0; i < mics.size(); ++i) {
-			unsigned channels = 2;
-			unsigned rate = 48000;
-			unsigned frames = 256;
-			std::string devstr;
-			// channel       ::= "channel=" integer
-			// rate          ::= "rate=" integer
-			// frame         ::= "frame=" integer
-			// argument      ::= channel | rate | frame
-			// argument_list ::= argument ("," argument)* "@" | empty
-			// device_string ::= any
-			// mic           ::= argument_list device_string
-			using namespace boost::spirit;
-			boost::spirit::rule<> r_mic, r_argument_list, r_argument, r_channel, r_rate, r_frame, r_devstr;
-			r_channel = str_p("channels=") >> uint_p[assign_a(channels)];
-			r_rate = str_p("rate=") >> uint_p[assign_a(rate)];
-			r_frame = str_p("frames=") >> uint_p[assign_a(frames)];
-			r_argument = r_channel | r_rate | r_frame;
-			r_argument_list = r_argument % ch_p(',');
-			r_devstr = (+anychar_p)[assign_a(devstr)];
-			r_mic = (r_argument_list >> ch_p('@') >> r_devstr) | r_argument_list | r_devstr;
-			if (!parse(mics[i].c_str(), r_mic).full ) {
+			channels = 2;
+			rate = 48000;
+			frames = 256;
+			devstr = "";
+			if (!parse(mics[i].c_str(), device).full ) {
 			  throw std::runtime_error("Invalid syntax in mics=" + mics[i]);
 			}
 			try {
@@ -235,32 +238,16 @@ int main(int argc, char** argv) {
 		if (capture.analyzers().empty()) try { capture.addMics(2, 48000, ""); } catch(...) {} // Anything goes...
 		if (capture.analyzers().empty()) std::cerr << "No capture devices could be used. Please use --mics to define some." << std::endl;
 
-		std::size_t prate = 48000;
-		std::string pdevstr("");
 		{
-			unsigned channels = 2;
-			unsigned frames = 256;
-			// channel       ::= "channel=" integer
-			// rate          ::= "rate=" integer
-			// frame         ::= "frame=" integer
-			// argument      ::= channel | rate | frame
-			// argument_list ::= argument ("," argument)* "@" | empty
-			// device_string ::= any
-			// mic           ::= argument_list device_string
-			using namespace boost::spirit;
-			boost::spirit::rule<> r_pdev, r_argument_list, r_argument, r_channel, r_rate, r_frame, r_devstr;
-			r_channel = str_p("channels=") >> uint_p[assign_a(channels)];
-			r_rate = str_p("rate=") >> uint_p[assign_a(prate)];
-			r_frame = str_p("frames=") >> uint_p[assign_a(frames)];
-			r_argument = r_channel | r_rate | r_frame;
-			r_argument_list = r_argument % ch_p(',');
-			r_devstr = (+anychar_p)[assign_a(pdevstr)];
-			r_pdev = !((r_argument_list >> ch_p('@') >> r_devstr) | r_argument_list | r_devstr);
-			if (!parse(pdev.c_str(), r_pdev).full ) {
+			channels = 2;
+			frames = 256;
+			rate = 48000;
+			devstr = "";
+			if (!parse(pdev.c_str(), device).full ) {
 			  throw std::runtime_error("Invalid syntax in pdev=" + pdev);
 			}
 		}
-		Audio audio(pdevstr, prate);
+		Audio audio(devstr, rate);
 		Songs songs(songdirs, songlist);
 		CScreenManager sm(theme);
 		Window window(width, height, fullscreen);
@@ -272,18 +259,18 @@ int main(int argc, char** argv) {
 		sm.activateScreen("Intro");
 		// Main loop
 		boost::xtime time = now();
-		int frames = 0;
+		unsigned nb_frames = 0;
 		while (!sm.isFinished()) {
 			checkEvents_SDL(sm, window);
 			window.blank();
 			sm.getCurrentScreen()->draw();
 			window.swap();
-			++frames;
+			++nb_frames;
 			if (fps) {
 				if (now() - time > 1.0) {
-					std::cout << frames << " FPS" << std::endl;
+					std::cout << nb_frames << " FPS" << std::endl;
 					time += 1.0;
-					frames = 0;
+					nb_frames = 0;
 				}
 			} else {
 				boost::thread::sleep(time + 0.01); // Max 100 FPS
