@@ -113,7 +113,7 @@ void CScreenSongs::draw() {
 		m_songbg.reset(); m_video.reset();
 		if (music.empty()) m_audio.fadeout(); else m_audio.playPreview(music);
 		if (!songbg.empty()) try { m_songbg.reset(new Surface(songbg)); } catch (std::exception const&) {}
-		m_video.reset(new Video(video));
+		if (!video.empty()) m_video.reset(new Video(video));
 		m_playing = music;
 	}
 	// Switch songs if idle for too long
