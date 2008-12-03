@@ -194,10 +194,11 @@
 			<key>/schemas/apps/performous/audio/playback</key>
 			<applyto>apps/performous/audio/playback</applyto>
 			<owner>performous</owner>
-			<type>string</type>
-			<default></default>
+			<type>list</type>
+			<list_type>string</list_type>
+			<default>[]</default>
 			<locale name="C">
-				<short>Playback configuration</short>
+				<short>List of playback devices</short>
 				<long></long>
 			</locale>
 		</schema>
