@@ -6,10 +6,12 @@ LibDA
 - GStreamer playback?
 
 General
-- Do not fail when playback device cannot be used (use "none" device?)?
-- Issue warning dialog about capture/playback failure?
-   * In this case the capture missing warning in practice should be removed
+- Implement a generic warning dialog (a simple function for popping the dialog with specified text?)
+- Issue a warning dialog about capture/playback failure
+   * Warning from practice screen may be removed then
 - Redo themes in the black/grey theme and rename it to default
+   * With widest AR support
+   * Performous text using the same font as on the website? (dunno which it is)
 
 Configuration
 - New config menu (several items visible at once, etc)

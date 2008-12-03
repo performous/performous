@@ -8,21 +8,22 @@
 #include "util.hh"
 #include "xtime.hh"
 
-Audio::Audio(std::string const& pdev, unsigned int rate):
+Audio::Audio():
 	m_crossfade(0),
 	m_crossbuf(0.4 * 48000 * 2), // 0.4 seconds at 48 kHz, 2 ch
 	m_volume(1.0),
 	m_volumeMusic(100),
 	m_volumePreview(70),
 	m_paused(false),
-	m_prebuffering(false),
-	m_rs(da::settings(pdev)
-	.set_callback(boost::ref(*this))
-	.set_channels(2)
-	.set_rate(rate)
-	.set_debug(std::cerr)),
-	m_playback(m_rs)
+	m_prebuffering(false)
 {}
+
+void Audio::open(std::string const& pdev, unsigned int rate) {
+	m_playback.reset();
+	m_mpeg.reset();
+	m_rs = da::settings(pdev).set_callback(boost::ref(*this)).set_channels(2).set_rate(rate).set_debug(std::cerr);
+	m_playback.reset(new da::playback(m_rs));
+}
 
 void Audio::operator()(da::pcm_data& areas, da::settings const&) {
 	boost::recursive_mutex::scoped_lock l(m_mutex);
@@ -80,6 +81,7 @@ void Audio::setVolume_internal(unsigned int volume) {
 }
 
 void Audio::playMusic(std::string const& filename, bool preview) {
+	if (!isOpen()) return;
 	// First construct the new stream
 	std::auto_ptr<CFfmpeg> mpeg;
 	try {

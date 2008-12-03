@@ -12,8 +12,10 @@
 /** @short High level audio playback API **/
 class Audio {
   public:
+	Audio();
 	/** Takes libda devstr and sample rate. Throws if the device fails. **/
-	Audio(std::string const& pdev, unsigned int rate);
+	void open(std::string const& pdev, unsigned int rate);
+	bool isOpen() const { return m_playback; }
 	/** Play a song from the beginning
 	 * @param filename the track filename
 	 */
@@ -58,7 +60,7 @@ class Audio {
 	bool m_prebuffering;
 	Notes const* volatile m_notes;
 	da::settings m_rs;
-	da::playback m_playback;
+	boost::scoped_ptr<da::playback> m_playback;
 };
 
 #endif

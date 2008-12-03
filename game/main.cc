@@ -88,7 +88,7 @@ int main(int argc, char** argv) {
 	std::string theme;
 	std::set<std::string> songdirs;
 	std::vector<std::string> mics;
-	std::string pdev;
+	std::vector<std::string> pdevs;
 	std::string homedir;
 	{
 		char const* home = getenv("HOME");
@@ -111,7 +111,8 @@ int main(int argc, char** argv) {
 		  ("height,H", po::value<unsigned int>(&height)->default_value(600), "set vertical resolution")
 		  ("michelp", "detailed help for --mics and a list of available audio devices")
 		  ("mics", po::value<std::vector<std::string> >(&mics)->composing(), "specify microphones to use")
-		  ("pdev", po::value<std::string>(&pdev), "set playback device (disable autodetection)\n  --pdev=[OPTIONS@]dev[:settings]\n  --pdev=help for list of devices")
+		  ("pdevhelp", "detailed help for --pdev and a list of available audio devices")
+		  ("pdev", po::value<std::vector<std::string> >(&pdevs)->composing(), "specify a playback device")
 		  ("clean,c", "disable internal default song folders")
 		  ("songdir,s", po::value<std::vector<std::string> >(&songdirstmp)->composing(), "additional song folders to scan\n  may be specified without -s or -songdir too");
 		po::positional_options_description p;
@@ -139,9 +140,15 @@ int main(int argc, char** argv) {
 			std::cout << cmdline << std::endl;
 			return 0;
 		}
-		if (pdev == "help") {
+		if (vm.count("pdevhelp")) {
 			da::playback::devlist_t l = da::playback::devices();
-			std::cout << "Playback devices:" << std::endl;
+			std::cout << "Specify with --pdev [OPTIONS@]dev[:settings]]. For example:\n"
+			  "  --pdev jack                       JACK output\n"
+			  "  --pdev rate=44100,frames=512@alsa ALSA with 44.1 kHz and buffers of 512 samples\n"
+			  "                                    Nearest available rate will be used.\n"
+			  "  --pdev alsa:hw:Intel              Use ALSA sound card named Intel.\n\n"
+			  "If multiple pdevs are specified, they will all be tested to find a working one.\n" << std::endl;
+			std::cout << "Playback devices available:" << std::endl;
 			for (da::playback::devlist_t::const_iterator it = l.begin(); it != l.end(); ++it) {
 				std::cout << boost::format("  %1% %|10t|%2%\n") % it->name() % it->desc();
 			}
@@ -198,56 +205,57 @@ int main(int argc, char** argv) {
         }
 		if (*theme.rbegin() == '/') theme.erase(theme.size() - 1); // Remove trailing slash
 	}
+	// Built-in defaults:
+	mics.push_back("alsa:hw:default"); // Singstar mics
+	mics.push_back(""); // Anything goes
+	pdevs.push_back(""); // Anything goes
 	try {
-		// initialize audio argument parser
-		using namespace boost::spirit;
-		unsigned channels, rate, frames;
-		std::string devstr;
-
-		// channel       ::= "channel=" integer
-		// rate          ::= "rate=" integer
-		// frame         ::= "frame=" integer
-		// argument      ::= channel | rate | frame
-		// argument_list ::= !(integer ",") argument % "," | integer
-		// backend       ::= anychar+
-		// device        ::= argument_list "@" backend | argument_list | backend
-		rule<> channels_r = "channels=" >> uint_p[assign_a(channels)];
-		rule<> rate_r = "rate=" >> uint_p[assign_a(rate)];
-		rule<> frames_r = "frames=" >> uint_p[assign_a(frames)];
-		rule<> argument = channels_r | rate_r | frames_r;
-		rule<> argument_list = (!(uint_p[assign_a(channels)] >> ',') >> (argument % ',')) | (uint_p[assign_a(channels)]);
-		rule<> backend = (+anychar_p)[assign_a(devstr)];
-		rule<> device = (argument_list >> '@' >> backend) | argument_list | backend;
-		// Initialize everything
 		Capture capture;
-		for(std::size_t i = 0; i < mics.size(); ++i) {
-			channels = 2;
-			rate = 48000;
-			frames = 256;
-			devstr = "";
-			if (!parse(mics[i].c_str(), device).full ) {
-			  throw std::runtime_error("Invalid syntax in mics=" + mics[i]);
-			}
-			try {
-				capture.addMics(channels, rate, devstr);
-			} catch (std::runtime_error const& e) {
-				std::cerr << "Capture device mics=" << mics[i] << " failed and will be ignored:\n  " << e.what() << std::endl;
-			}
-		}
-		if (capture.analyzers().empty()) try { std::cout << "No capture devices configured. Trying built-in defaults." << std::endl; capture.addMics(2, 48000, "alsa:hw:default"); } catch(...) {}
-		if (capture.analyzers().empty()) try { capture.addMics(2, 48000, ""); } catch(...) {} // Anything goes...
-		if (capture.analyzers().empty()) std::cerr << "No capture devices could be used. Please use --mics to define some." << std::endl;
-
+		Audio audio;
 		{
-			channels = 2;
-			frames = 256;
-			rate = 48000;
-			devstr = "";
-			if (!pdev.empty() && !parse(pdev.c_str(), device).full ) {
-			  throw std::runtime_error("Invalid syntax in pdev=" + pdev);
+			// initialize audio argument parser
+			using namespace boost::spirit;
+			unsigned channels, rate, frames;
+			std::string devstr;
+
+			// channel       ::= "channel=" integer
+			// rate          ::= "rate=" integer
+			// frame         ::= "frame=" integer
+			// argument      ::= channel | rate | frame
+			// argument_list ::= integer? argument % ","
+			// backend       ::= anychar+
+			// device        ::= argument_list "@" backend | argument_list | backend
+			rule<> channels_r = "channels=" >> uint_p[assign_a(channels)];
+			rule<> rate_r = "rate=" >> uint_p[assign_a(rate)];
+			rule<> frames_r = "frames=" >> uint_p[assign_a(frames)];
+			rule<> argument = channels_r | rate_r | frames_r;
+			rule<> argument_list = !(uint_p[assign_a(channels)] >> ',') >> argument % ',';
+			rule<> backend = (+anychar_p)[assign_a(devstr)];
+			rule<> device = !((argument_list >> '@' >> backend) | argument_list | backend);
+			// Capture devices
+			for(std::size_t i = 0; i < mics.size(); ++i) {
+				channels = 2; rate = 48000; frames = 256; devstr.clear();
+				if (!parse(mics[i].c_str(), device).full) throw std::runtime_error("Invalid syntax in mics=" + mics[i]);
+				try {
+					capture.addMics(channels, rate, devstr);
+				} catch (std::exception const& e) {
+					std::cerr << "Capture device mics=" << mics[i] << " failed and will be ignored:\n  " << e.what() << std::endl;
+				}
 			}
+			if (capture.analyzers().empty()) std::cerr << "No capture devices could be used. Please use --mics to define some." << std::endl;
+			// Playback devices
+			for(std::size_t i = 0; i < pdevs.size() && !audio.isOpen(); ++i) {
+				channels = 2; rate = 48000; frames = 256; devstr.clear();
+				if (!parse(pdevs[i].c_str(), device).full) throw std::runtime_error("Invalid syntax in pdev=" + pdevs[i]);
+				if (channels != 2) throw std::runtime_error("Only stereo playback is supported, error in pdev=" + pdevs[i]);
+				try {
+					audio.open(devstr, rate);
+				} catch (std::exception const& e) {
+					std::cerr << "Playback device pdev=" << pdevs[i] << " failed and will be ignored:\n  " << e.what() << std::endl;
+				}
+			}
+			if (!audio.isOpen()) std::cerr << "No playback devices could be used. Please use --pdev to define one." << std::endl;
 		}
-		Audio audio(devstr, rate);
 		Songs songs(songdirs, songlist);
 		CScreenManager sm(theme);
 		Window window(width, height, fullscreen);
