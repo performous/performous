@@ -10,6 +10,8 @@
 
 extern std::map<std::string, boost::any> config;
 
+void readConfigfile( const std::string &_configfile, const std::string &_schemafile);
+
 template<int min, int max> class Integer {
   public:
 	Integer(int value): m_value(clamp(value, min, max)) {}

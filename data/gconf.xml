@@ -40,7 +40,7 @@
 			<stringvalue>channels=1,rate=44100,frames=256@alsa:hw:M16DX</stringvalue>
 		</li>
 	</entry>
-	<entry name="playback" mtime="1227884395" schema="/schemas/apps/performous/audio/playback" type="list" mtype="string">
+	<entry name="playback" mtime="1227884395" schema="/schemas/apps/performous/audio/playback" type="list" ltype="string">
 		<li type="string">
 			<stringvalue>channels=2,rate=44100,frames=256@alsa</stringvalue>
 		</li>
