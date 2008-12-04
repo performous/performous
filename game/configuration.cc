@@ -5,13 +5,61 @@
 #include <libxml++/libxml++.h>
 
 
-std::map<std::string, boost::any> config;
+std::map<std::string, boost::any> config; // "name" is the key
+std::map<std::string, boost::any> config_desc; // "schema" on the config is the key
 
 void readConfigfile( const std::string &_configfile, const std::string &_schemafile)
 {
+	xmlpp::NodeSet n;
+	std::cout << "Openning configuration file \"" << _schemafile << "\"" << std::endl;
+
+	xmlpp::DomParser domSchema(_schemafile);
+	n = domSchema.get_document()->get_root_node()->find("/gconfschemafile/schemalist/schema");
+	for (xmlpp::NodeSet::const_iterator it = n.begin(), end = n.end(); it != end; ++it) {
+		xmlpp::NodeSet key_nodeset = dynamic_cast<xmlpp::Element&>(**it).find("key/text()");
+		if( key_nodeset.size() == 0 ) continue;
+		std::string key = dynamic_cast<xmlpp::TextNode&>(**key_nodeset.begin()).get_content();
+		std::cout << "Key: \"" << key << "\"" << std::endl;
+
+		xmlpp::NodeSet type_nodeset = dynamic_cast<xmlpp::Element&>(**it).find("type/text()");
+		if( type_nodeset.size() == 0 ) continue;
+		std::string type = dynamic_cast<xmlpp::TextNode&>(**type_nodeset.begin()).get_content();
+		std::cout << "  Type: \"" << type << "\"" << std::endl;
+
+		if( type == std::string("list") ) {
+			xmlpp::NodeSet ltype_nodeset = dynamic_cast<xmlpp::Element&>(**it).find("list_type/text()");
+			if( ltype_nodeset.size() == 0 ) continue;
+			std::string ltype = dynamic_cast<xmlpp::TextNode&>(**ltype_nodeset.begin()).get_content();
+			std::cout << "  List type: \"" << ltype << "\"" << std::endl;
+		}
+
+		xmlpp::NodeSet default_nodeset = dynamic_cast<xmlpp::Element&>(**it).find("default/text()");
+		if( default_nodeset.size() != 0 ) {
+			std::string default_value = dynamic_cast<xmlpp::TextNode&>(**default_nodeset.begin()).get_content();
+			std::cout << "  Default: \"" << default_value << "\"" << std::endl;
+		}
+
+		xmlpp::NodeSet short_desc_nodeset = dynamic_cast<xmlpp::Element&>(**it).find("locale[@name='C']/short/text()");
+		if( short_desc_nodeset.size() != 0 ) {
+			std::string short_desc = dynamic_cast<xmlpp::TextNode&>(**short_desc_nodeset.begin()).get_content();
+			std::cout << "  Short description: \"" << short_desc << "\"" << std::endl;
+		}
+
+		xmlpp::NodeSet long_desc_nodeset = dynamic_cast<xmlpp::Element&>(**it).find("locale[@name='C']/long/text()");
+		if( long_desc_nodeset.size() != 0 ) {
+			std::string long_desc = dynamic_cast<xmlpp::TextNode&>(**long_desc_nodeset.begin()).get_content();
+			std::cout << "  Long description: \"" << long_desc << "\"" << std::endl;
+		}
+	}
+
+
+
+
+
+
 	std::cout << "Openning configuration file \"" << _configfile << "\"" << std::endl;
-	xmlpp::DomParser dom(_configfile);
-	xmlpp::NodeSet n = dom.get_document()->get_root_node()->find("/gconf/entry");
+	xmlpp::DomParser domConfig(_configfile);
+	n = domConfig.get_document()->get_root_node()->find("/gconf/entry");
 	for (xmlpp::NodeSet::const_iterator it = n.begin(), end = n.end(); it != end; ++it) {
 		xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**it);
 		std::string name = elem.get_attribute("name")->get_value();
