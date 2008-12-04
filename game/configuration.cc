@@ -11,7 +11,7 @@ void readConfigfile( const std::string &_configfile, const std::string &_schemaf
 {
 	std::cout << "Openning configuration file \"" << _configfile << "\"" << std::endl;
 	xmlpp::DomParser dom(_configfile);
-	xmlpp::NodeSet n = dom.get_document()->get_root_node()->find("//entry");
+	xmlpp::NodeSet n = dom.get_document()->get_root_node()->find("/gconf/entry");
 	for (xmlpp::NodeSet::const_iterator it = n.begin(), end = n.end(); it != end; ++it) {
 		xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**it);
 		std::string name = elem.get_attribute("name")->get_value();
@@ -20,6 +20,12 @@ void readConfigfile( const std::string &_configfile, const std::string &_schemaf
 		if( name.empty() || schema.empty() || type.empty() ) continue;
 
 		if( type == std::string("bool") ) {
+			std::string value_string = elem.get_attribute("value")->get_value();
+			bool value = false;
+			if( value_string == std::string("true") || value_string == std::string("1") )
+				value = true;
+
+			std::cout <<  "  Found \"" << name << "\" of type \"" << type << "\" of value " << value << std::endl;
 		} else if( type == std::string("int") ) {
 			std::string value_string = elem.get_attribute("value")->get_value();
 			int value = 0;
