@@ -59,8 +59,8 @@ class LyricRow {
 
 class CScreenSing: public CScreen {
   public:
-	CScreenSing(std::string const& name, Audio& audio, Songs& songs, boost::ptr_vector<Analyzer>& analyzers):
-	  CScreen(name), m_audio(audio), m_songs(songs), m_analyzers(analyzers), m_latencyAV(), m_nlTop(0.0, 2.0), m_nlBottom(0.0, 2.0)
+	CScreenSing(std::string const& name, Audio& audio, Songs& songs, Capture& capture):
+	  CScreen(name), m_audio(audio), m_songs(songs), m_capture(capture), m_latencyAV(), m_nlTop(0.0, 2.0), m_nlBottom(0.0, 2.0)
 	{}
 	void enter();
 	void exit();
@@ -72,7 +72,7 @@ class CScreenSing: public CScreen {
 	Audio& m_audio;
 	Songs& m_songs;  // TODO: take song instead of all of them
 	boost::scoped_ptr<ScoreWindow> m_score_window;
-	boost::ptr_vector<Analyzer>& m_analyzers;
+	Capture& m_capture;
 	boost::scoped_ptr<ProgressBar> m_progress;
 	boost::scoped_ptr<Surface> m_background;
 	boost::scoped_ptr<Video> m_video;

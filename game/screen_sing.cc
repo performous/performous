@@ -46,7 +46,8 @@ void CScreenSing::enter() {
 	m_notealpha = 0.0f;
 	m_nlTop.setTarget(song.noteMax, true);
 	m_nlBottom.setTarget(song.noteMin, true);
-	m_engine.reset(new Engine(m_audio, m_songs.current(), m_analyzers.begin(), m_analyzers.end()));
+	boost::ptr_vector<Analyzer>& analyzers = m_capture.analyzers();
+	m_engine.reset(new Engine(m_audio, m_songs.current(), analyzers.begin(), analyzers.end()));
 }
 
 void CScreenSing::exit() {

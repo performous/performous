@@ -261,8 +261,8 @@ int main(int argc, char** argv) {
 		Window window(width, height, fullscreen);
 		sm.addScreen(new CScreenIntro("Intro", audio, capture));
 		sm.addScreen(new CScreenSongs("Songs", audio, songs));
-		sm.addScreen(new CScreenSing("Sing", audio, songs, capture.analyzers()));
-		sm.addScreen(new CScreenPractice("Practice", audio, capture.analyzers()));
+		sm.addScreen(new CScreenSing("Sing", audio, songs, capture));
+		sm.addScreen(new CScreenPractice("Practice", audio, capture));
 		sm.addScreen(new CScreenConfiguration("Configuration", audio));
 		sm.activateScreen("Intro");
 		// Main loop

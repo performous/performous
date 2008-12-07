@@ -9,14 +9,14 @@
 
 class CScreenPractice : public CScreen {
   public:
-	CScreenPractice(std::string const& name, Audio& audio, boost::ptr_vector<Analyzer>& analyzers);
+	CScreenPractice(std::string const& name, Audio& audio, Capture& capture);
 	void enter();
 	void exit();
 	void manageEvent( SDL_Event event );
 	void draw();
   private:
 	Audio& m_audio;
-	boost::ptr_vector<Analyzer>& m_analyzers;
+	Capture& m_capture;
 	boost::ptr_vector<ProgressBar> m_vumeters;
 	boost::scoped_ptr<CThemePractice> theme;
 };

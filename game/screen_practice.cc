@@ -2,29 +2,27 @@
 
 #include "util.hh"
 
-CScreenPractice::CScreenPractice(std::string const& name, Audio& audio, boost::ptr_vector<Analyzer>& analyzers):
-  CScreen(name), m_audio(audio), m_analyzers(analyzers)
+CScreenPractice::CScreenPractice(std::string const& name, Audio& audio, Capture& capture):
+  CScreen(name), m_audio(audio), m_capture(capture)
 {}
 
 void CScreenPractice::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	m_audio.playMusic(sm->getThemePathFile("practice.ogg"));
 	theme.reset(new CThemePractice());
-	for (unsigned int i = 0; i < m_analyzers.size(); ++i) {
+	for (unsigned int i = 0, mics = m_capture.analyzers().size(); i < mics; ++i) {
 		ProgressBar* b;
 		m_vumeters.push_back(b = new ProgressBar(sm->getThemePathFile("vumeter_bg.svg"), sm->getThemePathFile("vumeter_fg.svg"), ProgressBar::VERTICAL, 0.136, 0.023));
 		b->dimensions.screenBottom().left(-0.4 + i * 0.2).fixedWidth(0.04);
 	}
 }
 
-void CScreenPractice::exit()
-{
+void CScreenPractice::exit() {
 	m_vumeters.clear();
 	theme.reset();
 }
 
-void CScreenPractice::manageEvent(SDL_Event event)
-{
+void CScreenPractice::manageEvent(SDL_Event event) {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
 	if (event.type == SDL_KEYDOWN) {
 		int key = event.key.keysym.sym;
@@ -35,14 +33,11 @@ void CScreenPractice::manageEvent(SDL_Event event)
 
 void CScreenPractice::draw() {
 	theme->bg->draw();
-	if (m_analyzers.empty()) {
-		theme->note_txt->dimensions.left(-0.3).screenBottom(-0.1);
-		theme->note_txt->draw("No microphones\nconfigured");
-		return;
-	}
+	boost::ptr_vector<Analyzer>& analyzers = m_capture.analyzers();
+	if (analyzers.empty()) return;
 	bool text = false;
-	for (unsigned int i = 0; i < m_analyzers.size(); ++i) {
-		Analyzer& analyzer = m_analyzers[i];
+	for (unsigned int i = 0; i < analyzers.size(); ++i) {
+		Analyzer& analyzer = analyzers[i];
 		analyzer.process();
 		Tone const* tone = analyzer.findTone();
 		double freq = (tone ? tone->freq : 0.0);
