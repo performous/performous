@@ -2,9 +2,6 @@ Blockers for 0.3.1 release
 
 Entries ending with question mark are optional (and not really blockers).
 
-LibDA
-- GStreamer playback?
-
 General
 - Implement a generic warning dialog (a simple function for popping the dialog with specified text?)
 - Issue a warning dialog about capture/playback failure

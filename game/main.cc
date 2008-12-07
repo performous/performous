@@ -259,7 +259,7 @@ int main(int argc, char** argv) {
 		Songs songs(songdirs, songlist);
 		CScreenManager sm(theme);
 		Window window(width, height, fullscreen);
-		sm.addScreen(new CScreenIntro("Intro", audio));
+		sm.addScreen(new CScreenIntro("Intro", audio, capture));
 		sm.addScreen(new CScreenSongs("Songs", audio, songs));
 		sm.addScreen(new CScreenSing("Sing", audio, songs, capture.analyzers()));
 		sm.addScreen(new CScreenPractice("Practice", audio, capture.analyzers()));
