@@ -1,0 +1,144 @@
+<?xml version="1.0"?>
+<performous-default>
+	<!-- Graphic preferences -->
+        <entry name="graphic/width" type="int" value="640">
+		<locale name="C">
+			<short>Windowed width</short>
+			<long></long>
+		</locale>
+	</entry>
+        <entry name="graphic/height" type="int" value="480">
+		<locale name="C">
+			<short>Windowed height</short>
+			<long></long>
+		</locale>
+	</entry>
+        <entry name="graphic/fs_width" type="int" value="640">
+		<locale name="C">
+			<short>Fullscreen width</short>
+			<long></long>
+		</locale>
+	</entry>
+        <entry name="graphic/fs_height" type="int" value="480">
+		<locale name="C">
+			<short>Fullscreen height</short>
+			<long></long>
+		</locale>
+	</entry>
+        <entry name="graphic/fullscreen" type="bool" value="false">
+		<locale name="C">
+			<short>Enable fullsreen</short>
+			<long></long>
+		</locale>
+	</entry>
+        <entry name="graphic/video" type="bool" value="true">
+		<locale name="C">
+			<short>Enable video playback</short>
+			<long></long>
+		</locale>
+	</entry>
+        <entry name="graphic/svg_lod" type="int" value="1">
+		<locale name="C">
+			<short>SVG level of details</short>
+			<long></long>
+		</locale>
+	</entry>
+        <entry name="graphic/text_lod" type="int" value="1">
+		<locale name="C">
+			<short>Text level of details</short>
+			<long></long>
+		</locale>
+	</entry>
+        <entry name="graphic/fps" type="bool" value="false">
+		<locale name="C">
+			<short>Activate FPS display</short>
+			<long></long>
+		</locale>
+	</entry>
+
+	<!-- Audio preferences -->
+        <entry name="audio/round-trip" type="float" value="0.0">
+		<locale name="C">
+			<short>Audio round trip</short>
+			<long></long>
+		</locale>
+	</entry>
+        <entry name="audio/video_delay" type="float" value="0.0">
+		<locale name="C">
+			<short>Audio/Video delay</short>
+			<long></long>
+		</locale>
+	</entry>
+	<entry name="audio/capture" type="string_list">
+		<stringvalue>channels=2</stringvalue>
+		<stringvalue>channels=1,rate=44100,frames=256@alsa:hw:M16DX</stringvalue>
+		<locale name="C">
+			<short>List of capture devices</short>
+			<long></long>
+		</locale>
+	</entry>
+	<entry name="audio/playback" type="string_list">
+		<stringvalue>channels=2,rate=44100,frames=256@alsa</stringvalue>
+		<locale name="C">
+			<short>List of playback devices</short>
+			<long></long>
+		</locale>
+	</entry>
+        <entry name="audio/menu_volume" type="int" value="70">
+		<locale name="C">
+			<short>Menu screen audio level</short>
+			<long></long>
+		</locale>
+	</entry>
+        <entry name="audio/songs_volume" type="int" value="70">
+		<locale name="C">
+			<short>Songs screen audio level</short>
+			<long></long>
+		</locale>
+	</entry>
+        <entry name="audio/sing_volume" type="int" value="100">
+		<locale name="C">
+			<short>Sing screen audio level</short>
+			<long></long>
+		</locale>
+	</entry>
+
+	<!-- Themes preferences -->
+        <entry name="themes/default" type="string">
+		<stringvalue>lima</stringvalue>
+		<locale name="C">
+			<short>Default theme name</short>
+			<long></long>
+		</locale>
+	</entry>
+        <entry name="themes/override" type="bool" value="false">
+		<locale name="C">
+			<short>Enable themes directories override</short>
+			<long></long>
+		</locale>
+	</entry>
+        <entry name="themes/path" type="string_list">
+		<stringvalue>/usr/share/themes/</stringvalue>
+		<stringvalue>/home/songs/themes/</stringvalue>
+		<locale name="C">
+			<short>List of themes directories</short>
+			<long></long>
+		</locale>
+	</entry>
+
+	<!-- Songs preferences -->
+        <entry name="songs/override" type="bool" value="false">
+		<locale name="C">
+			<short>Enable songs directories override</short>
+			<long></long>
+		</locale>
+	</entry>
+        <entry name="songs/path" type="string_list">
+		<stringvalue>/usr/share/songs/</stringvalue>
+		<stringvalue>/home/songs/</stringvalue>
+		<locale name="C">
+			<short>List of songs directories</short>
+			<long></long>
+		</locale>
+	</entry>
+</performous-default>

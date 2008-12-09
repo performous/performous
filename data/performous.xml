@@ -1,34 +1,44 @@
+<?xml version="1.0"?>
 <performous>
-  <config version="1">
-    <songs>
-      <songs-directories method="override">
-        <directory path="/usr/share/songs/" />
-        <directory path="/home/songs/" />
-      </songs-directories>
-    </songs>
-    <themes default="lima">
-      <themes-directories method="append">
-        <directory path="/usr/share/themes/" />
-      </themes-directories>
-    </themes>
-    <graphic>
-      <resolution width="800" height="600" />
-      <fullscreen enable="true" />
-      <fps enable="false" />
-      <video enable="true" />
-    </graphic>
-    <audio round-trip="0.0" video-delay="0.0">
-      <capture>
-        <mics number="2" />
-        <mics number="2" backend="jack"/>
-        <mics number="18" backend="alsa" settings="hw:M16DX"/>
-        <mics number="1" rate="44100" />
-      </captude>
-      <playback backend="default" rate="48000">
-        <device name="alsa" settings="hw:0" />
-        <device name="jack" />
-      <playback>
-      <volumes menu="70" songs="70" sing="100" />
-    </audio>
-  </config>
+	<!-- Graphic preferences -->
+        <entry name="graphic/width" type="int" value="640" />
+        <entry name="graphic/height" type="int" value="480" />
+        <entry name="graphic/fs_width" type="int" value="640" />
+        <entry name="graphic/fs_height" type="int" value="480" />
+        <entry name="graphic/fullscreen" type="bool" value="false" />
+        <entry name="graphic/video" type="bool" value="true" />
+        <entry name="graphic/svg_lod" type="int" value="1" />
+        <entry name="graphic/text_lod" type="int" value="1" />
+        <entry name="graphic/fps" type="bool" value="false" />
+
+	<!-- Audio preferences -->
+        <entry name="audio/round-trip" type="float" value="0.0" />
+        <entry name="audio/video_delay" type="float" value="0.0" />
+	<entry name="audio/capture" type="string_list">
+		<stringvalue>channels=2</stringvalue>
+		<stringvalue>channels=1,rate=44100,frames=256@alsa:hw:M16DX</stringvalue>
+	</entry>
+	<entry name="audio/playback" type="string_list">
+		<stringvalue>channels=2,rate=44100,frames=256@alsa</stringvalue>
+	</entry>
+        <entry name="audio/menu_volume" type="int" value="70" />
+        <entry name="audio/songs_volume" type="int" value="70" />
+        <entry name="audio/sing_volume" type="int" value="100" />
+
+	<!-- Themes preferences -->
+        <entry name="themes/override" type="bool" value="false" />
+        <entry name="themes/default" type="string">
+		<stringvalue>lima</stringvalue>
+	</entry>
+        <entry name="themes/path" type="string_list">
+		<stringvalue>/usr/share/themes/</stringvalue>
+		<stringvalue>/home/songs/themes/</stringvalue>
+	</entry>
+
+	<!-- Songs preferences -->
+        <entry name="songs/override" type="bool" value="false" />
+        <entry name="songs/path" type="string_list">
+		<stringvalue>/usr/share/songs/</stringvalue>
+		<stringvalue>/home/songs/</stringvalue>
+	</entry>
 </performous>
