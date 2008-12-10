@@ -12,7 +12,7 @@
         <entry name="graphic/fps" type="bool" value="false" />
 
 	<!-- Audio preferences -->
-        <entry name="audio/round-trip" type="float" value="0.0" />
+        <entry name="audio/round-trip" type="float" value="0.1" />
         <entry name="audio/video_delay" type="float" value="0.0" />
 	<entry name="audio/capture" type="string_list">
 		<stringvalue>channels=2</stringvalue>
