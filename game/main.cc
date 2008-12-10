@@ -95,13 +95,11 @@ int main(int argc, char** argv) {
 		if (home) homedir = std::string(home) + '/';
 	}
 	{
-		/*
 		char const* default_config_file = getenv("PERFORMOUS_DEFAULT_CONFIG_FILE");
 		if(default_config_file)
 			readConfigfile( homedir + ".config/performous.xml", default_config_file);
 		else
-			readConfigfile( homedir + ".config/performous.xml", "/etc/performous.xml");
-		*/
+			readConfigfile( homedir + ".config/performous.xml", "/etc/performous/performous.xml");
 	}
 	{
 		std::vector<std::string> songdirstmp;

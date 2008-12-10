@@ -161,10 +161,11 @@ void assignConfigItem( ConfigItem &_item, std::string _type, xmlpp::Element& _el
 void readConfigfile( const std::string &_configfile, const std::string &_schemafile)
 {
 	xmlpp::NodeSet n;
+	xmlpp::DomParser domParser;
 
 	std::cout << "Openning default configuration file \"" << _schemafile << "\"" << std::endl;
-	xmlpp::DomParser domDefConfig(_schemafile);
-	n = domDefConfig.get_document()->get_root_node()->find("/performous/entry");
+	domParser.parse_file(_schemafile);
+	n = domParser.get_document()->get_root_node()->find("/performous/entry");
 	for (xmlpp::NodeSet::const_iterator it = n.begin(), end = n.end(); it != end; ++it) {
 		xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**it);
 		std::string name = elem.get_attribute("name")->get_value();
@@ -183,8 +184,8 @@ void readConfigfile( const std::string &_configfile, const std::string &_schemaf
 
 	std::cout << "Openning user configuration file \"" << _configfile << "\"" << std::endl;
 	try {
-		xmlpp::DomParser domConfig(_configfile);
-		n = domConfig.get_document()->get_root_node()->find("/performous/entry");
+		domParser.parse_file(_configfile);
+		n = domParser.get_document()->get_root_node()->find("/performous/entry");
 		for (xmlpp::NodeSet::const_iterator it = n.begin(), end = n.end(); it != end; ++it) {
 			xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**it);
 			std::string name = elem.get_attribute("name")->get_value();
