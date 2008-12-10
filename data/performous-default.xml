@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<performous-default>
+<performous>
 	<!-- Graphic preferences -->
         <entry name="graphic/width" type="int" value="640">
 		<locale name="C">
@@ -141,4 +141,4 @@
 			<long></long>
 		</locale>
 	</entry>
-</performous-default>
+</performous>
