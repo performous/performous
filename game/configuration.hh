@@ -8,7 +8,48 @@
 #include <map>
 #include <string>
 
-extern std::map<std::string, boost::any> config;
+class ConfigItem {
+  public:
+	ConfigItem();
+	ConfigItem( std::string _type, bool _is_default);
+	ConfigItem& operator++();
+	ConfigItem& operator--();
+	ConfigItem& operator+=(const int& right);
+	ConfigItem& operator-=(const int& right);
+	ConfigItem& operator+=(const float& right);
+	ConfigItem& operator-=(const float& right);
+	ConfigItem& operator+=(const double& right);
+	ConfigItem& operator-=(const double& right);
+	void set_short_description( std::string _short_desc );
+	void set_long_description( std::string _long_desc );
+	int &i(void);
+	bool &b(void);
+	double &f(void);
+	std::string &s(void);
+	std::vector<std::string> &sl(void);
+	friend std::ostream& operator <<(std::ostream &os,const ConfigItem &obj);
+  private:
+	std::string type;
+	std::string short_desc;
+	std::string long_desc;
+
+	bool is_default;
+
+	bool boolean_value;
+	int integer_value;
+	double double_value;
+	std::string string_value;
+	std::vector<std::string> string_list_value;
+
+	double double_step;
+	double double_min;
+	double double_max;
+	int integer_step;
+	int integer_min;
+	int integer_max;
+};
+
+extern std::map<std::string, ConfigItem> config;
 
 void readConfigfile( const std::string &_configfile, const std::string &_schemafile);
 
