@@ -25,7 +25,7 @@ endif(NOT CMAKE_BUILD_TYPE)
 set(SHARE_INSTALL "share/games/performous" CACHE STRING "Data file install path. Must be a relative path (from CMAKE_INSTALL_PREFIX), with no trailing slash.")
 mark_as_advanced(SHARE_INSTALL)
 
-set(SYSCONF_INSTALL_DIR "/etc/performous" CACHE STRING "global file install path. Must be a absolute path  with no trailing slash.")
+set(SYSCONF_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/etc/performous" CACHE STRING "global file install path. Must be a absolute path  with no trailing slash.")
 mark_as_advanced(SYSCONF_INSTALL_DIR)
 
 add_subdirectory(libda)
