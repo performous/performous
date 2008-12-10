@@ -99,7 +99,7 @@ int main(int argc, char** argv) {
 		if(default_config_file)
 			readConfigfile( homedir + ".config/performous.xml", default_config_file);
 		else
-			readConfigfile( homedir + ".config/performous.xml", "/etc/performous/performous.xml");
+			readConfigfile( homedir + ".config/performous.xml", "/etc/xdg/performous/performous.xml");
 	}
 	{
 		std::vector<std::string> songdirstmp;

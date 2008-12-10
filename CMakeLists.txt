@@ -25,7 +25,7 @@ endif(NOT CMAKE_BUILD_TYPE)
 set(SHARE_INSTALL "share/games/performous" CACHE STRING "Data file install path. Must be a relative path (from CMAKE_INSTALL_PREFIX), with no trailing slash.")
 mark_as_advanced(SHARE_INSTALL)
 
-set(SYSCONF_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/etc/performous" CACHE STRING "global file install path. Must be a absolute path  with no trailing slash.")
+set(SYSCONF_INSTALL_DIR "/etc/xdg/performous" CACHE STRING "global file install path. Must be a absolute path  with no trailing slash.")
 mark_as_advanced(SYSCONF_INSTALL_DIR)
 
 add_subdirectory(libda)
@@ -43,10 +43,10 @@ if(NOT "${SHARE_INSTALL}" MATCHES "^(share/performous|share/games/performous)$")
 	set(LAUNCHER_SCRIPT TRUE)
 endif(NOT "${SHARE_INSTALL}" MATCHES "^(share/performous|share/games/performous)$")
 
-if(NOT "${SYSCONF_INSTALL_DIR}" MATCHES "^(/etc/performous)$")
+if(NOT "${SYSCONF_INSTALL_DIR}" MATCHES "^(/etc/xdg/performous)$")
 	message(STATUS "Non-standard configuration file install path. Configuring performous.sh.")
 	set(LAUNCHER_SCRIPT TRUE)
-endif(NOT "${SYSCONF_INSTALL_DIR}" MATCHES "^(/etc/performous)$")
+endif(NOT "${SYSCONF_INSTALL_DIR}" MATCHES "^(/etc/xdg/performous)$")
 
 if(LAUNCHER_SCRIPT)
 	set(FULL_PREFIX ${CMAKE_INSTALL_PREFIX})
