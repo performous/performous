@@ -26,7 +26,7 @@ namespace {
 				PaError err = Pa_Initialize();
 				if( err != paNoError ) throw std::runtime_error(std::string("Cannot initialize PortAudio: ") + Pa_GetErrorText(err));
 			}
-			~init() { Pa_Terminate(); }
+			~init() { /* FIXME: This causes segfault soon after the call: Pa_Terminate(); */ }
 		} initialize;
 		struct strm {
 			PaStream* handle;
@@ -82,7 +82,7 @@ namespace {
 				PaError err = Pa_Initialize();
 				if( err != paNoError ) throw std::runtime_error(std::string("Cannot initialize PortAudio: ") + Pa_GetErrorText(err));
 			}
-			~init() { Pa_Terminate(); }
+			~init() { /* FIXME: This causes segfault soon after the call: Pa_Terminate(); */ }
 		} initialize;
 		struct strm {
 			PaStream* handle;
