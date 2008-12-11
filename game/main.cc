@@ -213,9 +213,13 @@ int main(int argc, char** argv) {
 		if (*theme.rbegin() == '/') theme.erase(theme.size() - 1); // Remove trailing slash
 	}
 	// Built-in defaults:
-	mics.push_back("alsa:hw:default"); // Singstar mics
-	mics.push_back(""); // Anything goes
-	pdevs.push_back(""); // Anything goes
+	if( mics.empty() ) {
+		mics.push_back("alsa:hw:default"); // Singstar mics
+		mics.push_back(""); // Anything goes
+	}
+	if( pdevs.empty() ) {
+		pdevs.push_back(""); // Anything goes
+	}
 	try {
 		Capture capture;
 		Audio audio;
