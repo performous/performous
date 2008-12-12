@@ -89,7 +89,7 @@ void CScreenSongs::draw() {
 			Song& song_display = m_songs[baseidx + i];
 			Surface* cover = NULL;
 			// Fetch cover image from cache or try loading it
-			try { cover = &m_covers[song_display.path + song_display.cover]; } catch (std::exception const&) {}
+			if (!song_display.cover.empty()) try { cover = &m_covers[song_display.path + song_display.cover]; } catch (std::exception const&) {}
 			Surface& s = (cover ? *cover : *m_emptyCover);
 			double diff = (i == 0 ? (0.5 - fabs(shift)) * 0.07 : 0.0);
 			double y = 0.28 + 0.5 * diff;
