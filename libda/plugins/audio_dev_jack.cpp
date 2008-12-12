@@ -6,6 +6,16 @@
 namespace {
 	using namespace da;
 
+	void handle_and_throw(jack_status_t status) {
+		if (status & JackServerFailed) throw std::runtime_error("Unable to connect to the JACK server");
+		if (status & JackServerError) throw std::runtime_error("Communication error with the JACK server");
+		if (status & JackLoadFailure) throw std::runtime_error("JACK unable to load internal client");
+		if (status & JackInitFailure) throw std::runtime_error("JACK unable to initialize client");
+		if (status & JackShmFailure) throw std::runtime_error("JACK unable to access shared memory");
+		if (status & JackVersionError) throw std::runtime_error("JACK client's protocol version doesn't match");
+		throw std::runtime_error("JACK failed (reason unknown)");
+	}
+
 	extern "C" int libda_jack_record_callback(jack_nframes_t frames, void* arg);
 	extern "C" void libda_jack_record_shutdown(void* arg);
 	class jack_record: public record::dev {
@@ -32,9 +42,10 @@ namespace {
 		void shutdown() { m_client = NULL; m_s.debug("da::jack_record: JACK server shutdown; processing terminated."); }
 	  public:
 		jack_record(settings& s): m_s(s) {
-			m_s.set_subdev(m_s.subdev().empty() ? "libda_jack_record" : m_s.subdev());
-			m_client = jack_client_new(m_s.subdev().c_str());
-			if (!m_client) throw std::runtime_error("Unable to register JACK client (jackd not running or name " + m_s.subdev() + " already used?)");
+			jack_status_t status = jack_status_t();
+			m_client = jack_client_open((m_s.subdev().empty() ? "libda_jack_record" : m_s.subdev()).c_str(), JackNullOption, &status);
+			if (!m_client) handle_and_throw(status);
+			m_s.set_subdev(jack_get_client_name(m_client));
 			for (size_t i = 0; i < m_s.channels(); ++i) {
 				std::string name = "capture_" + boost::lexical_cast<std::string>(i + 1);
 				jack_port_t* p = jack_port_register(m_client, name.c_str(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
@@ -88,9 +99,10 @@ namespace {
 		}
 	  public:
 		jack_playback(settings& s): m_s(s) {
-			m_s.set_subdev(m_s.subdev().empty() ? "libda_jack_playback" : m_s.subdev());
-			m_client = jack_client_new(m_s.subdev().c_str());
-			if (!m_client) throw std::runtime_error("Unable to register JACK client (jackd not running or name " + m_s.subdev() + " already used?)");
+			jack_status_t status = jack_status_t();
+			m_client = jack_client_open((m_s.subdev().empty() ? "libda_jack_playback" : m_s.subdev()).c_str(), JackNullOption, &status);
+			if (!m_client) handle_and_throw(status);
+			m_s.set_subdev(jack_get_client_name(m_client));
 			for (size_t i = 0; i < m_s.channels(); ++i) {
 				std::string name = "playback_" + boost::lexical_cast<std::string>(i + 1);
 				jack_port_t* p = jack_port_register(m_client, name.c_str(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
