@@ -236,11 +236,11 @@ int main(int argc, char** argv) {
 			// argument_list ::= integer? argument % ","
 			// backend       ::= anychar+
 			// device        ::= argument_list "@" backend | argument_list | backend
-			rule<> channels_r = "channels=" >> uint_p[assign_a(channels)];
+			rule<> channels_r = ("channels=" >> uint_p[assign_a(channels)]) | uint_p[assign_a(channels)];
 			rule<> rate_r = "rate=" >> uint_p[assign_a(rate)];
 			rule<> frames_r = "frames=" >> uint_p[assign_a(frames)];
 			rule<> argument = channels_r | rate_r | frames_r;
-			rule<> argument_list = !(uint_p[assign_a(channels)] >> ',') >> argument % ',';
+			rule<> argument_list = argument % ',';
 			rule<> backend = (+anychar_p)[assign_a(devstr)];
 			rule<> device = !((argument_list >> '@' >> backend) | argument_list | backend);
 			// Capture devices
