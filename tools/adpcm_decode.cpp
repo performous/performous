@@ -1,5 +1,6 @@
 #include "adpcm.h"
 #include "pak.h"
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <vector>

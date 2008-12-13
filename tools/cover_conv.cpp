@@ -1,7 +1,9 @@
-#include <stdlib.h>
+#include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include <stdexcept>
 
+// TODO: rewrite with libxml++
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 

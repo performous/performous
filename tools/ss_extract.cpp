@@ -27,7 +27,7 @@ int sleepts = -1;
 xmlpp::Node::PrefixNsMap nsmap;
 std::string ns;
 const bool video = true;
-const bool audiocompress = false;
+const bool mkvcompress = true;
 
 void safeErase(Glib::ustring& str, Glib::ustring const& del) {
 	do {
@@ -149,19 +149,10 @@ void writeWavHeader(std::ostream& outfile, unsigned ch, unsigned sr, unsigned sa
 	{ int   tmp = datasize; outfile.write((char*)(&tmp),4); }
 }
 
-void writeMusic(Song const& s, fs::path& filename, std::vector<short> const& buf, unsigned sr) {
+void writeMusic(Song const& s, fs::path const& filename, std::vector<short> const& buf, unsigned sr) {
 	std::ofstream f(filename.string().c_str(), std::ios::binary);
 	writeWavHeader(f, 2, sr, buf.size());
 	f.write(reinterpret_cast<char const*>(&buf[0]), buf.size() * sizeof(short));
-	// FIXME: use some library (preferrably ffmpeg):
-//	std::system(("oggenc \"" + filename.string() + "\" -l \"" + s.edition + "\" -a \"" + s.artist + "\" -G \"" + s.genre + "\" -t \"" + s.title + "\"").c_str());
-//	if (audiocompress) {
-//		Glib::ustring p = filename.string();
-//		safeErase(p, ".wav");
-//		p += ".ogg";
-//		fs::remove(filename);
-//		filename = p;
-//	}
 }
 
 void music(Song& song, PakFile const& dataFile, PakFile const& headerFile, fs::path const& outPath) {
@@ -190,7 +181,7 @@ void music(Song& song, PakFile const& dataFile, PakFile const& headerFile, fs::p
 		}
 	}
 	writeMusic(song, song.music = outPath / "music.wav", pcm[0], sr);
-	if (karaoke) writeMusic(song, song.vocals = outPath / "music_vocals.wav", pcm[1], sr);
+	if (karaoke) writeMusic(song, song.vocals = outPath / "vocals.wav", pcm[1], sr);
 }
 
 struct Match {
@@ -264,8 +255,13 @@ struct Process {
 			if (!song.year.empty()) txtfile << "#YEAR:" << song.year << std::endl;
 			if (!song.edition.empty()) txtfile << "#EDITION:" << song.edition << std::endl;
 			//txtfile << "#LANGUAGE:English" << std::endl; // Detect instead of hardcoding? 
-			txtfile << "#VIDEO:video.mpg" << std::endl;
-			txtfile << "#MP3:" << *--(song.music.end()) << std::endl;
+			if (video && mkvcompress) {
+				txtfile << "#MP3:music.mkv" << std::endl;
+				txtfile << "#VIDEO:music.mkv" << std::endl;
+			} else {
+				txtfile << "#MP3:" << *--(song.music.end()) << std::endl;
+				txtfile << "#VIDEO:video.mpg" << std::endl;
+			}
 			txtfile << "#COVER:cover.jpg" << std::endl;
 			//txtfile << "#BACKGROUND:background.jpg" << std::endl;
 			txtfile << "#BPM:" << song.tempo << std::endl;
@@ -277,7 +273,7 @@ struct Process {
 			std::for_each(n.begin(), n.end(), parseSentence);
 			txtfile << 'E' << std::endl;
 			txtfile.close();
-			//std::cerr << ">>> Extracting cover image" << std::endl;
+			std::cerr << ">>> Extracting cover image" << std::endl;
 			// FIXME: use internally instead of separate program
 			std::system(("cover_conv \"" + dvdPath + "/pack_ee.pak\" " + id + " \"" + path.string() + "/cover.jpg\"").c_str());
 			remove = "";
@@ -287,6 +283,16 @@ struct Process {
 				dataPak[id + "/movie.ipu"].get(ipudata);
 				std::cerr << ">>> Converting video" << std::endl;
 				IPUConv(ipudata, (path / "video.mpg").string());
+				// FIXME: use some library (preferrably ffmpeg):
+				if (mkvcompress) {
+					std::cerr << ">>> Compressing video and audio into music.mkv" << std::endl;
+					std::string cmd = "ffmpeg -i \"" + (path / "video.mpg").string() + "\" -i \"" + (path / "music.wav").string() + "\" -acodec libfaac -ab 128k -vcodec libx264 -vpre hq -crf 25 -threads 0 -album \"" + song.edition + "\" -author \"" + song.artist + "\" -comment \"" + song.genre + "\" -title \"" + song.title + "\" \"" + (path / "music.mkv\"").string();
+					std::cerr << cmd << std::endl;
+					if (std::system(cmd.c_str()) == 0) { // FIXME: std::system return value is not portable
+						fs::remove(path / "video.mpg");
+						fs::remove(path / "music.wav");
+					}
+				}
 			}
 		} catch (std::exception& e) {
 			std::cerr << e.what() << std::endl;

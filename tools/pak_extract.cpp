@@ -1,5 +1,6 @@
 #include "pak.h"
 #include <algorithm>
+#include <cstring>
 #include <functional>
 #include <iostream>
 #include <iterator>
