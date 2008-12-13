@@ -10,7 +10,7 @@ CScreenSongs::CScreenSongs(std::string const& name, Audio& audio, Songs& songs):
   CScreen(name), m_audio(audio), m_songs(songs), m_covers(20)
 {
 	m_songs.setAnimMargins(5.0, 5.0);
-	m_playTimer.setTarget(std::numeric_limits<double>::infinity()); // Using this as a simple timer counting seconds
+	m_playTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
 }
 
 void CScreenSongs::enter() {

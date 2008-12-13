@@ -1,5 +1,6 @@
 #include "pitch.hh"
 
+#include "util.hh"
 #include <fft.hpp>
 #include <algorithm>
 #include <functional>
@@ -13,12 +14,12 @@ static const double FFT_MAXFREQ = 5000.0;
 
 Tone::Tone():
   freq(0.0),
-  db(-std::numeric_limits<double>::infinity()),
-  stabledb(-std::numeric_limits<double>::infinity()),
+  db(-getInf()),
+  stabledb(-getInf()),
   age()
 {
 	for (std::size_t i = 0; i < MAXHARM; ++i)
-	  harmonics[i] = -std::numeric_limits<double>::infinity();
+	  harmonics[i] = -getInf();
 }
 
 void Tone::print() const {
@@ -55,14 +56,14 @@ namespace {
 		double freq;
 		double db;
 		bool harm[Tone::MAXHARM];
-		Peak(double _freq = 0.0, double _db = -std::numeric_limits<double>::infinity()):
+		Peak(double _freq = 0.0, double _db = -getInf()):
 		  freq(_freq), db(_db)
 		{
 			for (std::size_t i = 0; i < Tone::MAXHARM; ++i) harm[i] = false;
 		}
 		void clear() {
 			freq = 0.0;
-			db = -std::numeric_limits<double>::infinity();
+			db = -getInf();
 		}
 	};
 

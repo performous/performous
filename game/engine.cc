@@ -18,7 +18,7 @@ void Player::update() {
 		m_score = clamp(m_score, 0.0, 1.0);
 	} else {
 		if (m_activitytimer > 0) --m_activitytimer;
-		m_pitch.push_back(std::make_pair(getNaN(), -std::numeric_limits<double>::infinity()));
+		m_pitch.push_back(std::make_pair(getNaN(), -getInf()));
 	}
 }
 

@@ -15,5 +15,8 @@ template <typename T> T clamp(T val, T min = 0, T max = 1) {
 /** A convenient way for getting NaNs **/
 static inline double getNaN() { return std::numeric_limits<double>::quiet_NaN(); }
 
+/** A convenient way for getting infs **/
+static inline double getInf() { return std::numeric_limits<double>::infinity(); }
+
 #endif
 

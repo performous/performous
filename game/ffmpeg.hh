@@ -1,6 +1,8 @@
-#ifndef __FFMEG_HPP__
-#define __FFMEG_HPP__
+#pragma once
+#ifndef PERFORMOUS_FFMEG_HH
+#define PERFORMOUS_FFMEG_HH
 
+#include "util.hh"
 #include <boost/ptr_container/ptr_deque.hpp>
 #include <boost/ptr_container/ptr_set.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -15,7 +17,7 @@ struct AudioFrame {
 	double timestamp;
 	std::vector<int16_t> data;
 	template <typename InIt> AudioFrame(double ts, InIt begin, InIt end): timestamp(ts), data(begin, end) {}
-	AudioFrame(): timestamp(std::numeric_limits<double>::infinity()) {} // EOF marker
+	AudioFrame(): timestamp(getInf()) {} // EOF marker
 };
 
 struct VideoFrame {
@@ -23,7 +25,7 @@ struct VideoFrame {
 	int width, height;
 	std::vector<uint8_t> data; 
 	VideoFrame(double ts, int w, int h): timestamp(ts), width(w), height(h) {}
-	VideoFrame(): timestamp(std::numeric_limits<double>::infinity()) {} // EOF marker
+	VideoFrame(): timestamp(getInf()) {} // EOF marker
 	void swap(VideoFrame& f) {
 		std::swap(timestamp, f.timestamp);
 		data.swap(f.data);
@@ -79,7 +81,7 @@ class VideoFifo {
 	volatile unsigned m_available;
 	double m_timestamp;
 	bool m_eof;
-	static const unsigned m_min = 3;
+	static const unsigned m_min = 16; // H.264 may have 16 consecutive B frames
 	static const unsigned m_max = 50;
 };
 

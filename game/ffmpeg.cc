@@ -43,7 +43,8 @@ CFfmpeg::~CFfmpeg() {
 }
 
 double CFfmpeg::duration() {
-	return m_running ? pFormatCtx->duration / double(AV_TIME_BASE) : getNaN();
+	double d = m_running ? pFormatCtx->duration / double(AV_TIME_BASE) : getNaN();
+	return d >= 0.0 ? d : getInf();
 }
 
 void CFfmpeg::open() {
@@ -149,8 +150,16 @@ void CFfmpeg::seek(double time, bool wait) {
 void CFfmpeg::seek_internal() {
 	audioQueue.reset();
 	videoQueue.reset();
-	av_seek_frame(pFormatCtx, -1, m_seekTarget * AV_TIME_BASE, 0);
-	m_seekTarget = getNaN();
+	int flags = AVSEEK_FLAG_ANY;
+	if (m_seekTarget < position()) flags |= AVSEEK_FLAG_BACKWARD;
+	int stream = -1;
+	double target = m_seekTarget;
+	//if (decodeVideo) stream = videoStream;
+	//if (decodeAudio) stream = audioStream;
+	if (stream == -1) target *= AV_TIME_BASE;
+	else target = av_rescale_q(target, AV_TIME_BASE_Q, pFormatCtx->streams[stream]->time_base);
+	av_seek_frame(pFormatCtx, stream, target, flags);
+	m_seekTarget = getNaN(); // Signal that seeking is done
 }
 
 void CFfmpeg::decodeNextFrame() {
