@@ -24,12 +24,16 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL& _text) {
 	else if (_text.fontstyle == "italic") style = PANGO_STYLE_ITALIC;
 	else if (_text.fontstyle == "oblique") style = PANGO_STYLE_OBLIQUE;
 
+	const double m = 1.0; // Scaling factor
 	// set font description
 	PangoFontDescription *desc = pango_font_description_new();
 	pango_font_description_set_weight(desc, weight);
 	pango_font_description_set_style(desc, style);
 	pango_font_description_set_family(desc, _text.fontfamily.c_str());
-	pango_font_description_set_absolute_size(desc, _text.fontsize * PANGO_SCALE);
+	pango_font_description_set_absolute_size(desc, _text.fontsize * PANGO_SCALE * m);
+
+	double border = _text.stroke_width * m;
+	double margin = 2.0 * border;
 
 	// compute text extents
 	{
@@ -40,8 +44,8 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL& _text) {
 		pango_layout_set_text (layout, _text.text.c_str(), -1);
 		PangoRectangle rec1, rec2;
 		pango_layout_get_pixel_extents (layout,&rec1,&rec2);
-		m_x = rec2.width + 2 * _text.stroke_width;
-		m_y = rec2.height + 2 * _text.stroke_width;
+		m_x = rec2.width + 2.0 * margin;
+		m_y = rec2.height + 2.0 * margin;
 		m_x_advance = rec1.x;
 		m_y_advance = rec1.y;
 		g_object_unref (layout);
@@ -58,16 +62,15 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL& _text) {
 	pango_layout_set_font_description(layout, desc);
 	pango_layout_set_text(layout, _text.text.c_str(), -1);
 	cairo_save(dc);
-	cairo_move_to(dc, _text.stroke_width, _text.stroke_width);
+	cairo_move_to(dc, margin, margin);
 	pango_cairo_show_layout (dc, layout);
 	pango_cairo_layout_path(dc, layout);
 	if (_text.fill_col.a > 0.0) {
 		cairo_set_source_rgba(dc, _text.fill_col.r, _text.fill_col.g, _text.fill_col.b, _text.fill_col.a);
-		if (_text.stroke_col.r != -1 && _text.stroke_col.g != -1 && _text.stroke_col.b != -1) cairo_fill_preserve(dc);
-		else cairo_fill(dc);
+		cairo_fill_preserve(dc);
 	}
 	if (_text.stroke_col.a > 0.0) {
-		cairo_set_line_width(dc, _text.stroke_width);
+		cairo_set_line_width(dc, border);
 		cairo_set_source_rgba(dc, _text.stroke_col.r, _text.stroke_col.g, _text.stroke_col.b, _text.stroke_col.a);
 		cairo_stroke(dc);
 	}
@@ -82,6 +85,10 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL& _text) {
 	cairo_surface_destroy(surface);
 	// delete the font description
 	pango_font_description_free(desc);
+	m_x /= m;
+	m_y /= m;
+	m_x_advance /= m;
+	m_y_advance /= m;
 }
 
 void OpenGLText::draw() {
