@@ -30,6 +30,11 @@ std::string ns;
 const bool video = true;
 const bool mkvcompress = true;
 
+// LibXML2 logging facility
+extern "C" void xmlLogger(void* logger, char const* msg, ...) { if (logger) *(std::ostream*)logger << msg; }
+void enableXMLLogger(std::ostream& os = std::cerr) { xmlSetGenericErrorFunc(&os, xmlLogger); }
+void disableXMLLogger() { xmlSetGenericErrorFunc(NULL, xmlLogger); }
+
 void safeErase(Glib::ustring& str, Glib::ustring const& del) {
 	do {
 		Glib::ustring::size_type pos = str.find(del);
@@ -150,18 +155,9 @@ void writeWavHeader(std::ostream& outfile, unsigned ch, unsigned sr, unsigned sa
 	{ int   tmp = datasize; outfile.write((char*)(&tmp),4); }
 }
 
-void writeMusic(Song const& s, fs::path const& filename, std::vector<short> const& buf, unsigned sr) {
+void writeMusic(fs::path const& filename, std::vector<short> const& buf, unsigned sr) {
 	std::ofstream f(filename.string().c_str(), std::ios::binary);
-	faac::Enc enc(sr, 2, f);
-	faacEncConfigurationPtr config = faacEncGetCurrentConfiguration(enc);
-	config->mpegVersion = MPEG4;
-	config->aacObjectType = LOW;
-	config->allowMidside = 1;
-	config->useTns = 0;
-	config->bitRate = 60000;
-	config->bandWidth = sr / 2;
-	faacEncSetConfiguration(enc, config);
-	enc(buf.begin(), buf.end());
+	faac::Enc(sr, 2, f)(buf.begin(), buf.end()).close();
 }
 
 void music(Song& song, PakFile const& dataFile, PakFile const& headerFile, fs::path const& outPath) {
@@ -189,8 +185,8 @@ void music(Song& song, PakFile const& dataFile, PakFile const& headerFile, fs::p
 			if (l2 != 0 || r2 != 0) karaoke = true;
 		}
 	}
-	writeMusic(song, song.music = outPath / "music.wav", pcm[0], sr);
-	if (karaoke) writeMusic(song, song.vocals = outPath / "vocals.wav", pcm[1], sr);
+	writeMusic(song.music = outPath / "music.m4a", pcm[0], sr);
+	if (karaoke) writeMusic(song.vocals = outPath / "vocals.m4a", pcm[1], sr);
 }
 
 struct Match {
@@ -210,6 +206,8 @@ std::string xmlFix(std::vector<char> const& data) {
 	}
 	return ret;
 }
+
+std::string filename(boost::filesystem::path const& p) { return *--p.end(); }
 
 struct Process {
 	Pak const& pak;
@@ -264,11 +262,11 @@ struct Process {
 			if (!song.year.empty()) txtfile << "#YEAR:" << song.year << std::endl;
 			if (!song.edition.empty()) txtfile << "#EDITION:" << song.edition << std::endl;
 			//txtfile << "#LANGUAGE:English" << std::endl; // Detect instead of hardcoding? 
+			if (!song.music.empty()) txtfile << "#MP3:" << filename(song.music) << std::endl;
+			if (!song.vocals.empty()) txtfile << "#VOCALS:" << filename(song.vocals) << std::endl;
 			if (video && mkvcompress) {
-				txtfile << "#MP3:music.mkv" << std::endl;
-				txtfile << "#VIDEO:music.mkv" << std::endl;
+				txtfile << "#VIDEO:video.m4v" << std::endl;
 			} else {
-				txtfile << "#MP3:" << *--(song.music.end()) << std::endl;
 				txtfile << "#VIDEO:video.mpg" << std::endl;
 			}
 			txtfile << "#COVER:cover.jpg" << std::endl;
@@ -295,11 +293,10 @@ struct Process {
 				// FIXME: use some library (preferrably ffmpeg):
 				if (mkvcompress) {
 					std::cerr << ">>> Compressing video and audio into music.mkv" << std::endl;
-					std::string cmd = "ffmpeg -i \"" + (path / "video.mpg").string() + "\" -i \"" + (path / "music.wav").string() + "\" -acodec libfaac -ab 128k -vcodec libx264 -vpre hq -crf 25 -threads 0 -album \"" + song.edition + "\" -author \"" + song.artist + "\" -comment \"" + song.genre + "\" -title \"" + song.title + "\" \"" + (path / "music.mkv\"").string();
+					std::string cmd = "ffmpeg -i \"" + (path / "video.mpg").string() + "\" -vcodec libx264 -vpre hq -crf 25 -threads 0 -album \"" + song.edition + "\" -author \"" + song.artist + "\" -comment \"" + song.genre + "\" -title \"" + song.title + "\" \"" + (path / "video.m4v\"").string();
 					std::cerr << cmd << std::endl;
 					if (std::system(cmd.c_str()) == 0) { // FIXME: std::system return value is not portable
 						fs::remove(path / "video.mpg");
-						fs::remove(path / "music.wav");
 					}
 				}
 			}
@@ -353,11 +350,9 @@ void get_node(const xmlpp::Node* node, std::string& genre, std::string& year, do
 }
 
 struct FindSongs {
-	std::string songXPath;
 	std::string edition;
 	std::map<std::string, Song> songs;
-	FindSongs(std::string const& id = "") {
-		if (!id.empty()) songXPath = "[@ID='" + id + "' or @TITLE='" + id + "' or @PERFORMANCE_NAME='" + id + "']";
+	FindSongs(std::string const& search = ""): m_search(search) {
 	}
 	void operator()(Pak::files_t::value_type const& p) {
 		std::string name = p.first;
@@ -369,15 +364,15 @@ struct FindSongs {
 				std::vector<char> tmp;
 				p.second.get(tmp);
 				std::string buf = xmlFix(tmp);
-				bool succeeded = false;
+				disableXMLLogger();
 				try {
 					dom.parse_memory(buf);
-					succeeded = true;
-				} catch (...) {}
-				if (!succeeded) {
+				} catch (...) {
+					enableXMLLogger();
 					buf = Glib::convert(buf, "UTF-8", "ISO-8859-1"); // Convert to UTF-8
 					dom.parse_memory(buf);
 				}
+				enableXMLLogger();
 			}
 			ns.clear();
 
@@ -396,22 +391,22 @@ struct FindSongs {
 			std::vector<char> tmp;
 			p.second.get(tmp);
 			std::string buf = xmlFix(tmp);
-			bool succeeded = false;
+			disableXMLLogger();
 			try {
 				dom.parse_memory(buf);
-				succeeded = true;
-			} catch (...) {}
-			if (!succeeded) {
+			} catch (...) {
+				enableXMLLogger();
 				buf = Glib::convert(buf, "UTF-8", "ISO-8859-1"); // Convert to UTF-8
 				dom.parse_memory(buf);
 			}
+			enableXMLLogger();
 		}
 		ns.clear();
 
-		xmlpp::NodeSet n = dom.get_document()->get_root_node()->find("/SONG_SET/SONG" + songXPath);
+		xmlpp::NodeSet n = dom.get_document()->get_root_node()->find("/SONG_SET/SONG");
 		if (n.empty()) {
 			ns = "ss:";
-			n = dom.get_document()->get_root_node()->find("/ss:SONG_SET/ss:SONG" + songXPath, nsmap);
+			n = dom.get_document()->get_root_node()->find("/ss:SONG_SET/ss:SONG", nsmap);
 		}
 		Song s;
 		s.dataPakName = dvdPath + "/pak_iop" + name[name.size() - 5] + ".pak";
@@ -419,9 +414,9 @@ struct FindSongs {
 			xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**it);
 			s.title = elem.get_attribute("TITLE")->get_value();
 			s.artist = elem.get_attribute("PERFORMANCE_NAME")->get_value();
-
-    			xmlpp::Node* node = dynamic_cast<const xmlpp::Node*>((*it));
-      			get_node(node, s.genre, s.year, s.tempo); // get the values for genre, year and tempo
+			if (!m_search.empty() && m_search != elem.get_attribute("ID")->get_value() && (s.artist + " - " + s.title).find(m_search) == std::string::npos) continue;
+			xmlpp::Node* node = dynamic_cast<const xmlpp::Node*>((*it));
+			get_node(node, s.genre, s.year, s.tempo); // get the values for genre, year and tempo
 
 			xmlpp::NodeSet t = elem.find("TEMPO/@BPM");
 			if (t.empty()) s.tempo = 0.0; // this will always be 0.0
@@ -432,6 +427,8 @@ struct FindSongs {
 			songs[elem.get_attribute("ID")->get_value()] = s;
 		}
 	}
+  private:
+	std::string m_search;
 };
 
 int main( int argc, char **argv) {
