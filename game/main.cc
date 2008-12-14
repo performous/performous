@@ -241,8 +241,7 @@ int main(int argc, char** argv) {
 			rule<> frames_r = "frames=" >> uint_p[assign_a(frames)];
 			rule<> argument = channels_r | rate_r | frames_r;
 			rule<> argument_list = argument % ',';
-			rule<> backend = (+anychar_p)[assign_a(devstr)];
-			rule<> device = !((argument_list >> '@' >> backend) | argument_list | backend);
+			rule<> device = (!argument_list >> '@' >> (+anychar_p)[assign_a(devstr)]) | argument_list | (*~ch_p('@'))[assign_a(devstr)];
 			// Capture devices
 			for(std::size_t i = 0; i < mics.size(); ++i) {
 				channels = 2; rate = 48000; frames = 256; devstr.clear();
