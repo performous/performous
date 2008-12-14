@@ -23,7 +23,8 @@ endforeach(lib)
 # Set default compile flags for GCC
 if(CMAKE_COMPILER_IS_GNUCXX)
 	message(STATUS "GCC detected, enabling warnings")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++98 -pedantic -Wall -Wextra")
+	# Magick++ on OSX uses long long and thus cannot take -pedantic
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++98 -Wall -Wextra")
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
 if (LibXML++_FOUND)
