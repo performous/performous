@@ -2,6 +2,13 @@ Blockers for 0.3.1 release
 
 Entries ending with question mark are optional (and not really blockers).
 
+Text rendering (all parts optional for this release)
+- Detail adjustment (or at least make the default use higher detail)
+- Correct vertical alignment
+- Don't incorrectly crop outline of "j" and other such letters
+- Use dimensions to specify bounding box (possibly init from SVG)
+- Lyric hilighted should be rendered in front of the others
+
 General
 - Redo themes in the black/grey theme and rename it to default
    * With widest AR support

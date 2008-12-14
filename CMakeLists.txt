@@ -32,6 +32,7 @@ add_subdirectory(libda)
 add_subdirectory(themes)
 add_subdirectory(data)
 add_subdirectory(game)
+add_subdirectory(tools)
 
 if(NOT "${CMAKE_INSTALL_PREFIX}" MATCHES "^(/usr|/usr/local)$")
 	message(STATUS "Non-standard installation prefix. Configuring performous.sh.")

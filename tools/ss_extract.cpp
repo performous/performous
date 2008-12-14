@@ -15,6 +15,7 @@
 
 #include <boost/filesystem.hpp>
 
+#include "faac.hh"
 #include "pak.h"
 #include "ipuconv.hh"
 
@@ -151,8 +152,16 @@ void writeWavHeader(std::ostream& outfile, unsigned ch, unsigned sr, unsigned sa
 
 void writeMusic(Song const& s, fs::path const& filename, std::vector<short> const& buf, unsigned sr) {
 	std::ofstream f(filename.string().c_str(), std::ios::binary);
-	writeWavHeader(f, 2, sr, buf.size());
-	f.write(reinterpret_cast<char const*>(&buf[0]), buf.size() * sizeof(short));
+	faac::Enc enc(sr, 2, f);
+	faacEncConfigurationPtr config = faacEncGetCurrentConfiguration(enc);
+	config->mpegVersion = MPEG4;
+	config->aacObjectType = LOW;
+	config->allowMidside = 1;
+	config->useTns = 0;
+	config->bitRate = 60000;
+	config->bandWidth = sr / 2;
+	faacEncSetConfiguration(enc, config);
+	enc(buf.begin(), buf.end());
 }
 
 void music(Song& song, PakFile const& dataFile, PakFile const& headerFile, fs::path const& outPath) {

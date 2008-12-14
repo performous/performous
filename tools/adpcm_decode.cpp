@@ -8,9 +8,9 @@
 unsigned short decode_channels = 2;
 
 void process(Adpcm& adpcm, std::vector<char> const& data, std::ostream& outfile) {
-	short pcm[adpcm.chunkFrames() * decode_channels];
-	adpcm.decodeChunk(&data[0], pcm);
-	outfile.write(reinterpret_cast<char*>(pcm), sizeof(pcm));
+	std::vector<short> pcm(adpcm.chunkFrames() * decode_channels);
+	adpcm.decodeChunk(&data[0], &pcm[0]);
+	outfile.write(reinterpret_cast<char*>(&pcm[0]), pcm.size() * sizeof(short));
 }
 
 void writeWavHeader(std::ostream& outfile, unsigned ch, unsigned sr, unsigned samples) {
