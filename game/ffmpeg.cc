@@ -150,14 +150,13 @@ void CFfmpeg::seek(double time, bool wait) {
 void CFfmpeg::seek_internal() {
 	audioQueue.reset();
 	videoQueue.reset();
-	int flags = AVSEEK_FLAG_ANY;
+	int flags = 0;
 	if (m_seekTarget < position()) flags |= AVSEEK_FLAG_BACKWARD;
 	int stream = -1;
-	double target = m_seekTarget;
-	//if (decodeVideo) stream = videoStream;
-	//if (decodeAudio) stream = audioStream;
-	if (stream == -1) target *= AV_TIME_BASE;
-	else target = av_rescale_q(target, AV_TIME_BASE_Q, pFormatCtx->streams[stream]->time_base);
+	if (decodeVideo) stream = videoStream;
+	if (decodeAudio) stream = audioStream;
+	int64_t target = m_seekTarget * AV_TIME_BASE;
+	if (stream != -1) target = av_rescale_q(target, AV_TIME_BASE_Q, pFormatCtx->streams[stream]->time_base);
 	av_seek_frame(pFormatCtx, stream, target, flags);
 	m_seekTarget = getNaN(); // Signal that seeking is done
 }
