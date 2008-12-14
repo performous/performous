@@ -63,17 +63,19 @@ void CFfmpeg::open() {
 	if (videoStream == -1 && decodeVideo) throw std::runtime_error("No video stream found");
 	if (audioStream == -1 && decodeAudio) throw std::runtime_error("No audio stream found");
 	if (decodeVideo) {
-		pVideoCodecCtx = pFormatCtx->streams[videoStream]->codec;
-		pVideoCodec = avcodec_find_decoder(pVideoCodecCtx->codec_id);
+		AVCodecContext* cc = pFormatCtx->streams[videoStream]->codec;
+		pVideoCodec = avcodec_find_decoder(cc->codec_id);
 		if (!pVideoCodec) throw std::runtime_error("Cannot find video codec");
-		if (avcodec_open(pVideoCodecCtx, pVideoCodec) < 0) throw std::runtime_error("Cannot open video codec");
+		if (avcodec_open(cc, pVideoCodec) < 0) throw std::runtime_error("Cannot open video codec");
+		pVideoCodecCtx = cc;
 	}
 	if (decodeAudio) {
-		pAudioCodecCtx=pFormatCtx->streams[audioStream]->codec;
-		pAudioCodec=avcodec_find_decoder(pAudioCodecCtx->codec_id);
+		AVCodecContext* cc = pFormatCtx->streams[audioStream]->codec;
+		pAudioCodec = avcodec_find_decoder(cc->codec_id);
 		if (!pAudioCodec) throw std::runtime_error("Cannot find audio codec");
-		if (avcodec_open(pAudioCodecCtx, pAudioCodec) < 0) throw std::runtime_error("Cannot open audio codec");
-		pResampleCtx = audio_resample_init(AUDIO_CHANNELS, pAudioCodecCtx->channels, m_rate, pAudioCodecCtx->sample_rate);
+		if (avcodec_open(cc, pAudioCodec) < 0) throw std::runtime_error("Cannot open audio codec");
+		pAudioCodecCtx = cc;
+		pResampleCtx = audio_resample_init(AUDIO_CHANNELS, cc->channels, m_rate, cc->sample_rate);
 		if (!pResampleCtx) throw std::runtime_error("Cannot create resampling context");
 		audioQueue.setSamplesPerSecond(AUDIO_CHANNELS * m_rate);
 	}
