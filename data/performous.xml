@@ -15,8 +15,8 @@
         <entry name="audio/round-trip" type="float" value="0.1" />
         <entry name="audio/video_delay" type="float" value="0.0" />
 	<entry name="audio/capture" type="string_list">
+		<stringvalue>channels=2@alsa:hw:default</stringvalue>
 		<stringvalue>channels=2</stringvalue>
-		<stringvalue>channels=1,rate=44100,frames=256@alsa:hw:M16DX</stringvalue>
 	</entry>
 	<entry name="audio/playback" type="string_list">
 		<stringvalue>channels=2,rate=44100,frames=256@alsa</stringvalue>

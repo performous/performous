@@ -74,8 +74,8 @@
 		</locale>
 	</entry>
 	<entry name="audio/capture" type="string_list">
+		<stringvalue>channels=2@alsa:hw:default</stringvalue>
 		<stringvalue>channels=2</stringvalue>
-		<stringvalue>channels=1,rate=44100,frames=256@alsa:hw:M16DX</stringvalue>
 		<locale name="C">
 			<short>List of capture devices</short>
 			<long></long>
