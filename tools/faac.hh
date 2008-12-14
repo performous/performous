@@ -22,7 +22,7 @@ namespace faac {
 
 	class Enc {
 	  public:
-		Enc(unsigned long sampleRate, unsigned int numChannels, std::ostream& output):
+		Enc(unsigned long sampleRate, unsigned int numChannels, std::ostream& output, unsigned int bitRatePerCh = 80000):
 		  m_handle(faacEncOpen(sampleRate, numChannels, &m_inputSamples, &m_maxOutputBytes)),
 		  m_outputBuffer(m_maxOutputBytes),
 		  m_output(output)
@@ -34,7 +34,7 @@ namespace faac {
 			config->allowMidside = 1;
 			config->useLfe = 0;
 			config->useTns = 0;
-			config->bitRate = 60000;
+			config->bitRate = bitRatePerCh;
 			config->bandWidth = sampleRate / 2;
 			faacEncSetConfiguration(m_handle, config);
 		}

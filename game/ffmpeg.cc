@@ -50,15 +50,18 @@ double CFfmpeg::duration() {
 void CFfmpeg::open() {
 	boost::mutex::scoped_lock l(s_avcodec_mutex);
 	av_register_all();
-	av_log_set_level(AV_LOG_QUIET);
+	//av_log_set_level(AV_LOG_DEBUG);
 	if (av_open_input_file(&pFormatCtx, m_filename.c_str(), NULL, 0, NULL)) throw std::runtime_error("Cannot open input file");
 	if (av_find_stream_info(pFormatCtx) < 0) throw std::runtime_error("Cannot find stream information");
+	pFormatCtx->flags |= AVFMT_FLAG_GENPTS;
 	videoStream = -1;
 	audioStream = -1;
 	// Take the first video/audio streams
 	for (unsigned int i=0; i<pFormatCtx->nb_streams; i++) {
-		if (videoStream == -1 && pFormatCtx->streams[i]->codec->codec_type==CODEC_TYPE_VIDEO) videoStream = i;
-		if (audioStream == -1 && pFormatCtx->streams[i]->codec->codec_type==CODEC_TYPE_AUDIO) audioStream = i;
+		AVCodecContext* cc = pFormatCtx->streams[i]->codec;
+		cc->workaround_bugs = FF_BUG_AUTODETECT;
+		if (videoStream == -1 && cc->codec_type==CODEC_TYPE_VIDEO) videoStream = i;
+		if (audioStream == -1 && cc->codec_type==CODEC_TYPE_AUDIO) audioStream = i;
 	}
 	if (videoStream == -1 && decodeVideo) throw std::runtime_error("No video stream found");
 	if (audioStream == -1 && decodeAudio) throw std::runtime_error("No audio stream found");
@@ -72,8 +75,22 @@ void CFfmpeg::open() {
 	if (decodeAudio) {
 		AVCodecContext* cc = pFormatCtx->streams[audioStream]->codec;
 		pAudioCodec = avcodec_find_decoder(cc->codec_id);
+		// Awesome HACK for AAC to work (unfortunately libavformat fails to decode this information from MPEG ADTS)
+		if (pAudioCodec->name == std::string("aac") && cc->extradata_size == 0) {
+			cc->extradata = static_cast<uint8_t*>(malloc(2));
+			unsigned profile = 1; // 0 = MAIN, 1 = LC/LOW
+			unsigned srate_idx = 3; // 3 = 48000 Hz
+			unsigned channels = 2; // Just the number of channels
+			cc->extradata[0] = ((profile + 1) << 3) | ((srate_idx & 0xE) >> 1);
+			cc->extradata[1] = ((srate_idx & 0x1) << 7) | (channels << 3);
+			cc->extradata_size = 2;
+			cc->sample_rate = 48000;
+			cc->channels = 2;
+		}
+		std::cout << pAudioCodec->name << std::endl;
 		if (!pAudioCodec) throw std::runtime_error("Cannot find audio codec");
 		if (avcodec_open(cc, pAudioCodec) < 0) throw std::runtime_error("Cannot open audio codec");
+		std::cerr << cc->sample_rate << ", " << cc->channels << std::endl;
 		pAudioCodecCtx = cc;
 		pResampleCtx = audio_resample_init(AUDIO_CHANNELS, cc->channels, m_rate, cc->sample_rate);
 		if (!pResampleCtx) throw std::runtime_error("Cannot create resampling context");
@@ -194,6 +211,7 @@ void CFfmpeg::decodeNextFrame() {
 		if (decodeVideo && packet.stream_index == videoStream) {
 			while (packetSize) {
 				if (packetSize < 0) throw std::logic_error("negative video packet size?!");
+				if (m_quit || m_seekTarget == m_seekTarget) return;
 				int decodeSize = avcodec_decode_video(pVideoCodecCtx, videoFrame, &frameFinished, packetData, packetSize);
 				if (decodeSize < 0) throw std::runtime_error("cannot decode video frame");
 				// Move forward within the packet
@@ -214,14 +232,14 @@ void CFfmpeg::decodeNextFrame() {
 					tmp->data.swap(buffer);
 					videoQueue.push(tmp);
 				}
-				if (m_quit) return;
 			}
 		} else if (decodeAudio && packet.stream_index==audioStream) {
 			while (packetSize) {
 				if (packetSize < 0) throw std::logic_error("negative audio packet size?!");
-				int16_t audioFrames[AVCODEC_MAX_AUDIO_FRAME_SIZE];
+				if (m_quit || m_seekTarget == m_seekTarget) return;
+				std::vector<int16_t> audioFrames(AVCODEC_MAX_AUDIO_FRAME_SIZE);
 				int outsize = AVCODEC_MAX_AUDIO_FRAME_SIZE*sizeof(int16_t);
-				int decodeSize = avcodec_decode_audio2( pAudioCodecCtx, audioFrames, &outsize, packetData, packetSize);
+				int decodeSize = avcodec_decode_audio2(pAudioCodecCtx, &audioFrames[0], &outsize, packetData, packetSize);
 				// Handle special cases
 				if (decodeSize == 0) break;
 				if (outsize == 0) continue;
@@ -232,7 +250,7 @@ void CFfmpeg::decodeNextFrame() {
 				// Convert outsize from bytes into number of frames (samples)
 				outsize /= sizeof(int16_t) * pAudioCodecCtx->channels;
 				std::vector<int16_t> resampled(AVCODEC_MAX_AUDIO_FRAME_SIZE);
-				int frames = audio_resample(pResampleCtx, &resampled[0], audioFrames, outsize);
+				int frames = audio_resample(pResampleCtx, &resampled[0], &audioFrames[0], outsize);
 				// Construct AudioFrame and add it to the queue
 				AudioFrame* tmp = new AudioFrame();
 				std::copy(resampled.begin(), resampled.begin() + frames * AUDIO_CHANNELS, std::back_inserter(tmp->data));
@@ -240,7 +258,6 @@ void CFfmpeg::decodeNextFrame() {
 				else m_position += double(tmp->data.size())/double(audioQueue.getSamplesPerSecond());
 				tmp->timestamp = m_position;
 				audioQueue.push(tmp);
-				if (m_quit) return;
 			}
 			// Audio frames are always finished
 			frameFinished = 1;
