@@ -57,7 +57,7 @@ namespace faac {
 			if (!m_handle) throw std::logic_error("Operating on closed faac::Enc");
 			size_t pos = 0;
 			for (size_t left; (left = inputBuffer.size() - pos) > 0;) {
-				unsigned int num = std::min(m_inputSamples, left);
+				unsigned int num = std::min<unsigned int>(m_inputSamples, left);
 				encode(&inputBuffer[pos], num);
 				pos += num;
 			}
