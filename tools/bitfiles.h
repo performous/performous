@@ -7,7 +7,7 @@ class outBitFile {
 	outBitFile(const char* filename): outcnt(0), outfile(filename, std::ios::binary) {}
 	~outBitFile() { putbuf(); }
 
-	void putbits(int data, int n) {
+	void putbits(unsigned int data, unsigned int n) {
 		unsigned int mask = 1 << (n-1);
 		for( unsigned int i = 0 ; i < n; i++) {
 			outbuf <<= 1;
@@ -149,7 +149,7 @@ class inBitFile {
 		return 11;
 	}
   private:
-	int get_bits(unsigned int *destBuf, int num_bits) {
+	int get_bits(unsigned int *destBuf, unsigned int num_bits) {
 		*destBuf = 0;
 		for (unsigned int index = 0; index < num_bits; ++index) {
 			if (wdIndex >= indata.size()) return 0;

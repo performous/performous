@@ -17,7 +17,7 @@ IPUConv::IPUConv(std::vector<char> const& indata, std::string const& outfilename
 	int block;
 	int eob;
 	int size;
-	int diff;
+	int diff = 0;
 	int absval;
 	long int FrameByte;
 	unsigned int FrameBit;
@@ -357,5 +357,5 @@ int IPUConv::vlc(int write){
 			return(0);
 		} else throw std::runtime_error("Invalid VLC");
 	}
-}
+}
 
