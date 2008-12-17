@@ -23,7 +23,7 @@ struct CoverFile cover;
 
 bool parseCover(xmlNode *cur_node, char * song_id) {
 	bool found = false;
-	int u,v,w,h;
+	int u = 0, v = 0, w = 0 ,h = 0;
 	std::string filename;
 	std::string id(std::string("cover_") + std::string(song_id));
 	for ( xmlAttr *cur_attr = cur_node->properties; cur_attr; cur_attr = cur_attr->next) {
@@ -92,10 +92,9 @@ unsigned char * getBufferFromTX2(char * src) {
 	unsigned char *buffer = new unsigned char[width*height*4];
 
 	char * src_image = src+0x100;
-	char * src_palette_header = src+0x100+width*height;
 	char * src_palette = src+0x100+width*height+0x100;
 
-	for(unsigned int i = 0 ; i < width*height ; i++){
+	for(unsigned short i = 0; i < width*height; i++){
 		unsigned char id = src_image[i];
 		buffer[i*4+0] = src_palette[id*4+0]; // blue
 		buffer[i*4+1] = src_palette[id*4+1]; // green
