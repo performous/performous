@@ -87,19 +87,18 @@ unsigned short getHeightFromTX2(char * buffer) {
 }
 
 unsigned char * getBufferFromTX2(char * src) {
-	unsigned short width  = getWidthFromTX2(src);
-	unsigned short height = getHeightFromTX2(src);
-	unsigned char *buffer = new unsigned char[width*height*4];
+	unsigned int pixels = getWidthFromTX2(src) * getHeightFromTX2(src);
+	unsigned char *buffer = new unsigned char[pixels*4];
 
 	char * src_image = src+0x100;
-	char * src_palette = src+0x100+width*height+0x100;
+	char * src_palette = src+0x100+pixels+0x100;
 
-	for(unsigned short i = 0; i < width*height; i++){
+	for(unsigned int i = 0; i < pixels; i++){
 		unsigned char id = src_image[i];
 		buffer[i*4+0] = src_palette[id*4+0]; // blue
 		buffer[i*4+1] = src_palette[id*4+1]; // green
 		buffer[i*4+2] = src_palette[id*4+2]; // blue;
-		buffer[i*4+3] = src_palette[id*4+3]; // alpha
+		//buffer[i*4+3] = src_palette[id*4+3]; // alpha
 		buffer[i*4+3] = 0xff;
 	}
 	return buffer;
