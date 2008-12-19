@@ -210,6 +210,10 @@ void readConfigfile( const std::string &_configfile )
 	std::cout << "Found " << config.size() << " default configuration items" << std::endl;
 
 	std::cout << "Openning user configuration file \"" << _configfile << "\"" << std::endl;
+	if( !boost::filesystem::exists(_configfile) ) {
+		std::cout << "  Cannot open user configuration file (using defaults)" << std::endl;
+		return;
+	}
 	try {
 		domParser.parse_file(_configfile);
 		n = domParser.get_document()->get_root_node()->find("/performous/entry");
@@ -233,12 +237,7 @@ void readConfigfile( const std::string &_configfile )
 	
 		}
 	} catch( ... ) {
-		std::cout << "  Cannot open user configuration file (using defaults)" << std::endl;
 	}
-	/*
-	std::cout << "Object \"" << std::string("audio/songs_volume") << "\":" << std::endl;
-	std::cout << config[std::string("audio/songs_volume")];
-	*/
 }
 
 CConfigurationAudioVolume::CConfigurationAudioVolume(std::string const& title, Audio& audio, GetFunc get, SetFunc set):
