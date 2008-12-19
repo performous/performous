@@ -1,6 +1,7 @@
 #include "configuration.hh"
 #include "screen.hh"
 #include <boost/lexical_cast.hpp>
+#include <boost/filesystem.hpp>
 #include <algorithm>
 #include <libxml++/libxml++.h>
 
@@ -158,13 +159,37 @@ void assignConfigItem( ConfigItem &_item, std::string _type, xmlpp::Element& _el
 	}
 }
 
-void readConfigfile( const std::string &_configfile, const std::string &_schemafile)
+void readConfigfile( const std::string &_configfile )
 {
 	xmlpp::NodeSet n;
 	xmlpp::DomParser domParser;
 
-	std::cout << "Openning default configuration file \"" << _schemafile << "\"" << std::endl;
-	domParser.parse_file(_schemafile);
+	// looking for schemafile in:
+	// /usr/share/performous
+	// /usr/share/games/performous
+	// /usr/local/share/performous
+	// /usr/local/share/games/performous
+	// $PERFORMOUS_DEFAULT_CONFIG_FILE
+	std::string schemafile("NOT_FOUND");
+	std::vector<std::string> config_list;
+	config_list.push_back(std::string("/usr/share/performous")+std::string("/config/performous.xml"));
+	config_list.push_back(std::string("/usr/share/games/performous")+std::string("/config/performous.xml"));
+	config_list.push_back(std::string("/usr/local/share/performous")+std::string("/config/performous.xml"));
+	config_list.push_back(std::string("/usr/local/share/games/performous")+std::string("/config/performous.xml"));
+	config_list.push_back(std::string(getenv("PERFORMOUS_DEFAULT_CONFIG_FILE")));
+	for( unsigned int i = 0 ; i < config_list.size() ; ++i ) {
+		std::cout << "Testing config file \"" << config_list[i] << "\": ";
+		if( boost::filesystem::exists(config_list[i]) ) {
+			std::cout << "FOUND" << std::endl;
+			schemafile = config_list[i];
+			break;
+		} else {
+			std::cout << "NOT FOUND" << std::endl;
+		}
+	}
+
+	std::cout << "Openning default configuration file \"" << schemafile << "\"" << std::endl;
+	domParser.parse_file(schemafile);
 	n = domParser.get_document()->get_root_node()->find("/performous/entry");
 	for (xmlpp::NodeSet::const_iterator it = n.begin(), end = n.end(); it != end; ++it) {
 		xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**it);

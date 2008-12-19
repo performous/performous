@@ -51,7 +51,7 @@ class ConfigItem {
 
 extern std::map<std::string, ConfigItem> config;
 
-void readConfigfile( const std::string &_configfile, const std::string &_schemafile);
+void readConfigfile( const std::string &_configfile );
 
 template<int min, int max> class Integer {
   public:
