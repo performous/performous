@@ -34,6 +34,7 @@ namespace {
 				PaStreamParameters p;
 				if (rec->s.subdev().empty()) {
 					p.device = Pa_GetDefaultInputDevice();
+					if (p.device < 0) throw std::runtime_error("No PortAudio devices available");
 				} else {
 					std::istringstream iss(rec->s.subdev());
 					iss >> p.device;
@@ -90,6 +91,7 @@ namespace {
 				PaStreamParameters p;
 				if (pb->s.subdev().empty()) {
 					p.device = Pa_GetDefaultOutputDevice();
+					if (p.device < 0) throw std::runtime_error("No PortAudio devices available");
 				} else {
 					std::istringstream iss(pb->s.subdev());
 					iss >> p.device;
