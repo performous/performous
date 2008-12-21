@@ -28,7 +28,8 @@ int sleepts = -1;
 xmlpp::Node::PrefixNsMap nsmap;
 std::string ns;
 const bool video = true;
-const bool mkvcompress = true;
+const bool mkvcompress = false;
+const bool aacenc = false;
 
 // LibXML2 logging facility
 extern "C" void xmlLogger(void* logger, char const* msg, ...) { if (logger) *(std::ostream*)logger << msg; }
@@ -157,7 +158,11 @@ void writeWavHeader(std::ostream& outfile, unsigned ch, unsigned sr, unsigned sa
 
 void writeMusic(fs::path const& filename, std::vector<short> const& buf, unsigned sr) {
 	std::ofstream f(filename.string().c_str(), std::ios::binary);
-	faac::Enc(sr, 2, f)(buf.begin(), buf.end()).close();
+	if (aacenc) faac::Enc(sr, 2, f)(buf.begin(), buf.end()).close();
+	else {
+		writeWavHeader(f, 2, sr, buf.size());
+		f.write(reinterpret_cast<char const*>(&buf[0]), buf.size() * sizeof(short));
+	}
 }
 
 void music(Song& song, PakFile const& dataFile, PakFile const& headerFile, fs::path const& outPath) {
@@ -185,8 +190,9 @@ void music(Song& song, PakFile const& dataFile, PakFile const& headerFile, fs::p
 			if (l2 != 0 || r2 != 0) karaoke = true;
 		}
 	}
-	writeMusic(song.music = outPath / "music.m4a", pcm[0], sr);
-	if (karaoke) writeMusic(song.vocals = outPath / "vocals.m4a", pcm[1], sr);
+	std::string ext = (aacenc ? ".m4a" : ".wav");
+	writeMusic(song.music = outPath / ("music" + ext), pcm[0], sr);
+	if (karaoke) writeMusic(song.vocals = outPath / ("vocals" + ext), pcm[1], sr);
 }
 
 struct Match {
