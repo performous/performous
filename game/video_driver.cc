@@ -22,6 +22,7 @@ Window::Window(unsigned int width, unsigned int height, int fs): m_windowW(width
 	m_fullscreen = (fs != 0);
 	m_videoFlags = SDL_OPENGL | SDL_DOUBLEBUF | SDL_RESIZABLE;
 	resize();
+	SDL_ShowCursor(SDL_DISABLE);
 	SDL_EnableUNICODE(SDL_ENABLE);
 	SDL_EnableKeyRepeat(80, 80);
 }

@@ -87,10 +87,8 @@ void CFfmpeg::open() {
 			cc->sample_rate = 48000;
 			cc->channels = 2;
 		}
-		std::cout << pAudioCodec->name << std::endl;
 		if (!pAudioCodec) throw std::runtime_error("Cannot find audio codec");
 		if (avcodec_open(cc, pAudioCodec) < 0) throw std::runtime_error("Cannot open audio codec");
-		std::cerr << cc->sample_rate << ", " << cc->channels << std::endl;
 		pAudioCodecCtx = cc;
 		pResampleCtx = audio_resample_init(AUDIO_CHANNELS, cc->channels, m_rate, cc->sample_rate);
 		if (!pResampleCtx) throw std::runtime_error("Cannot create resampling context");
