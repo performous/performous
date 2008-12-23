@@ -22,17 +22,16 @@ Window::Window(unsigned int width, unsigned int height, int fs): m_windowW(width
 	m_fullscreen = (fs != 0);
 	m_videoFlags = SDL_OPENGL | SDL_DOUBLEBUF | SDL_RESIZABLE;
 	resize();
-	SDL_ShowCursor(SDL_DISABLE);
 	SDL_EnableUNICODE(SDL_ENABLE);
 	SDL_EnableKeyRepeat(80, 80);
+}
+
+void Window::blank() {
 	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
 	glDisable (GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable (GL_BLEND);
-}
-
-void Window::blank() {
 	s_width = screen->w;
 	s_height = screen->h;
 	if (s_height < 0.56f * s_width) s_width = roundf(s_height / 0.56f);
