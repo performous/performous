@@ -7,11 +7,16 @@
 #include "opengl_text.hh"
 #include <string>
 
-/// theme for song selection
-struct ThemeSongs: boost::noncopyable {
-	ThemeSongs();
-	/// background
+/// abstract theme class
+class Theme: boost::noncopyable {
+  public:
+	/// background image for theme
 	boost::scoped_ptr<Surface> bg;
+};
+
+/// theme for song selection
+struct ThemeSongs: Theme {
+	ThemeSongs();
 	/// song display
 	boost::scoped_ptr<SvgTxtTheme> song;
 	/// ordering display
@@ -19,10 +24,8 @@ struct ThemeSongs: boost::noncopyable {
 };
 
 /// theme for practice screen
-struct ThemePractice: boost::noncopyable {
+struct ThemePractice: Theme {
 	ThemePractice();
-	/// background (score)
-	boost::scoped_ptr<Surface> bg;
 	/// note
 	boost::scoped_ptr<Surface> note;
 	/// sharp sign
@@ -32,7 +35,7 @@ struct ThemePractice: boost::noncopyable {
 };
 
 /// theme for singing screen
-struct ThemeSing: boost::noncopyable {
+struct ThemeSing: Theme {
 	ThemeSing();
 	/// top background
 	boost::scoped_ptr<Surface> bg_top;
@@ -47,10 +50,8 @@ struct ThemeSing: boost::noncopyable {
 };
 
 /// theme for options screen
-struct ThemeConfiguration: boost::noncopyable {
+struct ThemeConfiguration: Theme {
 	ThemeConfiguration();
-	/// background
-	boost::scoped_ptr<Surface> bg;
 	/// configuration item
 	boost::scoped_ptr<SvgTxtTheme> item;
 	/// configuration value
