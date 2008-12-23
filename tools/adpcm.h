@@ -22,10 +22,18 @@ class Adpcm {
 				Header& h = headers[ch];
 				// Get a nibble and left-align it
 				short sample = (data[2 + n / 2 + ch * interleave] << (n % 2 ? 8 : 12)) & 0xF000;
+				int i_sample = sample;
 				// Apply ADPCM exponent
-				sample >>= h.shift;
+				i_sample >>= h.shift;
 				// Apply prediction
-				sample += (h.pr1 * h.prev1 + h.pr2 * h.prev2 + 32) >> 6;
+				i_sample += (h.pr1 * h.prev1 + h.pr2 * h.prev2 + 32) >> 6;
+				if( i_sample > 32767 ) {
+					sample = 32767;
+				} else if( i_sample < -32768 ) {
+					sample = -32768;
+				} else {
+					sample = i_sample;
+				}
 				// Store history for prediction
 				h.prev2 = h.prev1;
 				h.prev1 = sample;
