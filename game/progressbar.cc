@@ -18,7 +18,7 @@ void ProgressBar::draw(float value) {
 			else { tex.x1 = m_begin; tex.x2 = tex.x1 + value * scale; }
 			m_bar.draw(Dimensions(dimensions.x1() + m_begin * w, dimensions.y1(), value * scale * w, h), tex);
 		}
-		return;
+		break;
 	  case VERTICAL:
 		{
 			TexCoords tex;
@@ -26,13 +26,14 @@ void ProgressBar::draw(float value) {
 			else { tex.y2 = 1.0f - m_begin; tex.y1 = tex.y2 - value * scale; }
 			m_bar.draw(Dimensions(dimensions.x1(), 0.0f, w, value * scale * h).bottom(dimensions.y2() - m_begin * h), tex);
 		}
-		return;
+		break;
 	  case CIRCULAR:
 		{
 			UseTexture texblock(m_bar);
 			throw std::logic_error("ProgressBar::draw(): CIRCULAR not implemented yet");  // TODO: Implement
 		}
-		return;
+		break;
+		default:
+			throw std::logic_error("ProgressBar::draw(): unknown m_mode value");
 	}
-	throw std::logic_error("ProgressBar::draw(): unknown m_mode value");
 }

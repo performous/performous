@@ -11,18 +11,29 @@ static inline float virtH() { return float(screenH()) / screenW(); }
 
 class SDL_Surface;
 
+/// handles the window
 class Window {
   public:
+	/// constructor
 	Window(unsigned int width, unsigned int height, int fullscreen);
+	/// clears window
 	void blank();
+	/// swaps buffers
 	void swap();
+	/// resizes window to given dimensions
+	/** @param width the new width
+	 * @param height the new height
+	 */
 	void resize(unsigned width, unsigned height) {
 		if (m_fullscreen) { m_fsW = width; m_fsH = height; }
 		else { m_windowW = width; m_windowH = height; }
 		resize();
 	}
+	/// does the resizing
 	void resize();
+	/// toggles fullscreen
 	void fullscreen();
+
   private:
 	SDL_Surface* screen;
 	unsigned int m_videoFlags;

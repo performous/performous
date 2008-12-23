@@ -14,13 +14,16 @@
 
 class CAudio;
 
+/// song chooser screen
 class CScreenSongs : public CScreen {
   public:
+	/// constructor
 	CScreenSongs(std::string const& name, Audio& audio, Songs& songs);
 	void enter();
 	void exit();
 	void manageEvent(SDL_Event event);
 	void draw();
+
   private:
 	Audio& m_audio;
 	Songs& m_songs;

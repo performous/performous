@@ -8,18 +8,20 @@
 #include <vector>
 #include <algorithm>
 
+/// struct to represent tones
 struct Tone {
-	static const std::size_t MAXHARM = 48;
-	static const std::size_t MINAGE = 2;
-	double freq;
-	double db;
-	double stabledb;
-	double harmonics[MAXHARM];
-	std::size_t age;
-	Tone();
-	void print() const;
-	bool operator==(double f) const;
-	void update(Tone const& t);
+	static const std::size_t MAXHARM = 48; ///< maximum harmonics
+	static const std::size_t MINAGE = 2; ///< minimum age
+	double freq; ///< frequency
+	double db; ///< dezibels
+	double stabledb; ///< stable decibels
+	double harmonics[MAXHARM]; ///< harmonics array
+	std::size_t age; ///< age
+	Tone(); 
+	void print() const; ///< prints Tone
+	bool operator==(double f) const; ///< equality operator
+	void update(Tone const& t); ///< update Tone
+	/// compares left and right volume
 	static bool dbCompare(Tone const& l, Tone const& r) { return l.db < r.db; }
 };
 
@@ -34,10 +36,16 @@ static const unsigned FFT_P = 10;
 static const std::size_t FFT_N = 1 << FFT_P;
 static const std::size_t BUF_N = 2 * FFT_N;
 
+/// analyzer class
+ /** class to analyze input audio and transform it into useable data
+ */
 class Analyzer {
   public:
+	/// fast fourier transform vector
 	typedef std::vector<std::complex<float> > fft_t;
+	/// list of tones
 	typedef std::list<Tone> tones_t;
+	/// constructor
 	Analyzer(double rate, std::size_t step = 200);
 	/** Add input data to buffer. This is thread-safe (against other functions). **/
 	template <typename InIt> void input(InIt begin, InIt end) {
@@ -81,6 +89,7 @@ class Analyzer {
 		m_oldfreq = (best ? best->freq : 0.0);
 		return best;
 	}
+
   private:
 	std::size_t m_step;
 	double m_rate;

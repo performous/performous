@@ -8,26 +8,44 @@
 #include <map>
 #include <string>
 
+/// configuration option
 class ConfigItem {
+	friend std::ostream& operator <<(std::ostream &os,const ConfigItem &obj);
   public:
 	ConfigItem();
+	/// constructor
 	ConfigItem( std::string _type, bool _is_default);
+	/// increments config value
 	ConfigItem& operator++();
+	/// decrements config value
 	ConfigItem& operator--();
+	/// adds to config value
 	ConfigItem& operator+=(const int& right);
+	/// substracts from config value
 	ConfigItem& operator-=(const int& right);
+	/// adds to config value
 	ConfigItem& operator+=(const float& right);
+	/// substracts from config value
 	ConfigItem& operator-=(const float& right);
+	/// adds to config value
 	ConfigItem& operator+=(const double& right);
+	/// substracts from config value
 	ConfigItem& operator-=(const double& right);
+	/// sets short decsription for confi item
 	void set_short_description( std::string _short_desc );
+	/// sets long description for config item
 	void set_long_description( std::string _long_desc );
+	/// returns integer
 	int &i(void);
+	/// returns bool
 	bool &b(void);
+	/// returns float
 	double &f(void);
+	/// returns string
 	std::string &s(void);
+	/// returns string list
 	std::vector<std::string> &sl(void);
-	friend std::ostream& operator <<(std::ostream &os,const ConfigItem &obj);
+
   private:
 	std::string type;
 	std::string short_desc;
@@ -53,41 +71,60 @@ extern std::map<std::string, ConfigItem> config;
 
 void readConfigfile( const std::string &_configfile );
 
+/// integer class
+/** clamps to min, max
+ */
 template<int min, int max> class Integer {
   public:
+	/// constructor
 	Integer(int value): m_value(clamp(value, min, max)) {}
+	/// assignment
 	Integer& operator=(int value) { m_value = clamp(value, min, max); return *this; }
+	/// returns int value
 	int val() const { return m_value; }
+	/// returns int value
 	int& val() { return m_value; }
+
   private:
 	int m_value;
 };
 
-
+/// abstract configuration base class
 class CConfiguration {
   public:
+	/// constructor
 	CConfiguration(std::string const& description): m_description(description) {};
 	virtual ~CConfiguration() {};
+	/// next possible config value
 	virtual void setNext() = 0;
+	/// previous possible config value
 	virtual void setPrevious() = 0;
+	/// get config description
 	std::string const& getDescription() const { return m_description; };
+	/// get current config value
 	virtual std::string getValue() const = 0;
+
   private:
 	std::string m_description;
 };
 
+/// configuration for volume
 class CConfigurationAudioVolume: public CConfiguration {
   public:
+	/// typedef function pointer for getter
 	typedef unsigned int (Audio::*GetFunc)();
+	/// typedef function pointer for setter
 	typedef void (Audio::*SetFunc)(unsigned int);
+	/// constructor
 	CConfigurationAudioVolume(std::string const& title, Audio& audio, GetFunc get, SetFunc set);
 	void setNext();
 	void setPrevious();
 	std::string getValue() const;
+
   private:
 	Audio& m_audio;
-  	GetFunc m_get;
-  	SetFunc m_set;
+	GetFunc m_get;
+	SetFunc m_set;
 };
 
 #endif

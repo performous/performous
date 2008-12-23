@@ -7,34 +7,53 @@
 #include "opengl_text.hh"
 #include <string>
 
+/// theme for song selection
 struct CThemeSongs: boost::noncopyable {
 	CThemeSongs();
+	/// background
 	boost::scoped_ptr<Surface> bg;
+	/// song display
 	boost::scoped_ptr<SvgTxtTheme> song;
+	/// ordering display
 	boost::scoped_ptr<SvgTxtTheme> order;
 };
 
+/// theme for practice screen
 struct CThemePractice: boost::noncopyable {
 	CThemePractice();
+	/// background (score)
 	boost::scoped_ptr<Surface> bg;
+	/// note
 	boost::scoped_ptr<Surface> note;
+	/// sharp sign
 	boost::scoped_ptr<Surface> sharp;
+	/// note name text
 	boost::scoped_ptr<SvgTxtTheme> note_txt;
 };
 
+/// theme for singing screen
 struct CThemeSing: boost::noncopyable {
 	CThemeSing();
+	/// top background
 	boost::scoped_ptr<Surface> bg_top;
+	/// bottom background
 	boost::scoped_ptr<Surface> bg_bottom;
+	/// current lyrics line
 	boost::scoped_ptr<SvgTxtTheme> lyrics_now;
+	/// next lyrics line
 	boost::scoped_ptr<SvgTxtTheme> lyrics_next;
+	/// time display
 	boost::scoped_ptr<SvgTxtTheme> timer;
 };
 
+/// theme for options screen
 struct CThemeConfiguration: boost::noncopyable {
 	CThemeConfiguration();
+	/// background
 	boost::scoped_ptr<Surface> bg;
+	/// configuration item
 	boost::scoped_ptr<SvgTxtTheme> item;
+	/// configuration value
 	boost::scoped_ptr<SvgTxtTheme> value;
 };
 

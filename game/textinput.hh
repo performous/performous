@@ -1,8 +1,11 @@
 #include <SDL.h>
 #include <string>
 
+/// type text
 struct TextInput {
+	/// text to operate on
 	std::string text;
+	/// processes keypresses
 	bool process(SDL_keysym const& key) {
 		unsigned int ucs = key.unicode;
 		if (key.sym == SDLK_LEFT) return false;
@@ -14,6 +17,7 @@ struct TextInput {
 		else return false;
 		return true;
 	}
+	/// appends unicode symbol
 	TextInput& operator+=(unsigned int ucs) {
 		if (ucs < 0x80) {
 			text += ucs;
@@ -32,6 +36,7 @@ struct TextInput {
 		}
 		return *this;
 	}
+	/// deletes last char
 	void backspace() {
 		if (text.empty()) return;
 		std::string::size_type pos = text.size() - 1;

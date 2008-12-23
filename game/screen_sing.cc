@@ -25,7 +25,13 @@ void CScreenSing::enter() {
 	std::string file = song.path + song.mp3;
 	m_audio.playMusic(file.c_str());
 	theme.reset(new CThemeSing());
-	if (!song.background.empty()) { try { m_background.reset(new Surface(song.path + song.background, true)); } catch (std::exception& e) { std::cerr << e.what() << std::endl; } }
+	if (!song.background.empty()) {
+		try {
+			m_background.reset(new Surface(song.path + song.background, true));
+		} catch (std::exception& e) {
+			std::cerr << e.what() << std::endl;
+		}
+	}
 	if (!song.video.empty()) m_video.reset(new Video(song.path + song.video));
 	m_wave.reset(new Texture(sm->getThemePathFile("wave.png")));
 	m_notelines.reset(new Texture(sm->getThemePathFile("notelines.svg")));
@@ -89,7 +95,7 @@ void CScreenSing::manageEvent(SDL_Event event) {
 		if (key == SDLK_RETURN && songStatus() == INSTRUMENTAL_BREAK) {
 			double diff = m_songit->begin - 3.0 - m_audio.getPosition();
 			if (diff > 0.0) m_audio.seek(diff);
-		}
+		} // XXX: switch/case
 		else if (key == SDLK_F4) m_audio.toggleSynth(m_songs.current().notes);
 		else if (key == SDLK_F5) m_latencyAV -= 0.02;
 		else if (key == SDLK_F6) m_latencyAV += 0.02;
@@ -162,6 +168,7 @@ void CScreenSing::draw() {
 	double length = m_audio.getLength();
 	double time = clamp(m_audio.getPosition() - m_latencyAV, 0.0, length);
 	double songPercent = time / length;
+
 	// Rendering starts
 	{
 		double ar = arMax;
@@ -182,6 +189,7 @@ void CScreenSing::draw() {
 	const double pixUnit = 0.2;
 	// Update m_songit (which note to start the rendering from)
 	while (m_songit != song.notes.end() && (m_songit->type == Note::SLEEP || m_songit->end < time - (baseLine + 0.5) / pixUnit)) ++m_songit;
+
 	// Automatically zooming notelines
 	{
 		int low = song.noteMax;
@@ -206,6 +214,7 @@ void CScreenSing::draw() {
 	double noteUnit = -0.5 / std::max(24.0, max - min);
 	double baseY = -0.5 * (min + max) * noteUnit;
 	double baseX = baseLine - time * pixUnit;
+
 	// Draw note lines
 	if (m_songit == song.notes.end() || m_songit->begin > time + 3.0) m_notealpha -= 0.02f;
 	else if (m_notealpha < 1.0f) m_notealpha += 0.02f;
@@ -215,7 +224,8 @@ void CScreenSing::draw() {
 	} else {
 		glColor4f(1.0, 1.0, 1.0, m_notealpha);
 		m_notelines->draw(Dimensions().stretch(1.0, (max - min - 13) * noteUnit), TexCoords(0.0, (-min - 7.0) / 12.0f, 1.0, (-max + 6.0) / 12.0f));
-		// Draw notes
+
+		// Draw notes XXX
 		{
 			for (Notes::const_iterator it = m_songit; it != song.notes.end() && it->begin < time - (baseLine - 0.5) / pixUnit; ++it) {
 				if (it->type == Note::SLEEP) continue;
@@ -251,7 +261,8 @@ void CScreenSing::draw() {
 				}
 			}
 		}
-		// Pitch graph
+
+		// Pitch graph XXX
 		UseTexture tblock(*m_wave);
 		
 		for (std::list<Player>::const_iterator p = players.begin(); p != players.end(); ++p) {
@@ -267,6 +278,7 @@ void CScreenSing::draw() {
 			// Start processing
 			float tex = texOffset;
 			double t = idx * Engine::TIMESTEP;
+
 			for (; idx < endIdx; ++idx, t += Engine::TIMESTEP) {
 				double const freq = pitch[idx].first;
 				// If freq is NaN, we have nothing to process
@@ -306,6 +318,7 @@ void CScreenSing::draw() {
 		}
 		glColor3f(1.0, 1.0, 1.0);
 	}
+
 	// Score display
 	{
 		unsigned int i = 0;
@@ -321,6 +334,7 @@ void CScreenSing::draw() {
 			glColor4f(1.0, 1.0, 1.0, 1.0);
 		}
 	}
+
 	// Compute and draw lyrics
 	{
 		const double basepos = -0.1;
@@ -346,6 +360,7 @@ void CScreenSing::draw() {
 			else if (i == 1) m_lyrics[1].draw(*theme->lyrics_next, time, pos);
 		}
 	}
+
 	// Compute and draw the timer and the progressbar
 	{
 		m_progress->draw(songPercent);
@@ -402,6 +417,7 @@ void ScoreWindow::draw() {
 	m_bg.draw();
 	const double spacing = 0.1 + 0.1 / m_players.size();
 	unsigned i = 0;
+
 	for (std::list<Player>::const_iterator p = m_players.begin(); p != m_players.end(); ++p, ++i) {
 		int score = p->getScore();
 		glColor3f(p->m_color.r, p->m_color.g, p->m_color.b);

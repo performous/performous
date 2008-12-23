@@ -5,6 +5,7 @@
 #include "pitch.hh"
 #include <boost/ptr_container/ptr_vector.hpp>
 
+/// class for recording sound from mics
 class Capture {
   private:
 	class Device {
@@ -27,13 +28,16 @@ class Capture {
 				if (m_channels[ch]) m_channels[ch]->input(areas.begin(ch), areas.end(ch));
 			}
 		}
-	};
+	}; // Device
 	boost::ptr_vector<Analyzer> m_analyzers;  // This must come before the devices for correct destruction order
 	boost::ptr_vector<Device> m_devices;
+
   public:
+	/// add new microphones
 	void addMics(std::size_t channels, std::size_t rate, std::string device){
 		m_devices.push_back(new Device(*this, channels, rate, device));
 	}
+	/// get analyzers
 	boost::ptr_vector<Analyzer>& analyzers() { return m_analyzers; }
 };
 

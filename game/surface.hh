@@ -10,27 +10,44 @@
 #include <librsvg/rsvg-cairo.h>
 #include <cairo.h>
 
+/// class for geometry stuff
 class Dimensions {
   public:
 	/** Initialize with aspect ratio but no size, centered at screen center. **/
 	Dimensions(float ar_ = 0.0f): m_ar(ar_), m_x(), m_y(), m_w(), m_h(), m_xAnchor(), m_yAnchor(), m_screenAnchor() {}
 	/** Initialize with top-left corner and width & height **/
 	Dimensions(float x1, float y1, float w, float h): m_x(x1), m_y(y1), m_w(w), m_h(h), m_xAnchor(LEFT), m_yAnchor(TOP), m_screenAnchor() {}
+	/// sets middle
 	Dimensions& middle(float x = 0.0f) { m_x = x; m_xAnchor = MIDDLE; return *this; }
+	/// sets left
 	Dimensions& left(float x = 0.0f) { m_x = x; m_xAnchor = LEFT; return *this; }
+	/// sets right
 	Dimensions& right(float x = 0.0f) { m_x = x; m_xAnchor = RIGHT; return *this; }
+	/// sets center
 	Dimensions& center(float y = 0.0f) { m_y = y; m_yAnchor = CENTER; return *this; }
+	/// sets top
 	Dimensions& top(float y = 0.0f) { m_y = y; m_yAnchor = TOP; return *this; }
+	/// sets bottom
 	Dimensions& bottom(float y = 0.0f) { m_y = y; m_yAnchor = BOTTOM; return *this; }
+	/// fixes width
 	Dimensions& fixedWidth(float w) { m_w = w; m_h = w / m_ar; return *this; }
+	/// fixes height
 	Dimensions& fixedHeight(float h) { m_w = h * m_ar; m_h = h; return *this; }
+	/// fits inside
 	Dimensions& fitInside(float w, float h) { if (w / h > m_ar) fixedHeight(h); else fixedWidth(w); return *this; }
+	/// fits outside
 	Dimensions& fitOutside(float w, float h) { if (w / h > m_ar) fixedWidth(w); else fixedHeight(h); return *this; }
+	/// stretches dimensions
 	Dimensions& stretch(float w, float h) { m_w = w; m_h = h; m_ar = w / h; return *this; }
+	/// sets screen center
 	Dimensions& screenCenter(float y = 0.0f) { m_screenAnchor = CENTER; center(y); return *this; }
+	/// sets screen top
 	Dimensions& screenTop(float y = 0.0f) { m_screenAnchor = TOP; top(y); return *this; }
+	/// sets screen bottom
 	Dimensions& screenBottom(float y = 0.0f) { m_screenAnchor = BOTTOM; bottom(y); return *this; }
+	/// returns ar XXX
 	float ar() const { return m_ar; }
+	/// returns left
 	float x1() const {
 		switch (m_xAnchor) {
 		  case LEFT: return m_x;
@@ -39,6 +56,7 @@ class Dimensions {
 		}
 		throw std::logic_error("Unknown value in Dimensions::m_xAnchor");
 	}
+	/// returns top
 	float y1() const {
 		switch (m_yAnchor) {
 		  case TOP: return screenY() + m_y;
@@ -47,10 +65,15 @@ class Dimensions {
 		}
 		throw std::logic_error("Unknown value in Dimensions::m_yAnchor");
 	}
+	/// returns right
 	float x2() const { return x1() + w(); }
+	/// returns bottom
 	float y2() const { return y1() + h(); }
+	/// returns width
 	float w() const { return m_w; }
+	/// returns height
 	float h() const { return m_h; }
+
   private:
 	float screenY() const;
 	float m_ar;
@@ -59,8 +82,13 @@ class Dimensions {
 	enum YAnchor { CENTER, TOP, BOTTOM } m_yAnchor, m_screenAnchor;
 };
 
+/// texture coordinates
 struct TexCoords {
-	float x1, y1, x2, y2;
+	float x1, ///< left
+	      y1, ///< top
+	      x2, ///< right
+	      y2; ///< bottom
+	/// constructor
 	TexCoords(float x1_ = 0.0, float y1_ = 0.0, float x2_ = 1.0, float y2_ = 1.0):
 	  x1(x1_), y1(y1_), x2(x2_), y2(y2_) {}
 };
@@ -68,11 +96,15 @@ struct TexCoords {
 /** @short A RAII wrapper for allocating/deallocating OpenGL texture ID **/
 template <GLenum Type> class OpenGLTexture: boost::noncopyable {
   public:
+	/// return Type
 	static GLenum type() { return Type; };
 	OpenGLTexture(): m_id() { glGenTextures(1, &m_id); }
 	~OpenGLTexture() { glDeleteTextures(1, &m_id); }
+	/// returns id
 	GLuint id() const { return m_id; };
+	/// draw area
 	void draw(Dimensions const& dim, TexCoords const& tex) const;
+
   private:
 	GLuint m_id;
 };
@@ -80,11 +112,13 @@ template <GLenum Type> class OpenGLTexture: boost::noncopyable {
 /** @short A RAII wrapper for binding to a texture (using it, modifying it) **/
 class UseTexture: boost::noncopyable {
   public:
+	/// constructor
 	template <GLenum Type> UseTexture(OpenGLTexture<Type> const& s): m_type(s.type()) {
 		glEnable(m_type);
 		glBindTexture(m_type, s.id());
 	}
 	~UseTexture() { glDisable(m_type); }
+
   private:
 	GLenum m_type;
 };
@@ -113,7 +147,9 @@ class Texture: public OpenGLTexture<GL_TEXTURE_2D> {
 	Texture(std::string const& filename);
 	/** Get aspect ratio (1.0 for square, > 1.0 for wider). **/
 	float ar() const { return m_ar; }
+	/// loads texture into buffer
 	void load(unsigned int width, unsigned int height, pix::Format format, unsigned char const* buffer, float ar = 0.0f);
+
   private:
 	float m_ar;
 };
@@ -124,13 +160,20 @@ class Texture: public OpenGLTexture<GL_TEXTURE_2D> {
 **/
 class Surface {
   public:
-  	Dimensions dimensions;
+	/// dimensions
+ 	Dimensions dimensions;
+ 	/// texture coordinates
 	TexCoords tex;
 	Surface(): m_width(0), m_height(0) {}
+	/// creates surface from cairo surface
 	Surface(cairo_surface_t* _surf);
+	/// creates surface from file
 	Surface(std::string const& filename, bool autocrop = false);
+	/// draws surface
 	void draw() const;
+	/// loads surface into buffer
 	void load(unsigned int width, unsigned int height, pix::Format format, unsigned char const* buffer, float ar = 0.0f);
+
   private:
 	unsigned int m_width, m_height;
 	OpenGLTexture<GL_TEXTURE_RECTANGLE_ARB> m_texture;

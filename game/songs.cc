@@ -77,11 +77,14 @@ void Songs::reload_internal(boost::filesystem::path const& parent) {
 // Make std::find work with shared_ptrs and regular pointers
 static bool operator==(boost::shared_ptr<Song> const& a, Song const* b) { return a.get() == b; }
 
+/// restore selection
 class Songs::RestoreSel {
 	Songs& m_s;
 	Song const* m_sel;
   public:
+	/// constructor
 	RestoreSel(Songs& s): m_s(s), m_sel(s.empty() ? NULL : &s.current()) {}
+	/// resets song to given song
 	void reset(Song const* song = NULL) { m_sel = song; }
 	~RestoreSel() {
 		int pos = 0;
@@ -126,14 +129,18 @@ void Songs::filter_internal() {
 }
 
 #define STRLT_RET(lhs, rhs) { std::string l_ = Glib::ustring(lhs).casefold_collate_key(), r_ = Glib::ustring(rhs).casefold_collate_key(); if (l_ != r_) return l_ < r_; }
+/// class to compare by field XXX
 class CmpByField {
 	std::string Song::* m_field;
   public:
+	/// constructor
 	CmpByField(std::string Song::* field): m_field(field) {}
+	/// compare left and right song
 	bool operator()(Song const& left , Song const& right) {
 		STRLT_RET(left.*m_field, right.*m_field);
 		return false;
 	}
+	/// compare left and right song
 	bool operator()(boost::shared_ptr<Song> const& left, boost::shared_ptr<Song> const& right) {
 		return operator()(*left, *right);
 	}

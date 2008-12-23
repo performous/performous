@@ -13,10 +13,14 @@
 #include "opengl_text.hh"
 #include "progressbar.hh"
 
+/// shows score at end of song
 class ScoreWindow {
   public:
+	/// constructor
 	ScoreWindow(CScreenManager const* sm, Engine & e);
+	/// draws ScoreWindow
 	void draw();
+
   private:
 	Surface m_bg;
 	ProgressBar m_scoreBar;
@@ -26,10 +30,14 @@ class ScoreWindow {
 	std::string m_rank;
 };
 
+/// handles songlyrics
 class LyricRow {
   public:
-	AnimValue extraspacing, fade;
+	AnimValue extraspacing, ///< extraspacing for lyrics
+	          fade; ///< fade
+	/// iterator
 	typedef Notes::const_iterator Iterator;
+	/// constructor
 	LyricRow(Iterator& it, Iterator const& eof): extraspacing(0.0, 2.0), fade(0.0, 0.6) {
 		fade.setTarget(1.0);
 		m_begin = it;
@@ -38,11 +46,13 @@ class LyricRow {
 		if (it != eof) ++it;
 		if (m_begin == m_end) throw std::logic_error("Empty sentence");
 	}
+	/// lyric expired?
 	bool expired(double time) const {
 		double lastTime = 0.0;
 		for (Iterator it = m_begin; it != m_end; ++it) lastTime = it->end;
 		return time > lastTime;
 	}
+	/// draw/print lyrics
 	void draw(SvgTxtTheme& txt, double time, double pos) const {
 		std::vector<TZoomText> sentence;
 		for (Iterator it = m_begin; it != m_end; ++it) {
@@ -53,12 +63,15 @@ class LyricRow {
 		txt.dimensions.screenBottom(pos);
 		txt.draw(sentence, fade.get());
 	}
+
   private:
 	Iterator m_begin, m_end;
 };
 
+/// class for actual singing screen
 class CScreenSing: public CScreen {
   public:
+	/// constructor
 	CScreenSing(std::string const& name, Audio& audio, Songs& songs, Capture& capture):
 	  CScreen(name), m_audio(audio), m_songs(songs), m_capture(capture), m_latencyAV(), m_nlTop(0.0, 2.0), m_nlBottom(0.0, 2.0)
 	{}
@@ -66,8 +79,11 @@ class CScreenSing: public CScreen {
 	void exit();
 	void manageEvent(SDL_Event event);
 	void draw();
+	/// current status of song
 	enum SongStatus { NORMAL, INSTRUMENTAL_BREAK, FINISHED };
+	/// get songstatus
 	SongStatus songStatus() const;
+
   private:
 	Audio& m_audio;
 	Songs& m_songs;  // TODO: take song instead of all of them

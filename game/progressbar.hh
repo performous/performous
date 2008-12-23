@@ -3,8 +3,10 @@
 
 #include "surface.hh"
 
+/// simple progressbar class
 class ProgressBar {
   public:
+	/// type of progressbar
 	enum Mode { HORIZONTAL, VERTICAL, CIRCULAR };
 	/**
 	* Construct a new progress bar.
@@ -19,12 +21,16 @@ class ProgressBar {
 	  m_bg(bg), m_bar(bar), m_mode(mode), m_begin(begin), m_end(end), m_sliding(sliding), dimensions(m_bg.ar()) {}
 	/** Draw a progress bar with the given percentage [0, 1] **/
 	void draw(float value);
+	
   private:
 	Texture m_bg, m_bar;
 	Mode m_mode;
 	float m_begin, m_end;
 	bool m_sliding;
+
+  // TODO: merge with first public
   public:
+	/// dimensions of progressbar
 	Dimensions dimensions;
 };
 

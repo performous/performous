@@ -7,17 +7,25 @@
 #include <cmath>
 #include <stdexcept>
 
+/// class for simple/linear animation/transition of values
 class AnimValue {
   public:
+	/// constructor
 	AnimValue(double value = 0.0, double rate = 1.0): m_value(value), m_target(value), m_rate(rate), m_time(now()) {}
+	/// move animation forward by diff
 	void move(double diff) { m_value += diff; }
+	/// gets animition target
 	double getTarget() const { return m_target; }
+	/// sets animation target (end point)
 	void setTarget(double target, bool step = false) { m_target = target; if (step) m_value = target; }
+	/// sets animation range
 	void setRange(double tmin, double tmax) {
 		if (tmin > tmax) throw std::logic_error("AnimValue range is reversed");
 		m_target = clamp(m_target, tmin, tmax);
 	}
+	/// hard-sets anim value
 	void setValue(double value) { m_value = value; }
+	/// get current anim value
 	double get() const {
 		double maxadj = m_rate * duration();
 		double diff = m_value - m_target;
@@ -25,6 +33,7 @@ class AnimValue {
 		if (diff > 0.0) m_value -= adj; else m_value += adj;
 		return m_value;
 	}
+
   private:
 	double duration() const {
 		boost::xtime newtime = now();
@@ -38,11 +47,14 @@ class AnimValue {
 	mutable boost::xtime m_time;
 };
 
-
+/// easing animations
 class AnimAcceleration {
   public:
+	/// constructor
 	AnimAcceleration(): m_target(), m_songs(), m_position(), m_velocity(), m_marginLeft(), m_marginRight(), m_time() {}
+	/// set margins
 	void setMargins(double left, double right) { m_marginLeft = left; m_marginRight = right; }
+	/// get current value
 	double getValue() {
 		const double acceleration = 50.0; // the coefficient of velocity changes (animation speed)
 		const double overshoot = 0.95; // Over 1.0 decelerates too late, less than 1.0 decelerates too early
@@ -74,7 +86,9 @@ class AnimAcceleration {
 		if (m_position > m_marginLeft + m_songs) m_position -= num; // Normalize to [-m_marginLeft, songs + m_marginRight]
 		return m_position;
 	}
+	/// get target
 	unsigned int getTarget() const { return m_target; };
+	/// set target
 	void setTarget(unsigned int target, unsigned int songs) {
 		m_time = now();
 		m_target = target;
@@ -82,7 +96,9 @@ class AnimAcceleration {
 		m_songs = songs;
 		m_position = target;
 	};
+	/// get current velocity
 	double getVelocity() const { return m_velocity; }
+
   private:
 	unsigned int m_target;
 	unsigned int m_songs;

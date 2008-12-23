@@ -7,8 +7,10 @@
 #include <fstream>
 #include <iostream>
 
+/// parses songfiles
 class SongParser {
   public:
+	/// constructor
 	SongParser(Song& s):
 	  m_song(s),
 	  m_linenum(),

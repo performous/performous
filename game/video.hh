@@ -4,13 +4,19 @@
 #include "surface.hh"
 #include "ffmpeg.hh"
 #include <string>
-       
+   
+/// class for playing videos  
 class Video {
   public:
+	/// opens given video file
 	Video(std::string const& videoFile);
+	/// renders video
 	void render(double time);
+	/// returns Dimensions of video clip
 	Dimensions& dimensions() { return m_surface.dimensions; }
+	/// returns Dimensions of video clip
 	Dimensions const& dimensions() const { return m_surface.dimensions; }
+
   private:
 	CFfmpeg m_mpeg;
 	VideoFrame m_videoFrame;

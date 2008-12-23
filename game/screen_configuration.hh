@@ -8,13 +8,16 @@
 #include <boost/ptr_container/ptr_vector.hpp>
 #include "opengl_text.hh"
 
+/// options dialogue
 class CScreenConfiguration: public CScreen {
   public:
+	/// constructor
 	CScreenConfiguration(std::string const& name, Audio& m_audio);
 	void enter();
 	void exit();
 	void manageEvent(SDL_Event event);
 	void draw();
+
   private:
 	Audio& m_audio;
 	boost::scoped_ptr<CThemeConfiguration> theme;

@@ -13,19 +13,29 @@
 #include <vector>
 #include <limits>
 
+/// single audio frame
 struct AudioFrame {
+	/// timestamp of audio frame
 	double timestamp;
+	/// audio data
 	std::vector<int16_t> data;
+	/// constructor
 	template <typename InIt> AudioFrame(double ts, InIt begin, InIt end): timestamp(ts), data(begin, end) {}
 	AudioFrame(): timestamp(getInf()) {} // EOF marker
 };
 
+/// single video frame
 struct VideoFrame {
+	/// timestamp of video frame
 	double timestamp;
-	int width, height;
+	int width,  ///< width of frame
+	    height; ///< height of frame
+	/// data array
 	std::vector<uint8_t> data; 
+	/// constructor
 	VideoFrame(double ts, int w, int h): timestamp(ts), width(w), height(h) {}
 	VideoFrame(): timestamp(getInf()) {} // EOF marker
+	/// swaps to VideoFrames
 	void swap(VideoFrame& f) {
 		std::swap(timestamp, f.timestamp);
 		data.swap(f.data);
@@ -38,9 +48,11 @@ static bool operator<(VideoFrame const& a, VideoFrame const& b) {
 	return a.timestamp < b.timestamp;
 }
 
+/// video queue: first in first out
 class VideoFifo {
   public:
 	VideoFifo(): m_available(), m_timestamp(), m_eof() {}
+	/// trys to pop a VideoFrame from queue
 	bool tryPop(VideoFrame& f) {
 		boost::mutex::scoped_lock l(m_mutex);
 		if (!m_queue.empty() && m_queue.begin()->data.empty()) { m_eof = true; return false; }
@@ -53,6 +65,7 @@ class VideoFifo {
 		statsUpdate();
 		return true;
 	}
+	/// pushes VideoFrames to queue
 	void push(VideoFrame* f) {
 		boost::mutex::scoped_lock l(m_mutex);
 		while (m_queue.size() > m_max) m_cond.wait(l);
@@ -60,10 +73,12 @@ class VideoFifo {
 		m_queue.insert(f);
 		statsUpdate();
 	}
+	/// updates stats
 	void statsUpdate() {
 		m_available = std::max(0, int(m_queue.size()) - int(m_min));
 		if (m_available == 0 && !m_queue.empty() && m_queue.rbegin()->data.empty()) m_available = m_queue.size() - 1;
 	}
+	/// resets video queue
 	void reset() {
 		boost::mutex::scoped_lock l(m_mutex);
 		m_queue.clear();
@@ -71,9 +86,13 @@ class VideoFifo {
 		statsUpdate();
 		m_eof = false;
 	}
+	/// returns current position
 	double position() const { return m_timestamp; }
+	/// returns m_available / m_max
 	double percentage() const { return double(m_available) / m_max; }
+	/// simple eof check
 	double eof() const { return m_eof; }
+
   private:
 	boost::ptr_set<VideoFrame> m_queue;
 	mutable boost::mutex m_mutex;
@@ -85,11 +104,15 @@ class VideoFifo {
 	static const unsigned m_max = 50;
 };
 
+/// audio queue: first in first out
 class AudioFifo {
   public:
 	AudioFifo(): m_sps(), m_timestamp(), m_eof() {}
+	/// set samples per second
 	void setSamplesPerSecond(unsigned sps) { m_sps = sps; }
+	/// get samples per second
 	unsigned getSamplesPerSecond() { return m_sps; }
+	/// pops audio frame from queue to buffer
 	void tryPop(std::vector<int16_t>& buffer, std::size_t size = 0) {
 		if (size == 0) size = std::numeric_limits<std::size_t>::max();
 		boost::mutex::scoped_lock l(m_mutex);
@@ -111,24 +134,30 @@ class AudioFifo {
 			}
 		}
 	}
+	/// pushes AudioFrame to queue
 	void push(AudioFrame* f) {
 		boost::mutex::scoped_lock l(m_mutex);
 		while (m_queue.size() > m_max) m_cond.wait(l);
 		if (m_queue.empty()) m_timestamp = f->timestamp;
 		m_queue.push_back(f);
 	}
+	/// reset queue
 	void reset() {
 		boost::mutex::scoped_lock l(m_mutex);
 		m_queue.clear();
 		m_cond.notify_all();
 		m_eof = false;
 	}
+	/// current position
 	double position() const { return m_timestamp; }
+	/// end of queue
 	double eof() const { return m_eof; }
+	/// fill percentage
 	double percentage() const {
 		boost::mutex::scoped_lock l(m_mutex);
 		return double(m_queue.size()) / m_max;
 	}
+
   private:
 	boost::ptr_deque<AudioFrame> m_queue;
 	mutable boost::mutex m_mutex;
@@ -148,8 +177,10 @@ extern "C" {
   struct SwsContext;
 }
 
+/// ffmpeg class
 class CFfmpeg {
   public:
+	/// constructor
 	CFfmpeg(bool decodeVideo, bool decodeAudio, std::string const& file, unsigned int rate = 48000);
 	~CFfmpeg();
 	/**
@@ -158,14 +189,20 @@ class CFfmpeg {
 	* it to finish before exiting.
 	**/
 	void crash() { m_thread.reset(); m_quit = true; }
-	void operator()(); // Thread runs here, don't call directly
-	unsigned width, height;
+	void operator()(); ///< Thread runs here, don't call directly
+	unsigned width, ///< width
+	         height; ///< height
+	/// queue for video
 	VideoFifo  videoQueue;
+	/// queue for audio
 	AudioFifo  audioQueue;
 	/** Seek to the chosen time. Will block until the seek is done, if wait is true. **/
 	void seek(double time, bool wait = true);
+	/// duration
 	double duration();
+	/// return current position
 	double position() { return std::max(videoQueue.position(), audioQueue.position()); }
+
   private:
 	class eof_error: public std::exception {};
 	void seek_internal();

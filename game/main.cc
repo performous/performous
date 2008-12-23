@@ -63,13 +63,14 @@ static void checkEvents_SDL(CScreenManager& sm, Window& window) {
 			break;
 		}
 		sm.getCurrentScreen()->manageEvent(event);
-		GLenum error = glGetError();
-		if (error == GL_INVALID_ENUM) std::cerr << "OpenGL error: invalid enum" << std::endl;
-		if (error == GL_INVALID_VALUE) std::cerr << "OpenGL error: invalid value" << std::endl;
-		if (error == GL_INVALID_OPERATION) std::cerr << "OpenGL error: invalid operation" << std::endl;
-		if (error == GL_STACK_OVERFLOW) std::cerr << "OpenGL error: stack overflow" << std::endl;
-		if (error == GL_STACK_UNDERFLOW) std::cerr << "OpenGL error: stack underflow" << std::endl;
-		if (error == GL_OUT_OF_MEMORY) std::cerr << "OpenGL error: invalid enum" << std::endl;
+		switch(glGetError()) {
+			case GL_INVALID_ENUM: std::cerr << "OpenGL error: invalid enum" << std::endl; break;
+			case GL_INVALID_VALUE: std::cerr << "OpenGL error: invalid value" << std::endl; break;
+			case GL_INVALID_OPERATION: std::cerr << "OpenGL error: invalid operation" << std::endl; break;
+			case GL_STACK_OVERFLOW: std::cerr << "OpenGL error: stack overflow" << std::endl; break;
+			case GL_STACK_UNDERFLOW: std::cerr << "OpenGL error: stack underflow" << std::endl; break;
+			case GL_OUT_OF_MEMORY: std::cerr << "OpenGL error: invalid enum" << std::endl; break;
+		}
 	}
 }
 

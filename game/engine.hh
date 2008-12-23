@@ -16,19 +16,33 @@
 #include <list>
 #include <utility>
 
+/// player class
 struct Player {
+	/// currently playing song
 	Song& m_song;
+	/// sound analyzer
 	Analyzer& m_analyzer;
+	/// player color for bars, waves, scores
 	Color m_color;
+	/// typedef for pitch
 	typedef std::vector<std::pair<double, double> > pitch_t;
+	/// player's pitch
 	pitch_t m_pitch;
+	/// score for current song
 	double m_score;
+	/// activity timer
 	unsigned m_activitytimer;
+	/// score iterator
 	Notes::const_iterator m_scoreIt;
+	/// constructor
 	Player(Song& song, Analyzer& analyzer): m_song(song), m_analyzer(analyzer), m_score(), m_activitytimer() {}
+	/// prepares analyzer
 	void prepare() { m_analyzer.process(); }
+	/// updates player stats
 	void update();
+	/// player activity singing
 	float activity() const { return m_activitytimer / 300.0; }
+	/// get player's score
 	int getScore() const {
 		return 10000.0 * m_score;
 	}
@@ -45,6 +59,7 @@ namespace {
 	size_t playerColorsSize = sizeof(playerColors) / sizeof(*playerColors);
 }
 
+/// performous engine
 class Engine {
 	Audio& m_audio;
 	Song& m_song;
@@ -54,13 +69,16 @@ class Engine {
 	volatile bool m_quit;
 	mutable boost::mutex m_mutex;
 	boost::scoped_ptr<boost::thread> m_thread;
+
   public:
+	/// timestepping constant
 	static const double TIMESTEP;
 	/** Construct a new Engine with the players that go with it.
 	* The engine runs in the background in a separate thread.
 	* @param audio A reference will be stored in order to monitor playback time.
 	* @param anBegin Analyzers to use (beginning iterator)
-	* @param anBegin Analyzers to use (ending iterator)
+	* @param anEnd Analyzers to use (ending iterator)
+	* @param song Song to play
 	**/
 	template <typename FwdIt> Engine(Audio& audio, Song& song, FwdIt anBegin, FwdIt anEnd):
 	  m_audio(audio), m_song(song), m_latencyAR(0.1), m_time(), m_quit()
@@ -71,8 +89,11 @@ class Engine {
 		m_thread.reset(new boost::thread(boost::ref(*this)));
 	}
 	~Engine() { m_quit = true; m_thread->join(); }
+	/// kills playback
 	void kill() { m_quit = true; }
+	/// sets latency
 	void setLatencyAR(double value) { m_latencyAR = clamp(round(value * 1000.0) / 1000.0, 0.0, 0.5); }
+	/// get latency
 	double getLatencyAR() const { return m_latencyAR; }
 	/** Used internally for boost::thread. Do not call this yourself. (boost::thread requires this to be public). **/
 	void operator()() {
@@ -87,6 +108,7 @@ class Engine {
 			++m_time;
 		}
 	}
+	/// gets list of players currently plugged in
 	std::list<Player> getPlayers() const {
 		boost::thread::yield(); // Try to let engine perform its run right before getting the data
 		boost::mutex::scoped_lock l(m_mutex);

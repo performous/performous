@@ -10,6 +10,7 @@ void CScreenPractice::enter() {
 	CScreenManager* sm = CScreenManager::getSingletonPtr();
 	m_audio.playMusic(sm->getThemePathFile("practice.ogg"));
 	theme.reset(new CThemePractice());
+	// draw vu meters
 	for (unsigned int i = 0, mics = m_capture.analyzers().size(); i < mics; ++i) {
 		ProgressBar* b;
 		m_vumeters.push_back(b = new ProgressBar(sm->getThemePathFile("vumeter_bg.svg"), sm->getThemePathFile("vumeter_fg.svg"), ProgressBar::VERTICAL, 0.136, 0.023));
@@ -25,17 +26,31 @@ void CScreenPractice::exit() {
 void CScreenPractice::manageEvent(SDL_Event event) {
 	CScreenManager * sm = CScreenManager::getSingletonPtr();
 	if (event.type == SDL_KEYDOWN) {
-		int key = event.key.keysym.sym;
-		if (key == SDLK_ESCAPE || key == SDLK_q) sm->activateScreen("Intro");
-		else if (key == SDLK_SPACE || key == SDLK_PAUSE) m_audio.togglePause();
+		switch(event.key.keysym.sym) {
+			case SDLK_ESCAPE:
+			case SDLK_q:
+				sm->activateScreen("Intro");
+				break;
+			case SDLK_SPACE:
+			case SDLK_PAUSE:
+				m_audio.togglePause();
+				break;
+			default: // nothing to do, fixes warnings
+				break;
+		}
 	}
 }
 
 void CScreenPractice::draw() {
 	theme->bg->draw();
+	this->draw_analyzers();
+}
+
+void CScreenPractice::draw_analyzers() {
 	boost::ptr_vector<Analyzer>& analyzers = m_capture.analyzers();
 	if (analyzers.empty()) return;
 	bool text = false;
+
 	for (unsigned int i = 0; i < analyzers.size(); ++i) {
 		Analyzer& analyzer = analyzers[i];
 		analyzer.process();
@@ -45,8 +60,10 @@ void CScreenPractice::draw() {
 		// getPeak returns 0.0 when clipping, negative values when not that loud.
 		// Normalizing to [0,1], where 0 is -43 dB or less (to match the vumeter graphic)
 		m_vumeters[i].draw(analyzer.getPeak() / 43.0 + 1.0);
+
 		if (freq != 0.0) {
 			Analyzer::tones_t tones = analyzer.getTones();
+
 			for (Analyzer::tones_t::const_iterator t = tones.begin(); t != tones.end(); ++t) {
 				if (t->age < Tone::MINAGE) continue;
 				int note = scale.getNoteId(t->freq);
@@ -66,10 +83,12 @@ void CScreenPractice::draw() {
 					theme->sharp->draw();
 				}
 			}
+
 			if (!text) {
 				theme->note_txt->draw(scale.getNoteStr(freq));
 				text = true;
 			}
 		}
 	}
+
 }
