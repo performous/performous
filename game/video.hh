@@ -18,7 +18,7 @@ class Video {
 	Dimensions const& dimensions() const { return m_surface.dimensions; }
 
   private:
-	CFfmpeg m_mpeg;
+	FFmpeg m_mpeg;
 	VideoFrame m_videoFrame;
 	Surface m_surface;
 	double m_surfaceTime;

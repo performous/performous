@@ -68,7 +68,7 @@ class Audio {
 	double m_volume;
 	unsigned m_volumeMusic, m_volumePreview;
 	void setVolume_internal(unsigned int volume);
-	boost::scoped_ptr<CFfmpeg> m_mpeg;
+	boost::scoped_ptr<FFmpeg> m_mpeg;
 	bool m_paused;
 	bool m_prebuffering;
 	Notes const* volatile m_notes;

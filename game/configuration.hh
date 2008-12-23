@@ -90,11 +90,11 @@ template<int min, int max> class Integer {
 };
 
 /// abstract configuration base class
-class CConfiguration {
+class Configuration {
   public:
 	/// constructor
-	CConfiguration(std::string const& description): m_description(description) {};
-	virtual ~CConfiguration() {};
+	Configuration(std::string const& description): m_description(description) {};
+	virtual ~Configuration() {};
 	/// next possible config value
 	virtual void setNext() = 0;
 	/// previous possible config value
@@ -109,14 +109,14 @@ class CConfiguration {
 };
 
 /// configuration for volume
-class CConfigurationAudioVolume: public CConfiguration {
+class ConfigurationAudioVolume: public Configuration {
   public:
 	/// typedef function pointer for getter
 	typedef unsigned int (Audio::*GetFunc)();
 	/// typedef function pointer for setter
 	typedef void (Audio::*SetFunc)(unsigned int);
 	/// constructor
-	CConfigurationAudioVolume(std::string const& title, Audio& audio, GetFunc get, SetFunc set);
+	ConfigurationAudioVolume(std::string const& title, Audio& audio, GetFunc get, SetFunc set);
 	void setNext();
 	void setPrevious();
 	std::string getValue() const;

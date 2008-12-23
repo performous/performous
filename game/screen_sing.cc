@@ -12,19 +12,19 @@ namespace {
 	static const double QUIT_TIMEOUT = 30.0; // Return to songs screen after 30 seconds in score screen
 }
 
-CScreenSing::SongStatus CScreenSing::songStatus() const {
+ScreenSing::SongStatus ScreenSing::songStatus() const {
 	Song& song = m_songs.current();
 	if (m_songit == song.notes.end()) return FINISHED;
 	if (m_lyrics.empty() && m_lyricit != song.notes.end()) return INSTRUMENTAL_BREAK;
 	return NORMAL;
 }
 
-void CScreenSing::enter() {
-	CScreenManager* sm = CScreenManager::getSingletonPtr();
+void ScreenSing::enter() {
+	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	Song& song = m_songs.current();
 	std::string file = song.path + song.mp3;
 	m_audio.playMusic(file.c_str());
-	theme.reset(new CThemeSing());
+	theme.reset(new ThemeSing());
 	if (!song.background.empty()) {
 		try {
 			m_background.reset(new Surface(song.path + song.background, true));
@@ -56,7 +56,7 @@ void CScreenSing::enter() {
 	m_engine.reset(new Engine(m_audio, m_songs.current(), analyzers.begin(), analyzers.end()));
 }
 
-void CScreenSing::exit() {
+void ScreenSing::exit() {
 	m_score_window.reset();
 	m_lyrics.clear();
 	m_engine.reset();
@@ -78,11 +78,11 @@ void CScreenSing::exit() {
 	theme.reset();
 }
 
-void CScreenSing::manageEvent(SDL_Event event) {
+void ScreenSing::manageEvent(SDL_Event event) {
 	if (event.type == SDL_KEYDOWN) {
 		m_quitTimer.setValue(QUIT_TIMEOUT);
 		bool seekback = false;
-		CScreenManager* sm = CScreenManager::getSingletonPtr();
+		ScreenManager* sm = ScreenManager::getSingletonPtr();
 		int key = event.key.keysym.sym;
 		if (key == SDLK_ESCAPE || key == SDLK_q || (key == SDLK_RETURN && songStatus() == FINISHED)) {
 			// Enter at end of song display score window, except if score window is already displayed
@@ -161,8 +161,8 @@ namespace {
 
 }
 
-void CScreenSing::draw() {
-	CScreenManager* sm = CScreenManager::getSingletonPtr();
+void ScreenSing::draw() {
+	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	Song& song = m_songs.current();
 	// Get the time in the song
 	double length = m_audio.getLength();
@@ -388,7 +388,7 @@ void CScreenSing::draw() {
 	}
 }
 
-ScoreWindow::ScoreWindow(CScreenManager const* sm, Engine& e):
+ScoreWindow::ScoreWindow(ScreenManager const* sm, Engine& e):
   m_bg(sm->getThemePathFile("score_window.svg")),
   m_scoreBar(sm->getThemePathFile("score_bar_bg.svg"), sm->getThemePathFile("score_bar_fg.svg"), ProgressBar::VERTICAL, 0.0, 0.0, false),
   m_score_text(sm->getThemePathFile("score_txt.svg")),

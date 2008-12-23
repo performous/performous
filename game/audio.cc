@@ -83,9 +83,9 @@ void Audio::setVolume_internal(unsigned int volume) {
 void Audio::playMusic(std::string const& filename, bool preview) {
 	if (!isOpen()) return;
 	// First construct the new stream
-	std::auto_ptr<CFfmpeg> mpeg;
+	std::auto_ptr<FFmpeg> mpeg;
 	try {
-		mpeg.reset(new CFfmpeg(false, true, filename, m_rs.rate()));
+		mpeg.reset(new FFmpeg(false, true, filename, m_rs.rate()));
 		if (preview) mpeg->seek(30.0, false);
 	} catch (std::runtime_error& e) {
 		std::cerr << "Error loading " << filename << " (" << e.what() << ")" << std::endl;

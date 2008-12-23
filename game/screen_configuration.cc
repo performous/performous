@@ -1,20 +1,20 @@
 #include "screen_configuration.hh"
 
-CScreenConfiguration::CScreenConfiguration(std::string const& name, Audio& audio): CScreen(name), m_audio(audio)
+ScreenConfiguration::ScreenConfiguration(std::string const& name, Audio& audio): Screen(name), m_audio(audio)
 {
-	configuration.push_back(new CConfigurationAudioVolume("Music Volume", audio, &Audio::getVolumeMusic, &Audio::setVolumeMusic));
-	configuration.push_back(new CConfigurationAudioVolume("Song Preview Volume", audio, &Audio::getVolumePreview, &Audio::setVolumePreview));
+	configuration.push_back(new ConfigurationAudioVolume("Music Volume", audio, &Audio::getVolumeMusic, &Audio::setVolumeMusic));
+	configuration.push_back(new ConfigurationAudioVolume("Song Preview Volume", audio, &Audio::getVolumePreview, &Audio::setVolumePreview));
 	selected=0;
 }
 
-void CScreenConfiguration::enter() {
-	theme.reset(new CThemeConfiguration());
+void ScreenConfiguration::enter() {
+	theme.reset(new ThemeConfiguration());
 }
 
-void CScreenConfiguration::exit() { theme.reset(); }
+void ScreenConfiguration::exit() { theme.reset(); }
 
-void CScreenConfiguration::manageEvent(SDL_Event event) {
-	CScreenManager* sm = CScreenManager::getSingletonPtr();
+void ScreenConfiguration::manageEvent(SDL_Event event) {
+	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	if (event.type == SDL_KEYDOWN) {
 		m_audio.setVolumeMusic(m_audio.getVolumeMusic()); // Hack to reset the volume after preview volume adjustment
 		int key = event.key.keysym.sym;
@@ -27,7 +27,7 @@ void CScreenConfiguration::manageEvent(SDL_Event event) {
 	}
 }
 
-void CScreenConfiguration::draw() {
+void ScreenConfiguration::draw() {
 	theme->bg->draw();
 	theme->item->draw(configuration[selected].getDescription());
 	theme->value->draw(configuration[selected].getValue());

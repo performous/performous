@@ -8,8 +8,8 @@
 #include <string>
 
 /// theme for song selection
-struct CThemeSongs: boost::noncopyable {
-	CThemeSongs();
+struct ThemeSongs: boost::noncopyable {
+	ThemeSongs();
 	/// background
 	boost::scoped_ptr<Surface> bg;
 	/// song display
@@ -19,8 +19,8 @@ struct CThemeSongs: boost::noncopyable {
 };
 
 /// theme for practice screen
-struct CThemePractice: boost::noncopyable {
-	CThemePractice();
+struct ThemePractice: boost::noncopyable {
+	ThemePractice();
 	/// background (score)
 	boost::scoped_ptr<Surface> bg;
 	/// note
@@ -32,8 +32,8 @@ struct CThemePractice: boost::noncopyable {
 };
 
 /// theme for singing screen
-struct CThemeSing: boost::noncopyable {
-	CThemeSing();
+struct ThemeSing: boost::noncopyable {
+	ThemeSing();
 	/// top background
 	boost::scoped_ptr<Surface> bg_top;
 	/// bottom background
@@ -47,8 +47,8 @@ struct CThemeSing: boost::noncopyable {
 };
 
 /// theme for options screen
-struct CThemeConfiguration: boost::noncopyable {
-	CThemeConfiguration();
+struct ThemeConfiguration: boost::noncopyable {
+	ThemeConfiguration();
 	/// background
 	boost::scoped_ptr<Surface> bg;
 	/// configuration item

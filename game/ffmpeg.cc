@@ -15,16 +15,16 @@ extern "C" {
 #define USE_FFMPEG_CRASH_RECOVERY
 #define AUDIO_CHANNELS 2
 
-/*static*/ boost::mutex CFfmpeg::s_avcodec_mutex;
+/*static*/ boost::mutex FFmpeg::s_avcodec_mutex;
 
-CFfmpeg::CFfmpeg(bool _decodeVideo, bool _decodeAudio, std::string const& _filename, unsigned int rate):
+FFmpeg::FFmpeg(bool _decodeVideo, bool _decodeAudio, std::string const& _filename, unsigned int rate):
   m_filename(_filename), m_rate(rate), m_quit(), m_running(), m_eof(), m_seekTarget(getNaN()),
   pFormatCtx(), pResampleCtx(), img_convert_ctx(), pVideoCodecCtx(), pAudioCodecCtx(), pVideoCodec(), pAudioCodec(),
   videoStream(-1), audioStream(-1), decodeVideo(_decodeVideo), decodeAudio(_decodeAudio), m_position(),
   m_thread(new boost::thread(boost::ref(*this)))
 {}
 
-CFfmpeg::~CFfmpeg() {
+FFmpeg::~FFmpeg() {
 	m_quit = true;
 	videoQueue.reset();
 	audioQueue.reset();
@@ -42,12 +42,12 @@ CFfmpeg::~CFfmpeg() {
 	if (pFormatCtx) av_close_input_file(pFormatCtx);
 }
 
-double CFfmpeg::duration() {
+double FFmpeg::duration() {
 	double d = m_running ? pFormatCtx->duration / double(AV_TIME_BASE) : getNaN();
 	return d >= 0.0 ? d : getInf();
 }
 
-void CFfmpeg::open() {
+void FFmpeg::open() {
 	boost::mutex::scoped_lock l(s_avcodec_mutex);
 	av_register_all();
 	//av_log_set_level(AV_LOG_DEBUG);
@@ -111,7 +111,7 @@ void CFfmpeg::open() {
 #include <csignal>
 
 namespace {
-	boost::thread_specific_ptr<CFfmpeg*> ffmpeg_ptr;
+	boost::thread_specific_ptr<FFmpeg*> ffmpeg_ptr;
 	typedef void (*sighandler)(int);
 	sighandler sigabrt, sigsegv;
 }
@@ -128,10 +128,10 @@ extern "C" void performous_ffmpeg_crash_hack(int sig) {
 }
 #endif
 
-void CFfmpeg::operator()() {
+void FFmpeg::operator()() {
 #ifdef USE_FFMPEG_CRASH_RECOVERY
 	// A hack to avoid ffmpeg crashing the program :)
-	ffmpeg_ptr.reset(new CFfmpeg*);
+	ffmpeg_ptr.reset(new FFmpeg*);
 	*ffmpeg_ptr = this;
 	sigabrt = std::signal(SIGABRT, performous_ffmpeg_crash_hack);
 	sigsegv = std::signal(SIGSEGV, performous_ffmpeg_crash_hack);
@@ -158,13 +158,13 @@ void CFfmpeg::operator()() {
 	m_running = false;
 }
 
-void CFfmpeg::seek(double time, bool wait) {
+void FFmpeg::seek(double time, bool wait) {
 	m_seekTarget = time;
 	videoQueue.reset(); audioQueue.reset(); // Empty these to unblock the internals in case buffers were full
 	if (wait) while (!m_quit && m_seekTarget == m_seekTarget) boost::thread::sleep(now() + 0.01);
 }
 
-void CFfmpeg::seek_internal() {
+void FFmpeg::seek_internal() {
 	audioQueue.reset();
 	videoQueue.reset();
 	int flags = 0;
@@ -178,7 +178,7 @@ void CFfmpeg::seek_internal() {
 	m_seekTarget = getNaN(); // Signal that seeking is done
 }
 
-void CFfmpeg::decodeNextFrame() {
+void FFmpeg::decodeNextFrame() {
 	struct ReadFramePacket: public AVPacket {
 		AVFormatContext* m_s;
 		ReadFramePacket(AVFormatContext* s): m_s(s) {

@@ -1,22 +1,22 @@
 #include "screen.hh"
 #include <stdexcept>
 
-template<> CScreenManager* CSingleton<CScreenManager>::ms_CSingleton = NULL;
+template<> ScreenManager* Singleton<ScreenManager>::ms_Singleton = NULL;
 
-CScreenManager::CScreenManager(std::string const& theme):
+ScreenManager::ScreenManager(std::string const& theme):
   m_finished(false),
   currentScreen(),
   m_theme(theme)
 {}
 
-void CScreenManager::activateScreen(std::string const& name) {
-	CScreen* s = getScreen(name);
+void ScreenManager::activateScreen(std::string const& name) {
+	Screen* s = getScreen(name);
 	if (currentScreen) currentScreen->exit();
 	currentScreen = s;
 	currentScreen->enter();
 }
 
-CScreen* CScreenManager::getScreen(std::string const& name) {
+Screen* ScreenManager::getScreen(std::string const& name) {
 	try {
 		return &screens.at(name);
 	} catch (boost::bad_ptr_container_operation&) {
@@ -24,9 +24,9 @@ CScreen* CScreenManager::getScreen(std::string const& name) {
 	}
 }
 
-std::string CScreenManager::getThemePathFile(std::string const& file) const
+std::string ScreenManager::getThemePathFile(std::string const& file) const
 {
-	if (m_theme.empty()) throw std::logic_error("CScreenManager::getThemePathFile(): m_theme is empty");
+	if (m_theme.empty()) throw std::logic_error("ScreenManager::getThemePathFile(): m_theme is empty");
 	return m_theme + "/" + file;
 }
 

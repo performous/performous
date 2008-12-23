@@ -1,9 +1,9 @@
 #include "screen_intro.hh"
 
-CScreenIntro::CScreenIntro(std::string const& name, Audio& audio, Capture& capture): CScreen(name), m_audio(audio), m_capture(capture) {}
+ScreenIntro::ScreenIntro(std::string const& name, Audio& audio, Capture& capture): Screen(name), m_audio(audio), m_capture(capture) {}
 
-void CScreenIntro::enter() {
-	CScreenManager* sm = CScreenManager::getSingletonPtr();
+void ScreenIntro::enter() {
+	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	m_audio.playMusic(sm->getThemePathFile("menu.ogg"));
 	background.reset(new Surface(sm->getThemePathFile("intro.svg")));
 	std::string msg;
@@ -12,13 +12,13 @@ void CScreenIntro::enter() {
 	if (!msg.empty()) m_dialog.reset(new Dialog(msg + "\nPlease configure some before playing."));
 }
 
-void CScreenIntro::exit() {
+void ScreenIntro::exit() {
 	background.reset();
 	m_dialog.reset();
 }
 
-void CScreenIntro::manageEvent(SDL_Event event) {
-	CScreenManager* sm = CScreenManager::getSingletonPtr();
+void ScreenIntro::manageEvent(SDL_Event event) {
+	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	if (event.type == SDL_KEYDOWN) {
 		if (m_dialog) { m_dialog.reset(); return; }
 		int key = event.key.keysym.sym;
@@ -30,7 +30,7 @@ void CScreenIntro::manageEvent(SDL_Event event) {
 	}
 }
 
-void CScreenIntro::draw() {
+void ScreenIntro::draw() {
 	background->draw();
 	if (m_dialog) m_dialog->draw();
 }

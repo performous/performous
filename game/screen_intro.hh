@@ -8,10 +8,10 @@
 #include <boost/scoped_ptr.hpp>
 
 /// intro screen
-class CScreenIntro : public CScreen {
+class ScreenIntro : public Screen {
   public:
 	/// constructor
-	CScreenIntro(std::string const& name, Audio& audio, Capture& capture);
+	ScreenIntro(std::string const& name, Audio& audio, Capture& capture);
 	void enter();
 	void exit();
 	void manageEvent(SDL_Event event);

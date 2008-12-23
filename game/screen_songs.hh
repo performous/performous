@@ -15,10 +15,10 @@
 class CAudio;
 
 /// song chooser screen
-class CScreenSongs : public CScreen {
+class ScreenSongs : public Screen {
   public:
 	/// constructor
-	CScreenSongs(std::string const& name, Audio& audio, Songs& songs);
+	ScreenSongs(std::string const& name, Audio& audio, Songs& songs);
 	void enter();
 	void exit();
 	void manageEvent(SDL_Event event);
@@ -29,7 +29,7 @@ class CScreenSongs : public CScreen {
 	Songs& m_songs;
 	boost::scoped_ptr<Surface> m_songbg;
 	boost::scoped_ptr<Video> m_video;
-	boost::scoped_ptr<CThemeSongs> theme;
+	boost::scoped_ptr<ThemeSongs> theme;
 	std::string m_playing;
 	std::string m_playReq;
 	AnimValue m_playTimer;

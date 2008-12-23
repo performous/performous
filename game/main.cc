@@ -30,7 +30,7 @@ extern "C" void quit(int) {
 
 struct QuitNow {};
 
-static void checkEvents_SDL(CScreenManager& sm, Window& window) {
+static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 	if (g_quit) {
 		std::cout << "Terminating, please wait... (or kill the process)" << std::endl;
 		throw QuitNow();
@@ -262,13 +262,13 @@ int main(int argc, char** argv) {
 			if (!audio.isOpen()) std::cerr << "No playback devices could be used. Please use --pdev to define one." << std::endl;
 		}
 		Songs songs(songdirs, songlist);
-		CScreenManager sm(theme);
+		ScreenManager sm(theme);
 		Window window(width, height, fullscreen);
-		sm.addScreen(new CScreenIntro("Intro", audio, capture));
-		sm.addScreen(new CScreenSongs("Songs", audio, songs));
-		sm.addScreen(new CScreenSing("Sing", audio, songs, capture));
-		sm.addScreen(new CScreenPractice("Practice", audio, capture));
-		sm.addScreen(new CScreenConfiguration("Configuration", audio));
+		sm.addScreen(new ScreenIntro("Intro", audio, capture));
+		sm.addScreen(new ScreenSongs("Songs", audio, songs));
+		sm.addScreen(new ScreenSing("Sing", audio, songs, capture));
+		sm.addScreen(new ScreenPractice("Practice", audio, capture));
+		sm.addScreen(new ScreenConfiguration("Configuration", audio));
 		sm.activateScreen("Intro");
 		// Main loop
 		boost::xtime time = now();

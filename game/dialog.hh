@@ -11,8 +11,8 @@ class Dialog {
 	/// constructor
 	Dialog(std::string const& text):
 	  m_text(text),
-	  m_dialog(CScreenManager::getSingletonPtr()->getThemePathFile("warning.svg")),
-	  m_svgText(CScreenManager::getSingletonPtr()->getThemePathFile("dialog_txt.svg"))
+	  m_dialog(ScreenManager::getSingletonPtr()->getThemePathFile("warning.svg")),
+	  m_svgText(ScreenManager::getSingletonPtr()->getThemePathFile("dialog_txt.svg"))
 	{
 		m_dialog.dimensions.fixedWidth(0.8);
 	}

@@ -17,7 +17,7 @@
 class ScoreWindow {
   public:
 	/// constructor
-	ScoreWindow(CScreenManager const* sm, Engine & e);
+	ScoreWindow(ScreenManager const* sm, Engine & e);
 	/// draws ScoreWindow
 	void draw();
 
@@ -69,11 +69,11 @@ class LyricRow {
 };
 
 /// class for actual singing screen
-class CScreenSing: public CScreen {
+class ScreenSing: public Screen {
   public:
 	/// constructor
-	CScreenSing(std::string const& name, Audio& audio, Songs& songs, Capture& capture):
-	  CScreen(name), m_audio(audio), m_songs(songs), m_capture(capture), m_latencyAV(), m_nlTop(0.0, 2.0), m_nlBottom(0.0, 2.0)
+	ScreenSing(std::string const& name, Audio& audio, Songs& songs, Capture& capture):
+	  Screen(name), m_audio(audio), m_songs(songs), m_capture(capture), m_latencyAV(), m_nlTop(0.0, 2.0), m_nlBottom(0.0, 2.0)
 	{}
 	void enter();
 	void exit();
@@ -106,7 +106,7 @@ class CScreenSing: public CScreen {
 	boost::scoped_ptr<Engine> m_engine;
 	double m_latencyAV;  // Latency between audio and video output (do not confuse with latencyAR)
 	float m_notealpha;
-	boost::scoped_ptr<CThemeSing> theme;
+	boost::scoped_ptr<ThemeSing> theme;
 	Notes::const_iterator m_songit;
 	Notes::const_iterator m_lyricit;
 	AnimValue m_nlTop, m_nlBottom;

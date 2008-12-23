@@ -13,11 +13,11 @@
 #include <vector>
 
 /// Abstract Class for screens
-class CScreen {
+class Screen {
   public:
 	/// counstructor
-	CScreen(std::string const& name): m_name(name) {}
-	virtual ~CScreen() {}
+	Screen(std::string const& name): m_name(name) {}
+	virtual ~Screen() {}
 	/// eventhandler
 	virtual void manageEvent(SDL_Event event) = 0;
 	/// draws screen
@@ -35,20 +35,20 @@ class CScreen {
 
 /// Manager for screens
 /** manages screens
- * @see CSingleton 
+ * @see Singleton 
  */
-class CScreenManager: public CSingleton <CScreenManager> {
+class ScreenManager: public Singleton <ScreenManager> {
   public:
 	/// constructor
-	CScreenManager(std::string const& theme);
+	ScreenManager(std::string const& theme);
 	/// adds a screen to the manager
-	void addScreen(CScreen* s) { std::string tmp = s->getName(); screens.insert(tmp, s); };
+	void addScreen(Screen* s) { std::string tmp = s->getName(); screens.insert(tmp, s); };
 	/// activates screen
 	void activateScreen(std::string const& name);
-	/// returns pointer to current CScreen
-	CScreen* getCurrentScreen() { return currentScreen; };
-	/// returns pointer to CScreen for given name
-	CScreen* getScreen(std::string const& name);
+	/// returns pointer to current Screen
+	Screen* getCurrentScreen() { return currentScreen; };
+	/// returns pointer to Screen for given name
+	Screen* getScreen(std::string const& name);
 
 	/// sets finished to true
 	void finished() { m_finished=true; };
@@ -62,9 +62,9 @@ class CScreenManager: public CSingleton <CScreenManager> {
 
   private:
 	bool m_finished;
-	typedef boost::ptr_map<std::string, CScreen> screenmap_t;
+	typedef boost::ptr_map<std::string, Screen> screenmap_t;
 	screenmap_t screens;
-	CScreen* currentScreen;
+	Screen* currentScreen;
 	std::string m_theme;
 };
 

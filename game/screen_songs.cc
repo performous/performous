@@ -6,23 +6,23 @@
 
 static const double IDLE_TIMEOUT = 45.0; // seconds
 
-CScreenSongs::CScreenSongs(std::string const& name, Audio& audio, Songs& songs):
-  CScreen(name), m_audio(audio), m_songs(songs), m_covers(20)
+ScreenSongs::ScreenSongs(std::string const& name, Audio& audio, Songs& songs):
+  Screen(name), m_audio(audio), m_songs(songs), m_covers(20)
 {
 	m_songs.setAnimMargins(5.0, 5.0);
 	m_playTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
 }
 
-void CScreenSongs::enter() {
-	CScreenManager* sm = CScreenManager::getSingletonPtr();
-	theme.reset(new CThemeSongs());
+void ScreenSongs::enter() {
+	ScreenManager* sm = ScreenManager::getSingletonPtr();
+	theme.reset(new ThemeSongs());
 	m_emptyCover.reset(new Surface(sm->getThemePathFile("no_cover.svg")));
 	m_search.text.clear();
 	m_songs.setFilter(m_search.text);
 	m_audio.fadeout();
 }
 
-void CScreenSongs::exit() {
+void ScreenSongs::exit() {
 	m_covers.clear();
 	m_emptyCover.reset();
 	theme.reset();
@@ -33,8 +33,8 @@ void CScreenSongs::exit() {
 	m_audio.fadeout();
 }
 
-void CScreenSongs::manageEvent(SDL_Event event) {
-	CScreenManager* sm = CScreenManager::getSingletonPtr();
+void ScreenSongs::manageEvent(SDL_Event event) {
+	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	if (event.type != SDL_KEYDOWN) return;
 	SDL_keysym keysym = event.key.keysym;
 	int key = keysym.sym;
@@ -58,7 +58,7 @@ void CScreenSongs::manageEvent(SDL_Event event) {
 	else if (key == SDLK_DOWN) m_songs.sortChange(1);
 }
 
-void CScreenSongs::draw() {
+void ScreenSongs::draw() {
 	m_songs.update(); // Poll for new songs
 	if (m_songbg.get()) m_songbg->draw();
 	if (m_video.get()) m_video->render(m_audio.getPosition());  // FIXME: Compensate AV delay here too

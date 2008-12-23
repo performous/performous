@@ -2,14 +2,14 @@
 
 #include "util.hh"
 
-CScreenPractice::CScreenPractice(std::string const& name, Audio& audio, Capture& capture):
-  CScreen(name), m_audio(audio), m_capture(capture)
+ScreenPractice::ScreenPractice(std::string const& name, Audio& audio, Capture& capture):
+  Screen(name), m_audio(audio), m_capture(capture)
 {}
 
-void CScreenPractice::enter() {
-	CScreenManager* sm = CScreenManager::getSingletonPtr();
+void ScreenPractice::enter() {
+	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	m_audio.playMusic(sm->getThemePathFile("practice.ogg"));
-	theme.reset(new CThemePractice());
+	theme.reset(new ThemePractice());
 	// draw vu meters
 	for (unsigned int i = 0, mics = m_capture.analyzers().size(); i < mics; ++i) {
 		ProgressBar* b;
@@ -18,13 +18,13 @@ void CScreenPractice::enter() {
 	}
 }
 
-void CScreenPractice::exit() {
+void ScreenPractice::exit() {
 	m_vumeters.clear();
 	theme.reset();
 }
 
-void CScreenPractice::manageEvent(SDL_Event event) {
-	CScreenManager * sm = CScreenManager::getSingletonPtr();
+void ScreenPractice::manageEvent(SDL_Event event) {
+	ScreenManager * sm = ScreenManager::getSingletonPtr();
 	if (event.type == SDL_KEYDOWN) {
 		switch(event.key.keysym.sym) {
 			case SDLK_ESCAPE:
@@ -41,12 +41,12 @@ void CScreenPractice::manageEvent(SDL_Event event) {
 	}
 }
 
-void CScreenPractice::draw() {
+void ScreenPractice::draw() {
 	theme->bg->draw();
 	this->draw_analyzers();
 }
 
-void CScreenPractice::draw_analyzers() {
+void ScreenPractice::draw_analyzers() {
 	boost::ptr_vector<Analyzer>& analyzers = m_capture.analyzers();
 	if (analyzers.empty()) return;
 	bool text = false;

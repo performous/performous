@@ -9,10 +9,10 @@
 #include "opengl_text.hh"
 
 /// options dialogue
-class CScreenConfiguration: public CScreen {
+class ScreenConfiguration: public Screen {
   public:
 	/// constructor
-	CScreenConfiguration(std::string const& name, Audio& m_audio);
+	ScreenConfiguration(std::string const& name, Audio& m_audio);
 	void enter();
 	void exit();
 	void manageEvent(SDL_Event event);
@@ -20,8 +20,8 @@ class CScreenConfiguration: public CScreen {
 
   private:
 	Audio& m_audio;
-	boost::scoped_ptr<CThemeConfiguration> theme;
-	boost::ptr_vector<CConfiguration> configuration;
+	boost::scoped_ptr<ThemeConfiguration> theme;
+	boost::ptr_vector<Configuration> configuration;
 	unsigned int selected;
 };
 

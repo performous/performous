@@ -178,11 +178,11 @@ extern "C" {
 }
 
 /// ffmpeg class
-class CFfmpeg {
+class FFmpeg {
   public:
 	/// constructor
-	CFfmpeg(bool decodeVideo, bool decodeAudio, std::string const& file, unsigned int rate = 48000);
-	~CFfmpeg();
+	FFmpeg(bool decodeVideo, bool decodeAudio, std::string const& file, unsigned int rate = 48000);
+	~FFmpeg();
 	/**
 	* This function is called by the crash handler to indicate that FFMPEG has
 	* crashed or has gotten stuck, and that the destructor should not wait for
