@@ -4,11 +4,12 @@
 #include <boost/bind.hpp>
 #include <boost/regex.hpp>
 #include <libxml++/libxml++.h>
+#include <tr1/random>
 #include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
-
+#include <tr1/random>
 Songs::Songs(std::set<std::string> const& songdirs, std::string const& songlist): m_songdirs(songdirs), m_songlist(songlist), math_cover(), m_order(), m_dirty(false), m_loading(false) {
 	reload();
 }
@@ -100,6 +101,10 @@ class Songs::RestoreSel {
 
 void Songs::randomize() {
 	RestoreSel restore(*this);
+	namespace rnd = std::tr1;
+	rnd::random_device gendev;  // Random number generator (using /dev/urandom usually)
+	rnd::mt19937 gen(gendev);  // Make Mersenne Twister random number generator, seeded with random_device.
+	for (SongVector::const_iterator it = m_filtered.begin(); it != m_filtered.end(); ++it) (*it)->randomIdx = gen();
 	m_order = 0;
 	sort_internal();
 }
@@ -128,26 +133,28 @@ void Songs::filter_internal() {
 	m_dirty = false;
 }
 
-#define STRLT_RET(lhs, rhs) { std::string l_ = Glib::ustring(lhs).casefold_collate_key(), r_ = Glib::ustring(rhs).casefold_collate_key(); if (l_ != r_) return l_ < r_; }
-/// class to compare by field XXX
-class CmpByField {
-	std::string Song::* m_field;
-  public:
-	/// constructor
-	CmpByField(std::string Song::* field): m_field(field) {}
-	/// compare left and right song
-	bool operator()(Song const& left , Song const& right) {
-		STRLT_RET(left.*m_field, right.*m_field);
-		return false;
-	}
-	/// compare left and right song
-	bool operator()(boost::shared_ptr<Song> const& left, boost::shared_ptr<Song> const& right) {
-		return operator()(*left, *right);
-	}
-};
-#undef STRLT_RET
 
 namespace {
+
+    /// A functor that compares songs based on a selected member field of them.
+    template<typename Field> class CmpByField {
+	    Field Song::* m_field;
+      public:
+	    /** @param field a pointer to the field to use (pointer to member) **/
+	    CmpByField(Field Song::* field): m_field(field) {}
+	    /// Compare left < right
+	    bool operator()(Song const& left , Song const& right) {
+		    return left.*m_field < right.*m_field;
+	    }
+	    /// Compare *left < *right
+	    bool operator()(boost::shared_ptr<Song> const& left, boost::shared_ptr<Song> const& right) {
+		    return operator()(*left, *right);
+	    }
+    };
+
+    /// A helper for easily constructing CmpByField objects
+    template <typename T> CmpByField<T> comparator(T Song::*field) { return CmpByField<T>(field); }
+
 	std::string pathtrim(std::string path) {
 		std::string::size_type pos = path.rfind('/', path.size() - 1);
 		pos = path.rfind('/', pos - 1);
@@ -155,18 +162,20 @@ namespace {
 		if (pos == std::string::npos) pos = 0; else ++pos;
 		return path.substr(pos, path.size() - pos - 1);
 	}
+
+
+    static char const* order[] = {
+	    "random order",
+	    "by song",
+	    "by artist",
+	    "by edition",
+	    "by genre",
+	    "by path"
+    };
+
+    static const int orders = sizeof(order) / sizeof(*order);
+
 }
-
-static char const* order[] = {
-	"random order",
-	"by song",
-	"by artist",
-	"by edition",
-	"by genre",
-	"by path"
-};
-
-static const int orders = sizeof(order) / sizeof(*order);
 
 std::string Songs::sortDesc() const {
 	std::string str = order[m_order];
@@ -191,17 +200,12 @@ namespace {
 
 void Songs::sort_internal() {
 	switch (m_order) {
-	  case 0:
-		if (!m_loading) {
-			srand(time(NULL));
-			std::random_shuffle(m_filtered.begin(), m_filtered.end(), rnd);
-		}
-		break;
-	  case 1: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&Song::collateByTitle)); break;
-	  case 2: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&Song::collateByArtist)); break;
-	  case 3: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&Song::edition)); break;
-	  case 4: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&Song::genre)); break;
-	  case 5: std::sort(m_filtered.begin(), m_filtered.end(), CmpByField(&Song::path)); break;
+	  case 0: std::sort(m_filtered.begin(), m_filtered.end(), comparator(&Song::randomIdx)); break;
+	  case 1: std::sort(m_filtered.begin(), m_filtered.end(), comparator(&Song::collateByTitle)); break;
+	  case 2: std::sort(m_filtered.begin(), m_filtered.end(), comparator(&Song::collateByArtist)); break;
+	  case 3: std::sort(m_filtered.begin(), m_filtered.end(), comparator(&Song::edition)); break;
+	  case 4: std::sort(m_filtered.begin(), m_filtered.end(), comparator(&Song::genre)); break;
+	  case 5: std::sort(m_filtered.begin(), m_filtered.end(), comparator(&Song::path)); break;
 	  default: throw std::logic_error("Internal error: unknown sort order in Songs::sortChange");
 	}
 }
@@ -230,7 +234,7 @@ namespace {
 void Songs::dumpSongs_internal() const {
 	if (m_songlist.empty()) return;
 	SongVector s = m_songs;
-	std::sort(s.begin(), s.end(), CmpByField(&Song::collateByTitle)); dumpXML(s, "Songlist by song name", m_songlist + "/songs-by-title.xhtml");
-	std::sort(s.begin(), s.end(), CmpByField(&Song::collateByArtist)); dumpXML(s, "Songlist by artist", m_songlist + "/songs-by-artist.xhtml");
+	std::sort(s.begin(), s.end(), comparator(&Song::collateByTitle)); dumpXML(s, "Songlist by song name", m_songlist + "/songs-by-title.xhtml");
+	std::sort(s.begin(), s.end(), comparator(&Song::collateByArtist)); dumpXML(s, "Songlist by artist", m_songlist + "/songs-by-artist.xhtml");
 }
 

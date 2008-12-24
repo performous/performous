@@ -32,6 +32,7 @@ class Song: boost::noncopyable {
 	std::string str() const { return title + "  by  " + artist; }
 	/** Get full song information (used by the search function). **/
 	std::string strFull() const { return title + "\n" + artist + "\n" + genre + "\n" + edition + "\n" + path; }
+	int randomIdx; ///< sorting index used for random order
 	Notes notes; ///< notes for song
 	int noteMin, ///< lowest note
 	    noteMax; ///< highest note
