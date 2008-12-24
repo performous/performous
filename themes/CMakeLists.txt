@@ -1,4 +1,4 @@
-FILE(GLOB THEME_FILES "lima/*.ogg" "lima/*.svg" "lima/*.png" "lima/*.bmp")
+FILE(GLOB THEME_FILES "default/*.ogg" "default/*.svg" "default/*.png" "default/*.bmp")
 
-install( FILES ${THEME_FILES} DESTINATION ${SHARE_INSTALL}/themes/lima/)
+install( FILES ${THEME_FILES} DESTINATION ${SHARE_INSTALL}/themes/default/)
 

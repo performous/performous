@@ -105,7 +105,7 @@ int main(int argc, char** argv) {
 		  ("version,v", "display version number");
 		po::options_description opt2("Configuration options");
 		opt2.add_options()
-		  ("theme,t", po::value<std::string>(&theme)->default_value("lima"), "set theme (name or absolute path)")
+		  ("theme,t", po::value<std::string>(&theme)->default_value("default"), "set theme (name or absolute path)")
 		  ("fs,f", "enable full screen mode")
 		  ("fps", "benchmark rendering speed\n  also disable 100 FPS limit")
 		  ("songlist", po::value<std::string>(&songlist), "save a list of songs in the specified folder")
