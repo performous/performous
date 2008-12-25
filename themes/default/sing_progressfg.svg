@@ -31,10 +31,10 @@
   </metadata>
   <sodipodi:namedview
      inkscape:cy="20"
-     inkscape:cx="299.46668"
+     inkscape:cx="214.3756"
      inkscape:zoom="2.086"
-     inkscape:window-height="1125"
-     inkscape:window-width="1920"
+     inkscape:window-height="726"
+     inkscape:window-width="960"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      guidetolerance="10.0"
@@ -44,8 +44,8 @@
      bordercolor="#666666"
      pagecolor="#ffffff"
      id="base"
-     inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:window-x="160"
+     inkscape:window-y="63"
      inkscape:current-layer="svg3465"
      showgrid="true">
     <inkscape:grid
@@ -59,15 +59,15 @@
     <linearGradient
        id="linearGradient5193">
       <stop
-         style="stop-color:#000000;stop-opacity:1;"
+         style="stop-color:#000080;stop-opacity:1;"
          offset="0"
          id="stop5203" />
       <stop
          id="stop3296"
          offset="0.5"
-         style="stop-color:#535151;stop-opacity:1;" />
+         style="stop-color:#3333bf;stop-opacity:1;" />
       <stop
-         style="stop-color:#000000;stop-opacity:1;"
+         style="stop-color:#000080;stop-opacity:1;"
          offset="1"
          id="stop5197" />
     </linearGradient>

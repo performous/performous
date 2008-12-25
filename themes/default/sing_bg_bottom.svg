@@ -59,11 +59,11 @@
     <linearGradient
        id="linearGradient6239">
       <stop
-         style="stop-color:#2d2d2d;stop-opacity:1;"
+         style="stop-color:#414141;stop-opacity:1;"
          offset="0"
          id="stop6241" />
       <stop
-         style="stop-color:#171717;stop-opacity:1;"
+         style="stop-color:#151515;stop-opacity:1;"
          offset="1"
          id="stop6243" />
     </linearGradient>
@@ -119,34 +119,34 @@
        inkscape:collect="always"
        xlink:href="#linearGradient6239"
        id="radialGradient6281"
-       cx="0.00033175375"
-       cy="0.93368369"
-       fx="0.00033175375"
-       fy="0.93368369"
+       cx="-52.682827"
+       cy="22.638672"
+       fx="-52.682827"
+       fy="22.638672"
        r="139.13554"
-       gradientTransform="matrix(1,0,0,0.8902338,0,0.1024869)"
+       gradientTransform="matrix(0.5485002,4.7588748e-2,-3.8008734e-2,0.486111,-22.925821,11.758401)"
        gradientUnits="userSpaceOnUse"
        spreadMethod="reflect" />
     <radialGradient
        inkscape:collect="always"
        xlink:href="#linearGradient6239"
        id="radialGradient6283"
-       cx="-0.00043312719"
-       cy="0.93365741"
-       fx="-0.00043312719"
-       fy="0.93365741"
+       cx="54.552696"
+       cy="61.81908"
+       fx="54.552696"
+       fy="61.81908"
        r="85.972984"
-       gradientTransform="matrix(1,0,0,1.2958795,0,-0.2762501)"
+       gradientTransform="matrix(0.8491493,-0.5169578,0.3359319,0.5286533,-12.537687,75.354409)"
        gradientUnits="userSpaceOnUse"
        spreadMethod="reflect" />
     <radialGradient
        inkscape:collect="always"
        xlink:href="#linearGradient6239"
        id="radialGradient6285"
-       cx="-0.00043312719"
-       cy="0.93365741"
-       fx="-0.00043312719"
-       fy="0.93365741"
+       cx="-108.65945"
+       cy="46.669819"
+       fx="-108.65945"
+       fy="46.669819"
        r="85.972984"
        gradientTransform="matrix(1,0,0,1.2958795,0,-0.2762501)"
        gradientUnits="userSpaceOnUse"
@@ -160,41 +160,41 @@
        fx="-0.00043312719"
        fy="0.93365741"
        r="85.972984"
-       gradientTransform="matrix(1,0,0,1.2958795,0,-0.2762501)"
+       gradientTransform="matrix(0.7054225,-0.6154847,1,0.8642415,-0.933785,0.1264853)"
        gradientUnits="userSpaceOnUse"
        spreadMethod="reflect" />
     <radialGradient
        inkscape:collect="always"
        xlink:href="#linearGradient6239"
        id="radialGradient6289"
-       cx="0.00033175375"
-       cy="0.93368369"
-       fx="0.00033175375"
-       fy="0.93368369"
+       cx="-55.975525"
+       cy="110.75415"
+       fx="-55.975525"
+       fy="110.75415"
        r="139.13554"
-       gradientTransform="matrix(1,0,0,0.8902338,0,0.1024869)"
+       gradientTransform="matrix(0.4023117,1.7847586e-8,-2.8882931e-8,0.8902338,-33.455913,0.1024879)"
        gradientUnits="userSpaceOnUse"
        spreadMethod="reflect" />
     <radialGradient
        inkscape:collect="always"
        xlink:href="#linearGradient6239"
        id="radialGradient6291"
-       cx="0.00033175375"
-       cy="0.93368369"
-       fx="0.00033175375"
-       fy="0.93368369"
+       cx="-84.775795"
+       cy="102.82321"
+       fx="-84.775795"
+       fy="102.82321"
        r="139.13554"
-       gradientTransform="matrix(1,0,0,0.8902338,0,0.1024869)"
+       gradientTransform="matrix(0.609306,0,-1.7525848e-8,0.8902338,-33.121388,0.102488)"
        gradientUnits="userSpaceOnUse"
        spreadMethod="reflect" />
     <radialGradient
        inkscape:collect="always"
        xlink:href="#linearGradient6239"
        id="radialGradient6293"
-       cx="-0.00043312719"
-       cy="0.93365741"
-       fx="-0.00043312719"
-       fy="0.93365741"
+       cx="121.82938"
+       cy="29.891867"
+       fx="121.82938"
+       fy="29.891867"
        r="85.972984"
        gradientTransform="matrix(1,0,0,1.2958795,0,-0.2762501)"
        gradientUnits="userSpaceOnUse"
@@ -203,10 +203,10 @@
        inkscape:collect="always"
        xlink:href="#linearGradient6239"
        id="radialGradient6295"
-       cx="-0.00043312719"
-       cy="0.93365741"
-       fx="-0.00043312719"
-       fy="0.93365741"
+       cx="-54.119453"
+       cy="-33.586506"
+       fx="-54.119453"
+       fy="-33.586506"
        r="85.972984"
        gradientTransform="matrix(1,0,0,1.2958795,0,-0.2762501)"
        gradientUnits="userSpaceOnUse"
@@ -215,30 +215,14 @@
        inkscape:collect="always"
        xlink:href="#linearGradient6239"
        id="radialGradient6297"
-       cx="0.00033175375"
-       cy="0.93368369"
-       fx="0.00033175375"
-       fy="0.93368369"
+       cx="73.08477"
+       cy="-64.148376"
+       fx="73.08477"
+       fy="-64.148376"
        r="139.13554"
-       gradientTransform="matrix(1,0,0,0.8902338,0,0.1024869)"
+       gradientTransform="matrix(1.2783381,0.4169453,-0.272318,0.846931,-30.398528,-33.221331)"
        gradientUnits="userSpaceOnUse"
        spreadMethod="reflect" />
-    <filter
-       inkscape:collect="always"
-       id="filter6407">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="5.6837644"
-         id="feGaussianBlur6409" />
-    </filter>
-    <filter
-       inkscape:collect="always"
-       id="filter6411">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="5.3395885"
-         id="feGaussianBlur6413" />
-    </filter>
     <filter
        inkscape:collect="always"
        id="filter6415">
@@ -246,38 +230,6 @@
          inkscape:collect="always"
          stdDeviation="5.5378501"
          id="feGaussianBlur6417" />
-    </filter>
-    <filter
-       inkscape:collect="always"
-       id="filter6419">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="6.6976166"
-         id="feGaussianBlur6421" />
-    </filter>
-    <filter
-       inkscape:collect="always"
-       id="filter6423">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="5.9884042"
-         id="feGaussianBlur6425" />
-    </filter>
-    <filter
-       inkscape:collect="always"
-       id="filter6427">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="6.4212474"
-         id="feGaussianBlur6429" />
-    </filter>
-    <filter
-       inkscape:collect="always"
-       id="filter6431">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="5.9331108"
-         id="feGaussianBlur6433" />
     </filter>
     <filter
        inkscape:collect="always"
@@ -511,6 +463,54 @@
        fx="0.00033175375"
        fy="0.93368369"
        r="139.13554" />
+    <filter
+       inkscape:collect="always"
+       id="filter6529">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="4.8307749"
+         id="feGaussianBlur6531" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter6557">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="6.374635"
+         id="feGaussianBlur6559" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter6593">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="3.9535839"
+         id="feGaussianBlur6595" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter6609">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="3.7116756"
+         id="feGaussianBlur6611" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter6693">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="4.3837536"
+         id="feGaussianBlur6695" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter6781">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="5.8770044"
+         id="feGaussianBlur6783" />
+    </filter>
   </defs>
   <rect
      id="rect3210"
@@ -524,7 +524,7 @@
      id="layer1"
      inkscape:label="Layer 1"
      transform="matrix(0.8066215,0,0,0.8008797,451.66415,145.2047)"
-     style="fill:url(#radialGradient6297);fill-opacity:1.0;filter:url(#filter6439)">
+     style="fill:url(#radialGradient6297);fill-opacity:1;filter:url(#filter6439)">
     <g
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
@@ -543,7 +543,7 @@
      id="g2670"
      inkscape:label="Layer 1"
      transform="matrix(1,0,0,0.8832743,320.27471,120.95505)"
-     style="fill:url(#radialGradient6295);fill-opacity:1.0;filter:url(#filter6435)">
+     style="fill:url(#radialGradient6295);fill-opacity:1;filter:url(#filter6435)">
     <g
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
@@ -562,7 +562,7 @@
      id="g2674"
      inkscape:label="Layer 1"
      transform="matrix(-1,0,0,0.8711992,487.08999,112.44614)"
-     style="fill:url(#radialGradient6293);fill-opacity:1.0;filter:url(#filter6431)">
+     style="fill:url(#radialGradient6293);fill-opacity:1;filter:url(#filter6593)">
     <g
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
@@ -581,7 +581,7 @@
      id="g2680"
      inkscape:label="Layer 1"
      transform="matrix(0.8624259,0,0,0.8624259,266.15497,141.15386)"
-     style="fill:url(#radialGradient6291);fill-opacity:1.0;filter:url(#filter6427)">
+     style="fill:url(#radialGradient6291);fill-opacity:1;filter:url(#filter6609)">
     <g
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
@@ -600,7 +600,7 @@
      id="g2686"
      inkscape:label="Layer 1"
      transform="matrix(1,0,0,0.8551852,53.906246,135.77945)"
-     style="fill:url(#radialGradient6289);fill-opacity:1.0;filter:url(#filter6423)">
+     style="fill:url(#radialGradient6289);fill-opacity:1;filter:url(#filter6781)">
     <g
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
@@ -619,7 +619,7 @@
      id="g2692"
      inkscape:label="Layer 1"
      transform="matrix(-0.7704983,0,0,0.8872993,563.32327,145.61496)"
-     style="fill:url(#radialGradient6287);fill-opacity:1.0;filter:url(#filter6419)">
+     style="fill:url(#radialGradient6287);fill-opacity:1;filter:url(#filter6529)">
     <g
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
@@ -638,7 +638,7 @@
      id="g2698"
      inkscape:label="Layer 1"
      transform="matrix(-1,0,0,1,643.14381,132.95368)"
-     style="fill:url(#radialGradient6285);fill-opacity:1.0;filter:url(#filter6415)">
+     style="fill:url(#radialGradient6285);fill-opacity:1;filter:url(#filter6415)">
     <g
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
@@ -657,7 +657,7 @@
      id="g2704"
      inkscape:label="Layer 1"
      transform="matrix(1.0260797,0,0,1.0483003,955.70074,136.49604)"
-     style="fill:url(#radialGradient6283);fill-opacity:1.0;filter:url(#filter6411)">
+     style="fill:url(#radialGradient6283);fill-opacity:1;filter:url(#filter6693)">
     <g
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
@@ -676,7 +676,7 @@
      id="g2710"
      inkscape:label="Layer 1"
      transform="matrix(1,0,0,0.9493148,799.19772,126.72296)"
-     style="fill:url(#radialGradient6281);fill-opacity:1.0;filter:url(#filter6407)">
+     style="fill:url(#radialGradient6281);fill-opacity:1;filter:url(#filter6557)">
     <g
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
