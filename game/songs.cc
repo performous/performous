@@ -200,7 +200,7 @@ namespace {
 
 void Songs::sort_internal() {
 	switch (m_order) {
-	  case 0: std::sort(m_filtered.begin(), m_filtered.end(), comparator(&Song::randomIdx)); break;
+	  case 0: std::stable_sort(m_filtered.begin(), m_filtered.end(), comparator(&Song::randomIdx)); break;
 	  case 1: std::sort(m_filtered.begin(), m_filtered.end(), comparator(&Song::collateByTitle)); break;
 	  case 2: std::sort(m_filtered.begin(), m_filtered.end(), comparator(&Song::collateByArtist)); break;
 	  case 3: std::sort(m_filtered.begin(), m_filtered.end(), comparator(&Song::edition)); break;
