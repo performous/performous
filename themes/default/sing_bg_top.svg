@@ -59,18 +59,18 @@
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
        inkscape:vp_x="0 : 400 : 1"
-       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_y="6.1230318e-14 : 1000 : 0"
        inkscape:vp_z="1000 : 400 : 1"
        inkscape:persp3d-origin="500 : 266.66667 : 1"
        id="perspective57" />
     <linearGradient
        id="linearGradient3667">
       <stop
-         style="stop-color:#81d000;stop-opacity:1;"
+         style="stop-color:#000000;stop-opacity:1;"
          offset="0"
          id="stop3669" />
       <stop
-         style="stop-color:#81d000;stop-opacity:0;"
+         style="stop-color:#000000;stop-opacity:0;"
          offset="1"
          id="stop3671" />
     </linearGradient>
