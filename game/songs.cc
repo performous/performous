@@ -10,7 +10,7 @@
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
-#include <tr1/random>
+
 Songs::Songs(std::set<std::string> const& songdirs, std::string const& songlist): m_songdirs(songdirs), m_songlist(songlist), math_cover(), m_order(), m_dirty(false), m_loading(false) {
 	reload();
 }
