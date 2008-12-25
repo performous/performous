@@ -4,7 +4,8 @@
 #include <boost/bind.hpp>
 #include <boost/regex.hpp>
 #include <libxml++/libxml++.h>
-#include <tr1/random>
+// #include <tr1/random>
+#include <cstdlib>
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -101,10 +102,14 @@ class Songs::RestoreSel {
 
 void Songs::randomize() {
 	RestoreSel restore(*this);
+	/* TR1-based random number generation
 	namespace rnd = std::tr1;
 	rnd::random_device gendev;  // Random number generator (using /dev/urandom usually)
 	rnd::mt19937 gen(gendev);  // Make Mersenne Twister random number generator, seeded with random_device.
 	for (SongVector::const_iterator it = m_filtered.begin(); it != m_filtered.end(); ++it) (*it)->randomIdx = gen();
+	*/
+	srand(time(NULL));
+	for (SongVector::const_iterator it = m_filtered.begin(); it != m_filtered.end(); ++it) (*it)->randomIdx = rand();
 	m_order = 0;
 	sort_internal();
 }
