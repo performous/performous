@@ -92,7 +92,7 @@ void ScreenSongs::draw() {
 			if (!song_display.cover.empty()) try { cover = &m_covers[song_display.path + song_display.cover]; } catch (std::exception const&) {}
 			Surface& s = (cover ? *cover : *m_emptyCover);
 			double diff = (i == 0 ? (0.5 - fabs(shift)) * 0.07 : 0.0);
-			double y = 0.28 + 0.5 * diff;
+			double y = 0.27 + 0.5 * diff;
 			// Draw the cover
 			s.dimensions.middle(-0.2 + 0.17 * (i - shift)).bottom(y - 0.2 * diff).fitInside(0.14 + diff, 0.14 + diff); s.draw();
 			// Draw the reflection
