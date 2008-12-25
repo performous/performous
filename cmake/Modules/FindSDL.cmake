@@ -28,11 +28,14 @@ find_library(SDL_SDL_LIBRARY
 
 # Process others than OSX with native SDL normally
 if(NOT "${SDL_SDL_LIBRARY}" MATCHES "framework")
+  set(SDL_PROCESS_LIBS SDL_SDL_LIBRARY)
   find_library(SDL_SDLmain_LIBRARY
     NAMES libSDLmain.a SDLmain
     HINTS ${SDL_PKGCONF_LIBRARY_DIRS}
   )
-  set(SDL_PROCESS_LIBS SDL_SDL_LIBRARY SDL_SDLmain_LIBRARY)
+  if (SDL_SDLmain_LIBRARY)
+    set(SDL_PROCESS_LIBS ${SDL_PROCESS_LIBS} SDL_SDLmain_LIBRARY)
+  endif (SDL_SDLmain_LIBRARY)
 endif(NOT "${SDL_SDL_LIBRARY}" MATCHES "framework")
 
 set(SDL_PROCESS_INCLUDES SDL_INCLUDE_DIR)
