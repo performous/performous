@@ -422,10 +422,10 @@ void ScoreWindow::draw() {
 		int score = p->getScore();
 		glColor3f(p->m_color.r, p->m_color.g, p->m_color.b);
 		double x = -0.12 + spacing * (0.5 + i - 0.5 * m_players.size());
-		m_scoreBar.dimensions.middle(x).bottom(0.25);
+		m_scoreBar.dimensions.middle(x).bottom(0.24);
 		m_scoreBar.draw(score / 10000.0);
 		m_score_text.render(boost::lexical_cast<std::string>(score));
-		m_score_text.dimensions().middle(x).top(0.25).fixedHeight(0.05);
+		m_score_text.dimensions().middle(x).top(0.24).fixedHeight(0.05);
 		m_score_text.draw();
 		glColor3f(1.0f, 1.0f, 1.0f);
 	}

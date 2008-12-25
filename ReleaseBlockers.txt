@@ -9,11 +9,6 @@ Text rendering (all parts optional for this release)
 - Use dimensions to specify bounding box (possibly init from SVG)
 - Lyric hilighted should be rendered in front of the others
 
-General
-- Redo themes in the black/grey theme and rename it to default
-   * With widest AR support
-   * Performous text using the same font as on the website? (dunno which it is)
-
 Configuration
 - New config menu (several items visible at once, etc)
 - Saving config to XML file?
