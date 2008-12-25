@@ -108,8 +108,8 @@ void Songs::randomize() {
 	rnd::mt19937 gen(gendev);  // Make Mersenne Twister random number generator, seeded with random_device.
 	for (SongVector::const_iterator it = m_filtered.begin(); it != m_filtered.end(); ++it) (*it)->randomIdx = gen();
 	*/
-	srand(time(NULL));
-	for (SongVector::const_iterator it = m_filtered.begin(); it != m_filtered.end(); ++it) (*it)->randomIdx = rand();
+	std::srand(std::time(NULL));
+	for (SongVector::const_iterator it = m_filtered.begin(); it != m_filtered.end(); ++it) (*it)->randomIdx = std::rand();
 	m_order = 0;
 	sort_internal();
 }
