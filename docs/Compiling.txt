@@ -22,13 +22,16 @@ Dependencies:
 
 	- SDL : window management and input
 
-	- FFMpeg : A/V decoding
+	- FFMpeg (avcodec, avformat and swscale): A/V decoding
 	
 	- Cairo >= 1.2 : scalable graphical support
+
 	- librsvg : svg rendering (themes)
 
 	- libxml++ : XML parser, used for themes etc.
-	
+
+    - Magick++ : loading images (some internal graphics and song cover/bg)
+
 	- One or more of the following for audio capture and playback
 		* ALSA
 		* GStreamer
