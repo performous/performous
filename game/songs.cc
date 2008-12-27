@@ -60,6 +60,7 @@ void Songs::reload_internal(boost::filesystem::path const& parent) {
 			if (name.size() < 5 || !regex_match(name.substr(name.size() - 4).c_str(),match,expression)) continue;
 			try {
 				Song* s = new Song(path, name);
+				s->randomIdx = std::numeric_limits<int>::min();
 				boost::mutex::scoped_lock l(m_mutex);
 				m_songs.push_back(boost::shared_ptr<Song>(s));
 				m_dirty = true;
