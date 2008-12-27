@@ -29,7 +29,12 @@ add_subdirectory(libda)
 add_subdirectory(themes)
 add_subdirectory(data)
 add_subdirectory(game)
-add_subdirectory(tools)
+
+option(ENABLE_TOOLS "Enable extra tools (e.g. Singstar ripper)" ON)
+
+if (ENABLE_TOOLS)
+  add_subdirectory(tools)
+endif (ENABLE_TOOLS)
 
 if(NOT "${CMAKE_INSTALL_PREFIX}" MATCHES "^(/usr|/usr/local)$")
 	message(STATUS "Non-standard installation prefix. Configuring performous.sh.")
