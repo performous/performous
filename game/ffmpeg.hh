@@ -190,8 +190,7 @@ class FFmpeg {
 	**/
 	void crash() { m_thread.reset(); m_quit = true; }
 	void operator()(); ///< Thread runs here, don't call directly
-	unsigned width, ///< width
-	         height; ///< height
+	unsigned width, height;
 	/// queue for video
 	VideoFifo  videoQueue;
 	/// queue for audio
@@ -199,7 +198,7 @@ class FFmpeg {
 	/** Seek to the chosen time. Will block until the seek is done, if wait is true. **/
 	void seek(double time, bool wait = true);
 	/// duration
-	double duration();
+	double duration() const;
 	/// return current position
 	double position() { return std::max(videoQueue.position(), audioQueue.position()); }
 

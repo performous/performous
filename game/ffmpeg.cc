@@ -42,7 +42,7 @@ FFmpeg::~FFmpeg() {
 	if (pFormatCtx) av_close_input_file(pFormatCtx);
 }
 
-double FFmpeg::duration() {
+double FFmpeg::duration() const {
 	double d = m_running ? pFormatCtx->duration / double(AV_TIME_BASE) : getNaN();
 	return d >= 0.0 ? d : getInf();
 }

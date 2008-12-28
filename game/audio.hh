@@ -5,9 +5,36 @@
 
 #include "ffmpeg.hh"
 #include "notes.hh"
+#include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 #include <audio.hpp>
+
+struct Stream {
+	FFmpeg mpeg;
+	double srate;
+	double volume;
+	double fade;
+	double fadeSpeed;
+	bool prebuffering;
+	Stream(std::string const& filename, unsigned int sr):
+	  mpeg(false, true, filename, sr), srate(sr), volume(), fade(1.0), fadeSpeed(), prebuffering(true) {}
+	void fadein() { double time = 1.0; fade = 0.0; fadeSpeed = 1.0 / (time * srate); }
+	void fadeout() { double time = 1.0; fadeSpeed = - 1.0 / (time * srate); }
+	template <typename RndIt> void playmix(RndIt outbuf, unsigned int maxSamples) {
+		if (prebuffering && mpeg.audioQueue.percentage() > 0.9) prebuffering = false;
+		if (prebuffering) return;
+		std::vector<int16_t> buf;
+		mpeg.audioQueue.tryPop(buf, maxSamples);
+		if (fade < 0.0) { fade = 0.0; fadeSpeed = 0.0; }
+		if (fade > 1.0) { fade = 1.0; fadeSpeed = 0.0; }
+		for (size_t i = 0; i < buf.size(); ++i) {
+			outbuf[i] += volume * fade * da::conv_from_s16(buf[i]);
+			fade += fadeSpeed;				
+		}
+		if (buf.size() < maxSamples && !mpeg.audioQueue.eof() && mpeg.position() > 1.0) std::cerr << "Warning: audio decoding too slow (buffer underrun): " << std::endl;
+	}
+};
 
 /** @short High level audio playback API **/
 class Audio {
@@ -53,7 +80,7 @@ class Audio {
 	/// sets volume for preview
 	void setVolumePreview(unsigned int volume) { setVolume_internal(m_volumePreview = volume); }
 	void operator()(); ///< Thread runs here, don't call directly
-	/// () access
+	/// callback for the audio backend (libda)
 	void operator()(da::pcm_data& areas, da::settings const&);
 	/// pauses and unpauses playback
 	void togglePause() { m_paused = !m_paused; }
@@ -61,16 +88,12 @@ class Audio {
 	void toggleSynth(Notes const& notes) { m_notes = (m_notes ? NULL : &notes); }
 
   private:
-	boost::recursive_mutex m_mutex;
-	size_t m_crossfade; // Position within m_crossbuf
-	std::vector<float> m_crossbuf; // Crossfading buffer
-	std::string m_filename;
-	double m_volume;
+	mutable boost::recursive_mutex m_mutex;
 	unsigned m_volumeMusic, m_volumePreview;
 	void setVolume_internal(unsigned int volume);
-	boost::scoped_ptr<FFmpeg> m_mpeg;
+	typedef boost::ptr_vector<Stream> Streams;
+	Streams m_streams;
 	bool m_paused;
-	bool m_prebuffering;
 	Notes const* volatile m_notes;
 	da::settings m_rs;
 	boost::scoped_ptr<da::playback> m_playback;
