@@ -135,7 +135,7 @@ void Songs::filter_internal() {
 	}
 	math_cover.setTarget(0, 0);
 	sort_internal();
-	if (m_dirty && !m_loading) restore.reset();
+	if (m_dirty && !m_loading) randomize();
 	m_dirty = false;
 }
 
