@@ -82,8 +82,6 @@ int main(int argc, char** argv) {
 	signal(SIGTERM, quit);
 	std::ios::sync_with_stdio(false);  // We do not use C stdio
 	da::initialize libda;
-	bool fullscreen = false;
-	bool fps = false;
 	unsigned int width, height;
 	std::string songlist;
 	std::string theme;
@@ -176,8 +174,8 @@ int main(int argc, char** argv) {
 			std::cout << PACKAGE << ' ' << VERSION << std::endl;
 			return 0;
 		}
-		if (vm.count("fs")) fullscreen = true;
-		if (vm.count("fps")) fps = true;
+		if (vm.count("fs")) config["graphic/fullscreen"].b() = true;
+		if (vm.count("fps")) config["graphic/fps"].b() = true;
 		// Copy songdirstmp into songdirs
 		for (std::vector<std::string>::const_iterator it = songdirstmp.begin(); it != songdirstmp.end(); ++it) {
 			std::string str = *it;
@@ -263,7 +261,7 @@ int main(int argc, char** argv) {
 		}
 		Songs songs(songdirs, songlist);
 		ScreenManager sm(theme);
-		Window window(width, height, fullscreen);
+		Window window(width, height, config["graphic/fullscreen"].b());
 		sm.addScreen(new ScreenIntro("Intro", audio, capture));
 		sm.addScreen(new ScreenSongs("Songs", audio, songs));
 		sm.addScreen(new ScreenSing("Sing", audio, songs, capture));
@@ -279,7 +277,7 @@ int main(int argc, char** argv) {
 			sm.getCurrentScreen()->draw();
 			window.swap();
 			++nb_frames;
-			if (fps) {
+			if (config["graphic/fps"].b()) {
 				if (now() - time > 1.0) {
 					std::cout << nb_frames << " FPS" << std::endl;
 					time += 1.0;
