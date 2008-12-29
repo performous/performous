@@ -83,7 +83,6 @@ int main(int argc, char** argv) {
 	std::ios::sync_with_stdio(false);  // We do not use C stdio
 	da::initialize libda;
 	std::string songlist;
-	std::string theme;
 	std::set<std::string> songdirs;
 	std::vector<std::string> mics;
 	std::vector<std::string> pdevs;
@@ -102,7 +101,7 @@ int main(int argc, char** argv) {
 		  ("version,v", "display version number");
 		po::options_description opt2("Configuration options");
 		opt2.add_options()
-		  ("theme,t", po::value<std::string>(&theme)->default_value("default"), "set theme (name or absolute path)")
+		  ("theme,t", po::value<std::string>(), "set theme (name or absolute path)")
 		  ("fs,f", "enable full screen mode")
 		  ("fps", "benchmark rendering speed\n  also disable 100 FPS limit")
 		  ("songlist", po::value<std::string>(&songlist), "save a list of songs in the specified folder")
@@ -148,6 +147,9 @@ int main(int argc, char** argv) {
 		}
 		if (vm.count("fs-height")) {
 			config["graphic/fs_height"].i() = vm["fs-height"].as<int>();
+		}
+		if (vm.count("theme")) {
+			config["themes/default"].s() = vm["theme"].as<std::string>();
 		}
 		if (vm.count("help")) {
 			std::cout << cmdline << std::endl;
@@ -202,7 +204,7 @@ int main(int argc, char** argv) {
 			songdirs.insert("/usr/share/games/ultrastar/songs/");
 		}
 		// Figure out theme folder
-		if (theme.find('/') == std::string::npos) {
+		if (config["themes/default"].s().find('/') == std::string::npos) {
 			char const* envthemepath = getenv("PERFORMOUS_THEME_PATH");
 			std::string themepath;
 			if (envthemepath) themepath = envthemepath;
@@ -212,11 +214,11 @@ int main(int argc, char** argv) {
 			while (std::getline(iss, elem, ':')) {
 				if (elem.empty()) continue;
 				fs::path p = elem;
-				p /= theme;
-				if (fs::is_directory(p)) { theme = p.string(); break; }
+				p /= config["themes/default"].s();
+				if (fs::is_directory(p)) { config["themes/default"].s() = p.string(); break; }
 			}
         }
-		if (*theme.rbegin() == '/') theme.erase(theme.size() - 1); // Remove trailing slash
+		if (*config["themes/default"].s().rbegin() == '/') config["themes/default"].s().erase(config["themes/default"].s().size() - 1); // Remove trailing slash
 	}
 	// Built-in defaults:
 	if( mics.empty() ) {
@@ -273,7 +275,7 @@ int main(int argc, char** argv) {
 			if (!audio.isOpen()) std::cerr << "No playback devices could be used. Please use --pdev to define one." << std::endl;
 		}
 		Songs songs(songdirs, songlist);
-		ScreenManager sm(theme);
+		ScreenManager sm(config["themes/default"].s());
 		Window window(config["graphic/width"].i(), config["graphic/height"].i(), config["graphic/fullscreen"].b());
 		sm.addScreen(new ScreenIntro("Intro", audio, capture));
 		sm.addScreen(new ScreenSongs("Songs", audio, songs));

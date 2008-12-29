@@ -27,7 +27,7 @@
 	<!-- Themes preferences -->
         <entry name="themes/override" type="bool" value="false" />
         <entry name="themes/default" type="string">
-		<stringvalue>lima</stringvalue>
+		<stringvalue>default</stringvalue>
 	</entry>
         <entry name="themes/path" type="string_list">
 		<stringvalue>/usr/share/themes/</stringvalue>
