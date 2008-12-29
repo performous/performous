@@ -21,9 +21,8 @@
 	<entry name="audio/playback" type="string_list">
 		<stringvalue>channels=2,rate=44100,frames=256@alsa</stringvalue>
 	</entry>
-        <entry name="audio/menu_volume" type="int" value="70" />
-        <entry name="audio/songs_volume" type="int" value="70" />
-        <entry name="audio/sing_volume" type="int" value="100" />
+        <entry name="audio/preview_volume" type="int" value="70" />
+        <entry name="audio/music_volume" type="int" value="100" />
 
 	<!-- Themes preferences -->
         <entry name="themes/override" type="bool" value="false" />

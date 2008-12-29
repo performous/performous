@@ -82,7 +82,6 @@ int main(int argc, char** argv) {
 	signal(SIGTERM, quit);
 	std::ios::sync_with_stdio(false);  // We do not use C stdio
 	da::initialize libda;
-	unsigned int width, height;
 	std::string songlist;
 	std::string theme;
 	std::set<std::string> songdirs;
@@ -107,8 +106,10 @@ int main(int argc, char** argv) {
 		  ("fs,f", "enable full screen mode")
 		  ("fps", "benchmark rendering speed\n  also disable 100 FPS limit")
 		  ("songlist", po::value<std::string>(&songlist), "save a list of songs in the specified folder")
-		  ("width,W", po::value<unsigned int>(&width)->default_value(800), "set horizontal resolution")
-		  ("height,H", po::value<unsigned int>(&height)->default_value(600), "set vertical resolution")
+		  ("width,W", po::value<int>(&config["graphic/width"].i())->default_value(800), "set horizontal resolution")
+		  ("height,H", po::value<int>(&config["graphic/height"].i())->default_value(600), "set vertical resolution")
+		  ("fswidth", po::value<int>(&config["graphic/fs_width"].i())->default_value(800), "set fullscreen horizontal resolution")
+		  ("fsheight", po::value<int>(&config["graphic/fs_height"].i())->default_value(600), "set fullscreen vertical resolution")
 		  ("michelp", "detailed help for --mics and a list of available audio devices")
 		  ("mics", po::value<std::vector<std::string> >(&mics)->composing(), "specify microphones to use")
 		  ("pdevhelp", "detailed help for --pdev and a list of available audio devices")
@@ -261,7 +262,7 @@ int main(int argc, char** argv) {
 		}
 		Songs songs(songdirs, songlist);
 		ScreenManager sm(theme);
-		Window window(width, height, config["graphic/fullscreen"].b());
+		Window window(config["graphic/width"].i(), config["graphic/height"].i(), config["graphic/fullscreen"].b());
 		sm.addScreen(new ScreenIntro("Intro", audio, capture));
 		sm.addScreen(new ScreenSongs("Songs", audio, songs));
 		sm.addScreen(new ScreenSing("Sing", audio, songs, capture));

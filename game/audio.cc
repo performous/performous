@@ -5,12 +5,13 @@
 #include <iostream>
 #include <memory>
 #include "screen.hh"
+#include "configuration.hh"
 #include "util.hh"
 #include "xtime.hh"
 
 Audio::Audio():
-	m_volumeMusic(100),
-	m_volumePreview(70),
+	m_volumeMusic(config["audio/music_volume"].i()),
+	m_volumePreview(config["audio/preview_volume"].i()),
 	m_paused(false)
 {}
 

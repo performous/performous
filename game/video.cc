@@ -1,9 +1,12 @@
 #include "video.hh"
+#include "configuration.hh"
 #include <cmath>
 
 Video::Video(std::string const& _videoFile): m_mpeg(true, false, _videoFile), m_surfaceTime(), m_lastTime(), m_alpha() {}
 
 void Video::render(double time) {
+	if( config["graphic/video"].b() == false )
+		return;
 	VideoFrame& fr = m_videoFrame;
 	// Time to switch frame?
 	if (!fr.data.empty() && time >= fr.timestamp) {
