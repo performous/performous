@@ -82,7 +82,7 @@ class SongParser {
 		std::string key = line.substr(1, pos - 1);
 		std::string::size_type pos2 = line.find_last_not_of(" \t\r");
 		std::string value = line.substr(pos + 1, pos2 - pos);
-		if (value.empty()) throw std::runtime_error("Value missing from key " + key);
+		if (value.empty()) return true;
 		if (key == "TITLE") m_song.title = value.substr(value.find_first_not_of(" :"));
 		else if (key == "ARTIST") m_song.artist = value.substr(value.find_first_not_of(" "));
 		else if (key == "EDITION") m_song.edition = value.substr(value.find_first_not_of(" "));
