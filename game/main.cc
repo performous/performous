@@ -106,10 +106,10 @@ int main(int argc, char** argv) {
 		  ("fs,f", "enable full screen mode")
 		  ("fps", "benchmark rendering speed\n  also disable 100 FPS limit")
 		  ("songlist", po::value<std::string>(&songlist), "save a list of songs in the specified folder")
-		  ("width,W", po::value<int>(&config["graphic/width"].i())->default_value(800), "set horizontal resolution")
-		  ("height,H", po::value<int>(&config["graphic/height"].i())->default_value(600), "set vertical resolution")
-		  ("fswidth", po::value<int>(&config["graphic/fs_width"].i())->default_value(800), "set fullscreen horizontal resolution")
-		  ("fsheight", po::value<int>(&config["graphic/fs_height"].i())->default_value(600), "set fullscreen vertical resolution")
+		  ("width,W", po::value<int>(), "set horizontal resolution")
+		  ("height,H", po::value<int>(), "set vertical resolution")
+		  ("fs-width", po::value<int>(), "set fullscreen horizontal resolution")
+		  ("fs-height", po::value<int>(), "set fullscreen vertical resolution")
 		  ("michelp", "detailed help for --mics and a list of available audio devices")
 		  ("mics", po::value<std::vector<std::string> >(&mics)->composing(), "specify microphones to use")
 		  ("pdevhelp", "detailed help for --pdev and a list of available audio devices")
@@ -136,6 +136,18 @@ int main(int argc, char** argv) {
 			std::cout << cmdline << std::endl;
 			std::cout << "ERROR: " << e.what() << std::endl;
 			return 1;
+		}
+		if (vm.count("width")) {
+			config["graphic/width"].i() = vm["width"].as<int>();
+		}
+		if (vm.count("height")) {
+			config["graphic/height"].i() = vm["height"].as<int>();
+		}
+		if (vm.count("fs-width")) {
+			config["graphic/fs_width"].i() = vm["fs-width"].as<int>();
+		}
+		if (vm.count("fs-height")) {
+			config["graphic/fs_height"].i() = vm["fs-height"].as<int>();
 		}
 		if (vm.count("help")) {
 			std::cout << cmdline << std::endl;
