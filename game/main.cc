@@ -276,7 +276,7 @@ int main(int argc, char** argv) {
 		}
 		Songs songs(songdirs, songlist);
 		ScreenManager sm(config["themes/default"].s());
-		Window window(config["graphic/width"].i(), config["graphic/height"].i(), config["graphic/fullscreen"].b());
+		Window window(config["graphic/width"].i(), config["graphic/height"].i(), config["graphic/fullscreen"].b(), config["graphic/fs_width"].i(), config["graphic/fs_height"].i());
 		sm.addScreen(new ScreenIntro("Intro", audio, capture));
 		sm.addScreen(new ScreenSongs("Songs", audio, songs));
 		sm.addScreen(new ScreenSing("Sing", audio, songs, capture));

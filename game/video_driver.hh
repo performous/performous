@@ -15,7 +15,7 @@ class SDL_Surface;
 class Window {
   public:
 	/// constructor
-	Window(unsigned int width, unsigned int height, int fullscreen);
+	Window(unsigned int width, unsigned int height, int fullscreen, unsigned int fs_width, unsigned int fs_height);
 	/// clears window
 	void blank();
 	/// swaps buffers
