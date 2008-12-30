@@ -49,7 +49,7 @@ void Window::swap() {
 	SDL_GL_SwapBuffers();
 }
 
-void Window::fullscreen() {
+void Window::toggleFullscreen() {
 	m_fullscreen = !m_fullscreen;
 	resize();
 }

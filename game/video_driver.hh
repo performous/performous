@@ -32,7 +32,7 @@ class Window {
 	/// does the resizing
 	void resize();
 	/// toggles fullscreen
-	void fullscreen();
+	void toggleFullscreen();
 
   private:
 	SDL_Surface* screen;
