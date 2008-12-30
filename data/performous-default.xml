@@ -112,7 +112,7 @@
 
 	<!-- Themes preferences -->
         <entry name="themes/default" type="string">
-		<stringvalue>lima</stringvalue>
+		<stringvalue>default</stringvalue>
 		<locale name="C">
 			<short>Default theme name</short>
 			<long></long>
