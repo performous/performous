@@ -73,7 +73,7 @@ class ScreenSing: public Screen {
   public:
 	/// constructor
 	ScreenSing(std::string const& name, Audio& audio, Songs& songs, Capture& capture):
-	  Screen(name), m_audio(audio), m_songs(songs), m_capture(capture), m_latencyAV(), m_nlTop(0.0, 2.0), m_nlBottom(0.0, 2.0)
+	  Screen(name), m_audio(audio), m_songs(songs), m_capture(capture), m_latencyAV(), m_nlTop(0.0, 4.0), m_nlBottom(0.0, 4.0)
 	{}
 	void enter();
 	void exit();
