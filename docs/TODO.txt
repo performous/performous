@@ -3,34 +3,30 @@ Structural:
 - LibDA as a separate project
 	* Also playback and Vorbis + MP3 decoding
 	* Mixer and samplerate conversion inside
+- Get rid of ScreenManager in favor of recursive approach?
+- Switch to Clanlib?
 
 
 Big features:
 
 - Add compose screen (using features discussed on mailing list)
-- New song selection screen
 - Multiplayer duet (needs different song format)
 - Ingame Singstar DVD support
 - Playing and dancing (using USB guitar, USB drums, USB carpet) to make the game more like RockBand or StepMania
-- Mic effects (perfect pitch, reverb, etc)
+- Mic effects (reduce volume for bad singers, perfect pitch, reverb, etc)
 
 
 Features:
 
 - Auto-calibration of acoustic roundtrip latency (playback + capture)
 - Better audio card configuration ingame (needs libda support for listing cards)
-
-
-Fixes/Enhancement:
-
-- Cross-fading in song browser
 - Difficulty setting for hiding pitch graph (won't affect scoring)
-- More animation and eyecandy in UI
+- Allow playing a single song given as commandline argument (no menus)
+- Kiosk/arcade mode
 
 
 Ripper
 
 - Rewrite video code [DONE, but can be done better]
-- Try to figure out what causes clicks on adpcm decoding.
-
+- Compress into Vorbis and H.264 MKV
 
