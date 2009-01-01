@@ -443,8 +443,19 @@ int main( int argc, char **argv) {
 		return EXIT_FAILURE;
 	}
 	dvdPath = argv[1];
+	std::string pack_ee = dvdPath + "/pack_ee.pak"; // Note: lower case (ISO-9660)
+	if (!fs::exists(pack_ee)) {
+		if (fs::exists(dvdPath + "/Pack_EE.PAK")) { // Note: capitalization (UDF)
+			std::cerr <<
+			  "Singstar DVDs have UDF and ISO-9660 filesystems on them. Your disc is mounted\n"
+			  "as UDF and this causes some garbled data files, making ripping it impossible.\n\n"
+			  "Please remount the disc as ISO-9660 and try again. E.g. on Linux:\n"
+			  "# mount -t iso9600 /dev/cdrom " << dvdPath << std::endl;
+		} else std::cerr << "No Singstar DVD found. Enter a path to a folder with pack_ee.pak in it." << std::endl;
+		return EXIT_FAILURE;
+	}
 	nsmap["ss"] = "http://www.singstargame.com";
-	Pak p(dvdPath + "/pack_ee.pak");
+	Pak p(pack_ee);
 	FindSongs f = std::for_each(p.files().begin(), p.files().end(), FindSongs(argc > 2 ? argv[2] : ""));
 	std::cerr << f.songs.size() << " songs found" << std::endl;
 	std::for_each(f.songs.begin(), f.songs.end(), Process(p));
