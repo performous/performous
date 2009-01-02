@@ -13,4 +13,4 @@ Configuration
 - New config menu (several items visible at once, etc)
 - Saving config to XML file?
    * Needs to store the settings within Configuration when the program is running
-
+- Need to convert "~" in paths into what getenv("$HOME") gives
