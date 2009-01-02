@@ -1,25 +1,27 @@
 <?xml version="1.0"?>
 <performous>
 	<!-- Graphic preferences -->
-        <entry name="graphic/width" type="int" value="640" />
-        <entry name="graphic/height" type="int" value="480" />
-        <entry name="graphic/fs_width" type="int" value="640" />
-        <entry name="graphic/fs_height" type="int" value="480" />
+        <entry name="graphic/width" type="int" value="800" />
+        <entry name="graphic/height" type="int" value="600" />
+        <entry name="graphic/fs_width" type="int" value="1024" />
+        <entry name="graphic/fs_height" type="int" value="768" />
         <entry name="graphic/fullscreen" type="bool" value="false" />
         <entry name="graphic/video" type="bool" value="true" />
-        <entry name="graphic/svg_lod" type="int" value="1" />
-        <entry name="graphic/text_lod" type="int" value="1" />
+        <entry name="graphic/svg_lod" type="float" value="1.0" />
+        <entry name="graphic/text_lod" type="float" value="1.0" />
         <entry name="graphic/fps" type="bool" value="false" />
 
 	<!-- Audio preferences -->
-        <entry name="audio/round-trip" type="float" value="0.1" />
-        <entry name="audio/video_delay" type="float" value="0.0" />
+        <entry name="audio/round-trip" type="float" value="0.08" />
+        <entry name="audio/video_delay" type="float" value="0.00" />
 	<entry name="audio/capture" type="string_list">
 		<stringvalue>channels=2@alsa:hw:default</stringvalue>
 		<stringvalue>channels=2</stringvalue>
 	</entry>
 	<entry name="audio/playback" type="string_list">
-		<stringvalue>channels=2,rate=44100,frames=256@alsa</stringvalue>
+		<stringvalue></stringvalue>
+		<stringvalue>alsa:hw:0</stringvalue>
+		<!-- <stringvalue>channels=2,rate=44100,frames=256@alsa</stringvalue> -->
 	</entry>
         <entry name="audio/preview_volume" type="int" value="70" />
         <entry name="audio/music_volume" type="int" value="100" />
@@ -37,7 +39,8 @@
 	<!-- Songs preferences -->
         <entry name="songs/override" type="bool" value="false" />
         <entry name="songs/path" type="string_list">
-		<stringvalue>/usr/share/songs/</stringvalue>
-		<stringvalue>/home/songs/</stringvalue>
+		<stringvalue>/usr/share/games/ultrastar/songs/</stringvalue>
+		<stringvalue>/usr/local/share/games/ultrastar/songs/</stringvalue>
+		<stringvalue>~/.ultrastar/songs/</stringvalue>
 	</entry>
 </performous>
