@@ -12,6 +12,7 @@
 #include <iostream>
 #include <vector>
 #include <limits>
+#include <stdint.h>
 
 /// single audio frame
 struct AudioFrame {

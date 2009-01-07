@@ -1,4 +1,5 @@
 #include "color.hh"
+#include <cstdio>
 #include <iostream>
 
 namespace {
