@@ -10,17 +10,30 @@
 #include <boost/thread/recursive_mutex.hpp>
 #include <audio.hpp>
 
+/// audiostream
+/** allows buffering, fading and mixing of audiostreams
+ */
 struct Stream {
+	/// container for the media file
 	FFmpeg mpeg;
+	/// sample rate
 	double srate;
+	/// volume
 	double volume;
+	/// actual "faded volume"
 	double fade;
+	/// speed of fade effect
 	double fadeSpeed;
+	/// do buffering or not
 	bool prebuffering;
+	/// constructor
 	Stream(std::string const& filename, unsigned int sr):
 	  mpeg(false, true, filename, sr), srate(sr), volume(), fade(1.0), fadeSpeed(), prebuffering(true) {}
+	/// fades stream in
 	void fadein() { double time = 1.0; fade = 0.0; fadeSpeed = 1.0 / (time * srate); }
+	/// fades stream out
 	void fadeout() { double time = 1.0; fadeSpeed = - 1.0 / (time * srate); }
+	/// crossfades songs
 	template <typename RndIt> void playmix(RndIt outbuf, unsigned int maxSamples) {
 		if (prebuffering && mpeg.audioQueue.percentage() > 0.9) prebuffering = false;
 		if (prebuffering) return;

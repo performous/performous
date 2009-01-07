@@ -191,7 +191,8 @@ class FFmpeg {
 	**/
 	void crash() { m_thread.reset(); m_quit = true; }
 	void operator()(); ///< Thread runs here, don't call directly
-	unsigned width, height;
+	unsigned width, ///< width of video
+	         height; ///< height of video
 	/// queue for video
 	VideoFifo  videoQueue;
 	/// queue for audio

@@ -28,6 +28,7 @@ extern "C" void quit(int) {
 	g_quit = true;
 }
 
+/// can be thrown as an exception to quit the game
 struct QuitNow {};
 
 static void checkEvents_SDL(ScreenManager& sm, Window& window) {
