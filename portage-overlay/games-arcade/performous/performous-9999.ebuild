@@ -67,14 +67,36 @@ src_unpack() {
 src_compile() {
 	mkdir build
 	cd build
+	plugins="-DLIBDA_AUTODETECT_PLUGINS=false -DLIBDA_PLUGIN_TESTING=false"
+	if use alsa ; then
+		plugins="$plugins -DLIBDA_PLUGIN_ALSA=true"
+	else
+		plugins="$plugins -DLIBDA_PLUGIN_ALSA=false"
+	fi
+	if use jack ; then
+		plugins="$plugins -DLIBDA_PLUGIN_JACK=true"
+	else
+		plugins="$plugins -DLIBDA_PLUGIN_JACK=false"
+	fi
+	if use gstreamer ; then
+		plugins="$plugins -DLIBDA_PLUGIN_GSTREAMER=true"
+	else
+		plugins="$plugins -DLIBDA_PLUGIN_GSTREAMER=false"
+	fi
+	if use portaudio ; then
+		plugins="$plugins -DLIBDA_PLUGIN_PORTAUDIO=true"
+	else
+		plugins="$plugins -DLIBDA_PLUGIN_PORTAUDIO=false"
+	fi
+	if use pulseaudio ; then
+		plugins="$plugins -DLIBDA_PLUGIN_PULSE=true"
+	else
+		plugins="$plugins -DLIBDA_PLUGIN_PULSE=false"
+	fi
 	cmake \
 		-DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
 		-DCMAKE_INSTALL_PREFIX="${GAMES_PREFIX}" \
-		$(cmake-utils_use_with alsa ALSA) \
-		$(cmake-utils_use_with jack JACK) \
-		$(cmake-utils_use_with pulseaudio PULSEAUDIO) \
-		$(cmake-utils_use_with portaudio PORTAUDIO) \
-		$(cmake-utils_use_with gstreamer GSTREAMER) \
+		$plugins \
 		.. || die "cmake failed"
 	emake || die "emake failed"
 }
