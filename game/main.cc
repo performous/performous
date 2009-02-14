@@ -203,6 +203,11 @@ int main(int argc, char** argv) {
 			if (!homedir.empty()) songdirs.insert(homedir + ".ultrastar/songs/");
 			songdirs.insert("/usr/local/share/games/ultrastar/songs/");
 			songdirs.insert("/usr/share/games/ultrastar/songs/");
+			if( config["songs/override"].b() ) songdirs.clear();
+			std::vector<std::string> sd = config["songs/path"].sl();
+			for (std::vector<std::string>::const_iterator it = sd.begin(); it != sd.end(); ++it) {
+				songdirs.insert(*it);
+			}
 		}
 		// Figure out theme folder
 		if (config["themes/default"].s().find('/') == std::string::npos) {
@@ -223,10 +228,17 @@ int main(int argc, char** argv) {
 	}
 	// Built-in defaults:
 	if( mics.empty() ) {
-		mics.push_back("alsa:hw:default"); // Singstar mics
+		std::vector<std::string> ac = config["audio/capture"].sl();
+		for (std::vector<std::string>::const_iterator it = ac.begin(); it != ac.end(); ++it) {
+			mics.push_back(*it);
+		}
 		mics.push_back(""); // Anything goes
 	}
 	if( pdevs.empty() ) {
+		std::vector<std::string> ap = config["audio/playback"].sl();
+		for (std::vector<std::string>::const_iterator it = ap.begin(); it != ap.end(); ++it) {
+			pdevs.push_back(*it);
+		}
 		pdevs.push_back(""); // Anything goes
 	}
 	try {
