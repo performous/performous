@@ -10,8 +10,8 @@
 #include "xtime.hh"
 
 Audio::Audio():
-	m_volumeMusic(config["audio/music_volume"].i()),
-	m_volumePreview(config["audio/preview_volume"].i()),
+	m_volumeMusic(config["audio/music_volume"].get_i()),
+	m_volumePreview(config["audio/preview_volume"].get_i()),
 	m_paused(false)
 {}
 

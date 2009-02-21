@@ -36,6 +36,16 @@ class ConfigItem {
 	/// sets long description for config item
 	void set_long_description( std::string _long_desc );
 	/// returns integer
+	int get_i(void);
+	/// returns bool
+	bool get_b(void);
+	/// returns float
+	double get_f(void);
+	/// returns string
+	std::string get_s(void);
+	/// returns string list
+	std::vector<std::string> get_sl(void);
+	/// returns integer
 	int &i(void);
 	/// returns bool
 	bool &b(void);

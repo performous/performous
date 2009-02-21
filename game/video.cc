@@ -5,7 +5,7 @@
 Video::Video(std::string const& _videoFile): m_mpeg(true, false, _videoFile), m_surfaceTime(), m_lastTime(), m_alpha() {}
 
 void Video::render(double time) {
-	if( config["graphic/video"].b() == false )
+	if( config["graphic/video"].get_b() == false )
 		return;
 	VideoFrame& fr = m_videoFrame;
 	// Time to switch frame?

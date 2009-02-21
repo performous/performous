@@ -20,6 +20,7 @@ ConfigItem::ConfigItem( std::string _type, bool _is_default) : is_default(_is_de
 	}
 }
 ConfigItem& ConfigItem::operator++() {
+	is_default = false;
 	if( type == std::string("int") ) {
 		integer_value += integer_step;
 		integer_value = (integer_value / integer_step)*integer_step;
@@ -29,6 +30,7 @@ ConfigItem& ConfigItem::operator++() {
 	return *this;
 }
 ConfigItem& ConfigItem::operator--() {
+	is_default = false;
 	if( type == std::string("int") ) {
 		integer_value -= integer_step;
 		integer_value = (integer_value / integer_step)*integer_step;
@@ -38,6 +40,7 @@ ConfigItem& ConfigItem::operator--() {
 	return *this;
 }
 ConfigItem& ConfigItem::operator+=(const int& right) {
+	is_default = false;
 	if( type == std::string("int") ) {
 		integer_value += right;
 	} else if( type == std::string("float") ) {
@@ -46,9 +49,11 @@ ConfigItem& ConfigItem::operator+=(const int& right) {
 	return *this;
 }
 ConfigItem& ConfigItem::operator-=(const int& right) {
+	is_default = false;
 	return *this+=(-right);
 }
 ConfigItem& ConfigItem::operator+=(const float& right) {
+	is_default = false;
 	if( type == std::string("float") ) {
 		double_value += right;
 	} else if( type == std::string("int") ) {
@@ -57,9 +62,11 @@ ConfigItem& ConfigItem::operator+=(const float& right) {
 	return *this;
 }
 ConfigItem& ConfigItem::operator-=(const float& right) {
+	is_default = false;
 	return *this+=(-right);
 }
 ConfigItem& ConfigItem::operator+=(const double& right) {
+	is_default = false;
 	if( type == std::string("float") ) {
 		double_value += right;
 	} else if( type == std::string("int") ) {
@@ -68,6 +75,7 @@ ConfigItem& ConfigItem::operator+=(const double& right) {
 	return *this;
 }
 ConfigItem& ConfigItem::operator-=(const double& right) {
+	is_default = false;
 	return *this+=(-right);
 }
 void ConfigItem::set_short_description( std::string _short_desc ) {
@@ -76,19 +84,39 @@ void ConfigItem::set_short_description( std::string _short_desc ) {
 void ConfigItem::set_long_description( std::string _long_desc ) {
 	long_desc = _long_desc;
 }
+int ConfigItem::get_i(void) {
+	return integer_value;
+}
+bool ConfigItem::get_b(void) {
+	return boolean_value;
+}
+double ConfigItem::get_f(void) {
+	return double_value;
+}
+std::string ConfigItem::get_s(void) {
+	return string_value;
+}
+std::vector<std::string> ConfigItem::get_sl(void) {
+	return string_list_value;
+}
 int &ConfigItem::i(void) {
+	is_default = false;
 	return integer_value;
 }
 bool &ConfigItem::b(void) {
+	is_default = false;
 	return boolean_value;
 }
 double &ConfigItem::f(void) {
+	is_default = false;
 	return double_value;
 }
 std::string &ConfigItem::s(void) {
+	is_default = false;
 	return string_value;
 }
 std::vector<std::string> &ConfigItem::sl(void) {
+	is_default = false;
 	return string_list_value;
 }
 std::ostream& operator <<(std::ostream &os,const ConfigItem &obj) {
