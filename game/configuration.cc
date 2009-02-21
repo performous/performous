@@ -7,7 +7,7 @@
 
 
 ConfigItem::ConfigItem() {};
-ConfigItem::ConfigItem( std::string _type, bool _is_default) : is_default(_is_default), boolean_value(false), integer_value(), double_value(), string_value() {
+ConfigItem::ConfigItem( std::string _type, bool _is_default) : m_is_default(_is_default), boolean_value(false), integer_value(), double_value(), string_value() {
 	type = _type;
 	if(type == std::string("int") ) {
 		integer_min = std::numeric_limits<int>::min();
@@ -20,7 +20,7 @@ ConfigItem::ConfigItem( std::string _type, bool _is_default) : is_default(_is_de
 	}
 }
 ConfigItem& ConfigItem::operator++() {
-	is_default = false;
+	m_is_default = false;
 	if( type == std::string("int") ) {
 		integer_value += integer_step;
 		integer_value = (integer_value / integer_step)*integer_step;
@@ -30,7 +30,7 @@ ConfigItem& ConfigItem::operator++() {
 	return *this;
 }
 ConfigItem& ConfigItem::operator--() {
-	is_default = false;
+	m_is_default = false;
 	if( type == std::string("int") ) {
 		integer_value -= integer_step;
 		integer_value = (integer_value / integer_step)*integer_step;
@@ -40,7 +40,7 @@ ConfigItem& ConfigItem::operator--() {
 	return *this;
 }
 ConfigItem& ConfigItem::operator+=(const int& right) {
-	is_default = false;
+	m_is_default = false;
 	if( type == std::string("int") ) {
 		integer_value += right;
 	} else if( type == std::string("float") ) {
@@ -49,11 +49,11 @@ ConfigItem& ConfigItem::operator+=(const int& right) {
 	return *this;
 }
 ConfigItem& ConfigItem::operator-=(const int& right) {
-	is_default = false;
+	m_is_default = false;
 	return *this+=(-right);
 }
 ConfigItem& ConfigItem::operator+=(const float& right) {
-	is_default = false;
+	m_is_default = false;
 	if( type == std::string("float") ) {
 		double_value += right;
 	} else if( type == std::string("int") ) {
@@ -62,11 +62,11 @@ ConfigItem& ConfigItem::operator+=(const float& right) {
 	return *this;
 }
 ConfigItem& ConfigItem::operator-=(const float& right) {
-	is_default = false;
+	m_is_default = false;
 	return *this+=(-right);
 }
 ConfigItem& ConfigItem::operator+=(const double& right) {
-	is_default = false;
+	m_is_default = false;
 	if( type == std::string("float") ) {
 		double_value += right;
 	} else if( type == std::string("int") ) {
@@ -75,7 +75,7 @@ ConfigItem& ConfigItem::operator+=(const double& right) {
 	return *this;
 }
 ConfigItem& ConfigItem::operator-=(const double& right) {
-	is_default = false;
+	m_is_default = false;
 	return *this+=(-right);
 }
 void ConfigItem::set_short_description( std::string _short_desc ) {
@@ -84,39 +84,45 @@ void ConfigItem::set_short_description( std::string _short_desc ) {
 void ConfigItem::set_long_description( std::string _long_desc ) {
 	long_desc = _long_desc;
 }
-int ConfigItem::get_i(void) {
+bool ConfigItem::is_default(void) const {
+	return m_is_default;
+}
+std::string ConfigItem::get_type(void) const {
+	return type;
+}
+int ConfigItem::get_i(void) const {
 	return integer_value;
 }
-bool ConfigItem::get_b(void) {
+bool ConfigItem::get_b(void) const {
 	return boolean_value;
 }
-double ConfigItem::get_f(void) {
+double ConfigItem::get_f(void) const {
 	return double_value;
 }
-std::string ConfigItem::get_s(void) {
+std::string ConfigItem::get_s(void) const {
 	return string_value;
 }
-std::vector<std::string> ConfigItem::get_sl(void) {
+std::vector<std::string> ConfigItem::get_sl(void) const {
 	return string_list_value;
 }
-int &ConfigItem::i(void) {
-	is_default = false;
+int &ConfigItem::i(bool _is_default) {
+	m_is_default = _is_default;
 	return integer_value;
 }
-bool &ConfigItem::b(void) {
-	is_default = false;
+bool &ConfigItem::b(bool _is_default) {
+	m_is_default = _is_default;
 	return boolean_value;
 }
-double &ConfigItem::f(void) {
-	is_default = false;
+double &ConfigItem::f(bool _is_default) {
+	m_is_default = _is_default;
 	return double_value;
 }
-std::string &ConfigItem::s(void) {
-	is_default = false;
+std::string &ConfigItem::s(bool _is_default) {
+	m_is_default = _is_default;
 	return string_value;
 }
-std::vector<std::string> &ConfigItem::sl(void) {
-	is_default = false;
+std::vector<std::string> &ConfigItem::sl(bool _is_default) {
+	m_is_default = _is_default;
 	return string_list_value;
 }
 std::ostream& operator <<(std::ostream &os,const ConfigItem &obj) {
@@ -150,21 +156,21 @@ void assignConfigItem( ConfigItem &_item, std::string _type, xmlpp::Element& _el
 		if( value_string == std::string("true") || value_string == std::string("1") )
 			value = true;
 
-		_item.b() = value;
+		_item.b(true) = value;
 	} else if( _type == std::string("int") ) {
 		std::string value_string = _elem.get_attribute("value")->get_value();
 		int value = 0;
 		if( !value_string.empty() )
 			value = boost::lexical_cast<int>(value_string);
 
-		_item.i() = value;
+		_item.i(true) = value;
 	} else if( _type == std::string("float") ) {
 		std::string value_string = _elem.get_attribute("value")->get_value();
 		double value = 0;
 		if( !value_string.empty() )
 			value = boost::lexical_cast<double>(value_string);
 
-		_item.f() = value;
+		_item.f(true) = value;
 	} else if( _type == std::string("string") ) {
 		xmlpp::NodeSet n2 = _elem.find("stringvalue/text()");
 		std::string value("");
@@ -172,7 +178,7 @@ void assignConfigItem( ConfigItem &_item, std::string _type, xmlpp::Element& _el
 			xmlpp::TextNode& elem2 = dynamic_cast<xmlpp::TextNode&>(**it2);
 			value = elem2.get_content();
 		}
-		_item.s() = value;
+		_item.s(true) = value;
 	} else if( _type == std::string("string_list") ) {
 		std::vector<std::string> value;
 
@@ -181,10 +187,52 @@ void assignConfigItem( ConfigItem &_item, std::string _type, xmlpp::Element& _el
 			xmlpp::TextNode& elem2 = dynamic_cast<xmlpp::TextNode&>(**it2);
 			value.push_back(elem2.get_content());
 		}
-		_item.sl() = value;
+		_item.sl(true) = value;
 	} else {
 		std::cout <<  "  Found unknown type " << _type << std::endl;
 	}
+}
+
+void writeConfigfile( const std::string &_configfile )
+{
+	std::cout << "Saving configuration file \"" << _configfile << "\"" << std::endl;
+	xmlpp::Document doc;
+	xmlpp::Node* nodeRoot = doc.create_root_node("performous");
+	for(std::map<std::string, ConfigItem>::const_iterator itr = config.begin(); itr != config.end(); ++itr) {
+		ConfigItem item = (*itr).second;
+		std::string name = (*itr).first;
+		if(! item.is_default() ) {
+			xmlpp::Element* entryNode = nodeRoot->add_child("entry");
+			entryNode->set_attribute("name", name);
+
+			if( item.get_type() == "int" ) {
+				entryNode->set_attribute("type", "int");
+				entryNode->set_attribute("value",boost::lexical_cast<std::string>(item.get_i()));
+			} else if( item.get_type() == "bool" ) {
+				entryNode->set_attribute("type", "bool");
+				if( item.get_b()) {
+					entryNode->set_attribute("value","true");
+				} else {
+					entryNode->set_attribute("value","false");
+				}
+			} else if( item.get_type() == "float" ) {
+				entryNode->set_attribute("type", "float");
+				entryNode->set_attribute("value",boost::lexical_cast<std::string>(item.get_f()));
+			} else if( item.get_type() == "string" ) {
+				entryNode->set_attribute("type", "string");
+				xmlpp::Element* stringvalueNode = entryNode->add_child("stringvalue");
+				stringvalueNode->add_child_text(item.get_s());
+			} else if( item.get_type() == "string_list" ) {
+				entryNode->set_attribute("type", "string_list");
+				std::vector<std::string> value = item.get_sl();
+				for(std::vector<std::string>::const_iterator it = value.begin(); it != value.end(); ++it) {
+					xmlpp::Element* stringvalueNode = entryNode->add_child("stringvalue");
+					stringvalueNode->add_child_text(*it);
+				}
+			}
+		}
+	}
+	doc.write_to_file_formatted(_configfile);
 }
 
 void readConfigfile( const std::string &_configfile )

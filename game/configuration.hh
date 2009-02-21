@@ -35,33 +35,37 @@ class ConfigItem {
 	void set_short_description( std::string _short_desc );
 	/// sets long description for config item
 	void set_long_description( std::string _long_desc );
+	/// tells if the item is default or not
+	bool is_default(void) const;
+	/// returns the type
+	std::string get_type(void) const;
 	/// returns integer
-	int get_i(void);
+	int get_i(void) const;
 	/// returns bool
-	bool get_b(void);
+	bool get_b(void) const;
 	/// returns float
-	double get_f(void);
+	double get_f(void) const;
 	/// returns string
-	std::string get_s(void);
+	std::string get_s(void) const;
 	/// returns string list
-	std::vector<std::string> get_sl(void);
+	std::vector<std::string> get_sl(void) const;
 	/// returns integer
-	int &i(void);
+	int &i(bool _is_default = false);
 	/// returns bool
-	bool &b(void);
+	bool &b(bool _is_default = false);
 	/// returns float
-	double &f(void);
+	double &f(bool _is_default = false);
 	/// returns string
-	std::string &s(void);
+	std::string &s(bool _is_default = false);
 	/// returns string list
-	std::vector<std::string> &sl(void);
+	std::vector<std::string> &sl(bool _is_default = false);
 
   private:
 	std::string type;
 	std::string short_desc;
 	std::string long_desc;
 
-	bool is_default;
+	bool m_is_default;
 
 	bool boolean_value;
 	int integer_value;
@@ -80,6 +84,7 @@ class ConfigItem {
 extern std::map<std::string, ConfigItem> config;
 
 void readConfigfile( const std::string &_configfile );
+void writeConfigfile( const std::string &_configfile );
 
 /// integer class
 /** clamps to min, max

@@ -57,6 +57,13 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 				if (esc) return;
 				esc = true;
 			}
+			if (keypressed == SDLK_s && modifier & KMOD_CTRL ) {
+				std::string homedir;
+				char const* home = getenv("HOME");
+				if (home) homedir = std::string(home) + '/';
+				writeConfigfile( homedir + ".config/performous.xml" );
+				continue; // Already handled here...
+			}
 			if (keypressed == SDLK_RETURN && modifier & KMOD_ALT ) {
 				window.toggleFullscreen();
 				continue; // Already handled here...
