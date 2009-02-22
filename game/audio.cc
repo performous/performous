@@ -45,17 +45,19 @@ void Audio::operator()(da::pcm_data& areas, da::settings const&) {
 		double t = getPosition();
 		Notes::const_iterator it = n->begin();
 		while (it != n->end() && it->end < t) ++it;
+		for (size_t i = 0; i < samples; ++i) areas.m_buf[i] *= 0.3; // Decrease music volume
 		if (it == n->end() || it->type == Note::SLEEP || it->begin > t) { phase = 0.0; return; }
 		int n = it->note % 12;
 		double d = (n + 1) / 13.0;
 		double freq = MusicalScale().getNoteFreq(n + 12);
 		double value = 0.0;
+		// Synthesize tones
 		for (size_t i = 0; i < samples; ++i) {
 			if (i % areas.channels == 0) {
 				value = d * 0.2 * std::sin(phase) + 0.2 * std::sin(2 * phase) + (1.0 - d) * 0.2 * std::sin(4 * phase);
 				phase += 2.0 * M_PI * freq / m_rs.rate();
 			}
-			areas.m_buf[i] = 0.3 * areas.m_buf[i] + value;
+			areas.m_buf[i] += value;
 		}
 	}
 }
