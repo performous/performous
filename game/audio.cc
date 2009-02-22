@@ -15,10 +15,15 @@ Audio::Audio():
 	m_paused(false)
 {}
 
-void Audio::open(std::string const& pdev, unsigned int rate) {
+void Audio::open(std::string const& pdev, std::size_t rate, std::size_t frames) {
 	m_playback.reset();
 	stopMusic();
-	m_rs = da::settings(pdev).set_callback(boost::ref(*this)).set_channels(2).set_rate(rate).set_debug(std::cerr);
+	m_rs = da::settings(pdev)
+	  .set_callback(boost::ref(*this))
+	  .set_channels(2)
+	  .set_rate(rate)
+	  .set_frames(frames)
+	  .set_debug(std::cerr);
 	m_playback.reset(new da::playback(m_rs));
 }
 

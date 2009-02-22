@@ -54,7 +54,7 @@ class Audio {
   public:
 	Audio();
 	/** Takes libda devstr and sample rate. Throws if the device fails. **/
-	void open(std::string const& pdev, unsigned int rate);
+	void open(std::string const& pdev, std::size_t rate, std::size_t frames);
 	/// if audio is currently playing
 	bool isOpen() const { return m_playback; }
 	/** Play a song from the beginning

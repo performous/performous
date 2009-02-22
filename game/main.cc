@@ -272,10 +272,10 @@ int main(int argc, char** argv) {
 			rule<> device = (!argument_list >> '@' >> (+anychar_p)[assign_a(devstr)]) | argument_list | (*~ch_p('@'))[assign_a(devstr)];
 			// Capture devices
 			for(std::size_t i = 0; i < mics.size(); ++i) {
-				channels = 2; rate = 48000; frames = 256; devstr.clear();
+				channels = 2; rate = 48000; frames = 512; devstr.clear();
 				if (!parse(mics[i].c_str(), device).full) throw std::runtime_error("Invalid syntax in mics=" + mics[i]);
 				try {
-					capture.addMics(channels, rate, devstr);
+					capture.addMics(channels, rate, frames, devstr);
 				} catch (std::exception const& e) {
 					std::cerr << "Capture device mics=" << mics[i] << " failed and will be ignored:\n  " << e.what() << std::endl;
 				}
@@ -283,11 +283,11 @@ int main(int argc, char** argv) {
 			if (capture.analyzers().empty()) std::cerr << "No capture devices could be used. Please use --mics to define some." << std::endl;
 			// Playback devices
 			for(std::size_t i = 0; i < pdevs.size() && !audio.isOpen(); ++i) {
-				channels = 2; rate = 48000; frames = 256; devstr.clear();
+				channels = 2; rate = 48000; frames = 512; devstr.clear();
 				if (!parse(pdevs[i].c_str(), device).full) throw std::runtime_error("Invalid syntax in pdev=" + pdevs[i]);
 				if (channels != 2) throw std::runtime_error("Only stereo playback is supported, error in pdev=" + pdevs[i]);
 				try {
-					audio.open(devstr, rate);
+					audio.open(devstr, rate, frames);
 				} catch (std::exception const& e) {
 					std::cerr << "Playback device pdev=" << pdevs[i] << " failed and will be ignored:\n  " << e.what() << std::endl;
 				}
