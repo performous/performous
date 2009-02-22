@@ -38,9 +38,9 @@ void Songs::reload_internal() {
 		size_t count = m_songs.size();
 		reload_internal(*it);
 		size_t diff = m_songs.size() - count;
-		if (diff > 0) std::cout << diff << " songs loaded" << std::endl;
+		if (diff > 0 && m_loading) std::cout << diff << " songs loaded" << std::endl;
 	}
-	dumpSongs_internal(); // Dump the songlist to file (if requested)
+	if (m_loading) dumpSongs_internal(); // Dump the songlist to file (if requested)
 	m_loading = false;
 	m_dirty = true;  // Force shuffle
 }
