@@ -36,7 +36,6 @@ class Window {
 
   private:
 	SDL_Surface* screen;
-	unsigned int m_videoFlags;
 	unsigned int m_windowW, m_windowH;
 	unsigned int m_fsW, m_fsH;
 	bool m_fullscreen;

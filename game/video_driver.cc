@@ -20,7 +20,6 @@ Window::Window(unsigned int width, unsigned int height, int fs, unsigned int fs_
 		SDL_FreeSurface(icon);
 	}
 	m_fullscreen = (fs != 0);
-	m_videoFlags = SDL_OPENGL | SDL_DOUBLEBUF | SDL_RESIZABLE;
 	resize();
 	SDL_ShowCursor(SDL_DISABLE);
 	SDL_EnableUNICODE(SDL_ENABLE);
@@ -57,8 +56,19 @@ void Window::toggleFullscreen() {
 void Window::resize() {
 	unsigned width = m_fullscreen ? m_fsW : m_windowW;
 	unsigned height = m_fullscreen ? m_fsH : m_windowH;
-	const SDL_VideoInfo* videoInf = SDL_GetVideoInfo();
-	screen = SDL_SetVideoMode(width, height, videoInf->vfmt->BitsPerPixel, m_videoFlags | (m_fullscreen ? SDL_FULLSCREEN : 0));
-	if (!screen) throw std::runtime_error("SDL_SetVideoMode failed");
+	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
+	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+	SDL_GL_SetAttribute(SDL_GL_ACCUM_RED_SIZE, 16);
+	SDL_GL_SetAttribute(SDL_GL_ACCUM_GREEN_SIZE, 16);
+	SDL_GL_SetAttribute(SDL_GL_ACCUM_BLUE_SIZE, 16);
+	SDL_GL_SetAttribute(SDL_GL_ACCUM_ALPHA_SIZE, 16);
+	screen = SDL_SetVideoMode(width, height, 0, SDL_OPENGL | SDL_RESIZABLE | (m_fullscreen ? SDL_FULLSCREEN : 0));
+	if (!screen) throw std::runtime_error(std::string("SDL_SetVideoMode failed: ") + SDL_GetError());
 }
 
