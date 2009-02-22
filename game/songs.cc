@@ -103,6 +103,10 @@ class Songs::RestoreSel {
 
 void Songs::randomize() {
 	RestoreSel restore(*this);
+	randomize_internal();
+}
+
+void Songs::randomize_internal() {
 	/* TR1-based random number generation
 	namespace rnd = std::tr1;
 	rnd::random_device gendev;  // Random number generator (using /dev/urandom usually)
@@ -133,9 +137,9 @@ void Songs::filter_internal() {
 	} catch (...) {
 		SongVector(m_songs.begin(), m_songs.end()).swap(m_filtered);  // Invalid regex => copy everything
 	}
-	math_cover.setTarget(0, 0);
+	math_cover.reset();
 	sort_internal();
-	if (m_dirty && !m_loading) randomize();
+	if (m_dirty && !m_loading) { randomize_internal(); math_cover.setTarget(0, m_songs.size()); }
 	m_dirty = false;
 }
 

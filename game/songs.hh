@@ -73,6 +73,7 @@ class Songs: boost::noncopyable {
 	void dumpSongs_internal() const;
 	void reload_internal();
 	void reload_internal(boost::filesystem::path const& p);
+	void randomize_internal();
 	void filter_internal();
 	void sort_internal();
 	volatile bool m_dirty;

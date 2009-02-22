@@ -93,9 +93,12 @@ class AnimAcceleration {
 		m_time = now();
 		m_target = target;
 		if (m_songs == songs) return;
+		// Number of songs has changed => reset animation
 		m_songs = songs;
 		m_position = target;
+		m_velocity = 0.0;
 	};
+	void reset() { setTarget(0, 0); }
 	/// get current velocity
 	double getVelocity() const { return m_velocity; }
 
