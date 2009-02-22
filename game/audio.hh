@@ -43,7 +43,7 @@ struct Stream {
 		if (fade > 1.0) { fade = 1.0; fadeSpeed = 0.0; }
 		for (size_t i = 0; i < buf.size(); ++i) {
 			outbuf[i] += volume * fade * da::conv_from_s16(buf[i]);
-			fade += fadeSpeed;				
+			fade += fadeSpeed;
 		}
 		if (buf.size() < maxSamples && !mpeg.audioQueue.eof() && mpeg.position() > 1.0) std::cerr << "Warning: audio decoding too slow (buffer underrun): " << std::endl;
 	}

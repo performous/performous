@@ -35,7 +35,8 @@ namespace {
 		else if (s.channels_near()) hw.channels_near(channels);
 		else hw.channels(channels);
 		hw.period_size_near(period_size).buffer_size_near(buffer_size = 4 * period_size);
-		snd_pcm_format_t fmt[] = { SND_PCM_FORMAT_FLOAT, SND_PCM_FORMAT_S32, SND_PCM_FORMAT_S24_3LE, SND_PCM_FORMAT_S16 };
+		// TODO: move S16 as the last option. It is the second one now to avoid ALSA bug in that mode (cracking with INT_MIN-valued samples).
+		snd_pcm_format_t fmt[] = { SND_PCM_FORMAT_FLOAT, SND_PCM_FORMAT_S16, SND_PCM_FORMAT_S32, SND_PCM_FORMAT_S24_3LE };
 		size_t fmt_size = sizeof(fmt) / sizeof(*fmt);
 		size_t i = 0;
 		alsa::hw_params backup = hw;
