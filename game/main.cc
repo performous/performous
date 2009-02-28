@@ -65,7 +65,7 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 				continue; // Already handled here...
 			}
 			if (keypressed == SDLK_RETURN && modifier & KMOD_ALT ) {
-				window.toggleFullscreen();
+				config["graphic/fullscreen"].b() = !config["graphic/fullscreen"].get_b();
 				continue; // Already handled here...
 			}
 			break;
