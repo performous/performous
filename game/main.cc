@@ -80,6 +80,8 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 			case GL_OUT_OF_MEMORY: std::cerr << "OpenGL error: invalid enum" << std::endl; break;
 		}
 	}
+	if( config["graphic/fullscreen"].get_b() != window.getFullscreen() )
+		window.setFullscreen(config["graphic/fullscreen"].get_b());
 }
 
 #include <signal.h>

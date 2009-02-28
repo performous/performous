@@ -1,7 +1,6 @@
 #include "video_driver.hh"
 #include "screen.hh"
 #include "config.hh"
-#include "configuration.hh"
 #include <cmath>
 #include <SDL/SDL.h>
 
@@ -47,10 +46,15 @@ void Window::blank() {
 
 void Window::swap() {
 	SDL_GL_SwapBuffers();
-	if( config["graphic/fullscreen"].get_b() != m_fullscreen) {
-		m_fullscreen = config["graphic/fullscreen"].get_b();
-		resize();
-	}
+}
+
+void Window::setFullscreen(bool _fs) {
+	m_fullscreen = _fs;
+	resize();
+}
+
+bool Window::getFullscreen() {
+	return m_fullscreen;
 }
 
 void Window::resize() {
