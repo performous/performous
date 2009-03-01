@@ -123,23 +123,4 @@ class Configuration {
 	std::string m_description;
 };
 
-/// configuration for volume
-class ConfigurationAudioVolume: public Configuration {
-  public:
-	/// typedef function pointer for getter
-	typedef unsigned int (Audio::*GetFunc)();
-	/// typedef function pointer for setter
-	typedef void (Audio::*SetFunc)(unsigned int);
-	/// constructor
-	ConfigurationAudioVolume(std::string const& title, Audio& audio, GetFunc get, SetFunc set);
-	void setNext();
-	void setPrevious();
-	std::string getValue() const;
-
-  private:
-	Audio& m_audio;
-	GetFunc m_get;
-	SetFunc m_set;
-};
-
 #endif

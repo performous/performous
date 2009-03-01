@@ -84,14 +84,6 @@ class Audio {
 	bool isPlaying() const;
 	/** Get the current position. If not known or nothing is playing, NaN is returned. **/
 	double getPosition() const;
-	/// gets volume for music playback
-	unsigned int getVolumeMusic() { return m_volumeMusic; }
-	/// gets volume for preview
-	unsigned int getVolumePreview() { return m_volumePreview; }
-	/// sets volume for music playback
-	void setVolumeMusic(unsigned int volume) { setVolume_internal(m_volumeMusic = volume); }
-	/// sets volume for preview
-	void setVolumePreview(unsigned int volume) { setVolume_internal(m_volumePreview = volume); }
 	void operator()(); ///< Thread runs here, don't call directly
 	/// callback for the audio backend (libda)
 	void operator()(da::pcm_data& areas, da::settings const&);
@@ -102,7 +94,6 @@ class Audio {
 
   private:
 	mutable boost::recursive_mutex m_mutex;
-	unsigned m_volumeMusic, m_volumePreview;
 	void setVolume_internal(unsigned int volume);
 	typedef boost::ptr_vector<Stream> Streams;
 	Streams m_streams;

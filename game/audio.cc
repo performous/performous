@@ -10,8 +10,6 @@
 #include "xtime.hh"
 
 Audio::Audio():
-	m_volumeMusic(config["audio/music_volume"].get_i()),
-	m_volumePreview(config["audio/preview_volume"].get_i()),
 	m_paused(false)
 {}
 
@@ -84,7 +82,7 @@ void Audio::playMusic(std::string const& filename, bool preview) {
 	boost::recursive_mutex::scoped_lock l(m_mutex);
 	fadeout();
 	m_streams.push_back(s);
-	setVolume_internal(preview ? m_volumePreview : m_volumeMusic);
+	setVolume_internal(preview ? config["audio/preview_volume"].get_i() : config["audio/music_volume"].get_i());
 	if (!preview) m_paused = false;
 }
 
