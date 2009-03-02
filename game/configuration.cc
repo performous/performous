@@ -26,6 +26,8 @@ ConfigItem& ConfigItem::operator++() {
 		integer_value = (integer_value / integer_step)*integer_step;
 	} else if( type == std::string("float") ) {
 		double_value = double_value + double_step;
+	} else if( type == std::string("bool") ) {
+		boolean_value = !boolean_value;
 	}
 	return *this;
 }
@@ -36,6 +38,8 @@ ConfigItem& ConfigItem::operator--() {
 		integer_value = (integer_value / integer_step)*integer_step;
 	} else if( type == std::string("float") ) {
 		double_value = double_value - double_step;
+	} else if( type == std::string("bool") ) {
+		boolean_value = !boolean_value;
 	}
 	return *this;
 }
