@@ -128,26 +128,27 @@ class Configuration {
 class ConfigurationItem : public Configuration {
   public:
 	/// constructor
-	ConfigurationItem(ConfigItem &_item): Configuration(), m_item(_item) { };
+	ConfigurationItem(std::string _key): Configuration(), m_key(_key) { };
 	virtual ~ConfigurationItem() {};
 	/// next possible config value
 	void setNext() {
-		++m_item;
+		++config[m_key];
 	};
 	/// previous possible config value
 	void setPrevious() {
-		--m_item;
+		--config[m_key];
 	};
 	/// get current config value
 	std::string getValue() const {
-		if( m_item.get_type() == std::string("int") ) {
-			return (boost::format("%d") % m_item.get_i()).str();
-		} else if( m_item.get_type() == std::string("float") ) {
-			return (boost::format("%.2f") % m_item.get_f()).str();
-		} else if( m_item.get_type() == std::string("double") ) {
-			return (boost::format("%.2f") % m_item.get_f()).str();
-		} else if( m_item.get_type() == std::string("bool") ) {
-			if( m_item.get_b() ) {
+		ConfigItem item = config[m_key];
+		if( item.get_type() == std::string("int") ) {
+			return (boost::format("%d") % item.get_i()).str();
+		} else if( item.get_type() == std::string("float") ) {
+			return (boost::format("%.2f") % item.get_f()).str();
+		} else if( item.get_type() == std::string("double") ) {
+			return (boost::format("%.2f") % item.get_f()).str();
+		} else if( item.get_type() == std::string("bool") ) {
+			if( item.get_b() ) {
 				return std::string("True");
 			} else {
 				return std::string("False");
@@ -157,9 +158,11 @@ class ConfigurationItem : public Configuration {
 		}
 	};
 	/// get config description
-	std::string const getDescription() const { return m_item.get_short_description(); };
+	std::string const getDescription() const { 
+		return config[m_key].get_short_description();
+	};
   private:
-	ConfigItem m_item;
+	std::string m_key;
 };
 
 #endif

@@ -6,7 +6,7 @@ ScreenConfiguration::ScreenConfiguration(std::string const& name, Audio& audio):
 		ConfigItem item = (*itr).second;
 		std::string name = (*itr).first;
 		if( item.get_type() != std::string("string") && item.get_type() != std::string("string_list") ) {
-			configuration.push_back(new ConfigurationItem(item));
+			configuration.push_back(new ConfigurationItem(name));
 		}
 	}
 	selected=0;
