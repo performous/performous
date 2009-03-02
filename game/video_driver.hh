@@ -31,8 +31,13 @@ class Window {
 	}
 	/// does the resizing
 	void resize();
+	/// sets fullscreen
+	/** @param _fs true for fullscreen
+	 */
 	void setFullscreen(bool _fs);
+	/// gets fullscreen state
 	bool getFullscreen();
+
   private:
 	SDL_Surface* screen;
 	unsigned int m_windowW, m_windowH;

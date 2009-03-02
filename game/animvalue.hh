@@ -98,6 +98,7 @@ class AnimAcceleration {
 		m_position = target;
 		m_velocity = 0.0;
 	};
+	/// resets animation target to 0
 	void reset() { setTarget(0, 0); }
 	/// get current velocity
 	double getVelocity() const { return m_velocity; }
