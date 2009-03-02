@@ -88,6 +88,12 @@ void ConfigItem::set_short_description( std::string _short_desc ) {
 void ConfigItem::set_long_description( std::string _long_desc ) {
 	long_desc = _long_desc;
 }
+std::string ConfigItem::get_short_description() const {
+	return short_desc;
+}
+std::string ConfigItem::get_long_description() const {
+	return long_desc;
+}
 bool ConfigItem::is_default(void) const {
 	return m_is_default;
 }
@@ -194,6 +200,23 @@ void assignConfigItem( ConfigItem &_item, std::string _type, xmlpp::Element& _el
 		_item.sl(true) = value;
 	} else {
 		std::cout <<  "  Found unknown type " << _type << std::endl;
+	}
+
+	{
+		// Update short description
+		xmlpp::NodeSet n2 = _elem.find("locale/short/text()");
+		for (xmlpp::NodeSet::const_iterator it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
+			xmlpp::TextNode& elem2 = dynamic_cast<xmlpp::TextNode&>(**it2);
+			_item.set_short_description(elem2.get_content());
+		}
+	}
+	{
+		// Update long description
+		xmlpp::NodeSet n2 = _elem.find("locale/long/text()");
+		for (xmlpp::NodeSet::const_iterator it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
+			xmlpp::TextNode& elem2 = dynamic_cast<xmlpp::TextNode&>(**it2);
+			_item.set_long_description(elem2.get_content());
+		}
 	}
 }
 
@@ -311,7 +334,7 @@ void readConfigfile( const std::string &_configfile )
 					continue;
 				}
 		
-				ConfigItem item(type, true);
+				ConfigItem item = config.find(name)->second;
 				assignConfigItem(item, type, elem );
 				config[name] = item;
 		
@@ -342,7 +365,7 @@ void readConfigfile( const std::string &_configfile )
 				continue;
 			}
 	
-			ConfigItem item(type, false);
+			ConfigItem item = config.find(name)->second;
 			assignConfigItem(item, type, elem );
 			config[name] = item;
 	

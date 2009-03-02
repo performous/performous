@@ -5,6 +5,7 @@
 #include "audio.hh"
 #include "util.hh"
 #include <boost/any.hpp>
+#include <boost/format.hpp>
 #include <map>
 #include <string>
 
@@ -31,10 +32,14 @@ class ConfigItem {
 	ConfigItem& operator+=(const double& right);
 	/// substracts from config value
 	ConfigItem& operator-=(const double& right);
-	/// sets short decsription for confi item
+	/// sets short decsription for config item
 	void set_short_description( std::string _short_desc );
 	/// sets long description for config item
 	void set_long_description( std::string _long_desc );
+	/// gets short decsription for config item
+	std::string get_short_description() const;
+	/// gets long description for config item
+	std::string get_long_description() const;
 	/// tells if the item is default or not
 	bool is_default(void) const;
 	/// returns the type
@@ -108,19 +113,53 @@ template<int min, int max> class Integer {
 class Configuration {
   public:
 	/// constructor
-	Configuration(std::string const& description): m_description(description) {};
+	Configuration() {};
 	virtual ~Configuration() {};
 	/// next possible config value
 	virtual void setNext() = 0;
 	/// previous possible config value
 	virtual void setPrevious() = 0;
 	/// get config description
-	std::string const& getDescription() const { return m_description; };
+	virtual std::string const getDescription() const = 0;
 	/// get current config value
 	virtual std::string getValue() const = 0;
+};
 
+class ConfigurationItem : public Configuration {
+  public:
+	/// constructor
+	ConfigurationItem(ConfigItem &_item): Configuration(), m_item(_item) { };
+	virtual ~ConfigurationItem() {};
+	/// next possible config value
+	void setNext() {
+		++m_item;
+	};
+	/// previous possible config value
+	void setPrevious() {
+		--m_item;
+	};
+	/// get current config value
+	std::string getValue() const {
+		if( m_item.get_type() == std::string("int") ) {
+			return (boost::format("%d") % m_item.get_i()).str();
+		} else if( m_item.get_type() == std::string("float") ) {
+			return (boost::format("%.2f") % m_item.get_f()).str();
+		} else if( m_item.get_type() == std::string("double") ) {
+			return (boost::format("%.2f") % m_item.get_f()).str();
+		} else if( m_item.get_type() == std::string("bool") ) {
+			if( m_item.get_b() ) {
+				return std::string("True");
+			} else {
+				return std::string("False");
+			}
+		} else {
+			return std::string("Type not managed");
+		}
+	};
+	/// get config description
+	std::string const getDescription() const { return m_item.get_short_description(); };
   private:
-	std::string m_description;
+	ConfigItem m_item;
 };
 
 #endif

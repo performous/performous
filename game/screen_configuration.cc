@@ -2,6 +2,13 @@
 
 ScreenConfiguration::ScreenConfiguration(std::string const& name, Audio& audio): Screen(name), m_audio(audio)
 {
+	for(std::map<std::string, ConfigItem>::const_iterator itr = config.begin(); itr != config.end(); ++itr) {
+		ConfigItem item = (*itr).second;
+		std::string name = (*itr).first;
+		if( item.get_type() != std::string("string") && item.get_type() != std::string("string_list") ) {
+			configuration.push_back(new ConfigurationItem(item));
+		}
+	}
 	selected=0;
 }
 
