@@ -68,10 +68,10 @@ void Window::resize() {
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
 	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	SDL_GL_SetAttribute(SDL_GL_ACCUM_RED_SIZE, 16);
-	SDL_GL_SetAttribute(SDL_GL_ACCUM_GREEN_SIZE, 16);
-	SDL_GL_SetAttribute(SDL_GL_ACCUM_BLUE_SIZE, 16);
-	SDL_GL_SetAttribute(SDL_GL_ACCUM_ALPHA_SIZE, 16);
+	SDL_GL_SetAttribute(SDL_GL_ACCUM_RED_SIZE, 0);
+	SDL_GL_SetAttribute(SDL_GL_ACCUM_GREEN_SIZE, 0);
+	SDL_GL_SetAttribute(SDL_GL_ACCUM_BLUE_SIZE, 0);
+	SDL_GL_SetAttribute(SDL_GL_ACCUM_ALPHA_SIZE, 0);
 	screen = SDL_SetVideoMode(width, height, 0, SDL_OPENGL | SDL_RESIZABLE | (m_fullscreen ? SDL_FULLSCREEN : 0));
 	if (!screen) throw std::runtime_error(std::string("SDL_SetVideoMode failed: ") + SDL_GetError());
 }
