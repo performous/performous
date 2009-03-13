@@ -1,7 +1,7 @@
 project(libda)
 cmake_minimum_required(VERSION 2.6)
 
-set(LIBDA_PLUGIN_DIR "lib/libda")
+set(LIBDA_PLUGIN_DIR "lib${LIB_SUFFIX}/libda")
 
 include_directories(..) # to make #include <libda/*> work
 
