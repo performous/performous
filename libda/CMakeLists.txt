@@ -12,7 +12,7 @@ find_package(Boost 1.34 REQUIRED COMPONENTS thread filesystem)
 include_directories(${Boost_INCLUDE_DIR})
 add_library(da audio.cpp)
 target_link_libraries(da ${Boost_LIBRARIES})
-install(TARGETS da DESTINATION lib)
+install(TARGETS da DESTINATION lib${LIB_SUFFIX})
 
 add_subdirectory(plugins)
 
