@@ -14,9 +14,9 @@
    id="svg1901"
    sodipodi:version="0.32"
    inkscape:version="0.46"
-   sodipodi:docname="notebargold.svg"
+   sodipodi:docname="notebargold_hi.svg"
    sodipodi:docbase="/home/tsoots/ohj/translations/po"
-   inkscape:export-filename="notebar.png"
+   inkscape:export-filename="/home/knittl/git/performous/themes/default/notebargold.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90"
    version="1.0"
@@ -26,15 +26,15 @@
     <linearGradient
        id="linearGradient3207">
       <stop
-         style="stop-color:#fffbb9;stop-opacity:1;"
+         style="stop-color:#fffff5;stop-opacity:1;"
          offset="0"
          id="stop3209" />
       <stop
          id="stop3211"
          offset="0.44999999"
-         style="stop-color:#fff101;stop-opacity:1;" />
+         style="stop-color:#fffee1;stop-opacity:1;" />
       <stop
-         style="stop-color:#e63600;stop-opacity:1;"
+         style="stop-color:#ffd2c3;stop-opacity:1;"
          offset="1"
          id="stop3213" />
     </linearGradient>
@@ -47,7 +47,7 @@
        y1="525.70605"
        x2="319.99997"
        y2="555.27692"
-       gradientTransform="matrix(1.0432367,0,0,1.0929798,-13.83573,-50.242734)" />
+       gradientTransform="matrix(1.3567148,0,0,1.4375736,-114.08888,-236.38543)" />
     <filter
        inkscape:collect="always"
        id="filter3215"
@@ -68,28 +68,6 @@
          stdDeviation="0.2676702"
          id="feGaussianBlur3316" />
     </filter>
-    <filter
-       height="1.5963658"
-       y="-0.29818292"
-       width="1.1144185"
-       x="-0.057209262"
-       id="filter3260"
-       inkscape:collect="always">
-      <feGaussianBlur
-         id="feGaussianBlur3262"
-         stdDeviation="1.1676607"
-         inkscape:collect="always" />
-    </filter>
-    <linearGradient
-       gradientTransform="matrix(1.0432362,0,0,1.0929825,-13.835593,-50.244212)"
-       gradientUnits="userSpaceOnUse"
-       y2="555.01825"
-       x2="319.99997"
-       y1="525.70605"
-       x1="319.99997"
-       id="linearGradient2394"
-       xlink:href="#linearGradient2388"
-       inkscape:collect="always" />
     <linearGradient
        id="linearGradient2388">
       <stop
@@ -108,16 +86,6 @@
        inkscape:vp_y="0 : 1000 : 0"
        inkscape:vp_x="0 : 32 : 1"
        sodipodi:type="inkscape:persp3d" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient2388"
-       id="linearGradient3341"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(1.0432362,0,0,1.0929825,27.678613,-33.716309)"
-       x1="319.99997"
-       y1="525.70605"
-       x2="319.99997"
-       y2="555.01825" />
     <filter
        inkscape:collect="always"
        id="filter3359"
@@ -129,6 +97,18 @@
          inkscape:collect="always"
          stdDeviation="1.4369191"
          id="feGaussianBlur3361" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter3383"
+       x="-0.18092308"
+       width="1.3618462"
+       y="-0.35636363"
+       height="1.7127273">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="6.3044256"
+         id="feGaussianBlur3385" />
     </filter>
   </defs>
   <sodipodi:namedview
@@ -182,12 +162,12 @@
        d="M 44.09375,18.15625 C 42.954355,18.15625 42.018873,18.451916 41.25,18.6875 C 40.507736,18.902901 39.975772,19.554539 39.913311,20.324897 C 39.850849,21.095255 40.270884,21.824081 40.96875,22.15625 C 56.856448,29.789938 74.088462,28.835283 87.8125,22.375 C 88.481947,22.065076 88.905231,21.389083 88.891698,20.6515 C 88.878164,19.913917 88.430366,19.253906 87.75,18.96875 C 86.587974,18.471711 85.300976,18.15625 83.90625,18.15625 L 44.09375,18.15625 z"
        transform="matrix(1.0432367,0,0,1.0929798,253.23284,506.09055)" />
     <rect
-       style="opacity:1;fill:url(#linearGradient3203);fill-opacity:1;stroke:#000000;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="opacity:1;fill:url(#linearGradient3203);fill-opacity:1;stroke:#ffffff;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter3383)"
        id="rect3198"
-       width="62"
-       height="30"
-       x="288.80084"
-       y="525.16309"
+       width="80.630135"
+       height="39.458378"
+       x="279.48578"
+       y="520.4339"
        rx="12"
        ry="12" />
     <path
