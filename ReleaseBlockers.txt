@@ -3,14 +3,10 @@ Blockers for 0.3.1 release
 Entries ending with question mark are optional (and not really blockers).
 
 Text rendering (all parts optional for this release)
-- Detail adjustment (or at least make the default use higher detail)
 - Correct vertical alignment
-- Don't incorrectly crop outline of "j" and other such letters
 - Use dimensions to specify bounding box (possibly init from SVG)
 - Lyric hilighted should be rendered in front of the others
 
 Configuration
 - New config menu (several items visible at once, etc)
-- Saving config to XML file?
-   * Needs to store the settings within Configuration when the program is running
 - Need to convert "~" in paths into what getenv("$HOME") gives
