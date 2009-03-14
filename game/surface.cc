@@ -77,7 +77,7 @@ bool checkExtension(const char *extension)
 
 #include <fstream>
 
-template <typename T> void loader(T& target, std::string const& filename, bool autocrop) {
+template <typename T> void loader(T& target, std::string const& filename, bool autocrop, double factor) {
 	if (!std::ifstream(filename.c_str()).is_open()) throw std::runtime_error("File not found: " + filename);
 	if (filename.size() > 4 && filename.substr(filename.size() - 4) == ".svg") {
 		rsvg_init();
@@ -91,8 +91,8 @@ template <typename T> void loader(T& target, std::string const& filename, bool a
 		RsvgDimensionData svgDimension;
 		rsvg_handle_get_dimensions (svgHandle, &svgDimension);
 		rsvg_handle_free(svgHandle);
-		unsigned int w = nextPow2(svgDimension.width);
-		unsigned int h = nextPow2(svgDimension.height);
+		unsigned int w = nextPow2(svgDimension.width*factor);
+		unsigned int h = nextPow2(svgDimension.height*factor);
 		// Load and raster the SVG
 		GdkPixbuf* pb = rsvg_pixbuf_from_file_at_size(filename.c_str(), w, h, &pError);
 		if (pError) {
@@ -133,8 +133,8 @@ template <typename T> void loader(T& target, std::string const& filename, bool a
 	}
 }
 
-Texture::Texture(std::string const& filename) { loader(*this, filename, false); }
-Surface::Surface(std::string const& filename, bool autocrop) { loader(*this, filename, autocrop); }
+Texture::Texture(std::string const& filename, double factor) { loader(*this, filename, false, factor); }
+Surface::Surface(std::string const& filename, double factor, bool autocrop) { loader(*this, filename, autocrop, factor); }
 
 // Stuff for converting pix::Format into OpenGL enum values
 namespace {

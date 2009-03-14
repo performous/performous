@@ -1,11 +1,12 @@
 #include "screen_intro.hh"
+#include "configuration.hh"
 
 ScreenIntro::ScreenIntro(std::string const& name, Audio& audio, Capture& capture): Screen(name), m_audio(audio), m_capture(capture) {}
 
 void ScreenIntro::enter() {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	m_audio.playMusic(sm->getThemePathFile("menu.ogg"), true);
-	background.reset(new Surface(sm->getThemePathFile("intro.svg")));
+	background.reset(new Surface(sm->getThemePathFile("intro.svg"), config["graphic/svg_lod"].get_f()));
 	std::string msg;
 	if (!m_audio.isOpen()) msg = "No playback devices could be used.\n";
 	if (m_capture.analyzers().empty()) msg += "No microphones found.\n";
