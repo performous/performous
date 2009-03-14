@@ -30,7 +30,7 @@ RDEPEND="gnome-base/librsvg
 	dev-libs/boost
 	x11-libs/pango
 	dev-cpp/libxmlpp
-	media-libs/libsdl
+	media-libs/libsdl[joystick,opengl]
 	media-gfx/imagemagick
 	(
 		virtual/opengl
@@ -49,9 +49,6 @@ DEPEND="${RDEPEND}
 
 pkg_setup() {
 	games_pkg_setup
-	if ! built_with_use media-libs/libsdl opengl; then
-		eerror "libsdl wasn't build with opengl support"
-	fi
 	if ! built_with_use --missing true dev-libs/boost threads ; then
 		eerror "Please emerge dev-libs/boost with USE=threads"
 	fi
@@ -95,7 +92,7 @@ src_compile() {
 	fi
 	cmake \
 		-DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
-		-DCMAKE_INSTALL_PREFIX="${GAMES_PREFIX}" \
+		-DCMAKE_INSTALL_PREFIX="/usr" \
 		$plugins \
 		.. || die "cmake failed"
 	emake || die "emake failed"
@@ -104,12 +101,10 @@ src_compile() {
 src_install() {
 	cd build
 	emake DESTDIR="${D}" install || die "make install failed"
-	keepdir "${GAMES_DATADIR}"/ultrastar/songs
-	rm -rf "${D}${GAMES_PREFIX}/share/${PN}"/{applications,pixmaps}
-	mv "${D}/${GAMES_PREFIX}/share/games/${PN}" "${D}/${GAMES_DATADIR}/"
-	mv "${D}/${GAMES_PREFIX}/lib" "${D}/usr/"
+	keepdir "/usr/ultrastar/songs"
+	rm -rf "${D}/usr/share/${PN}"/{applications,pixmaps}
 	if use songs; then
-		insinto "${GAMES_DATADIR}"/ultrastar
+		insinto "/usr/ultrastar"
 		doins -r ../songs || die "doins songs failed"
 	fi
 	doicon data/${PN}.xpm
