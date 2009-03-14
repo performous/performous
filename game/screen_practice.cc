@@ -1,6 +1,7 @@
 #include "screen_practice.hh"
 
 #include "util.hh"
+#include "joystick.hh"
 #include "configuration.hh"
 
 ScreenPractice::ScreenPractice(std::string const& name, Audio& audio, Capture& capture):
@@ -39,6 +40,15 @@ void ScreenPractice::manageEvent(SDL_Event event) {
 			default: // nothing to do, fixes warnings
 				break;
 		}
+	}
+	switch( event.type ) {
+		case SDL_JOYAXISMOTION:
+		case SDL_JOYHATMOTION:
+		case SDL_JOYBALLMOTION:
+		case SDL_JOYBUTTONDOWN:
+		case SDL_JOYBUTTONUP:
+			check_joystick_event(event, m_audio);
+			break;
 	}
 }
 
