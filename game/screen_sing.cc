@@ -1,6 +1,7 @@
 #include "screen_sing.hh"
 
 #include "util.hh"
+#include "configuration.hh"
 #include "xtime.hh"
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
@@ -40,8 +41,8 @@ void ScreenSing::enter() {
 	m_notebarfs.reset(new Texture(sm->getThemePathFile("notebarfs.svg")));
 	m_notebarfs_hl.reset(new Texture(sm->getThemePathFile("notebarfs-hl.png")));
 	m_pause_icon.reset(new Surface(sm->getThemePathFile("sing_pause.svg")));
-	m_score_text[0].reset(new SvgTxtThemeSimple(sm->getThemePathFile("sing_score_text.svg")));
-	m_score_text[1].reset(new SvgTxtThemeSimple(sm->getThemePathFile("sing_score_text.svg")));
+	m_score_text[0].reset(new SvgTxtThemeSimple(sm->getThemePathFile("sing_score_text.svg"), config["graphic/text_lod"].get_f()));
+	m_score_text[1].reset(new SvgTxtThemeSimple(sm->getThemePathFile("sing_score_text.svg"), config["graphic/text_lod"].get_f()));
 	m_player_icon.reset(new Surface(sm->getThemePathFile("sing_pbox.svg")));
 	m_notebargold.reset(new Texture(sm->getThemePathFile("notebargold.svg")));
 	m_notebargold_hl.reset(new Texture(sm->getThemePathFile("notebargold.png")));

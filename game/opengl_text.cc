@@ -6,7 +6,7 @@
 #include <iostream>
 #include <sstream>
 
-OpenGLText::OpenGLText(TThemeTxtOpenGL& _text) {
+OpenGLText::OpenGLText(TThemeTxtOpenGL& _text, double m) {
 	if (_text.fontfamily.empty()) _text.fontfamily = "Sans";
 
 	PangoAlignment alignment = PANGO_ALIGN_LEFT;
@@ -24,7 +24,6 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL& _text) {
 	else if (_text.fontstyle == "italic") style = PANGO_STYLE_ITALIC;
 	else if (_text.fontstyle == "oblique") style = PANGO_STYLE_OBLIQUE;
 
-	const double m = 1.0; // Scaling factor
 	// set font description
 	PangoFontDescription *desc = pango_font_description_new();
 	pango_font_description_set_weight(desc, weight);
@@ -155,7 +154,7 @@ void parseTheme( std::string _theme_file, TThemeTxtOpenGL &_theme, double &_widt
 	_y = boost::lexical_cast<double>(y.get_value());
 }
 
-SvgTxtThemeSimple::SvgTxtThemeSimple(std::string _theme_file) {
+SvgTxtThemeSimple::SvgTxtThemeSimple(std::string _theme_file, double factor) : m_factor(factor) {
 	SvgTxtTheme::Align a;
 	parseTheme(_theme_file, m_text, m_width, m_height, m_x, m_y, a);
 }
@@ -164,7 +163,7 @@ void SvgTxtThemeSimple::render(std::string _text) {
 	if (!m_opengl_text.get() || m_cache_text != _text) {
 		m_cache_text = _text;
 		m_text.text = _text;
-		m_opengl_text.reset(new OpenGLText(m_text));
+		m_opengl_text.reset(new OpenGLText(m_text, m_factor));
 	}
 }
 
@@ -172,7 +171,7 @@ void SvgTxtThemeSimple::draw() {
 	m_opengl_text->draw();
 }
 
-SvgTxtTheme::SvgTxtTheme(std::string _theme_file): m_align() {
+SvgTxtTheme::SvgTxtTheme(std::string _theme_file, double factor): m_align(),m_factor(factor) {
 	parseTheme(_theme_file, m_text, m_width, m_height, m_x, m_y, m_align);
 	dimensions.stretch(0.0, 0.0).middle(-0.5 + m_x / m_width).center((m_y - 0.5 * m_height) / m_width);
 }
@@ -214,7 +213,7 @@ void SvgTxtTheme::draw(std::vector<TZoomText> const& _text, float alpha) {
 		m_opengl_text.clear();
 		for (unsigned int i = 0; i < _text.size(); i++ ) {
 			m_text.text = _text[i].string;
-			m_opengl_text.push_back(new OpenGLText(m_text));
+			m_opengl_text.push_back(new OpenGLText(m_text, m_factor));
 		}
 	}
 	double text_x = 0.0;

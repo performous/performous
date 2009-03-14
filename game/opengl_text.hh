@@ -44,7 +44,7 @@ struct TThemeTxtOpenGL {
 class OpenGLText {
   public:
 	/// constructor
-	OpenGLText(TThemeTxtOpenGL &_text);
+	OpenGLText(TThemeTxtOpenGL &_text, double m);
 	/// draws area
 	void draw(Dimensions &_dim, TexCoords &_tex);
 	/// draws full texture
@@ -72,7 +72,7 @@ class OpenGLText {
 class SvgTxtThemeSimple {
   public:
 	/// constructor
-	SvgTxtThemeSimple(std::string _theme_file);
+	SvgTxtThemeSimple(std::string _theme_file, double factor = 1.0);
 	/// renders text
 	void render(std::string _text);
 	/// draws texture
@@ -88,6 +88,7 @@ class SvgTxtThemeSimple {
 	double m_y;
 	double m_width;
 	double m_height;
+	double m_factor;
 };
 
 /// themed svg texts
@@ -140,7 +141,7 @@ class SvgTxtTheme {
 	/// dimensions, what else
 	Dimensions dimensions;
 	/// constructor
-	SvgTxtTheme(std::string _theme_file);
+	SvgTxtTheme(std::string _theme_file, double factor = 1.0);
 	/// draws text with alpha
 	void draw(std::vector<TZoomText> const& _text, float alpha = 1.0f);
 	/// draw texts
@@ -157,6 +158,7 @@ class SvgTxtTheme {
 	double m_y;
 	double m_width;
 	double m_height;
+	double m_factor;
 	std::string m_cache_text;
 	TThemeTxtOpenGL m_text;
 	TThemeTxtOpenGL m_text_highlight;
