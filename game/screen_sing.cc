@@ -61,7 +61,6 @@ void ScreenSing::exit() {
 	m_score_window.reset();
 	m_lyrics.clear();
 	m_engine.reset();
-	m_audio.stopMusic();
 	m_notebargold_hl.reset();
 	m_notebargold.reset();
 	m_pause_icon.reset();

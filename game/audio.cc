@@ -68,19 +68,20 @@ void Audio::setVolume_internal(unsigned int volume) {
 	s.volume = std::pow(10.0, (volume - 100.0) / 100.0 * 2.0);
 }
 
-void Audio::playMusic(std::string const& filename, bool preview) {
+void Audio::playMusic(std::string const& filename, bool preview, double fadeTime) {
 	if (!isOpen()) return;
 	// First construct the new stream
 	std::auto_ptr<Stream> s;
 	try {
 		s.reset(new Stream(filename, m_rs.rate()));
+		s->fadein(fadeTime);
 		if (preview) s->mpeg.seek(30.0, false);
 	} catch (std::runtime_error& e) {
 		std::cerr << "Error loading " << filename << " (" << e.what() << ")" << std::endl;
 		return;
 	}
 	boost::recursive_mutex::scoped_lock l(m_mutex);
-	fadeout();
+	fadeout(fadeTime);
 	m_streams.push_back(s);
 	setVolume_internal(preview ? config["audio/preview_volume"].get_i() : config["audio/music_volume"].get_i());
 	if (!preview) m_paused = false;
@@ -92,10 +93,10 @@ void Audio::stopMusic() {
 	m_streams.clear();
 }
 
-void Audio::fadeout() {
+void Audio::fadeout(double fadeTime) {
 	boost::recursive_mutex::scoped_lock l(m_mutex);
 	m_notes = NULL;
-	std::for_each(m_streams.begin(), m_streams.end(), std::mem_fun_ref(&Stream::fadeout));
+	for (Streams::iterator it = m_streams.begin(); it != m_streams.end(); ++it) it->fadeout(fadeTime);
 }
 
 double Audio::getPosition() const {

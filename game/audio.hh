@@ -30,21 +30,25 @@ struct Stream {
 	Stream(std::string const& filename, unsigned int sr):
 	  mpeg(false, true, filename, sr), srate(sr), volume(), fade(1.0), fadeSpeed(), prebuffering(true) {}
 	/// fades stream in
-	void fadein() { double time = 1.0; fade = 0.0; fadeSpeed = 1.0 / (time * srate); }
+	void fadein(double time) { fade = fadeSpeed = 1.0 / (time * srate); }
 	/// fades stream out
-	void fadeout() { double time = 1.0; fadeSpeed = - 1.0 / (time * srate); }
+	void fadeout(double time) { fadeSpeed = - 1.0 / (time * srate); }
 	/// crossfades songs
 	template <typename RndIt> void playmix(RndIt outbuf, unsigned int maxSamples) {
 		if (prebuffering && mpeg.audioQueue.percentage() > 0.9) prebuffering = false;
 		if (prebuffering) return;
 		std::vector<int16_t> buf;
 		mpeg.audioQueue.tryPop(buf, maxSamples);
-		if (fade < 0.0) { fade = 0.0; fadeSpeed = 0.0; }
-		if (fade > 1.0) { fade = 1.0; fadeSpeed = 0.0; }
+		bool fadeMin = false, fadeMax = false;
+		if (fade + maxSamples * fadeSpeed < 0.0) { fadeSpeed = fade / maxSamples; fadeMin = true; }
+		if (fade + maxSamples * fadeSpeed > 1.0) { fadeSpeed = (1.0 - fade) / maxSamples; fadeMax = true; }
 		for (size_t i = 0; i < buf.size(); ++i) {
 			outbuf[i] += volume * fade * da::conv_from_s16(buf[i]);
 			fade += fadeSpeed;
 		}
+		fade += (maxSamples - buf.size()) * fadeSpeed; // Fade continues even if no audio data was received.
+		if (fadeMin) { fade = 0.0; fadeSpeed = 0.0; }
+		if (fadeMax) { fade = 1.0; fadeSpeed = 0.0; }
 		if (buf.size() < maxSamples && !mpeg.audioQueue.eof() && mpeg.position() > 1.0) std::cerr << "Warning: audio decoding too slow (buffer underrun): " << std::endl;
 	}
 };
@@ -61,17 +65,17 @@ class Audio {
 	 * @param filename the track filename
 	 * @param preview if the song preview is to play
 	 */
-	void playMusic(std::string const& filename, bool preview = false);
+	void playMusic(std::string const& filename, bool preview = false, double fadeTime = 0.1);
 	/** Play a preview of the song, starting at 30 seconds
 	 * @param filename the track filename
 	 */
-	void playPreview(std::string const& filename) { playMusic(filename, true); }
+	void playPreview(std::string const& filename) { playMusic(filename, true, 1.0); }
 	/// get pause status
 	bool isPaused() { return m_paused; }
 	/// stops music
 	void stopMusic();
 	/// fades music out
-	void fadeout();
+	void fadeout(double time = 1.0);
 	/** Get the length of the currently playing song, in seconds. **/
 	double getLength() const;
 	/**

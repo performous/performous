@@ -31,7 +31,6 @@ void ScreenSongs::exit() {
 	m_songbg.reset();
 	m_playing.clear();
 	m_playReq.clear();
-	m_audio.fadeout();
 }
 
 void ScreenSongs::manageEvent(SDL_Event event) {
