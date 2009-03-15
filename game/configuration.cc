@@ -268,20 +268,20 @@ void readConfigfile( const std::string &_configfile )
 	xmlpp::DomParser domParser;
 
 	// looking for schemafile in:
+	// $PERFORMOUS_DEFAULT_CONFIG_FILE
 	// /usr/share/performous
 	// /usr/share/games/performous
 	// /usr/local/share/performous
 	// /usr/local/share/games/performous
-	// $PERFORMOUS_DEFAULT_CONFIG_FILE
 	std::string schemafile("NOT_FOUND");
 	std::vector<std::string> config_list;
+	char *env_config = getenv("PERFORMOUS_DEFAULT_CONFIG_FILE");
+	if( env_config != NULL )
+		config_list.push_back(std::string(env_config));
 	config_list.push_back(std::string("/usr/share/performous")+std::string("/config/performous.xml"));
 	config_list.push_back(std::string("/usr/share/games/performous")+std::string("/config/performous.xml"));
 	config_list.push_back(std::string("/usr/local/share/performous")+std::string("/config/performous.xml"));
 	config_list.push_back(std::string("/usr/local/share/games/performous")+std::string("/config/performous.xml"));
-	char *env_config = getenv("PERFORMOUS_DEFAULT_CONFIG_FILE");
-	if( env_config != NULL )
-		config_list.push_back(std::string(env_config));
 	for( unsigned int i = 0 ; i < config_list.size() ; ++i ) {
 		std::cout << "Testing config file \"" << config_list[i] << "\": ";
 		if( boost::filesystem::exists(config_list[i]) ) {
