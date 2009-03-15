@@ -9,6 +9,7 @@
 #include "songs.hh"
 #include "util.hh"
 #include "xtime.hh"
+#include "configuration.hh"
 #include <boost/bind.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
@@ -81,7 +82,7 @@ class Engine {
 	* @param song Song to play
 	**/
 	template <typename FwdIt> Engine(Audio& audio, Song& song, FwdIt anBegin, FwdIt anEnd):
-	  m_audio(audio), m_song(song), m_latencyAR(0.1), m_time(), m_quit()
+	  m_audio(audio), m_song(song), m_latencyAR(config["audio/round-trip"].get_f()), m_time(), m_quit()
 	{
 		while (anBegin != anEnd) m_players.push_back(Player(song, *anBegin++));
 		size_t player = 0;
@@ -92,7 +93,7 @@ class Engine {
 	/// kills playback
 	void kill() { m_quit = true; }
 	/// sets latency
-	void setLatencyAR(double value) { m_latencyAR = clamp(round(value * 1000.0) / 1000.0, 0.0, 0.5); }
+	void setLatencyAR(double value) { m_latencyAR = config["audio/round-trip"].f() = clamp(round(value * 1000.0) / 1000.0, 0.0, 0.5); }
 	/// get latency
 	double getLatencyAR() const { return m_latencyAR; }
 	/** Used internally for boost::thread. Do not call this yourself. (boost::thread requires this to be public). **/

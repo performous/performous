@@ -97,8 +97,8 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			if (diff > 0.0) m_audio.seek(diff);
 		} // XXX: switch/case
 		else if (key == SDLK_F4) m_audio.toggleSynth(m_songs.current().notes);
-		else if (key == SDLK_F5) m_latencyAV -= 0.02;
-		else if (key == SDLK_F6) m_latencyAV += 0.02;
+		else if (key == SDLK_F5) config["audio/video_delay"].f() -= 0.02;
+		else if (key == SDLK_F6) config["audio/video_delay"].f() += 0.02;
 		else if (key == SDLK_F7) m_engine->setLatencyAR(m_engine->getLatencyAR() - 0.02);
 		else if (key == SDLK_F8) m_engine->setLatencyAR(m_engine->getLatencyAR() + 0.02);
 		else if (key == SDLK_HOME) m_audio.seek(-m_audio.getPosition());
@@ -112,8 +112,8 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			exit(); enter();
 			m_audio.seek(pos);
 		}
-		m_latencyAV = clamp(round(m_latencyAV * 1000.0) / 1000.0, -0.5, 0.5);
-		if (key == SDLK_F5 || key == SDLK_F6 || key == SDLK_F7 || key == SDLK_F8) std::cout << "AV latency: " << m_latencyAV << ", AR latency: " << m_engine->getLatencyAR() << std::endl;
+		config["audio/video_delay"].f() = clamp(round(config["audio/video_delay"].get_f() * 1000.0) / 1000.0, -0.5, 0.5);
+		if (key == SDLK_F5 || key == SDLK_F6 || key == SDLK_F7 || key == SDLK_F8) std::cout << "AV latency: " << config["audio/video_delay"].get_f() << ", AR latency: " << m_engine->getLatencyAR() << std::endl;
 		// Some things must be reset after seeking backwards
 		if (seekback) {
 			m_lyricit = m_songit = m_songs.current().notes.begin();
@@ -166,7 +166,7 @@ void ScreenSing::draw() {
 	Song& song = m_songs.current();
 	// Get the time in the song
 	double length = m_audio.getLength();
-	double time = clamp(m_audio.getPosition() - m_latencyAV, 0.0, length);
+	double time = clamp(m_audio.getPosition() - config["audio/video_delay"].get_f(), 0.0, length);
 	double songPercent = time / length;
 
 	// Rendering starts
