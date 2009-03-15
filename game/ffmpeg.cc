@@ -156,6 +156,9 @@ void FFmpeg::operator()() {
 		}
 	}
 	m_running = false;
+	m_eof = true;
+	audioQueue.push(new AudioFrame()); // EOF marker
+	videoQueue.push(new VideoFrame()); // EOF marker
 }
 
 void FFmpeg::seek(double time, bool wait) {

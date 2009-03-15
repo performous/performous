@@ -1,5 +1,6 @@
 #include "joystick.hh"
 #include <iostream>
+#include <cstdlib>
 
 void check_joystick_event(SDL_Event event, Audio &audio) {
 	switch( event.type ) {
@@ -16,19 +17,22 @@ void check_joystick_event(SDL_Event event, Audio &audio) {
 			std::cout << "Received a button down on "  << (int)event.jbutton.which << " on " << (int)event.jbutton.button << std::endl;
 			switch( event.jbutton.button ) {
 				case 2: // Snare drum
-					audio.playMusic("/tmp/drum_snare.ogg");
+					audio.playSample("/tmp/drum_snare.ogg");
 					break;
 				case 0: // Tom 1
-					audio.playMusic("/tmp/drum_tom1.ogg");
+					audio.playSample("/tmp/drum_tom1.ogg");
 					break;
 				case 1: // Tom 2
-					audio.playMusic("/tmp/drum_tom2.ogg");
+					audio.playSample("/tmp/drum_tom2.ogg");
 					break;
 				case 3: // Hi hat
-					audio.playMusic("/tmp/drum_hi-hat.ogg");
+					audio.playSample("/tmp/drum_hi-hat.ogg");
 					break;
 				case 5: // crash cymbal
-					audio.playMusic("/tmp/drum_cymbal.ogg");
+					audio.playSample("/tmp/drum_cymbal.ogg");
+					break;
+				case 4: // Drum bass
+					audio.playSample("/tmp/drum_bass.ogg");
 					break;
 			}
 			break;

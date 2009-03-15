@@ -6,9 +6,54 @@
 #include "ffmpeg.hh"
 #include "notes.hh"
 #include <boost/ptr_container/ptr_vector.hpp>
+#include <boost/ptr_container/ptr_map.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 #include <audio.hpp>
+
+
+struct AudioSample {
+	/// sample rate
+	double srate;
+	/// volume
+	double volume;
+	/// sample
+	std::vector<int16_t> sample;
+	/// current position in the sample
+	unsigned int offset;
+	AudioSample() {}
+	/// constructor
+	AudioSample(std::string const& filename, unsigned int sr): srate(sr), volume(), sample(), offset() {
+		FFmpeg mpeg(false, true, filename, sr);
+		while( !mpeg.audioQueue.eof() ) {
+			std::vector<int16_t> buffer;
+			mpeg.audioQueue.tryPop(buffer, 1024);
+			sample.insert(sample.end(), buffer.begin(), buffer.end());
+			if( sample.size() > 1024 * 256 ) break; // do not authorized sample > 256k
+		}
+		std:: cout << "Loading sample " << filename << " done (size: " << sample.size() << ")" << std::endl;
+	}
+	void reset_position() {
+		offset = 0;
+	}
+	template <typename RndIt> void playmix(RndIt outbuf, unsigned int maxSamples) {
+		if( offset >= sample.size() ) {
+			// we are at the end, nothing to do
+			return;
+		} else if( sample.size() - offset < maxSamples ) {
+			// not enough data in sample
+			for (size_t i = offset; i < sample.size(); ++i) {
+				outbuf[i-offset] += da::conv_from_s16(sample[i]);
+			}
+			offset = sample.size();
+		} else {
+			for (size_t i = offset; i < offset + maxSamples; ++i) {
+				outbuf[i-offset] += da::conv_from_s16(sample[i]);
+			}
+			offset += maxSamples;
+		}
+	}
+};
 
 /// audiostream
 /** allows buffering, fading and mixing of audiostreams
@@ -95,6 +140,7 @@ class Audio {
 	void togglePause() { m_paused = !m_paused; }
 	/// toggles synth playback (F4)
 	void toggleSynth(Notes const& notes) { m_notes = (m_notes ? NULL : &notes); }
+	void playSample(std::string filename);
 
   private:
 	mutable boost::recursive_mutex m_mutex;
@@ -105,6 +151,7 @@ class Audio {
 	Notes const* volatile m_notes;
 	da::settings m_rs;
 	boost::scoped_ptr<da::playback> m_playback;
+	boost::ptr_map<std::string, AudioSample> m_samples;
 };
 
 #endif

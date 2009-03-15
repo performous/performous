@@ -37,6 +37,9 @@ void Audio::operator()(da::pcm_data& areas, da::settings const&) {
 			++it;
 		}
 	}
+	for (boost::ptr_map<std::string, AudioSample>::iterator it = m_samples.begin(); it != m_samples.end();++it) {
+		it->second->playmix(areas.m_buf, samples);
+	}
 	// Synthesize tones
 	Notes const* n = m_notes;
 	if (n && !m_paused) {
@@ -112,6 +115,15 @@ double Audio::getLength() const {
 bool Audio::isPlaying() const {
 	boost::recursive_mutex::scoped_lock l(m_mutex);
 	return m_streams.empty() ? getNaN() : !m_streams.back().mpeg.audioQueue.eof();
+}
+
+void Audio::playSample(std::string filename) {
+	boost::recursive_mutex::scoped_lock l(m_mutex);
+	if( m_samples.find(filename) == m_samples.end() ) {
+		m_samples.insert(filename,new AudioSample(filename, m_rs.rate())); 
+	} else {
+		m_samples[filename].reset_position();
+	}
 }
 
 void Audio::seek(double seek_dist) {
