@@ -1,16 +1,14 @@
 #include "notegraph.hh"
 
-NoteGraph::NoteGraph(Song const& song): m_song(song), m_nlTop(0.0, 4.0), m_nlBottom(0.0, 4.0) {
-	ScreenManager* sm = ScreenManager::getSingletonPtr();
-	m_wave.reset(new Texture(sm->getThemePathFile("wave.png")));
-	m_notelines.reset(new Texture(sm->getThemePathFile("notelines.svg")));
-	m_notebar.reset(new Texture(sm->getThemePathFile("notebar.svg")));
-	m_notebar_hl.reset(new Texture(sm->getThemePathFile("notebar.png")));
-	m_notebarfs.reset(new Texture(sm->getThemePathFile("notebarfs.svg")));
-	m_notebarfs_hl.reset(new Texture(sm->getThemePathFile("notebarfs-hl.png")));
-	m_notebargold.reset(new Texture(sm->getThemePathFile("notebargold.svg")));
-	m_notebargold_hl.reset(new Texture(sm->getThemePathFile("notebargold.png")));
-	m_notealpha = 0.0f;
+NoteGraph::NoteGraph(Song const& song):
+  m_song(song),
+  m_notelines("notelines.svg"),
+  m_wave("wave.png"),
+  m_notebar("notebar.svg"), m_notebar_hl("notebar.png"),
+  m_notebarfs("notebarfs.svg"), m_notebarfs_hl("notebarfs-hl.png"),
+  m_notebargold("notebargold.svg"), m_notebargold_hl("notebargold.png"),
+  m_notealpha(0.0f), m_nlTop(0.0, 4.0), m_nlBottom(0.0, 4.0)
+{
 	m_nlTop.setTarget(m_song.noteMax, true);
 	m_nlBottom.setTarget(m_song.noteMin, true);
 	reset();
@@ -89,7 +87,7 @@ void NoteGraph::drawNotes() {
 		m_notealpha = 0.0f;
 	} else {
 		glColor4f(1.0, 1.0, 1.0, m_notealpha);
-		m_notelines->draw(Dimensions().stretch(1.0, (m_max - m_min - 13) * m_noteUnit), TexCoords(0.0, (-m_min - 7.0) / 12.0f, 1.0, (-m_max + 6.0) / 12.0f));
+		m_notelines.draw(Dimensions().stretch(1.0, (m_max - m_min - 13) * m_noteUnit), TexCoords(0.0, (-m_min - 7.0) / 12.0f, 1.0, (-m_max + 6.0) / 12.0f));
 
 		// Draw notes
 		for (Notes::const_iterator it = m_songit; it != m_song.notes.end() && it->begin < m_time - (baseLine - 0.5) / pixUnit; ++it) {
@@ -98,17 +96,17 @@ void NoteGraph::drawNotes() {
 			Texture* t1;
 			Texture* t2;
 			switch (it->type) {
-			  case Note::NORMAL: t1 = m_notebar.get(); t2 = m_notebar_hl.get(); break;
-			  case Note::GOLDEN: t1 = m_notebargold.get(); t2 = m_notebargold_hl.get(); break;
+			  case Note::NORMAL: t1 = &m_notebar; t2 = &m_notebar_hl; break;
+			  case Note::GOLDEN: t1 = &m_notebargold; t2 = &m_notebargold_hl; break;
 			  case Note::FREESTYLE:  // Freestyle notes use custom handling
 				{
 					Dimensions dim;
 					dim.middle(m_baseX + 0.5 * (it->begin + it->end) * pixUnit).center(m_baseY + it->note * m_noteUnit).stretch((it->end - it->begin) * pixUnit, -m_noteUnit * 12.0);
-					float xoffset = 0.1 * m_time / m_notebarfs->ar();
-					m_notebarfs->draw(dim, TexCoords(xoffset, 0.0, xoffset + dim.ar() / m_notebarfs->ar(), 1.0));
+					float xoffset = 0.1 * m_time / m_notebarfs.ar();
+					m_notebarfs.draw(dim, TexCoords(xoffset, 0.0, xoffset + dim.ar() / m_notebarfs.ar(), 1.0));
 					if (alpha > 0.0) {
 						float xoffset = rand() / double(RAND_MAX);
-						m_notebarfs_hl->draw(dim, TexCoords(xoffset, 0.0, xoffset + dim.ar() / m_notebarfs_hl->ar(), 1.0));
+						m_notebarfs_hl.draw(dim, TexCoords(xoffset, 0.0, xoffset + dim.ar() / m_notebarfs_hl.ar(), 1.0));
 					}
 				}
 				continue;
@@ -130,7 +128,7 @@ void NoteGraph::drawNotes() {
 }
 
 void NoteGraph::drawWaves(std::list<Player> const& players) {
-	UseTexture tblock(*m_wave);
+	UseTexture tblock(m_wave);
 	
 	for (std::list<Player>::const_iterator p = players.begin(); p != players.end(); ++p) {
 		glColor4f(p->m_color.r, p->m_color.g, p->m_color.b, m_notealpha);
