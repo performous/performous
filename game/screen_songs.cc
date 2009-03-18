@@ -17,7 +17,7 @@ ScreenSongs::ScreenSongs(std::string const& name, Audio& audio, Songs& songs):
 void ScreenSongs::enter() {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	theme.reset(new ThemeSongs());
-	m_emptyCover.reset(new Surface(sm->getThemePathFile("no_cover.svg"), config["graphic/svg_lod"].get_f()));
+	m_emptyCover.reset(new Surface(sm->getThemePathFile("no_cover.svg")));
 	m_search.text.clear();
 	m_songs.setFilter(m_search.text);
 	m_audio.fadeout();
@@ -115,7 +115,7 @@ void ScreenSongs::draw() {
 	if (music != m_playing && m_playTimer.get() > 0.4) {
 		m_songbg.reset(); m_video.reset();
 		if (music.empty()) m_audio.fadeout(); else m_audio.playPreview(music);
-		if (!songbg.empty()) try { m_songbg.reset(new Surface(songbg, config["graphic/svg_lod"].get_f())); } catch (std::exception const&) {}
+		if (!songbg.empty()) try { m_songbg.reset(new Surface(songbg)); } catch (std::exception const&) {}
 		if (!video.empty()) m_video.reset(new Video(video));
 		m_playing = music;
 	}

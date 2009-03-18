@@ -10,7 +10,7 @@
 #include <iomanip>
 
 namespace {
-	static const double QUIT_TIMEOUT = 30.0; // Return to songs screen after 30 seconds in score screen
+	static const double QUIT_TIMEOUT = 20.0; // Return to songs screen after 20 seconds in score screen
 }
 
 ScreenSing::SongStatus ScreenSing::songStatus() const {
@@ -28,17 +28,17 @@ void ScreenSing::enter() {
 	theme.reset(new ThemeSing());
 	if (!song.background.empty()) {
 		try {
-			m_background.reset(new Surface(song.path + song.background, config["graphic/svg_lod"].get_f(), true));
+			m_background.reset(new Surface(song.path + song.background, true));
 		} catch (std::exception& e) {
 			std::cerr << e.what() << std::endl;
 		}
 	}
 	if (!song.video.empty()) m_video.reset(new Video(song.path + song.video));
-	m_pause_icon.reset(new Surface(sm->getThemePathFile("sing_pause.svg"), config["graphic/svg_lod"].get_f()));
+	m_pause_icon.reset(new Surface(sm->getThemePathFile("sing_pause.svg")));
 	m_score_text[0].reset(new SvgTxtThemeSimple(sm->getThemePathFile("sing_score_text.svg"), config["graphic/text_lod"].get_f()));
 	m_score_text[1].reset(new SvgTxtThemeSimple(sm->getThemePathFile("sing_score_text.svg"), config["graphic/text_lod"].get_f()));
-	m_player_icon.reset(new Surface(sm->getThemePathFile("sing_pbox.svg"), config["graphic/svg_lod"].get_f()));
-	m_progress.reset(new ProgressBar(sm->getThemePathFile("sing_progressbg.svg"), sm->getThemePathFile("sing_progressfg.svg"), config["graphic/svg_lod"].get_f(), ProgressBar::HORIZONTAL, 0.01, 0.01, true));
+	m_player_icon.reset(new Surface(sm->getThemePathFile("sing_pbox.svg")));
+	m_progress.reset(new ProgressBar(sm->getThemePathFile("sing_progressbg.svg"), sm->getThemePathFile("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01, 0.01, true));
 	m_progress->dimensions.fixedWidth(0.4).left(-0.5).screenTop();
 	theme->timer->dimensions.screenTop(0.5 * m_progress->dimensions.h());
 	m_lyricit = song.notes.begin();
@@ -223,7 +223,7 @@ void ScreenSing::draw() {
 
 ScoreWindow::ScoreWindow(ScreenManager const* sm, Engine& e):
   m_bg(sm->getThemePathFile("score_window.svg")),
-  m_scoreBar(sm->getThemePathFile("score_bar_bg.svg"), sm->getThemePathFile("score_bar_fg.svg"), config["graphic/svg_lod"].get_f(), ProgressBar::VERTICAL, 0.0, 0.0, false),
+  m_scoreBar(sm->getThemePathFile("score_bar_bg.svg"), sm->getThemePathFile("score_bar_fg.svg"), ProgressBar::VERTICAL, 0.0, 0.0, false),
   m_score_text(sm->getThemePathFile("score_txt.svg")),
   m_score_rank(sm->getThemePathFile("score_rank.svg")),
   m_players(e.getPlayers())

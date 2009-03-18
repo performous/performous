@@ -144,7 +144,7 @@ namespace pix { enum Format { INT_ARGB, CHAR_RGBA, RGB, BGR }; }
 class Texture: public OpenGLTexture<GL_TEXTURE_2D> {
   public:
 	/** Initialize from SVG or PNG file **/
-	Texture(std::string const& filename, double factor = 1.0);
+	Texture(std::string const& filename);
 	/** Get aspect ratio (1.0 for square, > 1.0 for wider). **/
 	float ar() const { return m_ar; }
 	/// loads texture into buffer
@@ -168,7 +168,7 @@ class Surface {
 	/// creates surface from cairo surface
 	Surface(cairo_surface_t* _surf);
 	/// creates surface from file
-	Surface(std::string const& filename, double factor = 1.0, bool autocrop = false);
+	Surface(std::string const& filename, bool autocrop = false);
 	/// draws surface
 	void draw() const;
 	/// loads surface into buffer
@@ -178,7 +178,5 @@ class Surface {
 	unsigned int m_width, m_height;
 	OpenGLTexture<GL_TEXTURE_RECTANGLE_ARB> m_texture;
 };
-
-bool checkExtension(const char* extension);
 
 #endif

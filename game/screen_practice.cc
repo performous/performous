@@ -16,7 +16,7 @@ void ScreenPractice::enter() {
 	// draw vu meters
 	for (unsigned int i = 0, mics = m_capture.analyzers().size(); i < mics; ++i) {
 		ProgressBar* b;
-		m_vumeters.push_back(b = new ProgressBar(sm->getThemePathFile("vumeter_bg.svg"), sm->getThemePathFile("vumeter_fg.svg"), config["graphic/svg_lod"].get_f(), ProgressBar::VERTICAL, 0.136, 0.023));
+		m_vumeters.push_back(b = new ProgressBar(sm->getThemePathFile("vumeter_bg.svg"), sm->getThemePathFile("vumeter_fg.svg"), ProgressBar::VERTICAL, 0.136, 0.023));
 		b->dimensions.screenBottom().left(-0.4 + i * 0.2).fixedWidth(0.04);
 	}
 }

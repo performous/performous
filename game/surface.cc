@@ -1,13 +1,11 @@
 #include "surface.hh"
 
+#include "configuration.hh"
 #include "video_driver.hh"
 #include <Magick++.h>
 #include <boost/bind.hpp>
 #include <stdexcept>
 #include <vector>
-
-// TODO: get rid of this and use C++ std::string instead
-#include <string.h>
 
 float Dimensions::screenY() const {
 	switch (m_screenAnchor) {
@@ -47,37 +45,15 @@ namespace {
 	}
 }
 
-bool checkExtension(const char *extension)
-{
-	const GLubyte *extensions = NULL;
-	const GLubyte *start;
-	GLubyte *where, *terminator;
-	
-	/* Extension names should not have spaces. */
-	where = (GLubyte *) strchr(extension, ' ');
-	if (where || *extension == '\0')
-		return false;
-	extensions = glGetString(GL_EXTENSIONS);
-	/* It takes a bit of care to be fool-proof about parsing the
-		 OpenGL extensions string. Don't be fooled by sub-strings,
-		 etc. */
-	start = extensions;
-	for (;;) {
-		where = (GLubyte *) strstr((const char *) start, extension);
-		if (!where)
-			break;
-		terminator = where + strlen(extension);
-		if (where == start || *(where - 1) == ' ')
-			if (*terminator == ' ' || *terminator == '\0')
-				return true;
-		start = terminator;
-	}
+bool checkExtension(std::string const& extension) {
+	std::istringstream iss(reinterpret_cast<char const*>(glGetString(GL_EXTENSIONS)));
+	for (std::string ext; iss >> ext;) if (ext == extension) return true;
 	return false;
 }
 
 #include <fstream>
 
-template <typename T> void loader(T& target, std::string const& filename, bool autocrop, double factor) {
+template <typename T> void loader(T& target, std::string const& filename, bool autocrop) {
 	if (!std::ifstream(filename.c_str()).is_open()) throw std::runtime_error("File not found: " + filename);
 	if (filename.size() > 4 && filename.substr(filename.size() - 4) == ".svg") {
 		rsvg_init();
@@ -91,6 +67,7 @@ template <typename T> void loader(T& target, std::string const& filename, bool a
 		RsvgDimensionData svgDimension;
 		rsvg_handle_get_dimensions (svgHandle, &svgDimension);
 		rsvg_handle_free(svgHandle);
+		double factor = config["graphic/svg_lod"].get_f();
 		unsigned int w = nextPow2(svgDimension.width*factor);
 		unsigned int h = nextPow2(svgDimension.height*factor);
 		// Load and raster the SVG
@@ -133,8 +110,8 @@ template <typename T> void loader(T& target, std::string const& filename, bool a
 	}
 }
 
-Texture::Texture(std::string const& filename, double factor) { loader(*this, filename, false, factor); }
-Surface::Surface(std::string const& filename, double factor, bool autocrop) { loader(*this, filename, autocrop, factor); }
+Texture::Texture(std::string const& filename) { loader(*this, filename, false); }
+Surface::Surface(std::string const& filename, bool autocrop) { loader(*this, filename, autocrop); }
 
 // Stuff for converting pix::Format into OpenGL enum values
 namespace {

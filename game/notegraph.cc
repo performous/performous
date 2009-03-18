@@ -2,14 +2,14 @@
 
 NoteGraph::NoteGraph(Song const& song): m_song(song), m_nlTop(0.0, 4.0), m_nlBottom(0.0, 4.0) {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
-	m_wave.reset(new Texture(sm->getThemePathFile("wave.png"), config["graphic/svg_lod"].get_f()));
-	m_notelines.reset(new Texture(sm->getThemePathFile("notelines.svg"), config["graphic/svg_lod"].get_f()));
-	m_notebar.reset(new Texture(sm->getThemePathFile("notebar.svg"), config["graphic/svg_lod"].get_f()));
-	m_notebar_hl.reset(new Texture(sm->getThemePathFile("notebar.png"), config["graphic/svg_lod"].get_f()));
-	m_notebarfs.reset(new Texture(sm->getThemePathFile("notebarfs.svg"), config["graphic/svg_lod"].get_f()));
-	m_notebarfs_hl.reset(new Texture(sm->getThemePathFile("notebarfs-hl.png"), config["graphic/svg_lod"].get_f()));
-	m_notebargold.reset(new Texture(sm->getThemePathFile("notebargold.svg"), config["graphic/svg_lod"].get_f()));
-	m_notebargold_hl.reset(new Texture(sm->getThemePathFile("notebargold.png"), config["graphic/svg_lod"].get_f()));
+	m_wave.reset(new Texture(sm->getThemePathFile("wave.png")));
+	m_notelines.reset(new Texture(sm->getThemePathFile("notelines.svg")));
+	m_notebar.reset(new Texture(sm->getThemePathFile("notebar.svg")));
+	m_notebar_hl.reset(new Texture(sm->getThemePathFile("notebar.png")));
+	m_notebarfs.reset(new Texture(sm->getThemePathFile("notebarfs.svg")));
+	m_notebarfs_hl.reset(new Texture(sm->getThemePathFile("notebarfs-hl.png")));
+	m_notebargold.reset(new Texture(sm->getThemePathFile("notebargold.svg")));
+	m_notebargold_hl.reset(new Texture(sm->getThemePathFile("notebargold.png")));
 	m_notealpha = 0.0f;
 	m_nlTop.setTarget(m_song.noteMax, true);
 	m_nlBottom.setTarget(m_song.noteMin, true);
