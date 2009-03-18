@@ -48,7 +48,7 @@ void ScreenPractice::manageEvent(SDL_Event event) {
 		case SDL_JOYBALLMOTION:
 		case SDL_JOYBUTTONDOWN:
 		case SDL_JOYBUTTONUP:
-			check_joystick_event(event, m_audio);
+			//check_joystick_event(event, m_audio);
 			break;
 	}
 }

@@ -6,6 +6,7 @@
 #include <deque>
 #include "animvalue.hh"
 #include "engine.hh"
+#include "notegraph.hh"
 #include "screen.hh"
 #include "theme.hh"
 #include "video.hh"
@@ -73,7 +74,7 @@ class ScreenSing: public Screen {
   public:
 	/// constructor
 	ScreenSing(std::string const& name, Audio& audio, Songs& songs, Capture& capture):
-	  Screen(name), m_audio(audio), m_songs(songs), m_capture(capture), m_latencyAV(), m_nlTop(0.0, 4.0), m_nlBottom(0.0, 4.0)
+	  Screen(name), m_audio(audio), m_songs(songs), m_capture(capture), m_latencyAV()
 	{}
 	void enter();
 	void exit();
@@ -95,21 +96,11 @@ class ScreenSing: public Screen {
 	boost::scoped_ptr<Surface> m_pause_icon;
 	boost::scoped_ptr<Surface> m_player_icon;
 	boost::scoped_ptr<SvgTxtThemeSimple> m_score_text[2];
-	boost::scoped_ptr<Texture> m_notelines;
-	boost::scoped_ptr<Texture> m_wave;
-	boost::scoped_ptr<Texture> m_notebar;
-	boost::scoped_ptr<Texture> m_notebar_hl;
-	boost::scoped_ptr<Texture> m_notebarfs;
-	boost::scoped_ptr<Texture> m_notebarfs_hl;
-	boost::scoped_ptr<Texture> m_notebargold;
-	boost::scoped_ptr<Texture> m_notebargold_hl;
 	boost::scoped_ptr<Engine> m_engine;
+	boost::scoped_ptr<NoteGraph> m_noteGraph;
 	double m_latencyAV;  // Latency between audio and video output (do not confuse with latencyAR)
-	float m_notealpha;
 	boost::scoped_ptr<ThemeSing> theme;
-	Notes::const_iterator m_songit;
 	Notes::const_iterator m_lyricit;
-	AnimValue m_nlTop, m_nlBottom;
 	std::deque<LyricRow> m_lyrics;
 	AnimValue m_quitTimer;
 };
