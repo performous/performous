@@ -216,12 +216,14 @@ void ScreenSing::draw() {
 }
 
 ScoreWindow::ScoreWindow(ScreenManager const* sm, Engine& e):
+  m_pos(0.8, 2.0),
   m_bg(sm->getThemePathFile("score_window.svg")),
   m_scoreBar(sm->getThemePathFile("score_bar_bg.svg"), sm->getThemePathFile("score_bar_fg.svg"), ProgressBar::VERTICAL, 0.0, 0.0, false),
   m_score_text(sm->getThemePathFile("score_txt.svg")),
   m_score_rank(sm->getThemePathFile("score_rank.svg")),
   m_players(e.getPlayers())
 {
+	m_pos.setTarget(0.0);
 	unsigned int topScore = 0;
 	e.kill(); // kill the engine thread (to avoid consuming memory)
 	for (std::list<Player>::iterator p = m_players.begin(); p != m_players.end();) {
@@ -241,6 +243,8 @@ ScoreWindow::ScoreWindow(ScreenManager const* sm, Engine& e):
 }
 
 void ScoreWindow::draw() {
+	glPushMatrix();
+	glTranslatef(0.0, m_pos.get(), 0.0);
 	m_bg.draw();
 	const double spacing = 0.1 + 0.1 / m_players.size();
 	unsigned i = 0;
@@ -257,5 +261,6 @@ void ScoreWindow::draw() {
 		glColor3f(1.0f, 1.0f, 1.0f);
 	}
 	m_score_rank.draw(m_rank);
+	glPopMatrix();
 }
 

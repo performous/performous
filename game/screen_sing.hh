@@ -23,6 +23,7 @@ class ScoreWindow {
 	void draw();
 
   private:
+	AnimValue m_pos;
 	Surface m_bg;
 	ProgressBar m_scoreBar;
 	SvgTxtThemeSimple m_score_text;
@@ -34,8 +35,8 @@ class ScoreWindow {
 /// handles songlyrics
 class LyricRow {
   public:
-	AnimValue extraspacing, ///< extraspacing for lyrics
-	          fade; ///< fade
+	AnimValue extraspacing; ///< extraspacing for lyrics (used when the previous line is removed)
+	AnimValue fade; ///< fade
 	/// iterator
 	typedef Notes::const_iterator Iterator;
 	/// constructor
