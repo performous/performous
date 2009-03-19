@@ -17,6 +17,7 @@ class SongParser {
 	  m_relative(),
 	  m_gap(),
 	  m_bpm(),
+	  m_prevtime(),
 	  m_prevts(),
 	  m_relativeShift(),
 	  m_maxScore()
@@ -99,6 +100,7 @@ class SongParser {
 		else if (key == "BPM") assign(m_bpm, value);
 		return true;
 	}
+	double m_prevtime;
 	unsigned int m_prevts;
 	unsigned int m_relativeShift;
 	double m_maxScore;
@@ -161,10 +163,8 @@ class SongParser {
 		n.begin = tsTime(ts);
 		Notes& notes = m_song.notes;
 		if (m_relative && m_song.notes.empty()) m_relativeShift = ts;
-		if (notes.empty() && n.type == Note::SLEEP) throw std::runtime_error("Song cannot begin with sleep");
 		m_prevts = ts;
-		double prevtime = notes.empty() ? 0.0 : notes.back().end;
-		if (n.begin < prevtime) {
+		if (n.begin < m_prevtime) {
 			// Oh no, overlapping notes (b0rked file)
 			// Can't do this because too many songs are b0rked: throw std::runtime_error("Note overlaps with previous note");
 			if (notes.size() >= 1) {
@@ -181,12 +181,17 @@ class SongParser {
 				else throw std::runtime_error("Note overlaps with earlier notes");
 			} else throw std::runtime_error("The first note has negative timestamp");
 		}
+		double prevtime = m_prevtime;
+		m_prevtime = n.end;
 		if (n.type != Note::SLEEP && n.end > n.begin) {
 			m_song.noteMin = std::min(m_song.noteMin, n.note);
 			m_song.noteMax = std::max(m_song.noteMax, n.note);
 			m_maxScore += n.maxScore();
 		}
-		if (n.type == Note::SLEEP) n.begin = n.end = notes.back().end; // Normalize sleep notes
+		if (n.type == Note::SLEEP) {
+			if (notes.empty()) return true; // Ignore sleeps at song beginning
+			n.begin = n.end = prevtime; // Normalize sleep notes
+		}
 		notes.push_back(n);
 		return true;
 	}

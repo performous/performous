@@ -9,4 +9,4 @@ Text rendering (all parts optional for this release)
 
 Configuration
 - New config menu (several items visible at once, etc)
-- Need to convert "~" in paths into what getenv("$HOME") gives
+
