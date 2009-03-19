@@ -80,10 +80,6 @@ class ScreenSing: public Screen {
 	void exit();
 	void manageEvent(SDL_Event event);
 	void draw();
-	/// current status of song
-	enum SongStatus { NORMAL, INSTRUMENTAL_BREAK, FINISHED };
-	/// get songstatus
-	SongStatus songStatus() const;
 
   private:
 	Audio& m_audio;

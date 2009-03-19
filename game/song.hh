@@ -32,6 +32,9 @@ class Song: boost::noncopyable {
 	std::string str() const { return title + "  by  " + artist; }
 	/** Get full song information (used by the search function). **/
 	std::string strFull() const { return title + "\n" + artist + "\n" + genre + "\n" + edition + "\n" + path; }
+	enum Status { NORMAL, INSTRUMENTAL_BREAK, FINISHED };
+	/** Get the song status at a given timestamp **/
+	Status status(double time) const;
 	int randomIdx; ///< sorting index used for random order
 	Notes notes; ///< notes for song
 	int noteMin, ///< lowest note

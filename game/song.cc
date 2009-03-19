@@ -186,6 +186,7 @@ class SongParser {
 			m_song.noteMax = std::max(m_song.noteMax, n.note);
 			m_maxScore += n.maxScore();
 		}
+		if (n.type == Note::SLEEP) n.begin = n.end = notes.back().end; // Normalize sleep notes
 		notes.push_back(n);
 		return true;
 	}
@@ -238,5 +239,16 @@ std::string Song::collate(std::string const& str) {
 	}
 	return ustr2;
 	// Should use ustr2.casefold_collate_key() instead of tolower, but it seems to be crashing...
+}
+
+namespace {
+	bool noteEndLessThan(Note const& n, double time) { return n.end < time; }
+}
+
+Song::Status Song::status(double time) const {
+	Notes::const_iterator it = std::lower_bound(notes.begin(), notes.end(), time, noteEndLessThan);
+	if (it == notes.end()) return FINISHED;
+	if (it->begin > time + 4.0) return INSTRUMENTAL_BREAK;
+	return NORMAL;
 }
 

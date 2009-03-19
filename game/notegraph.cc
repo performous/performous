@@ -7,7 +7,7 @@ NoteGraph::NoteGraph(Song const& song):
   m_notebar("notebar.svg"), m_notebar_hl("notebar.png"),
   m_notebarfs("notebarfs.svg"), m_notebarfs_hl("notebarfs-hl.png"),
   m_notebargold("notebargold.svg"), m_notebargold_hl("notebargold.png"),
-  m_notealpha(0.0f), m_nlTop(0.0, 4.0), m_nlBottom(0.0, 4.0)
+  m_notealpha(0.0f), m_nlTop(0.0, 4.0), m_nlBottom(0.0, 4.0), m_time()
 {
 	m_nlTop.setTarget(m_song.noteMax, true);
 	m_nlBottom.setTarget(m_song.noteMin, true);
@@ -46,6 +46,7 @@ const double baseLine = -0.2;
 const double pixUnit = 0.2;
 
 void NoteGraph::draw(double time, std::list<Player> const& players) {
+	if (time < m_time) reset();
 	m_time = time;
 	// Update m_songit (which note to start the rendering from)
 	while (m_songit != m_song.notes.end() && (m_songit->type == Note::SLEEP || m_songit->end < time - (baseLine + 0.5) / pixUnit)) ++m_songit;

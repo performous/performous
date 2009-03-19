@@ -13,13 +13,6 @@ namespace {
 	static const double QUIT_TIMEOUT = 20.0; // Return to songs screen after 20 seconds in score screen
 }
 
-ScreenSing::SongStatus ScreenSing::songStatus() const {
-	Song& song = m_songs.current();
-	// FIXME: if (m_songit == song.notes.end()) return FINISHED;
-	if (m_lyrics.empty() && m_lyricit != song.notes.end()) return INSTRUMENTAL_BREAK;
-	return NORMAL;
-}
-
 void ScreenSing::enter() {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	Song& song = m_songs.current();
@@ -63,11 +56,13 @@ void ScreenSing::exit() {
 
 void ScreenSing::manageEvent(SDL_Event event) {
 	if (event.type == SDL_KEYDOWN) {
+		double time = m_audio.getPosition();
+		Song::Status status = m_songs.current().status(time);
 		m_quitTimer.setValue(QUIT_TIMEOUT);
 		bool seekback = false;
 		ScreenManager* sm = ScreenManager::getSingletonPtr();
 		int key = event.key.keysym.sym;
-		if (key == SDLK_ESCAPE || key == SDLK_q || (key == SDLK_RETURN && songStatus() == FINISHED)) {
+		if (key == SDLK_ESCAPE || key == SDLK_q || (key == SDLK_RETURN && status == Song::FINISHED)) {
 			// Enter at end of song display score window, except if score window is already displayed
 			if (key != SDLK_RETURN || m_score_window.get()) sm->activateScreen("Songs");
 			else m_score_window.reset(new ScoreWindow(sm, *m_engine));
@@ -75,10 +70,10 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		else if (key == SDLK_SPACE || key == SDLK_PAUSE) m_audio.togglePause();
 		if (m_score_window.get()) return;
 		// The rest are only available when score window is not displayed
-		if (key == SDLK_RETURN && songStatus() == INSTRUMENTAL_BREAK) {
-			double diff = m_lyricit->begin - 3.0 - m_audio.getPosition(); // FIXME: Verify that this didn't get b0rked by Tronic changing songit into lyricit
+		if (key == SDLK_RETURN && status == Song::INSTRUMENTAL_BREAK) {
+			double diff = m_lyricit->begin - 3.0 - time;
 			if (diff > 0.0) m_audio.seek(diff);
-		} // XXX: switch/case
+		}
 		else if (key == SDLK_F4) m_audio.toggleSynth(m_songs.current().notes);
 		else if (key == SDLK_F5) config["audio/video_delay"].f() -= 0.02;
 		else if (key == SDLK_F6) config["audio/video_delay"].f() += 0.02;
@@ -90,16 +85,14 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		else if (key == SDLK_UP) m_audio.seek(30.0);
 		else if (key == SDLK_DOWN) { m_audio.seek(-30.0); seekback = true; }
 		else if (key == SDLK_r && event.key.keysym.mod & KMOD_CTRL) {
-			double pos = m_audio.getPosition();
 			m_songs.current().reload();
 			exit(); enter();
-			m_audio.seek(pos);
+			m_audio.seek(time);
 		}
 		config["audio/video_delay"].f() = clamp(round(config["audio/video_delay"].get_f() * 1000.0) / 1000.0, -0.5, 0.5);
 		if (key == SDLK_F5 || key == SDLK_F6 || key == SDLK_F7 || key == SDLK_F8) std::cout << "AV latency: " << config["audio/video_delay"].get_f() << ", AR latency: " << m_engine->getLatencyAR() << std::endl;
 		// Some things must be reset after seeking backwards
 		if (seekback) {
-			m_noteGraph.reset();
 			m_lyricit = m_songs.current().notes.begin();
 			m_lyrics.clear();
 		}
@@ -194,23 +187,24 @@ void ScreenSing::draw() {
 		}
 	}
 
+	Song::Status status = song.status(time);
+
 	// Compute and draw the timer and the progressbar
 	{
 		m_progress->draw(songPercent);
-		std::string status = (boost::format("%02u:%02u") % (unsigned(time) / 60) % (unsigned(time) % 60)).str();
+		std::string statustxt = (boost::format("%02u:%02u") % (unsigned(time) / 60) % (unsigned(time) % 60)).str();
 		if (!m_score_window.get()) {
-			SongStatus s = songStatus();
-			if (s == INSTRUMENTAL_BREAK) status += "   ENTER to skip instrumental break";
-			if (s == FINISHED) status += "   Remember to wait for grading!";
+			if (status == Song::INSTRUMENTAL_BREAK) statustxt += "   ENTER to skip instrumental break";
+			if (status == Song::FINISHED) statustxt += "   Remember to wait for grading!";
 		}
-		theme->timer->draw(status);
+		theme->timer->draw(statustxt);
 	}
 
 	if (m_score_window.get()) {
 		if (m_quitTimer.get() == 0.0 && !m_audio.isPaused()) { sm->activateScreen("Songs"); return; }
 		m_score_window->draw();
 	}
-	else if (!m_audio.isPlaying() || (/* FIXME m_songit == song.notes.end() &&*/ m_audio.getLength() - time < 3.0)) {
+	else if (!m_audio.isPlaying() || (status == Song::FINISHED && m_audio.getLength() - time < 3.0)) {
 		m_quitTimer.setValue(QUIT_TIMEOUT);
 		m_score_window.reset(new ScoreWindow(sm, *m_engine));
 	}
