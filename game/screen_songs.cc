@@ -69,9 +69,9 @@ void ScreenSongs::draw() {
 	if (m_songs.empty()) {
 		// Format the song information text
 		if (m_search.text.empty()) {
-			oss_song << "no songs found";
-			oss_order << "You can download free songs on\n";
-			oss_order << "http://performous.org";
+			oss_song << "No songs found!";
+			oss_order << "Visit performous.org\n";
+			oss_order << "for free songs";
 		} else {
 			oss_song << "no songs match search";
 			oss_order << m_search.text << '\n';
