@@ -62,10 +62,10 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		bool seekback = false;
 		ScreenManager* sm = ScreenManager::getSingletonPtr();
 		int key = event.key.keysym.sym;
-		if (key == SDLK_ESCAPE || key == SDLK_q || (key == SDLK_RETURN && status == Song::FINISHED)) {
-			// Enter at end of song display score window, except if score window is already displayed
-			if (key != SDLK_RETURN || m_score_window.get()) sm->activateScreen("Songs");
-			else m_score_window.reset(new ScoreWindow(sm, *m_engine));
+		if (key == SDLK_ESCAPE || key == SDLK_q) sm->activateScreen("Songs");
+		else if (key == SDLK_RETURN) {
+			if (m_score_window.get()) sm->activateScreen("Songs");  // Score window visible -> Enter quits
+			else if (status == Song::FINISHED) m_score_window.reset(new ScoreWindow(sm, *m_engine)); // Song finished, but no score window -> show it
 		}
 		else if (key == SDLK_SPACE || key == SDLK_PAUSE) m_audio.togglePause();
 		if (m_score_window.get()) return;
