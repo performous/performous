@@ -243,7 +243,7 @@ ScoreWindow::ScoreWindow(ScreenManager const* sm, Engine& e):
 }
 
 void ScoreWindow::draw() {
-	glPushMatrix();
+	struct PushMatrixBlock { PushMatrixBlock() { glPushMatrix(); } ~PushMatrixBlock() { glPopMatrix(); } } b;
 	glTranslatef(0.0, m_pos.get(), 0.0);
 	m_bg.draw();
 	const double spacing = 0.1 + 0.1 / m_players.size();
@@ -261,6 +261,5 @@ void ScoreWindow::draw() {
 		glColor3f(1.0f, 1.0f, 1.0f);
 	}
 	m_score_rank.draw(m_rank);
-	glPopMatrix();
 }
 
