@@ -6,6 +6,7 @@
 #include <boost/bind.hpp>
 #include <stdexcept>
 #include <vector>
+#include <sstream>
 
 float Dimensions::screenY() const {
 	switch (m_screenAnchor) {
