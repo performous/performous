@@ -12,6 +12,7 @@
 #include <audio.hpp>
 
 
+/// audiosamples for songfiles
 struct AudioSample {
 	/// sample rate
 	double srate;
@@ -33,9 +34,14 @@ struct AudioSample {
 		}
 		std:: cout << "Loading sample " << filename << " done (size: " << sample.size() << ")" << std::endl;
 	}
+	/// resets audio position
 	void reset_position() {
 		offset = 0;
 	}
+	/** plays and mixes samples
+	 * @param outbuf output buffer
+	 * @param maxSamples maximum number of samples
+	 */
 	template <typename RndIt> void playmix(RndIt outbuf, unsigned int maxSamples) {
 		if( offset >= sample.size() ) {
 			// we are at the end, nothing to do
@@ -109,6 +115,7 @@ class Audio {
 	/** Play a song from the beginning
 	 * @param filename the track filename
 	 * @param preview if the song preview is to play
+	 * @param fadeTime time to fade
 	 */
 	void playMusic(std::string const& filename, bool preview = false, double fadeTime = 0.1);
 	/** Play a preview of the song, starting at 30 seconds
@@ -140,6 +147,7 @@ class Audio {
 	void togglePause() { m_paused = !m_paused; }
 	/// toggles synth playback (F4)
 	void toggleSynth(Notes const& notes) { m_notes = (m_notes ? NULL : &notes); }
+	/// if necessary loads and plays a sample
 	void playSample(std::string filename);
 
   private:

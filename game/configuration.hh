@@ -125,6 +125,7 @@ class Configuration {
 	virtual std::string getValue() const = 0;
 };
 
+/// a single configuration item
 class ConfigurationItem : public Configuration {
   public:
 	/// constructor

@@ -8,13 +8,22 @@
 
 class Song;
 
+/// handles drawing of notes and waves
 class NoteGraph {
   public:
+	/// constructor
 	NoteGraph(Song const& song);
+	/// resets NoteGraph and Notes
 	void reset();
+	/** draws NoteGraph (notelines, notes, waves)
+	 * @param time at which time to draw
+	 * @param players reference to the list of singing Players
+	 */
 	void draw(double time, std::list<Player> const& players);
   private:
+	/// draw notebars
 	void drawNotes();
+	/// draw waves (what players are singing)
 	void drawWaves(std::list<Player> const& players);
 	Song const& m_song;
 	Texture m_notelines;
