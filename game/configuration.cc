@@ -293,7 +293,7 @@ void readConfigfile( const std::string &_configfile )
 		}
 	}
 
-	std::cout << "Openning default configuration file \"" << schemafile << "\"" << std::endl;
+	std::cout << "Opening default configuration file \"" << schemafile << "\"" << std::endl;
 	domParser.parse_file(schemafile);
 	n = domParser.get_document()->get_root_node()->find("/performous/entry");
 	for (xmlpp::NodeSet::const_iterator it = n.begin(), end = n.end(); it != end; ++it) {
@@ -313,7 +313,7 @@ void readConfigfile( const std::string &_configfile )
 	std::cout << "Found " << config.size() << " default configuration items" << std::endl;
 
 	std::string globalConfigFile("/etc/xdg/performous/performous.xml");
-	std::cout << "Openning global configuration file \"" << globalConfigFile << "\"" << std::endl;
+	std::cout << "Opening global configuration file \"" << globalConfigFile << "\"" << std::endl;
 	if( !boost::filesystem::exists(globalConfigFile) ) {
 		std::cout << "  Cannot open global configuration file" << std::endl;
 	} else {
@@ -328,22 +328,22 @@ void readConfigfile( const std::string &_configfile )
 					std::cout << "  name or type attribute is missing or empty" << std::endl;
 					continue;
 				}
-		
+
 				if( config.find(name) == config.end() ) {
 					std::cout << "  Cannot find \"" << name << "\" key inside default config file, discarding" << std::endl;
 					continue;
 				}
-		
+
 				ConfigItem item = config.find(name)->second;
 				assignConfigItem(item, type, elem );
 				config[name] = item;
-		
+
 			}
 		} catch( ... ) {
 		}
 	}
 
-	std::cout << "Openning user configuration file \"" << _configfile << "\"" << std::endl;
+	std::cout << "Opening user configuration file \"" << _configfile << "\"" << std::endl;
 	if( !boost::filesystem::exists(_configfile) ) {
 		std::cout << "  Cannot open user configuration file (using defaults)" << std::endl;
 		return;
@@ -359,16 +359,16 @@ void readConfigfile( const std::string &_configfile )
 				std::cout << "  name or type attribute is missing or empty" << std::endl;
 				continue;
 			}
-	
+
 			if( config.find(name) == config.end() ) {
 				std::cout << "  Cannot find \"" << name << "\" key inside default config file, discarding" << std::endl;
 				continue;
 			}
-	
+
 			ConfigItem item = config.find(name)->second;
 			assignConfigItem(item, type, elem );
 			config[name] = item;
-	
+
 		}
 	} catch( ... ) {
 	}
