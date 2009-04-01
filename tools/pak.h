@@ -1,6 +1,7 @@
 #ifndef USNG_PAK_H
 #define USNG_PAK_H
 
+#include <stdint.h>
 #include <string>
 #include <fstream>
 #include <map>
