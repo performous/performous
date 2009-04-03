@@ -20,8 +20,6 @@
 
 namespace fs = boost::filesystem;
 
-SDL_Surface * screenSDL;
-
 volatile bool g_quit = false;
 
 extern "C" void quit(int) {
