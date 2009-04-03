@@ -1,4 +1,5 @@
 #include "surface.hh"
+#include <GL/glu.h>
 
 #include "configuration.hh"
 #include "video_driver.hh"

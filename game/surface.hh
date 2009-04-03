@@ -5,7 +5,7 @@
 #include <string>
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <SDL/SDL_opengl.h>
+#include <GL/gl.h>
 #include <librsvg/rsvg.h>
 #include <librsvg/rsvg-cairo.h>
 #include <cairo.h>
