@@ -133,7 +133,7 @@ void ScreenSing::draw() {
 			if (ar > arMax || (m_video && ar > arMin)) fillBG();  // Fill white background to avoid black borders
 			m_background->draw();
 		} else fillBG();
-		if (m_video) { m_video->render(time - song.videoGap); double tmp = m_video->dimensions().ar(); if (tmp > 0.0) ar = tmp; }
+		if (m_video) { m_video->render(time + song.videoGap); double tmp = m_video->dimensions().ar(); if (tmp > 0.0) ar = tmp; }
 		ar = clamp(ar, arMin, arMax);
 		double offset = 0.5 / ar + 0.2;
 		theme->bg_bottom->dimensions.fixedWidth(1.0).bottom(offset);
