@@ -64,22 +64,30 @@ class SongParser {
 	double m_gap;
 	double m_bpm;
 	void assign(int& var, std::string const& str) {
-		var = boost::lexical_cast<int>(str);
+		try {
+			var = boost::lexical_cast<int>(str);
+		} catch (...) {
+			throw std::runtime_error("\"" + str + "\" is not valid integer value");
+		}
 	}
 	void assign(double& var, std::string str) {
 		std::replace(str.begin(), str.end(), ',', '.'); // Fix decimal separators
-		var = boost::lexical_cast<double>(str);
+		try {
+			var = boost::lexical_cast<double>(str);
+		} catch (...) {
+			throw std::runtime_error("\"" + str + "\" is not valid floating point value");
+		}
 	}
 	void assign(bool& var, std::string const& str) {
 		if (str == "YES" || str == "yes" || str == "1") var = true;
 		else if (str == "NO" || str == "no" || str == "0") var = false;
-		else throw std::logic_error("Invalid boolean value: " + str);
+		else throw std::runtime_error("Invalid boolean value: " + str);
 	}
 	bool parseField(std::string const& line) {
 		if (line.empty()) return true;
 		if (line[0] != '#') return false;
 		std::string::size_type pos = line.find(':');
-		if (pos == std::string::npos) throw std::runtime_error("Invalid format, should be #key=value");
+		if (pos == std::string::npos) throw std::runtime_error("Invalid format, should be #key:value");
 		std::string key = line.substr(1, pos - 1);
 		std::string::size_type pos2 = line.find_last_not_of(" \t\r");
 		std::string value = line.substr(pos + 1, pos2 - pos);
