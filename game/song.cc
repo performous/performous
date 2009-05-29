@@ -1,5 +1,6 @@
 #include "song.hh"
 
+#include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <glibmm/ustring.h>
 #include <glibmm/convert.h>
@@ -88,9 +89,8 @@ class SongParser {
 		if (line[0] != '#') return false;
 		std::string::size_type pos = line.find(':');
 		if (pos == std::string::npos) throw std::runtime_error("Invalid format, should be #key:value");
-		std::string key = line.substr(1, pos - 1);
-		std::string::size_type pos2 = line.find_last_not_of(" \t\r");
-		std::string value = line.substr(pos + 1, pos2 - pos);
+		std::string key = boost::trim_copy(line.substr(1, pos - 1));
+		std::string value = boost::trim_copy(line.substr(pos + 1));
 		if (value.empty()) return true;
 		if (key == "TITLE") m_song.title = value.substr(value.find_first_not_of(" :"));
 		else if (key == "ARTIST") m_song.artist = value.substr(value.find_first_not_of(" "));
