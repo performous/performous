@@ -26,6 +26,8 @@ You may currently access ScreenManager by a singleton, but this is discouraged
 and the singleton is to be removed because singletons are evil (but it is not
 buggy at the moment, so we are not rushing that).
 
+Notes of the song and TXT file parsing are in song.cc/hh.
+
 Most other files either implement little helpers for loading and displaying
 images (surface), playing sound (audio), decoding video/audio (ffmpeg),
 rendering and displaying text (opengl_text), etc.
