@@ -29,6 +29,8 @@ struct Player {
 	typedef std::vector<std::pair<double, double> > pitch_t;
 	/// player's pitch
 	pitch_t m_pitch;
+	/// current position in pitch vector (first unused spot)
+	size_t m_pos;
 	/// score for current song
 	double m_score;
 	/// activity timer
@@ -36,7 +38,7 @@ struct Player {
 	/// score iterator
 	Notes::const_iterator m_scoreIt;
 	/// constructor
-	Player(Song& song, Analyzer& analyzer): m_song(song), m_analyzer(analyzer), m_score(), m_activitytimer() {}
+	Player(Song& song, Analyzer& analyzer, size_t frames): m_song(song), m_analyzer(analyzer), m_pitch(frames), m_pos(), m_score(), m_activitytimer(), m_scoreIt(m_song.notes.begin()) {}
 	/// prepares analyzer
 	void prepare() { m_analyzer.process(); }
 	/// updates player stats
@@ -68,7 +70,6 @@ class Engine {
 	volatile double m_latencyAR;  // Audio roundtrip latency (don't confuse with latencyAV)
 	size_t m_time;
 	volatile bool m_quit;
-	mutable boost::mutex m_mutex;
 	boost::scoped_ptr<boost::thread> m_thread;
 
   public:
@@ -84,7 +85,8 @@ class Engine {
 	template <typename FwdIt> Engine(Audio& audio, Song& song, FwdIt anBegin, FwdIt anEnd):
 	  m_audio(audio), m_song(song), m_latencyAR(config["audio/round-trip"].get_f()), m_time(), m_quit()
 	{
-		while (anBegin != anEnd) m_players.push_back(Player(song, *anBegin++));
+		size_t frames = m_audio.getLength() / Engine::TIMESTEP;
+		while (anBegin != anEnd) m_players.push_back(Player(song, *anBegin++, frames));
 		size_t player = 0;
 		for (std::list<Player>::iterator it = m_players.begin(); it != m_players.end(); ++it, ++player) it->m_color = playerColors[player % playerColorsSize];
 		m_thread.reset(new boost::thread(boost::ref(*this)));
@@ -103,16 +105,14 @@ class Engine {
 			double t = m_audio.getPosition() - m_latencyAR;
 			double timeLeft = m_time * TIMESTEP - t;
 			if (timeLeft > 0.0) { boost::thread::sleep(now() + std::min(TIMESTEP, timeLeft)); continue; }
-			boost::mutex::scoped_lock l(m_mutex);
 			for (Notes::const_iterator it = m_song.notes.begin(); it != m_song.notes.end(); ++it) it->power = 0.0f;
 			std::for_each(m_players.begin(), m_players.end(), boost::bind(&Player::update, _1));
 			++m_time;
 		}
 	}
 	/// gets list of players currently plugged in
-	std::list<Player> getPlayers() const {
-		boost::thread::yield(); // Try to let engine perform its run right before getting the data
-		boost::mutex::scoped_lock l(m_mutex);
+	std::list<Player> const& getPlayers() const {
+		// XXX: Technically this code is incorrect because it returns a reference to a structure that is being at the same modified by another thread (and nothing's even marked volatile). This is done in order to improve performance.
 		return m_players;
 	}
 };

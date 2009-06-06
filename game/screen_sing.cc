@@ -85,8 +85,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		else if (key == SDLK_UP) m_audio.seek(30.0);
 		else if (key == SDLK_DOWN) { m_audio.seek(-30.0); seekback = true; }
 		else if (key == SDLK_r && event.key.keysym.mod & KMOD_CTRL) {
-			m_songs.current().reload();
-			exit(); enter();
+			exit(); m_songs.current().reload(); enter();
 			m_audio.seek(time);
 		}
 		config["audio/video_delay"].f() = clamp(round(config["audio/video_delay"].get_f() * 1000.0) / 1000.0, -0.5, 0.5);
@@ -142,7 +141,7 @@ void ScreenSing::draw() {
 		theme->bg_top->draw();
 	}
 
-	std::list<Player> players = m_engine->getPlayers();
+	std::list<Player> const& players = m_engine->getPlayers();
 	m_noteGraph->draw(time, players); // Draw notes and pitch waves
 
 	// Score display
