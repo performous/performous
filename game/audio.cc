@@ -71,14 +71,14 @@ void Audio::setVolume_internal(unsigned int volume) {
 	s.volume = std::pow(10.0, (volume - 100.0) / 100.0 * 2.0);
 }
 
-void Audio::playMusic(std::string const& filename, bool preview, double fadeTime) {
+void Audio::playMusic(std::string const& filename, bool preview, double fadeTime, double startPos) {
 	if (!isOpen()) return;
 	// First construct the new stream
 	std::auto_ptr<Stream> s;
 	try {
 		s.reset(new Stream(filename, m_rs.rate()));
 		s->fadein(fadeTime);
-		if (preview) s->mpeg.seek(30.0, false);
+		if (startPos != 0.0) s->mpeg.seek(startPos, false);
 	} catch (std::runtime_error& e) {
 		std::cerr << "Error loading " << filename << " (" << e.what() << ")" << std::endl;
 		return;

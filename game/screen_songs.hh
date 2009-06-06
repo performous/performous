@@ -23,6 +23,7 @@ class ScreenSongs : public Screen {
 	void exit();
 	void manageEvent(SDL_Event event);
 	void draw();
+	void drawJukebox();
 
   private:
 	Audio& m_audio;
@@ -36,6 +37,7 @@ class ScreenSongs : public Screen {
 	TextInput m_search;
 	boost::scoped_ptr<Surface> m_emptyCover;
 	Cachemap<std::string, Surface> m_covers;
+	bool m_jukebox;
 };
 
 #endif
