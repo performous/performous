@@ -130,7 +130,7 @@ void NoteGraph::drawNotes() {
 
 void NoteGraph::drawWaves(std::list<Player> const& players) {
 	UseTexture tblock(m_wave);
-	
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	for (std::list<Player>::const_iterator p = players.begin(); p != players.end(); ++p) {
 		glColor4f(p->m_color.r, p->m_color.g, p->m_color.b, m_notealpha);
 		float const texOffset = 2.0 * m_time; // Offset for animating the wave texture
@@ -183,5 +183,6 @@ void NoteGraph::drawWaves(std::list<Player> const& players) {
 		}
 	}
 	glColor3f(1.0, 1.0, 1.0);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
