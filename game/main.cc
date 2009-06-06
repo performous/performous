@@ -239,14 +239,14 @@ int main(int argc, char** argv) {
 		for (std::vector<std::string>::const_iterator it = ac.begin(); it != ac.end(); ++it) {
 			mics.push_back(*it);
 		}
-		mics.push_back(""); // Anything goes
+		// No default devices for mics because that might cause unwanted extra mics
 	}
 	if( pdevs.empty() ) {
 		std::vector<std::string> ap = config["audio/playback"].get_sl();
 		for (std::vector<std::string>::const_iterator it = ap.begin(); it != ap.end(); ++it) {
 			pdevs.push_back(*it);
 		}
-		pdevs.push_back(""); // Anything goes
+		pdevs.push_back(""); // Anything goes (fallback if everything else failed)
 	}
 	try {
 		Capture capture;
