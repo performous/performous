@@ -2,6 +2,8 @@
 
 #include "screen.hh"
 #include <boost/bind.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
 #include <libxml++/libxml++.h>
@@ -222,12 +224,28 @@ void Songs::sort_internal() {
 }
 
 namespace {
+	namespace fs = boost::filesystem;
+
+	void dumpCover(xmlpp::Element* song, Song const& s, size_t num) {
+		try {
+			std::string ext = s.cover.substr(s.cover.rfind('.'));
+			fs::path cover = s.path + s.cover;
+			if (fs::exists(cover)) {
+				std::string coverlink = "covers/" + (boost::format("%|04|") % num).str() + ext;
+				if (fs::is_symlink(coverlink)) fs::remove(coverlink);
+				create_symlink(cover, coverlink);
+				song->add_child("cover")->set_child_text(coverlink);
+			}
+		} catch (std::exception& e) {
+			std::cerr << "Songlist error handling cover image: " << e.what() << std::endl;
+		}
+	}
 	template <typename SongVector> void dumpXML(SongVector const& svec, std::string const& filename) {
 		xmlpp::Document doc;
 		xmlpp::Element* songlist = doc.create_root_node("songlist");
 		songlist->set_attribute("size", boost::lexical_cast<std::string>(svec.size()));
 		for (size_t i = 0; i < svec.size(); ++i) {
-			Song& s = *svec[i];
+			Song const& s = *svec[i];
 			xmlpp::Element* song = songlist->add_child("song");
 			song->set_attribute("num", boost::lexical_cast<std::string>(i + 1));
 			xmlpp::Element* collate = song->add_child("collate");
@@ -235,7 +253,7 @@ namespace {
 			collate->add_child("title")->set_child_text(s.collateByTitle);
 			song->add_child("artist")->set_child_text(s.artist);
 			song->add_child("title")->set_child_text(s.title);
-			if (!s.cover.empty()) song->add_child("cover")->set_child_text(s.path + s.cover);
+			if (!s.cover.empty()) dumpCover(song, s, i + 1);
 		}
 		doc.write_to_file_formatted(filename);
 	}
@@ -243,7 +261,10 @@ namespace {
 
 void Songs::dumpSongs_internal() const {
 	if (m_songlist.empty()) return;
-	SongVector s = m_songs;
-	std::sort(s.begin(), s.end(), comparator(&Song::collateByArtist)); dumpXML(s, m_songlist + "/songlist.xml");
+	SongVector svec = m_songs;
+	std::sort(svec.begin(), svec.end(), comparator(&Song::collateByArtist));
+	fs::path coverpath = fs::path(m_songlist) / "covers";
+	fs::create_directory(coverpath);
+	dumpXML(svec, m_songlist + "/songlist.xml");
 }
 
