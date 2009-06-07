@@ -246,6 +246,8 @@ void Song::collateUpdate() {
 
 std::string Song::collate(std::string const& str) {
 	Glib::ustring ustr = str, ustr2;
+	if (ustr.substr(0, 4) == "The ") ustr = ustr.substr(4) + "the";
+	if (ustr.substr(0, 2) == "A ") ustr = ustr.substr(2) + "a";	
 	// Remove all non-alnum characters
 	for (Glib::ustring::iterator it = ustr.begin(), end = ustr.end(); it != end; ++it) {
 		if (Glib::Unicode::isalnum(*it)) ustr2 += Glib::Unicode::tolower(*it);
