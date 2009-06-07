@@ -111,10 +111,10 @@ void ScreenSongs::draw() {
 		oss_song << song.title << '\n' << song.artist;
 		oss_order << (m_search.text.empty() ? m_songs.sortDesc() : m_search.text) << '\n';
 		oss_order << "(" << m_songs.currentId() + 1 << "/" << m_songs.size() << ")";
+		double spos = m_songs.currentPosition(); // This needs to be polled to run the animation
 		if (!m_jukebox) {
 			// Draw the covers
 			std::size_t ss = m_songs.size();
-			double spos = m_songs.currentPosition();
 			int baseidx = spos + 1.5; --baseidx; // Round correctly
 			double shift = spos - baseidx;
 			for (int i = -2; i < 5; ++i) {
