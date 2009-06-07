@@ -2,6 +2,7 @@
 
 #include "screen.hh"
 #include <boost/bind.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
 #include <libxml++/libxml++.h>
 // #include <tr1/random>
@@ -221,21 +222,20 @@ void Songs::sort_internal() {
 }
 
 namespace {
-	template <typename SongVector> void dumpXML(SongVector const& s, std::string const& title, std::string const& filename) {
+	template <typename SongVector> void dumpXML(SongVector const& svec, std::string const& filename) {
 		xmlpp::Document doc;
-		doc.set_internal_subset("html", "-//W3C//DTD XHTML 1.1//EN", "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd");
-		xmlpp::Element* html = doc.create_root_node("html", "http://www.w3.org/1999/xhtml");
-		xmlpp::Element* head = html->add_child("head");
-		head->add_child("title")->set_child_text(title);
-		xmlpp::Element* body = html->add_child("body");
-		xmlpp::Element* table = body->add_child("table");
-		xmlpp::Element* headtr = table->add_child("tr");
-		headtr->add_child("th")->set_child_text("Artist");
-		headtr->add_child("th")->set_child_text("Title");
-		for (typename SongVector::const_iterator it = s.begin(); it != s.end(); ++it) {
-			xmlpp::Element* tr = table->add_child("tr");
-			tr->add_child("td")->set_child_text((*it)->artist);
-			tr->add_child("td")->set_child_text((*it)->title);
+		xmlpp::Element* songlist = doc.create_root_node("songlist");
+		songlist->set_attribute("size", boost::lexical_cast<std::string>(svec.size()));
+		for (size_t i = 0; i < svec.size(); ++i) {
+			Song& s = *svec[i];
+			xmlpp::Element* song = songlist->add_child("song");
+			song->set_attribute("num", boost::lexical_cast<std::string>(i + 1));
+			xmlpp::Element* collate = song->add_child("collate");
+			collate->add_child("artist")->set_child_text(s.collateByArtist);
+			collate->add_child("title")->set_child_text(s.collateByTitle);
+			song->add_child("artist")->set_child_text(s.artist);
+			song->add_child("title")->set_child_text(s.title);
+			if (!s.cover.empty()) song->add_child("cover")->set_child_text(s.path + s.cover);
 		}
 		doc.write_to_file_formatted(filename);
 	}
@@ -244,7 +244,6 @@ namespace {
 void Songs::dumpSongs_internal() const {
 	if (m_songlist.empty()) return;
 	SongVector s = m_songs;
-	std::sort(s.begin(), s.end(), comparator(&Song::collateByTitle)); dumpXML(s, "Songlist by song name", m_songlist + "/songs-by-title.xhtml");
-	std::sort(s.begin(), s.end(), comparator(&Song::collateByArtist)); dumpXML(s, "Songlist by artist", m_songlist + "/songs-by-artist.xhtml");
+	std::sort(s.begin(), s.end(), comparator(&Song::collateByArtist)); dumpXML(s, m_songlist + "/songlist.xml");
 }
 
