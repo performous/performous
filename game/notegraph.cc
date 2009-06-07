@@ -130,8 +130,10 @@ void NoteGraph::drawNotes() {
 
 namespace {
 	struct Point {
-		float tx, ty;
-		float vx, vy;
+		float tx;
+		float ty;
+		float vx;
+		float vy;
 		Point(float tx_, float ty_, float vx_, float vy_): tx(tx_), ty(ty_), vx(vx_), vy(vy_) {}
 	};
 	
@@ -147,12 +149,14 @@ namespace {
 				p.vy = 0.5f * (p.vy + points[s-1].vy);
 			}
 			points.pop_back();
-			glBegin(GL_TRIANGLE_STRIP);
-			for (Points::const_iterator it = points.begin(); it != points.end(); ++it) {
-				glTexCoord2f(it->tx, it->ty);
-				glVertex2f(it->vx, it->vy);
-			}
-			glEnd();
+			// Render them as a triangle stripe
+			glEnableClientState(GL_VERTEX_ARRAY);
+			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+			glTexCoordPointer(2, GL_FLOAT, sizeof(Point), &points.front().tx);
+			glVertexPointer(2, GL_FLOAT, sizeof(Point), &points.front().vx);
+			glDrawArrays(GL_TRIANGLE_STRIP, 0, points.size());
+			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+			glDisableClientState(GL_VERTEX_ARRAY);
 		}
 		points.clear();
 	}
@@ -160,7 +164,7 @@ namespace {
 
 void NoteGraph::drawWaves(std::list<Player> const& players) {
 	UseTexture tblock(m_wave);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	for (std::list<Player>::const_iterator p = players.begin(); p != players.end(); ++p) {
 		glColor4f(p->m_color.r, p->m_color.g, p->m_color.b, m_notealpha);
 		float const texOffset = 2.0 * m_time; // Offset for animating the wave texture
@@ -213,6 +217,6 @@ void NoteGraph::drawWaves(std::list<Player> const& players) {
 		strip(points);
 	}
 	glColor3f(1.0, 1.0, 1.0);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
