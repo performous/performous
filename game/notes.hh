@@ -42,8 +42,10 @@ struct Note {
 	int note;
 	/// lyrics syllable for that note
 	std::string syllable;
-	/// difference to no
-	double diff(double n) const;
+	/// Difference of n from note
+	double diff(double n) const { return diff(note, n); }
+	/// Difference of n from note, so that note + diff(note, n) is n (mod 12)
+	static double diff(double note, double n);
 	/// maximum score
 	double maxScore() const;
 	/// score when singing

@@ -128,6 +128,36 @@ void NoteGraph::drawNotes() {
 	}
 }
 
+namespace {
+	struct Point {
+		float tx, ty;
+		float vx, vy;
+		Point(float tx_, float ty_, float vx_, float vy_): tx(tx_), ty(ty_), vx(vx_), vy(vy_) {}
+	};
+	
+	typedef std::vector<Point> Points;
+	
+	void strip(Points& points) {
+		size_t s = points.size();
+		if (s > 3) {
+			// Combine the two last points into a terminating point
+			{
+				Point& p = points[s-2];
+				p.ty = 0.5f;
+				p.vy = 0.5f * (p.vy + points[s-1].vy);
+			}
+			points.pop_back();
+			glBegin(GL_TRIANGLE_STRIP);
+			for (Points::const_iterator it = points.begin(); it != points.end(); ++it) {
+				glTexCoord2f(it->tx, it->ty);
+				glVertex2f(it->vx, it->vy);
+			}
+			glEnd();
+		}
+		points.clear();
+	}
+}
+
 void NoteGraph::drawWaves(std::list<Player> const& players) {
 	UseTexture tblock(m_wave);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
@@ -136,51 +166,51 @@ void NoteGraph::drawWaves(std::list<Player> const& players) {
 		float const texOffset = 2.0 * m_time; // Offset for animating the wave texture
 		Player::pitch_t const& pitch = p->m_pitch;
 		size_t const beginIdx = std::max(0.0, m_time - 0.5 / pixUnit) / Engine::TIMESTEP; // At which pitch idx to start displaying the wave
-		size_t const endIdx = pitch.size();
-		double oldval = getNaN();
+		size_t const endIdx = p->m_pos;
 		size_t idx = beginIdx;
 		// Go back until silence (NaN freq) to allow proper wave phase to be calculated
 		if (beginIdx < endIdx) while (idx > 0 && pitch[idx].first == pitch[idx].first) --idx;
 		// Start processing
 		float tex = texOffset;
 		double t = idx * Engine::TIMESTEP;
-
+		double oldval = getNaN();
+		Points points;
+		Notes::const_iterator noteIt = m_song.notes.begin();
 		for (; idx < endIdx; ++idx, t += Engine::TIMESTEP) {
 			double const freq = pitch[idx].first;
 			// If freq is NaN, we have nothing to process
-			if (freq != freq) { tex = texOffset; oldval = getNaN(); continue; }
-			tex = tex + freq * 0.001; // Wave phase (texture coordinate)
+			if (freq != freq) { oldval = getNaN(); tex = texOffset; continue; }
+			tex += freq * 0.001; // Wave phase (texture coordinate)
 			if (idx < beginIdx) continue; // Skip graphics rendering if out of screen
-			bool prev = idx > beginIdx && pitch[idx - 1].first > 0.0;
-			bool next = idx < endIdx - 1 && pitch[idx + 1].first > 0.0;
-			// If neither previous or next frames have proper frequency, ignore this one too
-			if (!prev && !next) { oldval = getNaN(); continue; }
 			double x = -0.2 + (t - m_time) * pixUnit;
-			// Find the currently playing note or the next playing note (or the last note?)
-			std::size_t i = 0;
-			while (i < m_song.notes.size() && t > m_song.notes[i].end) ++i;
-			Note const& n = m_song.notes[i];
-			double diff = n.diff(m_song.scale.getNote(freq));
-			double val = n.note + diff;
+			// Find the currently active note(s)
+			while (noteIt != m_song.notes.end() && (noteIt->type == Note::SLEEP || t > noteIt->end)) ++noteIt;
+			Notes::const_iterator notePrev = noteIt;
+			while (notePrev != m_song.notes.begin() && (notePrev->type == Note::SLEEP || t < notePrev->begin)) --notePrev;
+			bool hasNote = (noteIt != m_song.notes.end());
+			bool hasPrev = (notePrev->type != Note::SLEEP && t >= notePrev->begin);
+			double val;
+			if (hasNote && hasPrev) val = 0.5 * (noteIt->note + notePrev->note);
+			else if (hasNote) val = noteIt->note;
+			else val = notePrev->note;
+			// Now val contains the active note value. The following calculates note value for current freq:
+			val += Note::diff(val, m_song.scale.getNote(freq));
+			// Graphics positioning & animation:
 			double y = m_baseY + val * m_noteUnit;
 			double thickness = clamp(1.0 + pitch[idx].second / 60.0) + 0.5;
 			thickness *= 1.0 + 0.2 * std::sin(tex - 2.0 * texOffset); // Further animation :)
 			thickness *= -m_noteUnit;
-			// If pitch change is too fast, terminate and begin a new one
-			if (prev && std::abs(oldval - val) > 1.0) {
-				glEnd();
-				prev = false;
+			// If there has been a break or if the pitch change is too fast, terminate and begin a new one
+			if (oldval != oldval || std::abs(oldval - val) > 1) strip(points);
+			// Add a point or a pair of points
+			if (points.empty()) points.push_back(Point(tex, 0.5f, x, y));
+			else {
+				points.push_back(Point(tex, 0.0f, x, y - thickness));
+				points.push_back(Point(tex, 1.0f, x, y + thickness));
 			}
-			if (!prev) glBegin(GL_TRIANGLE_STRIP);
-			if (prev && next) {
-				glTexCoord2f(tex, 0.0f); glVertex2f(x, y - thickness);
-				glTexCoord2f(tex, 1.0f); glVertex2f(x, y + thickness);
-			} else {
-				glTexCoord2f(tex, 0.0f); glVertex2f(x, y);
-			}
-			if (!next) glEnd();
 			oldval = val;
 		}
+		strip(points);
 	}
 	glColor3f(1.0, 1.0, 1.0);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
