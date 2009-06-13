@@ -1,57 +1,63 @@
 <?xml version="1.0"?>
 <performous>
 	<!-- Graphic preferences -->
-        <entry name="graphic/width" type="int" value="800">
+	<entry name="graphic/width" type="int" value="800">
 		<locale name="C">
 			<short>Windowed width</short>
 			<long></long>
 		</locale>
 	</entry>
-        <entry name="graphic/height" type="int" value="600">
+	<entry name="graphic/height" type="int" value="600">
 		<locale name="C">
 			<short>Windowed height</short>
 			<long></long>
 		</locale>
 	</entry>
-        <entry name="graphic/fs_width" type="int" value="1024">
+	<entry name="graphic/fs_width" type="int" value="1024">
 		<locale name="C">
 			<short>Fullscreen width</short>
 			<long></long>
 		</locale>
 	</entry>
-        <entry name="graphic/fs_height" type="int" value="768">
+	<entry name="graphic/fs_height" type="int" value="768">
 		<locale name="C">
 			<short>Fullscreen height</short>
 			<long></long>
 		</locale>
 	</entry>
-        <entry name="graphic/fullscreen" type="bool" value="false">
+	<entry name="graphic/fullscreen" type="bool" value="false">
 		<locale name="C">
 			<short>Enable fullsreen</short>
 			<long></long>
 		</locale>
 	</entry>
-        <entry name="graphic/video" type="bool" value="true">
+	<entry name="graphic/video" type="bool" value="true">
 		<locale name="C">
 			<short>Enable video playback</short>
 			<long></long>
 		</locale>
 	</entry>
-        <entry name="graphic/svg_lod" type="float" value="1.0">
+	<entry name="graphic/pitch" type="bool" value="true">
+		<locale name="C">
+			<short>Enable singing pitch display</short>
+			<long></long>
+		</locale>
+	</entry>
+	<entry name="graphic/svg_lod" type="float" value="1.0">
 		<limits min="0.5" max="3.0" step="0.1" />
 		<locale name="C">
 			<short>SVG quality</short>
 			<long>Larger numbers cause vector graphics to be rendered in higher resolution.</long>
 		</locale>
 	</entry>
-        <entry name="graphic/text_lod" type="float" value="1.0">
+	<entry name="graphic/text_lod" type="float" value="1.0">
 		<limits min="0.5" max="3.0" step="0.1" />
 		<locale name="C">
 			<short>Text quality</short>
 			<long>Larger numbers cause text to be rendered in higher resolution.</long>
 		</locale>
 	</entry>
-        <entry name="graphic/fps" type="bool" value="false">
+	<entry name="graphic/fps" type="bool" value="false">
 		<locale name="C">
 			<short>Display FPS</short>
 			<long>Enables a benchmark mode where the framerate limit of 100 FPS is disabled and the game instead renders at full speed. FPS values are printed to console. Please note that the display drivers may still limit the rendering speed to the screen refresh rate.</long>
@@ -59,14 +65,14 @@
 	</entry>
 
 	<!-- Audio preferences -->
-        <entry name="audio/round-trip" type="float" value="0.08">
+	<entry name="audio/round-trip" type="float" value="0.08">
 		<limits min="0.0" max="0.5" step="0.02" />
 		<locale name="C">
 			<short>Audio round-trip latency in seconds</short>
 			<long></long>
 		</locale>
 	</entry>
-        <entry name="audio/video_delay" type="float" value="0.00">
+	<entry name="audio/video_delay" type="float" value="0.00">
 		<limits min="-0.5" max="0.5" step="0.02" />
 		<locale name="C">
 			<short>Audio/video delay in seconds</short>
@@ -90,14 +96,14 @@
 			<long>List of playback devices to try. The first working one will be used.</long>
 		</locale>
 	</entry>
-        <entry name="audio/preview_volume" type="int" value="70">
+	<entry name="audio/preview_volume" type="int" value="70">
 		<limits min="0" max="100" step="5" />
 		<locale name="C">
 			<short>Previex volume</short>
 			<long></long>
 		</locale>
 	</entry>
-        <entry name="audio/music_volume" type="int" value="100">
+	<entry name="audio/music_volume" type="int" value="100">
 		<limits min="0" max="100" step="5" />
 		<locale name="C">
 			<short>Music volume</short>
@@ -106,20 +112,20 @@
 	</entry>
 
 	<!-- Themes preferences -->
-        <entry name="themes/default" type="string">
+	<entry name="themes/default" type="string">
 		<stringvalue>default</stringvalue>
 		<locale name="C">
 			<short>Default theme name</short>
 			<long></long>
 		</locale>
 	</entry>
-        <entry name="themes/override" type="bool" value="false">
+	<entry name="themes/override" type="bool" value="false">
 		<locale name="C">
 			<short>Enable themes directories override</short>
 			<long></long>
 		</locale>
 	</entry>
-        <entry name="themes/path" type="string_list">
+	<entry name="themes/path" type="string_list">
 		<stringvalue>/usr/share/games/performous/themes/</stringvalue>
 		<stringvalue>/usr/local/share/games/performous/themes/</stringvalue>
 		<stringvalue>~/.performous/themes/</stringvalue>
@@ -130,13 +136,13 @@
 	</entry>
 
 	<!-- Songs preferences -->
-        <entry name="songs/override" type="bool" value="false">
+	<entry name="songs/override" type="bool" value="false">
 		<locale name="C">
 			<short>Enable songs directories override</short>
 			<long></long>
 		</locale>
 	</entry>
-        <entry name="songs/path" type="string_list">
+	<entry name="songs/path" type="string_list">
 		<stringvalue>/usr/share/games/ultrastar/songs/</stringvalue>
 		<stringvalue>/usr/local/share/games/ultrastar/songs/</stringvalue>
 		<stringvalue>~/.ultrastar/songs/</stringvalue>
