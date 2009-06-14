@@ -10,20 +10,6 @@
 
 Config config;
 
-template <typename T> ConfigItem::ConfigItem(std::string type, T const& defaultValue, std::string short_desc, std::string long_desc):
-  m_type(m_type), m_value(defaultValue), m_defaultValue(defaultValue)
-{
-	if (m_type == "int") {
-		m_min = std::numeric_limits<int>::min();
-		m_max = std::numeric_limits<int>::max();
-		m_step = 1;
-	} else if (m_type == "float") {
-		m_min = -getInf();
-		m_max = getInf();
-		m_step = 0.01;
-	}
-}
-
 ConfigItem& ConfigItem::incdec(int dir) {
 	if (m_type == "int") {
 		int& val = boost::get<int>(m_value);
@@ -41,7 +27,7 @@ ConfigItem& ConfigItem::incdec(int dir) {
 }
 
 bool ConfigItem::is_default() const {
-	if (m_type == "bool") return boost::get<std::string>(m_value) == boost::get<std::string>(m_defaultValue);
+	if (m_type == "bool") return boost::get<bool>(m_value) == boost::get<bool>(m_defaultValue);
 	if (m_type == "int") return boost::get<int>(m_value) == boost::get<int>(m_defaultValue);
 	if (m_type == "float") return boost::get<double>(m_value) == boost::get<double>(m_defaultValue);
 	if (m_type == "string") return boost::get<std::string>(m_value) == boost::get<std::string>(m_defaultValue);
@@ -94,13 +80,19 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) {
 	} else if (m_type == "int") {
 		std::string value_string = getAttribute(elem, "value");
 		if (!value_string.empty()) m_value = boost::lexical_cast<int>(value_string);
+		m_step = 1;
+		m_min = std::numeric_limits<int>::min();
+		m_max = std::numeric_limits<int>::max();
 	} else if (m_type == "float") {
 		std::string value_string = getAttribute(elem, "value");
 		if (!value_string.empty()) m_value = boost::lexical_cast<double>(value_string);
+		m_step = 0.01;
+		m_min = -getInf();
+		m_max = getInf();
 	} else if (m_type == "string") {
 		xmlpp::NodeSet n2 = elem.find("stringvalue/text()");
 		// FIXME: WTF does this loop do? Does find actually return many elements and why?
-		std::string value("");
+		std::string value;
 		for (xmlpp::NodeSet::const_iterator it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
 			xmlpp::TextNode& elem2 = dynamic_cast<xmlpp::TextNode&>(**it2);
 			value = elem2.get_content();
@@ -135,47 +127,31 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) {
 	if (mode < 2) m_defaultValue = m_value;
 }
 
-void writeConfigfile( const std::string &_configfile ) {
-/*
+void writeConfigfile(const std::string &_configfile) {
 	std::cout << "Saving configuration file \"" << _configfile << "\"" << std::endl;
 	xmlpp::Document doc;
 	xmlpp::Node* nodeRoot = doc.create_root_node("performous");
-	for(std::map<std::string, ConfigItem>::const_iterator itr = config.begin(); itr != config.end(); ++itr) {
-		ConfigItem item = (*itr).second;
-		std::string name = (*itr).first;
-		if(! item.is_default() ) {
-			xmlpp::Element* entryNode = nodeRoot->add_child("entry");
-			entryNode->set_attribute("name", name);
-
-			if( item.get_type() == "int" ) {
-				entryNode->set_attribute("type", "int");
-				entryNode->set_attribute("value",boost::lexical_cast<std::string>(item.get_i()));
-			} else if( item.get_type() == "bool" ) {
-				entryNode->set_attribute("type", "bool");
-				if( item.get_b()) {
-					entryNode->set_attribute("value","true");
-				} else {
-					entryNode->set_attribute("value","false");
-				}
-			} else if( item.get_type() == "float" ) {
-				entryNode->set_attribute("type", "float");
-				entryNode->set_attribute("value",boost::lexical_cast<std::string>(item.get_f()));
-			} else if( item.get_type() == "string" ) {
-				entryNode->set_attribute("type", "string");
+	for(std::map<std::string, ConfigItem>::iterator it = config.begin(); it != config.end(); ++it) {
+		ConfigItem& item = it->second;
+		std::string name = it->first;
+		if (item.is_default()) continue; // No need to save settings with default values
+		xmlpp::Element* entryNode = nodeRoot->add_child("entry");
+		entryNode->set_attribute("name", name);
+		std::string type = item.get_type();
+		entryNode->set_attribute("type", type);
+		if (type == "int") entryNode->set_attribute("value",boost::lexical_cast<std::string>(item.i()));
+		else if (type == "bool") entryNode->set_attribute("value", item.b() ? "true" : "false");
+		else if (type == "float") entryNode->set_attribute("value",boost::lexical_cast<std::string>(item.f()));
+		else if (item.get_type() == "string") entryNode->add_child("stringvalue")->add_child_text(item.s());
+		else if (item.get_type() == "string_list") {
+			std::vector<std::string> const& value = item.sl();
+			for(std::vector<std::string>::const_iterator it = value.begin(); it != value.end(); ++it) {
 				xmlpp::Element* stringvalueNode = entryNode->add_child("stringvalue");
-				stringvalueNode->add_child_text(item.get_s());
-			} else if( item.get_type() == "string_list" ) {
-				entryNode->set_attribute("type", "string_list");
-				std::vector<std::string> value = item.get_sl();
-				for(std::vector<std::string>::const_iterator it = value.begin(); it != value.end(); ++it) {
-					xmlpp::Element* stringvalueNode = entryNode->add_child("stringvalue");
-					stringvalueNode->add_child_text(*it);
-				}
+				stringvalueNode->add_child_text(*it);
 			}
 		}
 	}
 	doc.write_to_file_formatted(_configfile);
-	*/
 }
 
 void readConfigXML(std::string const& file, int mode) {
