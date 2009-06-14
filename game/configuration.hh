@@ -10,11 +10,14 @@
 #include <map>
 #include <string>
 
+namespace xmlpp { struct Element; }  // Forward declaration for libxml++ stuff
+
 /// configuration option
 class ConfigItem {
   public:
 	typedef std::vector<std::string> StringList;
 	ConfigItem() {}
+	void update(xmlpp::Element& elem, int mode); //< Load XML config file, elem = Entry, mode = 0 for schema, 1 for system config and 2 for user config
 	template <typename T> ConfigItem(std::string _type, T const& _defaultValue, std::string _short_desc, std::string _long_desc);
 	ConfigItem& operator++() { return incdec(1); } ///< increments config value
 	ConfigItem& operator--() { return incdec(-1); } ///< decrements config value

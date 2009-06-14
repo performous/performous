@@ -66,71 +66,76 @@ double& ConfigItem::f() { verifyType("float"); return boost::get<double>(m_value
 std::string& ConfigItem::s() { verifyType("string"); return boost::get<std::string>(m_value); }
 ConfigItem::StringList& ConfigItem::sl() { verifyType("string_list"); return boost::get<StringList>(m_value); }
 
-void assignConfigItem( ConfigItem &_item, std::string _type, xmlpp::Element& _elem ) {
-/*
-	if( _type == std::string("bool") ) {
-		std::string value_string = _elem.get_attribute("value")->get_value();
-		bool value = false;
-		if( value_string == std::string("true") || value_string == std::string("1") )
-			value = true;
+namespace {
+	struct XMLError {
+		XMLError(xmlpp::Element& e, std::string msg): elem(e), message(msg) {}
+		xmlpp::Element& elem;
+		std::string message;
+	};
+	std::string getAttribute(xmlpp::Element& elem, std::string const& attr) {
+		xmlpp::Attribute* a = elem.get_attribute(attr);
+		if (!a) throw XMLError(elem, "attribute " + attr + " not found");
+		return a->get_value();
+	}
+}
 
-		_item.b() = value;
-	} else if( _type == std::string("int") ) {
-		std::string value_string = _elem.get_attribute("value")->get_value();
-		int value = 0;
-		if( !value_string.empty() )
-			value = boost::lexical_cast<int>(value_string);
-
-		_item.i() = value;
-	} else if( _type == std::string("float") ) {
-		std::string value_string = _elem.get_attribute("value")->get_value();
-		double value = 0;
-		if( !value_string.empty() )
-			value = boost::lexical_cast<double>(value_string);
-
-		_item.f() = value;
-	} else if( _type == std::string("string") ) {
-		xmlpp::NodeSet n2 = _elem.find("stringvalue/text()");
+void ConfigItem::update(xmlpp::Element& elem, int mode) {
+	if (mode == 0) {
+		m_type = getAttribute(elem, "type");
+		if (m_type.empty()) throw std::runtime_error("Entry type attribute is missing");
+	}
+	if (m_type == "bool") {
+		std::string value_string = getAttribute(elem, "value");
+		bool value;
+		if (value_string == "true") value = true;
+		else if (value_string == "false") value = false;
+		else throw std::runtime_error("Invalid boolean value '" + value_string + "'");
+		m_value = value;
+	} else if (m_type == "int") {
+		std::string value_string = getAttribute(elem, "value");
+		if (!value_string.empty()) m_value = boost::lexical_cast<int>(value_string);
+	} else if (m_type == "float") {
+		std::string value_string = getAttribute(elem, "value");
+		if (!value_string.empty()) m_value = boost::lexical_cast<double>(value_string);
+	} else if (m_type == "string") {
+		xmlpp::NodeSet n2 = elem.find("stringvalue/text()");
+		// FIXME: WTF does this loop do? Does find actually return many elements and why?
 		std::string value("");
 		for (xmlpp::NodeSet::const_iterator it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
 			xmlpp::TextNode& elem2 = dynamic_cast<xmlpp::TextNode&>(**it2);
 			value = elem2.get_content();
 		}
-		_item.s() = value;
-	} else if( _type == std::string("string_list") ) {
+		m_value = value;
+	} else if (m_type == "string_list") {
 		std::vector<std::string> value;
-
-		xmlpp::NodeSet n2 = _elem.find("stringvalue/text()");
+		xmlpp::NodeSet n2 = elem.find("stringvalue/text()");
 		for (xmlpp::NodeSet::const_iterator it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
 			xmlpp::TextNode& elem2 = dynamic_cast<xmlpp::TextNode&>(**it2);
 			value.push_back(elem2.get_content());
 		}
-		_item.sl() = value;
-	} else {
-		std::cout <<  "  Found unknown type " << _type << std::endl;
+		m_value = value;
 	}
 
 	{
 		// Update short description
-		xmlpp::NodeSet n2 = _elem.find("locale/short/text()");
+		xmlpp::NodeSet n2 = elem.find("locale/short/text()");
 		for (xmlpp::NodeSet::const_iterator it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
 			xmlpp::TextNode& elem2 = dynamic_cast<xmlpp::TextNode&>(**it2);
-			_item.set_short_description(elem2.get_content());
+			m_shortDesc = elem2.get_content();
 		}
 	}
 	{
 		// Update long description
-		xmlpp::NodeSet n2 = _elem.find("locale/long/text()");
+		xmlpp::NodeSet n2 = elem.find("locale/long/text()");
 		for (xmlpp::NodeSet::const_iterator it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
 			xmlpp::TextNode& elem2 = dynamic_cast<xmlpp::TextNode&>(**it2);
-			_item.set_long_description(elem2.get_content());
+			m_longDesc = elem2.get_content();
 		}
 	}
-	*/
+	if (mode < 2) m_defaultValue = m_value;
 }
 
-void writeConfigfile( const std::string &_configfile )
-{
+void writeConfigfile( const std::string &_configfile ) {
 /*
 	std::cout << "Saving configuration file \"" << _configfile << "\"" << std::endl;
 	xmlpp::Document doc;
@@ -173,117 +178,62 @@ void writeConfigfile( const std::string &_configfile )
 	*/
 }
 
-void readConfigfile( const std::string &_configfile )
-{
-/*
-	xmlpp::NodeSet n;
-	xmlpp::DomParser domParser;
-
-	// looking for schemafile in:
-	// $PERFORMOUS_DEFAULT_CONFIG_FILE
-	// /usr/share/performous
-	// /usr/share/games/performous
-	// /usr/local/share/performous
-	// /usr/local/share/games/performous
-	std::string schemafile("NOT_FOUND");
-	std::vector<std::string> config_list;
-	char *env_config = getenv("PERFORMOUS_DEFAULT_CONFIG_FILE");
-	if( env_config != NULL )
-		config_list.push_back(std::string(env_config));
-	config_list.push_back(std::string("/usr/share/performous")+std::string("/config/performous.xml"));
-	config_list.push_back(std::string("/usr/share/games/performous")+std::string("/config/performous.xml"));
-	config_list.push_back(std::string("/usr/local/share/performous")+std::string("/config/performous.xml"));
-	config_list.push_back(std::string("/usr/local/share/games/performous")+std::string("/config/performous.xml"));
-	for( unsigned int i = 0 ; i < config_list.size() ; ++i ) {
-		std::cout << "Testing config file \"" << config_list[i] << "\": ";
-		if( boost::filesystem::exists(config_list[i]) ) {
-			std::cout << "FOUND" << std::endl;
-			schemafile = config_list[i];
-			break;
-		} else {
-			std::cout << "NOT FOUND" << std::endl;
-		}
-	}
-
-	std::cout << "Opening default configuration file \"" << schemafile << "\"" << std::endl;
-	domParser.parse_file(schemafile);
-	n = domParser.get_document()->get_root_node()->find("/performous/entry");
-	for (xmlpp::NodeSet::const_iterator it = n.begin(), end = n.end(); it != end; ++it) {
-		xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**it);
-		std::string name = elem.get_attribute("name")->get_value();
-		std::string type = elem.get_attribute("type")->get_value();
-		if( name.empty() || type.empty() ) {
-			std::cout << "  name or type attribute is missing or empty" << std::endl;
-			continue;
-		}
-
-		ConfigItem item(m_type, true);
-		assignConfigItem(item, type, elem );
-		config[name] = item;
-
-	}
-	std::cout << "Found " << config.size() << " default configuration items" << std::endl;
-
-	std::string globalConfigFile("/etc/xdg/performous/performous.xml");
-	std::cout << "Opening global configuration file \"" << globalConfigFile << "\"" << std::endl;
-	if( !boost::filesystem::exists(globalConfigFile) ) {
-		std::cout << "  Cannot open global configuration file" << std::endl;
-	} else {
-		try {
-			domParser.parse_file(globalConfigFile);
-			n = domParser.get_document()->get_root_node()->find("/performous/entry");
-			for (xmlpp::NodeSet::const_iterator it = n.begin(), end = n.end(); it != end; ++it) {
-				xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**it);
-				std::string name = elem.get_attribute("name")->get_value();
-				std::string type = elem.get_attribute("type")->get_value();
-				if( name.empty() || type.empty() ) {
-					std::cout << "  name or type attribute is missing or empty" << std::endl;
-					continue;
-				}
-
-				if( config.find(name) == config.end() ) {
-					std::cout << "  Cannot find \"" << name << "\" key inside default config file, discarding" << std::endl;
-					continue;
-				}
-
-				ConfigItem item = config.find(name)->second;
-				assignConfigItem(item, type, elem );
-				config[name] = item;
-
-			}
-		} catch( ... ) {
-		}
-	}
-
-	std::cout << "Opening user configuration file \"" << _configfile << "\"" << std::endl;
-	if( !boost::filesystem::exists(_configfile) ) {
-		std::cout << "  Cannot open user configuration file (using defaults)" << std::endl;
+void readConfigXML(std::string const& file, int mode) {
+	if (!boost::filesystem::exists(file)) {
+		std::cout << "Skipping " << file << " (not found)" << std::endl;
 		return;
 	}
+	std::cout << "Parsing " << file << std::endl;
+	xmlpp::DomParser domParser(file);
 	try {
-		domParser.parse_file(_configfile);
-		n = domParser.get_document()->get_root_node()->find("/performous/entry");
+		xmlpp::NodeSet n = domParser.get_document()->get_root_node()->find("/performous/entry");
 		for (xmlpp::NodeSet::const_iterator it = n.begin(), end = n.end(); it != end; ++it) {
 			xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**it);
-			std::string name = elem.get_attribute("name")->get_value();
-			std::string type = elem.get_attribute("type")->get_value();
-			if( name.empty() || type.empty() ) {
-				std::cout << "  name or type attribute is missing or empty" << std::endl;
-				continue;
+			std::string name = getAttribute(elem, "name");
+			if (name.empty()) throw std::runtime_error(file + " element Entry missing name attribute");
+			Config::iterator it = config.find(name);
+			if (mode == 0) { // Schema
+				if (it != config.end()) throw std::runtime_error("Configuration schema contains the same value twice: " + name);
+				config[name].update(elem, 0);
+			} else {
+				if (it == config.end()) {
+					std::cout << "  Entry " << name << " ignored (does not exist in config schema)." << std::endl;
+					continue;
+				}
+				it->second.update(elem, mode);
 			}
-
-			if( config.find(name) == config.end() ) {
-				std::cout << "  Cannot find \"" << name << "\" key inside default config file, discarding" << std::endl;
-				continue;
-			}
-
-			ConfigItem item = config.find(name)->second;
-			assignConfigItem(item, type, elem );
-			config[name] = item;
-
 		}
-	} catch( ... ) {
+	} catch (XMLError& e) {
+		int line = e.elem.get_line();
+		std::string name = e.elem.get_name();
+		throw std::runtime_error(file + ":" + boost::lexical_cast<std::string>(line) + " element " + name + " " + e.message);
 	}
-	*/
+}
+
+void readConfigfile(std::string const& userConf) {
+	// Find config schema
+	std::string schemafile;
+	{
+		typedef std::vector<std::string> ConfigList;
+		ConfigList config_list;
+		char const* env_config = getenv("PERFORMOUS_DEFAULT_CONFIG_FILE");
+		if (env_config) config_list.push_back(env_config);
+		config_list.push_back("/usr/local/share/games/performous/config/performous.xml");
+		config_list.push_back("/usr/local/share/performous/config/performous.xml");
+		config_list.push_back("/usr/share/games/performous/config/performous.xml");
+		config_list.push_back("/usr/share/performous/config/performous.xml");
+		ConfigList::const_iterator it = std::find_if(config_list.begin(), config_list.end(), static_cast<bool(&)(boost::filesystem::path const&)>(boost::filesystem::exists));
+		if (it == config_list.end()) {
+			std::ostringstream oss;
+			oss << "No config schema file found. The following locations were tried:\n";
+			std::copy(config_list.begin(), config_list.end(), std::ostream_iterator<std::string>(oss, "\n"));
+			oss << "Install the file or define environment variable PERFORMOUS_DEFAULT_CONFIG_FILE\n";
+			throw std::runtime_error(oss.str());
+		}
+		schemafile = *it;
+	}
+	readConfigXML(schemafile, 0);  // Read schema and defaults
+	readConfigXML("/etc/xdg/performous/performous.xml", 1);  // Update defaults with system config
+	readConfigXML(userConf, 2);  // Read user settings
 }
 
