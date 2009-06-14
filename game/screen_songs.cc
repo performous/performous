@@ -88,7 +88,7 @@ void ScreenSongs::drawJukebox() {
 void ScreenSongs::draw() {
 	m_songs.update(); // Poll for new songs
 	double length = m_audio.getLength();
-	double time = clamp(m_audio.getPosition() - config["audio/video_delay"].get_f(), 0.0, length);
+	double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
 	if (m_songbg.get()) m_songbg->draw();
 	if (m_video.get()) m_video->render(time);
 	if (!m_jukebox) theme->bg->draw();
@@ -150,7 +150,7 @@ void ScreenSongs::draw() {
 		m_songbg.reset(); m_video.reset();
 		if (music.empty()) m_audio.fadeout(); else m_audio.playPreview(music, m_jukebox ? 0.0 : 30.0);
 		if (!songbg.empty()) try { m_songbg.reset(new Surface(songbg)); } catch (std::exception const&) {}
-		if (!video.empty()) m_video.reset(new Video(video));
+		if (!video.empty() && config["graphic/video"].b()) m_video.reset(new Video(video));
 		m_playing = music;
 	}
 	if (m_jukebox) {

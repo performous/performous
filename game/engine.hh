@@ -67,7 +67,6 @@ class Engine {
 	Audio& m_audio;
 	Song& m_song;
 	std::list<Player> m_players;
-	volatile double m_latencyAR;  // Audio roundtrip latency (don't confuse with latencyAV)
 	size_t m_time;
 	volatile bool m_quit;
 	boost::scoped_ptr<boost::thread> m_thread;
@@ -83,7 +82,7 @@ class Engine {
 	* @param song Song to play
 	**/
 	template <typename FwdIt> Engine(Audio& audio, Song& song, FwdIt anBegin, FwdIt anEnd):
-	  m_audio(audio), m_song(song), m_latencyAR(config["audio/round-trip"].get_f()), m_time(), m_quit()
+	  m_audio(audio), m_song(song), m_time(), m_quit()
 	{
 		size_t frames = m_audio.getLength() / Engine::TIMESTEP;
 		while (anBegin != anEnd) m_players.push_back(Player(song, *anBegin++, frames));

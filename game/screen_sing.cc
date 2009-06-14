@@ -26,10 +26,10 @@ void ScreenSing::enter() {
 			std::cerr << e.what() << std::endl;
 		}
 	}
-	if (!song.video.empty()) m_video.reset(new Video(song.path + song.video));
+	if (!song.video.empty() && config["graphic/video"].b()) m_video.reset(new Video(song.path + song.video));
 	m_pause_icon.reset(new Surface(sm->getThemePathFile("sing_pause.svg")));
-	m_score_text[0].reset(new SvgTxtThemeSimple(sm->getThemePathFile("sing_score_text.svg"), config["graphic/text_lod"].get_f()));
-	m_score_text[1].reset(new SvgTxtThemeSimple(sm->getThemePathFile("sing_score_text.svg"), config["graphic/text_lod"].get_f()));
+	m_score_text[0].reset(new SvgTxtThemeSimple(sm->getThemePathFile("sing_score_text.svg"), config["graphic/text_lod"].f()));
+	m_score_text[1].reset(new SvgTxtThemeSimple(sm->getThemePathFile("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_player_icon.reset(new Surface(sm->getThemePathFile("sing_pbox.svg")));
 	m_progress.reset(new ProgressBar(sm->getThemePathFile("sing_progressbg.svg"), sm->getThemePathFile("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01, 0.01, true));
 	m_progress->dimensions.fixedWidth(0.4).left(-0.5).screenTop();
@@ -121,7 +121,7 @@ void ScreenSing::draw() {
 	Song& song = m_songs.current();
 	// Get the time in the song
 	double length = m_audio.getLength();
-	double time = clamp(m_audio.getPosition() - config["audio/video_delay"].get_f(), 0.0, length);
+	double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
 	double songPercent = time / length;
 
 	// Rendering starts
@@ -141,7 +141,7 @@ void ScreenSing::draw() {
 		theme->bg_top->draw();
 	}
 
-	if (!config["game/karaoke_mode"].get_b()) drawNonKaraoke(time);
+	if (!config["game/karaoke_mode"].b()) drawNonKaraoke(time);
 
 	// Compute and draw lyrics
 	{
@@ -177,12 +177,12 @@ void ScreenSing::draw() {
 		std::string statustxt = (boost::format("%02u:%02u") % (unsigned(time) / 60) % (unsigned(time) % 60)).str();
 		if (!m_score_window.get()) {
 			if (status == Song::INSTRUMENTAL_BREAK) statustxt += "   ENTER to skip instrumental break";
-			if (status == Song::FINISHED && !config["game/karaoke_mode"].get_b()) statustxt += "   Remember to wait for grading!";
+			if (status == Song::FINISHED && !config["game/karaoke_mode"].b()) statustxt += "   Remember to wait for grading!";
 		}
 		theme->timer->draw(statustxt);
 	}
 
-	if (config["game/karaoke_mode"].get_b()) {
+	if (config["game/karaoke_mode"].b()) {
 		if (!m_audio.isPlaying()) sm->activateScreen("Songs");
 	} else {
 		if (m_score_window.get()) {

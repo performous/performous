@@ -77,7 +77,7 @@ void NoteGraph::draw(double time, std::list<Player> const& players) {
 	m_baseX = baseLine - m_time * pixUnit;
 
 	drawNotes();
-	if (config["game/pitch"].get_b()) drawWaves(players);
+	if (config["game/pitch"].b()) drawWaves(players);
 }
 
 void NoteGraph::drawNotes() {

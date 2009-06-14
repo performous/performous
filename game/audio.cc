@@ -86,7 +86,7 @@ void Audio::playMusic(std::string const& filename, bool preview, double fadeTime
 	boost::recursive_mutex::scoped_lock l(m_mutex);
 	fadeout(fadeTime);
 	m_streams.push_back(s);
-	setVolume_internal(preview ? config["audio/preview_volume"].get_i() : config["audio/music_volume"].get_i());
+	setVolume_internal(preview ? config["audio/preview_volume"].i() : config["audio/music_volume"].i());
 	if (!preview) m_paused = false;
 }
 

@@ -6,90 +6,44 @@
 #include "util.hh"
 #include <boost/any.hpp>
 #include <boost/format.hpp>
+#include <boost/variant.hpp>
 #include <map>
 #include <string>
 
 /// configuration option
 class ConfigItem {
-	friend std::ostream& operator <<(std::ostream &os,const ConfigItem &obj);
   public:
-	ConfigItem();
-	/// constructor
-	ConfigItem( std::string _type, bool _is_default);
-	/// increments config value
-	ConfigItem& operator++();
-	/// decrements config value
-	ConfigItem& operator--();
-	/// adds to config value
-	ConfigItem& operator+=(const int& right);
-	/// substracts from config value
-	ConfigItem& operator-=(const int& right);
-	/// adds to config value
-	ConfigItem& operator+=(const float& right);
-	/// substracts from config value
-	ConfigItem& operator-=(const float& right);
-	/// adds to config value
-	ConfigItem& operator+=(const double& right);
-	/// substracts from config value
-	ConfigItem& operator-=(const double& right);
-	/// sets short decsription for config item
-	void set_short_description( std::string _short_desc );
-	/// sets long description for config item
-	void set_long_description( std::string _long_desc );
-	/// gets short decsription for config item
-	std::string get_short_description() const;
-	/// gets long description for config item
-	std::string get_long_description() const;
-	/// tells if the item is default or not
-	bool is_default(void) const;
-	/// returns the type
-	std::string get_type(void) const;
-	/// returns integer
-	int get_i(void) const;
-	/// returns bool
-	bool get_b(void) const;
-	/// returns float
-	double get_f(void) const;
-	/// returns string
-	std::string get_s(void) const;
-	/// returns string list
-	std::vector<std::string> get_sl(void) const;
-	/// returns integer
-	int &i(bool _is_default = false);
-	/// returns bool
-	bool &b(bool _is_default = false);
-	/// returns float
-	double &f(bool _is_default = false);
-	/// returns string
-	std::string &s(bool _is_default = false);
-	/// returns string list
-	std::vector<std::string> &sl(bool _is_default = false);
-
+	typedef std::vector<std::string> StringList;
+	ConfigItem() {}
+	template <typename T> ConfigItem(std::string _type, T const& _defaultValue, std::string _short_desc, std::string _long_desc);
+	ConfigItem& operator++() { return incdec(1); } ///< increments config value
+	ConfigItem& operator--() { return incdec(-1); } ///< decrements config value
+	bool is_default() const; ///< Is the current value the same as the default value
+	std::string get_type() const { return m_type; } ///< get the field type
+	int& i(); ///< Access integer item
+	bool& b(); ///< Access boolean item
+	double& f(); ///< Access floating-point item
+	std::string& s(); ///< Access string item
+	StringList& sl(); ///< Access stringlist item
+	void reset() { m_value = m_defaultValue; }
+	std::string const& get_short_description() { return m_shortDesc; }
+	std::string const& get_long_description() { return m_longDesc; }
+	
   private:
-  	/// throws std::logic_error if t != type
-	void verifyType(std::string const& t) const;
-	std::string type;
-	std::string short_desc;
-	std::string long_desc;
+	void verifyType(std::string const& t) const; ///< throws std::logic_error if t != type
+	ConfigItem& incdec(int dir); ///< Increment/decrement by dir steps (must be -1 or 1)
+	std::string m_type;
+	std::string m_shortDesc;
+	std::string m_longDesc;
 
-	bool m_is_default;
-
-	bool boolean_value;
-	int integer_value;
-	double double_value;
-	std::string string_value;
-	std::vector<std::string> string_list_value;
-
-	double double_step;
-	double double_min;
-	double double_max;
-	int integer_step;
-	int integer_min;
-	int integer_max;
+	typedef boost::variant<bool, int, double, std::string, StringList> Value;
+	Value m_value; ///< The current value
+	Value m_defaultValue; ///< The value from factory/system config
+	boost::variant<int, double> m_step, m_min, m_max;
 };
 
 typedef std::map<std::string, ConfigItem> Config;
-extern Config config;
+extern Config config; ///< A global variable that contains all config items
 
 void readConfigfile( const std::string &_configfile );
 void writeConfigfile( const std::string &_configfile );
@@ -145,21 +99,10 @@ class ConfigurationItem : public Configuration {
 	/// get current config value
 	std::string getValue() const {
 		ConfigItem item = config[m_key];
-		if( item.get_type() == std::string("int") ) {
-			return (boost::format("%d") % item.get_i()).str();
-		} else if( item.get_type() == std::string("float") ) {
-			return (boost::format("%.2f") % item.get_f()).str();
-		} else if( item.get_type() == std::string("double") ) {
-			return (boost::format("%.2f") % item.get_f()).str();
-		} else if( item.get_type() == std::string("bool") ) {
-			if( item.get_b() ) {
-				return std::string("True");
-			} else {
-				return std::string("False");
-			}
-		} else {
-			return std::string("Type not managed");
-		}
+		if (item.get_type() == "int") return (boost::format("%d") % item.i()).str();
+		else if (item.get_type() == "float") return (boost::format("%.2f") % item.f()).str();
+		else if( item.get_type() == "bool") return item.b() ? "Enabled" : "Disabled";
+		else return std::string("Type not managed");
 	};
 	/// get config description
 	std::string const getDescription() const { 

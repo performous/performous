@@ -72,7 +72,7 @@ template <typename T> void loader(T& target, std::string filename, bool autocrop
 		RsvgDimensionData svgDimension;
 		rsvg_handle_get_dimensions (svgHandle, &svgDimension);
 		rsvg_handle_free(svgHandle);
-		double factor = config["graphic/svg_lod"].get_f();
+		double factor = config["graphic/svg_lod"].f();
 		unsigned int w = nextPow2(svgDimension.width*factor);
 		unsigned int h = nextPow2(svgDimension.height*factor);
 		// Load and raster the SVG
