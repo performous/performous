@@ -1,5 +1,36 @@
 <?xml version="1.0"?>
 <performous>
+	<!-- Menu definitions.
+	All config entries with the same prefix as the menu entry are displayed in the menu,
+	except if they have attribute hidden="true". The options display in the same order
+	as they are specified here.
+	-->
+	<menu>
+		<entry name="game">
+			<locale name="C">
+				<short>Game</short>
+				<long>Gameplay settings.</long>
+			</locale>
+		</entry>
+		<entry name="graphic">
+			<locale name="C">
+				<short>Graphic</short>
+				<long>Video and rendering settings.</long>
+			</locale>
+		</entry>
+		<entry name="audio">
+			<locale name="C">
+				<short>Audio</short>
+				<long>Audio-related settings.</long>
+			</locale>
+		</entry>
+		<entry name="system">
+			<locale name="C">
+				<short>System</short>
+				<long>System paths.</long>
+			</locale>
+		</entry>
+	</menu>
 	<!-- Gameplay preferences -->
 	<entry name="game/karaoke_mode" type="bool" value="false">
 		<locale name="C">
@@ -13,27 +44,38 @@
 			<long>Enable singing pitch display (when not in karaoke mode)</long>
 		</locale>
 	</entry>
+	<entry name="game/theme" type="string">
+		<stringvalue>default</stringvalue>
+		<locale name="C">
+			<short>Default theme name</short>
+			<long></long>
+		</locale>
+	</entry>
 
 	<!-- Graphic preferences -->
-	<entry name="graphic/width" type="int" value="800">
+	<entry name="graphic/window_width" type="int" value="800" hidden="true">
+		<limits min="320" max="4096" step="16" />
 		<locale name="C">
 			<short>Windowed width</short>
 			<long></long>
 		</locale>
 	</entry>
-	<entry name="graphic/height" type="int" value="600">
+	<entry name="graphic/window_height" type="int" value="600" hidden="true">
+		<limits min="240" max="2048" step="16" />
 		<locale name="C">
 			<short>Windowed height</short>
 			<long></long>
 		</locale>
 	</entry>
 	<entry name="graphic/fs_width" type="int" value="1024">
+		<limits min="320" max="4096" step="16" />
 		<locale name="C">
 			<short>Fullscreen width</short>
 			<long></long>
 		</locale>
 	</entry>
 	<entry name="graphic/fs_height" type="int" value="768">
+		<limits min="240" max="2048" step="16" />
 		<locale name="C">
 			<short>Fullscreen height</short>
 			<long></long>
@@ -41,50 +83,50 @@
 	</entry>
 	<entry name="graphic/fullscreen" type="bool" value="false">
 		<locale name="C">
-			<short>Enable fullsreen</short>
-			<long></long>
+			<short>Fullsreen mode</short>
+			<long>Set width and height to suitable values first!</long>
 		</locale>
 	</entry>
 	<entry name="graphic/video" type="bool" value="true">
 		<locale name="C">
-			<short>Enable video playback</short>
-			<long></long>
+			<short>Video playback</short>
+			<long>Allows completely disabling background videos. It is recommended to leave this enabled as Performous will still smoothly fade out the video if your computer is not fast enough.</long>
 		</locale>
 	</entry>
 	<entry name="graphic/svg_lod" type="float" value="1.0">
 		<limits min="0.5" max="3.0" step="0.1" />
 		<locale name="C">
 			<short>SVG quality</short>
-			<long>Larger numbers cause vector graphics to be rendered in higher resolution.</long>
+			<long>Larger numbers cause vector graphics to be rendered in higher resolution. Decrease this to make navigating in menus faster.</long>
 		</locale>
 	</entry>
 	<entry name="graphic/text_lod" type="float" value="1.0">
 		<limits min="0.5" max="3.0" step="0.1" />
 		<locale name="C">
 			<short>Text quality</short>
-			<long>Larger numbers cause text to be rendered in higher resolution.</long>
+			<long>Larger numbers cause text to be rendered in higher resolution. Decrease this to make everything a little faster.</long>
 		</locale>
 	</entry>
 	<entry name="graphic/fps" type="bool" value="false">
 		<locale name="C">
-			<short>Display FPS</short>
-			<long>Enables a benchmark mode where the framerate limit of 100 FPS is disabled and the game instead renders at full speed. FPS values are printed to console. Please note that the display drivers may still limit the rendering speed to the screen refresh rate.</long>
+			<short>Benchmark mode</short>
+			<long>Framerate limit of 100 FPS is removed and the game instead renders at full speed. FPS values are printed to console. Please note that the display drivers may still limit the rendering speed to the screen refresh rate.</long>
 		</locale>
 	</entry>
 
 	<!-- Audio preferences -->
-	<entry name="audio/round-trip" type="float" value="0.08">
+	<entry name="audio/round-trip" type="float" value="0.08" unit="s">
 		<limits min="0.0" max="0.5" step="0.02" />
 		<locale name="C">
 			<short>Audio round-trip latency in seconds</short>
-			<long></long>
+			<long>The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. Use F4 debug mode in singing screen and adjust with F7/F8.</long>
 		</locale>
 	</entry>
 	<entry name="audio/video_delay" type="float" value="0.00">
 		<limits min="-0.5" max="0.5" step="0.02" />
 		<locale name="C">
 			<short>Audio/video delay in seconds</short>
-			<long>Use negative value if your display input lag is greater than the sound card output latency, positive values in opposite case and zero if they are equal.</long>
+			<long>Use negative value if your display input lag is greater than the sound card output latency, positive values in opposite case and zero if they are equal. F5/F6 adjust this in singing screen.</long>
 		</locale>
 	</entry>
 	<entry name="audio/capture" type="string_list">
@@ -107,56 +149,35 @@
 	<entry name="audio/preview_volume" type="int" value="70">
 		<limits min="0" max="100" step="5" />
 		<locale name="C">
-			<short>Previex volume</short>
-			<long></long>
+			<short>Menu volume</short>
+			<long>The volume level of menus, song previews and jukebox mode</long>
 		</locale>
 	</entry>
 	<entry name="audio/music_volume" type="int" value="100">
 		<limits min="0" max="100" step="5" />
 		<locale name="C">
 			<short>Music volume</short>
-			<long></long>
+			<long>The ingame music volume</long>
 		</locale>
 	</entry>
 
-	<!-- Themes preferences -->
-	<entry name="themes/default" type="string">
-		<stringvalue>default</stringvalue>
-		<locale name="C">
-			<short>Default theme name</short>
-			<long></long>
-		</locale>
-	</entry>
-	<entry name="themes/override" type="bool" value="false">
-		<locale name="C">
-			<short>Enable themes directories override</short>
-			<long></long>
-		</locale>
-	</entry>
-	<entry name="themes/path" type="string_list">
-		<stringvalue>/usr/share/games/performous/themes/</stringvalue>
+	<!-- System preferences -->
+	<entry name="system/path_themes" type="string_list">
 		<stringvalue>/usr/local/share/games/performous/themes/</stringvalue>
+		<stringvalue>/usr/share/games/performous/themes/</stringvalue>
 		<stringvalue>~/.performous/themes/</stringvalue>
 		<locale name="C">
-			<short>List of themes directories</short>
-			<long></long>
+			<short>Theme folders</short>
+			<long>Where Performous themes are stored.</long>
 		</locale>
 	</entry>
-
-	<!-- Songs preferences -->
-	<entry name="songs/override" type="bool" value="false">
-		<locale name="C">
-			<short>Enable songs directories override</short>
-			<long></long>
-		</locale>
-	</entry>
-	<entry name="songs/path" type="string_list">
-		<stringvalue>/usr/share/games/ultrastar/songs/</stringvalue>
+	<entry name="system/path_songs" type="string_list">
 		<stringvalue>/usr/local/share/games/ultrastar/songs/</stringvalue>
+		<stringvalue>/usr/share/games/ultrastar/songs/</stringvalue>
 		<stringvalue>~/.ultrastar/songs/</stringvalue>
 		<locale name="C">
 			<short>Song folders</short>
-			<long></long>
+			<long>Where to recursively look for songs.</long>
 		</locale>
 	</entry>
 </performous>

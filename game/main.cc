@@ -90,6 +90,7 @@ int main(int argc, char** argv) {
 	signal(SIGTERM, quit);
 	std::ios::sync_with_stdio(false);  // We do not use C stdio
 	da::initialize libda;
+	std::string theme;
 	std::string songlist;
 	std::set<std::string> songdirs;
 	std::vector<std::string> mics;
@@ -109,7 +110,7 @@ int main(int argc, char** argv) {
 		  ("version,v", "display version number");
 		po::options_description opt2("Configuration options");
 		opt2.add_options()
-		  ("theme,t", po::value<std::string>(), "set theme (name or absolute path)")
+		  ("theme,t", po::value<std::string>(&theme), "set theme (name or absolute path)")
 		  ("fs,f", "enable full screen mode")
 		  ("fps", "benchmark rendering speed\n  also disable 100 FPS limit")
 		  ("songlist", po::value<std::string>(&songlist), "save a list of songs in the specified folder")
@@ -144,21 +145,11 @@ int main(int argc, char** argv) {
 			std::cout << "ERROR: " << e.what() << std::endl;
 			return 1;
 		}
-		if (vm.count("width")) {
-			config["graphic/width"].i() = vm["width"].as<int>();
-		}
-		if (vm.count("height")) {
-			config["graphic/height"].i() = vm["height"].as<int>();
-		}
-		if (vm.count("fs-width")) {
-			config["graphic/fs_width"].i() = vm["fs-width"].as<int>();
-		}
-		if (vm.count("fs-height")) {
-			config["graphic/fs_height"].i() = vm["fs-height"].as<int>();
-		}
-		if (vm.count("theme")) {
-			config["themes/default"].s() = vm["theme"].as<std::string>();
-		}
+		if (vm.count("width")) config["graphic/window_width"].i() = vm["width"].as<int>();
+		if (vm.count("height")) config["graphic/window_height"].i() = vm["height"].as<int>();
+		if (vm.count("fs-width")) config["graphic/fs_width"].i() = vm["fs-width"].as<int>();
+		if (vm.count("fs-height")) config["graphic/fs_height"].i() = vm["fs-height"].as<int>();
+		if (vm.count("theme")) config["game/theme"].s() = vm["theme"].as<std::string>();
 		if (vm.count("help")) {
 			std::cout << cmdline << std::endl;
 			return 0;
@@ -207,33 +198,25 @@ int main(int argc, char** argv) {
 		}
 		// Insert default dirs
 		if (!vm.count("clean")) {
-			if (!homedir.empty()) songdirs.insert(homedir + ".ultrastar/songs/");
-			songdirs.insert("/usr/local/share/games/ultrastar/songs/");
-			songdirs.insert("/usr/share/games/ultrastar/songs/");
-			if( config["songs/override"].b() ) songdirs.clear();
-			std::vector<std::string> sd = config["songs/path"].sl();
+			ConfigItem::StringList sd = config["system/path_songs"].sl();
 			for (std::vector<std::string>::const_iterator it = sd.begin(); it != sd.end(); ++it) {
-				songdirs.insert(*it);
+				std::string dir = *it;
+				if (dir.size() >= 2 && dir[0] == '~' && dir[1] == '/' && !homedir.empty()) dir = homedir + dir.substr(2);
+				songdirs.insert(dir);
 			}
 		}
 		// Figure out theme folder
-		if (config["themes/default"].s().find('/') == std::string::npos) {
-			char const* envthemepath = getenv("PERFORMOUS_THEME_PATH");
-			std::string themepath;
-			if (envthemepath) themepath = envthemepath;
-			else themepath = "/usr/local/share/games/performous/themes:/usr/share/games/performous/themes";
-			std::istringstream iss(themepath);
-			std::string elem;
-			while (std::getline(iss, elem, ':')) {
-				if (elem.empty()) continue;
-				fs::path p = elem;
-				p /= config["themes/default"].s();
-				if (fs::is_directory(p)) { config["themes/default"].s() = p.string(); break; }
+		if (theme.find('/') == std::string::npos) {
+			ConfigItem::StringList sd = config["system/path_themes"].sl();
+			for (std::vector<std::string>::const_iterator it = sd.begin(); it != sd.end(); ++it) {
+				fs::path p = *it;
+				p /= config["game/theme"].s();
+				if (fs::is_directory(p)) { theme = p.string(); break; }
 			}
         }
-		if (*config["themes/default"].s().rbegin() == '/') config["themes/default"].s().erase(config["themes/default"].s().size() - 1); // Remove trailing slash
+		if (*theme.rbegin() == '/') theme.erase(theme.size() - 1); // Remove trailing slash
 	}
-	// Built-in defaults:
+	// Use ones from config file if none given on commandline. TODO: add commandline arguments to config instead.
 	if( mics.empty() ) {
 		std::vector<std::string> ac = config["audio/capture"].sl();
 		for (std::vector<std::string>::const_iterator it = ac.begin(); it != ac.end(); ++it) {
@@ -295,8 +278,8 @@ int main(int argc, char** argv) {
 			if (!audio.isOpen()) std::cerr << "No playback devices could be used. Please use --pdev to define one." << std::endl;
 		}
 		Songs songs(songdirs, songlist);
-		ScreenManager sm(config["themes/default"].s());
-		Window window(config["graphic/width"].i(), config["graphic/height"].i(), config["graphic/fullscreen"].b(), config["graphic/fs_width"].i(), config["graphic/fs_height"].i());
+		ScreenManager sm(theme);
+		Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b(), config["graphic/fs_width"].i(), config["graphic/fs_height"].i());
 		sm.addScreen(new ScreenIntro("Intro", audio, capture));
 		sm.addScreen(new ScreenSongs("Songs", audio, songs));
 		sm.addScreen(new ScreenSing("Sing", audio, songs, capture));

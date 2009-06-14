@@ -63,9 +63,16 @@ namespace {
 		if (!a) throw XMLError(elem, "attribute " + attr + " not found");
 		return a->get_value();
 	}
-}
+	std::string getLocaleText(xmlpp::Element& elem, std::string const& name) {
+		std::string str;
+		xmlpp::NodeSet n = elem.find("locale/" + name + "/text()"); // TODO: could pick specific locale
+		for (xmlpp::NodeSet::const_iterator it = n.begin(), end = n.end(); it != end; ++it) {
+			xmlpp::TextNode& elem2 = dynamic_cast<xmlpp::TextNode&>(**it);
+			str = elem2.get_content();
+		}
+		return str;
+	}
 
-namespace {
 	template <typename T, typename V> void setLimits(xmlpp::Element& e, V& min, V& max, V& step) {
 		std::string value = getAttribute(e, "min");
 		if (!value.empty()) min = boost::lexical_cast<T>(value);
@@ -173,6 +180,27 @@ void writeConfigfile(const std::string &_configfile) {
 	doc.write_to_file_formatted(_configfile);
 }
 
+// TODO: move MenuEntry definition to some header and allow screen_configuration access it (preferrably not via global variables)
+
+struct MenuEntry {
+	std::string name;
+	std::string shortDesc;
+	std::string longDesc;
+	std::vector<std::string> items;
+};
+
+typedef std::vector<MenuEntry> ConfigMenu;
+ConfigMenu configMenu;
+
+void readMenuXML(xmlpp::Node* node) {
+	xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(*node);
+	MenuEntry me;
+	me.name = getAttribute(elem, "name");
+	me.shortDesc = getLocaleText(elem, "short");
+	me.longDesc = getLocaleText(elem, "long");
+	configMenu.push_back(me);
+}
+
 void readConfigXML(std::string const& file, int mode) {
 	if (!boost::filesystem::exists(file)) {
 		std::cout << "Skipping " << file << " (not found)" << std::endl;
@@ -181,7 +209,12 @@ void readConfigXML(std::string const& file, int mode) {
 	std::cout << "Parsing " << file << std::endl;
 	xmlpp::DomParser domParser(file);
 	try {
-		xmlpp::NodeSet n = domParser.get_document()->get_root_node()->find("/performous/entry");
+		xmlpp::NodeSet n = domParser.get_document()->get_root_node()->find("/performous/menu/entry");
+		if (!n.empty()) {
+			configMenu.clear();
+			std::for_each(n.begin(), n.end(), readMenuXML);
+		}
+		n = domParser.get_document()->get_root_node()->find("/performous/entry");
 		for (xmlpp::NodeSet::const_iterator it = n.begin(), end = n.end(); it != end; ++it) {
 			xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**it);
 			std::string name = getAttribute(elem, "name");
@@ -190,6 +223,15 @@ void readConfigXML(std::string const& file, int mode) {
 			if (mode == 0) { // Schema
 				if (it != config.end()) throw std::runtime_error("Configuration schema contains the same value twice: " + name);
 				config[name].update(elem, 0);
+				// Add the item to menu, if not hidden
+				bool hidden = false;
+				try { if (getAttribute(elem, "hidden") == "true") hidden = true; } catch (XMLError&) {}
+				if (!hidden) {
+					for (ConfigMenu::iterator it = configMenu.begin(), end = configMenu.end(); it != end; ++it) {
+						std::string prefix = it->name + '/';
+						if (name.substr(0, prefix.size()) == prefix) { it->items.push_back(name); break; }
+					}
+				}
 			} else {
 				if (it == config.end()) {
 					std::cout << "  Entry " << name << " ignored (does not exist in config schema)." << std::endl;
@@ -230,5 +272,12 @@ void readConfigfile(std::string const& userConf) {
 	readConfigXML(schemafile, 0);  // Read schema and defaults
 	readConfigXML("/etc/xdg/performous/performous.xml", 1);  // Update defaults with system config
 	readConfigXML(userConf, 2);  // Read user settings
+	// DEBUG code follows, remove this after real menu is done
+	std::cout << "CONFIG MENU" << std::endl;
+	for (ConfigMenu::const_iterator it = configMenu.begin(), end = configMenu.end(); it != end; ++it) {
+		std::cout << it->shortDesc << " (" << it->longDesc << ")" << std::endl;
+		for (std::vector<std::string>::const_iterator it2 = it->items.begin(), end2 = it->items.end(); it2 < end2; ++it2)
+		  std::cout << "  " << config[*it2].get_short_description() << std::endl;
+	}
 }
 
