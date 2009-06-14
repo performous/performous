@@ -4,7 +4,7 @@
 #include <boost/filesystem.hpp>
 #include <algorithm>
 #include <libxml++/libxml++.h>
-
+#include <stdexcept>
 
 ConfigItem::ConfigItem() {};
 ConfigItem::ConfigItem( std::string _type, bool _is_default) : m_is_default(_is_default), boolean_value(false), integer_value(), double_value(), string_value() {
@@ -100,18 +100,20 @@ bool ConfigItem::is_default(void) const {
 std::string ConfigItem::get_type(void) const {
 	return type;
 }
-int ConfigItem::get_i(void) const {
-	return integer_value;
+void ConfigItem::verifyType(std::string const& t) const {
+	if (t == type) return;
+	std::string name = "unknown";
+	// Try to find this item in the config map
+	for (Config::const_iterator it = config.begin(); it != config.end(); ++it) {
+		if (&it->second == this) { name = it->first; break; }
+	}
+	throw std::logic_error("Config item type mismatch: item=" + name + ", type=" + type + ", requested=" + t);
 }
-bool ConfigItem::get_b(void) const {
-	return boolean_value;
-}
-double ConfigItem::get_f(void) const {
-	return double_value;
-}
-std::string ConfigItem::get_s(void) const {
-	return string_value;
-}
+
+int ConfigItem::get_i(void) const { verifyType("int"); return integer_value; }
+bool ConfigItem::get_b(void) const { verifyType("bool"); return boolean_value; }
+double ConfigItem::get_f(void) const { verifyType("float"); return double_value; }
+std::string ConfigItem::get_s(void) const { verifyType("string"); return string_value; }
 std::vector<std::string> ConfigItem::get_sl(void) const {
 	return string_list_value;
 }

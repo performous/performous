@@ -36,6 +36,12 @@ The program configuration is stored in a global variable named config, declared
 in configuration.hh. The code there is agnostic about the specific config
 options, so you probably don't need to touch it even if you add new options.
 
+Adding new options is very easy. In C++ you simply use something like
+config["some/identfier"].get_b() to read the value and that's it. There are
+different getters for different types of config variables (get_b is for bool).
+You need to add your new option to data/performous.xml so that it appears in
+the config menu and has a suitable default value.
+
 One rather widely used tool is animvalue, which implements variables that change
 their value smoothly over time. This effect is most prominent it the song
 browser, but it is used in various other parts of the UI and we also abuse it

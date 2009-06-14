@@ -1,5 +1,19 @@
 <?xml version="1.0"?>
 <performous>
+	<!-- Gameplay preferences -->
+	<entry name="game/karaoke_mode" type="bool" value="false">
+		<locale name="C">
+			<short>Karaoke mode</short>
+			<long>Hide pitch wave, notes and scoring</long>
+		</locale>
+	</entry>
+	<entry name="game/pitch" type="bool" value="true">
+		<locale name="C">
+			<short>Pitch waves</short>
+			<long>Enable singing pitch display (when not in karaoke mode)</long>
+		</locale>
+	</entry>
+
 	<!-- Graphic preferences -->
 	<entry name="graphic/width" type="int" value="800">
 		<locale name="C">
@@ -34,12 +48,6 @@
 	<entry name="graphic/video" type="bool" value="true">
 		<locale name="C">
 			<short>Enable video playback</short>
-			<long></long>
-		</locale>
-	</entry>
-	<entry name="graphic/pitch" type="bool" value="true">
-		<locale name="C">
-			<short>Enable singing pitch display</short>
 			<long></long>
 		</locale>
 	</entry>

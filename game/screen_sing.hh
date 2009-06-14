@@ -83,6 +83,7 @@ class ScreenSing: public Screen {
 	void draw();
 
   private:
+	void drawNonKaraoke(double time);
 	Audio& m_audio;
 	Songs& m_songs;  // TODO: take song instead of all of them
 	boost::scoped_ptr<ScoreWindow> m_score_window;

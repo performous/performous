@@ -75,10 +75,12 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			if (diff > 0.0) m_audio.seek(diff);
 		}
 		else if (key == SDLK_F4) m_audio.toggleSynth(m_songs.current().notes);
-		else if (key == SDLK_F5) config["audio/video_delay"].f() -= 0.02;
-		else if (key == SDLK_F6) config["audio/video_delay"].f() += 0.02;
-		else if (key == SDLK_F7) m_engine->setLatencyAR(m_engine->getLatencyAR() - 0.02);
-		else if (key == SDLK_F8) m_engine->setLatencyAR(m_engine->getLatencyAR() + 0.02);
+		else if (key == SDLK_F5) --config["audio/video_delay"];
+		else if (key == SDLK_F6) ++config["audio/video_delay"];
+		else if (key == SDLK_F7) --config["audio/round-trip"];
+		else if (key == SDLK_F8) ++config["audio/round-trip"];
+		else if (key == SDLK_F9) ++config["game/karaoke_mode"];
+		else if (key == SDLK_F10) ++config["game/pitch"];
 		else if (key == SDLK_HOME) m_audio.seek(-m_audio.getPosition());
 		else if (key == SDLK_LEFT) { m_audio.seek(-5.0); seekback = true; }
 		else if (key == SDLK_RIGHT) m_audio.seek(5.0);
@@ -88,8 +90,6 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			exit(); m_songs.current().reload(); enter();
 			m_audio.seek(time);
 		}
-		config["audio/video_delay"].f() = clamp(round(config["audio/video_delay"].get_f() * 1000.0) / 1000.0, -0.5, 0.5);
-		if (key == SDLK_F5 || key == SDLK_F6 || key == SDLK_F7 || key == SDLK_F8) std::cout << "AV latency: " << config["audio/video_delay"].get_f() << ", AR latency: " << m_engine->getLatencyAR() << std::endl;
 		// Some things must be reset after seeking backwards
 		if (seekback) {
 			m_lyricit = m_songs.current().notes.begin();
@@ -141,24 +141,7 @@ void ScreenSing::draw() {
 		theme->bg_top->draw();
 	}
 
-	std::list<Player> const& players = m_engine->getPlayers();
-	m_noteGraph->draw(time, players); // Draw notes and pitch waves
-
-	// Score display
-	{
-		unsigned int i = 0;
-		for (std::list<Player>::const_iterator p = players.begin(); p != players.end(); ++p, ++i) {
-			float act = p->activity();
-			if (act == 0.0f) continue;
-			glColor4f(p->m_color.r, p->m_color.g, p->m_color.b,act);
-			m_player_icon->dimensions.left(-0.5 + 0.01 + 0.25 * i).fixedWidth(0.075).screenTop(0.055);
-			m_player_icon->draw();
-			m_score_text[i%2]->render((boost::format("%04d") % p->getScore()).str());
-			m_score_text[i%2]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.075).screenTop(0.055);
-			m_score_text[i%2]->draw();
-			glColor4f(1.0, 1.0, 1.0, 1.0);
-		}
-	}
+	if (!config["game/karaoke_mode"].get_b()) drawNonKaraoke(time);
 
 	// Compute and draw lyrics
 	{
@@ -194,23 +177,48 @@ void ScreenSing::draw() {
 		std::string statustxt = (boost::format("%02u:%02u") % (unsigned(time) / 60) % (unsigned(time) % 60)).str();
 		if (!m_score_window.get()) {
 			if (status == Song::INSTRUMENTAL_BREAK) statustxt += "   ENTER to skip instrumental break";
-			if (status == Song::FINISHED) statustxt += "   Remember to wait for grading!";
+			if (status == Song::FINISHED && !config["game/karaoke_mode"].get_b()) statustxt += "   Remember to wait for grading!";
 		}
 		theme->timer->draw(statustxt);
 	}
 
-	if (m_score_window.get()) {
-		if (m_quitTimer.get() == 0.0 && !m_audio.isPaused()) { sm->activateScreen("Songs"); return; }
-		m_score_window->draw();
-	}
-	else if (!m_audio.isPlaying() || (status == Song::FINISHED && m_audio.getLength() - time < 3.0)) {
-		m_quitTimer.setValue(QUIT_TIMEOUT);
-		m_score_window.reset(new ScoreWindow(sm, *m_engine));
+	if (config["game/karaoke_mode"].get_b()) {
+		if (!m_audio.isPlaying()) sm->activateScreen("Songs");
+	} else {
+		if (m_score_window.get()) {
+			if (m_quitTimer.get() == 0.0 && !m_audio.isPaused()) { sm->activateScreen("Songs"); return; }
+			m_score_window->draw();
+		}
+		else if (!m_audio.isPlaying() || (status == Song::FINISHED && m_audio.getLength() - time < 3.0)) {
+			m_quitTimer.setValue(QUIT_TIMEOUT);
+			m_score_window.reset(new ScoreWindow(sm, *m_engine));
+		}
 	}
 		
 	if (m_audio.isPaused()) {
 		m_pause_icon->dimensions.middle().center().fixedWidth(.25);
 		m_pause_icon->draw();
+	}
+}
+
+void ScreenSing::drawNonKaraoke(double time) {
+	std::list<Player> const& players = m_engine->getPlayers();
+	m_noteGraph->draw(time, players); // Draw notes and pitch waves
+
+	// Score display
+	{
+		unsigned int i = 0;
+		for (std::list<Player>::const_iterator p = players.begin(); p != players.end(); ++p, ++i) {
+			float act = p->activity();
+			if (act == 0.0f) continue;
+			glColor4f(p->m_color.r, p->m_color.g, p->m_color.b,act);
+			m_player_icon->dimensions.left(-0.5 + 0.01 + 0.25 * i).fixedWidth(0.075).screenTop(0.055);
+			m_player_icon->draw();
+			m_score_text[i%2]->render((boost::format("%04d") % p->getScore()).str());
+			m_score_text[i%2]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.075).screenTop(0.055);
+			m_score_text[i%2]->draw();
+			glColor4f(1.0, 1.0, 1.0, 1.0);
+		}
 	}
 }
 

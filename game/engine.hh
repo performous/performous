@@ -91,18 +91,14 @@ class Engine {
 		for (std::list<Player>::iterator it = m_players.begin(); it != m_players.end(); ++it, ++player) it->m_color = playerColors[player % playerColorsSize];
 		m_thread.reset(new boost::thread(boost::ref(*this)));
 	}
-	~Engine() { m_quit = true; m_thread->join(); }
-	/// kills playback
+	~Engine() { kill(); m_thread->join(); }
+	/// Terminates processing
 	void kill() { m_quit = true; }
-	/// sets latency
-	void setLatencyAR(double value) { m_latencyAR = config["audio/round-trip"].f() = clamp(round(value * 1000.0) / 1000.0, 0.0, 0.5); }
-	/// get latency
-	double getLatencyAR() const { return m_latencyAR; }
 	/** Used internally for boost::thread. Do not call this yourself. (boost::thread requires this to be public). **/
 	void operator()() {
 		while (!m_quit) {
 			std::for_each(m_players.begin(), m_players.end(), boost::bind(&Player::prepare, _1));
-			double t = m_audio.getPosition() - m_latencyAR;
+			double t = m_audio.getPosition() - config["audio/round-trip"].f();
 			double timeLeft = m_time * TIMESTEP - t;
 			if (timeLeft > 0.0) { boost::thread::sleep(now() + std::min(TIMESTEP, timeLeft)); continue; }
 			for (Notes::const_iterator it = m_song.notes.begin(); it != m_song.notes.end(); ++it) it->power = 0.0f;

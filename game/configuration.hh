@@ -66,6 +66,8 @@ class ConfigItem {
 	std::vector<std::string> &sl(bool _is_default = false);
 
   private:
+  	/// throws std::logic_error if t != type
+	void verifyType(std::string const& t) const;
 	std::string type;
 	std::string short_desc;
 	std::string long_desc;
@@ -86,7 +88,8 @@ class ConfigItem {
 	int integer_max;
 };
 
-extern std::map<std::string, ConfigItem> config;
+typedef std::map<std::string, ConfigItem> Config;
+extern Config config;
 
 void readConfigfile( const std::string &_configfile );
 void writeConfigfile( const std::string &_configfile );
