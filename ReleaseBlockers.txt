@@ -7,6 +7,9 @@ Text rendering (all parts optional for this release)
 - Use dimensions to specify bounding box (possibly init from SVG)
 - Lyric hilighted should be rendered in front of the others
 
-Configuration
-- New config menu (several items visible at once, etc)
+New config menu
+- Menu structure already in place (from XML)
+- Multiple items visible at once
+- Modifying strings and stringlist items.
+
 

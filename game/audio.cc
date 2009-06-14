@@ -63,20 +63,12 @@ void Audio::operator()(da::pcm_data& areas, da::settings const&) {
 	}
 }
 
-void Audio::setVolume_internal(unsigned int volume) {
-	boost::recursive_mutex::scoped_lock l(m_mutex);
-	if (m_streams.empty()) return;
-	Stream& s = m_streams.back();
-	if (volume == 0) { s.volume = 0.0; return; }
-	s.volume = std::pow(10.0, (volume - 100.0) / 100.0 * 2.0);
-}
-
 void Audio::playMusic(std::string const& filename, bool preview, double fadeTime, double startPos) {
 	if (!isOpen()) return;
 	// First construct the new stream
 	std::auto_ptr<Stream> s;
 	try {
-		s.reset(new Stream(filename, m_rs.rate()));
+		s.reset(new Stream(filename, m_rs.rate(), preview ? config["audio/preview_volume"] : config["audio/music_volume"]));
 		s->fadein(fadeTime);
 		if (startPos != 0.0) s->mpeg.seek(startPos, false);
 	} catch (std::runtime_error& e) {
@@ -86,7 +78,6 @@ void Audio::playMusic(std::string const& filename, bool preview, double fadeTime
 	boost::recursive_mutex::scoped_lock l(m_mutex);
 	fadeout(fadeTime);
 	m_streams.push_back(s);
-	setVolume_internal(preview ? config["audio/preview_volume"].i() : config["audio/music_volume"].i());
 	if (!preview) m_paused = false;
 }
 

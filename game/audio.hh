@@ -3,6 +3,7 @@
 
 #include <string>
 
+#include "configuration.hh"
 #include "ffmpeg.hh"
 #include "notes.hh"
 #include <boost/ptr_container/ptr_vector.hpp>
@@ -69,8 +70,8 @@ struct Stream {
 	FFmpeg mpeg;
 	/// sample rate
 	double srate;
-	/// volume
-	double volume;
+	/// volume setting to follow
+	ConfigItem& volume;
 	/// actual "faded volume"
 	double fade;
 	/// speed of fade effect
@@ -78,8 +79,8 @@ struct Stream {
 	/// do buffering or not
 	bool prebuffering;
 	/// constructor
-	Stream(std::string const& filename, unsigned int sr):
-	  mpeg(false, true, filename, sr), srate(sr), volume(), fade(1.0), fadeSpeed(), prebuffering(true) {}
+	Stream(std::string const& filename, unsigned int sr, ConfigItem& vol):
+	  mpeg(false, true, filename, sr), srate(sr), volume(vol), fade(1.0), fadeSpeed(), prebuffering(true) {}
 	/// fades stream in
 	void fadein(double time) { fade = fadeSpeed = 1.0 / (time * srate); }
 	/// fades stream out
@@ -93,8 +94,10 @@ struct Stream {
 		bool fadeMin = false, fadeMax = false;
 		if (fade + maxSamples * fadeSpeed < 0.0) { fadeSpeed = fade / maxSamples; fadeMin = true; }
 		if (fade + maxSamples * fadeSpeed > 1.0) { fadeSpeed = (1.0 - fade) / maxSamples; fadeMax = true; }
+		double vol = 0.0;
+		if (volume.i() > 0) vol = std::pow(10.0, (volume.i() - 100.0) / 100.0 * 2.0);
 		for (size_t i = 0; i < buf.size(); ++i) {
-			outbuf[i] += volume * fade * da::conv_from_s16(buf[i]);
+			outbuf[i] += vol * fade * da::conv_from_s16(buf[i]);
 			fade += fadeSpeed;
 		}
 		fade += (maxSamples - buf.size()) * fadeSpeed; // Fade continues even if no audio data was received.
@@ -152,7 +155,6 @@ class Audio {
 
   private:
 	mutable boost::recursive_mutex m_mutex;
-	void setVolume_internal(unsigned int volume);
 	typedef boost::ptr_vector<Stream> Streams;
 	Streams m_streams;
 	bool m_paused;

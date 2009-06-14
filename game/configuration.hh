@@ -2,13 +2,13 @@
 #ifndef PERFORMOUS_CONFIGURATION_HH
 #define PERFORMOUS_CONFIGURATION_HH
 
-#include "audio.hh"
 #include "util.hh"
 #include <boost/any.hpp>
 #include <boost/format.hpp>
 #include <boost/variant.hpp>
 #include <map>
 #include <string>
+#include <vector>
 
 namespace xmlpp { struct Element; }  // Forward declaration for libxml++ stuff
 

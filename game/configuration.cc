@@ -100,21 +100,13 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) {
 		if (!value_string.empty()) m_value = boost::lexical_cast<int>(value_string);
 		xmlpp::NodeSet limits = elem.find("limits");
 		if (!limits.empty()) setLimits<int>(dynamic_cast<xmlpp::Element&>(*limits[0]), m_min, m_max, m_step);
-		else {
-			m_step = 1;
-			m_min = std::numeric_limits<int>::min();
-			m_max = std::numeric_limits<int>::max();
-		}
+		else if (mode == 0) throw XMLError(elem, "child element limits missing");
 	} else if (m_type == "float") {
 		std::string value_string = getAttribute(elem, "value");
 		if (!value_string.empty()) m_value = boost::lexical_cast<double>(value_string);
 		xmlpp::NodeSet limits = elem.find("limits");
 		if (!limits.empty()) setLimits<double>(dynamic_cast<xmlpp::Element&>(*limits[0]), m_min, m_max, m_step);
-		else {
-			m_step = 0.01;
-			m_min = -getInf();
-			m_max = getInf();
-		}
+		else if (mode == 0) throw XMLError(elem, "child element limits missing");
 	} else if (m_type == "string") {
 		xmlpp::NodeSet n2 = elem.find("stringvalue/text()");
 		// FIXME: WTF does this loop do? Does find actually return many elements and why?

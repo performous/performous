@@ -115,18 +115,20 @@
 	</entry>
 
 	<!-- Audio preferences -->
-	<entry name="audio/round-trip" type="float" value="0.08" unit="s">
-		<limits min="0.0" max="0.5" step="0.02" />
-		<locale name="C">
-			<short>Audio round-trip latency in seconds</short>
-			<long>The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. Use F4 debug mode in singing screen and adjust with F7/F8.</long>
-		</locale>
-	</entry>
 	<entry name="audio/video_delay" type="float" value="0.00">
+		<ui unit="ms" multiplier="1000" />
 		<limits min="-0.5" max="0.5" step="0.02" />
 		<locale name="C">
-			<short>Audio/video delay in seconds</short>
-			<long>Use negative value if your display input lag is greater than the sound card output latency, positive values in opposite case and zero if they are equal. F5/F6 adjust this in singing screen.</long>
+			<short>Audio/video latency</short>
+			<long>Use negative value if your display input lag is greater than the sound card output latency, positive values in opposite case and zero if they are equal. F5/F6 to adjust this in singing screen.</long>
+		</locale>
+	</entry>
+	<entry name="audio/round-trip" type="float" value="0.08">
+		<ui unit="ms" multiplier="1000" />
+		<limits min="0.0" max="0.5" step="0.02" />
+		<locale name="C">
+			<short>Audio round-trip latency</short>
+			<long>The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. Use F4 debug mode in singing screen and adjust with F7/F8.</long>
 		</locale>
 	</entry>
 	<entry name="audio/capture" type="string_list">
