@@ -65,6 +65,17 @@ namespace {
 	}
 }
 
+namespace {
+	template <typename T, typename V> void setLimits(xmlpp::Element& e, V& min, V& max, V& step) {
+		std::string value = getAttribute(e, "min");
+		if (!value.empty()) min = boost::lexical_cast<T>(value);
+		value = getAttribute(e, "max");
+		if (!value.empty()) max = boost::lexical_cast<T>(value);
+		value = getAttribute(e, "step");
+		if (!value.empty()) step = boost::lexical_cast<T>(value);
+	}
+}
+
 void ConfigItem::update(xmlpp::Element& elem, int mode) {
 	if (mode == 0) {
 		m_type = getAttribute(elem, "type");
@@ -80,15 +91,23 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) {
 	} else if (m_type == "int") {
 		std::string value_string = getAttribute(elem, "value");
 		if (!value_string.empty()) m_value = boost::lexical_cast<int>(value_string);
-		m_step = 1;
-		m_min = std::numeric_limits<int>::min();
-		m_max = std::numeric_limits<int>::max();
+		xmlpp::NodeSet limits = elem.find("limits");
+		if (!limits.empty()) setLimits<int>(dynamic_cast<xmlpp::Element&>(*limits[0]), m_min, m_max, m_step);
+		else {
+			m_step = 1;
+			m_min = std::numeric_limits<int>::min();
+			m_max = std::numeric_limits<int>::max();
+		}
 	} else if (m_type == "float") {
 		std::string value_string = getAttribute(elem, "value");
 		if (!value_string.empty()) m_value = boost::lexical_cast<double>(value_string);
-		m_step = 0.01;
-		m_min = -getInf();
-		m_max = getInf();
+		xmlpp::NodeSet limits = elem.find("limits");
+		if (!limits.empty()) setLimits<double>(dynamic_cast<xmlpp::Element&>(*limits[0]), m_min, m_max, m_step);
+		else {
+			m_step = 0.01;
+			m_min = -getInf();
+			m_max = getInf();
+		}
 	} else if (m_type == "string") {
 		xmlpp::NodeSet n2 = elem.find("stringvalue/text()");
 		// FIXME: WTF does this loop do? Does find actually return many elements and why?
