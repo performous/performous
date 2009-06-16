@@ -68,6 +68,7 @@ void Songs::reload_internal(boost::filesystem::path const& parent) {
 				m_songs.push_back(boost::shared_ptr<Song>(s));
 				m_dirty = true;
 			} catch (SongParserException& e) {
+				if (e.silent()) continue;
 				std::ostringstream oss;
 				oss << "-!- Error in " << path << "\n    " << name;
 				if (e.line()) oss << " line " << e.line();

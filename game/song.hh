@@ -9,11 +9,12 @@
 /// parsing of songfile failed
 struct SongParserException: public std::runtime_error {
 	/// constructor
-	SongParserException(std::string const& msg, unsigned int linenum): runtime_error(msg), m_linenum(linenum) {}
-	/// line in which the error occured
-	unsigned int line() const { return m_linenum; }
+	SongParserException(std::string const& msg, unsigned int linenum, bool sil = false): runtime_error(msg), m_linenum(linenum), m_silent(sil) {}
+	unsigned int line() const { return m_linenum; } ///< line in which the error occured
+	bool silent() const { return m_silent; } ///< if the error should not be printed to user (file skipped)
   private:
 	unsigned int m_linenum;
+	bool m_silent;
 };
 
 class SongParser;

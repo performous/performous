@@ -26,6 +26,9 @@ class SongParser {
 		{
 			std::ifstream f((s.path + s.filename).c_str());
 			if (!f.is_open()) throw SongParserException("Could not open TXT file", 0);
+			char ch;
+			if (!f.get(ch) || ch != '#') throw SongParserException("Does not begin with '#', ignoring file", 1, true);
+			m_ss << ch;
 			m_ss << f.rdbuf();
 		}
 		// Character set conversion needed?
@@ -33,7 +36,13 @@ class SongParser {
 			Glib::convert(m_ss.str(), "UTF-8", "UTF-8"); // Test if input is UTF-8
 		} catch(...) {
 			std::cerr << "WARNING: " << s.path + s.filename << " is not UTF-8.\n  Assuming CP1252 for now. Use recode CP1252..UTF-8 */*.txt to convert your song files." << std::endl;
-			m_ss.str(Glib::convert(m_ss.str(), "UTF-8", "CP1252")); // Convert from Microsoft CP1252
+			try {
+				m_ss.str(Glib::convert(m_ss.str(), "UTF-8", "CP1252")); // Convert from Microsoft CP1252
+			} catch (...) {
+				// Filter out anything but ASCII
+				std::string tmp;
+				for (char ch; m_ss.get(ch);) tmp += (ch >= 0x20 && ch < 0x7F) ? ch : '?';
+			}
 		}
 		std::string line;
 		try {
