@@ -43,6 +43,8 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 	if (m_jukebox) {
 		if (key == SDLK_ESCAPE || m_songs.empty()) { m_jukebox = false; return; }
 		if (key == SDLK_RETURN) sm->activateScreen("Sing");
+		if (key == SDLK_UP) m_audio.seek(5);
+		if (key == SDLK_DOWN) m_audio.seek(-5);
 	}
 	if (key == SDLK_r && mod & KMOD_CTRL) { m_songs.reload(); m_songs.setFilter(m_search.text); }
 	if (!m_jukebox && m_search.process(keysym)) m_songs.setFilter(m_search.text);
@@ -68,7 +70,8 @@ void ScreenSongs::drawJukebox() {
 	double pos = m_audio.getPosition();
 	double len = m_audio.getLength();
 	double diff = len - pos;
-	if (pos < diff) diff = pos;
+	if (pos < diff) diff = pos;  // Diff from beginning instead of from end
+	if (!m_songbg.get() && !m_video.get()) diff = 0.0;  // Always display song name if there is no background
 	if (diff < 3.0) {
 		Song& song = m_songs.current();
 		// Draw the cover
@@ -154,7 +157,7 @@ void ScreenSongs::draw() {
 		m_playing = music;
 	}
 	if (m_jukebox) {
-		if (!(m_audio.getPosition() + 1.4 < m_audio.getLength())) m_songs.random();  // Switch if position is NaN or there's less than 1.4 s to song end
+		if (!m_audio.isPlaying() || m_audio.getPosition() + 1.4 > m_audio.getLength()) m_songs.advance(1);  // Switch if at song end
 	} else if (!m_audio.isPaused() && m_playTimer.get() > IDLE_TIMEOUT) {  // Switch if song hasn't changed for IDLE_TIMEOUT seconds
 		if (!m_search.text.empty()) { m_search.text.clear(); m_songs.setFilter(m_search.text); }
 		m_songs.random();
