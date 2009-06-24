@@ -16,8 +16,7 @@ supports the UltraStar song format. It is not a fork of the Delphi-based
 UltraStar games, as Performous is rewritten from scratch in C++.
 
 If you have trouble with the program (no songs found, audio not working, etc),
-try running it on a terminal. Some useful debug information such a list of
-the song folders is printed there.
+try running it on a terminal. Some useful debug information is printed there.
 
 [navigation]
 In-game navigation uses the following keys:
@@ -63,8 +62,11 @@ Randomize songs (sort them again)
 \fBCtrl+R\fR
 Refresh song list (reload from disk)
 .TP
+\fBF4\fR
+Enter jukebox mode (play songs entirely, hide song browser)
+.TP
 \fBEsc\fR
-Exit to main menu or quit search mode
+Exit to main menu, exit jukebox mode or quit search mode
 
 .SS "Singing screen:"
 .TP
@@ -83,8 +85,22 @@ Adjust audio/video sync. Use if the notes pass the black line at incorrect time.
 \fBF7\fR/\fBF8\fR
 Adjust audio roundtrip latency. Use if the pitch wave does not match the notes, when you match your timing to what you hear.
 .TP
+\fBF9\fR
+Toggle karaoke mode (hide notes and scores)
+.TP
+\fBF10\fR
+Toggle pitch wave rendering (only when karaoke mode is disabled)
+.TP
 \fBCtrl+R\fR
 Hot reload song from disk (useful for making or repairing songs)
+
+.SS "Configuration:"
+.TP
+\fBLeft\fR/\fBRight\fR/\fBUp\fR/\fBDown\fR/\fBEnter\fR
+Modify options
+.TP
+\fBCtrl+S\fR
+Save current configuration to configuration file
 
 [see also]
 You can find more information at http://performous.org/ or
