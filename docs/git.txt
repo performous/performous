@@ -1,0 +1,93 @@
+Useful information for working with GIT
+=======================================
+
+Git is a distributed revision control system. Unlike Subversion and 
+others, there is no main-repository. Every developer has an equivilant 
+copy of the projects source code and its history.
+
+
+Getting started
+---------------
+
+Most probably you figured the clone part out by yourself:
+
+	$ git clone git://performous.git.sourceforge.net/gitroot/performous <new-working-dir>
+
+respectively
+
+	$ git clone ssh://<username>@performous.git.sourceforge.net/gitroot/performous <new-working-dir>
+
+if you are a developer and want to have write access on our global 
+repository.
+
+This will create a clone of the repository on your local harddisk with 
+branch "master" checked out by default.
+
+
+Branching
+---------
+
+If you want to switch branches, you can do this by typing, no internet 
+access is necessary:
+
+	$ git checkout <branch>
+
+Doing development happens usually on private branches, only existing in 
+your own repository and invisible to others. You can create a new branch 
+with the following command:
+
+	$ git checkout -b <new-branch>
+
+It will take all your changes to a new branch, and you can continue 
+working.
+
+
+Hacking
+-------
+
+To update your working copy do a simple:
+
+	$ git pull
+
+Discovering and investigating your changes isn't any different than 
+subversion:
+
+	$ git status
+	$ git diff <file>
+
+Committing changes in git usually takes two steps. First add the files 
+you want to commit:
+
+	$ git add <files>
+
+Next create a new commit. This will invoke a text editor which allows 
+you to enter a commit message and have a last glance at what changed:
+
+	$ git commit
+
+Again: this will not interact with the main repository in any way and 
+doesn't require an internet connection. All that is altered is your 
+local repository.
+
+
+Sharing
+-------
+
+For sharing your work with other developers it's best to bring your 
+changes back to master. This can either be done with a merge, or with a 
+rebase:
+
+	$ git checkout master
+	$ git merge <your-branch>
+
+This will create a new commit which records the merge. To avoid 
+cluttering history with merge commits it's sometimes good to rebase your 
+work. This results in nicer, more linear history, but is also a 
+dangerous task, as this commands rewrites history (and in the worst case 
+can destroy **your local** repository):
+
+	$ git rebase master
+
+Then to finally push your changes into the internet simply do:
+
+	$ git push
