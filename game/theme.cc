@@ -4,6 +4,25 @@
 #include <cairo.h>
 #include <pango/pangocairo.h>
 
+/*
+	// Figure out theme folder
+	if (theme.find('/') == std::string::npos) {
+		ConfigItem::StringList sd = config["system/path_themes"].sl();
+		for (std::vector<std::string>::const_iterator it = sd.begin(); it != sd.end(); ++it) {
+			fs::path p = *it;
+			p /= config["game/theme"].s();
+			if (fs::is_directory(p)) { theme = p.string(); break; }
+		}
+    }
+	if (*theme.rbegin() == '/') theme.erase(theme.size() - 1); // Remove trailing slash
+
+
+std::string ScreenManager::getThemePathFile(std::string const& file) const {
+	if (m_theme.empty()) throw std::logic_error("ScreenManager::getThemePathFile(): m_theme is empty");
+	return m_theme + "/" + file;
+}
+*/
+
 ThemeSongs::ThemeSongs() {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	bg.reset(new Surface(sm->getThemePathFile("songs_bg.svg")));

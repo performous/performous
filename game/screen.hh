@@ -40,7 +40,7 @@ class Screen {
 class ScreenManager: public Singleton <ScreenManager> {
   public:
 	/// constructor
-	ScreenManager(std::string const& theme);
+	ScreenManager();
 	/// adds a screen to the manager
 	void addScreen(Screen* s) { std::string tmp = s->getName(); screens.insert(tmp, s); };
 	/// activates screen
@@ -55,17 +55,12 @@ class ScreenManager: public Singleton <ScreenManager> {
 	/// returns finished state
 	bool isFinished() { return m_finished; };
 
-	/// returns themename
-	std::string getThemeName() const { return m_theme; };
-	/// returns theme path
-	std::string getThemePathFile(std::string const& file) const;
-
   private:
 	bool m_finished;
 	typedef boost::ptr_map<std::string, Screen> screenmap_t;
 	screenmap_t screens;
 	Screen* currentScreen;
-	std::string m_theme;
 };
 
 #endif
+

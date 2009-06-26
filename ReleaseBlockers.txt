@@ -2,14 +2,21 @@ Blockers for 0.3.1 release
 
 Entries ending with question mark are optional (and not really blockers).
 
+General
+- New application icon everywhere (blue instead of green)
+
+Device enumeration for libda
+- Display sensible options in config menu?
+
 Text rendering (all parts optional for this release)
 - Correct vertical alignment
 - Use dimensions to specify bounding box (possibly init from SVG)
 - Lyric hilighted should be rendered in front of the others
 
 New config menu
-- Menu structure already in place (from XML)
 - Multiple items visible at once
 - Modifying strings and stringlist items.
 
+Singing screen
+- Improve the looks of the song progress bar (maybe match main menu blue color)?
 

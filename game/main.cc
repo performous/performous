@@ -73,60 +73,60 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 		window.setFullscreen(config["graphic/fullscreen"].b());
 }
 
-std::string theme;
+void audioSetup() {
+	// initialize audio argument parser
+	using namespace boost::spirit;
+	unsigned channels, rate, frames;
+	std::string devstr;
+	// channel       ::= "channel=" integer
+	// rate          ::= "rate=" integer
+	// frame         ::= "frame=" integer
+	// argument      ::= channel | rate | frame
+	// argument_list ::= integer? argument % ","
+	// backend       ::= anychar+
+	// device        ::= argument_list "@" backend | argument_list | backend
+	rule<> channels_r = ("channels=" >> uint_p[assign_a(channels)]) | uint_p[assign_a(channels)];
+	rule<> rate_r = "rate=" >> uint_p[assign_a(rate)];
+	rule<> frames_r = "frames=" >> uint_p[assign_a(frames)];
+	rule<> argument = channels_r | rate_r | frames_r;
+	rule<> argument_list = argument % ',';
+	rule<> device = (!argument_list >> '@' >> (+anychar_p)[assign_a(devstr)]) | argument_list | (*~ch_p('@'))[assign_a(devstr)];
+	// Capture devices
+	ConfigItem::StringList const& cdevs = config["audio/capture"].sl();
+	for (ConfigItem::StringList::const_iterator it = cdevs.begin(); it != cdevs.end(); ++it) {
+		channels = 2; rate = 48000; frames = 512; devstr.clear();
+		if (!parse(it->c_str(), device).full) throw std::runtime_error("Invalid syntax in mics=" + mics[i]);
+		try {
+			capture.addMics(channels, rate, frames, devstr);
+		} catch (std::exception const& e) {
+			std::cerr << "Capture device mics=" << *it << " failed and will be ignored:\n  " << e.what() << std::endl;
+		}
+	}
+	if (capture.analyzers().empty()) std::cerr << "No capture devices could be used. Please use --mics to define some." << std::endl;
+	// Playback devices
+	ConfigItem::StringList const& pdevs = config["audio/playback"].sl();
+	for (ConfigItem::StringList::const_iterator it = pdevs.begin(); it != pdevs.end(); ++it) {
+		channels = 2; rate = 48000; frames = 512; devstr.clear();
+		if (!parse(it->c_str(), device).full) throw std::runtime_error("Invalid syntax in pdev=" + pdevs[i]);
+		if (channels != 2) throw std::runtime_error("Only stereo playback is supported, error in pdev=" + pdevs[i]);
+		try {
+			audio.open(devstr, rate, frames);
+		} catch (std::exception const& e) {
+			std::cerr << "Playback device pdev=" << *it << " failed and will be ignored:\n  " << e.what() << std::endl;
+		}
+	}
+	if (!audio.isOpen()) std::cerr << "No playback devices could be used. Please use --pdev to define one." << std::endl;
+}
+
 std::string songlist;
-std::vector<std::string> mics;
-std::vector<std::string> pdevs;
 
 void mainLoop() {
 	try {
 		Capture capture;
 		Audio audio;
-		{
-			// initialize audio argument parser
-			using namespace boost::spirit;
-			unsigned channels, rate, frames;
-			std::string devstr;
-
-			// channel       ::= "channel=" integer
-			// rate          ::= "rate=" integer
-			// frame         ::= "frame=" integer
-			// argument      ::= channel | rate | frame
-			// argument_list ::= integer? argument % ","
-			// backend       ::= anychar+
-			// device        ::= argument_list "@" backend | argument_list | backend
-			rule<> channels_r = ("channels=" >> uint_p[assign_a(channels)]) | uint_p[assign_a(channels)];
-			rule<> rate_r = "rate=" >> uint_p[assign_a(rate)];
-			rule<> frames_r = "frames=" >> uint_p[assign_a(frames)];
-			rule<> argument = channels_r | rate_r | frames_r;
-			rule<> argument_list = argument % ',';
-			rule<> device = (!argument_list >> '@' >> (+anychar_p)[assign_a(devstr)]) | argument_list | (*~ch_p('@'))[assign_a(devstr)];
-			// Capture devices
-			for(std::size_t i = 0; i < mics.size(); ++i) {
-				channels = 2; rate = 48000; frames = 512; devstr.clear();
-				if (!parse(mics[i].c_str(), device).full) throw std::runtime_error("Invalid syntax in mics=" + mics[i]);
-				try {
-					capture.addMics(channels, rate, frames, devstr);
-				} catch (std::exception const& e) {
-					std::cerr << "Capture device mics=" << mics[i] << " failed and will be ignored:\n  " << e.what() << std::endl;
-				}
-			}
-			if (capture.analyzers().empty()) std::cerr << "No capture devices could be used. Please use --mics to define some." << std::endl;
-			// Playback devices
-			for(std::size_t i = 0; i < pdevs.size() && !audio.isOpen(); ++i) {
-				channels = 2; rate = 48000; frames = 512; devstr.clear();
-				if (!parse(pdevs[i].c_str(), device).full) throw std::runtime_error("Invalid syntax in pdev=" + pdevs[i]);
-				if (channels != 2) throw std::runtime_error("Only stereo playback is supported, error in pdev=" + pdevs[i]);
-				try {
-					audio.open(devstr, rate, frames);
-				} catch (std::exception const& e) {
-					std::cerr << "Playback device pdev=" << pdevs[i] << " failed and will be ignored:\n  " << e.what() << std::endl;
-				}
-			}
-			if (!audio.isOpen()) std::cerr << "No playback devices could be used. Please use --pdev to define one." << std::endl;
-		}
+		audioSetup(capture, audio);
 		Songs songs(songlist);
-		ScreenManager sm(theme);
+		ScreenManager sm;
 		Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b(), config["graphic/fs_width"].i(), config["graphic/fs_height"].i());
 		sm.addScreen(new ScreenIntro("Intro", audio, capture));
 		sm.addScreen(new ScreenSongs("Songs", audio, songs));
@@ -161,6 +161,13 @@ void mainLoop() {
 	}
 }
 
+template <typename Container> void confOverride(Container const& c, std::string const& name) {
+	if (c.empty()) return;  // Don't override if no options specified
+	ConfigItem::StringList& sl = config[name].sl();
+	sl.clear();
+	std::copy(c.begin(), c.end(), std::back_inserter(sl));
+}
+
 #include <signal.h>
 
 int main(int argc, char** argv) {
@@ -170,125 +177,102 @@ int main(int argc, char** argv) {
 	std::ios::sync_with_stdio(false);  // We do not use C stdio
 	da::initialize libda;
 	readConfig();
-	{
-		std::vector<std::string> songdirs;
-		namespace po = boost::program_options;
-		po::options_description opt1("Generic options");
-		opt1.add_options()
-		  ("help,h", "you are viewing it")
-		  ("version,v", "display version number");
-		po::options_description opt2("Configuration options");
-		opt2.add_options()
-		  ("theme,t", po::value<std::string>(&theme), "set theme (name or absolute path)")
-		  ("fs,f", "enable full screen mode")
-		  ("fps", "benchmark rendering speed\n  also disable 100 FPS limit")
-		  ("songlist", po::value<std::string>(&songlist), "save a list of songs in the specified folder")
-		  ("width,W", po::value<int>(), "set horizontal resolution")
-		  ("height,H", po::value<int>(), "set vertical resolution")
-		  ("fs-width", po::value<int>(), "set fullscreen horizontal resolution")
-		  ("fs-height", po::value<int>(), "set fullscreen vertical resolution")
-		  ("michelp", "detailed help for --mics and a list of available audio devices")
-		  ("mics", po::value<std::vector<std::string> >(&mics)->composing(), "specify microphones to use")
-		  ("pdevhelp", "detailed help for --pdev and a list of available audio devices")
-		  ("pdev", po::value<std::vector<std::string> >(&pdevs)->composing(), "specify a playback device")
-		  ("songdir,s", po::value<std::vector<std::string> >(&songdirs)->composing(), "additional song folders to scan\n  may be specified without -s or -songdir too");
-		po::positional_options_description p;
-		p.add("songdir", -1);
-		po::options_description cmdline;
-		cmdline.add(opt1).add(opt2);
-		po::variables_map vm;
-		try {
-			po::store(po::command_line_parser(argc, argv).options(cmdline).positional(p).run(), vm);
-			{
-				std::ifstream conf((getHomeDir() / ".config" / "performous.conf").string().c_str());
-				po::store(po::parse_config_file(conf, opt2), vm);
-			}
-			{
-				std::ifstream conf("/etc/performous.conf");
-				po::store(po::parse_config_file(conf, opt2), vm);
-			}
-			po::notify(vm);
-		} catch (std::exception& e) {
-			std::cout << cmdline << std::endl;
-			std::cout << "ERROR: " << e.what() << std::endl;
-			return 1;
+	std::vector<std::string> mics;
+	std::vector<std::string> pdevs;
+	std::vector<std::string> songdirs;
+	namespace po = boost::program_options;
+	po::options_description opt1("Generic options");
+	opt1.add_options()
+	  ("help,h", "you are viewing it")
+	  ("version,v", "display version number");
+	po::options_description opt2("Configuration options");
+	opt2.add_options()
+	  ("theme,t", po::value<std::string>(), "set theme (name or absolute path)")
+	  ("fs,f", "enable full screen mode")
+	  ("fps", "benchmark rendering speed\n  also disable 100 FPS limit")
+	  ("songlist", po::value<std::string>(&songlist), "save a list of songs in the specified folder")
+	  ("width,W", po::value<int>(), "set horizontal resolution")
+	  ("height,H", po::value<int>(), "set vertical resolution")
+	  ("fs-width", po::value<int>(), "set fullscreen horizontal resolution")
+	  ("fs-height", po::value<int>(), "set fullscreen vertical resolution")
+	  ("michelp", "detailed help for --mics and a list of available audio devices")
+	  ("mics", po::value<std::vector<std::string> >(&mics)->composing(), "specify microphones to use")
+	  ("pdevhelp", "detailed help for --pdev and a list of available audio devices")
+	  ("pdev", po::value<std::vector<std::string> >(&pdevs)->composing(), "specify a playback device")
+	  ("songdir,s", po::value<std::vector<std::string> >(&songdirs)->composing(), "additional song folders to scan\n  may be specified without -s or -songdir too");
+	// Process flagless options as songdirs
+	po::positional_options_description p;
+	p.add("songdir", -1);
+	po::options_description cmdline;
+	cmdline.add(opt1).add(opt2);
+	po::variables_map vm;
+	// Load more arguments from performous.conf files
+	try {
+		po::store(po::command_line_parser(argc, argv).options(cmdline).positional(p).run(), vm);
+		{
+			std::ifstream conf((getHomeDir() / ".config" / "performous.conf").string().c_str());
+			po::store(po::parse_config_file(conf, opt2), vm);
 		}
-		if (vm.count("width")) config["graphic/window_width"].i() = vm["width"].as<int>();
-		if (vm.count("height")) config["graphic/window_height"].i() = vm["height"].as<int>();
-		if (vm.count("fs-width")) config["graphic/fs_width"].i() = vm["fs-width"].as<int>();
-		if (vm.count("fs-height")) config["graphic/fs_height"].i() = vm["fs-height"].as<int>();
-		if (vm.count("theme")) config["game/theme"].s() = vm["theme"].as<std::string>();
-		if (vm.count("help")) {
-			std::cout << cmdline << std::endl;
-			return 0;
+		{
+			std::ifstream conf("/etc/performous.conf");
+			po::store(po::parse_config_file(conf, opt2), vm);
 		}
-		if (vm.count("pdevhelp")) {
-			da::playback::devlist_t l = da::playback::devices();
-			std::cout << "Specify with --pdev [OPTIONS@]dev[:settings]]. For example:\n"
-			  "  --pdev jack                       JACK output\n"
-			  "  --pdev rate=44100,frames=512@alsa ALSA with 44.1 kHz and buffers of 512 samples\n"
-			  "                                    Nearest available rate will be used.\n"
-			  "  --pdev alsa:hw:Intel              Use ALSA sound card named Intel.\n\n"
-			  "If multiple pdevs are specified, they will all be tested to find a working one.\n" << std::endl;
-			std::cout << "Playback devices available:" << std::endl;
-			for (da::playback::devlist_t::const_iterator it = l.begin(); it != l.end(); ++it) {
-				std::cout << boost::format("  %1% %|10t|%2%\n") % it->name() % it->desc();
-			}
-			return 0;
-		}
-		if (vm.count("michelp")) {
-			da::record::devlist_t l = da::record::devices();
-			std::cout << "Specify with --mics [OPTIONS@]dev[:settings]]. For example:\n"
-			  "  --mics channels=2                 Two mics on any sound device\n"
-			  "  --mics channels=2@jack            Two mics on JACK\n"
-			  "  --mics channels=18@alsa:hw:M16DX  18 input channels on ALSA device \"hw:M16DX\"\n"
-			  "                                    Note: only the first four at most will be used\n"
-			  "  --mics channels=1,rate=44100      One mic; will try to get 44100 Hz if available\n\n"
-			  "Multiple --mics options may be specified and all the successfully opened inputs\n"
-			  "are be assigned as players until the maximum of four players are configured.\n" << std::endl;
-			std::cout << "Capture devices available:" << std::endl;
-			for (da::record::devlist_t::const_iterator it = l.begin(); it != l.end(); ++it) {
-				std::cout << boost::format("  %1% %|10t|%2%\n") % it->name() % it->desc();
-			}
-			return 0;
-		}
-		if (vm.count("version")) {
-			std::cout << PACKAGE << ' ' << VERSION << std::endl;
-			return 0;
-		}
-		if (vm.count("fs")) config["graphic/fullscreen"].b() = true;
-		if (vm.count("fps")) config["graphic/fps"].b() = true;
-		if (vm.count("songdir")) {
-			// Commandline arguments are used for songdirs and config
-			ConfigItem::StringList& sd = config["system/path_songs"].sl();
-			sd.clear();			
-			std::copy(songdirs.begin(), songdirs.end(), std::back_inserter(sd));
-		}
-		// Figure out theme folder
-		if (theme.find('/') == std::string::npos) {
-			ConfigItem::StringList sd = config["system/path_themes"].sl();
-			for (std::vector<std::string>::const_iterator it = sd.begin(); it != sd.end(); ++it) {
-				fs::path p = *it;
-				p /= config["game/theme"].s();
-				if (fs::is_directory(p)) { theme = p.string(); break; }
-			}
-        }
-		if (*theme.rbegin() == '/') theme.erase(theme.size() - 1); // Remove trailing slash
+	} catch (std::exception& e) {
+		std::cout << cmdline << std::endl;
+		std::cout << "ERROR: " << e.what() << std::endl;
+		return 1;
 	}
-	if( mics.empty() ) {
-		std::vector<std::string> ac = config["audio/capture"].sl();
-		for (std::vector<std::string>::const_iterator it = ac.begin(); it != ac.end(); ++it) {
-			mics.push_back(*it);
-		}
-		// No default devices for mics because that might cause unwanted extra mics
+	po::notify(vm);
+	if (vm.count("help")) {
+		std::cout << cmdline << std::endl;
+		return 0;
 	}
-	if( pdevs.empty() ) {
-		std::vector<std::string> ap = config["audio/playback"].sl();
-		for (std::vector<std::string>::const_iterator it = ap.begin(); it != ap.end(); ++it) {
-			pdevs.push_back(*it);
+	if (vm.count("pdevhelp")) {
+		da::playback::devlist_t l = da::playback::devices();
+		std::cout << "Specify with --pdev [OPTIONS@]dev[:settings]]. For example:\n"
+		  "  --pdev jack                       JACK output\n"
+		  "  --pdev rate=44100,frames=512@alsa ALSA with 44.1 kHz and buffers of 512 samples\n"
+		  "                                    Nearest available rate will be used.\n"
+		  "  --pdev alsa:hw:Intel              Use ALSA sound card named Intel.\n\n"
+		  "If multiple pdevs are specified, they will all be tested to find a working one.\n" << std::endl;
+		std::cout << "Playback devices available:" << std::endl;
+		for (da::playback::devlist_t::const_iterator it = l.begin(); it != l.end(); ++it) {
+			std::cout << boost::format("  %1% %|10t|%2%\n") % it->name() % it->desc();
 		}
-		pdevs.push_back(""); // Anything goes (fallback if everything else failed)
+		return 0;
 	}
+	if (vm.count("michelp")) {
+		da::record::devlist_t l = da::record::devices();
+		std::cout << "Specify with --mics [OPTIONS@]dev[:settings]]. For example:\n"
+		  "  --mics channels=2                 Two mics on any sound device\n"
+		  "  --mics channels=2@jack            Two mics on JACK\n"
+		  "  --mics channels=18@alsa:hw:M16DX  18 input channels on ALSA device \"hw:M16DX\"\n"
+		  "                                    Note: only the first four at most will be used\n"
+		  "  --mics channels=1,rate=44100      One mic; will try to get 44100 Hz if available\n\n"
+		  "Multiple --mics options may be specified and all the successfully opened inputs\n"
+		  "are be assigned as players until the maximum of four players are configured.\n" << std::endl;
+		std::cout << "Capture devices available:" << std::endl;
+		for (da::record::devlist_t::const_iterator it = l.begin(); it != l.end(); ++it) {
+			std::cout << boost::format("  %1% %|10t|%2%\n") % it->name() % it->desc();
+		}
+		return 0;
+	}
+	if (vm.count("version")) {
+		std::cout << PACKAGE << ' ' << VERSION << std::endl;
+		return 0;
+	}
+	// Override XML config for options that were specified from commandline or performous.conf
+	if (vm.count("width")) config["graphic/window_width"].i() = vm["width"].as<int>();
+	if (vm.count("height")) config["graphic/window_height"].i() = vm["height"].as<int>();
+	if (vm.count("fs-width")) config["graphic/fs_width"].i() = vm["fs-width"].as<int>();
+	if (vm.count("fs-height")) config["graphic/fs_height"].i() = vm["fs-height"].as<int>();
+	if (vm.count("theme")) config["game/theme"].s() = vm["theme"].as<std::string>();
+	if (vm.count("fs")) config["graphic/fullscreen"].b() = true;
+	if (vm.count("fps")) config["graphic/fps"].b() = true;
+	confOverride(songdirs, "system/path_songs");
+	confOverride(mics, "audio/capture");
+	confOverride(pdevs, "audio/playback");
+	// Run the game init and main loop
 	mainLoop();
 	return 0; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
 }
