@@ -18,7 +18,7 @@
 class ScoreWindow {
   public:
 	/// constructor
-	ScoreWindow(ScreenManager const* sm, Engine & e);
+	ScoreWindow(Engine & e);
 	/// draws ScoreWindow
 	void draw();
 

@@ -14,7 +14,6 @@ namespace {
 }
 
 void ScreenSing::enter() {
-	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	Song& song = m_songs.current();
 	std::string file = song.path + song.mp3;
 	m_audio.playMusic(file.c_str());
@@ -65,7 +64,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		if (key == SDLK_ESCAPE || key == SDLK_q) sm->activateScreen("Songs");
 		else if (key == SDLK_RETURN) {
 			if (m_score_window.get()) sm->activateScreen("Songs");  // Score window visible -> Enter quits
-			else if (status == Song::FINISHED) m_score_window.reset(new ScoreWindow(sm, *m_engine)); // Song finished, but no score window -> show it
+			else if (status == Song::FINISHED) m_score_window.reset(new ScoreWindow(*m_engine)); // Song finished, but no score window -> show it
 		}
 		else if (key == SDLK_SPACE || key == SDLK_PAUSE) m_audio.togglePause();
 		if (m_score_window.get()) return;
@@ -191,7 +190,7 @@ void ScreenSing::draw() {
 		}
 		else if (!m_audio.isPlaying() || (status == Song::FINISHED && m_audio.getLength() - time < 3.0)) {
 			m_quitTimer.setValue(QUIT_TIMEOUT);
-			m_score_window.reset(new ScoreWindow(sm, *m_engine));
+			m_score_window.reset(new ScoreWindow(*m_engine));
 		}
 	}
 		
@@ -222,7 +221,7 @@ void ScreenSing::drawNonKaraoke(double time) {
 	}
 }
 
-ScoreWindow::ScoreWindow(ScreenManager const* sm, Engine& e):
+ScoreWindow::ScoreWindow(Engine& e):
   m_pos(0.8, 2.0),
   m_bg(getThemePath("score_window.svg")),
   m_scoreBar(getThemePath("score_bar_bg.svg"), getThemePath("score_bar_fg.svg"), ProgressBar::VERTICAL, 0.0, 0.0, false),

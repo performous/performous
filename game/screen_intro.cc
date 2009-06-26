@@ -4,7 +4,6 @@
 ScreenIntro::ScreenIntro(std::string const& name, Audio& audio, Capture& capture): Screen(name), m_audio(audio), m_capture(capture) {}
 
 void ScreenIntro::enter() {
-	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	m_audio.playMusic(getThemePath("menu.ogg"), true);
 	background.reset(new Surface(getThemePath("intro.svg")));
 	std::string msg;

@@ -15,7 +15,6 @@ ScreenSongs::ScreenSongs(std::string const& name, Audio& audio, Songs& songs):
 }
 
 void ScreenSongs::enter() {
-	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	theme.reset(new ThemeSongs());
 	m_emptyCover.reset(new Surface(getThemePath("no_cover.svg")));
 	m_search.text.clear();

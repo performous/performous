@@ -10,7 +10,6 @@ ScreenPractice::ScreenPractice(std::string const& name, Audio& audio, Capture& c
 
 void ScreenPractice::enter() {
 	probe();
-	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	m_audio.playMusic(getThemePath("practice.ogg"));
 	theme.reset(new ThemePractice());
 	// draw vu meters
