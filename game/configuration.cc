@@ -145,8 +145,10 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) {
 	if (mode < 2) m_defaultValue = m_value;
 }
 
-void writeConfigfile(const std::string &_configfile) {
-	std::cout << "Saving configuration file \"" << _configfile << "\"" << std::endl;
+fs::path userConfFile = getHomeDir() / ".config" / "performous.xml";
+
+void writeConfig() {
+	std::cout << "Saving configuration file \"" << userConfFile << "\"" << std::endl;
 	xmlpp::Document doc;
 	xmlpp::Node* nodeRoot = doc.create_root_node("performous");
 	for(std::map<std::string, ConfigItem>::iterator it = config.begin(); it != config.end(); ++it) {
@@ -169,7 +171,7 @@ void writeConfigfile(const std::string &_configfile) {
 			}
 		}
 	}
-	doc.write_to_file_formatted(_configfile);
+	doc.write_to_file_formatted(userConfFile.string(), "UTF-8");
 }
 
 // TODO: move MenuEntry definition to some header and allow screen_configuration access it (preferrably not via global variables)
@@ -193,13 +195,13 @@ void readMenuXML(xmlpp::Node* node) {
 	configMenu.push_back(me);
 }
 
-void readConfigXML(std::string const& file, int mode) {
+void readConfigXML(fs::path const& file, int mode) {
 	if (!boost::filesystem::exists(file)) {
 		std::cout << "Skipping " << file << " (not found)" << std::endl;
 		return;
 	}
 	std::cout << "Parsing " << file << std::endl;
-	xmlpp::DomParser domParser(file);
+	xmlpp::DomParser domParser(file.string());
 	try {
 		xmlpp::NodeSet n = domParser.get_document()->get_root_node()->find("/performous/menu/entry");
 		if (!n.empty()) {
@@ -210,7 +212,7 @@ void readConfigXML(std::string const& file, int mode) {
 		for (xmlpp::NodeSet::const_iterator it = n.begin(), end = n.end(); it != end; ++it) {
 			xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**it);
 			std::string name = getAttribute(elem, "name");
-			if (name.empty()) throw std::runtime_error(file + " element Entry missing name attribute");
+			if (name.empty()) throw std::runtime_error(file.string() + " element Entry missing name attribute");
 			Config::iterator it = config.find(name);
 			if (mode == 0) { // Schema
 				if (it != config.end()) throw std::runtime_error("Configuration schema contains the same value twice: " + name);
@@ -235,11 +237,11 @@ void readConfigXML(std::string const& file, int mode) {
 	} catch (XMLError& e) {
 		int line = e.elem.get_line();
 		std::string name = e.elem.get_name();
-		throw std::runtime_error(file + ":" + boost::lexical_cast<std::string>(line) + " element " + name + " " + e.message);
+		throw std::runtime_error(file.string() + ":" + boost::lexical_cast<std::string>(line) + " element " + name + " " + e.message);
 	}
 }
 
-void readConfigfile(std::string const& userConf) {
+void readConfig() {
 	// Find config schema
 	std::string schemafile;
 	{
@@ -263,7 +265,7 @@ void readConfigfile(std::string const& userConf) {
 	}
 	readConfigXML(schemafile, 0);  // Read schema and defaults
 	readConfigXML("/etc/xdg/performous/performous.xml", 1);  // Update defaults with system config
-	readConfigXML(userConf, 2);  // Read user settings
+	readConfigXML(userConfFile, 2);  // Read user settings
 	// DEBUG code follows, remove this after real menu is done
 	std::cout << "CONFIG MENU" << std::endl;
 	for (ConfigMenu::const_iterator it = configMenu.begin(), end = configMenu.end(); it != end; ++it) {

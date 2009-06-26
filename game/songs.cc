@@ -1,8 +1,8 @@
 #include "songs.hh"
 
+#include "fs.hh"
 #include "screen.hh"
 #include <boost/bind.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
@@ -12,9 +12,10 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <iterator>
 #include <stdexcept>
 
-Songs::Songs(std::set<std::string> const& songdirs, std::string const& songlist): m_songdirs(songdirs), m_songlist(songlist), math_cover(), m_order(), m_dirty(false), m_loading(false) {
+Songs::Songs(std::string const& songlist): m_songlist(songlist), math_cover(), m_order(), m_dirty(false), m_loading(false) {
 	reload();
 }
 
@@ -25,6 +26,11 @@ Songs::~Songs() {
 
 void Songs::reload() {
 	if (m_loading) return;
+	// Copy songdirs from config into m_songdirs
+	ConfigItem::StringList const& sd = config["system/path_songs"].sl();
+	m_songdirs.clear();
+	std::transform(sd.begin(), sd.end(), std::inserter(m_songdirs, m_songdirs.end()), pathMangle);
+	// Run loading thread
 	m_loading = true;
 	m_thread.reset(new boost::thread(boost::bind(&Songs::reload_internal, boost::ref(*this))));
 }
@@ -35,8 +41,8 @@ void Songs::reload_internal() {
 		m_songs.clear();
 		m_dirty = true;
 	}
-	for (std::set<std::string>::const_iterator it = m_songdirs.begin(); m_loading && it != m_songdirs.end(); ++it) {
-		if (!boost::filesystem::is_directory(*it)) { std::cout << ">>> Not scanning: " << *it << " (no such directory)" << std::endl; continue; }
+	for (SongDirs::const_iterator it = m_songdirs.begin(); m_loading && it != m_songdirs.end(); ++it) {
+		if (!fs::is_directory(*it)) { std::cout << ">>> Not scanning: " << *it << " (no such directory)" << std::endl; continue; }
 		std::cout << ">>> Scanning " << *it << std::endl;
 		size_t count = m_songs.size();
 		reload_internal(*it);
@@ -48,8 +54,8 @@ void Songs::reload_internal() {
 	m_dirty = true;  // Force shuffle
 }
 
-void Songs::reload_internal(boost::filesystem::path const& parent) {
-	namespace fs = boost::filesystem;
+void Songs::reload_internal(fs::path const& parent) {
+	namespace fs = fs;
 	if (std::distance(parent.begin(), parent.end()) > 20) { std::cout << ">>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)" << std::endl; return; }
 	try {
 		boost::regex expression(".*\\.[Tt][Xx][Tt]$");
@@ -225,8 +231,6 @@ void Songs::sort_internal() {
 }
 
 namespace {
-	namespace fs = boost::filesystem;
-
 	void dumpCover(xmlpp::Element* song, Song const& s, size_t num) {
 		try {
 			std::string ext = s.cover.substr(s.cover.rfind('.'));
@@ -256,7 +260,7 @@ namespace {
 			song->add_child("title")->set_child_text(s.title);
 			if (!s.cover.empty()) dumpCover(song, s, i + 1);
 		}
-		doc.write_to_file_formatted(filename);
+		doc.write_to_file_formatted(filename, "UTF-8");
 	}
 }
 

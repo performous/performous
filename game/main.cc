@@ -1,5 +1,6 @@
 #include "config.hh"
 #include <audio.hpp>
+#include "fs.hh"
 #include "screen.hh"
 #include "screen_intro.hh"
 #include "screen_songs.hh"
@@ -8,7 +9,6 @@
 #include "screen_configuration.hh"
 #include "video_driver.hh"
 #include "xtime.hh"
-#include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 #include <boost/spirit/core.hpp>
@@ -17,8 +17,6 @@
 #include <set>
 #include <string>
 #include <vector>
-
-namespace fs = boost::filesystem;
 
 volatile bool g_quit = false;
 
@@ -55,13 +53,6 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 				if (esc) return;
 				esc = true;
 			}
-			if (keypressed == SDLK_s && modifier & KMOD_CTRL ) {
-				std::string homedir;
-				char const* home = getenv("HOME");
-				if (home) homedir = std::string(home) + '/';
-				writeConfigfile( homedir + ".config/performous.xml" );
-				continue; // Already handled here...
-			}
 			if (keypressed == SDLK_RETURN && modifier & KMOD_ALT ) {
 				config["graphic/fullscreen"].b() = !config["graphic/fullscreen"].b();
 				continue; // Already handled here...
@@ -92,17 +83,11 @@ int main(int argc, char** argv) {
 	da::initialize libda;
 	std::string theme;
 	std::string songlist;
-	std::set<std::string> songdirs;
 	std::vector<std::string> mics;
 	std::vector<std::string> pdevs;
-	std::string homedir;
+	readConfig();
 	{
-		char const* home = getenv("HOME");
-		if (home) homedir = std::string(home) + '/';
-		readConfigfile( homedir + ".config/performous.xml");
-	}
-	{
-		std::vector<std::string> songdirstmp;
+		std::vector<std::string> songdirs;
 		namespace po = boost::program_options;
 		po::options_description opt1("Generic options");
 		opt1.add_options()
@@ -122,8 +107,7 @@ int main(int argc, char** argv) {
 		  ("mics", po::value<std::vector<std::string> >(&mics)->composing(), "specify microphones to use")
 		  ("pdevhelp", "detailed help for --pdev and a list of available audio devices")
 		  ("pdev", po::value<std::vector<std::string> >(&pdevs)->composing(), "specify a playback device")
-		  ("clean,c", "disable internal default song folders")
-		  ("songdir,s", po::value<std::vector<std::string> >(&songdirstmp)->composing(), "additional song folders to scan\n  may be specified without -s or -songdir too");
+		  ("songdir,s", po::value<std::vector<std::string> >(&songdirs)->composing(), "additional song folders to scan\n  may be specified without -s or -songdir too");
 		po::positional_options_description p;
 		p.add("songdir", -1);
 		po::options_description cmdline;
@@ -131,8 +115,8 @@ int main(int argc, char** argv) {
 		po::variables_map vm;
 		try {
 			po::store(po::command_line_parser(argc, argv).options(cmdline).positional(p).run(), vm);
-			if (!homedir.empty()) {
-				std::ifstream conf((homedir + ".config/performous.conf").c_str());
+			{
+				std::ifstream conf((getHomeDir() / ".config" / "performous.conf").string().c_str());
 				po::store(po::parse_config_file(conf, opt2), vm);
 			}
 			{
@@ -190,20 +174,11 @@ int main(int argc, char** argv) {
 		}
 		if (vm.count("fs")) config["graphic/fullscreen"].b() = true;
 		if (vm.count("fps")) config["graphic/fps"].b() = true;
-		// Copy songdirstmp into songdirs
-		for (std::vector<std::string>::const_iterator it = songdirstmp.begin(); it != songdirstmp.end(); ++it) {
-			std::string str = *it;
-			if (*str.rbegin() != '/') str += '/';
-			songdirs.insert(str);
-		}
-		// Insert default dirs
-		if (!vm.count("clean")) {
-			ConfigItem::StringList sd = config["system/path_songs"].sl();
-			for (std::vector<std::string>::const_iterator it = sd.begin(); it != sd.end(); ++it) {
-				std::string dir = *it;
-				if (dir.size() >= 2 && dir[0] == '~' && dir[1] == '/' && !homedir.empty()) dir = homedir + dir.substr(2);
-				songdirs.insert(dir);
-			}
+		if (vm.count("songdir")) {
+			// Commandline arguments are used for songdirs and config
+			ConfigItem::StringList& sd = config["system/path_songs"].sl();
+			sd.clear();			
+			std::copy(songdirs.begin(), songdirs.end(), std::back_inserter(sd));
 		}
 		// Figure out theme folder
 		if (theme.find('/') == std::string::npos) {
@@ -216,7 +191,6 @@ int main(int argc, char** argv) {
         }
 		if (*theme.rbegin() == '/') theme.erase(theme.size() - 1); // Remove trailing slash
 	}
-	// Use ones from config file if none given on commandline. TODO: add commandline arguments to config instead.
 	if( mics.empty() ) {
 		std::vector<std::string> ac = config["audio/capture"].sl();
 		for (std::vector<std::string>::const_iterator it = ac.begin(); it != ac.end(); ++it) {
@@ -277,7 +251,7 @@ int main(int argc, char** argv) {
 			}
 			if (!audio.isOpen()) std::cerr << "No playback devices could be used. Please use --pdev to define one." << std::endl;
 		}
-		Songs songs(songdirs, songlist);
+		Songs songs(songlist);
 		ScreenManager sm(theme);
 		Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b(), config["graphic/fs_width"].i(), config["graphic/fs_height"].i());
 		sm.addScreen(new ScreenIntro("Intro", audio, capture));

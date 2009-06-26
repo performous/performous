@@ -47,8 +47,11 @@ class ConfigItem {
 typedef std::map<std::string, ConfigItem> Config;
 extern Config config; ///< A global variable that contains all config items
 
-void readConfigfile( const std::string &_configfile );
-void writeConfigfile( const std::string &_configfile );
+/** Read config schema and configuration from XML files **/
+void readConfig();
+
+/** Write modified config options to user's config XML **/
+void writeConfig();
 
 /// integer class
 /** clamps to min, max

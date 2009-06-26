@@ -1,10 +1,8 @@
 #pragma once
-#ifndef PERFORMOUS_SONGS_HH
-#define PERFORMOUS_SONGS_HH
 
 #include "animvalue.hh"
+#include "fs.hh"
 #include "song.hh"
-#include <boost/filesystem.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/mutex.hpp>
@@ -16,7 +14,7 @@
 class Songs: boost::noncopyable {
   public:
 	/// constructor
-	Songs(std::set<std::string> const& songdirs, std::string const& songlist = std::string());
+	Songs(std::string const& songlist = std::string());
 	~Songs();
 	/// updates filtered songlist
 	void update() { if (m_dirty) filter_internal(); }
@@ -64,7 +62,8 @@ class Songs: boost::noncopyable {
   private:
 	class RestoreSel;
 	typedef std::vector<boost::shared_ptr<Song> > SongVector;
-	std::set<std::string> m_songdirs;
+	typedef std::set<fs::path> SongDirs;
+	SongDirs m_songdirs;
 	std::string m_songlist;
 	SongVector m_songs, m_filtered;
 	AnimAcceleration math_cover;
@@ -72,7 +71,7 @@ class Songs: boost::noncopyable {
 	int m_order;
 	void dumpSongs_internal() const;
 	void reload_internal();
-	void reload_internal(boost::filesystem::path const& p);
+	void reload_internal(fs::path const& p);
 	void randomize_internal();
 	void filter_internal();
 	void sort_internal();
@@ -81,6 +80,4 @@ class Songs: boost::noncopyable {
 	boost::scoped_ptr<boost::thread> m_thread;
 	mutable boost::mutex m_mutex;
 };
-
-#endif
 

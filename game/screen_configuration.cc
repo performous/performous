@@ -22,12 +22,14 @@ void ScreenConfiguration::manageEvent(SDL_Event event) {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	if (event.type == SDL_KEYDOWN) {
 		int key = event.key.keysym.sym;
+		SDLMod modifier = event.key.keysym.mod;
 		if (key == SDLK_ESCAPE || key == SDLK_q) sm->activateScreen("Intro");
 		else if (key == SDLK_SPACE || key == SDLK_PAUSE) m_audio.togglePause();
 		else if (key == SDLK_UP && selected > 0) --selected;
 		else if (key == SDLK_DOWN && selected + 1 < configuration.size()) ++selected;
 		else if (key == SDLK_LEFT && configuration.size() > 0) configuration[selected].setPrevious();
 		else if (key == SDLK_RIGHT && configuration.size() > 0) configuration[selected].setNext();
+		else if (key == SDLK_s && modifier & KMOD_CTRL) writeConfig();
 	}
 }
 
