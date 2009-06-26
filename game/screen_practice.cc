@@ -53,7 +53,7 @@ void ScreenPractice::manageEvent(SDL_Event event) {
 }
 
 void ScreenPractice::draw() {
-	theme->bg->draw();
+	theme->bg.draw();
 	this->draw_analyzers();
 }
 
@@ -87,16 +87,16 @@ void ScreenPractice::draw_analyzers() {
 				float posXnote = -0.25 + 0.2 * i + 0.002 * t->stabledb;
 				float posYnote = .075-noteOffset*0.015;
 
-				theme->note->dimensions.left(posXnote).center(posYnote);
-				theme->note->draw();
+				theme->note.dimensions.left(posXnote).center(posYnote);
+				theme->note.draw();
 				if (sharp) {
-					theme->sharp->dimensions.right(posXnote).center(posYnote);
-					theme->sharp->draw();
+					theme->sharp.dimensions.right(posXnote).center(posYnote);
+					theme->sharp.draw();
 				}
 			}
 
 			if (!text) {
-				theme->note_txt->draw(scale.getNoteStr(freq));
+				theme->note_txt.draw(scale.getNoteStr(freq));
 				text = true;
 			}
 		}

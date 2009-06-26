@@ -32,7 +32,7 @@ void ScreenSing::enter() {
 	m_player_icon.reset(new Surface(getThemePath("sing_pbox.svg")));
 	m_progress.reset(new ProgressBar(getThemePath("sing_progressbg.svg"), getThemePath("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01, 0.01, true));
 	m_progress->dimensions.fixedWidth(0.4).left(-0.5).screenTop();
-	theme->timer->dimensions.screenTop(0.5 * m_progress->dimensions.h());
+	theme->timer.dimensions.screenTop(0.5 * m_progress->dimensions.h());
 	m_lyricit = song.notes.begin();
 	boost::ptr_vector<Analyzer>& analyzers = m_capture.analyzers();
 	m_engine.reset(new Engine(m_audio, m_songs.current(), analyzers.begin(), analyzers.end()));
@@ -134,10 +134,10 @@ void ScreenSing::draw() {
 		if (m_video) { m_video->render(time + song.videoGap); double tmp = m_video->dimensions().ar(); if (tmp > 0.0) ar = tmp; }
 		ar = clamp(ar, arMin, arMax);
 		double offset = 0.5 / ar + 0.2;
-		theme->bg_bottom->dimensions.fixedWidth(1.0).bottom(offset);
-		theme->bg_bottom->draw();
-		theme->bg_top->dimensions.fixedWidth(1.0).top(-offset);
-		theme->bg_top->draw();
+		theme->bg_bottom.dimensions.fixedWidth(1.0).bottom(offset);
+		theme->bg_bottom.draw();
+		theme->bg_top.dimensions.fixedWidth(1.0).top(-offset);
+		theme->bg_top.draw();
 	}
 
 	if (!config["game/karaoke_mode"].b()) drawNonKaraoke(time);
@@ -163,8 +163,8 @@ void ScreenSing::draw() {
 		double pos = basepos;
 		for (size_t i = 0; i < m_lyrics.size(); ++i, pos += linespacing) {
 			pos += m_lyrics[i].extraspacing.get() * linespacing;
-			if (i == 0) m_lyrics[0].draw(*theme->lyrics_now, time, pos);
-			else if (i == 1) m_lyrics[1].draw(*theme->lyrics_next, time, pos);
+			if (i == 0) m_lyrics[0].draw(theme->lyrics_now, time, pos);
+			else if (i == 1) m_lyrics[1].draw(theme->lyrics_next, time, pos);
 		}
 	}
 
@@ -178,7 +178,7 @@ void ScreenSing::draw() {
 			if (status == Song::INSTRUMENTAL_BREAK) statustxt += "   ENTER to skip instrumental break";
 			if (status == Song::FINISHED && !config["game/karaoke_mode"].b()) statustxt += "   Remember to wait for grading!";
 		}
-		theme->timer->draw(statustxt);
+		theme->timer.draw(statustxt);
 	}
 
 	if (config["game/karaoke_mode"].b()) {

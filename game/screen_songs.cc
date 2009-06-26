@@ -78,12 +78,12 @@ void ScreenSongs::drawJukebox() {
 		Surface* cover = NULL;
 		if (!song.cover.empty()) try { cover = &m_covers[song.path + song.cover]; } catch (std::exception const&) {}
 		Surface& s = (cover ? *cover : *m_emptyCover);
-		s.dimensions.right(theme->song->dimensions.x1()).top(theme->song->dimensions.y1()).fitInside(0.1, 0.1); s.draw();
+		s.dimensions.right(theme->song.dimensions.x1()).top(theme->song.dimensions.y1()).fitInside(0.1, 0.1); s.draw();
 		*/
 		// Format && draw the song information text
 		std::ostringstream oss_song;
 		oss_song << song.title << '\n' << song.artist;
-		theme->song->draw(oss_song.str());
+		theme->song.draw(oss_song.str());
 	}
 }
 
@@ -93,7 +93,7 @@ void ScreenSongs::draw() {
 	double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
 	if (m_songbg.get()) m_songbg->draw();
 	if (m_video.get()) m_video->render(time);
-	if (!m_jukebox) theme->bg->draw();
+	if (!m_jukebox) theme->bg.draw();
 	std::string music, songbg, video;
 	std::ostringstream oss_song, oss_order;
 	// Test if there are no songs
@@ -142,8 +142,8 @@ void ScreenSongs::draw() {
 	if (m_jukebox) drawJukebox();
 	else {
 		// Draw song and order texts
-		theme->song->draw(oss_song.str());
-		theme->order->draw(oss_order.str());
+		theme->song.draw(oss_song.str());
+		theme->order.draw(oss_order.str());
 	}
 	// Schedule playback change if the chosen song has changed
 	if (music != m_playReq) { m_playReq = music; m_playTimer.setValue(0.0); }

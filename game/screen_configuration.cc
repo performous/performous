@@ -34,10 +34,10 @@ void ScreenConfiguration::manageEvent(SDL_Event event) {
 }
 
 void ScreenConfiguration::draw() {
-	theme->bg->draw();
+	theme->bg.draw();
 	if(  configuration.size() > 0 ) {
-		theme->item->draw(configuration[selected].getDescription());
-		theme->value->draw(configuration[selected].getValue());
+		theme->item.draw(configuration[selected].getDescription());
+		theme->value.draw(configuration[selected].getValue());
 	}
 }
 
