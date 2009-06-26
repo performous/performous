@@ -73,6 +73,94 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 		window.setFullscreen(config["graphic/fullscreen"].b());
 }
 
+std::string theme;
+std::string songlist;
+std::vector<std::string> mics;
+std::vector<std::string> pdevs;
+
+void mainLoop() {
+	try {
+		Capture capture;
+		Audio audio;
+		{
+			// initialize audio argument parser
+			using namespace boost::spirit;
+			unsigned channels, rate, frames;
+			std::string devstr;
+
+			// channel       ::= "channel=" integer
+			// rate          ::= "rate=" integer
+			// frame         ::= "frame=" integer
+			// argument      ::= channel | rate | frame
+			// argument_list ::= integer? argument % ","
+			// backend       ::= anychar+
+			// device        ::= argument_list "@" backend | argument_list | backend
+			rule<> channels_r = ("channels=" >> uint_p[assign_a(channels)]) | uint_p[assign_a(channels)];
+			rule<> rate_r = "rate=" >> uint_p[assign_a(rate)];
+			rule<> frames_r = "frames=" >> uint_p[assign_a(frames)];
+			rule<> argument = channels_r | rate_r | frames_r;
+			rule<> argument_list = argument % ',';
+			rule<> device = (!argument_list >> '@' >> (+anychar_p)[assign_a(devstr)]) | argument_list | (*~ch_p('@'))[assign_a(devstr)];
+			// Capture devices
+			for(std::size_t i = 0; i < mics.size(); ++i) {
+				channels = 2; rate = 48000; frames = 512; devstr.clear();
+				if (!parse(mics[i].c_str(), device).full) throw std::runtime_error("Invalid syntax in mics=" + mics[i]);
+				try {
+					capture.addMics(channels, rate, frames, devstr);
+				} catch (std::exception const& e) {
+					std::cerr << "Capture device mics=" << mics[i] << " failed and will be ignored:\n  " << e.what() << std::endl;
+				}
+			}
+			if (capture.analyzers().empty()) std::cerr << "No capture devices could be used. Please use --mics to define some." << std::endl;
+			// Playback devices
+			for(std::size_t i = 0; i < pdevs.size() && !audio.isOpen(); ++i) {
+				channels = 2; rate = 48000; frames = 512; devstr.clear();
+				if (!parse(pdevs[i].c_str(), device).full) throw std::runtime_error("Invalid syntax in pdev=" + pdevs[i]);
+				if (channels != 2) throw std::runtime_error("Only stereo playback is supported, error in pdev=" + pdevs[i]);
+				try {
+					audio.open(devstr, rate, frames);
+				} catch (std::exception const& e) {
+					std::cerr << "Playback device pdev=" << pdevs[i] << " failed and will be ignored:\n  " << e.what() << std::endl;
+				}
+			}
+			if (!audio.isOpen()) std::cerr << "No playback devices could be used. Please use --pdev to define one." << std::endl;
+		}
+		Songs songs(songlist);
+		ScreenManager sm(theme);
+		Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b(), config["graphic/fs_width"].i(), config["graphic/fs_height"].i());
+		sm.addScreen(new ScreenIntro("Intro", audio, capture));
+		sm.addScreen(new ScreenSongs("Songs", audio, songs));
+		sm.addScreen(new ScreenSing("Sing", audio, songs, capture));
+		sm.addScreen(new ScreenPractice("Practice", audio, capture));
+		sm.addScreen(new ScreenConfiguration("Configuration", audio));
+		sm.activateScreen("Intro");
+		// Main loop
+		boost::xtime time = now();
+		unsigned nb_frames = 0;
+		while (!sm.isFinished()) {
+			checkEvents_SDL(sm, window);
+			window.blank();
+			sm.getCurrentScreen()->draw();
+			window.swap();
+			++nb_frames;
+			if (config["graphic/fps"].b()) {
+				if (now() - time > 1.0) {
+					std::cout << nb_frames << " FPS" << std::endl;
+					time += 1.0;
+					nb_frames = 0;
+				}
+			} else {
+				boost::thread::sleep(time + 0.01); // Max 100 FPS
+				time = now();
+			}
+		}
+	} catch (std::exception& e) {
+		std::cout << "FATAL ERROR: " << e.what() << std::endl;
+	} catch (QuitNow&) {
+		std::cout << "Terminated." << std::endl;
+	}
+}
+
 #include <signal.h>
 
 int main(int argc, char** argv) {
@@ -81,10 +169,6 @@ int main(int argc, char** argv) {
 	signal(SIGTERM, quit);
 	std::ios::sync_with_stdio(false);  // We do not use C stdio
 	da::initialize libda;
-	std::string theme;
-	std::string songlist;
-	std::vector<std::string> mics;
-	std::vector<std::string> pdevs;
 	readConfig();
 	{
 		std::vector<std::string> songdirs;
@@ -205,86 +289,7 @@ int main(int argc, char** argv) {
 		}
 		pdevs.push_back(""); // Anything goes (fallback if everything else failed)
 	}
-	try {
-		Capture capture;
-		Audio audio;
-		{
-			// initialize audio argument parser
-			using namespace boost::spirit;
-			unsigned channels, rate, frames;
-			std::string devstr;
-
-			// channel       ::= "channel=" integer
-			// rate          ::= "rate=" integer
-			// frame         ::= "frame=" integer
-			// argument      ::= channel | rate | frame
-			// argument_list ::= integer? argument % ","
-			// backend       ::= anychar+
-			// device        ::= argument_list "@" backend | argument_list | backend
-			rule<> channels_r = ("channels=" >> uint_p[assign_a(channels)]) | uint_p[assign_a(channels)];
-			rule<> rate_r = "rate=" >> uint_p[assign_a(rate)];
-			rule<> frames_r = "frames=" >> uint_p[assign_a(frames)];
-			rule<> argument = channels_r | rate_r | frames_r;
-			rule<> argument_list = argument % ',';
-			rule<> device = (!argument_list >> '@' >> (+anychar_p)[assign_a(devstr)]) | argument_list | (*~ch_p('@'))[assign_a(devstr)];
-			// Capture devices
-			for(std::size_t i = 0; i < mics.size(); ++i) {
-				channels = 2; rate = 48000; frames = 512; devstr.clear();
-				if (!parse(mics[i].c_str(), device).full) throw std::runtime_error("Invalid syntax in mics=" + mics[i]);
-				try {
-					capture.addMics(channels, rate, frames, devstr);
-				} catch (std::exception const& e) {
-					std::cerr << "Capture device mics=" << mics[i] << " failed and will be ignored:\n  " << e.what() << std::endl;
-				}
-			}
-			if (capture.analyzers().empty()) std::cerr << "No capture devices could be used. Please use --mics to define some." << std::endl;
-			// Playback devices
-			for(std::size_t i = 0; i < pdevs.size() && !audio.isOpen(); ++i) {
-				channels = 2; rate = 48000; frames = 512; devstr.clear();
-				if (!parse(pdevs[i].c_str(), device).full) throw std::runtime_error("Invalid syntax in pdev=" + pdevs[i]);
-				if (channels != 2) throw std::runtime_error("Only stereo playback is supported, error in pdev=" + pdevs[i]);
-				try {
-					audio.open(devstr, rate, frames);
-				} catch (std::exception const& e) {
-					std::cerr << "Playback device pdev=" << pdevs[i] << " failed and will be ignored:\n  " << e.what() << std::endl;
-				}
-			}
-			if (!audio.isOpen()) std::cerr << "No playback devices could be used. Please use --pdev to define one." << std::endl;
-		}
-		Songs songs(songlist);
-		ScreenManager sm(theme);
-		Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b(), config["graphic/fs_width"].i(), config["graphic/fs_height"].i());
-		sm.addScreen(new ScreenIntro("Intro", audio, capture));
-		sm.addScreen(new ScreenSongs("Songs", audio, songs));
-		sm.addScreen(new ScreenSing("Sing", audio, songs, capture));
-		sm.addScreen(new ScreenPractice("Practice", audio, capture));
-		sm.addScreen(new ScreenConfiguration("Configuration", audio));
-		sm.activateScreen("Intro");
-		// Main loop
-		boost::xtime time = now();
-		unsigned nb_frames = 0;
-		while (!sm.isFinished()) {
-			checkEvents_SDL(sm, window);
-			window.blank();
-			sm.getCurrentScreen()->draw();
-			window.swap();
-			++nb_frames;
-			if (config["graphic/fps"].b()) {
-				if (now() - time > 1.0) {
-					std::cout << nb_frames << " FPS" << std::endl;
-					time += 1.0;
-					nb_frames = 0;
-				}
-			} else {
-				boost::thread::sleep(time + 0.01); // Max 100 FPS
-				time = now();
-			}
-		}
-	} catch (std::exception& e) {
-		std::cout << "FATAL ERROR: " << e.what() << std::endl;
-	} catch (QuitNow&) {
-		std::cout << "Terminated." << std::endl;
-	}
+	mainLoop();
 	return 0; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
 }
 
