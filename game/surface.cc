@@ -1,13 +1,15 @@
 #include "surface.hh"
-#include <GL/glu.h>
 
+#include "fs.hh"
 #include "configuration.hh"
 #include "video_driver.hh"
+#include <GL/glu.h>
 #include <Magick++.h>
 #include <boost/bind.hpp>
+#include <fstream>
 #include <stdexcept>
-#include <vector>
 #include <sstream>
+#include <vector>
 
 float Dimensions::screenY() const {
 	switch (m_screenAnchor) {
@@ -53,11 +55,8 @@ bool checkExtension(std::string const& extension) {
 	return false;
 }
 
-#include <fstream>
-#include "screen.hh"
-
 template <typename T> void loader(T& target, std::string filename, bool autocrop) {
-	std::string themefilename = ScreenManager::getSingletonPtr()->getThemePathFile(filename);
+	std::string themefilename = getThemePath(filename);
 	if (std::ifstream(themefilename.c_str()).is_open()) filename = themefilename;
 	else if (!std::ifstream(filename.c_str()).is_open()) throw std::runtime_error("File not found: " + filename);
 	if (filename.size() > 4 && filename.substr(filename.size() - 4) == ".svg") {

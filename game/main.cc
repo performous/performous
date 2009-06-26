@@ -73,7 +73,7 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 		window.setFullscreen(config["graphic/fullscreen"].b());
 }
 
-void audioSetup() {
+void audioSetup(Capture& capture, Audio& audio) {
 	// initialize audio argument parser
 	using namespace boost::spirit;
 	unsigned channels, rate, frames;
@@ -95,7 +95,7 @@ void audioSetup() {
 	ConfigItem::StringList const& cdevs = config["audio/capture"].sl();
 	for (ConfigItem::StringList::const_iterator it = cdevs.begin(); it != cdevs.end(); ++it) {
 		channels = 2; rate = 48000; frames = 512; devstr.clear();
-		if (!parse(it->c_str(), device).full) throw std::runtime_error("Invalid syntax in mics=" + mics[i]);
+		if (!parse(it->c_str(), device).full) throw std::runtime_error("Invalid syntax in mics=" + *it);
 		try {
 			capture.addMics(channels, rate, frames, devstr);
 		} catch (std::exception const& e) {
@@ -107,8 +107,8 @@ void audioSetup() {
 	ConfigItem::StringList const& pdevs = config["audio/playback"].sl();
 	for (ConfigItem::StringList::const_iterator it = pdevs.begin(); it != pdevs.end(); ++it) {
 		channels = 2; rate = 48000; frames = 512; devstr.clear();
-		if (!parse(it->c_str(), device).full) throw std::runtime_error("Invalid syntax in pdev=" + pdevs[i]);
-		if (channels != 2) throw std::runtime_error("Only stereo playback is supported, error in pdev=" + pdevs[i]);
+		if (!parse(it->c_str(), device).full) throw std::runtime_error("Invalid syntax in pdev=" + *it);
+		if (channels != 2) throw std::runtime_error("Only stereo playback is supported, error in pdev=" + *it);
 		try {
 			audio.open(devstr, rate, frames);
 		} catch (std::exception const& e) {

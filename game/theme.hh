@@ -1,10 +1,9 @@
-#ifndef __THEME_H__
-#define __THEME_H__
+#pragma once
 
+#include "opengl_text.hh"
+#include "surface.hh"
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
-#include "surface.hh"
-#include "opengl_text.hh"
 #include <string>
 
 /// abstract theme class
@@ -58,4 +57,3 @@ struct ThemeConfiguration: Theme {
 	boost::scoped_ptr<SvgTxtTheme> value;
 };
 
-#endif

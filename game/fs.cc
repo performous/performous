@@ -1,5 +1,6 @@
 #include "fs.hh"
 
+#include "configuration.hh"
 #include <cstdlib>
 
 fs::path getHomeDir() {
@@ -23,5 +24,21 @@ fs::path pathMangle(fs::path const& dir) {
 		ret /= *it;
 	}
 	return ret;
+}
+
+std::string getThemePath(std::string const& filename) {
+	std::string theme = config["game/theme"].s();
+	if (theme.empty()) throw std::runtime_error("Configuration value game/theme is empty");
+	// Figure out theme folder (if theme name rather than path was given)
+	if (theme.find('/') == std::string::npos) {
+		ConfigItem::StringList sd = config["system/path_themes"].sl();
+		for (std::vector<std::string>::const_iterator it = sd.begin(); it != sd.end(); ++it) {
+			fs::path p = *it;
+			p /= theme;
+			if (fs::is_directory(p)) { theme = p.string(); break; }
+		}
+    }
+	if (*theme.rbegin() == '/') theme.erase(theme.size() - 1); // Remove trailing slash
+	return theme + "/" + filename;
 }
 

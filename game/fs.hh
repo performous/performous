@@ -11,3 +11,6 @@ fs::path getHomeDir();
 /** Do mangling to convert user-entered path into path suitable for use with stdlib etc. **/
 fs::path pathMangle(fs::path const& dir);
 
+/** Get full path to a file from the current theme **/
+std::string getThemePath(std::string const& filename);
+

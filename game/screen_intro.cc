@@ -5,8 +5,8 @@ ScreenIntro::ScreenIntro(std::string const& name, Audio& audio, Capture& capture
 
 void ScreenIntro::enter() {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
-	m_audio.playMusic(sm->getThemePathFile("menu.ogg"), true);
-	background.reset(new Surface(sm->getThemePathFile("intro.svg")));
+	m_audio.playMusic(getThemePath("menu.ogg"), true);
+	background.reset(new Surface(getThemePath("intro.svg")));
 	std::string msg;
 	if (!m_audio.isOpen()) msg = "No playback devices could be used.\n";
 	if (m_capture.analyzers().empty()) msg += "No microphones found.\n";

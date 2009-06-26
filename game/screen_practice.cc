@@ -11,12 +11,12 @@ ScreenPractice::ScreenPractice(std::string const& name, Audio& audio, Capture& c
 void ScreenPractice::enter() {
 	probe();
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
-	m_audio.playMusic(sm->getThemePathFile("practice.ogg"));
+	m_audio.playMusic(getThemePath("practice.ogg"));
 	theme.reset(new ThemePractice());
 	// draw vu meters
 	for (unsigned int i = 0, mics = m_capture.analyzers().size(); i < mics; ++i) {
 		ProgressBar* b;
-		m_vumeters.push_back(b = new ProgressBar(sm->getThemePathFile("vumeter_bg.svg"), sm->getThemePathFile("vumeter_fg.svg"), ProgressBar::VERTICAL, 0.136, 0.023));
+		m_vumeters.push_back(b = new ProgressBar(getThemePath("vumeter_bg.svg"), getThemePath("vumeter_fg.svg"), ProgressBar::VERTICAL, 0.136, 0.023));
 		b->dimensions.screenBottom().left(-0.4 + i * 0.2).fixedWidth(0.04);
 	}
 }
