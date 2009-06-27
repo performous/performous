@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /cvsroot/ultrastar-ng/UltraStar-ng/portage-overlay/games-arcade/performous/performous-9999.ebuild,v 1.10 2007/09/29 13:04:19 yoda-jm Exp $
 
-inherit games subversion cmake-utils
+inherit games git cmake-utils
 
 RESTRICT="nostrip"
 
@@ -13,8 +13,7 @@ DESCRIPTION="SingStar GPL clone"
 HOMEPAGE="http://performous.org"
 SRC_URI="songs? ( mirror://sourceforge/${PN}/${SONGS_P}.tar.bz2 )"
 
-ESVN_REPO_URI="https://ultrastar-ng.svn.sourceforge.net/svnroot/ultrastar-ng/trunk"
-ESVN_PROJECT="Performous"
+EGIT_REPO_URI="git://performous.git.sourceforge.net/gitroot/performous"
 
 LICENSE="GPL-2
 	songs? (
@@ -55,9 +54,11 @@ pkg_setup() {
 }
 
 src_unpack() {
-	subversion_src_unpack
+	git_src_unpack
 	if use songs; then
+		cd "${S}"
 		unpack "${SONGS_P}.tar.bz2"
+		pwd
 	fi
 }
 
