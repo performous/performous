@@ -20,7 +20,7 @@ class ScreenConfiguration: public Screen {
   private:
 	Audio& m_audio;
 	boost::scoped_ptr<ThemeConfiguration> theme;
-	boost::ptr_vector<Configuration> configuration;
+	std::vector<std::string> configuration;
 	unsigned int selected;
 };
 

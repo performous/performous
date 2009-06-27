@@ -27,11 +27,13 @@ class ConfigItem {
 	double& f(); ///< Access floating-point item
 	std::string& s(); ///< Access string item
 	StringList& sl(); ///< Access stringlist item
-	void reset() { m_value = m_defaultValue; }
-	std::string const& get_short_description() { return m_shortDesc; }
-	std::string const& get_long_description() { return m_longDesc; }
+	void reset() { m_value = m_defaultValue; } ///< Reset to factory default
+	std::string getValue() const; ///< Get a human-readable representation of the current value
+	std::string const& getShortDesc() const { return m_shortDesc; }
+	std::string const& getLongDesc() const { return m_longDesc; }
 	
   private:
+	template <typename T> void updateNumeric(xmlpp::Element& elem, int mode); ///< Used internally for loading XML
 	void verifyType(std::string const& t) const; ///< throws std::logic_error if t != type
 	ConfigItem& incdec(int dir); ///< Increment/decrement by dir steps (must be -1 or 1)
 	std::string m_type;
@@ -42,6 +44,8 @@ class ConfigItem {
 	Value m_value; ///< The current value
 	Value m_defaultValue; ///< The value from factory/system config
 	boost::variant<int, double> m_step, m_min, m_max;
+	boost::variant<int, double> m_multiplier;
+	std::string m_unit;
 };
 
 typedef std::map<std::string, ConfigItem> Config;
@@ -62,71 +66,5 @@ struct MenuEntry {
 
 typedef std::vector<MenuEntry> ConfigMenu;
 extern ConfigMenu configMenu;
-
-/// integer class
-/** clamps to min, max
- */
-template<int min, int max> class Integer {
-  public:
-	/// constructor
-	Integer(int value): m_value(clamp(value, min, max)) {}
-	/// assignment
-	Integer& operator=(int value) { m_value = clamp(value, min, max); return *this; }
-	/// returns int value
-	int val() const { return m_value; }
-	/// returns int value
-	int& val() { return m_value; }
-
-  private:
-	int m_value;
-};
-
-/// abstract configuration base class
-class Configuration {
-  public:
-	/// constructor
-	Configuration() {};
-	virtual ~Configuration() {};
-	/// next possible config value
-	virtual void setNext() = 0;
-	/// previous possible config value
-	virtual void setPrevious() = 0;
-	/// get config description
-	virtual std::string const getDescription() const = 0;
-	/// get current config value
-	virtual std::string getValue() const = 0;
-};
-
-/// a single configuration item
-class ConfigurationItem : public Configuration {
-  public:
-	/// constructor
-	ConfigurationItem(std::string _key): Configuration(), m_key(_key) { };
-	virtual ~ConfigurationItem() {};
-	/// next possible config value
-	void setNext() {
-		++config[m_key];
-	};
-	/// previous possible config value
-	void setPrevious() {
-		--config[m_key];
-	};
-	/// get current config value
-	std::string getValue() const {
-		ConfigItem item = config[m_key];
-		if (item.get_type() == "int") return (boost::format("%d") % item.i()).str();
-		else if (item.get_type() == "float") return (boost::format("%.2f") % item.f()).str();
-		else if (item.get_type() == "bool") return item.b() ? "Enabled" : "Disabled";
-		else if (item.get_type() == "string") return item.s();
-		else if (item.get_type() == "string_list") return (boost::format("%d items") % item.sl().size()).str();
-		else return std::string("Type not managed");
-	};
-	/// get config description
-	std::string const getDescription() const { 
-		return config[m_key].get_short_description();
-	};
-  private:
-	std::string m_key;
-};
 
 #endif

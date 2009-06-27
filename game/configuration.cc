@@ -6,6 +6,7 @@
 #include <libxml++/libxml++.h>
 #include <math.h>
 #include <algorithm>
+#include <iomanip>
 #include <stdexcept>
 
 Config config;
@@ -53,6 +54,32 @@ std::string& ConfigItem::s() { verifyType("string"); return boost::get<std::stri
 ConfigItem::StringList& ConfigItem::sl() { verifyType("string_list"); return boost::get<StringList>(m_value); }
 
 namespace {
+	template <typename T, typename VariantAll, typename VariantNum> std::string numericFormat(VariantAll const& value, VariantNum const& multiplier, VariantNum const& step) {
+		T m = boost::get<T>(multiplier);
+		// Find suitable precision (not very useful for integers, but this code is generic...)
+		T s = std::abs(m * boost::get<T>(step));
+		unsigned precision = 0;
+		while (s > 0.0 && (s *= 10) < 10) ++precision;
+		// Format the output
+		boost::format fmter("%f");
+		fmter % boost::io::group(std::setprecision(precision), double(m) * boost::get<T>(value));
+		return fmter.str();
+	}
+}
+
+std::string ConfigItem::getValue() const {
+	if (m_type == "int") return numericFormat<int>(m_value, m_multiplier, m_step) + m_unit;
+	if (m_type == "float") return numericFormat<double>(m_value, m_multiplier, m_step) + m_unit;
+	if (m_type == "bool") return boost::get<bool>(m_value) ? "Enabled" : "Disabled";
+	if (m_type == "string") return boost::get<std::string>(m_value);
+	if (m_type == "string_list") {
+		StringList const& sl = boost::get<StringList>(m_value);
+		return sl.size() == 1 ? "{" + sl[0] + "}" : (boost::format("%d items") % sl.size()).str();
+	}
+	throw std::logic_error("ConfigItem::getValue doesn't know type '" + m_type + "'");
+}
+
+namespace {
 	struct XMLError {
 		XMLError(xmlpp::Element& e, std::string msg): elem(e), message(msg) {}
 		xmlpp::Element& elem;
@@ -83,6 +110,28 @@ namespace {
 	}
 }
 
+template <typename T> void ConfigItem::updateNumeric(xmlpp::Element& elem, int mode) {
+	xmlpp::NodeSet ns = elem.find("limits");
+	if (!ns.empty()) setLimits<T>(dynamic_cast<xmlpp::Element&>(*ns[0]), m_min, m_max, m_step);
+	else if (mode == 0) throw XMLError(elem, "child element limits missing");
+	ns = elem.find("ui");
+	// Default values
+	if (mode == 0) {
+		m_unit.clear();
+		m_multiplier = static_cast<T>(1);
+	}
+	if (!ns.empty()) {
+		xmlpp::Element& e = dynamic_cast<xmlpp::Element&>(*ns[0]);
+		try { m_unit = getAttribute(e, "unit"); } catch (...) {}
+		std::string m;
+		try {
+			m = getAttribute(e, "multiplier");
+			m_multiplier = boost::lexical_cast<T>(m);
+		} catch (XMLError&) {}
+		catch (boost::bad_lexical_cast&) { throw XMLError(e, "attribute multiplier='" + m + "' value invalid"); }
+	}
+}
+
 void ConfigItem::update(xmlpp::Element& elem, int mode) {
 	if (mode == 0) {
 		m_type = getAttribute(elem, "type");
@@ -98,15 +147,11 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) {
 	} else if (m_type == "int") {
 		std::string value_string = getAttribute(elem, "value");
 		if (!value_string.empty()) m_value = boost::lexical_cast<int>(value_string);
-		xmlpp::NodeSet limits = elem.find("limits");
-		if (!limits.empty()) setLimits<int>(dynamic_cast<xmlpp::Element&>(*limits[0]), m_min, m_max, m_step);
-		else if (mode == 0) throw XMLError(elem, "child element limits missing");
+		updateNumeric<int>(elem, mode);
 	} else if (m_type == "float") {
 		std::string value_string = getAttribute(elem, "value");
 		if (!value_string.empty()) m_value = boost::lexical_cast<double>(value_string);
-		xmlpp::NodeSet limits = elem.find("limits");
-		if (!limits.empty()) setLimits<double>(dynamic_cast<xmlpp::Element&>(*limits[0]), m_min, m_max, m_step);
-		else if (mode == 0) throw XMLError(elem, "child element limits missing");
+		updateNumeric<double>(elem, mode);
 	} else if (m_type == "string") {
 		xmlpp::NodeSet n2 = elem.find("stringvalue/text()");
 		// FIXME: WTF does this loop do? Does find actually return many elements and why?
@@ -261,7 +306,7 @@ void readConfig() {
 	for (ConfigMenu::const_iterator it = configMenu.begin(), end = configMenu.end(); it != end; ++it) {
 		std::cout << it->shortDesc << " (" << it->longDesc << ")" << std::endl;
 		for (std::vector<std::string>::const_iterator it2 = it->items.begin(), end2 = it->items.end(); it2 < end2; ++it2)
-		  std::cout << "  " << config[*it2].get_short_description() << std::endl;
+		  std::cout << "  " << config[*it2].getShortDesc() << std::endl;
 	}
 }
 
