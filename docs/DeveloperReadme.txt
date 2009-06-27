@@ -70,6 +70,10 @@ Coding style & Boost:
 Use good C++ style. No C strings (char*), atoi or other things you may have
 become familiar with when coding "C/C++".
 
+All header files begin with line #pragma once, which is not standard, but is
+supported by all compilers that we care of. Include guards should not be used
+even though some older headers might still have them instead of #pragma once.
+
 We do not use delete, delete[] or new[] and we avoid using "new". Instead,
 standard library containers are used when arrays are needed and
 Boost.ptr_containers (e.g. boost::ptr_vector) are used when containers of
