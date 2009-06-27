@@ -54,6 +54,7 @@
 
 	<!-- Graphic preferences -->
 	<entry name="graphic/window_width" type="int" value="800" hidden="true">
+		<ui unit=" pixels" />
 		<limits min="320" max="4096" step="16" />
 		<locale name="C">
 			<short>Windowed width</short>
@@ -61,6 +62,7 @@
 		</locale>
 	</entry>
 	<entry name="graphic/window_height" type="int" value="600" hidden="true">
+		<ui unit=" pixels" />
 		<limits min="240" max="2048" step="16" />
 		<locale name="C">
 			<short>Windowed height</short>
@@ -68,6 +70,7 @@
 		</locale>
 	</entry>
 	<entry name="graphic/fs_width" type="int" value="1024">
+		<ui unit=" px" />
 		<limits min="320" max="4096" step="16" />
 		<locale name="C">
 			<short>Fullscreen width</short>
@@ -75,6 +78,7 @@
 		</locale>
 	</entry>
 	<entry name="graphic/fs_height" type="int" value="768">
+		<ui unit=" px" />
 		<limits min="240" max="2048" step="16" />
 		<locale name="C">
 			<short>Fullscreen height</short>
@@ -94,6 +98,7 @@
 		</locale>
 	</entry>
 	<entry name="graphic/svg_lod" type="float" value="1.0">
+		<ui unit="x" />
 		<limits min="0.5" max="3.0" step="0.1" />
 		<locale name="C">
 			<short>SVG quality</short>
@@ -101,6 +106,7 @@
 		</locale>
 	</entry>
 	<entry name="graphic/text_lod" type="float" value="1.0">
+		<ui unit="x" />
 		<limits min="0.5" max="3.0" step="0.1" />
 		<locale name="C">
 			<short>Text quality</short>
@@ -116,7 +122,7 @@
 
 	<!-- Audio preferences -->
 	<entry name="audio/video_delay" type="float" value="0.00">
-		<ui unit="ms" multiplier="1000" />
+		<ui unit=" ms" multiplier="1000" />
 		<limits min="-0.5" max="0.5" step="0.02" />
 		<locale name="C">
 			<short>Audio/video latency</short>
@@ -124,7 +130,7 @@
 		</locale>
 	</entry>
 	<entry name="audio/round-trip" type="float" value="0.08">
-		<ui unit="ms" multiplier="1000" />
+		<ui unit=" ms" multiplier="1000" />
 		<limits min="0.0" max="0.5" step="0.02" />
 		<locale name="C">
 			<short>Audio round-trip latency</short>
@@ -149,6 +155,7 @@
 		</locale>
 	</entry>
 	<entry name="audio/preview_volume" type="int" value="70">
+		<ui unit=" %" />
 		<limits min="0" max="100" step="5" />
 		<locale name="C">
 			<short>Menu volume</short>
@@ -156,6 +163,7 @@
 		</locale>
 	</entry>
 	<entry name="audio/music_volume" type="int" value="100">
+		<ui unit=" %" />
 		<limits min="0" max="100" step="5" />
 		<locale name="C">
 			<short>Music volume</short>
