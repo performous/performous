@@ -47,8 +47,8 @@
 	<entry name="game/theme" type="string">
 		<stringvalue>default</stringvalue>
 		<locale name="C">
-			<short>Default theme name</short>
-			<long></long>
+			<short>Theme</short>
+			<long>Name of the theme to use or absolute path to theme folder</long>
 		</locale>
 	</entry>
 
