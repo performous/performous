@@ -1,5 +1,6 @@
 #include <libda/plugins/audio_dev.hpp>
 #include <alsa/alsa.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/thread.hpp>
 #include <algorithm>
@@ -12,9 +13,36 @@
 #  error "######################################################"
 #endif
 
+#include <iostream>
 
 namespace {
 	using namespace da;
+
+
+	void devices(snd_pcm_stream_t stream) {
+		alsa::ctl_card_info info;
+		for (int card = -1; ALSA_CHECKED(snd_card_next, (&card)), card >= 0;) {
+			alsa::ctl ctl(("hw:" + boost::lexical_cast<std::string>(card)).c_str());
+			snd_ctl_card_info(ctl, info);
+			for (int dev = -1; ALSA_CHECKED(snd_ctl_pcm_next_device, (ctl, &dev)), dev >= 0;) {
+				alsa::pcm_info pcminfo(dev, 0, stream);
+				if (snd_ctl_pcm_info(ctl, pcminfo) < 0) continue;
+				std::string device = std::string("alsa:hw:") + snd_ctl_card_info_get_id(info) + "," + boost::lexical_cast<std::string>(dev);
+				std::string desc = std::string(snd_ctl_card_info_get_name(info)) + " (" + snd_pcm_info_get_name(pcminfo) + ")";
+				std::cout << "  " << device << "   " << desc << std::endl;
+			}
+		}
+	}
+
+	struct Foo {
+		Foo() {
+			std::cout << "ALSA capture devices:" << std::endl;
+			devices(SND_PCM_STREAM_CAPTURE);
+			std::cout << "ALSA playback devices:" << std::endl;
+			devices(SND_PCM_STREAM_PLAYBACK);
+		}
+	} foo;
+
 	/** Configure a pcm by the settings, store actual values back to s. Return the chose sample format. **/
 	snd_pcm_format_t config(alsa::pcm& pcm, settings& s) {
 		// Convert settings into types used by ALSA

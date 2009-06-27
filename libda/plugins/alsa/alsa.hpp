@@ -4,8 +4,8 @@
 /**
 
 @file alsa.hpp
-@brief An experimental low-level C++ API to ALSA.
-@version 0.7
+@brief A partial low-level C++ API to ALSA.
+@version 0.8
 @author Lasse Kärkkäinen <tronic>
 @license GNU LGPL 2.1 or later
 
@@ -264,6 +264,61 @@ namespace alsa {
 
 #define ALSA_HPP_NONCOPYABLE(c) c(c const&); c const& operator=(c const&);
 
+
+	/**
+	* @short A minimal RAII wrapper for ALSA ctl
+	* Automatically converts into snd_ctl_t* as needed, so the ALSA C API
+	* can be used directly with this.
+	**/
+	class ctl { ALSA_HPP_NONCOPYABLE(ctl)
+		snd_ctl_t* m_handle;
+	  public:
+		ctl(std::string const& devname, int mode = 0) {
+			ALSA_CHECKED(snd_ctl_open, (&m_handle, devname.c_str(), mode));
+        }
+		~ctl() { snd_ctl_close(m_handle); }
+		operator snd_ctl_t*() { return m_handle; }
+		operator snd_ctl_t const*() const { return m_handle; }
+	};
+
+	/**
+	* @short A minimal RAII wrapper for ALSA ctl card info
+	* Automatically converts into snd_ctl_card_info_t* as needed, so the ALSA C API
+	* can be used directly with this.
+	**/
+	class ctl_card_info {
+		snd_ctl_card_info_t* m_handle;
+		void init() { ALSA_CHECKED(snd_ctl_card_info_malloc, (&m_handle)); }
+	  public:
+		ctl_card_info() { init(); snd_ctl_card_info_clear(m_handle); }
+		explicit ctl_card_info(snd_ctl_card_info_t const* orig) { init(); *this = orig; }
+		ctl_card_info(ctl_card_info const& orig) { init(); *this = orig; }
+		~ctl_card_info() { snd_ctl_card_info_free(m_handle); }
+		ctl_card_info& operator=(snd_ctl_card_info_t const* orig) { snd_ctl_card_info_copy(m_handle, orig); return *this; }
+		ctl_card_info& operator=(ctl_card_info const& orig) { snd_ctl_card_info_copy(m_handle, orig); return *this; }
+		operator snd_ctl_card_info_t*() { return m_handle; }
+		operator snd_ctl_card_info_t const*() const { return m_handle; }
+	};
+
+	/**
+	* @short A minimal RAII wrapper for ALSA PCM stream info
+	* Automatically converts into snd_pcm_info_t* as needed, so the ALSA C API
+	* can be used directly with this.
+	**/
+	class pcm_info { ALSA_HPP_NONCOPYABLE(pcm_info)
+		snd_pcm_info_t* m_handle;
+	  public:
+		pcm_info(int dev = 0, int subdev = 0, snd_pcm_stream_t stream = SND_PCM_STREAM_PLAYBACK) {
+			ALSA_CHECKED(snd_pcm_info_malloc, (&m_handle));
+			snd_pcm_info_set_device(m_handle, dev);
+			snd_pcm_info_set_subdevice(m_handle, subdev);
+			snd_pcm_info_set_stream(m_handle, stream);
+        }
+		~pcm_info() { snd_pcm_info_free(m_handle); }
+		operator snd_pcm_info_t*() { return m_handle; }
+		operator snd_pcm_info_t const*() const { return m_handle; }
+	};
+
 	/**
 	* @short A minimal RAII wrapper for ALSA PCM.
 	* Automatically converts into snd_pcm_t* as needed, so the ALSA C API
@@ -307,7 +362,7 @@ namespace alsa {
 		type##_params(): m_handle() { init(); }\
 		~type##_params() { snd_pcm_##type##_params_free(m_handle); }\
 		type##_params(type##_params const& orig): m_handle() { init(); *this = orig; }\
-		type##_params(snd_pcm_##type##_params_t const* orig): m_handle() { init(); *this = orig; }\
+		explicit type##_params(snd_pcm_##type##_params_t const* orig): m_handle() { init(); *this = orig; }\
 		type##_params& operator=(type##_params const& params) { *this = params.m_handle; return *this; }\
 		type##_params& operator=(snd_pcm_##type##_params_t const* params) {\
 			if (m_handle != params) snd_pcm_##type##_params_copy(m_handle, params);\
