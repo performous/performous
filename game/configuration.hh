@@ -53,6 +53,16 @@ void readConfig();
 /** Write modified config options to user's config XML **/
 void writeConfig();
 
+struct MenuEntry {
+	std::string name;
+	std::string shortDesc;
+	std::string longDesc;
+	std::vector<std::string> items;
+};
+
+typedef std::vector<MenuEntry> ConfigMenu;
+extern ConfigMenu configMenu;
+
 /// integer class
 /** clamps to min, max
  */
@@ -106,7 +116,9 @@ class ConfigurationItem : public Configuration {
 		ConfigItem item = config[m_key];
 		if (item.get_type() == "int") return (boost::format("%d") % item.i()).str();
 		else if (item.get_type() == "float") return (boost::format("%.2f") % item.f()).str();
-		else if( item.get_type() == "bool") return item.b() ? "Enabled" : "Disabled";
+		else if (item.get_type() == "bool") return item.b() ? "Enabled" : "Disabled";
+		else if (item.get_type() == "string") return item.s();
+		else if (item.get_type() == "string_list") return (boost::format("%d items") % item.sl().size()).str();
 		else return std::string("Type not managed");
 	};
 	/// get config description

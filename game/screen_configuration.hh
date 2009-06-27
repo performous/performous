@@ -1,5 +1,4 @@
-#ifndef __SCREENCONFIGURATION_H__
-#define __SCREENCONFIGURATION_H__
+#pragma once
 
 #include "screen.hh"
 #include "configuration.hh"
@@ -25,4 +24,3 @@ class ScreenConfiguration: public Screen {
 	unsigned int selected;
 };
 
-#endif

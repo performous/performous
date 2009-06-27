@@ -174,16 +174,6 @@ void writeConfig() {
 	doc.write_to_file_formatted(userConfFile.string(), "UTF-8");
 }
 
-// TODO: move MenuEntry definition to some header and allow screen_configuration access it (preferrably not via global variables)
-
-struct MenuEntry {
-	std::string name;
-	std::string shortDesc;
-	std::string longDesc;
-	std::vector<std::string> items;
-};
-
-typedef std::vector<MenuEntry> ConfigMenu;
 ConfigMenu configMenu;
 
 void readMenuXML(xmlpp::Node* node) {
