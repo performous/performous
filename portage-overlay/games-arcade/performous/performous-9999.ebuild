@@ -9,7 +9,7 @@ RESTRICT="nostrip"
 SONGS_PN=ultrastar-songs
 SONGS_P=${SONGS_PN}-2
 
-DESCRIPTION="SingStar GPL clone"
+DESCRIPTION="Karaoke game similar to Singstar"
 HOMEPAGE="http://performous.org"
 SRC_URI="songs? ( mirror://sourceforge/${PN}/${SONGS_P}.tar.bz2 )"
 
