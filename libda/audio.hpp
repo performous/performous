@@ -64,7 +64,7 @@ namespace da {
 		iter_by_ch end(std::size_t ch) { return iter_by_ch(m_buf, ch, channels) + frames; }
 	};
 
-	class settings;
+	struct settings;
 	class pcm_data;
 	typedef boost::function<void (pcm_data& it, settings const&)> callback_t;
 
