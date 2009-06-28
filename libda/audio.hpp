@@ -21,7 +21,6 @@ Link with libda when you use this.
 #include <iterator>
 #include <string>
 #include <vector>
-#include <stdint.h>
 
 namespace da {
 

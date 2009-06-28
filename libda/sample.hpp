@@ -7,9 +7,11 @@
 Header-only, no need to link to LibDA.
 **/
 
-#include <math.h>
-
 namespace da {
+
+	// Implement mathematical rounding (which C++ unfortunately currently lacks)
+	template <typename T> T round(T val) { return int(val + (val >= 0 ? 0.5 : -0.5)); }
+	
 	// WARNING: changing this breaks binary compatibility on the library!
 	typedef float sample_t;
 
@@ -20,9 +22,9 @@ namespace da {
 		return val;
 	}
 	
-	const sample_t max_s16 = 32767.0, min_s16 = -max_s16 - 1.0;
-	const sample_t max_s24 = 8388607.0, min_s24 = -max_s24 - 1.0;
-	const sample_t max_s32 = 2147483647.0, min_s32= -max_s32 - 1.0;
+	const sample_t max_s16 = 32767.0f, min_s16 = -max_s16 - 1.0f;
+	const sample_t max_s24 = 8388607.0f, min_s24 = -max_s24 - 1.0f;
+	const sample_t max_s32 = 2147483647.0f, min_s32= -max_s32 - 1.0f;
 
 	// The following conversions provide lossless conversions between floats
 	// and integers. Be sure to use only these conversions or otherwise the
@@ -39,13 +41,13 @@ namespace da {
 	static inline sample_t conv_from_s32(int s) { return s / max_s32; }
 	// The rounding is strictly not necessary, but it greatly improves
 	// the error tolerance if any floating point calculations are done.
-	static inline int conv_to_s16(sample_t s) { return clamp<int>(roundf(s * max_s16), min_s16, max_s16); }
-	static inline int conv_to_s24(sample_t s) { return clamp<int>(roundf(s * max_s24), min_s24, max_s24); }
-	static inline int conv_to_s32(sample_t s) { return int(clamp<sample_t>(roundf(s * max_s32), min_s32, max_s32 )); }
+	static inline int conv_to_s16(sample_t s) { return clamp<int>(round(s * max_s16), min_s16, max_s16); }
+	static inline int conv_to_s24(sample_t s) { return clamp<int>(round(s * max_s24), min_s24, max_s24); }
+	static inline int conv_to_s32(sample_t s) { return int(clamp<sample_t>(round(s * max_s32), min_s32, max_s32 )); }
 	// Non-rounding non-clamping versions are provided for very low end devices (still lossless)
-	static inline int conv_to_s16_fast(sample_t s) { return s * max_s16; }
-	static inline int conv_to_s24_fast(sample_t s) { return s * max_s24; }
-	static inline int conv_to_s32_fast(sample_t s) { return s * max_s32; }
+	static inline int conv_to_s16_fast(sample_t s) { return int(s * max_s16); }
+	static inline int conv_to_s24_fast(sample_t s) { return int(s * max_s24); }
+	static inline int conv_to_s32_fast(sample_t s) { return int(s * max_s32); }
 }
 
 #endif
