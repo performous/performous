@@ -1,4 +1,5 @@
-#include "ipuconv.hh"#include <iostream>
+#include "ipuconv.hh"
+#include <iostream>
 #include <stdexcept>
 
 IPUConv::IPUConv(std::vector<char> const& indata, std::string const& outfilename): infile(indata), outfile(outfilename.c_str()) {
@@ -42,7 +43,8 @@ IPUConv::IPUConv(std::vector<char> const& indata, std::string const& outfilename
 
 	std::vector<t_MBData> MBData((sizex/16)*(sizey/16)+1);
 	for (frame=0;frame<frames;frame++){
-		if (frame % 100 == 0) std::cout << "Frame: " << frame << "/" << frames << "\r" << std::flush;		flag = infile.get(8);
+		if (frame % 100 == 0) std::cout << "Frame: " << frame << "/" << frames << "\r" << std::flush;
+		flag = infile.get(8);
 	
 		if (flag & 32) {
 			fprintf (stderr,"Intra VLC format not supported\n");
@@ -77,7 +79,7 @@ IPUConv::IPUConv(std::vector<char> const& indata, std::string const& outfilename
 				outfile.putbits(0x1,1);		// Progressive Sequence
 				outfile.putbits(0x1,2);		// Chroma Format 4:2:0
 				outfile.putbits(0x0,2);		// Breite Extension
-				outfile.putbits(0x0,2);		// Höhe Extension
+				outfile.putbits(0x0,2);		// HÃ¶he Extension
 				outfile.putbits(0x0,12);	// Bitrate Extension
 				outfile.putbits(0x1,1);		// Marker
 				outfile.putbits(0x0,8);		// VBV Buffer Extension
@@ -97,7 +99,7 @@ IPUConv::IPUConv(std::vector<char> const& indata, std::string const& outfilename
  *
  *				outfile.putbits(sizex,14);	// Display Breite
  *				outfile.putbits(1,1);		// Marker
- *				outfile.putbits(sizey,14);  // Display Höhe
+ *				outfile.putbits(sizey,14);  // Display HÃ¶he
  *				outfile.putbits(0,3);
  */
 			}				
@@ -223,7 +225,7 @@ IPUConv::IPUConv(std::vector<char> const& indata, std::string const& outfilename
 
 			for(block=0;block<6;block++) {
 				if (block==0) {
-					infile.get(infile.get_dcs_y());	// DCT_DC in Eingabestream überspringen
+					infile.get(infile.get_dcs_y());	// DCT_DC in Eingabestream Ã¼berspringen
 					diff = MBData[mb_source].dct_dc_y - dct_dc_y;
 					dct_dc_y = MBData[mb_source].dct_dc_y;
 
@@ -239,7 +241,7 @@ IPUConv::IPUConv(std::vector<char> const& indata, std::string const& outfilename
 						absval += (1<<size) -1;
 					outfile.putbits(absval,size);
 				} else if (block>3)	{
-					infile.get(infile.get_dcs_c());	// DCT_DC in Eingabestream überspringen
+					infile.get(infile.get_dcs_c());	// DCT_DC in Eingabestream Ã¼berspringen
 					if (block==4) {
 						diff = MBData[mb_source].dct_dc_cb - dct_dc_cb;
 						dct_dc_cb = MBData[mb_source].dct_dc_cb;
@@ -262,7 +264,7 @@ IPUConv::IPUConv(std::vector<char> const& indata, std::string const& outfilename
 					size = infile.get_dcs_y();
 					outfile.put_dcs_y(size);
 					diff = infile.get(size);
-					outfile.putbits(diff,size);		// DCT_DC kopieren (Blöcke 1,2,3)
+					outfile.putbits(diff,size);		// DCT_DC kopieren (BlÃ¶cke 1,2,3)
 					if (size) {
 						if (!(diff&(1<<(size - 1))))
 							diff = (-1 << size) | (diff + 1);
