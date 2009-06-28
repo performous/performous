@@ -2,7 +2,7 @@
 #define AUDIO_DEV_HPP_INCLUDED
 
 #include <libda/audio.hpp>
-#include "plugin.hpp"
+#include <plugin++/plugin.hpp>
 
 namespace da {
 	struct record::dev {

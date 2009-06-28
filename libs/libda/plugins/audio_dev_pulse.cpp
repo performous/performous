@@ -1,4 +1,4 @@
-#include <libda/plugins/audio_dev.hpp>
+#include <libda/audio_dev.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/thread.hpp>
 #include <pulse/simple.h>

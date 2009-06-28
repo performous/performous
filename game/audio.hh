@@ -1,5 +1,4 @@
-#ifndef PERFORMOUS_AUDIO_HH
-#define PERFORMOUS_AUDIO_HH
+#pragma once
 
 #include <string>
 
@@ -10,7 +9,7 @@
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/recursive_mutex.hpp>
-#include <audio.hpp>
+#include <libda/audio.hpp>
 
 
 /// audiosamples for songfiles
@@ -164,4 +163,3 @@ class Audio {
 	boost::ptr_map<std::string, AudioSample> m_samples;
 };
 
-#endif

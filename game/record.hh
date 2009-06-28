@@ -1,7 +1,6 @@
-#ifndef __RECORD_H_
-#define __RECORD_H_
+#pragma once
 
-#include <audio.hpp>
+#include <libda/audio.hpp>
 #include "pitch.hh"
 #include <boost/ptr_container/ptr_vector.hpp>
 
@@ -41,4 +40,3 @@ class Capture {
 	boost::ptr_vector<Analyzer>& analyzers() { return m_analyzers; }
 };
 
-#endif

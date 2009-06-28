@@ -1,4 +1,4 @@
-#include <libda/plugins/audio_dev.hpp>
+#include <libda/audio_dev.hpp>
 #include <alsa/alsa.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/scoped_ptr.hpp>
