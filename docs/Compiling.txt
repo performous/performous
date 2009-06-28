@@ -1,10 +1,10 @@
-To install from SVN:
+To install from git:
 
-	# Checkout the svn
-	svn co https://ultrastar-ng.svn.sourceforge.net/svnroot/ultrastar-ng/trunk/ Performous
+	# Checkout the git
+	git clone git://performous.git.sourceforge.net/gitroot/performous
 	# Create separate build folder under trunk to avoid polluting the source three
-	mkdir Performous/build
-	cd Performous/build
+	mkdir performous/build
+	cd performous/build
 	# Configure and build with CMake
 	cmake ..
 	make
