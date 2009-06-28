@@ -1,5 +1,5 @@
 #include <libda/audio_dev.hpp>
-#include <plugin++/dll.hpp>
+#include <plugin++/loader.hpp>
 #include <ostream>
 #include <limits>
 

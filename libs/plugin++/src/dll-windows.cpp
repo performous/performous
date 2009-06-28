@@ -4,7 +4,7 @@
 #include <stdexcept>
 
 namespace plugin {
-	dll::dll(fs::path const& filename): lib(LoadLibrary(filename.string().c_str())) {
+	dll::dll(std::string const& filename): lib(LoadLibrary(filename.c_str())) {
 		if (!lib) throw std::runtime_error(dlerror());
 	}
 

@@ -4,7 +4,7 @@
 #include <stdexcept>
 
 namespace plugin {
-	dll::dll(fs::path const& filename): lib(dlopen(filename.string().c_str(), RTLD_LAZY | RTLD_GLOBAL)) {
+	dll::dll(std::string const& filename): lib(dlopen(filename.c_str(), RTLD_LAZY | RTLD_GLOBAL)) {
 		if (!lib) throw std::runtime_error(dlerror());
 	}
 
