@@ -1,8 +1,7 @@
 #pragma once
-#ifndef PERFORMOUS_FFMEG_HH
-#define PERFORMOUS_FFMEG_HH
 
 #include "util.hh"
+#include <boost/cstdint.hpp>
 #include <boost/ptr_container/ptr_deque.hpp>
 #include <boost/ptr_container/ptr_set.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -12,7 +11,6 @@
 #include <iostream>
 #include <vector>
 #include <limits>
-#include <stdint.h>
 
 /// single audio frame
 struct AudioFrame {
@@ -233,4 +231,3 @@ class FFmpeg {
 	static boost::mutex s_avcodec_mutex; // Used for avcodec_open/close (which use some static crap and are thus not thread-safe)
 };
 
-#endif

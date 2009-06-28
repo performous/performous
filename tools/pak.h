@@ -1,7 +1,6 @@
-#ifndef USNG_PAK_H
-#define USNG_PAK_H
+#pragma once
 
-#include <stdint.h>
+#include <boost/cstdint.hpp>
 #include <string>
 #include <fstream>
 #include <map>
@@ -37,4 +36,3 @@ class Pak {
 std::ostream& operator<<(std::ostream& os, PakFile const& f);
 std::ostream& operator<<(std::ostream& os, Pak::files_t const& files);
 
-#endif
