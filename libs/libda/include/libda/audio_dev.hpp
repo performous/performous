@@ -5,10 +5,12 @@
 #include <plugin++/plugin.hpp>
 
 namespace da {
-	struct record::dev {
+	class record::dev {
+	  public:
 		virtual ~dev() {}
 	};
-	struct playback::dev {
+	class playback::dev {
+	  public:
 		virtual ~dev() {}
 	};
 	typedef plugin::registry<record::dev, settings&, devinfo> record_plugin;
