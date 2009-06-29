@@ -35,7 +35,7 @@ namespace {
 			  m_phase(2.0 * M_PI * phase), m_step(2.0 * M_PI * freq / rate), m_amplitude(amplitude) {}
 			sample_t operator()() {
 				double s = m_amplitude * std::sin(m_phase = fmod(m_phase + m_step, 2.0 * M_PI));
-				return return static_cast<sample_t>(s);
+				return static_cast<sample_t>(s);
 			}
 			operator sample_t() { return (*this)(); }
 		};

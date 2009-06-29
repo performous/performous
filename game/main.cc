@@ -171,7 +171,6 @@ template <typename Container> void confOverride(Container const& c, std::string 
 
 int main(int argc, char** argv) {
 	std::signal(SIGINT, quit);
-	// No such thing on Windows: signal(SIGQUIT, quit);
 	std::signal(SIGTERM, quit);
 	std::ios::sync_with_stdio(false);  // We do not use C stdio
 	da::initialize libda;

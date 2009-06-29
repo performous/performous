@@ -123,7 +123,7 @@ class UseTexture: boost::noncopyable {
 };
 
 /** Draw the texture using the specified dimensions and texture coordinates. **/
-template <GLenum Type> void OpenGLTexture<Type>::draw(Dimensions const& dim, TexCoords const& tex = TexCoords()) const {
+template <GLenum Type> void OpenGLTexture<Type>::draw(Dimensions const& dim, TexCoords const& tex) const {
 	UseTexture texture(*this);
 	glBegin(GL_QUADS);
 	glTexCoord2f(tex.x1, tex.y1); glVertex2f(dim.x1(), dim.y1());
