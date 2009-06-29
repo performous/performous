@@ -300,12 +300,5 @@ void readConfig() {
 	readConfigXML(schemafile, 0);  // Read schema and defaults
 	readConfigXML("/etc/xdg/performous/performous.xml", 1);  // Update defaults with system config
 	readConfigXML(userConfFile, 2);  // Read user settings
-	// DEBUG code follows, remove this after real menu is done
-	std::cout << "CONFIG MENU" << std::endl;
-	for (ConfigMenu::const_iterator it = configMenu.begin(), end = configMenu.end(); it != end; ++it) {
-		std::cout << it->shortDesc << " (" << it->longDesc << ")" << std::endl;
-		for (std::vector<std::string>::const_iterator it2 = it->items.begin(), end2 = it->items.end(); it2 < end2; ++it2)
-		  std::cout << "  " << config[*it2].getShortDesc() << std::endl;
-	}
 }
 
