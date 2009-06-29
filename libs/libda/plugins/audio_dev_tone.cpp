@@ -63,13 +63,12 @@ namespace {
 			using namespace boost::lambda;
 			placeholder1_type arg1;
 			if (!parse(tonestr.c_str(),
-			  !(limit_d(1.0, s.rate() / 2.0)[real_p][assign_a(freq)]) >> *(!ch_p('.') >> (
-			  str_p("amplitude(") >> (max_limit_d(0.0)[real_p][var(amplitude) = bind(static_cast<double(*)(double, double)>(std::pow), 10.0, arg1 / 20.0)] | real_p[assign_a(amplitude)]) |
-			  str_p("phase(") >> limit_d(0.0, 1.0)[real_p][assign_a(phase)]
-			  ) >> ')')
+			  !(limit_d(1.0, s.rate() / 2.0)[real_p][assign_a(freq)]) >>
+			  *(!ch_p('.') >> (str_p("amplitude(") >> real_p[assign_a(amplitude)] | str_p("phase(") >> limit_d(0.0, 1.0)[real_p][assign_a(phase)]) >> ')')
 			  ).full)
 			  throw std::invalid_argument("Invalid parameters for tonegen. See help for more information.");
 			{
+				if (amplitude <= 0.0) amplitude = std::pow(10.0, amplitude / 20.0); // Convert from dB
 				std::ostringstream oss;
 				oss << "  " << freq << ".amplitude(" << amplitude << ").phase(" << phase << ")";
 				s.debug(oss.str());
