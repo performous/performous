@@ -1,8 +1,10 @@
 #include "video_driver.hh"
-#include "screen.hh"
+
 #include "config.hh"
-#include <cmath>
-#include <SDL/SDL.h>
+#include "screen.hh"
+#include "util.hh"
+#include <GL/glew.h>
+#include <SDL.h>
 
 unsigned s_width;
 unsigned s_height;
@@ -34,8 +36,8 @@ void Window::blank() {
 	glEnable (GL_BLEND);
 	s_width = screen->w;
 	s_height = screen->h;
-	if (s_height < 0.56f * s_width) s_width = roundf(s_height / 0.56f);
-	if (s_height > 0.8f * s_width) s_height = roundf(0.8f * s_width);
+	if (s_height < 0.56f * s_width) s_width = round(s_height / 0.56f);
+	if (s_height > 0.8f * s_width) s_height = round(0.8f * s_width);
 	glViewport(0.5f * (screen->w - s_width), 0.5f * (screen->h - s_height), s_width, s_height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();

@@ -23,8 +23,8 @@ ThemePractice::ThemePractice():
 	sharp(getThemePath("practice_sharp.svg")),
 	note_txt(getThemePath("practice_txt.svg"), config["graphic/text_lod"].f())
 {
-	note.dimensions.fixedHeight(0.03);
-	sharp.dimensions.fixedHeight(0.09);
+	note.dimensions.fixedHeight(0.03f);
+	sharp.dimensions.fixedHeight(0.09f);
 }
 
 ThemeSing::ThemeSing():

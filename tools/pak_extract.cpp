@@ -1,12 +1,11 @@
 #include "pak.h"
+#include <boost/filesystem.hpp>
 #include <algorithm>
 #include <cstring>
 #include <functional>
 #include <iostream>
 #include <iterator>
 #include <stdexcept>
-#include <sys/stat.h>
-#include <sys/types.h>
 
 namespace {
 	void usage(char const* progname) {
@@ -32,7 +31,7 @@ namespace {
 			// Try to create new folders as required
 			for (std::string::size_type pos; (pos = filename.find('/', m_path.size() + 1)) != std::string::npos;) {
 				m_path = filename.substr(0, pos);
-				mkdir(m_path.c_str(), 0755);
+				boost::filesystem::create_directory(m_path);
 			}
 			// Extract the file
 			std::ofstream f(filename.c_str(), std::ios::binary);

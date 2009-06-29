@@ -1,4 +1,3 @@
-#include <libda/audio.hpp>
 #include "config.hh"
 #include "fs.hh"
 #include "screen.hh"
@@ -13,6 +12,8 @@
 #include <boost/program_options.hpp>
 #include <boost/spirit/core.hpp>
 #include <boost/thread.hpp>
+#include <libda/audio.hpp>
+#include <csignal>
 #include <fstream>
 #include <set>
 #include <string>
@@ -168,12 +169,10 @@ template <typename Container> void confOverride(Container const& c, std::string 
 	std::copy(c.begin(), c.end(), std::back_inserter(sl));
 }
 
-#include <signal.h>
-
 int main(int argc, char** argv) {
-	signal(SIGINT, quit);
-	signal(SIGQUIT, quit);
-	signal(SIGTERM, quit);
+	std::signal(SIGINT, quit);
+	// No such thing on Windows: signal(SIGQUIT, quit);
+	std::signal(SIGTERM, quit);
 	std::ios::sync_with_stdio(false);  // We do not use C stdio
 	da::initialize libda;
 	readConfig();

@@ -1,5 +1,4 @@
-#ifndef PERFORMOUS_PROGRESSBAR_HH
-#define PERFORMOUS_PROGRESSBAR_HH
+#pragma once
 
 #include "surface.hh"
 
@@ -33,6 +32,4 @@ class ProgressBar {
 	/// dimensions of progressbar
 	Dimensions dimensions;
 };
-
-#endif
 

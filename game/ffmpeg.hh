@@ -12,6 +12,9 @@
 #include <vector>
 #include <limits>
 
+using boost::int16_t;
+using boost::uint8_t;
+
 /// single audio frame
 struct AudioFrame {
 	/// timestamp of audio frame

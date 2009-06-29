@@ -104,9 +104,10 @@ namespace plugin {
         class handler {
             typename map_t::iterator m_it;
           public:
-            handler(Key const& key):
-              m_it(map().insert(std::pair<Key, handler*>(key, this)))
-            {}
+			handler(Key const& key) {
+				// MSVC9 gives warning about using this in initlist, so we do it here:
+				m_it = map().insert(std::pair<Key, handler*>(key, this));
+            }
             virtual ~handler() { map().erase(m_it); }
             virtual Base* operator()(Arg) const = 0;
         };

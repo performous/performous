@@ -11,6 +11,7 @@
 #include <boost/thread/recursive_mutex.hpp>
 #include <libda/audio.hpp>
 
+using boost::int16_t;
 
 /// audiosamples for songfiles
 struct AudioSample {

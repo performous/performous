@@ -2,17 +2,21 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
-#include <boost/spirit/core.hpp>
+#include <boost/spirit/include/classic_core.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/xtime.hpp>
 #include <algorithm>
 #include <cmath>
 #include <limits>
 #include <numeric>
-#include <signal.h>
 #include <sstream>
 
+#ifndef M_PI
+#define M_PI 3.141592653589793
+#endif
+
 namespace {
+
 	using namespace da;
 	// Boost WTF time format, directly from C...
 	boost::xtime& operator+=(boost::xtime& time, double seconds) {
@@ -27,9 +31,12 @@ namespace {
 			double m_phase, m_step;
 			sample_t m_amplitude;
 		  public:
-			sin_generator(double freq, double rate, double amplitude, double phase):
+			sin_generator(double freq, double rate, sample_t amplitude, double phase):
 			  m_phase(2.0 * M_PI * phase), m_step(2.0 * M_PI * freq / rate), m_amplitude(amplitude) {}
-			sample_t operator()() { return m_amplitude * std::sin(m_phase = fmod(m_phase + m_step, 2.0 * M_PI)); }
+			sample_t operator()() {
+				double s = m_amplitude * std::sin(m_phase = fmod(m_phase + m_step, 2.0 * M_PI));
+				return return static_cast<sample_t>(s);
+			}
 			operator sample_t() { return (*this)(); }
 		};
 		class accumgen {
@@ -42,7 +49,7 @@ namespace {
 			sample_t operator()() {
 				if (m_ch % m_channels == 0) m_val = std::accumulate(m_gen.begin(), m_gen.end(), sample_t());
 				m_ch = (m_ch + 1) % m_channels;
-				return m_val;
+				return static_cast<sample_t>(m_val);
 			}
 		};
 		std::vector<sin_generator> gen;
@@ -52,7 +59,7 @@ namespace {
 		boost::xtime time;
 		void add(std::string const& tonestr) {
 			double freq = 440.0, amplitude = 0.1, phase = 0.0;
-			using namespace boost::spirit;
+			using namespace boost::spirit::classic;
 			using namespace boost::lambda;
 			placeholder1_type arg1;
 			if (!parse(tonestr.c_str(),
@@ -67,7 +74,7 @@ namespace {
 				oss << "  " << freq << ".amplitude(" << amplitude << ").phase(" << phase << ")";
 				s.debug(oss.str());
 			}
-			gen.push_back(sin_generator(freq, s.rate(), amplitude, phase));
+			gen.push_back(sin_generator(freq, s.rate(), static_cast<sample_t>(amplitude), phase));
 		}
 	  public:
 		tonegen(settings& s_orig): s(s_orig), quit(false) {

@@ -15,7 +15,7 @@ struct PakFile {
 	unsigned int crc;
 	void get(std::vector<char>& buf, unsigned int pos = 0, unsigned int s = 0) const {
 		if (!s) s = size - pos;
-		if (uint64_t(pos) + s > size) throw std::logic_error("Trying to read past end of file");
+		if (pos + s > size) throw std::logic_error("Trying to read past end of file");
 		buf.resize(s);
 		std::ifstream f(pakname.c_str(), std::ios::binary);
 		f.seekg(offset + pos);

@@ -11,6 +11,10 @@ Header only, no need to link with libda.
 #include <cstddef>
 #include <vector>
 
+#ifndef M_PI
+#define M_PI 3.141592653589793
+#endif
+
 namespace da {
 
 	namespace math {

@@ -10,7 +10,7 @@ Header-only, no need to link to LibDA.
 namespace da {
 
 	// Implement mathematical rounding (which C++ unfortunately currently lacks)
-	template <typename T> T round(T val) { return int(val + (val >= 0 ? 0.5 : -0.5)); }
+	template <typename T> T round(T val) { return static_cast<T>(static_cast<int>(val + (val >= 0 ? 0.5 : -0.5))); }
 	
 	// WARNING: changing this breaks binary compatibility on the library!
 	typedef float sample_t;

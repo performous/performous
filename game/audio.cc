@@ -1,13 +1,14 @@
 #include "audio.hh"
 
+#include "configuration.hh"
+#include "screen.hh"
+#include "util.hh"
+#include "xtime.hh"
+#include <libda/fft.hpp>  // For M_PI
 #include <cmath>
 #include <functional>
 #include <iostream>
 #include <memory>
-#include "screen.hh"
-#include "configuration.hh"
-#include "util.hh"
-#include "xtime.hh"
 
 Audio::Audio():
 	m_paused(false)

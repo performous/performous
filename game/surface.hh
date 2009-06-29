@@ -1,11 +1,10 @@
-#ifndef __SURFACE_H__
-#define __SURFACE_H__
+#pragma once
 
+#include <GL/glew.h>
 #include <stdexcept>
 #include <string>
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <GL/gl.h>
 #include <librsvg/rsvg.h>
 #include <librsvg/rsvg-cairo.h>
 #include <cairo.h>
@@ -103,7 +102,7 @@ template <GLenum Type> class OpenGLTexture: boost::noncopyable {
 	/// returns id
 	GLuint id() const { return m_id; };
 	/// draw area
-	void draw(Dimensions const& dim, TexCoords const& tex) const;
+	void draw(Dimensions const& dim, TexCoords const& tex = TexCoords()) const;
 
   private:
 	GLuint m_id;
@@ -178,5 +177,3 @@ class Surface {
 	unsigned int m_width, m_height;
 	OpenGLTexture<GL_TEXTURE_RECTANGLE_ARB> m_texture;
 };
-
-#endif

@@ -107,7 +107,6 @@ void FFmpeg::open() {
 
 #ifdef USE_FFMPEG_CRASH_RECOVERY
 #include <boost/thread/tss.hpp>
-#include <unistd.h>
 #include <csignal>
 
 namespace {
@@ -118,9 +117,10 @@ namespace {
 
 extern "C" void performous_ffmpeg_crash_hack(int sig) {
 	if (ffmpeg_ptr.get()) {
-		signal(SIGABRT, sigabrt);
-		signal(SIGSEGV, sigsegv);
-		(*ffmpeg_ptr)->crash(); sleep(1000000000);
+		std::signal(SIGABRT, sigabrt);
+		std::signal(SIGSEGV, sigsegv);
+		(*ffmpeg_ptr)->crash();
+		boost::this_thread::sleep(boost::posix_time::hours(10000));
 	} // Uh-oh, FFMPEG goes again; wait here until eternity
 	sighandler h = (sig == SIGABRT ? sigabrt : sigsegv);
 	if (h && h != performous_ffmpeg_crash_hack) h(sig); // From another thread, call original handler
@@ -176,7 +176,8 @@ void FFmpeg::seek_internal() {
 	if (decodeVideo) stream = videoStream;
 	if (decodeAudio) stream = audioStream;
 	int64_t target = m_seekTarget * AV_TIME_BASE;
-	if (stream != -1) target = av_rescale_q(target, AV_TIME_BASE_Q, pFormatCtx->streams[stream]->time_base);
+	const AVRational time_base_q = { 1, AV_TIME_BASE };  // AV_TIME_BASE_Q is the same thing with C99 struct literal (not supported by MSVC)
+	if (stream != -1) target = av_rescale_q(target, time_base_q, pFormatCtx->streams[stream]->time_base);
 	av_seek_frame(pFormatCtx, stream, target, flags);
 	m_seekTarget = getNaN(); // Signal that seeking is done
 }
@@ -228,7 +229,7 @@ void FFmpeg::decodeNextFrame() {
 						int linesize = w * 3;
 						sws_scale(img_convert_ctx, videoFrame->data, videoFrame->linesize, 0, h, &data, &linesize);
 					}
-					if ( !std::isnan(packet.time()) ) m_position = packet.time();
+					if (packet.time() == packet.time()) m_position = packet.time();
 					VideoFrame* tmp = new VideoFrame(m_position, w, h);
 					tmp->data.swap(buffer);
 					videoQueue.push(tmp);
@@ -255,7 +256,7 @@ void FFmpeg::decodeNextFrame() {
 				// Construct AudioFrame and add it to the queue
 				AudioFrame* tmp = new AudioFrame();
 				std::copy(resampled.begin(), resampled.begin() + frames * AUDIO_CHANNELS, std::back_inserter(tmp->data));
-				if (!std::isnan(packet.time()) ) m_position = packet.time();
+				if (packet.time() == packet.time()) m_position = packet.time();
 				else m_position += double(tmp->data.size())/double(audioQueue.getSamplesPerSecond());
 				tmp->timestamp = m_position;
 				audioQueue.push(tmp);

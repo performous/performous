@@ -1,5 +1,4 @@
-#ifndef __SCREEN_H__
-#define __SCREEN_H__
+#pragma once
 
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -7,7 +6,8 @@
 #include "audio.hh"
 #include "record.hh"
 #include "songs.hh"
-#include <SDL/SDL.h>
+#include <GL/glew.h>
+#include <SDL.h>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -61,6 +61,4 @@ class ScreenManager: public Singleton <ScreenManager> {
 	screenmap_t screens;
 	Screen* currentScreen;
 };
-
-#endif
 

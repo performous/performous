@@ -4,7 +4,6 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
 #include <libxml++/libxml++.h>
-#include <math.h>
 #include <algorithm>
 #include <iomanip>
 #include <stdexcept>
@@ -19,7 +18,7 @@ ConfigItem& ConfigItem::incdec(int dir) {
 	} else if (m_type == "float") {
 		double& val = boost::get<double>(m_value);
 		double step = boost::get<double>(m_step);
-		val = clamp(roundf((val + dir * step) / step) * step, boost::get<double>(m_min), boost::get<double>(m_max));
+		val = clamp(round((val + dir * step) / step) * step, boost::get<double>(m_min), boost::get<double>(m_max));
 	} else if (m_type == "bool") {
 		bool& val = boost::get<bool>(m_value);
 		val = !val;
@@ -244,8 +243,8 @@ void readConfigXML(fs::path const& file, int mode) {
 			std::for_each(n.begin(), n.end(), readMenuXML);
 		}
 		n = domParser.get_document()->get_root_node()->find("/performous/entry");
-		for (xmlpp::NodeSet::const_iterator it = n.begin(), end = n.end(); it != end; ++it) {
-			xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**it);
+		for (xmlpp::NodeSet::const_iterator nodeit = n.begin(), end = n.end(); nodeit != end; ++nodeit) {
+			xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**nodeit);
 			std::string name = getAttribute(elem, "name");
 			if (name.empty()) throw std::runtime_error(file.string() + " element Entry missing name attribute");
 			Config::iterator it = config.find(name);

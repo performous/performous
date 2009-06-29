@@ -47,7 +47,11 @@ else (LibXML++_FOUND)
     message("No LibXML++ found, not building ss_extract nor cover_conv")
 endif (LibXML++_FOUND)
 
-add_executable(pak_extract pak_extract.cpp pak.cpp)
+if (Boost_FOUND)
+	add_executable(pak_extract pak_extract.cpp pak.cpp)
+	target_link_libraries(pak_extract ${Boost_LIBRARIES})
+endif (Boost_FOUND)
+
 add_executable(adpcm_decode adpcm_decode.cpp pak.cpp)
 add_executable(ipu_decode ipu_decode.cpp)
 add_executable(ipu_conv ipu_conv.cpp ipuconvmain.cpp pak.cpp)

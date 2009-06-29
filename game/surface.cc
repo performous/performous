@@ -11,6 +11,8 @@
 #include <sstream>
 #include <vector>
 
+using boost::uint32_t;
+
 float Dimensions::screenY() const {
 	switch (m_screenAnchor) {
 	  case CENTER: return 0.0;
@@ -107,7 +109,7 @@ template <typename T> void loader(T& target, std::string filename, bool autocrop
 			}
 			target.load(w, yend - ybegin, pix::CHAR_RGBA, reinterpret_cast<unsigned char const*>(buf + ybegin * w));
 		}
-		catch( Magick::Exception &error_ ) // add error handling
+		catch (Magick::Exception&) // add error handling
 		{
 			throw std::runtime_error("Image Error");
 		} 

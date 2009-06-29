@@ -1,8 +1,6 @@
 #include "notes.hh"
 
 #include "util.hh"
-// math.h needed for C99 stuff
-#include <math.h>
 #include <cmath>
 #include <algorithm>
 #include <limits>
@@ -48,12 +46,12 @@ int MusicalScale::getNoteId(double freq) const {
 
 double MusicalScale::getNote(double freq) const {
 	if (freq < 1.0) return getNaN();
-	return m_baseId + 12.0 * log(freq / m_baseFreq) / log(2);
+	return m_baseId + 12.0 * std::log(freq / m_baseFreq) / std::log(2.0);
 }
 
 double MusicalScale::getNoteOffset(double freq) const {
 	double frac = freq / getNoteFreq(getNoteId(freq));
-	return 12.0 * std::log(frac) / std::log(2);
+	return 12.0 * std::log(frac) / std::log(2.0);
 }
 
 double Note::diff(double note, double n) { return remainder(n - note, 12.0); }

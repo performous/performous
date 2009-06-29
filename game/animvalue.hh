@@ -1,6 +1,4 @@
 #pragma once
-#ifndef PERFOURMOUS_ANIMVALUE_HH
-#define PERFOURMOUS_ANIMVALUE_HH
 
 #include "util.hh"
 #include "xtime.hh"
@@ -112,6 +110,3 @@ class AnimAcceleration {
 	double m_marginRight;
 	boost::xtime m_time;
 };
-
-#endif
-

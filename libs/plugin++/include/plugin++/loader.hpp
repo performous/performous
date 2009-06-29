@@ -1,6 +1,8 @@
 #ifndef LOADER_HPP_INCLUDED
 #define LOADER_HPP_INCLUDED
 
+#pragma warning(disable: 4996)  // Disable stupid Microsoft warnings about stdlib functions
+
 #include "dll.hpp"
 #include <iostream>
 #include <set>
