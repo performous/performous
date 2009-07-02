@@ -20,9 +20,9 @@
    sodipodi:docname="icon.svg"
    sodipodi:docbase="/root/USNG/trunk/themes/lima"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
-   inkscape:export-filename="/home/yoda/git/performous/themes/default/icon.bmp.png"
-   inkscape:export-xdpi="90"
-   inkscape:export-ydpi="90">
+   inkscape:export-filename="/home/tronic/performous/themes/default/icon.bmp.png"
+   inkscape:export-xdpi="45"
+   inkscape:export-ydpi="45">
   <metadata
      id="metadata35">
     <rdf:RDF>
@@ -35,8 +35,8 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="801"
-     inkscape:window-width="1439"
+     inkscape:window-height="1127"
+     inkscape:window-width="1920"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      guidetolerance="10.0"
@@ -46,11 +46,11 @@
      bordercolor="#666666"
      pagecolor="#ffffff"
      id="base"
-     inkscape:zoom="3.5638182"
+     inkscape:zoom="1"
      inkscape:cx="75.895552"
-     inkscape:cy="49.475734"
-     inkscape:window-x="38"
-     inkscape:window-y="111"
+     inkscape:cy="1.6706911"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
      inkscape:current-layer="svg559"
      width="64px"
      height="64px"
@@ -101,12 +101,12 @@
        inkscape:collect="always"
        xlink:href="#linearGradient3928"
        id="radialGradient3940"
-       cx="32.180264"
-       cy="31.961508"
-       fx="32.180264"
-       fy="31.961508"
+       cx="29.759392"
+       cy="29.025885"
+       fx="29.759392"
+       fy="29.025885"
        r="33.97723"
-       gradientTransform="matrix(1.0826074,0.9916652,-1.0514316,1.1478552,30.947013,-36.637722)"
+       gradientTransform="matrix(-1.3159869,4.9113264,-5.2073272,-1.3952991,223.89352,-84.920692)"
        gradientUnits="userSpaceOnUse" />
   </defs>
   <rect
