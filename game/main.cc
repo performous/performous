@@ -173,8 +173,16 @@ int main(int argc, char** argv) {
 	std::signal(SIGINT, quit);
 	std::signal(SIGTERM, quit);
 	std::ios::sync_with_stdio(false);  // We do not use C stdio
-	da::initialize libda;
-	readConfig();
+	try {
+		da::initialize libda;
+		readConfig();
+	} catch (std::exception& e) {
+		std::cerr << e.what() << std::endl;
+		return EXIT_FAILURE;
+	} catch (...) {
+		std::cerr << "Some b0rked internal error, please report this!" << std::endl;
+		return EXIT_FAILURE;
+	}
 	std::vector<std::string> mics;
 	std::vector<std::string> pdevs;
 	std::vector<std::string> songdirs;

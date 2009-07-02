@@ -287,13 +287,13 @@ void readConfig() {
 		config_list.push_back("/usr/local/share/performous/config/performous.xml");
 		config_list.push_back("/usr/share/games/performous/config/performous.xml");
 		config_list.push_back("/usr/share/performous/config/performous.xml");
-		config_list.push_back("../share/performous/config/performous.xml");  // For Windows where program is started in bin/
+		config_list.push_back("../config/performous.xml");  // For Windows where program is started in bin/
 		ConfigList::const_iterator it = std::find_if(config_list.begin(), config_list.end(), static_cast<bool(&)(boost::filesystem::path const&)>(boost::filesystem::exists));
 		if (it == config_list.end()) {
 			std::ostringstream oss;
 			oss << "No config schema file found. The following locations were tried:\n";
 			std::copy(config_list.begin(), config_list.end(), std::ostream_iterator<std::string>(oss, "\n"));
-			oss << "Install the file or define environment variable PERFORMOUS_DEFAULT_CONFIG_FILE\n";
+			oss << "Install the file or define environment variable PERFORMOUS_CONFIG_SCHEMA\n";
 			throw std::runtime_error(oss.str());
 		}
 		schemafile = *it;
