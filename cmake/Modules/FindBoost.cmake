@@ -76,7 +76,7 @@
 
 # MESSAGE(STATUS "Finding Boost libraries.... ")
 
-SET( _boost_TEST_VERSIONS ${Boost_ADDITIONAL_VERSIONS} "1.37.0" "1.37" "1.36.0" "1.36" "1.34.1" "1.34.0" "1.34" "1.33.1" "1.33.0" "1.33")
+SET( _boost_TEST_VERSIONS ${Boost_ADDITIONAL_VERSIONS} "1.39.0" "1.39" "1.38.0" "1.38" "1.37.0" "1.37" "1.36.0" "1.36" "1.34.1" "1.34.0" "1.34" "1.33.1" "1.33.0" "1.33")
 
 ############################################
 #
@@ -277,9 +277,12 @@ ELSE (_boost_IN_CACHE)
   IF (MSVC71)
     SET (_boost_COMPILER "-vc71")
   ENDIF(MSVC71)
-   IF (MSVC80)
+  IF (MSVC80)
     SET (_boost_COMPILER "-vc80")
   ENDIF(MSVC80)
+  IF (MSVC90)
+    SET (_boost_COMPILER "-vc90")
+  ENDIF(MSVC90)
   IF (MINGW)
     SET (_boost_COMPILER "-mgw")
   ENDIF(MINGW)
@@ -380,6 +383,12 @@ ELSE (_boost_IN_CACHE)
   SET(Boost_PROCESS_INCLUDES Boost_INCLUDE_DIR)
 
   FOREACH ( COMPONENT  ${Boost_FIND_COMPONENTS} )
+    if (CMAKE_BUILD_TYPE MATCHES "Deb" AND Boost_${COMPONENT}_LIBRARY_DEBUG)
+      set(Boost_${COMPONENT}_LIBRARY ${Boost_${COMPONENT}_LIBRARY_RELEASE})
+    endif (CMAKE_BUILD_TYPE MATCHES "Deb" AND Boost_${COMPONENT}_LIBRARY_DEBUG)
+    if (NOT CMAKE_BUILD_TYPE MATCHES "Deb" AND Boost_${COMPONENT}_LIBRARY_RELEASE)
+      set(Boost_${COMPONENT}_LIBRARY ${Boost_${COMPONENT}_LIBRARY_RELEASE})
+    endif (NOT CMAKE_BUILD_TYPE MATCHES "Deb" AND Boost_${COMPONENT}_LIBRARY_RELEASE)
     SET(Boost_PROCESS_LIBS ${Boost_PROCESS_LIBS} Boost_${COMPONENT}_LIBRARY)
   ENDFOREACH(COMPONENT)
   
@@ -388,13 +397,8 @@ ELSE (_boost_IN_CACHE)
   # Check that everything was found correctly and do other processing
   libfind_process(Boost)
 
-  # MESSAGE(STATUS "Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
-  # MESSAGE(STATUS "Boost_LIBRARIES: ${Boost_LIBRARIES}")
-
-  # Under Windows, automatic linking is performed, so no need to specify the libraries.
-  IF (WIN32)
-      SET(Boost_LIBRARIES "")
-  ENDIF(WIN32)
+  MESSAGE(STATUS "Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
+  MESSAGE(STATUS "Boost_LIBRARIES: ${Boost_LIBRARIES}")
 
 ENDIF(_boost_IN_CACHE)
 

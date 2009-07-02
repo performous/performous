@@ -13,12 +13,12 @@ set(SOURCES ${SOURCE_FILES} ${HEADER_FILES})
 
 include_directories(${CMAKE_SOURCE_DIR}/libs/libda/include)
 
-find_package(Boost 1.34 REQUIRED COMPONENTS thread program_options regex filesystem)
+find_package(Boost 1.34 REQUIRED COMPONENTS thread date_time program_options regex filesystem)
 include_directories(${Boost_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${Boost_LIBRARIES})
 
 # Find all the libs that don't require extra parameters
-foreach(lib SDL LibRSVG PangoCairo LibXML++ Magick++ GLEW AVFormat SWScale)
+foreach(lib SDL LibRSVG PangoCairo LibXML++ Magick++ OpenGL GLEW AVFormat SWScale)
 	find_package(${lib} REQUIRED)
 	include_directories(${${lib}_INCLUDE_DIRS})
 	set(LIBS ${LIBS} ${${lib}_LIBRARIES})
