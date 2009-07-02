@@ -105,7 +105,7 @@ src_install() {
 	keepdir "/usr/ultrastar/songs"
 	rm -rf "${D}/usr/share/${PN}"/{applications,pixmaps}
 	if use songs; then
-		insinto "/usr/ultrastar"
+		insinto "/usr/share/games/ultrastar"
 		doins -r ../songs || die "doins songs failed"
 	fi
 	doicon data/${PN}.xpm
