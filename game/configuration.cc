@@ -281,12 +281,13 @@ void readConfig() {
 	{
 		typedef std::vector<std::string> ConfigList;
 		ConfigList config_list;
-		char const* env_config = getenv("PERFORMOUS_DEFAULT_CONFIG_FILE");
+		char const* env_config = getenv("PERFORMOUS_CONFIG_SCHEMA");
 		if (env_config) config_list.push_back(env_config);
 		config_list.push_back("/usr/local/share/games/performous/config/performous.xml");
 		config_list.push_back("/usr/local/share/performous/config/performous.xml");
 		config_list.push_back("/usr/share/games/performous/config/performous.xml");
 		config_list.push_back("/usr/share/performous/config/performous.xml");
+		config_list.push_back("../share/performous/config/performous.xml");  // For Windows where program is started in bin/
 		ConfigList::const_iterator it = std::find_if(config_list.begin(), config_list.end(), static_cast<bool(&)(boost::filesystem::path const&)>(boost::filesystem::exists));
 		if (it == config_list.end()) {
 			std::ostringstream oss;

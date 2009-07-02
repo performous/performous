@@ -175,6 +175,7 @@
 	<entry name="system/path_themes" type="string_list">
 		<stringvalue>/usr/local/share/games/performous/themes/</stringvalue>
 		<stringvalue>/usr/share/games/performous/themes/</stringvalue>
+		<stringvalue>../themes/</stringvalue><!-- For Windows where the program is started in bin/ -->
 		<stringvalue>~/.performous/themes/</stringvalue>
 		<locale name="C">
 			<short>Theme folders</short>
@@ -184,6 +185,7 @@
 	<entry name="system/path_songs" type="string_list">
 		<stringvalue>/usr/local/share/games/ultrastar/songs/</stringvalue>
 		<stringvalue>/usr/share/games/ultrastar/songs/</stringvalue>
+		<stringvalue>../songs/</stringvalue><!-- For Windows where the program is started in bin/ -->
 		<stringvalue>~/.ultrastar/songs/</stringvalue>
 		<locale name="C">
 			<short>Song folders</short>
