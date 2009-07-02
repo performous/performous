@@ -90,7 +90,12 @@ void FFmpeg::open() {
 		if (!pAudioCodec) throw std::runtime_error("Cannot find audio codec");
 		if (avcodec_open(cc, pAudioCodec) < 0) throw std::runtime_error("Cannot open audio codec");
 		pAudioCodecCtx = cc;
+#if LIBAVCODEC_VERSION_INT > ((52<<16)+(12<<8)+0)
+		pResampleCtx = av_audio_resample_init(AUDIO_CHANNELS, cc->channels, m_rate, cc->sample_rate,
+			SAMPLE_FMT_S16, SAMPLE_FMT_S16, 16, 10, 0, 0.8);
+#else
 		pResampleCtx = audio_resample_init(AUDIO_CHANNELS, cc->channels, m_rate, cc->sample_rate);
+#endif
 		if (!pResampleCtx) throw std::runtime_error("Cannot create resampling context");
 		audioQueue.setSamplesPerSecond(AUDIO_CHANNELS * m_rate);
 	}
