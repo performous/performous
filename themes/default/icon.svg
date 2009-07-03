@@ -20,9 +20,9 @@
    sodipodi:docname="icon.svg"
    sodipodi:docbase="/root/USNG/trunk/themes/lima"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
-   inkscape:export-filename="/home/tronic/performous/themes/default/icon.bmp.png"
-   inkscape:export-xdpi="45"
-   inkscape:export-ydpi="45">
+   inkscape:export-filename="/home/tronic/performous/themes/default/icon.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
   <metadata
      id="metadata35">
     <rdf:RDF>
@@ -101,10 +101,10 @@
        inkscape:collect="always"
        xlink:href="#linearGradient3928"
        id="radialGradient3940"
-       cx="29.759392"
-       cy="29.025885"
-       fx="29.759392"
-       fy="29.025885"
+       cx="29.106733"
+       cy="32.03397"
+       fx="29.106733"
+       fy="32.03397"
        r="33.97723"
        gradientTransform="matrix(-0.8888687,3.3173007,-3.5172311,-0.9424392,162.12621,-50.628114)"
        gradientUnits="userSpaceOnUse" />
