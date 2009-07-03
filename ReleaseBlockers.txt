@@ -2,9 +2,6 @@ Blockers for 0.3.1 release
 
 Entries ending with question mark are optional (and not really blockers).
 
-General
-- New application icon everywhere (blue instead of green)
-
 Device enumeration for libda
 - Display sensible options in config menu?
 
@@ -16,7 +13,4 @@ Text rendering (all parts optional for this release)
 New config menu
 - Multiple items visible at once
 - Modifying strings and stringlist items.
-
-Singing screen
-- Improve the looks of the song progress bar (maybe match main menu blue color)?
 

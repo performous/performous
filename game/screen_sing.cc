@@ -30,7 +30,7 @@ void ScreenSing::enter() {
 	m_score_text[0].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_score_text[1].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_player_icon.reset(new Surface(getThemePath("sing_pbox.svg")));
-	m_progress.reset(new ProgressBar(getThemePath("sing_progressbg.svg"), getThemePath("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01, 0.01, true));
+	m_progress.reset(new ProgressBar(getThemePath("sing_progressbg.svg"), getThemePath("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01f, 0.01f, true));
 	m_progress->dimensions.fixedWidth(0.4).left(-0.5).screenTop();
 	theme->timer.dimensions.screenTop(0.5 * m_progress->dimensions.h());
 	m_lyricit = song.notes.begin();
