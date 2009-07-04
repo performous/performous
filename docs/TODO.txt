@@ -1,3 +1,6 @@
+This file lists long-time goals that are not fixable quickly. Issues that are easily
+fixable should not be recorded here, but should rather be fixed in the code.
+
 Structural:
 
 - LibDA as a separate project
@@ -5,28 +8,32 @@ Structural:
 	* Mixer and samplerate conversion inside
 - Get rid of ScreenManager in favor of recursive approach?
 - Switch to Clanlib?
+- Switch to GStreamer? (both the ripper and the game)
 
 
 Big features:
 
 - Add compose screen (using features discussed on mailing list)
-- Multiplayer duet (needs different song format)
-- Ingame Singstar DVD support
-- Playing and dancing (using USB guitar, USB drums, USB carpet) to make the game more like RockBand or StepMania
+- Multiplayer duet (needs XML song format)
+- Recording performances
+    * Internet highscore
+- Ingame Singstar DVD support (integrated ripping + ffmpeg feeding + XML song format)
+- Playing and dancing
+    * Guitar code from Silky Strings project (needs some love, but should be quite usable)
+    * Drum code from scratch? [currently has testing mode in practice screen]
+    * Dance code from scratch?
 - Mic effects (reduce volume for bad singers, perfect pitch, reverb, etc)
 
 
 Features:
 
 - Auto-calibration of acoustic roundtrip latency (playback + capture)
-- Better audio card configuration ingame (needs libda support for listing cards)
-- Difficulty setting for hiding pitch graph (won't affect scoring)
+- Better audio card configuration ingame (needs libda support for listing cards) [WIP]
 - Allow playing a single song given as commandline argument (no menus)
 - Kiosk/arcade mode
 
 
 Ripper
 
-- Rewrite video code [DONE, but can be done better]
-- Compress into Vorbis and H.264 MKV
+- Compress into Vorbis Ogg and H.264 MKV
 
