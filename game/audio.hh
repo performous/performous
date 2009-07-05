@@ -139,6 +139,8 @@ class Audio {
 	 * @param seek_dist number of seconds to seek from current position
 	 */
 	void seek(double seek_dist);
+	/** Seek to specific time **/
+	void seekPos(double pos);
 	/** Is the music playing (loaded and not at EOF yet, pause doesn't matter) **/
 	bool isPlaying() const;
 	/** Get the current position. If not known or nothing is playing, NaN is returned. **/

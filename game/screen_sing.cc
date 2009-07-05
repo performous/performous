@@ -25,7 +25,7 @@ void ScreenSing::enter() {
 			std::cerr << e.what() << std::endl;
 		}
 	}
-	if (!song.video.empty() && config["graphic/video"].b()) m_video.reset(new Video(song.path + song.video));
+	if (!song.video.empty() && config["graphic/video"].b()) m_video.reset(new Video(song.path + song.video, song.videoGap));
 	m_pause_icon.reset(new Surface(getThemePath("sing_pause.svg")));
 	m_score_text[0].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_score_text[1].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
@@ -131,7 +131,7 @@ void ScreenSing::draw() {
 			if (ar > arMax || (m_video && ar > arMin)) fillBG();  // Fill white background to avoid black borders
 			m_background->draw();
 		} else fillBG();
-		if (m_video) { m_video->render(time + song.videoGap); double tmp = m_video->dimensions().ar(); if (tmp > 0.0) ar = tmp; }
+		if (m_video) { m_video->render(time); double tmp = m_video->dimensions().ar(); if (tmp > 0.0) ar = tmp; }
 		ar = clamp(ar, arMin, arMax);
 		double offset = 0.5 / ar + 0.2;
 		theme->bg_bottom.dimensions.fixedWidth(1.0).bottom(offset);
