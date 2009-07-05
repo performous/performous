@@ -43,6 +43,10 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 		if (key == SDLK_ESCAPE || m_songs.empty()) m_jukebox = false;
 		else if (key == SDLK_SPACE || (key == SDLK_PAUSE || (key == SDLK_p && mod && KMOD_CTRL))) m_audio.togglePause();
 		else if (key == SDLK_RETURN) sm->activateScreen("Sing");
+		else if (key == SDLK_LEFT) m_songs.advance(-1);
+		else if (key == SDLK_RIGHT) m_songs.advance(1);
+		else if (key == SDLK_PAGEUP) m_audio.seek(-30);
+		else if (key == SDLK_PAGEDOWN) m_audio.seek(30);
 		else if (key == SDLK_UP) m_audio.seek(5);
 		else if (key == SDLK_DOWN) m_audio.seek(-5);
 		return;
