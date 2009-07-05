@@ -29,7 +29,6 @@ void ProgressBar::draw(float value) {
 			TexCoords tex;
 			if (m_sliding) { dim.move(0.0f, off * dim.h()); tex.y2 = 1.0f - m_begin - off; }
 			else { tex.y2 = 1.0f - m_begin; tex.y1 = tex.y2 - value * scale; }
-			std::cout << dim.y1() << std::endl;
 			m_bar.drawCropped(dim, tex);
 		}
 		break;
