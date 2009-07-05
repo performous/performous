@@ -118,11 +118,18 @@ void Audio::playSample(std::string filename) {
 	}
 }
 
-void Audio::seek(double seek_dist) {
+void Audio::seek(double offset) {
 	boost::recursive_mutex::scoped_lock l(m_mutex);
 	if (m_streams.empty()) return;
 	Stream& s = m_streams.back();
-	int position = clamp(s.mpeg.position() + seek_dist, 0.0, s.mpeg.duration() - 1.0);
+	seekPos(s.mpeg.position() + offset);
+}
+
+void Audio::seekPos(double pos) {
+	boost::recursive_mutex::scoped_lock l(m_mutex);
+	if (m_streams.empty()) return;
+	Stream& s = m_streams.back();
+	int position = clamp(pos, 0.0, s.mpeg.duration() - 1.0);
 	s.mpeg.seek(position);
 	s.prebuffering = true;
 	m_paused = false;

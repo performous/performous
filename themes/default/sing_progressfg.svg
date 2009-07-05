@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -14,9 +15,8 @@
    height="40"
    id="svg3465"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
+   inkscape:version="0.47pre0 r21549"
    sodipodi:docname="sing_progressfg.svg"
-   sodipodi:docbase="/home/jesusda/docs/curro/yo/ultrastar-ng/base/theme-pod/themes/default"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <metadata
      id="metadata13394">
@@ -31,9 +31,9 @@
   </metadata>
   <sodipodi:namedview
      inkscape:cy="20"
-     inkscape:cx="250"
+     inkscape:cx="512.7357"
      inkscape:zoom="1.744"
-     inkscape:window-height="726"
+     inkscape:window-height="722"
      inkscape:window-width="960"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
@@ -44,18 +44,28 @@
      bordercolor="#666666"
      pagecolor="#ffffff"
      id="base"
-     inkscape:window-x="426"
-     inkscape:window-y="167"
+     inkscape:window-x="312"
+     inkscape:window-y="25"
      inkscape:current-layer="svg3465"
-     showgrid="true">
+     showgrid="true"
+     inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
        id="grid2385"
        visible="true"
-       enabled="true" />
+       enabled="true"
+       empspacing="5"
+       snapvisiblegridlinesonly="true" />
   </sodipodi:namedview>
   <defs
      id="defs3467">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 20 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="500 : 20 : 1"
+       inkscape:persp3d-origin="250 : 13.333333 : 1"
+       id="perspective1383" />
     <linearGradient
        id="linearGradient2403">
       <stop
@@ -65,21 +75,12 @@
       <stop
          id="stop2411"
          offset="0.25"
-         style="stop-color:#c3f110;stop-opacity:1;" />
+         style="stop-color:#c379ff;stop-opacity:1;" />
       <stop
          style="stop-color:#272c13;stop-opacity:1;"
          offset="1"
          id="stop2407" />
     </linearGradient>
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient2403"
-       id="linearGradient2409"
-       x1="245"
-       y1="5"
-       x2="245"
-       y2="35"
-       gradientUnits="userSpaceOnUse" />
     <filter
        id="filter3238">
       <feGaussianBlur
@@ -6302,14 +6303,41 @@
          stdDeviation="1.9537536"
          id="feGaussianBlur7424" />
     </filter>
+    <inkscape:perspective
+       id="perspective4209"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient2382"
+       id="linearGradient2388"
+       x1="250.26767"
+       y1="3.1680942"
+       x2="250.26767"
+       y2="37.752678"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       id="linearGradient2382">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0"
+         id="stop2384" />
+      <stop
+         id="stop2390"
+         offset="0.25"
+         style="stop-color:#a4a4a4;stop-opacity:1;" />
+      <stop
+         style="stop-color:#404040;stop-opacity:1;"
+         offset="1"
+         id="stop2386" />
+    </linearGradient>
   </defs>
-  <rect
-     style="opacity:0.9;fill:url(#linearGradient2409);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-     id="rect2401"
-     width="495"
-     height="30"
-     x="0"
-     y="5"
-     rx="5"
-     ry="5" />
+  <path
+     style="opacity:0.69999999999999996;fill:#ffffff;fill-opacity:0.5350877;fill-rule:nonzero;stroke:none;stroke-width:3;stroke-opacity:1;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+     d="m 484.25269,4.668094 c 6.648,0 12,5.352 12,12 l 0,7.584583 c 0,6.648 -5.352,12 -12,12 l -479.9700348,0 0,-31.584583 479.9700348,0 z"
+     id="rect2380"
+     sodipodi:nodetypes="ccccccc" />
 </svg>

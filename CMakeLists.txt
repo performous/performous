@@ -1,6 +1,6 @@
 project(Performous CXX)
 cmake_minimum_required(VERSION 2.4)
-set(PROJECT_VERSION "0.3.0+")
+set(PROJECT_VERSION "0.3.1")
 
 # Avoid source tree pollution
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
@@ -33,6 +33,7 @@ add_subdirectory(libs)
 add_subdirectory(themes)
 add_subdirectory(data)
 add_subdirectory(game)
+add_subdirectory(docs)
 
 option(ENABLE_TOOLS "Enable extra tools (e.g. Singstar ripper)" ON)
 

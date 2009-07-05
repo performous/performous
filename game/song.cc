@@ -23,13 +23,18 @@ class SongParser {
 	  m_relativeShift(),
 	  m_maxScore()
 	{
+		// Read the file and do some initial validation checks
 		{
 			std::ifstream f((s.path + s.filename).c_str());
 			if (!f.is_open()) throw SongParserException("Could not open TXT file", 0);
-			char ch;
-			if (!f.get(ch) || ch != '#') throw SongParserException("Does not begin with '#', ignoring file", 1, true);
-			m_ss << ch;
-			m_ss << f.rdbuf();
+			f.seekg(0, std::ios::end);
+			size_t size = f.tellg();
+			if (size < 10 || size > 100000) throw SongParserException("Does not look like a song file (wrong size)", 1, true);
+			f.seekg(0);
+			std::vector<char> data(size);
+			if (!f.read(&data[0], size)) throw SongParserException("Unexpected I/O error", 0);
+			if (data[0] != '#' || data[1] < 'A' || data[1] > 'Z') throw SongParserException("Does not look like a song file (wrong header)", 1, true);
+			m_ss.write(&data[0], size);
 		}
 		// Character set conversion needed?
 		try {

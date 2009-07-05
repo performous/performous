@@ -40,10 +40,16 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 	int key = keysym.sym;
 	SDLMod mod = event.key.keysym.mod;
 	if (m_jukebox) {
-		if (key == SDLK_ESCAPE || m_songs.empty()) { m_jukebox = false; return; }
-		if (key == SDLK_RETURN) sm->activateScreen("Sing");
-		if (key == SDLK_UP) m_audio.seek(5);
-		if (key == SDLK_DOWN) m_audio.seek(-5);
+		if (key == SDLK_ESCAPE || m_songs.empty()) m_jukebox = false;
+		else if (key == SDLK_SPACE || (key == SDLK_PAUSE || (key == SDLK_p && mod && KMOD_CTRL))) m_audio.togglePause();
+		else if (key == SDLK_RETURN) sm->activateScreen("Sing");
+		else if (key == SDLK_LEFT) m_songs.advance(-1);
+		else if (key == SDLK_RIGHT) m_songs.advance(1);
+		else if (key == SDLK_PAGEUP) m_audio.seek(-30);
+		else if (key == SDLK_PAGEDOWN) m_audio.seek(30);
+		else if (key == SDLK_UP) m_audio.seek(5);
+		else if (key == SDLK_DOWN) m_audio.seek(-5);
+		return;
 	}
 	if (key == SDLK_r && mod & KMOD_CTRL) { m_songs.reload(); m_songs.setFilter(m_search.text); }
 	if (!m_jukebox && m_search.process(keysym)) m_songs.setFilter(m_search.text);
@@ -95,6 +101,7 @@ void ScreenSongs::draw() {
 	if (m_video.get()) m_video->render(time);
 	if (!m_jukebox) theme->bg.draw();
 	std::string music, songbg, video;
+	double videoGap = 0.0;
 	std::ostringstream oss_song, oss_order;
 	// Test if there are no songs
 	if (m_songs.empty()) {
@@ -137,7 +144,7 @@ void ScreenSongs::draw() {
 		}
 		if (!song.mp3.empty()) music = song.path + song.mp3;
 		if (!song.background.empty()) songbg = song.path + song.background;
-		if (!song.video.empty()) video = song.path + song.video;
+		if (!song.video.empty()) { video = song.path + song.video; videoGap = song.videoGap; }
 	}
 	if (m_jukebox) drawJukebox();
 	else {
@@ -152,11 +159,16 @@ void ScreenSongs::draw() {
 		m_songbg.reset(); m_video.reset();
 		if (music.empty()) m_audio.fadeout(); else m_audio.playPreview(music, m_jukebox ? 0.0 : 30.0);
 		if (!songbg.empty()) try { m_songbg.reset(new Surface(songbg)); } catch (std::exception const&) {}
-		if (!video.empty() && config["graphic/video"].b()) m_video.reset(new Video(video));
+		if (!video.empty() && config["graphic/video"].b()) m_video.reset(new Video(video, videoGap));
 		m_playing = music;
 	}
 	if (m_jukebox) {
-		if (!m_audio.isPlaying() || m_audio.getPosition() + 1.4 > m_audio.getLength()) m_songs.advance(1);  // Switch if at song end
+		// Switch if at song end
+		if (!m_audio.isPlaying() || m_audio.getPosition() + 1.4 > m_audio.getLength()) {
+			m_songs.advance(1);
+			// Force reload of data
+			m_playing.clear();
+		}
 	} else if (!m_audio.isPaused() && m_playTimer.get() > IDLE_TIMEOUT) {  // Switch if song hasn't changed for IDLE_TIMEOUT seconds
 		if (!m_search.text.empty()) { m_search.text.clear(); m_songs.setFilter(m_search.text); }
 		m_songs.random();

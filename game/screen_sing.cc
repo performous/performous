@@ -25,12 +25,12 @@ void ScreenSing::enter() {
 			std::cerr << e.what() << std::endl;
 		}
 	}
-	if (!song.video.empty() && config["graphic/video"].b()) m_video.reset(new Video(song.path + song.video));
+	if (!song.video.empty() && config["graphic/video"].b()) m_video.reset(new Video(song.path + song.video, song.videoGap));
 	m_pause_icon.reset(new Surface(getThemePath("sing_pause.svg")));
 	m_score_text[0].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_score_text[1].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_player_icon.reset(new Surface(getThemePath("sing_pbox.svg")));
-	m_progress.reset(new ProgressBar(getThemePath("sing_progressbg.svg"), getThemePath("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01, 0.01, true));
+	m_progress.reset(new ProgressBar(getThemePath("sing_progressbg.svg"), getThemePath("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01f, 0.01f, true));
 	m_progress->dimensions.fixedWidth(0.4).left(-0.5).screenTop();
 	theme->timer.dimensions.screenTop(0.5 * m_progress->dimensions.h());
 	m_lyricit = song.notes.begin();
@@ -131,7 +131,7 @@ void ScreenSing::draw() {
 			if (ar > arMax || (m_video && ar > arMin)) fillBG();  // Fill white background to avoid black borders
 			m_background->draw();
 		} else fillBG();
-		if (m_video) { m_video->render(time + song.videoGap); double tmp = m_video->dimensions().ar(); if (tmp > 0.0) ar = tmp; }
+		if (m_video) { m_video->render(time); double tmp = m_video->dimensions().ar(); if (tmp > 0.0) ar = tmp; }
 		ar = clamp(ar, arMin, arMax);
 		double offset = 0.5 / ar + 0.2;
 		theme->bg_bottom.dimensions.fixedWidth(1.0).bottom(offset);

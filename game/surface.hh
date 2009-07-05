@@ -44,6 +44,8 @@ class Dimensions {
 	Dimensions& screenTop(float y = 0.0f) { m_screenAnchor = TOP; top(y); return *this; }
 	/// sets screen bottom
 	Dimensions& screenBottom(float y = 0.0f) { m_screenAnchor = BOTTOM; bottom(y); return *this; }
+	/// move the object without affecting anchoring
+	Dimensions& move(float x, float y) { m_x += x; m_y += y; return *this; }
 	/// returns ar XXX
 	float ar() const { return m_ar; }
 	/// returns left
@@ -101,9 +103,10 @@ template <GLenum Type> class OpenGLTexture: boost::noncopyable {
 	~OpenGLTexture() { glDeleteTextures(1, &m_id); }
 	/// returns id
 	GLuint id() const { return m_id; };
-	/// draw area
+	/// draw in given dimensions, with given texture coordinates
 	void draw(Dimensions const& dim, TexCoords const& tex = TexCoords()) const;
-
+	/// draw a subsection of the orig dimensions, cropping by tex
+	void drawCropped(Dimensions const& orig, TexCoords const& tex) const;
   private:
 	GLuint m_id;
 };
@@ -122,7 +125,6 @@ class UseTexture: boost::noncopyable {
 	GLenum m_type;
 };
 
-/** Draw the texture using the specified dimensions and texture coordinates. **/
 template <GLenum Type> void OpenGLTexture<Type>::draw(Dimensions const& dim, TexCoords const& tex) const {
 	UseTexture texture(*this);
 	glBegin(GL_QUADS);
@@ -131,6 +133,16 @@ template <GLenum Type> void OpenGLTexture<Type>::draw(Dimensions const& dim, Tex
 	glTexCoord2f(tex.x2, tex.y2); glVertex2f(dim.x2(), dim.y2());
 	glTexCoord2f(tex.x1, tex.y2); glVertex2f(dim.x1(), dim.y2());
 	glEnd();
+}
+
+template <GLenum Type> void OpenGLTexture<Type>::drawCropped(Dimensions const& orig, TexCoords const& tex) const {
+	Dimensions dim(
+	  orig.x1() + tex.x1 * orig.w(),
+	  orig.y1() + tex.y1 * orig.h(),
+	  orig.w() * (tex.x2 - tex.x1),
+	  orig.h() * (tex.y2 - tex.y1)
+	);
+	draw(dim, tex);
 }
 
 namespace pix { enum Format { INT_ARGB, CHAR_RGBA, RGB, BGR }; }

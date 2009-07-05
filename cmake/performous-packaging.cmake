@@ -4,9 +4,11 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A karaoke game with pitch detection and s
 set(CPACK_PACKAGE_CONTACT "http://performous.org/")
 set(CPACK_SOURCE_IGNORE_FILES
    "/.cvsignore"
+   "/.gitignore"
    "/songs/"
    "/build/"
    "/.svn/"
+   "/.git/"
    "/osx-utils/"
    "/portage-overlay/"
 )

@@ -2,9 +2,10 @@
 #include "configuration.hh"
 #include <cmath>
 
-Video::Video(std::string const& _videoFile): m_mpeg(true, false, _videoFile), m_surfaceTime(), m_lastTime(), m_alpha() {}
+Video::Video(std::string const& _videoFile, double videoGap): m_mpeg(true, false, _videoFile), m_videoGap(videoGap), m_surfaceTime(), m_lastTime(), m_alpha(-0.5, 1.5) {}
 
 void Video::render(double time) {
+	time += m_videoGap;
 	VideoFrame& fr = m_videoFrame;
 	// Time to switch frame?
 	if (!fr.data.empty() && time >= fr.timestamp) {
@@ -13,19 +14,18 @@ void Video::render(double time) {
 		m_surfaceTime = fr.timestamp;
 	}
 	double tdist = std::abs(m_surfaceTime - time);
-	m_alpha += (tdist < 0.4 ? 0.02f : -0.02f);
-	if (m_alpha <= 0.0f) m_alpha = 0.0f;
-	else {
-		if (m_alpha > 1.2f) m_alpha = 1.2f;
-		if (m_alpha < 1.0f) glColor4f(1.0f, 1.0f, 1.0f, m_alpha);
+	m_alpha.setTarget(tdist < 0.4 ? 1.2f : -0.5f);
+	float alpha = clamp(m_alpha.get());
+	if (alpha > 0.0f) {
+		if (alpha < 1.0f) glColor4f(1.0f, 1.0f, 1.0f, alpha);
 		m_surface.draw();
-		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		if (alpha < 1.0f) glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 	// Preload the next future frame
 	if (fr.data.empty()) while (m_mpeg.videoQueue.tryPop(fr) && fr.timestamp < time) {};
 	// Do a seek before next render, if required
-	if (time < m_lastTime - 0.4 || (!fr.data.empty() && time > fr.timestamp + 2.0)) {
-		m_mpeg.seek(time - 0.3);
+	if (time < m_lastTime - 1.0 || (!fr.data.empty() && time > fr.timestamp + 7.0)) {
+		m_mpeg.seek(std::max(0.0, time - 5.0));  // -5 to workaround ffmpeg inaccurate seeking
 		fr.data.clear();
 	}
 	m_lastTime = time;

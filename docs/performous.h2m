@@ -1,7 +1,7 @@
 Include file for Performous man page
 
 [name]
-performous \- The free Linux karaoke game
+performous \- The free karaoke game
 
 [description]
 Performous is a free cross-platform clone of the Playstation 2 game Singstar.
@@ -101,6 +101,11 @@ Modify options
 .TP
 \fBCtrl+S\fR
 Save current configuration to configuration file
+
+[audio device configuration]
+Performous normally autodetects microphones and playback devices correctly, but if this fails on your machine, you will need to configure them from command line because in-game configuration is not yet implemented. Once you have them working, enter the configuration menu and press \fBCtrl+S\fR to save them to your config file so that they don't need to specified when starting the program.
+
+Additionally, the current version prints a list of ALSA devices detected to console. Use this as a reference for your configuration.
 
 [see also]
 You can find more information at http://performous.org/ or

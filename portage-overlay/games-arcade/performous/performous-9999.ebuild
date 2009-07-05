@@ -7,11 +7,15 @@ inherit games git cmake-utils
 RESTRICT="nostrip"
 
 SONGS_PN=ultrastar-songs
-SONGS_P=${SONGS_PN}-2
 
 DESCRIPTION="Karaoke game similar to Singstar"
 HOMEPAGE="http://performous.org"
-SRC_URI="songs? ( mirror://sourceforge/${PN}/${SONGS_P}.tar.bz2 )"
+SRC_URI="songs? ( 
+	mirror://sourceforge/${PN}/${SONGS_PN}-jc-1.zip
+	mirror://sourceforge/${PN}/${SONGS_PN}-libre-3.zip
+	mirror://sourceforge/${PN}/${SONGS_PN}-restricted-3.zip
+	mirror://sourceforge/${PN}/${SONGS_PN}-shearer-1.zip
+	)"
 
 EGIT_REPO_URI="git://performous.git.sourceforge.net/gitroot/performous"
 
@@ -57,7 +61,10 @@ src_unpack() {
 	git_src_unpack
 	if use songs; then
 		cd "${S}"
-		unpack "${SONGS_P}.tar.bz2"
+		unpack "${SONGS_PN}-jc-1.zip"
+		unpack "${SONGS_PN}-libre-3.zip"
+		unpack "${SONGS_PN}-restricted-3.zip"
+		unpack "${SONGS_PN}-shearer-1.zip"
 		pwd
 	fi
 }

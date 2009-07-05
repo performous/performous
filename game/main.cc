@@ -173,13 +173,7 @@ int main(int argc, char** argv) {
 	std::signal(SIGINT, quit);
 	std::signal(SIGTERM, quit);
 	std::ios::sync_with_stdio(false);  // We do not use C stdio
-	da::initialize libda;
-	try {
-		readConfig();
-	} catch (std::exception& e) {
-		std::cerr << e.what() << std::endl;
-		return EXIT_FAILURE;
-	}
+	// Parse commandline options
 	std::vector<std::string> mics;
 	std::vector<std::string> pdevs;
 	std::vector<std::string> songdirs;
@@ -263,6 +257,15 @@ int main(int argc, char** argv) {
 	if (vm.count("version")) {
 		std::cout << PACKAGE << ' ' << VERSION << std::endl;
 		return 0;
+	}
+	// Initialize audio
+	da::initialize libda;
+	// Read config files
+	try {
+		readConfig();
+	} catch (std::exception& e) {
+		std::cerr << e.what() << std::endl;
+		return EXIT_FAILURE;
 	}
 	// Override XML config for options that were specified from commandline or performous.conf
 	if (vm.count("width")) config["graphic/window_width"].i() = vm["width"].as<int>();
