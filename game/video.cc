@@ -25,7 +25,7 @@ void Video::render(double time) {
 	if (fr.data.empty()) while (m_mpeg.videoQueue.tryPop(fr) && fr.timestamp < time) {};
 	// Do a seek before next render, if required
 	if (time < m_lastTime - 1.0 || (!fr.data.empty() && time > fr.timestamp + 7.0)) {
-		m_mpeg.seek(time - 5.0);  // -5 to workaround ffmpeg inaccurate seeking
+		m_mpeg.seek(std::max(0.0, time - 5.0));  // -5 to workaround ffmpeg inaccurate seeking
 		fr.data.clear();
 	}
 	m_lastTime = time;
