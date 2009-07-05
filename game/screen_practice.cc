@@ -58,16 +58,21 @@ void ScreenPractice::draw() {
 }
 
 void ScreenPractice::draw_analyzers() {
+	MusicalScale scale;
 	boost::ptr_vector<Analyzer>& analyzers = m_capture.analyzers();
 	if (analyzers.empty()) return;
-	bool text = false;
+	double textPower = -getInf();
+	double textFreq = 0.0;
 
 	for (unsigned int i = 0; i < analyzers.size(); ++i) {
 		Analyzer& analyzer = analyzers[i];
 		analyzer.process();
 		Tone const* tone = analyzer.findTone();
 		double freq = (tone ? tone->freq : 0.0);
-		MusicalScale scale;
+		if (tone && tone->db > textPower) {
+			textPower = tone->db;
+			textFreq = freq;
+		}
 		// getPeak returns 0.0 when clipping, negative values when not that loud.
 		// Normalizing to [0,1], where 0 is -43 dB or less (to match the vumeter graphic)
 		m_vumeters[i].draw(analyzer.getPeak() / 43.0 + 1.0);
@@ -94,12 +99,8 @@ void ScreenPractice::draw_analyzers() {
 					theme->sharp.draw();
 				}
 			}
-
-			if (!text) {
-				theme->note_txt.draw(scale.getNoteStr(freq));
-				text = true;
-			}
 		}
 	}
-
+	// Display note and frequency
+	if (textFreq > 0.0) theme->note_txt.draw(scale.getNoteStr(textFreq));
 }
