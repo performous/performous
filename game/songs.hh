@@ -17,7 +17,7 @@ class Songs: boost::noncopyable {
 	Songs(std::string const& songlist = std::string());
 	~Songs();
 	/// updates filtered songlist
-	void update() { if (m_dirty) filter_internal(); }
+	void update();
 	/// reloads songlist
 	void reload();
 	/// array access
@@ -77,6 +77,7 @@ class Songs: boost::noncopyable {
 	void sort_internal();
 	volatile bool m_dirty;
 	volatile bool m_loading;
+	volatile bool m_needShuffle;
 	boost::scoped_ptr<boost::thread> m_thread;
 	mutable boost::mutex m_mutex;
 };

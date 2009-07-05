@@ -33,7 +33,21 @@ Features:
 - Kiosk/arcade mode
 
 
-Ripper
+Text rendering bugs:
+
+- Correct vertical alignment
+- Use dimensions to specify bounding box (possibly init from SVG)
+- Lyric hilighted should be rendered in front of the others
+
+
+New config menu:
+
+- Multiple items visible at once
+- Modifying strings and stringlist items.
+- Predefined options from config schema and libda device enumeration
+
+
+Ripper:
 
 - Compress into Vorbis Ogg and H.264 MKV
 

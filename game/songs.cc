@@ -15,7 +15,7 @@
 #include <iterator>
 #include <stdexcept>
 
-Songs::Songs(std::string const& songlist): m_songlist(songlist), math_cover(), m_order(), m_dirty(false), m_loading(false) {
+Songs::Songs(std::string const& songlist): m_songlist(songlist), math_cover(), m_order(), m_dirty(false), m_loading(false), m_needShuffle(false) {
 	reload();
 }
 
@@ -31,6 +31,7 @@ void Songs::reload() {
 	m_songdirs.clear();
 	std::transform(sd.begin(), sd.end(), std::inserter(m_songdirs, m_songdirs.end()), pathMangle);
 	// Run loading thread
+	m_needShuffle = false;
 	m_loading = true;
 	m_thread.reset(new boost::thread(boost::bind(&Songs::reload_internal, boost::ref(*this))));
 }
@@ -51,10 +52,11 @@ void Songs::reload_internal() {
 	}
 	if (m_loading) dumpSongs_internal(); // Dump the songlist to file (if requested)
 	m_loading = false;
-	m_dirty = true;  // Force shuffle
+	m_needShuffle = true;  // Force shuffle
 }
 
 void Songs::reload_internal(fs::path const& parent) {
+	static int randomIdx = 0;
 	namespace fs = fs;
 	if (std::distance(parent.begin(), parent.end()) > 20) { std::cout << ">>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)" << std::endl; return; }
 	try {
@@ -69,7 +71,7 @@ void Songs::reload_internal(fs::path const& parent) {
 			if (name.size() < 5 || !regex_match(name.substr(name.size() - 4).c_str(),match,expression)) continue;
 			try {
 				Song* s = new Song(path, name);
-				s->randomIdx = std::numeric_limits<int>::min();
+				s->randomIdx = ++randomIdx; // Not so random during loading, they are shuffled after load is finished
 				boost::mutex::scoped_lock l(m_mutex);
 				m_songs.push_back(boost::shared_ptr<Song>(s));
 				m_dirty = true;
@@ -111,6 +113,16 @@ class Songs::RestoreSel {
 	}
 };
 
+void Songs::update() {
+	if (m_dirty) filter_internal();
+	// Shuffle the songlist if shuffle is finished and all songs are already filtered
+	if (m_needShuffle && !m_dirty) {
+		randomize_internal();
+		math_cover.setTarget(0, m_songs.size());
+		m_needShuffle = false;
+	}
+}
+
 void Songs::randomize() {
 	RestoreSel restore(*this);
 	randomize_internal();
@@ -124,8 +136,9 @@ void Songs::randomize_internal() {
 	for (SongVector::const_iterator it = m_filtered.begin(); it != m_filtered.end(); ++it) (*it)->randomIdx = gen();
 	*/
 	std::srand(std::time(NULL));
+	// Assign the songs randomIdx that is used for sorting in the "random" mode
 	for (SongVector::const_iterator it = m_filtered.begin(); it != m_filtered.end(); ++it) (*it)->randomIdx = std::rand();
-	m_order = 0;
+	m_order = 0;  // Use randomIdx sort mode
 	sort_internal();
 }
 
@@ -137,6 +150,7 @@ void Songs::setFilter(std::string const& val) {
 
 void Songs::filter_internal() {
 	boost::mutex::scoped_lock l(m_mutex);
+	m_dirty = false;
 	RestoreSel restore(*this);
 	try {
 		SongVector filtered;
@@ -149,10 +163,7 @@ void Songs::filter_internal() {
 	}
 	math_cover.reset();
 	sort_internal();
-	if (m_dirty && !m_loading) { randomize_internal(); math_cover.setTarget(0, m_songs.size()); }
-	m_dirty = false;
 }
-
 
 namespace {
 
