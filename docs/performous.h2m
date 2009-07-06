@@ -63,7 +63,7 @@ Randomize songs (sort them again)
 Refresh song list (reload from disk)
 .TP
 \fBF4\fR
-Enter jukebox mode (play songs entirely, hide song browser)
+Enter jukebox mode (play songs entirely, hide song browser, allow seeking with Up/Down)
 .TP
 \fBEsc\fR
 Exit to main menu, exit jukebox mode or quit search mode
@@ -78,6 +78,9 @@ Skip long instrumental breaks, or get the grading instantly at the end of song.
 .TP
 \fBPause\fR or \fBSpace\fR
 Pause the game
+.TP
+\fBF4\fR
+Toggle synth mode (synthesized tone for notes)
 .TP
 \fBF5\fR/\fBF6\fR
 Adjust audio/video sync. Use if the notes pass the black line at incorrect time.
