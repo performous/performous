@@ -29,17 +29,18 @@ namespace {
 				if (snd_ctl_pcm_info(ctl, pcminfo) < 0) continue;
 				std::string device = std::string("alsa:hw:") + snd_ctl_card_info_get_id(info) + "," + boost::lexical_cast<std::string>(dev);
 				std::string desc = std::string(snd_ctl_card_info_get_name(info)) + " (" + snd_pcm_info_get_name(pcminfo) + ")";
-				std::cout << "  " << device << "   " << desc << std::endl;
+				std::clog << "  " << device << "   " << desc << std::endl;
 			}
 		}
 	}
 
 	struct Foo {
 		Foo() {
-			std::cout << "ALSA capture devices:" << std::endl;
+			std::clog << "ALSA capture devices:\n";
 			devices(SND_PCM_STREAM_CAPTURE);
-			std::cout << "ALSA playback devices:" << std::endl;
+			std::clog << "ALSA playback devices:\n";
 			devices(SND_PCM_STREAM_PLAYBACK);
+			std::clog << std::endl;
 		}
 	} foo;
 
@@ -82,15 +83,15 @@ namespace {
 	/*
 	void status(alsa::pcm& pcm) {
 		switch (snd_pcm_state(pcm)) {
-		  case SND_PCM_STATE_OPEN: std::cout << "ALSA pcm state: OPEN" << std::endl; break;
-		  case SND_PCM_STATE_SETUP: std::cout << "ALSA pcm state: SETUP" << std::endl; break;
-		  case SND_PCM_STATE_PREPARED: std::cout << "ALSA pcm state: PREPARED" << std::endl; break;
-		  case SND_PCM_STATE_RUNNING: std::cout << "ALSA pcm state: RUNNING" << std::endl; break;
-		  case SND_PCM_STATE_XRUN: std::cout << "ALSA pcm state: XRUN" << std::endl; break;
-		  case SND_PCM_STATE_DRAINING: std::cout << "ALSA pcm state: DRAINING" << std::endl; break;
-		  case SND_PCM_STATE_PAUSED: std::cout << "ALSA pcm state: PAUSED" << std::endl; break;
-		  case SND_PCM_STATE_SUSPENDED: std::cout << "ALSA pcm state: SUSPENDED" << std::endl; break;
-		  case SND_PCM_STATE_DISCONNECTED: std::cout << "ALSA pcm state: DISCONNECTED" << std::endl; break;
+		  case SND_PCM_STATE_OPEN: std::clog << "ALSA pcm state: OPEN" << std::endl; break;
+		  case SND_PCM_STATE_SETUP: std::clog << "ALSA pcm state: SETUP" << std::endl; break;
+		  case SND_PCM_STATE_PREPARED: std::clog << "ALSA pcm state: PREPARED" << std::endl; break;
+		  case SND_PCM_STATE_RUNNING: std::clog << "ALSA pcm state: RUNNING" << std::endl; break;
+		  case SND_PCM_STATE_XRUN: std::clog << "ALSA pcm state: XRUN" << std::endl; break;
+		  case SND_PCM_STATE_DRAINING: std::clog << "ALSA pcm state: DRAINING" << std::endl; break;
+		  case SND_PCM_STATE_PAUSED: std::clog << "ALSA pcm state: PAUSED" << std::endl; break;
+		  case SND_PCM_STATE_SUSPENDED: std::clog << "ALSA pcm state: SUSPENDED" << std::endl; break;
+		  case SND_PCM_STATE_DISCONNECTED: std::clog << "ALSA pcm state: DISCONNECTED" << std::endl; break;
 		}
 	}
 	*/
