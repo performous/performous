@@ -43,3 +43,25 @@ include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
 install(TARGETS performous DESTINATION bin)
 
+# This should really be in doc/CMakeLists.txt but for some reason the performous target is not visible there
+if(UNIX)
+	find_program(HELP2MAN help2man DOC "Location of the help2man program")
+	find_program(GZIP gzip DOC "Location of the gzip program")
+	if(HELP2MAN AND GZIP)
+		set(MANFILE ${CMAKE_CURRENT_BINARY_DIR}/performous.1.gz)
+		set(H2MFILE ${CMAKE_SOURCE_DIR}/docs/performous.h2m)
+		add_custom_command(
+			OUTPUT ${MANFILE}
+			COMMAND ${HELP2MAN} ${CMAKE_CURRENT_BINARY_DIR}/performous -i ${H2MFILE} -N | ${GZIP} > ${MANFILE}
+			MAIN_DEPENDENCY ${H2MFILE}
+			DEPENDENCY performous
+			COMMENT "Building Performous man page"
+			VERBATIM
+		)
+		add_custom_target(manpage ALL DEPENDS ${MANFILE})
+		install(FILES ${MANFILE} DESTINATION share/man/man1)
+	else(HELP2MAN AND GZIP)
+		message("WARNING: Can't locate help2man or gzip; man pages will not be generated")
+	endif(HELP2MAN AND GZIP)
+endif(UNIX)
+
