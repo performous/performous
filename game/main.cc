@@ -221,10 +221,16 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 	po::notify(vm);
+	if (vm.count("version")) {
+		std::cout << PACKAGE << ' ' << VERSION << std::endl;
+		return 0;
+	}
 	if (vm.count("help")) {
 		std::cout << cmdline << std::endl;
 		return 0;
 	}
+	// Initialize audio for pdevhelp, michelp and the rest of the program
+	da::initialize libda;
 	if (vm.count("pdevhelp")) {
 		da::playback::devlist_t l = da::playback::devices();
 		std::cout << "Specify with --pdev [OPTIONS@]dev[:settings]]. For example:\n"
@@ -255,12 +261,6 @@ int main(int argc, char** argv) {
 		}
 		return 0;
 	}
-	if (vm.count("version")) {
-		std::cout << PACKAGE << ' ' << VERSION << std::endl;
-		return 0;
-	}
-	// Initialize audio
-	da::initialize libda;
 	// Read config files
 	try {
 		readConfig();
