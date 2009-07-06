@@ -2,6 +2,8 @@
 if(UNIX)
 	find_program(HELP2MAN help2man DOC "Location of the help2man program")
 	find_program(GZIP gzip DOC "Location of the gzip program")
+	mark_as_advanced(HELP2MAN)
+	mark_as_advanced(GZIP)
 	if(HELP2MAN AND GZIP)
 		set(MANFILE ${CMAKE_CURRENT_BINARY_DIR}/performous.1.gz)
 		set(H2MFILE ${CMAKE_CURRENT_SOURCE_DIR}/performous.h2m)
