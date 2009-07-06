@@ -271,11 +271,13 @@ std::string Song::collate(std::string const& str) {
 }
 
 namespace {
-	bool noteEndLessThan(Note const& n, double time) { return n.end < time; }
+	// Cannot simply take double as its second argument because of a C++ defect
+	bool noteEndLessThan(Note const& a, Note const& b) { return a.end < b.end; }
 }
 
 Song::Status Song::status(double time) const {
-	Notes::const_iterator it = std::lower_bound(notes.begin(), notes.end(), time, noteEndLessThan);
+	Note target; target.end = time;
+	Notes::const_iterator it = std::lower_bound(notes.begin(), notes.end(), target, noteEndLessThan);
 	if (it == notes.end()) return FINISHED;
 	if (it->begin > time + 4.0) return INSTRUMENTAL_BREAK;
 	return NORMAL;
