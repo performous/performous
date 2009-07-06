@@ -125,7 +125,7 @@ extern "C" void performous_ffmpeg_crash_hack(int sig) {
 		std::signal(SIGABRT, sigabrt);
 		std::signal(SIGSEGV, sigsegv);
 		(*ffmpeg_ptr)->crash();
-		boost::this_thread::sleep(boost::posix_time::hours(10000));
+		while (1) boost::thread::sleep(now() + 1000.0);
 	} // Uh-oh, FFMPEG goes again; wait here until eternity
 	sighandler h = (sig == SIGABRT ? sigabrt : sigsegv);
 	if (h && h != performous_ffmpeg_crash_hack) h(sig); // From another thread, call original handler
