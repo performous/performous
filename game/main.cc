@@ -10,7 +10,8 @@
 #include "xtime.hh"
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
-#include <boost/spirit/include/classic_core.hpp>
+// Needs at least Boost 1.36 and many systems don't have that: #include <boost/spirit/include/classic_core.hpp>
+#include <boost/spirit/core.hpp>
 #include <boost/thread.hpp>
 #include <libda/audio.hpp>
 #include <csignal>
@@ -76,7 +77,7 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 
 void audioSetup(Capture& capture, Audio& audio) {
 	// initialize audio argument parser
-	using namespace boost::spirit::classic;
+	using namespace boost::spirit; //::classic;
 	unsigned channels, rate, frames;
 	std::string devstr;
 	// channel       ::= "channel=" integer
