@@ -13,3 +13,5 @@ install(FILES ${CONFIG_FILE} DESTINATION "${SHARE_INSTALL}/config/")
 file(GLOB XSL_FILES "*.xsl")
 install(FILES ${XSL_FILES} DESTINATION "${SHARE_INSTALL}/xsl/")
 
+file(GLOB SOUND_FILES "sounds/*.ogg")
+install(FILES ${SOUND_FILES} DESTINATION "${SHARE_INSTALL}/sounds/")

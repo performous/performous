@@ -115,14 +115,16 @@ class Audio {
 	void open(std::string const& pdev, std::size_t rate, std::size_t frames);
 	/// if audio is currently playing
 	bool isOpen() const { return m_playback; }
-	/** Play a song from the beginning
+	/** Play a song beginning at startPos (defaults to 0)
 	 * @param filename the track filename
 	 * @param preview if the song preview is to play
 	 * @param fadeTime time to fade
+	 * @param startPos starting position
 	 */
 	void playMusic(std::string const& filename, bool preview = false, double fadeTime = 0.1, double startPos = 0.0);
-	/** Play a preview of the song, starting at 30 seconds
+	/** Play a preview of the song, starting at startPos
 	 * @param filename the track filename
+	 * @param startPos starting position
 	 */
 	void playPreview(std::string const& filename, double startPos) { playMusic(filename, true, 1.0, startPos); }
 	/// get pause status

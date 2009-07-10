@@ -23,7 +23,7 @@ class ScreenSongs : public Screen {
 	void exit();
 	void manageEvent(SDL_Event event);
 	void draw();
-	void drawJukebox();
+	void drawJukebox(); ///< draw the songbrowser in jukebox mode (fullscreen, full previews, ...)
 
   private:
 	Audio& m_audio;

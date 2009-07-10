@@ -15,9 +15,9 @@ namespace xmlpp { struct Element; }  // Forward declaration for libxml++ stuff
 /// configuration option
 class ConfigItem {
   public:
-	typedef std::vector<std::string> StringList;
+	typedef std::vector<std::string> StringList; ///< a list of strings
 	ConfigItem() {}
-	void update(xmlpp::Element& elem, int mode); //< Load XML config file, elem = Entry, mode = 0 for schema, 1 for system config and 2 for user config
+	void update(xmlpp::Element& elem, int mode); ///< Load XML config file, elem = Entry, mode = 0 for schema, 1 for system config and 2 for user config
 	ConfigItem& operator++() { return incdec(1); } ///< increments config value
 	ConfigItem& operator--() { return incdec(-1); } ///< decrements config value
 	bool is_default() const; ///< Is the current value the same as the default value
@@ -29,9 +29,9 @@ class ConfigItem {
 	StringList& sl(); ///< Access stringlist item
 	void reset() { m_value = m_defaultValue; } ///< Reset to factory default
 	std::string getValue() const; ///< Get a human-readable representation of the current value
-	std::string const& getShortDesc() const { return m_shortDesc; }
-	std::string const& getLongDesc() const { return m_longDesc; }
-	
+	std::string const& getShortDesc() const { return m_shortDesc; } ///< get the short description for this ConfigItem
+	std::string const& getLongDesc() const { return m_longDesc; } ///< get the long description for this ConfigItem
+
   private:
 	template <typename T> void updateNumeric(xmlpp::Element& elem, int mode); ///< Used internally for loading XML
 	void verifyType(std::string const& t) const; ///< throws std::logic_error if t != type
@@ -57,11 +57,12 @@ void readConfig();
 /** Write modified config options to user's config XML **/
 void writeConfig();
 
+/// struct for entries in menu
 struct MenuEntry {
-	std::string name;
-	std::string shortDesc;
-	std::string longDesc;
-	std::vector<std::string> items;
+	std::string name; ///< name of the menu entry
+	std::string shortDesc; ///< a short description
+	std::string longDesc; ///< a longer description
+	std::vector<std::string> items; ///< selectable options
 };
 
 typedef std::vector<MenuEntry> ConfigMenu;
