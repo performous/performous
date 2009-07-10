@@ -54,8 +54,9 @@ Launcher::SongIterator Launcher::SongIterator::operator++(){
 }
 
 bool Launcher::SongIterator::checkValidity(){
-	return  exists(*iter/"guitar.ogg") &&
-			exists(*iter/"notes.mid") &&
-			exists(*iter/"song.ini") &&
-			exists(*iter/"song.ogg");
+	boost::filesystem::path p = *iter;
+	return  exists(p/"guitar.ogg") &&
+			exists(p/"notes.mid") &&
+			exists(p/"song.ini") &&
+			exists(p/"song.ogg");
 }
