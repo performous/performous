@@ -44,6 +44,16 @@ jEsuSdA  <info at jesusda.com>
 Tobias Gehrig <tgehrig at users.sourceforge.net>
 	* Pre-calculate FFT window patch
 
+Olli Salli <osalli at cc.hut.fi>
+	* Silky Strings glfw window management, input and graphics
+
+Ville Virkkala <vvirkkal at cc.hut.fi>
+	* Silky Strings original MIDI parser
+	* Silky Strings game logic
+	
+Tuomas Perälä <tuomas.perala at hut.fi>
+	* Silky Strings Qt-based launcher
+
 
 GUEST DEVELOPERS
 ----------------
