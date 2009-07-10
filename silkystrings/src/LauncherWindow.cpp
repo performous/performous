@@ -217,6 +217,9 @@ void Launcher::LauncherWindow::play(){
   param[9] << height;
   param[10] << (fullscreen->checkState() == Qt::Unchecked ? false : true);
 	
+	std::cout << "silkystrings";
+	for (int n = 0; n < 11; ++n) std::cout << " " << param[n].str();
+	std::cout << std::endl;
 
 	// execute silkystring and exit launcher
 	execl("silkystrings",
@@ -232,7 +235,7 @@ void Launcher::LauncherWindow::play(){
     param[8].str().c_str(),
     param[9].str().c_str(),
     param[10].str().c_str(),
-    0);
+    (void*)NULL);
 
 
 	// if execution fails
