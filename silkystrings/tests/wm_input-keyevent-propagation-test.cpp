@@ -1,5 +1,5 @@
 /* This file is part of SilkyStrings 
- * Copyright (C) 2006  Olli Salli, Tuomas Per‰l‰, Ville Virkkala
+ * Copyright (C) 2006  Olli Salli, Tuomas Per√§l√§, Ville Virkkala
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
