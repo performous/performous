@@ -2,6 +2,15 @@
 #include <iostream>
 #include <cstdlib>
 
+#define PS3_DRUM_CONTROLLER_BLUE   0
+#define PS3_DRUM_CONTROLLER_GREEN  1
+#define PS3_DRUM_CONTROLLER_RED    2
+#define PS3_DRUM_CONTROLLER_YELLOW 3
+#define PS3_DRUM_CONTROLLER_XXX    4
+#define PS3_DRUM_CONTROLLER_ORANGE 5
+
+#define PERFORMOUS_DATA_DIR "/tmp/tmp/share/games/performous/sounds/"
+
 void check_joystick_event(SDL_Event event, Audio &audio) {
 	switch( event.type ) {
 		case SDL_JOYAXISMOTION:
@@ -16,23 +25,23 @@ void check_joystick_event(SDL_Event event, Audio &audio) {
 		case SDL_JOYBUTTONDOWN:
 			std::cout << "Received a button down on "  << (int)event.jbutton.which << " on " << (int)event.jbutton.button << std::endl;
 			switch( event.jbutton.button ) {
-				case 2: // Snare drum
-					audio.playSample("/tmp/drum_snare.ogg");
+				case PS3_DRUM_CONTROLLER_RED: // Snare drum
+					audio.playSample(PERFORMOUS_DATA_DIR "drum_snare.ogg");
 					break;
-				case 0: // Tom 1
-					audio.playSample("/tmp/drum_tom1.ogg");
+				case PS3_DRUM_CONTROLLER_BLUE: // Tom 1
+					audio.playSample(PERFORMOUS_DATA_DIR "drum_tom1.ogg");
 					break;
-				case 1: // Tom 2
-					audio.playSample("/tmp/drum_tom2.ogg");
+				case PS3_DRUM_CONTROLLER_GREEN: // Tom 2
+					audio.playSample(PERFORMOUS_DATA_DIR "drum_tom2.ogg");
 					break;
-				case 3: // Hi hat
-					audio.playSample("/tmp/drum_hi-hat.ogg");
+				case PS3_DRUM_CONTROLLER_YELLOW: // Hi hat
+					audio.playSample(PERFORMOUS_DATA_DIR "drum_hi-hat.ogg");
 					break;
-				case 5: // crash cymbal
-					audio.playSample("/tmp/drum_cymbal.ogg");
+				case PS3_DRUM_CONTROLLER_ORANGE: // crash cymbal
+					audio.playSample(PERFORMOUS_DATA_DIR "drum_cymbal.ogg");
 					break;
-				case 4: // Drum bass
-					audio.playSample("/tmp/drum_bass.ogg");
+				case PS3_DRUM_CONTROLLER_XXX: // Drum bass
+					audio.playSample(PERFORMOUS_DATA_DIR "drum_bass.ogg");
 					break;
 			}
 			break;
