@@ -41,6 +41,9 @@ namespace SilkyStrings {
 		files.push_back(songPath + "song.ogg");
 		files.push_back(songPath + "guitar.ogg");
 		files.push_back(songPath + "rhythm.ogg");
+		// The proper names of these are unknown to me:
+		files.push_back(songPath + "drums.ogg");
+		files.push_back(songPath + "vocals.ogg");
 		parser=&p;
 		statetime=0;
 		gamerunning=true;
@@ -51,7 +54,7 @@ namespace SilkyStrings {
 			++trackcount;
 		}
 		if (trackcount == 0) trackcount = 1; // Single-track song
-		if (trackcount + 1 > files.size()) throw std::runtime_error("Too many tracks in song");
+		if (trackcount + 1 >= files.size()) trackcount = files.size() - 1; // throw std::runtime_error("Too many tracks in song");
 	}
 	
 	Action::~Action() {}
@@ -126,7 +129,7 @@ namespace SilkyStrings {
 		autoselect_difficulty();
 		for (size_t i = 0; i <= trackcount; ++i) {
             std::cout << "Preloading " << files.at(i) << std::endl;
-            sound->preload(files[i]);
+            try { sound->preload(files[i]); } catch (...) { if (i < 2) throw; trackcount = i - 1; break; }
         }
 
 		int seconds = -5;

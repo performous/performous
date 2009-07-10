@@ -48,7 +48,7 @@ TARGET_LINK_LIBRARIES(silkystrings-convenience
 )
 
 IF (CMAKE_COMPILER_IS_GNUCXX)
-  SET_TARGET_PROPERTIES(silkystrings-convenience PROPERTIES COMPILE_FLAGS "-O2 -fno-inline-functions -Wall -Wextra -Wno-unused-parameter")
+  SET_TARGET_PROPERTIES(silkystrings-convenience PROPERTIES COMPILE_FLAGS "-Wall -Wextra -Wno-unused-parameter")
 ENDIF (CMAKE_COMPILER_IS_GNUCXX)
 
 INCLUDE_DIRECTORIES(
