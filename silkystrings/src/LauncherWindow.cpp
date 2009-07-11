@@ -222,7 +222,7 @@ void Launcher::LauncherWindow::play(){
 	std::cout << std::endl;
 
 	// execute silkystring and exit launcher
-	execl("silkystrings",
+	execlp("silkystrings",
     "silkystrings",
     param[0].str().c_str(),
     param[1].str().c_str(),

@@ -36,10 +36,15 @@ add_subdirectory(game)
 add_subdirectory(docs)
 
 option(ENABLE_TOOLS "Enable extra tools (e.g. Singstar ripper)" ON)
+option(ENABLE_SILKYSTRINGS "Enable Silky Strings (Guitar Hero clone)" ON)
 
 if (ENABLE_TOOLS)
   add_subdirectory(tools)
 endif (ENABLE_TOOLS)
+
+if (ENABLE_SILKYSTRINGS)
+  add_subdirectory(silkystrings)
+endif (ENABLE_SILKYSTRINGS)
 
 if(NOT WIN32)
 	if(NOT "${CMAKE_INSTALL_PREFIX}" MATCHES "^(/usr|/usr/local)$")

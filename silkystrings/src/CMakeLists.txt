@@ -1,77 +1,65 @@
-INCLUDE(FindOpenGL)
-INCLUDE(FindSDL)
-INCLUDE(FindSDL_mixer)
+cmake_minimum_required(VERSION 2.4)
 
-IF (CMAKE_COMPILER_IS_GNUCXX)
-  ADD_DEFINITIONS (-g)
-ENDIF (CMAKE_COMPILER_IS_GNUCXX)
+if(COMMAND cmake_policy)
+	cmake_policy(SET CMP0003 NEW)
+endif(COMMAND cmake_policy)
 
-FIND_PATH(FREETYPE2_INCLUDE_DIR freetype/freetype.h
-  ../include/freetype2
-  /usr/local/include/freetype2
-  /usr/include/freetype2
-  )
+# Libraries
 
-ADD_LIBRARY(silkystrings-convenience
-  Action.cpp
-  chord.cpp
-  GameView.cpp
-  GLExtensionProxy.cpp
-  Input.cpp
-  Mesh.cpp
-  MeshFactory.cpp
-  midiEvent.cpp
-  midiFileParser.cpp
-  midiStream.cpp
-  SoftwareElementDataBuffer.cpp
-  SoftwareVertexDataBuffer.cpp
-  Sound.cpp
-  Reaction.cpp
-  TextRenderer.cpp
-  Texture2D.cpp
-  VertexDataBufferManager.cpp
-  VertexFormat.cpp
-  WM.cpp
+#include_directories(${CMAKE_SOURCE_DIR}/libs/libda/include)
+
+find_package(Boost 1.34 REQUIRED COMPONENTS filesystem)
+include_directories(${Boost_INCLUDE_DIRS})
+set(LIBS ${LIBS} ${Boost_LIBRARIES})
+
+# Find all the libs that don't require extra parameters
+foreach(lib SDL OpenGL GLFW Freetype SDL_mixer)
+	find_package(${lib} REQUIRED)
+	include_directories(${${lib}_INCLUDE_DIRS})
+	set(LIBS ${LIBS} ${${lib}_LIBRARIES})
+	add_definitions(${${lib}_DEFINITIONS})
+endforeach(lib)
+
+# Set default compile flags for GCC
+if(CMAKE_COMPILER_IS_GNUCXX)
+	message(STATUS "GCC detected, enabling warnings")
+	# -pedantic cannot be used because ffmpeg headers are b0rked
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++98 -Wall -Wextra")
+endif(CMAKE_COMPILER_IS_GNUCXX)
+
+add_library(silkystrings-convenience
+	Action.cpp
+	chord.cpp
+	GameView.cpp
+	GLExtensionProxy.cpp
+	Input.cpp
+	Mesh.cpp
+	MeshFactory.cpp
+	midiEvent.cpp
+	midiFileParser.cpp
+	midiStream.cpp
+	SoftwareElementDataBuffer.cpp
+	SoftwareVertexDataBuffer.cpp
+	Sound.cpp
+	Reaction.cpp
+	TextRenderer.cpp
+	Texture2D.cpp
+	VertexDataBufferManager.cpp
+	VertexFormat.cpp
+	WM.cpp
 )
 
-IF (NOT WIN32)
-  SET (GLFW_EXTRA_LIBS Xxf86vm Xrandr)
-ENDIF (NOT WIN32)
+target_link_libraries(silkystrings-convenience ${LIBS})
 
-TARGET_LINK_LIBRARIES(silkystrings-convenience
-  glfw${GLFW_SUFFIX}
-  ${OPENGL_LIBRARIES}
-  freetype${FREETYPE_SUFFIX}
-  ${GLFW_EXTRA_LIBS}
-  ${SDL_LIBRARY}
-  ${SDLMIXER_LIBRARY}
-)
+add_executable(silkystrings silkystrings.cpp)
+target_link_libraries(silkystrings silkystrings-convenience)
 
-IF (CMAKE_COMPILER_IS_GNUCXX)
-  SET_TARGET_PROPERTIES(silkystrings-convenience PROPERTIES COMPILE_FLAGS "-Wall -Wextra -Wno-unused-parameter")
-ENDIF (CMAKE_COMPILER_IS_GNUCXX)
-
-INCLUDE_DIRECTORIES(
-  ${CMAKE_CURRENT_BINARY_DIR}
-  ${FREETYPE2_INCLUDE_DIR}
-  ${GLFW_INCLUDE_DIR}
-  ${BOOST_INCLUDE_DIR}
-  ${FMODEX_INCLUDE_DIR}
-  ${SDL_INCLUDE_DIR}
-  ${SDLMIXER_INCLUDE_DIR}
-)
-
-LINK_DIRECTORIES(${BOOST_LIB_DIR})
-
-INCLUDE(FindQt4)
-INCLUDE(${QT_USE_FILE})
-ADD_DEFINITIONS(${QT_DEFINITIONS})
-
+find_package(Qt4 REQUIRED)
+include(${QT_USE_FILE})
 QT4_AUTOMOC(LauncherWindow.cpp)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})  # For the MOC file
+add_executable(silkystrings-launcher LauncherWindow.cpp SongIterator.cpp)
+target_link_libraries(silkystrings-launcher ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${Boost_LIBRARIES})
 
-ADD_EXECUTABLE(silkystrings-launcher LauncherWindow.cpp SongIterator.cpp)
-TARGET_LINK_LIBRARIES(silkystrings-launcher ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} boost_filesystem${BOOST_SUFFIX})
-
-ADD_EXECUTABLE(silkystrings silkystrings.cpp)
-TARGET_LINK_LIBRARIES(silkystrings silkystrings-convenience)
+install(TARGETS silkystrings silkystrings-launcher DESTINATION bin)
 
