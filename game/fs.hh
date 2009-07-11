@@ -14,3 +14,5 @@ fs::path pathMangle(fs::path const& dir);
 /** Get full path to a file from the current theme **/
 std::string getThemePath(std::string const& filename);
 
+/** Get full path to a data file **/
+std::string getDataPath(std::string const& filename);
