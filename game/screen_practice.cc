@@ -9,7 +9,6 @@ ScreenPractice::ScreenPractice(std::string const& name, Audio& audio, Capture& c
 {}
 
 void ScreenPractice::enter() {
-	probe();
 	m_audio.playMusic(getThemePath("practice.ogg"));
 	theme.reset(new ThemePractice());
 	// draw vu meters
@@ -42,12 +41,27 @@ void ScreenPractice::manageEvent(SDL_Event event) {
 		}
 	}
 	switch( event.type ) {
-		case SDL_JOYAXISMOTION:
-		case SDL_JOYHATMOTION:
-		case SDL_JOYBALLMOTION:
 		case SDL_JOYBUTTONDOWN:
-		case SDL_JOYBUTTONUP:
-			//check_joystick_event(event, m_audio);
+			switch( event.jbutton.button ) {
+				case PS3_DRUM_CONTROLLER_RED: // Snare drum
+					m_audio.playSample(getDataPath("sounds/drum_snare.ogg"));
+					break;
+				case PS3_DRUM_CONTROLLER_BLUE: // Tom 1
+					m_audio.playSample(getDataPath("sounds/drum_tom1.ogg"));
+					break;
+				case PS3_DRUM_CONTROLLER_GREEN: // Tom 2
+					m_audio.playSample(getDataPath("sounds/drum_tom2.ogg"));
+					break;
+				case PS3_DRUM_CONTROLLER_YELLOW: // Hi hat
+					m_audio.playSample(getDataPath("sounds/drum_hi-hat.ogg"));
+					break;
+				case PS3_DRUM_CONTROLLER_ORANGE: // crash cymbal
+					m_audio.playSample(getDataPath("sounds/drum_cymbal.ogg"));
+					break;
+				case PS3_DRUM_CONTROLLER_XXX: // Drum bass
+					m_audio.playSample(getDataPath("sounds/drum_bass.ogg"));
+					break;
+			}
 			break;
 	}
 }
