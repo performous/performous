@@ -60,7 +60,7 @@ void Songs::reload_internal(fs::path const& parent) {
 	namespace fs = fs;
 	if (std::distance(parent.begin(), parent.end()) > 20) { std::cout << ">>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)" << std::endl; return; }
 	try {
-		boost::regex expression(".*\\.[Tt][Xx][Tt]$");
+		boost::regex expression(".*(\\.txt|/song\\.ini)$", boost::regex_constants::icase);
 		boost::cmatch match;
 		for (fs::directory_iterator dirIt(parent), dirEnd; m_loading && dirIt != dirEnd; ++dirIt) {
 			fs::path p = dirIt->path();
@@ -68,7 +68,7 @@ void Songs::reload_internal(fs::path const& parent) {
 			std::string name = p.leaf(); // File basename (notes.txt)
 			std::string path = p.directory_string(); // Path without filename
 			path.erase(path.size() - name.size());
-			if (name.size() < 5 || !regex_match(name.substr(name.size() - 4).c_str(),match,expression)) continue;
+			if (!regex_match(name.c_str(), match, expression)) continue;
 			try {
 				Song* s = new Song(path, name);
 				s->randomIdx = ++randomIdx; // Not so random during loading, they are shuffled after load is finished
@@ -155,7 +155,7 @@ void Songs::filter_internal() {
 	try {
 		SongVector filtered;
 		for (SongVector::const_iterator it = m_songs.begin(); it != m_songs.end(); ++it) {
-			if (regex_search(it->get()->strFull(), boost::regex(m_filter ,boost::regex_constants::icase))) filtered.push_back(*it);
+			if (regex_search(it->get()->strFull(), boost::regex(m_filter, boost::regex_constants::icase))) filtered.push_back(*it);
 		}
 		m_filtered.swap(filtered);
 	} catch (...) {

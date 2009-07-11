@@ -1,6 +1,4 @@
 #pragma once
-#ifndef PERFORMOUS_SONG_HH
-#define PERFORMOUS_SONG_HH
 
 #include "notes.hh"
 #include <boost/noncopyable.hpp>
@@ -74,4 +72,3 @@ class Song: boost::noncopyable {
 
 static inline bool operator<(Song const& l, Song const& r) { return l.collateByArtist < r.collateByArtist; }
 
-#endif

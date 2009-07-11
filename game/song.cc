@@ -23,17 +23,20 @@ class SongParser {
 	  m_relativeShift(),
 	  m_maxScore()
 	{
-		// Read the file and do some initial validation checks
+		enum { NONE, TXT, INI } type = NONE;
+		// Read the file, determine the type and do some initial validation checks
 		{
 			std::ifstream f((s.path + s.filename).c_str());
-			if (!f.is_open()) throw SongParserException("Could not open TXT file", 0);
+			if (!f.is_open()) throw SongParserException("Could not open song file", 0);
 			f.seekg(0, std::ios::end);
 			size_t size = f.tellg();
 			if (size < 10 || size > 100000) throw SongParserException("Does not look like a song file (wrong size)", 1, true);
 			f.seekg(0);
 			std::vector<char> data(size);
 			if (!f.read(&data[0], size)) throw SongParserException("Unexpected I/O error", 0);
-			if (data[0] != '#' || data[1] < 'A' || data[1] > 'Z') throw SongParserException("Does not look like a song file (wrong header)", 1, true);
+			if (checkTXT(data)) type = TXT;
+			else if (checkINI(data)) type = INI;
+			else throw SongParserException("Does not look like a song file (wrong header)", 1, true);
 			m_ss.write(&data[0], size);
 		}
 		// Character set conversion needed?
@@ -49,18 +52,9 @@ class SongParser {
 				for (char ch; m_ss.get(ch);) tmp += (ch >= 0x20 && ch < 0x7F) ? ch : '?';
 			}
 		}
-		std::string line;
-		try {
-			while (getline(line) && parseField(line)) {};
-			if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
-			if (m_bpm != 0.0) addBPM(0, m_bpm);
-			while (parseNote(line) && getline(line)) {};
-		} catch (std::runtime_error& e) {
-			throw SongParserException(e.what(), m_linenum);
-		}
+		if (type == TXT) parseTXT();
+		if (type == INI) parseINI();
 		if (s.notes.empty()) throw SongParserException("No notes", m_linenum);
-		// Workaround for the terminating : 1 0 0 line, written by some converters
-		if (s.notes.back().type != Note::SLEEP && s.notes.back().begin == s.notes.back().end) s.notes.pop_back();
 		// Adjust negative notes
 		if (m_song.noteMin <= 0) {
 			unsigned int shift = (1 - m_song.noteMin / 12) * 12;
@@ -78,6 +72,27 @@ class SongParser {
 	bool m_relative;
 	double m_gap;
 	double m_bpm;
+	bool checkTXT(std::vector<char> const& data) { return data[0] == '#' && data[1] >= 'A' && data[1] <= 'Z'; }
+	bool checkINI(std::vector<char> const& data) {
+		char const* header = "[song]";
+		return std::equal(header, header + strlen(header), data.begin());
+	}
+	void parseTXT() {
+		Song& s = m_song;
+		std::string line;
+		try {
+			while (getline(line) && parseField(line)) {}
+			if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
+			if (m_bpm != 0.0) addBPM(0, m_bpm);
+			while (parseNote(line) && getline(line)) {}
+		} catch (std::runtime_error& e) {
+			throw SongParserException(e.what(), m_linenum);
+		}
+		// Workaround for the terminating : 1 0 0 line, written by some converters
+		if (!s.notes.empty() && s.notes.back().type != Note::SLEEP && s.notes.back().begin == s.notes.back().end) s.notes.pop_back();
+	}
+	void parseINI() {
+	}
 	void assign(int& var, std::string const& str) {
 		try {
 			var = boost::lexical_cast<int>(str);
