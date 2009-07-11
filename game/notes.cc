@@ -54,7 +54,7 @@ double MusicalScale::getNoteOffset(double freq) const {
 	return 12.0 * std::log(frac) / std::log(2.0);
 }
 
-Note::Note(): begin(getNaN()), end(getNaN()), power(getNaN()), type(), note() {}
+Note::Note(): begin(getNaN()), end(getNaN()), power(getNaN()), type(NORMAL), note() {}
 
 double Note::diff(double note, double n) { return remainder(n - note, 12.0); }
 double Note::maxScore() const { return scoreMultiplier(0.0) * (end - begin); }
