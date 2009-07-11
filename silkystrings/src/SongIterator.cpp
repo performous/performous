@@ -37,7 +37,7 @@ bool Launcher::SongIterator::operator==(const SongIterator &iter){
 }
 
 std::string Launcher::SongIterator::operator*(){
-	return iter->leaf();
+	return iter->string();
 }
 
 Launcher::SongIterator Launcher::SongIterator::operator++(){

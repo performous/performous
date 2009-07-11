@@ -209,7 +209,7 @@ void Launcher::LauncherWindow::play(){
 	res.ignore();
 	res >> height;
 
-  param[0] << SONG_PATH << songList->currentItem()->text().toStdString() << '/';
+  param[0] << songList->currentItem()->text().toStdString() << '/';
 	for(int i=0; i<7; i++){
 		param[i+1] << gameButtons[i]->currentIndex();
 	}
