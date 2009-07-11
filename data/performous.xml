@@ -172,14 +172,14 @@
 	</entry>
 
 	<!-- System preferences -->
-	<entry name="system/path_themes" type="string_list">
-		<stringvalue>/usr/local/share/games/performous/themes/</stringvalue>
-		<stringvalue>/usr/share/games/performous/themes/</stringvalue>
-		<stringvalue>../themes/</stringvalue><!-- For Windows where the program is started in bin/ -->
-		<stringvalue>~/.performous/themes/</stringvalue>
+	<entry name="system/path_data" type="string_list">
+		<stringvalue>/usr/local/share/games/performous/</stringvalue>
+		<stringvalue>/usr/share/games/performous/</stringvalue>
+		<stringvalue>../</stringvalue><!-- For Windows where the program is started in bin/ -->
+		<stringvalue>~/.performous/</stringvalue>
 		<locale name="C">
-			<short>Theme folders</short>
-			<long>Where Performous themes are stored.</long>
+			<short>Data folders</short>
+			<long>Where Performous data are stored.</long>
 		</locale>
 	</entry>
 	<entry name="system/path_songs" type="string_list">
