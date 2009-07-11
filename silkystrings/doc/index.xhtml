@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>AS-0.1102 Projektidokumentti</title>
+</head>
+
+<body>
+
+<div style="text-align: center">
+<h3>AS-0.1102 - projektidokumentti</h3>
+<h1>Aihe <i>2</i> - <i>Guitar playing game</i></h1>
+</div>
+
+<h3>Tekijät:</h3>
+
+<table>
+<tr>
+<td>69588M</td>
+<td>Olli Salli</td>
+<td><a href="mailto:osalli@cc.hut.fi">osalli@cc.hut.fi</a></td>
+</tr>
+<tr>
+<td>63250W</td>
+<td>Tuomas Perälä</td>
+<td><a href="mailto:tuomas.perala@hut.fi">tuomas.perala@hut.fi</a></td>
+</tr>
+<tr>
+<td>63325V</td>
+<td>Ville Virkkala</td>
+<td><a href="mailto:vvirkkal@cc.hut.fi">vvirkkal@cc.hut.fi</a></td>
+</tr>
+</table>
+
+<h3>Viimeksi päivitetty: </h3>
+
+<p>07.12.2006</p>
+
+<h2>Asennus- ja käyttöohjeet</h2>
+
+<p>Pelin on testattu toimivan Windowsilla (XP) ja Linuxilla (Debian Sid // Linux
+  2.6.18). Peli vaatii kääntyäkseen ja toimiakseen uusimmat versiot <a
+    href="http://www.boost.org">Boost</a>-, <a
+    href="http://www.trolltech.com/products/qt">Qt4</a>-, <a
+    href="http://www.freetype.org">FreeType2</a>-, <a
+    href="http://glfw.sf.net">GLFW</a>-, <a
+    href="http://www.libsdl.org/">SDL</a>-, ja <a
+    href="http://www.libsdl.org/projects/SDL_mixer/">SDL_mixer</a>-kirjastoista. Kääntämiseen tarvitaan <a
+    href="http://www.cmake.org">CMake</a>-työkalu.
+</p>
+
+<p>
+  Jos jokin kirjastoista on asennettu epästandardiin polkuun, täytyy sen
+  sijainti kertoa CMakelle, esim. GLFW:n tapauksessa, jos kirjaston
+  header-tiedostot on asennettu polkuun /a/b/include, kirjastotiedostot polkuun
+  /b/c/lib ja kirjaston nimi on muotoa libglfwqwerty, tulee asettaa muuttujat
+  seuraavasti (projektin päähakemistossa):
+</p>
+  <pre>
+    cmake -D GLFW_INCLUDE_DIR:PATH=/a/b/include -D GLFW_LIB_DIR:PATH=/b/c/lib -D GLFW_SUFFIX:STRING=qwerty .
+  </pre>
+<p>
+  Kun kaikki muuttujat on asetettu oikein, peli kääntyy GNU Makella käyttäen
+  CMaken projetin päähakemistoon luomaa Makefileä.
+</p>
+
+<p>
+  Pelattavat kappaleet tulee siirtää projektin hakemistoon resources/songs.
+  Kappaleiden tulee olla omissa alihakemistoissaan kuten Frets on Firessä.
+</p>
+
+<p>
+  Peli käynnistetään käyttäen erillistä silkystrings-launcher-sovellusta. Peliä
+  käynnistäessä työhakemiston tulee olla projektin hakemisto src. Launcherista
+  asetetaan pelissä käytettävä resoluutio, näppäimet ja kokoruututila sekä
+  valitaan pelattava kappale ja vaikeustaso.
+</p>
+
+<p>
+  Pelin pelaaminen on identtistä Frets on Fire -pelin kanssa. Kappaleen loputtua
+  peli ei kuitenkaan lopu automaattisesti, vaan se täytyy lopettaa erikseen
+  launcherista valitulla lopetusnäppäimellä.
+</p>
+
+<p>
+  <a href="shot.png">Kuvaruutukaappaus pelistä</a>.
+</p>
+  
+<h2>Pelin arkkitehtuuri</h2>
+
+<p>
+  <a href="Architecture.png">Kaavio</a> pelin arkkitehtuurista. Kaavio ei kuvaa
+  pelin luokkajakoa tarkasti, mutta kuvaa toiminnallista jakoa hyvin. Tarkka
+  luokkajako ja luokkien toiminnallisuus selviää projektin hyvin kattavasta <a
+    href="http://oggis.be/silkystrings-doc">Doxygen-dokumentaatiosta</a>.
+</p>
+
+<p>
+  Pelin grafiikka- ja ääniengineissä on pelin toteutuksen kannalta tarpeettomia
+  ominaisuuksia. Niiden kehityksessä kuitenkin pyrittiin alusta alkaen
+  geneerisyyteen ja uudelleenkäytettävyyteen.
+</p>
+
+<p>
+  Pelin erillinen launcher-sovellus saattaa vaikuttaa oudolta ratkaisulta.
+  Erillinen launcher valittiin, koska se on huomattavasti helpompi toteuttaa,
+  kuin vastaavat ominaisuudet sisältävä pelin sisäinen valikkojärjestelmä.
+</p>
+
+<h2>Tietorakenteet ja algoritmit</h2>
+
+<p>
+  Peli on toteutettu käyttäen valmiita C++:n standardikirjaston perusalgoritmeja
+  ja -tietorakenteita. Algoritmit ja tietorakenteet on pyritty valitsemaan
+  tehokkuus silmälläpitäen.
+</p>
+
+<h2>Tunnetut bugit</h2>
+
+<p>
+  Joissain tilanteissa midi-parserin syötteen lukemisen on havaittu katkeavan
+  ennenaikaisesti. Tätä on tapahtunut vain Windows-alustoilla.
+</p>
+
+<p>
+  Äänet saattavat ajan myötä joissain ympäristöissä ajautua epäsynkroniseen
+  tilaan pelilogiikan kanssa.
+</p>
+
+<h2>Työnjako, yhteydenpito ja aikataulu</h2>
+
+<p>
+  Pidimme yhteyttä pääasiassa IRC:n välityksellä. Pidimme myös muutaman
+  palaverin Maarintalolla. Yhteydenpito oli koko projektin keston ajan
+  riittävää.
+</p>
+
+<p>
+  Työnjako oli käytännössäkin alkuperäisen suunnitelman mukainen. Olli Salli
+  hoiti grafiikan, äänet, ikkunanhallinnan ja näppäimistön kuuntelun toteutuksen.
+  Ville Virkkala teki MIDI-parserin ja pelaajan toiminnot rekisteröivän osan
+  pelilogiikasta. Tuomas Perälä toteutti Launcher-sovelluksen ja pelaajan
+  toimintoihin reagoivan osan pelilogiikasta.
+</p>
+
+<p>
+  Pelin basecoden toteuttaminen meni hyvin alkuperäisen aikataulun puitteissa
+  ensimmäisellä viikolla. Myöhempien projektin vaiheiden aikataulusta kuitenkin
+  lipsuttiin hieman, ja paljon työtä jäi viimeiselle viikolle.
+</p>
+
+<p>
+  Kokonaisuutena tehtävien jako oli onnistunut.
+</p>
+
+<h2>Eroavaisuudet alkuperäiseen suunnitelmaan nähden</h2>
+
+<p>
+  Aikataulun pieniä muutoksia lukuunottamatta alkuperäisessä suunnitelmassa
+  pysyttiin hyvin. Valinnaisista ominaisuuksista jäi toteuttamatta vain
+  latenssisäätö.
+</p>
+
+<p>
+  Viime hetkellä jouduttiin FMODin ongelmien takia vaihtamaan äänikirjasto
+  SDL_mixeriin.
+</p>
+
+<h2>Lähdekoodi</h2>
+
+<p>
+  Pelin lähdekoodit ovat saatavilla <a
+    href="http://abridgegame.org/darcs/">Darcs</a>-repositorystä, joka löytyy
+  osoitteesta <a
+    href="http://oggis.be/darcs/silkystrings">http://oggis.be/darcs/silkystrings</a>.
+  Kyseistä repositoryä on käytetty koko projektin ajan, joten sen historia
+  (darcs changes) vastaa projektin kehityshistoriaa. Jotkut muutoksista on
+  kuitenkin lisätty niiden tekijän puolesta, jolloin darcsissa näkyy niiden
+  kohdalla väärä nimi. Lähdekoodeista on myös otettu kirjoitushetkellä <a
+    href="silkystrings">snapshot</a>.
+</p>
+<p>
+  Doxygen-dokumentaatio löytyy osoitteesta <a
+    href="http://oggis.be/silkystrings-doc">http://oggis.be/silkystrings-doc</a>.
+</p>
+
+<h2>Projektin aikana käytetty lähdemateriaali</h2>
+
+  <ul>
+    <li><a href="http://www.boost.org/libs/libraries.htm">Boostin
+        dokumentaatio</a></li>
+    <li><a href="http://doc.trolltech.com/4.2/index.html">Qt:n
+        dokumentaatio</a></li>
+    <li><a
+        href="http://freetype.sourceforge.net/freetype2/documentation.html">FreeTypen
+        dokumentaation</a></li>
+    <li><a href="http://glfw.sourceforge.net/Reference.pdf">GLFW:n
+        dokumentaatio</a></li>
+    <li>Frets on Firen lähdekoodi</li>
+    <li>
+<a href="http://www.roguewave.com/support/docs/sourcepro/edition9/html/stdlibref/index.html">Rogue wave: Standard C++ Library Module Reference Guide </a>
+
+</li>
+<li>
+<a href="http://www.cppreference.com">C/C++ Reference (cppreference.com)</a>
+</li>
+  </ul>
+
+</body>
+</html>
+
