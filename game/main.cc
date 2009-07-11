@@ -265,7 +265,7 @@ int main(int argc, char** argv) {
 	try {
 		readConfig();
 		char const* env_data_dir = getenv("PERFORMOUS_DATA_DIR");
-		if(env_data_dir) config["system/path_data"].sl().push_back(std::string(env_data_dir));
+		if(env_data_dir) config["system/path_data"].sl().insert(config["system/path_data"].sl().begin(),std::string(env_data_dir));
 	} catch (std::exception& e) {
 		std::cerr << e.what() << std::endl;
 		return EXIT_FAILURE;

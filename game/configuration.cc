@@ -281,8 +281,12 @@ void readConfig() {
 	{
 		typedef std::vector<std::string> ConfigList;
 		ConfigList config_list;
-		char const* env_config = getenv("PERFORMOUS_CONFIG_SCHEMA");
-		if (env_config) config_list.push_back(env_config);
+		char const* env_data_dir = getenv("PERFORMOUS_DATA_DIR");
+		if (env_data_dir) {
+			std::string config_file(env_data_dir);
+			config_file.append("/config/performous.xml");
+			config_list.push_back(config_file);
+		}
 		config_list.push_back("/usr/local/share/games/performous/config/performous.xml");
 		config_list.push_back("/usr/local/share/performous/config/performous.xml");
 		config_list.push_back("/usr/share/games/performous/config/performous.xml");
@@ -293,7 +297,7 @@ void readConfig() {
 			std::ostringstream oss;
 			oss << "No config schema file found. The following locations were tried:\n";
 			std::copy(config_list.begin(), config_list.end(), std::ostream_iterator<std::string>(oss, "\n"));
-			oss << "Install the file or define environment variable PERFORMOUS_CONFIG_SCHEMA\n";
+			oss << "Install the file or define environment variable PERFORMOUS_DATA_DIR\n";
 			throw std::runtime_error(oss.str());
 		}
 		schemafile = *it;
