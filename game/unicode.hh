@@ -1,7 +1,5 @@
 #pragma once
 #include <iostream>
 
-namespace Unicode {
-	void convert( std::stringstream &_stream, std::string _filename );
-	std::string collate(std::string const& str);
-}
+void convertToUTF8( std::stringstream &_stream, std::string _filename = std::string() );
+std::string unicodeCollate(std::string const& str);

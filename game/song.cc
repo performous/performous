@@ -35,8 +35,7 @@ class SongParser {
 			if (data[0] != '#' || data[1] < 'A' || data[1] > 'Z') throw SongParserException("Does not look like a song file (wrong header)", 1, true);
 			m_ss.write(&data[0], size);
 		}
-		// Character set conversion needed?
-		Unicode::convert(m_ss, s.path + s.filename);
+		convertToUTF8(m_ss, s.path + s.filename);
 		std::string line;
 		try {
 			while (getline(line) && parseField(line)) {};
@@ -247,7 +246,7 @@ void Song::collateUpdate() {
 }
 
 std::string Song::collate(std::string const& str) {
-	return Unicode::collate(str);
+	return unicodeCollate(str);
 }
 
 namespace {
