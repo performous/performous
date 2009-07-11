@@ -16,7 +16,7 @@ void SongParser::iniParse() {
 		std::istringstream iss(line);
 		std::string key, value;
 		if (!std::getline(iss, key, '=') || !std::getline(iss, value)) std::runtime_error("Invalid format, should be key=value");
-		boost::trim(key);
+		boost::trim(key); boost::to_lower(key);
 		boost::trim(value);
 		if (key == "name") s.title = value;
 		else if (key == "artist") s.artist = value;
