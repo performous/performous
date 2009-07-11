@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SDL.h"
+#include "SDL_joystick.h"
 #include "audio.hh"
 
 #define PS3_DRUM_CONTROLLER_BLUE   0
@@ -10,7 +10,6 @@
 #define PS3_DRUM_CONTROLLER_XXX    4
 #define PS3_DRUM_CONTROLLER_ORANGE 5
 
-void check_joystick_event(SDL_Event event, Audio &audio);
 void joysticks_init();
 
 class Joystick {
