@@ -49,6 +49,8 @@ struct Note {
 	/// score when singing
 	double score(double freq, double b, double e) const;
 	Note();
+	static bool ltBegin(Note const& a, Note const& b) { return a.begin < b.begin; }
+	static bool ltEnd(Note const& a, Note const& b) { return a.end < b.end; }
   private:
 	double scoreMultiplier(double error) const;
 };
