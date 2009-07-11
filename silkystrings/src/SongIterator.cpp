@@ -18,19 +18,14 @@
 
 #include "SongIterator.h"
 
-#include <boost/filesystem/path.hpp>
 #include <string>
 
 
-Launcher::SongIterator::SongIterator(boost::filesystem::path path)
-: iter(boost::filesystem::directory_iterator(path)) {
-			
-	while(!checkValidity() && iter != boost::filesystem::directory_iterator())
-		iter++;
+Launcher::SongIterator::SongIterator(boost::filesystem::path path): iter(path) {
+	while(iter != boost::filesystem::recursive_directory_iterator() && !checkValidity()) ++iter;
 }
 
-Launcher::SongIterator::SongIterator()
-: iter(boost::filesystem::directory_iterator()) {};
+Launcher::SongIterator::SongIterator() {}
 
 
 bool Launcher::SongIterator::operator!=(const SongIterator &iter){
@@ -46,10 +41,8 @@ std::string Launcher::SongIterator::operator*(){
 }
 
 Launcher::SongIterator Launcher::SongIterator::operator++(){
-	do{
-		iter++;
-	}while(iter != boost::filesystem::directory_iterator() && !checkValidity());
-
+	++iter;
+	while(iter != boost::filesystem::recursive_directory_iterator() && !checkValidity()) ++iter;
 	return *this;
 }
 

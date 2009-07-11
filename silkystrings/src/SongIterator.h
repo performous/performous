@@ -19,8 +19,7 @@
 #ifndef SONGITERATOR_H
 #define SONGITERATOR_H
 
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem.hpp>
 
 #include <string>
 
@@ -67,7 +66,7 @@ namespace Launcher{
 	private:
 		bool checkValidity();
 
-		boost::filesystem::directory_iterator iter;
+		boost::filesystem::recursive_directory_iterator iter;
 	};
 }
 
