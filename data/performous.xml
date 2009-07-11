@@ -87,7 +87,7 @@
 	</entry>
 	<entry name="graphic/fullscreen" type="bool" value="false">
 		<locale name="C">
-			<short>Fullsreen mode</short>
+			<short>Fullscreen mode</short>
 			<long>Set width and height to suitable values first!</long>
 		</locale>
 	</entry>
