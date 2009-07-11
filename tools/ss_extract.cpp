@@ -283,7 +283,7 @@ struct Process {
 			txtfile.close();
 			std::cerr << ">>> Extracting cover image" << std::endl;
 			// FIXME: use internally instead of separate program
-			std::system(("cover_conv \"" + dvdPath + "/pack_ee.pak\" " + id + " \"" + path.string() + "/cover.jpg\"").c_str());
+			std::system(("ss_cover_conv \"" + dvdPath + "/pack_ee.pak\" " + id + " \"" + path.string() + "/cover.jpg\"").c_str());
 			remove = "";
 			if (video) {
 				std::cerr << ">>> Extracting video" << std::endl;
