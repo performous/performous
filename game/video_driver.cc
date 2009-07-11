@@ -3,6 +3,7 @@
 #include "config.hh"
 #include "screen.hh"
 #include "util.hh"
+#include "joystick.hh"
 #include <GL/glew.h>
 #include <SDL.h>
 
@@ -26,6 +27,11 @@ Window::Window(unsigned int width, unsigned int height, int fs, unsigned int fs_
 	SDL_ShowCursor(SDL_DISABLE);
 	SDL_EnableUNICODE(SDL_ENABLE);
 	SDL_EnableKeyRepeat(80, 80);
+	joysticks_init();
+}
+
+Window::~Window() {
+	joysticks.clear();
 }
 
 void Window::blank() {
