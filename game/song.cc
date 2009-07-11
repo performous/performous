@@ -38,7 +38,7 @@ class SongParser {
 			else throw SongParserException("Does not look like a song file (wrong header)", 1, true);
 			m_ss.write(&data[0], size);
 		}
-		Unicode::convert(m_ss, s.path + s.filename);
+		convertToUTF8(m_ss, s.path + s.filename);
 		if (type == TXT) parseTXT();
 		if (type == INI) parseINI();
 		if (s.notes.empty()) throw SongParserException("No notes", m_linenum);
@@ -261,7 +261,7 @@ void Song::collateUpdate() {
 }
 
 std::string Song::collate(std::string const& str) {
-	return Unicode::collate(str);
+	return unicodeCollate(str);
 }
 
 namespace {
