@@ -3,6 +3,51 @@
 #include <iostream>
 #include <cstdlib>
 
+class Joystick {
+  public:
+  	Joystick() {};
+	Joystick(unsigned int _id): m_id(_id) {
+		m_joystick = SDL_JoystickOpen(m_id);
+		for( int i = 0 ; i < SDL_JoystickNumButtons(m_joystick) ; i++ ) {
+			m_buttons_states[i] = false;
+		}
+		for( int i = 0 ; i < SDL_JoystickNumAxes(m_joystick) ; i++ ) {
+			m_axes_values[i] = 0;
+		}
+		for( int i = 0 ; i < SDL_JoystickNumHats(m_joystick) ; i++ ) {
+			m_hats_values[i] = 0;
+		}
+	};
+	~Joystick() {/*if(SDL_JoystickOpened(m_id)) SDL_JoystickClose(m_joystick);*/}; // should be called before SDL finished
+	std::string getName() const {return std::string(SDL_JoystickName(m_id));};
+	std::string getDescription() const {
+		std::string desc;
+		desc += "axes: ";
+		desc += boost::lexical_cast<std::string>(m_axes_values.size());
+		desc += ", buttons: ";
+		desc += boost::lexical_cast<std::string>(m_buttons_states.size());
+		desc += ", hats: ";
+		desc += boost::lexical_cast<std::string>(m_hats_values.size());
+		return desc;
+	};
+	void buttonPressed( int _button_id) { m_buttons_states[_button_id] = true; };
+	void buttonReleased( int _button_id) { m_buttons_states[_button_id] = false; };
+	bool buttonState(int _button_id) { return m_buttons_states[_button_id];};
+	void hat( int _hat_id, int _value) { m_hats_values[_hat_id] = _value;};
+	void axe( int _axe_id, int _value) { m_axes_values[_axe_id] = _value;};
+
+	int hat( int _hat_id) { return m_hats_values[_hat_id];};
+	int axe( int _axe_id) { return m_axes_values[_axe_id];};
+  private:
+	SDL_Joystick * m_joystick;
+	unsigned int m_id;
+	std::map<int, bool> m_buttons_states;
+	std::map<int, int> m_axes_values;
+	std::map<int, int> m_hats_values;
+};
+
+std::map<unsigned int,Joystick> joysticks;
+
 #define PS3_DRUM_CONTROLLER_BLUE   0
 #define PS3_DRUM_CONTROLLER_GREEN  1
 #define PS3_DRUM_CONTROLLER_RED    2
@@ -13,16 +58,16 @@
 void check_joystick_event(SDL_Event event, Audio &audio) {
 	switch( event.type ) {
 		case SDL_JOYAXISMOTION:
-			std::cout << "Received an axis motion on "  << (int)event.jaxis.which << std::endl;
+			joysticks[(int)event.jaxis.which].axe((int)event.jaxis.axis,(int)event.jaxis.value);
 			break;
 		case SDL_JOYHATMOTION:
-			std::cout << "Received an hat motion on "  << (int)event.jhat.which << std::endl;
+			joysticks[(int)event.jhat.which].axe((int)event.jhat.hat,(int)event.jhat.value);
 			break;
 		case SDL_JOYBALLMOTION:
-			std::cout << "Received an ball motion on "  << (int)event.jball.which << std::endl;
+			// relatives things, we do not want to manage this for the moment
 			break;
 		case SDL_JOYBUTTONDOWN:
-			std::cout << "Received a button down on "  << (int)event.jbutton.which << " on " << (int)event.jbutton.button << std::endl;
+			joysticks[(int)event.jbutton.which].buttonPressed((int)event.jbutton.button);
 			switch( event.jbutton.button ) {
 				case PS3_DRUM_CONTROLLER_RED: // Snare drum
 					audio.playSample(getDataPath("sounds/drum_snare.ogg"));
@@ -45,20 +90,18 @@ void check_joystick_event(SDL_Event event, Audio &audio) {
 			}
 			break;
 		case SDL_JOYBUTTONUP:
-			std::cout << "Received a button up on " << (int)event.jbutton.which << std::endl;
+			joysticks[(int)event.jbutton.which].buttonReleased((int)event.jbutton.button);
 			break;
 	}
 }
 void probe() {
-	int nbjoysticks = SDL_NumJoysticks();
-	printf("Number of joysticks: %d\n\n", nbjoysticks);
+	unsigned int nbjoysticks = SDL_NumJoysticks();
+	printf("Number of joysticks: %u\n\n", nbjoysticks);
 
-	for (int i = 0 ; i < nbjoysticks ; i++) {
-		SDL_Joystick * joy = SDL_JoystickOpen(i);
-		printf("Joystick %d %s\n", i, SDL_JoystickName(i));
-		printf("Axes: %d\n", SDL_JoystickNumAxes(joy));
-		printf("Buttons: %d\n", SDL_JoystickNumButtons(joy));
-		printf("Trackballs: %d\n", SDL_JoystickNumBalls(joy));
-		printf("Hats: %d\n\n", SDL_JoystickNumHats(joy));
+	for (unsigned int i = 0 ; i < nbjoysticks ; i++) {
+		joysticks[i] = Joystick(i);
+		std::cout << "Id: " << i << std::endl;
+		std::cout << "Name: " << joysticks[i].getName() << std::endl;
+		std::cout << "Description: " << joysticks[i].getDescription() << std::endl;
 	}
 }
