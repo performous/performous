@@ -1,6 +1,4 @@
 #pragma once
-#ifndef PERFORMOUS_NOTES_HH
-#define PERFORMOUS_NOTES_HH
 
 #include <string>
 #include <vector>
@@ -50,11 +48,10 @@ struct Note {
 	double maxScore() const;
 	/// score when singing
 	double score(double freq, double b, double e) const;
-
+	Note();
   private:
 	double scoreMultiplier(double error) const;
 };
 
 typedef std::vector<Note> Notes;
 
-#endif
