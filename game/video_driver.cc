@@ -48,8 +48,13 @@ void Window::blank() {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	float h = virtH();
-	glOrtho(-0.5f, 0.5f, 0.5f * h, -0.5f * h, -1.0f, 1.0f);
+	const float near = 1.5f; // This determines FOV: the value is your distance from the monitor (the unit being the width of the Performous window)
+	const float far = 100.0f; // How far away can things be seen
+	glFrustum(-0.5f, 0.5f, 0.5f * h, -0.5f * h, 1.5f, 100.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glTranslatef(0.0f, 0.0f, -near);  // So that z = 0.0f is still on monitor surface
 }
 
 void Window::swap() {
