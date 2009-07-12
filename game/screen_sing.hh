@@ -1,11 +1,11 @@
-#ifndef PERFORMOUS_SCREEN_SING_HH
-#define PERFORMOUS_SCREEN_SING_HH
+#pragma once
 
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <deque>
 #include "animvalue.hh"
 #include "engine.hh"
+#include "guitargraph.hh"
 #include "notegraph.hh"
 #include "screen.hh"
 #include "theme.hh"
@@ -96,6 +96,7 @@ class ScreenSing: public Screen {
 	boost::scoped_ptr<SvgTxtThemeSimple> m_score_text[2];
 	boost::scoped_ptr<Engine> m_engine;
 	boost::scoped_ptr<NoteGraph> m_noteGraph;
+	boost::scoped_ptr<GuitarGraph> m_guitarGraph;
 	double m_latencyAV;  // Latency between audio and video output (do not confuse with latencyAR)
 	boost::scoped_ptr<ThemeSing> theme;
 	Notes::const_iterator m_lyricit;
@@ -103,4 +104,3 @@ class ScreenSing: public Screen {
 	AnimValue m_quitTimer;
 };
 
-#endif

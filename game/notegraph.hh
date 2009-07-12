@@ -1,5 +1,4 @@
-#ifndef PERFORMOUS_NOTEGRAPH_HH
-#define PERFORMOUS_NOTEGRAPH_HH
+#pragma once
 
 #include <boost/scoped_ptr.hpp>
 #include "animvalue.hh"
@@ -41,6 +40,4 @@ class NoteGraph {
 	double m_max, m_min, m_noteUnit, m_baseY, m_baseX;
 
 };
-
-#endif
 

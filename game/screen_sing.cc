@@ -37,11 +37,13 @@ void ScreenSing::enter() {
 	boost::ptr_vector<Analyzer>& analyzers = m_capture.analyzers();
 	m_engine.reset(new Engine(m_audio, m_songs.current(), analyzers.begin(), analyzers.end()));
 	m_noteGraph.reset(new NoteGraph(song));
+	if (song.music.size() > 1) m_guitarGraph.reset(new GuitarGraph(song));
 }
 
 void ScreenSing::exit() {
 	m_score_window.reset();
 	m_lyrics.clear();
+	m_guitarGraph.reset();
 	m_noteGraph.reset();
 	m_engine.reset();
 	m_pause_icon.reset();
@@ -116,7 +118,6 @@ namespace {
 }
 
 void ScreenSing::draw() {
-	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	Song& song = m_songs.current();
 	// Get the time in the song
 	double length = m_audio.getLength();
@@ -140,26 +141,8 @@ void ScreenSing::draw() {
 		theme->bg_top.draw();
 	}
 
-	// Draw guitar stuff
-	Texture tex(getThemePath("guitarneck.svg"));
-	{
-		UseTexture t(tex);
-		glPushMatrix();
-		glTranslatef(0.0f, 0.3f, 0.0f);
-		glRotatef(80.0f, 1.0f, 0.0f, 0.0f);
-		glScalef(0.1f, 0.1f, 0.1f);
-		glBegin(GL_QUADS);
-		float ts = 12.0f;
-		float future = 3.0f;
-		glTexCoord2f(0.0f, -(time + future)); glColor4f(1.0f, 1.0f, 1.0f, 0.0f); glVertex2f(-2.5f, -future * ts);
-		glTexCoord2f(1.0f, -(time + future)); glColor4f(1.0f, 1.0f, 1.0f, 0.0f); glVertex2f(2.5f, -future * ts);
-		glTexCoord2f(1.0f, -(time + 0.0f)); glColor4f(1.0f, 1.0f, 1.0f, 1.0f); glVertex2f(2.5f, 0.0f * ts);
-		glTexCoord2f(0.0f, -(time + 0.0f)); glColor4f(1.0f, 1.0f, 1.0f, 1.0f); glVertex2f(-2.5f, 0.0f * ts);
-		glEnd();
-		glColor3f(1.0f, 1.0f, 1.0f);
-		glPopMatrix();
-	}
-
+	if (m_guitarGraph.get()) m_guitarGraph->draw(time);
+	
 	if (!config["game/karaoke_mode"].b()) drawNonKaraoke(time);
 
 	// Compute and draw lyrics
@@ -200,6 +183,8 @@ void ScreenSing::draw() {
 		}
 		theme->timer.draw(statustxt);
 	}
+
+	ScreenManager* sm = ScreenManager::getSingletonPtr();
 
 	if (config["game/karaoke_mode"].b()) {
 		if (!m_audio.isPlaying()) sm->activateScreen("Songs");
