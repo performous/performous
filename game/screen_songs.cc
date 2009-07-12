@@ -142,7 +142,7 @@ void ScreenSongs::draw() {
 				s.tex = TexCoords(); glColor3f(1.0, 1.0, 1.0); // Restore default attributes
 			}
 		}
-		if (!song.mp3.empty()) music = song.path + song.mp3;
+		if (!song.music.empty()) music = song.music[0]; // FIXME: support multiple tracks
 		if (!song.background.empty()) songbg = song.path + song.background;
 		if (!song.video.empty()) { video = song.path + song.video; videoGap = song.videoGap; }
 	}

@@ -14,7 +14,7 @@ void Song::reload(bool errorIgnore) {
 	collateByArtist.clear();
 	text.clear();
 	creator.clear();
-	mp3.clear();
+	music.clear();
 	cover.clear();
 	background.clear();
 	video.clear();

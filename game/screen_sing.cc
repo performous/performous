@@ -15,8 +15,8 @@ namespace {
 
 void ScreenSing::enter() {
 	Song& song = m_songs.current();
-	std::string file = song.path + song.mp3;
-	m_audio.playMusic(file.c_str());
+	std::cout << "DEBUG::::: " << song.music.size() << std::endl;
+	m_audio.playMusic(song.music);
 	theme.reset(new ThemeSing());
 	if (!song.background.empty()) {
 		try {

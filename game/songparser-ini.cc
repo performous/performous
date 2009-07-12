@@ -30,10 +30,13 @@ void SongParser::iniParse() {
 		else if (key == "artist") s.artist = value;
 	}
 	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
-	s.mp3 = "song.ogg";
+	s.music.push_back(s.path + "song.ogg");
+	s.music.push_back(s.path + "guitar.ogg");
 	MidiFileParser midi(s.path + "/notes.mid");
 	for (MidiFileParser::TempoChanges::const_iterator it = midi.tempochanges.begin(); it != midi.tempochanges.end(); ++it) addBPM(it->miditime * 4, it->value);
 	for (MidiFileParser::Tracks::const_iterator it = midi.tracks.begin(); it != midi.tracks.end(); ++it) {
+		if (it->name == "PART RHYTHM" || it->name == "PART BASS") s.music.push_back(s.path + "rhythm.ogg");
+		if (it->name == "PART DRUMS") s.music.push_back(s.path + "drums.ogg");
 		if (it->name != "PART VOCALS") continue;
 		for (MidiFileParser::Lyrics::const_iterator it2 = it->lyrics.begin(); it2 != it->lyrics.end(); ++it2) {
 			Note n;

@@ -48,7 +48,7 @@ class Song: boost::noncopyable {
 	std::string artist; ///< artist
 	std::string text; ///< songtext
 	std::string creator; ///< creator
-	std::string mp3; ///< mp3
+	std::vector<std::string> music; ///< music files (background, guitar, rhythm/bass, drums, vocals)
 	std::string cover; ///< cd cover
 	std::string background; ///< background image
 	std::string video; ///< video
