@@ -122,6 +122,7 @@ class Audio {
 	 * @param startPos starting position
 	 */
 	void playMusic(std::string const& filename, bool preview = false, double fadeTime = 0.1, double startPos = 0.0);
+	void playMusic(std::vector<std::string> const& filenames, bool preview = false, double fadeTime = 0.1, double startPos = 0.0);
 	/** Play a preview of the song, starting at startPos
 	 * @param filename the track filename
 	 * @param startPos starting position

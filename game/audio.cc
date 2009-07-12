@@ -64,6 +64,26 @@ void Audio::operator()(da::pcm_data& areas, da::settings const&) {
 	}
 }
 
+void Audio::playMusic(std::vector<std::string> const& filenames, bool preview, double fadeTime, double startPos) {
+	if (!isOpen()) return;
+	// First construct the new stream
+	fadeout(fadeTime);
+	for(unsigned int i = 0 ; i < filenames.size() ; i++ ) {
+		std::cout << "Adding " << filenames[i] << std::endl;
+		std::auto_ptr<Stream> s;
+		try {
+			s.reset(new Stream(filenames[i], m_rs.rate(), preview ? config["audio/preview_volume"] : config["audio/music_volume"]));
+			s->fadein(fadeTime);
+			if (startPos != 0.0) s->mpeg.seek(startPos, false);
+		} catch (std::runtime_error& e) {
+			std::cerr << "Error loading " << filenames[i] << " (" << e.what() << ")" << std::endl;
+		}
+		boost::recursive_mutex::scoped_lock l(m_mutex);
+		m_streams.push_back(s);
+	}
+	if (!preview) m_paused = false;
+}
+
 void Audio::playMusic(std::string const& filename, bool preview, double fadeTime, double startPos) {
 	if (!isOpen()) return;
 	// First construct the new stream
