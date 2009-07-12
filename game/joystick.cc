@@ -7,7 +7,8 @@ Joystick::Joystick(unsigned int _id): m_id(_id) {
 	m_joystick = SDL_JoystickOpen(m_id);
 };
 Joystick::~Joystick() {
-	if(SDL_JoystickOpened(m_id)) SDL_JoystickClose(m_joystick);
+	// Do it another way :/
+	//if(SDL_JoystickOpened(m_id)) SDL_JoystickClose(m_joystick);
 };
 std::string Joystick::getName() const {
 	return std::string(SDL_JoystickName(m_id));

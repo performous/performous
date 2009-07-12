@@ -14,7 +14,7 @@ void joysticks_init();
 
 class Joystick {
   public:
-  	Joystick() {};
+	Joystick() {};
 	Joystick(unsigned int _id);
 	~Joystick();
 	std::string getName() const;
