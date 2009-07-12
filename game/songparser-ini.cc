@@ -44,12 +44,18 @@ void SongParser::iniParse() {
 			n.syllable = it2->lyric;
 			if (!n.syllable.empty()) {
 				switch (*n.syllable.rbegin()) {
+				  case '#': {
+				  	n.type = Note::FREESTYLE;
+					n.syllable.erase(n.syllable.size()-1);
+					if( *n.syllable.rbegin() != '-' ) n.syllable += " ";
+					break;
+				  }
 				  case '-': eraseLast(n.syllable, '-'); break;
 				  case '+': if (!s.notes.empty()) eraseLast(s.notes.back().syllable); *n.syllable.rbegin() = '~'; break;
 				  default: n.syllable += " "; break;
 				}
 			}
-			if (n.type == Note::NORMAL) {
+			if (n.type == Note::NORMAL || n.type == Note::FREESTYLE) {
 				s.noteMin = std::min(s.noteMin, n.note);
 				s.noteMax = std::max(s.noteMax, n.note);
 				s.notes.push_back(n);
