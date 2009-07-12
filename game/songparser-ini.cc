@@ -45,7 +45,7 @@ void SongParser::iniParse() {
 			if (!n.syllable.empty()) {
 				switch (*n.syllable.rbegin()) {
 				  case '-': eraseLast(n.syllable, '-'); break;
-				  case '+': eraseLast(s.notes.back().syllable); *n.syllable.rbegin() = '~'; break;
+				  case '+': if (!s.notes.empty()) eraseLast(s.notes.back().syllable); *n.syllable.rbegin() = '~'; break;
 				  default: n.syllable += " "; break;
 				}
 			}
