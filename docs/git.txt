@@ -91,3 +91,13 @@ can destroy **your local** repository):
 Then to finally push your changes into the internet simply do:
 
 	$ git push
+
+
+Getting involved
+----------------
+
+When you become a developer of performous, you'll probably already have
+a clone of the performous repository. To be able to commit, you need to
+change the project url with this command:
+
+	$ git config remote.origin.url ssh://USER@performous.git.sourceforge.net/gitroot/performous
