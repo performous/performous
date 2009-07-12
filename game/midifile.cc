@@ -168,6 +168,8 @@ MidiFileParser::Track MidiFileParser::read_track(MidiStream& stream) {
 			std::string data = riff.read_bytes(riff.read_varlen());
 			switch (type) {
 			  case 0x01:
+			  	// Lyrics are hidden here, only [text] are orders
+			  	if( data[0] != '[' ) m_lyric = data;
 #if MIDI_DEBUG_LEVEL > 2
 				std::cout << "Text: " << data << std::endl;
 #endif
