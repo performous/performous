@@ -1,7 +1,10 @@
+#include <boost/cstdint.hpp>
 #include <fstream>
 #include <map>
 #include <string>
 #include <vector>
+
+using boost::uint32_t;
 
 #if 0
 
