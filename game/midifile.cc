@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iomanip>
 #include <stdexcept>
+#include <sstream>
 #include <string>
 
 #define MIDI_DEBUG_LEVEL 1
@@ -25,7 +26,11 @@ class MidiStream {
 	 *
 	 * @param file MidiFile to be read
 	 */
-	MidiStream(std::string file);
+	MidiStream(std::string const& file) {
+		std::ifstream ifs(file.c_str());
+		f << ifs.rdbuf();
+		f.exceptions(std::ios::failbit);
+	}
 
 	std::string read_bytes(size_t bytes);
 
@@ -58,14 +63,11 @@ class MidiStream {
 
 private:
 
-	std::ifstream f;
+	std::stringstream f;
 	uint16_t read_uint16() { return f.get() << 8 | f.get(); }
 	uint32_t read_uint32() { return f.get() << 24 | f.get() << 16 | f.get() << 8 | f.get(); }
 
 };
-
-
-MidiStream::MidiStream(std::string file): f(file.c_str()) { f.exceptions(std::ios::failbit); }
 
 namespace { bool is_not_alpha(char c) { return (c < 'A' || c > 'Z') && (c < 'a' || c > 'z'); } }
 
