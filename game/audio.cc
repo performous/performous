@@ -67,6 +67,7 @@ void Audio::operator()(da::pcm_data& areas, da::settings const&) {
 void Audio::playMusic(std::vector<std::string> const& filenames, bool preview, double fadeTime, double startPos) {
 	if (!isOpen()) return;
 	// First construct the new stream
+	boost::recursive_mutex::scoped_lock l(m_mutex);
 	fadeout(fadeTime);
 	for(std::vector<std::string>::const_iterator it = filenames.begin() ; it != filenames.end() ; ++it ) {
 		std::auto_ptr<Stream> s;
@@ -78,7 +79,6 @@ void Audio::playMusic(std::vector<std::string> const& filenames, bool preview, d
 			std::cerr << "Error loading " << *it << " (" << e.what() << ")" << std::endl;
 			continue;
 		}
-		boost::recursive_mutex::scoped_lock l(m_mutex);
 		m_streams.push_back(s);
 	}
 	if (!preview) m_paused = false;
