@@ -1,10 +1,10 @@
 #include "video_driver.hh"
 
 #include "config.hh"
+#include "glutil.hh"
 #include "screen.hh"
 #include "util.hh"
 #include "joystick.hh"
-#include <GL/glew.h>
 #include <SDL.h>
 
 unsigned s_width;

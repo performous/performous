@@ -106,12 +106,11 @@ namespace {
 	void fillBG() {
 		Dimensions dim(arMin);
 		dim.fixedWidth(1.0);
-		glBegin(GL_QUADS);
+		glutil::Begin block(GL_QUADS);
 		glVertex2f(dim.x1(), dim.y1());
 		glVertex2f(dim.x2(), dim.y1());
 		glVertex2f(dim.x2(), dim.y2());
 		glVertex2f(dim.x1(), dim.y2());
-		glEnd();		
 	}
 
 }
@@ -253,7 +252,7 @@ ScoreWindow::ScoreWindow(Engine& e):
 }
 
 void ScoreWindow::draw() {
-	struct PushMatrixBlock { PushMatrixBlock() { glPushMatrix(); } ~PushMatrixBlock() { glPopMatrix(); } } b;
+	glutil::PushMatrix block;
 	glTranslatef(0.0, m_pos.get(), 0.0);
 	m_bg.draw();
 	const double spacing = 0.1 + 0.1 / m_players.size();
