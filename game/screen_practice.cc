@@ -1,7 +1,6 @@
 #include "screen_practice.hh"
 
 #include "util.hh"
-#include "joystick.hh"
 #include "configuration.hh"
 
 ScreenPractice::ScreenPractice(std::string const& name, Audio& audio, Capture& capture):
@@ -9,7 +8,6 @@ ScreenPractice::ScreenPractice(std::string const& name, Audio& audio, Capture& c
 {}
 
 void ScreenPractice::enter() {
-	probe();
 	m_audio.playMusic(getThemePath("practice.ogg"));
 	theme.reset(new ThemePractice());
 	// draw vu meters
