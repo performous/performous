@@ -148,10 +148,11 @@ void Audio::seek(double offset) {
 void Audio::seekPos(double pos) {
 	boost::recursive_mutex::scoped_lock l(m_mutex);
 	if (m_streams.empty()) return;
-	Stream& s = m_streams.back();
-	int position = clamp(pos, 0.0, s.mpeg.duration() - 1.0);
-	s.mpeg.seek(position);
-	s.prebuffering = true;
+	for (Streams::iterator it = m_streams.begin(); it != m_streams.end(); ++it) {
+		int position = clamp(pos, 0.0, it->mpeg.duration() - 1.0);
+		it->mpeg.seek(position);
+		it->prebuffering = true;
+	}
 	m_paused = false;
 }
 
