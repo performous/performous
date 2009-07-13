@@ -1,5 +1,6 @@
 #include "songparser.hh"
 
+#include <boost/filesystem.hpp>
 #include "midifile.hh"
 
 /// @file Functions used for parsing the UltraStar TXT song format
@@ -12,6 +13,10 @@ bool SongParser::iniCheck(std::vector<char> const& data) {
 namespace {
 	void eraseLast(std::string& s, char ch = ' ') {
 		if (!s.empty() && *s.rbegin() == ch) s.erase(s.size() - 1);
+	}
+	void testAndAdd(Song& s, std::string const& filename) {
+		std::string f = s.path + filename;
+		if (boost::filesystem::exists(f)) s.music.push_back(f);
 	}
 }
 
@@ -30,13 +35,14 @@ void SongParser::iniParse() {
 		else if (key == "artist") s.artist = value;
 	}
 	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
-	s.music.push_back(s.path + "song.ogg");
-	s.music.push_back(s.path + "guitar.ogg");
+	testAndAdd(s, "song.ogg");
+	testAndAdd(s, "guitar.ogg");
+	testAndAdd(s, "rhythm.ogg");
+	testAndAdd(s, "drums.ogg");
+	testAndAdd(s, "vocals.ogg");
 	MidiFileParser midi(s.path + "/notes.mid");
 	for (MidiFileParser::TempoChanges::const_iterator it = midi.tempochanges.begin(); it != midi.tempochanges.end(); ++it) addBPM(it->miditime * 4, it->value);
 	for (MidiFileParser::Tracks::const_iterator it = midi.tracks.begin(); it != midi.tracks.end(); ++it) {
-		if (it->name == "PART RHYTHM" || it->name == "PART BASS") s.music.push_back(s.path + "rhythm.ogg");
-		if (it->name == "PART DRUMS") s.music.push_back(s.path + "drums.ogg");
 		if (it->name != "PART VOCALS") continue;
 		for (MidiFileParser::Lyrics::const_iterator it2 = it->lyrics.begin(); it2 != it->lyrics.end(); ++it2) {
 			Note n;
