@@ -21,7 +21,7 @@ void NoteGraph::reset() {
 namespace {
 	void drawNotebar(Texture const& texture, double x, double y, double w, double h) {
 		UseTexture tblock(texture);
-		glBegin(GL_TRIANGLE_STRIP);
+		glutil::Begin block(GL_TRIANGLE_STRIP);
 		glTexCoord2f(0.0f, 0.0f); glVertex2f(x, y);
 		glTexCoord2f(0.0f, 1.0f); glVertex2f(x, y + h);
 		if (w >= 2.0 * h) {
@@ -38,7 +38,6 @@ namespace {
 		}
 		glTexCoord2f(1.0f, 0.0f); glVertex2f(x + w, y);
 		glTexCoord2f(1.0f, 1.0f); glVertex2f(x + w, y + h);
-		glEnd();
 	}
 }
 

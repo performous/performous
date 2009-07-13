@@ -1,12 +1,12 @@
 #pragma once
 
+#include "audio.hh"
+#include "glutil.hh"
+#include "record.hh"
+#include "singleton.hh"
+#include "songs.hh"
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/scoped_ptr.hpp>
-#include "singleton.hh"
-#include "audio.hh"
-#include "record.hh"
-#include "songs.hh"
-#include <GL/glew.h>
 #include <SDL.h>
 #include <iostream>
 #include <string>

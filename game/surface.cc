@@ -3,7 +3,6 @@
 #include "fs.hh"
 #include "configuration.hh"
 #include "video_driver.hh"
-#include <GL/glu.h>
 #include <Magick++.h>
 #include <boost/bind.hpp>
 #include <fstream>
