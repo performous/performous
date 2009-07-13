@@ -163,6 +163,7 @@ class Audio {
 	typedef boost::ptr_vector<Stream> Streams;
 	Streams m_streams;
 	bool m_paused;
+	bool m_need_resync;
 	Notes const* volatile m_notes;
 	da::settings m_rs;
 	boost::scoped_ptr<da::playback> m_playback;

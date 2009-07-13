@@ -11,7 +11,8 @@
 #include <memory>
 
 Audio::Audio():
-	m_paused(false)
+	m_paused(false),
+	m_need_resync(false)
 {}
 
 void Audio::open(std::string const& pdev, std::size_t rate, std::size_t frames) {
@@ -32,6 +33,23 @@ void Audio::operator()(da::pcm_data& areas, da::settings const&) {
 	static double phase = 0.0;
 	std::fill(areas.m_buf, areas.m_buf + samples, 0.0f);
 	if (!m_paused) {
+		if(m_need_resync) {
+			/*
+			std::cout << "Audio need to be synched here" << std::endl;
+			// do a fast forward sync
+			double position = 0.0;
+			for (Streams::iterator it = m_streams.begin(); it != m_streams.end();) {
+				double tmp = it->mpeg.position();
+				if( tmp > position ) position = tmp;
+				++it;
+			}
+			for (Streams::iterator it = m_streams.begin(); it != m_streams.end();) {
+				it->mpeg.seek(position);
+				++it;
+			}
+			*/
+			m_need_resync = false;
+		}
 		for (Streams::iterator it = m_streams.begin(); it != m_streams.end();) {
 			it->playmix(areas.m_buf, samples);
 			if (it->fade <= 0.0) { it = m_streams.erase(it); continue; }
@@ -82,6 +100,7 @@ void Audio::playMusic(std::vector<std::string> const& filenames, bool preview, d
 		m_streams.push_back(s);
 	}
 	if (!preview) m_paused = false;
+	m_need_resync = true;
 }
 
 void Audio::playMusic(std::string const& filename, bool preview, double fadeTime, double startPos) {
@@ -154,5 +173,6 @@ void Audio::seekPos(double pos) {
 		it->prebuffering = true;
 	}
 	m_paused = false;
+	m_need_resync = true;
 }
 
