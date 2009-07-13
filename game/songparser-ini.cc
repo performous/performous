@@ -63,6 +63,7 @@ void SongParser::iniParse() {
 				  case '+': if (!s.notes.empty()) eraseLast(s.notes.back().syllable); *n.syllable.rbegin() = '~'; break;
 				  default: n.syllable += " "; break;
 				}
+				m_maxScore += n.maxScore();
 			}
 			if (n.type == Note::NORMAL || n.type == Note::FREESTYLE) {
 				s.noteMin = std::min(s.noteMin, n.note);
