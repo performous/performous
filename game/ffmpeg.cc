@@ -210,6 +210,18 @@ void FFmpeg::decodeNextFrame() {
 		AVFrame* operator->() { return m_frame; }
 	} videoFrame;
 
+	class AudioBuffer {
+	  public:
+		AudioBuffer(size_t _size): m_buffer((int16_t*)av_malloc(_size*sizeof(int16_t))) {
+			if (!m_buffer) throw std::runtime_error("Unable to allocate AudioBuffer");
+		}
+		~AudioBuffer() { av_free(m_buffer); }
+		operator  int16_t*() { return m_buffer; }
+		int16_t* operator->() { return m_buffer; }
+	  private:
+		int16_t* m_buffer;
+	};
+
 	int frameFinished=0;
 	while (!frameFinished) {
 		ReadFramePacket packet(pFormatCtx);
@@ -244,9 +256,9 @@ void FFmpeg::decodeNextFrame() {
 			while (packetSize) {
 				if (packetSize < 0) throw std::logic_error("negative audio packet size?!");
 				if (m_quit || m_seekTarget == m_seekTarget) return;
-				std::vector<int16_t> audioFrames(AVCODEC_MAX_AUDIO_FRAME_SIZE);
+				AudioBuffer audioFrames(AVCODEC_MAX_AUDIO_FRAME_SIZE);
 				int outsize = AVCODEC_MAX_AUDIO_FRAME_SIZE*sizeof(int16_t);
-				int decodeSize = avcodec_decode_audio2(pAudioCodecCtx, &audioFrames[0], &outsize, packetData, packetSize);
+				int decodeSize = avcodec_decode_audio2(pAudioCodecCtx, audioFrames, &outsize, packetData, packetSize);
 				// Handle special cases
 				if (decodeSize == 0) break;
 				if (outsize == 0) continue;
@@ -257,7 +269,7 @@ void FFmpeg::decodeNextFrame() {
 				// Convert outsize from bytes into number of frames (samples)
 				outsize /= sizeof(int16_t) * pAudioCodecCtx->channels;
 				std::vector<int16_t> resampled(AVCODEC_MAX_AUDIO_FRAME_SIZE);
-				int frames = audio_resample(pResampleCtx, &resampled[0], &audioFrames[0], outsize);
+				int frames = audio_resample(pResampleCtx, &resampled[0], audioFrames, outsize);
 				// Construct AudioFrame and add it to the queue
 				AudioFrame* tmp = new AudioFrame();
 				std::copy(resampled.begin(), resampled.begin() + frames * AUDIO_CHANNELS, std::back_inserter(tmp->data));
