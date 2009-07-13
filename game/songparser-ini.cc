@@ -80,6 +80,7 @@ void SongParser::iniParse() {
 		n.begin = 30.0;
 		n.end = 31.0;
 		n.syllable = "TODO";
+		s.noteMin = s.noteMax = n.note = 60;
 		s.notes.push_back(n);
 	}
 }
