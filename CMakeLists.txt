@@ -36,7 +36,7 @@ add_subdirectory(game)
 add_subdirectory(docs)
 
 option(ENABLE_TOOLS "Enable extra tools (e.g. Singstar ripper)" ON)
-option(ENABLE_SILKYSTRINGS "Enable Silky Strings (Guitar Hero clone)" ON)
+option(ENABLE_SILKYSTRINGS "Enable Silky Strings (Guitar Hero clone)" OFF)
 
 if (ENABLE_TOOLS)
   add_subdirectory(tools)
