@@ -10,7 +10,6 @@
 #define PS3_DRUM_CONTROLLER_XXX    4
 #define PS3_DRUM_CONTROLLER_ORANGE 5
 
->>>>>>> dd75dc2... Removed PERFORMOUS_CONFIG_SCHEMA and add getDataPath:game/joystick.cc
 void check_joystick_event(SDL_Event event, Audio &audio) {
 	switch( event.type ) {
 		case SDL_JOYAXISMOTION:
