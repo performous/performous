@@ -52,7 +52,10 @@ class SongParser {
 			unsigned int shift = (1 - m_song.noteMin / 12) * 12;
 			m_song.noteMin += shift;
 			m_song.noteMax += shift;
-			for (Notes::iterator it = s.notes.begin(); it != s.notes.end(); ++it) it->note += shift;
+			for (Notes::iterator it = s.notes.begin(); it != s.notes.end(); ++it) {
+				it->note += shift;
+				it->notePrev += shift;
+			}
 		}
 		m_song.m_scoreFactor = 1.0 / m_maxScore;
 	}

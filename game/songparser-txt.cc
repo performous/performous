@@ -87,6 +87,7 @@ bool SongParser::txtParseNote(std::string line) {
 		{
 			unsigned int length = 0;
 			if (!(iss >> ts >> length >> n.note)) throw std::runtime_error("Invalid note line format");
+			n.notePrev = n.note; // No slide notes in TXT yet.
 			if (m_relative) ts += m_relativeShift;
 			if (iss.get() == ' ') std::getline(iss, n.syllable);
 			n.end = tsTime(ts + length);
