@@ -50,7 +50,11 @@ void SongParser::iniParse() {
 			n.end = midi.get_seconds(it2->end);
 			n.notePrev = n.note = it2->note;
 			n.type = n.note > 100 ? Note::SLEEP : Note::NORMAL;
-			n.syllable = it2->lyric;
+			{
+				std::stringstream ss(it2->lyric);
+				convertToUTF8(ss);
+				n.syllable = ss.str();
+			}
 			std::string& syl = n.syllable;
 			if (n.type != Note::SLEEP) {
 				if (!syl.empty()) {
