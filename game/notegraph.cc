@@ -19,25 +19,29 @@ void NoteGraph::reset() {
 }
 
 namespace {
-	void drawNotebar(Texture const& texture, double x, double y, double w, double h) {
+	void drawNotebar(Texture const& texture, double x, double ybeg, double yend, double w, double h) {
 		UseTexture tblock(texture);
 		glutil::Begin block(GL_TRIANGLE_STRIP);
-		glTexCoord2f(0.0f, 0.0f); glVertex2f(x, y);
-		glTexCoord2f(0.0f, 1.0f); glVertex2f(x, y + h);
+		glTexCoord2f(0.0f, 0.0f); glVertex2f(x, ybeg);
+		glTexCoord2f(0.0f, 1.0f); glVertex2f(x, ybeg + h);
 		if (w >= 2.0 * h) {
-			glTexCoord2f(0.5f, 0.0f); glVertex2f(x + h, y);
-			glTexCoord2f(0.5f, 1.0f); glVertex2f(x + h, y + h);
-			glTexCoord2f(0.5f, 0.0f); glVertex2f(x + w - h, y);
-			glTexCoord2f(0.5f, 1.0f); glVertex2f(x + w - h, y + h);
+			double tmp = h / w;
+			double y1 = (1.0 - tmp) * ybeg + tmp * yend;
+			double y2 = tmp * ybeg + (1.0 - tmp) * yend;
+			glTexCoord2f(0.5f, 0.0f); glVertex2f(x + h, y1);
+			glTexCoord2f(0.5f, 1.0f); glVertex2f(x + h, y1 + h);
+			glTexCoord2f(0.5f, 0.0f); glVertex2f(x + w - h, y2);
+			glTexCoord2f(0.5f, 1.0f); glVertex2f(x + w - h, y2 + h);
 		} else {
+			double ymid = 0.5 * (ybeg + yend);
 			float crop = 0.25f * w / h;
-			glTexCoord2f(crop, 0.0f); glVertex2f(x + 0.5 * w, y);
-			glTexCoord2f(crop, 1.0f); glVertex2f(x + 0.5 * w, y + h);
-			glTexCoord2f(1.0f - crop, 0.0f); glVertex2f(x + 0.5 * w, y);
-			glTexCoord2f(1.0f - crop, 1.0f); glVertex2f(x + 0.5 * w, y + h);
+			glTexCoord2f(crop, 0.0f); glVertex2f(x + 0.5 * w, ymid);
+			glTexCoord2f(crop, 1.0f); glVertex2f(x + 0.5 * w, ymid + h);
+			glTexCoord2f(1.0f - crop, 0.0f); glVertex2f(x + 0.5 * w, ymid);
+			glTexCoord2f(1.0f - crop, 1.0f); glVertex2f(x + 0.5 * w, ymid + h);
 		}
-		glTexCoord2f(1.0f, 0.0f); glVertex2f(x + w, y);
-		glTexCoord2f(1.0f, 1.0f); glVertex2f(x + w, y + h);
+		glTexCoord2f(1.0f, 0.0f); glVertex2f(x + w, yend);
+		glTexCoord2f(1.0f, 1.0f); glVertex2f(x + w, yend + h);
 	}
 }
 
@@ -96,7 +100,7 @@ void NoteGraph::drawNotes() {
 			Texture* t1;
 			Texture* t2;
 			switch (it->type) {
-			  case Note::NORMAL: t1 = &m_notebar; t2 = &m_notebar_hl; break;
+			  case Note::NORMAL: case Note::SLIDE: t1 = &m_notebar; t2 = &m_notebar_hl; break;
 			  case Note::GOLDEN: t1 = &m_notebargold; t2 = &m_notebargold_hl; break;
 			  case Note::FREESTYLE:  // Freestyle notes use custom handling
 				{
@@ -113,13 +117,14 @@ void NoteGraph::drawNotes() {
 			  default: throw std::logic_error("Unknown note type: don't know how to render");
 			}
 			double x = m_baseX + it->begin * pixUnit + m_noteUnit; // left x coordinate: begin minus border (side borders -noteUnit wide)
-			double y = m_baseY + (it->note + 1) * m_noteUnit; // top y coordinate (on the one higher note line)
+			double ybeg = m_baseY + (it->notePrev + 1) * m_noteUnit; // top y coordinate (on the one higher note line)
+			double yend = m_baseY + (it->note + 1) * m_noteUnit; // top y coordinate (on the one higher note line)
 			double w = (it->end - it->begin) * pixUnit - m_noteUnit * 2.0; // width: including borders on both sides
 			double h = -m_noteUnit * 2.0; // height: 0.5 border + 1.0 bar + 0.5 border = 2.0
-			drawNotebar(*t1, x, y, w, h);
+			drawNotebar(*t1, x, ybeg, yend, w, h);
 			if (alpha > 0.0) {
 				glColor4f(1.0f, 1.0f, 1.0f, alpha * m_notealpha);
-				drawNotebar(*t2, x, y, w, h);
+				drawNotebar(*t2, x, ybeg, yend, w, h);
 				glColor4f(1.0f, 1.0f, 1.0f, m_notealpha);
 			}
 		}

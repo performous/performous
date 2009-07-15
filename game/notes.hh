@@ -30,14 +30,15 @@ class MusicalScale {
 
 /// note read from songfile
 struct Note {
+	Note();
 	double begin, ///< begin time
 	       end; ///< end time
 	/// power of note
 	mutable double power;
 	/// note type
-	enum Type { FREESTYLE = 'F', NORMAL = ':', GOLDEN = '*', SLEEP = '-'} type;
-	/// note
-	int note;
+	enum Type { FREESTYLE = 'F', NORMAL = ':', GOLDEN = '*', SLIDE = '+', SLEEP = '-'} type;
+	int note; ///< MIDI pitch of the note (at the end for slide notes)
+	int notePrev; ///< MIDI pitch of the previous note (should be same as note for everything but SLIDE)
 	/// lyrics syllable for that note
 	std::string syllable;
 	/// Difference of n from note
@@ -48,7 +49,6 @@ struct Note {
 	double maxScore() const;
 	/// score when singing
 	double score(double freq, double b, double e) const;
-	Note();
 	static bool ltBegin(Note const& a, Note const& b) { return a.begin < b.begin; }
 	static bool ltEnd(Note const& a, Note const& b) { return a.end < b.end; }
   private:

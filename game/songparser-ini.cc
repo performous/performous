@@ -48,24 +48,37 @@ void SongParser::iniParse() {
 			Note n;
 			n.begin = midi.get_seconds(it2->begin);
 			n.end = midi.get_seconds(it2->end);
-			n.note = it2->note;
+			n.notePrev = n.note = it2->note;
 			n.type = n.note > 100 ? Note::SLEEP : Note::NORMAL;
 			n.syllable = it2->lyric;
-			if (!n.syllable.empty()) {
-				switch (*n.syllable.rbegin()) {
-				  case '#': {
-				  	n.type = Note::FREESTYLE;
-					n.syllable.erase(n.syllable.size()-1);
-					if( *n.syllable.rbegin() != '-' ) n.syllable += " ";
-					break;
-				  }
-				  case '-': eraseLast(n.syllable, '-'); break;
-				  case '+': if (!s.notes.empty()) eraseLast(s.notes.back().syllable); *n.syllable.rbegin() = '~'; break;
-				  default: n.syllable += " "; break;
+			std::string& syl = n.syllable;
+			if (n.type != Note::SLEEP) {
+				if (!syl.empty()) {
+					bool erase = false;
+					// Examine note styles (specified by the last character of the syllable)
+					{
+						char& ch = *syl.rbegin();
+						if (ch == '#') { n.type = Note::FREESTYLE; erase = true; }
+						if (ch == '^') { n.type = Note::GOLDEN; erase = true; }
+						if (ch == '+') { n.type = Note::SLIDE; ch = '~'; }
+					}
+					if (erase) syl.erase(syl.size() - 1);
+					// Add spaces between words, remove hyphens
+					{
+						char ch = *syl.rbegin();
+						if (ch == '-') syl.erase(syl.size() - 1);
+						else if (ch != '~') syl += ' ';
+					}
+				}
+				// Special processing for slides (which depend on the previous note)
+				if (n.type == Note::SLIDE) {
+					Notes::reverse_iterator prev = s.notes.rbegin();
+					while (prev != s.notes.rend() && prev->type == Note::SLEEP) ++prev;
+					if (prev == s.notes.rend()) throw std::runtime_error("The song begins with a slide note");
+					eraseLast(prev->syllable); // Erase the space if there is any
+					n.notePrev = prev->note;
 				}
 				m_maxScore += n.maxScore();
-			}
-			if (n.type == Note::NORMAL || n.type == Note::FREESTYLE) {
 				s.noteMin = std::min(s.noteMin, n.note);
 				s.noteMax = std::max(s.noteMax, n.note);
 				s.notes.push_back(n);
@@ -76,14 +89,14 @@ void SongParser::iniParse() {
 		}
 		if (!s.notes.empty()) break;
 	}
-	if (s.notes.empty()) {
+	/*if (s.notes.empty()) {
 		Note n;
 		n.begin = 30.0;
 		n.end = 31.0;
 		n.syllable = "TODO";
 		s.noteMin = s.noteMax = n.note = 60;
 		s.notes.push_back(n);
-	}
+	}*/
 }
 
 
