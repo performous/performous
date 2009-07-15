@@ -85,6 +85,8 @@ struct Stream {
 	void fadein(double time) { fade = fadeSpeed = 1.0 / (time * srate); }
 	/// fades stream out
 	void fadeout(double time) { fadeSpeed = - 1.0 / (time * srate); }
+	/// is the stream fading out
+	bool fadingout() {return fadeSpeed < 0;}
 	/// crossfades songs
 	template <typename RndIt> void playmix(RndIt outbuf, unsigned int maxSamples) {
 		if (prebuffering && mpeg.audioQueue.percentage() > 0.9) prebuffering = false;

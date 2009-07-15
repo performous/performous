@@ -80,7 +80,24 @@ void SongParser::iniParse() {
 					while (prev != s.notes.rend() && prev->type == Note::SLEEP) ++prev;
 					if (prev == s.notes.rend()) throw std::runtime_error("The song begins with a slide note");
 					eraseLast(prev->syllable); // Erase the space if there is any
-					n.notePrev = prev->note;
+					{
+						// insert new sliding note
+						Note inter;
+						inter.begin = prev->end;
+						inter.end = n.begin;
+						inter.notePrev = prev->note;
+						inter.note = n.note;
+						inter.type = Note::SLIDE;
+						inter.syllable = std::string("~");
+						m_maxScore += inter.maxScore();
+						s.noteMin = std::min(s.noteMin, inter.note);
+						s.noteMax = std::max(s.noteMax,inter.note);
+						s.notes.push_back(inter);
+					}
+					{
+						// modifying current note to be normal again
+						n.type = Note::NORMAL;
+					}
 				}
 				m_maxScore += n.maxScore();
 				s.noteMin = std::min(s.noteMin, n.note);

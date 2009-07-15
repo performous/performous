@@ -34,18 +34,17 @@ void Audio::operator()(da::pcm_data& areas, da::settings const&) {
 	std::fill(areas.m_buf, areas.m_buf + samples, 0.0f);
 	if (!m_paused) {
 		if(m_need_resync) {
-			/*
 			std::cout << "Audio need to be synched here" << std::endl;
+			/*
 			// do a fast forward sync
 			double position = 0.0;
-			for (Streams::iterator it = m_streams.begin(); it != m_streams.end();) {
+			for (Streams::iterator it = m_streams.begin(); it != m_streams.end(); ++it) {
+				if( it->fadingout() ) continue;
 				double tmp = it->mpeg.position();
 				if( tmp > position ) position = tmp;
-				++it;
 			}
-			for (Streams::iterator it = m_streams.begin(); it != m_streams.end();) {
+			for (Streams::iterator it = m_streams.begin(); it != m_streams.end(); ++it) {
 				it->mpeg.seek(position);
-				++it;
 			}
 			*/
 			m_need_resync = false;
