@@ -259,58 +259,28 @@ void MidiFileParser::process_midi_event(Track& track, uint8_t t, uint8_t arg1, u
 #if MIDI_DEBUG_LEVEL > 3
 	cout_midi_event(t, arg1, arg2, miditime);
 #endif
-	if (track.name == "PART VOCALS") {
-		std::vector<Note>& pitch(track.notes[arg1]);
-		if (t == 8 || (t == 9 && arg2 == 0)) {
-			// Note off event or note on with velocity 0 => note ends
-			if (pitch.empty() || pitch.back().end != 0) {
+	std::vector<Note>& pitch(track.notes[arg1]);
+	if (t == 8 || (t == 9 && arg2 == 0)) {
+		// Note off event or note on with velocity 0 => note ends
+		if (pitch.empty() || pitch.back().end != 0) {
 #if MIDI_DEBUG_LEVEL > 0
-				std::cout << "WARNING: Note end event with no corresponding beginning:" << std::endl;
-				cout_midi_event(t, arg1, arg2, miditime);
+			std::cout << "WARNING: Note end event with no corresponding beginning:" << std::endl;
+			cout_midi_event(t, arg1, arg2, miditime);
 #endif
-			} else {
-				if (!m_lyric.empty()) {
-					pitch.back().end = miditime;
-					track.lyrics.back().end = miditime;
-					m_lyric.clear();
-				}
+		} else {
+			pitch.back().end = miditime;
+			if (track.name == "PART VOCALS" && !m_lyric.empty()) {
+				if (track.lyrics.empty()) throw std::logic_error("Lyrics empty in MidiFileParser::process_midi_event");
+				track.lyrics.back().end = miditime;
+				m_lyric.clear();
 			}
-		} else if (t == 9) {
-			pitch.push_back(Note(miditime));
+		}
+	} else if (t == 9) {
+		pitch.push_back(Note(miditime));
+		if (track.name == "PART VOCALS") {
 			if (arg1 > 100) track.lyrics.push_back(LyricNote("", arg1, miditime, miditime));
 			else if (!m_lyric.empty()) track.lyrics.push_back(LyricNote(m_lyric, arg1, miditime));
 		}
-	} else if (track.name == "PART GUITAR" || track.name == "PART BASS" || track.name == "PART DRUMS") {
-		std::string difficulty;
-		char button = 0;
-		if( arg1 >= 0x60 && arg1 <= 0x64 ) {
-			difficulty = "EXPERT";
-			button = arg1-0x5f;
-		} else if( arg1 >= 0x54 && arg1 <= 0x58 ) {
-			difficulty = "HARD";
-			button = arg1-0x53;
-		} else if( arg1 >= 0x48 && arg1 <= 0x4c ) {
-			difficulty = "MEDIUM";
-			button = arg1-0x47;
-		} else if( arg1 >= 0x3c && arg1 <= 0x40 ) {
-			difficulty = "EASY";
-			button = arg1-0x3b;
-		}
-
-		if( button != 0 ) {
-			std::string type((t==9)?"DOWN":"UP");
-#if MIDI_DEBUG_LEVEL > 2
-			std::cout << std::setiosflags(std::ios::left) << std::setw(7) << difficulty << " " << int(button) << " " << std::setw(5) <<type << std::fixed << std::setprecision(2) << std::setw(12) << get_seconds(miditime) << std::endl;
-#endif
-		} else {
-#if MIDI_DEBUG_LEVEL > 2
-			cout_midi_event(t, arg1, arg2, miditime);
-#endif
-		}
-	} else {
-#if MIDI_DEBUG_LEVEL > 3
-		cout_midi_event(t, arg1, arg2, miditime);
-#endif
 	}
 }
 
