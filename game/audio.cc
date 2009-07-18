@@ -43,8 +43,19 @@ void Audio::operator()(da::pcm_data& areas, da::settings const&) {
 				double tmp = it->mpeg.position();
 				if( tmp > position ) position = tmp;
 			}
-			for (Streams::iterator it = m_streams.begin(); it != m_streams.end(); ++it) {
-				it->mpeg.seek(position);
+			unsigned int i = 0;
+			for (Streams::iterator it = m_streams.begin(); it != m_streams.end(); ++it,++i) {
+				if( it->fadingout() ) continue;
+				double shift = position - it->mpeg.position();
+				if( shift != 0 ) {
+					std::cout << "Moving stream " << i << " " << shift << "s forward";
+					if( it->consume(shift) ) {
+						std::cout << " SUCCESS" << std::endl;
+					} else {
+						// here we should say that this stream still need to be synched with one of the sucess one
+						std::cout << " FAIL (not enough data)" << std::endl;
+					}
+				}
 			}
 			*/
 			m_need_resync = false;

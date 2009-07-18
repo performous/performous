@@ -87,6 +87,16 @@ struct Stream {
 	void fadeout(double time) { fadeSpeed = - 1.0 / (time * srate); }
 	/// is the stream fading out
 	bool fadingout() {return fadeSpeed < 0;}
+	bool consume(double duration) {
+		std::vector<int16_t> buf;
+		unsigned int samples = srate * duration;
+		mpeg.audioQueue.tryPop(buf, samples);
+		if( buf.size() == samples ) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 	/// crossfades songs
 	template <typename RndIt> void playmix(RndIt outbuf, unsigned int maxSamples) {
 		if (prebuffering && mpeg.audioQueue.percentage() > 0.9) prebuffering = false;
