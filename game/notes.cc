@@ -78,3 +78,5 @@ double Note::scoreMultiplier(double error) const {
 	return accuracy * max;
 }
 
+Duration::Duration(): begin(getNaN()), end(getNaN()) {}
+

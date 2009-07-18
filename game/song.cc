@@ -5,6 +5,7 @@
 
 void Song::reload(bool errorIgnore) {
 	notes.clear();
+	tracks.clear();
 	category.clear();
 	genre.clear();
 	edition.clear();

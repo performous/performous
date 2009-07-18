@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -27,6 +28,20 @@ class MusicalScale {
 	/// get note offset for frequence
 	double getNoteOffset(double freq) const;
 };
+
+struct Duration {
+	double begin, end; ///< Beginning and ending timestamps is seconds
+	Duration();
+	Duration(double b, double e): begin(b), end(e) {}
+	static bool ltBegin(Duration const& a, Duration const& b) { return a.begin < b.begin; }
+	static bool ltEnd(Duration const& a, Duration const& b) { return a.end < b.end; }
+};
+
+typedef std::vector<Duration> Durations;
+typedef std::map<int, Durations> NoteMap;
+typedef std::map<std::string, NoteMap> Tracks;
+
+// TODO: Make Note use Duration
 
 /// note read from songfile
 struct Note {

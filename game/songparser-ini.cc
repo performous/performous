@@ -43,7 +43,18 @@ void SongParser::iniParse() {
 	MidiFileParser midi(s.path + "/notes.mid");
 	for (MidiFileParser::TempoChanges::const_iterator it = midi.tempochanges.begin(); it != midi.tempochanges.end(); ++it) addBPM(it->miditime * 4, it->value);
 	for (MidiFileParser::Tracks::const_iterator it = midi.tracks.begin(); it != midi.tracks.end(); ++it) {
-		if (it->name != "PART VOCALS") continue;
+		if (it->name.substr(0, 5) != "PART ") continue;
+		std::string name = it->name.substr(5);
+		if (name != "VOCALS") {
+			NoteMap& nm = s.tracks[name];
+			for (MidiFileParser::NoteMap::const_iterator it2 = it->notes.begin(); it2 != it->notes.end(); ++it2) {
+				Durations& dur = nm[it2->first];
+				MidiFileParser::Notes const& notes = it2->second;
+				for (MidiFileParser::Notes::const_iterator it3 = notes.begin(); it3 != notes.end(); ++it3) {
+					dur.push_back(Duration(midi.get_seconds(it3->begin), midi.get_seconds(it3->end)));
+				}
+			}
+		}
 		for (MidiFileParser::Lyrics::const_iterator it2 = it->lyrics.begin(); it2 != it->lyrics.end(); ++it2) {
 			Note n;
 			n.begin = midi.get_seconds(it2->begin);

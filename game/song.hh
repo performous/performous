@@ -36,7 +36,8 @@ class Song: boost::noncopyable {
 	/** Get the song status at a given timestamp **/
 	Status status(double time) const;
 	int randomIdx; ///< sorting index used for random order
-	Notes notes; ///< notes for song
+	Notes notes; ///< notes for song (only used for singing)
+	Tracks tracks; ///< guitar etc. notes for this song
 	int noteMin, ///< lowest note
 	    noteMax; ///< highest note
 	std::string path; ///< path of songfile
