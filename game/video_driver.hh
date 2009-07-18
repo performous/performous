@@ -1,5 +1,4 @@
-#ifndef __VIDEODRIVER_H__
-#define __VIDEODRIVER_H__
+#pragma once
 
 #include "surface.hh"
 #include <boost/ptr_container/ptr_vector.hpp>
@@ -47,4 +46,3 @@ class Window {
 	bool m_fullscreen;
 };
 
-#endif

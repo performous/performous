@@ -7,8 +7,10 @@
 #include "joystick.hh"
 #include <SDL.h>
 
-unsigned s_width;
-unsigned s_height;
+namespace {
+	unsigned s_width;
+	unsigned s_height;
+}
 
 unsigned int screenW() { return s_width; }
 unsigned int screenH() { return s_height; }
@@ -35,34 +37,7 @@ Window::~Window() {
 }
 
 void Window::blank() {
-	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
-	glDisable (GL_DEPTH_TEST);
-	glDisable(GL_CULL_FACE);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable (GL_BLEND);
-	s_width = screen->w;
-	s_height = screen->h;
-	if (s_height < 0.56f * s_width) s_width = round(s_height / 0.56f);
-	if (s_height > 0.8f * s_width) s_height = round(0.8f * s_width);
-	glViewport(0.5f * (screen->w - s_width), 0.5f * (screen->h - s_height), s_width, s_height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	float h = virtH();
-	const float near = 1.5f; // This determines FOV: the value is your distance from the monitor (the unit being the width of the Performous window)
-	const float far = 100.0f; // How far away can things be seen
-	glFrustum(-0.5f, 0.5f, 0.5f * h, -0.5f * h, near, far);
 	glClear(GL_COLOR_BUFFER_BIT);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glTranslatef(0.0f, 0.0f, -near);  // So that z = 0.0f is still on monitor surface
-	/*
-	glFogi(GL_FOG_MODE, GL_LINEAR);
-	glFogf(GL_FOG_START, near);
-	glFogf(GL_FOG_END, far);
-	GLfloat color[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-	glFogfv(GL_FOG_COLOR, color);
-	glEnable(GL_FOG);
-	*/
 }
 
 void Window::swap() {
@@ -95,5 +70,33 @@ void Window::resize() {
 	SDL_GL_SetAttribute(SDL_GL_ACCUM_ALPHA_SIZE, 0);
 	screen = SDL_SetVideoMode(width, height, 0, SDL_OPENGL | SDL_RESIZABLE | (m_fullscreen ? SDL_FULLSCREEN : 0));
 	if (!screen) throw std::runtime_error(std::string("SDL_SetVideoMode failed: ") + SDL_GetError());
+
+	s_width = screen->w;
+	s_height = screen->h;
+	if (!m_fullscreen) {
+		config["graphic/window_width"].i() = s_width;
+		config["graphic/window_height"].i() = s_height;
+	}
+	if (s_height < 0.56f * s_width) s_width = round(s_height / 0.56f);
+	if (s_height > 0.8f * s_width) s_height = round(0.8f * s_width);
+	glViewport(0.5f * (screen->w - s_width), 0.5f * (screen->h - s_height), s_width, s_height);
+	// Set flags
+	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+	// Set projection
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	float h = virtH();
+	const float near = 1.5f; // This determines FOV: the value is your distance from the monitor (the unit being the width of the Performous window)
+	const float far = 100.0f; // How far away can things be seen
+	glFrustum(-0.5f, 0.5f, 0.5f * h, -0.5f * h, near, far);
+	// Set model-view matrix
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glTranslatef(0.0f, 0.0f, -near);  // So that z = 0.0f is still on monitor surface
+
 }
 
