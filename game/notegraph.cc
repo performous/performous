@@ -167,6 +167,7 @@ namespace {
 }
 
 void NoteGraph::drawWaves(std::list<Player> const& players) {
+	if (m_song.notes.empty()) return; // Cannot draw without notes
 	UseTexture tblock(m_wave);
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	for (std::list<Player>::const_iterator p = players.begin(); p != players.end(); ++p) {
@@ -196,7 +197,7 @@ void NoteGraph::drawWaves(std::list<Player> const& players) {
 			Notes::const_iterator notePrev = noteIt;
 			while (notePrev != m_song.notes.begin() && (notePrev->type == Note::SLEEP || t < notePrev->begin)) --notePrev;
 			bool hasNote = (noteIt != m_song.notes.end());
-			bool hasPrev = (notePrev->type != Note::SLEEP && t >= notePrev->begin);
+			bool hasPrev = notePrev->type != Note::SLEEP && t >= notePrev->begin;
 			double val;
 			if (hasNote && hasPrev) val = 0.5 * (noteIt->note + notePrev->note);
 			else if (hasNote) val = noteIt->note;

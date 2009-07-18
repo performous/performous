@@ -46,7 +46,6 @@ class SongParser {
 		} catch (std::runtime_error& e) {
 			throw SongParserException(e.what(), m_linenum);
 		}
-		if (s.notes.empty()) throw SongParserException("No notes", m_linenum);
 		// Adjust negative notes
 		if (m_song.noteMin <= 0) {
 			unsigned int shift = (1 - m_song.noteMin / 12) * 12;
