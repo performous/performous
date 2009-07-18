@@ -90,12 +90,10 @@ struct Stream {
 	bool consume(double duration) {
 		std::vector<int16_t> buf;
 		unsigned int samples = srate * duration;
+		if( samples == 0 ) return true;
 		mpeg.audioQueue.tryPop(buf, samples);
-		if( buf.size() == samples ) {
-			return true;
-		} else {
-			return false;
-		}
+		if( buf.size() == samples ) return true;
+		return false;
 	}
 	/// crossfades songs
 	template <typename RndIt> void playmix(RndIt outbuf, unsigned int maxSamples) {
