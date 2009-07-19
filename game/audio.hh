@@ -87,6 +87,7 @@ struct Stream {
 	void fadeout(double time) { fadeSpeed = - 1.0 / (time * srate); }
 	/// is the stream fading out
 	bool fadingout() {return fadeSpeed < 0;}
+	/// consume duration seconds of stream
 	bool consume(double duration) {
 		std::vector<int16_t> buf;
 		unsigned int samples = srate * duration;
@@ -132,6 +133,7 @@ class Audio {
 	 * @param startPos starting position
 	 */
 	void playMusic(std::string const& filename, bool preview = false, double fadeTime = 0.1, double startPos = 0.0);
+	/// plays a list of songs
 	void playMusic(std::vector<std::string> const& filenames, bool preview = false, double fadeTime = 0.1, double startPos = 0.0);
 	/** Play a preview of the song, starting at startPos
 	 * @param filename the track filename

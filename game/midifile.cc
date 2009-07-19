@@ -32,6 +32,7 @@ class MidiStream {
 		f.exceptions(std::ios::failbit);
 	}
 
+	/// read bytes
 	std::string read_bytes(size_t bytes);
 
 	class Riff {

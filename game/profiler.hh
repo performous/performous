@@ -5,12 +5,15 @@
 #include <sstream>
 #include <string>
 
+/// easy access for profiling code
 class Profiler {
 	std::ostringstream m_oss;
 	boost::xtime m_time;
   public:
+  /// create a new profiler with a given name
 	Profiler(std::string const& name): m_time(now()) { m_oss << name << ": "; }
 	~Profiler() { std::clog << m_oss.str() << std::endl; }
+	/// calling the object as a function will return the time since the start
 	void operator()(std::string const& tag) {
 		boost::xtime n = now();
 		std::swap(n, m_time);

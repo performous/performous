@@ -1,6 +1,7 @@
 #include "songparser.hh"
 
-/// @file Functions used for parsing the UltraStar TXT song format
+/// @file
+/// Functions used for parsing the UltraStar TXT song format
 
 namespace {
 	void assign(int& var, std::string const& str) {
