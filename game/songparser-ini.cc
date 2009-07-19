@@ -45,7 +45,8 @@ void SongParser::iniParse() {
 	for (MidiFileParser::Tracks::const_iterator it = midi.tracks.begin(); it != midi.tracks.end(); ++it) {
 		// Figure out the track name
 		std::string name = it->name;
-		if (midi.tracks.size() == 1) name = "GUITAR";
+		if (midi.tracks.size() == 1) name = "GUITAR"; // Original (old) FoF songs only have one track
+		else if (name == "T1 GEMS") name = "GUITAR"; // Some old MIDI files have a track named T1 GEMS
 		else if (name.substr(0, 5) != "PART ") continue;
 		else name.erase(0, 5);
 		// Process non-vocal tracks
