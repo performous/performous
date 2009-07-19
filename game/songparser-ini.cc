@@ -57,7 +57,9 @@ void SongParser::iniParse() {
 				Durations& dur = nm[it2->first];
 				MidiFileParser::Notes const& notes = it2->second;
 				for (MidiFileParser::Notes::const_iterator it3 = notes.begin(); it3 != notes.end(); ++it3) {
-					dur.push_back(Duration(midi.get_seconds(it3->begin), midi.get_seconds(it3->end)));
+					double beg = midi.get_seconds(it3->begin);
+					double end = midi.get_seconds(it3->end);
+					if (beg < end) dur.push_back(Duration(beg, end));
 				}
 			}
 			continue;

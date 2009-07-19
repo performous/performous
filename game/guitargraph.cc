@@ -21,19 +21,19 @@ void GuitarGraph::draw(double time) {
 	{ float s = dimensions.w() / 5.0f; glScalef(s, s, s); }
 	{
 		UseTexture tex(m_neck);
-		glutil::Begin block(GL_QUADS);
+		glutil::Begin block(GL_TRIANGLE_STRIP);
 		glTexCoord2f(0.0f, -(time + future)); glColor4f(1.0f, 1.0f, 1.0f, 0.0f); glVertex2f(-2.5f, time2y(future));
 		glTexCoord2f(1.0f, -(time + future)); glColor4f(1.0f, 1.0f, 1.0f, 0.0f); glVertex2f(2.5f, time2y(future));
-		glTexCoord2f(1.0f, -(time + past)); glColor4f(1.0f, 1.0f, 1.0f, 1.0f); glVertex2f(2.5f, time2y(past));
 		glTexCoord2f(0.0f, -(time + past)); glColor4f(1.0f, 1.0f, 1.0f, 1.0f); glVertex2f(-2.5f, time2y(past));
+		glTexCoord2f(1.0f, -(time + past)); glColor4f(1.0f, 1.0f, 1.0f, 1.0f); glVertex2f(2.5f, time2y(past));
 	}
 	{	
-		glutil::Begin block(GL_QUADS);
+		glutil::Begin block(GL_TRIANGLE_STRIP);
 		glColor3f(1.0f, 1.0f, 1.0f);
 		glVertex2f(-2.5f, time2y(0.01f));
 		glVertex2f(2.5f, time2y(0.01f));
-		glVertex2f(2.5f, time2y(-0.01f));
 		glVertex2f(-2.5f, time2y(-0.01f));
+		glVertex2f(2.5f, time2y(-0.01f));
 	}	
 	enum Difficulty {
 		DIFFICULTY_SUPAEASY,
@@ -67,17 +67,25 @@ void GuitarGraph::draw(double time) {
 		NoteMap::const_iterator it = nm.find(basepitch + fret);
 		if (it == nm.end()) continue;
 		Durations const& durs = it->second;
-		glutil::Begin block(GL_QUADS);
 		for (Durations::const_iterator it2 = durs.begin(); it2 != durs.end(); ++it2) {
 			float tBeg = it2->begin - time;
 			float tEnd = it2->end - time;
+			if (tEnd < past) continue;
 			if (tBeg > future) break;
+			float wEnd = 0.5f * w;
+			if (tEnd > future) {
+				// Crop the end off
+				float f = (future - tBeg) / (tEnd - tBeg);
+				wEnd = f * wEnd + (1.0f - f) * w; // Balanced average
+				tEnd = future;
+			}
+			glutil::Begin block(GL_TRIANGLE_STRIP);
+			c.a = time2a(tEnd); glColor4fv(c);
+			glVertex2f(x - wEnd, time2y(tEnd));
+			glVertex2f(x + wEnd, time2y(tEnd));
 			c.a = time2a(tBeg); glColor4fv(c);
-			glVertex2f(x - 0.5f * w, time2y(tEnd));
-			glVertex2f(x + 0.5f * w, time2y(tEnd));
-			c.a = time2a(tBeg); glColor4fv(c);
-			glVertex2f(x + w, time2y(tBeg));
 			glVertex2f(x - w, time2y(tBeg));
+			glVertex2f(x + w, time2y(tBeg));
 		}
 	}
 	glColor3f(1.0f, 1.0f, 1.0f);
