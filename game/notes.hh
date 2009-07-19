@@ -29,11 +29,16 @@ class MusicalScale {
 	double getNoteOffset(double freq) const;
 };
 
+/// stores duration of a note
 struct Duration {
-	double begin, end; ///< Beginning and ending timestamps is seconds
+	double begin, ///< beginning timestamp in seconds
+	       end;   ///< ending timestamp in seconds
 	Duration();
+	/// create a new Duration object and initialize begin and end
 	Duration(double b, double e): begin(b), end(e) {}
+	/// compares begin timestamps of two Duration structs
 	static bool ltBegin(Duration const& a, Duration const& b) { return a.begin < b.begin; }
+	/// compares end timestamps of two Duration structs
 	static bool ltEnd(Duration const& a, Duration const& b) { return a.end < b.end; }
 };
 
@@ -64,7 +69,9 @@ struct Note {
 	double maxScore() const;
 	/// score when singing
 	double score(double freq, double b, double e) const;
+	/// compares begin of two notes
 	static bool ltBegin(Note const& a, Note const& b) { return a.begin < b.begin; }
+	/// compares end of two notes
 	static bool ltEnd(Note const& a, Note const& b) { return a.end < b.end; }
   private:
 	double scoreMultiplier(double error) const;

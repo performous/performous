@@ -12,14 +12,20 @@
 
 void joysticks_init();
 
+/// joystick class used for dealing with ps3 drumsets
 class Joystick {
   public:
 	Joystick() {};
+	/// create joystick object with given id
 	Joystick(unsigned int _id);
 	~Joystick();
+	/// get name of joystick
 	std::string getName() const;
+	/// get longer description of joystick
 	std::string getDescription() const;
+	/// returns true if the button with _button_id is pressed
 	bool buttonState(unsigned char _button_id)  const;
+	/// hi-hat
 	unsigned char hat(unsigned char _hat_id) const;
 	short axe(unsigned char _axe_id) const;
 	std::pair<int, int> ball(int _ball_id) const;

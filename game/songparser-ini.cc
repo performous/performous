@@ -3,7 +3,8 @@
 #include <boost/filesystem.hpp>
 #include "midifile.hh"
 
-/// @file Functions used for parsing the UltraStar TXT song format
+/// @file
+/// Functions used for parsing the UltraStar TXT song format
 
 bool SongParser::iniCheck(std::vector<char> const& data) {
 	static const std::string header = "[song]";
