@@ -117,7 +117,7 @@ void MidiStream::Riff::seek_back(size_t o) {
 
 
 MidiFileParser::MidiFileParser(std::string name):
-  format(0), division(0)
+  format(0), division(0), ts_last(0)
 {
 	MidiStream stream(name.c_str());
 	size_t ntracks = parse_header(stream);
@@ -213,6 +213,7 @@ MidiFileParser::Track MidiFileParser::read_track(MidiStream& stream) {
 			process_midi_event(track, event >> 4, arg1, arg2, miditime);
 		}
 	}
+	if (miditime > ts_last) ts_last = miditime;
 	return track;
 }
 

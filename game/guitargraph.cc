@@ -4,6 +4,7 @@ namespace {
 	const float past = -0.3f;
 	const float future = 3.0f;
 	const float timescale = 30.0f;
+	const float texCoordStep = -0.5f; // Two beat lines per neck texture => 0.5 tex units per beat
 	// Note: t is difference from playback time so it must be in range [past, future]
 	float time2y(float t) { return -timescale * (t - past) / (future - past); }
 	float time2a(float t) { return 1.0f - t / future; } // Note: we want 1.0 alpha already at zero t.
@@ -19,22 +20,25 @@ void GuitarGraph::draw(double time) {
 	glTranslatef(0.0f, dimensions.y2(), 0.0f);
 	glRotatef(80.0f, 1.0f, 0.0f, 0.0f);
 	{ float s = dimensions.w() / 5.0f; glScalef(s, s, s); }
+	// Draw the neck
 	{
 		UseTexture tex(m_neck);
 		glutil::Begin block(GL_TRIANGLE_STRIP);
-		glTexCoord2f(0.0f, -(time + future)); glColor4f(1.0f, 1.0f, 1.0f, 0.0f); glVertex2f(-2.5f, time2y(future));
-		glTexCoord2f(1.0f, -(time + future)); glColor4f(1.0f, 1.0f, 1.0f, 0.0f); glVertex2f(2.5f, time2y(future));
-		glTexCoord2f(0.0f, -(time + past)); glColor4f(1.0f, 1.0f, 1.0f, 1.0f); glVertex2f(-2.5f, time2y(past));
-		glTexCoord2f(1.0f, -(time + past)); glColor4f(1.0f, 1.0f, 1.0f, 1.0f); glVertex2f(2.5f, time2y(past));
+		float texCoord = 0.0f;
+		float tBeg = 0.0f, tEnd;
+		for (Song::Beats::const_iterator it = m_song.beats.begin(); it != m_song.beats.end() && tBeg < future; ++it, texCoord += texCoordStep, tBeg = tEnd) {
+			tEnd = *it - time;
+			//if (tEnd < past) continue;
+			if (tEnd > future) {
+				// Crop the end off
+				texCoord -= texCoordStep * (tEnd - future) / (tEnd - tBeg);
+				tEnd = future;
+			}
+			glColor4f(1.0f, 1.0f, 1.0f, time2a(tEnd));
+			glTexCoord2f(0.0f, texCoord); glVertex2f(-2.5f, time2y(tEnd));
+			glTexCoord2f(1.0f, texCoord); glVertex2f(2.5f, time2y(tEnd));
+		}
 	}
-	{	
-		glutil::Begin block(GL_TRIANGLE_STRIP);
-		glColor3f(1.0f, 1.0f, 1.0f);
-		glVertex2f(-2.5f, time2y(0.01f));
-		glVertex2f(2.5f, time2y(0.01f));
-		glVertex2f(-2.5f, time2y(-0.01f));
-		glVertex2f(2.5f, time2y(-0.01f));
-	}	
 	enum Difficulty {
 		DIFFICULTY_SUPAEASY,
 		DIFFICULTY_EASY,
@@ -59,6 +63,7 @@ void GuitarGraph::draw(double time) {
 		glutil::Color(0.0f, 0.0f, 1.0f),
 		glutil::Color(1.0f, 0.5f, 0.0f)
 	};
+	// Draw the notes
 	NoteMap const& nm = m_song.tracks.begin()->second;
 	for (int fret = 0; fret < 5; ++fret) {
 		float x = -2.0f + fret;
@@ -89,4 +94,13 @@ void GuitarGraph::draw(double time) {
 		}
 	}
 	glColor3f(1.0f, 1.0f, 1.0f);
+	// Draw the cursor
+	{	
+		glutil::Begin block(GL_TRIANGLE_STRIP);
+		glVertex2f(-2.5f, time2y(0.01f));
+		glVertex2f(2.5f, time2y(0.01f));
+		glVertex2f(-2.5f, time2y(-0.01f));
+		glVertex2f(2.5f, time2y(-0.01f));
+	}	
 }
+

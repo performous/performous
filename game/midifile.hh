@@ -86,6 +86,7 @@ class MidiFileParser{
 
 	/** Ticks per beat == number of divisions per every quarter note **/
 	uint16_t division;
+	uint32_t ts_last;
   private:
 	std::string m_lyric;
 };
