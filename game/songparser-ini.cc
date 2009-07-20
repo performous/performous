@@ -42,7 +42,7 @@ void SongParser::iniParse() {
 	testAndAdd(s, "drums.ogg");
 	testAndAdd(s, "vocals.ogg");
 	MidiFileParser midi(s.path + "/notes.mid");
-	for (uint32_t ts = 0; ts <= midi.ts_last; ts += midi.division) s.beats.push_back(midi.get_seconds(ts));
+	for (uint32_t ts = 0, end = midi.ts_last + midi.division; ts < end; ts += midi.division) s.beats.push_back(midi.get_seconds(ts));
 	for (MidiFileParser::Tracks::const_iterator it = midi.tracks.begin(); it != midi.tracks.end(); ++it) {
 		// Figure out the track name
 		std::string name = it->name;
