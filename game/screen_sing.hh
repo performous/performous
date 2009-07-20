@@ -102,5 +102,6 @@ class ScreenSing: public Screen {
 	Notes::const_iterator m_lyricit;
 	std::deque<LyricRow> m_lyrics;
 	AnimValue m_quitTimer;
+	AnimValue m_startTimer;
 };
 

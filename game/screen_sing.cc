@@ -16,6 +16,7 @@ namespace {
 void ScreenSing::enter() {
 	Song& song = m_songs.current();
 	m_audio.playMusic(song.music);
+	m_audio.togglePause(); // Pause it for startup countdown
 	theme.reset(new ThemeSing());
 	if (!song.background.empty()) {
 		try {
@@ -37,6 +38,8 @@ void ScreenSing::enter() {
 	m_engine.reset(new Engine(m_audio, m_songs.current(), analyzers.begin(), analyzers.end()));
 	m_noteGraph.reset(new NoteGraph(song));
 	if (song.music.size() > 1) m_guitarGraph.reset(new GuitarGraph(song));
+	m_startTimer.setTarget(0.0);
+	m_startTimer.setValue(3.0);
 }
 
 void ScreenSing::exit() {
@@ -119,8 +122,15 @@ void ScreenSing::draw() {
 	Song& song = m_songs.current();
 	// Get the time in the song
 	double length = m_audio.getLength();
-	double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
-	double songPercent = time / length;
+	double time = -m_startTimer.get();
+	if (time == 0.0 || !m_audio.isPaused()) {
+		if (m_audio.isPaused()) m_audio.togglePause();
+		m_startTimer.setTarget(-1.0);
+		m_startTimer.setValue(-1.0);
+	}
+	if (time >= 0.0) time = m_audio.getPosition();
+	time -= config["audio/video_delay"].f();
+	double songPercent = clamp(time / length);
 
 	// Rendering starts
 	{
@@ -173,8 +183,9 @@ void ScreenSing::draw() {
 
 	// Compute and draw the timer and the progressbar
 	{
+		unsigned t = clamp(time, 0.0, length);
 		m_progress->draw(songPercent);
-		std::string statustxt = (boost::format("%02u:%02u") % (unsigned(time) / 60) % (unsigned(time) % 60)).str();
+		std::string statustxt = (boost::format("%02u:%02u") % (t / 60) % (t % 60)).str();
 		if (!m_score_window.get()) {
 			if (status == Song::INSTRUMENTAL_BREAK) statustxt += "   ENTER to skip instrumental break";
 			if (status == Song::FINISHED && !config["game/karaoke_mode"].b()) statustxt += "   Remember to wait for grading!";
@@ -197,7 +208,7 @@ void ScreenSing::draw() {
 		}
 	}
 		
-	if (m_audio.isPaused()) {
+	if (time > 0.0 && m_audio.isPaused()) {
 		m_pause_icon->dimensions.middle().center().fixedWidth(.25);
 		m_pause_icon->draw();
 	}
