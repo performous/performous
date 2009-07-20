@@ -15,9 +15,9 @@ GuitarGraph::GuitarGraph(Song const& song): m_song(song), m_neck("guitarneck.svg
 void GuitarGraph::draw(double time) {
 	if (m_song.tracks.empty()) return; // Can't render without tracks (FIXME: actually screen_song should choose a track for us)
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
-	dimensions.screenBottom().fixedWidth(0.5f);
+	dimensions.screenBottom().fixedWidth(0.5f).left(-0.5f);
 	glutil::PushMatrix pmb;
-	glTranslatef(0.0f, dimensions.y2(), 0.0f);
+	glTranslatef(0.5 * (dimensions.x1() + dimensions.x2()), dimensions.y2(), 0.0f);
 	glRotatef(80.0f, 1.0f, 0.0f, 0.0f);
 	{ float s = dimensions.w() / 5.0f; glScalef(s, s, s); }
 	// Draw the neck
