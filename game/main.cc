@@ -59,6 +59,10 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 				config["graphic/fullscreen"].b() = !config["graphic/fullscreen"].b();
 				continue; // Already handled here...
 			}
+			if (keypressed == SDLK_F4 && modifier & KMOD_ALT) {
+				sm.finished();
+				continue; // Already handled here...
+			}
 			break;
 		}
 		sm.getCurrentScreen()->manageEvent(event);
