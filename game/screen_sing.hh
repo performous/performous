@@ -3,6 +3,7 @@
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <deque>
+#include "layout_singer.hh"
 #include "animvalue.hh"
 #include "engine.hh"
 #include "guitargraph.hh"
@@ -32,44 +33,6 @@ class ScoreWindow {
 	std::string m_rank;
 };
 
-/// handles songlyrics
-class LyricRow {
-  public:
-	AnimValue extraspacing; ///< extraspacing for lyrics (used when the previous line is removed)
-	AnimValue fade; ///< fade
-	/// iterator
-	typedef Notes::const_iterator Iterator;
-	/// constructor
-	LyricRow(Iterator& it, Iterator const& eof): extraspacing(0.0, 2.0), fade(0.0, 0.6) {
-		fade.setTarget(1.0);
-		m_begin = it;
-		while (it != eof && it->type != Note::SLEEP) ++it;
-		m_end = it;
-		if (it != eof) ++it;
-		if (m_begin == m_end) throw std::logic_error("Empty sentence");
-	}
-	/// lyric expired?
-	bool expired(double time) const {
-		double lastTime = 0.0;
-		for (Iterator it = m_begin; it != m_end; ++it) lastTime = it->end;
-		return time > lastTime;
-	}
-	/// draw/print lyrics
-	void draw(SvgTxtTheme& txt, double time, double pos) const {
-		std::vector<TZoomText> sentence;
-		for (Iterator it = m_begin; it != m_end; ++it) {
-			sentence.push_back(TZoomText(it->syllable));
-			bool current = (time >= it->begin && time < it->end);
-			sentence.back().factor = current ? 1.2 - 0.2 * (time - it->begin) / (it->end - it->begin) : 1.0;
-		}
-		txt.dimensions.screenBottom(pos);
-		txt.draw(sentence, fade.get());
-	}
-
-  private:
-	Iterator m_begin, m_end;
-};
-
 /// class for actual singing screen
 class ScreenSing: public Screen {
   public:
@@ -83,7 +46,7 @@ class ScreenSing: public Screen {
 	void draw();
 
   private:
-	void drawNonKaraoke(double time);
+	void drawScores();
 	Audio& m_audio;
 	Songs& m_songs;  // TODO: take song instead of all of them
 	boost::scoped_ptr<ScoreWindow> m_score_window;
@@ -93,14 +56,12 @@ class ScreenSing: public Screen {
 	boost::scoped_ptr<Video> m_video;
 	boost::scoped_ptr<Surface> m_pause_icon;
 	boost::scoped_ptr<Surface> m_player_icon;
-	boost::scoped_ptr<SvgTxtThemeSimple> m_score_text[2];
+	boost::scoped_ptr<SvgTxtThemeSimple> m_score_text[4];
 	boost::scoped_ptr<Engine> m_engine;
-	boost::scoped_ptr<NoteGraph> m_noteGraph;
+	boost::scoped_ptr<LayoutSinger> m_layout_singer;
 	boost::scoped_ptr<GuitarGraph> m_guitarGraph;
 	double m_latencyAV;  // Latency between audio and video output (do not confuse with latencyAR)
 	boost::scoped_ptr<ThemeSing> theme;
-	Notes::const_iterator m_lyricit;
-	std::deque<LyricRow> m_lyrics;
 	AnimValue m_quitTimer;
 	AnimValue m_startTimer;
 };

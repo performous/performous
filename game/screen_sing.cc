@@ -29,14 +29,15 @@ void ScreenSing::enter() {
 	m_pause_icon.reset(new Surface(getThemePath("sing_pause.svg")));
 	m_score_text[0].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_score_text[1].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
+	m_score_text[2].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
+	m_score_text[3].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_player_icon.reset(new Surface(getThemePath("sing_pbox.svg")));
 	m_progress.reset(new ProgressBar(getThemePath("sing_progressbg.svg"), getThemePath("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01f, 0.01f, true));
 	m_progress->dimensions.fixedWidth(0.4).left(-0.5).screenTop();
 	theme->timer.dimensions.screenTop(0.5 * m_progress->dimensions.h());
-	m_lyricit = song.notes.begin();
 	boost::ptr_vector<Analyzer>& analyzers = m_capture.analyzers();
 	m_engine.reset(new Engine(m_audio, m_songs.current(), analyzers.begin(), analyzers.end()));
-	m_noteGraph.reset(new NoteGraph(song));
+	m_layout_singer.reset(new LayoutSinger(m_songs, *m_engine, *theme));
 	if (song.music.size() > 1) m_guitarGraph.reset(new GuitarGraph(song));
 	m_startTimer.setTarget(0.0);
 	m_startTimer.setValue(3.0);
@@ -44,9 +45,8 @@ void ScreenSing::enter() {
 
 void ScreenSing::exit() {
 	m_score_window.reset();
-	m_lyrics.clear();
 	m_guitarGraph.reset();
-	m_noteGraph.reset();
+	m_layout_singer.reset();
 	m_engine.reset();
 	m_pause_icon.reset();
 	m_player_icon.reset();
@@ -54,6 +54,8 @@ void ScreenSing::exit() {
 	m_background.reset();
 	m_score_text[0].reset();
 	m_score_text[1].reset();
+	m_score_text[2].reset();
+	m_score_text[3].reset();
 	theme.reset();
 }
 
@@ -74,7 +76,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		if (m_score_window.get()) return;
 		// The rest are only available when score window is not displayed
 		if (key == SDLK_RETURN && status == Song::INSTRUMENTAL_BREAK) {
-			double diff = m_lyricit->begin - 3.0 - time;
+			double diff = m_layout_singer->lyrics_begin() - 3.0 - time;
 			if (diff > 0.0) m_audio.seek(diff);
 		}
 		else if (key == SDLK_F4) m_audio.toggleSynth(m_songs.current().notes);
@@ -95,8 +97,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		}
 		// Some things must be reset after seeking backwards
 		if (seekback) {
-			m_lyricit = m_songs.current().notes.begin();
-			m_lyrics.clear();
+			m_layout_singer->reset();
 		}
 	}
 }
@@ -150,34 +151,9 @@ void ScreenSing::draw() {
 	}
 
 	if (m_guitarGraph.get()) m_guitarGraph->draw(time);
-	
-	if (!config["game/karaoke_mode"].b()) drawNonKaraoke(time);
 
-	// Compute and draw lyrics
-	{
-		const double basepos = -0.1;
-		const double linespacing = 0.06;
-		bool dirty;
-		do {
-			dirty = false;
-			if (!m_lyrics.empty() && m_lyrics[0].expired(time)) {
-				// Add extra spacing to replace the removed row
-				if (m_lyrics.size() > 1) m_lyrics[1].extraspacing.move(m_lyrics[0].extraspacing.get() + 1.0);
-				m_lyrics.pop_front();
-				dirty = true;
-			}
-			if (!dirty && m_lyricit != song.notes.end() && m_lyricit->begin < time + 4.0) {
-				m_lyrics.push_back(LyricRow(m_lyricit, song.notes.end()));
-				dirty = true;
-			}
-		} while (dirty);
-		double pos = basepos;
-		for (size_t i = 0; i < m_lyrics.size(); ++i, pos += linespacing) {
-			pos += m_lyrics[i].extraspacing.get() * linespacing;
-			if (i == 0) m_lyrics[0].draw(theme->lyrics_now, time, pos);
-			else if (i == 1) m_lyrics[1].draw(theme->lyrics_next, time, pos);
-		}
-	}
+	m_layout_singer->draw(time);
+	if (!config["game/karaoke_mode"].b()) drawScores(); // draw score if not in karaoke mode
 
 	Song::Status status = song.status(time);
 
@@ -214,10 +190,8 @@ void ScreenSing::draw() {
 	}
 }
 
-void ScreenSing::drawNonKaraoke(double time) {
+void ScreenSing::drawScores() {
 	std::list<Player> const& players = m_engine->getPlayers();
-	m_noteGraph->draw(time, players); // Draw notes and pitch waves
-
 	// Score display
 	{
 		unsigned int i = 0;
@@ -227,9 +201,9 @@ void ScreenSing::drawNonKaraoke(double time) {
 			glColor4f(p->m_color.r, p->m_color.g, p->m_color.b,act);
 			m_player_icon->dimensions.left(-0.5 + 0.01 + 0.25 * i).fixedWidth(0.075).screenTop(0.055);
 			m_player_icon->draw();
-			m_score_text[i%2]->render((boost::format("%04d") % p->getScore()).str());
-			m_score_text[i%2]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.075).screenTop(0.055);
-			m_score_text[i%2]->draw();
+			m_score_text[i%4]->render((boost::format("%04d") % p->getScore()).str());
+			m_score_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.075).screenTop(0.055);
+			m_score_text[i%4]->draw();
 			glColor4f(1.0, 1.0, 1.0, 1.0);
 		}
 	}
