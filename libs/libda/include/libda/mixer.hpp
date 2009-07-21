@@ -9,6 +9,7 @@ Link with libda when you use this.
 
 #include "audio.hpp"
 #include <boost/scoped_ptr.hpp>
+#include <boost/thread/mutex.hpp>
 #include <algorithm>
 
 namespace da {
@@ -25,21 +26,28 @@ namespace da {
 		return shared_reference_wrapper<T>(ptr);
 	}
 
-	class chain {
+	class chain: boost::noncopyable {
+		typedef std::vector<callback_t> streams_t;
 	  public:
 		chain() {}
-		chain(callback_t const& cb): streams(1, cb) {}
-		typedef std::vector<callback_t> streams_t;
-		streams_t streams;
+		chain(callback_t const& cb): m_streams(1, cb) {}
+		void add(callback_t const& cb) {
+			boost::mutex::scoped_lock l(m_mutex);
+			m_streams.push_back(cb);
+		}
+		/** Calls every scream in the chain and removes those that return false. **/
 		bool operator()(pcm_data& data, settings const& s) {
-			streams_t::iterator wr = streams.begin();
-			for (streams_t::iterator it = wr; it != streams.end(); ++it) {
+			boost::mutex::scoped_lock l(m_mutex);
+			streams_t::iterator wr = m_streams.begin();
+			for (streams_t::iterator it = wr; it != m_streams.end(); ++it) {
 				if ((*it)(data, s)) *wr++ = *it;
 			}
-			streams.erase(wr);
-			return !streams.empty();
+			if (wr != m_streams.end()) m_streams.erase(wr);
+			return !m_streams.empty();
 		}
 	  private:
+		streams_t m_streams;
+		boost::mutex m_mutex;
 	};
 
 	namespace {
@@ -49,7 +57,7 @@ namespace da {
 		}
 	}
 
-	class buffer {
+	class buffer: boost::noncopyable {
 	  public:
 		explicit buffer(size_t s): m_data(s) {}
 		sample_t* begin() { return &m_data[0]; }
@@ -58,7 +66,7 @@ namespace da {
 		std::vector<sample_t> m_data;
 	};
 
-	class stream {
+	class stream: boost::noncopyable {
 	  public:
 		bool operator()(pcm_data& data, settings const&) {
 			sample_t* b = m_buffer->begin();
@@ -79,9 +87,10 @@ namespace da {
 	  public:
 		mixer(settings s = settings()):
 		  m_chain(zero),
-		  m_settings(s.set_callback(m_chain)),
+		  m_settings(s.set_callback(boost::ref(m_chain))),
 		  m_playback(m_settings)
 		{}
+		void add(callback_t const& cb) { m_chain.add(cb); }
 	  private:
 		chain m_chain;
 		settings m_settings;

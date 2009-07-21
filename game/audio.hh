@@ -125,7 +125,7 @@ class Audio {
 	/** Takes libda devstr and sample rate. Throws if the device fails. **/
 	void open(std::string const& pdev, std::size_t rate, std::size_t frames);
 	/// if audio is currently playing
-	bool isOpen() const { return m_playback; }
+	bool isOpen() const { return m_mixer; }
 	/** Play a song beginning at startPos (defaults to 0)
 	 * @param filename the track filename
 	 * @param preview if the song preview is to play
@@ -178,7 +178,7 @@ class Audio {
 	bool m_need_resync;
 	Notes const* volatile m_notes;
 	da::settings m_rs;
-	boost::scoped_ptr<da::playback> m_playback;
+	boost::scoped_ptr<da::mixer> m_mixer;
 	boost::ptr_map<std::string, AudioSample> m_samples;
 };
 

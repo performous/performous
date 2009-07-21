@@ -16,15 +16,15 @@ Audio::Audio():
 {}
 
 void Audio::open(std::string const& pdev, std::size_t rate, std::size_t frames) {
-	m_playback.reset();
+	m_mixer.reset();
 	stopMusic();
 	m_rs = da::settings(pdev)
-	  .set_callback(boost::ref(*this))
 	  .set_channels(2)
 	  .set_rate(rate)
 	  .set_frames(frames)
 	  .set_debug(std::cerr);
-	m_playback.reset(new da::playback(m_rs));
+	m_mixer.reset(new da::mixer(m_rs));
+	m_mixer->add(boost::ref(*this));
 }
 
 bool Audio::operator()(da::pcm_data& areas, da::settings const&) {
