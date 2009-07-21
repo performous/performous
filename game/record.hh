@@ -22,10 +22,11 @@ class Capture {
 				if (c.m_analyzers.size() < 4) c.m_analyzers.push_back(m_channels[ch] = new Analyzer(m_settings.rate()));
 			}
 		}
-		void operator()(da::pcm_data& areas, da::settings const&) {
+		bool operator()(da::pcm_data& areas, da::settings const&) {
 			for(std::size_t ch = 0; ch < m_channels.size(); ++ch) {
 				if (m_channels[ch]) m_channels[ch]->input(areas.begin(ch), areas.end(ch));
 			}
+			return true;
 		}
 	}; // Device
 	boost::ptr_vector<Analyzer> m_analyzers;  // This must come before the devices for correct destruction order

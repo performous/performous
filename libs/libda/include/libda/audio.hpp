@@ -41,12 +41,12 @@ namespace da {
 	/** Provides various access iterators to a multich interleaved sample buffer. **/
 	class pcm_data {
 	  public:
-		sample_t* m_buf;
+		sample_t* rawbuf;
 		const std::size_t frames;
 		const std::size_t channels;
-		pcm_data(sample_t* buf, std::size_t _frames, std::size_t _channels): m_buf(buf), frames(_frames), channels(_channels) {}
-		sample_t& operator()(std::size_t frame, std::size_t channel) { return m_buf[frame * channels + channel]; }
-		sample_t& operator[](std::size_t idx) { return m_buf[idx]; }
+		pcm_data(sample_t* buf, std::size_t _frames, std::size_t _channels): rawbuf(buf), frames(_frames), channels(_channels) {}
+		sample_t& operator()(std::size_t frame, std::size_t channel) { return rawbuf[frame * channels + channel]; }
+		sample_t& operator[](std::size_t idx) { return rawbuf[idx]; }
 		class iter_by_ch: public std::iterator<std::random_access_iterator_tag, sample_t> {
 			sample_t* m_buf;
 			std::size_t m_pos;
@@ -60,13 +60,15 @@ namespace da {
 			std::ptrdiff_t operator-(iter_by_ch const& rhs) const { return (m_pos - rhs.m_pos) / m_channels; }
 			// TODO: more operators
 		};
-		iter_by_ch begin(std::size_t ch) { return iter_by_ch(m_buf, ch, channels); }
-		iter_by_ch end(std::size_t ch) { return iter_by_ch(m_buf, ch, channels) + frames; }
+		iter_by_ch begin(std::size_t ch) { return iter_by_ch(rawbuf, ch, channels); }
+		iter_by_ch end(std::size_t ch) { return iter_by_ch(rawbuf, ch, channels) + frames; }
 	};
 
 	struct settings;
 	class pcm_data;
-	typedef boost::function<void (pcm_data& it, settings const&)> callback_t;
+	
+	/** The callback functor typedef. If the function returns false, it will be removed from the processing chain. **/
+	typedef boost::function<bool (pcm_data& it, settings const&)> callback_t;
 
 	struct settings {
 		static const std::size_t low;

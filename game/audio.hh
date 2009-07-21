@@ -9,7 +9,7 @@
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/recursive_mutex.hpp>
-#include <libda/audio.hpp>
+#include <libda/mixer.hpp>
 
 using boost::int16_t;
 
@@ -162,7 +162,7 @@ class Audio {
 	double getPosition() const;
 	void operator()(); ///< Thread runs here, don't call directly
 	/// callback for the audio backend (libda)
-	void operator()(da::pcm_data& areas, da::settings const&);
+	bool operator()(da::pcm_data& areas, da::settings const&);
 	/// pauses and unpauses playback
 	void togglePause() { m_paused = !m_paused; }
 	/// toggles synth playback (F4)

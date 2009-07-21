@@ -27,11 +27,11 @@ void Audio::open(std::string const& pdev, std::size_t rate, std::size_t frames) 
 	m_playback.reset(new da::playback(m_rs));
 }
 
-void Audio::operator()(da::pcm_data& areas, da::settings const&) {
+bool Audio::operator()(da::pcm_data& areas, da::settings const&) {
 	boost::recursive_mutex::scoped_lock l(m_mutex);
 	std::size_t samples = areas.channels * areas.frames;
 	static double phase = 0.0;
-	std::fill(areas.m_buf, areas.m_buf + samples, 0.0f);
+	std::fill(areas.rawbuf, areas.rawbuf + samples, 0.0f);
 	if (!m_paused) {
 		if(m_need_resync) {
 			std::cout << "Audio need to be synched here" << std::endl;
@@ -61,13 +61,13 @@ void Audio::operator()(da::pcm_data& areas, da::settings const&) {
 			m_need_resync = false;
 		}
 		for (Streams::iterator it = m_streams.begin(); it != m_streams.end();) {
-			it->playmix(areas.m_buf, samples);
+			it->playmix(areas.rawbuf, samples);
 			if (it->fade <= 0.0) { it = m_streams.erase(it); continue; }
 			++it;
 		}
 	}
 	for (boost::ptr_map<std::string, AudioSample>::iterator it = m_samples.begin(); it != m_samples.end();++it) {
-		it->second->playmix(areas.m_buf, samples);
+		it->second->playmix(areas.rawbuf, samples);
 	}
 	// Synthesize tones
 	Notes const* n = m_notes;
@@ -75,8 +75,8 @@ void Audio::operator()(da::pcm_data& areas, da::settings const&) {
 		double t = getPosition();
 		Notes::const_iterator it = n->begin();
 		while (it != n->end() && it->end < t) ++it;
-		for (size_t i = 0; i < samples; ++i) areas.m_buf[i] *= 0.3; // Decrease music volume
-		if (it == n->end() || it->type == Note::SLEEP || it->begin > t) { phase = 0.0; return; }
+		for (size_t i = 0; i < samples; ++i) areas.rawbuf[i] *= 0.3; // Decrease music volume
+		if (it == n->end() || it->type == Note::SLEEP || it->begin > t) { phase = 0.0; return true; }
 		int n = it->note % 12;
 		double d = (n + 1) / 13.0;
 		double freq = MusicalScale().getNoteFreq(n + 12);
@@ -87,9 +87,10 @@ void Audio::operator()(da::pcm_data& areas, da::settings const&) {
 				value = d * 0.2 * std::sin(phase) + 0.2 * std::sin(2 * phase) + (1.0 - d) * 0.2 * std::sin(4 * phase);
 				phase += 2.0 * M_PI * freq / m_rs.rate();
 			}
-			areas.m_buf[i] += value;
+			areas.rawbuf[i] += value;
 		}
 	}
+	return true;
 }
 
 void Audio::playMusic(std::vector<std::string> const& filenames, bool preview, double fadeTime, double startPos) {
