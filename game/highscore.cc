@@ -5,10 +5,18 @@
 
 #include <fstream>
 #include <sstream>
+#include <algorithm>
 
 HighScore::HighScore (std::string const& path_, std::string const& filename_) :
 	m_path(path_),
-	m_filename(filename_)
+	m_filename(filename_),
+	m_scores(m_maxEntries)
+{}
+
+HighScore::~HighScore()
+{}
+
+void HighScore::load()
 {
 	std::ifstream in((m_path + m_filename).c_str());
 
@@ -26,7 +34,7 @@ HighScore::HighScore (std::string const& path_, std::string const& filename_) :
 	std::stringstream ss;
 	ss.write(&data[0], size);
 
-	convertToUTF8(ss, m_path + m_filename);
+	// XXX convertToUTF8(ss, m_path + m_filename);
 
 	// now parse line by line and build up highscore
 	std::string str;
@@ -49,8 +57,7 @@ HighScore::HighScore (std::string const& path_, std::string const& filename_) :
 
 		std::string name = str.substr(9, str.length()-9);
 		if (name.empty()) throw HighScoreException("Did not find name", linenum);
-		std::cout << "name: " << name << std::endl;
-		m_names.push_back(name);
+		m_scores[playernum].name = name;
 
 		std::getline(ss, str);
 		linenum++;
@@ -64,34 +71,72 @@ HighScore::HighScore (std::string const& path_, std::string const& filename_) :
 		if (nr != playernum + '0') throw HighScoreException("Did not find correct playernum", linenum);
 		if (str[7] != ':') throw HighScoreException("Did not find :", linenum);
 
-		std::string score = str.substr(8, str.length()-8);
-		if (score.empty()) throw HighScoreException("Did not find score", linenum);
-		std::cout << "score: " << score << std::endl;
+		std::string sscore = str.substr(8, str.length()-8);
+		if (sscore.empty()) throw HighScoreException("Did not find score", linenum);
 
 		try {
-			double dscore = boost::lexical_cast<int>(score) / 10000.0;
-			if (dscore < 0.0 || dscore > 1.0) throw HighScoreException("Number not between 0 and 10000", linenum);
-			if (playernum>0 && m_scores.back() < dscore) throw HighScoreException("Lower ranked highscore is higher", linenum);
-			m_scores.push_back(dscore);
+			double score = boost::lexical_cast<int>(sscore) / 10000.0;
+			if (score < 0.0 || score > 1.0) throw HighScoreException("Number not between 0 and 10000", linenum);
+			if (playernum>0 && m_scores[playernum-1].score < score) throw HighScoreException("Lower ranked highscore is higher", linenum);
+			m_scores[playernum].score = score;
 		} catch (boost::bad_lexical_cast const& blc)
 		{
 			throw HighScoreException("Did not find valid double number", linenum);
 		}
 
+
 		playernum++;
 	}
 }
 
-HighScore::~HighScore()
-{}
+void HighScore::save()
+{
+	std::ofstream out ((m_path + m_filename).c_str());
+
+	if (!out.is_open()) throw HighScoreException("Could not open file for writing", 0);
+
+	out.exceptions ( std::ofstream::eofbit | std::ofstream::failbit | std::ofstream::badbit );
+	for (size_t i=0; i<m_scores.size();i++)
+	{
+		try {
+			out << "#PLAYER" << i << ":"
+			  << m_scores[i].name << std::endl;
+			out << "#SCORE" << i << ":"
+			  << m_scores[i].score*10000 << std::endl;
+		} catch (std::ofstream::failure const&) {
+			throw HighScoreException("Unexpected I/O error", i);
+		}
+	}
+	out << "E" << std::endl;
+}
+
+void HighScore::addNewHighscore(std::string name, double score)
+{
+	HighScoreItem hsi;
+	hsi.name = name;
+	hsi.score = score;
+
+	m_scores.push_back(hsi);
+	std::sort(m_scores.begin(), m_scores.end());
+
+	m_scores.resize(m_maxEntries); // throw away worst score
+}
 
 /*
-#include <iostream> // TODO debug
+#include <iostream>
 
 int main()
 {
 	try {
 		HighScore hi ("", "highscore.txt");
+		hi.load();
+		double new_score = 0.9;
+		if (hi.reachedNewHighscore(new_score))
+		{
+			std::cout << "Reached new highscore" << std::endl;
+			hi.addNewHighscore("new player", new_score);
+		}
+		hi.save();
 	} catch (HighScoreException const& hie)
 	{
 		std::cerr << "Exception: " << hie.what()
