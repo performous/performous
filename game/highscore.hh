@@ -20,7 +20,7 @@ struct HighScoreException: public std::runtime_error {
   single item of a highscore.*/
 struct HighScoreItem {
 	std::string name;
-	double score;
+	int score;
 	// std::string song;
 
 	/**Operator for sorting by score.*/
@@ -40,15 +40,18 @@ class HighScore {
 	void save();
 
 	/**Check if you reached a new highscore.
+	  @param score is a value between 0 and 10000
+	    values below 500 will lead to returning false
 	  @return true if the score make it into the top.
 	  @return false if addNewHighscore does not make sense
 	    for that score.*/
-	bool reachedNewHighscore(double score)
+	bool reachedNewHighscore(int score)
 	{
-		return score > m_scores.back().score;
+		if (score < 500) return false;
+		return score > m_scores[2].score;
 	}
 	/**Add a new entry to the highscore.*/
-	void addNewHighscore(std::string name, double score);
+	void addNewHighscore(std::string name, int score);
   private:
 	static const int m_maxEntries = 10;
 	std::string m_path;

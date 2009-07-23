@@ -74,15 +74,16 @@ void HighScore::load()
 		std::string sscore = str.substr(8, str.length()-8);
 		if (sscore.empty()) throw HighScoreException("Did not find score", linenum);
 
+		int score = 0;
 		try {
-			double score = boost::lexical_cast<int>(sscore) / 10000.0;
-			if (score < 0.0 || score > 1.0) throw HighScoreException("Number not between 0 and 10000", linenum);
-			if (playernum>0 && m_scores[playernum-1].score < score) throw HighScoreException("Lower ranked highscore is higher", linenum);
-			m_scores[playernum].score = score;
+			score = boost::lexical_cast<int>(sscore);
 		} catch (boost::bad_lexical_cast const& blc)
 		{
-			throw HighScoreException("Did not find valid double number", linenum);
+			throw HighScoreException("Did not find valid int number", linenum);
 		}
+		if (score < 0 || score > 10000) throw HighScoreException("Number not between 0 and 10000", linenum);
+		if (playernum>0 && m_scores[playernum-1].score < score) throw HighScoreException("Lower ranked highscore is higher", linenum);
+		m_scores[playernum].score = score;
 
 
 		playernum++;
@@ -98,11 +99,13 @@ void HighScore::save()
 	out.exceptions ( std::ofstream::eofbit | std::ofstream::failbit | std::ofstream::badbit );
 	for (size_t i=0; i<m_scores.size();i++)
 	{
+		if (m_scores[i].score <= 0) break; // maybe change to 500?
+
 		try {
 			out << "#PLAYER" << i << ":"
 			  << m_scores[i].name << std::endl;
 			out << "#SCORE" << i << ":"
-			  << m_scores[i].score*10000 << std::endl;
+			  << m_scores[i].score << std::endl;
 		} catch (std::ofstream::failure const&) {
 			throw HighScoreException("Unexpected I/O error", i);
 		}
@@ -110,7 +113,7 @@ void HighScore::save()
 	out << "E" << std::endl;
 }
 
-void HighScore::addNewHighscore(std::string name, double score)
+void HighScore::addNewHighscore(std::string name, int score)
 {
 	HighScoreItem hsi;
 	hsi.name = name;
@@ -130,7 +133,7 @@ int main()
 	try {
 		HighScore hi ("", "highscore.txt");
 		hi.load();
-		double new_score = 0.9;
+		int new_score = 9000;
 		if (hi.reachedNewHighscore(new_score))
 		{
 			std::cout << "Reached new highscore" << std::endl;
