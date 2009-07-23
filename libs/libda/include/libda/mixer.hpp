@@ -92,7 +92,7 @@ namespace da {
 
 	class fadeout: boost::noncopyable {
 	  public:
-		fadeout(callback_t stream, double time = 1.0): m_stream(stream), m_pos(), m_time(time) { std::cerr << "fadeout" << std::endl; }
+		fadeout(callback_t stream, double time = 1.0): m_stream(stream), m_pos(), m_time(time) {}
 		bool operator()(pcm_data& data) {
 			bool ret = m_stream(data);
 			size_t end = m_time * data.rate;
@@ -151,7 +151,7 @@ namespace da {
 			if (m_chain.streams.size() == 1) return;
 			std::auto_ptr<chain> ch(new chain());
 			ch->streams = chain::streams_t(m_chain.streams.begin() + 1, m_chain.streams.end());
-			m_chain.streams.erase(m_chain.streams.begin() + 1);
+			m_chain.streams.erase(m_chain.streams.begin() + 1, m_chain.streams.end());
 			m_chain.add(shared_ref(new fadeout(shared_ref(ch.release()), time)));
 		}
 		settings get_settings() { return m_settings; }
