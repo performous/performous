@@ -40,25 +40,23 @@ struct AudioSample {
 		offset = 0;
 	}
 	/** plays and mixes samples
-	 * @param outbuf output buffer
-	 * @param maxSamples maximum number of samples
 	 */
-	template <typename RndIt> void playmix(RndIt outbuf, unsigned int maxSamples) {
-		if( offset >= sample.size() ) {
-			// we are at the end, nothing to do
-			return;
-		} else if( sample.size() - offset < maxSamples ) {
+	bool operator()(da::pcm_data& data) {
+		std::size_t maxSamples = data.channels * data.frames;
+		if( offset >= sample.size() ) return false;
+		if( sample.size() - offset < maxSamples ) {
 			// not enough data in sample
 			for (size_t i = offset; i < sample.size(); ++i) {
-				outbuf[i-offset] += da::conv_from_s16(sample[i]);
+				data.rawbuf[i-offset] += da::conv_from_s16(sample[i]);
 			}
 			offset = sample.size();
 		} else {
 			for (size_t i = offset; i < offset + maxSamples; ++i) {
-				outbuf[i-offset] += da::conv_from_s16(sample[i]);
+				data.rawbuf[i-offset] += da::conv_from_s16(sample[i]);
 			}
 			offset += maxSamples;
 		}
+		return true;
 	}
 };
 
@@ -97,9 +95,10 @@ struct Stream {
 		return false;
 	}
 	/// crossfades songs
-	template <typename RndIt> void playmix(RndIt outbuf, unsigned int maxSamples) {
+	bool operator()(da::pcm_data& data) {
+		std::size_t maxSamples = data.channels * data.frames;
 		if (prebuffering && mpeg.audioQueue.percentage() > 0.9) prebuffering = false;
-		if (prebuffering) return;
+		if (prebuffering) return true;
 		std::vector<int16_t> buf;
 		mpeg.audioQueue.tryPop(buf, maxSamples);
 		bool fadeMin = false, fadeMax = false;
@@ -108,13 +107,14 @@ struct Stream {
 		double vol = 0.0;
 		if (volume.i() > 0) vol = std::pow(10.0, (volume.i() - 100.0) / 100.0 * 2.0);
 		for (size_t i = 0; i < buf.size(); ++i) {
-			outbuf[i] += vol * fade * da::conv_from_s16(buf[i]);
+			data.rawbuf[i] += vol * fade * da::conv_from_s16(buf[i]);
 			fade += fadeSpeed;
 		}
 		fade += (maxSamples - buf.size()) * fadeSpeed; // Fade continues even if no audio data was received.
 		if (fadeMin) { fade = 0.0; fadeSpeed = 0.0; }
 		if (fadeMax) { fade = 1.0; fadeSpeed = 0.0; }
 		if (buf.size() < maxSamples && !mpeg.audioQueue.eof() && mpeg.position() > 1.0) std::cerr << "Warning: audio decoding too slow (buffer underrun): " << std::endl;
+		return fade > 0.0;
 	}
 };
 
@@ -125,7 +125,7 @@ class Audio {
 	/** Takes libda devstr and sample rate. Throws if the device fails. **/
 	void open(std::string const& pdev, std::size_t rate, std::size_t frames);
 	/// if audio is currently playing
-	bool isOpen() const { return m_mixer; }
+	bool isOpen() const { return m_mixer.started(); }
 	/** Play a song beginning at startPos (defaults to 0)
 	 * @param filename the track filename
 	 * @param preview if the song preview is to play
@@ -162,7 +162,7 @@ class Audio {
 	double getPosition() const;
 	void operator()(); ///< Thread runs here, don't call directly
 	/// callback for the audio backend (libda)
-	bool operator()(da::pcm_data& areas, da::settings const&);
+	bool operator()(da::pcm_data& areas);
 	/// pauses and unpauses playback
 	void togglePause() { m_paused = !m_paused; }
 	/// toggles synth playback (F4)
@@ -172,13 +172,10 @@ class Audio {
 
   private:
 	mutable boost::recursive_mutex m_mutex;
-	typedef boost::ptr_vector<Stream> Streams;
-	Streams m_streams;
 	bool m_paused;
-	bool m_need_resync;
 	Notes const* volatile m_notes;
 	da::settings m_rs;
-	boost::scoped_ptr<da::mixer> m_mixer;
-	boost::ptr_map<std::string, AudioSample> m_samples;
+	da::mixer m_mixer;
+	std::vector<boost::shared_ptr<Stream> > m_streams;
 };
 

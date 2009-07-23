@@ -10,65 +10,25 @@
 #include <iostream>
 #include <memory>
 
-Audio::Audio():
-	m_paused(false),
-	m_need_resync(false)
-{}
+Audio::Audio(): m_paused(false) {
+	m_mixer.add(boost::ref(*this));
+}
 
 void Audio::open(std::string const& pdev, std::size_t rate, std::size_t frames) {
-	m_mixer.reset();
+	m_mixer.stop();
 	stopMusic();
 	m_rs = da::settings(pdev)
 	  .set_channels(2)
 	  .set_rate(rate)
 	  .set_frames(frames)
 	  .set_debug(std::cerr);
-	m_mixer.reset(new da::mixer(m_rs));
-	m_mixer->add(boost::ref(*this));
+	m_mixer.start(m_rs);
 }
 
-bool Audio::operator()(da::pcm_data& areas, da::settings const&) {
+bool Audio::operator()(da::pcm_data& areas) {
 	boost::recursive_mutex::scoped_lock l(m_mutex);
 	std::size_t samples = areas.channels * areas.frames;
 	static double phase = 0.0;
-	std::fill(areas.rawbuf, areas.rawbuf + samples, 0.0f);
-	if (!m_paused) {
-		if(m_need_resync) {
-			std::cout << "Audio need to be synched here" << std::endl;
-			/*
-			// do a fast forward sync
-			double position = 0.0;
-			for (Streams::iterator it = m_streams.begin(); it != m_streams.end(); ++it) {
-				if( it->fadingout() ) continue;
-				double tmp = it->mpeg.position();
-				if( tmp > position ) position = tmp;
-			}
-			unsigned int i = 0;
-			for (Streams::iterator it = m_streams.begin(); it != m_streams.end(); ++it,++i) {
-				if( it->fadingout() ) continue;
-				double shift = position - it->mpeg.position();
-				if( shift != 0 ) {
-					std::cout << "Moving stream " << i << " " << shift << "s forward";
-					if( it->consume(shift) ) {
-						std::cout << " SUCCESS" << std::endl;
-					} else {
-						// here we should say that this stream still need to be synched with one of the sucess one
-						std::cout << " FAIL (not enough data)" << std::endl;
-					}
-				}
-			}
-			*/
-			m_need_resync = false;
-		}
-		for (Streams::iterator it = m_streams.begin(); it != m_streams.end();) {
-			it->playmix(areas.rawbuf, samples);
-			if (it->fade <= 0.0) { it = m_streams.erase(it); continue; }
-			++it;
-		}
-	}
-	for (boost::ptr_map<std::string, AudioSample>::iterator it = m_samples.begin(); it != m_samples.end();++it) {
-		it->second->playmix(areas.rawbuf, samples);
-	}
 	// Synthesize tones
 	Notes const* n = m_notes;
 	if (n && !m_paused) {
@@ -95,95 +55,77 @@ bool Audio::operator()(da::pcm_data& areas, da::settings const&) {
 
 void Audio::playMusic(std::vector<std::string> const& filenames, bool preview, double fadeTime, double startPos) {
 	if (!isOpen()) return;
-	// First construct the new stream
 	boost::recursive_mutex::scoped_lock l(m_mutex);
+	// First construct the new stream
 	fadeout(fadeTime);
 	for(std::vector<std::string>::const_iterator it = filenames.begin() ; it != filenames.end() ; ++it ) {
-		std::auto_ptr<Stream> s;
 		try {
-			s.reset(new Stream(*it, m_rs.rate(), preview ? config["audio/preview_volume"] : config["audio/music_volume"]));
-			s->fadein(fadeTime);
-			if (startPos != 0.0) s->mpeg.seek(startPos, false);
+			m_streams.push_back(boost::shared_ptr<Stream>(new Stream(*it, m_rs.rate(), preview ? config["audio/preview_volume"] : config["audio/music_volume"])));
+			m_streams.back()->fadein(fadeTime);
+			if (startPos != 0.0) m_streams.back()->mpeg.seek(startPos, false);
 		} catch (std::runtime_error& e) {
 			std::cerr << "Error loading " << *it << " (" << e.what() << ")" << std::endl;
 			continue;
 		}
-		m_streams.push_back(s);
 	}
+	for (size_t i = 0; i < m_streams.size(); ++i) m_mixer.add(da::shared_ref(m_streams[i]));
 	if (!preview) m_paused = false;
-	m_need_resync = true;
 }
 
 void Audio::playMusic(std::string const& filename, bool preview, double fadeTime, double startPos) {
-	if (!isOpen()) return;
-	// First construct the new stream
-	std::auto_ptr<Stream> s;
-	try {
-		s.reset(new Stream(filename, m_rs.rate(), preview ? config["audio/preview_volume"] : config["audio/music_volume"]));
-		s->fadein(fadeTime);
-		if (startPos != 0.0) s->mpeg.seek(startPos, false);
-	} catch (std::runtime_error& e) {
-		std::cerr << "Error loading " << filename << " (" << e.what() << ")" << std::endl;
-		return;
-	}
-	boost::recursive_mutex::scoped_lock l(m_mutex);
-	fadeout(fadeTime);
-	m_streams.push_back(s);
-	if (!preview) m_paused = false;
+	playMusic(std::vector<std::string>(1, filename), preview, fadeTime, startPos);
 }
 
 void Audio::stopMusic() {
 	boost::recursive_mutex::scoped_lock l(m_mutex);
 	m_notes = NULL;
+	m_mixer.fade(0.0);
 	m_streams.clear();
 }
 
 void Audio::fadeout(double fadeTime) {
 	boost::recursive_mutex::scoped_lock l(m_mutex);
 	m_notes = NULL;
-	for (Streams::iterator it = m_streams.begin(); it != m_streams.end(); ++it) it->fadeout(fadeTime);
+	m_mixer.fade(fadeTime);
+	m_streams.clear();
 }
 
 double Audio::getPosition() const {
 	boost::recursive_mutex::scoped_lock l(m_mutex);
-	return m_streams.empty() ? getNaN() : m_streams.back().mpeg.audioQueue.position();
+	return m_streams.empty() ? getNaN() : m_streams.front()->mpeg.audioQueue.position();
 }
 
 double Audio::getLength() const {
 	boost::recursive_mutex::scoped_lock l(m_mutex);
-	return m_streams.empty() ? getNaN() : m_streams.back().mpeg.duration();
+	return m_streams.empty() ? getNaN() : m_streams.front()->mpeg.duration();
 }
 
 bool Audio::isPlaying() const {
 	boost::recursive_mutex::scoped_lock l(m_mutex);
-	return m_streams.empty() ? getNaN() : !m_streams.back().mpeg.audioQueue.eof();
+	return m_streams.empty() ? getNaN() : !m_streams.front()->mpeg.audioQueue.eof();
 }
 
 void Audio::playSample(std::string filename) {
 	boost::recursive_mutex::scoped_lock l(m_mutex);
-	if( m_samples.find(filename) == m_samples.end() ) {
+	/* FIXME if( m_samples.find(filename) == m_samples.end() ) {
 		m_samples.insert(filename,new AudioSample(filename, m_rs.rate())); 
 	} else {
 		m_samples[filename].reset_position();
-	}
+	}*/
 }
 
 void Audio::seek(double offset) {
-	boost::recursive_mutex::scoped_lock l(m_mutex);
-	if (m_streams.empty()) return;
-	Stream& s = m_streams.back();
-	seekPos(s.mpeg.position() + offset);
+	seekPos(m_streams.back()->mpeg.position() + offset);
 }
 
 void Audio::seekPos(double pos) {
 	boost::recursive_mutex::scoped_lock l(m_mutex);
-	if (m_streams.empty()) return;
-	for (Streams::iterator it = m_streams.begin(); it != m_streams.end(); ++it) {
-		int position = clamp(pos, 0.0, it->mpeg.duration() - 1.0);
-		it->mpeg.seek(position);
-		it->prebuffering = true;
+	for (size_t i = 0; i < m_streams.size(); ++i) {
+		Stream& s = *m_streams[i];
+		int position = clamp(pos, 0.0, s.mpeg.duration() - 1.0);
+		s.mpeg.seek(position);
+		s.prebuffering = true;
 	}
 	m_paused = false;
-	m_need_resync = true;
 }
 

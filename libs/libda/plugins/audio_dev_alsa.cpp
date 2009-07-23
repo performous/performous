@@ -154,9 +154,9 @@ namespace {
 						}
 						mmap.commit();
 					}
-					pcm_data data(&buf[0], buf.size() / channels, channels);
+					pcm_data data(&buf[0], buf.size() / channels, channels, m_s.rate());
 					try {
-						m_s.callback()(data, m_s);
+						m_s.callback()(data);
 					} catch (std::exception& e) {
 						m_s.debug(std::string("Exception from recording callback: ") + e.what());
 					}
@@ -200,9 +200,9 @@ namespace {
 				const std::size_t channels = m_s.channels();
 				// Request data from application
 				buf.resize(m_s.frames() * channels);
-				pcm_data data(&buf[0], buf.size() / channels, channels);
+				pcm_data data(&buf[0], buf.size() / channels, channels, m_s.rate());
 				try {
-					m_s.callback()(data, m_s);
+					m_s.callback()(data);
 				} catch (std::exception& e) {
 					m_s.debug(std::string("Exception from playback callback: ") + e.what());
 				}

@@ -44,7 +44,8 @@ namespace da {
 		sample_t* rawbuf;
 		const std::size_t frames;
 		const std::size_t channels;
-		pcm_data(sample_t* buf, std::size_t _frames, std::size_t _channels): rawbuf(buf), frames(_frames), channels(_channels) {}
+		const std::size_t rate;
+		pcm_data(sample_t* buf, std::size_t _frames, std::size_t _channels, std::size_t _rate): rawbuf(buf), frames(_frames), channels(_channels), rate(_rate) {}
 		sample_t& operator()(std::size_t frame, std::size_t channel) { return rawbuf[frame * channels + channel]; }
 		sample_t& operator[](std::size_t idx) { return rawbuf[idx]; }
 		class iter_by_ch: public std::iterator<std::random_access_iterator_tag, sample_t> {
@@ -68,7 +69,7 @@ namespace da {
 	class pcm_data;
 	
 	/** The callback functor typedef. If the function returns false, it will be removed from the processing chain. **/
-	typedef boost::function<bool (pcm_data& it, settings const&)> callback_t;
+	typedef boost::function<bool (pcm_data& it)> callback_t;
 
 	struct settings {
 		static const std::size_t low;
