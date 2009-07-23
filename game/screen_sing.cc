@@ -3,6 +3,7 @@
 #include "util.hh"
 #include "configuration.hh"
 #include "xtime.hh"
+#include "highscore.hh"
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 #include "songs.hh"
@@ -218,13 +219,32 @@ ScoreWindow::ScoreWindow(Engine& e):
   m_players(e.getPlayers())
 {
 	m_pos.setTarget(0.0);
-	unsigned int topScore = 0;
 	e.kill(); // kill the engine thread (to avoid consuming memory)
+
+
+	// TODO correct path and filename
+	HighScore hi ("", "High.sco");
+	try {
+		hi.load();
+	} catch (HighScoreException const& hi) {
+		std::cerr << "high.sco:" << hi.line() << " " << hi.what() << std::endl;
+	}
+	unsigned int topScore = 0;
 	for (std::list<Player>::iterator p = m_players.begin(); p != m_players.end();) {
 		unsigned int score = p->getScore();
 		if (score < 500) { p = m_players.erase(p); continue; }
 		if (score > topScore) topScore = score;
 		++p;
+		if (hi.reachedNewHighscore(score))
+		{
+			// TODO ask for name...
+			hi.addNewHighscore(getenv ("USER"), score);
+		}
+	}
+	try {
+		hi.save();
+	} catch (HighScoreException const& hi) {
+		std::cerr << "high.sco:" << hi.line() << " " << hi.what() << std::endl;
 	}
 	if (m_players.empty()) m_rank = "No singer!";
 	else if (topScore > 8000) m_rank = "Hit singer";
