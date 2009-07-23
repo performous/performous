@@ -14,7 +14,7 @@ To install from git:
 	performous
 	
 	# Should you need to change building settings (e.g. installation prefix)
-	ccmake .
+	ccmake ..
 	
 Dependencies:
 
@@ -55,7 +55,7 @@ After that make sure that all the characters display correctly. If they don't,
 you need to guess which charset the original used (instead of CP1252) and retry.
 
 If you want to improve the game, join our IRC channel #Performous (Freenode) and
-you'll get SVN write access.
+you'll get git write access.
 
 For more (up to date) information, see http://performous.org/
 
