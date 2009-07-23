@@ -34,7 +34,7 @@ void HighScore::load()
 	std::stringstream ss;
 	ss.write(&data[0], size);
 
-	// XXX convertToUTF8(ss, m_path + m_filename);
+	convertToUTF8(ss, m_path + m_filename);
 
 	// now parse line by line and build up highscore
 	std::string str;
