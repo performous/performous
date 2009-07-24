@@ -9,7 +9,7 @@
 class Players
 {
   private:
-	std::list<Player> m_players;
+	std::list<PlayerItem> m_players;
   public:
 	void load();
 	void save();
