@@ -27,6 +27,7 @@ FFmpeg::FFmpeg(bool _decodeVideo, bool _decodeAudio, std::string const& _filenam
 FFmpeg::~FFmpeg() {
 	m_quit = true;
 	videoQueue.reset();
+	audioQueue.quit();
 	if (!m_thread) {
 		std::cerr << "FFMPEG crashed at some point, decoding " << m_filename << std::endl;
 		std::cerr << "Please restart Performous to avoid resource leaks and program crashes!" << std::endl;
@@ -143,10 +144,11 @@ void FFmpeg::operator()() {
 #endif
 	try { open(); } catch (std::exception const& e) { std::cerr << "FFMPEG failed to open " << m_filename << ": " << e.what() << std::endl; m_quit = true; }
 	m_running = true;
-	//audioQueue.setDuration(duration());
+	audioQueue.setDuration(duration());
 	int errors = 0;
 	while (!m_quit) {
 		try {
+			if (audioQueue.wantSeek()) m_seekTarget = 0.0;
 			if (m_seekTarget == m_seekTarget) seek_internal();
 			decodeNextFrame();
 			m_eof = false;
@@ -169,12 +171,13 @@ void FFmpeg::operator()() {
 
 void FFmpeg::seek(double time, bool wait) {
 	m_seekTarget = time;
-	videoQueue.reset(); // Empty this to unblock the internals in case buffers were full
+	videoQueue.reset(); audioQueue.reset(); // Empty these to unblock the internals in case buffers were full
 	if (wait) while (!m_quit && m_seekTarget == m_seekTarget) boost::thread::sleep(now() + 0.01);
 }
 
 void FFmpeg::seek_internal() {
 	videoQueue.reset();
+	audioQueue.reset();
 	int flags = 0;
 	if (m_seekTarget < position()) flags |= AVSEEK_FLAG_BACKWARD;
 	int stream = -1;

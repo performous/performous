@@ -1,6 +1,7 @@
 #pragma once
 
 #include "util.hh"
+#include <boost/circular_buffer.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/ptr_container/ptr_deque.hpp>
 #include <boost/ptr_container/ptr_set.hpp>
@@ -110,36 +111,68 @@ class VideoFifo {
 
 class AudioBuffer {
   public:
-	AudioBuffer(): m_eof(), m_sps(), m_duration(getNaN()) {}
+	AudioBuffer(size_t size = 1000000): m_data(size), m_pos(), m_posReq(), m_sps(), m_duration(getNaN()), m_quit() {}
+	/// Reset from FFMPEG side (seeking to beginning or terminate stream)
+	void reset() {
+		boost::mutex::scoped_lock l(m_mutex);
+		m_data.clear();
+		m_pos = 0;
+		l.unlock();
+		m_cond.notify_one();
+	}
+	void quit() {
+		boost::mutex::scoped_lock l(m_mutex);
+		m_quit = true;
+		l.unlock();
+		m_cond.notify_one();
+	}
 	/// set samples per second
 	void setSamplesPerSecond(unsigned sps) { m_sps = sps; }
 	/// get samples per second
 	unsigned getSamplesPerSecond() { return m_sps; }
 	void push(AudioFrame* f) {
+		if (f->data.empty()) return;
 		boost::mutex::scoped_lock l(m_mutex);
-		if (f->data.empty()) {
-			m_eof = true;
-			m_duration = double(m_data.size()) / m_sps;
-		} else m_data.insert(m_data.end(), f->data.begin(), f->data.end());
+		while (!condition()) m_cond.wait(l);
+		if (m_quit) return;
+		if (m_pos == 0 && f->timestamp != 0.0) {
+			//std::cerr << "Warning: The first audio frame begins at " << f->timestamp << " seconds instead of zero, compensating." << std::endl;
+			m_pos = f->timestamp * m_sps;
+		}
+		m_data.insert(m_data.end(), f->data.begin(), f->data.end());
+		m_pos += f->data.size();
 	}
 	bool operator()(da::pcm_data data, int64_t& pos) {
 		boost::mutex::scoped_lock l(m_mutex);
-		int64_t samples = data.frames * data.channels;
-		for (int64_t s = 0; s < samples; ++s) {
-			size_t offset = pos++;
-			if (offset < m_data.size()) data.rawbuf[s] += da::conv_from_s16(m_data[offset]);
+		size_t samples = data.frames * data.channels;
+		size_t idx = pos + m_data.size() - m_pos;
+		for (size_t s = 0; s < samples; ++s, ++idx) {
+			if (idx < m_data.size()) data.rawbuf[s] += da::conv_from_s16(m_data[idx]);
 		}
+		m_posReq = pos += samples;
+		l.unlock();
+		if (wantSeek()) reset();
+		if (condition()) m_cond.notify_one();
 		return !eof(pos);
 	}
-	bool eof(int64_t pos) const { return m_eof && pos >= int64_t(m_data.size()); }
+	bool eof(int64_t pos) const { return double(pos) / m_sps >= m_duration; }
 	double duration() const { return m_duration; }
 	void setDuration(double seconds) { m_duration = seconds; }
+	bool wantSeek() {
+		size_t oldest = m_pos - m_data.size();
+		return oldest > 0 && m_posReq < int64_t(oldest);
+	}
   private:
+	bool wantMore() { return int64_t(m_pos) - 30000 < m_posReq; }
+	bool condition() { return m_quit || wantMore() || wantSeek(); }
 	mutable boost::mutex m_mutex;
-	std::vector<int16_t> m_data;
-	bool m_eof;
+	boost::condition m_cond;
+	boost::circular_buffer<int16_t> m_data;
+	size_t m_pos;
+	int64_t m_posReq;
 	unsigned m_sps;
 	double m_duration;
+	bool m_quit;
 };
 
 // ffmpeg forward declarations
