@@ -9,7 +9,8 @@ Players::Players(std::string filename):
 	m_filename(filename),
 	m_filter(),
 	math_cover(),
-	m_dirty(false)
+	m_dirty(false),
+	cur()
 {
 	load();
 	m_filtered = m_players;

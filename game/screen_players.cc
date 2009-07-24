@@ -41,7 +41,7 @@ void ScreenPlayers::manageEvent(SDL_Event event) {
 	if (key == SDLK_r && mod & KMOD_CTRL) { m_players.reload(); m_players.setFilter(m_search.text); }
 	if (m_search.process(keysym)) m_players.setFilter(m_search.text);
 	else if (key == SDLK_ESCAPE) {
-		if (m_search.text.empty()) sm->activateScreen("Sing");
+		if (m_search.text.empty()) sm->activateScreen("Songs");
 		else { m_search.text.clear(); m_players.setFilter(m_search.text); }
 	}
 	// The rest are only available when there are songs available
@@ -54,7 +54,8 @@ void ScreenPlayers::manageEvent(SDL_Event event) {
 			m_players.addPlayer(m_search.text);
 			m_players.setFilter(m_search.text); // set new Player as current
 		}
-		sm->activateScreen("Sing");
+		// we are now finished
+		sm->activateScreen("Songs");
 	}
 	else if (key == SDLK_LEFT) m_players.advance(-1);
 	else if (key == SDLK_RIGHT) m_players.advance(1);

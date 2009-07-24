@@ -1,8 +1,10 @@
 #pragma once
 #include <vector>
 #include <string>
+
 #include <boost/utility.hpp>
 
+#include "player.hh"
 #include "animvalue.hh"
 
 
@@ -30,8 +32,10 @@ struct PlayerItem {
  The current players plugged in a song can
  be retrieved with Engine::getPlayers().*/
 class Players: boost::noncopyable {
-  public:
+  private:
 	typedef std::vector<PlayerItem> players_t;
+	typedef std::list<Player> cur_players_t;
+
   private:
 	players_t m_players;
 	players_t m_filtered;
@@ -41,6 +45,9 @@ class Players: boost::noncopyable {
 	AnimAcceleration math_cover;
 
 	bool m_dirty;
+
+  public:
+	cur_players_t cur;
 
   public:
 	Players(std::string filename);

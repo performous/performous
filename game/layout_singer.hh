@@ -43,7 +43,7 @@ class LyricRow {
 
 class LayoutSinger {
   public:
-	LayoutSinger(Song &_song, Engine &_engine, ThemeSing& _theme);
+	LayoutSinger(Song &_song, Engine &_engine, ThemeSing& _theme, Players & players);
 	~LayoutSinger();
 	void reset();
 	void draw(double time);
@@ -55,4 +55,5 @@ class LayoutSinger {
 	NoteGraph m_noteGraph;
 	Notes::const_iterator m_lyricit;
 	std::deque<LyricRow> m_lyrics;
+	Players & m_players;
 };

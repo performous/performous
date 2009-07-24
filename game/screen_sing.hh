@@ -27,13 +27,12 @@ class ScoreWindow {
 
   private:
 	Song const& m_song;
-	Players & m_allplayers;
+	Players & m_players;
 	AnimValue m_pos;
 	Surface m_bg;
 	ProgressBar m_scoreBar;
 	SvgTxtThemeSimple m_score_text;
 	SvgTxtTheme m_score_rank;
-	std::list<Player> m_players;
 	std::string m_rank;
 };
 
@@ -41,8 +40,8 @@ class ScoreWindow {
 class ScreenSing: public Screen {
   public:
 	/// constructor
-	ScreenSing(std::string const& name, Audio& audio, Capture& capture, Players & allplayers):
-	  Screen(name), m_audio(audio), m_capture(capture), m_allplayers(allplayers), m_latencyAV()
+	ScreenSing(std::string const& name, Audio& audio, Capture& capture, Players & players):
+	  Screen(name), m_audio(audio), m_capture(capture), m_players(players), m_latencyAV()
 	{}
 	void enter();
 	void exit();
@@ -58,7 +57,7 @@ class ScreenSing: public Screen {
 	void drawScores();
 	Audio& m_audio;
 	Capture& m_capture;
-	Players& m_allplayers;
+	Players& m_players;
 	boost::shared_ptr<Song> m_song; /// Pointer to the current song
 	boost::scoped_ptr<ScoreWindow> m_score_window;
 	boost::scoped_ptr<ProgressBar> m_progress;

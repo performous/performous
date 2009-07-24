@@ -18,12 +18,12 @@ class NoteGraph {
 	 * @param time at which time to draw
 	 * @param players reference to the list of singing Players
 	 */
-	void draw(double time, std::list<Player> const& players);
+	void draw(double time, Players const& players);
   private:
 	/// draw notebars
 	void drawNotes();
 	/// draw waves (what players are singing)
-	void drawWaves(std::list<Player> const& players);
+	void drawWaves(Players const& players);
 	Song const& m_song;
 	Texture m_notelines;
 	Texture m_wave;

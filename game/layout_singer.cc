@@ -1,7 +1,10 @@
 #include "layout_singer.hh"
 
 
-LayoutSinger::LayoutSinger(Song &_song, Engine &_engine, ThemeSing& _theme): m_engine(_engine), m_song(_song), m_theme(_theme), m_noteGraph(_song),m_lyricit(_song.notes.begin()), m_lyrics() {};
+LayoutSinger::LayoutSinger(Song &_song, Engine &_engine, ThemeSing& _theme, Players& _players):
+	m_engine(_engine), m_song(_song), m_theme(_theme), m_noteGraph(_song),
+	m_lyricit(_song.notes.begin()), m_lyrics(), m_players(_players)
+{};
 
 LayoutSinger::~LayoutSinger() {};
 
@@ -15,8 +18,7 @@ void LayoutSinger::draw(double time) {
 
 	// Draw notes and pitch waves (only when not in karaoke mode)
 	if (!config["game/karaoke_mode"].b()) {
-		std::list<Player> const& players = m_engine.getPlayers();
-		m_noteGraph.draw(time, players);
+		m_noteGraph.draw(time, m_players);
 	}
 
 	// Draw the lyrics
