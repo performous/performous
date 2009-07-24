@@ -41,7 +41,7 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 	SDLMod mod = event.key.keysym.mod;
 	if (m_jukebox) {
 		if (key == SDLK_ESCAPE || m_songs.empty()) m_jukebox = false;
-		else if (key == SDLK_SPACE || (key == SDLK_PAUSE || (key == SDLK_p && mod && KMOD_CTRL))) m_audio.togglePause();
+		else if (key == SDLK_SPACE || (key == SDLK_PAUSE || (key == SDLK_p && mod & KMOD_CTRL))) m_audio.togglePause();
 		else if (key == SDLK_RETURN) sm->activateScreen("Sing");
 		else if (key == SDLK_LEFT) m_songs.advance(-1);
 		else if (key == SDLK_RIGHT) m_songs.advance(1);
@@ -59,7 +59,7 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 	}
 	// The rest are only available when there are songs available
 	else if (m_songs.empty()) return;
-	else if (key == SDLK_SPACE || (key == SDLK_PAUSE || (key == SDLK_p && mod && KMOD_CTRL))) m_audio.togglePause();
+	else if (key == SDLK_SPACE || (key == SDLK_PAUSE || (key == SDLK_p && mod & KMOD_CTRL))) m_audio.togglePause();
 	else if (key == SDLK_TAB && !(mod & KMOD_ALT)) m_songs.randomize();
 	else if (key == SDLK_RETURN) sm->activateScreen("Sing");
 	else if (key == SDLK_LEFT) m_songs.advance(-1);
