@@ -50,7 +50,9 @@ class HighScore {
 		if (score < 500) return false;
 		return score > m_scores[2].score;
 	}
-	/**Add a new entry to the highscore.*/
+	/**Add a new entry to the highscore.
+	  It will do nothing on empty name.
+	 */
 	void addNewHighscore(std::string name, int score);
   private:
 	static const int m_maxEntries = 10;

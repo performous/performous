@@ -21,12 +21,13 @@
 class ScoreWindow {
   public:
 	/// constructor
-	ScoreWindow(Engine & e, Song const& song);
+	ScoreWindow(Engine & e, Song const& song, Players & players);
 	/// draws ScoreWindow
 	void draw();
 
   private:
 	Song const& m_song;
+	Players & m_allplayers;
 	AnimValue m_pos;
 	Surface m_bg;
 	ProgressBar m_scoreBar;
@@ -40,8 +41,8 @@ class ScoreWindow {
 class ScreenSing: public Screen {
   public:
 	/// constructor
-	ScreenSing(std::string const& name, Audio& audio, Capture& capture):
-	  Screen(name), m_audio(audio), m_capture(capture), m_latencyAV()
+	ScreenSing(std::string const& name, Audio& audio, Capture& capture, Players & allplayers):
+	  Screen(name), m_audio(audio), m_capture(capture), m_allplayers(allplayers), m_latencyAV()
 	{}
 	void enter();
 	void exit();
@@ -56,9 +57,10 @@ class ScreenSing: public Screen {
   private:
 	void drawScores();
 	Audio& m_audio;
+	Capture& m_capture;
+	Players& m_allplayers;
 	boost::shared_ptr<Song> m_song; /// Pointer to the current song
 	boost::scoped_ptr<ScoreWindow> m_score_window;
-	Capture& m_capture;
 	boost::scoped_ptr<ProgressBar> m_progress;
 	boost::scoped_ptr<Surface> m_background;
 	boost::scoped_ptr<Video> m_video;

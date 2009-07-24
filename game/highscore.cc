@@ -115,6 +115,9 @@ void HighScore::save()
 
 void HighScore::addNewHighscore(std::string name, int score)
 {
+	// do not allow invalid name
+	if (name == "") return;
+
 	HighScoreItem hsi;
 	hsi.name = name;
 	hsi.score = score;
