@@ -44,22 +44,22 @@ void ScreenPractice::manageEvent(SDL_Event event) {
 		case SDL_JOYBUTTONDOWN:
 			switch( event.jbutton.button ) {
 				case PS3_DRUM_CONTROLLER_RED: // Snare drum
-					m_audio.playSample(getDataPath("sounds/drum_snare.ogg"));
+					m_audio.playMusic(getDataPath("sounds/drum_snare.ogg"));
 					break;
 				case PS3_DRUM_CONTROLLER_BLUE: // Tom 1
-					m_audio.playSample(getDataPath("sounds/drum_tom1.ogg"));
+					m_audio.playMusic(getDataPath("sounds/drum_tom1.ogg"));
 					break;
 				case PS3_DRUM_CONTROLLER_GREEN: // Tom 2
-					m_audio.playSample(getDataPath("sounds/drum_tom2.ogg"));
+					m_audio.playMusic(getDataPath("sounds/drum_tom2.ogg"));
 					break;
 				case PS3_DRUM_CONTROLLER_YELLOW: // Hi hat
-					m_audio.playSample(getDataPath("sounds/drum_hi-hat.ogg"));
+					m_audio.playMusic(getDataPath("sounds/drum_hi-hat.ogg"));
 					break;
 				case PS3_DRUM_CONTROLLER_ORANGE: // crash cymbal
-					m_audio.playSample(getDataPath("sounds/drum_cymbal.ogg"));
+					m_audio.playMusic(getDataPath("sounds/drum_cymbal.ogg"));
 					break;
 				case PS3_DRUM_CONTROLLER_XXX: // Drum bass
-					m_audio.playSample(getDataPath("sounds/drum_bass.ogg"));
+					m_audio.playMusic(getDataPath("sounds/drum_bass.ogg"));
 					break;
 			}
 			break;

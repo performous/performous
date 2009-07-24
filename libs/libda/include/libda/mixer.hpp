@@ -110,9 +110,9 @@ namespace da {
 		double m_time;
 	};
 
-	class scoped_lock: public boost::mutex::scoped_lock {
+	class scoped_lock: public boost::recursive_mutex::scoped_lock {
 	  public:
-		template <typename T> scoped_lock(T& obj): boost::mutex::scoped_lock(obj.m_mutex) {}
+		template <typename T> scoped_lock(T& obj): boost::recursive_mutex::scoped_lock(obj.m_mutex) {}
 	};
 	
 	class mutex_stream: boost::noncopyable {
@@ -124,7 +124,7 @@ namespace da {
 		}
 	  private:
 		callback_t m_stream;
-		boost::mutex m_mutex;
+		boost::recursive_mutex m_mutex;
 		friend class scoped_lock;
 	};
 	

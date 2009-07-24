@@ -63,6 +63,5 @@ class ScreenSing: public Screen {
 	double m_latencyAV;  // Latency between audio and video output (do not confuse with latencyAR)
 	boost::scoped_ptr<ThemeSing> theme;
 	AnimValue m_quitTimer;
-	AnimValue m_startTimer;
 };
 

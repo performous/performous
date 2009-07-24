@@ -61,13 +61,14 @@ void Audio::playMusic(std::vector<std::string> const& filenames, bool preview, d
 	for(std::vector<std::string>::const_iterator it = filenames.begin() ; it != filenames.end() ; ++it ) {
 		try {
 			m_streams.push_back(boost::shared_ptr<Stream>(new Stream(*it, m_rs.rate(), preview ? config["audio/preview_volume"] : config["audio/music_volume"])));
-			m_streams.back()->fadein(fadeTime);
-			if (startPos != 0.0) m_streams.back()->mpeg.seek(startPos, false);
+			if (fadeTime > 0) m_streams.back()->fadein(fadeTime);
+			if (startPos != 0.0) m_streams.back()->seek(startPos);
 		} catch (std::runtime_error& e) {
 			std::cerr << "Error loading " << *it << " (" << e.what() << ")" << std::endl;
 			continue;
 		}
 	}
+	da::lock_holder l2 = m_mixer.lock();
 	for (size_t i = 0; i < m_streams.size(); ++i) m_mixer.add(da::shared_ref(m_streams[i]));
 	if (!preview) m_paused = false;
 }
@@ -92,39 +93,35 @@ void Audio::fadeout(double fadeTime) {
 
 double Audio::getPosition() const {
 	boost::recursive_mutex::scoped_lock l(m_mutex);
-	return m_streams.empty() ? getNaN() : m_streams.front()->mpeg.audioQueue.position();
+	return m_streams.empty() ? getNaN() : m_streams.front()->pos();
 }
 
 double Audio::getLength() const {
 	boost::recursive_mutex::scoped_lock l(m_mutex);
-	return m_streams.empty() ? getNaN() : m_streams.front()->mpeg.duration();
+	return m_streams.empty() ? getNaN() : m_streams.front()->duration();
 }
 
 bool Audio::isPlaying() const {
 	boost::recursive_mutex::scoped_lock l(m_mutex);
-	return m_streams.empty() ? getNaN() : !m_streams.front()->mpeg.audioQueue.eof();
-}
-
-void Audio::playSample(std::string filename) {
-	boost::recursive_mutex::scoped_lock l(m_mutex);
-	/* FIXME if( m_samples.find(filename) == m_samples.end() ) {
-		m_samples.insert(filename,new AudioSample(filename, m_rs.rate())); 
-	} else {
-		m_samples[filename].reset_position();
-	}*/
+	return m_streams.empty() ? false : !m_streams.front()->eof();
 }
 
 void Audio::seek(double offset) {
-	seekPos(m_streams.back()->mpeg.position() + offset);
+	boost::recursive_mutex::scoped_lock l(m_mutex);
+	for (size_t i = 0; i < m_streams.size(); ++i) {
+		Stream& s = *m_streams[i];
+		s.seek(clamp(s.pos() + offset, 0.0, s.duration()));
+		std::cout << "Seek by " << offset << " to " << s.pos() << std::endl;
+	}
+	m_paused = false;
 }
 
 void Audio::seekPos(double pos) {
 	boost::recursive_mutex::scoped_lock l(m_mutex);
 	for (size_t i = 0; i < m_streams.size(); ++i) {
 		Stream& s = *m_streams[i];
-		int position = clamp(pos, 0.0, s.mpeg.duration() - 1.0);
-		s.mpeg.seek(position);
-		s.prebuffering = true;
+		s.seek(pos);
+		std::cout << "Seek to " << pos << std::endl;
 	}
 	m_paused = false;
 }

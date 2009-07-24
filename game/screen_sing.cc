@@ -15,8 +15,7 @@ namespace {
 
 void ScreenSing::enter() {
 	Song& song = m_songs.current();
-	m_audio.playMusic(song.music);
-	m_audio.togglePause(); // Pause it for startup countdown
+	m_audio.playMusic(song.music, false, 0.0, -3.0);
 	theme.reset(new ThemeSing());
 	if (!song.background.empty()) {
 		try {
@@ -39,8 +38,6 @@ void ScreenSing::enter() {
 	m_engine.reset(new Engine(m_audio, m_songs.current(), analyzers.begin(), analyzers.end()));
 	m_layout_singer.reset(new LayoutSinger(m_songs, *m_engine, *theme));
 	if (song.music.size() > 1) m_guitarGraph.reset(new GuitarGraph(song));
-	m_startTimer.setTarget(0.0);
-	m_startTimer.setValue(3.0);
 }
 
 void ScreenSing::exit() {
@@ -123,13 +120,7 @@ void ScreenSing::draw() {
 	Song& song = m_songs.current();
 	// Get the time in the song
 	double length = m_audio.getLength();
-	double time = -m_startTimer.get();
-	if (time == 0.0 || !m_audio.isPaused()) {
-		if (m_audio.isPaused()) m_audio.togglePause();
-		m_startTimer.setTarget(-1.0);
-		m_startTimer.setValue(-1.0);
-	}
-	if (time >= 0.0) time = m_audio.getPosition();
+	double time = m_audio.getPosition();
 	time -= config["audio/video_delay"].f();
 	double songPercent = clamp(time / length);
 
@@ -184,7 +175,7 @@ void ScreenSing::draw() {
 		}
 	}
 		
-	if (time > 0.0 && m_audio.isPaused()) {
+	if (m_audio.isPaused()) {
 		m_pause_icon->dimensions.middle().center().fixedWidth(.25);
 		m_pause_icon->draw();
 	}

@@ -106,68 +106,40 @@ class VideoFifo {
 	static const unsigned m_max = 50;
 };
 
-/// audio queue: first in first out
-class AudioFifo {
+#include <libda/audio.hpp>
+
+class AudioBuffer {
   public:
-	AudioFifo(): m_sps(), m_timestamp(), m_eof() {}
+	AudioBuffer(): m_eof(), m_sps(), m_duration(getNaN()) {}
 	/// set samples per second
 	void setSamplesPerSecond(unsigned sps) { m_sps = sps; }
 	/// get samples per second
 	unsigned getSamplesPerSecond() { return m_sps; }
-	/// pops audio frame from queue to buffer
-	void tryPop(std::vector<int16_t>& buffer, std::size_t size = 0) {
-		if (size == 0) size = std::numeric_limits<std::size_t>::max();
-		boost::mutex::scoped_lock l(m_mutex);
-		while (!m_queue.empty() && size > 0) {
-			AudioFrame& f = m_queue.front();
-			if (f.data.empty()) { m_eof = true; break; } // Empty frames are EOF markers
-			if (f.data.size() <= size) {
-				buffer.insert(buffer.end(), f.data.begin(), f.data.end());
-				size -= f.data.size();
-				m_timestamp = f.timestamp + double(size) / m_sps;
-				m_queue.pop_front();
-				m_cond.notify_one();
-			} else {
-				buffer.insert(buffer.end(), f.data.begin(), f.data.begin() + size);
-				f.data.erase(f.data.begin(), f.data.begin() + size);
-				if (m_sps > 0) f.timestamp += double(size) / m_sps; // Samples of the package used, increment timestamp
-				m_timestamp = f.timestamp;
-				size = 0;
-			}
-		}
-	}
-	/// pushes AudioFrame to queue
 	void push(AudioFrame* f) {
 		boost::mutex::scoped_lock l(m_mutex);
-		while (m_queue.size() > m_max) m_cond.wait(l);
-		if (m_queue.empty()) m_timestamp = f->timestamp;
-		m_queue.push_back(f);
+		if (f->data.empty()) {
+			m_eof = true;
+			m_duration = double(m_data.size()) / m_sps;
+		} else m_data.insert(m_data.end(), f->data.begin(), f->data.end());
 	}
-	/// reset queue
-	void reset() {
+	bool operator()(da::pcm_data data, int64_t& pos) {
 		boost::mutex::scoped_lock l(m_mutex);
-		m_queue.clear();
-		m_cond.notify_all();
-		m_eof = false;
+		int64_t samples = data.frames * data.channels;
+		for (int64_t s = 0; s < samples; ++s) {
+			size_t offset = pos++;
+			if (offset < m_data.size()) data.rawbuf[s] += da::conv_from_s16(m_data[offset]);
+		}
+		return !eof(pos);
 	}
-	/// current position
-	double position() const { return m_timestamp; }
-	/// end of queue
-	double eof() const { return m_eof; }
-	/// fill percentage
-	double percentage() const {
-		boost::mutex::scoped_lock l(m_mutex);
-		return double(m_queue.size()) / m_max;
-	}
-
+	bool eof(int64_t pos) const { return m_eof && pos >= int64_t(m_data.size()); }
+	double duration() const { return m_duration; }
+	void setDuration(double seconds) { m_duration = seconds; }
   private:
-	boost::ptr_deque<AudioFrame> m_queue;
 	mutable boost::mutex m_mutex;
-	boost::condition m_cond;
-	unsigned m_sps;
-	double m_timestamp;
+	std::vector<int16_t> m_data;
 	bool m_eof;
-	static const unsigned m_max = 100;
+	unsigned m_sps;
+	double m_duration;
 };
 
 // ffmpeg forward declarations
@@ -197,13 +169,13 @@ class FFmpeg {
 	/// queue for video
 	VideoFifo  videoQueue;
 	/// queue for audio
-	AudioFifo  audioQueue;
+	AudioBuffer  audioQueue;
 	/** Seek to the chosen time. Will block until the seek is done, if wait is true. **/
 	void seek(double time, bool wait = true);
 	/// duration
 	double duration() const;
 	/// return current position
-	double position() { return std::max(videoQueue.position(), audioQueue.position()); }
+	double position() { return videoQueue.position(); /* FIXME: remove */ }
 
   private:
 	class eof_error: public std::exception {};

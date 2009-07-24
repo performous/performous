@@ -13,6 +13,7 @@
 
 using boost::int16_t;
 
+#if 0
 /// audiosamples for songfiles
 struct AudioSample {
 	/// sample rate
@@ -59,6 +60,7 @@ struct AudioSample {
 		return true;
 	}
 };
+#endif
 
 /// audiostream
 /** allows buffering, fading and mixing of audiostreams
@@ -74,48 +76,37 @@ struct Stream {
 	double fade;
 	/// speed of fade effect
 	double fadeSpeed;
-	/// do buffering or not
-	bool prebuffering;
 	/// constructor
 	Stream(std::string const& filename, unsigned int sr, ConfigItem& vol):
-	  mpeg(false, true, filename, sr), srate(sr), volume(vol), fade(1.0), fadeSpeed(), prebuffering(true) {}
+	  mpeg(false, true, filename, sr), srate(sr), volume(vol), fade(1.0), fadeSpeed(), m_pos() {}
 	/// fades stream in
 	void fadein(double time) { fade = fadeSpeed = 1.0 / (time * srate); }
 	/// fades stream out
 	void fadeout(double time) { fadeSpeed = - 1.0 / (time * srate); }
 	/// is the stream fading out
 	bool fadingout() {return fadeSpeed < 0;}
-	/// consume duration seconds of stream
-	bool consume(double duration) {
-		std::vector<int16_t> buf;
-		unsigned int samples = srate * duration;
-		if( samples == 0 ) return true;
-		mpeg.audioQueue.tryPop(buf, samples);
-		if( buf.size() == samples ) return true;
-		return false;
-	}
 	/// crossfades songs
 	bool operator()(da::pcm_data& data) {
 		std::size_t maxSamples = data.channels * data.frames;
-		if (prebuffering && mpeg.audioQueue.percentage() > 0.9) prebuffering = false;
-		if (prebuffering) return true;
-		std::vector<int16_t> buf;
-		mpeg.audioQueue.tryPop(buf, maxSamples);
+		mpeg.audioQueue(data, m_pos);
 		bool fadeMin = false, fadeMax = false;
 		if (fade + maxSamples * fadeSpeed < 0.0) { fadeSpeed = fade / maxSamples; fadeMin = true; }
 		if (fade + maxSamples * fadeSpeed > 1.0) { fadeSpeed = (1.0 - fade) / maxSamples; fadeMax = true; }
 		double vol = 0.0;
 		if (volume.i() > 0) vol = std::pow(10.0, (volume.i() - 100.0) / 100.0 * 2.0);
-		for (size_t i = 0; i < buf.size(); ++i) {
-			data.rawbuf[i] += vol * fade * da::conv_from_s16(buf[i]);
+		for (size_t i = 0; i < maxSamples; ++i) {
+			data.rawbuf[i] *= vol * fade;
 			fade += fadeSpeed;
 		}
-		fade += (maxSamples - buf.size()) * fadeSpeed; // Fade continues even if no audio data was received.
 		if (fadeMin) { fade = 0.0; fadeSpeed = 0.0; }
 		if (fadeMax) { fade = 1.0; fadeSpeed = 0.0; }
-		if (buf.size() < maxSamples && !mpeg.audioQueue.eof() && mpeg.position() > 1.0) std::cerr << "Warning: audio decoding too slow (buffer underrun): " << std::endl;
-		return fade > 0.0;
+		return !eof();
 	}
+	void seek(double time) { m_pos = time * srate * 2.0; }
+	double pos() const { return double(m_pos) / srate / 2.0; }
+	double duration() const { return mpeg.audioQueue.duration(); }
+	bool eof() const { return mpeg.audioQueue.eof(m_pos) || (fade == 0.0 && fadeSpeed == 0.0); }
+	int64_t m_pos;
 };
 
 /** @short High level audio playback API **/
@@ -167,8 +158,6 @@ class Audio {
 	void togglePause() { m_paused = !m_paused; }
 	/// toggles synth playback (F4)
 	void toggleSynth(Notes const& notes) { m_notes = (m_notes ? NULL : &notes); }
-	/// if necessary loads and plays a sample
-	void playSample(std::string filename);
 
   private:
 	mutable boost::recursive_mutex m_mutex;
