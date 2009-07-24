@@ -41,18 +41,3 @@ struct Player {
 		return 10000.0 * m_score;
 	}
 };
-
-/** Static Information of a player, not
-  dependent from current song.
-
-  Used for Players Management.
-  */
-struct PlayerItem
-{
-	std::string name; /// unique name, link to highscore
-/* Future ideas
-	std::string displayedName; /// artist name, short name, nick (can be changed)
-	std::string picture; /// a path to a picture shown
-	std::map<std::string, int> scores; /// map between a Song and the highest score the Player achieved
-*/
-};
