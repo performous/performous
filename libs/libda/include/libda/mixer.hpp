@@ -49,7 +49,7 @@ namespace da {
 			for (streams_t::iterator it = wr; it != streams.end(); ++it) {
 				if ((*it)(data)) *wr++ = *it;
 			}
-			if (wr != streams.end()) streams.erase(wr);
+			if (wr != streams.end()) streams.erase(wr, streams.end());
 			return !streams.empty();
 		}
 		streams_t streams;

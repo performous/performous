@@ -108,21 +108,18 @@ bool Audio::isPlaying() const {
 
 void Audio::seek(double offset) {
 	boost::recursive_mutex::scoped_lock l(m_mutex);
+	da::lock_holder l2 = m_mixer.lock();
 	for (size_t i = 0; i < m_streams.size(); ++i) {
 		Stream& s = *m_streams[i];
 		s.seek(clamp(s.pos() + offset, 0.0, s.duration()));
-		std::cout << "Seek by " << offset << " to " << s.pos() << std::endl;
 	}
 	m_paused = false;
 }
 
 void Audio::seekPos(double pos) {
 	boost::recursive_mutex::scoped_lock l(m_mutex);
-	for (size_t i = 0; i < m_streams.size(); ++i) {
-		Stream& s = *m_streams[i];
-		s.seek(pos);
-		std::cout << "Seek to " << pos << std::endl;
-	}
+	da::lock_holder l2 = m_mixer.lock();
+	for (size_t i = 0; i < m_streams.size(); ++i) m_streams[i]->seek(pos);
 	m_paused = false;
 }
 

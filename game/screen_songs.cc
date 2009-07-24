@@ -100,7 +100,8 @@ void ScreenSongs::draw() {
 	if (m_songbg.get()) m_songbg->draw();
 	if (m_video.get()) m_video->render(time);
 	if (!m_jukebox) theme->bg.draw();
-	std::string music, songbg, video;
+	std::string songbg, video;
+	std::vector<std::string> music;
 	double videoGap = 0.0;
 	std::ostringstream oss_song, oss_order;
 	// Test if there are no songs
@@ -142,7 +143,7 @@ void ScreenSongs::draw() {
 				s.tex = TexCoords(); glColor3f(1.0, 1.0, 1.0); // Restore default attributes
 			}
 		}
-		if (!song.music.empty()) music = song.music[0]; // FIXME: support multiple tracks
+		if (!song.music.empty()) music = song.music;
 		if (!song.background.empty()) songbg = song.path + song.background;
 		if (!song.video.empty()) { video = song.path + song.video; videoGap = song.videoGap; }
 	}
@@ -157,7 +158,7 @@ void ScreenSongs::draw() {
 	// Play/stop preview playback (if it is the time)
 	if (music != m_playing && m_playTimer.get() > 0.4) {
 		m_songbg.reset(); m_video.reset();
-		if (music.empty()) m_audio.fadeout(); else m_audio.playMusic(music, m_jukebox ? 0.0 : 30.0, true, 0.5);
+		if (music.empty()) m_audio.fadeout(); else m_audio.playMusic(music, true, 1.0);
 		if (!songbg.empty()) try { m_songbg.reset(new Surface(songbg)); } catch (std::exception const&) {}
 		if (!video.empty() && config["graphic/video"].b()) m_video.reset(new Video(video, videoGap));
 		m_playing = music;
