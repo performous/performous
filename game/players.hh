@@ -1,6 +1,8 @@
 #pragma once
-#include <list>
+#include <vector>
 #include <string>
+
+#include "animvalue.hh"
 
 
 /** Static Information of a player, not
@@ -25,14 +27,53 @@ struct PlayerItem
 class Players
 {
   public:
-	typedef std::list<PlayerItem> players_t;
+	typedef std::vector<PlayerItem> players_t;
   private:
 	players_t m_players;
+	players_t m_filtered;
+
 	std::string m_filename;
+	std::string m_filter;
+	AnimAcceleration math_cover;
+
   public:
 	Players(std::string filename);
 	~Players();
+
 	void load();
+	void reload()
+	{
+		m_players.clear();
+		load();
+	}
 	void save();
 	void addPlayer (std::string name);
+
+	/// advances to next player
+	void advance(int diff) {
+		int size = m_filtered.size();
+		if (size == 0) return;  // Do nothing if no songs are available
+		int _current = size ? (int(math_cover.getTarget()) + diff) % size : 0;
+		if (_current < 0) _current += m_filtered.size();
+		math_cover.setTarget(_current,this->size());
+	}
+	/// array access
+	PlayerItem operator[](std::size_t pos) { return m_filtered[pos]; }
+	PlayerItem operator[](std::size_t pos) const { return m_filtered[pos]; }
+	/// number of players
+	int size() const { return m_filtered.size(); };
+	/// true if empty
+	int empty() const { return m_filtered.empty(); };
+	/// filters playerlist by regular expression
+	void setFilter(std::string const& regex);
+	/// sets margins for animation
+	void setAnimMargins(double left, double right) { math_cover.setMargins(left, right); }
+	/// @return current PlayerItem (the copy is very cheap at the moment)
+	PlayerItem current() const { return m_filtered[math_cover.getTarget()]; }
+	/// get current id
+	int currentId() const { return math_cover.getTarget(); }
+	/// gets current position
+	double currentPosition() { return math_cover.getValue(); }
+  private:
+	void filter_internal();
 };

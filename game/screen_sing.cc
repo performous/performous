@@ -229,6 +229,7 @@ ScoreWindow::ScoreWindow(Engine& e, Song const& song):
 		std::cerr << "high.sco:" << hi.line() << " " << hi.what() << std::endl;
 	}
 	unsigned int topScore = 0;
+	// TODO: sort Players and start entering highscore with highest
 	for (std::list<Player>::iterator p = m_players.begin(); p != m_players.end();) {
 		unsigned int score = p->getScore();
 		if (score < 500) { p = m_players.erase(p); continue; }
@@ -236,7 +237,9 @@ ScoreWindow::ScoreWindow(Engine& e, Song const& song):
 		++p;
 		if (hi.reachedNewHighscore(score))
 		{
-			// TODO ask for name...
+			ScreenManager* sm = ScreenManager::getSingletonPtr();
+			// show the players screen
+			sm->activateScreen("Players");
 			hi.addNewHighscore(getenv ("USER"), score);
 		}
 	}

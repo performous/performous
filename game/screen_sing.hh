@@ -15,6 +15,8 @@
 #include "opengl_text.hh"
 #include "progressbar.hh"
 
+#include "screen_players.hh"
+
 /// shows score at end of song
 class ScoreWindow {
   public:
