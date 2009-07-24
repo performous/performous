@@ -11,18 +11,9 @@ ScreenPlayers::ScreenPlayers(std::string const& name, Audio& audio, Players& pla
 {
 	m_players.setAnimMargins(5.0, 5.0);
 	m_playTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
-
-	// print all names
-	std::cout << "Constructor of ScreenPlayers" << std::endl;
-	for (size_t i=0; i<m_players.size(); i++)
-	{
-		std::cout << "Name " << i << ": " << m_players[i].name << std::endl;
-	}
 }
 
 void ScreenPlayers::enter() {
-	std::cout << "Entered ScreenPlayers" << std::endl;
-
 	theme.reset(new ThemeSongs());
 	m_emptyCover.reset(new Surface(getThemePath("no_cover.svg"))); // TODO use persons head
 	m_search.text.clear();
@@ -41,7 +32,7 @@ void ScreenPlayers::exit() {
 }
 
 void ScreenPlayers::manageEvent(SDL_Event event) {
-	// ScreenManager* sm = ScreenManager::getSingletonPtr();
+	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	if (event.type != SDL_KEYDOWN) return;
 	SDL_keysym keysym = event.key.keysym;
 	int key = keysym.sym;
@@ -50,25 +41,34 @@ void ScreenPlayers::manageEvent(SDL_Event event) {
 	if (key == SDLK_r && mod & KMOD_CTRL) { m_players.reload(); m_players.setFilter(m_search.text); }
 	if (m_search.process(keysym)) m_players.setFilter(m_search.text);
 	else if (key == SDLK_ESCAPE) {
-		if (m_search.text.empty())/*TODO*/; // sm->activateScreen("Intro");
+		if (m_search.text.empty()) sm->activateScreen("Sing");
 		else { m_search.text.clear(); m_players.setFilter(m_search.text); }
 	}
 	// The rest are only available when there are songs available
 	else if (m_players.empty()) return;
 	else if (key == SDLK_SPACE || (key == SDLK_PAUSE || (key == SDLK_p && mod & KMOD_CTRL))) m_audio.togglePause();
-	else if (key == SDLK_RETURN)/*TODO*/; // sm->activateScreen("Score");
+	else if (key == SDLK_RETURN)
+	{
+		if (m_players.empty())
+		{
+			m_players.addPlayer(m_search.text);
+			m_players.setFilter(m_search.text); // set new Player as current
+		}
+		sm->activateScreen("Sing");
+	}
 	else if (key == SDLK_LEFT) m_players.advance(-1);
 	else if (key == SDLK_RIGHT) m_players.advance(1);
 	else if (key == SDLK_PAGEUP) m_players.advance(-10);
 	else if (key == SDLK_PAGEDOWN) m_players.advance(10);
-	// else if (key == SDLK_TAB && !(mod & KMOD_ALT)) m_players.randomize();
 }
 
 void ScreenPlayers::draw() {
+	m_players.update(); // Poll for new players
 	double length = m_audio.getLength();
 	double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
 	if (m_songbg.get()) m_songbg->draw();
 	if (m_video.get()) m_video->render(time);
+	theme->bg.draw();
 	std::string music, songbg, video;
 	double videoGap = 0.0;
 	std::ostringstream oss_song, oss_order;
@@ -77,10 +77,10 @@ void ScreenPlayers::draw() {
 		// Format the song information text
 		if (m_search.text.empty()) {
 			oss_song << "No players found!";
-			oss_order << "Visit performous.org\n";
+			oss_order << "Check players.txt in current\n";
+			oss_order << "directory for players";
 		} else {
-			// TODO: create new player
-			oss_song << "no players match search";
+			oss_song << "press enter to create player";
 			oss_order << m_search.text << '\n';
 		}
 	} else {

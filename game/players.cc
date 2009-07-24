@@ -8,19 +8,18 @@ Players::Players(std::string filename):
 	m_filtered(),
 	m_filename(filename),
 	m_filter(),
-	math_cover()
+	math_cover(),
+	m_dirty(false)
 {
 	load();
 	m_filtered = m_players;
 }
 
-Players::~Players()
-{
+Players::~Players() {
 	save();
 }
 
-void Players::load()
-{
+void Players::load() {
 	std::ifstream in (m_filename.c_str());
 
 	std::string str;
@@ -30,8 +29,7 @@ void Players::load()
 	}
 }
 
-void Players::save()
-{
+void Players::save() {
 	std::ofstream out (m_filename.c_str());
 
 	for (players_t::const_iterator it = m_players.begin(); it!=m_players.end(); ++it)
@@ -40,14 +38,18 @@ void Players::save()
 	}
 }
 
-void Players::addPlayer (std::string const& name)
-{
+void Players::update() {
+	if (m_dirty) filter_internal();
+}
+
+void Players::addPlayer (std::string const& name) {
 	PlayerItem pi;
 	pi.name = name;
 
 	players_t::const_iterator it =  std::find(m_players.begin(), m_players.end(), pi);
 	if (it != m_players.end()) return; // dont do anything, player exists
 
+	m_dirty = true;
 	m_players.push_back(pi);
 }
 
@@ -57,9 +59,14 @@ void Players::setFilter(std::string const& val) {
 	filter_internal();
 }
 
+#include <iostream> //TODO remove
+
 void Players::filter_internal() {
+	m_dirty = false;
+
 	if (m_filter == "")
 	{
+		std::cout << "empty filter" << std::endl; //TODO remove
 		// without filter get all names
 		m_filtered = m_players;
 		return;
@@ -75,7 +82,9 @@ void Players::filter_internal() {
 		players_t(m_players.begin(), m_players.end()).swap(m_filtered);  // Invalid regex => copy everything
 	}
 	math_cover.reset();
+	// TODO restore selection
 }
+
 
 /*
 #include <iostream>
