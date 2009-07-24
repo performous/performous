@@ -40,4 +40,9 @@ struct Player {
 	int getScore() const {
 		return 10000.0 * m_score;
 	}
+	/**Operator for sorting by score.*/
+	bool operator < (Player const& other) const
+	{
+		return other.m_score < m_score;
+	}
 };
