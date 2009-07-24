@@ -1,3 +1,4 @@
+#pragma once
 #ifndef __OPENGL_THEME_H__
 #define __OPENGL_THEME_H__
 

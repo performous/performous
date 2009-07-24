@@ -1,3 +1,4 @@
+#pragma once
 #ifndef __SCREENPRACTICE_H__
 #define __SCREENPRACTICE_H__
 

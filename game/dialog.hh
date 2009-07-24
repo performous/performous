@@ -1,3 +1,4 @@
+#pragma once
 #ifndef PERFORMOUS_DIALOG_HH
 #define PERFORMOUS_DIALOG_HH
 

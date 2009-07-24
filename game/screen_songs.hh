@@ -1,3 +1,4 @@
+#pragma once
 #ifndef PERFORMOUS_SCREEN_SONGS_HH
 #define PERFORMOUS_SCREEN_SONGS_HH
 

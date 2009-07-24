@@ -1,3 +1,4 @@
+#pragma once
 #ifndef PERFORMOUS_FFTGRAPH_HH
 #define PERFORMOUS_FFTGRAPH_HH
 
