@@ -61,8 +61,8 @@ void Audio::playMusic(std::vector<std::string> const& filenames, bool preview, d
 	for(std::vector<std::string>::const_iterator it = filenames.begin() ; it != filenames.end() ; ++it ) {
 		try {
 			m_streams.push_back(boost::shared_ptr<Stream>(new Stream(*it, m_rs.rate(), preview ? config["audio/preview_volume"] : config["audio/music_volume"])));
-			if (fadeTime > 0) m_streams.back()->fadein(fadeTime);
-			if (startPos != 0.0) m_streams.back()->seek(startPos);
+			m_streams.back()->fadein(fadeTime);
+			m_streams.back()->seek(startPos);
 		} catch (std::runtime_error& e) {
 			std::cerr << "Error loading " << *it << " (" << e.what() << ")" << std::endl;
 			continue;

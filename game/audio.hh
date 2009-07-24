@@ -123,14 +123,9 @@ class Audio {
 	 * @param fadeTime time to fade
 	 * @param startPos starting position
 	 */
-	void playMusic(std::string const& filename, bool preview = false, double fadeTime = 0.1, double startPos = 0.0);
+	void playMusic(std::string const& filename, bool preview = false, double fadeTime = 0.1, double startPos = -0.1);
 	/// plays a list of songs
-	void playMusic(std::vector<std::string> const& filenames, bool preview = false, double fadeTime = 0.1, double startPos = 0.0);
-	/** Play a preview of the song, starting at startPos
-	 * @param filename the track filename
-	 * @param startPos starting position
-	 */
-	void playPreview(std::string const& filename, double startPos) { playMusic(filename, true, 1.0, startPos); }
+	void playMusic(std::vector<std::string> const& filenames, bool preview = false, double fadeTime = 0.1, double startPos = -0.1);
 	/// get pause status
 	bool isPaused() { return m_paused; }
 	/// stops music

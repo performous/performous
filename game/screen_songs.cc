@@ -157,7 +157,7 @@ void ScreenSongs::draw() {
 	// Play/stop preview playback (if it is the time)
 	if (music != m_playing && m_playTimer.get() > 0.4) {
 		m_songbg.reset(); m_video.reset();
-		if (music.empty()) m_audio.fadeout(); else m_audio.playPreview(music, m_jukebox ? 0.0 : 30.0);
+		if (music.empty()) m_audio.fadeout(); else m_audio.playMusic(music, m_jukebox ? 0.0 : 30.0, true, 0.5);
 		if (!songbg.empty()) try { m_songbg.reset(new Surface(songbg)); } catch (std::exception const&) {}
 		if (!video.empty() && config["graphic/video"].b()) m_video.reset(new Video(video, videoGap));
 		m_playing = music;
