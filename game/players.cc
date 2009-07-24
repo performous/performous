@@ -4,11 +4,20 @@
 #include <boost/regex.hpp>
 
 Players::Players(std::string filename):
-	m_filename(filename)
-{}
+	m_players(),
+	m_filtered(),
+	m_filename(filename),
+	m_filter(),
+	math_cover()
+{
+	load();
+	m_filtered = m_players;
+}
 
 Players::~Players()
-{}
+{
+	save();
+}
 
 void Players::load()
 {
@@ -31,10 +40,14 @@ void Players::save()
 	}
 }
 
-void Players::addPlayer (std::string name)
+void Players::addPlayer (std::string const& name)
 {
 	PlayerItem pi;
 	pi.name = name;
+
+	players_t::const_iterator it =  std::find(m_players.begin(), m_players.end(), pi);
+	if (it != m_players.end()) return; // dont do anything, player exists
+
 	m_players.push_back(pi);
 }
 
@@ -45,6 +58,13 @@ void Players::setFilter(std::string const& val) {
 }
 
 void Players::filter_internal() {
+	if (m_filter == "")
+	{
+		// without filter get all names
+		m_filtered = m_players;
+		return;
+	}
+
 	try {
 		players_t filtered;
 		for (players_t::const_iterator it = m_players.begin(); it != m_players.end(); ++it) {
@@ -54,7 +74,7 @@ void Players::filter_internal() {
 	} catch (...) {
 		players_t(m_players.begin(), m_players.end()).swap(m_filtered);  // Invalid regex => copy everything
 	}
-	// TODO: reset images
+	math_cover.reset();
 }
 
 /*
@@ -66,15 +86,12 @@ int main(int argc, char** argv)
 
 	std::string filter = argv[1];
 	Players p("players.txt");
-	p.load();
-	// p.addPlayer(name);
+	p.addPlayer("hubert");
 	p.setFilter(filter);
 
 	for (size_t i=0; i<p.size(); i++)
 	{
 		std::cout << p[i].name << std::endl;
 	}
-
-	p.save();
 }
 */

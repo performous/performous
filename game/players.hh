@@ -18,6 +18,11 @@ struct PlayerItem
 	std::string picture; /// a path to a picture shown
 	std::map<std::string, int> scores; /// map between a Song and the highest score the Player achieved
 */
+
+	bool operator== (PlayerItem const& pi) const
+	{
+		return name == pi.name;
+	}
 };
 
 /**A collection of all Players.
@@ -47,7 +52,7 @@ class Players
 		load();
 	}
 	void save();
-	void addPlayer (std::string name);
+	void addPlayer (std::string const& name);
 
 	/// advances to next player
 	void advance(int diff) {
@@ -61,7 +66,7 @@ class Players
 	PlayerItem operator[](std::size_t pos) { return m_filtered[pos]; }
 	PlayerItem operator[](std::size_t pos) const { return m_filtered[pos]; }
 	/// number of players
-	int size() const { return m_filtered.size(); };
+	std::size_t size() const { return m_filtered.size(); };
 	/// true if empty
 	int empty() const { return m_filtered.empty(); };
 	/// filters playerlist by regular expression

@@ -11,11 +11,20 @@ ScreenPlayers::ScreenPlayers(std::string const& name, Audio& audio, Players& pla
 {
 	m_players.setAnimMargins(5.0, 5.0);
 	m_playTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
+
+	// print all names
+	std::cout << "Constructor of ScreenPlayers" << std::endl;
+	for (size_t i=0; i<m_players.size(); i++)
+	{
+		std::cout << "Name " << i << ": " << m_players[i].name << std::endl;
+	}
 }
 
 void ScreenPlayers::enter() {
+	std::cout << "Entered ScreenPlayers" << std::endl;
+
 	theme.reset(new ThemeSongs());
-	m_emptyCover.reset(new Surface(getThemePath("no_cover.svg")));
+	m_emptyCover.reset(new Surface(getThemePath("no_cover.svg"))); // TODO use persons head
 	m_search.text.clear();
 	m_players.setFilter(m_search.text);
 	m_audio.fadeout();
