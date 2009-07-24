@@ -221,8 +221,8 @@ ScoreWindow::ScoreWindow(Engine& e, Song const& song):
 	e.kill(); // kill the engine thread (to avoid consuming memory)
 
 
-	// TODO correct path and filename
-	HighScore hi ("", "High.sco");
+	HighScore hi (m_song.path, "High.sco");
+	// TODO fallback path if not writeable?
 	try {
 		hi.load();
 	} catch (HighScoreException const& hi) {
