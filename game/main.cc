@@ -1,6 +1,7 @@
 #include "config.hh"
 #include "fs.hh"
 #include "screen.hh"
+#include "joystick.hh"
 #include "screen_intro.hh"
 #include "screen_songs.hh"
 #include "screen_sing.hh"
@@ -44,6 +45,19 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 		  case SDL_VIDEORESIZE:
 			window.resize(event.resize.w, event.resize.h);
 			break;
+		  case SDL_JOYAXISMOTION:
+			joysticks[event.jaxis.which].addEvent(event.jaxis);
+			break;
+		  case SDL_JOYBALLMOTION:
+			joysticks[event.jball.which].addEvent(event.jball);
+			break;
+		  case SDL_JOYHATMOTION:
+			joysticks[event.jhat.which].addEvent(event.jhat);
+			break;
+		  case SDL_JOYBUTTONDOWN:
+		  case SDL_JOYBUTTONUP:
+			joysticks[event.jbutton.which].addEvent(event.jbutton);
+			break;
 		  case SDL_KEYUP:
 			if (event.key.keysym.sym == SDLK_ESCAPE) esc = false;
 			break;
@@ -74,6 +88,9 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 			case GL_STACK_UNDERFLOW: std::cerr << "OpenGL error: stack underflow" << std::endl; break;
 			case GL_OUT_OF_MEMORY: std::cerr << "OpenGL error: invalid enum" << std::endl; break;
 		}
+	}
+	for(Joysticks::iterator it = joysticks.begin() ; it != joysticks.end() ; ++it ) {
+		it->second.clearEvents();
 	}
 	if( config["graphic/fullscreen"].b() != window.getFullscreen() )
 		window.setFullscreen(config["graphic/fullscreen"].b());

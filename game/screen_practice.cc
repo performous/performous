@@ -40,9 +40,10 @@ void ScreenPractice::manageEvent(SDL_Event event) {
 				break;
 		}
 	}
-	switch( event.type ) {
-		case SDL_JOYBUTTONDOWN:
-			switch( event.jbutton.button ) {
+	JoystickEvent joy_event;
+	for(Joysticks::iterator it = joysticks.begin() ; it != joysticks.end() ; ++it ) {
+		if( it->second.tryPollEvent(joy_event) && joy_event.type == JoystickEvent::BUTTON_DOWN) {
+			switch(joy_event.button_id) {
 				case PS3_DRUM_CONTROLLER_RED: // Snare drum
 					m_audio.playMusic(getDataPath("sounds/drum_snare.ogg"));
 					break;
@@ -62,7 +63,7 @@ void ScreenPractice::manageEvent(SDL_Event event) {
 					m_audio.playMusic(getDataPath("sounds/drum_bass.ogg"));
 					break;
 			}
-			break;
+		}
 	}
 }
 
