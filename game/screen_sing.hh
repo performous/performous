@@ -19,11 +19,12 @@
 class ScoreWindow {
   public:
 	/// constructor
-	ScoreWindow(Engine & e);
+	ScoreWindow(Engine & e, Song const& song);
 	/// draws ScoreWindow
 	void draw();
 
   private:
+	Song const& m_song;
 	AnimValue m_pos;
 	Surface m_bg;
 	ProgressBar m_scoreBar;
@@ -37,18 +38,23 @@ class ScoreWindow {
 class ScreenSing: public Screen {
   public:
 	/// constructor
-	ScreenSing(std::string const& name, Audio& audio, Songs& songs, Capture& capture):
-	  Screen(name), m_audio(audio), m_songs(songs), m_capture(capture), m_latencyAV()
+	ScreenSing(std::string const& name, Audio& audio, Capture& capture):
+	  Screen(name), m_audio(audio), m_capture(capture), m_latencyAV()
 	{}
 	void enter();
 	void exit();
 	void manageEvent(SDL_Event event);
 	void draw();
 
+	void setSong (boost::shared_ptr<Song> song_)
+	{
+		m_song = song_;
+	}
+
   private:
 	void drawScores();
 	Audio& m_audio;
-	Songs& m_songs;  // TODO: take song instead of all of them
+	boost::shared_ptr<Song> m_song; /// Pointer to the current song
 	boost::scoped_ptr<ScoreWindow> m_score_window;
 	Capture& m_capture;
 	boost::scoped_ptr<ProgressBar> m_progress;

@@ -43,14 +43,14 @@ class LyricRow {
 
 class LayoutSinger {
   public:
-	LayoutSinger(Songs &_songs, Engine &_engine, ThemeSing& _theme);
+	LayoutSinger(Song &_song, Engine &_engine, ThemeSing& _theme);
 	~LayoutSinger();
 	void reset();
 	void draw(double time);
 	double lyrics_begin();
   private:
 	Engine& m_engine;
-  	Songs& m_songs;
+  	Song& m_song;
 	ThemeSing& m_theme;
 	NoteGraph m_noteGraph;
 	Notes::const_iterator m_lyricit;

@@ -1,4 +1,5 @@
 #include "screen_songs.hh"
+#include "screen_sing.hh"
 #include "configuration.hh"
 #include "util.hh"
 #include "xtime.hh"
@@ -33,6 +34,24 @@ void ScreenSongs::exit() {
 	m_playReq.clear();
 }
 
+/**Add keys here which should effect both the
+  juke box and the normal screen*/
+void ScreenSongs::manageSharedKey(int key, SDLMod mod)
+{
+	if (key == SDLK_SPACE || (key == SDLK_PAUSE || (key == SDLK_p && mod & KMOD_CTRL))) m_audio.togglePause();
+	else if (key == SDLK_RETURN)
+	{
+		ScreenManager* sm = ScreenManager::getSingletonPtr();
+		Screen* s = sm->getScreen("Sing");
+		ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
+		assert(ss);
+		ss->setSong(m_songs.currentPtr());
+		sm->activateScreen("Sing");
+	}
+	else if (key == SDLK_LEFT) m_songs.advance(-1);
+	else if (key == SDLK_RIGHT) m_songs.advance(1);
+}
+
 void ScreenSongs::manageEvent(SDL_Event event) {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	if (event.type != SDL_KEYDOWN) return;
@@ -41,14 +60,11 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 	SDLMod mod = event.key.keysym.mod;
 	if (m_jukebox) {
 		if (key == SDLK_ESCAPE || m_songs.empty()) m_jukebox = false;
-		else if (key == SDLK_SPACE || (key == SDLK_PAUSE || (key == SDLK_p && mod && KMOD_CTRL))) m_audio.togglePause();
-		else if (key == SDLK_RETURN) sm->activateScreen("Sing");
-		else if (key == SDLK_LEFT) m_songs.advance(-1);
-		else if (key == SDLK_RIGHT) m_songs.advance(1);
 		else if (key == SDLK_PAGEUP) m_audio.seek(-30);
 		else if (key == SDLK_PAGEDOWN) m_audio.seek(30);
 		else if (key == SDLK_UP) m_audio.seek(5);
 		else if (key == SDLK_DOWN) m_audio.seek(-5);
+		else manageSharedKey(key, mod);
 		return;
 	}
 	if (key == SDLK_r && mod & KMOD_CTRL) { m_songs.reload(); m_songs.setFilter(m_search.text); }
@@ -59,16 +75,13 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 	}
 	// The rest are only available when there are songs available
 	else if (m_songs.empty()) return;
-	else if (key == SDLK_SPACE || (key == SDLK_PAUSE || (key == SDLK_p && mod && KMOD_CTRL))) m_audio.togglePause();
-	else if (key == SDLK_TAB && !(mod & KMOD_ALT)) m_songs.randomize();
-	else if (key == SDLK_RETURN) sm->activateScreen("Sing");
-	else if (key == SDLK_LEFT) m_songs.advance(-1);
-	else if (key == SDLK_RIGHT) m_songs.advance(1);
 	else if (key == SDLK_PAGEUP) m_songs.advance(-10);
 	else if (key == SDLK_PAGEDOWN) m_songs.advance(10);
 	else if (key == SDLK_UP) m_songs.sortChange(-1);
 	else if (key == SDLK_DOWN) m_songs.sortChange(1);
 	else if (!m_jukebox && key == SDLK_F4) m_jukebox = true;
+	else if (key == SDLK_TAB && !(mod & KMOD_ALT)) m_songs.randomize();
+	else manageSharedKey(key, mod);
 }
 
 void ScreenSongs::drawJukebox() {

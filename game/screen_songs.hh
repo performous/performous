@@ -21,6 +21,7 @@ class ScreenSongs : public Screen {
 	ScreenSongs(std::string const& name, Audio& audio, Songs& songs);
 	void enter();
 	void exit();
+	void manageSharedKey(int key, SDLMod mod); ///< same behaviour for jukebox and normal mode
 	void manageEvent(SDL_Event event);
 	void draw();
 	void drawJukebox(); ///< draw the songbrowser in jukebox mode (fullscreen, full previews, ...)
