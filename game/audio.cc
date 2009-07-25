@@ -75,7 +75,7 @@ void Audio::playMusic(std::vector<std::string> const& filenames, bool preview, d
 	ch->add(boost::ref(*this));
 	m_volumeSetting = preview ? "audio/preview_volume" : "audio/music_volume";
 	ch->add(boost::ref(m_volume));
-	m_mixer.fadein(da::shared_ref(ch), 0.5, startPos);
+	m_mixer.fadein(da::shared_ref(ch), fadeTime, startPos);
 	if (!preview) pause(false);
 }
 
