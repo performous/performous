@@ -43,7 +43,6 @@ FFmpeg::~FFmpeg() {
 }
 
 double FFmpeg::duration() const {
-	std::cout << m_running << ", " << pFormatCtx->duration << ", " << AV_TIME_BASE << std::endl;
 	double d = m_running ? pFormatCtx->duration / double(AV_TIME_BASE) : getNaN();
 	return d >= 0.0 ? d : getInf();
 }
