@@ -156,16 +156,16 @@ void ScreenSongs::draw() {
 	// Schedule playback change if the chosen song has changed
 	if (music != m_playReq) { m_playReq = music; m_playTimer.setValue(0.0); }
 	// Play/stop preview playback (if it is the time)
-	if (music != m_playing && m_playTimer.get() > 0.4) {
+	if (music != m_playing && m_playTimer.get() > 0.3) {
 		m_songbg.reset(); m_video.reset();
-		if (music.empty()) m_audio.fadeout(); else m_audio.playMusic(music, true, 1.0);
+		if (music.empty()) m_audio.fadeout(1.0); else m_audio.playMusic(music, true, 2.0);
 		if (!songbg.empty()) try { m_songbg.reset(new Surface(songbg)); } catch (std::exception const&) {}
 		if (!video.empty() && config["graphic/video"].b()) m_video.reset(new Video(video, videoGap));
 		m_playing = music;
 	}
 	if (m_jukebox) {
 		// Switch if at song end
-		if (!m_audio.isPlaying() || m_audio.getPosition() + 1.4 > m_audio.getLength()) {
+		if (!m_audio.isPlaying() || m_audio.getPosition() + 1.3 > m_audio.getLength()) {
 			m_songs.advance(1);
 			// Force reload of data
 			m_playing.clear();

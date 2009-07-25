@@ -27,19 +27,19 @@ void Audio::open(std::string const& pdev, std::size_t rate, std::size_t frames) 
 
 bool Audio::operator()(da::pcm_data& areas) {
 	boost::recursive_mutex::scoped_lock l(m_mutex);
-	std::size_t samples = areas.channels * areas.frames;
+	std::size_t samples = areas.samples();
 	static double phase = 0.0;
 	// Synthesize tones
 	Notes const* n = m_notes;
-	if (n && !m_paused) {
-		double t = getPosition();
+	double t = getPosition();
+	if (n) {
 		Notes::const_iterator it = n->begin();
 		while (it != n->end() && it->end < t) ++it;
 		for (size_t i = 0; i < samples; ++i) areas.rawbuf[i] *= 0.3; // Decrease music volume
 		if (it == n->end() || it->type == Note::SLEEP || it->begin > t) { phase = 0.0; return true; }
-		int n = it->note % 12;
-		double d = (n + 1) / 13.0;
-		double freq = MusicalScale().getNoteFreq(n + 12);
+		int note = it->note % 12;
+		double d = (note + 1) / 13.0;
+		double freq = MusicalScale().getNoteFreq(note + 12);
 		double value = 0.0;
 		// Synthesize tones
 		for (size_t i = 0; i < samples; ++i) {
@@ -50,26 +50,32 @@ bool Audio::operator()(da::pcm_data& areas) {
 			areas.rawbuf[i] += value;
 		}
 	}
-	return true;
+	return t < getLength();
 }
 
 void Audio::playMusic(std::vector<std::string> const& filenames, bool preview, double fadeTime, double startPos) {
 	if (!isOpen()) return;
 	boost::recursive_mutex::scoped_lock l(m_mutex);
-	// First construct the new stream
 	fadeout(fadeTime);
+	boost::shared_ptr<da::chain> ch(new da::chain());
 	for(std::vector<std::string>::const_iterator it = filenames.begin() ; it != filenames.end() ; ++it ) {
 		try {
-			m_streams.push_back(boost::shared_ptr<Stream>(new Stream(*it, m_rs.rate(), preview ? config["audio/preview_volume"] : config["audio/music_volume"])));
-			m_streams.back()->fadein(fadeTime);
-			m_streams.back()->seek(startPos);
+			boost::shared_ptr<Stream> s(new Stream(*it, m_rs.rate()));
+			m_streams.push_back(s);
+			ch->add(da::shared_ref(s));
+			s->seek(startPos);
 		} catch (std::runtime_error& e) {
 			std::cerr << "Error loading " << *it << " (" << e.what() << ")" << std::endl;
 			continue;
 		}
 	}
+	ch->add(boost::ref(*this));
+	/*
+	m_volumeSetting = preview ? "audio/preview_volume" : "audio/music_volume";
+	ch->add(boost::ref(m_volume));
+	*/
 	da::lock_holder l2 = m_mixer.lock();
-	for (size_t i = 0; i < m_streams.size(); ++i) m_mixer.add(da::shared_ref(m_streams[i]));
+	m_mixer.fadein(da::shared_ref(ch), 0.5, startPos);
 	if (!preview) pause(false);
 }
 
@@ -80,15 +86,17 @@ void Audio::playMusic(std::string const& filename, bool preview, double fadeTime
 void Audio::stopMusic() {
 	boost::recursive_mutex::scoped_lock l(m_mutex);
 	m_notes = NULL;
-	m_mixer.fade(0.0);
+	m_mixer.clear();
 	m_streams.clear();
+	std::cerr << "STOP!" << std::endl;
 }
 
 void Audio::fadeout(double fadeTime) {
 	boost::recursive_mutex::scoped_lock l(m_mutex);
 	m_notes = NULL;
-	m_mixer.fade(fadeTime);
+	m_mixer.fadeout(fadeTime);
 	m_streams.clear();
+	std::cerr << "FADEOUT!" << fadeTime << std::endl;
 }
 
 double Audio::getPosition() const {
@@ -125,7 +133,6 @@ void Audio::seekPos(double pos) {
 
 void Audio::pause(bool state) {
 	m_paused = state;
-	da::lock_holder l2 = m_mixer.lock();
 	m_mixer.pause(m_paused);
 }
 

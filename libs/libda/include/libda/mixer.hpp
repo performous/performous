@@ -35,14 +35,12 @@ namespace da {
 		return shared_reference_wrapper<T>(ptr);
 	}
 
+	
 	class chain: boost::noncopyable {
 	  public:
 		typedef std::vector<callback_t> streams_t;
-		chain() {}
-		chain(callback_t const& cb): streams(1, cb) {}
-		void add(callback_t const& cb) {
-			streams.push_back(cb);
-		}
+		void add(callback_t const& cb) { streams.push_back(cb); }
+		void clear() { streams.clear(); }
 		/** Calls every stream in the chain and removes those that return false. **/
 		bool operator()(pcm_data& data) {
 			streams_t::iterator wr = streams.begin();
@@ -57,6 +55,7 @@ namespace da {
 	};
 
 	namespace {
+		bool voidOp(pcm_data const&) { return true; }
 		bool zero(pcm_data& data) {
 			std::fill(data.rawbuf, data.rawbuf + (data.channels * data.frames), 0.0f);
 			return true;
@@ -66,10 +65,8 @@ namespace da {
 	class accumulate: boost::noncopyable {
 	  public:
 		typedef std::vector<callback_t> streams_t;
-		accumulate() {}
-		void add(callback_t const& cb) {
-			streams.push_back(cb);
-		}
+		void add(callback_t const& cb) { streams.push_back(cb); }
+		void clear() { streams.clear(); }
 		/** Calls every stream in the chain and removes those that return false, summing the results. **/
 		bool operator()(pcm_data& data) {
 			std::vector<sample_t> buffer(data.samples());
@@ -116,9 +113,28 @@ namespace da {
 		int64_t m_pos;
 	};
 
-	class fadeout: boost::noncopyable {
+	class fadeinOp: boost::noncopyable {
 	  public:
-		fadeout(callback_t stream, double time = 1.0): m_stream(stream), m_pos(), m_time(time) {}
+		fadeinOp(double time = 1.0, int64_t pos = 0): m_pos(pos), m_time(time) {}
+		bool operator()(pcm_data& data) {
+			size_t end = m_time * data.rate;
+			size_t size = data.frames * data.channels;
+			if (m_pos > int64_t(end)) return 1.0f;
+			for (size_t i = 0; i < size; ++i, ++m_pos) {
+				if (m_pos < 0) data.rawbuf[i] = 0.0f;
+				sample_t level = size_t(m_pos) < end ? sample_t(m_pos) / end : 1.0f;
+				data.rawbuf[i] *= level;
+			}
+			return m_pos < int64_t(end);
+		}
+	  private:
+		int64_t m_pos;
+		double m_time;
+	};
+
+	class fadeoutOp: boost::noncopyable {
+	  public:
+		fadeoutOp(callback_t cb, double time = 1.0, int64_t pos = 0): m_stream(cb), m_pos(pos), m_time(time) {}
 		bool operator()(pcm_data& data) {
 			bool ret = m_stream(data);
 			size_t end = m_time * data.rate;
@@ -134,6 +150,19 @@ namespace da {
 		callback_t m_stream;
 		int64_t m_pos;
 		double m_time;
+	};
+
+	class volume {
+	  public:
+		volume(sample_t level = 1.0f): m_level(level) {}
+		void level(sample_t level) { m_level = level; }
+		bool operator()(pcm_data& data) {
+			if (m_level == 1.0f) return true;
+			for (size_t i = 0, s = data.samples(); i < s; ++i) data.rawbuf[i] *= m_level;
+			return true;
+		}
+	  private:
+		sample_t m_level;
 	};
 
 	class scoped_lock: public boost::recursive_mutex::scoped_lock {
@@ -180,12 +209,8 @@ namespace da {
 	
 	class mixer {
 	  public:
-		mixer(): m_chain(zero), m_mutex(boost::ref(m_select)) {
-			m_select.insert("paused", zero);
-			m_select.insert("normal", boost::ref(m_chain));
-			pause(false);
-		}
-		mixer(settings& s): m_chain(zero), m_mutex(boost::ref(m_chain)) { start(s); }
+		mixer(): m_mutex(boost::ref(m_select)) { init(); }
+		mixer(settings& s): m_mutex(boost::ref(m_select)) { init(); start(s); }
 		void start(settings& s) { m_settings = s; start(); s = m_settings; }
 		void start() {
 			stop();
@@ -196,22 +221,69 @@ namespace da {
 		bool started() const { return m_playback; }
 		void add(callback_t const& cb) {
 			scoped_lock l(m_mutex);
-			m_chain.add(cb);
+			m_user.add(cb);
 		}
-		void fade(double time = 1.0) {
+		void fadein(callback_t const& cb, double time, double startpos = 0.0) {
 			scoped_lock l(m_mutex);
-			if (m_chain.streams.size() == 1) return;
-			std::auto_ptr<chain> ch(new chain());
-			ch->streams = chain::streams_t(m_chain.streams.begin() + 1, m_chain.streams.end());
-			m_chain.streams.erase(m_chain.streams.begin() + 1, m_chain.streams.end());
-			m_chain.add(shared_ref(new fadeout(shared_ref(ch.release()), time)));
+			if (m_user.streams.size() <= 1) {
+				// The simple case
+				m_user.add(cb);
+				m_user.add(shared_ref(new fadeinOp(time)));
+				return;
+			}
+			// Make a new chain that produces the same output as the old one
+			boost::shared_ptr<chain> origch(new chain());
+			origch->streams.insert(origch->streams.end(), m_user.streams.begin() + 1, m_user.streams.end());
+			// Make a new chain for cb + fade
+			boost::shared_ptr<chain> fadech(new chain());
+			fadech->add(cb);
+			fadech->add(shared_ref(new fadeinOp(time, startpos * m_settings.rate() * m_settings.channels())));
+			// Replace the output with accumulate of both chains
+			clear();
+			boost::shared_ptr<accumulate> accu(new accumulate());
+			accu->add(shared_ref(origch));
+			accu->add(shared_ref(fadech));
+			add(shared_ref(accu));
 		}
-		void pause(bool p) { m_select.choose(p ? "paused" : "normal"); }
+		void fadeout(double time, double startpos = 0.0) {
+			scoped_lock l(m_mutex);
+			if (m_user.streams.size() <= 1) return;
+			// Make a new chain that produces the same output as the old one
+			boost::shared_ptr<chain> ch(new chain());
+			ch->streams.insert(ch->streams.end(), m_user.streams.begin() + 1, m_user.streams.end());
+			// Replace the output with our new stream (with fade)
+			clear();
+			add(shared_ref(new fadeoutOp(shared_ref(ch), time, startpos * m_settings.rate() * m_settings.channels())));
+		}
+		void clear() {
+			scoped_lock l(m_mutex);
+			m_user.clear();
+			m_user.add(voidOp);
+		}
+		void set_volume(sample_t level) {
+			scoped_lock l(m_mutex);
+			m_volume.level(level);
+		}
+		void pause(bool p) {
+			scoped_lock l(m_mutex);
+			m_select.choose(p ? "paused" : "normal");
+		}
 		settings get_settings() { return m_settings; }
 		lock_holder lock() { return lock_holder(new scoped_lock(m_mutex)); }
 	  private:
+		void init() {
+			m_master.add(zero);
+			m_master.add(boost::ref(m_user));
+			m_master.add(boost::ref(m_volume));
+			m_select.insert("paused", zero);
+			m_select.insert("normal", boost::ref(m_master));
+			pause(false);
+			clear();
+		}
+		volume m_volume;
+		chain m_user;
+		chain m_master;
 		select<std::string> m_select;
-		chain m_chain;
 		mutex_stream m_mutex;
 		settings m_settings;
 		boost::scoped_ptr<playback> m_playback;

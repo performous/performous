@@ -21,42 +21,19 @@ struct Stream {
 	FFmpeg mpeg;
 	/// sample rate
 	double srate;
-	/// volume setting to follow
-	ConfigItem& volume;
-	/// actual "faded volume"
-	double fade;
-	/// speed of fade effect
-	double fadeSpeed;
 	/// constructor
-	Stream(std::string const& filename, unsigned int sr, ConfigItem& vol):
-	  mpeg(false, true, filename, sr), srate(sr), volume(vol), fade(1.0), fadeSpeed(), m_pos() {}
-	/// fades stream in
-	void fadein(double time) { fade = fadeSpeed = 1.0 / (time * srate); }
-	/// fades stream out
-	void fadeout(double time) { fadeSpeed = - 1.0 / (time * srate); }
-	/// is the stream fading out
-	bool fadingout() {return fadeSpeed < 0;}
+	Stream(std::string const& filename, unsigned int sr):
+	  mpeg(false, true, filename, sr), srate(sr), m_pos() {}
 	/// crossfades songs
 	bool operator()(da::pcm_data& data) {
-		std::size_t maxSamples = data.channels * data.frames;
 		mpeg.audioQueue(data, m_pos);
-		bool fadeMin = false, fadeMax = false;
-		if (fade + maxSamples * fadeSpeed < 0.0) { fadeSpeed = fade / maxSamples; fadeMin = true; }
-		if (fade + maxSamples * fadeSpeed > 1.0) { fadeSpeed = (1.0 - fade) / maxSamples; fadeMax = true; }
-		double vol = 0.0;
-		if (volume.i() > 0) vol = std::pow(10.0, (volume.i() - 100.0) / 100.0 * 2.0);
-		for (size_t i = 0; i < maxSamples; ++i) {
-			data.rawbuf[i] *= vol * fade;
-			fade += fadeSpeed;
-		}
-		if (fadeMin) { fade = 0.0; fadeSpeed = 0.0; }
-		if (fadeMax) { fade = 1.0; fadeSpeed = 0.0; }
+		//if (volume.i() > 0) vol = std::pow(10.0, (volume.i() - 100.0) / 100.0 * 2.0);
 		return !eof();
 	}
 	void seek(double time) { m_pos = time * srate * 2.0; }
 	double pos() const { return double(m_pos) / srate / 2.0; }
 	double duration() const { return mpeg.audioQueue.duration(); }
-	bool eof() const { return mpeg.audioQueue.eof(m_pos) || (fade == 0.0 && fadeSpeed == 0.0); }
+	bool eof() const { return mpeg.audioQueue.eof(m_pos); }
 	int64_t m_pos;
 };
 
@@ -74,9 +51,9 @@ class Audio {
 	 * @param fadeTime time to fade
 	 * @param startPos starting position
 	 */
-	void playMusic(std::string const& filename, bool preview = false, double fadeTime = 0.1, double startPos = -0.1);
+	void playMusic(std::string const& filename, bool preview = false, double fadeTime = 0.5, double startPos = -0.2);
 	/// plays a list of songs
-	void playMusic(std::vector<std::string> const& filenames, bool preview = false, double fadeTime = 0.1, double startPos = -0.1);
+	void playMusic(std::vector<std::string> const& filenames, bool preview = false, double fadeTime = 0.5, double startPos = -0.2);
 	/// get pause status
 	bool isPaused() { return m_paused; }
 	/// stops music
