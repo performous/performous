@@ -14,6 +14,13 @@ ScreenPlayers::ScreenPlayers(std::string const& name, Audio& audio, Players& pla
 }
 
 void ScreenPlayers::enter() {
+	m_highscore.reset(new HighScore(m_song->path, "High.sco"));
+	try {
+		m_highscore->load();
+	} catch (HighScoreException const& hi) {
+		std::cerr << "high.sco:" << hi.line() << " " << hi.what() << std::endl;
+	}
+
 	theme.reset(new ThemeSongs());
 	m_emptyCover.reset(new Surface(getThemePath("no_cover.svg"))); // TODO use persons head
 	m_search.text.clear();
@@ -29,20 +36,27 @@ void ScreenPlayers::exit() {
 	m_songbg.reset();
 	m_playing.clear();
 	m_playReq.clear();
+
+	try {
+		m_highscore->save();
+	} catch (HighScoreException const& hi) {
+		std::cerr << "high.sco:" << hi.line() << " " << hi.what() << std::endl;
+	}
+	m_highscore.reset();
 }
 
 void ScreenPlayers::manageEvent(SDL_Event event) {
-	ScreenManager* sm = ScreenManager::getSingletonPtr();
-	if (event.type != SDL_KEYDOWN) return;
-	SDL_keysym keysym = event.key.keysym;
-	int key = keysym.sym;
-	SDLMod mod = event.key.keysym.mod;
+ScreenManager* sm = ScreenManager::getSingletonPtr();
+if (event.type != SDL_KEYDOWN) return;
+SDL_keysym keysym = event.key.keysym;
+int key = keysym.sym;
+SDLMod mod = event.key.keysym.mod;
 
-	if (key == SDLK_r && mod & KMOD_CTRL) { m_players.reload(); m_players.setFilter(m_search.text); }
-	if (m_search.process(keysym)) m_players.setFilter(m_search.text);
-	else if (key == SDLK_ESCAPE) {
-		if (m_search.text.empty()) sm->activateScreen("Songs");
-		else { m_search.text.clear(); m_players.setFilter(m_search.text); }
+if (key == SDLK_r && mod & KMOD_CTRL) { m_players.reload(); m_players.setFilter(m_search.text); }
+if (m_search.process(keysym)) m_players.setFilter(m_search.text);
+else if (key == SDLK_ESCAPE) {
+	if (m_search.text.empty()) sm->activateScreen("Songs");
+	else { m_search.text.clear(); m_players.setFilter(m_search.text); }
 	}
 	// The rest are only available when there are songs available
 	else if (m_players.empty()) return;
@@ -52,10 +66,27 @@ void ScreenPlayers::manageEvent(SDL_Event event) {
 		if (m_players.empty())
 		{
 			m_players.addPlayer(m_search.text);
-			m_players.setFilter(m_search.text); // set new Player as current
+			m_players.setFilter(m_search.text);
+			// the current player is the new created one
 		}
-		// we are now finished
-		sm->activateScreen("Songs");
+		std::cout << "add new highscore " << m_players.scores.front()
+			<< " name: " << m_players.current().name
+			<< std::endl;
+		m_highscore->addNewHighscore(m_players.current().name, m_players.scores.front());
+		m_players.scores.pop_front();
+
+		if (m_players.scores.empty() || !m_highscore->reachedNewHighscore(m_players.scores.front()))
+		{
+			// no more highscore, we are now finished
+			// clear the old players lists
+			m_players.scores.clear();
+			m_players.cur.clear();
+			sm->activateScreen("Songs");
+		} else {
+			std::cout << "enter the next highscore" << std::endl;
+			m_search.text.clear();
+			// enter the next highscore
+		}
 	}
 	else if (key == SDLK_LEFT) m_players.advance(-1);
 	else if (key == SDLK_RIGHT) m_players.advance(1);
@@ -85,10 +116,12 @@ void ScreenPlayers::draw() {
 			oss_order << m_search.text << '\n';
 		}
 	} else {
-		PlayerItem player = m_players.current();
 		// Format the player information text
-		oss_song << player.name << '\n';
-		oss_order << (m_search.text.empty() ? std::string("new player") : m_search.text) << '\n';
+		oss_song << "You reached " << m_players.scores.front() << " points\n";
+		oss_order << "Name: " << m_players.current().name
+			<< " Search Text: "
+			<< (m_search.text.empty() ? std::string("new player") : m_search.text)
+			<< '\n';
 		oss_order << "(" << m_players.currentId() + 1 << "/" << m_players.size() << ")";
 		double spos = m_players.currentPosition(); // This needs to be polled to run the animation
 

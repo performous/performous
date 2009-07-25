@@ -6,10 +6,11 @@
 #include "opengl_text.hh"
 #include "screen.hh"
 #include "surface.hh"
-#include "players.hh"
 #include "textinput.hh"
 #include "theme.hh"
 #include "video.hh"
+#include "players.hh"
+#include "highscore.hh"
 
 class CAudio;
 
@@ -23,9 +24,16 @@ class ScreenPlayers : public Screen {
 	void manageEvent(SDL_Event event);
 	void draw();
 
+	void setSong (boost::shared_ptr<Song> song_)
+	{
+		m_song = song_;
+	}
+
   private:
 	Audio& m_audio;
 	Players& m_players;
+	boost::shared_ptr<Song> m_song; /// Pointer to the current song
+	boost::scoped_ptr<HighScore> m_highscore;
 	boost::scoped_ptr<Surface> m_songbg;
 	boost::scoped_ptr<Video> m_video;
 	boost::scoped_ptr<ThemeSongs> theme;

@@ -21,12 +21,11 @@
 class ScoreWindow {
   public:
 	/// constructor
-	ScoreWindow(Engine & e, Song const& song, Players & players);
+	ScoreWindow(Engine & e, Players & players);
 	/// draws ScoreWindow
 	void draw();
 
   private:
-	Song const& m_song;
 	Players & m_players;
 	AnimValue m_pos;
 	Surface m_bg;

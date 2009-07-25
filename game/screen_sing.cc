@@ -3,7 +3,6 @@
 #include "util.hh"
 #include "configuration.hh"
 #include "xtime.hh"
-#include "highscore.hh"
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 #include "songs.hh"
@@ -71,11 +70,14 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		else if (key == SDLK_RETURN) {
 			if (m_score_window.get())
 			{
-				// Score window visible -> Enter quits to Songs or Players Screen
-				// TODO if (m_players.hasNewHighscore()) sm->activateScreen("Players");
-				sm->activateScreen("Songs");
+				// Score window visible -> Enter quits to Players Screen
+				Screen* s = sm->getScreen("Players");
+				ScreenPlayers* ss = dynamic_cast<ScreenPlayers*> (s);
+				assert(ss);
+				ss->setSong(m_song);
+				sm->activateScreen("Players");
 			}
-			else if (status == Song::FINISHED) m_score_window.reset(new ScoreWindow(*m_engine, *m_song, m_players)); // Song finished, but no score window -> show it
+			else if (status == Song::FINISHED) m_score_window.reset(new ScoreWindow(*m_engine, m_players)); // Song finished, but no score window -> show it
 		}
 		else if (key == SDLK_SPACE || key == SDLK_PAUSE) m_audio.togglePause();
 		if (m_score_window.get()) return;
@@ -184,7 +186,7 @@ void ScreenSing::draw() {
 		}
 		else if (!m_audio.isPlaying() || (status == Song::FINISHED && m_audio.getLength() - time < 3.0)) {
 			m_quitTimer.setValue(QUIT_TIMEOUT);
-			m_score_window.reset(new ScoreWindow(*m_engine, *m_song, m_players));
+			m_score_window.reset(new ScoreWindow(*m_engine, m_players));
 		}
 	}
 		
@@ -212,8 +214,7 @@ void ScreenSing::drawScores() {
 	}
 }
 
-ScoreWindow::ScoreWindow(Engine& e, Song const& song, Players & players):
-  m_song(song),
+ScoreWindow::ScoreWindow(Engine& e, Players & players):
   m_players(players),
   m_pos(0.8, 2.0),
   m_bg(getThemePath("score_window.svg")),
@@ -224,27 +225,18 @@ ScoreWindow::ScoreWindow(Engine& e, Song const& song, Players & players):
 	m_pos.setTarget(0.0);
 	e.kill(); // kill the engine thread (to avoid consuming memory)
 
-
-	HighScore hi (m_song.path, "High.sco");
-	// TODO fallback path if not writeable?
-
-	try {
-		hi.load();
-	} catch (HighScoreException const& hi) {
-		std::cerr << "high.sco:" << hi.line() << " " << hi.what() << std::endl;
-	}
+	m_players.scores.clear();
 	unsigned int topScore = 0;
 	for (std::list<Player>::iterator p = m_players.cur.begin(); p != m_players.cur.end();) {
 		unsigned int score = p->getScore();
 		if (score < 500) { p = m_players.cur.erase(p); continue; }
+		m_players.scores.push_back(score);
 		if (score > topScore) topScore = score;
 		++p;
 	}
-	try {
-		hi.save();
-	} catch (HighScoreException const& hi) {
-		std::cerr << "high.sco:" << hi.line() << " " << hi.what() << std::endl;
-	}
+	m_players.scores.sort();
+	// topScore is also in m_players.scores.front()
+
 	if (m_players.cur.empty()) m_rank = "No singer!";
 	else if (topScore > 8000) m_rank = "Hit singer";
 	else if (topScore > 6000) m_rank = "Lead singer";

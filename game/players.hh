@@ -35,6 +35,7 @@ class Players: boost::noncopyable {
   private:
 	typedef std::vector<PlayerItem> players_t;
 	typedef std::list<Player> cur_players_t;
+	typedef std::list<int> cur_scores_t;
 
   private:
 	players_t m_players;
@@ -48,6 +49,7 @@ class Players: boost::noncopyable {
 
   public:
 	cur_players_t cur;
+	cur_scores_t scores;
 
   public:
 	Players(std::string filename);
