@@ -30,10 +30,10 @@ namespace {
 			std::vector<sample_t> buf;
 			buf.reserve(frames * m_s.channels());
 			for (jack_nframes_t fr = 0; fr < frames; ++fr) for (size_t ch = 0; ch < m_ports.size(); ++ch) buf.push_back(*samples[ch]++);
-			pcm_data data(&buf[0], frames, m_ports.size());
+			pcm_data data(&buf[0], frames, m_ports.size(), m_s.rate());
 			m_s.set_frames(frames);
 			try {
-				m_s.callback()(data, m_s);
+				m_s.callback()(data);
 			} catch (std::exception& e) {
 				m_s.debug(std::string("Exception from recording callback: ") + e.what());
 			}
@@ -85,10 +85,10 @@ namespace {
 		void shutdown() { m_client = NULL; m_s.debug("da::jack_playback: JACK server shutdown; processing terminated."); }
 		int callback(jack_nframes_t frames) {
 			std::vector<sample_t> buf(frames * m_s.channels());
-			pcm_data data(&buf[0], frames, m_ports.size());
+			pcm_data data(&buf[0], frames, m_ports.size(), m_s.rate());
 			m_s.set_frames(frames);
 			try {
-				m_s.callback()(data, m_s);
+				m_s.callback()(data);
 			} catch (std::exception& e) {
 				m_s.debug(std::string("Exception from playback callback: ") + e.what());
 			}

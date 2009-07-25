@@ -97,8 +97,8 @@ namespace {
 				try {
 					std::vector<sample_t> buf(s.frames() * s.channels());
 					std::generate(buf.begin(), buf.end(), accumgen(gen, s.channels()));
-					pcm_data data(&buf[0], s.frames(), s.channels());
-					s.callback()(data, s);
+					pcm_data data(&buf[0], s.frames(), s.channels(), s.rate());
+					s.callback()(data);
 				} catch (std::exception& e) {
 					s.debug(std::string("Exception from recording callback: ") + e.what());
 				}

@@ -52,9 +52,9 @@ namespace {
 				const std::size_t channels = m_s.channels();
 				buf.resize(m_s.frames() * channels);
 				if (pa_simple_read(m_stream, &buf[0], buf.size() * sizeof(sample_t), NULL) < 0) continue;
-				pcm_data data(&buf[0], buf.size() / channels, channels);
+				pcm_data data(&buf[0], buf.size() / channels, channels, m_s.rate());
 				try {
-					m_s.callback()(data, m_s);
+					m_s.callback()(data);
 				} catch (std::exception& e) {
 					m_s.debug(std::string("Exception from recording callback: ") + e.what());
 				}
@@ -105,9 +105,9 @@ namespace {
 			while (!m_quit) {
 				const std::size_t channels = m_s.channels();
 				buf.resize(m_s.frames() * channels);
-				pcm_data data(&buf[0], buf.size() / channels, channels);
+				pcm_data data(&buf[0], buf.size() / channels, channels, m_s.rate());
 				try {
-						m_s.callback()(data, m_s);
+						m_s.callback()(data);
 				} catch (std::exception& e) {
 					m_s.debug(std::string("Exception from playback callback: ") + e.what());
 				}

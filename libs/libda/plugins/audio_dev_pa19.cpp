@@ -13,8 +13,8 @@ namespace {
 			try {
 				std::vector<sample_t> buf(frames * self.s.channels());
 				std::transform(iptr, iptr + buf.size(), buf.begin(), conv_from_s16);
-				pcm_data data(&buf[0], frames, self.s.channels());
-				self.s.callback()(data, self.s);
+				pcm_data data(&buf[0], frames, self.s.channels(), self.s.rate());
+				self.s.callback()(data);
 			} catch (std::exception& e) {
 				self.s.debug(std::string("Exception from recording callback: ") + e.what());
 			}
@@ -68,8 +68,8 @@ namespace {
 				iptr[i] = 0;
 			try {
 				std::vector<sample_t> buf(frames * self.s.channels());
-				pcm_data data(&buf[0], frames, self.s.channels());
-				self.s.callback()(data, self.s);
+				pcm_data data(&buf[0], frames, self.s.channels(), self.s.rate());
+				self.s.callback()(data);
 				for( unsigned int i = 0 ; i < frames*self.s.channels() ; i++ )
 					iptr[i] = da::conv_to_s16(data[i]);
 			} catch (std::exception& e) {
