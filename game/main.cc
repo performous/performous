@@ -7,6 +7,7 @@
 #include "screen_practice.hh"
 #include "screen_configuration.hh"
 #include "screen_players.hh"
+#include "screen_highscore.hh"
 #include "video_driver.hh"
 #include "xtime.hh"
 #include <boost/format.hpp>
@@ -142,6 +143,7 @@ void mainLoop() {
 		sm.addScreen(new ScreenPractice("Practice", audio, capture));
 		sm.addScreen(new ScreenConfiguration("Configuration", audio));
 		sm.addScreen(new ScreenPlayers("Players", audio, players));
+		sm.addScreen(new ScreenHighscore("Highscore", audio, players));
 		sm.activateScreen("Intro");
 		// Main loop
 		boost::xtime time = now();

@@ -113,6 +113,21 @@ void HighScore::save()
 	out << "E" << std::endl;
 }
 
+void HighScore::getInfo (std::ostream & out)
+{
+	for (size_t i=0; i<m_scores.size();i++)
+	{
+		if (m_scores[i].score <= 0) break; // maybe change to 500?
+
+		try {
+			out << i+1 << ".\t" << m_scores[i].name
+			  << "\t" << m_scores[i].score << std::endl;
+		} catch (std::ofstream::failure const&) {
+			throw HighScoreException("Unexpected I/O error", i);
+		}
+	}
+}
+
 void HighScore::addNewHighscore(std::string name, int score)
 {
 	// do not allow invalid name

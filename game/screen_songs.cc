@@ -1,5 +1,6 @@
 #include "screen_songs.hh"
 #include "screen_sing.hh"
+#include "screen_highscore.hh"
 #include "configuration.hh"
 #include "util.hh"
 #include "xtime.hh"
@@ -50,6 +51,15 @@ void ScreenSongs::manageSharedKey(int key, SDLMod mod)
 	}
 	else if (key == SDLK_LEFT) m_songs.advance(-1);
 	else if (key == SDLK_RIGHT) m_songs.advance(1);
+	else if (key == SDLK_END)
+	{
+		ScreenManager* sm = ScreenManager::getSingletonPtr();
+		Screen* s = sm->getScreen("Highscore");
+		ScreenHighscore* ss = dynamic_cast<ScreenHighscore*> (s);
+		assert(ss);
+		ss->setSong(m_songs.currentPtr());
+		sm->activateScreen("Highscore");
+	}
 }
 
 void ScreenSongs::manageEvent(SDL_Event event) {

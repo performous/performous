@@ -4,6 +4,8 @@
 #include <vector>
 #include <stdexcept>
 
+#include <ostream>
+
 /**Exception which will be thrown when loading or
   saving a HighScore fails.*/
 struct HighScoreException: public std::runtime_error {
@@ -38,6 +40,8 @@ class HighScore {
 
 	void load();
 	void save();
+
+	void getInfo (std::ostream & os);
 
 	/**Check if you reached a new highscore.
 	  @param score is a value between 0 and 10000
