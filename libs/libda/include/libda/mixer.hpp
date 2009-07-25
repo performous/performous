@@ -155,10 +155,36 @@ namespace da {
 	};
 	
 	typedef std::auto_ptr<scoped_lock> lock_holder;
+
+	template <typename Key> class select {
+		typedef std::map<Key, callback_t> streams;
+	  public:
+		void choose(Key const& k) {
+			typename streams::iterator it = m_streams.find(k);
+			if (it == m_streams.end()) throw std::logic_error("da::select::key: Invalid key");
+			m_key = k;
+			m_stream = it->second;
+		}
+		void insert(Key const& k, callback_t const& cb) {
+			m_streams[k] = cb;
+		}
+		bool operator()(pcm_data& data) {
+			if (!m_stream) return false;
+			return m_stream(data);
+		}
+	  private:
+		streams m_streams;
+		Key m_key;
+		callback_t m_stream;
+	};
 	
 	class mixer {
 	  public:
-		mixer(): m_chain(zero), m_mutex(boost::ref(m_chain)) {}
+		mixer(): m_chain(zero), m_mutex(boost::ref(m_select)) {
+			m_select.insert("paused", zero);
+			m_select.insert("normal", boost::ref(m_chain));
+			pause(false);
+		}
 		mixer(settings& s): m_chain(zero), m_mutex(boost::ref(m_chain)) { start(s); }
 		void start(settings& s) { m_settings = s; start(); s = m_settings; }
 		void start() {
@@ -180,9 +206,11 @@ namespace da {
 			m_chain.streams.erase(m_chain.streams.begin() + 1, m_chain.streams.end());
 			m_chain.add(shared_ref(new fadeout(shared_ref(ch.release()), time)));
 		}
+		void pause(bool p) { m_select.choose(p ? "paused" : "normal"); }
 		settings get_settings() { return m_settings; }
 		lock_holder lock() { return lock_holder(new scoped_lock(m_mutex)); }
 	  private:
+		select<std::string> m_select;
 		chain m_chain;
 		mutex_stream m_mutex;
 		settings m_settings;

@@ -70,7 +70,7 @@ void Audio::playMusic(std::vector<std::string> const& filenames, bool preview, d
 	}
 	da::lock_holder l2 = m_mixer.lock();
 	for (size_t i = 0; i < m_streams.size(); ++i) m_mixer.add(da::shared_ref(m_streams[i]));
-	if (!preview) m_paused = false;
+	if (!preview) pause(false);
 }
 
 void Audio::playMusic(std::string const& filename, bool preview, double fadeTime, double startPos) {
@@ -113,13 +113,19 @@ void Audio::seek(double offset) {
 		Stream& s = *m_streams[i];
 		s.seek(clamp(s.pos() + offset, 0.0, s.duration()));
 	}
-	m_paused = false;
+	pause(false);
 }
 
 void Audio::seekPos(double pos) {
 	boost::recursive_mutex::scoped_lock l(m_mutex);
 	da::lock_holder l2 = m_mixer.lock();
 	for (size_t i = 0; i < m_streams.size(); ++i) m_streams[i]->seek(pos);
-	m_paused = false;
+	pause(false);
+}
+
+void Audio::pause(bool state) {
+	m_paused = state;
+	da::lock_holder l2 = m_mixer.lock();
+	m_mixer.pause(m_paused);
 }
 

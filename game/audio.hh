@@ -13,55 +13,6 @@
 
 using boost::int16_t;
 
-#if 0
-/// audiosamples for songfiles
-struct AudioSample {
-	/// sample rate
-	double srate;
-	/// volume
-	double volume;
-	/// sample
-	std::vector<int16_t> sample;
-	/// current position in the sample
-	unsigned int offset;
-	AudioSample() {}
-	/// constructor
-	AudioSample(std::string const& filename, unsigned int sr): srate(sr), volume(), sample(), offset() {
-		FFmpeg mpeg(false, true, filename, sr);
-		while( !mpeg.audioQueue.eof() ) {
-			std::vector<int16_t> buffer;
-			mpeg.audioQueue.tryPop(buffer, 1024);
-			sample.insert(sample.end(), buffer.begin(), buffer.end());
-			if( sample.size() > 1024 * 256 ) break; // do not authorized sample > 256k
-		}
-		std:: cout << "Loading sample " << filename << " done (size: " << sample.size() << ")" << std::endl;
-	}
-	/// resets audio position
-	void reset_position() {
-		offset = 0;
-	}
-	/** plays and mixes samples
-	 */
-	bool operator()(da::pcm_data& data) {
-		std::size_t maxSamples = data.channels * data.frames;
-		if( offset >= sample.size() ) return false;
-		if( sample.size() - offset < maxSamples ) {
-			// not enough data in sample
-			for (size_t i = offset; i < sample.size(); ++i) {
-				data.rawbuf[i-offset] += da::conv_from_s16(sample[i]);
-			}
-			offset = sample.size();
-		} else {
-			for (size_t i = offset; i < offset + maxSamples; ++i) {
-				data.rawbuf[i-offset] += da::conv_from_s16(sample[i]);
-			}
-			offset += maxSamples;
-		}
-		return true;
-	}
-};
-#endif
-
 /// audiostream
 /** allows buffering, fading and mixing of audiostreams
  */
@@ -150,7 +101,8 @@ class Audio {
 	/// callback for the audio backend (libda)
 	bool operator()(da::pcm_data& areas);
 	/// pauses and unpauses playback
-	void togglePause() { m_paused = !m_paused; }
+	void togglePause() { pause(!m_paused); }
+	void pause(bool state = true);
 	/// toggles synth playback (F4)
 	void toggleSynth(Notes const& notes) { m_notes = (m_notes ? NULL : &notes); }
 
