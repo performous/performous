@@ -252,6 +252,7 @@ ScoreWindow::ScoreWindow(Engine& e, Players & players):
 		++p;
 	}
 	m_players.scores.sort();
+	m_players.scores.reverse(); // top should be first
 	// topScore is also in m_players.scores.front()
 
 	if (m_players.cur.empty()) m_rank = "No singer!";
