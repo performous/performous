@@ -62,7 +62,11 @@ class AnimAcceleration {
 		double duration = seconds(curtime) - seconds(m_time);
 		m_time = curtime;
 		if (!(duration > 0.0)) return m_position; // Negative value or NaN, or no songs - skip processing
-		if (duration > 1.0) duration = 1.0; // No more than one second per frame
+		if (duration > 1.0) {
+			// More than one second has elapsed, assume that we have stopped on target already
+			m_velocity = 0.0;
+			return m_position = m_target;
+		}
 		std::size_t rounds = 1.0 + 1000.0 * duration; // 1 ms or shorter timesteps
 		double t = duration / rounds;
 		for (std::size_t i = 0; i < rounds; ++i) {
