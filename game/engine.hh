@@ -46,6 +46,10 @@ class Engine {
 	template <typename FwdIt> Engine(Audio& audio, Song& song, FwdIt anBegin, FwdIt anEnd, Players &players):
 	  m_audio(audio), m_song(song), m_time(), m_quit(), m_players(players)
 	{
+		// clear old player information
+		m_players.cur.clear();
+		m_players.scores.clear();
+
 		size_t frames = m_audio.getLength() / Engine::TIMESTEP;
 		while (anBegin != anEnd) m_players.cur.push_back(Player(song, *anBegin++, frames));
 		size_t player = 0;

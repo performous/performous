@@ -8,6 +8,7 @@
 #include "songs.hh"
 #include <iostream>
 #include <iomanip>
+#include "highscore.hh" // to check if Players have to be shown
 
 namespace {
 	static const double QUIT_TIMEOUT = 20.0; // Return to songs screen after 20 seconds in score screen
@@ -70,12 +71,28 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		else if (key == SDLK_RETURN) {
 			if (m_score_window.get())
 			{
+				// TODO: multiple loading...
+				HighScore hi(m_song->path, "High.sco");
+				try {
+					hi.load();
+				} catch (HighScoreException const& hi) {
+					std::cerr << "high.sco:" << hi.line() << " " << hi.what() << std::endl;
+				}
+
+				if (m_players.scores.empty() || !hi.reachedNewHighscore(m_players.scores.front()))
+				{
+					// if no highscore reached..
+					sm->activateScreen("Songs");
+					return;
+				}
+
 				// Score window visible -> Enter quits to Players Screen
 				Screen* s = sm->getScreen("Players");
 				ScreenPlayers* ss = dynamic_cast<ScreenPlayers*> (s);
 				assert(ss);
 				ss->setSong(m_song);
 				sm->activateScreen("Players");
+				return;
 			}
 			else if (status == Song::FINISHED) m_score_window.reset(new ScoreWindow(*m_engine, m_players)); // Song finished, but no score window -> show it
 		}

@@ -78,9 +78,6 @@ else if (key == SDLK_ESCAPE) {
 		if (m_players.scores.empty() || !m_highscore->reachedNewHighscore(m_players.scores.front()))
 		{
 			// no more highscore, we are now finished
-			// clear the old players lists
-			m_players.scores.clear();
-			m_players.cur.clear();
 			sm->activateScreen("Songs");
 		} else {
 			std::cout << "enter the next highscore" << std::endl;
@@ -112,14 +109,14 @@ void ScreenPlayers::draw() {
 			oss_order << "Check players.txt in current\n";
 			oss_order << "directory for players";
 		} else {
-			oss_song << "press enter to create player";
+			oss_song << "Press enter to create player!";
 			oss_order << m_search.text << '\n';
 		}
 	} else {
 		// Format the player information text
-		oss_song << "You reached " << m_players.scores.front() << " points\n";
-		oss_order << "Name: " << m_players.current().name
-			<< " Search Text: "
+		oss_song << "You reached " << m_players.scores.front() << " points!\n";
+		oss_order << "Name: " << m_players.current().name << '\n'
+			<< "Search Text: "
 			<< (m_search.text.empty() ? std::string("new player") : m_search.text)
 			<< '\n';
 		oss_order << "(" << m_players.currentId() + 1 << "/" << m_players.size() << ")";
