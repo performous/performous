@@ -27,7 +27,6 @@ struct Stream {
 	/// crossfades songs
 	bool operator()(da::pcm_data& data) {
 		mpeg.audioQueue(data, m_pos);
-		//if (volume.i() > 0) vol = std::pow(10.0, (volume.i() - 100.0) / 100.0 * 2.0);
 		return !eof();
 	}
 	void seek(double time) { m_pos = time * srate * 2.0; }
@@ -84,11 +83,12 @@ class Audio {
 	void toggleSynth(Notes const& notes) { m_notes = (m_notes ? NULL : &notes); }
 
   private:
-	mutable boost::recursive_mutex m_mutex;
 	bool m_paused;
 	Notes const* volatile m_notes;
 	da::settings m_rs;
+	da::volume m_volume;
 	da::mixer m_mixer;
 	std::vector<boost::shared_ptr<Stream> > m_streams;
+	std::string m_volumeSetting;
 };
 

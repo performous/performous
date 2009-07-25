@@ -26,7 +26,6 @@ void Audio::open(std::string const& pdev, std::size_t rate, std::size_t frames) 
 }
 
 bool Audio::operator()(da::pcm_data& areas) {
-	boost::recursive_mutex::scoped_lock l(m_mutex);
 	std::size_t samples = areas.samples();
 	static double phase = 0.0;
 	// Synthesize tones
@@ -50,12 +49,16 @@ bool Audio::operator()(da::pcm_data& areas) {
 			areas.rawbuf[i] += value;
 		}
 	}
-	return t < getLength();
+	// Set chain volume
+	double vol = config[m_volumeSetting].i();
+	if (vol > 0) vol = std::pow(10.0, (vol - 100.0) / 100.0 * 2.0);
+	m_volume.level(vol);
+	return true;
 }
 
 void Audio::playMusic(std::vector<std::string> const& filenames, bool preview, double fadeTime, double startPos) {
 	if (!isOpen()) return;
-	boost::recursive_mutex::scoped_lock l(m_mutex);
+	da::lock_holder l = m_mixer.lock();
 	fadeout(fadeTime);
 	boost::shared_ptr<da::chain> ch(new da::chain());
 	for(std::vector<std::string>::const_iterator it = filenames.begin() ; it != filenames.end() ; ++it ) {
@@ -70,11 +73,8 @@ void Audio::playMusic(std::vector<std::string> const& filenames, bool preview, d
 		}
 	}
 	ch->add(boost::ref(*this));
-	/*
 	m_volumeSetting = preview ? "audio/preview_volume" : "audio/music_volume";
 	ch->add(boost::ref(m_volume));
-	*/
-	da::lock_holder l2 = m_mixer.lock();
 	m_mixer.fadein(da::shared_ref(ch), 0.5, startPos);
 	if (!preview) pause(false);
 }
@@ -84,39 +84,36 @@ void Audio::playMusic(std::string const& filename, bool preview, double fadeTime
 }
 
 void Audio::stopMusic() {
-	boost::recursive_mutex::scoped_lock l(m_mutex);
+	da::lock_holder l = m_mixer.lock();
 	m_notes = NULL;
 	m_mixer.clear();
 	m_streams.clear();
-	std::cerr << "STOP!" << std::endl;
 }
 
 void Audio::fadeout(double fadeTime) {
-	boost::recursive_mutex::scoped_lock l(m_mutex);
+	da::lock_holder l = m_mixer.lock();
 	m_notes = NULL;
 	m_mixer.fadeout(fadeTime);
 	m_streams.clear();
-	std::cerr << "FADEOUT!" << fadeTime << std::endl;
 }
 
 double Audio::getPosition() const {
-	boost::recursive_mutex::scoped_lock l(m_mutex);
+	da::lock_holder l = m_mixer.lock();
 	return m_streams.empty() ? getNaN() : m_streams.front()->pos();
 }
 
 double Audio::getLength() const {
-	boost::recursive_mutex::scoped_lock l(m_mutex);
+	da::lock_holder l = m_mixer.lock();
 	return m_streams.empty() ? getNaN() : m_streams.front()->duration();
 }
 
 bool Audio::isPlaying() const {
-	boost::recursive_mutex::scoped_lock l(m_mutex);
+	da::lock_holder l = m_mixer.lock();
 	return m_streams.empty() ? false : !m_streams.front()->eof();
 }
 
 void Audio::seek(double offset) {
-	boost::recursive_mutex::scoped_lock l(m_mutex);
-	da::lock_holder l2 = m_mixer.lock();
+	da::lock_holder l = m_mixer.lock();
 	for (size_t i = 0; i < m_streams.size(); ++i) {
 		Stream& s = *m_streams[i];
 		s.seek(clamp(s.pos() + offset, 0.0, s.duration()));
@@ -125,13 +122,13 @@ void Audio::seek(double offset) {
 }
 
 void Audio::seekPos(double pos) {
-	boost::recursive_mutex::scoped_lock l(m_mutex);
-	da::lock_holder l2 = m_mixer.lock();
+	da::lock_holder l = m_mixer.lock();
 	for (size_t i = 0; i < m_streams.size(); ++i) m_streams[i]->seek(pos);
 	pause(false);
 }
 
 void Audio::pause(bool state) {
+	da::lock_holder l = m_mixer.lock();
 	m_paused = state;
 	m_mixer.pause(m_paused);
 }

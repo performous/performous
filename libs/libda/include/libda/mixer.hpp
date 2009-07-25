@@ -179,7 +179,7 @@ namespace da {
 		}
 	  private:
 		callback_t m_stream;
-		boost::recursive_mutex m_mutex;
+		mutable boost::recursive_mutex m_mutex;
 		friend class scoped_lock;
 	};
 	
@@ -269,7 +269,7 @@ namespace da {
 			m_select.choose(p ? "paused" : "normal");
 		}
 		settings get_settings() { return m_settings; }
-		lock_holder lock() { return lock_holder(new scoped_lock(m_mutex)); }
+		lock_holder lock() const { return lock_holder(new scoped_lock(m_mutex)); }
 	  private:
 		void init() {
 			m_master.add(zero);
