@@ -3,22 +3,22 @@
 namespace {
 	const float past = -0.3f;
 	const float future = 3.0f;
-	const float timescale = 30.0f;
+	const float timescale = 80.0f;
 	const float texCoordStep = -0.5f; // Two beat lines per neck texture => 0.5 tex units per beat
 	// Note: t is difference from playback time so it must be in range [past, future]
 	float time2y(float t) { return -timescale * (t - past) / (future - past); }
 	float time2a(float t) { return 1.0f - t / future; } // Note: we want 1.0 alpha already at zero t.
 }
 
-GuitarGraph::GuitarGraph(Song const& song): m_song(song), m_neck("guitarneck.svg") {}
+GuitarGraph::GuitarGraph(Song const& song): m_song(song), m_neck("guitarneck.svg"), m_button("button.svg") {}
 
 void GuitarGraph::draw(double time) {
 	if (m_song.tracks.empty()) return; // Can't render without tracks (FIXME: actually screen_song should choose a track for us)
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
-	dimensions.screenBottom().fixedWidth(0.5f).left(-0.5f);
+	dimensions.screenBottom().fixedWidth(0.5f);
 	glutil::PushMatrix pmb;
 	glTranslatef(0.5 * (dimensions.x1() + dimensions.x2()), dimensions.y2(), 0.0f);
-	glRotatef(80.0f, 1.0f, 0.0f, 0.0f);
+	glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
 	{ float s = dimensions.w() / 5.0f; glScalef(s, s, s); }
 	// Draw the neck
 	{
@@ -93,7 +93,7 @@ void GuitarGraph::draw(double time) {
 			glVertex2f(x + w, time2y(tBeg));
 		}
 	}
-	glColor3f(1.0f, 1.0f, 1.0f);
+	glColor3f(0.0f, 0.0f, 0.0f);
 	// Draw the cursor
 	{	
 		glutil::Begin block(GL_TRIANGLE_STRIP);
@@ -101,6 +101,19 @@ void GuitarGraph::draw(double time) {
 		glVertex2f(2.5f, time2y(0.01f));
 		glVertex2f(-2.5f, time2y(-0.01f));
 		glVertex2f(2.5f, time2y(-0.01f));
-	}	
+	}
+	for (int fret = 0; fret < 5; ++fret) {
+		float x = -2.0f + fret;
+		glutil::Color c = fretColors[fret];
+		if (true) {
+			c.r *= 0.5f;
+			c.g *= 0.5f;
+			c.b *= 0.5f;
+		}
+		glColor4fv(c);
+		m_button.dimensions.center(time2y(0.0)).middle(x);
+		m_button.draw();
+	}
+	glColor3f(1.0f, 1.0f, 1.0f);
 }
 

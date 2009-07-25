@@ -20,5 +20,6 @@ class GuitarGraph {
   private:
 	Song const& m_song;
 	Texture m_neck;
+	Surface m_button;
 };
 
