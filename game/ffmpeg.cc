@@ -141,7 +141,7 @@ void FFmpeg::operator()() {
 	sigabrt = std::signal(SIGABRT, performous_ffmpeg_crash_hack);
 	sigsegv = std::signal(SIGSEGV, performous_ffmpeg_crash_hack);
 #endif
-	try { open(); } catch (std::exception const& e) { std::cerr << "FFMPEG failed to open " << m_filename << ": " << e.what() << std::endl; m_quit = true; }
+	try { open(); } catch (std::exception const& e) { std::cerr << "FFMPEG failed to open " << m_filename << ": " << e.what() << std::endl; m_quit = true; return; }
 	m_running = true;
 	audioQueue.setDuration(duration());
 	int errors = 0;
