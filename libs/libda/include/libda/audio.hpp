@@ -63,6 +63,7 @@ namespace da {
 		};
 		iter_by_ch begin(std::size_t ch) { return iter_by_ch(rawbuf, ch, channels); }
 		iter_by_ch end(std::size_t ch) { return iter_by_ch(rawbuf, ch, channels) + frames; }
+		std::size_t samples() const { return channels * frames; }
 	};
 
 	struct settings;

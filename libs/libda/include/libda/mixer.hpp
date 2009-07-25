@@ -43,7 +43,7 @@ namespace da {
 		void add(callback_t const& cb) {
 			streams.push_back(cb);
 		}
-		/** Calls every scream in the chain and removes those that return false. **/
+		/** Calls every stream in the chain and removes those that return false. **/
 		bool operator()(pcm_data& data) {
 			streams_t::iterator wr = streams.begin();
 			for (streams_t::iterator it = wr; it != streams.end(); ++it) {
@@ -63,9 +63,35 @@ namespace da {
 		}
 	}
 
+	class accumulate: boost::noncopyable {
+	  public:
+		typedef std::vector<callback_t> streams_t;
+		accumulate() {}
+		void add(callback_t const& cb) {
+			streams.push_back(cb);
+		}
+		/** Calls every stream in the chain and removes those that return false, summing the results. **/
+		bool operator()(pcm_data& data) {
+			std::vector<sample_t> buffer(data.samples());
+			pcm_data accumbuf(&buffer[0], data.frames, data.channels, data.rate);
+			streams_t::iterator wr = streams.begin();
+			for (streams_t::iterator it = wr; it != streams.end(); ++it) {
+				if ((*it)(accumbuf)) *wr++ = *it;
+				for (std::size_t i = 0; i < buffer.size(); ++i) {
+					data.rawbuf[i] += buffer[i];
+					buffer[i] = 0.0f;
+				}
+			}
+			if (wr != streams.end()) streams.erase(wr, streams.end());
+			return !streams.empty();
+		}
+		streams_t streams;
+	  private:
+	};
+
 	class buffer: boost::noncopyable {
 	  public:
-		explicit buffer(size_t s): m_data(s) {}
+		explicit buffer(std::size_t s): m_data(s) {}
 		sample_t* begin() { return &m_data[0]; }
 		sample_t* end() { return begin() + m_data.size(); }
 	  private:
