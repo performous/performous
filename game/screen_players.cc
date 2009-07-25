@@ -21,6 +21,11 @@ void ScreenPlayers::enter() {
 		std::cerr << "high.sco:" << hi.line() << " " << hi.what() << std::endl;
 	}
 
+	m_score_text[0].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
+	m_score_text[1].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
+	m_score_text[2].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
+	m_score_text[3].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
+	m_player_icon.reset(new Surface(getThemePath("sing_pbox.svg")));
 	theme.reset(new ThemeSongs());
 	m_emptyCover.reset(new Surface(getThemePath("no_cover.svg"))); // TODO use persons head
 	m_search.text.clear();
@@ -29,6 +34,12 @@ void ScreenPlayers::enter() {
 }
 
 void ScreenPlayers::exit() {
+	m_player_icon.reset();
+	m_score_text[0].reset();
+	m_score_text[1].reset();
+	m_score_text[2].reset();
+	m_score_text[3].reset();
+
 	m_covers.clear();
 	m_emptyCover.reset();
 	theme.reset();
@@ -91,6 +102,27 @@ else if (key == SDLK_ESCAPE) {
 	else if (key == SDLK_PAGEDOWN) m_players.advance(10);
 }
 
+/**Draw the scores in the bottom*/
+void ScreenPlayers::drawScores() {
+	// Score display
+	{
+		unsigned int i = 0;
+		for (std::list<Player>::const_iterator p = m_players.cur.begin(); p != m_players.cur.end(); ++p, ++i) {
+			float act = p->activity();
+			if (act == 0.0f) continue;
+			glColor4f(p->m_color.r, p->m_color.g, p->m_color.b,act);
+			m_player_icon->dimensions.left(-0.5 + 0.01 + 0.25 * i).fixedWidth(0.075)
+				.screenBottom(-0.025);
+			m_player_icon->draw();
+			m_score_text[i%4]->render((boost::format("%04d") % p->getScore()).str());
+			m_score_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.075)
+				.screenBottom(-0.025);
+			m_score_text[i%4]->draw();
+			glColor4f(1.0, 1.0, 1.0, 1.0);
+		}
+	}
+}
+
 void ScreenPlayers::draw() {
 	m_players.update(); // Poll for new players
 	double length = m_audio.getLength();
@@ -117,7 +149,7 @@ void ScreenPlayers::draw() {
 		oss_song << "You reached " << m_players.scores.front() << " points!\n";
 		oss_order << "Name: " << m_players.current().name << '\n'
 			<< "Search Text: "
-			<< (m_search.text.empty() ? std::string("new player") : m_search.text)
+			<< (m_search.text.empty() ? std::string("please enter") : m_search.text)
 			<< '\n';
 		oss_order << "(" << m_players.currentId() + 1 << "/" << m_players.size() << ")";
 		double spos = m_players.currentPosition(); // This needs to be polled to run the animation
@@ -166,5 +198,6 @@ void ScreenPlayers::draw() {
 	} else if (!m_audio.isPaused() && m_playTimer.get() > IDLE_TIMEOUT) {  // Switch if song hasn't changed for IDLE_TIMEOUT seconds
 		if (!m_search.text.empty()) { m_search.text.clear(); m_players.setFilter(m_search.text); }
 	}
+	drawScores();
 }
 

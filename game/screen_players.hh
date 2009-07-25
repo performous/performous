@@ -23,6 +23,7 @@ class ScreenPlayers : public Screen {
 	void exit();
 	void manageEvent(SDL_Event event);
 	void draw();
+	void drawScores();
 
 	void setSong (boost::shared_ptr<Song> song_)
 	{
@@ -43,4 +44,6 @@ class ScreenPlayers : public Screen {
 	TextInput m_search;
 	boost::scoped_ptr<Surface> m_emptyCover;
 	Cachemap<std::string, Surface> m_covers;
+	boost::scoped_ptr<Surface> m_player_icon;
+	boost::scoped_ptr<SvgTxtThemeSimple> m_score_text[4];
 };
