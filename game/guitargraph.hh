@@ -5,6 +5,7 @@
 #include "animvalue.hh"
 #include "engine.hh"
 #include "surface.hh"
+#include "opengl_text.hh"
 
 class Song;
 
@@ -151,5 +152,6 @@ class GuitarGraph {
 	bool difficulty(Difficulty level);
 	typedef std::vector<Chord> Chords;
 	Chords m_chords;
+	SvgTxtTheme m_text;
 };
 

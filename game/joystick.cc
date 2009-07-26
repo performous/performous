@@ -122,6 +122,7 @@ void Joystick::addEvent(SDL_JoyButtonEvent event) {
 	JoystickEvent joy_event((event.type == SDL_JOYBUTTONDOWN) ? JoystickEvent::BUTTON_DOWN : JoystickEvent::BUTTON_UP);
 
 	joy_event.button_id = event.button;
+	joy_event.button_state = event.state;
 
 	m_events.push_back(joy_event);
 }

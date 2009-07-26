@@ -56,4 +56,6 @@ class LayoutSinger {
 	NoteGraph m_noteGraph;
 	Notes::const_iterator m_lyricit;
 	std::deque<LyricRow> m_lyrics;
+	boost::scoped_ptr<Surface> m_player_icon;
+	boost::scoped_ptr<SvgTxtThemeSimple> m_score_text[4];
 };

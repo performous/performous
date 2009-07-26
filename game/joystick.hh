@@ -16,11 +16,12 @@ void joysticks_init();
 class JoystickEvent {
   public:
 	enum Type {BUTTON_DOWN, BUTTON_UP, HAT_MOTION, AXIS_MOTION, BALL_MOTION};
-	JoystickEvent(): button_id(), hat_id(), hat_direction(CENTERED), axis_id(), axis_value(), ball_id(), ball_dx(), ball_dy()  {};
-	JoystickEvent(Type _type): type(_type), button_id(), hat_id(), hat_direction(CENTERED), axis_id(), axis_value(), ball_id(), ball_dx(), ball_dy()  {};
+	JoystickEvent(): button_id(), button_state(), hat_id(), hat_direction(CENTERED), axis_id(), axis_value(), ball_id(), ball_dx(), ball_dy()  {};
+	JoystickEvent(Type _type): type(_type), button_id(), button_state(), hat_id(), hat_direction(CENTERED), axis_id(), axis_value(), ball_id(), ball_dx(), ball_dy()  {};
 	Type type;
 	// for BUTTON_DOWN and BUTTON_UP
 	unsigned char button_id;
+	bool button_state;
 	// for HAT_MOTION
 	enum HatDirection {
 		LEFT_UP, UP, RIGHT_UP,
@@ -77,3 +78,18 @@ class Joystick {
 
 typedef std::map<unsigned int,Joystick> Joysticks;
 extern Joysticks joysticks;
+
+class InputDevEvent {
+  public:
+	InputDevEvent() {};
+};
+
+class InputDev {
+  public:
+	InputDev() {};
+	bool tryPoll(InputDevEvent& _event) {(void)_event;return true;};
+	bool fret(unsigned int _id) {(void)_id;return false;};
+	// reserved for feeding the device with event
+	void addEvent(SDL_JoyButtonEvent _event) {(void)_event;};
+  private:
+};

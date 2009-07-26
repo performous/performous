@@ -26,11 +26,6 @@ void ScreenSing::enter() {
 	}
 	if (!song.video.empty() && config["graphic/video"].b()) m_video.reset(new Video(song.path + song.video, song.videoGap));
 	m_pause_icon.reset(new Surface(getThemePath("sing_pause.svg")));
-	m_score_text[0].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
-	m_score_text[1].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
-	m_score_text[2].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
-	m_score_text[3].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
-	m_player_icon.reset(new Surface(getThemePath("sing_pbox.svg")));
 	m_progress.reset(new ProgressBar(getThemePath("sing_progressbg.svg"), getThemePath("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01f, 0.01f, true));
 	m_progress->dimensions.fixedWidth(0.4).left(-0.5).screenTop();
 	theme->timer.dimensions.screenTop(0.5 * m_progress->dimensions.h());
@@ -46,13 +41,8 @@ void ScreenSing::exit() {
 	m_layout_singer.reset();
 	m_engine.reset();
 	m_pause_icon.reset();
-	m_player_icon.reset();
 	m_video.reset();
 	m_background.reset();
-	m_score_text[0].reset();
-	m_score_text[1].reset();
-	m_score_text[2].reset();
-	m_score_text[3].reset();
 	theme.reset();
 }
 
@@ -149,7 +139,6 @@ void ScreenSing::draw() {
 	} else {
 		m_layout_singer->draw(time, LayoutSinger::MIDDLE);
 	}
-	if (!config["game/karaoke_mode"].b()) drawScores(); // draw score if not in karaoke mode
 
 	Song::Status status = song.status(time);
 
@@ -183,25 +172,6 @@ void ScreenSing::draw() {
 	if (m_audio.isPaused()) {
 		m_pause_icon->dimensions.middle().center().fixedWidth(.25);
 		m_pause_icon->draw();
-	}
-}
-
-void ScreenSing::drawScores() {
-	std::list<Player> const& players = m_engine->getPlayers();
-	// Score display
-	{
-		unsigned int i = 0;
-		for (std::list<Player>::const_iterator p = players.begin(); p != players.end(); ++p, ++i) {
-			float act = p->activity();
-			if (act == 0.0f) continue;
-			glColor4f(p->m_color.r, p->m_color.g, p->m_color.b,act);
-			m_player_icon->dimensions.left(-0.5 + 0.01 + 0.25 * i).fixedWidth(0.075).screenTop(0.055);
-			m_player_icon->draw();
-			m_score_text[i%4]->render((boost::format("%04d") % p->getScore()).str());
-			m_score_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.075).screenTop(0.055);
-			m_score_text[i%4]->draw();
-			glColor4f(1.0, 1.0, 1.0, 1.0);
-		}
 	}
 }
 

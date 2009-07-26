@@ -1,7 +1,13 @@
 #include "layout_singer.hh"
 
 
-LayoutSinger::LayoutSinger(Songs &_songs, Engine &_engine, ThemeSing& _theme): m_engine(_engine), m_songs(_songs), m_theme(_theme), m_noteGraph(_songs.current()),m_lyricit(_songs.current().notes.begin()), m_lyrics() {};
+LayoutSinger::LayoutSinger(Songs &_songs, Engine &_engine, ThemeSing& _theme): m_engine(_engine), m_songs(_songs), m_theme(_theme), m_noteGraph(_songs.current()),m_lyricit(_songs.current().notes.begin()), m_lyrics() {
+	m_score_text[0].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
+	m_score_text[1].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
+	m_score_text[2].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
+	m_score_text[3].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
+	m_player_icon.reset(new Surface(getThemePath("sing_pbox.svg")));
+}
 
 LayoutSinger::~LayoutSinger() {};
 
@@ -56,6 +62,23 @@ void LayoutSinger::draw(double time, Position position) {
 		pos.move(0.0, m_lyrics[i].extraspacing.get() * linespacing);
 		if (i == 0) m_lyrics[0].draw(m_theme.lyrics_now, time, pos);
 		else if (i == 1 && position == LayoutSinger::BOTTOM) m_lyrics[1].draw(m_theme.lyrics_next, time, pos);
+	}
+
+	// Score display
+	if (!config["game/karaoke_mode"].b() ) {// draw score if not in karaoke mode
+		std::list<Player> const& players = m_engine.getPlayers();
+		unsigned int i = 0;
+		for (std::list<Player>::const_iterator p = players.begin(); p != players.end(); ++p, ++i) {
+			float act = p->activity();
+			if (act == 0.0f) continue;
+			glColor4f(p->m_color.r, p->m_color.g, p->m_color.b,act);
+			m_player_icon->dimensions.left(-0.5 + 0.01 + 0.25 * i).fixedWidth(0.075).screenTop(0.055);
+			m_player_icon->draw();
+			m_score_text[i%4]->render((boost::format("%04d") % p->getScore()).str());
+			m_score_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.075).screenTop(0.055);
+			m_score_text[i%4]->draw();
+			glColor4f(1.0, 1.0, 1.0, 1.0);
+		}
 	}
 }
 

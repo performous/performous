@@ -55,8 +55,6 @@ class ScreenSing: public Screen {
 	boost::scoped_ptr<Surface> m_background;
 	boost::scoped_ptr<Video> m_video;
 	boost::scoped_ptr<Surface> m_pause_icon;
-	boost::scoped_ptr<Surface> m_player_icon;
-	boost::scoped_ptr<SvgTxtThemeSimple> m_score_text[4];
 	boost::scoped_ptr<Engine> m_engine;
 	boost::scoped_ptr<LayoutSinger> m_layout_singer;
 	boost::scoped_ptr<GuitarGraph> m_guitarGraph;

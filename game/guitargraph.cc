@@ -81,7 +81,7 @@ namespace {
 	bool picked = false;
 }
 
-GuitarGraph::GuitarGraph(Song const& song): m_song(song), m_button("button.svg"), m_pickValue(0.0, 5.0), m_instrument(), m_level() {
+GuitarGraph::GuitarGraph(Song const& song): m_song(song), m_button("button.svg"), m_pickValue(0.0, 5.0), m_instrument(), m_level(), m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()) {
 	if (m_song.tracks.empty()) throw std::runtime_error("No tracks");
 	m_necks.push_back(new Texture("guitarneck.svg"));
 	m_necks.push_back(new Texture("bassneck.svg"));
@@ -139,6 +139,8 @@ bool GuitarGraph::difficulty(Difficulty level) {
 }
 
 void GuitarGraph::draw(double time) {
+	m_text.dimensions.screenBottom(-0.1).middle(0.2);
+	m_text.draw(std::string("Tronic FIXME"));
 	engine(time);
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
 	dimensions.screenBottom().fixedWidth(0.5f);
