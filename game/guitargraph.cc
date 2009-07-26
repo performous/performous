@@ -50,11 +50,14 @@ void GuitarGraph::inputProcess() {
 
 void GuitarGraph::engine(double time) {
 	if (picked && time < -0.5) {
+		if (fretPressed[4]) {
+			m_instrument = (m_instrument + 1) % m_song.tracks.size();
+			if (!difficulty(m_level)) difficultyAuto();
+		}
 		if (fretPressed[0]) difficulty(DIFFICULTY_SUPAEASY);
 		else if (fretPressed[1]) difficulty(DIFFICULTY_EASY);
 		else if (fretPressed[2]) difficulty(DIFFICULTY_MEDIUM);
 		else if (fretPressed[3]) difficulty(DIFFICULTY_AMAZING);
-		if (fretPressed[4]) { m_instrument = (m_instrument + 1) % m_song.tracks.size(); difficultyAuto(); }
 	}
 	if (picked) { m_pickValue.setValue(1.0); }
 	picked = false;
