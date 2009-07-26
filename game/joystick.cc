@@ -5,6 +5,13 @@ Joysticks joysticks;
 
 Joystick::Joystick(unsigned int _id): m_id(_id) {
 	m_joystick = SDL_JoystickOpen(m_id);
+	if( getName().find("Guitar Hero") != std::string::npos ) {
+		m_type = Joystick::GUITARHERO;
+	} else if( getName().find("Harmonix") != std::string::npos ) {
+		m_type = Joystick::ROCKBAND;
+	} else {
+		m_type = Joystick::UNKNOWN;
+	}
 };
 Joystick::~Joystick() {
 	// Do it another way :/
@@ -13,6 +20,9 @@ Joystick::~Joystick() {
 std::string Joystick::getName() const {
 	return std::string(SDL_JoystickName(m_id));
 };
+Joystick::Type Joystick::getType() const {
+	return m_type;
+}
 std::string Joystick::getDescription() const {
 	std::string desc;
 	desc += "axes: ";

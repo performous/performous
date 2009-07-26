@@ -42,10 +42,13 @@ class JoystickEvent {
 /// joystick class used for dealing with ps3 drumsets
 class Joystick {
   public:
+  	enum Type {UNKNOWN, GUITARHERO, ROCKBAND};
 	Joystick() {};
 	/// create joystick object with given id
 	Joystick(unsigned int _id);
 	~Joystick();
+	/// Return joystick Type
+	Joystick::Type getType() const;
 	/// get name of joystick
 	std::string getName() const;
 	/// get longer description of joystick
@@ -74,6 +77,7 @@ class Joystick {
 	SDL_Joystick * m_joystick;
 	std::deque<JoystickEvent> m_events;
 	unsigned int m_id;
+	Type m_type;
 };
 
 typedef std::map<unsigned int,Joystick> Joysticks;
