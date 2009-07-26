@@ -52,7 +52,8 @@ void SongParser::iniParse() {
 		else name.erase(0, 5);
 		// Process non-vocal tracks
 		if (name != "VOCALS") {
-			NoteMap& nm = s.tracks[name];
+			s.tracks.push_back(Track(name));
+			NoteMap& nm = s.tracks.back().nm;
 			for (MidiFileParser::NoteMap::const_iterator it2 = it->notes.begin(); it2 != it->notes.end(); ++it2) {
 				Durations& dur = nm[it2->first];
 				MidiFileParser::Notes const& notes = it2->second;

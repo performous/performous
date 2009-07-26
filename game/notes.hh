@@ -44,7 +44,14 @@ struct Duration {
 
 typedef std::vector<Duration> Durations;
 typedef std::map<int, Durations> NoteMap;
-typedef std::map<std::string, NoteMap> Tracks;
+
+struct Track {
+	Track(std::string n): name(n) {}
+	std::string name;
+	NoteMap nm;
+};
+
+typedef std::vector<Track> Tracks;
 
 // TODO: Make Note use Duration
 
