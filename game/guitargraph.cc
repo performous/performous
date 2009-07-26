@@ -196,20 +196,19 @@ void GuitarGraph::draw(double time) {
 			float tEnd = it2->end - time;
 			if (tEnd < past) continue;
 			if (tBeg > future) break;
-			float wEnd = 0.5f * w;
-			if (tEnd > future) {
-				// Crop the end off
-				float f = (future - tBeg) / (tEnd - tBeg);
-				wEnd = f * wEnd + (1.0f - f) * w; // Balanced average
-				tEnd = future;
+			float wLine = 0.5f * w;
+			if (tEnd > future) tEnd = future;
+			{
+				glutil::Begin block(GL_TRIANGLE_STRIP);
+				c.a = time2a(tEnd); glColor4fv(c);
+				glVertex2f(x - wLine, time2y(tEnd));
+				glVertex2f(x + wLine, time2y(tEnd));
+				c.a = time2a(tBeg); glColor4fv(c);
+				glVertex2f(x - wLine, time2y(tBeg));
+				glVertex2f(x + wLine, time2y(tBeg));
 			}
-			glutil::Begin block(GL_TRIANGLE_STRIP);
-			c.a = time2a(tEnd); glColor4fv(c);
-			glVertex2f(x - wEnd, time2y(tEnd));
-			glVertex2f(x + wEnd, time2y(tEnd));
-			c.a = time2a(tBeg); glColor4fv(c);
-			glVertex2f(x - w, time2y(tBeg));
-			glVertex2f(x + w, time2y(tBeg));
+			m_button.dimensions.center(time2y(tBeg)).middle(x);
+			m_button.draw();
 		}
 	}
 	{
@@ -224,6 +223,7 @@ void GuitarGraph::draw(double time) {
 		glVertex2f(-2.5f, time2y(-0.01f));
 		glVertex2f(2.5f, time2y(-0.01f));
 	}
+	// Fret buttons on cursor
 	for (int fret = 0; fret < 5; ++fret) {
 		float x = -2.0f + fret;
 		glutil::Color c = fretColors[fret];
