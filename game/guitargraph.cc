@@ -22,7 +22,7 @@ namespace {
 	bool picked = false;
 }
 
-GuitarGraph::GuitarGraph(Song const& song): m_song(song), m_button("button.svg"), m_pickValue(0.0, 5.0), m_instrument(), m_level(), m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()) {
+GuitarGraph::GuitarGraph(Song const& song): m_song(song), m_button("button.svg"), m_pickValue(0.0, 5.0), m_instrument(), m_level(), m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()), m_score() {
 	std::size_t tracks = m_song.tracks.size();
 	if (tracks == 0) throw std::runtime_error("No tracks");
 	m_necks.push_back(new Texture("guitarneck.svg"));
@@ -59,7 +59,8 @@ void GuitarGraph::inputProcess() {
 }
 
 void GuitarGraph::engine(double time) {
-	if (picked && time < -0.5) {
+	if (!picked) return; // TODO: hammering etc. later, remove this
+	if (time < -0.5) {
 		if (fretPressed[4]) {
 			m_instrument = (m_instrument + 1) % m_song.tracks.size();
 			if (!difficulty(m_level)) difficultyAuto();
@@ -68,8 +69,30 @@ void GuitarGraph::engine(double time) {
 		else if (fretPressed[1]) difficulty(DIFFICULTY_EASY);
 		else if (fretPressed[2]) difficulty(DIFFICULTY_MEDIUM);
 		else if (fretPressed[3]) difficulty(DIFFICULTY_AMAZING);
+		return;
 	}
-	if (picked) { m_pickValue.setValue(1.0); }
+	m_pickValue.setValue(1.0);
+	for (NoteStatus::iterator it = m_notes.begin(); it != m_notes.end(); ++it) if (it->second == 1) it->second = 2;
+	int basepitch = diffv[m_level].basepitch;
+	for (int fret = 0; fret < 5; ++fret) {
+		if (!fretPressed[fret]) continue;
+		NoteMap const& nm = m_song.tracks[m_instrument].nm;
+		NoteMap::const_iterator it = nm.find(basepitch + fret);
+		if (it == nm.end()) continue;
+		Durations const& dur = it->second;
+		Durations::const_iterator it2 = dur.begin(), it2tmp, it2end = dur.end();
+		double tolerance = 0.2;
+		while (it2 != it2end && it2->begin < time - tolerance) ++it2;
+		if (it2 == it2end || it2->begin > time + tolerance) continue;
+		it2tmp = it2;
+		do {
+			it2 = it2tmp;
+			tolerance = std::abs(it2->begin - time);
+		} while (++it2tmp != it2end && std::abs(it2tmp->begin - time) < tolerance);
+		if (m_notes[&*it2] != 0) continue;
+		m_notes[&*it2] = 1;
+		m_score += (tolerance < 0.1 ? 50 : 25);
+	}
 	picked = false;
 }
 
@@ -89,11 +112,14 @@ bool GuitarGraph::difficulty(Difficulty level) {
 }
 
 void GuitarGraph::draw(double time) {
-	m_text.dimensions.screenBottom(-0.05).middle(0.0);
 	if (time < -0.5) {
 		std::string txt = "Play a fret to change:\n";
 		txt += m_song.tracks[m_instrument].name + "/" + diffv[m_level].name;
+		m_text.dimensions.screenBottom(-0.05).middle(0.0);
 		m_text.draw(txt);
+	} else {
+		m_text.dimensions.screenBottom(-0.1).middle(0.2);
+		m_text.draw(boost::lexical_cast<std::string>(m_score));
 	}
 	engine(time);
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
@@ -135,7 +161,6 @@ void GuitarGraph::draw(double time) {
 	for (int fret = 0; fret < 5; ++fret) {
 		float x = -2.0f + fret;
 		float w = 0.5f;
-		glutil::Color c = fretColors[fret];
 		NoteMap::const_iterator it = nm.find(basepitch + fret);
 		if (it == nm.end()) continue;
 		Durations const& durs = it->second;
@@ -144,6 +169,8 @@ void GuitarGraph::draw(double time) {
 			float tEnd = it2->end - time;
 			if (tEnd < past) continue;
 			if (tBeg > future) break;
+			glutil::Color c = fretColors[fret];
+			if (m_notes[&*it2] == 1) c.r = c.g = c.b = 1.0f;
 			float wLine = 0.5f * w;
 			if (tEnd > future) tEnd = future;
 			{

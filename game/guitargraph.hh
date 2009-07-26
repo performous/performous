@@ -36,5 +36,8 @@ class GuitarGraph {
 	void difficultyAuto();
 	bool difficulty(Difficulty level);
 	SvgTxtTheme m_text;
+	typedef std::map<Duration const*, int> NoteStatus;
+	NoteStatus m_notes;
+	int m_score;
 };
 
