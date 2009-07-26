@@ -27,7 +27,7 @@ void LayoutSinger::draw(double time, Position position) {
 	}
 
 	// Draw the lyrics
-	double linespacing;
+	double linespacing = 0.0;
 	Dimensions pos;
 	switch(position) {
 		case LayoutSinger::BOTTOM:
