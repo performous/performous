@@ -17,6 +17,8 @@ ScreenSongs::ScreenSongs(std::string const& name, Audio& audio, Songs& songs):
 void ScreenSongs::enter() {
 	theme.reset(new ThemeSongs());
 	m_emptyCover.reset(new Surface(getThemePath("no_cover.svg")));
+	m_instrumentCover.reset(new Surface(getThemePath("instrument_cover.svg")));
+	m_bandCover.reset(new Surface(getThemePath("band_cover.svg")));
 	m_search.text.clear();
 	m_songs.setFilter(m_search.text);
 	m_audio.fadeout();
@@ -26,6 +28,8 @@ void ScreenSongs::enter() {
 void ScreenSongs::exit() {
 	m_covers.clear();
 	m_emptyCover.reset();
+	m_instrumentCover.reset();
+	m_bandCover.reset();
 	theme.reset();
 	m_video.reset();
 	m_songbg.reset();
@@ -133,7 +137,13 @@ void ScreenSongs::draw() {
 				Surface* cover = NULL;
 				// Fetch cover image from cache or try loading it
 				if (!song_display.cover.empty()) try { cover = &m_covers[song_display.path + song_display.cover]; } catch (std::exception const&) {}
-				Surface& s = (cover ? *cover : *m_emptyCover);
+				if (!cover) {
+					size_t tracks = song_display.tracks.size();
+					if (tracks == 0) cover = m_emptyCover.get();
+					else if (tracks == 1) cover = m_instrumentCover.get();
+					else cover = m_bandCover.get();
+				}
+				Surface& s = *cover;
 				double diff = (i == 0 ? (0.5 - fabs(shift)) * 0.07 : 0.0);
 				double y = 0.27 + 0.5 * diff;
 				// Draw the cover

@@ -36,6 +36,8 @@ class ScreenSongs : public Screen {
 	AnimValue m_playTimer;
 	TextInput m_search;
 	boost::scoped_ptr<Surface> m_emptyCover;
+	boost::scoped_ptr<Surface> m_instrumentCover;
+	boost::scoped_ptr<Surface> m_bandCover;
 	Cachemap<std::string, Surface> m_covers;
 	bool m_jukebox;
 };
