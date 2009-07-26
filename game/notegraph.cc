@@ -1,5 +1,7 @@
 #include "notegraph.hh"
 
+Dimensions dimensions; // Make a public member variable
+
 NoteGraph::NoteGraph(Song const& song):
   m_song(song),
   m_notelines("notelines.svg"),
@@ -9,6 +11,7 @@ NoteGraph::NoteGraph(Song const& song):
   m_notebargold("notebargold.svg"), m_notebargold_hl("notebargold.png"),
   m_notealpha(0.0f), m_nlTop(0.0, 4.0), m_nlBottom(0.0, 4.0), m_time()
 {
+	dimensions.stretch(1.0, 0.5); // Initial dimensions, probably overridden from somewhere
 	m_nlTop.setTarget(m_song.noteMax, true);
 	m_nlBottom.setTarget(m_song.noteMin, true);
 	reset();
@@ -73,16 +76,12 @@ void NoteGraph::draw(double time, std::list<Player> const& players) {
 			m_nlBottom.setRange(low, low2);
 		}
 	}
+	dimensions.stretch(1.0, 0.25).bottom(0.0); // FIXME: Don't hardcode these testing dimensions
 	m_max = m_nlTop.get() + 7.0;
 	m_min = m_nlBottom.get() - 7.0;
-	if(1) {
-		m_noteUnit = -0.25 / std::max(12.0, m_max - m_min);
-		m_baseY = -0.35 * (m_min + m_max) * m_noteUnit;
-	} else {
-		m_noteUnit = -0.5 / std::max(24.0, m_max - m_min);
-		m_baseY = -0.5 * (m_min + m_max) * m_noteUnit;
-	}
-	m_baseX = baseLine - m_time * pixUnit;
+	m_noteUnit = -dimensions.h() / std::max(48.0 * dimensions.h(), m_max - m_min);
+	m_baseY = -0.5 * (m_min + m_max) * m_noteUnit + dimensions.yc();
+	m_baseX = baseLine - m_time * pixUnit + dimensions.xc();  // FIXME: Moving in X direction requires additional love (is b0rked now, keep it centered at zero)
 
 	drawNotes();
 	if (config["game/pitch"].b()) drawWaves(players);
@@ -96,7 +95,7 @@ void NoteGraph::drawNotes() {
 		m_notealpha = 0.0f;
 	} else {
 		glColor4f(1.0, 1.0, 1.0, m_notealpha);
-		m_notelines.draw(Dimensions().stretch(1.0, (m_max - m_min - 13) * m_noteUnit), TexCoords(0.0, (-m_min - 7.0) / 12.0f, 1.0, (-m_max + 6.0) / 12.0f));
+		m_notelines.draw(Dimensions().stretch(1.0, (m_max - m_min - 13) * m_noteUnit).middle(dimensions.xc()).center(dimensions.yc()), TexCoords(0.0, (-m_min - 7.0) / 12.0f, 1.0, (-m_max + 6.0) / 12.0f));
 
 		// Draw notes
 		for (Notes::const_iterator it = m_songit; it != m_song.notes.end() && it->begin < m_time - (baseLine - 0.5) / pixUnit; ++it) {

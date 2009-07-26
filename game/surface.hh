@@ -70,6 +70,10 @@ class Dimensions {
 	float x2() const { return x1() + w(); }
 	/// returns bottom
 	float y2() const { return y1() + h(); }
+	/// returns x center
+	float xc() const { return x1() + 0.5 * w(); }
+	/// returns y center
+	float yc() const { return y1() + 0.5 * h(); }
 	/// returns width
 	float w() const { return m_w; }
 	/// returns height
