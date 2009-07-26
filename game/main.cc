@@ -192,6 +192,7 @@ template <typename Container> void confOverride(Container const& c, std::string 
 }
 
 int main(int argc, char** argv) {
+	std::cout << PACKAGE " " VERSION << std::endl;
 	std::signal(SIGINT, quit);
 	std::signal(SIGTERM, quit);
 	std::ios::sync_with_stdio(false);  // We do not use C stdio
@@ -243,7 +244,7 @@ int main(int argc, char** argv) {
 	}
 	po::notify(vm);
 	if (vm.count("version")) {
-		std::cout << PACKAGE << ' ' << VERSION << std::endl;
+		// Already printed the version string in the beginning...
 		return 0;
 	}
 	if (vm.count("help")) {
