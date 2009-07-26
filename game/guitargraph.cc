@@ -231,10 +231,6 @@ void GuitarGraph::draw(double time) {
 			c.r = 1.0f;
 			c.g = 1.0f;
 			c.b = 1.0f;
-		} else {
-			c.r *= 0.5f;
-			c.g *= 0.5f;
-			c.b *= 0.5f;
 		}
 		glColor4fv(c);
 		m_button.dimensions.center(time2y(0.0)).middle(x);
