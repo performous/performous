@@ -91,7 +91,10 @@ GuitarGraph::GuitarGraph(Song const& song): m_song(song), m_button("button.svg")
 void GuitarGraph::inputProcess() {
 	for (Joysticks::iterator it = joysticks.begin(); it != joysticks.end(); ++it) {
 		for (JoystickEvent ev; it->second.tryPollEvent(ev); ) {
+			// RockBand pick event
 			if (ev.type == JoystickEvent::HAT_MOTION && ev.hat_direction != JoystickEvent::CENTERED) picked = true;
+			// GuitarHero pick event
+			if (ev.type == JoystickEvent::AXIS_MOTION && ev.axis_id == 5 && ev.axis_value != 0) picked = true;
 			if (ev.type != JoystickEvent::BUTTON_DOWN && ev.type != JoystickEvent::BUTTON_UP) continue;
 			unsigned b = ev.button_id;
 			if (b >= 5) continue;
