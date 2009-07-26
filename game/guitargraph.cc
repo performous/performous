@@ -50,6 +50,7 @@ void GuitarGraph::inputProcess() {
 
 void GuitarGraph::engine(double time) {
 	if (!picked) return; // TODO: hammering etc. later, remove this
+	picked = false;
 	if (time < -0.5) {
 		if (fretPressed[4]) {
 			m_instrument = (m_instrument + 1) % m_song.tracks.size();
@@ -83,7 +84,6 @@ void GuitarGraph::engine(double time) {
 		m_notes[&*it2] = 1;
 		m_score += (tolerance < 0.1 ? 50 : 25);
 	}
-	picked = false;
 }
 
 void GuitarGraph::difficultyAuto() {
