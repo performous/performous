@@ -21,6 +21,7 @@ zarrn <zarrn at users.sourceforge.net>
 	* OSX build fixes and testing
 
 knittl <knittl at users.sourceforge.net>
+	* Code documentation (Doxygen comments)
 	* SVG design
 
 dex7 <dex7 at users.sourceforge.net>
