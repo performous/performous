@@ -15,7 +15,7 @@ namespace {
 
 void ScreenSing::enter() {
 	Song& song = m_songs.current();
-	m_audio.playMusic(song.music, false, 0.0, -3.0);
+	m_audio.playMusic(song.music, false, 0.0, song.tracks.empty() ? -1.0 : -4.0); // Startup delay for instruments is longer than for singing only
 	theme.reset(new ThemeSing());
 	if (!song.background.empty()) {
 		try {
