@@ -72,7 +72,7 @@ double Chord::getDt(){
 namespace {
 	const float past = -0.3f;
 	const float future = 3.0f;
-	const float timescale = 80.0f;
+	const float timescale = 60.0f;
 	const float texCoordStep = -0.5f; // Two beat lines per neck texture => 0.5 tex units per beat
 	// Note: t is difference from playback time so it must be in range [past, future]
 	float time2y(float t) { return -timescale * (t - past) / (future - past); }
@@ -139,14 +139,25 @@ bool GuitarGraph::difficulty(Difficulty level) {
 }
 
 void GuitarGraph::draw(double time) {
-	m_text.dimensions.screenBottom(-0.1).middle(0.2);
-	m_text.draw(std::string("Tronic FIXME"));
+	m_text.dimensions.screenBottom(-0.05).middle(0.0);
+	if (time < -0.5) {
+		std::string txt = "Play a fret to change:\n";
+		txt += m_song.tracks[m_instrument].name + "/";
+		switch (m_level) {
+			case DIFFICULTY_SUPAEASY: txt += "Supaeasy"; break;
+			case DIFFICULTY_EASY: txt += "Easy"; break;
+			case DIFFICULTY_MEDIUM: txt += "Medium"; break;
+			case DIFFICULTY_AMAZING: txt += "Amazing"; break;
+			default: throw std::logic_error("Invalid difficulty level");
+		}
+		m_text.draw(txt);
+	}
 	engine(time);
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
 	dimensions.screenBottom().fixedWidth(0.5f);
 	glutil::PushMatrix pmb;
 	glTranslatef(0.5 * (dimensions.x1() + dimensions.x2()), dimensions.y2(), 0.0f);
-	glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+	glRotatef(85.0f, 1.0f, 0.0f, 0.0f);
 	{ float s = dimensions.w() / 5.0f; glScalef(s, s, s); }
 	// Draw the neck
 	{
