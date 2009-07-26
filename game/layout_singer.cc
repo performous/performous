@@ -70,7 +70,7 @@ void LayoutSinger::draw(double time, Position position) {
 		unsigned int i = 0;
 		for (std::list<Player>::const_iterator p = players.begin(); p != players.end(); ++p, ++i) {
 			float act = p->activity();
-			//if (act == 0.0f) continue;
+			if (act == 0.0f) continue;
 			glColor4f(p->m_color.r, p->m_color.g, p->m_color.b,act);
 			switch(position) {
 				case LayoutSinger::BOTTOM:
