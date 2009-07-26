@@ -159,15 +159,15 @@
 		<limits min="0" max="100" step="5" />
 		<locale name="C">
 			<short>Menu volume</short>
-			<long>The volume level of menus, song previews and jukebox mode</long>
+			<long>The volume level of menus, song previews and jukebox mode.</long>
 		</locale>
 	</entry>
-	<entry name="audio/music_volume" type="int" value="100">
+	<entry name="audio/music_volume" type="int" value="90">
 		<ui unit=" %" />
 		<limits min="0" max="100" step="5" />
 		<locale name="C">
 			<short>Music volume</short>
-			<long>The ingame music volume</long>
+			<long>The ingame music volume. Values above 90 are not recommended as distortion may occur.</long>
 		</locale>
 	</entry>
 
