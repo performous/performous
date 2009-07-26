@@ -6,55 +6,92 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="64"
    height="64"
-   id="svg1901"
+   id="svg2463"
    sodipodi:version="0.32"
    inkscape:version="0.46"
-   sodipodi:docname="button.svg"
-   sodipodi:docbase="/home/tsoots/ohj/translations/po"
    version="1.0"
+   sodipodi:docname="fret_button.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
-     id="defs1903">
+     id="defs2465">
+    <linearGradient
+       id="linearGradient3262">
+      <stop
+         style="stop-color:#f5f5f5;stop-opacity:0.22680412;"
+         offset="0"
+         id="stop3264" />
+      <stop
+         style="stop-color:#f5f5f5;stop-opacity:0.96078432;"
+         offset="1"
+         id="stop3266" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3751"
+       inkscape:collect="always">
+      <stop
+         id="stop3753"
+         offset="0"
+         style="stop-color:black;stop-opacity:1;" />
+      <stop
+         id="stop3755"
+         offset="1"
+         style="stop-color:black;stop-opacity:0;" />
+    </linearGradient>
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
        inkscape:vp_x="0 : 526.18109 : 1"
        inkscape:vp_y="0 : 1000 : 0"
        inkscape:vp_z="744.09448 : 526.18109 : 1"
        inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
-       id="perspective7" />
+       id="perspective2471" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3751"
+       id="linearGradient3272"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.3868046,0,0,0.3868046,40.335717,481.59837)"
+       x1="665.12128"
+       y1="684.16162"
+       x2="381.28015"
+       y2="449.80624" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3751"
+       id="linearGradient2406"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.3868046,0,0,0.3868046,43.114888,485.8841)"
+       x1="665.12128"
+       y1="684.16162"
+       x2="381.28015"
+       y2="449.80624" />
   </defs>
   <sodipodi:namedview
      id="base"
-     pagecolor="#ffffff"
+     pagecolor="#f5f5f5"
      bordercolor="#666666"
      borderopacity="1.0"
-     inkscape:pageopacity="0.0"
+     gridtolerance="10000"
+     guidetolerance="10"
+     objecttolerance="10"
+     inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.8284271"
-     inkscape:cx="-1.2442731"
-     inkscape:cy="40"
+     inkscape:zoom="5.6"
+     inkscape:cx="56.224066"
+     inkscape:cy="40.644334"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
-     gridtolerance="10000"
-     inkscape:window-width="877"
-     inkscape:window-height="739"
-     inkscape:window-x="10"
-     inkscape:window-y="69"
-     showgrid="true"
-     inkscape:showpageshadow="false">
-    <inkscape:grid
-       type="xygrid"
-       id="grid2382"
-       visible="true"
-       enabled="true"
-       empspacing="8" />
-  </sodipodi:namedview>
+     showgrid="false"
+     inkscape:window-width="1021"
+     inkscape:window-height="676"
+     inkscape:window-x="87"
+     inkscape:window-y="34" />
   <metadata
-     id="metadata1906">
+     id="metadata2468">
     <rdf:RDF>
       <cc:Work
          rdf:about="">
@@ -65,18 +102,23 @@
     </rdf:RDF>
   </metadata>
   <g
-     inkscape:label="Taso 1"
+     inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     style="opacity:1">
+     transform="translate(-110.35967,-771.51188)">
     <path
        sodipodi:type="arc"
-       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-       id="path2390"
-       sodipodi:cx="32"
-       sodipodi:cy="32"
-       sodipodi:rx="24"
-       sodipodi:ry="24"
-       d="M 56,32 A 24,24 0 1 1 8,32 A 24,24 0 1 1 56,32 z" />
+       style="opacity:1;fill:#f5f5f5;fill-opacity:0.96078431;stroke:#000000;stroke-width:5;stroke-miterlimit:3.29999995;stroke-dasharray:none;stroke-opacity:1"
+       id="path2481"
+       sodipodi:cx="360"
+       sodipodi:cy="838.07648"
+       sodipodi:rx="165.71428"
+       sodipodi:ry="165.71428"
+       d="M 525.71428,838.07648 A 165.71428,165.71428 0 1 1 194.28572,838.07648 A 165.71428,165.71428 0 1 1 525.71428,838.07648 z"
+       transform="matrix(0.1902335,0,0,0.1902336,73.876048,644.33005)" />
+    <path
+       style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.07658868px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 146.26053,783.90065 L 144.7132,783.90065 L 144.40374,784.67432 L 144.7132,785.52533 L 144.55847,786.45374 L 143.78482,785.98954 L 143.16588,784.82904 L 141.85065,784.51958 L 141.30909,783.97802 L 140.1486,783.43645 L 138.83337,781.27019 L 138.91075,780.26443 L 142.16013,777.7887 L 143.70743,778.485 L 143.93954,779.02658 L 143.93954,779.6455 L 144.32637,780.18706 L 145.10003,780.41917 L 145.64159,779.95496 L 145.71896,779.4134 L 145.48686,778.94921 L 145.02267,778.7171 L 144.7132,778.33027 L 145.4095,778.02081 L 145.25477,777.24714 L 145.25477,776.78295 L 144.79058,776.31874 L 144.55847,775.62244 L 143.63008,775.39035 L 142.85641,775.23562 L 141.23172,776.39611 L 137.13132,778.02081 L 136.20292,778.94921 L 135.50662,779.49077 L 135.35188,780.72862 L 135.66137,781.34755 L 136.43503,783.43645 L 137.44078,785.37061 L 138.52391,786.7632 L 136.82185,789.54839 L 134.88769,793.72616 L 133.72719,795.58294 L 131.79305,797.98131 L 131.71568,799.06443 L 130.70993,799.99284 L 132.25724,801.38543 L 131.87042,803.01013 L 132.02515,806.64633 L 132.72143,810.82411 L 133.41774,814.5377 L 134.19139,815.77555 L 135.27453,818.01917 L 136.97658,820.57227 L 137.44078,822.19695 L 137.90498,823.35745 L 136.51238,825.29161 L 134.03666,826.29736 L 133.80457,827.07103 L 138.52391,826.91631 L 137.82762,828.15417 L 138.67864,828.92783 L 140.92227,829.15993 L 142.70169,827.61261 L 143.32063,825.44635 L 144.32637,823.58955 L 145.56423,822.50643 L 145.95106,821.26856 L 144.63585,821.19119 L 145.48686,820.34016 L 143.78482,820.88173 L 145.02267,819.64386 L 144.09428,819.41177 L 143.39797,818.56074 L 142.23749,816.16239 L 139.52967,813.91877 L 138.98812,813.76403 L 139.52967,813.29984 L 139.4523,811.98462 L 139.99387,810.82411 L 139.52967,810.90148 L 140.3807,809.43152 L 140.3807,807.96157 L 140.92227,807.1879 L 140.92227,806.18213 L 142.08275,804.6348 L 142.16013,803.31958 L 141.92802,802.23646 L 142.46959,800.99859 L 143.0885,799.99284 L 143.0885,799.3739 L 143.78482,799.29653 L 144.40374,798.6776 L 144.9453,797.13028 L 146.18317,795.73768 L 147.65311,795.19612 L 148.58151,795.96979 L 150.82513,796.66608 L 152.60456,797.59448 L 153.45557,798.6776 L 154.92554,798.83233 L 159.56752,800.84386 L 161.96586,801.69488 L 163.90002,803.16485 L 164.36421,803.01013 L 164.36421,802.54592 L 163.2811,801.69488 L 165.36997,802.23646 L 165.60208,801.84962 L 165.13788,801.38543 L 165.91154,801.38543 L 165.98891,800.92123 L 164.59631,800.61176 L 165.67944,800.30229 L 165.67944,799.76073 L 165.29261,799.68337 L 164.13211,799.76073 L 163.20373,799.3739 L 162.58479,799.06443 L 163.51319,798.29077 L 163.74529,797.74921 L 163.59055,797.36238 L 162.73954,797.51711 L 160.9601,798.44551 L 160.72801,798.9097 L 160.10908,798.75497 L 157.86545,797.51711 L 157.78808,796.66608 L 156.47286,795.96979 L 154.22924,794.80928 L 153.68769,795.19612 L 153.76504,794.65455 L 152.52719,793.49406 L 151.44405,793.1846 L 150.4383,792.0241 L 150.12884,791.63727 L 151.1346,792.33357 L 150.97987,791.5599 L 151.75353,791.94673 L 151.52142,790.78624 L 152.60456,791.79199 L 152.14037,791.0957 L 153.22348,791.5599 L 152.2951,790.24469 L 152.99138,790.47677 L 152.68192,789.23892 L 153.22348,789.70311 L 152.44982,788.54263 L 153.22348,788.77473 L 152.52719,787.84633 L 153.45557,787.76896 L 152.44982,787.15003 L 153.06875,786.84057 L 152.37247,786.7632 L 153.30084,785.91217 L 152.44982,785.98954 L 152.52719,785.44798 L 152.60456,783.90065 L 152.14037,784.98378 L 151.59879,783.43645 L 151.67616,784.67432 L 151.36669,784.75168 L 150.59303,784.75168 L 149.74201,783.51382 L 148.89097,783.51382 L 147.88521,782.66278 L 147.42101,783.12698 L 146.26053,783.90065 z"
+       id="path1939" />
   </g>
 </svg>
