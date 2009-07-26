@@ -62,8 +62,8 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		}
 		else if (key == SDLK_SPACE || key == SDLK_PAUSE) m_audio.togglePause();
 		if (m_score_window.get()) return;
-		// The rest are only available when score window is not displayed
-		if (key == SDLK_RETURN && status == Song::INSTRUMENTAL_BREAK) {
+		// The rest are only available when score window is not displayed and when there are no instruments
+		if (key == SDLK_RETURN && status == Song::INSTRUMENTAL_BREAK && m_songs.current().tracks.empty()) {
 			double diff = m_layout_singer->lyrics_begin() - 3.0 - time;
 			if (diff > 0.0) m_audio.seek(diff);
 		}
@@ -74,7 +74,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		else if (key == SDLK_F8) ++config["audio/round-trip"];
 		else if (key == SDLK_F9) ++config["game/karaoke_mode"];
 		else if (key == SDLK_F10) ++config["game/pitch"];
-		else if (key == SDLK_HOME) m_audio.seek(-m_audio.getPosition());
+		else if (key == SDLK_HOME) m_audio.seekPos(0.0);
 		else if (key == SDLK_LEFT) { m_audio.seek(-5.0); seekback = true; }
 		else if (key == SDLK_RIGHT) m_audio.seek(5.0);
 		else if (key == SDLK_UP) m_audio.seek(30.0);
@@ -147,7 +147,7 @@ void ScreenSing::draw() {
 		unsigned t = clamp(time, 0.0, length);
 		m_progress->draw(songPercent);
 		std::string statustxt = (boost::format("%02u:%02u") % (t / 60) % (t % 60)).str();
-		if (!m_score_window.get()) {
+		if (!m_score_window.get() && song.tracks.empty()) {
 			if (status == Song::INSTRUMENTAL_BREAK) statustxt += "   ENTER to skip instrumental break";
 			if (status == Song::FINISHED && !config["game/karaoke_mode"].b()) statustxt += "   Remember to wait for grading!";
 		}
@@ -156,7 +156,7 @@ void ScreenSing::draw() {
 
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 
-	if (config["game/karaoke_mode"].b()) {
+	if (config["game/karaoke_mode"].b() || !song.tracks.empty()) {
 		if (!m_audio.isPlaying()) sm->activateScreen("Songs");
 	} else {
 		if (m_score_window.get()) {
