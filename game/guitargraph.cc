@@ -43,17 +43,7 @@ void GuitarGraph::inputProcess() {
 			if (b >= 5) continue;
 			static const int gh[] = { 2, 0, 1, 3, 4 };
 			static const int rb[] = { 3, 0, 1, 2, 4 };
-			switch( it->second.getType() ) {
-				case Joystick::ROCKBAND:
-					fretPressed[rb[b]] = (ev.type == JoystickEvent::BUTTON_DOWN);
-					break;
-				case Joystick::GUITARHERO:
-					fretPressed[gh[b]] = (ev.type == JoystickEvent::BUTTON_DOWN);
-					break;
-				default:
-					fretPressed[gh[b]] = (ev.type == JoystickEvent::BUTTON_DOWN);
-					break;
-			}
+			fretPressed[(it->second.getType() == Joystick::ROCKBAND ? rb : gh)[b]] = (ev.type == JoystickEvent::BUTTON_DOWN);
 		}
 	}
 }
