@@ -41,6 +41,7 @@ void LayoutSinger::draw(double time, Position position) {
 			linespacing = 0.06;
 			break;
 		case LayoutSinger::MIDDLE:
+			pos.center(-0.05);
 			linespacing = 0.04;
 			break;
 	}
