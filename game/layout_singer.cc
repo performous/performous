@@ -70,12 +70,26 @@ void LayoutSinger::draw(double time, Position position) {
 		unsigned int i = 0;
 		for (std::list<Player>::const_iterator p = players.begin(); p != players.end(); ++p, ++i) {
 			float act = p->activity();
-			if (act == 0.0f) continue;
+			//if (act == 0.0f) continue;
 			glColor4f(p->m_color.r, p->m_color.g, p->m_color.b,act);
-			m_player_icon->dimensions.left(-0.5 + 0.01 + 0.25 * i).fixedWidth(0.075).screenTop(0.055);
+			switch(position) {
+				case LayoutSinger::BOTTOM:
+					m_player_icon->dimensions.left(-0.5 + 0.01 + 0.25 * i).fixedWidth(0.075).screenTop(0.055);
+					break;
+				case LayoutSinger::MIDDLE:
+					m_player_icon->dimensions.right(0.35).fixedHeight(0.050).screenTop(0.025 + 0.050 * i);
+					break;
+			}
 			m_player_icon->draw();
 			m_score_text[i%4]->render((boost::format("%04d") % p->getScore()).str());
-			m_score_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.075).screenTop(0.055);
+			switch(position) {
+				case LayoutSinger::BOTTOM:
+					m_score_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.075).screenTop(0.055);
+					break;
+				case LayoutSinger::MIDDLE:
+					m_score_text[i%4]->dimensions().right(0.45).fixedHeight(0.050).screenTop(0.025 + 0.050 * i);
+					break;
+			}
 			m_score_text[i%4]->draw();
 			glColor4f(1.0, 1.0, 1.0, 1.0);
 		}
