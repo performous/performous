@@ -10,6 +10,7 @@ class Song;
 /// handles drawing of notes and waves
 class NoteGraph {
   public:
+	enum Position {FULLSCREEN, TOP};
 	/// constructor
 	NoteGraph(Song const& song);
 	/// resets NoteGraph and Notes
@@ -18,7 +19,7 @@ class NoteGraph {
 	 * @param time at which time to draw
 	 * @param players reference to the list of singing Players
 	 */
-	void draw(double time, std::list<Player> const& players);
+	void draw(double time, std::list<Player> const& players, Position position = NoteGraph::FULLSCREEN);
   private:
 	/// draw notebars
 	void drawNotes();

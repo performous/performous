@@ -144,7 +144,11 @@ void ScreenSing::draw() {
 
 	if (m_guitarGraph.get()) m_guitarGraph->draw(time);
 
-	m_layout_singer->draw(time);
+	if( song.tracks.empty() ) {
+		m_layout_singer->draw(time, LayoutSinger::BOTTOM);
+	} else {
+		m_layout_singer->draw(time, LayoutSinger::MIDDLE);
+	}
 	if (!config["game/karaoke_mode"].b()) drawScores(); // draw score if not in karaoke mode
 
 	Song::Status status = song.status(time);

@@ -51,7 +51,7 @@ namespace {
 const double baseLine = -0.2;
 const double pixUnit = 0.2;
 
-void NoteGraph::draw(double time, std::list<Player> const& players) {
+void NoteGraph::draw(double time, std::list<Player> const& players, Position position) {
 	if (time < m_time) reset();
 	m_time = time;
 	// Update m_songit (which note to start the rendering from)
@@ -76,7 +76,14 @@ void NoteGraph::draw(double time, std::list<Player> const& players) {
 			m_nlBottom.setRange(low, low2);
 		}
 	}
-	dimensions.stretch(1.0, 0.25).bottom(0.0); // FIXME: Don't hardcode these testing dimensions
+	switch(position) {
+		case NoteGraph::FULLSCREEN:
+			dimensions.stretch(1.0, 0.50).center();
+			break;
+		case NoteGraph::TOP:
+			dimensions.stretch(1.0, 0.25).bottom(0.0);
+			break;
+	}
 	m_max = m_nlTop.get() + 7.0;
 	m_min = m_nlBottom.get() - 7.0;
 	m_noteUnit = -dimensions.h() / std::max(48.0 * dimensions.h(), m_max - m_min);

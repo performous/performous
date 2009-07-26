@@ -26,14 +26,14 @@ class LyricRow {
 		return time > lastTime;
 	}
 	/// draw/print lyrics
-	void draw(SvgTxtTheme& txt, double time, double pos) const {
+	void draw(SvgTxtTheme& txt, double time, Dimensions &dim) const {
 		std::vector<TZoomText> sentence;
 		for (Iterator it = m_begin; it != m_end; ++it) {
 			sentence.push_back(TZoomText(it->syllable));
 			bool current = (time >= it->begin && time < it->end);
 			sentence.back().factor = current ? 1.2 - 0.2 * (time - it->begin) / (it->end - it->begin) : 1.0;
 		}
-		txt.dimensions.screenBottom(pos);
+		txt.dimensions = dim;
 		txt.draw(sentence, fade.get());
 	}
 
@@ -43,10 +43,11 @@ class LyricRow {
 
 class LayoutSinger {
   public:
+	enum Position {BOTTOM, MIDDLE};
 	LayoutSinger(Songs &_songs, Engine &_engine, ThemeSing& _theme);
 	~LayoutSinger();
 	void reset();
-	void draw(double time);
+	void draw(double time, Position position = LayoutSinger::BOTTOM);
 	double lyrics_begin();
   private:
 	Engine& m_engine;

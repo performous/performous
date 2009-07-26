@@ -10,24 +10,33 @@ void LayoutSinger::reset() {
 	m_lyrics.clear();
 }
 
-void LayoutSinger::draw(double time) {
+void LayoutSinger::draw(double time, Position position) {
 	Song &song = m_songs.current();
 
 	// Draw notes and pitch waves (only when not in karaoke mode)
 	if (!config["game/karaoke_mode"].b()) {
 		std::list<Player> const& players = m_engine.getPlayers();
-		m_noteGraph.draw(time, players);
+		switch(position) {
+			case LayoutSinger::BOTTOM:
+				m_noteGraph.draw(time, players, NoteGraph::FULLSCREEN);
+				break;
+			case LayoutSinger::MIDDLE:
+				m_noteGraph.draw(time, players, NoteGraph::TOP);
+				break;
+		}
 	}
 
 	// Draw the lyrics
-	double basepos;
 	double linespacing;
-	if(1) {
-		basepos = -0.35;
-		linespacing = 0.04;
-	} else {
-		basepos = -0.1;
-		linespacing = 0.06;
+	Dimensions pos;
+	switch(position) {
+		case LayoutSinger::BOTTOM:
+			pos.screenBottom(-0.1);
+			linespacing = 0.06;
+			break;
+		case LayoutSinger::MIDDLE:
+			linespacing = 0.04;
+			break;
 	}
 	bool dirty;
 	do {
@@ -43,11 +52,10 @@ void LayoutSinger::draw(double time) {
 			dirty = true;
 		}
 	} while (dirty);
-	double pos = basepos;
-	for (size_t i = 0; i < m_lyrics.size(); ++i, pos += linespacing) {
-		pos += m_lyrics[i].extraspacing.get() * linespacing;
+	for (size_t i = 0; i < m_lyrics.size(); ++i, pos.move(0.0, linespacing)) {
+		pos.move(0.0, m_lyrics[i].extraspacing.get() * linespacing);
 		if (i == 0) m_lyrics[0].draw(m_theme.lyrics_now, time, pos);
-		else if (i == 1) m_lyrics[1].draw(m_theme.lyrics_next, time, pos);
+		else if (i == 1 && position == LayoutSinger::BOTTOM) m_lyrics[1].draw(m_theme.lyrics_next, time, pos);
 	}
 }
 
