@@ -20,8 +20,15 @@ void LayoutSinger::draw(double time) {
 	}
 
 	// Draw the lyrics
-	const double basepos = -0.1;
-	const double linespacing = 0.06;
+	double basepos;
+	double linespacing;
+	if(1) {
+		basepos = -0.35;
+		linespacing = 0.04;
+	} else {
+		basepos = -0.1;
+		linespacing = 0.06;
+	}
 	bool dirty;
 	do {
 		dirty = false;

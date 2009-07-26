@@ -75,8 +75,13 @@ void NoteGraph::draw(double time, std::list<Player> const& players) {
 	}
 	m_max = m_nlTop.get() + 7.0;
 	m_min = m_nlBottom.get() - 7.0;
-	m_noteUnit = -0.5 / std::max(24.0, m_max - m_min);
-	m_baseY = -0.5 * (m_min + m_max) * m_noteUnit;
+	if(1) {
+		m_noteUnit = -0.25 / std::max(12.0, m_max - m_min);
+		m_baseY = -0.35 * (m_min + m_max) * m_noteUnit;
+	} else {
+		m_noteUnit = -0.5 / std::max(24.0, m_max - m_min);
+		m_baseY = -0.5 * (m_min + m_max) * m_noteUnit;
+	}
 	m_baseX = baseLine - m_time * pixUnit;
 
 	drawNotes();
