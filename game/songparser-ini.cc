@@ -52,6 +52,7 @@ void SongParser::iniParse() {
 		else name.erase(0, 5);
 		// Process non-vocal tracks
 		if (name != "VOCALS") {
+			bool drums = (name == "DRUMS");
 			s.tracks.push_back(Track(name));
 			NoteMap& nm = s.tracks.back().nm;
 			for (MidiFileParser::NoteMap::const_iterator it2 = it->notes.begin(); it2 != it->notes.end(); ++it2) {
@@ -60,7 +61,10 @@ void SongParser::iniParse() {
 				for (MidiFileParser::Notes::const_iterator it3 = notes.begin(); it3 != notes.end(); ++it3) {
 					double beg = midi.get_seconds(it3->begin);
 					double end = midi.get_seconds(it3->end);
-					if (beg < end) dur.push_back(Duration(beg, end));
+					if (end == 0) continue; // Note with no ending
+					if (beg > end) throw std::runtime_error("Reversed notes");
+					if (drums) end = beg;
+					dur.push_back(Duration(beg, end));
 				}
 			}
 			continue;
