@@ -62,6 +62,7 @@ void Players::setFilter(std::string const& val) {
 
 void Players::filter_internal() {
 	m_dirty = false;
+	PlayerItem selection = current();
 
 	try {
 		players_t filtered;
@@ -73,7 +74,15 @@ void Players::filter_internal() {
 		players_t(m_players.begin(), m_players.end()).swap(m_filtered);  // Invalid regex => copy everything
 	}
 	math_cover.reset();
-	// TODO restore selection
+
+	// Restore old selection
+	int pos = 0;
+	if (selection.name != "") {
+		players_t::iterator it = std::find(m_filtered.begin(), m_filtered.end(), selection);
+		math_cover.setTarget(0, 0);
+		if (it != m_filtered.end()) pos = it - m_filtered.begin();
+	}
+	math_cover.setTarget(pos, size());
 }
 
 
