@@ -88,7 +88,10 @@ class Players: boost::noncopyable {
 	/// sets margins for animation
 	void setAnimMargins(double left, double right) { math_cover.setMargins(left, right); }
 	/// @return current PlayerItem (the copy is very cheap at the moment)
-	PlayerItem current() const { return m_filtered[math_cover.getTarget()]; }
+	PlayerItem current() const {
+		if (math_cover.getTarget() < m_filtered.size()) return m_filtered[math_cover.getTarget()];
+		else return PlayerItem();
+	}
 	/// filters playerlist by regular expression
 	void setFilter(std::string const& regex);
   private:
