@@ -88,7 +88,8 @@ void ScreenPlayers::manageEvent(SDL_Event event) {
 		} else {
 			m_search.text.clear();
 			m_players.setFilter("");
-			// enter the next highscore
+			// add all players which reach highscore because if score is very near or same it might be
+			// frustrating for second one that he cannot enter, so better go for next one...
 		}
 	}
 	// The rest are only available when there are songs available

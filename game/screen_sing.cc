@@ -72,6 +72,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			if (m_score_window.get())
 			{
 				// TODO: multiple loading...
+				// TODO: make it possible to switch of highscore through configuration
 				HighScore hi(m_song->path, "High.sco");
 				try {
 					hi.load();

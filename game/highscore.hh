@@ -32,7 +32,18 @@ struct HighScoreItem {
 	}
 };
 
-/**HighScore loads and saves a list of HighScoreItems.*/
+/**HighScore loads and saves a list of HighScoreItems.
+
+ Format of highscore is compatible with Ultrastar.
+ 
+ Name of File: High.sco
+ @code
+#PLAYER0:name 
+#SCORE0:1234 
+ @endcode
+ Then the same thing for PLAYER/SCORE with other numbers up to 9.
+ Finally, you need to have a line that says only "E".
+ */
 class HighScore {
   public:
 	HighScore (std::string const& path_, std::string const& filename_);
@@ -44,6 +55,11 @@ class HighScore {
 	void getInfo (std::ostream & os);
 
 	/**Check if you reached a new highscore.
+
+	  You must be in TOP 3 to enter the highscore list.
+	  This is because it will take forever to fill all 9.
+	  And people refuse to enter their names if they are not close to the top.
+
 	  @param score is a value between 0 and 10000
 	    values below 500 will lead to returning false
 	  @return true if the score make it into the top.
