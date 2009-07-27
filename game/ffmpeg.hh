@@ -130,17 +130,16 @@ class AudioBuffer {
 	void setSamplesPerSecond(unsigned sps) { m_sps = sps; }
 	/// get samples per second
 	unsigned getSamplesPerSecond() { return m_sps; }
-	void push(AudioFrame* f) {
-		if (f->data.empty()) return;
+	void push(std::vector<int16_t> const& data, double timestamp) {
 		boost::mutex::scoped_lock l(m_mutex);
 		while (!condition()) m_cond.wait(l);
 		if (m_quit) return;
-		if (m_pos == 0 && f->timestamp != 0.0) {
-			//std::cerr << "Warning: The first audio frame begins at " << f->timestamp << " seconds instead of zero, compensating." << std::endl;
-			m_pos = f->timestamp * m_sps;
+		if (m_pos == 0 && timestamp != 0.0) {
+			//std::cerr << "Warning: The first audio frame begins at " << timestamp << " seconds instead of zero, compensating." << std::endl;
+			m_pos = timestamp * m_sps;
 		}
-		m_data.insert(m_data.end(), f->data.begin(), f->data.end());
-		m_pos += f->data.size();
+		m_data.insert(m_data.end(), data.begin(), data.end());
+		m_pos += data.size();
 	}
 	bool operator()(da::pcm_data data, int64_t& pos) {
 		boost::mutex::scoped_lock l(m_mutex);

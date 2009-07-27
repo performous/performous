@@ -154,7 +154,6 @@ void FFmpeg::operator()() {
 			errors = 0;
 		} catch (eof_error&) {
 			m_eof = true;
-			audioQueue.push(new AudioFrame()); // EOF marker
 			videoQueue.push(new VideoFrame()); // EOF marker
 			boost::thread::sleep(now() + 0.1);
 		} catch (std::exception& e) {
@@ -164,8 +163,10 @@ void FFmpeg::operator()() {
 	}
 	m_running = false;
 	m_eof = true;
-	audioQueue.push(new AudioFrame()); // EOF marker
 	videoQueue.push(new VideoFrame()); // EOF marker
+#ifdef USE_FFMPEG_CRASH_RECOVERY
+	ffmpeg_ptr.reset(); // Free the memory
+#endif
 }
 
 void FFmpeg::seek(double time, bool wait) {
@@ -249,9 +250,10 @@ void FFmpeg::decodeNextFrame() {
 						sws_scale(img_convert_ctx, videoFrame->data, videoFrame->linesize, 0, h, &data, &linesize);
 					}
 					if (packet.time() == packet.time()) m_position = packet.time();
+					// Construct a new video frame and push it to output queue
 					VideoFrame* tmp = new VideoFrame(m_position, w, h);
 					tmp->data.swap(buffer);
-					videoQueue.push(tmp);
+					videoQueue.push(tmp); // Takes ownership and may block
 				}
 			}
 		} else if (decodeAudio && packet.stream_index==audioStream) {
@@ -272,13 +274,12 @@ void FFmpeg::decodeNextFrame() {
 				outsize /= sizeof(int16_t) * pAudioCodecCtx->channels;
 				std::vector<int16_t> resampled(AVCODEC_MAX_AUDIO_FRAME_SIZE);
 				int frames = audio_resample(pResampleCtx, &resampled[0], audioFrames, outsize);
-				// Construct AudioFrame and add it to the queue
-				AudioFrame* tmp = new AudioFrame();
-				std::copy(resampled.begin(), resampled.begin() + frames * AUDIO_CHANNELS, std::back_inserter(tmp->data));
+				resampled.resize(frames * AUDIO_CHANNELS);
+				// Calculate new positions
 				if (packet.time() == packet.time()) m_position = packet.time();
-				else m_position += double(tmp->data.size())/double(audioQueue.getSamplesPerSecond());
-				tmp->timestamp = m_position;
-				audioQueue.push(tmp);
+				else m_position += double(resampled.size())/double(audioQueue.getSamplesPerSecond());
+				// Push to output queue (may block)
+				audioQueue.push(resampled, m_position);
 			}
 			// Audio frames are always finished
 			frameFinished = 1;
