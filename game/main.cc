@@ -134,7 +134,7 @@ void mainLoop() {
 		Audio audio;
 		audioSetup(capture, audio);
 		Songs songs(songlist);
-		Players players("players.txt"); // TODO: retrieve from configuration
+		Players players("players.xml"); // TODO: retrieve from configuration
 		ScreenManager sm;
 		Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b(), config["graphic/fs_width"].i(), config["graphic/fs_height"].i());
 		sm.addScreen(new ScreenIntro("Intro", audio, capture));

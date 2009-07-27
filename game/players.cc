@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <boost/regex.hpp>
+#include <libxml++/libxml++.h>
 
 Players::Players(std::string filename):
 	m_players(),
@@ -21,22 +22,29 @@ Players::~Players() {
 }
 
 void Players::load() {
-	std::ifstream in (m_filename.c_str());
+	xmlpp::DomParser domParser(m_filename);
+	xmlpp::NodeSet n = domParser.get_document()->get_root_node()->find("/performous/players/player");
 
-	std::string str;
-	while (getline(in, str))
+	for (xmlpp::NodeSet::const_iterator it = n.begin(); it != n.end(); ++it)
 	{
-		addPlayer(str);
+		xmlpp::Element& element = dynamic_cast<xmlpp::Element&>(**it);
+		xmlpp::Attribute* a = element.get_attribute("name");
+		addPlayer(a->get_value());
 	}
 }
 
 void Players::save() {
-	std::ofstream out (m_filename.c_str());
+	xmlpp::Document doc;
+	xmlpp::Node* nodeRoot = doc.create_root_node("performous");
+	xmlpp::Element *players = nodeRoot->add_child("players");
 
 	for (players_t::const_iterator it = m_players.begin(); it!=m_players.end(); ++it)
 	{
-		out << it->name << std::endl;
+		xmlpp::Element* player = players->add_child("player");
+		player->set_attribute("name", it->name);
 	}
+
+	doc.write_to_file_formatted(m_filename, "UTF-8");
 }
 
 void Players::update() {
@@ -91,16 +99,14 @@ void Players::filter_internal() {
 
 int main(int argc, char** argv)
 {
-	if (argc != 2) return 1;
-
-	std::string filter = argv[1];
-	Players p("players.txt");
+	Players p("players.xml");
 	p.addPlayer("hubert");
-	p.setFilter(filter);
 
 	for (size_t i=0; i<p.size(); i++)
 	{
 		std::cout << p[i].name << std::endl;
 	}
+
+	return 0;
 }
 */

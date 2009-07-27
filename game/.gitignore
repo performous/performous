@@ -3,4 +3,4 @@ Makefile
 highscore
 highscore.txt
 players
-players.txt
+players.xml

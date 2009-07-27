@@ -137,7 +137,7 @@ void ScreenPlayers::draw() {
 		// Format the song information text
 		if (m_search.text.empty()) {
 			oss_song << "No players found!";
-			oss_order << "Check players.txt in current\n";
+			oss_order << "Check players.xml in current\n"; // TODO retrieve from configuration
 			oss_order << "directory for players";
 		} else {
 			oss_song << "Press enter to create player!";
