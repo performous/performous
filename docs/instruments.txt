@@ -1,0 +1,70 @@
+This file aims to list common band instruments (including dance carpet).
+B means button
+A means axis (+: positive values, -: negative values)
+SDL report axis or button ID minus one.
+
+Ex: A5- => SDL axis 4 with negative value
+
+[Guitar Hero III: Legends of Rock] PS3 Guitar
+ USB id: 12ba:0100
+ SDL name: Licensed by Sony Computer Entertainment Guitar Hero3 for PlayStation (R) 3
+ GREEN FRET:  B2
+ RED FRET:    B3
+ YELLOW FRET: B1
+ BLUE FRET:   B4
+ ORANGE FRET: B5
+ START:       B10
+ SELECT:      B9
+ PS3:         B13
+ DOWN:        A6+
+ UP:          A6-
+ LEFT:        A5-
+ RIGHT:       A5+
+ BEND:        A3+
+ PICK DOWN:   A6+
+ PICK UP:     A6-
+
+[Guitar Hero World Tour] PS3 Guitar
+ USB id: 12ba:0100
+ SDL name: Licensed by Sony Computer Entertainment Guitar Hero4 for PlayStation (R) 3
+ GREEN FRET:  B2
+ RED FRET:    B3
+ YELLOW FRET: B1
+ BLUE FRET:   B4
+ ORANGE FRET: B5
+ HAMMER ZONE: A4 APPROX  VALUES:
+	- GREEN -26000
+	- RED   -10000
+	- YELLOW  2000
+	- BLUE   16000
+	- ORANGE 32000
+ START:       B10
+ SELECT:      B9 (Also activate star power)
+ PS3:         B13
+ DOWN:        A6+
+ UP:          A6-
+ LEFT:        A5-
+ RIGHT:       A5+
+ BEND:        A3+
+ PICK DOWN:   A6+
+ PICK UP:     A6-
+
+[Guitar Hero World Tour] PS3 Drumkit
+ USB id: 12ba:0120
+ SDL name: Licensed by Sony Computer Entertainment Guitar Hero4 for PlayStation (R) 3
+ GREEN FRET or CROSS:     B2
+ RED FRET or CIRCLE:      B3
+ YELLOW FRET or TRIANGLE: B4
+ BLUE FRET or SQUARE:     B1
+ ORANGE FRET:             B6
+ KICK:                    B5
+ START:                   B10
+ SELECT:                  B9
+ PS3:                     B13
+ DOWN:                    A6+
+ UP:                      A6-
+ LEFT:                    A5-
+ RIGHT:                   A5+
+ BEND:                    A3+
+ PICK DOWN:               A6+
+ PICK UP:                 A6-
