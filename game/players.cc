@@ -60,18 +60,8 @@ void Players::setFilter(std::string const& val) {
 	filter_internal();
 }
 
-#include <iostream> //TODO remove
-
 void Players::filter_internal() {
 	m_dirty = false;
-
-	if (m_filter == "")
-	{
-		std::cout << "empty filter" << std::endl; //TODO remove
-		// without filter get all names
-		m_filtered = m_players;
-		return;
-	}
 
 	try {
 		players_t filtered;

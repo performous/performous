@@ -57,32 +57,27 @@ void ScreenPlayers::exit() {
 }
 
 void ScreenPlayers::manageEvent(SDL_Event event) {
-ScreenManager* sm = ScreenManager::getSingletonPtr();
-if (event.type != SDL_KEYDOWN) return;
-SDL_keysym keysym = event.key.keysym;
-int key = keysym.sym;
-SDLMod mod = event.key.keysym.mod;
+	ScreenManager* sm = ScreenManager::getSingletonPtr();
+	if (event.type != SDL_KEYDOWN) return;
+	SDL_keysym keysym = event.key.keysym;
+	int key = keysym.sym;
+	SDLMod mod = event.key.keysym.mod;
 
-if (key == SDLK_r && mod & KMOD_CTRL) { m_players.reload(); m_players.setFilter(m_search.text); }
-if (m_search.process(keysym)) m_players.setFilter(m_search.text);
-else if (key == SDLK_ESCAPE) {
-	if (m_search.text.empty()) sm->activateScreen("Songs");
-	else { m_search.text.clear(); m_players.setFilter(m_search.text); }
+	if (key == SDLK_r && mod & KMOD_CTRL) { m_players.reload(); m_players.setFilter(m_search.text); }
+	if (m_search.process(keysym)) m_players.setFilter(m_search.text);
+	else if (key == SDLK_ESCAPE) {
+		if (m_search.text.empty()) sm->activateScreen("Songs");
+		else { m_search.text.clear(); m_players.setFilter(m_search.text); }
 	}
-	// The rest are only available when there are songs available
-	else if (m_players.empty()) return;
-	else if (key == SDLK_SPACE || (key == SDLK_PAUSE || (key == SDLK_p && mod & KMOD_CTRL))) m_audio.togglePause();
 	else if (key == SDLK_RETURN)
 	{
 		if (m_players.empty())
 		{
 			m_players.addPlayer(m_search.text);
 			m_players.setFilter(m_search.text);
+			m_players.update();
 			// the current player is the new created one
 		}
-		std::cout << "add new highscore " << m_players.scores.front()
-			<< " name: " << m_players.current().name
-			<< std::endl;
 		m_highscore->addNewHighscore(m_players.current().name, m_players.scores.front());
 		m_players.scores.pop_front();
 
@@ -91,11 +86,14 @@ else if (key == SDLK_ESCAPE) {
 			// no more highscore, we are now finished
 			sm->activateScreen("Songs");
 		} else {
-			std::cout << "enter the next highscore" << std::endl;
 			m_search.text.clear();
+			m_players.setFilter("");
 			// enter the next highscore
 		}
 	}
+	// The rest are only available when there are songs available
+	else if (m_players.empty()) return;
+	else if (key == SDLK_SPACE || (key == SDLK_PAUSE || (key == SDLK_p && mod & KMOD_CTRL))) m_audio.togglePause();
 	else if (key == SDLK_LEFT) m_players.advance(-1);
 	else if (key == SDLK_RIGHT) m_players.advance(1);
 	else if (key == SDLK_PAGEUP) m_players.advance(-10);
@@ -147,11 +145,11 @@ void ScreenPlayers::draw() {
 	} else {
 		// Format the player information text
 		oss_song << "You reached " << m_players.scores.front() << " points!\n";
-		oss_order << "Name: " << m_players.current().name << '\n'
+		oss_order << "Please enter your Name!\n"
+			<< "Name: " << m_players.current().name << '\n'
 			<< "Search Text: "
 			<< (m_search.text.empty() ? std::string("please enter") : m_search.text)
 			<< '\n';
-		oss_order << "(" << m_players.currentId() + 1 << "/" << m_players.size() << ")";
 		double spos = m_players.currentPosition(); // This needs to be polled to run the animation
 
 		// Draw the covers
