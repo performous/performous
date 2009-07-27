@@ -73,14 +73,14 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			{
 				// TODO: multiple loading...
 				// TODO: make it possible to switch of highscore through configuration
-				HighScore hi(m_song->path, "High.sco");
+				SongHiscore hi(m_song->path, "High.sco");
 				try {
 					hi.load();
-				} catch (HighScoreException const& hi) {
+				} catch (HiscoreException const& hi) {
 					std::cerr << "high.sco:" << hi.line() << " " << hi.what() << std::endl;
 				}
 
-				if (m_players.scores.empty() || !hi.reachedNewHighscore(m_players.scores.front()))
+				if (m_players.scores.empty() || !hi.reachedNewHiscore(m_players.scores.front()))
 				{
 					// if no highscore reached..
 					sm->activateScreen("Songs");

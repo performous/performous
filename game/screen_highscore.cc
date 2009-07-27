@@ -6,18 +6,18 @@
 
 static const double IDLE_TIMEOUT = 45.0; // seconds
 
-ScreenHighscore::ScreenHighscore(std::string const& name, Audio& audio, Players& players):
+ScreenHiscore::ScreenHiscore(std::string const& name, Audio& audio, Players& players):
   Screen(name), m_audio(audio), m_players(players), m_covers(20)
 {
 	m_players.setAnimMargins(5.0, 5.0);
 	m_playTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
 }
 
-void ScreenHighscore::enter() {
-	m_highscore.reset(new HighScore(m_song->path, "High.sco"));
+void ScreenHiscore::enter() {
+	m_highscore.reset(new SongHiscore(m_song->path, "High.sco"));
 	try {
 		m_highscore->load();
-	} catch (HighScoreException const& hi) {
+	} catch (HiscoreException const& hi) {
 		std::cerr << "high.sco:" << hi.line() << " " << hi.what() << std::endl;
 	}
 
@@ -33,7 +33,7 @@ void ScreenHighscore::enter() {
 	m_audio.fadeout();
 }
 
-void ScreenHighscore::exit() {
+void ScreenHiscore::exit() {
 	m_player_icon.reset();
 	m_score_text[0].reset();
 	m_score_text[1].reset();
@@ -50,13 +50,13 @@ void ScreenHighscore::exit() {
 
 	try {
 		m_highscore->save();
-	} catch (HighScoreException const& hi) {
+	} catch (HiscoreException const& hi) {
 		std::cerr << "high.sco:" << hi.line() << " " << hi.what() << std::endl;
 	}
 	m_highscore.reset();
 }
 
-void ScreenHighscore::manageEvent(SDL_Event event) {
+void ScreenHiscore::manageEvent(SDL_Event event) {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	if (event.type != SDL_KEYDOWN) return;
 	SDL_keysym keysym = event.key.keysym;
@@ -83,7 +83,7 @@ void ScreenHighscore::manageEvent(SDL_Event event) {
 }
 
 /**Draw the scores in the bottom*/
-void ScreenHighscore::drawScores() {
+void ScreenHiscore::drawScores() {
 	// Score display
 	{
 		unsigned int i = 0;
@@ -103,7 +103,7 @@ void ScreenHighscore::drawScores() {
 	}
 }
 
-void ScreenHighscore::draw() {
+void ScreenHiscore::draw() {
 	m_players.update(); // Poll for new players
 	double length = m_audio.getLength();
 	double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
@@ -115,7 +115,7 @@ void ScreenHighscore::draw() {
 	std::ostringstream oss_song, oss_order;
 
 	// Format the player information text
-	oss_song << "Highscore for " << m_song->title << "!\n";
+	oss_song << "Hiscore for " << m_song->title << "!\n";
 
 	m_highscore->getInfo (oss_order);
 

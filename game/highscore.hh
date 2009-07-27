@@ -7,9 +7,9 @@
 #include <ostream>
 
 /**Exception which will be thrown when loading or
-  saving a HighScore fails.*/
-struct HighScoreException: public std::runtime_error {
-	HighScoreException (std::string const& msg, unsigned int linenum) :
+  saving a SongHiscore fails.*/
+struct HiscoreException: public std::runtime_error {
+	HiscoreException (std::string const& msg, unsigned int linenum) :
 		runtime_error(msg), m_linenum(linenum)
 	{}
 	/**Line information where the problem occured.*/
@@ -20,19 +20,19 @@ struct HighScoreException: public std::runtime_error {
 
 /**This struct holds together information for a
   single item of a highscore.*/
-struct HighScoreItem {
+struct SongHiscoreItem {
 	std::string name;
 	int score;
 	// std::string song;
 
 	/**Operator for sorting by score.*/
-	bool operator < (HighScoreItem const& other) const
+	bool operator < (SongHiscoreItem const& other) const
 	{
 		return other.score < score;
 	}
 };
 
-/**HighScore loads and saves a list of HighScoreItems.
+/**SongHiscore loads and saves a list of SongHiscoreItems.
 
  Format of highscore is compatible with Ultrastar.
  
@@ -44,10 +44,10 @@ struct HighScoreItem {
  Then the same thing for PLAYER/SCORE with other numbers up to 9.
  Finally, you need to have a line that says only "E".
  */
-class HighScore {
+class SongHiscore {
   public:
-	HighScore (std::string const& path_, std::string const& filename_);
-	~HighScore ();
+	SongHiscore (std::string const& path_, std::string const& filename_);
+	~SongHiscore ();
 
 	void load();
 	void save();
@@ -63,9 +63,9 @@ class HighScore {
 	  @param score is a value between 0 and 10000
 	    values below 500 will lead to returning false
 	  @return true if the score make it into the top.
-	  @return false if addNewHighscore does not make sense
+	  @return false if addNewHiscore does not make sense
 	    for that score.*/
-	bool reachedNewHighscore(int score)
+	bool reachedNewHiscore(int score)
 	{
 		if (score < 500) return false;
 		return score > m_scores[2].score;
@@ -73,10 +73,10 @@ class HighScore {
 	/**Add a new entry to the highscore.
 	  It will do nothing on empty name.
 	 */
-	void addNewHighscore(std::string name, int score);
+	void addNewHiscore(std::string name, int score);
   private:
 	static const int m_maxEntries = 10;
 	std::string m_path;
 	std::string m_filename;
-	std::vector <HighScoreItem> m_scores;
+	std::vector <SongHiscoreItem> m_scores;
 };

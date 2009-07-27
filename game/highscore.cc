@@ -7,29 +7,29 @@
 #include <sstream>
 #include <algorithm>
 
-HighScore::HighScore (std::string const& path_, std::string const& filename_) :
+SongHiscore::SongHiscore (std::string const& path_, std::string const& filename_) :
 	m_path(path_),
 	m_filename(filename_),
 	m_scores(m_maxEntries)
 {}
 
-HighScore::~HighScore()
+SongHiscore::~SongHiscore()
 {}
 
-void HighScore::load()
+void SongHiscore::load()
 {
 	std::ifstream in((m_path + m_filename).c_str());
 
-	if (!in.is_open()) throw HighScoreException("Could not open highscore file", 0);
+	if (!in.is_open()) throw HiscoreException("Could not open highscore file", 0);
 
 
 	in.seekg(0, std::ios::end);
 	size_t size = in.tellg();
-	if (size < 10 || size > 100000) throw HighScoreException("Does not look like a highscore file (wrong size)", 1);
+	if (size < 10 || size > 100000) throw HiscoreException("Does not look like a highscore file (wrong size)", 1);
 	in.seekg(0);
 
 	std::vector<char> data(size);
-	if (!in.read(&data[0], size)) throw HighScoreException("Unexpected I/O error", 0);
+	if (!in.read(&data[0], size)) throw HiscoreException("Unexpected I/O error", 0);
 
 	std::stringstream ss;
 	ss.write(&data[0], size);
@@ -44,45 +44,45 @@ void HighScore::load()
 	{
 		if (str == "E") break;
 		linenum++;
-		if (playernum > 9) throw HighScoreException("Not more than 10 highscores expected in file", linenum);
+		if (playernum > 9) throw HiscoreException("Not more than 10 highscores expected in file", linenum);
 		if (str.empty()) continue; // ignore empty player lines
-		if (str.length() <= 9) throw HighScoreException("Line not long enough for player information", linenum);
+		if (str.length() <= 9) throw HiscoreException("Line not long enough for player information", linenum);
 
-		if (str[0] != '#') throw HighScoreException("No # found at begin of line", linenum);
-		if (str.substr(1,6) != "PLAYER") throw HighScoreException("Expected PLAYER not found", linenum);
+		if (str[0] != '#') throw HiscoreException("No # found at begin of line", linenum);
+		if (str.substr(1,6) != "PLAYER") throw HiscoreException("Expected PLAYER not found", linenum);
 
 		unsigned int nr = str[7];
-		if (nr != playernum + '0') throw HighScoreException("Did not find correct playernum", linenum);
-		if (str[8] != ':') throw HighScoreException("Did not find :", linenum);
+		if (nr != playernum + '0') throw HiscoreException("Did not find correct playernum", linenum);
+		if (str[8] != ':') throw HiscoreException("Did not find :", linenum);
 
 		std::string name = str.substr(9, str.length()-9);
-		if (name.empty()) throw HighScoreException("Did not find name", linenum);
+		if (name.empty()) throw HiscoreException("Did not find name", linenum);
 		m_scores[playernum].name = name;
 
 		std::getline(ss, str);
 		linenum++;
-		if (str.empty()) throw HighScoreException("Expected Score, but found empty line", linenum);
-		if (str.length() <= 8) throw HighScoreException("Line not long enough for score information", linenum);
+		if (str.empty()) throw HiscoreException("Expected Score, but found empty line", linenum);
+		if (str.length() <= 8) throw HiscoreException("Line not long enough for score information", linenum);
 
-		if (str[0] != '#') throw HighScoreException("No # found at begin of line", linenum);
-		if (str.substr(1,5) != "SCORE") throw HighScoreException("Expected SCORE not found", linenum);
+		if (str[0] != '#') throw HiscoreException("No # found at begin of line", linenum);
+		if (str.substr(1,5) != "SCORE") throw HiscoreException("Expected SCORE not found", linenum);
 
 		nr = str[6];
-		if (nr != playernum + '0') throw HighScoreException("Did not find correct playernum", linenum);
-		if (str[7] != ':') throw HighScoreException("Did not find :", linenum);
+		if (nr != playernum + '0') throw HiscoreException("Did not find correct playernum", linenum);
+		if (str[7] != ':') throw HiscoreException("Did not find :", linenum);
 
 		std::string sscore = str.substr(8, str.length()-8);
-		if (sscore.empty()) throw HighScoreException("Did not find score", linenum);
+		if (sscore.empty()) throw HiscoreException("Did not find score", linenum);
 
 		int score = 0;
 		try {
 			score = boost::lexical_cast<int>(sscore);
 		} catch (boost::bad_lexical_cast const& blc)
 		{
-			throw HighScoreException("Did not find valid int number", linenum);
+			throw HiscoreException("Did not find valid int number", linenum);
 		}
-		if (score < 0 || score > 10000) throw HighScoreException("Number not between 0 and 10000", linenum);
-		if (playernum>0 && m_scores[playernum-1].score < score) throw HighScoreException("Lower ranked highscore is higher", linenum);
+		if (score < 0 || score > 10000) throw HiscoreException("Number not between 0 and 10000", linenum);
+		if (playernum>0 && m_scores[playernum-1].score < score) throw HiscoreException("Lower ranked highscore is higher", linenum);
 		m_scores[playernum].score = score;
 
 
@@ -90,11 +90,11 @@ void HighScore::load()
 	}
 }
 
-void HighScore::save()
+void SongHiscore::save()
 {
 	std::ofstream out ((m_path + m_filename).c_str());
 
-	if (!out.is_open()) throw HighScoreException("Could not open file for writing", 0);
+	if (!out.is_open()) throw HiscoreException("Could not open file for writing", 0);
 
 	out.exceptions ( std::ofstream::eofbit | std::ofstream::failbit | std::ofstream::badbit );
 	for (size_t i=0; i<m_scores.size();i++)
@@ -107,13 +107,13 @@ void HighScore::save()
 			out << "#SCORE" << i << ":"
 			  << m_scores[i].score << std::endl;
 		} catch (std::ofstream::failure const&) {
-			throw HighScoreException("Unexpected I/O error", i);
+			throw HiscoreException("Unexpected I/O error", i);
 		}
 	}
 	out << "E" << std::endl;
 }
 
-void HighScore::getInfo (std::ostream & out)
+void SongHiscore::getInfo (std::ostream & out)
 {
 	for (size_t i=0; i<m_scores.size();i++)
 	{
@@ -123,17 +123,17 @@ void HighScore::getInfo (std::ostream & out)
 			out << i+1 << ".\t" << m_scores[i].name
 			  << "\t" << m_scores[i].score << std::endl;
 		} catch (std::ofstream::failure const&) {
-			throw HighScoreException("Unexpected I/O error", i);
+			throw HiscoreException("Unexpected I/O error", i);
 		}
 	}
 }
 
-void HighScore::addNewHighscore(std::string name, int score)
+void SongHiscore::addNewHiscore(std::string name, int score)
 {
 	// do not allow invalid name
 	if (name == "") return;
 
-	HighScoreItem hsi;
+	SongHiscoreItem hsi;
 	hsi.name = name;
 	hsi.score = score;
 
@@ -149,16 +149,16 @@ void HighScore::addNewHighscore(std::string name, int score)
 int main()
 {
 	try {
-		HighScore hi ("", "highscore.txt");
+		SongHiscore hi ("", "highscore.txt");
 		hi.load();
 		int new_score = 9000;
-		if (hi.reachedNewHighscore(new_score))
+		if (hi.reachedNewHiscore(new_score))
 		{
 			std::cout << "Reached new highscore" << std::endl;
-			hi.addNewHighscore("new player", new_score);
+			hi.addNewHiscore("new player", new_score);
 		}
 		hi.save();
-	} catch (HighScoreException const& hie)
+	} catch (HiscoreException const& hie)
 	{
 		std::cerr << "Exception: " << hie.what()
 			<< "  at line: " << hie.line()

@@ -54,11 +54,11 @@ void ScreenSongs::manageSharedKey(int key, SDLMod mod)
 	else if (key == SDLK_END)
 	{
 		ScreenManager* sm = ScreenManager::getSingletonPtr();
-		Screen* s = sm->getScreen("Highscore");
-		ScreenHighscore* ss = dynamic_cast<ScreenHighscore*> (s);
+		Screen* s = sm->getScreen("Hiscore");
+		ScreenHiscore* ss = dynamic_cast<ScreenHiscore*> (s);
 		assert(ss);
 		ss->setSong(m_songs.currentPtr());
-		sm->activateScreen("Highscore");
+		sm->activateScreen("Hiscore");
 	}
 }
 

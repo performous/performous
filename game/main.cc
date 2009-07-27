@@ -143,7 +143,7 @@ void mainLoop() {
 		sm.addScreen(new ScreenPractice("Practice", audio, capture));
 		sm.addScreen(new ScreenConfiguration("Configuration", audio));
 		sm.addScreen(new ScreenPlayers("Players", audio, players));
-		sm.addScreen(new ScreenHighscore("Highscore", audio, players));
+		sm.addScreen(new ScreenHiscore("Hiscore", audio, players));
 		sm.activateScreen("Intro");
 		// Main loop
 		boost::xtime time = now();

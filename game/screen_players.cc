@@ -14,10 +14,10 @@ ScreenPlayers::ScreenPlayers(std::string const& name, Audio& audio, Players& pla
 }
 
 void ScreenPlayers::enter() {
-	m_highscore.reset(new HighScore(m_song->path, "High.sco"));
+	m_highscore.reset(new SongHiscore(m_song->path, "High.sco"));
 	try {
 		m_highscore->load();
-	} catch (HighScoreException const& hi) {
+	} catch (HiscoreException const& hi) {
 		std::cerr << "high.sco:" << hi.line() << " " << hi.what() << std::endl;
 	}
 
@@ -50,7 +50,7 @@ void ScreenPlayers::exit() {
 
 	try {
 		m_highscore->save();
-	} catch (HighScoreException const& hi) {
+	} catch (HiscoreException const& hi) {
 		std::cerr << "high.sco:" << hi.line() << " " << hi.what() << std::endl;
 	}
 	m_highscore.reset();
@@ -78,10 +78,10 @@ void ScreenPlayers::manageEvent(SDL_Event event) {
 			m_players.update();
 			// the current player is the new created one
 		}
-		m_highscore->addNewHighscore(m_players.current().name, m_players.scores.front());
+		m_highscore->addNewHiscore(m_players.current().name, m_players.scores.front());
 		m_players.scores.pop_front();
 
-		if (m_players.scores.empty() || !m_highscore->reachedNewHighscore(m_players.scores.front()))
+		if (m_players.scores.empty() || !m_highscore->reachedNewHiscore(m_players.scores.front()))
 		{
 			// no more highscore, we are now finished
 			sm->activateScreen("Songs");

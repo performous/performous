@@ -15,10 +15,10 @@
 class CAudio;
 
 /// song chooser screen
-class ScreenHighscore : public Screen {
+class ScreenHiscore : public Screen {
   public:
 	/// constructor
-	ScreenHighscore(std::string const& name, Audio& audio, Players& players);
+	ScreenHiscore(std::string const& name, Audio& audio, Players& players);
 	void enter();
 	void exit();
 	void manageEvent(SDL_Event event);
@@ -34,7 +34,7 @@ class ScreenHighscore : public Screen {
 	Audio& m_audio;
 	Players& m_players;
 	boost::shared_ptr<Song> m_song; /// Pointer to the current song
-	boost::scoped_ptr<HighScore> m_highscore;
+	boost::scoped_ptr<SongHiscore> m_highscore;
 	boost::scoped_ptr<Surface> m_songbg;
 	boost::scoped_ptr<Video> m_video;
 	boost::scoped_ptr<ThemeSongs> theme;
