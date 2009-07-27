@@ -164,9 +164,6 @@ void FFmpeg::operator()() {
 	m_running = false;
 	m_eof = true;
 	videoQueue.push(new VideoFrame()); // EOF marker
-#ifdef USE_FFMPEG_CRASH_RECOVERY
-	ffmpeg_ptr.reset(); // Free the memory
-#endif
 }
 
 void FFmpeg::seek(double time, bool wait) {
