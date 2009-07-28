@@ -65,24 +65,50 @@ void GuitarGraph::engine(double time) {
 	m_pickValue.setValue(1.0);
 	for (NoteStatus::iterator it = m_notes.begin(); it != m_notes.end(); ++it) if (it->second == 1) it->second = 2;
 	int basepitch = diffv[m_level].basepitch;
+	Duration const* dIt[5] = {};
+	double begin = getNaN();
+	double tolerance = 0.2;
 	for (int fret = 0; fret < 5; ++fret) {
-		if (!fretPressed[fret]) continue;
 		NoteMap const& nm = m_song.tracks[m_instrument].nm;
 		NoteMap::const_iterator it = nm.find(basepitch + fret);
 		if (it == nm.end()) continue;
 		Durations const& dur = it->second;
 		Durations::const_iterator it2 = dur.begin(), it2tmp, it2end = dur.end();
-		double tolerance = 0.2;
-		while (it2 != it2end && it2->begin < time - tolerance) ++it2;
+		// Find any suitable note within the tolerance
+		while (it2 != it2end && (it2->begin < time - tolerance || m_notes[&*it2] != 0)) ++it2;
+		// If we are already past the accepted region, skip further processing
 		if (it2 == it2end || it2->begin > time + tolerance) continue;
+		// Find the note with the smallest error
 		it2tmp = it2;
 		do {
 			it2 = it2tmp;
-			tolerance = std::abs(it2->begin - time);
+			if (m_notes[&*it2] != 0) continue; // Notes already played are ignored
+			dIt[fret] = &*it2;
+			begin = it2->begin;
+			tolerance = std::abs(begin - time);
 		} while (++it2tmp != it2end && std::abs(it2tmp->begin - time) < tolerance);
-		if (m_notes[&*it2] != 0) continue;
-		m_notes[&*it2] = 1;
-		m_score += (tolerance < 0.1 ? 50 : 25);
+	}
+	bool need[5] = {};
+	int count = 0;
+	for (int fret = 0; fret < 5; ++fret) {
+		if (!dIt[fret] || dIt[fret]->begin != begin) continue;
+		need[fret] = true;
+		++count;
+	}
+	bool shadowed = (count == 1); // If the chord only requires one fret, frets on the left side of that are "shadowed" (ignored)
+	for (int fret = 0; fret < 5; ++fret) {
+		if (need[fret] && !fretPressed[fret]) return; // Fret missing -> fail
+		if (need[fret]) shadowed = false;
+		if (!shadowed && fretPressed[fret] && !need[fret]) return; // Pressing non-shadowed fret that is not needed -> fail
+	}
+	// Okay, got this far, we have a match, let's score it
+	for (int fret = 0; fret < 5; ++fret) {
+		if (!need[fret]) continue;
+		m_notes[dIt[fret]] = 1;
+		m_score += 15;
+		if (tolerance < 0.1) m_score += 15;
+		if (tolerance < 0.05) m_score += 15;
+		if (tolerance < 0.03) m_score += 5;
 	}
 }
 
