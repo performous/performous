@@ -59,40 +59,49 @@ void ScreenSing::exit() {
 	theme.reset();
 }
 
+void ScreenSing::activatePlayerScreen()
+{
+	ScreenManager* sm = ScreenManager::getSingletonPtr();
+
+	// TODO: multiple loading...
+	// TODO: make it possible to switch of highscore through configuration
+	SongHiscore hi(m_song->path, "High.sco");
+	try {
+		hi.load();
+	} catch (HiscoreException const& hi) {
+		std::cerr << "high.sco:" << hi.line() << " " << hi.what() << std::endl;
+	}
+
+	if (m_players.scores.empty() || !hi.reachedNewHiscore(m_players.scores.front()))
+	{
+		// if no highscore reached..
+		sm->activateScreen("Songs");
+		return;
+	}
+
+	// Score window visible -> Enter quits to Players Screen
+	Screen* s = sm->getScreen("Players");
+	ScreenPlayers* ss = dynamic_cast<ScreenPlayers*> (s);
+	assert(ss);
+	ss->setSong(m_song);
+	sm->activateScreen("Players");
+}
+
 void ScreenSing::manageEvent(SDL_Event event) {
 	if (event.type == SDL_KEYDOWN) {
 		double time = m_audio.getPosition();
 		Song::Status status = m_song->status(time);
 		m_quitTimer.setValue(QUIT_TIMEOUT);
 		bool seekback = false;
-		ScreenManager* sm = ScreenManager::getSingletonPtr();
 		int key = event.key.keysym.sym;
-		if (key == SDLK_ESCAPE || key == SDLK_q) sm->activateScreen("Songs");
+		if (key == SDLK_ESCAPE || key == SDLK_q) {
+			ScreenManager* sm = ScreenManager::getSingletonPtr();
+			sm->activateScreen("Songs");
+		}
 		else if (key == SDLK_RETURN) {
 			if (m_score_window.get())
 			{
-				// TODO: multiple loading...
-				// TODO: make it possible to switch of highscore through configuration
-				SongHiscore hi(m_song->path, "High.sco");
-				try {
-					hi.load();
-				} catch (HiscoreException const& hi) {
-					std::cerr << "high.sco:" << hi.line() << " " << hi.what() << std::endl;
-				}
-
-				if (m_players.scores.empty() || !hi.reachedNewHiscore(m_players.scores.front()))
-				{
-					// if no highscore reached..
-					sm->activateScreen("Songs");
-					return;
-				}
-
-				// Score window visible -> Enter quits to Players Screen
-				Screen* s = sm->getScreen("Players");
-				ScreenPlayers* ss = dynamic_cast<ScreenPlayers*> (s);
-				assert(ss);
-				ss->setSong(m_song);
-				sm->activateScreen("Players");
+				activatePlayerScreen();
 				return;
 			}
 			else if (status == Song::FINISHED) m_score_window.reset(new ScoreWindow(*m_engine, m_players)); // Song finished, but no score window -> show it
@@ -193,13 +202,14 @@ void ScreenSing::draw() {
 		theme->timer.draw(statustxt);
 	}
 
-	ScreenManager* sm = ScreenManager::getSingletonPtr();
-
 	if (config["game/karaoke_mode"].b()) {
-		if (!m_audio.isPlaying()) sm->activateScreen("Songs");
+		if (!m_audio.isPlaying()) {
+			ScreenManager* sm = ScreenManager::getSingletonPtr();
+			sm->activateScreen("Songs");
+		}
 	} else {
 		if (m_score_window.get()) {
-			if (m_quitTimer.get() == 0.0 && !m_audio.isPaused()) { sm->activateScreen("Songs"); return; }
+			if (m_quitTimer.get() == 0.0 && !m_audio.isPaused()) { activatePlayerScreen(); return; }
 			m_score_window->draw();
 		}
 		else if (!m_audio.isPlaying() || (status == Song::FINISHED && m_audio.getLength() - time < 3.0)) {

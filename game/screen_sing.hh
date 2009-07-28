@@ -54,6 +54,7 @@ class ScreenSing: public Screen {
 
   private:
 	void drawScores();
+	void activatePlayerScreen();
 	Audio& m_audio;
 	Capture& m_capture;
 	Players& m_players;
