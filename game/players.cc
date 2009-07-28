@@ -29,7 +29,15 @@ void Players::load() {
 	{
 		xmlpp::Element& element = dynamic_cast<xmlpp::Element&>(**it);
 		xmlpp::Attribute* a = element.get_attribute("name");
-		addPlayer(a->get_value());
+		xmlpp::NodeSet n2 = element.find("picture");
+		std::string picture;
+		if (!n2.empty()) // optional picture element
+		{
+			xmlpp::Element& element2 =dynamic_cast<xmlpp::Element&>(**n2.begin());
+			xmlpp::TextNode* tn = element2.get_child_text();
+			picture = tn->get_content();
+		}
+		addPlayer(a->get_value(), picture);
 	}
 }
 
@@ -42,6 +50,11 @@ void Players::save() {
 	{
 		xmlpp::Element* player = players->add_child("player");
 		player->set_attribute("name", it->name);
+		if (it->picture != "")
+		{
+			xmlpp::Element* picture = player->add_child("picture");
+			picture->add_child_text(it->picture);
+		}
 	}
 
 	doc.write_to_file_formatted(m_filename, "UTF-8");
@@ -51,9 +64,11 @@ void Players::update() {
 	if (m_dirty) filter_internal();
 }
 
-void Players::addPlayer (std::string const& name) {
+void Players::addPlayer (std::string const& name, std::string const& picture) {
 	PlayerItem pi;
 	pi.name = name;
+	pi.path = "";
+	pi.picture = picture;
 
 	players_t::const_iterator it =  std::find(m_players.begin(), m_players.end(), pi);
 	if (it != m_players.end()) return; // dont do anything, player exists
@@ -104,7 +119,7 @@ int main(int argc, char** argv)
 
 	for (size_t i=0; i<p.size(); i++)
 	{
-		std::cout << p[i].name << std::endl;
+		std::cout << p[i].name << " picture: " << p[i].picture << std::endl;
 	}
 
 	return 0;

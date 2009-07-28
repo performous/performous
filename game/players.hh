@@ -15,9 +15,10 @@
   */
 struct PlayerItem {
 	std::string name; /// unique name, link to highscore
+	std::string path; /// a path to a picture shown
+	std::string picture; /// + the filename for it
 /* Future ideas
 	std::string displayedName; /// artist name, short name, nick (can be changed)
-	std::string picture; /// a path to a picture shown
 	std::map<std::string, int> scores; /// map between a Song and the highest score the Player achieved
 */
 
@@ -63,10 +64,13 @@ class Players: boost::noncopyable {
 	}
 	void save();
 	void update();
-	void addPlayer (std::string const& name);
+	void addPlayer (std::string const& name, std::string const& picture = "");
 
 	/// const array access
-	PlayerItem operator[](std::size_t pos) const { return m_filtered[pos]; }
+	PlayerItem operator[](std::size_t pos) const {
+		if (pos < m_filtered.size()) return m_filtered[pos];
+		else return PlayerItem();
+	}
 	/// number of songs
 	size_t size() const { return m_filtered.size(); };
 	/// true if empty

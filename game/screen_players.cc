@@ -158,13 +158,10 @@ void ScreenPlayers::draw() {
 		int baseidx = spos + 1.5; --baseidx; // Round correctly
 		double shift = spos - baseidx;
 		for (int i = -2; i < 5; ++i) {
+			PlayerItem player_display = m_players[baseidx + i];
 			if (baseidx + i < 0 || baseidx + i >= int(ss)) continue;
 			Surface* cover = NULL;
-			/*
-			Song& song_display = m_players[baseidx + i];
-			// Fetch cover image from cache or try loading it
-			if (!song_display.cover.empty()) try { cover = &m_covers[song_display.path + song_display.cover]; } catch (std::exception const&) {}
-			*/
+			try { cover = &m_covers[player_display.path + player_display.picture]; } catch (std::exception const&) {}
 			Surface& s = (cover ? *cover : *m_emptyCover);
 			double diff = (i == 0 ? (0.5 - fabs(shift)) * 0.07 : 0.0);
 			double y = 0.27 + 0.5 * diff;
