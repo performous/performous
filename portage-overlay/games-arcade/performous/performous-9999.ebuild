@@ -33,12 +33,9 @@ RDEPEND="gnome-base/librsvg
 	dev-libs/boost
 	x11-libs/pango
 	dev-cpp/libxmlpp
+	media-libs/glew
 	media-libs/libsdl[joystick,opengl]
-	media-gfx/imagemagick
-	(
-		virtual/opengl
-		virtual/glu
-	)
+	media-gfx/imagemagick[png]
 	>=media-video/ffmpeg-0.4.9_p20070616-r20
 	alsa? ( media-libs/alsa-lib )
 	jack? ( media-sound/jack-audio-connection-kit )
