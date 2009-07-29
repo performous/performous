@@ -74,7 +74,8 @@ void ScreenSing::activatePlayerScreen()
 
 	if (m_players.scores.empty()
 	      || !hi.reachedNewHiscore(m_players.scores.front())
-	      || !hi.isWritable())
+	      || !hi.isWritable()
+	      || !config["game/song_hiscore"].b())
 	{
 		// if no highscore reached..
 		sm->activateScreen("Songs");
