@@ -63,6 +63,13 @@ void ScreenSing::activatePlayerScreen()
 {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 
+	if (!config["game/song_hiscore"].b())
+	{
+		// user does not want a per song highscore
+		sm->activateScreen("Songs");
+		return;
+	}
+
 	// TODO: multiple loading...
 	// TODO: make it possible to switch of highscore through configuration
 	SongHiscore hi(m_song->path, "High.sco");
@@ -74,8 +81,7 @@ void ScreenSing::activatePlayerScreen()
 
 	if (m_players.scores.empty()
 	      || !hi.reachedNewHiscore(m_players.scores.front())
-	      || !hi.isWritable()
-	      || !config["game/song_hiscore"].b())
+	      || !hi.isWritable())
 	{
 		// if no highscore reached..
 		sm->activateScreen("Songs");
