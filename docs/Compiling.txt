@@ -14,7 +14,7 @@ To install from git:
 	performous
 	
 	# Should you need to change building settings (e.g. installation prefix)
-	ccmake ..
+	ccmake .
 	
 Dependencies:
 
