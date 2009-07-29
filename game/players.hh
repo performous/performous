@@ -64,6 +64,8 @@ class Players: boost::noncopyable {
 	}
 	void save();
 	void update();
+	/**Returns the path to which file is used*/
+	std::string file();
 	void addPlayer (std::string const& name, std::string const& picture = "");
 
 	/// const array access

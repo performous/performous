@@ -17,11 +17,14 @@ Players::Players(std::string filename):
 	m_dirty(false),
 	cur()
 {
+	try { load(); }
+	catch(...) { std::cerr << "Could not load " << file() << ", will create" << std::endl; }
 	m_filtered = m_players;
 }
 
 Players::~Players() {
-	try { save(); } catch (...) { std::cerr << "Could not save players to " << m_filename << std::endl; }
+	try { save(); }
+	catch (...) { std::cerr << "Could not save players to " << file() << std::endl; }
 }
 
 void Players::load() {
@@ -65,6 +68,10 @@ void Players::save() {
 
 void Players::update() {
 	if (m_dirty) filter_internal();
+}
+
+std::string Players::file() {
+	return m_filename;
 }
 
 void Players::addPlayer (std::string const& name, std::string const& picture) {

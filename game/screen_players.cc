@@ -18,7 +18,7 @@ void ScreenPlayers::enter() {
 	try {
 		m_highscore->load();
 	} catch (HiscoreException const& hi) {
-		std::cerr << "high.sco:" << hi.line() << " " << hi.what() << std::endl;
+		std::cerr << "High.sco:" << hi.line() << " " << hi.what() << std::endl;
 	}
 
 	m_score_text[0].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
@@ -51,7 +51,7 @@ void ScreenPlayers::exit() {
 	try {
 		m_highscore->save();
 	} catch (HiscoreException const& hi) {
-		std::cerr << "high.sco:" << hi.line() << " " << hi.what() << std::endl;
+		std::cerr << "High.sco:" << hi.line() << " " << hi.what() << std::endl;
 	}
 	m_highscore.reset();
 }
@@ -137,8 +137,9 @@ void ScreenPlayers::draw() {
 		// Format the song information text
 		if (m_search.text.empty()) {
 			oss_song << "No players found!";
-			oss_order << "Check players.xml in current\n"; // TODO retrieve from configuration
-			oss_order << "directory for players";
+			oss_order << "Check " << m_players.file() << "\n";
+			oss_order << "directory for players\n";
+			oss_order << "Enter a name to create a new player.";
 		} else {
 			oss_song << "Press enter to create player!";
 			oss_order << m_search.text << '\n';
