@@ -160,8 +160,12 @@ void ScreenPlayers::draw() {
 		for (int i = -2; i < 5; ++i) {
 			PlayerItem player_display = m_players[baseidx + i];
 			if (baseidx + i < 0 || baseidx + i >= int(ss)) continue;
-			Surface* cover = NULL;
-			try { cover = &m_covers[player_display.path + player_display.picture]; } catch (std::exception const&) {}
+			Surface* cover = 0;
+			if (player_display.picture != "")
+			{
+				try { cover = &m_covers[player_display.path + "/" + player_display.picture]; }
+				catch (std::exception const&) {}
+			}
 			Surface& s = (cover ? *cover : *m_emptyCover);
 			double diff = (i == 0 ? (0.5 - fabs(shift)) * 0.07 : 0.0);
 			double y = 0.27 + 0.5 * diff;

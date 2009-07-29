@@ -1,6 +1,10 @@
 #include "players.hh"
 
+#include "fs.hh"
+#include "configuration.hh"
+
 #include <fstream>
+#include <iostream>
 #include <boost/regex.hpp>
 #include <libxml++/libxml++.h>
 
@@ -67,8 +71,25 @@ void Players::update() {
 void Players::addPlayer (std::string const& name, std::string const& picture) {
 	PlayerItem pi;
 	pi.name = name;
-	pi.path = "";
 	pi.picture = picture;
+	pi.path = "";
+
+	if (pi.picture != "") // no picture, so don't search path
+	{
+		ConfigItem::StringList const& sl = config["system/path_pictures"].sl();
+		typedef std::set<fs::path> dirs;
+		dirs d;
+		std::transform(sl.begin(), sl.end(), std::inserter(d, d.end()), pathMangle);
+
+		for (dirs::const_iterator it = d.begin(); it != d.end(); ++it) {
+			if (!fs::exists(*it)) continue; // as long as it does not exists
+			pi.path = it->file_string();
+		}
+
+		if (pi.path != "") std::cout << "Found " << pi.picture << " in " << pi.path << std::endl;
+		else std::cout << "Not found " << pi.picture << std::endl;
+	}
+
 
 	players_t::const_iterator it =  std::find(m_players.begin(), m_players.end(), pi);
 	if (it != m_players.end()) return; // dont do anything, player exists
