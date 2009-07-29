@@ -72,7 +72,9 @@ void ScreenSing::activatePlayerScreen()
 		std::cerr << "high.sco:" << hi.line() << " " << hi.what() << std::endl;
 	}
 
-	if (m_players.scores.empty() || !hi.reachedNewHiscore(m_players.scores.front()))
+	if (m_players.scores.empty()
+	      || !hi.reachedNewHiscore(m_players.scores.front())
+	      || !hi.isWritable())
 	{
 		// if no highscore reached..
 		sm->activateScreen("Songs");

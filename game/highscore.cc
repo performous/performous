@@ -113,6 +113,13 @@ void SongHiscore::save()
 	out << "E" << std::endl;
 }
 
+bool SongHiscore::isWritable()
+{
+	std::ofstream out ((m_path + m_filename).c_str());
+
+	return out.is_open();
+}
+
 void SongHiscore::getInfo (std::ostream & out)
 {
 	for (size_t i=0; i<m_scores.size();i++)
@@ -150,6 +157,10 @@ int main()
 {
 	try {
 		SongHiscore hi ("", "highscore.txt");
+
+		if (hi.isWritable()) std::cout << "Is writeable" << std::endl;
+		else std::cout << "Is not writeable" << std::endl;
+
 		hi.load();
 		int new_score = 9000;
 		if (hi.reachedNewHiscore(new_score))

@@ -52,6 +52,12 @@ class SongHiscore {
 	void load();
 	void save();
 
+	/**Check if file location is writable.
+	  @return true if it is.
+	  @return false if you can't write at the location where path points to.
+	  */
+	bool isWritable();
+
 	void getInfo (std::ostream & os);
 
 	/**Check if you reached a new highscore.
