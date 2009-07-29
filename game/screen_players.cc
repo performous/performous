@@ -162,7 +162,7 @@ void ScreenPlayers::draw() {
 			PlayerItem player_display = m_players[baseidx + i];
 			if (baseidx + i < 0 || baseidx + i >= int(ss)) continue;
 			Surface* cover = 0;
-			if (player_display.picture != "")
+			if (player_display.path != "")
 			{
 				try { cover = &m_covers[player_display.path + "/" + player_display.picture]; }
 				catch (std::exception const&) {}
