@@ -1,3 +1,4 @@
+#pragma once
 #ifndef USNG_XTIME_H_INCLUDED
 #define USNG_XTIME_H_INCLUDED
 

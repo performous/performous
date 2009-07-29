@@ -8,31 +8,31 @@
 #include "songs.hh"
 #include <iostream>
 #include <iomanip>
+#include "highscore.hh" // to check if Players have to be shown
 
 namespace {
 	static const double QUIT_TIMEOUT = 20.0; // Return to songs screen after 20 seconds in score screen
 }
 
 void ScreenSing::enter() {
-	Song& song = m_songs.current();
-	m_audio.playMusic(song.music, false, 0.0, song.tracks.empty() ? -1.0 : -4.0); // Startup delay for instruments is longer than for singing only
+	m_audio.playMusic(m_song->music, false, 0.0, m_song->tracks.empty() ? -1.0 : -4.0); // Startup delay for instruments is longer than for singing only
 	theme.reset(new ThemeSing());
-	if (!song.background.empty()) {
+	if (!m_song->background.empty()) {
 		try {
-			m_background.reset(new Surface(song.path + song.background, true));
+			m_background.reset(new Surface(m_song->path + m_song->background, true));
 		} catch (std::exception& e) {
 			std::cerr << e.what() << std::endl;
 		}
 	}
-	if (!song.video.empty() && config["graphic/video"].b()) m_video.reset(new Video(song.path + song.video, song.videoGap));
+	if (!m_song->video.empty() && config["graphic/video"].b()) m_video.reset(new Video(m_song->path + m_song->video, m_song->videoGap));
 	m_pause_icon.reset(new Surface(getThemePath("sing_pause.svg")));
 	m_progress.reset(new ProgressBar(getThemePath("sing_progressbg.svg"), getThemePath("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01f, 0.01f, true));
 	m_progress->dimensions.fixedWidth(0.4).left(-0.5).screenTop();
 	theme->timer.dimensions.screenTop(0.5 * m_progress->dimensions.h());
 	boost::ptr_vector<Analyzer>& analyzers = m_capture.analyzers();
-	m_engine.reset(new Engine(m_audio, m_songs.current(), analyzers.begin(), analyzers.end()));
-	m_layout_singer.reset(new LayoutSinger(m_songs, *m_engine, *theme));
-	if (song.music.size() > 1) m_guitarGraph.reset(new GuitarGraph(song));
+	m_engine.reset(new Engine(m_audio, *m_song, analyzers.begin(), analyzers.end(), m_players));
+	m_layout_singer.reset(new LayoutSinger(*m_song, *m_engine, *theme, m_players));
+	if (m_song->music.size() > 1) m_guitarGraph.reset(new GuitarGraph(*m_song));
 }
 
 void ScreenSing::exit() {
@@ -46,28 +46,68 @@ void ScreenSing::exit() {
 	theme.reset();
 }
 
+void ScreenSing::activatePlayerScreen()
+{
+	ScreenManager* sm = ScreenManager::getSingletonPtr();
+
+	if (!config["game/song_hiscore"].b())
+	{
+		// user does not want a per song highscore
+		sm->activateScreen("Songs");
+		return;
+	}
+
+	// TODO: multiple loading...
+	// TODO: make it possible to switch of highscore through configuration
+	SongHiscore hi(m_song->path, "High.sco");
+	try {
+		hi.load();
+	} catch (HiscoreException const& hi) {
+		std::cerr << "high.sco:" << hi.line() << " " << hi.what() << std::endl;
+	}
+
+	if (m_players.scores.empty()
+	      || !hi.reachedNewHiscore(m_players.scores.front())
+	      || !hi.isWritable())
+	{
+		// if no highscore reached..
+		sm->activateScreen("Songs");
+		return;
+	}
+
+	// Score window visible -> Enter quits to Players Screen
+	Screen* s = sm->getScreen("Players");
+	ScreenPlayers* ss = dynamic_cast<ScreenPlayers*> (s);
+	assert(ss);
+	ss->setSong(m_song);
+	sm->activateScreen("Players");
+}
+
 void ScreenSing::manageEvent(SDL_Event event) {
 	if (m_guitarGraph) m_guitarGraph->inputProcess();
 	if (event.type == SDL_KEYDOWN) {
 		double time = m_audio.getPosition();
-		Song::Status status = m_songs.current().status(time);
+		Song::Status status = m_song->status(time);
 		m_quitTimer.setValue(QUIT_TIMEOUT);
 		bool seekback = false;
-		ScreenManager* sm = ScreenManager::getSingletonPtr();
 		int key = event.key.keysym.sym;
-		if (key == SDLK_ESCAPE || key == SDLK_q) sm->activateScreen("Songs");
+		if (key == SDLK_ESCAPE || key == SDLK_q) {
+			ScreenManager* sm = ScreenManager::getSingletonPtr();
+			sm->activateScreen("Songs");
+			return;
+		}
 		else if (key == SDLK_RETURN) {
-			if (m_score_window.get()) sm->activateScreen("Songs");  // Score window visible -> Enter quits
-			else if (status == Song::FINISHED) m_score_window.reset(new ScoreWindow(*m_engine)); // Song finished, but no score window -> show it
+			if (m_score_window.get()) { activatePlayerScreen(); return; } // Score window visible -> Enter quits
+			else if (status == Song::FINISHED) m_score_window.reset(new ScoreWindow(*m_engine, m_players)); // Song finished, but no score window -> show it
 		}
 		else if (key == SDLK_SPACE || key == SDLK_PAUSE) m_audio.togglePause();
 		if (m_score_window.get()) return;
 		// The rest are only available when score window is not displayed and when there are no instruments
-		if (key == SDLK_RETURN && status == Song::INSTRUMENTAL_BREAK && m_songs.current().tracks.empty()) {
+		if (key == SDLK_RETURN && status == Song::INSTRUMENTAL_BREAK && m_song->tracks.empty()) {
 			double diff = m_layout_singer->lyrics_begin() - 3.0 - time;
 			if (diff > 0.0) m_audio.seek(diff);
 		}
-		else if (key == SDLK_F4) m_audio.toggleSynth(m_songs.current().notes);
+		else if (key == SDLK_F4) m_audio.toggleSynth(m_song->notes);
 		else if (key == SDLK_F5) --config["audio/video_delay"];
 		else if (key == SDLK_F6) ++config["audio/video_delay"];
 		else if (key == SDLK_F7) --config["audio/round-trip"];
@@ -80,7 +120,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		else if (key == SDLK_UP) m_audio.seek(30.0);
 		else if (key == SDLK_DOWN) { m_audio.seek(-30.0); seekback = true; }
 		else if (key == SDLK_r && event.key.keysym.mod & KMOD_CTRL) {
-			exit(); m_songs.current().reload(); enter();
+			exit(); m_song->reload(); enter();
 			m_audio.seek(time);
 		}
 		// Some things must be reset after seeking backwards
@@ -108,7 +148,6 @@ namespace {
 }
 
 void ScreenSing::draw() {
-	Song& song = m_songs.current();
 	// Get the time in the song
 	double length = m_audio.getLength();
 	double time = m_audio.getPosition();
@@ -134,38 +173,40 @@ void ScreenSing::draw() {
 
 	if (m_guitarGraph.get()) m_guitarGraph->draw(time);
 
-	if( song.tracks.empty() ) {
+	if( m_song->tracks.empty() ) {
 		m_layout_singer->draw(time, LayoutSinger::BOTTOM);
 	} else {
 		m_layout_singer->draw(time, LayoutSinger::MIDDLE);
 	}
 
-	Song::Status status = song.status(time);
+	Song::Status status = m_song->status(time);
 
 	// Compute and draw the timer and the progressbar
 	{
 		unsigned t = clamp(time, 0.0, length);
 		m_progress->draw(songPercent);
 		std::string statustxt = (boost::format("%02u:%02u") % (t / 60) % (t % 60)).str();
-		if (!m_score_window.get() && song.tracks.empty()) {
+		if (!m_score_window.get() && m_song->tracks.empty()) {
 			if (status == Song::INSTRUMENTAL_BREAK) statustxt += "   ENTER to skip instrumental break";
 			if (status == Song::FINISHED && !config["game/karaoke_mode"].b()) statustxt += "   Remember to wait for grading!";
 		}
 		theme->timer.draw(statustxt);
 	}
 
-	ScreenManager* sm = ScreenManager::getSingletonPtr();
-
-	if (config["game/karaoke_mode"].b() || !song.tracks.empty()) {
-		if (!m_audio.isPlaying()) sm->activateScreen("Songs");
+	if (config["game/karaoke_mode"].b() || !m_song->tracks.empty()) {
+		if (!m_audio.isPlaying()) {
+			ScreenManager* sm = ScreenManager::getSingletonPtr();
+			sm->activateScreen("Songs");
+			return;
+		}
 	} else {
 		if (m_score_window.get()) {
-			if (m_quitTimer.get() == 0.0 && !m_audio.isPaused()) { sm->activateScreen("Songs"); return; }
+			if (m_quitTimer.get() == 0.0 && !m_audio.isPaused()) { activatePlayerScreen(); return; }
 			m_score_window->draw();
 		}
 		else if (!m_audio.isPlaying() || (status == Song::FINISHED && m_audio.getLength() - time < 3.0)) {
 			m_quitTimer.setValue(QUIT_TIMEOUT);
-			m_score_window.reset(new ScoreWindow(*m_engine));
+			m_score_window.reset(new ScoreWindow(*m_engine, m_players));
 		}
 	}
 		
@@ -175,24 +216,31 @@ void ScreenSing::draw() {
 	}
 }
 
-ScoreWindow::ScoreWindow(Engine& e):
+ScoreWindow::ScoreWindow(Engine& e, Players & players):
+  m_players(players),
   m_pos(0.8, 2.0),
   m_bg(getThemePath("score_window.svg")),
   m_scoreBar(getThemePath("score_bar_bg.svg"), getThemePath("score_bar_fg.svg"), ProgressBar::VERTICAL, 0.0, 0.0, false),
   m_score_text(getThemePath("score_txt.svg")),
-  m_score_rank(getThemePath("score_rank.svg")),
-  m_players(e.getPlayers())
+  m_score_rank(getThemePath("score_rank.svg"))
 {
 	m_pos.setTarget(0.0);
-	unsigned int topScore = 0;
 	e.kill(); // kill the engine thread (to avoid consuming memory)
-	for (std::list<Player>::iterator p = m_players.begin(); p != m_players.end();) {
+
+	m_players.scores.clear();
+	unsigned int topScore = 0;
+	for (std::list<Player>::iterator p = m_players.cur.begin(); p != m_players.cur.end();) {
 		unsigned int score = p->getScore();
-		if (score < 500) { p = m_players.erase(p); continue; }
+		if (score < 500) { p = m_players.cur.erase(p); continue; }
+		m_players.scores.push_back(score);
 		if (score > topScore) topScore = score;
 		++p;
 	}
-	if (m_players.empty()) m_rank = "No singer!";
+	m_players.scores.sort();
+	m_players.scores.reverse(); // top should be first
+	// topScore is also in m_players.scores.front()
+
+	if (m_players.cur.empty()) m_rank = "No singer!";
 	else if (topScore > 8000) m_rank = "Hit singer";
 	else if (topScore > 6000) m_rank = "Lead singer";
 	else if (topScore > 4000) m_rank = "Rising star";
@@ -206,13 +254,13 @@ void ScoreWindow::draw() {
 	glutil::PushMatrix block;
 	glTranslatef(0.0, m_pos.get(), 0.0);
 	m_bg.draw();
-	const double spacing = 0.1 + 0.1 / m_players.size();
+	const double spacing = 0.1 + 0.1 / m_players.cur.size();
 	unsigned i = 0;
 
-	for (std::list<Player>::const_iterator p = m_players.begin(); p != m_players.end(); ++p, ++i) {
+	for (std::list<Player>::const_iterator p = m_players.cur.begin(); p != m_players.cur.end(); ++p, ++i) {
 		int score = p->getScore();
 		glColor3f(p->m_color.r, p->m_color.g, p->m_color.b);
-		double x = -0.12 + spacing * (0.5 + i - 0.5 * m_players.size());
+		double x = -0.12 + spacing * (0.5 + i - 0.5 * m_players.cur.size());
 		m_scoreBar.dimensions.middle(x).bottom(0.24);
 		m_scoreBar.draw(score / 10000.0);
 		m_score_text.render(boost::lexical_cast<std::string>(score));

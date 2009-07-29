@@ -1,6 +1,8 @@
 #include "joystick.hh"
 #include <iostream>
 
+#include <boost/lexical_cast.hpp>
+
 Joysticks joysticks;
 
 Joystick::Joystick(unsigned int _id): m_id(_id) {

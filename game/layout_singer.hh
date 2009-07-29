@@ -44,18 +44,19 @@ class LyricRow {
 class LayoutSinger {
   public:
 	enum Position {BOTTOM, MIDDLE};
-	LayoutSinger(Songs &_songs, Engine &_engine, ThemeSing& _theme);
+	LayoutSinger(Song &_song, Engine &_engine, ThemeSing& _theme, Players & players);
 	~LayoutSinger();
 	void reset();
 	void draw(double time, Position position = LayoutSinger::BOTTOM);
 	double lyrics_begin();
   private:
 	Engine& m_engine;
-  	Songs& m_songs;
+  	Song& m_song;
 	ThemeSing& m_theme;
 	NoteGraph m_noteGraph;
 	Notes::const_iterator m_lyricit;
 	std::deque<LyricRow> m_lyrics;
 	boost::scoped_ptr<Surface> m_player_icon;
 	boost::scoped_ptr<SvgTxtThemeSimple> m_score_text[4];
+	Players & m_players;
 };

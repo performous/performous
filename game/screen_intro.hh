@@ -1,3 +1,4 @@
+#pragma once
 #ifndef __SCREENINTRO_H__
 #define __SCREENINTRO_H__
 

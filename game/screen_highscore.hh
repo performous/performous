@@ -1,6 +1,4 @@
 #pragma once
-#ifndef PERFORMOUS_SCREEN_SONGS_HH
-#define PERFORMOUS_SCREEN_SONGS_HH
 
 #include <boost/scoped_ptr.hpp>
 #include "animvalue.hh"
@@ -8,41 +6,44 @@
 #include "opengl_text.hh"
 #include "screen.hh"
 #include "surface.hh"
-#include "songs.hh"
 #include "textinput.hh"
 #include "theme.hh"
 #include "video.hh"
+#include "players.hh"
+#include "highscore.hh"
 
 class CAudio;
 
 /// song chooser screen
-class ScreenSongs : public Screen {
+class ScreenHiscore : public Screen {
   public:
 	/// constructor
-	ScreenSongs(std::string const& name, Audio& audio, Songs& songs);
+	ScreenHiscore(std::string const& name, Audio& audio, Players& players);
 	void enter();
 	void exit();
-	void manageSharedKey(int key, SDLMod mod); ///< same behaviour for jukebox and normal mode
 	void manageEvent(SDL_Event event);
 	void draw();
-	void drawJukebox(); ///< draw the songbrowser in jukebox mode (fullscreen, full previews, ...)
+	void drawScores();
+
+	void setSong (boost::shared_ptr<Song> song_)
+	{
+		m_song = song_;
+	}
 
   private:
 	Audio& m_audio;
-	Songs& m_songs;
+	Players& m_players;
+	boost::shared_ptr<Song> m_song; /// Pointer to the current song
+	boost::scoped_ptr<SongHiscore> m_highscore;
 	boost::scoped_ptr<Surface> m_songbg;
 	boost::scoped_ptr<Video> m_video;
 	boost::scoped_ptr<ThemeSongs> theme;
-	std::vector<std::string> m_playing;
-	std::vector<std::string> m_playReq;
+	std::string m_playing;
+	std::string m_playReq;
 	AnimValue m_playTimer;
 	TextInput m_search;
 	boost::scoped_ptr<Surface> m_emptyCover;
-	boost::scoped_ptr<Surface> m_instrumentCover;
-	boost::scoped_ptr<Surface> m_bandCover;
 	Cachemap<std::string, Surface> m_covers;
-	bool m_jukebox;
+	boost::scoped_ptr<Surface> m_player_icon;
+	boost::scoped_ptr<SvgTxtThemeSimple> m_score_text[4];
 };
-
-#endif
-

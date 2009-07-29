@@ -38,6 +38,12 @@
 			<long>Hide pitch wave, notes and scoring</long>
 		</locale>
 	</entry>
+	<entry name="game/song_hiscore" type="bool" value="false">
+		<locale name="C">
+			<short>Song Hiscore</short>
+			<long>Show and save a per song hiscore.</long>
+		</locale>
+	</entry>
 	<entry name="game/pitch" type="bool" value="true">
 		<locale name="C">
 			<short>Pitch waves</short>
@@ -190,6 +196,25 @@
 		<locale name="C">
 			<short>Song folders</short>
 			<long>Where to recursively look for songs.</long>
+		</locale>
+	</entry>
+	<entry name="system/path_share" type="string_list">
+		<stringvalue>~/.local/share</stringvalue>
+		<stringvalue>../share</stringvalue><!-- For Windows where the program is started in bin/ -->
+		<stringvalue>~/.performous/share</stringvalue>
+		<locale name="C">
+			<short>Data folders</short>
+			<long>Where Performous data are stored.</long>
+		</locale>
+	</entry>
+	<entry name="system/path_pictures" type="string_list">
+		<stringvalue>/usr/local/share/games/performous/pictures</stringvalue>
+		<stringvalue>/usr/share/games/performous/pictures</stringvalue>
+		<stringvalue>../pictures/</stringvalue><!-- For Windows where the program is started in bin/ -->
+		<stringvalue>~/.performous/pictures/</stringvalue>
+		<locale name="C">
+			<short>Picture folders</short>
+			<long>Where to look for pictures of players.</long>
 		</locale>
 	</entry>
 </performous>

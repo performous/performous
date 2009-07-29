@@ -7,6 +7,8 @@
 #include "screen_sing.hh"
 #include "screen_practice.hh"
 #include "screen_configuration.hh"
+#include "screen_players.hh"
+#include "screen_highscore.hh"
 #include "video_driver.hh"
 #include "xtime.hh"
 #include <boost/format.hpp>
@@ -149,13 +151,16 @@ void mainLoop() {
 		Audio audio;
 		audioSetup(capture, audio);
 		Songs songs(songlist);
+		Players players(getSharePath("performous.xml"));
 		ScreenManager sm;
 		Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b(), config["graphic/fs_width"].i(), config["graphic/fs_height"].i());
 		sm.addScreen(new ScreenIntro("Intro", audio, capture));
 		sm.addScreen(new ScreenSongs("Songs", audio, songs));
-		sm.addScreen(new ScreenSing("Sing", audio, songs, capture));
+		sm.addScreen(new ScreenSing("Sing", audio, capture, players));
 		sm.addScreen(new ScreenPractice("Practice", audio, capture));
 		sm.addScreen(new ScreenConfiguration("Configuration", audio));
+		sm.addScreen(new ScreenPlayers("Players", audio, players));
+		sm.addScreen(new ScreenHiscore("Hiscore", audio, players));
 		sm.activateScreen("Intro");
 		// Main loop
 		boost::xtime time = now();

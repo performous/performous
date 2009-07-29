@@ -49,6 +49,19 @@ std::string getDataPath(std::string const& filename) {
 	ConfigItem::StringList sd = config["system/path_data"].sl();
 	for (std::vector<std::string>::const_iterator it = sd.begin(); it != sd.end(); ++it) {
 		fs::path p = *it;
+		p = pathMangle(p);
+		if (fs::is_directory(p)) { data_dir = p.string(); break; }
+	}
+	return data_dir + "/" + filename;
+}
+
+std::string getSharePath(std::string const& filename) {
+	// Figure out theme folder (if theme name rather than path was given)
+	std::string data_dir;
+	ConfigItem::StringList sd = config["system/path_share"].sl();
+	for (std::vector<std::string>::const_iterator it = sd.begin(); it != sd.end(); ++it) {
+		fs::path p = *it;
+		p = pathMangle(p);
 		if (fs::is_directory(p)) { data_dir = p.string(); break; }
 	}
 	return data_dir + "/" + filename;

@@ -51,7 +51,7 @@ namespace {
 const double baseLine = -0.2;
 const double pixUnit = 0.2;
 
-void NoteGraph::draw(double time, std::list<Player> const& players, Position position) {
+void NoteGraph::draw(double time, Players const& players, Position position) {
 	if (time < m_time) reset();
 	m_time = time;
 	// Update m_songit (which note to start the rendering from)
@@ -177,11 +177,11 @@ namespace {
 	}
 }
 
-void NoteGraph::drawWaves(std::list<Player> const& players) {
+void NoteGraph::drawWaves(Players const& players) {
 	if (m_song.notes.empty()) return; // Cannot draw without notes
 	UseTexture tblock(m_wave);
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-	for (std::list<Player>::const_iterator p = players.begin(); p != players.end(); ++p) {
+	for (std::list<Player>::const_iterator p = players.cur.begin(); p != players.cur.end(); ++p) {
 		glColor4f(p->m_color.r, p->m_color.g, p->m_color.b, m_notealpha);
 		float const texOffset = 2.0 * m_time; // Offset for animating the wave texture
 		Player::pitch_t const& pitch = p->m_pitch;

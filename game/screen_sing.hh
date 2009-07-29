@@ -15,21 +15,23 @@
 #include "opengl_text.hh"
 #include "progressbar.hh"
 
+#include "screen_players.hh"
+
 /// shows score at end of song
 class ScoreWindow {
   public:
 	/// constructor
-	ScoreWindow(Engine & e);
+	ScoreWindow(Engine & e, Players & players);
 	/// draws ScoreWindow
 	void draw();
 
   private:
+	Players & m_players;
 	AnimValue m_pos;
 	Surface m_bg;
 	ProgressBar m_scoreBar;
 	SvgTxtThemeSimple m_score_text;
 	SvgTxtTheme m_score_rank;
-	std::list<Player> m_players;
 	std::string m_rank;
 };
 
@@ -37,20 +39,26 @@ class ScoreWindow {
 class ScreenSing: public Screen {
   public:
 	/// constructor
-	ScreenSing(std::string const& name, Audio& audio, Songs& songs, Capture& capture):
-	  Screen(name), m_audio(audio), m_songs(songs), m_capture(capture), m_latencyAV()
+	ScreenSing(std::string const& name, Audio& audio, Capture& capture, Players & players):
+	  Screen(name), m_audio(audio), m_capture(capture), m_players(players), m_latencyAV()
 	{}
 	void enter();
 	void exit();
 	void manageEvent(SDL_Event event);
 	void draw();
 
+	void setSong (boost::shared_ptr<Song> song_)
+	{
+		m_song = song_;
+	}
+
   private:
-	void drawScores();
+	void activatePlayerScreen();
 	Audio& m_audio;
-	Songs& m_songs;  // TODO: take song instead of all of them
-	boost::scoped_ptr<ScoreWindow> m_score_window;
 	Capture& m_capture;
+	Players& m_players;
+	boost::shared_ptr<Song> m_song; /// Pointer to the current song
+	boost::scoped_ptr<ScoreWindow> m_score_window;
 	boost::scoped_ptr<ProgressBar> m_progress;
 	boost::scoped_ptr<Surface> m_background;
 	boost::scoped_ptr<Video> m_video;

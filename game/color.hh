@@ -1,3 +1,4 @@
+#pragma once
 #ifndef PERFORMOUS_COLOR_HH
 #define PERFORMOUS_COLOR_HH
 

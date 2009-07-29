@@ -1,3 +1,4 @@
+#pragma once
 #ifndef USNG_PITCH_H_INCLUDED
 #define USNG_PITCH_H_INCLUDED
 

@@ -1,7 +1,7 @@
 #include "layout_singer.hh"
 
 
-LayoutSinger::LayoutSinger(Songs &_songs, Engine &_engine, ThemeSing& _theme): m_engine(_engine), m_songs(_songs), m_theme(_theme), m_noteGraph(_songs.current()),m_lyricit(_songs.current().notes.begin()), m_lyrics() {
+LayoutSinger::LayoutSinger(Song &_song, Engine &_engine, ThemeSing& _theme, Players& _players): m_engine(_engine), m_song(_song), m_theme(_theme), m_noteGraph(_song),m_lyricit(_song.notes.begin()), m_lyrics(), m_players(_players) {
 	m_score_text[0].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_score_text[1].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_score_text[2].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
@@ -12,22 +12,19 @@ LayoutSinger::LayoutSinger(Songs &_songs, Engine &_engine, ThemeSing& _theme): m
 LayoutSinger::~LayoutSinger() {};
 
 void LayoutSinger::reset() {
-	m_lyricit = m_songs.current().notes.begin();
+	m_lyricit = m_song.notes.begin();
 	m_lyrics.clear();
 }
 
 void LayoutSinger::draw(double time, Position position) {
-	Song &song = m_songs.current();
-
 	// Draw notes and pitch waves (only when not in karaoke mode)
 	if (!config["game/karaoke_mode"].b()) {
-		std::list<Player> const& players = m_engine.getPlayers();
 		switch(position) {
 			case LayoutSinger::BOTTOM:
-				m_noteGraph.draw(time, players, NoteGraph::FULLSCREEN);
+				m_noteGraph.draw(time, m_players, NoteGraph::FULLSCREEN);
 				break;
 			case LayoutSinger::MIDDLE:
-				m_noteGraph.draw(time, players, NoteGraph::TOP);
+				m_noteGraph.draw(time, m_players, NoteGraph::TOP);
 				break;
 		}
 	}
@@ -54,8 +51,8 @@ void LayoutSinger::draw(double time, Position position) {
 			m_lyrics.pop_front();
 			dirty = true;
 		}
-		if (!dirty && m_lyricit != song.notes.end() && m_lyricit->begin < time + 4.0) {
-			m_lyrics.push_back(LyricRow(m_lyricit, song.notes.end()));
+		if (!dirty && m_lyricit != m_song.notes.end() && m_lyricit->begin < time + 4.0) {
+			m_lyrics.push_back(LyricRow(m_lyricit, m_song.notes.end()));
 			dirty = true;
 		}
 	} while (dirty);
@@ -67,9 +64,8 @@ void LayoutSinger::draw(double time, Position position) {
 
 	// Score display
 	if (!config["game/karaoke_mode"].b() ) {// draw score if not in karaoke mode
-		std::list<Player> const& players = m_engine.getPlayers();
 		unsigned int i = 0;
-		for (std::list<Player>::const_iterator p = players.begin(); p != players.end(); ++p, ++i) {
+		for (std::list<Player>::const_iterator p = m_players.cur.begin(); p != m_players.cur.end(); ++p, ++i) {
 			float act = p->activity();
 			if (act == 0.0f) continue;
 			glColor4f(p->m_color.r, p->m_color.g, p->m_color.b,act);
