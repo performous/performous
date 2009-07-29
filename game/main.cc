@@ -134,7 +134,8 @@ void mainLoop() {
 		Audio audio;
 		audioSetup(capture, audio);
 		Songs songs(songlist);
-		Players players("players.xml"); // TODO: retrieve from configuration
+		Players players(getSharePath("performous.xml"));
+		try {players.load();} catch(...) {std::cerr << "Could not load players" << std::endl;}
 		ScreenManager sm;
 		Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b(), config["graphic/fs_width"].i(), config["graphic/fs_height"].i());
 		sm.addScreen(new ScreenIntro("Intro", audio, capture));

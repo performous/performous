@@ -17,12 +17,11 @@ Players::Players(std::string filename):
 	m_dirty(false),
 	cur()
 {
-	load();
 	m_filtered = m_players;
 }
 
 Players::~Players() {
-	save();
+	try { save(); } catch (...) { std::cerr << "Could not save players to " << m_filename << std::endl; }
 }
 
 void Players::load() {

@@ -198,6 +198,15 @@
 			<long>Where to recursively look for songs.</long>
 		</locale>
 	</entry>
+	<entry name="system/path_share" type="string_list">
+		<stringvalue>~/.local/share</stringvalue>
+		<stringvalue>../share</stringvalue><!-- For Windows where the program is started in bin/ -->
+		<stringvalue>~/.performous/share</stringvalue>
+		<locale name="C">
+			<short>Data folders</short>
+			<long>Where Performous data are stored.</long>
+		</locale>
+	</entry>
 	<entry name="system/path_pictures" type="string_list">
 		<stringvalue>/usr/local/share/games/performous/pictures</stringvalue>
 		<stringvalue>/usr/share/games/performous/pictures</stringvalue>
