@@ -67,7 +67,7 @@ class ScreenSing: public Screen {
 	boost::scoped_ptr<LayoutSinger> m_layout_singer;
 	boost::scoped_ptr<GuitarGraph> m_guitarGraph;
 	double m_latencyAV;  // Latency between audio and video output (do not confuse with latencyAR)
-	boost::scoped_ptr<ThemeSing> theme;
+	boost::shared_ptr<ThemeSing> theme;
 	AnimValue m_quitTimer;
 };
 

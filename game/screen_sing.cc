@@ -31,7 +31,7 @@ void ScreenSing::enter() {
 	theme->timer.dimensions.screenTop(0.5 * m_progress->dimensions.h());
 	boost::ptr_vector<Analyzer>& analyzers = m_capture.analyzers();
 	m_engine.reset(new Engine(m_audio, *m_song, analyzers.begin(), analyzers.end(), m_players));
-	m_layout_singer.reset(new LayoutSinger(*m_song, *m_engine, *theme, m_players));
+	m_layout_singer.reset(new LayoutSinger(*m_song, m_players, theme));
 	if (m_song->music.size() > 1) m_guitarGraph.reset(new GuitarGraph(*m_song));
 }
 

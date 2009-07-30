@@ -1,7 +1,6 @@
 #include "layout_singer.hh"
 
-
-LayoutSinger::LayoutSinger(Song &_song, Engine &_engine, ThemeSing& _theme, Players& _players): m_engine(_engine), m_song(_song), m_theme(_theme), m_noteGraph(_song),m_lyricit(_song.notes.begin()), m_lyrics(), m_players(_players) {
+LayoutSinger::LayoutSinger(Song &_song, Players& _players, boost::shared_ptr<ThemeSing> _theme): m_song(_song), m_noteGraph(_song),m_lyricit(_song.notes.begin()), m_lyrics(), m_players(_players), m_theme(_theme) {
 	m_score_text[0].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_score_text[1].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_score_text[2].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
@@ -14,6 +13,35 @@ LayoutSinger::~LayoutSinger() {};
 void LayoutSinger::reset() {
 	m_lyricit = m_song.notes.begin();
 	m_lyrics.clear();
+}
+
+void LayoutSinger::drawScore(Position position) {
+	unsigned int i = 0;
+	for (std::list<Player>::const_iterator p = m_players.cur.begin(); p != m_players.cur.end(); ++p, ++i) {
+		float act = p->activity();
+		if (act == 0.0f) continue;
+		glColor4f(p->m_color.r, p->m_color.g, p->m_color.b,act);
+		switch(position) {
+			case LayoutSinger::BOTTOM:
+				m_player_icon->dimensions.left(-0.5 + 0.01 + 0.25 * i).fixedWidth(0.075).screenTop(0.055);
+				break;
+			case LayoutSinger::MIDDLE:
+				m_player_icon->dimensions.right(0.35).fixedHeight(0.050).screenTop(0.025 + 0.050 * i);
+				break;
+		}
+		m_player_icon->draw();
+		m_score_text[i%4]->render((boost::format("%04d") % p->getScore()).str());
+		switch(position) {
+			case LayoutSinger::BOTTOM:
+				m_score_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.075).screenTop(0.055);
+				break;
+			case LayoutSinger::MIDDLE:
+				m_score_text[i%4]->dimensions().right(0.45).fixedHeight(0.050).screenTop(0.025 + 0.050 * i);
+				break;
+		}
+		m_score_text[i%4]->draw();
+		glColor4f(1.0, 1.0, 1.0, 1.0);
+	}
 }
 
 void LayoutSinger::draw(double time, Position position) {
@@ -56,41 +84,16 @@ void LayoutSinger::draw(double time, Position position) {
 			dirty = true;
 		}
 	} while (dirty);
-	for (size_t i = 0; i < m_lyrics.size(); ++i, pos.move(0.0, linespacing)) {
-		pos.move(0.0, m_lyrics[i].extraspacing.get() * linespacing);
-		if (i == 0) m_lyrics[0].draw(m_theme.lyrics_now, time, pos);
-		else if (i == 1 && position == LayoutSinger::BOTTOM) m_lyrics[1].draw(m_theme.lyrics_next, time, pos);
-	}
-
-	// Score display
-	if (!config["game/karaoke_mode"].b() ) {// draw score if not in karaoke mode
-		unsigned int i = 0;
-		for (std::list<Player>::const_iterator p = m_players.cur.begin(); p != m_players.cur.end(); ++p, ++i) {
-			float act = p->activity();
-			if (act == 0.0f) continue;
-			glColor4f(p->m_color.r, p->m_color.g, p->m_color.b,act);
-			switch(position) {
-				case LayoutSinger::BOTTOM:
-					m_player_icon->dimensions.left(-0.5 + 0.01 + 0.25 * i).fixedWidth(0.075).screenTop(0.055);
-					break;
-				case LayoutSinger::MIDDLE:
-					m_player_icon->dimensions.right(0.35).fixedHeight(0.050).screenTop(0.025 + 0.050 * i);
-					break;
-			}
-			m_player_icon->draw();
-			m_score_text[i%4]->render((boost::format("%04d") % p->getScore()).str());
-			switch(position) {
-				case LayoutSinger::BOTTOM:
-					m_score_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.075).screenTop(0.055);
-					break;
-				case LayoutSinger::MIDDLE:
-					m_score_text[i%4]->dimensions().right(0.45).fixedHeight(0.050).screenTop(0.025 + 0.050 * i);
-					break;
-			}
-			m_score_text[i%4]->draw();
-			glColor4f(1.0, 1.0, 1.0, 1.0);
+	if (m_theme.get()) // if there is a theme, draw the lyrics with it
+	{
+		for (size_t i = 0; i < m_lyrics.size(); ++i, pos.move(0.0, linespacing)) {
+			pos.move(0.0, m_lyrics[i].extraspacing.get() * linespacing);
+			if (i == 0) m_lyrics[0].draw(m_theme->lyrics_now, time, pos);
+			else if (i == 1 && position == LayoutSinger::BOTTOM) m_lyrics[1].draw(m_theme->lyrics_next, time, pos);
 		}
 	}
+
+	if (!config["game/karaoke_mode"].b() ) drawScore(position); // draw score if not in karaoke mode
 }
 
 double LayoutSinger::lyrics_begin() {
