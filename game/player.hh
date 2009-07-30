@@ -46,3 +46,23 @@ struct Player {
 		return other.m_score < m_score;
 	}
 };
+
+/** Static Information of a player, not
+  dependent from current song.
+
+  Used for Players Management.
+  */
+struct PlayerItem {
+	std::string name; /// unique name, link to highscore
+	std::string path; /// a path to a picture shown
+	std::string picture; /// + the filename for it
+/* Future ideas
+	std::string displayedName; /// artist name, short name, nick (can be changed)
+	std::map<std::string, int> scores; /// map between a Song and the highest score the Player achieved
+*/
+
+	bool operator== (PlayerItem const& pi) const
+	{
+		return name == pi.name;
+	}
+};
