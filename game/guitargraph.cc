@@ -22,12 +22,12 @@ namespace {
 	bool picked = false;
 }
 
-GuitarGraph::GuitarGraph(Song const& song): m_song(song), m_button("button.svg"), m_pickValue(0.0, 5.0), m_instrument(), m_level(), m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()), m_score() {
+GuitarGraph::GuitarGraph(Song const& song): m_song(song), m_button("button.svg"), m_pickValue(0.0, 5.0), m_drums(), m_instrument(), m_level(), m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()), m_score() {
 	std::size_t tracks = m_song.tracks.size();
 	if (tracks == 0) throw std::runtime_error("No tracks");
 	m_necks.push_back(new Texture("guitarneck.svg"));
 	if (tracks > 1) m_necks.push_back(new Texture("bassneck.svg"));
-	if (tracks > 2) m_necks.push_back(new Texture("bassneck.svg")); // Drums
+	if (tracks > 2) m_necks.push_back(new Texture("drumneck.svg"));
 	difficultyAuto();
 }
 
@@ -43,17 +43,23 @@ void GuitarGraph::inputProcess() {
 			if (b >= 5) continue;
 			static const int gh[] = { 2, 0, 1, 3, 4 };
 			static const int rb[] = { 3, 0, 1, 2, 4 };
-			fretPressed[(it->second.getType() == Joystick::ROCKBAND ? rb : gh)[b]] = (ev.type == JoystickEvent::BUTTON_DOWN);
+			int button = (it->second.getType() == Joystick::ROCKBAND ? rb : gh)[b];
+			if (m_drums) {
+				if (button == 0) button = 4;
+				else if (button == 4) button = 0;
+			}
+			fretPressed[button] = (ev.type == JoystickEvent::BUTTON_DOWN);
 		}
 	}
 }
 
 void GuitarGraph::engine(double time) {
+	if (m_drums && fretPressed[0]) m_pickValue.setValue(1.0); // FIXME: should react to press event, not holding
 	if (!picked) return; // TODO: hammering etc. later, remove this
 	picked = false;
 	if (time < -0.5) {
 		if (fretPressed[4]) {
-			m_instrument = (m_instrument + 1) % m_song.tracks.size();
+			++m_instrument;
 			if (!difficulty(m_level)) difficultyAuto();
 		}
 		if (fretPressed[0]) difficulty(DIFFICULTY_SUPAEASY);
@@ -118,13 +124,32 @@ void GuitarGraph::difficultyAuto() {
 }
 
 bool GuitarGraph::difficulty(Difficulty level) {
+	m_instrument %= m_song.tracks.size();
+	Track const& track = m_song.tracks[m_instrument];
+	m_drums = (m_song.tracks[m_instrument].name == "DRUMS");
 	uint8_t basepitch = diffv[level].basepitch;
-	NoteMap const& nm = m_song.tracks[m_instrument].nm;
+	NoteMap const& nm = track.nm;
 	int fail = 0;
 	for (int fret = 0; fret < 5; ++fret) if (nm.find(basepitch + fret) == nm.end()) ++fail;
 	if (fail == 5) return false;
 	m_level = level;
 	return true;
+}
+
+glutil::Color const& GuitarGraph::color(int fret) const {
+	static glutil::Color fretColors[5] = {
+		glutil::Color(0.0f, 1.0f, 0.0f),
+		glutil::Color(1.0f, 0.0f, 0.0f),
+		glutil::Color(1.0f, 1.0f, 0.0f),
+		glutil::Color(0.0f, 0.0f, 1.0f),
+		glutil::Color(1.0f, 0.5f, 0.0f)
+	};
+	if (fret < 0 || fret > 4) throw std::logic_error("Invalid fret number in GuitarGraph::getColor");
+	if (m_drums) {
+		if (fret == 0) fret = 4;
+		else if (fret == 4) fret = 0;
+	}
+	return fretColors[fret];
 }
 
 void GuitarGraph::draw(double time) {
@@ -148,6 +173,7 @@ void GuitarGraph::draw(double time) {
 	{
 		UseTexture tex(m_necks[m_instrument]);
 		glutil::Begin block(GL_TRIANGLE_STRIP);
+		float w = m_instrument == 2 ? 2.0f : 2.5f;
 		float texCoord = 0.0f;
 		float tBeg = 0.0f, tEnd;
 		for (Song::Beats::const_iterator it = m_song.beats.begin(); it != m_song.beats.end() && tBeg < future; ++it, texCoord += texCoordStep, tBeg = tEnd) {
@@ -159,23 +185,18 @@ void GuitarGraph::draw(double time) {
 				tEnd = future;
 			}
 			glColor4f(1.0f, 1.0f, 1.0f, time2a(tEnd));
-			glTexCoord2f(0.0f, texCoord); glVertex2f(-2.5f, time2y(tEnd));
-			glTexCoord2f(1.0f, texCoord); glVertex2f(2.5f, time2y(tEnd));
+			glTexCoord2f(0.0f, texCoord); glVertex2f(-w, time2y(tEnd));
+			glTexCoord2f(1.0f, texCoord); glVertex2f(w, time2y(tEnd));
 		}
 	}
 	int basepitch = diffv[m_level].basepitch;
 
-	static glutil::Color fretColors[5] = {
-		glutil::Color(0.0f, 1.0f, 0.0f),
-		glutil::Color(1.0f, 0.0f, 0.0f),
-		glutil::Color(1.0f, 1.0f, 0.0f),
-		glutil::Color(0.0f, 0.0f, 1.0f),
-		glutil::Color(1.0f, 0.5f, 0.0f)
-	};
 	// Draw the notes
-	NoteMap const& nm = m_song.tracks[m_instrument].nm;
+	Track const& track = m_song.tracks[m_instrument];
+	NoteMap const& nm = track.nm;
 	for (int fret = 0; fret < 5; ++fret) {
 		float x = -2.0f + fret;
+		if (m_drums) x -= 0.5f;
 		float w = 0.5f;
 		NoteMap::const_iterator it = nm.find(basepitch + fret);
 		if (it == nm.end()) continue;
@@ -185,10 +206,15 @@ void GuitarGraph::draw(double time) {
 			float tEnd = it2->end - time;
 			if (tEnd < past) continue;
 			if (tBeg > future) break;
-			glutil::Color c = fretColors[fret];
+			glutil::Color c = color(fret);
 			if (m_notes[&*it2] == 1) c.r = c.g = c.b = 1.0f;
 			float wLine = 0.5f * w;
 			if (tEnd > future) tEnd = future;
+			if (m_drums && fret == 0) {
+				c.a = time2a(tBeg); glColor4fv(c);
+				drawBar(tBeg, 0.01f);
+				continue;
+			}
 			{
 				glutil::Begin block(GL_TRIANGLE_STRIP);
 				c.a = time2a(tEnd); glColor4fv(c);
@@ -202,22 +228,18 @@ void GuitarGraph::draw(double time) {
 			m_button.draw();
 		}
 	}
-	{
-		float pl = m_pickValue.get();
-		glColor3f(pl, pl, pl);
-	}
-	// Draw the cursor
-	{	
-		glutil::Begin block(GL_TRIANGLE_STRIP);
-		glVertex2f(-2.5f, time2y(0.01f));
-		glVertex2f(2.5f, time2y(0.01f));
-		glVertex2f(-2.5f, time2y(-0.01f));
-		glVertex2f(2.5f, time2y(-0.01f));
-	}
+	// Draw the cursor / bass pedal
+	float level = m_pickValue.get();
+	glColor3f(level, level, level);
+	drawBar(0.0, 0.01f);
 	// Fret buttons on cursor
 	for (int fret = 0; fret < 5; ++fret) {
 		float x = -2.0f + fret;
-		glutil::Color c = fretColors[fret];
+		if (m_drums) {
+			if (fret == 0) continue;
+			x -= 0.5f;
+		}
+		glutil::Color c = color(fret);
 		if (fretPressed[fret]) {
 			c.r = 1.0f;
 			c.g = 1.0f;
@@ -228,5 +250,13 @@ void GuitarGraph::draw(double time) {
 		m_button.draw();
 	}
 	glColor3f(1.0f, 1.0f, 1.0f);
+}
+
+void GuitarGraph::drawBar(double time, float h) {
+	glutil::Begin block(GL_TRIANGLE_STRIP);
+	glVertex2f(-2.5f, time2y(time + h));
+	glVertex2f(2.5f, time2y(time + h));
+	glVertex2f(-2.5f, time2y(time - h));
+	glVertex2f(2.5f, time2y(time - h));
 }
 

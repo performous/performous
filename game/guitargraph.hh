@@ -25,6 +25,7 @@ class GuitarGraph {
 	Surface m_button;
 	AnimValue m_pickValue;
 	boost::ptr_vector<Texture> m_necks;
+	bool m_drums;
 	std::size_t m_instrument;
 	enum Difficulty {
 		DIFFICULTY_SUPAEASY,
@@ -33,6 +34,8 @@ class GuitarGraph {
 		DIFFICULTY_AMAZING,
 		DIFFICULTYCOUNT
 	} m_level;
+	glutil::Color const& color(int fret) const;
+	void drawBar(double time, float h);
 	void difficultyAuto();
 	bool difficulty(Difficulty level);
 	SvgTxtTheme m_text;
