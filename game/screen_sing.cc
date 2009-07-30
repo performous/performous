@@ -46,7 +46,7 @@ void ScreenSing::exit() {
 	theme.reset();
 }
 
-void ScreenSing::activatePlayerScreen()
+void ScreenSing::activateNextScreen()
 {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 
@@ -97,7 +97,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			return;
 		}
 		else if (key == SDLK_RETURN) {
-			if (m_score_window.get()) { activatePlayerScreen(); return; } // Score window visible -> Enter quits
+			if (m_score_window.get()) { activateNextScreen(); return; } // Score window visible -> Enter quits
 			else if (status == Song::FINISHED) m_score_window.reset(new ScoreWindow(*m_engine, m_players)); // Song finished, but no score window -> show it
 		}
 		else if (key == SDLK_SPACE || key == SDLK_PAUSE) m_audio.togglePause();
@@ -201,7 +201,7 @@ void ScreenSing::draw() {
 		}
 	} else {
 		if (m_score_window.get()) {
-			if (m_quitTimer.get() == 0.0 && !m_audio.isPaused()) { activatePlayerScreen(); return; }
+			if (m_quitTimer.get() == 0.0 && !m_audio.isPaused()) { activateNextScreen(); return; }
 			m_score_window->draw();
 		}
 		else if (!m_audio.isPlaying() || (status == Song::FINISHED && m_audio.getLength() - time < 3.0)) {

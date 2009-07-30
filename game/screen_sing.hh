@@ -53,7 +53,13 @@ class ScreenSing: public Screen {
 	}
 
   private:
-	void activatePlayerScreen();
+	/**Activates Songs Screen or Players Screen.
+	  This depends on
+	  - the configuration (is Hiscore enabled)
+	  - did a player reach a new hiscore
+	  - is the hiscore file writable
+	  */
+	void activateNextScreen();
 	Audio& m_audio;
 	Capture& m_capture;
 	Players& m_players;
