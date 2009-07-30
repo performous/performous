@@ -19,6 +19,7 @@ namespace {
 	float time2y(float t) { return -timescale * (t - past) / (future - past); }
 	float time2a(float t) { return 1.0f - t / future; } // Note: we want 1.0 alpha already at zero t.
 	bool fretPressed[5] = {};
+	bool fretHit[5] = {};
 	bool picked = false;
 }
 
@@ -47,30 +48,66 @@ void GuitarGraph::inputProcess() {
 			if (m_drums) {
 				if (button == 0) button = 4;
 				else if (button == 4) button = 0;
+				if (ev.type == JoystickEvent::BUTTON_DOWN) {
+					if (button == 0) m_pickValue.setValue(1.0);
+				}
 			}
 			fretPressed[button] = (ev.type == JoystickEvent::BUTTON_DOWN);
+			if (fretPressed[button]) fretHit[button] = true;
 		}
 	}
 }
 
 void GuitarGraph::engine(double time) {
-	if (m_drums && fretPressed[0]) m_pickValue.setValue(1.0); // FIXME: should react to press event, not holding
-	if (!picked) return; // TODO: hammering etc. later, remove this
-	picked = false;
 	if (time < -0.5) {
-		if (fretPressed[4]) {
-			++m_instrument;
-			if (!difficulty(m_level)) difficultyAuto();
+		if (picked) {
+			if (fretPressed[4]) {
+				++m_instrument;
+				if (!difficulty(m_level)) difficultyAuto();
+			}
+			if (fretPressed[0]) difficulty(DIFFICULTY_SUPAEASY);
+			else if (fretPressed[1]) difficulty(DIFFICULTY_EASY);
+			else if (fretPressed[2]) difficulty(DIFFICULTY_MEDIUM);
+			else if (fretPressed[3]) difficulty(DIFFICULTY_AMAZING);
 		}
-		if (fretPressed[0]) difficulty(DIFFICULTY_SUPAEASY);
-		else if (fretPressed[1]) difficulty(DIFFICULTY_EASY);
-		else if (fretPressed[2]) difficulty(DIFFICULTY_MEDIUM);
-		else if (fretPressed[3]) difficulty(DIFFICULTY_AMAZING);
 		return;
 	}
+	int basepitch = diffv[m_level].basepitch;
+	if (m_drums) {
+		for (int fret = 0; fret < 5; ++fret) {
+			if (!fretHit[fret]) continue;
+			NoteMap const& nm = m_song.tracks[m_instrument].nm;
+			NoteMap::const_iterator it = nm.find(basepitch + fret);
+			if (it == nm.end()) continue;
+			Durations const& dur = it->second;
+			Durations::const_iterator it2 = dur.begin(), it2tmp, it2end = dur.end();
+			double tolerance = 0.2;
+			// Find the first suitable note within the tolerance
+			while (it2 != it2end && (it2->begin < time - tolerance || m_notes[&*it2] != 0)) ++it2;
+			// If we are already past the accepted region, skip further processing
+			if (it2 == it2end || it2->begin > time + tolerance) { m_score -= 100; continue; }
+			// Find the note with the smallest error
+			it2tmp = it2;
+			Duration const* d = NULL;
+			do {
+				it2 = it2tmp;
+				if (m_notes[&*it2] != 0) continue; // Notes already played are ignored
+				d = &*it2;
+				tolerance = std::abs(it2->begin - time);
+			} while (++it2tmp != it2end && std::abs(it2tmp->begin - time) < tolerance);
+			if (!d) throw std::logic_error("d is NULL in GuitarGraph::engine");
+			m_score += 15;
+			if (tolerance < 0.1) m_score += 15;
+			if (tolerance < 0.05) m_score += 15;
+			if (tolerance < 0.03) m_score += 5;
+			m_notes[d] = 1;
+		}
+		if (m_score < 0) m_score = 0;
+		return;
+	}
+	if (!picked) return; // TODO: hammering etc. later, remove this
 	m_pickValue.setValue(1.0);
 	for (NoteStatus::iterator it = m_notes.begin(); it != m_notes.end(); ++it) if (it->second == 1) it->second = 2;
-	int basepitch = diffv[m_level].basepitch;
 	Duration const* dIt[5] = {};
 	double begin = getNaN();
 	double tolerance = 0.2;
@@ -102,19 +139,25 @@ void GuitarGraph::engine(double time) {
 		++count;
 	}
 	bool shadowed = (count == 1); // If the chord only requires one fret, frets on the left side of that are "shadowed" (ignored)
-	for (int fret = 0; fret < 5; ++fret) {
-		if (need[fret] && !fretPressed[fret]) return; // Fret missing -> fail
+	bool fail = false;
+	for (int fret = 0; fret < 5 && !fail; ++fret) {
+		if (need[fret] && !fretPressed[fret]) { fail = true; break; } // Fret missing
 		if (need[fret]) shadowed = false;
-		if (!shadowed && fretPressed[fret] && !need[fret]) return; // Pressing non-shadowed fret that is not needed -> fail
+		if (!shadowed && fretPressed[fret] && !need[fret]) { fail = true; break; } // Pressing non-shadowed fret that is not needed
 	}
-	// Okay, got this far, we have a match, let's score it
-	for (int fret = 0; fret < 5; ++fret) {
-		if (!need[fret]) continue;
-		m_notes[dIt[fret]] = 1;
-		m_score += 15;
-		if (tolerance < 0.1) m_score += 15;
-		if (tolerance < 0.05) m_score += 15;
-		if (tolerance < 0.03) m_score += 5;
+	if (fail) {
+		m_score -= 100.0;
+		if (m_score < 0) m_score = 0;
+	} else {
+		// Successful pick, mark and score it so
+		for (int fret = 0; fret < 5; ++fret) {
+			if (!need[fret]) continue;
+			m_notes[dIt[fret]] = 1;
+			m_score += 15;
+			if (tolerance < 0.1) m_score += 15;
+			if (tolerance < 0.05) m_score += 15;
+			if (tolerance < 0.03) m_score += 5;
+		}
 	}
 }
 
@@ -163,6 +206,9 @@ void GuitarGraph::draw(double time) {
 		m_text.draw(boost::lexical_cast<std::string>(m_score));
 	}
 	engine(time);
+	// TODO: Clear these in input class instead
+	picked = false;
+	std::fill(fretHit, fretHit + 5, false);
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
 	dimensions.screenBottom().fixedWidth(0.5f);
 	glutil::PushMatrix pmb;
