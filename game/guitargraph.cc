@@ -44,17 +44,15 @@ void GuitarGraph::inputProcess() {
 			if (ev.type == JoystickEvent::AXIS_MOTION && ev.axis_id == 5 && ev.axis_value != 0) picked = true;
 			if (ev.type != JoystickEvent::BUTTON_DOWN && ev.type != JoystickEvent::BUTTON_UP) continue;
 			unsigned b = ev.button_id;
-			if (b >= 5) continue;
-			static const int gh[] = { 2, 0, 1, 3, 4 };
-			static const int rb[] = { 3, 0, 1, 2, 4 };
-			int button = (it->second.getType() == Joystick::ROCKBAND ? rb : gh)[b];
-			if (m_drums) {
-				if (button == 0) button = 4;
-				else if (button == 4) button = 0;
-				if (ev.type == JoystickEvent::BUTTON_DOWN) {
-					if (button == 0) m_pickValue.setValue(1.0);
-				}
-			}
+			if (b >= 6) continue;
+			static const int inputmap[][6] = {
+				{ 2, 0, 1, 3, 4, 0 }, // Guitar Hero guitar
+				{ 0, 0, 0, 0, 0, 0 }, // Guitar Hero drums (FIXME)
+				{ 3, 0, 1, 2, 4, 0 }, // Rock Band guitar
+				{ 3, 4, 1, 2, 0, 0 }  // Rock Band drums
+			};
+			int instrument = 2 * (it->second.getType() == Joystick::ROCKBAND) + m_drums;
+			int button = inputmap[instrument][b];
 			fretPressed[button] = (ev.type == JoystickEvent::BUTTON_DOWN);
 			if (fretPressed[button]) fretHit[button] = true;
 		}
@@ -62,6 +60,7 @@ void GuitarGraph::inputProcess() {
 }
 
 void GuitarGraph::engine(double time) {
+	if (m_drums && fretHit[0]) m_pickValue.setValue(1.0);
 	if (time < -0.5) {
 		if (picked) {
 			if (fretPressed[4]) {
