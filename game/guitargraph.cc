@@ -332,3 +332,44 @@ void GuitarGraph::drawBar(double time, float h) {
 	glVertex2f(2.5f, time2y(time - h));
 }
 
+void GuitarGraph::updateChords() {
+	m_chords.clear();
+	Durations::size_type pos[5] = {}, size[5] = {};
+	Durations const* durations[5] = {};
+	for (int fret = 0; fret < 5; ++fret) {
+		NoteMap const& nm = m_song.tracks[m_instrument].nm;
+		int basepitch = diffv[m_level].basepitch;
+		NoteMap::const_iterator it = nm.find(basepitch + fret);
+		if (it == nm.end()) continue;
+		durations[fret] = &it->second;
+	}
+	while (true) {
+		// Find the earliest
+		double t = getInf();
+		for (int fret = 0; fret < 5; ++fret) {
+			if (pos[fret] == size[fret]) continue;
+			Durations const& dur = *durations[fret];
+			t = std::min(t, dur[pos[fret]].begin);
+		}
+		// Quit processing if none were left
+		if (t == getInf()) break;
+		// Construct a chord
+		Chord c;
+		c.begin = t;
+		for (int fret = 0; fret < 5; ++fret) {
+			if (pos[fret] == size[fret]) continue;
+			Durations const& dur = *durations[fret];
+			Duration const& d = dur[pos[fret]++];
+			if (d.begin > t) continue;
+			c.fret[fret] = true;
+			c.dur[fret] = &d;
+			++c.polyphony;
+		}
+		if (c.polyphony == 1) {
+			c.tappable = true;
+			if (m_chords.empty() || m_chords.back() == c) c.tappable = false;
+		}
+		m_chords.push_back(c);
+	}
+}
+

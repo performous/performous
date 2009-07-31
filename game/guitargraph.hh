@@ -13,10 +13,14 @@ struct Chord {
 	double begin;
 	bool fret[5];
 	Duration const* dur[5];
-	bool chord;
+	int polyphony;
 	bool tappable;
 	bool tapped;
 	int tapScore;
+	Chord(): begin(), polyphony(), tappable(), tapped(), tapScore() {
+		std::fill(fret, fret + 5, false);
+		std::fill(dur, dur + 5, static_cast<Duration const*>(NULL));
+	}
 };
 
 static inline bool operator==(Chord const& a, Chord const& b) {
@@ -53,7 +57,7 @@ class GuitarGraph {
 	void difficultyAuto();
 	bool difficulty(Difficulty level);
 	SvgTxtTheme m_text;
-	void updateChords() {}
+	void updateChords();
 	std::vector<Chord> m_chords;
 	typedef std::map<Duration const*, int> NoteStatus;
 	NoteStatus m_notes;
