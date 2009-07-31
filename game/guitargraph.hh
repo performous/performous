@@ -41,6 +41,7 @@ class GuitarGraph {
 	SvgTxtTheme m_text;
 	typedef std::map<Duration const*, int> NoteStatus;
 	NoteStatus m_notes;
+	bool m_hammerReady;
 	int m_score;
 };
 

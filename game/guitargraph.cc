@@ -26,7 +26,7 @@ namespace {
 	bool picked = false;
 }
 
-GuitarGraph::GuitarGraph(Song const& song): m_song(song), m_button("button.svg"), m_pickValue(0.0, 5.0), m_drums(), m_instrument(), m_level(), m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()), m_score() {
+GuitarGraph::GuitarGraph(Song const& song): m_song(song), m_button("button.svg"), m_pickValue(0.0, 5.0), m_drums(), m_instrument(), m_level(), m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()), m_hammerReady(), m_score() {
 	std::size_t tracks = m_song.tracks.size();
 	if (tracks == 0) throw std::runtime_error("No tracks");
 	m_necks.push_back(new Texture("guitarneck.svg"));
@@ -103,14 +103,24 @@ void GuitarGraph::engine(double time) {
 			if (tolerance < 0.1) m_score += 15;
 			if (tolerance < 0.05) m_score += 15;
 			if (tolerance < 0.03) m_score += 5;
-			m_notes[d] = 1;
+			m_notes[d] = 2;
 		}
 		if (m_score < 0) m_score = 0;
 		return;
 	}
-	if (!picked) return; // TODO: hammering etc. later, remove this
+	int hammerFret = -1;
+	if (!picked) {
+		if (!m_hammerReady) return;
+		// Check if exactly one fret is hammered
+		for (int fret = 0; fret < 5; ++fret) {
+			if (!fretHit[fret]) continue;
+			if (hammerFret != -1) return;
+			hammerFret = fret;
+		}
+		if (hammerFret == -1) return;
+	}
 	m_pickValue.setValue(1.0);
-	for (NoteStatus::iterator it = m_notes.begin(); it != m_notes.end(); ++it) if (it->second == 1) it->second = 2;
+	// FIXME: Replace with hold code for (NoteStatus::iterator it = m_notes.begin(); it != m_notes.end(); ++it) if (it->second == 1) it->second = 2;
 	Duration const* dIt[5] = {};
 	double begin = getNaN();
 	double tolerance = 0.2;
@@ -141,26 +151,39 @@ void GuitarGraph::engine(double time) {
 		need[fret] = true;
 		++count;
 	}
-	bool shadowed = (count == 1); // If the chord only requires one fret, frets on the left side of that are "shadowed" (ignored)
-	bool fail = false;
-	for (int fret = 0; fret < 5 && !fail; ++fret) {
-		if (need[fret] && !fretPressed[fret]) { fail = true; break; } // Fret missing
-		if (need[fret]) shadowed = false;
-		if (!shadowed && fretPressed[fret] && !need[fret]) { fail = true; break; } // Pressing non-shadowed fret that is not needed
-	}
-	if (fail) {
-		m_score -= 100.0;
-		if (m_score < 0) m_score = 0;
-	} else {
-		// Successful pick, mark and score it so
-		for (int fret = 0; fret < 5; ++fret) {
-			if (!need[fret]) continue;
-			m_notes[dIt[fret]] = 1;
-			m_score += 15;
-			if (tolerance < 0.1) m_score += 15;
-			if (tolerance < 0.05) m_score += 15;
-			if (tolerance < 0.03) m_score += 5;
+	m_hammerReady = false;
+	if (picked) {
+		// Regular pick handling
+		bool shadowed = (count == 1); // If the chord only requires one fret, frets on the left side of that are "shadowed" (ignored)
+		bool fail = false;
+		for (int fret = 0; fret < 5 && !fail; ++fret) {
+			if (need[fret] && !fretPressed[fret]) { fail = true; break; } // Fret missing
+			if (need[fret]) shadowed = false;
+			if (!shadowed && fretPressed[fret] && !need[fret]) { fail = true; break; } // Pressing non-shadowed fret that is not needed
 		}
+		if (fail) {
+			m_score -= 100.0;
+			if (m_score < 0) m_score = 0;
+		} else {
+			// Successful pick, mark and score it so
+			for (int fret = 0; fret < 5; ++fret) {
+				if (!need[fret]) continue;
+				m_notes[dIt[fret]] = 2;
+				m_score += 15;
+				if (tolerance < 0.1) m_score += 15;
+				if (tolerance < 0.05) m_score += 15;
+				if (tolerance < 0.03) m_score += 5;
+			}
+			m_hammerReady = true;
+		}
+	} else {
+		// Hammering
+		if (count != 1 || !need[hammerFret] || tolerance > 0.1) return;
+		m_notes[dIt[hammerFret]] = 1;
+		m_score += 30;
+		if (tolerance < 0.05) m_score += 15;
+		if (tolerance < 0.03) m_score += 5;
+		m_hammerReady = true;
 	}
 }
 
