@@ -1,5 +1,6 @@
 #include "highscore.hh"
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include "unicode.hh"
 
@@ -42,10 +43,13 @@ void SongHiscore::load()
 	unsigned int playernum = 0;
 	while (std::getline(ss, str))
 	{
-		if (str == "E") break;
 		linenum++;
-		if (playernum > 9) throw HiscoreException("Not more than 10 highscores expected in file", linenum);
+
+		boost::trim(str);
 		if (str.empty()) continue; // ignore empty player lines
+
+		if (str == "E") break;
+		if (playernum > 9) throw HiscoreException("Not more than 10 highscores expected in file", linenum);
 		if (str.length() <= 9) throw HiscoreException("Line not long enough for player information", linenum);
 
 		if (str[0] != '#') throw HiscoreException("No # found at begin of line", linenum);
@@ -61,7 +65,10 @@ void SongHiscore::load()
 
 		std::getline(ss, str);
 		linenum++;
+
+		boost::trim(str);
 		if (str.empty()) throw HiscoreException("Expected Score, but found empty line", linenum);
+
 		if (str.length() <= 8) throw HiscoreException("Line not long enough for score information", linenum);
 
 		if (str[0] != '#') throw HiscoreException("No # found at begin of line", linenum);
@@ -76,6 +83,7 @@ void SongHiscore::load()
 
 		int score = 0;
 		try {
+			boost::trim(sscore);
 			score = boost::lexical_cast<int>(sscore);
 		} catch (boost::bad_lexical_cast const& blc)
 		{
@@ -115,7 +123,7 @@ void SongHiscore::save()
 
 bool SongHiscore::isWritable()
 {
-	std::ofstream out ((m_path + m_filename).c_str());
+	std::ofstream out ((m_path + m_filename).c_str(), std::ios::app);
 
 	return out.is_open();
 }
@@ -162,12 +170,13 @@ int main()
 		else std::cout << "Is not writeable" << std::endl;
 
 		hi.load();
-		int new_score = 9000;
+		int new_score = 5000;
 		if (hi.reachedNewHiscore(new_score))
 		{
 			std::cout << "Reached new highscore" << std::endl;
-			hi.addNewHiscore("new player", new_score);
+			hi.addNewHiscore("nplayer", new_score);
 		}
+		hi.getInfo(std::cout);
 		hi.save();
 	} catch (HiscoreException const& hie)
 	{
