@@ -17,7 +17,10 @@ namespace {
 	const float texCoordStep = -0.5f; // Two beat lines per neck texture => 0.5 tex units per beat
 	// Note: t is difference from playback time so it must be in range [past, future]
 	float time2y(float t) { return -timescale * (t - past) / (future - past); }
-	float time2a(float t) { return 1.0f - t / future; } // Note: we want 1.0 alpha already at zero t.
+	float time2a(float t) {
+		float a = clamp(1.0 - t / future); // Note: we want 1.0 alpha already at zero t.
+		return std::pow(a, 0.8); // Nicer curve
+	}
 	bool fretPressed[5] = {};
 	bool fretHit[5] = {};
 	bool picked = false;
