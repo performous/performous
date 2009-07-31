@@ -47,7 +47,7 @@ void GuitarGraph::inputProcess() {
 			if (b >= 6) continue;
 			static const int inputmap[][6] = {
 				{ 2, 0, 1, 3, 4, 0 }, // Guitar Hero guitar
-				{ 0, 0, 0, 0, 0, 0 }, // Guitar Hero drums (FIXME)
+				{ 3, 4, 1, 2, 0, 4 }, // Guitar Hero drums
 				{ 3, 0, 1, 2, 4, 0 }, // Rock Band guitar
 				{ 3, 4, 1, 2, 0, 0 }  // Rock Band drums
 			};
