@@ -202,6 +202,7 @@ bool GuitarGraph::difficulty(Difficulty level) {
 	for (int fret = 0; fret < 5; ++fret) if (nm.find(basepitch + fret) == nm.end()) ++fail;
 	if (fail == 5) return false;
 	m_level = level;
+	updateChords();
 	return true;
 }
 

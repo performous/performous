@@ -9,6 +9,20 @@
 
 class Song;
 
+struct Chord {
+	double begin;
+	bool fret[5];
+	Duration const* dur[5];
+	bool chord;
+	bool tappable;
+	bool tapped;
+	int tapScore;
+};
+
+static inline bool operator==(Chord const& a, Chord const& b) {
+	return std::equal(a.fret, a.fret + 5, b.fret);
+}
+
 /// handles drawing of notes and waves
 class GuitarGraph {
   public:
@@ -39,6 +53,8 @@ class GuitarGraph {
 	void difficultyAuto();
 	bool difficulty(Difficulty level);
 	SvgTxtTheme m_text;
+	void updateChords() {}
+	std::vector<Chord> m_chords;
 	typedef std::map<Duration const*, int> NoteStatus;
 	NoteStatus m_notes;
 	bool m_hammerReady;
