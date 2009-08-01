@@ -42,29 +42,31 @@ void ScreenPractice::manageEvent(SDL_Event event) {
 		}
 	}
 	input::Event input_event;
-	while( drums->tryPoll(input_event) ) {
-		if(input_event.type == input::Event::PRESS) {
-			switch(input_event.button) {
-				case 0:
-					m_audio.playMusic(getDataPath("sounds/drum_bass.ogg"));
-					break;
-				case 1:
-					m_audio.playMusic(getDataPath("sounds/drum_snare.ogg"));
-					break;
-				case 2:
-					m_audio.playMusic(getDataPath("sounds/drum_tom1.ogg"));
-					break;
-				case 3:
-					m_audio.playMusic(getDataPath("sounds/drum_tom2.ogg"));
-					break;
-				case 4:
-					m_audio.playMusic(getDataPath("sounds/drum_hi-hat.ogg"));
-					break;
-				case 5:
-					m_audio.playMusic(getDataPath("sounds/drum_cymbal.ogg"));
-					break;
-				default:
-					break;
+	if( drums ) {
+		while( drums->tryPoll(input_event) ) {
+			if(input_event.type == input::Event::PRESS) {
+				switch(input_event.button) {
+					case 0:
+						m_audio.playMusic(getDataPath("sounds/drum_bass.ogg"));
+						break;
+					case 1:
+						m_audio.playMusic(getDataPath("sounds/drum_snare.ogg"));
+						break;
+					case 2:
+						m_audio.playMusic(getDataPath("sounds/drum_tom1.ogg"));
+						break;
+					case 3:
+						m_audio.playMusic(getDataPath("sounds/drum_tom2.ogg"));
+						break;
+					case 4:
+						m_audio.playMusic(getDataPath("sounds/drum_hi-hat.ogg"));
+						break;
+					case 5:
+						m_audio.playMusic(getDataPath("sounds/drum_cymbal.ogg"));
+						break;
+					default:
+						break;
+				}
 			}
 		}
 	}
