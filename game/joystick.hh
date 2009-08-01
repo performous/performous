@@ -111,23 +111,21 @@ namespace input {
 			bool assigned() {return m_assigned;};
 			bool pressed(int _button) {return m_pressed[_button];};
 			input::Private::Type type() {return m_type;};
-			bool type_match( input::Type _type) {
-				if( _type == input::UNKNOWN && m_type == input::Private::UNKNOWN ) {
-					return true;
-				} else if( _type == input::GUITAR && 
+			bool type_match( input::DevType _type) {
+				if( _type == input::GUITAR &&
 					(m_type == input::Private::GUITAR_GH || m_type == input::Private::GUITAR_RB) ) {
 					return true;
-				} else if( _type == input::DRUM && 
+				} else if( _type == input::DRUMS &&
 					(m_type == input::Private::DRUM_GH || m_type == input::Private::DRUM_RB) ) {
 					return true;
 				} else {
 					return false;
 				}
 			};
-			void setType(input::Type _type) {
+			void setType(input::DevType _type) {
 				if( _type == input::GUITAR ) {
 					m_type = input::Private::GUITAR_RB;
-				} else if( _type == input::DRUM ) {
+				} else if( _type == input::DRUMS ) {
 					m_type = input::Private::DRUM_RB;
 				} else {
 					m_type = input::Private::UNKNOWN;
@@ -156,14 +154,6 @@ namespace input {
 			for(InputDevs::iterator it = devices.begin() ; it != devices.end() ; ++it) {
 				if( !it->second.assigned() && it->second.type_match(_type) ) {
 					m_device_id = it->first;
-					it->second.assign();
-					return;
-				}
-			}
-			for(InputDevs::iterator it = devices.begin() ; it != devices.end() ; ++it) {
-				if( !it->second.assigned() && it->second.type_match(input::UNKNOWN) ) {
-					m_device_id = it->first;
-					it->second.setType(_type);
 					it->second.assign();
 					return;
 				}
