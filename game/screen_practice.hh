@@ -7,6 +7,7 @@
 #include "theme.hh"
 #include "opengl_text.hh"
 #include "progressbar.hh"
+#include "joystick.hh"
 
 /// screen for practice mode
 class ScreenPractice : public Screen {
@@ -26,6 +27,7 @@ class ScreenPractice : public Screen {
 	Capture& m_capture;
 	boost::ptr_vector<ProgressBar> m_vumeters;
 	boost::scoped_ptr<ThemePractice> theme;
+	boost::scoped_ptr<input::InputDev> drums;
 };
 
 #endif

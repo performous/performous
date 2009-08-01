@@ -3,6 +3,7 @@
 
 #include <boost/lexical_cast.hpp>
 
+/*
 enum TypeSDL {UNKNOWN, GUITAR_RB, DRUM_RB, GUITAR_GH, DRUM_GH, TYPESDL_N};
 static const unsigned SDL_BUTTONS = 6;
 
@@ -16,6 +17,7 @@ int buttonFromSDL(TypeSDL type, unsigned sdlButton) {
 	if (sdlButton > SDL_BUTTONS) return -1;
 	return inputmap[type][sdlButton];
 }
+*/
 
 
 /*

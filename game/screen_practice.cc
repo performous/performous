@@ -1,7 +1,6 @@
 #include "screen_practice.hh"
 
 #include "util.hh"
-#include "joystick.hh"
 #include "configuration.hh"
 
 ScreenPractice::ScreenPractice(std::string const& name, Audio& audio, Capture& capture):
@@ -17,11 +16,13 @@ void ScreenPractice::enter() {
 		m_vumeters.push_back(b = new ProgressBar(getThemePath("vumeter_bg.svg"), getThemePath("vumeter_fg.svg"), ProgressBar::VERTICAL, 0.136, 0.023));
 		b->dimensions.screenBottom().left(-0.4 + i * 0.2).fixedWidth(0.04);
 	}
+	drums.reset(new input::InputDev(input::DRUMS));
 }
 
 void ScreenPractice::exit() {
 	m_vumeters.clear();
 	theme.reset();
+	drums.reset();
 }
 
 void ScreenPractice::manageEvent(SDL_Event event) {
@@ -40,27 +41,29 @@ void ScreenPractice::manageEvent(SDL_Event event) {
 				break;
 		}
 	}
-	JoystickEvent joy_event;
-	for(Joysticks::iterator it = joysticks.begin() ; it != joysticks.end() ; ++it ) {
-		if( it->second.tryPollEvent(joy_event) && joy_event.type == JoystickEvent::BUTTON_DOWN) {
-			switch(joy_event.button_id) {
-				case PS3_DRUM_CONTROLLER_RED: // Snare drum
+	input::Event input_event;
+	while( drums->tryPollEvent(input_event) ) {
+		if(input_event.type == input::Event::PRESS) {
+			switch(input_event.button) {
+				case 0:
+					m_audio.playMusic(getDataPath("sounds/drum_bass.ogg"));
+					break;
+				case 1:
 					m_audio.playMusic(getDataPath("sounds/drum_snare.ogg"));
 					break;
-				case PS3_DRUM_CONTROLLER_BLUE: // Tom 1
+				case 2:
 					m_audio.playMusic(getDataPath("sounds/drum_tom1.ogg"));
 					break;
-				case PS3_DRUM_CONTROLLER_GREEN: // Tom 2
+				case 3:
 					m_audio.playMusic(getDataPath("sounds/drum_tom2.ogg"));
 					break;
-				case PS3_DRUM_CONTROLLER_YELLOW: // Hi hat
+				case 4:
 					m_audio.playMusic(getDataPath("sounds/drum_hi-hat.ogg"));
 					break;
-				case PS3_DRUM_CONTROLLER_ORANGE: // crash cymbal
+				case 5:
 					m_audio.playMusic(getDataPath("sounds/drum_cymbal.ogg"));
 					break;
-				case PS3_DRUM_CONTROLLER_XXX: // Drum bass
-					m_audio.playMusic(getDataPath("sounds/drum_bass.ogg"));
+				default:
 					break;
 			}
 		}
