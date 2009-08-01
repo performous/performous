@@ -50,6 +50,7 @@ void SongParser::iniParse() {
 		else if (name == "T1 GEMS") name = "GUITAR"; // Some old MIDI files have a track named T1 GEMS
 		else if (name.substr(0, 5) != "PART ") continue;
 		else name.erase(0, 5);
+		if (name == "DRUM") name = "DRUMS";
 		// Process non-vocal tracks
 		if (name != "VOCALS") {
 			bool drums = (name == "DRUMS");
