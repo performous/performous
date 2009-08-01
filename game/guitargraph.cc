@@ -58,24 +58,22 @@ GuitarGraph::GuitarGraph(Song const& song, bool drums, unsigned track):
 
 void GuitarGraph::engine(double time) {
 	for (input::Event ev; m_input.tryPoll(ev);) {
-		if (m_drums) {
+		if (time < -0.5) {
+			if (ev.type == input::Event::PICK || (m_drums && ev.type == input::Event::PRESS)) {
+				if (ev.pressed[4]) {
+					++m_track;
+					if (!difficulty(m_level)) difficultyAuto();
+				}
+				if (ev.pressed[0]) difficulty(DIFFICULTY_SUPAEASY);
+				else if (ev.pressed[1]) difficulty(DIFFICULTY_EASY);
+				else if (ev.pressed[2]) difficulty(DIFFICULTY_MEDIUM);
+				else if (ev.pressed[3]) difficulty(DIFFICULTY_AMAZING);
+			}
+		} else if (m_drums) {
 			if (ev.type == input::Event::PRESS) drumHit(time, ev.button);
 		} else {
-			if (time < -0.5) {
-				if (ev.type == input::Event::PICK) {
-					if (ev.pressed[4]) {
-						++m_track;
-						if (!difficulty(m_level)) difficultyAuto();
-					}
-					if (ev.pressed[0]) difficulty(DIFFICULTY_SUPAEASY);
-					else if (ev.pressed[1]) difficulty(DIFFICULTY_EASY);
-					else if (ev.pressed[2]) difficulty(DIFFICULTY_MEDIUM);
-					else if (ev.pressed[3]) difficulty(DIFFICULTY_AMAZING);
-				}
-				continue;
-			}
+			if (ev.type == input::Event::PRESS || ev.type == input::Event::PICK) guitarPlay(time, ev);
 		}
-		if (m_score < 0) m_score = 0;
 	}
 }
 
