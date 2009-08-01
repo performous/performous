@@ -87,6 +87,7 @@ namespace input {
 		  public:
 			InputDevPrivate(input::Type _type = input::UNKNOWN) : m_assigned(false), m_type(_type) {};
 			bool tryPoll(InputDevEvent&) {return true;};
+			// this will modify the m_pressed member
 			void addEvent(InputDevEvent) {};
 			void clearEvents() {m_events.clear();};
 			void assign() {m_assigned = true;};

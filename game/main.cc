@@ -39,6 +39,8 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 	}
 	static bool esc = false;
 	SDL_Event event;
+	// Clear input event first
+	input::clear();
 	while(SDL_PollEvent(&event) == 1) {
 		// catch input event first
 		if(!input::pushEvent(event)) {
@@ -81,7 +83,6 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 			case GL_OUT_OF_MEMORY: std::cerr << "OpenGL error: invalid enum" << std::endl; break;
 		}
 	}
-	input::clear();
 	if( config["graphic/fullscreen"].b() != window.getFullscreen() )
 		window.setFullscreen(config["graphic/fullscreen"].b());
 }
