@@ -4,71 +4,6 @@
 #include "SDL_joystick.h"
 #include "audio.hh"
 
-#define PS3_DRUM_CONTROLLER_BLUE   0
-#define PS3_DRUM_CONTROLLER_GREEN  1
-#define PS3_DRUM_CONTROLLER_RED    2
-#define PS3_DRUM_CONTROLLER_YELLOW 3
-#define PS3_DRUM_CONTROLLER_XXX    4
-#define PS3_DRUM_CONTROLLER_ORANGE 5
-
-class JoystickEvent {
-  public:
-	enum Type {BUTTON_DOWN, BUTTON_UP, HAT_MOTION, AXIS_MOTION, BALL_MOTION};
-	JoystickEvent(): button_id(), button_state(), hat_id(), hat_direction(CENTERED), axis_id(), axis_value(), ball_id(), ball_dx(), ball_dy()  {};
-	JoystickEvent(Type _type): type(_type), button_id(), button_state(), hat_id(), hat_direction(CENTERED), axis_id(), axis_value(), ball_id(), ball_dx(), ball_dy()  {};
-	Type type;
-	// for BUTTON_DOWN and BUTTON_UP
-	unsigned char button_id;
-	bool button_state;
-	// for HAT_MOTION
-	enum HatDirection {
-		LEFT_UP, UP, RIGHT_UP,
-		LEFT, CENTERED, RIGHT,
-		LEFT_DOWN, DOWN, RIGHT_DOWN
-	};
-	unsigned char hat_id;
-	HatDirection hat_direction;
-	// for AXIS_MOTION
-	unsigned char axis_id;
-	short axis_value;
-	// for BALL_MOTION
-	unsigned char ball_id;
-	short ball_dx;
-	short ball_dy;
-};
-
-/// joystick class used for dealing with ps3 drumsets
-class Joystick {
-  public:
-  	enum Type {UNKNOWN, GUITARHERO, ROCKBAND};
-	/// create joystick object
-	Joystick(Joystick::Type _type = Joystick::UNKNOWN);
-	~Joystick();
-	/// Return joystick Type
-	Joystick::Type getType() const;
-	/// add an even from an SDL_JoyAxisEvent
-	void addEvent(SDL_JoyAxisEvent event);
-	/// add an even from an SDL_JoyBallEvent
-	void addEvent(SDL_JoyBallEvent event);
-	/// add an even from an SDL_JoyHatEvent
-	void addEvent(SDL_JoyHatEvent event);
-	/// add an even from an SDL_JoyButtonEvent
-	void addEvent(SDL_JoyButtonEvent event);
-	/// try to poll an event, return false if no more event is available
-	bool tryPollEvent(JoystickEvent& _event);
-	/// clear all the events
-	void clearEvents();
-  private:
-	std::deque<JoystickEvent> m_events;
-	Type m_type;
-};
-
-typedef std::map<unsigned int,Joystick> Joysticks;
-extern Joysticks joysticks;
-
-/**
- * New input management, superseed all joysticks stuffs
- */
 namespace input {
 	enum DevType { GUITAR, DRUMS };
 
@@ -100,6 +35,12 @@ namespace input {
 			void addEvent(Event _event) {
 				// only add event if the device is assigned
 				if( m_assigned ) m_events.push_back(_event);
+				if( _event.type == input::Event::PICK )
+					std::cout << "PICK event " << _event.button << std::endl;
+				if( _event.type == input::Event::PRESS )
+					std::cout << "PRESS event " << _event.button << std::endl;
+				if( _event.type == input::Event::RELEASE )
+					std::cout << "RELEASE event " << _event.button << std::endl;
 				// always keep track of button status
 				for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
 					m_pressed[i] = _event.pressed[i];
@@ -150,17 +91,26 @@ namespace input {
 		// Finally throw an exception if only wrong (or none) instrument are available
 		InputDev(input::DevType _type) {
 			using namespace input::Private;
+			if( _type == input::DRUMS )
+				std::cout << "Request aquiring DRUM" << std::endl;
+			if( _type == input::GUITAR )
+				std::cout << "Request aquiring GUITAR" << std::endl;
 			if( devices.size() == 0 ) throw std::runtime_error("No InputDev available");
 			for(InputDevs::iterator it = devices.begin() ; it != devices.end() ; ++it) {
 				if( !it->second.assigned() && it->second.type_match(_type) ) {
+					std::cout << "Found @" << it->first << std::endl;
 					m_device_id = it->first;
 					it->second.assign();
 					return;
 				}
 			}
+			std::cout << "Not Found" << std::endl;
 			throw std::runtime_error("No matching instrument available");
 		};
-		~InputDev() {input::Private::devices[m_device_id].unassign();};
+		~InputDev() {
+			std::cout << "Releasing @" << m_device_id << std::endl;
+			input::Private::devices[m_device_id].unassign();
+		};
 		bool tryPoll(Event& _e) {return input::Private::devices[m_device_id].tryPoll(_e);};
 		void addEvent(Event _e) {input::Private::devices[m_device_id].addEvent(_e);};
 		bool pressed(int _button) {return input::Private::devices[m_device_id].pressed(_button);}; // Current state
@@ -170,8 +120,6 @@ namespace input {
 
 	// Initialize all event stuffs
 	void init();
-	// clear all event stuffs
-	void clear();
 	// Returns true if event is taken, feed an InputDev by transforming SDL_Event into Event
 	bool pushEvent(SDL_Event);
 };

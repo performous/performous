@@ -39,9 +39,6 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 	}
 	static bool esc = false;
 	SDL_Event event;
-	// Clear input event first
-	// FIXME: onlyrequired for old Joystick compatibility
-	input::clear();
 	while(SDL_PollEvent(&event) == 1) {
 		// catch input event first
 		if(!input::pushEvent(event)) {
