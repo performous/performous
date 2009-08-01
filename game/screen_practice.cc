@@ -42,7 +42,7 @@ void ScreenPractice::manageEvent(SDL_Event event) {
 		}
 	}
 	input::Event input_event;
-	while( drums->tryPollEvent(input_event) ) {
+	while( drums->tryPoll(input_event) ) {
 		if(input_event.type == input::Event::PRESS) {
 			switch(input_event.button) {
 				case 0:
