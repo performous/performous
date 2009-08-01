@@ -160,3 +160,9 @@ void joysticks_init() {
 		std::cout << "  Description: " << joysticks[i].getDescription() << std::endl;
 	}
 }
+
+/**
+ * New input management, superseed all joysticks stuffs
+ */
+void input::assign(InputDev&, input::Type) {}
+bool input::pushEvent(SDL_Event) {return false;}

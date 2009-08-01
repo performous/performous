@@ -83,17 +83,37 @@ class Joystick {
 typedef std::map<unsigned int,Joystick> Joysticks;
 extern Joysticks joysticks;
 
-class InputDevEvent {
-  public:
-	InputDevEvent() {};
+/**
+ * New input management, superseed all joysticks stuffs
+ */
+namespace input {
+	enum Type {UNKNOWN, GUITAR, DRUM};
+
+	struct InputDevEvent {
+		enum Type {GREEN, RED, YELLOW, BLUE, ORANGE, KICK, PICK, WHAMMY};
+		Type type;
+		bool pressed; // for buttons
+		short value; // for axis
+	};
+
+	class InputDev {
+	  public:
+		InputDev() {};
+		bool tryPoll(InputDevEvent&) {return true;};
+		void addEvent(InputDevEvent) {};
+		bool status(InputDevEvent::Type) {return false;}; // for buttons
+		short value(InputDevEvent::Type) {return 0;}; // for axis
+	  private:
+		bool m_assigned;
+		input::Type m_type;
+	};
+
+	typedef std::map<unsigned int,InputDev> InputDevs;
+	extern InputDevs devices;
+
+	// Throw an exception if none is available
+	void assign(InputDev&, input::Type);
+	// Returns true if event is taken, feed an InputDev by transforming SDL_Event into InputDevEvent
+	bool pushEvent(SDL_Event);
 };
 
-class InputDev {
-  public:
-	InputDev() {};
-	bool tryPoll(InputDevEvent& _event) {(void)_event;return true;};
-	bool fret(unsigned int _id) {(void)_id;return false;};
-	// reserved for feeding the device with event
-	void addEvent(SDL_JoyButtonEvent _event) {(void)_event;};
-  private:
-};
