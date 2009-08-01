@@ -89,12 +89,14 @@ extern Joysticks joysticks;
 namespace input {
 	enum Type {UNKNOWN, GUITAR, DRUM};
 
-	struct InputDevEvent {
-		enum Type {GREEN, RED, YELLOW, BLUE, ORANGE, KICK, PICK, WHAMMY, TYPE_SIZE};
-		Type type;
-		bool pressed[TYPE_SIZE]; // for buttons
-		short value[TYPE_SIZE]; // for axis
+	static const std::size_t BUTTONS = 6;
 
+	struct InputDevEvent {
+		enum Type { PRESS, RELEASE, PICK };
+		Type type;
+		int button; // Translated button number for press/release events. 0 for pick down, 1 for pick up (NOTE: these are NOT pick press/release events but rather different directions)
+		bool pressed[BUTTONS]; // All events tell the button state right after the event happened
+		// More stuff later, when it is actually used
 	};
 	
 	namespace Private {
@@ -125,6 +127,7 @@ namespace input {
 		void addEvent(InputDevEvent _e) {input::Private::devices[m_device_id].addEvent(_e);};
 		bool status(InputDevEvent::Type _t) {return input::Private::devices[m_device_id].status(_t);}; // for buttons
 		short value(InputDevEvent::Type _t) {return input::Private::devices[m_device_id].value(_t);}; // for axis
+		bool pressed[BUTTONS]; // Current state
 	  private:
 		unsigned int m_device_id; // should be some kind of reference
 	};
