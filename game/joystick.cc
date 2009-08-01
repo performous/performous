@@ -6,7 +6,6 @@
 Joysticks joysticks;
 
 Joystick::Joystick(unsigned int _id): m_id(_id) {
-	m_joystick = SDL_JoystickOpen(m_id);
 	if( getName().find("Guitar Hero") != std::string::npos ) {
 		m_type = Joystick::GUITARHERO;
 	} else if( getName().find("Harmonix") != std::string::npos ) {
@@ -25,18 +24,6 @@ std::string Joystick::getName() const {
 Joystick::Type Joystick::getType() const {
 	return m_type;
 }
-std::string Joystick::getDescription() const {
-	std::string desc;
-	desc += "axes: ";
-	desc += boost::lexical_cast<std::string>(SDL_JoystickNumAxes(m_joystick));
-	desc += ", buttons: ";
-	desc += boost::lexical_cast<std::string>(SDL_JoystickNumButtons(m_joystick));
-	desc += ", balls: ";
-	desc += boost::lexical_cast<std::string>(SDL_JoystickNumBalls(m_joystick));
-	desc += ", hats: ";
-	desc += boost::lexical_cast<std::string>(SDL_JoystickNumHats(m_joystick));
-	return desc;
-};
 bool Joystick::buttonState(unsigned char _button_id) const {
 	return (SDL_JoystickGetButton(m_joystick, _button_id) != 0);
 };
@@ -149,21 +136,57 @@ void Joystick::clearEvents() {
 	m_events.clear();
 }
 
-void joysticks_init() {
+/**
+ * New input management, superseed all joysticks stuffs
+ */
+input::Private::InputDevs input::Private::devices;
+
+void input::init() {
+	// new stuffs
 	unsigned int nbjoysticks = SDL_NumJoysticks();
 	std::cout << "Detecting " << nbjoysticks << " joysticks..." << std::endl;
 
 	for (unsigned int i = 0 ; i < nbjoysticks ; i++) {
-		joysticks[i] = Joystick(i);
+		SDL_JoystickOpen(i);
+		input::Private::devices[i] = input::Private::InputDevPrivate();
 		std::cout << "Id: " << i << std::endl;
-		std::cout << "  Name: " << joysticks[i].getName() << std::endl;
-		std::cout << "  Description: " << joysticks[i].getDescription() << std::endl;
+		std::cout << "  Name: " << SDL_JoystickName(i) << std::endl;
+	}
+	// compatibility with old joystick stuffs
+	for (input::Private::InputDevs::iterator it = input::Private::devices.begin() ; it != input::Private::devices.end() ; ++it) {
+		joysticks[it->first] = Joystick(it->first);
 	}
 }
-
-/**
- * New input management, superseed all joysticks stuffs
- */
-void input::init() {}
-input::InputDev& input::assign(input::Type) {}
-bool input::pushEvent(SDL_Event) {return false;}
+void input::clear() {
+	// new stuffs
+	for (input::Private::InputDevs::iterator it = input::Private::devices.begin() ; it != input::Private::devices.end() ; ++it) {
+		it->second.clearEvents();
+	}
+	// compatibility with old joystick stuffs
+	for(Joysticks::iterator it = joysticks.begin() ; it != joysticks.end() ; ++it ) {
+		it->second.clearEvents();
+	}
+}
+bool input::pushEvent(SDL_Event _e) {
+	// new stuffs
+	// TODO
+	// compatibility with old joystick stuffs
+	switch(_e.type) {
+		case SDL_JOYAXISMOTION:
+			joysticks[_e.jaxis.which].addEvent(_e.jaxis);
+			break;
+		case SDL_JOYBALLMOTION:
+			joysticks[_e.jball.which].addEvent(_e.jball);
+			break;
+		case SDL_JOYHATMOTION:
+			joysticks[_e.jhat.which].addEvent(_e.jhat);
+			break;
+		case SDL_JOYBUTTONDOWN:
+		case SDL_JOYBUTTONUP:
+			joysticks[_e.jbutton.which].addEvent(_e.jbutton);
+			break;
+		default:
+			return false;
+	}
+	return true;
+}

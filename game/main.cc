@@ -40,46 +40,36 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 	static bool esc = false;
 	SDL_Event event;
 	while(SDL_PollEvent(&event) == 1) {
-		switch(event.type) {
-		  case SDL_QUIT:
-			sm.finished();
-			break;
-		  case SDL_VIDEORESIZE:
-			window.resize(event.resize.w, event.resize.h);
-			break;
-		  case SDL_JOYAXISMOTION:
-			joysticks[event.jaxis.which].addEvent(event.jaxis);
-			break;
-		  case SDL_JOYBALLMOTION:
-			joysticks[event.jball.which].addEvent(event.jball);
-			break;
-		  case SDL_JOYHATMOTION:
-			joysticks[event.jhat.which].addEvent(event.jhat);
-			break;
-		  case SDL_JOYBUTTONDOWN:
-		  case SDL_JOYBUTTONUP:
-			joysticks[event.jbutton.which].addEvent(event.jbutton);
-			break;
-		  case SDL_KEYUP:
-			if (event.key.keysym.sym == SDLK_ESCAPE) esc = false;
-			break;
-		  case SDL_KEYDOWN:
-			int keypressed  = event.key.keysym.sym;
-			SDLMod modifier = event.key.keysym.mod;
-			// Workaround for key repeat on escape
-			if (keypressed == SDLK_ESCAPE) {
-				if (esc) return;
-				esc = true;
-			}
-			if (keypressed == SDLK_RETURN && modifier & KMOD_ALT ) {
-				config["graphic/fullscreen"].b() = !config["graphic/fullscreen"].b();
-				continue; // Already handled here...
-			}
-			if (keypressed == SDLK_F4 && modifier & KMOD_ALT) {
+		// catch input event first
+		if(!input::pushEvent(event)) {
+			switch(event.type) {
+			  case SDL_QUIT:
 				sm.finished();
-				continue; // Already handled here...
+				break;
+			  case SDL_VIDEORESIZE:
+				window.resize(event.resize.w, event.resize.h);
+				break;
+			  case SDL_KEYUP:
+				if (event.key.keysym.sym == SDLK_ESCAPE) esc = false;
+				break;
+			  case SDL_KEYDOWN:
+				int keypressed  = event.key.keysym.sym;
+				SDLMod modifier = event.key.keysym.mod;
+				// Workaround for key repeat on escape
+				if (keypressed == SDLK_ESCAPE) {
+					if (esc) return;
+					esc = true;
+				}
+				if (keypressed == SDLK_RETURN && modifier & KMOD_ALT ) {
+					config["graphic/fullscreen"].b() = !config["graphic/fullscreen"].b();
+					continue; // Already handled here...
+				}
+				if (keypressed == SDLK_F4 && modifier & KMOD_ALT) {
+					sm.finished();
+					continue; // Already handled here...
+				}
+				break;
 			}
-			break;
 		}
 		sm.getCurrentScreen()->manageEvent(event);
 		switch(glGetError()) {
@@ -91,9 +81,7 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 			case GL_OUT_OF_MEMORY: std::cerr << "OpenGL error: invalid enum" << std::endl; break;
 		}
 	}
-	for(Joysticks::iterator it = joysticks.begin() ; it != joysticks.end() ; ++it ) {
-		it->second.clearEvents();
-	}
+	input::clear();
 	if( config["graphic/fullscreen"].b() != window.getFullscreen() )
 		window.setFullscreen(config["graphic/fullscreen"].b());
 }

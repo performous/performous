@@ -11,8 +11,6 @@
 #define PS3_DRUM_CONTROLLER_XXX    4
 #define PS3_DRUM_CONTROLLER_ORANGE 5
 
-void joysticks_init();
-
 class JoystickEvent {
   public:
 	enum Type {BUTTON_DOWN, BUTTON_UP, HAT_MOTION, AXIS_MOTION, BALL_MOTION};
@@ -51,8 +49,6 @@ class Joystick {
 	Joystick::Type getType() const;
 	/// get name of joystick
 	std::string getName() const;
-	/// get longer description of joystick
-	std::string getDescription() const;
 	/// add an even from an SDL_JoyAxisEvent
 	void addEvent(SDL_JoyAxisEvent event);
 	/// add an even from an SDL_JoyBallEvent
@@ -102,15 +98,17 @@ namespace input {
 	namespace Private {
 		class InputDevPrivate {
 		  public:
-			InputDevPrivate() : m_assigned(false) {};
+			InputDevPrivate() : m_assigned(false), m_type(input::UNKNOWN) {};
 			bool tryPoll(InputDevEvent&) {return true;};
 			void addEvent(InputDevEvent) {};
+			void clearEvents() {m_events.clear();};
 			bool status(InputDevEvent::Type) {return false;}; // for buttons
 			short value(InputDevEvent::Type) {return 0;}; // for axis
 			void assign() {m_assigned = true;};
 			void unassign() {m_assigned = false;};
 			bool assigned() {return m_assigned;};
 		  private:
+			std::deque<InputDevEvent> m_events;
 			bool m_assigned;
 			input::Type m_type;
 		};
@@ -121,6 +119,7 @@ namespace input {
 
 	class InputDev {
 	  public:
+		// Throw an exception if none is available
 		InputDev(input::Type) : m_device_id() {input::Private::devices[m_device_id].assign();};
 		~InputDev() {input::Private::devices[m_device_id].unassign();};
 		bool tryPoll(InputDevEvent& _e) {return input::Private::devices[m_device_id].tryPoll(_e);};
@@ -134,8 +133,8 @@ namespace input {
 
 	// Initialize all event stuffs
 	void init();
-	// Throw an exception if none is available
-	InputDev& assign(input::Type);
+	// clear all event stuffs
+	void clear();
 	// Returns true if event is taken, feed an InputDev by transforming SDL_Event into InputDevEvent
 	bool pushEvent(SDL_Event);
 };

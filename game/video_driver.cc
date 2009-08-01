@@ -29,12 +29,10 @@ Window::Window(unsigned int width, unsigned int height, int fs, unsigned int fs_
 	SDL_ShowCursor(SDL_DISABLE);
 	SDL_EnableUNICODE(SDL_ENABLE);
 	SDL_EnableKeyRepeat(80, 80);
-	joysticks_init();
+	input::init();
 }
 
-Window::~Window() {
-	joysticks.clear();
-}
+Window::~Window() { }
 
 void Window::blank() {
 	glClear(GL_COLOR_BUFFER_BIT);
