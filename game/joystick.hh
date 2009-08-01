@@ -74,6 +74,10 @@ namespace input {
 
 	static const std::size_t BUTTONS = 6;
 
+	typedef std::map<unsigned int,SDL_Joystick*> SDL_devices;
+	extern SDL_devices sdl_devices;
+	void init_devices();
+
 	struct InputDevEvent {
 		enum Type { PRESS, RELEASE, PICK };
 		Type type;
@@ -83,9 +87,10 @@ namespace input {
 	};
 	
 	namespace Private {
+		enum Type {UNKNOWN, GUITAR_RB, DRUM_RB, GUITAR_GH, DRUM_GH};
 		class InputDevPrivate {
 		  public:
-			InputDevPrivate(input::Type _type = input::UNKNOWN) : m_assigned(false), m_type(_type) {};
+			InputDevPrivate(input::Private::Type _type = input::Private::UNKNOWN) : m_assigned(false), m_type(_type) {};
 			bool tryPoll(InputDevEvent& _event) {
 				if( m_events.empty() ) return false;
 				_event = m_events.front();
@@ -105,12 +110,35 @@ namespace input {
 			void unassign() {m_assigned = false; clearEvents();};
 			bool assigned() {return m_assigned;};
 			bool pressed(int _button) {return m_pressed[_button];};
-			input::Type type() {return m_type;};
+			input::Private::Type type() {return m_type;};
+			bool type_match( input::Type _type) {
+				if( _type == input::UNKNOWN && m_type == input::Private::UNKNOWN ) {
+					return true;
+				} else if( _type == input::GUITAR && 
+					(m_type == input::Private::GUITAR_GH || m_type == input::Private::GUITAR_RB) ) {
+					return true;
+				} else if( _type == input::DRUM && 
+					(m_type == input::Private::DRUM_GH || m_type == input::Private::DRUM_RB) ) {
+					return true;
+				} else {
+					return false;
+				}
+			};
+			void setType(input::Type _type) {
+				if( _type == input::GUITAR ) {
+					m_type = input::Private::GUITAR_RB;
+				} else if( _type == input::DRUM ) {
+					m_type = input::Private::DRUM_RB;
+				} else {
+					m_type = input::Private::UNKNOWN;
+				}
+				init_devices();
+			};
 		  private:
 			std::deque<InputDevEvent> m_events;
 			bool m_assigned;
 			bool m_pressed[BUTTONS];
-			input::Type m_type;
+			input::Private::Type m_type;
 		};
 	
 		typedef std::map<unsigned int,InputDevPrivate> InputDevs;
@@ -122,7 +150,26 @@ namespace input {
 		// First gives a correct instrument type
 		// Then gives an unknown instrument type
 		// Finally throw an exception if only wrong (or none) instrument are available
-		InputDev(input::DevType) : m_device_id() {input::Private::devices[m_device_id].assign();};
+		InputDev(input::DevType _type) {
+			using namespace input::Private;
+			if( devices.size() == 0 ) throw std::runtime_error("No InputDev available");
+			for(InputDevs::iterator it = devices.begin() ; it != devices.end() ; ++it) {
+				if( !it->second.assigned() && it->second.type_match(_type) ) {
+					m_device_id = it->first;
+					it->second.assign();
+					return;
+				}
+			}
+			for(InputDevs::iterator it = devices.begin() ; it != devices.end() ; ++it) {
+				if( !it->second.assigned() && it->second.type_match(input::UNKNOWN) ) {
+					m_device_id = it->first;
+					it->second.setType(_type);
+					it->second.assign();
+					return;
+				}
+			}
+			throw std::runtime_error("No matching instrument available");
+		};
 		~InputDev() {input::Private::devices[m_device_id].unassign();};
 		bool tryPoll(InputDevEvent& _e) {return input::Private::devices[m_device_id].tryPoll(_e);};
 		void addEvent(InputDevEvent _e) {input::Private::devices[m_device_id].addEvent(_e);};
