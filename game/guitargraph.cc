@@ -203,8 +203,10 @@ void GuitarGraph::draw(double time) {
 	engine(time);
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
 	dimensions.screenBottom().middle(m_cx).fixedWidth(m_width);
-	glutil::PushMatrix pmb;
-	glTranslatef(0.5 * (dimensions.x1() + dimensions.x2()), dimensions.y2(), 0.0f);
+	glutil::PushMatrixMode pmm(GL_PROJECTION);
+	glTranslatef((dimensions.x1() + dimensions.x2()), 0.0f, 0.0f);
+	glutil::PushMatrixMode pmb(GL_MODELVIEW);
+	glTranslatef(0.0, dimensions.y2(), 0.0f);
 	glRotatef(85.0f, 1.0f, 0.0f, 0.0f);
 	{ float s = dimensions.w() / 5.0f; glScalef(s, s, s); }
 	// Draw the neck

@@ -90,10 +90,10 @@ void Window::resize() {
 	float h = virtH();
 	const float near = 1.5f; // This determines FOV: the value is your distance from the monitor (the unit being the width of the Performous window)
 	const float far = 100.0f; // How far away can things be seen
-	glFrustum(-0.5f, 0.5f, 0.5f * h, -0.5f * h, near, far);
 	// Set model-view matrix
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+	glFrustum(-0.5f, 0.5f, 0.5f * h, -0.5f * h, near, far);
 	glTranslatef(0.0f, 0.0f, -near);  // So that z = 0.0f is still on monitor surface
 
 }
