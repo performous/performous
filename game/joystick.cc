@@ -125,8 +125,11 @@ void input::init() {
 	for (unsigned int i = 0 ; i < nbjoysticks ; ++i) {
 		input::sdl_devices[i] = SDL_JoystickOpen(i);
 		std::string name = SDL_JoystickName(i);
-		if( name.find("Guitar Hero") != std::string::npos ) {
+		if( name.find("Guitar Hero3") != std::string::npos ) {
 			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::GUITAR_GH);
+		} else if( name.find("Guitar Hero4") != std::string::npos ) {
+			// here we can have both drumkit or guitar .... let say the drumkit
+			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::DRUM_GH);
 		} else if( name.find("Harmonix") != std::string::npos ) {
 			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::GUITAR_RB);
 		} else {
