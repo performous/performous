@@ -41,14 +41,11 @@ class JoystickEvent {
 class Joystick {
   public:
   	enum Type {UNKNOWN, GUITARHERO, ROCKBAND};
-	Joystick() {};
-	/// create joystick object with given id
-	Joystick(unsigned int _id);
+	/// create joystick object
+	Joystick(Joystick::Type _type = Joystick::UNKNOWN);
 	~Joystick();
 	/// Return joystick Type
 	Joystick::Type getType() const;
-	/// get name of joystick
-	std::string getName() const;
 	/// add an even from an SDL_JoyAxisEvent
 	void addEvent(SDL_JoyAxisEvent event);
 	/// add an even from an SDL_JoyBallEvent
@@ -61,18 +58,8 @@ class Joystick {
 	bool tryPollEvent(JoystickEvent& _event);
 	/// clear all the events
 	void clearEvents();
-	/// returns button state (true if pressed, else false)
-	bool buttonState(unsigned char _button_id)  const;
-	/// returns hi-hat state
-	JoystickEvent::HatDirection hat(unsigned char _hat_id) const;
-	/// returns axis state
-	short axis(unsigned char _axis_id) const;
-	/// returns ball state
-	std::pair<int, int> ball(int _ball_id) const;
   private:
-	SDL_Joystick * m_joystick;
 	std::deque<JoystickEvent> m_events;
-	unsigned int m_id;
 	Type m_type;
 };
 
@@ -83,7 +70,7 @@ extern Joysticks joysticks;
  * New input management, superseed all joysticks stuffs
  */
 namespace input {
-	enum Type {UNKNOWN, GUITAR, DRUM};
+	enum Type {UNKNOWN, GUITAR_RB, DRUM_RB, GUITAR_GH, DRUM_GH};
 
 	static const std::size_t BUTTONS = 6;
 
@@ -98,7 +85,7 @@ namespace input {
 	namespace Private {
 		class InputDevPrivate {
 		  public:
-			InputDevPrivate() : m_assigned(false), m_type(input::UNKNOWN) {};
+			InputDevPrivate(input::Type _type = input::UNKNOWN) : m_assigned(false), m_type(_type) {};
 			bool tryPoll(InputDevEvent&) {return true;};
 			void addEvent(InputDevEvent) {};
 			void clearEvents() {m_events.clear();};
@@ -107,6 +94,7 @@ namespace input {
 			void assign() {m_assigned = true;};
 			void unassign() {m_assigned = false;};
 			bool assigned() {return m_assigned;};
+			input::Type type() {return m_type;};
 		  private:
 			std::deque<InputDevEvent> m_events;
 			bool m_assigned;

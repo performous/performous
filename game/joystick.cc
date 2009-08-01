@@ -5,61 +5,14 @@
 
 Joysticks joysticks;
 
-Joystick::Joystick(unsigned int _id): m_id(_id) {
-	if( getName().find("Guitar Hero") != std::string::npos ) {
-		m_type = Joystick::GUITARHERO;
-	} else if( getName().find("Harmonix") != std::string::npos ) {
-		m_type = Joystick::ROCKBAND;
-	} else {
-		m_type = Joystick::UNKNOWN;
-	}
-};
+Joystick::Joystick(Joystick::Type _type): m_type(_type) { }
+
 Joystick::~Joystick() {
-	// Do it another way :/
-	//if(SDL_JoystickOpened(m_id)) SDL_JoystickClose(m_joystick);
 };
-std::string Joystick::getName() const {
-	return std::string(SDL_JoystickName(m_id));
-};
+
 Joystick::Type Joystick::getType() const {
 	return m_type;
 }
-bool Joystick::buttonState(unsigned char _button_id) const {
-	return (SDL_JoystickGetButton(m_joystick, _button_id) != 0);
-};
-JoystickEvent::HatDirection Joystick::hat(unsigned char _hat_id) const {
-	unsigned char direction = SDL_JoystickGetHat(m_joystick, _hat_id);
-	switch(direction) {
-		case SDL_HAT_LEFTUP:
-			return JoystickEvent::LEFT_UP;
-		case SDL_HAT_LEFT:
-			return JoystickEvent::LEFT;
-		case SDL_HAT_LEFTDOWN:
-			return JoystickEvent::LEFT_DOWN;
-		case SDL_HAT_UP:
-			return JoystickEvent::UP;
-		case SDL_HAT_CENTERED:
-			return JoystickEvent::CENTERED;
-		case SDL_HAT_DOWN:
-			return JoystickEvent::DOWN;
-		case SDL_HAT_RIGHTUP:
-			return JoystickEvent::RIGHT_UP;
-		case SDL_HAT_RIGHT:
-			return JoystickEvent::RIGHT;
-		case SDL_HAT_RIGHTDOWN:
-			return JoystickEvent::RIGHT_DOWN;
-	}
-	// we should not go here
-	return JoystickEvent::CENTERED;
-};
-short Joystick::axis(unsigned char _axis_id) const {
-	return SDL_JoystickGetAxis(m_joystick, _axis_id);
-};
-std::pair<int, int> Joystick::ball(int _ball_id) const {
-	int dx, dy;
-	SDL_JoystickGetBall(m_joystick, _ball_id, &dx,&dy);
-	return std::pair<int,int>(dx,dy);
-};
 
 void Joystick::addEvent(SDL_JoyAxisEvent event) {
 	JoystickEvent joy_event(JoystickEvent::AXIS_MOTION);
@@ -69,6 +22,7 @@ void Joystick::addEvent(SDL_JoyAxisEvent event) {
 
 	m_events.push_back(joy_event);
 }
+
 void Joystick::addEvent(SDL_JoyBallEvent event) {
 	JoystickEvent joy_event(JoystickEvent::BALL_MOTION);
 
@@ -78,6 +32,7 @@ void Joystick::addEvent(SDL_JoyBallEvent event) {
 
 	m_events.push_back(joy_event);
 }
+
 void Joystick::addEvent(SDL_JoyHatEvent event) {
 	JoystickEvent joy_event(JoystickEvent::HAT_MOTION);
 
@@ -117,6 +72,7 @@ void Joystick::addEvent(SDL_JoyHatEvent event) {
 
 	m_events.push_back(joy_event);
 }
+
 void Joystick::addEvent(SDL_JoyButtonEvent event) {
 	JoystickEvent joy_event((event.type == SDL_JOYBUTTONDOWN) ? JoystickEvent::BUTTON_DOWN : JoystickEvent::BUTTON_UP);
 
@@ -124,6 +80,7 @@ void Joystick::addEvent(SDL_JoyButtonEvent event) {
 	joy_event.button_state = event.state;
 
 	m_events.push_back(joy_event);
+
 }
 bool Joystick::tryPollEvent(JoystickEvent& _event) {
 	if( m_events.empty() ) return false;
@@ -132,6 +89,7 @@ bool Joystick::tryPollEvent(JoystickEvent& _event) {
 	m_events.pop_front();
 	return true;
 }
+
 void Joystick::clearEvents() {
 	m_events.clear();
 }
@@ -148,13 +106,26 @@ void input::init() {
 
 	for (unsigned int i = 0 ; i < nbjoysticks ; i++) {
 		SDL_JoystickOpen(i);
-		input::Private::devices[i] = input::Private::InputDevPrivate();
+		std::string name = SDL_JoystickName(i);
+		if( name.find("Guitar Hero") != std::string::npos ) {
+			input::Private::devices[i] = input::Private::InputDevPrivate(input::GUITAR_GH);
+		} else if( name.find("Harmonix") != std::string::npos ) {
+			input::Private::devices[i] = input::Private::InputDevPrivate(input::GUITAR_RB);
+		} else {
+			input::Private::devices[i] = input::Private::InputDevPrivate();
+		}
 		std::cout << "Id: " << i << std::endl;
-		std::cout << "  Name: " << SDL_JoystickName(i) << std::endl;
+		std::cout << "  Name: " << name << std::endl;
 	}
 	// compatibility with old joystick stuffs
 	for (input::Private::InputDevs::iterator it = input::Private::devices.begin() ; it != input::Private::devices.end() ; ++it) {
-		joysticks[it->first] = Joystick(it->first);
+		if( it->second.type() == GUITAR_GH || it->second.type() == DRUM_GH ) {
+			joysticks[it->first] = Joystick(Joystick::GUITARHERO);
+		} else if( it->second.type() == GUITAR_GH || it->second.type() == DRUM_GH ) {
+			joysticks[it->first] = Joystick(Joystick::ROCKBAND);
+		} else {
+			joysticks[it->first] = Joystick();
+		}
 	}
 }
 void input::clear() {
