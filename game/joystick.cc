@@ -130,9 +130,7 @@ void input::init() {
 }
 void input::clear() {
 	// new stuffs
-	for (input::Private::InputDevs::iterator it = input::Private::devices.begin() ; it != input::Private::devices.end() ; ++it) {
-		it->second.clearEvents();
-	}
+	// nothing to do here
 	// compatibility with old joystick stuffs
 	for(Joysticks::iterator it = joysticks.begin() ; it != joysticks.end() ; ++it ) {
 		it->second.clearEvents();
@@ -140,7 +138,30 @@ void input::clear() {
 }
 bool input::pushEvent(SDL_Event _e) {
 	// new stuffs
-	// TODO
+	int joy_id;
+	using namespace input::Private;
+	switch(_e.type) {
+		case SDL_JOYAXISMOTION:
+			joy_id = _e.jaxis.which;
+			if( !devices[joy_id].assigned() ) break;
+			// do stuffs to devices[joy_id] events (PICK)
+			break;
+		case SDL_JOYHATMOTION:
+			joy_id = _e.jhat.which;
+			if( !devices[joy_id].assigned() ) break;
+			// do stuffs to devices[joy_id] events (PICK)
+			break;
+		case SDL_JOYBUTTONDOWN:
+		case SDL_JOYBUTTONUP:
+			joy_id = _e.jbutton.which;
+			// do stuffs to devices[joy_id] states (BUTTONS)
+			if( !devices[joy_id].assigned() ) break;
+			// do stuffs to devices[joy_id] events (BUTTONS)
+			break;
+		case SDL_JOYBALLMOTION:
+		default:
+			return false;
+	}
 	// compatibility with old joystick stuffs
 	switch(_e.type) {
 		case SDL_JOYAXISMOTION:

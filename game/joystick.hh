@@ -91,7 +91,7 @@ namespace input {
 			void addEvent(InputDevEvent) {};
 			void clearEvents() {m_events.clear();};
 			void assign() {m_assigned = true;};
-			void unassign() {m_assigned = false;};
+			void unassign() {m_assigned = false; clearEvents();};
 			bool assigned() {return m_assigned;};
 			bool pressed(int _button) {return m_pressed[_button];};
 			input::Type type() {return m_type;};
