@@ -33,15 +33,13 @@ void ScreenSing::enter() {
 	m_engine.reset(new Engine(m_audio, *m_song, analyzers.begin(), analyzers.end(), m_players));
 	m_layout_singer.reset(new LayoutSinger(*m_song, m_players, theme));
 	// I know some purists would hang me for this loop
+	bool drums = false;
 	for (int num = 0; true; ++num) {
 		try {
-			m_instruments.push_back(new GuitarGraph(*m_song));
-		} catch (std::runtime_error&) { break; }
-	}
-	for (int num = 0; true; ++num) {
-		try {
-			m_instruments.push_back(new GuitarGraph(*m_song, true));
-		} catch (std::runtime_error&) { break; }
+			Instruments::iterator it = m_instruments.end();
+			if (drums && m_instruments.size() > 1) it = m_instruments.begin() + 1; // Drums go after the first guitar
+			m_instruments.insert(it, new GuitarGraph(*m_song, drums, num));
+		} catch (std::runtime_error&) { if (drums) break; drums = true; }
 	}
 	double iw = std::min(0.5, 1.0 / m_instruments.size());
 	for (Instruments::size_type i = 0, s = m_instruments.size(); i < s; ++i) {

@@ -47,7 +47,7 @@ static inline bool operator==(Chord const& a, Chord const& b) {
 class GuitarGraph {
   public:
 	/// constructor
-	GuitarGraph(Song const& song, bool drums = false);
+	GuitarGraph(Song const& song, bool drums, unsigned num);
 	/** draws GuitarGraph
 	 * @param time at which time to draw
 	 */
@@ -63,7 +63,8 @@ class GuitarGraph {
 	boost::ptr_vector<Texture> m_necks;
 	bool m_drums;
 	double m_cx, m_width;
-	std::size_t m_instrument;
+	unsigned m_track;
+	std::vector<Track const*> m_tracks;
 	void drumHit(double time, int pad);
 	void guitarPlay(double time, input::Event const& ev);
 	enum Difficulty {
