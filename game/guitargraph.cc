@@ -49,8 +49,8 @@ GuitarGraph::GuitarGraph(Song const& song, bool drums, unsigned track):
 		if (drums != (it->name == "DRUMS")) continue;
 		m_tracks.push_back(&*it);
 		if (it->name == "DRUMS") m_necks.push_back(new Texture("drumneck.svg"));
-		else if (it->name == "BASS") m_necks.push_back(new Texture("guitarneck.svg"));
-		else m_necks.push_back(new Texture("bassneck.svg"));
+		else if (it->name == "BASS") m_necks.push_back(new Texture("bassneck.svg"));
+		else m_necks.push_back(new Texture("guitarneck.svg"));
 	}
 	if (m_tracks.empty()) throw std::runtime_error("No tracks");
 	difficultyAuto();
