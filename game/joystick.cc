@@ -3,6 +3,20 @@
 
 #include <boost/lexical_cast.hpp>
 
+enum TypeSDL {UNKNOWN, GUITAR_RB, DRUM_RB, GUITAR_GH, DRUM_GH, TYPESDL_N};
+static const int SDL_BUTTONS = 6;
+
+int buttonFromSDL(TypeSDL type, unsigned sdlButton) {
+	static const int inputmap[TYPESDL_N][SDL_BUTTONS] = {
+		{ 2, 0, 1, 3, 4, 0 }, // Guitar Hero guitar
+		{ 3, 4, 1, 2, 0, 4 }, // Guitar Hero drums
+		{ 3, 0, 1, 2, 4, 0 }, // Rock Band guitar
+		{ 3, 4, 1, 2, 0, 0 }  // Rock Band drums
+	};
+	if (sdlButton > SDL_BUTTONS) return -1;
+	return inputmap[instrument][sdlButton];
+}
+
 Joysticks joysticks;
 
 Joystick::Joystick(Joystick::Type _type): m_type(_type) { }

@@ -1,7 +1,5 @@
 #include "guitargraph.hh"
 
-#include "joystick.hh"
-
 namespace {
 	struct Diff { std::string name; int basepitch; } diffv[] = {
 		{ "Supaeasy", 0x3C },
@@ -21,12 +19,21 @@ namespace {
 		float a = clamp(1.0 - t / future); // Note: we want 1.0 alpha already at zero t.
 		return std::pow(a, 0.8); // Nicer curve
 	}
-	bool fretPressed[5] = {};
-	bool fretHit[5] = {};
-	bool picked = false;
 }
 
-GuitarGraph::GuitarGraph(Song const& song): m_song(song), m_button("button.svg"), m_tap("tap.svg"), m_pickValue(0.0, 5.0), m_drums(), m_instrument(), m_level(), m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()), m_hammerReady(0.0, 2.0), m_score() {
+GuitarGraph::GuitarGraph(Song const& song, bool drums = false):
+  m_input(drums ? input::DRUMS : input::GUITAR),
+  m_song(song),
+  m_button("button.svg"),
+  m_tap("tap.svg"),
+  m_pickValue(0.0, 5.0),
+  m_drums(),
+  m_instrument(),
+  m_level(),
+  m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
+  m_hammerReady(0.0, 2.0),
+  m_score()
+{
 	std::size_t tracks = m_song.tracks.size();
 	if (tracks == 0) throw std::runtime_error("No tracks");
 	m_necks.push_back(new Texture("guitarneck.svg"));

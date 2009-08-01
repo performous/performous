@@ -70,7 +70,7 @@ extern Joysticks joysticks;
  * New input management, superseed all joysticks stuffs
  */
 namespace input {
-	enum Type {UNKNOWN, GUITAR_RB, DRUM_RB, GUITAR_GH, DRUM_GH};
+	enum DevType { GUITAR, DRUMS };
 
 	static const std::size_t BUTTONS = 6;
 
@@ -122,7 +122,7 @@ namespace input {
 		// First gives a correct instrument type
 		// Then gives an unknown instrument type
 		// Finally throw an exception if only wrong (or none) instrument are available
-		InputDev(input::Type) : m_device_id() {input::Private::devices[m_device_id].assign();};
+		InputDev(input::DevType) : m_device_id() {input::Private::devices[m_device_id].assign();};
 		~InputDev() {input::Private::devices[m_device_id].unassign();};
 		bool tryPoll(InputDevEvent& _e) {return input::Private::devices[m_device_id].tryPoll(_e);};
 		void addEvent(InputDevEvent _e) {input::Private::devices[m_device_id].addEvent(_e);};

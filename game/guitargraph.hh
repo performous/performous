@@ -4,6 +4,7 @@
 #include <boost/scoped_ptr.hpp>
 #include "animvalue.hh"
 #include "engine.hh"
+#include "joystick.hh"
 #include "surface.hh"
 #include "opengl_text.hh"
 
@@ -54,6 +55,7 @@ class GuitarGraph {
 	void draw(double time);
 	void engine(double time);
   private:
+	InputDev m_input;
 	Song const& m_song;
 	Surface m_button;
 	Surface m_tap;
