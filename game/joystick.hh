@@ -127,7 +127,26 @@ namespace input {
 		// First gives a correct instrument type
 		// Then gives an unknown instrument type
 		// Finally throw an exception if only wrong (or none) instrument are available
-		InputDev(input::Type) : m_device_id() {input::Private::devices[m_device_id].assign();};
+		InputDev(input::Type _type) {
+			using namespace input::Private;
+			if( devices.size() == 0 ) throw std::runtime_error("No InputDev available");
+			for(InputDevs::iterator it = devices.begin() ; it != devices.end() ; ++it) {
+				if( !it->second.assigned() && it->second.type() == _type ) {
+					m_device_id = it->first;
+					it->second.assign();
+					return;
+				}
+			}
+			for(InputDevs::iterator it = devices.begin() ; it != devices.end() ; ++it) {
+				if( !it->second.assigned() && it->second.type() == input::Type::UNKNOWN ) {
+					m_device_id = it->first;
+					it->second.type(_type);
+					it->second.assign();
+					return;
+				}
+			}
+			throw std::runtime_error("No matching instrument available")
+		};
 		~InputDev() {input::Private::devices[m_device_id].unassign();};
 		bool tryPoll(InputDevEvent& _e) {return input::Private::devices[m_device_id].tryPoll(_e);};
 		void addEvent(InputDevEvent _e) {input::Private::devices[m_device_id].addEvent(_e);};
