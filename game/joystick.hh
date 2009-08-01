@@ -78,7 +78,7 @@ namespace input {
 	extern SDL_devices sdl_devices;
 	void init_devices();
 
-	struct InputDevEvent {
+	struct Event {
 		enum Type { PRESS, RELEASE, PICK };
 		Type type;
 		int button; // Translated button number for press/release events. 0 for pick down, 1 for pick up (NOTE: these are NOT pick press/release events but rather different directions)
@@ -91,13 +91,13 @@ namespace input {
 		class InputDevPrivate {
 		  public:
 			InputDevPrivate(input::Private::Type _type = input::Private::UNKNOWN) : m_assigned(false), m_type(_type) {};
-			bool tryPoll(InputDevEvent& _event) {
+			bool tryPoll(Event& _event) {
 				if( m_events.empty() ) return false;
 				_event = m_events.front();
 				m_events.pop_front();
 				return true;
 			};
-			void addEvent(InputDevEvent _event) {
+			void addEvent(Event _event) {
 				// only add event if the device is assigned
 				if( m_assigned ) m_events.push_back(_event);
 				// always keep track of button status
@@ -133,7 +133,7 @@ namespace input {
 				init_devices();
 			};
 		  private:
-			std::deque<InputDevEvent> m_events;
+			std::deque<Event> m_events;
 			bool m_assigned;
 			bool m_pressed[BUTTONS];
 			input::Private::Type m_type;
@@ -161,8 +161,8 @@ namespace input {
 			throw std::runtime_error("No matching instrument available");
 		};
 		~InputDev() {input::Private::devices[m_device_id].unassign();};
-		bool tryPoll(InputDevEvent& _e) {return input::Private::devices[m_device_id].tryPoll(_e);};
-		void addEvent(InputDevEvent _e) {input::Private::devices[m_device_id].addEvent(_e);};
+		bool tryPoll(Event& _e) {return input::Private::devices[m_device_id].tryPoll(_e);};
+		void addEvent(Event _e) {input::Private::devices[m_device_id].addEvent(_e);};
 		bool pressed(int _button) {return input::Private::devices[m_device_id].pressed(_button);}; // Current state
 	  private:
 		unsigned int m_device_id; // should be some kind of reference
@@ -172,7 +172,7 @@ namespace input {
 	void init();
 	// clear all event stuffs
 	void clear();
-	// Returns true if event is taken, feed an InputDev by transforming SDL_Event into InputDevEvent
+	// Returns true if event is taken, feed an InputDev by transforming SDL_Event into Event
 	bool pushEvent(SDL_Event);
 };
 
