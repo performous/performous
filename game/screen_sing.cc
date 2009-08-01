@@ -84,7 +84,6 @@ void ScreenSing::activateNextScreen()
 }
 
 void ScreenSing::manageEvent(SDL_Event event) {
-	if (m_guitarGraph) m_guitarGraph->inputProcess();
 	if (event.type == SDL_KEYDOWN) {
 		double time = m_audio.getPosition();
 		Song::Status status = m_song->status(time);

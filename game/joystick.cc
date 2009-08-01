@@ -4,7 +4,7 @@
 #include <boost/lexical_cast.hpp>
 
 enum TypeSDL {UNKNOWN, GUITAR_RB, DRUM_RB, GUITAR_GH, DRUM_GH, TYPESDL_N};
-static const int SDL_BUTTONS = 6;
+static const unsigned SDL_BUTTONS = 6;
 
 int buttonFromSDL(TypeSDL type, unsigned sdlButton) {
 	static const int inputmap[TYPESDL_N][SDL_BUTTONS] = {
@@ -14,8 +14,39 @@ int buttonFromSDL(TypeSDL type, unsigned sdlButton) {
 		{ 3, 4, 1, 2, 0, 0 }  // Rock Band drums
 	};
 	if (sdlButton > SDL_BUTTONS) return -1;
-	return inputmap[instrument][sdlButton];
+	return inputmap[type][sdlButton];
 }
+
+
+/*
+
+As reference:
+
+void GuitarGraph::inputProcess() {
+	for (Joysticks::iterator it = joysticks.begin(); it != joysticks.end(); ++it) {
+		for (JoystickEvent ev; it->second.tryPollEvent(ev); ) {
+			// RockBand pick event
+			if (ev.type == JoystickEvent::HAT_MOTION && ev.hat_direction != JoystickEvent::CENTERED) picked = true;
+			// GuitarHero pick event
+			if (ev.type == JoystickEvent::AXIS_MOTION && ev.axis_id == 5 && ev.axis_value != 0) picked = true;
+			if (ev.type != JoystickEvent::BUTTON_DOWN && ev.type != JoystickEvent::BUTTON_UP) continue;
+			unsigned b = ev.button_id;
+			if (b >= 6) continue;
+			static const int inputmap[][6] = {
+				{ 2, 0, 1, 3, 4, 0 }, // Guitar Hero guitar
+				{ 3, 4, 1, 2, 0, 4 }, // Guitar Hero drums
+				{ 3, 0, 1, 2, 4, 0 }, // Rock Band guitar
+				{ 3, 4, 1, 2, 0, 0 }  // Rock Band drums
+			};
+			int instrument = 2 * (it->second.getType() == Joystick::ROCKBAND) + m_drums;
+			int button = inputmap[instrument][b];
+			fretPressed[button] = (ev.type == JoystickEvent::BUTTON_DOWN);
+			if (fretPressed[button]) fretHit[button] = true;
+		}
+	}
+}
+
+*/
 
 Joysticks joysticks;
 

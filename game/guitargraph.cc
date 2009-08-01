@@ -21,13 +21,13 @@ namespace {
 	}
 }
 
-GuitarGraph::GuitarGraph(Song const& song, bool drums = false):
+GuitarGraph::GuitarGraph(Song const& song, bool drums):
   m_input(drums ? input::DRUMS : input::GUITAR),
   m_song(song),
   m_button("button.svg"),
   m_tap("tap.svg"),
   m_pickValue(0.0, 5.0),
-  m_drums(),
+  m_drums(drums),
   m_instrument(),
   m_level(),
   m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
@@ -42,91 +42,66 @@ GuitarGraph::GuitarGraph(Song const& song, bool drums = false):
 	difficultyAuto();
 }
 
-void GuitarGraph::inputProcess() {
-	for (Joysticks::iterator it = joysticks.begin(); it != joysticks.end(); ++it) {
-		for (JoystickEvent ev; it->second.tryPollEvent(ev); ) {
-			// RockBand pick event
-			if (ev.type == JoystickEvent::HAT_MOTION && ev.hat_direction != JoystickEvent::CENTERED) picked = true;
-			// GuitarHero pick event
-			if (ev.type == JoystickEvent::AXIS_MOTION && ev.axis_id == 5 && ev.axis_value != 0) picked = true;
-			if (ev.type != JoystickEvent::BUTTON_DOWN && ev.type != JoystickEvent::BUTTON_UP) continue;
-			unsigned b = ev.button_id;
-			if (b >= 6) continue;
-			static const int inputmap[][6] = {
-				{ 2, 0, 1, 3, 4, 0 }, // Guitar Hero guitar
-				{ 3, 4, 1, 2, 0, 4 }, // Guitar Hero drums
-				{ 3, 0, 1, 2, 4, 0 }, // Rock Band guitar
-				{ 3, 4, 1, 2, 0, 0 }  // Rock Band drums
-			};
-			int instrument = 2 * (it->second.getType() == Joystick::ROCKBAND) + m_drums;
-			int button = inputmap[instrument][b];
-			fretPressed[button] = (ev.type == JoystickEvent::BUTTON_DOWN);
-			if (fretPressed[button]) fretHit[button] = true;
+void GuitarGraph::engine(double time) {
+	for (input::Event ev; m_input.tryPoll(ev);) {
+		if (m_drums) {
+			if (ev.type == input::Event::PRESS) drumHit(time, ev.button);
+		} else {
+			if (time < -0.5) {
+				if (ev.type == input::Event::PICK) {
+					if (ev.pressed[4]) {
+						++m_instrument;
+						if (!difficulty(m_level)) difficultyAuto();
+					}
+					if (ev.pressed[0]) difficulty(DIFFICULTY_SUPAEASY);
+					else if (ev.pressed[1]) difficulty(DIFFICULTY_EASY);
+					else if (ev.pressed[2]) difficulty(DIFFICULTY_MEDIUM);
+					else if (ev.pressed[3]) difficulty(DIFFICULTY_AMAZING);
+				}
+				continue;
+			}
 		}
+		if (m_score < 0) m_score = 0;
 	}
 }
 
-void GuitarGraph::engine(double time) {
-	if (m_drums && fretHit[0]) m_pickValue.setValue(1.0);
-	if (time < -0.5) {
-		if (picked) {
-			if (fretPressed[4]) {
-				++m_instrument;
-				if (!difficulty(m_level)) difficultyAuto();
-			}
-			if (fretPressed[0]) difficulty(DIFFICULTY_SUPAEASY);
-			else if (fretPressed[1]) difficulty(DIFFICULTY_EASY);
-			else if (fretPressed[2]) difficulty(DIFFICULTY_MEDIUM);
-			else if (fretPressed[3]) difficulty(DIFFICULTY_AMAZING);
-		}
-		return;
-	}
+void GuitarGraph::drumHit(double time, int fret) {
+	if (fret == 0) m_pickValue.setValue(1.0);
 	int basepitch = diffv[m_level].basepitch;
-	if (m_drums) {
-		for (int fret = 0; fret < 5; ++fret) {
-			if (!fretHit[fret]) continue;
-			NoteMap const& nm = m_song.tracks[m_instrument].nm;
-			NoteMap::const_iterator it = nm.find(basepitch + fret);
-			if (it == nm.end()) continue;
-			Durations const& dur = it->second;
-			Durations::const_iterator it2 = dur.begin(), it2tmp, it2end = dur.end();
-			double tolerance = 0.2;
-			// Find the first suitable note within the tolerance
-			while (it2 != it2end && (it2->begin < time - tolerance || m_notes[&*it2] != 0)) ++it2;
-			// If we are already past the accepted region, skip further processing
-			if (it2 == it2end || it2->begin > time + tolerance) { m_score -= 100; continue; }
-			// Find the note with the smallest error
-			it2tmp = it2;
-			Duration const* d = NULL;
-			do {
-				it2 = it2tmp;
-				if (m_notes[&*it2] != 0) continue; // Notes already played are ignored
-				d = &*it2;
-				tolerance = std::abs(it2->begin - time);
-			} while (++it2tmp != it2end && std::abs(it2tmp->begin - time) < tolerance);
-			if (!d) throw std::logic_error("d is NULL in GuitarGraph::engine");
-			m_score += 15;
-			if (tolerance < 0.1) m_score += 15;
-			if (tolerance < 0.05) m_score += 15;
-			if (tolerance < 0.03) m_score += 5;
-			m_notes[d] = 2;
-		}
-		if (m_score < 0) m_score = 0;
-		return;
-	}
-	bool const* frets = NULL;
+	NoteMap const& nm = m_song.tracks[m_instrument].nm;
+	NoteMap::const_iterator it = nm.find(basepitch + fret);
+	if (it == nm.end()) return;
+	Durations const& dur = it->second;
+	Durations::const_iterator it2 = dur.begin(), it2tmp, it2end = dur.end();
+	double tolerance = 0.2;
+	// Find the first suitable note within the tolerance
+	while (it2 != it2end && (it2->begin < time - tolerance || m_notes[&*it2] != 0)) ++it2;
+	// If we are already past the accepted region, skip further processing
+	if (it2 == it2end || it2->begin > time + tolerance) { m_score -= 100; return; }
+	// Find the note with the smallest error
+	it2tmp = it2;
+	Duration const* d = NULL;
+	do {
+		it2 = it2tmp;
+		if (m_notes[&*it2] != 0) return; // Notes already played are ignored
+		d = &*it2;
+		tolerance = std::abs(it2->begin - time);
+	} while (++it2tmp != it2end && std::abs(it2tmp->begin - time) < tolerance);
+	if (!d) throw std::logic_error("d is NULL in GuitarGraph::engine");
+	m_score += 15;
+	if (tolerance < 0.1) m_score += 15;
+	if (tolerance < 0.05) m_score += 15;
+	if (tolerance < 0.03) m_score += 5;
+	m_notes[d] = 2;
+}
+
+void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
+	bool picked = (ev.type == input::Event::PICK);
+	bool const* frets = ev.pressed; // Kinda b0rked, FIXME
 	if (picked) {
-		frets = fretPressed;
 		m_pickValue.setValue(1.0);
-		/* FIXME: release holds
-		for (int fret = 0; fret < 5; ++fret) {
-			if (m_chordIt == m_chords.end() || m_chordIt->status == 0) continue;
-			NoteStatus::iterator it = m_notes.find(m_chordif (it->second == 1) it->second = 2;
-		}*/
 	} else {
 		if (m_hammerReady.get() < 0.5) return; // Hammering not possible at the moment
-		for (int fret = 0; fret < 5; ++fret) if (fretHit[fret]) frets = fretHit;
-		if (!frets) return; // No tap found
 	}
 	m_hammerReady.setTarget(0.0);
 	// Find any suitable note within the tolerance
@@ -218,9 +193,6 @@ void GuitarGraph::draw(double time) {
 		m_text.draw(boost::lexical_cast<std::string>(m_score));
 	}
 	engine(time);
-	// TODO: Clear these in input class instead
-	picked = false;
-	std::fill(fretHit, fretHit + 5, false);
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
 	dimensions.screenBottom().fixedWidth(0.5f);
 	glutil::PushMatrix pmb;
@@ -298,7 +270,7 @@ void GuitarGraph::draw(double time) {
 			x -= 0.5f;
 		}
 		glutil::Color c = color(fret);
-		if (fretPressed[fret]) {
+		if (m_input.pressed(fret)) {
 			c.r = 1.0f;
 			c.g = 1.0f;
 			c.b = 1.0f;

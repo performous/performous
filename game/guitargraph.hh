@@ -47,15 +47,14 @@ static inline bool operator==(Chord const& a, Chord const& b) {
 class GuitarGraph {
   public:
 	/// constructor
-	GuitarGraph(Song const& song);
-	void inputProcess();
+	GuitarGraph(Song const& song, bool drums = false);
 	/** draws GuitarGraph
 	 * @param time at which time to draw
 	 */
 	void draw(double time);
 	void engine(double time);
   private:
-	InputDev m_input;
+	input::InputDev m_input;
 	Song const& m_song;
 	Surface m_button;
 	Surface m_tap;
@@ -63,6 +62,8 @@ class GuitarGraph {
 	boost::ptr_vector<Texture> m_necks;
 	bool m_drums;
 	std::size_t m_instrument;
+	void drumHit(double time, int pad);
+	void guitarPlay(double time, input::Event const& ev);
 	enum Difficulty {
 		DIFFICULTY_SUPAEASY,
 		DIFFICULTY_EASY,
