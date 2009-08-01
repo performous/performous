@@ -86,9 +86,20 @@ namespace input {
 		class InputDevPrivate {
 		  public:
 			InputDevPrivate(input::Type _type = input::UNKNOWN) : m_assigned(false), m_type(_type) {};
-			bool tryPoll(InputDevEvent&) {return true;};
-			// this will modify the m_pressed member
-			void addEvent(InputDevEvent) {};
+			bool tryPoll(InputDevEvent& _event) {
+				if( m_events.empty() ) return false;
+				_event = m_events.front();
+				m_events.pop_front();
+				return true;
+			};
+			void addEvent(InputDevEvent _event) {
+				// only add event if the device is assigned
+				if( m_assigned ) m_events.push_back(_event);
+				// always keep track of button status
+				for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
+					m_pressed[i] = _event.pressed[i];
+				}
+			};
 			void clearEvents() {m_events.clear();};
 			void assign() {m_assigned = true;};
 			void unassign() {m_assigned = false; clearEvents();};

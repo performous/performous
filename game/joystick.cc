@@ -104,8 +104,8 @@ void input::init() {
 	unsigned int nbjoysticks = SDL_NumJoysticks();
 	std::cout << "Detecting " << nbjoysticks << " joysticks..." << std::endl;
 
-	for (unsigned int i = 0 ; i < nbjoysticks ; i++) {
-		SDL_JoystickOpen(i);
+	for (unsigned int i = 0 ; i < nbjoysticks ; ++i) {
+		SDL_Joystick * joystick = SDL_JoystickOpen(i);
 		std::string name = SDL_JoystickName(i);
 		if( name.find("Guitar Hero") != std::string::npos ) {
 			input::Private::devices[i] = input::Private::InputDevPrivate(input::GUITAR_GH);
@@ -116,6 +116,17 @@ void input::init() {
 		}
 		std::cout << "Id: " << i << std::endl;
 		std::cout << "  Name: " << name << std::endl;
+		// Here we should send an event to have correct state buttons
+		unsigned int num_buttons = SDL_JoystickNumButtons(joystick);
+		for( unsigned int j = 0 ; j < num_buttons ; ++j ) {
+			SDL_Event event;
+			event.type = SDL_JOYBUTTONDOWN;
+			event.jbutton.type = SDL_JOYBUTTONDOWN;
+			event.jbutton.which = i;
+			event.jbutton.button = j;
+			event.jbutton.state = SDL_PRESSED;
+			input::pushEvent(event);
+		}
 	}
 	// compatibility with old joystick stuffs
 	for (input::Private::InputDevs::iterator it = input::Private::devices.begin() ; it != input::Private::devices.end() ; ++it) {
@@ -143,19 +154,16 @@ bool input::pushEvent(SDL_Event _e) {
 	switch(_e.type) {
 		case SDL_JOYAXISMOTION:
 			joy_id = _e.jaxis.which;
-			if( !devices[joy_id].assigned() ) break;
 			// do stuffs to devices[joy_id] events (PICK)
 			break;
 		case SDL_JOYHATMOTION:
 			joy_id = _e.jhat.which;
-			if( !devices[joy_id].assigned() ) break;
 			// do stuffs to devices[joy_id] events (PICK)
 			break;
 		case SDL_JOYBUTTONDOWN:
 		case SDL_JOYBUTTONUP:
 			joy_id = _e.jbutton.which;
 			// do stuffs to devices[joy_id] states (BUTTONS)
-			if( !devices[joy_id].assigned() ) break;
 			// do stuffs to devices[joy_id] events (BUTTONS)
 			break;
 		case SDL_JOYBALLMOTION:
