@@ -68,3 +68,22 @@ Ex: A5- => SDL axis 4 with negative value
  BEND:                    A3+
  PICK DOWN:               A6+
  PICK UP:                 A6-
+ 
+
+Performous InputDev button numbers
+----------------------------------
+
+drums:
+0 = kick
+1 = red
+2 = yellow
+3 = blue
+4 = green (also orange of GHWT drums)
+
+guitar:
+0 = green
+1 = red
+2 = yellow
+3 = blue
+4 = orange
+
