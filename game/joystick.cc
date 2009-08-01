@@ -144,8 +144,10 @@ void input::init() {
 		} else if( name.find("Guitar Hero4") != std::string::npos ) {
 			// here we can have both drumkit or guitar .... let say the drumkit
 			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::DRUM_GH);
-		} else if( name.find("Harmonix") != std::string::npos ) {
+		} else if( name.find("Harmonix Guitar") != std::string::npos ) {
 			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::GUITAR_RB);
+		} else if( name.find("Harmonix Drum Kit") != std::string::npos ) {
+			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::DRUM_RB);
 		} else {
 			input::Private::devices[i] = input::Private::InputDevPrivate();
 		}
