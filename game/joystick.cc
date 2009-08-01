@@ -164,5 +164,5 @@ void joysticks_init() {
 /**
  * New input management, superseed all joysticks stuffs
  */
-void input::assign(InputDev&, input::Type) {}
+input::InputDev& input::assign(input::Type) {}
 bool input::pushEvent(SDL_Event) {return false;}

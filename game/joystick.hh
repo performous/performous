@@ -95,24 +95,37 @@ namespace input {
 		bool pressed; // for buttons
 		short value; // for axis
 	};
+	
+	namespace Private {
+		class InputDevPrivate {
+		  public:
+			InputDevPrivate() {};
+			bool tryPoll(InputDevEvent&) {return true;};
+			void addEvent(InputDevEvent) {};
+			bool status(InputDevEvent::Type) {return false;}; // for buttons
+			short value(InputDevEvent::Type) {return 0;}; // for axis
+		  private:
+			bool m_assigned;
+			input::Type m_type;
+		};
+	
+		typedef std::map<unsigned int,InputDevPrivate> InputDevs;
+		extern InputDevs devices;
+	}
 
 	class InputDev {
 	  public:
-		InputDev() {};
-		bool tryPoll(InputDevEvent&) {return true;};
-		void addEvent(InputDevEvent) {};
-		bool status(InputDevEvent::Type) {return false;}; // for buttons
-		short value(InputDevEvent::Type) {return 0;}; // for axis
+		InputDev(input::Private::InputDevPrivate& _device):m_device(_device) {};
+		bool tryPoll(InputDevEvent& _e) {return m_device.tryPoll(_e);};
+		void addEvent(InputDevEvent _e) {m_device.addEvent(_e);};
+		bool status(InputDevEvent::Type _t) {return m_device.status(_t);}; // for buttons
+		short value(InputDevEvent::Type _t) {return m_device.value(_t);}; // for axis
 	  private:
-		bool m_assigned;
-		input::Type m_type;
+		input::Private::InputDevPrivate& m_device;
 	};
 
-	typedef std::map<unsigned int,InputDev> InputDevs;
-	extern InputDevs devices;
-
 	// Throw an exception if none is available
-	void assign(InputDev&, input::Type);
+	InputDev& assign(input::Type);
 	// Returns true if event is taken, feed an InputDev by transforming SDL_Event into InputDevEvent
 	bool pushEvent(SDL_Event);
 };
