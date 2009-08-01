@@ -151,22 +151,23 @@ void mainLoop() {
 		sm.activateScreen("Intro");
 		// Main loop
 		boost::xtime time = now();
-		unsigned nb_frames = 0;
+		unsigned frames = 0;
 		while (!sm.isFinished()) {
 			checkEvents_SDL(sm, window);
 			window.blank();
 			sm.getCurrentScreen()->draw();
 			window.swap();
-			++nb_frames;
 			if (config["graphic/fps"].b()) {
+				++frames;
 				if (now() - time > 1.0) {
-					std::cout << nb_frames << " FPS" << std::endl;
+					std::cout << frames << " FPS" << std::endl;
 					time += 1.0;
-					nb_frames = 0;
+					frames = 0;
 				}
 			} else {
 				boost::thread::sleep(time + 0.01); // Max 100 FPS
 				time = now();
+				frames = 0;
 			}
 		}
 	} catch (std::exception& e) {
