@@ -12,7 +12,7 @@ int buttonFromSDL(input::Private::Type _type, unsigned int _sdl_button) {
 		{ 3, 0, 1, 2, 4, 0 }, // Rock Band guitar
 		{ 3, 4, 1, 2, 0, 0 }  // Rock Band drums
 	};
-	if( _sdl_button > 6 ) return -1;
+	if( _sdl_button >= SDL_BUTTONS ) return -1;
 	switch(_type) {
 		case input::Private::GUITAR_GH:
 			return inputmap[0][_sdl_button];
