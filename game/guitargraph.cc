@@ -249,12 +249,13 @@ void GuitarGraph::draw(double time) {
 				drawBar(tBeg, 0.01f);
 				continue;
 			}
-			{
+			if (tEnd > tBeg) {
 				glutil::Begin block(GL_TRIANGLE_STRIP);
-				c.a = time2a(tEnd); glColor4fv(c);
-				glVertex2f(x - wLine, time2y(tEnd));
-				glVertex2f(x + wLine, time2y(tEnd));
-				c.a = time2a(tBeg); glColor4fv(c);
+				for (float t = tEnd; t > tBeg; t -= 0.1f) {
+					c.a = time2a(t); glColor4fv(c);
+					glVertex2f(x - wLine, time2y(t));
+					glVertex2f(x + wLine, time2y(t));
+				}
 				glVertex2f(x - wLine, time2y(tBeg));
 				glVertex2f(x + wLine, time2y(tBeg));
 			}
@@ -279,15 +280,14 @@ void GuitarGraph::draw(double time) {
 			if (fret == 0) continue;
 			x -= 0.5f;
 		}
-		glutil::Color c = color(fret);
-		if (m_input.pressed(fret)) {
-			c.r = 1.0f;
-			c.g = 1.0f;
-			c.b = 1.0f;
-		}
-		glColor4fv(c);
+		glColor4fv(color(fret));
 		m_button.dimensions.center(time2y(0.0)).middle(x);
 		m_button.draw();
+		if (m_input.pressed(fret)) {
+			glColor3f(1.0f, 1.0f, 1.0f);
+			m_tap.dimensions = m_button.dimensions;
+			m_tap.draw();
+		}
 	}
 	glColor3f(1.0f, 1.0f, 1.0f);
 }
