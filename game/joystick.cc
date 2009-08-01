@@ -67,11 +67,19 @@ void input::init_devices() {
 		unsigned int num_buttons = SDL_JoystickNumButtons(input::sdl_devices[id]);
 		for( unsigned int i = 0 ; i < num_buttons ; ++i ) {
 			SDL_Event event;
-			event.type = SDL_JOYBUTTONDOWN;
-			event.jbutton.type = SDL_JOYBUTTONDOWN;
+			int state = SDL_JoystickGetButton(input::sdl_devices[id], i);
+			if( state == 0 ) {
+				event.type = SDL_JOYBUTTONDOWN;
+				event.jbutton.type = SDL_JOYBUTTONDOWN;
+				event.jbutton.state = SDL_PRESSED;
+			} else {
+				event.type = SDL_JOYBUTTONUP;
+				event.jbutton.type = SDL_JOYBUTTONUP;
+				event.jbutton.state = SDL_RELEASED;
+			}
+
 			event.jbutton.which = id;
 			event.jbutton.button = i;
-			event.jbutton.state = SDL_PRESSED;
 			input::pushEvent(event);
 		}
 	}
