@@ -22,10 +22,11 @@ namespace input {
 	};
 	
 	namespace Private {
-		enum Type {UNKNOWN, GUITAR_RB, DRUM_RB, GUITAR_GH, DRUM_GH};
+		enum Type {GUITAR_RB, DRUMS_RB, GUITAR_GH, DRUMS_GH};
 		class InputDevPrivate {
 		  public:
-			InputDevPrivate(input::Private::Type _type = input::Private::UNKNOWN) : m_assigned(false), m_type(_type) {};
+			InputDevPrivate() : m_assigned(false), m_type(input::Private::DRUMS_GH) {};
+			InputDevPrivate(input::Private::Type _type) : m_assigned(false), m_type(_type) {};
 			bool tryPoll(Event& _event) {
 				if( m_events.empty() ) return false;
 				_event = m_events.front();
@@ -57,21 +58,11 @@ namespace input {
 					(m_type == input::Private::GUITAR_GH || m_type == input::Private::GUITAR_RB) ) {
 					return true;
 				} else if( _type == input::DRUMS &&
-					(m_type == input::Private::DRUM_GH || m_type == input::Private::DRUM_RB) ) {
+					(m_type == input::Private::DRUMS_GH || m_type == input::Private::DRUMS_RB) ) {
 					return true;
 				} else {
 					return false;
 				}
-			};
-			void setType(input::DevType _type) {
-				if( _type == input::GUITAR ) {
-					m_type = input::Private::GUITAR_RB;
-				} else if( _type == input::DRUMS ) {
-					m_type = input::Private::DRUM_RB;
-				} else {
-					m_type = input::Private::UNKNOWN;
-				}
-				init_devices();
 			};
 		  private:
 			std::deque<Event> m_events;
@@ -108,12 +99,13 @@ namespace input {
 			throw std::runtime_error("No matching instrument available");
 		};
 		~InputDev() {
-			std::cout << "Releasing @" << m_device_id << std::endl;
-			input::Private::devices[m_device_id].unassign();
+			using namespace input::Private;
+			// we assume find will success
+			devices.find(m_device_id)->second.unassign();
 		};
-		bool tryPoll(Event& _e) {return input::Private::devices[m_device_id].tryPoll(_e);};
-		void addEvent(Event _e) {input::Private::devices[m_device_id].addEvent(_e);};
-		bool pressed(int _button) {return input::Private::devices[m_device_id].pressed(_button);}; // Current state
+		bool tryPoll(Event& _e) {return input::Private::devices.find(m_device_id)->second.tryPoll(_e);};
+		void addEvent(Event _e) {input::Private::devices.find(m_device_id)->second.addEvent(_e);};
+		bool pressed(int _button) {return input::Private::devices.find(m_device_id)->second.pressed(_button);}; // Current state
 	  private:
 		unsigned int m_device_id; // should be some kind of reference
 	};
