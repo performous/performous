@@ -90,20 +90,24 @@ namespace input {
 	enum Type {UNKNOWN, GUITAR, DRUM};
 
 	struct InputDevEvent {
-		enum Type {GREEN, RED, YELLOW, BLUE, ORANGE, KICK, PICK, WHAMMY};
+		enum Type {GREEN, RED, YELLOW, BLUE, ORANGE, KICK, PICK, WHAMMY, TYPE_SIZE};
 		Type type;
-		bool pressed; // for buttons
-		short value; // for axis
+		bool pressed[TYPE_SIZE]; // for buttons
+		short value[TYPE_SIZE]; // for axis
+
 	};
 	
 	namespace Private {
 		class InputDevPrivate {
 		  public:
-			InputDevPrivate() {};
+			InputDevPrivate() : m_assigned(false) {};
 			bool tryPoll(InputDevEvent&) {return true;};
 			void addEvent(InputDevEvent) {};
 			bool status(InputDevEvent::Type) {return false;}; // for buttons
 			short value(InputDevEvent::Type) {return 0;}; // for axis
+			void assign() {m_assigned = true;};
+			void unassign() {m_assigned = false;};
+			bool assigned() {return m_assigned;};
 		  private:
 			bool m_assigned;
 			input::Type m_type;
@@ -115,15 +119,18 @@ namespace input {
 
 	class InputDev {
 	  public:
-		InputDev(input::Private::InputDevPrivate& _device):m_device(_device) {};
-		bool tryPoll(InputDevEvent& _e) {return m_device.tryPoll(_e);};
-		void addEvent(InputDevEvent _e) {m_device.addEvent(_e);};
-		bool status(InputDevEvent::Type _t) {return m_device.status(_t);}; // for buttons
-		short value(InputDevEvent::Type _t) {return m_device.value(_t);}; // for axis
+		InputDev(input::Type) : m_device_id() {input::Private::devices[m_device_id].assign();};
+		~InputDev() {input::Private::devices[m_device_id].unassign();};
+		bool tryPoll(InputDevEvent& _e) {return input::Private::devices[m_device_id].tryPoll(_e);};
+		void addEvent(InputDevEvent _e) {input::Private::devices[m_device_id].addEvent(_e);};
+		bool status(InputDevEvent::Type _t) {return input::Private::devices[m_device_id].status(_t);}; // for buttons
+		short value(InputDevEvent::Type _t) {return input::Private::devices[m_device_id].value(_t);}; // for axis
 	  private:
-		input::Private::InputDevPrivate& m_device;
+		unsigned int m_device_id; // should be some kind of reference
 	};
 
+	// Initialize all event stuffs
+	void init();
 	// Throw an exception if none is available
 	InputDev& assign(input::Type);
 	// Returns true if event is taken, feed an InputDev by transforming SDL_Event into InputDevEvent
