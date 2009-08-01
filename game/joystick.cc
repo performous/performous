@@ -126,9 +126,9 @@ void input::init() {
 		input::sdl_devices[i] = SDL_JoystickOpen(i);
 		std::string name = SDL_JoystickName(i);
 		if( name.find("Guitar Hero") != std::string::npos ) {
-			input::Private::devices[i] = input::Private::InputDevPrivate(input::GUITAR_GH);
+			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::GUITAR_GH);
 		} else if( name.find("Harmonix") != std::string::npos ) {
-			input::Private::devices[i] = input::Private::InputDevPrivate(input::GUITAR_RB);
+			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::GUITAR_RB);
 		} else {
 			input::Private::devices[i] = input::Private::InputDevPrivate();
 		}
@@ -139,9 +139,9 @@ void input::init() {
 	init_devices();
 	// compatibility with old joystick stuffs
 	for (input::Private::InputDevs::iterator it = input::Private::devices.begin() ; it != input::Private::devices.end() ; ++it) {
-		if( it->second.type() == GUITAR_GH || it->second.type() == DRUM_GH ) {
+		if( it->second.type() == Private::GUITAR_GH || it->second.type() == Private::DRUM_GH ) {
 			joysticks[it->first] = Joystick(Joystick::GUITARHERO);
-		} else if( it->second.type() == GUITAR_GH || it->second.type() == DRUM_GH ) {
+		} else if( it->second.type() == Private::GUITAR_GH || it->second.type() == Private::DRUM_GH ) {
 			joysticks[it->first] = Joystick(Joystick::ROCKBAND);
 		} else {
 			joysticks[it->first] = Joystick();
