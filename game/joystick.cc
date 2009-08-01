@@ -104,14 +104,38 @@ void input::init() {
 bool input::pushEvent(SDL_Event _e) {
 	int joy_id;
 	using namespace input::Private;
+
+	Event event;
 	switch(_e.type) {
 		case SDL_JOYAXISMOTION:
 			joy_id = _e.jaxis.which;
-			// do stuffs to devices[joy_id] events (PICK)
+
+			event.type = input::Event::PICK;
+			for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
+				event.pressed[i] = devices[joy_id].pressed(i);
+			}
+			if(_e.jaxis.value > 0 ) { // down
+				event.button = 0;
+				devices[joy_id].addEvent(event);
+			} else if(_e.jaxis.value < 0 ) { // up
+				event.button = 1;
+				devices[joy_id].addEvent(event);
+			}
 			break;
 		case SDL_JOYHATMOTION:
 			joy_id = _e.jhat.which;
-			// do stuffs to devices[joy_id] events (PICK)
+
+			event.type = input::Event::PICK;
+			for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
+				event.pressed[i] = devices[joy_id].pressed(i);
+			}
+			if(_e.jhat.value == SDL_HAT_DOWN ) {
+				event.button = 0;
+				devices[joy_id].addEvent(event);
+			} else if(_e.jhat.value == SDL_HAT_UP ) {
+				event.button = 1;
+				devices[joy_id].addEvent(event);
+			}
 			break;
 		case SDL_JOYBUTTONDOWN:
 		case SDL_JOYBUTTONUP:

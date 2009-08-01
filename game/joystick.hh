@@ -35,6 +35,12 @@ namespace input {
 			void addEvent(Event _event) {
 				// only add event if the device is assigned
 				if( m_assigned ) m_events.push_back(_event);
+				if( _event.type == input::Event::PICK )
+					std::cout << "PICK event " << _event.button << std::endl;
+				if( _event.type == input::Event::PRESS )
+					std::cout << "PRESS event " << _event.button << std::endl;
+				if( _event.type == input::Event::RELEASE )
+					std::cout << "RELEASE event " << _event.button << std::endl;
 				// always keep track of button status
 				for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
 					m_pressed[i] = _event.pressed[i];
