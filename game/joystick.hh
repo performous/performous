@@ -89,15 +89,15 @@ namespace input {
 			bool tryPoll(InputDevEvent&) {return true;};
 			void addEvent(InputDevEvent) {};
 			void clearEvents() {m_events.clear();};
-			bool status(InputDevEvent::Type) {return false;}; // for buttons
-			short value(InputDevEvent::Type) {return 0;}; // for axis
 			void assign() {m_assigned = true;};
 			void unassign() {m_assigned = false;};
 			bool assigned() {return m_assigned;};
+			bool pressed(int _button) {return m_pressed[_button];};
 			input::Type type() {return m_type;};
 		  private:
 			std::deque<InputDevEvent> m_events;
 			bool m_assigned;
+			bool m_pressed[BUTTONS];
 			input::Type m_type;
 		};
 	
@@ -107,14 +107,14 @@ namespace input {
 
 	class InputDev {
 	  public:
-		// Throw an exception if none is available
+		// First gives a correct instrument type
+		// Then gives an unknown instrument type
+		// Finally throw an exception if only wrong (or none) instrument are available
 		InputDev(input::Type) : m_device_id() {input::Private::devices[m_device_id].assign();};
 		~InputDev() {input::Private::devices[m_device_id].unassign();};
 		bool tryPoll(InputDevEvent& _e) {return input::Private::devices[m_device_id].tryPoll(_e);};
 		void addEvent(InputDevEvent _e) {input::Private::devices[m_device_id].addEvent(_e);};
-		bool status(InputDevEvent::Type _t) {return input::Private::devices[m_device_id].status(_t);}; // for buttons
-		short value(InputDevEvent::Type _t) {return input::Private::devices[m_device_id].value(_t);}; // for axis
-		bool pressed[BUTTONS]; // Current state
+		bool pressed(int _button) {return input::Private::devices[m_device_id].pressed(_button);}; // Current state
 	  private:
 		unsigned int m_device_id; // should be some kind of reference
 	};
