@@ -68,7 +68,7 @@ void input::init_devices() {
 		for( unsigned int i = 0 ; i < num_buttons ; ++i ) {
 			SDL_Event event;
 			int state = SDL_JoystickGetButton(input::sdl_devices[id], i);
-			if( state == 0 ) {
+			if( state != 0 ) {
 				event.type = SDL_JOYBUTTONDOWN;
 				event.jbutton.type = SDL_JOYBUTTONDOWN;
 				event.jbutton.state = SDL_PRESSED;
