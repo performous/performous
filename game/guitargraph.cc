@@ -19,6 +19,15 @@ namespace {
 		float a = clamp(1.0 - t / future); // Note: we want 1.0 alpha already at zero t.
 		return std::pow(a, 0.8); // Nicer curve
 	}
+
+	double points(double error) {
+		double score = 15;
+		if (error < 0.1) score += 15;
+		if (error < 0.05) score += 15;
+		if (error < 0.03) score += 5;
+		return score;
+	}
+
 }
 
 GuitarGraph::GuitarGraph(Song const& song, bool drums):
@@ -88,10 +97,7 @@ void GuitarGraph::drumHit(double time, int fret) {
 		tolerance = std::abs(it2->begin - time);
 	} while (++it2tmp != it2end && std::abs(it2tmp->begin - time) < tolerance);
 	if (!d) throw std::logic_error("d is NULL in GuitarGraph::engine");
-	m_score += 15;
-	if (tolerance < 0.1) m_score += 15;
-	if (tolerance < 0.05) m_score += 15;
-	if (tolerance < 0.03) m_score += 5;
+	m_score += points(tolerance);
 	m_notes[d] = 2;
 }
 
@@ -106,7 +112,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 	m_hammerReady.setTarget(0.0);
 	// Find any suitable note within the tolerance
 	double tolerance = 0.2;
-	if (!picked) tolerance *= 0.5; // Hammering has stricter limits
+	if (!picked) tolerance *= 0.5; // Hammering and drums have stricter limits
 	Chords::iterator best = m_chords.end();
 	for (Chords::iterator it = m_chordIt; it != m_chords.end() && it->begin <= time + tolerance; ++it) {
 		if (it->status > 1) continue; // Already picked, can't play again
@@ -115,7 +121,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 			if (!it->tappable) continue; // Cannot tap
 			Chords::iterator tmp = it;
 			if (tmp == m_chords.begin() || (--tmp)->status == 0) continue; // The previous note not played
-		}	
+		}
 		if (!it->matches(frets)) continue;
 		double error = std::abs(it->begin - time);
 		if (error < tolerance) {
@@ -123,7 +129,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 			tolerance = error;
 		}
 	}
-	std::cout << (picked ? "Pick: " : "Tap: ");
+	std::cout << (picked ? "Hard: " : "Soft: ");
 	if (best == m_chords.end()) {
 		std::cout << "MISS" << std::endl;
 		if (picked) {
@@ -135,10 +141,8 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 		int& score = m_chordIt->score;
 		std::cout << "HIT, old score = " << score;
 		m_score -= score;
-		score = 15;
-		if (tolerance < 0.1) score += 15;
-		if (tolerance < 0.05) score += 15;
-		if (tolerance < 0.03) score += 5;
+		score = points(tolerance);
+		score *= m_chordIt->polyphony;
 		std::cout << ", new score = " << score << std::endl;
 		m_chordIt->status = 1 + picked;
 		m_score += score;
@@ -184,7 +188,7 @@ glutil::Color const& GuitarGraph::color(int fret) const {
 
 void GuitarGraph::draw(double time) {
 	if (time < -0.5) {
-		std::string txt = "Play a fret to change:\n";
+		std::string txt = (m_drums ? "Hit a pad to change:\n" : "Play a fret to change:\n");
 		txt += m_song.tracks[m_instrument].name + "/" + diffv[m_level].name;
 		m_text.dimensions.screenBottom(-0.05).middle(0.0);
 		m_text.draw(txt);
