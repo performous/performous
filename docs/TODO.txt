@@ -51,3 +51,34 @@ Ripper:
 
 - Compress into Vorbis Ogg and H.264 MKV
 
+
+Bugs:
+
+- On Compiz switching from fullscreen to window makes the window maximized even though the viewport stays small
+- Random segfault deep within librsvg when entering the singing screen (very hard to reproduce)
+
+*** glibc detected *** performous: free(): invalid pointer: 0x00007f1bc016ec30 ***
+======= Backtrace: =========
+/lib/libc.so.6[0x7f1bdc530cb8]
+/lib/libc.so.6(cfree+0x76)[0x7f1bdc533276]
+/usr/lib/libglib-2.0.so.0(g_ptr_array_free+0x4a)[0x7f1bdfca68fa]
+/usr/lib/librsvg-2.so.2[0x7f1bdf5b0c2c]
+/usr/lib/librsvg-2.so.2[0x7f1bdf5b0c59]
+/usr/lib/librsvg-2.so.2[0x7f1bdf59c532]
+/usr/lib/librsvg-2.so.2[0x7f1bdf5be78d]
+/usr/lib/libgobject-2.0.so.0(g_object_unref+0xc2)[0x7f1bdfa5a1f2]
+/usr/lib/librsvg-2.so.2[0x7f1bdf5bed68]
+/usr/lib/librsvg-2.so.2(rsvg_pixbuf_from_file_at_size+0x26)[0x7f1bdf5bee56]
+performous(_Z6loaderI7TextureEvRT_Ssb+0x82c)[0x451e1c]
+performous(_ZN7TextureC1ERKSs+0x44)[0x44f8b4]
+performous(_ZN11ProgressBarC1ERKSsS1_NS_4ModeEffb+0x40)[0x4aebd0]
+performous(_ZN10ScreenSing5enterEv+0x209)[0x4c9379]
+performous(_ZN11ScreenSongs15manageSharedKeyEi6SDLMod+0x178)[0x475d68]
+performous(_ZN11ScreenSongs11manageEventE9SDL_Event+0xcb)[0x47600b]
+performous[0x4d0659]
+performous(_Z8mainLoopv+0x579)[0x4d1bf9]
+performous(main+0x1d30)[0x4d42c0]
+
+- Random segfault on program exit (very hard to reproduce)
+   * Don't even need to enter songs screen, start and exit is enough.
+
