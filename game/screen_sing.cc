@@ -32,12 +32,26 @@ void ScreenSing::enter() {
 	boost::ptr_vector<Analyzer>& analyzers = m_capture.analyzers();
 	m_engine.reset(new Engine(m_audio, *m_song, analyzers.begin(), analyzers.end(), m_players));
 	m_layout_singer.reset(new LayoutSinger(*m_song, m_players, theme));
-	if (m_song->music.size() > 1) m_guitarGraph.reset(new GuitarGraph(*m_song));
+	// I know some purists would hang me for this loop
+	for (int num = 0; true; ++num) {
+		try {
+			m_instruments.push_back(new GuitarGraph(*m_song));
+		} catch (std::runtime_error&) { break; }
+	}
+	for (int num = 0; true; ++num) {
+		try {
+			m_instruments.push_back(new GuitarGraph(*m_song, true));
+		} catch (std::runtime_error&) { break; }
+	}
+	double iw = std::min(0.5, 1.0 / m_instruments.size());
+	for (Instruments::size_type i = 0, s = m_instruments.size(); i < s; ++i) {
+		m_instruments[i].position((0.5 + i - 0.5 * s) * iw, iw);
+	}
 }
 
 void ScreenSing::exit() {
 	m_score_window.reset();
-	m_guitarGraph.reset();
+	m_instruments.clear();
 	m_layout_singer.reset();
 	m_engine.reset();
 	m_pause_icon.reset();
@@ -170,7 +184,7 @@ void ScreenSing::draw() {
 		theme->bg_top.draw();
 	}
 
-	if (m_guitarGraph.get()) m_guitarGraph->draw(time);
+	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it) it->draw(time);
 
 	if( m_song->tracks.empty() ) {
 		m_layout_singer->draw(time, LayoutSinger::BOTTOM);

@@ -53,6 +53,7 @@ class GuitarGraph {
 	 */
 	void draw(double time);
 	void engine(double time);
+	void position(double cx, double width) { m_cx = cx; m_width = width; }
   private:
 	input::InputDev m_input;
 	Song const& m_song;
@@ -61,6 +62,7 @@ class GuitarGraph {
 	AnimValue m_pickValue;
 	boost::ptr_vector<Texture> m_necks;
 	bool m_drums;
+	double m_cx, m_width;
 	std::size_t m_instrument;
 	void drumHit(double time, int pad);
 	void guitarPlay(double time, input::Event const& ev);

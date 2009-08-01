@@ -3,10 +3,18 @@
 #include <GL/glew.h>
 
 namespace glutil {
-  /// wrapper struct for RAII
+	/// wrapper struct for RAII
 	struct PushMatrix {
 		PushMatrix() { glPushMatrix(); }
 		~PushMatrix() { glPopMatrix(); }
+	};
+
+	/// wrapper struct for RAII
+	struct PushMatrixMode {
+		PushMatrixMode(GLenum mode) { glGetIntegerv(GL_MATRIX_MODE, &m_old); glMatrixMode(mode); glPushMatrix(); }
+		~PushMatrixMode() { glPopMatrix(); glMatrixMode(m_old); }
+	  private:
+		GLint m_old;
 	};
 
 	/// wrapper struct for RAII

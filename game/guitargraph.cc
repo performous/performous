@@ -37,6 +37,8 @@ GuitarGraph::GuitarGraph(Song const& song, bool drums):
   m_tap("tap.svg"),
   m_pickValue(0.0, 5.0),
   m_drums(drums),
+  m_cx(),
+  m_width(0.5),
   m_instrument(),
   m_level(),
   m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
@@ -198,7 +200,7 @@ void GuitarGraph::draw(double time) {
 	}
 	engine(time);
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
-	dimensions.screenBottom().fixedWidth(0.5f);
+	dimensions.screenBottom().middle(m_cx).fixedWidth(m_width);
 	glutil::PushMatrix pmb;
 	glTranslatef(0.5 * (dimensions.x1() + dimensions.x2()), dimensions.y2(), 0.0f);
 	glRotatef(85.0f, 1.0f, 0.0f, 0.0f);

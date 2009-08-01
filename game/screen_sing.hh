@@ -71,7 +71,8 @@ class ScreenSing: public Screen {
 	boost::scoped_ptr<Surface> m_pause_icon;
 	boost::scoped_ptr<Engine> m_engine;
 	boost::scoped_ptr<LayoutSinger> m_layout_singer;
-	boost::scoped_ptr<GuitarGraph> m_guitarGraph;
+	typedef boost::ptr_vector<GuitarGraph> Instruments;
+	Instruments m_instruments;
 	double m_latencyAV;  // Latency between audio and video output (do not confuse with latencyAR)
 	boost::shared_ptr<ThemeSing> theme;
 	AnimValue m_quitTimer;
