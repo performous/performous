@@ -74,6 +74,10 @@ namespace input {
 
 	static const std::size_t BUTTONS = 6;
 
+	typedef std::map<unsigned int,SDL_Joystick*> SDL_devices;
+	extern SDL_devices sdl_devices;
+	void init_devices();
+
 	struct InputDevEvent {
 		enum Type { PRESS, RELEASE, PICK };
 		Type type;
@@ -106,6 +110,7 @@ namespace input {
 			bool assigned() {return m_assigned;};
 			bool pressed(int _button) {return m_pressed[_button];};
 			input::Type type() {return m_type;};
+			void setType(input::Type _type) {m_type=_type;init_devices();};
 		  private:
 			std::deque<InputDevEvent> m_events;
 			bool m_assigned;

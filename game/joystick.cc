@@ -98,6 +98,24 @@ void Joystick::clearEvents() {
  * New input management, superseed all joysticks stuffs
  */
 input::Private::InputDevs input::Private::devices;
+input::SDL_devices input::sdl_devices;
+
+void input::init_devices() {
+	for (input::Private::InputDevs::iterator it = input::Private::devices.begin() ; it != input::Private::devices.end() ; ++it) {
+		unsigned int id = it->first;
+		if( it->second.assigned() ) continue;
+		unsigned int num_buttons = SDL_JoystickNumButtons(input::sdl_devices[id]);
+		for( unsigned int i = 0 ; i < num_buttons ; ++i ) {
+			SDL_Event event;
+			event.type = SDL_JOYBUTTONDOWN;
+			event.jbutton.type = SDL_JOYBUTTONDOWN;
+			event.jbutton.which = id;
+			event.jbutton.button = i;
+			event.jbutton.state = SDL_PRESSED;
+			input::pushEvent(event);
+		}
+	}
+}
 
 void input::init() {
 	// new stuffs
@@ -105,7 +123,7 @@ void input::init() {
 	std::cout << "Detecting " << nbjoysticks << " joysticks..." << std::endl;
 
 	for (unsigned int i = 0 ; i < nbjoysticks ; ++i) {
-		SDL_Joystick * joystick = SDL_JoystickOpen(i);
+		input::sdl_devices[i] = SDL_JoystickOpen(i);
 		std::string name = SDL_JoystickName(i);
 		if( name.find("Guitar Hero") != std::string::npos ) {
 			input::Private::devices[i] = input::Private::InputDevPrivate(input::GUITAR_GH);
@@ -116,18 +134,9 @@ void input::init() {
 		}
 		std::cout << "Id: " << i << std::endl;
 		std::cout << "  Name: " << name << std::endl;
-		// Here we should send an event to have correct state buttons
-		unsigned int num_buttons = SDL_JoystickNumButtons(joystick);
-		for( unsigned int j = 0 ; j < num_buttons ; ++j ) {
-			SDL_Event event;
-			event.type = SDL_JOYBUTTONDOWN;
-			event.jbutton.type = SDL_JOYBUTTONDOWN;
-			event.jbutton.which = i;
-			event.jbutton.button = j;
-			event.jbutton.state = SDL_PRESSED;
-			input::pushEvent(event);
-		}
 	}
+	// Here we should send an event to have correct state buttons
+	init_devices();
 	// compatibility with old joystick stuffs
 	for (input::Private::InputDevs::iterator it = input::Private::devices.begin() ; it != input::Private::devices.end() ; ++it) {
 		if( it->second.type() == GUITAR_GH || it->second.type() == DRUM_GH ) {
