@@ -10,16 +10,31 @@
 class Song;
 
 struct Chord {
-	double begin;
+	double begin, end;
 	bool fret[5];
 	Duration const* dur[5];
 	int polyphony;
 	bool tappable;
-	bool tapped;
-	int tapScore;
-	Chord(): begin(), polyphony(), tappable(), tapped(), tapScore() {
+	int status; // 0 = not played, 1 = tapped, 2 = picked, 3 = released
+	int score;
+	Chord(): begin(), end(), polyphony(), tappable(), status(), score() {
 		std::fill(fret, fret + 5, false);
 		std::fill(dur, dur + 5, static_cast<Duration const*>(NULL));
+	}
+	bool matches(bool const* fretPressed) {
+		for (int i = 0; i < 5; ++i) {
+			std::cout << fret[i] << fretPressed[i] << " ";
+		}
+		std::cout << std::endl;
+		if (polyphony == 1) {
+			bool shadowed = true;
+			for (int i = 0; i < 5; ++i) {
+				if (fret[i]) shadowed = false;
+				if (!shadowed && fret[i] != fretPressed[i]) return false;
+			}
+			return true;
+		}
+		return std::equal(fret, fret + 5, fretPressed);
 	}
 };
 
@@ -41,6 +56,7 @@ class GuitarGraph {
   private:
 	Song const& m_song;
 	Surface m_button;
+	Surface m_tap;
 	AnimValue m_pickValue;
 	boost::ptr_vector<Texture> m_necks;
 	bool m_drums;
@@ -58,10 +74,12 @@ class GuitarGraph {
 	bool difficulty(Difficulty level);
 	SvgTxtTheme m_text;
 	void updateChords();
-	std::vector<Chord> m_chords;
+	typedef std::vector<Chord> Chords;
+	Chords m_chords;
+	Chords::iterator m_chordIt;
 	typedef std::map<Duration const*, int> NoteStatus;
 	NoteStatus m_notes;
-	bool m_hammerReady;
+	AnimValue m_hammerReady;
 	int m_score;
 };
 

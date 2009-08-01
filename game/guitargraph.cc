@@ -26,7 +26,7 @@ namespace {
 	bool picked = false;
 }
 
-GuitarGraph::GuitarGraph(Song const& song): m_song(song), m_button("button.svg"), m_pickValue(0.0, 5.0), m_drums(), m_instrument(), m_level(), m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()), m_hammerReady(), m_score() {
+GuitarGraph::GuitarGraph(Song const& song): m_song(song), m_button("button.svg"), m_tap("tap.svg"), m_pickValue(0.0, 5.0), m_drums(), m_instrument(), m_level(), m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()), m_hammerReady(0.0, 2.0), m_score() {
 	std::size_t tracks = m_song.tracks.size();
 	if (tracks == 0) throw std::runtime_error("No tracks");
 	m_necks.push_back(new Texture("guitarneck.svg"));
@@ -107,83 +107,62 @@ void GuitarGraph::engine(double time) {
 		if (m_score < 0) m_score = 0;
 		return;
 	}
-	int hammerFret = -1;
-	if (!picked) {
-		if (!m_hammerReady) return;
-		// Check if exactly one fret is hammered
-		for (int fret = 0; fret < 5; ++fret) {
-			if (!fretHit[fret]) continue;
-			if (hammerFret != -1) return;
-			hammerFret = fret;
-		}
-		if (hammerFret == -1) return;
-	}
-	m_pickValue.setValue(1.0);
-	// FIXME: Replace with hold code for (NoteStatus::iterator it = m_notes.begin(); it != m_notes.end(); ++it) if (it->second == 1) it->second = 2;
-	Duration const* dIt[5] = {};
-	double begin = getNaN();
-	double tolerance = 0.2;
-	for (int fret = 0; fret < 5; ++fret) {
-		NoteMap const& nm = m_song.tracks[m_instrument].nm;
-		NoteMap::const_iterator it = nm.find(basepitch + fret);
-		if (it == nm.end()) continue;
-		Durations const& dur = it->second;
-		Durations::const_iterator it2 = dur.begin(), it2tmp, it2end = dur.end();
-		// Find any suitable note within the tolerance
-		while (it2 != it2end && (it2->begin < time - tolerance || m_notes[&*it2] != 0)) ++it2;
-		// If we are already past the accepted region, skip further processing
-		if (it2 == it2end || it2->begin > time + tolerance) continue;
-		// Find the note with the smallest error
-		it2tmp = it2;
-		do {
-			it2 = it2tmp;
-			if (m_notes[&*it2] != 0) continue; // Notes already played are ignored
-			dIt[fret] = &*it2;
-			begin = it2->begin;
-			tolerance = std::abs(begin - time);
-		} while (++it2tmp != it2end && std::abs(it2tmp->begin - time) < tolerance);
-	}
-	bool need[5] = {};
-	int count = 0;
-	for (int fret = 0; fret < 5; ++fret) {
-		if (!dIt[fret] || dIt[fret]->begin != begin) continue;
-		need[fret] = true;
-		++count;
-	}
-	m_hammerReady = false;
+	bool const* frets = NULL;
 	if (picked) {
-		// Regular pick handling
-		bool shadowed = (count == 1); // If the chord only requires one fret, frets on the left side of that are "shadowed" (ignored)
-		bool fail = false;
-		for (int fret = 0; fret < 5 && !fail; ++fret) {
-			if (need[fret] && !fretPressed[fret]) { fail = true; break; } // Fret missing
-			if (need[fret]) shadowed = false;
-			if (!shadowed && fretPressed[fret] && !need[fret]) { fail = true; break; } // Pressing non-shadowed fret that is not needed
+		frets = fretPressed;
+		m_pickValue.setValue(1.0);
+		/* FIXME: release holds
+		for (int fret = 0; fret < 5; ++fret) {
+			if (m_chordIt == m_chords.end() || m_chordIt->status == 0) continue;
+			NoteStatus::iterator it = m_notes.find(m_chordif (it->second == 1) it->second = 2;
+		}*/
+	} else {
+		if (m_hammerReady.get() < 0.5) return; // Hammering not possible at the moment
+		for (int fret = 0; fret < 5; ++fret) if (fretHit[fret]) frets = fretHit;
+		if (!frets) return; // No tap found
+	}
+	m_hammerReady.setTarget(0.0);
+	// Find any suitable note within the tolerance
+	double tolerance = 0.2;
+	if (!picked) tolerance *= 0.5; // Hammering has stricter limits
+	Chords::iterator best = m_chords.end();
+	for (Chords::iterator it = m_chordIt; it != m_chords.end() && it->begin <= time + tolerance; ++it) {
+		if (it->status > 1) continue; // Already picked, can't play again
+		if (!picked) { // Tapping rules
+			if (it->status > 0) continue; // Already tapped, can't tap again
+			if (!it->tappable) continue; // Cannot tap
+			Chords::iterator tmp = it;
+			if (tmp == m_chords.begin() || (--tmp)->status == 0) continue; // The previous note not played
+		}	
+		if (!it->matches(frets)) continue;
+		double error = std::abs(it->begin - time);
+		if (error < tolerance) {
+			best = it;
+			tolerance = error;
 		}
-		if (fail) {
-			m_score -= 100.0;
-			if (m_score < 0) m_score = 0;
-		} else {
-			// Successful pick, mark and score it so
-			for (int fret = 0; fret < 5; ++fret) {
-				if (!need[fret]) continue;
-				m_notes[dIt[fret]] = 2;
-				m_score += 15;
-				if (tolerance < 0.1) m_score += 15;
-				if (tolerance < 0.05) m_score += 15;
-				if (tolerance < 0.03) m_score += 5;
-			}
-			m_hammerReady = true;
+	}
+	std::cout << (picked ? "Pick: " : "Tap: ");
+	if (best == m_chords.end()) {
+		std::cout << "MISS" << std::endl;
+		if (picked) {
+			m_score -= 100;
+			m_hammerReady.setTarget(0.0, true); // Instantly go to zero
 		}
 	} else {
-		// Hammering
-		if (count != 1 || !need[hammerFret] || tolerance > 0.1) return;
-		m_notes[dIt[hammerFret]] = 1;
-		m_score += 30;
-		if (tolerance < 0.05) m_score += 15;
-		if (tolerance < 0.03) m_score += 5;
-		m_hammerReady = true;
+		m_chordIt = best;
+		int& score = m_chordIt->score;
+		std::cout << "HIT, old score = " << score;
+		m_score -= score;
+		score = 15;
+		if (tolerance < 0.1) score += 15;
+		if (tolerance < 0.05) score += 15;
+		if (tolerance < 0.03) score += 5;
+		std::cout << ", new score = " << score << std::endl;
+		m_chordIt->status = 1 + picked;
+		m_score += score;
+		m_hammerReady.setTarget(1.0, true); // Instantly go to one
 	}
+	if (m_score < 0) m_score = 0;
 }
 
 void GuitarGraph::difficultyAuto() {
@@ -261,25 +240,19 @@ void GuitarGraph::draw(double time) {
 			glTexCoord2f(1.0f, texCoord); glVertex2f(w, time2y(tEnd));
 		}
 	}
-	int basepitch = diffv[m_level].basepitch;
-
 	// Draw the notes
-	Track const& track = m_song.tracks[m_instrument];
-	NoteMap const& nm = track.nm;
-	for (int fret = 0; fret < 5; ++fret) {
-		float x = -2.0f + fret;
-		if (m_drums) x -= 0.5f;
-		float w = 0.5f;
-		NoteMap::const_iterator it = nm.find(basepitch + fret);
-		if (it == nm.end()) continue;
-		Durations const& durs = it->second;
-		for (Durations::const_iterator it2 = durs.begin(); it2 != durs.end(); ++it2) {
-			float tBeg = it2->begin - time;
-			float tEnd = it2->end - time;
-			if (tEnd < past) continue;
-			if (tBeg > future) break;
+	for (Chords::const_iterator it = m_chords.begin(); it != m_chords.end(); ++it) {
+		float tBeg = it->begin - time;
+		float tEnd = it->end - time;
+		if (tEnd < past) continue;
+		if (tBeg > future) break;
+		for (int fret = 0; fret < 5; ++fret) {
+			if (!it->fret[fret]) continue;
+			float x = -2.0f + fret;
+			if (m_drums) x -= 0.5f;
+			float w = 0.5f;
 			glutil::Color c = color(fret);
-			if (m_notes[&*it2] == 1) c.r = c.g = c.b = 1.0f;
+			if (m_notes[it->dur[fret]] == 1) c.r = c.g = c.b = 1.0f;
 			float wLine = 0.5f * w;
 			if (tEnd > future) tEnd = future;
 			if (m_drums && fret == 0) {
@@ -298,6 +271,12 @@ void GuitarGraph::draw(double time) {
 			}
 			m_button.dimensions.center(time2y(tBeg)).middle(x);
 			m_button.draw();
+			if (it->tappable) {
+				float l = std::max(0.5, m_hammerReady.get());
+				glColor3f(l, l, l);
+				m_tap.dimensions = m_button.dimensions;
+				m_tap.draw();
+			}
 		}
 	}
 	// Draw the cursor / bass pedal
@@ -342,7 +321,10 @@ void GuitarGraph::updateChords() {
 		NoteMap::const_iterator it = nm.find(basepitch + fret);
 		if (it == nm.end()) continue;
 		durations[fret] = &it->second;
+		size[fret] = durations[fret]->size();
 	}
+	double lastEnd = 0.0;
+	const double tapMaxDelay = 0.05;  // Delay from the end of the previous note
 	while (true) {
 		// Find the earliest
 		double t = getInf();
@@ -359,17 +341,22 @@ void GuitarGraph::updateChords() {
 		for (int fret = 0; fret < 5; ++fret) {
 			if (pos[fret] == size[fret]) continue;
 			Durations const& dur = *durations[fret];
-			Duration const& d = dur[pos[fret]++];
+			Duration const& d = dur[pos[fret]];
 			if (d.begin > t) continue;
+			c.end = std::max(c.end, d.end);
 			c.fret[fret] = true;
 			c.dur[fret] = &d;
 			++c.polyphony;
+			++pos[fret];
 		}
 		if (c.polyphony == 1) {
 			c.tappable = true;
 			if (m_chords.empty() || m_chords.back() == c) c.tappable = false;
+			if (lastEnd + tapMaxDelay < t) c.tappable = false;
 		}
+		lastEnd = c.end;
 		m_chords.push_back(c);
 	}
+	m_chordIt = m_chords.begin();
 }
 
