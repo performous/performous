@@ -7,18 +7,20 @@ static const unsigned SDL_BUTTONS = 6;
 
 int buttonFromSDL(input::Private::Type _type, unsigned int _sdl_button) {
 	static const int inputmap[4][SDL_BUTTONS] = {
+		//G  R  Y  B  O       // for guitars
 		{ 2, 0, 1, 3, 4, 0 }, // Guitar Hero guitar
-		{ 3, 4, 1, 2, 0, 4 }, // Guitar Hero drums
 		{ 3, 0, 1, 2, 4, 0 }, // Rock Band guitar
+		//K  R  Y  B  G  O    // for drums
+		{ 3, 4, 1, 2, 0, 4 }, // Guitar Hero drums
 		{ 3, 4, 1, 2, 0, 0 }  // Rock Band drums
 	};
 	if( _sdl_button >= SDL_BUTTONS ) return -1;
 	switch(_type) {
 		case input::Private::GUITAR_GH:
 			return inputmap[0][_sdl_button];
-		case input::Private::DRUMS_GH:
-			return inputmap[1][_sdl_button];
 		case input::Private::GUITAR_RB:
+			return inputmap[1][_sdl_button];
+		case input::Private::DRUMS_GH:
 			return inputmap[2][_sdl_button];
 		case input::Private::DRUMS_RB:
 			return inputmap[3][_sdl_button];
