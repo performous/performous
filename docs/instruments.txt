@@ -49,14 +49,33 @@ Ex: A5- => SDL axis 4 with negative value
  PICK DOWN:   A6+
  PICK UP:     A6-
 
+[Rock Band I] PS3 Guitar
+ USB id: 12ba:0200
+ SDL name: Licensed by Sony Computer Entertainment America Harmonix Guitar for PlayStation®3   (Note: Latin-1 encoding)
+ GREEN FRET:  B2
+ RED FRET:    B3
+ YELLOW FRET: B4
+ BLUE FRET:   B1
+ ORANGE FRET: B5
+ START:       B10
+ SELECT:      B9
+ PS3:         B13
+ DOWN:        A6+
+ UP:          A6-
+ LEFT:        A5-
+ RIGHT:       A5+
+ BEND:        A3 = 1.0 (fully pressed) .. -1.0 (fully released), but resets to 0.0 after a while when fully released
+ PICK DOWN:   A6+
+ PICK UP:     A6-
+
 [Guitar Hero World Tour] PS3 Drumkit
  USB id: 12ba:0120
  SDL name: Licensed by Sony Computer Entertainment Guitar Hero4 for PlayStation (R) 3
- GREEN FRET or CROSS:     B2
  RED FRET or CIRCLE:      B3
  YELLOW FRET or TRIANGLE: B4
  BLUE FRET or SQUARE:     B1
  ORANGE FRET:             B6
+ GREEN FRET or CROSS:     B2
  KICK:                    B5
  START:                   B10
  SELECT:                  B9
@@ -65,9 +84,23 @@ Ex: A5- => SDL axis 4 with negative value
  UP:                      A6-
  LEFT:                    A5-
  RIGHT:                   A5+
- BEND:                    A3+
- PICK DOWN:               A6+
- PICK UP:                 A6-
+
+[Rock Band I] PS3 Drumkit
+ USB id: 12ba:0210
+ SDL name: Licensed by Sony Computer Entertainment America Harmonix Drum Kit for PlayStation(R)3
+ RED FRET or CIRCLE:      B3
+ YELLOW FRET or TRIANGLE: B4
+ BLUE FRET or SQUARE:     B1
+ GREEN FRET or CROSS:     B2
+ KICK:                    B5
+ START:                   B10
+ SELECT:                  B9
+ PS3:                     B13
+ DOWN:                    A6+
+ UP:                      A6-
+ LEFT:                    A5-
+ RIGHT:                   A5+
+
  
 
 Performous InputDev button numbers
