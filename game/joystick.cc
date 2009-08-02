@@ -152,15 +152,15 @@ bool input::pushEvent(SDL_Event _e) {
 					}
 					devices[joy_id].addEvent(event);
 					return true;
-				case SDLK_F5:
+				case SDLK_F5: case SDLK_5:
 					button++;
-				case SDLK_F4:
+				case SDLK_F4: case SDLK_4:
 					button++;
-				case SDLK_F3:
+				case SDLK_F3: case SDLK_3:
 					button++;
-				case SDLK_F2:
+				case SDLK_F2: case SDLK_2:
 					button++;
-				case SDLK_F1:
+				case SDLK_F1: case SDLK_1:
 					event.type = input::Event::PRESS;
 					break;
 				default:
@@ -180,15 +180,15 @@ bool input::pushEvent(SDL_Event _e) {
 			joy_id = UINT_MAX;
 			if(!devices[joy_id].assigned()) return false;
 			switch(_e.key.keysym.sym) {
-				case SDLK_F5:
+				case SDLK_F5: case SDLK_5:
 					button++;
-				case SDLK_F4:
+				case SDLK_F4: case SDLK_4:
 					button++;
-				case SDLK_F3:
+				case SDLK_F3: case SDLK_3:
 					button++;
-				case SDLK_F2:
+				case SDLK_F2: case SDLK_2:
 					button++;
-				case SDLK_F1:
+				case SDLK_F1: case SDLK_1:
 					event.type = input::Event::RELEASE;
 					break;
 				default:
@@ -204,7 +204,7 @@ bool input::pushEvent(SDL_Event _e) {
 		}
 		case SDL_JOYAXISMOTION:
 			joy_id = _e.jaxis.which;
-
+			if (_e.jaxis.axis != 5 && _e.jaxis.axis != 6) return false;
 			event.type = input::Event::PICK;
 			for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
 				event.pressed[i] = devices[joy_id].pressed(i);

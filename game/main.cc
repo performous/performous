@@ -70,8 +70,8 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 				}
 				break;
 			}
+			sm.getCurrentScreen()->manageEvent(event);
 		}
-		sm.getCurrentScreen()->manageEvent(event);
 		switch(glGetError()) {
 			case GL_INVALID_ENUM: std::cerr << "OpenGL error: invalid enum" << std::endl; break;
 			case GL_INVALID_VALUE: std::cerr << "OpenGL error: invalid value" << std::endl; break;
