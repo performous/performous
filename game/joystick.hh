@@ -93,9 +93,9 @@ namespace input {
 		InputDev(input::DevType _type) {
 			using namespace input::Private;
 			if( _type == input::DRUMS )
-				std::cout << "Request aquiring DRUM" << std::endl;
+				std::cout << "Request acquiring DRUM" << std::endl;
 			if( _type == input::GUITAR )
-				std::cout << "Request aquiring GUITAR" << std::endl;
+				std::cout << "Request acquiring GUITAR" << std::endl;
 			if( devices.size() == 0 ) throw std::runtime_error("No InputDev available");
 			for(InputDevs::iterator it = devices.begin() ; it != devices.end() ; ++it) {
 				if( !it->second.assigned() && it->second.type_match(_type) ) {
