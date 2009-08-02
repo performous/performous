@@ -16,7 +16,7 @@ struct Chord {
 	Duration const* dur[5];
 	int polyphony;
 	bool tappable;
-	int status; // 0 = not played, 1 = tapped, 2 = picked, 3 = released
+	int status; // Guitar: 0 = not played, 10 = tapped, 20 = picked, 30 = released, drums: number of pads hit
 	int score;
 	Chord(): begin(), end(), polyphony(), tappable(), status(), score() {
 		std::fill(fret, fret + 5, false);
