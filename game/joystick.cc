@@ -8,11 +8,11 @@ static const unsigned SDL_BUTTONS = 6;
 int buttonFromSDL(input::Private::Type _type, unsigned int _sdl_button) {
 	static const int inputmap[4][SDL_BUTTONS] = {
 		//G  R  Y  B  O       // for guitars
-		{ 2, 0, 1, 3, 4, 0 }, // Guitar Hero guitar
-		{ 3, 0, 1, 2, 4, 0 }, // Rock Band guitar
+		{ 2, 0, 1, 3, 4, -1 }, // Guitar Hero guitar
+		{ 3, 0, 1, 2, 4, -1 }, // Rock Band guitar
 		//K  R  Y  B  G  O    // for drums
 		{ 3, 4, 1, 2, 0, 4 }, // Guitar Hero drums
-		{ 3, 4, 1, 2, 0, 0 }  // Rock Band drums
+		{ 3, 4, 1, 2, 0, -1 }  // Rock Band drums
 	};
 	if( _sdl_button >= SDL_BUTTONS ) return -1;
 	switch(_type) {
@@ -235,7 +235,7 @@ bool input::pushEvent(SDL_Event _e) {
 		case SDL_JOYBUTTONDOWN:
 			joy_id = _e.jbutton.which;
 			button = buttonFromSDL(devices[joy_id].type(),_e.jbutton.button);
-			if( button == -1 ) break;
+			if( button == -1 ) return false;
 			for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
 				event.pressed[i] = devices[joy_id].pressed(i);
 			}
@@ -247,7 +247,7 @@ bool input::pushEvent(SDL_Event _e) {
 		case SDL_JOYBUTTONUP:
 			joy_id = _e.jbutton.which;
 			button = buttonFromSDL(devices[joy_id].type(),_e.jbutton.button);
-			if( button == -1 ) break;
+			if( button == -1 ) return false;
 			for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
 				event.pressed[i] = devices[joy_id].pressed(i);
 			}
