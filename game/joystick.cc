@@ -138,7 +138,15 @@ bool input::pushEvent(SDL_Event _e) {
 			switch(_e.key.keysym.sym) {
 				case SDLK_RETURN:
 					event.type = input::Event::PICK;
-					button = 0;
+					event.button = 1;
+					for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
+						event.pressed[i] = devices[joy_id].pressed(i);
+					}
+					devices[joy_id].addEvent(event);
+					return true;
+				case SDLK_RSHIFT:
+					event.type = input::Event::PICK;
+					event.button = 0;
 					for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
 						event.pressed[i] = devices[joy_id].pressed(i);
 					}
