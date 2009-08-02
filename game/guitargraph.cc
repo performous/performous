@@ -119,7 +119,7 @@ void GuitarGraph::drumHit(double time, int fret) {
 	std::cout << "Drum: ";
 	if (best == m_chords.end()) {
 		std::cout << "MISS" << std::endl;
-		m_score -= 100;
+		m_score -= 50;
 		m_hammerReady.setTarget(0.0, true); // Instantly go to zero
 	} else {
 		while (best != m_chordIt) {
@@ -172,7 +172,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 	if (best == m_chords.end()) {
 		std::cout << "MISS" << std::endl;
 		if (picked) {
-			m_score -= 100;
+			m_score -= 50;
 			m_hammerReady.setTarget(0.0, true); // Instantly go to zero
 		}
 	} else {
