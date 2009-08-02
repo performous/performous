@@ -20,12 +20,12 @@ namespace {
 		return std::pow(a, 0.8); // Nicer curve
 	}
 
-	const double maxTolerance = 0.1;
+	const double maxTolerance = 0.15;
 	
 	double points(double error) {
 		double score = 0.0;
 		if (error < maxTolerance) score += 15;
-		if (error < 0.075) score += 15;
+		if (error < 0.1) score += 15;
 		if (error < 0.05) score += 15;
 		if (error < 0.03) score += 5;
 		return score;
@@ -46,7 +46,7 @@ GuitarGraph::GuitarGraph(Song const& song, bool drums, unsigned track):
   m_level(),
   m_dead(-1),
   m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
-  m_correctness(0.0, 2.0),
+  m_correctness(0.0, 5.0),
   m_score()
 {
 	for (Tracks::const_iterator it = m_song.tracks.begin(); it != m_song.tracks.end(); ++it) {
@@ -151,8 +151,14 @@ void GuitarGraph::drumHit(double time, int fret) {
 
 void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 	bool picked = (ev.type == input::Event::PICK);
-	bool const* frets = ev.pressed; // Kinda b0rked, FIXME
-	if (!picked && m_correctness.get() < 0.5) return; // Hammering not possible at the moment
+	bool frets[5] = {};
+	if (picked) {
+		for (int fret = 0; fret < 5; ++fret) frets[fret] = ev.pressed[fret];
+	} else {
+		if (m_correctness.get() < 0.5) return; // Hammering not possible at the moment
+		frets[ev.button] = true;
+		for (int fret = ev.button + 1; fret < 5; ++fret) if (ev.pressed[fret]) return; // Extra buttons on right side
+	}
 	// Find any suitable note within the tolerance
 	double tolerance = maxTolerance;
 	Chords::iterator best = m_chords.end();
@@ -181,11 +187,10 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 	} else {
 		m_chordIt = best;
 		int& score = m_chordIt->score;
-		std::cout << "HIT, old score = " << score;
+		std::cout << "HIT, error = " << int(1000.0 * (best->begin - time)) << " ms" << std::endl;
 		m_score -= score;
 		score = points(tolerance);
 		score *= m_chordIt->polyphony;
-		std::cout << ", new score = " << score << std::endl;
 		m_chordIt->status = 1 + picked;
 		m_score += score;
 		m_correctness.setTarget(1.0, true); // Instantly go to one
@@ -351,7 +356,7 @@ void GuitarGraph::updateChords() {
 		size[fret] = durations[fret]->size();
 	}
 	double lastEnd = 0.0;
-	const double tapMaxDelay = 0.05;  // Delay from the end of the previous note
+	const double tapMaxDelay = 0.15;  // Delay from the end of the previous note
 	while (true) {
 		// Find the earliest
 		double t = getInf();
@@ -365,6 +370,7 @@ void GuitarGraph::updateChords() {
 		// Construct a chord
 		Chord c;
 		c.begin = t;
+		int tapfret = -1;
 		for (int fret = 0; fret < 5; ++fret) {
 			if (pos[fret] == size[fret]) continue;
 			Durations const& dur = *durations[fret];
@@ -373,12 +379,13 @@ void GuitarGraph::updateChords() {
 			c.end = std::max(c.end, d.end);
 			c.fret[fret] = true;
 			c.dur[fret] = &d;
+			tapfret = fret;
 			++c.polyphony;
 			++pos[fret];
 		}
 		if (c.polyphony == 1) {
 			c.tappable = true;
-			if (m_chords.empty() || m_chords.back() == c) c.tappable = false;
+			if (m_chords.empty() || m_chords.back().fret[tapfret]) c.tappable = false;
 			if (lastEnd + tapMaxDelay < t) c.tappable = false;
 		}
 		lastEnd = c.end;
