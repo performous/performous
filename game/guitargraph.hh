@@ -53,7 +53,8 @@ class GuitarGraph {
 	 */
 	void draw(double time);
 	void engine(double time);
-	void position(double cx, double width) { m_cx = cx; m_width = width; }
+	void position(double cx, double width) { m_cx.setTarget(cx); m_width.setTarget(width); }
+	double dead(double time) const { return time > -0.5 && m_dead > 10; }
   private:
 	input::InputDev m_input;
 	Song const& m_song;
@@ -62,7 +63,7 @@ class GuitarGraph {
 	AnimValue m_hit[6];
 	boost::ptr_vector<Texture> m_necks;
 	bool m_drums;
-	double m_cx, m_width;
+	AnimValue m_cx, m_width;
 	unsigned m_track;
 	std::vector<Track const*> m_tracks;
 	void drumHit(double time, int pad);
@@ -74,6 +75,7 @@ class GuitarGraph {
 		DIFFICULTY_AMAZING,
 		DIFFICULTYCOUNT
 	} m_level;
+	int m_dead;
 	glutil::Color const& color(int fret) const;
 	void drawBar(double time, float h);
 	void difficultyAuto();

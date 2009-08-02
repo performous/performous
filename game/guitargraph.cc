@@ -39,10 +39,11 @@ GuitarGraph::GuitarGraph(Song const& song, bool drums, unsigned track):
   m_button("button.svg"),
   m_tap("tap.svg"),
   m_drums(drums),
-  m_cx(),
-  m_width(0.5),
+  m_cx(0.0, 0.2),
+  m_width(0.5, 0.4),
   m_track(track),
   m_level(),
+  m_dead(-1),
   m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
   m_hammerReady(0.0, 2.0),
   m_score()
@@ -74,6 +75,7 @@ void GuitarGraph::engine(double time) {
 	}
 	// Handle all events
 	for (input::Event ev; m_input.tryPoll(ev);) {
+		m_dead = false;
 		if (ev.type == input::Event::PRESS) m_hit[!m_drums + ev.button].setValue(1.0);
 		else if (ev.type == input::Event::PICK) m_hit[0].setValue(1.0);
 		if (time < -0.5) {
@@ -98,6 +100,7 @@ void GuitarGraph::engine(double time) {
 	while (m_chordIt != m_chords.end() && m_chordIt->begin + maxTolerance < time) {
 		if (m_chordIt->status < m_chordIt->polyphony) m_hammerReady.setTarget(0.0);
 		++m_chordIt;
+		++m_dead;
 	}
 }
 
@@ -223,7 +226,7 @@ glutil::Color const& GuitarGraph::color(int fret) const {
 void GuitarGraph::draw(double time) {
 	engine(time);
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
-	dimensions.screenBottom().middle(m_cx).fixedWidth(m_width);
+	dimensions.screenBottom().middle(m_cx.get()).fixedWidth(m_width.get());
 	glutil::PushMatrixMode pmm(GL_PROJECTION);
 	double offsetX = 0.5 * (dimensions.x1() + dimensions.x2());
 	double frac = 0.75;  // Adjustable: 1.0 means fully separated, 0.0 means fully attached

@@ -41,10 +41,17 @@ void ScreenSing::enter() {
 			m_instruments.insert(it, new GuitarGraph(*m_song, drums, num));
 		} catch (std::runtime_error&) { if (drums) break; drums = true; }
 	}
+}
+
+void ScreenSing::instrumentLayout(double time) {
+	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end();) {
+		if (it->dead(time)) it = m_instruments.erase(it); else ++it;
+	}
 	double iw = std::min(0.5, 1.0 / m_instruments.size());
 	for (Instruments::size_type i = 0, s = m_instruments.size(); i < s; ++i) {
 		m_instruments[i].position((0.5 + i - 0.5 * s) * iw, iw);
 	}
+	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it) it->draw(time);
 }
 
 void ScreenSing::exit() {
@@ -182,7 +189,7 @@ void ScreenSing::draw() {
 		theme->bg_top.draw();
 	}
 
-	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it) it->draw(time);
+	instrumentLayout(time);
 
 	if( m_song->tracks.empty() ) {
 		m_layout_singer->draw(time, LayoutSinger::BOTTOM);
