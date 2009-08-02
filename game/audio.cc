@@ -133,3 +133,8 @@ void Audio::pause(bool state) {
 	m_mixer.pause(m_paused);
 }
 
+void Audio::streamFade(unsigned num, double level) {
+	da::lock_holder l = m_mixer.lock();
+	m_streams.at(num)->fade = level;
+}
+

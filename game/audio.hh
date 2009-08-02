@@ -23,10 +23,19 @@ struct Stream {
 	double srate;
 	/// constructor
 	Stream(std::string const& filename, unsigned int sr):
-	  mpeg(false, true, filename, sr), srate(sr), m_pos() {}
+	  mpeg(false, true, filename, sr), srate(sr), m_pos(), fade(1.0) {}
 	/// crossfades songs
 	bool operator()(da::pcm_data& data) {
-		mpeg.audioQueue(data, m_pos);
+		if (fade == 1.0) {
+			mpeg.audioQueue(data, m_pos);
+		} else {
+			std::vector<da::sample_t> tmp(data.samples());
+			da::pcm_data dtmp(&tmp[0], data.frames, data.channels, data.rate);
+			mpeg.audioQueue(dtmp, m_pos);
+			for (std::size_t i = 0, s = data.samples(); i < s; ++i) {
+				data[i] += dtmp[i] * fade;
+			}
+		}
 		return !eof();
 	}
 	void seek(double time) { m_pos = time * srate * 2.0; }
@@ -34,6 +43,7 @@ struct Stream {
 	double duration() const { return mpeg.audioQueue.duration(); }
 	bool eof() const { return mpeg.audioQueue.eof(m_pos); }
 	int64_t m_pos;
+	double fade;
 };
 
 /** @short High level audio playback API **/
@@ -81,7 +91,7 @@ class Audio {
 	void pause(bool state = true);
 	/// toggles synth playback (F4)
 	void toggleSynth(Notes const& notes) { m_notes = (m_notes ? NULL : &notes); }
-
+	void streamFade(unsigned num, double level);
   private:
 	bool m_paused;
 	Notes const* volatile m_notes;

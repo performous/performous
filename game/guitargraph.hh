@@ -52,9 +52,11 @@ class GuitarGraph {
 	 * @param time at which time to draw
 	 */
 	void draw(double time);
-	void engine(double time);
+	void engine(Audio& audio);
 	void position(double cx, double width) { m_cx.setTarget(cx); m_width.setTarget(width); }
 	double dead(double time) const { return time > -0.5 && m_dead > 10; }
+	unsigned stream() const { return m_stream; }
+	double correctness() const { return m_correctness.get(); }
   private:
 	input::InputDev m_input;
 	Song const& m_song;
@@ -65,6 +67,7 @@ class GuitarGraph {
 	bool m_drums;
 	AnimValue m_cx, m_width;
 	unsigned m_track;
+	std::size_t m_stream;
 	std::vector<Track const*> m_tracks;
 	void drumHit(double time, int pad);
 	void guitarPlay(double time, input::Event const& ev);
@@ -87,7 +90,7 @@ class GuitarGraph {
 	Chords::iterator m_chordIt;
 	typedef std::map<Duration const*, int> NoteStatus;
 	NoteStatus m_notes;
-	AnimValue m_hammerReady;
+	AnimValue m_correctness;
 	int m_score;
 };
 

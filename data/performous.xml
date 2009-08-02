@@ -132,7 +132,15 @@
 		<limits min="-0.5" max="0.5" step="0.02" />
 		<locale name="C">
 			<short>Audio/video latency</short>
-			<long>Use negative value if your display input lag is greater than the sound card output latency, positive values in opposite case and zero if they are equal. F5/F6 to adjust this in singing screen.</long>
+			<long>Use negative value if your display input lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal. F5/F6 to adjust this in singing screen.</long>
+		</locale>
+	</entry>
+	<entry name="audio/controller_delay" type="float" value="0.00">
+		<ui unit=" ms" multiplier="1000" />
+		<limits min="-0.5" max="0.5" step="0.02" />
+		<locale name="C">
+			<short>Audio/controller latency</short>
+			<long>Use negative value if your controller lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal.</long>
 		</locale>
 	</entry>
 	<entry name="audio/round-trip" type="float" value="0.08">

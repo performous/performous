@@ -51,7 +51,22 @@ void ScreenSing::instrumentLayout(double time) {
 	for (Instruments::size_type i = 0, s = m_instruments.size(); i < s; ++i) {
 		m_instruments[i].position((0.5 + i - 0.5 * s) * iw, iw);
 	}
-	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it) it->draw(time);
+	typedef std::pair<unsigned, double> CountSum;
+	std::map<unsigned, CountSum> volume; // stream number to (count, sum)
+	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it) {
+		it->engine(m_audio);
+		CountSum& cs = volume[it->stream() + 1];
+		cs.first++;
+		cs.second += it->correctness();
+		it->draw(time);
+	}
+	// Set volume levels (averages of all instruments playing that track)
+	for (std::size_t i = 0, s = m_song->music.size(); i < s; ++i) {
+		double level = 1.0;
+		CountSum cs = volume[i];
+		if (cs.first > 0) level = cs.second / cs.first;
+		m_audio.streamFade(i, level); // +1 because 0 is bg
+	}
 }
 
 void ScreenSing::exit() {

@@ -42,10 +42,11 @@ GuitarGraph::GuitarGraph(Song const& song, bool drums, unsigned track):
   m_cx(0.0, 0.2),
   m_width(0.5, 0.4),
   m_track(track),
+  m_stream(),
   m_level(),
   m_dead(-1),
   m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
-  m_hammerReady(0.0, 2.0),
+  m_correctness(0.0, 2.0),
   m_score()
 {
 	for (Tracks::const_iterator it = m_song.tracks.begin(); it != m_song.tracks.end(); ++it) {
@@ -60,7 +61,9 @@ GuitarGraph::GuitarGraph(Song const& song, bool drums, unsigned track):
 	difficultyAuto();
 }
 
-void GuitarGraph::engine(double time) {
+void GuitarGraph::engine(Audio& audio) {
+	double time = audio.getPosition();
+	time -= config["audio/controller_delay"].f();
 	// Handle holds
 	if (!m_drums) {
 		for (int i = 0; i < 5; ++i) {
@@ -98,10 +101,11 @@ void GuitarGraph::engine(double time) {
 	}
 	// Skip missed notes
 	while (m_chordIt != m_chords.end() && m_chordIt->begin + maxTolerance < time) {
-		if (m_chordIt->status < m_chordIt->polyphony) m_hammerReady.setTarget(0.0);
+		if (m_chordIt->status < m_chordIt->polyphony) m_correctness.setTarget(0.0);
 		++m_chordIt;
 		++m_dead;
 	}
+	if (m_chordIt != m_chords.end() && m_chordIt->end < time) m_correctness.setTarget(1.0);
 }
 
 void GuitarGraph::drumHit(double time, int fret) {
@@ -120,11 +124,11 @@ void GuitarGraph::drumHit(double time, int fret) {
 	if (best == m_chords.end()) {
 		std::cout << "MISS" << std::endl;
 		m_score -= 50;
-		m_hammerReady.setTarget(0.0, true); // Instantly go to zero
+		m_correctness.setTarget(0.0, true); // Instantly go to zero
 	} else {
 		while (best != m_chordIt) {
 			if (m_chordIt->status == m_chordIt->polyphony) continue;
-			m_hammerReady.setTarget(0.0);
+			m_correctness.setTarget(0.0);
 			std::cout << "SKIPPED, ";
 			++m_chordIt;
 		}
@@ -148,8 +152,7 @@ void GuitarGraph::drumHit(double time, int fret) {
 void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 	bool picked = (ev.type == input::Event::PICK);
 	bool const* frets = ev.pressed; // Kinda b0rked, FIXME
-	if (!picked && m_hammerReady.get() < 0.5) return; // Hammering not possible at the moment
-	m_hammerReady.setTarget(0.0);
+	if (!picked && m_correctness.get() < 0.5) return; // Hammering not possible at the moment
 	// Find any suitable note within the tolerance
 	double tolerance = maxTolerance;
 	Chords::iterator best = m_chords.end();
@@ -173,7 +176,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 		std::cout << "MISS" << std::endl;
 		if (picked) {
 			m_score -= 50;
-			m_hammerReady.setTarget(0.0, true); // Instantly go to zero
+			m_correctness.setTarget(0.0, true); // Instantly go to zero
 		}
 	} else {
 		m_chordIt = best;
@@ -185,7 +188,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 		std::cout << ", new score = " << score << std::endl;
 		m_chordIt->status = 1 + picked;
 		m_score += score;
-		m_hammerReady.setTarget(1.0, true); // Instantly go to one
+		m_correctness.setTarget(1.0, true); // Instantly go to one
 	}
 }
 
@@ -197,6 +200,11 @@ void GuitarGraph::difficultyAuto() {
 bool GuitarGraph::difficulty(Difficulty level) {
 	m_track %= m_tracks.size();
 	Track const& track = *m_tracks[m_track];
+	// Find the stream number
+	for (m_stream = 0; m_stream < m_song.tracks.size(); ++m_stream) {
+		if (&track == &m_song.tracks[m_stream]) break;
+	}
+	// Check if the difficulty level is available
 	uint8_t basepitch = diffv[level].basepitch;
 	NoteMap const& nm = track.nm;
 	int fail = 0;
@@ -224,7 +232,6 @@ glutil::Color const& GuitarGraph::color(int fret) const {
 }
 
 void GuitarGraph::draw(double time) {
-	engine(time);
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
 	dimensions.screenBottom().middle(m_cx.get()).fixedWidth(m_width.get());
 	glutil::PushMatrixMode pmm(GL_PROJECTION);
@@ -298,7 +305,7 @@ void GuitarGraph::draw(double time) {
 			m_button.dimensions.center(time2y(tBeg)).middle(x);
 			m_button.draw();
 			if (it->tappable) {
-				float l = std::max(0.5, m_hammerReady.get());
+				float l = std::max(0.5, m_correctness.get());
 				glColor3f(l, l, l);
 				m_tap.dimensions = m_button.dimensions;
 				m_tap.draw();
