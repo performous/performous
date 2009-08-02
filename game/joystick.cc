@@ -65,7 +65,8 @@ input::SDL_devices input::sdl_devices;
 void input::init_devices() {
 	for (input::Private::InputDevs::iterator it = input::Private::devices.begin() ; it != input::Private::devices.end() ; ++it) {
 		unsigned int id = it->first;
-		if( it->second.assigned() ) continue;
+		if(it->second.assigned()) continue;
+		if(input::sdl_devices[id] == NULL) continue; // Keyboard
 		unsigned int num_buttons = SDL_JoystickNumButtons(input::sdl_devices[id]);
 		for( unsigned int i = 0 ; i < num_buttons ; ++i ) {
 			SDL_Event event;
@@ -116,6 +117,11 @@ void input::init() {
 	}
 	// Here we should send an event to have correct state buttons
 	init_devices();
+	// Adding keyboard instrument
+	std::cout << "Id: " << UINT_MAX << std::endl;
+	std::cout << "  Name: Keyboard (emulated guitar)" << std::endl;
+	input::sdl_devices[UINT_MAX] = NULL;
+	input::Private::devices[UINT_MAX] = input::Private::InputDevPrivate(input::Private::GUITAR_GH);
 }
 
 bool input::pushEvent(SDL_Event _e) {
@@ -125,6 +131,69 @@ bool input::pushEvent(SDL_Event _e) {
 
 	Event event;
 	switch(_e.type) {
+		case SDL_KEYDOWN: {
+			int button = 0;
+			joy_id = UINT_MAX;
+			if(!devices[joy_id].assigned()) return false;
+			switch(_e.key.keysym.sym) {
+				case SDLK_RETURN:
+					event.type = input::Event::PICK;
+					button = 0;
+					for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
+						event.pressed[i] = devices[joy_id].pressed(i);
+					}
+					devices[joy_id].addEvent(event);
+					return true;
+				case SDLK_F5:
+					button++;
+				case SDLK_F4:
+					button++;
+				case SDLK_F3:
+					button++;
+				case SDLK_F2:
+					button++;
+				case SDLK_F1:
+					event.type = input::Event::PRESS;
+					break;
+				default:
+					return false;
+			}
+			if(devices[joy_id].pressed(button)) return true; // repeating
+			event.button = button;
+			for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
+				event.pressed[i] = devices[joy_id].pressed(i);
+			}
+			event.pressed[button] = true;
+			devices[joy_id].addEvent(event);
+			break;
+		}
+		case SDL_KEYUP: {
+			int button = 0;
+			joy_id = UINT_MAX;
+			if(!devices[joy_id].assigned()) return false;
+			switch(_e.key.keysym.sym) {
+				case SDLK_F5:
+					button++;
+				case SDLK_F4:
+					button++;
+				case SDLK_F3:
+					button++;
+				case SDLK_F2:
+					button++;
+				case SDLK_F1:
+					event.type = input::Event::RELEASE;
+					break;
+				default:
+					return false;
+			}
+			event.button = button;
+			for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
+				event.pressed[i] = devices[joy_id].pressed(i);
+			}
+			event.pressed[button] = false;
+			devices[joy_id].addEvent(event);
+			break;
+		}
 		case SDL_JOYAXISMOTION:
 			joy_id = _e.jaxis.which;
 
