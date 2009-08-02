@@ -23,6 +23,8 @@ class AnimValue {
 	}
 	/// hard-sets anim value
 	void setValue(double value) { m_value = value; }
+	/// set the adjustment rate
+	void setRate(double value) { m_rate = value; }
 	/// get current anim value
 	double get() const {
 		double maxadj = m_rate * duration();

@@ -59,7 +59,7 @@ class GuitarGraph {
 	Song const& m_song;
 	Surface m_button;
 	Surface m_tap;
-	AnimValue m_pickValue;
+	AnimValue m_hit[6];
 	boost::ptr_vector<Texture> m_necks;
 	bool m_drums;
 	double m_cx, m_width;

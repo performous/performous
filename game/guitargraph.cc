@@ -38,7 +38,6 @@ GuitarGraph::GuitarGraph(Song const& song, bool drums, unsigned track):
   m_song(song),
   m_button("button.svg"),
   m_tap("tap.svg"),
-  m_pickValue(0.0, 5.0),
   m_drums(drums),
   m_cx(),
   m_width(0.5),
@@ -55,12 +54,15 @@ GuitarGraph::GuitarGraph(Song const& song, bool drums, unsigned track):
 		else if (it->name == "BASS") m_necks.push_back(new Texture("bassneck.svg"));
 		else m_necks.push_back(new Texture("guitarneck.svg"));
 	}
+	for (int i = 0; i < 6; ++i) m_hit[i].setRate(5.0);
 	if (m_tracks.empty()) throw std::runtime_error("No tracks");
 	difficultyAuto();
 }
 
 void GuitarGraph::engine(double time) {
 	for (input::Event ev; m_input.tryPoll(ev);) {
+		if (ev.type == input::Event::PRESS) m_hit[!m_drums + ev.button].setValue(1.0);
+		else if (ev.type == input::Event::PICK) m_hit[0].setValue(1.0);
 		if (time < -0.5) {
 			if (ev.type == input::Event::PICK || (m_drums && ev.type == input::Event::PRESS)) {
 				if (ev.pressed[4]) {
@@ -129,11 +131,7 @@ void GuitarGraph::drumHit(double time, int fret) {
 void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 	bool picked = (ev.type == input::Event::PICK);
 	bool const* frets = ev.pressed; // Kinda b0rked, FIXME
-	if (picked) {
-		m_pickValue.setValue(1.0);
-	} else {
-		if (m_hammerReady.get() < 0.5) return; // Hammering not possible at the moment
-	}
+	if (!picked && m_hammerReady.get() < 0.5) return; // Hammering not possible at the moment
 	m_hammerReady.setTarget(0.0);
 	// Find any suitable note within the tolerance
 	double tolerance = maxTolerance;
@@ -291,25 +289,20 @@ void GuitarGraph::draw(double time) {
 			}
 		}
 	}
-	// Draw the cursor / bass pedal
-	float level = m_pickValue.get();
+	// Draw the cursor
+	float level = m_hit[0].get();
 	glColor3f(level, level, level);
 	drawBar(0.0, 0.01f);
 	// Fret buttons on cursor
-	for (int fret = 0; fret < 5; ++fret) {
-		float x = -2.0f + fret;
-		if (m_drums) {
-			if (fret == 0) continue;
-			x -= 0.5f;
-		}
+	for (int fret = m_drums; fret < 5; ++fret) {
+		float x = -2.0f + fret - 0.5f * m_drums;
 		glColor4fv(color(fret));
 		m_button.dimensions.center(time2y(0.0)).middle(x);
 		m_button.draw();
-		if (m_input.pressed(fret)) {
-			glColor3f(1.0f, 1.0f, 1.0f);
-			m_tap.dimensions = m_button.dimensions;
-			m_tap.draw();
-		}
+		float l = m_hit[fret + !m_drums].get();
+		glColor3f(l, l, l);
+		m_tap.dimensions = m_button.dimensions;
+		m_tap.draw();
 	}
 	glColor3f(1.0f, 1.0f, 1.0f);
 }
