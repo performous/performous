@@ -25,8 +25,16 @@ namespace input {
 		enum Type {GUITAR_RB, DRUMS_RB, GUITAR_GH, DRUMS_GH};
 		class InputDevPrivate {
 		  public:
-			InputDevPrivate() : m_assigned(false), m_type(input::Private::DRUMS_GH) {};
-			InputDevPrivate(input::Private::Type _type) : m_assigned(false), m_type(_type) {};
+			InputDevPrivate() : m_assigned(false), m_type(input::Private::DRUMS_GH) {
+				for(unsigned int i = 0 ; i < BUTTONS ; i++) {
+					m_pressed[i] = false;
+				}
+			};
+			InputDevPrivate(input::Private::Type _type) : m_assigned(false), m_type(_type) {
+				for(unsigned int i = 0 ; i < BUTTONS ; i++) {
+					m_pressed[i] = false;
+				}
+			};
 			bool tryPoll(Event& _event) {
 				if( m_events.empty() ) return false;
 				_event = m_events.front();
