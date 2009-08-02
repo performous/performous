@@ -60,6 +60,19 @@ GuitarGraph::GuitarGraph(Song const& song, bool drums, unsigned track):
 }
 
 void GuitarGraph::engine(double time) {
+	// Handle holds
+	if (!m_drums) {
+		for (int i = 0; i < 5; ++i) {
+			if (m_input.pressed(i)) {
+				m_hit[i + 1].setValue(1.0);
+				// TODO: score holds etc
+			} else {
+				// TODO: Release holds
+			}
+		
+		}
+	}
+	// Handle all events
 	for (input::Event ev; m_input.tryPoll(ev);) {
 		if (ev.type == input::Event::PRESS) m_hit[!m_drums + ev.button].setValue(1.0);
 		else if (ev.type == input::Event::PICK) m_hit[0].setValue(1.0);
@@ -79,8 +92,9 @@ void GuitarGraph::engine(double time) {
 		} else {
 			if (ev.type == input::Event::PRESS || ev.type == input::Event::PICK) guitarPlay(time, ev);
 		}
+		if (m_score < 0) m_score = 0;
 	}
-	
+	// Skip missed notes
 	while (m_chordIt != m_chords.end() && m_chordIt->begin + maxTolerance < time) {
 		if (m_chordIt->status < m_chordIt->polyphony) m_hammerReady.setTarget(0.0);
 		++m_chordIt;
@@ -170,7 +184,6 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 		m_score += score;
 		m_hammerReady.setTarget(1.0, true); // Instantly go to one
 	}
-	if (m_score < 0) m_score = 0;
 }
 
 void GuitarGraph::difficultyAuto() {
