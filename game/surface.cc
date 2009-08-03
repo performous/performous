@@ -152,10 +152,10 @@ void Texture::load(unsigned int width, unsigned int height, pix::Format format, 
 	glTexParameterf(type(), GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
 	// When texture area is large, bilinear filter the original
 	glTexParameterf(type(), GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameterf(type(), GL_TEXTURE_MAX_LEVEL, 0);
 	// The texture wraps over at the edges (repeat)
 	glTexParameterf(type(), GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameterf(type(), GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(type(), GL_GENERATE_MIPMAP, GL_TRUE);
 	PixFmt const& f = getPixFmt(format);
 	glPixelStorei(GL_UNPACK_SWAP_BYTES, f.swap);
 	// Load the data into texture
