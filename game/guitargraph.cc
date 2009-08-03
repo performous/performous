@@ -244,21 +244,21 @@ glutil::Color const& GuitarGraph::color(int fret) const {
 void GuitarGraph::draw(double time) {
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
 	dimensions.screenBottom().middle(m_cx.get()).fixedWidth(m_width.get());
-	glutil::PushMatrixMode pmm(GL_PROJECTION);
 	double offsetX = 0.5 * (dimensions.x1() + dimensions.x2());
 	double frac = 0.75;  // Adjustable: 1.0 means fully separated, 0.0 means fully attached
-	glTranslatef(frac * 2.0 * offsetX, 0.0f, 0.0f);
-	glutil::PushMatrixMode pmb(GL_MODELVIEW);
-	glTranslatef((1.0 - frac) * offsetX, dimensions.y2(), 0.0f);
 	if (time < -0.5) {
 		std::string txt;
 		txt += m_tracks[m_track]->name + "\n" + diffv[m_level].name;
-		m_text.dimensions.middle(-0.1);
+		m_text.dimensions.screenBottom(-0.05).middle(-0.1 + offsetX);
 		m_text.draw(txt);
 	} else {
-		m_text.dimensions.middle(0.0);
+		m_text.dimensions.screenBottom(-0.15).middle(0.4 * dimensions.w() + offsetX);
 		m_text.draw(boost::lexical_cast<std::string>(m_score));
 	}
+	glutil::PushMatrixMode pmm(GL_PROJECTION);
+	glTranslatef(frac * 2.0 * offsetX, 0.0f, 0.0f);
+	glutil::PushMatrixMode pmb(GL_MODELVIEW);
+	glTranslatef((1.0 - frac) * offsetX, dimensions.y2(), 0.0f);
 	glRotatef(85.0f, 1.0f, 0.0f, 0.0f);
 	{ float s = dimensions.w() / 5.0f; glScalef(s, s, s); }
 	// Draw the neck
