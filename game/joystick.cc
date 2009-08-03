@@ -130,6 +130,7 @@ bool input::pushEvent(SDL_Event _e) {
 	using namespace input::Private;
 
 	Event event;
+	static bool pickPressed[2] = {}; // HACK for tracking enter and rshift status
 	switch(_e.type) {
 		case SDL_KEYDOWN: {
 			int button = 0;
@@ -137,6 +138,8 @@ bool input::pushEvent(SDL_Event _e) {
 			if(!devices[joy_id].assigned()) return false;
 			switch(_e.key.keysym.sym) {
 				case SDLK_RETURN:
+					if (pickPressed[0]) return true; // repeating
+					pickPressed[0] = true;
 					event.type = input::Event::PICK;
 					event.button = 1;
 					for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
@@ -145,6 +148,8 @@ bool input::pushEvent(SDL_Event _e) {
 					devices[joy_id].addEvent(event);
 					return true;
 				case SDLK_RSHIFT:
+					if (pickPressed[1]) return true; // repeating
+					pickPressed[1] = true;
 					event.type = input::Event::PICK;
 					event.button = 0;
 					for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
@@ -180,6 +185,8 @@ bool input::pushEvent(SDL_Event _e) {
 			joy_id = UINT_MAX;
 			if(!devices[joy_id].assigned()) return false;
 			switch(_e.key.keysym.sym) {
+				case SDLK_RETURN: pickPressed[0] = false; return true;
+				case SDLK_RSHIFT: pickPressed[1] = false; return true;
 				case SDLK_F5: case SDLK_5:
 					button++;
 				case SDLK_F4: case SDLK_4:
