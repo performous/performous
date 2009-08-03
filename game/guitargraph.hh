@@ -23,10 +23,6 @@ struct Chord {
 		std::fill(dur, dur + 5, static_cast<Duration const*>(NULL));
 	}
 	bool matches(bool const* fretPressed) {
-		for (int i = 0; i < 5; ++i) {
-			std::cout << fret[i] << fretPressed[i] << " ";
-		}
-		std::cout << std::endl;
 		if (polyphony == 1) {
 			bool shadowed = true;
 			for (int i = 0; i < 5; ++i) {
@@ -54,7 +50,7 @@ class GuitarGraph {
 	void draw(double time);
 	void engine(Audio& audio);
 	void position(double cx, double width) { m_cx.setTarget(cx); m_width.setTarget(width); }
-	double dead(double time) const { return time > -0.5 && m_dead > 10; }
+	double dead(double time) const { return time > -0.5 && m_dead > 50; }
 	unsigned stream() const { return m_stream; }
 	double correctness() const { return m_correctness.get(); }
   private:
@@ -78,6 +74,14 @@ class GuitarGraph {
 		DIFFICULTY_AMAZING,
 		DIFFICULTYCOUNT
 	} m_level;
+	struct Event {
+		double time;
+		AnimValue glow;
+		int type; // 0 = miss (pick), 1 = tap, 2 = pick
+		Event(double t, int ty): time(t), glow(0.0, 0.5), type(ty) { if (type > 0) glow.setValue(1.0); }
+	};
+	typedef std::vector<Event> Events;
+	Events m_events;
 	int m_dead;
 	glutil::Color const& color(int fret) const;
 	void drawBar(double time, float h);
@@ -88,7 +92,7 @@ class GuitarGraph {
 	typedef std::vector<Chord> Chords;
 	Chords m_chords;
 	Chords::iterator m_chordIt;
-	typedef std::map<Duration const*, int> NoteStatus;
+	typedef std::map<Duration const*, unsigned> NoteStatus; // Note in song to m_events[unsigned - 1] or 0 for not played
 	NoteStatus m_notes;
 	AnimValue m_correctness;
 	int m_score;

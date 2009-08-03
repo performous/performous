@@ -44,7 +44,7 @@ GuitarGraph::GuitarGraph(Song const& song, bool drums, unsigned track):
   m_track(track),
   m_stream(),
   m_level(),
-  m_dead(-1),
+  m_dead(1000),
   m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
   m_correctness(0.0, 5.0),
   m_score()
@@ -133,7 +133,8 @@ void GuitarGraph::drumHit(double time, int fret) {
 			++m_chordIt;
 		}
 		++m_chordIt->status;
-		m_notes[m_chordIt->dur[fret]] = 1;
+		m_events.push_back(Event(time, 1));
+		m_notes[m_chordIt->dur[fret]] = m_events.size();
 		double score = points(tolerance);
 		m_chordIt->score += score;
 		m_score += score;
@@ -180,10 +181,10 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 	std::cout << (picked ? "Pick: " : "Tap: ");
 	if (best == m_chords.end()) {
 		std::cout << "MISS" << std::endl;
-		if (picked) {
-			m_score -= 50;
-			m_correctness.setTarget(0.0, true); // Instantly go to zero
-		}
+		if (!picked) return;
+		m_score -= 50;
+		m_correctness.setTarget(0.0, true); // Instantly go to zero
+		m_events.push_back(Event(time, 0));
 	} else {
 		m_chordIt = best;
 		int& score = m_chordIt->score;
@@ -194,6 +195,10 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 		m_chordIt->status = 1 + picked;
 		m_score += score;
 		m_correctness.setTarget(1.0, true); // Instantly go to one
+		m_events.push_back(Event(time, 1 + picked));
+		for (int fret = 0; fret < 5; ++fret) {
+			if (m_chordIt->fret[fret]) m_notes[m_chordIt->dur[fret]] = m_events.size();
+		}
 	}
 }
 
@@ -288,7 +293,10 @@ void GuitarGraph::draw(double time) {
 			if (m_drums) x -= 0.5f;
 			float w = 0.5f;
 			glutil::Color c = color(fret);
-			if (m_notes[it->dur[fret]] == 1) c.r = c.g = c.b = 1.0f;
+			unsigned event = m_notes[it->dur[fret]];
+			if (event) {
+				c.r = c.g = c.b = std::max(0.5, m_events[event - 1].glow.get());
+			}
 			float wLine = 0.5f * w;
 			if (tEnd > future) tEnd = future;
 			if (m_drums && fret == 0) {
