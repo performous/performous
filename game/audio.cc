@@ -10,6 +10,17 @@
 #include <iostream>
 #include <memory>
 
+struct SampleStream {
+	SampleStream(boost::shared_ptr<FFmpeg> const& mpeg): m_mpeg(mpeg) {}
+	bool operator()(da::pcm_data& data) {
+		m_mpeg->audioQueue(data, m_pos);
+		return !m_mpeg->audioQueue.eof(m_pos);;
+	}
+  private:
+	boost::shared_ptr<FFmpeg> m_mpeg;
+	int64_t m_pos;
+};
+
 Audio::Audio(): m_paused(false) {
 	m_mixer.add(boost::ref(*this));
 }
@@ -54,6 +65,11 @@ bool Audio::operator()(da::pcm_data& areas) {
 	if (vol > 0) vol = std::pow(10.0, (vol - 100.0) / 100.0 * 2.0);
 	m_volume.level(vol);
 	return true;
+}
+
+void Audio::play(Sample const& s) {
+	da::lock_holder l = m_mixer.lock();
+	m_mixer.add(SampleStream(s.mpeg));
 }
 
 void Audio::playMusic(std::vector<std::string> const& filenames, bool preview, double fadeTime, double startPos) {

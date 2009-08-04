@@ -46,6 +46,11 @@ struct Stream {
 	double fade;
 };
 
+struct Sample {
+	Sample(std::string const& filename, unsigned int sr): mpeg(new FFmpeg(false, true, filename, sr)) {}
+	boost::shared_ptr<FFmpeg> mpeg;
+};
+
 /** @short High level audio playback API **/
 class Audio {
   public:
@@ -63,6 +68,8 @@ class Audio {
 	void playMusic(std::string const& filename, bool preview = false, double fadeTime = 0.5, double startPos = -0.2);
 	/// plays a list of songs
 	void playMusic(std::vector<std::string> const& filenames, bool preview = false, double fadeTime = 0.5, double startPos = -0.2);
+	/// plays a sample
+	void play(Sample const& s);
 	/// get pause status
 	bool isPaused() { return m_paused; }
 	/// stops music
@@ -92,6 +99,7 @@ class Audio {
 	/// toggles synth playback (F4)
 	void toggleSynth(Notes const& notes) { m_notes = (m_notes ? NULL : &notes); }
 	void streamFade(unsigned num, double level);
+	unsigned int getSR() const { return m_rs.rate(); }
   private:
 	bool m_paused;
 	Notes const* volatile m_notes;

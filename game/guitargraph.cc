@@ -1,4 +1,5 @@
 #include "guitargraph.hh"
+#include <cstdlib>
 
 namespace {
 	struct Diff { std::string name; int basepitch; } diffv[] = {
@@ -33,7 +34,8 @@ namespace {
 
 }
 
-GuitarGraph::GuitarGraph(Song const& song, bool drums, unsigned track):
+GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, unsigned track):
+  m_audio(audio),
   m_input(drums ? input::DRUMS : input::GUITAR),
   m_song(song),
   m_button("button.svg"),
@@ -49,6 +51,21 @@ GuitarGraph::GuitarGraph(Song const& song, bool drums, unsigned track):
   m_correctness(0.0, 5.0),
   m_score()
 {
+	unsigned int sr = m_audio.getSR();
+	if (m_drums) {
+		m_samples.push_back(Sample(getDataPath("sounds/drum_bass.ogg"), sr));
+		m_samples.push_back(Sample(getDataPath("sounds/drum_snare.ogg"), sr));
+		m_samples.push_back(Sample(getDataPath("sounds/drum_tom1.ogg"), sr));
+		m_samples.push_back(Sample(getDataPath("sounds/drum_tom2.ogg"), sr));
+		m_samples.push_back(Sample(getDataPath("sounds/drum_hi-hat.ogg"), sr));
+		m_samples.push_back(Sample(getDataPath("sounds/drum_cymbal.ogg"), sr));
+	} else {
+		m_samples.push_back(Sample(getDataPath("sounds/guitar_fail1.ogg"), sr));
+		m_samples.push_back(Sample(getDataPath("sounds/guitar_fail2.ogg"), sr));
+		m_samples.push_back(Sample(getDataPath("sounds/guitar_fail3.ogg"), sr));
+		m_samples.push_back(Sample(getDataPath("sounds/guitar_fail4.ogg"), sr));
+		m_samples.push_back(Sample(getDataPath("sounds/guitar_fail5.ogg"), sr));
+	}
 	for (Tracks::const_iterator it = m_song.tracks.begin(); it != m_song.tracks.end(); ++it) {
 		if (drums != (it->name == "DRUMS")) continue;
 		m_tracks.push_back(&*it);
@@ -61,8 +78,8 @@ GuitarGraph::GuitarGraph(Song const& song, bool drums, unsigned track):
 	difficultyAuto();
 }
 
-void GuitarGraph::engine(Audio& audio) {
-	double time = audio.getPosition();
+void GuitarGraph::engine() {
+	double time = m_audio.getPosition();
 	time -= config["audio/controller_delay"].f();
 	// Handle holds
 	if (!m_drums) {
@@ -113,6 +130,15 @@ void GuitarGraph::engine(Audio& audio) {
 	}
 }
 
+void GuitarGraph::fail(double time, int fret) {
+	std::cout << "MISS" << std::endl;
+	if (fret == -2) return; // Tapped note
+	m_events.push_back(Event(time, 0, fret));
+	if (fret < 0) fret = std::rand();
+	m_audio.play(m_samples[fret % m_samples.size()]);
+	m_score -= 50;
+}
+
 void GuitarGraph::drumHit(double time, int fret) {
 	// Find any suitable note within the tolerance
 	double tolerance = maxTolerance;
@@ -126,11 +152,8 @@ void GuitarGraph::drumHit(double time, int fret) {
 		}
 	}
 	std::cout << "Drum: ";
-	if (best == m_chords.end()) {
-		std::cout << "MISS" << std::endl;
-		m_score -= 50;
-		m_events.push_back(Event(time, 0, fret));
-	} else {
+	if (best == m_chords.end()) fail(time, fret);
+	else {
 		for (; best != m_chordIt; ++m_chordIt) {
 			if (m_chordIt->status == m_chordIt->polyphony) continue;
 			std::cout << "SKIPPED, ";
@@ -145,13 +168,12 @@ void GuitarGraph::drumHit(double time, int fret) {
 			m_score -= m_chordIt->score;
 			m_chordIt->score *= m_chordIt->polyphony;
 			m_score += m_chordIt->score;
-			std::cout << "FULL HIT!";
+			std::cout << "FULL HIT!" << std::endl;
 		} else {
-			std::cout << "HIT";
+			std::cout << "HIT" << std::endl;
 		}
 		m_correctness.setTarget(double(m_chordIt->status) / m_chordIt->polyphony, true);
 	}
-	std::cout << std::endl;
 }
 
 void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
@@ -183,12 +205,8 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 		}
 	}
 	std::cout << (picked ? "Pick: " : "Tap: ");
-	if (best == m_chords.end()) {
-		std::cout << "MISS" << std::endl;
-		if (!picked) return;
-		m_score -= 50;
-		m_events.push_back(Event(time, 0));
-	} else {
+	if (best == m_chords.end()) fail(time, picked ? 0 : -2);
+	else {
 		m_chordIt = best;
 		int& score = m_chordIt->score;
 		std::cout << "HIT, error = " << int(1000.0 * (best->begin - time)) << " ms" << std::endl;

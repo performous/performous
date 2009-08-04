@@ -38,7 +38,7 @@ void ScreenSing::enter() {
 		try {
 			Instruments::iterator it = m_instruments.end();
 			if (drums && m_instruments.size() > 1) it = m_instruments.begin() + 1; // Drums go after the first guitar
-			m_instruments.insert(it, new GuitarGraph(*m_song, drums, num));
+			m_instruments.insert(it, new GuitarGraph(m_audio, *m_song, drums, num));
 		} catch (std::runtime_error&) { if (drums) break; drums = true; }
 	}
 }
@@ -54,7 +54,7 @@ void ScreenSing::instrumentLayout(double time) {
 	typedef std::pair<unsigned, double> CountSum;
 	std::map<unsigned, CountSum> volume; // stream number to (count, sum)
 	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it) {
-		it->engine(m_audio);
+		it->engine();
 		CountSum& cs = volume[it->stream() + 1];
 		cs.first++;
 		cs.second += it->correctness();

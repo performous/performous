@@ -43,17 +43,20 @@ static inline bool operator==(Chord const& a, Chord const& b) {
 class GuitarGraph {
   public:
 	/// constructor
-	GuitarGraph(Song const& song, bool drums, unsigned num);
+	GuitarGraph(Audio& audio, Song const& song, bool drums, unsigned num);
 	/** draws GuitarGraph
 	 * @param time at which time to draw
 	 */
 	void draw(double time);
-	void engine(Audio& audio);
+	void engine();
 	void position(double cx, double width) { m_cx.setTarget(cx); m_width.setTarget(width); }
 	double dead(double time) const { return time > -0.5 && m_dead > 50; }
 	unsigned stream() const { return m_stream; }
 	double correctness() const { return m_correctness.get(); }
   private:
+	void fail(double time, int fret);
+	Audio& m_audio;
+	std::vector<Sample> m_samples;
 	input::InputDev m_input;
 	Song const& m_song;
 	Surface m_button;
