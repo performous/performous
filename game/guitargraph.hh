@@ -78,7 +78,8 @@ class GuitarGraph {
 		double time;
 		AnimValue glow;
 		int type; // 0 = miss (pick), 1 = tap, 2 = pick
-		Event(double t, int ty): time(t), glow(0.0, 0.5), type(ty) { if (type > 0) glow.setValue(1.0); }
+		int fret;
+		Event(double t, int ty, int f = -1): time(t), glow(0.0, 0.5), type(ty), fret(f) { if (type > 0) glow.setValue(1.0); }
 	};
 	typedef std::vector<Event> Events;
 	Events m_events;

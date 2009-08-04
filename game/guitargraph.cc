@@ -83,14 +83,14 @@ void GuitarGraph::engine(Audio& audio) {
 		else if (ev.type == input::Event::PICK) m_hit[0].setValue(1.0);
 		if (time < -0.5) {
 			if (ev.type == input::Event::PICK || (m_drums && ev.type == input::Event::PRESS)) {
-				if (ev.pressed[4]) {
+				if (m_drums ? ev.pressed[0] : ev.pressed[4]) {
 					++m_track;
 					if (!difficulty(m_level)) difficultyAuto();
 				}
-				if (ev.pressed[0]) difficulty(DIFFICULTY_SUPAEASY);
-				else if (ev.pressed[1]) difficulty(DIFFICULTY_EASY);
-				else if (ev.pressed[2]) difficulty(DIFFICULTY_MEDIUM);
-				else if (ev.pressed[3]) difficulty(DIFFICULTY_AMAZING);
+				if (ev.pressed[0 + m_drums]) difficulty(DIFFICULTY_SUPAEASY);
+				else if (ev.pressed[1 + m_drums]) difficulty(DIFFICULTY_EASY);
+				else if (ev.pressed[2 + m_drums]) difficulty(DIFFICULTY_MEDIUM);
+				else if (ev.pressed[3 + m_drums]) difficulty(DIFFICULTY_AMAZING);
 			}
 		} else if (m_drums) {
 			if (ev.type == input::Event::PRESS) drumHit(time, ev.button);
@@ -101,11 +101,11 @@ void GuitarGraph::engine(Audio& audio) {
 	}
 	// Skip missed notes
 	while (m_chordIt != m_chords.end() && m_chordIt->begin + maxTolerance < time) {
-		if (m_chordIt->status < m_chordIt->polyphony) m_correctness.setTarget(0.0);
 		++m_chordIt;
 		++m_dead;
 	}
-	if (m_chordIt != m_chords.end() && m_chordIt->end < time) m_correctness.setTarget(1.0);
+	if (!m_events.empty() && m_events.back().type == 0) m_correctness.setTarget(0.0, true);
+	else if (m_chordIt != m_chords.end() && m_chordIt->begin <= time) m_correctness.setTarget(double(m_chordIt->status) / m_chordIt->polyphony);
 }
 
 void GuitarGraph::drumHit(double time, int fret) {
@@ -124,13 +124,11 @@ void GuitarGraph::drumHit(double time, int fret) {
 	if (best == m_chords.end()) {
 		std::cout << "MISS" << std::endl;
 		m_score -= 50;
-		m_correctness.setTarget(0.0, true); // Instantly go to zero
+		m_events.push_back(Event(time, 0, fret));
 	} else {
-		while (best != m_chordIt) {
+		for (; best != m_chordIt; ++m_chordIt) {
 			if (m_chordIt->status == m_chordIt->polyphony) continue;
-			m_correctness.setTarget(0.0);
 			std::cout << "SKIPPED, ";
-			++m_chordIt;
 		}
 		++m_chordIt->status;
 		m_events.push_back(Event(time, 1));
@@ -146,6 +144,7 @@ void GuitarGraph::drumHit(double time, int fret) {
 		} else {
 			std::cout << "HIT";
 		}
+		m_correctness.setTarget(double(m_chordIt->status) / m_chordIt->polyphony, true);
 	}
 	std::cout << std::endl;
 }
@@ -183,7 +182,6 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 		std::cout << "MISS" << std::endl;
 		if (!picked) return;
 		m_score -= 50;
-		m_correctness.setTarget(0.0, true); // Instantly go to zero
 		m_events.push_back(Event(time, 0));
 	} else {
 		m_chordIt = best;
