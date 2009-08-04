@@ -184,6 +184,14 @@
 			<long>The ingame music volume. Values above 90 are not recommended as distortion may occur.</long>
 		</locale>
 	</entry>
+	<entry name="audio/fail_volume" type="int" value="90">
+		<ui unit=" %" />
+		<limits min="0" max="100" step="5" />
+		<locale name="C">
+			<short>Failure volume</short>
+			<long>The ingame fail sound volume. Values above 90 are not recommended as distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!</long>
+		</locale>
+	</entry>
 
 	<!-- System preferences -->
 	<entry name="system/path_data" type="string_list">

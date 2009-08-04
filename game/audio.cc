@@ -67,9 +67,15 @@ bool Audio::operator()(da::pcm_data& areas) {
 	return true;
 }
 
-void Audio::play(Sample const& s) {
-	da::lock_holder l = m_mixer.lock();
-	m_mixer.add(SampleStream(s.mpeg));
+void Audio::play(Sample const& s, std::string const& volumeSetting) {
+	double vol = config[volumeSetting].i();
+	if (vol > 0) vol = std::pow(10.0, (vol - 100.0) / 100.0 * 2.0);
+	m_volume.level(vol);
+	boost::shared_ptr<da::accumulate> acc(new da::accumulate());
+	acc->add(da::shared_ref(new SampleStream(s.mpeg)));
+	acc->add(da::shared_ref(new da::volume(vol)));
+	m_mixer.add(da::shared_ref(acc));
+	std::cout << "FAIL with volume " << vol << std::endl;
 }
 
 void Audio::playMusic(std::vector<std::string> const& filenames, bool preview, double fadeTime, double startPos) {

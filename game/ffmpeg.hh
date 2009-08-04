@@ -111,7 +111,7 @@ class VideoFifo {
 
 class AudioBuffer {
   public:
-	AudioBuffer(size_t size = 1000000): m_data(size), m_pos(), m_posReq(), m_sps(), m_duration(getNaN()), m_quit() {}
+	AudioBuffer(size_t size = 2000000): m_data(size), m_pos(), m_posReq(), m_sps(), m_duration(getNaN()), m_quit() {}
 	/// Reset from FFMPEG side (seeking to beginning or terminate stream)
 	void reset() {
 		boost::mutex::scoped_lock l(m_mutex);
@@ -162,7 +162,7 @@ class AudioBuffer {
 		return oldest > 0 && m_posReq < int64_t(oldest);
 	}
   private:
-	bool wantMore() { return int64_t(m_pos) - 30000 < m_posReq; }
+	bool wantMore() { return int64_t(m_pos) - int64_t(m_data.capacity() / 2) < m_posReq; }
 	bool condition() { return m_quit || wantMore() || wantSeek(); }
 	mutable boost::mutex m_mutex;
 	boost::condition m_cond;

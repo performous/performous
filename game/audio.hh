@@ -69,7 +69,7 @@ class Audio {
 	/// plays a list of songs
 	void playMusic(std::vector<std::string> const& filenames, bool preview = false, double fadeTime = 0.5, double startPos = -0.2);
 	/// plays a sample
-	void play(Sample const& s);
+	void play(Sample const& s, std::string const& volumeSetting);
 	/// get pause status
 	bool isPaused() { return m_paused; }
 	/// stops music

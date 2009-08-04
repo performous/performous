@@ -135,7 +135,7 @@ void GuitarGraph::fail(double time, int fret) {
 	if (fret == -2) return; // Tapped note
 	m_events.push_back(Event(time, 0, fret));
 	if (fret < 0) fret = std::rand();
-	m_audio.play(m_samples[fret % m_samples.size()]);
+	m_audio.play(m_samples[unsigned(fret) % m_samples.size()], "audio/fail_volume");
 	m_score -= 50;
 }
 
@@ -205,7 +205,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 		}
 	}
 	std::cout << (picked ? "Pick: " : "Tap: ");
-	if (best == m_chords.end()) fail(time, picked ? 0 : -2);
+	if (best == m_chords.end()) fail(time, picked ? -1 : -2);
 	else {
 		m_chordIt = best;
 		int& score = m_chordIt->score;
