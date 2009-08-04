@@ -105,7 +105,12 @@ void GuitarGraph::engine(Audio& audio) {
 		++m_dead;
 	}
 	if (!m_events.empty() && m_events.back().type == 0) m_correctness.setTarget(0.0, true);
-	else if (m_chordIt != m_chords.end() && m_chordIt->begin <= time) m_correctness.setTarget(double(m_chordIt->status) / m_chordIt->polyphony);
+	else if (m_chordIt != m_chords.end() && m_chordIt->begin <= time) {
+		double level;
+		if (m_drums) level = double(m_chordIt->status) / m_chordIt->polyphony;
+		else level = m_chordIt->status ? 1.0 : 0.0;
+		m_correctness.setTarget(level);
+	}
 }
 
 void GuitarGraph::drumHit(double time, int fret) {
