@@ -55,6 +55,7 @@ class GuitarGraph {
 	double correctness() const { return m_correctness.get(); }
   private:
 	void fail(double time, int fret);
+	void endHold(int fret);
 	Audio& m_audio;
 	input::InputDev m_input;
 	Song const& m_song;
@@ -82,10 +83,13 @@ class GuitarGraph {
 		AnimValue glow;
 		int type; // 0 = miss (pick), 1 = tap, 2 = pick
 		int fret;
-		Event(double t, int ty, int f = -1): time(t), glow(0.0, 0.5), type(ty), fret(f) { if (type > 0) glow.setValue(1.0); }
+		Duration const* dur;
+		double holdTime;
+		Event(double t, int ty, int f = -1, Duration const* d = NULL): time(t), glow(0.0, 5.0), type(ty), fret(f), dur(d), holdTime(d ? d->begin : getNaN()) { if (type > 0) glow.setValue(1.0); }
 	};
 	typedef std::vector<Event> Events;
 	Events m_events;
+	unsigned m_holds[5];
 	int m_dead;
 	glutil::Color const& color(int fret) const;
 	void drawBar(double time, float h);
@@ -100,6 +104,6 @@ class GuitarGraph {
 	typedef std::map<Duration const*, unsigned> NoteStatus; // Note in song to m_events[unsigned - 1] or 0 for not played
 	NoteStatus m_notes;
 	AnimValue m_correctness;
-	int m_score;
+	double m_score;
 };
 

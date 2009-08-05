@@ -77,6 +77,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, unsigned tr
 		else m_necks.push_back(new Texture("guitarneck.svg"));
 	}
 	for (int i = 0; i < 6; ++i) m_hit[i].setRate(5.0);
+	for (int i = 0; i < 5; ++i) m_holds[i] = 0;
 	if (m_tracks.empty()) throw std::runtime_error("No tracks");
 	difficultyAuto();
 }
@@ -84,21 +85,18 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, unsigned tr
 void GuitarGraph::engine() {
 	double time = m_audio.getPosition();
 	time -= config["audio/controller_delay"].f();
-	// Handle holds
+	// Handle key markers
 	if (!m_drums) {
 		for (int i = 0; i < 5; ++i) {
-			if (m_input.pressed(i)) {
-				m_hit[i + 1].setValue(1.0);
-				// TODO: score holds etc
-			} else {
-				// TODO: Release holds
-			}
-		
+			if (m_input.pressed(i)) m_hit[i + 1].setValue(1.0);
 		}
 	}
 	// Handle all events
 	for (input::Event ev; m_input.tryPoll(ev);) {
 		m_dead = false;
+		if (!m_drums && ev.type == input::Event::RELEASE) {
+			endHold(ev.button);
+		}
 		if (ev.type == input::Event::PRESS) m_hit[!m_drums + ev.button].setValue(1.0);
 		else if (ev.type == input::Event::PICK) m_hit[0].setValue(1.0);
 		if (time < -0.5) {
@@ -131,6 +129,27 @@ void GuitarGraph::engine() {
 		else level = m_chordIt->status ? 1.0 : 0.0;
 		m_correctness.setTarget(level);
 	}
+	if (!m_drums) {
+		// Processing holds
+		for (int fret = 0; fret < 5; ++fret) {
+			if (!m_holds[fret]) continue;
+			Event& ev = m_events[m_holds[fret] - 1];
+			ev.glow.setTarget(1.0, true);
+			double last = std::min(time, ev.dur->end);
+			double t = last - ev.holdTime;
+			if (t > 0) {
+				m_score += t * 10.0;
+				ev.holdTime = time;
+			}
+			if (last == ev.dur->end) m_holds[fret] = 0;
+		}
+	}
+}
+
+void GuitarGraph::endHold(int fret) {
+	if (!m_holds[fret]) return;
+	m_events[m_holds[fret] - 1].glow.setTarget(0.0);
+	m_holds[fret] = 0;
 }
 
 void GuitarGraph::fail(double time, int fret) {
@@ -163,8 +182,9 @@ void GuitarGraph::drumHit(double time, int fret) {
 			std::cout << "SKIPPED, ";
 		}
 		++m_chordIt->status;
-		m_events.push_back(Event(time, 1));
-		m_notes[m_chordIt->dur[fret]] = m_events.size();
+		Duration const* dur = m_chordIt->dur[fret];
+		m_events.push_back(Event(time, 1, fret, dur));
+		m_notes[dur] = m_events.size();
 		double score = points(tolerance);
 		m_chordIt->score += score;
 		m_score += score;
@@ -184,7 +204,10 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 	bool picked = (ev.type == input::Event::PICK);
 	bool frets[5] = {};
 	if (picked) {
-		for (int fret = 0; fret < 5; ++fret) frets[fret] = ev.pressed[fret];
+		for (int fret = 0; fret < 5; ++fret) {
+			frets[fret] = ev.pressed[fret];
+			m_holds[fret] = 0;
+		}
 	} else {
 		if (m_correctness.get() < 0.5) return; // Hammering not possible at the moment
 		frets[ev.button] = true;
@@ -220,9 +243,12 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 		m_chordIt->status = 1 + picked;
 		m_score += score;
 		m_correctness.setTarget(1.0, true); // Instantly go to one
-		m_events.push_back(Event(time, 1 + picked));
 		for (int fret = 0; fret < 5; ++fret) {
-			if (m_chordIt->fret[fret]) m_notes[m_chordIt->dur[fret]] = m_events.size();
+			if (!m_chordIt->fret[fret]) continue;
+			Duration const* dur = m_chordIt->dur[fret];
+			m_events.push_back(Event(time, 1 + picked, fret, dur));
+			m_notes[dur] = m_events.size();
+			m_holds[fret] = m_events.size();
 		}
 	}
 }
