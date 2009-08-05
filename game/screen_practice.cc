@@ -28,6 +28,7 @@ void ScreenPractice::enter() {
 
 void ScreenPractice::exit() {
 	m_vumeters.clear();
+	m_samples.clear();
 	theme.reset();
 	drums.reset();
 }
@@ -54,7 +55,7 @@ void ScreenPractice::manageEvent(SDL_Event event) {
 }
 
 void ScreenPractice::draw() {
-	if( drums ) {
+	if( drums && m_samples.size()) {
 		input::Event input_event;
 		while( drums->tryPoll(input_event) ) {
 			if(input_event.type == input::Event::PRESS) {
