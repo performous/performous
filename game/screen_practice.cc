@@ -40,6 +40,9 @@ void ScreenPractice::manageEvent(SDL_Event event) {
 			default: // nothing to do, fixes warnings
 				break;
 		}
+	} else if (event.type == SDL_JOYBUTTONDOWN) {
+		int button = event.jbutton.button;
+		if (button == 2) sm->activateScreen("Intro");
 	}
 	input::Event input_event;
 	if( drums ) {

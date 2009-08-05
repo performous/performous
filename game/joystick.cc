@@ -217,6 +217,7 @@ bool input::pushEvent(SDL_Event _e) {
 		}
 		case SDL_JOYAXISMOTION:
 			joy_id = _e.jaxis.which;
+			if(!devices[joy_id].assigned()) return false;
 			if (_e.jaxis.axis != 5 && _e.jaxis.axis != 6) return false;
 			event.type = input::Event::PICK;
 			for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
@@ -233,6 +234,7 @@ bool input::pushEvent(SDL_Event _e) {
 		case SDL_JOYHATMOTION:
 			joy_id = _e.jhat.which;
 
+			if(!devices[joy_id].assigned()) return false;
 			event.type = input::Event::PICK;
 			for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
 				event.pressed[i] = devices[joy_id].pressed(i);
@@ -247,6 +249,7 @@ bool input::pushEvent(SDL_Event _e) {
 			break;
 		case SDL_JOYBUTTONDOWN:
 			joy_id = _e.jbutton.which;
+			if(!devices[joy_id].assigned()) return false;
 			button = buttonFromSDL(devices[joy_id].type(),_e.jbutton.button);
 			if( button == -1 ) return false;
 			for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
@@ -259,6 +262,7 @@ bool input::pushEvent(SDL_Event _e) {
 			break;
 		case SDL_JOYBUTTONUP:
 			joy_id = _e.jbutton.which;
+			if(!devices[joy_id].assigned()) return false;
 			button = buttonFromSDL(devices[joy_id].type(),_e.jbutton.button);
 			if( button == -1 ) return false;
 			for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {

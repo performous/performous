@@ -68,34 +68,64 @@ void ScreenSongs::manageSharedKey(int key, SDLMod mod)
 
 void ScreenSongs::manageEvent(SDL_Event event) {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
-	if (event.type != SDL_KEYDOWN) return;
-	SDL_keysym keysym = event.key.keysym;
-	int key = keysym.sym;
-	SDLMod mod = event.key.keysym.mod;
-	if (m_jukebox) {
-		if (key == SDLK_ESCAPE || m_songs.empty()) m_jukebox = false;
-		else if (key == SDLK_PAGEUP) m_audio.seek(-30);
-		else if (key == SDLK_PAGEDOWN) m_audio.seek(30);
-		else if (key == SDLK_UP) m_audio.seek(5);
-		else if (key == SDLK_DOWN) m_audio.seek(-5);
+	if (event.type == SDL_KEYDOWN) {
+		SDL_keysym keysym = event.key.keysym;
+		int key = keysym.sym;
+		SDLMod mod = event.key.keysym.mod;
+		if (m_jukebox) {
+			if (key == SDLK_ESCAPE || m_songs.empty()) m_jukebox = false;
+			else if (key == SDLK_PAGEUP) m_audio.seek(-30);
+			else if (key == SDLK_PAGEDOWN) m_audio.seek(30);
+			else if (key == SDLK_UP) m_audio.seek(5);
+			else if (key == SDLK_DOWN) m_audio.seek(-5);
+			else manageSharedKey(key, mod);
+			return;
+		}
+		if (key == SDLK_r && mod & KMOD_CTRL) { m_songs.reload(); m_songs.setFilter(m_search.text); }
+		if (!m_jukebox && m_search.process(keysym)) m_songs.setFilter(m_search.text);
+		else if (key == SDLK_ESCAPE) {
+			if (m_search.text.empty()) sm->activateScreen("Intro");
+			else { m_search.text.clear(); m_songs.setFilter(m_search.text); }
+		}
+		// The rest are only available when there are songs available
+		else if (m_songs.empty()) return;
+		else if (key == SDLK_PAGEUP) m_songs.advance(-10);
+		else if (key == SDLK_PAGEDOWN) m_songs.advance(10);
+		else if (key == SDLK_UP) m_songs.sortChange(-1);
+		else if (key == SDLK_DOWN) m_songs.sortChange(1);
+		else if (!m_jukebox && key == SDLK_F4) m_jukebox = true;
+		else if (key == SDLK_TAB && !(mod & KMOD_ALT)) m_songs.randomize();
 		else manageSharedKey(key, mod);
-		return;
+	} else if (event.type == SDL_JOYBUTTONDOWN) {
+		int button = event.jbutton.button;
+		if (button == 1) {
+			ScreenManager* sm = ScreenManager::getSingletonPtr();
+			Screen* s = sm->getScreen("Sing");
+			ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
+			assert(ss);
+			ss->setSong(m_songs.currentPtr());
+			sm->activateScreen("Sing");
+		} else if (button == 2) {
+			if (m_jukebox) {
+				m_jukebox = false;
+			} else {
+				if (m_search.text.empty()) sm->activateScreen("Intro");
+				else { m_search.text.clear(); m_songs.setFilter(m_search.text); }
+			}
+		}
+	} else if (event.type == SDL_JOYAXISMOTION) {
+		int axis = event.jaxis.axis;
+		int value = event.jaxis.value;
+		if (m_jukebox) {
+			if (axis == 5 && value > 0) m_audio.seek(5);
+			else if (axis == 5 && value < 0) m_audio.seek(-5);
+		} else {
+			if (axis == 5 && value > 0) m_songs.sortChange(-1);
+			else if (axis == 5 && value < 0) m_songs.sortChange(1);
+		}
+		if (axis == 4 && value > 0) m_songs.advance(1);
+		else if (axis == 4 && value < 0) m_songs.advance(-1);
 	}
-	if (key == SDLK_r && mod & KMOD_CTRL) { m_songs.reload(); m_songs.setFilter(m_search.text); }
-	if (!m_jukebox && m_search.process(keysym)) m_songs.setFilter(m_search.text);
-	else if (key == SDLK_ESCAPE) {
-		if (m_search.text.empty()) sm->activateScreen("Intro");
-		else { m_search.text.clear(); m_songs.setFilter(m_search.text); }
-	}
-	// The rest are only available when there are songs available
-	else if (m_songs.empty()) return;
-	else if (key == SDLK_PAGEUP) m_songs.advance(-10);
-	else if (key == SDLK_PAGEDOWN) m_songs.advance(10);
-	else if (key == SDLK_UP) m_songs.sortChange(-1);
-	else if (key == SDLK_DOWN) m_songs.sortChange(1);
-	else if (!m_jukebox && key == SDLK_F4) m_jukebox = true;
-	else if (key == SDLK_TAB && !(mod & KMOD_ALT)) m_songs.randomize();
-	else manageSharedKey(key, mod);
 }
 
 void ScreenSongs::drawJukebox() {

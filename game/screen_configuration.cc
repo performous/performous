@@ -32,6 +32,16 @@ void ScreenConfiguration::manageEvent(SDL_Event event) {
 		else if (key == SDLK_RIGHT) ++*ci;
 		else if (key == SDLK_r && modifier & KMOD_CTRL) ci->reset();
 		else if (key == SDLK_s && modifier & KMOD_CTRL) writeConfig();
+	} else if (event.type == SDL_JOYBUTTONDOWN) {
+		int button = event.jbutton.button;
+		if (button == 2) sm->activateScreen("Intro");
+	} else if (event.type == SDL_JOYAXISMOTION) {
+		int axis = event.jaxis.axis;
+		int value = event.jaxis.value;
+		if (axis == 5 && value > 0 && selected + 1 < configuration.size()) ++selected;
+		else if (axis == 5 && value < 0 && selected > 0) --selected;
+		else if (axis == 4 && value > 0) ++*ci;
+		else if (axis == 4 && value < 0) --*ci;
 	}
 }
 
