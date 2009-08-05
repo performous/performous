@@ -56,7 +56,6 @@ class GuitarGraph {
   private:
 	void fail(double time, int fret);
 	Audio& m_audio;
-	std::vector<Sample> m_samples;
 	input::InputDev m_input;
 	Song const& m_song;
 	Surface m_button;

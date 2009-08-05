@@ -32,6 +32,8 @@ namespace {
 		return score;
 	}
 
+	std::vector<Sample> g_samplesG, g_samplesD;
+
 }
 
 GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, unsigned track):
@@ -52,19 +54,18 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, unsigned tr
   m_score()
 {
 	unsigned int sr = m_audio.getSR();
-	if (m_drums) {
-		m_samples.push_back(Sample(getDataPath("sounds/drum_bass.ogg"), sr));
-		m_samples.push_back(Sample(getDataPath("sounds/drum_snare.ogg"), sr));
-		m_samples.push_back(Sample(getDataPath("sounds/drum_hi-hat.ogg"), sr));
-		m_samples.push_back(Sample(getDataPath("sounds/drum_tom1.ogg"), sr));
-		m_samples.push_back(Sample(getDataPath("sounds/drum_cymbal.ogg"), sr));
-		//m_samples.push_back(Sample(getDataPath("sounds/drum_tom2.ogg"), sr));
-	} else {
-		m_samples.push_back(Sample(getDataPath("sounds/guitar_fail1.ogg"), sr));
-		m_samples.push_back(Sample(getDataPath("sounds/guitar_fail2.ogg"), sr));
-		m_samples.push_back(Sample(getDataPath("sounds/guitar_fail3.ogg"), sr));
-		m_samples.push_back(Sample(getDataPath("sounds/guitar_fail4.ogg"), sr));
-		m_samples.push_back(Sample(getDataPath("sounds/guitar_fail5.ogg"), sr));
+	if (g_samplesD.empty()) {
+		g_samplesD.push_back(Sample(getDataPath("sounds/drum_bass.ogg"), sr));
+		g_samplesD.push_back(Sample(getDataPath("sounds/drum_snare.ogg"), sr));
+		g_samplesD.push_back(Sample(getDataPath("sounds/drum_hi-hat.ogg"), sr));
+		g_samplesD.push_back(Sample(getDataPath("sounds/drum_tom1.ogg"), sr));
+		g_samplesD.push_back(Sample(getDataPath("sounds/drum_cymbal.ogg"), sr));
+		//g_samplesD.push_back(Sample(getDataPath("sounds/drum_tom2.ogg"), sr));
+		g_samplesG.push_back(Sample(getDataPath("sounds/guitar_fail1.ogg"), sr));
+		g_samplesG.push_back(Sample(getDataPath("sounds/guitar_fail2.ogg"), sr));
+		g_samplesG.push_back(Sample(getDataPath("sounds/guitar_fail3.ogg"), sr));
+		g_samplesG.push_back(Sample(getDataPath("sounds/guitar_fail4.ogg"), sr));
+		g_samplesG.push_back(Sample(getDataPath("sounds/guitar_fail5.ogg"), sr));
 	}
 	for (Tracks::const_iterator it = m_song.tracks.begin(); it != m_song.tracks.end(); ++it) {
 		if (drums != (it->name == "DRUMS")) continue;
@@ -135,7 +136,8 @@ void GuitarGraph::fail(double time, int fret) {
 	if (fret == -2) return; // Tapped note
 	m_events.push_back(Event(time, 0, fret));
 	if (fret < 0) fret = std::rand();
-	m_audio.play(m_samples[unsigned(fret) % m_samples.size()], "audio/fail_volume");
+	std::vector<Sample> const& samples = (m_drums ? g_samplesD : g_samplesG);
+	m_audio.play(samples[unsigned(fret) % samples.size()], "audio/fail_volume");
 	m_score -= 50;
 }
 
