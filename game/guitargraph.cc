@@ -66,6 +66,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, unsigned tr
 		g_samplesG.push_back(Sample(getDataPath("sounds/guitar_fail3.ogg"), sr));
 		g_samplesG.push_back(Sample(getDataPath("sounds/guitar_fail4.ogg"), sr));
 		g_samplesG.push_back(Sample(getDataPath("sounds/guitar_fail5.ogg"), sr));
+		g_samplesG.push_back(Sample(getDataPath("sounds/guitar_fail6.ogg"), sr));
 	}
 	for (Tracks::const_iterator it = m_song.tracks.begin(); it != m_song.tracks.end(); ++it) {
 		if (drums != (it->name == "DRUMS")) continue;
