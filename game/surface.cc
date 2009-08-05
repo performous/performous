@@ -155,6 +155,8 @@ void Texture::load(unsigned int width, unsigned int height, pix::Format format, 
 	// The texture wraps over at the edges (repeat)
 	glTexParameterf(type(), GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameterf(type(), GL_TEXTURE_WRAP_T, GL_REPEAT);
+	//glTexParameterf(type(), GL_TEXTURE_MAX_LEVEL, 1);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16.0f);
 	glTexParameteri(type(), GL_GENERATE_MIPMAP, GL_TRUE);
 	PixFmt const& f = getPixFmt(format);
 	glPixelStorei(GL_UNPACK_SWAP_BYTES, f.swap);
