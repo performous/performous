@@ -58,15 +58,23 @@
     <linearGradient
        id="linearGradient4387">
       <stop
-         style="stop-color:#53300d;stop-opacity:1;"
+         style="stop-color:#53300d;stop-opacity:0.46666667;"
          offset="0"
          id="stop4389" />
       <stop
+         id="stop10266"
+         offset="0.04048297"
+         style="stop-color:#59330d;stop-opacity:0.93333333;" />
+      <stop
          id="stop4395"
          offset="0.5"
-         style="stop-color:#a65b10;stop-opacity:1;" />
+         style="stop-color:#a65b10;stop-opacity:0.93333334;" />
       <stop
-         style="stop-color:#462403;stop-opacity:1;"
+         style="stop-color:#4e2804;stop-opacity:0.93333333;"
+         offset="0.95584792"
+         id="stop10268" />
+      <stop
+         style="stop-color:#462403;stop-opacity:0.46666667;"
          offset="1"
          id="stop4391" />
     </linearGradient>
@@ -105,24 +113,24 @@
        y2="4.6783328" />
     <linearGradient
        inkscape:collect="always"
-       xlink:href="#linearGradient3207"
-       id="linearGradient4385"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(1.7058765,0,0,1.0054914,478.96768,-1.4243308)"
-       spreadMethod="repeat"
-       x1="-265.2009"
-       y1="-3.3672962"
-       x2="-267.09619"
-       y2="1.8804884" />
-    <linearGradient
-       inkscape:collect="always"
        xlink:href="#linearGradient4387"
        id="linearGradient4393"
        x1="0"
        y1="259.35468"
        x2="252.68669"
-       y2="259.35466"
+       y2="259.35464"
        gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3207"
+       id="linearGradient10308"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.7058765,0,0,1.0054914,478.96768,-1.4243308)"
+       spreadMethod="repeat"
+       x1="-265.2009"
+       y1="-3.3672962"
+       x2="-267.33176"
+       y2="2.4799759" />
   </defs>
   <rect
      y="-2.2854736"
@@ -130,7 +138,7 @@
      height="523.28027"
      width="252.68669"
      id="rect2405"
-     style="fill:url(#linearGradient4393);fill-opacity:0.70103090999999995;stroke:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+     style="fill:url(#linearGradient4393);fill-opacity:1;stroke:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;opacity:1" />
   <g
      id="g3393"
      transform="translate(1.3558093,0.6218326)">
@@ -195,6 +203,6 @@
        height="528.36328"
        width="12"
        id="rect3205"
-       style="fill:url(#linearGradient4385);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:6;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+       style="fill:url(#linearGradient10308);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:6;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
   </g>
 </svg>
