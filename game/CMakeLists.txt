@@ -25,7 +25,7 @@ endforeach(lib)
 if(CMAKE_COMPILER_IS_GNUCXX)
 	message(STATUS "GCC detected, enabling warnings")
 	# -pedantic cannot be used because ffmpeg headers are b0rked
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++98 -Wall -Wextra")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++98 -Wall -Wextra")
 	# Needed for ffmpeg.cc to compile cleanly on OSX (it's a (unsigned long) long story)
 	add_definitions("-D__STDC_CONSTANT_MACROS")
 endif(CMAKE_COMPILER_IS_GNUCXX)
