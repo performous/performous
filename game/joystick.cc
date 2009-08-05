@@ -118,10 +118,14 @@ void input::init() {
 	// Here we should send an event to have correct state buttons
 	init_devices();
 	// Adding keyboard instrument
-	std::cout << "Id: " << UINT_MAX << std::endl;
-	std::cout << "  Name: Keyboard (emulated guitar)" << std::endl;
-	input::sdl_devices[UINT_MAX] = NULL;
-	input::Private::devices[UINT_MAX] = input::Private::InputDevPrivate(input::Private::GUITAR_GH);
+	if( config["game/keyboard_guitar"].b() ) {
+		std::cout << "Id: " << UINT_MAX << std::endl;
+		std::cout << "  Name: Keyboard (emulated guitar)" << std::endl;
+		input::sdl_devices[UINT_MAX] = NULL;
+		input::Private::devices[UINT_MAX] = input::Private::InputDevPrivate(input::Private::GUITAR_GH);
+	} else {
+		std::cout << "Keyboard as guitar disable" << std::endl;
+	}
 }
 
 bool input::pushEvent(SDL_Event _e) {
@@ -133,6 +137,7 @@ bool input::pushEvent(SDL_Event _e) {
 	static bool pickPressed[2] = {}; // HACK for tracking enter and rshift status
 	switch(_e.type) {
 		case SDL_KEYDOWN: {
+			if( !config["game/keyboard_guitar"].b() ) return false;
 			int button = 0;
 			joy_id = UINT_MAX;
 			if(!devices[joy_id].assigned()) return false;
@@ -181,6 +186,7 @@ bool input::pushEvent(SDL_Event _e) {
 			break;
 		}
 		case SDL_KEYUP: {
+			if( !config["game/keyboard_guitar"].b() ) return false;
 			int button = 0;
 			joy_id = UINT_MAX;
 			if(!devices[joy_id].assigned()) return false;

@@ -57,6 +57,12 @@
 			<long>Name of the theme to use or absolute path to theme folder</long>
 		</locale>
 	</entry>
+	<entry name="game/keyboard_guitar" type="bool" value="true">
+		<locale name="C">
+			<short>Keyboard as guitar</short>
+			<long>Enable keyboard as guitar (Frets on Frire mode)</long>
+		</locale>
+	</entry>
 
 	<!-- Graphic preferences -->
 	<entry name="graphic/window_width" type="int" value="800" hidden="true">
