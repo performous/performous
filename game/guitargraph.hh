@@ -88,6 +88,7 @@ class GuitarGraph {
 	int m_dead;
 	glutil::Color const& color(int fret) const;
 	void drawBar(double time, float h);
+	void drawNote(int fret, glutil::Color, float tBeg, float tEnd);
 	void difficultyAuto();
 	bool difficulty(Difficulty level);
 	SvgTxtTheme m_text;

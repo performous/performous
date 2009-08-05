@@ -312,34 +312,16 @@ void GuitarGraph::draw(double time) {
 		if (tBeg > future) break;
 		for (int fret = 0; fret < 5; ++fret) {
 			if (!it->fret[fret]) continue;
-			float x = -2.0f + fret;
-			if (m_drums) x -= 0.5f;
-			float w = 0.5f;
-			glutil::Color c = color(fret);
-			unsigned event = m_notes[it->dur[fret]];
-			if (event) {
-				c.r = c.g = c.b = std::max(0.5, m_events[event - 1].glow.get());
-			}
-			float wLine = 0.5f * w;
 			if (tEnd > future) tEnd = future;
-			if (m_drums && fret == 0) {
-				c.a = time2a(tBeg); glColor4fv(c);
-				drawBar(tBeg, 0.01f);
-				continue;
+			drawNote(fret, color(fret), tBeg, tEnd);
+			unsigned event = m_notes[it->dur[fret]];
+			float glow = 0.0f;
+			if (event > 0) glow = m_events[event - 1].glow.get();
+			if (glow > 0.0f) {
+				glBlendFunc(GL_ONE, GL_ONE);
+				drawNote(fret, glutil::Color(glow, glow, glow), tBeg, tEnd);
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			}
-			if (tEnd > tBeg) {
-				glutil::Begin block(GL_TRIANGLE_STRIP);
-				for (float t = tEnd; true; t -= 0.1f) {
-					if (t < tBeg) t = tBeg;
-					c.a = time2a(t); glColor4fv(c);
-					glVertex2f(x - wLine, time2y(t));
-					glVertex2f(x + wLine, time2y(t));
-					if (t == tBeg) break;
-				}
-			}
-			c.a = time2a(tBeg); glColor4fv(c);
-			m_button.dimensions.center(time2y(tBeg)).middle(x);
-			m_button.draw();
 			if (it->tappable) {
 				float l = std::max(0.5, m_correctness.get());
 				glColor3f(l, l, l);
@@ -364,6 +346,31 @@ void GuitarGraph::draw(double time) {
 		m_tap.draw();
 	}
 	glColor3f(1.0f, 1.0f, 1.0f);
+}
+
+void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd) {
+	float x = -2.0f + fret;
+	if (m_drums) x -= 0.5f;
+	float w = 0.5f;
+	float wLine = 0.5f * w;
+	if (m_drums && fret == 0) {
+		c.a = time2a(tBeg); glColor4fv(c);
+		drawBar(tBeg, 0.01f);
+		return;
+	}
+	if (tEnd > tBeg) {
+		glutil::Begin block(GL_TRIANGLE_STRIP);
+		for (float t = tEnd; true; t -= 0.1f) {
+			if (t < tBeg) t = tBeg;
+			c.a = time2a(t); glColor4fv(c);
+			glVertex2f(x - wLine, time2y(t));
+			glVertex2f(x + wLine, time2y(t));
+			if (t == tBeg) break;
+		}
+	}
+	c.a = time2a(tBeg); glColor4fv(c);
+	m_button.dimensions.center(time2y(tBeg)).middle(x);
+	m_button.draw();
 }
 
 void GuitarGraph::drawBar(double time, float h) {
