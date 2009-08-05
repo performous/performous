@@ -20,7 +20,7 @@ namespace {
 		float a = clamp(1.0 - t / future); // Note: we want 1.0 alpha already at zero t.
 		return std::pow(a, 0.8); // Nicer curve
 	}
-
+	float y2a(float y) { return time2a(past - y / timescale * (future - past)); }
 	const double maxTolerance = 0.15;
 	
 	double points(double error) {
@@ -341,21 +341,32 @@ void GuitarGraph::draw(double time) {
 		for (int fret = 0; fret < 5; ++fret) {
 			if (!it->fret[fret]) continue;
 			if (tEnd > future) tEnd = future;
-			drawNote(fret, color(fret), tBeg, tEnd);
+			//drawNote(fret, color(fret), tBeg, tEnd);
 			unsigned event = m_notes[it->dur[fret]];
 			float glow = 0.0f;
 			if (event > 0) glow = m_events[event - 1].glow.get();
+			/*
 			if (glow > 0.0f) {
 				glBlendFunc(GL_ONE, GL_ONE);
 				drawNote(fret, glutil::Color(glow, glow, glow), tBeg, tEnd);
 				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			}
+			*/
+			glutil::Color c = color(fret);
+			c.r += glow;
+			c.g += glow;
+			c.b += glow;
+			drawNote(fret, c, tBeg, tEnd);
+
 			if (it->tappable) {
 				float l = std::max(0.5, m_correctness.get());
 				glColor3f(l, l, l);
-				m_tap.dimensions = m_button.dimensions;
-				m_tap.draw();
+			} else {
+				glColor3f(0.0f, 0.0f, 0.0f);
 			}
+			float x = -2.0f + fret;
+			m_tap.dimensions.center(time2y(tBeg)).middle(x);
+			m_tap.draw();
 		}
 	}
 	// Draw the cursor
@@ -376,34 +387,42 @@ void GuitarGraph::draw(double time) {
 	glColor3f(1.0f, 1.0f, 1.0f);
 }
 
+namespace {
+	const float fretWid = 0.5f;
+	void vertexPair(float x, float y, glutil::Color c, float ty) {
+		c.a = y2a(y); glColor4fv(c);
+		glTexCoord2f(0.0f, ty); glVertex2f(x - fretWid, y);
+		glTexCoord2f(1.0f, ty); glVertex2f(x + fretWid, y);
+	}
+}
+
 void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd) {
 	float x = -2.0f + fret;
 	if (m_drums) x -= 0.5f;
-	float w = 0.5f;
 	if (m_drums && fret == 0) {
 		c.a = time2a(tBeg); glColor4fv(c);
 		drawBar(tBeg, 0.01f);
 		return;
 	}
-	if (tEnd > tBeg) {
+	float yBeg = time2y(tBeg);
+	float yEnd = time2y(tEnd);
+	if (yBeg - 3 * fretWid >= yEnd) {
 		UseTexture tblock(m_button_l);
 		glutil::Begin block(GL_TRIANGLE_STRIP);
 		c.a = time2a(tBeg); glColor4fv(c);
-		glTexCoord2f(0.0f, 1.0f); glVertex2f(x - w, time2y(tBeg) + w);
-		glTexCoord2f(1.0f, 1.0f); glVertex2f(x + w, time2y(tBeg) + w);
-		glTexCoord2f(0.0f, 0.5f); glVertex2f(x - w, time2y(tBeg) - w);
-		glTexCoord2f(1.0f, 0.5f); glVertex2f(x + w, time2y(tBeg) - w);
-		for (float t = tBeg; true; t += 0.1f) {
-			if (t > tEnd) t = tEnd;
-			c.a = time2a(t); glColor4fv(c);
-			glTexCoord2f(0.0f, 0.5f); glVertex2f(x - w, time2y(t) - w);
-			glTexCoord2f(1.0f, 0.5f); glVertex2f(x + w, time2y(t) - w);
-			glTexCoord2f(0.0f, 0.5f); glVertex2f(x - w, time2y(t) - w);
-			glTexCoord2f(1.0f, 0.5f); glVertex2f(x + w, time2y(t) - w);
-			if (t == tEnd) break;
+		// Render the ring
+		float y = yBeg + fretWid;
+		vertexPair(x, y, c, 1.0f);
+		y -= 2 * fretWid;
+		vertexPair(x, y, c, 0.5f);
+		// Render the middle
+		while ((y -= 10.0) > yEnd + fretWid) {
+			vertexPair(x, y, c, 0.5f);
 		}
-		glTexCoord2f(0.0f, 0.0f); glVertex2f(x - w, time2y(tEnd) - 2.0 * w);
-		glTexCoord2f(1.0f, 0.0f); glVertex2f(x + w, time2y(tEnd) - 2.0 * w);
+		// Render the end
+		y = yEnd + fretWid;
+		vertexPair(x, y, c, 0.25f);
+		vertexPair(x, yEnd, c, 0.0f);
 	} else {
 		c.a = time2a(tBeg); glColor4fv(c);
 		m_button.dimensions.center(time2y(tBeg)).middle(x);
