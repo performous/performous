@@ -63,6 +63,16 @@
 			<long>Enable keyboard as guitar (Frets on Frire mode)</long>
 		</locale>
 	</entry>
+	<entry name="game/instruments" type="string_list">
+		<!-- Should be SDL_ID:{GUITAR_GUITARHERO|GUITAR_ROCKBAND|DRUMS_GUITARHERO|DRUMS_ROCKBAND}
+		     example:
+			<stringvalue>0:GUITAR_GH</stringvalue>
+		-->
+		<locale name="C">
+			<short>Joystick configuration</short>
+			<long>Force joystick to some kind of instrument.</long>
+		</locale>
+	</entry>
 
 	<!-- Graphic preferences -->
 	<entry name="graphic/window_width" type="int" value="800" hidden="true">

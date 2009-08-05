@@ -88,7 +88,36 @@ void input::init_devices() {
 	}
 }
 
+// Needs at least Boost 1.36 and many systems don't have that: #include <boost/spirit/include/classic_core.hpp>
+#include <boost/spirit/core.hpp>
+
 void input::init() {
+	unsigned int sdl_id;
+	std::string instrument_type;
+	std::map<unsigned int, input::Private::Type> forced_type;
+
+	using namespace boost::spirit; //::classic;
+	rule<> type = str_p("GUITAR_GUITARHERO") | "GUITAR_ROCKBAND" | "DRUMS_GUITARHERO" | "DRUMS_ROCKBAND";
+	rule<> entry = uint_p[assign_a(sdl_id)] >> ":" >> (type)[assign_a(instrument_type)];
+
+	ConfigItem::StringList const& instruments = config["game/instruments"].sl();
+	for (ConfigItem::StringList::const_iterator it = instruments.begin(); it != instruments.end(); ++it) {
+		if (!parse(it->c_str(), entry).full) {
+			std::cerr << "Error \"" << *it << "\" is not a valid instrument forced value" << std::endl;
+			continue;
+		} else {
+			if (instrument_type == "GUITAR_GUITARHERO") {
+				forced_type[sdl_id] = input::Private::GUITAR_GH;
+			} else if (instrument_type == "DRUMS_GUITARHERO") {
+				forced_type[sdl_id] = input::Private::DRUMS_GH;
+			} else if (instrument_type == "GUITAR_ROCKBAND") {
+				forced_type[sdl_id] = input::Private::GUITAR_RB;
+			} else if (instrument_type == "DRUMS_ROCKBAND") {
+				forced_type[sdl_id] = input::Private::DRUMS_GH;
+			}
+		}
+	}
+
 	unsigned int nbjoysticks = SDL_NumJoysticks();
 	std::cout << "Detecting " << nbjoysticks << " joysticks..." << std::endl;
 
@@ -97,7 +126,23 @@ void input::init() {
 		std::string name = SDL_JoystickName(i);
 		std::cout << "Id: " << i << std::endl;
 		std::cout << "  Name: " << name << std::endl;
-		if( name.find("Guitar Hero3") != std::string::npos ) {
+		if( forced_type.find(i) != forced_type.end() ) {
+			switch(forced_type[i]) {
+				case input::Private::GUITAR_GH:
+					std::cout << "  Detected as: Guitar Hero Guitar (forced)" << std::endl;
+					break;
+				case input::Private::DRUMS_GH:
+					std::cout << "  Detected as: Guitar Hero Drums (forced)" << std::endl;
+					break;
+				case input::Private::GUITAR_RB:
+					std::cout << "  Detected as: RockBand Guitar (forced)" << std::endl;
+					break;
+				case input::Private::DRUMS_RB:
+					std::cout << "  Detected as: RockBand Drums (forced)" << std::endl;
+					break;
+			}
+			input::Private::devices[i] = input::Private::InputDevPrivate(forced_type[i]);
+		} else if( name.find("Guitar Hero3") != std::string::npos ) {
 			std::cout << "  Detected as: Guitar Hero Guitar" << std::endl;
 			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::GUITAR_GH);
 		} else if( name.find("Guitar Hero4") != std::string::npos ) {
