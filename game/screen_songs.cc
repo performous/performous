@@ -125,6 +125,18 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 		}
 		if (axis == 4 && value > 0) m_songs.advance(1);
 		else if (axis == 4 && value < 0) m_songs.advance(-1);
+	} else if (event.type == SDL_JOYHATMOTION) {
+		int dir = event.jhat.value;
+		if (event.jhat.value == SDL_HAT_UP || event.jhat.value == SDL_HAT_RIGHT) dir = 1;
+		if (m_jukebox) {
+			if (dir == SDL_HAT_RIGHT) m_audio.seek(5);
+			else if (dir == SDL_HAT_LEFT) m_audio.seek(-5);
+		} else {
+			if (dir == SDL_HAT_LEFT) m_songs.sortChange(-1);
+			else if (dir == SDL_HAT_RIGHT) m_songs.sortChange(1);
+		}
+		if (dir == SDL_HAT_DOWN) m_songs.advance(1);
+		else if (dir == SDL_HAT_UP) m_songs.advance(-1);
 	}
 }
 
