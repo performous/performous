@@ -60,17 +60,17 @@ void GuitarGraph::inputProcess() {
 */
 
 input::Private::InputDevs input::Private::devices;
-input::SDL_devices input::sdl_devices;
+input::SDL::SDL_devices input::SDL::sdl_devices;
 
-void input::init_devices() {
+void input::SDL::init_devices() {
 	for (input::Private::InputDevs::iterator it = input::Private::devices.begin() ; it != input::Private::devices.end() ; ++it) {
 		unsigned int id = it->first;
 		if(it->second.assigned()) continue;
-		if(input::sdl_devices[id] == NULL) continue; // Keyboard
-		unsigned int num_buttons = SDL_JoystickNumButtons(input::sdl_devices[id]);
+		if(input::SDL::sdl_devices[id] == NULL) continue; // Keyboard
+		unsigned int num_buttons = SDL_JoystickNumButtons(input::SDL::sdl_devices[id]);
 		for( unsigned int i = 0 ; i < num_buttons ; ++i ) {
 			SDL_Event event;
-			int state = SDL_JoystickGetButton(input::sdl_devices[id], i);
+			int state = SDL_JoystickGetButton(input::SDL::sdl_devices[id], i);
 			if( state != 0 ) {
 				event.type = SDL_JOYBUTTONDOWN;
 				event.jbutton.type = SDL_JOYBUTTONDOWN;
@@ -83,7 +83,7 @@ void input::init_devices() {
 
 			event.jbutton.which = id;
 			event.jbutton.button = i;
-			input::pushEvent(event);
+			input::SDL::pushEvent(event);
 		}
 	}
 }
@@ -91,7 +91,7 @@ void input::init_devices() {
 // Needs at least Boost 1.36 and many systems don't have that: #include <boost/spirit/include/classic_core.hpp>
 #include <boost/spirit/core.hpp>
 
-void input::init() {
+void input::SDL::init() {
 	unsigned int sdl_id;
 	std::string instrument_type;
 	std::map<unsigned int, input::Private::Type> forced_type;
@@ -122,7 +122,7 @@ void input::init() {
 	std::cout << "Detecting " << nbjoysticks << " joysticks..." << std::endl;
 
 	for (unsigned int i = 0 ; i < nbjoysticks ; ++i) {
-		input::sdl_devices[i] = SDL_JoystickOpen(i);
+		input::SDL::sdl_devices[i] = SDL_JoystickOpen(i);
 		std::string name = SDL_JoystickName(i);
 		std::cout << "Id: " << i << std::endl;
 		std::cout << "  Name: " << name << std::endl;
@@ -166,14 +166,14 @@ void input::init() {
 	if( config["game/keyboard_guitar"].b() ) {
 		std::cout << "Id: " << UINT_MAX << std::endl;
 		std::cout << "  Name: Keyboard (emulated guitar)" << std::endl;
-		input::sdl_devices[UINT_MAX] = NULL;
+		input::SDL::sdl_devices[UINT_MAX] = NULL;
 		input::Private::devices[UINT_MAX] = input::Private::InputDevPrivate(input::Private::GUITAR_GH);
 	} else {
 		std::cout << "Keyboard as guitar disable" << std::endl;
 	}
 }
 
-bool input::pushEvent(SDL_Event _e) {
+bool input::SDL::pushEvent(SDL_Event _e) {
 	int joy_id;
 	int button;
 	using namespace input::Private;

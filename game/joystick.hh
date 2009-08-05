@@ -9,10 +9,6 @@ namespace input {
 
 	static const std::size_t BUTTONS = 6;
 
-	typedef std::map<unsigned int,SDL_Joystick*> SDL_devices;
-	extern SDL_devices sdl_devices;
-	void init_devices();
-
 	struct Event {
 		enum Type { PRESS, RELEASE, PICK };
 		Type type;
@@ -120,9 +116,14 @@ namespace input {
 		unsigned int m_device_id; // should be some kind of reference
 	};
 
-	// Initialize all event stuffs
-	void init();
-	// Returns true if event is taken, feed an InputDev by transforming SDL_Event into Event
-	bool pushEvent(SDL_Event);
+	namespace SDL {
+		typedef std::map<unsigned int,SDL_Joystick*> SDL_devices;
+		extern SDL_devices sdl_devices;
+		void init_devices();
+		// Initialize all event stuffs
+		void init();
+		// Returns true if event is taken, feed an InputDev by transforming SDL_Event into Event
+		bool pushEvent(SDL_Event);
+	}
 };
 

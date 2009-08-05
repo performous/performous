@@ -41,7 +41,7 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 	SDL_Event event;
 	while(SDL_PollEvent(&event) == 1) {
 		// catch input event first
-		if(!input::pushEvent(event)) {
+		if(!input::SDL::pushEvent(event)) {
 			switch(event.type) {
 			  case SDL_QUIT:
 				sm.finished();

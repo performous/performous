@@ -29,7 +29,7 @@ Window::Window(unsigned int width, unsigned int height, int fs, unsigned int fs_
 	SDL_ShowCursor(SDL_DISABLE);
 	SDL_EnableUNICODE(SDL_ENABLE);
 	SDL_EnableKeyRepeat(80, 80);
-	input::init();
+	input::SDL::init();
 }
 
 Window::~Window() { }
