@@ -106,7 +106,7 @@
          style="stop-color:#a65b10;stop-opacity:0.93333334;" />
       <stop
          style="stop-color:#4e2804;stop-opacity:0.93333333;"
-         offset="0.95584792"
+         offset="0.96050948"
          id="stop10268" />
       <stop
          style="stop-color:#462403;stop-opacity:0.46666667;"
@@ -137,24 +137,14 @@
     </linearGradient>
     <linearGradient
        inkscape:collect="always"
-       xlink:href="#linearGradient2417"
-       id="linearGradient3596"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.8922696,0,0,1.2260835,253.8584,-0.7360251)"
-       spreadMethod="reflect"
-       x1="-142.75803"
-       y1="0.78900218"
-       x2="-142.75803"
-       y2="4.6783328" />
-    <linearGradient
-       inkscape:collect="always"
        xlink:href="#linearGradient4387"
        id="linearGradient4393"
-       x1="0"
+       x1="3.4098361"
        y1="259.35468"
-       x2="252.68669"
-       y2="259.35464"
-       gradientUnits="userSpaceOnUse" />
+       x2="249.85738"
+       y2="259.35468"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.9893675,0,0,0.9937313,0,2.2711467)" />
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient3207"
@@ -166,6 +156,17 @@
        y1="-3.3672962"
        x2="-267.33176"
        y2="2.4799759" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient2417"
+       id="linearGradient10369"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.8756074,0,0,1.2260835,248.64415,3.5311546)"
+       spreadMethod="reflect"
+       x1="-142.75803"
+       y1="0.78900218"
+       x2="-142.75803"
+       y2="4.6783328" />
   </defs>
   <g
      id="g4297">
@@ -185,26 +186,26 @@
        inkscape:transform-center-y="240.44022" />
   </g>
   <rect
-     y="-2.2854736"
+     y="0"
      x="0"
-     height="523.28027"
-     width="252.68669"
+     height="520"
+     width="250"
      id="rect2405"
-     style="fill:url(#linearGradient4393);fill-opacity:1;stroke:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;opacity:1" />
+     style="opacity:1;fill:url(#linearGradient4393);fill-opacity:1;stroke:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
   <g
      id="g3393"
      transform="translate(1.3558093,0.6218326)">
     <rect
-       y="-4.8890123"
-       x="-0.89887726"
+       y="-0.62183261"
+       x="-1.3558093"
        height="9.8890123"
-       width="254.75731"
+       width="250"
        id="rect2415"
-       style="fill:url(#linearGradient3596);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:6;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+       style="fill:url(#linearGradient10369);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:6;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
     <use
        height="520"
        width="250"
-       transform="translate(-0.9948295,259.60335)"
+       transform="translate(3.0940247e-8,255.33617)"
        id="use3197"
        xlink:href="#rect2415"
        y="0"
@@ -212,7 +213,7 @@
     <use
        height="520"
        width="250"
-       transform="translate(-0.9948294,519.40402)"
+       transform="translate(3.0940247e-8,515.13684)"
        id="use3203"
        xlink:href="#rect2415"
        y="0"

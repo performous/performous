@@ -84,12 +84,12 @@
        inkscape:collect="always"
        xlink:href="#linearGradient4387"
        id="linearGradient4393"
-       x1="0"
+       x1="3.9839032"
        y1="259.35468"
-       x2="252.68669"
+       x2="249.84105"
        y2="259.35468"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="scale(0.9910865,1)" />
+       gradientTransform="matrix(0.9893674,0,0,0.9937313,0,3.2659465)" />
     <linearGradient
        id="linearGradient4109">
       <stop
@@ -169,6 +169,17 @@
        y1="-3.3672962"
        x2="-265.91348"
        y2="-0.3399277" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient2417"
+       id="linearGradient10373"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.8756075,0,0,1.2260835,249.99996,-0.7360251)"
+       spreadMethod="reflect"
+       x1="-142.75803"
+       y1="0.78900218"
+       x2="-142.75803"
+       y2="4.6783328" />
   </defs>
   <g
      id="g4297">
@@ -190,25 +201,25 @@
        inkscape:transform-center-y="-165.68501" />
   </g>
   <rect
-     y="-2.2854736"
+     y="0.99479985"
      x="0"
-     height="523.28027"
-     width="250.43439"
+     height="520"
+     width="250"
      id="rect2405"
      style="opacity:1;fill:url(#linearGradient4393);fill-opacity:1;stroke:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
   <g
      id="g3393">
     <rect
        y="-4.8890123"
-       x="-0.89887726"
+       x="0"
        height="9.8890123"
-       width="254.75731"
+       width="250"
        id="rect2415"
-       style="fill:url(#linearGradient3337);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:6;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+       style="fill:url(#linearGradient10373);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:6;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
     <use
        height="520"
        width="250"
-       transform="translate(-0.7461265,259.60335)"
+       transform="translate(3.6930847e-8,259.60335)"
        id="use3197"
        xlink:href="#rect2415"
        y="0"
@@ -216,7 +227,7 @@
     <use
        height="520"
        width="250"
-       transform="translate(-0.9948294,519.40402)"
+       transform="translate(3.6930847e-8,519.40402)"
        id="use3203"
        xlink:href="#rect2415"
        y="0"
