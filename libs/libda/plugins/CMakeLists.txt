@@ -12,7 +12,7 @@ option(LIBDA_PLUGIN_ALSA "Enable ALSA capture and playback" ${ALSA_DEFAULT})
 option(LIBDA_PLUGIN_GSTREAMER "Enable GStreamer capture device" false)
 option(LIBDA_PLUGIN_JACK "Enable JACK capture and playback" true)
 option(LIBDA_PLUGIN_PORTAUDIO "Enable Portaudio (v18 or v19) capture and playback" ${PORTAUDIO_DEFAULT})
-option(LIBDA_PLUGIN_PULSE "Enable PulseAudio capture and playback" true)
+option(LIBDA_PLUGIN_PULSE "Enable PulseAudio capture and playback" false)
 option(LIBDA_PLUGIN_TESTING "Enable testing plugins (tone generator)" true)
 
 if(LIBDA_PLUGIN_ALSA)
