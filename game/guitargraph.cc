@@ -41,6 +41,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, unsigned tr
   m_input(drums ? input::DRUMS : input::GUITAR),
   m_song(song),
   m_button("button.svg"),
+  m_button_l("button_l.svg"),
   m_tap("tap.svg"),
   m_drums(drums),
   m_cx(0.0, 0.2),
@@ -353,25 +354,35 @@ void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd) {
 	float x = -2.0f + fret;
 	if (m_drums) x -= 0.5f;
 	float w = 0.5f;
-	float wLine = 0.5f * w;
 	if (m_drums && fret == 0) {
 		c.a = time2a(tBeg); glColor4fv(c);
 		drawBar(tBeg, 0.01f);
 		return;
 	}
 	if (tEnd > tBeg) {
+		UseTexture tblock(m_button_l);
 		glutil::Begin block(GL_TRIANGLE_STRIP);
-		for (float t = tEnd; true; t -= 0.1f) {
-			if (t < tBeg) t = tBeg;
+		c.a = time2a(tBeg); glColor4fv(c);
+		glTexCoord2f(0.0f, 1.0f); glVertex2f(x - w, time2y(tBeg) + w);
+		glTexCoord2f(1.0f, 1.0f); glVertex2f(x + w, time2y(tBeg) + w);
+		glTexCoord2f(0.0f, 0.5f); glVertex2f(x - w, time2y(tBeg) - w);
+		glTexCoord2f(1.0f, 0.5f); glVertex2f(x + w, time2y(tBeg) - w);
+		for (float t = tBeg; true; t += 0.1f) {
+			if (t > tEnd) t = tEnd;
 			c.a = time2a(t); glColor4fv(c);
-			glVertex2f(x - wLine, time2y(t));
-			glVertex2f(x + wLine, time2y(t));
-			if (t == tBeg) break;
+			glTexCoord2f(0.0f, 0.5f); glVertex2f(x - w, time2y(t) - w);
+			glTexCoord2f(1.0f, 0.5f); glVertex2f(x + w, time2y(t) - w);
+			glTexCoord2f(0.0f, 0.5f); glVertex2f(x - w, time2y(t) - w);
+			glTexCoord2f(1.0f, 0.5f); glVertex2f(x + w, time2y(t) - w);
+			if (t == tEnd) break;
 		}
+		glTexCoord2f(0.0f, 0.0f); glVertex2f(x - w, time2y(tEnd) - 2.0 * w);
+		glTexCoord2f(1.0f, 0.0f); glVertex2f(x + w, time2y(tEnd) - 2.0 * w);
+	} else {
+		c.a = time2a(tBeg); glColor4fv(c);
+		m_button.dimensions.center(time2y(tBeg)).middle(x);
+		m_button.draw();
 	}
-	c.a = time2a(tBeg); glColor4fv(c);
-	m_button.dimensions.center(time2y(tBeg)).middle(x);
-	m_button.draw();
 }
 
 void GuitarGraph::drawBar(double time, float h) {
