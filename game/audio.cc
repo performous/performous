@@ -75,7 +75,6 @@ void Audio::play(Sample const& s, std::string const& volumeSetting) {
 	acc->add(da::shared_ref(new SampleStream(s.mpeg)));
 	acc->add(da::shared_ref(new da::volume(vol)));
 	m_mixer.add(da::shared_ref(acc));
-	std::cout << "FAIL with volume " << vol << std::endl;
 }
 
 void Audio::playMusic(std::vector<std::string> const& filenames, bool preview, double fadeTime, double startPos) {

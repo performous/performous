@@ -17,6 +17,13 @@ void ScreenPractice::enter() {
 		b->dimensions.screenBottom().left(-0.4 + i * 0.2).fixedWidth(0.04);
 	}
 	drums.reset(new input::InputDev(input::DRUMS));
+	unsigned int sr = m_audio.getSR();
+	m_samples.push_back(Sample(getDataPath("sounds/drum_bass.ogg"), sr));
+	m_samples.push_back(Sample(getDataPath("sounds/drum_snare.ogg"), sr));
+	m_samples.push_back(Sample(getDataPath("sounds/drum_hi-hat.ogg"), sr));
+	m_samples.push_back(Sample(getDataPath("sounds/drum_tom1.ogg"), sr));
+	m_samples.push_back(Sample(getDataPath("sounds/drum_cymbal.ogg"), sr));
+	//m_samples.push_back(Sample(getDataPath("sounds/drum_tom2.ogg"), sr));
 }
 
 void ScreenPractice::exit() {
@@ -44,38 +51,17 @@ void ScreenPractice::manageEvent(SDL_Event event) {
 		int button = event.jbutton.button;
 		if (button == 2) sm->activateScreen("Intro");
 	}
-	input::Event input_event;
-	if( drums ) {
-		while( drums->tryPoll(input_event) ) {
-			if(input_event.type == input::Event::PRESS) {
-				switch(input_event.button) {
-					case 0:
-						m_audio.playMusic(getDataPath("sounds/drum_bass.ogg"));
-						break;
-					case 1:
-						m_audio.playMusic(getDataPath("sounds/drum_snare.ogg"));
-						break;
-					case 2:
-						m_audio.playMusic(getDataPath("sounds/drum_tom1.ogg"));
-						break;
-					case 3:
-						m_audio.playMusic(getDataPath("sounds/drum_tom2.ogg"));
-						break;
-					case 4:
-						m_audio.playMusic(getDataPath("sounds/drum_hi-hat.ogg"));
-						break;
-					case 5:
-						m_audio.playMusic(getDataPath("sounds/drum_cymbal.ogg"));
-						break;
-					default:
-						break;
-				}
-			}
-		}
-	}
 }
 
 void ScreenPractice::draw() {
+	if( drums ) {
+		input::Event input_event;
+		while( drums->tryPoll(input_event) ) {
+			if(input_event.type == input::Event::PRESS) {
+				m_audio.play(m_samples[unsigned(input_event.button) % m_samples.size()], "audio/fail_volume");
+			}
+		}
+	}
 	theme->bg.draw();
 	this->draw_analyzers();
 }
