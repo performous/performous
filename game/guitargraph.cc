@@ -304,7 +304,7 @@ void GuitarGraph::draw(double time) {
 		m_text.draw(txt);
 	} else {
 		m_text.dimensions.screenBottom(-0.15).middle(0.4 * dimensions.w() + offsetX);
-		m_text.draw(boost::lexical_cast<std::string>(m_score));
+		m_text.draw(boost::lexical_cast<std::string>(unsigned(m_score)));
 	}
 	glutil::PushMatrixMode pmm(GL_PROJECTION);
 	glTranslatef(frac * 2.0 * offsetX, 0.0f, 0.0f);
