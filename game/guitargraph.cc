@@ -55,10 +55,10 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, unsigned tr
 	if (m_drums) {
 		m_samples.push_back(Sample(getDataPath("sounds/drum_bass.ogg"), sr));
 		m_samples.push_back(Sample(getDataPath("sounds/drum_snare.ogg"), sr));
-		m_samples.push_back(Sample(getDataPath("sounds/drum_tom1.ogg"), sr));
-		m_samples.push_back(Sample(getDataPath("sounds/drum_tom2.ogg"), sr));
 		m_samples.push_back(Sample(getDataPath("sounds/drum_hi-hat.ogg"), sr));
+		m_samples.push_back(Sample(getDataPath("sounds/drum_tom1.ogg"), sr));
 		m_samples.push_back(Sample(getDataPath("sounds/drum_cymbal.ogg"), sr));
+		//m_samples.push_back(Sample(getDataPath("sounds/drum_tom2.ogg"), sr));
 	} else {
 		m_samples.push_back(Sample(getDataPath("sounds/guitar_fail1.ogg"), sr));
 		m_samples.push_back(Sample(getDataPath("sounds/guitar_fail2.ogg"), sr));
