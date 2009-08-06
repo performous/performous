@@ -138,7 +138,7 @@ void GuitarGraph::engine() {
 			double last = std::min(time, ev.dur->end);
 			double t = last - ev.holdTime;
 			if (t > 0) {
-				m_score += t * 10.0;
+				m_score += t * 50.0;
 				ev.holdTime = time;
 			}
 			if (last == ev.dur->end) m_holds[fret] = 0;
