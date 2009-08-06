@@ -32,7 +32,7 @@
   </metadata>
   <sodipodi:namedview
      inkscape:window-height="1127"
-     inkscape:window-width="1918"
+     inkscape:window-width="1920"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      borderopacity="1.0"
@@ -43,7 +43,7 @@
      inkscape:cx="125"
      inkscape:cy="260"
      inkscape:window-x="0"
-     inkscape:window-y="24"
+     inkscape:window-y="25"
      inkscape:current-layer="svg2"
      showgrid="true"
      showguides="false">
@@ -55,6 +55,13 @@
   </sodipodi:namedview>
   <defs
      id="defs4">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 260 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="250 : 260 : 1"
+       inkscape:persp3d-origin="125 : 173.33333 : 1"
+       id="perspective41" />
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient4109"
@@ -93,7 +100,7 @@
     <linearGradient
        id="linearGradient4387">
       <stop
-         style="stop-color:#53300d;stop-opacity:0.46666667;"
+         style="stop-color:#53300d;stop-opacity:0;"
          offset="0"
          id="stop4389" />
       <stop
@@ -109,7 +116,7 @@
          offset="0.96050948"
          id="stop10268" />
       <stop
-         style="stop-color:#462403;stop-opacity:0.46666667;"
+         style="stop-color:#462403;stop-opacity:0;"
          offset="1"
          id="stop4391" />
     </linearGradient>
