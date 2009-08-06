@@ -141,7 +141,7 @@ void GuitarGraph::engine() {
 				m_score += t * 50.0;
 				ev.holdTime = time;
 			}
-			if (last == ev.dur->end) m_holds[fret] = 0;
+			if (last == ev.dur->end) endHold(fret);
 		}
 	}
 }
