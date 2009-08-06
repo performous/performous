@@ -70,6 +70,7 @@ class ScreenSing: public Screen {
 	boost::scoped_ptr<Surface> m_background;
 	boost::scoped_ptr<Video> m_video;
 	boost::scoped_ptr<Surface> m_pause_icon;
+	boost::scoped_ptr<Surface> m_help;
 	boost::scoped_ptr<Engine> m_engine;
 	boost::scoped_ptr<LayoutSinger> m_layout_singer;
 	typedef boost::ptr_vector<GuitarGraph> Instruments;

@@ -15,7 +15,6 @@ namespace {
 }
 
 void ScreenSing::enter() {
-	m_audio.playMusic(m_song->music, false, 0.0, m_song->tracks.empty() ? -1.0 : -8.0); // Startup delay for instruments is longer than for singing only
 	theme.reset(new ThemeSing());
 	if (!m_song->background.empty()) {
 		try {
@@ -26,6 +25,7 @@ void ScreenSing::enter() {
 	}
 	if (!m_song->video.empty() && config["graphic/video"].b()) m_video.reset(new Video(m_song->path + m_song->video, m_song->videoGap));
 	m_pause_icon.reset(new Surface(getThemePath("sing_pause.svg")));
+	m_help.reset(new Surface(getThemePath("instrumenthelp.svg")));
 	m_progress.reset(new ProgressBar(getThemePath("sing_progressbg.svg"), getThemePath("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01f, 0.01f, true));
 	m_progress->dimensions.fixedWidth(0.4).left(-0.5).screenTop();
 	theme->timer.dimensions.screenTop(0.5 * m_progress->dimensions.h());
@@ -41,6 +41,7 @@ void ScreenSing::enter() {
 			m_instruments.insert(it, new GuitarGraph(m_audio, *m_song, drums, num));
 		} catch (std::runtime_error&) { if (drums) break; drums = true; }
 	}
+	m_audio.playMusic(m_song->music, false, 0.0, m_instruments.empty() ? -1.0 : -8.0); // Startup delay for instruments is longer than for singing only
 }
 
 void ScreenSing::instrumentLayout(double time) {
@@ -60,6 +61,11 @@ void ScreenSing::instrumentLayout(double time) {
 		cs.second += it->correctness();
 		it->draw(time);
 	}
+	if (time < -0.5) {
+		glColor4f(1.0f, 1.0f, 1.0f, clamp(-1.0 - 2.0 * time));
+		m_help->draw();
+		glColor3f(1.0f, 1.0f, 1.0f);
+	}
 	// Set volume levels (averages of all instruments playing that track)
 	for (std::size_t i = 0, s = m_song->music.size(); i < s; ++i) {
 		double level = 1.0;
@@ -74,6 +80,7 @@ void ScreenSing::exit() {
 	m_instruments.clear();
 	m_layout_singer.reset();
 	m_engine.reset();
+	m_help.reset();
 	m_pause_icon.reset();
 	m_video.reset();
 	m_background.reset();
