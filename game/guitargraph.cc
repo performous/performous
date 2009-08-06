@@ -361,12 +361,10 @@ void GuitarGraph::draw(double time) {
 			if (it->tappable) {
 				float l = std::max(0.5, m_correctness.get());
 				glColor3f(l, l, l);
-			} else {
-				glColor3f(0.0f, 0.0f, 0.0f);
+				float x = -2.0f + fret;
+				m_tap.dimensions.center(time2y(tBeg)).middle(x);
+				m_tap.draw();
 			}
-			float x = -2.0f + fret;
-			m_tap.dimensions.center(time2y(tBeg)).middle(x);
-			m_tap.draw();
 		}
 	}
 	// Draw the cursor
