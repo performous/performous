@@ -98,14 +98,14 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 		else manageSharedKey(key, mod);
 	} else if (event.type == SDL_JOYBUTTONDOWN) {
 		int button = event.jbutton.button;
-		if (button == 1) {
+		if (button == 9) {
 			ScreenManager* sm = ScreenManager::getSingletonPtr();
 			Screen* s = sm->getScreen("Sing");
 			ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
 			assert(ss);
 			ss->setSong(m_songs.currentPtr());
 			sm->activateScreen("Sing");
-		} else if (button == 2) {
+		} else if (button == 8) {
 			if (m_jukebox) {
 				m_jukebox = false;
 			} else {

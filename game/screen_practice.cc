@@ -50,7 +50,7 @@ void ScreenPractice::manageEvent(SDL_Event event) {
 		}
 	} else if (event.type == SDL_JOYBUTTONDOWN) {
 		int button = event.jbutton.button;
-		if (button == 2) sm->activateScreen("Intro");
+		if (button == 8) sm->activateScreen("Intro");
 	}
 }
 

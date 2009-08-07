@@ -29,8 +29,8 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 		else if (key == SDLK_SPACE || key == SDLK_PAUSE) m_audio.togglePause();
 	} else if (event.type == SDL_JOYBUTTONDOWN) {
 		int button = event.jbutton.button;
-		if (button == 1) sm->activateScreen("Songs");
-		else if (button == 2) sm->finished();
+		if (button == 9) sm->activateScreen("Songs");
+		else if (button == 8) sm->finished();
 	}
 }
 

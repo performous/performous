@@ -167,6 +167,9 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		if (seekback) {
 			m_layout_singer->reset();
 		}
+	} else if (event.type == SDL_JOYBUTTONDOWN) {
+		int button = event.jbutton.button;
+		if (button == 8 || button == 9) m_audio.togglePause();
 	}
 }
 

@@ -34,7 +34,7 @@ void ScreenConfiguration::manageEvent(SDL_Event event) {
 		else if (key == SDLK_s && modifier & KMOD_CTRL) writeConfig();
 	} else if (event.type == SDL_JOYBUTTONDOWN) {
 		int button = event.jbutton.button;
-		if (button == 2) sm->activateScreen("Intro");
+		if (button == 8) sm->activateScreen("Intro");
 	} else if (event.type == SDL_JOYAXISMOTION) {
 		int axis = event.jaxis.axis;
 		int value = event.jaxis.value;
