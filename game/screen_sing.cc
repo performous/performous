@@ -33,13 +33,15 @@ void ScreenSing::enter() {
 	m_engine.reset(new Engine(m_audio, *m_song, analyzers.begin(), analyzers.end(), m_players));
 	m_layout_singer.reset(new LayoutSinger(*m_song, m_players, theme));
 	// I know some purists would hang me for this loop
-	bool drums = false;
-	for (int num = 0; true; ++num) {
-		try {
-			Instruments::iterator it = m_instruments.end();
-			if (drums && m_instruments.size() > 1) it = m_instruments.begin() + 1; // Drums go after the first guitar
-			m_instruments.insert(it, new GuitarGraph(m_audio, *m_song, drums, num));
-		} catch (std::runtime_error&) { if (drums) break; drums = true; }
+	if( !m_song->tracks.empty() ) {
+		bool drums = false;
+		for (int num = 0; true; ++num) {
+			try {
+				Instruments::iterator it = m_instruments.end();
+				if (drums && m_instruments.size() > 1) it = m_instruments.begin() + 1; // Drums go after the first guitar
+				m_instruments.insert(it, new GuitarGraph(m_audio, *m_song, drums, num));
+			} catch (std::runtime_error&) { if (drums) break; drums = true; }
+		}
 	}
 	m_audio.playMusic(m_song->music, false, 0.0, m_instruments.empty() ? -1.0 : -8.0); // Startup delay for instruments is longer than for singing only
 }
@@ -214,11 +216,10 @@ void ScreenSing::draw() {
 		theme->bg_top.draw();
 	}
 
-	instrumentLayout(time);
-
 	if( m_song->tracks.empty() ) {
 		m_layout_singer->draw(time, LayoutSinger::BOTTOM);
 	} else {
+		instrumentLayout(time);
 		m_layout_singer->draw(time, LayoutSinger::MIDDLE);
 	}
 
