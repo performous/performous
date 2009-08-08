@@ -12,7 +12,7 @@ extern "C" {
 #include SWSCALE_INCLUDE
 }
 
-#define USE_FFMPEG_CRASH_RECOVERY
+// #define USE_FFMPEG_CRASH_RECOVERY
 #define AUDIO_CHANNELS 2
 
 /*static*/ boost::mutex FFmpeg::s_avcodec_mutex;

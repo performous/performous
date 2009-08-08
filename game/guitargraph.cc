@@ -278,11 +278,11 @@ bool GuitarGraph::difficulty(Difficulty level) {
 
 glutil::Color const& GuitarGraph::color(int fret) const {
 	static glutil::Color fretColors[5] = {
-		glutil::Color(0.0f, 1.0f, 0.0f),
-		glutil::Color(1.0f, 0.0f, 0.0f),
-		glutil::Color(1.0f, 1.0f, 0.0f),
+		glutil::Color(0.0f, 0.9f, 0.0f),
+		glutil::Color(0.9f, 0.0f, 0.0f),
+		glutil::Color(0.8f, 0.8f, 0.0f),
 		glutil::Color(0.0f, 0.0f, 1.0f),
-		glutil::Color(1.0f, 0.5f, 0.0f)
+		glutil::Color(0.8f, 0.4f, 0.0f)
 	};
 	if (fret < 0 || fret > 4) throw std::logic_error("Invalid fret number in GuitarGraph::getColor");
 	if (m_drums) {
