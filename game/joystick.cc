@@ -163,14 +163,10 @@ void input::SDL::init() {
 	// Here we should send an event to have correct state buttons
 	init_devices();
 	// Adding keyboard instrument
-	if( config["game/keyboard_guitar"].b() ) {
-		std::cout << "Id: " << UINT_MAX << std::endl;
-		std::cout << "  Name: Keyboard (emulated guitar)" << std::endl;
-		input::SDL::sdl_devices[UINT_MAX] = NULL;
-		input::Private::devices[UINT_MAX] = input::Private::InputDevPrivate(input::Private::GUITAR_GH);
-	} else {
-		std::cout << "Keyboard as guitar disable" << std::endl;
-	}
+	std::cout << "Id: " << input::Private::KEYBOARD_ID << std::endl;
+	std::cout << "  Name: Keyboard (emulated guitar): " << (config["game/keyboard_guitar"].b() ? "disabled":"enabled") << std::endl;
+	input::SDL::sdl_devices[input::Private::KEYBOARD_ID] = NULL;
+	input::Private::devices[input::Private::KEYBOARD_ID] = input::Private::InputDevPrivate(input::Private::GUITAR_GH);
 }
 
 bool input::SDL::pushEvent(SDL_Event _e) {
@@ -184,7 +180,7 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 		case SDL_KEYDOWN: {
 			if( !config["game/keyboard_guitar"].b() ) return false;
 			int button = 0;
-			joy_id = UINT_MAX;
+			joy_id = input::Private::KEYBOARD_ID;
 			if(!devices[joy_id].assigned()) return false;
 			switch(_e.key.keysym.sym) {
 				case SDLK_RETURN:
@@ -233,7 +229,7 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 		case SDL_KEYUP: {
 			if( !config["game/keyboard_guitar"].b() ) return false;
 			int button = 0;
-			joy_id = UINT_MAX;
+			joy_id = input::Private::KEYBOARD_ID;
 			if(!devices[joy_id].assigned()) return false;
 			switch(_e.key.keysym.sym) {
 				case SDLK_RETURN: pickPressed[0] = false; return true;

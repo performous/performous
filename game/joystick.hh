@@ -19,6 +19,7 @@ namespace input {
 	
 	namespace Private {
 		enum Type {GUITAR_RB, DRUMS_RB, GUITAR_GH, DRUMS_GH};
+		static unsigned int KEYBOARD_ID = UINT_MAX;
 		class InputDevPrivate {
 		  public:
 			InputDevPrivate() : m_assigned(false), m_type(input::Private::DRUMS_GH) {
@@ -94,6 +95,7 @@ namespace input {
 				std::cout << "Request acquiring GUITAR" << std::endl;
 			if( devices.size() == 0 ) throw std::runtime_error("No InputDev available");
 			for(InputDevs::iterator it = devices.begin() ; it != devices.end() ; ++it) {
+				if( it->first == input::Private::KEYBOARD_ID && !config["game/keyboard_guitar"].b()) continue;
 				if( !it->second.assigned() && it->second.type_match(_type) ) {
 					std::cout << "Found @" << it->first << std::endl;
 					m_device_id = it->first;
