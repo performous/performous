@@ -61,6 +61,7 @@ bool SongParser::txtParseField(std::string const& line) {
 	else if (key == "RELATIVE") assign(m_relative, value);
 	else if (key == "GAP") { assign(m_gap, value); m_gap *= 1e-3; }
 	else if (key == "BPM") assign(m_bpm, value);
+	else if (key == "LANGUAGE") m_song.language= value.substr(value.find_first_not_of(" "));
 	return true;
 }
 

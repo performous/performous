@@ -201,7 +201,8 @@ namespace {
 	    "by artist",
 	    "by edition",
 	    "by genre",
-	    "by path"
+	    "by path",
+	    "by language"
     };
 
     static const int orders = sizeof(order) / sizeof(*order);
@@ -237,6 +238,7 @@ void Songs::sort_internal() {
 	  case 3: std::sort(m_filtered.begin(), m_filtered.end(), comparator(&Song::edition)); break;
 	  case 4: std::sort(m_filtered.begin(), m_filtered.end(), comparator(&Song::genre)); break;
 	  case 5: std::sort(m_filtered.begin(), m_filtered.end(), comparator(&Song::path)); break;
+	  case 6: std::sort(m_filtered.begin(), m_filtered.end(), comparator(&Song::language)); break;
 	  default: throw std::logic_error("Internal error: unknown sort order in Songs::sortChange");
 	}
 }
