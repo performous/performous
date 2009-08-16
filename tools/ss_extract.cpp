@@ -335,7 +335,7 @@ struct Process {
 					if (std::system(cmd.c_str()) == 0) { // FIXME: std::system return value is not portable
 						fs::remove(path / "music.wav");
 					}
-					cmd = "oggenc \"" + (path / "vocals.wav").string();
+					cmd = "oggenc \"" + (path / "vocals.wav").string() + "\"";
 					std::cerr << cmd << std::endl;
 					if (std::system(cmd.c_str()) == 0) { // FIXME: std::system return value is not portable
 						fs::remove(path / "vocals.wav");
