@@ -27,7 +27,8 @@ int sleepts = -1;
 xmlpp::Node::PrefixNsMap nsmap;
 std::string ns;
 const bool video = true;
-const bool mkvcompress = false;
+const bool mkvcompress = true;
+const bool oggcompress = true;
 
 // LibXML2 logging facility
 extern "C" void xmlLogger(void* logger, char const* msg, ...) { if (logger) *(std::ostream*)logger << msg; }
@@ -185,9 +186,13 @@ void music(Song& song, PakFile const& dataFile, PakFile const& headerFile, fs::p
 			if (l2 != 0 || r2 != 0) karaoke = true;
 		}
 	}
-	std::string ext = ".wav";
-	writeMusic(song.music = outPath / ("music" + ext), pcm[0], sr);
-	if (karaoke) writeMusic(song.vocals = outPath / ("vocals" + ext), pcm[1], sr);
+	std::string ext;
+	writeMusic(song.music = outPath / ("music.wav"), pcm[0], sr);
+	if (karaoke) writeMusic(song.vocals = outPath / ("vocals.wav"), pcm[1], sr);
+	if( oggcompress ) {
+		song.music = outPath / ("music.ogg");
+		if (karaoke) song.vocals = outPath / ("vocals.ogg");
+	}
 }
 
 struct Match {
@@ -209,6 +214,42 @@ std::string xmlFix(std::vector<char> const& data) {
 }
 
 std::string filename(boost::filesystem::path const& p) { return *--p.end(); }
+
+void saveTxtFile(xmlpp::NodeSet &sentence, const fs::path &path, const Song &song, const std::string singer = "") {
+	fs::path file_path;
+
+	if( singer.empty() ) {
+		file_path = path / "notes.txt";
+	} else {
+		file_path = path;
+		file_path /= safename(std::string("notes") + " (" + singer + ")" + ".txt");
+	}
+	txtfile.open(file_path.string().c_str());
+	if( singer.empty() )
+		txtfile << "#TITLE:" << song.title << std::endl;
+	else
+		txtfile << "#TITLE:" << song.title << " (" << singer << ")" << std::endl;
+	txtfile << "#ARTIST:" << song.artist << std::endl;
+	if (!song.genre.empty()) txtfile << "#GENRE:" << song.genre << std::endl;
+	if (!song.year.empty()) txtfile << "#YEAR:" << song.year << std::endl;
+	if (!song.edition.empty()) txtfile << "#EDITION:" << song.edition << std::endl;
+	//txtfile << "#LANGUAGE:English" << std::endl; // Detect instead of hardcoding? 
+	if (!song.music.empty()) txtfile << "#MP3:" << filename(song.music) << std::endl;
+	if (!song.vocals.empty()) txtfile << "#VOCALS:" << filename(song.vocals) << std::endl;
+	if (video && mkvcompress) {
+		txtfile << "#VIDEO:video.m4v" << std::endl;
+	} else {
+		txtfile << "#VIDEO:video.mpg" << std::endl;
+	}
+	txtfile << "#COVER:cover.jpg" << std::endl;
+	//txtfile << "#BACKGROUND:background.jpg" << std::endl;
+	txtfile << "#BPM:" << song.tempo << std::endl;
+	ts = 0;
+	sleepts = -1;
+	std::for_each(sentence.begin(), sentence.end(), parseSentence);
+	txtfile << 'E' << std::endl;
+	txtfile.close();
+}
 
 struct Process {
 	Pak const& pak;
@@ -256,31 +297,26 @@ struct Process {
 			Pak dataPak(song.dataPakName);
 			std::cerr << ">>> Extracting and decoding music" << std::endl;
 			music(song, dataPak[id + "/music.mib"], pak["export/" + id + "/music.mih"], path);
-			txtfile.open((path / "notes.txt").string().c_str());
-			txtfile << "#TITLE:" << song.title << std::endl;
-			txtfile << "#ARTIST:" << song.artist << std::endl;
-			if (!song.genre.empty()) txtfile << "#GENRE:" << song.genre << std::endl;
-			if (!song.year.empty()) txtfile << "#YEAR:" << song.year << std::endl;
-			if (!song.edition.empty()) txtfile << "#EDITION:" << song.edition << std::endl;
-			//txtfile << "#LANGUAGE:English" << std::endl; // Detect instead of hardcoding? 
-			if (!song.music.empty()) txtfile << "#MP3:" << filename(song.music) << std::endl;
-			if (!song.vocals.empty()) txtfile << "#VOCALS:" << filename(song.vocals) << std::endl;
-			if (video && mkvcompress) {
-				txtfile << "#VIDEO:video.m4v" << std::endl;
+			std::cerr << ">>> Extracting lyrics" << std::endl;
+			xmlpp::NodeSet sentences = dom.get_document()->get_root_node()->find("/" + ns + "MELODY/" + ns + "SENTENCE", nsmap);
+			if(!sentences.empty()) {
+				// Sentences not inside tracks (normal songs)
+				std::cerr << "  >>> Solo track" << std::endl;
+				saveTxtFile(sentences, path, song);
 			} else {
-				txtfile << "#VIDEO:video.mpg" << std::endl;
+				xmlpp::NodeSet tracks = dom.get_document()->get_root_node()->find("/" + ns + "MELODY/" + ns + "TRACK", nsmap);
+				if( !tracks.empty()) {
+					for( xmlpp::NodeSet::iterator it = tracks.begin() ; it != tracks.end() ; ++it ) {
+						xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**it);
+						std::string singer = elem.get_attribute("Artist")->get_value();
+						std::cerr << "  >>> Track from " << singer << std::endl;
+						sentences = dom.get_document()->get_root_node()->find((*it)->get_path() + "/" + ns + "SENTENCE", nsmap);
+						saveTxtFile(sentences, path, song, singer);
+					}
+				} else {
+					throw std::runtime_error("Unable to find any sentences in melody XML");
+				}
 			}
-			txtfile << "#COVER:cover.jpg" << std::endl;
-			//txtfile << "#BACKGROUND:background.jpg" << std::endl;
-			txtfile << "#BPM:" << song.tempo << std::endl;
-			ts = 0;
-			sleepts = -1;
-			xmlpp::NodeSet n = dom.get_document()->get_root_node()->find("/" + ns + "MELODY/" + ns + "SENTENCE", nsmap); // Sentences not inside tracks (normal songs)
-			if (n.empty()) n = dom.get_document()->get_root_node()->find("/" + ns + "MELODY/" + ns + "TRACK[1]/" + ns + "SENTENCE", nsmap); // Try to get the first track (duet songs?)
-			if (n.empty()) throw std::runtime_error("Unable to find any sentences in melody XML");
-			std::for_each(n.begin(), n.end(), parseSentence);
-			txtfile << 'E' << std::endl;
-			txtfile.close();
 			std::cerr << ">>> Extracting cover image" << std::endl;
 			// FIXME: use internally instead of separate program
 			std::system(("ss_cover_conv \"" + dvdPath + "/pack_ee.pak\" " + id + " \"" + path.string() + "/cover.jpg\"").c_str());
@@ -292,9 +328,22 @@ struct Process {
 				std::cerr << ">>> Converting video" << std::endl;
 				IPUConv(ipudata, (path / "video.mpg").string());
 				// FIXME: use some library (preferrably ffmpeg):
+				if (oggcompress) {
+					std::cerr << ">>> Compressing audio into music.ogg/vocals.ogg" << std::endl;
+					std::string cmd = "oggenc \"" + (path / "music.wav").string() + "\"";
+					std::cerr << cmd << std::endl;
+					if (std::system(cmd.c_str()) == 0) { // FIXME: std::system return value is not portable
+						fs::remove(path / "music.wav");
+					}
+					cmd = "oggenc \"" + (path / "vocals.wav").string();
+					std::cerr << cmd << std::endl;
+					if (std::system(cmd.c_str()) == 0) { // FIXME: std::system return value is not portable
+						fs::remove(path / "vocals.wav");
+					}
+				}
 				if (mkvcompress) {
 					std::cerr << ">>> Compressing video and audio into music.mkv" << std::endl;
-					std::string cmd = "ffmpeg -i \"" + (path / "video.mpg").string() + "\" -vcodec libx264 -vpre hq -crf 25 -threads 0 -album \"" + song.edition + "\" -author \"" + song.artist + "\" -comment \"" + song.genre + "\" -title \"" + song.title + "\" \"" + (path / "video.m4v\"").string();
+					std::string cmd = "ffmpeg -i \"" + (path / "video.mpg").string() + "\" -vcodec libx264 -vpre hq -crf 25 -threads 0 -metadata album=\"" + song.edition + "\" -metadata author=\"" + song.artist + "\" -metadata comment=\"" + song.genre + "\" -metadata title=\"" + song.title + "\" \"" + (path / "video.m4v\"").string();
 					std::cerr << cmd << std::endl;
 					if (std::system(cmd.c_str()) == 0) { // FIXME: std::system return value is not portable
 						fs::remove(path / "video.mpg");
