@@ -215,6 +215,7 @@ std::string Songs::sortDesc() const {
 		if (m_order == 3) str += " (" + current().edition + ")";
 		if (m_order == 4) str += " (" + current().genre + ")";
 		if (m_order == 5) str += " (" + pathtrim(current().path) + ")";
+		if (m_order == 6) str += " (" + current().language + ")";
 	}
 	return str;
 }
