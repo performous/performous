@@ -14,9 +14,11 @@
 #include <libxml++/libxml++.h>
 
 #include <boost/filesystem.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include "pak.h"
 #include "ipuconv.hh"
+#include "ss_cover.hh"
 
 namespace fs = boost::filesystem;
 
@@ -318,8 +320,10 @@ struct Process {
 				}
 			}
 			std::cerr << ">>> Extracting cover image" << std::endl;
-			// FIXME: use internally instead of separate program
-			std::system(("ss_cover_conv \"" + dvdPath + "/pack_ee.pak\" " + id + " \"" + path.string() + "/cover.jpg\"").c_str());
+			try {
+				SingstarCover c = SingstarCover(dvdPath + "/pack_ee.pak", boost::lexical_cast<unsigned int>(id));
+				c.write(path.string() + "/cover.jpg");
+			} catch (...) {}
 			remove = "";
 			if (video) {
 				std::cerr << ">>> Extracting video" << std::endl;
