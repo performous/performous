@@ -1,6 +1,7 @@
 #include "songparser.hh"
 
 #include <boost/filesystem.hpp>
+#include <boost/regex.hpp>
 #include "midifile.hh"
 
 /// @file
@@ -36,12 +37,24 @@ void SongParser::iniParse() {
 		else if (key == "artist") s.artist = value;
 	}
 	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
-	testAndAdd(s, "song.ogg");
-	testAndAdd(s, "guitar.ogg");
-	testAndAdd(s, "rhythm.ogg");
-	testAndAdd(s, "drums.ogg");
-	testAndAdd(s, "vocals.ogg");
-	MidiFileParser midi(s.path + "/notes.mid");
+
+	boost::regex midifile("(.*\\.mid)$", boost::regex_constants::icase);
+	boost::regex audiofile("(.*\\.ogg)$", boost::regex_constants::icase);
+	boost::cmatch match;
+	std::string midifilename("notes.mid");
+
+	for (boost::filesystem::directory_iterator dirIt(s.path), dirEnd; dirIt != dirEnd; ++dirIt) {
+		boost::filesystem::path p = dirIt->path();
+		std::string name = p.leaf(); // File basename (notes.txt)
+		if (regex_match(name.c_str(), match, midifile)) {
+			 midifilename = name;
+		}
+		if (regex_match(name.c_str(), match, audiofile)) {
+			testAndAdd(s, name);
+		}
+	}
+
+	MidiFileParser midi(s.path + "/" + midifilename);
 	for (uint32_t ts = 0, end = midi.ts_last + midi.division; ts < end; ts += midi.division) s.beats.push_back(midi.get_seconds(ts));
 	for (MidiFileParser::Tracks::const_iterator it = midi.tracks.begin(); it != midi.tracks.end(); ++it) {
 		// Figure out the track name
