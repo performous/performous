@@ -197,39 +197,32 @@ int main(int argc, char** argv) {
 	po::options_description opt1("Generic options");
 	opt1.add_options()
 	  ("help,h", "you are viewing it")
-	  ("version,v", "display version number");
+	  ("version,v", "display version number")
+	  ("songlist", po::value<std::string>(&songlist), "save a list of songs in the specified folder");
 	po::options_description opt2("Configuration options");
 	opt2.add_options()
-	  ("theme,t", po::value<std::string>(), "set theme (name or absolute path)")
-	  ("fs,f", "enable full screen mode")
-	  ("fps", "benchmark rendering speed\n  also disable 100 FPS limit")
-	  ("songlist", po::value<std::string>(&songlist), "save a list of songs in the specified folder")
+	  ("fs", po::value<bool>()->implicit_value(true), "start in full screen mode\n  --fs=0 for windowed mode")
 	  ("width,W", po::value<int>(), "set horizontal resolution")
 	  ("height,H", po::value<int>(), "set vertical resolution")
-	  ("fs-width", po::value<int>(), "set fullscreen horizontal resolution")
-	  ("fs-height", po::value<int>(), "set fullscreen vertical resolution")
-	  ("michelp", "detailed help for --mics and a list of available audio devices")
-	  ("mics", po::value<std::vector<std::string> >(&mics)->composing(), "specify microphones to use")
-	  ("pdevhelp", "detailed help for --pdev and a list of available audio devices")
-	  ("pdev", po::value<std::vector<std::string> >(&pdevs)->composing(), "specify a playback device")
-	  ("songdir,s", po::value<std::vector<std::string> >(&songdirs)->composing(), "additional song folders to scan\n  may be specified without -s or -songdir too");
+	  ("mics", po::value<std::vector<std::string> >(&mics)->composing(), "specify the microphones to use")
+	  ("pdev", po::value<std::vector<std::string> >(&pdevs)->composing(), "specify the playback device")
+	  ("michelp", "detailed help and device list for --mics")
+	  ("pdevhelp", "detailed help and device list for --pdev")
+	  ("theme", po::value<std::string>(), "set theme (name or absolute path)");
+	po::options_description opt3("Hidden options");
+	opt3.add_options()
+	  ("songdir", po::value<std::vector<std::string> >(&songdirs)->composing(), "");
 	// Process flagless options as songdirs
 	po::positional_options_description p;
 	p.add("songdir", -1);
 	po::options_description cmdline;
 	cmdline.add(opt1).add(opt2);
 	po::variables_map vm;
-	// Load more arguments from performous.conf files
+	// Load the arguments
 	try {
-		po::store(po::command_line_parser(argc, argv).options(cmdline).positional(p).run(), vm);
-		{
-			std::ifstream conf((getHomeDir() / ".config" / "performous.conf").string().c_str());
-			po::store(po::parse_config_file(conf, opt2), vm);
-		}
-		{
-			std::ifstream conf("/etc/performous.conf");
-			po::store(po::parse_config_file(conf, opt2), vm);
-		}
+		po::options_description allopts(cmdline);
+		allopts.add(opt3);
+		po::store(po::command_line_parser(argc, argv).options(allopts).positional(p).run(), vm);
 	} catch (std::exception& e) {
 		std::cout << cmdline << std::endl;
 		std::cout << "ERROR: " << e.what() << std::endl;
@@ -241,7 +234,7 @@ int main(int argc, char** argv) {
 		return 0;
 	}
 	if (vm.count("help")) {
-		std::cout << cmdline << std::endl;
+		std::cout << cmdline << "  any arguments without a switch are interpreted as song folders.\n" << std::endl;
 		return 0;
 	}
 	// Initialize audio for pdevhelp, michelp and the rest of the program
@@ -269,7 +262,7 @@ int main(int argc, char** argv) {
 		  "                                    Note: only the first four at most will be used\n"
 		  "  --mics channels=1,rate=44100      One mic; will try to get 44100 Hz if available\n\n"
 		  "Multiple --mics options may be specified and all the successfully opened inputs\n"
-		  "are be assigned as players until the maximum of four players are configured.\n" << std::endl;
+		  "are assigned as players until the maximum of four players are configured.\n" << std::endl;
 		std::cout << "Capture devices available:" << std::endl;
 		for (da::record::devlist_t::const_iterator it = l.begin(); it != l.end(); ++it) {
 			std::cout << boost::format("  %1% %|10t|%2%\n") % it->name() % it->desc();
@@ -286,13 +279,10 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 	// Override XML config for options that were specified from commandline or performous.conf
-	if (vm.count("width")) config["graphic/window_width"].i() = vm["width"].as<int>();
-	if (vm.count("height")) config["graphic/window_height"].i() = vm["height"].as<int>();
-	if (vm.count("fs-width")) config["graphic/fs_width"].i() = vm["fs-width"].as<int>();
-	if (vm.count("fs-height")) config["graphic/fs_height"].i() = vm["fs-height"].as<int>();
-	if (vm.count("theme")) config["game/theme"].s() = vm["theme"].as<std::string>();
-	if (vm.count("fs")) config["graphic/fullscreen"].b() = true;
-	if (vm.count("fps")) config["graphic/fps"].b() = true;
+	if (vm.count("fs")) config["graphic/fullscreen"].b() = vm["fs"].as<bool>();
+	std::string graphic = config["graphic/fullscreen"].b() ? "graphic/fs_" : "graphic/window_";
+	if (vm.count("width")) config[graphic + "width"].i() = vm["width"].as<int>();
+	if (vm.count("height")) config[graphic + "height"].i() = vm["height"].as<int>();
 	confOverride(songdirs, "system/path_songs");
 	confOverride(mics, "audio/capture");
 	confOverride(pdevs, "audio/playback");
