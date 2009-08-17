@@ -33,7 +33,7 @@ if (LibXML++_FOUND)
 	endif (Boost_FOUND)
 
     if (Magick++_FOUND)
-        add_executable(ss_cover_conv cover_conv.cpp pak.cpp)
+        add_executable(ss_cover_conv cover_conv.cpp pak.cpp ss_cover.cpp)
         target_link_libraries(ss_cover_conv ${Magick++_LIBRARIES} ${LibXML++_LIBRARIES})
 		set(targets ${targets} ss_cover_conv)
     else (Magick++_FOUND)
