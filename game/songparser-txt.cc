@@ -54,6 +54,7 @@ bool SongParser::txtParseField(std::string const& line) {
 	else if (key == "CREATOR") m_song.creator = value.substr(value.find_first_not_of(" "));
 	else if (key == "COVER") m_song.cover = value;
 	else if (key == "MP3") m_song.music.push_back(m_song.path + value);
+	else if (key == "VOCALS") m_song.music.push_back(m_song.path + value);
 	else if (key == "VIDEO") m_song.video = value;
 	else if (key == "BACKGROUND") m_song.background = value;
 	else if (key == "START") assign(m_song.start, value);
