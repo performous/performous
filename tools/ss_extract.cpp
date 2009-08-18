@@ -131,6 +131,7 @@ void parseSentence(xmlpp::Node* node) {
 #include "adpcm.h"
 
 unsigned getLE16(char* buf) { unsigned char* b = reinterpret_cast<unsigned char*>(buf); return b[0] | (b[1] << 8); }
+unsigned getLE32(char* buf) { unsigned char* b = reinterpret_cast<unsigned char*>(buf); return b[0] | (b[1] << 8) | (b[2] << 16) | (b[3] << 24); }
 
 struct Song {
 	std::string dataPakName, title, artist, genre, edition, year;
@@ -299,7 +300,29 @@ struct Process {
 			dom.get_document()->write_to_file((path / "notes.xml").string(), "UTF-8");
 			Pak dataPak(song.dataPakName);
 			std::cerr << ">>> Extracting and decoding music" << std::endl;
-			music(song, dataPak[id + "/music.mib"], pak["export/" + id + "/music.mih"], path);
+			try {
+				music(song, dataPak[id + "/music.mib"], pak["export/" + id + "/music.mih"], path);
+			} catch (...) {
+				std::cerr << "  >>> European DVD failed, trying American (WIP)" << std::endl;
+				// Tracks on my example
+				// 0 => video (ipu)
+				// 1 and 2 => adpcm song (left/right)
+				// 3 and 4 => adpcm vocals (left/right)
+				std::vector<char> offsets_header;
+				std::vector<char> offsets_data;
+				dataPak[id + "/mus+vid.ind"].get(offsets_header, 0, 0x68);
+				unsigned int track_count = getLE32(&offsets_header[4]);
+				dataPak[id + "/mus+vid.ind"].get(offsets_data, 0x68);
+				unsigned int offset = 0;
+				/*
+				for( unsigned int i = 0 ; i < offsets_data.size() ; i+=2) {
+					std::vector<char> chunk_data;
+					unsigned int size = getLE16(&offsets_data[i]) << 4;
+					dataPak[id + "/mus+vid.iav"].get(chunk_data, offset, size);
+					offset+=size;
+				}
+				*/
+			}
 			std::cerr << ">>> Extracting lyrics" << std::endl;
 			xmlpp::NodeSet sentences = dom.get_document()->get_root_node()->find("/" + ns + "MELODY/" + ns + "SENTENCE", nsmap);
 			if(!sentences.empty()) {
