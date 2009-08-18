@@ -15,6 +15,7 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/program_options.hpp>
 
 #include "pak.h"
 #include "ipuconv.hh"
@@ -486,11 +487,35 @@ struct FindSongs {
 };
 
 int main( int argc, char **argv) {
-	if (argc < 2 || argc > 3) {
-		std::cerr << "Usage: " << argv[0] << " dvdPath [track id or name]" << std::endl;
-		return EXIT_FAILURE;
+	std::string video, audio, song;
+	namespace po = boost::program_options;
+	po::options_description opt("Options");
+	opt.add_options()
+	  ("help,h", "you are viewing it")
+	  ("dvd", po::value<std::string>(&dvdPath), "path to Singstar DVD root")
+	  ("list,l", "list tracks only")
+	  ("song", po::value<std::string>(&song), "only extract the given track (ID or partial name)")
+	  ("video", po::value<std::string>(&video)->default_value("mkv"), "specify video format (none, mkv, mpeg2)")
+	  ("audio", po::value<std::string>(&audio)->default_value("ogg"), "specify audio format (none, ogg, wav)")
+	  ;
+	// Process the first flagless option as dvd, the second as song
+	po::positional_options_description pos;
+	pos.add("dvd", 1);
+	pos.add("song", 1);
+	po::options_description cmdline;
+	cmdline.add(opt);
+	po::variables_map vm;
+	// Load the arguments
+	try {
+		po::store(po::command_line_parser(argc, argv).options(opt).positional(pos).run(), vm);
+		po::notify(vm);
+		if (dvdPath.empty()) throw std::runtime_error("No Singstar DVD path specified. Enter a path to a folder with pack_ee.pak in it.");
+		// TODO: process audio and video options and throw if they have incorrect values
+	} catch (std::exception& e) {
+		std::cout << cmdline << std::endl;
+		std::cout << "ERROR: " << e.what() << std::endl;
+		return 1;
 	}
-	dvdPath = argv[1];
 	std::string pack_ee = dvdPath + "/pack_ee.pak"; // Note: lower case (ISO-9660)
 	if (!fs::exists(pack_ee)) {
 		if (fs::exists(dvdPath + "/Pack_EE.PAK")) { // Note: capitalization (UDF)
@@ -504,8 +529,11 @@ int main( int argc, char **argv) {
 	}
 	nsmap["ss"] = "http://www.singstargame.com";
 	Pak p(pack_ee);
-	FindSongs f = std::for_each(p.files().begin(), p.files().end(), FindSongs(argc > 2 ? argv[2] : ""));
+	FindSongs f = std::for_each(p.files().begin(), p.files().end(), FindSongs(song));
 	std::cerr << f.songs.size() << " songs found" << std::endl;
-	std::for_each(f.songs.begin(), f.songs.end(), Process(p));
+	if (vm.count("list")) {
+		// TODO: dump list of songs
+	}
+	else std::for_each(f.songs.begin(), f.songs.end(), Process(p));
 }
 

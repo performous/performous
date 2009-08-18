@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 2.6)
 
 include_directories(${CMAKE_SOURCE_DIR}/libda)
 
-find_package(Boost 1.34 REQUIRED COMPONENTS filesystem)
+find_package(Boost 1.34 REQUIRED COMPONENTS filesystem program_options)
 include_directories(${Boost_INCLUDE_DIRS})
 
 # Find all the libs that don't require extra parameters
