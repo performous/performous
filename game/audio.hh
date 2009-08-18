@@ -98,7 +98,7 @@ class Audio {
 	void pause(bool state = true);
 	/// toggles synth playback (F4)
 	void toggleSynth(Notes const& notes) { m_notes = (m_notes ? NULL : &notes); }
-	void streamFade(unsigned num, double level);
+	void streamFade(std::string stream_id, double level);
 	unsigned int getSR() const { return m_rs.rate(); }
   private:
 	bool m_paused;
@@ -106,7 +106,7 @@ class Audio {
 	da::settings m_rs;
 	da::volume m_volume;
 	da::mixer m_mixer;
-	std::vector<boost::shared_ptr<Stream> > m_streams;
+	std::map<std::string,boost::shared_ptr<Stream> > m_streams;
 	std::string m_volumeSetting;
 };
 

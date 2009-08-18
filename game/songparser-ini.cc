@@ -73,15 +73,18 @@ void SongParser::iniParse() {
 	for (MidiFileParser::Tracks::const_iterator it = midi.tracks.begin(); it != midi.tracks.end(); ++it) {
 		// Figure out the track name
 		std::string name = it->name;
-		if (midi.tracks.size() == 1) name = "GUITAR"; // Original (old) FoF songs only have one track
-		else if (name == "T1 GEMS") name = "GUITAR"; // Some old MIDI files have a track named T1 GEMS
+		if (midi.tracks.size() == 1) name = "guitar"; // Original (old) FoF songs only have one track
+		else if (name == "T1 GEMS") name = "guitar"; // Some old MIDI files have a track named T1 GEMS
 		else if (name.substr(0, 5) != "PART ") continue;
 		else name.erase(0, 5);
 		if (name == "GUITAR COOP") continue; // TODO: do something with these? They don't work in current version
-		if (name == "DRUM") name = "DRUMS";
+		if (name == "DRUM") name = "drums";
+		if (name == "DRUMS") name = "drums";
+		if (name == "BASS") name = "bass";
+		if (name == "GUITAR") name = "guitar";
 		// Process non-vocal tracks
 		if (name != "VOCALS") {
-			bool drums = (name == "DRUMS");
+			bool drums = (name == "drums");
 			s.tracks.push_back(Track(name));
 			NoteMap& nm = s.tracks.back().nm;
 			for (MidiFileParser::NoteMap::const_iterator it2 = it->notes.begin(); it2 != it->notes.end(); ++it2) {

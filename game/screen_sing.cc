@@ -55,7 +55,7 @@ void ScreenSing::instrumentLayout(double time) {
 		m_instruments[i].position((0.5 + i - 0.5 * s) * iw, iw);
 	}
 	typedef std::pair<unsigned, double> CountSum;
-	std::map<unsigned, CountSum> volume; // stream number to (count, sum)
+	std::map<unsigned, CountSum> volume; // stream id to (count, sum)
 	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it) {
 		it->engine();
 		CountSum& cs = volume[it->stream() + 1];
@@ -73,8 +73,16 @@ void ScreenSing::instrumentLayout(double time) {
 		double level = 1.0;
 		CountSum cs = volume[i];
 		if (cs.first > 0) level = cs.second / cs.first;
-		m_audio.streamFade(i, level); // +1 because 0 is bg
+		//m_audio.streamFade(i, level); // +1 because 0 is bg
 	}
+	/*
+	for( std::map<std::string,std::string>::iterator it = m_song->music.begin() ; it != m_song->music.end() ; ++it ) {
+		double level = 1.0;
+		CountSum cs = volume[it->first];
+		if (cs.first > 0) level = cs.second / cs.first;
+		m_audio.streamFade(it->first, level);
+	}
+	*/
 }
 
 void ScreenSing::exit() {
@@ -161,6 +169,8 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		else if (key == SDLK_RIGHT) m_audio.seek(5.0);
 		else if (key == SDLK_UP) m_audio.seek(30.0);
 		else if (key == SDLK_DOWN) { m_audio.seek(-30.0); seekback = true; }
+		else if (key == SDLK_k && event.key.keysym.mod & KMOD_SHIFT) { m_audio.streamFade("vocals", 1.0); }
+		else if (key == SDLK_k && !(event.key.keysym.mod & KMOD_SHIFT)) { m_audio.streamFade("vocals", 0.0); }
 		else if (key == SDLK_r && event.key.keysym.mod & KMOD_CTRL) {
 			exit(); m_song->reload(); enter();
 			m_audio.seek(time);

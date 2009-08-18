@@ -85,7 +85,7 @@ void Audio::playMusic(std::map<std::string,std::string> const& filenames, bool p
 	for(std::map<std::string,std::string>::const_iterator it = filenames.begin() ; it != filenames.end() ; ++it ) {
 		try {
 			boost::shared_ptr<Stream> s(new Stream(it->second, m_rs.rate()));
-			m_streams.push_back(s);
+			m_streams[it->first] = s;
 			ch->add(da::shared_ref(s));
 			s->seek(startPos);
 		} catch (std::runtime_error& e) {
@@ -122,31 +122,30 @@ void Audio::fadeout(double fadeTime) {
 
 double Audio::getPosition() const {
 	da::lock_holder l = m_mixer.lock();
-	return m_streams.empty() ? getNaN() : m_streams.front()->pos();
+	return m_streams.empty() ? getNaN() : m_streams.begin()->second->pos();
 }
 
 double Audio::getLength() const {
 	da::lock_holder l = m_mixer.lock();
-	return m_streams.empty() ? getNaN() : m_streams.front()->duration();
+	return m_streams.empty() ? getNaN() : m_streams.begin()->second->duration();
 }
 
 bool Audio::isPlaying() const {
 	da::lock_holder l = m_mixer.lock();
-	return m_streams.empty() ? false : !m_streams.front()->eof();
+	return m_streams.empty() ? false : !m_streams.begin()->second->eof();
 }
 
 void Audio::seek(double offset) {
 	da::lock_holder l = m_mixer.lock();
-	for (size_t i = 0; i < m_streams.size(); ++i) {
-		Stream& s = *m_streams[i];
-		s.seek(clamp(s.pos() + offset, 0.0, s.duration()));
-	}
+	for(std::map<std::string,boost::shared_ptr<Stream> >::iterator it = m_streams.begin() ; it != m_streams.end() ; ++it)
+		it->second->seek(clamp(it->second->pos() + offset, 0.0, it->second->duration()));
 	pause(false);
 }
 
 void Audio::seekPos(double pos) {
 	da::lock_holder l = m_mixer.lock();
-	for (size_t i = 0; i < m_streams.size(); ++i) m_streams[i]->seek(pos);
+	for(std::map<std::string,boost::shared_ptr<Stream> >::iterator it = m_streams.begin() ; it != m_streams.end() ; ++it)
+		it->second->seek(pos);
 	pause(false);
 }
 
@@ -156,8 +155,9 @@ void Audio::pause(bool state) {
 	m_mixer.pause(m_paused);
 }
 
-void Audio::streamFade(unsigned num, double level) {
+void Audio::streamFade(std::string stream_id, double level) {
 	da::lock_holder l = m_mixer.lock();
-	m_streams.at(num)->fade = level;
+	std::map<std::string,boost::shared_ptr<Stream> >::iterator it = m_streams.find(stream_id);
+	if( it != m_streams.end() ) it->second->fade = level;
 }
 

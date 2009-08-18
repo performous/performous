@@ -70,10 +70,10 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, unsigned tr
 		g_samplesG.push_back(Sample(getDataPath("sounds/guitar_fail6.ogg"), sr));
 	}
 	for (Tracks::const_iterator it = m_song.tracks.begin(); it != m_song.tracks.end(); ++it) {
-		if (drums != (it->name == "DRUMS")) continue;
+		if (drums != (it->name == "drums")) continue;
 		m_tracks.push_back(&*it);
-		if (it->name == "DRUMS") m_necks.push_back(new Texture("drumneck.svg"));
-		else if (it->name == "BASS") m_necks.push_back(new Texture("bassneck.svg"));
+		if (it->name == "drums") m_necks.push_back(new Texture("drumneck.svg"));
+		else if (it->name == "bass") m_necks.push_back(new Texture("bassneck.svg"));
 		else m_necks.push_back(new Texture("guitarneck.svg"));
 	}
 	for (int i = 0; i < 6; ++i) m_hit[i].setRate(5.0);
