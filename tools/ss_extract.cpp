@@ -88,7 +88,7 @@ Filename_ safename(Glib::ustring const& str) {
 		if (*it >= 0x7F && *it < 0xA0) continue; // Additional control characters
 		if (first && *it == '.') continue;
 		if (first && *it == '-') continue;
-		if (*it == '&') { ret += " et "; continue; }
+		if (*it == '&') { ret += " and "; continue; }
 		if (*it == '%') { ret += " percent "; continue; }
 		if (*it == '$') { ret += " dollar "; continue; }
 		if (forbidden.find(*it) != Glib::ustring::npos) { ret += "_"; continue; }
