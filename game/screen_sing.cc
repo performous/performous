@@ -226,7 +226,7 @@ void ScreenSing::draw() {
 		theme->bg_top.draw();
 	}
 
-	if( m_song->tracks.empty() ) {
+	if( m_instruments.empty() ) {
 		m_layout_singer->draw(time, LayoutSinger::BOTTOM);
 	} else {
 		instrumentLayout(time);
