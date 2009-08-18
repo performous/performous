@@ -56,9 +56,9 @@ class Engine {
 		for (std::list<Player>::iterator it = m_players.cur.begin(); it != m_players.cur.end(); ++it, ++player) it->m_color = playerColors[player % playerColorsSize];
 		m_thread.reset(new boost::thread(boost::ref(*this)));
 	}
-	~Engine() { kill(); m_thread->join(); }
+	~Engine() { kill(); }
 	/// Terminates processing
-	void kill() { m_quit = true; }
+	void kill() { m_quit = true; m_thread->join(); }
 	/** Used internally for boost::thread. Do not call this yourself. (boost::thread requires this to be public). **/
 	void operator()() {
 		while (!m_quit) {
