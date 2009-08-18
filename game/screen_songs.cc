@@ -21,6 +21,7 @@ void ScreenSongs::enter() {
 	m_emptyCover.reset(new Surface(getThemePath("no_cover.svg")));
 	m_instrumentCover.reset(new Surface(getThemePath("instrument_cover.svg")));
 	m_bandCover.reset(new Surface(getThemePath("band_cover.svg")));
+	m_instrumentList.reset(new Surface(getThemePath("instruments.svg")));
 	m_search.text.clear();
 	m_songs.setFilter(m_search.text);
 	m_audio.fadeout();
@@ -32,6 +33,7 @@ void ScreenSongs::exit() {
 	m_emptyCover.reset();
 	m_instrumentCover.reset();
 	m_bandCover.reset();
+	m_instrumentList.reset();
 	theme.reset();
 	m_video.reset();
 	m_songbg.reset();
@@ -216,6 +218,8 @@ void ScreenSongs::draw() {
 				// Draw the reflection
 				s.dimensions.top(y + 0.2 * diff); s.tex = TexCoords(0, 1, 1, 0); glColor4f(1.0, 1.0, 1.0, 0.4); s.draw();
 				s.tex = TexCoords(); glColor3f(1.0, 1.0, 1.0); // Restore default attributes
+				// Draw the intruments
+				m_instrumentList->dimensions.middle(-0.2 + 0.17 * (i - shift)).bottom(y - (0.14+diff) - 0.2 * diff).fitInside(0.14 + diff, 0.14 + diff); m_instrumentList->draw();
 			}
 		}
 		if (!song.music.empty()) music = song.music;
