@@ -227,8 +227,13 @@ void ScreenSongs::draw() {
 					{
 						// vocals
 						alpha = (song_display.notes.size()) ? 1.00 : 0.25;
+						bool karaoke = (song_display.music.find("vocals") != song_display.music.end());
 						glutil::Begin block(GL_TRIANGLE_STRIP);
-						glColor4f(1.0, 1.0, 1.0, alpha);
+						if(karaoke) {
+							glColor4f(1.0, 1.0, 0.25, alpha);
+						} else {
+							glColor4f(1.0, 1.0, 1.0, alpha);
+						}
 						x = dim.x1()+0.00*(dim.x2()-dim.x1());
 						glTexCoord2f(0.00f, 0.0f); glVertex2f(x, dim.y1());
 						glTexCoord2f(0.00f, 1.0f); glVertex2f(x, dim.y2());
@@ -272,6 +277,7 @@ void ScreenSongs::draw() {
 						glTexCoord2f(1.00f, 0.0f); glVertex2f(x, dim.y1());
 						glTexCoord2f(1.00f, 1.0f); glVertex2f(x, dim.y2());
 					}
+					glColor4f(1.0, 1.0, 1.0, 1.0);
 				}
 			}
 		}
