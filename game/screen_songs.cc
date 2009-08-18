@@ -170,7 +170,7 @@ void ScreenSongs::draw() {
 	if (m_video.get()) m_video->render(time);
 	if (!m_jukebox) theme->bg.draw();
 	std::string songbg, video;
-	std::vector<std::string> music;
+	std::map<std::string,std::string> music;
 	double videoGap = 0.0;
 	std::ostringstream oss_song, oss_order;
 	// Test if there are no songs

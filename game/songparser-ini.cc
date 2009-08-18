@@ -16,9 +16,9 @@ namespace {
 	void eraseLast(std::string& s, char ch = ' ') {
 		if (!s.empty() && *s.rbegin() == ch) s.erase(s.size() - 1);
 	}
-	void testAndAdd(Song& s, std::string const& filename) {
+	void testAndAdd(Song& s, std::string const& trackid, std::string const& filename) {
 		std::string f = s.path + filename;
-		if (boost::filesystem::exists(f)) s.music.push_back(f);
+		if (boost::filesystem::exists(f)) s.music[trackid] = f;
 	}
 }
 
@@ -39,7 +39,12 @@ void SongParser::iniParse() {
 	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
 
 	boost::regex midifile("(.*\\.mid)$", boost::regex_constants::icase);
-	boost::regex audiofile("(.*\\.ogg)$", boost::regex_constants::icase);
+	boost::regex audiofile_background("(song\\.ogg)$", boost::regex_constants::icase);
+	boost::regex audiofile_guitar("(guitar\\.ogg)$", boost::regex_constants::icase);
+	boost::regex audiofile_drums("(drums\\.ogg)$", boost::regex_constants::icase);
+	boost::regex audiofile_bass("(rhythm\\.ogg)$", boost::regex_constants::icase);
+	boost::regex audiofile_vocals("(vocals\\.ogg)$", boost::regex_constants::icase);
+	boost::regex audiofile_other("(.*\\.ogg)$", boost::regex_constants::icase);
 	boost::cmatch match;
 	std::string midifilename("notes.mid");
 
@@ -48,9 +53,18 @@ void SongParser::iniParse() {
 		std::string name = p.leaf(); // File basename (notes.txt)
 		if (regex_match(name.c_str(), match, midifile)) {
 			 midifilename = name;
-		}
-		if (regex_match(name.c_str(), match, audiofile)) {
-			testAndAdd(s, name);
+		} else if (regex_match(name.c_str(), match, audiofile_background)) {
+			testAndAdd(s, "background", name);
+		} else if (regex_match(name.c_str(), match, audiofile_guitar)) {
+			testAndAdd(s, "guitar", name);
+		} else if (regex_match(name.c_str(), match, audiofile_bass)) {
+			testAndAdd(s, "bass", name);
+		} else if (regex_match(name.c_str(), match, audiofile_drums)) {
+			testAndAdd(s, "drums", name);
+		} else if (regex_match(name.c_str(), match, audiofile_vocals)) {
+			testAndAdd(s, "vocals", name);
+		} else if (regex_match(name.c_str(), match, audiofile_other)) {
+			std::cout << "Found unknown ogg file: " << name << std::endl;
 		}
 	}
 

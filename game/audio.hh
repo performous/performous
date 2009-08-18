@@ -67,7 +67,7 @@ class Audio {
 	 */
 	void playMusic(std::string const& filename, bool preview = false, double fadeTime = 0.5, double startPos = -0.2);
 	/// plays a list of songs
-	void playMusic(std::vector<std::string> const& filenames, bool preview = false, double fadeTime = 0.5, double startPos = -0.2);
+	void playMusic(std::map<std::string,std::string> const& filenames, bool preview = false, double fadeTime = 0.5, double startPos = -0.2);
 	/// plays a sample
 	void play(Sample const& s, std::string const& volumeSetting);
 	/// get pause status
