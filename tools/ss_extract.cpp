@@ -498,7 +498,7 @@ int main( int argc, char **argv) {
 			  "Singstar DVDs have UDF and ISO-9660 filesystems on them. Your disc is mounted\n"
 			  "as UDF and this causes some garbled data files, making ripping it impossible.\n\n"
 			  "Please remount the disc as ISO-9660 and try again. E.g. on Linux:\n"
-			  "# mount -t iso9600 /dev/cdrom " << dvdPath << std::endl;
+			  "# mount -t iso9660 /dev/cdrom " << dvdPath << std::endl;
 		} else std::cerr << "No Singstar DVD found. Enter a path to a folder with pack_ee.pak in it." << std::endl;
 		return EXIT_FAILURE;
 	}
