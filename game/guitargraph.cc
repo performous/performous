@@ -476,7 +476,8 @@ void GuitarGraph::updateChords() {
 			++c.polyphony;
 			++pos[fret];
 		}
-		if (c.polyphony == 1) {
+		// Check if the chord is tappable
+		if (!m_drums && c.polyphony == 1) {
 			c.tappable = true;
 			if (m_chords.empty() || m_chords.back().fret[tapfret]) c.tappable = false;
 			if (lastEnd + tapMaxDelay < t) c.tappable = false;
