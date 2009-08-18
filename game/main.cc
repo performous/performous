@@ -40,38 +40,36 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 	static bool esc = false;
 	SDL_Event event;
 	while(SDL_PollEvent(&event) == 1) {
-		// catch input event first
-		if(!input::SDL::pushEvent(event)) {
-			switch(event.type) {
-			  case SDL_QUIT:
-				sm.finished();
-				break;
-			  case SDL_VIDEORESIZE:
-				window.resize(event.resize.w, event.resize.h);
-				break;
-			  case SDL_KEYUP:
-				if (event.key.keysym.sym == SDLK_ESCAPE) esc = false;
-				break;
-			  case SDL_KEYDOWN:
-				int keypressed  = event.key.keysym.sym;
-				SDLMod modifier = event.key.keysym.mod;
-				// Workaround for key repeat on escape
-				if (keypressed == SDLK_ESCAPE) {
-					if (esc) return;
-					esc = true;
-				}
-				if (keypressed == SDLK_RETURN && modifier & KMOD_ALT ) {
-					config["graphic/fullscreen"].b() = !config["graphic/fullscreen"].b();
-					continue; // Already handled here...
-				}
-				if (keypressed == SDLK_F4 && modifier & KMOD_ALT) {
-					sm.finished();
-					continue; // Already handled here...
-				}
-				break;
+		switch(event.type) {
+		  case SDL_QUIT:
+			sm.finished();
+			break;
+		  case SDL_VIDEORESIZE:
+			window.resize(event.resize.w, event.resize.h);
+			break;
+		  case SDL_KEYUP:
+			if (event.key.keysym.sym == SDLK_ESCAPE) esc = false;
+			break;
+		  case SDL_KEYDOWN:
+			int keypressed  = event.key.keysym.sym;
+			SDLMod modifier = event.key.keysym.mod;
+			// Workaround for key repeat on escape
+			if (keypressed == SDLK_ESCAPE) {
+				if (esc) return;
+				esc = true;
 			}
-			sm.getCurrentScreen()->manageEvent(event);
+			if (keypressed == SDLK_RETURN && modifier & KMOD_ALT ) {
+				config["graphic/fullscreen"].b() = !config["graphic/fullscreen"].b();
+				continue; // Already handled here...
+			}
+			if (keypressed == SDLK_F4 && modifier & KMOD_ALT) {
+				sm.finished();
+				continue; // Already handled here...
+			}
+			break;
 		}
+		// Forward to screen if the input system doesn't eat the event first
+		if(!input::SDL::pushEvent(event)) sm.getCurrentScreen()->manageEvent(event);
 		switch(glGetError()) {
 			case GL_INVALID_ENUM: std::cerr << "OpenGL error: invalid enum" << std::endl; break;
 			case GL_INVALID_VALUE: std::cerr << "OpenGL error: invalid value" << std::endl; break;
