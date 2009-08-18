@@ -27,7 +27,7 @@ LICENSE="GPL-2
 SLOT="0"
 KEYWORDS="~x86 ~amd64 ~ppc ~ppc64"
 
-IUSE="debug alsa portaudio pulseaudio jack songs gstreamer"
+IUSE="debug alsa portaudio pulseaudio jack songs gstreamer tools"
 
 RDEPEND="gnome-base/librsvg
 	dev-libs/boost
@@ -70,6 +70,11 @@ src_compile() {
 	mkdir build
 	cd build
 	plugins="-DLIBDA_AUTODETECT_PLUGINS=false -DLIBDA_PLUGIN_TESTING=false"
+	if use tools ; then
+		plugins="$plugins -DENABLE_TOOLS=true"
+	else
+		plugins="$plugins -DENABLE_TOOLS=false"
+	fi
 	if use alsa ; then
 		plugins="$plugins -DLIBDA_PLUGIN_ALSA=true"
 	else
