@@ -21,7 +21,7 @@ void ScreenSongs::enter() {
 	m_emptyCover.reset(new Surface(getThemePath("no_cover.svg")));
 	m_instrumentCover.reset(new Surface(getThemePath("instrument_cover.svg")));
 	m_bandCover.reset(new Surface(getThemePath("band_cover.svg")));
-	m_instrumentList.reset(new Surface(getThemePath("instruments.svg")));
+	m_instrumentList.reset(new Texture(getThemePath("instruments.svg")));
 	m_search.text.clear();
 	m_songs.setFilter(m_search.text);
 	m_audio.fadeout();
@@ -219,7 +219,60 @@ void ScreenSongs::draw() {
 				s.dimensions.top(y + 0.2 * diff); s.tex = TexCoords(0, 1, 1, 0); glColor4f(1.0, 1.0, 1.0, 0.4); s.draw();
 				s.tex = TexCoords(); glColor3f(1.0, 1.0, 1.0); // Restore default attributes
 				// Draw the intruments
-				m_instrumentList->dimensions.middle(-0.2 + 0.17 * (i - shift)).bottom(y - (0.14+diff) - 0.2 * diff).fitInside(0.14 + diff, 0.14 + diff); m_instrumentList->draw();
+				{
+					UseTexture tex(*m_instrumentList);
+					Dimensions dim = Dimensions(m_instrumentList->ar()).middle(-0.2 + 0.17 * (i - shift)).bottom(y - (0.14+diff) - 0.2 * diff).fitInside(0.14 + diff, 0.14 + diff);
+					double x;
+					float alpha;
+					{
+						// vocals
+						alpha = (song_display.notes.size()) ? 1.00 : 0.25;
+						glutil::Begin block(GL_TRIANGLE_STRIP);
+						glColor4f(1.0, 1.0, 1.0, alpha);
+						x = dim.x1()+0.00*(dim.x2()-dim.x1());
+						glTexCoord2f(0.00f, 0.0f); glVertex2f(x, dim.y1());
+						glTexCoord2f(0.00f, 1.0f); glVertex2f(x, dim.y2());
+						x = dim.x1()+0.25*(dim.x2()-dim.x1());
+						glTexCoord2f(0.25f, 0.0f); glVertex2f(x, dim.y1());
+						glTexCoord2f(0.25f, 1.0f); glVertex2f(x, dim.y2());
+					}
+					{
+						// guitar
+						alpha = (isTrackInside(song_display.tracks,"guitar")) ? 1.00 : 0.25;
+						glutil::Begin block(GL_TRIANGLE_STRIP);
+						glColor4f(1.0, 1.0, 1.0, alpha);
+						x = dim.x1()+0.25*(dim.x2()-dim.x1());
+						glTexCoord2f(0.25f, 0.0f); glVertex2f(x, dim.y1());
+						glTexCoord2f(0.25f, 1.0f); glVertex2f(x, dim.y2());
+						x = dim.x1()+0.50*(dim.x2()-dim.x1());
+						glTexCoord2f(0.50f, 0.0f); glVertex2f(x, dim.y1());
+						glTexCoord2f(0.50f, 1.0f); glVertex2f(x, dim.y2());
+					}
+					{
+						// bass
+						alpha = (isTrackInside(song_display.tracks,"bass")) ? 1.00 : 0.25;
+						glutil::Begin block(GL_TRIANGLE_STRIP);
+						glColor4f(1.0, 1.0, 1.0, alpha);
+						x = dim.x1()+0.50*(dim.x2()-dim.x1());
+						glTexCoord2f(0.50f, 0.0f); glVertex2f(x, dim.y1());
+						glTexCoord2f(0.50f, 1.0f); glVertex2f(x, dim.y2());
+						x = dim.x1()+0.75*(dim.x2()-dim.x1());
+						glTexCoord2f(0.75f, 0.0f); glVertex2f(x, dim.y1());
+						glTexCoord2f(0.75f, 1.0f); glVertex2f(x, dim.y2());
+					}
+					{
+						// drums
+						alpha = (isTrackInside(song_display.tracks,"drums")) ? 1.00 : 0.25;
+						glutil::Begin block(GL_TRIANGLE_STRIP);
+						glColor4f(1.0, 1.0, 1.0, alpha);
+						x = dim.x1()+0.75*(dim.x2()-dim.x1());
+						glTexCoord2f(0.75f, 0.0f); glVertex2f(x, dim.y1());
+						glTexCoord2f(0.75f, 1.0f); glVertex2f(x, dim.y2());
+						x = dim.x1()+1.00*(dim.x2()-dim.x1());
+						glTexCoord2f(1.00f, 0.0f); glVertex2f(x, dim.y1());
+						glTexCoord2f(1.00f, 1.0f); glVertex2f(x, dim.y2());
+					}
+				}
 			}
 		}
 		if (!song.music.empty()) music = song.music;

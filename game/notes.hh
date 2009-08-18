@@ -53,6 +53,15 @@ struct Track {
 
 typedef std::vector<Track> Tracks;
 
+namespace {
+	bool isTrackInside(Tracks &_tracks, std::string _name) {
+		for( Tracks::iterator it = _tracks.begin() ; it != _tracks.end() ; ++it ) {
+			if(it->name == _name) return true;
+		}
+		return false;
+	}
+}
+
 // TODO: Make Note use Duration
 
 /// note read from songfile

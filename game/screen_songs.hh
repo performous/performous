@@ -40,7 +40,7 @@ class ScreenSongs : public Screen {
 	boost::scoped_ptr<Surface> m_emptyCover;
 	boost::scoped_ptr<Surface> m_instrumentCover;
 	boost::scoped_ptr<Surface> m_bandCover;
-	boost::scoped_ptr<Surface> m_instrumentList;
+	boost::scoped_ptr<Texture> m_instrumentList;
 	Cachemap<std::string, Surface> m_covers;
 	bool m_jukebox;
 };
