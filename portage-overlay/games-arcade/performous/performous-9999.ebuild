@@ -17,7 +17,7 @@ SRC_URI="songs? (
 	mirror://sourceforge/${PN}/${SONGS_PN}-shearer-1.zip
 	)"
 
-EGIT_REPO_URI="git://performous.git.sourceforge.net/gitroot/performous"
+EGIT_REPO_URI="git://performous.git.sourceforge.net/gitroot/performous/performous"
 
 LICENSE="GPL-2
 	songs? (

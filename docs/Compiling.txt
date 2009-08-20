@@ -1,7 +1,7 @@
 To install from git:
 
 	# Checkout the git
-	git clone git://performous.git.sourceforge.net/gitroot/performous
+	git clone git://performous.git.sourceforge.net/gitroot/performous/performous
 	# Create separate build folder under trunk to avoid polluting the source three
 	mkdir performous/build
 	cd performous/build
