@@ -68,7 +68,7 @@ class GuitarGraph {
 	AnimValue m_cx, m_width;
 	unsigned m_track;
 	std::size_t m_stream;
-	std::vector<Track const*> m_tracks;
+	TrackVectorConstPtr m_tracks;
 	void drumHit(double time, int pad);
 	void guitarPlay(double time, input::Event const& ev);
 	enum Difficulty {

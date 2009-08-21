@@ -33,7 +33,7 @@ void ScreenSing::enter() {
 	m_engine.reset(new Engine(m_audio, *m_song, analyzers.begin(), analyzers.end(), m_players));
 	m_layout_singer.reset(new LayoutSinger(*m_song, m_players, theme));
 	// I know some purists would hang me for this loop
-	if( !m_song->tracks.empty() ) {
+	if( !m_song->track_map.empty() ) {
 		bool drums = false;
 		for (int num = 0; true; ++num) {
 			try {
@@ -153,7 +153,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		else if (key == SDLK_SPACE || key == SDLK_PAUSE) m_audio.togglePause();
 		if (m_score_window.get()) return;
 		// The rest are only available when score window is not displayed and when there are no instruments
-		if (key == SDLK_RETURN && status == Song::INSTRUMENTAL_BREAK && m_song->tracks.empty()) {
+		if (key == SDLK_RETURN && status == Song::INSTRUMENTAL_BREAK && m_song->track_map.empty()) {
 			double diff = m_layout_singer->lyrics_begin() - 3.0 - time;
 			if (diff > 0.0) m_audio.seek(diff);
 		}
@@ -240,14 +240,14 @@ void ScreenSing::draw() {
 		unsigned t = clamp(time, 0.0, length);
 		m_progress->draw(songPercent);
 		std::string statustxt = (boost::format("%02u:%02u") % (t / 60) % (t % 60)).str();
-		if (!m_score_window.get() && m_song->tracks.empty()) {
+		if (!m_score_window.get() && m_song->track_map.empty()) {
 			if (status == Song::INSTRUMENTAL_BREAK) statustxt += "   ENTER to skip instrumental break";
 			if (status == Song::FINISHED && !config["game/karaoke_mode"].b()) statustxt += "   Remember to wait for grading!";
 		}
 		theme->timer.draw(statustxt);
 	}
 
-	if (config["game/karaoke_mode"].b() || !m_song->tracks.empty()) {
+	if (config["game/karaoke_mode"].b() || !m_song->track_map.empty()) {
 		if (!m_audio.isPlaying()) {
 			ScreenManager* sm = ScreenManager::getSingletonPtr();
 			sm->activateScreen("Songs");

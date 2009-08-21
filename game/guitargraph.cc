@@ -69,16 +69,16 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, unsigned tr
 		g_samplesG.push_back(Sample(getDataPath("sounds/guitar_fail5.ogg"), sr));
 		g_samplesG.push_back(Sample(getDataPath("sounds/guitar_fail6.ogg"), sr));
 	}
-	for (Tracks::const_iterator it = m_song.tracks.begin(); it != m_song.tracks.end(); ++it) {
-		if (drums != (it->name == "drums")) continue;
-		m_tracks.push_back(&*it);
-		if (it->name == "drums") m_necks.push_back(new Texture("drumneck.svg"));
-		else if (it->name == "bass") m_necks.push_back(new Texture("bassneck.svg"));
+	for (TrackMap::const_iterator it = m_song.track_map.begin(); it != m_song.track_map.end(); ++it) {
+		if (drums != (it->first == "drums")) continue;
+		m_tracks.push_back(&it->second);
+		if (it->first == "drums") m_necks.push_back(new Texture("drumneck.svg"));
+		else if (it->first == "bass") m_necks.push_back(new Texture("bassneck.svg"));
 		else m_necks.push_back(new Texture("guitarneck.svg"));
 	}
 	for (int i = 0; i < 6; ++i) m_hit[i].setRate(5.0);
 	for (int i = 0; i < 5; ++i) m_holds[i] = 0;
-	if (m_tracks.empty()) throw std::runtime_error("No tracks");
+	if (m_tracks.empty()) throw std::runtime_error("No track");
 	difficultyAuto();
 }
 
@@ -262,8 +262,8 @@ bool GuitarGraph::difficulty(Difficulty level) {
 	m_track %= m_tracks.size();
 	Track const& track = *m_tracks[m_track];
 	// Find the stream number
-	for (m_stream = 0; m_stream < m_song.tracks.size(); ++m_stream) {
-		if (&track == &m_song.tracks[m_stream]) break;
+	for (TrackMap::const_iterator it = m_song.track_map.begin(); it != m_song.track_map.end(); ++it) {
+		if (&track == &it->second) break;
 	}
 	// Check if the difficulty level is available
 	uint8_t basepitch = diffv[level].basepitch;

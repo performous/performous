@@ -46,18 +46,22 @@ typedef std::vector<Duration> Durations;
 typedef std::map<int, Durations> NoteMap;
 
 struct Track {
+	// TODO: name should not be needed here (contained into the map)
 	Track(std::string n): name(n) {}
 	std::string name;
 	NoteMap nm;
 };
 
-typedef std::vector<Track> Tracks;
+// TODO: remove the following two types
+typedef std::vector<Track> TrackVector;
+typedef std::vector<Track const*> TrackVectorConstPtr;
+// keep these ones
+typedef std::map<std::string,Track> TrackMap;
+typedef std::map<std::string,Track const*> TrackMapConstPtr; // this one really needed ? can't we save only the map key for comparison ?
 
 namespace {
-	bool isTrackInside(Tracks &_tracks, std::string _name) {
-		for( Tracks::iterator it = _tracks.begin() ; it != _tracks.end() ; ++it ) {
-			if(it->name == _name) return true;
-		}
+	bool isTrackInside(TrackMap &track_map, std::string name) {
+		if( track_map.find(name) != track_map.end() ) return true;
 		return false;
 	}
 }

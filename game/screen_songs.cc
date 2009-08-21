@@ -205,7 +205,7 @@ void ScreenSongs::draw() {
 				// Fetch cover image from cache or try loading it
 				if (!song_display.cover.empty()) try { cover = &m_covers[song_display.path + song_display.cover]; } catch (std::exception const&) {}
 				if (!cover) {
-					size_t tracks = song_display.tracks.size();
+					size_t tracks = song_display.track_map.size();
 					if (tracks == 0) cover = m_emptyCover.get();
 					else if (tracks == 1) cover = m_instrumentCover.get();
 					else cover = m_bandCover.get();
@@ -243,7 +243,7 @@ void ScreenSongs::draw() {
 					}
 					{
 						// guitar
-						alpha = (isTrackInside(song_display.tracks,"guitar")) ? 1.00 : 0.25;
+						alpha = (isTrackInside(song_display.track_map,"guitar")) ? 1.00 : 0.25;
 						glutil::Begin block(GL_TRIANGLE_STRIP);
 						glColor4f(1.0, 1.0, 1.0, alpha);
 						x = dim.x1()+0.25*(dim.x2()-dim.x1());
@@ -255,7 +255,7 @@ void ScreenSongs::draw() {
 					}
 					{
 						// bass
-						alpha = (isTrackInside(song_display.tracks,"bass")) ? 1.00 : 0.25;
+						alpha = (isTrackInside(song_display.track_map,"bass")) ? 1.00 : 0.25;
 						glutil::Begin block(GL_TRIANGLE_STRIP);
 						glColor4f(1.0, 1.0, 1.0, alpha);
 						x = dim.x1()+0.50*(dim.x2()-dim.x1());
@@ -267,7 +267,7 @@ void ScreenSongs::draw() {
 					}
 					{
 						// drums
-						alpha = (isTrackInside(song_display.tracks,"drums")) ? 1.00 : 0.25;
+						alpha = (isTrackInside(song_display.track_map,"drums")) ? 1.00 : 0.25;
 						glutil::Begin block(GL_TRIANGLE_STRIP);
 						glColor4f(1.0, 1.0, 1.0, alpha);
 						x = dim.x1()+0.75*(dim.x2()-dim.x1());
