@@ -168,7 +168,8 @@
 		</locale>
 	</entry>
 	<entry name="audio/capture" type="string_list">
-		<stringvalue>channels=2@alsa:hw:default</stringvalue>
+		<stringvalue>channels=2@alsa:hw:default</stringvalue><!-- SingStar mics -->
+		<stringvalue>channels=1@alsa:hw:Microphone</stringvalue><!-- Rock Band branded Logitech mic -->
 		<stringvalue>channels=2</stringvalue>
 		<locale name="C">
 			<short>Microphones</short>
