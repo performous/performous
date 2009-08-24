@@ -11,14 +11,7 @@ Getting started
 
 Most probably you figured the clone part out by yourself:
 
-	$ git clone git://performous.git.sourceforge.net/gitroot/performous/performous <new-working-dir>
-
-respectively
-
-	$ git clone ssh://<username>@performous.git.sourceforge.net/gitroot/performous/performous <new-working-dir>
-
-if you are a developer and want to have write access on our global 
-repository.
+	$ git clone git://git.performous.org/gitroot/performous/performous <new-working-dir>
 
 This will create a clone of the repository on your local harddisk with 
 branch "master" checked out by default.
@@ -97,7 +90,8 @@ Getting involved
 ----------------
 
 When you become a developer of performous, you'll probably already have
-a clone of the performous repository. To be able to commit, you need to
+a clone of the performous repository. To be able to push, you need to
 change the project url with this command:
 
-	$ git config remote.origin.url ssh://USER@performous.git.sourceforge.net/gitroot/performous/performous
+	$ git config remote.origin.url <SF.net username>@git.performous.org:/gitroot/performous/performous
+
