@@ -157,7 +157,6 @@ class AudioBuffer {
 	bool eof(int64_t pos) const { return double(pos) / m_sps >= m_duration; }
 	double duration() const { return m_duration; }
 	void setDuration(double seconds) { m_duration = seconds; }
-	double position() { return double(m_pos) / m_sps; }
 	bool wantSeek() {
 		size_t oldest = m_pos - m_data.size();
 		return oldest > 0 && m_posReq < int64_t(oldest);
