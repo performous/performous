@@ -29,6 +29,7 @@ add_subdirectory(libs)
 add_subdirectory(themes)
 add_subdirectory(data)
 add_subdirectory(game)
+add_subdirectory(editor)
 add_subdirectory(docs)
 
 option(ENABLE_TOOLS "Enable extra tools (e.g. Singstar ripper)" ON)
