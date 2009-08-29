@@ -1,23 +1,50 @@
 #include "pitch.hh"
 #include "ffmpeg.hh"
+#include "notes.hh"
 #include <boost/math/special_functions/fpclassify.hpp>
 
 int main(int argc, char **argv) {
 	// Load audio
 	FFmpeg mpeg(false, true, argv[1], 48000);
-	int64_t position = 0;
-
-	da::sample_t *sample = new da::sample_t(1500);
-	da::pcm_data data(sample, 1500, 2, 48000);
+	Analyzer analyzer(48000, 1500);
+	MusicalScale scale;
 
 	// wait for ffmpeg to be ready
 	// TODO: fix this it is probably not enough
 	while( boost::math::isinf(mpeg.duration()) );
 
+	// this should majorate the song duration
+	int64_t duration = (mpeg.duration() + 0.5) * 48000 * 2;
+
+	unsigned int i = 0;
+	int64_t position = 0;
+	da::sample_t *sample = new da::sample_t(2);
+	da::pcm_data data(sample, 1500, 2, 48000);
 	while( mpeg.audioQueue(data, position) ) {
-		std::cout << "Position: " << position << " " << double(position) / double(48000*2)<< std::endl;
+		std::cout << i << ": " << position << " " << double(position) / double(48000*2)<< std::endl;
+
+		analyzer.input(data.begin(0), data.end(0));
+		analyzer.process();
+
+		Tone const* tone = analyzer.findTone();
+		double freq = (tone ? tone->freq : 0.0);
+
+		if( freq != 0.0 ) {
+			std::cout << "  Found: " << freq << std::endl;
+			Analyzer::tones_t tones = analyzer.getTones();
+			for (Analyzer::tones_t::const_iterator t = tones.begin(); t != tones.end(); ++t) {
+				if (t->age < Tone::MINAGE) continue;
+				std::cout << "  " << t->freq << std::endl;
+				int note = scale.getNoteId(t->freq);
+				if (note < 0) continue;
+				// Here I could spot X=position, Y=note, Z=t->db
+			}
+		} else {
+			std::cout << "  No tone here" << std::endl;
+		}
+		i++;
 	}
 
-	std::cout << "Duration: " << mpeg.duration() << std::endl;
+	std::cout << i << ": " << duration << " " << mpeg.duration() << std::endl;
 	return EXIT_SUCCESS;
 }
