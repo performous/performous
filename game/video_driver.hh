@@ -14,7 +14,7 @@ class SDL_Surface;
 class Window {
   public:
 	/// constructor
-	Window(unsigned int width, unsigned int height, int fullscreen, unsigned int fs_width, unsigned int fs_height);
+	Window(unsigned int windowW, unsigned int windowH, bool fullscreen);
 	/// destructor
 	~Window();
 	/// clears window
@@ -26,8 +26,7 @@ class Window {
 	 * @param height the new height
 	 */
 	void resize(unsigned width, unsigned height) {
-		if (m_fullscreen) { m_fsW = width; m_fsH = height; }
-		else { m_windowW = width; m_windowH = height; }
+		if (!m_fullscreen) { m_windowW = width; m_windowH = height; }
 		resize();
 	}
 	/// does the resizing

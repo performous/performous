@@ -91,26 +91,10 @@
 			<long></long>
 		</locale>
 	</entry>
-	<entry name="graphic/fs_width" type="int" value="1024">
-		<ui unit=" px" />
-		<limits min="320" max="4096" step="16" />
-		<locale name="C">
-			<short>Fullscreen width</short>
-			<long></long>
-		</locale>
-	</entry>
-	<entry name="graphic/fs_height" type="int" value="768">
-		<ui unit=" px" />
-		<limits min="240" max="2048" step="16" />
-		<locale name="C">
-			<short>Fullscreen height</short>
-			<long></long>
-		</locale>
-	</entry>
 	<entry name="graphic/fullscreen" type="bool" value="false">
 		<locale name="C">
 			<short>Fullscreen mode</short>
-			<long>Set width and height to suitable values first!</long>
+			<long></long>
 		</locale>
 	</entry>
 	<entry name="graphic/video" type="bool" value="true">

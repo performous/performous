@@ -15,7 +15,7 @@ namespace {
 unsigned int screenW() { return s_width; }
 unsigned int screenH() { return s_height; }
 
-Window::Window(unsigned int width, unsigned int height, int fs, unsigned int fs_width, unsigned int fs_height): m_windowW(width), m_windowH(height), m_fsW(fs_width), m_fsH(fs_height) {
+Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(width), m_windowH(height), m_fullscreen(fs) {
 	std::atexit(SDL_Quit);
 	if( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK) ==  -1 ) throw std::runtime_error("SDL_Init failed");
 	SDL_WM_SetCaption(PACKAGE " " VERSION, PACKAGE);
@@ -24,7 +24,10 @@ Window::Window(unsigned int width, unsigned int height, int fs, unsigned int fs_
 		SDL_WM_SetIcon(icon, NULL);
 		SDL_FreeSurface(icon);
 	}
-	m_fullscreen = (fs != 0);
+	// SDL_SetVideoMode not called yet => get the desktop resolution for fs mode
+	SDL_VideoInfo const* vi = SDL_GetVideoInfo();
+	m_fsW = vi->current_w;
+	m_fsH = vi->current_h;
 	resize();
 	SDL_ShowCursor(SDL_DISABLE);
 	SDL_EnableUNICODE(SDL_ENABLE);

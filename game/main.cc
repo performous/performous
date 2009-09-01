@@ -138,7 +138,7 @@ void mainLoop() {
 		Songs songs(songlist);
 		Players players(getSharePath("performous.xml"));
 		ScreenManager sm;
-		Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b(), config["graphic/fs_width"].i(), config["graphic/fs_height"].i());
+		Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());
 		sm.addScreen(new ScreenIntro("Intro", audio, capture));
 		sm.addScreen(new ScreenSongs("Songs", audio, songs));
 		sm.addScreen(new ScreenSing("Sing", audio, capture, players));
@@ -199,9 +199,6 @@ int main(int argc, char** argv) {
 	  ("songlist", po::value<std::string>(&songlist), "save a list of songs in the specified folder");
 	po::options_description opt2("Configuration options");
 	opt2.add_options()
-	  ("fs", po::value<bool>()->implicit_value(true), "start in full screen mode\n  --fs=0 for windowed mode")
-	  ("width,W", po::value<int>(), "set horizontal resolution")
-	  ("height,H", po::value<int>(), "set vertical resolution")
 	  ("mics", po::value<std::vector<std::string> >(&mics)->composing(), "specify the microphones to use")
 	  ("pdev", po::value<std::vector<std::string> >(&pdevs)->composing(), "specify the playback device")
 	  ("michelp", "detailed help and device list for --mics")
@@ -277,10 +274,6 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 	// Override XML config for options that were specified from commandline or performous.conf
-	if (vm.count("fs")) config["graphic/fullscreen"].b() = vm["fs"].as<bool>();
-	std::string graphic = config["graphic/fullscreen"].b() ? "graphic/fs_" : "graphic/window_";
-	if (vm.count("width")) config[graphic + "width"].i() = vm["width"].as<int>();
-	if (vm.count("height")) config[graphic + "height"].i() = vm["height"].as<int>();
 	confOverride(songdirs, "system/path_songs");
 	confOverride(mics, "audio/capture");
 	confOverride(pdevs, "audio/playback");
