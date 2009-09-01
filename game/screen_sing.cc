@@ -55,10 +55,10 @@ void ScreenSing::instrumentLayout(double time) {
 		m_instruments[i].position((0.5 + i - 0.5 * s) * iw, iw);
 	}
 	typedef std::pair<unsigned, double> CountSum;
-	std::map<unsigned, CountSum> volume; // stream id to (count, sum)
+	std::map<std::string, CountSum> volume; // stream id to (count, sum)
 	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it) {
 		it->engine();
-		CountSum& cs = volume[it->stream() + 1];
+		CountSum& cs = volume[it->getTrackIndex()];
 		cs.first++;
 		cs.second += it->correctness();
 		it->draw(time);
@@ -69,20 +69,16 @@ void ScreenSing::instrumentLayout(double time) {
 		glColor3f(1.0f, 1.0f, 1.0f);
 	}
 	// Set volume levels (averages of all instruments playing that track)
-	for (std::size_t i = 0, s = m_song->music.size(); i < s; ++i) {
-		double level = 1.0;
-		CountSum cs = volume[i];
-		if (cs.first > 0) level = cs.second / cs.first;
-		//m_audio.streamFade(i, level); // +1 because 0 is bg
-	}
-	/*
 	for( std::map<std::string,std::string>::iterator it = m_song->music.begin() ; it != m_song->music.end() ; ++it ) {
 		double level = 1.0;
-		CountSum cs = volume[it->first];
-		if (cs.first > 0) level = cs.second / cs.first;
-		m_audio.streamFade(it->first, level);
+		if( volume.find(it->first) == volume.end() ) {
+			m_audio.streamFade(it->first, level);
+		} else {
+			CountSum cs = volume[it->first];
+			if (cs.first > 0) level = cs.second / cs.first;
+			m_audio.streamFade(it->first, level);
+		}
 	}
-	*/
 }
 
 void ScreenSing::exit() {

@@ -53,6 +53,7 @@ class GuitarGraph {
 	double dead(double time) const { return time > -0.5 && m_dead > 50; }
 	unsigned stream() const { return m_stream; }
 	double correctness() const { return m_correctness.get(); }
+	std::string getTrackIndex() const { return m_track_index;}
   private:
 	void fail(double time, int fret);
 	void endHold(int fret);
@@ -63,12 +64,12 @@ class GuitarGraph {
 	Texture m_button_l;
 	Surface m_tap;
 	AnimValue m_hit[6];
-	boost::ptr_vector<Texture> m_necks;
+	boost::ptr_map<std::string,Texture> m_necks;
 	bool m_drums;
 	AnimValue m_cx, m_width;
-	unsigned m_track;
+	std::string m_track_index;
 	std::size_t m_stream;
-	TrackVectorConstPtr m_tracks;
+	TrackMapConstPtr m_track_map;
 	void drumHit(double time, int pad);
 	void guitarPlay(double time, input::Event const& ev);
 	enum Difficulty {
