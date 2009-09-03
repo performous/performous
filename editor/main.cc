@@ -4,6 +4,15 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 
 int main(int argc, char **argv) {
+
+	if (argc < 2)
+	{
+		std::cerr << "Not enough arguments" << std::endl;
+		std::cerr << "Use " << argv[0] << " audiofile" << std::endl;
+
+		return 1;
+	}
+
 	// Load audio
 	FFmpeg mpeg(false, true, argv[1], 48000);
 	Analyzer analyzer(48000, 1500);
@@ -11,7 +20,7 @@ int main(int argc, char **argv) {
 
 	// wait for ffmpeg to be ready
 	// TODO: fix this it is probably not enough
-	while( boost::math::isinf(mpeg.duration()) );
+	while( boost::math::isinf(mpeg.duration()) ) ;
 
 	// this should majorate the song duration
 	int64_t duration = (mpeg.duration() + 0.5) * 48000 * 2;
