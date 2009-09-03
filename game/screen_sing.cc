@@ -97,31 +97,6 @@ void ScreenSing::activateNextScreen()
 {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 
-	if (!config["game/song_hiscore"].b())
-	{
-		// user does not want a per song highscore
-		sm->activateScreen("Songs");
-		return;
-	}
-
-	// TODO: multiple loading...
-	// TODO: make it possible to switch of highscore through configuration
-	SongHiscore hi(m_song->path, "High.sco");
-	try {
-		hi.load();
-	} catch (HiscoreException const& hi) {
-		std::cerr << "high.sco:" << hi.line() << " " << hi.what() << std::endl;
-	}
-
-	if (m_players.scores.empty()
-	      || !hi.reachedNewHiscore(m_players.scores.front())
-	      || !hi.isWritable())
-	{
-		// if no highscore reached..
-		sm->activateScreen("Songs");
-		return;
-	}
-
 	// Score window visible -> Enter quits to Players Screen
 	Screen* s = sm->getScreen("Players");
 	ScreenPlayers* ss = dynamic_cast<ScreenPlayers*> (s);

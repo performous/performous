@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <fstream>
 #include <stdexcept>
 
 #include <ostream>
@@ -32,7 +33,10 @@ struct SongHiscoreItem {
 	}
 };
 
-/**SongHiscore loads and saves a list of SongHiscoreItems.
+/**SongHiscore loads (and saves) a list of SongHiscoreItems.
+
+ The class is only used for reading information in
+ performous.
 
  Format of highscore is compatible with Ultrastar.
  
@@ -46,19 +50,24 @@ struct SongHiscoreItem {
  */
 class SongHiscore {
   public:
+	/**Open the file in a read-only mode
+	  and read everything in.*/
 	SongHiscore (std::string const& path_, std::string const& filename_);
+
+	/**Close the file.*/
 	~SongHiscore ();
 
-	void load();
-	void save();
+	/**Read everything in (again).
+	 Will be called at the constructor.*/
+	void reload();
 
-	/**Check if file location is writable.
-	  @return true if it is.
-	  @return false if you can't write at the location where path points to.
-	  */
-	bool isWritable();
+	/**Save the players information in High.sco
+	  format to the stream os.*/
+	void save (std::ostream & os);
 
-	void getInfo (std::ostream & os);
+	/**Write the players information in a pretty
+	  print format to the stream os.*/
+	void getInfo(std::ostream & os);
 
 	/**Check if you reached a new highscore.
 
@@ -85,4 +94,5 @@ class SongHiscore {
 	std::string m_path;
 	std::string m_filename;
 	std::vector <SongHiscoreItem> m_scores;
+	std::ifstream m_handle;
 };

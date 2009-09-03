@@ -4,33 +4,32 @@
 
 #include "unicode.hh"
 
-#include <fstream>
 #include <sstream>
 #include <algorithm>
 
 SongHiscore::SongHiscore (std::string const& path_, std::string const& filename_) :
 	m_path(path_),
 	m_filename(filename_),
-	m_scores(m_maxEntries)
-{}
+	m_scores(m_maxEntries),
+	m_handle((m_path + m_filename).c_str())
+{
+	if (!m_handle.is_open()) throw HiscoreException("Could not open file for reading", 0);
+
+	reload();
+}
 
 SongHiscore::~SongHiscore()
 {}
 
-void SongHiscore::load()
+void SongHiscore::reload()
 {
-	std::ifstream in((m_path + m_filename).c_str());
-
-	if (!in.is_open()) throw HiscoreException("Could not open highscore file", 0);
-
-
-	in.seekg(0, std::ios::end);
-	size_t size = in.tellg();
+	m_handle.seekg(0, std::ios::end);
+	size_t size = m_handle.tellg();
 	if (size < 10 || size > 100000) throw HiscoreException("Does not look like a highscore file (wrong size)", 1);
-	in.seekg(0);
+	m_handle.seekg(0);
 
 	std::vector<char> data(size);
-	if (!in.read(&data[0], size)) throw HiscoreException("Unexpected I/O error", 0);
+	if (!m_handle.read(&data[0], size)) throw HiscoreException("Unexpected I/O error", 0);
 
 	std::stringstream ss;
 	ss.write(&data[0], size);
@@ -49,7 +48,7 @@ void SongHiscore::load()
 		if (str.empty()) continue; // ignore empty player lines
 
 		if (str == "E") break;
-		if (playernum > 9) throw HiscoreException("Not more than 10 highscores expected in file", linenum);
+		if (playernum > 9) throw HiscoreException("Not more than 10 highscores expected m_handle file", linenum);
 		if (str.length() <= 9) throw HiscoreException("Line not long enough for player information", linenum);
 
 		if (str[0] != '#') throw HiscoreException("No # found at begin of line", linenum);
@@ -98,13 +97,10 @@ void SongHiscore::load()
 	}
 }
 
-void SongHiscore::save()
+void SongHiscore::save(std::ostream & out)
 {
-	std::ofstream out ((m_path + m_filename).c_str());
-
-	if (!out.is_open()) throw HiscoreException("Could not open file for writing", 0);
-
 	out.exceptions ( std::ofstream::eofbit | std::ofstream::failbit | std::ofstream::badbit );
+
 	for (size_t i=0; i<m_scores.size();i++)
 	{
 		if (m_scores[i].score <= 0) break; // maybe change to 500?
@@ -119,13 +115,6 @@ void SongHiscore::save()
 		}
 	}
 	out << "E" << std::endl;
-}
-
-bool SongHiscore::isWritable()
-{
-	std::ofstream out ((m_path + m_filename).c_str(), std::ios::app);
-
-	return out.is_open();
 }
 
 void SongHiscore::getInfo (std::ostream & out)
@@ -166,22 +155,11 @@ int main()
 	try {
 		SongHiscore hi ("", "highscore.txt");
 
-		if (hi.isWritable()) std::cout << "Is writeable" << std::endl;
-		else std::cout << "Is not writeable" << std::endl;
-
-		hi.load();
-		int new_score = 5000;
-		if (hi.reachedNewHiscore(new_score))
-		{
-			std::cout << "Reached new highscore" << std::endl;
-			hi.addNewHiscore("nplayer", new_score);
-		}
 		hi.getInfo(std::cout);
-		hi.save();
 	} catch (HiscoreException const& hie)
 	{
-		std::cerr << "Exception: " << hie.what()
-			<< "  at line: " << hie.line()
+		std::cerr << "Exception while reading: " << hie.what()
+			<< " at line: " << hie.line()
 			<< std::endl;
 	}
 }

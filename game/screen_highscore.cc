@@ -14,11 +14,11 @@ ScreenHiscore::ScreenHiscore(std::string const& name, Audio& audio, Players& pla
 }
 
 void ScreenHiscore::enter() {
-	m_highscore.reset(new SongHiscore(m_song->path, "High.sco"));
 	try {
-		m_highscore->load();
+		m_highscore.reset(new SongHiscore(m_song->path, "High.sco"));
 	} catch (HiscoreException const& hi) {
 		std::cerr << "high.sco:" << hi.line() << " " << hi.what() << std::endl;
+		activateNextScreen();
 	}
 
 	m_score_text[0].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
@@ -48,16 +48,17 @@ void ScreenHiscore::exit() {
 	m_playing.clear();
 	m_playReq.clear();
 
-	try {
-		m_highscore->save();
-	} catch (HiscoreException const& hi) {
-		std::cerr << "high.sco:" << hi.line() << " " << hi.what() << std::endl;
-	}
+	// TODO: writing out Highscore
+
 	m_highscore.reset();
 }
 
-void ScreenHiscore::manageEvent(SDL_Event event) {
+void ScreenHiscore::activateNextScreen() {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
+	sm->activateScreen("Songs");
+}
+
+void ScreenHiscore::manageEvent(SDL_Event event) {
 	if (event.type != SDL_KEYDOWN) return;
 	SDL_keysym keysym = event.key.keysym;
 	int key = keysym.sym;
@@ -66,16 +67,13 @@ void ScreenHiscore::manageEvent(SDL_Event event) {
 	if (key == SDLK_r && mod & KMOD_CTRL) { m_players.reload(); m_players.setFilter(m_search.text); }
 	if (m_search.process(keysym)) m_players.setFilter(m_search.text);
 	else if (key == SDLK_ESCAPE) {
-		if (m_search.text.empty()) sm->activateScreen("Songs");
+		if (m_search.text.empty()) { activateNextScreen(); return; }
 	else { m_search.text.clear(); m_players.setFilter(m_search.text); }
 	}
 	// The rest are only available when there are songs available
 	else if (m_players.empty()) return;
 	else if (key == SDLK_SPACE || (key == SDLK_PAUSE || (key == SDLK_p && mod & KMOD_CTRL))) m_audio.togglePause();
-	else if (key == SDLK_RETURN)
-	{
-		sm->activateScreen("Songs");
-	}
+	else if (key == SDLK_RETURN) { activateNextScreen(); return; }
 	else if (key == SDLK_LEFT) m_players.advance(-1);
 	else if (key == SDLK_RIGHT) m_players.advance(1);
 	else if (key == SDLK_PAGEUP) m_players.advance(-10);

@@ -14,11 +14,14 @@ ScreenPlayers::ScreenPlayers(std::string const& name, Audio& audio, Players& pla
 }
 
 void ScreenPlayers::enter() {
-	m_highscore.reset(new SongHiscore(m_song->path, "High.sco"));
 	try {
-		m_highscore->load();
+		m_highscore.reset(new SongHiscore(m_song->path, "High.sco"));
 	} catch (HiscoreException const& hi) {
 		std::cerr << "High.sco:" << hi.line() << " " << hi.what() << std::endl;
+
+		ScreenManager* sm = ScreenManager::getSingletonPtr();
+		sm->activateScreen("Songs");
+		return;
 	}
 
 	m_layout_singer.reset(new LayoutSinger(*m_song, m_players));
@@ -41,11 +44,7 @@ void ScreenPlayers::exit() {
 	m_playing.clear();
 	m_playReq.clear();
 
-	try {
-		m_highscore->save();
-	} catch (HiscoreException const& hi) {
-		std::cerr << "High.sco:" << hi.line() << " " << hi.what() << std::endl;
-	}
+	// TODO save hiscore
 	m_highscore.reset();
 }
 
@@ -59,7 +58,7 @@ void ScreenPlayers::manageEvent(SDL_Event event) {
 	if (key == SDLK_r && mod & KMOD_CTRL) { m_players.reload(); m_players.setFilter(m_search.text); }
 	if (m_search.process(keysym)) m_players.setFilter(m_search.text);
 	else if (key == SDLK_ESCAPE) {
-		if (m_search.text.empty()) sm->activateScreen("Songs");
+		if (m_search.text.empty()) { sm->activateScreen("Songs"); return; }
 		else { m_search.text.clear(); m_players.setFilter(m_search.text); }
 	}
 	else if (key == SDLK_RETURN)

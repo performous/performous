@@ -19,8 +19,11 @@ class ScreenHiscore : public Screen {
   public:
 	/// constructor
 	ScreenHiscore(std::string const& name, Audio& audio, Players& players);
+
 	void enter();
 	void exit();
+	void activateNextScreen();
+
 	void manageEvent(SDL_Event event);
 	void draw();
 	void drawScores();
