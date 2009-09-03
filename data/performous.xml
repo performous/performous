@@ -35,7 +35,7 @@
 	<entry name="game/karaoke_mode" type="bool" value="false">
 		<locale name="C">
 			<short>Karaoke mode</short>
-			<long>Hide pitch wave, notes and scoring</long>
+			<long>Hide pitch wave, notes and scoring.</long>
 		</locale>
 	</entry>
 	<entry name="game/song_hiscore" type="bool" value="false">
@@ -47,20 +47,20 @@
 	<entry name="game/pitch" type="bool" value="true">
 		<locale name="C">
 			<short>Pitch waves</short>
-			<long>Enable singing pitch display (when not in karaoke mode)</long>
+			<long>Enable singing pitch display (when not in karaoke mode).</long>
 		</locale>
 	</entry>
 	<entry name="game/theme" type="string">
 		<stringvalue>default</stringvalue>
 		<locale name="C">
 			<short>Theme</short>
-			<long>Name of the theme to use or absolute path to theme folder</long>
+			<long>Name of the theme to use or absolute path to theme folder.</long>
 		</locale>
 	</entry>
 	<entry name="game/keyboard_guitar" type="bool" value="true">
 		<locale name="C">
 			<short>Keyboard as guitar</short>
-			<long>Enable keyboard as guitar (Frets on Frire mode)</long>
+			<long>Enable keyboard as guitar (Frets on Fire mode).</long>
 		</locale>
 	</entry>
 	<entry name="game/instruments" type="string_list">
@@ -80,7 +80,7 @@
 		<limits min="320" max="4096" step="16" />
 		<locale name="C">
 			<short>Windowed width</short>
-			<long></long>
+			<long>The width of the window.</long>
 		</locale>
 	</entry>
 	<entry name="graphic/window_height" type="int" value="600" hidden="true">
@@ -88,13 +88,13 @@
 		<limits min="240" max="2048" step="16" />
 		<locale name="C">
 			<short>Windowed height</short>
-			<long></long>
+			<long>The height of the window.</long>
 		</locale>
 	</entry>
 	<entry name="graphic/fullscreen" type="bool" value="false">
 		<locale name="C">
 			<short>Fullscreen mode</short>
-			<long></long>
+			<long>Enable fullscreen mode on startup.</long>
 		</locale>
 	</entry>
 	<entry name="graphic/video" type="bool" value="true">
