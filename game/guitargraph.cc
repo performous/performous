@@ -36,14 +36,14 @@ namespace {
 
 }
 
-GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, unsigned track):
+GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
   m_audio(audio),
-  m_input(drums ? input::DRUMS : input::GUITAR),
+  m_input(track=="drums" ? input::DRUMS : input::GUITAR),
   m_song(song),
   m_button("button.svg"),
   m_button_l("button_l.svg"),
   m_tap("tap.svg"),
-  m_drums(drums),
+  m_drums(track=="drums"),
   m_cx(0.0, 0.2),
   m_width(0.5, 0.4),
   m_stream(),
@@ -71,9 +71,10 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, unsigned tr
 	unsigned int i = 0;
 	for (TrackMap::const_iterator it = m_song.track_map.begin(); it != m_song.track_map.end(); ++it,++i) {
 		std::string index = it->first;
-		if (drums != (index == "drums")) continue;
 		m_track_map.insert(make_pair(index, &it->second));
-		if( i == track ) m_track_index = index;
+		if( index == track ) m_track_index = index;
+
+		// load required textures (even the unused)
 		if (index == "drums") m_necks.insert(index, new Texture("drumneck.svg"));
 		else if (index == "bass") m_necks.insert(index, new Texture("bassneck.svg"));
 		else m_necks.insert(index, new Texture("guitarneck.svg"));

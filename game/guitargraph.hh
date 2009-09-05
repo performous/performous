@@ -43,7 +43,7 @@ static inline bool operator==(Chord const& a, Chord const& b) {
 class GuitarGraph {
   public:
 	/// constructor
-	GuitarGraph(Audio& audio, Song const& song, bool drums, unsigned num);
+	GuitarGraph(Audio& audio, Song const& song, std::string track);
 	/** draws GuitarGraph
 	 * @param time at which time to draw
 	 */
