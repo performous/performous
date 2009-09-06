@@ -18,7 +18,7 @@ namespace {
 	float time2y(float t) { return -timescale * (t - past) / (future - past); }
 	float time2a(float t) {
 		float a = clamp(1.0 - t / future); // Note: we want 1.0 alpha already at zero t.
-		return std::pow(a, 0.8); // Nicer curve
+		return std::pow(a, 0.8f); // Nicer curve
 	}
 	float y2a(float y) { return time2a(past - y / timescale * (future - past)); }
 	const double maxTolerance = 0.15;
