@@ -30,11 +30,11 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 	add_definitions("-D__STDC_CONSTANT_MACROS")
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
-add_executable(editor ${SOURCES} ${SDL_SOURCES})
-target_link_libraries(editor da ${LIBS})
+add_executable(performous-editor ${SOURCES} ${SDL_SOURCES})
+target_link_libraries(performous-editor da ${LIBS})
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.cmake.hh" "${CMAKE_CURRENT_BINARY_DIR}/config.hh" @ONLY)
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
-install(TARGETS editor DESTINATION bin)
+install(TARGETS performous-editor DESTINATION bin)
 
