@@ -2,13 +2,11 @@
 #include "configuration.hh"
 
 #include "fs.hh"
-#include "screen.hh"
 #include <boost/bind.hpp>
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
 #include <libxml++/libxml++.h>
-// #include <tr1/random>
 #include <cstdlib>
 #include <algorithm>
 #include <fstream>
