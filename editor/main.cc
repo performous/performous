@@ -1,7 +1,7 @@
 #include "pitch.hh"
 #include "ffmpeg.hh"
 #include "notes.hh"
-#include <boost/math/special_functions/fpclassify.hpp>
+//#include <boost/math/special_functions/fpclassify.hpp>
 
 int main(int argc, char **argv) {
 
@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
 
 	// wait for ffmpeg to be ready
 	// TODO: fix this it is probably not enough
-	while( boost::math::isinf(mpeg.duration()) ) ;
+	while(isinf(mpeg.duration()) ) ;
 
 	// this should majorate the song duration
 	int64_t duration = (mpeg.duration() + 0.5) * 48000 * 2;
