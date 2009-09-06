@@ -36,15 +36,25 @@ void ScreenSing::enter() {
 	if( !m_song->track_map.empty() ) {
 		// Here we load alternatively guitar/bass tracks until no guitar controler is available
 		// then we load all the drums tracks until no drum controler is available (and place them in second position)
-		std::string track = "guitar";
+		bool no_guitar = false;
+		bool no_bass = false;
 		while (1) {
 			try {
 				Instruments::iterator it = m_instruments.end();
-				if (track == "drums" && m_instruments.size() > 1) it = m_instruments.begin() + 1; // Drums go after the first guitar
-				m_instruments.insert(it, new GuitarGraph(m_audio, *m_song, track));
-			} catch (std::runtime_error&) { if (track=="drums") break; track = "drums";}
-			if( track == "guitar" ) track = "bass";
-			if( track == "bass" ) track = "guitar";
+				m_instruments.insert(it, new GuitarGraph(m_audio, *m_song, "guitar"));
+			} catch (std::runtime_error&) {no_guitar = true;}
+			try {
+				Instruments::iterator it = m_instruments.end();
+				m_instruments.insert(it, new GuitarGraph(m_audio, *m_song, "bass"));
+			} catch (std::runtime_error&) {no_bass = true;}
+			if( no_guitar && no_bass ) break;
+		}
+		while(1) {
+			try {
+				Instruments::iterator it = m_instruments.end();
+				if (m_instruments.size() > 1) it = m_instruments.begin() + 1; // Drums go after the first guitar
+				m_instruments.insert(it, new GuitarGraph(m_audio, *m_song, "drums"));
+			} catch (std::runtime_error&) { break; }
 		}
 	}
 	m_audio.playMusic(m_song->music, false, 0.0, m_instruments.empty() ? -1.0 : -8.0); // Startup delay for instruments is longer than for singing only

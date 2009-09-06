@@ -79,6 +79,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
 		else if (index == "bass") m_necks.insert(index, new Texture("bassneck.svg"));
 		else m_necks.insert(index, new Texture("guitarneck.svg"));
 	}
+	if( m_track_index.empty() ) throw std::runtime_error("Could not find track \"" + track + "\"");
 	for (int i = 0; i < 6; ++i) m_hit[i].setRate(5.0);
 	for (int i = 0; i < 5; ++i) m_holds[i] = 0;
 	if (m_track_map.empty()) throw std::runtime_error("No track");
