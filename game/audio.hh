@@ -105,8 +105,8 @@ class Audio {
 	Notes const* volatile m_notes;
 	da::settings m_rs;
 	da::volume m_volume;
+	std::string m_volumeSetting;
 	da::mixer m_mixer;
 	std::map<std::string,boost::shared_ptr<Stream> > m_streams;
-	std::string m_volumeSetting;
 };
 

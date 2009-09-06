@@ -175,7 +175,12 @@ namespace da {
 		mutex_stream(callback_t const& stream): m_stream(stream) {}
 		bool operator()(pcm_data& data) {
 			scoped_lock l(*this);
+			if (!m_stream) return false;
 			return m_stream(data);
+		}
+		void clear() {
+			scoped_lock l(*this);
+			m_stream.clear();
 		}
 	  private:
 		callback_t m_stream;
@@ -211,6 +216,12 @@ namespace da {
 	  public:
 		mixer(): m_mutex(boost::ref(m_select)) { init(); }
 		mixer(settings& s): m_mutex(boost::ref(m_select)) { init(); start(s); }
+		~mixer() {
+			// Make sure that all processing has stopped before exiting
+			scoped_lock l(m_mutex);
+			m_mutex.clear();
+			m_playback.reset();
+		}
 		void start(settings& s) { m_settings = s; start(); s = m_settings; }
 		void start() {
 			stop();
