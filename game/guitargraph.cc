@@ -10,9 +10,10 @@ namespace {
 	};
 	const size_t diffsz = sizeof(diffv) / sizeof(*diffv);
 
-	const float past = -0.3f;
-	const float future = 3.0f;
-	const float timescale = 60.0f;
+	const float g_angle = 80.0f;
+	const float past = -0.2f;
+	const float future = 1.8f;
+	const float timescale = 25.0f;
 	const float texCoordStep = -0.5f; // Two beat lines per neck texture => 0.5 tex units per beat
 	// Note: t is difference from playback time so it must be in range [past, future]
 	float time2y(float t) { return -timescale * (t - past) / (future - past); }
@@ -322,7 +323,7 @@ void GuitarGraph::draw(double time) {
 	glTranslatef(frac * 2.0 * offsetX, 0.0f, 0.0f);
 	glutil::PushMatrixMode pmb(GL_MODELVIEW);
 	glTranslatef((1.0 - frac) * offsetX, dimensions.y2(), 0.0f);
-	glRotatef(85.0f, 1.0f, 0.0f, 0.0f);
+	glRotatef(g_angle, 1.0f, 0.0f, 0.0f);
 	{ float s = dimensions.w() / 5.0f; glScalef(s, s, s); }
 	// Draw the neck
 	{
