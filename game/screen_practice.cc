@@ -1,7 +1,9 @@
 #include "screen_practice.hh"
 
 #include "util.hh"
+#include "fs.hh"
 #include "configuration.hh"
+#include "record.hh"
 
 ScreenPractice::ScreenPractice(std::string const& name, Audio& audio, Capture& capture):
   Screen(name), m_audio(audio), m_capture(capture)

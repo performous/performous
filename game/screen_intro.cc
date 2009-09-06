@@ -1,4 +1,6 @@
 #include "screen_intro.hh"
+#include "audio.hh"
+#include "record.hh"
 #include "configuration.hh"
 
 ScreenIntro::ScreenIntro(std::string const& name, Audio& audio, Capture& capture): Screen(name), m_audio(audio), m_capture(capture) {}

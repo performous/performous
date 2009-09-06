@@ -1,16 +1,9 @@
 #pragma once
 
-#include "audio.hh"
-#include "glutil.hh"
-#include "record.hh"
 #include "singleton.hh"
-#include "songs.hh"
 #include <boost/ptr_container/ptr_map.hpp>
-#include <boost/scoped_ptr.hpp>
 #include <SDL.h>
-#include <iostream>
 #include <string>
-#include <vector>
 
 /// Abstract Class for screens
 class Screen {

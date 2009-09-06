@@ -1,13 +1,10 @@
 #pragma once
-#ifndef USNG_PITCH_H_INCLUDED
-#define USNG_PITCH_H_INCLUDED
 
-#include <boost/thread/mutex.hpp>
 #include <complex>
-#include <deque>
-#include <list>
 #include <vector>
+#include <list>
 #include <algorithm>
+#include <cmath>
 
 /// struct to represent tones
 struct Tone {
@@ -106,6 +103,3 @@ class Analyzer {
 	void calcTones();
 	void mergeWithOld(tones_t& tones) const;
 };
-
-#endif
-

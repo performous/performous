@@ -5,8 +5,6 @@
 #include <fstream>
 #include <stdexcept>
 
-#include <ostream>
-
 /**Exception which will be thrown when loading or
   saving a SongHiscore fails.*/
 struct HiscoreException: public std::runtime_error {

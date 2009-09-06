@@ -1,4 +1,12 @@
 #include "layout_singer.hh"
+#include "configuration.hh"
+#include "fs.hh"
+#include "song.hh"
+#include "player.hh"
+#include "players.hh"
+
+#include <list>
+#include <boost/format.hpp>
 
 LayoutSinger::LayoutSinger(Song &_song, Players& _players, boost::shared_ptr<ThemeSing> _theme): m_song(_song), m_noteGraph(_song),m_lyricit(_song.notes.begin()), m_lyrics(), m_players(_players), m_theme(_theme) {
 	m_score_text[0].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));

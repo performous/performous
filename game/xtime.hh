@@ -1,6 +1,4 @@
 #pragma once
-#ifndef USNG_XTIME_H_INCLUDED
-#define USNG_XTIME_H_INCLUDED
 
 #include <boost/thread/xtime.hpp>
 #include <cmath>
@@ -29,6 +27,3 @@ namespace {
 		return time.sec + time.nsec * 1e-9;
 	}
 }
-
-#endif
-

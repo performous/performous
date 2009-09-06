@@ -1,6 +1,7 @@
 #pragma once
-#include "engine.hh"
+
 #include "theme.hh"
+#include "opengl_text.hh"
 #include "notegraph.hh"
 
 /// handles songlyrics

@@ -7,7 +7,6 @@
 #include "animvalue.hh"
 #include "engine.hh"
 #include "guitargraph.hh"
-#include "notegraph.hh"
 #include "screen.hh"
 #include "theme.hh"
 #include "video.hh"
@@ -16,6 +15,10 @@
 #include "progressbar.hh"
 
 #include "screen_players.hh"
+
+class Players;
+class Audio;
+class Capture;
 
 /// shows score at end of song
 class ScoreWindow {

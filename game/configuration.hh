@@ -1,10 +1,5 @@
 #pragma once
-#ifndef PERFORMOUS_CONFIGURATION_HH
-#define PERFORMOUS_CONFIGURATION_HH
 
-#include "util.hh"
-#include <boost/any.hpp>
-#include <boost/format.hpp>
 #include <boost/variant.hpp>
 #include <map>
 #include <string>
@@ -67,5 +62,3 @@ struct MenuEntry {
 
 typedef std::vector<MenuEntry> ConfigMenu;
 extern ConfigMenu configMenu;
-
-#endif

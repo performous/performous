@@ -2,9 +2,6 @@
 
 #include "song.hh"
 #include "unicode.hh"
-#include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
-#include <algorithm>
 #include <fstream>
 #include <sstream>
 

@@ -1,12 +1,10 @@
 #pragma once
-#include "songs.hh"
+#include "song.hh"
 #include "color.hh"
 #include "pitch.hh"
 #include "util.hh"
 
 #include <vector>
-#include <limits>
-
 
 /// player class
 struct Player {

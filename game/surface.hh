@@ -4,9 +4,6 @@
 #include <stdexcept>
 #include <string>
 #include <boost/noncopyable.hpp>
-#include <boost/scoped_ptr.hpp>
-#include <librsvg/rsvg.h>
-#include <librsvg/rsvg-cairo.h>
 #include <cairo.h>
 
 /// class for geometry stuff

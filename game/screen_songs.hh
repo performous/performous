@@ -1,19 +1,16 @@
 #pragma once
-#ifndef PERFORMOUS_SCREEN_SONGS_HH
-#define PERFORMOUS_SCREEN_SONGS_HH
 
 #include <boost/scoped_ptr.hpp>
 #include "animvalue.hh"
 #include "cachemap.hh"
-#include "opengl_text.hh"
 #include "screen.hh"
 #include "surface.hh"
-#include "songs.hh"
 #include "textinput.hh"
 #include "theme.hh"
 #include "video.hh"
 
-class CAudio;
+class Audio;
+class Songs;
 
 /// song chooser screen
 class ScreenSongs : public Screen {
@@ -44,6 +41,3 @@ class ScreenSongs : public Screen {
 	Cachemap<std::string, Surface> m_covers;
 	bool m_jukebox;
 };
-
-#endif
-

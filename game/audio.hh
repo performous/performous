@@ -1,14 +1,12 @@
 #pragma once
 
 #include <string>
+#include <vector>
+#include <map>
 
-#include "configuration.hh"
 #include "ffmpeg.hh"
 #include "notes.hh"
-#include <boost/ptr_container/ptr_vector.hpp>
-#include <boost/ptr_container/ptr_map.hpp>
-#include <boost/scoped_ptr.hpp>
-#include <boost/thread/recursive_mutex.hpp>
+#include <boost/shared_ptr.hpp>
 #include <libda/mixer.hpp>
 
 using boost::int16_t;

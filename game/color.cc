@@ -1,6 +1,7 @@
 #include "color.hh"
 #include <cstdio>
 #include <iostream>
+#include <map>
 
 namespace {
 	struct ColorNames {

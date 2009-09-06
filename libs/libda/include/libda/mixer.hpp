@@ -9,7 +9,8 @@ Link with libda when you use this.
 
 #include "audio.hpp"
 #include <boost/scoped_ptr.hpp>
-#include <boost/thread/mutex.hpp>
+#include <boost/thread/recursive_mutex.hpp>
+//#include <boost/thread/mutex.hpp>
 #include <algorithm>
 #include <memory>
 

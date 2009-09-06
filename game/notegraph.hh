@@ -1,11 +1,11 @@
 #pragma once
 
-#include <boost/scoped_ptr.hpp>
 #include "animvalue.hh"
-#include "engine.hh"
 #include "surface.hh"
+#include "notes.hh"
 
 class Song;
+class Players;
 
 /// handles drawing of notes and waves
 class NoteGraph {

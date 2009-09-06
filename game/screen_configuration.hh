@@ -1,11 +1,9 @@
 #pragma once
 
 #include "screen.hh"
-#include "configuration.hh"
+#include "audio.hh"
 #include "theme.hh"
 #include <boost/scoped_ptr.hpp>
-#include <boost/ptr_container/ptr_vector.hpp>
-#include "opengl_text.hh"
 
 /// options dialogue
 class ScreenConfiguration: public Screen {

@@ -2,16 +2,12 @@
 
 #include "util.hh"
 #include <boost/circular_buffer.hpp>
-#include <boost/cstdint.hpp>
-#include <boost/ptr_container/ptr_deque.hpp>
 #include <boost/ptr_container/ptr_set.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
-#include <iostream>
 #include <vector>
-#include <limits>
 
 using boost::int16_t;
 using boost::uint8_t;

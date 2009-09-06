@@ -2,7 +2,7 @@
 
 #include "config.hh"
 #include "glutil.hh"
-#include "screen.hh"
+#include "fs.hh"
 #include "util.hh"
 #include "joystick.hh"
 #include <SDL.h>

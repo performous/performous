@@ -3,6 +3,8 @@
 #include <libda/audio.hpp>
 #include "pitch.hh"
 #include <boost/ptr_container/ptr_vector.hpp>
+#include <vector>
+#include <iostream>
 
 /// class for recording sound from mics
 class Capture {

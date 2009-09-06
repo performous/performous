@@ -1,6 +1,4 @@
 #pragma once
-#ifndef __OPENGL_THEME_H__
-#define __OPENGL_THEME_H__
 
 #include "color.hh"
 #include "surface.hh"
@@ -164,6 +162,3 @@ class SvgTxtTheme {
 	TThemeTxtOpenGL m_text;
 	TThemeTxtOpenGL m_text_highlight;
 };
-
-
-#endif // __OPENGL_TEXT_H__

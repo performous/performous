@@ -1,4 +1,7 @@
 #include "songparser.hh"
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
+#include <algorithm>
 
 /// @file
 /// Functions used for parsing the UltraStar TXT song format

@@ -12,7 +12,7 @@
 #include "players.hh"
 #include "highscore.hh"
 
-class CAudio;
+class Audio;
 
 /// song chooser screen
 class ScreenHiscore : public Screen {

@@ -1,8 +1,14 @@
 #pragma once
 
+#include <climits>
+#include <deque>
+#include <iostream>
+#include <stdexcept>
+
 #include "SDL_events.h"
 #include "SDL_joystick.h"
-#include "audio.hh"
+
+#include "configuration.hh"
 
 namespace input {
 	enum DevType { GUITAR, DRUMS };

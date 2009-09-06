@@ -2,6 +2,7 @@
 
 #include "notes.hh"
 #include <boost/noncopyable.hpp>
+
 #include <stdexcept>
 
 /// parsing of songfile failed

@@ -1,9 +1,7 @@
 #pragma once
-#ifndef PERFORMOUS_DIALOG_HH
-#define PERFORMOUS_DIALOG_HH
 
 #include "opengl_text.hh"
-#include "screen.hh"
+#include "fs.hh"
 #include "surface.hh"
 
 /// class for printing dialogues
@@ -28,6 +26,3 @@ class Dialog {
 	Surface m_dialog;
 	SvgTxtTheme m_svgText;
 };
-
-#endif
-

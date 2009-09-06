@@ -1,6 +1,4 @@
 #pragma once
-#ifndef __SINGLETON_H__
-#define __SINGLETON_H__
 
 /// template for creating singletons
 template <class T> class Singleton {
@@ -16,5 +14,3 @@ template <class T> class Singleton {
 	/// gets pointer to singleton object
 	inline static T* getSingletonPtr() { return ms_Singleton; }
 };
-
-#endif

@@ -1,9 +1,6 @@
 #pragma once
-#ifndef PERFORMOUS_COLOR_HH
-#define PERFORMOUS_COLOR_HH
 
 #include <istream>
-#include <map>
 #include <string>
 
 /// color struct
@@ -27,5 +24,3 @@ static inline Color getColor(std::istream& is) {
 	std::getline(is, str);
 	return Color(str);
 }
-
-#endif

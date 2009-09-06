@@ -1,12 +1,15 @@
 #include "configuration.hh"
-#include "screen.hh"
+#include "fs.hh"
 #include "util.hh"
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/format.hpp>
 #include <libxml++/libxml++.h>
 #include <algorithm>
 #include <iomanip>
 #include <stdexcept>
+#include <iostream>
+#include <cmath>
 
 Config config;
 

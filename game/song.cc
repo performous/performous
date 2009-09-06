@@ -2,6 +2,8 @@
 
 #include "songparser.hh"
 #include <iostream>
+#include <limits>
+#include <algorithm>
 
 void Song::reload(bool errorIgnore) {
 	notes.clear();

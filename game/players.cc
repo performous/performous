@@ -5,6 +5,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <set>
 #include <boost/regex.hpp>
 #include <libxml++/libxml++.h>
 

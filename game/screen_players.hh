@@ -7,11 +7,11 @@
 #include "textinput.hh"
 #include "theme.hh"
 #include "video.hh"
-#include "players.hh"
 #include "highscore.hh"
 #include "layout_singer.hh"
 
-class CAudio;
+class Audio;
+class Players;
 
 /// song chooser screen
 class ScreenPlayers : public Screen {

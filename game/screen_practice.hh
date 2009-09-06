@@ -1,13 +1,14 @@
 #pragma once
-#ifndef __SCREENPRACTICE_H__
-#define __SCREENPRACTICE_H__
 
 #include <boost/scoped_ptr.hpp>
+#include "audio.hh"
 #include "screen.hh"
 #include "theme.hh"
-#include "opengl_text.hh"
+//#include "opengl_text.hh"
 #include "progressbar.hh"
 #include "joystick.hh"
+
+class Capture;
 
 /// screen for practice mode
 class ScreenPractice : public Screen {
@@ -30,5 +31,3 @@ class ScreenPractice : public Screen {
 	boost::scoped_ptr<ThemePractice> theme;
 	boost::scoped_ptr<input::InputDev> drums;
 };
-
-#endif

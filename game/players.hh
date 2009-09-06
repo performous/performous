@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 
-#include <boost/utility.hpp>
+#include <boost/noncopyable.hpp>
 
 #include "player.hh"
 #include "animvalue.hh"

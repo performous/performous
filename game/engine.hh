@@ -1,17 +1,12 @@
 #pragma once
-#ifndef PERFORMOUS_ENGINE_HH
-#define PERFORMOUS_ENGINE_HH
 
 #include "audio.hh"
 #include "color.hh"
-#include "pitch.hh"
-#include "songs.hh"
-#include "xtime.hh"
+#include "song.hh"
 #include "configuration.hh"
 #include "players.hh"
 #include <boost/bind.hpp>
 #include <boost/thread/thread.hpp>
-#include <boost/thread/mutex.hpp>
 #include <list>
 
 namespace {
@@ -72,5 +67,3 @@ class Engine {
 		}
 	}
 };
-
-#endif

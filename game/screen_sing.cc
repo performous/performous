@@ -1,6 +1,7 @@
 #include "screen_sing.hh"
 
 #include "util.hh"
+#include "record.hh"
 #include "configuration.hh"
 #include "xtime.hh"
 #include <boost/format.hpp>

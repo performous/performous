@@ -1,9 +1,5 @@
 #pragma once
 
-#include "surface.hh"
-#include <boost/ptr_container/ptr_vector.hpp>
-#include <vector>
-
 unsigned int screenW();
 unsigned int screenH();
 static inline float virtH() { return float(screenH()) / screenW(); }

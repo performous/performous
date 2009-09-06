@@ -1,12 +1,12 @@
 #pragma once
-#ifndef __SCREENINTRO_H__
-#define __SCREENINTRO_H__
 
 #include "dialog.hh"
-#include "record.hh"
 #include "screen.hh"
 #include "surface.hh"
 #include <boost/scoped_ptr.hpp>
+
+class Audio;
+class Capture;
 
 /// intro screen
 class ScreenIntro : public Screen {
@@ -24,5 +24,3 @@ class ScreenIntro : public Screen {
 	boost::scoped_ptr<Surface> background;
 	boost::scoped_ptr<Dialog> m_dialog;
 };
-
-#endif
