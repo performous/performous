@@ -1,7 +1,7 @@
 #include "progressbar.hh"
 
 #include "util.hh"
-#include <iostream>
+
 #include <stdexcept>
 
 ProgressBar::ProgressBar(std::string const& bg, std::string const& bar, Mode mode, float begin, float end, bool sliding):

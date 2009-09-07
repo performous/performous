@@ -1,5 +1,7 @@
 #include "video.hh"
-#include "configuration.hh"
+
+#include "util.hh"
+
 #include <cmath>
 
 Video::Video(std::string const& _videoFile, double videoGap): m_mpeg(true, false, _videoFile), m_videoGap(videoGap), m_surfaceTime(), m_lastTime(), m_alpha(-0.5, 1.5) {}

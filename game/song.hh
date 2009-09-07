@@ -4,6 +4,7 @@
 #include <boost/noncopyable.hpp>
 
 #include <stdexcept>
+#include <string>
 
 /// parsing of songfile failed
 struct SongParserException: public std::runtime_error {

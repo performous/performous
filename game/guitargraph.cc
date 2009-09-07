@@ -1,6 +1,8 @@
 #include "guitargraph.hh"
+
 #include "fs.hh"
 #include "song.hh"
+#include <cmath>
 #include <cstdlib>
 
 namespace {

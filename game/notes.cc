@@ -2,8 +2,6 @@
 
 #include "util.hh"
 #include <cmath>
-#include <algorithm>
-#include <limits>
 #include <sstream>
 #include <stdexcept>
 
@@ -35,7 +33,7 @@ bool MusicalScale::isSharp(int id) const {
 
 double MusicalScale::getNoteFreq(int id) const {
 	if (id == -1) return 0.0;
-	return m_baseFreq * pow(2.0, (id - m_baseId) / 12.0);
+	return m_baseFreq * std::pow(2.0, (id - m_baseId) / 12.0);
 }
 
 int MusicalScale::getNoteId(double freq) const {

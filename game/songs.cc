@@ -1,18 +1,18 @@
 #include "songs.hh"
-#include "configuration.hh"
 
+#include "configuration.hh"
 #include "fs.hh"
+
 #include <boost/bind.hpp>
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
 #include <libxml++/libxml++.h>
-#include <cstdlib>
 #include <algorithm>
-#include <fstream>
 #include <iostream>
-#include <iterator>
+#include <sstream>
 #include <stdexcept>
+#include <cstdlib>
 
 Songs::Songs(std::string const& songlist): m_songlist(songlist), math_cover(), m_order(), m_dirty(false), m_loading(false), m_needShuffle(false) {
 	reload();

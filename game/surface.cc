@@ -1,13 +1,12 @@
 #include "surface.hh"
 
-#include <librsvg/rsvg.h>
-#include <librsvg/rsvg-cairo.h>
-
 #include "fs.hh"
 #include "configuration.hh"
 #include "video_driver.hh"
+
+#include <librsvg/rsvg.h>
+#include <librsvg/rsvg-cairo.h>
 #include <Magick++.h>
-#include <boost/bind.hpp>
 #include <fstream>
 #include <stdexcept>
 #include <sstream>

@@ -3,13 +3,15 @@
 #include "util.hh"
 #include "record.hh"
 #include "configuration.hh"
-#include "xtime.hh"
+#include "screen_players.hh"
+#include "fs.hh"
+
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
-#include "songs.hh"
 #include <iostream>
-#include <iomanip>
-#include "highscore.hh" // to check if Players have to be shown
+#include <stdexcept>
+#include <cmath>
+#include <utility>
 
 namespace {
 	static const double QUIT_TIMEOUT = 20.0; // Return to songs screen after 20 seconds in score screen

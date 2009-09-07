@@ -2,9 +2,6 @@
 
 #include "fs.hh"
 #include "configuration.hh"
-#include "screen.hh"
-#include <cairo.h>
-#include <pango/pangocairo.h>
 
 Theme::Theme()
 {}

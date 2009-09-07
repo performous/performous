@@ -1,4 +1,5 @@
 #include "screen.hh"
+
 #include <stdexcept>
 
 template<> ScreenManager* Singleton<ScreenManager>::ms_Singleton = NULL;

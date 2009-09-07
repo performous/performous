@@ -1,9 +1,9 @@
 #include "highscore.hh"
-#include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string.hpp>
 
 #include "unicode.hh"
 
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
 #include <sstream>
 #include <algorithm>
 

@@ -1,14 +1,10 @@
 #include "audio.hh"
 
 #include "configuration.hh"
-#include "screen.hh"
 #include "util.hh"
-#include "xtime.hh"
 #include <libda/fft.hpp>  // For M_PI
 #include <cmath>
-#include <functional>
 #include <iostream>
-#include <memory>
 
 struct SampleStream {
 	SampleStream(boost::shared_ptr<FFmpeg> const& mpeg): m_mpeg(mpeg) {}

@@ -1,4 +1,5 @@
 #include "layout_singer.hh"
+
 #include "configuration.hh"
 #include "fs.hh"
 #include "song.hh"

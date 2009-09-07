@@ -1,4 +1,5 @@
 #include "notegraph.hh"
+
 #include "configuration.hh"
 #include "engine.hh"
 

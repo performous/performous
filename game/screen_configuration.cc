@@ -1,4 +1,5 @@
 #include "screen_configuration.hh"
+
 #include "configuration.hh"
 
 ScreenConfiguration::ScreenConfiguration(std::string const& name, Audio& audio): Screen(name), m_audio(audio), selected() {

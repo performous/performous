@@ -2,11 +2,9 @@
 
 #include "util.hh"
 #include <libda/fft.hpp>
-#include <algorithm>
-#include <functional>
-#include <iomanip>
+#include <cmath>
 #include <iostream>
-#include <limits>
+#include <iomanip>
 
 // Limit the range to avoid noise and useless computation
 static const double FFT_MINFREQ = 45.0;

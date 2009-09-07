@@ -1,9 +1,10 @@
 #include "screen_highscore.hh"
+
 #include "configuration.hh"
 #include "audio.hh"
 #include "fs.hh"
 #include "util.hh"
-#include "xtime.hh"
+
 #include <iostream>
 #include <sstream>
 #include <boost/format.hpp>

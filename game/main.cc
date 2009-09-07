@@ -4,6 +4,10 @@
 #include "screen.hh"
 #include "joystick.hh"
 #include "songs.hh"
+#include "xtime.hh"
+#include "video_driver.hh"
+
+// Screens
 #include "screen_intro.hh"
 #include "screen_songs.hh"
 #include "screen_sing.hh"
@@ -11,8 +15,7 @@
 #include "screen_configuration.hh"
 #include "screen_players.hh"
 #include "screen_highscore.hh"
-#include "video_driver.hh"
-#include "xtime.hh"
+
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 // Needs at least Boost 1.36 and many systems don't have that: #include <boost/spirit/include/classic_core.hpp>
@@ -21,7 +24,6 @@
 #include <libda/audio.hpp>
 #include <csignal>
 #include <fstream>
-#include <set>
 #include <string>
 #include <vector>
 
