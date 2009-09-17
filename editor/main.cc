@@ -27,8 +27,8 @@ int main(int argc, char **argv) {
 
 	unsigned int i = 0;
 	int64_t position = 0;
-	da::sample_t *sample = new da::sample_t(2);
-	da::pcm_data data(sample, 1500, 2, 48000);
+	std::vector<da::sample_t> sample(1500*2);
+	da::pcm_data data(&sample[0], 1500, 2, 48000);
 	while( mpeg.audioQueue(data, position) ) {
 		std::cout << i << ": " << position << " " << double(position) / double(48000*2)<< std::endl;
 
