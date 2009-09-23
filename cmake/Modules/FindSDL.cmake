@@ -29,7 +29,7 @@ find_library(SDL_SDL_LIBRARY
 # Process others than OSX with native SDL normally
 if(NOT "${SDL_SDL_LIBRARY}" MATCHES "framework")
   if(MINGW)
-    set(MINGW32_LIBRARY mingw)
+    set(MINGW32_LIBRARY mingw32)
     set(SDL_PROCESS_LIBS ${SDL_PROCESS_LIBS} MINGW32_LIBRARY)
   endif(MINGW)
   find_library(SDL_SDLmain_LIBRARY
