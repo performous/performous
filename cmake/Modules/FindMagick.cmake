@@ -17,10 +17,17 @@ find_path(Magick_INCLUDE_DIR
 )
 
 # Finally the library itself
-find_library(Magick_LIBRARY
-  NAMES Magick MagickCore
-  PATHS ${Magick_PKGCONF_LIBRARY_DIRS}
-)
+if(MINGW)
+  find_library(Magick_LIBRARY
+    NAMES Magick MagickCore MagickWand
+    PATHS ${Magick_PKGCONF_LIBRARY_DIRS}
+  )
+else(MINGW)
+  find_library(Magick_LIBRARY
+    NAMES Magick MagickCore
+    PATHS ${Magick_PKGCONF_LIBRARY_DIRS}
+  )
+endif(MINGW)
 
 # Set the include dir variables and the libraries and let libfind_process do the rest.
 # NOTE: Singular variables for this library, plural for libraries this this lib depends on.
