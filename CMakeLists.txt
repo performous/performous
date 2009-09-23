@@ -29,8 +29,13 @@ add_subdirectory(libs)
 add_subdirectory(themes)
 add_subdirectory(data)
 add_subdirectory(game)
-add_subdirectory(editor)
 add_subdirectory(docs)
+
+option(ENABLE_EDITOR "Enable experimental song editor (doesn't work)" OFF)
+
+if (ENABLE_EDITOR)
+  add_subdirectory(editor)
+endif (ENABLE_EDITOR)
 
 option(ENABLE_TOOLS "Enable extra tools (e.g. Singstar ripper)" ON)
 
