@@ -3,6 +3,8 @@
 #include "notes.hh"
 //#include <boost/math/special_functions/fpclassify.hpp>
 
+#include <cmath>
+
 int main(int argc, char **argv) {
 
 	if (argc < 2)
@@ -20,7 +22,7 @@ int main(int argc, char **argv) {
 
 	// wait for ffmpeg to be ready
 	// TODO: fix this it is probably not enough
-	while(isinf(mpeg.duration()) ) ;
+	while(std::isinf(mpeg.duration()) ) ;
 
 	// this should majorate the song duration
 	int64_t duration = (mpeg.duration() + 0.5) * 48000 * 2;
