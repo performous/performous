@@ -29,7 +29,9 @@ int main(int argc, char **argv) {
 	int64_t position = 0;
 	std::vector<da::sample_t> sample(1500*2);
 	da::pcm_data data(&sample[0], 1500, 2, 48000);
+	usleep(500000);
 	while( mpeg.audioQueue(data, position) ) {
+		usleep(500000);
 		std::cout << i << ": " << position << " " << double(position) / double(48000*2)<< std::endl;
 
 		analyzer.input(data.begin(0), data.end(0));

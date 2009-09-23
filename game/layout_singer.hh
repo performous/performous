@@ -4,6 +4,8 @@
 #include "opengl_text.hh"
 #include "notegraph.hh"
 
+#include <deque>
+
 /// handles songlyrics
 class LyricRow {
   public:
