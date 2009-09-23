@@ -5,6 +5,8 @@
 #include <cmath>
 #include <cstdlib>
 
+#include <boost/lexical_cast.hpp>
+
 namespace {
 	struct Diff { std::string name; int basepitch; } diffv[] = {
 		{ "Supaeasy", 0x3C },
