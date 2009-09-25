@@ -76,7 +76,7 @@
 
 # MESSAGE(STATUS "Finding Boost libraries.... ")
 
-SET( _boost_TEST_VERSIONS ${Boost_ADDITIONAL_VERSIONS} "1.39.0" "1.39" "1.38.0" "1.38" "1.37.0" "1.37" "1.36.0" "1.36" "1.34.1" "1.34.0" "1.34" "1.33.1" "1.33.0" "1.33")
+SET( _boost_TEST_VERSIONS ${Boost_ADDITIONAL_VERSIONS} "1.40" "1.39.0" "1.39" "1.38.0" "1.38" "1.37.0" "1.37" "1.36.0" "1.36" "1.34.1" "1.34.0" "1.34" "1.33.1" "1.33.0" "1.33")
 
 ############################################
 #
@@ -284,7 +284,7 @@ ELSE (_boost_IN_CACHE)
     SET (_boost_COMPILER "-vc90")
   ENDIF(MSVC90)
   IF (MINGW)
-    SET (_boost_COMPILER "-mgw")
+    SET (_boost_COMPILER "-mgw44")
   ENDIF(MINGW)
   IF (CYGWIN)
     SET (_boost_COMPILER "-gcc")
@@ -317,7 +317,7 @@ ELSE (_boost_IN_CACHE)
 
   SET( _boost_STATIC_TAG "")
   IF (WIN32)
-    SET (_boost_ABI_TAG "g")
+    SET (_boost_ABI_TAG "")
     SET( _boost_STATIC_TAG "-s")
   ENDIF(WIN32)
   SET (_boost_ABI_TAG "${_boost_ABI_TAG}d")

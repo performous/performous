@@ -1,5 +1,8 @@
 #include <boost/lexical_cast.hpp>
 #include <iostream>
+#ifdef __WIN32__
+#  include <windows.h>
+#endif
 
 #include "ss_cover.hh"
 
