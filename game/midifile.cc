@@ -261,27 +261,38 @@ void MidiFileParser::process_midi_event(Track& track, uint8_t t, uint8_t arg1, u
 #if MIDI_DEBUG_LEVEL > 3
 	cout_midi_event(t, arg1, arg2, miditime);
 #endif
+
 	std::vector<Note>& pitch(track.notes[arg1]);
+	// common track management
 	if (t == 8 || (t == 9 && arg2 == 0)) {
-		// Note off event or note on with velocity 0 => note ends
 		if (pitch.empty() || pitch.back().end != 0) {
-#if MIDI_DEBUG_LEVEL > 0
-			std::cout << "WARNING: Note end event with no corresponding beginning:" << std::endl;
-			cout_midi_event(t, arg1, arg2, miditime);
-#endif
+			// Note end event with no corresponding beginning
 		} else {
 			pitch.back().end = miditime;
-			if (track.name == "PART VOCALS" && !m_lyric.empty()) {
-				if (track.lyrics.empty()) throw std::logic_error("Lyrics empty in MidiFileParser::process_midi_event");
-				track.lyrics.back().end = miditime;
-				m_lyric.clear();
-			}
 		}
-	} else if (t == 9) {
+	} else {
 		pitch.push_back(Note(miditime));
-		if (track.name == "PART VOCALS") {
-			if (arg1 > 100) track.lyrics.push_back(LyricNote("", arg1, miditime, miditime));
-			else if (!m_lyric.empty()) track.lyrics.push_back(LyricNote(m_lyric, arg1, miditime));
+	}
+	// special management for lyrics
+	if (track.name == "PART VOCALS") {
+		if (t == 8 || (t == 9 && arg2 == 0)) {
+			// end of note (note off or note on with zero velocity)
+			if( !m_lyric.empty()  ) {
+				// here we should update the last note lyric with the current m_lyric
+				track.lyrics.back().lyric = m_lyric;
+				// here we should update the last note end time with the miditime
+				track.lyrics.back().end = miditime;
+			} else {
+				if( track.lyrics.back().lyric.empty() ) {
+					// bad notes, removing it
+					track.lyrics.pop_back();
+				}
+			}
+			m_lyric.clear();
+		} else {
+			// beginning of note then
+			// here we should add a lyric with the start time at miditime
+			track.lyrics.push_back(LyricNote("", arg1, miditime, miditime));
 		}
 	}
 }
