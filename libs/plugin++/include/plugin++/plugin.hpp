@@ -11,6 +11,7 @@
 #ifndef PLUGIN_HPP_INCLUDED
 #define PLUGIN_HPP_INCLUDED
 
+#include "dllhelper.hpp"
 #include <map>
 #include <stdexcept>
 #include <string>
@@ -48,7 +49,7 @@ namespace plugin {
         // being a static member variable of this class to ensure that it gets
         // initialized when it is used the first time. If it were static member,
         // the initialization (on program startup) might occur too late.
-        static map_t& map() {
+        DLL_PUBLIC static map_t& map() {
             static map_t m;
             return m;
         }

@@ -9,6 +9,11 @@ include_directories(../plugin++/include)
 FILE(GLOB HEADER_FILES "include/libda/*")
 install(FILES ${HEADER_FILES} DESTINATION include/libda)
 
+if(CMAKE_COMPILER_IS_GNUCXX)
+	message(STATUS "GCC detected, adding compile flags")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++98 -Wall -Wextra -fvisibility=hidden -fvisibility-inlines-hidden")
+endif(CMAKE_COMPILER_IS_GNUCXX)
+
 add_subdirectory(src)
 add_subdirectory(plugins)
 

@@ -1,11 +1,12 @@
 #include <libda/audio_dev.hpp>
+#include <plugin++/dllhelper.hpp>
 #include <plugin++/loader.hpp>
 #include <ostream>
 #include <limits>
 
 namespace da {
-	const std::size_t settings::low = std::numeric_limits<std::size_t>::min();
-	const std::size_t settings::high = std::numeric_limits<std::size_t>::max();
+	DLL_PUBLIC const std::size_t settings::low = std::numeric_limits<std::size_t>::min();
+	DLL_PUBLIC const std::size_t settings::high = std::numeric_limits<std::size_t>::max();
 
 	class init_impl {
 		plugin::loader m_loader;
