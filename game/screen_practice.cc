@@ -17,7 +17,9 @@ void ScreenPractice::enter() {
 		m_vumeters.push_back(b = new ProgressBar(getThemePath("vumeter_bg.svg"), getThemePath("vumeter_fg.svg"), ProgressBar::VERTICAL, 0.136, 0.023));
 		b->dimensions.screenBottom().left(-0.4 + i * 0.2).fixedWidth(0.04);
 	}
-	drums.reset(new input::InputDev(input::DRUMS));
+	try {
+		drums.reset(new input::InputDev(input::DRUMS));
+	} catch (std::runtime_error&) {drums.reset();}
 	unsigned int sr = m_audio.getSR();
 	m_samples.push_back(Sample(getDataPath("sounds/drum_bass.ogg"), sr));
 	m_samples.push_back(Sample(getDataPath("sounds/drum_snare.ogg"), sr));
