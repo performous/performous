@@ -7,8 +7,6 @@ set(SOURCES ${SOURCE_FILES} ${HEADER_FILES})
 
 # Libraries
 
-include_directories(${CMAKE_SOURCE_DIR}/libs/libda/include)
-
 find_package(Boost 1.34 REQUIRED COMPONENTS thread)
 include_directories(${Boost_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${Boost_LIBRARIES})

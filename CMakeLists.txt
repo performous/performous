@@ -25,6 +25,10 @@ endif(WIN32)
 
 mark_as_advanced(SHARE_INSTALL)
 
+# Need to find the headers even if they haven't been installed yet:
+include_directories(libs/plugin++/include)
+include_directories(libs/libda/include)
+
 add_subdirectory(libs)
 add_subdirectory(themes)
 add_subdirectory(data)
