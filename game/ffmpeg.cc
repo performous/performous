@@ -231,7 +231,11 @@ void FFmpeg::decodeNextFrame() {
 			while (packetSize) {
 				if (packetSize < 0) throw std::logic_error("negative video packet size?!");
 				if (m_quit || m_seekTarget == m_seekTarget) return;
+#if LIBAVCODEC_VERSION_INT > ((52<<16)+(25<<8)+0)
+				int decodeSize = avcodec_decode_video2(pVideoCodecCtx, videoFrame, &frameFinished, &packet);
+#else
 				int decodeSize = avcodec_decode_video(pVideoCodecCtx, videoFrame, &frameFinished, packetData, packetSize);
+#endif
 				if (decodeSize < 0) throw std::runtime_error("cannot decode video frame");
 				// Move forward within the packet
 				packetSize -= decodeSize;
@@ -259,7 +263,11 @@ void FFmpeg::decodeNextFrame() {
 				if (m_quit || m_seekTarget == m_seekTarget) return;
 				AudioBuffer audioFrames(AVCODEC_MAX_AUDIO_FRAME_SIZE);
 				int outsize = AVCODEC_MAX_AUDIO_FRAME_SIZE*sizeof(int16_t);
+#if LIBAVCODEC_VERSION_INT > ((52<<16)+(25<<8)+0)
+				int decodeSize = avcodec_decode_audio3(pAudioCodecCtx, audioFrames, &outsize, &packet);
+#else
 				int decodeSize = avcodec_decode_audio2(pAudioCodecCtx, audioFrames, &outsize, packetData, packetSize);
+#endif
 				// Handle special cases
 				if (decodeSize == 0) break;
 				if (outsize == 0) continue;
