@@ -1,5 +1,7 @@
+#define BUILDING_DLL   // So that we get dllexports everywhere instead of dllimports (this is some Windows crap)
 #include <libda/audio_dev.hpp>
-#include <plugin++/dllhelper.hpp>
+#undef BUILDING_DLL
+
 #include <plugin++/loader.hpp>
 #include <ostream>
 #include <limits>
