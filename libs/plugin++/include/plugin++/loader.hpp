@@ -13,7 +13,7 @@
 namespace plugin {
     namespace fs = boost::filesystem;
 
-	/** @short A helper for loading all matching libraries in a folder. **/
+    /** @short A helper for loading all matching libraries in a folder. **/
     class loader {
         boost::ptr_vector<dll> dlls;
         void parse(std::set<fs::path>& paths, char const* var, fs::path const& folder = fs::path()) {

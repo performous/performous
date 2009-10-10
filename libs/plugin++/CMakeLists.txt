@@ -9,9 +9,10 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
 if (WIN32)
-  add_library(plugin++ STATIC src/dll-windows.cpp)
+  add_library(plugin++ SHARED src/dll-windows.cpp)
 else (WIN32)
-  add_library(plugin++ STATIC src/dll-posix.cpp)
+  add_library(plugin++ SHARED src/dll-posix.cpp)
+  target_link_libraries(plugin++ dl)
 endif (WIN32)
 
 install(TARGETS plugin++ DESTINATION lib${LIB_SUFFIX})

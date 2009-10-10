@@ -10,6 +10,6 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
 include_directories(${Boost_INCLUDE_DIRS})
-add_library(da audio.cpp)
+add_library(da SHARED audio.cpp)
 target_link_libraries(da plugin++ ${Boost_LIBRARIES})
 install(TARGETS da DESTINATION lib${LIB_SUFFIX})

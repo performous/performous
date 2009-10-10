@@ -15,6 +15,7 @@ Link with libda when you use this.
 #include "sample.hpp"
 #include <boost/function.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <plugin++/dllhelper.hpp>
 #include <cmath>
 #include <cstddef>
 #include <iosfwd>
@@ -31,7 +32,7 @@ namespace da {
 	* so that you can create multiple da::initialize objects.
 	* Do not, however, destroy the object while audio devices are still in use!
 	**/
-	class initialize {
+	class DLL_PUBLIC initialize {
 		init_impl* m_impl;
 	  public:
 		initialize();
@@ -143,7 +144,7 @@ namespace da {
 		bool special() const { return !m_name.empty() && m_name[0] == '~'; }
 	};
 	
-	class record {
+	class DLL_PUBLIC record {
 	  public:
 		typedef std::vector<devinfo> devlist_t;
 		static devlist_t devices();
@@ -154,7 +155,7 @@ namespace da {
 		dev* m_handle;
 	};
 
-	class playback {
+	class DLL_PUBLIC playback {
 	  public:
 		typedef std::vector<devinfo> devlist_t;
 		static devlist_t devices();
