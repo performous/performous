@@ -145,6 +145,8 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 	using namespace input::Private;
 
 	Event event;
+	// Add event time
+	event.time = now();
 	static bool pickPressed[2] = {}; // HACK for tracking enter and rshift status
 	switch(_e.type) {
 		case SDL_KEYDOWN: {

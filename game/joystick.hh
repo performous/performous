@@ -47,8 +47,6 @@ namespace input {
 				return true;
 			};
 			void addEvent(Event _event) {
-				// Add event time
-				_event.time = now();
 				// only add event if the device is assigned
 				if( m_assigned ) m_events.push_back(_event);
 				/*
