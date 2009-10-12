@@ -8,6 +8,7 @@
 #include "SDL_events.h"
 #include "SDL_joystick.h"
 
+#include "xtime.hh"
 #include "configuration.hh"
 
 namespace input {
@@ -21,6 +22,7 @@ namespace input {
 		int button; // Translated button number for press/release events. 0 for pick down, 1 for pick up (NOTE: these are NOT pick press/release events but rather different directions)
 		bool pressed[BUTTONS]; // All events tell the button state right after the event happened
 		// More stuff later, when it is actually used
+		boost::xtime time;
 	};
 	
 	namespace Private {
@@ -45,6 +47,8 @@ namespace input {
 				return true;
 			};
 			void addEvent(Event _event) {
+				// Add event time
+				_event.time = now();
 				// only add event if the device is assigned
 				if( m_assigned ) m_events.push_back(_event);
 				/*
