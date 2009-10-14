@@ -2,6 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /cvsroot/ultrastar-ng/UltraStar-ng/portage-overlay/games-arcade/performous/performous-9999.ebuild,v 1.10 2007/09/29 13:04:19 yoda-jm Exp $
 
+EAPI=2
 inherit games git cmake-utils
 
 RESTRICT="nostrip"
@@ -100,9 +101,14 @@ src_compile() {
 	else
 		plugins="$plugins -DLIBDA_PLUGIN_PULSE=false"
 	fi
+	if [[ $(get_libdir) = "lib64" ]]; then
+		libdir_suffix="64"
+	fi
 	cmake \
 		-DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
-		-DCMAKE_INSTALL_PREFIX="/usr" \
+		-DCMAKE_INSTALL_PREFIX="${GAMES_PREFIX}" \
+		-DLIB_SUFFIX="$libdir_suffix" \
+		-DSHARE_INSTALL="share/" \
 		$plugins \
 		.. || die "cmake failed"
 	emake || die "emake failed"
@@ -111,8 +117,12 @@ src_compile() {
 src_install() {
 	cd build
 	emake DESTDIR="${D}" install || die "make install failed"
+
+	perl -pi -e "s+bin/performous+bin/performous.bin+" "${D}/${GAMES_PREFIX}/bin/performous.sh"
+	mv "${D}/${GAMES_PREFIX}/bin/performous" "${D}/${GAMES_PREFIX}/bin/performous.bin"
+	mv "${D}/${GAMES_PREFIX}/bin/performous.sh" "${D}/${GAMES_PREFIX}/bin/performous"
+
 	keepdir "/usr/ultrastar/songs"
-	rm -rf "${D}/usr/share/${PN}"/{applications,pixmaps}
 	if use songs; then
 		insinto "/usr/share/games/ultrastar"
 		doins -r ../songs || die "doins songs failed"
