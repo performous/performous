@@ -3,7 +3,7 @@
 # $Header: /cvsroot/ultrastar-ng/UltraStar-ng/portage-overlay/games-arcade/performous/performous-9999.ebuild,v 1.10 2007/09/29 13:04:19 yoda-jm Exp $
 
 EAPI=2
-inherit games git cmake-utils
+inherit git games cmake-utils
 
 RESTRICT="nostrip"
 
@@ -49,7 +49,6 @@ DEPEND="${RDEPEND}
     >=dev-util/cmake-2.6.0"
 
 pkg_setup() {
-	games_pkg_setup
 	if ! built_with_use --missing true dev-libs/boost threads ; then
 		eerror "Please emerge dev-libs/boost with USE=threads"
 	fi
@@ -68,67 +67,40 @@ src_unpack() {
 }
 
 src_compile() {
-	mkdir build
-	cd build
-	plugins="-DLIBDA_AUTODETECT_PLUGINS=false -DLIBDA_PLUGIN_TESTING=false"
-	if use tools ; then
-		plugins="$plugins -DENABLE_TOOLS=true"
-	else
-		plugins="$plugins -DENABLE_TOOLS=false"
-	fi
-	if use alsa ; then
-		plugins="$plugins -DLIBDA_PLUGIN_ALSA=true"
-	else
-		plugins="$plugins -DLIBDA_PLUGIN_ALSA=false"
-	fi
-	if use jack ; then
-		plugins="$plugins -DLIBDA_PLUGIN_JACK=true"
-	else
-		plugins="$plugins -DLIBDA_PLUGIN_JACK=false"
-	fi
-	if use gstreamer ; then
-		plugins="$plugins -DLIBDA_PLUGIN_GSTREAMER=true"
-	else
-		plugins="$plugins -DLIBDA_PLUGIN_GSTREAMER=false"
-	fi
-	if use portaudio ; then
-		plugins="$plugins -DLIBDA_PLUGIN_PORTAUDIO=true"
-	else
-		plugins="$plugins -DLIBDA_PLUGIN_PORTAUDIO=false"
-	fi
-	if use pulseaudio ; then
-		plugins="$plugins -DLIBDA_PLUGIN_PULSE=true"
-	else
-		plugins="$plugins -DLIBDA_PLUGIN_PULSE=false"
-	fi
-	if [[ $(get_libdir) = "lib64" ]]; then
-		libdir_suffix="64"
-	fi
-	cmake \
-		-DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
-		-DCMAKE_INSTALL_PREFIX="${GAMES_PREFIX}" \
-		-DLIB_SUFFIX="$libdir_suffix" \
-		-DSHARE_INSTALL="share/" \
-		$plugins \
-		.. || die "cmake failed"
-	emake || die "emake failed"
+	local mycmakeargs="
+		$(cmake-utils_use_enable alsa LIBDA_PLUGIN_ALSA)
+		$(cmake-utils_use_enable jack LIBDA_PLUGIN_ALSA)
+		$(cmake-utils_use_enable gstreamer LIBDA_PLUGIN_GSTREAMER)
+		$(cmake-utils_use_enable portaudio LIBDA_PLUGIN_PORTAUDIO)
+		$(cmake-utils_use_enable pulseaudio LIBDA_PLUGIN_PULSEAUDIO)
+		$(cmake-utils_use_enable tools TOOLS)
+		-DCMAKE_INSTALL_PREFIX=${GAMES_PREFIX}
+		-DSHARE_INSTALL=share/
+		-DLIBDA_AUTODETECT_PLUGINS=false
+		-DLIBDA_PLUGIN_TESTING=false
+		-DCMAKE_BUILD_TYPE=Release"
+
+	cmake-utils_src_configure
+}
+
+src_compile() {
+	cmake-utils_src_compile
 }
 
 src_install() {
-	cd build
-	emake DESTDIR="${D}" install || die "make install failed"
+	DOCS="docs/*.txt" cmake-utils_src_install
 
-	perl -pi -e "s+bin/performous+bin/performous.bin+" "${D}/${GAMES_PREFIX}/bin/performous.sh"
-	mv "${D}/${GAMES_PREFIX}/bin/performous" "${D}/${GAMES_PREFIX}/bin/performous.bin"
-	mv "${D}/${GAMES_PREFIX}/bin/performous.sh" "${D}/${GAMES_PREFIX}/bin/performous"
+	if test -f "${D}/usr/bin/performous.sh" ; then
+		perl -pi -e "s+bin/performous+bin/performous.bin+" "${D}/usr/bin/performous.sh"
+		mv "${D}/usr/bin/performous" "${D}/usr/bin/performous.bin"
+		mv "${D}/usr/bin/performous.sh" "${D}/usr/bin/performous"
+	fi
 
-	keepdir "/usr/ultrastar/songs"
 	if use songs; then
 		insinto "/usr/share/games/ultrastar"
-		doins -r ../songs || die "doins songs failed"
+		doins -r "${S}/songs" || die "doins songs failed"
 	fi
-	doicon data/${PN}.xpm
-	domenu data/${PN}.desktop
-	dodoc ../docs/*.txt
+	doicon "${S}/data/${PN}.xpm"
+	domenu "${S}/data/${PN}.desktop"
 	prepgamesdirs
 }
