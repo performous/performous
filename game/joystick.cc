@@ -3,6 +3,26 @@
 
 #include <boost/lexical_cast.hpp>
 
+#ifdef HAVE_PORTMIDI
+input::MidiDrums::MidiDrums(int devId): stream(devId) {
+	Private::devices[0x8000] = Private::InputDevPrivate(Private::DRUMS_MIDI);
+	event.type = Event::PRESS;
+	for (unsigned int i = 0; i < BUTTONS; ++i) event.pressed[i] = false;
+}
+
+void input::MidiDrums::process() {
+	PmEvent ev;
+	while (Pm_Read(stream, &ev, 1) == 1) {
+		if ((ev.message & 0xFF) != 0x99) continue;
+		unsigned char ch = ev.message >> 8;
+		//unsigned char vel = ev.message >> 16;
+		event.button = ch % 5;
+		event.time = now();
+		Private::devices[0x8000].addEvent(event);
+	}
+}
+#endif
+
 static const unsigned SDL_BUTTONS = 6;
 
 int buttonFromSDL(input::Private::Type _type, unsigned int _sdl_button) {
@@ -109,6 +129,9 @@ void input::SDL::init() {
 					break;
 				case input::Private::DRUMS_RB:
 					std::cout << "  Detected as: RockBand Drums (forced)" << std::endl;
+					break;
+				case input::Private::DRUMS_MIDI:
+					std::cout << "  Detected as: MIDI Drums (forced)" << std::endl;
 					break;
 			}
 			input::Private::devices[i] = input::Private::InputDevPrivate(forced_type[i]);
@@ -292,3 +315,4 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 	}
 	return true;
 }
+

@@ -63,6 +63,12 @@
 			<long>Enable keyboard as guitar (Frets on Fire mode).</long>
 		</locale>
 	</entry>
+	<entry name="game/midi_drums" type="string">
+		<locale name="C">
+			<short>MIDI drum mapping</short>
+			<long>Mapping of hardware MIDI device: devID:kick,pad1,pad2,pad3,pad4</long>
+		</locale>
+	</entry>
 	<entry name="game/instruments" type="string_list">
 		<!-- Should be SDL_ID:{GUITAR_GUITARHERO|GUITAR_ROCKBAND|DRUMS_GUITARHERO|DRUMS_ROCKBAND}
 		     example:

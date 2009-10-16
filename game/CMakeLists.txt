@@ -19,6 +19,13 @@ foreach(lib SDL PangoCairo LibRSVG LibXML++ Magick++ GLEW AVFormat SWScale OpenG
 	add_definitions(${${lib}_DEFINITIONS})
 endforeach(lib)
 
+find_package(PortMidi)
+if(PortMidi_FOUND)
+	include_directories(PortMidi_INCLUDE_DIRS)
+	set(LIBS ${LIBS} ${PortMidi_LIBRARIES})
+	add_definitions("-DHAVE_PORTMIDI")
+endif(PortMidi_FOUND)
+
 # Set default compile flags for GCC
 if(CMAKE_COMPILER_IS_GNUCXX)
 	message(STATUS "GCC detected, adding compile flags")

@@ -11,6 +11,10 @@
 #include "xtime.hh"
 #include "configuration.hh"
 
+#ifdef HAVE_PORTMIDI
+#include "portmidi.hh"
+#endif
+
 namespace input {
 	enum DevType { GUITAR, DRUMS };
 
@@ -26,7 +30,7 @@ namespace input {
 	};
 	
 	namespace Private {
-		enum Type {GUITAR_RB, DRUMS_RB, GUITAR_GH, DRUMS_GH};
+		enum Type {GUITAR_RB, DRUMS_RB, GUITAR_GH, DRUMS_GH, DRUMS_MIDI};
 		static unsigned int KEYBOARD_ID = UINT_MAX;
 		class InputDevPrivate {
 		  public:
@@ -73,7 +77,7 @@ namespace input {
 					(m_type == input::Private::GUITAR_GH || m_type == input::Private::GUITAR_RB) ) {
 					return true;
 				} else if( _type == input::DRUMS &&
-					(m_type == input::Private::DRUMS_GH || m_type == input::Private::DRUMS_RB) ) {
+					(m_type == input::Private::DRUMS_GH || m_type == input::Private::DRUMS_RB || m_type == input::Private::DRUMS_MIDI) ) {
 					return true;
 				} else {
 					return false;
@@ -135,5 +139,17 @@ namespace input {
 		// Returns true if event is taken, feed an InputDev by transforming SDL_Event into Event
 		bool pushEvent(SDL_Event);
 	}
+	
+#ifdef HAVE_PORTMIDI
+	class MidiDrums {
+	  public:
+		MidiDrums(int devId);
+		void process();
+	  private:
+		pm::Input stream;
+		Event event;
+	};
+#endif
+	
 };
 
