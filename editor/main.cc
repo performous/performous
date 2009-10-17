@@ -1,9 +1,10 @@
 #include "pitch.hh"
 #include "ffmpeg.hh"
 #include "notes.hh"
-//#include <boost/math/special_functions/fpclassify.hpp>
 
 #include <cmath>
+
+#include <Magick++.h>
 
 int main(int argc, char **argv) {
 
@@ -33,7 +34,6 @@ int main(int argc, char **argv) {
 	da::pcm_data data(&sample[0], 1500, 2, 48000);
 	usleep(500000);
 	while( mpeg.audioQueue(data, position) ) {
-		usleep(500000);
 		std::cout << i << ": " << position << " " << double(position) / double(48000*2)<< std::endl;
 
 		analyzer.input(data.begin(0), data.end(0));
@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
 			Analyzer::tones_t tones = analyzer.getTones();
 			for (Analyzer::tones_t::const_iterator t = tones.begin(); t != tones.end(); ++t) {
 				if (t->age < Tone::MINAGE) continue;
-				std::cout << "  " << t->freq << std::endl;
+				std::cout << "  " << t->freq << " -> " << t->db << std::endl;
 				int note = scale.getNoteId(t->freq);
 				if (note < 0) continue;
 				// Here I could spot X=position, Y=note, Z=t->db
