@@ -90,12 +90,6 @@ src_compile() {
 src_install() {
 	DOCS="docs/*.txt" cmake-utils_src_install
 
-	if test -f "${D}/usr/bin/performous.sh" ; then
-		perl -pi -e "s+bin/performous+bin/performous.bin+" "${D}/usr/bin/performous.sh"
-		mv "${D}/usr/bin/performous" "${D}/usr/bin/performous.bin"
-		mv "${D}/usr/bin/performous.sh" "${D}/usr/bin/performous"
-	fi
-
 	if use songs; then
 		insinto "/usr/share/games/ultrastar"
 		doins -r "${S}/songs" || die "doins songs failed"
