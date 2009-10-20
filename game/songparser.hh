@@ -4,6 +4,8 @@
 #include "unicode.hh"
 #include <fstream>
 #include <sstream>
+#include <boost/filesystem.hpp>
+#include <boost/regex.hpp>
 
 /// parses songfiles
 class SongParser {
@@ -43,6 +45,27 @@ class SongParser {
 		} catch (std::runtime_error& e) {
 			throw SongParserException(e.what(), m_linenum);
 		}
+		
+		// In case no images/videos were specified, try to guess them
+		if (m_song.cover.empty() || (m_song.background.empty() && m_song.video.empty())) {
+			boost::regex coverfile("((cover|album|label|\\[co\\])\\.(png|jpeg|jpg|svg|bmp|gif))$", boost::regex_constants::icase);
+			boost::regex backgroundfile("((background|bg||\\[bg\\])\\.(png|jpeg|jpg|svg|bmp|gif))$", boost::regex_constants::icase);
+			boost::regex videofile("(.*\\.(avi|mpg|mpeg|flv|mov))$", boost::regex_constants::icase);
+			boost::cmatch match;
+
+			for (boost::filesystem::directory_iterator dirIt(s.path), dirEnd; dirIt != dirEnd; ++dirIt) {
+				boost::filesystem::path p = dirIt->path();
+				std::string name = p.leaf(); // File basename
+				if (m_song.cover.empty() && regex_match(name.c_str(), match, coverfile)) {
+					m_song.cover = name;
+				} else if (m_song.background.empty() && regex_match(name.c_str(), match, backgroundfile)) {
+					m_song.background = name;
+				} else if (m_song.background.empty() && m_song.video.empty() && regex_match(name.c_str(), match, videofile)) {
+					m_song.video = name;
+				}
+			}
+		}
+		
 		// Adjust negative notes
 		if (m_song.noteMin <= 0) {
 			unsigned int shift = (1 - m_song.noteMin / 12) * 12;
