@@ -1,8 +1,10 @@
 #include "songparser.hh"
 
+#include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/regex.hpp>
+#include <stdexcept>
 #include "midifile.hh"
 
 /// @file
@@ -21,6 +23,14 @@ namespace {
 		std::string f = s.path + filename;
 		if (boost::filesystem::exists(f)) s.music[trackid] = f;
 	}
+	void assign(double& var, std::string str) {
+		std::replace(str.begin(), str.end(), ',', '.'); // Fix decimal separators
+		try {
+			var = boost::lexical_cast<double>(str);
+		} catch (...) {
+			throw std::runtime_error("\"" + str + "\" is not valid floating point value");
+		}
+	}
 }
 
 void SongParser::iniParse() {
@@ -36,6 +46,12 @@ void SongParser::iniParse() {
 		boost::trim(value);
 		if (key == "name") s.title = value;
 		else if (key == "artist") s.artist = value;
+		// These are added features (not part of FoF)
+		else if (key == "cover") s.cover = value;
+		else if (key == "background") s.background = value;
+		else if (key == "video") m_song.video = value;
+		else if (key == "videogap") assign(m_song.videoGap, value);
+		// End of added features
 	}
 	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
 
