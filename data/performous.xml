@@ -222,7 +222,7 @@
 		</locale>
 	</entry>
 	<entry name="system/path_share" type="string_list">
-		<stringvalue>~/.local/share</stringvalue>
+		<stringvalue>~/.local/share/performous</stringvalue>
 		<stringvalue>../share</stringvalue><!-- For Windows where the program is started in bin/ -->
 		<stringvalue>~/.performous/share</stringvalue>
 		<locale name="C">
