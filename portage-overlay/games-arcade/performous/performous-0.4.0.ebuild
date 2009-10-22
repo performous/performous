@@ -3,19 +3,23 @@
 # $Header: /cvsroot/ultrastar-ng/UltraStar-ng/portage-overlay/games-arcade/performous/performous-9999.ebuild,v 1.10 2007/09/29 13:04:19 yoda-jm Exp $
 
 EAPI=2
-inherit git games cmake-utils
+inherit cmake-utils games
 
 RESTRICT="nostrip"
 
 SONGS_PN=ultrastar-songs
+MY_PN=Performous
+MY_P=${MY_PN}-${PV}-Source
+SONGS_PN=ultrastar-songs
 
 DESCRIPTION="Karaoke game similar to Singstar"
 HOMEPAGE="http://performous.org"
-SRC_URI="songs? ( 
-	mirror://sourceforge/${PN}/${SONGS_PN}-jc-1.zip
-	mirror://sourceforge/${PN}/${SONGS_PN}-libre-3.zip
-	mirror://sourceforge/${PN}/${SONGS_PN}-restricted-3.zip
-	mirror://sourceforge/${PN}/${SONGS_PN}-shearer-1.zip
+SRC_URI="mirror://sourceforge/${PN}/${MY_P}.tar.bz2
+	songs? ( 
+		mirror://sourceforge/${PN}/${SONGS_PN}-jc-1.zip
+		mirror://sourceforge/${PN}/${SONGS_PN}-libre-3.zip
+		mirror://sourceforge/${PN}/${SONGS_PN}-restricted-3.zip
+		mirror://sourceforge/${PN}/${SONGS_PN}-shearer-1.zip
 	)"
 
 EGIT_REPO_URI="git://performous.git.sourceforge.net/gitroot/performous/performous"
@@ -48,8 +52,10 @@ RDEPEND="gnome-base/librsvg
 DEPEND="${RDEPEND}
     >=dev-util/cmake-2.6.0"
 
+S="${WORKDIR}/${MY_P}"
+
 src_unpack() {
-	git_src_unpack
+	unpack "${MY_P}.tar.bz2"
 	if use songs; then
 		cd "${S}"
 		unpack "${SONGS_PN}-jc-1.zip"
