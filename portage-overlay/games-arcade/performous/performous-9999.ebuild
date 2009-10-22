@@ -28,7 +28,7 @@ LICENSE="GPL-2
 SLOT="0"
 KEYWORDS="~x86 ~amd64 ~ppc ~ppc64"
 
-IUSE="debug alsa portaudio pulseaudio jack songs gstreamer tools"
+IUSE="debug alsa portaudio pulseaudio jack songs gstreamer tools editor"
 
 RDEPEND="gnome-base/librsvg
 	dev-libs/boost
@@ -67,7 +67,7 @@ src_configure() {
 		$(cmake-utils_use portaudio LIBDA_PLUGIN_PORTAUDIO)
 		$(cmake-utils_use pulseaudio LIBDA_PLUGIN_PULSEAUDIO)
 		$(cmake-utils_use_enable tools TOOLS)
-		$(cmake-utils_use_enable tools EDITOR)
+		$(cmake-utils_use_enable editor EDITOR)
 		-DCMAKE_INSTALL_PREFIX=${GAMES_PREFIX}
 		-DSHARE_INSTALL=share/
 		-DLIBDA_AUTODETECT_PLUGINS=false
