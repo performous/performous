@@ -58,7 +58,9 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
   m_dead(1000),
   m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
   m_correctness(0.0, 5.0),
-  m_score()
+  m_score(),
+  m_streak(),
+  m_longestStreak()
 {
 	unsigned int sr = m_audio.getSR();
 	if (g_samplesD.empty()) {
@@ -149,6 +151,7 @@ void GuitarGraph::engine() {
 		else level = m_chordIt->status ? 1.0 : 0.0;
 		m_correctness.setTarget(level);
 	}
+	if (m_correctness.get() == 0) m_streak = 0;
 	if (!m_drums) {
 		// Processing holds
 		for (int fret = 0; fret < 5; ++fret) {
@@ -180,6 +183,7 @@ void GuitarGraph::fail(double time, int fret) {
 	std::vector<Sample> const& samples = (m_drums ? g_samplesD : g_samplesG);
 	m_audio.play(samples[unsigned(fret) % samples.size()], "audio/fail_volume");
 	m_score -= 50;
+	m_streak = 0;
 }
 
 void GuitarGraph::drumHit(double time, int fret) {
@@ -200,6 +204,7 @@ void GuitarGraph::drumHit(double time, int fret) {
 		for (; best != m_chordIt; ++m_chordIt) {
 			if (m_chordIt->status == m_chordIt->polyphony) continue;
 			std::cout << "SKIPPED, ";
+			m_streak = 0;
 		}
 		++m_chordIt->status;
 		Duration const* dur = m_chordIt->dur[fret];
@@ -212,6 +217,8 @@ void GuitarGraph::drumHit(double time, int fret) {
 			m_score -= m_chordIt->score;
 			m_chordIt->score *= m_chordIt->polyphony;
 			m_score += m_chordIt->score;
+			m_streak += 1;
+			if (m_streak > m_longestStreak) m_longestStreak = m_streak;
 			std::cout << "FULL HIT!" << std::endl;
 		} else {
 			std::cout << "HIT" << std::endl;
@@ -262,6 +269,8 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 		score *= m_chordIt->polyphony;
 		m_chordIt->status = 1 + picked;
 		m_score += score;
+		m_streak += 1;
+		if (m_streak > m_longestStreak) m_longestStreak = m_streak;
 		m_correctness.setTarget(1.0, true); // Instantly go to one
 		for (int fret = 0; fret < 5; ++fret) {
 			if (!m_chordIt->fret[fret]) continue;
@@ -316,14 +325,18 @@ void GuitarGraph::draw(double time) {
 	dimensions.screenBottom().middle(m_cx.get()).fixedWidth(m_width.get());
 	double offsetX = 0.5 * (dimensions.x1() + dimensions.x2());
 	double frac = 0.75;  // Adjustable: 1.0 means fully separated, 0.0 means fully attached
+	// Draw scores
 	if (time < -0.5) {
 		std::string txt;
 		txt += m_track_map.find(m_track_index)->first + "\n" + diffv[m_level].name;
 		m_text.dimensions.screenBottom(-0.05).middle(-0.1 + offsetX);
 		m_text.draw(txt);
 	} else {
-		m_text.dimensions.screenBottom(-0.15).middle(0.4 * dimensions.w() + offsetX);
+		m_text.dimensions.screenBottom(-0.30).middle(0.32 * dimensions.w() + offsetX);
 		m_text.draw(boost::lexical_cast<std::string>(unsigned(m_score)));
+		m_text.dimensions.screenBottom(-0.27).middle(0.32 * dimensions.w() + offsetX);
+		m_text.draw(boost::lexical_cast<std::string>(unsigned(m_streak)) + "/" 
+		  + boost::lexical_cast<std::string>(unsigned(m_longestStreak)));
 	}
 	glutil::PushMatrixMode pmm(GL_PROJECTION);
 	glTranslatef(frac * 2.0 * offsetX, 0.0f, 0.0f);

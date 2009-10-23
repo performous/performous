@@ -108,5 +108,7 @@ class GuitarGraph {
 	NoteStatus m_notes;
 	AnimValue m_correctness;
 	double m_score;
+	int m_streak;
+	int m_longestStreak;
 };
 
