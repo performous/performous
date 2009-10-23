@@ -14,6 +14,10 @@ LayoutSinger::LayoutSinger(Song &_song, Players& _players, boost::shared_ptr<The
 	m_score_text[1].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_score_text[2].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_score_text[3].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
+	m_line_rank_text[0].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
+	m_line_rank_text[1].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
+	m_line_rank_text[2].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
+	m_line_rank_text[3].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_player_icon.reset(new Surface(getThemePath("sing_pbox.svg")));
 }
 
@@ -49,6 +53,26 @@ void LayoutSinger::drawScore(Position position) {
 				break;
 		}
 		m_score_text[i%4]->draw();
+		// Give some feedback on how well the last lyricss row went
+		if (p->m_maxLineScore > 0) {
+			std::string prevLineRank;
+			if (p->m_prevLineScore > 0.9) { prevLineRank = "Perfect"; glColor4f(0.5, 1.0, 0.0, act); }
+			else if (p->m_prevLineScore > 0.8) { prevLineRank = "Excellent"; glColor4f(0.2, 0.8, 0.2, act); }
+			else if (p->m_prevLineScore > 0.6) { prevLineRank = "Good"; glColor4f(0.6, 1.0, 0.2, act); }
+			else if (p->m_prevLineScore > 0.5) { prevLineRank = "Ok"; glColor4f(0.6, 1.0, 0.2, act); }
+			else if (p->m_prevLineScore > 0.3) { prevLineRank = "Poor"; glColor4f(0.6, 0.8, 0.2, act); }
+			else { prevLineRank = "Horrible"; glColor4f(0.5, 0.5, 0.3, act); }
+			m_line_rank_text[i%4]->render(prevLineRank);
+			switch(position) {
+				case LayoutSinger::BOTTOM:
+					m_line_rank_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.055).screenTop(0.11);
+					break;
+				case LayoutSinger::MIDDLE:
+					m_line_rank_text[i%4]->dimensions().right(0.45).fixedHeight(0.04).screenTop(0.060 + 0.050 * i);
+					break;
+			}
+			m_line_rank_text[i%4]->draw();
+		}
 		glColor4f(1.0, 1.0, 1.0, 1.0);
 	}
 }

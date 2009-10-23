@@ -22,6 +22,12 @@ struct Player {
 	size_t m_pos;
 	/// score for current song
 	double m_score;
+	/// score for current line
+	double m_lineScore;
+	/// maximum score for the current line
+	double m_maxLineScore;
+	/// score for the previous line (normalized)
+	double m_prevLineScore;
 	/// activity timer
 	unsigned m_activitytimer;
 	/// score iterator

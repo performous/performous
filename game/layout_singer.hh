@@ -61,6 +61,7 @@ class LayoutSinger {
 	std::deque<LyricRow> m_lyrics;
 	boost::scoped_ptr<Surface> m_player_icon;
 	boost::scoped_ptr<SvgTxtThemeSimple> m_score_text[4];
+	boost::scoped_ptr<SvgTxtThemeSimple> m_line_rank_text[4];
 	Players& m_players;
 	boost::shared_ptr<ThemeSing> m_theme;
 };
