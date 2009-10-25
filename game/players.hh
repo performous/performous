@@ -6,6 +6,7 @@
 
 #include "player.hh"
 #include "animvalue.hh"
+#include "fs.hh"
 
 
 /**A collection of all Players.
@@ -22,7 +23,7 @@ class Players: boost::noncopyable {
 	players_t m_players;
 	players_t m_filtered;
 
-	std::string m_filename;
+	fs::path m_filename;
 	std::string m_filter;
 	AnimAcceleration math_cover;
 
@@ -33,7 +34,7 @@ class Players: boost::noncopyable {
 	cur_scores_t scores;
 
   public:
-	Players(std::string filename);
+	Players(fs::path filename);
 	~Players();
 
 	void load();

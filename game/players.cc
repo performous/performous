@@ -9,7 +9,7 @@
 #include <boost/regex.hpp>
 #include <libxml++/libxml++.h>
 
-Players::Players(std::string filename):
+Players::Players(fs::path filename):
 	m_players(),
 	m_filtered(),
 	m_filename(filename),
@@ -29,7 +29,7 @@ Players::~Players() {
 }
 
 void Players::load() {
-	xmlpp::DomParser domParser(m_filename);
+	xmlpp::DomParser domParser(m_filename.string());
 	xmlpp::NodeSet n = domParser.get_document()->get_root_node()->find("/performous/players/player");
 
 	for (xmlpp::NodeSet::const_iterator it = n.begin(); it != n.end(); ++it)
@@ -64,7 +64,7 @@ void Players::save() {
 		}
 	}
 
-	doc.write_to_file_formatted(m_filename, "UTF-8");
+	doc.write_to_file_formatted(m_filename.string(), "UTF-8");
 }
 
 void Players::update() {
@@ -72,7 +72,7 @@ void Players::update() {
 }
 
 std::string Players::file() {
-	return m_filename;
+	return m_filename.string();
 }
 
 void Players::addPlayer (std::string const& name, std::string const& picture) {
