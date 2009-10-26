@@ -119,11 +119,7 @@ void GuitarGraph::engine() {
 					TrackMapConstPtr::iterator track_it = m_track_map.find(m_track_index);
 					if( track_it != m_track_map.end() ) {
 						++track_it;
-						if(track_it != m_track_map.end()) {
-							m_track_index = track_it->first;
-						} else {
-							m_track_index = m_track_map.begin()->first;
-						}
+						m_track_index = (track_it != m_track_map.end() ? track_it : m_track_map.begin())->first;
 					}
 					if (!difficulty(m_level)) difficultyAuto();
 				}
