@@ -74,8 +74,8 @@ namespace da {
 	typedef boost::function<bool (pcm_data& it)> callback_t;
 
 	struct settings {
-		static const std::size_t low;
-		static const std::size_t high;
+		DLL_PUBLIC static const std::size_t low;
+		DLL_PUBLIC static const std::size_t high;
 		settings(std::string const& devstr = ""):
 		  m_channels(high),
 		  m_channels_near(true),

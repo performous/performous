@@ -7,8 +7,8 @@
 #include <limits>
 
 namespace da {
-	DLL_PUBLIC const std::size_t settings::low = std::numeric_limits<std::size_t>::min();
-	DLL_PUBLIC const std::size_t settings::high = std::numeric_limits<std::size_t>::max();
+	const std::size_t settings::low = std::numeric_limits<std::size_t>::min();
+	const std::size_t settings::high = std::numeric_limits<std::size_t>::max();
 
 	class init_impl {
 		plugin::loader m_loader;

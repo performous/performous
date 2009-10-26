@@ -9,6 +9,7 @@
 #include <sstream>
 #include <boost/filesystem.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
+#include <stdexcept>
 
 namespace plugin {
     namespace fs = boost::filesystem;
@@ -33,6 +34,8 @@ namespace plugin {
                     dlls.push_back(new dll(it->string()));
                 } catch (std::runtime_error const& e) {
                     std::cerr << e.what() << std::endl;
+                } catch (...) {
+                	std::cerr << "WTF?" << std::endl;
                 }
             }
         }

@@ -34,7 +34,7 @@ namespace plugin {
     template <typename Base,
       typename Arg = std::string const&,
       typename Key = std::string>
-    class registry {
+    class DLL_PUBLIC registry {
       public:
         typedef Base base_type;
         typedef Arg arg_type;
@@ -49,7 +49,7 @@ namespace plugin {
         // being a static member variable of this class to ensure that it gets
         // initialized when it is used the first time. If it were static member,
         // the initialization (on program startup) might occur too late.
-        DLL_PUBLIC static map_t& map() {
+        static map_t& map() {
             static map_t m;
             return m;
         }
