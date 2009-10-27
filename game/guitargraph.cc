@@ -59,6 +59,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
   m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
   m_correctness(0.0, 5.0),
   m_score(),
+  m_scoreFactor(),
   m_streak(),
   m_longestStreak()
 {
@@ -218,9 +219,9 @@ void GuitarGraph::drumHit(double time, int fret) {
 		m_chordIt->score += score;
 		m_score += score;
 		if (m_chordIt->status == m_chordIt->polyphony) {
-			m_score -= m_chordIt->score;
-			m_chordIt->score *= m_chordIt->polyphony;
-			m_score += m_chordIt->score;
+			//m_score -= m_chordIt->score;
+			//m_chordIt->score *= m_chordIt->polyphony;
+			//m_score += m_chordIt->score;
 			m_streak += 1;
 			if (m_streak > m_longestStreak) m_longestStreak = m_streak;
 			std::cout << "FULL HIT!" << std::endl;
@@ -349,7 +350,7 @@ void GuitarGraph::draw(double time) {
 		m_text.draw(txt);
 	} else {
 		m_text.dimensions.screenBottom(-0.30).middle(0.32 * dimensions.w() + offsetX);
-		m_text.draw(boost::lexical_cast<std::string>(unsigned(m_score)));
+		m_text.draw(boost::lexical_cast<std::string>(unsigned(getScore())));
 		m_text.dimensions.screenBottom(-0.27).middle(0.32 * dimensions.w() + offsetX);
 		m_text.draw(boost::lexical_cast<std::string>(unsigned(m_streak)) + "/" 
 		  + boost::lexical_cast<std::string>(unsigned(m_longestStreak)));
@@ -495,6 +496,7 @@ void GuitarGraph::drawBar(double time, float h) {
 
 void GuitarGraph::updateChords() {
 	m_chords.clear();
+	m_scoreFactor = 0;
 	Durations::size_type pos[5] = {}, size[5] = {};
 	Durations const* durations[5] = {};
 	for (int fret = 0; fret < 5; ++fret) {
@@ -532,6 +534,8 @@ void GuitarGraph::updateChords() {
 			tapfret = fret;
 			++c.polyphony;
 			++pos[fret];
+			m_scoreFactor += 50;
+			if (d.end - d.begin > 0.0) m_scoreFactor += 50.0 * (d.end - d.begin);
 		}
 		// Check if the chord is tappable
 		if (!m_drums && c.polyphony == 1) {
@@ -543,5 +547,6 @@ void GuitarGraph::updateChords() {
 		m_chords.push_back(c);
 	}
 	m_chordIt = m_chords.begin();
+	m_scoreFactor = 10000.0 / m_scoreFactor; // normalize maximum score factor
 }
 

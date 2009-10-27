@@ -55,7 +55,8 @@ class GuitarGraph {
 	double dead(double time) const { return time > -0.5 && m_dead > 50; }
 	unsigned stream() const { return m_stream; }
 	double correctness() const { return m_correctness.get(); }
-	std::string getTrackIndex() const { return m_track_index;}
+	std::string getTrackIndex() const { return m_track_index; }
+	int getScore() const { return m_score * m_scoreFactor; }
   private:
 	void fail(double time, int fret);
 	void endHold(int fret);
@@ -109,6 +110,7 @@ class GuitarGraph {
 	NoteStatus m_notes;
 	AnimValue m_correctness;
 	double m_score;
+	double m_scoreFactor;
 	int m_streak;
 	int m_longestStreak;
 };
