@@ -131,7 +131,7 @@ void GuitarGraph::engine() {
 		} else if (m_drums) {
 			if (ev.type == input::Event::PRESS) drumHit(time, ev.button);
 		} else {
-			if (ev.type == input::Event::PRESS || ev.type == input::Event::PICK) guitarPlay(time, ev);
+			guitarPlay(time, ev);
 		}
 		if (m_score < 0) m_score = 0;
 	}
@@ -225,7 +225,7 @@ void GuitarGraph::drumHit(double time, int fret) {
 
 void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 	bool picked = (ev.type == input::Event::PICK);
-	bool frets[5] = {};
+	bool frets[5] = {};  // The combination about to be played
 	if (picked) {
 		for (int fret = 0; fret < 5; ++fret) {
 			frets[fret] = ev.pressed[fret];
@@ -233,8 +233,20 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 		}
 	} else {
 		if (m_correctness.get() < 0.5) return; // Hammering not possible at the moment
-		frets[ev.button] = true;
-		for (int fret = ev.button + 1; fret < 5; ++fret) if (ev.pressed[fret]) return; // Extra buttons on right side
+		for (int fret = ev.button + 1; fret < 5; ++fret) {
+			if (ev.pressed[fret]) return; // Extra buttons on right side
+		}
+		if (ev.type == input::Event::PRESS) {
+			// Hammer-on, the fret pressed is played
+			frets[ev.button] = true;
+		} else {
+			// Pull off, find the note to played that way
+			int fret = ev.button;
+			do {
+				if (--fret < 0) return; // No frets pressed -> not a pull off
+			} while (!ev.pressed[fret]);
+			frets[fret] = true;
+		}
 	}
 	// Find any suitable note within the tolerance
 	double tolerance = maxTolerance;
