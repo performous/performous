@@ -84,11 +84,12 @@ class GuitarGraph {
 	struct Event {
 		double time;
 		AnimValue glow;
+		AnimValue whammy;
 		int type; // 0 = miss (pick), 1 = tap, 2 = pick
 		int fret;
 		Duration const* dur;
 		double holdTime;
-		Event(double t, int ty, int f = -1, Duration const* d = NULL): time(t), glow(0.0, 5.0), type(ty), fret(f), dur(d), holdTime(d ? d->begin : getNaN()) { if (type > 0) glow.setValue(1.0); }
+		Event(double t, int ty, int f = -1, Duration const* d = NULL): time(t), glow(0.0, 5.0), whammy(0.0, 0.4), type(ty), fret(f), dur(d), holdTime(d ? d->begin : getNaN()) { if (type > 0) glow.setValue(1.0); }
 	};
 	typedef std::vector<Event> Events;
 	Events m_events;
@@ -96,7 +97,7 @@ class GuitarGraph {
 	int m_dead;
 	glutil::Color const& color(int fret) const;
 	void drawBar(double time, float h);
-	void drawNote(int fret, glutil::Color, float tBeg, float tEnd);
+	void drawNote(int fret, glutil::Color, float tBeg, float tEnd, float whammy = 0);
 	void difficultyAuto();
 	bool difficulty(Difficulty level);
 	SvgTxtTheme m_text;

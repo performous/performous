@@ -21,7 +21,7 @@ namespace input {
 	static const std::size_t BUTTONS = 6;
 
 	struct Event {
-		enum Type { PRESS, RELEASE, PICK };
+		enum Type { PRESS, RELEASE, PICK, WHAMMY };
 		Type type;
 		int button; // Translated button number for press/release events. 0 for pick down, 1 for pick up (NOTE: these are NOT pick press/release events but rather different directions)
 		bool pressed[BUTTONS]; // All events tell the button state right after the event happened

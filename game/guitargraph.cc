@@ -104,12 +104,14 @@ void GuitarGraph::engine() {
 			if (m_input.pressed(i)) m_hit[i + 1].setValue(1.0);
 		}
 	}
+	double whammy = 0;
 	// Handle all events
 	for (input::Event ev; m_input.tryPoll(ev);) {
 		m_dead = false;
 		if (!m_drums && ev.type == input::Event::RELEASE) {
 			endHold(ev.button);
 		}
+		if (!m_drums && ev.type == input::Event::WHAMMY) whammy = (1.0 + ev.button) / 2.0;
 		if (ev.type == input::Event::PRESS) m_hit[!m_drums + ev.button].setValue(1.0);
 		else if (ev.type == input::Event::PICK) m_hit[0].setValue(1.0);
 		if (time < -0.5) {
@@ -154,6 +156,11 @@ void GuitarGraph::engine() {
 			if (!m_holds[fret]) continue;
 			Event& ev = m_events[m_holds[fret] - 1];
 			ev.glow.setTarget(1.0, true);
+			ev.whammy.setTarget(whammy);
+			if (whammy > 0) {
+				ev.whammy.move(0.5);
+				if (ev.whammy.get() > 1.0) ev.whammy.setValue(1.0);
+			}
 			double last = std::min(time, ev.dur->end);
 			double t = last - ev.holdTime;
 			if (t > 0) {
@@ -168,6 +175,7 @@ void GuitarGraph::engine() {
 void GuitarGraph::endHold(int fret) {
 	if (!m_holds[fret]) return;
 	m_events[m_holds[fret] - 1].glow.setTarget(0.0);
+	m_events[m_holds[fret] - 1].whammy.setTarget(0.0, true);
 	m_holds[fret] = 0;
 }
 
@@ -384,7 +392,11 @@ void GuitarGraph::draw(double time) {
 			//drawNote(fret, color(fret), tBeg, tEnd);
 			unsigned event = m_notes[it->dur[fret]];
 			float glow = 0.0f;
-			if (event > 0) glow = m_events[event - 1].glow.get();
+			float whammy = 0.0f;
+			if (event > 0) {
+				glow = m_events[event - 1].glow.get();
+				whammy = m_events[event - 1].whammy.get();
+			}
 			/*
 			if (glow > 0.0f) {
 				glBlendFunc(GL_ONE, GL_ONE);
@@ -396,7 +408,7 @@ void GuitarGraph::draw(double time) {
 			c.r += glow;
 			c.g += glow;
 			c.b += glow;
-			drawNote(fret, c, tBeg, tEnd);
+			drawNote(fret, c, tBeg, tEnd, whammy);
 
 			if (it->tappable) {
 				float l = std::max(0.5, m_correctness.get());
@@ -434,7 +446,7 @@ namespace {
 	}
 }
 
-void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd) {
+void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, float whammy) {
 	float x = -2.0f + fret;
 	if (m_drums) x -= 0.5f;
 	if (m_drums && fret == 0) {
@@ -454,8 +466,13 @@ void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd) {
 		y -= 2 * fretWid;
 		vertexPair(x, y, c, 0.5f);
 		// Render the middle
-		while ((y -= 10.0) > yEnd + fretWid) {
-			vertexPair(x, y, c, 0.5f);
+		while ((y -= fretWid) > yEnd + fretWid) {
+			if (whammy < 0.1) {
+				vertexPair(x, y, c, 0.5f);
+			} else {
+				// The sin formula is pure magic
+				vertexPair(x+sin((whammy-0.75)*6.0 + (yBeg-tEnd)/y)/3.0, y, c, 0.5f);
+			}
 		}
 		// Render the end
 		y = yEnd + fretWid;
