@@ -53,8 +53,8 @@ void LayoutSinger::drawScore(Position position) {
 				break;
 		}
 		m_score_text[i%4]->draw();
-		// Give some feedback on how well the last lyricss row went
-		if (p->m_maxLineScore > 0) {
+		// Give some feedback on how well the last lyrics row went
+		if (p->m_prevLineScore >= 0) {
 			std::string prevLineRank;
 			if (p->m_prevLineScore > 0.9) { prevLineRank = "Perfect"; glColor4f(0.5, 1.0, 0.0, act); }
 			else if (p->m_prevLineScore > 0.8) { prevLineRank = "Excellent"; glColor4f(0.2, 0.8, 0.2, act); }
