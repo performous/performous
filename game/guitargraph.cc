@@ -457,7 +457,8 @@ void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, fl
 	}
 	float yBeg = time2y(tBeg);
 	float yEnd = time2y(tEnd);
-	if (yBeg - 3 * fretWid >= yEnd) {
+	if (yBeg - 2 * fretWid >= yEnd) {
+		if (yEnd > yBeg - 3 * fretWid) yEnd = yBeg - 3 * fretWid;  // Short note: render minimum renderable length
 		UseTexture tblock(m_button_l);
 		glutil::Begin block(GL_TRIANGLE_STRIP);
 		c.a = time2a(tBeg); glColor4fv(c);
@@ -480,6 +481,7 @@ void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, fl
 		vertexPair(x, y, c, 0.25f);
 		vertexPair(x, yEnd, c, 0.0f);
 	} else {
+		// Too short note: only render the ring
 		c.a = time2a(tBeg); glColor4fv(c);
 		m_button.dimensions.center(time2y(tBeg)).middle(x);
 		m_button.draw();
