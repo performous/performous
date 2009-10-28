@@ -31,7 +31,9 @@ namespace plugin {
         void load(fs::path const& path) {
             for (fs::directory_iterator it(path), end; it != end; ++it) {
                 try {
+					std::cerr << "Loading " << it->string() << std::endl;
                     dlls.push_back(new dll(it->string()));
+					std::cerr << "Loaded." << std::endl;
                 } catch (std::runtime_error const& e) {
                     std::cerr << e.what() << std::endl;
                 } catch (...) {

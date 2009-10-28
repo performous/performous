@@ -2,9 +2,16 @@
 #include <boost/lexical_cast.hpp>
 #include <jack/jack.h>
 #include <algorithm>
+#include <iostream>
 
 namespace {
 	using namespace da;
+
+	struct Foo {
+		Foo() {
+			std::cerr << "JACK driver loading..." << std::endl;
+		}
+	} foo;
 
 	void handle_and_throw(jack_status_t status) {
 		if (status & JackServerFailed) throw std::runtime_error("Unable to connect to the JACK server");
