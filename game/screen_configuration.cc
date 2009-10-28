@@ -32,8 +32,8 @@ void ScreenConfiguration::manageEvent(SDL_Event event) {
 		else if (key == SDLK_DOWN && selected + 1 < configuration.size()) ++selected;
 		else if (key == SDLK_LEFT) --*ci;
 		else if (key == SDLK_RIGHT) ++*ci;
-		else if (key == SDLK_r && modifier & KMOD_CTRL) ci->reset();
-		else if (key == SDLK_s && modifier & KMOD_CTRL) writeConfig();
+		else if (key == SDLK_r && modifier & KMOD_CTRL) ci->reset(modifier & KMOD_ALT);
+		else if (key == SDLK_s && modifier & KMOD_CTRL) writeConfig(modifier & KMOD_ALT);
 	} else if (event.type == SDL_JOYBUTTONDOWN) {
 		int button = event.jbutton.button;
 		if (button == 8) sm->activateScreen("Intro");

@@ -140,7 +140,7 @@ void mainLoop() {
 		Audio audio;
 		audioSetup(capture, audio);
 		Songs songs(songlist);
-		Players players(getHomeDir() / ".config" / "performous-players.xml");
+		Players players(getHomeDir() / ".config" / "performous" / "players.xml");
 		ScreenManager sm;
 		Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());
 		sm.addScreen(new ScreenIntro("Intro", audio, capture));
@@ -155,21 +155,25 @@ void mainLoop() {
 		boost::xtime time = now();
 		unsigned frames = 0;
 		while (!sm.isFinished()) {
-			checkEvents_SDL(sm, window);
-			window.blank();
-			sm.getCurrentScreen()->draw();
-			window.swap();
-			if (config["graphic/fps"].b()) {
-				++frames;
-				if (now() - time > 1.0) {
-					std::cout << frames << " FPS" << std::endl;
-					time += 1.0;
+			try {
+				checkEvents_SDL(sm, window);
+				window.blank();
+				sm.getCurrentScreen()->draw();
+				window.swap();
+				if (config["graphic/fps"].b()) {
+					++frames;
+					if (now() - time > 1.0) {
+						std::cout << frames << " FPS" << std::endl;
+						time += 1.0;
+						frames = 0;
+					}
+				} else {
+					boost::thread::sleep(time + 0.01); // Max 100 FPS
+					time = now();
 					frames = 0;
 				}
-			} else {
-				boost::thread::sleep(time + 0.01); // Max 100 FPS
-				time = now();
-				frames = 0;
+			} catch (std::runtime_error& e) {
+				std::cerr << "ERROR: " << e.what() << std::endl;
 			}
 		}
 	} catch (std::exception& e) {
