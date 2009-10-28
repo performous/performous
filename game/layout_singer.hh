@@ -64,4 +64,5 @@ class LayoutSinger {
 	boost::scoped_ptr<SvgTxtThemeSimple> m_line_rank_text[4];
 	Players& m_players;
 	boost::shared_ptr<ThemeSing> m_theme;
+	AnimValue m_feedbackFader;
 };

@@ -3,6 +3,7 @@
 #include "color.hh"
 #include "pitch.hh"
 #include "util.hh"
+#include "animvalue.hh"
 
 #include <vector>
 
@@ -28,6 +29,8 @@ struct Player {
 	double m_maxLineScore;
 	/// score for the previous line (normalized [0,1])
 	double m_prevLineScore;
+	/// fader for text feedback display
+	AnimValue m_feedbackFader;
 	/// activity timer
 	unsigned m_activitytimer;
 	/// score iterator
@@ -36,7 +39,7 @@ struct Player {
 	Player(Song& song, Analyzer& analyzer, size_t frames):
 	  m_song(song), m_analyzer(analyzer), m_pitch(frames, std::make_pair(getNaN(),
 	  -getInf())), m_pos(), m_score(), m_lineScore(), m_maxLineScore(), m_prevLineScore(-1),
-	  m_activitytimer(), m_scoreIt(m_song.notes.begin()) {}
+	  m_feedbackFader(0.0, 0.5), m_activitytimer(), m_scoreIt(m_song.notes.begin()) {}
 	/// prepares analyzer
 	void prepare() { m_analyzer.process(); }
 	/// updates player stats

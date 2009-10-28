@@ -31,9 +31,12 @@ void Player::update() {
 					m_maxLineScore += m_song.m_scoreFactor * maxScoreIt->maxScore();
 					maxScoreIt++;
 				}
-				if (m_maxLineScore > 0)
+				if (m_maxLineScore > 0) {
 					m_prevLineScore /= m_maxLineScore;
-				else m_prevLineScore = -1;
+					m_feedbackFader.setValue(1.0);
+				} else {
+					m_prevLineScore = -1;
+				}
 				m_lineScore = 0;
 			}
 		} else {
