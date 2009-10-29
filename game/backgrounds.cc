@@ -31,7 +31,7 @@ void Backgrounds::reload_internal() {
 		m_dirty = true;
 	}
 	for (BGDirs::const_iterator it = m_bgdirs.begin(); m_loading && it != m_bgdirs.end(); ++it) {
-		if (!fs::is_directory(*it)) { std::cout << ">>> Not scanning: " << *it << " (no such directory)" << std::endl; continue; }
+		if (!fs::is_directory(*it)) { std::cout << ">>> Not scanning for backgrounds: " << *it << " (no such directory)" << std::endl; continue; }
 		std::cout << ">>> Scanning " << *it << " (for backgrounds)" << std::endl;
 		size_t count = m_bgs.size();
 		reload_internal(*it);

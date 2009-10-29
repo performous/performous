@@ -16,7 +16,6 @@ class Backgrounds: boost::noncopyable {
 	/// constructor
 	Backgrounds(): m_bgiter(0), m_dirty(false), m_loading(false)
 	{
-		std::cout << "BACKGROUNDS!" << std::endl;
 		reload();
 	}
 	~Backgrounds() {
