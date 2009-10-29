@@ -27,7 +27,8 @@ void Player::update() {
 				m_prevLineScore = m_lineScore;
 				// Calculate max score of the completed row
 				Notes::const_reverse_iterator maxScoreIt(m_scoreIt);
-				while (maxScoreIt != m_song.notes.rend() && maxScoreIt->type != Note::SLEEP) {
+				// FIXME: MacOSX needs the following cast to compile correctly
+				while ((maxScoreIt != (Notes::const_reverse_iterator)m_song.notes.rend()) && (maxScoreIt->type != Note::SLEEP)) {
 					m_maxLineScore += m_song.m_scoreFactor * maxScoreIt->maxScore();
 					maxScoreIt++;
 				}
