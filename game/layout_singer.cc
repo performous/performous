@@ -9,7 +9,8 @@
 #include <list>
 #include <boost/format.hpp>
 
-LayoutSinger::LayoutSinger(Song &_song, Players& _players, boost::shared_ptr<ThemeSing> _theme): m_song(_song), m_noteGraph(_song),m_lyricit(_song.notes.begin()), m_lyrics(), m_players(_players), m_theme(_theme) {
+LayoutSinger::LayoutSinger(Song &_song, Players& _players, boost::shared_ptr<ThemeSing> _theme):
+  m_song(_song), m_noteGraph(_song),m_lyricit(_song.notes.begin()), m_lyrics(), m_players(_players), m_theme(_theme) {
 	m_score_text[0].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_score_text[1].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_score_text[2].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
@@ -57,7 +58,7 @@ void LayoutSinger::drawScore(Position position) {
 		float fact = p->m_feedbackFader.get();
 		if (p->m_prevLineScore > 0.5 && fact > 0) {
 			std::string prevLineRank;
-			float fzoom = fact / 2.0 + 0.5;
+			float fzoom = 2.0 / (1.0 + fact);
 			if (p->m_prevLineScore > 0.95) { prevLineRank = "Perfect"; glColor4f(0.5, 1.0, 0.0, fact); }
 			else if (p->m_prevLineScore > 0.9) { prevLineRank = "Super"; glColor4f(0.4, 0.9, 0.0, fact); }
 			else if (p->m_prevLineScore > 0.8) { prevLineRank = "Excellent"; glColor4f(0.2, 0.8, 0.2, fact); }
