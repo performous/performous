@@ -23,29 +23,33 @@ void Player::update() {
 		}
 		// If a row of lyrics ends, calculate how well it went
 		if (m_scoreIt->type == Note::SLEEP) {
-			if (m_maxLineScore == 0) { // Has the maximum already been calculated for this SLEEP?
-				m_prevLineScore = m_lineScore;
-				// Calculate max score of the completed row
-				Notes::const_reverse_iterator maxScoreIt(m_scoreIt);
-				// FIXME: MacOSX needs the following cast to compile correctly
-				while ((maxScoreIt != (Notes::const_reverse_iterator)m_song.notes.rend()) && (maxScoreIt->type != Note::SLEEP)) {
-					m_maxLineScore += m_song.m_scoreFactor * maxScoreIt->maxScore();
-					maxScoreIt++;
-				}
-				if (m_maxLineScore > 0) {
-					m_prevLineScore /= m_maxLineScore;
-					m_feedbackFader.setValue(1.0);
-				} else {
-					m_prevLineScore = -1;
-				}
-				m_lineScore = 0;
-			}
+			calcRowRank();
 		} else {
 			m_maxLineScore = 0; // Not in SLEEP note anymore, so reset maximum
 		}
 		if (endTime < m_scoreIt->end) break;
 		++m_scoreIt;
 	}
+	if (m_scoreIt == m_song.notes.end()) calcRowRank();
 	m_score = clamp(m_score, 0.0, 1.0);
 }
 
+void Player::calcRowRank() {
+	if (m_maxLineScore == 0) { // Has the maximum already been calculated for this SLEEP?
+		m_prevLineScore = m_lineScore;
+		// Calculate max score of the completed row
+		Notes::const_reverse_iterator maxScoreIt(m_scoreIt);
+		// FIXME: MacOSX needs the following cast to compile correctly
+		while ((maxScoreIt != (Notes::const_reverse_iterator)m_song.notes.rend()) && (maxScoreIt->type != Note::SLEEP)) {
+			m_maxLineScore += m_song.m_scoreFactor * maxScoreIt->maxScore();
+			maxScoreIt++;
+		}
+		if (m_maxLineScore > 0) {
+			m_prevLineScore /= m_maxLineScore;
+			m_feedbackFader.setValue(1.0);
+		} else {
+			m_prevLineScore = -1;
+		}
+		m_lineScore = 0;
+	}
+}

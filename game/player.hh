@@ -44,6 +44,8 @@ struct Player {
 	void prepare() { m_analyzer.process(); }
 	/// updates player stats
 	void update();
+	/// calculate how well last lyrics row went
+	void calcRowRank();
 	/// player activity singing
 	float activity() const { return m_activitytimer / 300.0; }
 	/// get player's score
