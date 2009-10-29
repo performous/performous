@@ -19,14 +19,26 @@ namespace {
 
 void ScreenSing::enter() {
 	theme.reset(new ThemeSing());
+	bool foundbg = false;
 	if (!m_song->background.empty()) {
 		try {
 			m_background.reset(new Surface(m_song->path + m_song->background, true));
+			foundbg = true;
 		} catch (std::exception& e) {
 			std::cerr << e.what() << std::endl;
 		}
 	}
-	if (!m_song->video.empty() && config["graphic/video"].b()) m_video.reset(new Video(m_song->path + m_song->video, m_song->videoGap));
+	if (!m_song->video.empty() && config["graphic/video"].b()) {
+		m_video.reset(new Video(m_song->path + m_song->video, m_song->videoGap));
+		foundbg = true;
+	}
+	if (foundbg == false) {
+		try {
+			m_background.reset(new Surface(m_backgrounds.getRandom(), true));
+		} catch (std::exception& e) {
+			std::cerr << e.what() << std::endl;
+		}		
+	}
 	m_pause_icon.reset(new Surface(getThemePath("sing_pause.svg")));
 	m_help.reset(new Surface(getThemePath("instrumenthelp.svg")));
 	m_progress.reset(new ProgressBar(getThemePath("sing_progressbg.svg"), getThemePath("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01f, 0.01f, true));
