@@ -40,7 +40,8 @@ void Player::calcRowRank() {
 		// Calculate max score of the completed row
 		Notes::const_reverse_iterator maxScoreIt(m_scoreIt);
 		// FIXME: MacOSX needs the following cast to compile correctly
-		while ((maxScoreIt != (Notes::const_reverse_iterator)m_song.notes.rend()) && (maxScoreIt->type != Note::SLEEP)) {
+		// it is related to the fact that OSX default compiler is 4.0.1 that is buggy when not casting
+		while ((maxScoreIt != static_cast<Notes::const_reverse_iterator>(m_song.notes.rend())) && (maxScoreIt->type != Note::SLEEP)) {
 			m_maxLineScore += m_song.m_scoreFactor * maxScoreIt->maxScore();
 			maxScoreIt++;
 		}
