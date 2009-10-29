@@ -243,10 +243,16 @@ void ScreenSing::draw() {
 		}
 	} else {
 		if (m_score_window.get()) {
-			if (m_quitTimer.get() == 0.0 && !m_audio.isPaused()) { activateNextScreen(); return; }
-			m_score_window->draw();
+			// Score window has been created (we are near the end)
+			if (m_score_window->empty()) {  // No players to display scores for
+				if (!m_audio.isPlaying()) { activateNextScreen(); return; }
+			} else {  // Window being displayed
+				if (m_quitTimer.get() == 0.0 && !m_audio.isPaused()) { activateNextScreen(); return; }
+				m_score_window->draw();
+			}
 		}
 		else if (!m_audio.isPlaying() || (status == Song::FINISHED && m_audio.getLength() - time < 3.0)) {
+			// Time to create the score window
 			m_quitTimer.setValue(QUIT_TIMEOUT);
 			m_score_window.reset(new ScoreWindow(*m_engine, m_players));
 		}

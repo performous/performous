@@ -27,7 +27,7 @@ class ScoreWindow {
 	ScoreWindow(Engine & e, Players & players);
 	/// draws ScoreWindow
 	void draw();
-
+	bool empty() { return m_players.cur.empty(); }
   private:
 	Players & m_players;
 	AnimValue m_pos;
