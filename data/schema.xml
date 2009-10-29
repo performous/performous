@@ -249,4 +249,14 @@ to save the current settings to XML.
 			<long>Where to look for pictures of players.</long>
 		</locale>
 	</entry>
+	<entry name="system/path_backgrounds" type="string_list">
+		<stringvalue>/usr/local/share/games/performous/backgrounds</stringvalue>
+		<stringvalue>/usr/share/games/performous/backgrounds</stringvalue>
+		<stringvalue>../backgrounds/</stringvalue><!-- For Windows where the program is started in bin/ -->
+		<stringvalue>~/.performous/backgrounds/</stringvalue>
+		<locale name="C">
+			<short>Random background folders</short>
+			<long>Where to look for default backgrounds.</long>
+		</locale>
+	</entry>
 </performous>
