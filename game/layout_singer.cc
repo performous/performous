@@ -34,7 +34,10 @@ void LayoutSinger::drawScore(Position position) {
 	for (std::list<Player>::const_iterator p = m_players.cur.begin(); p != m_players.cur.end(); ++p, ++i) {
 		float act = p->activity();
 		if (act == 0.0f) continue;
-		glColor4f(p->m_color.r, p->m_color.g, p->m_color.b,act);
+		float r = p->m_color.r;
+		float g = p->m_color.g;
+		float b = p->m_color.b;
+		glColor4f(r, g, b,act);
 		switch(position) {
 			case LayoutSinger::BOTTOM:
 				m_player_icon->dimensions.left(-0.5 + 0.01 + 0.25 * i).fixedWidth(0.075).screenTop(0.055);
@@ -58,12 +61,15 @@ void LayoutSinger::drawScore(Position position) {
 		float fact = p->m_feedbackFader.get();
 		if (p->m_prevLineScore > 0.5 && fact > 0) {
 			std::string prevLineRank;
-			float fzoom = 2.0 / (1.0 + fact);
-			if (p->m_prevLineScore > 0.95) { prevLineRank = "Perfect"; glColor4f(0.5, 1.0, 0.0, fact); }
-			else if (p->m_prevLineScore > 0.9) { prevLineRank = "Super"; glColor4f(0.4, 0.9, 0.0, fact); }
-			else if (p->m_prevLineScore > 0.8) { prevLineRank = "Excellent"; glColor4f(0.2, 0.8, 0.2, fact); }
-			else if (p->m_prevLineScore > 0.6) { prevLineRank = "Good"; glColor4f(0.6, 1.0, 0.2, fact); }
-			else if (p->m_prevLineScore > 0.5) { prevLineRank = "Ok"; glColor4f(0.6, 1.0, 0.2, fact); }
+			float fzoom = 3.0 / (2.0 + fact);
+			float rank = 0.0f;
+			if (p->m_prevLineScore > 0.95) { prevLineRank = "Perfect"; rank = 1.0f; }
+			else if (p->m_prevLineScore > 0.9) { prevLineRank = "Excellent"; rank = 0.8f; }
+			else if (p->m_prevLineScore > 0.8) { prevLineRank = "Great"; rank = 0.6f; }
+			else if (p->m_prevLineScore > 0.6) { prevLineRank = "Good"; rank = 0.3f; }
+			else if (p->m_prevLineScore > 0.4) { prevLineRank = "OK"; rank = 0.0f; }
+			float base = 0.2f * (1.0f - rank);
+			glColor4f(base + r * rank, base + g * rank, base + b * rank, fact);
 			m_line_rank_text[i%4]->render(prevLineRank);
 			switch(position) {
 				case LayoutSinger::BOTTOM:
