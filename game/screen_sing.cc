@@ -34,7 +34,8 @@ void ScreenSing::enter() {
 	}
 	if (foundbg == false) {
 		try {
-			m_background.reset(new Surface(m_backgrounds.getRandom(), true));
+			std::string bgpath = m_backgrounds.getRandom();
+			m_background.reset(new Surface(bgpath, true));
 		} catch (std::exception& e) {
 			std::cerr << e.what() << std::endl;
 		}		

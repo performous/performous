@@ -71,4 +71,8 @@ void Backgrounds::reload_internal(fs::path const& parent) {
 	}
 }
 
+std::string Backgrounds::getRandom() {
+	if (m_bgs.empty()) throw std::runtime_error("No random backgrounds available");
+	return m_bgs.at((++m_bgiter) % m_bgs.size());
+}
 

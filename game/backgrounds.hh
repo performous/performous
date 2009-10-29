@@ -31,10 +31,7 @@ class Backgrounds: boost::noncopyable {
 	/// true if empty
 	int empty() const { return m_bgs.empty(); };
 	/// returns random background
-	std::string getRandom() { 
-		if (!m_bgs.empty()) return m_bgs.at((++m_bgiter) % m_bgs.size());
-		else return "";
-	}
+	std::string getRandom();
 	
   private:
 	typedef std::set<fs::path> BGDirs;
