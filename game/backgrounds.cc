@@ -16,7 +16,13 @@
 void Backgrounds::reload() {
 	if (m_loading) return;
 	// Copy backgrounddirs from config into m_bgdirs
-	ConfigItem::StringList const& sd = config["system/path_backgrounds"].sl();
+	ConfigItem::StringList sd = config["system/path_backgrounds"].sl();
+	char const* env_data_dir = getenv("PERFORMOUS_DATA_DIR");
+	if (env_data_dir) {
+		std::string background_dir(env_data_dir);
+		background_dir.append("/backgrounds/");
+		sd.push_back(background_dir);
+	}
 	m_bgs.clear();
 	std::transform(sd.begin(), sd.end(), std::inserter(m_bgdirs, m_bgdirs.end()), pathMangle);
 	// Run loading thread
