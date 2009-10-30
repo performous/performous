@@ -19,6 +19,8 @@ namespace {
 	size_t playerColorsSize = sizeof(playerColors) / sizeof(*playerColors);
 }
 
+#include <iostream>
+
 /// performous engine
 class Engine {
 	Audio& m_audio;
@@ -44,11 +46,15 @@ class Engine {
 		// clear old player information
 		m_players.cur.clear();
 		m_players.scores.clear();
-
-		size_t frames = m_audio.getLength() / Engine::TIMESTEP;
-		while (anBegin != anEnd) m_players.cur.push_back(Player(song, *anBegin++, frames));
-		size_t player = 0;
-		for (std::list<Player>::iterator it = m_players.cur.begin(); it != m_players.cur.end(); ++it, ++player) it->m_color = playerColors[player % playerColorsSize];
+		// Only add players if the vocal track has sensible length (not NaN or extremely long)
+		std::cout << "Endtime: " << song.endTime << std::endl;
+		if (song.endTime < 10000.0) {
+			// Calculate the space required for pitch frames
+			size_t frames = song.endTime / Engine::TIMESTEP;
+			while (anBegin != anEnd) m_players.cur.push_back(Player(song, *anBegin++, frames));
+			size_t player = 0;
+			for (std::list<Player>::iterator it = m_players.cur.begin(); it != m_players.cur.end(); ++it, ++player) it->m_color = playerColors[player % playerColorsSize];
+		}
 		m_thread.reset(new boost::thread(boost::ref(*this)));
 	}
 	~Engine() { kill(); }
