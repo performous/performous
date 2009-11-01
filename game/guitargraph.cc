@@ -475,13 +475,13 @@ void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, fl
 		y -= 2 * fretWid;
 		vertexPair(x, y, c, 0.5f);
 		// Render the middle
-		while ((y -= fretWid) > yEnd + fretWid) {
-			if (whammy < 0.1) {
-				vertexPair(x, y, c, 0.5f);
-			} else {
+		if (whammy > 0.1) {
+			while ((y -= fretWid) > yEnd + fretWid) {
 				// The sin formula is pure magic
 				vertexPair(x+sin((whammy-0.75)*6.0 + (yBeg-tEnd)/y)/3.0, y, c, 0.5f);
 			}
+		} else {
+			while ((y -= 10.0) > yEnd + fretWid) vertexPair(x, y, c, 0.5f);
 		}
 		// Render the end
 		y = yEnd + fretWid;
