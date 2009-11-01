@@ -323,8 +323,14 @@ bool GuitarGraph::difficulty(Difficulty level) {
 	int fail = 0;
 	for (int fret = 0; fret < 5; ++fret) if (nm.find(basepitch + fret) == nm.end()) ++fail;
 	if (fail == 5) return false;
+	Difficulty prevLevel = m_level;
 	m_level = level;
 	updateChords();
+	if (m_chords.size() <= 1) { // If there is only one chord, it's probably b0rked
+		m_level = prevLevel;
+		updateChords();
+		return false;
+	}
 	return true;
 }
 
