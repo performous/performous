@@ -182,7 +182,11 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		}
 	} else if (event.type == SDL_JOYBUTTONDOWN) {
 		int button = event.jbutton.button;
-		if (button == 8 || button == 9) m_audio.togglePause();
+		if (button == 9 /* START */) m_audio.togglePause();
+		if (button == 8 /* SELECT */) {
+			ScreenManager::getSingletonPtr()->activateScreen("Songs");
+			return;
+		}
 	}
 }
 
