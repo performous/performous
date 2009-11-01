@@ -20,6 +20,7 @@ ScreenSongs::ScreenSongs(std::string const& name, Audio& audio, Songs& songs):
 
 void ScreenSongs::enter() {
 	theme.reset(new ThemeSongs());
+	m_songbg_default.reset(new Surface(getThemePath("songs_bg_default.svg")));
 	m_emptyCover.reset(new Surface(getThemePath("no_cover.svg")));
 	m_instrumentCover.reset(new Surface(getThemePath("instrument_cover.svg")));
 	m_bandCover.reset(new Surface(getThemePath("band_cover.svg")));
@@ -170,7 +171,7 @@ void ScreenSongs::draw() {
 	m_songs.update(); // Poll for new songs
 	double length = m_audio.getLength();
 	double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
-	if (m_songbg.get()) m_songbg->draw();
+	if (m_songbg.get()) m_songbg->draw(); else m_songbg_default->draw();
 	if (m_video.get()) m_video->render(time);
 	if (!m_jukebox) theme->bg.draw();
 	std::string songbg, video;
