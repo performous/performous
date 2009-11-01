@@ -54,6 +54,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
   m_cx(0.0, 0.2),
   m_width(0.5, 0.4),
   m_stream(),
+  m_track_index(m_track_map.end()),
   m_level(),
   m_dead(1000),
   m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
@@ -81,19 +82,23 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
 	unsigned int i = 0;
 	for (TrackMap::const_iterator it = m_song.track_map.begin(); it != m_song.track_map.end(); ++it,++i) {
 		std::string index = it->first;
-		m_track_map.insert(make_pair(index, &it->second));
-		if( index == track ) m_track_index = index;
-
-		// load required textures (even the unused)
-		if (index == "drums") m_necks.insert(index, new Texture("drumneck.svg"));
-		else if (index == "bass") m_necks.insert(index, new Texture("bassneck.svg"));
-		else m_necks.insert(index, new Texture("guitarneck.svg"));
+		TrackMapConstPtr::const_iterator it2 = m_track_map.insert(std::make_pair(index, &it->second)).first;
+		if (index == track) m_track_index = it2;
 	}
-	if( m_track_index.empty() ) throw std::runtime_error("Could not find track \"" + track + "\"");
+	if (m_track_index == m_track_map.end()) throw std::runtime_error("Could not find track \"" + track + "\"");
 	for (int i = 0; i < 6; ++i) m_hit[i].setRate(5.0);
 	for (int i = 0; i < 5; ++i) m_holds[i] = 0;
 	if (m_track_map.empty()) throw std::runtime_error("No track");
 	difficultyAuto();
+	updateNeck();
+}
+
+void GuitarGraph::updateNeck() {
+	// TODO: Optimize with texture cache
+	std::string index = m_track_index->first;
+	if (index == "drums") m_neck.reset(new Texture("drumneck.svg"));
+	else if (index == "bass") m_neck.reset(new Texture("bassneck.svg"));
+	else m_neck.reset(new Texture("guitarneck.svg"));
 }
 
 void GuitarGraph::engine() {
@@ -117,15 +122,7 @@ void GuitarGraph::engine() {
 		else if (ev.type == input::Event::PICK) m_hit[0].setValue(1.0);
 		if (time < -0.5) {
 			if (ev.type == input::Event::PICK || (m_drums && ev.type == input::Event::PRESS)) {
-				if (m_drums ? ev.pressed[0] : ev.pressed[4]) {
-					// lets find the next track
-					TrackMapConstPtr::iterator track_it = m_track_map.find(m_track_index);
-					if( track_it != m_track_map.end() ) {
-						++track_it;
-						m_track_index = (track_it != m_track_map.end() ? track_it : m_track_map.begin())->first;
-					}
-					if (!difficulty(m_level)) difficultyAuto();
-				}
+				if (!m_drums && ev.pressed[4]) nextTrack();
 				if (ev.pressed[0 + m_drums]) difficulty(DIFFICULTY_SUPAEASY);
 				else if (ev.pressed[1 + m_drums]) difficulty(DIFFICULTY_EASY);
 				else if (ev.pressed[2 + m_drums]) difficulty(DIFFICULTY_MEDIUM);
@@ -299,13 +296,23 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 	}
 }
 
-void GuitarGraph::difficultyAuto() {
+void GuitarGraph::nextTrack() {
+	while (1) {
+		if (++m_track_index == m_track_map.end()) m_track_index = m_track_map.begin();
+		if (m_track_index->first != "drums") break;  // Only accept non-drum tracks
+	}
+	difficultyAuto();
+	updateNeck();
+}
+
+void GuitarGraph::difficultyAuto(bool tryKeep) {
+	if (tryKeep && difficulty(Difficulty(m_level))) return;
 	for (int level = 0; level < DIFFICULTYCOUNT; ++level) if (difficulty(Difficulty(level))) return;
 	throw std::runtime_error("No difficulty levels found");
 }
 
 bool GuitarGraph::difficulty(Difficulty level) {
-	Track const& track = *m_track_map.find(m_track_index)->second;
+	Track const& track = *m_track_index->second;
 	// Find the stream number
 	for (TrackMap::const_iterator it = m_song.track_map.begin(); it != m_song.track_map.end(); ++it) {
 		if (&track == &it->second) break;
@@ -345,7 +352,7 @@ void GuitarGraph::draw(double time) {
 	// Draw scores
 	if (time < -0.5) {
 		std::string txt;
-		txt += m_track_map.find(m_track_index)->first + "\n" + diffv[m_level].name;
+		txt += m_track_index->first + "\n" + diffv[m_level].name;
 		m_text.dimensions.screenBottom(-0.05).middle(-0.1 + offsetX);
 		m_text.draw(txt);
 	} else {
@@ -363,7 +370,7 @@ void GuitarGraph::draw(double time) {
 	{ float s = dimensions.w() / 5.0f; glScalef(s, s, s); }
 	// Draw the neck
 	{
-		UseTexture tex(*m_necks.find(m_track_index)->second);
+		UseTexture tex(*m_neck);
 		glutil::Begin block(GL_TRIANGLE_STRIP);
 		float w = (m_drums ? 2.0f : 2.5f);
 		float texCoord = 0.0f;
@@ -502,7 +509,7 @@ void GuitarGraph::updateChords() {
 	Durations::size_type pos[5] = {}, size[5] = {};
 	Durations const* durations[5] = {};
 	for (int fret = 0; fret < 5; ++fret) {
-		NoteMap const& nm = m_track_map.find(m_track_index)->second->nm;
+		NoteMap const& nm = m_track_index->second->nm;
 		int basepitch = diffv[m_level].basepitch;
 		NoteMap::const_iterator it = nm.find(basepitch + fret);
 		if (it == nm.end()) continue;
