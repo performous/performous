@@ -106,6 +106,7 @@ void ScreenSing::instrumentLayout(double time) {
 		} else {
 			CountSum cs = volume[it->first];
 			if (cs.first > 0) level = cs.second / cs.first;
+			if (m_song->music.size() <= 1) level = std::max(0.333, level);
 			m_audio.streamFade(it->first, level);
 		}
 	}
