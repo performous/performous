@@ -245,16 +245,23 @@ void ScreenSongs::draw() {
 						glTexCoord2f(0.25f, 1.0f); glVertex2f(x, dim.y2());
 					}
 					{
-						// guitar
-						alpha = (isTrackInside(song_display.track_map,"guitar")) ? 1.00 : 0.25;
-						glutil::Begin block(GL_TRIANGLE_STRIP);
-						glColor4f(1.0, 1.0, 1.0, alpha);
-						x = dim.x1()+0.25*(dim.x2()-dim.x1());
-						glTexCoord2f(0.25f, 0.0f); glVertex2f(x, dim.y1());
-						glTexCoord2f(0.25f, 1.0f); glVertex2f(x, dim.y2());
-						x = dim.x1()+0.50*(dim.x2()-dim.x1());
-						glTexCoord2f(0.50f, 0.0f); glVertex2f(x, dim.y1());
-						glTexCoord2f(0.50f, 1.0f); glVertex2f(x, dim.y2());
+						// guitars
+						alpha = 1.0;
+						int guitarCount = 0;
+						if (isTrackInside(song_display.track_map,"guitar")) guitarCount++;
+						if (isTrackInside(song_display.track_map,"coop guitar")) guitarCount++;
+						if (isTrackInside(song_display.track_map,"rhythm guitar")) guitarCount++;
+						if (guitarCount == 0) { guitarCount = 1; alpha = 0.25; }
+						for (int i = guitarCount-1; i >= 0; i--) {
+							glutil::Begin block(GL_TRIANGLE_STRIP);
+							glColor4f(1.0, 1.0, 1.0, alpha);
+							x = dim.x1()+(0.25+i*0.04)*(dim.x2()-dim.x1());
+							glTexCoord2f(0.25f, 0.0f); glVertex2f(x, dim.y1());
+							glTexCoord2f(0.25f, 1.0f); glVertex2f(x, dim.y2());
+							x = dim.x1()+(0.50+i*0.04)*(dim.x2()-dim.x1());
+							glTexCoord2f(0.50f, 0.0f); glVertex2f(x, dim.y1());
+							glTexCoord2f(0.50f, 1.0f); glVertex2f(x, dim.y2());
+						}
 					}
 					{
 						// bass

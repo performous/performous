@@ -53,6 +53,8 @@ void ScreenSing::enter() {
 		// Here we load alternatively guitar/bass tracks until no guitar controler is available
 		// then we load all the drums tracks until no drum controler is available (and place them in second position)
 		bool no_guitar = false;
+		bool no_guitar2 = false;
+		bool no_guitar3 = false;
 		bool no_bass = false;
 		while (1) {
 			try {
@@ -61,9 +63,17 @@ void ScreenSing::enter() {
 			} catch (std::runtime_error&) {no_guitar = true;}
 			try {
 				Instruments::iterator it = m_instruments.end();
+				m_instruments.insert(it, new GuitarGraph(m_audio, *m_song, "coop guitar"));
+			} catch (std::runtime_error&) {no_guitar2 = true;}
+			try {
+				Instruments::iterator it = m_instruments.end();
 				m_instruments.insert(it, new GuitarGraph(m_audio, *m_song, "bass"));
 			} catch (std::runtime_error&) {no_bass = true;}
-			if( no_guitar && no_bass ) break;
+			try {
+				Instruments::iterator it = m_instruments.end();
+				m_instruments.insert(it, new GuitarGraph(m_audio, *m_song, "rhythm guitar"));
+			} catch (std::runtime_error&) {no_guitar3 = true;}
+			if( no_guitar && no_guitar2 && no_guitar3 && no_bass ) break;
 		}
 		while(1) {
 			try {

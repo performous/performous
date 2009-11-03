@@ -49,8 +49,8 @@ void SongParser::iniParse() {
 		// These are added features (not part of FoF)
 		else if (key == "cover") s.cover = value;
 		else if (key == "background") s.background = value;
-		else if (key == "video") m_song.video = value;
-		else if (key == "videogap") assign(m_song.videoGap, value);
+		else if (key == "video") s.video = value;
+		else if (key == "videogap") assign(s.videoGap, value);
 		// End of added features
 	}
 	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
@@ -94,7 +94,8 @@ void SongParser::iniParse() {
 		else if (name == "T1 GEMS") name = "guitar"; // Some old MIDI files have a track named T1 GEMS
 		else if (name.substr(0, 5) != "PART ") continue;
 		else name.erase(0, 5);
-		if (name == "GUITAR COOP") continue; // TODO: do something with these? They don't work in current version
+		if (name == "GUITAR COOP") name = "coop guitar";
+		if (name == "RHYTHM") name = "rhythm guitar";
 		if (name == "DRUM") name = "drums";
 		if (name == "DRUMS") name = "drums";
 		if (name == "BASS") name = "bass";
@@ -102,6 +103,7 @@ void SongParser::iniParse() {
 		// Process non-vocal tracks
 		if (name != "VOCALS") {
 			bool drums = (name == "drums");
+			int durCount = 0;
 			s.track_map.insert(make_pair(name,Track(name)));
 			NoteMap& nm2 = s.track_map.find(name)->second.nm;
 			for (MidiFileParser::NoteMap::const_iterator it2 = it->notes.begin(); it2 != it->notes.end(); ++it2) {
@@ -114,7 +116,15 @@ void SongParser::iniParse() {
 					if (beg > end) throw std::runtime_error("Reversed notes");
 					if (drums) end = beg;
 					dur.push_back(Duration(beg, end));
+					durCount++;
 				}
+			}
+			// If a track has only 20 or less frets it's most likely b0rked.
+			// This number has been extracted from broken song tracks, but
+			// it is probably DIFFICULTYCOUNT * different_frets.
+			if (durCount <= 20) {
+				nm2.clear();
+				s.track_map.erase(name);
 			}
 			continue;
 		}
