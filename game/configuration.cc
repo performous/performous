@@ -1,15 +1,20 @@
 #include "configuration.hh"
 
+#include "config.hh"
 #include "fs.hh"
 #include "util.hh"
+#include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 #include <libxml++/libxml++.h>
+#include <plugin++/execname.hpp>
 #include <algorithm>
 #include <iomanip>
 #include <stdexcept>
 #include <iostream>
 #include <cmath>
+
+namespace fs = boost::filesystem;
 
 Config config;
 
@@ -67,6 +72,8 @@ namespace {
 		fmter % boost::io::group(std::setprecision(precision), double(m) * boost::get<T>(value));
 		return fmter.str();
 	}
+	
+	fs::path origin;  // The primary shared data folder
 }
 
 std::string ConfigItem::getValue() const {
@@ -255,7 +262,7 @@ void readMenuXML(xmlpp::Node* node) {
 }
 
 void readConfigXML(fs::path const& file, int mode) {
-	if (!boost::filesystem::exists(file)) {
+	if (!fs::exists(file)) {
 		std::cout << "Skipping " << file << " (not found)" << std::endl;
 		return;
 	}
@@ -300,31 +307,28 @@ void readConfigXML(fs::path const& file, int mode) {
 	}
 }
 
+#define CONFIG_SCHEMA "/config/schema.xml"  // Relative to shared data path. Update readConfig and actual file location if you change this
+
 void readConfig() {
 	// Find config schema
 	std::string schemafile;
 	{
 		typedef std::vector<std::string> ConfigList;
 		ConfigList config_list;
-		char const* env_data_dir = getenv("PERFORMOUS_DATA_DIR");
-		if (env_data_dir) {
-			std::string config_file(env_data_dir);
-			config_file.append("/config/schema.xml");
-			config_list.push_back(config_file);
-		}
-		config_list.push_back("/usr/local/share/games/performous/config/schema.xml");
-		config_list.push_back("/usr/local/share/performous/config/schema.xml");
-		config_list.push_back("/usr/share/games/performous/config/schema.xml");
-		config_list.push_back("/usr/share/performous/config/schema.xml");
-		ConfigList::const_iterator it = std::find_if(config_list.begin(), config_list.end(), static_cast<bool(&)(boost::filesystem::path const&)>(boost::filesystem::exists));
+		char const* root = getenv("PERFORMOUS_ROOT");
+		if (root) config_list.push_back(std::string(root) + "/" SHARED_DATA_DIR CONFIG_SCHEMA);
+		fs::path exec = plugin::execname();
+		if (!exec.empty()) config_list.push_back(exec.parent_path().string() + "/../" SHARED_DATA_DIR CONFIG_SCHEMA);
+		ConfigList::const_iterator it = std::find_if(config_list.begin(), config_list.end(), static_cast<bool(&)(fs::path const&)>(fs::exists));
 		if (it == config_list.end()) {
 			std::ostringstream oss;
 			oss << "No config schema file found. The following locations were tried:\n";
 			std::copy(config_list.begin(), config_list.end(), std::ostream_iterator<std::string>(oss, "\n"));
-			oss << "Install the file or define environment variable PERFORMOUS_DATA_DIR\n";
+			oss << "Install the file or define environment variable PERFORMOUS_ROOT\n";
 			throw std::runtime_error(oss.str());
 		}
 		schemafile = *it;
+		origin = fs::path(schemafile).parent_path().parent_path(); // Assuming that two times parent from config file = origin
 	}
 	readConfigXML(schemafile, 0);  // Read schema and defaults
 	readConfigXML(systemConfFile, 1);  // Update defaults with system config
