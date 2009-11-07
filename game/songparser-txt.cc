@@ -85,6 +85,7 @@ bool SongParser::txtParseNote(std::string line) {
 		addBPM(ts, bpm);
 		return true;
 	}
+	if (line[0] == 'P') return true; //We ignore player information for now (multiplayer hack)
 	Note n;
 	n.type = Note::Type(iss.get());
 	unsigned int ts = m_prevts;
