@@ -27,6 +27,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <cstdlib>
 
 volatile bool g_quit = false;
 
@@ -197,6 +198,7 @@ int main(int argc, char** argv) {
 	std::signal(SIGINT, quit);
 	std::signal(SIGTERM, quit);
 	std::ios::sync_with_stdio(false);  // We do not use C stdio
+	std::srand(std::time(NULL));
 	// Parse commandline options
 	std::vector<std::string> mics;
 	std::vector<std::string> pdevs;

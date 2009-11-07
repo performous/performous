@@ -12,7 +12,6 @@
 #include <sstream>
 #include <stdexcept>
 #include <cstdlib>
-#include <ctime>
 
 void Backgrounds::reload() {
 	if (m_loading) return;
@@ -48,7 +47,6 @@ void Backgrounds::reload_internal() {
 	m_loading = false;
 	{	
 		boost::mutex::scoped_lock l(m_mutex);
-		std::srand(time(NULL));
 		random_shuffle(m_bgs.begin(), m_bgs.end());
 		m_dirty = false;
 		m_bgiter = 0;
