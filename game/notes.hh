@@ -52,9 +52,6 @@ struct Track {
 	NoteMap nm;
 };
 
-// TODO: remove the following two types
-typedef std::vector<Track> TrackVector;
-typedef std::vector<Track const*> TrackVectorConstPtr;
 // keep these ones
 typedef std::map<std::string,Track> TrackMap;
 typedef std::map<std::string,Track const*> TrackMapConstPtr; // this one really needed ? can't we save only the map key for comparison ?

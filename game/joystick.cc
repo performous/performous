@@ -109,13 +109,20 @@ void input::SDL::init() {
 	}
 
 	unsigned int nbjoysticks = SDL_NumJoysticks();
-	std::cout << "Detecting " << nbjoysticks << " joysticks..." << std::endl;
-
 	for (unsigned int i = 0 ; i < nbjoysticks ; ++i) {
-		input::SDL::sdl_devices[i] = SDL_JoystickOpen(i);
 		std::string name = SDL_JoystickName(i);
-		std::cout << "Id: " << i << std::endl;
-		std::cout << "  Name: " << name << std::endl;
+		std::cout << "SDL joystick: " << name << std::endl;
+		SDL_Joystick* joy = SDL_JoystickOpen(i);
+		if (SDL_JoystickNumButtons(joy) == 0) {
+			std::cout << "  Not suitable for Performous" << std::endl;
+			SDL_JoystickClose(joy);
+			continue;
+		}
+		input::SDL::sdl_devices[i] = joy;
+		std::cout << SDL_JoystickNumAxes(joy) << std::endl;
+		std::cout << SDL_JoystickNumBalls(joy) << std::endl;
+		std::cout << SDL_JoystickNumButtons(joy) << std::endl;
+		std::cout << SDL_JoystickNumHats(joy) << std::endl;
 		if( forced_type.find(i) != forced_type.end() ) {
 			switch(forced_type[i]) {
 				case input::Private::GUITAR_GH:
@@ -156,8 +163,7 @@ void input::SDL::init() {
 	// Here we should send an event to have correct state buttons
 	init_devices();
 	// Adding keyboard instrument
-	std::cout << "Id: " << input::Private::KEYBOARD_ID << std::endl;
-	std::cout << "  Name: Keyboard (emulated guitar): " << (config["game/keyboard_guitar"].b() ? "disabled":"enabled") << std::endl;
+	std::cout << "Keyboard as guitar controller: " << (config["game/keyboard_guitar"].b() ? "disabled":"enabled") << std::endl;
 	input::SDL::sdl_devices[input::Private::KEYBOARD_ID] = NULL;
 	input::Private::devices[input::Private::KEYBOARD_ID] = input::Private::InputDevPrivate(input::Private::GUITAR_GH);
 }

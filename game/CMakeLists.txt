@@ -30,13 +30,20 @@ endif(PortMidi_FOUND)
 if(CMAKE_COMPILER_IS_GNUCXX)
 	message(STATUS "GCC detected, adding compile flags")
 	# -pedantic cannot be used because ffmpeg headers are b0rked
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++98 -Wall -Wextra -fvisibility=hidden")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++98 -Wall -Wextra")
 	# Needed for ffmpeg.cc to compile cleanly on OSX (it's a (unsigned long) long story)
 	add_definitions("-D__STDC_CONSTANT_MACROS")
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
 add_executable(performous.bin ${SOURCES} ${SDL_SOURCES})
 target_link_libraries(performous.bin da ${LIBS})
+
+set_target_properties(performous.bin PROPERTIES
+	INSTALL_RPATH_USE_LINK_PATH TRUE
+	SKIP_BUILD_RPATH FALSE
+	INSTALL_RPATH \$ORIGIN/../lib
+	BUILD_WITH_INSTALL_RPATH FALSE
+)
 
 # Generate config.hh
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.cmake.hh" "${CMAKE_CURRENT_BINARY_DIR}/config.hh" @ONLY)

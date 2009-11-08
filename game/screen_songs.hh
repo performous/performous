@@ -28,6 +28,7 @@ class ScreenSongs : public Screen {
 	Audio& m_audio;
 	Songs& m_songs;
 	boost::scoped_ptr<Surface> m_songbg;
+	boost::scoped_ptr<Surface> m_songbg_default;
 	boost::scoped_ptr<Video> m_video;
 	boost::scoped_ptr<ThemeSongs> theme;
 	std::map<std::string,std::string> m_playing;

@@ -19,14 +19,27 @@ namespace {
 
 void ScreenSing::enter() {
 	theme.reset(new ThemeSing());
+	bool foundbg = false;
 	if (!m_song->background.empty()) {
 		try {
 			m_background.reset(new Surface(m_song->path + m_song->background, true));
+			foundbg = true;
 		} catch (std::exception& e) {
 			std::cerr << e.what() << std::endl;
 		}
 	}
-	if (!m_song->video.empty() && config["graphic/video"].b()) m_video.reset(new Video(m_song->path + m_song->video, m_song->videoGap));
+	if (!m_song->video.empty() && config["graphic/video"].b()) {
+		m_video.reset(new Video(m_song->path + m_song->video, m_song->videoGap));
+		foundbg = true;
+	}
+	if (foundbg == false) {
+		try {
+			std::string bgpath = m_backgrounds.getRandom();
+			m_background.reset(new Surface(bgpath, true));
+		} catch (std::exception& e) {
+			std::cerr << e.what() << std::endl;
+		}		
+	}
 	m_pause_icon.reset(new Surface(getThemePath("sing_pause.svg")));
 	m_help.reset(new Surface(getThemePath("instrumenthelp.svg")));
 	m_progress.reset(new ProgressBar(getThemePath("sing_progressbg.svg"), getThemePath("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01f, 0.01f, true));
@@ -40,6 +53,8 @@ void ScreenSing::enter() {
 		// Here we load alternatively guitar/bass tracks until no guitar controler is available
 		// then we load all the drums tracks until no drum controler is available (and place them in second position)
 		bool no_guitar = false;
+		bool no_guitar2 = false;
+		bool no_guitar3 = false;
 		bool no_bass = false;
 		while (1) {
 			try {
@@ -48,9 +63,17 @@ void ScreenSing::enter() {
 			} catch (std::runtime_error&) {no_guitar = true;}
 			try {
 				Instruments::iterator it = m_instruments.end();
+				m_instruments.insert(it, new GuitarGraph(m_audio, *m_song, "coop guitar"));
+			} catch (std::runtime_error&) {no_guitar2 = true;}
+			try {
+				Instruments::iterator it = m_instruments.end();
 				m_instruments.insert(it, new GuitarGraph(m_audio, *m_song, "bass"));
 			} catch (std::runtime_error&) {no_bass = true;}
-			if( no_guitar && no_bass ) break;
+			try {
+				Instruments::iterator it = m_instruments.end();
+				m_instruments.insert(it, new GuitarGraph(m_audio, *m_song, "rhythm guitar"));
+			} catch (std::runtime_error&) {no_guitar3 = true;}
+			if( no_guitar && no_guitar2 && no_guitar3 && no_bass ) break;
 		}
 		while(1) {
 			try {
@@ -93,6 +116,7 @@ void ScreenSing::instrumentLayout(double time) {
 		} else {
 			CountSum cs = volume[it->first];
 			if (cs.first > 0) level = cs.second / cs.first;
+			if (m_song->music.size() <= 1) level = std::max(0.333, level);
 			m_audio.streamFade(it->first, level);
 		}
 	}
@@ -169,7 +193,11 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		}
 	} else if (event.type == SDL_JOYBUTTONDOWN) {
 		int button = event.jbutton.button;
-		if (button == 8 || button == 9) m_audio.togglePause();
+		if (button == 9 /* START */) m_audio.togglePause();
+		if (button == 8 /* SELECT */) {
+			ScreenManager::getSingletonPtr()->activateScreen("Songs");
+			return;
+		}
 	}
 }
 
@@ -243,10 +271,16 @@ void ScreenSing::draw() {
 		}
 	} else {
 		if (m_score_window.get()) {
-			if (m_quitTimer.get() == 0.0 && !m_audio.isPaused()) { activateNextScreen(); return; }
-			m_score_window->draw();
+			// Score window has been created (we are near the end)
+			if (m_score_window->empty()) {  // No players to display scores for
+				if (!m_audio.isPlaying()) { activateNextScreen(); return; }
+			} else {  // Window being displayed
+				if (m_quitTimer.get() == 0.0 && !m_audio.isPaused()) { activateNextScreen(); return; }
+				m_score_window->draw();
+			}
 		}
 		else if (!m_audio.isPlaying() || (status == Song::FINISHED && m_audio.getLength() - time < 3.0)) {
+			// Time to create the score window
 			m_quitTimer.setValue(QUIT_TIMEOUT);
 			m_score_window.reset(new ScoreWindow(*m_engine, m_players));
 		}

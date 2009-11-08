@@ -20,6 +20,7 @@ ScreenSongs::ScreenSongs(std::string const& name, Audio& audio, Songs& songs):
 
 void ScreenSongs::enter() {
 	theme.reset(new ThemeSongs());
+	m_songbg_default.reset(new Surface(getThemePath("songs_bg_default.svg")));
 	m_emptyCover.reset(new Surface(getThemePath("no_cover.svg")));
 	m_instrumentCover.reset(new Surface(getThemePath("instrument_cover.svg")));
 	m_bandCover.reset(new Surface(getThemePath("band_cover.svg")));
@@ -170,7 +171,7 @@ void ScreenSongs::draw() {
 	m_songs.update(); // Poll for new songs
 	double length = m_audio.getLength();
 	double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
-	if (m_songbg.get()) m_songbg->draw();
+	if (m_songbg.get()) m_songbg->draw(); else m_songbg_default->draw();
 	if (m_video.get()) m_video->render(time);
 	if (!m_jukebox) theme->bg.draw();
 	std::string songbg, video;
@@ -244,16 +245,23 @@ void ScreenSongs::draw() {
 						glTexCoord2f(0.25f, 1.0f); glVertex2f(x, dim.y2());
 					}
 					{
-						// guitar
-						alpha = (isTrackInside(song_display.track_map,"guitar")) ? 1.00 : 0.25;
-						glutil::Begin block(GL_TRIANGLE_STRIP);
-						glColor4f(1.0, 1.0, 1.0, alpha);
-						x = dim.x1()+0.25*(dim.x2()-dim.x1());
-						glTexCoord2f(0.25f, 0.0f); glVertex2f(x, dim.y1());
-						glTexCoord2f(0.25f, 1.0f); glVertex2f(x, dim.y2());
-						x = dim.x1()+0.50*(dim.x2()-dim.x1());
-						glTexCoord2f(0.50f, 0.0f); glVertex2f(x, dim.y1());
-						glTexCoord2f(0.50f, 1.0f); glVertex2f(x, dim.y2());
+						// guitars
+						alpha = 1.0;
+						int guitarCount = 0;
+						if (isTrackInside(song_display.track_map,"guitar")) guitarCount++;
+						if (isTrackInside(song_display.track_map,"coop guitar")) guitarCount++;
+						if (isTrackInside(song_display.track_map,"rhythm guitar")) guitarCount++;
+						if (guitarCount == 0) { guitarCount = 1; alpha = 0.25; }
+						for (int i = guitarCount-1; i >= 0; i--) {
+							glutil::Begin block(GL_TRIANGLE_STRIP);
+							glColor4f(1.0, 1.0, 1.0, alpha);
+							x = dim.x1()+(0.25+i*0.04)*(dim.x2()-dim.x1());
+							glTexCoord2f(0.25f, 0.0f); glVertex2f(x, dim.y1());
+							glTexCoord2f(0.25f, 1.0f); glVertex2f(x, dim.y2());
+							x = dim.x1()+(0.50+i*0.04)*(dim.x2()-dim.x1());
+							glTexCoord2f(0.50f, 0.0f); glVertex2f(x, dim.y1());
+							glTexCoord2f(0.50f, 1.0f); glVertex2f(x, dim.y2());
+						}
 					}
 					{
 						// bass

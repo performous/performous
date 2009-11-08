@@ -1,6 +1,6 @@
 set(APPLICATION_FILE "performous.desktop")
 set(PIXMAP_FILE      "performous.xpm")
-set(CONFIG_FILE      "performous.xml")
+set(CONFIG_FILE      "schema.xml")
 
 if(UNIX)
 	install(FILES ${APPLICATION_FILE} DESTINATION "share/applications/")
@@ -14,3 +14,7 @@ install(FILES ${XSL_FILES} DESTINATION "${SHARE_INSTALL}/xsl/")
 
 file(GLOB SOUND_FILES "sounds/*.ogg")
 install(FILES ${SOUND_FILES} DESTINATION "${SHARE_INSTALL}/sounds/")
+
+file(GLOB BG_FILES "backgrounds/*.svg")
+install(FILES ${BG_FILES} DESTINATION "${SHARE_INSTALL}/backgrounds/")
+

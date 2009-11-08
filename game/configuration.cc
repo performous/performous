@@ -1,15 +1,20 @@
 #include "configuration.hh"
 
+#include "config.hh"
 #include "fs.hh"
 #include "util.hh"
+#include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 #include <libxml++/libxml++.h>
+#include <plugin++/execname.hpp>
 #include <algorithm>
 #include <iomanip>
 #include <stdexcept>
 #include <iostream>
 #include <cmath>
+
+namespace fs = boost::filesystem;
 
 Config config;
 
@@ -29,12 +34,12 @@ ConfigItem& ConfigItem::incdec(int dir) {
 	return *this;
 }
 
-bool ConfigItem::is_default() const {
-	if (m_type == "bool") return boost::get<bool>(m_value) == boost::get<bool>(m_defaultValue);
-	if (m_type == "int") return boost::get<int>(m_value) == boost::get<int>(m_defaultValue);
-	if (m_type == "float") return boost::get<double>(m_value) == boost::get<double>(m_defaultValue);
-	if (m_type == "string") return boost::get<std::string>(m_value) == boost::get<std::string>(m_defaultValue);
-	if (m_type == "string_list") return boost::get<StringList>(m_value) == boost::get<StringList>(m_defaultValue);
+bool ConfigItem::isDefaultImpl(ConfigItem::Value const& defaultValue) const {
+	if (m_type == "bool") return boost::get<bool>(m_value) == boost::get<bool>(defaultValue);
+	if (m_type == "int") return boost::get<int>(m_value) == boost::get<int>(defaultValue);
+	if (m_type == "float") return boost::get<double>(m_value) == boost::get<double>(defaultValue);
+	if (m_type == "string") return boost::get<std::string>(m_value) == boost::get<std::string>(defaultValue);
+	if (m_type == "string_list") return boost::get<StringList>(m_value) == boost::get<StringList>(defaultValue);
 	throw std::logic_error("ConfigItem::is_default doesn't know type '" + m_type + "'");
 }
 
@@ -67,6 +72,8 @@ namespace {
 		fmter % boost::io::group(std::setprecision(precision), double(m) * boost::get<T>(value));
 		return fmter.str();
 	}
+	
+	fs::path origin;  // The primary shared data folder
 }
 
 std::string ConfigItem::getValue() const {
@@ -189,19 +196,22 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) {
 			m_longDesc = elem2.get_content();
 		}
 	}
+	if (mode < 1) m_factoryDefaultValue = m_defaultValue = m_value;
 	if (mode < 2) m_defaultValue = m_value;
 }
 
-fs::path userConfFile = getHomeDir() / ".config" / "performous.xml";
+fs::path systemConfFile = "/etc/xdg/performous/config.xml";
+fs::path userConfFile = getHomeDir() / ".config" / "performous" / "config.xml";
 
-void writeConfig() {
-	std::cout << "Saving configuration file \"" << userConfFile << "\"" << std::endl;
+void writeConfig(bool system) {
 	xmlpp::Document doc;
 	xmlpp::Node* nodeRoot = doc.create_root_node("performous");
-	for(std::map<std::string, ConfigItem>::iterator it = config.begin(); it != config.end(); ++it) {
+	bool dirty = false;
+	for (Config::iterator it = config.begin(); it != config.end(); ++it) {
 		ConfigItem& item = it->second;
 		std::string name = it->first;
-		if (item.is_default()) continue; // No need to save settings with default values
+		if (item.isDefault(system)) continue; // No need to save settings with default values
+		dirty = true;
 		xmlpp::Element* entryNode = nodeRoot->add_child("entry");
 		entryNode->set_attribute("name", name);
 		std::string type = item.get_type();
@@ -218,7 +228,26 @@ void writeConfig() {
 			}
 		}
 	}
-	doc.write_to_file_formatted(userConfFile.string(), "UTF-8");
+	fs::path const& conf = system ? systemConfFile : userConfFile;
+	std::string tmp = conf.string() + "tmp";
+	try {
+		create_directory(conf.parent_path());
+		if (dirty) doc.write_to_file_formatted(tmp, "UTF-8");
+		if (exists(conf)) remove(conf);
+		if (dirty) {
+			rename(tmp, conf);
+			std::cerr << "Saved configuration to \"" << conf << "\"" << std::endl;
+		} else {
+			std::cerr << "Using default settings, no configuration file needed." << std::endl;
+		}
+	} catch (...) {
+		throw std::runtime_error("Unable to save " + conf.string());
+	}
+	if (!system) return;
+	// Tell the items that we have changed the system default
+	for (Config::iterator it = config.begin(); it != config.end(); ++it) it->second.makeSystem();
+	// User config is no longer needed
+	if (exists(userConfFile)) remove(userConfFile);
 }
 
 ConfigMenu configMenu;
@@ -233,7 +262,7 @@ void readMenuXML(xmlpp::Node* node) {
 }
 
 void readConfigXML(fs::path const& file, int mode) {
-	if (!boost::filesystem::exists(file)) {
+	if (!fs::exists(file)) {
 		std::cout << "Skipping " << file << " (not found)" << std::endl;
 		return;
 	}
@@ -278,35 +307,31 @@ void readConfigXML(fs::path const& file, int mode) {
 	}
 }
 
+#define CONFIG_SCHEMA "/config/schema.xml"  // Relative to shared data path. Update readConfig and actual file location if you change this
+
 void readConfig() {
 	// Find config schema
 	std::string schemafile;
 	{
 		typedef std::vector<std::string> ConfigList;
 		ConfigList config_list;
-		char const* env_data_dir = getenv("PERFORMOUS_DATA_DIR");
-		if (env_data_dir) {
-			std::string config_file(env_data_dir);
-			config_file.append("/config/performous.xml");
-			config_list.push_back(config_file);
-		}
-		config_list.push_back("/usr/local/share/games/performous/config/performous.xml");
-		config_list.push_back("/usr/local/share/performous/config/performous.xml");
-		config_list.push_back("/usr/share/games/performous/config/performous.xml");
-		config_list.push_back("/usr/share/performous/config/performous.xml");
-		config_list.push_back("../config/performous.xml");  // For Windows where program is started in bin/
-		ConfigList::const_iterator it = std::find_if(config_list.begin(), config_list.end(), static_cast<bool(&)(boost::filesystem::path const&)>(boost::filesystem::exists));
+		char const* root = getenv("PERFORMOUS_ROOT");
+		if (root) config_list.push_back(std::string(root) + "/" SHARED_DATA_DIR CONFIG_SCHEMA);
+		fs::path exec = plugin::execname();
+		if (!exec.empty()) config_list.push_back(exec.parent_path().string() + "/../" SHARED_DATA_DIR CONFIG_SCHEMA);
+		ConfigList::const_iterator it = std::find_if(config_list.begin(), config_list.end(), static_cast<bool(&)(fs::path const&)>(fs::exists));
 		if (it == config_list.end()) {
 			std::ostringstream oss;
 			oss << "No config schema file found. The following locations were tried:\n";
 			std::copy(config_list.begin(), config_list.end(), std::ostream_iterator<std::string>(oss, "\n"));
-			oss << "Install the file or define environment variable PERFORMOUS_DATA_DIR\n";
+			oss << "Install the file or define environment variable PERFORMOUS_ROOT\n";
 			throw std::runtime_error(oss.str());
 		}
 		schemafile = *it;
+		origin = fs::path(schemafile).parent_path().parent_path(); // Assuming that two times parent from config file = origin
 	}
 	readConfigXML(schemafile, 0);  // Read schema and defaults
-	readConfigXML("/etc/xdg/performous/performous.xml", 1);  // Update defaults with system config
+	readConfigXML(systemConfFile, 1);  // Update defaults with system config
 	readConfigXML(userConfFile, 2);  // Read user settings
 }
 

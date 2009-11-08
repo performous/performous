@@ -76,6 +76,8 @@ class SongParser {
 				it->notePrev += shift;
 			}
 		}
+		// Set begin/end times
+		if (!s.notes.empty()) s.beginTime = s.notes.front().begin, s.endTime = s.notes.back().end;
 		m_song.m_scoreFactor = 1.0 / m_maxScore;
 	}
   private:

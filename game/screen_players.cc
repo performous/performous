@@ -112,8 +112,7 @@ void ScreenPlayers::draw() {
 		// Format the song information text
 		if (m_search.text.empty()) {
 			oss_song << "No players found!";
-			oss_order << "Check " << m_players.file() << "\n";
-			oss_order << "directory for players\n";
+			// oss_order << "Check " << m_players.file() << "\n" << "directory for players\n";
 			oss_order << "Enter a name to create a new player.";
 		} else {
 			oss_song << "Press enter to create player!";

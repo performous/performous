@@ -9,7 +9,8 @@
 #include <list>
 #include <boost/format.hpp>
 
-LayoutSinger::LayoutSinger(Song &_song, Players& _players, boost::shared_ptr<ThemeSing> _theme): m_song(_song), m_noteGraph(_song),m_lyricit(_song.notes.begin()), m_lyrics(), m_players(_players), m_theme(_theme) {
+LayoutSinger::LayoutSinger(Song &_song, Players& _players, boost::shared_ptr<ThemeSing> _theme):
+  m_song(_song), m_noteGraph(_song),m_lyricit(_song.notes.begin()), m_lyrics(), m_players(_players), m_theme(_theme) {
 	m_score_text[0].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_score_text[1].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_score_text[2].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
@@ -33,7 +34,10 @@ void LayoutSinger::drawScore(Position position) {
 	for (std::list<Player>::const_iterator p = m_players.cur.begin(); p != m_players.cur.end(); ++p, ++i) {
 		float act = p->activity();
 		if (act == 0.0f) continue;
-		glColor4f(p->m_color.r, p->m_color.g, p->m_color.b,act);
+		float r = p->m_color.r;
+		float g = p->m_color.g;
+		float b = p->m_color.b;
+		glColor4f(r, g, b,act);
 		switch(position) {
 			case LayoutSinger::BOTTOM:
 				m_player_icon->dimensions.left(-0.5 + 0.01 + 0.25 * i).fixedWidth(0.075).screenTop(0.055);
@@ -53,22 +57,26 @@ void LayoutSinger::drawScore(Position position) {
 				break;
 		}
 		m_score_text[i%4]->draw();
-		// Give some feedback on how well the last lyricss row went
-		if (p->m_maxLineScore > 0) {
+		// Give some feedback on how well the last lyrics row went
+		float fact = p->m_feedbackFader.get();
+		if (p->m_prevLineScore > 0.5 && fact > 0) {
 			std::string prevLineRank;
-			if (p->m_prevLineScore > 0.9) { prevLineRank = "Perfect"; glColor4f(0.5, 1.0, 0.0, act); }
-			else if (p->m_prevLineScore > 0.8) { prevLineRank = "Excellent"; glColor4f(0.2, 0.8, 0.2, act); }
-			else if (p->m_prevLineScore > 0.6) { prevLineRank = "Good"; glColor4f(0.6, 1.0, 0.2, act); }
-			else if (p->m_prevLineScore > 0.5) { prevLineRank = "Ok"; glColor4f(0.6, 1.0, 0.2, act); }
-			else if (p->m_prevLineScore > 0.3) { prevLineRank = "Poor"; glColor4f(0.6, 0.8, 0.2, act); }
-			else { prevLineRank = "Horrible"; glColor4f(0.5, 0.5, 0.3, act); }
+			float fzoom = 3.0 / (2.0 + fact);
+			float rank = 0.0f;
+			if (p->m_prevLineScore > 0.95) { prevLineRank = "Perfect"; rank = 1.0f; }
+			else if (p->m_prevLineScore > 0.9) { prevLineRank = "Excellent"; rank = 0.8f; }
+			else if (p->m_prevLineScore > 0.8) { prevLineRank = "Great"; rank = 0.6f; }
+			else if (p->m_prevLineScore > 0.6) { prevLineRank = "Good"; rank = 0.3f; }
+			else if (p->m_prevLineScore > 0.4) { prevLineRank = "OK"; rank = 0.0f; }
+			float base = 0.2f * (1.0f - rank);
+			glColor4f(base + r * rank, base + g * rank, base + b * rank, fact);
 			m_line_rank_text[i%4]->render(prevLineRank);
 			switch(position) {
 				case LayoutSinger::BOTTOM:
-					m_line_rank_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.055).screenTop(0.11);
+					m_line_rank_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.055*fzoom).screenTop(0.11);
 					break;
 				case LayoutSinger::MIDDLE:
-					m_line_rank_text[i%4]->dimensions().right(0.45).fixedHeight(0.04).screenTop(0.060 + 0.050 * i);
+					m_line_rank_text[i%4]->dimensions().right(0.45).fixedHeight(0.04*fzoom).screenTop(0.060 + 0.050 * i);
 					break;
 			}
 			m_line_rank_text[i%4]->draw();

@@ -29,6 +29,7 @@ Players::~Players() {
 }
 
 void Players::load() {
+	if (!exists(m_filename)) return;
 	xmlpp::DomParser domParser(m_filename.string());
 	xmlpp::NodeSet n = domParser.get_document()->get_root_node()->find("/performous/players/player");
 
@@ -64,6 +65,7 @@ void Players::save() {
 		}
 	}
 
+	create_directory(m_filename.parent_path());
 	doc.write_to_file_formatted(m_filename.string(), "UTF-8");
 }
 

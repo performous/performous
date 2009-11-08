@@ -73,6 +73,7 @@ class Song: boost::noncopyable {
 	std::vector<double> pitchPitchGraph; ///< pitch of pitch graph
 	std::vector<double> volumePitchGraph; ///< volume of pitch graph
 	std::vector<bool> drawPitchGraph; ///< if pitch graph should be drawn
+	double beginTime, endTime; ///< the period where there are notes
 	double m_scoreFactor; ///< Normalization factor for the scoring system
 };
 

@@ -13,7 +13,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 	message(STATUS "GCC detected, adding compile flags")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++98 -Wall -Wextra")
 	if(NOT WIN32)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -fvisibility=hidden -fvisibility-inlines-hidden")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 	endif(NOT WIN32)
 endif(CMAKE_COMPILER_IS_GNUCXX)
 

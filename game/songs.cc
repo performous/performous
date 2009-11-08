@@ -134,7 +134,6 @@ void Songs::randomize_internal() {
 	rnd::mt19937 gen(gendev);  // Make Mersenne Twister random number generator, seeded with random_device.
 	for (SongVector::const_iterator it = m_filtered.begin(); it != m_filtered.end(); ++it) (*it)->randomIdx = gen();
 	*/
-	std::srand(std::time(NULL));
 	// Assign the songs randomIdx that is used for sorting in the "random" mode
 	for (SongVector::const_iterator it = m_filtered.begin(); it != m_filtered.end(); ++it) (*it)->randomIdx = std::rand();
 	m_order = 0;  // Use randomIdx sort mode

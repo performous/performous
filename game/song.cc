@@ -1,6 +1,7 @@
 #include "song.hh"
 
 #include "songparser.hh"
+#include "util.hh"
 #include <limits>
 #include <algorithm>
 
@@ -25,6 +26,7 @@ void Song::reload(bool errorIgnore) {
 	noteMax = std::numeric_limits<int>::min();
 	videoGap = 0.0;
 	start = 0.0;
+	beginTime = endTime = getNaN();
 	m_scoreFactor = 0.0;
 	try { SongParser(*this); } catch (...) { if (!errorIgnore) throw; }
 	collateUpdate();

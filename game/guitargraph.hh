@@ -49,13 +49,14 @@ class GuitarGraph {
 	/** draws GuitarGraph
 	 * @param time at which time to draw
 	 */
+	void updateNeck();
 	void draw(double time);
 	void engine();
 	void position(double cx, double width) { m_cx.setTarget(cx); m_width.setTarget(width); }
 	double dead(double time) const { return time > -0.5 && m_dead > 50; }
 	unsigned stream() const { return m_stream; }
 	double correctness() const { return m_correctness.get(); }
-	std::string getTrackIndex() const { return m_track_index; }
+	std::string getTrackIndex() const { return m_track_index->first; }
 	int getScore() const { return m_score * m_scoreFactor; }
   private:
 	void fail(double time, int fret);
@@ -67,12 +68,12 @@ class GuitarGraph {
 	Texture m_button_l;
 	Surface m_tap;
 	AnimValue m_hit[6];
-	boost::ptr_map<std::string,Texture> m_necks;
+	boost::scoped_ptr<Texture> m_neck;
 	bool m_drums;
 	AnimValue m_cx, m_width;
-	std::string m_track_index;
 	std::size_t m_stream;
 	TrackMapConstPtr m_track_map;
+	TrackMapConstPtr::const_iterator m_track_index;
 	void drumHit(double time, int pad);
 	void guitarPlay(double time, input::Event const& ev);
 	enum Difficulty {
@@ -99,7 +100,8 @@ class GuitarGraph {
 	glutil::Color const& color(int fret) const;
 	void drawBar(double time, float h);
 	void drawNote(int fret, glutil::Color, float tBeg, float tEnd, float whammy = 0);
-	void difficultyAuto();
+	void nextTrack();
+	void difficultyAuto(bool tryKeepCurrent = false);
 	bool difficulty(Difficulty level);
 	SvgTxtTheme m_text;
 	void updateChords();

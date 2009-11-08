@@ -15,14 +15,16 @@ class ConfigItem {
 	void update(xmlpp::Element& elem, int mode); ///< Load XML config file, elem = Entry, mode = 0 for schema, 1 for system config and 2 for user config
 	ConfigItem& operator++() { return incdec(1); } ///< increments config value
 	ConfigItem& operator--() { return incdec(-1); } ///< decrements config value
-	bool is_default() const; ///< Is the current value the same as the default value
+	/// Is the current value the same as the default value (factory setting or system setting)
+	bool isDefault(bool factory = false) const { return isDefaultImpl(factory ? m_factoryDefaultValue : m_defaultValue); }
 	std::string get_type() const { return m_type; } ///< get the field type
 	int& i(); ///< Access integer item
 	bool& b(); ///< Access boolean item
 	double& f(); ///< Access floating-point item
 	std::string& s(); ///< Access string item
 	StringList& sl(); ///< Access stringlist item
-	void reset() { m_value = m_defaultValue; } ///< Reset to factory default
+	void reset(bool factory = false) { m_value = factory ? m_factoryDefaultValue : m_defaultValue; } ///< Reset to default
+	void makeSystem() { m_defaultValue = m_value; } ///< Make current value the system default (used when saving system config)
 	std::string getValue() const; ///< Get a human-readable representation of the current value
 	std::string const& getShortDesc() const { return m_shortDesc; } ///< get the short description for this ConfigItem
 	std::string const& getLongDesc() const { return m_longDesc; } ///< get the long description for this ConfigItem
@@ -36,8 +38,10 @@ class ConfigItem {
 	std::string m_longDesc;
 
 	typedef boost::variant<bool, int, double, std::string, StringList> Value;
+	bool isDefaultImpl(Value const& defaultValue) const;
 	Value m_value; ///< The current value
-	Value m_defaultValue; ///< The value from factory/system config
+	Value m_factoryDefaultValue; ///< The value from config schema
+	Value m_defaultValue; ///< The value from config schema or system config
 	boost::variant<int, double> m_step, m_min, m_max;
 	boost::variant<int, double> m_multiplier;
 	std::string m_unit;
@@ -49,8 +53,8 @@ extern Config config; ///< A global variable that contains all config items
 /** Read config schema and configuration from XML files **/
 void readConfig();
 
-/** Write modified config options to user's config XML **/
-void writeConfig();
+/** Write modified config options to user's or system-wide config XML **/
+void writeConfig(bool system = false);
 
 /// struct for entries in menu
 struct MenuEntry {

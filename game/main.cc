@@ -4,6 +4,7 @@
 #include "screen.hh"
 #include "joystick.hh"
 #include "songs.hh"
+#include "backgrounds.hh"
 #include "xtime.hh"
 #include "video_driver.hh"
 
@@ -26,6 +27,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <cstdlib>
 
 volatile bool g_quit = false;
 
@@ -139,13 +141,14 @@ void mainLoop() {
 		Capture capture;
 		Audio audio;
 		audioSetup(capture, audio);
+		Backgrounds backgrounds;
 		Songs songs(songlist);
-		Players players(getHomeDir() / ".config" / "performous-players.xml");
+		Players players(getHomeDir() / ".config" / "performous" / "players.xml");
 		ScreenManager sm;
 		Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());
 		sm.addScreen(new ScreenIntro("Intro", audio, capture));
 		sm.addScreen(new ScreenSongs("Songs", audio, songs));
-		sm.addScreen(new ScreenSing("Sing", audio, capture, players));
+		sm.addScreen(new ScreenSing("Sing", audio, capture, players, backgrounds));
 		sm.addScreen(new ScreenPractice("Practice", audio, capture));
 		sm.addScreen(new ScreenConfiguration("Configuration", audio));
 		sm.addScreen(new ScreenPlayers("Players", audio, players));
@@ -155,21 +158,25 @@ void mainLoop() {
 		boost::xtime time = now();
 		unsigned frames = 0;
 		while (!sm.isFinished()) {
-			checkEvents_SDL(sm, window);
-			window.blank();
-			sm.getCurrentScreen()->draw();
-			window.swap();
-			if (config["graphic/fps"].b()) {
-				++frames;
-				if (now() - time > 1.0) {
-					std::cout << frames << " FPS" << std::endl;
-					time += 1.0;
+			try {
+				checkEvents_SDL(sm, window);
+				window.blank();
+				sm.getCurrentScreen()->draw();
+				window.swap();
+				if (config["graphic/fps"].b()) {
+					++frames;
+					if (now() - time > 1.0) {
+						std::cout << frames << " FPS" << std::endl;
+						time += 1.0;
+						frames = 0;
+					}
+				} else {
+					boost::thread::sleep(time + 0.01); // Max 100 FPS
+					time = now();
 					frames = 0;
 				}
-			} else {
-				boost::thread::sleep(time + 0.01); // Max 100 FPS
-				time = now();
-				frames = 0;
+			} catch (std::runtime_error& e) {
+				std::cerr << "ERROR: " << e.what() << std::endl;
 			}
 		}
 	} catch (std::exception& e) {
@@ -191,6 +198,7 @@ int main(int argc, char** argv) {
 	std::signal(SIGINT, quit);
 	std::signal(SIGTERM, quit);
 	std::ios::sync_with_stdio(false);  // We do not use C stdio
+	std::srand(std::time(NULL));
 	// Parse commandline options
 	std::vector<std::string> mics;
 	std::vector<std::string> pdevs;
@@ -271,8 +279,6 @@ int main(int argc, char** argv) {
 	// Read config files
 	try {
 		readConfig();
-		char const* env_data_dir = getenv("PERFORMOUS_DATA_DIR");
-		if(env_data_dir) config["system/path_data"].sl().insert(config["system/path_data"].sl().begin(),std::string(env_data_dir));
 	} catch (std::exception& e) {
 		std::cerr << e.what() << std::endl;
 		return EXIT_FAILURE;
