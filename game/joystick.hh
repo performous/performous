@@ -16,7 +16,7 @@
 #endif
 
 namespace input {
-	enum DevType { GUITAR, DRUMS };
+	enum DevType { GUITAR, DRUMS, DANCEPAD };
 
 	static const std::size_t BUTTONS = 6;
 
