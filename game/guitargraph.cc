@@ -522,7 +522,6 @@ void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, fl
 			vertexPair(x, y, c, 1.0f);
 			y -= 2 * fretWid;
 			vertexPair(x, y, c, 0.5f);
-
 		}
 		// Render the middle
 		UseTexture tblock(m_button_l);
@@ -555,6 +554,7 @@ void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, fl
 
 void GuitarGraph::drawBar(double time, float h) {
 	glutil::Begin block(GL_TRIANGLE_STRIP);
+	glNormal3f(0.0f, 1.0f, 0.0f);
 	glVertex2f(-2.5f, time2y(time + h));
 	glVertex2f(2.5f, time2y(time + h));
 	glVertex2f(-2.5f, time2y(time - h));
