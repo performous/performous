@@ -512,7 +512,7 @@ void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, fl
 		float y = yBeg + fretWid;
 		if (m_use3d) {
 			y -= fretWid;
-			glColor4fv(c);
+			c.a = clamp(time2a(tBeg)*2.0f,0.0f,1.0f); glColor4fv(c);
 			obj->draw(x, y, 0.0f);
 			y -= fretWid;
 		} else {
@@ -542,7 +542,7 @@ void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, fl
 	} else {
 		// Too short note: only render the ring
 		if (m_use3d) {
-			glColor4fv(c);
+			c.a = clamp(time2a(tBeg)*2.0f,0.0f,1.0f); glColor4fv(c);
 			obj->draw(x, time2y(tBeg), 0.0f);
 		} else {
 			c.a = time2a(tBeg); glColor4fv(c);
