@@ -118,6 +118,12 @@ to save the current settings to XML.
 			<long>Allows completely disabling background videos. It is recommended to leave this enabled as Performous will still smoothly fade out the video if your computer is not fast enough.</long>
 		</locale>
 	</entry>
+	<entry name="graphic/3d_notes" type="bool" value="true">
+		<locale name="C">
+			<short>3D notes</short>
+			<long>Draw instrument notes as 3-dimensional objects. May hurt performance on older hardware.</long>
+		</locale>
+	</entry>
 	<entry name="graphic/svg_lod" type="float" value="1.0">
 		<ui unit="x" />
 		<limits min="0.5" max="3.0" step="0.1" />
