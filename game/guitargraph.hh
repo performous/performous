@@ -9,6 +9,7 @@
 #include "joystick.hh"
 #include "surface.hh"
 #include "opengl_text.hh"
+#include "3dobject.hh"
 
 class Song;
 
@@ -67,6 +68,8 @@ class GuitarGraph {
 	Surface m_button;
 	Texture m_button_l;
 	Surface m_tap;
+	Object3d m_fretObj;
+	Object3d m_tappableObj;
 	AnimValue m_hit[6];
 	boost::scoped_ptr<Texture> m_neck;
 	bool m_drums;
@@ -99,7 +102,7 @@ class GuitarGraph {
 	int m_dead;
 	glutil::Color const& color(int fret) const;
 	void drawBar(double time, float h);
-	void drawNote(int fret, glutil::Color, float tBeg, float tEnd, float whammy = 0);
+	void drawNote(int fret, glutil::Color, float tBeg, float tEnd, float whammy = 0, bool tappable = false);
 	void nextTrack();
 	void difficultyAuto(bool tryKeepCurrent = false);
 	bool difficulty(Difficulty level);
