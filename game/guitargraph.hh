@@ -73,6 +73,7 @@ class GuitarGraph {
 	AnimValue m_hit[6];
 	boost::scoped_ptr<Texture> m_neck;
 	bool m_drums;
+	bool m_use3d;
 	AnimValue m_cx, m_width;
 	std::size_t m_stream;
 	TrackMapConstPtr m_track_map;
