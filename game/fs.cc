@@ -31,10 +31,9 @@ std::string getThemePath(std::string const& filename) {
 	if (theme.empty()) throw std::runtime_error("Configuration value game/theme is empty");
 	// Figure out theme folder (if theme name rather than path was given)
 	if (theme.find('/') == std::string::npos) {
-		ConfigItem::StringList sd = config["system/path_data"].sl();
+		ConfigItem::StringList sd = config["system/path_themes"].sl();
 		for (std::vector<std::string>::const_iterator it = sd.begin(); it != sd.end(); ++it) {
 			fs::path p = *it;
-			p /= "themes/";
 			p /= theme;
 			if (fs::is_directory(p)) { theme = p.string(); break; }
 		}
@@ -44,26 +43,10 @@ std::string getThemePath(std::string const& filename) {
 }
 
 std::string getDataPath(std::string const& filename) {
-	// Figure out theme folder (if theme name rather than path was given)
-	std::string data_dir;
-	ConfigItem::StringList sd = config["system/path_data"].sl();
-	for (std::vector<std::string>::const_iterator it = sd.begin(); it != sd.end(); ++it) {
-		fs::path p = *it;
-		p = pathMangle(p);
-		if (fs::is_directory(p)) { data_dir = p.string(); break; }
+	char const* env_data_dir = getenv("PERFORMOUS_DATA_DIR");
+	if (env_data_dir) {
+		return std::string(env_data_dir)+filename;
+	} else {
+		return std::string(filename);
 	}
-	return data_dir + "/" + filename;
 }
-
-std::string getSharePath(std::string const& filename) {
-	// Figure out theme folder (if theme name rather than path was given)
-	std::string data_dir;
-	ConfigItem::StringList sd = config["system/path_share"].sl();
-	for (std::vector<std::string>::const_iterator it = sd.begin(); it != sd.end(); ++it) {
-		fs::path p = *it;
-		p = pathMangle(p);
-		if (fs::is_directory(p)) { data_dir = p.string(); break; }
-	}
-	return data_dir + "/" + filename;
-}
-

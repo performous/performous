@@ -216,16 +216,6 @@ to save the current settings to XML.
 	</entry>
 
 	<!-- System preferences -->
-	<entry name="system/path_data" type="string_list">
-		<stringvalue>/usr/local/share/games/performous/</stringvalue>
-		<stringvalue>/usr/share/games/performous/</stringvalue>
-		<stringvalue>../</stringvalue><!-- For Windows where the program is started in bin/ -->
-		<stringvalue>~/.performous/</stringvalue>
-		<locale name="C">
-			<short>Data folders</short>
-			<long>Where Performous data are stored.</long>
-		</locale>
-	</entry>
 	<entry name="system/path_songs" type="string_list">
 		<stringvalue>/usr/local/share/games/ultrastar/songs/</stringvalue>
 		<stringvalue>/usr/share/games/ultrastar/songs/</stringvalue>
@@ -236,13 +226,14 @@ to save the current settings to XML.
 			<long>Where to recursively look for songs.</long>
 		</locale>
 	</entry>
-	<entry name="system/path_share" type="string_list">
-		<stringvalue>~/.local/share/performous</stringvalue>
-		<stringvalue>../share</stringvalue><!-- For Windows where the program is started in bin/ -->
-		<stringvalue>~/.performous/share</stringvalue>
+	<entry name="system/path_themes" type="string_list">
+		<stringvalue>/usr/local/share/games/performous/themes</stringvalue>
+		<stringvalue>/usr/share/games/performous/themes</stringvalue>
+		<stringvalue>../themes/</stringvalue><!-- For Windows where the program is started in bin/ -->
+		<stringvalue>~/.performous/themes/</stringvalue>
 		<locale name="C">
-			<short>Data folders</short>
-			<long>Where Performous data are stored.</long>
+			<short>Theme folders</short>
+			<long>Where to look for themes.</long>
 		</locale>
 	</entry>
 	<entry name="system/path_pictures" type="string_list">

@@ -337,8 +337,7 @@ void readConfig() {
 	// Adding some default pathes
 	char const* env_data_dir = getenv("PERFORMOUS_DATA_DIR");
 	if (env_data_dir) {
-		config["system/path_data"].sl().push_back(std::string(env_data_dir));
-		config["system/path_share"].sl().push_back(std::string(env_data_dir));
+		config["system/path_themes"].sl().push_back(std::string(env_data_dir) + "/themes/");
 		config["system/path_songs"].sl().push_back(std::string(env_data_dir) + "/songs/");
 		config["system/path_pictures"].sl().push_back(std::string(env_data_dir) + "/pictures/");
 		config["system/path_backgrounds"].sl().push_back(std::string(env_data_dir) + "/backgrounds/");
