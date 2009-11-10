@@ -1,4 +1,4 @@
-#include "highscore.hh"
+#include "hiscore.hh"
 
 #include "unicode.hh"
 
@@ -6,6 +6,11 @@
 #include <boost/algorithm/string.hpp>
 #include <sstream>
 #include <algorithm>
+
+
+Hiscore::Hiscore()
+{}
+
 
 SongHiscore::SongHiscore (std::string const& path_, std::string const& filename_) :
 	m_path(path_),

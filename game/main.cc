@@ -5,6 +5,7 @@
 #include "joystick.hh"
 #include "songs.hh"
 #include "backgrounds.hh"
+#include "database.hh"
 #include "xtime.hh"
 #include "video_driver.hh"
 
@@ -15,7 +16,7 @@
 #include "screen_practice.hh"
 #include "screen_configuration.hh"
 #include "screen_players.hh"
-#include "screen_highscore.hh"
+#include "screen_hiscore.hh"
 
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
@@ -143,16 +144,16 @@ void mainLoop() {
 		audioSetup(capture, audio);
 		Backgrounds backgrounds;
 		Songs songs(songlist);
-		Players players(getHomeDir() / ".config" / "performous" / "players.xml");
+		Database database(getHomeDir() / ".config" / "performous" / "database.xml");
 		ScreenManager sm;
 		Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());
 		sm.addScreen(new ScreenIntro("Intro", audio, capture));
 		sm.addScreen(new ScreenSongs("Songs", audio, songs));
-		sm.addScreen(new ScreenSing("Sing", audio, capture, players, backgrounds));
+		sm.addScreen(new ScreenSing("Sing", audio, capture, database.m_players, backgrounds));
 		sm.addScreen(new ScreenPractice("Practice", audio, capture));
 		sm.addScreen(new ScreenConfiguration("Configuration", audio));
-		sm.addScreen(new ScreenPlayers("Players", audio, players));
-		sm.addScreen(new ScreenHiscore("Hiscore", audio, players));
+		sm.addScreen(new ScreenPlayers("Players", audio, database.m_players));
+		sm.addScreen(new ScreenHiscore("Hiscore", audio, database.m_players));
 		sm.activateScreen("Intro");
 		// Main loop
 		boost::xtime time = now();

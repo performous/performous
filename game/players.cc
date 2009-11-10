@@ -9,29 +9,19 @@
 #include <boost/regex.hpp>
 #include <libxml++/libxml++.h>
 
-Players::Players(fs::path filename):
+Players::Players():
 	m_players(),
 	m_filtered(),
-	m_filename(filename),
 	m_filter(),
 	math_cover(),
 	m_dirty(false),
 	cur()
-{
-	try { load(); }
-	catch(...) { std::cerr << "Could not load " << file() << ", will create" << std::endl; }
-	m_filtered = m_players;
-}
+{ }
 
-Players::~Players() {
-	try { save(); }
-	catch (...) { std::cerr << "Could not save players to " << file() << std::endl; }
-}
+Players::~Players()
+{ }
 
-void Players::load() {
-	if (!exists(m_filename)) return;
-	xmlpp::DomParser domParser(m_filename.string());
-	xmlpp::NodeSet n = domParser.get_document()->get_root_node()->find("/performous/players/player");
+void Players::load(xmlpp::NodeSet n) {
 
 	for (xmlpp::NodeSet::const_iterator it = n.begin(); it != n.end(); ++it)
 	{
@@ -49,11 +39,7 @@ void Players::load() {
 	}
 }
 
-void Players::save() {
-	xmlpp::Document doc;
-	xmlpp::Node* nodeRoot = doc.create_root_node("performous");
-	xmlpp::Element *players = nodeRoot->add_child("players");
-
+void Players::save(xmlpp::Element *players) {
 	for (players_t::const_iterator it = m_players.begin(); it!=m_players.end(); ++it)
 	{
 		xmlpp::Element* player = players->add_child("player");
@@ -64,17 +50,10 @@ void Players::save() {
 			picture->add_child_text(it->picture);
 		}
 	}
-
-	create_directory(m_filename.parent_path());
-	doc.write_to_file_formatted(m_filename.string(), "UTF-8");
 }
 
 void Players::update() {
 	if (m_dirty) filter_internal();
-}
-
-std::string Players::file() {
-	return m_filename.string();
 }
 
 void Players::addPlayer (std::string const& name, std::string const& picture) {
@@ -137,21 +116,3 @@ void Players::filter_internal() {
 	}
 	math_cover.setTarget(pos, size());
 }
-
-
-/*
-#include <iostream>
-
-int main(int argc, char** argv)
-{
-	Players p("players.xml");
-	p.addPlayer("hubert");
-
-	for (size_t i=0; i<p.size(); i++)
-	{
-		std::cout << p[i].name << " picture: " << p[i].picture << std::endl;
-	}
-
-	return 0;
-}
-*/

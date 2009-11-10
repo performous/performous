@@ -59,7 +59,8 @@ void ScreenPlayers::manageEvent(SDL_Event event) {
 	int key = keysym.sym;
 	SDLMod mod = event.key.keysym.mod;
 
-	if (key == SDLK_r && mod & KMOD_CTRL) { m_players.reload(); m_players.setFilter(m_search.text); }
+	//TODO: reload -- needs database reload
+	// if (key == SDLK_r && mod & KMOD_CTRL) { m_players.reload(); m_players.setFilter(m_search.text); }
 	if (m_search.process(keysym)) m_players.setFilter(m_search.text);
 	else if (key == SDLK_ESCAPE) {
 		if (m_search.text.empty()) { sm->activateScreen("Songs"); return; }

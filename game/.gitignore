@@ -1,6 +1,15 @@
+*~
+
 .ctags
 Makefile
+
+config.hh
+
+database
+performous.xml
+
 highscore
 highscore.txt
+
 players
 players.xml

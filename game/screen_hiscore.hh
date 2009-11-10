@@ -10,7 +10,7 @@
 #include "theme.hh"
 #include "video.hh"
 #include "players.hh"
-#include "highscore.hh"
+#include "hiscore.hh"
 
 class Audio;
 

@@ -7,7 +7,7 @@
 #include "textinput.hh"
 #include "theme.hh"
 #include "video.hh"
-#include "highscore.hh"
+#include "hiscore.hh"
 #include "layout_singer.hh"
 
 class Audio;

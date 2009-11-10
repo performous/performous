@@ -1,7 +1,7 @@
 #include "screen_songs.hh"
 
 #include "screen_sing.hh"
-#include "screen_highscore.hh"
+#include "screen_hiscore.hh"
 #include "configuration.hh"
 #include "util.hh"
 #include "songs.hh"

@@ -1,4 +1,5 @@
 #pragma once
+
 #include <vector>
 #include <string>
 
@@ -7,6 +8,8 @@
 #include "player.hh"
 #include "animvalue.hh"
 #include "fs.hh"
+
+namespace xmlpp { class Node; class Element; typedef std::vector<Node*>NodeSet; }
 
 
 /**A collection of all Players.
@@ -23,7 +26,6 @@ class Players: boost::noncopyable {
 	players_t m_players;
 	players_t m_filtered;
 
-	fs::path m_filename;
 	std::string m_filter;
 	AnimAcceleration math_cover;
 
@@ -34,19 +36,14 @@ class Players: boost::noncopyable {
 	cur_scores_t scores;
 
   public:
-	Players(fs::path filename);
+	Players();
 	~Players();
 
-	void load();
-	void reload()
-	{
-		m_players.clear();
-		load();
-	}
-	void save();
+	void load(xmlpp::NodeSet n);
+	void save(xmlpp::Element *players);
+
 	void update();
-	/**Returns the path to which file is used*/
-	std::string file();
+
 	void addPlayer (std::string const& name, std::string const& picture = "");
 
 	/// const array access
