@@ -7,6 +7,7 @@ config.hh
 
 database
 performous.xml
+database.xml
 
 highscore
 highscore.txt
