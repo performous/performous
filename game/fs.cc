@@ -37,7 +37,7 @@ std::string getThemePath(std::string const& filename) {
 			p /= theme;
 			if (fs::is_directory(p)) { theme = p.string(); break; }
 		}
-    }
+	}
 	if (*theme.rbegin() == '/') theme.erase(theme.size() - 1); // Remove trailing slash
 	return theme + "/" + filename;
 }
