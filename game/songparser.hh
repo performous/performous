@@ -94,6 +94,10 @@ class SongParser {
 	bool txtParseNote(std::string line);
 	bool iniCheck(std::vector<char> const& data);
 	void iniParse();
+	bool smCheck(std::vector<char> const& data);
+	void smParse();
+	bool smParseField(std::string& line);
+	bool smParseNote(std::string& line);
 	double m_prevtime;
 	unsigned int m_prevts;
 	unsigned int m_relativeShift;
