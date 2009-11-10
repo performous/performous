@@ -354,28 +354,6 @@ glutil::Color const& GuitarGraph::color(int fret) const {
 	return fretColors[fret];
 }
 
-namespace {
-	void enableLighting() {
-		glClear(GL_DEPTH_BUFFER_BIT);
-		glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-		
-		GLfloat light_position[] = { -50.0, 15.0, -5.0, 1.0 };
-		glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-		
-		glEnable(GL_DEPTH_TEST);
-		glEnable(GL_LIGHTING);
-		glEnable(GL_COLOR_MATERIAL);
-		glEnable(GL_LIGHT0);
-	}
-
-	void disableLighting() {
-		glDisable(GL_LIGHT0);
-		glDisable(GL_COLOR_MATERIAL);
-		glDisable(GL_LIGHTING);
-		glDisable(GL_DEPTH_TEST);
-	}
-}
-
 void GuitarGraph::draw(double time) {
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
 	dimensions.screenBottom().middle(m_cx.get()).fixedWidth(m_width.get());
@@ -423,7 +401,7 @@ void GuitarGraph::draw(double time) {
 		}
 	}
 	// Draw the notes
-	if (m_use3d) enableLighting();
+	glutil::UseLighting lighting(m_use3d);
 	for (Chords::const_iterator it = m_chords.begin(); it != m_chords.end(); ++it) {
 		float tBeg = it->begin - time;
 		float tEnd = it->end - time;
@@ -481,7 +459,6 @@ void GuitarGraph::draw(double time) {
 			m_tap.draw();
 		}
 	}
-	if (m_use3d) disableLighting();
 	glColor3f(1.0f, 1.0f, 1.0f);
 }
 
