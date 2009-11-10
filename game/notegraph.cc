@@ -86,6 +86,12 @@ void NoteGraph::draw(double time, Players const& players, Position position) {
 		case NoteGraph::TOP:
 			dimensions.stretch(1.0, 0.25).bottom(0.0);
 			break;
+		case NoteGraph::LEFT:
+			dimensions.stretch(0.50, 0.50).bottom(0.0);
+			break;
+		case NoteGraph::RIGHT:
+			dimensions.stretch(0.50, 0.50).bottom(0.0);
+			break;
 	}
 	m_max = m_nlTop.get() + 7.0;
 	m_min = m_nlBottom.get() - 7.0;
