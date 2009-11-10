@@ -1,0 +1,19 @@
+<performous>
+	<songs> <!-- a list of songs -->
+		<song id="123" artist="ABBA" title="Dancing Queen">
+			<!-- extra song details -->
+		</song>
+	</songs>
+	<players> <!-- a list of players -->
+		<player id="123" name="Markus">
+			<picture>markus.jpg</picture> <!-- optional picture shown at players selection -->
+		</player>
+	</players>
+	<hiscores> <!-- a list of highscores -->
+		<hiscore songid="123" playerid="123" track="VOCALS">600</hiscore>
+	</hiscores>
+</performous>
+<!--
+id of songs: collateByTitle (?)
+id of players: ?
+-->
