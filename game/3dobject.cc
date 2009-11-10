@@ -87,6 +87,7 @@ void Object3d::loadWavefrontObj(std::string filepath, float scale) {
 
 
 void Object3d::generateDisplayList() {
+	if (m_displist != 0) glDeleteLists(m_displist, 1);
 	m_displist = glGenLists(1);
 	glutil::DisplayList displist(m_displist, GL_COMPILE);
 	//UseTexture tex(*m_texture);

@@ -5,6 +5,7 @@
 #include "3dobject.hh"
 #include <cmath>
 #include <cstdlib>
+#include <stdexcept>
 
 #include <boost/lexical_cast.hpp>
 
@@ -51,8 +52,6 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
   m_button("button.svg"),
   m_button_l("button_l.svg"),
   m_tap("tap.svg"),
-  m_fretObj(getThemePath("fret.obj"), 1.0f),
-  m_tappableObj(getThemePath("fret_tap.obj"), 1.0f),
   m_drums(track=="drums"),
   m_use3d(config["graphic/3d_notes"].b()),
   m_cx(0.0, 0.2),
@@ -68,6 +67,13 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
   m_streak(),
   m_longestStreak()
 {
+	try {
+		m_fretObj.load(getThemePath("fret.obj"));
+		m_tappableObj.load(getThemePath("fret_tap.obj"));
+	} catch (std::exception const& e) {
+		std::cout << e.what() << std::endl;
+		m_use3d = false;
+	}
 	unsigned int sr = m_audio.getSR();
 	if (g_samplesD.empty()) {
 		g_samplesD.push_back(Sample(getDataPath("sounds/drum_bass.ogg"), sr));

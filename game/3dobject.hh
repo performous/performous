@@ -47,15 +47,19 @@ class Object3d: boost::noncopyable {
 	void generateDisplayList();
   public:
 	/// constructors
-	Object3d();
+	Object3d(): m_displist(0) {};
 	Object3d(std::string filepath, float scale = 1.0): m_displist(0) {
-		//m_texture.reset(new Texture("button.svg"));
-		loadWavefrontObj(filepath, scale);
-		generateDisplayList();
+		load(filepath, scale);
 	}
 	/// destructor
 	~Object3d() {
 		if (m_displist != 0) glDeleteLists(m_displist, 1);
+	}
+	/// load a new object file
+	void load(std::string filepath, float scale = 1.0) {
+		//m_texture.reset(new Texture("button.svg"));
+		loadWavefrontObj(filepath, scale);
+		generateDisplayList();
 	}
 	/// draws the object
 	void draw(float x = 0, float y = 0, float z = 0) const {
