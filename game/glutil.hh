@@ -24,6 +24,13 @@ namespace glutil {
 		~Begin() { glEnd(); }
 	};
 
+	/// wrapper struct for RAII
+	struct DisplayList {
+		/// call glNewList with given list id and mode
+		DisplayList(GLuint id, GLenum mode) { glNewList(id, mode); }
+		~DisplayList() { glEndList(); }
+	};
+
 	/// struct to store color information
 	struct Color {
 		float r, ///< red component
