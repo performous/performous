@@ -22,7 +22,6 @@ Players::~Players()
 { }
 
 void Players::load(xmlpp::NodeSet n) {
-
 	for (xmlpp::NodeSet::const_iterator it = n.begin(); it != n.end(); ++it)
 	{
 		xmlpp::Element& element = dynamic_cast<xmlpp::Element&>(**it);
@@ -64,6 +63,7 @@ void Players::addPlayer (std::string const& name, std::string const& picture) {
 
 	if (pi.picture != "") // no picture, so don't search path
 	{
+		/* TODO: add again
 		ConfigItem::StringList const& sl = config["system/path_pictures"].sl();
 		typedef std::set<fs::path> dirs;
 		dirs d;
@@ -76,6 +76,7 @@ void Players::addPlayer (std::string const& name, std::string const& picture) {
 
 		if (pi.path != "") std::cout << "Found " << pi.picture << " in " << pi.path << std::endl;
 		else std::cout << "Not found " << pi.picture << std::endl;
+		*/
 	}
 
 

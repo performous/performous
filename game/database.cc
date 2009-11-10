@@ -8,12 +8,17 @@ Database::Database(fs::path filename) :
 	m_filename(filename)
 {
 	try { load(); }
-	catch(...) { std::cerr << "Could not load " << file() << ", will create" << std::endl; }
+	catch(std::exception const& e) {
+		std::cerr << "Could not load " << file() << ": " << e.what() << std::endl;
+		std::cerr << "will try to create" << std::endl;
+	}
 }
 
 Database::~Database() {
 	try { save(); }
-	catch (...) { std::cerr << "Could not save players to " << file() << std::endl; }
+	catch (std::exception const& e) {
+		std::cerr << "Could not save " << file() << ": " << e.what() << std::endl;
+	}
 }
 
 void Database::load() {
@@ -31,7 +36,11 @@ void Database::save() {
 
 	m_players.save(players);
 
-	create_directory(m_filename.parent_path());
+	if (!exists(m_filename.parent_path()) && !m_filename.parent_path().empty())
+	{
+		std::cout << "Will create directory: " << m_filename.parent_path() << std::endl;
+		create_directory(m_filename.parent_path());
+	}
 	doc.write_to_file_formatted(m_filename.string(), "UTF-8");
 }
 
@@ -39,9 +48,8 @@ std::string Database::file() {
 	return m_filename.string();
 }
 
-/*
-
 // Test program for Database
 int main()
-{}
-*/
+{
+	Database ("database.xml");
+}
