@@ -31,6 +31,9 @@ void Database::load() {
 
 	xmlpp::NodeSet hiscores = nodeRoot->find("/performous/hiscores/hiscore");
 	m_hiscores.load(hiscores);
+
+	xmlpp::NodeSet songs = nodeRoot->find("/performous/songs/song");
+	m_songs.load(songs);
 }
 
 void Database::save() {
@@ -42,6 +45,9 @@ void Database::save() {
 
 	xmlpp::Element *hiscores = nodeRoot->add_child("hiscores");
 	m_hiscores.save(hiscores);
+
+	xmlpp::Element *songs = nodeRoot->add_child("songs");
+	m_songs.save(songs);
 
 	if (!exists(m_filename.parent_path()) && !m_filename.parent_path().empty())
 	{

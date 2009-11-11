@@ -4,6 +4,7 @@
 
 #include "players.hh"
 #include "hiscore.hh"
+#include "songitems.hh"
 
 #include "fs.hh"
 
@@ -23,7 +24,7 @@ public:
 	  @exception xmlpp exceptions may be thrown on any parse errors
 	  @exception PlayersException if some conditions of players fail (e.g. no id)
 	  @exception HiscoreException if some hiscore conditions fail (e.g. score too high)
-	  @exception SongsExceptions if some songs conditions fail (e.g. no id)
+	  @exception SongItemsExceptions if some songs conditions fail (e.g. no id)
 	  @post filled database
 	  */
 	void load();
@@ -41,4 +42,5 @@ private:
 
 	Players m_players;
 	Hiscore m_hiscores;
+	SongItems m_songs;
 };

@@ -4,12 +4,13 @@
 #include <list>
 #include <vector>
 #include <string>
+#include <stdexcept>
 
 #include <boost/noncopyable.hpp>
 
+#include "fs.hh"
 #include "player.hh"
 #include "animvalue.hh"
-#include "fs.hh"
 
 namespace xmlpp { class Node; class Element; typedef std::vector<Node*>NodeSet; }
 
