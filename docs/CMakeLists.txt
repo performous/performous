@@ -7,7 +7,7 @@ if(UNIX)
 	if(HELP2MAN AND GZIP)
 		set(MANFILE ${CMAKE_CURRENT_BINARY_DIR}/performous.6.gz)
 		set(H2MFILE ${CMAKE_CURRENT_SOURCE_DIR}/performous.h2m)
-		set(PERFORMOUS_EXEC ${CMAKE_BINARY_DIR}/game/performous.bin)
+		set(PERFORMOUS_EXEC ${CMAKE_BINARY_DIR}/game/performous)
 		add_custom_command(
 			OUTPUT ${MANFILE}
 			COMMAND ${HELP2MAN} ${PERFORMOUS_EXEC} -s 6 -i ${H2MFILE} -N | ${GZIP} > ${MANFILE}
