@@ -29,7 +29,9 @@ void Players::load(xmlpp::NodeSet const& n) {
 	{
 		xmlpp::Element& element = dynamic_cast<xmlpp::Element&>(**it);
 		xmlpp::Attribute* a_name = element.get_attribute("name");
+		if (!a_name) throw PlayersException("Attribute name not found");
 		xmlpp::Attribute* a_id = element.get_attribute("id");
+		if (!a_id) throw PlayersException("Attribute id not found");
 		int id = -1;
 		try {id = boost::lexical_cast<int>(a_id->get_value());} catch (boost::bad_lexical_cast const&) { }
 		xmlpp::NodeSet n2 = element.find("picture");

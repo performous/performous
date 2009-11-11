@@ -13,6 +13,13 @@
 
 namespace xmlpp { class Node; class Element; typedef std::vector<Node*>NodeSet; }
 
+/**Exception which will be thrown when loading or
+  saving Players fails.*/
+struct PlayersException: public std::runtime_error {
+	PlayersException (std::string const& msg) :
+		runtime_error(msg)
+	{}
+};
 
 /**A collection of all Players.
  

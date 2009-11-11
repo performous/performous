@@ -9,13 +9,9 @@ namespace xmlpp { class Node; class Element; typedef std::vector<Node*>NodeSet; 
 /**Exception which will be thrown when loading or
   saving a SongHiscore fails.*/
 struct HiscoreException: public std::runtime_error {
-	HiscoreException (std::string const& msg, unsigned int linenum) :
-		runtime_error(msg), m_linenum(linenum)
+	HiscoreException (std::string const& msg) :
+		runtime_error(msg)
 	{}
-	/**Line information where the problem occured.*/
-	unsigned int line() const {return m_linenum;}
-  private:
-	unsigned int m_linenum;
 };
 
 /**This struct holds together information for a

@@ -4,7 +4,6 @@
 #include <algorithm>
 
 #include <boost/lexical_cast.hpp>
-#include <boost/numeric/conversion/cast.hpp>
 
 #include <libxml++/libxml++.h>
 
@@ -30,18 +29,23 @@ void Hiscore::load(xmlpp::NodeSet const& n)
 	{
 		xmlpp::Element& element = dynamic_cast<xmlpp::Element&>(**it);
 		xmlpp::Attribute* a_playerid = element.get_attribute("playerid");
+		if (!a_playerid) throw HiscoreException("Attribute playerid not found");
 		xmlpp::Attribute* a_songid = element.get_attribute("songid");
+		if (!a_songid) throw HiscoreException("Attribute songid not found");
 		xmlpp::Attribute* a_track = element.get_attribute("track");
 
 		int playerid = boost::lexical_cast<int>(a_playerid->get_value());
 		int songid = boost::lexical_cast<int>(a_songid->get_value());
 
 		xmlpp::TextNode* tn = element.get_child_text();
+		if (!tn) throw HiscoreException("Score not found");
 		int score = boost::lexical_cast<int>(tn->get_content());
-		if (score < 0) throw boost::numeric::negative_overflow();
-		if (score > 10000) throw boost::numeric::positive_overflow();
+		if (score < 0) throw HiscoreException("Score negativ overflow");
+		if (score > 10000) throw HiscoreException("Score positive overflow");
 
-		std::string track = a_track->get_value();
+		std::string track;
+		if (!a_track) track = "VOCALS";
+		else track = a_track->get_value();
 
 		addHiscore(score, playerid, songid, track);
 	}
