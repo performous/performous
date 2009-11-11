@@ -129,6 +129,7 @@ void Songs::randomize() {
 
 void Songs::randomize_internal() {
 	/* TR1-based random number generation
+	TODO: it is enough that random_device is initialized once and not for every randomize_internal
 	namespace rnd = std::tr1;
 	rnd::random_device gendev;  // Random number generator (using /dev/urandom usually)
 	rnd::mt19937 gen(gendev);  // Make Mersenne Twister random number generator, seeded with random_device.
@@ -223,10 +224,6 @@ void Songs::sortChange(int diff) {
 	if (m_order < 0) m_order += orders;
 	RestoreSel restore(*this);
 	sort_internal();
-}
-
-namespace {
-	int rnd(int n) { return rand() % n; }
 }
 
 void Songs::sort_internal() {
