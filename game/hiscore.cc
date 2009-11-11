@@ -10,6 +10,25 @@
 Hiscore::Hiscore()
 {}
 
+bool Hiscore::reachedHiscore(int score, int songid, std::string const& track)
+{
+	if (score < 0) throw HiscoreException("Score negativ overflow");
+	if (score > 10000) throw HiscoreException("Score positive overflow");
+
+	if (score < 500) return false; // come on, did you even try to sing?
+
+	int counter = 0;
+	for (hiscore_t::const_reverse_iterator it = m_hiscore.rbegin(); it != m_hiscore.rend(); ++it)
+	{
+		if (it->songid != songid) continue;
+		if (it->track != track) continue;
+		if (score > it->score) return true; // seems like you are in top 3!
+		else ++counter;
+		if (counter == 3) return false; // not in top 3 -> leave
+	}
+	return true; // nothing found for that song -> true
+}
+
 void Hiscore::addHiscore(int score, int playerid, int songid, std::string const& track)
 {
 	HiscoreItem hi;

@@ -37,6 +37,7 @@ class Database
 	void addPlayer (std::string const& name, std::string const& picture = "", int id = -1);
 	void addSong (boost::shared_ptr<Song> s);
 	void addHiscore (boost::shared_ptr<Song> s);
+	bool reachedHiscore (boost::shared_ptr<Song> s);
 
 	friend int test();
 

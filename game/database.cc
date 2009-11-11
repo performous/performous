@@ -76,6 +76,12 @@ void Database::addHiscore (boost::shared_ptr<Song> s) {
 	m_hiscores.addHiscore(score, playerid, songid);
 }
 
+bool Database::reachedHiscore (boost::shared_ptr<Song> s) {
+	int score = m_players.scores.front();
+	int songid = m_songs.lookup(s);
+	return m_hiscores.reachedHiscore(score, songid);
+}
+
 int test() {
 	Database d("database.xml");
 	d.addPlayer("Markus", "m.jpg");
@@ -87,6 +93,8 @@ int test() {
 	pi.name = "Markus";
 	d.m_players.m_filtered.push_back(pi);
 	d.m_players.scores.push_back(5000);
+
+	if (d.reachedHiscore(s)) std::cout << "Reached a new Hiscore" << std::endl;
 
 	d.addHiscore(s);
 
