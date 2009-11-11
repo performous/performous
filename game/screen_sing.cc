@@ -83,6 +83,14 @@ void ScreenSing::enter() {
 			} catch (std::runtime_error&) { break; }
 		}
 	}
+	// Load dance tracks
+	if ( !m_song->danceTracks.empty() ) {
+		while(1) {
+			try {
+				m_dancers.push_back(new DanceGraph(m_audio, *m_song));
+			} catch (std::runtime_error&) { break; }
+		}
+	}
 	m_audio.playMusic(m_song->music, false, 0.0, m_instruments.empty() ? -1.0 : -8.0); // Startup delay for instruments is longer than for singing only
 }
 
@@ -242,7 +250,9 @@ void ScreenSing::draw() {
 		theme->bg_top.draw();
 	}
 
-	if( m_instruments.empty() ) {
+	if( !m_dancers.empty() ) {
+		m_layout_singer->draw(time, LayoutSinger::LEFT);
+	} else if( m_instruments.empty() ) {
 		m_layout_singer->draw(time, LayoutSinger::BOTTOM);
 	} else {
 		instrumentLayout(time);
