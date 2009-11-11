@@ -54,7 +54,7 @@ class Players: boost::noncopyable {
 
 	bool m_dirty;
 
-	friend int test();
+	friend int test(std::string const&, int);
 
   public:
 	cur_players_t cur;

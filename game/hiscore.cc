@@ -18,7 +18,7 @@ bool Hiscore::reachedHiscore(int score, int songid, std::string const& track)
 	if (score < 500) return false; // come on, did you even try to sing?
 
 	int counter = 0;
-	for (hiscore_t::const_reverse_iterator it = m_hiscore.rbegin(); it != m_hiscore.rend(); ++it)
+	for (hiscore_t::const_iterator it = m_hiscore.begin(); it != m_hiscore.end(); ++it)
 	{
 		if (it->songid != songid) continue;
 		if (it->track != track) continue;

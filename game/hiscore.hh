@@ -24,7 +24,8 @@ struct HiscoreItem {
 
 	std::string track;
 
-	/**Operator for sorting by score.*/
+	/**Operator for sorting by score.
+	 Reverse order, so that highest is first!*/
 	bool operator < (HiscoreItem const& other) const
 	{
 		return other.score < score;

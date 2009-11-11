@@ -39,7 +39,7 @@ class Database
 	void addHiscore (boost::shared_ptr<Song> s);
 	bool reachedHiscore (boost::shared_ptr<Song> s);
 
-	friend int test();
+	friend int test(std::string const&, int);
 
   private:
 	fs::path m_filename;

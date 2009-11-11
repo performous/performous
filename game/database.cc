@@ -82,25 +82,35 @@ bool Database::reachedHiscore (boost::shared_ptr<Song> s) {
 	return m_hiscores.reachedHiscore(score, songid);
 }
 
-int test() {
+int test(std::string const& name, int score) {
 	Database d("database.xml");
-	d.addPlayer("Markus", "m.jpg");
+	// d.addPlayer("Markus", "m.jpg");
 
 	boost::shared_ptr<Song> s(new Song("/usr/share/songs/ABBA/ABBA - Dancing Queen/", "ABBA - Dancing Queen.txt"));
 	d.addSong(s);
 
 	PlayerItem pi;
-	pi.name = "Markus";
+	pi.name = name;
 	d.m_players.m_filtered.push_back(pi);
-	d.m_players.scores.push_back(5000);
+	d.m_players.scores.push_back(score);
 
-	if (d.reachedHiscore(s)) std::cout << "Reached a new Hiscore" << std::endl;
-
-	d.addHiscore(s);
+	if (d.reachedHiscore(s))
+	{
+		std::cout << "Reached a new Hiscore" << std::endl;
+		d.addHiscore(s);
+	}
 
 	return 0;
 }
 
-int main() {
-	return test();
+#include "boost/lexical_cast.hpp"
+
+int main(int argc, char**argv) {
+
+	if (argc < 3) return 3;
+
+	std::string name = argv[1];
+	int score = boost::lexical_cast<int>(argv[2]);
+
+	return test(name, score);
 }
