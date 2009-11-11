@@ -76,13 +76,23 @@ void Database::addHiscore (boost::shared_ptr<Song> s) {
 	m_hiscores.addHiscore(score, playerid, songid);
 }
 
-// Test program for Database
-int main() {
+int test() {
 	Database d("database.xml");
 	d.addPlayer("Markus", "m.jpg");
 
 	boost::shared_ptr<Song> s(new Song("/usr/share/songs/ABBA/ABBA - Dancing Queen/", "ABBA - Dancing Queen.txt"));
 	d.addSong(s);
 
+	PlayerItem pi;
+	pi.name = "Markus";
+	d.m_players.m_filtered.push_back(pi);
+	d.m_players.scores.push_back(5000);
+
 	d.addHiscore(s);
+
+	return 0;
+}
+
+int main() {
+	return test();
 }

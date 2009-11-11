@@ -38,6 +38,8 @@ class Database
 	void addSong (boost::shared_ptr<Song> s);
 	void addHiscore (boost::shared_ptr<Song> s);
 
+	friend int test();
+
   private:
 	fs::path m_filename;
 
