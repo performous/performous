@@ -2,6 +2,7 @@
 
 #include <glibmm/ustring.h>
 #include <glibmm/convert.h>
+#include <sstream>
 
 void convertToUTF8( std::stringstream &_stream, std::string _filename ) {
 	try {
