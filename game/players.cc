@@ -69,6 +69,9 @@ void Players::addPlayer (std::string const& name, std::string const& picture, in
 	pi.picture = picture;
 	pi.path = "";
 
+
+	if (pi.id == -1) pi.id = assign_id_internal();
+
 	if (pi.picture != "") // no picture, so don't search path
 	{
 		/* TODO: add again check for pictures
@@ -87,12 +90,13 @@ void Players::addPlayer (std::string const& name, std::string const& picture, in
 		*/
 	}
 
-
-	players_t::const_iterator it =  std::find(m_players.begin(), m_players.end(), pi);
-	if (it != m_players.end()) return; // dont do anything, player exists
-
 	m_dirty = true;
-	m_players.push_back(pi);
+	std::pair<players_t::iterator, bool> ret = m_players.insert(pi);
+	if (!ret.second)
+	{
+		pi.id = assign_id_internal();
+		m_players.insert(pi); // now do the insert with the fresh id
+	}
 }
 
 void Players::setFilter(std::string const& val) {
@@ -101,25 +105,32 @@ void Players::setFilter(std::string const& val) {
 	filter_internal();
 }
 
+int Players::assign_id_internal()
+{
+	players_t::const_reverse_iterator it = m_players.rbegin();
+	if (it != m_players.rend()) return it->id+1;
+	else return 1; // empty set
+}
+
 void Players::filter_internal() {
 	m_dirty = false;
 	PlayerItem selection = current();
 
 	try {
-		players_t filtered;
+		fplayers_t filtered;
 		for (players_t::const_iterator it = m_players.begin(); it != m_players.end(); ++it) {
 			if (regex_search(it->name, boost::regex(m_filter, boost::regex_constants::icase))) filtered.push_back(*it);
 		}
 		m_filtered.swap(filtered);
 	} catch (...) {
-		players_t(m_players.begin(), m_players.end()).swap(m_filtered);  // Invalid regex => copy everything
+		fplayers_t(m_players.begin(), m_players.end()).swap(m_filtered);  // Invalid regex => copy everything
 	}
 	math_cover.reset();
 
 	// Restore old selection
 	int pos = 0;
 	if (selection.name != "") {
-		players_t::iterator it = std::find(m_filtered.begin(), m_filtered.end(), selection);
+		fplayers_t::iterator it = std::find(m_filtered.begin(), m_filtered.end(), selection);
 		math_cover.setTarget(0, 0);
 		if (it != m_filtered.end()) pos = it - m_filtered.begin();
 	}

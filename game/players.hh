@@ -1,5 +1,7 @@
 #pragma once
 
+#include <set>
+#include <list>
 #include <vector>
 #include <string>
 
@@ -18,13 +20,14 @@ namespace xmlpp { class Node; class Element; typedef std::vector<Node*>NodeSet; 
  be retrieved with Engine::getPlayers().*/
 class Players: boost::noncopyable {
   private:
-	typedef std::vector<PlayerItem> players_t;
+	typedef std::set<PlayerItem> players_t;
+	typedef std::vector<PlayerItem> fplayers_t;
 	typedef std::list<Player> cur_players_t;
 	typedef std::list<int> cur_scores_t;
 
   private:
 	players_t m_players;
-	players_t m_filtered;
+	fplayers_t m_filtered;
 
 	std::string m_filter;
 	AnimAcceleration math_cover;
@@ -43,6 +46,7 @@ class Players: boost::noncopyable {
 	void save(xmlpp::Element *players);
 
 	void update();
+
 
 	/// add a player with a displayed name and an optional picture; if no id is given one will be assigned
 	void addPlayer (std::string const& name, std::string const& picture = "", int id = -1);
@@ -80,5 +84,6 @@ class Players: boost::noncopyable {
 	/// filters playerlist by regular expression
 	void setFilter(std::string const& regex);
   private:
+	int assign_id_internal(); /// returns the next available id
 	void filter_internal();
 };

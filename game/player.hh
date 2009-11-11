@@ -75,6 +75,15 @@ struct PlayerItem {
 	std::map<std::string, int> scores; /// map between a Song and the highest score the Player achieved
 */
 
+	/**For insertion in set.
+	 Provides ordering and ensures id is unique.*/
+	bool operator< (PlayerItem const& pi) const
+	{
+		return id < pi.id;
+	}
+
+	/**Checks if a player has the same name.
+	  Used to find a PlayerItem with the same name.*/
 	bool operator== (PlayerItem const& pi) const
 	{
 		return name == pi.name;
