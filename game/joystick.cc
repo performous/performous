@@ -78,15 +78,14 @@ void input::SDL::init_devices() {
 	}
 }
 
-// Needs at least Boost 1.36 and many systems don't have that: #include <boost/spirit/include/classic_core.hpp>
-#include <boost/spirit/core.hpp>
+#include <boost/spirit/include/classic_core.hpp>
 
 void input::SDL::init() {
 	unsigned int sdl_id;
 	std::string instrument_type;
 	std::map<unsigned int, input::Private::Type> forced_type;
 
-	using namespace boost::spirit; //::classic;
+	using namespace boost::spirit::classic;
 	rule<> type = str_p("GUITAR_GUITARHERO") | "GUITAR_ROCKBAND" | "DRUMS_GUITARHERO" | "DRUMS_ROCKBAND";
 	rule<> entry = uint_p[assign_a(sdl_id)] >> ":" >> (type)[assign_a(instrument_type)];
 
@@ -119,10 +118,10 @@ void input::SDL::init() {
 			continue;
 		}
 		input::SDL::sdl_devices[i] = joy;
-		std::cout << SDL_JoystickNumAxes(joy) << std::endl;
-		std::cout << SDL_JoystickNumBalls(joy) << std::endl;
-		std::cout << SDL_JoystickNumButtons(joy) << std::endl;
-		std::cout << SDL_JoystickNumHats(joy) << std::endl;
+		std::cout << "  Axes: " << SDL_JoystickNumAxes(joy);
+		std::cout << ", Balls: " << SDL_JoystickNumBalls(joy);
+		std::cout << ", Buttons: " << SDL_JoystickNumButtons(joy);
+		std::cout << ", Hats: " << SDL_JoystickNumHats(joy) << std::endl;
 		if( forced_type.find(i) != forced_type.end() ) {
 			switch(forced_type[i]) {
 				case input::Private::GUITAR_GH:
@@ -163,7 +162,7 @@ void input::SDL::init() {
 	// Here we should send an event to have correct state buttons
 	init_devices();
 	// Adding keyboard instrument
-	std::cout << "Keyboard as guitar controller: " << (config["game/keyboard_guitar"].b() ? "disabled":"enabled") << std::endl;
+	std::cout << "Keyboard as guitar controller: " << (config["game/keyboard_guitar"].b() ? "enabled":"disabled") << std::endl;
 	input::SDL::sdl_devices[input::Private::KEYBOARD_ID] = NULL;
 	input::Private::devices[input::Private::KEYBOARD_ID] = input::Private::InputDevPrivate(input::Private::GUITAR_GH);
 }

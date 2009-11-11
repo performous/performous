@@ -7,11 +7,11 @@ Dimensions dimensions; // Make a public member variable
 
 NoteGraph::NoteGraph(Song const& song):
   m_song(song),
-  m_notelines("notelines.svg"),
-  m_wave("wave.png"),
-  m_notebar("notebar.svg"), m_notebar_hl("notebar.png"),
-  m_notebarfs("notebarfs.svg"), m_notebarfs_hl("notebarfs-hl.png"),
-  m_notebargold("notebargold.svg"), m_notebargold_hl("notebargold.png"),
+  m_notelines(getThemePath("notelines.svg")),
+  m_wave(getThemePath("wave.png")),
+  m_notebar(getThemePath("notebar.svg")), m_notebar_hl(getThemePath("notebar.png")),
+  m_notebarfs(getThemePath("notebarfs.svg")), m_notebarfs_hl(getThemePath("notebarfs-hl.png")),
+  m_notebargold(getThemePath("notebargold.svg")), m_notebargold_hl(getThemePath("notebargold.png")),
   m_notealpha(0.0f), m_nlTop(0.0, 4.0), m_nlBottom(0.0, 4.0), m_time()
 {
 	dimensions.stretch(1.0, 0.5); // Initial dimensions, probably overridden from somewhere

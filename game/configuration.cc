@@ -333,14 +333,4 @@ void readConfig() {
 	readConfigXML(schemafile, 0);  // Read schema and defaults
 	readConfigXML(systemConfFile, 1);  // Update defaults with system config
 	readConfigXML(userConfFile, 2);  // Read user settings
-
-	// Adding some default pathes
-	char const* env_data_dir = getenv("PERFORMOUS_DATA_DIR");
-	if (env_data_dir) {
-		config["system/path_themes"].sl().insert(config["system/path_themes"].sl().begin(), std::string(env_data_dir) + "/themes/");
-		config["system/path_songs"].sl().insert(config["system/path_songs"].sl().begin(), std::string(env_data_dir) + "/songs/");
-		config["system/path_pictures"].sl().insert(config["system/path_pictures"].sl().begin(), std::string(env_data_dir) + "/pictures/");
-		config["system/path_backgrounds"].sl().insert(config["system/path_backgrounds"].sl().begin(), std::string(env_data_dir) + "/backgrounds/");
-	}
 }
-

@@ -57,7 +57,7 @@ class Object3d: boost::noncopyable {
 	}
 	/// load a new object file
 	void load(std::string filepath, float scale = 1.0) {
-		//m_texture.reset(new Texture("button.svg"));
+		//m_texture.reset(new Texture(getThemePath("button.svg")));
 		loadWavefrontObj(filepath, scale);
 		generateDisplayList();
 	}

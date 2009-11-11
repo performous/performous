@@ -49,9 +49,9 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
   m_audio(audio),
   m_input(track=="drums" ? input::DRUMS : input::GUITAR),
   m_song(song),
-  m_button("button.svg"),
-  m_button_l("button_l.svg"),
-  m_tap("tap.svg"),
+  m_button(getThemePath("button.svg")),
+  m_button_l(getThemePath("button_l.svg")),
+  m_tap(getThemePath("tap.svg")),
   m_drums(track=="drums"),
   m_use3d(config["graphic/3d_notes"].b()),
   m_cx(0.0, 0.2),
@@ -76,18 +76,18 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
 	}
 	unsigned int sr = m_audio.getSR();
 	if (g_samplesD.empty()) {
-		g_samplesD.push_back(Sample(getDataPath("sounds/drum_bass.ogg"), sr));
-		g_samplesD.push_back(Sample(getDataPath("sounds/drum_snare.ogg"), sr));
-		g_samplesD.push_back(Sample(getDataPath("sounds/drum_hi-hat.ogg"), sr));
-		g_samplesD.push_back(Sample(getDataPath("sounds/drum_tom1.ogg"), sr));
-		g_samplesD.push_back(Sample(getDataPath("sounds/drum_cymbal.ogg"), sr));
-		//g_samplesD.push_back(Sample(getDataPath("sounds/drum_tom2.ogg"), sr));
-		g_samplesG.push_back(Sample(getDataPath("sounds/guitar_fail1.ogg"), sr));
-		g_samplesG.push_back(Sample(getDataPath("sounds/guitar_fail2.ogg"), sr));
-		g_samplesG.push_back(Sample(getDataPath("sounds/guitar_fail3.ogg"), sr));
-		g_samplesG.push_back(Sample(getDataPath("sounds/guitar_fail4.ogg"), sr));
-		g_samplesG.push_back(Sample(getDataPath("sounds/guitar_fail5.ogg"), sr));
-		g_samplesG.push_back(Sample(getDataPath("sounds/guitar_fail6.ogg"), sr));
+		g_samplesD.push_back(Sample(getXdgPath("sounds/drum_bass.ogg"), sr));
+		g_samplesD.push_back(Sample(getXdgPath("sounds/drum_snare.ogg"), sr));
+		g_samplesD.push_back(Sample(getXdgPath("sounds/drum_hi-hat.ogg"), sr));
+		g_samplesD.push_back(Sample(getXdgPath("sounds/drum_tom1.ogg"), sr));
+		g_samplesD.push_back(Sample(getXdgPath("sounds/drum_cymbal.ogg"), sr));
+		//g_samplesD.push_back(Sample(getXdgPath("sounds/drum_tom2.ogg"), sr));
+		g_samplesG.push_back(Sample(getXdgPath("sounds/guitar_fail1.ogg"), sr));
+		g_samplesG.push_back(Sample(getXdgPath("sounds/guitar_fail2.ogg"), sr));
+		g_samplesG.push_back(Sample(getXdgPath("sounds/guitar_fail3.ogg"), sr));
+		g_samplesG.push_back(Sample(getXdgPath("sounds/guitar_fail4.ogg"), sr));
+		g_samplesG.push_back(Sample(getXdgPath("sounds/guitar_fail5.ogg"), sr));
+		g_samplesG.push_back(Sample(getXdgPath("sounds/guitar_fail6.ogg"), sr));
 	}
 	unsigned int i = 0;
 	for (TrackMap::const_iterator it = m_song.track_map.begin(); it != m_song.track_map.end(); ++it,++i) {
@@ -106,9 +106,9 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
 void GuitarGraph::updateNeck() {
 	// TODO: Optimize with texture cache
 	std::string index = m_track_index->first;
-	if (index == "drums") m_neck.reset(new Texture("drumneck.svg"));
-	else if (index == "bass") m_neck.reset(new Texture("bassneck.svg"));
-	else m_neck.reset(new Texture("guitarneck.svg"));
+	if (index == "drums") m_neck.reset(new Texture(getThemePath("drumneck.svg")));
+	else if (index == "bass") m_neck.reset(new Texture(getThemePath("bassneck.svg")));
+	else m_neck.reset(new Texture(getThemePath("guitarneck.svg")));
 }
 
 void GuitarGraph::engine() {
