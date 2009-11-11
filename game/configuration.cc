@@ -334,4 +334,3 @@ void readConfig() {
 	readConfigXML(systemConfFile, 1);  // Update defaults with system config
 	readConfigXML(userConfFile, 2);  // Read user settings
 }
-

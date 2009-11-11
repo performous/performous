@@ -5,6 +5,7 @@
 #include "3dobject.hh"
 #include <cmath>
 #include <cstdlib>
+#include <stdexcept>
 
 #include <boost/lexical_cast.hpp>
 
@@ -48,11 +49,9 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
   m_audio(audio),
   m_input(track=="drums" ? input::DRUMS : input::GUITAR),
   m_song(song),
-  m_button("button.svg"),
-  m_button_l("button_l.svg"),
-  m_tap("tap.svg"),
-  m_fretObj(getThemePath("fret.obj"), 1.0f),
-  m_tappableObj(getThemePath("fret_tap.obj"), 1.0f),
+  m_button(getThemePath("button.svg")),
+  m_button_l(getThemePath("button_l.svg")),
+  m_tap(getThemePath("tap.svg")),
   m_drums(track=="drums"),
   m_use3d(config["graphic/3d_notes"].b()),
   m_cx(0.0, 0.2),
@@ -68,20 +67,27 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
   m_streak(),
   m_longestStreak()
 {
+	try {
+		m_fretObj.load(getThemePath("fret.obj"));
+		m_tappableObj.load(getThemePath("fret_tap.obj"));
+	} catch (std::exception const& e) {
+		std::cout << e.what() << std::endl;
+		m_use3d = false;
+	}
 	unsigned int sr = m_audio.getSR();
 	if (g_samplesD.empty()) {
-		g_samplesD.push_back(Sample(getDataPath("sounds/drum_bass.ogg"), sr));
-		g_samplesD.push_back(Sample(getDataPath("sounds/drum_snare.ogg"), sr));
-		g_samplesD.push_back(Sample(getDataPath("sounds/drum_hi-hat.ogg"), sr));
-		g_samplesD.push_back(Sample(getDataPath("sounds/drum_tom1.ogg"), sr));
-		g_samplesD.push_back(Sample(getDataPath("sounds/drum_cymbal.ogg"), sr));
-		//g_samplesD.push_back(Sample(getDataPath("sounds/drum_tom2.ogg"), sr));
-		g_samplesG.push_back(Sample(getDataPath("sounds/guitar_fail1.ogg"), sr));
-		g_samplesG.push_back(Sample(getDataPath("sounds/guitar_fail2.ogg"), sr));
-		g_samplesG.push_back(Sample(getDataPath("sounds/guitar_fail3.ogg"), sr));
-		g_samplesG.push_back(Sample(getDataPath("sounds/guitar_fail4.ogg"), sr));
-		g_samplesG.push_back(Sample(getDataPath("sounds/guitar_fail5.ogg"), sr));
-		g_samplesG.push_back(Sample(getDataPath("sounds/guitar_fail6.ogg"), sr));
+		g_samplesD.push_back(Sample(getXdgPath("sounds/drum_bass.ogg"), sr));
+		g_samplesD.push_back(Sample(getXdgPath("sounds/drum_snare.ogg"), sr));
+		g_samplesD.push_back(Sample(getXdgPath("sounds/drum_hi-hat.ogg"), sr));
+		g_samplesD.push_back(Sample(getXdgPath("sounds/drum_tom1.ogg"), sr));
+		g_samplesD.push_back(Sample(getXdgPath("sounds/drum_cymbal.ogg"), sr));
+		//g_samplesD.push_back(Sample(getXdgPath("sounds/drum_tom2.ogg"), sr));
+		g_samplesG.push_back(Sample(getXdgPath("sounds/guitar_fail1.ogg"), sr));
+		g_samplesG.push_back(Sample(getXdgPath("sounds/guitar_fail2.ogg"), sr));
+		g_samplesG.push_back(Sample(getXdgPath("sounds/guitar_fail3.ogg"), sr));
+		g_samplesG.push_back(Sample(getXdgPath("sounds/guitar_fail4.ogg"), sr));
+		g_samplesG.push_back(Sample(getXdgPath("sounds/guitar_fail5.ogg"), sr));
+		g_samplesG.push_back(Sample(getXdgPath("sounds/guitar_fail6.ogg"), sr));
 	}
 	unsigned int i = 0;
 	for (TrackMap::const_iterator it = m_song.track_map.begin(); it != m_song.track_map.end(); ++it,++i) {
@@ -100,9 +106,9 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
 void GuitarGraph::updateNeck() {
 	// TODO: Optimize with texture cache
 	std::string index = m_track_index->first;
-	if (index == "drums") m_neck.reset(new Texture("drumneck.svg"));
-	else if (index == "bass") m_neck.reset(new Texture("bassneck.svg"));
-	else m_neck.reset(new Texture("guitarneck.svg"));
+	if (index == "drums") m_neck.reset(new Texture(getThemePath("drumneck.svg")));
+	else if (index == "bass") m_neck.reset(new Texture(getThemePath("bassneck.svg")));
+	else m_neck.reset(new Texture(getThemePath("guitarneck.svg")));
 }
 
 void GuitarGraph::engine() {
@@ -354,28 +360,6 @@ glutil::Color const& GuitarGraph::color(int fret) const {
 	return fretColors[fret];
 }
 
-namespace {
-	void enableLighting() {
-		glClear(GL_DEPTH_BUFFER_BIT);
-		glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-		
-		GLfloat light_position[] = { -50.0, 15.0, -5.0, 1.0 };
-		glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-		
-		glEnable(GL_DEPTH_TEST);
-		glEnable(GL_LIGHTING);
-		glEnable(GL_COLOR_MATERIAL);
-		glEnable(GL_LIGHT0);
-	}
-
-	void disableLighting() {
-		glDisable(GL_LIGHT0);
-		glDisable(GL_COLOR_MATERIAL);
-		glDisable(GL_LIGHTING);
-		glDisable(GL_DEPTH_TEST);
-	}
-}
-
 void GuitarGraph::draw(double time) {
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
 	dimensions.screenBottom().middle(m_cx.get()).fixedWidth(m_width.get());
@@ -423,7 +407,7 @@ void GuitarGraph::draw(double time) {
 		}
 	}
 	// Draw the notes
-	if (m_use3d) enableLighting();
+	glutil::UseLighting lighting(m_use3d);
 	for (Chords::const_iterator it = m_chords.begin(); it != m_chords.end(); ++it) {
 		float tBeg = it->begin - time;
 		float tEnd = it->end - time;
@@ -481,7 +465,6 @@ void GuitarGraph::draw(double time) {
 			m_tap.draw();
 		}
 	}
-	if (m_use3d) disableLighting();
 	glColor3f(1.0f, 1.0f, 1.0f);
 }
 
