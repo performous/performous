@@ -96,3 +96,20 @@ struct Note {
 
 typedef std::vector<Note> Notes;
 
+
+
+struct DanceTrack {
+	//TODO
+};
+
+enum DanceDifficulty {
+	BEGINNER,
+	EASY,
+	MEDIUM,
+	HARD,
+	CHALLENGE,
+	DIFFICULTYCOUNT
+};
+
+typedef std::map<DanceDifficulty, DanceTrack> DanceDifficultyMap;
+typedef std::map<std::string, DanceDifficultyMap> DanceTracks;

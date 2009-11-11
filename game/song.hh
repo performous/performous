@@ -40,6 +40,7 @@ class Song: boost::noncopyable {
 	int randomIdx; ///< sorting index used for random order
 	Notes notes; ///< notes for song (only used for singing)
 	TrackMap track_map; ///< guitar etc. notes for this song
+	DanceTracks danceTracks; ///< dance tracks
 	// TODO: TEMPORARY TO ALLOW COMPILING
 	std::vector<std::map<int, Note> > d_notes; ///< dance notes
 	// ^
