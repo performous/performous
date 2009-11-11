@@ -59,9 +59,7 @@ bool checkExtension(std::string const& extension) {
 }
 
 template <typename T> void loader(T& target, std::string filename, bool autocrop) {
-	std::string themefilename = getThemePath(filename);
-	if (std::ifstream(themefilename.c_str()).is_open()) filename = themefilename;
-	else if (!std::ifstream(filename.c_str()).is_open()) throw std::runtime_error("File not found: " + filename);
+	if (!std::ifstream(filename.c_str()).is_open()) throw std::runtime_error("File not found: " + filename);
 	if (filename.size() > 4 && filename.substr(filename.size() - 4) == ".svg") {
 		rsvg_init();
 		GError* pError = NULL;

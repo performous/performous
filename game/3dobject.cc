@@ -12,7 +12,6 @@
 #include <cmath>
 
 
-// TODO: use display lists for drawing?
 // TODO: test & fix faces that doesn't have texcoords in the file
 // TODO: group handling for loader
 
@@ -87,7 +86,10 @@ void Object3d::loadWavefrontObj(std::string filepath, float scale) {
 }
 
 
-void Object3d::draw(float x, float y, float z) const {
+void Object3d::generateDisplayList() {
+	if (m_displist != 0) glDeleteLists(m_displist, 1);
+	m_displist = glGenLists(1);
+	glutil::DisplayList displist(m_displist, GL_COMPILE);
 	//UseTexture tex(*m_texture);
 	std::vector<Face>::const_iterator it;
 	// Iterate through faces
@@ -113,9 +115,9 @@ void Object3d::draw(float x, float y, float z) const {
 				m_normals[it->normals[i]].z);
 			// Vertices
 			glVertex3f(
-			  m_vertices[it->vertices[i]].x+x, 
-			  m_vertices[it->vertices[i]].y+y, 
-			  m_vertices[it->vertices[i]].z+z);
+			  m_vertices[it->vertices[i]].x, 
+			  m_vertices[it->vertices[i]].y, 
+			  m_vertices[it->vertices[i]].z);
 		}
 	}
 }
