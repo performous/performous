@@ -10,6 +10,10 @@ endif(CMAKE_COMPILER_IS_GNUCXX)
 
 add_library(plugin++ SHARED src/dll.cc src/execname.cc src/loader.cc)
 
+find_package(Boost 1.36 REQUIRED COMPONENTS filesystem)
+include_directories(${Boost_INCLUDE_DIRS})
+target_link_libraries(plugin++ ${Boost_LIBRARIES})
+
 if(NOT WIN32)
   target_link_libraries(plugin++ dl)
 endif()

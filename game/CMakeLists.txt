@@ -7,7 +7,7 @@ set(SOURCES ${SOURCE_FILES} ${HEADER_FILES})
 
 # Libraries
 
-find_package(Boost 1.34 REQUIRED COMPONENTS thread date_time program_options regex filesystem)
+find_package(Boost 1.36 REQUIRED COMPONENTS thread date_time program_options regex filesystem)
 include_directories(${Boost_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${Boost_LIBRARIES})
 
