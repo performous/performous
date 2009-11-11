@@ -24,7 +24,7 @@ Players::Players():
 Players::~Players()
 { }
 
-void Players::load(xmlpp::NodeSet n) {
+void Players::load(xmlpp::NodeSet const& n) {
 	for (xmlpp::NodeSet::const_iterator it = n.begin(); it != n.end(); ++it)
 	{
 		xmlpp::Element& element = dynamic_cast<xmlpp::Element&>(**it);

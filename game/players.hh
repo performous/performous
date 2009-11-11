@@ -42,7 +42,7 @@ class Players: boost::noncopyable {
 	Players();
 	~Players();
 
-	void load(xmlpp::NodeSet n);
+	void load(xmlpp::NodeSet const& n);
 	void save(xmlpp::Element *players);
 
 	void update();

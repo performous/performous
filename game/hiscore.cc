@@ -24,7 +24,7 @@ void Hiscore::addHiscore(int score, int playerid, int songid, std::string const&
 	m_hiscore.insert(hi);
 }
 
-void Hiscore::load(xmlpp::NodeSet n)
+void Hiscore::load(xmlpp::NodeSet const& n)
 {
 	for (xmlpp::NodeSet::const_iterator it = n.begin(); it != n.end(); ++it)
 	{

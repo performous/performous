@@ -40,7 +40,7 @@ class Hiscore
 public:
 	Hiscore ();
 
-	void load(xmlpp::NodeSet n);
+	void load(xmlpp::NodeSet const& n);
 	void save(xmlpp::Element *players);
 
 	void addHiscore(int score, int playerid, int songid, std::string const& track);
