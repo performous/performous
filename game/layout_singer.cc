@@ -62,21 +62,19 @@ void LayoutSinger::drawScore(Position position) {
 		if (p->m_prevLineScore > 0.5 && fact > 0) {
 			std::string prevLineRank;
 			float fzoom = 3.0 / (2.0 + fact);
-			float rank = 0.0f;
-			if (p->m_prevLineScore > 0.95) { prevLineRank = "Perfect"; rank = 1.0f; }
-			else if (p->m_prevLineScore > 0.9) { prevLineRank = "Excellent"; rank = 0.8f; }
-			else if (p->m_prevLineScore > 0.8) { prevLineRank = "Great"; rank = 0.6f; }
-			else if (p->m_prevLineScore > 0.6) { prevLineRank = "Good"; rank = 0.3f; }
-			else if (p->m_prevLineScore > 0.4) { prevLineRank = "OK"; rank = 0.0f; }
-			float base = 0.2f * (1.0f - rank);
-			glColor4f(base + r * rank, base + g * rank, base + b * rank, fact);
+			if (p->m_prevLineScore > 0.95) prevLineRank = "Perfect";
+			else if (p->m_prevLineScore > 0.9) prevLineRank = "Excellent";
+			else if (p->m_prevLineScore > 0.8) prevLineRank = "Great";
+			else if (p->m_prevLineScore > 0.6) prevLineRank = "Good";
+			else if (p->m_prevLineScore > 0.4) prevLineRank = "OK";
+			glColor4f(r, g, b, clamp(fact*2.0f));
 			m_line_rank_text[i%4]->render(prevLineRank);
 			switch(position) {
 				case LayoutSinger::BOTTOM:
 					m_line_rank_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.055*fzoom).screenTop(0.11);
 					break;
 				case LayoutSinger::MIDDLE:
-					m_line_rank_text[i%4]->dimensions().right(0.45).fixedHeight(0.04*fzoom).screenTop(0.060 + 0.050 * i);
+					m_line_rank_text[i%4]->dimensions().right(0.30).fixedHeight(0.05*fzoom).screenTop(0.025 + 0.050 * i);
 					break;
 			}
 			m_line_rank_text[i%4]->draw();
