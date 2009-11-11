@@ -1,6 +1,7 @@
 #include "fs.hh"
 
 #include "configuration.hh"
+#include <plugin++/execname.hpp>
 #include <cstdlib>
 #include <iostream>
 
@@ -56,6 +57,8 @@ std::string getXdgPath(fs::path const& filename) {
 		} else {
 			dir.push_back(getHomeDir() / ".local" / "share" / "performous" );
 		}
+		// Adding relative path from executable
+		dir.push_back(fs::path(plugin::execname()).parent_path() / ".." / "share" / "performous");
 		// Adding XDG_DATA_DIRS
 		char const* xdg_data_dirs = getenv("XDG_DATA_DIRS");
 		if (xdg_data_dirs) {
