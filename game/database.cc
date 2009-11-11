@@ -66,4 +66,7 @@ int main()
 {
 	Database d("database.xml");
 	d.addPlayer("Markus", "m.jpg");
+
+	boost::shared_ptr<Song> s(new Song("/usr/share/songs/ABBA/ABBA - Dancing Queen/", "ABBA - Dancing Queen.txt"));
+	d.addSong(s);
 }

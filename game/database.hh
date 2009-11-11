@@ -37,6 +37,9 @@ public: // methods for player management
 	void addPlayer (std::string const& name, std::string const& picture = "", int id = -1)
 	{ m_players.addPlayer(name, picture, id); }
 
+	void addSong (boost::shared_ptr<Song>s)
+	{ m_songs.addSong(s); }
+
 private:
 	fs::path m_filename;
 

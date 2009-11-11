@@ -15,7 +15,9 @@ void Song::reload(bool errorIgnore) {
 	title.clear();
 	artist.clear();
 	collateByTitle.clear();
+	collateByTitleOnly.clear();
 	collateByArtist.clear();
+	collateByArtistOnly.clear();
 	text.clear();
 	creator.clear();
 	music.clear();
@@ -34,7 +36,9 @@ void Song::reload(bool errorIgnore) {
 
 void Song::collateUpdate() {
 	collateByTitle = collate(title + artist) + '\0' + filename;
+	collateByTitleOnly = collate(title);
 	collateByArtist = collate(artist + title) + '\0' + filename;
+	collateByArtistOnly = collate(artist);
 }
 
 std::string Song::collate(std::string const& str) {

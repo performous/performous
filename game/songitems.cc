@@ -60,7 +60,7 @@ void SongItems::addSong(boost::shared_ptr<Song> song)
 {
 	for (songs_t::iterator it = m_songs.begin(); it != m_songs.end(); ++it)
 	{
-		if (song->artist == it->artist && song->title == it->title) return;
+		if (song->collateByArtistOnly == it->artist && song->collateByTitleOnly == it->title) return;
 	}
 	addSongItem(song->artist, song->title);
 }
