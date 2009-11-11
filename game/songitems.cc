@@ -1,7 +1,10 @@
 #include "songitems.hh"
 
+#include "unicode.hh"
+
 #include <string>
 
+#include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include <libxml++/libxml++.h>
@@ -22,7 +25,7 @@ void SongItems::load(xmlpp::NodeSet const& n)
 		xmlpp::Attribute* a_title = element.get_attribute("title");
 		if (!a_title) throw SongItemsException("No attribute title");
 
-		addSong(a_artist->get_value(), a_title->get_value(), boost::lexical_cast<int>(a_id->get_value()));
+		addSongItem(a_artist->get_value(), a_title->get_value(), boost::lexical_cast<int>(a_id->get_value()));
 	}
 }
 
@@ -37,13 +40,13 @@ void SongItems::save(xmlpp::Element *songs)
 	}
 }
 
-void SongItems::addSong(std::string const& artist, std::string const& title, int id)
+void SongItems::addSongItem(std::string const& artist, std::string const& title, int id)
 {
 	SongItem si;
 	if (id==-1) id = assign_id_internal();
 	si.id = id;
-	si.artist = artist;
-	si.title = title;
+	si.artist = unicodeCollate(artist);
+	si.title = unicodeCollate(title);
 
 	std::pair<songs_t::iterator, bool> ret = m_songs.insert(si);
 	if (!ret.second)
@@ -51,6 +54,15 @@ void SongItems::addSong(std::string const& artist, std::string const& title, int
 		si.id = assign_id_internal();
 		m_songs.insert(si); // now do the insert with the fresh id
 	}
+}
+
+void SongItems::addSong(boost::shared_ptr<Song> song)
+{
+	for (songs_t::iterator it = m_songs.begin(); it != m_songs.end(); ++it)
+	{
+		if (song->artist == it->artist && song->title == it->title) return;
+	}
+	addSongItem(song->artist, song->title);
 }
 
 int SongItems::assign_id_internal()

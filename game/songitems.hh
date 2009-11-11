@@ -1,9 +1,13 @@
 #pragma once
 
+#include "song.hh"
+
 #include <set>
 #include <vector>
 #include <string>
 #include <stdexcept>
+
+#include <boost/shared_ptr.hpp>
 
 namespace xmlpp { class Node; class Element; typedef std::vector<Node*>NodeSet; }
 
@@ -33,7 +37,17 @@ struct SongItems
 	void load(xmlpp::NodeSet const& n);
 	void save(xmlpp::Element *players);
 
-	void addSong(std::string const& artist, std::string const& title, int id = -1);
+	/**Adds a song item.
+	  If the id is not unique or -1 a new one will be assigned.
+	  There will be no check if artist and title already exist - if you
+	  need that you want addSong().
+	 */
+	void addSongItem(std::string const& artist, std::string const& title, int id = -1);
+	/**Adds or Links an already existing song with an songitem.
+	  The id will be assigned and artist and title will be filled in.
+	  If there is already a song with the same artist and title nothing will be done.
+	  */
+	void addSong(boost::shared_ptr<Song> song);
 
 private:
 	int assign_id_internal();
