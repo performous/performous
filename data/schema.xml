@@ -81,7 +81,7 @@ to save the current settings to XML.
 	<entry name="game/instruments" type="string_list">
 		<!-- Should be SDL_ID:{GUITAR_GUITARHERO|GUITAR_ROCKBAND|DRUMS_GUITARHERO|DRUMS_ROCKBAND}
 		     example:
-			<stringvalue>0:GUITAR_GH</stringvalue>
+			<stringvalue>0:GUITAR_GUITARHERO</stringvalue>
 		-->
 		<locale name="C">
 			<short>Joystick configuration</short>
