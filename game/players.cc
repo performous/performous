@@ -85,20 +85,7 @@ void Players::addPlayer (std::string const& name, std::string const& picture, in
 
 	if (pi.picture != "") // no picture, so don't search path
 	{
-		/* TODO: add again check for pictures
-		ConfigItem::StringList const& sl = config["system/path_pictures"].sl();
-		typedef std::set<fs::path> dirs;
-		dirs d;
-		std::transform(sl.begin(), sl.end(), std::inserter(d, d.end()), pathMangle);
-
-		for (dirs::const_iterator it = d.begin(); it != d.end(); ++it) {
-			if (!fs::exists(*it)) continue; // as long as it does not exists
-			pi.path = it->file_string();
-		}
-
-		if (pi.path != "") std::cout << "Found " << pi.picture << " in " << pi.path << std::endl;
-		else std::cout << "Not found " << pi.picture << std::endl;
-		*/
+		// pi.picture =  getXdgPath(fs::path("pictures") / pi.picture);
 	}
 
 	m_dirty = true;
