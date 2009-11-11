@@ -1,5 +1,6 @@
 project(Performous CXX)
 cmake_minimum_required(VERSION 2.6)
+cmake_policy(VERSION 2.6)
 set(PROJECT_VERSION "0.4-pre5")
 
 # Avoid source tree pollution
