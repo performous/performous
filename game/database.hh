@@ -15,7 +15,7 @@
   the program.*/
 class Database
 {
-public:
+  public:
 	Database (fs::path filename);
 	~Database ();
 
@@ -32,15 +32,13 @@ public:
 
 	std::string file();
 
-public: // methods for player management
+  public: // methods for player management
 
-	void addPlayer (std::string const& name, std::string const& picture = "", int id = -1)
-	{ m_players.addPlayer(name, picture, id); }
+	void addPlayer (std::string const& name, std::string const& picture = "", int id = -1);
+	void addSong (boost::shared_ptr<Song> s);
+	void addHiscore (boost::shared_ptr<Song> s);
 
-	void addSong (boost::shared_ptr<Song>s)
-	{ m_songs.addSong(s); }
-
-private:
+  private:
 	fs::path m_filename;
 
 	Players m_players;

@@ -39,7 +39,7 @@ public:
 	void load(xmlpp::NodeSet const& n);
 	void save(xmlpp::Element *players);
 
-	void addHiscore(int score, int playerid, int songid, std::string const& track);
+	void addHiscore(int score, int playerid, int songid, std::string const& track = "VOCALS");
 private:
 	typedef std::multiset<HiscoreItem>hiscore_t;
 

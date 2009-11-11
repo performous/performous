@@ -32,6 +32,18 @@ struct SongItem
 	}
 };
 
+/**A list of songs for the database.
+
+  Every song has a unique id managed by that database.
+  This class was introduced to hide the implementation
+  detail which data structure is used for the list away.
+
+  Currently a std::set is used, which makes both addSongItem()
+  and addSong() slow. The only advantage is that the id is
+  unique and it is cheap to get a new unique id.
+
+  When one of the methods is to slow, it can be optimized
+  easily. */
 struct SongItems
 {
 	void load(xmlpp::NodeSet const& n);
@@ -46,10 +58,16 @@ struct SongItems
 	/**Adds or Links an already existing song with an songitem.
 	  The id will be assigned and artist and title will be filled in.
 	  If there is already a song with the same artist and title nothing will be done.
+
+	  lookup is used internally to achieve that.
 	  */
 	void addSong(boost::shared_ptr<Song> song);
 
-private:
+	/**Lookup a songid for a specific song.
+	  @return -1 if no song found.*/
+	int lookup(boost::shared_ptr<Song> song);
+
+  private:
 	int assign_id_internal();
 
 	typedef std::set<SongItem> songs_t;

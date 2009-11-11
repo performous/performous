@@ -25,7 +25,19 @@ struct PlayersException: public std::runtime_error {
 /**A collection of all Players.
  
  The current players plugged in a song can
- be retrieved with Engine::getPlayers().*/
+ be retrieved with Engine::getPlayers().
+ 
+ There are 3 different views united in that collection.
+ There is a full players list which are used by the
+ database, but also for the filtering.
+
+ The filtered list is used to show players in
+ the screen_players.
+
+ The current lists (Players and scores) are used
+ to pass the information which players have won
+ to the ScoreScreen and then to the players window.
+ */
 class Players: boost::noncopyable {
   private:
 	typedef std::set<PlayerItem> players_t;
@@ -55,6 +67,8 @@ class Players: boost::noncopyable {
 
 	void update();
 
+	/// lookup a playerid using the players name
+	int lookup(std::string const& name);
 
 	/// add a player with a displayed name and an optional picture; if no id is given one will be assigned
 	void addPlayer (std::string const& name, std::string const& picture = "", int id = -1);

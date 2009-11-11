@@ -10,8 +10,7 @@
 #include <libxml++/libxml++.h>
 
 
-void SongItems::load(xmlpp::NodeSet const& n)
-{
+void SongItems::load(xmlpp::NodeSet const& n) {
 	for (xmlpp::NodeSet::const_iterator it = n.begin(); it != n.end(); ++it)
 	{
 		xmlpp::Element& element = dynamic_cast<xmlpp::Element&>(**it);
@@ -29,8 +28,7 @@ void SongItems::load(xmlpp::NodeSet const& n)
 	}
 }
 
-void SongItems::save(xmlpp::Element *songs)
-{
+void SongItems::save(xmlpp::Element *songs) {
 	for (songs_t::const_iterator it = m_songs.begin(); it != m_songs.end(); ++it)
 	{
 		xmlpp::Element* song = songs->add_child("song");
@@ -40,8 +38,7 @@ void SongItems::save(xmlpp::Element *songs)
 	}
 }
 
-void SongItems::addSongItem(std::string const& artist, std::string const& title, int id)
-{
+void SongItems::addSongItem(std::string const& artist, std::string const& title, int id) {
 	SongItem si;
 	if (id==-1) id = assign_id_internal();
 	si.id = id;
@@ -56,17 +53,19 @@ void SongItems::addSongItem(std::string const& artist, std::string const& title,
 	}
 }
 
-void SongItems::addSong(boost::shared_ptr<Song> song)
-{
-	for (songs_t::iterator it = m_songs.begin(); it != m_songs.end(); ++it)
-	{
-		if (song->collateByArtistOnly == it->artist && song->collateByTitleOnly == it->title) return;
-	}
-	addSongItem(song->artist, song->title);
+void SongItems::addSong(boost::shared_ptr<Song> song) {
+	if (lookup(song) == -1) addSongItem(song->artist, song->title);
 }
 
-int SongItems::assign_id_internal()
-{
+int SongItems::lookup(boost::shared_ptr<Song> song) {
+	for (songs_t::iterator it = m_songs.begin(); it != m_songs.end(); ++it)
+	{
+		if (song->collateByArtistOnly == it->artist && song->collateByTitleOnly == it->title) return it->id;
+	}
+	return -1;
+}
+
+int SongItems::assign_id_internal() {
 	songs_t::const_reverse_iterator it = m_songs.rbegin();
 	if (it != m_songs.rend()) return it->id+1;
 	else return 1; // empty set

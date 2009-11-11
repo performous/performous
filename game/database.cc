@@ -61,12 +61,28 @@ std::string Database::file() {
 	return m_filename.string();
 }
 
+void Database::addPlayer (std::string const& name, std::string const& picture, int id) {
+	m_players.addPlayer(name, picture, id);
+}
+
+void Database::addSong (boost::shared_ptr<Song> s) {
+	m_songs.addSong(s);
+}
+
+void Database::addHiscore (boost::shared_ptr<Song> s) {
+	int playerid = m_players.lookup(m_players.current().name);
+	int score = m_players.scores.front();
+	int songid = m_songs.lookup(s);
+	m_hiscores.addHiscore(score, playerid, songid);
+}
+
 // Test program for Database
-int main()
-{
+int main() {
 	Database d("database.xml");
 	d.addPlayer("Markus", "m.jpg");
 
 	boost::shared_ptr<Song> s(new Song("/usr/share/songs/ABBA/ABBA - Dancing Queen/", "ABBA - Dancing Queen.txt"));
 	d.addSong(s);
+
+	d.addHiscore(s);
 }

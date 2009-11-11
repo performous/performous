@@ -64,6 +64,15 @@ void Players::update() {
 	if (m_dirty) filter_internal();
 }
 
+int Players::lookup(std::string const& name) {
+	for (players_t::const_iterator it = m_players.begin(); it != m_players.end(); ++it)
+	{
+		if (it->name == name) return it->id;
+	}
+
+	return -1;
+}
+
 void Players::addPlayer (std::string const& name, std::string const& picture, int id) {
 	PlayerItem pi;
 	pi.id = id;
@@ -107,8 +116,7 @@ void Players::setFilter(std::string const& val) {
 	filter_internal();
 }
 
-int Players::assign_id_internal()
-{
+int Players::assign_id_internal() {
 	players_t::const_reverse_iterator it = m_players.rbegin();
 	if (it != m_players.rend()) return it->id+1;
 	else return 1; // empty set
