@@ -23,10 +23,14 @@ public:
 
 	std::string file();
 
+public: // methods for player management
+
+	void addPlayer (std::string const& name, std::string const& picture = "", int id = -1)
+	{ m_players.addPlayer(name, picture, id); }
+
 private:
 	fs::path m_filename;
 
-public: // TODO make private
 	Players m_players;
-	Hiscore m_hiscore;
+	Hiscore m_hiscores;
 };

@@ -24,17 +24,24 @@ Database::~Database() {
 void Database::load() {
 	if (!exists(m_filename)) return;
 	xmlpp::DomParser domParser(m_filename.string());
-	xmlpp::NodeSet n = domParser.get_document()->get_root_node()->find("/performous/players/player");
+	xmlpp::Node* nodeRoot = domParser.get_document()->get_root_node();
 
-	m_players.load(n);
+	xmlpp::NodeSet players = nodeRoot->find("/performous/players/player");
+	m_players.load(players);
+
+	xmlpp::NodeSet hiscores = nodeRoot->find("/performous/hiscores/hiscore");
+	m_hiscores.load(hiscores);
 }
 
 void Database::save() {
 	xmlpp::Document doc;
 	xmlpp::Node* nodeRoot = doc.create_root_node("performous");
-	xmlpp::Element *players = nodeRoot->add_child("players");
 
+	xmlpp::Element *players = nodeRoot->add_child("players");
 	m_players.save(players);
+
+	xmlpp::Element *hiscores = nodeRoot->add_child("hiscores");
+	m_hiscores.save(hiscores);
 
 	if (!exists(m_filename.parent_path()) && !m_filename.parent_path().empty())
 	{
@@ -51,5 +58,6 @@ std::string Database::file() {
 // Test program for Database
 int main()
 {
-	Database ("database.xml");
+	Database d("database.xml");
+	d.addPlayer("Markus", "m.jpg");
 }
