@@ -65,7 +65,9 @@ struct Player {
   Used for Players Management.
   */
 struct PlayerItem {
-	std::string name; /// unique name, link to highscore
+	int id; /// unique identifier for this PlayerItem, Link to hiscore
+
+	std::string name; /// name displayed and used for searching the player
 	std::string path; /// a path to a picture shown
 	std::string picture; /// + the filename for it
 /* Future ideas

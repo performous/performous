@@ -44,7 +44,8 @@ class Players: boost::noncopyable {
 
 	void update();
 
-	void addPlayer (std::string const& name, std::string const& picture = "");
+	/// add a player with a displayed name and an optional picture; if no id is given one will be assigned
+	void addPlayer (std::string const& name, std::string const& picture = "", int id = -1);
 
 	/// const array access
 	PlayerItem operator[](std::size_t pos) const {

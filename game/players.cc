@@ -3,10 +3,13 @@
 #include "fs.hh"
 #include "configuration.hh"
 
+#include <set>
 #include <fstream>
 #include <iostream>
-#include <set>
+
 #include <boost/regex.hpp>
+#include <boost/lexical_cast.hpp>
+
 #include <libxml++/libxml++.h>
 
 Players::Players():
@@ -25,7 +28,10 @@ void Players::load(xmlpp::NodeSet n) {
 	for (xmlpp::NodeSet::const_iterator it = n.begin(); it != n.end(); ++it)
 	{
 		xmlpp::Element& element = dynamic_cast<xmlpp::Element&>(**it);
-		xmlpp::Attribute* a = element.get_attribute("name");
+		xmlpp::Attribute* a_name = element.get_attribute("name");
+		xmlpp::Attribute* a_id = element.get_attribute("id");
+		int id = -1;
+		try {id = boost::lexical_cast<int>(a_id->get_value());} catch (boost::bad_lexical_cast const&) { }
 		xmlpp::NodeSet n2 = element.find("picture");
 		std::string picture;
 		if (!n2.empty()) // optional picture element
@@ -34,7 +40,7 @@ void Players::load(xmlpp::NodeSet n) {
 			xmlpp::TextNode* tn = element2.get_child_text();
 			picture = tn->get_content();
 		}
-		addPlayer(a->get_value(), picture);
+		addPlayer(a_name->get_value(), picture, id);
 	}
 }
 
@@ -43,6 +49,7 @@ void Players::save(xmlpp::Element *players) {
 	{
 		xmlpp::Element* player = players->add_child("player");
 		player->set_attribute("name", it->name);
+		player->set_attribute("id", boost::lexical_cast<std::string>(it->id));
 		if (it->picture != "")
 		{
 			xmlpp::Element* picture = player->add_child("picture");
@@ -55,15 +62,16 @@ void Players::update() {
 	if (m_dirty) filter_internal();
 }
 
-void Players::addPlayer (std::string const& name, std::string const& picture) {
+void Players::addPlayer (std::string const& name, std::string const& picture, int id) {
 	PlayerItem pi;
+	pi.id = id;
 	pi.name = name;
 	pi.picture = picture;
 	pi.path = "";
 
 	if (pi.picture != "") // no picture, so don't search path
 	{
-		/* TODO: add again
+		/* TODO: add again check for pictures
 		ConfigItem::StringList const& sl = config["system/path_pictures"].sl();
 		typedef std::set<fs::path> dirs;
 		dirs d;
