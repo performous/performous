@@ -15,4 +15,4 @@ fs::path pathMangle(fs::path const& dir);
 std::string getThemePath(std::string const& filename);
 
 /** Get full path to a share file **/
-std::string getXdgPath(fs::path const& filename);
+std::string getPath(fs::path const& filename);

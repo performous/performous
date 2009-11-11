@@ -21,12 +21,12 @@ void ScreenPractice::enter() {
 		drums.reset(new input::InputDev(input::DRUMS));
 	} catch (std::runtime_error&) {drums.reset();}
 	unsigned int sr = m_audio.getSR();
-	m_samples.push_back(Sample(getXdgPath("sounds/drum_bass.ogg"), sr));
-	m_samples.push_back(Sample(getXdgPath("sounds/drum_snare.ogg"), sr));
-	m_samples.push_back(Sample(getXdgPath("sounds/drum_hi-hat.ogg"), sr));
-	m_samples.push_back(Sample(getXdgPath("sounds/drum_tom1.ogg"), sr));
-	m_samples.push_back(Sample(getXdgPath("sounds/drum_cymbal.ogg"), sr));
-	//m_samples.push_back(Sample(getXdgPath("sounds/drum_tom2.ogg"), sr));
+	m_samples.push_back(Sample(getPath("sounds/drum_bass.ogg"), sr));
+	m_samples.push_back(Sample(getPath("sounds/drum_snare.ogg"), sr));
+	m_samples.push_back(Sample(getPath("sounds/drum_hi-hat.ogg"), sr));
+	m_samples.push_back(Sample(getPath("sounds/drum_tom1.ogg"), sr));
+	m_samples.push_back(Sample(getPath("sounds/drum_cymbal.ogg"), sr));
+	//m_samples.push_back(Sample(getPath("sounds/drum_tom2.ogg"), sr));
 }
 
 void ScreenPractice::exit() {
