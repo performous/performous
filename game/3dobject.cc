@@ -90,7 +90,6 @@ void Object3d::generateDisplayList() {
 	if (m_displist != 0) glDeleteLists(m_displist, 1);
 	m_displist = glGenLists(1);
 	glutil::DisplayList displist(m_displist, GL_COMPILE);
-	//UseTexture tex(*m_texture);
 	std::vector<Face>::const_iterator it;
 	// Iterate through faces
 	for (it = m_faces.begin(); it != m_faces.end(); it++) {
