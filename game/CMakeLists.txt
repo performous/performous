@@ -35,10 +35,11 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 	add_definitions("-D__STDC_CONSTANT_MACROS")
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
-add_executable(performous.bin ${SOURCES} ${SDL_SOURCES})
-target_link_libraries(performous.bin da ${LIBS})
+add_executable(performous ${SOURCES} ${SDL_SOURCES})
+target_link_libraries(performous da ${LIBS})
 
-set_target_properties(performous.bin PROPERTIES
+# Store library paths in executable
+set_target_properties(performous PROPERTIES
 	INSTALL_RPATH_USE_LINK_PATH TRUE
 	SKIP_BUILD_RPATH FALSE
 	INSTALL_RPATH \$ORIGIN/../lib
@@ -49,5 +50,5 @@ set_target_properties(performous.bin PROPERTIES
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.cmake.hh" "${CMAKE_CURRENT_BINARY_DIR}/config.hh" @ONLY)
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
-install(TARGETS performous.bin DESTINATION bin)
+install(TARGETS performous DESTINATION bin)
 
