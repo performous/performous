@@ -275,6 +275,8 @@ void MidiFileParser::process_midi_event(Track& track, uint8_t t, uint8_t arg1, u
 	}
 	// special management for lyrics
 	if (track.name == "PART VOCALS") {
+		// Discard note effects
+		if( arg1 < 20 ) return;
 		if (t == 8 || (t == 9 && arg2 == 0)) {
 			// end of note (note off or note on with zero velocity)
 			if( !m_lyric.empty()  ) {
