@@ -72,7 +72,14 @@ bool SongParser::smParseField(std::string line) {
 	//<DifficultyClass>:
 	if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
 	std::string difficultyclass = boost::trim_copy(line.substr(0, line.size() -1));
-	
+	//enum	
+	DanceDifficulty danceDifficulty;		
+	if(difficultyclass == "BEGINNER") danceDifficulty = BEGINNER;
+	if(difficultyclass == "EASY") danceDifficulty = EASY;
+	if(difficultyclass == "MEDIUM") danceDifficulty = MEDIUM;
+	if(difficultyclass == "HARD") danceDifficulty = HARD;
+	if(difficultyclass == "CHALLENGE") danceDifficulty = CHALLENGE;
+
 	//ignoring difficultymeter and radarvalues
 	//<DifficultyMeter>:
 	if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
@@ -84,8 +91,8 @@ bool SongParser::smParseField(std::string line) {
 	//<NoteData>:
 	while (getline(line) && smParseNote(line, chords)) {}
 	
-	DanceTrack danceTrack(difficultyclass, chords);
-	danceTrackMap[difficultyclass] = danceTrack;
+	DanceTrack danceTrack(description, chords);
+	danceTrackMap[danceDifficulty] = danceTrack;
 	m_song.danceTracks[notestype] = danceTrackMap;	
 	return true;
 	}
