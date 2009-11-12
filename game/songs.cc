@@ -116,8 +116,8 @@ void Songs::update() {
 	if (m_dirty) filter_internal();
 	// Shuffle the songlist if shuffle is finished and all songs are already filtered
 	if (m_needShuffle && !m_dirty) {
+		RestoreSel restore(*this);
 		randomize_internal();
-		math_cover.setTarget(0, m_songs.size());
 		m_needShuffle = false;
 	}
 }
