@@ -58,7 +58,7 @@ bool SongParser::smParseField(std::string line) {
 
 	//temporary containers for note data
 	DanceTrackMap danceTrackMap;
-	Chords chords;
+	DanceChords chords;
 	
 	//Note values are analyzed here. Values are:
 
@@ -130,7 +130,7 @@ bool SongParser::smParseField(std::string line) {
 	return true;
 }
 
-bool SongParser::smParseNote(std::string line, Chords chords){
+bool SongParser::smParseNote(std::string line, DanceChords chords){
 	if(line.empty()) return true;
 	if(line[0] == '#') throw std::runtime_error("Key found in the middle of notes");
 	if(line[0] == ';') return false; //end mark	
@@ -145,8 +145,8 @@ bool SongParser::smParseNote(std::string line, Chords chords){
 		dur = 4 * ( 1/(m_bpm/60) ) / lcount;	//counts one note duration in seconds;	
 		for(int j = count - lcount; j<count ; j++) {	
 			for(int i = 0; i<4; i++) {
-				if(m_song.dance_chords[j][i]) m_song.dance_chords[j][i].begin = tm;
-				if(m_song.dance_chords[j][i]) m_song.dance_chords[j][i].end = tm;		
+				if(chords[j][i]) chords[j][i].begin = tm;
+				if(chords[j][i]) chords[j][i].end = tm;		
 				
 			}
 			tm += dur;
@@ -157,7 +157,7 @@ bool SongParser::smParseNote(std::string line, Chords chords){
 
 	//reading notes into a chord 
 	std::istringstream iss(line);
-	Chord chord;
+	DanceChord chord;
 	for(int i =1; i <= 4; i++){
 		if(iss.get() == '1') {
 			Note note;	
