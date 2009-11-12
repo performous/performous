@@ -5,7 +5,7 @@
 namespace {
 	const float past = -0.2f;
 	const float future = 1.8f;
-	const float timescale = 25.0f;
+	const float timescale = 15.0f;
 	const float texCoordStep = -0.5f; // Two beat lines per neck texture => 0.5 tex units per beat
 	// Note: t is difference from playback time so it must be in range [past, future]
 	float time2y(float t) { return -timescale * (t - past) / (future - past); }
@@ -80,6 +80,8 @@ glutil::Color const& DanceGraph::color(int arrow_i) const {
 
 /// Draws the dance graph
 void DanceGraph::draw(double time) {
+	static float arrowRotations[4] = { 90.0f, 180.0f, 0.0f, 270.0f };
+	
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
 	dimensions.screenBottom().middle(m_cx.get()).fixedWidth(m_width.get());
 	double offsetX = 0.5 * (dimensions.x1() + dimensions.x2());
@@ -126,9 +128,11 @@ void DanceGraph::draw(double time) {
 	for (int arrow_i = 0; arrow_i < 4; ++arrow_i) {
 		float x = -2.5f + arrow_i;
 		glColor4fv(color(arrow_i));
-		m_arrow.dimensions.center(time2y(0.0)).middle(x);
+		glTranslatef(x, 0.0f, time2y(0.0));
+		glRotatef(arrowRotations[arrow_i], 0.0f, 0.0f, 1.0f);
 		m_arrow.draw();
-		//float l = m_hit[fret + !m_drums].get();
+		glRotatef(-arrowRotations[arrow_i], 0.0f, 0.0f, 1.0f);
+		glTranslatef(-x, 0.0f, -time2y(0.0));
 	}
 	glColor3f(1.0f, 1.0f, 1.0f);	
 }
