@@ -84,10 +84,13 @@ void ScreenSing::enter() {
 		}
 	}
 	// Load dance tracks
-	if ( !m_song->danceTracks.empty() ) {
-		while(1) {
+	//if ( !m_song->danceTracks.empty() ) {
+	m_dancers.push_back(new DanceGraph(m_audio, *m_song));
+	if (true) {
+		while(true) {
 			try {
 				m_dancers.push_back(new DanceGraph(m_audio, *m_song));
+				break; // REMOVEME
 			} catch (std::runtime_error&) { break; }
 		}
 	}
@@ -127,6 +130,21 @@ void ScreenSing::instrumentLayout(double time) {
 			if (m_song->music.size() <= 1) level = std::max(0.333, level);
 			m_audio.streamFade(it->first, level);
 		}
+	}
+}
+
+void ScreenSing::danceLayout(double time) {
+	double iw = std::min(0.5, 1.0 / m_dancers.size());
+	Dancers::size_type i = 0;
+	for (Dancers::iterator it = m_dancers.begin(); it != m_dancers.end(); ++it, ++i) {
+		it->position((0.5 + i - 0.25 * m_dancers.size()) * iw, iw);
+		it->engine();
+		it->draw(time);
+	}
+	if (time < -0.5) {
+		glColor4f(1.0f, 1.0f, 1.0f, clamp(-1.0 - 2.0 * time));
+		// TODO: help?
+		glColor3f(1.0f, 1.0f, 1.0f);
 	}
 }
 
@@ -251,6 +269,7 @@ void ScreenSing::draw() {
 	}
 
 	if( !m_dancers.empty() ) {
+		danceLayout(time);
 		m_layout_singer->draw(time, LayoutSinger::LEFT);
 	} else if( m_instruments.empty() ) {
 		m_layout_singer->draw(time, LayoutSinger::BOTTOM);
