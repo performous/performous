@@ -47,6 +47,15 @@ their value smoothly over time. This effect is most prominent it the song
 browser, but it is used in various other parts of the UI and we also abuse it
 as a simple timer in some places.
 
+The database is the access point to static information. There you can add
+players, songitems and - the reason why it was introduced - hiscores. It is also
+a facade for Players (players.cc/hh), hiscore (hiscore.cc/hh)
+and songitems (songitems.cc/hh). Don't confuse songs with songitems. In fact
+they both hold a shared_ptr to the same song (song.cc/hh), but only the songitems
+have a unique id which is used in the highscore. On the other hand the
+songs (songs.cc/hh) are used for the song browser. There is also the code
+for iterating above all files and call the song-parser.
+
 The game logic runs as a separate thread so that slow OpenGL rendering or other
 such factors don't disturb it (engine.cc/hh). This engine runs in an endless
 loop, polling the audio analyzer code (pitch.cc/hh) for data that it then uses

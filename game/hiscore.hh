@@ -34,7 +34,7 @@ struct HiscoreItem {
 
 class Hiscore
 {
-public:
+  public:
 	Hiscore ();
 
 	void load(xmlpp::NodeSet const& n);
@@ -52,8 +52,20 @@ public:
 	  @return false if addNewHiscore does not make sense
 	    for that score.*/
 	bool reachedHiscore(int score, int songid, std::string const& track = "VOCALS");
+
+	/**Add a specific highscore into the list.
+
+	  @pre Hiscore is added.
+
+	  There is no check regarding if it is useful to add this hiscore.
+	  To check this, use reachedHiscore() first.
+
+	  The method will check if all ids are non-negative and the score
+	  in its valid interval. If one of this conditions is not net a
+	  HiscoreException will be raised.
+	  */
 	void addHiscore(int score, int playerid, int songid, std::string const& track = "VOCALS");
-private:
+  private:
 	typedef std::multiset<HiscoreItem>hiscore_t;
 
 	hiscore_t m_hiscore;

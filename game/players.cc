@@ -25,8 +25,7 @@ Players::~Players()
 { }
 
 void Players::load(xmlpp::NodeSet const& n) {
-	for (xmlpp::NodeSet::const_iterator it = n.begin(); it != n.end(); ++it)
-	{
+	for (xmlpp::NodeSet::const_iterator it = n.begin(); it != n.end(); ++it) {
 		xmlpp::Element& element = dynamic_cast<xmlpp::Element&>(**it);
 		xmlpp::Attribute* a_name = element.get_attribute("name");
 		if (!a_name) throw PlayersException("Attribute name not found");
@@ -47,8 +46,7 @@ void Players::load(xmlpp::NodeSet const& n) {
 }
 
 void Players::save(xmlpp::Element *players) {
-	for (players_t::const_iterator it = m_players.begin(); it!=m_players.end(); ++it)
-	{
+	for (players_t::const_iterator it = m_players.begin(); it!=m_players.end(); ++it) {
 		xmlpp::Element* player = players->add_child("player");
 		player->set_attribute("name", it->name);
 		player->set_attribute("id", boost::lexical_cast<std::string>(it->id));
@@ -65,8 +63,7 @@ void Players::update() {
 }
 
 int Players::lookup(std::string const& name) {
-	for (players_t::const_iterator it = m_players.begin(); it != m_players.end(); ++it)
-	{
+	for (players_t::const_iterator it = m_players.begin(); it != m_players.end(); ++it) {
 		if (it->name == name) return it->id;
 	}
 
