@@ -138,6 +138,7 @@ void ScreenSing::activateNextScreen()
 {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 
+	m_database.addSong(m_song);
 	if (m_database.scores.empty()
 	      || !m_database.reachedHiscore(m_song))
 	{

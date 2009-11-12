@@ -72,7 +72,6 @@ void Songs::reload_internal(fs::path const& parent) {
 				boost::shared_ptr<Song>s(new Song(path, name));
 				s->randomIdx = ++randomIdx; // Not so random during loading, they are shuffled after load is finished
 				boost::mutex::scoped_lock l(m_mutex);
-				m_database.addSong(s);
 				m_songs.push_back(s);
 				m_dirty = true;
 			} catch (SongParserException& e) {
