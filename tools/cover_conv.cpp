@@ -1,5 +1,6 @@
 #include <boost/lexical_cast.hpp>
 #include <iostream>
+#include <cstdlib>
 #ifdef __WIN32__
 #  include <windows.h>
 #endif
