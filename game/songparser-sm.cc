@@ -57,18 +57,17 @@ bool SongParser::smParseField(std::string line) {
 	if (key == "NOTES") {	
 
 	//temporary containers for note data
-	DanceTrackMap danceTrackMap;
+	DanceDifficultyMap danceDifficultyMap;
 	DanceChords chords;
 	
 	//Note values are analyzed here. Values are:
 
 	//<NotesType>:
 	if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
-	std::string notestype = boost::trim_copy(line.substr(0, line.size() -1);
+	std::string notestype = boost::trim_copy(line.substr(0, line.size() -1));
 	//<Description>:
 	if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
 	std::string description = boost::trim_copy(line.substr(0, line.size() -1));
-	m_song.dance_data.addDescription(description);
 	//<DifficultyClass>:
 	if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
 	std::string difficultyclass = boost::trim_copy(line.substr(0, line.size() -1));
@@ -92,8 +91,8 @@ bool SongParser::smParseField(std::string line) {
 	while (getline(line) && smParseNote(line, chords)) {}
 	
 	DanceTrack danceTrack(description, chords);
-	danceTrackMap[danceDifficulty] = danceTrack;
-	m_song.danceTracks[notestype] = danceTrackMap;	
+//	danceDifficultyMap[danceDifficulty] = danceTrack;
+//	m_song.danceTracks[notestype] = danceDifficultyMap;	
 	return true;
 	}
 
@@ -145,8 +144,8 @@ bool SongParser::smParseNote(std::string line, DanceChords chords){
 		dur = 4 * ( 1/(m_bpm/60) ) / lcount;	//counts one note duration in seconds;	
 		for(int j = count - lcount; j<count ; j++) {	
 			for(int i = 0; i<4; i++) {
-				if(chords[j][i]) chords[j][i].begin = tm;
-				if(chords[j][i]) chords[j][i].end = tm;		
+	//			if((chords[j])[i]) (chords[j])[i].begin = tm;
+	//			if((chords[j])[i]) (chords[j])[i].end = tm;		
 				
 			}
 			tm += dur;
