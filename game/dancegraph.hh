@@ -30,6 +30,7 @@ class DanceGraph {
   private:
 	void dance(double time, input::Event const& ev);
 	void drawNote(int fret, glutil::Color, float tBeg, float tEnd);
+	glutil::Color const& color(int arrow_i) const ;
 	Audio& m_audio;
 	input::InputDev m_input;
 	Song const& m_song;
@@ -51,6 +52,7 @@ class DanceGraph {
 	int m_dead;
 	SvgTxtTheme m_text;
 	AnimValue m_correctness;
+	int m_flow_direction;
 	double m_score;
 	double m_scoreFactor;
 	int m_streak;
