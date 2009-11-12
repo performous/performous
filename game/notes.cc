@@ -78,7 +78,7 @@ double Note::scoreMultiplier(double error) const {
 
 Duration::Duration(): begin(getNaN()), end(getNaN()) {}
 
-DanceData::DanceData(std::string d, Chords c) : description(d), chords(c) {}
+DanceTrack::DanceTrack(std::string d, Chords c) : description(d), chords(c) {}
 
 
 
