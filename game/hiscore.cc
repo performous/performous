@@ -64,7 +64,7 @@ void Hiscore::load(xmlpp::NodeSet const& n) {
 		int score = boost::lexical_cast<int>(tn->get_content());
 
 		std::string track;
-		if (!a_track) track = "VOCALS";
+		if (!a_track) track = "vocals";
 		else track = a_track->get_value();
 
 		addHiscore(score, playerid, songid, track);

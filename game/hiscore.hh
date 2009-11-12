@@ -51,7 +51,7 @@ class Hiscore
 	  @return true if the score make it into the top.
 	  @return false if addNewHiscore does not make sense
 	    for that score.*/
-	bool reachedHiscore(int score, int songid, std::string const& track = "VOCALS");
+	bool reachedHiscore(int score, int songid, std::string const& track = "vocals");
 
 	/**Add a specific highscore into the list.
 
@@ -64,7 +64,7 @@ class Hiscore
 	  in its valid interval. If one of this conditions is not net a
 	  HiscoreException will be raised.
 	  */
-	void addHiscore(int score, int playerid, int songid, std::string const& track = "VOCALS");
+	void addHiscore(int score, int playerid, int songid, std::string const& track = "vocals");
   private:
 	typedef std::multiset<HiscoreItem>hiscore_t;
 
