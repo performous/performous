@@ -32,7 +32,7 @@ class ScreenPlayers : public Screen {
 	Audio& m_audio;
 	Players& m_players;
 	boost::shared_ptr<Song> m_song; /// Pointer to the current song
-	boost::scoped_ptr<SongHiscore> m_highscore;
+	boost::scoped_ptr<Hiscore> m_highscore;
 	boost::scoped_ptr<Surface> m_songbg;
 	boost::scoped_ptr<Video> m_video;
 	boost::scoped_ptr<ThemeSongs> theme;

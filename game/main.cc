@@ -142,17 +142,17 @@ void mainLoop() {
 		Audio audio;
 		audioSetup(capture, audio);
 		Backgrounds backgrounds;
-		Songs songs(songlist);
 		Database database(getHomeDir() / ".config" / "performous" / "database.xml");
+		Songs songs(database, songlist);
 		ScreenManager sm;
 		Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());
 		sm.addScreen(new ScreenIntro("Intro", audio, capture));
 		sm.addScreen(new ScreenSongs("Songs", audio, songs));
-		sm.addScreen(new ScreenSing("Sing", audio, capture, database.m_players, backgrounds));
+		sm.addScreen(new ScreenSing("Sing", audio, capture, database, backgrounds));
 		sm.addScreen(new ScreenPractice("Practice", audio, capture));
 		sm.addScreen(new ScreenConfiguration("Configuration", audio));
-		sm.addScreen(new ScreenPlayers("Players", audio, database.m_players));
-		sm.addScreen(new ScreenHiscore("Hiscore", audio, database.m_players));
+		sm.addScreen(new ScreenPlayers("Players", audio, database));
+		sm.addScreen(new ScreenHiscore("Hiscore", audio, database));
 		sm.activateScreen("Intro");
 		// Main loop
 		boost::xtime time = now();

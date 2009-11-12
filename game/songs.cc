@@ -14,7 +14,7 @@
 #include <stdexcept>
 #include <cstdlib>
 
-Songs::Songs(std::string const& songlist): m_songlist(songlist), math_cover(), m_order(), m_dirty(false), m_loading(false), m_needShuffle(false) {
+Songs::Songs(Database & database, std::string const& songlist): m_songlist(songlist), math_cover(), m_order(), m_dirty(false), m_loading(false), m_needShuffle(false), m_database(database) {
 	reload();
 }
 
@@ -72,6 +72,7 @@ void Songs::reload_internal(fs::path const& parent) {
 				Song* s = new Song(path, name);
 				s->randomIdx = ++randomIdx; // Not so random during loading, they are shuffled after load is finished
 				boost::mutex::scoped_lock l(m_mutex);
+				database.addSong(s);
 				m_songs.push_back(boost::shared_ptr<Song>(s));
 				m_dirty = true;
 			} catch (SongParserException& e) {

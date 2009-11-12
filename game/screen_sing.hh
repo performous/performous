@@ -14,6 +14,7 @@
 #include "surface.hh"
 #include "opengl_text.hh"
 #include "progressbar.hh"
+#include "database.hh"
 
 #include "screen_players.hh"
 
@@ -25,12 +26,12 @@ class Capture;
 class ScoreWindow {
   public:
 	/// constructor
-	ScoreWindow(Engine & e, Players & players);
+	ScoreWindow(Engine & e, Database & database);
 	/// draws ScoreWindow
 	void draw();
-	bool empty() { return m_players.cur.empty(); }
+	bool empty() { return m_database.noPlayers(); }
   private:
-	Players & m_players;
+	Database & m_database;
 	AnimValue m_pos;
 	Surface m_bg;
 	ProgressBar m_scoreBar;
@@ -43,8 +44,8 @@ class ScoreWindow {
 class ScreenSing: public Screen {
   public:
 	/// constructor
-	ScreenSing(std::string const& name, Audio& audio, Capture& capture, Players& players, Backgrounds& bgs):
-	  Screen(name), m_audio(audio), m_capture(capture), m_players(players), m_backgrounds(bgs), m_latencyAV()
+	ScreenSing(std::string const& name, Audio& audio, Capture& capture, Database& database, Backgrounds& bgs):
+	  Screen(name), m_audio(audio), m_capture(capture), m_database(database), m_backgrounds(bgs), m_latencyAV()
 	{}
 	void enter();
 	void exit();

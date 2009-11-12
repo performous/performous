@@ -118,7 +118,11 @@ void Database::queryPerPlayerHiscore (std::ostream & os, std::string const& trac
 		   << hi[i].score << "\n";
 	}
 }
+bool Database::noPlayers() const {
+	return m_players.cur.empty();
+}
 
+/*
 int test(std::string const& name, std::string const& song, int score) {
 	Database d("database.xml");
 	// d.addPlayer("Markus", "m.jpg");
@@ -161,3 +165,4 @@ int main(int argc, char**argv) {
 
 	return test(name, song,  score);
 }
+*/

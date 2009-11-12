@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 
-# FILE(GLOB SOURCE_FILES "*.cc")
-SET(SOURCE_FILES hiscore.cc database.cc players.cc configuration.cc fs.cc unicode.cc songitems.cc song.cc notes.cc songparser-ini.cc songparser-txt.cc midifile.cc)
+FILE(GLOB SOURCE_FILES "*.cc")
 FILE(GLOB HEADER_FILES "*.hh")
 
 set(SOURCES ${SOURCE_FILES} ${HEADER_FILES})

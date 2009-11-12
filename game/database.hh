@@ -71,7 +71,7 @@ class Database
 	void queryPerSongHiscore (std::ostream & os, boost::shared_ptr<Song> s, std::string const& track = "") const;
 	void queryPerPlayerHiscore (std::ostream & os, std::string const& track = "") const;
 
-	friend int test(std::string const&, std::string const&, int);
+	bool noPlayers() const;
 
   private:
 	fs::path m_filename;
