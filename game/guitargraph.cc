@@ -127,7 +127,8 @@ void GuitarGraph::engine() {
 		if (!m_drums && ev.type == input::Event::RELEASE) {
 			endHold(ev.button);
 		}
-		if (!m_drums && ev.type == input::Event::WHAMMY) whammy = (1.0 + ev.button) / 2.0;
+		if (!m_drums && ev.type == input::Event::WHAMMY)
+		  whammy = (1.0 + ev.button + 2.0*(rand()/double(RAND_MAX))) / 4.0;
 		if (ev.type == input::Event::PRESS) m_hit[!m_drums + ev.button].setValue(1.0);
 		else if (ev.type == input::Event::PICK) m_hit[0].setValue(1.0);
 		if (time < -0.5) {
@@ -470,10 +471,10 @@ void GuitarGraph::draw(double time) {
 
 namespace {
 	const float fretWid = 0.5f;
-	void vertexPair(float x, float y, glutil::Color c, float ty) {
+	void vertexPair(float x, float y, glutil::Color c, float ty, float fretW = fretWid) {
 		c.a = y2a(y); glColor4fv(c);
-		glNormal3f(0.0f,1.0f,0.0f); glTexCoord2f(0.0f, ty); glVertex2f(x - fretWid, y);
-		glNormal3f(0.0f,1.0f,0.0f); glTexCoord2f(1.0f, ty); glVertex2f(x + fretWid, y);
+		glNormal3f(0.0f,1.0f,0.0f); glTexCoord2f(0.0f, ty); glVertex2f(x - fretW, y);
+		glNormal3f(0.0f,1.0f,0.0f); glTexCoord2f(1.0f, ty); glVertex2f(x + fretW, y);
 	}
 }
 
@@ -512,8 +513,9 @@ void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, fl
 		vertexPair(x, y, c, 0.5f);
 		if (whammy > 0.1) {
 			while ((y -= fretWid) > yEnd + fretWid) {
-				// The sin formula is pure magic
-				vertexPair(x+sin((whammy-0.75)*6.0 + (yBeg-tEnd)/y)/3.0, y, c, 0.5f);
+				float r = rand() / double(RAND_MAX);
+				float r2 = rand() / double(RAND_MAX);
+				vertexPair(x+cos(y*whammy)/4.0+(r-0.5)/4.0, y, c, r2*0.30 + 0.20);
 			}
 		} else {
 			while ((y -= 10.0) > yEnd + fretWid) vertexPair(x, y, c, 0.5f);
