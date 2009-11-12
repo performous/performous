@@ -3,14 +3,13 @@
 #include "configuration.hh"
 #include "fs.hh"
 #include "song.hh"
-#include "player.hh"
-#include "players.hh"
+#include "database.hh"
 
 #include <list>
 #include <boost/format.hpp>
 
-LayoutSinger::LayoutSinger(Song &_song, Players& _players, boost::shared_ptr<ThemeSing> _theme):
-  m_song(_song), m_noteGraph(_song),m_lyricit(_song.notes.begin()), m_lyrics(), m_players(_players), m_theme(_theme) {
+LayoutSinger::LayoutSinger(Song& song, Database& database, boost::shared_ptr<ThemeSing> theme):
+  m_song(song), m_noteGraph(song),m_lyricit(song.notes.begin()), m_lyrics(), m_database(database), m_theme(theme) {
 	m_score_text[0].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_score_text[1].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_score_text[2].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
@@ -31,7 +30,7 @@ void LayoutSinger::reset() {
 
 void LayoutSinger::drawScore(Position position) {
 	unsigned int i = 0;
-	for (std::list<Player>::const_iterator p = m_players.cur.begin(); p != m_players.cur.end(); ++p, ++i) {
+	for (std::list<Player>::const_iterator p = m_database.cur.begin(); p != m_database.cur.end(); ++p, ++i) {
 		float act = p->activity();
 		if (act == 0.0f) continue;
 		float r = p->m_color.r;
@@ -88,10 +87,10 @@ void LayoutSinger::draw(double time, Position position) {
 	if (!config["game/karaoke_mode"].b()) {
 		switch(position) {
 			case LayoutSinger::BOTTOM:
-				m_noteGraph.draw(time, m_players, NoteGraph::FULLSCREEN);
+				m_noteGraph.draw(time, m_database, NoteGraph::FULLSCREEN);
 				break;
 			case LayoutSinger::MIDDLE:
-				m_noteGraph.draw(time, m_players, NoteGraph::TOP);
+				m_noteGraph.draw(time, m_database, NoteGraph::TOP);
 				break;
 		}
 	}

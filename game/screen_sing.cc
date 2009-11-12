@@ -46,8 +46,8 @@ void ScreenSing::enter() {
 	m_progress->dimensions.fixedWidth(0.4).left(-0.5).screenTop();
 	theme->timer.dimensions.screenTop(0.5 * m_progress->dimensions.h());
 	boost::ptr_vector<Analyzer>& analyzers = m_capture.analyzers();
-	m_engine.reset(new Engine(m_audio, *m_song, analyzers.begin(), analyzers.end(), m_players));
-	m_layout_singer.reset(new LayoutSinger(*m_song, m_players, theme));
+	m_engine.reset(new Engine(m_audio, *m_song, analyzers.begin(), analyzers.end(), m_database));
+	m_layout_singer.reset(new LayoutSinger(*m_song, m_database, theme));
 	// I know some purists would hang me for this loop
 	if( !m_song->track_map.empty() ) {
 		// Here we load alternatively guitar/bass tracks until no guitar controler is available
@@ -138,6 +138,14 @@ void ScreenSing::activateNextScreen()
 {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 
+	if (m_database.scores.empty()
+	      || !m_database.reachedHiscore(m_song))
+	{
+		// if no highscore reached..
+		sm->activateScreen("Songs");
+		return;
+	}
+
 	// Score window visible -> Enter quits to Players Screen
 	Screen* s = sm->getScreen("Players");
 	ScreenPlayers* ss = dynamic_cast<ScreenPlayers*> (s);
@@ -160,7 +168,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		}
 		else if (key == SDLK_RETURN) {
 			if (m_score_window.get()) { activateNextScreen(); return; } // Score window visible -> Enter quits
-			else if (status == Song::FINISHED) m_score_window.reset(new ScoreWindow(*m_engine, m_players)); // Song finished, but no score window -> show it
+			else if (status == Song::FINISHED) m_score_window.reset(new ScoreWindow(*m_engine, m_database)); // Song finished, but no score window -> show it
 		}
 		else if (key == SDLK_SPACE || key == SDLK_PAUSE) m_audio.togglePause();
 		if (m_score_window.get()) return;
@@ -282,7 +290,7 @@ void ScreenSing::draw() {
 		else if (!m_audio.isPlaying() || (status == Song::FINISHED && m_audio.getLength() - time < 3.0)) {
 			// Time to create the score window
 			m_quitTimer.setValue(QUIT_TIMEOUT);
-			m_score_window.reset(new ScoreWindow(*m_engine, m_players));
+			m_score_window.reset(new ScoreWindow(*m_engine, m_database));
 		}
 	}
 		
@@ -292,8 +300,8 @@ void ScreenSing::draw() {
 	}
 }
 
-ScoreWindow::ScoreWindow(Engine& e, Players & players):
-  m_players(players),
+ScoreWindow::ScoreWindow(Engine& e, Database& database):
+  m_database(database),
   m_pos(0.8, 2.0),
   m_bg(getThemePath("score_window.svg")),
   m_scoreBar(getThemePath("score_bar_bg.svg"), getThemePath("score_bar_fg.svg"), ProgressBar::VERTICAL, 0.0, 0.0, false),
@@ -303,20 +311,20 @@ ScoreWindow::ScoreWindow(Engine& e, Players & players):
 	m_pos.setTarget(0.0);
 	e.kill(); // kill the engine thread (to avoid consuming memory)
 
-	m_players.scores.clear();
+	m_database.scores.clear();
 	unsigned int topScore = 0;
-	for (std::list<Player>::iterator p = m_players.cur.begin(); p != m_players.cur.end();) {
+	for (std::list<Player>::iterator p = m_database.cur.begin(); p != m_database.cur.end();) {
 		unsigned int score = p->getScore();
-		if (score < 500) { p = m_players.cur.erase(p); continue; }
-		m_players.scores.push_back(score);
+		if (score < 500) { p = m_database.cur.erase(p); continue; }
+		m_database.scores.push_back(score);
 		if (score > topScore) topScore = score;
 		++p;
 	}
-	m_players.scores.sort();
-	m_players.scores.reverse(); // top should be first
-	// topScore is also in m_players.scores.front()
+	m_database.scores.sort();
+	m_database.scores.reverse(); // top should be first
+	// topScore is also in m_database.scores.front()
 
-	if (m_players.cur.empty()) m_rank = "No singer!";
+	if (m_database.cur.empty()) m_rank = "No singer!";
 	else if (topScore > 8000) m_rank = "Hit singer";
 	else if (topScore > 6000) m_rank = "Lead singer";
 	else if (topScore > 4000) m_rank = "Rising star";
@@ -330,13 +338,13 @@ void ScoreWindow::draw() {
 	glutil::PushMatrix block;
 	glTranslatef(0.0, m_pos.get(), 0.0);
 	m_bg.draw();
-	const double spacing = 0.1 + 0.1 / m_players.cur.size();
+	const double spacing = 0.1 + 0.1 / m_database.cur.size();
 	unsigned i = 0;
 
-	for (std::list<Player>::const_iterator p = m_players.cur.begin(); p != m_players.cur.end(); ++p, ++i) {
+	for (std::list<Player>::const_iterator p = m_database.cur.begin(); p != m_database.cur.end(); ++p, ++i) {
 		int score = p->getScore();
 		glColor3f(p->m_color.r, p->m_color.g, p->m_color.b);
-		double x = -0.12 + spacing * (0.5 + i - 0.5 * m_players.cur.size());
+		double x = -0.12 + spacing * (0.5 + i - 0.5 * m_database.cur.size());
 		m_scoreBar.dimensions.middle(x).bottom(0.24);
 		m_scoreBar.draw(score / 10000.0);
 		m_score_text.render(boost::lexical_cast<std::string>(score));

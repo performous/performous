@@ -4,6 +4,7 @@
 #include "audio.hh"
 #include "fs.hh"
 #include "util.hh"
+#include "database.hh"
 
 #include <iostream>
 #include <sstream>
@@ -11,21 +12,14 @@
 
 static const double IDLE_TIMEOUT = 45.0; // seconds
 
-ScreenHiscore::ScreenHiscore(std::string const& name, Audio& audio, Players& players):
-  Screen(name), m_audio(audio), m_players(players), m_covers(20)
+ScreenHiscore::ScreenHiscore(std::string const& name, Audio& audio, Database& database):
+  Screen(name), m_audio(audio), m_database(database), m_players(database.m_players), m_covers(20)
 {
 	m_players.setAnimMargins(5.0, 5.0);
 	m_playTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
 }
 
 void ScreenHiscore::enter() {
-	try {
-		m_highscore.reset(new SongHiscore(m_song->path, "High.sco"));
-	} catch (HiscoreException const& hi) {
-		std::cerr << "high.sco:" << hi.line() << " " << hi.what() << std::endl;
-		activateNextScreen();
-	}
-
 	m_score_text[0].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_score_text[1].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_score_text[2].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
@@ -52,10 +46,6 @@ void ScreenHiscore::exit() {
 	m_songbg.reset();
 	m_playing.clear();
 	m_playReq.clear();
-
-	// TODO: writing out Highscore
-
-	m_highscore.reset();
 }
 
 void ScreenHiscore::activateNextScreen() {
@@ -91,7 +81,7 @@ void ScreenHiscore::drawScores() {
 	// Score display
 	{
 		unsigned int i = 0;
-		for (std::list<Player>::const_iterator p = m_players.cur.begin(); p != m_players.cur.end(); ++p, ++i) {
+		for (std::list<Player>::const_iterator p = m_database.cur.begin(); p != m_database.cur.end(); ++p, ++i) {
 			float act = p->activity();
 			if (act == 0.0f) continue;
 			glColor4f(p->m_color.r, p->m_color.g, p->m_color.b,act);
@@ -121,7 +111,7 @@ void ScreenHiscore::draw() {
 	// Format the player information text
 	oss_song << "Hiscore for " << m_song->title << "!\n";
 
-	m_highscore->getInfo (oss_order);
+	m_database.queryPerSongHiscore(oss_order, m_song);
 
 	// Draw song and order texts
 	theme->song.draw(oss_song.str());

@@ -29,7 +29,7 @@ class ScoreWindow {
 	ScoreWindow(Engine & e, Database & database);
 	/// draws ScoreWindow
 	void draw();
-	bool empty() { return m_database.noPlayers(); }
+	bool empty() { return m_database.cur.empty(); }
   private:
 	Database & m_database;
 	AnimValue m_pos;
@@ -68,7 +68,7 @@ class ScreenSing: public Screen {
 	void instrumentLayout(double time);
 	Audio& m_audio;
 	Capture& m_capture;
-	Players& m_players;
+	Database& m_database;
 	Backgrounds& m_backgrounds;
 	boost::shared_ptr<Song> m_song; /// Pointer to the current song
 	boost::scoped_ptr<ScoreWindow> m_score_window;

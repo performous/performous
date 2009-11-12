@@ -33,17 +33,11 @@ struct PlayersException: public std::runtime_error {
 
  The filtered list is used to show players in
  the screen_players.
-
- The current lists (Players and scores) are used
- to pass the information which players have won
- to the ScoreScreen and then to the players window.
  */
 class Players: boost::noncopyable {
   private:
 	typedef std::set<PlayerItem> players_t;
 	typedef std::vector<PlayerItem> fplayers_t;
-	typedef std::list<Player> cur_players_t;
-	typedef std::list<int> cur_scores_t;
 
   private:
 	players_t m_players;
@@ -53,10 +47,6 @@ class Players: boost::noncopyable {
 	AnimAcceleration math_cover;
 
 	bool m_dirty;
-
-  public:
-	cur_players_t cur;
-	cur_scores_t scores;
 
   public:
 	Players();

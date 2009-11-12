@@ -47,12 +47,6 @@ to save the current settings to XML.
 			<long>Hide pitch wave, notes and scoring.</long>
 		</locale>
 	</entry>
-	<entry name="game/song_hiscore" type="bool" value="false">
-		<locale name="C">
-			<short>Song Hiscore</short>
-			<long>Show and save a per song hiscore.</long>
-		</locale>
-	</entry>
 	<entry name="game/pitch" type="bool" value="true">
 		<locale name="C">
 			<short>Pitch waves</short>

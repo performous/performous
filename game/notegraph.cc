@@ -54,7 +54,7 @@ namespace {
 const double baseLine = -0.2;
 const double pixUnit = 0.2;
 
-void NoteGraph::draw(double time, Players const& players, Position position) {
+void NoteGraph::draw(double time, Database const& database, Position position) {
 	if (time < m_time) reset();
 	m_time = time;
 	// Update m_songit (which note to start the rendering from)
@@ -94,7 +94,7 @@ void NoteGraph::draw(double time, Players const& players, Position position) {
 	m_baseX = baseLine - m_time * pixUnit + dimensions.xc();  // FIXME: Moving in X direction requires additional love (is b0rked now, keep it centered at zero)
 
 	drawNotes();
-	if (config["game/pitch"].b()) drawWaves(players);
+	if (config["game/pitch"].b()) drawWaves(database);
 }
 
 void NoteGraph::drawNotes() {
@@ -180,11 +180,11 @@ namespace {
 	}
 }
 
-void NoteGraph::drawWaves(Players const& players) {
+void NoteGraph::drawWaves(Database const& database) {
 	if (m_song.notes.empty()) return; // Cannot draw without notes
 	UseTexture tblock(m_wave);
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-	for (std::list<Player>::const_iterator p = players.cur.begin(); p != players.cur.end(); ++p) {
+	for (std::list<Player>::const_iterator p = database.cur.begin(); p != database.cur.end(); ++p) {
 		glColor4f(p->m_color.r, p->m_color.g, p->m_color.b, m_notealpha);
 		float const texOffset = 2.0 * m_time; // Offset for animating the wave texture
 		Player::pitch_t const& pitch = p->m_pitch;

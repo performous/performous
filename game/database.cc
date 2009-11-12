@@ -71,13 +71,14 @@ void Database::addSong (boost::shared_ptr<Song> s) {
 
 void Database::addHiscore (boost::shared_ptr<Song> s) {
 	int playerid = m_players.lookup(m_players.current().name);
-	int score = m_players.scores.front();
+	int score = scores.front();
 	int songid = m_songs.lookup(s);
+
 	m_hiscores.addHiscore(score, playerid, songid);
 }
 
 bool Database::reachedHiscore (boost::shared_ptr<Song> s) const {
-	int score = m_players.scores.front();
+	int score = scores.front();
 	int songid = m_songs.lookup(s);
 
 	return m_hiscores.reachedHiscore(score, songid);
@@ -118,9 +119,6 @@ void Database::queryPerPlayerHiscore (std::ostream & os, std::string const& trac
 		   << hi[i].score << "\n";
 	}
 }
-bool Database::noPlayers() const {
-	return m_players.cur.empty();
-}
 
 /*
 int test(std::string const& name, std::string const& song, int score) {
@@ -133,7 +131,7 @@ int test(std::string const& name, std::string const& song, int score) {
 	PlayerItem pi;
 	pi.name = name;
 	d.m_players.m_filtered.push_back(pi);
-	d.m_players.scores.push_back(score);
+	d.scores.push_back(score);
 
 	if (d.reachedHiscore(s))
 	{

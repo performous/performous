@@ -16,7 +16,12 @@
   This is a facade for Players, Hiscore and SongItems.
 
   Will be initialized at the very beginning of
-  the program.*/
+  the program.
+
+  The current lists (Players and scores) are used
+  to pass the information which players have won
+  to the ScoreScreen and then to the players window.
+ */
 class Database
 {
   public:
@@ -50,6 +55,21 @@ class Database
 	  */
 	std::string file();
 
+	friend class ScreenHiscore;
+	friend class ScreenPlayers;
+	friend class ScreenSing;
+	friend class ScoreWindow;
+	friend class LayoutSinger;
+	friend class NoteGraph;
+	friend class Engine;
+  private: // will be bypassed by above friend declaration
+	typedef std::list<Player> cur_players_t;
+	typedef std::list<int> cur_scores_t;
+
+	//This fields are misused as additional parameters
+	cur_players_t cur;
+	cur_scores_t scores;
+
   public: // methods for database management
 
 	/**A facade for Players::addPlayer.*/
@@ -57,7 +77,8 @@ class Database
 	/**A facade for SongItems::addSong.*/
 	void addSong (boost::shared_ptr<Song> s);
 	/**A facade for Hiscore::addHiscore.
-	 The ids will be looked up first by using the songs and current players data.*/
+	 The ids will be looked up first by using the songs and current players data.
+	 */
 	void addHiscore (boost::shared_ptr<Song> s);
 
   public: // methods for database queries

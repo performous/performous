@@ -17,8 +17,7 @@ Players::Players():
 	m_filtered(),
 	m_filter(),
 	math_cover(),
-	m_dirty(false),
-	cur()
+	m_dirty(false)
 { }
 
 Players::~Players()

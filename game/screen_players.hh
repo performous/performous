@@ -11,13 +11,17 @@
 #include "layout_singer.hh"
 
 class Audio;
+class Database;
 class Players;
 
-/// song chooser screen
+/** song chooser screen.
+  Database is passed as argument, but only the players is stored
+  and used everywhere.
+ */
 class ScreenPlayers : public Screen {
   public:
 	/// constructor
-	ScreenPlayers(std::string const& name, Audio& audio, Players& players);
+	ScreenPlayers(std::string const& name, Audio& audio, Database& database);
 	void enter();
 	void exit();
 	void manageEvent(SDL_Event event);
@@ -30,9 +34,9 @@ class ScreenPlayers : public Screen {
 
   private:
 	Audio& m_audio;
+	Database& m_database;
 	Players& m_players;
 	boost::shared_ptr<Song> m_song; /// Pointer to the current song
-	boost::scoped_ptr<Hiscore> m_highscore;
 	boost::scoped_ptr<Surface> m_songbg;
 	boost::scoped_ptr<Video> m_video;
 	boost::scoped_ptr<ThemeSongs> theme;
