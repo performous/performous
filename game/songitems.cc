@@ -83,8 +83,18 @@ int SongItems::lookup(boost::shared_ptr<Song> song) const {
 	return -1;
 }
 
+std::string SongItems::lookup (int id) const {
+	SongItem si;
+	si.id = id;
+	songs_t::iterator it = m_songs.find(si);
+	if (it == m_songs.end()) return "Unkown Song";
+	else if (!it->song) return it->artist + " - " + it->title;
+	else return it->song->artist + " - " + it->song->title;
+}
+
 int SongItems::assign_id_internal() const {
-	songs_t::const_iterator it = m_songs.begin();
-	if (it != m_songs.end()) return it->id+1;
+	// use the last one with highest id
+	songs_t::const_reverse_iterator it = m_songs.rbegin();
+	if (it != m_songs.rend()) return it->id+1;
 	else return 1; // empty set
 }

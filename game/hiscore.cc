@@ -10,7 +10,7 @@
 Hiscore::Hiscore()
 {}
 
-bool Hiscore::reachedHiscore(int score, int songid, std::string const& track) {
+bool Hiscore::reachedHiscore(int score, int songid, std::string const& track) const {
 	if (score < 0) throw HiscoreException("Score negativ overflow");
 	if (score > 10000) throw HiscoreException("Score positive overflow");
 
@@ -46,6 +46,31 @@ void Hiscore::addHiscore(int score, int playerid, int songid, std::string const&
 	m_hiscore.insert(hi);
 }
 
+Hiscore::HiscoreVector Hiscore::queryHiscore(int max, int playerid, int songid, std::string const& track) const {
+	HiscoreVector hv;
+	for (hiscore_t::const_iterator it = m_hiscore.begin(); it != m_hiscore.end(); ++it) {
+		if (playerid != -1)
+		{
+			if (playerid != it->playerid) continue;
+		}
+		if (songid != -1)
+		{
+			if (songid != it->songid) continue;
+		}
+		if (!track.empty())
+		{
+			if (track != it->track) continue;
+		}
+		if (max != -1)
+		{
+			if (max == 0) break;
+			--max;
+		}
+		hv.push_back(*it);
+	}
+	return hv;
+}
+
 void Hiscore::load(xmlpp::NodeSet const& n) {
 	for (xmlpp::NodeSet::const_iterator it = n.begin(); it != n.end(); ++it)
 	{
@@ -72,8 +97,7 @@ void Hiscore::load(xmlpp::NodeSet const& n) {
 }
 
 void Hiscore::save(xmlpp::Element *hiscores) {
-	for (hiscore_t::const_iterator it = m_hiscore.begin(); it != m_hiscore.end(); ++it)
-	{
+	for (hiscore_t::const_iterator it = m_hiscore.begin(); it != m_hiscore.end(); ++it) {
 		xmlpp::Element* hiscore = hiscores->add_child("hiscore");
 		hiscore->set_attribute("playerid", boost::lexical_cast<std::string>(it->playerid));
 		hiscore->set_attribute("songid", boost::lexical_cast<std::string>(it->songid));

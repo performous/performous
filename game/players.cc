@@ -62,12 +62,20 @@ void Players::update() {
 	if (m_dirty) filter_internal();
 }
 
-int Players::lookup(std::string const& name) {
+int Players::lookup(std::string const& name) const {
 	for (players_t::const_iterator it = m_players.begin(); it != m_players.end(); ++it) {
 		if (it->name == name) return it->id;
 	}
 
 	return -1;
+}
+
+std::string Players::lookup(int id) const {
+	PlayerItem pi;
+	pi.id = id;
+	players_t::iterator it = m_players.find(pi);
+	if (it == m_players.end()) return "Unkown Player";
+	else return it->name;
 }
 
 void Players::addPlayer (std::string const& name, std::string const& picture, int id) {

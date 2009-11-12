@@ -51,7 +51,7 @@ class Hiscore
 	  @return true if the score make it into the top.
 	  @return false if addNewHiscore does not make sense
 	    for that score.*/
-	bool reachedHiscore(int score, int songid, std::string const& track = "vocals");
+	bool reachedHiscore(int score, int songid, std::string const& track = "vocals") const;
 
 	/**Add a specific highscore into the list.
 
@@ -65,6 +65,13 @@ class Hiscore
 	  HiscoreException will be raised.
 	  */
 	void addHiscore(int score, int playerid, int songid, std::string const& track = "vocals");
+
+	typedef std::vector<HiscoreItem> HiscoreVector;
+	/**This queries the database for a sorted vector of highscores.
+	  The defaults mean to query everything.
+	  @param max limits the number of elements returned.
+	 */
+	HiscoreVector queryHiscore(int max = -1, int playerid = -1, int songid = -1, std::string const& track = "") const;
   private:
 	typedef std::multiset<HiscoreItem>hiscore_t;
 

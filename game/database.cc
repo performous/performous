@@ -76,17 +76,54 @@ void Database::addHiscore (boost::shared_ptr<Song> s) {
 	m_hiscores.addHiscore(score, playerid, songid);
 }
 
-bool Database::reachedHiscore (boost::shared_ptr<Song> s) {
+bool Database::reachedHiscore (boost::shared_ptr<Song> s) const {
 	int score = m_players.scores.front();
 	int songid = m_songs.lookup(s);
+
 	return m_hiscores.reachedHiscore(score, songid);
 }
 
-int test(std::string const& name, int score) {
+void Database::queryOverallHiscore (std::ostream & os, std::string const& track) const {
+	std::vector<HiscoreItem> hi = m_hiscores.queryHiscore (10, -1, -1, track);
+	for (size_t i=0; i<hi.size(); ++i)
+	{
+		os << i+1 << ".\t"
+		   << m_players.lookup(hi[i].playerid) << "\t"
+		   << m_songs.lookup(hi[i].songid) << "\t"
+		// << hi[i].track << "\t"
+		   << hi[i].score << "\n";
+	}
+}
+
+void Database::queryPerSongHiscore (std::ostream & os, boost::shared_ptr<Song> s, std::string const& track) const {
+	int songid = m_songs.lookup(s);
+	std::vector<HiscoreItem> hi = m_hiscores.queryHiscore(10, -1, songid, track);
+	for (size_t i=0; i<hi.size(); ++i)
+	{
+		os << i+1 << ".\t"
+		   << m_players.lookup(hi[i].playerid) << "\t"
+		// << hi[i].track << "\t"
+		   << hi[i].score << "\n";
+	}
+}
+
+void Database::queryPerPlayerHiscore (std::ostream & os, std::string const& track) const {
+	int playerid = m_players.lookup(m_players.current().name);
+	std::vector<HiscoreItem> hi = m_hiscores.queryHiscore(10, playerid, -1, track);
+	for (size_t i=0; i<hi.size(); ++i)
+	{
+		os << i+1 << ".\t"
+		   << m_songs.lookup(hi[i].songid) << "\t"
+		// << hi[i].track << "\t"
+		   << hi[i].score << "\n";
+	}
+}
+
+int test(std::string const& name, std::string const& song, int score) {
 	Database d("database.xml");
 	// d.addPlayer("Markus", "m.jpg");
 
-	boost::shared_ptr<Song> s(new Song("/usr/share/songs/ABBA/ABBA - Dancing Queen/", "ABBA - Dancing Queen.txt"));
+	boost::shared_ptr<Song> s(new Song("/usr/share/songs/ABBA/ABBA - " + song + "/", "ABBA - " + song + ".txt"));
 	d.addSong(s);
 
 	PlayerItem pi;
@@ -100,6 +137,15 @@ int test(std::string const& name, int score) {
 		d.addHiscore(s);
 	}
 
+	std::cout << " --- Overall Hiscore ---" << std::endl;
+	d.queryOverallHiscore(std::cout);
+
+	std::cout << " --- Player Hiscore ---" << std::endl;
+	d.queryPerPlayerHiscore(std::cout);
+
+	std::cout << " --- Song Hiscore ---" << std::endl;
+	d.queryPerSongHiscore(std::cout, s);
+
 	return 0;
 }
 
@@ -107,10 +153,11 @@ int test(std::string const& name, int score) {
 
 int main(int argc, char**argv) {
 
-	if (argc < 3) return 3;
+	if (argc < 4) return 3;
 
 	std::string name = argv[1];
-	int score = boost::lexical_cast<int>(argv[2]);
+	std::string song = argv[2];
+	int score = boost::lexical_cast<int>(argv[3]);
 
-	return test(name, score);
+	return test(name, song,  score);
 }

@@ -54,7 +54,7 @@ class Players: boost::noncopyable {
 
 	bool m_dirty;
 
-	friend int test(std::string const&, int);
+	friend int test(std::string const&, std::string const&, int);
 
   public:
 	cur_players_t cur;
@@ -70,7 +70,12 @@ class Players: boost::noncopyable {
 	void update();
 
 	/// lookup a playerid using the players name
-	int lookup(std::string const& name);
+	int lookup(std::string const& name) const;
+
+	/** lookup a players name using the playerid.
+	  @return the players name or "Unkown Player"
+	  */
+	std::string lookup(int id) const;
 
 	/// add a player with a displayed name and an optional picture; if no id is given one will be assigned
 	void addPlayer (std::string const& name, std::string const& picture = "", int id = -1);

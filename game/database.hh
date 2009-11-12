@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <ostream>
 
 #include "players.hh"
 #include "hiscore.hh"
@@ -64,9 +65,13 @@ class Database
 	  Queries if the current player with current score has reached a new hiscore
 	  for the song s.
 	 */
-	bool reachedHiscore (boost::shared_ptr<Song> s);
+	bool reachedHiscore (boost::shared_ptr<Song> s) const;
 
-	friend int test(std::string const&, int);
+	void queryOverallHiscore (std::ostream & os, std::string const& track = "") const;
+	void queryPerSongHiscore (std::ostream & os, boost::shared_ptr<Song> s, std::string const& track = "") const;
+	void queryPerPlayerHiscore (std::ostream & os, std::string const& track = "") const;
+
+	friend int test(std::string const&, std::string const&, int);
 
   private:
 	fs::path m_filename;
