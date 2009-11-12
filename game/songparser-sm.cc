@@ -9,9 +9,6 @@
 /// @file
 /// Functions used for parsing the StepMania SM format
 
-//needs additions to songparser.hh: smCheck, smParseNote, smParseField
-//needs additions to song.hh: typedef std::vector<std::map<int, Note> > d_notes or std::vector<std::vector<Note> > d_notes or similar
-
 namespace {
 	void assign(int& var, std::string const& str) {
 		try {
@@ -45,29 +42,54 @@ void SongParser::smParse() {
 	while (getline(line) && smParseField(line)) {}
 	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
 	if (m_bpm != 0.0) addBPM(0, m_bpm);
-	while (getline(line) && smParseNote(line)) {}
+	
 	// Workaround for the terminating : 1 0 0 line, written by some converters
 /*	if (!s.notes.empty() && s.notes.back().type != Note::SLEEP && s.notes.back().begin == s.notes.back().end) s.notes.pop_back();
 */
 }
 
-bool SongParser::smParseField(std::string& line) {
+bool SongParser::smParseField(std::string line) {
 	if (line.empty()) return true;
 	if (line[0] == '/' && line[1] == '/') return true; //jump over possible comments
 	std::string::size_type pos = line.find(':');
 	if (pos == std::string::npos) throw std::runtime_error("Invalid format, should be #key:value");
 	std::string key = boost::trim_copy(line.substr(1, pos - 1));
 	if (key == "NOTES") {	
-	/*note values need to be analyzed here, because of different kind of 
-	representation. Values are:
-	<NotesType>:
-	<Description>:
-	<DifficultyClass>:
-	<DifficultyMeter>:
-	<RadarValues>:
-	<NoteData>*/
-	return false; // after taking note values, jumps to "NoteData"	
+
+	//temporary containers for note data
+	DanceTrackMap danceTrackMap;
+	Chords chords;
+	
+	//Note values are analyzed here. Values are:
+
+	//<NotesType>:
+	if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
+	std::string notestype = boost::trim_copy(line.substr(0, line.size() -1);
+	//<Description>:
+	if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
+	std::string description = boost::trim_copy(line.substr(0, line.size() -1));
+	m_song.dance_data.addDescription(description);
+	//<DifficultyClass>:
+	if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
+	std::string difficultyclass = boost::trim_copy(line.substr(0, line.size() -1));
+	
+	//ignoring difficultymeter and radarvalues
+	//<DifficultyMeter>:
+	if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
+	//std::string difficultymeter = boost::trim_copy(line.substr(0, line.size() -1));
+	//<RadarValues>:
+	if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
+	//std::string radarvalues = boost::trim_copy(line.substr(0, line.size() -1));
+	
+	//<NoteData>:
+	while (getline(line) && smParseNote(line, chords)) {}
+	
+	DanceTrack danceTrack(difficultyclass, chords);
+	danceTrackMap[difficultyclass] = danceTrack;
+	m_song.danceTracks[notestype] = danceTrackMap;	
+	return true;
 	}
+
 	std::string value = boost::trim_copy(line.substr(pos + 1)); 
 	value.erase(value.size() -1);	// compared to txtParseField, here last character(';') is eliminated
 	if (value.empty()) return true;
@@ -101,38 +123,42 @@ bool SongParser::smParseField(std::string& line) {
 	return true;
 }
 
-bool SongParser::smParseNote(std::string& line){
+bool SongParser::smParseNote(std::string line, Chords chords){
 	if(line.empty()) return true;
 	if(line[0] == '#') throw std::runtime_error("Key found in the middle of notes");
 	if(line[0] == ';') return false; //end mark	
 
-	//reading the notes into m_song.dance_notes
-	//int lcount; 	//line counter for bpm
+	//reading the notes into m_song.dance_data
+	int lcount = 0;	//line counter for bpm
+	int count = 0; //total lines counter
 	int tm = 0; 	//time counter
+	int dur; 	//note duration
 	if(line[0] == ',') {
-		/*TODO  Counting the timestamp of each note
-			tm += 			
-			count new bpm
-			lcount =0;*/
+		/*Counting the timestamp of each note*/
+		dur = 4 * ( 1/(m_bpm/60) ) / lcount;	//counts one note duration in seconds;	
+		for(int j = count - lcount; j<count ; j++) {	
+			for(int i = 0; i<4; i++) {
+				if(m_song.dance_chords[j][i]) m_song.dance_chords[j][i].begin = tm;
+				if(m_song.dance_chords[j][i]) m_song.dance_chords[j][i].end = tm;		
+				
+			}
+			tm += dur;
+		}
+		lcount =0;
 		return true;
 	}
+
+	//reading notes into a chord 
 	std::istringstream iss(line);
-	std::map<int, Note> d_beat;
+	Chord chord;
 	for(int i =1; i <= 4; i++){
-		if(iss.get() == '0') { 
-			Note note;			
-			//@TODO Note should be NULL or something...
-			d_beat[i] = note;
-			continue; 
+		if(iss.get() == '1') {
+			Note note;	
+			chord[i] = note;
 		}
-		else { //if(iss.get() == '1')
-			Note note;		
-			note.begin = tm;
-			note.end = tm;
-			d_beat[i] = note;
-		}
-		//@TODO hold etc. notes
-	m_song.d_notes.push_back(d_beat); //d_notes must be in song.hh
+		//TODO hold etc. notes
+	chords.push_back(chord);
+	lcount++;
 	}
 	return true;
 }

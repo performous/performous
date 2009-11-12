@@ -96,10 +96,17 @@ struct Note {
 
 typedef std::vector<Note> Notes;
 
+//container for dance songs
+typedef std::map<int, Note> Chord;	//int indicates "arrow" position (cmp. fret in guitar) 
+typedef std::vector<Chord> Chords;
 
 
 struct DanceTrack {
-	//TODO
+	//track description
+	std::string description;
+	//container for the actual note data
+	Chords chords;	
+	DanceTrack(std::string d, Chords c);
 };
 
 enum DanceDifficulty {
