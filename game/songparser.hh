@@ -50,7 +50,7 @@ class SongParser {
 		if (m_song.cover.empty() || (m_song.background.empty() && m_song.video.empty())) {
 			boost::regex coverfile("((cover|album|label|\\[co\\])\\.(png|jpeg|jpg|svg|bmp|gif))$", boost::regex_constants::icase);
 			boost::regex backgroundfile("((background|bg||\\[bg\\])\\.(png|jpeg|jpg|svg|bmp|gif))$", boost::regex_constants::icase);
-			boost::regex videofile("(.*\\.(avi|mpg|mpeg|flv|mov))$", boost::regex_constants::icase);
+			boost::regex videofile("(.*\\.(avi|mpg|mpeg|flv|mov|mp4))$", boost::regex_constants::icase);
 			boost::cmatch match;
 
 			for (boost::filesystem::directory_iterator dirIt(s.path), dirEnd; dirIt != dirEnd; ++dirIt) {
