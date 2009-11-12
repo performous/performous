@@ -38,7 +38,7 @@ void SongItems::save(xmlpp::Element *songs) {
 	}
 }
 
-void SongItems::addSongItem(std::string const& artist, std::string const& title, int id) {
+int SongItems::addSongItem(std::string const& artist, std::string const& title, int id) {
 	SongItem si;
 	if (id==-1) id = assign_id_internal();
 	si.id = id;
@@ -51,22 +51,40 @@ void SongItems::addSongItem(std::string const& artist, std::string const& title,
 		si.id = assign_id_internal();
 		m_songs.insert(si); // now do the insert with the fresh id
 	}
+	return si.id;
 }
 
 void SongItems::addSong(boost::shared_ptr<Song> song) {
-	if (lookup(song) == -1) addSongItem(song->artist, song->title);
+	int id = lookup(song);
+	if (id == -1)
+	{
+		id = addSongItem(song->artist, song->title);
+	}
+
+	SongItem si;
+	si.id = id;
+	songs_t::iterator it = m_songs.find(si);
+	if (it == m_songs.end()) throw SongItemsException("Cant find song which was added just before");
+	// it->song.reset(song); // does not work, it is a read only structure...
+
+	// fill up the rest of the information
+	si.artist = it->artist;
+	si.title = it->title;
+	si.song = song;
+
+	m_songs.erase(it);
+	m_songs.insert(si);
 }
 
-int SongItems::lookup(boost::shared_ptr<Song> song) {
-	for (songs_t::iterator it = m_songs.begin(); it != m_songs.end(); ++it)
-	{
+int SongItems::lookup(boost::shared_ptr<Song> song) const {
+	for (songs_t::const_iterator it = m_songs.begin(); it != m_songs.end(); ++it) {
 		if (song->collateByArtistOnly == it->artist && song->collateByTitleOnly == it->title) return it->id;
 	}
 	return -1;
 }
 
-int SongItems::assign_id_internal() {
-	songs_t::const_reverse_iterator it = m_songs.rbegin();
-	if (it != m_songs.rend()) return it->id+1;
+int SongItems::assign_id_internal() const {
+	songs_t::const_iterator it = m_songs.begin();
+	if (it != m_songs.end()) return it->id+1;
 	else return 1; // empty set
 }

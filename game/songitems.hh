@@ -21,10 +21,21 @@ struct SongItemsException: public std::runtime_error {
 
 struct SongItem
 {
-	int id; // TODO use a PUID instead (LibOFA)
+	int id; ///< The unique id for every song
 
+	/** This data is stored separate because it is read in before
+	  the song is added.
+	  A short, but relatively non-ambiguous collate form is used.
+	  */
 	std::string artist;
 	std::string title;
+
+	/** This shared pointer is stored to access all song
+	  information available.
+	  E.g. the full artist information can be accessed using
+	  this pointer.
+	 */
+	boost::shared_ptr<Song> song;
 
 	bool operator< (SongItem const& other) const
 	{
@@ -54,10 +65,15 @@ struct SongItems
 	  There will be no check if artist and title already exist - if you
 	  need that you want addSong().
 	 */
-	void addSongItem(std::string const& artist, std::string const& title, int id = -1);
+	int addSongItem(std::string const& artist, std::string const& title, int id = -1);
 	/**Adds or Links an already existing song with an songitem.
+
 	  The id will be assigned and artist and title will be filled in.
-	  If there is already a song with the same artist and title nothing will be done.
+	  If there is already a song with the same artist and title the existing
+	  will be used.
+
+	  Afterwards the pointer to the song will be stored for entire available
+	  song information.
 
 	  lookup is used internally to achieve that.
 	  */
@@ -65,10 +81,10 @@ struct SongItems
 
 	/**Lookup a songid for a specific song.
 	  @return -1 if no song found.*/
-	int lookup(boost::shared_ptr<Song> song);
+	int lookup(boost::shared_ptr<Song> song) const;
 
   private:
-	int assign_id_internal();
+	int assign_id_internal() const;
 
 	typedef std::set<SongItem> songs_t;
 	songs_t m_songs;
