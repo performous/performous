@@ -39,12 +39,11 @@ add_executable(performous ${SOURCES} ${SDL_SOURCES})
 target_link_libraries(performous da ${LIBS})
 
 # Store library paths in executable
-set_target_properties(performous PROPERTIES
-	INSTALL_RPATH_USE_LINK_PATH TRUE
-	SKIP_BUILD_RPATH FALSE
-	INSTALL_RPATH \$ORIGIN/../lib
-	BUILD_WITH_INSTALL_RPATH FALSE
-)
+if(APPLE)
+	set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE INSTALL_RPATH @loader_path/../lib)
+else()
+	set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE INSTALL_RPATH \$ORIGIN/../lib)
+endif()
 
 # Generate config.hh
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.cmake.hh" "${CMAKE_CURRENT_BINARY_DIR}/config.hh" @ONLY)

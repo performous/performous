@@ -19,7 +19,7 @@ if(NOT WIN32)
   target_link_libraries(plugin++ dl)
 endif()
 
-set_target_properties(plugin++ PROPERTIES INSTALL_NAME_DIR ${CMAKE_INSTALL_PREFIX}/lib)
+set_target_properties(plugin++ PROPERTIES INSTALL_NAME_DIR @rpath/lib)
 install(TARGETS plugin++ DESTINATION lib${LIB_SUFFIX})
 
 FILE(GLOB HEADER_FILES "include/plugin++/*")
