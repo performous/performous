@@ -32,7 +32,7 @@ class DanceGraph {
 	void drawNote(int fret, glutil::Color, float tBeg, float tEnd);
 	glutil::Color const& color(int arrow_i) const ;
 	Audio& m_audio;
-	input::InputDev m_input;
+	//input::InputDev m_input;
 	Song const& m_song;
 	Surface m_arrow;
 	AnimValue m_cx, m_width;

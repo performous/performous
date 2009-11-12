@@ -66,6 +66,7 @@ class ScreenSing: public Screen {
 	  */
 	void activateNextScreen();
 	void instrumentLayout(double time);
+	void danceLayout(double time);
 	Audio& m_audio;
 	Capture& m_capture;
 	Players& m_players;

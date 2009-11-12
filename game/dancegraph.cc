@@ -1,19 +1,46 @@
 #include "dancegraph.hh"
 #include "fs.hh"
 
+
+namespace {
+	const float past = -0.2f;
+	const float future = 1.8f;
+	const float timescale = 25.0f;
+	const float texCoordStep = -0.5f; // Two beat lines per neck texture => 0.5 tex units per beat
+	// Note: t is difference from playback time so it must be in range [past, future]
+	float time2y(float t) { return -timescale * (t - past) / (future - past); }
+	float time2a(float t) {
+		float a = clamp(1.0 - t / future); // Note: we want 1.0 alpha already at zero t.
+		return std::pow(a, 0.8f); // Nicer curve
+	}
+	float y2a(float y) { return time2a(past - y / timescale * (future - past)); }
+	const double maxTolerance = 0.15;
+	
+	// TODO: Use this or something else?
+	double points(double error) {
+		double score = 0.0;
+		if (error < maxTolerance) score += 15;
+		if (error < 0.1) score += 15;
+		if (error < 0.05) score += 15;
+		if (error < 0.03) score += 5;
+		return score;
+	}
+}
+
+
 /// Constructor
 DanceGraph::DanceGraph(Audio& audio, Song const& song):
   m_audio(audio),
   m_song(song),
-  m_input(input::DANCEPAD),
-  m_arrow("arrow.svg"),
+  //m_input(input::DANCEPAD),
+  m_arrow(getThemePath("arrow.svg")),
   m_cx(0.0, 0.2),
   m_width(0.5, 0.4),
   m_stream(),
   m_dead(1000),
   m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
   m_correctness(0.0, 5.0),
-  m_flow_direction(1);
+  m_flow_direction(1),
   m_score(),
   m_scoreFactor(),
   m_streak(),
@@ -40,7 +67,7 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 
 
 glutil::Color const& DanceGraph::color(int arrow_i) const {
-	static glutil::Color arrowColors[3] = {
+	static glutil::Color arrowColors[4] = {
 		glutil::Color(0.0f, 0.9f, 0.0f),
 		glutil::Color(0.9f, 0.0f, 0.0f),
 		glutil::Color(0.9f, 0.9f, 0.0f),
@@ -73,6 +100,7 @@ void DanceGraph::draw(double time) {
 	// Draw the notes
 	// TODO: iteration needs rewrite to the dancenotes structure
 	//for (Chords::const_iterator it = m_chords.begin(); it != m_chords.end(); ++it) {
+		/*
 		float tBeg = it->begin - time;
 		float tEnd = it->end - time;
 		if (tEnd < past) continue;
@@ -88,18 +116,19 @@ void DanceGraph::draw(double time) {
 			c.r += glow;
 			c.g += glow;
 			c.b += glow;
-			drawNote(fret, c, tBeg, tEnd, whammy);
+			drawNote(fret, c, tBeg, tEnd);
 		}
+		*/
 	//}
 	// Arrows on cursor
 	// TODO: suitable effect for pressing the arrows?
 	// TODO: effect possibilities: zooming, whitening, external glow
-	for (int arrow_i = m_drums; arrow_i < 5; ++arrow_i) {
-		float x = -2.0f + fret - 0.5f * m_drums;
+	for (int arrow_i = 0; arrow_i < 4; ++arrow_i) {
+		float x = -2.5f + arrow_i;
 		glColor4fv(color(arrow_i));
 		m_arrow.dimensions.center(time2y(0.0)).middle(x);
 		m_arrow.draw();
-		float l = m_hit[fret + !m_drums].get();
+		//float l = m_hit[fret + !m_drums].get();
 	}
 	glColor3f(1.0f, 1.0f, 1.0f);	
 }
