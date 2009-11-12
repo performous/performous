@@ -118,7 +118,8 @@ void input::SDL::init() {
 			continue;
 		}
 		input::SDL::sdl_devices[i] = joy;
-		std::cout << "  Axes: " << SDL_JoystickNumAxes(joy);
+		std::cout << "  Id: " << i;
+		std::cout << ",  Axes: " << SDL_JoystickNumAxes(joy);
 		std::cout << ", Balls: " << SDL_JoystickNumBalls(joy);
 		std::cout << ", Buttons: " << SDL_JoystickNumButtons(joy);
 		std::cout << ", Hats: " << SDL_JoystickNumHats(joy) << std::endl;
@@ -152,6 +153,9 @@ void input::SDL::init() {
 			std::cout << "  Detected as: RockBand Guitar" << std::endl;
 			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::GUITAR_RB);
 		} else if( name.find("Harmonix Drum Kit") != std::string::npos ) {
+			std::cout << "  Detected as: RockBand Drums" << std::endl;
+			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::DRUMS_RB);
+		} else if( name.find("Harmonix Drum kit") != std::string::npos ) {
 			std::cout << "  Detected as: RockBand Drums" << std::endl;
 			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::DRUMS_RB);
 		} else {

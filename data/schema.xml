@@ -81,7 +81,7 @@ to save the current settings to XML.
 	<entry name="game/instruments" type="string_list">
 		<!-- Should be SDL_ID:{GUITAR_GUITARHERO|GUITAR_ROCKBAND|DRUMS_GUITARHERO|DRUMS_ROCKBAND}
 		     example:
-			<stringvalue>0:GUITAR_GH</stringvalue>
+			<stringvalue>0:GUITAR_GUITARHERO</stringvalue>
 		-->
 		<locale name="C">
 			<short>Joystick configuration</short>
@@ -237,10 +237,6 @@ to save the current settings to XML.
 		</locale>
 	</entry>
 	<entry name="system/path" type="string_list">
-		<stringvalue>/usr/local/share/games/performous/</stringvalue>
-		<stringvalue>/usr/share/games/performous/</stringvalue>
-		<stringvalue>../</stringvalue><!-- For Windows where the program is started in bin/ -->
-		<stringvalue>~/.performous/</stringvalue>
 		<locale name="C">
 			<short>System folders</short>
 			<long>Where to look for performous data.</long>

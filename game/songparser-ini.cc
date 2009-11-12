@@ -156,6 +156,7 @@ void SongParser::iniParse() {
 					{
 						char ch = *syl.rbegin();
 						if (ch == '-') syl.erase(syl.size() - 1);
+						else if (ch == '=') { *syl.rbegin() = '-'; }
 						else if (ch != '~') syl += ' ';
 					}
 				}

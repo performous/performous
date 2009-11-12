@@ -76,18 +76,18 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
 	}
 	unsigned int sr = m_audio.getSR();
 	if (g_samplesD.empty()) {
-		g_samplesD.push_back(Sample(getXdgPath("sounds/drum_bass.ogg"), sr));
-		g_samplesD.push_back(Sample(getXdgPath("sounds/drum_snare.ogg"), sr));
-		g_samplesD.push_back(Sample(getXdgPath("sounds/drum_hi-hat.ogg"), sr));
-		g_samplesD.push_back(Sample(getXdgPath("sounds/drum_tom1.ogg"), sr));
-		g_samplesD.push_back(Sample(getXdgPath("sounds/drum_cymbal.ogg"), sr));
-		//g_samplesD.push_back(Sample(getXdgPath("sounds/drum_tom2.ogg"), sr));
-		g_samplesG.push_back(Sample(getXdgPath("sounds/guitar_fail1.ogg"), sr));
-		g_samplesG.push_back(Sample(getXdgPath("sounds/guitar_fail2.ogg"), sr));
-		g_samplesG.push_back(Sample(getXdgPath("sounds/guitar_fail3.ogg"), sr));
-		g_samplesG.push_back(Sample(getXdgPath("sounds/guitar_fail4.ogg"), sr));
-		g_samplesG.push_back(Sample(getXdgPath("sounds/guitar_fail5.ogg"), sr));
-		g_samplesG.push_back(Sample(getXdgPath("sounds/guitar_fail6.ogg"), sr));
+		g_samplesD.push_back(Sample(getPath("sounds/drum_bass.ogg"), sr));
+		g_samplesD.push_back(Sample(getPath("sounds/drum_snare.ogg"), sr));
+		g_samplesD.push_back(Sample(getPath("sounds/drum_hi-hat.ogg"), sr));
+		g_samplesD.push_back(Sample(getPath("sounds/drum_tom1.ogg"), sr));
+		g_samplesD.push_back(Sample(getPath("sounds/drum_cymbal.ogg"), sr));
+		//g_samplesD.push_back(Sample(getPath("sounds/drum_tom2.ogg"), sr));
+		g_samplesG.push_back(Sample(getPath("sounds/guitar_fail1.ogg"), sr));
+		g_samplesG.push_back(Sample(getPath("sounds/guitar_fail2.ogg"), sr));
+		g_samplesG.push_back(Sample(getPath("sounds/guitar_fail3.ogg"), sr));
+		g_samplesG.push_back(Sample(getPath("sounds/guitar_fail4.ogg"), sr));
+		g_samplesG.push_back(Sample(getPath("sounds/guitar_fail5.ogg"), sr));
+		g_samplesG.push_back(Sample(getPath("sounds/guitar_fail6.ogg"), sr));
 	}
 	unsigned int i = 0;
 	for (TrackMap::const_iterator it = m_song.track_map.begin(); it != m_song.track_map.end(); ++it,++i) {
@@ -367,10 +367,10 @@ void GuitarGraph::draw(double time) {
 	double frac = 0.75;  // Adjustable: 1.0 means fully separated, 0.0 means fully attached
 	// Draw scores
 	if (time < -0.5) {
-		std::string txt;
-		txt += m_track_index->first + "\n" + diffv[m_level].name;
-		m_text.dimensions.screenBottom(-0.05).middle(-0.1 + offsetX);
-		m_text.draw(txt);
+		m_text.dimensions.screenBottom(-0.041).middle(-0.09 + offsetX);
+		m_text.draw(diffv[m_level].name);
+		m_text.dimensions.screenBottom(-0.015).middle(-0.09 + offsetX);
+		m_text.draw(m_track_index->first);
 	} else {
 		m_text.dimensions.screenBottom(-0.30).middle(0.32 * dimensions.w() + offsetX);
 		m_text.draw(boost::lexical_cast<std::string>(unsigned(getScore())));
