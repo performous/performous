@@ -19,7 +19,7 @@ if(NOT WIN32)
   target_link_libraries(plugin++ dl)
 endif()
 
-set_target_properties(plugin++ PROPERTIES INSTALL_NAME_DIR @rpath/lib)
+set_target_properties(plugin++ PROPERTIES INSTALL_NAME_DIR @rpath)
 install(TARGETS plugin++ DESTINATION lib${LIB_SUFFIX})
 
 FILE(GLOB HEADER_FILES "include/plugin++/*")
