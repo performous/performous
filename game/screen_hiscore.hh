@@ -42,6 +42,7 @@ class ScreenHiscore : public Screen {
 	boost::scoped_ptr<Surface> m_songbg;
 	boost::scoped_ptr<Video> m_video;
 	boost::scoped_ptr<ThemeSongs> theme;
+	boost::scoped_ptr<Surface> m_background;
 	std::string m_playing;
 	std::string m_playReq;
 	AnimValue m_playTimer;

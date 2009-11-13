@@ -20,6 +20,18 @@ ScreenHiscore::ScreenHiscore(std::string const& name, Audio& audio, Database& da
 }
 
 void ScreenHiscore::enter() {
+	if (!m_song->background.empty()) {
+		try {
+			m_background.reset(new Surface(m_song->path + m_song->background, true));
+		} catch (std::exception& e) {
+			std::cerr << e.what() << std::endl;
+		}
+	}
+
+	if (!m_song->video.empty() && config["graphic/video"].b()) {
+		m_video.reset(new Video(m_song->path + m_song->video, m_song->videoGap));
+	}
+
 	m_score_text[0].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_score_text[1].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_score_text[2].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
@@ -29,7 +41,8 @@ void ScreenHiscore::enter() {
 	m_emptyCover.reset(new Surface(getThemePath("no_cover.svg"))); // TODO use persons head
 	m_search.text.clear();
 	m_players.setFilter(m_search.text);
-	m_audio.fadeout();
+	// m_audio.fadeout();
+	m_audio.playMusic(m_song->music, false, 0.0, -1.0);
 }
 
 void ScreenHiscore::exit() {
@@ -97,12 +110,44 @@ void ScreenHiscore::drawScores() {
 	}
 }
 
+namespace {
+
+	const double arMin = 1.33;
+	const double arMax = 2.35;
+
+	void fillBG() {
+		Dimensions dim(arMin);
+		dim.fixedWidth(1.0);
+		glutil::Begin block(GL_QUADS);
+		glVertex2f(dim.x1(), dim.y1());
+		glVertex2f(dim.x2(), dim.y1());
+		glVertex2f(dim.x2(), dim.y2());
+		glVertex2f(dim.x1(), dim.y2());
+	}
+
+}
+
 void ScreenHiscore::draw() {
+	const double arMin = 1.33;
+	const double arMax = 2.35;
+
 	m_players.update(); // Poll for new players
 	double length = m_audio.getLength();
 	double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
-	if (m_songbg.get()) m_songbg->draw();
-	if (m_video.get()) m_video->render(time);
+	time -= config["audio/video_delay"].f();
+	
+	// Rendering starts
+	{
+		double ar = arMax;
+		if (m_background) {
+			ar = m_background->dimensions.ar();
+			if (ar > arMax || (m_video && ar > arMin)) fillBG();  // Fill white background to avoid black borders
+			m_background->draw();
+		} else fillBG();
+		if (m_video) { m_video->render(time); double tmp = m_video->dimensions().ar(); if (tmp > 0.0) ar = tmp; }
+		ar = clamp(ar, arMin, arMax);
+	}
+
 	theme->bg.draw();
 	std::string music, songbg, video;
 	double videoGap = 0.0;
