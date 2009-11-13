@@ -176,7 +176,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		}
 		else if (key == SDLK_RETURN) {
 			if (m_score_window.get()) { activateNextScreen(); return; } // Score window visible -> Enter quits
-			else if (status == Song::FINISHED) {
+			else if (status == Song::FINISHED && m_song->track_map.empty()) {
 				m_engine->kill(); // kill the engine thread (to avoid consuming memory)
 				m_score_window.reset(new ScoreWindow(m_instruments, m_database)); // Song finished, but no score window -> show it
 			}
