@@ -276,7 +276,7 @@ void ScreenSing::draw() {
 		theme->timer.draw(statustxt);
 	}
 
-	if (config["game/karaoke_mode"].b() || !m_song->track_map.empty()) {
+	if (config["game/karaoke_mode"].b()) {
 		if (!m_audio.isPlaying()) {
 			ScreenManager* sm = ScreenManager::getSingletonPtr();
 			sm->activateScreen("Songs");
