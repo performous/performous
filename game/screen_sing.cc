@@ -92,7 +92,10 @@ void ScreenSing::enter() {
 
 void ScreenSing::instrumentLayout(double time) {
 	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end();) {
-		if (it->dead(time)) it = m_instruments.erase(it); else ++it;
+		if (it->dead(time)) {
+			std::cout << it->getTrack() << " was thrown out after " << time << " inactive" << std::endl;
+			it = m_instruments.erase(it);
+		} else ++it;
 	}
 	double iw = std::min(0.5, 1.0 / m_instruments.size());
 	for (Instruments::size_type i = 0, s = m_instruments.size(); i < s; ++i) {
@@ -173,7 +176,10 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		}
 		else if (key == SDLK_RETURN) {
 			if (m_score_window.get()) { activateNextScreen(); return; } // Score window visible -> Enter quits
-			else if (status == Song::FINISHED) m_score_window.reset(new ScoreWindow(*m_engine, m_database)); // Song finished, but no score window -> show it
+			else if (status == Song::FINISHED) {
+				m_engine->kill(); // kill the engine thread (to avoid consuming memory)
+				m_score_window.reset(new ScoreWindow(m_instruments, m_database)); // Song finished, but no score window -> show it
+			}
 		}
 		else if (key == SDLK_SPACE || key == SDLK_PAUSE) m_audio.togglePause();
 		if (m_score_window.get()) return;
@@ -295,7 +301,8 @@ void ScreenSing::draw() {
 		else if (!m_audio.isPlaying() || (status == Song::FINISHED && m_audio.getLength() - time < 3.0)) {
 			// Time to create the score window
 			m_quitTimer.setValue(QUIT_TIMEOUT);
-			m_score_window.reset(new ScoreWindow(*m_engine, m_database));
+			m_engine->kill(); // kill the engine thread (to avoid consuming memory)
+			m_score_window.reset(new ScoreWindow(m_instruments, m_database));
 		}
 	}
 		
@@ -305,7 +312,7 @@ void ScreenSing::draw() {
 	}
 }
 
-ScoreWindow::ScoreWindow(Engine& e, Database& database):
+ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
   m_database(database),
   m_pos(0.8, 2.0),
   m_bg(getThemePath("score_window.svg")),
@@ -314,16 +321,30 @@ ScoreWindow::ScoreWindow(Engine& e, Database& database):
   m_score_rank(getThemePath("score_rank.svg"))
 {
 	m_pos.setTarget(0.0);
-	e.kill(); // kill the engine thread (to avoid consuming memory)
 
 	m_database.scores.clear();
-	unsigned int topScore = 0;
+	int topScore = 0;
 	for (std::list<Player>::iterator p = m_database.cur.begin(); p != m_database.cur.end();) {
-		unsigned int score = p->getScore();
-		if (score < 500) { p = m_database.cur.erase(p); continue; }
-		m_database.scores.push_back(score);
-		if (score > topScore) topScore = score;
+		ScoreItem item;
+		item.score = p->getScore();
+		item.track = "vocals";
+
+		if (item.score < 500) { p = m_database.cur.erase(p); continue; }
+		m_database.scores.push_back(item);
+		if (item.score > topScore) topScore = item.score;
 		++p;
+	}
+	for (Instruments::iterator it = instruments.begin(); it != instruments.end();) {
+		ScoreItem item;
+		item.score = it->getScore();
+		item.track = it->getTrack();
+
+		if (item.score < 500) { std::cout << "kick " << item.track << std::endl; it = instruments.erase(it); continue; }
+		std::cout << "insert " << item.track << " score: " << item.score << std::endl;
+		m_database.scores.push_back(item);
+		// TODO: top score for best instrumental
+		// if (item.score > topScore) topScore = item.score;
+		++it;
 	}
 	m_database.scores.sort();
 	m_database.scores.reverse(); // top should be first

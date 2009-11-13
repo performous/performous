@@ -46,6 +46,7 @@ namespace {
 }
 
 GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
+  m_track(track),
   m_audio(audio),
   m_input(track=="drums" ? input::DRUMS : input::GUITAR),
   m_song(song),

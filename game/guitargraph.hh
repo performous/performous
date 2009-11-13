@@ -59,9 +59,11 @@ class GuitarGraph {
 	double correctness() const { return m_correctness.get(); }
 	std::string getTrackIndex() const { return m_track_index->first; }
 	int getScore() const { return m_score * m_scoreFactor; }
+	std::string getTrack() const { return m_track; }
   private:
 	void fail(double time, int fret);
 	void endHold(int fret);
+	std::string m_track;
 	Audio& m_audio;
 	input::InputDev m_input;
 	Song const& m_song;

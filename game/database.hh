@@ -9,6 +9,15 @@
 
 #include "fs.hh"
 
+struct ScoreItem {
+	int score;
+	std::string track;
+	bool operator < (ScoreItem const& other)
+	{
+		return score < other.score;
+	}
+};
+
 /**Access to a database for performous which holds
   Player-, Hiscore-, Song-, Track- and (in future)
   Partydata.
@@ -64,7 +73,7 @@ class Database
 	friend class Engine;
   private: // will be bypassed by above friend declaration
 	typedef std::list<Player> cur_players_t;
-	typedef std::list<int> cur_scores_t;
+	typedef std::list<ScoreItem> cur_scores_t;
 
 	//This fields are misused as additional parameters
 	cur_players_t cur;

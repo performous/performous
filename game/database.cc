@@ -71,17 +71,19 @@ void Database::addSong (boost::shared_ptr<Song> s) {
 
 void Database::addHiscore (boost::shared_ptr<Song> s) {
 	int playerid = m_players.lookup(m_players.current().name);
-	int score = scores.front();
+	int score = scores.front().score;
+	std::string track = scores.front().track;
 	int songid = m_songs.lookup(s);
 
-	m_hiscores.addHiscore(score, playerid, songid);
+	m_hiscores.addHiscore(score, playerid, songid, track);
 }
 
 bool Database::reachedHiscore (boost::shared_ptr<Song> s) const {
-	int score = scores.front();
+	int score = scores.front().score;
+	std::string track = scores.front().track;
 	int songid = m_songs.lookup(s);
 
-	return m_hiscores.reachedHiscore(score, songid);
+	return m_hiscores.reachedHiscore(score, songid, track);
 }
 
 void Database::queryOverallHiscore (std::ostream & os, std::string const& track) const {

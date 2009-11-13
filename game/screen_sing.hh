@@ -22,11 +22,13 @@ class Capture;
 class Database;
 class Video;
 
+typedef boost::ptr_vector<GuitarGraph> Instruments;
+
 /// shows score at end of song
 class ScoreWindow {
   public:
 	/// constructor
-	ScoreWindow(Engine & e, Database& database);
+	ScoreWindow(Instruments& instruments, Database& database);
 	/// draws ScoreWindow
 	void draw();
 	bool empty() { return m_database.cur.empty(); }
@@ -79,7 +81,6 @@ class ScreenSing: public Screen {
 	boost::scoped_ptr<Surface> m_help;
 	boost::scoped_ptr<Engine> m_engine;
 	boost::scoped_ptr<LayoutSinger> m_layout_singer;
-	typedef boost::ptr_vector<GuitarGraph> Instruments;
 	Instruments m_instruments;
 	double m_latencyAV;  // Latency between audio and video output (do not confuse with latencyAR)
 	boost::shared_ptr<ThemeSing> theme;
