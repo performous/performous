@@ -63,7 +63,7 @@ namespace glutil {
 		      b, ///< blue
 		      a; ///< alpha value
 		/// create nec Color object with given channels
-		Color(float r_, float g_, float b_, float a_ = 1.0): r(r_), g(g_), b(b_), a(a_) {}
+		Color(float r_ = 0.0, float g_ = 0.0, float b_ = 0.0, float a_ = 1.0): r(r_), g(g_), b(b_), a(a_) {}
 		/// overload float cast
 		operator float*() { return reinterpret_cast<float*>(this); }
 		/// overload float const cast

@@ -8,7 +8,7 @@
 #include "database.hh"
 #include "video.hh"
 #include "guitargraph.hh"
-
+#include "glutil.hh"
 
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
@@ -328,7 +328,8 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 		ScoreItem item;
 		item.score = p->getScore();
 		item.track = "vocals";
-
+		item.color = glutil::Color(p->m_color.r, p->m_color.g, p->m_color.b);
+		
 		if (item.score < 500) { p = m_database.cur.erase(p); continue; }
 		m_database.scores.push_back(item);
 		if (item.score > topScore) topScore = item.score;
@@ -350,7 +351,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 	m_database.scores.reverse(); // top should be first
 	// topScore is also in m_database.scores.front()
 
-	if (m_database.cur.empty()) m_rank = "No singer!";
+	if (m_database.scores.empty()) m_rank = "No player!";
 	else if (topScore > 8000) m_rank = "Hit singer";
 	else if (topScore > 6000) m_rank = "Lead singer";
 	else if (topScore > 4000) m_rank = "Rising star";
@@ -364,12 +365,12 @@ void ScoreWindow::draw() {
 	glutil::PushMatrix block;
 	glTranslatef(0.0, m_pos.get(), 0.0);
 	m_bg.draw();
-	const double spacing = 0.1 + 0.1 / m_database.cur.size();
+	const double spacing = 0.1 + 0.1 / m_database.scores.size();
 	unsigned i = 0;
 
-	for (std::list<Player>::const_iterator p = m_database.cur.begin(); p != m_database.cur.end(); ++p, ++i) {
-		int score = p->getScore();
-		glColor3f(p->m_color.r, p->m_color.g, p->m_color.b);
+	for (Database::cur_scores_t::const_iterator p = m_database.scores.begin(); p != m_database.scores.end(); ++p, ++i) {
+		int score = p->score;
+		glColor4fv(p->color);
 		double x = -0.12 + spacing * (0.5 + i - 0.5 * m_database.cur.size());
 		m_scoreBar.dimensions.middle(x).bottom(0.24);
 		m_scoreBar.draw(score / 10000.0);

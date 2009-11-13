@@ -6,12 +6,13 @@
 #include "players.hh"
 #include "hiscore.hh"
 #include "songitems.hh"
-
+#include "glutil.hh"
 #include "fs.hh"
 
 struct ScoreItem {
 	int score;
 	std::string track;
+	glutil::Color color;
 	bool operator < (ScoreItem const& other)
 	{
 		return score < other.score;

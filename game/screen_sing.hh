@@ -31,7 +31,7 @@ class ScoreWindow {
 	ScoreWindow(Instruments& instruments, Database& database);
 	/// draws ScoreWindow
 	void draw();
-	bool empty() { return m_database.cur.empty(); }
+	bool empty() { return m_database.scores.empty(); }
   private:
 	Database& m_database;
 	AnimValue m_pos;
