@@ -1,6 +1,7 @@
 #include "dancegraph.hh"
-#include "fs.hh"
 
+#include "fs.hh"
+#include <boost/lexical_cast.hpp>
 
 namespace {
 	const float past = -0.2f;
