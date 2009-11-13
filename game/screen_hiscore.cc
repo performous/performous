@@ -10,39 +10,25 @@
 #include <sstream>
 #include <boost/format.hpp>
 
-static const double IDLE_TIMEOUT = 45.0; // seconds
-
-ScreenHiscore::ScreenHiscore(std::string const& name, Audio& audio, Database& database):
-  Screen(name), m_audio(audio), m_database(database), m_players(database.m_players), m_covers(20)
+ScreenHiscore::ScreenHiscore(std::string const& name, Audio& audio, Songs& songs, Database& database):
+  ScreenSongs(name, audio, songs), m_database(database), m_players(database.m_players)
 {
 	m_players.setAnimMargins(5.0, 5.0);
-	m_playTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
 }
 
 void ScreenHiscore::enter() {
-	if (!m_song->background.empty()) {
-		try {
-			m_background.reset(new Surface(m_song->path + m_song->background, true));
-		} catch (std::exception& e) {
-			std::cerr << e.what() << std::endl;
-		}
-	}
-
-	if (!m_song->video.empty() && config["graphic/video"].b()) {
-		m_video.reset(new Video(m_song->path + m_song->video, m_song->videoGap));
-	}
-
 	m_score_text[0].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_score_text[1].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_score_text[2].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_score_text[3].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_player_icon.reset(new Surface(getThemePath("sing_pbox.svg")));
-	theme.reset(new ThemeSongs());
-	m_emptyCover.reset(new Surface(getThemePath("no_cover.svg"))); // TODO use persons head
+
+	// m_emptyCover.reset(new Surface(getThemePath("no_person.svg"))); // TODO use persons head
+
 	m_search.text.clear();
 	m_players.setFilter(m_search.text);
-	// m_audio.fadeout();
-	m_audio.playMusic(m_song->music, false, 0.0, -1.0);
+
+	ScreenSongs::enter();
 }
 
 void ScreenHiscore::exit() {
@@ -52,13 +38,7 @@ void ScreenHiscore::exit() {
 	m_score_text[2].reset();
 	m_score_text[3].reset();
 
-	m_covers.clear();
-	m_emptyCover.reset();
-	theme.reset();
-	m_video.reset();
-	m_songbg.reset();
-	m_playing.clear();
-	m_playReq.clear();
+	ScreenSongs::exit();
 }
 
 void ScreenHiscore::activateNextScreen() {
@@ -110,51 +90,17 @@ void ScreenHiscore::drawScores() {
 	}
 }
 
-namespace {
-
-	const double arMin = 1.33;
-	const double arMax = 2.35;
-
-	void fillBG() {
-		Dimensions dim(arMin);
-		dim.fixedWidth(1.0);
-		glutil::Begin block(GL_QUADS);
-		glVertex2f(dim.x1(), dim.y1());
-		glVertex2f(dim.x2(), dim.y1());
-		glVertex2f(dim.x2(), dim.y2());
-		glVertex2f(dim.x1(), dim.y2());
-	}
-
-}
-
 void ScreenHiscore::draw() {
-	const double arMin = 1.33;
-	const double arMax = 2.35;
+	ScreenSharedInfo info;
+	info.videoGap = 0.0;
 
-	m_players.update(); // Poll for new players
-	double length = m_audio.getLength();
-	double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
-	time -= config["audio/video_delay"].f();
-	
-	// Rendering starts
-	{
-		double ar = arMax;
-		if (m_background) {
-			ar = m_background->dimensions.ar();
-			if (ar > arMax || (m_video && ar > arMin)) fillBG();  // Fill white background to avoid black borders
-			m_background->draw();
-		} else fillBG();
-		if (m_video) { m_video->render(time); double tmp = m_video->dimensions().ar(); if (tmp > 0.0) ar = tmp; }
-		ar = clamp(ar, arMin, arMax);
-	}
+	ScreenSongs::drawMultimedia();
+	ScreenSongs::updateMultimedia(*m_song, info);
 
-	theme->bg.draw();
-	std::string music, songbg, video;
-	double videoGap = 0.0;
 	std::ostringstream oss_song, oss_order;
 
 	// Format the player information text
-	oss_song << "Hiscore for " << m_song->title << "!\n";
+	oss_song << "Hiscore for " << m_song->title << "\n";
 
 	m_database.queryPerSongHiscore(oss_order, m_song);
 
@@ -162,17 +108,6 @@ void ScreenHiscore::draw() {
 	theme->song.draw(oss_song.str());
 	theme->order.draw(oss_order.str());
 
-		// Schedule playback change if the chosen song has changed
-	if (music != m_playReq) { m_playReq = music; m_playTimer.setValue(0.0); }
-	// Play/stop preview playback (if it is the time)
-	if (music != m_playing && m_playTimer.get() > 0.4) {
-		m_songbg.reset(); m_video.reset();
-		// if (music.empty()) m_audio.fadeout(); else m_audio.playPreview(music, 30.0);
-		if (!songbg.empty()) try { m_songbg.reset(new Surface(songbg)); } catch (std::exception const&) {}
-		if (!video.empty() && config["graphic/video"].b()) m_video.reset(new Video(video, videoGap));
-		m_playing = music;
-	} else if (!m_audio.isPaused() && m_playTimer.get() > IDLE_TIMEOUT) {  // Switch if song hasn't changed for IDLE_TIMEOUT seconds
-		if (!m_search.text.empty()) { m_search.text.clear(); m_players.setFilter(m_search.text); }
-	}
+	ScreenSongs::stopMultimedia(info);
 }
 

@@ -150,7 +150,7 @@ void mainLoop(std::string const& songlist) {
 		sm.addScreen(new ScreenPractice("Practice", audio, capture));
 		sm.addScreen(new ScreenConfiguration("Configuration", audio));
 		sm.addScreen(new ScreenPlayers("Players", audio, database));
-		sm.addScreen(new ScreenHiscore("Hiscore", audio, database));
+		sm.addScreen(new ScreenHiscore("Hiscore", audio, songs, database));
 		sm.activateScreen("Intro");
 		// Main loop
 		boost::xtime time = now();

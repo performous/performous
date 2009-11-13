@@ -167,16 +167,39 @@ void ScreenSongs::drawJukebox() {
 	}
 }
 
-void ScreenSongs::draw() {
-	m_songs.update(); // Poll for new songs
+void ScreenSongs::drawMultimedia() {
 	double length = m_audio.getLength();
 	double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
 	if (m_songbg.get()) m_songbg->draw(); else m_songbg_default->draw();
 	if (m_video.get()) m_video->render(time);
 	if (!m_jukebox) theme->bg.draw();
-	std::string songbg, video;
-	std::map<std::string,std::string> music;
-	double videoGap = 0.0;
+}
+
+void ScreenSongs::updateMultimedia(Song& song, ScreenSharedInfo& info) {
+	if (!song.music.empty()) info.music = song.music; // TODO it is always empty?
+	if (!song.background.empty()) info.songbg = song.path + song.background;
+	if (!song.video.empty()) { info.video = song.path + song.video; info.videoGap = song.videoGap; }
+}
+
+void ScreenSongs::stopMultimedia(ScreenSharedInfo& info) {
+	// Schedule playback change if the chosen song has changed
+	if (info.music != m_playReq) { m_playReq = info.music; m_playTimer.setValue(0.0); }
+	// Play/stop preview playback (if it is the time)
+	if (info.music != m_playing && m_playTimer.get() > 0.3) {
+		m_songbg.reset(); m_video.reset();
+		if (info.music.empty()) m_audio.fadeout(1.0); else m_audio.playMusic(info.music, true, 2.0);
+		if (!info.songbg.empty()) try { m_songbg.reset(new Surface(info.songbg)); } catch (std::exception const&) {}
+		if (!info.video.empty() && config["graphic/video"].b()) m_video.reset(new Video(info.video, info.videoGap));
+		m_playing = info.music;
+	}
+}
+
+void ScreenSongs::draw() {
+	m_songs.update(); // Poll for new songs
+	ScreenSharedInfo info;
+	info.videoGap = 0.0;
+
+	drawMultimedia();
 	std::ostringstream oss_song, oss_order;
 	// Test if there are no songs
 	if (m_songs.empty()) {
@@ -291,9 +314,7 @@ void ScreenSongs::draw() {
 				}
 			}
 		}
-		if (!song.music.empty()) music = song.music;
-		if (!song.background.empty()) songbg = song.path + song.background;
-		if (!song.video.empty()) { video = song.path + song.video; videoGap = song.videoGap; }
+		updateMultimedia(song, info);
 	}
 	if (m_jukebox) drawJukebox();
 	else {
@@ -301,16 +322,7 @@ void ScreenSongs::draw() {
 		theme->song.draw(oss_song.str());
 		theme->order.draw(oss_order.str());
 	}
-	// Schedule playback change if the chosen song has changed
-	if (music != m_playReq) { m_playReq = music; m_playTimer.setValue(0.0); }
-	// Play/stop preview playback (if it is the time)
-	if (music != m_playing && m_playTimer.get() > 0.3) {
-		m_songbg.reset(); m_video.reset();
-		if (music.empty()) m_audio.fadeout(1.0); else m_audio.playMusic(music, true, 2.0);
-		if (!songbg.empty()) try { m_songbg.reset(new Surface(songbg)); } catch (std::exception const&) {}
-		if (!video.empty() && config["graphic/video"].b()) m_video.reset(new Video(video, videoGap));
-		m_playing = music;
-	}
+	stopMultimedia(info);
 	if (m_jukebox) {
 		// Switch if at song end
 		if (!m_audio.isPlaying() || m_audio.getPosition() + 1.3 > m_audio.getLength()) {
