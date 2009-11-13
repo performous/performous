@@ -59,7 +59,7 @@ void Songs::reload_internal(fs::path const& parent) {
 	namespace fs = fs;
 	if (std::distance(parent.begin(), parent.end()) > 20) { std::cout << ">>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)" << std::endl; return; }
 	try {
-		boost::regex expression("(.*\\.txt|^song\\.ini)$", boost::regex_constants::icase);
+		boost::regex expression("(.*\\.txt|^song\\.ini|.*\\.sm)$", boost::regex_constants::icase);
 		boost::cmatch match;
 		for (fs::directory_iterator dirIt(parent), dirEnd; m_loading && dirIt != dirEnd; ++dirIt) {
 			fs::path p = dirIt->path();
