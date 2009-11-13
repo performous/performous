@@ -99,6 +99,14 @@ void Database::queryOverallHiscore (std::ostream & os, std::string const& track)
 void Database::queryPerSongHiscore (std::ostream & os, boost::shared_ptr<Song> s, std::string const& track) const {
 	int songid = m_songs.lookup(s);
 	std::vector<HiscoreItem> hi = m_hiscores.queryHiscore(10, -1, songid, track);
+
+	if (songid == -1 || hi.size() == 0)
+	{
+		os << "No Items up to now.\n";
+		os << "Be the first to be listed here!\n";
+		return;
+	}
+
 	for (size_t i=0; i<hi.size(); ++i)
 	{
 		os << i+1 << ".\t"
