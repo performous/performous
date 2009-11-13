@@ -145,7 +145,7 @@ bool SongParser::smParseNote(std::string line, DanceChords chords){
 		for(int j = count - lcount; j<count ; j++) {	
 			for(int i = 0; i<4; i++) {
 				DanceChord _chord = chords.at(j);
-				if(_chord[i] != _chord.end()) {
+				if(_chord.find(i) != _chord.end()) {
 					_chord[i].begin = tm;
 					_chord[i].end = tm;
 				}				
