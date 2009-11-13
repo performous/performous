@@ -91,8 +91,8 @@ bool SongParser::smParseField(std::string line) {
 	while (getline(line) && smParseNote(line, chords)) {}
 	
 	DanceTrack danceTrack(description, chords);
-//	danceDifficultyMap[danceDifficulty] = danceTrack;
-//	m_song.danceTracks[notestype] = danceDifficultyMap;	
+	danceDifficultyMap.insert(std::make_pair(danceDifficulty, danceTrack));
+	m_song.danceTracks.insert(std::make_pair(notestype, danceDifficultyMap));	
 	return true;
 	}
 
@@ -144,9 +144,11 @@ bool SongParser::smParseNote(std::string line, DanceChords chords){
 		dur = 4 * ( 1/(m_bpm/60) ) / lcount;	//counts one note duration in seconds;	
 		for(int j = count - lcount; j<count ; j++) {	
 			for(int i = 0; i<4; i++) {
-	//			if((chords[j])[i]) (chords[j])[i].begin = tm;
-	//			if((chords[j])[i]) (chords[j])[i].end = tm;		
-				
+				DanceChord _chord = chords.at(j);
+				if(_chord[i] != _chord.end()) {
+					_chord[i].begin = tm;
+					_chord[i].end = tm;
+				}				
 			}
 			tm += dur;
 		}
