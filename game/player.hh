@@ -65,11 +65,11 @@ struct Player {
   Used for Players Management.
   */
 struct PlayerItem {
-	int id; /// unique identifier for this PlayerItem, Link to hiscore
+	int id; ///< unique identifier for this PlayerItem, Link to hiscore
 
-	std::string name; /// name displayed and used for searching the player
-	std::string path; /// a path to a picture shown
-	std::string picture; /// + the filename for it
+	std::string name; ///< name displayed and used for searching the player
+	std::string picture; ///< the filename which was passed from xml (and is written back)
+	std::string path; ///< a full path to a picture shown, generated from picture above
 /* Future ideas
 	std::string displayedName; /// artist name, short name, nick (can be changed)
 	std::map<std::string, int> scores; /// map between a Song and the highest score the Player achieved

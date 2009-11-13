@@ -129,7 +129,7 @@ void ScreenPlayers::draw() {
 			Surface* cover = 0;
 			if (player_display.path != "")
 			{
-				try { cover = &m_covers[player_display.path + "/" + player_display.picture]; }
+				try { cover = &m_covers[player_display.path]; }
 				catch (std::exception const&) {}
 			}
 			Surface& s = (cover ? *cover : *m_emptyCover);
