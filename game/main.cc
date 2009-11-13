@@ -134,9 +134,7 @@ void audioSetup(Capture& capture, Audio& audio) {
 	if (!audio.isOpen()) std::cerr << "No playback devices could be used. Please use --pdev to define one." << std::endl;
 }
 
-std::string songlist;
-
-void mainLoop() {
+void mainLoop(std::string const& songlist) {
 	try {
 		Capture capture;
 		Audio audio;
@@ -205,6 +203,7 @@ int main(int argc, char** argv) {
 	std::vector<std::string> songdirs;
 	namespace po = boost::program_options;
 	po::options_description opt1("Generic options");
+	std::string songlist;
 	opt1.add_options()
 	  ("help,h", "you are viewing it")
 	  ("version,v", "display version number")
@@ -288,7 +287,7 @@ int main(int argc, char** argv) {
 	confOverride(mics, "audio/capture");
 	confOverride(pdevs, "audio/playback");
 	// Run the game init and main loop
-	mainLoop();
+	mainLoop(songlist);
 	return 0; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
 }
 
