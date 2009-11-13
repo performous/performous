@@ -89,7 +89,7 @@ void ScreenSing::enter() {
 	if (true) {
 		while(true) {
 			try {
-				//m_dancers.push_back(new DanceGraph(m_audio, *m_song));
+				m_dancers.push_back(new DanceGraph(m_audio, *m_song));
 				break; // REMOVEME
 			} catch (std::runtime_error&) { break; }
 		}
@@ -137,7 +137,7 @@ void ScreenSing::danceLayout(double time) {
 	double iw = std::min(0.5, 1.0 / m_dancers.size());
 	Dancers::size_type i = 0;
 	for (Dancers::iterator it = m_dancers.begin(); it != m_dancers.end(); ++it, ++i) {
-		it->position(0.5 + (i * 0.5 * m_dancers.size()) * iw, iw);
+		it->position((0.5 + i - 0.5 * m_dancers.size()) * iw, iw);
 		it->engine();
 		it->draw(time);
 	}
@@ -270,7 +270,7 @@ void ScreenSing::draw() {
 
 	if( !m_dancers.empty() ) {
 		danceLayout(time);
-		m_layout_singer->draw(time, LayoutSinger::LEFT);
+		//m_layout_singer->draw(time, LayoutSinger::LEFT);
 	} else if( m_instruments.empty() ) {
 		m_layout_singer->draw(time, LayoutSinger::BOTTOM);
 	} else {

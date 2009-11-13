@@ -29,8 +29,9 @@ class DanceGraph {
 	int getScore() const { return m_score * m_scoreFactor; }
   private:
 	void dance(double time, input::Event const& ev);
-	void drawNote(int fret, glutil::Color, float tBeg, float tEnd);
+	void drawNote(int arrow_i, glutil::Color, float tBeg, float tEnd);
 	glutil::Color const& color(int arrow_i) const ;
+	void drawArrow(int arrow_i, float x, float y, float scale = 1.0);
 	Audio& m_audio;
 	//input::InputDev m_input;
 	Song const& m_song;
