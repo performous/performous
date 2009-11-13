@@ -173,7 +173,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		}
 		else if (key == SDLK_RETURN) {
 			if (m_score_window.get()) { activateNextScreen(); return; } // Score window visible -> Enter quits
-			else if (status == Song::FINISHED) m_score_window.reset(new ScoreWindow(*m_engine, m_database)); // Song finished, but no score window -> show it
+			else if (status == Song::FINISHED && m_song->track_map.empty()) m_score_window.reset(new ScoreWindow(*m_engine, m_database)); // Song finished, but no score window -> show it
 		}
 		else if (key == SDLK_SPACE || key == SDLK_PAUSE) m_audio.togglePause();
 		if (m_score_window.get()) return;
