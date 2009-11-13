@@ -8,6 +8,9 @@ namespace fs = boost::filesystem;
 /** Get user's home folder **/
 fs::path getHomeDir();
 
+/** Get the users configuration folder **/
+fs::path getConfigDir();
+
 /** Do mangling to convert user-entered path into path suitable for use with stdlib etc. **/
 fs::path pathMangle(fs::path const& dir);
 

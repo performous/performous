@@ -18,6 +18,18 @@ fs::path getHomeDir() {
 	return dir;
 }
 
+fs::path getConfigDir() {
+	static fs::path dir;
+	static bool initialized = false;
+	if (!initialized) {
+		initialized = true;
+		char const* conf = getenv("XDG_CONFIG_HOME");
+		if (conf) dir = fs::path(conf) / "performous";
+		else dir = getHomeDir() / ".config" / "performous";
+	}
+	return dir;
+}
+
 fs::path pathMangle(fs::path const& dir) {
 	fs::path ret;
 	for (fs::path::const_iterator it = dir.begin(); it != dir.end(); ++it) {

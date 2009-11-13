@@ -201,7 +201,7 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) {
 }
 
 fs::path systemConfFile = "/etc/xdg/performous/config.xml";
-fs::path userConfFile = getHomeDir() / ".config" / "performous" / "config.xml";
+fs::path userConfFile = getConfigDir() / "config.xml";
 
 void writeConfig(bool system) {
 	xmlpp::Document doc;

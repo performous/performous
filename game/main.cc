@@ -140,7 +140,7 @@ void mainLoop(std::string const& songlist) {
 		Audio audio;
 		audioSetup(capture, audio);
 		Backgrounds backgrounds;
-		Database database(getHomeDir() / ".config" / "performous" / "database.xml");
+		Database database(getConfigDir() / "database.xml");
 		Songs songs(database, songlist);
 		ScreenManager sm;
 		Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());
