@@ -5,14 +5,16 @@
 #include "cachemap.hh"
 #include "screen.hh"
 #include "textinput.hh"
-#include "theme.hh"
-#include "video.hh"
-#include "hiscore.hh"
-#include "layout_singer.hh"
 
+class Song;
 class Audio;
-class Database;
+class Video;
 class Players;
+class Surface;
+class Database;
+class ThemeSongs;
+class LayoutSinger;
+
 
 /** song chooser screen.
   Database is passed as argument, but only the players is stored

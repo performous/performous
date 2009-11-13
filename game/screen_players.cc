@@ -5,6 +5,10 @@
 #include "database.hh"
 #include "fs.hh"
 #include "util.hh"
+#include "layout_singer.hh"
+#include "theme.hh"
+#include "video.hh"
+
 #include <iostream>
 #include <sstream>
 

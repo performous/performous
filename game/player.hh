@@ -1,11 +1,15 @@
 #pragma once
-#include "song.hh"
 #include "color.hh"
 #include "pitch.hh"
 #include "util.hh"
+#include "notes.hh"
 #include "animvalue.hh"
 
+#include <string>
 #include <vector>
+#include <utility>
+
+class Song;
 
 /// player class
 struct Player {
@@ -36,10 +40,7 @@ struct Player {
 	/// score iterator
 	Notes::const_iterator m_scoreIt;
 	/// constructor
-	Player(Song& song, Analyzer& analyzer, size_t frames):
-	  m_song(song), m_analyzer(analyzer), m_pitch(frames, std::make_pair(getNaN(),
-	  -getInf())), m_pos(), m_score(), m_lineScore(), m_maxLineScore(), m_prevLineScore(-1),
-	  m_feedbackFader(0.0, 2.0), m_activitytimer(), m_scoreIt(m_song.notes.begin()) {}
+	Player(Song& song, Analyzer& analyzer, size_t frames);
 	/// prepares analyzer
 	void prepare() { m_analyzer.process(); }
 	/// updates player stats

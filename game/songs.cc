@@ -2,6 +2,8 @@
 
 #include "configuration.hh"
 #include "fs.hh"
+#include "song.hh"
+#include "database.hh"
 
 #include <boost/bind.hpp>
 #include <boost/format.hpp>

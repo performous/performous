@@ -1,6 +1,13 @@
 #include "player.hh"
+#include "song.hh"
 
 #include "engine.hh" // just for Engine::TIMESTEP
+
+Player::Player(Song& song, Analyzer& analyzer, size_t frames):
+	  m_song(song), m_analyzer(analyzer), m_pitch(frames, std::make_pair(getNaN(),
+	  -getInf())), m_pos(), m_score(), m_lineScore(), m_maxLineScore(), m_prevLineScore(-1),
+	  m_feedbackFader(0.0, 2.0), m_activitytimer(), m_scoreIt(m_song.notes.begin())
+{ }
 
 void Player::update() {
 	if (m_pos == m_pitch.size()) return; // End of song already

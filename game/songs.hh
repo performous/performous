@@ -2,8 +2,6 @@
 
 #include "animvalue.hh"
 #include "fs.hh"
-#include "song.hh"
-#include "database.hh"
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/mutex.hpp>
@@ -11,11 +9,14 @@
 #include <set>
 #include <vector>
 
+class Song;
+class Database;
+
 /// songs class for songs screen
 class Songs: boost::noncopyable {
   public:
 	/// constructor
-	Songs(Database & database, std::string const& songlist = std::string());
+	Songs(Database& database, std::string const& songlist = std::string());
 	~Songs();
 	/// updates filtered songlist
 	void update();

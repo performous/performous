@@ -5,6 +5,10 @@
 #include "configuration.hh"
 #include "screen_players.hh"
 #include "fs.hh"
+#include "database.hh"
+#include "video.hh"
+#include "guitargraph.hh"
+
 
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>

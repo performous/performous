@@ -6,32 +6,32 @@
 #include "layout_singer.hh"
 #include "animvalue.hh"
 #include "engine.hh"
-#include "guitargraph.hh"
 #include "screen.hh"
 #include "backgrounds.hh"
 #include "theme.hh"
-#include "video.hh"
 #include "surface.hh"
 #include "opengl_text.hh"
 #include "progressbar.hh"
-#include "database.hh"
+#include "guitargraph.hh"
 
 #include "screen_players.hh"
 
 class Players;
 class Audio;
 class Capture;
+class Database;
+class Video;
 
 /// shows score at end of song
 class ScoreWindow {
   public:
 	/// constructor
-	ScoreWindow(Engine & e, Database & database);
+	ScoreWindow(Engine & e, Database& database);
 	/// draws ScoreWindow
 	void draw();
 	bool empty() { return m_database.cur.empty(); }
   private:
-	Database & m_database;
+	Database& m_database;
 	AnimValue m_pos;
 	Surface m_bg;
 	ProgressBar m_scoreBar;
