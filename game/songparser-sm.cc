@@ -42,15 +42,11 @@ void SongParser::smParse() {
 	while (getline(line) && smParseField(line)) {}
 	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
 	if (m_bpm != 0.0) addBPM(0, m_bpm);
-	
-	// Workaround for the terminating : 1 0 0 line, written by some converters
-/*	if (!s.notes.empty() && s.notes.back().type != Note::SLEEP && s.notes.back().begin == s.notes.back().end) s.notes.pop_back();
-*/
 }
 
-bool SongParser::smParseField(std::string line) {
+bool SongParser::smParseField(std::string& line) {
 	if (line.empty()) return true;
-	if (line[0] == '/' && line[1] == '/') return true; //jump over possible comments
+	if (line[0] == '/') return true; //jump over possible comments
 	std::string::size_type pos = line.find(':');
 	if (pos == std::string::npos) throw std::runtime_error("Invalid format, should be #key:value");
 	std::string key = boost::trim_copy(line.substr(1, pos - 1));
@@ -129,7 +125,7 @@ bool SongParser::smParseField(std::string line) {
 	return true;
 }
 
-bool SongParser::smParseNote(std::string line, DanceChords chords){
+bool SongParser::smParseNote(std::string& line, DanceChords& chords){
 	if(line.empty()) return true;
 	if(line[0] == '#') throw std::runtime_error("Key found in the middle of notes");
 	if(line[0] == ';') return false; //end mark	
