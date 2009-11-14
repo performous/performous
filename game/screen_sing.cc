@@ -84,15 +84,13 @@ void ScreenSing::enter() {
 		}
 	}
 	// Load dance tracks
+	m_dancers.push_back(new DanceGraph(m_audio, *m_song)); // REMOVEME
 	if ( !m_song->danceTracks.empty() ) {
-		m_dancers.push_back(new DanceGraph(m_audio, *m_song));
-		if (true) {
-			while(true) {
-				try {
-					m_dancers.push_back(new DanceGraph(m_audio, *m_song));
-					break; // REMOVEME
-				} catch (std::runtime_error&) { break; }
-			}
+		while(1) {
+			try {
+				m_dancers.push_back(new DanceGraph(m_audio, *m_song));
+				break; // REMOVEME
+			} catch (std::runtime_error&) { break; }
 		}
 	}
 	m_audio.playMusic(m_song->music, false, 0.0, m_instruments.empty() ? -1.0 : -8.0); // Startup delay for instruments is longer than for singing only
