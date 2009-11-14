@@ -321,10 +321,8 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
   m_score_rank(getThemePath("score_rank.svg"))
 {
 	m_pos.setTarget(0.0);
-
 	m_database.scores.clear();
-	int topScore = 0;
-	for (std::list<Player>::iterator p = m_database.cur.begin(); p != m_database.cur.end();) {
+	for (std::list<Player>::iterator p = m_database.cur.begin(); p != m_database.cur.end(); ++p) {
 		ScoreItem item;
 		item.score = p->getScore();
 		item.track = "vocals";
@@ -332,33 +330,42 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 		
 		if (item.score < 500) { p = m_database.cur.erase(p); continue; }
 		m_database.scores.push_back(item);
-		if (item.score > topScore) topScore = item.score;
-		++p;
 	}
-	for (Instruments::iterator it = instruments.begin(); it != instruments.end();) {
+	for (Instruments::iterator it = instruments.begin(); it != instruments.end(); ++it) {
 		ScoreItem item;
 		item.score = it->getScore();
 		item.track = it->getTrack();
-
+		if (item.track == "drums") item.color = glutil::Color(0.1f, 0.1f, 0.1f);
+		else if (item.track == "bass") item.color = glutil::Color(0.5f, 0.3f, 0.1f);
+		else item.color = glutil::Color(1.0f, 0.0f, 0.0f);
+		
 		if (item.score < 500) { std::cout << "kick " << item.track << std::endl; it = instruments.erase(it); continue; }
 		std::cout << "insert " << item.track << " score: " << item.score << std::endl;
 		m_database.scores.push_back(item);
-		// TODO: top score for best instrumental
-		// if (item.score > topScore) topScore = item.score;
-		++it;
 	}
 	m_database.scores.sort();
 	m_database.scores.reverse(); // top should be first
-	// topScore is also in m_database.scores.front()
 
-	if (m_database.scores.empty()) m_rank = "No player!";
-	else if (topScore > 8000) m_rank = "Hit singer";
-	else if (topScore > 6000) m_rank = "Lead singer";
-	else if (topScore > 4000) m_rank = "Rising star";
-	else if (topScore > 2000) m_rank = "Amateur";
-	else m_rank = "Tone deaf";
+	if (m_database.scores.empty())
+		m_rank = "No player!";
+	else {
+		int topScore = m_database.scores.front().score;
+		if (m_database.scores.front().track == "vocals") {
+			if (topScore > 8000) m_rank = "Hit singer";
+			else if (topScore > 6000) m_rank = "Lead singer";
+			else if (topScore > 4000) m_rank = "Rising star";
+			else if (topScore > 2000) m_rank = "Amateur";
+			else m_rank = "Tone deaf";
+		} else {
+			if (topScore > 8000) m_rank = "Virtuoso";
+			else if (topScore > 6000) m_rank = "Rocker";
+			else if (topScore > 4000) m_rank = "Rising star";
+			else if (topScore > 2000) m_rank = "Amateur";
+			else m_rank = "Tone deaf";
+		}
+	}
 	m_bg.dimensions.middle().center();
-	m_scoreBar.dimensions.fixedWidth(0.1);
+	m_scoreBar.dimensions.fixedWidth(0.09);
 }
 
 void ScoreWindow::draw() {
@@ -372,10 +379,13 @@ void ScoreWindow::draw() {
 		int score = p->score;
 		glColor4fv(p->color);
 		double x = -0.12 + spacing * (0.5 + i - 0.5 * m_database.cur.size());
-		m_scoreBar.dimensions.middle(x).bottom(0.24);
+		m_scoreBar.dimensions.middle(x).bottom(0.20);
 		m_scoreBar.draw(score / 10000.0);
 		m_score_text.render(boost::lexical_cast<std::string>(score));
 		m_score_text.dimensions().middle(x).top(0.24).fixedHeight(0.05);
+		m_score_text.draw();
+		m_score_text.render(p->track);
+		m_score_text.dimensions().middle(x).top(0.20).fixedHeight(0.05);
 		m_score_text.draw();
 		glColor3f(1.0f, 1.0f, 1.0f);
 	}
