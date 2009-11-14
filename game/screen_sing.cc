@@ -181,6 +181,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 				m_score_window.reset(new ScoreWindow(m_instruments, m_database)); // Song finished, but no score window -> show it
 			}
 		}
+		else if (key == SDLK_SPACE && m_score_window.get()) { activateNextScreen(); return; } // Score window visible -> Space quits
 		else if (key == SDLK_SPACE || key == SDLK_PAUSE) m_audio.togglePause();
 		if (m_score_window.get()) return;
 		// The rest are only available when score window is not displayed and when there are no instruments
