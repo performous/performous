@@ -5,7 +5,7 @@ cmake/performous-packaging.cmake.
 
 
 Source packages:
-- Remove any extra files in source tree (the ones from SVN and build folder can be kept)
+- Remove any extra files in source tree (the ones from Git and an the build folder can be kept)
 
 cmake ../
 make package_source
@@ -17,9 +17,4 @@ Binary packages:
 
 cmake ../
 make package
-
-
-Ubuntu 8.04 needs special care:
-- CMake 2.4 cannot package for Debian, so install 2.6 from backports
-- Be sure not to install anything else from backports if you intend plain 8.04 package
 
