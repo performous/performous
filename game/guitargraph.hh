@@ -60,6 +60,7 @@ class GuitarGraph {
 	std::string getTrackIndex() const { return m_track_index->first; }
 	int getScore() const { return m_score * m_scoreFactor; }
 	std::string getTrack() const { return m_track_index->first; }
+	std::string getDifficultyString() const;
   private:
 	void fail(double time, int fret);
 	void endHold(int fret);

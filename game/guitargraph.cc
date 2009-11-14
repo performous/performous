@@ -316,6 +316,8 @@ void GuitarGraph::nextTrack() {
 	updateNeck();
 }
 
+std::string GuitarGraph::getDifficultyString() const { return diffv[m_level].name; }
+
 void GuitarGraph::difficultyAuto(bool tryKeep) {
 	if (tryKeep && difficulty(Difficulty(m_level))) return;
 	for (int level = 0; level < DIFFICULTYCOUNT; ++level) if (difficulty(Difficulty(level))) return;

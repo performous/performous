@@ -11,12 +11,10 @@
 
 struct ScoreItem {
 	int score;
-	std::string track;
+	std::string track; // includes difficulty
+	std::string track_simple; // no difficulty
 	glutil::Color color;
-	bool operator < (ScoreItem const& other)
-	{
-		return score < other.score;
-	}
+	bool operator < (ScoreItem const& other) { return score < other.score; }
 };
 
 /**Access to a database for performous which holds

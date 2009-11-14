@@ -326,6 +326,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 		ScoreItem item;
 		item.score = p->getScore();
 		item.track = "vocals";
+		item.track_simple = "vocals";
 		item.color = glutil::Color(p->m_color.r, p->m_color.g, p->m_color.b);
 		
 		if (item.score < 500) { p = m_database.cur.erase(p); continue; }
@@ -334,12 +335,14 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 	for (Instruments::iterator it = instruments.begin(); it != instruments.end(); ++it) {
 		ScoreItem item;
 		item.score = it->getScore();
-		item.track = it->getTrack();
+		item.track_simple = it->getTrack();
+		item.track = it->getTrack() + "-" + it->getDifficultyString();
+		if (item.score < 500) { std::cout << "kick " << item.track << std::endl; it = instruments.erase(it); continue; }
+		
 		if (item.track == "drums") item.color = glutil::Color(0.1f, 0.1f, 0.1f);
 		else if (item.track == "bass") item.color = glutil::Color(0.5f, 0.3f, 0.1f);
 		else item.color = glutil::Color(1.0f, 0.0f, 0.0f);
 		
-		if (item.score < 500) { std::cout << "kick " << item.track << std::endl; it = instruments.erase(it); continue; }
 		std::cout << "insert " << item.track << " score: " << item.score << std::endl;
 		m_database.scores.push_back(item);
 	}
@@ -384,7 +387,7 @@ void ScoreWindow::draw() {
 		m_score_text.render(boost::lexical_cast<std::string>(score));
 		m_score_text.dimensions().middle(x).top(0.24).fixedHeight(0.05);
 		m_score_text.draw();
-		m_score_text.render(p->track);
+		m_score_text.render(p->track_simple);
 		m_score_text.dimensions().middle(x).top(0.20).fixedHeight(0.05);
 		m_score_text.draw();
 		glColor3f(1.0f, 1.0f, 1.0f);
