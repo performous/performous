@@ -49,24 +49,23 @@ bool SongParser::smCheck(std::vector<char> const& data) {
 void SongParser::smParse() {
 	Song& s = m_song;
 	std::string line;
+	int lcount = 0;		//line counter for note duration
+	int count = 0; 		//total lines counter
+	bool readable = false; 	//makes sure that other values are read before notes
+	int tm = 0; 		//time counter
+	int dur; 		//note duration
+	std::string notestype;
+	std::string description;
+	DanceDifficulty danceDifficulty;
+	DanceDifficultyMap danceDifficultyMap;
+	DanceChords chords;
 
 	while (getline(line)) {
-
-		int lcount = 0;		//line counter for note duration
-		int count = 0; 		//total lines counter
-		bool readable = false; 	//makes sure that other values are read before notes
-		int tm = 0; 		//time counter
-		int dur; 		//note duration
-		std::string notestype;
-		std::string description;
-		DanceDifficulty danceDifficulty;
-		DanceDifficultyMap danceDifficultyMap;
-		DanceChords chords;
 	
 		if (line.empty() || line == "\r") continue;
 		if (line[0] == '/' && line[1] == '/') continue; //jump over possible comments
 		//reading of the values
-		if (!readable && isNote(line[0]) ) {
+		if (readable && isNote(line[0]) ) {
 			//reading notes into a chord 
 			std::istringstream iss(line);
 			DanceChord chord;
@@ -83,7 +82,7 @@ void SongParser::smParse() {
 			}
 			continue;
 		}	
-		if (readable && isNote(line[0]) ) throw std::runtime_error("Notes outside NoteData");
+		if (!readable && isNote(line[0]) ) throw std::runtime_error("Notes outside NoteData");
 		if (line[0] == ',') {
 			/*Counting the timestamp of each note*/
 			dur = 4 * ( 1/(m_bpm/60) ) / lcount;	//counts one note duration in seconds;	
@@ -185,6 +184,8 @@ void SongParser::smParse() {
 		*/
 		continue;
 		}
+	if (m_song.danceTracks.empty() ) throw std::runtime_error("No note data in the file");
 	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
 	if (m_bpm != 0.0) addBPM(0, m_bpm);
+	
 }											
