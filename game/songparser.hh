@@ -22,7 +22,7 @@ class SongParser {
 	  m_relativeShift(),
 	  m_maxScore()
 	{
-		enum { NONE, TXT, INI } type = NONE;
+		enum { NONE, TXT, INI, SM } type = NONE;
 		// Read the file, determine the type and do some initial validation checks
 		{
 			std::ifstream f((s.path + s.filename).c_str());
@@ -33,7 +33,8 @@ class SongParser {
 			f.seekg(0);
 			std::vector<char> data(size);
 			if (!f.read(&data[0], size)) throw SongParserException("Unexpected I/O error", 0);
-			if (txtCheck(data)) type = TXT;
+			if (smCheck(data)) type = SM;
+			else if (txtCheck(data)) type = TXT;
 			else if (iniCheck(data)) type = INI;
 			else throw SongParserException("Does not look like a song file (wrong header)", 1, true);
 			m_ss.write(&data[0], size);
@@ -42,6 +43,7 @@ class SongParser {
 		try {
 			if (type == TXT) txtParse();
 			if (type == INI) iniParse();
+			if (type == SM) smParse();
 		} catch (std::runtime_error& e) {
 			throw SongParserException(e.what(), m_linenum);
 		}
