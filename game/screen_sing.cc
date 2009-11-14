@@ -326,7 +326,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 	for (std::list<Player>::iterator p = m_database.cur.begin(); p != m_database.cur.end(); ++p) {
 		ScoreItem item;
 		item.score = p->getScore();
-		item.track = "vocals";
+		item.track = "Vocals";
 		item.track_simple = "vocals";
 		item.color = glutil::Color(p->m_color.r, p->m_color.g, p->m_color.b);
 		
@@ -337,7 +337,8 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 		ScoreItem item;
 		item.score = it->getScore();
 		item.track_simple = it->getTrack();
-		item.track = it->getTrack() + "-" + it->getDifficultyString();
+		item.track = it->getTrack() + " - " + it->getDifficultyString();
+		item.track[0] = toupper(item.track[0]);
 		if (item.score < 500) { std::cout << "kick " << item.track << std::endl; it = instruments.erase(it); continue; }
 		
 		if (item.track == "drums") item.color = glutil::Color(0.1f, 0.1f, 0.1f);
