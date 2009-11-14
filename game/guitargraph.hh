@@ -73,6 +73,7 @@ class GuitarGraph {
 	Object3d m_fretObj;
 	Object3d m_tappableObj;
 	AnimValue m_hit[6];
+	std::vector<Sample> m_samples;
 	boost::scoped_ptr<Texture> m_neck;
 	bool m_drums;
 	bool m_use3d;
