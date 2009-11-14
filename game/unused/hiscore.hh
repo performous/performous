@@ -31,6 +31,12 @@ struct SongHiscoreItem {
 	}
 };
 
+class Hiscore
+{
+public:
+	Hiscore ();
+};
+
 /**SongHiscore loads (and saves) a list of SongHiscoreItems.
 
  The class is only used for reading information in

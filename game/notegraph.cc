@@ -7,11 +7,11 @@ Dimensions dimensions; // Make a public member variable
 
 NoteGraph::NoteGraph(Song const& song):
   m_song(song),
-  m_notelines("notelines.svg"),
-  m_wave("wave.png"),
-  m_notebar("notebar.svg"), m_notebar_hl("notebar.png"),
-  m_notebarfs("notebarfs.svg"), m_notebarfs_hl("notebarfs-hl.png"),
-  m_notebargold("notebargold.svg"), m_notebargold_hl("notebargold.png"),
+  m_notelines(getThemePath("notelines.svg")),
+  m_wave(getThemePath("wave.png")),
+  m_notebar(getThemePath("notebar.svg")), m_notebar_hl(getThemePath("notebar.png")),
+  m_notebarfs(getThemePath("notebarfs.svg")), m_notebarfs_hl(getThemePath("notebarfs-hl.png")),
+  m_notebargold(getThemePath("notebargold.svg")), m_notebargold_hl(getThemePath("notebargold.png")),
   m_notealpha(0.0f), m_nlTop(0.0, 4.0), m_nlBottom(0.0, 4.0), m_time()
 {
 	dimensions.stretch(1.0, 0.5); // Initial dimensions, probably overridden from somewhere
@@ -54,7 +54,7 @@ namespace {
 const double baseLine = -0.2;
 const double pixUnit = 0.2;
 
-void NoteGraph::draw(double time, Players const& players, Position position) {
+void NoteGraph::draw(double time, Database const& database, Position position) {
 	if (time < m_time) reset();
 	m_time = time;
 	// Update m_songit (which note to start the rendering from)
@@ -100,7 +100,7 @@ void NoteGraph::draw(double time, Players const& players, Position position) {
 	m_baseX = baseLine - m_time * pixUnit + dimensions.xc();  // FIXME: Moving in X direction requires additional love (is b0rked now, keep it centered at zero)
 
 	drawNotes();
-	if (config["game/pitch"].b()) drawWaves(players);
+	if (config["game/pitch"].b()) drawWaves(database);
 }
 
 void NoteGraph::drawNotes() {
@@ -186,11 +186,11 @@ namespace {
 	}
 }
 
-void NoteGraph::drawWaves(Players const& players) {
+void NoteGraph::drawWaves(Database const& database) {
 	if (m_song.notes.empty()) return; // Cannot draw without notes
 	UseTexture tblock(m_wave);
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-	for (std::list<Player>::const_iterator p = players.cur.begin(); p != players.cur.end(); ++p) {
+	for (std::list<Player>::const_iterator p = database.cur.begin(); p != database.cur.end(); ++p) {
 		glColor4f(p->m_color.r, p->m_color.g, p->m_color.b, m_notealpha);
 		float const texOffset = 2.0 * m_time; // Offset for animating the wave texture
 		Player::pitch_t const& pitch = p->m_pitch;

@@ -5,7 +5,7 @@
 #include "notes.hh"
 
 class Song;
-class Players;
+class Database;
 
 /// handles drawing of notes and waves
 class NoteGraph {
@@ -19,12 +19,12 @@ class NoteGraph {
 	 * @param time at which time to draw
 	 * @param players reference to the list of singing Players
 	 */
-	void draw(double time, Players const& players, Position position = NoteGraph::FULLSCREEN);
+	void draw(double time, Database const& database, Position position = NoteGraph::FULLSCREEN);
   private:
 	/// draw notebars
 	void drawNotes();
 	/// draw waves (what players are singing)
-	void drawWaves(Players const& players);
+	void drawWaves(Database const& database);
 	Song const& m_song;
 	Texture m_notelines;
 	Texture m_wave;

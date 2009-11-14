@@ -9,16 +9,20 @@
 #include "textinput.hh"
 #include "theme.hh"
 #include "video.hh"
-#include "players.hh"
-#include "highscore.hh"
 
+#include "screen_songs.hh"
+
+class Song;
+class Songs;
 class Audio;
+class Players;
+class Database;
 
 /// song chooser screen
-class ScreenHiscore : public Screen {
+class ScreenHiscore : public ScreenSongs {
   public:
-	/// constructor
-	ScreenHiscore(std::string const& name, Audio& audio, Players& players);
+	/// constructor: songs is just used to pass to ScreenSongs
+	ScreenHiscore(std::string const& name, Audio& audio, Songs& songs, Database& database);
 
 	void enter();
 	void exit();
@@ -34,19 +38,9 @@ class ScreenHiscore : public Screen {
 	}
 
   private:
-	Audio& m_audio;
+	Database& m_database;
 	Players& m_players;
-	boost::shared_ptr<Song> m_song; /// Pointer to the current song
-	boost::scoped_ptr<SongHiscore> m_highscore;
-	boost::scoped_ptr<Surface> m_songbg;
-	boost::scoped_ptr<Video> m_video;
-	boost::scoped_ptr<ThemeSongs> theme;
-	std::string m_playing;
-	std::string m_playReq;
-	AnimValue m_playTimer;
-	TextInput m_search;
-	boost::scoped_ptr<Surface> m_emptyCover;
-	Cachemap<std::string, Surface> m_covers;
 	boost::scoped_ptr<Surface> m_player_icon;
 	boost::scoped_ptr<SvgTxtThemeSimple> m_score_text[4];
+	boost::shared_ptr<Song> m_song;
 };

@@ -1,5 +1,6 @@
 project(Performous CXX)
 cmake_minimum_required(VERSION 2.6)
+cmake_policy(VERSION 2.6)
 set(PROJECT_VERSION "0.4-pre5")
 
 # Avoid source tree pollution
@@ -49,12 +50,3 @@ if (ENABLE_TOOLS)
   add_subdirectory(tools)
 endif (ENABLE_TOOLS)
 
-set(FULL_PREFIX ${CMAKE_INSTALL_PREFIX})
-if(UNIX AND NOT "${FULL_PREFIX}" MATCHES "^/")
-  set(FULL_PREFIX "${CMAKE_BINARY_DIR}/${FULL_PREFIX}")
-endif(UNIX AND NOT "${FULL_PREFIX}" MATCHES "^/")
-set(PERFORMOUS_PLUGIN_PATH "${FULL_PREFIX}/lib${LIB_SUFFIX}/libda")
-set(PERFORMOUS_EXECUTABLE "${FULL_PREFIX}/bin/performous.bin")
-configure_file("${PROJECT_SOURCE_DIR}/cmake/performous.sh.cmake" "${PROJECT_BINARY_DIR}/performous" ESCAPE_QUOTES @ONLY)
-install(PROGRAMS "${PROJECT_BINARY_DIR}/performous" DESTINATION bin)
-install(SCRIPT "${PROJECT_SOURCE_DIR}/cmake/performous-launcher.cmake")

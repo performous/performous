@@ -86,6 +86,8 @@ void Window::resize() {
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+	glShadeModel(GL_SMOOTH);
 	glEnable(GL_BLEND);
 	// Set projection
 	glMatrixMode(GL_PROJECTION);

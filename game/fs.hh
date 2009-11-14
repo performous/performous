@@ -8,14 +8,14 @@ namespace fs = boost::filesystem;
 /** Get user's home folder **/
 fs::path getHomeDir();
 
+/** Get the users configuration folder **/
+fs::path getConfigDir();
+
 /** Do mangling to convert user-entered path into path suitable for use with stdlib etc. **/
 fs::path pathMangle(fs::path const& dir);
 
 /** Get full path to a file from the current theme **/
 std::string getThemePath(std::string const& filename);
 
-/** Get full path to a data file **/
-std::string getDataPath(std::string const& filename);
-
 /** Get full path to a share file **/
-std::string getSharePath(std::string const& filename);
+std::string getPath(fs::path const& filename);

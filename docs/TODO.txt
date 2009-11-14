@@ -7,22 +7,19 @@ Structural:
 	* Also playback and Vorbis + MP3 decoding
 	* Mixer and samplerate conversion inside
 - Get rid of ScreenManager in favor of recursive approach?
-- Switch to Clanlib?
+- Switch to Clanlib or SFML?
 - Switch to GStreamer? (both the ripper and the game)
 
 
 Big features:
 
 - Add compose screen (using features discussed on mailing list)
-- Multiplayer duet (needs XML song format)
+- Multiplayer duet (needs XML or MIDI song format)
 - Recording performances
     * Internet highscore
-- Ingame Singstar DVD support (integrated ripping + ffmpeg feeding + XML song format)
-- Playing and dancing
-    * Guitar code from Silky Strings project (needs some love, but should be quite usable)
-    * Drum code from scratch? [currently has testing mode in practice screen]
-    * Dance code from scratch?
 - Mic effects (reduce volume for bad singers, perfect pitch, reverb, etc)
+- Ingame Singstar DVD support (integrated ripping + ffmpeg feeding + XML song format)
+- Dance game [WIP]
 
 
 Features:

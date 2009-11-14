@@ -9,6 +9,7 @@
 #include "joystick.hh"
 #include "surface.hh"
 #include "opengl_text.hh"
+#include "3dobject.hh"
 
 class Song;
 
@@ -58,6 +59,8 @@ class GuitarGraph {
 	double correctness() const { return m_correctness.get(); }
 	std::string getTrackIndex() const { return m_track_index->first; }
 	int getScore() const { return m_score * m_scoreFactor; }
+	std::string getTrack() const { return m_track_index->first; }
+	std::string getDifficultyString() const;
   private:
 	void fail(double time, int fret);
 	void endHold(int fret);
@@ -67,9 +70,13 @@ class GuitarGraph {
 	Surface m_button;
 	Texture m_button_l;
 	Surface m_tap;
+	Object3d m_fretObj;
+	Object3d m_tappableObj;
 	AnimValue m_hit[6];
+	std::vector<Sample> m_samples;
 	boost::scoped_ptr<Texture> m_neck;
 	bool m_drums;
+	bool m_use3d;
 	AnimValue m_cx, m_width;
 	std::size_t m_stream;
 	TrackMapConstPtr m_track_map;
@@ -91,7 +98,7 @@ class GuitarGraph {
 		int fret;
 		Duration const* dur;
 		double holdTime;
-		Event(double t, int ty, int f = -1, Duration const* d = NULL): time(t), glow(0.0, 5.0), whammy(0.0, 0.4), type(ty), fret(f), dur(d), holdTime(d ? d->begin : getNaN()) { if (type > 0) glow.setValue(1.0); }
+		Event(double t, int ty, int f = -1, Duration const* d = NULL): time(t), glow(0.0, 5.0), whammy(0.0, 1.2), type(ty), fret(f), dur(d), holdTime(d ? d->begin : getNaN()) { if (type > 0) glow.setValue(1.0); }
 	};
 	typedef std::vector<Event> Events;
 	Events m_events;
@@ -99,7 +106,7 @@ class GuitarGraph {
 	int m_dead;
 	glutil::Color const& color(int fret) const;
 	void drawBar(double time, float h);
-	void drawNote(int fret, glutil::Color, float tBeg, float tEnd, float whammy = 0);
+	void drawNote(int fret, glutil::Color, float tBeg, float tEnd, float whammy = 0, bool tappable = false);
 	void nextTrack();
 	void difficultyAuto(bool tryKeepCurrent = false);
 	bool difficulty(Difficulty level);

@@ -2,33 +2,27 @@
 
 #include "configuration.hh"
 #include "audio.hh"
-#include "players.hh"
+#include "database.hh"
 #include "fs.hh"
 #include "util.hh"
+#include "layout_singer.hh"
+#include "theme.hh"
+#include "video.hh"
+
 #include <iostream>
 #include <sstream>
 
 static const double IDLE_TIMEOUT = 45.0; // seconds
 
-ScreenPlayers::ScreenPlayers(std::string const& name, Audio& audio, Players& players):
-  Screen(name), m_audio(audio), m_players(players), m_covers(20)
+ScreenPlayers::ScreenPlayers(std::string const& name, Audio& audio, Database& database):
+  Screen(name), m_audio(audio), m_database(database), m_players(database.m_players), m_covers(20)
 {
 	m_players.setAnimMargins(5.0, 5.0);
 	m_playTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
 }
 
 void ScreenPlayers::enter() {
-	try {
-		m_highscore.reset(new SongHiscore(m_song->path, "High.sco"));
-	} catch (HiscoreException const& hi) {
-		std::cerr << "High.sco:" << hi.line() << " " << hi.what() << std::endl;
-
-		ScreenManager* sm = ScreenManager::getSingletonPtr();
-		sm->activateScreen("Songs");
-		return;
-	}
-
-	m_layout_singer.reset(new LayoutSinger(*m_song, m_players));
+	m_layout_singer.reset(new LayoutSinger(*m_song, m_database));
 
 	theme.reset(new ThemeSongs());
 	m_emptyCover.reset(new Surface(getThemePath("no_cover.svg"))); // TODO use persons head
@@ -48,8 +42,7 @@ void ScreenPlayers::exit() {
 	m_playing.clear();
 	m_playReq.clear();
 
-	// TODO save hiscore
-	m_highscore.reset();
+	m_database.save();
 }
 
 void ScreenPlayers::manageEvent(SDL_Event event) {
@@ -59,7 +52,8 @@ void ScreenPlayers::manageEvent(SDL_Event event) {
 	int key = keysym.sym;
 	SDLMod mod = event.key.keysym.mod;
 
-	if (key == SDLK_r && mod & KMOD_CTRL) { m_players.reload(); m_players.setFilter(m_search.text); }
+	//TODO: reload -- needs database reload
+	// if (key == SDLK_r && mod & KMOD_CTRL) { m_players.reload(); m_players.setFilter(m_search.text); }
 	if (m_search.process(keysym)) m_players.setFilter(m_search.text);
 	else if (key == SDLK_ESCAPE) {
 		if (m_search.text.empty()) { sm->activateScreen("Songs"); return; }
@@ -74,10 +68,11 @@ void ScreenPlayers::manageEvent(SDL_Event event) {
 			m_players.update();
 			// the current player is the new created one
 		}
-		m_highscore->addNewHiscore(m_players.current().name, m_players.scores.front());
-		m_players.scores.pop_front();
+		m_database.addHiscore(m_song);
+		m_database.scores.pop_front();
 
-		if (m_players.scores.empty() || !m_highscore->reachedNewHiscore(m_players.scores.front()))
+		if (m_database.scores.empty()
+			|| !m_database.reachedHiscore(m_song))
 		{
 			// no more highscore, we are now finished
 			sm->activateScreen("Songs");
@@ -120,7 +115,7 @@ void ScreenPlayers::draw() {
 		}
 	} else {
 		// Format the player information text
-		oss_song << "You reached " << m_players.scores.front() << " points!\n";
+		oss_song << "You reached " << m_database.scores.front().score << " points!\n";
 		oss_order << "Please enter your Name!\n"
 			<< "Name: " << m_players.current().name << '\n'
 			<< "Search Text: "
@@ -138,7 +133,7 @@ void ScreenPlayers::draw() {
 			Surface* cover = 0;
 			if (player_display.path != "")
 			{
-				try { cover = &m_covers[player_display.path + "/" + player_display.picture]; }
+				try { cover = &m_covers[player_display.path]; }
 				catch (std::exception const&) {}
 			}
 			Surface& s = (cover ? *cover : *m_emptyCover);

@@ -86,6 +86,7 @@ void SongParser::iniParse() {
 	}
 
 	MidiFileParser midi(s.path + "/" + midifilename);
+	int reversedNoteCount = 0;
 	for (uint32_t ts = 0, end = midi.ts_last + midi.division; ts < end; ts += midi.division) s.beats.push_back(midi.get_seconds(ts));
 	for (MidiFileParser::Tracks::const_iterator it = midi.tracks.begin(); it != midi.tracks.end(); ++it) {
 		// Figure out the track name
@@ -113,7 +114,7 @@ void SongParser::iniParse() {
 					double beg = midi.get_seconds(it3->begin);
 					double end = midi.get_seconds(it3->end);
 					if (end == 0) continue; // Note with no ending
-					if (beg > end) throw std::runtime_error("Reversed notes");
+					if (beg > end) { reversedNoteCount++; continue; } // Reversed note
 					if (drums) end = beg;
 					dur.push_back(Duration(beg, end));
 					durCount++;
@@ -156,6 +157,7 @@ void SongParser::iniParse() {
 					{
 						char ch = *syl.rbegin();
 						if (ch == '-') syl.erase(syl.size() - 1);
+						else if (ch == '=') { *syl.rbegin() = '-'; }
 						else if (ch != '~') syl += ' ';
 					}
 				}
@@ -195,6 +197,13 @@ void SongParser::iniParse() {
 		}
 		if (!s.notes.empty()) break;
 	}
+	if (reversedNoteCount > 0) {
+		std::ostringstream oss;
+		oss << "WARNING: Skipping " << reversedNoteCount << " reversed note(s) in ";
+		oss << s.path << midifilename << std::endl;
+		std::cerr << oss.str(); // More likely to be atomic when written as one string
+	}
+
 	/*if (s.notes.empty()) {
 		Note n;
 		n.begin = 30.0;

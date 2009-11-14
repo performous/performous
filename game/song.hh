@@ -61,8 +61,10 @@ class Song: boost::noncopyable {
 	std::string video; ///< video
 	/// Variables used for comparisons (sorting)
 	std::string collateByTitle;
+	std::string collateByTitleOnly;
 	/// Variables used for comparisons (sorting)
 	std::string collateByArtist;
+	std::string collateByArtistOnly;
 	/** Rebuild collate variables from other strings **/
 	void collateUpdate();
 	/** Convert a string to its collate form **/

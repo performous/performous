@@ -5,6 +5,10 @@
 #include "configuration.hh"
 #include "screen_players.hh"
 #include "fs.hh"
+#include "database.hh"
+#include "video.hh"
+#include "guitargraph.hh"
+#include "glutil.hh"
 
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
@@ -46,8 +50,8 @@ void ScreenSing::enter() {
 	m_progress->dimensions.fixedWidth(0.4).left(-0.5).screenTop();
 	theme->timer.dimensions.screenTop(0.5 * m_progress->dimensions.h());
 	boost::ptr_vector<Analyzer>& analyzers = m_capture.analyzers();
-	m_engine.reset(new Engine(m_audio, *m_song, analyzers.begin(), analyzers.end(), m_players));
-	m_layout_singer.reset(new LayoutSinger(*m_song, m_players, theme));
+	m_engine.reset(new Engine(m_audio, *m_song, analyzers.begin(), analyzers.end(), m_database));
+	m_layout_singer.reset(new LayoutSinger(*m_song, m_database, theme));
 	// I know some purists would hang me for this loop
 	if( !m_song->track_map.empty() ) {
 		// Here we load alternatively guitar/bass tracks until no guitar controler is available
@@ -98,7 +102,10 @@ void ScreenSing::enter() {
 
 void ScreenSing::instrumentLayout(double time) {
 	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end();) {
-		if (it->dead(time)) it = m_instruments.erase(it); else ++it;
+		if (it->dead(time)) {
+			std::cout << it->getTrack() << " was thrown out after " << time << " inactive" << std::endl;
+			it = m_instruments.erase(it);
+		} else ++it;
 	}
 	double iw = std::min(0.5, 1.0 / m_instruments.size());
 	for (Instruments::size_type i = 0, s = m_instruments.size(); i < s; ++i) {
@@ -163,6 +170,15 @@ void ScreenSing::activateNextScreen()
 {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 
+	m_database.addSong(m_song);
+	if (m_database.scores.empty()
+	      || !m_database.reachedHiscore(m_song))
+	{
+		// if no highscore reached..
+		sm->activateScreen("Songs");
+		return;
+	}
+
 	// Score window visible -> Enter quits to Players Screen
 	Screen* s = sm->getScreen("Players");
 	ScreenPlayers* ss = dynamic_cast<ScreenPlayers*> (s);
@@ -185,8 +201,12 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		}
 		else if (key == SDLK_RETURN) {
 			if (m_score_window.get()) { activateNextScreen(); return; } // Score window visible -> Enter quits
-			else if (status == Song::FINISHED) m_score_window.reset(new ScoreWindow(*m_engine, m_players)); // Song finished, but no score window -> show it
+			else if (status == Song::FINISHED && m_song->track_map.empty()) {
+				m_engine->kill(); // kill the engine thread (to avoid consuming memory)
+				m_score_window.reset(new ScoreWindow(m_instruments, m_database)); // Song finished, but no score window -> show it
+			}
 		}
+		else if (key == SDLK_SPACE && m_score_window.get()) { activateNextScreen(); return; } // Score window visible -> Space quits
 		else if (key == SDLK_SPACE || key == SDLK_PAUSE) m_audio.togglePause();
 		if (m_score_window.get()) return;
 		// The rest are only available when score window is not displayed and when there are no instruments
@@ -291,7 +311,7 @@ void ScreenSing::draw() {
 		theme->timer.draw(statustxt);
 	}
 
-	if (config["game/karaoke_mode"].b() || !m_song->track_map.empty()) {
+	if (config["game/karaoke_mode"].b()) {
 		if (!m_audio.isPlaying()) {
 			ScreenManager* sm = ScreenManager::getSingletonPtr();
 			sm->activateScreen("Songs");
@@ -310,7 +330,8 @@ void ScreenSing::draw() {
 		else if (!m_audio.isPlaying() || (status == Song::FINISHED && m_audio.getLength() - time < 3.0)) {
 			// Time to create the score window
 			m_quitTimer.setValue(QUIT_TIMEOUT);
-			m_score_window.reset(new ScoreWindow(*m_engine, m_players));
+			m_engine->kill(); // kill the engine thread (to avoid consuming memory)
+			m_score_window.reset(new ScoreWindow(m_instruments, m_database));
 		}
 	}
 		
@@ -320,8 +341,8 @@ void ScreenSing::draw() {
 	}
 }
 
-ScoreWindow::ScoreWindow(Engine& e, Players & players):
-  m_players(players),
+ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
+  m_database(database),
   m_pos(0.8, 2.0),
   m_bg(getThemePath("score_window.svg")),
   m_scoreBar(getThemePath("score_bar_bg.svg"), getThemePath("score_bar_fg.svg"), ProgressBar::VERTICAL, 0.0, 0.0, false),
@@ -329,46 +350,75 @@ ScoreWindow::ScoreWindow(Engine& e, Players & players):
   m_score_rank(getThemePath("score_rank.svg"))
 {
 	m_pos.setTarget(0.0);
-	e.kill(); // kill the engine thread (to avoid consuming memory)
-
-	m_players.scores.clear();
-	unsigned int topScore = 0;
-	for (std::list<Player>::iterator p = m_players.cur.begin(); p != m_players.cur.end();) {
-		unsigned int score = p->getScore();
-		if (score < 500) { p = m_players.cur.erase(p); continue; }
-		m_players.scores.push_back(score);
-		if (score > topScore) topScore = score;
-		++p;
+	m_database.scores.clear();
+	for (std::list<Player>::iterator p = m_database.cur.begin(); p != m_database.cur.end(); ++p) {
+		ScoreItem item;
+		item.score = p->getScore();
+		item.track = "Vocals";
+		item.track_simple = "vocals";
+		item.color = glutil::Color(p->m_color.r, p->m_color.g, p->m_color.b);
+		
+		if (item.score < 500) { p = m_database.cur.erase(p); continue; }
+		m_database.scores.push_back(item);
 	}
-	m_players.scores.sort();
-	m_players.scores.reverse(); // top should be first
-	// topScore is also in m_players.scores.front()
+	for (Instruments::iterator it = instruments.begin(); it != instruments.end(); ++it) {
+		ScoreItem item;
+		item.score = it->getScore();
+		item.track_simple = it->getTrack();
+		item.track = it->getTrack() + " - " + it->getDifficultyString();
+		item.track[0] = toupper(item.track[0]);
+		if (item.score < 100) { std::cout << "kick " << item.track << std::endl; it = instruments.erase(it); continue; }
+		
+		if (item.track_simple == "drums") item.color = glutil::Color(0.1f, 0.1f, 0.1f);
+		else if (item.track_simple == "bass") item.color = glutil::Color(0.5f, 0.3f, 0.1f);
+		else item.color = glutil::Color(1.0f, 0.0f, 0.0f);
+		
+		std::cout << "insert " << item.track << " score: " << item.score << std::endl;
+		m_database.scores.push_back(item);
+	}
+	m_database.scores.sort();
+	m_database.scores.reverse(); // top should be first
 
-	if (m_players.cur.empty()) m_rank = "No singer!";
-	else if (topScore > 8000) m_rank = "Hit singer";
-	else if (topScore > 6000) m_rank = "Lead singer";
-	else if (topScore > 4000) m_rank = "Rising star";
-	else if (topScore > 2000) m_rank = "Amateur";
-	else m_rank = "Tone deaf";
+	if (m_database.scores.empty())
+		m_rank = "No player!";
+	else {
+		int topScore = m_database.scores.front().score;
+		if (m_database.scores.front().track_simple == "vocals") {
+			if (topScore > 8000) m_rank = "Hit singer";
+			else if (topScore > 6000) m_rank = "Lead singer";
+			else if (topScore > 4000) m_rank = "Rising star";
+			else if (topScore > 2000) m_rank = "Amateur";
+			else m_rank = "Tone deaf";
+		} else {
+			if (topScore > 8000) m_rank = "Virtuoso";
+			else if (topScore > 6000) m_rank = "Rocker";
+			else if (topScore > 4000) m_rank = "Rising star";
+			else if (topScore > 2000) m_rank = "Amateur";
+			else m_rank = "Tone deaf";
+		}
+	}
 	m_bg.dimensions.middle().center();
-	m_scoreBar.dimensions.fixedWidth(0.1);
+	m_scoreBar.dimensions.fixedWidth(0.09);
 }
 
 void ScoreWindow::draw() {
 	glutil::PushMatrix block;
 	glTranslatef(0.0, m_pos.get(), 0.0);
 	m_bg.draw();
-	const double spacing = 0.1 + 0.1 / m_players.cur.size();
+	const double spacing = 0.1 + 0.1 / m_database.scores.size();
 	unsigned i = 0;
 
-	for (std::list<Player>::const_iterator p = m_players.cur.begin(); p != m_players.cur.end(); ++p, ++i) {
-		int score = p->getScore();
-		glColor3f(p->m_color.r, p->m_color.g, p->m_color.b);
-		double x = -0.12 + spacing * (0.5 + i - 0.5 * m_players.cur.size());
-		m_scoreBar.dimensions.middle(x).bottom(0.24);
+	for (Database::cur_scores_t::const_iterator p = m_database.scores.begin(); p != m_database.scores.end(); ++p, ++i) {
+		int score = p->score;
+		glColor4fv(p->color);
+		double x = -0.12 + spacing * (0.5 + i - 0.5 * m_database.cur.size());
+		m_scoreBar.dimensions.middle(x).bottom(0.20);
 		m_scoreBar.draw(score / 10000.0);
 		m_score_text.render(boost::lexical_cast<std::string>(score));
 		m_score_text.dimensions().middle(x).top(0.24).fixedHeight(0.05);
+		m_score_text.draw();
+		m_score_text.render(p->track_simple);
+		m_score_text.dimensions().middle(x).top(0.20).fixedHeight(0.05);
 		m_score_text.draw();
 		glColor3f(1.0f, 1.0f, 1.0f);
 	}

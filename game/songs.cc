@@ -2,6 +2,8 @@
 
 #include "configuration.hh"
 #include "fs.hh"
+#include "song.hh"
+#include "database.hh"
 
 #include <boost/bind.hpp>
 #include <boost/format.hpp>
@@ -14,7 +16,7 @@
 #include <stdexcept>
 #include <cstdlib>
 
-Songs::Songs(std::string const& songlist): m_songlist(songlist), math_cover(), m_order(), m_dirty(false), m_loading(false), m_needShuffle(false) {
+Songs::Songs(Database & database, std::string const& songlist): m_songlist(songlist), math_cover(), m_database(database), m_order(), m_dirty(false), m_loading(false), m_needShuffle(false) {
 	reload();
 }
 
@@ -69,10 +71,10 @@ void Songs::reload_internal(fs::path const& parent) {
 			path.erase(path.size() - name.size());
 			if (!regex_match(name.c_str(), match, expression)) continue;
 			try {
-				Song* s = new Song(path, name);
+				boost::shared_ptr<Song>s(new Song(path, name));
 				s->randomIdx = ++randomIdx; // Not so random during loading, they are shuffled after load is finished
 				boost::mutex::scoped_lock l(m_mutex);
-				m_songs.push_back(boost::shared_ptr<Song>(s));
+				m_songs.push_back(s);
 				m_dirty = true;
 			} catch (SongParserException& e) {
 				if (e.silent()) continue;
@@ -116,8 +118,8 @@ void Songs::update() {
 	if (m_dirty) filter_internal();
 	// Shuffle the songlist if shuffle is finished and all songs are already filtered
 	if (m_needShuffle && !m_dirty) {
+		RestoreSel restore(*this);
 		randomize_internal();
-		math_cover.setTarget(0, m_songs.size());
 		m_needShuffle = false;
 	}
 }
@@ -129,6 +131,7 @@ void Songs::randomize() {
 
 void Songs::randomize_internal() {
 	/* TR1-based random number generation
+	TODO: it is enough that random_device is initialized once and not for every randomize_internal
 	namespace rnd = std::tr1;
 	rnd::random_device gendev;  // Random number generator (using /dev/urandom usually)
 	rnd::mt19937 gen(gendev);  // Make Mersenne Twister random number generator, seeded with random_device.
@@ -223,10 +226,6 @@ void Songs::sortChange(int diff) {
 	if (m_order < 0) m_order += orders;
 	RestoreSel restore(*this);
 	sort_internal();
-}
-
-namespace {
-	int rnd(int n) { return rand() % n; }
 }
 
 void Songs::sort_internal() {

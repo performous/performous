@@ -47,12 +47,6 @@ to save the current settings to XML.
 			<long>Hide pitch wave, notes and scoring.</long>
 		</locale>
 	</entry>
-	<entry name="game/song_hiscore" type="bool" value="false">
-		<locale name="C">
-			<short>Song Hiscore</short>
-			<long>Show and save a per song hiscore.</long>
-		</locale>
-	</entry>
 	<entry name="game/pitch" type="bool" value="true">
 		<locale name="C">
 			<short>Pitch waves</short>
@@ -81,7 +75,7 @@ to save the current settings to XML.
 	<entry name="game/instruments" type="string_list">
 		<!-- Should be SDL_ID:{GUITAR_GUITARHERO|GUITAR_ROCKBAND|DRUMS_GUITARHERO|DRUMS_ROCKBAND}
 		     example:
-			<stringvalue>0:GUITAR_GH</stringvalue>
+			<stringvalue>0:GUITAR_GUITARHERO</stringvalue>
 		-->
 		<locale name="C">
 			<short>Joystick configuration</short>
@@ -116,6 +110,12 @@ to save the current settings to XML.
 		<locale name="C">
 			<short>Video playback</short>
 			<long>Allows completely disabling background videos. It is recommended to leave this enabled as Performous will still smoothly fade out the video if your computer is not fast enough.</long>
+		</locale>
+	</entry>
+	<entry name="graphic/3d_notes" type="bool" value="true">
+		<locale name="C">
+			<short>3D notes</short>
+			<long>Draw instrument notes as 3-dimensional objects. May hurt performance on older hardware.</long>
 		</locale>
 	</entry>
 	<entry name="graphic/svg_lod" type="float" value="1.0">
@@ -210,16 +210,6 @@ to save the current settings to XML.
 	</entry>
 
 	<!-- System preferences -->
-	<entry name="system/path_data" type="string_list">
-		<stringvalue>/usr/local/share/games/performous/</stringvalue>
-		<stringvalue>/usr/share/games/performous/</stringvalue>
-		<stringvalue>../</stringvalue><!-- For Windows where the program is started in bin/ -->
-		<stringvalue>~/.performous/</stringvalue>
-		<locale name="C">
-			<short>Data folders</short>
-			<long>Where Performous data are stored.</long>
-		</locale>
-	</entry>
 	<entry name="system/path_songs" type="string_list">
 		<stringvalue>/usr/local/share/games/ultrastar/songs/</stringvalue>
 		<stringvalue>/usr/share/games/ultrastar/songs/</stringvalue>
@@ -230,33 +220,20 @@ to save the current settings to XML.
 			<long>Where to recursively look for songs.</long>
 		</locale>
 	</entry>
-	<entry name="system/path_share" type="string_list">
-		<stringvalue>~/.local/share/performous</stringvalue>
-		<stringvalue>../share</stringvalue><!-- For Windows where the program is started in bin/ -->
-		<stringvalue>~/.performous/share</stringvalue>
-		<locale name="C">
-			<short>Data folders</short>
-			<long>Where Performous data are stored.</long>
-		</locale>
-	</entry>
-	<entry name="system/path_pictures" type="string_list">
-		<stringvalue>/usr/local/share/games/performous/pictures</stringvalue>
-		<stringvalue>/usr/share/games/performous/pictures</stringvalue>
-		<stringvalue>../pictures/</stringvalue><!-- For Windows where the program is started in bin/ -->
-		<stringvalue>~/.performous/pictures/</stringvalue>
-		<locale name="C">
-			<short>Picture folders</short>
-			<long>Where to look for pictures of players.</long>
-		</locale>
-	</entry>
 	<entry name="system/path_backgrounds" type="string_list">
-		<stringvalue>/usr/local/share/games/performous/backgrounds</stringvalue>
-		<stringvalue>/usr/share/games/performous/backgrounds</stringvalue>
+		<stringvalue>/usr/local/share/games/performous/backgrounds/</stringvalue>
+		<stringvalue>/usr/share/games/performous/backgrounds/</stringvalue>
 		<stringvalue>../backgrounds/</stringvalue><!-- For Windows where the program is started in bin/ -->
 		<stringvalue>~/.performous/backgrounds/</stringvalue>
 		<locale name="C">
-			<short>Random background folders</short>
-			<long>Where to look for default backgrounds.</long>
+			<short>Background folders</short>
+			<long>Where to look for backgrounds.</long>
+		</locale>
+	</entry>
+	<entry name="system/path" type="string_list">
+		<locale name="C">
+			<short>System folders</short>
+			<long>Where to look for performous data.</long>
 		</locale>
 	</entry>
 </performous>

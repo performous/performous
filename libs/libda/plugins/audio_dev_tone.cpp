@@ -2,8 +2,7 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
-// Needs at least Boost 1.36 and many systems don't have that: #include <boost/spirit/include/classic_core.hpp>
-#include <boost/spirit/core.hpp>
+#include <boost/spirit/include/classic_core.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/xtime.hpp>
 #include <algorithm>
@@ -60,7 +59,7 @@ namespace {
 		boost::xtime time;
 		void add(std::string const& tonestr) {
 			double freq = 440.0, amplitude = 0.1, phase = 0.0;
-			using namespace boost::spirit; //::classic;
+			using namespace boost::spirit::classic;
 			using namespace boost::lambda;
 			placeholder1_type arg1;
 			if (!parse(tonestr.c_str(),

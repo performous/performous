@@ -1,7 +1,11 @@
 #include "fs.hh"
 
 #include "configuration.hh"
+#include <plugin++/execname.hpp>
 #include <cstdlib>
+#include <iostream>
+#include <list>
+#include <sstream>
 
 fs::path getHomeDir() {
 	static fs::path dir;
@@ -10,6 +14,18 @@ fs::path getHomeDir() {
 		initialized = true;
 		char const* home = getenv("HOME");
 		if (home) dir = home;
+	}
+	return dir;
+}
+
+fs::path getConfigDir() {
+	static fs::path dir;
+	static bool initialized = false;
+	if (!initialized) {
+		initialized = true;
+		char const* conf = getenv("XDG_CONFIG_HOME");
+		if (conf) dir = fs::path(conf) / "performous";
+		else dir = getHomeDir() / ".config" / "performous";
 	}
 	return dir;
 }
@@ -31,39 +47,66 @@ std::string getThemePath(std::string const& filename) {
 	if (theme.empty()) throw std::runtime_error("Configuration value game/theme is empty");
 	// Figure out theme folder (if theme name rather than path was given)
 	if (theme.find('/') == std::string::npos) {
-		ConfigItem::StringList sd = config["system/path_data"].sl();
-		for (std::vector<std::string>::const_iterator it = sd.begin(); it != sd.end(); ++it) {
-			fs::path p = *it;
-			p /= "themes/";
-			p /= theme;
-			if (fs::is_directory(p)) { theme = p.string(); break; }
+		return getPath(fs::path("themes") / theme / filename);
+	} else {
+		if (*theme.rbegin() == '/') theme.erase(theme.size() - 1); // Remove trailing slash
+		return theme + "/" + filename;
+	}
+}
+
+namespace {
+	bool pathNotExist(fs::path const& p) {
+		if (exists(p)) {
+			std::cout << ">>> Using data path \"" << p.string() << "\"" << std::endl;
+			return false;
 		}
-    }
-	if (*theme.rbegin() == '/') theme.erase(theme.size() - 1); // Remove trailing slash
-	return theme + "/" + filename;
-}
-
-std::string getDataPath(std::string const& filename) {
-	// Figure out theme folder (if theme name rather than path was given)
-	std::string data_dir;
-	ConfigItem::StringList sd = config["system/path_data"].sl();
-	for (std::vector<std::string>::const_iterator it = sd.begin(); it != sd.end(); ++it) {
-		fs::path p = *it;
-		p = pathMangle(p);
-		if (fs::is_directory(p)) { data_dir = p.string(); break; }
+		std::cout << ">>> Not using \"" << p.string() << "\" (does not exist)" << std::endl;
+		return true;
 	}
-	return data_dir + "/" + filename;
 }
 
-std::string getSharePath(std::string const& filename) {
-	// Figure out theme folder (if theme name rather than path was given)
-	std::string data_dir;
-	ConfigItem::StringList sd = config["system/path_share"].sl();
-	for (std::vector<std::string>::const_iterator it = sd.begin(); it != sd.end(); ++it) {
-		fs::path p = *it;
-		p = pathMangle(p);
-		if (fs::is_directory(p)) { data_dir = p.string(); break; }
+std::string getPath(fs::path const& filename) {
+	typedef std::list<fs::path> Dirs;
+	static Dirs dirs;
+	static bool initialized = false;
+	if (!initialized) {
+		initialized = true;
+		fs::path shortDir = "performous";
+		fs::path shareDir = "share/games" / shortDir;
+#ifdef _WIN32
+		// Add APPLIC~1 (user-specific application data)  FIXME: Not tested
+		{
+			char const* appdata = getenv("APPDATA");
+			if (appdata) dirs.push_back(appdata / shortDir);
+		}
+#else
+		// Adding XDG_DATA_HOME
+		{
+			char const* xdg_data_home = getenv("XDG_DATA_HOME");
+			// FIXME: Should this use "games" or not?
+			dirs.push_back(xdg_data_home ? xdg_data_home / shortDir : getHomeDir() / ".local" / shareDir);
+		}
+#endif
+		// Adding relative path from executable
+		dirs.push_back(fs::path(plugin::execname()).parent_path().parent_path() / shareDir);
+#ifndef _WIN32
+		// Adding XDG_DATA_DIRS
+		{
+			char const* xdg_data_dirs = getenv("XDG_DATA_DIRS");
+			std::istringstream iss(xdg_data_dirs ? xdg_data_dirs : "/usr/local/share/:/usr/share/");
+			for (std::string p; std::getline(iss, p, ':'); dirs.push_back(p / shortDir)) {}
+		}
+#endif
+		// Adding paths from config file
+		std::vector<std::string> pathes = config["system/path"].sl();
+		std::transform(pathes.begin(), pathes.end(), std::inserter(dirs, dirs.end()), pathMangle);
+		// Check if they actually exist and print debug
+		dirs.remove_if(pathNotExist);
 	}
-	return data_dir + "/" + filename;
+	for (Dirs::const_iterator it = dirs.begin(); it != dirs.end(); ++it) {
+		fs::path p = *it;
+		p /= filename;
+		if( fs::exists(p) ) return p.string();
+	}
+	throw std::runtime_error("Cannot find file \"" + filename.string() + "\" in any of Performous data folders");
 }
-

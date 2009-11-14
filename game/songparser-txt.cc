@@ -87,6 +87,7 @@ bool SongParser::txtParseNote(std::string line) {
 		addBPM(ts, bpm);
 		return true;
 	}
+	if (line[0] == 'P') return true; //We ignore player information for now (multiplayer hack)
 	Note n;
 	n.type = Note::Type(iss.get());
 	unsigned int ts = m_prevts;
@@ -135,7 +136,12 @@ bool SongParser::txtParseNote(std::string line) {
 			}
 			// Can we just make the previous note shorter?
 			if (p.begin <= n.begin) p.end = n.begin;
-			else throw std::runtime_error("Note overlaps with earlier notes");
+			else { // Nothing to do, warn and skip
+				std::ostringstream oss;
+				oss << "WARNING: Skipping overlapping note in " << m_song.path << m_song.filename << std::endl;
+				std::cerr << oss.str(); // More likely to be atomic when written as one string
+				return true;
+			}
 		} else throw std::runtime_error("The first note has negative timestamp");
 	}
 	double prevtime = m_prevtime;

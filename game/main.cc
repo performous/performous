@@ -5,6 +5,7 @@
 #include "joystick.hh"
 #include "songs.hh"
 #include "backgrounds.hh"
+#include "database.hh"
 #include "xtime.hh"
 #include "video_driver.hh"
 
@@ -15,12 +16,11 @@
 #include "screen_practice.hh"
 #include "screen_configuration.hh"
 #include "screen_players.hh"
-#include "screen_highscore.hh"
+#include "screen_hiscore.hh"
 
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
-// Needs at least Boost 1.36 and many systems don't have that: #include <boost/spirit/include/classic_core.hpp>
-#include <boost/spirit/core.hpp>
+#include <boost/spirit/include/classic_core.hpp>
 #include <boost/thread.hpp>
 #include <libda/audio.hpp>
 #include <csignal>
@@ -91,7 +91,7 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 
 void audioSetup(Capture& capture, Audio& audio) {
 	// initialize audio argument parser
-	using namespace boost::spirit; //::classic;
+	using namespace boost::spirit::classic;
 	unsigned channels, rate, frames;
 	std::string devstr;
 	// channel       ::= "channel=" integer
@@ -134,25 +134,23 @@ void audioSetup(Capture& capture, Audio& audio) {
 	if (!audio.isOpen()) std::cerr << "No playback devices could be used. Please use --pdev to define one." << std::endl;
 }
 
-std::string songlist;
-
-void mainLoop() {
+void mainLoop(std::string const& songlist) {
 	try {
 		Capture capture;
 		Audio audio;
 		audioSetup(capture, audio);
 		Backgrounds backgrounds;
-		Songs songs(songlist);
-		Players players(getHomeDir() / ".config" / "performous" / "players.xml");
+		Database database(getConfigDir() / "database.xml");
+		Songs songs(database, songlist);
 		ScreenManager sm;
 		Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());
 		sm.addScreen(new ScreenIntro("Intro", audio, capture));
 		sm.addScreen(new ScreenSongs("Songs", audio, songs));
-		sm.addScreen(new ScreenSing("Sing", audio, capture, players, backgrounds));
+		sm.addScreen(new ScreenSing("Sing", audio, capture, database, backgrounds));
 		sm.addScreen(new ScreenPractice("Practice", audio, capture));
 		sm.addScreen(new ScreenConfiguration("Configuration", audio));
-		sm.addScreen(new ScreenPlayers("Players", audio, players));
-		sm.addScreen(new ScreenHiscore("Hiscore", audio, players));
+		sm.addScreen(new ScreenPlayers("Players", audio, database));
+		sm.addScreen(new ScreenHiscore("Hiscore", audio, songs, database));
 		sm.activateScreen("Intro");
 		// Main loop
 		boost::xtime time = now();
@@ -205,6 +203,7 @@ int main(int argc, char** argv) {
 	std::vector<std::string> songdirs;
 	namespace po = boost::program_options;
 	po::options_description opt1("Generic options");
+	std::string songlist;
 	opt1.add_options()
 	  ("help,h", "you are viewing it")
 	  ("version,v", "display version number")
@@ -288,7 +287,7 @@ int main(int argc, char** argv) {
 	confOverride(mics, "audio/capture");
 	confOverride(pdevs, "audio/playback");
 	// Run the game init and main loop
-	mainLoop();
+	mainLoop(songlist);
 	return 0; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
 }
 

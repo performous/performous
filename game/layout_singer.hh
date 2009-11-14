@@ -6,6 +6,8 @@
 
 #include <deque>
 
+class Database;
+
 /// handles songlyrics
 class LyricRow {
   public:
@@ -48,7 +50,7 @@ class LayoutSinger {
   public:
 	enum Position {BOTTOM, MIDDLE, LEFT, RIGHT};
 	/// ThemeSing is optional if you want to use drawScore only
-	LayoutSinger(Song &_song, Players & players, boost::shared_ptr<ThemeSing> _theme = boost::shared_ptr<ThemeSing>());
+	LayoutSinger(Song& song, Database& database, boost::shared_ptr<ThemeSing> theme = boost::shared_ptr<ThemeSing>());
 	~LayoutSinger();
 	void reset();
 	void draw(double time, Position position = LayoutSinger::BOTTOM);
@@ -62,7 +64,7 @@ class LayoutSinger {
 	boost::scoped_ptr<Surface> m_player_icon;
 	boost::scoped_ptr<SvgTxtThemeSimple> m_score_text[4];
 	boost::scoped_ptr<SvgTxtThemeSimple> m_line_rank_text[4];
-	Players& m_players;
+	Database& m_database;
 	boost::shared_ptr<ThemeSing> m_theme;
 	AnimValue m_feedbackFader;
 };

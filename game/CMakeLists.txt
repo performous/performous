@@ -7,7 +7,7 @@ set(SOURCES ${SOURCE_FILES} ${HEADER_FILES})
 
 # Libraries
 
-find_package(Boost 1.34 REQUIRED COMPONENTS thread date_time program_options regex filesystem)
+find_package(Boost 1.36 REQUIRED COMPONENTS thread date_time program_options regex filesystem)
 include_directories(${Boost_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${Boost_LIBRARIES})
 
@@ -35,19 +35,19 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 	add_definitions("-D__STDC_CONSTANT_MACROS")
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
-add_executable(performous.bin ${SOURCES} ${SDL_SOURCES})
-target_link_libraries(performous.bin da ${LIBS})
+add_executable(performous ${SOURCES} ${SDL_SOURCES})
+target_link_libraries(performous da ${LIBS})
 
-set_target_properties(performous.bin PROPERTIES
-	INSTALL_RPATH_USE_LINK_PATH TRUE
-	SKIP_BUILD_RPATH FALSE
-	INSTALL_RPATH \$ORIGIN/../lib
-	BUILD_WITH_INSTALL_RPATH FALSE
-)
+# Store library paths in executable
+if(APPLE)
+	set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE INSTALL_RPATH @loader_path/../lib)
+else()
+	set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE INSTALL_RPATH \$ORIGIN/../lib)
+endif()
 
 # Generate config.hh
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.cmake.hh" "${CMAKE_CURRENT_BINARY_DIR}/config.hh" @ONLY)
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
-install(TARGETS performous.bin DESTINATION bin)
+install(TARGETS performous DESTINATION bin)
 

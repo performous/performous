@@ -1,11 +1,15 @@
 #pragma once
-#include "song.hh"
 #include "color.hh"
 #include "pitch.hh"
 #include "util.hh"
+#include "notes.hh"
 #include "animvalue.hh"
 
+#include <string>
 #include <vector>
+#include <utility>
+
+class Song;
 
 /// player class
 struct Player {
@@ -36,10 +40,7 @@ struct Player {
 	/// score iterator
 	Notes::const_iterator m_scoreIt;
 	/// constructor
-	Player(Song& song, Analyzer& analyzer, size_t frames):
-	  m_song(song), m_analyzer(analyzer), m_pitch(frames, std::make_pair(getNaN(),
-	  -getInf())), m_pos(), m_score(), m_lineScore(), m_maxLineScore(), m_prevLineScore(-1),
-	  m_feedbackFader(0.0, 2.0), m_activitytimer(), m_scoreIt(m_song.notes.begin()) {}
+	Player(Song& song, Analyzer& analyzer, size_t frames);
 	/// prepares analyzer
 	void prepare() { m_analyzer.process(); }
 	/// updates player stats
@@ -65,14 +66,25 @@ struct Player {
   Used for Players Management.
   */
 struct PlayerItem {
-	std::string name; /// unique name, link to highscore
-	std::string path; /// a path to a picture shown
-	std::string picture; /// + the filename for it
+	int id; ///< unique identifier for this PlayerItem, Link to hiscore
+
+	std::string name; ///< name displayed and used for searching the player
+	std::string picture; ///< the filename which was passed from xml (and is written back)
+	std::string path; ///< a full path to a picture shown, generated from picture above
 /* Future ideas
 	std::string displayedName; /// artist name, short name, nick (can be changed)
 	std::map<std::string, int> scores; /// map between a Song and the highest score the Player achieved
 */
 
+	/**For insertion in set.
+	 Provides ordering and ensures id is unique.*/
+	bool operator< (PlayerItem const& pi) const
+	{
+		return id < pi.id;
+	}
+
+	/**Checks if a player has the same name.
+	  Used to find a PlayerItem with the same name.*/
 	bool operator== (PlayerItem const& pi) const
 	{
 		return name == pi.name;

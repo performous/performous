@@ -201,7 +201,7 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) {
 }
 
 fs::path systemConfFile = "/etc/xdg/performous/config.xml";
-fs::path userConfFile = getHomeDir() / ".config" / "performous" / "config.xml";
+fs::path userConfFile = getConfigDir() / "config.xml";
 
 void writeConfig(bool system) {
 	xmlpp::Document doc;
@@ -334,4 +334,3 @@ void readConfig() {
 	readConfigXML(systemConfFile, 1);  // Update defaults with system config
 	readConfigXML(userConfFile, 2);  // Read user settings
 }
-

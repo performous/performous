@@ -11,27 +11,31 @@
 #include "screen.hh"
 #include "backgrounds.hh"
 #include "theme.hh"
-#include "video.hh"
 #include "surface.hh"
 #include "opengl_text.hh"
 #include "progressbar.hh"
+#include "guitargraph.hh"
 
 #include "screen_players.hh"
 
 class Players;
 class Audio;
 class Capture;
+class Database;
+class Video;
+
+typedef boost::ptr_vector<GuitarGraph> Instruments;
 
 /// shows score at end of song
 class ScoreWindow {
   public:
 	/// constructor
-	ScoreWindow(Engine & e, Players & players);
+	ScoreWindow(Instruments& instruments, Database& database);
 	/// draws ScoreWindow
 	void draw();
-	bool empty() { return m_players.cur.empty(); }
+	bool empty() { return m_database.scores.empty(); }
   private:
-	Players & m_players;
+	Database& m_database;
 	AnimValue m_pos;
 	Surface m_bg;
 	ProgressBar m_scoreBar;
@@ -44,8 +48,8 @@ class ScoreWindow {
 class ScreenSing: public Screen {
   public:
 	/// constructor
-	ScreenSing(std::string const& name, Audio& audio, Capture& capture, Players& players, Backgrounds& bgs):
-	  Screen(name), m_audio(audio), m_capture(capture), m_players(players), m_backgrounds(bgs), m_latencyAV()
+	ScreenSing(std::string const& name, Audio& audio, Capture& capture, Database& database, Backgrounds& bgs):
+	  Screen(name), m_audio(audio), m_capture(capture), m_database(database), m_backgrounds(bgs), m_latencyAV()
 	{}
 	void enter();
 	void exit();
@@ -69,7 +73,7 @@ class ScreenSing: public Screen {
 	void danceLayout(double time);
 	Audio& m_audio;
 	Capture& m_capture;
-	Players& m_players;
+	Database& m_database;
 	Backgrounds& m_backgrounds;
 	boost::shared_ptr<Song> m_song; /// Pointer to the current song
 	boost::scoped_ptr<ScoreWindow> m_score_window;

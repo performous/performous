@@ -9,8 +9,17 @@
 #include "theme.hh"
 #include "video.hh"
 
+class Song;
 class Audio;
 class Songs;
+
+struct ScreenSharedInfo
+{
+	std::map<std::string,std::string> music;
+	std::string songbg;
+	std::string video;
+	double videoGap;
+};
 
 /// song chooser screen
 class ScreenSongs : public Screen {
@@ -24,7 +33,11 @@ class ScreenSongs : public Screen {
 	void draw();
 	void drawJukebox(); ///< draw the songbrowser in jukebox mode (fullscreen, full previews, ...)
 
-  private:
+  protected:
+	void drawMultimedia();
+	void updateMultimedia(Song& song, ScreenSharedInfo& info);
+	void stopMultimedia(ScreenSharedInfo& info);
+
 	Audio& m_audio;
 	Songs& m_songs;
 	boost::scoped_ptr<Surface> m_songbg;
