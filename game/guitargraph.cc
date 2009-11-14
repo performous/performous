@@ -11,10 +11,10 @@
 
 namespace {
 	struct Diff { std::string name; int basepitch; } diffv[] = {
-		{ "Supaeasy", 0x3C },
-		{ "Easy", 0x48 },
-		{ "Medium", 0x54 },
-		{ "Amazing", 0x60 }
+		{ "Easy", 0x3C },
+		{ "Medium", 0x48 },
+		{ "Hard", 0x54 },
+		{ "Expert", 0x60 }
 	};
 	const size_t diffsz = sizeof(diffv) / sizeof(*diffv);
 
