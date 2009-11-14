@@ -339,10 +339,10 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 		item.track_simple = it->getTrack();
 		item.track = it->getTrack() + " - " + it->getDifficultyString();
 		item.track[0] = toupper(item.track[0]);
-		if (item.score < 500) { std::cout << "kick " << item.track << std::endl; it = instruments.erase(it); continue; }
+		if (item.score < 100) { std::cout << "kick " << item.track << std::endl; it = instruments.erase(it); continue; }
 		
-		if (item.track == "drums") item.color = glutil::Color(0.1f, 0.1f, 0.1f);
-		else if (item.track == "bass") item.color = glutil::Color(0.5f, 0.3f, 0.1f);
+		if (item.track_simple == "drums") item.color = glutil::Color(0.1f, 0.1f, 0.1f);
+		else if (item.track_simple == "bass") item.color = glutil::Color(0.5f, 0.3f, 0.1f);
 		else item.color = glutil::Color(1.0f, 0.0f, 0.0f);
 		
 		std::cout << "insert " << item.track << " score: " << item.score << std::endl;
@@ -355,7 +355,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 		m_rank = "No player!";
 	else {
 		int topScore = m_database.scores.front().score;
-		if (m_database.scores.front().track == "vocals") {
+		if (m_database.scores.front().track_simple == "vocals") {
 			if (topScore > 8000) m_rank = "Hit singer";
 			else if (topScore > 6000) m_rank = "Lead singer";
 			else if (topScore > 4000) m_rank = "Rising star";
