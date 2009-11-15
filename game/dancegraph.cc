@@ -33,7 +33,7 @@ namespace {
 DanceGraph::DanceGraph(Audio& audio, Song const& song):
   m_audio(audio),
   m_song(song),
-  //m_input(input::DANCEPAD),
+  m_input(input::GUITAR), // TODO: to be replaced by DANCEPAD
   m_arrow(getThemePath("arrow.svg")),
   m_cx(0.0, 0.2),
   m_width(0.5, 0.4),
@@ -70,25 +70,40 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
 
 /// Handles input
 void DanceGraph::engine() {
-	//TODO
+	double time = m_audio.getPosition();
+	time -= config["audio/controller_delay"].f();
+
+	// Handle all events
+	for (input::Event ev; m_input.tryPoll(ev);) {
+		m_dead = false;
+		if(ev.button < 0 || ev.button > 3)
+			continue;
+		if (ev.type == input::Event::RELEASE) m_holds[ev.button] = false;
+		else if (ev.type == input::Event::PRESS) m_holds[ev.button] = true;
+	}
+
 	
 }
 
 
 /// Handles scoring and such
 void DanceGraph::dance(double time, input::Event const& ev) {
-	//TODO
+	//TODO - Kemppi
 	
 }
 
 
 glutil::Color const& DanceGraph::color(int arrow_i) const {
-	static glutil::Color arrowColors[4] = {
+	// TODO: Hack.. Needs animation through events.
+	glutil::Color arrowColors[4] = {
 		glutil::Color(0.0f, 0.9f, 0.0f),
 		glutil::Color(0.9f, 0.0f, 0.0f),
 		glutil::Color(0.9f, 0.9f, 0.0f),
 		glutil::Color(0.0f, 0.0f, 0.9f),
 	};
+	for(size_t i = 0; i < 4; i++) {
+		if(m_holds[i] != 0) arrowColors[i] = glutil::Color(0.9f, 0.9f, 0.9f);
+	}
 	if (arrow_i < 0 || arrow_i > 3) throw std::logic_error("Invalid arrow number in DanceGraph::getColor");
 	return arrowColors[arrow_i];
 }
@@ -116,14 +131,14 @@ void DanceGraph::draw(double time) {
 	dimensions.screenCenter().middle(m_cx.get()).stretch(m_width.get(), 0.9);
 	double offsetX = 0.5 * (dimensions.x1() + dimensions.x2());
 	double frac = 0.75;  // Adjustable: 1.0 means fully separated, 0.0 means fully attached
-	// Draw scores
+/*	// Draw scores
 	if (time >= -0.5) {
 		m_text.dimensions.screenBottom(-0.30).middle(0.32 * dimensions.w() + offsetX);
 		m_text.draw(boost::lexical_cast<std::string>(unsigned(getScore())));
 		m_text.dimensions.screenBottom(-0.27).middle(0.32 * dimensions.w() + offsetX);
 		m_text.draw(boost::lexical_cast<std::string>(unsigned(m_streak)) + "/" 
 		  + boost::lexical_cast<std::string>(unsigned(m_longestStreak)));
-	}
+	}*/
 //std::cout << "m" << dimensions.x1() << " " << dimensions.x2() << std::endl;
 //std::cout << dimensions.y1() << " " << dimensions.y2() << std::endl;
 	glutil::PushMatrixMode pmm(GL_PROJECTION);
@@ -134,7 +149,7 @@ void DanceGraph::draw(double time) {
 	{ float s = dimensions.w() / 5.0f; glScalef(s, s, s); }
 	// Draw the notes
 	// TODO: iteration needs rewrite to the dancenotes structure
-	float tBeg, tEnd = 0.0f;
+/*	float tBeg, tEnd = 0.0f;
 	for (DanceChords::const_iterator it = m_chords.begin(); it != m_chords.end(); ++it) {
 		// TODO: rewrite for guitargraph's Chord
 		DanceChord chord = *it;
@@ -154,7 +169,7 @@ void DanceGraph::draw(double time) {
 				drawNote(arrow_i, c, tBeg, tEnd);
 			}
 		}
-	}
+	}*/
 	// Arrows on cursor
 	// TODO: suitable effect for pressing the arrows?
 	// TODO: effect possibilities: zooming, whitening, external glow

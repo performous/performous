@@ -34,7 +34,7 @@ class DanceGraph {
 	glutil::Color const& color(int arrow_i) const ;
 	void drawArrow(int arrow_i, float x, float y, float scale = 1.0);
 	Audio& m_audio;
-	//input::InputDev m_input;
+	input::InputDev m_input;
 	Song const& m_song;
 	DanceChords m_chords;
 	Surface m_arrow;
@@ -51,7 +51,7 @@ class DanceGraph {
 	};
 	typedef std::vector<Event> Events;
 	Events m_events;
-	unsigned m_holds[4];
+	bool m_holds[4];
 	int m_dead;
 	SvgTxtTheme m_text;
 	AnimValue m_correctness;
