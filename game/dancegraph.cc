@@ -49,6 +49,8 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
 {
 	m_arrow.dimensions.middle().center();
 	
+	for(size_t i=0; i < 4; i++) m_holds[i] = 0;
+	
 	//TODO: this is a hack
 	for (DanceTracks::const_iterator it = m_song.danceTracks.begin(); it != m_song.danceTracks.end(); ++it) {
 		std::cout << "DANCE GAME MODE FOUND: " << it->first << std::endl;
