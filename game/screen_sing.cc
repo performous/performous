@@ -156,6 +156,7 @@ void ScreenSing::danceLayout(double time) {
 void ScreenSing::exit() {
 	m_score_window.reset();
 	m_instruments.clear();
+	m_dancers.clear();
 	m_layout_singer.reset();
 	m_engine.reset();
 	m_help.reset();
