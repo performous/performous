@@ -35,6 +35,7 @@ namespace {
 		else if (str == "NO" || str == "no" || str == "0") var = false;
 		else throw std::runtime_error("Invalid boolean value: " + str);
 	}
+	int upper_case (int c) { return toupper (c); }
 }
 
 
@@ -56,7 +57,7 @@ void SongParser::smParse() {
 	int dur; 		//note duration
 	std::string notestype;
 	std::string description;
-	DanceDifficulty danceDifficulty;
+	DanceDifficulty danceDifficulty = DIFFICULTYCOUNT;
 	DanceDifficultyMap danceDifficultyMap;
 	DanceChords chords;
 
@@ -117,29 +118,33 @@ void SongParser::smParse() {
 		
 			//Note values are analyzed here. Values are:
 		
+			// TODO: NOTES header vars needs better way to strip trailing colon ':'
+			
 			//<NotesType>:
 			if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
-			notestype = boost::trim_copy(line.substr(0, line.size() -1));
+			notestype = boost::trim_copy(line.substr(0, line.size() -2));
 			//<Description>:
 			if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
-			description = boost::trim_copy(line.substr(0, line.size() -1));
+			description = boost::trim_copy(line.substr(0, line.size() -2));
 			//<DifficultyClass>:
 			if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
-			std::string difficultyclass = boost::trim_copy(line.substr(0, line.size() -1));
+			std::string difficultyclass = boost::trim_copy(line.substr(0, line.size() -2));
 			//enum			
+				transform(difficultyclass.begin(), difficultyclass.end(), 
+				  difficultyclass.begin(), upper_case );
 				if(difficultyclass == "BEGINNER") danceDifficulty = BEGINNER;
 				if(difficultyclass == "EASY") danceDifficulty = EASY;
 				if(difficultyclass == "MEDIUM") danceDifficulty = MEDIUM;
 				if(difficultyclass == "HARD") danceDifficulty = HARD;
 				if(difficultyclass == "CHALLENGE") danceDifficulty = CHALLENGE;
-		
+
 			//ignoring difficultymeter and radarvalues
 			//<DifficultyMeter>:
 			if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
-			//std::string difficultymeter = boost::trim_copy(line.substr(0, line.size() -1));
+			//std::string difficultymeter = boost::trim_copy(line.substr(0, line.size() -2));
 			//<RadarValues>:
 			if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
-			//std::string radarvalues = boost::trim_copy(line.substr(0, line.size() -1));
+			//std::string radarvalues = boost::trim_copy(line.substr(0, line.size() -2));
 			
 			//<NoteData>:
 			/*while (getline(line) && smParseNotes(line, chords)) {}

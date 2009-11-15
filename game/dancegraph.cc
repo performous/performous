@@ -1,6 +1,7 @@
 #include "dancegraph.hh"
 
 #include "fs.hh"
+#include "notes.hh"
 #include <boost/lexical_cast.hpp>
 
 namespace {
@@ -46,9 +47,24 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
   m_streak(),
   m_longestStreak()
 {
-	//TODO
 	m_arrow.dimensions.middle().center();
 	
+	//TODO: this is a hack
+	for (DanceTracks::const_iterator it = m_song.danceTracks.begin(); it != m_song.danceTracks.end(); ++it) {
+		std::cout << "DANCE GAME MODE FOUND: " << it->first << std::endl;
+		if (it->first == "dance-single") {
+			DanceDifficultyMap dtracks = it->second;
+			DanceDifficulty d = EASY;
+			for (DanceDifficultyMap::const_iterator it2 = dtracks.begin(); it2 != dtracks.end(); ++it2) {
+				std::cout << "DANCE DIFFICULTY FOUND: " << it2->first << std::endl;
+				if (it2->first == d) {
+					DanceTrack dt = it2->second;
+					m_chords = dt.chords;
+					std::cout << "DANCE-TRACK FOUND" << std::endl;
+				}
+			}
+		}
+	}
 }
 
 
@@ -108,8 +124,8 @@ void DanceGraph::draw(double time) {
 		m_text.draw(boost::lexical_cast<std::string>(unsigned(m_streak)) + "/" 
 		  + boost::lexical_cast<std::string>(unsigned(m_longestStreak)));
 	}
-std::cout << "m" << dimensions.x1() << " " << dimensions.x2() << std::endl;
-std::cout << dimensions.y1() << " " << dimensions.y2() << std::endl;
+//std::cout << "m" << dimensions.x1() << " " << dimensions.x2() << std::endl;
+//std::cout << dimensions.y1() << " " << dimensions.y2() << std::endl;
 	glutil::PushMatrixMode pmm(GL_PROJECTION);
 	glTranslatef(frac * 2.0 * offsetX, 0.0f, 0.0f);
 	glutil::PushMatrixMode pmb(GL_MODELVIEW);
@@ -118,27 +134,27 @@ std::cout << dimensions.y1() << " " << dimensions.y2() << std::endl;
 	{ float s = dimensions.w() / 5.0f; glScalef(s, s, s); }
 	// Draw the notes
 	// TODO: iteration needs rewrite to the dancenotes structure
-	//for (Chords::const_iterator it = m_chords.begin(); it != m_chords.end(); ++it) {
-		/*
-		float tBeg = it->begin - time;
-		float tEnd = it->end - time;
-		if (tEnd < past) continue;
-		if (tBeg > future) break;
-		for (int arrow_i = 0; arrow_i < 5; ++arrow_i) {
-			//if (!it->fret[arrow_i]) continue;
-			if (tEnd > future) tEnd = future;
-			unsigned event = m_notes[it->dur[fret]];
-			float glow = 0.0f;
-			if (event > 0) glow = m_events[event - 1].glow.get();
+	float tBeg, tEnd = 0.0f;
+	for (DanceChords::const_iterator it = m_chords.begin(); it != m_chords.end(); ++it) {
+		// TODO: rewrite for guitargraph's Chord
+		DanceChord chord = *it;
+		for (int arrow_i = 0; arrow_i < 4; arrow_i++) {
+			if (chord.find(arrow_i) != chord.end()) {
+				tBeg = chord[arrow_i].begin; tEnd = chord[arrow_i].end;
+				if (tEnd < past) continue;
+				if (tBeg > future) break;
+				//unsigned event = m_notes[it->dur[fret]];
+				//float glow = 0.0f;
+				//if (event > 0) glow = m_events[event - 1].glow.get();
 
-			glutil::Color c = color(arrow_i);
-			c.r += glow;
-			c.g += glow;
-			c.b += glow;
-			drawNote(fret, c, tBeg, tEnd);
+				glutil::Color c = color(arrow_i);
+				//c.r += glow;
+				//c.g += glow;
+				//c.b += glow;
+				drawNote(arrow_i, c, tBeg, tEnd);
+			}
 		}
-		*/
-	//}
+	}
 	// Arrows on cursor
 	// TODO: suitable effect for pressing the arrows?
 	// TODO: effect possibilities: zooming, whitening, external glow
@@ -157,5 +173,5 @@ void DanceGraph::drawNote(int arrow_i, glutil::Color c, float tBeg, float tEnd) 
 	float yBeg = time2y(tBeg);
 	float yEnd = time2y(tEnd);
 	c.a = time2a(tBeg); glColor4fv(c);
-	drawArrow(arrow_i, x, time2y(tBeg));
+	drawArrow(arrow_i, x, yBeg);
 }

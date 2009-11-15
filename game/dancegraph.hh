@@ -4,6 +4,7 @@
 
 #include <boost/ptr_container/ptr_map.hpp>
 #include "animvalue.hh"
+#include "song.hh"
 #include "notes.hh"
 #include "audio.hh"
 #include "joystick.hh"
@@ -35,6 +36,7 @@ class DanceGraph {
 	Audio& m_audio;
 	//input::InputDev m_input;
 	Song const& m_song;
+	DanceChords m_chords;
 	Surface m_arrow;
 	AnimValue m_cx, m_width;
 	std::size_t m_stream;
