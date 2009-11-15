@@ -97,15 +97,12 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 
 glutil::Color const& DanceGraph::color(int arrow_i) const {
 	// TODO: Hack.. Needs animation through events.
-	glutil::Color arrowColors[4] = {
+	static glutil::Color arrowColors[4] = {
 		glutil::Color(0.0f, 0.9f, 0.0f),
 		glutil::Color(0.9f, 0.0f, 0.0f),
 		glutil::Color(0.9f, 0.9f, 0.0f),
 		glutil::Color(0.0f, 0.0f, 0.9f),
 	};
-	for(size_t i = 0; i < 4; i++) {
-		if(m_holds[i] != 0) arrowColors[i] = glutil::Color(0.9f, 0.9f, 0.9f);
-	}
 	if (arrow_i < 0 || arrow_i > 3) throw std::logic_error("Invalid arrow number in DanceGraph::getColor");
 	return arrowColors[arrow_i];
 }
@@ -178,6 +175,7 @@ void DanceGraph::draw(double time) {
 	for (int arrow_i = 0; arrow_i < 4; ++arrow_i) {
 		float x = -1.5f + arrow_i;
 		glColor4fv(color(arrow_i));
+		if (m_holds[arrow_i]) glColor3f(1.0f, 1.0f, 1.0f);
 		drawArrow(arrow_i, x, time2y(0.0), 0.6);
 	}
 	glColor3f(1.0f, 1.0f, 1.0f);	
