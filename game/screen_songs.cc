@@ -320,8 +320,7 @@ void ScreenSongs::draw() {
 					}
 					{
 						// dancing
-						// TODO: test for dance track
-						alpha = 0.25;
+						alpha = !song_display.danceTracks.empty() ? 1.00 : 0.25;
 						glutil::Begin block(GL_TRIANGLE_STRIP);
 						glColor4f(1.0, 1.0, 1.0, alpha);
 						x = dim.x1()+4*xincr*(dim.x2()-dim.x1());

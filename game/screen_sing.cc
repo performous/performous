@@ -88,12 +88,11 @@ void ScreenSing::enter() {
 		}
 	}
 	// Load dance tracks
-	m_dancers.push_back(new DanceGraph(m_audio, *m_song)); // REMOVEME
 	if ( !m_song->danceTracks.empty() ) {
 		while(1) {
 			try {
 				m_dancers.push_back(new DanceGraph(m_audio, *m_song));
-				break; // REMOVEME
+				break; // REMOVEME (when input assignement is correctly implemented)
 			} catch (std::runtime_error&) { break; }
 		}
 	}
