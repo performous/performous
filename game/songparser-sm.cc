@@ -53,8 +53,8 @@ void SongParser::smParse() {
 	int lcount = 0;		//line counter for note duration
 	int count = 0; 		//total lines counter
 	bool readable = false; 	//makes sure that other values are read before notes
-	int tm = 0; 		//time counter
-	int dur; 		//note duration
+	double tm = 0; 		//time counter
+	double dur; 		//note duration
 	std::string notestype;
 	std::string description;
 	DanceDifficulty danceDifficulty = DIFFICULTYCOUNT;
@@ -86,10 +86,11 @@ void SongParser::smParse() {
 		if (!readable && isNote(line[0]) ) throw std::runtime_error("Notes outside NoteData");
 		if (line[0] == ',') {
 			/*Counting the timestamp of each note*/
-			dur = 4 * ( 1/(m_bpm/60) ) / lcount;	//counts one note duration in seconds;	
+			dur = 4.0 * ( 1.0/(m_bpm/60.0) ) / lcount;	//counts one note duration in seconds;	
+			//std::cout << "DUR: " << dur << "TM: " << tm << std::endl;
 			for(int j = count - lcount; j<count ; j++) {	
 				for(int i = 0; i<4; i++) {
-					DanceChord _chord = chords.at(j);
+					DanceChord& _chord = chords.at(j);
 					if(_chord.find(i) != _chord.end()) {
 						_chord[i].begin = tm;
 						_chord[i].end = tm;
