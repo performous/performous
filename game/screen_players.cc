@@ -115,7 +115,8 @@ void ScreenPlayers::draw() {
 		}
 	} else {
 		// Format the player information text
-		oss_song << "You reached " << m_database.scores.front().score << " points!\n";
+		oss_song << m_database.scores.front().track << "\n";
+		oss_song << "You reached " << m_database.scores.front().score << " points!";
 		oss_order << "Please enter your Name!\n"
 			<< "Name: " << m_players.current().name << '\n'
 			<< "Search Text: "
