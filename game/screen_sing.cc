@@ -146,9 +146,7 @@ void ScreenSing::activateNextScreen()
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 
 	m_database.addSong(m_song);
-	if (m_database.scores.empty()
-	      || !m_database.reachedHiscore(m_song))
-	{
+	if (m_database.scores.empty() || !m_database.reachedHiscore(m_song)) {
 		// if no highscore reached..
 		sm->activateScreen("Songs");
 		return;
@@ -325,7 +323,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 {
 	m_pos.setTarget(0.0);
 	m_database.scores.clear();
-	for (std::list<Player>::iterator p = m_database.cur.begin(); p != m_database.cur.end(); ++p) {
+	for (std::list<Player>::iterator p = m_database.cur.begin(); p != m_database.cur.end();) {
 		ScoreItem item;
 		item.score = p->getScore();
 		item.track = "Vocals";
@@ -334,28 +332,29 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 		
 		if (item.score < 500) { p = m_database.cur.erase(p); continue; }
 		m_database.scores.push_back(item);
+		++p;
 	}
-	for (Instruments::iterator it = instruments.begin(); it != instruments.end(); ++it) {
+	for (Instruments::iterator it = instruments.begin(); it != instruments.end();) {
 		ScoreItem item;
 		item.score = it->getScore();
 		item.track_simple = it->getTrack();
 		item.track = it->getTrack() + " - " + it->getDifficultyString();
 		item.track[0] = toupper(item.track[0]);
-		if (item.score < 100) { std::cout << "kick " << item.track << std::endl; it = instruments.erase(it); continue; }
+		if (item.score < 100) { it = instruments.erase(it); continue; }
 		
 		if (item.track_simple == "drums") item.color = glutil::Color(0.1f, 0.1f, 0.1f);
 		else if (item.track_simple == "bass") item.color = glutil::Color(0.5f, 0.3f, 0.1f);
 		else item.color = glutil::Color(1.0f, 0.0f, 0.0f);
 		
-		std::cout << "insert " << item.track << " score: " << item.score << std::endl;
 		m_database.scores.push_back(item);
+		++it;
 	}
-	m_database.scores.sort();
-	m_database.scores.reverse(); // top should be first
 
 	if (m_database.scores.empty())
 		m_rank = "No player!";
 	else {
+		m_database.scores.sort();
+		m_database.scores.reverse(); // top should be first
 		int topScore = m_database.scores.front().score;
 		if (m_database.scores.front().track_simple == "vocals") {
 			if (topScore > 8000) m_rank = "Hit singer";
