@@ -170,6 +170,8 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		bool seekback = false;
 		int key = event.key.keysym.sym;
 		if (key == SDLK_ESCAPE || key == SDLK_q) {
+			// In ScoreWindow ESC goes to Players, otherwise insta-quit to Songs
+			if (m_score_window.get() && key == SDLK_ESCAPE) { activateNextScreen(); return; }
 			ScreenManager* sm = ScreenManager::getSingletonPtr();
 			sm->activateScreen("Songs");
 			return;
