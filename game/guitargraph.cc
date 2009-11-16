@@ -496,7 +496,9 @@ void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, fl
 		float y = yBeg + fretWid;
 		if (m_use3d) {
 			y -= fretWid;
-			c.a = clamp(time2a(tBeg)*2.0f,0.0f,1.0f); glColor4fv(c);
+			c.a = clamp(time2a(tBeg)*2.0f,0.0f,1.0f);
+			if (tappable && m_correctness.get() < .99) { c.r *= 0.5f; c.g *= 0.5f; c.b *= 0.5f; }
+			glColor4fv(c);
 			obj->draw(x, y, 0.0f);
 			y -= fretWid;
 		} else {
