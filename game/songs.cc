@@ -86,7 +86,8 @@ void Songs::reload_internal(fs::path const& parent) {
 			}
 		}
 	} catch (std::exception const& e) {
-		std::cout << "Error accessing " << parent << std::endl;
+		
+		std::cout << "Error accessing " << parent << e.what() << std::endl;
 	}
 }
 
