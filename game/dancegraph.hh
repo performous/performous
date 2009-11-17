@@ -13,6 +13,16 @@
 
 class Song;
 
+struct DanceNote {
+	DanceNote(struct Note note) : note(note), isHit(false), score(0) {}
+	struct Note note;
+	bool isHit;
+	int score;
+};
+
+
+typedef std::vector<DanceNote> DanceNotes;
+
 /// handles drawing of notes
 class DanceGraph {
   public:
@@ -29,14 +39,23 @@ class DanceGraph {
 	double correctness() const { return m_correctness.get(); }
 	int getScore() const { return m_score * m_scoreFactor; }
   private:
+	enum DanceStep {
+		STEP_LEFT = 0,
+		STEP_DOWN = 1,
+		STEP_UP = 2,
+		STEP_RIGHT = 3
+	};
+	void difficultyDelta(int delta);
+	void difficulty(DanceDifficulty level);
+	DanceDifficulty m_level;
 	void dance(double time, input::Event const& ev);
 	void drawNote(int arrow_i, glutil::Color, float tBeg, float tEnd);
-	glutil::Color const& color(int arrow_i) const ;
+	glutil::Color const& color(int arrow_i) const;
 	void drawArrow(int arrow_i, float x, float y, float scale = 1.0);
 	Audio& m_audio;
-	input::InputDev m_input;
 	Song const& m_song;
-	DanceChords m_chords;
+	input::InputDev m_input;
+	DanceNotes m_notes;
 	Surface m_arrow;
 	AnimValue m_cx, m_width;
 	std::size_t m_stream;
@@ -51,7 +70,7 @@ class DanceGraph {
 	};
 	typedef std::vector<Event> Events;
 	Events m_events;
-	bool m_holds[4];
+	bool m_pressed[4];
 	int m_dead;
 	SvgTxtTheme m_text;
 	AnimValue m_correctness;

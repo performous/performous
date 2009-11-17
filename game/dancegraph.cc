@@ -7,9 +7,10 @@
 namespace {
 	const float past = -0.2f;
 	const float future = 1.8f;
-	const float timescale = 25.0f;
+	const float offset = 0.5f; // TODO: more clever way to do this?
+	const float timescale = 10.0f;
 	// Note: t is difference from playback time so it must be in range [past, future]
-	float time2y(float t) { return timescale * (t - past) / (future - past); }
+	float time2y(float t) { return offset + timescale * (t - past) / (future - past); }
 	float time2a(float t) {
 		float a = clamp(1.0 - t / future); // Note: we want 1.0 alpha already at zero t.
 		return std::pow(a, 0.8f); // Nicer curve
@@ -31,6 +32,7 @@ namespace {
 
 /// Constructor
 DanceGraph::DanceGraph(Audio& audio, Song const& song):
+  m_level(EASY),
   m_audio(audio),
   m_song(song),
   m_input(input::GUITAR), // TODO: to be replaced by DANCEPAD
@@ -49,27 +51,28 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
 {
 	m_arrow.dimensions.middle().center();
 	
-	for(size_t i=0; i < 4; i++) m_holds[i] = 0;
+	for(size_t i=0; i < 4; i++) m_pressed[i] = 0;
 	
-	//TODO: this is a hack
-	for (DanceTracks::const_iterator it = m_song.danceTracks.begin(); it != m_song.danceTracks.end(); ++it) {
-		std::cout << "DANCE GAME MODE FOUND: " << it->first << std::endl;
-		if (it->first == "dance-single") {
-			DanceDifficultyMap dtracks = it->second;
-			DanceDifficulty d = EASY;
-			for (DanceDifficultyMap::const_iterator it2 = dtracks.begin(); it2 != dtracks.end(); ++it2) {
-				std::cout << "DANCE DIFFICULTY FOUND: " << it2->first << std::endl;
-				if (it2->first == d) {
-					DanceTrack dt = it2->second;
-					m_chords = dt.chords;
-					std::cout << "DANCE-TRACK FOUND" << std::endl;
-					// TODO: nothing done here!
-				}
-			}
-		}
+	/**
+	* TODO: Skype 17.11.
+	* - trackien etsintä
+	**/
+	DanceTracks::const_iterator it = m_song.danceTracks.find("dance-single");
+	if(it == m_song.danceTracks.end()) {
+		// TODO: game over, no suitable mode
 	}
 }
 
+void DanceGraph::difficultyDelta(int delta) {
+	int newLevel = m_level + delta;
+	if(newLevel >= DIFFICULTYCOUNT || newLevel < 0)
+		return;
+	difficulty((DanceDifficulty)newLevel);
+}
+
+void DanceGraph::difficulty(DanceDifficulty level) {
+
+}
 
 /// Handles input
 void DanceGraph::engine() {
@@ -81,8 +84,14 @@ void DanceGraph::engine() {
 		m_dead = false;
 		if(ev.button < 0 || ev.button > 3)
 			continue;
-		if (ev.type == input::Event::RELEASE) m_holds[ev.button] = false;
-		else if (ev.type == input::Event::PRESS) m_holds[ev.button] = true;
+		if (time < -0.5) {
+			if (ev.type == input::Event::PRESS) {
+				if (ev.pressed[STEP_UP]) difficultyDelta(1);
+				else if (ev.pressed[STEP_DOWN]) difficultyDelta(-1);
+			}
+		}
+		if (ev.type == input::Event::RELEASE) m_pressed[ev.button] = false;
+		else if (ev.type == input::Event::PRESS) m_pressed[ev.button] = true;
 	}
 
 	
@@ -156,7 +165,7 @@ void DanceGraph::draw(double time) {
 		if (tEnd < past) continue;
 		if (tBeg > future) break;
 
-		glutil::Color c = color(arrow_i);
+		glutil::Color c = color(it->note.note);
 		//c.r += glow;
 		//c.g += glow;
 		//c.b += glow;
@@ -175,7 +184,7 @@ void DanceGraph::draw(double time) {
 	for (int arrow_i = 0; arrow_i < 4; ++arrow_i) {
 		float x = -1.5f + arrow_i;
 		glColor4fv(color(arrow_i));
-		if (m_holds[arrow_i]) glColor3f(1.0f, 1.0f, 1.0f);
+		if (m_pressed[arrow_i]) glColor3f(1.0f, 1.0f, 1.0f);
 		drawArrow(arrow_i, x, time2y(0.0), 0.6);
 	}
 	glColor3f(1.0f, 1.0f, 1.0f);
