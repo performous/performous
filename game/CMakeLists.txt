@@ -40,9 +40,9 @@ target_link_libraries(performous da ${LIBS})
 
 # Store library paths in executable
 if(APPLE)
-	set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE INSTALL_RPATH @loader_path/../lib)
+	set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE INSTALL_RPATH @loader_path/../lib${LIB_SUFFIX})
 else()
-	set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE INSTALL_RPATH \$ORIGIN/../lib)
+	set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE INSTALL_RPATH \$ORIGIN/../lib${LIB_SUFFIX})
 endif()
 
 # Generate config.hh
