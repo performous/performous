@@ -55,7 +55,6 @@ bool SongParser::smParseField(std::string line) {
 		if (line.empty() || line == "\r") return true;
 		if (line[0] == '/' && line[1] == '/') return true; //jump over possible comments
 		if (line[0] == ';') return true;
-		std::cout << line << std::endl;
 		std::string::size_type pos = line.find(':');
 		if (pos == std::string::npos) throw std::runtime_error("Invalid format, should be #key:value");
 		std::string key = boost::trim_copy(line.substr(1, pos - 1));
@@ -65,7 +64,6 @@ bool SongParser::smParseField(std::string line) {
 		bool endOfInput = false;
 			// TODO: NOTES header vars needs better way to strip trailing colon ':'
 			while (getline(line)) {
-			std::cout << line << std::endl;
 			//<NotesType>:
 			//if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
 			std::string notestype = boost::trim_copy(line.substr(0, line.size() -2));
@@ -147,7 +145,6 @@ Notes SongParser::smParseNotes(std::string line, bool endOfInput) {
 	double dur; 		//note duration
 
 	while(getline(line)) {
-//	std::cout << line << std::endl;
 		if (line.empty() || line == "\r") continue;
 		if (line[0] == '/' && line[1] == '/') continue;
 		if (line[0] == '#') return notes;
