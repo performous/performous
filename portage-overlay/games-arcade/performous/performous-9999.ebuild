@@ -69,7 +69,7 @@ src_configure() {
 		$(cmake-utils_use_enable tools TOOLS)
 		$(cmake-utils_use_enable editor EDITOR)
 		-DCMAKE_INSTALL_PREFIX=${GAMES_PREFIX}
-		-DSHARE_INSTALL=share/
+		-DSHARE_INSTALL=share/performous
 		-DLIBDA_AUTODETECT_PLUGINS=false
 		-DLIBDA_PLUGIN_TESTING=false
 		-DCMAKE_BUILD_TYPE=Release"
