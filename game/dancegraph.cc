@@ -63,13 +63,7 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
 					DanceTrack dt = it2->second;
 					m_chords = dt.chords;
 					std::cout << "DANCE-TRACK FOUND" << std::endl;
-					for (DanceChords::iterator it3 = m_chords.begin(); it3 != m_chords.end(); it3++) {
-						DanceChord dc = *it3;
-						for (int i = 0; i < 4; i++) {
-							if (dc.find(i) != dc.end())
-							  std::cout << "NOTE begin: " << dc[i].begin << std::endl;
-						}
-					}
+					// TODO: nothing done here!
 				}
 			}
 		}
@@ -156,26 +150,17 @@ void DanceGraph::draw(double time) {
 	// TODO: iteration needs rewrite to the dancenotes structure
 	float tBeg, tEnd = 0.0f;
 
-	for (DanceChords::const_iterator it = m_chords.begin(); it != m_chords.end(); ++it) {
-		// TODO: rewrite for guitargraph's Chord??
-		DanceChord chord = *it;
-		for (int arrow_i = 0; arrow_i < 4; arrow_i++) {
-			if (chord.find(arrow_i) != chord.end()) {
-				tBeg = chord[arrow_i].begin - time;
-				tEnd = chord[arrow_i].end - time;
-				if (tEnd < past) continue;
-				if (tBeg > future) break;
-				//unsigned event = m_notes[it->dur[fret]];
-				//float glow = 0.0f;
-				//if (event > 0) glow = m_events[event - 1].glow.get();
+	for (DanceNotes::const_iterator it = m_notes.begin(); it != m_notes.end(); ++it) {
+		tBeg = it->note.begin - time;
+		tEnd = it->note.end - time;
+		if (tEnd < past) continue;
+		if (tBeg > future) break;
 
-				glutil::Color c = color(arrow_i);
-				//c.r += glow;
-				//c.g += glow;
-				//c.b += glow;
-				drawNote(arrow_i, c, tBeg, tEnd);
-			}
-		}
+		glutil::Color c = color(arrow_i);
+		//c.r += glow;
+		//c.g += glow;
+		//c.b += glow;
+		drawNote(it->note.note, c, tBeg, tEnd);
 	}
 
 	// To test arrow coordinate positioning
