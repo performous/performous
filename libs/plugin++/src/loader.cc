@@ -50,13 +50,13 @@ loader::loader(fs::path const& folder) {
 		fs::path p = execname();
 		p = p.parent_path().parent_path();
 		if (!p.empty()) {
-			p /= "lib" / folder;
+			p /= "lib" LIB_SUFFIX / folder;
 			if (fs::is_directory(p)) paths.insert(p);
 		}
 #ifndef _WIN32
 	    // Try UNIX library paths
         parse(paths, std::getenv("LD_LIBRARY_PATH"), folder);
-        parse(paths, "/usr/lib:/usr/local/lib", folder);
+        parse(paths, "/usr/lib" LIB_SUFFIX ":/usr/local/lib" LIB_SUFFIX, folder);
 #endif
     }
     // Load the contents of each folder

@@ -15,6 +15,8 @@ find_package(Boost 1.36 REQUIRED COMPONENTS filesystem)
 include_directories(${Boost_INCLUDE_DIRS})
 target_link_libraries(plugin++ ${Boost_LIBRARIES})
 
+add_definitions("-DLIB_SUFFIX=\"${LIB_SUFFIX}\"")
+
 if(NOT WIN32)
   target_link_libraries(plugin++ dl)
 endif()
