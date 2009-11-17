@@ -102,11 +102,11 @@ typedef std::vector<DanceChord> DanceChords;
 
 
 struct DanceTrack {
-	DanceTrack(std::string& d, DanceChords& c);
+	DanceTrack(std::string& description, Notes& notes);
 	//track description
 	std::string description;
 	//container for the actual note data
-	DanceChords chords;	
+	Notes notes;	
 };
 
 enum DanceDifficulty {

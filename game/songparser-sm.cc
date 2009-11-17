@@ -93,11 +93,11 @@ bool SongParser::smParseField(std::string line) {
 			//std::string radarvalues = boost::trim_copy(line.substr(0, line.size() -2));
 			
 			//<NoteData>:
-			DanceChords chords = smParseNotes(line, endOfInput);
+			Notes notes = smParseNotes(line, endOfInput);
 			if(endOfInput) throw std::runtime_error("end is here");
 			
 			
-			DanceTrack danceTrack(description, chords);
+			DanceTrack danceTrack(description, notes);
 			DanceDifficultyMap danceDifficultyMap;
 			danceDifficultyMap.insert(std::make_pair(danceDifficulty, danceTrack));
 			m_song.danceTracks.insert(std::make_pair(notestype, danceDifficultyMap));
@@ -138,8 +138,9 @@ bool SongParser::smParseField(std::string line) {
 		return true;
 }
 
-DanceChords SongParser::smParseNotes(std::string line, bool endOfInput) {
-	DanceChords chords;	
+Notes SongParser::smParseNotes(std::string line, bool endOfInput) {
+	DanceChords chords;	//temporary container for notes
+	Notes notes;	
 	int lcount = 0;		//line counter for note duration
 	int count = 0; 		//total lines counter
 	double tm = 0; 		//time counter
@@ -149,7 +150,7 @@ DanceChords SongParser::smParseNotes(std::string line, bool endOfInput) {
 //	std::cout << line << std::endl;
 		if (line.empty() || line == "\r") continue;
 		if (line[0] == '/' && line[1] == '/') continue;
-		if (line[0] == '#') return chords;
+		if (line[0] == '#') return notes;
 		if (line[0] == ';') continue;
 		if (line[0] == ',') {
 			/*Counting the timestamp of each note*/
@@ -161,6 +162,8 @@ DanceChords SongParser::smParseNotes(std::string line, bool endOfInput) {
 					if(_chord.find(i) != _chord.end()) {
 						_chord[i].begin = tm;
 						_chord[i].end = tm;
+						notes.push_back(_chord[i]);	//note added to notes container used in DanceTrack
+						
 					}
 				}
 				tm += dur;
@@ -168,12 +171,13 @@ DanceChords SongParser::smParseNotes(std::string line, bool endOfInput) {
 			lcount =0;
 			continue;
 		}
-		//reading notes into a chord
-		std::istringstream iss(line);
+		//reading notes into a temporary container chord
 		DanceChord chord;
+		std::istringstream iss(line);
 		for(int i =0; i<4; i++){
 			if(iss.get() == '1') {
 				Note note;	
+				note.note = i;
 				chord[i] = note;
 			}
 		chords.push_back(chord);
@@ -183,5 +187,5 @@ DanceChords SongParser::smParseNotes(std::string line, bool endOfInput) {
 		continue;
 	}
 	endOfInput = true;
-	return chords;
+	return notes;
 }									
