@@ -3,6 +3,7 @@
 #include "fs.hh"
 #include "notes.hh"
 #include <boost/lexical_cast.hpp>
+#include <stdexcept>
 
 namespace {
 	const float past = -0.2f;
@@ -32,7 +33,7 @@ namespace {
 
 /// Constructor
 DanceGraph::DanceGraph(Audio& audio, Song const& song):
-  m_level(EASY),
+  m_level(BEGINNER),
   m_audio(audio),
   m_song(song),
   m_input(input::GUITAR), // TODO: to be replaced by DANCEPAD
@@ -47,7 +48,8 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
   m_score(),
   m_scoreFactor(),
   m_streak(),
-  m_longestStreak()
+  m_longestStreak(),
+  m_gamingMode("dance-single")
 {
 	m_arrow.dimensions.middle().center();
 	
@@ -57,21 +59,33 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
 	* TODO: Skype 17.11.
 	* - trackien etsintä
 	**/
-	DanceTracks::const_iterator it = m_song.danceTracks.find("dance-single");
-	if(it == m_song.danceTracks.end()) {
-		// TODO: game over, no suitable mode
-	}
+	DanceTracks::const_iterator it = m_song.danceTracks.find(m_gamingMode);
+	if(it == m_song.danceTracks.end())
+		throw std::runtime_error("Could not find any dance tracks.");
+	difficultyDelta(0); // hack to get initial level
+	
 }
 
 void DanceGraph::difficultyDelta(int delta) {
 	int newLevel = m_level + delta;
+	std::cout << "difficultyDelta called with " << delta << " (newLevel = " << newLevel << ")" << std::endl;
 	if(newLevel >= DIFFICULTYCOUNT || newLevel < 0)
 		return;
-	difficulty((DanceDifficulty)newLevel);
+	DanceTracks::const_iterator it = m_song.danceTracks.find(m_gamingMode);
+	if(it->second.find((DanceDifficulty)newLevel) != it->second.end())
+		difficulty((DanceDifficulty)newLevel);
+	else
+		difficultyDelta(delta + (delta < 0 ? -1 : 1));
 }
 
 void DanceGraph::difficulty(DanceDifficulty level) {
-
+	// TODO: error handling)
+	m_notes.clear();
+	DanceTrack const& track = m_song.danceTracks.find(m_gamingMode)->second.find(level)->second;
+	for(Notes::const_iterator it = track.notes.begin(); it != track.notes.end(); it++)
+		m_notes.push_back(DanceNote(*it));
+	std::cout << "Difficulty set to: " << level << std::endl;
+	m_level = level;	
 }
 
 /// Handles input

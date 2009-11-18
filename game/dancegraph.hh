@@ -79,5 +79,6 @@ class DanceGraph {
 	double m_scoreFactor;
 	int m_streak;
 	int m_longestStreak;
+	std::string m_gamingMode;
 };
 

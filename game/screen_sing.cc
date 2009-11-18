@@ -96,7 +96,8 @@ void ScreenSing::enter() {
 			} catch (std::runtime_error&) { break; }
 		}
 	}
-	m_audio.playMusic(m_song->music, false, 0.0, m_instruments.empty() ? -1.0 : -8.0); // Startup delay for instruments is longer than for singing only
+	double setup_delay = m_dancers.size() != 0 ? -5.0 : (m_instruments.empty() ? -1.0 : -8.0);
+	m_audio.playMusic(m_song->music, false, 0.0, setup_delay); // Startup delay for instruments is longer than for singing only
 }
 
 void ScreenSing::instrumentLayout(double time) {
