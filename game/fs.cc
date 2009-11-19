@@ -89,7 +89,7 @@ std::string getPath(fs::path const& filename) {
 		}
 #endif
 		// Adding relative path from executable
-		dirs.push_back(fs::path(plugin::execname()).parent_path().parent_path() / shareDir);
+		dirs.push_back(plugin::execname().parent_path().parent_path() / shareDir);
 #ifndef _WIN32
 		// Adding XDG_DATA_DIRS
 		{
