@@ -2,6 +2,8 @@ project(libda)
 cmake_minimum_required(VERSION 2.6)
 cmake_policy(VERSION 2.6)
 
+set(LIB_SUFFIX "" CACHE STRING "Optional suffix to use on lib folders (e.g. 64 for lib64)")
+
 set(LIBDA_PLUGIN_DIR "lib${LIB_SUFFIX}/libda")
 
 include_directories(include)
