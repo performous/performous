@@ -15,6 +15,10 @@ namespace fs = boost::filesystem;
 #define PATHSEP ';'
 #else
 #define PATHSEP ':'
+#ifndef LIB_SUFFIX
+#define LIB_SUFFIX ""
+#endif
+#define UNIX_LIBPATH "/usr/lib" LIB_SUFFIX ":/usr/local/lib" LIB_SUFFIX
 #endif
 
 /// Break var (a delimited path string) into paths (appends folder if supplied).
@@ -56,7 +60,7 @@ loader::loader(fs::path const& folder) {
 #ifndef _WIN32
 	    // Try UNIX library paths
         parse(paths, std::getenv("LD_LIBRARY_PATH"), folder);
-        parse(paths, "/usr/lib" LIB_SUFFIX ":/usr/local/lib" LIB_SUFFIX, folder);
+        parse(paths, UNIX_LIBPATH, folder);
 #endif
     }
     // Load the contents of each folder

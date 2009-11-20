@@ -38,6 +38,8 @@ add_subdirectory(data)
 add_subdirectory(game)
 add_subdirectory(docs)
 
+set(LIB_SUFFIX "" CACHE STRING "Optional suffix to use on lib folders (e.g. 64 for lib64)")
+
 option(ENABLE_EDITOR "Enable experimental song editor (doesn't work)" OFF)
 
 if (ENABLE_EDITOR)
