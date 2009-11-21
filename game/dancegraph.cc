@@ -8,10 +8,10 @@
 namespace {
 	const float past = -0.2f;
 	const float future = 1.8f;
-	const float offset = 0.5f; // TODO: more clever way to do this?
-	const float timescale = 10.0f;
+	const float offsetY = 1.8f; // TODO: more clever way to do this?
+	const float timescale = 6.0f;
 	// Note: t is difference from playback time so it must be in range [past, future]
-	float time2y(float t) { return offset + timescale * (t - past) / (future - past); }
+	float time2y(float t) { return offsetY + timescale * (t - past) / (future - past); }
 	float time2a(float t) {
 		float a = clamp(1.0 - t / future); // Note: we want 1.0 alpha already at zero t.
 		return std::pow(a, 0.8f); // Nicer curve
@@ -53,7 +53,7 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
 {
 	m_arrow.dimensions.middle().center();
 	
-	for(size_t i=0; i < 4; i++) m_pressed[i] = 0;
+	for(size_t i = 0; i < 4; i++) m_pressed[i] = AnimValue(0.0, 8.0);
 	
 	/**
 	* TODO: Skype 17.11.
@@ -104,8 +104,8 @@ void DanceGraph::engine() {
 				else if (ev.pressed[STEP_DOWN]) difficultyDelta(-1);
 			}
 		}
-		if (ev.type == input::Event::RELEASE) m_pressed[ev.button] = false;
-		else if (ev.type == input::Event::PRESS) m_pressed[ev.button] = true;
+		if (ev.type == input::Event::RELEASE) m_pressed[ev.button].setTarget(0.0, false);
+		else if (ev.type == input::Event::PRESS) m_pressed[ev.button].setTarget(1.0, true);
 	}
 
 	
@@ -169,42 +169,59 @@ void DanceGraph::draw(double time) {
 	glTranslatef((1.0 - frac) * offsetX, dimensions.y1(), 0.0f);
 	//glTranslatef((1.0 - frac) * offsetX, 0.0f, 0.0f);
 	{ float s = dimensions.w() / 5.0f; glScalef(s, s, s); }
-	// Draw the notes
-	// TODO: iteration needs rewrite to the dancenotes structure
-	float tBeg, tEnd = 0.0f;
-
-	for (DanceNotes::const_iterator it = m_notes.begin(); it != m_notes.end(); ++it) {
-		tBeg = it->note.begin - time;
-		tEnd = it->note.end - time;
-		if (tEnd < past) continue;
-		if (tBeg > future) break;
-
-		glutil::Color c = color(it->note.note);
-		//c.r += glow;
-		//c.g += glow;
-		//c.b += glow;
-		drawNote(it->note.note, c, tBeg, tEnd);
-	}
-
-	// To test arrow coordinate positioning
-	//for (int i = 0; i < 10; ++i) {
-		//std::cout << time2y(i*0.1f) << std::endl;
-		//drawArrow(1, 0, time2y(i*0.1f), 0.6);
-	//}
 
 	// Arrows on cursor
 	// TODO: suitable effect for pressing the arrows?
 	// TODO: effect possibilities: zooming, whitening, external glow
 	for (int arrow_i = 0; arrow_i < 4; ++arrow_i) {
 		float x = -1.5f + arrow_i;
-		glColor4fv(color(arrow_i));
-		if (m_pressed[arrow_i]) glColor3f(1.0f, 1.0f, 1.0f);
-		drawArrow(arrow_i, x, time2y(0.0), 0.6);
+		float l = m_pressed[arrow_i].get();
+		float s = (5.0 - l) / 5.0;
+		glutil::Color c = color(arrow_i);
+		c.r += l; c.g += l; c.b +=l;
+		glColor4fv(c);
+		drawArrow(arrow_i, x, time2y(0.0), 0.6 * s);
 	}
+
+	// Draw the notes
+	float tBeg, tEnd = 0.0f;
+	for (DanceNotes::iterator it = m_notes.begin(); it != m_notes.end(); ++it) {
+		tBeg = it->note.begin - time;
+		tEnd = it->note.end - time;
+		if (tEnd < past) continue;
+		if (tBeg > future) break;
+		
+		int arrow_i = it->note.note;
+		float x = -1.5f + arrow_i;
+		float s = 0.6f;
+		float yBeg = time2y(tBeg);
+		float yEnd = time2y(tEnd);
+		glutil::Color c = color(arrow_i);
+		
+		double glow = it->hitAnim.get();
+		//c.a = std::sqrt(1.0 - glow);
+		c.a = 1.0 - glow;
+		c.r += glow *.5;
+		c.g += glow *.5;
+		c.b += glow *.5;
+		s += glow;
+		
+		glColor4fv(c);
+		drawArrow(arrow_i, x, yBeg, s);
+		
+		//drawNote(it->note.note, c, tBeg, tEnd);
+	}
+
+	// To test arrow coordinate positioning
+//	for (float i = past; i < future; i+=0.2) {
+//		std::cout << time2y(i) << std::endl;
+//		drawArrow(1, 0, time2y(i), 0.6);
+//	}
+
 	glColor3f(1.0f, 1.0f, 1.0f);
 }
 
-
+// TODO: See if this is needed at all
 /// Draws a single note (or hold)
 void DanceGraph::drawNote(int arrow_i, glutil::Color c, float tBeg, float tEnd) {
 	float x = -1.5f + arrow_i;

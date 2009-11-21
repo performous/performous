@@ -14,9 +14,11 @@
 class Song;
 
 struct DanceNote {
-	DanceNote(struct Note note) : note(note), isHit(false), score(0) {}
-	struct Note note;
+	DanceNote(Note note) :
+		note(note), isHit(false), hitAnim(0.0, 5.0), score(0) {}
+	Note note;
 	bool isHit;
+	AnimValue hitAnim;
 	int score;
 };
 
@@ -70,7 +72,7 @@ class DanceGraph {
 	};
 	typedef std::vector<Event> Events;
 	Events m_events;
-	bool m_pressed[4];
+	AnimValue m_pressed[4];
 	int m_dead;
 	SvgTxtTheme m_text;
 	AnimValue m_correctness;
