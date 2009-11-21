@@ -191,6 +191,11 @@ void DanceGraph::draw(double time) {
 		if (tEnd < past) continue;
 		if (tBeg > future) break;
 		
+		// TODO: Remove me (temporary hack to test hitAnim)
+		if (tBeg <= 0.0 && !it->isHit) {
+			it->isHit = true; it->hitAnim.setTarget(1.0, false);
+		}
+		
 		int arrow_i = it->note.note;
 		float x = -1.5f + arrow_i;
 		float s = 0.6f;
