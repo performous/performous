@@ -60,6 +60,7 @@ class DanceGraph {
 	DanceNotes m_notes;
 	DanceNotes::iterator m_notesIt;
 	Surface m_arrow;
+	Texture m_arrow_hold;
 	AnimValue m_cx, m_width;
 	std::size_t m_stream;
 	struct Event {

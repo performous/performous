@@ -2,6 +2,7 @@
 
 #include "fs.hh"
 #include "notes.hh"
+#include "surface.hh"
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
 
@@ -39,6 +40,7 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
   m_song(song),
   m_input(input::GUITAR), // TODO: to be replaced by DANCEPAD
   m_arrow(getThemePath("arrow.svg")),
+  m_arrow_hold(getThemePath("arrow_hold.svg")),
   m_cx(0.0, 0.2),
   m_width(0.5, 0.4),
   m_stream(),
@@ -141,9 +143,14 @@ glutil::Color const& DanceGraph::color(int arrow_i) const {
 }
 
 namespace {
+	const float arrowScale = 0.6f;
 	const float arrowRotations[4] = { 270.0f, 180.0f, 0.0f, 90.0f };
-
-
+	const float holdWidth = 0.3;
+	
+	void vertexPair(float x, float y, float ty) {
+		glTexCoord2f(0.0f, ty); glVertex2f(x - holdWidth, y);
+		glTexCoord2f(1.0f, ty); glVertex2f(x + holdWidth, y);
+	}
 }
 
 void DanceGraph::drawArrow(int arrow_i, float x, float y, float scale) {
@@ -190,36 +197,57 @@ void DanceGraph::draw(double time) {
 		glutil::Color c = color(arrow_i);
 		c.r += l; c.g += l; c.b +=l;
 		glColor4fv(c);
-		drawArrow(arrow_i, x, time2y(0.0), 0.6 * s);
+		drawArrow(arrow_i, x, time2y(0.0), arrowScale * s);
 	}
 
 	// Draw the notes
-	float tBeg, tEnd = 0.0f;
 	for (DanceNotes::iterator it = m_notes.begin(); it != m_notes.end(); ++it) {
-		tBeg = it->note.begin - time;
-		tEnd = it->note.end - time;
+		float tBeg = it->note.begin - time;
+		float tEnd = it->note.end - time;
+		
+		// TODO: Remove me (temporary hack to test hold note drawing)
+		//tEnd += 0.6;
+		
 		if (tEnd < past) continue;
 		if (tBeg > future) break;
-				
+
 		int arrow_i = it->note.note;
 		float x = -1.5f + arrow_i;
-		float s = 0.6f;
+		float s = arrowScale;
 		float yBeg = time2y(tBeg);
 		float yEnd = time2y(tEnd);
 		glutil::Color c = color(arrow_i);
 		
 		double glow = it->hitAnim.get();
 		//c.a = std::sqrt(1.0 - glow);
-		c.a = 1.0 - glow;
 		c.r += glow *.5;
 		c.g += glow *.5;
 		c.b += glow *.5;
-		s += glow;
 		
-		glColor4fv(c);
-		drawArrow(arrow_i, x, yBeg, s);
-		
-		//drawNote(it->note.note, c, tBeg, tEnd);
+		if (tEnd - tBeg > 0.1) {
+			// Draw holds
+			glColor4fv(c);
+			if (it->isHit) {
+				// TODO: What if hold is ended prematurely?
+				yBeg = std::max(time2y(0.0), yBeg);
+				yEnd = std::max(time2y(0.0), yEnd);
+				glColor3f(1.0f, 1.0f, 1.0f);
+			}
+			{
+				UseTexture tblock(m_arrow_hold);
+				glutil::Begin block(GL_TRIANGLE_STRIP);
+				vertexPair(x, yEnd, 1.0f);
+				vertexPair(x, yBeg, 0.0f);
+			}
+			// Draw begin
+			drawArrow(arrow_i, x, yBeg, s);
+		} else {
+			// Draw short note
+			c.a = 1.0 - glow;
+			s = arrowScale + glow;
+			glColor4fv(c);
+			drawArrow(arrow_i, x, yBeg, s);
+		}
 	}
 
 	// To test arrow coordinate positioning
