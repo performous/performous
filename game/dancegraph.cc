@@ -104,7 +104,7 @@ void DanceGraph::engine() {
 		}
 		if (ev.type == input::Event::RELEASE) {
 			m_pressed[ev.button].setTarget(0.0, false);
-		} 
+		}
 		else if (ev.type == input::Event::PRESS) {
 			dance(time, ev);
 			m_pressed[ev.button].setTarget(1.0, true);
@@ -123,6 +123,7 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 			double p = points(it->note.begin - time);
 			it->score = p;
 			m_score += p;
+			it->hitAnim.setTarget(1.0, false);
 		}
 	}
 }
