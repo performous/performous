@@ -15,11 +15,11 @@ class Song;
 
 struct DanceNote {
 	DanceNote(Note note) :
-		note(note), isHit(false), hitAnim(0.0, 5.0), score(0) {}
+		note(note), hitAnim(0.0, 5.0), score(0), isHit(false) {}
 	Note note;
-	bool isHit;
 	AnimValue hitAnim;
 	int score;
+	bool isHit;
 };
 
 
@@ -58,6 +58,7 @@ class DanceGraph {
 	Song const& m_song;
 	input::InputDev m_input;
 	DanceNotes m_notes;
+	DanceNotes::iterator m_notesIt;
 	Surface m_arrow;
 	AnimValue m_cx, m_width;
 	std::size_t m_stream;

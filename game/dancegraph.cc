@@ -21,11 +21,12 @@ namespace {
 	
 	// TODO: Use this or something else?
 	double points(double error) {
+		error = (error < 0.0) ? -error : error;
 		double score = 0.0;
 		if (error < maxTolerance) score += 15;
-		if (error < 0.1) score += 15;
-		if (error < 0.05) score += 15;
-		if (error < 0.03) score += 5;
+		if (error < maxTolerance / 2) score += 15;
+		if (error < maxTolerance / 4) score += 15;
+		if (error < maxTolerance / 6) score += 5;
 		return score;
 	}
 }
@@ -55,10 +56,6 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
 	
 	for(size_t i = 0; i < 4; i++) m_pressed[i] = AnimValue(0.0, 8.0);
 	
-	/**
-	* TODO: Skype 17.11.
-	* - trackien etsintä
-	**/
 	DanceTracks::const_iterator it = m_song.danceTracks.find(m_gamingMode);
 	if(it == m_song.danceTracks.end())
 		throw std::runtime_error("Could not find any dance tracks.");
@@ -84,7 +81,8 @@ void DanceGraph::difficulty(DanceDifficulty level) {
 	DanceTrack const& track = m_song.danceTracks.find(m_gamingMode)->second.find(level)->second;
 	for(Notes::const_iterator it = track.notes.begin(); it != track.notes.end(); it++)
 		m_notes.push_back(DanceNote(*it));
-	std::cout << "Difficulty set to: " << level << std::endl;
+	m_notesIt = m_notes.begin();
+//	std::cout << "Difficulty set to: " << level << std::endl;
 	m_level = level;	
 }
 
@@ -104,8 +102,13 @@ void DanceGraph::engine() {
 				else if (ev.pressed[STEP_DOWN]) difficultyDelta(-1);
 			}
 		}
-		if (ev.type == input::Event::RELEASE) m_pressed[ev.button].setTarget(0.0, false);
-		else if (ev.type == input::Event::PRESS) m_pressed[ev.button].setTarget(1.0, true);
+		if (ev.type == input::Event::RELEASE) {
+			m_pressed[ev.button].setTarget(0.0, false);
+		} 
+		else if (ev.type == input::Event::PRESS) {
+			dance(time, ev);
+			m_pressed[ev.button].setTarget(1.0, true);
+		}
 	}
 
 	
@@ -114,8 +117,14 @@ void DanceGraph::engine() {
 
 /// Handles scoring and such
 void DanceGraph::dance(double time, input::Event const& ev) {
-	//TODO - Kemppi
-	
+	for (DanceNotes::iterator& it = m_notesIt; it != m_notes.end() && it->note.begin <= time + maxTolerance; ++it) {
+		if(!it->isHit) {
+			it->isHit = true;
+			double p = points(it->note.begin - time);
+			it->score = p;
+			m_score += p;
+		}
+	}
 }
 
 
@@ -190,12 +199,7 @@ void DanceGraph::draw(double time) {
 		tEnd = it->note.end - time;
 		if (tEnd < past) continue;
 		if (tBeg > future) break;
-		
-		// TODO: Remove me (temporary hack to test hitAnim)
-		if (tBeg <= 0.0 && !it->isHit) {
-			it->isHit = true; it->hitAnim.setTarget(1.0, false);
-		}
-		
+				
 		int arrow_i = it->note.note;
 		float x = -1.5f + arrow_i;
 		float s = 0.6f;
