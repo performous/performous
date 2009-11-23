@@ -47,7 +47,7 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
   m_correctness(0.0, 5.0),
   m_flow_direction(1),
   m_score(),
-  m_scoreFactor(),
+  m_scoreFactor(1),
   m_streak(),
   m_longestStreak(),
   m_gamingMode("dance-single")
@@ -118,7 +118,7 @@ void DanceGraph::engine() {
 /// Handles scoring and such
 void DanceGraph::dance(double time, input::Event const& ev) {
 	for (DanceNotes::iterator& it = m_notesIt; it != m_notes.end() && it->note.begin <= time + maxTolerance; ++it) {
-		if(!it->isHit) {
+		if(!it->isHit && ev.button == it->note.note) {
 			it->isHit = true;
 			double p = points(it->note.begin - time);
 			it->score = p;
