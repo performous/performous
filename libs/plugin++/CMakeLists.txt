@@ -1,6 +1,9 @@
 project(Plugin++)
 cmake_minimum_required(VERSION 2.6)
-set(Plugin++_VERSION 1)
+
+set(Plugin++_VERSION_MAJOR 1)
+set(Plugin++_VERSION_MINOR 0)
+set(Plugin++_VERSION "${Plugin++_VERSION_MAJOR}.${Plugin++_VERSION_MINOR}")
 
 # Avoid source tree pollution
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
@@ -40,11 +43,12 @@ add_definitions("-DLIB_SUFFIX=\"${LIB_SUFFIX}\"")
 set_target_properties(plugin++ PROPERTIES
 	INSTALL_NAME_DIR @rpath
 	VERSION "${Plugin++_VERSION}"
+	SOVERSION "${Plugin++_VERSION_MAJOR}"
 	DEBUG_POSTFIX -d
+	INSTALL_RPATH_USE_LINK_PATH TRUE
 )
 
 install(TARGETS plugin++ EXPORT Plugin++ DESTINATION lib${LIB_SUFFIX})
-get_target_property(type plugin++ TYPE)
 
 FILE(GLOB HEADER_FILES "include/plugin++/*")
 install(FILES ${HEADER_FILES} DESTINATION include/plugin++)
