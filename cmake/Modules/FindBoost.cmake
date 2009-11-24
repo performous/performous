@@ -68,6 +68,7 @@
 #  Copyright (c) 2007      Wengo
 #  Copyright (c) 2007      Mike Jackson
 #  Copyright (c) 2008      Andreas Pakulat <apaku@gmx.de>
+#  Copyright (c) 2009      Lasse Kärkkäinen
 #
 #  Redistribution AND use is allowed according to the terms of the New
 #  BSD license.
@@ -77,12 +78,15 @@
 # Force proper redetection (to allow e.g. changed COMPONENTS)
 set(Boost_FOUND false)
 
-find_package(Boost COMPONENTS ${Boost_FIND_COMPONENTS} NO_MODULE)
+find_package(Boost QUIET COMPONENTS ${Boost_FIND_COMPONENTS} NO_MODULE)
 
 if (Boost_FOUND)
-  message(STATUS "Found Boost ${Boost_VERSION}")
-  message("${Boost_LIBRARIES}")
-  message("${Boost_INCLUDE_DIRS}")
+  if (Boost_FIND_COMPONENTS)
+    set(_boost_COMP " (${Boost_FIND_COMPONENTS})")
+  else()
+    set(_boost_COMP " (using headers only)")
+  endif()
+  message(STATUS "Found Boost ${Boost_VERSION}${_boost_COMP}")
 else()
   # MESSAGE(STATUS "Finding Boost libraries.... ")
 
