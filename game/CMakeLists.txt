@@ -12,7 +12,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${Boost_LIBRARIES})
 
 # Find all the libs that don't require extra parameters
-foreach(lib LibDA SDL PangoCairo LibRSVG LibXML++ Magick++ GLEW AVFormat SWScale OpenGL)
+foreach(lib Plugin++ LibDA SDL PangoCairo LibRSVG LibXML++ Magick++ GLEW AVFormat SWScale OpenGL)
 	find_package(${lib} REQUIRED)
 	include_directories(${${lib}_INCLUDE_DIRS})
 	set(LIBS ${LIBS} ${${lib}_LIBRARIES})
