@@ -12,7 +12,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${Boost_LIBRARIES})
 
 # Find all the libs that don't require extra parameters
-foreach(lib SDL PangoCairo LibRSVG LibXML++ Magick++ GLEW AVFormat SWScale OpenGL)
+foreach(lib LibDA SDL PangoCairo LibRSVG LibXML++ Magick++ GLEW AVFormat SWScale OpenGL)
 	find_package(${lib} REQUIRED)
 	include_directories(${${lib}_INCLUDE_DIRS})
 	set(LIBS ${LIBS} ${${lib}_LIBRARIES})
@@ -36,13 +36,13 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
 add_executable(performous ${SOURCES} ${SDL_SOURCES})
-target_link_libraries(performous da ${LIBS})
+target_link_libraries(performous ${LIBS})
 
 # Store library paths in executable
 if(APPLE)
-	set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE INSTALL_RPATH @loader_path/../lib${LIB_SUFFIX})
+	set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE INSTALL_RPATH "@loader_path/../lib${LIB_SUFFIX}:@loader_path/../../lib${LIB_SUFFIX}")
 else()
-	set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE INSTALL_RPATH \$ORIGIN/../lib${LIB_SUFFIX})
+	set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE INSTALL_RPATH "\$ORIGIN/../lib${LIB_SUFFIX}:\$ORIGIN/../../lib${LIB_SUFFIX}")
 endif()
 
 # Generate config.hh
