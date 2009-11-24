@@ -41,6 +41,10 @@ set(Boost_USE_MULTITHREAD ON)
 find_package(Boost 1.36 REQUIRED COMPONENTS thread date_time)
 include_directories(${Boost_INCLUDE_DIRS})
 
+find_package(Plugin++ REQUIRED)
+message(plugin++ ${Plugin++_INCLUDE_DIRS})
+include_directories(${Plugin++_INCLUDE_DIRS})
+
 add_subdirectory(src)
 add_subdirectory(plugins)
 add_subdirectory(cmake)

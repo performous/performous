@@ -1,8 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
 
-find_package(Plugin++ REQUIRED)
-include_directories(${Plugin++_INCLUDE_DIRS})
-
 add_library(da SHARED audio.cpp)
 target_link_libraries(da plugin++ ${Boost_LIBRARIES} ${Plugin++_LIBRARIES})
 
