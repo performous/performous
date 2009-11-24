@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 
 add_library(da SHARED audio.cpp)
-target_link_libraries(da plugin++ ${Boost_LIBRARIES} ${Plugin++_LIBRARIES})
+target_link_libraries(da ${Boost_LIBRARIES} ${Plugin++_LIBRARIES})
 
 set_target_properties(da PROPERTIES
 	INSTALL_NAME_DIR @rpath
