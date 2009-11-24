@@ -32,7 +32,6 @@ mark_as_advanced(SHARE_INSTALL)
 include_directories(libs/plugin++/include)
 include_directories(libs/libda/include)
 
-add_subdirectory(libs)
 add_subdirectory(themes)
 add_subdirectory(data)
 add_subdirectory(game)
