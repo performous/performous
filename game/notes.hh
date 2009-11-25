@@ -73,7 +73,8 @@ struct Note {
 	/// power of note
 	mutable double power;
 	/// note type
-	enum Type { FREESTYLE = 'F', NORMAL = ':', GOLDEN = '*', SLIDE = '+', SLEEP = '-'} type;
+	int danceType; ///1 for tap, 2 for hold begin note, 3 for hold end etc. (perhars enum could be made)
+	enum Type { FREESTYLE = 'F', NORMAL = ':', GOLDEN = '*', SLIDE = '+', SLEEP = '-', MINE = 'M'} type;
 	int note; ///< MIDI pitch of the note (at the end for slide notes)
 	int notePrev; ///< MIDI pitch of the previous note (should be same as note for everything but SLIDE)
 	/// lyrics syllable for that note
