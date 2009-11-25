@@ -40,6 +40,7 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
   m_song(song),
   m_input(input::GUITAR), // TODO: to be replaced by DANCEPAD
   m_arrow(getThemePath("arrow.svg")),
+  m_mine(getThemePath("mine.svg")),
   m_arrow_hold(getThemePath("arrow_hold.svg")),
   m_cx(0.0, 0.2),
   m_width(0.5, 0.4),
@@ -160,7 +161,17 @@ void DanceGraph::drawArrow(int arrow_i, float x, float y, float scale) {
 	m_arrow.draw();
 	if (scale != 1.0) glScalef(1.0/scale, 1.0/scale, 1.0/scale);
 	glRotatef(-arrowRotations[arrow_i], 0.0f, 0.0f, 1.0f);
-	glTranslatef(-x, -y, 0.0f);	
+	glTranslatef(-x, -y, 0.0f);
+}
+
+void DanceGraph::drawMine(float x, float y, float rot, float scale) {
+	glTranslatef(x, y, 0.0f);
+	glRotatef(rot, 0.0f, 0.0f, 1.0f);
+	if (scale != 1.0) glScalef(scale, scale, scale);
+	m_mine.draw();
+	if (scale != 1.0) glScalef(1.0/scale, 1.0/scale, 1.0/scale);
+	glRotatef(-rot, 0.0f, 0.0f, 1.0f);
+	glTranslatef(-x, -y, 0.0f);
 }
 
 /// Draws the dance graph
@@ -212,6 +223,7 @@ void DanceGraph::draw(double time) {
 		if (tBeg > future) break;
 
 		int arrow_i = it->note.note;
+		bool mine = it->note.type == Note::MINE;
 		float x = -1.5f + arrow_i;
 		float s = arrowScale;
 		float yBeg = time2y(tBeg);
@@ -246,7 +258,8 @@ void DanceGraph::draw(double time) {
 			c.a = 1.0 - glow;
 			s = arrowScale + glow;
 			glColor4fv(c);
-			drawArrow(arrow_i, x, yBeg, s);
+			if (mine) drawMine(x, yBeg, int(time*360) % 360, s);
+			  else drawArrow(arrow_i, x, yBeg, s);
 		}
 	}
 

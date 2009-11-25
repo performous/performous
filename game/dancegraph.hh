@@ -54,12 +54,14 @@ class DanceGraph {
 	void drawNote(int arrow_i, glutil::Color, float tBeg, float tEnd);
 	glutil::Color const& color(int arrow_i) const;
 	void drawArrow(int arrow_i, float x, float y, float scale = 1.0);
+	void drawMine(float x, float y, float rot = 0.0, float scale = 1.0);
 	Audio& m_audio;
 	Song const& m_song;
 	input::InputDev m_input;
 	DanceNotes m_notes;
 	DanceNotes::iterator m_notesIt;
 	Surface m_arrow;
+	Surface m_mine;
 	Texture m_arrow_hold;
 	AnimValue m_cx, m_width;
 	std::size_t m_stream;
