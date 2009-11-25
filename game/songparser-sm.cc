@@ -146,6 +146,7 @@ Notes SongParser::smParseNotes(std::string line, bool endOfInput) {
 	double dur; 		//note duration
 
 	std::vector<int> holdMarks(4, -1);	//vector to contain mark for the chord where hold began for each "fret" (-1 if no mark set)
+
 	while(getline(line)) {
 		if (line.empty() || line == "\r") continue;
 		if (line[0] == '/' && line[1] == '/') continue;
@@ -156,27 +157,25 @@ Notes SongParser::smParseNotes(std::string line, bool endOfInput) {
 			dur = 4.0 * ( 1.0/(m_bpm/60.0) ) / lcount;	//counts one note duration in seconds;	
 			//std::cout << "DUR: " << dur << "TM: " << tm << std::endl;
 			for(int j = count - lcount; j<count ; j++) {
-				DanceChord _chord = chords.at(j);
+				DanceChord& _chord = chords.at(j);
 				for(int i = 0; i<4; i++) {
 					if(_chord.find(i) != _chord.end()) {
-						//if(_chord[i].danceType == 1) {
+						if(_chord[i].type == Note::TAP || _chord[i].type == Note::MINE) {
 						_chord[i].begin = tm;
 						_chord[i].end = tm;
 						notes.push_back(_chord[i]);	//note added to notes container used in DanceTrack
-						/*}
-						if(_chord[i].danceType == 2) {
+						}
+						if(_chord[i].type == Note::HOLDBEGIN) {
 						_chord[i].begin = tm;
 						notes.push_back(_chord[i]);	//note added to notes container used in DanceTrack
+						holdMarks.at(i) = notes.size() - 1; //mark to hold beginning in notes vector
 						}
-						if(_chord[i].danceType == 3) {
+						if(_chord[i].type == Note::HOLDEND) {
 							if(holdMarks.at(i) < 0) throw std::runtime_error("hold end without beginning");
-						std::cout << "mark1" << std::endl;
-						Note _note = notes.at(holdMarks.at(i));
-						std::cout << "mark2" << std::endl;
+						Note& _note = notes.at(holdMarks.at(i));
 						_note.end = tm;
-						std::cout << "mark3" << std::endl;
 						holdMarks.at(i) = -1;
-						}*/
+						}
 					}
 				}
 				tm += dur;
@@ -189,10 +188,10 @@ Notes SongParser::smParseNotes(std::string line, bool endOfInput) {
 		std::istringstream iss(line);
 		for(int i =0; i<4; i++){
 			char notetype = iss.get();
-			if(notetype == '1' || notetype == '2') {
+			if(notetype == '1') {
 				Note note;	
 				note.note = i;
-				//note.danceType = 1;
+				note.type = Note::TAP;
 				chord[i] = note;
 			}
 			if(notetype == 'M') {
@@ -201,23 +200,19 @@ Notes SongParser::smParseNotes(std::string line, bool endOfInput) {
 				note.type = Note::MINE;
 				chord[i] = note;
 			}
-			/*
+			
 			if(notetype == '2') {
-				std::cout << "hold begin" << std::endl;
 				Note note;
 				note.note = i;
-				note.danceType = 2;
+				note.type = Note::HOLDBEGIN;
 				chord[i] = note;
-				holdMarks.at(i) = count;
 			}
 			if(notetype == '3') {
-				std::cout << "hold end" << std::endl;
 				Note note;
 				note.note = i;
-				note.danceType = 3;
+				note.type = Note::HOLDEND;
 				chord[i] = note;
 			}
-			*/
 		}
 		lcount++;
 		count++;
