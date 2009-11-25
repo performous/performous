@@ -5,16 +5,25 @@ To install from git:
 	# Create separate build folder under trunk to avoid polluting the source three
 	mkdir performous/build
 	cd performous/build
-	# Configure and build with CMake
-	cmake ..
+	# Compile and install libplugin++ (our C++ plugin/DLL library)
+	cmake ../libs/plugin++/
 	make
-	# Install into system prefix /usr/local/
+	sudo make install
+	rm -rf *
+	# Compile and install libda (our audio library)
+	cmake ../libs/libda/
+	make
+	sudo make install
+	rm -rf *
+	# Compile the game itself
+	cmake ../libs/libda/
+	make
 	sudo make install
 	# Run the game
 	performous
 	
-	# Should you need to change building settings (e.g. installation prefix)
-	ccmake .
+	In order to change installation location (the default is /usr/local/),
+	use cmake parameter -DCMAKE_INSTALL_PREFIX=/where/to.
 	
 Dependencies:
 
@@ -38,6 +47,8 @@ Dependencies:
 		* JACK
 		* PortAudio v18 or v19
 		* Pulseaudio
+
+	- PortMidi (optional) for MIDI drum support
 
 	Please refer to http://performous.org/develop.html for packages to install.
 	
