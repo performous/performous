@@ -138,6 +138,7 @@ bool SongParser::smParseField(std::string line) {
 
 Notes SongParser::smParseNotes(std::string line, bool endOfInput) {
 	DanceChords chords;	//temporary container for notes
+	
 	Notes notes;	
 	int lcount = 0;		//line counter for note duration
 	int count = 0; 		//total lines counter
@@ -153,14 +154,13 @@ Notes SongParser::smParseNotes(std::string line, bool endOfInput) {
 			/*Counting the timestamp of each note*/
 			dur = 4.0 * ( 1.0/(m_bpm/60.0) ) / lcount;	//counts one note duration in seconds;	
 			//std::cout << "DUR: " << dur << "TM: " << tm << std::endl;
-			for(int j = count - lcount; j<count ; j++) {	
+			for(int j = count - lcount; j<count ; j++) {
+				DanceChord _chord = chords.at(j);
 				for(int i = 0; i<4; i++) {
-					DanceChord& _chord = chords.at(j);
 					if(_chord.find(i) != _chord.end()) {
 						_chord[i].begin = tm;
 						_chord[i].end = tm;
 						notes.push_back(_chord[i]);	//note added to notes container used in DanceTrack
-						
 					}
 				}
 				tm += dur;
@@ -177,10 +177,10 @@ Notes SongParser::smParseNotes(std::string line, bool endOfInput) {
 				note.note = i;
 				chord[i] = note;
 			}
-		chords.push_back(chord);
+		}
 		lcount++;
 		count++;
-		}
+		chords.push_back(chord);
 		continue;
 	}
 	endOfInput = true;
