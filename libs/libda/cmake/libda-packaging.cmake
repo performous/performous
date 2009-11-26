@@ -1,7 +1,7 @@
 set(CPACK_PACKAGE_NAME "${CMAKE_PROJECT_NAME}")
-set(CPACK_PACKAGE_VERSION "${Plugin++_VERSION}")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Plugin++ is a cross platform plug-in framework for C++ that uses XML to marshal data across the application and the shared library space.")
-set(CPACK_PACKAGE_CONTACT "http://sourceforge.net/projects/pluginpp/")
+set(CPACK_PACKAGE_VERSION "${LibDA_VERSION}")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "C++ digital audio I/O and processing library.")
+set(CPACK_PACKAGE_CONTACT "http://performous.org/")
 set(CPACK_SOURCE_IGNORE_FILES
    "/.cvsignore"
    "/.gitignore"
@@ -47,7 +47,7 @@ if(UNIX)
 		endif("${CPACK_PACKAGE_ARCHITECTURE}" MATCHES "x86_64")
 		# Set the dependencies based on the distro version
 		if("${LSB_DISTRIB}" MATCHES "Debian5.*")
-			set(CPACK_DEBIAN_PACKAGE_DEPENDS "libboost-dev, libc6-dev")
+			set(CPACK_DEBIAN_PACKAGE_DEPENDS "libboost-dev, libasound2, libjack0")
 		endif("${LSB_DISTRIB}" MATCHES "Debian5.*")
 		if(NOT CPACK_DEBIAN_PACKAGE_DEPENDS)
 			message("WARNING: ${LSB_DISTRIB} not supported yet.\nPlease set deps in cmake/performous-packaging.cmake before packaging.")
