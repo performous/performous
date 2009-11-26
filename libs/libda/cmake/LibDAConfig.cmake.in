@@ -6,5 +6,5 @@ if(NOT LibDA_FOUND)
 
 	include("@CMAKE_INSTALL_PREFIX@/@LibDA_CMAKE_DIR@/LibDA.cmake")
 	set(LibDA_LIBRARIES da)
-endif()
+endif(NOT LibDA_FOUND)
 
