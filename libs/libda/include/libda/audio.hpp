@@ -2,15 +2,14 @@
 #define LIBDA_AUDIO_HPP_INCLUDED
 
 /**
-@file audio.hpp LibDA public interface.
+@file audio.hpp LibDA audio I/O public interface
 
-Link with libda when you use this.
+Link with libda when you use this. ABI will change, API is likely to change in
+future versions (which hopefully will bring API and ABI compatibility).
 **/
 
 // Library version number, may be used to test whether a certain function is
 // available. Incremented by one each time a new release is done.
-
-#define LIBDA_VERSION 0
 
 #include "sample.hpp"
 #include <boost/function.hpp>

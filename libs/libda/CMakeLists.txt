@@ -25,8 +25,13 @@ set(LibDA_PLUGIN_DIR "lib${LIB_SUFFIX}/libda")
 
 include_directories(include)
 
-FILE(GLOB HEADER_FILES "include/libda/*")
-install(FILES ${HEADER_FILES} DESTINATION include/libda)
+# Store version data in config.h
+set(CONFIG_H ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+configure_file(cmake/config.h.in ${CONFIG_H} ESCAPE_QUOTES @ONLY)
+
+# Install include files
+file(GLOB HEADER_FILES "include/libda/*")
+install(FILES ${HEADER_FILES} ${CONFIG_H} DESTINATION include/libda)
 
 if(CMAKE_COMPILER_IS_GNUCXX)
 	message(STATUS "GCC detected, adding compile flags")
