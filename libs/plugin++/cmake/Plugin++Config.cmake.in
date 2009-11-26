@@ -6,5 +6,5 @@ if(NOT Plugin++_FOUND)
 
 	include("@CMAKE_INSTALL_PREFIX@/@Plugin++_CMAKE_DIR@/Plugin++.cmake")
 	set(Plugin++_LIBRARIES "plugin++")
-endif()
+endif(NOT Plugin++_FOUND)
 
