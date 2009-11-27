@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 
-add_library(da SHARED audio.cpp)
+add_library(da STATIC audio.cpp)
 target_link_libraries(da ${Boost_LIBRARIES} ${Plugin++_LIBRARIES})
 
 set_target_properties(da PROPERTIES

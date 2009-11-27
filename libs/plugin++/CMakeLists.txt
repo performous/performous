@@ -28,7 +28,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++98 -Wall -Wextra")
 endif()
 
-add_library(plugin++ SHARED src/dll.cc src/execname.cc src/loader.cc)
+add_library(plugin++ STATIC src/dll.cc src/execname.cc src/loader.cc)
 
 find_package(DL REQUIRED)
 include_directories(${DL_INCLUDE_DIRS})
