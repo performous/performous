@@ -10,8 +10,6 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
 	message(FATAL_ERROR "In-source builds are not permitted. Make a separate folder for building:\nmkdir build; cd build; cmake ..\nBefore that, remove the files already created:\nrm -rf CMakeCache.txt CMakeFiles")
 endif()
 
-include("${CMAKE_SOURCE_DIR}/cmake/plugin++-packaging.cmake")
-
 # Add a sensible build type default and warning because empty means no optimization and no debug info.
 if(NOT CMAKE_BUILD_TYPE)
 	message("WARNING: CMAKE_BUILD_TYPE is not defined!\n         Defaulting to CMAKE_BUILD_TYPE=Release. Use ccmake to set a proper value.")
@@ -50,11 +48,15 @@ set_target_properties(plugin++ PROPERTIES
 	INSTALL_RPATH_USE_LINK_PATH TRUE
 )
 
-install(TARGETS plugin++ EXPORT Plugin++ DESTINATION lib${LIB_SUFFIX})
+if(NOT SLAVE_LIB)
+	include(cmake/plugin++-packaging.cmake)
 
-FILE(GLOB HEADER_FILES "include/plugin++/*")
-install(FILES ${HEADER_FILES} DESTINATION include/plugin++)
+	install(TARGETS plugin++ EXPORT Plugin++ DESTINATION lib${LIB_SUFFIX})
 
-# Install/generate CMake files for finding Plugin++
-add_subdirectory(cmake)
+	FILE(GLOB HEADER_FILES "include/plugin++/*")
+	install(FILES ${HEADER_FILES} DESTINATION include/plugin++)
+
+	# Install/generate CMake files for finding Plugin++
+	add_subdirectory(cmake)
+endif()
 

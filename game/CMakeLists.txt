@@ -9,20 +9,28 @@ set(SOURCES ${SOURCE_FILES} ${HEADER_FILES})
 
 find_package(Boost 1.36 REQUIRED COMPONENTS thread date_time program_options regex filesystem)
 include_directories(${Boost_INCLUDE_DIRS})
-set(LIBS ${LIBS} ${Boost_LIBRARIES})
+list(APPEND LIBS ${Boost_LIBRARIES})
+
+# Libraries are part of Performous build process (for now)
+set(SLAVE_LIBS TRUE)
+if(SLAVE_LIBS)
+	list(APPEND LIBS plugin++ da)
+else()
+	set(OUR_LIBS Plugin++ LibDA)
+endif()
 
 # Find all the libs that don't require extra parameters
-foreach(lib Plugin++ LibDA SDL PangoCairo LibRSVG LibXML++ Magick++ GLEW AVFormat SWScale OpenGL)
+foreach(lib ${OUR_LIBS} SDL PangoCairo LibRSVG LibXML++ Magick++ GLEW AVFormat SWScale OpenGL)
 	find_package(${lib} REQUIRED)
 	include_directories(${${lib}_INCLUDE_DIRS})
-	set(LIBS ${LIBS} ${${lib}_LIBRARIES})
+	list(APPEND LIBS ${${lib}_LIBRARIES})
 	add_definitions(${${lib}_DEFINITIONS})
 endforeach(lib)
 
 find_package(PortMidi)
 if(PortMidi_FOUND)
 	include_directories(PortMidi_INCLUDE_DIRS)
-	set(LIBS ${LIBS} ${PortMidi_LIBRARIES})
+	list(APPEND LIBS ${PortMidi_LIBRARIES})
 	add_definitions("-DHAVE_PORTMIDI")
 endif(PortMidi_FOUND)
 

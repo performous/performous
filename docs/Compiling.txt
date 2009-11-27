@@ -2,21 +2,11 @@ To install from git:
 
 	# Checkout the git
 	git clone git://performous.git.sourceforge.net/gitroot/performous/performous
-	# Create separate build folder under trunk to avoid polluting the source three
+	# Create separate build folder under trunk to avoid polluting the source tree
 	mkdir performous/build
 	cd performous/build
-	# Compile and install libplugin++ (our C++ plugin/DLL library)
-	cmake ../libs/plugin++/
-	make
-	sudo make install
-	rm -rf *
-	# Compile and install libda (our audio library)
-	cmake ../libs/libda/
-	make
-	sudo make install
-	rm -rf *
-	# Compile the game itself
-	cmake ..
+	# Compile the game and its support libraries
+	cmake ../
 	make
 	sudo make install
 	# Run the game
