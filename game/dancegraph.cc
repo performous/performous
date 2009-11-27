@@ -242,7 +242,10 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	float yEnd = time2y(tEnd);
 	glutil::Color c = color(arrow_i);
 	
-	if (note.isHit && std::abs(tEnd) < maxTolerance) note.hitAnim.setTarget(1.0, false);
+	if (note.isHit && std::abs(tEnd) < maxTolerance) {
+		if (mine) note.hitAnim.setRate(1.0);
+		note.hitAnim.setTarget(1.0, false);
+	}
 	double glow = note.hitAnim.get();
 	
 	if (tEnd - tBeg > 0.1) {
@@ -270,9 +273,16 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 		drawArrow(arrow_i, x, yBeg, s);
 	} else {
 		// Draw short note
-		s = arrowScale + glow;
-		glColor4fv(colorGlow(c,glow));
-		if (mine) drawMine(x, yBeg, int(time*360) % 360, s);
-		  else drawArrow(arrow_i, x, yBeg, s);
+		if (mine) {
+			c.a = 1.0 - glow; glColor4fv(c);
+			s += glow * 0.5;
+			float rot = int(time*360 * (note.isHit ? 2.0 : 1.0) ) % 360;
+			if (note.isHit) yBeg = time2y(0.0);
+			drawMine(x, yBeg, rot, s);
+		} else {
+			s = arrowScale + glow;
+			glColor4fv(colorGlow(c, glow));
+			drawArrow(arrow_i, x, yBeg, s);
+		}
 	}
 }
