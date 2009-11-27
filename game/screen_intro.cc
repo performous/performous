@@ -4,7 +4,8 @@
 #include "audio.hh"
 #include "record.hh"
 
-ScreenIntro::ScreenIntro(std::string const& name, Audio& audio, Capture& capture): Screen(name), m_audio(audio), m_capture(capture) {}
+ScreenIntro::ScreenIntro(std::string const& name, Audio& audio, Capture& capture):
+	Screen(name), m_audio(audio), m_capture(capture), selected() {}
 
 void ScreenIntro::enter() {
 	m_audio.playMusic(getThemePath("menu.ogg"), true);
@@ -37,10 +38,30 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 		 * */
 		
 		else if (key == SDLK_DOWN) {
-			theme->sing.draw();
+			if (selected < 3) {
+				selected++;
+			} else selected = 0;
 		}
-		else if (key == SDLK_DOWN) {
-			theme->configure.draw();
+		else if (key == SDLK_UP) {
+			if (selected > 0) {
+				selected--;
+			} else selected = 3;
+		}
+		else if (key == SDLK_RETURN) {
+			switch (selected) {
+				case 0 :
+					sm->activateScreen("Songs");
+					break;
+				case 1 :
+					sm->activateScreen("Practice");
+					break;
+				case 2 :
+					sm->activateScreen("Configuration");
+					break;
+				case 3 :
+					sm->finished();
+					break;
+			}
 		}
 			
 		
@@ -57,6 +78,23 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 
 void ScreenIntro::draw() {
 	theme->bg.draw();
+	switch (selected) {
+		case 0 :
+			theme->sing.draw();
+			break;
+		case 1 :
+			theme->practice.draw();
+			break;
+		case 2 :
+			theme->configure.draw();
+			break;
+		case 3 :
+			theme->quit.draw();
+			break;
+		default :
+			theme->sing.draw();
+	}
+	
 	//background->draw();
 	if (m_dialog) m_dialog->draw();
 }
