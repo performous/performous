@@ -57,7 +57,8 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
 {
 	m_arrow.dimensions.middle().center();
 	
-	for(size_t i = 0; i < 4; i++) m_pressed[i] = AnimValue(0.0, 8.0);
+	for(size_t i = 0; i < 4; i++) m_pressed[i] = false;
+	for(size_t i = 0; i < 4; i++) m_pressed_anim[i] = AnimValue(0.0, 4.0);
 	
 	DanceTracks::const_iterator it = m_song.danceTracks.find(m_gamingMode);
 	if(it == m_song.danceTracks.end())
@@ -106,11 +107,13 @@ void DanceGraph::engine() {
 			}
 		}
 		if (ev.type == input::Event::RELEASE) {
-			m_pressed[ev.button].setTarget(0.0, false);
+			m_pressed[ev.button] = false;
 		}
 		else if (ev.type == input::Event::PRESS) {
+			m_pressed[ev.button] = true;
 			dance(time, ev);
-			m_pressed[ev.button].setTarget(1.0, true);
+			m_pressed_anim[ev.button].setValue(1.0);
+			m_pressed_anim[ev.button].setTarget(0.0);
 		}
 	}
 
@@ -206,7 +209,7 @@ void DanceGraph::draw(double time) {
 	// Arrows on cursor
 	for (int arrow_i = 0; arrow_i < 4; ++arrow_i) {
 		float x = -1.5f + arrow_i;
-		float l = m_pressed[arrow_i].get();
+		float l = m_pressed_anim[arrow_i].get();
 		float s = (5.0 - l) / 5.0;
 		glutil::Color c = color(arrow_i);
 		c.r += l; c.g += l; c.b +=l;

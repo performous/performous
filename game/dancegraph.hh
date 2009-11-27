@@ -76,7 +76,8 @@ class DanceGraph {
 	};
 	typedef std::vector<Event> Events;
 	Events m_events;
-	AnimValue m_pressed[4];
+	bool m_pressed[4];
+	AnimValue m_pressed_anim[4];
 	int m_dead;
 	SvgTxtTheme m_text;
 	AnimValue m_correctness;
