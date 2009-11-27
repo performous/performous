@@ -8,7 +8,8 @@ ScreenIntro::ScreenIntro(std::string const& name, Audio& audio, Capture& capture
 
 void ScreenIntro::enter() {
 	m_audio.playMusic(getThemePath("menu.ogg"), true);
-	background.reset(new Surface(getThemePath("intro.svg")));
+	//background.reset(new Surface(getThemePath("intro.svg")));
+	theme.reset(new ThemeIntro());
 	std::string msg;
 	if (!m_audio.isOpen()) msg = "No playback devices could be used.\n";
 	if (m_capture.analyzers().empty()) msg += "No microphones found.\n";
@@ -16,7 +17,7 @@ void ScreenIntro::enter() {
 }
 
 void ScreenIntro::exit() {
-	background.reset();
+	theme.reset();
 	m_dialog.reset();
 }
 
@@ -26,6 +27,16 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 		if (m_dialog) { m_dialog.reset(); return; }
 		int key = event.key.keysym.sym;
 		if (key == SDLK_ESCAPE || key == SDLK_q) sm->finished();
+		
+		/*
+		 * Here im writing my code, loading the images in the theme
+		 * "sing", "configure", etc. just using SDLK_DOWN and SDLK_UP
+		 * my question is, how can i load those images? do i have to use
+		 * something like "theme->sing.draw()"? because i think that is
+		 * not working
+		 * */
+			
+		
 		else if (key == SDLK_s) sm->activateScreen("Songs");
 		else if (key == SDLK_c) sm->activateScreen("Configuration");
 		else if (key == SDLK_p) sm->activateScreen("Practice");
@@ -38,7 +49,8 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 }
 
 void ScreenIntro::draw() {
-	background->draw();
+	theme->bg.draw();
+	//background->draw();
 	if (m_dialog) m_dialog->draw();
 }
 

@@ -16,7 +16,7 @@ To install from git:
 	sudo make install
 	rm -rf *
 	# Compile the game itself
-	cmake ../libs/libda/
+	cmake ../
 	make
 	sudo make install
 	# Run the game

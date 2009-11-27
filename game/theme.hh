@@ -59,3 +59,15 @@ struct ThemeConfiguration: Theme {
 	SvgTxtTheme value;
 };
 
+/// theme for intro screen
+struct ThemeIntro: Theme {
+	ThemeIntro();
+	/// Sing option
+	Surface sing;
+	/// Practice option
+	Surface practice;
+	/// Configuration option
+	Surface configuration;
+	/// Quit option
+	Surface quit;
+};

@@ -2,7 +2,7 @@
 
 #include "dialog.hh"
 #include "screen.hh"
-#include "surface.hh"
+#include "theme.hh"
 #include <boost/scoped_ptr.hpp>
 
 class Audio;
@@ -21,6 +21,7 @@ class ScreenIntro : public Screen {
   private:
 	Audio& m_audio;
 	Capture& m_capture;
-	boost::scoped_ptr<Surface> background;
+	boost::scoped_ptr<ThemeIntro> theme;
 	boost::scoped_ptr<Dialog> m_dialog;
+	unsigned int selected;
 };
