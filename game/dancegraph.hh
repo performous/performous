@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-
 #include <boost/ptr_container/ptr_map.hpp>
 #include "animvalue.hh"
 #include "song.hh"
@@ -50,9 +49,9 @@ class DanceGraph {
 	void difficultyDelta(int delta);
 	void difficulty(DanceDifficulty level);
 	DanceDifficulty m_level;
-	void dance(double time, input::Event const& ev);
-	void drawNote(int arrow_i, glutil::Color, float tBeg, float tEnd);
 	glutil::Color const& color(int arrow_i) const;
+	void dance(double time, input::Event const& ev);
+	void drawNote(DanceNote& note, double time);
 	void drawArrow(int arrow_i, float x, float y, float scale = 1.0);
 	void drawMine(float x, float y, float rot = 0.0, float scale = 1.0);
 	Audio& m_audio;
