@@ -41,9 +41,9 @@ ThemeConfiguration::ThemeConfiguration():
 {}
 
 ThemeIntro::ThemeIntro():
-	Theme(getThemePath("prueba_intro.svg")),
-	sing(getThemePath("prueba_sing.svg")),
-	practice(getThemePath("prueba_practice.svg")),
-	configure(getThemePath("prueba_configure.svg")),
-	quit(getThemePath("prueba_quit.svg"))
+	Theme(getThemePath("intro_bg.svg")),
+	sing(getThemePath("intro_sing.svg")),
+	practice(getThemePath("intro_practice.svg")),
+	configure(getThemePath("intro_configure.svg")),
+	quit(getThemePath("intro_quit.svg"))
 {}
