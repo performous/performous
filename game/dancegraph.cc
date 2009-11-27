@@ -114,7 +114,7 @@ void DanceGraph::engine() {
 		}
 	}
 
-	
+
 }
 
 
@@ -126,7 +126,6 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 			double p = points(it->note.begin - time);
 			it->score = p;
 			m_score += p;
-			it->hitAnim.setTarget(1.0, false);
 		}
 	}
 }
@@ -140,6 +139,15 @@ namespace {
 	void vertexPair(float x, float y, float ty) {
 		glTexCoord2f(0.0f, ty); glVertex2f(x - holdWidth, y);
 		glTexCoord2f(1.0f, ty); glVertex2f(x + holdWidth, y);
+	}
+
+	glutil::Color& colorGlow(glutil::Color& c, double glow) {
+		//c.a = std::sqrt(1.0 - glow);
+		c.a = 1.0 - glow;
+		c.r += glow *.5;
+		c.g += glow *.5;
+		c.b += glow *.5;
+		return c;
 	}
 }
 
@@ -234,6 +242,9 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	float yEnd = time2y(tEnd);
 	glutil::Color c = color(arrow_i);
 	
+	if (note.isHit && std::abs(tEnd) < maxTolerance) note.hitAnim.setTarget(1.0, false);
+	double glow = note.hitAnim.get();
+	
 	if (tEnd - tBeg > 0.1) {
 		// Draw holds
 		glColor4fv(c);
@@ -252,17 +263,15 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 			vertexPair(x, yBeg, 0.0f);
 		}
 		// Draw begin
+		if (note.isHit && tEnd < 0.1) {
+			glColor4fv(colorGlow(c,glow));
+			s = arrowScale + glow;
+		}
 		drawArrow(arrow_i, x, yBeg, s);
 	} else {
 		// Draw short note
-		double glow = note.hitAnim.get();
-		//c.a = std::sqrt(1.0 - glow);
-		c.a = 1.0 - glow;
-		c.r += glow *.5;
-		c.g += glow *.5;
-		c.b += glow *.5;
 		s = arrowScale + glow;
-		glColor4fv(c);
+		glColor4fv(colorGlow(c,glow));
 		if (mine) drawMine(x, yBeg, int(time*360) % 360, s);
 		  else drawArrow(arrow_i, x, yBeg, s);
 	}
