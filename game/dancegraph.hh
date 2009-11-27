@@ -14,9 +14,10 @@ class Song;
 
 struct DanceNote {
 	DanceNote(Note note) :
-		note(note), hitAnim(0.0, 5.0), score(0), isHit(false) {}
+		note(note), hitAnim(0.0, 5.0), releaseTime(0), score(0), isHit(false) {}
 	Note note;
-	AnimValue hitAnim;
+	AnimValue hitAnim; /// for animating hits
+	double releaseTime; /// tells when a hold was ended
 	int score;
 	bool isHit;
 };

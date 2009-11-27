@@ -234,22 +234,18 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	float yEnd = time2y(tEnd);
 	glutil::Color c = color(arrow_i);
 	
-	double glow = note.hitAnim.get();
-	//c.a = std::sqrt(1.0 - glow);
-	c.r += glow *.5;
-	c.g += glow *.5;
-	c.b += glow *.5;
-	
 	if (tEnd - tBeg > 0.1) {
 		// Draw holds
 		glColor4fv(c);
-		if (note.isHit) {
-			// TODO: What if hold is ended prematurely?
+		if (note.isHit && note.releaseTime <= 0) {
 			yBeg = std::max(time2y(0.0), yBeg);
 			yEnd = std::max(time2y(0.0), yEnd);
 			glColor3f(1.0f, 1.0f, 1.0f);
+			// Hack to test hold releasing
+			//if (time > note.note.begin + 1) note.releaseTime = time;
 		}
-		{
+		if (note.releaseTime > 0) yBeg = time2y(note.releaseTime - time);
+		{ // Scope block for Begin and UseTexture
 			UseTexture tblock(m_arrow_hold);
 			glutil::Begin block(GL_TRIANGLE_STRIP);
 			vertexPair(x, yEnd, 1.0f);
@@ -259,7 +255,12 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 		drawArrow(arrow_i, x, yBeg, s);
 	} else {
 		// Draw short note
+		double glow = note.hitAnim.get();
+		//c.a = std::sqrt(1.0 - glow);
 		c.a = 1.0 - glow;
+		c.r += glow *.5;
+		c.g += glow *.5;
+		c.b += glow *.5;
 		s = arrowScale + glow;
 		glColor4fv(c);
 		if (mine) drawMine(x, yBeg, int(time*360) % 360, s);
