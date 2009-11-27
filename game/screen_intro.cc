@@ -35,6 +35,13 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 		 * something like "theme->sing.draw()"? because i think that is
 		 * not working
 		 * */
+		
+		else if (key == SDLK_DOWN) {
+			theme->sing.draw();
+		}
+		else if (key == SDLK_DOWN) {
+			theme->configure.draw();
+		}
 			
 		
 		else if (key == SDLK_s) sm->activateScreen("Songs");

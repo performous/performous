@@ -18,7 +18,7 @@
    id="svg559"
    sodipodi:version="0.32"
    inkscape:version="0.47pre4 r22446"
-   sodipodi:docname="intro.svg"
+   sodipodi:docname="songs_bg_default.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <metadata
      id="metadata35">
@@ -32,8 +32,8 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="854"
-     inkscape:window-width="1440"
+     inkscape:window-height="726"
+     inkscape:window-width="1280"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      guidetolerance="10.0"
@@ -43,12 +43,12 @@
      bordercolor="#666666"
      pagecolor="#ffffff"
      id="base"
-     inkscape:zoom="0.87006002"
-     inkscape:cx="495.26133"
-     inkscape:cy="393.92889"
+     inkscape:zoom="0.30761267"
+     inkscape:cx="363.18045"
+     inkscape:cy="265.80237"
      inkscape:window-x="0"
-     inkscape:window-y="0"
-     inkscape:current-layer="g3955"
+     inkscape:window-y="25"
+     inkscape:current-layer="svg559"
      showgrid="false"
      showguides="true"
      inkscape:guide-bbox="true"
@@ -62,7 +62,7 @@
          offset="0"
          id="stop4559" />
       <stop
-         style="stop-color:#0300da;stop-opacity:1;"
+         style="stop-color:#000000;stop-opacity:1;"
          offset="1"
          id="stop4561" />
     </linearGradient>
@@ -139,18 +139,6 @@
        y1="-116.67703"
        x2="311.95688"
        y2="-276.41519" />
-    <filter
-       inkscape:collect="always"
-       id="filter3869"
-       x="-0.019231318"
-       width="1.0384626"
-       y="-0.12226724"
-       height="1.2445345">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="3.4581674"
-         id="feGaussianBlur3871" />
-    </filter>
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient6499"
@@ -191,54 +179,6 @@
        y1="260.4765"
        x2="358.07056"
        y2="260.4765" />
-    <filter
-       inkscape:collect="always"
-       id="filter4397"
-       x="-0.14167116"
-       width="1.2833423"
-       y="-0.10407921"
-       height="1.2081584">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="2.8834025"
-         id="feGaussianBlur4399" />
-    </filter>
-    <filter
-       inkscape:collect="always"
-       id="filter4445"
-       x="-0.13414668"
-       width="1.2682934"
-       y="-0.10855241"
-       height="1.2171048">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="3.5790177"
-         id="feGaussianBlur4447" />
-    </filter>
-    <filter
-       inkscape:collect="always"
-       id="filter4489"
-       x="-0.15104939"
-       width="1.3020988"
-       y="-0.099538981"
-       height="1.199078">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="2.6848123"
-         id="feGaussianBlur4491" />
-    </filter>
-    <filter
-       inkscape:collect="always"
-       id="filter4529"
-       x="-0.16248027"
-       width="1.3249605"
-       y="-0.095128714"
-       height="1.1902574">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="2.6354387"
-         id="feGaussianBlur4531" />
-    </filter>
     <radialGradient
        inkscape:collect="always"
        xlink:href="#linearGradient4557"

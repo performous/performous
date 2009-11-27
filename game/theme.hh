@@ -67,7 +67,7 @@ struct ThemeIntro: Theme {
 	/// Practice option
 	Surface practice;
 	/// Configuration option
-	Surface configuration;
+	Surface configure;
 	/// Quit option
 	Surface quit;
 };
