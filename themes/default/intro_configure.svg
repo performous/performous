@@ -232,7 +232,7 @@
        x2="358.07056"
        y1="260.4765"
        x1="44.868057"
-       gradientTransform="matrix(1.3544445,0,0,1.8513768,15.275442,21.71542)"
+       gradientTransform="matrix(1.3544445,0,0,1.8513768,-45.940851,21.71542)"
        gradientUnits="userSpaceOnUse"
        id="linearGradient2880"
        xlink:href="#linearGradient6499-1"
@@ -301,7 +301,7 @@
        y="759.88806" /></text>
   <g
      id="g2900"
-     transform="translate(466.07672,-49.945801)">
+     transform="translate(464.76919,-50.551761)">
     <g
        id="g2943"
        transform="matrix(0.25866863,-0.70093291,0.70093291,0.25866863,-1269.8962,257.2773)"
@@ -327,7 +327,7 @@
   </g>
   <rect
      y="463.436"
-     x="161.21629"
+     x="100"
      height="81.040909"
      width="337.48822"
      id="rect6405"
