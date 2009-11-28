@@ -518,10 +518,12 @@ void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, fl
 	}
 	if (tappable) {
 		float l = std::max(0.5, m_correctness.get());
-		glColor3f(l, l, l);
 		if (m_use3d) {
+			glColor3f(l, l, l);
 			m_tappableObj.draw(x, yBeg, 0.0f);
 		} else {
+			l = l * 2.0 - 1.0; // Full black to white range to overcome ambient lighting or something
+			glColor3f(l, l, l);
 			m_tap.dimensions.center(yBeg).middle(x);
 			m_tap.draw();
 		}
