@@ -31,6 +31,8 @@
 
 volatile bool g_quit = false;
 
+bool g_take_screenshot = false;
+
 extern "C" void quit(int) {
 	g_quit = true;
 }
@@ -67,6 +69,9 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 			if (keypressed == SDLK_RETURN && modifier & KMOD_ALT ) {
 				config["graphic/fullscreen"].b() = !config["graphic/fullscreen"].b();
 				continue; // Already handled here...
+			}
+			if (keypressed ==  SDLK_F11 ) {
+				g_take_screenshot = true;
 			}
 			if (keypressed == SDLK_F4 && modifier & KMOD_ALT) {
 				sm.finished();
@@ -156,6 +161,15 @@ void mainLoop(std::string const& songlist) {
 		boost::xtime time = now();
 		unsigned frames = 0;
 		while (!sm.isFinished()) {
+			if( g_take_screenshot ) {
+				try {
+					window.screenshot();
+					std::cout << ">>> Screenshot taken" << std::endl;
+				} catch (std::exception& e) {
+					std::cerr << "ERROR: " << e.what() << std::endl;
+				}
+				g_take_screenshot = false;
+			}
 			try {
 				checkEvents_SDL(sm, window);
 				window.blank();
