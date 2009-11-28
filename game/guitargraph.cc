@@ -407,6 +407,21 @@ void GuitarGraph::draw(double time) {
 			glTexCoord2f(1.0f, texCoord); glVertex2f(w, time2y(tEnd));
 		}
 	}
+	// Draw the cursor
+	float level = m_hit[0].get();
+	glColor3f(level, level, level);
+	drawBar(0.0, 0.01f);
+	// Fret buttons on cursor
+	for (int fret = m_drums; fret < 5; ++fret) {
+		float x = -2.0f + fret - 0.5f * m_drums;
+		float l = m_hit[fret + !m_drums].get();
+		glColor4fv(color(fret));
+		m_button.dimensions.center(time2y(0.0)).middle(x);
+		m_button.draw();
+		glColor3f(l, l, l);
+		m_tap.dimensions = m_button.dimensions;
+		m_tap.draw();
+	}
 	// Draw the notes
 	glutil::UseLighting lighting(m_use3d);
 	for (Chords::const_iterator it = m_chords.begin(); it != m_chords.end(); ++it) {
@@ -445,25 +460,6 @@ void GuitarGraph::draw(double time) {
 				m_tap.dimensions.center(time2y(tBeg)).middle(x);
 				m_tap.draw();
 			}
-		}
-	}
-	// Draw the cursor
-	float level = m_hit[0].get();
-	glColor3f(level, level, level);
-	drawBar(0.0, 0.01f);
-	// Fret buttons on cursor
-	for (int fret = m_drums; fret < 5; ++fret) {
-		float x = -2.0f + fret - 0.5f * m_drums;
-		float l = m_hit[fret + !m_drums].get();
-		glColor4fv(color(fret));
-		if (m_use3d) {
-			m_fretObj.draw(x, time2y(0.0), (1.0-l)/8.0);
-		} else {
-			m_button.dimensions.center(time2y(0.0)).middle(x);
-			m_button.draw();
-			glColor3f(l, l, l);
-			m_tap.dimensions = m_button.dimensions;
-			m_tap.draw();
 		}
 	}
 	glColor3f(1.0f, 1.0f, 1.0f);
