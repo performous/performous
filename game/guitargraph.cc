@@ -440,26 +440,12 @@ void GuitarGraph::draw(double time) {
 				glow = m_events[event - 1].glow.get();
 				whammy = m_events[event - 1].whammy.get();
 			}
-			/*
-			if (glow > 0.0f) {
-				glBlendFunc(GL_ONE, GL_ONE);
-				drawNote(fret, glutil::Color(glow, glow, glow), tBeg, tEnd);
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			}
-			*/
 			glutil::Color c = color(fret);
 			c.r += glow;
 			c.g += glow;
 			c.b += glow;
 			drawNote(fret, c, tBeg, tEnd, whammy, it->tappable);
 
-			if (!m_use3d && it->tappable) {
-				float l = std::max(0.5, m_correctness.get());
-				glColor3f(l, l, l);
-				float x = -2.0f + fret;
-				m_tap.dimensions.center(time2y(tBeg)).middle(x);
-				m_tap.draw();
-			}
 		}
 	}
 	glColor3f(1.0f, 1.0f, 1.0f);
@@ -475,8 +461,6 @@ namespace {
 }
 
 void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, float whammy, bool tappable) {
-	Object3d* obj = &m_fretObj;
-	if (tappable) obj = &m_tappableObj;
 	float x = -2.0f + fret;
 	if (m_drums) x -= 0.5f;
 	if (m_drums && fret == 0) {
@@ -493,9 +477,8 @@ void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, fl
 		if (m_use3d) {
 			y -= fretWid;
 			c.a = clamp(time2a(tBeg)*2.0f,0.0f,1.0f);
-			if (tappable && m_correctness.get() < .99) { c.r *= 0.5f; c.g *= 0.5f; c.b *= 0.5f; }
 			glColor4fv(c);
-			obj->draw(x, y, 0.0f);
+			m_fretObj.draw(x, y, 0.0f);
 			y -= fretWid;
 		} else {
 			UseTexture tblock(m_button_l);
@@ -526,11 +509,21 @@ void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, fl
 		// Too short note: only render the ring
 		if (m_use3d) {
 			c.a = clamp(time2a(tBeg)*2.0f,0.0f,1.0f); glColor4fv(c);
-			obj->draw(x, time2y(tBeg), 0.0f);
+			m_fretObj.draw(x, time2y(tBeg), 0.0f);
 		} else {
 			c.a = time2a(tBeg); glColor4fv(c);
 			m_button.dimensions.center(time2y(tBeg)).middle(x);
 			m_button.draw();
+		}
+	}
+	if (tappable) {
+		float l = std::max(0.5, m_correctness.get());
+		glColor3f(l, l, l);
+		if (m_use3d) {
+			m_tappableObj.draw(x, yBeg, 0.0f);
+		} else {
+			m_tap.dimensions.center(yBeg).middle(x);
+			m_tap.draw();
 		}
 	}
 }
