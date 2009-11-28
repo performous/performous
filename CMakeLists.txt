@@ -8,7 +8,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
 	message(FATAL_ERROR "In-source builds are not permitted. Make a separate folder for building:\nmkdir build; cd build; cmake ..\nBefore that, remove the files already created:\nrm -rf CMakeCache.txt CMakeFiles")
 endif(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
 
-include("${CMAKE_SOURCE_DIR}/cmake/performous-packaging.cmake")
+include(cmake/performous-packaging.cmake)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
@@ -32,6 +32,7 @@ mark_as_advanced(SHARE_INSTALL)
 include_directories(libs/plugin++/include)
 include_directories(libs/libda/include)
 
+add_subdirectory(libs)
 add_subdirectory(themes)
 add_subdirectory(data)
 add_subdirectory(game)

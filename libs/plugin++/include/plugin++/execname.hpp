@@ -1,4 +1,7 @@
 #pragma once
+#ifndef EXECNAME_HPP_INCLUDED
+#define EXECNAME_HPP_INCLUDED
+
 #include <boost/filesystem.hpp>
 
 namespace plugin {
@@ -7,3 +10,4 @@ namespace plugin {
 	boost::filesystem::path execname();
 }
 
+#endif

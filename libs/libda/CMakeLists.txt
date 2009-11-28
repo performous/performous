@@ -25,8 +25,17 @@ set(LibDA_PLUGIN_DIR "lib${LIB_SUFFIX}/libda")
 
 include_directories(include)
 
-FILE(GLOB HEADER_FILES "include/libda/*")
-install(FILES ${HEADER_FILES} DESTINATION include/libda)
+if(NOT SLAVE_LIB)
+	include(cmake/libda-packaging.cmake)
+	# Store version data in config.h
+	set(CONFIG_H ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+	configure_file(cmake/config.h.in ${CONFIG_H} ESCAPE_QUOTES @ONLY)
+	# Install include files
+	file(GLOB HEADER_FILES "include/libda/*")
+	install(FILES ${HEADER_FILES} ${CONFIG_H} DESTINATION include/libda)
+	# Generate CMake scripts for finding the library
+	add_subdirectory(cmake)
+endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX)
 	message(STATUS "GCC detected, adding compile flags")
@@ -41,11 +50,13 @@ set(Boost_USE_MULTITHREAD ON)
 find_package(Boost 1.36 REQUIRED COMPONENTS thread date_time)
 include_directories(${Boost_INCLUDE_DIRS})
 
-find_package(Plugin++ REQUIRED)
-message(plugin++ ${Plugin++_INCLUDE_DIRS})
-include_directories(${Plugin++_INCLUDE_DIRS})
+if(SLAVE_LIB)
+	set(Plugin++_LIBRARIES da)
+else()
+	find_package(Plugin++ REQUIRED)
+	include_directories(${Plugin++_INCLUDE_DIRS})
+endif()
 
 add_subdirectory(src)
 add_subdirectory(plugins)
-add_subdirectory(cmake)
 

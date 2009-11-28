@@ -1,13 +1,4 @@
-//  plugin.hpp - C++ plugin framework
-
-//  Copyright Lasse Karkkainen 2007-2008
-
-//  Use, modification, and distribution is subject to the Boost Software
-//  License, Version 1.0 or later. (See accompanying file LICENSE_1_0.txt or
-//  copy at http://www.boost.org/LICENSE_1_0.txt)
-
-//  See library home page at http://www.boost.org/libs/plugin
-
+#pragma once
 #ifndef PLUGIN_HPP_INCLUDED
 #define PLUGIN_HPP_INCLUDED
 

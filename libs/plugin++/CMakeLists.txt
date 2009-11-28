@@ -28,7 +28,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++98 -Wall -Wextra")
 endif()
 
-add_library(plugin++ SHARED src/dll.cc src/execname.cc src/loader.cc)
+add_library(plugin++ STATIC src/dll.cc src/execname.cc src/loader.cc)
 
 find_package(DL REQUIRED)
 include_directories(${DL_INCLUDE_DIRS})
@@ -48,11 +48,15 @@ set_target_properties(plugin++ PROPERTIES
 	INSTALL_RPATH_USE_LINK_PATH TRUE
 )
 
-install(TARGETS plugin++ EXPORT Plugin++ DESTINATION lib${LIB_SUFFIX})
+if(NOT SLAVE_LIB)
+	include(cmake/plugin++-packaging.cmake)
 
-FILE(GLOB HEADER_FILES "include/plugin++/*")
-install(FILES ${HEADER_FILES} DESTINATION include/plugin++)
+	install(TARGETS plugin++ EXPORT Plugin++ DESTINATION lib${LIB_SUFFIX})
 
-# Install/generate CMake files for finding Plugin++
-add_subdirectory(cmake)
+	FILE(GLOB HEADER_FILES "include/plugin++/*")
+	install(FILES ${HEADER_FILES} DESTINATION include/plugin++)
+
+	# Install/generate CMake files for finding Plugin++
+	add_subdirectory(cmake)
+endif()
 

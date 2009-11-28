@@ -1,29 +1,24 @@
 set(CPACK_PACKAGE_NAME "${CMAKE_PROJECT_NAME}")
-set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A karaoke game with pitch detection and scoring, similar to Singstar games. Previously known as UltraStar-NG. Supports songs in Ultrastar format.")
+set(CPACK_PACKAGE_VERSION "${LibDA_VERSION}")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "C++ digital audio I/O and processing library.")
 set(CPACK_PACKAGE_CONTACT "http://performous.org/")
 set(CPACK_SOURCE_IGNORE_FILES
    "/.cvsignore"
    "/.gitignore"
    "/songs/"
-   "/libs/"
    "/build/"
    "/.svn/"
    "/.git/"
    "/osx-utils/"
    "/portage-overlay/"
 )
-set(CPACK_PACKAGE_EXECUTABLES performous)
-set(CPACK_SOURCE_GENERATOR "TBZ2")
-set(CPACK_GENERATOR "TBZ2")
+
 
 if("${CMAKE_BUILD_TYPE}" MATCHES "Release")
 	set(CPACK_STRIP_FILES TRUE)
 endif("${CMAKE_BUILD_TYPE}" MATCHES "Release")
 
-if(APPLE)
-	set(CPACK_GENERATOR "PACKAGEMAKER;OSXX11")
-endif(APPLE)
+
 if(UNIX)
 	# Try to find architecture
 	execute_process(COMMAND uname -m OUTPUT_VARIABLE CPACK_PACKAGE_ARCHITECTURE)
@@ -51,20 +46,8 @@ if(UNIX)
 			set(CPACK_PACKAGE_ARCHITECTURE amd64)
 		endif("${CPACK_PACKAGE_ARCHITECTURE}" MATCHES "x86_64")
 		# Set the dependencies based on the distro version
-		if("${LSB_DISTRIB}" MATCHES "Ubuntu8.04")
-			set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsdl1.2debian, libcairo2, librsvg2-2, libboost-thread1.34.1, libboost-serialization1.34.1, libboost-program-options1.34.1, libboost-regex1.34.1, libboost-filesystem1.34.1, libboost-date-time1.34.1, libavcodec1d, libavformat1d, libswscale1d, libmagick++10, libxml++2.6c2a, libglew1.5")
-		endif("${LSB_DISTRIB}" MATCHES "Ubuntu8.04")
-		if("${LSB_DISTRIB}" MATCHES "Ubuntu8.10")
-			set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsdl1.2debian, libcairo2, librsvg2-2, libboost-thread1.35.0, libboost-serialization1.35.0, libboost-program-options1.35.0, libboost-regex1.35.0, libboost-filesystem1.35.0, libboost-date-time1.35.0, libavcodec51, libavformat52, libswscale0, libmagick++10, libxml++2.6-2, libglew1.5")
-		endif("${LSB_DISTRIB}" MATCHES "Ubuntu8.10")
-		if("${LSB_DISTRIB}" MATCHES "Ubuntu9.04")
-			set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsdl1.2debian, libcairo2, librsvg2-2, libboost-thread1.35.0, libboost-program-options1.35.0, libboost-regex1.35.0, libboost-filesystem1.35.0, libboost-date-time1.35.0, libavcodec52, libavformat52, libswscale0, libmagick++1, libxml++2.6-2, libglew1.5")
-		endif("${LSB_DISTRIB}" MATCHES "Ubuntu9.04")
-		if("${LSB_DISTRIB}" MATCHES "Ubuntu9.10")
-			set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsdl1.2debian, libcairo2, librsvg2-2, libboost-thread1.38.0, libboost-program-options1.38.0, libboost-regex1.38.0, libboost-filesystem1.38.0, libboost-date-time1.38.0, libavcodec52, libavformat52, libswscale0, libmagick++1, libxml++2.6-2, libglew1.5")
-		endif("${LSB_DISTRIB}" MATCHES "Ubuntu9.10")
 		if("${LSB_DISTRIB}" MATCHES "Debian5.*")
-			set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsdl1.2debian, libcairo2, librsvg2-2, libboost-dev, libavcodec51, libavformat52, libswscale0, libmagick++10, libxml++2.6-2, libglew1.5")
+			set(CPACK_DEBIAN_PACKAGE_DEPENDS "libboost-dev, libasound2, libjack0")
 		endif("${LSB_DISTRIB}" MATCHES "Debian5.*")
 		if(NOT CPACK_DEBIAN_PACKAGE_DEPENDS)
 			message("WARNING: ${LSB_DISTRIB} not supported yet.\nPlease set deps in cmake/performous-packaging.cmake before packaging.")

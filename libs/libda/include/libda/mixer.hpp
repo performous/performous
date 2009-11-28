@@ -2,7 +2,10 @@
 #define LIBDA_MIXER_HPP_INCLUDED
 
 /**
-@file mixer.hpp LibDA mixer interface.
+@file mixer.hpp LibDA mixer interface, version 1.
+
+This appears to be too complex and will probably be removed in later release in
+favor of something easier and faster.
 
 Link with libda when you use this.
 **/
