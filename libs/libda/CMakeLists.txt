@@ -21,15 +21,24 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 set(LIB_SUFFIX "" CACHE STRING "Optional suffix to use on lib folders (e.g. 64 for lib64)")
 set(LibDA_CMAKE_DIR share/libda/cmake CACHE STRING "Relative path (from prefix) where to put CMake configuration files")
-set(LibDA_PLUGIN_DIR "lib${LIB_SUFFIX}/libda")
+
+if(SLAVE_LIB)
+	set(LibDA_PLUGIN_FOLDER "performous/libda-${LibDA_VERSION_MAJOR}")
+else()
+	set(LibDA_PLUGIN_FOLDER "libda-${LibDA_VERSION_MAJOR}")
+endif()
+
+set(LibDA_PLUGIN_DIR "lib${LIB_SUFFIX}/${LibDA_PLUGIN_FOLDER}")
 
 include_directories(include)
 
+# Store version data in config.h
+set(CONFIG_H ${CMAKE_CURRENT_BINARY_DIR}/libda/config.h)
+configure_file(cmake/config.h.in ${CONFIG_H} ESCAPE_QUOTES @ONLY)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
 if(NOT SLAVE_LIB)
 	include(cmake/libda-packaging.cmake)
-	# Store version data in config.h
-	set(CONFIG_H ${CMAKE_CURRENT_BINARY_DIR}/config.h)
-	configure_file(cmake/config.h.in ${CONFIG_H} ESCAPE_QUOTES @ONLY)
 	# Install include files
 	file(GLOB HEADER_FILES "include/libda/*")
 	install(FILES ${HEADER_FILES} ${CONFIG_H} DESTINATION include/libda)
