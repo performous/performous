@@ -17,7 +17,12 @@ dll::dll(std::string const& filename): lib(LoadLibrary(filename.c_str())) {
 dll::~dll() { FreeLibrary(static_cast<HINSTANCE>(lib)); }
 
 void* dll::sym(char const* sym) {
-	return GetProcAddress(static_cast<HINSTANCE>(lib), sym);
+	union{
+		void* ptr;
+		FARPROC fptr;
+	}conv;
+	conv.fptr = GetProcAddress(static_cast<HINSTANCE>(lib), sym);
+	return conv.ptr;
 }
 
 #else
