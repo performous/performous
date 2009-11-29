@@ -20,6 +20,20 @@ void ScreenIntro::exit() {
 	m_dialog.reset();
 }
 
+/*
+Tronic's note on making the menu more generic:
+
+struct MenuOption {
+	std::string screen;
+	Surface image;
+};
+
+In ScreenIntro:
+std::vector<MenuOption> m_menuOptions;
+
+This should avoid all if-elses for testing selected == 1, ...
+*/
+
 void ScreenIntro::manageEvent(SDL_Event event) {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	if (event.type == SDL_KEYDOWN) {
