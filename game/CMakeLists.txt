@@ -9,20 +9,28 @@ set(SOURCES ${SOURCE_FILES} ${HEADER_FILES})
 
 find_package(Boost 1.36 REQUIRED COMPONENTS thread date_time program_options regex filesystem)
 include_directories(${Boost_INCLUDE_DIRS})
-set(LIBS ${LIBS} ${Boost_LIBRARIES})
+list(APPEND LIBS ${Boost_LIBRARIES})
+
+# Libraries are part of Performous build process (for now)
+set(SLAVE_LIBS TRUE)
+if(SLAVE_LIBS)
+	list(APPEND LIBS da plugin++)
+else()
+	set(OUR_LIBS Plugin++ LibDA)
+endif()
 
 # Find all the libs that don't require extra parameters
-foreach(lib SDL PangoCairo LibRSVG LibXML++ Magick++ GLEW AVFormat SWScale OpenGL)
+foreach(lib ${OUR_LIBS} SDL PangoCairo LibRSVG LibXML++ Magick++ GLEW AVFormat SWScale OpenGL)
 	find_package(${lib} REQUIRED)
 	include_directories(${${lib}_INCLUDE_DIRS})
-	set(LIBS ${LIBS} ${${lib}_LIBRARIES})
+	list(APPEND LIBS ${${lib}_LIBRARIES})
 	add_definitions(${${lib}_DEFINITIONS})
 endforeach(lib)
 
 find_package(PortMidi)
 if(PortMidi_FOUND)
 	include_directories(PortMidi_INCLUDE_DIRS)
-	set(LIBS ${LIBS} ${PortMidi_LIBRARIES})
+	list(APPEND LIBS ${PortMidi_LIBRARIES})
 	add_definitions("-DHAVE_PORTMIDI")
 endif(PortMidi_FOUND)
 
@@ -30,19 +38,19 @@ endif(PortMidi_FOUND)
 if(CMAKE_COMPILER_IS_GNUCXX)
 	message(STATUS "GCC detected, adding compile flags")
 	# -pedantic cannot be used because ffmpeg headers are b0rked
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++98 -Wall -Wextra")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++98 -Wall -Wextra -Wno-missing-field-initializers")
 	# Needed for ffmpeg.cc to compile cleanly on OSX (it's a (unsigned long) long story)
 	add_definitions("-D__STDC_CONSTANT_MACROS")
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
 add_executable(performous ${SOURCES} ${SDL_SOURCES})
-target_link_libraries(performous da ${LIBS})
+target_link_libraries(performous ${LIBS})
 
 # Store library paths in executable
 if(APPLE)
-	set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE INSTALL_RPATH @loader_path/../lib)
+	set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 else()
-	set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE INSTALL_RPATH \$ORIGIN/../lib)
+	set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 endif()
 
 # Generate config.hh

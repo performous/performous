@@ -5,7 +5,9 @@
 #include "fs.hh"
 #include "util.hh"
 #include "joystick.hh"
+
 #include <SDL.h>
+#include <Magick++.h>
 
 namespace {
 	unsigned s_width;
@@ -53,6 +55,30 @@ void Window::setFullscreen(bool _fs) {
 bool Window::getFullscreen() {
 	return m_fullscreen;
 }
+
+void Window::screenshot() {
+	static unsigned int count = 0;
+	unsigned width = m_fullscreen ? m_fsW : m_windowW;
+	unsigned height = m_fullscreen ? m_fsH : m_windowH;
+
+	std::vector<char> buffer(width*height*3);
+	glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, &buffer[0]);
+	Magick::Blob blob( &buffer[0], width*height*3);
+
+	Magick::Image image;
+	char geometry[16];
+	sprintf(geometry,"%dx%d",width,height);
+	image.size(geometry);
+	image.depth(8);
+	image.magick( "RGB" );
+	image.read(blob);
+	image.flip();
+	char filename[256];
+	sprintf(filename,"/tmp/performous_screenshot_%u.png",count);
+	image.write(filename);
+	count++;
+}
+
 
 void Window::resize() {
 	unsigned width = m_fullscreen ? m_fsW : m_windowW;

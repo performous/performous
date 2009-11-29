@@ -1,6 +1,13 @@
 #ifndef AUDIO_DEV_HPP_INCLUDED
 #define AUDIO_DEV_HPP_INCLUDED
 
+/**
+@file audio_dev.hpp Audio plugin interface. Not very stable yet.
+
+This requires linking with libda and the ABI is not stable yet. The API might
+also change.
+**/
+
 #include <libda/audio.hpp>
 #include <plugin++/plugin.hpp>
 

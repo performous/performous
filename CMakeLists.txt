@@ -1,14 +1,14 @@
 project(Performous CXX)
 cmake_minimum_required(VERSION 2.6)
 cmake_policy(VERSION 2.6)
-set(PROJECT_VERSION "0.4-pre5")
+set(PROJECT_VERSION "0.4.0+")
 
 # Avoid source tree pollution
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
 	message(FATAL_ERROR "In-source builds are not permitted. Make a separate folder for building:\nmkdir build; cd build; cmake ..\nBefore that, remove the files already created:\nrm -rf CMakeCache.txt CMakeFiles")
 endif(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
 
-include("${CMAKE_SOURCE_DIR}/cmake/performous-packaging.cmake")
+include(cmake/performous-packaging.cmake)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
@@ -37,6 +37,8 @@ add_subdirectory(themes)
 add_subdirectory(data)
 add_subdirectory(game)
 add_subdirectory(docs)
+
+set(LIB_SUFFIX "" CACHE STRING "Optional suffix to use on lib folders (e.g. 64 for lib64)")
 
 option(ENABLE_EDITOR "Enable experimental song editor (doesn't work)" OFF)
 

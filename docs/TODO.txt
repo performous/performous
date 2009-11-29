@@ -79,3 +79,36 @@ performous(main+0x1d30)[0x4d42c0]
 - Random segfault on program exit (very hard to reproduce)
    * Don't even need to enter songs screen, start and exit is enough.
 
+- Hang on program exit (deadlock in mixer):
+(gdb) thread 1
+[Switching to thread 1 (Thread 0x7f6f4f1aa8a0 (LWP 13792))]#0  0x00007f6f4949e5a9 in pthread_cond_wait@@GLIBC_2.3.2 () from /lib/libpthread.so.0
+(gdb) bt
+#0  0x00007f6f4949e5a9 in pthread_cond_wait@@GLIBC_2.3.2 () from /lib/libpthread.so.0
+#1  0x00007f6f4ecc7669 in boost::thread::join() () from /usr/lib/libboost_thread.so.1.40.0  // Waiting for audio thread (thread 3) to terminate
+#2  0x00007f6f3d980f09 in ~alsa_playback (this=0x218e770, __in_chrg=<value optimized out>) at /home/tronic/performous/libs/libda/plugins/audio_dev_alsa.cpp:194
+#3  0x000000000048e68d in da::mixer::~mixer() ()
+#4  0x00000000004ffad8 in Audio::~Audio() ()
+#5  0x00000000004f7e73 in mainLoop (songlist=<value optimized out>) at /home/tronic/performous/game/main.cc:179
+#6  0x00000000004f9a9d in main (argc=<value optimized out>, argv=<value optimized out>) at /home/tronic/performous/game/main.cc:290
+(gdb) thread 3
+[Switching to thread 3 (Thread 0x7f6f3c65d910 (LWP 13794))]#0  0x00007f6f494a0c34 in __lll_lock_wait () from /lib/libpthread.so.0
+(gdb) bt
+#0  0x00007f6f494a0c34 in __lll_lock_wait () from /lib/libpthread.so.0
+#1  0x00007f6f4949c2b0 in _L_lock_1022 () from /lib/libpthread.so.0
+#2  0x00007f6f4949c111 in pthread_mutex_lock () from /lib/libpthread.so.0
+#3  0x000000000048c253 in boost::unique_lock<boost::recursive_mutex>::unique_lock(boost::recursive_mutex&) ()    // Mixer lock?
+#4  0x000000000048cad5 in boost::detail::function::function_ref_invoker1<da::mutex_stream, bool, da::pcm_data&>::invoke(boost::detail::function::function_buffer&, da::pcm_data&) ()
+#5  0x000000000048bd3e in boost::function1<bool, da::pcm_data&>::operator()(da::pcm_data&) const ()
+#6  0x00007f6f3d97fddb in operator() (this=0x218e770) at /home/tronic/performous/libs/libda/plugins/audio_dev_alsa.cpp:205
+#7  0x00007f6f4ecc6db0 in thread_proxy () from /usr/lib/libboost_thread.so.1.40.0
+#8  0x00007f6f49499a04 in start_thread () from /lib/libpthread.so.0
+#9  0x00007f6f492037bd in clone () from /lib/libc.so.6
+#10 0x0000000000000000 in ?? ()
+
+- Bitmap surfaces are often loaded only partially, loading stops at a middle of a scanline.
+   * Affects at least PNG format, maybe not others
+   * The rest appears black or transparent (at least most of the time)
+   * Reloading often causes different results on the same image
+   * Different images may also stop at the exact same pixel
+   => out of memory condition or something?
+

@@ -28,7 +28,10 @@ dex7 <dex7 at users.sourceforge.net>
 	* Website layout
 
 Fabian Fingerle  <fabian at datensalat.eu>
-	* dependency testing
+	* Dependency testing
+
+Tapio Vierros <aave000 at users.sourceforge.net>
+	* Various things and features
 
 	
 INACTIVE DEVELOPERS
@@ -45,16 +48,6 @@ jEsuSdA  <info at jesusda.com>
 Tobias Gehrig <tgehrig at users.sourceforge.net>
 	* Pre-calculate FFT window patch
 
-Olli Salli <osalli at cc.hut.fi>
-	* Silky Strings glfw window management, input and graphics
-
-Ville Virkkala <vvirkkal at cc.hut.fi>
-	* Silky Strings original MIDI parser
-	* Silky Strings game logic
-	
-Tuomas Perälä <tuomas.perala at hut.fi>
-	* Silky Strings Qt-based launcher
-
 
 GUEST DEVELOPERS
 ----------------
@@ -66,7 +59,7 @@ Tryad <http://tryad.org/>
 	* The menu song (CC-by-sa)
 
 Oxetti choir <http://www.oxetti.info/>
-        * Practice background vocalization (recorded for this project)
+	* Practice background vocalization (recorded for this project)
 
 Joonas Kerttula / Frets on Fire <http://fretsonfire.sourceforge.net/>
 	* SVGs borrowed from FoF under GNU GPL :)
@@ -95,4 +88,13 @@ Ignacio Casal Quinteiro  <nacho.resa at gmail.com>
 Sylvain Henry <hsyl20 at yahoo.fr>
 	* Long sentence display patch
 
+Olli Salli <osalli at cc.hut.fi>
+	* Silky Strings glfw window management, input and graphics
+
+Ville Virkkala <vvirkkal at cc.hut.fi>
+	* Silky Strings original MIDI parser
+	* Silky Strings game logic
+	
+Tuomas Perälä <tuomas.perala at hut.fi>
+	* Silky Strings Qt-based launcher
 

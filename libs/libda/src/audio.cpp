@@ -2,6 +2,7 @@
 #include <libda/audio_dev.hpp>
 #undef BUILDING_DLL
 
+#include <libda/config.h>
 #include <plugin++/loader.hpp>
 #include <ostream>
 #include <limits>
@@ -13,7 +14,7 @@ namespace da {
 	class init_impl {
 		plugin::loader m_loader;
 	  public:
-		init_impl(): m_loader("libda") {}
+		init_impl(): m_loader(LIBDA_PLUGIN_FOLDER) {}
 	};
 
 	initialize::initialize(): m_impl(new init_impl) {}
