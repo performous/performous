@@ -1,9 +1,11 @@
 #ifndef LIBDA_CONFIG_H
 #define LIBDA_CONFIG_H
 
+// Note C versions use all-capital LIBDA, while CMake has LibDA...
+
 #define LIBDA_VERSION "@LibDA_VERSION@"
 #define LIBDA_VERSION_MAJOR @LibDA_VERSION_MAJOR@
 #define LIBDA_VERSION_MINOR @LibDA_VERSION_MINOR@
-
+#define LIBDA_PLUGIN_FOLDER "@LibDA_PLUGIN_FOLDER@"
 #endif
 
