@@ -41,6 +41,7 @@ namespace {
 		return score;
 	}
 	
+	int getNextBigStreak(int prev) { return prev + 50; }
 	inline float blend(float a, float b, float f) { return a*f + b*(1.0f-f); }
 	
 	glutil::Color starpowerColorize(glutil::Color c, float f) {
@@ -74,11 +75,13 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
   m_dead(1000),
   m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
   m_correctness(0.0, 5.0),
+  m_streakPopup(0.0, 1.0),
   m_score(),
   m_scoreFactor(),
   m_starmeter(),
   m_streak(),
-  m_longestStreak()
+  m_longestStreak(),
+  m_bigStreak()
 {
 	try {
 		m_fretObj.load(getThemePath("fret.obj"));
@@ -87,6 +90,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
 		std::cout << e.what() << std::endl;
 		m_use3d = false;
 	}
+	m_streakPopupText.reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	unsigned int sr = m_audio.getSR();
 	if (m_drums) {
 		m_samples.push_back(Sample(getPath("sounds/drum_bass.ogg"), sr));
@@ -173,7 +177,7 @@ void GuitarGraph::engine() {
 		else level = m_chordIt->status ? 1.0 : 0.0;
 		m_correctness.setTarget(level);
 	}
-	if (m_correctness.get() == 0) m_streak = 0;
+	if (m_correctness.get() == 0) endStreak();
 	if (!m_drums) {
 		// Processing holds
 		for (int fret = 0; fret < 5; ++fret) {
@@ -198,6 +202,11 @@ void GuitarGraph::engine() {
 			if (last == ev.dur->end) endHold(fret);
 		}
 	}
+	// Check if a long streak goal has been reached
+	if (m_streak >= getNextBigStreak(m_bigStreak)) {
+		m_streakPopup.setTarget(1.0);
+		m_bigStreak = getNextBigStreak(m_bigStreak);
+	}
 }
 
 void GuitarGraph::activateStarpower() {
@@ -211,6 +220,11 @@ void GuitarGraph::endHold(int fret) {
 	m_holds[fret] = 0;
 }
 
+void GuitarGraph::endStreak() {
+	m_streak = 0;
+	m_bigStreak = 0;
+}
+
 void GuitarGraph::fail(double time, int fret) {
 	std::cout << "MISS" << std::endl;
 	if (fret == -2) return; // Tapped note
@@ -218,7 +232,7 @@ void GuitarGraph::fail(double time, int fret) {
 	if (fret < 0) fret = std::rand();
 	m_audio.play(m_samples[unsigned(fret) % m_samples.size()], "audio/fail_volume");
 	if (m_starpower.get() < 0.01) m_score -= 50;
-	m_streak = 0;
+	endStreak();
 }
 
 void GuitarGraph::drumHit(double time, int fret) {
@@ -239,7 +253,7 @@ void GuitarGraph::drumHit(double time, int fret) {
 		for (; best != m_chordIt; ++m_chordIt) {
 			if (m_chordIt->status == m_chordIt->polyphony) continue;
 			std::cout << "SKIPPED, ";
-			m_streak = 0;
+			endStreak();
 		}
 		++m_chordIt->status;
 		Duration const* dur = m_chordIt->dur[fret];
@@ -481,11 +495,21 @@ void GuitarGraph::draw(double time) {
 		}
 		glTranslatef(-frac * 2.0 * offsetX, 0.0f, 0.0f);
 	}
-	
+	// Is Starpower ready?
 	if (canActivateStarpower(m_starmeter)) {
 		float a = (int(time * 1000.0) % 1000) / 1000.0;
 		m_text.dimensions.screenBottom(-0.02).middle(-0.12 + offsetX);
 		m_text.draw("Starpower Ready!", a);
+	}
+	// Draw streak pop-up for long streak intervals
+	double streakAnim = m_streakPopup.get();
+	if (streakAnim > 0.0) {
+		double s = 0.2 * (1.0 + streakAnim);
+		glColor4f(1.0f, 0.0f, 0.0f, 1.0 - streakAnim);
+		m_streakPopupText->render(boost::lexical_cast<std::string>(unsigned(m_bigStreak)) + "\nStreak!");
+		m_streakPopupText->dimensions().center(0.1).middle(0.0).stretch(s,s);
+		m_streakPopupText->draw();
+		if (streakAnim > 0.999) m_streakPopup.setTarget(0.0, true);
 	}
 	glColor3f(1.0f, 1.0f, 1.0f);
 }

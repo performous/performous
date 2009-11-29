@@ -65,6 +65,7 @@ class GuitarGraph {
 	void activateStarpower();
 	void fail(double time, int fret);
 	void endHold(int fret);
+	void endStreak();
 	Audio& m_audio;
 	input::InputDev m_input;
 	Song const& m_song;
@@ -113,6 +114,7 @@ class GuitarGraph {
 	void difficultyAuto(bool tryKeepCurrent = false);
 	bool difficulty(Difficulty level);
 	SvgTxtTheme m_text;
+	boost::scoped_ptr<SvgTxtThemeSimple> m_streakPopupText;
 	void updateChords();
 	typedef std::vector<Chord> Chords;
 	Chords m_chords;
@@ -120,10 +122,12 @@ class GuitarGraph {
 	typedef std::map<Duration const*, unsigned> NoteStatus; // Note in song to m_events[unsigned - 1] or 0 for not played
 	NoteStatus m_notes;
 	AnimValue m_correctness;
+	AnimValue m_streakPopup;
 	double m_score;
 	double m_scoreFactor;
 	double m_starmeter;
 	int m_streak;
 	int m_longestStreak;
+	int m_bigStreak;
 };
 
