@@ -40,6 +40,18 @@ namespace {
 		if (error < 0.03) score += 5;
 		return score;
 	}
+	
+	inline float blend(float a, float b, float f) { return a*f + b*(1.0f-f); }
+	
+	glutil::Color starpowerColorize(glutil::Color c, float f) {
+		static glutil::Color starpowerC(0.5f, 0.5f, 1.0f);
+		if ( f < 0.001 ) return c;
+		f = std::sqrt(std::sqrt(f));
+		c.r = blend(starpowerC.r, c.r, f);
+		c.g = blend(starpowerC.g, c.g, f);
+		c.b = blend(starpowerC.b, c.b, f);
+		return c;
+	}
 
 }
 
@@ -52,6 +64,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
   m_tap(getThemePath("tap.svg")),
   m_drums(track=="drums"),
   m_use3d(config["graphic/3d_notes"].b()),
+  m_starpower(0.0, 0.1),
   m_cx(0.0, 0.2),
   m_width(0.5, 0.4),
   m_stream(),
@@ -128,6 +141,7 @@ void GuitarGraph::engine() {
 		}
 		if (!m_drums && ev.type == input::Event::WHAMMY)
 		  whammy = (1.0 + ev.button + 2.0*(rand()/double(RAND_MAX))) / 4.0;
+		if (!m_drums && ev.type == input::Event::STARPOWER) m_starpower.setValue(1.0);
 		if (ev.type == input::Event::PRESS) m_hit[!m_drums + ev.button].setValue(1.0);
 		else if (ev.type == input::Event::PICK) m_hit[0].setValue(1.0);
 		if (time < -0.5) {
@@ -400,7 +414,8 @@ void GuitarGraph::draw(double time) {
 				texCoord -= texCoordStep * (tEnd - future) / (tEnd - tBeg);
 				tEnd = future;
 			}
-			glColor4f(1.0f, 1.0f, 1.0f, time2a(tEnd));
+			glutil::Color c(1.0f, 1.0f, 1.0f, time2a(tEnd));
+			glColor4fv(starpowerColorize(c, m_starpower.get()));
 			glNormal3f(0.0f, 1.0f, 0.0f);
 			glTexCoord2f(0.0f, texCoord); glVertex2f(-w, time2y(tEnd));
 			glNormal3f(0.0f, 1.0f, 0.0f);
@@ -415,7 +430,8 @@ void GuitarGraph::draw(double time) {
 	for (int fret = m_drums; fret < 5; ++fret) {
 		float x = -2.0f + fret - 0.5f * m_drums;
 		float l = m_hit[fret + !m_drums].get();
-		glColor4fv(color(fret));
+		glColor4fv(starpowerColorize(color(fret), m_starpower.get()));
+		//glColor4fv(c);
 		m_button.dimensions.center(time2y(0.0)).middle(x);
 		m_button.draw();
 		glColor3f(l, l, l);
@@ -440,7 +456,7 @@ void GuitarGraph::draw(double time) {
 				glow = m_events[event - 1].glow.get();
 				whammy = m_events[event - 1].whammy.get();
 			}
-			glutil::Color c = color(fret);
+			glutil::Color c = starpowerColorize(color(fret), m_starpower.get());
 			c.r += glow;
 			c.g += glow;
 			c.b += glow;
