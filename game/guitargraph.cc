@@ -207,7 +207,7 @@ void GuitarGraph::fail(double time, int fret) {
 	m_events.push_back(Event(time, 0, fret));
 	if (fret < 0) fret = std::rand();
 	m_audio.play(m_samples[unsigned(fret) % m_samples.size()], "audio/fail_volume");
-	m_score -= 50;
+	if (m_starpower.get() < 0.01) m_score -= 50;
 	m_streak = 0;
 }
 
