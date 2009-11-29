@@ -186,7 +186,9 @@ void GuitarGraph::engine() {
 			double last = std::min(time, ev.dur->end);
 			double t = last - ev.holdTime;
 			if (t > 0) {
-				m_score += t * 50.0;
+				// Minimal points for long holds unless whammy is used
+				double wfactor = (ev.dur->end - ev.dur->begin < 1.5 || ev.whammy.get() > 0.01) ? 1.0 : 0.2;
+				m_score += t * 50.0 * wfactor;
 				ev.holdTime = time;
 			}
 			if (last == ev.dur->end) endHold(fret);
