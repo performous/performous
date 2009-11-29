@@ -44,12 +44,12 @@
      bordercolor="#666666"
      pagecolor="#ffffff"
      id="base"
-     inkscape:zoom="1.74012"
-     inkscape:cx="656.35156"
-     inkscape:cy="280.59685"
+     inkscape:zoom="0.61522533"
+     inkscape:cx="532.90629"
+     inkscape:cy="358.2374"
      inkscape:window-x="0"
      inkscape:window-y="25"
-     inkscape:current-layer="g3726"
+     inkscape:current-layer="svg559"
      showgrid="false"
      showguides="true"
      inkscape:guide-bbox="true"
@@ -316,5 +316,7 @@
      height="99.733246"
      width="337.48822"
      id="rect6405"
-     style="fill:url(#linearGradient2880);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.29999995;marker:none;visibility:visible;display:inline;overflow:visible" />
+     style="fill:url(#linearGradient2880);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.29999995;marker:none;visibility:visible;display:inline;overflow:visible"
+     rx="15"
+     ry="15" />
 </svg>

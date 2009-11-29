@@ -295,5 +295,7 @@
      height="81.040909"
      width="337.48822"
      id="rect6405"
-     style="fill:url(#linearGradient2880);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.29999995;marker:none;visibility:visible;display:inline;overflow:visible" />
+     style="fill:url(#linearGradient2880);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.29999995;marker:none;visibility:visible;display:inline;overflow:visible"
+     rx="15"
+     ry="15" />
 </svg>
