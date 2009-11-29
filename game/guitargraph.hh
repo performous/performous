@@ -62,6 +62,7 @@ class GuitarGraph {
 	std::string getTrack() const { return m_track_index->first; }
 	std::string getDifficultyString() const;
   private:
+	void activateStarpower();
 	void fail(double time, int fret);
 	void endHold(int fret);
 	Audio& m_audio;
@@ -121,6 +122,7 @@ class GuitarGraph {
 	AnimValue m_correctness;
 	double m_score;
 	double m_scoreFactor;
+	double m_starmeter;
 	int m_streak;
 	int m_longestStreak;
 };

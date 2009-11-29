@@ -196,13 +196,13 @@ void SvgTxtTheme::draw(std::vector<std::string> const& _text) {
 	draw(tmp);
 }
 
-void SvgTxtTheme::draw(std::string _text) {
+void SvgTxtTheme::draw(std::string _text, float alpha) {
 	std::vector<TZoomText> tmp;
 	TZoomText t;
 	t.string = _text;
 	t.factor = 1.0;
 	tmp.push_back(t);
-	draw(tmp);
+	draw(tmp, alpha);
 }
 
 void SvgTxtTheme::draw(std::vector<TZoomText> const& _text, float alpha) {

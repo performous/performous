@@ -145,8 +145,8 @@ class SvgTxtTheme {
 	void draw(std::vector<TZoomText> const& _text, float alpha = 1.0f);
 	/// draw texts
 	void draw(std::vector<std::string> const& _text);
-	/// draw text
-	void draw(std::string _text);
+	/// draw text with alpha
+	void draw(std::string _text, float alpha = 1.0f);
 	/// sets highlight
 	void setHighlight(std::string _theme_file);
 

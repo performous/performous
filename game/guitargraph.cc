@@ -53,6 +53,7 @@ namespace {
 		return c;
 	}
 
+	bool canActivateStarpower(int meter) { return (meter > 6000);	}
 }
 
 GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
@@ -75,6 +76,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
   m_correctness(0.0, 5.0),
   m_score(),
   m_scoreFactor(),
+  m_starmeter(),
   m_streak(),
   m_longestStreak()
 {
@@ -141,7 +143,7 @@ void GuitarGraph::engine() {
 		}
 		if (!m_drums && ev.type == input::Event::WHAMMY)
 		  whammy = (1.0 + ev.button + 2.0*(rand()/double(RAND_MAX))) / 4.0;
-		if (!m_drums && ev.type == input::Event::STARPOWER) m_starpower.setValue(1.0);
+		if (!m_drums && ev.type == input::Event::STARPOWER) activateStarpower();
 		if (ev.type == input::Event::PRESS) m_hit[!m_drums + ev.button].setValue(1.0);
 		else if (ev.type == input::Event::PICK) m_hit[0].setValue(1.0);
 		if (time < -0.5) {
@@ -189,11 +191,17 @@ void GuitarGraph::engine() {
 				// Minimal points for long holds unless whammy is used
 				double wfactor = (ev.dur->end - ev.dur->begin < 1.5 || ev.whammy.get() > 0.01) ? 1.0 : 0.2;
 				m_score += t * 50.0 * wfactor;
+				// Whammy fills starmeter much faster
+				m_starmeter += t * 50 * ( (ev.whammy.get() > 0.01) ? 2.0 : 1.0 );
 				ev.holdTime = time;
 			}
 			if (last == ev.dur->end) endHold(fret);
 		}
 	}
+}
+
+void GuitarGraph::activateStarpower() {
+	if (canActivateStarpower(m_starmeter)) { m_starmeter = 0; m_starpower.setValue(1.0); }
 }
 
 void GuitarGraph::endHold(int fret) {
@@ -308,6 +316,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 		score *= m_chordIt->polyphony;
 		m_chordIt->status = 1 + picked;
 		m_score += score;
+		m_starmeter += score;
 		m_streak += 1;
 		if (m_streak > m_longestStreak) m_longestStreak = m_streak;
 		m_correctness.setTarget(1.0, true); // Instantly go to one
@@ -395,76 +404,88 @@ void GuitarGraph::draw(double time) {
 		m_text.draw(boost::lexical_cast<std::string>(unsigned(m_streak)) + "/" 
 		  + boost::lexical_cast<std::string>(unsigned(m_longestStreak)));
 	}
-	glutil::PushMatrixMode pmm(GL_PROJECTION);
-	glTranslatef(frac * 2.0 * offsetX, 0.0f, 0.0f);
-	glutil::PushMatrixMode pmb(GL_MODELVIEW);
-	glTranslatef((1.0 - frac) * offsetX, dimensions.y2(), 0.0f);
-	glRotatef(g_angle, 1.0f, 0.0f, 0.0f);
-	{ float s = dimensions.w() / 5.0f; glScalef(s, s, s); }
-	// Draw the neck
 	{
-		UseTexture tex(*m_neck);
-		glutil::Begin block(GL_TRIANGLE_STRIP);
-		float w = (m_drums ? 2.0f : 2.5f);
-		float texCoord = 0.0f;
-		float tBeg = 0.0f, tEnd;
-		for (Song::Beats::const_iterator it = m_song.beats.begin(); it != m_song.beats.end() && tBeg < future; ++it, texCoord += texCoordStep, tBeg = tEnd) {
-			tEnd = *it - time;
-			//if (tEnd < past) continue;
-			if (tEnd > future) {
-				// Crop the end off
-				texCoord -= texCoordStep * (tEnd - future) / (tEnd - tBeg);
-				tEnd = future;
+		glutil::PushMatrixMode pmm(GL_PROJECTION);
+		glTranslatef(frac * 2.0 * offsetX, 0.0f, 0.0f);
+		{
+			glutil::PushMatrixMode pmb(GL_MODELVIEW);
+			glTranslatef((1.0 - frac) * offsetX, dimensions.y2(), 0.0f);
+			glRotatef(g_angle, 1.0f, 0.0f, 0.0f);
+			{ float s = dimensions.w() / 5.0f; glScalef(s, s, s); }
+			// Draw the neck
+			{
+				UseTexture tex(*m_neck);
+				glutil::Begin block(GL_TRIANGLE_STRIP);
+				float w = (m_drums ? 2.0f : 2.5f);
+				float texCoord = 0.0f;
+				float tBeg = 0.0f, tEnd;
+				for (Song::Beats::const_iterator it = m_song.beats.begin(); it != m_song.beats.end() && tBeg < future; ++it, texCoord += texCoordStep, tBeg = tEnd) {
+					tEnd = *it - time;
+					//if (tEnd < past) continue;
+					if (tEnd > future) {
+						// Crop the end off
+						texCoord -= texCoordStep * (tEnd - future) / (tEnd - tBeg);
+						tEnd = future;
+					}
+					glutil::Color c(1.0f, 1.0f, 1.0f, time2a(tEnd));
+					glColor4fv(starpowerColorize(c, m_starpower.get()));
+					glNormal3f(0.0f, 1.0f, 0.0f);
+					glTexCoord2f(0.0f, texCoord); glVertex2f(-w, time2y(tEnd));
+					glNormal3f(0.0f, 1.0f, 0.0f);
+					glTexCoord2f(1.0f, texCoord); glVertex2f(w, time2y(tEnd));
+				}
 			}
-			glutil::Color c(1.0f, 1.0f, 1.0f, time2a(tEnd));
-			glColor4fv(starpowerColorize(c, m_starpower.get()));
-			glNormal3f(0.0f, 1.0f, 0.0f);
-			glTexCoord2f(0.0f, texCoord); glVertex2f(-w, time2y(tEnd));
-			glNormal3f(0.0f, 1.0f, 0.0f);
-			glTexCoord2f(1.0f, texCoord); glVertex2f(w, time2y(tEnd));
-		}
-	}
-	// Draw the cursor
-	float level = m_hit[0].get();
-	glColor3f(level, level, level);
-	drawBar(0.0, 0.01f);
-	// Fret buttons on cursor
-	for (int fret = m_drums; fret < 5; ++fret) {
-		float x = -2.0f + fret - 0.5f * m_drums;
-		float l = m_hit[fret + !m_drums].get();
-		glColor4fv(starpowerColorize(color(fret), m_starpower.get()));
-		//glColor4fv(c);
-		m_button.dimensions.center(time2y(0.0)).middle(x);
-		m_button.draw();
-		glColor3f(l, l, l);
-		m_tap.dimensions = m_button.dimensions;
-		m_tap.draw();
-	}
-	// Draw the notes
-	glutil::UseLighting lighting(m_use3d);
-	for (Chords::const_iterator it = m_chords.begin(); it != m_chords.end(); ++it) {
-		float tBeg = it->begin - time;
-		float tEnd = it->end - time;
-		if (tEnd < past) continue;
-		if (tBeg > future) break;
-		for (int fret = 0; fret < 5; ++fret) {
-			if (!it->fret[fret]) continue;
-			if (tEnd > future) tEnd = future;
-			//drawNote(fret, color(fret), tBeg, tEnd);
-			unsigned event = m_notes[it->dur[fret]];
-			float glow = 0.0f;
-			float whammy = 0.0f;
-			if (event > 0) {
-				glow = m_events[event - 1].glow.get();
-				whammy = m_events[event - 1].whammy.get();
+			// Draw the cursor
+			float level = m_hit[0].get();
+			glColor3f(level, level, level);
+			drawBar(0.0, 0.01f);
+			// Fret buttons on cursor
+			for (int fret = m_drums; fret < 5; ++fret) {
+				float x = -2.0f + fret - 0.5f * m_drums;
+				float l = m_hit[fret + !m_drums].get();
+				glColor4fv(starpowerColorize(color(fret), m_starpower.get()));
+				m_button.dimensions.center(time2y(0.0)).middle(x);
+				m_button.draw();
+				glColor3f(l, l, l);
+				m_tap.dimensions = m_button.dimensions;
+				m_tap.draw();
 			}
-			glutil::Color c = starpowerColorize(color(fret), m_starpower.get());
-			c.r += glow;
-			c.g += glow;
-			c.b += glow;
-			drawNote(fret, c, tBeg, tEnd, whammy, it->tappable);
-
+			// Draw the notes
+			glutil::UseLighting lighting(m_use3d);
+			for (Chords::const_iterator it = m_chords.begin(); it != m_chords.end(); ++it) {
+				float tBeg = it->begin - time;
+				float tEnd = it->end - time;
+				if (tEnd < past) continue;
+				if (tBeg > future) break;
+				for (int fret = 0; fret < 5; ++fret) {
+					if (!it->fret[fret]) continue;
+					if (tEnd > future) tEnd = future;
+					//drawNote(fret, color(fret), tBeg, tEnd);
+					unsigned event = m_notes[it->dur[fret]];
+					float glow = 0.0f;
+					float whammy = 0.0f;
+					if (event > 0) {
+						glow = m_events[event - 1].glow.get();
+						whammy = m_events[event - 1].whammy.get();
+					}
+					glutil::Color c = starpowerColorize(color(fret), m_starpower.get());
+					c.r += glow;
+					c.g += glow;
+					c.b += glow;
+					drawNote(fret, c, tBeg, tEnd, whammy, it->tappable);
+				}
+			}
+			glRotatef(-g_angle, 1.0f, 0.0f, 0.0f);
+			glTranslatef(-(1.0 - frac) * offsetX, -dimensions.y2(), 0.0f);
+			glScalef(5.0f, 5.0f, 5.0f);
 		}
+		glTranslatef(-frac * 2.0 * offsetX, 0.0f, 0.0f);
+	}
+	
+	if (canActivateStarpower(m_starmeter)) {
+		float a = (int(time * 1000.0) % 1000) / 1000.0;
+		m_text.dimensions.screenBottom(-0.02).middle(-0.12 + offsetX);
+		m_text.draw("Starpower Ready!", a);
 	}
 	glColor3f(1.0f, 1.0f, 1.0f);
 }
