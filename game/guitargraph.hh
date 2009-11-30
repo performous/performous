@@ -10,6 +10,7 @@
 #include "surface.hh"
 #include "opengl_text.hh"
 #include "3dobject.hh"
+#include "glutil.hh"
 
 class Song;
 
@@ -62,14 +63,18 @@ class GuitarGraph {
 	std::string getTrack() const { return m_track_index->first; }
 	std::string getDifficultyString() const;
   private:
+	void activateStarpower();
 	void fail(double time, int fret);
 	void endHold(int fret);
+	void endStreak();
 	Audio& m_audio;
 	input::InputDev m_input;
 	Song const& m_song;
 	Surface m_button;
 	Texture m_button_l;
 	Surface m_tap;
+	Surface m_neckglow;
+	glutil::Color m_neckglowColor;
 	Object3d m_fretObj;
 	Object3d m_tappableObj;
 	AnimValue m_hit[6];
@@ -77,6 +82,7 @@ class GuitarGraph {
 	boost::scoped_ptr<Texture> m_neck;
 	bool m_drums;
 	bool m_use3d;
+	AnimValue m_starpower;
 	AnimValue m_cx, m_width;
 	std::size_t m_stream;
 	TrackMapConstPtr m_track_map;
@@ -111,6 +117,7 @@ class GuitarGraph {
 	void difficultyAuto(bool tryKeepCurrent = false);
 	bool difficulty(Difficulty level);
 	SvgTxtTheme m_text;
+	boost::scoped_ptr<SvgTxtThemeSimple> m_streakPopupText;
 	void updateChords();
 	typedef std::vector<Chord> Chords;
 	Chords m_chords;
@@ -118,9 +125,12 @@ class GuitarGraph {
 	typedef std::map<Duration const*, unsigned> NoteStatus; // Note in song to m_events[unsigned - 1] or 0 for not played
 	NoteStatus m_notes;
 	AnimValue m_correctness;
+	AnimValue m_streakPopup;
 	double m_score;
 	double m_scoreFactor;
+	double m_starmeter;
 	int m_streak;
 	int m_longestStreak;
+	int m_bigStreak;
 };
 

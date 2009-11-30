@@ -19,6 +19,7 @@ namespace input {
 	enum DevType { GUITAR, DRUMS };
 
 	static const std::size_t BUTTONS = 6;
+	static const std::size_t STARPOWER_BUTTON = BUTTONS - 1;
 
 	struct Event {
 		enum Type { PRESS, RELEASE, PICK, WHAMMY };

@@ -1,12 +1,11 @@
 set(CPACK_PACKAGE_NAME "${CMAKE_PROJECT_NAME}")
 set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A karaoke game with pitch detection and scoring, similar to Singstar games. Previously known as UltraStar-NG. Supports songs in Ultrastar format.")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A karaoke and band game where one or more players perform a song and the game scores their performances. Supports songs in UltraStar and Frets on Fire formats. Microphones and instruments from SingStar, Guitar Hero and Rock Band are autodetected.")
 set(CPACK_PACKAGE_CONTACT "http://performous.org/")
 set(CPACK_SOURCE_IGNORE_FILES
    "/.cvsignore"
    "/.gitignore"
    "/songs/"
-   "/libs/"
    "/build/"
    "/.svn/"
    "/.git/"
@@ -61,7 +60,7 @@ if(UNIX)
 			set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsdl1.2debian, libcairo2, librsvg2-2, libboost-thread1.35.0, libboost-program-options1.35.0, libboost-regex1.35.0, libboost-filesystem1.35.0, libboost-date-time1.35.0, libavcodec52, libavformat52, libswscale0, libmagick++1, libxml++2.6-2, libglew1.5")
 		endif("${LSB_DISTRIB}" MATCHES "Ubuntu9.04")
 		if("${LSB_DISTRIB}" MATCHES "Ubuntu9.10")
-			set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsdl1.2debian, libcairo2, librsvg2-2, libboost-thread1.38.0, libboost-program-options1.38.0, libboost-regex1.38.0, libboost-filesystem1.38.0, libboost-date-time1.38.0, libavcodec52, libavformat52, libswscale0, libmagick++1, libxml++2.6-2, libglew1.5")
+			set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsdl1.2debian, libcairo2, librsvg2-2, libboost-thread1.38.0, libboost-program-options1.38.0, libboost-regex1.38.0, libboost-filesystem1.38.0, libboost-date-time1.38.0, libavcodec52, libavformat52, libswscale0, libmagick++2, libxml++2.6-2, libglew1.5")
 		endif("${LSB_DISTRIB}" MATCHES "Ubuntu9.10")
 		if("${LSB_DISTRIB}" MATCHES "Debian5.*")
 			set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsdl1.2debian, libcairo2, librsvg2-2, libboost-dev, libavcodec51, libavformat52, libswscale0, libmagick++10, libxml++2.6-2, libglew1.5")

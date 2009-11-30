@@ -33,6 +33,8 @@ class Window {
 	void setFullscreen(bool _fs);
 	/// gets fullscreen state
 	bool getFullscreen();
+	/// take a screenshot
+	void screenshot();
 
   private:
 	SDL_Surface* screen;

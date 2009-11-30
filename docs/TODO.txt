@@ -105,3 +105,10 @@ performous(main+0x1d30)[0x4d42c0]
 #9  0x00007f6f492037bd in clone () from /lib/libc.so.6
 #10 0x0000000000000000 in ?? ()
 
+- Bitmap surfaces are often loaded only partially, loading stops at a middle of a scanline.
+   * Affects at least PNG format, maybe not others
+   * The rest appears black or transparent (at least most of the time)
+   * Reloading often causes different results on the same image
+   * Different images may also stop at the exact same pixel
+   => out of memory condition or something?
+

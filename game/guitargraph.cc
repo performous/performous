@@ -40,7 +40,21 @@ namespace {
 		if (error < 0.03) score += 5;
 		return score;
 	}
+	
+	int getNextBigStreak(int prev) { return prev + 50; }
+	inline float blend(float a, float b, float f) { return a*f + b*(1.0f-f); }
+	
+	glutil::Color starpowerColorize(glutil::Color c, float f) {
+		static glutil::Color starpowerC(0.5f, 0.5f, 1.0f);
+		if ( f < 0.001 ) return c;
+		f = std::sqrt(std::sqrt(f));
+		c.r = blend(starpowerC.r, c.r, f);
+		c.g = blend(starpowerC.g, c.g, f);
+		c.b = blend(starpowerC.b, c.b, f);
+		return c;
+	}
 
+	bool canActivateStarpower(int meter) { return (meter > 6000);	}
 }
 
 GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
@@ -50,8 +64,11 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
   m_button(getThemePath("button.svg")),
   m_button_l(getThemePath("button_l.svg")),
   m_tap(getThemePath("tap.svg")),
+  m_neckglow(getThemePath("neck_glow.svg")),
+  m_neckglowColor(),
   m_drums(track=="drums"),
   m_use3d(config["graphic/3d_notes"].b()),
+  m_starpower(0.0, 0.1),
   m_cx(0.0, 0.2),
   m_width(0.5, 0.4),
   m_stream(),
@@ -60,10 +77,13 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
   m_dead(1000),
   m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
   m_correctness(0.0, 5.0),
+  m_streakPopup(0.0, 1.0),
   m_score(),
   m_scoreFactor(),
+  m_starmeter(),
   m_streak(),
-  m_longestStreak()
+  m_longestStreak(),
+  m_bigStreak()
 {
 	try {
 		m_fretObj.load(getThemePath("fret.obj"));
@@ -72,6 +92,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
 		std::cout << e.what() << std::endl;
 		m_use3d = false;
 	}
+	m_streakPopupText.reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	unsigned int sr = m_audio.getSR();
 	if (m_drums) {
 		m_samples.push_back(Sample(getPath("sounds/drum_bass.ogg"), sr));
@@ -123,11 +144,14 @@ void GuitarGraph::engine() {
 	// Handle all events
 	for (input::Event ev; m_input.tryPoll(ev);) {
 		m_dead = false;
-		if (!m_drums && ev.type == input::Event::RELEASE) {
-			endHold(ev.button);
+		if (!m_drums) {
+			if ((ev.type == input::Event::PRESS || ev.type == input::Event::RELEASE) && ev.button == input::STARPOWER_BUTTON) {
+				if (ev.type == input::Event::PRESS) activateStarpower();
+				continue;
+			}
+			if (ev.type == input::Event::RELEASE) endHold(ev.button);
+			if (ev.type == input::Event::WHAMMY) whammy = (1.0 + ev.button + 2.0*(rand()/double(RAND_MAX))) / 4.0;
 		}
-		if (!m_drums && ev.type == input::Event::WHAMMY)
-		  whammy = (1.0 + ev.button + 2.0*(rand()/double(RAND_MAX))) / 4.0;
 		if (ev.type == input::Event::PRESS) m_hit[!m_drums + ev.button].setValue(1.0);
 		else if (ev.type == input::Event::PICK) m_hit[0].setValue(1.0);
 		if (time < -0.5) {
@@ -157,7 +181,7 @@ void GuitarGraph::engine() {
 		else level = m_chordIt->status ? 1.0 : 0.0;
 		m_correctness.setTarget(level);
 	}
-	if (m_correctness.get() == 0) m_streak = 0;
+	if (m_correctness.get() == 0) endStreak();
 	if (!m_drums) {
 		// Processing holds
 		for (int fret = 0; fret < 5; ++fret) {
@@ -172,12 +196,26 @@ void GuitarGraph::engine() {
 			double last = std::min(time, ev.dur->end);
 			double t = last - ev.holdTime;
 			if (t > 0) {
-				m_score += t * 50.0;
+				// Minimal points for long holds unless whammy is used
+				double wfactor = (ev.dur->end - ev.dur->begin < 1.5 || ev.whammy.get() > 0.01
+				  || m_starpower.get() > 0.01) ? 1.0 : 0.2;
+				m_score += t * 50.0 * wfactor;
+				// Whammy fills starmeter much faster
+				m_starmeter += t * 50 * ( (ev.whammy.get() > 0.01) ? 2.0 : 1.0 );
 				ev.holdTime = time;
 			}
 			if (last == ev.dur->end) endHold(fret);
 		}
 	}
+	// Check if a long streak goal has been reached
+	if (m_streak >= getNextBigStreak(m_bigStreak)) {
+		m_streakPopup.setTarget(1.0);
+		m_bigStreak = getNextBigStreak(m_bigStreak);
+	}
+}
+
+void GuitarGraph::activateStarpower() {
+	if (canActivateStarpower(m_starmeter)) { m_starmeter = 0; m_starpower.setValue(1.0); }
 }
 
 void GuitarGraph::endHold(int fret) {
@@ -187,14 +225,21 @@ void GuitarGraph::endHold(int fret) {
 	m_holds[fret] = 0;
 }
 
+void GuitarGraph::endStreak() {
+	m_streak = 0;
+	m_bigStreak = 0;
+}
+
 void GuitarGraph::fail(double time, int fret) {
 	std::cout << "MISS" << std::endl;
 	if (fret == -2) return; // Tapped note
-	m_events.push_back(Event(time, 0, fret));
-	if (fret < 0) fret = std::rand();
-	m_audio.play(m_samples[unsigned(fret) % m_samples.size()], "audio/fail_volume");
-	m_score -= 50;
-	m_streak = 0;
+	if (m_starpower.get() < 0.01) {
+		m_events.push_back(Event(time, 0, fret));
+		if (fret < 0) fret = std::rand();
+		m_audio.play(m_samples[unsigned(fret) % m_samples.size()], "audio/fail_volume");
+		m_score -= 50;
+	}
+	endStreak();
 }
 
 void GuitarGraph::drumHit(double time, int fret) {
@@ -215,7 +260,7 @@ void GuitarGraph::drumHit(double time, int fret) {
 		for (; best != m_chordIt; ++m_chordIt) {
 			if (m_chordIt->status == m_chordIt->polyphony) continue;
 			std::cout << "SKIPPED, ";
-			m_streak = 0;
+			endStreak();
 		}
 		++m_chordIt->status;
 		Duration const* dur = m_chordIt->dur[fret];
@@ -292,6 +337,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 		score *= m_chordIt->polyphony;
 		m_chordIt->status = 1 + picked;
 		m_score += score;
+		m_starmeter += score;
 		m_streak += 1;
 		if (m_streak > m_longestStreak) m_longestStreak = m_streak;
 		m_correctness.setTarget(1.0, true); // Instantly go to one
@@ -379,92 +425,119 @@ void GuitarGraph::draw(double time) {
 		m_text.draw(boost::lexical_cast<std::string>(unsigned(m_streak)) + "/" 
 		  + boost::lexical_cast<std::string>(unsigned(m_longestStreak)));
 	}
-	glutil::PushMatrixMode pmm(GL_PROJECTION);
-	glTranslatef(frac * 2.0 * offsetX, 0.0f, 0.0f);
-	glutil::PushMatrixMode pmb(GL_MODELVIEW);
-	glTranslatef((1.0 - frac) * offsetX, dimensions.y2(), 0.0f);
-	glRotatef(g_angle, 1.0f, 0.0f, 0.0f);
-	{ float s = dimensions.w() / 5.0f; glScalef(s, s, s); }
-	// Draw the neck
+	float ng_r = 0, ng_g = 0, ng_b = 0; // neck glow color components
+	int ng_ccnt = 0; // neck glow color count
 	{
-		UseTexture tex(*m_neck);
-		glutil::Begin block(GL_TRIANGLE_STRIP);
-		float w = (m_drums ? 2.0f : 2.5f);
-		float texCoord = 0.0f;
-		float tBeg = 0.0f, tEnd;
-		for (Song::Beats::const_iterator it = m_song.beats.begin(); it != m_song.beats.end() && tBeg < future; ++it, texCoord += texCoordStep, tBeg = tEnd) {
-			tEnd = *it - time;
-			//if (tEnd < past) continue;
-			if (tEnd > future) {
-				// Crop the end off
-				texCoord -= texCoordStep * (tEnd - future) / (tEnd - tBeg);
-				tEnd = future;
+		glutil::PushMatrixMode pmm(GL_PROJECTION);
+		glTranslatef(frac * 2.0 * offsetX, 0.0f, 0.0f);
+		{
+			glutil::PushMatrixMode pmb(GL_MODELVIEW);
+			glTranslatef((1.0 - frac) * offsetX, dimensions.y2(), 0.0f);
+			glRotatef(g_angle, 1.0f, 0.0f, 0.0f);
+			{ float s = dimensions.w() / 5.0f; glScalef(s, s, s); }
+			// Draw the neck
+			{
+				UseTexture tex(*m_neck);
+				glutil::Begin block(GL_TRIANGLE_STRIP);
+				float w = (m_drums ? 2.0f : 2.5f);
+				float texCoord = 0.0f;
+				float tBeg = 0.0f, tEnd;
+				for (Song::Beats::const_iterator it = m_song.beats.begin(); it != m_song.beats.end() && tBeg < future; ++it, texCoord += texCoordStep, tBeg = tEnd) {
+					tEnd = *it - time;
+					//if (tEnd < past) continue;
+					if (tEnd > future) {
+						// Crop the end off
+						texCoord -= texCoordStep * (tEnd - future) / (tEnd - tBeg);
+						tEnd = future;
+					}
+					glutil::Color c(1.0f, 1.0f, 1.0f, time2a(tEnd));
+					glColor4fv(starpowerColorize(c, m_starpower.get()));
+					glNormal3f(0.0f, 1.0f, 0.0f);
+					glTexCoord2f(0.0f, texCoord); glVertex2f(-w, time2y(tEnd));
+					glNormal3f(0.0f, 1.0f, 0.0f);
+					glTexCoord2f(1.0f, texCoord); glVertex2f(w, time2y(tEnd));
+				}
 			}
-			glColor4f(1.0f, 1.0f, 1.0f, time2a(tEnd));
-			glNormal3f(0.0f, 1.0f, 0.0f);
-			glTexCoord2f(0.0f, texCoord); glVertex2f(-w, time2y(tEnd));
-			glNormal3f(0.0f, 1.0f, 0.0f);
-			glTexCoord2f(1.0f, texCoord); glVertex2f(w, time2y(tEnd));
-		}
-	}
-	// Draw the notes
-	glutil::UseLighting lighting(m_use3d);
-	for (Chords::const_iterator it = m_chords.begin(); it != m_chords.end(); ++it) {
-		float tBeg = it->begin - time;
-		float tEnd = it->end - time;
-		if (tEnd < past) continue;
-		if (tBeg > future) break;
-		for (int fret = 0; fret < 5; ++fret) {
-			if (!it->fret[fret]) continue;
-			if (tEnd > future) tEnd = future;
-			//drawNote(fret, color(fret), tBeg, tEnd);
-			unsigned event = m_notes[it->dur[fret]];
-			float glow = 0.0f;
-			float whammy = 0.0f;
-			if (event > 0) {
-				glow = m_events[event - 1].glow.get();
-				whammy = m_events[event - 1].whammy.get();
-			}
-			/*
-			if (glow > 0.0f) {
-				glBlendFunc(GL_ONE, GL_ONE);
-				drawNote(fret, glutil::Color(glow, glow, glow), tBeg, tEnd);
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			}
-			*/
-			glutil::Color c = color(fret);
-			c.r += glow;
-			c.g += glow;
-			c.b += glow;
-			drawNote(fret, c, tBeg, tEnd, whammy, it->tappable);
-
-			if (!m_use3d && it->tappable) {
-				float l = std::max(0.5, m_correctness.get());
+			// Draw the cursor
+			float level = m_hit[0].get();
+			glColor3f(level, level, level);
+			drawBar(0.0, 0.01f);
+			// Fret buttons on cursor
+			for (int fret = m_drums; fret < 5; ++fret) {
+				float x = -2.0f + fret - 0.5f * m_drums;
+				float l = m_hit[fret + !m_drums].get();
+				glColor4fv(starpowerColorize(color(fret), m_starpower.get()));
+				m_button.dimensions.center(time2y(0.0)).middle(x);
+				m_button.draw();
 				glColor3f(l, l, l);
-				float x = -2.0f + fret;
-				m_tap.dimensions.center(time2y(tBeg)).middle(x);
+				m_tap.dimensions = m_button.dimensions;
 				m_tap.draw();
 			}
+			// Draw the notes
+			glutil::UseLighting lighting(m_use3d);
+			for (Chords::const_iterator it = m_chords.begin(); it != m_chords.end(); ++it) {
+				float tBeg = it->begin - time;
+				float tEnd = it->end - time;
+				if (tEnd < past) continue;
+				if (tBeg > future) break;
+				for (int fret = 0; fret < 5; ++fret) {
+					if (!it->fret[fret]) continue;
+					if (tEnd > future) tEnd = future;
+					//drawNote(fret, color(fret), tBeg, tEnd);
+					unsigned event = m_notes[it->dur[fret]];
+					float glow = 0.0f;
+					float whammy = 0.0f;
+					if (event > 0) {
+						glow = m_events[event - 1].glow.get();
+						whammy = m_events[event - 1].whammy.get();
+					}
+					glutil::Color c = starpowerColorize(color(fret), m_starpower.get());
+					if (glow > 0.1f) { ng_r+=c.r; ng_g+=c.g; ng_b+=c.b; ng_ccnt++; } // neck glow
+					c.r += glow;
+					c.g += glow;
+					c.b += glow;
+					drawNote(fret, c, tBeg, tEnd, whammy, it->tappable);
+				}
+			}
+			glRotatef(-g_angle, 1.0f, 0.0f, 0.0f);
+			glTranslatef(-(1.0 - frac) * offsetX, -dimensions.y2(), 0.0f);
+			glScalef(5.0f, 5.0f, 5.0f);
 		}
+		glTranslatef(-frac * 2.0 * offsetX, 0.0f, 0.0f);
 	}
-	// Draw the cursor
-	float level = m_hit[0].get();
-	glColor3f(level, level, level);
-	drawBar(0.0, 0.01f);
-	// Fret buttons on cursor
-	for (int fret = m_drums; fret < 5; ++fret) {
-		float x = -2.0f + fret - 0.5f * m_drums;
-		float l = m_hit[fret + !m_drums].get();
-		glColor4fv(color(fret));
-		if (m_use3d) {
-			m_fretObj.draw(x, time2y(0.0), (1.0-l)/8.0);
+	// Bottom neck glow
+	if (ng_ccnt > 0) {
+		if (m_neckglowColor.r > 0 || m_neckglowColor.g > 0 || m_neckglowColor.b > 0) {
+			m_neckglowColor.r = blend(m_neckglowColor.r, ng_r / ng_ccnt, 0.95);
+			m_neckglowColor.g = blend(m_neckglowColor.g, ng_g / ng_ccnt, 0.95);
+			m_neckglowColor.b = blend(m_neckglowColor.b, ng_b / ng_ccnt, 0.95);
 		} else {
-			m_button.dimensions.center(time2y(0.0)).middle(x);
-			m_button.draw();
-			glColor3f(l, l, l);
-			m_tap.dimensions = m_button.dimensions;
-			m_tap.draw();
+			m_neckglowColor.r = ng_r / ng_ccnt;
+			m_neckglowColor.g = ng_g / ng_ccnt;
+			m_neckglowColor.b = ng_b / ng_ccnt;
 		}
+		m_neckglowColor.a = correctness();
+	}
+	if (correctness() > 0) {
+		glColor4fv(m_neckglowColor);
+		m_neckglow.dimensions.screenBottom(0.0).middle(offsetX).fixedWidth(m_width.get());
+		m_neckglow.draw();
+	}
+	// Is Starpower ready?
+	if (canActivateStarpower(m_starmeter)) {
+		float a = (int(time * 1000.0) % 1000) / 1000.0;
+		m_text.dimensions.screenBottom(-0.02).middle(-0.12 + offsetX);
+		m_text.draw("Starpower Ready!", a);
+	}
+	// Draw streak pop-up for long streak intervals
+	double streakAnim = m_streakPopup.get();
+	if (streakAnim > 0.0) {
+		double s = 0.2 * (1.0 + streakAnim);
+		glColor4f(1.0f, 0.0f, 0.0f, 1.0 - streakAnim);
+		m_streakPopupText->render(boost::lexical_cast<std::string>(unsigned(m_bigStreak)) + "\nStreak!");
+		m_streakPopupText->dimensions().center(0.1).middle(0.0).stretch(s,s);
+		m_streakPopupText->draw();
+		if (streakAnim > 0.999) m_streakPopup.setTarget(0.0, true);
 	}
 	glColor3f(1.0f, 1.0f, 1.0f);
 }
@@ -479,8 +552,6 @@ namespace {
 }
 
 void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, float whammy, bool tappable) {
-	Object3d* obj = &m_fretObj;
-	if (tappable) obj = &m_tappableObj;
 	float x = -2.0f + fret;
 	if (m_drums) x -= 0.5f;
 	if (m_drums && fret == 0) {
@@ -497,9 +568,8 @@ void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, fl
 		if (m_use3d) {
 			y -= fretWid;
 			c.a = clamp(time2a(tBeg)*2.0f,0.0f,1.0f);
-			if (tappable && m_correctness.get() < .99) { c.r *= 0.5f; c.g *= 0.5f; c.b *= 0.5f; }
 			glColor4fv(c);
-			obj->draw(x, y, 0.0f);
+			m_fretObj.draw(x, y, 0.0f);
 			y -= fretWid;
 		} else {
 			UseTexture tblock(m_button_l);
@@ -530,11 +600,22 @@ void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, fl
 		// Too short note: only render the ring
 		if (m_use3d) {
 			c.a = clamp(time2a(tBeg)*2.0f,0.0f,1.0f); glColor4fv(c);
-			obj->draw(x, time2y(tBeg), 0.0f);
+			m_fretObj.draw(x, time2y(tBeg), 0.0f);
 		} else {
 			c.a = time2a(tBeg); glColor4fv(c);
 			m_button.dimensions.center(time2y(tBeg)).middle(x);
 			m_button.draw();
+		}
+	}
+	if (tappable) {
+		float l = std::max(0.3, m_correctness.get());
+		if (m_use3d) {
+			glColor3f(l, l, l);
+			m_tappableObj.draw(x, yBeg, 0.0f);
+		} else {
+			glColor3f(l, l, l);
+			m_tap.dimensions.center(yBeg).middle(x);
+			m_tap.draw();
 		}
 	}
 }

@@ -2,10 +2,14 @@
 
 #if defined _WIN32 || defined __CYGWIN__
 
+// A hack to allow static library build (for now) -Tronic
+#define DLL_PUBLIC
+#if 0
 #ifdef BUILDING_DLL
 #define DLL_PUBLIC __declspec(dllexport)
 #else
 #define DLL_PUBLIC __declspec(dllimport)
+#endif
 #endif
 
 #else

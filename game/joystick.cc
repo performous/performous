@@ -27,9 +27,9 @@ static const unsigned SDL_BUTTONS = 6;
 
 int buttonFromSDL(input::Private::Type _type, unsigned int _sdl_button) {
 	static const int inputmap[4][SDL_BUTTONS] = {
-		//G  R  Y  B  O       // for guitars
-		{ 2, 0, 1, 3, 4, -1 }, // Guitar Hero guitar
-		{ 3, 0, 1, 2, 4, -1 }, // Rock Band guitar
+		//G  R  Y  B  O  S    // for guitars (S=starpower)
+		{ 2, 0, 1, 3, 4, 5 }, // Guitar Hero guitar
+		{ 3, 0, 1, 2, 4, 5 }, // Rock Band guitar
 		//K  R  Y  B  G  O    // for drums
 		{ 3, 4, 1, 2, 0, 4 }, // Guitar Hero drums
 		{ 3, 4, 1, 2, 0, -1 }  // Rock Band drums
@@ -215,6 +215,8 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 					}
 					devices[joy_id].addEvent(event);
 					return true;
+				case SDLK_F6: case SDLK_6:
+					button++;
 				case SDLK_F5: case SDLK_5:
 					button++;
 				case SDLK_F4: case SDLK_4:
@@ -254,6 +256,8 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 					}
 					devices[joy_id].addEvent(event);
 					return true;
+				case SDLK_F6: case SDLK_6:
+					button++;
 				case SDLK_F5: case SDLK_5:
 					button++;
 				case SDLK_F4: case SDLK_4:
