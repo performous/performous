@@ -142,12 +142,14 @@ void GuitarGraph::engine() {
 	// Handle all events
 	for (input::Event ev; m_input.tryPoll(ev);) {
 		m_dead = false;
-		if (!m_drums && ev.type == input::Event::RELEASE) {
-			endHold(ev.button);
+		if (!m_drums) {
+			if ((ev.type == input::Event::PRESS || ev.type == input::Event::RELEASE) && ev.button == input::STARPOWER_BUTTON) {
+				if (ev.type == input::Event::PRESS) activateStarpower();
+				continue;
+			}
+			if (ev.type == input::Event::RELEASE) endHold(ev.button);
+			if (ev.type == input::Event::WHAMMY) whammy = (1.0 + ev.button + 2.0*(rand()/double(RAND_MAX))) / 4.0;
 		}
-		if (!m_drums && ev.type == input::Event::WHAMMY)
-		  whammy = (1.0 + ev.button + 2.0*(rand()/double(RAND_MAX))) / 4.0;
-		if (!m_drums && ev.type == input::Event::STARPOWER) activateStarpower();
 		if (ev.type == input::Event::PRESS) m_hit[!m_drums + ev.button].setValue(1.0);
 		else if (ev.type == input::Event::PICK) m_hit[0].setValue(1.0);
 		if (time < -0.5) {

@@ -215,14 +215,8 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 					}
 					devices[joy_id].addEvent(event);
 					return true;
-				case SDLK_F6:
-					event.type = input::Event::STARPOWER;
-					event.button = 1;
-					for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
-						event.pressed[i] = devices[joy_id].pressed(i);
-					}
-					devices[joy_id].addEvent(event);
-					return true;
+				case SDLK_F6: case SDLK_6:
+					button++;
 				case SDLK_F5: case SDLK_5:
 					button++;
 				case SDLK_F4: case SDLK_4:
@@ -262,14 +256,8 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 					}
 					devices[joy_id].addEvent(event);
 					return true;
-				case SDLK_F6:
-					event.type = input::Event::STARPOWER;
-					event.button = 0;
-					for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
-						event.pressed[i] = devices[joy_id].pressed(i);
-					}
-					devices[joy_id].addEvent(event);
-					return true;
+				case SDLK_F6: case SDLK_6:
+					button++;
 				case SDLK_F5: case SDLK_5:
 					button++;
 				case SDLK_F4: case SDLK_4:
@@ -334,14 +322,10 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 			if(!devices[joy_id].assigned()) return false;
 			button = buttonFromSDL(devices[joy_id].type(),_e.jbutton.button);
 			if( button == -1 ) return false;
-			if( button == 5) {
-				event.type = input::Event::STARPOWER;
-			} else {
-				for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
-					event.pressed[i] = devices[joy_id].pressed(i);
-				}
-				event.type = input::Event::PRESS;
+			for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
+				event.pressed[i] = devices[joy_id].pressed(i);
 			}
+			event.type = input::Event::PRESS;
 			event.button = button;
 			event.pressed[button] = true;
 			devices[joy_id].addEvent(event);
@@ -351,12 +335,10 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 			if(!devices[joy_id].assigned()) return false;
 			button = buttonFromSDL(devices[joy_id].type(),_e.jbutton.button);
 			if( button == -1 ) return false;
-			if( button != 5) {
-				for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
-					event.pressed[i] = devices[joy_id].pressed(i);
-				}
-				event.type = input::Event::RELEASE;
+			for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
+				event.pressed[i] = devices[joy_id].pressed(i);
 			}
+			event.type = input::Event::RELEASE;
 			event.button = button;
 			event.pressed[button] = false;
 			devices[joy_id].addEvent(event);
