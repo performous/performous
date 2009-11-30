@@ -193,7 +193,8 @@ void GuitarGraph::engine() {
 			double t = last - ev.holdTime;
 			if (t > 0) {
 				// Minimal points for long holds unless whammy is used
-				double wfactor = (ev.dur->end - ev.dur->begin < 1.5 || ev.whammy.get() > 0.01) ? 1.0 : 0.2;
+				double wfactor = (ev.dur->end - ev.dur->begin < 1.5 || ev.whammy.get() > 0.01
+				  || m_starpower.get() > 0.01) ? 1.0 : 0.2;
 				m_score += t * 50.0 * wfactor;
 				// Whammy fills starmeter much faster
 				m_starmeter += t * 50 * ( (ev.whammy.get() > 0.01) ? 2.0 : 1.0 );
@@ -228,10 +229,12 @@ void GuitarGraph::endStreak() {
 void GuitarGraph::fail(double time, int fret) {
 	std::cout << "MISS" << std::endl;
 	if (fret == -2) return; // Tapped note
-	m_events.push_back(Event(time, 0, fret));
-	if (fret < 0) fret = std::rand();
-	m_audio.play(m_samples[unsigned(fret) % m_samples.size()], "audio/fail_volume");
-	if (m_starpower.get() < 0.01) m_score -= 50;
+	if (m_starpower.get() < 0.01) {
+		m_events.push_back(Event(time, 0, fret));
+		if (fret < 0) fret = std::rand();
+		m_audio.play(m_samples[unsigned(fret) % m_samples.size()], "audio/fail_volume");
+		m_score -= 50;
+	}
 	endStreak();
 }
 
