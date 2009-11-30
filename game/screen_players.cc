@@ -102,7 +102,7 @@ void ScreenPlayers::draw() {
 	std::string music, songbg, video;
 	double videoGap = 0.0;
 	std::ostringstream oss_song, oss_order;
-	// Test if there are no songs
+	// Test if there are no players currently selected
 	if (m_players.empty()) {
 		// Format the song information text
 		if (m_search.text.empty()) {
@@ -118,8 +118,9 @@ void ScreenPlayers::draw() {
 		oss_song << m_database.scores.front().track << "\n";
 		oss_song << "You reached " << m_database.scores.front().score << " points!";
 		oss_order << "Please enter your Name!\n"
-			<< "Name: " << m_players.current().name << '\n'
-			<< "Search Text: "
+			<< "Name: " << m_players.current().name << '\n';
+		m_database.queryPerPlayerHiscore(oss_order);
+		oss_order << "\nSearch Text: "
 			<< (m_search.text.empty() ? std::string("please enter") : m_search.text)
 			<< '\n';
 		double spos = m_players.currentPosition(); // This needs to be polled to run the animation
