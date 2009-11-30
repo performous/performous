@@ -10,6 +10,7 @@
 #include "surface.hh"
 #include "opengl_text.hh"
 #include "3dobject.hh"
+#include "glutil.hh"
 
 class Song;
 
@@ -72,6 +73,8 @@ class GuitarGraph {
 	Surface m_button;
 	Texture m_button_l;
 	Surface m_tap;
+	Surface m_neckglow;
+	glutil::Color m_neckglowColor;
 	Object3d m_fretObj;
 	Object3d m_tappableObj;
 	AnimValue m_hit[6];

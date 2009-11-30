@@ -64,6 +64,8 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
   m_button(getThemePath("button.svg")),
   m_button_l(getThemePath("button_l.svg")),
   m_tap(getThemePath("tap.svg")),
+  m_neckglow(getThemePath("neck_glow.svg")),
+  m_neckglowColor(),
   m_drums(track=="drums"),
   m_use3d(config["graphic/3d_notes"].b()),
   m_starpower(0.0, 0.1),
@@ -423,6 +425,8 @@ void GuitarGraph::draw(double time) {
 		m_text.draw(boost::lexical_cast<std::string>(unsigned(m_streak)) + "/" 
 		  + boost::lexical_cast<std::string>(unsigned(m_longestStreak)));
 	}
+	float ng_r = 0, ng_g = 0, ng_b = 0; // neck glow color components
+	int ng_ccnt = 0; // neck glow color count
 	{
 		glutil::PushMatrixMode pmm(GL_PROJECTION);
 		glTranslatef(frac * 2.0 * offsetX, 0.0f, 0.0f);
@@ -488,6 +492,7 @@ void GuitarGraph::draw(double time) {
 						whammy = m_events[event - 1].whammy.get();
 					}
 					glutil::Color c = starpowerColorize(color(fret), m_starpower.get());
+					if (glow > 0.1f) { ng_r+=c.r; ng_g+=c.g; ng_b+=c.b; ng_ccnt++; } // neck glow
 					c.r += glow;
 					c.g += glow;
 					c.b += glow;
@@ -499,6 +504,24 @@ void GuitarGraph::draw(double time) {
 			glScalef(5.0f, 5.0f, 5.0f);
 		}
 		glTranslatef(-frac * 2.0 * offsetX, 0.0f, 0.0f);
+	}
+	// Bottom neck glow
+	if (ng_ccnt > 0) {
+		if (m_neckglowColor.r > 0 || m_neckglowColor.g > 0 || m_neckglowColor.b > 0) {
+			m_neckglowColor.r = blend(m_neckglowColor.r, ng_r / ng_ccnt, 0.95);
+			m_neckglowColor.g = blend(m_neckglowColor.g, ng_g / ng_ccnt, 0.95);
+			m_neckglowColor.b = blend(m_neckglowColor.b, ng_b / ng_ccnt, 0.95);
+		} else {
+			m_neckglowColor.r = ng_r / ng_ccnt;
+			m_neckglowColor.g = ng_g / ng_ccnt;
+			m_neckglowColor.b = ng_b / ng_ccnt;
+		}
+		m_neckglowColor.a = correctness();
+	}
+	if (correctness() > 0) {
+		glColor4fv(m_neckglowColor);
+		m_neckglow.dimensions.screenBottom(0.0).middle(offsetX).fixedWidth(m_width.get());
+		m_neckglow.draw();
 	}
 	// Is Starpower ready?
 	if (canActivateStarpower(m_starmeter)) {
