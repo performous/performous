@@ -16,6 +16,8 @@ Ex: A5- => SDL axis 4 with negative value
  START:       B10
  SELECT:      B9
  PS3:         B13
+ STAR POWER:  N/A?
+ MIC SWITCH:  N/A?
  DOWN:        A6+
  UP:          A6-
  LEFT:        A5-
@@ -60,6 +62,8 @@ Ex: A5- => SDL axis 4 with negative value
  START:       B10
  SELECT:      B9
  PS3:         B13
+ STAR POWER:  B5
+ MIC SWITCH:  A4
  DOWN:        A6+
  UP:          A6-
  LEFT:        A5-
