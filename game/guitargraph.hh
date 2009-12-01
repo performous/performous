@@ -113,6 +113,7 @@ class GuitarGraph {
 	glutil::Color const& color(int fret) const;
 	void drawBar(double time, float h);
 	void drawNote(int fret, glutil::Color, float tBeg, float tEnd, float whammy = 0, bool tappable = false);
+	void drawInfo(double time, double offsetX);
 	void nextTrack();
 	void difficultyAuto(bool tryKeepCurrent = false);
 	bool difficulty(Difficulty level);

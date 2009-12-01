@@ -531,6 +531,12 @@ void GuitarGraph::draw(double time) {
 		m_neckglow.dimensions.screenBottom(0.0).middle(offsetX).fixedWidth(m_width.get());
 		m_neckglow.draw();
 	}
+	drawInfo(time, offsetX);
+	glColor3f(1.0f, 1.0f, 1.0f);
+}
+
+/// Draw popups and other info texts
+void GuitarGraph::drawInfo(double time, double offsetX) {
 	// Is Starpower ready?
 	if (canActivateStarpower(m_starmeter)) {
 		float a = (int(time * 1000.0) % 1000) / 1000.0;
@@ -563,7 +569,6 @@ void GuitarGraph::draw(double time) {
 		m_popupText->draw();
 		if (godAnim > 0.999) m_godmodePopup.setTarget(0.0, true);
 	}
-	glColor3f(1.0f, 1.0f, 1.0f);
 }
 
 namespace {
