@@ -1,0 +1,21 @@
+--- /mingw/lib/gcc/mingw32/4.4.0/include/c++/cwchar	2009-06-17 09:37:48 +0000
++++ /mingw/lib/gcc/mingw32/4.4.0/include/c++/cwchar	2009-11-27 21:25:35 +0000
+@@ -156,14 +156,18 @@ _GLIBCXX_BEGIN_NAMESPACE(std)
+   using ::mbsrtowcs;
+   using ::putwc;
+   using ::putwchar;
++#ifndef __STRICT_ANSI__ 
+   using ::swprintf;
++#endif
+   using ::swscanf;
+   using ::ungetwc;
+   using ::vfwprintf;
+ #if _GLIBCXX_HAVE_VFWSCANF
+   using ::vfwscanf;
+ #endif
++#ifndef __STRICT_ANSI__ 
+   using ::vswprintf;
++#endif
+ #if _GLIBCXX_HAVE_VSWSCANF
+   using ::vswscanf;
+ #endif

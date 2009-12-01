@@ -1,0 +1,40 @@
+This script automatically build dependencies of Performous (except Boost).
+
+To install boost libraries:
+	Boost libraries (http://www.boost.org/)
+		If you want, you can use the precompiled one, but I don't like it,
+		so I compiled it by myself (long, a lot of time and space, but not difficult)
+		To compile these libraries, you'll need bjam utility
+		  (http://sourceforge.net/projects/boost/files/boost-jam/3.1.9/bjam-3.1.9-1-ntx86.zip/download)
+		unzip bjam in you Boost sources, and run the command
+		  bjam --build-type=complete --toolset=gcc install (not sure, but think this is :))
+		And (by default) it will install Boost into C:\Boost (if you are using Vista, remember the UAC)
+
+Then, I suppose that you installed MinGW + MSYS
+Quick guide:
+	GCC compiler
+		MinGW suite (http://www.mingw.org) INSTALL ONLY GCC AND G++!!!
+	To run the ./configure scripts of libraries, the MSYS 
+		(http://sourceforge.net/projects/mingw/files/MSYS Base System/Current Release_ MSYS-1.0.11/MSYS-1.0.11.exe/download)
+	and the MSYSDTK
+		(http://sourceforge.net/projects/mingw/files/MSYS Supplementary Tools/msysDTK-1.0.1/msysDTK-1.0.1.exe/download).
+	
+	Upgrade to version 4.4.0 of GCC
+		https://sourceforge.net/projects/mingw/files/GCC%20Version%204/Current%20Release_%20gcc-4.4.0/gcc-ada-4.4.0-mingw32-dll.tar.gz/download
+		https://sourceforge.net/projects/mingw/files/GCC%20Version%204/Current%20Release_%20gcc-4.4.0/gcc-ada-4.4.0-mingw32-bin.tar.gz/download
+		https://sourceforge.net/projects/mingw/files/GCC%20Version%204/Current%20Release_%20gcc-4.4.0/gcc-c%2B%2B-4.4.0-mingw32-bin.tar.gz/download
+		https://sourceforge.net/projects/mingw/files/GCC%20Version%204/Current%20Release_%20gcc-4.4.0/gcc-c%2B%2B-4.4.0-mingw32-dll.tar.gz/download
+		https://sourceforge.net/projects/mingw/files/GCC%20Version%204/Current%20Release_%20gcc-4.4.0/gcc-core-4.4.0-mingw32-bin.tar.gz/download
+		https://sourceforge.net/projects/mingw/files/GCC%20Version%204/Current%20Release_%20gcc-4.4.0/gcc-core-4.4.0-mingw32-dll.tar.gz/download
+		
+	
+Launch MSYS, then move to performous folder
+	cd /where/performous/folder/win32
+	./install.sh
+	
+	Wait about 3 hours
+	(maybe some problem with ImageMagick and rpcndrt.h, but I can't verify them. Google it if you get error about boolean typedef)
+	
+	Good! Now you can start to compile performous :)
+	
+For trouble, contact us at #performous on irc.freenode.net
