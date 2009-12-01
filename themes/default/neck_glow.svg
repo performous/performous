@@ -12,7 +12,7 @@
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.0"
    width="256"
-   height="256"
+   height="128"
    id="svg2"
    sodipodi:version="0.32"
    inkscape:version="0.47 r22583"
@@ -39,9 +39,9 @@
      bordercolor="#666666"
      pagecolor="#ffffff"
      id="base"
-     inkscape:zoom="2.5115781"
-     inkscape:cx="7.4039701"
-     inkscape:cy="152.62316"
+     inkscape:zoom="1.7759539"
+     inkscape:cx="9.4369493"
+     inkscape:cy="44.237484"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:current-layer="svg2"
@@ -64,7 +64,7 @@
     <linearGradient
        id="linearGradient3655">
       <stop
-         style="stop-color:#ffffff;stop-opacity:1;"
+         style="stop-color:#ffffff;stop-opacity:0.627451;"
          offset="0"
          id="stop3657" />
       <stop
@@ -282,12 +282,12 @@
   </defs>
   <path
      sodipodi:type="arc"
-     style="fill:url(#radialGradient3661);fill-opacity:1.0;fill-rule:nonzero;stroke:none;stroke-width:1.10901402999999998;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+     style="fill:url(#radialGradient3661);fill-opacity:1.0;fill-rule:nonzero;stroke:none"
      id="path2879"
      sodipodi:cx="162.5"
      sodipodi:cy="256"
      sodipodi:rx="157.5"
      sodipodi:ry="35"
      d="m 320,256 a 157.5,35 0 1 1 -315,0 157.5,35 0 1 1 315,0 z"
-     transform="matrix(0.80793651,0,0,2.2642857,-3.2896825,-323.65714)" />
+     transform="matrix(0.81269841,0,0,1.8285714,-4.063492,-340.11428)" />
 </svg>

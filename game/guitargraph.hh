@@ -104,7 +104,7 @@ class GuitarGraph {
 		int fret;
 		Duration const* dur;
 		double holdTime;
-		Event(double t, int ty, int f = -1, Duration const* d = NULL): time(t), glow(0.0, 5.0), whammy(0.0, 1.2), type(ty), fret(f), dur(d), holdTime(d ? d->begin : getNaN()) { if (type > 0) glow.setValue(1.0); }
+		Event(double t, int ty, int f = -1, Duration const* d = NULL): time(t), glow(0.0, 5.0), whammy(0.0, 0.5), type(ty), fret(f), dur(d), holdTime(d ? d->begin : getNaN()) { if (type > 0) glow.setValue(1.0); }
 	};
 	typedef std::vector<Event> Events;
 	Events m_events;
@@ -113,11 +113,12 @@ class GuitarGraph {
 	glutil::Color const& color(int fret) const;
 	void drawBar(double time, float h);
 	void drawNote(int fret, glutil::Color, float tBeg, float tEnd, float whammy = 0, bool tappable = false);
+	void drawInfo(double time, double offsetX);
 	void nextTrack();
 	void difficultyAuto(bool tryKeepCurrent = false);
 	bool difficulty(Difficulty level);
 	SvgTxtTheme m_text;
-	boost::scoped_ptr<SvgTxtThemeSimple> m_streakPopupText;
+	boost::scoped_ptr<SvgTxtThemeSimple> m_popupText;
 	void updateChords();
 	typedef std::vector<Chord> Chords;
 	Chords m_chords;
@@ -126,6 +127,7 @@ class GuitarGraph {
 	NoteStatus m_notes;
 	AnimValue m_correctness;
 	AnimValue m_streakPopup;
+	AnimValue m_godmodePopup;
 	double m_score;
 	double m_scoreFactor;
 	double m_starmeter;
