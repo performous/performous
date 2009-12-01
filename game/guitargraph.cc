@@ -78,6 +78,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
   m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
   m_correctness(0.0, 5.0),
   m_streakPopup(0.0, 1.0),
+  m_godmodePopup(0.0, 0.666),
   m_score(),
   m_scoreFactor(),
   m_starmeter(),
@@ -92,7 +93,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
 		std::cout << e.what() << std::endl;
 		m_use3d = false;
 	}
-	m_streakPopupText.reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
+	m_popupText.reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	unsigned int sr = m_audio.getSR();
 	if (m_drums) {
 		m_samples.push_back(Sample(getPath("sounds/drum_bass.ogg"), sr));
@@ -140,6 +141,7 @@ void GuitarGraph::engine() {
 			if (m_input.pressed(i)) m_hit[i + 1].setValue(1.0);
 		}
 	}
+	if (m_starpower.get() > 0.001) m_correctness.setTarget(1.0, true);
 	double whammy = 0;
 	// Handle all events
 	for (input::Event ev; m_input.tryPoll(ev);) {
@@ -212,10 +214,15 @@ void GuitarGraph::engine() {
 		m_streakPopup.setTarget(1.0);
 		m_bigStreak = getNextBigStreak(m_bigStreak);
 	}
+	if (m_starpower.get() > 0.01) m_correctness.setTarget(1.0, true);
 }
 
 void GuitarGraph::activateStarpower() {
-	if (canActivateStarpower(m_starmeter)) { m_starmeter = 0; m_starpower.setValue(1.0); }
+	if (canActivateStarpower(m_starmeter)) {
+		m_starmeter = 0;
+		m_starpower.setValue(1.0);
+		m_godmodePopup.setTarget(1.0);
+	}
 }
 
 void GuitarGraph::endHold(int fret) {
@@ -292,7 +299,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 			endHold(fret);
 		}
 	} else {
-		if (m_correctness.get() < 0.5) return; // Hammering not possible at the moment
+		if (m_correctness.get() < 0.5 && m_starpower.get() < 0.001) return; // Hammering not possible at the moment
 		for (int fret = ev.button + 1; fret < 5; ++fret) {
 			if (ev.pressed[fret]) return; // Extra buttons on right side
 		}
@@ -317,7 +324,8 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 			if (it->status > 0) continue; // Already tapped, can't tap again
 			if (!it->tappable) continue; // Cannot tap
 			Chords::iterator tmp = it;
-			if (tmp == m_chords.begin() || (--tmp)->status == 0) continue; // The previous note not played
+			if ( (tmp == m_chords.begin() || (--tmp)->status == 0) &&
+			  m_starpower.get() < 0.001) continue; // The previous note not played
 		}
 		if (!it->matches(frets)) continue;
 		double error = std::abs(it->begin - time);
@@ -499,12 +507,12 @@ void GuitarGraph::draw(double time) {
 					drawNote(fret, c, tBeg, tEnd, whammy, it->tappable);
 				}
 			}
-		} // reverse scale sc1
-		} // reverse rot rot1
-		} // reverse trans tr2
-		} // reverse push pmb
-		} // reverse trans tr1
-	} // reverse push pmm
+		} //< reverse scale sc1
+		} //< reverse rot rot1
+		} //< reverse trans tr2
+		} //< reverse push pmb
+		} //< reverse trans tr1
+	} //< reverse push pmm
 	// Bottom neck glow
 	if (ng_ccnt > 0) {
 		if (m_neckglowColor.r > 0 || m_neckglowColor.g > 0 || m_neckglowColor.b > 0) {
@@ -527,17 +535,33 @@ void GuitarGraph::draw(double time) {
 	if (canActivateStarpower(m_starmeter)) {
 		float a = (int(time * 1000.0) % 1000) / 1000.0;
 		m_text.dimensions.screenBottom(-0.02).middle(-0.12 + offsetX);
-		m_text.draw("Starpower Ready!", a);
+		m_text.draw("God Mode Ready!", a);
 	}
 	// Draw streak pop-up for long streak intervals
 	double streakAnim = m_streakPopup.get();
 	if (streakAnim > 0.0) {
 		double s = 0.2 * (1.0 + streakAnim);
 		glColor4f(1.0f, 0.0f, 0.0f, 1.0 - streakAnim);
-		m_streakPopupText->render(boost::lexical_cast<std::string>(unsigned(m_bigStreak)) + "\nStreak!");
-		m_streakPopupText->dimensions().center(0.1).middle(0.0).stretch(s,s);
-		m_streakPopupText->draw();
+		m_popupText->render(boost::lexical_cast<std::string>(unsigned(m_bigStreak)) + "\nStreak!");
+		m_popupText->dimensions().center(0.1).middle(0.0).stretch(s,s);
+		m_popupText->draw();
 		if (streakAnim > 0.999) m_streakPopup.setTarget(0.0, true);
+	}
+	// Draw godmode activation pop-up
+	double godAnim = m_godmodePopup.get();
+	if (godAnim > 0.0) {
+		float a = 1.0 - godAnim;
+		float s = 0.2 * (1.0 + godAnim);
+		glColor4f(0.3f, 0.0f, 1.0f, a);
+		m_popupText->render("God Mode\nActivated!");
+		m_popupText->dimensions().center(0.1).middle(0.0).stretch(s,s);
+		m_popupText->draw();
+		s = 0.12 * (1.0 + godAnim);
+		glColor4f(0.8f, 0.8f, 1.0f, a);
+		m_popupText->render("Mistakes ignored");
+		m_popupText->dimensions().center(0.26).middle(0.0).stretch(s, s/5.0);
+		m_popupText->draw();
+		if (godAnim > 0.999) m_godmodePopup.setTarget(0.0, true);
 	}
 	glColor3f(1.0f, 1.0f, 1.0f);
 }

@@ -117,7 +117,7 @@ class GuitarGraph {
 	void difficultyAuto(bool tryKeepCurrent = false);
 	bool difficulty(Difficulty level);
 	SvgTxtTheme m_text;
-	boost::scoped_ptr<SvgTxtThemeSimple> m_streakPopupText;
+	boost::scoped_ptr<SvgTxtThemeSimple> m_popupText;
 	void updateChords();
 	typedef std::vector<Chord> Chords;
 	Chords m_chords;
@@ -126,6 +126,7 @@ class GuitarGraph {
 	NoteStatus m_notes;
 	AnimValue m_correctness;
 	AnimValue m_streakPopup;
+	AnimValue m_godmodePopup;
 	double m_score;
 	double m_scoreFactor;
 	double m_starmeter;
