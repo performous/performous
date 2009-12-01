@@ -18,7 +18,7 @@ find_path(Tiff_INCLUDE_DIR
 )
 
 find_library(Tiff_LIBRARY
-  NAMES libtiff
+  NAMES tiff
   PATHS ${Tiff_PKGCONF_LIBRARY_DIRS}
 )
 
