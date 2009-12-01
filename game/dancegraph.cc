@@ -8,12 +8,11 @@
 
 namespace {
 	const std::string diffv[] = { "Beginner", "Easy", "Medium", "Hard", "Challenge" };
-	const float past = -0.2f;
-	const float future = 1.8f;
-	const float offsetY = 1.8f; // TODO: more clever way to do this?
-	const float timescale = 6.0f;
+	const float past = -0.4f;
+	const float future = 2.0f;
+	const float timescale = 7.0f;
 	// Note: t is difference from playback time so it must be in range [past, future]
-	float time2y(float t) { return offsetY + timescale * (t - past) / (future - past); }
+	float time2y(float t) { return timescale * (t - past) / (future - past); }
 	float time2a(float t) {
 		float a = clamp(1.0 - t / future); // Note: we want 1.0 alpha already at zero t.
 		return std::pow(a, 0.8f); // Nicer curve
@@ -191,8 +190,7 @@ void DanceGraph::drawMine(float x, float y, float rot, float scale) {
 /// Draws the dance graph
 void DanceGraph::draw(double time) {
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
-	//dimensions.screenTop().middle(m_cx.get()).fixedWidth(m_width.get());
-	dimensions.screenCenter().middle(m_cx.get()).stretch(m_width.get(), 0.9);
+	dimensions.screenTop().middle(m_cx.get()).stretch(m_width.get(), 1.0);
 	double offsetX = 0.5 * (dimensions.x1() + dimensions.x2());
 	double frac = 0.75;  // Adjustable: 1.0 means fully separated, 0.0 means fully attached
 	// Draw scores
@@ -233,10 +231,10 @@ void DanceGraph::draw(double time) {
 	}
 
 	// To test arrow coordinate positioning
-//	for (float i = past; i < future; i+=0.2) {
-//		std::cout << time2y(i) << std::endl;
-//		drawArrow(1, 0, time2y(i), 0.6);
-//	}
+	//for (float i = past; i <= future; i+=0.2) {
+		//std::cout << i << ": " << time2y(i) << std::endl;
+		//drawArrow(1, 0, time2y(i), 0.6);
+	//}
 
 	glColor3f(1.0f, 1.0f, 1.0f);
 }
