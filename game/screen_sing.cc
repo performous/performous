@@ -150,6 +150,7 @@ void ScreenSing::danceLayout(double time) {
 	if (time < -0.5) {
 		glColor4f(1.0f, 1.0f, 1.0f, clamp(-1.0 - 2.0 * time));
 		// TODO: help?
+		//m_help->draw();
 		glColor3f(1.0f, 1.0f, 1.0f);
 	}
 }

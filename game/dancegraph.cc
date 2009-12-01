@@ -202,6 +202,11 @@ void DanceGraph::draw(double time) {
 		m_text.dimensions.screenBottom(-0.27).middle(0.32 * dimensions.w() + offsetX);
 		m_text.draw(boost::lexical_cast<std::string>(unsigned(m_streak)) + "/" 
 		  + boost::lexical_cast<std::string>(unsigned(m_longestStreak)));
+	} else {
+		m_text.dimensions.screenBottom(-0.041).middle(-0.09 + offsetX);
+		m_text.draw(getDifficultyString());
+		m_text.dimensions.screenBottom(-0.015).middle(-0.09 + offsetX);
+		m_text.draw(getGameMode());
 	}
 	glutil::PushMatrixMode pmm(GL_PROJECTION);
 	glTranslatef(frac * 2.0 * offsetX, 0.0f, 0.0f);
