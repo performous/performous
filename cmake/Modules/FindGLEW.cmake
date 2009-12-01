@@ -14,12 +14,13 @@ include(LibFindMacros)
 libfind_pkg_check_modules(OpenGL_PKGCONF gl)
 
 find_path(GLEW_INCLUDE_DIR
-  NAMES GL/glew.h
+  NAMES glew.h
   PATHS ${OpenGL_INCLUDE_DIRS}
+  PATH_SUFFIXES GL
 )
 
 find_library(GLEW_LIBRARY
-  NAMES GLEW GLEW32
+  NAMES GLEW GLEW32.a GLEW32
   PATHS ${OpenGL_PKGCONF_LIBRARY_DIRS}
 )
 
