@@ -299,7 +299,8 @@ void ScreenSing::draw() {
 				m_score_window->draw();
 			}
 		}
-		else if (!m_audio.isPlaying() || (status == Song::FINISHED && m_audio.getLength() - time < 3.0)) {
+		else if (!m_audio.isPlaying() || (status == Song::FINISHED
+		  && m_audio.getLength() - time <= (m_song->track_map.empty() ? 3.0 : 0.2) )) {
 			// Time to create the score window
 			m_quitTimer.setValue(QUIT_TIMEOUT);
 			m_engine->kill(); // kill the engine thread (to avoid consuming memory)
