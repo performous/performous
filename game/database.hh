@@ -11,6 +11,7 @@
 
 struct ScoreItem {
 	int score;
+	enum Type { SINGER, INSTRUMENT, DANCER } type;
 	std::string track; // includes difficulty
 	std::string track_simple; // no difficulty
 	glutil::Color color;

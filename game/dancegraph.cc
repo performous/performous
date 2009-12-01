@@ -7,6 +7,7 @@
 #include <stdexcept>
 
 namespace {
+	const std::string diffv[] = { "Beginner", "Easy", "Medium", "Hard", "Challenge" };
 	const float past = -0.2f;
 	const float future = 1.8f;
 	const float offsetY = 1.8f; // TODO: more clever way to do this?
@@ -66,6 +67,8 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
 	difficultyDelta(0); // hack to get initial level
 	
 }
+
+std::string DanceGraph::getDifficultyString() const { return diffv[m_level]; }
 
 void DanceGraph::difficultyDelta(int delta) {
 	int newLevel = m_level + delta;

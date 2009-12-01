@@ -204,7 +204,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			if (m_score_window.get()) { activateNextScreen(); return; } // Score window visible -> Enter quits
 			else if (status == Song::FINISHED && m_song->track_map.empty()) {
 				m_engine->kill(); // kill the engine thread (to avoid consuming memory)
-				m_score_window.reset(new ScoreWindow(m_instruments, m_database)); // Song finished, but no score window -> show it
+				m_score_window.reset(new ScoreWindow(m_instruments, m_database, m_dancers)); // Song finished, but no score window -> show it
 			}
 		}
 		else if (key == SDLK_SPACE && m_score_window.get()) { activateNextScreen(); return; } // Score window visible -> Space quits
@@ -332,7 +332,7 @@ void ScreenSing::draw() {
 			// Time to create the score window
 			m_quitTimer.setValue(QUIT_TIMEOUT);
 			m_engine->kill(); // kill the engine thread (to avoid consuming memory)
-			m_score_window.reset(new ScoreWindow(m_instruments, m_database));
+			m_score_window.reset(new ScoreWindow(m_instruments, m_database, m_dancers));
 		}
 	}
 		
@@ -342,7 +342,7 @@ void ScreenSing::draw() {
 	}
 }
 
-ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
+ScoreWindow::ScoreWindow(Instruments& instruments, Database& database, Dancers& dancers):
   m_database(database),
   m_pos(0.8, 2.0),
   m_bg(getThemePath("score_window.svg")),
@@ -352,8 +352,9 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 {
 	m_pos.setTarget(0.0);
 	m_database.scores.clear();
+	// Singers
 	for (std::list<Player>::iterator p = m_database.cur.begin(); p != m_database.cur.end();) {
-		ScoreItem item;
+		ScoreItem item; item.type = ScoreItem::SINGER;
 		item.score = p->getScore();
 		item.track = "Vocals";
 		item.track_simple = "vocals";
@@ -363,8 +364,9 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 		m_database.scores.push_back(item);
 		++p;
 	}
+	// Instruments
 	for (Instruments::iterator it = instruments.begin(); it != instruments.end();) {
-		ScoreItem item;
+		ScoreItem item; item.type = ScoreItem::INSTRUMENT;
 		item.score = it->getScore();
 		item.track_simple = it->getTrack();
 		item.track = it->getTrack() + " - " + it->getDifficultyString();
@@ -378,6 +380,20 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 		m_database.scores.push_back(item);
 		++it;
 	}
+	// Dancers
+	for (Dancers::iterator it = dancers.begin(); it != dancers.end();) {
+		ScoreItem item; item.type = ScoreItem::DANCER;
+		item.score = it->getScore();
+		item.track_simple = it->getGameMode();
+		item.track = it->getGameMode() + " - " + it->getDifficultyString();
+		item.track[0] = toupper(item.track[0]);
+		if (item.score < 100) { it = dancers.erase(it); continue; }
+		
+		item.color = glutil::Color(1.0f, 0.4f, 0.1f);
+		
+		m_database.scores.push_back(item);
+		++it;
+	}
 
 	if (m_database.scores.empty())
 		m_rank = "No player!";
@@ -385,12 +401,18 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 		m_database.scores.sort();
 		m_database.scores.reverse(); // top should be first
 		int topScore = m_database.scores.front().score;
-		if (m_database.scores.front().track_simple == "vocals") {
+		if (m_database.scores.front().type == ScoreItem::SINGER) {
 			if (topScore > 8000) m_rank = "Hit singer";
 			else if (topScore > 6000) m_rank = "Lead singer";
 			else if (topScore > 4000) m_rank = "Rising star";
 			else if (topScore > 2000) m_rank = "Amateur";
 			else m_rank = "Tone deaf";
+		} else if (m_database.scores.front().type == ScoreItem::DANCER) {
+			if (topScore > 8000) m_rank = "Maniac";
+			else if (topScore > 6000) m_rank = "Hoofer";
+			else if (topScore > 4000) m_rank = "Rising star";
+			else if (topScore > 2000) m_rank = "Amateur";
+			else m_rank = "Loser";
 		} else {
 			if (topScore > 8000) m_rank = "Virtuoso";
 			else if (topScore > 6000) m_rank = "Rocker";

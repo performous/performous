@@ -40,6 +40,8 @@ class DanceGraph {
 	unsigned stream() const { return m_stream; }
 	double correctness() const { return m_correctness.get(); }
 	int getScore() const { return m_score * m_scoreFactor; }
+	std::string getGameMode() const { return m_gamingMode; }
+	std::string getDifficultyString() const;
   private:
 	enum DanceStep {
 		STEP_LEFT = 0,
