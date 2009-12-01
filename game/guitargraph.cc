@@ -428,13 +428,13 @@ void GuitarGraph::draw(double time) {
 	float ng_r = 0, ng_g = 0, ng_b = 0; // neck glow color components
 	int ng_ccnt = 0; // neck glow color count
 	{
-		glutil::PushMatrixMode pmm(GL_PROJECTION);
-		glTranslatef(frac * 2.0 * offsetX, 0.0f, 0.0f);
-		{
-			glutil::PushMatrixMode pmb(GL_MODELVIEW);
-			glTranslatef((1.0 - frac) * offsetX, dimensions.y2(), 0.0f);
-			glRotatef(g_angle, 1.0f, 0.0f, 0.0f);
-			{ float s = dimensions.w() / 5.0f; glScalef(s, s, s); }
+		glutil::PushMatrixMode pmm(GL_PROJECTION); {
+		glutil::Translation tr1(frac * 2.0 * offsetX, 0.0f, 0.0f); {
+		glutil::PushMatrixMode pmb(GL_MODELVIEW); {
+		glutil::Translation tr2((1.0 - frac) * offsetX, dimensions.y2(), 0.0f); {
+		glutil::Rotation rot1(g_angle, 1.0f, 0.0f, 0.0f); {
+		float temp_s = dimensions.w() / 5.0f;
+		glutil::Scale sc1(temp_s, temp_s, temp_s);
 			// Draw the neck
 			{
 				UseTexture tex(*m_neck);
@@ -499,12 +499,12 @@ void GuitarGraph::draw(double time) {
 					drawNote(fret, c, tBeg, tEnd, whammy, it->tappable);
 				}
 			}
-			glRotatef(-g_angle, 1.0f, 0.0f, 0.0f);
-			glTranslatef(-(1.0 - frac) * offsetX, -dimensions.y2(), 0.0f);
-			glScalef(5.0f, 5.0f, 5.0f);
-		}
-		glTranslatef(-frac * 2.0 * offsetX, 0.0f, 0.0f);
-	}
+		} // reverse scale sc1
+		} // reverse rot rot1
+		} // reverse trans tr2
+		} // reverse push pmb
+		} // reverse trans tr1
+	} // reverse push pmm
 	// Bottom neck glow
 	if (ng_ccnt > 0) {
 		if (m_neckglowColor.r > 0 || m_neckglowColor.g > 0 || m_neckglowColor.b > 0) {
