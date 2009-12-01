@@ -198,9 +198,9 @@ void GuitarGraph::engine() {
 			double last = std::min(time, ev.dur->end);
 			double t = last - ev.holdTime;
 			if (t > 0) {
-				// Minimal points for long holds unless whammy is used
-				double wfactor = (ev.dur->end - ev.dur->begin < 1.5 || ev.whammy.get() > 0.01
-				  || m_starpower.get() > 0.01) ? 1.0 : 0.2;
+				// No points for long holds unless whammy is used
+				double wfactor = (time - ev.dur->begin < 1.5 || ev.whammy.get() > 0.01
+				  || m_starpower.get() > 0.01) ? 1.0 : 0.0;
 				m_score += t * 50.0 * wfactor;
 				// Whammy fills starmeter much faster
 				m_starmeter += t * 50 * ( (ev.whammy.get() > 0.01) ? 2.0 : 1.0 );
@@ -615,8 +615,7 @@ void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, fl
 		if (whammy > 0.1) {
 			while ((y -= fretWid) > yEnd + fretWid) {
 				float r = rand() / double(RAND_MAX);
-				float r2 = rand() / double(RAND_MAX);
-				vertexPair(x+cos(y*whammy)/4.0+(r-0.5)/4.0, y, c, r2*0.30 + 0.20);
+				vertexPair(x+cos(y*whammy)/4.0+(r-0.5)/4.0, y, c, 0.5f);
 			}
 		} else {
 			while ((y -= 10.0) > yEnd + fretWid) vertexPair(x, y, c, 0.5f);
