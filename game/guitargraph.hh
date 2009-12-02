@@ -22,9 +22,12 @@ struct Chord {
 	bool tappable;
 	int status; // Guitar: 0 = not played, 10 = tapped, 20 = picked, 30 = released, drums: number of pads hit
 	int score;
-	Chord(): begin(), end(), polyphony(), tappable(), status(), score() {
+	AnimValue hitAnim;
+	double releaseTimes[5];
+	Chord(): begin(), end(), polyphony(), tappable(), status(), score(), hitAnim(0.0, 1.5) {
 		std::fill(fret, fret + 5, false);
 		std::fill(dur, dur + 5, static_cast<Duration const*>(NULL));
+		std::fill(releaseTimes, releaseTimes + 5, 0.0);
 	}
 	bool matches(bool const* fretPressed) {
 		if (polyphony == 1) {
@@ -65,8 +68,8 @@ class GuitarGraph {
   private:
 	void activateStarpower();
 	void fail(double time, int fret);
-	void endHold(int fret);
-	void endStreak();
+	void endHold(int fret, double time = 0.0);
+	void endStreak() { m_streak = 0; m_bigStreak = 0; }
 	Audio& m_audio;
 	input::InputDev m_input;
 	Song const& m_song;
@@ -112,7 +115,7 @@ class GuitarGraph {
 	int m_dead;
 	glutil::Color const& color(int fret) const;
 	void drawBar(double time, float h);
-	void drawNote(int fret, glutil::Color, float tBeg, float tEnd, float whammy = 0, bool tappable = false);
+	void drawNote(int fret, glutil::Color, float tBeg, float tEnd, float whammy = 0, bool tappable = false, bool hit = false, double hitAnim = 0.0, double releaseTime = 0.0);
 	void drawInfo(double time, double offsetX);
 	void nextTrack();
 	void difficultyAuto(bool tryKeepCurrent = false);
