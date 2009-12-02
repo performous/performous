@@ -48,14 +48,19 @@ set_target_properties(plugin++ PROPERTIES
 	INSTALL_RPATH_USE_LINK_PATH TRUE
 )
 
+# Store version data in config.h
+set(CONFIG_H ${CMAKE_CURRENT_BINARY_DIR}/plugin++/config.h)
+configure_file(cmake/config.h.in ${CONFIG_H} ESCAPE_QUOTES @ONLY)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
 if(NOT SLAVE_LIB)
 	include(cmake/plugin++-packaging.cmake)
 
 	install(TARGETS plugin++ EXPORT Plugin++ DESTINATION lib${LIB_SUFFIX})
 
 	FILE(GLOB HEADER_FILES "include/plugin++/*")
-	install(FILES ${HEADER_FILES} DESTINATION include/plugin++)
-
+	install(FILES ${HEADER_FILES} ${CONFIG_H} DESTINATION include/plugin++)
+	
 	# Install/generate CMake files for finding Plugin++
 	add_subdirectory(cmake)
 endif()
