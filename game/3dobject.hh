@@ -63,12 +63,14 @@ class Object3d: boost::noncopyable {
 		generateDisplayList();
 	}
 	/// draws the object
-	void draw(float x = 0, float y = 0, float z = 0) const {
+	void draw(float x = 0, float y = 0, float z = 0, float s = 1.0) const {
 		glTranslatef(x, y, z);
+		if (s != 1.0) glScalef(s,s,s);
 		if (m_texture) {
 			UseTexture tex(*m_texture);
 			glCallList(m_displist);
 		} else glCallList(m_displist);
+		if (s != 1.0) { float ss = 1.0/s; glScalef(ss,ss,ss); }
 		glTranslatef(-x, -y, -z);
 	}
 };
