@@ -31,16 +31,14 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 		if (m_dialog) { m_dialog.reset(); return; }
 		int key = event.key.keysym.sym;
 		if (key == SDLK_ESCAPE || key == SDLK_q) sm->finished();
-		else if (key == SDLK_DOWN) {
-			if (selected < 3) selected++;
-			else selected = 0;
-		} else if (key == SDLK_UP) {
-			if (selected > 0) selected--;
-			else selected = 3;
-		} else if (key == SDLK_RETURN) {
+		else if (key == SDLK_DOWN) ++selected;
+		else if (key == SDLK_UP) --selected;
+		else if (key == SDLK_RETURN) {
 			if (selected != 3) sm->activateScreen(m_menuOptions[selected].screen);
 			else sm->finished();
 		} else if (key == SDLK_SPACE || key == SDLK_PAUSE) m_audio.togglePause();
+		// Normalize selected to [0, size)
+		selected = (m_menuOptions.size() + selected) % m_menuOptions.size();
 	} else if (event.type == SDL_JOYBUTTONDOWN) {
 		int button = event.jbutton.button;
 		if (button == 9) sm->activateScreen("Songs");
