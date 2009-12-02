@@ -2,10 +2,27 @@
 #ifndef PLUGIN_HPP_INCLUDED
 #define PLUGIN_HPP_INCLUDED
 
-#include "dllhelper.hpp"
 #include <map>
 #include <stdexcept>
 #include <string>
+
+#if defined _WIN32 || defined __CYGWIN__
+
+#ifdef PLUGIN_MASTER
+#define PLUGIN_REGISTRY_API __declspec(dllexport)
+#else
+#define PLUGIN_REGISTRY_API __declspec(dllimport)
+#endif
+
+#else
+
+#if __GNUC__ >= 4
+#define PLUGIN_REGISTRY_API __attribute__ ((visibility("default")))
+#else
+#define PLUGIN_REGISTRY_API
+#endif
+
+#endif
 
 namespace plugin {
 
@@ -25,7 +42,7 @@ namespace plugin {
     template <typename Base,
       typename Arg = std::string const&,
       typename Key = std::string>
-    class DLL_PUBLIC registry {
+    class PLUGIN_REGISTRY_API registry {
       public:
         typedef Base base_type;
         typedef Arg arg_type;

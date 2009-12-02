@@ -1,6 +1,4 @@
-#define BUILDING_DLL
 #include <plugin++/dll.hpp>
-#undef BUILDING_DLL
 
 #include <stdexcept>
 

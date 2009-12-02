@@ -8,6 +8,10 @@ This requires linking with libda and the ABI is not stable yet. The API might
 also change.
 **/
 
+#ifdef BUILDING_DA
+#define PLUGIN_MASTER
+#endif
+
 #include <libda/audio.hpp>
 #include <plugin++/plugin.hpp>
 

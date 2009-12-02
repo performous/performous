@@ -2,9 +2,10 @@
 #ifndef DLL_HPP_INCLUDED
 #define DLL_HPP_INCLUDED
 
-#include "dllhelper.hpp"
 #include <stdexcept>
 #include <string>
+
+#define Plugin_API
 
 namespace plugin {
 
@@ -15,7 +16,7 @@ namespace plugin {
 	};
 
     /// \brief Dynamic library loader
-    class DLL_PUBLIC dll {
+    class Plugin_API dll {
         void* lib;
     public:
     	/// Open a dynamic library
