@@ -3,6 +3,7 @@
 #include "dialog.hh"
 #include "screen.hh"
 #include "theme.hh"
+#include "menu.hh"
 #include <boost/scoped_ptr.hpp>
 
 class Audio;
@@ -22,6 +23,7 @@ class ScreenIntro : public Screen {
 	Audio& m_audio;
 	Capture& m_capture;
 	boost::scoped_ptr<ThemeIntro> theme;
+	boost::ptr_vector<MenuOption> m_menuOptions;
 	boost::scoped_ptr<Dialog> m_dialog;
 	unsigned int selected;
 };

@@ -62,14 +62,6 @@ struct ThemeConfiguration: Theme {
 /// theme for intro screen
 struct ThemeIntro: Theme {
 	ThemeIntro();
-	/// sing option
-	Surface sing;
-	/// practice option
-	Surface practice;
-	/// configuration option
-	Surface configure;
-	/// quit option
-	Surface quit;
 	/// top layer
 	Surface top;
 };

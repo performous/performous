@@ -4,7 +4,12 @@
 #include "audio.hh"
 #include "record.hh"
 
-ScreenIntro::ScreenIntro(std::string const& name, Audio& audio, Capture& capture): Screen(name), m_audio(audio), m_capture(capture), selected() {}
+ScreenIntro::ScreenIntro(std::string const& name, Audio& audio, Capture& capture): Screen(name), m_audio(audio), m_capture(capture), selected() {
+	m_menuOptions.push_back(new MenuOption("Songs", "intro_sing.svg"));
+	m_menuOptions.push_back(new MenuOption("Practice", "intro_practice.svg"));
+	m_menuOptions.push_back(new MenuOption("Configuration", "intro_configure.svg"));
+	m_menuOptions.push_back(new MenuOption("", "intro_quit.svg"));
+}
 
 void ScreenIntro::enter() {
 	m_audio.playMusic(getThemePath("menu.ogg"), true);
@@ -20,20 +25,6 @@ void ScreenIntro::exit() {
 	m_dialog.reset();
 }
 
-/*
-Tronic's note on making the menu more generic:
-
-struct MenuOption {
-	std::string screen;
-	Surface image;
-};
-
-In ScreenIntro:
-std::vector<MenuOption> m_menuOptions;
-
-This should avoid all if-elses for testing selected == 1, ...
-*/
-
 void ScreenIntro::manageEvent(SDL_Event event) {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	if (event.type == SDL_KEYDOWN) {
@@ -47,14 +38,9 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 			if (selected > 0) selected--;
 			else selected = 3;
 		} else if (key == SDLK_RETURN) {
-			if (selected == 0) sm->activateScreen("Songs");
-			else if (selected == 1) sm->activateScreen("Practice");
-			else if (selected == 2) sm->activateScreen("Configuration");
-			else if (selected == 3) sm->finished();
-		} else if (key == SDLK_s) sm->activateScreen("Songs");
-		else if (key == SDLK_c) sm->activateScreen("Configuration");
-		else if (key == SDLK_p) sm->activateScreen("Practice");
-		else if (key == SDLK_SPACE || key == SDLK_PAUSE) m_audio.togglePause();
+			if (selected != 3) sm->activateScreen(m_menuOptions[selected].screen);
+			else sm->finished();
+		} else if (key == SDLK_SPACE || key == SDLK_PAUSE) m_audio.togglePause();
 	} else if (event.type == SDL_JOYBUTTONDOWN) {
 		int button = event.jbutton.button;
 		if (button == 9) sm->activateScreen("Songs");
@@ -64,10 +50,7 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 
 void ScreenIntro::draw() {
 	theme->bg.draw();
-	if (selected == 0) theme->sing.draw();
-	else if (selected == 1) theme->practice.draw();
-	else if (selected == 2) theme->configure.draw();
-	else if (selected == 3) theme->quit.draw();
+	m_menuOptions[selected].image.draw();
 	theme->top.draw();
 	if (m_dialog) m_dialog->draw();
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Sodipodi ("http://www.sodipodi.com/") -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -15,9 +16,8 @@
    height="600.000000"
    id="svg559"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
+   inkscape:version="0.47pre4 r22446"
    sodipodi:docname="configuration_value.svg"
-   sodipodi:docbase="/home/yoda/UltraStar/sf/UltraStar-ng/themes/lima"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs2522">
@@ -41,7 +41,7 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="797"
+     inkscape:window-height="724"
      inkscape:window-width="1081"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
@@ -52,13 +52,14 @@
      bordercolor="#666666"
      pagecolor="#ffffff"
      id="base"
-     inkscape:zoom="0.63"
-     inkscape:cx="382.28027"
-     inkscape:cy="304.78209"
+     inkscape:zoom="2.52"
+     inkscape:cx="395.84082"
+     inkscape:cy="267.82124"
      inkscape:window-x="5"
-     inkscape:window-y="73"
+     inkscape:window-y="25"
      inkscape:current-layer="svg559"
-     showgrid="false" />
+     showgrid="false"
+     inkscape:window-maximized="0" />
   <text
      x="400"
      y="330"

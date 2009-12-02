@@ -42,9 +42,5 @@ ThemeConfiguration::ThemeConfiguration():
 
 ThemeIntro::ThemeIntro():
 	Theme(getThemePath("intro_bg.svg")),
-	sing(getThemePath("intro_sing.svg")),
-	practice(getThemePath("intro_practice.svg")),
-	configure(getThemePath("intro_configure.svg")),
-	quit(getThemePath("intro_quit.svg")),
 	top(getThemePath("intro_top.svg"))
 {}
