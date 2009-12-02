@@ -38,7 +38,7 @@ if(AVCodec_INCLUDE_DIR)
 endif(AVCodec_INCLUDE_DIR)
 
 find_library(AVCodec_LIBRARY
-  NAMES libavcodec.dll.a avcodec
+  NAMES libavcodec.a avcodec
   PATHS ${AVCodec_PKGCONF_LIBRARY_DIRS}
 )
 

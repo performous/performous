@@ -36,7 +36,7 @@ if(AVFormat_INCLUDE_DIR)
 endif(AVFormat_INCLUDE_DIR)
 
 find_library(AVFormat_LIBRARY
-  NAMES libavformat.dll.a avformat
+  NAMES libavformat.a avformat
   PATHS ${AVFormat_PKGCONF_LIBRARY_DIRS}
 )
 
