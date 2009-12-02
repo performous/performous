@@ -26,6 +26,10 @@ namespace da {
 	};
 	typedef plugin::registry<record::dev, settings&, devinfo> record_plugin;
 	typedef plugin::registry<playback::dev, settings&, devinfo> playback_plugin;
+	namespace {
+		record_plugin::init record_init;
+		playback_plugin::init playback_init;
+	}
 }
 
 #endif
