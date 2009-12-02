@@ -34,8 +34,8 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 		else if (key == SDLK_DOWN) ++selected;
 		else if (key == SDLK_UP) --selected;
 		else if (key == SDLK_RETURN) {
-			if (selected != 3) sm->activateScreen(m_menuOptions[selected].screen);
-			else sm->finished();
+			std::string screen = m_menuOptions[selected].screen;
+			if (screen.empty()) sm->finished(); else sm->activateScreen(screen);
 		} else if (key == SDLK_SPACE || key == SDLK_PAUSE) m_audio.togglePause();
 		// Normalize selected to [0, size)
 		selected = (m_menuOptions.size() + selected) % m_menuOptions.size();
