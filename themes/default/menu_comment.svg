@@ -12,8 +12,8 @@
    version="1.0"
    x="0"
    y="0"
-   width="106"
-   height="23"
+   width="80"
+   height="20"
    id="svg559"
    sodipodi:version="0.32"
    inkscape:version="0.47pre4 r22446"
@@ -63,14 +63,14 @@
      inkscape:window-maximized="1" />
   <text
      x="1.8177605"
-     y="20.087931"
-     style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#060000;fill-opacity:1;stroke:none;display:inline;font-family:Comic Sans MS;-inkscape-font-specification:Comic Sans MS"
+     y="17.063263"
+     style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#060000;fill-opacity:1;stroke:none;display:inline;font-family:Comic Sans MS;-inkscape-font-specification:Comic Sans MS"
      id="text10203"
      xml:space="preserve"
      sodipodi:linespacing="125%"
      transform="scale(1.0082228,0.99184427)"><tspan
        x="1.8177605"
-       y="20.087931"
+       y="17.063263"
        id="tspan10205"
-       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;text-anchor:start;fill:#060000;fill-opacity:1;stroke:none;font-family:Comic Sans MS;-inkscape-font-specification:Comic Sans MS">Comment</tspan></text>
+       style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;text-anchor:start;fill:#060000;fill-opacity:1;stroke:none;font-family:Comic Sans MS;-inkscape-font-specification:Comic Sans MS">Comment</tspan></text>
 </svg>

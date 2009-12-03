@@ -11,7 +11,7 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="1000"
-   height="51"
+   height="35"
    id="svg2919"
    version="1.1"
    inkscape:version="0.47pre4 r22446"
@@ -58,13 +58,20 @@
        x2="0"
        y1="768"
        x1="0"
-       gradientTransform="matrix(1,0,0,0.98,-3.1907349e-7,298.72223)"
+       gradientTransform="matrix(1.0001729,0,0,0.66978968,-0.08644188,537.20848)"
        gradientUnits="userSpaceOnUse"
        id="linearGradient2917"
        xlink:href="#linearGradient5448"
        inkscape:collect="always" />
     <inkscape:perspective
        id="perspective2956"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective2821"
        inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
        inkscape:vp_z="1 : 0.5 : 1"
        inkscape:vp_y="0 : 1000 : 0"
@@ -79,8 +86,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.70710678"
-     inkscape:cx="472.87473"
-     inkscape:cy="116.23028"
+     inkscape:cx="403.07156"
+     inkscape:cy="55.181507"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -105,20 +112,20 @@
      inkscape:label="Capa 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(0,-1001.3622)">
+     transform="translate(0,-1017.3622)">
     <rect
-       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.00187743;stroke-opacity:1"
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.82833934;stroke-opacity:1"
        id="rect3982-4"
-       width="1003.7961"
-       height="49.998123"
-       x="-1.8940613"
-       y="1001.8631" />
+       width="1003.9697"
+       height="34.171661"
+       x="-1.9808303"
+       y="1017.7764" />
     <rect
        style="fill:url(#linearGradient2917);fill-opacity:1;stroke:none"
        id="rect3982"
-       width="1000"
-       height="49"
-       x="0"
-       y="1002.3622" />
+       width="1000.1728"
+       height="33.489483"
+       x="-0.086441576"
+       y="1018.1177" />
   </g>
 </svg>

@@ -63,9 +63,9 @@ void ScreenIntro::draw_menu_options() {
 void ScreenIntro::draw() {
 	theme->bg.draw();
 	m_menuOptions[selected].image.draw();
-	theme->comment_bg.dimensions.center().center(0.336);
+	theme->comment_bg.dimensions.center().screenBottom(-0.01);
 	theme->comment_bg.draw();
-	theme->comment.dimensions.left(-0.45).center(0.336);
+	theme->comment.dimensions.left(-0.45).screenBottom(-0.028);
 	theme->comment.draw(m_menuOptions[selected].comment);
 	draw_menu_options();
 	if (m_dialog) m_dialog->draw();
