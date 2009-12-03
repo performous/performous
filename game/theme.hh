@@ -62,10 +62,14 @@ struct ThemeConfiguration: Theme {
 /// theme for intro screen
 struct ThemeIntro: Theme {
 	ThemeIntro();
-	/// back highlight
+	/// back highlight for selected option
 	Surface back_h;
-	/// menu option
+	/// menu option text
 	SvgTxtTheme option;
-	/// menu comment
+	/// menu selected option text
+	SvgTxtTheme option_selected;
+	/// menu comment text
 	SvgTxtTheme comment;
+	/// menu comment background
+	Surface comment_bg;
 };

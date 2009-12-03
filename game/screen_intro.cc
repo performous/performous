@@ -51,8 +51,8 @@ void ScreenIntro::draw_menu_options() {
 		if (i == selected) {
 			theme->back_h.dimensions.left(-0.4).center(-0.1 + i*0.08);
 			theme->back_h.draw();
-			theme->option.dimensions.left(-0.35).center(-0.1 + i*0.08);
-			theme->option.draw(m_menuOptions[i].name);
+			theme->option_selected.dimensions.left(-0.35).center(-0.1 + i*0.08);
+			theme->option_selected.draw(m_menuOptions[i].name);
 		} else {
 			theme->option.dimensions.left(-0.35).center(-0.1 + i*0.08);
 			theme->option.draw(m_menuOptions[i].name);
@@ -63,6 +63,8 @@ void ScreenIntro::draw_menu_options() {
 void ScreenIntro::draw() {
 	theme->bg.draw();
 	m_menuOptions[selected].image.draw();
+	theme->comment_bg.dimensions.center().center(0.336);
+	theme->comment_bg.draw();
 	theme->comment.dimensions.left(-0.45).center(0.336);
 	theme->comment.draw(m_menuOptions[selected].comment);
 	draw_menu_options();
