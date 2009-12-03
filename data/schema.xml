@@ -212,9 +212,12 @@ to save the current settings to XML.
 	<!-- System preferences -->
 	<entry name="system/path_songs" type="string_list">
 		<stringvalue>/usr/local/share/games/ultrastar/songs/</stringvalue>
+		<stringvalue>/usr/local/share/games/fretsonfire/data/songs/</stringvalue>
 		<stringvalue>/usr/share/games/ultrastar/songs/</stringvalue>
+		<stringvalue>/usr/share/games/fretsonfire/data/songs/</stringvalue>
 		<stringvalue>../songs/</stringvalue><!-- For Windows where the program is started in bin/ -->
 		<stringvalue>~/.ultrastar/songs/</stringvalue>
+		<stringvalue>~/.fretsonfire/songs/</stringvalue>
 		<locale name="C">
 			<short>Song folders</short>
 			<long>Where to recursively look for songs.</long>
