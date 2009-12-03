@@ -49,7 +49,7 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 void ScreenIntro::draw_menu_options() {
 	for (unsigned i = 0; i < m_menuOptions.size(); i++) {
 		if (i == selected) {
-			theme->back_h.dimensions.left(-0.4).center(-0.1 + i*0.08);
+			theme->back_h.dimensions.left(-0.4).center(-0.097 + i*0.08);
 			theme->back_h.draw();
 			theme->option_selected.dimensions.left(-0.35).center(-0.1 + i*0.08);
 			theme->option_selected.draw(m_menuOptions[i].name);
