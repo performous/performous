@@ -7,19 +7,28 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.0"
    x="0"
    y="0"
-   width="250"
-   height="75"
+   width="140"
+   height="40"
    id="svg559"
    sodipodi:version="0.32"
    inkscape:version="0.47pre4 r22446"
    sodipodi:docname="menu_option.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
+  <defs
+     id="defs2522">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 300 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="800 : 300 : 1"
+       inkscape:persp3d-origin="400 : 200 : 1"
+       id="perspective8" />
+  </defs>
   <metadata
      id="metadata35">
     <rdf:RDF>
@@ -28,7 +37,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -44,139 +53,24 @@
      bordercolor="#666666"
      pagecolor="#ffffff"
      id="base"
-     inkscape:zoom="0.61522534"
-     inkscape:cx="396.2737"
-     inkscape:cy="210.50273"
+     inkscape:zoom="3.5638182"
+     inkscape:cx="63.312761"
+     inkscape:cy="28.662714"
      inkscape:window-x="0"
      inkscape:window-y="25"
      inkscape:current-layer="svg559"
      showgrid="false"
-     showguides="true"
-     inkscape:guide-bbox="true"
      inkscape:window-maximized="1" />
-  <defs
-     id="defs561">
-    <linearGradient
-       id="linearGradient4557">
-      <stop
-         style="stop-color:#ffffff;stop-opacity:1;"
-         offset="0"
-         id="stop4559" />
-      <stop
-         style="stop-color:#0300da;stop-opacity:1;"
-         offset="1"
-         id="stop4561" />
-    </linearGradient>
-    <linearGradient
-       id="linearGradient3945">
-      <stop
-         style="stop-color:#ffffff;stop-opacity:1;"
-         offset="0"
-         id="stop3947" />
-      <stop
-         style="stop-color:#ffffff;stop-opacity:0;"
-         offset="1"
-         id="stop3949" />
-    </linearGradient>
-    <inkscape:perspective
-       sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="0 : 400 : 1"
-       inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_z="1000 : 400 : 1"
-       inkscape:persp3d-origin="500 : 266.66667 : 1"
-       id="perspective62" />
-    <linearGradient
-       id="linearGradient6053">
-      <stop
-         style="stop-color:#000000;stop-opacity:1;"
-         offset="0"
-         id="stop6055" />
-      <stop
-         style="stop-color:#5f5f5f;stop-opacity:1;"
-         offset="1"
-         id="stop6057" />
-    </linearGradient>
-    <linearGradient
-       id="linearGradient6499"
-       inkscape:collect="always">
-      <stop
-         id="stop6501"
-         offset="0"
-         style="stop-color:white;stop-opacity:1;" />
-      <stop
-         id="stop6503"
-         offset="1"
-         style="stop-color:white;stop-opacity:0;" />
-    </linearGradient>
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient6499"
-       id="linearGradient3245"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.8327515,0,0,-0.6476426,-48.09403,12.672202)"
-       x1="311.95688"
-       y1="-116.67703"
-       x2="311.95688"
-       y2="-276.41519" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient6499"
-       id="linearGradient4108"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(1.3544445,0,0,1.7332213,31.621862,51.58815)"
-       x1="44.868057"
-       y1="260.4765"
-       x2="358.07056"
-       y2="260.4765" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient6499"
-       id="linearGradient4121"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(1.2483528,0,0,1.0242885,40.754503,133.62899)"
-       x1="44.868057"
-       y1="260.4765"
-       x2="358.07056"
-       y2="260.4765" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient6499"
-       id="linearGradient4127"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(1.2483528,0,0,1.0242885,40.754503,340.11416)"
-       x1="44.868057"
-       y1="260.4765"
-       x2="358.07056"
-       y2="260.4765" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient6499"
-       id="linearGradient4133"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(1.2483528,0,0,1.0242885,39.887975,233.1463)"
-       x1="44.868057"
-       y1="260.4765"
-       x2="358.07056"
-       y2="260.4765" />
-  </defs>
   <text
+     x="0.42621329"
+     y="30.720901"
+     style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#008080;fill-opacity:1;stroke:#000000;stroke-width:0.96595240000000004;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;display:inline;font-family:Arial Black"
+     id="text10203"
      xml:space="preserve"
-     style="font-size:24.89476013px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
-     x="266.96185"
-     y="34.888062"
-     id="text2508"><tspan
-       sodipodi:role="line"
-       id="tspan2510"
-       x="266.96185"
-       y="34.888062" /></text>
-  <text
-     id="text4553"
-     y="53.166054"
-     x="36.966019"
-     style="font-size:48px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ff9955;fill-opacity:1;stroke:#000000;stroke-opacity:1;font-family:Arial Black;-inkscape-font-specification:'Arial Black, Bold'"
-     xml:space="preserve"><tspan
-       y="53.166054"
-       x="36.966019"
-       id="tspan4555"
-       sodipodi:role="line">Option</tspan></text>
+     sodipodi:linespacing="125%"
+     transform="scale(1.0082228,0.99184427)"><tspan
+       x="0.42621329"
+       y="30.720901"
+       id="tspan10205"
+       style="font-size:40px;text-align:start;text-anchor:start;fill:#008080;fill-opacity:1;stroke-width:0.96595240000000004">option</tspan></text>
 </svg>

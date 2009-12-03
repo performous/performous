@@ -244,10 +244,57 @@
          offset="1"
          id="stop4044" />
     </linearGradient>
+    <inkscape:perspective
+       id="perspective3712"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <radialGradient
+       r="500"
+       fy="757.60583"
+       fx="727.25122"
+       cy="757.60583"
+       cx="727.25122"
+       gradientTransform="matrix(0.43355171,-0.84504566,1.805509,0.92631863,-980.8803,538.04792)"
+       gradientUnits="userSpaceOnUse"
+       id="radialGradient3750"
+       xlink:href="#linearGradient3629-3"
+       inkscape:collect="always" />
+    <linearGradient
+       id="linearGradient3629-3">
+      <stop
+         style="stop-color:#00cbff;stop-opacity:0;"
+         offset="0"
+         id="stop3631-1" />
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="1"
+         id="stop3633-4" />
+    </linearGradient>
+    <radialGradient
+       r="500"
+       fy="757.60583"
+       fx="727.25122"
+       cy="757.60583"
+       cx="727.25122"
+       gradientTransform="matrix(0.43355171,-0.84504566,1.805509,0.92631863,-980.88023,538.04792)"
+       gradientUnits="userSpaceOnUse"
+       id="radialGradient3721"
+       xlink:href="#linearGradient3629-3"
+       inkscape:collect="always" />
   </defs>
   <rect
-     style="fill:#efefef;fill-opacity:1"
+     style="fill:#ffffff;fill-opacity:1"
      id="rect2851"
+     width="1000"
+     height="800"
+     x="0"
+     y="0" />
+  <rect
+     style="fill:url(#radialGradient3721);fill-opacity:1;stroke:none"
+     id="rect2855"
      width="1000"
      height="800"
      x="0"
@@ -279,11 +326,6 @@
      id="g3955"
      transform="translate(18.488319,-59.198001)"
      style="opacity:0.6;filter:url(#filter5083)">
-    <path
-       sodipodi:nodetypes="cssc"
-       id="path3759"
-       d="M 763.90087,255.09122 C 737.27952,245.25132 726.24864,281.2444 731.7447,302.74821 C 738.17651,327.91326 740.1544,358.76892 728.57172,381.46481 C 720.27205,397.72776 681.88886,403.81659 682.37312,426.6734"
-       style="fill:none;fill-opacity:0.75000000000000000;fill-rule:evenodd;stroke:#ffffff;stroke-width:1.60380363000000004;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <g
        id="g2900"
        transform="translate(446.28087,8.6462405)">
