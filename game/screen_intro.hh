@@ -18,6 +18,9 @@ class ScreenIntro : public Screen {
 	void exit();
 	void manageEvent(SDL_Event event);
 	void draw();
+	
+	/// draw menu
+	void draw_menu_options();
 
   private:
 	Audio& m_audio;

@@ -42,5 +42,10 @@ ThemeConfiguration::ThemeConfiguration():
 
 ThemeIntro::ThemeIntro():
 	Theme(getThemePath("intro_bg.svg")),
-	top(getThemePath("intro_top.svg"))
-{}
+	back_h(getThemePath("menu_back_highlight.svg")),
+	option(getThemePath("menu_option.svg"), config["graphic/text_lod"].f()),
+	comment(getThemePath("menu_comment.svg"), config["graphic/text_lod"].f())
+{
+	option.setHighlight(getThemePath("menu_option_selected.svg"));
+	back_h.dimensions.fixedHeight(0.08f);
+}

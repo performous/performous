@@ -5,10 +5,10 @@
 #include "record.hh"
 
 ScreenIntro::ScreenIntro(std::string const& name, Audio& audio, Capture& capture): Screen(name), m_audio(audio), m_capture(capture), selected() {
-	m_menuOptions.push_back(new MenuOption("Songs", "intro_sing.svg"));
-	m_menuOptions.push_back(new MenuOption("Practice", "intro_practice.svg"));
-	m_menuOptions.push_back(new MenuOption("Configuration", "intro_configure.svg"));
-	m_menuOptions.push_back(new MenuOption("", "intro_quit.svg"));
+	m_menuOptions.push_back(new MenuOption("Perform", "Songs", "intro_sing.svg", "Search songs database and start performing!"));
+	m_menuOptions.push_back(new MenuOption("Practice", "Practice", "intro_practice.svg", "Check your skills or test the microphones"));
+	m_menuOptions.push_back(new MenuOption("Configure", "Configuration", "intro_configure.svg", "Configure game options"));
+	m_menuOptions.push_back(new MenuOption("Quit", "", "intro_quit.svg", "Leave the game"));
 }
 
 void ScreenIntro::enter() {
@@ -46,10 +46,22 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 	}
 }
 
+void ScreenIntro::draw_menu_options() {
+	for (unsigned i = 0; i < m_menuOptions.size(); i++) {
+		if (i == selected) {
+			theme->back_h.dimensions.left(-0.4).center(-0.1 + i*0.08);
+			theme->back_h.draw();
+		}
+		theme->option.dimensions.left(-0.35).center(-0.1 + i*0.08);
+		theme->option.draw(m_menuOptions[i].name);
+	}
+}
+
 void ScreenIntro::draw() {
 	theme->bg.draw();
 	m_menuOptions[selected].image.draw();
-	theme->top.draw();
+	theme->comment.dimensions.left(-0.45).center(0.34);
+	theme->comment.draw(m_menuOptions[selected].comment);
+	draw_menu_options();
 	if (m_dialog) m_dialog->draw();
 }
-
