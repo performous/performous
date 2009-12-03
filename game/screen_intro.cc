@@ -5,7 +5,7 @@
 #include "record.hh"
 
 ScreenIntro::ScreenIntro(std::string const& name, Audio& audio, Capture& capture): Screen(name), m_audio(audio), m_capture(capture), selected() {
-	m_menuOptions.push_back(new MenuOption("Perform", "Songs", "intro_sing.svg", "Search songs database and start performing!"));
+	m_menuOptions.push_back(new MenuOption("Perform", "Songs", "intro_sing.svg", "Start performing!"));
 	m_menuOptions.push_back(new MenuOption("Practice", "Practice", "intro_practice.svg", "Check your skills or test the microphones"));
 	m_menuOptions.push_back(new MenuOption("Configure", "Configuration", "intro_configure.svg", "Configure game options"));
 	m_menuOptions.push_back(new MenuOption("Quit", "", "intro_quit.svg", "Leave the game"));
