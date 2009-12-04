@@ -316,7 +316,11 @@ void readConfig() {
 		typedef std::vector<std::string> ConfigList;
 		ConfigList config_list;
 		char const* root = getenv("PERFORMOUS_ROOT");
-		if (root) config_list.push_back(std::string(root) + "/" SHARED_DATA_DIR CONFIG_SCHEMA);
+		if( SHARED_DATA_DIR[0] == '/' ) {
+			config_list.push_back(SHARED_DATA_DIR CONFIG_SCHEMA);
+		} else {
+			if (root) config_list.push_back(std::string(root) + "/" SHARED_DATA_DIR CONFIG_SCHEMA);
+		}
 		fs::path exec = plugin::execname();
 		if (!exec.empty()) config_list.push_back(exec.parent_path().string() + "/../" SHARED_DATA_DIR CONFIG_SCHEMA);
 		ConfigList::const_iterator it = std::find_if(config_list.begin(), config_list.end(), static_cast<bool(&)(fs::path const&)>(fs::exists));

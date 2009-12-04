@@ -88,8 +88,13 @@ std::string getPath(fs::path const& filename) {
 			dirs.push_back(xdg_data_home ? xdg_data_home / shortDir : getHomeDir() / ".local" / shareDir);
 		}
 #endif
-		// Adding relative path from executable
-		dirs.push_back(plugin::execname().parent_path().parent_path() / shareDir);
+		if( shareDir.string()[0] == '/' ) {
+			// Adding absolute path
+			dirs.push_back(shareDir);
+		} else {
+			// Adding relative path from executable
+			dirs.push_back(plugin::execname().parent_path().parent_path() / shareDir);
+		}
 #ifndef _WIN32
 		// Adding XDG_DATA_DIRS
 		{
