@@ -271,6 +271,7 @@ int main(int argc, char** argv) {
 		for (da::playback::devlist_t::const_iterator it = l.begin(); it != l.end(); ++it) {
 			std::cout << boost::format("  %1% %|10t|%2%\n") % it->name() % it->desc();
 		}
+		std::cout << std::flush;
 		return 0;
 	}
 	if (vm.count("michelp")) {
@@ -287,6 +288,7 @@ int main(int argc, char** argv) {
 		for (da::record::devlist_t::const_iterator it = l.begin(); it != l.end(); ++it) {
 			std::cout << boost::format("  %1% %|10t|%2%\n") % it->name() % it->desc();
 		}
+		std::cout << std::flush;
 		return 0;
 	}
 	// Read config files

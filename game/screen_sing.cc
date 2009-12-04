@@ -42,10 +42,13 @@ void ScreenSing::enter() {
 			m_background.reset(new Surface(bgpath, true));
 		} catch (std::exception& e) {
 			std::cerr << e.what() << std::endl;
-		}		
+		}
 	}
 	m_pause_icon.reset(new Surface(getThemePath("sing_pause.svg")));
+//FIXME: this line crashes under windows. Have to fix. At moment, just don't use it on Windows
+#ifndef _WIN32
 	m_help.reset(new Surface(getThemePath("instrumenthelp.svg")));
+#endif
 	m_progress.reset(new ProgressBar(getThemePath("sing_progressbg.svg"), getThemePath("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01f, 0.01f, true));
 	m_progress->dimensions.fixedWidth(0.4).left(-0.5).screenTop();
 	theme->timer.dimensions.screenTop(0.5 * m_progress->dimensions.h());
@@ -112,7 +115,9 @@ void ScreenSing::instrumentLayout(double time) {
 	}
 	if (time < -0.5) {
 		glColor4f(1.0f, 1.0f, 1.0f, clamp(-1.0 - 2.0 * time));
+    #ifndef _WIN32
 		m_help->draw();
+    #endif
 		glColor3f(1.0f, 1.0f, 1.0f);
 	}
 	// Set volume levels (averages of all instruments playing that track)
@@ -134,7 +139,9 @@ void ScreenSing::exit() {
 	m_instruments.clear();
 	m_layout_singer.reset();
 	m_engine.reset();
+#ifndef _WIN32
 	m_help.reset();
+#endif
 	m_pause_icon.reset();
 	m_video.reset();
 	m_background.reset();
@@ -307,7 +314,7 @@ void ScreenSing::draw() {
 			m_score_window.reset(new ScoreWindow(m_instruments, m_database));
 		}
 	}
-		
+
 	if (m_audio.isPaused()) {
 		m_pause_icon->dimensions.middle().center().fixedWidth(.25);
 		m_pause_icon->draw();
@@ -330,7 +337,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 		item.track = "Vocals";
 		item.track_simple = "vocals";
 		item.color = glutil::Color(p->m_color.r, p->m_color.g, p->m_color.b);
-		
+
 		if (item.score < 500) { p = m_database.cur.erase(p); continue; }
 		m_database.scores.push_back(item);
 		++p;
@@ -342,11 +349,11 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 		item.track = it->getTrack() + " - " + it->getDifficultyString();
 		item.track[0] = toupper(item.track[0]);
 		if (item.score < 100) { it = instruments.erase(it); continue; }
-		
+
 		if (item.track_simple == "drums") item.color = glutil::Color(0.1f, 0.1f, 0.1f);
 		else if (item.track_simple == "bass") item.color = glutil::Color(0.5f, 0.3f, 0.1f);
 		else item.color = glutil::Color(1.0f, 0.0f, 0.0f);
-		
+
 		m_database.scores.push_back(item);
 		++it;
 	}

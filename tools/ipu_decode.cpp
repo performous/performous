@@ -114,8 +114,8 @@ int main( int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 
-	m_f1.open(argv[1]);
-	m_f2.open(argv[2]);
+	m_f1.open(argv[1], std::ios::binary);
+	m_f2.open(argv[2], std::ios::binary);
 	if (!m_f1.is_open()) throw std::runtime_error("Could not open PAK file");
 
 	m_f1.seekg(0x4, std::ios::cur);
@@ -161,9 +161,9 @@ int main( int argc, char** argv) {
 		unsigned j = 3;
 		while(1) {
 			unsigned char ch;
-			if( 	buffer_in[j]   == 0xb0 && 
-				buffer_in[j-1] == 0x01 && 
-				buffer_in[j-2] == 0x00 && 
+			if( 	buffer_in[j]   == 0xb0 &&
+				buffer_in[j-1] == 0x01 &&
+				buffer_in[j-2] == 0x00 &&
 				buffer_in[j-3] == 0x00 )
 				break;
 			m_f1.read((char*)&ch,sizeof(char));

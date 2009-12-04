@@ -320,7 +320,7 @@ cd ffmpeg-0.5
 	INSTALL_DIR=ffmpeg-0.5
 	
 	#to check this line, maybe some options can be reactivated
-	./configure --prefix=$BUILD/$INSTALL_DIR --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-memalign-hack --enable-static --enable-shared --enable-gpl --disable-encoders --disable-muxers --disable-bsfs --disable-ffmpeg --disable-ffserver --disable-ffplay --disable-protocol=http --disable-protocol=rtp --disable-protocol=tcp --disable-protocol=udp && make && make install
+	./configure --prefix=$BUILD/$INSTALL_DIR --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-memalign-hack --enable-static --disable-shared --enable-gpl --disable-encoders --disable-muxers --disable-bsfs --disable-ffmpeg --disable-ffserver --disable-ffplay --disable-protocol=http --disable-protocol=rtp --disable-protocol=tcp --disable-protocol=udp && make && make install
 	add_paths
 cd ..
 

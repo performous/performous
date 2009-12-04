@@ -57,14 +57,10 @@ namespace plugin {
 		// being a static member variable of this class to ensure that it gets
 		// initialized when it is used the first time. If it were static member,
 		// the initialization (on program startup) might occur too late.
-#ifdef PLUGIN_MASTER
-		static map_t& PLUGIN_REGISTRY_API map() {
+		static map_t& map() {
 			static map_t m;
 			return m;
 		}
-#else
-		static map_t& PLUGIN_REGISTRY_API map();
-#endif
 	public:
 		/** An iterator for browsing the available keys. **/
 		class iterator:
