@@ -12,12 +12,12 @@
    version="1.0"
    x="0"
    y="0"
-   width="800.000000"
-   height="600.000000"
+   width="140"
+   height="40"
    id="svg559"
    sodipodi:version="0.32"
    inkscape:version="0.47pre4 r22446"
-   sodipodi:docname="configuration_value.svg"
+   sodipodi:docname="menu_option.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs2522">
@@ -37,12 +37,13 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="724"
-     inkscape:window-width="1081"
+     inkscape:window-height="726"
+     inkscape:window-width="1280"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      guidetolerance="10.0"
@@ -52,23 +53,24 @@
      bordercolor="#666666"
      pagecolor="#ffffff"
      id="base"
-     inkscape:zoom="2.52"
-     inkscape:cx="395.84082"
-     inkscape:cy="267.82124"
-     inkscape:window-x="5"
+     inkscape:zoom="3.5638182"
+     inkscape:cx="63.312761"
+     inkscape:cy="28.662714"
+     inkscape:window-x="0"
      inkscape:window-y="25"
      inkscape:current-layer="svg559"
      showgrid="false"
-     inkscape:window-maximized="0" />
+     inkscape:window-maximized="1" />
   <text
-     x="400"
-     y="330"
-     style="font-size:56px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;writing-mode:lr-tb;text-anchor:middle;opacity:1;fill:#ffd100;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:inline;font-family:Arial Black"
+     x="0.42621329"
+     y="30.720901"
+     style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.96595240000000004;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;display:inline;font-family:Arial Black"
      id="text10203"
      xml:space="preserve"
-     sodipodi:linespacing="125%"><tspan
-       x="400"
-       y="330"
+     sodipodi:linespacing="125%"
+     transform="scale(1.0082228,0.99184427)"><tspan
+       x="0.42621329"
+       y="30.720901"
        id="tspan10205"
-       style="font-size:56px;fill:#ffd100;fill-opacity:1;text-anchor:middle;text-align:center">value</tspan></text>
+       style="font-size:40px;text-align:start;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke-width:0.96595240000000004">option</tspan></text>
 </svg>
