@@ -49,7 +49,7 @@ void SongParser::smParse() {
 	while (getline(line) && smParseField(line)) {}
 	if (m_song.danceTracks.empty() ) throw std::runtime_error("No note data in the file");
 	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
-	if (m_bpm != 0.0) addBPM(0, m_bpm);
+	//if (m_bpm != 0.0) addBPM(0, m_bpm);
 }	
 bool SongParser::smParseField(std::string line) {
 		if (line.empty() || line == "\r") return true;
@@ -102,7 +102,13 @@ bool SongParser::smParseField(std::string line) {
 			}
 			return false;
 		}
-		std::string value = boost::trim_copy(line.substr(pos + 1)); 
+		std::string value = boost::trim_copy(line.substr(pos + 1));
+		//values that continue to next line are handeled here
+		while (value[value.size() -1] != ';') {			
+			std::string str;			
+			getline (str);
+			value += boost::trim_copy(str);
+		}
 		value = value.substr(0, value.size() - 1);	// compared to txtParseField, here last character(';') is eliminated
 		if (value.empty()) return true;
 		if (key == "TITLE") m_song.title = value.substr(value.find_first_not_of(" :"));
@@ -112,13 +118,14 @@ bool SongParser::smParseField(std::string line) {
 		else if (key == "BACKGROUND") m_song.background = value;
 		else if (key == "OFFSET") assign(m_song.start, value);
 		else if (key == "BPMS"){
-			std::replace(value.begin(), value.end(), ';', ','); // replacing the last ';'
-			std::istringstream iss(value);
-			std::string ts, bpm; //ts is the timestamp of the bpm
-			while(std::getline(iss, ts, '=') && std::getline(iss, bpm, ',')) {
-				if(atof(ts.c_str()) == 0) assign(m_bpm, bpm);
-				else addBPM(atof(ts.c_str()), atof(bpm.c_str()));
-			}
+				std::istringstream iss(value);	
+				double ts, bpm;	
+				char chr;
+				while (iss >> ts >> chr >> bpm) {				
+					if (ts == 0.0) m_bpm = bpm;
+					addBPM(ts, bpm);
+					if (!(iss >> chr)) break;
+				}
 		}
 		/*additionally .sm fileformat has following constants:
 		#SUBTITLE
