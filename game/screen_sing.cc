@@ -92,7 +92,6 @@ void ScreenSing::enter() {
 		while(1) {
 			try {
 				m_dancers.push_back(new DanceGraph(m_audio, *m_song));
-				break; // REMOVEME (when input assignement is correctly implemented)
 			} catch (std::runtime_error&) { break; }
 		}
 	}
@@ -150,6 +149,7 @@ void ScreenSing::danceLayout(double time) {
 	if (time < -0.5) {
 		glColor4f(1.0f, 1.0f, 1.0f, clamp(-1.0 - 2.0 * time));
 		// TODO: help?
+		//m_help->draw();
 		glColor3f(1.0f, 1.0f, 1.0f);
 	}
 }
@@ -172,9 +172,7 @@ void ScreenSing::activateNextScreen()
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 
 	m_database.addSong(m_song);
-	if (m_database.scores.empty()
-	      || !m_database.reachedHiscore(m_song))
-	{
+	if (m_database.scores.empty() || !m_database.reachedHiscore(m_song)) {
 		// if no highscore reached..
 		sm->activateScreen("Songs");
 		return;
@@ -196,6 +194,8 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		bool seekback = false;
 		int key = event.key.keysym.sym;
 		if (key == SDLK_ESCAPE || key == SDLK_q) {
+			// In ScoreWindow ESC goes to Players, otherwise insta-quit to Songs
+			if (m_score_window.get() && key == SDLK_ESCAPE) { activateNextScreen(); return; }
 			ScreenManager* sm = ScreenManager::getSingletonPtr();
 			sm->activateScreen("Songs");
 			return;
@@ -204,7 +204,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			if (m_score_window.get()) { activateNextScreen(); return; } // Score window visible -> Enter quits
 			else if (status == Song::FINISHED && m_song->track_map.empty()) {
 				m_engine->kill(); // kill the engine thread (to avoid consuming memory)
-				m_score_window.reset(new ScoreWindow(m_instruments, m_database)); // Song finished, but no score window -> show it
+				m_score_window.reset(new ScoreWindow(m_instruments, m_database, m_dancers)); // Song finished, but no score window -> show it
 			}
 		}
 		else if (key == SDLK_SPACE && m_score_window.get()) { activateNextScreen(); return; } // Score window visible -> Space quits
@@ -332,7 +332,7 @@ void ScreenSing::draw() {
 			// Time to create the score window
 			m_quitTimer.setValue(QUIT_TIMEOUT);
 			m_engine->kill(); // kill the engine thread (to avoid consuming memory)
-			m_score_window.reset(new ScoreWindow(m_instruments, m_database));
+			m_score_window.reset(new ScoreWindow(m_instruments, m_database, m_dancers));
 		}
 	}
 		
@@ -342,7 +342,7 @@ void ScreenSing::draw() {
 	}
 }
 
-ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
+ScoreWindow::ScoreWindow(Instruments& instruments, Database& database, Dancers& dancers):
   m_database(database),
   m_pos(0.8, 2.0),
   m_bg(getThemePath("score_window.svg")),
@@ -352,8 +352,9 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 {
 	m_pos.setTarget(0.0);
 	m_database.scores.clear();
-	for (std::list<Player>::iterator p = m_database.cur.begin(); p != m_database.cur.end(); ++p) {
-		ScoreItem item;
+	// Singers
+	for (std::list<Player>::iterator p = m_database.cur.begin(); p != m_database.cur.end();) {
+		ScoreItem item; item.type = ScoreItem::SINGER;
 		item.score = p->getScore();
 		item.track = "Vocals";
 		item.track_simple = "vocals";
@@ -361,35 +362,57 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 		
 		if (item.score < 500) { p = m_database.cur.erase(p); continue; }
 		m_database.scores.push_back(item);
+		++p;
 	}
-	for (Instruments::iterator it = instruments.begin(); it != instruments.end(); ++it) {
-		ScoreItem item;
+	// Instruments
+	for (Instruments::iterator it = instruments.begin(); it != instruments.end();) {
+		ScoreItem item; item.type = ScoreItem::INSTRUMENT;
 		item.score = it->getScore();
 		item.track_simple = it->getTrack();
 		item.track = it->getTrack() + " - " + it->getDifficultyString();
 		item.track[0] = toupper(item.track[0]);
-		if (item.score < 100) { std::cout << "kick " << item.track << std::endl; it = instruments.erase(it); continue; }
+		if (item.score < 100) { it = instruments.erase(it); continue; }
 		
 		if (item.track_simple == "drums") item.color = glutil::Color(0.1f, 0.1f, 0.1f);
 		else if (item.track_simple == "bass") item.color = glutil::Color(0.5f, 0.3f, 0.1f);
 		else item.color = glutil::Color(1.0f, 0.0f, 0.0f);
 		
-		std::cout << "insert " << item.track << " score: " << item.score << std::endl;
 		m_database.scores.push_back(item);
+		++it;
 	}
-	m_database.scores.sort();
-	m_database.scores.reverse(); // top should be first
+	// Dancers
+	for (Dancers::iterator it = dancers.begin(); it != dancers.end();) {
+		ScoreItem item; item.type = ScoreItem::DANCER;
+		item.score = it->getScore();
+		item.track_simple = it->getGameMode();
+		item.track = it->getGameMode() + " - " + it->getDifficultyString();
+		item.track[0] = toupper(item.track[0]);
+		if (item.score < 100) { it = dancers.erase(it); continue; }
+		
+		item.color = glutil::Color(1.0f, 0.4f, 0.1f);
+		
+		m_database.scores.push_back(item);
+		++it;
+	}
 
 	if (m_database.scores.empty())
 		m_rank = "No player!";
 	else {
+		m_database.scores.sort();
+		m_database.scores.reverse(); // top should be first
 		int topScore = m_database.scores.front().score;
-		if (m_database.scores.front().track_simple == "vocals") {
+		if (m_database.scores.front().type == ScoreItem::SINGER) {
 			if (topScore > 8000) m_rank = "Hit singer";
 			else if (topScore > 6000) m_rank = "Lead singer";
 			else if (topScore > 4000) m_rank = "Rising star";
 			else if (topScore > 2000) m_rank = "Amateur";
 			else m_rank = "Tone deaf";
+		} else if (m_database.scores.front().type == ScoreItem::DANCER) {
+			if (topScore > 8000) m_rank = "Maniac";
+			else if (topScore > 6000) m_rank = "Hoofer";
+			else if (topScore > 4000) m_rank = "Rising star";
+			else if (topScore > 2000) m_rank = "Amateur";
+			else m_rank = "Loser";
 		} else {
 			if (topScore > 8000) m_rank = "Virtuoso";
 			else if (topScore > 6000) m_rank = "Rocker";
@@ -412,7 +435,7 @@ void ScoreWindow::draw() {
 	for (Database::cur_scores_t::const_iterator p = m_database.scores.begin(); p != m_database.scores.end(); ++p, ++i) {
 		int score = p->score;
 		glColor4fv(p->color);
-		double x = -0.12 + spacing * (0.5 + i - 0.5 * m_database.cur.size());
+		double x = -0.12 + spacing * (0.5 + i - 0.5 * m_database.scores.size());
 		m_scoreBar.dimensions.middle(x).bottom(0.20);
 		m_scoreBar.draw(score / 10000.0);
 		m_score_text.render(boost::lexical_cast<std::string>(score));

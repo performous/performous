@@ -7,12 +7,12 @@
 #include <stdexcept>
 
 namespace {
-	const float past = -0.2f;
-	const float future = 1.8f;
-	const float offsetY = 1.8f; // TODO: more clever way to do this?
-	const float timescale = 6.0f;
+	const std::string diffv[] = { "Beginner", "Easy", "Medium", "Hard", "Challenge" };
+	const float past = -0.4f;
+	const float future = 2.0f;
+	const float timescale = 7.0f;
 	// Note: t is difference from playback time so it must be in range [past, future]
-	float time2y(float t) { return offsetY + timescale * (t - past) / (future - past); }
+	float time2y(float t) { return timescale * (t - past) / (future - past); }
 	float time2a(float t) {
 		float a = clamp(1.0 - t / future); // Note: we want 1.0 alpha already at zero t.
 		return std::pow(a, 0.8f); // Nicer curve
@@ -57,7 +57,8 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
 {
 	m_arrow.dimensions.middle().center();
 	
-	for(size_t i = 0; i < 4; i++) m_pressed[i] = AnimValue(0.0, 8.0);
+	for(size_t i = 0; i < 4; i++) m_pressed[i] = false;
+	for(size_t i = 0; i < 4; i++) m_pressed_anim[i] = AnimValue(0.0, 4.0);
 	
 	DanceTracks::const_iterator it = m_song.danceTracks.find(m_gamingMode);
 	if(it == m_song.danceTracks.end())
@@ -65,6 +66,8 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
 	difficultyDelta(0); // hack to get initial level
 	
 }
+
+std::string DanceGraph::getDifficultyString() const { return diffv[m_level]; }
 
 void DanceGraph::difficultyDelta(int delta) {
 	int newLevel = m_level + delta;
@@ -106,15 +109,17 @@ void DanceGraph::engine() {
 			}
 		}
 		if (ev.type == input::Event::RELEASE) {
-			m_pressed[ev.button].setTarget(0.0, false);
+			m_pressed[ev.button] = false;
 		}
 		else if (ev.type == input::Event::PRESS) {
+			m_pressed[ev.button] = true;
 			dance(time, ev);
-			m_pressed[ev.button].setTarget(1.0, true);
+			m_pressed_anim[ev.button].setValue(1.0);
+			m_pressed_anim[ev.button].setTarget(0.0);
 		}
 	}
 
-	
+
 }
 
 
@@ -126,22 +131,10 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 			double p = points(it->note.begin - time);
 			it->score = p;
 			m_score += p;
-			it->hitAnim.setTarget(1.0, false);
 		}
 	}
 }
 
-
-glutil::Color const& DanceGraph::color(int arrow_i) const {
-	static glutil::Color arrowColors[4] = {
-		glutil::Color(0.0f, 0.9f, 0.0f),
-		glutil::Color(0.9f, 0.0f, 0.0f),
-		glutil::Color(0.9f, 0.9f, 0.0f),
-		glutil::Color(0.0f, 0.0f, 0.9f),
-	};
-	if (arrow_i < 0 || arrow_i > 3) throw std::logic_error("Invalid arrow number in DanceGraph::getColor");
-	return arrowColors[arrow_i];
-}
 
 namespace {
 	const float arrowScale = 0.6f;
@@ -152,6 +145,26 @@ namespace {
 		glTexCoord2f(0.0f, ty); glVertex2f(x - holdWidth, y);
 		glTexCoord2f(1.0f, ty); glVertex2f(x + holdWidth, y);
 	}
+
+	glutil::Color& colorGlow(glutil::Color& c, double glow) {
+		//c.a = std::sqrt(1.0 - glow);
+		c.a = 1.0 - glow;
+		c.r += glow *.5;
+		c.g += glow *.5;
+		c.b += glow *.5;
+		return c;
+	}
+}
+
+glutil::Color const& DanceGraph::color(int arrow_i) const {
+	static glutil::Color arrowColors[4] = {
+		glutil::Color(0.0f, 0.9f, 0.0f),
+		glutil::Color(0.9f, 0.0f, 0.0f),
+		glutil::Color(0.9f, 0.9f, 0.0f),
+		glutil::Color(0.0f, 0.0f, 0.9f),
+	};
+	if (arrow_i < 0 || arrow_i > 3) throw std::logic_error("Invalid arrow index in DanceGraph::getColor");
+	return arrowColors[arrow_i];
 }
 
 void DanceGraph::drawArrow(int arrow_i, float x, float y, float scale) {
@@ -177,8 +190,7 @@ void DanceGraph::drawMine(float x, float y, float rot, float scale) {
 /// Draws the dance graph
 void DanceGraph::draw(double time) {
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
-	//dimensions.screenTop().middle(m_cx.get()).fixedWidth(m_width.get());
-	dimensions.screenCenter().middle(m_cx.get()).stretch(m_width.get(), 0.9);
+	dimensions.screenTop().middle(m_cx.get()).stretch(m_width.get(), 1.0);
 	double offsetX = 0.5 * (dimensions.x1() + dimensions.x2());
 	double frac = 0.75;  // Adjustable: 1.0 means fully separated, 0.0 means fully attached
 	// Draw scores
@@ -188,22 +200,22 @@ void DanceGraph::draw(double time) {
 		m_text.dimensions.screenBottom(-0.27).middle(0.32 * dimensions.w() + offsetX);
 		m_text.draw(boost::lexical_cast<std::string>(unsigned(m_streak)) + "/" 
 		  + boost::lexical_cast<std::string>(unsigned(m_longestStreak)));
+	} else {
+		m_text.dimensions.screenBottom(-0.041).middle(-0.09 + offsetX);
+		m_text.draw(getDifficultyString());
+		m_text.dimensions.screenBottom(-0.015).middle(-0.09 + offsetX);
+		m_text.draw(getGameMode());
 	}
-//std::cout << "m" << dimensions.x1() << " " << dimensions.x2() << std::endl;
-//std::cout << dimensions.y1() << " " << dimensions.y2() << std::endl;
 	glutil::PushMatrixMode pmm(GL_PROJECTION);
 	glTranslatef(frac * 2.0 * offsetX, 0.0f, 0.0f);
 	glutil::PushMatrixMode pmb(GL_MODELVIEW);
 	glTranslatef((1.0 - frac) * offsetX, dimensions.y1(), 0.0f);
-	//glTranslatef((1.0 - frac) * offsetX, 0.0f, 0.0f);
 	{ float s = dimensions.w() / 5.0f; glScalef(s, s, s); }
 
 	// Arrows on cursor
-	// TODO: suitable effect for pressing the arrows?
-	// TODO: effect possibilities: zooming, whitening, external glow
 	for (int arrow_i = 0; arrow_i < 4; ++arrow_i) {
 		float x = -1.5f + arrow_i;
-		float l = m_pressed[arrow_i].get();
+		float l = m_pressed_anim[arrow_i].get();
 		float s = (5.0 - l) / 5.0;
 		glutil::Color c = color(arrow_i);
 		c.r += l; c.g += l; c.b +=l;
@@ -213,72 +225,73 @@ void DanceGraph::draw(double time) {
 
 	// Draw the notes
 	for (DanceNotes::iterator it = m_notes.begin(); it != m_notes.end(); ++it) {
-		float tBeg = it->note.begin - time;
-		float tEnd = it->note.end - time;
-		
-		// TODO: Remove me (temporary hack to test hold note drawing)
-		//tEnd += 0.6;
-		
-		if (tEnd < past) continue;
-		if (tBeg > future) break;
-
-		int arrow_i = it->note.note;
-		bool mine = it->note.type == Note::MINE;
-		float x = -1.5f + arrow_i;
-		float s = arrowScale;
-		float yBeg = time2y(tBeg);
-		float yEnd = time2y(tEnd);
-		glutil::Color c = color(arrow_i);
-		
-		double glow = it->hitAnim.get();
-		//c.a = std::sqrt(1.0 - glow);
-		c.r += glow *.5;
-		c.g += glow *.5;
-		c.b += glow *.5;
-		
-		if (tEnd - tBeg > 0.1) {
-			// Draw holds
-			glColor4fv(c);
-			if (it->isHit) {
-				// TODO: What if hold is ended prematurely?
-				yBeg = std::max(time2y(0.0), yBeg);
-				yEnd = std::max(time2y(0.0), yEnd);
-				glColor3f(1.0f, 1.0f, 1.0f);
-			}
-			{
-				UseTexture tblock(m_arrow_hold);
-				glutil::Begin block(GL_TRIANGLE_STRIP);
-				vertexPair(x, yEnd, 1.0f);
-				vertexPair(x, yBeg, 0.0f);
-			}
-			// Draw begin
-			drawArrow(arrow_i, x, yBeg, s);
-		} else {
-			// Draw short note
-			c.a = 1.0 - glow;
-			s = arrowScale + glow;
-			glColor4fv(c);
-			if (mine) drawMine(x, yBeg, int(time*360) % 360, s);
-			  else drawArrow(arrow_i, x, yBeg, s);
-		}
+		if (it->note.end - time < past) continue;
+		if (it->note.begin - time > future) break;
+		drawNote(*it, time);
 	}
 
 	// To test arrow coordinate positioning
-//	for (float i = past; i < future; i+=0.2) {
-//		std::cout << time2y(i) << std::endl;
-//		drawArrow(1, 0, time2y(i), 0.6);
-//	}
+	//for (float i = past; i <= future; i+=0.2) {
+		//std::cout << i << ": " << time2y(i) << std::endl;
+		//drawArrow(1, 0, time2y(i), 0.6);
+	//}
 
 	glColor3f(1.0f, 1.0f, 1.0f);
 }
 
-// TODO: See if this is needed at all
 /// Draws a single note (or hold)
-void DanceGraph::drawNote(int arrow_i, glutil::Color c, float tBeg, float tEnd) {
+void DanceGraph::drawNote(DanceNote& note, double time) {
+	float tBeg = note.note.begin - time;
+	float tEnd = note.note.end - time;
+	int arrow_i = note.note.note;
+	bool mine = note.note.type == Note::MINE;
 	float x = -1.5f + arrow_i;
+	float s = arrowScale;
 	float yBeg = time2y(tBeg);
 	float yEnd = time2y(tEnd);
-	//c.a = time2a(tBeg);
-	glColor4fv(c);
-	drawArrow(arrow_i, x, yBeg, 0.6);
+	glutil::Color c = color(arrow_i);
+	
+	if (note.isHit && std::abs(tEnd) < maxTolerance) {
+		if (mine) note.hitAnim.setRate(1.0);
+		note.hitAnim.setTarget(1.0, false);
+	}
+	double glow = note.hitAnim.get();
+	
+	if (tEnd - tBeg > 0.1) {
+		// Draw holds
+		glColor4fv(c);
+		if (note.isHit && note.releaseTime <= 0) {
+			yBeg = std::max(time2y(0.0), yBeg);
+			yEnd = std::max(time2y(0.0), yEnd);
+			glColor3f(1.0f, 1.0f, 1.0f);
+			// Hack to test hold releasing
+			//if (time > note.note.begin + 1) note.releaseTime = time;
+		}
+		if (note.releaseTime > 0) yBeg = time2y(note.releaseTime - time);
+		{ // Scope block for Begin and UseTexture
+			UseTexture tblock(m_arrow_hold);
+			glutil::Begin block(GL_TRIANGLE_STRIP);
+			vertexPair(x, yEnd, 1.0f);
+			vertexPair(x, yBeg, 0.0f);
+		}
+		// Draw begin
+		if (note.isHit && tEnd < 0.1) {
+			glColor4fv(colorGlow(c,glow));
+			s = arrowScale + glow;
+		}
+		drawArrow(arrow_i, x, yBeg, s);
+	} else {
+		// Draw short note
+		if (mine) {
+			c.a = 1.0 - glow; glColor4fv(c);
+			s += glow * 0.5;
+			float rot = int(time*360 * (note.isHit ? 2.0 : 1.0) ) % 360;
+			if (note.isHit) yBeg = time2y(0.0);
+			drawMine(x, yBeg, rot, s);
+		} else {
+			s = arrowScale + glow;
+			glColor4fv(colorGlow(c, glow));
+			drawArrow(arrow_i, x, yBeg, s);
+		}
+	}
 }

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-
 #include <boost/ptr_container/ptr_map.hpp>
 #include "animvalue.hh"
 #include "song.hh"
@@ -15,9 +14,10 @@ class Song;
 
 struct DanceNote {
 	DanceNote(Note note) :
-		note(note), hitAnim(0.0, 5.0), score(0), isHit(false) {}
+		note(note), hitAnim(0.0, 5.0), releaseTime(0), score(0), isHit(false) {}
 	Note note;
-	AnimValue hitAnim;
+	AnimValue hitAnim; /// for animating hits
+	double releaseTime; /// tells when a hold was ended
 	int score;
 	bool isHit;
 };
@@ -40,6 +40,8 @@ class DanceGraph {
 	unsigned stream() const { return m_stream; }
 	double correctness() const { return m_correctness.get(); }
 	int getScore() const { return m_score * m_scoreFactor; }
+	std::string getGameMode() const { return m_gamingMode; }
+	std::string getDifficultyString() const;
   private:
 	enum DanceStep {
 		STEP_LEFT = 0,
@@ -50,9 +52,9 @@ class DanceGraph {
 	void difficultyDelta(int delta);
 	void difficulty(DanceDifficulty level);
 	DanceDifficulty m_level;
-	void dance(double time, input::Event const& ev);
-	void drawNote(int arrow_i, glutil::Color, float tBeg, float tEnd);
 	glutil::Color const& color(int arrow_i) const;
+	void dance(double time, input::Event const& ev);
+	void drawNote(DanceNote& note, double time);
 	void drawArrow(int arrow_i, float x, float y, float scale = 1.0);
 	void drawMine(float x, float y, float rot = 0.0, float scale = 1.0);
 	Audio& m_audio;
@@ -76,7 +78,8 @@ class DanceGraph {
 	};
 	typedef std::vector<Event> Events;
 	Events m_events;
-	AnimValue m_pressed[4];
+	bool m_pressed[4];
+	AnimValue m_pressed_anim[4];
 	int m_dead;
 	SvgTxtTheme m_text;
 	AnimValue m_correctness;

@@ -1,0 +1,10 @@
+if(NOT Plugin++_FOUND)
+	set(Plugin++_FOUND TRUE)
+	set(Plugin++_VERSION "@Plugin++_VERSION@")
+	set(Plugin++_INCLUDE_DIR "@CMAKE_INSTALL_PREFIX@/include" CACHE FILEPATH "Plugin++ include directory")
+	set(Plugin++_INCLUDE_DIRS ${Plugin++_INCLUDE_DIR} "@Boost_INCLUDE_DIRS@")
+
+	include("@CMAKE_INSTALL_PREFIX@/@Plugin++_CMAKE_DIR@/Plugin++.cmake")
+	set(Plugin++_LIBRARIES "plugin++")
+endif(NOT Plugin++_FOUND)
+

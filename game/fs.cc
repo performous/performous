@@ -1,5 +1,6 @@
 #include "fs.hh"
 
+#include "config.hh"
 #include "configuration.hh"
 #include <plugin++/execname.hpp>
 #include <cstdlib>
@@ -72,7 +73,7 @@ std::string getPath(fs::path const& filename) {
 	if (!initialized) {
 		initialized = true;
 		fs::path shortDir = "performous";
-		fs::path shareDir = "share/games" / shortDir;
+		fs::path shareDir = SHARED_DATA_DIR;
 #ifdef _WIN32
 		// Add APPLIC~1 (user-specific application data)  FIXME: Not tested
 		{
@@ -88,7 +89,7 @@ std::string getPath(fs::path const& filename) {
 		}
 #endif
 		// Adding relative path from executable
-		dirs.push_back(fs::path(plugin::execname()).parent_path().parent_path() / shareDir);
+		dirs.push_back(plugin::execname().parent_path().parent_path() / shareDir);
 #ifndef _WIN32
 		// Adding XDG_DATA_DIRS
 		{

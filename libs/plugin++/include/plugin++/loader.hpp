@@ -1,3 +1,4 @@
+#pragma once
 #ifndef LOADER_HPP_INCLUDED
 #define LOADER_HPP_INCLUDED
 

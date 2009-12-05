@@ -407,6 +407,21 @@ void GuitarGraph::draw(double time) {
 			glTexCoord2f(1.0f, texCoord); glVertex2f(w, time2y(tEnd));
 		}
 	}
+	// Draw the cursor
+	float level = m_hit[0].get();
+	glColor3f(level, level, level);
+	drawBar(0.0, 0.01f);
+	// Fret buttons on cursor
+	for (int fret = m_drums; fret < 5; ++fret) {
+		float x = -2.0f + fret - 0.5f * m_drums;
+		float l = m_hit[fret + !m_drums].get();
+		glColor4fv(color(fret));
+		m_button.dimensions.center(time2y(0.0)).middle(x);
+		m_button.draw();
+		glColor3f(l, l, l);
+		m_tap.dimensions = m_button.dimensions;
+		m_tap.draw();
+	}
 	// Draw the notes
 	glutil::UseLighting lighting(m_use3d);
 	for (Chords::const_iterator it = m_chords.begin(); it != m_chords.end(); ++it) {
@@ -425,45 +440,12 @@ void GuitarGraph::draw(double time) {
 				glow = m_events[event - 1].glow.get();
 				whammy = m_events[event - 1].whammy.get();
 			}
-			/*
-			if (glow > 0.0f) {
-				glBlendFunc(GL_ONE, GL_ONE);
-				drawNote(fret, glutil::Color(glow, glow, glow), tBeg, tEnd);
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			}
-			*/
 			glutil::Color c = color(fret);
 			c.r += glow;
 			c.g += glow;
 			c.b += glow;
 			drawNote(fret, c, tBeg, tEnd, whammy, it->tappable);
 
-			if (!m_use3d && it->tappable) {
-				float l = std::max(0.5, m_correctness.get());
-				glColor3f(l, l, l);
-				float x = -2.0f + fret;
-				m_tap.dimensions.center(time2y(tBeg)).middle(x);
-				m_tap.draw();
-			}
-		}
-	}
-	// Draw the cursor
-	float level = m_hit[0].get();
-	glColor3f(level, level, level);
-	drawBar(0.0, 0.01f);
-	// Fret buttons on cursor
-	for (int fret = m_drums; fret < 5; ++fret) {
-		float x = -2.0f + fret - 0.5f * m_drums;
-		float l = m_hit[fret + !m_drums].get();
-		glColor4fv(color(fret));
-		if (m_use3d) {
-			m_fretObj.draw(x, time2y(0.0), (1.0-l)/8.0);
-		} else {
-			m_button.dimensions.center(time2y(0.0)).middle(x);
-			m_button.draw();
-			glColor3f(l, l, l);
-			m_tap.dimensions = m_button.dimensions;
-			m_tap.draw();
 		}
 	}
 	glColor3f(1.0f, 1.0f, 1.0f);
@@ -479,8 +461,6 @@ namespace {
 }
 
 void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, float whammy, bool tappable) {
-	Object3d* obj = &m_fretObj;
-	if (tappable) obj = &m_tappableObj;
 	float x = -2.0f + fret;
 	if (m_drums) x -= 0.5f;
 	if (m_drums && fret == 0) {
@@ -496,8 +476,9 @@ void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, fl
 		float y = yBeg + fretWid;
 		if (m_use3d) {
 			y -= fretWid;
-			c.a = clamp(time2a(tBeg)*2.0f,0.0f,1.0f); glColor4fv(c);
-			obj->draw(x, y, 0.0f);
+			c.a = clamp(time2a(tBeg)*2.0f,0.0f,1.0f);
+			glColor4fv(c);
+			m_fretObj.draw(x, y, 0.0f);
 			y -= fretWid;
 		} else {
 			UseTexture tblock(m_button_l);
@@ -528,11 +509,22 @@ void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, fl
 		// Too short note: only render the ring
 		if (m_use3d) {
 			c.a = clamp(time2a(tBeg)*2.0f,0.0f,1.0f); glColor4fv(c);
-			obj->draw(x, time2y(tBeg), 0.0f);
+			m_fretObj.draw(x, time2y(tBeg), 0.0f);
 		} else {
 			c.a = time2a(tBeg); glColor4fv(c);
 			m_button.dimensions.center(time2y(tBeg)).middle(x);
 			m_button.draw();
+		}
+	}
+	if (tappable) {
+		float l = std::max(0.3, m_correctness.get());
+		if (m_use3d) {
+			glColor3f(l, l, l);
+			m_tappableObj.draw(x, yBeg, 0.0f);
+		} else {
+			glColor3f(l, l, l);
+			m_tap.dimensions.center(yBeg).middle(x);
+			m_tap.draw();
 		}
 	}
 }
