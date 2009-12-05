@@ -17,7 +17,7 @@
    id="svg559"
    sodipodi:version="0.32"
    inkscape:version="0.47pre4 r22446"
-   sodipodi:docname="menu_option_selected.svg"
+   sodipodi:docname="menu_option.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs2522">
@@ -37,7 +37,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -54,7 +54,7 @@
      pagecolor="#ffffff"
      id="base"
      inkscape:zoom="3.5638182"
-     inkscape:cx="53.491625"
+     inkscape:cx="63.312761"
      inkscape:cy="28.662714"
      inkscape:window-x="0"
      inkscape:window-y="25"

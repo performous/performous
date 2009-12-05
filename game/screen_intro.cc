@@ -54,8 +54,8 @@ void ScreenIntro::draw_menu_options() {
 			theme->option_selected.dimensions.left(-0.35).center(-0.1 + i*0.08);
 			theme->option_selected.draw(m_menuOptions[i].name);
 		} else {
-			theme->option.dimensions.left(-0.35).center(-0.1 + i*0.08);
-			theme->option.draw(m_menuOptions[i].name);
+			theme->option[i].dimensions.left(-0.35).center(-0.1 + i*0.08);
+			theme->option[i].draw(m_menuOptions[i].name);
 		}
 	}
 }

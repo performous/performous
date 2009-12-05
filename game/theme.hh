@@ -65,7 +65,7 @@ struct ThemeIntro: Theme {
 	/// back highlight for selected option
 	Surface back_h;
 	/// menu option text
-	SvgTxtTheme option;
+	boost::ptr_vector<SvgTxtTheme> option;
 	/// menu selected option text
 	SvgTxtTheme option_selected;
 	/// menu comment text
