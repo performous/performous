@@ -110,6 +110,7 @@ void DanceGraph::engine() {
 		}
 		if (ev.type == input::Event::RELEASE) {
 			m_pressed[ev.button] = false;
+			dance(time, ev);
 		}
 		else if (ev.type == input::Event::PRESS) {
 			m_pressed[ev.button] = true;
@@ -125,26 +126,35 @@ void DanceGraph::engine() {
 	 * Compare to the usage in the dance() function!
 	 * Iterator is first initialized in the difficulty setting..
 	**/
-	for (DanceNotes::iterator& it = m_notesIt; it != m_notes.end() && it->note.begin < time - maxTolerance; it++) {
+/*	for (DanceNotes::iterator& it = m_notesIt; it != m_notes.end() && it->note.begin < time - maxTolerance; it++) {
 		if(!it->isHit)
 			std::cout << "Missed note at time " << time
 			<< "(note timing " << it->note.begin << ")" << std::endl;
-	}
+	}*/
 
 }
 
 
 /// Handles scoring and such
 void DanceGraph::dance(double time, input::Event const& ev) {
-	std::cout << "Pressed button " << ev.button << " at time " << time << std::endl;	
-	int a = 0;
+	if(ev.type == input::Event::RELEASE) {
+		// (at least) initial hack for testing hold end..
+		for (DanceNotes::iterator it = m_notesIt; it != m_notes.end() && it->note.begin <= time + maxTolerance; it++) {
+			if(it->isHit && it->note.end - it->note.begin > 0.5) {
+				it->releaseTime = time;
+				it->isHit = false;
+			}
+		}
+		return;
+	}
+
+	std::cout << "Pressed button " << ev.button << " at time " << time << std::endl;
 	/**
 	 * Idea behind the usage of the iterator:
 	 * Here it is copied to a local variable, because jumping back to the first accepted time (within tolerance)
 	 * is necessary in order to recognize notes closely timed notes.
 	**/
 	for (DanceNotes::iterator it = m_notesIt; it != m_notes.end() && it->note.begin <= time + maxTolerance; it++) {
-		a++;
 		if(!it->isHit && ev.button == it->note.note) {
 			// following clause needless?
 			if(!(it->note.begin >= time - maxTolerance))
@@ -158,7 +168,6 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 			m_score += p;
 		}
 	}
-	std::cout << "Dance had " << a << " iterations." << std::endl;
 }
 
 
