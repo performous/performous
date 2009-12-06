@@ -1,4 +1,4 @@
-ACTIVE DEVELOPERS
+﻿ACTIVE DEVELOPERS
 -----------------
 
 Vincent Le Ligeour  <yoda-jm at users.sourceforge.net>
@@ -36,6 +36,9 @@ Tapio Vierros <aave000 at users.sourceforge.net>
 Miguel Sánchez de León Peque <msdeleonpeque at gmail.com>
 	* Main menu
 	* SVG design
+
+Xaldyz <xaldyz at users.sourceforge.net>
+	* Windows build fixes and testing
 
 	
 INACTIVE DEVELOPERS
