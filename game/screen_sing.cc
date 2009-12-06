@@ -9,6 +9,7 @@
 #include "video.hh"
 #include "guitargraph.hh"
 #include "glutil.hh"
+#include "i18n.hh"
 
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
@@ -96,6 +97,7 @@ void ScreenSing::enter() {
 void ScreenSing::instrumentLayout(double time) {
 	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end();) {
 		if (it->dead(time)) {
+			// TODO: use boost::format
 			std::cout << it->getTrack() << " was thrown out after " << time << " inactive" << std::endl;
 			it = m_instruments.erase(it);
 		} else ++it;

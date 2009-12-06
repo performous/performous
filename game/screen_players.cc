@@ -8,6 +8,7 @@
 #include "layout_singer.hh"
 #include "theme.hh"
 #include "video.hh"
+#include "i18n.hh"
 
 #include <iostream>
 #include <sstream>
@@ -106,16 +107,16 @@ void ScreenPlayers::draw() {
 	if (m_players.empty()) {
 		// Format the song information text
 		if (m_search.text.empty()) {
-			oss_song << "No players found!";
-			// oss_order << "Check " << m_players.file() << "\n" << "directory for players\n";
-			oss_order << "Enter a name to create a new player.";
+			oss_song << _("No players found!");
+			oss_order << _("Enter a name to create a new player.");
 		} else {
-			oss_song << "Press enter to create player!";
+			oss_song << _("Press enter to create player!");
 			oss_order << m_search.text << '\n';
 		}
 	} else {
 		// Format the player information text
 		oss_song << m_database.scores.front().track << "\n";
+		// TODO: use boost::format
 		oss_song << "You reached " << m_database.scores.front().score << " points!";
 		oss_order << "Please enter your Name!\n"
 			<< "Name: " << m_players.current().name << '\n';
