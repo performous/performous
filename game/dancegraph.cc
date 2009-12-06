@@ -118,21 +118,47 @@ void DanceGraph::engine() {
 			m_pressed_anim[ev.button].setTarget(0.0);
 		}
 	}
-
+	
+	/**
+	 * Idea in the usage of the iterator:
+	 * Here it is used as reference to avoid needless iterations of the past notes during later calls of engine().
+	 * Compare to the usage in the dance() function!
+	 * Iterator is first initialized in the difficulty setting..
+	**/
+	for (DanceNotes::iterator& it = m_notesIt; it != m_notes.end() && it->note.begin < time - maxTolerance; it++) {
+		if(!it->isHit)
+			std::cout << "Missed note at time " << time
+			<< "(note timing " << it->note.begin << ")" << std::endl;
+	}
 
 }
 
 
 /// Handles scoring and such
 void DanceGraph::dance(double time, input::Event const& ev) {
-	for (DanceNotes::iterator& it = m_notesIt; it != m_notes.end() && it->note.begin <= time + maxTolerance; ++it) {
+	std::cout << "Pressed button " << ev.button << " at time " << time << std::endl;	
+	int a = 0;
+	/**
+	 * Idea behind the usage of the iterator:
+	 * Here it is copied to a local variable, because jumping back to the first accepted time (within tolerance)
+	 * is necessary in order to recognize notes closely timed notes.
+	**/
+	for (DanceNotes::iterator it = m_notesIt; it != m_notes.end() && it->note.begin <= time + maxTolerance; it++) {
+		a++;
 		if(!it->isHit && ev.button == it->note.note) {
+			// following clause needless?
+			if(!(it->note.begin >= time - maxTolerance))
+				std::cout << "Missed note. Timing: " << it->note.begin << "; Time: " << time
+				<< "(difference " << (it->note.begin - time) << ")" << std::endl;
 			it->isHit = true;
 			double p = points(it->note.begin - time);
+			std::cout << "Hit note " << ev.button << " at time " << time
+			  << "; " << p << " points." << std::endl;
 			it->score = p;
 			m_score += p;
 		}
 	}
+	std::cout << "Dance had " << a << " iterations." << std::endl;
 }
 
 
