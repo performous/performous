@@ -33,6 +33,10 @@ Fabian Fingerle  <fabian at datensalat.eu>
 Tapio Vierros <aave000 at users.sourceforge.net>
 	* Various things and features
 
+Miguel Sánchez de León Peque <msdeleonpeque at gmail.com>
+	* Main menu
+	* SVG design
+
 	
 INACTIVE DEVELOPERS
 -------------------
