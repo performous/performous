@@ -1,3 +1,5 @@
+#pragma once
+
 /* Internationalization Dependances */
 #include <libintl.h>
 #include <locale.h>
