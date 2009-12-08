@@ -39,9 +39,10 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
   m_audio(audio),
   m_song(song),
   m_input(input::GUITAR), // TODO: to be replaced by DANCEPAD
-  m_arrow(getThemePath("arrow.svg")),
+  m_arrows(getThemePath("arrows.svg")),
+  m_arrows_cursor(getThemePath("arrows_cursor.svg")),
+  m_arrows_hold(getThemePath("arrows_hold.svg")),
   m_mine(getThemePath("mine.svg")),
-  m_arrow_hold(getThemePath("arrow_hold.svg")),
   m_cx(0.0, 0.2),
   m_width(0.5, 0.4),
   m_stream(),
@@ -55,7 +56,6 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
   m_longestStreak(),
   m_gamingMode("dance-single")
 {
-	m_arrow.dimensions.middle().center();
 	
 	for(size_t i = 0; i < 4; i++) m_pressed[i] = false;
 	for(size_t i = 0; i < 4; i++) m_pressed_anim[i] = AnimValue(0.0, 4.0);
@@ -172,13 +172,14 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 
 
 namespace {
-	const float arrowScale = 0.6f;
+	//const float arrowScale = 0.6f;
+	const float arrowSize = 0.3f;
 	const float arrowRotations[4] = { 270.0f, 180.0f, 0.0f, 90.0f };
-	const float holdWidth = 0.3;
+	const float one_arrow_tex_w = 1.0 / 8.0;
 	
-	void vertexPair(float x, float y, float ty) {
-		glTexCoord2f(0.0f, ty); glVertex2f(x - holdWidth, y);
-		glTexCoord2f(1.0f, ty); glVertex2f(x + holdWidth, y);
+	void vertexPair(int arrow_i, float x, float y, float ty) {
+		glTexCoord2f(arrow_i * one_arrow_tex_w, ty); glVertex2f(x - arrowSize, y);
+		glTexCoord2f((arrow_i+1) * one_arrow_tex_w, ty); glVertex2f(x + arrowSize, y);
 	}
 
 	glutil::Color& colorGlow(glutil::Color& c, double glow) {
@@ -202,23 +203,26 @@ glutil::Color const& DanceGraph::color(int arrow_i) const {
 	return arrowColors[arrow_i];
 }
 
-void DanceGraph::drawArrow(int arrow_i, float x, float y, float scale) {
+void DanceGraph::drawArrow(int arrow_i, Texture& tex, float x, float y, float scale, float ty1, float ty2) {
 	glTranslatef(x, y, 0.0f);
-	glRotatef(arrowRotations[arrow_i], 0.0f, 0.0f, 1.0f);
-	if (scale != 1.0) glScalef(scale, scale, scale);
-	m_arrow.draw();
-	if (scale != 1.0) glScalef(1.0/scale, 1.0/scale, 1.0/scale);
-	glRotatef(-arrowRotations[arrow_i], 0.0f, 0.0f, 1.0f);
+	if (scale != 1.0f) glScalef(scale, scale, scale);
+	{
+		UseTexture tblock(tex);
+		glutil::Begin block(GL_TRIANGLE_STRIP);
+		vertexPair(arrow_i, 0.0f, -arrowSize, ty1);
+		vertexPair(arrow_i, 0.0f, arrowSize, ty2);
+	}
+	if (scale != 1.0f) glScalef(1.0f/scale, 1.0f/scale, 1.0f/scale);
 	glTranslatef(-x, -y, 0.0f);
 }
 
 void DanceGraph::drawMine(float x, float y, float rot, float scale) {
 	glTranslatef(x, y, 0.0f);
-	glRotatef(rot, 0.0f, 0.0f, 1.0f);
-	if (scale != 1.0) glScalef(scale, scale, scale);
+	if (scale != 1.0f) glScalef(scale, scale, scale);
+	if (rot != 0.0f) glRotatef(rot, 0.0f, 0.0f, 1.0f);
 	m_mine.draw();
-	if (scale != 1.0) glScalef(1.0/scale, 1.0/scale, 1.0/scale);
-	glRotatef(-rot, 0.0f, 0.0f, 1.0f);
+	if (rot != 0.0f) glRotatef(-rot, 0.0f, 0.0f, 1.0f);
+	if (scale != 1.0f) glScalef(1.0f/scale, 1.0f/scale, 1.0f/scale);
 	glTranslatef(-x, -y, 0.0f);
 }
 
@@ -250,14 +254,15 @@ void DanceGraph::draw(double time) {
 	// Arrows on cursor
 	for (int arrow_i = 0; arrow_i < 4; ++arrow_i) {
 		float x = -1.5f + arrow_i;
+		float y = time2y(0.0);
 		float l = m_pressed_anim[arrow_i].get();
 		float s = (5.0 - l) / 5.0;
 		glutil::Color c = color(arrow_i);
 		c.r += l; c.g += l; c.b +=l;
 		glColor4fv(c);
-		drawArrow(arrow_i, x, time2y(0.0), arrowScale * s);
+		drawArrow(arrow_i, m_arrows_cursor, x, y, s);
 	}
-
+	
 	// Draw the notes
 	for (DanceNotes::iterator it = m_notes.begin(); it != m_notes.end(); ++it) {
 		if (it->note.end - time < past) continue;
@@ -281,7 +286,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	int arrow_i = note.note.note;
 	bool mine = note.note.type == Note::MINE;
 	float x = -1.5f + arrow_i;
-	float s = arrowScale;
+	float s = 1.0; //arrowScale;
 	float yBeg = time2y(tBeg);
 	float yEnd = time2y(tEnd);
 	glutil::Color c = color(arrow_i);
@@ -292,7 +297,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	}
 	double glow = note.hitAnim.get();
 	
-	if (tEnd - tBeg > 0.1) {
+	if (yEnd - yBeg > arrowSize) {
 		// Draw holds
 		glColor4fv(c);
 		if (note.isHit && note.releaseTime <= 0) {
@@ -303,30 +308,34 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 			//if (time > note.note.begin + 1) note.releaseTime = time;
 		}
 		if (note.releaseTime > 0) yBeg = time2y(note.releaseTime - time);
-		{ // Scope block for Begin and UseTexture
-			UseTexture tblock(m_arrow_hold);
+		if (yEnd - yBeg > 0) {
+			UseTexture tblock(m_arrows_hold);
 			glutil::Begin block(GL_TRIANGLE_STRIP);
-			vertexPair(x, yEnd, 1.0f);
-			vertexPair(x, yBeg, 0.0f);
+			// Draw end
+			vertexPair(arrow_i, x, yEnd, 1.0f);
+			float yMid = std::max(yEnd-arrowSize, yBeg+arrowSize);
+			vertexPair(arrow_i, x, yMid, 2.0f/3.0f);
+			// Draw middle
+			vertexPair(arrow_i, x, yBeg+arrowSize, 1.0f/3.0f);
 		}
 		// Draw begin
 		if (note.isHit && tEnd < 0.1) {
 			glColor4fv(colorGlow(c,glow));
-			s = arrowScale + glow;
+			s += glow;
 		}
-		drawArrow(arrow_i, x, yBeg, s);
+		drawArrow(arrow_i, m_arrows_hold, x, yBeg, s, 0.0f, 1.0f/3.0f);
 	} else {
 		// Draw short note
 		if (mine) {
 			c.a = 1.0 - glow; glColor4fv(c);
-			s += glow * 0.5;
+			s = 0.6f + glow * 0.5f;
 			float rot = int(time*360 * (note.isHit ? 2.0 : 1.0) ) % 360;
 			if (note.isHit) yBeg = time2y(0.0);
 			drawMine(x, yBeg, rot, s);
 		} else {
-			s = arrowScale + glow;
+			s += glow;
 			glColor4fv(colorGlow(c, glow));
-			drawArrow(arrow_i, x, yBeg, s);
+			drawArrow(arrow_i, m_arrows, x, yBeg, s);
 		}
 	}
 }
