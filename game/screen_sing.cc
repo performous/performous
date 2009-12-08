@@ -54,7 +54,6 @@ void ScreenSing::enter() {
 	m_progress->dimensions.fixedWidth(0.4).left(-0.5).screenTop();
 	theme->timer.dimensions.screenTop(0.5 * m_progress->dimensions.h());
 	boost::ptr_vector<Analyzer>& analyzers = m_capture.analyzers();
-	m_engine.reset(new Engine(m_audio, *m_song, analyzers.begin(), analyzers.end(), m_database));
 	m_layout_singer.reset(new LayoutSinger(*m_song, m_database, theme));
 	// I know some purists would hang me for this loop
 	if( !m_song->track_map.empty() ) {
@@ -92,6 +91,7 @@ void ScreenSing::enter() {
 		}
 	}
 	m_audio.playMusic(m_song->music, false, 0.0, m_instruments.empty() ? -1.0 : -8.0); // Startup delay for instruments is longer than for singing only
+	m_engine.reset(new Engine(m_audio, *m_song, analyzers.begin(), analyzers.end(), m_database));
 }
 
 void ScreenSing::instrumentLayout(double time) {
