@@ -25,9 +25,9 @@ float Dimensions::screenY() const {
 
 namespace {
 	bool isPow2(unsigned int val) {
-		unsigned int count = 0;
-		do { if (val & 1) ++count; } while (val >>= 1);
-		return val == 1;
+		if (val == 0) return false;
+		if ((val & (val-1)) == 0) return true; // From Wikipedia: Power_of_two
+		return false;
 	}
 
 	unsigned int nextPow2(unsigned int val) {
@@ -161,7 +161,8 @@ void Texture::load(unsigned int width, unsigned int height, pix::Format format, 
 	PixFmt const& f = getPixFmt(format);
 	glPixelStorei(GL_UNPACK_SWAP_BYTES, f.swap);
 	// Load the data into texture
-	if (checkExtension("GL_ARB_texture_non_power_of_two")) { // Use OpenGL 2.0 functionality 
+	if ((isPow2(width) && isPow2(height)) || 
+	  checkExtension("GL_ARB_texture_non_power_of_two")) { // Use OpenGL 2.0 functionality 
 		glTexImage2D(type(), 0, GL_RGBA, width, height, 0, f.format, f.type, buffer);	
 	} else {
 		// TODO: Test for OpenGL extension GL_ARB_texture_non_power_of_two and if not found, 
