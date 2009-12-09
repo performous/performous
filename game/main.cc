@@ -8,7 +8,7 @@
 #include "database.hh"
 #include "xtime.hh"
 #include "video_driver.hh"
-#include "i18n.h"
+#include "i18n.hh"
 
 // Screens
 #include "screen_intro.hh"
@@ -211,7 +211,7 @@ int main(int argc, char** argv) {
     setlocale (LC_ALL, "");
     bindtextdomain (PACKAGE, "../locale");
     textdomain (PACKAGE);
-	
+
 	std::cout << PACKAGE " " VERSION << std::endl;
 	std::signal(SIGINT, quit);
 	std::signal(SIGTERM, quit);
