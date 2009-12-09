@@ -24,4 +24,4 @@ find_library(gettext_LIBRARY
 
 set(gettext_PROCESS_INCLUDES gettext_INCLUDE_DIR)
 set(gettext_PROCESS_LIBS gettext_LIBRARY)
-libfind_process(gettext)
+libfind_process(Gettext)

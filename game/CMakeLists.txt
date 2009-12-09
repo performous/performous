@@ -20,7 +20,7 @@ else()
 endif()
 
 # Find all the libs that don't require extra parameters
-foreach(lib ${OUR_LIBS} SDL PangoCairo LibRSVG LibXML++ Magick++ GLEW AVFormat SWScale OpenGL gettext Z Jpeg Tiff Png)
+foreach(lib ${OUR_LIBS} SDL PangoCairo LibRSVG LibXML++ Magick++ GLEW AVFormat SWScale OpenGL Gettext Z Jpeg Tiff Png)
 	find_package(${lib} REQUIRED)
 	include_directories(${${lib}_INCLUDE_DIRS})
 	list(APPEND LIBS ${${lib}_LIBRARIES})
