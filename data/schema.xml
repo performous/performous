@@ -178,6 +178,7 @@ to save the current settings to XML.
 	<entry name="audio/playback" type="string_list">
 		<stringvalue></stringvalue>
 		<stringvalue>alsa:hw:0</stringvalue>
+		<stringvalue>channels=2</stringvalue>
 		<!-- <stringvalue>channels=2,rate=44100,frames=256@alsa</stringvalue> -->
 		<locale name="C">
 			<short>Playback devices</short>

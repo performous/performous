@@ -8,6 +8,7 @@
 #include "database.hh"
 #include "xtime.hh"
 #include "video_driver.hh"
+#include "i18n.h"
 
 // Screens
 #include "screen_intro.hh"
@@ -206,6 +207,11 @@ template <typename Container> void confOverride(Container const& c, std::string 
 }
 
 int main(int argc, char** argv) {
+	// initialize gettext
+    setlocale (LC_ALL, "");
+    bindtextdomain (PACKAGE, "../locale");
+    textdomain (PACKAGE);
+	
 	std::cout << PACKAGE " " VERSION << std::endl;
 	std::signal(SIGINT, quit);
 	std::signal(SIGTERM, quit);
