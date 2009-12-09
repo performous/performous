@@ -178,6 +178,8 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 			  << "; " << p << " points." << std::endl;
 			it->score = p;
 			m_score += p;
+			
+			m_streak++; // Hack to test streak popup
 		}
 	}
 }
