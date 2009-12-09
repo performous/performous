@@ -86,11 +86,13 @@ class DanceGraph {
 	SvgTxtTheme m_text;
 	boost::scoped_ptr<SvgTxtThemeSimple> m_popupText;
 	AnimValue m_correctness;
+	AnimValue m_streakPopup;
 	int m_flow_direction;
 	double m_score;
 	double m_scoreFactor;
 	int m_streak;
 	int m_longestStreak;
+	int m_bigStreak;
 	std::string m_gamingMode;
 };
 

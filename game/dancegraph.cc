@@ -19,6 +19,7 @@ namespace {
 	}
 	float y2a(float y) { return time2a(past - y / timescale * (future - past)); }
 	const double maxTolerance = 0.15;
+	int getNextBigStreak(int prev) { return prev + 10; }
 	
 	// TODO: Use this or something else?
 	double points(double error) {
@@ -50,11 +51,13 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
   m_dead(1000),
   m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
   m_correctness(0.0, 5.0),
+  m_streakPopup(0.0, 1.0),
   m_flow_direction(1),
   m_score(),
   m_scoreFactor(1),
   m_streak(),
   m_longestStreak(),
+  m_bigStreak(),
   m_gamingMode("dance-single")
 {
 	
@@ -135,6 +138,11 @@ void DanceGraph::engine() {
 			<< "(note timing " << it->note.begin << ")" << std::endl;
 	}*/
 
+	// Check if a long streak goal has been reached
+	if (m_streak >= getNextBigStreak(m_bigStreak)) {
+		m_streakPopup.setTarget(1.0);
+		m_bigStreak = getNextBigStreak(m_bigStreak);
+	}
 }
 
 
@@ -249,12 +257,13 @@ void DanceGraph::draw(double time) {
 		m_text.dimensions.screenBottom(-0.015).middle(-0.09 + offsetX);
 		m_text.draw(getGameMode());
 	}
-	glutil::PushMatrixMode pmm(GL_PROJECTION);
-	glTranslatef(frac * 2.0 * offsetX, 0.0f, 0.0f);
-	glutil::PushMatrixMode pmb(GL_MODELVIEW);
-	glTranslatef((1.0 - frac) * offsetX, dimensions.y1(), 0.0f);
-	{ float s = dimensions.w() / 5.0f; glScalef(s, s, s); }
-
+	{ glutil::PushMatrixMode pmm(GL_PROJECTION);
+	{ glutil::Translation tr1(frac * 2.0 * offsetX, 0.0f, 0.0f);
+	{ glutil::PushMatrixMode pmb(GL_MODELVIEW);
+	{ glutil::Translation tr2((1.0 - frac) * offsetX, dimensions.y1(), 0.0f);
+	{ float temp_s = dimensions.w() / 5.0f;
+	  glutil::Scale sc1(temp_s, temp_s, temp_s);
+	
 	// Arrows on cursor
 	for (int arrow_i = 0; arrow_i < 4; ++arrow_i) {
 		float x = -1.5f + arrow_i;
@@ -279,7 +288,24 @@ void DanceGraph::draw(double time) {
 		//std::cout << i << ": " << time2y(i) << std::endl;
 		//drawArrow(1, 0, time2y(i), 0.6);
 	//}
-
+	
+	} //< reverse scale sc1
+	} //< reverse trans tr2
+	} //< reverse push pmb
+	} //< reverse trans tr1
+	} //< reverse push pmm
+	
+	// Draw streak pop-up for long streak intervals
+	double streakAnim = m_streakPopup.get();
+	if (streakAnim > 0.0) {
+		double s = 0.15 * (1.0 + streakAnim);
+		glColor4f(1.0f, 0.0f, 0.0f, 1.0 - streakAnim);
+		m_popupText->render(boost::lexical_cast<std::string>(unsigned(m_bigStreak)) + "\nStreak!");
+		m_popupText->dimensions().center(0.0).middle(0.0).stretch(s,s);
+		m_popupText->draw();
+		if (streakAnim > 0.999) m_streakPopup.setTarget(0.0, true);
+	}
+	
 	glColor3f(1.0f, 1.0f, 1.0f);
 }
 
