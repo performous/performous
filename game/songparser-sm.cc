@@ -32,6 +32,7 @@ namespace {
 		else throw std::runtime_error("Invalid boolean value: " + str);
 	}
 	int upper_case (int c) { return toupper (c); }
+	int lower_case (int c) { return tolower (c); }
 }
 
 
@@ -50,7 +51,17 @@ void SongParser::smParse() {
 	if (m_song.danceTracks.empty() ) throw std::runtime_error("No note data in the file");
 	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
 	//if (m_bpm != 0.0) addBPM(0, m_bpm);
-}	
+
+/*
+	if (m_song.danceTracks.find("EASY") != m_song.danceTracks.end() ) std::cout << "OK" << std::endl;
+	else std::cout << "WRONG TRACK" << std::endl;
+	if (m_song.danceTracks.find("MEDIUM") != m_song.danceTracks.end() ) std::cout << "OK" << std::endl;
+	else std::cout << "WRONG TRACK" << std::endl;
+	if (m_song.danceTracks.find("HARD") != m_song.danceTracks.end() ) std::cout << "OK" << std::endl;
+	else std::cout << "WRONG TRACK" << std::endl;
+*/
+}
+	
 bool SongParser::smParseField(std::string line) {
 		if (line.empty() || line == "\r") return true;
 		if (line[0] == '/' && line[1] == '/') return true; //jump over possible comments
@@ -61,20 +72,20 @@ bool SongParser::smParseField(std::string line) {
 		if (key == "NOTES") {
 		
 			//Note values are analyzed here. Values are:
-		bool endOfInput = false;
 			// TODO: NOTES header vars needs better way to strip trailing colon ':'
 			while (getline(line)) {
 			//<NotesType>:
 			//if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
-			std::string notestype = boost::trim_copy(line.substr(0, line.size() -2));
+			std::string notestype = boost::trim_copy(line.substr(0, line.find_first_of(':')));
+			transform(notestype.begin(), notestype.end(), notestype.begin(), lower_case );
 			//<Description>:
 			if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
-			std::string description = boost::trim_copy(line.substr(0, line.size() -2));
+			std::string description = boost::trim_copy(line.substr(0, line.find_first_of(':')));
+			//transform(description.begin(), description.end(), description.begin(), lower_case );
 			//<DifficultyClass>:
 			if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
-			std::string difficultyclass = boost::trim_copy(line.substr(0, line.size() -2));
-			transform(difficultyclass.begin(), difficultyclass.end(), 
-			difficultyclass.begin(), upper_case );
+			std::string difficultyclass = boost::trim_copy(line.substr(0, line.find_first_of(':')));
+			transform(difficultyclass.begin(), difficultyclass.end(), difficultyclass.begin(), upper_case );
 			DanceDifficulty danceDifficulty = DIFFICULTYCOUNT;
 				if(difficultyclass == "BEGINNER") danceDifficulty = BEGINNER;
 				if(difficultyclass == "EASY") danceDifficulty = EASY;
@@ -91,20 +102,20 @@ bool SongParser::smParseField(std::string line) {
 			//std::string radarvalues = boost::trim_copy(line.substr(0, line.size() -2));
 			
 			//<NoteData>:
-			Notes notes = smParseNotes(line, endOfInput);
-			if(endOfInput) throw std::runtime_error("end is here");
-			
-			
+			Notes notes = smParseNotes(line);
+
 			DanceTrack danceTrack(description, notes);
-			DanceDifficultyMap danceDifficultyMap;
-			danceDifficultyMap.insert(std::make_pair(danceDifficulty, danceTrack));
-			m_song.danceTracks.insert(std::make_pair(notestype, danceDifficultyMap));
+			if (m_song.danceTracks.find(notestype) == m_song.danceTracks.end() ) {
+				DanceDifficultyMap danceDifficultyMap;
+				m_song.danceTracks.insert(std::make_pair(notestype, danceDifficultyMap));
+			}
+			m_song.danceTracks[notestype].insert(std::make_pair(danceDifficulty, danceTrack));
 			}
 			return false;
 		}
 		std::string value = boost::trim_copy(line.substr(pos + 1));
 		//values that continue to next line are handeled here
-		while (value[value.size() -1] != ';') {			
+		while (value[value.size() -1] != ';') {
 			std::string str;			
 			getline (str);
 			value += boost::trim_copy(str);
@@ -127,7 +138,18 @@ bool SongParser::smParseField(std::string line) {
 					if (!(iss >> chr)) break;
 				}
 		}
-		/*additionally .sm fileformat has following constants:
+		else if (key == "STOPS"){
+				std::istringstream iss(value);	
+				double beat, sec;	
+				char chr;
+				while (iss >> beat >> chr >> sec) {				
+					m_stops.push_back(std::make_pair(beat, sec));
+					if (!(iss >> chr)) break;
+		
+				}
+		}
+
+		/*.sm fileformat has also following constants that are ignored in this version of the parser:
 		#SUBTITLE
 		#TITLETRANSLIT
 		#SUBTITLETRANSLIT
@@ -137,13 +159,12 @@ bool SongParser::smParseField(std::string line) {
 		#SAMPLESTART
     		#SAMPLELENGTH
 		#SELECTABLE
-    		#STOPS
 		#BGCHANGE
 		*/
 		return true;
 }
 
-Notes SongParser::smParseNotes(std::string line, bool endOfInput) {
+Notes SongParser::smParseNotes(std::string line) {
 	DanceChords chords;	//temporary container for notes
 	
 	Notes notes;	
@@ -192,6 +213,7 @@ Notes SongParser::smParseNotes(std::string line, bool endOfInput) {
 		}
 		//reading notes into a temporary container chord
 		DanceChord chord;
+
 		std::istringstream iss(line);
 		for(int i =0; i<4; i++){
 			char notetype = iss.get();
@@ -226,6 +248,5 @@ Notes SongParser::smParseNotes(std::string line, bool endOfInput) {
 		chords.push_back(chord);
 		continue;
 	}
-	endOfInput = true;
 	return notes;
 }									

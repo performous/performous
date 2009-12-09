@@ -90,6 +90,7 @@ class SongParser {
 	bool m_relative;
 	double m_gap;
 	double m_bpm;
+	
 	bool txtCheck(std::vector<char> const& data);
 	void txtParse();
 	bool txtParseField(std::string const& line);
@@ -99,11 +100,12 @@ class SongParser {
 	bool smCheck(std::vector<char> const& data);
 	void smParse();
 	bool smParseField(std::string line);
-	Notes smParseNotes(std::string line, bool endOfInput);
+	Notes smParseNotes(std::string line);
 	double m_prevtime;
 	unsigned int m_prevts;
 	unsigned int m_relativeShift;
 	double m_maxScore;
+	std::vector<std::pair<double,double> > m_stops;
 	struct BPM {
 		BPM(double _begin, unsigned int _ts, double bpm): begin(_begin), step(0.25 * 60.0 / bpm), ts(_ts) {}
 		double begin; // Time in seconds
