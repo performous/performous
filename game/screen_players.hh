@@ -16,7 +16,7 @@ class ThemeSongs;
 class LayoutSinger;
 
 
-/** song chooser screen.
+/** Player hiscore addition screen.
   Database is passed as argument, but only the players is stored
   and used everywhere.
  */

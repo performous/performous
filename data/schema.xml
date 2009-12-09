@@ -217,6 +217,7 @@ to save the current settings to XML.
 		<stringvalue>/usr/share/games/ultrastar/songs/</stringvalue>
 		<stringvalue>/usr/share/games/fretsonfire/data/songs/</stringvalue>
 		<stringvalue>../songs/</stringvalue><!-- For Windows where the program is started in bin/ -->
+		<stringvalue>~/.performous/songs/</stringvalue>
 		<stringvalue>~/.ultrastar/songs/</stringvalue>
 		<stringvalue>~/.fretsonfire/songs/</stringvalue>
 		<locale name="C">
