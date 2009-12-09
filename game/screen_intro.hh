@@ -29,4 +29,5 @@ class ScreenIntro : public Screen {
 	boost::ptr_vector<MenuOption> m_menuOptions;
 	boost::scoped_ptr<Dialog> m_dialog;
 	unsigned int selected;
+	bool m_first;
 };

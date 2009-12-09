@@ -5,7 +5,7 @@
 #include "record.hh"
 #include "i18n.hh"
 
-ScreenIntro::ScreenIntro(std::string const& name, Audio& audio, Capture& capture): Screen(name), m_audio(audio), m_capture(capture), selected() {
+ScreenIntro::ScreenIntro(std::string const& name, Audio& audio, Capture& capture): Screen(name), m_audio(audio), m_capture(capture), selected(), m_first(true) {
 	m_menuOptions.push_back(new MenuOption(_("Perform"), "Songs", "intro_sing.svg", _("Start performing!")));
 	m_menuOptions.push_back(new MenuOption(_("Practice"), "Practice", "intro_practice.svg", _("Check your skills or test the microphones")));
 	m_menuOptions.push_back(new MenuOption(_("Configure"), "Configuration", "intro_configure.svg", _("Configure game options")));
@@ -15,10 +15,15 @@ ScreenIntro::ScreenIntro(std::string const& name, Audio& audio, Capture& capture
 void ScreenIntro::enter() {
 	m_audio.playMusic(getThemePath("menu.ogg"), true);
 	theme.reset(new ThemeIntro());
-	std::string msg;
-	if (!m_audio.isOpen()) msg = _("No playback devices could be used.\n");
-	if (m_capture.analyzers().empty()) msg += _("No microphones found.\n");
-	if (!msg.empty()) m_dialog.reset(new Dialog(msg + _("\nPlease configure some before playing.")));
+	if( m_first ) {
+		std::string msg;
+		if (!m_audio.isOpen()) msg = _("No playback devices could be used.\n");
+		if (m_capture.analyzers().empty()) msg += _("No microphones found.\n");
+		if (!msg.empty()) m_dialog.reset(new Dialog(msg + _("\nPlease configure some before playing.")));
+		m_first = false;
+	} else {
+		m_dialog.reset();
+	}
 }
 
 void ScreenIntro::exit() {
