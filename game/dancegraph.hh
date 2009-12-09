@@ -55,7 +55,7 @@ class DanceGraph {
 	glutil::Color const& color(int arrow_i) const;
 	void dance(double time, input::Event const& ev);
 	void drawNote(DanceNote& note, double time);
-	void drawArrow(int arrow_i, Texture& tex, float x, float y, float scale = 1.0, float ty1 = 1.0, float ty2 = 0.0);
+	void drawArrow(int arrow_i, Texture& tex, float x, float y, float scale = 1.0, float ty1 = 0.0, float ty2 = 1.0);
 	void drawMine(float x, float y, float rot = 0.0, float scale = 1.0);
 	Audio& m_audio;
 	Song const& m_song;
