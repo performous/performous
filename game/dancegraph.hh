@@ -14,10 +14,11 @@ class Song;
 
 struct DanceNote {
 	DanceNote(Note note) :
-		note(note), hitAnim(0.0, 5.0), releaseTime(0), score(0), isHit(false) {}
+		note(note), hitAnim(0.0, 5.0), releaseTime(0), accuracy(0), score(0), isHit(false) {}
 	Note note;
 	AnimValue hitAnim; /// for animating hits
 	double releaseTime; /// tells when a hold was ended
+	float accuracy; /// how accurate the hit was [0,1]
 	int score;
 	bool isHit;
 };
@@ -83,6 +84,7 @@ class DanceGraph {
 	AnimValue m_pressed_anim[4];
 	int m_dead;
 	SvgTxtTheme m_text;
+	boost::scoped_ptr<SvgTxtThemeSimple> m_popupText;
 	AnimValue m_correctness;
 	int m_flow_direction;
 	double m_score;

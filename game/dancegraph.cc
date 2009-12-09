@@ -30,6 +30,7 @@ namespace {
 		if (error < maxTolerance / 6) score += 5;
 		return score;
 	}
+	
 }
 
 
@@ -56,6 +57,8 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
   m_longestStreak(),
   m_gamingMode("dance-single")
 {
+	
+	m_popupText.reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	
 	for(size_t i = 0; i < 4; i++) m_pressed[i] = false;
 	for(size_t i = 0; i < 4; i++) m_pressed_anim[i] = AnimValue(0.0, 4.0);
@@ -162,6 +165,7 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 				<< "(difference " << (it->note.begin - time) << ")" << std::endl;
 			it->isHit = true;
 			double p = points(it->note.begin - time);
+			it->accuracy = 1.0 - (std::abs(it->note.begin - time) / maxTolerance);
 			std::cout << "Hit note " << ev.button << " at time " << time
 			  << "; " << p << " points." << std::endl;
 			it->score = p;
@@ -286,7 +290,8 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	int arrow_i = note.note.note;
 	bool mine = note.note.type == Note::MINE;
 	float x = -1.5f + arrow_i;
-	float s = 1.0; //arrowScale;
+	float s = 1.0;
+	float ac = note.accuracy;
 	float yBeg = time2y(tBeg);
 	float yEnd = time2y(tEnd);
 	glutil::Color c = color(arrow_i);
@@ -337,5 +342,20 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 			glColor4fv(colorGlow(c, glow));
 			drawArrow(arrow_i, m_arrows, x, yBeg, s);
 		}
+	}
+	if (glow > 0 && ac > 0 && !mine) {
+		double s = 0.4 * (1.0 + glow);
+		glColor4fv(color(arrow_i));
+		std::string rank = "Horrible!";
+		if (ac > .90) rank = "Perfect!";
+		else if (ac > .80) rank = "Excellent!";
+		else if (ac > .70) rank = "Great!";
+		else if (ac > .60) rank = "Good!";
+		else if (ac > .50) rank = "OK!";
+		else if (ac > .40) rank = "Poor!";
+		else if (ac > .30) rank = "Bad!";
+		m_popupText->render(rank);
+		m_popupText->dimensions().middle(x).center(time2y(0.0)).stretch(s,s/2.0);
+		m_popupText->draw();
 	}
 }
