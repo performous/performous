@@ -645,7 +645,7 @@ void GuitarGraph::drawInfo(double time, double offsetX) {
 		double s = 0.2 * (1.0 + streakAnim);
 		glColor4f(1.0f, 0.0f, 0.0f, 1.0 - streakAnim);
 		m_popupText->render(boost::lexical_cast<std::string>(unsigned(m_bigStreak)) + "\nStreak!");
-		m_popupText->dimensions().center(0.1).middle(0.0).stretch(s,s);
+		m_popupText->dimensions().center(0.1).middle(offsetX).stretch(s,s);
 		m_popupText->draw();
 		if (streakAnim > 0.999) m_streakPopup.setTarget(0.0, true);
 	}
@@ -656,12 +656,12 @@ void GuitarGraph::drawInfo(double time, double offsetX) {
 		float s = 0.2 * (1.0 + godAnim);
 		glColor4f(0.3f, 0.0f, 1.0f, a);
 		m_popupText->render("God Mode\nActivated!");
-		m_popupText->dimensions().center(0.1).middle(0.0).stretch(s,s);
+		m_popupText->dimensions().center(0.1).middle(offsetX).stretch(s,s);
 		m_popupText->draw();
 		s = 0.12 * (1.0 + godAnim);
 		glColor4f(0.8f, 0.8f, 1.0f, a);
 		m_popupText->render("Mistakes ignored");
-		m_popupText->dimensions().center(0.26).middle(0.0).stretch(s, s/5.0);
+		m_popupText->dimensions().center(0.26).middle(offsetX).stretch(s, s/5.0);
 		m_popupText->draw();
 		if (godAnim > 0.999) m_godmodePopup.setTarget(0.0, true);
 	}
