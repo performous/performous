@@ -101,11 +101,11 @@ std::runtime_error (for errors in input data, etc) or std::logic_error
 
 Indentation is one tab character per a pair of {}. Long lines that are
 split over several use "small indent" of two spaces. Labels (public/private,
-case/default) are one level "higher" than they should (i.e. one less tab) but
-have a small indent of two spaces instead. Do not try to align anything with the
-next/previous line of code. Maintaining the alignment wastes time and it also
-easily breaks with Emacs (which cannot understand that it should not convert
-those spaces that you used for alignment into tab characters).
+case/default) are one level "higher" than they should (i.e. one less tab).
+Do not try to align anything with the next/previous line of code. Maintaining
+the alignment wastes time and it also easily breaks with Emacs (which cannot
+understand that it should not convert those spaces that you used for alignment
+into tab characters).
 
 We prefer short and simple code. E-g- if (foo) bar(); is easiest to read when it
 is all on one line, so don't make it three or four lines long by adding braces,
@@ -115,10 +115,57 @@ When you can, use "if" with return, break, continue and throw to handle
 conditional situations instead of using if-elses. This makes the code much
 easier to read.
 
+Do not use switch-case for anything but enum values (and never provide default
+label in that case). Just use ifs that break execution (return, continue,
+break or throw) or if-else structures.
+
+Rationale: The switch statement is very badly designed. There are no blocks
+around cases by default, so if you need to define variables, you need to add
+a block yourself (causing total two levels of indentation). It is also very easy
+to forget a break, causing incorrect and hard-to-debug errors that you will get
+no compile warnings for. Additionally, you won't be able to break out of a
+surrounding loop like you can with if-elses. The reason why enum values can and
+should still be handled with switch-case is that GCC gives a warning if you do
+not handle all possible values, therefore catching a class of hard-to-find bugs
+and outweighting the other disadvantages of switch statements.
+
 Write more comments than we do! (to describe the intention, larger logical
 blocks of code and the external behavior of functions, but do not duplicate your
 C++ in English).
 
+
+Development model: (adding a new feature)
+
+1. Make things work (with minimal functionality)
+2. Clean up the code (trying to minimize the amount of code)
+3. Add functionality
+4. Repeat from step 2 until the feature is done
+
+Each step includes the necessary testing to make sure that the code works. At
+least one git commit should be done for each step. Atomic commits are preferred.
+
+If you are not sufficiently familiar with C++, ask other developers to help with
+the cleanup phase.
+
+Doing very rapid development also means that the git trunk may be broken at
+times. Bigger features that may cause breakage for more than a few hours
+(therefore disturbing other developers) or that may require postponing a release
+by several days should be done in separate branches and only merged to master
+once the problems have been sorted out. The separate branches should also merge
+master to them quite often to avoid becoming incompatible with the master
+branch.
+
+If you are working on master branch, avoid pushing your changes if they break
+compiling or any existing functionality. As long as the commits are in your
+local repository, they do not disturb other developers. On the other hand, you
+still should push often (a partially implemented feature doesn't usually cause
+problems). Frequent pushing allows other developers to follow what you are doing
+and comment on it.
+
+TDD hasn't been used, as it doesn't seem suitable for game developement where
+there are no specifications to follow (you only find out what you will be doing
+after implementing some of it). Writing useful tests for code dealing with
+graphics, threads etc. is also very difficult.
 
 
 TODO: move the documentation in this file to the website developers page?
