@@ -83,6 +83,7 @@ class DanceGraph {
 	bool m_pressed[4];
 	AnimValue m_pressed_anim[4];
 	int m_dead;
+	double m_jointime;
 	SvgTxtTheme m_text;
 	boost::scoped_ptr<SvgTxtThemeSimple> m_popupText;
 	AnimValue m_correctness;

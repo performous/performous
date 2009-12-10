@@ -11,6 +11,7 @@ namespace {
 	const float past = -0.4f;
 	const float future = 2.0f;
 	const float timescale = 7.0f;
+	const float join_delay = 5.0f; // how long player has time to choose difficulty when joining in the middle
 	// Note: t is difference from playback time so it must be in range [past, future]
 	float time2y(float t) { return timescale * (t - past) / (future - past); }
 	float time2a(float t) {
@@ -49,6 +50,7 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
   m_width(0.5, 0.4),
   m_stream(),
   m_dead(1000),
+  m_jointime(0),
   m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
   m_correctness(0.0, 5.0),
   m_streakPopup(0.0, 1.0),
@@ -106,6 +108,7 @@ void DanceGraph::engine() {
 	// Handle all events
 	for (input::Event ev; m_input.tryPoll(ev);) {
 		m_dead = false;
+		if (m_jointime == 0) m_jointime = (time < 0.0 ? -join_delay : time);
 		if(ev.button < 0 || ev.button > 3)
 			continue;
 		if (time < -0.5) {
@@ -246,72 +249,73 @@ void DanceGraph::draw(double time) {
 	dimensions.screenTop().middle(m_cx.get()).stretch(m_width.get(), 1.0);
 	double offsetX = 0.5 * (dimensions.x1() + dimensions.x2());
 	double frac = 0.75;  // Adjustable: 1.0 means fully separated, 0.0 means fully attached
-	// Draw scores
-	if (time >= -0.5) {
+	if (time < -0.5 || m_jointime == 0 || time - m_jointime < join_delay) {
+		if (m_jointime == 0) {
+			m_popupText->render("Choose difficulty/mode\nto enter the game!");
+			m_popupText->dimensions().center(0.0).middle(0.0 + offsetX).stretch(0.3, 0.15);
+			m_popupText->draw();
+		}
+		m_text.dimensions.screenBottom(-0.075).middle(-0.09 + offsetX);
+		m_text.draw("^ " + getDifficultyString() + " v");
+		m_text.dimensions.screenBottom(-0.050).middle(-0.09 + offsetX);
+		m_text.draw(getGameMode());
+	} else {
+		// Draw scores
 		m_text.dimensions.screenBottom(-0.35).middle(0.32 * dimensions.w() + offsetX);
 		m_text.draw(boost::lexical_cast<std::string>(unsigned(getScore())));
 		m_text.dimensions.screenBottom(-0.32).middle(0.32 * dimensions.w() + offsetX);
 		m_text.draw(boost::lexical_cast<std::string>(unsigned(m_streak)) + "/" 
 		  + boost::lexical_cast<std::string>(unsigned(m_longestStreak)));
-	} else {
-		// TODO: only display if help if not pressed anything
-		m_popupText->render("Choose difficulty/mode\nto enter the game!");
-		m_popupText->dimensions().center(0.0).middle(0.0 + offsetX).stretch(0.3, 0.15);
-		m_popupText->draw();
-		m_text.dimensions.screenBottom(-0.075).middle(-0.09 + offsetX);
-		m_text.draw("^ " + getDifficultyString() + " v");
-		m_text.dimensions.screenBottom(-0.050).middle(-0.09 + offsetX);
-		m_text.draw(getGameMode());
-	}
-	{ glutil::PushMatrixMode pmm(GL_PROJECTION);
-	{ glutil::Translation tr1(frac * 2.0 * offsetX, 0.0f, 0.0f);
-	{ glutil::PushMatrixMode pmb(GL_MODELVIEW);
-	{ glutil::Translation tr2((1.0 - frac) * offsetX, dimensions.y1(), 0.0f);
-	{ float temp_s = dimensions.w() / 5.0f;
-	  glutil::Scale sc1(temp_s, temp_s, temp_s);
-	
-	// Arrows on cursor
-	for (int arrow_i = 0; arrow_i < 4; ++arrow_i) {
-		float x = -1.5f + arrow_i;
-		float y = time2y(0.0);
-		float l = m_pressed_anim[arrow_i].get();
-		float s = (5.0 - l) / 5.0;
-		glutil::Color c = color(arrow_i);
-		c.r += l; c.g += l; c.b +=l;
-		glColor4fv(c);
-		drawArrow(arrow_i, m_arrows_cursor, x, y, s);
-	}
-	
-	// Draw the notes
-	for (DanceNotes::iterator it = m_notes.begin(); it != m_notes.end(); ++it) {
-		if (it->note.end - time < past) continue;
-		if (it->note.begin - time > future) break;
-		drawNote(*it, time);
-	}
+		// Some matrix magic to get the viewport right
+		{ glutil::PushMatrixMode pmm(GL_PROJECTION);
+		{ glutil::Translation tr1(frac * 2.0 * offsetX, 0.0f, 0.0f);
+		{ glutil::PushMatrixMode pmb(GL_MODELVIEW);
+		{ glutil::Translation tr2((1.0 - frac) * offsetX, dimensions.y1(), 0.0f);
+		{ float temp_s = dimensions.w() / 5.0f;
+		  glutil::Scale sc1(temp_s, temp_s, temp_s);
+		
+		// Arrows on cursor
+		for (int arrow_i = 0; arrow_i < 4; ++arrow_i) {
+			float x = -1.5f + arrow_i;
+			float y = time2y(0.0);
+			float l = m_pressed_anim[arrow_i].get();
+			float s = (5.0 - l) / 5.0;
+			glutil::Color c = color(arrow_i);
+			c.r += l; c.g += l; c.b +=l;
+			glColor4fv(c);
+			drawArrow(arrow_i, m_arrows_cursor, x, y, s);
+		}
+		
+		// Draw the notes
+		for (DanceNotes::iterator it = m_notes.begin(); it != m_notes.end(); ++it) {
+			if (it->note.end - time < past) continue;
+			if (it->note.begin - time > future) break;
+			drawNote(*it, time);
+		}
 
-	// To test arrow coordinate positioning
-	//for (float i = past; i <= future; i+=0.2) {
-		//std::cout << i << ": " << time2y(i) << std::endl;
-		//drawArrow(1, 0, time2y(i), 0.6);
-	//}
-	
-	} //< reverse scale sc1
-	} //< reverse trans tr2
-	} //< reverse push pmb
-	} //< reverse trans tr1
-	} //< reverse push pmm
-	
-	// Draw streak pop-up for long streak intervals
-	double streakAnim = m_streakPopup.get();
-	if (streakAnim > 0.0) {
-		double s = 0.15 * (1.0 + streakAnim);
-		glColor4f(1.0f, 0.0f, 0.0f, 1.0 - streakAnim);
-		m_popupText->render(boost::lexical_cast<std::string>(unsigned(m_bigStreak)) + "\nStreak!");
-		m_popupText->dimensions().center(0.0).middle(offsetX).stretch(s,s);
-		m_popupText->draw();
-		if (streakAnim > 0.999) m_streakPopup.setTarget(0.0, true);
+		// To test arrow coordinate positioning
+		//for (float i = past; i <= future; i+=0.2) {
+			//std::cout << i << ": " << time2y(i) << std::endl;
+			//drawArrow(1, 0, time2y(i), 0.6);
+		//}
+		
+		} //< reverse scale sc1
+		} //< reverse trans tr2
+		} //< reverse push pmb
+		} //< reverse trans tr1
+		} //< reverse push pmm
+		
+		// Draw streak pop-up for long streak intervals
+		double streakAnim = m_streakPopup.get();
+		if (streakAnim > 0.0) {
+			double s = 0.15 * (1.0 + streakAnim);
+			glColor4f(1.0f, 0.0f, 0.0f, 1.0 - streakAnim);
+			m_popupText->render(boost::lexical_cast<std::string>(unsigned(m_bigStreak)) + "\nStreak!");
+			m_popupText->dimensions().center(0.0).middle(offsetX).stretch(s,s);
+			m_popupText->draw();
+			if (streakAnim > 0.999) m_streakPopup.setTarget(0.0, true);
+		}
 	}
-	
 	glColor3f(1.0f, 1.0f, 1.0f);
 }
 
