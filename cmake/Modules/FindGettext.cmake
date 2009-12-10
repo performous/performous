@@ -10,18 +10,18 @@
 
 include(LibFindMacros)
 
-libfind_pkg_check_modules(gettext_PKGCONF gettext)
+libfind_pkg_check_modules(Gettext_PKGCONF Gettext)
 
-find_path(gettext_INCLUDE_DIR
+find_path(Gettext_INCLUDE_DIR
   NAMES libintl.h
-  PATHS ${gettext_PKGCONF_INCLUDE_DIRS}
+  PATHS ${Gettext_PKGCONF_INCLUDE_DIRS}
 )
 
-find_library(gettext_LIBRARY
+find_library(Gettext_LIBRARY
   NAMES libintl
-  PATHS ${gettext_PKGCONF_LIBRARY_DIRS}
+  PATHS ${Gettext_PKGCONF_LIBRARY_DIRS}
 )
 
-set(gettext_PROCESS_INCLUDES gettext_INCLUDE_DIR)
-set(gettext_PROCESS_LIBS gettext_LIBRARY)
+set(Gettext_PROCESS_INCLUDES Gettext_INCLUDE_DIR)
+set(Gettext_PROCESS_LIBS Gettext_LIBRARY)
 libfind_process(Gettext)
