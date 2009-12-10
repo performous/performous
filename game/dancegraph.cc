@@ -307,7 +307,7 @@ void DanceGraph::draw(double time) {
 		double s = 0.15 * (1.0 + streakAnim);
 		glColor4f(1.0f, 0.0f, 0.0f, 1.0 - streakAnim);
 		m_popupText->render(boost::lexical_cast<std::string>(unsigned(m_bigStreak)) + "\nStreak!");
-		m_popupText->dimensions().center(0.0).middle(0.0).stretch(s,s);
+		m_popupText->dimensions().center(0.0).middle(offsetX).stretch(s,s);
 		m_popupText->draw();
 		if (streakAnim > 0.999) m_streakPopup.setTarget(0.0, true);
 	}
