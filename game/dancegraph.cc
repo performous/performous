@@ -248,15 +248,19 @@ void DanceGraph::draw(double time) {
 	double frac = 0.75;  // Adjustable: 1.0 means fully separated, 0.0 means fully attached
 	// Draw scores
 	if (time >= -0.5) {
-		m_text.dimensions.screenBottom(-0.30).middle(0.32 * dimensions.w() + offsetX);
+		m_text.dimensions.screenBottom(-0.35).middle(0.32 * dimensions.w() + offsetX);
 		m_text.draw(boost::lexical_cast<std::string>(unsigned(getScore())));
-		m_text.dimensions.screenBottom(-0.27).middle(0.32 * dimensions.w() + offsetX);
+		m_text.dimensions.screenBottom(-0.32).middle(0.32 * dimensions.w() + offsetX);
 		m_text.draw(boost::lexical_cast<std::string>(unsigned(m_streak)) + "/" 
 		  + boost::lexical_cast<std::string>(unsigned(m_longestStreak)));
 	} else {
-		m_text.dimensions.screenBottom(-0.041).middle(-0.09 + offsetX);
-		m_text.draw(getDifficultyString());
-		m_text.dimensions.screenBottom(-0.015).middle(-0.09 + offsetX);
+		// TODO: only display if help if not pressed anything
+		m_popupText->render("Choose difficulty/mode\nto enter the game!");
+		m_popupText->dimensions().center(0.0).middle(0.0 + offsetX).stretch(0.3, 0.15);
+		m_popupText->draw();
+		m_text.dimensions.screenBottom(-0.075).middle(-0.09 + offsetX);
+		m_text.draw("^ " + getDifficultyString() + " v");
+		m_text.dimensions.screenBottom(-0.050).middle(-0.09 + offsetX);
 		m_text.draw(getGameMode());
 	}
 	{ glutil::PushMatrixMode pmm(GL_PROJECTION);
@@ -337,8 +341,6 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 			yBeg = std::max(time2y(0.0), yBeg);
 			yEnd = std::max(time2y(0.0), yEnd);
 			glColor3f(1.0f, 1.0f, 1.0f);
-			// Hack to test hold releasing
-			//if (time > note.note.begin + 1) note.releaseTime = time;
 		}
 		if (note.releaseTime > 0) yBeg = time2y(note.releaseTime - time);
 		if (yEnd - yBeg > 0) {
