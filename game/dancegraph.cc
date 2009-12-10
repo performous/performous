@@ -41,7 +41,7 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
   m_level(BEGINNER),
   m_audio(audio),
   m_song(song),
-  m_input(input::GUITAR), // TODO: to be replaced by DANCEPAD
+  m_input(input::DANCEPAD), // TODO: to be replaced by DANCEPAD
   m_arrows(getThemePath("arrows.svg")),
   m_arrows_cursor(getThemePath("arrows_cursor.svg")),
   m_arrows_hold(getThemePath("arrows_hold.svg")),

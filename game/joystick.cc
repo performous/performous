@@ -23,16 +23,18 @@ void input::MidiDrums::process() {
 }
 #endif
 
-static const unsigned SDL_BUTTONS = 6;
+static const unsigned SDL_BUTTONS = 10;
 
 int buttonFromSDL(input::Private::Type _type, unsigned int _sdl_button) {
-	static const int inputmap[4][SDL_BUTTONS] = {
+	static const int inputmap[5][SDL_BUTTONS] = {
 		//G  R  Y  B  O       // for guitars
 		{ 2, 0, 1, 3, 4, -1 }, // Guitar Hero guitar
 		{ 3, 0, 1, 2, 4, -1 }, // Rock Band guitar
 		//K  R  Y  B  G  O    // for drums
 		{ 3, 4, 1, 2, 0, 4 }, // Guitar Hero drums
-		{ 3, 4, 1, 2, 0, -1 }  // Rock Band drums
+		{ 3, 4, 1, 2, 0, -1 },  // Rock Band drums
+		// Left  Down  Up  Right  DownL  DownR  UpL  UpR  Enter  Select
+		{  0,    2,    1,  3 } /*   4,     5,     6,   7,   8,     9 } */ // generic dance pad
 	};
 	if( _sdl_button >= SDL_BUTTONS ) return -1;
 	switch(_type) {
@@ -44,6 +46,8 @@ int buttonFromSDL(input::Private::Type _type, unsigned int _sdl_button) {
 			return inputmap[2][_sdl_button];
 		case input::Private::DRUMS_RB:
 			return inputmap[3][_sdl_button];
+		case input::Private::DANCEPAD_GENERIC:
+			return inputmap[4][_sdl_button];
 		default:
 			return -1;
 	}
@@ -140,6 +144,9 @@ void input::SDL::init() {
 				case input::Private::DRUMS_MIDI:
 					std::cout << "  Detected as: MIDI Drums (forced)" << std::endl;
 					break;
+				case input::Private::DANCEPAD_GENERIC:
+					std::cout << "  Detected as: Generic dance pad" << std::endl;
+					break;
 			}
 			input::Private::devices[i] = input::Private::InputDevPrivate(forced_type[i]);
 		} else if( name.find("Guitar Hero3") != std::string::npos ) {
@@ -158,6 +165,9 @@ void input::SDL::init() {
 		} else if( name.find("Harmonix Drum kit") != std::string::npos ) {
 			std::cout << "  Detected as: RockBand Drums" << std::endl;
 			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::DRUMS_RB);
+		} else if( name.find("RedOctane USB Pad") != std::string::npos ) {
+			std::cout << "  Detected as: Generic Dance Pad" << std::endl;
+			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::DANCEPAD_GENERIC);
 		} else {
 			std::cout << "  Detected as: Unknwown (please report the name, assuming Guitar Hero Drums)" << std::endl;
 			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::DRUMS_GH);
