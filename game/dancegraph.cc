@@ -334,15 +334,17 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 		note.hitAnim.setTarget(1.0, false);
 	}
 	double glow = note.hitAnim.get();
+
+	// Modify hold drawing coordinates
+	if (note.isHit && note.releaseTime <= 0) {
+		yBeg = std::max(time2y(0.0), yBeg);
+		yEnd = std::max(time2y(0.0), yEnd);
+	}
+	if (note.releaseTime > 0) yBeg = time2y(note.releaseTime - time);
 	
 	if (yEnd - yBeg > arrowSize) {
-		// Draw holds
-		if (note.isHit && note.releaseTime <= 0) {
-			yBeg = std::max(time2y(0.0), yBeg);
-			yEnd = std::max(time2y(0.0), yEnd);
-		}
-		if (note.releaseTime > 0) yBeg = time2y(note.releaseTime - time);
-		if (yEnd - yBeg > 0) {
+		// Draw hold
+		{
 			UseTexture tblock(m_arrows_hold);
 			glutil::Begin block(GL_TRIANGLE_STRIP);
 			// Draw end
@@ -353,10 +355,6 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 			vertexPair(arrow_i, x, yBeg+arrowSize, 1.0f/3.0f);
 		}
 		// Draw begin
-		if (note.isHit && tEnd < 0.1) {
-			glColor4f(1.0f, 1.0f, 1.0f, 1.0 - glow);
-			s += glow;
-		}
 		drawArrow(arrow_i, m_arrows_hold, x, yBeg, s, 0.0f, 1.0f/3.0f);
 	} else {
 		// Draw short note
