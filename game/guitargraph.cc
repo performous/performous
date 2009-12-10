@@ -41,6 +41,7 @@ namespace {
 		return score;
 	}
 	
+	const int streakStarBonus = 500;
 	int getNextBigStreak(int prev) { return prev + 50; }
 	inline float blend(float a, float b, float f) { return a*f + b*(1.0f-f); }
 	
@@ -213,6 +214,7 @@ void GuitarGraph::engine() {
 	if (m_streak >= getNextBigStreak(m_bigStreak)) {
 		m_streakPopup.setTarget(1.0);
 		m_bigStreak = getNextBigStreak(m_bigStreak);
+		m_starmeter += streakStarBonus;
 	}
 	if (m_starpower.get() > 0.01) m_correctness.setTarget(1.0, true);
 }
