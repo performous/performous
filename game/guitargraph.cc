@@ -20,7 +20,7 @@ namespace {
 
 	const float g_angle = 80.0f;
 	const float past = -0.2f;
-	const float future = 1.8f;
+	const float future = 1.5f;
 	const float timescale = 25.0f;
 	const float texCoordStep = -0.5f; // Two beat lines per neck texture => 0.5 tex units per beat
 	// Note: t is difference from playback time so it must be in range [past, future]
