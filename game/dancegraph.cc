@@ -5,6 +5,7 @@
 #include "surface.hh"
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
+#include <algorithm>
 
 namespace {
 	const std::string diffv[] = { "Beginner", "Easy", "Medium", "Hard", "Challenge" };
@@ -32,7 +33,11 @@ namespace {
 		if (error < maxTolerance / 6) score += 5;
 		return score;
 	}
-	
+	struct lessEnd {
+		bool operator()(const DanceNote& left, const DanceNote& right) {
+			return left.note.end < right.note.end;
+		}
+	};
 }
 
 
@@ -41,7 +46,7 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
   m_level(BEGINNER),
   m_audio(audio),
   m_song(song),
-  m_input(input::DANCEPAD), // TODO: to be replaced by DANCEPAD
+  m_input(input::DANCEPAD),
   m_arrows(getThemePath("arrows.svg")),
   m_arrows_cursor(getThemePath("arrows_cursor.svg")),
   m_arrows_hold(getThemePath("arrows_hold.svg")),
@@ -62,7 +67,8 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
   m_bigStreak(),
   m_gamingMode("dance-single")
 {
-	
+	for(size_t i=0; i < 4; i++)
+		m_activeNotes[i] = m_notes.end();
 	m_popupText.reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	
 	for(size_t i = 0; i < 4; i++) m_pressed[i] = false;
@@ -72,7 +78,7 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
 	if(it == m_song.danceTracks.end())
 		throw std::runtime_error("Could not find any dance tracks.");
 	difficultyDelta(0); // hack to get initial level
-	
+		
 }
 
 std::string DanceGraph::getDifficultyString() const { return diffv[m_level]; }
@@ -95,15 +101,40 @@ void DanceGraph::difficulty(DanceDifficulty level) {
 	DanceTrack const& track = m_song.danceTracks.find(m_gamingMode)->second.find(level)->second;
 	for(Notes::const_iterator it = track.notes.begin(); it != track.notes.end(); it++)
 		m_notes.push_back(DanceNote(*it));
+	std::sort(m_notes.begin(), m_notes.end(), lessEnd()); // for engine's iterators
 	m_notesIt = m_notes.begin();
+	
+	for (DanceNotes::iterator it = m_notes.begin(); it != m_notes.end(); it++)
+		std::cout << "Begin: " << it->note.begin << "; End: " << it->note.end << "; Button: " << it->note.note << std::endl;
 //	std::cout << "Difficulty set to: " << level << std::endl;
-	m_level = level;	
+	m_level = level;
+	for(size_t i=0; i < 4; i++)
+		m_activeNotes[i] = m_notes.end();
+	m_scoreFactor = 1;
+	if(m_notes.size() != 0)
+		m_scoreFactor = 10000.0 / (50 * m_notes.size()); // maxpoints / (notepoint * notes)
+	std::cout << "Scorefactor: " << m_scoreFactor << std::endl;
 }
 
 /// Handles input
 void DanceGraph::engine() {
 	double time = m_audio.getPosition();
 	time -= config["audio/controller_delay"].f();
+
+	// missed notes
+	for (DanceNotes::iterator& it = m_notesIt; it != m_notes.end() && time > it->note.end + maxTolerance; it++) {
+		if(!it->isHit) {
+			std::cout << "(Engine) Missed note at time " << time
+			  << "(note timing " << it->note.begin << ")" << std::endl;
+			m_streak = 0;
+		}
+		else {
+			std::cout << "Note correctly played.." << std::endl;
+			if(!it->releaseTime)
+				it->releaseTime = time;
+			m_score += it->score;
+		}
+	}
 
 	// Handle all events
 	for (input::Event ev; m_input.tryPoll(ev);) {
@@ -129,17 +160,6 @@ void DanceGraph::engine() {
 		}
 	}
 	
-	/**
-	 * Idea in the usage of the iterator:
-	 * Here it is used as reference to avoid needless iterations of the past notes during later calls of engine().
-	 * Compare to the usage in the dance() function!
-	 * Iterator is first initialized in the difficulty setting..
-	**/
-/*	for (DanceNotes::iterator& it = m_notesIt; it != m_notes.end() && it->note.begin < time - maxTolerance; it++) {
-		if(!it->isHit)
-			std::cout << "Missed note at time " << time
-			<< "(note timing " << it->note.begin << ")" << std::endl;
-	}*/
 
 	// Check if a long streak goal has been reached
 	if (m_streak >= getNextBigStreak(m_bigStreak)) {
@@ -148,41 +168,34 @@ void DanceGraph::engine() {
 	}
 }
 
-
 /// Handles scoring and such
 void DanceGraph::dance(double time, input::Event const& ev) {
 	if(ev.type == input::Event::RELEASE) {
-		// (at least) initial hack for testing hold end..
-		for (DanceNotes::iterator it = m_notesIt; it != m_notes.end() && it->note.begin <= time + maxTolerance; it++) {
-			if(it->isHit && it->note.end - it->note.begin > 0.5) {
+		std::cout << "Release called at " << time << ", button " << ev.button << std::endl;
+		DanceNotes::iterator it = m_activeNotes[ev.button];
+		if(it != m_notes.end()) {
+			if(!it->releaseTime && it->note.end > time + maxTolerance) {
 				it->releaseTime = time;
-				it->isHit = false;
+				it->score = 0;
+				std::cout << "Failed to hold note " << it->note.note << "! Begin: "
+				  << it->note.begin << "; End: " << it->note.end << std::endl;
 			}
 		}
 		return;
 	}
 
-	std::cout << "Pressed button " << ev.button << " at time " << time << std::endl;
-	/**
-	 * Idea behind the usage of the iterator:
-	 * Here it is copied to a local variable, because jumping back to the first accepted time (within tolerance)
-	 * is necessary in order to recognize notes closely timed notes.
-	**/
-	for (DanceNotes::iterator it = m_notesIt; it != m_notes.end() && it->note.begin <= time + maxTolerance; it++) {
-		if(!it->isHit && ev.button == it->note.note) {
-			// following clause needless?
-			if(!(it->note.begin >= time - maxTolerance))
-				std::cout << "Missed note. Timing: " << it->note.begin << "; Time: " << time
-				<< "(difference " << (it->note.begin - time) << ")" << std::endl;
+	std::cout << "Hit button " << ev.button << " at " << time << std::endl;
+	for (DanceNotes::iterator it = m_notesIt; it != m_notes.end() && time <= it->note.begin + maxTolerance; it++) {
+		std::cout << "Iterating note beginning at " << it->note.begin << "..(button " << it->note.note << ")" << std::endl;
+		if(!it->isHit && time >= it->note.begin - maxTolerance && ev.button == it->note.note) {
 			it->isHit = true;
-			double p = points(it->note.begin - time);
+			std::cout << "hit note!" << std::endl;
+			it->score = points(it->note.begin - time);
 			it->accuracy = 1.0 - (std::abs(it->note.begin - time) / maxTolerance);
-			std::cout << "Hit note " << ev.button << " at time " << time
-			  << "; " << p << " points." << std::endl;
-			it->score = p;
-			m_score += p;
-			
-			m_streak++; // Hack to test streak popup
+			std::cout << "Hit note " << ev.button << " at time " << time << std::endl;
+			m_streak++;
+			m_activeNotes[ev.button] = it;
+			break;
 		}
 	}
 }
@@ -289,7 +302,7 @@ void DanceGraph::draw(double time) {
 		// Draw the notes
 		for (DanceNotes::iterator it = m_notes.begin(); it != m_notes.end(); ++it) {
 			if (it->note.end - time < past) continue;
-			if (it->note.begin - time > future) break;
+			if (it->note.begin - time > future) continue;
 			drawNote(*it, time);
 		}
 

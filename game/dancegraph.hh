@@ -44,12 +44,7 @@ class DanceGraph {
 	std::string getGameMode() const { return m_gamingMode; }
 	std::string getDifficultyString() const;
   private:
-	enum DanceStep {
-		STEP_LEFT = 0,
-		STEP_DOWN = 1,
-		STEP_UP = 2,
-		STEP_RIGHT = 3
-	};
+	enum DanceStep { STEP_LEFT, STEP_DOWN, STEP_UP, STEP_RIGHT };
 	void difficultyDelta(int delta);
 	void difficulty(DanceDifficulty level);
 	DanceDifficulty m_level;
@@ -63,6 +58,7 @@ class DanceGraph {
 	input::InputDev m_input;
 	DanceNotes m_notes;
 	DanceNotes::iterator m_notesIt;
+	DanceNotes::iterator m_activeNotes[4];
 	Texture m_arrows;
 	Texture m_arrows_cursor;
 	Texture m_arrows_hold;
