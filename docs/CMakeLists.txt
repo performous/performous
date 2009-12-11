@@ -19,8 +19,24 @@ if(UNIX)
 		add_custom_target(manpage ALL DEPENDS ${MANFILE})
 		install(FILES ${MANFILE} DESTINATION share/man/man6)
 	else(HELP2MAN AND GZIP)
-		message("WARNING: Can't locate help2man or gzip; man pages will not be generated")
+		message("WARNING: One of the following is missing: help2man, gzip; performous man page will not be generated")
 	endif(HELP2MAN AND GZIP)
+	if(ENABLE_TOOLS AND GZIP)
+		set(TOOLS "ss_pak_extract" "ss_extract" "ss_cover_conv" "ss_adpcm_decode" "ss_ipu_decode" "ss_ipu_conv")
+		foreach(TOOL ${TOOLS})
+			set(TOOL_MANFILE ${CMAKE_CURRENT_SOURCE_DIR}/${TOOL}.3)
+			set(TOOL_MANFILE_GZ ${CMAKE_CURRENT_BINARY_DIR}/${TOOL}.3.gz)
+			add_custom_command(
+				OUTPUT ${TOOL_MANFILE_GZ}
+				COMMAND ${GZIP} -c ${TOOL_MANFILE} > ${TOOL_MANFILE_GZ}
+				MAIN_DEPENDENCY ${TOOL_MANFILE}
+				COMMENT "Building ${TOOL} man page"
+				VERBATIM
+			)
+			add_custom_target(${TOOL}.3 ALL DEPENDS ${TOOL_MANFILE_GZ})
+			install(FILES ${TOOL_MANFILE_GZ} DESTINATION share/man/man3)
+		endforeach(TOOL)
+	endif(ENABLE_TOOLS AND GZIP)
 endif(UNIX)
 
 
