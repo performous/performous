@@ -123,25 +123,25 @@ void DanceGraph::engine() {
 		if(!it->isHit) {
 			std::cout << "(Engine) Missed note at time " << time
 			  << "(note timing " << it->note.begin << ")" << std::endl;
-			m_streak = 0;
+			if (it->note.type != Note::MINE) m_streak = 0;
 		}
 		else {
-			if(it->note.type != Note::MINE)
+			if(it->note.type != Note::MINE) {
 				std::cout << "Note correctly played.." << std::endl;
+				m_score += it->score;
+			}
 			if(!it->releaseTime)
 				it->releaseTime = time;
-			m_score += it->score;
 		}
 	}
 
-	// mines
+	// Holding button when mine comes?
 	for (DanceNotes::iterator it = m_notesIt; it != m_notes.end() && time <= it->note.begin + maxTolerance; it++) {
-		if(!it->isHit && it->note.type == Note::MINE &&
-		  m_pressed[it->note.note] &&
+		if(!it->isHit && it->note.type == Note::MINE && m_pressed[it->note.note] &&
 		  it->note.begin >= time - maxTolerance && it->note.end <= time + maxTolerance) {
 			std::cout << "Hit mine at " << time << "!" << std::endl;
 			it->isHit = true;
-			m_score = -points(0);
+			m_score -= points(0);
 		}
 	}
 
@@ -197,9 +197,15 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 	for (DanceNotes::iterator it = m_notesIt; it != m_notes.end() && time <= it->note.begin + maxTolerance; it++) {
 		if(!it->isHit && time >= it->note.begin - maxTolerance && ev.button == it->note.note) {
 			it->isHit = true;
-			it->score = points(it->note.begin - time);
-			it->accuracy = 1.0 - (std::abs(it->note.begin - time) / maxTolerance);
-			m_streak++;
+			if (it->note.type != Note::MINE) {
+				it->score = points(it->note.begin - time);
+				it->accuracy = 1.0 - (std::abs(it->note.begin - time) / maxTolerance);
+				m_streak++;
+				if (m_streak > m_longestStreak) m_longestStreak = m_streak;
+			} else {
+				m_score -= points(0);
+				m_streak = 0;
+			}
 			m_activeNotes[ev.button] = it;
 			break;
 		}
@@ -208,9 +214,7 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 
 
 namespace {
-	//const float arrowScale = 0.6f;
 	const float arrowSize = 0.3f;
-	const float arrowRotations[4] = { 270.0f, 180.0f, 0.0f, 90.0f };
 	const float one_arrow_tex_w = 1.0 / 8.0;
 	
 	void vertexPair(int arrow_i, float x, float y, float ty) {
@@ -240,7 +244,7 @@ glutil::Color const& DanceGraph::color(int arrow_i) const {
 }
 
 void DanceGraph::drawArrow(int arrow_i, Texture& tex, float x, float y, float scale, float ty1, float ty2) {
-	glTranslatef(x, y, 0.0f);
+	glutil::Translation tr(x, y, 0.0f);
 	if (scale != 1.0f) glScalef(scale, scale, scale);
 	{
 		UseTexture tblock(tex);
@@ -249,7 +253,6 @@ void DanceGraph::drawArrow(int arrow_i, Texture& tex, float x, float y, float sc
 		vertexPair(arrow_i, 0.0f, arrowSize, ty2);
 	}
 	if (scale != 1.0f) glScalef(1.0f/scale, 1.0f/scale, 1.0f/scale);
-	glTranslatef(-x, -y, 0.0f);
 }
 
 void DanceGraph::drawMine(float x, float y, float rot, float scale) {
