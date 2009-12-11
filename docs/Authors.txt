@@ -33,6 +33,9 @@ Fabian Fingerle  <fabian at datensalat.eu>
 Tapio Vierros <aave000 at users.sourceforge.net>
 	* Various things and features
 
+Markus Raab <ich at markus-raab.org>
+	* hiscore (xml + ultrastar format)
+
 	
 INACTIVE DEVELOPERS
 -------------------
