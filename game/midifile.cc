@@ -27,7 +27,7 @@ class MidiStream {
 	 * @param file MidiFile to be read
 	 */
 	MidiStream(std::string const& file) {
-		std::ifstream ifs(file.c_str());
+		std::ifstream ifs(file.c_str(), std::ios::binary);
 		f << ifs.rdbuf();
 		f.exceptions(std::ios::failbit);
 	}

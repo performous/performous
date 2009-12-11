@@ -5,6 +5,7 @@
 #include "fs.hh"
 #include "util.hh"
 #include "database.hh"
+#include "i18n.hh"
 
 #include <iostream>
 #include <sstream>
@@ -100,7 +101,7 @@ void ScreenHiscore::draw() {
 	std::ostringstream oss_song, oss_order;
 
 	// Format the player information text
-	oss_song << "Hiscore for " << m_song->title << "\n";
+	oss_song << _("Hiscore for ") << m_song->title << "\n";
 
 	m_database.queryPerSongHiscore(oss_order, m_song);
 

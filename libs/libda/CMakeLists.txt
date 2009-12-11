@@ -56,7 +56,7 @@ endif(CMAKE_COMPILER_IS_GNUCXX)
 
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREAD ON)
-find_package(Boost 1.36 REQUIRED COMPONENTS thread date_time)
+find_package(Boost 1.36 REQUIRED COMPONENTS thread date_time system filesystem)
 include_directories(${Boost_INCLUDE_DIRS})
 
 if(SLAVE_LIB)

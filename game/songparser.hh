@@ -25,7 +25,7 @@ class SongParser {
 		enum { NONE, TXT, INI } type = NONE;
 		// Read the file, determine the type and do some initial validation checks
 		{
-			std::ifstream f((s.path + s.filename).c_str());
+			std::ifstream f((s.path + s.filename).c_str(), std::ios::binary);
 			if (!f.is_open()) throw SongParserException("Could not open song file", 0);
 			f.seekg(0, std::ios::end);
 			size_t size = f.tellg();
@@ -45,7 +45,7 @@ class SongParser {
 		} catch (std::runtime_error& e) {
 			throw SongParserException(e.what(), m_linenum);
 		}
-		
+
 		// In case no images/videos were specified, try to guess them
 		if (m_song.cover.empty() || (m_song.background.empty() && m_song.video.empty())) {
 			boost::regex coverfile("((cover|album|label|\\[co\\])\\.(png|jpeg|jpg|svg|bmp|gif))$", boost::regex_constants::icase);
@@ -65,7 +65,7 @@ class SongParser {
 				}
 			}
 		}
-		
+
 		// Adjust negative notes
 		if (m_song.noteMin <= 0) {
 			unsigned int shift = (1 - m_song.noteMin / 12) * 12;

@@ -8,6 +8,7 @@
 #include "layout_singer.hh"
 #include "theme.hh"
 #include "video.hh"
+#include "i18n.hh"
 
 #include <iostream>
 #include <sstream>
@@ -83,11 +84,12 @@ void ScreenPlayers::manageEvent(SDL_Event event) {
 			// frustrating for second one that he cannot enter, so better go for next one...
 		}
 	}
-	// The rest are only available when there are songs available
 	else if (m_players.empty()) return;
 	else if (key == SDLK_SPACE || (key == SDLK_PAUSE || (key == SDLK_p && mod & KMOD_CTRL))) m_audio.togglePause();
 	else if (key == SDLK_LEFT) m_players.advance(-1);
 	else if (key == SDLK_RIGHT) m_players.advance(1);
+	else if (key == SDLK_UP) m_players.advance(-1);
+	else if (key == SDLK_DOWN) m_players.advance(1);
 	else if (key == SDLK_PAGEUP) m_players.advance(-10);
 	else if (key == SDLK_PAGEDOWN) m_players.advance(10);
 }
@@ -106,22 +108,22 @@ void ScreenPlayers::draw() {
 	if (m_players.empty()) {
 		// Format the song information text
 		if (m_search.text.empty()) {
-			oss_song << "No players found!";
-			// oss_order << "Check " << m_players.file() << "\n" << "directory for players\n";
-			oss_order << "Enter a name to create a new player.";
+			oss_song << _("No players found!");
+			oss_order << _("Enter a name to create a new player.");
 		} else {
-			oss_song << "Press enter to create player!";
+			oss_song << _("Press enter to create player!");
 			oss_order << m_search.text << '\n';
 		}
 	} else {
 		// Format the player information text
-		oss_song << m_database.scores.front().track << "\n";
-		oss_song << "You reached " << m_database.scores.front().score << " points!";
-		oss_order << "Please enter your Name!\n"
-			<< "Name: " << m_players.current().name << '\n';
-		m_database.queryPerPlayerHiscore(oss_order);
-		oss_order << "\nSearch Text: "
-			<< (m_search.text.empty() ? std::string("please enter") : m_search.text)
+		oss_song << m_database.scores.front().track << '\n';
+		// TODO: use boost::format
+		oss_song << _("You reached") << ' ' << m_database.scores.front().score << ' ' << _("points!");
+		oss_order << _("Change player with arrow keys.") << '\n'
+			<< _("Name:") << ' ' << m_players.current().name << '\n';
+		//m_database.queryPerPlayerHiscore(oss_order);
+		oss_order << '\n'
+			<< (m_search.text.empty() ? _("Type text to filter or create a new player.") : std::string(_("Search Text:")) + " " + m_search.text)
 			<< '\n';
 		double spos = m_players.currentPosition(); // This needs to be polled to run the animation
 
@@ -158,7 +160,7 @@ void ScreenPlayers::draw() {
 	theme->song.draw(oss_song.str());
 	theme->order.draw(oss_order.str());
 
-		// Schedule playback change if the chosen song has changed
+	// Schedule playback change if the chosen song has changed
 	if (music != m_playReq) { m_playReq = music; m_playTimer.setValue(0.0); }
 	// Play/stop preview playback (if it is the time)
 	if (music != m_playing && m_playTimer.get() > 0.4) {

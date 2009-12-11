@@ -8,6 +8,7 @@
 #include "database.hh"
 #include "xtime.hh"
 #include "video_driver.hh"
+#include "i18n.hh"
 
 // Screens
 #include "screen_intro.hh"
@@ -206,6 +207,11 @@ template <typename Container> void confOverride(Container const& c, std::string 
 }
 
 int main(int argc, char** argv) {
+	// initialize gettext
+    setlocale (LC_ALL, "");
+    bindtextdomain (PACKAGE, "../locale");
+    textdomain (PACKAGE);
+
 	std::cout << PACKAGE " " VERSION << std::endl;
 	std::signal(SIGINT, quit);
 	std::signal(SIGTERM, quit);
@@ -271,6 +277,7 @@ int main(int argc, char** argv) {
 		for (da::playback::devlist_t::const_iterator it = l.begin(); it != l.end(); ++it) {
 			std::cout << boost::format("  %1% %|10t|%2%\n") % it->name() % it->desc();
 		}
+		std::cout << std::flush;
 		return 0;
 	}
 	if (vm.count("michelp")) {
@@ -287,6 +294,7 @@ int main(int argc, char** argv) {
 		for (da::record::devlist_t::const_iterator it = l.begin(); it != l.end(); ++it) {
 			std::cout << boost::format("  %1% %|10t|%2%\n") % it->name() % it->desc();
 		}
+		std::cout << std::flush;
 		return 0;
 	}
 	// Read config files

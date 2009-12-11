@@ -36,7 +36,7 @@ if(SWScale_INCLUDE_DIR)
 endif(SWScale_INCLUDE_DIR)
 
 find_library(SWScale_LIBRARY
-  NAMES swscale
+  NAMES libswscale.dll.a swscale
   PATHS ${SWScale_PKGCONF_LIBRARY_DIRS}
 )
 

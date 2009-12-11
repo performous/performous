@@ -8,6 +8,11 @@
 #include <list>
 #include <sstream>
 
+#ifdef _WIN32
+#include <windows.h>
+#include <Shlobj.h>
+#endif
+
 fs::path getHomeDir() {
 	static fs::path dir;
 	static bool initialized = false;
@@ -20,13 +25,36 @@ fs::path getHomeDir() {
 }
 
 fs::path getConfigDir() {
+
 	static fs::path dir;
 	static bool initialized = false;
 	if (!initialized) {
 		initialized = true;
-		char const* conf = getenv("XDG_CONFIG_HOME");
-		if (conf) dir = fs::path(conf) / "performous";
-		else dir = getHomeDir() / ".config" / "performous";
+        #ifndef _WIN32
+        {
+            char const* conf = getenv("XDG_CONFIG_HOME");
+            if (conf) dir = fs::path(conf) / "performous";
+            else dir = getHomeDir() / ".config" / "performous";
+        }
+        #else
+        {
+            //open AppData directory
+            std::string str;
+            ITEMIDLIST* pidl;
+            char AppDir[MAX_PATH];
+            HRESULT hRes = SHGetSpecialFolderLocation( NULL, CSIDL_APPDATA|CSIDL_FLAG_CREATE , &pidl );
+            if (hRes==NOERROR)
+            {
+              SHGetPathFromIDList( pidl, AppDir );
+              int i;
+              for(i = 0; AppDir[i] != '\0'; i++){
+                  if(AppDir[i] == '\\') str += '/';
+                  else                  str += AppDir[i];
+              }
+              dir = fs::path(str) / "performous";
+            }
+        }
+        #endif
 	}
 	return dir;
 }
@@ -77,8 +105,9 @@ std::string getPath(fs::path const& filename) {
 #ifdef _WIN32
 		// Add APPLIC~1 (user-specific application data)  FIXME: Not tested
 		{
-			char const* appdata = getenv("APPDATA");
-			if (appdata) dirs.push_back(appdata / shortDir);
+			//char const* appdata = getenv("APPDATA");
+			//if (appdata) dirs.push_back(appdata / shortDir);
+			dirs.push_back(getConfigDir());
 		}
 #else
 		// Adding XDG_DATA_HOME

@@ -3,6 +3,7 @@
 #include "opengl_text.hh"
 #include "fs.hh"
 #include "surface.hh"
+#include "configuration.hh"
 
 /// class for printing dialogues
 class Dialog {
@@ -11,7 +12,7 @@ class Dialog {
 	Dialog(std::string const& text):
 	  m_text(text),
 	  m_dialog(getThemePath("warning.svg")),
-	  m_svgText(getThemePath("dialog_txt.svg"))
+	  m_svgText(getThemePath("dialog_txt.svg"), config["graphic/text_lod"].f())
 	{
 		m_dialog.dimensions.fixedWidth(0.8);
 	}

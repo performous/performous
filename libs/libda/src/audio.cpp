@@ -1,7 +1,5 @@
-#define BUILDING_DLL   // So that we get dllexports everywhere instead of dllimports (this is some Windows crap)
+#define BUILDING_DA
 #include <libda/audio_dev.hpp>
-#undef BUILDING_DLL
-
 #include <libda/config.h>
 #include <plugin++/loader.hpp>
 #include <ostream>
@@ -99,3 +97,7 @@ namespace da {
 	playback::~playback() { delete m_handle; }
 }
 
+//hack to have sound in Windows (at moment). Waiting libda, this is only method to get sound
+#ifdef _WIN32
+#include <../plugins/audio_dev_pa19.cpp>
+#endif

@@ -40,3 +40,16 @@ ThemeConfiguration::ThemeConfiguration():
 	value(getThemePath("configuration_value.svg"), config["graphic/text_lod"].f())
 {}
 
+ThemeIntro::ThemeIntro():
+	Theme(getThemePath("intro_bg.svg")),
+	back_h(getThemePath("menu_back_highlight.svg")),
+	option_selected(getThemePath("menu_option_selected.svg"), config["graphic/text_lod"].f()),
+	comment(getThemePath("menu_comment.svg"), config["graphic/text_lod"].f()),
+	comment_bg(getThemePath("menu_comment_bg.svg"))
+{
+	back_h.dimensions.fixedHeight(0.08f);
+	option.push_back(new SvgTxtTheme(getThemePath("menu_option.svg"), config["graphic/text_lod"].f()));
+	option.push_back(new SvgTxtTheme(getThemePath("menu_option.svg"), config["graphic/text_lod"].f()));
+	option.push_back(new SvgTxtTheme(getThemePath("menu_option.svg"), config["graphic/text_lod"].f()));
+	option.push_back(new SvgTxtTheme(getThemePath("menu_option.svg"), config["graphic/text_lod"].f()));
+}

@@ -1,0 +1,15 @@
+--- /mingw/lib/gcc/mingw32/4.4.0/libstdc++.la	2009-11-27 11:37:38 +0000
++++ /mingw/lib/gcc/mingw32/4.4.0/libstdc++.la	2009-11-27 11:11:08 +0000
+@@ -5,10 +5,10 @@
+ # It is necessary for linking the library.
+ 
+ # The name that we can dlopen(3).
+-dlname='../bin/libstdc++-6.dll'
++#dlname='../bin/libstdc++-6.dll'
+ 
+ # Names of this library.
+-library_names='libstdc++.dll.a'
++#library_names='libstdc++.dll.a'
+ 
+ # The name of the static archive.
+ old_library='libstdc++.a'

@@ -59,3 +59,17 @@ struct ThemeConfiguration: Theme {
 	SvgTxtTheme value;
 };
 
+/// theme for intro screen
+struct ThemeIntro: Theme {
+	ThemeIntro();
+	/// back highlight for selected option
+	Surface back_h;
+	/// menu option text
+	boost::ptr_vector<SvgTxtTheme> option;
+	/// menu selected option text
+	SvgTxtTheme option_selected;
+	/// menu comment text
+	SvgTxtTheme comment;
+	/// menu comment background
+	Surface comment_bg;
+};
