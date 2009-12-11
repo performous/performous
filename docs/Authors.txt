@@ -1,4 +1,4 @@
-﻿ACTIVE DEVELOPERS
+ACTIVE DEVELOPERS
 -----------------
 
 Vincent Le Ligeour  <yoda-jm at users.sourceforge.net>
