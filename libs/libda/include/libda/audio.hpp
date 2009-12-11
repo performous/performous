@@ -14,13 +14,14 @@ future versions (which hopefully will bring API and ABI compatibility).
 #include "sample.hpp"
 #include <boost/function.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <plugin++/dllhelper.hpp>
 #include <cmath>
 #include <cstddef>
 #include <iosfwd>
 #include <iterator>
 #include <string>
 #include <vector>
+
+#define LIBDA_API
 
 namespace da {
 
@@ -31,7 +32,7 @@ namespace da {
 	* so that you can create multiple da::initialize objects.
 	* Do not, however, destroy the object while audio devices are still in use!
 	**/
-	class DLL_PUBLIC initialize {
+	class LIBDA_API initialize {
 		init_impl* m_impl;
 	  public:
 		initialize();
@@ -73,8 +74,8 @@ namespace da {
 	typedef boost::function<bool (pcm_data& it)> callback_t;
 
 	struct settings {
-		DLL_PUBLIC static const std::size_t low;
-		DLL_PUBLIC static const std::size_t high;
+		LIBDA_API static const std::size_t low;
+		LIBDA_API static const std::size_t high;
 		settings(std::string const& devstr = ""):
 		  m_channels(high),
 		  m_channels_near(true),
@@ -143,7 +144,7 @@ namespace da {
 		bool special() const { return !m_name.empty() && m_name[0] == '~'; }
 	};
 	
-	class DLL_PUBLIC record {
+	class LIBDA_API record {
 	  public:
 		typedef std::vector<devinfo> devlist_t;
 		static devlist_t devices();
@@ -154,7 +155,7 @@ namespace da {
 		dev* m_handle;
 	};
 
-	class DLL_PUBLIC playback {
+	class LIBDA_API playback {
 	  public:
 		typedef std::vector<devinfo> devlist_t;
 		static devlist_t devices();

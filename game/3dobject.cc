@@ -30,7 +30,7 @@ namespace {
 
 void Object3d::loadWavefrontObj(std::string filepath, float scale) {
 	std::string row;
-	std::ifstream file(filepath.c_str());
+	std::ifstream file(filepath.c_str(), std::ios::binary);
 	if (!file.is_open()) throw std::runtime_error("Couldn't open object file "+filepath);
 	m_vertices.clear();
 	m_faces.clear();
@@ -104,18 +104,18 @@ void Object3d::generateDisplayList() {
 		std::vector<int>::const_iterator it2;
 		for (size_t i = 0; i < it->vertices.size(); i++) {
 			// Texture coordinates
-			if (!it->texcoords.empty()) 
+			if (!it->texcoords.empty())
 			  glTexCoord2f(m_texcoords[it->texcoords[i]].s, m_texcoords[it->texcoords[i]].t);
 			// Normals
 			if (!it->normals.empty())
 			  glNormal3f(
-				m_normals[it->normals[i]].x, 
-				m_normals[it->normals[i]].y, 
+				m_normals[it->normals[i]].x,
+				m_normals[it->normals[i]].y,
 				m_normals[it->normals[i]].z);
 			// Vertices
 			glVertex3f(
-			  m_vertices[it->vertices[i]].x, 
-			  m_vertices[it->vertices[i]].y, 
+			  m_vertices[it->vertices[i]].x,
+			  m_vertices[it->vertices[i]].y,
 			  m_vertices[it->vertices[i]].z);
 		}
 	}

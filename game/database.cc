@@ -113,20 +113,20 @@ void Database::queryPerSongHiscore (std::ostream & os, boost::shared_ptr<Song> s
 	{
 		os << i+1 << ".\t"
 		   << m_players.lookup(hi[i].playerid) << "\t"
-		// << hi[i].track << "\t"
-		   << hi[i].score << "\n";
+		   << hi[i].score << "\t"
+		   << "(" << hi[i].track << ")\n";
 	}
 }
 
 void Database::queryPerPlayerHiscore (std::ostream & os, std::string const& track) const {
 	int playerid = m_players.lookup(m_players.current().name);
-	std::vector<HiscoreItem> hi = m_hiscores.queryHiscore(10, playerid, -1, track);
+	std::vector<HiscoreItem> hi = m_hiscores.queryHiscore(3, playerid, -1, track);
 	for (size_t i=0; i<hi.size(); ++i)
 	{
 		os << i+1 << ".\t"
 		   << m_songs.lookup(hi[i].songid) << "\t"
-		// << hi[i].track << "\t"
-		   << hi[i].score << "\n";
+		   << hi[i].score << "\t"
+		   << "(" << hi[i].track << ")\n";
 	}
 }
 

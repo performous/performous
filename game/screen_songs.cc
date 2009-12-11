@@ -6,6 +6,7 @@
 #include "util.hh"
 #include "songs.hh"
 #include "audio.hh"
+#include "i18n.hh"
 #include <iostream>
 #include <sstream>
 
@@ -212,11 +213,10 @@ void ScreenSongs::draw() {
 	if (m_songs.empty()) {
 		// Format the song information text
 		if (m_search.text.empty()) {
-			oss_song << "No songs found!";
-			oss_order << "Visit performous.org\n";
-			oss_order << "for free songs";
+			oss_song << _("No songs found!");
+			oss_order << _("Visit performous.org\nfor free songs");
 		} else {
-			oss_song << "no songs match search";
+			oss_song << _("no songs match search");
 			oss_order << m_search.text << '\n';
 		}
 	} else {

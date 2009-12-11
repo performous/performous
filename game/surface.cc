@@ -59,7 +59,7 @@ bool checkExtension(std::string const& extension) {
 }
 
 template <typename T> void loader(T& target, std::string filename, bool autocrop) {
-	if (!std::ifstream(filename.c_str()).is_open()) throw std::runtime_error("File not found: " + filename);
+	if (!std::ifstream(filename.c_str(), std::ios::binary).is_open()) throw std::runtime_error("File not found: " + filename);
 	if (filename.size() > 4 && filename.substr(filename.size() - 4) == ".svg") {
 		rsvg_init();
 		GError* pError = NULL;
@@ -111,7 +111,7 @@ template <typename T> void loader(T& target, std::string filename, bool autocrop
 		catch (Magick::Exception&) // add error handling
 		{
 			throw std::runtime_error("Image Error");
-		} 
+		}
 	}
 }
 
@@ -165,8 +165,8 @@ void Texture::load(unsigned int width, unsigned int height, pix::Format format, 
 	  checkExtension("GL_ARB_texture_non_power_of_two")) { // Use OpenGL 2.0 functionality 
 		glTexImage2D(type(), 0, GL_RGBA, width, height, 0, f.format, f.type, buffer);	
 	} else {
-		// TODO: Test for OpenGL extension GL_ARB_texture_non_power_of_two and if not found, 
-		// use gluScaleImage to upscale the texture to nextPow2 dimensions before calling 
+		// TODO: Test for OpenGL extension GL_ARB_texture_non_power_of_two and if not found,
+		// use gluScaleImage to upscale the texture to nextPow2 dimensions before calling
 		// glTexImage2D (if it isn't pow2 already).
 		// speeds it up... trust me you need it for now at least! :P
 		// TODO: remove when cairo is fixed.
@@ -182,7 +182,7 @@ void Texture::load(unsigned int width, unsigned int height, pix::Format format, 
 		// BIG FAT WARNING: Do not even think of using ARB_texture_rectangle here!
 		// Every developer of the game so far has tried doing so, but it just cannot work.
 		// (1) no repeat => cannot texture
-		// (2) coordinates not normalized => would require special hackery elsewhere		
+		// (2) coordinates not normalized => would require special hackery elsewhere
 		// Just don't do it in Surface class, thanks. -Tronic
 		glTexImage2D(type(), 0, GL_RGBA, newWidth, newHeight, 0, f.format, f.type, &outBuf[0]);
 	}
@@ -197,7 +197,7 @@ void Surface::load(unsigned int width, unsigned int height, pix::Format format, 
 	UseTexture texture(m_texture);
 	PixFmt const& f = getPixFmt(format);
 	glPixelStorei(GL_UNPACK_SWAP_BYTES, f.swap);
-	glTexImage2D(m_texture.type(), 0, GL_RGBA, width, height, 0, f.format, f.type, buffer);	
+	glTexImage2D(m_texture.type(), 0, GL_RGBA, width, height, 0, f.format, f.type, buffer);
 }
 
 void Surface::draw() const {

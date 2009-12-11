@@ -1,4 +1,5 @@
 #include <libda/audio_dev.hpp>
+#include <stdint.h>
 #include <portaudio.h>
 #include <ostream>
 #include <sstream>

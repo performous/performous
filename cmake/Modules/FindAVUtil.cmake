@@ -34,7 +34,7 @@ if(AVUtil_INCLUDE_DIR)
 endif(AVUtil_INCLUDE_DIR)
 
 find_library(AVUtil_LIBRARY
-  NAMES avutil
+  NAMES libavutil.dll.a avutil
   PATHS ${AVUtil_PKGCONF_LIBRARY_DIRS}
 )
 
