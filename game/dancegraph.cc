@@ -103,9 +103,6 @@ void DanceGraph::difficulty(DanceDifficulty level) {
 		m_notes.push_back(DanceNote(*it));
 	std::sort(m_notes.begin(), m_notes.end(), lessEnd()); // for engine's iterators
 	m_notesIt = m_notes.begin();
-	
-	for (DanceNotes::iterator it = m_notes.begin(); it != m_notes.end(); it++)
-		std::cout << "Begin: " << it->note.begin << "; End: " << it->note.end << "; Button: " << it->note.note << std::endl;
 //	std::cout << "Difficulty set to: " << level << std::endl;
 	m_level = level;
 	for(size_t i=0; i < 4; i++)
@@ -129,10 +126,22 @@ void DanceGraph::engine() {
 			m_streak = 0;
 		}
 		else {
-			std::cout << "Note correctly played.." << std::endl;
+			if(it->note.type != Note::MINE)
+				std::cout << "Note correctly played.." << std::endl;
 			if(!it->releaseTime)
 				it->releaseTime = time;
 			m_score += it->score;
+		}
+	}
+
+	// mines
+	for (DanceNotes::iterator it = m_notesIt; it != m_notes.end() && time <= it->note.begin + maxTolerance; it++) {
+		if(!it->isHit && it->note.type == Note::MINE &&
+		  m_pressed[it->note.note] &&
+		  it->note.begin >= time - maxTolerance && it->note.end <= time + maxTolerance) {
+			std::cout << "Hit mine at " << time << "!" << std::endl;
+			it->isHit = true;
+			m_score = -points(0);
 		}
 	}
 
@@ -151,12 +160,12 @@ void DanceGraph::engine() {
 		if (ev.type == input::Event::RELEASE) {
 			m_pressed[ev.button] = false;
 			dance(time, ev);
+			m_pressed_anim[ev.button].setTarget(0.0);
 		}
 		else if (ev.type == input::Event::PRESS) {
 			m_pressed[ev.button] = true;
 			dance(time, ev);
 			m_pressed_anim[ev.button].setValue(1.0);
-			m_pressed_anim[ev.button].setTarget(0.0);
 		}
 	}
 	
@@ -171,7 +180,6 @@ void DanceGraph::engine() {
 /// Handles scoring and such
 void DanceGraph::dance(double time, input::Event const& ev) {
 	if(ev.type == input::Event::RELEASE) {
-		std::cout << "Release called at " << time << ", button " << ev.button << std::endl;
 		DanceNotes::iterator it = m_activeNotes[ev.button];
 		if(it != m_notes.end()) {
 			if(!it->releaseTime && it->note.end > time + maxTolerance) {
@@ -179,6 +187,7 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 				it->score = 0;
 				std::cout << "Failed to hold note " << it->note.note << "! Begin: "
 				  << it->note.begin << "; End: " << it->note.end << std::endl;
+				m_streak = 0;
 			}
 		}
 		return;
@@ -186,13 +195,10 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 
 	std::cout << "Hit button " << ev.button << " at " << time << std::endl;
 	for (DanceNotes::iterator it = m_notesIt; it != m_notes.end() && time <= it->note.begin + maxTolerance; it++) {
-		std::cout << "Iterating note beginning at " << it->note.begin << "..(button " << it->note.note << ")" << std::endl;
 		if(!it->isHit && time >= it->note.begin - maxTolerance && ev.button == it->note.note) {
 			it->isHit = true;
-			std::cout << "hit note!" << std::endl;
 			it->score = points(it->note.begin - time);
 			it->accuracy = 1.0 - (std::abs(it->note.begin - time) / maxTolerance);
-			std::cout << "Hit note " << ev.button << " at time " << time << std::endl;
 			m_streak++;
 			m_activeNotes[ev.button] = it;
 			break;
@@ -293,6 +299,9 @@ void DanceGraph::draw(double time) {
 			float y = time2y(0.0);
 			float l = m_pressed_anim[arrow_i].get();
 			float s = (5.0 - l) / 5.0;
+			glutil::Color c = color(arrow_i);
+			c.r += l; c.g += l; c.b +=l;
+			glColor4fv(c);
 			drawArrow(arrow_i, m_arrows_cursor, x, y, s);
 		}
 		
@@ -340,24 +349,24 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	float ac = note.accuracy;
 	float yBeg = time2y(tBeg);
 	float yEnd = time2y(tEnd);
-	glColor3f(1.0f, 1.0f, 1.0f);
+	glutil::Color c = color(arrow_i);
 	
 	if (note.isHit && std::abs(tEnd) < maxTolerance) {
 		if (mine) note.hitAnim.setRate(1.0);
 		note.hitAnim.setTarget(1.0, false);
 	}
 	double glow = note.hitAnim.get();
-
-	// Modify hold drawing coordinates
-	if (note.isHit && note.releaseTime <= 0) {
-		yBeg = std::max(time2y(0.0), yBeg);
-		yEnd = std::max(time2y(0.0), yEnd);
-	}
-	if (note.releaseTime > 0) yBeg = time2y(note.releaseTime - time);
 	
 	if (yEnd - yBeg > arrowSize) {
-		// Draw hold
-		{
+		// Draw holds
+		glColor4fv(c);
+		if (note.isHit && note.releaseTime <= 0) {
+			yBeg = std::max(time2y(0.0), yBeg);
+			yEnd = std::max(time2y(0.0), yEnd);
+			glColor3f(1.0f, 1.0f, 1.0f);
+		}
+		if (note.releaseTime > 0) yBeg = time2y(note.releaseTime - time);
+		if (yEnd - yBeg > 0) {
 			UseTexture tblock(m_arrows_hold);
 			glutil::Begin block(GL_TRIANGLE_STRIP);
 			// Draw end
@@ -368,18 +377,22 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 			vertexPair(arrow_i, x, yBeg+arrowSize, 1.0f/3.0f);
 		}
 		// Draw begin
+		if (note.isHit && tEnd < 0.1) {
+			glColor4fv(colorGlow(c,glow));
+			s += glow;
+		}
 		drawArrow(arrow_i, m_arrows_hold, x, yBeg, s, 0.0f, 1.0f/3.0f);
 	} else {
 		// Draw short note
 		if (mine) {
-			glColor4f(1.0f, 1.0f, 1.0f, 1.0 - glow);
+			c.a = 1.0 - glow; glColor4fv(c);
 			s = 0.6f + glow * 0.5f;
 			float rot = int(time*360 * (note.isHit ? 2.0 : 1.0) ) % 360;
 			if (note.isHit) yBeg = time2y(0.0);
 			drawMine(x, yBeg, rot, s);
 		} else {
 			s += glow;
-			glColor4f(1.0f, 1.0f, 1.0f, 1.0 - glow);
+			glColor4fv(colorGlow(c, glow));
 			drawArrow(arrow_i, m_arrows, x, yBeg, s);
 		}
 	}
