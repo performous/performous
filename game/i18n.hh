@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef HAVE_GETTEXT
+#ifdef USE_GETTEXT
 /* Internationalization Dependances */
 #include <libintl.h>
 #include <locale.h>

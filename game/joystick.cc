@@ -3,7 +3,7 @@
 
 #include <boost/lexical_cast.hpp>
 
-#ifdef HAVE_PORTMIDI
+#ifdef USE_PORTMIDI
 input::MidiDrums::MidiDrums(int devId): stream(devId) {
 	Private::devices[0x8000] = Private::InputDevPrivate(Private::DRUMS_MIDI);
 	event.type = Event::PRESS;
