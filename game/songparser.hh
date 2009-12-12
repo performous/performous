@@ -22,7 +22,7 @@ class SongParser {
 	  m_relativeShift(),
 	  m_maxScore()
 	{
-		enum { NONE, TXT, INI } type = NONE;
+		enum { NONE, TXT, INI, SM } type = NONE;
 		// Read the file, determine the type and do some initial validation checks
 		{
 			std::ifstream f((s.path + s.filename).c_str(), std::ios::binary);
@@ -33,7 +33,8 @@ class SongParser {
 			f.seekg(0);
 			std::vector<char> data(size);
 			if (!f.read(&data[0], size)) throw SongParserException("Unexpected I/O error", 0);
-			if (txtCheck(data)) type = TXT;
+			if (smCheck(data)) type = SM;
+			else if (txtCheck(data)) type = TXT;
 			else if (iniCheck(data)) type = INI;
 			else throw SongParserException("Does not look like a song file (wrong header)", 1, true);
 			m_ss.write(&data[0], size);
@@ -42,6 +43,7 @@ class SongParser {
 		try {
 			if (type == TXT) txtParse();
 			if (type == INI) iniParse();
+			if (type == SM) smParse();
 		} catch (std::runtime_error& e) {
 			throw SongParserException(e.what(), m_linenum);
 		}
@@ -84,20 +86,26 @@ class SongParser {
 	Song& m_song;
 	std::stringstream m_ss;
 	unsigned int m_linenum;
-	bool getline(std::string& line) { ++m_linenum; return std::getline(m_ss, line); }
+	bool getline(std::string& line) { ++m_linenum; return std::getline(m_ss, line);}
 	bool m_relative;
 	double m_gap;
 	double m_bpm;
+	
 	bool txtCheck(std::vector<char> const& data);
 	void txtParse();
 	bool txtParseField(std::string const& line);
 	bool txtParseNote(std::string line);
 	bool iniCheck(std::vector<char> const& data);
 	void iniParse();
+	bool smCheck(std::vector<char> const& data);
+	void smParse();
+	bool smParseField(std::string line);
+	Notes smParseNotes(std::string line);
 	double m_prevtime;
 	unsigned int m_prevts;
 	unsigned int m_relativeShift;
 	double m_maxScore;
+	std::vector<std::pair<double,double> > m_stops;
 	struct BPM {
 		BPM(double _begin, unsigned int _ts, double bpm): begin(_begin), step(0.25 * 60.0 / bpm), ts(_ts) {}
 		double begin; // Time in seconds

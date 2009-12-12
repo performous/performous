@@ -73,7 +73,7 @@ struct Note {
 	/// power of note
 	mutable double power;
 	/// note type
-	enum Type { FREESTYLE = 'F', NORMAL = ':', GOLDEN = '*', SLIDE = '+', SLEEP = '-'} type;
+	enum Type { FREESTYLE = 'F', NORMAL = ':', GOLDEN = '*', SLIDE = '+', SLEEP = '-', TAP = '1', HOLDBEGIN = '2', HOLDEND = '3', MINE = 'M'} type;
 	int note; ///< MIDI pitch of the note (at the end for slide notes)
 	int notePrev; ///< MIDI pitch of the previous note (should be same as note for everything but SLIDE)
 	/// lyrics syllable for that note
@@ -96,3 +96,27 @@ struct Note {
 
 typedef std::vector<Note> Notes;
 
+//container for dance songs
+typedef std::map<int, Note> DanceChord;	//int indicates "arrow" position (cmp. fret in guitar) 
+typedef std::vector<DanceChord> DanceChords;
+
+
+struct DanceTrack {
+	DanceTrack(std::string& description, Notes& notes);
+	//track description
+	std::string description;
+	//container for the actual note data
+	Notes notes;	
+};
+
+enum DanceDifficulty {
+	BEGINNER,
+	EASY,
+	MEDIUM,
+	HARD,
+	CHALLENGE,
+	DIFFICULTYCOUNT
+};
+
+typedef std::map<DanceDifficulty, DanceTrack> DanceDifficultyMap;
+typedef std::map<std::string, DanceDifficultyMap> DanceTracks;

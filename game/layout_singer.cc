@@ -37,24 +37,23 @@ void LayoutSinger::drawScore(Position position) {
 		float g = p->m_color.g;
 		float b = p->m_color.b;
 		glColor4f(r, g, b,act);
-		switch(position) {
-			case LayoutSinger::BOTTOM:
-				m_player_icon->dimensions.left(-0.5 + 0.01 + 0.25 * i).fixedWidth(0.075).screenTop(0.055);
-				break;
-			case LayoutSinger::MIDDLE:
-				m_player_icon->dimensions.right(0.35).fixedHeight(0.050).screenTop(0.025 + 0.050 * i);
-				break;
-		}
-		m_player_icon->draw();
 		m_score_text[i%4]->render((boost::format("%04d") % p->getScore()).str());
 		switch(position) {
 			case LayoutSinger::BOTTOM:
+				m_player_icon->dimensions.left(-0.5 + 0.01 + 0.25 * i).fixedWidth(0.075).screenTop(0.055);
 				m_score_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.075).screenTop(0.055);
 				break;
 			case LayoutSinger::MIDDLE:
+				m_player_icon->dimensions.right(0.35).fixedHeight(0.050).screenTop(0.025 + 0.050 * i);
 				m_score_text[i%4]->dimensions().right(0.45).fixedHeight(0.050).screenTop(0.025 + 0.050 * i);
 				break;
+			case LayoutSinger::LEFT:
+			case LayoutSinger::RIGHT:
+				m_player_icon->dimensions.left(-0.5 + 0.01 + 0.25 * i).fixedWidth(0.075).screenTop(0.055);
+				m_score_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.075).screenTop(0.055);
+				break;
 		}
+		m_player_icon->draw();
 		m_score_text[i%4]->draw();
 		// Give some feedback on how well the last lyrics row went
 		float fact = p->m_feedbackFader.get();
@@ -75,6 +74,10 @@ void LayoutSinger::drawScore(Position position) {
 				case LayoutSinger::MIDDLE:
 					m_line_rank_text[i%4]->dimensions().right(0.30).fixedHeight(0.05*fzoom).screenTop(0.025 + 0.050 * i);
 					break;
+				case LayoutSinger::LEFT:
+				case LayoutSinger::RIGHT:
+					m_line_rank_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.055*fzoom).screenTop(0.11);
+					break;
 			}
 			m_line_rank_text[i%4]->draw();
 		}
@@ -92,6 +95,10 @@ void LayoutSinger::draw(double time, Position position) {
 			case LayoutSinger::MIDDLE:
 				m_noteGraph.draw(time, m_database, NoteGraph::TOP);
 				break;
+			case LayoutSinger::LEFT:
+			case LayoutSinger::RIGHT:
+				m_noteGraph.draw(time, m_database, NoteGraph::LEFT);
+				break;
 		}
 	}
 
@@ -106,6 +113,11 @@ void LayoutSinger::draw(double time, Position position) {
 		case LayoutSinger::MIDDLE:
 			pos.center(-0.05);
 			linespacing = 0.04;
+			break;
+		case LayoutSinger::LEFT:
+		case LayoutSinger::RIGHT:
+			pos.screenBottom(-0.1);
+			linespacing = 0.06;
 			break;
 	}
 	bool dirty;

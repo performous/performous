@@ -31,7 +31,9 @@ namespace {
 	}
 }
 
-bool SongParser::txtCheck(std::vector<char> const& data) { return data[0] == '#' && data[1] >= 'A' && data[1] <= 'Z'; }
+bool SongParser::txtCheck(std::vector<char> const& data) {
+	return data[0] == '#' && data[1] >= 'A' && data[1] <= 'Z';
+}
 
 void SongParser::txtParse() {
 	Song& s = m_song;

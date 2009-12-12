@@ -10,7 +10,7 @@ class Database;
 /// handles drawing of notes and waves
 class NoteGraph {
   public:
-	enum Position {FULLSCREEN, TOP};
+	enum Position {FULLSCREEN, TOP, LEFT, RIGHT};
 	/// constructor
 	NoteGraph(Song const& song);
 	/// resets NoteGraph and Notes

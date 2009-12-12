@@ -16,10 +16,10 @@
 #endif
 
 namespace input {
-	enum DevType { GUITAR, DRUMS };
+	enum DevType { GUITAR, DRUMS, DANCEPAD };
 
-	static const std::size_t BUTTONS = 6;
-	static const std::size_t STARPOWER_BUTTON = BUTTONS - 1;
+	static const std::size_t BUTTONS = 10;
+	static const std::size_t STARPOWER_BUTTON = 5;
 
 	struct Event {
 		enum Type { PRESS, RELEASE, PICK, WHAMMY };
@@ -31,7 +31,7 @@ namespace input {
 	};
 	
 	namespace Private {
-		enum Type {GUITAR_RB, DRUMS_RB, GUITAR_GH, DRUMS_GH, DRUMS_MIDI};
+		enum Type { GUITAR_RB, DRUMS_RB, GUITAR_GH, DRUMS_GH, DRUMS_MIDI, DANCEPAD_GENERIC };
 		static unsigned int KEYBOARD_ID = UINT_MAX;
 		class InputDevPrivate {
 		  public:
@@ -77,10 +77,17 @@ namespace input {
 				if( _type == input::GUITAR &&
 					(m_type == input::Private::GUITAR_GH || m_type == input::Private::GUITAR_RB) ) {
 					return true;
-				} else if( _type == input::DRUMS &&
+				}
+				else if( _type == input::DRUMS &&
 					(m_type == input::Private::DRUMS_GH || m_type == input::Private::DRUMS_RB || m_type == input::Private::DRUMS_MIDI) ) {
 					return true;
-				} else {
+				}
+				else if( _type == input::DANCEPAD && (m_type == input::Private::DANCEPAD_GENERIC
+				  || m_type == input::Private::GUITAR_GH // for keyboard controlling
+				  )) {
+					return true;
+				}
+				else {
 					return false;
 				}
 			};
@@ -106,6 +113,8 @@ namespace input {
 				std::cout << "Request acquiring DRUM" << std::endl;
 			if( _type == input::GUITAR )
 				std::cout << "Request acquiring GUITAR" << std::endl;
+			if( _type == input::DANCEPAD )
+				std::cout << "Request acquiring DANCEPAD" << std::endl;
 			if( devices.size() == 0 ) throw std::runtime_error("No InputDev available");
 			for(InputDevs::iterator it = devices.begin() ; it != devices.end() ; ++it) {
 				if( it->first == input::Private::KEYBOARD_ID && !config["game/keyboard_guitar"].b()) continue;
@@ -116,7 +125,7 @@ namespace input {
 					return;
 				}
 			}
-			std::cout << "Not Found" << std::endl;
+			std::cout << "No InputDev was found!" << std::endl;
 			throw std::runtime_error("No matching instrument available");
 		};
 		~InputDev() {

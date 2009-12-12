@@ -6,6 +6,8 @@
 #include "layout_singer.hh"
 #include "animvalue.hh"
 #include "engine.hh"
+#include "guitargraph.hh"
+#include "dancegraph.hh"
 #include "screen.hh"
 #include "backgrounds.hh"
 #include "theme.hh"
@@ -23,12 +25,13 @@ class Database;
 class Video;
 
 typedef boost::ptr_vector<GuitarGraph> Instruments;
+typedef boost::ptr_vector<DanceGraph> Dancers;
 
 /// shows score at end of song
 class ScoreWindow {
   public:
 	/// constructor
-	ScoreWindow(Instruments& instruments, Database& database);
+	ScoreWindow(Instruments& instruments, Database& database, Dancers& dancers);
 	/// draws ScoreWindow
 	void draw();
 	bool empty() { return m_database.scores.empty(); }
@@ -68,6 +71,7 @@ class ScreenSing: public Screen {
 	  */
 	void activateNextScreen();
 	void instrumentLayout(double time);
+	void danceLayout(double time);
 	Audio& m_audio;
 	Capture& m_capture;
 	Database& m_database;
@@ -84,6 +88,7 @@ class ScreenSing: public Screen {
 	boost::scoped_ptr<Engine> m_engine;
 	boost::scoped_ptr<LayoutSinger> m_layout_singer;
 	Instruments m_instruments;
+	Dancers m_dancers;
 	double m_latencyAV;  // Latency between audio and video output (do not confuse with latencyAR)
 	boost::shared_ptr<ThemeSing> theme;
 	AnimValue m_quitTimer;

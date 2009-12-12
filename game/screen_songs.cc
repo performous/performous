@@ -195,6 +195,13 @@ void ScreenSongs::stopMultimedia(ScreenSharedInfo& info) {
 	}
 }
 
+namespace {
+	float getIconTex(int i) {
+		static int iconcount = 8;
+		return (i-1)/float(iconcount);
+	}
+}
+
 void ScreenSongs::draw() {
 	m_songs.update(); // Poll for new songs
 	ScreenSharedInfo info;
@@ -250,6 +257,7 @@ void ScreenSongs::draw() {
 					Dimensions dim = Dimensions(m_instrumentList->ar()).middle(-0.2 + 0.17 * (i - shift)).bottom(y - (0.14+diff) - 0.2 * diff).fitInside(0.14 + diff, 0.14 + diff);
 					double x;
 					float alpha;
+					float xincr = 0.2f;
 					{
 						// vocals
 						alpha = (song_display.notes.size()) ? 1.00 : 0.25;
@@ -261,11 +269,11 @@ void ScreenSongs::draw() {
 							glColor4f(1.0, 1.0, 1.0, alpha);
 						}
 						x = dim.x1()+0.00*(dim.x2()-dim.x1());
-						glTexCoord2f(0.00f, 0.0f); glVertex2f(x, dim.y1());
-						glTexCoord2f(0.00f, 1.0f); glVertex2f(x, dim.y2());
-						x = dim.x1()+0.25*(dim.x2()-dim.x1());
-						glTexCoord2f(0.25f, 0.0f); glVertex2f(x, dim.y1());
-						glTexCoord2f(0.25f, 1.0f); glVertex2f(x, dim.y2());
+						glTexCoord2f(getIconTex(1), 0.0f); glVertex2f(x, dim.y1());
+						glTexCoord2f(getIconTex(1), 1.0f); glVertex2f(x, dim.y2());
+						x = dim.x1()+xincr*(dim.x2()-dim.x1());
+						glTexCoord2f(getIconTex(2), 0.0f); glVertex2f(x, dim.y1());
+						glTexCoord2f(getIconTex(2), 1.0f); glVertex2f(x, dim.y2());
 					}
 					{
 						// guitars
@@ -278,12 +286,12 @@ void ScreenSongs::draw() {
 						for (int i = guitarCount-1; i >= 0; i--) {
 							glutil::Begin block(GL_TRIANGLE_STRIP);
 							glColor4f(1.0, 1.0, 1.0, alpha);
-							x = dim.x1()+(0.25+i*0.04)*(dim.x2()-dim.x1());
-							glTexCoord2f(0.25f, 0.0f); glVertex2f(x, dim.y1());
-							glTexCoord2f(0.25f, 1.0f); glVertex2f(x, dim.y2());
-							x = dim.x1()+(0.50+i*0.04)*(dim.x2()-dim.x1());
-							glTexCoord2f(0.50f, 0.0f); glVertex2f(x, dim.y1());
-							glTexCoord2f(0.50f, 1.0f); glVertex2f(x, dim.y2());
+							x = dim.x1()+(xincr+i*0.04)*(dim.x2()-dim.x1());
+							glTexCoord2f(getIconTex(2), 0.0f); glVertex2f(x, dim.y1());
+							glTexCoord2f(getIconTex(2), 1.0f); glVertex2f(x, dim.y2());
+							x = dim.x1()+(2*xincr+i*0.04)*(dim.x2()-dim.x1());
+							glTexCoord2f(getIconTex(3), 0.0f); glVertex2f(x, dim.y1());
+							glTexCoord2f(getIconTex(3), 1.0f); glVertex2f(x, dim.y2());
 						}
 					}
 					{
@@ -291,24 +299,36 @@ void ScreenSongs::draw() {
 						alpha = (isTrackInside(song_display.track_map,"bass")) ? 1.00 : 0.25;
 						glutil::Begin block(GL_TRIANGLE_STRIP);
 						glColor4f(1.0, 1.0, 1.0, alpha);
-						x = dim.x1()+0.50*(dim.x2()-dim.x1());
-						glTexCoord2f(0.50f, 0.0f); glVertex2f(x, dim.y1());
-						glTexCoord2f(0.50f, 1.0f); glVertex2f(x, dim.y2());
-						x = dim.x1()+0.75*(dim.x2()-dim.x1());
-						glTexCoord2f(0.75f, 0.0f); glVertex2f(x, dim.y1());
-						glTexCoord2f(0.75f, 1.0f); glVertex2f(x, dim.y2());
+						x = dim.x1()+2*xincr*(dim.x2()-dim.x1());
+						glTexCoord2f(getIconTex(3), 0.0f); glVertex2f(x, dim.y1());
+						glTexCoord2f(getIconTex(3), 1.0f); glVertex2f(x, dim.y2());
+						x = dim.x1()+3*xincr*(dim.x2()-dim.x1());
+						glTexCoord2f(getIconTex(4), 0.0f); glVertex2f(x, dim.y1());
+						glTexCoord2f(getIconTex(4), 1.0f); glVertex2f(x, dim.y2());
 					}
 					{
 						// drums
 						alpha = (isTrackInside(song_display.track_map,"drums")) ? 1.00 : 0.25;
 						glutil::Begin block(GL_TRIANGLE_STRIP);
 						glColor4f(1.0, 1.0, 1.0, alpha);
-						x = dim.x1()+0.75*(dim.x2()-dim.x1());
-						glTexCoord2f(0.75f, 0.0f); glVertex2f(x, dim.y1());
-						glTexCoord2f(0.75f, 1.0f); glVertex2f(x, dim.y2());
-						x = dim.x1()+1.00*(dim.x2()-dim.x1());
-						glTexCoord2f(1.00f, 0.0f); glVertex2f(x, dim.y1());
-						glTexCoord2f(1.00f, 1.0f); glVertex2f(x, dim.y2());
+						x = dim.x1()+3*xincr*(dim.x2()-dim.x1());
+						glTexCoord2f(getIconTex(4), 0.0f); glVertex2f(x, dim.y1());
+						glTexCoord2f(getIconTex(4), 1.0f); glVertex2f(x, dim.y2());
+						x = dim.x1()+4*xincr*(dim.x2()-dim.x1());
+						glTexCoord2f(getIconTex(5), 0.0f); glVertex2f(x, dim.y1());
+						glTexCoord2f(getIconTex(5), 1.0f); glVertex2f(x, dim.y2());
+					}
+					{
+						// dancing
+						alpha = !song_display.danceTracks.empty() ? 1.00 : 0.25;
+						glutil::Begin block(GL_TRIANGLE_STRIP);
+						glColor4f(1.0, 1.0, 1.0, alpha);
+						x = dim.x1()+4*xincr*(dim.x2()-dim.x1());
+						glTexCoord2f(getIconTex(5), 0.0f); glVertex2f(x, dim.y1());
+						glTexCoord2f(getIconTex(5), 1.0f); glVertex2f(x, dim.y2());
+						x = dim.x1()+5*xincr*(dim.x2()-dim.x1());
+						glTexCoord2f(getIconTex(6), 0.0f); glVertex2f(x, dim.y1());
+						glTexCoord2f(getIconTex(6), 1.0f); glVertex2f(x, dim.y2());
 					}
 					glColor4f(1.0, 1.0, 1.0, 1.0);
 				}

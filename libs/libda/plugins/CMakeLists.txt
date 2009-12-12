@@ -167,3 +167,4 @@ if(NOT WIN32)
 		endif(APPLE OR WIN32)
 	endif(PLUGIN_TESTING)
 endif(NOT WIN32)
+

@@ -48,7 +48,7 @@ class LyricRow {
 
 class LayoutSinger {
   public:
-	enum Position {BOTTOM, MIDDLE};
+	enum Position {BOTTOM, MIDDLE, LEFT, RIGHT};
 	/// ThemeSing is optional if you want to use drawScore only
 	LayoutSinger(Song& song, Database& database, boost::shared_ptr<ThemeSing> theme = boost::shared_ptr<ThemeSing>());
 	~LayoutSinger();
