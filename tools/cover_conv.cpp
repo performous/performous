@@ -9,7 +9,7 @@
 
 int main( int argc, char **argv) {
 	if(argc != 4 ) {
-		std::cout << "Usage: " << argv[0] << " [pak_file] [track_id] [output_image]" << std::endl;
+		std::cout << "Usage: " << argv[0] << " [-h|--help] pak_file track_id output_image" << std::endl;
 		return EXIT_FAILURE;
 	}
 

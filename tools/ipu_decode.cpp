@@ -110,13 +110,13 @@ int main( int argc, char** argv) {
 	struct IPUFile ipu;
 
 	if( argc < 3 ) {
-		std::cout << "Usage: " << argv[0] << "input output" << std::endl;
+		std::cout << "Usage: " << argv[0] << " input output" << std::endl;
 		return EXIT_FAILURE;
 	}
 
 	m_f1.open(argv[1], std::ios::binary);
 	m_f2.open(argv[2], std::ios::binary);
-	if (!m_f1.is_open()) throw std::runtime_error("Could not open PAK file");
+	if (!m_f1.is_open()) throw std::runtime_error("Could not open IPU file");
 
 	m_f1.seekg(0x4, std::ios::cur);
 	m_f1.read((char*)&ipu.file_size,sizeof(int));

@@ -1,0 +1,27 @@
+.TH ss_extract "1" "" "" ""
+.SH "NAME"
+ss_extract \- Tool for converting Singstar DVDs to Ultrastar format
+.SH "SYNOPSIS"
+\fBss_extract\fR [\-h|\-\-help] [\-\-dvd arg] [\-l|\-\-list] [\-\-song arg] [\-\-video arg] [\-\-audio arg]
+.TP
+\fB\-h\fR [ \fB\-\-help\fR ]
+you are viewing it
+.TP
+\fB\-\-dvd\fR arg
+path to Singstar DVD root
+.TP
+\fB\-l\fR [ \fB\-\-list\fR ]
+list tracks only
+.TP
+\fB\-\-song\fR arg
+only extract the given track (ID or partial name)
+.TP
+\fB\-\-video\fR arg (=mkv)
+specify video format (none, mkv, mpeg2)
+.TP
+\fB\-\-audio\fR arg (=ogg)
+specify audio format (none, ogg, wav)
+.SH "DESCRIPTION"
+Tool for converting original Singstar DVDs to the format used by Performous.
+.SH "SEE ALSO"
+\fIperformous\fR(6)
