@@ -45,10 +45,10 @@ class DanceGraph {
 	std::string getDifficultyString() const;
   private:
 	enum DanceStep { STEP_LEFT, STEP_DOWN, STEP_UP, STEP_RIGHT };
+	void gameMode(int direction);
 	void difficultyDelta(int delta);
 	void difficulty(DanceDifficulty level);
 	DanceDifficulty m_level;
-	glutil::Color const& color(int arrow_i) const;
 	void dance(double time, input::Event const& ev);
 	void drawNote(DanceNote& note, double time);
 	void drawArrow(int arrow_i, Texture& tex, float x, float y, float scale = 1.0, float ty1 = 0.0, float ty2 = 1.0);
@@ -90,6 +90,8 @@ class DanceGraph {
 	int m_streak;
 	int m_longestStreak;
 	int m_bigStreak;
+	int m_pads;
 	std::string m_gamingMode;
+	DanceTracks::const_iterator m_curTrackIt;
 };
 

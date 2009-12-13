@@ -64,8 +64,7 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
   m_scoreFactor(1),
   m_streak(),
   m_longestStreak(),
-  m_bigStreak(),
-  m_gamingMode("dance-single")
+  m_bigStreak()
 {
 	for(size_t i=0; i < 4; i++)
 		m_activeNotes[i] = m_notes.end();
@@ -74,11 +73,38 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
 	for(size_t i = 0; i < 4; i++) m_pressed[i] = false;
 	for(size_t i = 0; i < 4; i++) m_pressed_anim[i] = AnimValue(0.0, 4.0);
 	
-	DanceTracks::const_iterator it = m_song.danceTracks.find(m_gamingMode);
-	if(it == m_song.danceTracks.end())
+	if(m_song.danceTracks.empty())
 		throw std::runtime_error("Could not find any dance tracks.");
+	
+	gameMode(0);
 	difficultyDelta(0); // hack to get initial level
 		
+}
+
+void DanceGraph::gameMode(int direction) {
+	if (direction == 0) {
+		m_curTrackIt = m_song.danceTracks.begin();
+	} else if (direction > 0) {
+		m_curTrackIt++;
+		if (m_curTrackIt == m_song.danceTracks.end()) m_curTrackIt = m_song.danceTracks.begin();
+	} else if (direction < 0) {
+		if (m_curTrackIt == m_song.danceTracks.begin()) m_curTrackIt = (--m_song.danceTracks.end());
+		else m_curTrackIt--;
+	}
+	m_gamingMode = m_curTrackIt->first;
+	std::string gm = m_gamingMode;
+	if (gm == "dance-single") m_pads = 4;
+	else if (gm == "dance-double") m_pads = 8;
+	else if (gm == "dance-couple") m_pads = 8;
+	else if (gm == "dance-solo") m_pads = 6;
+	else if (gm == "pump-single") m_pads =5 ;
+	else if (gm == "pump-double") m_pads = 10;
+	else if (gm == "pump-couple") m_pads = 10;
+	else if (gm == "ez2-single") m_pads = 5;
+	else if (gm == "ez2-double") m_pads = 10;
+	else if (gm == "ex2-real") m_pads = 7;
+	else if (gm == "para-single") m_pads = 5;
+	else throw std::runtime_error("Unknown track " + gm);
 }
 
 std::string DanceGraph::getDifficultyString() const { return diffv[m_level]; }
@@ -155,6 +181,8 @@ void DanceGraph::engine() {
 			if (ev.type == input::Event::PRESS) {
 				if (ev.pressed[STEP_UP]) difficultyDelta(1);
 				else if (ev.pressed[STEP_DOWN]) difficultyDelta(-1);
+				else if (ev.pressed[STEP_LEFT]) gameMode(-1);
+				else if (ev.pressed[STEP_RIGHT]) gameMode(1);
 			}
 		}
 		if (ev.type == input::Event::RELEASE) {
@@ -232,17 +260,6 @@ namespace {
 	}
 }
 
-glutil::Color const& DanceGraph::color(int arrow_i) const {
-	static glutil::Color arrowColors[4] = {
-		glutil::Color(0.0f, 0.9f, 0.0f),
-		glutil::Color(0.9f, 0.0f, 0.0f),
-		glutil::Color(0.9f, 0.9f, 0.0f),
-		glutil::Color(0.0f, 0.0f, 0.9f),
-	};
-	if (arrow_i < 0 || arrow_i > 3) throw std::logic_error("Invalid arrow index in DanceGraph::getColor");
-	return arrowColors[arrow_i];
-}
-
 void DanceGraph::drawArrow(int arrow_i, Texture& tex, float x, float y, float scale, float ty1, float ty2) {
 	glutil::Translation tr(x, y, 0.0f);
 	if (scale != 1.0f) glScalef(scale, scale, scale);
@@ -280,7 +297,7 @@ void DanceGraph::draw(double time) {
 		m_text.dimensions.screenBottom(-0.075).middle(-0.09 + offsetX);
 		m_text.draw("^ " + getDifficultyString() + " v");
 		m_text.dimensions.screenBottom(-0.050).middle(-0.09 + offsetX);
-		m_text.draw(getGameMode());
+		m_text.draw("< " + getGameMode() + " >");
 	} else {
 		// Draw scores
 		m_text.dimensions.screenBottom(-0.35).middle(0.32 * dimensions.w() + offsetX);
@@ -297,14 +314,12 @@ void DanceGraph::draw(double time) {
 		  glutil::Scale sc1(temp_s, temp_s, temp_s);
 		
 		// Arrows on cursor
-		for (int arrow_i = 0; arrow_i < 4; ++arrow_i) {
+		glColor3f(1.0f, 1.0f, 1.0f);
+		for (int arrow_i = 0; arrow_i < m_pads; ++arrow_i) {
 			float x = -1.5f + arrow_i;
 			float y = time2y(0.0);
 			float l = m_pressed_anim[arrow_i].get();
 			float s = (5.0 - l) / 5.0;
-			glutil::Color c = color(arrow_i);
-			c.r += l; c.g += l; c.b +=l;
-			glColor4fv(c);
 			drawArrow(arrow_i, m_arrows_cursor, x, y, s);
 		}
 		
@@ -352,7 +367,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	float ac = note.accuracy;
 	float yBeg = time2y(tBeg);
 	float yEnd = time2y(tEnd);
-	glutil::Color c = color(arrow_i);
+	glutil::Color c(1.0f, 1.0f, 1.0f);
 	
 	if (note.isHit && std::abs(tEnd) < maxTolerance) {
 		if (mine) note.hitAnim.setRate(1.0);
@@ -401,15 +416,15 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	}
 	if (glow > 0 && ac > 0 && !mine) {
 		double s = 0.4 * (1.0 + glow);
-		glColor4fv(color(arrow_i));
+		glColor3f(1.0f, 1.0f, 1.0f);
 		std::string rank = "Horrible!";
 		if (ac > .90) rank = "Perfect!";
 		else if (ac > .80) rank = "Excellent!";
 		else if (ac > .70) rank = "Great!";
 		else if (ac > .60) rank = "Good!";
-		else if (ac > .50) rank = "OK!";
+		else if (ac > .50) rank = "  OK!  ";
 		else if (ac > .40) rank = "Poor!";
-		else if (ac > .30) rank = "Bad!";
+		else if (ac > .30) rank = " Bad! ";
 		m_popupText->render(rank);
 		m_popupText->dimensions().middle(x).center(time2y(0.0)).stretch(s,s/2.0);
 		m_popupText->draw();

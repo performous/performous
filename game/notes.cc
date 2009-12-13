@@ -69,7 +69,7 @@ double Note::scoreMultiplier(double error) const {
 	  case FREESTYLE: power += 1.0; return 1.0;
 	  case NORMAL: case SLIDE: max = 1.0; break;
 	  case GOLDEN: max = 2.0; break;
-	  case SLEEP: case TAP: case HOLDBEGIN: case HOLDEND: case MINE: break;
+	  case SLEEP: case TAP: case HOLDBEGIN: case HOLDEND: case ROLL: case MINE: case LIFT: break;
 	}
 	double accuracy = clamp(1.5 - error, 0.0, 1.0);
 	power += accuracy;

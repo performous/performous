@@ -73,7 +73,8 @@ struct Note {
 	/// power of note
 	mutable double power;
 	/// note type
-	enum Type { FREESTYLE = 'F', NORMAL = ':', GOLDEN = '*', SLIDE = '+', SLEEP = '-', TAP = '1', HOLDBEGIN = '2', HOLDEND = '3', MINE = 'M'} type;
+	enum Type { FREESTYLE = 'F', NORMAL = ':', GOLDEN = '*', SLIDE = '+', SLEEP = '-',
+	  TAP = '1', HOLDBEGIN = '2', HOLDEND = '3', ROLL = '4', MINE = 'M', LIFT = 'L'} type;
 	int note; ///< MIDI pitch of the note (at the end for slide notes)
 	int notePrev; ///< MIDI pitch of the previous note (should be same as note for everything but SLIDE)
 	/// lyrics syllable for that note
