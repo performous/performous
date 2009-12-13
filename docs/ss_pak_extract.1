@@ -1,16 +1,17 @@
-.TH "" "" "" "" ""
+.TH "ss_pak_extract" "1" "" "" ""
 .SH "NAME"
-performous\-tools \- Tools for Performous karaoke game
+ss_pak_extract \- Tool for reading general PAK files (used by Singstar)
 .SH "SYNOPSIS"
-\fBss_extract\fR [\-h|\-\-help] [\-\-dvd arg] [\-l|\-\-list] [\-\-song arg] [\-\-video arg] [\-\-audio arg]
-\fBss_adpcm_decode\fR [\-h|\-\-help] [archive.pak] input.mib output.wav
-\fBss_cover_conv\fR [\-h|\-\-help] [pak_file] [track_id] [output_image]
-\fBss_ipu_conv\fR [\-h|\-\-help] infile.ipu outfile.m2v
-\fBss_ipu_decode\fR [\-h|\-\-help] input output
+.TP
 \fBss_pak_extract\fR [\-h|\-\-help] file.pak \-\-extract [files]
+Extract \fBfiles\fR from \fBfile.pak\fR pak file.
+.TP
 \fBss_pak_extract\fR file.pak \-\-dump file
+Dump \fBfile\fR content from \fBfile.pak\fR pak file to stdout.
+.TP
 \fBss_pak_extract\fR file.pak \-\-list
+List files from \fBfile.pak\fR pak file to stdout.
 .SH "DESCRIPTION"
-Tools for converting original Singstar DVDs to the format used by Performous.
+Tool for reading general PAK files (used by Singstar)
 .SH "SEE ALSO"
 \fIperformous\fR(1)
