@@ -23,9 +23,10 @@ if(UNIX)
 	endif(HELP2MAN AND GZIP)
 	if(ENABLE_TOOLS AND GZIP)
 		set(TOOLS "ss_pak_extract" "ss_extract" "ss_cover_conv" "ss_adpcm_decode" "ss_ipu_decode" "ss_ipu_conv")
+		set(MAN_SECTION "1")
 		foreach(TOOL ${TOOLS})
-			set(TOOL_MANFILE ${CMAKE_CURRENT_SOURCE_DIR}/${TOOL}.3)
-			set(TOOL_MANFILE_GZ ${CMAKE_CURRENT_BINARY_DIR}/${TOOL}.3.gz)
+			set(TOOL_MANFILE ${CMAKE_CURRENT_SOURCE_DIR}/${TOOL}.${MAN_SECTION})
+			set(TOOL_MANFILE_GZ ${CMAKE_CURRENT_BINARY_DIR}/${TOOL}.${MAN_SECTION}.gz)
 			add_custom_command(
 				OUTPUT ${TOOL_MANFILE_GZ}
 				COMMAND ${GZIP} -c ${TOOL_MANFILE} > ${TOOL_MANFILE_GZ}
@@ -33,8 +34,8 @@ if(UNIX)
 				COMMENT "Building ${TOOL} man page"
 				VERBATIM
 			)
-			add_custom_target(${TOOL}.3 ALL DEPENDS ${TOOL_MANFILE_GZ})
-			install(FILES ${TOOL_MANFILE_GZ} DESTINATION share/man/man3)
+			add_custom_target(${TOOL}.${MAN_SECTION} ALL DEPENDS ${TOOL_MANFILE_GZ})
+			install(FILES ${TOOL_MANFILE_GZ} DESTINATION share/man/man${MAN_SECTION})
 		endforeach(TOOL)
 	endif(ENABLE_TOOLS AND GZIP)
 endif(UNIX)
