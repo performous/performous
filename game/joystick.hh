@@ -11,7 +11,7 @@
 #include "xtime.hh"
 #include "configuration.hh"
 
-#ifdef HAVE_PORTMIDI
+#ifdef USE_PORTMIDI
 #include "portmidi.hh"
 #endif
 
@@ -150,7 +150,7 @@ namespace input {
 		bool pushEvent(SDL_Event);
 	}
 	
-#ifdef HAVE_PORTMIDI
+#ifdef USE_PORTMIDI
 	class MidiDrums {
 	  public:
 		MidiDrums(int devId);
