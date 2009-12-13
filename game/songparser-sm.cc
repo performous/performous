@@ -120,7 +120,7 @@ bool SongParser::smParseField(std::string line) {
 	//In case the value continues to several lines, all text before the ending character ';' is read to single line.
 	while (value[value.size() -1] != ';') {
 		std::string str;			
-		getline (str);
+		if (!getline (str)) throw std::runtime_error("Invalid format, semicolon missing after value of " + key);
 		value += boost::trim_copy(str);
 	}
 	value = value.substr(0, value.size() - 1);	//Here the end character(';') is eliminated
