@@ -34,7 +34,7 @@ int buttonFromSDL(input::Private::Type _type, unsigned int _sdl_button) {
 		{ 3, 4, 1, 2, 0, 4 }, // Guitar Hero drums
 		{ 3, 4, 1, 2, 0, -1 },  // Rock Band drums
 		// Left  Down  Up  Right  DownL  DownR  UpL  UpR  Enter  Select
-		{  0,    2,    1,  3 } /*   4,     5,     6,   7,   8,     9 } */ // generic dance pad
+		{  0,    1,    2,  3 } /*   4,     5,     6,   7,   8,     9 } */ // generic dance pad
 	};
 	if( _sdl_button >= SDL_BUTTONS ) return -1;
 	switch(_type) {
@@ -145,7 +145,7 @@ void input::SDL::init() {
 					std::cout << "  Detected as: MIDI Drums (forced)" << std::endl;
 					break;
 				case input::Private::DANCEPAD_GENERIC:
-					std::cout << "  Detected as: Generic dance pad" << std::endl;
+					std::cout << "  Detected as: Generic dance pad (forced)" << std::endl;
 					break;
 			}
 			input::Private::devices[i] = input::Private::InputDevPrivate(forced_type[i]);
@@ -175,14 +175,17 @@ void input::SDL::init() {
 	}
 	// Here we should send an event to have correct state buttons
 	init_devices();
-	// Adding keyboard instrument
+	// Adding keyboard instruments
 	std::cout << "Keyboard as guitar controller: " << (config["game/keyboard_guitar"].b() ? "enabled":"disabled") << std::endl;
+	std::cout << "Keyboard as dance pad controller: " << (config["game/keyboard_dancepad"].b() ? "enabled":"disabled") << std::endl;
 	input::SDL::sdl_devices[input::Private::KEYBOARD_ID] = NULL;
 	input::Private::devices[input::Private::KEYBOARD_ID] = input::Private::InputDevPrivate(input::Private::GUITAR_GH);
+	input::SDL::sdl_devices[input::Private::KEYBOARD_ID2] = NULL;
+	input::Private::devices[input::Private::KEYBOARD_ID2] = input::Private::InputDevPrivate(input::Private::DANCEPAD_GENERIC);
 }
 
 bool input::SDL::pushEvent(SDL_Event _e) {
-	int joy_id;
+	unsigned int joy_id = 0;
 	int button;
 	using namespace input::Private;
 
@@ -192,54 +195,73 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 	static bool pickPressed[2] = {}; // HACK for tracking enter and rshift status
 	switch(_e.type) {
 		case SDL_KEYDOWN: {
-			if( !config["game/keyboard_guitar"].b() ) return false;
+			if(!config["game/keyboard_guitar"].b() && !config["game/keyboard_dancepad"].b())
+			  return false;
 			int button = 0;
-			joy_id = input::Private::KEYBOARD_ID;
-			if(!devices[joy_id].assigned()) return false;
-			switch(_e.key.keysym.sym) {
-				case SDLK_RETURN:
-					if (pickPressed[0]) return true; // repeating
-					pickPressed[0] = true;
-					event.type = input::Event::PICK;
-					event.button = 1;
-					for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
-						event.pressed[i] = devices[joy_id].pressed(i);
-					}
-					devices[joy_id].addEvent(event);
-					return true;
-				case SDLK_RSHIFT:
-					if (pickPressed[1]) return true; // repeating
-					pickPressed[1] = true;
-					event.type = input::Event::PICK;
-					event.button = 0;
-					for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
-						event.pressed[i] = devices[joy_id].pressed(i);
-					}
-					devices[joy_id].addEvent(event);
-					return true;
-				case SDLK_BACKSPACE:
-					event.type = input::Event::WHAMMY;
-					event.button = 1;
-					for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
-						event.pressed[i] = devices[joy_id].pressed(i);
-					}
-					devices[joy_id].addEvent(event);
-					return true;
-				case SDLK_F6: case SDLK_6:
-					button++;
-				case SDLK_F5: case SDLK_5:
-					button++;
-				case SDLK_F4: case SDLK_4:
-					button++;
-				case SDLK_F3: case SDLK_3:
-					button++;
-				case SDLK_F2: case SDLK_2:
-					button++;
-				case SDLK_F1: case SDLK_1:
-					event.type = input::Event::PRESS;
-					break;
-				default:
-					return false;
+			event.type = input::Event::PRESS;
+			if(config["game/keyboard_guitar"].b() && devices[input::Private::KEYBOARD_ID].assigned()) {
+				joy_id = input::Private::KEYBOARD_ID;
+				switch(_e.key.keysym.sym) {
+					case SDLK_RETURN:
+						if (pickPressed[0]) return true; // repeating
+						pickPressed[0] = true;
+						event.type = input::Event::PICK;
+						event.button = 1;
+						for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
+							event.pressed[i] = devices[joy_id].pressed(i);
+						}
+						devices[joy_id].addEvent(event);
+						return true;
+					case SDLK_RSHIFT:
+						if (pickPressed[1]) return true; // repeating
+						pickPressed[1] = true;
+						event.type = input::Event::PICK;
+						event.button = 0;
+						for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
+							event.pressed[i] = devices[joy_id].pressed(i);
+						}
+						devices[joy_id].addEvent(event);
+						return true;
+					case SDLK_BACKSPACE:
+						event.type = input::Event::WHAMMY;
+						event.button = 1;
+						for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
+							event.pressed[i] = devices[joy_id].pressed(i);
+						}
+						devices[joy_id].addEvent(event);
+						return true;
+					case SDLK_F6: case SDLK_6:
+						button++;
+					case SDLK_F5: case SDLK_5:
+						button++;
+					case SDLK_F4: case SDLK_4:
+						button++;
+					case SDLK_F3: case SDLK_3:
+						button++;
+					case SDLK_F2: case SDLK_2:
+						button++;
+					case SDLK_F1: case SDLK_1:
+						event.type = input::Event::PRESS;
+						break;
+					default:
+						return false;
+				}
+			} else if(config["game/keyboard_dancepad"].b() && devices[input::Private::KEYBOARD_ID2].assigned()) {
+				joy_id = input::Private::KEYBOARD_ID2;
+				switch(_e.key.keysym.sym) {
+					case SDLK_KP9: button = 6; break;
+					case SDLK_KP8: button = 2; break;
+					case SDLK_KP7: button = 7; break;
+					case SDLK_KP6: button = 3; break;
+					case SDLK_KP5: button = 8; break;
+					case SDLK_KP4: button = 0; break;
+					case SDLK_KP3: button = 5; break;
+					case SDLK_KP2: button = 1; break;
+					case SDLK_KP1: button = 4; break;
+					default: return false;
+				}
+			} else {
+				return false;
 			}
 			if(devices[joy_id].pressed(button)) return true; // repeating
 			event.button = button;
@@ -251,36 +273,55 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 			break;
 		}
 		case SDL_KEYUP: {
-			if( !config["game/keyboard_guitar"].b() ) return false;
+			if(!config["game/keyboard_guitar"].b() && !config["game/keyboard_dancepad"].b())
+			  return false;
 			int button = 0;
-			joy_id = input::Private::KEYBOARD_ID;
-			if(!devices[joy_id].assigned()) return false;
-			switch(_e.key.keysym.sym) {
-				case SDLK_RETURN: pickPressed[0] = false; return true;
-				case SDLK_RSHIFT: pickPressed[1] = false; return true;
-				case SDLK_BACKSPACE:
-					event.type = input::Event::WHAMMY;
-					event.button = 0;
-					for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
-						event.pressed[i] = devices[joy_id].pressed(i);
-					}
-					devices[joy_id].addEvent(event);
-					return true;
-				case SDLK_F6: case SDLK_6:
-					button++;
-				case SDLK_F5: case SDLK_5:
-					button++;
-				case SDLK_F4: case SDLK_4:
-					button++;
-				case SDLK_F3: case SDLK_3:
-					button++;
-				case SDLK_F2: case SDLK_2:
-					button++;
-				case SDLK_F1: case SDLK_1:
-					event.type = input::Event::RELEASE;
-					break;
-				default:
-					return false;
+			event.type = input::Event::RELEASE;
+			if(config["game/keyboard_guitar"].b() && devices[input::Private::KEYBOARD_ID].assigned()) {
+				joy_id = input::Private::KEYBOARD_ID;
+				switch(_e.key.keysym.sym) {
+					case SDLK_RETURN: pickPressed[0] = false; return true;
+					case SDLK_RSHIFT: pickPressed[1] = false; return true;
+					case SDLK_BACKSPACE:
+						event.type = input::Event::WHAMMY;
+						event.button = 0;
+						for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
+							event.pressed[i] = devices[joy_id].pressed(i);
+						}
+						devices[joy_id].addEvent(event);
+						return true;
+					case SDLK_F6: case SDLK_6:
+						button++;
+					case SDLK_F5: case SDLK_5:
+						button++;
+					case SDLK_F4: case SDLK_4:
+						button++;
+					case SDLK_F3: case SDLK_3:
+						button++;
+					case SDLK_F2: case SDLK_2:
+						button++;
+					case SDLK_F1: case SDLK_1:
+						event.type = input::Event::RELEASE;
+						break;
+					default:
+						return false;
+				}
+			} else if(config["game/keyboard_dancepad"].b() && devices[input::Private::KEYBOARD_ID2].assigned()) {
+				joy_id = input::Private::KEYBOARD_ID2;
+				switch(_e.key.keysym.sym) {
+					case SDLK_KP9: button = 6; break;
+					case SDLK_KP8: button = 2; break;
+					case SDLK_KP7: button = 7; break;
+					case SDLK_KP6: button = 3; break;
+					case SDLK_KP5: button = 8; break;
+					case SDLK_KP4: button = 0; break;
+					case SDLK_KP3: button = 5; break;
+					case SDLK_KP2: button = 1; break;
+					case SDLK_KP1: button = 4; break;
+					default: return false;
+				}
+			} else {
+				return false;
 			}
 			event.button = button;
 			for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {

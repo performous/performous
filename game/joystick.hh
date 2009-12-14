@@ -33,6 +33,8 @@ namespace input {
 	namespace Private {
 		enum Type { GUITAR_RB, DRUMS_RB, GUITAR_GH, DRUMS_GH, DRUMS_MIDI, DANCEPAD_GENERIC };
 		static unsigned int KEYBOARD_ID = UINT_MAX;
+		static unsigned int KEYBOARD_ID2 = KEYBOARD_ID-1; // Two ids needed for keyboard guitar/dancepad
+		
 		class InputDevPrivate {
 		  public:
 			InputDevPrivate() : m_assigned(false), m_type(input::Private::DRUMS_GH) {
@@ -75,16 +77,15 @@ namespace input {
 			input::Private::Type type() {return m_type;};
 			bool type_match( input::DevType _type) {
 				if( _type == input::GUITAR &&
-					(m_type == input::Private::GUITAR_GH || m_type == input::Private::GUITAR_RB) ) {
+				  (m_type == input::Private::GUITAR_GH || m_type == input::Private::GUITAR_RB) ) {
 					return true;
 				}
 				else if( _type == input::DRUMS &&
-					(m_type == input::Private::DRUMS_GH || m_type == input::Private::DRUMS_RB || m_type == input::Private::DRUMS_MIDI) ) {
+				  (m_type == input::Private::DRUMS_GH || m_type == input::Private::DRUMS_RB || m_type == input::Private::DRUMS_MIDI) ) {
 					return true;
 				}
-				else if( _type == input::DANCEPAD && (m_type == input::Private::DANCEPAD_GENERIC
-				  || m_type == input::Private::GUITAR_GH // for keyboard controlling
-				  )) {
+				else if( _type == input::DANCEPAD &&
+				  (m_type == input::Private::DANCEPAD_GENERIC) ) {
 					return true;
 				}
 				else {
@@ -117,7 +118,10 @@ namespace input {
 				std::cout << "Request acquiring DANCEPAD" << std::endl;
 			if( devices.size() == 0 ) throw std::runtime_error("No InputDev available");
 			for(InputDevs::iterator it = devices.begin() ; it != devices.end() ; ++it) {
-				if( it->first == input::Private::KEYBOARD_ID && !config["game/keyboard_guitar"].b()) continue;
+				if( it->first == input::Private::KEYBOARD_ID && !config["game/keyboard_guitar"].b() )
+					continue;
+				if( it->first == input::Private::KEYBOARD_ID2 && !config["game/keyboard_dancepad"].b() )
+					continue;
 				if( !it->second.assigned() && it->second.type_match(_type) ) {
 					std::cout << "Found @" << it->first << std::endl;
 					m_device_id = it->first;
