@@ -512,10 +512,10 @@ void GuitarGraph::draw(double time) {
 					c.r += glow;
 					c.g += glow;
 					c.b += glow;
-					if (glow > 0.5f && tEnd < 0.1f && it->hitAnim.get() == 0.0) 
-					  it->hitAnim.setTarget(1.0);
+					if (glow > 0.5f && tEnd < 0.1f && it->hitAnim[fret].get() == 0.0) 
+					  it->hitAnim[fret].setTarget(1.0);
 					// Call the actual note drawing function
-					drawNote(fret, c, tBeg, tEnd, whammy, it->tappable, glow > 0.5f, it->hitAnim.get(), 
+					drawNote(fret, c, tBeg, tEnd, whammy, it->tappable, glow > 0.5f, it->hitAnim[fret].get(), 
 					  it->releaseTimes[fret] > 0.0 ? it->releaseTimes[fret] - time : 0.0);
 				}
 			}
@@ -561,11 +561,12 @@ void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, fl
 	float x = -2.0f + fret;
 	if (m_drums) x -= 0.5f;
 	if (m_drums && fret == 0) {
+		if (hit || hitAnim > 0) return;
 		c.a = time2a(tBeg); glColor4fv(c);
-		drawBar(tBeg, 0.01f);
+		drawBar(tBeg, 0.015f);
 		return;
 	}
-	float yBeg = (hit || hitAnim > 0) ? time2y(0.0) : time2y(tBeg);
+	float yBeg = (hit || hitAnim > 0) ? std::min(time2y(0.0), time2y(tBeg)): time2y(tBeg);
 	float yEnd = time2y(tEnd);
 	if (yBeg - 2 * fretWid >= yEnd) {
 		if (releaseTime != 0.0 && tEnd - releaseTime > 0.1) yBeg = time2y(releaseTime);

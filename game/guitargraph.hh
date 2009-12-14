@@ -22,11 +22,12 @@ struct Chord {
 	bool tappable;
 	int status; // Guitar: 0 = not played, 10 = tapped, 20 = picked, 30 = released, drums: number of pads hit
 	int score;
-	AnimValue hitAnim;
+	AnimValue hitAnim[5];
 	double releaseTimes[5];
-	Chord(): begin(), end(), polyphony(), tappable(), status(), score(), hitAnim(0.0, 1.5) {
+	Chord(): begin(), end(), polyphony(), tappable(), status(), score() {
 		std::fill(fret, fret + 5, false);
 		std::fill(dur, dur + 5, static_cast<Duration const*>(NULL));
+		std::fill(hitAnim, hitAnim + 5, AnimValue(0.0, 1.5));
 		std::fill(releaseTimes, releaseTimes + 5, 0.0);
 	}
 	bool matches(bool const* fretPressed) {
