@@ -17,6 +17,7 @@
 
 namespace input {
 	enum DevType { GUITAR, DRUMS, DANCEPAD };
+	enum NavButton { NONE, UP, DOWN, LEFT, RIGHT, START, SELECT, CANCEL, PAUSE };
 
 	static const std::size_t BUTTONS = 10;
 	static const int STARPOWER_BUTTON = 5;
@@ -29,7 +30,9 @@ namespace input {
 		// More stuff later, when it is actually used
 		boost::xtime time;
 	};
-	
+
+	NavButton getNav(SDL_Event const &e);
+
 	namespace Private {
 		enum Type { GUITAR_RB, DRUMS_RB, GUITAR_GH, DRUMS_GH, DRUMS_MIDI, DANCEPAD_GENERIC };
 		static unsigned int KEYBOARD_ID = UINT_MAX;

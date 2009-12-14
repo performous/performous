@@ -45,13 +45,11 @@ void ScreenSongs::exit() {
 	m_playReq.clear();
 }
 
-/**Add keys here which should effect both the
-  juke box and the normal screen*/
-void ScreenSongs::manageSharedKey(int key, SDLMod mod)
-{
-	if (key == SDLK_SPACE || (key == SDLK_PAUSE || (key == SDLK_p && mod & KMOD_CTRL))) m_audio.togglePause();
-	else if (key == SDLK_RETURN)
-	{
+/**Add actions here which should effect both the
+  jukebox and the normal screen*/
+void ScreenSongs::manageSharedKey(input::NavButton nav) {
+	if (nav == input::PAUSE) m_audio.togglePause();
+	else if (nav == input::START) {
 		ScreenManager* sm = ScreenManager::getSingletonPtr();
 		Screen* s = sm->getScreen("Sing");
 		ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
@@ -59,90 +57,56 @@ void ScreenSongs::manageSharedKey(int key, SDLMod mod)
 		ss->setSong(m_songs.currentPtr());
 		sm->activateScreen("Sing");
 	}
-	else if (key == SDLK_LEFT) m_songs.advance(-1);
-	else if (key == SDLK_RIGHT) m_songs.advance(1);
-	else if (key == SDLK_END)
-	{
-		ScreenManager* sm = ScreenManager::getSingletonPtr();
-		Screen* s = sm->getScreen("Hiscore");
-		ScreenHiscore* ss = dynamic_cast<ScreenHiscore*> (s);
-		assert(ss);
-		ss->setSong(m_songs.currentPtr());
-		sm->activateScreen("Hiscore");
-	}
+	else if (nav == input::LEFT) m_songs.advance(-1);
+	else if (nav == input::RIGHT) m_songs.advance(1);
 }
 
 void ScreenSongs::manageEvent(SDL_Event event) {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
-	if (event.type == SDL_KEYDOWN) {
-		SDL_keysym keysym = event.key.keysym;
-		int key = keysym.sym;
-		SDLMod mod = event.key.keysym.mod;
+	input::NavButton nav(input::getNav(event));
+	// Handle basic navigational input that is possible also with instruments
+	if (nav != input::NONE) {
 		if (m_jukebox) {
-			if (key == SDLK_ESCAPE || m_songs.empty()) m_jukebox = false;
-			else if (key == SDLK_PAGEUP) m_audio.seek(-30);
-			else if (key == SDLK_PAGEDOWN) m_audio.seek(30);
-			else if (key == SDLK_UP) m_audio.seek(5);
-			else if (key == SDLK_DOWN) m_audio.seek(-5);
-			else manageSharedKey(key, mod);
+			if (nav == input::CANCEL || m_songs.empty()) m_jukebox = false;
+			else if (nav == input::UP) m_audio.seek(5);
+			else if (nav == input::DOWN) m_audio.seek(-5);
+			else manageSharedKey(nav);
 			return;
-		}
-		if (key == SDLK_r && mod & KMOD_CTRL) { m_songs.reload(); m_songs.setFilter(m_search.text); }
-		if (!m_jukebox && m_search.process(keysym)) m_songs.setFilter(m_search.text);
-		else if (key == SDLK_ESCAPE) {
+		} else if (nav == input::CANCEL) {
 			if (m_search.text.empty()) sm->activateScreen("Intro");
 			else { m_search.text.clear(); m_songs.setFilter(m_search.text); }
 		}
 		// The rest are only available when there are songs available
 		else if (m_songs.empty()) return;
+		else if (nav == input::UP) m_songs.sortChange(-1);
+		else if (nav == input::DOWN) m_songs.sortChange(1);
+		else manageSharedKey(nav);
+	// Handle less common, keyboard only keys
+	} else if (event.type == SDL_KEYDOWN) {
+		SDL_keysym keysym = event.key.keysym;
+		int key = keysym.sym;
+		SDLMod mod = event.key.keysym.mod;
+		if (m_jukebox) {
+			if (key == SDLK_PAGEUP) m_audio.seek(-30);
+			else if (key == SDLK_PAGEDOWN) m_audio.seek(30);
+			return;
+		}
+		if (key == SDLK_r && mod & KMOD_CTRL) { m_songs.reload(); m_songs.setFilter(m_search.text); }
+		if (!m_jukebox && m_search.process(keysym)) m_songs.setFilter(m_search.text);
+		// The rest are only available when there are songs available
+		else if (m_songs.empty()) return;
 		else if (key == SDLK_PAGEUP) m_songs.advance(-10);
 		else if (key == SDLK_PAGEDOWN) m_songs.advance(10);
-		else if (key == SDLK_UP) m_songs.sortChange(-1);
-		else if (key == SDLK_DOWN) m_songs.sortChange(1);
 		else if (!m_jukebox && key == SDLK_F4) m_jukebox = true;
 		else if (key == SDLK_TAB && !(mod & KMOD_ALT)) m_songs.randomize();
-		else manageSharedKey(key, mod);
-	} else if (event.type == SDL_JOYBUTTONDOWN) {
-		int button = event.jbutton.button;
-		if (button == 9) {
+		else if (key == SDLK_END) {
 			ScreenManager* sm = ScreenManager::getSingletonPtr();
-			Screen* s = sm->getScreen("Sing");
-			ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
+			Screen* s = sm->getScreen("Hiscore");
+			ScreenHiscore* ss = dynamic_cast<ScreenHiscore*> (s);
 			assert(ss);
 			ss->setSong(m_songs.currentPtr());
-			sm->activateScreen("Sing");
-		} else if (button == 8) {
-			if (m_jukebox) {
-				m_jukebox = false;
-			} else {
-				if (m_search.text.empty()) sm->activateScreen("Intro");
-				else { m_search.text.clear(); m_songs.setFilter(m_search.text); }
-			}
+			sm->activateScreen("Hiscore");
 		}
-	} else if (event.type == SDL_JOYAXISMOTION) {
-		int axis = event.jaxis.axis;
-		int value = event.jaxis.value;
-		if (m_jukebox) {
-			if (axis == 5 && value > 0) m_audio.seek(5);
-			else if (axis == 5 && value < 0) m_audio.seek(-5);
-		} else {
-			if (axis == 5 && value > 0) m_songs.sortChange(-1);
-			else if (axis == 5 && value < 0) m_songs.sortChange(1);
-		}
-		if (axis == 4 && value > 0) m_songs.advance(1);
-		else if (axis == 4 && value < 0) m_songs.advance(-1);
-	} else if (event.type == SDL_JOYHATMOTION) {
-		int dir = event.jhat.value;
-		if (event.jhat.value == SDL_HAT_UP || event.jhat.value == SDL_HAT_RIGHT) dir = 1;
-		if (m_jukebox) {
-			if (dir == SDL_HAT_RIGHT) m_audio.seek(5);
-			else if (dir == SDL_HAT_LEFT) m_audio.seek(-5);
-		} else {
-			if (dir == SDL_HAT_LEFT) m_songs.sortChange(-1);
-			else if (dir == SDL_HAT_RIGHT) m_songs.sortChange(1);
-		}
-		if (dir == SDL_HAT_DOWN) m_songs.advance(1);
-		else if (dir == SDL_HAT_UP) m_songs.advance(-1);
 	}
 }
 

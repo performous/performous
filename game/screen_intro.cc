@@ -4,6 +4,7 @@
 #include "audio.hh"
 #include "record.hh"
 #include "i18n.hh"
+#include "joystick.hh"
 
 ScreenIntro::ScreenIntro(std::string const& name, Audio& audio, Capture& capture): Screen(name), m_audio(audio), m_capture(capture), selected(), m_first(true) {
 	m_menuOptions.push_back(new MenuOption(_("Perform"), "Songs", "intro_sing.svg", _("Start performing!")));
@@ -33,22 +34,18 @@ void ScreenIntro::exit() {
 
 void ScreenIntro::manageEvent(SDL_Event event) {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
-	if (event.type == SDL_KEYDOWN) {
+	input::NavButton nav(input::getNav(event));
+	if (nav != input::NONE) {
 		if (m_dialog) { m_dialog.reset(); return; }
-		int key = event.key.keysym.sym;
-		if (key == SDLK_ESCAPE || key == SDLK_q) sm->finished();
-		else if (key == SDLK_DOWN) ++selected;
-		else if (key == SDLK_UP) --selected;
-		else if (key == SDLK_RETURN) {
+		if (nav == input::CANCEL) sm->finished();
+		else if (nav == input::DOWN || nav == input::RIGHT) ++selected;
+		else if (nav == input::UP || nav == input::LEFT) --selected;
+		else if (nav == input::START) {
 			std::string screen = m_menuOptions[selected].screen;
 			if (screen.empty()) sm->finished(); else sm->activateScreen(screen);
-		} else if (key == SDLK_SPACE || key == SDLK_PAUSE) m_audio.togglePause();
+		} else if (nav == input::PAUSE) m_audio.togglePause();
 		// Normalize selected to [0, size)
 		selected = (m_menuOptions.size() + selected) % m_menuOptions.size();
-	} else if (event.type == SDL_JOYBUTTONDOWN) {
-		int button = event.jbutton.button;
-		if (button == 9) sm->activateScreen("Songs");
-		else if (button == 8) sm->finished();
 	}
 }
 

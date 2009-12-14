@@ -124,3 +124,15 @@ guitar:
 3 = blue
 4 = orange
 
+dancepad:
+0 = left
+1 = down
+2 = up
+3 = right
+4 = down left
+5 = down right
+6 = up left
+7 = up right
+8 = start
+9 = select
+
