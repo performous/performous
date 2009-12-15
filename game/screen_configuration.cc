@@ -1,6 +1,7 @@
 #include "screen_configuration.hh"
 
 #include "configuration.hh"
+#include "joystick.hh"
 
 ScreenConfiguration::ScreenConfiguration(std::string const& name, Audio& audio): Screen(name), m_audio(audio), selected() {
 	for (ConfigMenu::const_iterator it = configMenu.begin(); it != configMenu.end(); ++it) {
@@ -22,28 +23,21 @@ void ScreenConfiguration::manageEvent(SDL_Event event) {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	ConfigItem* ci = NULL;
 	if (!configuration.empty()) ci = &config[configuration[selected]];
-	if (event.type == SDL_KEYDOWN) {
+	input::NavButton nav(input::getNav(event));
+	if (nav != input::NONE) {
+		if (nav == input::CANCEL || nav == input::SELECT) sm->activateScreen("Intro");
+		else if (nav == input::PAUSE) m_audio.togglePause();
+		else if (configuration.empty()) return; // The rest work if there are any config options
+		else if (nav == input::UP && selected > 0) --selected;
+		else if (nav == input::DOWN && selected + 1 < configuration.size()) ++selected;
+		else if (nav == input::LEFT) --*ci;
+		else if (nav == input::RIGHT) ++*ci;
+	} else if (event.type == SDL_KEYDOWN) {
 		int key = event.key.keysym.sym;
 		SDLMod modifier = event.key.keysym.mod;
-		if (key == SDLK_ESCAPE || key == SDLK_q) sm->activateScreen("Intro");
-		else if (key == SDLK_SPACE || key == SDLK_PAUSE) m_audio.togglePause();
 		if (configuration.empty()) return; // The rest work if there are any config options
-		else if (key == SDLK_UP && selected > 0) --selected;
-		else if (key == SDLK_DOWN && selected + 1 < configuration.size()) ++selected;
-		else if (key == SDLK_LEFT) --*ci;
-		else if (key == SDLK_RIGHT) ++*ci;
 		else if (key == SDLK_r && modifier & KMOD_CTRL) ci->reset(modifier & KMOD_ALT);
 		else if (key == SDLK_s && modifier & KMOD_CTRL) writeConfig(modifier & KMOD_ALT);
-	} else if (event.type == SDL_JOYBUTTONDOWN) {
-		int button = event.jbutton.button;
-		if (button == 8) sm->activateScreen("Intro");
-	} else if (event.type == SDL_JOYAXISMOTION) {
-		int axis = event.jaxis.axis;
-		int value = event.jaxis.value;
-		if (axis == 5 && value > 0 && selected + 1 < configuration.size()) ++selected;
-		else if (axis == 5 && value < 0 && selected > 0) --selected;
-		else if (axis == 4 && value > 0) ++*ci;
-		else if (axis == 4 && value < 0) --*ci;
 	}
 }
 

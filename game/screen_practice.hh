@@ -29,5 +29,4 @@ class ScreenPractice : public Screen {
 	std::vector<Sample> m_samples;
 	boost::ptr_vector<ProgressBar> m_vumeters;
 	boost::scoped_ptr<ThemePractice> theme;
-	boost::scoped_ptr<input::InputDev> drums;
 };

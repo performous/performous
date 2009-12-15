@@ -31,8 +31,6 @@ namespace input {
 		boost::xtime time;
 	};
 
-	NavButton getNav(SDL_Event const &e);
-
 	namespace Private {
 		enum Type { GUITAR_RB, DRUMS_RB, GUITAR_GH, DRUMS_GH, DRUMS_MIDI, DANCEPAD_GENERIC };
 		static unsigned int KEYBOARD_ID = UINT_MAX;
@@ -105,6 +103,9 @@ namespace input {
 		typedef std::map<unsigned int,InputDevPrivate> InputDevs;
 		extern InputDevs devices;
 	}
+
+	int buttonFromSDL(input::Private::Type _type, unsigned int _sdl_button);
+	NavButton getNav(SDL_Event const &e);
 
 	class InputDev {
 	  public:

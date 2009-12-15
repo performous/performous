@@ -3,6 +3,7 @@
 #include "util.hh"
 #include "fs.hh"
 #include "record.hh"
+#include "joystick.hh"
 
 ScreenPractice::ScreenPractice(std::string const& name, Audio& audio, Capture& capture):
   Screen(name), m_audio(audio), m_capture(capture)
@@ -17,9 +18,6 @@ void ScreenPractice::enter() {
 		m_vumeters.push_back(b = new ProgressBar(getThemePath("vumeter_bg.svg"), getThemePath("vumeter_fg.svg"), ProgressBar::VERTICAL, 0.136, 0.023));
 		b->dimensions.screenBottom().left(-0.4 + i * 0.2).fixedWidth(0.04);
 	}
-	try {
-		drums.reset(new input::InputDev(input::DRUMS));
-	} catch (std::runtime_error&) {drums.reset();}
 	unsigned int sr = m_audio.getSR();
 	m_samples.push_back(Sample(getPath("sounds/drum_bass.ogg"), sr));
 	m_samples.push_back(Sample(getPath("sounds/drum_snare.ogg"), sr));
@@ -33,39 +31,21 @@ void ScreenPractice::exit() {
 	m_vumeters.clear();
 	m_samples.clear();
 	theme.reset();
-	drums.reset();
 }
 
 void ScreenPractice::manageEvent(SDL_Event event) {
 	ScreenManager * sm = ScreenManager::getSingletonPtr();
-	if (event.type == SDL_KEYDOWN) {
-		switch(event.key.keysym.sym) {
-			case SDLK_ESCAPE:
-			case SDLK_q:
-				sm->activateScreen("Intro");
-				break;
-			case SDLK_SPACE:
-			case SDLK_PAUSE:
-				m_audio.togglePause();
-				break;
-			default: // nothing to do, fixes warnings
-				break;
-		}
-	} else if (event.type == SDL_JOYBUTTONDOWN) {
-		int button = event.jbutton.button;
-		if (button == 8) sm->activateScreen("Intro");
+	input::NavButton nav(input::getNav(event));
+	if (nav == input::CANCEL || nav == input::START || nav == input::SELECT) sm->activateScreen("Intro");
+	else if (nav == input::PAUSE) m_audio.togglePause();
+	else if (event.type == SDL_JOYBUTTONDOWN // Play drum sounds here
+	  && input::Private::devices[event.jbutton.which].type_match(input::DRUMS)) {
+		int b = input::buttonFromSDL(input::Private::devices[event.jbutton.which].type(), event.jbutton.button);
+		if (b != -1) m_audio.play(m_samples[unsigned(b) % m_samples.size()], "audio/fail_volume");
 	}
 }
 
 void ScreenPractice::draw() {
-	if( drums && m_samples.size()) {
-		input::Event input_event;
-		while( drums->tryPoll(input_event) ) {
-			if(input_event.type == input::Event::PRESS) {
-				m_audio.play(m_samples[unsigned(input_event.button) % m_samples.size()], "audio/fail_volume");
-			}
-		}
-	}
 	theme->bg.draw();
 	this->draw_analyzers();
 }

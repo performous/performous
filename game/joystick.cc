@@ -25,7 +25,7 @@ void input::MidiDrums::process() {
 
 static const unsigned SDL_BUTTONS = 10;
 
-int buttonFromSDL(input::Private::Type _type, unsigned int _sdl_button) {
+int input::buttonFromSDL(input::Private::Type _type, unsigned int _sdl_button) {
 	static const int inputmap[5][SDL_BUTTONS] = {
 		//G  R  Y  B  O  S    // for guitars (S=starpower)
 		{ 2, 0, 1, 3, 4, 5, -1, -1, 8, 9 }, // Guitar Hero guitar
@@ -74,20 +74,20 @@ input::NavButton input::getNav(SDL_Event const &e) {
 	} else if (e.type == SDL_JOYBUTTONDOWN) {
 		// Joystick buttons
 		unsigned int joy_id = e.jbutton.which;
-		input::Private::Type devt = input::Private::devices[joy_id].type();
-		int b = buttonFromSDL(devt, e.jbutton.button);
+		input::Private::InputDevPrivate devt = input::Private::devices[joy_id];
+		int b = buttonFromSDL(devt.type(), e.jbutton.button);
 		if (b == -1) return input::NONE;
 		else if (b == 8) return input::SELECT;
 		else if (b == 9) return input::START;
 		// Totally different device types need their own custom mappings
-		if (devt == input::Private::DANCEPAD_GENERIC) {
+		if (devt.type_match(input::DANCEPAD)) {
 			// Dance pad can be used for navigation
 			if (b == 0) return input::LEFT;
 			else if (b == 1) return input::DOWN;
 			else if (b == 2) return input::UP;
 			else if (b == 3) return input::RIGHT;
 			else return input::CANCEL;
-		} else if (devt == input::Private::DRUMS_RB || devt == input::Private::DRUMS_GH) {
+		} else if (devt.type_match(input::DRUMS)) {
 			// Drums can be used for navigation
 			if (b == 0) return input::START;
 			else if (b == 1) return input::LEFT;
@@ -95,7 +95,8 @@ input::NavButton input::getNav(SDL_Event const &e) {
 			else if (b == 3) return input::DOWN;
 			else if (b == 4) return input::RIGHT;
 		}
-	} else if (e.type == SDL_JOYAXISMOTION) {
+	// Are these needed?
+	/* } else if (e.type == SDL_JOYAXISMOTION) {
 		// Axis motion
 		int axis = e.jaxis.axis;
 		int value = e.jaxis.value;
@@ -103,18 +104,18 @@ input::NavButton input::getNav(SDL_Event const &e) {
 		else if (axis == 4 && value < 0) return input::LEFT;
 		else if (axis == 5 && value > 0) return input::DOWN;
 		else if (axis == 5 && value < 0) return input::UP;
+	*/
 	} else if (e.type == SDL_JOYHATMOTION) {
 		// Hat motion
 		int dir = e.jhat.value;
 		// HACK: We probably wan't the guitar strum to scroll songs
 		// and main menu items, but they have different orientation.
 		// These are switched so it works for now (menu scrolls also on left/right).
-		input::Private::Type devt = input::Private::devices[e.jhat.which].type();
-		if (devt == input::Private::GUITAR_GH || devt == input::Private::GUITAR_RB) {
+		if (input::Private::devices[e.jhat.which].type_match(input::GUITAR)) {
 			if (dir == SDL_HAT_UP) return input::LEFT;
 			else if (dir == SDL_HAT_DOWN) return input::RIGHT;
-			else if (dir == SDL_HAT_LEFT) return input::DOWN;
-			else if (dir == SDL_HAT_RIGHT) return input::UP;
+			else if (dir == SDL_HAT_LEFT) return input::UP;
+			else if (dir == SDL_HAT_RIGHT) return input::DOWN;
 		} else {
 			if (dir == SDL_HAT_UP) return input::UP;
 			else if (dir == SDL_HAT_DOWN) return input::DOWN;
@@ -124,7 +125,6 @@ input::NavButton input::getNav(SDL_Event const &e) {
 	}
 	return input::NONE;
 }
-
 
 void input::SDL::init_devices() {
 	for (input::Private::InputDevs::iterator it = input::Private::devices.begin() ; it != input::Private::devices.end() ; ++it) {

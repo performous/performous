@@ -302,7 +302,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 	if (picked) {
 		for (int fret = 0; fret < 5; ++fret) {
 			frets[fret] = ev.pressed[fret];
-			endHold(fret, time);
+			endHold(fret);
 		}
 	} else {
 		if (m_correctness.get() < 0.5 && m_starpower.get() < 0.001) return; // Hammering not possible at the moment
