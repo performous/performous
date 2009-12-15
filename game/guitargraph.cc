@@ -174,6 +174,8 @@ void GuitarGraph::engine() {
 	}
 	// Skip missed notes
 	while (m_chordIt != m_chords.end() && m_chordIt->begin + maxTolerance < time) {
+		if ( (m_drums && m_chordIt->status != m_chordIt->polyphony) 
+		  || (!m_drums && m_chordIt->status == 0) ) endStreak();
 		++m_chordIt;
 		++m_dead;
 	}
@@ -246,6 +248,9 @@ void GuitarGraph::endHold(int fret, double time) {
 void GuitarGraph::fail(double time, int fret) {
 	std::cout << "MISS" << std::endl;
 	if (fret == -2) return; // Tapped note
+	if (fret == -1) {
+		for (int i = 0; i < 5; ++i) endHold(i, time);
+	}
 	if (m_starpower.get() < 0.01) {
 		m_events.push_back(Event(time, 0, fret));
 		if (fret < 0) fret = std::rand();
@@ -302,7 +307,6 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 	if (picked) {
 		for (int fret = 0; fret < 5; ++fret) {
 			frets[fret] = ev.pressed[fret];
-			endHold(fret);
 		}
 	} else {
 		if (m_correctness.get() < 0.5 && m_starpower.get() < 0.001) return; // Hammering not possible at the moment
