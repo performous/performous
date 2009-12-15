@@ -59,13 +59,13 @@ class GuitarGraph {
 	void draw(double time);
 	void engine();
 	void position(double cx, double width) { m_cx.setTarget(cx); m_width.setTarget(width); }
-	double dead(double time) const { return time > -0.5 && m_dead > 50; }
 	unsigned stream() const { return m_stream; }
 	double correctness() const { return m_correctness.get(); }
 	std::string getTrackIndex() const { return m_track_index->first; }
 	int getScore() const { return m_score * m_scoreFactor; }
 	std::string getTrack() const { return m_track_index->first; }
 	std::string getDifficultyString() const;
+	double dead(double time) const { return m_jointime == -100.0 || time > (m_acttime + death_delay); }
   private:
 	void activateStarpower();
 	void fail(double time, int fret);
@@ -113,11 +113,10 @@ class GuitarGraph {
 	typedef std::vector<Event> Events;
 	Events m_events;
 	unsigned m_holds[5];
-	int m_dead;
 	glutil::Color const& color(int fret) const;
 	void drawBar(double time, float h);
 	void drawNote(int fret, glutil::Color, float tBeg, float tEnd, float whammy = 0, bool tappable = false, bool hit = false, double hitAnim = 0.0, double releaseTime = 0.0);
-	void drawInfo(double time, double offsetX);
+	void drawInfo(double time, double offsetX, Dimensions dimensions);
 	void nextTrack();
 	void difficultyAuto(bool tryKeepCurrent = false);
 	bool difficulty(Difficulty level);
@@ -138,5 +137,9 @@ class GuitarGraph {
 	int m_streak;
 	int m_longestStreak;
 	int m_bigStreak;
+	const float death_delay; /// Delay in seconds after which the player is hidden
+	const float not_joined; /// A value that indicates player hasn't joined
+	double m_jointime;
+	double m_acttime;
 };
 

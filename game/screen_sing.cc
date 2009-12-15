@@ -104,25 +104,24 @@ void ScreenSing::enter() {
 }
 
 void ScreenSing::instrumentLayout(double time) {
-	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end();) {
-		if (it->dead(time)) {
-			// TODO: use boost::format
-			std::cout << it->getTrack() << " was thrown out after " << time << " inactive" << std::endl;
-			it = m_instruments.erase(it);
-		} else ++it;
-	}
-	double iw = std::min(0.5, 1.0 / m_instruments.size());
-	for (Instruments::size_type i = 0, s = m_instruments.size(); i < s; ++i) {
-		m_instruments[i].position((0.5 + i - 0.5 * s) * iw, iw);
-	}
-	typedef std::pair<unsigned, double> CountSum;
-	std::map<std::string, CountSum> volume; // stream id to (count, sum)
+	int count = 0, i = 0;
+	// Count active instruments
 	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it) {
-		it->engine();
-		CountSum& cs = volume[it->getTrackIndex()];
-		cs.first++;
-		cs.second += it->correctness();
-		it->draw(time);
+		if (!it->dead(time)) count++;
+	}
+	double iw = std::min(0.5, 1.0 / count);
+	typedef std::pair<unsigned, double> CountSum;
+	std::map<std::string, CountSum> volume; // Stream id to (count, sum)
+	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it) {
+		it->engine(); // Run engine even when dead so that joining is possible
+		if (!it->dead(time)) {
+			it->position((0.5 + i - 0.5 * count) * iw, iw); // Do layout stuff
+			CountSum& cs = volume[it->getTrackIndex()];
+			cs.first++;
+			cs.second += it->correctness();
+			it->draw(time);
+			++i;
+		}
 	}
 	if (time < -0.5) {
 		glColor4f(1.0f, 1.0f, 1.0f, clamp(-1.0 - 2.0 * time));

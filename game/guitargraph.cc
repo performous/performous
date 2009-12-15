@@ -18,6 +18,7 @@ namespace {
 	};
 	const size_t diffsz = sizeof(diffv) / sizeof(*diffv);
 
+	const float join_delay = 6.0f; // Time to select track/difficulty when joining mid-game
 	const float g_angle = 80.0f;
 	const float past = -0.2f;
 	const float future = 1.5f;
@@ -55,7 +56,7 @@ namespace {
 		return c;
 	}
 
-	bool canActivateStarpower(int meter) { return (meter > 6000);	}
+	bool canActivateStarpower(int meter) { return (meter > 6000); }
 }
 
 GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
@@ -75,7 +76,6 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
   m_stream(),
   m_track_index(m_track_map.end()),
   m_level(),
-  m_dead(1000),
   m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
   m_correctness(0.0, 5.0),
   m_streakPopup(0.0, 1.0),
@@ -85,7 +85,11 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
   m_starmeter(),
   m_streak(),
   m_longestStreak(),
-  m_bigStreak()
+  m_bigStreak(),
+  death_delay(20.0f),
+  not_joined(-100),
+  m_jointime(not_joined),
+  m_acttime()
 {
 	try {
 		m_fretObj.load(getThemePath("fret.obj"));
@@ -125,6 +129,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
 	updateNeck();
 }
 
+/// Load the appropriate neck texture
 void GuitarGraph::updateNeck() {
 	// TODO: Optimize with texture cache
 	std::string index = m_track_index->first;
@@ -133,6 +138,7 @@ void GuitarGraph::updateNeck() {
 	else m_neck.reset(new Texture(getThemePath("guitarneck.svg")));
 }
 
+/// Core engine
 void GuitarGraph::engine() {
 	double time = m_audio.getPosition();
 	time -= config["audio/controller_delay"].f();
@@ -146,7 +152,10 @@ void GuitarGraph::engine() {
 	double whammy = 0;
 	// Handle all events
 	for (input::Event ev; m_input.tryPoll(ev);) {
-		m_dead = false;
+		// Handle joining and keeping alive
+		if (m_jointime == not_joined) m_jointime = (time < 0.0 ? -join_delay : time); // join
+		m_acttime = time;
+		// Guitar specific actions
 		if (!m_drums) {
 			if ((ev.type == input::Event::PRESS || ev.type == input::Event::RELEASE) && ev.button == input::STARPOWER_BUTTON) {
 				if (ev.type == input::Event::PRESS) activateStarpower();
@@ -155,16 +164,19 @@ void GuitarGraph::engine() {
 			if (ev.type == input::Event::RELEASE) endHold(ev.button, time);
 			if (ev.type == input::Event::WHAMMY) whammy = (1.0 + ev.button + 2.0*(rand()/double(RAND_MAX))) / 4.0;
 		}
+		// Keypress anims
 		if (ev.type == input::Event::PRESS) m_hit[!m_drums + ev.button].setValue(1.0);
 		else if (ev.type == input::Event::PICK) m_hit[0].setValue(1.0);
-		if (time < -0.5) {
-			if (ev.type == input::Event::PICK || (m_drums && ev.type == input::Event::PRESS)) {
+		// Difficulty and track selection
+		if (time < m_jointime + join_delay) {
+			if (ev.type == input::Event::PICK || ev.type == input::Event::PRESS) {
 				if (!m_drums && ev.pressed[4]) nextTrack();
 				if (ev.pressed[0 + m_drums]) difficulty(DIFFICULTY_SUPAEASY);
 				else if (ev.pressed[1 + m_drums]) difficulty(DIFFICULTY_EASY);
 				else if (ev.pressed[2 + m_drums]) difficulty(DIFFICULTY_MEDIUM);
 				else if (ev.pressed[3 + m_drums]) difficulty(DIFFICULTY_AMAZING);
 			}
+		// Playing
 		} else if (m_drums) {
 			if (ev.type == input::Event::PRESS) drumHit(time, ev.button);
 		} else {
@@ -177,8 +189,8 @@ void GuitarGraph::engine() {
 		if ( (m_drums && m_chordIt->status != m_chordIt->polyphony) 
 		  || (!m_drums && m_chordIt->status == 0) ) endStreak();
 		++m_chordIt;
-		++m_dead;
 	}
+	// Adjust the correctness value
 	if (!m_events.empty() && m_events.back().type == 0) m_correctness.setTarget(0.0, true);
 	else if (m_chordIt != m_chords.end() && m_chordIt->begin <= time) {
 		double level;
@@ -187,17 +199,19 @@ void GuitarGraph::engine() {
 		m_correctness.setTarget(level);
 	}
 	if (m_correctness.get() == 0) endStreak();
+	// Process holds
 	if (!m_drums) {
-		// Processing holds
 		for (int fret = 0; fret < 5; ++fret) {
 			if (!m_holds[fret]) continue;
 			Event& ev = m_events[m_holds[fret] - 1];
 			ev.glow.setTarget(1.0, true);
+			// Whammy animvalue mangling
 			ev.whammy.setTarget(whammy);
 			if (whammy > 0) {
 				ev.whammy.move(0.5);
 				if (ev.whammy.get() > 1.0) ev.whammy.setValue(1.0);
 			}
+			// Calculate how long the note was held this cycle and score it
 			double last = std::min(time, ev.dur->end);
 			double t = last - ev.holdTime;
 			if (t > 0) {
@@ -209,6 +223,7 @@ void GuitarGraph::engine() {
 				m_starmeter += t * 50 * ( (ev.whammy.get() > 0.01) ? 2.0 : 1.0 );
 				ev.holdTime = time;
 			}
+			// If end reached, handle it
 			if (last == ev.dur->end) endHold(fret, time);
 		}
 	}
@@ -218,9 +233,11 @@ void GuitarGraph::engine() {
 		m_bigStreak = getNextBigStreak(m_bigStreak);
 		m_starmeter += streakStarBonus;
 	}
+	// During GodMode, correctness is full, no matter what
 	if (m_starpower.get() > 0.01) m_correctness.setTarget(1.0, true);
 }
 
+/// Attempt to activate GodMode
 void GuitarGraph::activateStarpower() {
 	if (canActivateStarpower(m_starmeter)) {
 		m_starmeter = 0;
@@ -229,12 +246,13 @@ void GuitarGraph::activateStarpower() {
 	}
 }
 
+/// Mark the holding of a note as ended
 void GuitarGraph::endHold(int fret, double time) {
 	if (!m_holds[fret]) return;
 	m_events[m_holds[fret] - 1].glow.setTarget(0.0);
 	m_events[m_holds[fret] - 1].whammy.setTarget(0.0, true);
 	m_holds[fret] = 0;
-	if (time > 0) {
+	if (time > 0) { // Do we set the relaseTime?
 		// Search for the Chord this hold belongs to
 		for (Chords::iterator it = m_chords.begin(); it != m_chords.end(); ++it) {
 			if (time >= it->begin && time <= it->end) {
@@ -245,6 +263,7 @@ void GuitarGraph::endHold(int fret, double time) {
 	}
 }
 
+/// Do stuff when a note is played incorrectly
 void GuitarGraph::fail(double time, int fret) {
 	std::cout << "MISS" << std::endl;
 	if (fret == -2) return; // Tapped note
@@ -252,6 +271,7 @@ void GuitarGraph::fail(double time, int fret) {
 		for (int i = 0; i < 5; ++i) endHold(i, time);
 	}
 	if (m_starpower.get() < 0.01) {
+		// Reduce points and play fail sample only when GodMode is deactivated
 		m_events.push_back(Event(time, 0, fret));
 		if (fret < 0) fret = std::rand();
 		m_audio.play(m_samples[unsigned(fret) % m_samples.size()], "audio/fail_volume");
@@ -260,6 +280,7 @@ void GuitarGraph::fail(double time, int fret) {
 	endStreak();
 }
 
+/// Handle drum hit scoring
 void GuitarGraph::drumHit(double time, int fret) {
 	// Find any suitable note within the tolerance
 	double tolerance = maxTolerance;
@@ -301,6 +322,7 @@ void GuitarGraph::drumHit(double time, int fret) {
 	}
 }
 
+/// Handle guitar events and scoring
 void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 	bool picked = (ev.type == input::Event::PICK);
 	bool frets[5] = {};  // The combination about to be played
@@ -308,7 +330,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 		for (int fret = 0; fret < 5; ++fret) {
 			frets[fret] = ev.pressed[fret];
 		}
-	} else {
+	} else { // Attempt to tap
 		if (m_correctness.get() < 0.5 && m_starpower.get() < 0.001) return; // Hammering not possible at the moment
 		for (int fret = ev.button + 1; fret < 5; ++fret) {
 			if (ev.pressed[fret]) return; // Extra buttons on right side
@@ -346,7 +368,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 	}
 	std::cout << (picked ? "Pick: " : "Tap: ");
 	if (best == m_chords.end()) fail(time, picked ? -1 : -2);
-	else {
+	else { // Correctly hit
 		m_chordIt = best;
 		int& score = m_chordIt->score;
 		std::cout << "HIT, error = " << int(1000.0 * (best->begin - time)) << " ms" << std::endl;
@@ -369,23 +391,27 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 	}
 }
 
+/// Cycle through the different tracks
 void GuitarGraph::nextTrack() {
 	while (1) {
 		if (++m_track_index == m_track_map.end()) m_track_index = m_track_map.begin();
 		if (m_track_index->first != "drums") break;  // Only accept non-drum tracks
 	}
-	difficultyAuto();
+	difficultyAuto(true);
 	updateNeck();
 }
 
+/// Get the difficulty as displayable string
 std::string GuitarGraph::getDifficultyString() const { return diffv[m_level].name; }
 
+/// Find an initial difficulty level to use
 void GuitarGraph::difficultyAuto(bool tryKeep) {
 	if (tryKeep && difficulty(Difficulty(m_level))) return;
 	for (int level = 0; level < DIFFICULTYCOUNT; ++level) if (difficulty(Difficulty(level))) return;
 	throw std::runtime_error("No difficulty levels found");
 }
 
+/// Attempt to use a given difficulty level
 bool GuitarGraph::difficulty(Difficulty level) {
 	Track const& track = *m_track_index->second;
 	// Find the stream number
@@ -409,6 +435,7 @@ bool GuitarGraph::difficulty(Difficulty level) {
 	return true;
 }
 
+/// Get a color based on fret index
 glutil::Color const& GuitarGraph::color(int fret) const {
 	static glutil::Color fretColors[5] = {
 		glutil::Color(0.0f, 0.9f, 0.0f),
@@ -425,27 +452,16 @@ glutil::Color const& GuitarGraph::color(int fret) const {
 	return fretColors[fret];
 }
 
+/// Main drawing function (projection, neck, cursor...)
 void GuitarGraph::draw(double time) {
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
 	dimensions.screenBottom().middle(m_cx.get()).fixedWidth(m_width.get());
 	double offsetX = 0.5 * (dimensions.x1() + dimensions.x2());
 	double frac = 0.75;  // Adjustable: 1.0 means fully separated, 0.0 means fully attached
-	// Draw scores
-	if (time < -0.5) {
-		m_text.dimensions.screenBottom(-0.041).middle(-0.09 + offsetX);
-		m_text.draw(diffv[m_level].name);
-		m_text.dimensions.screenBottom(-0.015).middle(-0.09 + offsetX);
-		m_text.draw(m_track_index->first);
-	} else {
-		m_text.dimensions.screenBottom(-0.30).middle(0.32 * dimensions.w() + offsetX);
-		m_text.draw(boost::lexical_cast<std::string>(unsigned(getScore())));
-		m_text.dimensions.screenBottom(-0.27).middle(0.32 * dimensions.w() + offsetX);
-		m_text.draw(boost::lexical_cast<std::string>(unsigned(m_streak)) + "/" 
-		  + boost::lexical_cast<std::string>(unsigned(m_longestStreak)));
-	}
 	float ng_r = 0, ng_g = 0, ng_b = 0; // neck glow color components
 	int ng_ccnt = 0; // neck glow color count
-	{
+	{	// Translate, rotate and scale to place
+		// The scope blocks are there so that the actions are automatically reversed
 		glutil::PushMatrixMode pmm(GL_PROJECTION); {
 		glutil::Translation tr1(frac * 2.0 * offsetX, 0.0f, 0.0f); {
 		glutil::PushMatrixMode pmb(GL_MODELVIEW); {
@@ -486,6 +502,7 @@ void GuitarGraph::draw(double time) {
 			for (int fret = m_drums; fret < 5; ++fret) {
 				float x = -2.0f + fret - 0.5f * m_drums;
 				float l = m_hit[fret + !m_drums].get();
+				// Get a color for the fret and adjust it if GodMode is on
 				glColor4fv(starpowerColorize(color(fret), m_starpower.get()));
 				m_button.dimensions.center(time2y(0.0)).middle(x);
 				m_button.draw();
@@ -501,7 +518,7 @@ void GuitarGraph::draw(double time) {
 				float tEnd = it->end - time;
 				if (tEnd < past) continue;
 				if (tBeg > future) break;
-				for (int fret = 0; fret < 5; ++fret) {
+				for (int fret = 0; fret < 5; ++fret) { // Loop through the frets
 					if (!it->fret[fret]) continue;
 					if (tEnd > future) tEnd = future;
 					unsigned event = m_notes[it->dur[fret]];
@@ -511,8 +528,10 @@ void GuitarGraph::draw(double time) {
 						glow = m_events[event - 1].glow.get();
 						whammy = m_events[event - 1].whammy.get();
 					}
+					// Get a color for the fret and adjust it if GodMode is on
 					glutil::Color c = starpowerColorize(color(fret), m_starpower.get());
 					if (glow > 0.1f) { ng_r+=c.r; ng_g+=c.g; ng_b+=c.b; ng_ccnt++; } // neck glow
+					// Further adjust the color if the note is hit
 					c.r += glow;
 					c.g += glow;
 					c.b += glow;
@@ -532,11 +551,12 @@ void GuitarGraph::draw(double time) {
 	
 	// Bottom neck glow
 	if (ng_ccnt > 0) {
+		// Mangle color
 		if (m_neckglowColor.r > 0 || m_neckglowColor.g > 0 || m_neckglowColor.b > 0) {
 			m_neckglowColor.r = blend(m_neckglowColor.r, ng_r / ng_ccnt, 0.95);
 			m_neckglowColor.g = blend(m_neckglowColor.g, ng_g / ng_ccnt, 0.95);
 			m_neckglowColor.b = blend(m_neckglowColor.b, ng_b / ng_ccnt, 0.95);
-		} else {
+		} else { // We don't want to fade from black in the start
 			m_neckglowColor.r = ng_r / ng_ccnt;
 			m_neckglowColor.g = ng_g / ng_ccnt;
 			m_neckglowColor.b = ng_b / ng_ccnt;
@@ -544,16 +564,19 @@ void GuitarGraph::draw(double time) {
 		m_neckglowColor.a = correctness();
 	}
 	if (correctness() > 0) {
+		// Glow drawing
 		glColor4fv(m_neckglowColor);
 		m_neckglow.dimensions.screenBottom(0.0).middle(offsetX).fixedWidth(m_width.get());
 		m_neckglow.draw();
 	}
-	drawInfo(time, offsetX);
+	drawInfo(time, offsetX, dimensions); // Go draw some texts and other interface stuff
 	glColor3f(1.0f, 1.0f, 1.0f);
 }
 
 namespace {
-	const float fretWid = 0.5f;
+	const float fretWid = 0.5f; // The actual width is two times this
+	
+	/// Create a symmetric vertex pair of given data
 	void vertexPair(float x, float y, glutil::Color c, float ty, float fretW = fretWid) {
 		c.a = y2a(y); glColor4fv(c);
 		glNormal3f(0.0f,1.0f,0.0f); glTexCoord2f(0.0f, ty); glVertex2f(x - fretW, y);
@@ -561,29 +584,35 @@ namespace {
 	}
 }
 
+/// Draws a single note
+/// The times passed are normalized to [past, future]
 void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, float whammy, bool tappable, bool hit, double hitAnim, double releaseTime) {
 	float x = -2.0f + fret;
 	if (m_drums) x -= 0.5f;
-	if (m_drums && fret == 0) {
-		if (hit || hitAnim > 0) return;
+	if (m_drums && fret == 0) { // Bass drum? That's easy
+		if (hit || hitAnim > 0) return;	// Hide it if it's hit
 		c.a = time2a(tBeg); glColor4fv(c);
 		drawBar(tBeg, 0.015f);
 		return;
 	}
+	// If the note is hit, limit it to cursor position
 	float yBeg = (hit || hitAnim > 0) ? std::min(time2y(0.0), time2y(tBeg)): time2y(tBeg);
 	float yEnd = time2y(tEnd);
+	// Long notes
 	if (yBeg - 2 * fretWid >= yEnd) {
+		// A hold is released? Let it go...
 		if (releaseTime != 0.0 && tEnd - releaseTime > 0.1) yBeg = time2y(releaseTime);
-		if (yEnd > yBeg - 3 * fretWid) yEnd = yBeg - 3 * fretWid;  // Short note: render minimum renderable length
+		// Short note? Render minimum renderable length
+		if (yEnd > yBeg - 3 * fretWid) yEnd = yBeg - 3 * fretWid;
 		// Render the ring
 		float y = yBeg + fretWid;
-		if (m_use3d) {
+		if (m_use3d) { // 3D
 			y -= fretWid;
 			c.a = clamp(time2a(tBeg)*2.0f,0.0f,1.0f);
 			glColor4fv(c);
 			m_fretObj.draw(x, y, 0.0f);
 			y -= fretWid;
-		} else {
+		} else { // 2D
 			UseTexture tblock(m_button_l);
 			glutil::Begin block(GL_TRIANGLE_STRIP);
 			c.a = time2a(tBeg); glColor4fv(c);
@@ -596,6 +625,7 @@ void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, fl
 		glutil::Begin block(GL_TRIANGLE_STRIP);
 		vertexPair(x, y, c, 0.5f);
 		if (whammy > 0.1) {
+			// Whammy uses more vertices
 			while ((y -= fretWid) > yEnd + fretWid) {
 				float r = rand() / double(RAND_MAX);
 				vertexPair(x+cos(y*whammy)/4.0+(r-0.5)/4.0, y, c, 0.5f);
@@ -609,7 +639,7 @@ void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, fl
 		vertexPair(x, yEnd, c, 0.0f);
 	} else {
 		// Too short note: only render the ring
-		if (m_use3d) {
+		if (m_use3d) { // 3D
 			if (hitAnim > 0.0 && tEnd <= 0.1) {
 				float s = 1.0 - hitAnim;
 				c.a = s; glColor4fv(c);
@@ -618,19 +648,20 @@ void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, fl
 				c.a = clamp(time2a(tBeg)*2.0f,0.0f,1.0f); glColor4fv(c);
 				m_fretObj.draw(x, yBeg, 0.0f);
 			}
-		} else {
+		} else { // 2D
 			c.a = time2a(tBeg); glColor4fv(c);
 			m_button.dimensions.center(yBeg).middle(x);
 			m_button.draw();
 		}
 	}
+	// Hammer note caps
 	if (tappable) {
 		float l = std::max(0.3, m_correctness.get());
-		if (m_use3d) {
+		if (m_use3d) { // 3D
 			float s = 1.0 - hitAnim;
 			glColor4f(l, l, l, s);
 			m_tappableObj.draw(x, yBeg, 0.0f, s);
-		} else {
+		} else { // 2D
 			glColor3f(l, l, l);
 			m_tap.dimensions.center(yBeg).middle(x);
 			m_tap.draw();
@@ -639,7 +670,20 @@ void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, fl
 }
 
 /// Draw popups and other info texts
-void GuitarGraph::drawInfo(double time, double offsetX) {
+void GuitarGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
+	// Draw info
+	if (time < m_jointime + join_delay) {
+		m_text.dimensions.screenBottom(-0.041).middle(-0.09 + offsetX);
+		m_text.draw(diffv[m_level].name);
+		m_text.dimensions.screenBottom(-0.015).middle(-0.09 + offsetX);
+		m_text.draw(m_track_index->first);
+	} else { // Draw scores
+		m_text.dimensions.screenBottom(-0.30).middle(0.32 * dimensions.w() + offsetX);
+		m_text.draw(boost::lexical_cast<std::string>(unsigned(getScore())));
+		m_text.dimensions.screenBottom(-0.27).middle(0.32 * dimensions.w() + offsetX);
+		m_text.draw(boost::lexical_cast<std::string>(unsigned(m_streak)) + "/" 
+		  + boost::lexical_cast<std::string>(unsigned(m_longestStreak)));
+	}
 	// Is Starpower ready?
 	if (canActivateStarpower(m_starmeter)) {
 		float a = (int(time * 1000.0) % 1000) / 1000.0;
@@ -674,6 +718,7 @@ void GuitarGraph::drawInfo(double time, double offsetX) {
 	}
 }
 
+/// Draw a bar for drum bass pedal/note
 void GuitarGraph::drawBar(double time, float h) {
 	glutil::Begin block(GL_TRIANGLE_STRIP);
 	glNormal3f(0.0f, 1.0f, 0.0f);
@@ -683,6 +728,7 @@ void GuitarGraph::drawBar(double time, float h) {
 	glVertex2f(2.5f, time2y(time - h));
 }
 
+/// Create the Chord structures for the current track/difficulty level
 void GuitarGraph::updateChords() {
 	m_chords.clear();
 	m_scoreFactor = 0;

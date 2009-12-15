@@ -11,7 +11,7 @@
    height="700"
    id="svg5215"
    sodipodi:version="0.32"
-   inkscape:version="0.47pre4 r22446"
+   inkscape:version="0.47 r22583"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    sodipodi:docname="instrumenthelp.svg"
    version="1.0">
@@ -37,8 +37,8 @@
        id="perspective5464" />
   </defs>
   <sodipodi:namedview
-     inkscape:window-height="1126"
-     inkscape:window-width="1920"
+     inkscape:window-height="854"
+     inkscape:window-width="1440"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      guidetolerance="10.0"
@@ -55,7 +55,7 @@
      inkscape:cx="519.94396"
      inkscape:cy="351.04189"
      inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:window-y="0"
      inkscape:current-layer="svg5215"
      inkscape:window-maximized="1" />
   <!-- EMR_SETMAPMODE -->
@@ -359,9 +359,9 @@
        y="434.98087"
        x="560.16595"
        sodipodi:role="line"
-       id="tspan2966">CHOOSE LEVEL <tspan
-   style="fill:#ff7f2a;stroke-width:1.01400006"
-   id="tspan2972">NOW</tspan></tspan><tspan
+       id="tspan2966"><tspan
+   style="fill:#ff6600"
+   id="tspan2873">PRESS</tspan> A BUTTON</tspan><tspan
        style="text-align:center;text-anchor:middle;stroke-width:1.01400006;stroke-miterlimit:4;stroke-dasharray:none"
        y="495.83234"
        x="560.16595"
