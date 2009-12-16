@@ -21,6 +21,20 @@ if(WIN32)
 	set(Gettext_PROCESS_LIBS Gettext_LIBRARY)
 endif()
 
+if(APPLE)
+  set(Gettext_LIBRARY_SEARCH_DIRS
+    /opt/local/lib
+    /sw/local/lib
+  )
+  
+  find_library(Gettext_LIBRARY
+    NAMES intl
+    PATHS ${Gettext_LIBRARY_SEARCH_DIRS}
+  )
+
+  set(Gettext_PROCESS_LIBS Gettext_LIBRARY)
+endif()
+
 find_path(Gettext_INCLUDE_DIR
   NAMES libintl.h
   PATHS ${Gettext_PKGCONF_INCLUDE_DIRS}

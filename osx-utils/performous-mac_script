@@ -1,7 +1,4 @@
 #!/bin/bash
 
-export PATH="$(dirname "$0")/../Resources/performous/bin":$PATH
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"$(dirname "$0")/../Resources/performous/lib"
-export PERFORMOUS_DEFAULT_CONFIG_FILE="$(dirname "$0")/../Resources/performous/share/games/performous/config/performous.xml"
-export PERFORMOUS_THEME_PATH="$(dirname "$0")/../Resources/performous/share/games/performous/themes"
+export PERFORMOUS_ROOT="$(dirname "$0")/../Resources/performous"
 "$(dirname "$0")/../Resources/performous/bin/performous"
