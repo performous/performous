@@ -43,6 +43,8 @@ Xaldyz <xaldyz at users.sourceforge.net>
 Markus Raab <ich at markus-raab.org>
 	* hiscore (xml + ultrastar format)
 
+Matti Kemppainen <mpkemppa at users.sf.net>
+	* prototyping dance game
 	
 INACTIVE DEVELOPERS
 -------------------
