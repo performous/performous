@@ -17,7 +17,8 @@ namespace {
 		{ "Expert", 0x60 }
 	};
 	const size_t diffsz = sizeof(diffv) / sizeof(*diffv);
-
+	const float death_delay = 20.0f; // Delay in seconds after which the player is hidden
+	const float not_joined = -100; // A value that indicates player hasn't joined
 	const float join_delay = 6.0f; // Time to select track/difficulty when joining mid-game
 	const float g_angle = 80.0f;
 	const float past = -0.2f;
@@ -86,8 +87,6 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
   m_streak(),
   m_longestStreak(),
   m_bigStreak(),
-  death_delay(20.0f),
-  not_joined(-100),
   m_jointime(not_joined),
   m_acttime()
 {
@@ -235,6 +234,11 @@ void GuitarGraph::engine() {
 	}
 	// During GodMode, correctness is full, no matter what
 	if (m_starpower.get() > 0.01) m_correctness.setTarget(1.0, true);
+}
+
+/// Are we alive?
+bool GuitarGraph::dead(double time) const {
+	return m_jointime == not_joined || time > (m_acttime + death_delay);
 }
 
 /// Attempt to activate GodMode

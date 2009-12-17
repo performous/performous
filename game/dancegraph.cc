@@ -9,10 +9,12 @@
 
 namespace {
 	const std::string diffv[] = { "Beginner", "Easy", "Medium", "Hard", "Challenge" };
+	const float death_delay = 20.0f; // Delay in seconds after which the player is hidden
+	const float not_joined = -100; // A value that indicates player hasn't joined
+	const float join_delay = 5.0f; // Time to select track/difficulty when joining mid-game
 	const float past = -0.4f;
 	const float future = 2.0f;
 	const float timescale = 7.0f;
-	const float join_delay = 5.0f; // how long player has time to choose difficulty when joining in the middle
 	// Note: t is difference from playback time so it must be in range [past, future]
 	float time2y(float t) { return timescale * (t - past) / (future - past); }
 	float time2a(float t) {
@@ -23,7 +25,7 @@ namespace {
 	const double maxTolerance = 0.15;
 	int getNextBigStreak(int prev) { return prev + 10; }
 	
-	// TODO: Use this or something else?
+	/// Gives points based on error from a perfect hit
 	double points(double error) {
 		error = (error < 0.0) ? -error : error;
 		double score = 0.0;
@@ -54,8 +56,6 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
   m_cx(0.0, 0.2),
   m_width(0.5, 0.4),
   m_stream(),
-  m_dead(1000),
-  m_jointime(0),
   m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
   m_correctness(0.0, 5.0),
   m_streakPopup(0.0, 1.0),
@@ -64,12 +64,14 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
   m_scoreFactor(1),
   m_streak(),
   m_longestStreak(),
-  m_bigStreak()
+  m_bigStreak(),
+  m_jointime(not_joined),
+  m_acttime()
 {
-	for(size_t i=0; i < 4; i++)
-		m_activeNotes[i] = m_notes.end();
 	m_popupText.reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
-	
+
+	// Initialize some arrays
+	for(size_t i=0; i < 4; i++) m_activeNotes[i] = m_notes.end();
 	for(size_t i = 0; i < 4; i++) m_pressed[i] = false;
 	for(size_t i = 0; i < 4; i++) m_pressed_anim[i] = AnimValue(0.0, 4.0);
 	
@@ -81,7 +83,9 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
 		
 }
 
+/// Attempt to select next/previous game mode
 void DanceGraph::gameMode(int direction) {
+	// Cycling
 	if (direction == 0) {
 		m_curTrackIt = m_song.danceTracks.begin();
 	} else if (direction > 0) {
@@ -91,6 +95,7 @@ void DanceGraph::gameMode(int direction) {
 		if (m_curTrackIt == m_song.danceTracks.begin()) m_curTrackIt = (--m_song.danceTracks.end());
 		else m_curTrackIt--;
 	}
+	// Determine how many arrow lines are needed
 	m_gamingMode = m_curTrackIt->first;
 	std::string gm = m_gamingMode;
 	if (gm == "dance-single") m_pads = 4;
@@ -107,13 +112,19 @@ void DanceGraph::gameMode(int direction) {
 	else throw std::runtime_error("Unknown track " + gm);
 }
 
+/// Are we alive?
+bool DanceGraph::dead(double time) const {
+	return m_jointime == not_joined || time > (m_acttime + death_delay);
+}
+
+/// Get the difficulty as displayable string
 std::string DanceGraph::getDifficultyString() const { return diffv[m_level]; }
 
+/// Attempt to change the difficulty by a step
 void DanceGraph::difficultyDelta(int delta) {
 	int newLevel = m_level + delta;
 	std::cout << "difficultyDelta called with " << delta << " (newLevel = " << newLevel << ")" << std::endl;
-	if(newLevel >= DIFFICULTYCOUNT || newLevel < 0)
-		return;
+	if(newLevel >= DIFFICULTYCOUNT || newLevel < 0) return; // Out of bounds
 	DanceTracks::const_iterator it = m_song.danceTracks.find(m_gamingMode);
 	if(it->second.find((DanceDifficulty)newLevel) != it->second.end())
 		difficulty((DanceDifficulty)newLevel);
@@ -121,6 +132,7 @@ void DanceGraph::difficultyDelta(int delta) {
 		difficultyDelta(delta + (delta < 0 ? -1 : 1));
 }
 
+/// Select a difficulty and construct DanceNotes and score normalizer for it
 void DanceGraph::difficulty(DanceDifficulty level) {
 	// TODO: error handling)
 	m_notes.clear();
@@ -139,25 +151,23 @@ void DanceGraph::difficulty(DanceDifficulty level) {
 	std::cout << "Scorefactor: " << m_scoreFactor << std::endl;
 }
 
-/// Handles input
+/// Handles input and some logic
 void DanceGraph::engine() {
 	double time = m_audio.getPosition();
 	time -= config["audio/controller_delay"].f();
 
-	// missed notes
+	// Notes gone by
 	for (DanceNotes::iterator& it = m_notesIt; it != m_notes.end() && time > it->note.end + maxTolerance; it++) {
-		if(!it->isHit) {
+		if(!it->isHit) { // Missed
 			std::cout << "(Engine) Missed note at time " << time
 			  << "(note timing " << it->note.begin << ")" << std::endl;
 			if (it->note.type != Note::MINE) m_streak = 0;
-		}
-		else {
+		} else { // Hit, add score
 			if(it->note.type != Note::MINE) {
 				std::cout << "Note correctly played.." << std::endl;
 				m_score += it->score;
 			}
-			if(!it->releaseTime)
-				it->releaseTime = time;
+			if(!it->releaseTime) it->releaseTime = time;
 		}
 	}
 
@@ -173,11 +183,13 @@ void DanceGraph::engine() {
 
 	// Handle all events
 	for (input::Event ev; m_input.tryPoll(ev);) {
-		m_dead = false;
-		if (m_jointime == 0) m_jointime = (time < 0.0 ? -join_delay : time);
-		if(ev.button < 0 || ev.button > 3)
-			continue;
-		if (time < -0.5) {
+		// Handle joining and keeping alive
+		if (m_jointime == not_joined) m_jointime = (time < 0.0 ? -join_delay : time); // join
+		m_acttime = time;
+		
+		if(ev.button < 0 || ev.button > 3) continue; // ignore other than 4 buttons for now
+		// Difficulty / mode selection
+		if (time < m_jointime + join_delay) {
 			if (ev.type == input::Event::PRESS) {
 				if (ev.pressed[STEP_UP]) difficultyDelta(1);
 				else if (ev.pressed[STEP_DOWN]) difficultyDelta(-1);
@@ -185,18 +197,17 @@ void DanceGraph::engine() {
 				else if (ev.pressed[STEP_RIGHT]) gameMode(1);
 			}
 		}
+		// Gaming controls
 		if (ev.type == input::Event::RELEASE) {
 			m_pressed[ev.button] = false;
 			dance(time, ev);
 			m_pressed_anim[ev.button].setTarget(0.0);
-		}
-		else if (ev.type == input::Event::PRESS) {
+		} else if (ev.type == input::Event::PRESS) {
 			m_pressed[ev.button] = true;
 			dance(time, ev);
 			m_pressed_anim[ev.button].setValue(1.0);
 		}
 	}
-	
 
 	// Check if a long streak goal has been reached
 	if (m_streak >= getNextBigStreak(m_bigStreak)) {
@@ -207,6 +218,7 @@ void DanceGraph::engine() {
 
 /// Handles scoring and such
 void DanceGraph::dance(double time, input::Event const& ev) {
+	// Handle release events
 	if(ev.type == input::Event::RELEASE) {
 		DanceNotes::iterator it = m_activeNotes[ev.button];
 		if(it != m_notes.end()) {
@@ -230,7 +242,7 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 				it->accuracy = 1.0 - (std::abs(it->note.begin - time) / maxTolerance);
 				m_streak++;
 				if (m_streak > m_longestStreak) m_longestStreak = m_streak;
-			} else {
+			} else { // Mine!
 				m_score -= points(0);
 				m_streak = 0;
 			}
@@ -242,9 +254,10 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 
 
 namespace {
-	const float arrowSize = 0.3f;
-	const float one_arrow_tex_w = 1.0 / 8.0;
+	const float arrowSize = 0.4f; // Half width of an arrow
+	const float one_arrow_tex_w = 1.0 / 8.0; // Width of a single arrow in texture coordinates
 	
+	/// Create a symmetric vertex pair of given data
 	void vertexPair(int arrow_i, float x, float y, float ty) {
 		glTexCoord2f(arrow_i * one_arrow_tex_w, ty); glVertex2f(x - arrowSize, y);
 		glTexCoord2f((arrow_i+1) * one_arrow_tex_w, ty); glVertex2f(x + arrowSize, y);
@@ -260,6 +273,7 @@ namespace {
 	}
 }
 
+/// Draw a dance pad icon using the given texture
 void DanceGraph::drawArrow(int arrow_i, Texture& tex, float x, float y, float scale, float ty1, float ty2) {
 	glutil::Translation tr(x, y, 0.0f);
 	if (scale != 1.0f) glScalef(scale, scale, scale);
@@ -272,14 +286,14 @@ void DanceGraph::drawArrow(int arrow_i, Texture& tex, float x, float y, float sc
 	if (scale != 1.0f) glScalef(1.0f/scale, 1.0f/scale, 1.0f/scale);
 }
 
+/// Draw a mine note
 void DanceGraph::drawMine(float x, float y, float rot, float scale) {
-	glTranslatef(x, y, 0.0f);
+	glutil::Translation tr(x, y, 0.0f);
 	if (scale != 1.0f) glScalef(scale, scale, scale);
 	if (rot != 0.0f) glRotatef(rot, 0.0f, 0.0f, 1.0f);
 	m_mine.draw();
 	if (rot != 0.0f) glRotatef(-rot, 0.0f, 0.0f, 1.0f);
 	if (scale != 1.0f) glScalef(1.0f/scale, 1.0f/scale, 1.0f/scale);
-	glTranslatef(-x, -y, 0.0f);
 }
 
 /// Draws the dance graph
@@ -288,71 +302,45 @@ void DanceGraph::draw(double time) {
 	dimensions.screenTop().middle(m_cx.get()).stretch(m_width.get(), 1.0);
 	double offsetX = 0.5 * (dimensions.x1() + dimensions.x2());
 	double frac = 0.75;  // Adjustable: 1.0 means fully separated, 0.0 means fully attached
-	if (time < -0.5 || m_jointime == 0 || time - m_jointime < join_delay) {
-		if (m_jointime == 0) {
-			m_popupText->render("Choose difficulty/mode\nto enter the game!");
-			m_popupText->dimensions().center(0.0).middle(0.0 + offsetX).stretch(0.3, 0.15);
-			m_popupText->draw();
-		}
-		m_text.dimensions.screenBottom(-0.075).middle(-0.09 + offsetX);
-		m_text.draw("^ " + getDifficultyString() + " v");
-		m_text.dimensions.screenBottom(-0.050).middle(-0.09 + offsetX);
-		m_text.draw("< " + getGameMode() + " >");
-	} else {
-		// Draw scores
-		m_text.dimensions.screenBottom(-0.35).middle(0.32 * dimensions.w() + offsetX);
-		m_text.draw(boost::lexical_cast<std::string>(unsigned(getScore())));
-		m_text.dimensions.screenBottom(-0.32).middle(0.32 * dimensions.w() + offsetX);
-		m_text.draw(boost::lexical_cast<std::string>(unsigned(m_streak)) + "/" 
-		  + boost::lexical_cast<std::string>(unsigned(m_longestStreak)));
-		// Some matrix magic to get the viewport right
-		{ glutil::PushMatrixMode pmm(GL_PROJECTION);
-		{ glutil::Translation tr1(frac * 2.0 * offsetX, 0.0f, 0.0f);
-		{ glutil::PushMatrixMode pmb(GL_MODELVIEW);
-		{ glutil::Translation tr2((1.0 - frac) * offsetX, dimensions.y1(), 0.0f);
-		{ float temp_s = dimensions.w() / 5.0f;
-		  glutil::Scale sc1(temp_s, temp_s, temp_s);
-		
-		// Arrows on cursor
-		glColor3f(1.0f, 1.0f, 1.0f);
-		for (int arrow_i = 0; arrow_i < m_pads; ++arrow_i) {
-			float x = -1.5f + arrow_i;
-			float y = time2y(0.0);
-			float l = m_pressed_anim[arrow_i].get();
-			float s = (5.0 - l) / 5.0;
-			drawArrow(arrow_i, m_arrows_cursor, x, y, s);
-		}
-		
-		// Draw the notes
-		for (DanceNotes::iterator it = m_notes.begin(); it != m_notes.end(); ++it) {
-			if (it->note.end - time < past) continue;
-			if (it->note.begin - time > future) continue;
-			drawNote(*it, time);
-		}
 
-		// To test arrow coordinate positioning
-		//for (float i = past; i <= future; i+=0.2) {
-			//std::cout << i << ": " << time2y(i) << std::endl;
-			//drawArrow(1, 0, time2y(i), 0.6);
-		//}
-		
-		} //< reverse scale sc1
-		} //< reverse trans tr2
-		} //< reverse push pmb
-		} //< reverse trans tr1
-		} //< reverse push pmm
-		
-		// Draw streak pop-up for long streak intervals
-		double streakAnim = m_streakPopup.get();
-		if (streakAnim > 0.0) {
-			double s = 0.15 * (1.0 + streakAnim);
-			glColor4f(1.0f, 0.0f, 0.0f, 1.0 - streakAnim);
-			m_popupText->render(boost::lexical_cast<std::string>(unsigned(m_bigStreak)) + "\nStreak!");
-			m_popupText->dimensions().center(0.0).middle(offsetX).stretch(s,s);
-			m_popupText->draw();
-			if (streakAnim > 0.999) m_streakPopup.setTarget(0.0, true);
-		}
+	// Some matrix magic to get the viewport right
+	{ glutil::PushMatrixMode pmm(GL_PROJECTION);
+	{ glutil::Translation tr1(frac * 2.0 * offsetX, 0.0f, 0.0f);
+	{ glutil::PushMatrixMode pmb(GL_MODELVIEW);
+	{ glutil::Translation tr2((1.0 - frac) * offsetX, dimensions.y1(), 0.0f);
+	{ float temp_s = dimensions.w() / 5.0f;
+	  glutil::Scale sc1(temp_s, temp_s, temp_s);
+	
+	// Arrows on cursor
+	glColor3f(1.0f, 1.0f, 1.0f);
+	for (int arrow_i = 0; arrow_i < m_pads; ++arrow_i) {
+		float x = -1.5f + arrow_i;
+		float y = time2y(0.0);
+		float l = m_pressed_anim[arrow_i].get();
+		float s = (5.0 - l) / 5.0;
+		drawArrow(arrow_i, m_arrows_cursor, x, y, s);
 	}
+	
+	// Draw the notes
+	for (DanceNotes::iterator it = m_notes.begin(); it != m_notes.end(); ++it) {
+		if (it->note.end - time < past) continue;
+		if (it->note.begin - time > future) continue;
+		drawNote(*it, time); // Let's just do all the calculating in the sub, instead of passing them as a long list
+	}
+
+	// To test arrow coordinate positioning
+	//for (float i = past; i <= future; i+=0.2) {
+		//std::cout << i << ": " << time2y(i) << std::endl;
+		//drawArrow(1, 0, time2y(i), 0.6);
+	//}
+	
+	} //< reverse scale sc1
+	} //< reverse trans tr2
+	} //< reverse push pmb
+	} //< reverse trans tr1
+	} //< reverse push pmm
+	
+	drawInfo(time, offsetX, dimensions); // Go draw some texts and other interface stuff
 	glColor3f(1.0f, 1.0f, 1.0f);
 }
 
@@ -369,7 +357,8 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	float yEnd = time2y(tEnd);
 	glutil::Color c(1.0f, 1.0f, 1.0f);
 	
-	if (note.isHit && std::abs(tEnd) < maxTolerance) {
+	// Did we hit it?
+	if (note.isHit && std::abs(tEnd) < maxTolerance && note.hitAnim.getTarget() == 0) {
 		if (mine) note.hitAnim.setRate(1.0);
 		note.hitAnim.setTarget(1.0, false);
 	}
@@ -378,12 +367,12 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	if (yEnd - yBeg > arrowSize) {
 		// Draw holds
 		glColor4fv(c);
-		if (note.isHit && note.releaseTime <= 0) {
+		if (note.isHit && note.releaseTime <= 0) { // The note is being held down
 			yBeg = std::max(time2y(0.0), yBeg);
 			yEnd = std::max(time2y(0.0), yEnd);
 			glColor3f(1.0f, 1.0f, 1.0f);
 		}
-		if (note.releaseTime > 0) yBeg = time2y(note.releaseTime - time);
+		if (note.releaseTime > 0) yBeg = time2y(note.releaseTime - time); // Oh noes, it got released!
 		if (yEnd - yBeg > 0) {
 			UseTexture tblock(m_arrows_hold);
 			glutil::Begin block(GL_TRIANGLE_STRIP);
@@ -402,20 +391,21 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 		drawArrow(arrow_i, m_arrows_hold, x, yBeg, s, 0.0f, 1.0f/3.0f);
 	} else {
 		// Draw short note
-		if (mine) {
+		if (mine) { // Mines need special handling
 			c.a = 1.0 - glow; glColor4fv(c);
-			s = 0.6f + glow * 0.5f;
-			float rot = int(time*360 * (note.isHit ? 2.0 : 1.0) ) % 360;
+			s = 0.8f + glow * 0.5f;
+			float rot = int(time*360 * (note.isHit ? 2.0 : 1.0) ) % 360; // They rotate!
 			if (note.isHit) yBeg = time2y(0.0);
 			drawMine(x, yBeg, rot, s);
-		} else {
+		} else { // Regular arrows
 			s += glow;
 			glColor4fv(colorGlow(c, glow));
 			drawArrow(arrow_i, m_arrows, x, yBeg, s);
 		}
 	}
+	// Draw a text telling how well we hit
 	if (glow > 0 && ac > 0 && !mine) {
-		double s = 0.4 * (1.0 + glow);
+		double s = 1.2 * arrowSize * (1.0 + glow);
 		glColor3f(1.0f, 1.0f, 1.0f);
 		std::string rank = "Horrible!";
 		if (ac > .90) rank = "Perfect!";
@@ -428,5 +418,32 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 		m_popupText->render(rank);
 		m_popupText->dimensions().middle(x).center(time2y(0.0)).stretch(s,s/2.0);
 		m_popupText->draw();
+	}
+}
+
+/// Draw popups and other info texts
+void DanceGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
+	// Draw info
+	if (time < m_jointime + join_delay) {
+		m_text.dimensions.screenBottom(-0.075).middle(-0.09 + offsetX);
+		m_text.draw("^ " + getDifficultyString() + " v");
+		m_text.dimensions.screenBottom(-0.050).middle(-0.09 + offsetX);
+		m_text.draw("< " + getGameMode() + " >");
+	} else { // Draw scores
+		m_text.dimensions.screenBottom(-0.35).middle(0.32 * dimensions.w() + offsetX);
+		m_text.draw(boost::lexical_cast<std::string>(unsigned(getScore())));
+		m_text.dimensions.screenBottom(-0.32).middle(0.32 * dimensions.w() + offsetX);
+		m_text.draw(boost::lexical_cast<std::string>(unsigned(m_streak)) + "/" 
+		  + boost::lexical_cast<std::string>(unsigned(m_longestStreak)));
+	}
+	// Draw streak pop-up for long streak intervals
+	double streakAnim = m_streakPopup.get();
+	if (streakAnim > 0.0) {
+		double s = 0.15 * (1.0 + streakAnim);
+		glColor4f(1.0f, 0.0f, 0.0f, 1.0 - streakAnim);
+		m_popupText->render(boost::lexical_cast<std::string>(unsigned(m_bigStreak)) + "\nStreak!");
+		m_popupText->dimensions().center(0.0).middle(offsetX).stretch(s,s);
+		m_popupText->draw();
+		if (streakAnim > 0.999) m_streakPopup.setTarget(0.0, true);
 	}
 }

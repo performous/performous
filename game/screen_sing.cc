@@ -106,9 +106,8 @@ void ScreenSing::enter() {
 void ScreenSing::instrumentLayout(double time) {
 	int count = 0, i = 0;
 	// Count active instruments
-	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it) {
+	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it)
 		if (!it->dead(time)) count++;
-	}
 	double iw = std::min(0.5, 1.0 / count);
 	typedef std::pair<unsigned, double> CountSum;
 	std::map<std::string, CountSum> volume; // Stream id to (count, sum)
@@ -145,17 +144,22 @@ void ScreenSing::instrumentLayout(double time) {
 }
 
 void ScreenSing::danceLayout(double time) {
+	int count = 0, i = 0;
+	// Count active dancers
+	for (Dancers::iterator it = m_dancers.begin(); it != m_dancers.end(); ++it)
+		if (!it->dead(time)) count++;
 	double iw = std::min(0.5, 1.0 / m_dancers.size());
-	Dancers::size_type i = 0;
-	for (Dancers::iterator it = m_dancers.begin(); it != m_dancers.end(); ++it, ++i) {
-		it->position((0.5 + i - 0.5 * m_dancers.size()) * iw, iw);
-		it->engine();
-		it->draw(time);
+	for (Dancers::iterator it = m_dancers.begin(); it != m_dancers.end(); ++it) {
+		it->engine(); // Run engine even when dead so that joining is possible
+		if (!it->dead(time)) {
+			it->position((0.5 + i - 0.5 * count) * iw, iw); // Do layout stuff
+			it->draw(time);
+			++i;
+		}
 	}
 	if (time < -0.5) {
 		glColor4f(1.0f, 1.0f, 1.0f, clamp(-1.0 - 2.0 * time));
-		// TODO: help?
-		//m_help->draw();
+		m_help->draw();
 		glColor3f(1.0f, 1.0f, 1.0f);
 	}
 }

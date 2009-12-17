@@ -60,12 +60,12 @@ class GuitarGraph {
 	void engine();
 	void position(double cx, double width) { m_cx.setTarget(cx); m_width.setTarget(width); }
 	unsigned stream() const { return m_stream; }
+	bool dead(double time) const;
 	double correctness() const { return m_correctness.get(); }
 	std::string getTrackIndex() const { return m_track_index->first; }
 	int getScore() const { return m_score * m_scoreFactor; }
 	std::string getTrack() const { return m_track_index->first; }
 	std::string getDifficultyString() const;
-	double dead(double time) const { return m_jointime == -100.0 || time > (m_acttime + death_delay); }
   private:
 	void activateStarpower();
 	void fail(double time, int fret);
@@ -137,8 +137,6 @@ class GuitarGraph {
 	int m_streak;
 	int m_longestStreak;
 	int m_bigStreak;
-	const float death_delay; /// Delay in seconds after which the player is hidden
-	const float not_joined; /// A value that indicates player hasn't joined
 	double m_jointime;
 	double m_acttime;
 };

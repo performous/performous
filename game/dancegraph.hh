@@ -37,8 +37,8 @@ class DanceGraph {
 	void draw(double time);
 	void engine();
 	void position(double cx, double width) { m_cx.setTarget(cx); m_width.setTarget(width); }
-	double dead(double time) const { return time > -0.5 && m_dead > 50; }
 	unsigned stream() const { return m_stream; }
+	bool dead(double time) const;
 	double correctness() const { return m_correctness.get(); }
 	int getScore() const { return (m_score > 0 ? m_score : 0) * m_scoreFactor; }
 	std::string getGameMode() const { return m_gamingMode; }
@@ -51,6 +51,7 @@ class DanceGraph {
 	DanceDifficulty m_level;
 	void dance(double time, input::Event const& ev);
 	void drawNote(DanceNote& note, double time);
+	void drawInfo(double time, double offsetX, Dimensions dimensions);
 	void drawArrow(int arrow_i, Texture& tex, float x, float y, float scale = 1.0, float ty1 = 0.0, float ty2 = 1.0);
 	void drawMine(float x, float y, float rot = 0.0, float scale = 1.0);
 	Audio& m_audio;
@@ -78,8 +79,6 @@ class DanceGraph {
 	Events m_events;
 	bool m_pressed[4];
 	AnimValue m_pressed_anim[4];
-	int m_dead;
-	double m_jointime;
 	SvgTxtTheme m_text;
 	boost::scoped_ptr<SvgTxtThemeSimple> m_popupText;
 	AnimValue m_correctness;
@@ -93,5 +92,7 @@ class DanceGraph {
 	int m_pads;
 	std::string m_gamingMode;
 	DanceTracks::const_iterator m_curTrackIt;
+	double m_jointime;
+	double m_acttime;
 };
 
