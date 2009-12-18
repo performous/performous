@@ -46,6 +46,9 @@ Markus Raab <ich at markus-raab.org>
 Matti Kemppainen <mpkemppa at users.sf.net>
 	* prototyping dance game
 	
+Jaakko Nikkola <jnikkola at users.sourceforge.net>
+	* Dance game developer
+	
 INACTIVE DEVELOPERS
 -------------------
 
