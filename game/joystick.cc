@@ -320,13 +320,13 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 				joy_id = input::Private::KEYBOARD_ID2;
 				switch(_e.key.keysym.sym) {
 					case SDLK_KP9: button = 6; break;
-					case SDLK_KP8: button = 2; break;
+					case SDLK_KP8: case SDLK_UP: button = 2; break;
 					case SDLK_KP7: button = 7; break;
-					case SDLK_KP6: button = 3; break;
+					case SDLK_KP6: case SDLK_RIGHT: button = 3; break;
 					case SDLK_KP5: button = 8; break;
-					case SDLK_KP4: button = 0; break;
+					case SDLK_KP4: case SDLK_LEFT: button = 0; break;
 					case SDLK_KP3: button = 5; break;
-					case SDLK_KP2: button = 1; break;
+					case SDLK_KP2: case SDLK_DOWN: button = 1; break;
 					case SDLK_KP1: button = 4; break;
 					default: return false;
 				}
@@ -380,13 +380,13 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 				joy_id = input::Private::KEYBOARD_ID2;
 				switch(_e.key.keysym.sym) {
 					case SDLK_KP9: button = 6; break;
-					case SDLK_KP8: button = 2; break;
+					case SDLK_KP8: case SDLK_UP: button = 2; break;
 					case SDLK_KP7: button = 7; break;
-					case SDLK_KP6: button = 3; break;
+					case SDLK_KP6: case SDLK_RIGHT: button = 3; break;
 					case SDLK_KP5: button = 8; break;
-					case SDLK_KP4: button = 0; break;
+					case SDLK_KP4: case SDLK_LEFT: button = 0; break;
 					case SDLK_KP3: button = 5; break;
-					case SDLK_KP2: button = 1; break;
+					case SDLK_KP2: case SDLK_DOWN: button = 1; break;
 					case SDLK_KP1: button = 4; break;
 					default: return false;
 				}

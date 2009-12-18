@@ -159,7 +159,9 @@ void ScreenSing::danceLayout(double time) {
 	}
 	if (time < -0.5) {
 		glColor4f(1.0f, 1.0f, 1.0f, clamp(-1.0 - 2.0 * time));
+    #ifndef _WIN32
 		m_help->draw();
+    #endif
 		glColor3f(1.0f, 1.0f, 1.0f);
 	}
 }
@@ -401,9 +403,9 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database, Dancers& 
 		item.track = it->getGameMode() + " - " + it->getDifficultyString();
 		item.track[0] = toupper(item.track[0]);
 		if (item.score < 100) { it = dancers.erase(it); continue; }
-		
+
 		item.color = glutil::Color(1.0f, 0.4f, 0.1f);
-		
+
 		m_database.scores.push_back(item);
 		++it;
 	}
