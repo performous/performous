@@ -25,6 +25,7 @@ struct DanceNote {
 
 
 typedef std::vector<DanceNote> DanceNotes;
+const size_t max_panels = 10; // Maximum number of arrow lines
 
 /// handles drawing of notes
 class DanceGraph {
@@ -54,12 +55,13 @@ class DanceGraph {
 	void drawInfo(double time, double offsetX, Dimensions dimensions);
 	void drawArrow(int arrow_i, Texture& tex, float x, float y, float scale = 1.0, float ty1 = 0.0, float ty2 = 1.0);
 	void drawMine(float x, float y, float rot = 0.0, float scale = 1.0);
+	float panel2x(int i) { return -(m_pads * 0.5f) + m_arrow_map[i] + 0.5f; } /// Get x for an arrow line
 	Audio& m_audio;
 	Song const& m_song;
 	input::InputDev m_input;
 	DanceNotes m_notes;
 	DanceNotes::iterator m_notesIt;
-	DanceNotes::iterator m_activeNotes[4];
+	DanceNotes::iterator m_activeNotes[max_panels];
 	Texture m_arrows;
 	Texture m_arrows_cursor;
 	Texture m_arrows_hold;
@@ -77,8 +79,9 @@ class DanceGraph {
 	};
 	typedef std::vector<Event> Events;
 	Events m_events;
-	bool m_pressed[4];
-	AnimValue m_pressed_anim[4];
+	bool m_pressed[max_panels];
+	AnimValue m_pressed_anim[max_panels];
+	int m_arrow_map[max_panels];
 	SvgTxtTheme m_text;
 	boost::scoped_ptr<SvgTxtThemeSimple> m_popupText;
 	AnimValue m_correctness;

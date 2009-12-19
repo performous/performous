@@ -11,7 +11,10 @@
 
 
 namespace {
-	//Here are some functions needed in reading the data.
+	
+	const int max_panels = 10; // Maximum number of arrow lines
+	
+	// Here are some functions needed in reading the data.
 	void assign(int& var, std::string const& str) {
 		try {
 			var = boost::lexical_cast<int>(str);
@@ -179,7 +182,7 @@ Notes SongParser::smParseNotes(std::string line) {
 	double tm = 0; 		//time counter
 	double dur; 		//note duration
 
-	std::vector<int> holdMarks(4, -1);	//vector to contain mark for the chord where hold began for each "fret" (-1 if no mark set)
+	std::vector<int> holdMarks(max_panels, -1);	//vector to contain mark for the chord where hold began for each "fret" (-1 if no mark set)
 
 	while(getline(line)) {
 		if (line.empty() || line == "\r") continue;
@@ -192,7 +195,7 @@ Notes SongParser::smParseNotes(std::string line) {
 			dur = 4.0 * ( 1.0/(m_bpm/60.0) ) / lcount;	//counts one note duration in seconds;	
 			for(int j = count - lcount; j<count ; j++) {
 				DanceChord& _chord = chords.at(j);
-				for(int i = 0; i<4; i++) {
+				for(int i = 0; i < max_panels; i++) {
 					if(_chord.find(i) != _chord.end()) {
 						// TODO: Proper LIFT handling
 						if(_chord[i].type == Note::TAP || _chord[i].type == Note::MINE || _chord[i].type == Note::LIFT) {
@@ -225,17 +228,20 @@ Notes SongParser::smParseNotes(std::string line) {
 		*/
 		DanceChord chord;
 		std::istringstream iss(line);
-		for(int i =0; i<4; i++){
+		for(int i = 0; i < max_panels; i++) {
+			if ((unsigned)i > line.size()) break; // end of line reached
 			char notetype = iss.get();
 			if (notetype == '0') continue;
 			Note note;
-			note.type = Note::TAP; // default (1, a-z, A-Z)
 			if(notetype == '1') note.type = Note::TAP;
-			if(notetype == '2') note.type = Note::HOLDBEGIN;
-			if(notetype == '3') note.type = Note::HOLDEND;
-			if(notetype == '4') note.type = Note::ROLL;
-			if(notetype == 'M') note.type = Note::MINE;
-			if(notetype == 'L') note.type = Note::LIFT;
+			else if(notetype == '2') note.type = Note::HOLDBEGIN;
+			else if(notetype == '3') note.type = Note::HOLDEND;
+			else if(notetype == '4') note.type = Note::ROLL;
+			else if(notetype == 'M') note.type = Note::MINE;
+			else if(notetype == 'L') note.type = Note::LIFT;
+			else if(notetype >= 'a' && notetype <= 'z') note.type = Note::TAP;
+			else if(notetype >= 'A' && notetype <= 'Z') note.type = Note::TAP;
+			else continue;
 			note.note = i;
 			chord[i] = note;
 		}

@@ -71,9 +71,12 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
 	m_popupText.reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 
 	// Initialize some arrays
-	for(size_t i=0; i < 4; i++) m_activeNotes[i] = m_notes.end();
-	for(size_t i = 0; i < 4; i++) m_pressed[i] = false;
-	for(size_t i = 0; i < 4; i++) m_pressed_anim[i] = AnimValue(0.0, 4.0);
+	for(size_t i = 0; i < max_panels; i++) {
+		m_activeNotes[i] = m_notes.end();
+		m_pressed[i] = false;
+		m_pressed_anim[i] = AnimValue(0.0, 4.0);
+		m_arrow_map[i] = -1;
+	}
 	
 	if(m_song.danceTracks.empty())
 		throw std::runtime_error("Could not find any dance tracks.");
@@ -85,6 +88,13 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
 
 /// Attempt to select next/previous game mode
 void DanceGraph::gameMode(int direction) {
+	// Position mappings for panels
+	static int mapping4[max_panels] = {0, 1, 2, 3,-1,-1,-1,-1,-1,-1};
+	static int mapping5[max_panels] = {0, 1, 2, 4, 3,-1,-1,-1,-1,-1};
+	static int mapping6[max_panels] = {0, 2, 3, 5, 1, 4,-1,-1,-1,-1};
+	static int mapping7[max_panels] = {0, 3, 4, 7, 1, 6, 2,-1,-1,-1};
+	static int mapping8[max_panels] = {0, 3, 4, 7, 1, 6, 2, 5,-1,-1};
+	static int mapping10[max_panels]= {0, 3, 4, 7, 1, 6, 2, 5,-1,-1};
 	// Cycling
 	if (direction == 0) {
 		m_curTrackIt = m_song.danceTracks.begin();
@@ -98,17 +108,17 @@ void DanceGraph::gameMode(int direction) {
 	// Determine how many arrow lines are needed
 	m_gamingMode = m_curTrackIt->first;
 	std::string gm = m_gamingMode;
-	if (gm == "dance-single") m_pads = 4;
-	else if (gm == "dance-double") m_pads = 8;
-	else if (gm == "dance-couple") m_pads = 8;
-	else if (gm == "dance-solo") m_pads = 6;
-	else if (gm == "pump-single") m_pads =5 ;
-	else if (gm == "pump-double") m_pads = 10;
-	else if (gm == "pump-couple") m_pads = 10;
-	else if (gm == "ez2-single") m_pads = 5;
-	else if (gm == "ez2-double") m_pads = 10;
-	else if (gm == "ex2-real") m_pads = 7;
-	else if (gm == "para-single") m_pads = 5;
+	if (gm == "dance-single") { m_pads = 4; std::copy(mapping4, mapping4+max_panels, m_arrow_map); }
+	else if (gm == "dance-double") { m_pads = 8; std::copy(mapping8, mapping8+max_panels, m_arrow_map); }
+	else if (gm == "dance-couple") { m_pads = 8; std::copy(mapping8, mapping8+max_panels, m_arrow_map); }
+	else if (gm == "dance-solo") { m_pads = 6; std::copy(mapping6, mapping6+max_panels, m_arrow_map); }
+	else if (gm == "pump-single") { m_pads = 5 ; std::copy(mapping5, mapping5+max_panels, m_arrow_map); }
+	else if (gm == "pump-double") { m_pads = 10; std::copy(mapping10, mapping10+max_panels, m_arrow_map); }
+	else if (gm == "pump-couple") { m_pads = 10; std::copy(mapping10, mapping10+max_panels, m_arrow_map); }
+	else if (gm == "ez2-single") { m_pads = 5; std::copy(mapping5, mapping5+max_panels, m_arrow_map); }
+	else if (gm == "ez2-double") { m_pads = 10; std::copy(mapping10, mapping10+max_panels, m_arrow_map); }
+	else if (gm == "ex2-real") { m_pads = 7; std::copy(mapping7, mapping7+max_panels, m_arrow_map); }
+	else if (gm == "para-single") { m_pads = 5; std::copy(mapping5, mapping5+max_panels, m_arrow_map); }
 	else throw std::runtime_error("Unknown track " + gm);
 }
 
@@ -143,8 +153,7 @@ void DanceGraph::difficulty(DanceDifficulty level) {
 	m_notesIt = m_notes.begin();
 //	std::cout << "Difficulty set to: " << level << std::endl;
 	m_level = level;
-	for(size_t i=0; i < 4; i++)
-		m_activeNotes[i] = m_notes.end();
+	for(size_t i = 0; i < max_panels; i++) m_activeNotes[i] = m_notes.end();
 	m_scoreFactor = 1;
 	if(m_notes.size() != 0)
 		m_scoreFactor = 10000.0 / (50 * m_notes.size()); // maxpoints / (notepoint * notes)
@@ -186,8 +195,6 @@ void DanceGraph::engine() {
 		// Handle joining and keeping alive
 		if (m_jointime == not_joined) m_jointime = (time < 0.0 ? -join_delay : time); // join
 		m_acttime = time;
-		
-		if(ev.button < 0 || ev.button > 3) continue; // ignore other than 4 buttons for now
 		// Difficulty / mode selection
 		if (time < m_jointime + join_delay) {
 			if (ev.type == input::Event::PRESS) {
@@ -256,9 +263,10 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 namespace {
 	const float arrowSize = 0.4f; // Half width of an arrow
 	const float one_arrow_tex_w = 1.0 / 8.0; // Width of a single arrow in texture coordinates
-	
-	/// Create a symmetric vertex pair of given data
+
+	/// Create a symmetric vertex pair for arrow drawing
 	void vertexPair(int arrow_i, float x, float y, float ty) {
+		if (arrow_i < 0) return;
 		glTexCoord2f(arrow_i * one_arrow_tex_w, ty); glVertex2f(x - arrowSize, y);
 		glTexCoord2f((arrow_i+1) * one_arrow_tex_w, ty); glVertex2f(x + arrowSize, y);
 	}
@@ -314,7 +322,7 @@ void DanceGraph::draw(double time) {
 	// Arrows on cursor
 	glColor3f(1.0f, 1.0f, 1.0f);
 	for (int arrow_i = 0; arrow_i < m_pads; ++arrow_i) {
-		float x = -1.5f + arrow_i;
+		float x = panel2x(arrow_i);
 		float y = time2y(0.0);
 		float l = m_pressed_anim[arrow_i].get();
 		float s = (5.0 - l) / 5.0;
@@ -350,7 +358,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	float tEnd = note.note.end - time;
 	int arrow_i = note.note.note;
 	bool mine = note.note.type == Note::MINE;
-	float x = -1.5f + arrow_i;
+	float x = panel2x(arrow_i);
 	float s = 1.0;
 	float ac = note.accuracy;
 	float yBeg = time2y(tBeg);

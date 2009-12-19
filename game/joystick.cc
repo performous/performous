@@ -33,8 +33,8 @@ int input::buttonFromSDL(input::Private::Type _type, unsigned int _sdl_button) {
 		//K  R  Y  B  G  O    // for drums
 		{ 3, 4, 1, 2, 0, 4, -1, -1, 8, 9 }, // Guitar Hero drums
 		{ 3, 4, 1, 2, 0,-1, -1, -1, 8, 9 }, // Rock Band drums
-		// Left  Down  Up  Right  DownL  DownR  UpL  UpR  Start  Select
-		{  0,    1,    2,  3,     4,     5,     6,   7,   9,     8 } // generic dance pad
+		// Left  Down  Up  Right  UpL  UpR  DownL  DownR  Start  Select
+		{  0,    1,    2,  3,     6,   7,   4,     5,     9,     8 } // generic dance pad
 	};
 	if( _sdl_button >= SDL_BUTTONS ) return -1;
 	switch(_type) {
@@ -69,7 +69,7 @@ input::NavButton input::getNav(SDL_Event const &e) {
 		else if (k == SDLK_RIGHT) return input::RIGHT;
 		else if (k == SDLK_RETURN) return input::START;
 		else if (k == SDLK_ESCAPE || k == SDLK_q) return input::CANCEL;
-		else if (k == SDLK_SPACE || k == SDLK_PAUSE || (k == SDLK_p && mod & KMOD_CTRL))
+		else if (k == SDLK_PAUSE || (k == SDLK_p && mod & KMOD_CTRL))
 			return input::PAUSE;
 	} else if (e.type == SDL_JOYBUTTONDOWN) {
 		// Joystick buttons
@@ -319,15 +319,15 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 			} else if(config["game/keyboard_dancepad"].b() && devices[input::Private::KEYBOARD_ID2].assigned()) {
 				joy_id = input::Private::KEYBOARD_ID2;
 				switch(_e.key.keysym.sym) {
-					case SDLK_KP9: button = 6; break;
+					case SDLK_KP9: button = 5; break;
 					case SDLK_KP8: case SDLK_UP: button = 2; break;
-					case SDLK_KP7: button = 7; break;
+					case SDLK_KP7: button = 4; break;
 					case SDLK_KP6: case SDLK_RIGHT: button = 3; break;
-					case SDLK_KP5: button = 8; break;
+					case SDLK_KP5: button = 1; break; // 5 is also down
 					case SDLK_KP4: case SDLK_LEFT: button = 0; break;
-					case SDLK_KP3: button = 5; break;
+					case SDLK_KP3: button = 7; break;
 					case SDLK_KP2: case SDLK_DOWN: button = 1; break;
-					case SDLK_KP1: button = 4; break;
+					case SDLK_KP1: button = 6; break;
 					default: return false;
 				}
 			} else {
@@ -379,15 +379,15 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 			} else if(config["game/keyboard_dancepad"].b() && devices[input::Private::KEYBOARD_ID2].assigned()) {
 				joy_id = input::Private::KEYBOARD_ID2;
 				switch(_e.key.keysym.sym) {
-					case SDLK_KP9: button = 6; break;
+					case SDLK_KP9: button = 5; break;
 					case SDLK_KP8: case SDLK_UP: button = 2; break;
-					case SDLK_KP7: button = 7; break;
+					case SDLK_KP7: button = 4; break;
 					case SDLK_KP6: case SDLK_RIGHT: button = 3; break;
-					case SDLK_KP5: button = 8; break;
+					case SDLK_KP5: button = 1; break; // 5 is also down
 					case SDLK_KP4: case SDLK_LEFT: button = 0; break;
-					case SDLK_KP3: button = 5; break;
+					case SDLK_KP3: button = 7; break;
 					case SDLK_KP2: case SDLK_DOWN: button = 1; break;
-					case SDLK_KP1: button = 4; break;
+					case SDLK_KP1: button = 6; break;
 					default: return false;
 				}
 			} else {
