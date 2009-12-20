@@ -57,6 +57,10 @@ struct ThemeConfiguration: Theme {
 	SvgTxtTheme item;
 	/// configuration value
 	SvgTxtTheme value;
+	/// configuration comment text
+	SvgTxtTheme comment;
+	/// configuration comment background
+	Surface comment_bg;
 };
 
 /// theme for intro screen
