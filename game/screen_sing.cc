@@ -371,11 +371,11 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database, Dancers& 
 	for (std::list<Player>::iterator p = m_database.cur.begin(); p != m_database.cur.end();) {
 		ScoreItem item; item.type = ScoreItem::SINGER;
 		item.score = p->getScore();
-		item.track = "Vocals";
-		item.track_simple = "vocals";
+		if (item.score < 500) { p = m_database.cur.erase(p); continue; } // Dead
+		item.track = "Vocals"; // For database
+		item.track_simple = "vocals"; // For ScoreWindow
 		item.color = glutil::Color(p->m_color.r, p->m_color.g, p->m_color.b);
 
-		if (item.score < 500) { p = m_database.cur.erase(p); continue; }
 		m_database.scores.push_back(item);
 		++p;
 	}
@@ -383,11 +383,10 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database, Dancers& 
 	for (Instruments::iterator it = instruments.begin(); it != instruments.end();) {
 		ScoreItem item; item.type = ScoreItem::INSTRUMENT;
 		item.score = it->getScore();
+		if (item.score < 100) { it = instruments.erase(it); continue; } // Dead
 		item.track_simple = it->getTrack();
 		item.track = it->getTrack() + " - " + it->getDifficultyString();
-		item.track[0] = toupper(item.track[0]);
-		if (item.score < 100) { it = instruments.erase(it); continue; }
-
+		item.track[0] = toupper(item.track[0]); // Capitalize
 		if (item.track_simple == "drums") item.color = glutil::Color(0.1f, 0.1f, 0.1f);
 		else if (item.track_simple == "bass") item.color = glutil::Color(0.5f, 0.3f, 0.1f);
 		else item.color = glutil::Color(1.0f, 0.0f, 0.0f);
@@ -399,11 +398,10 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database, Dancers& 
 	for (Dancers::iterator it = dancers.begin(); it != dancers.end();) {
 		ScoreItem item; item.type = ScoreItem::DANCER;
 		item.score = it->getScore();
+		if (item.score < 100) { it = dancers.erase(it); continue; } // Dead
 		item.track_simple = it->getGameMode();
 		item.track = it->getGameMode() + " - " + it->getDifficultyString();
-		item.track[0] = toupper(item.track[0]);
-		if (item.score < 100) { it = dancers.erase(it); continue; }
-
+		item.track[0] = toupper(item.track[0]); // Capitalize
 		item.color = glutil::Color(1.0f, 0.4f, 0.1f);
 
 		m_database.scores.push_back(item);
@@ -413,16 +411,19 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database, Dancers& 
 	if (m_database.scores.empty())
 		m_rank = "No player!";
 	else {
-		m_database.scores.sort();
-		m_database.scores.reverse(); // top should be first
-		int topScore = m_database.scores.front().score;
-		if (m_database.scores.front().type == ScoreItem::SINGER) {
+		// Determine winner
+		ScoreItem winner = m_database.scores.front();
+		for (Database::cur_scores_t::const_iterator it = m_database.scores.begin(); it != m_database.scores.end(); ++it)
+			if (it->score > winner.score) winner = *it;
+		int topScore = winner.score;
+		// Determine rank
+		if (winner.type == ScoreItem::SINGER) {
 			if (topScore > 8000) m_rank = "Hit singer";
 			else if (topScore > 6000) m_rank = "Lead singer";
 			else if (topScore > 4000) m_rank = "Rising star";
 			else if (topScore > 2000) m_rank = "Amateur";
 			else m_rank = "Tone deaf";
-		} else if (m_database.scores.front().type == ScoreItem::DANCER) {
+		} else if (winner.type == ScoreItem::DANCER) {
 			if (topScore > 8000) m_rank = "Maniac";
 			else if (topScore > 6000) m_rank = "Hoofer";
 			else if (topScore > 4000) m_rank = "Rising star";
