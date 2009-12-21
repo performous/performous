@@ -10,10 +10,9 @@
 
 include(LibFindMacros)
 
-# On Linux there is no pkgconfig script and gettext is part of glibc
+# On Linux there is no pkgconfig script, but with this we force Gettext_PKGCONF_INCLUDE_DIRS to ""
+libfind_pkg_check_modules(Gettext_PKGCONF Gettext)
 if(WIN32 OR APPLE)
-  libfind_pkg_check_modules(Gettext_PKGCONF Gettext)
-  
   set(Gettext_LIBRARY_SEARCH_DIRS
     ${Gettext_PKGCONF_LIBRARY_DIRS}
     /opt/local/lib
