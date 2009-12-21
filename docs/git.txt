@@ -42,11 +42,18 @@ To update your working copy do a simple:
 
 	$ git pull
 
+Discover and investigate changes others made:
+
+	$ git log
+	$ git show <commit-hash>		(ommit <commit-hash> to see latest)
+
+Note that only a few characters (of 40) from the commit hash id is needed.
+
 Discovering and investigating your changes isn't any different than 
 subversion:
 
 	$ git status
-	$ git diff <file>
+	$ git diff <file>				(ommit <file> to see all changes)
 
 Committing changes in git usually takes two steps. First add the files 
 you want to commit:
@@ -58,9 +65,13 @@ you to enter a commit message and have a last glance at what changed:
 
 	$ git commit
 
-Again: this will not interact with the main repository in any way and 
-doesn't require an internet connection. All that is altered is your 
-local repository.
+You can also pass -a parameter to add all your changes (and bypass the
+git-add stage). These operations won't interact with the main repository
+in any way and no internet connection is needed. All that is altered is
+your local repository.
+
+If you are not sure what you should do next, git status usually provides
+some good suggestions.
 
 
 Sharing
@@ -94,4 +105,39 @@ a clone of the performous repository. To be able to push, you need to
 change the project url with this command:
 
 	$ git config remote.origin.url <SF.net username>@git.performous.org:/gitroot/performous/performous
+
+Be also sure to set your name and email before committing
+(if you haven't done that already):
+
+	$ git config --global user.name "My Name"
+	$ git config --global user.email "myemail@example.com"
+
+
+Tricks
+------
+
+If you have already learned the basics of Git, you may find the following
+things useful.
+
+Stash:
+
+If you e.g. need to do a hot-fix or switch branch, but you are in a middle
+of some hacking you don't want to commit just yet, you can use stash to
+put your changes aside, "under the carpet":
+
+	$ git stash
+
+When you are ready to continue, just type:
+
+	$ git stash pop
+
+If you want to keep the stuff in the stash, use 'apply' instead of 'pop'.
+You can have multiple things stashed away at once.
+
+Cherry-pick:
+
+If you e.g. committed to a wrong branch and don't want to merge the whole
+branch, you can cherry-pick (merge) just the one commit:
+
+	$ git cherry-pick <commit-hash>
 
