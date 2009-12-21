@@ -1,5 +1,6 @@
 #include "songparser.hh"
 
+#include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <algorithm>
@@ -62,7 +63,10 @@ void SongParser::smParse() {
 	while (getline(line) && smParseField(line)) {}
 	if (m_song.danceTracks.empty() ) throw std::runtime_error("No note data in the file");
 	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
-
+	std::string& music = s.music["background"];
+	std::string tmp = s.path + "music.ogg";
+	namespace fs = boost::filesystem;
+	if ((music.empty() || !fs::exists(music)) && fs::exists(tmp)) music = tmp;
 }
 	
 bool SongParser::smParseField(std::string line) {
