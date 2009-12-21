@@ -6,7 +6,7 @@ find_package(Boost 1.34 REQUIRED COMPONENTS filesystem program_options)
 include_directories(${Boost_INCLUDE_DIRS})
 
 # Find all the libs that don't require extra parameters
-foreach(lib LibXML++ Magick++ Z Jpeg Tiff Png Freetype)
+foreach(lib LibXML++ Magick++ Z Jpeg Tiff Png Freetype Z)
 	find_package(${lib})
 	if (${lib}_FOUND)
 		include_directories(${${lib}_INCLUDE_DIRS})
@@ -48,12 +48,16 @@ endif (LibXML++_FOUND)
 if (Boost_FOUND)
 	add_executable(ss_pak_extract pak_extract.cpp pak.cpp)
 	target_link_libraries(ss_pak_extract ${Boost_LIBRARIES})
+	if (Z_FOUND)
+		add_executable(itg_pck itg_pck.cc)
+		target_link_libraries(itg_pck ${Boost_LIBRARIES} ${Z_LIBRARIES})
+	endif()
 endif (Boost_FOUND)
 
 add_executable(ss_adpcm_decode adpcm_decode.cpp pak.cpp)
 add_executable(ss_ipu_decode ipu_decode.cpp)
 add_executable(ss_ipu_conv ipu_conv.cpp ipuconvmain.cpp pak.cpp)
-set(targets ${targets} ss_pak_extract ss_adpcm_decode ss_ipu_decode ss_ipu_conv)
+set(targets ${targets} ss_pak_extract ss_adpcm_decode ss_ipu_decode ss_ipu_conv itg_pck)
 
 # add install target:
 install(TARGETS ${targets} DESTINATION bin)
