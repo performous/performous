@@ -6,13 +6,18 @@
 
 #include <librsvg/rsvg.h>
 #include <librsvg/rsvg-cairo.h>
-#include <Magick++.h>
+#ifdef LESS_MAGIC
+	#include <SDL_image.h>
+#else
+	#include <Magick++.h>
+	using boost::uint32_t;
+#endif
 #include <fstream>
 #include <stdexcept>
 #include <sstream>
 #include <vector>
 
-using boost::uint32_t;
+
 
 float Dimensions::screenY() const {
 	switch (m_screenAnchor) {
@@ -85,6 +90,22 @@ template <typename T> void loader(T& target, std::string filename, bool autocrop
 		gdk_pixbuf_unref(pb);
 		rsvg_term();
 	} else {
+	#ifdef LESS_MAGIC
+		IMG_Init(0);
+		SDL_Surface* imgsurf = IMG_Load(filename.c_str());
+		IMG_Quit();
+		if (imgsurf == NULL) {
+			throw std::runtime_error("Unable to load " + filename + ": " + IMG_GetError());
+		}
+		// TODO: blit to a new RGBA surface to ensure it actually *is* RGBA
+		try {
+			target.load(imgsurf->w, imgsurf->h, pix::CHAR_RGBA, reinterpret_cast<const unsigned char*>(imgsurf->pixels));
+			SDL_FreeSurface(imgsurf);
+		} catch (...) {
+			SDL_FreeSurface(imgsurf);
+			throw;
+		}
+	#else
 		Magick::Image image;
 		Magick::Blob blob;
 		try {
@@ -112,6 +133,7 @@ template <typename T> void loader(T& target, std::string filename, bool autocrop
 		{
 			throw std::runtime_error("Image Error");
 		}
+	#endif
 	}
 }
 

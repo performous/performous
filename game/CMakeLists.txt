@@ -47,6 +47,16 @@ else()
 	message(STATUS "MIDI I/O: Disabled (libportmidi not found)")
 endif()
 
+find_package(SDL_image)
+if(SDL_image_FOUND)
+  include_directories(${SDL_image_INCLUDE_DIRS})
+  add_definitions(-DLESS_MAGIC) # ;)
+  list(APPEND LIBS ${SDL_image_LIBRARIES})
+  message(STATUS "SDL_image: found, enabling replacements for Magick++ code")
+else()
+  message(STATUS "SDL_image: not found, falling back to Magick++")
+endif()
+
 # Set default compile flags for GCC
 if(CMAKE_COMPILER_IS_GNUCXX)
 	message(STATUS "GCC detected, adding compile flags")
