@@ -56,7 +56,7 @@ type bzip2 #--version >/dev/null 2>&1 && echo 'bzip2 is working...'
 type cat
 type cl #'-?' </dev/null >/dev/null 2>&1 && echo 'cl is working...'
 type cmake #--version >/dev/null 2>&1 && echo 'cmake is working...'
-alias cmake="cmake -G \"NMake Makefiles\""
+alias cmake="cmake -G \"NMake Makefiles\"" #to get cmake doing the right makefiles
 type cmd #//c echo cmd is working...
 type cp #--version >/dev/null 2>&1 && echo 'cp is working...'
 type cscript #'-?' </dev/null >/dev/null 2>&1 && echo 'cscript is working...'
@@ -460,13 +460,13 @@ EOF
     cp -v bin.ntx86/bjam.exe ../../../../../bin
     cd ../../..
   fi
-  bjam stage toolset=msvc variant=release link=shared threading=multi runtime-link=shared
+  bjam stage toolset=msvc --build-type=complete link=shared threading=multi runtime-link=shared
   if test -d ../../include/boost; then
     rm -rf ../../include/boost
   fi
   mv -v boost ../../include
   cp -v stage/lib/*.dll ../../bin
-  for file in stage/lib/boost*.lib; do
+  for file in stage/lib/*.lib; do
     if test "`expr "$file" : '.*-mt\.lib$'`" -eq 0; then
       cp -v "$file" ../../lib/"`basename "$file"`"
       cp -v "$file" ../../lib/lib"`basename "$file"`"
@@ -670,8 +670,12 @@ setup_glib () {
     mkdir -p glib
     cd glib
     tar --strip-components=1 -jxvf ../glib-2.22.3.tar.bz2
-    sed -e 's/@GLIB_VERSION@/2.22.3/g' gobject/glib-mkenums.in >gobject/glib-mkenums
-    cp -v glibconfig.h.win32 glibconfig.h
+    sed -e 's/@GLIB_VERSION@/2.22.3/g' gobject/glib-mkenums.in >gobject/glib-mkenums.new
+	sed -e 's/@PERL_PATH@/\/bin\/perl/g' gobject/glib-mkenums.new >gobject/glib-mkenums
+	rm gobject/glib-mkenums.new
+	sed -e 's/GLIB = $(TOP)\\glib/GLIB = $(TOP)\/glib/g' build/win32/make.msc >build/win32/make.msc.new
+	mv -v build/win32/make.msc.new build/win32/make.msc
+	cp -v glibconfig.h.win32 glibconfig.h
     cp -v config.h.win32 config.h
     cat >fixmakemsc.sed <<"EOF"
 /^ATK_LIBS/s/\$(ATK)\\[^\\]*\\//g
@@ -752,6 +756,10 @@ EOF
  
  static PangoStyle
 EOF
+  sed -e 's/$(PERL) $(GLIB)\\gobject\\glib-mkenums/$(PERL) $(GLIB)\/gobject\/glib-mkenums/g' makefile.msc > makefile.msc.new
+  mv -v makefile.msc.new makefile.msc
+  sed -e 's/opentype\\pango-ot.lib/opentype\/pango-ot.lib/g' makefile.msc > makefile.msc.new
+  mv -v makefile.msc.new makefile.msc
   nmake -f makefile.msc
   mkdir -pv ../../../include/pango
   cp -v pango-attributes.h pango-bidi-type.h pango-break.h pangocairo.h pango-context.h pango-coverage.h pango-engine.h pango-enum-types.h pangofc-decoder.h pangofc-font.h pangofc-fontmap.h pango-features.h pango-font.h pango-fontmap.h pango-fontset.h pangoft2.h pango-glyph.h pango-glyph-item.h pango-gravity.h pango.h pango-item.h pango-language.h pango-layout.h pango-matrix.h pango-modules.h pango-ot.h pango-renderer.h pango-script.h pango-tabs.h pango-types.h pango-utils.h pangowin32.h pangoxft.h pangoxft-render.h pangox.h ../../../include/pango

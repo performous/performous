@@ -72,7 +72,7 @@ int Players::lookup(std::string const& name) const {
 std::string Players::lookup(int id) const {
 	PlayerItem pi;
 	pi.id = id;
-	players_t::iterator it = m_players.find(pi);
+	players_t::const_iterator it = m_players.find(pi);
 	if (it == m_players.end()) return "Unkown Player";
 	else return it->name;
 }

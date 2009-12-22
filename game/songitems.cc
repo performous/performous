@@ -86,7 +86,7 @@ int SongItems::lookup(boost::shared_ptr<Song> song) const {
 std::string SongItems::lookup (int id) const {
 	SongItem si;
 	si.id = id;
-	songs_t::iterator it = m_songs.find(si);
+	songs_t::const_iterator it = m_songs.find(si);
 	if (it == m_songs.end()) return "Unkown Song";
 	else if (!it->song) return it->artist + " - " + it->title;
 	else return it->song->artist + " - " + it->song->title;

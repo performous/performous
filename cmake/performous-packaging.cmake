@@ -73,5 +73,21 @@ if(UNIX)
 	message(STATUS "Detected ${CPACK_SYSTEM_NAME}. Use make package to build packages (${CPACK_GENERATOR}).")
 endif(UNIX)
 
+if(WIN32)
+  set(CPACK_GENERATOR "NSIS")
+  set(CPACK_PACKAGE_EXECUTABLES "performous" "Performous - game")#executable file - display name to menu programs
+  set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CMAKE_PROJECT_NAME}")
+  # There is a bug in NSI that does not handle full unix paths properly. Make
+  # sure there is at least one set of four (4) backlasshes.
+  SET(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/themes/default\\\\icon.bmp")
+  SET(CPACK_NSIS_MUI_ICON "${CMAKE_CURRENT_SOURCE_DIR}/themes/default\\\\icon.ico")
+  SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\${CMAKE_PROJECT_NAME}.exe")
+  SET(CPACK_NSIS_DISPLAY_NAME "${CPACK_PACKAGE_INSTALL_DIRECTORY} Performous!")
+  SET(CPACK_NSIS_HELP_LINK "http:\\\\\\\\performous.org")
+  SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\performous.org")
+  SET(CPACK_NSIS_MODIFY_PATH OFF)
+
+endif(WIN32)
+
 include(CPack)
 

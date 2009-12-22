@@ -10,6 +10,7 @@
 #include <libda/mixer.hpp>
 
 using boost::int16_t;
+using boost::int64_t;
 
 /// audiostream
 /** allows buffering, fading and mixing of audiostreams

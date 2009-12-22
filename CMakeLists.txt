@@ -37,6 +37,18 @@ add_subdirectory(themes)
 add_subdirectory(data)
 add_subdirectory(game)
 add_subdirectory(docs)
+find_package(Gettext)
+if(Gettext_FOUND)
+	if(WIN32)
+		SET(LOCALE_DIR "../locale")
+	endif(WIN32)
+	
+	if(NOT LOCALE_DIR)
+		message(QUIET "Set LOCALE_DIR to path to get Gettext working")
+	else()
+		add_subdirectory(lang)
+	endif(NOT LOCALE_DIR)
+endif(Gettext_FOUND)
 
 set(LIB_SUFFIX "" CACHE STRING "Optional suffix to use on lib folders (e.g. 64 for lib64)")
 

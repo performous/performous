@@ -13,9 +13,9 @@ Download POEdit (http://www.poedit.net/)
   12. Click Okay
   13. Choose a name for your .po file (performous) 
   
-REMEMBER TO SAVE INTO A SUBDIR WITH <your-locale>/LC_MESSAGES/performous.po
+REMEMBER TO SAVE WITH YOU LOCALE NAME
 
 Example for English:
-en/LC_MESSAGES/performous.po
+en.po
 
 Thanks to guide at http://codex.wordpress.org/User:Skippy/Creating_POT_Files

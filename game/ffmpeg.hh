@@ -9,8 +9,9 @@
 #include <boost/thread/thread.hpp>
 #include <vector>
 
-using boost::int16_t;
 using boost::uint8_t;
+using boost::int16_t;
+using boost::int64_t;
 
 /// single audio frame
 struct AudioFrame {
