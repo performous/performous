@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 2.6)
+file(GLOB LANGUAGES *.po)
+foreach(language ${LANGUAGES})
+	string(REGEX REPLACE "(.+(\\\\|/))+" "" language ${language})
+	string(REGEX REPLACE "\\.po$" "" language ${language})
+	execute_process(COMMAND ${MSGFMT} ${CMAKE_CURRENT_SOURCE_DIR}/${language}.po -o ${CMAKE_CURRENT_BINARY_DIR}/${language}.mo)
+	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${language}.mo DESTINATION ${LOCALE_DIR}/${language}/LC_MESSAGES/${CMAKE_PROJECT_NAME}.mo)
+endforeach(language)
