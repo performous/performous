@@ -4,14 +4,27 @@ FILE(GLOB SOURCE_FILES "*.cc")
 FILE(GLOB HEADER_FILES "*.hh")
 
 if(WIN32)
-  if(MSVC)
-    set(RESOURCE_FILES ../win32/performous.rc)
-  else()
-    # mingw32 - TODO
-    set(RESOURCE_FILES) #nothing
+  set(RESOURCE_FILES "${CMAKE_BINARY_DIR}/performous.rc")
+  set(RESOURCE_OBJECT)#nothing
+  
+  configure_file("../win32/performous.cmake.rc" "${RESOURCE_FILES}")
+  if(NOT MSVC)
+    #in according to MinGW tools, we need to compile the rc file, and then link it into projects:
+	#windres foo.rc foores.o
+    #gcc -o foo.exe foo.o foores.o
+	find_program(WINDRES windres)
+	if(NOT WINDRES)
+		message(STATUS "Cannot find windres. Will not create a versioned exe")
+		set(RESOURCE_FILES)
+		set(RESOURCE_OBJECT)
+	else()
+		set(RESOURCE_OBJECT "${CMAKE_BINARY_DIR}/performous.rc.o")
+		execute_process(COMMAND "${WINDRES}" "${RESOURCE_FILES}" "${RESOURCE_OBJECT}")
+	endif(NOT WINDRES)
   endif()
 else()
   set(RESOURCE_FILES) #nothing
+  set(RESOURCE_OBJECT)#nothing
 endif()
 
 set(SOURCES ${SOURCE_FILES} ${HEADER_FILES} ${RESOURCE_FILES})
@@ -77,7 +90,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 	add_definitions("-D__STDC_CONSTANT_MACROS")
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
-add_executable(performous ${SOURCES} ${SDL_SOURCES})
+add_executable(performous ${SOURCES} ${SDL_SOURCES} ${RESOURCE_OBJECT})
 target_link_libraries(performous ${LIBS})
 
 # Store library paths in executable
