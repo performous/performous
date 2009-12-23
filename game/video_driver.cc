@@ -119,9 +119,6 @@ void Window::screenshot() {
 	image.flip();
 	image.write(fnstr.str().c_str());
 #endif
-	char filename[256];
-	sprintf(filename,"/tmp/performous_screenshot_%u.png",count);
-	image.write(filename);
 	count++;
 }
 
