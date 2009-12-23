@@ -44,7 +44,7 @@ else()
 endif()
 
 # Find all the libs that don't require extra parameters
-foreach(lib ${OUR_LIBS} SDL PangoCairo LibRSVG LibXML++ Magick++ GLEW AVFormat SWScale OpenGL Z Jpeg Tiff Png)
+foreach(lib ${OUR_LIBS} SDL PangoCairo LibRSVG LibXML++ GLEW AVFormat SWScale OpenGL Z Jpeg Tiff Png)
 	find_package(${lib} REQUIRED)
 	include_directories(${${lib}_INCLUDE_DIRS})
 	list(APPEND LIBS ${${lib}_LIBRARIES})
@@ -79,6 +79,10 @@ if(SDL_image_FOUND)
   message(STATUS "SDL_image: found, enabling replacements for Magick++ code")
 else()
   message(STATUS "SDL_image: not found, falling back to Magick++")
+  find_package(Magick++ REQUIRED)
+  include_directories(${Magick++_INCLUDE_DIRS})
+  list(APPEND LIBS ${Magick++_LIBRARIES})
+  add_definitions(${Magick++_DEFINITIONS})
 endif()
 
 # Set default compile flags for GCC
