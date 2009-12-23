@@ -97,14 +97,22 @@ template <typename T> void loader(T& target, std::string filename, bool autocrop
 		if (imgsurf == NULL) {
 			throw std::runtime_error("Unable to load " + filename + ": " + IMG_GetError());
 		}
-		// TODO: blit to a new RGBA surface to ensure it actually *is* RGBA
-		try {
-			target.load(imgsurf->w, imgsurf->h, pix::CHAR_RGBA, reinterpret_cast<const unsigned char*>(imgsurf->pixels));
+		// Copy the image to an RGBA surface to ensure that it is indeed RGBA.
+		SDL_Surface* rgbasurf = SDL_CreateRGBSurface(SDL_SWSURFACE, imgsurf->w, imgsurf->h, 32,
+#if SDL_BYTEORDER == SDL_BIGENDIAN
+		  0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff
+#else
+		  0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000
+#endif
+		);
+		if (rgbasurf == NULL) {
 			SDL_FreeSurface(imgsurf);
-		} catch (...) {
-			SDL_FreeSurface(imgsurf);
-			throw;
+			throw std::runtime_error(std::string("Unable to allocate image surface: ") + IMG_GetError());
 		}
+		SDL_BlitSurface(imgsurf, NULL, rgbasurf, NULL);
+		SDL_FreeSurface(imgsurf);
+		target.load(rgbasurf->w, rgbasurf->h, pix::CHAR_RGBA, reinterpret_cast<const unsigned char*>(rgbasurf->pixels));
+		SDL_FreeSurface(rgbasurf);
 	#else
 		Magick::Image image;
 		Magick::Blob blob;
