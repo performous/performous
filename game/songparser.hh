@@ -107,19 +107,22 @@ class SongParser {
 	double m_maxScore;
 	std::vector<std::pair<double,double> > m_stops;
 	struct BPM {
-		BPM(double _begin, unsigned int _ts, double bpm): begin(_begin), step(0.25 * 60.0 / bpm), ts(_ts) {}
+		BPM(double _begin, double _ts, double bpm): begin(_begin), step(0.25 * 60.0 / bpm), ts(_ts) {}
 		double begin; // Time in seconds
 		double step; // Seconds per quarter note
-		unsigned int ts;
+		double ts;
 	};
 	typedef std::vector<BPM> bpms_t;
 	bpms_t m_bpms;
-	void addBPM(unsigned int ts, double bpm) {
-		if (!m_bpms.empty() && m_bpms.back().ts >= ts) throw std::runtime_error("Invalid BPM timestamp");
+	void addBPM(double ts, double bpm) {
 		if (!(bpm >= 1.0 && bpm < 1e12)) throw std::runtime_error("Invalid BPM value");
+		if (!m_bpms.empty() && m_bpms.back().ts >= ts) {
+			if (m_bpms.back().ts < ts) throw std::runtime_error("Invalid BPM timestamp");
+			m_bpms.pop_back(); // Some ITG songs contain repeated BPM definitions...
+		}
 		m_bpms.push_back(BPM(tsTime(ts), ts, bpm));
 	}
-	double tsTime(unsigned int ts) const {
+	double tsTime(double ts) const {
 		if (m_bpms.empty()) {
 			if (ts != 0) throw std::runtime_error("BPM data missing");
 			return m_gap;
