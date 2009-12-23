@@ -252,7 +252,7 @@ void GuitarGraph::activateStarpower() {
 
 /// Mark the holding of a note as ended
 void GuitarGraph::endHold(int fret, double time) {
-	if (!m_holds[fret]) return;
+	if (fret >= 5 || !m_holds[fret]) return;
 	m_events[m_holds[fret] - 1].glow.setTarget(0.0);
 	m_events[m_holds[fret] - 1].whammy.setTarget(0.0, true);
 	m_holds[fret] = 0;
@@ -286,6 +286,7 @@ void GuitarGraph::fail(double time, int fret) {
 
 /// Handle drum hit scoring
 void GuitarGraph::drumHit(double time, int fret) {
+	if (fret >= 5) return;
 	// Find any suitable note within the tolerance
 	double tolerance = maxTolerance;
 	Chords::iterator best = m_chords.end();
@@ -335,6 +336,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 			frets[fret] = ev.pressed[fret];
 		}
 	} else { // Attempt to tap
+		if (ev.button >= 5) return;
 		if (m_correctness.get() < 0.5 && m_starpower.get() < 0.001) return; // Hammering not possible at the moment
 		for (int fret = ev.button + 1; fret < 5; ++fret) {
 			if (ev.pressed[fret]) return; // Extra buttons on right side
