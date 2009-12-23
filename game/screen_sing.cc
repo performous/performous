@@ -59,28 +59,21 @@ void ScreenSing::enter() {
 	if( !m_song->track_map.empty() ) {
 		// Here we load alternatively guitar/bass tracks until no guitar controler is available
 		// then we load all the drums tracks until no drum controler is available (and place them in second position)
-		bool no_guitar = false;
-		bool no_guitar2 = false;
-		bool no_guitar3 = false;
-		bool no_bass = false;
+		std::vector<std::string> instrument_tracks;
+		instrument_tracks.push_back("guitar");
+		instrument_tracks.push_back("coop guitar");
+		instrument_tracks.push_back("bass");
+		instrument_tracks.push_back("rhythm guitar");
 		while (1) {
-			try {
-				Instruments::iterator it = m_instruments.end();
-				m_instruments.insert(it, new GuitarGraph(m_audio, *m_song, "guitar"));
-			} catch (std::runtime_error&) {no_guitar = true;}
-			try {
-				Instruments::iterator it = m_instruments.end();
-				m_instruments.insert(it, new GuitarGraph(m_audio, *m_song, "coop guitar"));
-			} catch (std::runtime_error&) {no_guitar2 = true;}
-			try {
-				Instruments::iterator it = m_instruments.end();
-				m_instruments.insert(it, new GuitarGraph(m_audio, *m_song, "bass"));
-			} catch (std::runtime_error&) {no_bass = true;}
-			try {
-				Instruments::iterator it = m_instruments.end();
-				m_instruments.insert(it, new GuitarGraph(m_audio, *m_song, "rhythm guitar"));
-			} catch (std::runtime_error&) {no_guitar3 = true;}
-			if( no_guitar && no_guitar2 && no_guitar3 && no_bass ) break;
+			bool assigned = false;
+			for (std::vector<std::string>::const_iterator it = instrument_tracks.begin(); it != instrument_tracks.end(); ++it) {
+				try {
+					Instruments::iterator ite = m_instruments.end();
+					m_instruments.insert(ite, new GuitarGraph(m_audio, *m_song, *it));
+					assigned = true;
+				} catch (std::runtime_error&) {}
+			}
+			if( !assigned ) break;
 		}
 		while(1) {
 			try {
