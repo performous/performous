@@ -91,9 +91,7 @@ template <typename T> void loader(T& target, std::string filename, bool autocrop
 		rsvg_term();
 	} else {
 	#ifdef LESS_MAGIC
-		IMG_Init(0);
 		SDL_Surface* imgsurf = IMG_Load(filename.c_str());
-		IMG_Quit();
 		if (imgsurf == NULL) {
 			throw std::runtime_error("Unable to load " + filename + ": " + IMG_GetError());
 		}
