@@ -3,7 +3,18 @@ cmake_minimum_required(VERSION 2.6)
 FILE(GLOB SOURCE_FILES "*.cc")
 FILE(GLOB HEADER_FILES "*.hh")
 
-set(SOURCES ${SOURCE_FILES} ${HEADER_FILES})
+if(WIN32)
+  if(MSVC)
+    set(RESOURCE_FILES ../win32/performous.rc)
+  else()
+    # mingw32 - TODO
+    set(RESOURCE_FILES) #nothing
+  endif()
+else()
+  set(RESOURCE_FILES) #nothing
+endif()
+
+set(SOURCES ${SOURCE_FILES} ${HEADER_FILES} ${RESOURCE_FILES})
 
 # Libraries
 
