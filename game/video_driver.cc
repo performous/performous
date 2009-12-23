@@ -102,7 +102,7 @@ void Window::screenshot() {
 	tgaout << static_cast<char>(height >> 8);
 	tgaout << static_cast<char>(24);  /* bits per pixel */
 	tgaout << static_cast<char>(0x00);  /* no special flags */
-	for (int i = 0; i < width*height*3; i += 3)
+	for (unsigned i = 0; i < width*height*3; i += 3)
 		std::swap(buffer[i], buffer[i+2]);  /* fix the channel order */
 	tgaout.write(&buffer[0], width*height*3);  /* dump the image data */
 	tgaout.close();
