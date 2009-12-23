@@ -34,10 +34,3 @@ find_path(Gettext_INCLUDE_DIR
 
 set(Gettext_PROCESS_INCLUDES Gettext_INCLUDE_DIR)
 libfind_process(Gettext)
-
-if(Gettext_FOUND)
-	find_program(MSGFMT msgfmt)
-	if(NOT MSGFMT)
-		message(FATAL_ERROR "Cannot find msgfmt to convert language file. Please specify path of msgfmt")
-	endif(NOT MSGFMT)
-endif(Gettext_FOUND)

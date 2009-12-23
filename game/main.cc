@@ -207,10 +207,12 @@ template <typename Container> void confOverride(Container const& c, std::string 
 }
 
 int main(int argc, char** argv) {
+#ifdef USE_GETTEXT
 	// initialize gettext
-    setlocale (LC_ALL, "");
-    bindtextdomain (PACKAGE, "../locale");
-    textdomain (PACKAGE);
+	setlocale (LC_MESSAGES, "");
+	bindtextdomain (PACKAGE, LOCALEDIR);
+	textdomain (PACKAGE);
+#endif
 
 	std::cout << PACKAGE " " VERSION << std::endl;
 	std::signal(SIGINT, quit);
