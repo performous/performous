@@ -124,9 +124,9 @@ void ScreenSing::instrumentLayout(double time) {
 	}
 	if (time < -0.5) {
 		glColor4f(1.0f, 1.0f, 1.0f, clamp(-1.0 - 2.0 * time));
-    #ifndef _WIN32
+#ifndef _WIN32  // FIXME
 		m_help->draw();
-    #endif
+#endif
 		glColor3f(1.0f, 1.0f, 1.0f);
 	}
 	// Set volume levels (averages of all instruments playing that track)
@@ -159,9 +159,9 @@ void ScreenSing::danceLayout(double time) {
 	}
 	if (time < -0.5) {
 		glColor4f(1.0f, 1.0f, 1.0f, clamp(-1.0 - 2.0 * time));
-    #ifndef _WIN32
+#ifndef _WIN32  // FIXME
 		m_help->draw();
-    #endif
+#endif
 		glColor3f(1.0f, 1.0f, 1.0f);
 	}
 }
@@ -172,7 +172,7 @@ void ScreenSing::exit() {
 	m_dancers.clear();
 	m_layout_singer.reset();
 	m_engine.reset();
-#ifndef _WIN32
+#ifndef _WIN32  // FIXME
 	m_help.reset();
 #endif
 	m_pause_icon.reset();
