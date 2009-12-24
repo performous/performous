@@ -314,9 +314,6 @@ void ScreenSongs::draw() {
 			// Force reload of data
 			m_playing.clear();
 		}
-	} else if (!m_audio.isPaused() && m_playTimer.get() > IDLE_TIMEOUT) {  // Switch if song hasn't changed for IDLE_TIMEOUT seconds
-		if (!m_search.text.empty()) { m_search.text.clear(); m_songs.setFilter(m_search.text); }
-		m_songs.random();
-	}
+	} else if (!m_audio.isPaused() && m_playTimer.get() > IDLE_TIMEOUT) m_songs.random();  // Switch if song hasn't changed for IDLE_TIMEOUT seconds
 }
 
