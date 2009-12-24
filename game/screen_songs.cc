@@ -26,7 +26,6 @@ void ScreenSongs::enter() {
 	m_instrumentCover.reset(new Surface(getThemePath("instrument_cover.svg")));
 	m_bandCover.reset(new Surface(getThemePath("band_cover.svg")));
 	m_instrumentList.reset(new Texture(getThemePath("instruments.svg")));
-	m_search.text.clear();
 	m_songs.setFilter(m_search.text);
 	m_audio.fadeout();
 	m_jukebox = false;
