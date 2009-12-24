@@ -10,7 +10,7 @@
 #include <iostream>
 #include <sstream>
 
-static const double IDLE_TIMEOUT = 10.0; // seconds
+static const double IDLE_TIMEOUT = 45.0; // seconds
 
 ScreenSongs::ScreenSongs(std::string const& name, Audio& audio, Songs& songs):
   Screen(name), m_audio(audio), m_songs(songs), m_covers(20), m_jukebox()
@@ -187,8 +187,7 @@ void ScreenSongs::draw() {
 		Song& song = m_songs.current();
 		// Format the song information text
 		oss_song << song.title << '\n' << song.artist;
-		oss_order << "filter: " << (m_search.text.empty() ? "none" : m_search.text) << '\n';
-		oss_order << m_songs.sortDesc() << '\n';
+		oss_order << (m_search.text.empty() ? m_songs.sortDesc() : m_search.text) << '\n';
 		oss_order << "(" << m_songs.currentId() + 1 << "/" << m_songs.size() << ")";
 		double spos = m_songs.currentPosition(); // This needs to be polled to run the animation
 		if (!m_jukebox) {
@@ -315,6 +314,6 @@ void ScreenSongs::draw() {
 			// Force reload of data
 			m_playing.clear();
 		}
-	} else if (!m_audio.isPaused() && m_playTimer.get() > IDLE_TIMEOUT) m_songs.advance(1);  // Switch if song hasn't changed for IDLE_TIMEOUT seconds
+	} else if (!m_audio.isPaused() && m_playTimer.get() > IDLE_TIMEOUT) m_songs.random();  // Switch if song hasn't changed for IDLE_TIMEOUT seconds
 }
 
