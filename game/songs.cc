@@ -199,12 +199,12 @@ namespace {
 
     static char const* order[] = {
 	    "random order",
-	    "by song",
-	    "by artist",
-	    "by edition",
-	    "by genre",
-	    "by path",
-	    "by language"
+	    "sorted by song",
+	    "sorted by artist",
+	    "sorted by edition",
+	    "sorted by genre",
+	    "sorted by path",
+	    "sorted by language"
     };
 
     static const int orders = sizeof(order) / sizeof(*order);
