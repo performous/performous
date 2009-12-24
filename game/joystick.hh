@@ -165,7 +165,10 @@ namespace input {
 		void process();
 	  private:
 		pm::Input stream;
+		unsigned int devnum;
 		Event event;
+		typedef std::map<unsigned, unsigned> Map;
+		Map map;
 	};
 #endif
 	
