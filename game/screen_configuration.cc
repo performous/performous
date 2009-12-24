@@ -47,17 +47,17 @@ void ScreenConfiguration::draw() {
 		ConfigItem const& ci = config[configuration[selected]];
 		theme->item.draw(ci.getShortDesc());
 		theme->value.draw(ci.getValue());
-		// Long description
-		theme->comment_bg.dimensions.middle().screenBottom(-0.05);
-		theme->comment_bg.draw();
-		theme->comment.dimensions.left(-0.48).screenBottom(-0.068);
-		theme->comment.draw(ci.getLongDesc());
 		// Key help
+		theme->short_comment_bg.dimensions.fixedHeight(0.025);
+		theme->short_comment_bg.dimensions.right(-0.04).screenBottom(-0.054);
+		theme->short_comment_bg.draw();
+		theme->comment.dimensions.left(-0.48).screenBottom(-0.067);
+		theme->comment.draw("Ctrl + S to save, Ctrl + R to reset defaults");
+		// Long description
 		theme->comment_bg.dimensions.middle().screenBottom(-0.01);
 		theme->comment_bg.draw();
 		theme->comment.dimensions.left(-0.48).screenBottom(-0.028);
-		theme->comment.draw("Ctrl + S to save, Ctrl + R to reset defaults");
-
+		theme->comment.draw(ci.getLongDesc());
 	}
 }
 

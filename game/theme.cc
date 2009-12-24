@@ -39,7 +39,8 @@ ThemeConfiguration::ThemeConfiguration():
 	item(getThemePath("configuration_item.svg"), config["graphic/text_lod"].f()),
 	value(getThemePath("configuration_value.svg"), config["graphic/text_lod"].f()),
 	comment(getThemePath("menu_comment.svg"), config["graphic/text_lod"].f()),
-	comment_bg(getThemePath("menu_comment_bg.svg"))
+	comment_bg(getThemePath("menu_comment_bg.svg")),
+	short_comment_bg(getThemePath("menu_scomment_bg.svg"))
 {}
 
 ThemeIntro::ThemeIntro():

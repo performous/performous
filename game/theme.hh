@@ -61,6 +61,8 @@ struct ThemeConfiguration: Theme {
 	SvgTxtTheme comment;
 	/// configuration comment background
 	Surface comment_bg;
+	/// configuration comment background (short tip)
+	Surface short_comment_bg;
 };
 
 /// theme for intro screen
