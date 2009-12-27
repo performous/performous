@@ -7,7 +7,7 @@
 #include "joystick.hh"
 
 #include <SDL.h>
-#ifdef LESS_MAGIC
+#ifdef USE_SDL_IMAGE
   #include <sstream>
   #include <fstream>
 #else
@@ -82,7 +82,7 @@ void Window::screenshot() {
 	fnstr << "/tmp/";
 #endif
 	fnstr << "performous_screenshot_" << count;
-#ifdef LESS_MAGIC
+#ifdef USE_SDL_IMAGE
 	/* Write the image out as an uncompressed tga. */
 	fnstr << ".tga";
 	std::ofstream tgaout(fnstr.str().c_str(), std::ios::binary);

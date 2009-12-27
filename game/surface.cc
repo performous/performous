@@ -6,7 +6,7 @@
 
 #include <librsvg/rsvg.h>
 #include <librsvg/rsvg-cairo.h>
-#ifdef LESS_MAGIC
+#ifdef USE_SDL_IMAGE
 	#include <SDL_image.h>
 #else
 	#include <Magick++.h>
@@ -90,7 +90,7 @@ template <typename T> void loader(T& target, std::string filename, bool autocrop
 		gdk_pixbuf_unref(pb);
 		rsvg_term();
 	} else {
-	#ifdef LESS_MAGIC
+	#ifdef USE_SDL_IMAGE
 		SDL_Surface* imgsurf = IMG_Load(filename.c_str());
 		if (imgsurf == NULL) {
 			throw std::runtime_error("Unable to load " + filename + ": " + IMG_GetError());
