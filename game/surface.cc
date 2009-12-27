@@ -95,7 +95,12 @@ template <typename T> void loader(T& target, std::string filename, bool autocrop
 		if (imgsurf == NULL) {
 			throw std::runtime_error("Unable to load " + filename + ": " + IMG_GetError());
 		}
-		// Copy the image to an RGBA surface to ensure that it is indeed RGBA.
+		// If an alpha channel is present in the source, ensure that SDL_SRCALPHA is not set on it
+		// so the alpha actually makes it onto the destination surface.
+		if (imgsurf->format->Amask != 0) {
+			SDL_SetAlpha(imgsurf, 0, 0);
+		}
+		// Copy the image to an RGBA surface to ensure that it is indeed RGBA with the right pixel layout.
 		SDL_Surface* rgbasurf = SDL_CreateRGBSurface(SDL_SWSURFACE, imgsurf->w, imgsurf->h, 32,
 #if SDL_BYTEORDER == SDL_BIGENDIAN
 		  0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff
