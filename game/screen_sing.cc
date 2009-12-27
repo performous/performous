@@ -96,7 +96,9 @@ void ScreenSing::enter() {
 	m_engine.reset(new Engine(m_audio, *m_song, analyzers.begin(), analyzers.end(), m_database));
 }
 
-void ScreenSing::instrumentLayout(double time) {
+/// Manages the instrument drawing
+/// Returns false if no instuments are alive
+bool ScreenSing::instrumentLayout(double time) {
 	int count = 0, i = 0;
 	// Count active instruments
 	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it)
@@ -134,6 +136,7 @@ void ScreenSing::instrumentLayout(double time) {
 			m_audio.streamFade(it->first, level);
 		}
 	}
+	return (count > 0);
 }
 
 void ScreenSing::danceLayout(double time) {
@@ -301,8 +304,8 @@ void ScreenSing::draw() {
 	} else if( m_instruments.empty() ) {
 		m_layout_singer->draw(time, LayoutSinger::BOTTOM);
 	} else {
-		instrumentLayout(time);
-		m_layout_singer->draw(time, LayoutSinger::MIDDLE);
+		bool some_alive = instrumentLayout(time);
+		m_layout_singer->draw(time, some_alive ? LayoutSinger::MIDDLE : LayoutSinger::BOTTOM);
 	}
 
 	Song::Status status = m_song->status(time);

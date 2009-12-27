@@ -70,7 +70,7 @@ class ScreenSing: public Screen {
 	  - is the hiscore file writable
 	  */
 	void activateNextScreen();
-	void instrumentLayout(double time);
+	bool instrumentLayout(double time);
 	void danceLayout(double time);
 	Audio& m_audio;
 	Capture& m_capture;
