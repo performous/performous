@@ -25,6 +25,7 @@ namespace {
 	const float future = 1.5f;
 	const float timescale = 25.0f;
 	const float texCoordStep = -0.5f; // Two beat lines per neck texture => 0.5 tex units per beat
+	const float flameSpd = 6.0f; // Multiplier for flame growth
 	// Note: t is difference from playback time so it must be in range [past, future]
 	float time2y(float t) { return -timescale * (t - past) / (future - past); }
 	float time2a(float t) {
@@ -66,6 +67,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
   m_song(song),
   m_button(getThemePath("button.svg")),
   m_button_l(getThemePath("button_l.svg")),
+  m_flame(getThemePath("flame.svg")),
   m_tap(getThemePath("tap.svg")),
   m_neckglow(getThemePath("neck_glow.svg")),
   m_neckglowColor(),
@@ -315,6 +317,8 @@ void GuitarGraph::drumHit(double time, int fret) {
 		double score = points(tolerance);
 		m_chordIt->score += score;
 		m_score += score;
+		m_flames[fret].push_back(AnimValue(0.0, flameSpd));
+		m_flames[fret].back().setTarget(1.0);
 		if (m_chordIt->status == m_chordIt->polyphony) {
 			//m_score -= m_chordIt->score;
 			//m_chordIt->score *= m_chordIt->polyphony;
@@ -395,6 +399,8 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 			m_events.push_back(Event(time, 1 + picked, fret, dur));
 			m_notes[dur] = m_events.size();
 			m_holds[fret] = m_events.size();
+			m_flames[fret].push_back(AnimValue(0.0, flameSpd));
+			m_flames[fret].back().setTarget(1.0);
 		}
 	}
 }
@@ -460,6 +466,17 @@ glutil::Color const& GuitarGraph::color(int fret) const {
 	return fretColors[fret];
 }
 
+namespace {
+	const float fretWid = 0.5f; // The actual width is two times this
+	
+	/// Create a symmetric vertex pair of given data
+	void vertexPair(float x, float y, glutil::Color c, float ty, float fretW = fretWid) {
+		c.a = y2a(y); glColor4fv(c);
+		glNormal3f(0.0f,1.0f,0.0f); glTexCoord2f(0.0f, ty); glVertex2f(x - fretW, y);
+		glNormal3f(0.0f,1.0f,0.0f); glTexCoord2f(1.0f, ty); glVertex2f(x + fretW, y);
+	}
+}
+
 /// Main drawing function (projection, neck, cursor...)
 void GuitarGraph::draw(double time) {
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
@@ -520,39 +537,67 @@ void GuitarGraph::draw(double time) {
 			}
 			
 			// Draw the notes
-			glutil::UseLighting lighting(m_use3d);
-			for (Chords::iterator it = m_chords.begin(); it != m_chords.end(); ++it) {
-				float tBeg = it->begin - time;
-				float tEnd = it->end - time;
-				if (tBeg > future) break;
-				if (tEnd < past) {
-					if (it->status < 100) it->status += 100; // Mark as past note for rewinding
-					continue;
-				}
-				if (it->status >= 100 || (tBeg > maxTolerance
-				  && it->status > 0)) continue; // Don't show past chords when rewinding
-				for (int fret = 0; fret < 5; ++fret) { // Loop through the frets
-					if (!it->fret[fret] || (tBeg > maxTolerance && it->releaseTimes[fret] > 0)) continue;
-					if (tEnd > future) tEnd = future;
-					unsigned event = m_notes[it->dur[fret]];
-					float glow = 0.0f;
-					float whammy = 0.0f;
-					if (event > 0) {
-						glow = m_events[event - 1].glow.get();
-						whammy = m_events[event - 1].whammy.get();
+			{ glutil::UseLighting lighting(m_use3d);
+				for (Chords::iterator it = m_chords.begin(); it != m_chords.end(); ++it) {
+					float tBeg = it->begin - time;
+					float tEnd = it->end - time;
+					if (tBeg > future) break;
+					if (tEnd < past) {
+						if (it->status < 100) it->status += 100; // Mark as past note for rewinding
+						continue;
 					}
-					// Get a color for the fret and adjust it if GodMode is on
-					glutil::Color c = starpowerColorize(color(fret), m_starpower.get());
-					if (glow > 0.1f) { ng_r+=c.r; ng_g+=c.g; ng_b+=c.b; ng_ccnt++; } // neck glow
-					// Further adjust the color if the note is hit
-					c.r += glow;
-					c.g += glow;
-					c.b += glow;
-					if (glow > 0.5f && tEnd < 0.1f && it->hitAnim[fret].get() == 0.0) 
-					  it->hitAnim[fret].setTarget(1.0);
-					// Call the actual note drawing function
-					drawNote(fret, c, tBeg, tEnd, whammy, it->tappable, glow > 0.5f, it->hitAnim[fret].get(), 
-					  it->releaseTimes[fret] > 0.0 ? it->releaseTimes[fret] - time : 0.0);
+					if (it->status >= 100 || (tBeg > maxTolerance
+					  && it->status > 0)) continue; // Don't show past chords when rewinding
+					for (int fret = 0; fret < 5; ++fret) { // Loop through the frets
+						if (!it->fret[fret] || (tBeg > maxTolerance && it->releaseTimes[fret] > 0)) continue;
+						if (tEnd > future) tEnd = future;
+						unsigned event = m_notes[it->dur[fret]];
+						float glow = 0.0f;
+						float whammy = 0.0f;
+						if (event > 0) {
+							glow = m_events[event - 1].glow.get();
+							whammy = m_events[event - 1].whammy.get();
+						}
+						// Get a color for the fret and adjust it if GodMode is on
+						glutil::Color c = starpowerColorize(color(fret), m_starpower.get());
+						if (glow > 0.1f) { ng_r+=c.r; ng_g+=c.g; ng_b+=c.b; ng_ccnt++; } // neck glow
+						// Further adjust the color if the note is hit
+						c.r += glow;
+						c.g += glow;
+						c.b += glow;
+						if (glow > 0.5f && tEnd < 0.1f && it->hitAnim[fret].get() == 0.0) {
+							it->hitAnim[fret].setTarget(1.0);
+							if (it->end - it->begin > 2 * maxTolerance) {
+								m_flames[fret].push_back(AnimValue(0.0, flameSpd));
+								m_flames[fret].back().setTarget(1.0);
+							}
+						}
+						// Call the actual note drawing function
+						drawNote(fret, c, tBeg, tEnd, whammy, it->tappable, glow > 0.5f, it->hitAnim[fret].get(), 
+						  it->releaseTimes[fret] > 0.0 ? it->releaseTimes[fret] - time : 0.0);
+					}
+				}
+			} //< disable lighting
+			
+			// Draw flames
+			for (int fret = 0; fret < 5; ++fret) { // Loop through the frets
+				float x = -2.0f + fret - 0.5f * m_drums;
+				for (std::vector<AnimValue>::iterator it = m_flames[fret].begin(); it != m_flames[fret].end();) {
+					float flameAnim = it->get();
+					if (flameAnim < 1.0f) {
+						float h = flameAnim * 4.0f * fretWid;
+						UseTexture tblock(m_flame);
+						glutil::Begin block(GL_TRIANGLE_STRIP);
+						glColor4f(1.0f,1.0f,1.0f,1.0f);
+						glTexCoord2f(0.0f, 1.0f); glVertex3f(x - fretWid, time2y(0.0f), 0.0f);
+						glTexCoord2f(1.0f, 1.0f); glVertex3f(x + fretWid, time2y(0.0f), 0.0f);
+						glTexCoord2f(0.0f, 0.0f); glVertex3f(x - fretWid, time2y(0.0f), h);
+						glTexCoord2f(1.0f, 0.0f); glVertex3f(x + fretWid, time2y(0.0f), h);
+					} else {
+						it = m_flames[fret].erase(it);
+						continue;
+					}
+					++it;
 				}
 			}
 		} //< reverse scale sc1
@@ -584,17 +629,6 @@ void GuitarGraph::draw(double time) {
 	}
 	drawInfo(time, offsetX, dimensions); // Go draw some texts and other interface stuff
 	glColor3f(1.0f, 1.0f, 1.0f);
-}
-
-namespace {
-	const float fretWid = 0.5f; // The actual width is two times this
-	
-	/// Create a symmetric vertex pair of given data
-	void vertexPair(float x, float y, glutil::Color c, float ty, float fretW = fretWid) {
-		c.a = y2a(y); glColor4fv(c);
-		glNormal3f(0.0f,1.0f,0.0f); glTexCoord2f(0.0f, ty); glVertex2f(x - fretW, y);
-		glNormal3f(0.0f,1.0f,0.0f); glTexCoord2f(1.0f, ty); glVertex2f(x + fretW, y);
-	}
 }
 
 /// Draws a single note
@@ -653,7 +687,7 @@ void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, fl
 	} else {
 		// Too short note: only render the ring
 		if (m_use3d) { // 3D
-			if (hitAnim > 0.0 && tEnd <= 0.1) {
+			if (hitAnim > 0.0 && tEnd <= maxTolerance) {
 				float s = 1.0 - hitAnim;
 				c.a = s; glColor4fv(c);
 				m_fretObj.draw(x, yBeg, 0.0f, s);

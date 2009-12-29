@@ -76,6 +76,7 @@ class GuitarGraph {
 	Song const& m_song;
 	Surface m_button;
 	Texture m_button_l;
+	Texture m_flame;
 	Surface m_tap;
 	Surface m_neckglow;
 	glutil::Color m_neckglowColor;
@@ -89,6 +90,7 @@ class GuitarGraph {
 	AnimValue m_starpower;
 	AnimValue m_cx, m_width;
 	std::size_t m_stream;
+	std::vector<AnimValue> m_flames[5];
 	TrackMapConstPtr m_track_map;
 	TrackMapConstPtr::const_iterator m_track_index;
 	void drumHit(double time, int pad);
