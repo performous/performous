@@ -71,7 +71,7 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 				config["graphic/fullscreen"].b() = !config["graphic/fullscreen"].b();
 				continue; // Already handled here...
 			}
-			if (keypressed ==  SDLK_F11 ) {
+			if (keypressed ==  SDLK_PRINT ) {
 				g_take_screenshot = true;
 			}
 			if (keypressed == SDLK_F4 && modifier & KMOD_ALT) {

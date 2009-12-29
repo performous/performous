@@ -38,7 +38,11 @@ void ScreenPractice::manageEvent(SDL_Event event) {
 	input::NavButton nav(input::getNav(event));
 	if (nav == input::CANCEL || nav == input::START || nav == input::SELECT) sm->activateScreen("Intro");
 	else if (nav == input::PAUSE) m_audio.togglePause();
-	else if (event.type == SDL_JOYBUTTONDOWN // Play drum sounds here
+	else if (event.type == SDL_KEYDOWN) {
+		int key = event.key.keysym.sym;
+		if (key == SDLK_F11) --config["audio/music_volume"];
+		else if (key == SDLK_F12) ++config["audio/music_volume"];
+	} else if (event.type == SDL_JOYBUTTONDOWN // Play drum sounds here
 	  && input::Private::devices[event.jbutton.which].type_match(input::DRUMS)) {
 		int b = input::buttonFromSDL(input::Private::devices[event.jbutton.which].type(), event.jbutton.button);
 		if (b != -1) m_audio.play(m_samples[unsigned(b) % m_samples.size()], "audio/fail_volume");

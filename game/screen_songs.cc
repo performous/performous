@@ -96,6 +96,8 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 		else if (m_songs.empty()) return;
 		else if (key == SDLK_PAGEUP) m_songs.advance(-10);
 		else if (key == SDLK_PAGEDOWN) m_songs.advance(10);
+		else if (key == SDLK_F11) --config["audio/preview_volume"];
+		else if (key == SDLK_F12) ++config["audio/preview_volume"];
 		else if (!m_jukebox && key == SDLK_F4) m_jukebox = true;
 		else if (key == SDLK_TAB && !(mod & KMOD_ALT)) m_songs.randomize();
 		else if (key == SDLK_END) {

@@ -46,6 +46,10 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 		} else if (nav == input::PAUSE) m_audio.togglePause();
 		// Normalize selected to [0, size)
 		selected = (m_menuOptions.size() + selected) % m_menuOptions.size();
+	} else if (event.type == SDL_KEYDOWN) {
+		int key = event.key.keysym.sym;
+		if (key == SDLK_F11) --config["audio/preview_volume"];
+		else if (key == SDLK_F12) ++config["audio/preview_volume"];
 	}
 }
 

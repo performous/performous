@@ -59,6 +59,8 @@ struct ThemeConfiguration: Theme {
 	SvgTxtTheme value;
 	/// configuration comment text
 	SvgTxtTheme comment;
+	/// configuration comment text (short tip)
+	SvgTxtTheme short_comment;
 	/// configuration comment background
 	Surface comment_bg;
 	/// configuration comment background (short tip)

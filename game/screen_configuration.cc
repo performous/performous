@@ -38,6 +38,8 @@ void ScreenConfiguration::manageEvent(SDL_Event event) {
 		if (configuration.empty()) return; // The rest work if there are any config options
 		else if (key == SDLK_r && modifier & KMOD_CTRL) ci->reset(modifier & KMOD_ALT);
 		else if (key == SDLK_s && modifier & KMOD_CTRL) writeConfig(modifier & KMOD_ALT);
+		else if (key == SDLK_F11) --config["audio/preview_volume"];
+		else if (key == SDLK_F12) ++config["audio/preview_volume"];
 	}
 }
 
@@ -51,8 +53,8 @@ void ScreenConfiguration::draw() {
 		theme->short_comment_bg.dimensions.fixedHeight(0.025);
 		theme->short_comment_bg.dimensions.right(-0.04).screenBottom(-0.054);
 		theme->short_comment_bg.draw();
-		theme->comment.dimensions.left(-0.48).screenBottom(-0.067);
-		theme->comment.draw("Ctrl + S to save, Ctrl + R to reset defaults");
+		theme->short_comment.dimensions.left(-0.48).screenBottom(-0.067);
+		theme->short_comment.draw("Ctrl + S to save, Ctrl + R to reset defaults");
 		// Long description
 		theme->comment_bg.dimensions.middle().screenBottom(-0.01);
 		theme->comment_bg.draw();
