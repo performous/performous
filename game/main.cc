@@ -212,6 +212,7 @@ int main(int argc, char** argv) {
 	setlocale (LC_MESSAGES, "");
 	bindtextdomain (PACKAGE, LOCALEDIR);
 	textdomain (PACKAGE);
+	bind_textdomain_codeset (PACKAGE, "UTF-8");
 #endif
 
 	std::cout << PACKAGE " " VERSION << std::endl;
