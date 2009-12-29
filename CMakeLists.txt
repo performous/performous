@@ -35,7 +35,7 @@ include_directories(libs/libda/include)
 #need to put here do setting LOCALE_DIR variable
 find_package(Gettext)
 if(Gettext_FOUND)
-	if(not LOCALE_DIR)
+	if(NOT LOCALE_DIR)
 		if(WIN32)
 			SET(LOCALE_DIR "../locale")
 		elseif(APPLE)
@@ -43,7 +43,7 @@ if(Gettext_FOUND)
 		else()#other os
 			SET(LOCALE_DIR "/usr/share/locale")
 		endif(WIN32)
-	endif(not LOCALE_DIR)
+	endif(NOT LOCALE_DIR)
 	
 	if(NOT LOCALE_DIR)
 		message(QUIET "Set LOCALE_DIR to path to get Gettext working")
