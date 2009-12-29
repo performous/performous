@@ -722,11 +722,8 @@ void GuitarGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 		m_popupText->render("God Mode\nActivated!");
 		m_popupText->dimensions().center(0.1).middle(offsetX).stretch(s,s);
 		m_popupText->draw();
-		s = 0.12 * (1.0 + godAnim);
-		glColor4f(0.8f, 0.8f, 1.0f, a);
-		m_popupText->render("Mistakes ignored");
-		m_popupText->dimensions().center(0.26).middle(offsetX).stretch(s, s/5.0);
-		m_popupText->draw();
+		m_text.dimensions.screenBottom(-0.02).middle(-0.12 + offsetX);
+		m_text.draw("Mistakes ignored!", 1.0 - godAnim);
 		if (godAnim > 0.999) m_godmodePopup.setTarget(0.0, true);
 	}
 }
