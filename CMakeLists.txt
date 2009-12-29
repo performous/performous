@@ -37,6 +37,8 @@ find_package(Gettext)
 if(Gettext_FOUND)
 	if(WIN32)
 		SET(LOCALE_DIR "../locale")
+	elseif(APPLE)
+		SET(LOCALE_DIR "share/locale")
 	else()#other os
 		SET(LOCALE_DIR "/usr/share/locale")
 	endif(WIN32)
