@@ -261,6 +261,8 @@ void GuitarGraph::endHold(int fret, double time) {
 		for (Chords::iterator it = m_chords.begin(); it != m_chords.end(); ++it) {
 			if (time >= it->begin && time <= it->end) {
 				it->releaseTimes[fret] = time;
+				if (it->status < 100 && time >= it->end - maxTolerance)
+					it->status += 100; // Mark as past note for rewinding
 				break;
 			}
 		}
@@ -522,10 +524,15 @@ void GuitarGraph::draw(double time) {
 			for (Chords::iterator it = m_chords.begin(); it != m_chords.end(); ++it) {
 				float tBeg = it->begin - time;
 				float tEnd = it->end - time;
-				if (tEnd < past) continue;
 				if (tBeg > future) break;
+				if (tEnd < past) {
+					if (it->status < 100) it->status += 100; // Mark as past note for rewinding
+					continue;
+				}
+				if (it->status >= 100 || (tBeg > maxTolerance
+				  && it->status > 0)) continue; // Don't show past chords when rewinding
 				for (int fret = 0; fret < 5; ++fret) { // Loop through the frets
-					if (!it->fret[fret]) continue;
+					if (!it->fret[fret] || (tBeg > maxTolerance && it->releaseTimes[fret] > 0)) continue;
 					if (tEnd > future) tEnd = future;
 					unsigned event = m_notes[it->dur[fret]];
 					float glow = 0.0f;
