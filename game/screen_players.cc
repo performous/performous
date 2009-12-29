@@ -9,6 +9,7 @@
 #include "theme.hh"
 #include "video.hh"
 #include "i18n.hh"
+#include "joystick.hh"
 
 #include <iostream>
 #include <sstream>
@@ -48,50 +49,49 @@ void ScreenPlayers::exit() {
 
 void ScreenPlayers::manageEvent(SDL_Event event) {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
-	if (event.type != SDL_KEYDOWN) return;
-	SDL_keysym keysym = event.key.keysym;
-	int key = keysym.sym;
-	SDLMod mod = event.key.keysym.mod;
+	input::NavButton nav(input::getNav(event));
+	if (nav != input::NONE) {
+		if (nav == input::CANCEL) {
+			if (m_search.text.empty()) { sm->activateScreen("Songs"); return; }
+			else { m_search.text.clear(); m_players.setFilter(m_search.text); }
+		} else if (nav == input::START) {
+			if (m_players.empty()) {
+				m_players.addPlayer(m_search.text);
+				m_players.setFilter(m_search.text);
+				m_players.update();
+				// the current player is the new created one
+			}
+			m_database.addHiscore(m_song);
+			m_database.scores.pop_front();
 
-	//TODO: reload -- needs database reload
-	// if (key == SDLK_r && mod & KMOD_CTRL) { m_players.reload(); m_players.setFilter(m_search.text); }
-	if (m_search.process(keysym)) m_players.setFilter(m_search.text);
-	else if (key == SDLK_ESCAPE) {
-		if (m_search.text.empty()) { sm->activateScreen("Songs"); return; }
-		else { m_search.text.clear(); m_players.setFilter(m_search.text); }
-	}
-	else if (key == SDLK_RETURN)
-	{
-		if (m_players.empty())
-		{
-			m_players.addPlayer(m_search.text);
-			m_players.setFilter(m_search.text);
-			m_players.update();
-			// the current player is the new created one
+			if (m_database.scores.empty() || !m_database.reachedHiscore(m_song)) {
+				// no more highscore, we are now finished
+				sm->activateScreen("Songs");
+			} else {
+				m_search.text.clear();
+				m_players.setFilter("");
+				// add all players which reach highscore because if score is very near or same it might be
+				// frustrating for second one that he cannot enter, so better go for next one...
+			}
 		}
-		m_database.addHiscore(m_song);
-		m_database.scores.pop_front();
+		else if (m_players.empty()) return;
+		else if (nav == input::PAUSE) m_audio.togglePause();
+		else if (nav == input::LEFT) m_players.advance(-1);
+		else if (nav == input::RIGHT) m_players.advance(1);
+		else if (nav == input::UP) m_players.advance(-1);
+		else if (nav == input::DOWN) m_players.advance(1);
+		else if (nav == input::MOREUP) m_players.advance(-10);
+		else if (nav == input::MOREDOWN) m_players.advance(10);
+	}
+	else if (event.type == SDL_KEYDOWN) { // Process keyboard-only keys
+		SDL_keysym keysym = event.key.keysym;
+		//int key = keysym.sym;
+		//SDLMod mod = event.key.keysym.mod;
 
-		if (m_database.scores.empty()
-			|| !m_database.reachedHiscore(m_song))
-		{
-			// no more highscore, we are now finished
-			sm->activateScreen("Songs");
-		} else {
-			m_search.text.clear();
-			m_players.setFilter("");
-			// add all players which reach highscore because if score is very near or same it might be
-			// frustrating for second one that he cannot enter, so better go for next one...
-		}
+		//TODO: reload -- needs database reload
+		// if (key == SDLK_r && mod & KMOD_CTRL) { m_players.reload(); m_players.setFilter(m_search.text); }
+		if (m_search.process(keysym)) m_players.setFilter(m_search.text);
 	}
-	else if (m_players.empty()) return;
-	else if (key == SDLK_SPACE || (key == SDLK_PAUSE || (key == SDLK_p && mod & KMOD_CTRL))) m_audio.togglePause();
-	else if (key == SDLK_LEFT) m_players.advance(-1);
-	else if (key == SDLK_RIGHT) m_players.advance(1);
-	else if (key == SDLK_UP) m_players.advance(-1);
-	else if (key == SDLK_DOWN) m_players.advance(1);
-	else if (key == SDLK_PAGEUP) m_players.advance(-10);
-	else if (key == SDLK_PAGEDOWN) m_players.advance(10);
 }
 
 void ScreenPlayers::draw() {

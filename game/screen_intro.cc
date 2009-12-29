@@ -37,9 +37,12 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 	input::NavButton nav(input::getNav(event));
 	if (nav != input::NONE) {
 		if (m_dialog) { m_dialog.reset(); return; }
-		if (nav == input::CANCEL) sm->finished();
-		else if (nav == input::DOWN || nav == input::RIGHT) ++selected;
-		else if (nav == input::UP || nav == input::LEFT) --selected;
+		if (nav == input::CANCEL) {
+			if (selected == m_menuOptions.size()-1) sm->finished();
+			else selected = m_menuOptions.size()-1;
+		}
+		else if (nav == input::DOWN || nav == input::RIGHT || nav == input::MOREDOWN) ++selected;
+		else if (nav == input::UP || nav == input::LEFT || nav == input::MOREUP) --selected;
 		else if (nav == input::START) {
 			std::string screen = m_menuOptions[selected].screen;
 			if (screen.empty()) sm->finished(); else sm->activateScreen(screen);

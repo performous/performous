@@ -17,7 +17,7 @@
 
 namespace input {
 	enum DevType { GUITAR, DRUMS, DANCEPAD };
-	enum NavButton { NONE, UP, DOWN, LEFT, RIGHT, START, SELECT, CANCEL, PAUSE };
+	enum NavButton { NONE, UP, DOWN, LEFT, RIGHT, START, SELECT, CANCEL, PAUSE, MOREUP, MOREDOWN };
 
 	static const std::size_t BUTTONS = 10;
 	static const int STARPOWER_BUTTON = 5;

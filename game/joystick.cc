@@ -45,8 +45,8 @@ int input::buttonFromSDL(input::Private::Type _type, unsigned int _sdl_button) {
 		//K  R  Y  B  G  O    // for drums
 		{ 3, 4, 1, 2, 0, 4, -1, -1, 8, 9 }, // Guitar Hero drums
 		{ 3, 4, 1, 2, 0,-1, -1, -1, 8, 9 }, // Rock Band drums
-		// Left  Down  Up  Right  UpL  UpR  DownL  DownR  Start  Select
-		{  0,    1,    2,  3,     6,   7,   4,     5,     9,     8 } // generic dance pad
+		// Left  Down  Up  Right  DownL  DownR  UpL    UpR    Start  Select
+		{  0,    1,    2,  3,     6,     7,     4,     5,     9,     8 } // generic dance pad
 	};
 	if( _sdl_button >= SDL_BUTTONS ) return -1;
 	switch(_type) {
@@ -81,6 +81,8 @@ input::NavButton input::getNav(SDL_Event const &e) {
 		else if (k == SDLK_RIGHT) return input::RIGHT;
 		else if (k == SDLK_RETURN) return input::START;
 		else if (k == SDLK_ESCAPE || k == SDLK_q) return input::CANCEL;
+		else if (k == SDLK_PAGEUP) return input::MOREUP;
+		else if (k == SDLK_PAGEDOWN) return input::MOREDOWN;
 		else if (k == SDLK_PAUSE || (k == SDLK_p && mod & KMOD_CTRL))
 			return input::PAUSE;
 	} else if (e.type == SDL_JOYBUTTONDOWN) {
@@ -89,7 +91,7 @@ input::NavButton input::getNav(SDL_Event const &e) {
 		input::Private::InputDevPrivate devt = input::Private::devices[joy_id];
 		int b = buttonFromSDL(devt.type(), e.jbutton.button);
 		if (b == -1) return input::NONE;
-		else if (b == 8) return input::SELECT;
+		else if (b == 8) return input::CANCEL;
 		else if (b == 9) return input::START;
 		// Totally different device types need their own custom mappings
 		if (devt.type_match(input::DANCEPAD)) {
@@ -98,7 +100,9 @@ input::NavButton input::getNav(SDL_Event const &e) {
 			else if (b == 1) return input::DOWN;
 			else if (b == 2) return input::UP;
 			else if (b == 3) return input::RIGHT;
-			else return input::CANCEL;
+			else if (b == 5) return input::MOREUP;
+			else if (b == 6) return input::MOREDOWN;
+			else return input::NONE;
 		} else if (devt.type_match(input::DRUMS)) {
 			// Drums can be used for navigation
 			if (b == 0) return input::START;

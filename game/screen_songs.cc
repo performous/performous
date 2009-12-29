@@ -69,6 +69,8 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 			if (nav == input::CANCEL || m_songs.empty()) m_jukebox = false;
 			else if (nav == input::UP) m_audio.seek(5);
 			else if (nav == input::DOWN) m_audio.seek(-5);
+			else if (nav == input::MOREUP) m_audio.seek(-30);
+			else if (nav == input::MOREDOWN) m_audio.seek(30);
 			else manageSharedKey(nav);
 			return;
 		} else if (nav == input::CANCEL) {
@@ -79,23 +81,18 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 		else if (m_songs.empty()) return;
 		else if (nav == input::UP) m_songs.sortChange(-1);
 		else if (nav == input::DOWN) m_songs.sortChange(1);
+		else if (nav == input::MOREUP) m_songs.advance(-10);
+		else if (nav == input::MOREDOWN) m_songs.advance(10);
 		else manageSharedKey(nav);
 	// Handle less common, keyboard only keys
 	} else if (event.type == SDL_KEYDOWN) {
 		SDL_keysym keysym = event.key.keysym;
 		int key = keysym.sym;
 		SDLMod mod = event.key.keysym.mod;
-		if (m_jukebox) {
-			if (key == SDLK_PAGEUP) m_audio.seek(-30);
-			else if (key == SDLK_PAGEDOWN) m_audio.seek(30);
-			return;
-		}
 		if (key == SDLK_r && mod & KMOD_CTRL) { m_songs.reload(); m_songs.setFilter(m_search.text); }
 		if (!m_jukebox && m_search.process(keysym)) m_songs.setFilter(m_search.text);
 		// The rest are only available when there are songs available
 		else if (m_songs.empty()) return;
-		else if (key == SDLK_PAGEUP) m_songs.advance(-10);
-		else if (key == SDLK_PAGEDOWN) m_songs.advance(10);
 		else if (key == SDLK_F11) --config["audio/preview_volume"];
 		else if (key == SDLK_F12) ++config["audio/preview_volume"];
 		else if (!m_jukebox && key == SDLK_F4) m_jukebox = true;
