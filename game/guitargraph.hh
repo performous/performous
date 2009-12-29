@@ -20,7 +20,7 @@ struct Chord {
 	Duration const* dur[5];
 	int polyphony;
 	bool tappable;
-	int status; // Guitar: 0 = not played, 10 = tapped, 20 = picked, 30 = released, drums: number of pads hit
+	int status; // Guitar: 0 = not played, 10 = tapped, 20 = picked, 30 = released, drums: number of pads hit, all: >100 = past
 	int score;
 	AnimValue hitAnim[5];
 	double releaseTimes[5];
