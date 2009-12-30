@@ -66,7 +66,10 @@ bool checkExtension(std::string const& extension) {
 template <typename T> void loader(T& target, std::string filename, bool autocrop) {
 	if (!std::ifstream(filename.c_str(), std::ios::binary).is_open()) throw std::runtime_error("File not found: " + filename);
 	if (filename.size() > 4 && filename.substr(filename.size() - 4) == ".svg") {
-		rsvg_init();
+		struct RSVGInit {
+			RSVGInit() { rsvg_init(); }
+			~RSVGInit() { rsvg_term(); }
+		} rsvgInit;
 		GError* pError = NULL;
 		// Find SVG dimensions (in pixels)
 		RsvgHandle* svgHandle = rsvg_handle_new_from_file(filename.c_str(), &pError);
@@ -88,7 +91,6 @@ template <typename T> void loader(T& target, std::string filename, bool autocrop
 		}
 		target.load(w, h, pix::CHAR_RGBA, gdk_pixbuf_get_pixels(pb), float(svgDimension.width)/svgDimension.height);
 		gdk_pixbuf_unref(pb);
-		rsvg_term();
 	} else {
 	#ifdef USE_SDL_IMAGE
 		SDL_Surface* imgsurf = IMG_Load(filename.c_str());
