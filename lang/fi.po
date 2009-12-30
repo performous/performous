@@ -2,62 +2,58 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-12-07 01:56+0100\n"
+"POT-Creation-Date: 2009-12-30 23:29+0200\n"
 "PO-Revision-Date: \n"
+"Last-Translator: Tapio Vierros <tapiovierros@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: _\n"
 "X-Poedit-Basepath: .\n"
-"Last-Translator: Tapio Vierros <tapiovierros@gmail.com>\n"
 "X-Poedit-SearchPath-0: ../game\n"
 
-#: ../game/screen_hiscore.cc:104
-msgid "Hiscore for "
-msgstr "Ennätykset kappaleelle "
-
-#: ../game/screen_intro.cc:9
+#: ../game/screen_intro.cc:10
 msgid "Perform"
 msgstr "Esiinny"
 
-#: ../game/screen_intro.cc:9
+#: ../game/screen_intro.cc:10
 msgid "Start performing!"
 msgstr "Aloita esiintyminen!"
 
-#: ../game/screen_intro.cc:10
+#: ../game/screen_intro.cc:11
 msgid "Practice"
 msgstr "Harjoittele"
 
-#: ../game/screen_intro.cc:10
+#: ../game/screen_intro.cc:11
 msgid "Check your skills or test the microphones"
 msgstr "Tarkista taitosi tai testaa mikrofonit"
 
-#: ../game/screen_intro.cc:11
+#: ../game/screen_intro.cc:12
 msgid "Configure"
 msgstr "Asetukset"
 
-#: ../game/screen_intro.cc:11
+#: ../game/screen_intro.cc:12
 msgid "Configure game options"
 msgstr "Muokkaa pelin asetuksia"
 
-#: ../game/screen_intro.cc:12
+#: ../game/screen_intro.cc:13
 msgid "Quit"
 msgstr "Lopeta"
 
-#: ../game/screen_intro.cc:12
+#: ../game/screen_intro.cc:13
 msgid "Leave the game"
 msgstr "Poistu pelistä"
 
-#: ../game/screen_intro.cc:19
+#: ../game/screen_intro.cc:21
 msgid "No playback devices could be used.\n"
 msgstr "Äänen ulostulolaitteita ei löytynyt.\n"
 
-#: ../game/screen_intro.cc:20
+#: ../game/screen_intro.cc:22
 msgid "No microphones found.\n"
 msgstr "Mikrofoneja ei löytynyt.\n"
 
-#: ../game/screen_intro.cc:21
+#: ../game/screen_intro.cc:23
 msgid ""
 "\n"
 "Please configure some before playing."
@@ -65,23 +61,39 @@ msgstr ""
 "\n"
 "Säädä laitteet ennen pelaamista."
 
-#: ../game/screen_players.cc:110
-msgid "No players found!"
-msgstr "Pelaajia ei löytynyt!"
+#: ../game/songs.cc:204
+msgid "random order"
+msgstr "satunnainen järjestys"
 
-#: ../game/screen_players.cc:111
-msgid "Enter a name to create a new player."
-msgstr "Syötä nimi luodaksesi uuden pelaajan."
+#: ../game/songs.cc:205
+msgid "sorted by song"
+msgstr "järjestetty kappaleen mukaan"
 
-#: ../game/screen_players.cc:113
-msgid "Press enter to create player!"
-msgstr "Paina Enter luodaksesi pelaajan!"
+#: ../game/songs.cc:206
+msgid "sorted by artist"
+msgstr "järjestetty esittäjän mukaan"
 
-#: ../game/screen_songs.cc:209
+#: ../game/songs.cc:207
+msgid "sorted by edition"
+msgstr "järjestetty julkaisun mukaan"
+
+#: ../game/songs.cc:208
+msgid "sorted by genre"
+msgstr "järjestetty lajityypin mukaan"
+
+#: ../game/songs.cc:209
+msgid "sorted by path"
+msgstr "järjestetty polun mukaan"
+
+#: ../game/songs.cc:210
+msgid "sorted by language"
+msgstr "järjestetty kielen mukaan"
+
+#: ../game/screen_songs.cc:178
 msgid "No songs found!"
 msgstr "Kappaleita ei löytynyt!"
 
-#: ../game/screen_songs.cc:210
+#: ../game/screen_songs.cc:179
 msgid ""
 "Visit performous.org\n"
 "for free songs"
@@ -89,7 +101,55 @@ msgstr ""
 "Vieraile osoitteessa performous.org\n"
 "ladataksesi ilmaista musiikkia."
 
-#: ../game/screen_songs.cc:212
+#: ../game/screen_songs.cc:181
 msgid "no songs match search"
 msgstr "yksikään kappale ei vastannut hakuasi"
+
+#: ../game/screen_songs.cc:188
+msgid "filter: "
+msgstr "soudatin: "
+
+#: ../game/screen_songs.cc:188
+msgid "none"
+msgstr "tyhjä"
+
+#: ../game/screen_players.cc:111
+msgid "No players found!"
+msgstr "Pelaajia ei löytynyt!"
+
+#: ../game/screen_players.cc:112
+msgid "Enter a name to create a new player."
+msgstr "Syötä nimi luodaksesi uuden pelaajan."
+
+#: ../game/screen_players.cc:114
+msgid "Press enter to create player!"
+msgstr "Paina Enter luodaksesi pelaajan!"
+
+#: ../game/screen_players.cc:121
+msgid "You reached"
+msgstr "Sait"
+
+#: ../game/screen_players.cc:121
+msgid "points!"
+msgstr "pistettä!"
+
+#: ../game/screen_players.cc:122
+msgid "Change player with arrow keys."
+msgstr "Valitse pelaaja nuolinäppäimillä."
+
+#: ../game/screen_players.cc:123
+msgid "Name:"
+msgstr "Nimi:"
+
+#: ../game/screen_players.cc:126
+msgid "Type text to filter or create a new player."
+msgstr "Syötä nimi etsiäksesi tai luodaksesi uuden pelaajan."
+
+#: ../game/screen_players.cc:126
+msgid "Search Text:"
+msgstr "Etsi:"
+
+#: ../game/screen_hiscore.cc:104
+msgid "Hiscore for "
+msgstr "Ennätykset kappaleelle "
 
