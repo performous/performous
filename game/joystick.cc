@@ -257,6 +257,9 @@ void input::SDL::init() {
 		} else if( name.find("Positive Gaming Impact USB pad") != std::string::npos ) {
 			std::cout << "  Detected as: Generic Dance Pad" << std::endl;
 			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::DANCEPAD_GENERIC);
+		} else if( name.find("Joypad to USB converter") != std::string::npos ) {
+			std::cout << "  Detected as: Generic Dance Pad (guessed)" << std::endl;
+			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::DANCEPAD_GENERIC);
 		} else {
 			std::cout << "  Detected as: Unknwown (please report the name, assuming Guitar Hero Drums)" << std::endl;
 			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::DRUMS_GH);
