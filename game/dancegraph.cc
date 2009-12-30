@@ -9,7 +9,7 @@
 
 namespace {
 	const std::string diffv[] = { "Beginner", "Easy", "Medium", "Hard", "Challenge" };
-	const float death_delay = 20.0f; // Delay in seconds after which the player is hidden
+	const int death_delay = 25; // Delay in notes after which the player is hidden
 	const float not_joined = -100; // A value that indicates player hasn't joined
 	const float join_delay = 7.0f; // Time to select track/difficulty when joining mid-game
 	const float past = -0.4f;
@@ -66,7 +66,7 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
   m_longestStreak(),
   m_bigStreak(),
   m_jointime(not_joined),
-  m_acttime()
+  m_dead()
 {
 	m_popupText.reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 
@@ -125,8 +125,8 @@ void DanceGraph::gameMode(int direction) {
 }
 
 /// Are we alive?
-bool DanceGraph::dead(double time) const {
-	return m_jointime == not_joined || time > (m_acttime + death_delay);
+bool DanceGraph::dead() const {
+	return m_jointime == not_joined || m_dead >= death_delay;
 }
 
 /// Get the difficulty as displayable string
@@ -180,6 +180,7 @@ void DanceGraph::engine() {
 			}
 			if(!it->releaseTime) it->releaseTime = time;
 		}
+		++m_dead;
 	}
 
 	// Holding button when mine comes?
@@ -194,12 +195,11 @@ void DanceGraph::engine() {
 
 	// Handle all events
 	for (input::Event ev; m_input.tryPoll(ev);) {
-		// Handle joining and keeping alive
-		if (m_jointime == not_joined) {
-			m_jointime = (time < 0.0 ? -join_delay : time); // join
+		m_dead = 0; // Keep alive
+		if (m_jointime == not_joined) { // Handle joining
+			m_jointime = (time < 0.0 ? -join_delay : time);
 			break;
 		}
-		m_acttime = time;
 		// Difficulty / mode selection
 		if (time < m_jointime + join_delay) {
 			if (ev.type == input::Event::PRESS) {

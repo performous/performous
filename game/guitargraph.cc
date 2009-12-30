@@ -17,7 +17,7 @@ namespace {
 		{ "Expert", 0x60 }
 	};
 	const size_t diffsz = sizeof(diffv) / sizeof(*diffv);
-	const float death_delay = 20.0f; // Delay in seconds after which the player is hidden
+	const int death_delay = 25; // Delay in notes after which the player is hidden
 	const float not_joined = -100; // A value that indicates player hasn't joined
 	const float join_delay = 6.0f; // Time to select track/difficulty when joining mid-game
 	const float g_angle = 80.0f;
@@ -90,7 +90,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
   m_longestStreak(),
   m_bigStreak(),
   m_jointime(not_joined),
-  m_acttime()
+  m_dead()
 {
 	try {
 		m_fretObj.load(getThemePath("fret.obj"));
@@ -153,9 +153,8 @@ void GuitarGraph::engine() {
 	double whammy = 0;
 	// Handle all events
 	for (input::Event ev; m_input.tryPoll(ev);) {
-		// Handle joining and keeping alive
-		if (m_jointime == not_joined) m_jointime = (time < 0.0 ? -join_delay : time); // join
-		m_acttime = time;
+		m_dead = 0; // Keep alive
+		if (m_jointime == not_joined) m_jointime = (time < 0.0 ? -join_delay : time); // Handle joining
 		// Guitar specific actions
 		if (!m_drums) {
 			if ((ev.type == input::Event::PRESS || ev.type == input::Event::RELEASE) && ev.button == input::STARPOWER_BUTTON) {
@@ -189,6 +188,7 @@ void GuitarGraph::engine() {
 	while (m_chordIt != m_chords.end() && m_chordIt->begin + maxTolerance < time) {
 		if ( (m_drums && m_chordIt->status != m_chordIt->polyphony) 
 		  || (!m_drums && m_chordIt->status == 0) ) endStreak();
+		++m_dead;
 		++m_chordIt;
 	}
 	// Adjust the correctness value
@@ -239,8 +239,8 @@ void GuitarGraph::engine() {
 }
 
 /// Are we alive?
-bool GuitarGraph::dead(double time) const {
-	return m_jointime == not_joined || time > (m_acttime + death_delay);
+bool GuitarGraph::dead() const {
+	return m_jointime == not_joined || m_dead >= death_delay;
 }
 
 /// Attempt to activate GodMode

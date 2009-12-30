@@ -103,13 +103,13 @@ bool ScreenSing::instrumentLayout(double time) {
 	int count = 0, i = 0;
 	// Count active instruments
 	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it)
-		if (!it->dead(time)) count++;
+		if (!it->dead()) count++;
 	double iw = std::min(0.5, 1.0 / count);
 	typedef std::pair<unsigned, double> CountSum;
 	std::map<std::string, CountSum> volume; // Stream id to (count, sum)
 	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it) {
 		it->engine(); // Run engine even when dead so that joining is possible
-		if (!it->dead(time)) {
+		if (!it->dead()) {
 			it->position((0.5 + i - 0.5 * count) * iw, iw); // Do layout stuff
 			CountSum& cs = volume[it->getTrackIndex()];
 			cs.first++;
@@ -144,11 +144,11 @@ void ScreenSing::danceLayout(double time) {
 	int count = 0, i = 0;
 	// Count active dancers
 	for (Dancers::iterator it = m_dancers.begin(); it != m_dancers.end(); ++it)
-		if (!it->dead(time)) count++;
+		if (!it->dead()) count++;
 	double iw = std::min(0.5, 1.0 / m_dancers.size());
 	for (Dancers::iterator it = m_dancers.begin(); it != m_dancers.end(); ++it) {
 		it->engine(); // Run engine even when dead so that joining is possible
-		if (!it->dead(time)) {
+		if (!it->dead()) {
 			it->position((0.5 + i - 0.5 * count) * iw, iw); // Do layout stuff
 			it->draw(time);
 			++i;

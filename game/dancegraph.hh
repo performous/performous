@@ -39,7 +39,7 @@ class DanceGraph {
 	void engine();
 	void position(double cx, double width) { m_cx.setTarget(cx); m_width.setTarget(width); }
 	unsigned stream() const { return m_stream; }
-	bool dead(double time) const;
+	bool dead() const;
 	double correctness() const { return m_correctness.get(); }
 	int getScore() const { return (m_score > 0 ? m_score : 0) * m_scoreFactor; }
 	std::string getGameMode() const { return m_gamingMode; }
@@ -96,6 +96,6 @@ class DanceGraph {
 	std::string m_gamingMode;
 	DanceTracks::const_iterator m_curTrackIt;
 	double m_jointime;
-	double m_acttime;
+	int m_dead;
 };
 

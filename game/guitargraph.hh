@@ -60,7 +60,7 @@ class GuitarGraph {
 	void engine();
 	void position(double cx, double width) { m_cx.setTarget(cx); m_width.setTarget(width); }
 	unsigned stream() const { return m_stream; }
-	bool dead(double time) const;
+	bool dead() const;
 	double correctness() const { return m_correctness.get(); }
 	std::string getTrackIndex() const { return m_track_index->first; }
 	int getScore() const { return m_score * m_scoreFactor; }
@@ -140,6 +140,6 @@ class GuitarGraph {
 	int m_longestStreak;
 	int m_bigStreak;
 	double m_jointime;
-	double m_acttime;
+	int m_dead;
 };
 
