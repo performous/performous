@@ -108,7 +108,14 @@ bool ScreenSing::instrumentLayout(double time) {
 	typedef std::pair<unsigned, double> CountSum;
 	std::map<std::string, CountSum> volume; // Stream id to (count, sum)
 	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it) {
-		it->engine(); // Run engine even when dead so that joining is possible
+		try {
+			it->engine(); // Run engine even when dead so that joining is possible
+		} catch (std::runtime_error& e) { // Receive Start/Select key presses
+			std::string what(e.what());
+			if (what == "start") m_audio.togglePause();
+			// We cannot quit from here (crash) so let's throw it further
+			else if (what == "select") throw std::runtime_error("exit");
+		}
 		if (!it->dead()) {
 			it->position((0.5 + i - 0.5 * count) * iw, iw); // Do layout stuff
 			CountSum& cs = volume[it->getTrackIndex()];
@@ -250,13 +257,13 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		if (seekback) {
 			m_layout_singer->reset();
 		}
-	} else if (event.type == SDL_JOYBUTTONDOWN) {
-		int button = event.jbutton.button;
-		if (button == 9 /* START */) m_audio.togglePause();
-		if (button == 8 /* SELECT */) {
-			ScreenManager::getSingletonPtr()->activateScreen("Songs");
-			return;
-		}
+	//} else if (event.type == SDL_JOYBUTTONDOWN) {
+		//int button = event.jbutton.button;
+		//if (button == 9 /* START */) m_audio.togglePause();
+		//if (button == 8 /* SELECT */) {
+			//ScreenManager::getSingletonPtr()->activateScreen("Songs");
+			//return;
+		//}
 	}
 }
 
@@ -307,7 +314,13 @@ void ScreenSing::draw() {
 	} else if( m_instruments.empty() ) {
 		m_layout_singer->draw(time, LayoutSinger::BOTTOM);
 	} else {
-		bool some_alive = instrumentLayout(time);
+		bool some_alive;
+		try {
+			some_alive = instrumentLayout(time);
+		} catch (std::runtime_error& e) { // Did we catch an quit signal?
+			ScreenManager::getSingletonPtr()->activateScreen("Songs");
+			return;
+		}
 		m_layout_singer->draw(time, some_alive ? LayoutSinger::MIDDLE : LayoutSinger::BOTTOM);
 	}
 
