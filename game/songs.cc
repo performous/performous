@@ -27,10 +27,6 @@ Songs::~Songs() {
 
 void Songs::reload() {
 	if (m_loading) return;
-	// Copy songdirs from config into m_songdirs
-	ConfigItem::StringList const& sd = config["system/path_songs"].sl();
-	m_songdirs.clear();
-	std::transform(sd.begin(), sd.end(), std::inserter(m_songdirs, m_songdirs.end()), pathMangle);
 	// Run loading thread
 	m_needShuffle = false;
 	m_loading = true;
@@ -43,7 +39,9 @@ void Songs::reload_internal() {
 		m_songs.clear();
 		m_dirty = true;
 	}
-	for (SongDirs::const_iterator it = m_songdirs.begin(); m_loading && it != m_songdirs.end(); ++it) {
+	Paths paths = getPaths();
+	for (Paths::iterator it = paths.begin(); m_loading && it != paths.end(); ++it) {
+		*it /= "songs";
 		if (!fs::is_directory(*it)) { std::cout << ">>> Not scanning: " << *it << " (no such directory)" << std::endl; continue; }
 		std::cout << ">>> Scanning " << *it << std::endl;
 		size_t count = m_songs.size();

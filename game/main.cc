@@ -223,7 +223,6 @@ int main(int argc, char** argv) {
 	// Parse commandline options
 	std::vector<std::string> mics;
 	std::vector<std::string> pdevs;
-	std::vector<std::string> songdirs;
 	namespace po = boost::program_options;
 	po::options_description opt1("Generic options");
 	std::string songlist;
@@ -238,20 +237,12 @@ int main(int argc, char** argv) {
 	  ("michelp", "detailed help and device list for --mics")
 	  ("pdevhelp", "detailed help and device list for --pdev")
 	  ("theme", po::value<std::string>(), "set theme (name or absolute path)");
-	po::options_description opt3("Hidden options");
-	opt3.add_options()
-	  ("songdir", po::value<std::vector<std::string> >(&songdirs)->composing(), "");
-	// Process flagless options as songdirs
-	po::positional_options_description p;
-	p.add("songdir", -1);
 	po::options_description cmdline;
 	cmdline.add(opt1).add(opt2);
 	po::variables_map vm;
 	// Load the arguments
 	try {
-		po::options_description allopts(cmdline);
-		allopts.add(opt3);
-		po::store(po::command_line_parser(argc, argv).options(allopts).positional(p).run(), vm);
+		po::store(po::command_line_parser(argc, argv).options(cmdline).run(), vm);
 	} catch (std::exception& e) {
 		std::cout << cmdline << std::endl;
 		std::cout << "ERROR: " << e.what() << std::endl;
@@ -308,7 +299,6 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 	// Override XML config for options that were specified from commandline or performous.conf
-	confOverride(songdirs, "system/path_songs");
 	confOverride(mics, "audio/capture");
 	confOverride(pdevs, "audio/playback");
 	// Run the game init and main loop

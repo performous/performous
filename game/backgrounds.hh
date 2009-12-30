@@ -34,9 +34,7 @@ class Backgrounds: boost::noncopyable {
 	std::string getRandom();
 	
   private:
-	typedef std::set<fs::path> BGDirs;
 	typedef std::vector<std::string> BGVector;
-	BGDirs m_bgdirs;
 	BGVector m_bgs;
 	int m_bgiter;
 	void reload_internal();

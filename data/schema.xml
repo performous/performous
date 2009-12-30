@@ -217,30 +217,6 @@ to save the current settings to XML.
 	</entry>
 
 	<!-- System preferences -->
-	<entry name="system/path_songs" type="string_list">
-		<stringvalue>/usr/local/share/games/ultrastar/songs/</stringvalue>
-		<stringvalue>/usr/local/share/games/fretsonfire/data/songs/</stringvalue>
-		<stringvalue>/usr/share/games/ultrastar/songs/</stringvalue>
-		<stringvalue>/usr/share/games/fretsonfire/data/songs/</stringvalue>
-		<stringvalue>../songs/</stringvalue><!-- For Windows where the program is started in bin/ -->
-		<stringvalue>~/.local/share/games/performous/songs/</stringvalue>
-		<stringvalue>~/.ultrastar/songs/</stringvalue>
-		<stringvalue>~/.fretsonfire/songs/</stringvalue>
-		<locale name="C">
-			<short>Song folders</short>
-			<long>Where to recursively look for songs.</long>
-		</locale>
-	</entry>
-	<entry name="system/path_backgrounds" type="string_list">
-		<stringvalue>/usr/local/share/games/performous/backgrounds/</stringvalue>
-		<stringvalue>/usr/share/games/performous/backgrounds/</stringvalue>
-		<stringvalue>../backgrounds/</stringvalue><!-- For Windows where the program is started in bin/ -->
-		<stringvalue>~/.local/share/games/performous/backgrounds/</stringvalue>
-		<locale name="C">
-			<short>Background folders</short>
-			<long>Where to look for backgrounds.</long>
-		</locale>
-	</entry>
 	<entry name="system/path" type="string_list">
 		<locale name="C">
 			<short>Base folders for data</short>

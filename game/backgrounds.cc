@@ -15,10 +15,6 @@
 
 void Backgrounds::reload() {
 	if (m_loading) return;
-	// Copy backgrounddirs from config into m_bgdirs
-	ConfigItem::StringList sd = config["system/path_backgrounds"].sl();
-	m_bgs.clear();
-	std::transform(sd.begin(), sd.end(), std::inserter(m_bgdirs, m_bgdirs.end()), pathMangle);
 	// Run loading thread
 	m_loading = true;
 	m_thread.reset(new boost::thread(boost::bind(&Backgrounds::reload_internal, boost::ref(*this))));
@@ -30,7 +26,9 @@ void Backgrounds::reload_internal() {
 		m_bgs.clear();
 		m_dirty = true;
 	}
-	for (BGDirs::const_iterator it = m_bgdirs.begin(); m_loading && it != m_bgdirs.end(); ++it) {
+	Paths paths = getPaths();
+	for (Paths::iterator it = paths.begin(); m_loading && it != paths.end(); ++it) {
+		*it /= "backgrounds";
 		if (!fs::is_directory(*it)) { std::cout << ">>> Not scanning for backgrounds: " << *it << " (no such directory)" << std::endl; continue; }
 		std::cout << ">>> Scanning " << *it << " (for backgrounds)" << std::endl;
 		size_t count = m_bgs.size();

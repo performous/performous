@@ -66,8 +66,6 @@ class Songs: boost::noncopyable {
   private:
 	class RestoreSel;
 	typedef std::vector<boost::shared_ptr<Song> > SongVector;
-	typedef std::set<fs::path> SongDirs;
-	SongDirs m_songdirs;
 	std::string m_songlist;
 	SongVector m_songs, m_filtered;
 	AnimAcceleration math_cover;

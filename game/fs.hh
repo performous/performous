@@ -1,6 +1,7 @@
 #pragma once
 
 #include <boost/filesystem.hpp>
+#include <vector>
 
 // Define this useful alias for the overlong namespace name (yes, for everyone who includes this header)
 namespace fs = boost::filesystem;
@@ -19,3 +20,9 @@ std::string getThemePath(std::string const& filename);
 
 /** Get full path to a share file **/
 std::string getPath(fs::path const& filename);
+
+typedef std::vector<fs::path> Paths;
+
+/** Get all shared data paths in preference order **/
+Paths const& getPaths(bool refresh = false);
+

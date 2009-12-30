@@ -5,7 +5,6 @@
 #include <plugin++/execname.hpp>
 #include <cstdlib>
 #include <iostream>
-#include <list>
 #include <sstream>
 
 #ifdef _WIN32
@@ -95,13 +94,23 @@ namespace {
 }
 
 std::string getPath(fs::path const& filename) {
-	typedef std::list<fs::path> Dirs;
-	static Dirs dirs;
+	Paths const& paths = getPaths();
+	for (Paths::const_iterator it = paths.begin(); it != paths.end(); ++it) {
+		fs::path p = *it;
+		p /= filename;
+		if( fs::exists(p) ) return p.string();
+	}
+	throw std::runtime_error("Cannot find file \"" + filename.string() + "\" in any of Performous data folders");
+}
+
+Paths const& getPaths(bool refresh) {
+	static Paths paths;
 	static bool initialized = false;
-	if (!initialized) {
+	if (!initialized || refresh) {
 		initialized = true;
 		fs::path shortDir = "performous";
 		fs::path shareDir = SHARED_DATA_DIR;
+		Paths dirs;
 #ifdef _WIN32
 		// Add APPLIC~1 (user-specific application data)  FIXME: Not tested
 		{
@@ -128,15 +137,12 @@ std::string getPath(fs::path const& filename) {
 		}
 #endif
 		// Adding paths from config file
-		std::vector<std::string> pathes = config["system/path"].sl();
-		std::transform(pathes.begin(), pathes.end(), std::inserter(dirs, dirs.end()), pathMangle);
+		std::vector<std::string> const& confPaths = config["system/path"].sl();
+		std::transform(confPaths.begin(), confPaths.end(), std::inserter(dirs, dirs.end()), pathMangle);
 		// Check if they actually exist and print debug
-		dirs.remove_if(pathNotExist);
+		paths.clear();
+		std::remove_copy_if(dirs.begin(), dirs.end(), std::inserter(paths, paths.end()), pathNotExist);
 	}
-	for (Dirs::const_iterator it = dirs.begin(); it != dirs.end(); ++it) {
-		fs::path p = *it;
-		p /= filename;
-		if( fs::exists(p) ) return p.string();
-	}
-	throw std::runtime_error("Cannot find file \"" + filename.string() + "\" in any of Performous data folders");
+	return paths;
 }
+
