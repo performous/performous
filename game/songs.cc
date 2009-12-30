@@ -4,6 +4,7 @@
 #include "fs.hh"
 #include "song.hh"
 #include "database.hh"
+#include "i18n.hh"
 
 #include <boost/bind.hpp>
 #include <boost/format.hpp>
@@ -166,21 +167,21 @@ void Songs::filter_internal() {
 
 namespace {
 
-    /// A functor that compares songs based on a selected member field of them.
-    template<typename Field> class CmpByField {
-	    Field Song::* m_field;
-      public:
-	    /** @param field a pointer to the field to use (pointer to member) **/
-	    CmpByField(Field Song::* field): m_field(field) {}
-	    /// Compare left < right
-	    bool operator()(Song const& left , Song const& right) {
+	/// A functor that compares songs based on a selected member field of them.
+	template<typename Field> class CmpByField {
+		Field Song::* m_field;
+	  public:
+		/** @param field a pointer to the field to use (pointer to member) **/
+		CmpByField(Field Song::* field): m_field(field) {}
+		/// Compare left < right
+		bool operator()(Song const& left , Song const& right) {
 		    return left.*m_field < right.*m_field;
-	    }
-	    /// Compare *left < *right
-	    bool operator()(boost::shared_ptr<Song> const& left, boost::shared_ptr<Song> const& right) {
-		    return operator()(*left, *right);
-	    }
-    };
+		}
+		/// Compare *left < *right
+		bool operator()(boost::shared_ptr<Song> const& left, boost::shared_ptr<Song> const& right) {
+			return operator()(*left, *right);
+		}
+	};
 
     /// A helper for easily constructing CmpByField objects
     template <typename T> CmpByField<T> comparator(T Song::*field) { return CmpByField<T>(field); }
@@ -193,23 +194,22 @@ namespace {
 		return path.substr(pos, path.size() - pos - 1);
 	}
 
-
-    static char const* order[] = {
-	    "random order",
-	    "sorted by song",
-	    "sorted by artist",
-	    "sorted by edition",
-	    "sorted by genre",
-	    "sorted by path",
-	    "sorted by language"
-    };
-
-    static const int orders = sizeof(order) / sizeof(*order);
+	static const int orders = 7;
 
 }
 
 std::string Songs::sortDesc() const {
-	std::string str = order[m_order];
+	std::string str = "";
+	switch (m_order) {
+	  case 0: str = _("random order"); break;
+	  case 1: str = _("sorted by song"); break;
+	  case 2: str = _("sorted by artist"); break;
+	  case 3: str = _("sorted by edition"); break;
+	  case 4: str = _("sorted by genre"); break;
+	  case 5: str = _("sorted by path"); break;
+	  case 6: str = _("sorted by language"); break;
+	  default: throw std::logic_error("Internal error: unknown sort order in Songs::sortDesc");
+	}
 	if (!empty()) {
 		if (m_order == 3) str += " (" + current().edition + ")";
 		if (m_order == 4) str += " (" + current().genre + ")";

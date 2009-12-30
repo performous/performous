@@ -185,7 +185,7 @@ void ScreenSongs::draw() {
 		Song& song = m_songs.current();
 		// Format the song information text
 		oss_song << song.title << '\n' << song.artist;
-		oss_order << "filter: " << (m_search.text.empty() ? "none" : m_search.text) << '\n';
+		oss_order << _("filter: ") << (m_search.text.empty() ? _("none") : m_search.text) << '\n';
 		oss_order << m_songs.sortDesc() << '\n';
 		oss_order << "(" << m_songs.currentId() + 1 << "/" << m_songs.size() << ")";
 		double spos = m_songs.currentPosition(); // This needs to be polled to run the animation
