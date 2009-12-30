@@ -158,10 +158,10 @@ to save the current settings to XML.
 	</entry>
 	<entry name="audio/controller_delay" type="float" value="0.00">
 		<ui unit=" ms" multiplier="1000" />
-		<limits min="-0.5" max="0.5" step="0.02" />
+		<limits min="0.0" max="0.5" step="0.02" />
 		<locale name="C">
 			<short>Audio/controller latency</short>
-			<long>Use negative value if your controller lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal.</long>
+			<long>The total of USB (guitar or dance pad) latency combined with audio output latency.</long>
 		</locale>
 	</entry>
 	<entry name="audio/round-trip" type="float" value="0.08">
@@ -223,7 +223,7 @@ to save the current settings to XML.
 		<stringvalue>/usr/share/games/ultrastar/songs/</stringvalue>
 		<stringvalue>/usr/share/games/fretsonfire/data/songs/</stringvalue>
 		<stringvalue>../songs/</stringvalue><!-- For Windows where the program is started in bin/ -->
-		<stringvalue>~/.performous/songs/</stringvalue>
+		<stringvalue>~/.local/share/games/performous/songs/</stringvalue>
 		<stringvalue>~/.ultrastar/songs/</stringvalue>
 		<stringvalue>~/.fretsonfire/songs/</stringvalue>
 		<locale name="C">
@@ -235,7 +235,7 @@ to save the current settings to XML.
 		<stringvalue>/usr/local/share/games/performous/backgrounds/</stringvalue>
 		<stringvalue>/usr/share/games/performous/backgrounds/</stringvalue>
 		<stringvalue>../backgrounds/</stringvalue><!-- For Windows where the program is started in bin/ -->
-		<stringvalue>~/.performous/backgrounds/</stringvalue>
+		<stringvalue>~/.local/share/games/performous/backgrounds/</stringvalue>
 		<locale name="C">
 			<short>Background folders</short>
 			<long>Where to look for backgrounds.</long>
@@ -243,8 +243,8 @@ to save the current settings to XML.
 	</entry>
 	<entry name="system/path" type="string_list">
 		<locale name="C">
-			<short>System folders</short>
-			<long>Where to look for performous data.</long>
+			<short>Base folders for data</short>
+			<long>System defaults are included automatically. Additional paths can be added here.</long>
 		</locale>
 	</entry>
 </performous>
