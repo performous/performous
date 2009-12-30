@@ -82,8 +82,6 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
 		throw std::runtime_error("Could not find any dance tracks.");
 	
 	gameMode(0);
-	difficultyDelta(0); // hack to get initial level
-		
 }
 
 /// Attempt to select next/previous game mode
@@ -122,6 +120,8 @@ void DanceGraph::gameMode(int direction) {
 	else if (gm == "ex2-real") { m_pads = 7; std::copy(mapping7, mapping7+max_panels, m_arrow_map); }
 	else if (gm == "para-single") { m_pads = 5; std::copy(mapping5, mapping5+max_panels, m_arrow_map); }
 	else throw std::runtime_error("Unknown track " + gm);
+	
+	difficultyDelta(0); // Construct new notes
 }
 
 /// Are we alive?
