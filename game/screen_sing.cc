@@ -91,8 +91,9 @@ void ScreenSing::enter() {
 			} catch (std::runtime_error&) { break; }
 		}
 	}
-	double setup_delay = m_dancers.size() != 0 ? -5.0 : (m_instruments.empty() ? -1.0 : -8.0);
-	m_audio.playMusic(m_song->music, false, 0.0, setup_delay); // Startup delay for instruments is longer than for singing only
+	// Startup delay for instruments is longer than for singing only
+	double setup_delay = (m_instruments.empty() && m_dancers.empty() ? -1.0 : -8.0);
+	m_audio.playMusic(m_song->music, false, 0.0, setup_delay);
 	m_engine.reset(new Engine(m_audio, *m_song, analyzers.begin(), analyzers.end(), m_database));
 }
 

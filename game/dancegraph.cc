@@ -11,7 +11,7 @@ namespace {
 	const std::string diffv[] = { "Beginner", "Easy", "Medium", "Hard", "Challenge" };
 	const float death_delay = 20.0f; // Delay in seconds after which the player is hidden
 	const float not_joined = -100; // A value that indicates player hasn't joined
-	const float join_delay = 5.0f; // Time to select track/difficulty when joining mid-game
+	const float join_delay = 7.0f; // Time to select track/difficulty when joining mid-game
 	const float past = -0.4f;
 	const float future = 2.0f;
 	const float timescale = 7.0f;
@@ -97,7 +97,9 @@ void DanceGraph::gameMode(int direction) {
 	static int mapping10[max_panels]= {0, 3, 4, 7, 1, 6, 2, 5,-1,-1};
 	// Cycling
 	if (direction == 0) {
-		m_curTrackIt = m_song.danceTracks.begin();
+		m_curTrackIt = m_song.danceTracks.find("dance-single");
+		if (m_curTrackIt == m_song.danceTracks.end())
+			m_curTrackIt = m_song.danceTracks.begin();
 	} else if (direction > 0) {
 		m_curTrackIt++;
 		if (m_curTrackIt == m_song.danceTracks.end()) m_curTrackIt = m_song.danceTracks.begin();
@@ -193,7 +195,10 @@ void DanceGraph::engine() {
 	// Handle all events
 	for (input::Event ev; m_input.tryPoll(ev);) {
 		// Handle joining and keeping alive
-		if (m_jointime == not_joined) m_jointime = (time < 0.0 ? -join_delay : time); // join
+		if (m_jointime == not_joined) {
+			m_jointime = (time < 0.0 ? -join_delay : time); // join
+			break;
+		}
 		m_acttime = time;
 		// Difficulty / mode selection
 		if (time < m_jointime + join_delay) {
