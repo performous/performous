@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<!-- Use xmlstarlet tr songlist-to-xhtml.xml songlist.xml > songlist.tex -->
+<!-- Use xmlstarlet tr songlist-to-tex.xsl songlist.xml > songlist.tex -->
 <!-- Then compile the tex into pdf with pdflatex songlist.tex -->
 
 <xsl:stylesheet  version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
