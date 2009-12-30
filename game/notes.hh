@@ -72,6 +72,8 @@ struct Note {
 	       end; ///< end time
 	/// power of note
 	mutable double power;
+	/// how well the note was sung [0,1] (used for drawing a star)
+	mutable float accuracy;
 	/// note type
 	enum Type { FREESTYLE = 'F', NORMAL = ':', GOLDEN = '*', SLIDE = '+', SLEEP = '-',
 	  TAP = '1', HOLDBEGIN = '2', HOLDEND = '3', ROLL = '4', MINE = 'M', LIFT = 'L'} type;

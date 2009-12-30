@@ -5,8 +5,9 @@
 
 Player::Player(Song& song, Analyzer& analyzer, size_t frames):
 	  m_song(song), m_analyzer(analyzer), m_pitch(frames, std::make_pair(getNaN(),
-	  -getInf())), m_pos(), m_score(), m_lineScore(), m_maxLineScore(), m_prevLineScore(-1),
-	  m_feedbackFader(0.0, 2.0), m_activitytimer(), m_scoreIt(m_song.notes.begin())
+	  -getInf())), m_pos(), m_score(), m_noteScore(), m_lineScore(), m_maxLineScore(),
+	  m_prevLineScore(-1), m_feedbackFader(0.0, 2.0), m_activitytimer(),
+	  m_scoreIt(m_song.notes.begin())
 { }
 
 void Player::update() {
@@ -26,6 +27,7 @@ void Player::update() {
 			// Add score
 			double score_addition = m_song.m_scoreFactor * m_scoreIt->score(m_song.scale.getNote(t->freq), beginTime, endTime);
 			m_score += score_addition;
+			m_noteScore += score_addition;
 			m_lineScore += score_addition;
 		}
 		// If a row of lyrics ends, calculate how well it went
@@ -35,6 +37,10 @@ void Player::update() {
 			m_maxLineScore = 0; // Not in SLEEP note anymore, so reset maximum
 		}
 		if (endTime < m_scoreIt->end) break;
+		// Set accuracy
+		m_scoreIt->accuracy = std::max(m_scoreIt->accuracy,
+		  float(m_noteScore / m_song.m_scoreFactor / m_scoreIt->maxScore()));
+		m_noteScore = 0; // Reset noteScore as we are moving on to the next one
 		++m_scoreIt;
 	}
 	if (m_scoreIt == m_song.notes.end()) calcRowRank();

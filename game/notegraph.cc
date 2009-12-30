@@ -8,7 +8,7 @@ Dimensions dimensions; // Make a public member variable
 NoteGraph::NoteGraph(Song const& song):
   m_song(song),
   m_notelines(getThemePath("notelines.svg")),
-  m_wave(getThemePath("wave.png")),
+  m_wave(getThemePath("wave.png")), m_star(getThemePath("star.svg")),
   m_notebar(getThemePath("notebar.svg")), m_notebar_hl(getThemePath("notebar.png")),
   m_notebarfs(getThemePath("notebarfs.svg")), m_notebarfs_hl(getThemePath("notebarfs-hl.png")),
   m_notebargold(getThemePath("notebargold.svg")), m_notebargold_hl(getThemePath("notebargold.png")),
@@ -21,6 +21,8 @@ NoteGraph::NoteGraph(Song const& song):
 }
 
 void NoteGraph::reset() {
+	for (Notes::const_iterator it = m_song.notes.begin(); it != m_song.notes.end(); ++it)
+		it->accuracy = 0.0; // Reset accuracy
 	m_songit = m_song.notes.begin();
 }
 
@@ -101,6 +103,32 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 
 	drawNotes();
 	if (config["game/pitch"].b()) drawWaves(database);
+
+	// Draw a star for well sung notes
+	for (Notes::const_iterator it = m_songit; it != m_song.notes.end() && it->begin < m_time - (baseLine - 0.5) / pixUnit; ++it) {
+			if (it->accuracy >= 0.8 && (it->type == Note::NORMAL || it->type == Note::SLIDE || it->type == Note::GOLDEN)) {
+				double x = m_baseX + it->begin * pixUnit + m_noteUnit; // left x coordinate: begin minus border (side borders -noteUnit wide)
+				double yend = m_baseY + (it->note + 1) * m_noteUnit; // top y coordinate (on the one higher note line)
+				double w = (it->end - it->begin) * pixUnit - m_noteUnit * 2.0; // width: including borders on both sides
+				float hh = -m_noteUnit;
+				float centerx = x + w - hh;
+				float rot = int(time*360) % 360; // They rotate!
+				float zoom = std::abs((rot-180) / 360.0f) + 0.5f;
+				{ glutil::Translation tr(centerx, yend);
+				{ glutil::Scale sc(zoom, zoom, zoom);
+				{ glutil::Rotation rt(rot, 0.0f, 0.0f, 1.0f);
+					UseTexture tblock(m_star);
+					glutil::Begin block(GL_TRIANGLE_STRIP);
+					glTexCoord2f(0.0f, 0.0f); glVertex2f(-hh, -hh);
+					glTexCoord2f(1.0f, 0.0f); glVertex2f( hh, -hh);
+					glTexCoord2f(0.0f, 1.0f); glVertex2f(-hh,  hh);
+					glTexCoord2f(1.0f, 1.0f); glVertex2f( hh,  hh);
+				} //< revert rotation
+				} //< revert scale
+				} //< revert translation
+			}
+
+	}
 }
 
 void NoteGraph::drawNotes() {
@@ -148,7 +176,6 @@ void NoteGraph::drawNotes() {
 				glColor4f(1.0f, 1.0f, 1.0f, m_notealpha);
 			}
 		}
-
 	}
 }
 

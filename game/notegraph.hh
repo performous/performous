@@ -28,6 +28,7 @@ class NoteGraph {
 	Song const& m_song;
 	Texture m_notelines;
 	Texture m_wave;
+	Texture m_star;
 	Texture m_notebar;
 	Texture m_notebar_hl;
 	Texture m_notebarfs;

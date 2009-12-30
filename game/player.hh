@@ -27,6 +27,8 @@ struct Player {
 	size_t m_pos;
 	/// score for current song
 	double m_score;
+	/// score for current note
+	double m_noteScore;
 	/// score for current line
 	double m_lineScore;
 	/// maximum score for the previous line
