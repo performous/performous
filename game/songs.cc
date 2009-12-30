@@ -39,9 +39,8 @@ void Songs::reload_internal() {
 		m_songs.clear();
 		m_dirty = true;
 	}
-	Paths paths = getPaths();
+	Paths paths = getPathsConfig("system/path_songs");
 	for (Paths::iterator it = paths.begin(); m_loading && it != paths.end(); ++it) {
-		*it /= "songs";
 		if (!fs::is_directory(*it)) { std::cout << ">>> Not scanning: " << *it << " (no such directory)" << std::endl; continue; }
 		std::cout << ">>> Scanning " << *it << std::endl;
 		size_t count = m_songs.size();

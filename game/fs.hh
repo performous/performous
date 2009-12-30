@@ -26,3 +26,5 @@ typedef std::vector<fs::path> Paths;
 /** Get all shared data paths in preference order **/
 Paths const& getPaths(bool refresh = false);
 
+/** Get all paths listed in a config option **/
+Paths getPathsConfig(std::string const& confOption);

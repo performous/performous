@@ -217,6 +217,18 @@ to save the current settings to XML.
 	</entry>
 
 	<!-- System preferences -->
+	<entry name="system/path_songs" type="string_list">
+		<stringvalue>DATADIR/songs/</stringvalue>
+		<stringvalue>/usr/local/share/games/ultrastar/songs/</stringvalue>
+		<stringvalue>/usr/local/share/games/fretsonfire/data/songs/</stringvalue>
+		<stringvalue>/usr/share/games/ultrastar/songs/</stringvalue>
+		<stringvalue>/usr/share/games/fretsonfire/data/songs/</stringvalue>
+		<stringvalue>~/.ultrastar/songs/</stringvalue>
+		<locale name="C">
+			<short>Song folders</short>
+			<long>Where to recursively look for songs. DATADIR at the beginning means all Performous data folders.</long>
+		</locale>
+	</entry>
 	<entry name="system/path" type="string_list">
 		<locale name="C">
 			<short>Base folders for data</short>

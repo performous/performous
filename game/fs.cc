@@ -72,13 +72,14 @@ fs::path pathMangle(fs::path const& dir) {
 
 std::string getThemePath(std::string const& filename) {
 	std::string theme = config["game/theme"].s();
-	if (theme.empty()) throw std::runtime_error("Configuration value game/theme is empty");
-	// Figure out theme folder (if theme name rather than path was given)
-	if (theme.find('/') == std::string::npos) {
+	static const std::string defaultTheme = "default";
+	if (theme.empty()) theme = defaultTheme;
+	// Try current theme and if that fails, try default theme.
+	try {
 		return getPath(fs::path("themes") / theme / filename);
-	} else {
-		if (*theme.rbegin() == '/') theme.erase(theme.size() - 1); // Remove trailing slash
-		return theme + "/" + filename;
+	} catch (std::runtime_error&) {
+		if (theme == defaultTheme) throw;
+		return getPath(fs::path("themes") / defaultTheme / filename);
 	}
 }
 
@@ -144,5 +145,26 @@ Paths const& getPaths(bool refresh) {
 		std::remove_copy_if(dirs.begin(), dirs.end(), std::inserter(paths, paths.end()), pathNotExist);
 	}
 	return paths;
+}
+
+Paths getPathsConfig(std::string const& confOption) {
+	Paths ret;
+	Paths const& paths = getPaths();
+	ConfigItem::StringList const& sl = config[confOption].sl();
+	for (ConfigItem::StringList::const_iterator it = sl.begin(), end = sl.end(); it != end; ++it) {
+		fs::path p = pathMangle(*it);
+		if (p.empty()) continue;  // Ignore empty paths
+		if (*p.begin() == "DATADIR") {
+			// Remove first element
+			p = p.string().substr(7);
+			// Add all data paths with p appended to them
+			for (Paths::const_iterator it2 = paths.begin(), end2 = paths.end(); it2 != end2; ++it2) {
+				ret.push_back(*it2 / p);
+			}
+			continue;
+		}
+		ret.push_back(p);
+	}
+	return ret;
 }
 
