@@ -23,3 +23,21 @@ static inline double getNaN() { return std::numeric_limits<double>::quiet_NaN();
 /** A convenient way for getting infs **/
 static inline double getInf() { return std::numeric_limits<double>::infinity(); }
 
+static inline bool isPow2(unsigned int val) {
+	if (val == 0) return false;
+	if ((val & (val-1)) == 0) return true; // From Wikipedia: Power_of_two
+	return false;
+}
+
+static inline unsigned int nextPow2(unsigned int val) {
+	unsigned int ret = 1;
+	while (ret < val) ret *= 2;
+	return ret;
+}
+
+static inline unsigned int prevPow2(unsigned int val) {
+	unsigned int ret = 1;
+	while ((ret*2) < val) ret *= 2;
+	return ret;
+}
+

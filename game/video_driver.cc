@@ -7,16 +7,10 @@
 #include "joystick.hh"
 
 #include <SDL.h>
-#ifdef USE_SDL_IMAGE
-  #include <sstream>
-  #include <fstream>
-#else
-  #include <Magick++.h>
-#endif
 
 #ifdef _WIN32
-  // for GetTempPathA
-  #include <windows.h>
+// for GetTempPathA
+#include <windows.h>
 #endif
 
 namespace {
@@ -82,6 +76,7 @@ void Window::screenshot() {
 	fnstr << "/tmp/";
 #endif
 	fnstr << "performous_screenshot_" << count;
+#if 0  // TODO: implement with libpng
 #ifdef USE_SDL_IMAGE
 	/* Write the image out as an uncompressed tga. */
 	fnstr << ".tga";
@@ -118,6 +113,7 @@ void Window::screenshot() {
 	image.read(blob);
 	image.flip();
 	image.write(fnstr.str().c_str());
+#endif
 #endif
 	count++;
 }

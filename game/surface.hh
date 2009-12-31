@@ -179,7 +179,7 @@ class Surface {
 	/// creates surface from cairo surface
 	Surface(cairo_surface_t* _surf);
 	/// creates surface from file
-	Surface(std::string const& filename, bool autocrop = false);
+	Surface(std::string const& filename);
 	/// draws surface
 	void draw() const;
 	/// loads surface into buffer

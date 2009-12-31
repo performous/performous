@@ -27,7 +27,7 @@ void ScreenSing::enter() {
 	bool foundbg = false;
 	if (!m_song->background.empty()) {
 		try {
-			m_background.reset(new Surface(m_song->path + m_song->background, true));
+			m_background.reset(new Surface(m_song->path + m_song->background));
 			foundbg = true;
 		} catch (std::exception& e) {
 			std::cerr << e.what() << std::endl;
@@ -40,7 +40,7 @@ void ScreenSing::enter() {
 	if (foundbg == false) {
 		try {
 			std::string bgpath = m_backgrounds.getRandom();
-			m_background.reset(new Surface(bgpath, true));
+			m_background.reset(new Surface(bgpath));
 		} catch (std::exception& e) {
 			std::cerr << e.what() << std::endl;
 		}

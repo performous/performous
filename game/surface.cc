@@ -3,15 +3,8 @@
 #include "fs.hh"
 #include "configuration.hh"
 #include "video_driver.hh"
+#include "image.hh"
 
-#include <librsvg/rsvg.h>
-#include <librsvg/rsvg-cairo.h>
-#ifdef USE_SDL_IMAGE
-	#include <SDL_image.h>
-#else
-	#include <Magick++.h>
-	using boost::uint32_t;
-#endif
 #include <fstream>
 #include <stdexcept>
 #include <sstream>
@@ -28,130 +21,26 @@ float Dimensions::screenY() const {
 	throw std::logic_error("Dimensions::screenY(): unknown m_screenAnchor value");
 }
 
-namespace {
-	bool isPow2(unsigned int val) {
-		if (val == 0) return false;
-		if ((val & (val-1)) == 0) return true; // From Wikipedia: Power_of_two
-		return false;
-	}
-
-	unsigned int nextPow2(unsigned int val) {
-		unsigned int ret = 1;
-		while (ret < val) ret *= 2;
-		return ret;
-	}
-
-	unsigned int prevPow2(unsigned int val) {
-		unsigned int ret = 1;
-		while ((ret*2) < val) ret *= 2;
-		return ret;
-	}
-
-	bool diffRGBA(uint32_t a, uint32_t b, unsigned threshold = 5) {
-		for (unsigned byte = 0; byte < 4; ++byte) {
-			int aByte = (a >> (byte * 8)) & 0xFF;
-			int bByte = (b >> (byte * 8)) & 0xFF;
-			if (unsigned(std::abs(aByte - bByte)) > threshold) return true;
-		}
-		return false;
-	}
-}
-
 bool checkExtension(std::string const& extension) {
 	std::istringstream iss(reinterpret_cast<char const*>(glGetString(GL_EXTENSIONS)));
 	for (std::string ext; iss >> ext;) if (ext == extension) return true;
 	return false;
 }
 
-template <typename T> void loader(T& target, std::string filename, bool autocrop) {
-	if (!std::ifstream(filename.c_str(), std::ios::binary).is_open()) throw std::runtime_error("File not found: " + filename);
-	if (filename.size() > 4 && filename.substr(filename.size() - 4) == ".svg") {
-		struct RSVGInit {
-			RSVGInit() { rsvg_init(); }
-			~RSVGInit() { rsvg_term(); }
-		} rsvgInit;
-		GError* pError = NULL;
-		// Find SVG dimensions (in pixels)
-		RsvgHandle* svgHandle = rsvg_handle_new_from_file(filename.c_str(), &pError);
-		if (pError) {
-			g_error_free(pError);
-			throw std::runtime_error("Unable to load " + filename);
-		}
-		RsvgDimensionData svgDimension;
-		rsvg_handle_get_dimensions (svgHandle, &svgDimension);
-		rsvg_handle_free(svgHandle);
-		double factor = config["graphic/svg_lod"].f();
-		unsigned int w = nextPow2(svgDimension.width*factor);
-		unsigned int h = nextPow2(svgDimension.height*factor);
-		// Load and raster the SVG
-		GdkPixbuf* pb = rsvg_pixbuf_from_file_at_size(filename.c_str(), w, h, &pError);
-		if (pError) {
-			g_error_free(pError);
-			throw std::runtime_error("Unable to load " + filename);
-		}
-		target.load(w, h, pix::CHAR_RGBA, gdk_pixbuf_get_pixels(pb), float(svgDimension.width)/svgDimension.height);
-		gdk_pixbuf_unref(pb);
-	} else {
-	#ifdef USE_SDL_IMAGE
-		SDL_Surface* imgsurf = IMG_Load(filename.c_str());
-		if (imgsurf == NULL) {
-			throw std::runtime_error("Unable to load " + filename + ": " + IMG_GetError());
-		}
-		// If an alpha channel is present in the source, ensure that SDL_SRCALPHA is not set on it
-		// so the alpha actually makes it onto the destination surface.
-		if (imgsurf->format->Amask != 0) {
-			SDL_SetAlpha(imgsurf, 0, 0);
-		}
-		// Copy the image to an RGBA surface to ensure that it is indeed RGBA with the right pixel layout.
-		SDL_Surface* rgbasurf = SDL_CreateRGBSurface(SDL_SWSURFACE, imgsurf->w, imgsurf->h, 32,
-#if SDL_BYTEORDER == SDL_BIGENDIAN
-		  0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff
-#else
-		  0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000
-#endif
-		);
-		if (rgbasurf == NULL) {
-			SDL_FreeSurface(imgsurf);
-			throw std::runtime_error(std::string("Unable to allocate image surface: ") + IMG_GetError());
-		}
-		SDL_BlitSurface(imgsurf, NULL, rgbasurf, NULL);
-		SDL_FreeSurface(imgsurf);
-		target.load(rgbasurf->w, rgbasurf->h, pix::CHAR_RGBA, reinterpret_cast<const unsigned char*>(rgbasurf->pixels));
-		SDL_FreeSurface(rgbasurf);
-	#else
-		Magick::Image image;
-		Magick::Blob blob;
-		try {
-			image.read(filename);
-			image.magick("RGBA");
-			image.write(&blob);
-			unsigned w = image.columns();
-			unsigned ybegin = 0, yend = image.rows();
-			uint32_t const* buf = static_cast<uint32_t const*>(blob.data());
-			if (autocrop) {
-				uint32_t bordercol = buf[0];
-				for (bool mismatch = false; ybegin < yend; ++ybegin) {
-					for (unsigned x = 0; x < w; ++x) if (diffRGBA(buf[ybegin * w + x], bordercol)) { mismatch = true; break; }
-					if (mismatch) break;
-				}
-				for (bool mismatch = false; yend > ybegin; --yend) {
-					unsigned y = yend - 1;
-					for (unsigned x = 0; x < w; ++x) if (diffRGBA(buf[y * w + x], bordercol)) { mismatch = true; break; }
-					if (mismatch) break;
-				}
-			}
-			target.load(w, yend - ybegin, pix::CHAR_RGBA, reinterpret_cast<unsigned char const*>(buf + ybegin * w));
-		}
-		catch (Magick::Exception&) // add error handling
-		{
-			throw std::runtime_error("Image Error");
-		}
-	#endif
-	}
+template <typename T> void loader(T& target, fs::path name) {
+	std::string const filename = name.string();
+	if (!fs::exists(name)) throw std::runtime_error("File not found: " + filename);
+	// Get file extension in lower case
+	std::string ext = name.extension();
+	std::for_each(ext.begin(), ext.end(), static_cast<int(*)(int)>(std::tolower));
+	
+	if (ext == ".svg") loadSVG(target, filename);
+	else if (ext == ".png") loadPNG(target, filename);
+	else loadJPEG(target, filename);
 }
 
-Texture::Texture(std::string const& filename) { loader(*this, filename, false); }
-Surface::Surface(std::string const& filename, bool autocrop) { loader(*this, filename, autocrop); }
+Texture::Texture(std::string const& filename) { loader(*this, filename); }
+Surface::Surface(std::string const& filename) { loader(*this, filename); }
 
 // Stuff for converting pix::Format into OpenGL enum values
 namespace {
