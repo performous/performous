@@ -587,6 +587,9 @@ void GuitarGraph::draw(double time) {
 			
 			// Draw flames
 			for (int fret = 0; fret < 5; ++fret) { // Loop through the frets
+				if (m_drums && fret == 0) { // Skip bass drum
+					m_flames[fret].clear(); continue;
+				}
 				float x = -2.0f + fret - 0.5f * m_drums;
 				for (std::vector<AnimValue>::iterator it = m_flames[fret].begin(); it != m_flames[fret].end();) {
 					float flameAnim = it->get();
