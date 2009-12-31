@@ -5,7 +5,7 @@
 #include "fs.hh"
 #include "util.hh"
 #include "joystick.hh"
-
+#include <fstream>
 #include <SDL.h>
 
 #ifdef _WIN32
@@ -76,8 +76,8 @@ void Window::screenshot() {
 	fnstr << "/tmp/";
 #endif
 	fnstr << "performous_screenshot_" << count;
-#if 0  // TODO: implement with libpng
-#ifdef USE_SDL_IMAGE
+#if 1  // TODO: implement with libpng?
+//#ifdef USE_SDL_IMAGE
 	/* Write the image out as an uncompressed tga. */
 	fnstr << ".tga";
 	std::ofstream tgaout(fnstr.str().c_str(), std::ios::binary);
@@ -113,7 +113,6 @@ void Window::screenshot() {
 	image.read(blob);
 	image.flip();
 	image.write(fnstr.str().c_str());
-#endif
 #endif
 	count++;
 }
