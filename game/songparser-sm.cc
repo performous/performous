@@ -137,7 +137,7 @@ bool SongParser::smParseField(std::string line) {
 	else if (key == "BANNER") m_song.cover = value;
 	else if (key == "MUSIC") m_song.music["background"] = m_song.path + value;
 	else if (key == "BACKGROUND") m_song.background = value;
-	else if (key == "OFFSET") assign(m_song.start, value);
+	else if (key == "OFFSET") { assign(m_gap, value); m_gap *= -1; }
 	//Bpm values are only read into a container in class SongParser, but not used (except the first value).
 	else if (key == "BPMS"){
 			std::istringstream iss(value);
