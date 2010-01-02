@@ -166,7 +166,11 @@ void DanceGraph::difficulty(DanceDifficulty level) {
 void DanceGraph::engine() {
 	double time = m_audio.getPosition();
 	time -= config["audio/controller_delay"].f();
-
+	for (Song::Stops::const_iterator it = m_song.stops.begin(), end = m_song.stops.end(); it != end; ++it) {
+		if (it->first >= time) break;
+		if (time < it->first + it->second) { time = it->first; break; } // Inside stop
+		time -= it->second;
+	}
 	// Notes gone by
 	for (DanceNotes::iterator& it = m_notesIt; it != m_notes.end() && time > it->note.end + maxTolerance; it++) {
 		if(!it->isHit) { // Missed
@@ -311,6 +315,12 @@ void DanceGraph::drawMine(float x, float y, float rot, float scale) {
 
 /// Draws the dance graph
 void DanceGraph::draw(double time) {
+	for (Song::Stops::const_iterator it = m_song.stops.begin(), end = m_song.stops.end(); it != end; ++it) {
+		if (it->first >= time) break;
+		if (time < it->first + it->second) { time = it->first; break; } // Inside stop
+		time -= it->second;
+	}
+
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
 	dimensions.screenTop().middle(m_cx.get()).stretch(m_width.get(), 1.0);
 	double offsetX = 0.5 * (dimensions.x1() + dimensions.x2());

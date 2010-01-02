@@ -10,10 +10,7 @@
 /// @file
 /// Functions used for parsing the StepMania SM format
 
-
 namespace {
-	
-	const int max_panels = 10; // Maximum number of arrow lines
 	
 	// Here are some functions needed in reading the data.
 	void assign(int& var, std::string const& str) {
@@ -60,6 +57,7 @@ reaches value #NOTES.
 void SongParser::smParse() {
 	Song& s = m_song;
 	std::string line;
+	// Parse the the entire file
 	while (getline(line) && smParseField(line)) {}
 	if (m_song.danceTracks.empty() ) throw std::runtime_error("No note data in the file");
 	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
@@ -67,6 +65,12 @@ void SongParser::smParse() {
 	std::string tmp = s.path + "music.ogg";
 	namespace fs = boost::filesystem;
 	if ((music.empty() || !fs::exists(music)) && fs::exists(tmp)) music = tmp;
+	// Convert stops to the format required in Song
+	s.stops.resize(m_stops.size());
+	for (std::size_t i = 0; i < m_stops.size(); ++i) s.stops[i] = stopConvert(m_stops[i]);
+	for (unsigned ts = 0; ts < 16 * 260; ts += 16) {
+		std::cout << ts / 16 + 1 << " " << tsTime(ts) + 0.030 << std::endl;
+	}
 }
 	
 bool SongParser::smParseField(std::string line) {
@@ -138,24 +142,22 @@ bool SongParser::smParseField(std::string line) {
 	else if (key == "MUSIC") m_song.music["background"] = m_song.path + value;
 	else if (key == "BACKGROUND") m_song.background = value;
 	else if (key == "OFFSET") { assign(m_gap, value); m_gap *= -1; }
-	//Bpm values are only read into a container in class SongParser, but not used (except the first value).
 	else if (key == "BPMS"){
 			std::istringstream iss(value);
 			double ts, bpm;	
 			char chr;
 			while (iss >> ts >> chr >> bpm) {
 				if (ts == 0.0) m_bpm = bpm;
-				addBPM(ts, bpm);
+				addBPM(ts * 4.0, bpm);
 				if (!(iss >> chr)) break;
 			}
 	}
-	//Stops are only read into a container in class SongParser, but not used.
 	else if (key == "STOPS"){
 			std::istringstream iss(value);
 			double beat, sec;
 			char chr;
 			while (iss >> beat >> chr >> sec) {
-				m_stops.push_back(std::make_pair(beat, sec));
+				m_stops.push_back(std::make_pair(beat * 4.0, sec));
 				if (!(iss >> chr)) break;
 	
 			}
@@ -179,51 +181,49 @@ bool SongParser::smParseField(std::string line) {
 
 
 Notes SongParser::smParseNotes(std::string line) {
+	//container for dance songs
+	typedef std::map<int, Note> DanceChord;	//int indicates "arrow" position (cmp. fret in guitar) 
+	typedef std::vector<DanceChord> DanceChords;
+
 	DanceChords chords;	//temporary container for notes
 	Notes notes;	
-	int lcount = 0;		//line counter for note duration
-	int count = 0; 		//total lines counter
-	double tm = 0; 		//time counter
-	double dur; 		//note duration
+	unsigned measure = 1;
+	double begin = 0.0;
 
-	std::vector<int> holdMarks(max_panels, -1);	//vector to contain mark for the chord where hold began for each "fret" (-1 if no mark set)
+	std::map<int, int> holdMarks; // Keeps track of hold notes not yet terminated
 
-	while(getline(line)) {
+	while (getline(line)) {
 		if (line.empty() || line == "\r") continue;
 		if (line[0] == '/' && line[1] == '/') continue;
 		if (line[0] == '#') return notes;
 		if (line[0] == ',' || line[0] == ';') {
-			/*Counting of the time stamps of the notes is done
-			every time there is a character ',' which indicates the end of a measure.
-			*/
-			dur = 4.0 * ( 1.0/(m_bpm/60.0) ) / lcount;	//counts one note duration in seconds;	
-			for(int j = count - lcount; j<count ; j++) {
-				DanceChord& _chord = chords.at(j);
-				for(int i = 0; i < max_panels; i++) {
-					if(_chord.find(i) != _chord.end()) {
-						// TODO: Proper LIFT handling
-						if(_chord[i].type == Note::TAP || _chord[i].type == Note::MINE || _chord[i].type == Note::LIFT) {
-							_chord[i].begin = tm;
-							_chord[i].end = tm;
-							notes.push_back(_chord[i]);	//note added to notes container used in DanceTrack
-						}
-						// TODO: Proper ROLL handling
-						if(_chord[i].type == Note::HOLDBEGIN || _chord[i].type == Note::ROLL) {
-							_chord[i].begin = tm;
-							notes.push_back(_chord[i]);	//note added to notes container used in DanceTrack
-							holdMarks.at(i) = notes.size() - 1; //mark to hold beginning in notes vector
-						}
-						if(_chord[i].type == Note::HOLDEND) {
-							if(holdMarks.at(i) < 0) throw std::runtime_error("hold end without beginning");
-							Note& _note = notes.at(holdMarks.at(i));
-							_note.end = tm;
-							holdMarks.at(i) = -1;
-						}
+			double end = tsTime(measure * 16.0);
+			unsigned div = chords.size();
+			double step = (end - begin) / div;
+			for (unsigned note = 0; note < div; ++note) {
+				double t = begin + note * step;
+				for (DanceChord::iterator it = chords[note].begin(), end = chords[note].end(); it != end; ++it) {
+					int& holdIdx = holdMarks[it->first];  // holdIdx for current arrow
+					Note& n = it->second;
+					n.begin = n.end = t;
+					// TODO: Proper LIFT handling
+					if (n.type == Note::TAP || n.type == Note::MINE || n.type == Note::LIFT) notes.push_back(n);
+					// TODO: Proper ROLL handling
+					if (n.type == Note::HOLDBEGIN || n.type == Note::ROLL) {
+						notes.push_back(n);  // Note added now, end time will be fixed later
+						holdIdx = notes.size(); // Store index in notes plus one
+						continue;
 					}
+					if (n.type == Note::HOLDEND) {
+						if (holdIdx == 0) throw std::runtime_error("Hold end without beginning");
+						notes[holdIdx - 1].end = t;
+					}
+					holdIdx = 0;
 				}
-				tm += dur;
 			}
-			lcount =0;
+			chords.clear();
+			begin = end;
+			++measure;
 			continue;
 		}
 		/*Note data is read into temporary container chords before
@@ -231,10 +231,8 @@ Notes SongParser::smParseNotes(std::string line) {
 		would be easier to count afterwards.
 		*/
 		DanceChord chord;
-		std::istringstream iss(line);
-		for(int i = 0; i < max_panels; i++) {
-			if ((unsigned)i > line.size()) break; // end of line reached
-			char notetype = iss.get();
+		for(std::size_t i = 0; i < line.size(); i++) {
+			char notetype = line[i];
 			if (notetype == '0') continue;
 			Note note;
 			if(notetype == '1') note.type = Note::TAP;
@@ -249,10 +247,7 @@ Notes SongParser::smParseNotes(std::string line) {
 			note.note = i;
 			chord[i] = note;
 		}
-		lcount++;	//lcount and count values will be used to count the time stamps
-		count++;
 		chords.push_back(chord);
-		continue;
 	}
 	//The code reaches here only when all data is read from the file.
 	return notes;

@@ -105,7 +105,6 @@ class SongParser {
 	unsigned int m_prevts;
 	unsigned int m_relativeShift;
 	double m_maxScore;
-	std::vector<std::pair<double,double> > m_stops;
 	struct BPM {
 		BPM(double _begin, double _ts, double bpm): begin(_begin), step(0.25 * 60.0 / bpm), ts(_ts) {}
 		double begin; // Time in seconds
@@ -122,6 +121,7 @@ class SongParser {
 		}
 		m_bpms.push_back(BPM(tsTime(ts), ts, bpm));
 	}
+	/// Convert a timestamp (beats) into time (seconds)
 	double tsTime(double ts) const {
 		if (m_bpms.empty()) {
 			if (ts != 0) throw std::runtime_error("BPM data missing");
@@ -131,6 +131,13 @@ class SongParser {
 			if (it->ts <= ts) return it->begin + (ts - it->ts) * it->step;
 		}
 		throw std::logic_error("INTERNAL ERROR: BPM data invalid");
+	}
+	/// Stops stored in <ts, duration> format
+	std::vector<std::pair<double, double> > m_stops;
+	/// Convert a stop into <time, duration> (as stored in the song)
+	std::pair<double, double> stopConvert(std::pair<double, double> s) {
+		s.first = tsTime(s.first);
+		return s;
 	}
 };
 

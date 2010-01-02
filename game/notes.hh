@@ -99,10 +99,6 @@ struct Note {
 
 typedef std::vector<Note> Notes;
 
-//container for dance songs
-typedef std::map<int, Note> DanceChord;	//int indicates "arrow" position (cmp. fret in guitar) 
-typedef std::vector<DanceChord> DanceChords;
-
 
 struct DanceTrack {
 	DanceTrack(std::string& description, Notes& notes);

@@ -78,6 +78,8 @@ class Song: boost::noncopyable {
 	std::vector<bool> drawPitchGraph; ///< if pitch graph should be drawn
 	double beginTime, endTime; ///< the period where there are notes
 	double m_scoreFactor; ///< Normalization factor for the scoring system
+	typedef std::vector<std::pair<double,double> > Stops;
+	Stops stops;
 };
 
 static inline bool operator<(Song const& l, Song const& r) { return l.collateByArtist < r.collateByArtist; }
