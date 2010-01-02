@@ -71,7 +71,7 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 				config["graphic/fullscreen"].b() = !config["graphic/fullscreen"].b();
 				continue; // Already handled here...
 			}
-			if (keypressed == SDLK_PRINT || keypressed == SDLK_WORLD_7) { // WORLD_7 = section sign (next to 1)
+			if (keypressed == SDLK_PRINT || keypressed == SDLK_F12) {
 				g_take_screenshot = true;
 			}
 			if (keypressed == SDLK_F4 && modifier & KMOD_ALT) {
@@ -163,9 +163,9 @@ void mainLoop(std::string const& songlist) {
 		unsigned frames = 0;
 		while (!sm.isFinished()) {
 			if( g_take_screenshot ) {
+				fs::path filename;
 				try {
 					window.screenshot();
-					std::cout << ">>> Screenshot taken" << std::endl;
 				} catch (std::exception& e) {
 					std::cerr << "ERROR: " << e.what() << std::endl;
 				}

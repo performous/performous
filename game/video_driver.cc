@@ -3,15 +3,12 @@
 #include "config.hh"
 #include "glutil.hh"
 #include "fs.hh"
+#include "image.hh"
 #include "util.hh"
 #include "joystick.hh"
+#include <boost/date_time.hpp>
 #include <fstream>
 #include <SDL.h>
-
-#ifdef _WIN32
-// for GetTempPathA
-#include <windows.h>
-#endif
 
 namespace {
 	unsigned s_width;
@@ -61,60 +58,14 @@ bool Window::getFullscreen() {
 }
 
 void Window::screenshot() {
-	static unsigned int count = 0;
-	unsigned width = m_fullscreen ? m_fsW : m_windowW;
-	unsigned height = m_fullscreen ? m_fsH : m_windowH;
-
-	std::vector<char> buffer(width*height*3);
-	glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, &buffer[0]);
-	std::ostringstream fnstr;
-#ifdef _WIN32
-	char tmppath[256];
-	GetTempPathA(256, tmppath);  /* this includes a backslash at the end */
-	fnstr << tmppath;
-#else
-	fnstr << "/tmp/";
-#endif
-	fnstr << "performous_screenshot_" << count;
-#if 1  // TODO: implement with libpng?
-//#ifdef USE_SDL_IMAGE
-	/* Write the image out as an uncompressed tga. */
-	fnstr << ".tga";
-	std::ofstream tgaout(fnstr.str().c_str(), std::ios::binary);
-	char tga_hdr_part1[] = {
-	  0x00,  /* no identification field */
-	  0x00,  /* no palette */
-	  0x02,  /* 24-bit RGB */
-	  0x00, 0x00, 0x00, 0x00, 0x00,  /* palette info (ignored) */
-	  0x00, 0x00,  /* x-origin */
-	  0x00, 0x00,  /* y-origin */
-	};
-	tgaout.write(tga_hdr_part1, sizeof(tga_hdr_part1));
-	/* two 16-bit little endian words for width and height */
-	tgaout << static_cast<char>(width & 0xff);
-	tgaout << static_cast<char>(width >> 8);
-	tgaout << static_cast<char>(height & 0xff);
-	tgaout << static_cast<char>(height >> 8);
-	tgaout << static_cast<char>(24);  /* bits per pixel */
-	tgaout << static_cast<char>(0x00);  /* no special flags */
-	for (unsigned i = 0; i < width*height*3; i += 3)
-		std::swap(buffer[i], buffer[i+2]);  /* fix the channel order */
-	tgaout.write(&buffer[0], width*height*3);  /* dump the image data */
-	tgaout.close();
-#else
-	fnstr << ".png";
-	Magick::Blob blob( &buffer[0], width*height*3);
-	Magick::Image image;
-	char geometry[16];
-	sprintf(geometry,"%dx%d",width,height);
-	image.size(geometry);
-	image.depth(8);
-	image.magick( "RGB" );
-	image.read(blob);
-	image.flip();
-	image.write(fnstr.str().c_str());
-#endif
-	count++;
+	Image img;
+	img.w = m_fullscreen ? m_fsW : m_windowW;
+	img.h = m_fullscreen ? m_fsH : m_windowH;
+	img.data.resize(((img.w + 3) & ~3) * img.h * 3);
+	glReadPixels(0, 0, img.w, img.h, GL_RGB, GL_UNSIGNED_BYTE, &img.data[0]);
+	fs::path filename = getHomeDir() / ("Performous_" + to_iso_string(boost::posix_time::second_clock::local_time()) + ".png");
+	writePNG(filename.string(), img);
+	std::cout << ">>> Screenshot taken: " << filename << " (" << img.w << "x" << img.h << ")" << std::endl;
 }
 
 
