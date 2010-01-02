@@ -68,9 +68,6 @@ void SongParser::smParse() {
 	// Convert stops to the format required in Song
 	s.stops.resize(m_stops.size());
 	for (std::size_t i = 0; i < m_stops.size(); ++i) s.stops[i] = stopConvert(m_stops[i]);
-	for (unsigned ts = 0; ts < 16 * 260; ts += 16) {
-		std::cout << ts / 16 + 1 << " " << tsTime(ts) + 0.030 << std::endl;
-	}
 }
 	
 bool SongParser::smParseField(std::string line) {
