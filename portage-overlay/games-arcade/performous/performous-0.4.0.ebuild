@@ -35,7 +35,7 @@ KEYWORDS="~x86 ~amd64 ~ppc ~ppc64"
 IUSE="debug alsa portaudio pulseaudio jack songs gstreamer tools editor"
 
 RDEPEND="gnome-base/librsvg
-	dev-libs/boost
+	>=dev-libs/boost-1.36.0
 	x11-libs/pango
 	dev-cpp/libxmlpp
 	media-libs/glew
