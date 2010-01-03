@@ -392,13 +392,15 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 		int& score = m_chordIt->score;
 		std::cout << "HIT, error = " << int(1000.0 * (best->begin - time)) << " ms" << std::endl;
 		m_score -= score;
+		m_starmeter -= score;
+		bool first_time = (score == 0 ? true : false);
+		if (first_time) m_streak++;
+		if (m_streak > m_longestStreak) m_longestStreak = m_streak;
 		score = points(tolerance);
 		score *= m_chordIt->polyphony;
 		m_chordIt->status = 1 + picked;
 		m_score += score;
 		m_starmeter += score;
-		m_streak += 1;
-		if (m_streak > m_longestStreak) m_longestStreak = m_streak;
 		m_correctness.setTarget(1.0, true); // Instantly go to one
 		for (int fret = 0; fret < 5; ++fret) {
 			if (!m_chordIt->fret[fret]) continue;
@@ -406,8 +408,10 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 			m_events.push_back(Event(time, 1 + picked, fret, dur));
 			m_notes[dur] = m_events.size();
 			m_holds[fret] = m_events.size();
-			m_flames[fret].push_back(AnimValue(0.0, flameSpd));
-			m_flames[fret].back().setTarget(1.0);
+			if (first_time) {
+				m_flames[fret].push_back(AnimValue(0.0, flameSpd));
+				m_flames[fret].back().setTarget(1.0);
+			}
 		}
 	}
 }
