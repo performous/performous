@@ -43,16 +43,14 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 		}
 		else if (nav == input::DOWN || nav == input::RIGHT || nav == input::MOREDOWN) ++selected;
 		else if (nav == input::UP || nav == input::LEFT || nav == input::MOREUP) --selected;
+		else if (nav == input::CTRL_DOWN) --config["audio/preview_volume"];
+		else if (nav == input::CTRL_UP) ++config["audio/preview_volume"];
 		else if (nav == input::START) {
 			std::string screen = m_menuOptions[selected].screen;
 			if (screen.empty()) sm->finished(); else sm->activateScreen(screen);
 		} else if (nav == input::PAUSE) m_audio.togglePause();
 		// Normalize selected to [0, size)
 		selected = (m_menuOptions.size() + selected) % m_menuOptions.size();
-	} else if (event.type == SDL_KEYDOWN) {
-		int key = event.key.keysym.sym;
-		if (key == SDLK_F11) --config["audio/preview_volume"];
-		else if (key == SDLK_F12) ++config["audio/preview_volume"];
 	}
 }
 

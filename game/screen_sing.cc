@@ -240,13 +240,13 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		else if (key == SDLK_F8) ++config["audio/round-trip"];
 		else if (key == SDLK_F9) ++config["game/karaoke_mode"];
 		else if (key == SDLK_F10) ++config["game/pitch"];
-		else if (key == SDLK_F11) --config["audio/music_volume"];
-		else if (key == SDLK_F12) ++config["audio/music_volume"];
 		else if (key == SDLK_HOME) m_audio.seekPos(0.0);
 		else if (key == SDLK_LEFT) { m_audio.seek(-5.0); seekback = true; }
 		else if (key == SDLK_RIGHT) m_audio.seek(5.0);
-		else if (key == SDLK_UP) m_audio.seek(30.0);
-		else if (key == SDLK_DOWN) { m_audio.seek(-30.0); seekback = true; }
+		else if (key == SDLK_UP && !(event.key.keysym.mod & KMOD_CTRL)) m_audio.seek(30.0);
+		else if (key == SDLK_DOWN && !(event.key.keysym.mod & KMOD_CTRL)) { m_audio.seek(-30.0); seekback = true; }
+		else if (key == SDLK_UP && (event.key.keysym.mod & KMOD_CTRL)) ++config["audio/music_volume"];
+		else if (key == SDLK_DOWN && (event.key.keysym.mod & KMOD_CTRL)) --config["audio/music_volume"];
 		else if (key == SDLK_k && event.key.keysym.mod & KMOD_SHIFT) { m_audio.streamFade("vocals", 1.0); }
 		else if (key == SDLK_k && !(event.key.keysym.mod & KMOD_SHIFT)) { m_audio.streamFade("vocals", 0.0); }
 		else if (key == SDLK_r && event.key.keysym.mod & KMOD_CTRL) {

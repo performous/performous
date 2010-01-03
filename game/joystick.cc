@@ -75,16 +75,17 @@ input::NavButton input::getNav(SDL_Event const &e) {
 		// Keyboard
 		int k = e.key.keysym.sym;
 		SDLMod mod = e.key.keysym.mod;
-		if (k == SDLK_UP) return input::UP;
-		else if (k == SDLK_DOWN) return input::DOWN;
+		if (k == SDLK_UP && !(mod & KMOD_CTRL)) return input::UP;
+		else if (k == SDLK_DOWN && !(mod & KMOD_CTRL)) return input::DOWN;
 		else if (k == SDLK_LEFT) return input::LEFT;
 		else if (k == SDLK_RIGHT) return input::RIGHT;
 		else if (k == SDLK_RETURN) return input::START;
 		else if (k == SDLK_ESCAPE || k == SDLK_q) return input::CANCEL;
 		else if (k == SDLK_PAGEUP) return input::MOREUP;
 		else if (k == SDLK_PAGEDOWN) return input::MOREDOWN;
-		else if (k == SDLK_PAUSE || (k == SDLK_p && mod & KMOD_CTRL))
-			return input::PAUSE;
+		else if (k == SDLK_PAUSE || (k == SDLK_p && mod & KMOD_CTRL)) return input::PAUSE;
+		else if (k == SDLK_UP && mod & KMOD_CTRL) return input::CTRL_UP;
+		else if (k == SDLK_DOWN && mod & KMOD_CTRL) return input::CTRL_DOWN;
 	} else if (e.type == SDL_JOYBUTTONDOWN) {
 		// Joystick buttons
 		unsigned int joy_id = e.jbutton.which;

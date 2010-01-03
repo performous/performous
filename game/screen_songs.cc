@@ -83,6 +83,8 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 		else if (nav == input::DOWN) m_songs.sortChange(1);
 		else if (nav == input::MOREUP) m_songs.advance(-10);
 		else if (nav == input::MOREDOWN) m_songs.advance(10);
+		else if (nav == input::CTRL_DOWN) --config["audio/preview_volume"];
+		else if (nav == input::CTRL_UP) ++config["audio/preview_volume"];
 		else manageSharedKey(nav);
 	// Handle less common, keyboard only keys
 	} else if (event.type == SDL_KEYDOWN) {
@@ -93,8 +95,6 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 		if (!m_jukebox && m_search.process(keysym)) m_songs.setFilter(m_search.text);
 		// The rest are only available when there are songs available
 		else if (m_songs.empty()) return;
-		else if (key == SDLK_F11) --config["audio/preview_volume"];
-		else if (key == SDLK_F12) ++config["audio/preview_volume"];
 		else if (!m_jukebox && key == SDLK_F4) m_jukebox = true;
 		else if (key == SDLK_TAB && !(mod & KMOD_ALT)) m_songs.randomize();
 		else if (key == SDLK_END) {

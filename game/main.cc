@@ -67,7 +67,7 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 				if (esc) return;
 				esc = true;
 			}
-			if (keypressed == SDLK_RETURN && modifier & KMOD_ALT ) {
+			if ((keypressed == SDLK_RETURN && modifier & KMOD_ALT) || keypressed == SDLK_F11) {
 				config["graphic/fullscreen"].b() = !config["graphic/fullscreen"].b();
 				continue; // Already handled here...
 			}
