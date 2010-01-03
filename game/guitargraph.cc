@@ -68,6 +68,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
   m_button(getThemePath("button.svg")),
   m_button_l(getThemePath("button_l.svg")),
   m_flame(getThemePath("flame.svg")),
+  m_flame_godmode(getThemePath("flame_godmode.svg")),
   m_tap(getThemePath("tap.svg")),
   m_neckglow(getThemePath("neck_glow.svg")),
   m_neckglowColor(),
@@ -590,12 +591,14 @@ void GuitarGraph::draw(double time) {
 				if (m_drums && fret == 0) { // Skip bass drum
 					m_flames[fret].clear(); continue;
 				}
+				Texture* ftex = &m_flame;
+				if (m_starpower.get() > 0.01) ftex = &m_flame_godmode;
 				float x = -2.0f + fret - 0.5f * m_drums;
 				for (std::vector<AnimValue>::iterator it = m_flames[fret].begin(); it != m_flames[fret].end();) {
 					float flameAnim = it->get();
 					if (flameAnim < 1.0f) {
 						float h = flameAnim * 4.0f * fretWid;
-						UseTexture tblock(m_flame);
+						UseTexture tblock(*ftex);
 						glutil::Begin block(GL_TRIANGLE_STRIP);
 						glColor4f(1.0f,1.0f,1.0f,1.0f);
 						glTexCoord2f(0.0f, 1.0f); glVertex3f(x - fretWid, time2y(0.0f), 0.0f);

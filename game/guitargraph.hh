@@ -77,6 +77,7 @@ class GuitarGraph {
 	Surface m_button;
 	Texture m_button_l;
 	Texture m_flame;
+	Texture m_flame_godmode;
 	Surface m_tap;
 	Surface m_neckglow;
 	glutil::Color m_neckglowColor;
