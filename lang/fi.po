@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-12-30 23:29+0200\n"
+"POT-Creation-Date: 2010-01-03 22:06+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Tapio Vierros <tapiovierros@gmail.com>\n"
 "Language-Team: \n"
@@ -107,7 +107,7 @@ msgstr "yksikään kappale ei vastannut hakuasi"
 
 #: ../game/screen_songs.cc:188
 msgid "filter: "
-msgstr "soudatin: "
+msgstr "suodatin: "
 
 #: ../game/screen_songs.cc:188
 msgid "none"
