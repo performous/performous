@@ -576,13 +576,8 @@ void GuitarGraph::draw(double time) {
 						c.r += glow;
 						c.g += glow;
 						c.b += glow;
-						if (glow > 0.5f && tEnd < 0.1f && it->hitAnim[fret].get() == 0.0) {
+						if (glow > 0.5f && tEnd < 0.1f && it->hitAnim[fret].get() == 0.0)
 							it->hitAnim[fret].setTarget(1.0);
-							if (it->end - it->begin > 2 * maxTolerance) {
-								m_flames[fret].push_back(AnimValue(0.0, flameSpd));
-								m_flames[fret].back().setTarget(1.0);
-							}
-						}
 						// Call the actual note drawing function
 						drawNote(fret, c, tBeg, tEnd, whammy, it->tappable, glow > 0.5f, it->hitAnim[fret].get(), 
 						  it->releaseTimes[fret] > 0.0 ? it->releaseTimes[fret] - time : 0.0);
