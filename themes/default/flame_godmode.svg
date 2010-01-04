@@ -15,7 +15,7 @@
    id="svg1901"
    sodipodi:version="0.32"
    inkscape:version="0.47 r22583"
-   sodipodi:docname="flame_godmode.svg"
+   sodipodi:docname="flame.svg"
    version="1.1">
   <defs
      id="defs1903">
@@ -77,15 +77,15 @@
     <linearGradient
        id="linearGradient3605-4">
       <stop
-         style="stop-color:#0000ff;stop-opacity:0.88235295;"
+         style="stop-color:#0047ff;stop-opacity:0.88235295;"
          offset="0"
          id="stop3607-1" />
       <stop
          id="stop3613-9"
          offset="0.5"
-         style="stop-color:#00ffff;stop-opacity:0.78431374;" />
+         style="stop-color:#93fdff;stop-opacity:0.78431374;" />
       <stop
-         style="stop-color:#000080;stop-opacity:0.3764706;"
+         style="stop-color:#00ff36;stop-opacity:0.3764706;"
          offset="1"
          id="stop3609-4" />
     </linearGradient>
@@ -107,17 +107,17 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="3.959798"
-     inkscape:cx="49.089497"
-     inkscape:cy="62.215768"
+     inkscape:zoom="2.8"
+     inkscape:cx="22.313482"
+     inkscape:cy="64.054951"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
-     inkscape:window-width="1091"
-     inkscape:window-height="814"
-     inkscape:window-x="63"
-     inkscape:window-y="34"
+     inkscape:window-width="1280"
+     inkscape:window-height="725"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
      showgrid="false"
-     inkscape:window-maximized="0" />
+     inkscape:window-maximized="1" />
   <metadata
      id="metadata1906">
     <rdf:RDF>
@@ -126,7 +126,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>

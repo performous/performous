@@ -23,15 +23,15 @@
     <linearGradient
        id="linearGradient3596">
       <stop
-         style="stop-color:#ffffa0;stop-opacity:1;"
+         style="stop-color:#ffffff;stop-opacity:1;"
          offset="0"
          id="stop3598" />
       <stop
          id="stop3604"
-         offset="0.29577464"
-         style="stop-color:#ffe22c;stop-opacity:1;" />
+         offset="0.35157821"
+         style="stop-color:#ffffff;stop-opacity:0.82681566;" />
       <stop
-         style="stop-color:#ff9300;stop-opacity:1;"
+         style="stop-color:#ffffff;stop-opacity:1;"
          offset="1"
          id="stop3600" />
     </linearGradient>
@@ -89,10 +89,10 @@
        inkscape:collect="always"
        xlink:href="#linearGradient3596"
        id="radialGradient3602"
-       cx="31.851445"
-       cy="28.896912"
-       fx="31.851445"
-       fy="28.896912"
+       cx="31.851444"
+       cy="31.795218"
+       fx="31.851444"
+       fy="31.795218"
        r="30.551558"
        gradientTransform="matrix(1,0,0,0.95456924,0,1.3128087)"
        gradientUnits="userSpaceOnUse" />
@@ -108,16 +108,16 @@
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:zoom="5.6"
-     inkscape:cx="22.764912"
-     inkscape:cy="40.003406"
+     inkscape:cx="26.939127"
+     inkscape:cy="39.646263"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1021"
-     inkscape:window-height="720"
-     inkscape:window-x="87"
-     inkscape:window-y="34"
-     inkscape:window-maximized="0" />
+     inkscape:window-width="1280"
+     inkscape:window-height="725"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:window-maximized="1" />
   <metadata
      id="metadata2468">
     <rdf:RDF>
@@ -142,13 +142,13 @@
        sodipodi:cx="31.964287"
        sodipodi:cy="31.857143"
        sodipodi:r1="32.125885"
-       sodipodi:r2="11.093419"
+       sodipodi:r2="3.2125885"
        sodipodi:arg1="0.93111088"
        sodipodi:arg2="1.5577518"
        inkscape:flatsided="false"
        inkscape:rounded="0"
        inkscape:randomized="0"
-       d="M 51.141613,57.631213 32.108991,42.949619 13.377809,58.06049 21.459432,35.422529 1.2998864,22.277632 25.327225,22.968197 31.599122,-0.26666619 38.367212,22.798087 62.403003,21.583048 42.558574,35.147285 51.141613,57.631213 z"
+       d="M 51.141613,57.631213 32.006192,35.069459 13.377809,58.06049 28.922143,32.889658 1.2998864,22.277632 30.042233,29.282957 31.599122,-0.26666619 33.818536,29.233694 62.403003,21.583048 35.03233,32.809949 51.141613,57.631213 z"
        transform="matrix(1.0474097,0,0,1.0972591,108.99816,771.80448)" />
   </g>
 </svg>
