@@ -14,8 +14,6 @@
 #include <iostream>
 #include <sstream>
 
-static const double IDLE_TIMEOUT = 45.0; // seconds
-
 ScreenPlayers::ScreenPlayers(std::string const& name, Audio& audio, Database& database):
   Screen(name), m_audio(audio), m_database(database), m_players(database.m_players), m_covers(20)
 {
@@ -169,8 +167,6 @@ void ScreenPlayers::draw() {
 		if (!songbg.empty()) try { m_songbg.reset(new Surface(songbg)); } catch (std::exception const&) {}
 		if (!video.empty() && config["graphic/video"].b()) m_video.reset(new Video(video, videoGap));
 		m_playing = music;
-	} else if (!m_audio.isPaused() && m_playTimer.get() > IDLE_TIMEOUT) {  // Switch if song hasn't changed for IDLE_TIMEOUT seconds
-		if (!m_search.text.empty()) { m_search.text.clear(); m_players.setFilter(m_search.text); }
 	}
 	m_layout_singer->drawScore(LayoutSinger::MIDDLE);
 }
