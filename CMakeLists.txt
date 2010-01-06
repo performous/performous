@@ -38,6 +38,7 @@ if(Gettext_FOUND)
 	if(NOT LOCALE_DIR)
 		if(WIN32)
 			SET(LOCALE_DIR "locale")
+			SET(LOCALE_DIR_WIN32_PREFIX "bin/")
 		elseif(APPLE)
 			SET(LOCALE_DIR "share/locale")
 		else()#other os
