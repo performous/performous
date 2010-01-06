@@ -80,7 +80,7 @@ input::NavButton input::getNav(SDL_Event const &e) {
 		else if (k == SDLK_LEFT) return input::LEFT;
 		else if (k == SDLK_RIGHT) return input::RIGHT;
 		else if (k == SDLK_RETURN) return input::START;
-		else if (k == SDLK_ESCAPE || k == SDLK_q) return input::CANCEL;
+		else if (k == SDLK_ESCAPE) return input::CANCEL;
 		else if (k == SDLK_PAGEUP) return input::MOREUP;
 		else if (k == SDLK_PAGEDOWN) return input::MOREDOWN;
 		else if (k == SDLK_PAUSE || (k == SDLK_p && mod & KMOD_CTRL)) return input::PAUSE;

@@ -205,65 +205,74 @@ void ScreenSing::activateNextScreen()
 }
 
 void ScreenSing::manageEvent(SDL_Event event) {
-	if (event.type == SDL_KEYDOWN) {
-		double time = m_audio.getPosition();
-		Song::Status status = m_song->status(time);
-		m_quitTimer.setValue(QUIT_TIMEOUT);
-		bool seekback = false;
-		int key = event.key.keysym.sym;
-		if (key == SDLK_ESCAPE || key == SDLK_q) {
-			// In ScoreWindow ESC goes to Players, otherwise insta-quit to Songs
-			if (m_score_window.get() && key == SDLK_ESCAPE) { activateNextScreen(); return; }
-			ScreenManager* sm = ScreenManager::getSingletonPtr();
-			sm->activateScreen("Songs");
+	double time = m_audio.getPosition();
+	Song::Status status = m_song->status(time);
+	input::NavButton nav(input::getNav(event));
+	int key = event.key.keysym.sym;
+	// A kludge to allow using space for navigation
+	if (event.type == SDL_KEYDOWN && key == SDLK_SPACE) nav = m_score_window.get() ? input::START : input::PAUSE;
+	if (nav != input::NONE) {
+		if (nav == input::CANCEL) {
+			// In ScoreWindow cancel goes to Players, otherwise insta-quit to Songs
+			if (m_score_window.get()) activateNextScreen();
+			else ScreenManager::getSingletonPtr()->activateScreen("Songs");
 			return;
 		}
-		else if (key == SDLK_RETURN) {
-			if (m_score_window.get()) { activateNextScreen(); return; } // Score window visible -> Enter quits
-			else if (status == Song::FINISHED && m_song->track_map.empty()) {
-				m_engine->kill(); // kill the engine thread (to avoid consuming memory)
+		if (nav == input::PAUSE) m_audio.togglePause();
+		if (m_score_window.get()) {
+			if (nav == input::START) activateNextScreen(); // Score window visible -> Start quits
+			return;  // The rest are only available when score window is not displayed
+		}
+		// Start button has special functions for skipping things (only in singing for now)
+		if (nav == input::START && m_song->track_map.empty()) {
+			// Open score dialog early
+			if (status == Song::FINISHED) {
+				m_engine->kill(); // kill the engine thread
 				m_score_window.reset(new ScoreWindow(m_instruments, m_database, m_dancers)); // Song finished, but no score window -> show it
 			}
+			// Skip instrumental breaks (not supported with instruments yet)
+			else if (status == Song::INSTRUMENTAL_BREAK) {
+				double diff = m_layout_singer->lyrics_begin() - 3.0 - time;
+				if (diff > 0.0) m_audio.seek(diff);
+			}
 		}
-		else if (key == SDLK_SPACE && m_score_window.get()) { activateNextScreen(); return; } // Score window visible -> Space quits
-		else if (key == SDLK_SPACE || key == SDLK_PAUSE) m_audio.togglePause();
-		if (m_score_window.get()) return;
-		// The rest are only available when score window is not displayed and when there are no instruments
-		if (key == SDLK_RETURN && status == Song::INSTRUMENTAL_BREAK && m_song->track_map.empty()) {
-			double diff = m_layout_singer->lyrics_begin() - 3.0 - time;
-			if (diff > 0.0) m_audio.seek(diff);
+		// Volume control
+		if (nav == input::CTRL_UP) ++config["audio/music_volume"];
+		if (nav == input::CTRL_DOWN) --config["audio/music_volume"];
+	} else if (event.type == SDL_KEYDOWN) {
+		m_quitTimer.setValue(QUIT_TIMEOUT);
+		if (m_score_window.get()) return;  // The rest are only available when score window is not displayed
+		// Control combinations
+		if (event.key.keysym.mod & KMOD_CTRL) {
+			// Latency settings
+			if (key == SDLK_F1) --config["audio/round-trip"];
+			if (key == SDLK_F2) ++config["audio/round-trip"];
+			if (key == SDLK_F3) --config["audio/video_delay"];
+			if (key == SDLK_F4) ++config["audio/video_delay"];
+			if (key == SDLK_F5) --config["audio/controller_delay"];
+			if (key == SDLK_F6) ++config["audio/controller_delay"];
+			// Reload current song
+			if (key == SDLK_r) {
+				exit(); m_song->reload(); enter();
+				// m_audio.seek(time);  FIXME: enable after seeking is enabled
+			}
+			if (key == SDLK_s) m_audio.toggleSynth(m_song->notes);
+		} else {
+			// Toggle vocals (in songs with a separate vocals track)
+			if (key == SDLK_v) { m_audio.streamFade("vocals", event.key.keysym.mod & KMOD_SHIFT ? 1.0 : 0.0); }
+			if (key == SDLK_k) ++config["game/karaoke_mode"]; // Toggle karaoke mode
+			if (key == SDLK_w) ++config["game/pitch"]; // Toggle pitch wave
+			if (m_song->track_map.empty()) { // Seeking is currently only permitted for karaoke songs
+				bool seekback = false;
+				if (key == SDLK_HOME) m_audio.seekPos(0.0);
+				if (key == SDLK_LEFT) { m_audio.seek(-5.0); seekback = true; }
+				if (key == SDLK_RIGHT) m_audio.seek(5.0);
+				if (key == SDLK_UP) m_audio.seek(30.0);
+				if (key == SDLK_DOWN) { m_audio.seek(-30.0); seekback = true; }
+				// Some things must be reset after seeking backwards
+				if (seekback) m_layout_singer->reset();
+			}
 		}
-		else if (key == SDLK_F4) m_audio.toggleSynth(m_song->notes);
-		else if (key == SDLK_F5) --config["audio/video_delay"];
-		else if (key == SDLK_F6) ++config["audio/video_delay"];
-		else if (key == SDLK_F7) --config["audio/round-trip"];
-		else if (key == SDLK_F8) ++config["audio/round-trip"];
-		else if (key == SDLK_F9) ++config["game/karaoke_mode"];
-		else if (key == SDLK_F10) ++config["game/pitch"];
-		else if (key == SDLK_HOME) m_audio.seekPos(0.0);
-		else if (key == SDLK_LEFT) { m_audio.seek(-5.0); seekback = true; }
-		else if (key == SDLK_RIGHT) m_audio.seek(5.0);
-		else if (key == SDLK_UP && !(event.key.keysym.mod & KMOD_CTRL)) m_audio.seek(30.0);
-		else if (key == SDLK_DOWN && !(event.key.keysym.mod & KMOD_CTRL)) { m_audio.seek(-30.0); seekback = true; }
-		else if (key == SDLK_UP && (event.key.keysym.mod & KMOD_CTRL)) ++config["audio/music_volume"];
-		else if (key == SDLK_DOWN && (event.key.keysym.mod & KMOD_CTRL)) --config["audio/music_volume"];
-		else if (key == SDLK_k && event.key.keysym.mod & KMOD_SHIFT) { m_audio.streamFade("vocals", 1.0); }
-		else if (key == SDLK_k && !(event.key.keysym.mod & KMOD_SHIFT)) { m_audio.streamFade("vocals", 0.0); }
-		else if (key == SDLK_r && event.key.keysym.mod & KMOD_CTRL) {
-			exit(); m_song->reload(); enter();
-			m_audio.seek(time);
-		}
-		// Some things must be reset after seeking backwards
-		if (seekback) {
-			m_layout_singer->reset();
-		}
-	//} else if (event.type == SDL_JOYBUTTONDOWN) {
-		//int button = event.jbutton.button;
-		//if (button == 9 /* START */) m_audio.togglePause();
-		//if (button == 8 /* SELECT */) {
-			//ScreenManager::getSingletonPtr()->activateScreen("Songs");
-			//return;
-		//}
 	}
 }
 
