@@ -128,11 +128,11 @@ class UseTexture: boost::noncopyable {
 
 template <GLenum Type> void OpenGLTexture<Type>::draw(Dimensions const& dim, TexCoords const& tex) const {
 	UseTexture texture(*this);
-	glutil::Begin block(GL_QUADS);
+	glutil::Begin block(GL_TRIANGLE_STRIP);
 	glTexCoord2f(tex.x1, tex.y1); glVertex2f(dim.x1(), dim.y1());
 	glTexCoord2f(tex.x2, tex.y1); glVertex2f(dim.x2(), dim.y1());
-	glTexCoord2f(tex.x2, tex.y2); glVertex2f(dim.x2(), dim.y2());
 	glTexCoord2f(tex.x1, tex.y2); glVertex2f(dim.x1(), dim.y2());
+	glTexCoord2f(tex.x2, tex.y2); glVertex2f(dim.x2(), dim.y2());
 }
 
 template <GLenum Type> void OpenGLTexture<Type>::drawCropped(Dimensions const& orig, TexCoords const& tex) const {
