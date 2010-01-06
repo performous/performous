@@ -212,6 +212,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 	// A kludge to allow using space for navigation
 	if (event.type == SDL_KEYDOWN && key == SDLK_SPACE) nav = m_score_window.get() ? input::START : input::PAUSE;
 	if (nav != input::NONE) {
+		m_quitTimer.setValue(QUIT_TIMEOUT);
 		if (nav == input::CANCEL) {
 			// In ScoreWindow cancel goes to Players, otherwise insta-quit to Songs
 			if (m_score_window.get()) activateNextScreen();
@@ -239,7 +240,8 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		// Volume control
 		if (nav == input::CTRL_UP) ++config["audio/music_volume"];
 		if (nav == input::CTRL_DOWN) --config["audio/music_volume"];
-	} else if (event.type == SDL_KEYDOWN) {
+	}
+	if (event.type == SDL_KEYDOWN) {
 		m_quitTimer.setValue(QUIT_TIMEOUT);
 		if (m_score_window.get()) return;  // The rest are only available when score window is not displayed
 		// Control combinations
@@ -251,6 +253,16 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			if (key == SDLK_F4) ++config["audio/video_delay"];
 			if (key == SDLK_F5) --config["audio/controller_delay"];
 			if (key == SDLK_F6) ++config["audio/controller_delay"];
+			if (m_song->track_map.empty()) { // Seeking is currently only permitted for karaoke songs
+				bool seekback = false;
+				if (key == SDLK_HOME) m_audio.seekPos(0.0);
+				if (key == SDLK_LEFT) { m_audio.seek(-5.0); seekback = true; }
+				if (key == SDLK_RIGHT) m_audio.seek(5.0);
+				if (key == SDLK_UP) m_audio.seek(30.0);
+				if (key == SDLK_DOWN) { m_audio.seek(-30.0); seekback = true; }
+				// Some things must be reset after seeking backwards
+				if (seekback) m_layout_singer->reset();
+			}
 			// Reload current song
 			if (key == SDLK_r) {
 				exit(); m_song->reload(); enter();
@@ -262,16 +274,6 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			if (key == SDLK_v) { m_audio.streamFade("vocals", event.key.keysym.mod & KMOD_SHIFT ? 1.0 : 0.0); }
 			if (key == SDLK_k) ++config["game/karaoke_mode"]; // Toggle karaoke mode
 			if (key == SDLK_w) ++config["game/pitch"]; // Toggle pitch wave
-			if (m_song->track_map.empty()) { // Seeking is currently only permitted for karaoke songs
-				bool seekback = false;
-				if (key == SDLK_HOME) m_audio.seekPos(0.0);
-				if (key == SDLK_LEFT) { m_audio.seek(-5.0); seekback = true; }
-				if (key == SDLK_RIGHT) m_audio.seek(5.0);
-				if (key == SDLK_UP) m_audio.seek(30.0);
-				if (key == SDLK_DOWN) { m_audio.seek(-30.0); seekback = true; }
-				// Some things must be reset after seeking backwards
-				if (seekback) m_layout_singer->reset();
-			}
 		}
 	}
 }
