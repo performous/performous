@@ -108,24 +108,15 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 	for (Notes::const_iterator it = m_songit; it != m_song.notes.end() && it->begin < m_time - (baseLine - 0.5) / pixUnit; ++it) {
 			if (it->accuracy >= 0.8 && (it->type == Note::NORMAL || it->type == Note::SLIDE || it->type == Note::GOLDEN)) {
 				double x = m_baseX + it->begin * pixUnit + m_noteUnit; // left x coordinate: begin minus border (side borders -noteUnit wide)
-				double yend = m_baseY + (it->note + 1) * m_noteUnit; // top y coordinate (on the one higher note line)
 				double w = (it->end - it->begin) * pixUnit - m_noteUnit * 2.0; // width: including borders on both sides
 				float hh = -m_noteUnit;
-				float centerx = x + w - hh;
-				float rot = int(time*360) % 360; // They rotate!
-				float zoom = std::abs((rot-180) / 360.0f) + 0.5f;
-				{ glutil::Translation tr(centerx, yend);
-				{ glutil::Scale sc(zoom, zoom, zoom);
-				{ glutil::Rotation rt(rot, 0.0f, 0.0f, 1.0f);
-					UseTexture tblock(m_star);
-					glutil::Begin block(GL_TRIANGLE_STRIP);
-					glTexCoord2f(0.0f, 0.0f); glVertex2f(-hh, -hh);
-					glTexCoord2f(1.0f, 0.0f); glVertex2f( hh, -hh);
-					glTexCoord2f(0.0f, 1.0f); glVertex2f(-hh,  hh);
-					glTexCoord2f(1.0f, 1.0f); glVertex2f( hh,  hh);
-				} //< revert rotation
-				} //< revert scale
-				} //< revert translation
+				float centery = m_baseY + (it->note + 0.4) * m_noteUnit; // Star is 0.4 notes higher than current note
+				float centerx = x + w - 1.2 * hh; // Star is 1.2 units from end
+				float rot = fmod(time * 360, 360); // They rotate!
+				float zoom = (std::abs((rot-180) / 360.0f) + 0.5f) * 2.0 * hh;
+				glutil::Translation tr(centerx, centery);
+				glutil::Rotation rt(rot, 0.0f, 0.0f, 1.0f);
+				m_star.draw(Dimensions().stretch(zoom, zoom).center().middle(), TexCoords());
 			}
 
 	}
