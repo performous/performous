@@ -37,7 +37,7 @@ find_package(Gettext)
 if(Gettext_FOUND)
 	if(NOT LOCALE_DIR)
 		if(WIN32)
-			SET(LOCALE_DIR "../locale")
+			SET(LOCALE_DIR "locale")
 		elseif(APPLE)
 			SET(LOCALE_DIR "share/locale")
 		else()#other os
