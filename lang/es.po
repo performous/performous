@@ -99,7 +99,7 @@ msgstr "Nombre:"
 
 #: ../game/screen_players.cc:126
 msgid "Type text to filter or create a new player."
-msgstr "Introduce el nombre del jugador (si no existe ya, se creará uno nuevo)."
+msgstr "Introduce texto para filtrar o crear un nuevo jugador."
 
 #: ../game/screen_players.cc:126
 msgid "Search Text:"
