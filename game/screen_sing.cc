@@ -255,18 +255,16 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			if (key == SDLK_F6) ++config["audio/controller_delay"];
 			if (m_song->track_map.empty()) { // Seeking is currently only permitted for karaoke songs
 				bool seekback = false;
-				if (key == SDLK_HOME) m_audio.seekPos(0.0);
+				if (key == SDLK_HOME) { m_audio.seekPos(0.0); seekback = true; }
 				if (key == SDLK_LEFT) { m_audio.seek(-5.0); seekback = true; }
 				if (key == SDLK_RIGHT) m_audio.seek(5.0);
-				if (key == SDLK_UP) m_audio.seek(30.0);
-				if (key == SDLK_DOWN) { m_audio.seek(-30.0); seekback = true; }
 				// Some things must be reset after seeking backwards
 				if (seekback) m_layout_singer->reset();
 			}
 			// Reload current song
 			if (key == SDLK_r) {
 				exit(); m_song->reload(); enter();
-				// m_audio.seek(time);  FIXME: enable after seeking is enabled
+				m_audio.seek(time);
 			}
 			if (key == SDLK_s) m_audio.toggleSynth(m_song->notes);
 		} else {
