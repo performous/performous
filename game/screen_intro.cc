@@ -37,10 +37,7 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 	input::NavButton nav(input::getNav(event));
 	if (nav != input::NONE) {
 		if (m_dialog) { m_dialog.reset(); return; }
-		if (nav == input::CANCEL) {
-			if (selected == m_menuOptions.size()-1) sm->finished();
-			else selected = m_menuOptions.size()-1;
-		}
+		if (nav == input::CANCEL) selected = m_menuOptions.size() - 1;  // Move cursor to quit
 		else if (nav == input::DOWN || nav == input::RIGHT || nav == input::MOREDOWN) ++selected;
 		else if (nav == input::UP || nav == input::LEFT || nav == input::MOREUP) --selected;
 		else if (nav == input::CTRL_DOWN) --config["audio/preview_volume"];
