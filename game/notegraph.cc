@@ -113,7 +113,7 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 				float centery = m_baseY + (it->note + 0.4) * m_noteUnit; // Star is 0.4 notes higher than current note
 				float centerx = x + w - 1.2 * hh; // Star is 1.2 units from end
 				float rot = fmod(time * 360, 360); // They rotate!
-				float zoom = (std::abs((rot-180) / 360.0f) + 0.5f) * 2.0 * hh;
+				float zoom = (std::abs((rot-180) / 360.0f) * 0.8f + 0.6f) * (position == NoteGraph::TOP ? 3.0 : 2.0) * hh;
 				glutil::Translation tr(centerx, centery);
 				glutil::Rotation rt(rot, 0.0f, 0.0f, 1.0f);
 				m_star.draw(Dimensions().stretch(zoom, zoom).center().middle(), TexCoords());
