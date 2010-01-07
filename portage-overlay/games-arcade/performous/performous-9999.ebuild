@@ -36,7 +36,10 @@ RDEPEND="gnome-base/librsvg
 	dev-cpp/libxmlpp
 	media-libs/glew
 	media-libs/libsdl[joystick,opengl]
-	media-gfx/imagemagick[png]
+	media-libs/libpng
+	media-libs/jpeg
+	tools? ( media-gfx/imagemagick[png] )
+	editor? ( media-gfx/imagemagick[png] )
 	>=media-video/ffmpeg-0.4.9_p20070616-r20
 	alsa? ( media-libs/alsa-lib )
 	jack? ( media-sound/jack-audio-connection-kit )
