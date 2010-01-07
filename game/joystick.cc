@@ -385,7 +385,7 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 			break;
 		}
 		case SDL_KEYUP: {
-			if(!config["game/keyboard_guitar"].b() && !config["game/keyboard_dancepad"].b())
+			if(!config["game/keyboard_guitar"].b() && !config["game/keyboard_drumkit"].b() && !config["game/keyboard_dancepad"].b())
 			  return false;
 			if (_e.key.keysym.mod & (KMOD_CTRL|KMOD_SHIFT|KMOD_ALT|KMOD_META)) return false;
 			int button = 0;
