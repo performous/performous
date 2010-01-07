@@ -34,7 +34,8 @@ namespace input {
 	namespace Private {
 		enum Type { GUITAR_RB, DRUMS_RB, GUITAR_GH, DRUMS_GH, DRUMS_MIDI, DANCEPAD_GENERIC };
 		static unsigned int KEYBOARD_ID = UINT_MAX;
-		static unsigned int KEYBOARD_ID2 = KEYBOARD_ID-1; // Two ids needed for keyboard guitar/dancepad
+		static unsigned int KEYBOARD_ID2 = KEYBOARD_ID-1;
+		static unsigned int KEYBOARD_ID3 = KEYBOARD_ID-2; // Three ids needed for keyboard guitar/drumkit/dancepad
 		
 		class InputDevPrivate {
 		  public:
@@ -124,7 +125,9 @@ namespace input {
 			for(InputDevs::iterator it = devices.begin() ; it != devices.end() ; ++it) {
 				if( it->first == input::Private::KEYBOARD_ID && !config["game/keyboard_guitar"].b() )
 					continue;
-				if( it->first == input::Private::KEYBOARD_ID2 && !config["game/keyboard_dancepad"].b() )
+				if( it->first == input::Private::KEYBOARD_ID2 && !config["game/keyboard_drumkit"].b() )
+					continue;
+				if( it->first == input::Private::KEYBOARD_ID3 && !config["game/keyboard_dancepad"].b() )
 					continue;
 				if( !it->second.assigned() && it->second.type_match(_type) ) {
 					std::cout << "Found @" << it->first << std::endl;

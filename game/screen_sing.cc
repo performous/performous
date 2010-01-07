@@ -241,37 +241,30 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		if (nav == input::CTRL_UP) ++config["audio/music_volume"];
 		if (nav == input::CTRL_DOWN) --config["audio/music_volume"];
 	}
-	if (event.type == SDL_KEYDOWN) {
-		m_quitTimer.setValue(QUIT_TIMEOUT);
-		if (m_score_window.get()) return;  // The rest are only available when score window is not displayed
-		// Control combinations
-		if (event.key.keysym.mod & KMOD_CTRL) {
-			// Latency settings
-			if (key == SDLK_F1) --config["audio/round-trip"];
-			if (key == SDLK_F2) ++config["audio/round-trip"];
-			if (key == SDLK_F3) --config["audio/video_delay"];
-			if (key == SDLK_F4) ++config["audio/video_delay"];
-			if (key == SDLK_F5) --config["audio/controller_delay"];
-			if (key == SDLK_F6) ++config["audio/controller_delay"];
-			if (m_song->track_map.empty()) { // Seeking is currently only permitted for karaoke songs
-				bool seekback = false;
-				if (key == SDLK_HOME) { m_audio.seekPos(0.0); seekback = true; }
-				if (key == SDLK_LEFT) { m_audio.seek(-5.0); seekback = true; }
-				if (key == SDLK_RIGHT) m_audio.seek(5.0);
-				// Some things must be reset after seeking backwards
-				if (seekback) m_layout_singer->reset();
-			}
-			// Reload current song
-			if (key == SDLK_r) {
-				exit(); m_song->reload(); enter();
-				m_audio.seek(time);
-			}
-			if (key == SDLK_s) m_audio.toggleSynth(m_song->notes);
-		} else {
-			// Toggle vocals (in songs with a separate vocals track)
-			if (key == SDLK_v) { m_audio.streamFade("vocals", event.key.keysym.mod & KMOD_SHIFT ? 1.0 : 0.0); }
-			if (key == SDLK_k) ++config["game/karaoke_mode"]; // Toggle karaoke mode
-			if (key == SDLK_w) ++config["game/pitch"]; // Toggle pitch wave
+	// Ctrl combinations that can be used while performing (not when score dialog is displayed)
+	if (event.type == SDL_KEYDOWN && (event.key.keysym.mod & KMOD_CTRL) && !m_score_window.get()) {
+		if (key == SDLK_s) m_audio.toggleSynth(m_song->notes);
+		if (key == SDLK_k) ++config["game/karaoke_mode"]; // Toggle karaoke mode
+		if (key == SDLK_w) ++config["game/pitch"]; // Toggle pitch wave
+		// Latency settings
+		if (key == SDLK_F1) --config["audio/video_delay"];
+		if (key == SDLK_F2) ++config["audio/video_delay"];
+		if (key == SDLK_F3) --config["audio/round-trip"];
+		if (key == SDLK_F4) ++config["audio/round-trip"];
+		if (key == SDLK_F5) --config["audio/controller_delay"];
+		if (key == SDLK_F6) ++config["audio/controller_delay"];
+		if (m_song->danceTracks.empty()) { // Seeking is currently not permitted for dance songs
+			bool seekback = false;
+			if (key == SDLK_HOME) { m_audio.seekPos(0.0); seekback = true; }
+			if (key == SDLK_LEFT) { m_audio.seek(-5.0); seekback = true; }
+			if (key == SDLK_RIGHT) m_audio.seek(5.0);
+			// Some things must be reset after seeking backwards
+			if (seekback) m_layout_singer->reset();
+		}
+		// Reload current song
+		if (key == SDLK_r) {
+			exit(); m_song->reload(); enter();
+			m_audio.seek(time);
 		}
 	}
 }

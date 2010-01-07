@@ -66,6 +66,12 @@ to save the current settings to XML.
 			<long>Enable keyboard as guitar (Frets on Fire mode).</long>
 		</locale>
 	</entry>
+	<entry name="game/keyboard_drumkit" type="bool" value="true">
+		<locale name="C">
+			<short>Keyboard as drumkit</short>
+			<long>Enable keyboard as drumkit.</long>
+		</locale>
+	</entry>
 	<entry name="game/keyboard_dancepad" type="bool" value="true">
 		<locale name="C">
 			<short>Keyboard as dance pad</short>
@@ -153,15 +159,7 @@ to save the current settings to XML.
 		<limits min="-0.5" max="0.5" step="0.01" />
 		<locale name="C">
 			<short>Audio/video latency</short>
-			<long>Use negative value if your display input lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal. F5/F6 to adjust this in singing screen.</long>
-		</locale>
-	</entry>
-	<entry name="audio/controller_delay" type="float" value="0.08">
-		<ui unit=" ms" multiplier="1000" />
-		<limits min="0.0" max="0.5" step="0.01" />
-		<locale name="C">
-			<short>Audio/controller latency</short>
-			<long>The total of USB (guitar or dance pad) latency combined with audio output latency.</long>
+			<long>Affects all modes. Use negative value if your display input lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal. This should be set so that the notes pass the cursor at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while performing.</long>
 		</locale>
 	</entry>
 	<entry name="audio/round-trip" type="float" value="0.09">
@@ -169,7 +167,15 @@ to save the current settings to XML.
 		<limits min="0.0" max="0.5" step="0.01" />
 		<locale name="C">
 			<short>Audio round-trip latency</short>
-			<long>The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. Use F4 debug mode in singing screen and adjust with F7/F8.</long>
+			<long>Affects singing only. The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. While performing, press Ctrl+S for synth mode and adjust with Ctrl+F3/F4.</long>
+		</locale>
+	</entry>
+	<entry name="audio/controller_delay" type="float" value="0.08">
+		<ui unit=" ms" multiplier="1000" />
+		<limits min="0.0" max="0.5" step="0.01" />
+		<locale name="C">
+			<short>Audio/controller latency</short>
+			<long>Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to adjust while performing.</long>
 		</locale>
 	</entry>
 	<entry name="audio/capture" type="string_list">
