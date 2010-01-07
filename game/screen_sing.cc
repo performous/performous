@@ -253,7 +253,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		if (key == SDLK_F4) ++config["audio/round-trip"];
 		if (key == SDLK_F5) --config["audio/controller_delay"];
 		if (key == SDLK_F6) ++config["audio/controller_delay"];
-		if (m_song->track_map.empty()) { // Seeking is currently only permitted for karaoke songs
+		if (m_song->danceTracks.empty()) { // Seeking is currently not permitted for dance songs
 			bool seekback = false;
 			if (key == SDLK_HOME) { m_audio.seekPos(0.0); seekback = true; }
 			if (key == SDLK_LEFT) { m_audio.seek(-5.0); seekback = true; }
