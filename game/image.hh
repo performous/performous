@@ -98,7 +98,7 @@ template <typename T> void loadJPEG(T& target, std::string const& filename) {
 	cinfo.err = jpeg_std_error(&jerr);
 	jpeg_create_decompress(&cinfo);
 	jpeg_stdio_src(&cinfo, infile);
-	jpeg_read_header(&cinfo, true);
+	if( jpeg_read_header(&cinfo, true) != JPEG_HEADER_OK) throw std::runtime_error("Cannot read header of " + filename);
 	jpeg_start_decompress(&cinfo);
 	unsigned w = cinfo.output_width;
 	unsigned h = cinfo.output_height;
