@@ -227,13 +227,13 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			return;  // The rest are only available when score window is not displayed
 		}
 		// Start button has special functions for skipping things (only in singing for now)
-		if (nav == input::START && m_song->track_map.empty() && !m_audio.isPaused()) {
+		if (nav == input::START && m_only_singers_alive && !m_song->notes.empty() && !m_audio.isPaused()) {
 			// Open score dialog early
 			if (status == Song::FINISHED) {
 				m_engine->kill(); // kill the engine thread
 				m_score_window.reset(new ScoreWindow(m_instruments, m_database, m_dancers)); // Song finished, but no score window -> show it
 			}
-			// Skip instrumental breaks (not supported with instruments yet)
+			// Skip instrumental breaks
 			else if (status == Song::INSTRUMENTAL_BREAK) {
 				double diff = m_layout_singer->lyrics_begin() - 3.0 - time;
 				if (diff > 0.0) m_audio.seek(diff);
@@ -315,11 +315,13 @@ void ScreenSing::draw() {
 	if( !m_dancers.empty() ) {
 		danceLayout(time);
 		//m_layout_singer->draw(time, LayoutSinger::LEFT);
+		m_only_singers_alive = false;
 	} else if( m_instruments.empty() ) {
 		m_layout_singer->draw(time, LayoutSinger::BOTTOM);
+		m_only_singers_alive = true;
 	} else {
-		bool some_alive = instrumentLayout(time);;
-		m_layout_singer->draw(time, some_alive ? LayoutSinger::MIDDLE : LayoutSinger::BOTTOM);
+		m_only_singers_alive = !instrumentLayout(time);;
+		m_layout_singer->draw(time, m_only_singers_alive ? LayoutSinger::BOTTOM : LayoutSinger::MIDDLE);
 	}
 
 	Song::Status status = m_song->status(time);
@@ -329,7 +331,7 @@ void ScreenSing::draw() {
 		unsigned t = clamp(time, 0.0, length);
 		m_progress->draw(songPercent);
 		std::string statustxt = (boost::format("%02u:%02u") % (t / 60) % (t % 60)).str();
-		if (!m_score_window.get() && m_song->track_map.empty() && m_song->danceTracks.empty()) {
+		if (!m_score_window.get() && m_only_singers_alive && !m_song->notes.empty()) {
 			if (status == Song::INSTRUMENTAL_BREAK) statustxt += "   ENTER to skip instrumental break";
 			if (status == Song::FINISHED && !config["game/karaoke_mode"].b()) statustxt += "   Remember to wait for grading!";
 		}

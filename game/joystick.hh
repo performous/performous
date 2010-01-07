@@ -147,6 +147,7 @@ namespace input {
 		bool tryPoll(Event& _e) {return input::Private::devices.find(m_device_id)->second.tryPoll(_e);};
 		void addEvent(Event _e) {input::Private::devices.find(m_device_id)->second.addEvent(_e);};
 		bool pressed(int _button) {return input::Private::devices.find(m_device_id)->second.pressed(_button);}; // Current state
+		bool isKeyboard() {return (m_device_id == input::Private::KEYBOARD_ID || m_device_id == input::Private::KEYBOARD_ID2 || m_device_id == input::Private::KEYBOARD_ID3);};
 	  private:
 		unsigned int m_device_id; // should be some kind of reference
 	};

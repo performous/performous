@@ -17,7 +17,7 @@ namespace {
 		{ "Expert", 0x60 }
 	};
 	const size_t diffsz = sizeof(diffv) / sizeof(*diffv);
-	const int death_delay = 25; // Delay in notes after which the player is hidden
+	const int death_delay = 20; // Delay in notes after which the player is hidden
 	const float not_joined = -100; // A value that indicates player hasn't joined
 	const float join_delay = 6.0f; // Time to select track/difficulty when joining mid-game
 	const float g_angle = 80.0f;
@@ -154,6 +154,9 @@ void GuitarGraph::engine() {
 	double whammy = 0;
 	// Handle all events
 	for (input::Event ev; m_input.tryPoll(ev);) {
+		// This hack disallows joining with Enter-key for skipping instrumental
+		// breaks to be usable with FoF songs.
+		if (dead() && m_input.isKeyboard() && ev.type == input::Event::PICK) continue;
 		m_dead = 0; // Keep alive
 		if (m_jointime == not_joined) m_jointime = (time < 0.0 ? -join_delay : time); // Handle joining
 		// Handle Start/Select keypresses
