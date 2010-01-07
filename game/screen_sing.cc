@@ -247,10 +247,10 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		// Control combinations
 		if (event.key.keysym.mod & KMOD_CTRL) {
 			// Latency settings
-			if (key == SDLK_F1) --config["audio/round-trip"];
-			if (key == SDLK_F2) ++config["audio/round-trip"];
-			if (key == SDLK_F3) --config["audio/video_delay"];
-			if (key == SDLK_F4) ++config["audio/video_delay"];
+			if (key == SDLK_F1) --config["audio/video_delay"];
+			if (key == SDLK_F2) ++config["audio/video_delay"];
+			if (key == SDLK_F3) --config["audio/round-trip"];
+			if (key == SDLK_F4) ++config["audio/round-trip"];
 			if (key == SDLK_F5) --config["audio/controller_delay"];
 			if (key == SDLK_F6) ++config["audio/controller_delay"];
 			if (m_song->track_map.empty()) { // Seeking is currently only permitted for karaoke songs
