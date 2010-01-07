@@ -40,8 +40,8 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 		if (nav == input::CANCEL) selected = m_menuOptions.size() - 1;  // Move cursor to quit
 		else if (nav == input::DOWN || nav == input::RIGHT || nav == input::MOREDOWN) ++selected;
 		else if (nav == input::UP || nav == input::LEFT || nav == input::MOREUP) --selected;
-		else if (nav == input::CTRL_DOWN) --config["audio/preview_volume"];
-		else if (nav == input::CTRL_UP) ++config["audio/preview_volume"];
+		else if (nav == input::VOLUME_DOWN) --config["audio/preview_volume"];
+		else if (nav == input::VOLUME_UP) ++config["audio/preview_volume"];
 		else if (nav == input::START) {
 			std::string screen = m_menuOptions[selected].screen;
 			if (screen.empty()) sm->finished(); else sm->activateScreen(screen);
