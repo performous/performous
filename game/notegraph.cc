@@ -86,7 +86,7 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 			dimensions.stretch(1.0, 0.50).center();
 			break;
 		case NoteGraph::TOP:
-			dimensions.stretch(1.0, 0.40).bottom(0.0);
+			dimensions.stretch(1.0, 0.32).bottom(0.0);
 			break;
 		case NoteGraph::LEFT:
 			dimensions.stretch(0.50, 0.50).center().left(-0.5);
