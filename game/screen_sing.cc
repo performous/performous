@@ -235,8 +235,11 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			}
 			// Skip instrumental breaks
 			else if (status == Song::INSTRUMENTAL_BREAK) {
-				double diff = m_layout_singer->lyrics_begin() - 3.0 - time;
-				if (diff > 0.0) m_audio.seek(diff);
+				if (time < 0) m_audio.seek(0.0);
+				else {
+					double diff = m_layout_singer->lyrics_begin() - 3.0 - time;
+					if (diff > 0.0) m_audio.seek(diff);
+				}
 			}
 		}
 		// Volume control
