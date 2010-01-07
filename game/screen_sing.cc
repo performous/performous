@@ -108,14 +108,7 @@ bool ScreenSing::instrumentLayout(double time) {
 	typedef std::pair<unsigned, double> CountSum;
 	std::map<std::string, CountSum> volume; // Stream id to (count, sum)
 	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it) {
-		try {
-			it->engine(); // Run engine even when dead so that joining is possible
-		} catch (std::runtime_error& e) { // Receive Start/Select key presses
-			std::string what(e.what());
-			if (what == "start") m_audio.togglePause();
-			// We cannot quit from here (crash) so let's throw it further
-			else if (what == "select") throw std::runtime_error("exit");
-		}
+		it->engine(); // Run engine even when dead so that joining is possible
 		if (!it->dead()) {
 			it->position((0.5 + i - 0.5 * count) * iw, iw); // Do layout stuff
 			CountSum& cs = volume[it->getTrackIndex()];
@@ -183,6 +176,7 @@ void ScreenSing::exit() {
 	m_video.reset();
 	m_background.reset();
 	theme.reset();
+	if (m_audio.isPaused()) m_audio.togglePause();
 }
 
 void ScreenSing::activateNextScreen()
@@ -211,21 +205,29 @@ void ScreenSing::manageEvent(SDL_Event event) {
 	int key = event.key.keysym.sym;
 	// A kludge to allow using space for navigation
 	if (event.type == SDL_KEYDOWN && key == SDLK_SPACE) nav = m_score_window.get() ? input::START : input::PAUSE;
+	// A kludge to allow using Esc for quitting through pause
+	if (event.type == SDL_KEYDOWN && key == SDLK_ESCAPE) nav = m_audio.isPaused() ? input::CANCEL : input::PAUSE;
+	// A kludge to use Start as Pause
+	if (nav == input::START && key != SDLK_RETURN) nav = input::PAUSE;
+	// Handle keys
 	if (nav != input::NONE) {
 		m_quitTimer.setValue(QUIT_TIMEOUT);
-		if (nav == input::CANCEL) {
+		if (nav == input::CANCEL && (m_audio.isPaused() || m_score_window.get())) {
 			// In ScoreWindow cancel goes to Players, otherwise insta-quit to Songs
 			if (m_score_window.get()) activateNextScreen();
 			else ScreenManager::getSingletonPtr()->activateScreen("Songs");
 			return;
 		}
-		if (nav == input::PAUSE) m_audio.togglePause();
+		if (nav == input::PAUSE || (m_audio.isPaused() && nav == input::START)) {
+			m_audio.togglePause();
+			return;
+		}
 		if (m_score_window.get()) {
 			if (nav == input::START) activateNextScreen(); // Score window visible -> Start quits
 			return;  // The rest are only available when score window is not displayed
 		}
 		// Start button has special functions for skipping things (only in singing for now)
-		if (nav == input::START && m_song->track_map.empty()) {
+		if (nav == input::START && m_song->track_map.empty() && !m_audio.isPaused()) {
 			// Open score dialog early
 			if (status == Song::FINISHED) {
 				m_engine->kill(); // kill the engine thread
@@ -316,13 +318,7 @@ void ScreenSing::draw() {
 	} else if( m_instruments.empty() ) {
 		m_layout_singer->draw(time, LayoutSinger::BOTTOM);
 	} else {
-		bool some_alive;
-		try {
-			some_alive = instrumentLayout(time);
-		} catch (std::runtime_error& e) { // Did we catch an quit signal?
-			ScreenManager::getSingletonPtr()->activateScreen("Songs");
-			return;
-		}
+		bool some_alive = instrumentLayout(time);;
 		m_layout_singer->draw(time, some_alive ? LayoutSinger::MIDDLE : LayoutSinger::BOTTOM);
 	}
 
@@ -366,7 +362,7 @@ void ScreenSing::draw() {
 	}
 
 	if (m_audio.isPaused()) {
-		m_pause_icon->dimensions.middle().center().fixedWidth(.25);
+		m_pause_icon->dimensions.middle().center().fixedWidth(.32);
 		m_pause_icon->draw();
 	}
 }

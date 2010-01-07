@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -8,11 +9,11 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="400"
-   height="320"
+   width="500"
+   height="400"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
+   inkscape:version="0.47 r22583"
    version="1.0"
    sodipodi:docname="sing_pause.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
@@ -35,14 +36,15 @@
      inkscape:pageshadow="2"
      inkscape:zoom="0.98994949"
      inkscape:cx="239.68036"
-     inkscape:cy="112.11319"
+     inkscape:cy="233.3315"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1313"
      inkscape:window-height="722"
      inkscape:window-x="0"
-     inkscape:window-y="25" />
+     inkscape:window-y="25"
+     inkscape:window-maximized="0" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -57,43 +59,59 @@
   <g
      inkscape:label="Calque 1"
      inkscape:groupmode="layer"
-     id="layer1">
+     id="layer1"
+     transform="translate(0,80)">
     <rect
-       style="opacity:1;fill:#ffffff;fill-opacity:0.65016503;stroke:#000000;stroke-width:1.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#ffffff;fill-opacity:0.65016503;stroke:#000000;stroke-width:1.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect2383"
-       width="376.7869"
-       height="291.93408"
-       x="12.121834"
-       y="12.913627"
-       rx="42.424664"
-       ry="42.424664" />
+       width="478.5"
+       height="378.5"
+       x="10.75"
+       y="-69.25"
+       rx="53.877144"
+       ry="55.004662" />
     <rect
-       style="opacity:1;fill:#000000;fill-opacity:0.99688475;stroke:none;stroke-width:1.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#000000;fill-opacity:0.99688475;stroke:none"
        id="rect3155"
-       width="72.731049"
-       height="154.55328"
-       x="122.22845"
-       y="81.604027"
+       width="72"
+       height="150"
+       x="160"
+       y="20"
        rx="0"
        ry="0" />
     <rect
-       style="opacity:1;fill:#000000;fill-opacity:0.99688475;stroke:none;stroke-width:1.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#000000;fill-opacity:0.99688475;stroke:none"
        id="rect3157"
-       width="72.731049"
-       height="154.55328"
-       x="206.07106"
-       y="81.604027"
+       width="72"
+       height="150"
+       x="268"
+       y="20"
        rx="0"
        ry="0" />
     <text
        xml:space="preserve"
-       style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
-       x="135.3981"
-       y="279.5939"
-       id="text3179"><tspan
+       style="font-size:49.19297028px;font-style:normal;font-weight:normal;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="267.95001"
+       y="-9.9983273"
+       id="text3179"
+       transform="scale(0.93017475,1.0750668)"><tspan
          sodipodi:role="line"
          id="tspan3181"
-         x="135.3981"
-         y="279.5939">PAUSE</tspan></text>
+         x="267.95001"
+         y="-9.9983273">PAUSE</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:28px;font-style:normal;font-weight:normal;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="249.50768"
+       y="233.12689"
+       id="text2817"><tspan
+         sodipodi:role="line"
+         x="249.50768"
+         y="233.12689"
+         id="tspan2823">Enter/Start/Pause to continue</tspan><tspan
+         sodipodi:role="line"
+         x="249.50768"
+         y="268.12692"
+         id="tspan2821">Esc/Select to quit</tspan></text>
   </g>
 </svg>

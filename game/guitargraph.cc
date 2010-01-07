@@ -156,38 +156,37 @@ void GuitarGraph::engine() {
 	for (input::Event ev; m_input.tryPoll(ev);) {
 		m_dead = 0; // Keep alive
 		if (m_jointime == not_joined) m_jointime = (time < 0.0 ? -join_delay : time); // Handle joining
+		// Handle Start/Select keypresses
 		if (ev.type == input::Event::PRESS && ev.button > input::STARPOWER_BUTTON) {
-			// This hack signals Screen_sing about Start/Select presses by throwing exceptions
-			if (ev.button == 8) throw std::runtime_error("select");
-			else if (ev.button == 9) throw std::runtime_error("start");
+			if (ev.button == 8) ev.button = input::STARPOWER_BUTTON; // Select works for GodMode
+			else continue;
+		}
+		// Guitar specific actions
+		if (!m_drums) {
+			if ((ev.type == input::Event::PRESS || ev.type == input::Event::RELEASE) && ev.button == input::STARPOWER_BUTTON) {
+				if (ev.type == input::Event::PRESS) activateStarpower();
+				continue;
+			}
+			if (ev.type == input::Event::RELEASE) endHold(ev.button, time);
+			if (ev.type == input::Event::WHAMMY) whammy = (1.0 + ev.button + 2.0*(rand()/double(RAND_MAX))) / 4.0;
+		}
+		// Keypress anims
+		if (ev.type == input::Event::PRESS) m_hit[!m_drums + ev.button].setValue(1.0);
+		else if (ev.type == input::Event::PICK) m_hit[0].setValue(1.0);
+		// Difficulty and track selection
+		if (time < m_jointime + join_delay) {
+			if (ev.type == input::Event::PICK || ev.type == input::Event::PRESS) {
+				if (!m_drums && ev.pressed[4]) nextTrack();
+				if (ev.pressed[0 + m_drums]) difficulty(DIFFICULTY_SUPAEASY);
+				else if (ev.pressed[1 + m_drums]) difficulty(DIFFICULTY_EASY);
+				else if (ev.pressed[2 + m_drums]) difficulty(DIFFICULTY_MEDIUM);
+				else if (ev.pressed[3 + m_drums]) difficulty(DIFFICULTY_AMAZING);
+			}
+		// Playing
+		} else if (m_drums) {
+			if (ev.type == input::Event::PRESS) drumHit(time, ev.button);
 		} else {
-			// Guitar specific actions
-			if (!m_drums) {
-				if ((ev.type == input::Event::PRESS || ev.type == input::Event::RELEASE) && ev.button == input::STARPOWER_BUTTON) {
-					if (ev.type == input::Event::PRESS) activateStarpower();
-					continue;
-				}
-				if (ev.type == input::Event::RELEASE) endHold(ev.button, time);
-				if (ev.type == input::Event::WHAMMY) whammy = (1.0 + ev.button + 2.0*(rand()/double(RAND_MAX))) / 4.0;
-			}
-			// Keypress anims
-			if (ev.type == input::Event::PRESS) m_hit[!m_drums + ev.button].setValue(1.0);
-			else if (ev.type == input::Event::PICK) m_hit[0].setValue(1.0);
-			// Difficulty and track selection
-			if (time < m_jointime + join_delay) {
-				if (ev.type == input::Event::PICK || ev.type == input::Event::PRESS) {
-					if (!m_drums && ev.pressed[4]) nextTrack();
-					if (ev.pressed[0 + m_drums]) difficulty(DIFFICULTY_SUPAEASY);
-					else if (ev.pressed[1 + m_drums]) difficulty(DIFFICULTY_EASY);
-					else if (ev.pressed[2 + m_drums]) difficulty(DIFFICULTY_MEDIUM);
-					else if (ev.pressed[3 + m_drums]) difficulty(DIFFICULTY_AMAZING);
-				}
-			// Playing
-			} else if (m_drums) {
-				if (ev.type == input::Event::PRESS) drumHit(time, ev.button);
-			} else {
-				guitarPlay(time, ev);
-			}
+			guitarPlay(time, ev);
 		}
 		if (m_score < 0) m_score = 0;
 	}
