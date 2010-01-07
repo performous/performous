@@ -262,8 +262,9 @@ void input::SDL::init() {
 			std::cout << "  Detected as: Generic Dance Pad (guessed)" << std::endl;
 			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::DANCEPAD_GENERIC);
 		} else {
-			std::cout << "  Detected as: Unknwown (please report the name, assuming Guitar Hero Drums)" << std::endl;
-			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::DRUMS_GH);
+			std::cout << "  Detected as: Unknown (please report the name; use config to force detection)" << std::endl;
+			SDL_JoystickClose(joy);
+			continue;
 		}
 	}
 	// Here we should send an event to have correct state buttons
