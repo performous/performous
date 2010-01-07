@@ -66,6 +66,12 @@ to save the current settings to XML.
 			<long>Enable keyboard as guitar (Frets on Fire mode).</long>
 		</locale>
 	</entry>
+	<entry name="game/keyboard_drumkit" type="bool" value="true">
+		<locale name="C">
+			<short>Keyboard as drumkit</short>
+			<long>Enable keyboard as drumkit.</long>
+		</locale>
+	</entry>
 	<entry name="game/keyboard_dancepad" type="bool" value="true">
 		<locale name="C">
 			<short>Keyboard as dance pad</short>

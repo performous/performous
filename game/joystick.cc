@@ -270,11 +270,14 @@ void input::SDL::init() {
 	init_devices();
 	// Adding keyboard instruments
 	std::cout << "Keyboard as guitar controller: " << (config["game/keyboard_guitar"].b() ? "enabled":"disabled") << std::endl;
+	std::cout << "Keyboard as drumkit controller: " << (config["game/keyboard_drumkit"].b() ? "enabled":"disabled") << std::endl;
 	std::cout << "Keyboard as dance pad controller: " << (config["game/keyboard_dancepad"].b() ? "enabled":"disabled") << std::endl;
 	input::SDL::sdl_devices[input::Private::KEYBOARD_ID] = NULL;
 	input::Private::devices[input::Private::KEYBOARD_ID] = input::Private::InputDevPrivate(input::Private::GUITAR_GH);
 	input::SDL::sdl_devices[input::Private::KEYBOARD_ID2] = NULL;
-	input::Private::devices[input::Private::KEYBOARD_ID2] = input::Private::InputDevPrivate(input::Private::DANCEPAD_GENERIC);
+	input::Private::devices[input::Private::KEYBOARD_ID2] = input::Private::InputDevPrivate(input::Private::DRUMS_GH);
+	input::SDL::sdl_devices[input::Private::KEYBOARD_ID3] = NULL;
+	input::Private::devices[input::Private::KEYBOARD_ID3] = input::Private::InputDevPrivate(input::Private::DANCEPAD_GENERIC);
 }
 
 bool input::SDL::pushEvent(SDL_Event _e) {
@@ -288,7 +291,7 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 	static bool pickPressed[2] = {}; // HACK for tracking enter and rshift status
 	switch(_e.type) {
 		case SDL_KEYDOWN: {
-			if(!config["game/keyboard_guitar"].b() && !config["game/keyboard_dancepad"].b())
+			if(!config["game/keyboard_guitar"].b() && !config["game/keyboard_drumkit"].b() && !config["game/keyboard_dancepad"].b())
 			  return false;
 			if (_e.key.keysym.mod & (KMOD_CTRL|KMOD_SHIFT|KMOD_ALT|KMOD_META)) return false;
 			int button = 0;
@@ -340,8 +343,23 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 					default:
 						return false;
 				}
-			} else if(config["game/keyboard_dancepad"].b() && devices[input::Private::KEYBOARD_ID2].assigned()) {
+			} else if(config["game/keyboard_drumkit"].b() && devices[input::Private::KEYBOARD_ID2].assigned()) {
 				joy_id = input::Private::KEYBOARD_ID2;
+				switch(_e.key.keysym.sym) {
+					case SDLK_u:
+						button++;
+					case SDLK_i:
+						button++;
+					case SDLK_o:
+						button++;
+					case SDLK_p:
+						event.type = input::Event::PRESS;
+						break;
+					default:
+						return false;
+				}
+			} else if(config["game/keyboard_dancepad"].b() && devices[input::Private::KEYBOARD_ID3].assigned()) {
+				joy_id = input::Private::KEYBOARD_ID3;
 				switch(_e.key.keysym.sym) {
 					case SDLK_KP9: button = 5; break;
 					case SDLK_KP8: case SDLK_UP: button = 2; break;
@@ -401,8 +419,23 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 					default:
 						return false;
 				}
-			} else if(config["game/keyboard_dancepad"].b() && devices[input::Private::KEYBOARD_ID2].assigned()) {
+			} else if(config["game/keyboard_drumkit"].b() && devices[input::Private::KEYBOARD_ID2].assigned()) {
 				joy_id = input::Private::KEYBOARD_ID2;
+				switch(_e.key.keysym.sym) {
+					case SDLK_u:
+						button++;
+					case SDLK_i:
+						button++;
+					case SDLK_o:
+						button++;
+					case SDLK_p:
+						event.type = input::Event::RELEASE;
+						break;
+					default:
+						return false;
+				}
+			} else if(config["game/keyboard_dancepad"].b() && devices[input::Private::KEYBOARD_ID3].assigned()) {
+				joy_id = input::Private::KEYBOARD_ID3;
 				switch(_e.key.keysym.sym) {
 					case SDLK_KP9: button = 5; break;
 					case SDLK_KP8: case SDLK_UP: button = 2; break;
