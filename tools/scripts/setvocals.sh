@@ -2,7 +2,7 @@
 # this script guess which is the vocals track of a song and name it "vocals.ogg"
 # usage ./setvocals.sh [songdir]
 
-cd "$1"
+cd "$1" || exit
 
 function setvocals_rockband {
 	if [ -f "song.ogg" -a -f "drums.ogg" -a -f "rhythm.ogg" -a -f "guitar.ogg" ];
