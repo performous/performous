@@ -89,13 +89,32 @@ template <typename T> void loadPNG(T& target, std::string const& filename) {
 	target.load(w, h, channels == 4 ? pix::CHAR_RGBA : pix::RGB, &image[0], float(w)/h);
 }
 
+struct my_jpeg_error_mgr {
+	struct jpeg_error_mgr pub;	/* "public" fields */
+	jmp_buf setjmp_buffer;	/* for return to caller */
+};
+
+typedef struct my_jpeg_error_mgr * my_jpeg_error_mgr_ptr;
+
+static void my_jpeg_error_exit (j_common_ptr cinfo) {
+	my_jpeg_error_mgr_ptr myerr = (my_jpeg_error_mgr_ptr) cinfo->err;
+	(*cinfo->err->output_message) (cinfo);
+	longjmp(myerr->setjmp_buffer, 1);
+}
+
 template <typename T> void loadJPEG(T& target, std::string const& filename) {
 	std::vector<unsigned char> image;
+	struct my_jpeg_error_mgr jerr;
 	FILE* infile = fopen(filename.c_str(), "rb");
 	if (!infile) throw std::runtime_error("Cannot open " + filename);
 	jpeg_decompress_struct cinfo;
-	jpeg_error_mgr jerr;
-	cinfo.err = jpeg_std_error(&jerr);
+	cinfo.err = jpeg_std_error(&jerr.pub);
+	jerr.pub.error_exit = my_jpeg_error_exit;
+	if (setjmp(jerr.setjmp_buffer)) {
+		jpeg_destroy_decompress(&cinfo);
+		fclose(infile);
+		throw std::runtime_error("Error in libjpeg for file " + filename);
+	}
 	jpeg_create_decompress(&cinfo);
 	jpeg_stdio_src(&cinfo, infile);
 	if( jpeg_read_header(&cinfo, true) != JPEG_HEADER_OK) throw std::runtime_error("Cannot read header of " + filename);
@@ -103,7 +122,7 @@ template <typename T> void loadJPEG(T& target, std::string const& filename) {
 	unsigned w = cinfo.output_width;
 	unsigned h = cinfo.output_height;
 	image.resize(w * h * 4);
-	unsigned stride = (w * 3 + 3) & ~3;  // Number of bytes per row (word-aligned)
+	//unsigned stride = (w * 3 + 3) & ~3;  // Number of bytes per row (word-aligned)
 	unsigned char* ptr = &image[0];
 	while (cinfo.output_scanline < h) {
 		jpeg_read_scanlines(&cinfo, &ptr, 1);
