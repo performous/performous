@@ -11,10 +11,10 @@
 
 namespace {
 	const Color playerColors[] = {
-		Color(0.2, 0.5, 0.7),
-		Color(0.8, 0.3, 0.3),
-		Color(0.2, 0.9, 0.2),
-		Color(1.0, 0.6, 0.0)
+		Color(0.125, 1.0, 0.1328125),
+		Color(0.12890625, 0.546875, 1.0),
+		Color(1.0, 0.12890625, 0.98046875),
+		Color(1.0, 0.578125, 0.12890625)
 	};
 	size_t playerColorsSize = sizeof(playerColors) / sizeof(*playerColors);
 }
