@@ -78,12 +78,8 @@ msgid "Press enter to create player!"
 msgstr "Premi invio per creare il giocatore!"
 
 #: ../game/screen_players.cc:119
-msgid "You reached"
-msgstr "Hai fatto"
-
-#: ../game/screen_players.cc:119
-msgid "points!"
-msgstr "punti!"
+msgid "You reached %1 points!"
+msgstr "Hai fatto %1 punti!"
 
 #: ../game/screen_players.cc:120
 msgid "Change player with arrow keys."
