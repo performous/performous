@@ -13,6 +13,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <boost/format.hpp>
 
 ScreenPlayers::ScreenPlayers(std::string const& name, Audio& audio, Database& database):
   Screen(name), m_audio(audio), m_database(database), m_players(database.m_players), m_covers(20)
@@ -116,7 +117,7 @@ void ScreenPlayers::draw() {
 		// Format the player information text
 		oss_song << m_database.scores.front().track << '\n';
 		// TODO: use boost::format
-		oss_song << _("You reached") << ' ' << m_database.scores.front().score << ' ' << _("points!");
+		oss_song << boost::format(_("You reached %1 points!")) % m_database.scores.front().score;
 		oss_order << _("Change player with arrow keys.") << '\n'
 			<< _("Name:") << ' ' << m_players.current().name << '\n';
 		//m_database.queryPerPlayerHiscore(oss_order);

@@ -203,28 +203,19 @@ void ScreenSing::manageEvent(SDL_Event event) {
 	Song::Status status = m_song->status(time);
 	input::NavButton nav(input::getNav(event));
 	int key = event.key.keysym.sym;
-	// A kludge to allow using space for navigation
-	if (event.type == SDL_KEYDOWN && key == SDLK_SPACE) nav = m_score_window.get() ? input::START : input::PAUSE;
-	// A kludge to allow using Esc for quitting through pause
-	if (event.type == SDL_KEYDOWN && key == SDLK_ESCAPE) nav = m_audio.isPaused() ? input::CANCEL : input::PAUSE;
-	// A kludge to use Start as Pause
-	if (nav == input::START && key != SDLK_RETURN) nav = input::PAUSE;
 	// Handle keys
 	if (nav != input::NONE) {
 		m_quitTimer.setValue(QUIT_TIMEOUT);
-		if (nav == input::CANCEL && (m_audio.isPaused() || m_score_window.get())) {
-			// In ScoreWindow cancel goes to Players, otherwise insta-quit to Songs
-			if (m_score_window.get()) activateNextScreen();
-			else ScreenManager::getSingletonPtr()->activateScreen("Songs");
-			return;
-		}
-		if (nav == input::PAUSE || (m_audio.isPaused() && nav == input::START)) {
-			m_audio.togglePause();
-			return;
-		}
+		if (nav == input::PAUSE || nav == input::CANCEL) m_audio.togglePause();
+		// When score window is displayed
 		if (m_score_window.get()) {
-			if (nav == input::START) activateNextScreen(); // Score window visible -> Start quits
+			if (nav == input::START || nav == input::CANCEL) activateNextScreen();
 			return;  // The rest are only available when score window is not displayed
+		}
+		// Confirm quit with START while paused or instant quit with CANCEL at the very beginning
+		if ((nav == input::START && m_audio.isPaused()) || (nav == input::CANCEL && time < 1.0)) {
+			ScreenManager::getSingletonPtr()->activateScreen("Songs");
+			return;
 		}
 		// Start button has special functions for skipping things (only in singing for now)
 		if (nav == input::START && m_only_singers_alive && !m_song->notes.empty() && !m_audio.isPaused()) {

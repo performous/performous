@@ -13,20 +13,27 @@
    height="400"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.47 r22583"
+   inkscape:version="0.47pre4 r22446"
    version="1.0"
    sodipodi:docname="sing_pause.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
-     id="defs4">
-    <inkscape:perspective
-       sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="0 : 526.18109 : 1"
-       inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_z="744.09448 : 526.18109 : 1"
-       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
-       id="perspective10" />
-  </defs>
+     id="defs4"><inkscape:perspective
+   sodipodi:type="inkscape:persp3d"
+   inkscape:vp_x="0 : 526.18109 : 1"
+   inkscape:vp_y="0 : 1000 : 0"
+   inkscape:vp_z="744.09448 : 526.18109 : 1"
+   inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+   id="perspective10" />
+
+<inkscape:perspective
+   id="perspective2963"
+   inkscape:persp3d-origin="88 : 58.666667 : 1"
+   inkscape:vp_z="176 : 88 : 1"
+   inkscape:vp_y="0 : 1000 : 0"
+   inkscape:vp_x="0 : 88 : 1"
+   sodipodi:type="inkscape:persp3d" />
+</defs>
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"
@@ -70,48 +77,40 @@
        y="-69.25"
        rx="53.877144"
        ry="55.004662" />
-    <rect
-       style="fill:#000000;fill-opacity:0.99688475;stroke:none"
-       id="rect3155"
-       width="72"
-       height="150"
-       x="160"
-       y="20"
-       rx="0"
-       ry="0" />
-    <rect
-       style="fill:#000000;fill-opacity:0.99688475;stroke:none"
-       id="rect3157"
-       width="72"
-       height="150"
-       x="268"
-       y="20"
-       rx="0"
-       ry="0" />
     <text
        xml:space="preserve"
        style="font-size:49.19297028px;font-style:normal;font-weight:normal;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
-       x="267.95001"
-       y="-9.9983273"
+       x="266.86404"
+       y="10.673278"
        id="text3179"
        transform="scale(0.93017475,1.0750668)"><tspan
          sodipodi:role="line"
          id="tspan3181"
-         x="267.95001"
-         y="-9.9983273">PAUSE</tspan></text>
+         x="266.86404"
+         y="10.673278">QUIT NOW?</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:28px;font-style:normal;font-weight:normal;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
-       x="249.50768"
-       y="233.12689"
+       x="248.49753"
+       y="255.35025"
        id="text2817"><tspan
          sodipodi:role="line"
-         x="249.50768"
-         y="233.12689"
-         id="tspan2823">Enter/Start/Pause to continue</tspan><tspan
+         x="248.49753"
+         y="255.35025"
+         id="tspan2823">Enter/Start to quit</tspan><tspan
          sodipodi:role="line"
-         x="249.50768"
-         y="268.12692"
-         id="tspan2821">Esc/Select to quit</tspan></text>
+         x="248.49753"
+         y="290.35025"
+         id="tspan2821" /></text>
+    <g
+       id="g2966"
+       transform="translate(159.78738,34.3101)">
+      <path
+         id="path2955"
+         d="M 0,87.7 C 0,39.2 39.2,0 87.7,0 l 0,0 v 15 15 c -16,0 -30.3,6.4 -40.8,16.9 l 0,0 C 36.4,57.4 30,71.7 30,87.7 l 0,0 c 0,16 6.4,30.3 16.9,40.8 l 0,0 c 10.5,10.5 24.8,16.9 40.8,16.9 l 0,0 c 16,0 30.3,-6.4 40.8,-16.9 l 0,0 C 139,118 145.4,103.7 145.4,87.7 l 0,0 c 0,-16 -6.4,-30.3 -16.9,-40.8 l 0,0 C 118,36.4 103.6,30 87.7,30 l 0,0 V 15 0 c 48.4,0 87.7,39.2 87.7,87.7 l 0,0 c 0,48.4 -39.2,87.7 -87.7,87.7 l 0,0 C 39.2,175.3 0,136.1 0,87.7 l 0,0 z" />
+      <path
+         id="path2957"
+         d="m 72.7,115.4 v -55 c 0,-8.3 6.7,-15 15,-15 l 0,0 c 8.3,0 15,6.7 15,15 l 0,0 v 55 c 0,8.3 -6.7,15 -15,15 l 0,0 c -8.3,0 -15,-6.8 -15,-15 l 0,0 z" />
+    </g>
   </g>
 </svg>
