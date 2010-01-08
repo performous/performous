@@ -134,6 +134,7 @@ template <typename T> void loadJPEG(T& target, std::string const& filename) {
 }
 
 static inline void writePNG(std::string const& filename, Image const& img) {
+	std::vector<png_bytep> rows(img.h);
 	std::ofstream file(filename.c_str(), std::ios::binary);
 	png_structp pngPtr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	if (!pngPtr) throw std::runtime_error("png_create_read_struct failed");
@@ -146,7 +147,6 @@ static inline void writePNG(std::string const& filename, Image const& img) {
 	} cleanup(pngPtr, infoPtr);
 	infoPtr = png_create_info_struct(pngPtr);
 	if (!infoPtr) throw std::runtime_error("png_create_info_struct failed");
-	std::vector<png_bytep> rows(img.h);
 	// There must be no C++ objects after the setjmp line! (they won't get properly destructed)
 	if (setjmp(png_jmpbuf(pngPtr))) throw std::runtime_error("Writing PNG failed");
 	png_set_write_fn(pngPtr, &file, writePngHelper, NULL);
@@ -159,5 +159,6 @@ static inline void writePNG(std::string const& filename, Image const& img) {
 		rows[y] = (png_bytep)(&img.data[pos]);
 	}
 	png_write_image(pngPtr, &rows[0]);
+	png_write_end(pngPtr, NULL);
 }
 
