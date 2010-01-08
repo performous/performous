@@ -20,75 +20,156 @@ msgstr ""
 msgid "Hiscore for "
 msgstr ""
 
-#: ../game/screen_intro.cc:9 ../game/screen_intro.cc:10
+#: ../game/screen_intro.cc:10
 msgid "Perform"
 msgstr ""
 
-#: ../game/screen_intro.cc:9 ../game/screen_intro.cc:10
+#: ../game/screen_intro.cc:10
 msgid "Start performing!"
 msgstr ""
 
-#: ../game/screen_intro.cc:10 ../game/screen_intro.cc:11
+#: ../game/screen_intro.cc:11
 msgid "Practice"
 msgstr ""
 
-#: ../game/screen_intro.cc:10 ../game/screen_intro.cc:11
+#: ../game/screen_intro.cc:11
 msgid "Check your skills or test the microphones"
 msgstr ""
 
-#: ../game/screen_intro.cc:11 ../game/screen_intro.cc:12
+#: ../game/screen_intro.cc:12
 msgid "Configure"
 msgstr ""
 
-#: ../game/screen_intro.cc:11 ../game/screen_intro.cc:12
+#: ../game/screen_intro.cc:12
 msgid "Configure game options"
 msgstr ""
 
-#: ../game/screen_intro.cc:12 ../game/screen_intro.cc:13
+#: ../game/screen_intro.cc:13
 msgid "Quit"
 msgstr ""
 
-#: ../game/screen_intro.cc:12 ../game/screen_intro.cc:13
+#: ../game/screen_intro.cc:13
 msgid "Leave the game"
 msgstr ""
 
-#: ../game/screen_intro.cc:19 ../game/screen_intro.cc:21
+#: ../game/screen_intro.cc:21
 msgid "No playback devices could be used.\n"
 msgstr ""
 
-#: ../game/screen_intro.cc:20 ../game/screen_intro.cc:22
+#: ../game/screen_intro.cc:22
 msgid "No microphones found.\n"
 msgstr ""
 
-#: ../game/screen_intro.cc:21 ../game/screen_intro.cc:23
+#: ../game/screen_intro.cc:23
 msgid ""
 "\n"
 "Please configure some before playing."
 msgstr ""
 
-#: ../game/screen_players.cc:110 ../game/screen_players.cc:111
+#: ../game/screen_players.cc:109
 msgid "No players found!"
 msgstr ""
 
-#: ../game/screen_players.cc:111 ../game/screen_players.cc:112
+#: ../game/screen_players.cc:110
 msgid "Enter a name to create a new player."
 msgstr ""
 
-#: ../game/screen_players.cc:113 ../game/screen_players.cc:114
+#: ../game/screen_players.cc:112
 msgid "Press enter to create player!"
 msgstr ""
 
-#: ../game/screen_songs.cc:209 ../game/screen_songs.cc:178
+#: ../game/screen_players.cc:119
+msgid "You reached"
+msgstr ""
+
+#: ../game/screen_players.cc:119
+msgid "points!"
+msgstr ""
+
+#: ../game/screen_players.cc:120
+msgid "Change player with arrow keys."
+msgstr ""
+
+#: ../game/screen_players.cc:121
+msgid "Name:"
+msgstr ""
+
+#: ../game/screen_players.cc:124
+msgid "Type text to filter or create a new player."
+msgstr ""
+
+#: ../game/screen_players.cc:124
+msgid "Search Text:"
+msgstr ""
+
+#: ../game/screen_sing.cc:338
+msgid "   ENTER to skip instrumental break"
+msgstr ""
+
+#: ../game/screen_sing.cc:339
+msgid "   Remember to wait for grading!"
+msgstr ""
+
+#: ../game/screen_sing.cc:427
+msgid "No player!"
+msgstr ""
+
+#: ../game/screen_sing.cc:436
+msgid "Hit singer"
+msgstr ""
+
+#: ../game/screen_sing.cc:437
+msgid "Lead singer"
+msgstr ""
+
+#: ../game/screen_sing.cc:438
+#: ../game/screen_sing.cc:444
+#: ../game/screen_sing.cc:450
+msgid "Rising star"
+msgstr ""
+
+#: ../game/screen_sing.cc:439
+#: ../game/screen_sing.cc:445
+#: ../game/screen_sing.cc:451
+msgid "Amateur"
+msgstr ""
+
+#: ../game/screen_sing.cc:440
+#: ../game/screen_sing.cc:452
+msgid "Tone deaf"
+msgstr ""
+
+#: ../game/screen_sing.cc:442
+msgid "Maniac"
+msgstr ""
+
+#: ../game/screen_sing.cc:443
+msgid "Hoofer"
+msgstr ""
+
+#: ../game/screen_sing.cc:446
+msgid "Loser"
+msgstr ""
+
+#: ../game/screen_sing.cc:448
+msgid "Virtuoso"
+msgstr ""
+
+#: ../game/screen_sing.cc:449
+msgid "Rocker"
+msgstr ""
+
+#: ../game/screen_songs.cc:178
 msgid "No songs found!"
 msgstr ""
 
-#: ../game/screen_songs.cc:210 ../game/screen_songs.cc:179
+#: ../game/screen_songs.cc:179
 msgid ""
 "Visit performous.org\n"
 "for free songs"
 msgstr ""
 
-#: ../game/screen_songs.cc:212 ../game/screen_songs.cc:181
+#: ../game/screen_songs.cc:181
 msgid "no songs match search"
 msgstr ""
 
@@ -98,30 +179,6 @@ msgstr ""
 
 #: ../game/screen_songs.cc:188
 msgid "none"
-msgstr ""
-
-#: ../game/screen_players.cc:121
-msgid "You reached"
-msgstr ""
-
-#: ../game/screen_players.cc:121
-msgid "points!"
-msgstr ""
-
-#: ../game/screen_players.cc:122
-msgid "Change player with arrow keys."
-msgstr ""
-
-#: ../game/screen_players.cc:123
-msgid "Name:"
-msgstr ""
-
-#: ../game/screen_players.cc:126
-msgid "Type text to filter or create a new player."
-msgstr ""
-
-#: ../game/screen_players.cc:126
-msgid "Search Text:"
 msgstr ""
 
 #: ../game/songs.cc:204
@@ -151,3 +208,4 @@ msgstr ""
 #: ../game/songs.cc:210
 msgid "sorted by language"
 msgstr ""
+

@@ -17,57 +17,46 @@ msgstr ""
 msgid "Hiscore for "
 msgstr "Punteggi per "
 
-#: ../game/screen_intro.cc:9
 #: ../game/screen_intro.cc:10
 msgid "Perform"
 msgstr "Gioca"
 
-#: ../game/screen_intro.cc:9
 #: ../game/screen_intro.cc:10
 msgid "Start performing!"
 msgstr "Comincia a cantare"
 
-#: ../game/screen_intro.cc:10
 #: ../game/screen_intro.cc:11
 msgid "Practice"
 msgstr "Pratica"
 
-#: ../game/screen_intro.cc:10
 #: ../game/screen_intro.cc:11
 msgid "Check your skills or test the microphones"
 msgstr "Controlla la tua bravura! / Test microfono"
 
-#: ../game/screen_intro.cc:11
 #: ../game/screen_intro.cc:12
 msgid "Configure"
 msgstr "Configura"
 
-#: ../game/screen_intro.cc:11
 #: ../game/screen_intro.cc:12
 msgid "Configure game options"
 msgstr "Opzioni di configurazione gioco"
 
-#: ../game/screen_intro.cc:12
 #: ../game/screen_intro.cc:13
 msgid "Quit"
 msgstr "Esci"
 
-#: ../game/screen_intro.cc:12
 #: ../game/screen_intro.cc:13
 msgid "Leave the game"
 msgstr "Lascia il gioco"
 
-#: ../game/screen_intro.cc:19
 #: ../game/screen_intro.cc:21
 msgid "No playback devices could be used.\n"
 msgstr "Nessun dispositivo di riproduzione può essere usato.\n"
 
-#: ../game/screen_intro.cc:20
 #: ../game/screen_intro.cc:22
 msgid "No microphones found.\n"
 msgstr "Nessun microfono trovato.\n"
 
-#: ../game/screen_intro.cc:21
 #: ../game/screen_intro.cc:23
 msgid ""
 "\n"
@@ -76,27 +65,103 @@ msgstr ""
 "\n"
 "Per favore entra in configurazione prima di giocare"
 
-#: ../game/screen_players.cc:110
-#: ../game/screen_players.cc:111
+#: ../game/screen_players.cc:109
 msgid "No players found!"
 msgstr "Nessun giocatore trovato!"
 
-#: ../game/screen_players.cc:111
-#: ../game/screen_players.cc:112
+#: ../game/screen_players.cc:110
 msgid "Enter a name to create a new player."
 msgstr "Inserisci un nome per creare un nuovo giocatore."
 
-#: ../game/screen_players.cc:113
-#: ../game/screen_players.cc:114
+#: ../game/screen_players.cc:112
 msgid "Press enter to create player!"
 msgstr "Premi invio per creare il giocatore!"
 
-#: ../game/screen_songs.cc:209
+#: ../game/screen_players.cc:119
+msgid "You reached"
+msgstr "Hai fatto"
+
+#: ../game/screen_players.cc:119
+msgid "points!"
+msgstr "punti!"
+
+#: ../game/screen_players.cc:120
+msgid "Change player with arrow keys."
+msgstr "Cambia il giocatore con le frecce."
+
+#: ../game/screen_players.cc:121
+msgid "Name:"
+msgstr "Nome:"
+
+#: ../game/screen_players.cc:124
+msgid "Type text to filter or create a new player."
+msgstr "Inserisci un nome per selezionare un giocatore o crearne uno nuovo."
+
+#: ../game/screen_players.cc:124
+msgid "Search Text:"
+msgstr "Testo di ricerca"
+
+#: ../game/screen_sing.cc:338
+msgid "   ENTER to skip instrumental break"
+msgstr "   INVIO per saltare lo stacco musicale"
+
+#: ../game/screen_sing.cc:339
+msgid "   Remember to wait for grading!"
+msgstr "   Ricordati di aspettare per il voto!"
+
+#: ../game/screen_sing.cc:427
+msgid "No player!"
+msgstr "Nessun giocatore trovato!"
+
+#: ../game/screen_sing.cc:436
+msgid "Hit singer"
+msgstr "Star"
+
+#: ../game/screen_sing.cc:437
+msgid "Lead singer"
+msgstr "Cantante"
+
+#: ../game/screen_sing.cc:438
+#: ../game/screen_sing.cc:444
+#: ../game/screen_sing.cc:450
+msgid "Rising star"
+msgstr "Dilettante"
+
+#: ../game/screen_sing.cc:439
+#: ../game/screen_sing.cc:445
+#: ../game/screen_sing.cc:451
+msgid "Amateur"
+msgstr "Amatore"
+
+#: ../game/screen_sing.cc:440
+#: ../game/screen_sing.cc:452
+msgid "Tone deaf"
+msgstr "Stonato"
+
+#: ../game/screen_sing.cc:442
+msgid "Maniac"
+msgstr "Maniaco"
+
+#: ../game/screen_sing.cc:443
+msgid "Hoofer"
+msgstr "Professionista"
+
+#: ../game/screen_sing.cc:446
+msgid "Loser"
+msgstr "Perdente"
+
+#: ../game/screen_sing.cc:448
+msgid "Virtuoso"
+msgstr "Virtuoso"
+
+#: ../game/screen_sing.cc:449
+msgid "Rocker"
+msgstr "Rockstar"
+
 #: ../game/screen_songs.cc:178
 msgid "No songs found!"
 msgstr "Nessuna canzone trovata!"
 
-#: ../game/screen_songs.cc:210
 #: ../game/screen_songs.cc:179
 msgid ""
 "Visit performous.org\n"
@@ -105,7 +170,6 @@ msgstr ""
 "Visita performous.org\n"
 "per canzoni gratis"
 
-#: ../game/screen_songs.cc:212
 #: ../game/screen_songs.cc:181
 msgid "no songs match search"
 msgstr "nessuna canzone trovata"
@@ -117,30 +181,6 @@ msgstr "filtro:"
 #: ../game/screen_songs.cc:188
 msgid "none"
 msgstr "niente"
-
-#: ../game/screen_players.cc:121
-msgid "You reached"
-msgstr "Hai fatto"
-
-#: ../game/screen_players.cc:121
-msgid "points!"
-msgstr "punti!"
-
-#: ../game/screen_players.cc:122
-msgid "Change player with arrow keys."
-msgstr "Cambia il giocatore con le frecce."
-
-#: ../game/screen_players.cc:123
-msgid "Name:"
-msgstr "Nome:"
-
-#: ../game/screen_players.cc:126
-msgid "Type text to filter or create a new player."
-msgstr "Inserisci un nome per selezionare un giocatore o crearne uno nuovo."
-
-#: ../game/screen_players.cc:126
-msgid "Search Text:"
-msgstr "Testo di ricerca"
 
 #: ../game/songs.cc:204
 msgid "random order"

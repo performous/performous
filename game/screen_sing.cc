@@ -335,8 +335,8 @@ void ScreenSing::draw() {
 		m_progress->draw(songPercent);
 		std::string statustxt = (boost::format("%02u:%02u") % (t / 60) % (t % 60)).str();
 		if (!m_score_window.get() && m_only_singers_alive && !m_song->notes.empty()) {
-			if (status == Song::INSTRUMENTAL_BREAK) statustxt += "   ENTER to skip instrumental break";
-			if (status == Song::FINISHED && !config["game/karaoke_mode"].b()) statustxt += "   Remember to wait for grading!";
+			if (status == Song::INSTRUMENTAL_BREAK) statustxt += _("   ENTER to skip instrumental break");
+			if (status == Song::FINISHED && !config["game/karaoke_mode"].b()) statustxt += _("   Remember to wait for grading!");
 		}
 		theme->timer.draw(statustxt);
 	}
@@ -424,7 +424,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database, Dancers& 
 	}
 
 	if (m_database.scores.empty())
-		m_rank = "No player!";
+		m_rank = _("No player!");
 	else {
 		// Determine winner
 		ScoreItem winner = m_database.scores.front();
@@ -433,23 +433,23 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database, Dancers& 
 		int topScore = winner.score;
 		// Determine rank
 		if (winner.type == ScoreItem::SINGER) {
-			if (topScore > 8000) m_rank = "Hit singer";
-			else if (topScore > 6000) m_rank = "Lead singer";
-			else if (topScore > 4000) m_rank = "Rising star";
-			else if (topScore > 2000) m_rank = "Amateur";
-			else m_rank = "Tone deaf";
+			if (topScore > 8000) m_rank = _("Hit singer");
+			else if (topScore > 6000) m_rank = _("Lead singer");
+			else if (topScore > 4000) m_rank = _("Rising star");
+			else if (topScore > 2000) m_rank = _("Amateur");
+			else m_rank = _("Tone deaf");
 		} else if (winner.type == ScoreItem::DANCER) {
-			if (topScore > 8000) m_rank = "Maniac";
-			else if (topScore > 6000) m_rank = "Hoofer";
-			else if (topScore > 4000) m_rank = "Rising star";
-			else if (topScore > 2000) m_rank = "Amateur";
-			else m_rank = "Loser";
+			if (topScore > 8000) m_rank = _("Maniac");
+			else if (topScore > 6000) m_rank = _("Hoofer");
+			else if (topScore > 4000) m_rank = _("Rising star");
+			else if (topScore > 2000) m_rank = _("Amateur");
+			else m_rank = _("Loser");
 		} else {
-			if (topScore > 8000) m_rank = "Virtuoso";
-			else if (topScore > 6000) m_rank = "Rocker";
-			else if (topScore > 4000) m_rank = "Rising star";
-			else if (topScore > 2000) m_rank = "Amateur";
-			else m_rank = "Tone deaf";
+			if (topScore > 8000) m_rank = _("Virtuoso");
+			else if (topScore > 6000) m_rank = _("Rocker");
+			else if (topScore > 4000) m_rank = _("Rising star");
+			else if (topScore > 2000) m_rank = _("Amateur");
+			else m_rank = _("Tone deaf");
 		}
 	}
 	m_bg.dimensions.middle().center();
