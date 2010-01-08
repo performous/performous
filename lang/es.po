@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-08 12:20+0100\n"
+"POT-Creation-Date: 2010-01-08 12:36+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Miguel Sánchez de León Peque <msdeleonpeque@gmail.com>\n"
 "Language-Team: \n"
@@ -135,7 +135,7 @@ msgstr "ordenadas por idioma"
 
 #: ../game/screen_sing.cc:338
 msgid "   ENTER to skip instrumental break"
-msgstr "   ENTER para pasar la parte instrumental"
+msgstr "   \"ENTER\" para pasar la parte instrumental"
 
 #: ../game/screen_sing.cc:339
 msgid "   Remember to wait for grading!"

@@ -139,6 +139,7 @@ bool SongParser::smParseField(std::string line) {
 	else if (key == "MUSIC") m_song.music["background"] = m_song.path + value;
 	else if (key == "BACKGROUND") m_song.background = value;
 	else if (key == "OFFSET") { assign(m_gap, value); m_gap *= -1; }
+	else if (key == "SAMPLESTART") assign(m_song.preview_start, value);
 	else if (key == "BPMS"){
 			std::istringstream iss(value);
 			double ts, bpm;	
