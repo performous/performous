@@ -27,7 +27,7 @@ msgstr "Commencer une partie!"
 
 #: ../game/screen_intro.cc:10 ../game/screen_intro.cc:11
 msgid "Practice"
-msgstr "Entrainement"
+msgstr "S'exercer"
 
 #: ../game/screen_intro.cc:10 ../game/screen_intro.cc:11
 msgid "Check your skills or test the microphones"
@@ -35,7 +35,7 @@ msgstr "Chauffer votre voix et tester les micros"
 
 #: ../game/screen_intro.cc:11 ../game/screen_intro.cc:12
 msgid "Configure"
-msgstr "Configuration"
+msgstr "Options"
 
 #: ../game/screen_intro.cc:11 ../game/screen_intro.cc:12
 msgid "Configure game options"
