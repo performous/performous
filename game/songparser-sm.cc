@@ -200,10 +200,12 @@ Notes SongParser::smParseNotes(std::string line) {
 			double step = (end - begin) / div;
 			for (unsigned note = 0; note < div; ++note) {
 				double t = begin + note * step;
+				double phase = double(note) / div;
 				for (DanceChord::iterator it = chords[note].begin(), end = chords[note].end(); it != end; ++it) {
 					int& holdIdx = holdMarks[it->first];  // holdIdx for current arrow
 					Note& n = it->second;
 					n.begin = n.end = t;
+					n.phase = phase;
 					// TODO: Proper LIFT handling
 					if (n.type == Note::TAP || n.type == Note::MINE || n.type == Note::LIFT) notes.push_back(n);
 					// TODO: Proper ROLL handling
