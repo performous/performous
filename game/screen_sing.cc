@@ -45,11 +45,9 @@ void ScreenSing::enter() {
 			std::cerr << e.what() << std::endl;
 		}
 	}
+	//FIXME: this line crashes under windows. Have to fix. At moment, just don't use it on Windows
 	m_pause_icon.reset(new Surface(getThemePath("sing_pause.svg")));
-//FIXME: this line crashes under windows. Have to fix. At moment, just don't use it on Windows
-#ifndef _WIN32
 	m_help.reset(new Surface(getThemePath("instrumenthelp.svg")));
-#endif
 	m_progress.reset(new ProgressBar(getThemePath("sing_progressbg.svg"), getThemePath("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01f, 0.01f, true));
 	m_progress->dimensions.fixedWidth(0.4).left(-0.5).screenTop();
 	theme->timer.dimensions.screenTop(0.5 * m_progress->dimensions.h());
@@ -120,9 +118,7 @@ bool ScreenSing::instrumentLayout(double time) {
 	}
 	if (time < -0.5) {
 		glColor4f(1.0f, 1.0f, 1.0f, clamp(-1.0 - 2.0 * time));
-#ifndef _WIN32  // FIXME
 		m_help->draw();
-#endif
 		glColor3f(1.0f, 1.0f, 1.0f);
 	}
 	// Set volume levels (averages of all instruments playing that track)
@@ -156,9 +152,7 @@ void ScreenSing::danceLayout(double time) {
 	}
 	if (time < -0.5) {
 		glColor4f(1.0f, 1.0f, 1.0f, clamp(-1.0 - 2.0 * time));
-#ifndef _WIN32  // FIXME
 		m_help->draw();
-#endif
 		glColor3f(1.0f, 1.0f, 1.0f);
 	}
 }
@@ -169,9 +163,7 @@ void ScreenSing::exit() {
 	m_dancers.clear();
 	m_layout_singer.reset();
 	m_engine.reset();
-#ifndef _WIN32  // FIXME
 	m_help.reset();
-#endif
 	m_pause_icon.reset();
 	m_video.reset();
 	m_background.reset();

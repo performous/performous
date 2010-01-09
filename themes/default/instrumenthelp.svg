@@ -65,13 +65,34 @@
      showgrid="false"
      showguides="true"
      inkscape:guide-bbox="true"
-     inkscape:zoom="0.8536787"
-     inkscape:cx="363.42267"
-     inkscape:cy="373.7774"
+     inkscape:zoom="0.5"
+     inkscape:cx="287.72345"
+     inkscape:cy="261.06756"
      inkscape:window-x="58"
      inkscape:window-y="13"
      inkscape:current-layer="svg5215"
      inkscape:window-maximized="0" />
+  <text
+     transform="scale(0.89213371,1.1209082)"
+     id="text2954"
+     y="434.98087"
+     x="323.69031"
+     style="font-size:48.68118668000000300px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.01400006000000010;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;font-family:Verdana;-inkscape-font-specification:Verdana Bold"
+     xml:space="preserve"><tspan
+       style="text-align:center;text-anchor:start;stroke:#000000;stroke-width:1.01400006000000010;stroke-miterlimit:4;stroke-dasharray:none"
+       y="434.98087"
+       x="323.69031"
+       sodipodi:role="line"
+       id="tspan2905"><tspan
+   style="fill:#ff6600;stroke:#000000;stroke-width:1.01400006000000010"
+   id="tspan2873">PRESS</tspan> A BUTTON</tspan><tspan
+       style="text-align:center;text-anchor:start;stroke:#000000;stroke-width:1.01400006000000010;stroke-miterlimit:4;stroke-dasharray:none"
+       y="434.98087"
+       x="323.69031"
+       sodipodi:role="line"
+       id="tspan2970"><tspan
+         style="fill:#ffff00;stroke:#000000;stroke-width:1.01400006000000010"
+         id="tspan2911" /></tspan></text>
   <!-- EMR_SETMAPMODE -->
   <!-- EMR_SETWINDOWEXTEX -->
   <!-- EMR_SETVIEWPORTEXTEX -->
@@ -300,12 +321,12 @@
        sodipodi:role="line">PICK</tspan></text>
   <text
      xml:space="preserve"
-     style="font-size:28px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;opacity:0.95;fill:#ffffff;fill-opacity:0.95;fill-rule:nonzero;stroke:#000000;stroke-width:0.89999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;font-family:Verdana;-inkscape-font-specification:Verdana"
-     x="687.93378"
+     style="font-size:28px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:start;opacity:0.95;fill:#ffffff;fill-opacity:0.95;fill-rule:nonzero;stroke:#000000;stroke-width:0.89999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;font-family:Verdana;-inkscape-font-specification:Verdana"
+     x="562.48071"
      y="372.84677"
      id="text3235"><tspan
        sodipodi:role="line"
-       x="687.93378"
+       x="562.48071"
        y="372.84677"
        id="tspan3239"
        style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.89999998;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none">Choose your level</tspan></text>
@@ -363,25 +384,6 @@
        id="tspan2869"
        x="370.25256"
        y="559.18805" /></text>
-  <text
-     transform="scale(0.89213371,1.1209082)"
-     id="text2954"
-     y="434.98087"
-     x="560.16595"
-     style="font-size:48.68118668px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.01400006;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;font-family:Verdana;-inkscape-font-specification:Verdana Bold"
-     xml:space="preserve"><tspan
-       style="text-align:center;text-anchor:middle;stroke-width:1.01400006;stroke-miterlimit:4;stroke-dasharray:none"
-       y="434.98087"
-       x="560.16595"
-       sodipodi:role="line"
-       id="tspan2966"><tspan
-   style="fill:#ff6600"
-   id="tspan2873">PRESS</tspan> A BUTTON</tspan><tspan
-       style="text-align:center;text-anchor:middle;stroke-width:1.01400006;stroke-miterlimit:4;stroke-dasharray:none"
-       y="495.83234"
-       x="560.16595"
-       sodipodi:role="line"
-       id="tspan2970">TO JOIN THE GAME</tspan></text>
   <path
      style="fill:#ff40a9;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
      d="m 360.74551,386.80657 c -1.19397,-0.89713 -2.54012,-1.74835 -2.99146,-1.8916 -1.08508,-0.34439 -1.03628,-1.15017 0.15341,-2.53328 l 0.97403,-1.13238 2.64981,1.36391 c 2.83946,1.46152 4.51349,2.77696 4.51349,3.54665 0,0.66336 -1.78807,2.27784 -2.52275,2.27784 -0.33313,0 -1.58256,-0.73401 -2.77653,-1.63114 z"
@@ -449,4 +451,16 @@
        y="327.96237"
        id="tspan3245-0"
        style="fill-rule:nonzero;stroke-width:0.89999998;stroke-miterlimit:4;stroke-dasharray:none">Dancing</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-size:48.68118668px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.01400006;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;font-family:Verdana;-inkscape-font-specification:Verdana Bold"
+     x="297.83939"
+     y="495.83029"
+     id="text2891"
+     transform="scale(0.89213371,1.1209082)"><tspan
+       id="tspan2897"
+       sodipodi:role="line"
+       x="297.83939"
+       y="495.83029"
+       style="text-align:center;text-anchor:start;stroke-width:1.01400006;stroke-miterlimit:4;stroke-dasharray:none">TO JOIN THE GAME</tspan></text>
 </svg>

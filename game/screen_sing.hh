@@ -82,9 +82,7 @@ class ScreenSing: public Screen {
 	boost::scoped_ptr<Surface> m_background;
 	boost::scoped_ptr<Video> m_video;
 	boost::scoped_ptr<Surface> m_pause_icon;
-#ifndef _WIN32
 	boost::scoped_ptr<Surface> m_help;
-#endif
 	boost::scoped_ptr<Engine> m_engine;
 	boost::scoped_ptr<LayoutSinger> m_layout_singer;
 	Instruments m_instruments;
