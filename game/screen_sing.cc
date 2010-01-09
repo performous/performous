@@ -240,6 +240,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 	// Ctrl combinations that can be used while performing (not when score dialog is displayed)
 	if (event.type == SDL_KEYDOWN && (event.key.keysym.mod & KMOD_CTRL) && !m_score_window.get()) {
 		if (key == SDLK_s) m_audio.toggleSynth(m_song->notes);
+		if (key == SDLK_v) m_audio.streamFade("vocals", event.key.keysym.mod & KMOD_SHIFT ? 1.0 : 0.0);
 		if (key == SDLK_k) ++config["game/karaoke_mode"]; // Toggle karaoke mode
 		if (key == SDLK_w) ++config["game/pitch"]; // Toggle pitch wave
 		// Latency settings
