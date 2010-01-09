@@ -162,7 +162,7 @@ void GuitarGraph::engine() {
 		if (m_jointime == not_joined) m_jointime = (time < 0.0 ? -join_delay : time); // Handle joining
 		// Handle Start/Select keypresses
 		if (ev.type == input::Event::PRESS && ev.button > input::STARPOWER_BUTTON) {
-			if (ev.button == 8) ev.button = input::STARPOWER_BUTTON; // Select works for GodMode
+			if (ev.button == 9) ev.button = input::STARPOWER_BUTTON; // Start works for GodMode
 			else continue;
 		}
 		// Guitar specific actions
