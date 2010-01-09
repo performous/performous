@@ -5,6 +5,7 @@
 #include "fs.hh"
 #include "util.hh"
 #include "database.hh"
+#include "joystick.hh"
 #include "i18n.hh"
 
 #include <iostream>
@@ -48,26 +49,9 @@ void ScreenHiscore::activateNextScreen() {
 }
 
 void ScreenHiscore::manageEvent(SDL_Event event) {
-	if (event.type != SDL_KEYDOWN) return;
-	SDL_keysym keysym = event.key.keysym;
-	int key = keysym.sym;
-	SDLMod mod = event.key.keysym.mod;
-
-	// TODO: reload button? - needs database reload
-	// if (key == SDLK_r && mod & KMOD_CTRL) { m_players.reload(); m_players.setFilter(m_search.text); }
-	if (m_search.process(keysym)) m_players.setFilter(m_search.text);
-	else if (key == SDLK_ESCAPE) {
-		if (m_search.text.empty()) { activateNextScreen(); return; }
-	else { m_search.text.clear(); m_players.setFilter(m_search.text); }
-	}
-	// The rest are only available when there are songs available
-	else if (m_players.empty()) return;
-	else if (key == SDLK_SPACE || (key == SDLK_PAUSE || (key == SDLK_p && mod & KMOD_CTRL))) m_audio.togglePause();
-	else if (key == SDLK_RETURN) { activateNextScreen(); return; }
-	else if (key == SDLK_LEFT) m_players.advance(-1);
-	else if (key == SDLK_RIGHT) m_players.advance(1);
-	else if (key == SDLK_PAGEUP) m_players.advance(-10);
-	else if (key == SDLK_PAGEDOWN) m_players.advance(10);
+	input::NavButton nav(input::getNav(event));
+	if (nav == input::CANCEL || nav == input::START) activateNextScreen();
+	else if (nav == input::PAUSE) m_audio.togglePause();
 }
 
 /**Draw the scores in the bottom*/
