@@ -250,14 +250,14 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		if (key == SDLK_F4) ++config["audio/round-trip"];
 		if (key == SDLK_F5) --config["audio/controller_delay"];
 		if (key == SDLK_F6) ++config["audio/controller_delay"];
-		if (m_song->danceTracks.empty()) { // Seeking is currently not permitted for dance songs
-			bool seekback = false;
+		bool seekback = false;
+		if (m_song->danceTracks.empty()) { // Seeking backwards is currently not permitted for dance songs
 			if (key == SDLK_HOME) { m_audio.seekPos(0.0); seekback = true; }
 			if (key == SDLK_LEFT) { m_audio.seek(-5.0); seekback = true; }
-			if (key == SDLK_RIGHT) m_audio.seek(5.0);
-			// Some things must be reset after seeking backwards
-			if (seekback) m_layout_singer->reset();
 		}
+		if (key == SDLK_RIGHT) m_audio.seek(5.0);
+		// Some things must be reset after seeking backwards
+		if (seekback) m_layout_singer->reset();
 		// Reload current song
 		if (key == SDLK_r) {
 			exit(); m_song->reload(); enter();
