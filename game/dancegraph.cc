@@ -103,12 +103,12 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
 /// Attempt to select next/previous game mode
 void DanceGraph::gameMode(int direction) {
 	// Position mappings for panels
-	static int mapping4[max_panels] = {0, 1, 2, 3,-1,-1,-1,-1,-1,-1};
-	static int mapping5[max_panels] = {0, 1, 2, 4, 3,-1,-1,-1,-1,-1};
-	static int mapping6[max_panels] = {0, 2, 3, 5, 1, 4,-1,-1,-1,-1};
-	static int mapping7[max_panels] = {0, 3, 4, 7, 1, 6, 2,-1,-1,-1};
-	static int mapping8[max_panels] = {0, 3, 4, 7, 1, 6, 2, 5,-1,-1};
-	static int mapping10[max_panels]= {0, 3, 4, 7, 1, 6, 2, 5,-1,-1};
+	static const int mapping4[max_panels] = {0, 1, 2, 3,-1,-1,-1,-1,-1,-1};
+	static const int mapping5[max_panels] = {0, 1, 2, 4, 3,-1,-1,-1,-1,-1};
+	static const int mapping6[max_panels] = {0, 2, 3, 5, 1, 4,-1,-1,-1,-1};
+	static const int mapping7[max_panels] = {0, 3, 4, 7, 1, 6, 2,-1,-1,-1};
+	static const int mapping8[max_panels] = {0, 3, 4, 7, 1, 6, 2, 5,-1,-1};
+	static const int mapping10[max_panels]= {0, 3, 4, 7, 1, 6, 2, 5,-1,-1};
 	// Cycling
 	if (direction == 0) {
 		m_curTrackIt = m_song.danceTracks.find("dance-single");
