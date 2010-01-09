@@ -152,6 +152,7 @@ void GuitarGraph::engine() {
 	}
 	if (m_starpower.get() > 0.001) m_correctness.setTarget(1.0, true);
 	double whammy = 0;
+	bool difficulty_changed = false;
 	// Handle all events
 	for (input::Event ev; m_input.tryPoll(ev);) {
 		// This hack disallows joining with Enter-key for skipping instrumental
@@ -161,7 +162,7 @@ void GuitarGraph::engine() {
 		if (m_jointime == not_joined) m_jointime = (time < 0.0 ? -join_delay : time); // Handle joining
 		// Handle Start/Select keypresses
 		if (ev.type == input::Event::PRESS && ev.button > input::STARPOWER_BUTTON) {
-			if (ev.button == 8) ev.button = input::STARPOWER_BUTTON; // Select works for GodMode
+			if (ev.button == 9) ev.button = input::STARPOWER_BUTTON; // Start works for GodMode
 			else continue;
 		}
 		// Guitar specific actions
@@ -184,6 +185,7 @@ void GuitarGraph::engine() {
 				else if (ev.pressed[1 + m_drums]) difficulty(DIFFICULTY_EASY);
 				else if (ev.pressed[2 + m_drums]) difficulty(DIFFICULTY_MEDIUM);
 				else if (ev.pressed[3 + m_drums]) difficulty(DIFFICULTY_AMAZING);
+				difficulty_changed = true;
 			}
 		// Playing
 		} else if (m_drums) {
@@ -200,6 +202,7 @@ void GuitarGraph::engine() {
 		++m_dead;
 		++m_chordIt;
 	}
+	if (difficulty_changed) m_dead = 0; // if difficulty is changed, m_dead would get incorrect
 	// Adjust the correctness value
 	if (!m_events.empty() && m_events.back().type == 0) m_correctness.setTarget(0.0, true);
 	else if (m_chordIt != m_chords.end() && m_chordIt->begin <= time) {
@@ -429,7 +432,11 @@ void GuitarGraph::nextTrack() {
 }
 
 /// Get the difficulty as displayable string
-std::string GuitarGraph::getDifficultyString() const { return diffv[m_level].name; }
+std::string GuitarGraph::getDifficultyString() const {
+	std::string ret = diffv[m_level].name;
+	if (m_drums && m_input.isKeyboard()) ret += " (kbd)";
+	return ret;
+}
 
 /// Find an initial difficulty level to use
 void GuitarGraph::difficultyAuto(bool tryKeep) {

@@ -79,11 +79,7 @@ msgid "Press enter to create player!"
 msgstr ""
 
 #: ../game/screen_players.cc:119
-msgid "You reached"
-msgstr ""
-
-#: ../game/screen_players.cc:119
-msgid "points!"
+msgid "You reached %1% points!"
 msgstr ""
 
 #: ../game/screen_players.cc:120

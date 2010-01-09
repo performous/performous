@@ -71,6 +71,7 @@ class Song: boost::noncopyable {
 	static std::string collate(std::string const& str);
 	double videoGap; ///< gap with video
 	double start; ///< start of song
+	double preview_start; ///< starting time for the preview
 	MusicalScale scale; ///< scale in which song is sung
 	std::vector<double> timePitchGraph; ///< time of pitch graph
 	std::vector<double> pitchPitchGraph; ///< pitch of pitch graph

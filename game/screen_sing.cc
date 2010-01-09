@@ -203,28 +203,19 @@ void ScreenSing::manageEvent(SDL_Event event) {
 	Song::Status status = m_song->status(time);
 	input::NavButton nav(input::getNav(event));
 	int key = event.key.keysym.sym;
-	// A kludge to allow using space for navigation
-	if (event.type == SDL_KEYDOWN && key == SDLK_SPACE) nav = m_score_window.get() ? input::START : input::PAUSE;
-	// A kludge to allow using Esc for quitting through pause
-	if (event.type == SDL_KEYDOWN && key == SDLK_ESCAPE) nav = m_audio.isPaused() ? input::CANCEL : input::PAUSE;
-	// A kludge to use Start as Pause
-	if (nav == input::START && key != SDLK_RETURN) nav = input::PAUSE;
 	// Handle keys
 	if (nav != input::NONE) {
 		m_quitTimer.setValue(QUIT_TIMEOUT);
-		if (nav == input::CANCEL && (m_audio.isPaused() || m_score_window.get())) {
-			// In ScoreWindow cancel goes to Players, otherwise insta-quit to Songs
-			if (m_score_window.get()) activateNextScreen();
-			else ScreenManager::getSingletonPtr()->activateScreen("Songs");
-			return;
-		}
-		if (nav == input::PAUSE || (m_audio.isPaused() && nav == input::START)) {
-			m_audio.togglePause();
-			return;
-		}
+		if (nav == input::PAUSE || nav == input::CANCEL) m_audio.togglePause();
+		// When score window is displayed
 		if (m_score_window.get()) {
-			if (nav == input::START) activateNextScreen(); // Score window visible -> Start quits
+			if (nav == input::START || nav == input::CANCEL) activateNextScreen();
 			return;  // The rest are only available when score window is not displayed
+		}
+		// Confirm quit with START while paused or instant quit with CANCEL at the very beginning
+		if ((nav == input::START && m_audio.isPaused()) || (nav == input::CANCEL && time < 1.0)) {
+			ScreenManager::getSingletonPtr()->activateScreen("Songs");
+			return;
 		}
 		// Start button has special functions for skipping things (only in singing for now)
 		if (nav == input::START && m_only_singers_alive && !m_song->notes.empty() && !m_audio.isPaused()) {
@@ -249,6 +240,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 	// Ctrl combinations that can be used while performing (not when score dialog is displayed)
 	if (event.type == SDL_KEYDOWN && (event.key.keysym.mod & KMOD_CTRL) && !m_score_window.get()) {
 		if (key == SDLK_s) m_audio.toggleSynth(m_song->notes);
+		if (key == SDLK_v) m_audio.streamFade("vocals", event.key.keysym.mod & KMOD_SHIFT ? 1.0 : 0.0);
 		if (key == SDLK_k) ++config["game/karaoke_mode"]; // Toggle karaoke mode
 		if (key == SDLK_w) ++config["game/pitch"]; // Toggle pitch wave
 		// Latency settings
@@ -258,14 +250,14 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		if (key == SDLK_F4) ++config["audio/round-trip"];
 		if (key == SDLK_F5) --config["audio/controller_delay"];
 		if (key == SDLK_F6) ++config["audio/controller_delay"];
-		if (m_song->danceTracks.empty()) { // Seeking is currently not permitted for dance songs
-			bool seekback = false;
+		bool seekback = false;
+		if (m_song->danceTracks.empty()) { // Seeking backwards is currently not permitted for dance songs
 			if (key == SDLK_HOME) { m_audio.seekPos(0.0); seekback = true; }
 			if (key == SDLK_LEFT) { m_audio.seek(-5.0); seekback = true; }
-			if (key == SDLK_RIGHT) m_audio.seek(5.0);
-			// Some things must be reset after seeking backwards
-			if (seekback) m_layout_singer->reset();
 		}
+		if (key == SDLK_RIGHT) m_audio.seek(5.0);
+		// Some things must be reset after seeking backwards
+		if (seekback) m_layout_singer->reset();
 		// Reload current song
 		if (key == SDLK_r) {
 			exit(); m_song->reload(); enter();

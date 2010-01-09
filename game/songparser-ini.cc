@@ -47,10 +47,12 @@ void SongParser::iniParse() {
 		if (key == "name") s.title = value;
 		else if (key == "artist") s.artist = value;
 		// These are added features (not part of FoF, though video is supported in FoFiX SVN)
+		// TODO these tags need to be checked/discussed with FoFiX developers
 		else if (key == "cover") s.cover = value;
 		else if (key == "background") s.background = value;
 		else if (key == "video") s.video = value;
 		else if (key == "video_start_time") { assign(s.videoGap, value); s.videoGap/=1000.0; }
+		else if (key == "prev_start_time") { assign(s.preview_start, value); s.preview_start/=1000.0; }
 		// End of added features
 	}
 	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");

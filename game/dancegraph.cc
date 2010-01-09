@@ -130,7 +130,11 @@ bool DanceGraph::dead() const {
 }
 
 /// Get the difficulty as displayable string
-std::string DanceGraph::getDifficultyString() const { return diffv[m_level]; }
+std::string DanceGraph::getDifficultyString() const {
+	std::string ret = diffv[m_level];
+	if (m_input.isKeyboard()) ret += " (kbd)";
+	return ret;
+}
 
 /// Attempt to change the difficulty by a step
 void DanceGraph::difficultyDelta(int delta) {
@@ -171,6 +175,35 @@ void DanceGraph::engine() {
 		if (time < it->first + it->second) { time = it->first; break; } // Inside stop
 		time -= it->second;
 	}
+
+	bool difficulty_changed = false;
+	// Handle all events
+	for (input::Event ev; m_input.tryPoll(ev);) {
+		m_dead = 0; // Keep alive
+		if (m_jointime == not_joined) { // Handle joining
+			m_jointime = (time < 0.0 ? -join_delay : time);
+			break;
+		}
+		// Difficulty / mode selection
+		if (time < m_jointime + join_delay && ev.type == input::Event::PRESS) {
+			if (ev.pressed[STEP_UP]) difficultyDelta(1);
+			else if (ev.pressed[STEP_DOWN]) difficultyDelta(-1);
+			else if (ev.pressed[STEP_LEFT]) gameMode(-1);
+			else if (ev.pressed[STEP_RIGHT]) gameMode(1);
+			difficulty_changed = true;
+		}
+		// Gaming controls
+		if (ev.type == input::Event::RELEASE) {
+			m_pressed[ev.button] = false;
+			dance(time, ev);
+			m_pressed_anim[ev.button].setTarget(0.0);
+		} else if (ev.type == input::Event::PRESS) {
+			m_pressed[ev.button] = true;
+			dance(time, ev);
+			m_pressed_anim[ev.button].setValue(1.0);
+		}
+	}
+
 	// Notes gone by
 	for (DanceNotes::iterator& it = m_notesIt; it != m_notes.end() && time > it->note.end + maxTolerance; it++) {
 		if(!it->isHit) { // Missed
@@ -186,6 +219,7 @@ void DanceGraph::engine() {
 		}
 		++m_dead;
 	}
+	if (difficulty_changed) m_dead = 0; // if difficulty is changed, m_dead would get incorrect
 
 	// Holding button when mine comes?
 	for (DanceNotes::iterator it = m_notesIt; it != m_notes.end() && time <= it->note.begin + maxTolerance; it++) {
@@ -194,34 +228,6 @@ void DanceGraph::engine() {
 			std::cout << "Hit mine at " << time << "!" << std::endl;
 			it->isHit = true;
 			m_score -= points(0);
-		}
-	}
-
-	// Handle all events
-	for (input::Event ev; m_input.tryPoll(ev);) {
-		m_dead = 0; // Keep alive
-		if (m_jointime == not_joined) { // Handle joining
-			m_jointime = (time < 0.0 ? -join_delay : time);
-			break;
-		}
-		// Difficulty / mode selection
-		if (time < m_jointime + join_delay) {
-			if (ev.type == input::Event::PRESS) {
-				if (ev.pressed[STEP_UP]) difficultyDelta(1);
-				else if (ev.pressed[STEP_DOWN]) difficultyDelta(-1);
-				else if (ev.pressed[STEP_LEFT]) gameMode(-1);
-				else if (ev.pressed[STEP_RIGHT]) gameMode(1);
-			}
-		}
-		// Gaming controls
-		if (ev.type == input::Event::RELEASE) {
-			m_pressed[ev.button] = false;
-			dance(time, ev);
-			m_pressed_anim[ev.button].setTarget(0.0);
-		} else if (ev.type == input::Event::PRESS) {
-			m_pressed[ev.button] = true;
-			dance(time, ev);
-			m_pressed_anim[ev.button].setValue(1.0);
 		}
 	}
 

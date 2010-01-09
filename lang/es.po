@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-03 16:50+0100\n"
+"POT-Creation-Date: 2010-01-08 12:36+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Miguel Sánchez de León Peque <msdeleonpeque@gmail.com>\n"
 "Language-Team: \n"
@@ -69,39 +69,35 @@ msgstr ""
 "\n"
 "Por favor, configura alguno antes de jugar."
 
-#: ../game/screen_players.cc:111
+#: ../game/screen_players.cc:109
 msgid "No players found!"
 msgstr "¡No se han encontrado jugadores!"
 
-#: ../game/screen_players.cc:112
+#: ../game/screen_players.cc:110
 msgid "Enter a name to create a new player."
 msgstr "Introduce un nombre para crear un nuevo jugador."
 
-#: ../game/screen_players.cc:114
+#: ../game/screen_players.cc:112
 msgid "Press enter to create player!"
 msgstr "Presiona \"enter\" para crear el nuevo jugador:"
 
-#: ../game/screen_players.cc:121
-msgid "You reached"
-msgstr "¡Has conseguido"
+#: ../game/screen_players.cc:119
+msgid "You reached %1% points!"
+msgstr "¡Has conseguido %1% puntos!"
 
-#: ../game/screen_players.cc:121
-msgid "points!"
-msgstr "puntos!"
-
-#: ../game/screen_players.cc:122
+#: ../game/screen_players.cc:120
 msgid "Change player with arrow keys."
 msgstr "Cambia de jugador con las flechas del teclado"
 
-#: ../game/screen_players.cc:123
+#: ../game/screen_players.cc:121
 msgid "Name:"
 msgstr "Nombre:"
 
-#: ../game/screen_players.cc:126
+#: ../game/screen_players.cc:124
 msgid "Type text to filter or create a new player."
 msgstr "Introduce texto para filtrar o crear un nuevo jugador."
 
-#: ../game/screen_players.cc:126
+#: ../game/screen_players.cc:124
 msgid "Search Text:"
 msgstr "Buscar texto:"
 
@@ -132,6 +128,63 @@ msgstr "ordenadas por directorio"
 #: ../game/songs.cc:210
 msgid "sorted by language"
 msgstr "ordenadas por idioma"
+
+#: ../game/screen_sing.cc:338
+msgid "   ENTER to skip instrumental break"
+msgstr "   \"ENTER\" para pasar la parte instrumental"
+
+#: ../game/screen_sing.cc:339
+msgid "   Remember to wait for grading!"
+msgstr "   Recuerda esperar para ser evaluado!"
+
+#: ../game/screen_sing.cc:427
+msgid "No player!"
+msgstr "¡No se han encontrado jugadores!"
+
+#: ../game/screen_sing.cc:436
+msgid "Hit singer"
+msgstr "Superestrella"
+
+#: ../game/screen_sing.cc:437
+msgid "Lead singer"
+msgstr "Vocalista"
+
+#: ../game/screen_sing.cc:438
+#: ../game/screen_sing.cc:444
+#: ../game/screen_sing.cc:450
+msgid "Rising star"
+msgstr "Aficionado"
+
+#: ../game/screen_sing.cc:439
+#: ../game/screen_sing.cc:445
+#: ../game/screen_sing.cc:451
+msgid "Amateur"
+msgstr "Novato"
+
+#: ../game/screen_sing.cc:440
+#: ../game/screen_sing.cc:452
+msgid "Tone deaf"
+msgstr "Sin oído"
+
+#: ../game/screen_sing.cc:442
+msgid "Maniac"
+msgstr "Maníaco"
+
+#: ../game/screen_sing.cc:443
+msgid "Hoofer"
+msgstr "Artista"
+
+#: ../game/screen_sing.cc:446
+msgid "Loser"
+msgstr "Perdedor"
+
+#: ../game/screen_sing.cc:448
+msgid "Virtuoso"
+msgstr "Virtuoso"
+
+#: ../game/screen_sing.cc:449
+msgid "Rocker"
+msgstr "Rockero"
 
 #: ../game/screen_songs.cc:178
 msgid "No songs found!"
