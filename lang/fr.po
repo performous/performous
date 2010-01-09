@@ -99,7 +99,7 @@ msgstr "Recherche:"
 
 #: ../game/screen_sing.cc:338
 msgid "   ENTER to skip instrumental break"
-msgstr "   \"Entrée\" to passer l'instrumental"
+msgstr "   \"Entrée\" pour passer l'instrumental"
 
 #: ../game/screen_sing.cc:339
 msgid "   Remember to wait for grading!"
