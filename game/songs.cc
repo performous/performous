@@ -114,13 +114,8 @@ class Songs::RestoreSel {
 };
 
 void Songs::update() {
-	if (m_dirty) filter_internal();
-	// Shuffle the songlist if shuffle is finished and all songs are already filtered
-	if (m_needShuffle && !m_dirty) {
-		RestoreSel restore(*this);
-		randomize_internal();
-		m_needShuffle = false;
-	}
+	if (m_dirty) filter_internal(); // Update with newly loaded songs
+	if (m_needShuffle) randomize(); // Shuffle the songlist if needed
 }
 
 void Songs::randomize() {
@@ -129,6 +124,8 @@ void Songs::randomize() {
 }
 
 void Songs::randomize_internal() {
+	boost::mutex::scoped_lock l(m_mutex);
+	m_needShuffle = false;
 	/* TR1-based random number generation
 	TODO: it is enough that random_device is initialized once and not for every randomize_internal
 	namespace rnd = std::tr1;
@@ -137,7 +134,7 @@ void Songs::randomize_internal() {
 	for (SongVector::const_iterator it = m_filtered.begin(); it != m_filtered.end(); ++it) (*it)->randomIdx = gen();
 	*/
 	// Assign the songs randomIdx that is used for sorting in the "random" mode
-	for (SongVector::const_iterator it = m_filtered.begin(); it != m_filtered.end(); ++it) (*it)->randomIdx = std::rand();
+	for (SongVector::const_iterator it = m_songs.begin(); it != m_songs.end(); ++it) (*it)->randomIdx = std::rand();
 	m_order = 0;  // Use randomIdx sort mode
 	sort_internal();
 }
