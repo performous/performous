@@ -10,7 +10,10 @@
 #include <sstream>
 #include <vector>
 
+#include <cctype>
 
+#include <boost/cstdint.hpp>
+using boost::uint32_t;
 
 float Dimensions::screenY() const {
 	switch (m_screenAnchor) {
