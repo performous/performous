@@ -28,13 +28,29 @@ namespace {
 	/// Gives points based on error from a perfect hit
 	double points(double error) {
 		error = (error < 0.0) ? -error : error;
-		double score = 0.0;
-		if (error < maxTolerance) score += 15;
-		if (error < maxTolerance / 2) score += 15;
-		if (error < maxTolerance / 4) score += 15;
-		if (error < maxTolerance / 6) score += 5;
-		return score;
+		double ac = 1.0 - error / maxTolerance;
+		if (ac > .90) return 50.0;  // Perfect
+		if (ac > .80) return 40.0;  // Excellent
+		if (ac > .70) return 30.0;  // Great
+		if (ac > .60) return 25.0;  // Good
+		if (ac > .50) return 20.0;  // OK
+		if (ac > .40) return 15.0;  // Poor
+		if (ac > .30) return 10.0;  // Bad
+		if (ac > 0.0) return 5.0;  // Horrible
+		return 0.0;
 	}
+
+	std::string getRank(double ac) {
+		if (ac > .90) return "Perfect!";
+		if (ac > .80) return "Excellent!";
+		if (ac > .70) return "Great!";
+		if (ac > .60) return "Good!";
+		if (ac > .50) return "  OK!  ";
+		if (ac > .40) return "Poor!";
+		if (ac > .30) return " Bad! ";
+		return "Horrible!";
+	}
+	
 	struct lessEnd {
 		bool operator()(const DanceNote& left, const DanceNote& right) {
 			return left.note.end < right.note.end;
@@ -436,14 +452,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	if (glow > 0 && ac > 0 && !mine) {
 		double s = 1.2 * arrowSize * (1.0 + glow);
 		glColor3f(1.0f, 1.0f, 1.0f);
-		std::string rank = "Horrible!";
-		if (ac > .90) rank = "Perfect!";
-		else if (ac > .80) rank = "Excellent!";
-		else if (ac > .70) rank = "Great!";
-		else if (ac > .60) rank = "Good!";
-		else if (ac > .50) rank = "  OK!  ";
-		else if (ac > .40) rank = "Poor!";
-		else if (ac > .30) rank = " Bad! ";
+		std::string rank = getRank(ac);
 		m_popupText->render(rank);
 		m_popupText->dimensions().middle(x).center(time2y(0.0)).stretch(s,s/2.0);
 		m_popupText->draw();
