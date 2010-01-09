@@ -126,8 +126,8 @@ msgid "Press enter to create player!"
 msgstr "Paina Enter luodaksesi pelaajan!"
 
 #: ../game/screen_players.cc:121
-msgid "You reached %1 points!"
-msgstr "Sait %1 pistettä!"
+msgid "You reached %1% points!"
+msgstr "Sait %1% pistettä!"
 
 #: ../game/screen_players.cc:122
 msgid "Change player with arrow keys."

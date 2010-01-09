@@ -117,7 +117,7 @@ void ScreenPlayers::draw() {
 		// Format the player information text
 		oss_song << m_database.scores.front().track << '\n';
 		// TODO: use boost::format
-		oss_song << boost::format(_("You reached %1 points!")) % m_database.scores.front().score;
+		oss_song << boost::format(_("You reached %1% points!")) % m_database.scores.front().score;
 		oss_order << _("Change player with arrow keys.") << '\n'
 			<< _("Name:") << ' ' << m_players.current().name << '\n';
 		//m_database.queryPerPlayerHiscore(oss_order);

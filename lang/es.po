@@ -82,8 +82,8 @@ msgid "Press enter to create player!"
 msgstr "Presiona \"enter\" para crear el nuevo jugador:"
 
 #: ../game/screen_players.cc:119
-msgid "You reached %1 points!"
-msgstr "¡Has conseguido %1 puntos!"
+msgid "You reached %1% points!"
+msgstr "¡Has conseguido %1% puntos!"
 
 #: ../game/screen_players.cc:120
 msgid "Change player with arrow keys."
