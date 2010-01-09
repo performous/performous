@@ -432,7 +432,11 @@ void GuitarGraph::nextTrack() {
 }
 
 /// Get the difficulty as displayable string
-std::string GuitarGraph::getDifficultyString() const { return diffv[m_level].name; }
+std::string GuitarGraph::getDifficultyString() const {
+	std::string ret = diffv[m_level].name;
+	if (m_drums && m_input.isKeyboard()) ret += " (kbd)";
+	return ret;
+}
 
 /// Find an initial difficulty level to use
 void GuitarGraph::difficultyAuto(bool tryKeep) {

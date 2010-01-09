@@ -130,7 +130,11 @@ bool DanceGraph::dead() const {
 }
 
 /// Get the difficulty as displayable string
-std::string DanceGraph::getDifficultyString() const { return diffv[m_level]; }
+std::string DanceGraph::getDifficultyString() const {
+	std::string ret = diffv[m_level];
+	if (m_input.isKeyboard()) ret += " (kbd)";
+	return ret;
+}
 
 /// Attempt to change the difficulty by a step
 void DanceGraph::difficultyDelta(int delta) {
