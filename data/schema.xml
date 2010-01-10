@@ -85,7 +85,7 @@ to save the current settings to XML.
 		</locale>
 	</entry>
 	<entry name="game/instruments" type="string_list">
-		<!-- Should be SDL_ID:{GUITAR_GUITARHERO|GUITAR_ROCKBAND|DRUMS_GUITARHERO|DRUMS_ROCKBAND}
+		<!-- Should be SDL_ID:{GUITAR_GUITARHERO|GUITAR_ROCKBAND|DRUMS_GUITARHERO|DRUMS_ROCKBAND|DRUMS_MIDI|DANCEPAD_GENERIC}
 		     example:
 			<stringvalue>0:GUITAR_GUITARHERO</stringvalue>
 		-->

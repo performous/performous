@@ -177,7 +177,7 @@ void input::SDL::init() {
 	std::map<unsigned int, input::Private::Type> forced_type;
 
 	using namespace boost::spirit::classic;
-	rule<> type = str_p("GUITAR_GUITARHERO") | "GUITAR_ROCKBAND" | "DRUMS_GUITARHERO" | "DRUMS_ROCKBAND";
+	rule<> type = str_p("GUITAR_GUITARHERO") | "GUITAR_ROCKBAND" | "DRUMS_GUITARHERO" | "DRUMS_ROCKBAND" | "DRUMS_MIDI" | "DANCEPAD_GENERIC";
 	rule<> entry = uint_p[assign_a(sdl_id)] >> ":" >> (type)[assign_a(instrument_type)];
 
 	ConfigItem::StringList const& instruments = config["game/instruments"].sl();
@@ -193,7 +193,11 @@ void input::SDL::init() {
 			} else if (instrument_type == "GUITAR_ROCKBAND") {
 				forced_type[sdl_id] = input::Private::GUITAR_RB;
 			} else if (instrument_type == "DRUMS_ROCKBAND") {
-				forced_type[sdl_id] = input::Private::DRUMS_GH;
+				forced_type[sdl_id] = input::Private::DRUMS_RB;
+			} else if (instrument_type == "DRUMS_MIDI") {
+				forced_type[sdl_id] = input::Private::DRUMS_MIDI;
+			} else if (instrument_type == "DANCEPAD_GENERIC") {
+				forced_type[sdl_id] = input::Private::DANCEPAD_GENERIC;
 			}
 		}
 	}
