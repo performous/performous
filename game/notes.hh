@@ -70,6 +70,7 @@ struct Note {
 	Note();
 	double begin, ///< begin time
 	       end; ///< end time
+	double phase; /// Position within a measure, [0, 1)
 	/// power of note
 	mutable double power;
 	/// how well the note was sung [0,1] (used for drawing a star)
