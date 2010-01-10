@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Sodipodi ("http://www.sodipodi.com/") -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -15,9 +16,8 @@
    height="600.000000"
    id="svg559"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
+   inkscape:version="0.47 r22583"
    sodipodi:docname="configuration_item.svg"
-   sodipodi:docbase="/home/yoda/UltraStar/sf/UltraStar-ng/themes/lima"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs2513">
@@ -58,15 +58,18 @@
      inkscape:window-x="5"
      inkscape:window-y="73"
      inkscape:current-layer="svg559"
-     showgrid="false" />
+     showgrid="false"
+     inkscape:window-maximized="0" />
   <text
      xml:space="preserve"
-     style="font-size:32px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans;text-anchor:middle;text-align:center"
+     style="font-size:32px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Arial;text-anchor:middle;text-align:center;-inkscape-font-specification:Arial;font-stretch:normal;font-variant:normal;writing-mode:lr;line-height:125%"
      x="400"
      y="213"
-     id="text1990"><tspan
+     id="text1990"
+     sodipodi:linespacing="125%"><tspan
        sodipodi:role="line"
        id="tspan1992"
        x="400"
-       y="213">item</tspan></text>
+       y="213"
+       style="-inkscape-font-specification:Arial;font-family:Arial;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-size:32px;text-anchor:middle;text-align:center;writing-mode:lr;line-height:125%">item</tspan></text>
 </svg>

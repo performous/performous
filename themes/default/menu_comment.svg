@@ -16,7 +16,7 @@
    height="20"
    id="svg559"
    sodipodi:version="0.32"
-   inkscape:version="0.47pre4 r22446"
+   inkscape:version="0.47 r22583"
    sodipodi:docname="menu_comment.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
@@ -42,8 +42,8 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="726"
-     inkscape:window-width="1280"
+     inkscape:window-height="1000"
+     inkscape:window-width="1680"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      guidetolerance="10.0"
@@ -56,15 +56,15 @@
      inkscape:zoom="3.5638182"
      inkscape:cx="63.312761"
      inkscape:cy="28.662714"
-     inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
      inkscape:current-layer="svg559"
      showgrid="false"
      inkscape:window-maximized="1" />
   <text
      x="1.2611415"
      y="16.780357"
-     style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#060000;fill-opacity:1;stroke:none;display:inline;font-family:Bitstream Charter;-inkscape-font-specification:Bitstream Charter"
+     style="font-size:17.99999994px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr;text-anchor:start;fill:#060000;fill-opacity:1;stroke:none;display:inline;font-family:Arial;-inkscape-font-specification:Arial"
      id="text10203"
      xml:space="preserve"
      sodipodi:linespacing="125%"
@@ -72,5 +72,5 @@
        x="1.2611415"
        y="16.780357"
        id="tspan10205"
-       style="font-size:18px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;text-anchor:start;fill:#060000;fill-opacity:1;stroke:none;font-family:Bitstream Charter;-inkscape-font-specification:Bitstream Charter">Comment</tspan></text>
+       style="font-size:17.99999994px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;text-anchor:start;fill:#060000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial;writing-mode:lr;line-height:125%">Comment</tspan></text>
 </svg>

@@ -8,7 +8,7 @@
 #include <sstream>
 
 OpenGLText::OpenGLText(TThemeTxtOpenGL& _text, double m) {
-	if (_text.fontfamily.empty()) _text.fontfamily = "Sans";
+	if (_text.fontfamily.empty()) _text.fontfamily = "Arial";
 
 	PangoAlignment alignment = PANGO_ALIGN_LEFT;
 	if (_text.fontalign == "start") alignment = PANGO_ALIGN_LEFT;

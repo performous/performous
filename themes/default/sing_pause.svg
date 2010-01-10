@@ -87,7 +87,8 @@
          sodipodi:role="line"
          id="tspan3181"
          x="127.49952"
-         y="10.672979">QUIT NOW?</tspan></text>
+         y="10.672979"
+         style="-inkscape-font-specification:arial;font-family:arial">QUIT NOW?</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:28px;font-style:normal;font-weight:normal;text-align:center;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
@@ -97,7 +98,8 @@
          sodipodi:role="line"
          x="139.50516"
          y="255.35054"
-         id="tspan2823">Enter/Start to quit</tspan><tspan
+         id="tspan2823"
+         style="-inkscape-font-specification:arial;font-family:arial">Enter/Start to quit</tspan><tspan
          sodipodi:role="line"
          x="139.50516"
          y="290.35056"
