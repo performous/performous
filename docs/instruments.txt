@@ -72,6 +72,13 @@ Ex: A5- => SDL axis 4 with negative value
  PICK DOWN:   A6+
  PICK UP:     A6-
 
+[Guitar Hero X0] Guitar Hero X-plorer
+ GREEN FRET:  B1
+ RED FRET:    B2
+ YELLOW FRET: B4
+ BLUE FRET:   B3
+ ORANGE FRET: B5
+
 [Guitar Hero World Tour] PS3 Drumkit
  USB id: 12ba:0120
  SDL name: Licensed by Sony Computer Entertainment Guitar Hero4 for PlayStation (R) 3
