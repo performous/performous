@@ -73,11 +73,24 @@ Ex: A5- => SDL axis 4 with negative value
  PICK UP:     A6-
 
 [Guitar Hero X0] Guitar Hero X-plorer
+ USB id: 1430:4748
+ SDL name: Guitar Hero X-plorer
  GREEN FRET:  B1
  RED FRET:    B2
  YELLOW FRET: B4
  BLUE FRET:   B3
  ORANGE FRET: B5
+ START:       B8
+ SELECT:      B7  (Says "BACK" on the guitar)
+ STAR POWER:  A4  (Y axis on Windows, didn't verify that it is A4 but A3 is X axis)
+ DOWN:        A6+
+ UP:          A6-
+ LEFT:        A5-
+ RIGHT:       A5+
+ BEND:        A3
+ PICK DOWN:   A6+
+ PICK UP:     A6-
+
 
 [Guitar Hero World Tour] PS3 Drumkit
  USB id: 12ba:0120
