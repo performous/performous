@@ -12,9 +12,9 @@ namespace {
 	const int death_delay = 25; // Delay in notes after which the player is hidden
 	const float not_joined = -100; // A value that indicates player hasn't joined
 	const float join_delay = 7.0f; // Time to select track/difficulty when joining mid-game
-	const float past = -0.4f;
+	const float past = -0.3f;
 	const float future = 2.0f;
-	const float timescale = 7.0f;
+	const float timescale = 12.0f;
 	const float texCoordStep = -0.25f; // Four beat lines per beat texture
 	// Note: t is difference from playback time so it must be in range [past, future]
 	float time2y(float t) { return timescale * (t - past) / (future - past); }
@@ -356,7 +356,7 @@ void DanceGraph::draw(double time) {
 		glTranslatef(frac * 2.0 * offsetX, 0.0f, 0.0f);
 		glutil::PushMatrixMode pmb(GL_MODELVIEW);
 		glTranslatef((1.0 - frac) * offsetX, dimensions.y1(), 0.0f);
-		float temp_s = dimensions.w() / 5.0f;
+		float temp_s = dimensions.w() / 8.0f; // Allow for 8 pads to fit on a track
 		glScalef(temp_s, temp_s, temp_s);
 
 		// Draw the "neck" graph (beat lines)
