@@ -115,12 +115,15 @@ bool SongParser::smParseField(std::string line) {
 			Notes notes = smParseNotes(line);
 
 		//Here all note data from the current track is inserted into containers 
-			DanceTrack danceTrack(description, notes);
-			if (m_song.danceTracks.find(notestype) == m_song.danceTracks.end() ) {
-				DanceDifficultyMap danceDifficultyMap;
-				m_song.danceTracks.insert(std::make_pair(notestype, danceDifficultyMap));
+			// TODO: support other track types. For now all others are simply ignored.
+			if (notestype == "dance-single" || notestype == "dance-double") {
+				DanceTrack danceTrack(description, notes);
+				if (m_song.danceTracks.find(notestype) == m_song.danceTracks.end() ) {
+					DanceDifficultyMap danceDifficultyMap;
+					m_song.danceTracks.insert(std::make_pair(notestype, danceDifficultyMap));
+				}
+				m_song.danceTracks[notestype].insert(std::make_pair(danceDifficulty, danceTrack));
 			}
-			m_song.danceTracks[notestype].insert(std::make_pair(danceDifficulty, danceTrack));
 		}
 			return false;
 	}
