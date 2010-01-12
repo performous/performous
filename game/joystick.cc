@@ -38,9 +38,10 @@ void input::MidiDrums::process() {
 static const unsigned SDL_BUTTONS = 10;
 
 int input::buttonFromSDL(input::Private::Type _type, unsigned int _sdl_button) {
-	static const int inputmap[5][SDL_BUTTONS] = {
+	static const int inputmap[6][SDL_BUTTONS] = {
 		//G  R  Y  B  O  S    // for guitars (S=starpower)
 		{ 2, 0, 1, 3, 4, 5, -1, -1, 8, 9 }, // Guitar Hero guitar
+		{ 0, 1, 3, 2, 4,-1,  8,  9,-1,-1 }, // Guitar Hero X-plorer guitar
 		{ 3, 0, 1, 2, 4, 5, -1, -1, 8, 9 }, // Rock Band guitar
 		//K  R  Y  B  G  O    // for drums
 		{ 3, 4, 1, 2, 0, 4, -1, -1, 8, 9 }, // Guitar Hero drums
@@ -52,14 +53,16 @@ int input::buttonFromSDL(input::Private::Type _type, unsigned int _sdl_button) {
 	switch(_type) {
 		case input::Private::GUITAR_GH:
 			return inputmap[0][_sdl_button];
-		case input::Private::GUITAR_RB:
+		case input::Private::GUITAR_GH_XPLORER:
 			return inputmap[1][_sdl_button];
-		case input::Private::DRUMS_GH:
+		case input::Private::GUITAR_RB:
 			return inputmap[2][_sdl_button];
-		case input::Private::DRUMS_RB:
+		case input::Private::DRUMS_GH:
 			return inputmap[3][_sdl_button];
-		case input::Private::DANCEPAD_GENERIC:
+		case input::Private::DRUMS_RB:
 			return inputmap[4][_sdl_button];
+		case input::Private::DANCEPAD_GENERIC:
+			return inputmap[5][_sdl_button];
 		default:
 			return -1;
 	}
@@ -177,7 +180,8 @@ void input::SDL::init() {
 	std::map<unsigned int, input::Private::Type> forced_type;
 
 	using namespace boost::spirit::classic;
-	rule<> type = str_p("GUITAR_GUITARHERO") | "GUITAR_ROCKBAND" | "DRUMS_GUITARHERO" | "DRUMS_ROCKBAND" | "DRUMS_MIDI" | "DANCEPAD_GENERIC";
+	rule<> type = str_p("GUITAR_GUITARHERO") | "GUITAR_ROCKBAND" | "GUITAR_GUITARHERO_XPLORER"
+	  | "DRUMS_GUITARHERO" | "DRUMS_ROCKBAND" | "DRUMS_MIDI" | "DANCEPAD_GENERIC";
 	rule<> entry = uint_p[assign_a(sdl_id)] >> ":" >> (type)[assign_a(instrument_type)];
 
 	ConfigItem::StringList const& instruments = config["game/instruments"].sl();
@@ -188,6 +192,8 @@ void input::SDL::init() {
 		} else {
 			if (instrument_type == "GUITAR_GUITARHERO") {
 				forced_type[sdl_id] = input::Private::GUITAR_GH;
+			} else if (instrument_type == "GUITAR_GUITARHERO_XPLORER") {
+				forced_type[sdl_id] = input::Private::GUITAR_GH_XPLORER;
 			} else if (instrument_type == "DRUMS_GUITARHERO") {
 				forced_type[sdl_id] = input::Private::DRUMS_GH;
 			} else if (instrument_type == "GUITAR_ROCKBAND") {
@@ -223,6 +229,9 @@ void input::SDL::init() {
 				case input::Private::GUITAR_GH:
 					std::cout << "  Detected as: Guitar Hero Guitar (forced)" << std::endl;
 					break;
+				case input::Private::GUITAR_GH_XPLORER:
+					std::cout << "  Detected as: Guitar Hero Guitar X-plorer (forced)" << std::endl;
+					break;
 				case input::Private::DRUMS_GH:
 					std::cout << "  Detected as: Guitar Hero Drums (forced)" << std::endl;
 					break;
@@ -243,6 +252,9 @@ void input::SDL::init() {
 		} else if( name.find("Guitar Hero3") != std::string::npos ) {
 			std::cout << "  Detected as: Guitar Hero Guitar" << std::endl;
 			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::GUITAR_GH);
+		} else if( name.find("Guitar Hero X-plorer") != std::string::npos ) {
+			std::cout << "  Detected as: Guitar Hero Guitar X-plorer" << std::endl;
+			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::GUITAR_GH_XPLORER);
 		} else if( name.find("Guitar Hero4") != std::string::npos ) {
 			// here we can have both drumkit or guitar .... let say the drumkit
 			std::cout << "  Detected as: Guitar Hero Drums (guessed)" << std::endl;
