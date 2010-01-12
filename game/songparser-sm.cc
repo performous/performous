@@ -89,32 +89,32 @@ bool SongParser::smParseField(std::string line) {
 		*/
 
 		while (getline(line)) {
-		//<NotesType>:
+			//<NotesType>:
 			std::string notestype = boost::trim_copy(line.substr(0, line.find_first_of(':')));
 			transform(notestype.begin(), notestype.end(), notestype.begin(), lower_case );
-		//<Description>:
+			//<Description>:
 			if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
 			std::string description = boost::trim_copy(line.substr(0, line.find_first_of(':')));
-		//<DifficultyClass>:
+			//<DifficultyClass>:
 			if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
 			std::string difficultyclass = boost::trim_copy(line.substr(0, line.find_first_of(':')));
 			transform(difficultyclass.begin(), difficultyclass.end(), difficultyclass.begin(), upper_case );
 			DanceDifficulty danceDifficulty = DIFFICULTYCOUNT;
-				if(difficultyclass == "BEGINNER") danceDifficulty = BEGINNER;
-				if(difficultyclass == "EASY") danceDifficulty = EASY;
-				if(difficultyclass == "MEDIUM") danceDifficulty = MEDIUM;
-				if(difficultyclass == "HARD") danceDifficulty = HARD;
-				if(difficultyclass == "CHALLENGE") danceDifficulty = CHALLENGE;
+			if(difficultyclass == "BEGINNER") danceDifficulty = BEGINNER;
+			if(difficultyclass == "EASY") danceDifficulty = EASY;
+			if(difficultyclass == "MEDIUM") danceDifficulty = MEDIUM;
+			if(difficultyclass == "HARD") danceDifficulty = HARD;
+			if(difficultyclass == "CHALLENGE") danceDifficulty = CHALLENGE;
 
-		//ignoring difficultymeter and radarvalues
+			//ignoring difficultymeter and radarvalues
 			//<DifficultyMeter>:
 			if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
 			if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
 			
-		//<NoteData>:
+			//<NoteData>:
 			Notes notes = smParseNotes(line);
 
-		//Here all note data from the current track is inserted into containers 
+			//Here all note data from the current track is inserted into containers 
 			// TODO: support other track types. For now all others are simply ignored.
 			if (notestype == "dance-single" || notestype == "dance-double") {
 				DanceTrack danceTrack(description, notes);
