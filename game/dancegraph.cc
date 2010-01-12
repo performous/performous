@@ -15,6 +15,7 @@ namespace {
 	const float past = -0.4f;
 	const float future = 2.0f;
 	const float timescale = 7.0f;
+	const float texCoordStep = -0.25f; // Four beat lines per beat texture
 	// Note: t is difference from playback time so it must be in range [past, future]
 	float time2y(float t) { return timescale * (t - past) / (future - past); }
 	float time2a(float t) {
@@ -65,6 +66,7 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
   m_audio(audio),
   m_song(song),
   m_input(input::DANCEPAD),
+  m_beat(getThemePath("dancebeat.svg")),
   m_arrows(getThemePath("arrows.svg")),
   m_arrows_cursor(getThemePath("arrows_cursor.svg")),
   m_arrows_hold(getThemePath("arrows_hold.svg")),
@@ -348,45 +350,57 @@ void DanceGraph::draw(double time) {
 	double offsetX = 0.5 * (dimensions.x1() + dimensions.x2());
 	double frac = 0.75;  // Adjustable: 1.0 means fully separated, 0.0 means fully attached
 
-	// Some matrix magic to get the viewport right
-	{ glutil::PushMatrixMode pmm(GL_PROJECTION);
-	{ glutil::Translation tr1(frac * 2.0 * offsetX, 0.0f, 0.0f);
-	{ glutil::PushMatrixMode pmb(GL_MODELVIEW);
-	{ glutil::Translation tr2((1.0 - frac) * offsetX, dimensions.y1(), 0.0f);
-	{ float temp_s = dimensions.w() / 5.0f;
-	  glutil::Scale sc1(temp_s, temp_s, temp_s);
-	
-	// Arrows on cursor
-	glColor3f(1.0f, 1.0f, 1.0f);
-	for (int arrow_i = 0; arrow_i < m_pads; ++arrow_i) {
-		float x = panel2x(arrow_i);
-		float y = time2y(0.0);
-		float l = m_pressed_anim[arrow_i].get();
-		float s = (5.0 - l) / 5.0;
-		drawArrow(arrow_i, m_arrows_cursor, x, y, s);
-	}
-	
-	// Draw the notes
-	for (DanceNotes::iterator it = m_notes.begin(); it != m_notes.end(); ++it) {
-		if (it->note.end - time < past) continue;
-		if (it->note.begin - time > future) continue;
-		drawNote(*it, time); // Let's just do all the calculating in the sub, instead of passing them as a long list
-	}
+	{
+		// Some matrix magic to get the viewport right
+		glutil::PushMatrixMode pmm(GL_PROJECTION);
+		glTranslatef(frac * 2.0 * offsetX, 0.0f, 0.0f);
+		glutil::PushMatrixMode pmb(GL_MODELVIEW);
+		glTranslatef((1.0 - frac) * offsetX, dimensions.y1(), 0.0f);
+		float temp_s = dimensions.w() / 5.0f;
+		glScalef(temp_s, temp_s, temp_s);
 
-	// To test arrow coordinate positioning
-	//for (float i = past; i <= future; i+=0.2) {
-		//std::cout << i << ": " << time2y(i) << std::endl;
-		//drawArrow(1, 0, time2y(i), 0.6);
-	//}
+		// Draw the "neck" graph (beat lines)
+		drawBeats(time);
 	
-	} //< reverse scale sc1
-	} //< reverse trans tr2
-	} //< reverse push pmb
-	} //< reverse trans tr1
-	} //< reverse push pmm
+		// Arrows on cursor
+		glColor3f(1.0f, 1.0f, 1.0f);
+		for (int arrow_i = 0; arrow_i < m_pads; ++arrow_i) {
+			float x = panel2x(arrow_i);
+			float y = time2y(0.0);
+			float l = m_pressed_anim[arrow_i].get();
+			float s = (5.0 - l) / 5.0;
+			drawArrow(arrow_i, m_arrows_cursor, x, y, s);
+		}
 	
+		// Draw the notes
+		for (DanceNotes::iterator it = m_notes.begin(); it != m_notes.end(); ++it) {
+			if (it->note.end - time < past) continue;
+			if (it->note.begin - time > future) continue;
+			drawNote(*it, time); // Let's just do all the calculating in the sub, instead of passing them as a long list
+		}
+	}
 	drawInfo(time, offsetX, dimensions); // Go draw some texts and other interface stuff
 	glColor3f(1.0f, 1.0f, 1.0f);
+}
+
+void DanceGraph::drawBeats(double time) {
+	UseTexture tex(m_beat);
+	glutil::Begin block(GL_TRIANGLE_STRIP);
+	float texCoord = 0.0f;
+	float tBeg = 0.0f, tEnd;
+	float w = 2.0;
+	for (Song::Beats::const_iterator it = m_song.beats.begin(); it != m_song.beats.end() && tBeg < future; ++it, texCoord += texCoordStep, tBeg = tEnd) {
+		tEnd = *it - time;
+		//if (tEnd < past) continue;
+		if (tEnd > future) {
+			// Crop the end off
+			texCoord -= texCoordStep * (tEnd - future) / (tEnd - tBeg);
+			tEnd = future;
+		}
+		glutil::Color c(1.0f, 1.0f, 1.0f, time2a(tEnd));
+		glNormal3f(0.0f, 1.0f, 0.0f); glTexCoord2f(0.0f, texCoord); glVertex2f(-w, time2y(tEnd));
+		glNormal3f(0.0f, 1.0f, 0.0f); glTexCoord2f(1.0f, texCoord); glVertex2f(w, time2y(tEnd));
+	}
 }
 
 /// Draws a single note (or hold)

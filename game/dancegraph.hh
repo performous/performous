@@ -51,6 +51,7 @@ class DanceGraph {
 	void difficulty(DanceDifficulty level);
 	DanceDifficulty m_level;
 	void dance(double time, input::Event const& ev);
+	void drawBeats(double time);
 	void drawNote(DanceNote& note, double time);
 	void drawInfo(double time, double offsetX, Dimensions dimensions);
 	void drawArrow(int arrow_i, Texture& tex, float x, float y, float scale = 1.0, float ty1 = 0.0, float ty2 = 1.0);
@@ -62,6 +63,7 @@ class DanceGraph {
 	DanceNotes m_notes;
 	DanceNotes::iterator m_notesIt;
 	DanceNotes::iterator m_activeNotes[max_panels];
+	Texture m_beat;
 	Texture m_arrows;
 	Texture m_arrows_cursor;
 	Texture m_arrows_hold;

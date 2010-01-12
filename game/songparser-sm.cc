@@ -172,6 +172,7 @@ bool SongParser::smParseField(std::string line) {
 		#SELECTABLE
 		#BGCHANGE
 		*/
+	// Add beat info to song
 	return true;
 }
 
@@ -250,5 +251,7 @@ Notes SongParser::smParseNotes(std::string line) {
 		chords.push_back(chord);
 	}
 	//The code reaches here only when all data is read from the file.
+	// Add song beat markers
+	for (uint32_t ts = 0, end = 16 * measure; ts < end; ts += 4) m_song.beats.push_back(tsTime(ts));
 	return notes;
 }
