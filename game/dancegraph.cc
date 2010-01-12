@@ -388,7 +388,7 @@ void DanceGraph::drawBeats(double time) {
 	glutil::Begin block(GL_TRIANGLE_STRIP);
 	float texCoord = 0.0f;
 	float tBeg = 0.0f, tEnd;
-	float w = 2.0;
+	float w = 0.5 * m_pads;
 	for (Song::Beats::const_iterator it = m_song.beats.begin(); it != m_song.beats.end() && tBeg < future; ++it, texCoord += texCoordStep, tBeg = tEnd) {
 		tEnd = *it - time;
 		//if (tEnd < past) continue;
