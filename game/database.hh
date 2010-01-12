@@ -101,6 +101,7 @@ class Database
 	void queryPerSongHiscore (std::ostream & os, boost::shared_ptr<Song> s, std::string const& track = "") const;
 	void queryPerPlayerHiscore (std::ostream & os, std::string const& track = "") const;
 
+	bool hasHiscore(boost::shared_ptr<Song> s) const;
 	bool noPlayers() const;
 
   private:

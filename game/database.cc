@@ -130,6 +130,11 @@ void Database::queryPerPlayerHiscore (std::ostream & os, std::string const& trac
 	}
 }
 
+bool Database::hasHiscore(boost::shared_ptr<Song> s) const {
+	int songid = m_songs.lookup(s);
+	return m_hiscores.hasHiscore(songid);
+}
+
 /*
 int test(std::string const& name, std::string const& song, int score) {
 	Database d("database.xml");

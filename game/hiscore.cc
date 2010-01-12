@@ -71,6 +71,13 @@ Hiscore::HiscoreVector Hiscore::queryHiscore(int max, int playerid, int songid, 
 	return hv;
 }
 
+bool Hiscore::hasHiscore(int songid) const {
+	for (hiscore_t::const_iterator it = m_hiscore.begin(); it != m_hiscore.end(); ++it) {
+		if(songid == it->songid) return true;
+	}
+	return false;
+}
+
 void Hiscore::load(xmlpp::NodeSet const& n) {
 	for (xmlpp::NodeSet::const_iterator it = n.begin(); it != n.end(); ++it)
 	{

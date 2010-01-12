@@ -72,6 +72,7 @@ class Hiscore
 	  @param max limits the number of elements returned.
 	 */
 	HiscoreVector queryHiscore(int max = -1, int playerid = -1, int songid = -1, std::string const& track = "") const;
+	bool hasHiscore(int songid) const;
   private:
 	typedef std::multiset<HiscoreItem>hiscore_t;
 
