@@ -1,37 +1,24 @@
-#!/bin/bash
-
-# mkdir build
-# cd build
-# cmake ..
-# make
-
-export VER=$(cd .. ; svn info | grep Revision | sed -e 's/Revision: //')
-
-mkdir -p Performous.app/Contents/{MacOS,Resources}
-cp ../osx-utils/performous.icns Performous.app/Contents/Resources/
-cp ../osx-utils/performous-mac_script Performous.app/Contents/MacOS/performous
-chmod +x Performous.app/Contents/MacOS/performous
-cmake .. -DCMAKE_INSTALL_PREFIX=$PWD/Performous.app/Contents/Resources/performous
+mkdir build
+cd build
+cmake ../../ -DCMAKE_INSTALL_PREFIX=./Performous.app/Contents
 make install
-cd Performous.app/Contents/
 
-echo '<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-	<key>CFBundleExecutable</key>
-	<string>performous</string>
-	<key>CFBundleIconFile</key>
-	<string>performous.icns</string>
-	<key>CFBundleIdentifier</key>
-	<string>net.sourceforge.performous</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-	<key>CFBundleVersion</key>
-	<string>VERSION</string>
-</dict>
-</plist>
-' > Info.plist
+mkdir Performous.app/Contents/MacOS
+mkdir Performous.app/Contents/Resources
+mkdir Performous.app/Contents/Frameworks
 
-sed -i.bak -e "s/VERSION/0.3.0 \(r$VER\)/" Info.plist
-rm Info.plist.bak
+mv Performous.app/Contents/bin/* Performous.app/Contents/MacOS/
+
+cp ../resources/performous-launcher Performous.app/Contents/MacOS/
+cp ../resources/performous.icns Performous.app/Contents/Resources
+cp ../resources/Info.plist Performous.app/Contents/
+cp -R ../resources/etc Performous.app/Contents/Resources
+
+cp -R /Library/Frameworks/SDL.framework Performous.app/Contents/Frameworks/SDL.framework
+
+dylibbundler -od -b -x ./Performous.app/Contents/MacOS/performous -d ./Performous.app/Contents/libs/
+dylibbundler -of -b -x ./Performous.app/Contents/lib/performous/libda-1/libda_audio_dev_jack.so -d ./Performous.app/Contents/libs
+dylibbundler -of -b -x ./Performous.app/Contents/lib/performous/libda-1/libda_audio_dev_pa19.so -d ./Performous.app/Contents/libs
+dylibbundler -of -b -x ./Performous.app/Contents/lib/performous/libda-1/libda_audio_dev_tone.so -d ./Performous.app/Contents/libs
+
+cd ..

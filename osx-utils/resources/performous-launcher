@@ -1,0 +1,6 @@
+#!/bin/bash
+
+dir=$(dirname "$0")
+export PATH=$PATH:"$dir"
+export FONTCONFIG_PATH="$dir/../Resources/etc/fonts"
+performous 2>&1 --pdev pa19 --mics pa19

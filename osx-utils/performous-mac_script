@@ -1,4 +1,0 @@
-#!/bin/bash
-
-export PERFORMOUS_ROOT="$(dirname "$0")/../Resources/performous"
-"$(dirname "$0")/../Resources/performous/bin/performous"
