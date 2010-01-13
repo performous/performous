@@ -67,6 +67,7 @@ class GuitarGraph {
 	std::string getTrack() const { return m_track_index->first; }
 	std::string getDifficultyString() const;
   private:
+	bool canActivateStarpower() { return !m_drums && (m_starmeter > 6000); }
 	void activateStarpower();
 	void fail(double time, int fret);
 	void endHold(int fret, double time = 0.0);

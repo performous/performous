@@ -57,8 +57,6 @@ namespace {
 		c.b = blend(starpowerC.b, c.b, f);
 		return c;
 	}
-
-	bool canActivateStarpower(int meter) { return (meter > 6000); }
 }
 
 GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
@@ -257,7 +255,7 @@ bool GuitarGraph::dead() const {
 
 /// Attempt to activate GodMode
 void GuitarGraph::activateStarpower() {
-	if (canActivateStarpower(m_starmeter)) {
+	if (canActivateStarpower()) {
 		m_starmeter = 0;
 		m_starpower.setValue(1.0);
 		m_godmodePopup.setTarget(1.0);
@@ -752,7 +750,7 @@ void GuitarGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 		  + boost::lexical_cast<std::string>(unsigned(m_longestStreak)));
 	}
 	// Is Starpower ready?
-	if (canActivateStarpower(m_starmeter)) {
+	if (canActivateStarpower()) {
 		float a = (int(time * 1000.0) % 1000) / 1000.0;
 		m_text.dimensions.screenBottom(-0.02).middle(-0.12 + offsetX);
 		m_text.draw("God Mode Ready!", a);
