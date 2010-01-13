@@ -52,7 +52,7 @@ if(UNIX)
 		endif("${CPACK_PACKAGE_ARCHITECTURE}" MATCHES "x86_64")
 		# Set the dependencies based on the distro version
 		if("${LSB_DISTRIB}" MATCHES "Ubuntu9.10")
-			set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsdl1.2debian, libcairo2, librsvg2-2, libboost-thread1.38.0, libboost-program-options1.38.0, libboost-regex1.38.0, libboost-filesystem1.38.0, libboost-date-time1.38.0, libavcodec52, libavformat52, libswscale0, libmagick++2, libxml++2.6-2, libglew1.5 libpng12-0 libjpeg62")
+			set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsdl1.2debian, libcairo2, librsvg2-2, libboost-thread1.38.0, libboost-program-options1.38.0, libboost-regex1.38.0, libboost-filesystem1.38.0, libboost-date-time1.38.0, libavcodec52, libavformat52, libswscale0, libmagick++2, libxml++2.6-2, libglew1.5, libpng12-0, libjpeg62")
 		endif("${LSB_DISTRIB}" MATCHES "Ubuntu9.10")
 		if("${LSB_DISTRIB}" MATCHES "Debian5.*")
 			set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsdl1.2debian, libcairo2, librsvg2-2, libboost-dev, libavcodec51, libavformat52, libswscale0, libmagick++10, libxml++2.6-2, libglew1.5")
