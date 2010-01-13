@@ -20,7 +20,9 @@ class SongParser {
 	  m_prevtime(),
 	  m_prevts(),
 	  m_relativeShift(),
-	  m_maxScore()
+	  m_maxScore(),
+	  m_tsPerBeat(),
+	  m_tsEnd()
 	{
 		enum { NONE, TXT, INI, SM } type = NONE;
 		// Read the file, determine the type and do some initial validation checks
@@ -81,6 +83,10 @@ class SongParser {
 		// Set begin/end times
 		if (!s.notes.empty()) s.beginTime = s.notes.front().begin, s.endTime = s.notes.back().end;
 		m_song.m_scoreFactor = 1.0 / m_maxScore;
+		if (m_tsPerBeat) {
+			// Add song beat markers
+			for (unsigned ts = 0; ts < m_tsEnd; ts += m_tsPerBeat) m_song.beats.push_back(tsTime(ts));
+		}
 	}
   private:
 	Song& m_song;
@@ -113,6 +119,8 @@ class SongParser {
 	};
 	typedef std::vector<BPM> bpms_t;
 	bpms_t m_bpms;
+	unsigned m_tsPerBeat;  ///< The ts increment per beat
+	unsigned m_tsEnd;  ///< The ending ts of the song
 	void addBPM(double ts, double bpm) {
 		if (!(bpm >= 1.0 && bpm < 1e12)) throw std::runtime_error("Invalid BPM value");
 		if (!m_bpms.empty() && m_bpms.back().ts >= ts) {

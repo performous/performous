@@ -392,11 +392,11 @@ void DanceGraph::drawBeats(double time) {
 	for (Song::Beats::const_iterator it = m_song.beats.begin(); it != m_song.beats.end() && tBeg < future; ++it, texCoord += texCoordStep, tBeg = tEnd) {
 		tEnd = *it - time;
 		//if (tEnd < past) continue;
-		if (tEnd > future) {
+		/*if (tEnd > future) {
 			// Crop the end off
 			texCoord -= texCoordStep * (tEnd - future) / (tEnd - tBeg);
 			tEnd = future;
-		}
+		}*/
 		glutil::Color c(1.0f, 1.0f, 1.0f, time2a(tEnd));
 		glNormal3f(0.0f, 1.0f, 0.0f); glTexCoord2f(0.0f, texCoord); glVertex2f(-w, time2y(tEnd));
 		glNormal3f(0.0f, 1.0f, 0.0f); glTexCoord2f(1.0f, texCoord); glVertex2f(w, time2y(tEnd));

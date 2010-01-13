@@ -68,6 +68,7 @@ void SongParser::smParse() {
 	// Convert stops to the format required in Song
 	s.stops.resize(m_stops.size());
 	for (std::size_t i = 0; i < m_stops.size(); ++i) s.stops[i] = stopConvert(m_stops[i]);
+	m_tsPerBeat = 4;
 }
 	
 bool SongParser::smParseField(std::string line) {
@@ -256,8 +257,6 @@ Notes SongParser::smParseNotes(std::string line) {
 		}
 		chords.push_back(chord);
 	}
-	//The code reaches here only when all data is read from the file.
-	// Add song beat markers
-	for (uint32_t ts = 0, end = 16 * measure; ts < end; ts += 4) m_song.beats.push_back(tsTime(ts));
+	m_tsEnd = std::max(m_tsEnd, measure * 16);
 	return notes;
 }
