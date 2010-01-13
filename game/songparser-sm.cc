@@ -71,9 +71,10 @@ void SongParser::smParse() {
 }
 	
 bool SongParser::smParseField(std::string line) {
-	if (line.empty() || line == "\r") return true;
-	if (line[0] == '/' && line[1] == '/') return true; //jump over possible comments
-	if (line[0] == ';') return true;
+	boost::trim(line);
+	if (line.empty()) return true;
+	if (line.substr(0, 2) == "//") return true; //jump over possible comments
+	if (line[0] == ';') return true; // HACK: Skip ; left over from previous field
 
 	//Here the data contained by the current line is separated in key and value.
 	//However, because of the differing format of notedata the value is analyzed only if key is not NOTES
@@ -126,7 +127,7 @@ bool SongParser::smParseField(std::string line) {
 				m_song.danceTracks[notestype].insert(std::make_pair(danceDifficulty, danceTrack));
 			}
 		}
-			return false;
+		return false;
 	}
 	std::string value = boost::trim_copy(line.substr(pos + 1));
 	//In case the value continues to several lines, all text before the ending character ';' is read to single line.
@@ -164,18 +165,18 @@ bool SongParser::smParseField(std::string line) {
 	
 			}
 	}
-		/*.sm fileformat has also the following constants but they are ignored in this version of the parser:
-		#SUBTITLE
-		#TITLETRANSLIT
-		#SUBTITLETRANSLIT
-   		#ARTISTTRANSLIT
-		#CREDIT
-   		#CDTITLE
-		#SAMPLESTART
-    		#SAMPLELENGTH
-		#SELECTABLE
-		#BGCHANGE
-		*/
+	/*.sm fileformat has also the following constants but they are ignored in this version of the parser:
+	#SUBTITLE
+	#TITLETRANSLIT
+	#SUBTITLETRANSLIT
+	#ARTISTTRANSLIT
+	#CREDIT
+	#CDTITLE
+	#SAMPLESTART
+		#SAMPLELENGTH
+	#SELECTABLE
+	#BGCHANGE
+	*/
 	// Add beat info to song
 	return true;
 }
@@ -196,9 +197,10 @@ Notes SongParser::smParseNotes(std::string line) {
 	std::map<int, int> holdMarks; // Keeps track of hold notes not yet terminated
 
 	while (getline(line)) {
-		if (line.empty() || line == "\r") continue;
-		if (line[0] == '/' && line[1] == '/') continue;
-		if (line[0] == '#') return notes;
+		boost::trim(line); // Remove whitespace
+		if (line.empty()) continue;
+		if (line.substr(0, 2) == "//") continue;  // Skip comments
+		if (line[0] == '#') break;  // HACK: This should read away the next #NOTES: line
 		if (line[0] == ',' || line[0] == ';') {
 			double end = tsTime(measure * 16.0);
 			unsigned div = chords.size();
@@ -248,7 +250,7 @@ Notes SongParser::smParseNotes(std::string line) {
 			else if(notetype == 'L') note.type = Note::LIFT;
 			else if(notetype >= 'a' && notetype <= 'z') note.type = Note::TAP;
 			else if(notetype >= 'A' && notetype <= 'Z') note.type = Note::TAP;
-			else continue;
+			else throw std::runtime_error(std::string("Invalid note command: ") + notetype);
 			note.note = i;
 			chord[i] = note;
 		}
