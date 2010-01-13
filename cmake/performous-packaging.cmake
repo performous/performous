@@ -1,6 +1,6 @@
 set(CPACK_PACKAGE_NAME "${CMAKE_PROJECT_NAME}")
 set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A karaoke and band game where one or more players perform a song and the game scores their performances. Supports songs in UltraStar and Frets on Fire formats. Microphones and instruments from SingStar, Guitar Hero and Rock Band are autodetected.")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A karaoke, band and dancing game where one or more players perform a song and the game scores their performances. Supports songs in UltraStar, Frets on Fire and StepMania formats. Microphones and instruments from SingStar, Guitar Hero and Rock Band as well as some dance pads are autodetected.")
 set(CPACK_PACKAGE_CONTACT "http://performous.org/")
 set(CPACK_SOURCE_IGNORE_FILES
    "/.cvsignore"
