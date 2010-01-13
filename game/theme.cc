@@ -11,7 +11,8 @@ Theme::Theme(const std::string path) : bg(path)
 ThemeSongs::ThemeSongs():
 	Theme(getThemePath("songs_bg.svg")),
 	song(getThemePath("songs_song.svg"), config["graphic/text_lod"].f()),
-	order(getThemePath("songs_order.svg"), config["graphic/text_lod"].f())
+	order(getThemePath("songs_order.svg"), config["graphic/text_lod"].f()),
+	hiscore(getThemePath("songs_hiscore.svg"), config["graphic/text_lod"].f())
 {}
 
 ThemePractice::ThemePractice():

@@ -83,6 +83,13 @@ int SongItems::lookup(boost::shared_ptr<Song> song) const {
 	return -1;
 }
 
+int SongItems::lookup(Song& song) const {
+	for (songs_t::const_iterator it = m_songs.begin(); it != m_songs.end(); ++it) {
+		if (song.collateByArtistOnly == it->artist && song.collateByTitleOnly == it->title) return it->id;
+	}
+	return -1;
+}
+
 std::string SongItems::lookup (int id) const {
 	SongItem si;
 	si.id = id;

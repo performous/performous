@@ -82,6 +82,7 @@ struct SongItems
 	/**Lookup a songid for a specific song.
 	  @return -1 if no song found.*/
 	int lookup(boost::shared_ptr<Song> song) const;
+	int lookup(Song& song) const;
 
 	/**Lookup the artist + title for a specific song.
 	  @return "Unknown Song" if nothing is found.

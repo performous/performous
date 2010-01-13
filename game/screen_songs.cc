@@ -177,7 +177,7 @@ void ScreenSongs::draw() {
 	info.videoGap = 0.0;
 
 	drawMultimedia();
-	std::ostringstream oss_song, oss_order;
+	std::ostringstream oss_song, oss_order, oss_hiscore;
 	// Test if there are no songs
 	if (m_songs.empty()) {
 		// Format the song information text
@@ -192,6 +192,8 @@ void ScreenSongs::draw() {
 		Song& song = m_songs.current();
 		// Format the song information text
 		oss_song << song.title << '\n' << song.artist;
+		if(m_database.hasHiscore(song))
+			oss_hiscore << _("(hiscore available, push \"End\" key to see them)");
 		oss_order << _("filter: ") << (m_search.text.empty() ? _("none") : m_search.text) << '\n';
 		oss_order << m_songs.sortDesc() << '\n';
 		oss_order << "(" << m_songs.currentId() + 1 << "/" << m_songs.size() << ")";
@@ -311,6 +313,7 @@ void ScreenSongs::draw() {
 		// Draw song and order texts
 		theme->song.draw(oss_song.str());
 		theme->order.draw(oss_order.str());
+		theme->hiscore.draw(oss_hiscore.str());
 	}
 	stopMultimedia(info);
 	if (m_jukebox) {

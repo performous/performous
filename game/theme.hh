@@ -22,6 +22,8 @@ struct ThemeSongs: Theme {
 	SvgTxtTheme song;
 	/// ordering display
 	SvgTxtTheme order;
+	/// hiscore display
+	SvgTxtTheme hiscore;
 };
 
 /// theme for practice screen
