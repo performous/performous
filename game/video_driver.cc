@@ -34,7 +34,6 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	resize();
 	SDL_ShowCursor(SDL_DISABLE);
 	SDL_EnableUNICODE(SDL_ENABLE);
-	SDL_EnableKeyRepeat(80, 80);
 	input::SDL::init();
 }
 
