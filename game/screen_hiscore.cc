@@ -13,7 +13,7 @@
 #include <boost/format.hpp>
 
 ScreenHiscore::ScreenHiscore(std::string const& name, Audio& audio, Songs& songs, Database& database):
-  ScreenSongs(name, audio, songs), m_database(database), m_players(database.m_players)
+  ScreenSongs(name, audio, songs, database), m_database(database), m_players(database.m_players)
 {
 	m_players.setAnimMargins(5.0, 5.0);
 }

@@ -12,8 +12,8 @@
 
 static const double IDLE_TIMEOUT = 45.0; // seconds
 
-ScreenSongs::ScreenSongs(std::string const& name, Audio& audio, Songs& songs):
-  Screen(name), m_audio(audio), m_songs(songs), m_covers(20), m_jukebox()
+ScreenSongs::ScreenSongs(std::string const& name, Audio& audio, Songs& songs, Database& database):
+  Screen(name), m_audio(audio), m_songs(songs), m_database(database), m_covers(20), m_jukebox()
 {
 	m_songs.setAnimMargins(5.0, 5.0);
 	m_playTimer.setTarget(getInf()); // Using this as a simple timer counting seconds

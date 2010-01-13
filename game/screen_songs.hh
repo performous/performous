@@ -3,6 +3,7 @@
 #include <boost/scoped_ptr.hpp>
 #include "animvalue.hh"
 #include "cachemap.hh"
+#include "database.hh"
 #include "screen.hh"
 #include "surface.hh"
 #include "textinput.hh"
@@ -26,7 +27,7 @@ struct ScreenSharedInfo
 class ScreenSongs : public Screen {
   public:
 	/// constructor
-	ScreenSongs(std::string const& name, Audio& audio, Songs& songs);
+	ScreenSongs(std::string const& name, Audio& audio, Songs& songs, Database& database);
 	void enter();
 	void exit();
 	void manageSharedKey(input::NavButton nav); ///< same behaviour for jukebox and normal mode
@@ -41,6 +42,7 @@ class ScreenSongs : public Screen {
 
 	Audio& m_audio;
 	Songs& m_songs;
+	Database& m_database;
 	boost::scoped_ptr<Surface> m_songbg;
 	boost::scoped_ptr<Surface> m_songbg_default;
 	boost::scoped_ptr<Video> m_video;
