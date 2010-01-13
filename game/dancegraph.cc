@@ -463,13 +463,21 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 		}
 	}
 	// Draw a text telling how well we hit
-	if (glow > 0 && ac > 0 && !mine) {
-		double s = 1.2 * arrowSize * (1.0 + glow);
-		glColor3f(1.0f, 1.0f, 1.0f);
-		std::string rank = getRank(ac);
-		m_popupText->render(rank);
-		m_popupText->dimensions().middle(x).center(time2y(0.0)).stretch(s,s/2.0);
-		m_popupText->draw();
+	if (!mine && note.isHit) {
+		std::string text;
+		if (note.releaseTime <= 0.0 && tBeg < tEnd) { // Is being held down and is a hold note
+			text = "HOLD";
+			glow = 1.0;
+		} else if (glow > 0.0) { // Released already, display rank
+			text = getRank(ac);
+		}
+		if (!text.empty()) {
+			glColor3f(1.0f, 1.0f, 1.0f);
+			double s = 1.2 * arrowSize * (1.0 + glow);
+			m_popupText->render(text);
+			m_popupText->dimensions().middle(x).center(time2y(0.0)).stretch(s,s/2.0);
+			m_popupText->draw();
+		}
 	}
 }
 
