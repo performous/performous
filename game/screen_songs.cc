@@ -193,7 +193,7 @@ void ScreenSongs::draw() {
 		// Format the song information text
 		oss_song << song.title << '\n' << song.artist;
 		if(m_database.hasHiscore(song))
-			oss_hiscore << _("(hiscore available, push \"End\" key to see them)");
+			oss_hiscore << _("(press END to view hiscores)");
 		oss_order << _("filter: ") << (m_search.text.empty() ? _("none") : m_search.text) << '\n';
 		oss_order << m_songs.sortDesc() << '\n';
 		oss_order << "(" << m_songs.currentId() + 1 << "/" << m_songs.size() << ")";
