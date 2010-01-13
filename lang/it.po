@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-12-30 22:52+0100\n"
+"POT-Creation-Date: 2010-01-13 15:27+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Xaldyz <xaldyz@users.sourceforge.net>\n"
 "Language-Team: \n"
@@ -78,6 +78,7 @@ msgid "Press enter to create player!"
 msgstr "Premi invio per creare il giocatore!"
 
 #: ../game/screen_players.cc:119
+#, boost-format
 msgid "You reached %1% points!"
 msgstr "Hai fatto %1% punti!"
 
@@ -117,20 +118,15 @@ msgstr "Star"
 msgid "Lead singer"
 msgstr "Cantante"
 
-#: ../game/screen_sing.cc:438
-#: ../game/screen_sing.cc:444
-#: ../game/screen_sing.cc:450
+#: ../game/screen_sing.cc:428
 msgid "Rising star"
 msgstr "Dilettante"
 
-#: ../game/screen_sing.cc:439
-#: ../game/screen_sing.cc:445
-#: ../game/screen_sing.cc:451
+#: ../game/screen_sing.cc:429
 msgid "Amateur"
 msgstr "Amatore"
 
-#: ../game/screen_sing.cc:440
-#: ../game/screen_sing.cc:452
+#: ../game/screen_sing.cc:424
 msgid "Tone deaf"
 msgstr "Stonato"
 
@@ -205,4 +201,8 @@ msgstr "ordinato per percorso"
 #: ../game/songs.cc:210
 msgid "sorted by language"
 msgstr "ordinato per lingua"
+
+#: ../game/screen_songs.cc:196
+msgid "(press END to view hiscores)"
+msgstr "(premi END per vedere i punteggi migliori)"
 
