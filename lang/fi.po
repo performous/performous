@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-09 16:59+0200\n"
+"POT-Creation-Date: 2010-01-13 16:14+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Tapio Vierros <tapiovierros@gmail.com>\n"
 "Language-Team: \n"
@@ -61,88 +61,88 @@ msgstr ""
 "\n"
 "Säädä ääniasetuksia ennen pelaamista."
 
-#: ../game/screen_sing.cc:330
+#: ../game/screen_sing.cc:322
 msgid "   ENTER to skip instrumental break"
 msgstr "   ENTER hypätäksesi lauluosaan"
 
-#: ../game/screen_sing.cc:331
+#: ../game/screen_sing.cc:323
 msgid "   Remember to wait for grading!"
 msgstr "   Muista odottaa arvostelua!"
 
-#: ../game/screen_sing.cc:419
+#: ../game/screen_sing.cc:411
 msgid "No player!"
 msgstr "Pelaajia ei löytynyt!"
 
-#: ../game/screen_sing.cc:428
+#: ../game/screen_sing.cc:420
 msgid "Hit singer"
 msgstr "Tähti"
 
-#: ../game/screen_sing.cc:429
+#: ../game/screen_sing.cc:421
 msgid "Lead singer"
 msgstr "Solisti"
 
-#: ../game/screen_sing.cc:430
-#: ../game/screen_sing.cc:436
-#: ../game/screen_sing.cc:442
+#: ../game/screen_sing.cc:422
+#: ../game/screen_sing.cc:428
+#: ../game/screen_sing.cc:434
 msgid "Rising star"
 msgstr "Harrastaja"
 
-#: ../game/screen_sing.cc:431
-#: ../game/screen_sing.cc:437
-#: ../game/screen_sing.cc:443
+#: ../game/screen_sing.cc:423
+#: ../game/screen_sing.cc:429
+#: ../game/screen_sing.cc:435
 msgid "Amateur"
 msgstr "Amatööri"
 
-#: ../game/screen_sing.cc:432
-#: ../game/screen_sing.cc:444
+#: ../game/screen_sing.cc:424
+#: ../game/screen_sing.cc:436
 msgid "Tone deaf"
 msgstr "Lahjaton"
 
-#: ../game/screen_sing.cc:434
+#: ../game/screen_sing.cc:426
 msgid "Maniac"
 msgstr "Maanikko"
 
-#: ../game/screen_sing.cc:435
+#: ../game/screen_sing.cc:427
 msgid "Hoofer"
 msgstr "Ekspertti"
 
-#: ../game/screen_sing.cc:438
+#: ../game/screen_sing.cc:430
 msgid "Loser"
 msgstr "Luuseri"
 
-#: ../game/screen_sing.cc:440
+#: ../game/screen_sing.cc:432
 msgid "Virtuoso"
 msgstr "Virtuoosi"
 
-#: ../game/screen_sing.cc:441
+#: ../game/screen_sing.cc:433
 msgid "Rocker"
 msgstr "Rokkari"
 
-#: ../game/songs.cc:204
+#: ../game/songs.cc:201
 msgid "random order"
 msgstr "satunnainen järjestys"
 
-#: ../game/songs.cc:205
+#: ../game/songs.cc:202
 msgid "sorted by song"
 msgstr "järjestetty kappaleen mukaan"
 
-#: ../game/songs.cc:206
+#: ../game/songs.cc:203
 msgid "sorted by artist"
 msgstr "järjestetty esittäjän mukaan"
 
-#: ../game/songs.cc:207
+#: ../game/songs.cc:204
 msgid "sorted by edition"
 msgstr "järjestetty julkaisun mukaan"
 
-#: ../game/songs.cc:208
+#: ../game/songs.cc:205
 msgid "sorted by genre"
 msgstr "järjestetty lajityypin mukaan"
 
-#: ../game/songs.cc:209
+#: ../game/songs.cc:206
 msgid "sorted by path"
 msgstr "järjestetty polun mukaan"
 
-#: ../game/songs.cc:210
+#: ../game/songs.cc:207
 msgid "sorted by language"
 msgstr "järjestetty kielen mukaan"
 
@@ -162,11 +162,15 @@ msgstr ""
 msgid "no songs match search"
 msgstr "yksikään kappale ei vastannut hakuasi"
 
-#: ../game/screen_songs.cc:195
+#: ../game/screen_songs.cc:196
+msgid "(press END to view hiscores)"
+msgstr "(paina END nähdäksesi ennätykset)"
+
+#: ../game/screen_songs.cc:197
 msgid "filter: "
 msgstr "suodatin: "
 
-#: ../game/screen_songs.cc:195
+#: ../game/screen_songs.cc:197
 msgid "none"
 msgstr "tyhjä"
 
@@ -202,7 +206,7 @@ msgstr "Kirjoita etsiäksesi tai luodaksesi uuden pelaajan."
 msgid "Search Text:"
 msgstr "Etsi:"
 
-#: ../game/screen_hiscore.cc:104
+#: ../game/screen_hiscore.cc:88
 msgid "Hiscore for "
 msgstr "Ennätykset kappaleelle "
 
