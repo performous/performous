@@ -106,9 +106,9 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
 void DanceGraph::gameMode(int direction) {
 	// Position mappings for panels
 	static const int mapping4[max_panels] = {0, 1, 2, 3,-1,-1,-1,-1,-1,-1};
-	static const int mapping5[max_panels] = {0, 1, 2, 4, 3,-1,-1,-1,-1,-1};
+	static const int mapping5[max_panels] = {0, 1, 3, 4, 2,-1,-1,-1,-1,-1};
 	static const int mapping6[max_panels] = {0, 2, 3, 5, 1, 4,-1,-1,-1,-1};
-	static const int mapping7[max_panels] = {0, 3, 4, 7, 1, 6, 2,-1,-1,-1};
+	static const int mapping7[max_panels] = {0, 2, 4, 6, 1, 5, 3,-1,-1,-1};
 	static const int mapping8[max_panels] = {0, 3, 4, 7, 1, 6, 2, 5,-1,-1};
 	static const int mapping10[max_panels]= {0, 3, 4, 7, 1, 6, 2, 5,-1,-1};
 	// Cycling
@@ -135,7 +135,7 @@ void DanceGraph::gameMode(int direction) {
 	else if (gm == "pump-couple") { m_pads = 10; std::copy(mapping10, mapping10+max_panels, m_arrow_map); }
 	else if (gm == "ez2-single") { m_pads = 5; std::copy(mapping5, mapping5+max_panels, m_arrow_map); }
 	else if (gm == "ez2-double") { m_pads = 10; std::copy(mapping10, mapping10+max_panels, m_arrow_map); }
-	else if (gm == "ex2-real") { m_pads = 7; std::copy(mapping7, mapping7+max_panels, m_arrow_map); }
+	else if (gm == "ez2-real") { m_pads = 7; std::copy(mapping7, mapping7+max_panels, m_arrow_map); }
 	else if (gm == "para-single") { m_pads = 5; std::copy(mapping5, mapping5+max_panels, m_arrow_map); }
 	else throw std::runtime_error("Unknown track " + gm);
 	
