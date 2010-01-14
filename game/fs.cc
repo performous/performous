@@ -113,12 +113,7 @@ Paths const& getPaths(bool refresh) {
 		fs::path shareDir = SHARED_DATA_DIR;
 		Paths dirs;
 #ifdef _WIN32
-		// Add APPLIC~1 (user-specific application data)  FIXME: Not tested
-		{
-			//char const* appdata = getenv("APPDATA");
-			//if (appdata) dirs.push_back(appdata / shortDir);
-			dirs.push_back(getConfigDir());
-		}
+		dirs.push_back(getConfigDir());  // APPDATA/performous
 #else
 		// Adding XDG_DATA_HOME
 		{
