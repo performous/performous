@@ -25,31 +25,41 @@ namespace {
 	float y2a(float y) { return time2a(past - y / timescale * (future - past)); }
 	const double maxTolerance = 0.15;
 	int getNextBigStreak(int prev) { return prev + 10; }
-	
+
+	/// Get an accuracy value [0, 1] for the error offset (in seconds)
+	double accuracy(double error) { return 1.0 - (std::abs(error) / maxTolerance); };
+
 	/// Gives points based on error from a perfect hit
 	double points(double error) {
-		error = (error < 0.0) ? -error : error;
-		double ac = 1.0 - error / maxTolerance;
+		double ac = accuracy(error);
 		if (ac > .90) return 50.0;  // Perfect
 		if (ac > .80) return 40.0;  // Excellent
 		if (ac > .70) return 30.0;  // Great
-		if (ac > .60) return 25.0;  // Good
-		if (ac > .50) return 20.0;  // OK
-		if (ac > .40) return 15.0;  // Poor
-		if (ac > .30) return 10.0;  // Bad
-		if (ac > 0.0) return 5.0;  // Horrible
-		return 0.0;
+		if (ac > .60) return 20.0;  // Good
+		if (ac > .40) return 15.0;  // OK
+		if (ac > .20) return 10.0;  // Late/Early
+		return 5.0;  // Way off
 	}
 
-	std::string getRank(double ac) {
-		if (ac > .90) return "Perfect!";
-		if (ac > .80) return "Excellent!";
-		if (ac > .70) return "Great!";
-		if (ac > .60) return "Good!";
-		if (ac > .50) return "  OK!  ";
-		if (ac > .40) return "Poor!";
-		if (ac > .30) return " Bad! ";
-		return "Horrible!";
+	std::string getRank(double error) {
+		double ac = accuracy(error);
+		if (error < 0.0) {
+			if (ac > .90) return "Perfect!";
+			if (ac > .80) return "Excellent!-";
+			if (ac > .70) return "Great!-";
+			if (ac > .60) return " Good!- ";
+			if (ac > .40) return "  OK!-  ";
+			if (ac > .20) return "Late!-";
+			return "Way off!";
+		} else {
+			if (ac > .90) return "Perfect!";
+			if (ac > .80) return "-Excellent!";
+			if (ac > .70) return "-Great!";
+			if (ac > .60) return " -Good! ";
+			if (ac > .40) return "  -OK!  ";
+			if (ac > .20) return "-Early!";
+			return "Way off!";
+		}
 	}
 	
 	struct lessEnd {
@@ -279,7 +289,7 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 			it->isHit = true;
 			if (it->note.type != Note::MINE) {
 				it->score = points(it->note.begin - time);
-				it->accuracy = 1.0 - (std::abs(it->note.begin - time) / maxTolerance);
+				it->error = it->note.begin - time;
 				m_streak++;
 				if (m_streak > m_longestStreak) m_longestStreak = m_streak;
 			} else { // Mine!
@@ -411,7 +421,6 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	bool mine = note.note.type == Note::MINE;
 	float x = panel2x(arrow_i);
 	float s = 1.0;
-	float ac = note.accuracy;
 	float yBeg = time2y(tBeg);
 	float yEnd = time2y(tEnd);
 	glutil::Color c(1.0f, 1.0f, 1.0f);
@@ -469,7 +478,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 			text = "HOLD";
 			glow = 1.0;
 		} else if (glow > 0.0) { // Released already, display rank
-			text = getRank(ac);
+			text = getRank(note.error);
 		}
 		if (!text.empty()) {
 			glColor3f(1.0f, 1.0f, 1.0f);

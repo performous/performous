@@ -14,11 +14,11 @@ class Song;
 
 struct DanceNote {
 	DanceNote(Note note) :
-		note(note), hitAnim(0.0, 5.0), releaseTime(0), accuracy(0), score(0), isHit(false) {}
+		note(note), hitAnim(0.0, 5.0), releaseTime(0), error(getNaN()), score(0), isHit(false) {}
 	Note note;
 	AnimValue hitAnim; /// for animating hits
 	double releaseTime; /// tells when a hold was ended
-	float accuracy; /// how accurate the hit was [0,1]
+	double error; /// time difference between hit and correct time (negative = late)
 	int score;
 	bool isHit;
 };
