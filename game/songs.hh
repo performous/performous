@@ -55,10 +55,6 @@ class Songs: boost::noncopyable {
 	void setFilter(std::string const& regex);
 	/// sort descending
 	std::string sortDesc() const;
-	/// randomizes songlist
-	void randomize();
-	/// randomizes if ordered
-	void random() { if (m_order) randomize(); advance(1); }
 	/// changes sorting
 	void sortChange(int diff);
 	/// parses file into Song &tmp
@@ -81,7 +77,6 @@ class Songs: boost::noncopyable {
 	void sort_internal();
 	volatile bool m_dirty;
 	volatile bool m_loading;
-	volatile bool m_needShuffle;
 	std::stringstream m_debug;
 	boost::scoped_ptr<boost::thread> m_thread;
 	mutable boost::mutex m_mutex;

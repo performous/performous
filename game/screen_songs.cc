@@ -96,7 +96,6 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 		// The rest are only available when there are songs available
 		else if (m_songs.empty()) return;
 		else if (!m_jukebox && key == SDLK_F4) m_jukebox = true;
-		else if (key == SDLK_TAB && !(mod & KMOD_ALT)) m_songs.randomize();
 		else if (key == SDLK_END) {
 			ScreenManager* sm = ScreenManager::getSingletonPtr();
 			Screen* s = sm->getScreen("Hiscore");

@@ -16,7 +16,7 @@
 #include <stdexcept>
 #include <cstdlib>
 
-Songs::Songs(Database & database, std::string const& songlist): m_songlist(songlist), math_cover(), m_database(database), m_order(), m_dirty(false), m_loading(false), m_needShuffle(false) {
+Songs::Songs(Database & database, std::string const& songlist): m_songlist(songlist), math_cover(), m_database(database), m_order(), m_dirty(false), m_loading(false) {
 	reload();
 }
 
@@ -28,7 +28,6 @@ Songs::~Songs() {
 void Songs::reload() {
 	if (m_loading) return;
 	// Run loading thread
-	m_needShuffle = false;
 	m_loading = true;
 	m_thread.reset(new boost::thread(boost::bind(&Songs::reload_internal, boost::ref(*this))));
 }
@@ -50,11 +49,9 @@ void Songs::reload_internal() {
 	}
 	if (m_loading) dumpSongs_internal(); // Dump the songlist to file (if requested)
 	m_loading = false;
-	m_needShuffle = true;  // Force shuffle
 }
 
 void Songs::reload_internal(fs::path const& parent) {
-	static int randomIdx = 0;
 	namespace fs = fs;
 	if (std::distance(parent.begin(), parent.end()) > 20) { m_debug << ">>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)" << std::endl; return; }
 	try {
@@ -69,7 +66,7 @@ void Songs::reload_internal(fs::path const& parent) {
 			if (!regex_match(name.c_str(), match, expression)) continue;
 			try {
 				boost::shared_ptr<Song>s(new Song(path, name));
-				s->randomIdx = ++randomIdx; // Not so random during loading, they are shuffled after load is finished
+				s->randomIdx = rand();
 				boost::mutex::scoped_lock l(m_mutex);
 				m_songs.push_back(s);
 				m_dirty = true;
@@ -112,28 +109,9 @@ class Songs::RestoreSel {
 
 void Songs::update() {
 	if (m_dirty) filter_internal(); // Update with newly loaded songs
-	if (m_needShuffle) randomize(); // Shuffle the songlist if needed
-}
-
-void Songs::randomize() {
-	RestoreSel restore(*this);
-	randomize_internal();
-}
-
-void Songs::randomize_internal() {
-	boost::mutex::scoped_lock l(m_mutex);
-	m_needShuffle = false;
-	/* TR1-based random number generation
-	TODO: it is enough that random_device is initialized once and not for every randomize_internal
-	namespace rnd = std::tr1;
-	rnd::random_device gendev;  // Random number generator (using /dev/urandom usually)
-	rnd::mt19937 gen(gendev);  // Make Mersenne Twister random number generator, seeded with random_device.
-	for (SongVector::const_iterator it = m_filtered.begin(); it != m_filtered.end(); ++it) (*it)->randomIdx = gen();
-	*/
-	// Assign the songs randomIdx that is used for sorting in the "random" mode
-	for (SongVector::const_iterator it = m_songs.begin(); it != m_songs.end(); ++it) (*it)->randomIdx = std::rand();
-	m_order = 0;  // Use randomIdx sort mode
-	sort_internal();
+	// A hack to move to the first song when the song screen is entered the first time
+	static bool first = true;
+	if (first) { first = false; math_cover.setTarget(0, 0); math_cover.setTarget(0, size()); }
 }
 
 void Songs::setFilter(std::string const& val) {
