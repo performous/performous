@@ -292,6 +292,9 @@ void input::SDL::init() {
 				std::cout << "  Detected as: RockBand Drums PS3" << std::endl;
 				input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::DRUMS_RB_PS3);
 			}
+		} else if( name.find("Mad Catz Portable Drum") != std::string::npos) {
+			std::cout << "  Detected as: RockBand Drums Xbox360" << std::endl;
+			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::DRUMS_RB_XB360);
 		} else if( name.find("RedOctane USB Pad") != std::string::npos ) {
 			std::cout << "  Detected as: Generic Dance Pad" << std::endl;
 			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::DANCEPAD_GENERIC);
