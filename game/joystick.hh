@@ -32,7 +32,8 @@ namespace input {
 	};
 
 	namespace Private {
-		enum Type { GUITAR_RB, DRUMS_RB, GUITAR_GH, GUITAR_GH_XPLORER, DRUMS_GH, DRUMS_MIDI, DANCEPAD_GENERIC };
+		enum Type { GUITAR_RB_PS3, DRUMS_RB_PS3, GUITAR_RB_XB360, DRUMS_RB_XB360,
+		  GUITAR_GH, GUITAR_GH_XPLORER, DRUMS_GH, DRUMS_MIDI, DANCEPAD_GENERIC };
 		static unsigned int KEYBOARD_ID = UINT_MAX;
 		static unsigned int KEYBOARD_ID2 = KEYBOARD_ID-1;
 		static unsigned int KEYBOARD_ID3 = KEYBOARD_ID-2; // Three ids needed for keyboard guitar/drumkit/dancepad
@@ -79,11 +80,13 @@ namespace input {
 			input::Private::Type type() {return m_type;};
 			bool type_match( input::DevType _type) {
 				if( _type == input::GUITAR &&
-				  (m_type == input::Private::GUITAR_GH || m_type == input::Private::GUITAR_GH_XPLORER || m_type == input::Private::GUITAR_RB) ) {
+				  (m_type == input::Private::GUITAR_GH || m_type == input::Private::GUITAR_GH_XPLORER
+				  || m_type == input::Private::GUITAR_RB_PS3 || m_type == input::Private::GUITAR_RB_XB360) ) {
 					return true;
 				}
 				else if( _type == input::DRUMS &&
-				  (m_type == input::Private::DRUMS_GH || m_type == input::Private::DRUMS_RB || m_type == input::Private::DRUMS_MIDI) ) {
+				  (m_type == input::Private::DRUMS_GH || m_type == input::Private::DRUMS_MIDI
+				  || m_type == input::Private::DRUMS_RB_PS3 || m_type == input::Private::DRUMS_RB_XB360) ) {
 					return true;
 				}
 				else if( _type == input::DANCEPAD &&

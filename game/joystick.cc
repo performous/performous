@@ -38,14 +38,16 @@ void input::MidiDrums::process() {
 static const unsigned SDL_BUTTONS = 10;
 
 int input::buttonFromSDL(input::Private::Type _type, unsigned int _sdl_button) {
-	static const int inputmap[6][SDL_BUTTONS] = {
+	static const int inputmap[8][SDL_BUTTONS] = {
 		//G  R  Y  B  O  S    // for guitars (S=starpower)
 		{ 2, 0, 1, 3, 4, 5, -1, -1, 8, 9 }, // Guitar Hero guitar
 		{ 0, 1, 3, 2, 4,-1,  8,  9,-1,-1 }, // Guitar Hero X-plorer guitar
-		{ 3, 0, 1, 2, 4, 5, -1, -1, 8, 9 }, // Rock Band guitar
+		{ 3, 0, 1, 2, 4, 5, -1, -1, 8, 9 }, // Rock Band guitar PS3
+		{ 0, 1, 3, 2, 4, 5, -1, -1, 8, 9 }, // Rock Band guitar XBOX360
 		//K  R  Y  B  G  O    // for drums
 		{ 3, 4, 1, 2, 0, 4, -1, -1, 8, 9 }, // Guitar Hero drums
-		{ 3, 4, 1, 2, 0,-1, -1, -1, 8, 9 }, // Rock Band drums
+		{ 3, 4, 1, 2, 0,-1, -1, -1, 8, 9 }, // Rock Band drums PS3
+		{ 4, 1, 3, 2, 0,-1, -1, -1, 8, 9 }, // Rock Band drums XBOX360
 		// Left  Down  Up  Right  DownL  DownR  UpL    UpR    Start  Select
 		{  0,    1,    2,  3,     6,     7,     4,     5,     9,     8 } // generic dance pad
 	};
@@ -55,14 +57,18 @@ int input::buttonFromSDL(input::Private::Type _type, unsigned int _sdl_button) {
 			return inputmap[0][_sdl_button];
 		case input::Private::GUITAR_GH_XPLORER:
 			return inputmap[1][_sdl_button];
-		case input::Private::GUITAR_RB:
+		case input::Private::GUITAR_RB_PS3:
 			return inputmap[2][_sdl_button];
-		case input::Private::DRUMS_GH:
+		case input::Private::GUITAR_RB_XB360:
 			return inputmap[3][_sdl_button];
-		case input::Private::DRUMS_RB:
+		case input::Private::DRUMS_GH:
 			return inputmap[4][_sdl_button];
-		case input::Private::DANCEPAD_GENERIC:
+		case input::Private::DRUMS_RB_PS3:
 			return inputmap[5][_sdl_button];
+		case input::Private::DRUMS_RB_XB360:
+			return inputmap[6][_sdl_button];
+		case input::Private::DANCEPAD_GENERIC:
+			return inputmap[7][_sdl_button];
 		default:
 			return -1;
 	}
@@ -180,8 +186,9 @@ void input::SDL::init() {
 	std::map<unsigned int, input::Private::Type> forced_type;
 
 	using namespace boost::spirit::classic;
-	rule<> type = str_p("GUITAR_GUITARHERO") | "GUITAR_ROCKBAND" | "GUITAR_GUITARHERO_XPLORER"
-	  | "DRUMS_GUITARHERO" | "DRUMS_ROCKBAND" | "DRUMS_MIDI" | "DANCEPAD_GENERIC";
+	rule<> type = str_p("GUITAR_GUITARHERO") | "GUITAR_ROCKBAND_PS3" | "GUITAR_ROCKBAND_XB360"
+	  | "GUITAR_GUITARHERO_XPLORER" | "DRUMS_GUITARHERO" | "DRUMS_ROCKBAND_PS3" | "DRUMS_ROCKBAND_XB360"
+	  | "DRUMS_MIDI" | "DANCEPAD_GENERIC";
 	rule<> entry = uint_p[assign_a(sdl_id)] >> ":" >> (type)[assign_a(instrument_type)];
 
 	ConfigItem::StringList const& instruments = config["game/instruments"].sl();
@@ -196,10 +203,14 @@ void input::SDL::init() {
 				forced_type[sdl_id] = input::Private::GUITAR_GH_XPLORER;
 			} else if (instrument_type == "DRUMS_GUITARHERO") {
 				forced_type[sdl_id] = input::Private::DRUMS_GH;
-			} else if (instrument_type == "GUITAR_ROCKBAND") {
-				forced_type[sdl_id] = input::Private::GUITAR_RB;
-			} else if (instrument_type == "DRUMS_ROCKBAND") {
-				forced_type[sdl_id] = input::Private::DRUMS_RB;
+			} else if (instrument_type == "GUITAR_ROCKBAND_PS3") {
+				forced_type[sdl_id] = input::Private::GUITAR_RB_PS3;
+			} else if (instrument_type == "GUITAR_ROCKBAND_XB360") {
+				forced_type[sdl_id] = input::Private::GUITAR_RB_XB360;
+			} else if (instrument_type == "DRUMS_ROCKBAND_PS3") {
+				forced_type[sdl_id] = input::Private::DRUMS_RB_PS3;
+			} else if (instrument_type == "DRUMS_ROCKBAND_XB360") {
+				forced_type[sdl_id] = input::Private::DRUMS_RB_XB360;
 			} else if (instrument_type == "DRUMS_MIDI") {
 				forced_type[sdl_id] = input::Private::DRUMS_MIDI;
 			} else if (instrument_type == "DANCEPAD_GENERIC") {
@@ -235,11 +246,17 @@ void input::SDL::init() {
 				case input::Private::DRUMS_GH:
 					std::cout << "  Detected as: Guitar Hero Drums (forced)" << std::endl;
 					break;
-				case input::Private::GUITAR_RB:
-					std::cout << "  Detected as: RockBand Guitar (forced)" << std::endl;
+				case input::Private::GUITAR_RB_PS3:
+					std::cout << "  Detected as: RockBand Guitar PS3 (forced)" << std::endl;
 					break;
-				case input::Private::DRUMS_RB:
-					std::cout << "  Detected as: RockBand Drums (forced)" << std::endl;
+				case input::Private::GUITAR_RB_XB360:
+					std::cout << "  Detected as: RockBand Guitar Xbox360 (forced)" << std::endl;
+					break;
+				case input::Private::DRUMS_RB_PS3:
+					std::cout << "  Detected as: RockBand Drums PS3 (forced)" << std::endl;
+					break;
+				case input::Private::DRUMS_RB_XB360:
+					std::cout << "  Detected as: RockBand Drums Xbox360 (forced)" << std::endl;
 					break;
 				case input::Private::DRUMS_MIDI:
 					std::cout << "  Detected as: MIDI Drums (forced)" << std::endl;
@@ -260,14 +277,21 @@ void input::SDL::init() {
 			std::cout << "  Detected as: Guitar Hero Drums (guessed)" << std::endl;
 			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::DRUMS_GH);
 		} else if( name.find("Harmonix Guitar") != std::string::npos ) {
-			std::cout << "  Detected as: RockBand Guitar" << std::endl;
-			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::GUITAR_RB);
-		} else if( name.find("Harmonix Drum Kit") != std::string::npos ) {
-			std::cout << "  Detected as: RockBand Drums" << std::endl;
-			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::DRUMS_RB);
-		} else if( name.find("Harmonix Drum kit") != std::string::npos ) {
-			std::cout << "  Detected as: RockBand Drums" << std::endl;
-			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::DRUMS_RB);
+			if (name.find("Xbox") != std::string::npos) {
+				std::cout << "  Detected as: RockBand Guitar Xbox360" << std::endl;
+				input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::GUITAR_RB_XB360);
+			} else {
+				std::cout << "  Detected as: RockBand Guitar PS3" << std::endl;
+				input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::GUITAR_RB_PS3);
+			}
+		} else if( name.find("Harmonix Drum Kit") != std::string::npos || name.find("Harmonix Drum kit") != std::string::npos) {
+			if (name.find("Xbox") != std::string::npos) {
+				std::cout << "  Detected as: RockBand Drums Xbox360" << std::endl;
+				input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::DRUMS_RB_XB360);
+			} else {
+				std::cout << "  Detected as: RockBand Drums PS3" << std::endl;
+				input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::DRUMS_RB_PS3);
+			}
 		} else if( name.find("RedOctane USB Pad") != std::string::npos ) {
 			std::cout << "  Detected as: Generic Dance Pad" << std::endl;
 			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::DANCEPAD_GENERIC);
