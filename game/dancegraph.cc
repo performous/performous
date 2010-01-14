@@ -284,8 +284,8 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 	}
 
 	std::cout << "Hit button " << ev.button << " at " << time << std::endl;
-	for (DanceNotes::iterator it = m_notesIt; it != m_notes.end() && time <= it->note.begin + maxTolerance; it++) {
-		if(!it->isHit && time >= it->note.begin - maxTolerance && ev.button == it->note.note) {
+	for (DanceNotes::iterator it = m_notesIt; it != m_notes.end() && time <= it->note.end + maxTolerance; it++) {
+		if(!it->isHit && std::abs(time - it->note.begin) <= maxTolerance && ev.button == it->note.note) {
 			it->isHit = true;
 			if (it->note.type != Note::MINE) {
 				it->score = points(it->note.begin - time);
