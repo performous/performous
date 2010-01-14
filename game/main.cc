@@ -234,8 +234,7 @@ int main(int argc, char** argv) {
 	  ("mics", po::value<std::vector<std::string> >(&mics)->composing(), "specify the microphones to use")
 	  ("pdev", po::value<std::vector<std::string> >(&pdevs)->composing(), "specify the playback device")
 	  ("michelp", "detailed help and device list for --mics")
-	  ("pdevhelp", "detailed help and device list for --pdev")
-	  ("theme", po::value<std::string>(), "set theme (name or absolute path)");
+	  ("pdevhelp", "detailed help and device list for --pdev");
 	po::options_description opt3("Hidden options");
 	opt3.add_options()
 	  ("songdir", po::value<std::vector<std::string> >(&songdirs)->composing(), "");
@@ -309,6 +308,7 @@ int main(int argc, char** argv) {
 	confOverride(songdirs, "system/path_songs");
 	confOverride(mics, "audio/capture");
 	confOverride(pdevs, "audio/playback");
+	getPaths(); // Initialize paths before other threads start
 	// Run the game init and main loop
 	mainLoop(songlist);
 	return 0; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
