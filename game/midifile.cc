@@ -3,15 +3,13 @@
 #include <algorithm>
 #include <fstream>
 #include <iomanip>
+#include <iostream>
 #include <stdexcept>
 #include <sstream>
 #include <string>
 
-#define MIDI_DEBUG_LEVEL 1
+#define MIDI_DEBUG_LEVEL 0
 
-#if MIDI_DEBUG_LEVEL > 0
-#include <iostream>
-#endif
 
 /**
  * @short The MidiStream class reads midifile for MidiFileParser.

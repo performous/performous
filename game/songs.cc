@@ -13,7 +13,6 @@
 #include <libxml++/libxml++.h>
 #include <algorithm>
 #include <iostream>
-#include <sstream>
 #include <stdexcept>
 #include <cstdlib>
 
@@ -42,12 +41,12 @@ void Songs::reload_internal() {
 	}
 	Paths paths = getPathsConfig("system/path_songs");
 	for (Paths::iterator it = paths.begin(); m_loading && it != paths.end(); ++it) {
-		if (!fs::is_directory(*it)) { std::cout << ">>> Not scanning: " << *it << " (no such directory)" << std::endl; continue; }
-		std::cout << ">>> Scanning " << *it << std::endl;
+		if (!fs::is_directory(*it)) { m_debug << ">>> Not scanning: " << *it << " (no such directory)" << std::endl; continue; }
+		m_debug << ">>> Scanning " << *it << std::endl;
 		size_t count = m_songs.size();
 		reload_internal(*it);
 		size_t diff = m_songs.size() - count;
-		if (diff > 0 && m_loading) std::cout << diff << " songs loaded" << std::endl;
+		if (diff > 0 && m_loading) m_debug << diff << " songs loaded" << std::endl;
 	}
 	if (m_loading) dumpSongs_internal(); // Dump the songlist to file (if requested)
 	m_loading = false;
@@ -57,7 +56,7 @@ void Songs::reload_internal() {
 void Songs::reload_internal(fs::path const& parent) {
 	static int randomIdx = 0;
 	namespace fs = fs;
-	if (std::distance(parent.begin(), parent.end()) > 20) { std::cout << ">>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)" << std::endl; return; }
+	if (std::distance(parent.begin(), parent.end()) > 20) { m_debug << ">>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)" << std::endl; return; }
 	try {
 		boost::regex expression("(.*\\.txt|^song\\.ini|.*\\.sm)$", boost::regex_constants::icase);
 		boost::cmatch match;
@@ -76,16 +75,14 @@ void Songs::reload_internal(fs::path const& parent) {
 				m_dirty = true;
 			} catch (SongParserException& e) {
 				if (e.silent()) continue;
-				std::ostringstream oss;
-				oss << "-!- Error in " << path << "\n    " << name;
-				if (e.line()) oss << " line " << e.line();
-				oss << ": " << e.what() << std::endl;
-				std::cerr << oss.str(); // More likely to be atomic when written as one string
+				// Construct error message
+				m_debug << "-!- Error in " << path << "\n    " << name;
+				if (e.line()) m_debug << " line " << e.line();
+				m_debug << ": " << e.what() << std::endl;
 			}
 		}
 	} catch (std::exception const& e) {
-		
-		std::cout << "Error accessing " << parent << e.what() << std::endl;
+		m_debug << "Error accessing " << parent << e.what() << std::endl;
 	}
 }
 
@@ -147,6 +144,11 @@ void Songs::setFilter(std::string const& val) {
 
 void Songs::filter_internal() {
 	boost::mutex::scoped_lock l(m_mutex);
+	// Print messages when loading has finished
+	if (!m_loading) {
+		std::cerr << m_debug.str();
+		m_debug.str(""); m_debug.clear();
+	}
 	m_dirty = false;
 	RestoreSel restore(*this);
 	try {

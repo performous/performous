@@ -7,6 +7,7 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
 #include <set>
+#include <sstream>
 #include <vector>
 
 class Song;
@@ -81,6 +82,7 @@ class Songs: boost::noncopyable {
 	volatile bool m_dirty;
 	volatile bool m_loading;
 	volatile bool m_needShuffle;
+	std::stringstream m_debug;
 	boost::scoped_ptr<boost::thread> m_thread;
 	mutable boost::mutex m_mutex;
 };
