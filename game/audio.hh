@@ -6,6 +6,7 @@
 
 #include "ffmpeg.hh"
 #include "notes.hh"
+#include <boost/date_time.hpp>
 #include <boost/shared_ptr.hpp>
 #include <libda/mixer.hpp>
 
@@ -16,15 +17,15 @@ using boost::int64_t;
 /** allows buffering, fading and mixing of audiostreams
  */
 struct Stream {
-	/// container for the media file
-	FFmpeg mpeg;
-	/// sample rate
-	double srate;
+	FFmpeg mpeg; ///< Audio stream
+	double srate; ///< Sample rate
+	double fade; ///< Fade level
 	/// constructor
 	Stream(std::string const& filename, unsigned int sr):
-	  mpeg(false, true, filename, sr), srate(sr), m_pos(), fade(1.0) {}
+	  mpeg(false, true, filename, sr), srate(sr), fade(1.0), m_time(getTime()), m_pos() {}
 	/// crossfades songs
 	bool operator()(da::pcm_data& data) {
+		m_time = getTime();
 		if (fade == 1.0) {
 			mpeg.audioQueue(data, m_pos);
 		} else {
@@ -38,11 +39,13 @@ struct Stream {
 		return !eof();
 	}
 	void seek(double time) { m_pos = time * srate * 2.0; }
-	double pos() const { return double(m_pos) / srate / 2.0; }
+	double pos() const { return double(m_pos) / srate / 2.0 + (getTime() - m_time).total_microseconds() * 1e-6; }
 	double duration() const { return mpeg.audioQueue.duration(); }
 	bool eof() const { return mpeg.audioQueue.eof(m_pos); }
-	int64_t m_pos;
-	double fade;
+private:
+	static boost::posix_time::ptime getTime() { return boost::posix_time::microsec_clock::universal_time(); }
+	boost::posix_time::ptime m_time; ///< Audio time at last frame
+	int64_t m_pos; ///< Current sample position
 };
 
 struct Sample {
