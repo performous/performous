@@ -193,6 +193,37 @@ void mainLoop(std::string const& songlist) {
 	}
 }
 
+/// Simple test utility to make mapping of joystick buttons/axes easier
+void jstestLoop() {
+	try {
+		Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), false);
+		// Main loop
+		boost::xtime time = now();
+		while (true) {
+			SDL_Event e;
+			while(SDL_PollEvent(&e) == 1) {
+				if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE)) {
+					return;
+				} else if (e.type == SDL_JOYBUTTONDOWN) {
+					std::cout << "JoyID: " << int(e.jbutton.which) << ", button: " << int(e.jbutton.button) << ", state: " << int(e.jbutton.state) << std::endl;
+				} else if (e.type == SDL_JOYAXISMOTION) {
+					std::cout << "JoyID: " << int(e.jaxis.which) << ", axis: " << int(e.jaxis.axis) << ", value: " << int(e.jaxis.value) << std::endl;
+				} else if (e.type == SDL_JOYHATMOTION) {
+					std::cout << "JoyID: " << int(e.jhat.which) << ", hat: " << int(e.jhat.hat) << ", value: " << int(e.jhat.value) << std::endl;
+				}
+			}
+			window.blank(); window.swap();
+			boost::thread::sleep(time + 0.01); // Max 100 FPS
+			time = now();
+		}
+	} catch (std::exception& e) {
+		std::cout << "ERROR: " << e.what() << std::endl;
+	} catch (QuitNow&) {
+		std::cout << "Terminated." << std::endl;
+	}
+	return;
+}
+
 template <typename Container> void confOverride(Container const& c, std::string const& name) {
 	if (c.empty()) return;  // Don't override if no options specified
 	ConfigItem::StringList& sl = config[name].sl();
@@ -234,7 +265,8 @@ int main(int argc, char** argv) {
 	  ("mics", po::value<std::vector<std::string> >(&mics)->composing(), "specify the microphones to use")
 	  ("pdev", po::value<std::vector<std::string> >(&pdevs)->composing(), "specify the playback device")
 	  ("michelp", "detailed help and device list for --mics")
-	  ("pdevhelp", "detailed help and device list for --pdev");
+	  ("pdevhelp", "detailed help and device list for --pdev")
+	  ("jstest", "utility to get joystick button mappings");
 	po::options_description opt3("Hidden options");
 	opt3.add_options()
 	  ("songdir", po::value<std::vector<std::string> >(&songdirs)->composing(), "");
@@ -309,6 +341,12 @@ int main(int argc, char** argv) {
 	confOverride(mics, "audio/capture");
 	confOverride(pdevs, "audio/playback");
 	getPaths(); // Initialize paths before other threads start
+	if (vm.count("jstest")) { // Joystick test program
+		std::cout << std::endl << "Joystick utility - Touch your joystick to see buttons here" << std::endl
+		<< "Hit ESC (window focused) to quit" << std::endl << std::endl;
+		jstestLoop();
+		return 0;
+	}
 	// Run the game init and main loop
 	mainLoop(songlist);
 	return 0; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
