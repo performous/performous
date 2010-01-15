@@ -1,19 +1,16 @@
 Include file for Performous man page
 
 [name]
-performous \- The free karaoke game
+performous \- The free music and rhythm game
 
 [description]
-Performous is a free cross-platform clone of the Playstation 2 game Singstar.
+Performous is a free cross-platform karaoke, band and dancing game, where
+one or more players perform a song and the game scores their performances
+based on timing and accuracy.
 
-While Performous might be classified as a karaoke program, it is actually much
-more than that. Instead of just displaying the lyrics, notes are also displayed
-and the performance is scored based on how well you hit the notes and you can
-see your own singing pitch on screen.
-
-Performous was previously known as UltraStar Next Generation (USNG) because it
-supports the UltraStar song format. It is not a fork of the Delphi-based
-UltraStar games, as Performous is rewritten from scratch in C++.
+Performous supports songs in UltraStar, Frets on Fire and StepMania formats.
+Also, microphones and instruments from SingStar, Guitar Hero and Rock Band
+as well as some dance pads are autodetected.
 
 If you have trouble with the program (no songs found, audio not working, etc),
 try running it on a terminal. Some useful debug information is printed there.
@@ -22,39 +19,31 @@ try running it on a terminal. Some useful debug information is printed there.
 In-game navigation uses the following keys:
 .SS "Global shortcuts:"
 .TP
+\fBLeft\fR/\fBRight\fR/\fBUp\fR/\fBDown\fR/
+Change selected option/song
+.TP
+\fBEnter\fR
+Enter selection
+.TP
 \fBEsc\fR
-Exit the current screen
+Exit the current screen/mode
 .TP
 \fBAlt+Enter\fR
 Switch between full screen and windowed modes
-
-.SS "Main menu:"
 .TP
-\fBS\fR
-Sing: single player game
+\fBPause\fR or \fBCtrl+P\fR
+Pause audio/game
 .TP
-\fBP\fR
-Practice: displays the tones detected and a VU meter for checking microphone recording levels
-.TP
-\fBC\fR
-Configuration: adjust settings
+\fBCtrl+Up/Down\fR
+Change audio volume
 
 .SS "Song selection:"
-.TP
-\fBEnter\fR
-Pick the currently selected song
-.TP
-\fBLeft\fR/\fBRight\fR/\fBPgUp\fR/\fBPgDn\fR
-Browse the list of songs
 .TP
 \fBUp\fR/\fBDown\fR
 Switch the sort order (song name, artist, edition, genre or song folder path)
 .TP
 \fBAny text\fR
 Search for songs (write the text to find, uses regexp format)
-.TP
-\fBPause\fR or \fBSpace\fR
-Pause song preview and automatic song switching
 .TP
 \fBTab\fR
 Randomize songs (sort them again)
@@ -64,46 +53,35 @@ Refresh song list (reload from disk)
 .TP
 \fBF4\fR
 Enter jukebox mode (play songs entirely, hide song browser, allow seeking with Up/Down)
-.TP
-\fBEsc\fR
-Exit to main menu, exit jukebox mode or quit search mode
 
 .SS "Singing screen:"
 .TP
-\fBLeft\fR/\fBRight\fR/\fBUp\fR/\fBDown\fR/\fBHome\fR
+\fBCtrl+Left/Right\fR/\fBHome\fR
 Fast forward or rewind the song
 .TP
 \fBEnter\fR
 Skip long instrumental breaks, or get the grading instantly at the end of song.
 .TP
-\fBPause\fR or \fBSpace\fR
-Pause the game
-.TP
-\fBF4\fR
+\fBCtrl+S\fR
 Toggle synth mode (synthesized tone for notes)
 .TP
-\fBF5\fR/\fBF6\fR
+\fBCtrl+F1/F2\fR
 Adjust audio/video sync. Use if the notes pass the black line at incorrect time.
 .TP
-\fBF7\fR/\fBF8\fR
+\fBCtrl+F3/F4\fR
 Adjust audio roundtrip latency. Use if the pitch wave does not match the notes, when you match your timing to what you hear.
 .TP
-\fBF9\fR
+\fBCtrl+F5/F6\fR
+The total of USB controller latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen).
+.TP
+\fBCtrl+K\fR
 Toggle karaoke mode (hide notes and scores)
 .TP
-\fBF10\fR
+\fBCtrl+W\fR
 Toggle pitch wave rendering (only when karaoke mode is disabled)
 .TP
 \fBCtrl+R\fR
 Hot reload song from disk (useful for making or repairing songs)
-
-.SS "Configuration:"
-.TP
-\fBLeft\fR/\fBRight\fR/\fBUp\fR/\fBDown\fR/\fBEnter\fR
-Modify options
-.TP
-\fBCtrl+S\fR
-Save current configuration to configuration file
 
 [audio device configuration]
 Performous normally autodetects microphones and playback devices correctly, but if this fails on your machine, you will need to configure them from command line because in-game configuration is not yet implemented. Once you have them working, enter the configuration menu and press \fBCtrl+S\fR to save them to your config file so that they don't need to specified when starting the program.
