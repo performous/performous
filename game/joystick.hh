@@ -33,11 +33,11 @@ namespace input {
 
 	namespace Private {
 		enum Type { GUITAR_RB_PS3, DRUMS_RB_PS3, GUITAR_RB_XB360, DRUMS_RB_XB360,
-		  GUITAR_GH, GUITAR_GH_XPLORER, DRUMS_GH, DRUMS_MIDI, DANCEPAD_GENERIC };
+		  GUITAR_GH, GUITAR_GH_XPLORER, DRUMS_GH, DRUMS_MIDI, DANCEPAD_TIGERGAME, DANCEPAD_GENERIC };
 		static unsigned int KEYBOARD_ID = UINT_MAX;
 		static unsigned int KEYBOARD_ID2 = KEYBOARD_ID-1;
 		static unsigned int KEYBOARD_ID3 = KEYBOARD_ID-2; // Three ids needed for keyboard guitar/drumkit/dancepad
-		
+
 		class InputDevPrivate {
 		  public:
 			InputDevPrivate() : m_assigned(false), m_type(input::Private::DRUMS_GH) {
@@ -90,7 +90,7 @@ namespace input {
 					return true;
 				}
 				else if( _type == input::DANCEPAD &&
-				  (m_type == input::Private::DANCEPAD_GENERIC) ) {
+				  (m_type == input::Private::DANCEPAD_GENERIC || m_type == input::Private::DANCEPAD_TIGERGAME) ) {
 					return true;
 				}
 				else {
@@ -103,7 +103,7 @@ namespace input {
 			bool m_pressed[BUTTONS];
 			input::Private::Type m_type;
 		};
-	
+
 		typedef std::map<unsigned int,InputDevPrivate> InputDevs;
 		extern InputDevs devices;
 	}
@@ -164,7 +164,7 @@ namespace input {
 		// Returns true if event is taken, feed an InputDev by transforming SDL_Event into Event
 		bool pushEvent(SDL_Event);
 	}
-	
+
 #ifdef USE_PORTMIDI
 	class MidiDrums {
 	  public:
@@ -178,6 +178,6 @@ namespace input {
 		Map map;
 	};
 #endif
-	
+
 };
 
