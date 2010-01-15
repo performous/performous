@@ -35,22 +35,22 @@ void input::MidiDrums::process() {
 }
 #endif
 
-static const unsigned SDL_BUTTONS = 10;
+static const unsigned SDL_BUTTONS = 12;
 
 int input::buttonFromSDL(input::Private::Type _type, unsigned int _sdl_button) {
 	static const int inputmap[9][SDL_BUTTONS] = {
 		//G  R  Y  B  O  S    // for guitars (S=starpower)
-		{ 2, 0, 1, 3, 4, 5, -1, -1, 8, 9 }, // Guitar Hero guitar
-		{ 0, 1, 3, 2, 4,-1,  8,  9,-1,-1 }, // Guitar Hero X-plorer guitar
-		{ 3, 0, 1, 2, 4, 5, -1, -1, 8, 9 }, // Rock Band guitar PS3
-		{ 0, 1, 3, 2, 4, 5, -1, -1, 8, 9 }, // Rock Band guitar XBOX360
+		{ 2, 0, 1, 3, 4, 5, -1, -1, 8, 9, -1, -1 }, // Guitar Hero guitar
+		{ 0, 1, 3, 2, 4,-1,  8,  9,-1,-1, -1, -1 }, // Guitar Hero X-plorer guitar
+		{ 3, 0, 1, 2, 4, 5, -1, -1, 8, 9, -1, -1 }, // Rock Band guitar PS3
+		{ 0, 1, 3, 2, 4, 5, -1, -1, 8, 9, -1, -1 }, // Rock Band guitar XBOX360
 		//K  R  Y  B  G  O    // for drums
-		{ 3, 4, 1, 2, 0, 4, -1, -1, 8, 9 }, // Guitar Hero drums
-		{ 3, 4, 1, 2, 0,-1, -1, -1, 8, 9 }, // Rock Band drums PS3
-		{ 4, 1, 3, 2, 0,-1, -1, -1, 8, 9 }, // Rock Band drums XBOX360
+		{ 3, 4, 1, 2, 0, 4, -1, -1, 8, 9, -1, -1 }, // Guitar Hero drums
+		{ 3, 4, 1, 2, 0,-1, -1, -1, 8, 9, -1, -1 }, // Rock Band drums PS3
+		{ 4, 1, 3, 2, 0,-1, -1, -1, 8, 9, -1, -1 }, // Rock Band drums XBOX360
 		// Left  Down  Up  Right  DownL  DownR  UpL    UpR    Start  Select
-		{  0,    1,    2,  3,     6,     7,     4,     5,     9,     8 }, // generic dance pad
-		{  9,    8,    2,  1,     6,     7,     4,     5,     0,     3 } // TigerGame dance pas
+		{  0,    1,    2,  3,     6,     7,     4,     5,     9,     8,     -1, -1 }, // generic dance pad
+		{  9,    8,   -1, -1,    -1,    -1,    -1,    -1,     0,     3,      1,  2 } // TigerGame dance pad
 	};
 	if( _sdl_button >= SDL_BUTTONS ) return -1;
 	switch(_type) {
