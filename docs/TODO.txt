@@ -70,3 +70,5 @@ Bugs:
    * Different images may also stop at the exact same pixel
    => out of memory condition or something?
 
+- Instrument data files + catch
+

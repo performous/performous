@@ -55,25 +55,20 @@ double MusicalScale::getNoteOffset(double freq) const {
 Note::Note(): begin(getNaN()), end(getNaN()), phase(getNaN()), power(getNaN()), type(NORMAL), note(), notePrev() {}
 
 double Note::diff(double note, double n) { return remainder(n - note, 12.0); }
-double Note::maxScore() const { return scoreMultiplier(0.0) * (end - begin); }
+double Note::maxScore() const { return scoreMultiplier() * (end - begin); }
 
 double Note::score(double n, double b, double e) const {
 	double len = std::min(e, end) - std::max(b, begin);
 	if (len <= 0.0 || !(n > 0.0)) return 0.0;
-	return scoreMultiplier(std::abs(diff(n))) * len;
+	return scoreMultiplier() * powerFactor(n) * len;
 }
 
-double Note::scoreMultiplier(double error) const {
-	double max = 0.0;
-	switch (type) {
-	  case FREESTYLE: power += 1.0; return 1.0;
-	  case NORMAL: case SLIDE: max = 1.0; break;
-	  case GOLDEN: max = 2.0; break;
-	  case SLEEP: case TAP: case HOLDBEGIN: case HOLDEND: case ROLL: case MINE: case LIFT: break;
-	}
-	double accuracy = clamp(1.5 - error, 0.0, 1.0);
-	power += accuracy;
-	return accuracy * max;
+double Note::scoreMultiplier() const { return type == GOLDEN ? 2.0 : 1.0; }
+
+double Note::powerFactor(double note) const {
+	if (type == FREESTYLE) return 1.0;
+	double error = std::abs(diff(note));
+	return clamp(1.5 - error, 0.0, 1.0);
 }
 
 Duration::Duration(): begin(getNaN()), end(getNaN()) {}

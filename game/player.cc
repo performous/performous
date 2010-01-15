@@ -13,6 +13,7 @@ Player::Player(Song& song, Analyzer& analyzer, size_t frames):
 void Player::update() {
 	if (m_pos == m_pitch.size()) return; // End of song already
 	double beginTime = Engine::TIMESTEP * m_pos;
+	// Get the currently sung tone and store it in player's pitch data (also control inactivity timer)
 	Tone const* t = m_analyzer.findTone();
 	if (t) {
 		m_activitytimer = 1000;
@@ -22,13 +23,18 @@ void Player::update() {
 		m_pitch[m_pos++] = std::make_pair(getNaN(), -getInf());
 	}
 	double endTime = Engine::TIMESTEP * m_pos;
+	// Iterate over all the notes that are considered for this timestep
 	while (m_scoreIt != m_song.notes.end()) {
+		// If tone was detected, calculate score
 		if (t) {
+			double note = m_song.scale.getNote(t->freq);
 			// Add score
-			double score_addition = m_song.m_scoreFactor * m_scoreIt->score(m_song.scale.getNote(t->freq), beginTime, endTime);
+			double score_addition = m_song.m_scoreFactor * m_scoreIt->score(note, beginTime, endTime);
 			m_score += score_addition;
 			m_noteScore += score_addition;
 			m_lineScore += score_addition;
+			// Add power
+			m_scoreIt->power = std::max(m_scoreIt->power, m_scoreIt->powerFactor(note));
 		}
 		// If a row of lyrics ends, calculate how well it went
 		if (m_scoreIt->type == Note::SLEEP) {
@@ -38,8 +44,7 @@ void Player::update() {
 		}
 		if (endTime < m_scoreIt->end) break;
 		// Set accuracy
-		m_scoreIt->accuracy = std::max(m_scoreIt->accuracy,
-		  float(m_noteScore / m_song.m_scoreFactor / m_scoreIt->maxScore()));
+		m_scoreIt->accuracy = std::max(m_scoreIt->accuracy, m_noteScore / m_song.m_scoreFactor / m_scoreIt->maxScore());
 		m_noteScore = 0; // Reset noteScore as we are moving on to the next one
 		++m_scoreIt;
 	}

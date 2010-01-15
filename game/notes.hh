@@ -71,10 +71,10 @@ struct Note {
 	double begin, ///< begin time
 	       end; ///< end time
 	double phase; /// Position within a measure, [0, 1)
-	/// power of note
+	/// power of note (how well it is being hit right now)
 	mutable double power;
 	/// how well the note was sung [0,1] (used for drawing a star)
-	mutable float accuracy;
+	mutable double accuracy;
 	/// note type
 	enum Type { FREESTYLE = 'F', NORMAL = ':', GOLDEN = '*', SLIDE = '+', SLEEP = '-',
 	  TAP = '1', HOLDBEGIN = '2', HOLDEND = '3', ROLL = '4', MINE = 'M', LIFT = 'L'} type;
@@ -88,14 +88,16 @@ struct Note {
 	static double diff(double note, double n);
 	/// maximum score
 	double maxScore() const;
-	/// score when singing
+	/// score when singing over time period (a, b), which needs not to be entirely within the note
 	double score(double freq, double b, double e) const;
+	/// How precisely the note is hit (always 1.0 for freestyle, 0..1 for others)
+	double powerFactor(double note) const;
 	/// compares begin of two notes
 	static bool ltBegin(Note const& a, Note const& b) { return a.begin < b.begin; }
 	/// compares end of two notes
 	static bool ltEnd(Note const& a, Note const& b) { return a.end < b.end; }
   private:
-	double scoreMultiplier(double error) const;
+	double scoreMultiplier() const;
 };
 
 typedef std::vector<Note> Notes;
