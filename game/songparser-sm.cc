@@ -11,7 +11,7 @@
 /// Functions used for parsing the StepMania SM format
 
 namespace {
-	
+
 	// Here are some functions needed in reading the data.
 	void assign(int& var, std::string const& str) {
 		try {
@@ -70,7 +70,7 @@ void SongParser::smParse() {
 	for (std::size_t i = 0; i < m_stops.size(); ++i) s.stops[i] = stopConvert(m_stops[i]);
 	m_tsPerBeat = 4;
 }
-	
+
 bool SongParser::smParseField(std::string line) {
 	boost::trim(line);
 	if (line.empty()) return true;
@@ -83,7 +83,6 @@ bool SongParser::smParseField(std::string line) {
 	if (pos == std::string::npos) throw std::runtime_error("Invalid format, should be #key:value");
 	std::string key = boost::trim_copy(line.substr(1, pos - 1));
 	if (key == "NOTES") {
-		
 		/*All remaining data is parsed here.
 			All five lines of note metadata is read first and then smParseNotes is called to read
 			the actual note data.
@@ -112,11 +111,11 @@ bool SongParser::smParseField(std::string line) {
 			//<DifficultyMeter>:
 			if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
 			if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
-			
+
 			//<NoteData>:
 			Notes notes = smParseNotes(line);
 
-			//Here all note data from the current track is inserted into containers 
+			//Here all note data from the current track is inserted into containers
 			// TODO: support other track types. For now all others are simply ignored.
 			if (notestype == "dance-single" || notestype == "dance-double" || notestype == "dance-solo"
 			  || notestype == "pump-single" || notestype == "ez2-single" || notestype == "ez2-real"
@@ -149,7 +148,7 @@ bool SongParser::smParseField(std::string line) {
 	else if (key == "SAMPLESTART") assign(m_song.preview_start, value);
 	else if (key == "BPMS"){
 			std::istringstream iss(value);
-			double ts, bpm;	
+			double ts, bpm;
 			char chr;
 			while (iss >> ts >> chr >> bpm) {
 				if (ts == 0.0) m_bpm = bpm;
@@ -164,7 +163,6 @@ bool SongParser::smParseField(std::string line) {
 			while (iss >> beat >> chr >> sec) {
 				m_stops.push_back(std::make_pair(beat * 4.0, sec));
 				if (!(iss >> chr)) break;
-	
 			}
 	}
 	/*.sm fileformat has also the following constants but they are ignored in this version of the parser:
@@ -188,11 +186,11 @@ bool SongParser::smParseField(std::string line) {
 
 Notes SongParser::smParseNotes(std::string line) {
 	//container for dance songs
-	typedef std::map<int, Note> DanceChord;	//int indicates "arrow" position (cmp. fret in guitar) 
+	typedef std::map<int, Note> DanceChord;	//int indicates "arrow" position (cmp. fret in guitar)
 	typedef std::vector<DanceChord> DanceChords;
 
 	DanceChords chords;	//temporary container for notes
-	Notes notes;	
+	Notes notes;
 	unsigned measure = 1;
 	double begin = 0.0;
 
