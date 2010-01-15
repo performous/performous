@@ -25,6 +25,7 @@ void Player::update() {
 	double endTime = Engine::TIMESTEP * m_pos;
 	// Iterate over all the notes that are considered for this timestep
 	while (m_scoreIt != m_song.notes.end()) {
+		if (endTime < m_scoreIt->begin) break;  // The note begins later than on this timestep
 		// If tone was detected, calculate score
 		if (t) {
 			double note = m_song.scale.getNote(t->freq);
@@ -33,7 +34,7 @@ void Player::update() {
 			m_score += score_addition;
 			m_noteScore += score_addition;
 			m_lineScore += score_addition;
-			// Add power
+			// Add power if already on the note
 			m_scoreIt->power = std::max(m_scoreIt->power, m_scoreIt->powerFactor(note));
 		}
 		// If a row of lyrics ends, calculate how well it went
@@ -42,7 +43,7 @@ void Player::update() {
 		} else {
 			m_maxLineScore = 0; // Not in SLEEP note anymore, so reset maximum
 		}
-		if (endTime < m_scoreIt->end) break;
+		if (endTime < m_scoreIt->end) break;  // The note continues past this timestep
 		// Set accuracy
 		m_scoreIt->accuracy = std::max(m_scoreIt->accuracy, m_noteScore / m_song.m_scoreFactor / m_scoreIt->maxScore());
 		m_noteScore = 0; // Reset noteScore as we are moving on to the next one
