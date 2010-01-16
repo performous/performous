@@ -123,11 +123,11 @@ msgstr ""
 
 #: ../game/screen_sing.cc:322
 msgid "   ENTER to skip instrumental break"
-msgstr "   ENTER om het muzikaal intermezzo over te slaan"
+msgstr "   ENTER: sla muzikaal stuk over"
 
 #: ../game/screen_sing.cc:323
 msgid "   Remember to wait for grading!"
-msgstr "   Vergeet niet te wachten op de uitslag!"
+msgstr "   Even wachten op de uitslag!"
 
 #: ../game/screen_sing.cc:411
 msgid "No player!"
