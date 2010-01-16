@@ -40,14 +40,14 @@ static const unsigned SDL_BUTTONS = 12;
 int input::buttonFromSDL(input::Private::Type _type, unsigned int _sdl_button) {
 	static const int inputmap[9][SDL_BUTTONS] = {
 		//G  R  Y  B  O  S    // for guitars (S=starpower)
-		{ 2, 0, 1, 3, 4, 5, -1, -1, 8, 9, -1, -1 }, // Guitar Hero guitar
-		{ 0, 1, 3, 2, 4,-1,  8,  9,-1,-1, -1, -1 }, // Guitar Hero X-plorer guitar
-		{ 3, 0, 1, 2, 4, 5, -1, -1, 8, 9, -1, -1 }, // Rock Band guitar PS3
-		{ 0, 1, 3, 2, 4, 5, -1, -1, 8, 9, -1, -1 }, // Rock Band guitar XBOX360
+		{ 2, 0, 1, 3, 4, 5, -1, -1,  8,  9, -1, -1 }, // Guitar Hero guitar
+		{ 0, 1, 3, 2, 4,-1,  8,  9, -1, -1, -1, -1 }, // Guitar Hero X-plorer guitar
+		{ 3, 0, 1, 2, 4, 5, -1, -1,  8,  9, -1, -1 }, // Rock Band guitar PS3
+		{ 0, 1, 3, 2, 4, 5,  8,  9, -1, -1, -1, -1 }, // Rock Band guitar XBOX360
 		//K  R  Y  B  G  O    // for drums
-		{ 3, 4, 1, 2, 0, 4, -1, -1, 8, 9, -1, -1 }, // Guitar Hero drums
-		{ 3, 4, 1, 2, 0,-1, -1, -1, 8, 9, -1, -1 }, // Rock Band drums PS3
-		{ 4, 1, 3, 2, 0,-1, -1, -1, 8, 9, -1, -1 }, // Rock Band drums XBOX360
+		{ 3, 4, 1, 2, 0, 4, -1, -1,  8,  9, -1, -1 }, // Guitar Hero drums
+		{ 3, 4, 1, 2, 0,-1, -1, -1,  8,  9, -1, -1 }, // Rock Band drums PS3
+		{ 4, 1, 3, 2, 0,-1,  8,  9, -1, -1, -1, -1 }, // Rock Band drums XBOX360
 		// Left  Down  Up  Right  DownL  DownR  UpL    UpR    Start  Select
 		{  0,    1,    2,  3,     6,     7,     4,     5,     9,     8,     -1, -1 }, // generic dance pad
 		{  9,    8,   -1, -1,    -1,    -1,    -1,    -1,     0,     3,      1,  2 } // TigerGame dance pad
@@ -642,7 +642,8 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 			if(!devices[joy_id].assigned()) return false;
 			if (_e.jaxis.axis == 5 || _e.jaxis.axis == 6) {
 				event.type = input::Event::PICK;
-			} else if (_e.jaxis.axis == 2) {
+			} else if (_e.jaxis.axis == 2 || (devices[joy_id].type() == input::Private::GUITAR_RB_XB360
+			  && _e.jaxis.axis == 4)) {
 				event.type = input::Event::WHAMMY;
 			} else {
 				return false;
@@ -650,6 +651,20 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 			for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
 				event.pressed[i] = devices[joy_id].pressed(i);
 			}
+			// XBox RB guitar's Tilt sensor
+			if (devices[joy_id].type() == input::Private::GUITAR_RB_XB360 && _e.jaxis.axis == 3) {
+				event.button = input::STARPOWER_BUTTON;
+				if (_e.jaxis.value < -2) {
+					event.type = input::Event::PRESS;
+					event.pressed[event.button] = true;
+				} else {
+					event.type = input::Event::RELEASE;
+					event.pressed[event.button] = false;
+				}
+				devices[joy_id].addEvent(event);
+				break;
+			}
+			// Direction
 			if(_e.jaxis.value > 0 ) { // down
 				event.button = 0;
 				devices[joy_id].addEvent(event);
