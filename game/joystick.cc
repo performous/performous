@@ -306,6 +306,9 @@ void input::SDL::init() {
 		} else if( name.find("TigerGame") != std::string::npos ) {
 			std::cout << "  Detected as: TigerGame Dance Pad" << std::endl;
 			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::DANCEPAD_TIGERGAME);
+		} else if( name.find("Dance mat") != std::string::npos ) {
+			std::cout << "  Detected as: Generic Dance Pad" << std::endl;
+			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::DANCEPAD_GENERIC);
 		} else if( name.find("RedOctane USB Pad") != std::string::npos ) {
 			std::cout << "  Detected as: Generic Dance Pad" << std::endl;
 			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::DANCEPAD_GENERIC);
