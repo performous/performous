@@ -1,0 +1,37 @@
+Performous release procedures
+-----------------------------
+
+(1) Come to an agreement of the project being in a releasable state
+      - No bugs that make it "broken"
+      - No major regressions on old features
+      - New features should be either be somewhat usable or disabled
+      - All core developers must agree
+
+(2) Bump version number (remove plus and increment)
+
+(3) Build packages for all platforms
+
+(4) Test packages thoroughly on all platforms
+      - Allow at least 48 hours of testing for a new major (x.0.0) release
+      - Allow at least 24 hours of testing for a new minor (x.y.0) release
+      - No time limit for patch releases but the fixes need to be tested on
+        every platform.
+      - All core developers need to be around during testing
+
+(5) Upload packages and post a release announcement
+
+(6) Tag release on git and bump version number (add plus)
+
+If errors are found in any phase, the package building needs to be restarted and
+the fixes tested. This does not start another 48/24 hour testing period if the
+earlier version was already being tested.
+
+Steps 3 and 4 can be done at the same time, otherwise the process must be
+sequential. In particular, no packages can be uploaded until all of them have
+been built and tested properly.
+
+Core developers who haven't been seen for 48 hours on #performous can be
+excluded. Core developers may also opt out by notifying about that in advance
+(e.g. saying that they agree on a release or that they cannot participate in
+testing).
+
