@@ -62,8 +62,8 @@ private:
 		m_syncTime = now;
 		if (duration < 0.0 || duration > 1.0) return; // No syncing for weird situations
 		if (std::abs(diff) < 0.1 * duration) {
-			// Apply 1 % adjustment either up or down
-			m_correction += (diff > 0.0 ? -1.0 : 1.0) * 0.01 * duration;
+			// Apply 5 % adjustment either up or down
+			m_correction += (diff > 0.0 ? -1.0 : 1.0) * 0.05 * duration;
 		} else {
 			// Stepped adjustment to the right time (e.g. after seeking)
 			m_correction -= diff;
