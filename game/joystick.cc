@@ -91,7 +91,7 @@ input::NavButton input::getNav(SDL_Event const &e) {
 		else if (k == SDLK_DOWN && !(mod & KMOD_CTRL)) return input::DOWN;
 		else if (k == SDLK_LEFT) return input::LEFT;
 		else if (k == SDLK_RIGHT) return input::RIGHT;
-		else if (k == SDLK_RETURN) return input::START;
+		else if (k == SDLK_RETURN || k == SDLK_KP_ENTER) return input::START;
 		else if (k == SDLK_ESCAPE) return input::CANCEL;
 		else if (k == SDLK_PAGEUP) return input::MOREUP;
 		else if (k == SDLK_PAGEDOWN) return input::MOREDOWN;
@@ -360,7 +360,7 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 			if (_e.key.keysym.mod & (KMOD_CTRL|KMOD_SHIFT|KMOD_ALT|KMOD_META)) return false;
 
 			switch(_e.key.keysym.sym) {
-				case SDLK_RETURN:
+				case SDLK_RETURN: case SDLK_KP_ENTER:
 					if(!guitar) return false;
 					if (pickPressed[0]) return true; // repeating
 					pickPressed[0] = true;
@@ -509,7 +509,7 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 			if (_e.key.keysym.mod & (KMOD_CTRL|KMOD_SHIFT|KMOD_ALT|KMOD_META)) return false;
 
 			switch(_e.key.keysym.sym) {
-				case SDLK_RETURN:
+				case SDLK_RETURN: case SDLK_KP_ENTER:
 					if(!guitar) return false;
 					pickPressed[0] = false;
 					return true;

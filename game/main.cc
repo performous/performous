@@ -58,7 +58,7 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 		  case SDL_KEYDOWN:
 			int keypressed  = event.key.keysym.sym;
 			SDLMod modifier = event.key.keysym.mod;
-			if ((keypressed == SDLK_RETURN && modifier & KMOD_ALT) || keypressed == SDLK_F11) {
+			if (((keypressed == SDLK_RETURN || keypressed == SDLK_KP_ENTER) && modifier & KMOD_ALT) || keypressed == SDLK_F11) {
 				config["graphic/fullscreen"].b() = !config["graphic/fullscreen"].b();
 				continue; // Already handled here...
 			}
