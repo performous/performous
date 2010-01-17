@@ -54,7 +54,7 @@ void ScreenSing::enter() {
 	boost::ptr_vector<Analyzer>& analyzers = m_capture.analyzers();
 	m_layout_singer.reset(new LayoutSinger(*m_song, m_database, theme));
 	// Load instrument and dance tracks
-	if (!m_song->track_map.empty()) {
+	{
 		int type = 0; // 0 for dance, 1 for guitars, 2 for drums
 		int idx = 0;
 		while (1) {
