@@ -282,6 +282,10 @@ void input::SDL::init() {
 			// here we can have both drumkit or guitar .... let say the drumkit
 			std::cout << "  Detected as: Guitar Hero Drums (guessed)" << std::endl;
 			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::DRUMS_GH);
+		} else if( name.find("RedOctane MIDI Drum GuitarHero") != std::string::npos ) {
+			// This is GH Metallica guitar
+			std::cout << "  Detected as: Guitar Hero Guitar" << std::endl;
+			input::Private::devices[i] = input::Private::InputDevPrivate(input::Private::GUITAR_GH);
 		} else if( name.find("Harmonix Guitar") != std::string::npos ) {
 			if (name.find("Xbox") != std::string::npos) {
 				std::cout << "  Detected as: RockBand Guitar Xbox360" << std::endl;
