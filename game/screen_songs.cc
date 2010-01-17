@@ -185,7 +185,7 @@ void ScreenSongs::draw() {
 			oss_order << _("Visit performous.org\nfor free songs");
 		} else {
 			oss_song << _("no songs match search");
-			oss_order << m_search.text << '\n';
+			oss_order << m_search.text << "\n\n";
 		}
 	} else {
 		Song& song = m_songs.current();
@@ -193,7 +193,7 @@ void ScreenSongs::draw() {
 		oss_song << song.title << '\n' << song.artist;
 		if(m_database.hasHiscore(song))
 			oss_hiscore << _("(press END to view hiscores)");
-		oss_order << _("filter: ") << (m_search.text.empty() ? _("none") : m_search.text) << '\n';
+		oss_order << (m_search.text.empty() ? _("<type in to search>") : m_search.text) << '\n';
 		oss_order << m_songs.sortDesc() << '\n';
 		oss_order << "(" << m_songs.currentId() + 1 << "/" << m_songs.size() << ")";
 		double spos = m_songs.currentPosition(); // This needs to be polled to run the animation
