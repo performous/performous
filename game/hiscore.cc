@@ -11,10 +11,10 @@ Hiscore::Hiscore()
 {}
 
 bool Hiscore::reachedHiscore(int score, int songid, std::string const& track) const {
-	if (score < 0) throw HiscoreException("Score negativ overflow");
+	if (score < 0) throw HiscoreException("Score negative overflow");
 	if (score > 10000) throw HiscoreException("Score positive overflow");
 
-	if (score < 500) return false; // come on, did you even try to sing?
+	if (score < 2000) return false; // come on, did you even try to sing?
 
 	int counter = 0;
 	for (hiscore_t::const_iterator it = m_hiscore.begin(); it != m_hiscore.end(); ++it)
@@ -30,7 +30,7 @@ bool Hiscore::reachedHiscore(int score, int songid, std::string const& track) co
 
 void Hiscore::addHiscore(int score, int playerid, int songid, std::string const& track) {
 	HiscoreItem hi;
-	if (score < 0) throw HiscoreException("Score negativ overflow");
+	if (score < 0) throw HiscoreException("Score negative overflow");
 	if (score > 10000) throw HiscoreException("Score positive overflow");
 	hi.score = score;
 
