@@ -193,10 +193,12 @@ Notes SongParser::smParseNotes(std::string line) {
 	Notes notes;
 	unsigned measure = 1;
 	double begin = 0.0;
+	bool forceMeasure = false;
 
 	std::map<int, int> holdMarks; // Keeps track of hold notes not yet terminated
 
-	while (getline(line)) {
+	while (forceMeasure || getline(line)) {
+		if (forceMeasure) { line = ";"; forceMeasure = false; }
 		boost::trim(line); // Remove whitespace
 		if (line.empty()) continue;
 		if (line.substr(0, 2) == "//") continue;  // Skip comments
@@ -238,6 +240,11 @@ Notes SongParser::smParseNotes(std::string line) {
 		would be easier to count afterwards.
 		*/
 		DanceChord chord;
+		// Deal with ; or , being on a same line
+		if (line[line.size()-1] == ';' || line[line.size()-1] == ',') {
+			forceMeasure = true;
+			line = line.substr(0, line.size()-1);
+		}
 		for(std::size_t i = 0; i < line.size(); i++) {
 			char notetype = line[i];
 			if (notetype == '0') continue;
