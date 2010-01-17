@@ -124,8 +124,7 @@ input::NavButton input::getNav(SDL_Event const &e) {
 			else if (b == 3) return input::DOWN;
 			else if (b == 4) return input::RIGHT;
 		}
-	// Are these needed?
-	/* } else if (e.type == SDL_JOYAXISMOTION) {
+	} else if (e.type == SDL_JOYAXISMOTION) {
 		// Axis motion
 		int axis = e.jaxis.axis;
 		int value = e.jaxis.value;
@@ -133,7 +132,6 @@ input::NavButton input::getNav(SDL_Event const &e) {
 		else if (axis == 4 && value < 0) return input::LEFT;
 		else if (axis == 5 && value > 0) return input::DOWN;
 		else if (axis == 5 && value < 0) return input::UP;
-	*/
 	} else if (e.type == SDL_JOYHATMOTION) {
 		// Hat motion
 		int dir = e.jhat.value;
