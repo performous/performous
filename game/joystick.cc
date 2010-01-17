@@ -179,8 +179,8 @@ void input::SDL::init() {
 	std::map<unsigned int, input::detail::Type> forced_type;
 
 	using namespace boost::spirit::classic;
-	rule<> type = str_p("GUITAR_GUITARHERO") | "GUITAR_ROCKBAND_PS3" | "GUITAR_ROCKBAND_XB360"
-	  | "GUITAR_GUITARHERO_XPLORER" | "DRUMS_GUITARHERO" | "DRUMS_ROCKBAND_PS3" | "DRUMS_ROCKBAND_XB360"
+	rule<> type = str_p("GUITAR_GUITARHERO_XPLORER") | "GUITAR_ROCKBAND_PS3" | "GUITAR_ROCKBAND_XB360"
+	  | "GUITAR_GUITARHERO" | "DRUMS_GUITARHERO" | "DRUMS_ROCKBAND_PS3" | "DRUMS_ROCKBAND_XB360"
 	  | "DRUMS_MIDI" | "DANCEPAD_GENERIC" | "DANCEPAD_TIGERGAME";
 	rule<> entry = uint_p[assign_a(sdl_id)] >> ":" >> (type)[assign_a(instrument_type)];
 
