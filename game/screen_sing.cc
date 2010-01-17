@@ -53,40 +53,25 @@ void ScreenSing::enter() {
 	theme->timer.dimensions.screenTop(0.5 * m_progress->dimensions.h());
 	boost::ptr_vector<Analyzer>& analyzers = m_capture.analyzers();
 	m_layout_singer.reset(new LayoutSinger(*m_song, m_database, theme));
-	// I know some purists would hang me for this loop
-	if( !m_song->track_map.empty() ) {
-		// Here we load alternatively guitar/bass tracks until no guitar controler is available
-		// then we load all the drums tracks until no drum controler is available (and place them in second position)
-		std::vector<std::string> instrument_tracks;
-		instrument_tracks.push_back("guitar");
-		instrument_tracks.push_back("coop guitar");
-		instrument_tracks.push_back("bass");
-		instrument_tracks.push_back("rhythm guitar");
+	// Load instrument and dance tracks
+	if (!m_song->track_map.empty()) {
+		int type = 0; // 0 for dance, 1 for guitars, 2 for drums
+		int idx = 0;
 		while (1) {
-			bool assigned = false;
-			for (std::vector<std::string>::const_iterator it = instrument_tracks.begin(); it != instrument_tracks.end(); ++it) {
-				try {
-					Instruments::iterator ite = m_instruments.end();
-					m_instruments.insert(ite, new GuitarGraph(m_audio, *m_song, *it));
-					assigned = true;
-				} catch (input::NoDevError&) {}
+			try {
+				if (idx == 0) {
+					if (type == 0 && !m_song->hasDance()) ++type;
+					if (type == 1 && !m_song->hasDrums()) ++type;
+					if (type == 2 && !m_song->hasGuitars()) ++type;
+					if (type == 3) break;
+				}
+				if (type == 0) m_dancers.push_back(new DanceGraph(m_audio, *m_song));
+				else m_instruments.push_back(new GuitarGraph(m_audio, *m_song, type == 1, idx));
+				++idx;
+			} catch (input::NoDevError&) {
+				++type;
+				idx = 0;
 			}
-			if( !assigned ) break;
-		}
-		while(1) {
-			try {
-				Instruments::iterator it = m_instruments.end();
-				if (m_instruments.size() > 1) it = m_instruments.begin() + 1; // Drums go after the first guitar
-				m_instruments.insert(it, new GuitarGraph(m_audio, *m_song, "drums"));
-			} catch (input::NoDevError&) { break; }
-		}
-	}
-	// Load dance tracks
-	if ( !m_song->danceTracks.empty() ) {
-		while(1) {
-			try {
-				m_dancers.push_back(new DanceGraph(m_audio, *m_song));
-			} catch (input::NoDevError&) { break; }
 		}
 	}
 	// Startup delay for instruments is longer than for singing only

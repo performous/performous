@@ -51,7 +51,7 @@ static inline bool operator==(Chord const& a, Chord const& b) {
 class GuitarGraph {
   public:
 	/// constructor
-	GuitarGraph(Audio& audio, Song const& song, std::string track);
+	GuitarGraph(Audio& audio, Song const& song, bool drums, int number);
 	/** draws GuitarGraph
 	 * @param time at which time to draw
 	 */
@@ -121,7 +121,7 @@ class GuitarGraph {
 	void drawBar(double time, float h);
 	void drawNote(int fret, glutil::Color, float tBeg, float tEnd, float whammy = 0, bool tappable = false, bool hit = false, double hitAnim = 0.0, double releaseTime = 0.0);
 	void drawInfo(double time, double offsetX, Dimensions dimensions);
-	void nextTrack();
+	void nextTrack(bool fast = false);
 	void difficultyAuto(bool tryKeepCurrent = false);
 	bool difficulty(Difficulty level);
 	SvgTxtTheme m_text;

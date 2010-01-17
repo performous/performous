@@ -40,9 +40,10 @@ void ScreenPractice::manageEvent(SDL_Event event) {
 	else if (nav == input::PAUSE) m_audio.togglePause();
 	else if (nav == input::VOLUME_DOWN) --config["audio/music_volume"];
 	else if (nav == input::VOLUME_UP) ++config["audio/music_volume"];
+	// FIXME: This should not use stuff from input::detail namespace!
 	else if (event.type == SDL_JOYBUTTONDOWN // Play drum sounds here
-	  && input::Private::devices[event.jbutton.which].type_match(input::DRUMS)) {
-		int b = input::buttonFromSDL(input::Private::devices[event.jbutton.which].type(), event.jbutton.button);
+	  && input::detail::devices[event.jbutton.which].type_match(input::DRUMS)) {
+		int b = input::buttonFromSDL(input::detail::devices[event.jbutton.which].type(), event.jbutton.button);
 		if (b != -1) m_audio.play(m_samples[unsigned(b) % m_samples.size()], "audio/fail_volume");
 	}
 }

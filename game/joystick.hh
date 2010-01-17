@@ -31,7 +31,7 @@ namespace input {
 		boost::xtime time;
 	};
 
-	namespace Private {
+	namespace detail {
 		enum Type { GUITAR_RB_PS3, DRUMS_RB_PS3, GUITAR_RB_XB360, DRUMS_RB_XB360,
 		  GUITAR_GH, GUITAR_GH_XPLORER, DRUMS_GH, DRUMS_MIDI, DANCEPAD_TIGERGAME, DANCEPAD_GENERIC };
 		static unsigned int KEYBOARD_ID = UINT_MAX;
@@ -40,35 +40,35 @@ namespace input {
 
 		class InputDevPrivate {
 		  public:
-			InputDevPrivate() : m_assigned(false), m_type(input::Private::DRUMS_GH) {
+			InputDevPrivate() : m_assigned(false), m_type(DRUMS_GH) {
 				for(unsigned int i = 0 ; i < BUTTONS ; i++) {
 					m_pressed[i] = false;
 				}
 			};
-			InputDevPrivate(input::Private::Type _type) : m_assigned(false), m_type(_type) {
+			InputDevPrivate(Type _type) : m_assigned(false), m_type(_type) {
 				for(unsigned int i = 0 ; i < BUTTONS ; i++) {
 					m_pressed[i] = false;
 				}
 			};
 			bool tryPoll(Event& _event) {
-				if( m_events.empty() ) return false;
+				if (m_events.empty()) return false;
 				_event = m_events.front();
 				m_events.pop_front();
 				return true;
 			};
 			void addEvent(Event _event) {
 				// only add event if the device is assigned
-				if( m_assigned ) m_events.push_back(_event);
+				if (m_assigned) m_events.push_back(_event);
 				/*
-				if( _event.type == input::Event::PICK )
+				if (_event.type == Event::PICK)
 					std::cout << "PICK event " << _event.button << std::endl;
-				if( _event.type == input::Event::PRESS )
+				if (_event.type == Event::PRESS)
 					std::cout << "PRESS event " << _event.button << std::endl;
-				if( _event.type == input::Event::RELEASE )
+				if (_event.type == Event::RELEASE)
 					std::cout << "RELEASE event " << _event.button << std::endl;
 				*/
 				// always keep track of button status
-				for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
+				for( unsigned int i = 0 ; i < BUTTONS ; ++i) {
 					m_pressed[i] = _event.pressed[i];
 				}
 			};
@@ -77,38 +77,37 @@ namespace input {
 			void unassign() {m_assigned = false; clearEvents();};
 			bool assigned() {return m_assigned;};
 			bool pressed(int _button) {return m_pressed[_button];};
-			input::Private::Type type() {return m_type;};
-			bool type_match( input::DevType _type) {
-				if( _type == input::GUITAR &&
-				  (m_type == input::Private::GUITAR_GH || m_type == input::Private::GUITAR_GH_XPLORER
-				  || m_type == input::Private::GUITAR_RB_PS3 || m_type == input::Private::GUITAR_RB_XB360) ) {
-					return true;
+			Type type() {return m_type;};
+			bool type_match(DevType _type) {
+				switch (m_type) {
+				case GUITAR_GH:
+				case GUITAR_GH_XPLORER:
+				case GUITAR_RB_PS3:
+				case GUITAR_RB_XB360:
+					return _type == GUITAR;
+				case DRUMS_GH:
+				case DRUMS_MIDI:
+				case DRUMS_RB_PS3:
+				case DRUMS_RB_XB360:
+					return _type == DRUMS;
+				case DANCEPAD_GENERIC:
+				case DANCEPAD_TIGERGAME:
+					return _type == DANCEPAD;
 				}
-				else if( _type == input::DRUMS &&
-				  (m_type == input::Private::DRUMS_GH || m_type == input::Private::DRUMS_MIDI
-				  || m_type == input::Private::DRUMS_RB_PS3 || m_type == input::Private::DRUMS_RB_XB360) ) {
-					return true;
-				}
-				else if( _type == input::DANCEPAD &&
-				  (m_type == input::Private::DANCEPAD_GENERIC || m_type == input::Private::DANCEPAD_TIGERGAME) ) {
-					return true;
-				}
-				else {
-					return false;
-				}
+				throw std::logic_error("Unhandled DevType");
 			};
 		  private:
 			std::deque<Event> m_events;
 			bool m_assigned;
 			bool m_pressed[BUTTONS];
-			input::Private::Type m_type;
+			Type m_type;
 		};
 
 		typedef std::map<unsigned int,InputDevPrivate> InputDevs;
 		extern InputDevs devices;
 	}
 
-	int buttonFromSDL(input::Private::Type _type, unsigned int _sdl_button);
+	int buttonFromSDL(detail::Type _type, unsigned int _sdl_button);
 	NavButton getNav(SDL_Event const &e);
 
 	struct NoDevError: std::runtime_error {
@@ -120,41 +119,26 @@ namespace input {
 		// First gives a correct instrument type
 		// Then gives an unknown instrument type
 		// Finally throw an exception if only wrong (or none) instrument are available
-		InputDev(input::DevType _type) {
-			using namespace input::Private;
-			if( _type == input::DRUMS )
-				std::cout << "Request acquiring DRUM" << std::endl;
-			if( _type == input::GUITAR )
-				std::cout << "Request acquiring GUITAR" << std::endl;
-			if( _type == input::DANCEPAD )
-				std::cout << "Request acquiring DANCEPAD" << std::endl;
-			if( devices.size() == 0 ) throw std::runtime_error("No InputDev available");
-			for(InputDevs::iterator it = devices.begin() ; it != devices.end() ; ++it) {
-				if( it->first == input::Private::KEYBOARD_ID && !config["game/keyboard_guitar"].b() )
-					continue;
-				if( it->first == input::Private::KEYBOARD_ID2 && !config["game/keyboard_drumkit"].b() )
-					continue;
-				if( it->first == input::Private::KEYBOARD_ID3 && !config["game/keyboard_dancepad"].b() )
-					continue;
-				if( !it->second.assigned() && it->second.type_match(_type) ) {
-					std::cout << "Found @" << it->first << std::endl;
+		InputDev(DevType _type) {
+			for (detail::InputDevs::iterator it = detail::devices.begin() ; it != detail::devices.end() ; ++it) {
+				if (it->first == detail::KEYBOARD_ID && !config["game/keyboard_guitar"].b()) continue;
+				if (it->first == detail::KEYBOARD_ID2 && !config["game/keyboard_drumkit"].b()) continue;
+				if (it->first == detail::KEYBOARD_ID3 && !config["game/keyboard_dancepad"].b()) continue;
+				if (!it->second.assigned() && it->second.type_match(_type)) {
 					m_device_id = it->first;
 					it->second.assign();
 					return;
 				}
 			}
-			std::cout << "No InputDev was found!" << std::endl;
 			throw NoDevError();
 		};
 		~InputDev() {
-			using namespace input::Private;
-			// we assume find will success
-			devices.find(m_device_id)->second.unassign();
+			detail::devices[m_device_id].unassign();
 		};
-		bool tryPoll(Event& _e) {return input::Private::devices.find(m_device_id)->second.tryPoll(_e);};
-		void addEvent(Event _e) {input::Private::devices.find(m_device_id)->second.addEvent(_e);};
-		bool pressed(int _button) {return input::Private::devices.find(m_device_id)->second.pressed(_button);}; // Current state
-		bool isKeyboard() const {return (m_device_id == input::Private::KEYBOARD_ID || m_device_id == input::Private::KEYBOARD_ID2 || m_device_id == input::Private::KEYBOARD_ID3);};
+		bool tryPoll(Event& _e) { return detail::devices.find(m_device_id)->second.tryPoll(_e); };
+		void addEvent(Event _e) { detail::devices.find(m_device_id)->second.addEvent(_e); };
+		bool pressed(int _button) { return detail::devices.find(m_device_id)->second.pressed(_button); }; // Current state
+		bool isKeyboard() const { return (m_device_id == detail::KEYBOARD_ID || m_device_id == detail::KEYBOARD_ID2 || m_device_id == detail::KEYBOARD_ID3); };
 	  private:
 		unsigned int m_device_id; // should be some kind of reference
 	};

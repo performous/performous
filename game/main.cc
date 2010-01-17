@@ -165,6 +165,7 @@ void mainLoop(std::string const& songlist) {
 				}
 				g_take_screenshot = false;
 			}
+			sm.updateScreen();  // exit/enter, any exception is fatal error
 			try {
 				checkEvents_SDL(sm, window);
 				window.blank();

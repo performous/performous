@@ -59,9 +59,9 @@ namespace {
 	}
 }
 
-GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
+GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number):
   m_audio(audio),
-  m_input(track=="drums" ? input::DRUMS : input::GUITAR),
+  m_input(drums ? input::DRUMS : input::GUITAR),
   m_song(song),
   m_button(getThemePath("button.svg")),
   m_button_l(getThemePath("button_l.svg")),
@@ -70,7 +70,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
   m_tap(getThemePath("tap.svg")),
   m_neckglow(getThemePath("neck_glow.svg")),
   m_neckglowColor(),
-  m_drums(track=="drums"),
+  m_drums(drums),
   m_use3d(config["graphic/3d_notes"].b()),
   m_starpower(0.0, 0.1),
   m_cx(0.0, 0.2),
@@ -91,6 +91,13 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
   m_jointime(not_joined),
   m_dead()
 {
+	// Copy all tracks of supported types (either drums or non-drums) to m_track_map
+	for (TrackMap::const_iterator it = m_song.track_map.begin(); it != m_song.track_map.end(); ++it) {
+		std::string index = it->first;
+		if (m_drums == (index == "drums")) m_track_map[index] = &it->second;
+	}
+	if (m_track_map.empty()) throw std::logic_error(m_drums ? "No drum tracks found" : "No guitar tracks found");
+	// Load 3D fret objects
 	try {
 		m_fretObj.load(getThemePath("fret.obj"));
 		m_tappableObj.load(getThemePath("fret_tap.obj"));
@@ -98,7 +105,9 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
 		std::cout << e.what() << std::endl;
 		m_use3d = false;
 	}
+	// Score calculator (TODO a better one)
 	m_popupText.reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
+	// Load fail sounds
 	unsigned int sr = m_audio.getSR();
 	if (m_drums) {
 		m_samples.push_back(Sample(getPath("sounds/drum_bass.ogg"), sr));
@@ -115,16 +124,10 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, std::string track):
 		m_samples.push_back(Sample(getPath("sounds/guitar_fail5.ogg"), sr));
 		m_samples.push_back(Sample(getPath("sounds/guitar_fail6.ogg"), sr));
 	}
-	unsigned int i = 0;
-	for (TrackMap::const_iterator it = m_song.track_map.begin(); it != m_song.track_map.end(); ++it,++i) {
-		std::string index = it->first;
-		TrackMapConstPtr::const_iterator it2 = m_track_map.insert(std::make_pair(index, &it->second)).first;
-		if (index == track) m_track_index = it2;
-	}
-	if (m_track_index == m_track_map.end()) throw std::runtime_error("Could not find track \"" + track + "\"");
 	for (int i = 0; i < 6; ++i) m_hit[i].setRate(5.0);
 	for (int i = 0; i < 5; ++i) m_holds[i] = 0;
-	if (m_track_map.empty()) throw std::runtime_error("No track");
+	m_track_index = m_track_map.begin();
+	while (number--) nextTrack(true);
 	difficultyAuto();
 	updateNeck();
 }
@@ -137,6 +140,53 @@ void GuitarGraph::updateNeck() {
 	else if (index == "bass") m_neck.reset(new Texture(getThemePath("bassneck.svg")));
 	else m_neck.reset(new Texture(getThemePath("guitarneck.svg")));
 }
+
+/// Cycle through the different tracks
+void GuitarGraph::nextTrack(bool fast) {
+	if (++m_track_index == m_track_map.end()) m_track_index = m_track_map.begin();
+	if (fast) return;
+	difficultyAuto(true);
+	updateNeck();
+}
+
+/// Get the difficulty as displayable string
+std::string GuitarGraph::getDifficultyString() const {
+	std::string ret = diffv[m_level].name;
+	if (m_drums && m_input.isKeyboard()) ret += " (kbd)";
+	return ret;
+}
+
+/// Find an initial difficulty level to use
+void GuitarGraph::difficultyAuto(bool tryKeep) {
+	if (tryKeep && difficulty(Difficulty(m_level))) return;
+	for (int level = 0; level < DIFFICULTYCOUNT; ++level) if (difficulty(Difficulty(level))) return;
+	throw std::runtime_error("No difficulty levels found");
+}
+
+/// Attempt to use a given difficulty level
+bool GuitarGraph::difficulty(Difficulty level) {
+	Track const& track = *m_track_index->second;
+	// Find the stream number
+	for (TrackMap::const_iterator it = m_song.track_map.begin(); it != m_song.track_map.end(); ++it) {
+		if (&track == &it->second) break;
+	}
+	// Check if the difficulty level is available
+	uint8_t basepitch = diffv[level].basepitch;
+	NoteMap const& nm = track.nm;
+	int fail = 0;
+	for (int fret = 0; fret < 5; ++fret) if (nm.find(basepitch + fret) == nm.end()) ++fail;
+	if (fail == 5) return false;
+	Difficulty prevLevel = m_level;
+	m_level = level;
+	updateChords();
+	if (m_chords.size() <= 1) { // If there is only one chord, it's probably b0rked
+		m_level = prevLevel;
+		updateChords();
+		return false;
+	}
+	return true;
+}
+
 
 /// Core engine
 void GuitarGraph::engine() {
@@ -417,54 +467,6 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 			}
 		}
 	}
-}
-
-/// Cycle through the different tracks
-void GuitarGraph::nextTrack() {
-	while (1) {
-		if (++m_track_index == m_track_map.end()) m_track_index = m_track_map.begin();
-		if (m_track_index->first != "drums") break;  // Only accept non-drum tracks
-	}
-	difficultyAuto(true);
-	updateNeck();
-}
-
-/// Get the difficulty as displayable string
-std::string GuitarGraph::getDifficultyString() const {
-	std::string ret = diffv[m_level].name;
-	if (m_drums && m_input.isKeyboard()) ret += " (kbd)";
-	return ret;
-}
-
-/// Find an initial difficulty level to use
-void GuitarGraph::difficultyAuto(bool tryKeep) {
-	if (tryKeep && difficulty(Difficulty(m_level))) return;
-	for (int level = 0; level < DIFFICULTYCOUNT; ++level) if (difficulty(Difficulty(level))) return;
-	throw std::runtime_error("No difficulty levels found");
-}
-
-/// Attempt to use a given difficulty level
-bool GuitarGraph::difficulty(Difficulty level) {
-	Track const& track = *m_track_index->second;
-	// Find the stream number
-	for (TrackMap::const_iterator it = m_song.track_map.begin(); it != m_song.track_map.end(); ++it) {
-		if (&track == &it->second) break;
-	}
-	// Check if the difficulty level is available
-	uint8_t basepitch = diffv[level].basepitch;
-	NoteMap const& nm = track.nm;
-	int fail = 0;
-	for (int fret = 0; fret < 5; ++fret) if (nm.find(basepitch + fret) == nm.end()) ++fail;
-	if (fail == 5) return false;
-	Difficulty prevLevel = m_level;
-	m_level = level;
-	updateChords();
-	if (m_chords.size() <= 1) { // If there is only one chord, it's probably b0rked
-		m_level = prevLevel;
-		updateChords();
-		return false;
-	}
-	return true;
 }
 
 /// Get a color based on fret index

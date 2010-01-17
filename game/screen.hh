@@ -36,8 +36,10 @@ class ScreenManager: public Singleton <ScreenManager> {
 	ScreenManager();
 	/// adds a screen to the manager
 	void addScreen(Screen* s) { std::string tmp = s->getName(); screens.insert(tmp, s); };
-	/// activates screen
+	/// Switches active screen
 	void activateScreen(std::string const& name);
+	/// Does actual switching of screens (if necessary)
+	void updateScreen();
 	/// returns pointer to current Screen
 	Screen* getCurrentScreen() { return currentScreen; };
 	/// returns pointer to Screen for given name
@@ -52,6 +54,7 @@ class ScreenManager: public Singleton <ScreenManager> {
 	bool m_finished;
 	typedef boost::ptr_map<std::string, Screen> screenmap_t;
 	screenmap_t screens;
+	Screen* newScreen;
 	Screen* currentScreen;
 };
 
