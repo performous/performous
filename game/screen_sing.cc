@@ -69,7 +69,7 @@ void ScreenSing::enter() {
 					Instruments::iterator ite = m_instruments.end();
 					m_instruments.insert(ite, new GuitarGraph(m_audio, *m_song, *it));
 					assigned = true;
-				} catch (std::runtime_error&) {}
+				} catch (input::NoDevError&) {}
 			}
 			if( !assigned ) break;
 		}
@@ -78,7 +78,7 @@ void ScreenSing::enter() {
 				Instruments::iterator it = m_instruments.end();
 				if (m_instruments.size() > 1) it = m_instruments.begin() + 1; // Drums go after the first guitar
 				m_instruments.insert(it, new GuitarGraph(m_audio, *m_song, "drums"));
-			} catch (std::runtime_error&) { break; }
+			} catch (input::NoDevError&) { break; }
 		}
 	}
 	// Load dance tracks
@@ -86,7 +86,7 @@ void ScreenSing::enter() {
 		while(1) {
 			try {
 				m_dancers.push_back(new DanceGraph(m_audio, *m_song));
-			} catch (std::runtime_error&) { break; }
+			} catch (input::NoDevError&) { break; }
 		}
 	}
 	// Startup delay for instruments is longer than for singing only

@@ -111,6 +111,10 @@ namespace input {
 	int buttonFromSDL(input::Private::Type _type, unsigned int _sdl_button);
 	NavButton getNav(SDL_Event const &e);
 
+	struct NoDevError: std::runtime_error {
+		NoDevError(): runtime_error("No instrument of the requested type was available") {}
+	};
+	
 	class InputDev {
 	  public:
 		// First gives a correct instrument type
@@ -140,7 +144,7 @@ namespace input {
 				}
 			}
 			std::cout << "No InputDev was found!" << std::endl;
-			throw std::runtime_error("No matching instrument available");
+			throw NoDevError();
 		};
 		~InputDev() {
 			using namespace input::Private;
