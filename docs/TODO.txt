@@ -1,25 +1,22 @@
 This file lists long-time goals that are not fixable quickly. Issues that are easily
 fixable should not be recorded here, but should rather be fixed in the code.
 
+
 Structural:
 
-- LibDA as a separate project
-	* Also playback and Vorbis + MP3 decoding
-	* Mixer and samplerate conversion inside
-- Get rid of ScreenManager in favor of recursive approach?
-- Switch to Clanlib or SFML?
+- PortAudio as the only audio backend (instead of libda plugin system) [WIP]
+- Rename ScreenManager to Game and put globally used resources into it
 - Switch to GStreamer? (both the ripper and the game)
 
 
 Big features:
 
 - Add compose screen (using features discussed on mailing list)
-- Multiplayer duet (needs XML or MIDI song format)
+- Multiplayer duet (using FoF file format)
 - Recording performances
     * Internet highscore
 - Mic effects (reduce volume for bad singers, perfect pitch, reverb, etc)
 - Ingame Singstar DVD support (integrated ripping + ffmpeg feeding + XML song format)
-- Dance game [WIP]
 
 
 Features:
@@ -28,14 +25,15 @@ Features:
    * Audio roundtrip by analyzing the sound captured by the microphone
    * Controller/audio latency by playing blindly (listening to the beat only)
    * Audio/video by playing visually without audio? (needs controller/audio calibrated)
-- Better audio card configuration ingame (needs PortAudio backend) [WIP]
+- Better audio card configuration ingame (needs PortAudio backend)
 - Allow playing a single song given as commandline argument (no menus)
 - Kiosk/arcade mode (disable exiting game and limit other functions)
 
 
 Dance features:
+
 - Colored arrows for timing
-- BGCHANGE support (background videos)
+- BGCHANGE support for SM format (background videos)
 
 
 Text rendering bugs:
@@ -55,20 +53,10 @@ New config menu:
 SS Ripper:
 
 - Compress into Vorbis Ogg and H.264 MKV
+- Generate FoF format
 
 
 Bugs:
 
-- On Compiz switching from fullscreen to window makes the window maximized even though the viewport stays small
-
 - Segfault when browsing songs in song browser while loading (segfaults before loading finishes), quite rare
-
-- Bitmap surfaces are often loaded only partially, loading stops at a middle of a scanline.
-   * Affects at least PNG format, maybe not others
-   * The rest appears black or transparent (at least most of the time)
-   * Reloading often causes different results on the same image
-   * Different images may also stop at the exact same pixel
-   => out of memory condition or something?
-
-- Instrument data files + catch
 
