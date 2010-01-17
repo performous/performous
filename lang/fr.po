@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-13 15:27+0100\n"
+"POT-Creation-Date: 2010-01-17 23:51+0100\n"
 "PO-Revision-Date: \n"
-"Last-Translator: Yoda-JM <yoda-jm@users.sourceforge.net>\n"
+"Last-Translator: Vincent Le Ligeour <yoda-jm@users.sourceforge.net>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -13,9 +13,62 @@ msgstr ""
 "X-Poedit-Basepath: .\n"
 "X-Poedit-SearchPath-0: ../game\n"
 
-#: ../game/screen_hiscore.cc:104
-msgid "Hiscore for "
-msgstr "Records pour "
+#: ../game/screen_sing.cc:307
+msgid "   ENTER to skip instrumental break"
+msgstr "   \"Entrée\" pour passer l'instrumental"
+
+#: ../game/screen_sing.cc:308
+msgid "   Remember to wait for grading!"
+msgstr "   N'oubliez pas d'attendre pour votre classement!"
+
+#: ../game/screen_sing.cc:396
+msgid "No player!"
+msgstr "Aucun joueur n'a été trouvé!"
+
+#: ../game/screen_sing.cc:405
+msgid "Hit singer"
+msgstr "Superstar"
+
+#: ../game/screen_sing.cc:406
+msgid "Lead singer"
+msgstr "Soliste"
+
+#: ../game/screen_sing.cc:407
+#: ../game/screen_sing.cc:413
+#: ../game/screen_sing.cc:419
+msgid "Rising star"
+msgstr "Etoile montante"
+
+#: ../game/screen_sing.cc:408
+#: ../game/screen_sing.cc:414
+#: ../game/screen_sing.cc:420
+msgid "Amateur"
+msgstr "Amateur"
+
+#: ../game/screen_sing.cc:409
+#: ../game/screen_sing.cc:421
+msgid "Tone deaf"
+msgstr "Casserole"
+
+#: ../game/screen_sing.cc:411
+msgid "Maniac"
+msgstr "Maniac"
+
+#: ../game/screen_sing.cc:412
+msgid "Hoofer"
+msgstr "Claquettiste"
+
+#: ../game/screen_sing.cc:415
+msgid "Loser"
+msgstr "Perdant"
+
+#: ../game/screen_sing.cc:417
+msgid "Virtuoso"
+msgstr "Virtuose"
+
+#: ../game/screen_sing.cc:418
+msgid "Rocker"
+msgstr "Rockeur"
 
 #: ../game/screen_intro.cc:10
 msgid "Perform"
@@ -65,96 +118,11 @@ msgstr ""
 "\n"
 "Veuillez en configurer certains avant de jouer."
 
-#: ../game/screen_players.cc:109
-msgid "No players found!"
-msgstr "Aucun joueur n'a été trouvé!"
-
-#: ../game/screen_players.cc:110
-msgid "Enter a name to create a new player."
-msgstr "Entrez un nom pour créer un nouveau joueur."
-
-#: ../game/screen_players.cc:112
-msgid "Press enter to create player!"
-msgstr "Pressez Entrer pour créer un nouveau joueur!"
-
-#: ../game/screen_players.cc:119
-#, boost-format
-msgid "You reached %1% points!"
-msgstr "%1% points marqués!"
-
-#: ../game/screen_players.cc:120
-msgid "Change player with arrow keys."
-msgstr "Changez de joueur avec les flèches"
-
-#: ../game/screen_players.cc:121
-msgid "Name:"
-msgstr "Nom:"
-
-#: ../game/screen_players.cc:124
-msgid "Type text to filter or create a new player."
-msgstr "Entrez un nom pour créer un nouveau joueur."
-
-#: ../game/screen_players.cc:124
-msgid "Search Text:"
-msgstr "Recherche:"
-
-#: ../game/screen_sing.cc:338
-msgid "   ENTER to skip instrumental break"
-msgstr "   \"Entrée\" pour passer l'instrumental"
-
-#: ../game/screen_sing.cc:339
-msgid "   Remember to wait for grading!"
-msgstr "   N'oubliez pas d'attendre pour votre classement!"
-
-#: ../game/screen_sing.cc:427
-msgid "No player!"
-msgstr "Aucun joueur n'a été trouvé!"
-
-#: ../game/screen_sing.cc:436
-msgid "Hit singer"
-msgstr "Superstar"
-
-#: ../game/screen_sing.cc:437
-msgid "Lead singer"
-msgstr "Soliste"
-
-#: ../game/screen_sing.cc:428
-msgid "Rising star"
-msgstr "Etoile montante"
-
-#: ../game/screen_sing.cc:429
-msgid "Amateur"
-msgstr "Amateur"
-
-#: ../game/screen_sing.cc:424
-msgid "Tone deaf"
-msgstr "Casserole"
-
-#: ../game/screen_sing.cc:442
-msgid "Maniac"
-msgstr "Maniac"
-
-#: ../game/screen_sing.cc:443
-msgid "Hoofer"
-msgstr "Claquettiste"
-
-#: ../game/screen_sing.cc:446
-msgid "Loser"
-msgstr "Perdant"
-
-#: ../game/screen_sing.cc:448
-msgid "Virtuoso"
-msgstr "Virtuose"
-
-#: ../game/screen_sing.cc:449
-msgid "Rocker"
-msgstr "Rockeur"
-
-#: ../game/screen_songs.cc:178
+#: ../game/screen_songs.cc:184
 msgid "No songs found!"
 msgstr "Aucun morceau trouvé!"
 
-#: ../game/screen_songs.cc:179
+#: ../game/screen_songs.cc:185
 msgid ""
 "Visit performous.org\n"
 "for free songs"
@@ -162,46 +130,84 @@ msgstr ""
 "Visitez performous.org\n"
 "pour des morceaux gratuits"
 
-#: ../game/screen_songs.cc:181
+#: ../game/screen_songs.cc:187
 msgid "no songs match search"
 msgstr "aucun morceau ne satisfait la recherche"
 
-#: ../game/screen_songs.cc:188
-msgid "filter: "
-msgstr "filtre: "
+#: ../game/screen_songs.cc:195
+msgid "(press END to view hiscores)"
+msgstr "(presser Fin pour voir le classement)"
 
-#: ../game/screen_songs.cc:188
-msgid "none"
-msgstr "aucun"
+#: ../game/screen_songs.cc:196
+msgid "<type in to search>"
+msgstr "<Entrez votre recherche>"
 
-#: ../game/songs.cc:204
+#: ../game/screen_hiscore.cc:88
+msgid "Hiscore for "
+msgstr "Records pour "
+
+#: ../game/screen_players.cc:110
+msgid "No players found!"
+msgstr "Aucun joueur n'a été trouvé!"
+
+#: ../game/screen_players.cc:111
+msgid "Enter a name to create a new player."
+msgstr "Entrez un nom pour créer un nouveau joueur."
+
+#: ../game/screen_players.cc:113
+msgid "Press enter to create player!"
+msgstr "Pressez Entrer pour créer un nouveau joueur!"
+
+#: ../game/screen_players.cc:120
+msgid "You reached %1% points!"
+msgstr "%1% points marqués!"
+
+#: ../game/screen_players.cc:121
+msgid "Change player with arrow keys."
+msgstr "Changez de joueur avec les flèches"
+
+#: ../game/screen_players.cc:122
+msgid "Name:"
+msgstr "Nom:"
+
+#: ../game/screen_players.cc:125
+msgid "Type text to filter or create a new player."
+msgstr "Entrez un nom pour créer un nouveau joueur."
+
+#: ../game/screen_players.cc:125
+msgid "Search Text:"
+msgstr "Recherche:"
+
+#: ../game/songs.cc:181
 msgid "random order"
 msgstr "ordre aléatoire"
 
-#: ../game/songs.cc:205
+#: ../game/songs.cc:182
 msgid "sorted by song"
 msgstr "classement par chanson"
 
-#: ../game/songs.cc:206
+#: ../game/songs.cc:183
 msgid "sorted by artist"
 msgstr "classement par artiste"
 
-#: ../game/songs.cc:207
+#: ../game/songs.cc:184
 msgid "sorted by edition"
 msgstr "classement par édition"
 
-#: ../game/songs.cc:208
+#: ../game/songs.cc:185
 msgid "sorted by genre"
 msgstr "classement par genre"
 
-#: ../game/songs.cc:209
+#: ../game/songs.cc:186
 msgid "sorted by path"
 msgstr "classement par chemin"
 
-#: ../game/songs.cc:210
+#: ../game/songs.cc:187
 msgid "sorted by language"
 msgstr "classement par langue"
 
-#: ../game/screen_songs.cc:196
-msgid "(press END to view hiscores)"
-msgstr "(presser Fin pour voir le classement)"
+#~ msgid "filter: "
+#~ msgstr "filtre: "
+#~ msgid "none"
+#~ msgstr "aucun"
+
