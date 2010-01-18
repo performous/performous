@@ -64,7 +64,6 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 			}
 			if (keypressed == SDLK_PRINT || keypressed == SDLK_F12) {
 				g_take_screenshot = true;
-				sm.FlashMessage(_("Screenshot taken!"));
 				continue;
 			}
 			if (keypressed == SDLK_F4 && modifier & KMOD_ALT) {
@@ -161,8 +160,10 @@ void mainLoop(std::string const& songlist) {
 				fs::path filename;
 				try {
 					window.screenshot();
+					sm.FlashMessage(_("Screenshot taken!"));
 				} catch (std::exception& e) {
 					std::cerr << "ERROR: " << e.what() << std::endl;
+					sm.FlashMessage(_("Screenshot failed!"));
 				}
 				g_take_screenshot = false;
 			}
