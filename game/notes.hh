@@ -57,9 +57,8 @@ typedef std::map<std::string,Track> TrackMap;
 typedef std::map<std::string,Track const*> TrackMapConstPtr; // this one really needed ? can't we save only the map key for comparison ?
 
 namespace {
-	bool isTrackInside(TrackMap &track_map, std::string name) {
-		if( track_map.find(name) != track_map.end() ) return true;
-		return false;
+	bool isTrackInside(TrackMap const& track_map, std::string const& name) {
+		return track_map.find(name) != track_map.end();
 	}
 }
 

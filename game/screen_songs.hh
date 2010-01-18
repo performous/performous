@@ -25,7 +25,7 @@ struct ScreenSharedInfo
 
 /// song chooser screen
 class ScreenSongs : public Screen {
-  public:
+public:
 	/// constructor
 	ScreenSongs(std::string const& name, Audio& audio, Songs& songs, Database& database);
 	void enter();
@@ -35,7 +35,8 @@ class ScreenSongs : public Screen {
 	void draw();
 	void drawJukebox(); ///< draw the songbrowser in jukebox mode (fullscreen, full previews, ...)
 
-  protected:
+protected:
+	void drawInstruments(Song const& song, Dimensions const& dim, float alpha = 1.0f) const;
 	void drawMultimedia();
 	void updateMultimedia(Song& song, ScreenSharedInfo& info);
 	void stopMultimedia(ScreenSharedInfo& info);

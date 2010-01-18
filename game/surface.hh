@@ -25,6 +25,8 @@ class Dimensions {
 	Dimensions& top(float y = 0.0f) { m_y = y; m_yAnchor = TOP; return *this; }
 	/// sets bottom
 	Dimensions& bottom(float y = 0.0f) { m_y = y; m_yAnchor = BOTTOM; return *this; }
+	/// reset aspect ratio and switch to fixed width mode
+	Dimensions& ar(float ar) { m_ar = ar; return fixedWidth(m_w); }
 	/// fixes width
 	Dimensions& fixedWidth(float w) { m_w = w; m_h = w / m_ar; return *this; }
 	/// fixes height

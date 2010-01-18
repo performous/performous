@@ -215,94 +215,26 @@ void ScreenSongs::draw() {
 					else cover = m_bandCover.get();
 				}
 				Surface& s = *cover;
+				// Calculate dimensions for cover and instrument markers
 				double diff = (i == 0 ? (0.5 - fabs(shift)) * 0.07 : 0.0);
 				double y = 0.27 + 0.5 * diff;
-				// Draw the cover
-				s.dimensions.middle(-0.2 + 0.17 * (i - shift)).bottom(y - 0.2 * diff).fitInside(0.14 + diff, 0.14 + diff); s.draw();
+				s.dimensions.middle(-0.2 + 0.17 * (i - shift)).bottom(y - 0.2 * diff).fitInside(0.14 + diff, 0.14 + diff);
+				Dimensions dim = s.dimensions;
+				dim.ar(m_instrumentList->ar());
+				// Draw the cover and the instruments normally
+				s.draw();
+				drawInstruments(song_display, dim);
 				// Draw the reflection
-				s.dimensions.top(y + 0.2 * diff); s.tex = TexCoords(0, 1, 1, 0); glColor4f(1.0, 1.0, 1.0, 0.4); s.draw();
-				s.tex = TexCoords(); glColor4f(1.0, 1.0, 1.0, 1.0); // Restore default attributes
-				// Draw the intruments
 				{
-					UseTexture tex(*m_instrumentList);
-					Dimensions dim = Dimensions(m_instrumentList->ar()).middle(-0.2 + 0.17 * (i - shift)).bottom(y - (0.14+diff) - 0.2 * diff).fitInside(0.14 + diff, 0.14 + diff);
-					double x;
-					float alpha;
-					float xincr = 0.2f;
-					{
-						// vocals
-						alpha = (song_display.notes.size()) ? 1.00 : 0.25;
-						bool karaoke = (song_display.music.find("vocals") != song_display.music.end());
-						glutil::Begin block(GL_TRIANGLE_STRIP);
-						if(karaoke) {
-							glColor4f(1.0, 1.0, 0.25, alpha);
-						} else {
-							glColor4f(1.0, 1.0, 1.0, alpha);
-						}
-						x = dim.x1()+0.00*(dim.x2()-dim.x1());
-						glTexCoord2f(getIconTex(1), 0.0f); glVertex2f(x, dim.y1());
-						glTexCoord2f(getIconTex(1), 1.0f); glVertex2f(x, dim.y2());
-						x = dim.x1()+xincr*(dim.x2()-dim.x1());
-						glTexCoord2f(getIconTex(2), 0.0f); glVertex2f(x, dim.y1());
-						glTexCoord2f(getIconTex(2), 1.0f); glVertex2f(x, dim.y2());
-					}
-					{
-						// guitars
-						alpha = 1.0;
-						int guitarCount = 0;
-						if (isTrackInside(song_display.track_map,"guitar")) guitarCount++;
-						if (isTrackInside(song_display.track_map,"coop guitar")) guitarCount++;
-						if (isTrackInside(song_display.track_map,"rhythm guitar")) guitarCount++;
-						if (guitarCount == 0) { guitarCount = 1; alpha = 0.25; }
-						for (int i = guitarCount-1; i >= 0; i--) {
-							glutil::Begin block(GL_TRIANGLE_STRIP);
-							glColor4f(1.0, 1.0, 1.0, alpha);
-							x = dim.x1()+(xincr+i*0.04)*(dim.x2()-dim.x1());
-							glTexCoord2f(getIconTex(2), 0.0f); glVertex2f(x, dim.y1());
-							glTexCoord2f(getIconTex(2), 1.0f); glVertex2f(x, dim.y2());
-							x = dim.x1()+(2*xincr+i*0.04)*(dim.x2()-dim.x1());
-							glTexCoord2f(getIconTex(3), 0.0f); glVertex2f(x, dim.y1());
-							glTexCoord2f(getIconTex(3), 1.0f); glVertex2f(x, dim.y2());
-						}
-					}
-					{
-						// bass
-						alpha = (isTrackInside(song_display.track_map,"bass")) ? 1.00 : 0.25;
-						glutil::Begin block(GL_TRIANGLE_STRIP);
-						glColor4f(1.0, 1.0, 1.0, alpha);
-						x = dim.x1()+2*xincr*(dim.x2()-dim.x1());
-						glTexCoord2f(getIconTex(3), 0.0f); glVertex2f(x, dim.y1());
-						glTexCoord2f(getIconTex(3), 1.0f); glVertex2f(x, dim.y2());
-						x = dim.x1()+3*xincr*(dim.x2()-dim.x1());
-						glTexCoord2f(getIconTex(4), 0.0f); glVertex2f(x, dim.y1());
-						glTexCoord2f(getIconTex(4), 1.0f); glVertex2f(x, dim.y2());
-					}
-					{
-						// drums
-						alpha = (isTrackInside(song_display.track_map,"drums")) ? 1.00 : 0.25;
-						glutil::Begin block(GL_TRIANGLE_STRIP);
-						glColor4f(1.0, 1.0, 1.0, alpha);
-						x = dim.x1()+3*xincr*(dim.x2()-dim.x1());
-						glTexCoord2f(getIconTex(4), 0.0f); glVertex2f(x, dim.y1());
-						glTexCoord2f(getIconTex(4), 1.0f); glVertex2f(x, dim.y2());
-						x = dim.x1()+4*xincr*(dim.x2()-dim.x1());
-						glTexCoord2f(getIconTex(5), 0.0f); glVertex2f(x, dim.y1());
-						glTexCoord2f(getIconTex(5), 1.0f); glVertex2f(x, dim.y2());
-					}
-					{
-						// dancing
-						alpha = !song_display.danceTracks.empty() ? 1.00 : 0.25;
-						glutil::Begin block(GL_TRIANGLE_STRIP);
-						glColor4f(1.0, 1.0, 1.0, alpha);
-						x = dim.x1()+4*xincr*(dim.x2()-dim.x1());
-						glTexCoord2f(getIconTex(5), 0.0f); glVertex2f(x, dim.y1());
-						glTexCoord2f(getIconTex(5), 1.0f); glVertex2f(x, dim.y2());
-						x = dim.x1()+5*xincr*(dim.x2()-dim.x1());
-						glTexCoord2f(getIconTex(6), 0.0f); glVertex2f(x, dim.y1());
-						glTexCoord2f(getIconTex(6), 1.0f); glVertex2f(x, dim.y2());
-					}
-					glColor4f(1.0, 1.0, 1.0, 1.0);
+					glutil::PushMatrix m;
+					glTranslatef(0.0f, 2.0 * y, 0.0f);
+					glScalef(1.0f, -1.0f, 1.0f);
+					glColor4f(1.0f, 1.0f, 1.0f, 0.4f);
+					s.draw();
+					drawInstruments(song_display, dim, 0.4f);
 				}
+				//s.dimensions.top(y + 0.2 * diff); s.tex = TexCoords(0, 1, 1, 0); glColor4f(1.0, 1.0, 1.0, 0.4); s.draw();
+				//s.tex = TexCoords(); glColor4f(1.0, 1.0, 1.0, 1.0); // Restore default attributes
 			}
 		}
 		updateMultimedia(song, info);
@@ -323,5 +255,80 @@ void ScreenSongs::draw() {
 			m_playing.clear();
 		}
 	} else if (!m_audio.isPaused() && m_playTimer.get() > IDLE_TIMEOUT) m_songs.advance(1);  // Switch if song hasn't changed for IDLE_TIMEOUT seconds
+}
+
+void ScreenSongs::drawInstruments(Song const& song, Dimensions const& dim, float alpha) const {
+	UseTexture tex(*m_instrumentList);
+	double x;
+	float xincr = 0.2f;
+	{
+		// vocals
+		float a = alpha * (!song.notes.empty() ? 1.00 : 0.25);
+		bool karaoke = (song.music.find("vocals") != song.music.end());
+		glutil::Begin block(GL_TRIANGLE_STRIP);
+		glColor4f(1.0f, 1.0f, karaoke ? 0.25f : 1.0f, a);
+		x = dim.x1()+0.00*(dim.x2()-dim.x1());
+		glTexCoord2f(getIconTex(1), 0.0f); glVertex2f(x, dim.y1());
+		glTexCoord2f(getIconTex(1), 1.0f); glVertex2f(x, dim.y2());
+		x = dim.x1()+xincr*(dim.x2()-dim.x1());
+		glTexCoord2f(getIconTex(2), 0.0f); glVertex2f(x, dim.y1());
+		glTexCoord2f(getIconTex(2), 1.0f); glVertex2f(x, dim.y2());
+	}
+	{
+		// guitars
+		float a = alpha;
+		int guitarCount = 0;
+		if (isTrackInside(song.track_map,"guitar")) guitarCount++;
+		if (isTrackInside(song.track_map,"coop guitar")) guitarCount++;
+		if (isTrackInside(song.track_map,"rhythm guitar")) guitarCount++;
+		if (guitarCount == 0) { guitarCount = 1; a *= 0.25f; }
+		for (int i = guitarCount-1; i >= 0; i--) {
+			glutil::Begin block(GL_TRIANGLE_STRIP);
+			glColor4f(1.0f, 1.0f, 1.0f, a);
+			x = dim.x1()+(xincr+i*0.04)*(dim.x2()-dim.x1());
+			glTexCoord2f(getIconTex(2), 0.0f); glVertex2f(x, dim.y1());
+			glTexCoord2f(getIconTex(2), 1.0f); glVertex2f(x, dim.y2());
+			x = dim.x1()+(2*xincr+i*0.04)*(dim.x2()-dim.x1());
+			glTexCoord2f(getIconTex(3), 0.0f); glVertex2f(x, dim.y1());
+			glTexCoord2f(getIconTex(3), 1.0f); glVertex2f(x, dim.y2());
+		}
+	}
+	{
+		// bass
+		float a = alpha * (isTrackInside(song.track_map,"bass") ? 1.00f : 0.25f);
+		glutil::Begin block(GL_TRIANGLE_STRIP);
+		glColor4f(1.0f, 1.0f, 1.0f, a);
+		x = dim.x1()+2*xincr*(dim.x2()-dim.x1());
+		glTexCoord2f(getIconTex(3), 0.0f); glVertex2f(x, dim.y1());
+		glTexCoord2f(getIconTex(3), 1.0f); glVertex2f(x, dim.y2());
+		x = dim.x1()+3*xincr*(dim.x2()-dim.x1());
+		glTexCoord2f(getIconTex(4), 0.0f); glVertex2f(x, dim.y1());
+		glTexCoord2f(getIconTex(4), 1.0f); glVertex2f(x, dim.y2());
+	}
+	{
+		// drums
+		float a = alpha * (song.hasDrums() ? 1.00f : 0.25f);
+		glutil::Begin block(GL_TRIANGLE_STRIP);
+		glColor4f(1.0f, 1.0f, 1.0f, a);
+		x = dim.x1()+3*xincr*(dim.x2()-dim.x1());
+		glTexCoord2f(getIconTex(4), 0.0f); glVertex2f(x, dim.y1());
+		glTexCoord2f(getIconTex(4), 1.0f); glVertex2f(x, dim.y2());
+		x = dim.x1()+4*xincr*(dim.x2()-dim.x1());
+		glTexCoord2f(getIconTex(5), 0.0f); glVertex2f(x, dim.y1());
+		glTexCoord2f(getIconTex(5), 1.0f); glVertex2f(x, dim.y2());
+	}
+	{
+		// dancing
+		float a = alpha * (song.hasDance() ? 1.00f : 0.25f);
+		glutil::Begin block(GL_TRIANGLE_STRIP);
+		glColor4f(1.0f, 1.0f, 1.0f, a);
+		x = dim.x1()+4*xincr*(dim.x2()-dim.x1());
+		glTexCoord2f(getIconTex(5), 0.0f); glVertex2f(x, dim.y1());
+		glTexCoord2f(getIconTex(5), 1.0f); glVertex2f(x, dim.y2());
+		x = dim.x1()+5*xincr*(dim.x2()-dim.x1());
+		glTexCoord2f(getIconTex(6), 0.0f); glVertex2f(x, dim.y1());
+		glTexCoord2f(getIconTex(6), 1.0f); glVertex2f(x, dim.y2());
+	}
+	glColor3f(1.0f, 1.0f, 1.0f);
 }
 
