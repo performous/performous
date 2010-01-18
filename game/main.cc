@@ -205,6 +205,7 @@ void jstestLoop() {
 		Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), false);
 		// Main loop
 		boost::xtime time = now();
+		int oldjoy = -1, oldaxis = -1, oldvalue = -1;
 		while (true) {
 			SDL_Event e;
 			while(SDL_PollEvent(&e) == 1) {
@@ -213,7 +214,12 @@ void jstestLoop() {
 				} else if (e.type == SDL_JOYBUTTONDOWN) {
 					std::cout << "JoyID: " << int(e.jbutton.which) << ", button: " << int(e.jbutton.button) << ", state: " << int(e.jbutton.state) << std::endl;
 				} else if (e.type == SDL_JOYAXISMOTION) {
-					std::cout << "JoyID: " << int(e.jaxis.which) << ", axis: " << int(e.jaxis.axis) << ", value: " << int(e.jaxis.value) << std::endl;
+					if ((oldjoy != int(e.jaxis.which)) || (oldaxis != int(e.jaxis.axis)) || (oldvalue != int(e.jaxis.value))) {
+						std::cout << "JoyID: " << int(e.jaxis.which) << ", axis: " << int(e.jaxis.axis) << ", value: " << int(e.jaxis.value) << std::endl;
+						oldjoy = int(e.jaxis.which);
+						oldaxis = int(e.jaxis.axis);
+						oldvalue = int(e.jaxis.value);
+					}
 				} else if (e.type == SDL_JOYHATMOTION) {
 					std::cout << "JoyID: " << int(e.jhat.which) << ", hat: " << int(e.jhat.hat) << ", value: " << int(e.jhat.value) << std::endl;
 				}
