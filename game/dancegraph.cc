@@ -413,7 +413,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	glutil::Color c(1.0f, 1.0f, 1.0f);
 
 	// Did we hit it?
-	if (note.isHit && std::abs(tEnd) < maxTolerance && note.hitAnim.getTarget() == 0) {
+	if (note.isHit && (note.releaseTime > 0.0 || std::abs(tEnd) < maxTolerance) && note.hitAnim.getTarget() == 0.0) {
 		if (mine) note.hitAnim.setRate(1.0);
 		note.hitAnim.setTarget(1.0, false);
 	}
@@ -465,7 +465,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 			text = "HOLD";
 			glow = 1.0;
 		} else if (glow > 0.0) { // Released already, display rank
-			text = getRank(note.error);
+			text = note.score ? getRank(note.error) : "FAIL!";
 		}
 		if (!text.empty()) {
 			glColor3f(1.0f, 1.0f, 1.0f);
