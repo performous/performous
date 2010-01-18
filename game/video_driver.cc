@@ -34,6 +34,7 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	resize();
 	SDL_ShowCursor(SDL_DISABLE);
 	SDL_EnableUNICODE(SDL_ENABLE);
+	if (glewInit() != GLEW_OK) throw std::runtime_error("Initializing GLEW failed (is your OpenGL broken?)");
 	input::SDL::init();
 }
 
