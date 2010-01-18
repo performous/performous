@@ -64,6 +64,7 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 			}
 			if (keypressed == SDLK_PRINT || keypressed == SDLK_F12) {
 				g_take_screenshot = true;
+				sm.FlashMessage(_("Screenshot taken!"));
 				continue;
 			}
 			if (keypressed == SDLK_F4 && modifier & KMOD_ALT) {
@@ -170,6 +171,7 @@ void mainLoop(std::string const& songlist) {
 				// Draw
 				window.blank();
 				sm.getCurrentScreen()->draw();
+				sm.FlashMessages();
 				// Display (and wait until next frame)
 				window.swap();
 				if (config["graphic/fps"].b()) {

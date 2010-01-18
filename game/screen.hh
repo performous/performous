@@ -1,6 +1,8 @@
 #pragma once
 
 #include "singleton.hh"
+#include "animvalue.hh"
+#include "opengl_text.hh"
 #include <boost/ptr_container/ptr_map.hpp>
 #include <SDL.h>
 #include <string>
@@ -44,6 +46,19 @@ class ScreenManager: public Singleton <ScreenManager> {
 	Screen* getCurrentScreen() { return currentScreen; };
 	/// returns pointer to Screen for given name
 	Screen* getScreen(std::string const& name);
+	
+	/// Get time to fade in/out the message
+	float getFadeTime();
+	/// Get time the message have to been showned
+	float getShowTime();
+	/// Set time to fade in/out the message
+	bool setFadeTime(float fadeTime);
+	/// Set time the message have to been showned
+	bool setShowTime(float showTime);
+	/// Set a messag to flash in current screen
+	void FlashMessage(std::string const& name);
+	/// Flash messages in current screen
+	void FlashMessages();
 
 	/// sets finished to true
 	void finished() { m_finished=true; };
@@ -52,9 +67,14 @@ class ScreenManager: public Singleton <ScreenManager> {
 
   private:
 	bool m_finished;
+	float m_timeToFade;
+	float m_timeToShow;
 	typedef boost::ptr_map<std::string, Screen> screenmap_t;
 	screenmap_t screens;
 	Screen* newScreen;
 	Screen* currentScreen;
+	AnimValue m_messagePopup;
+	SvgTxtTheme m_textMessage;
+	std::string m_message;
 };
 
