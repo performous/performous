@@ -212,6 +212,8 @@ void jstestLoop() {
 			while(SDL_PollEvent(&e) == 1) {
 				if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE)) {
 					return;
+				} else if (e.type == SDL_KEYDOWN) {
+					std::cout << "Keyboard key: " << int(e.key.keysym.sym) << ", mod: " << int(e.key.keysym.mod) << std::endl;
 				} else if (e.type == SDL_JOYBUTTONDOWN) {
 					std::cout << "JoyID: " << int(e.jbutton.which) << ", button: " << int(e.jbutton.button) << ", state: " << int(e.jbutton.state) << std::endl;
 				} else if (e.type == SDL_JOYAXISMOTION) {
