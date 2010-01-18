@@ -37,7 +37,7 @@ void Backgrounds::reload_internal() {
 		if (diff > 0 && m_loading) std::cout << diff << " backgrounds loaded" << std::endl;
 	}
 	m_loading = false;
-	{	
+	{
 		boost::mutex::scoped_lock l(m_mutex);
 		random_shuffle(m_bgs.begin(), m_bgs.end());
 		m_dirty = false;

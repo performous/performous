@@ -40,13 +40,13 @@ void Object3d::loadWavefrontObj(std::string filepath, float scale) {
 		std::istringstream srow(row);
 		float x,y,z;
 		std::string tempst;
-		if (row.substr(0,2) == "v ") { 				// Vertices
+		if (row.substr(0,2) == "v ") {			// Vertices
 			srow >> tempst >> x >> y >> z;
 			m_vertices.push_back(Vertex(x*scale,y*scale,z*scale));
-		} else if (row.substr(0,2) == "vt") { 		// Texture Coordinates
+		} else if (row.substr(0,2) == "vt") {		// Texture Coordinates
 			srow >> tempst >> x >> y;
 			m_texcoords.push_back(TexCoord(x,y));
-		} else if (row.substr(0,2) == "vn") { 		// Normals
+		} else if (row.substr(0,2) == "vn") {		// Normals
 			srow >> tempst >> x >> y >> z;
 			double sum = std::abs(x)+std::abs(y)+std::abs(z);
 			if (sum == 0) throw std::runtime_error("Object "+filepath+" has invalid normal(s).");

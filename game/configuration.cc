@@ -72,7 +72,7 @@ namespace {
 		fmter % boost::io::group(std::setprecision(precision), double(m) * boost::get<T>(value));
 		return fmter.str();
 	}
-	
+
 	fs::path origin;  // The primary shared data folder
 }
 

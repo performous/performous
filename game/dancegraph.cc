@@ -61,7 +61,7 @@ namespace {
 			return "Way off!";
 		}
 	}
-	
+
 	struct lessEnd {
 		bool operator()(const DanceNote& left, const DanceNote& right) {
 			return left.note.end < right.note.end;
@@ -105,10 +105,10 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
 		m_pressed_anim[i] = AnimValue(0.0, 4.0);
 		m_arrow_map[i] = -1;
 	}
-	
+
 	if(m_song.danceTracks.empty())
 		throw std::runtime_error("Could not find any dance tracks.");
-	
+
 	gameMode(0);
 }
 
@@ -148,7 +148,7 @@ void DanceGraph::gameMode(int direction) {
 	else if (gm == "ez2-real") { m_pads = 7; std::copy(mapping7, mapping7+max_panels, m_arrow_map); }
 	else if (gm == "para-single") { m_pads = 5; std::copy(mapping5, mapping5+max_panels, m_arrow_map); }
 	else throw std::runtime_error("Unknown track " + gm);
-	
+
 	difficultyDelta(0); // Construct new notes
 }
 
@@ -371,7 +371,7 @@ void DanceGraph::draw(double time) {
 
 		// Draw the "neck" graph (beat lines)
 		drawBeats(time);
-	
+
 		// Arrows on cursor
 		glColor3f(1.0f, 1.0f, 1.0f);
 		for (int arrow_i = 0; arrow_i < m_pads; ++arrow_i) {
@@ -381,7 +381,7 @@ void DanceGraph::draw(double time) {
 			float s = (5.0 - l) / 5.0;
 			drawArrow(arrow_i, m_arrows_cursor, x, y, s);
 		}
-	
+
 		// Draw the notes
 		for (DanceNotes::iterator it = m_notes.begin(); it != m_notes.end(); ++it) {
 			if (it->note.end - time < past) continue;
@@ -424,14 +424,14 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	float yBeg = time2y(tBeg);
 	float yEnd = time2y(tEnd);
 	glutil::Color c(1.0f, 1.0f, 1.0f);
-	
+
 	// Did we hit it?
 	if (note.isHit && std::abs(tEnd) < maxTolerance && note.hitAnim.getTarget() == 0) {
 		if (mine) note.hitAnim.setRate(1.0);
 		note.hitAnim.setTarget(1.0, false);
 	}
 	double glow = note.hitAnim.get();
-	
+
 	if (yEnd - yBeg > arrowSize) {
 		// Draw holds
 		glColor4fv(c);
@@ -502,7 +502,7 @@ void DanceGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 		m_text.dimensions.screenBottom(-0.35).middle(0.32 * dimensions.w() + offsetX);
 		m_text.draw(boost::lexical_cast<std::string>(unsigned(getScore())));
 		m_text.dimensions.screenBottom(-0.32).middle(0.32 * dimensions.w() + offsetX);
-		m_text.draw(boost::lexical_cast<std::string>(unsigned(m_streak)) + "/" 
+		m_text.draw(boost::lexical_cast<std::string>(unsigned(m_streak)) + "/"
 		  + boost::lexical_cast<std::string>(unsigned(m_longestStreak)));
 	}
 	// Draw streak pop-up for long streak intervals

@@ -32,7 +32,7 @@ class Backgrounds: boost::noncopyable {
 	int empty() const { return m_bgs.empty(); };
 	/// returns random background
 	std::string getRandom();
-	
+
   private:
 	typedef std::vector<std::string> BGVector;
 	BGVector m_bgs;
