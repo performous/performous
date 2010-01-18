@@ -20,6 +20,12 @@
 
 namespace {
 	static const double QUIT_TIMEOUT = 20.0; // Return to songs screen after 20 seconds in score screen
+
+	/// Add a flash message about the state of a config item
+	void dispInFlash(ConfigItem& ci) {
+		ScreenManager* sm = ScreenManager::getSingletonPtr();
+		sm->FlashMessage(ci.getShortDesc() + ": " + ci.getValue());
+	}
 }
 
 void ScreenSing::enter() {
@@ -211,22 +217,22 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			}
 		}
 		// Volume control
-		if (nav == input::VOLUME_UP) ++config["audio/music_volume"];
-		if (nav == input::VOLUME_DOWN) --config["audio/music_volume"];
+		if (nav == input::VOLUME_UP) dispInFlash(++config["audio/music_volume"]);
+		if (nav == input::VOLUME_DOWN) dispInFlash(--config["audio/music_volume"]);
 	}
 	// Ctrl combinations that can be used while performing (not when score dialog is displayed)
 	if (event.type == SDL_KEYDOWN && (event.key.keysym.mod & KMOD_CTRL) && !m_score_window.get()) {
 		if (key == SDLK_s) m_audio.toggleSynth(m_song->notes);
 		if (key == SDLK_v) m_audio.streamFade("vocals", event.key.keysym.mod & KMOD_SHIFT ? 1.0 : 0.0);
-		if (key == SDLK_k) ++config["game/karaoke_mode"]; // Toggle karaoke mode
-		if (key == SDLK_w) ++config["game/pitch"]; // Toggle pitch wave
+		if (key == SDLK_k) dispInFlash(++config["game/karaoke_mode"]); // Toggle karaoke mode
+		if (key == SDLK_w) dispInFlash(++config["game/pitch"]); // Toggle pitch wave
 		// Latency settings
-		if (key == SDLK_F1) --config["audio/video_delay"];
-		if (key == SDLK_F2) ++config["audio/video_delay"];
-		if (key == SDLK_F3) --config["audio/round-trip"];
-		if (key == SDLK_F4) ++config["audio/round-trip"];
-		if (key == SDLK_F5) --config["audio/controller_delay"];
-		if (key == SDLK_F6) ++config["audio/controller_delay"];
+		if (key == SDLK_F1) dispInFlash(--config["audio/video_delay"]);
+		if (key == SDLK_F2) dispInFlash(++config["audio/video_delay"]);
+		if (key == SDLK_F3) dispInFlash(--config["audio/round-trip"]);
+		if (key == SDLK_F4) dispInFlash(++config["audio/round-trip"]);
+		if (key == SDLK_F5) dispInFlash(--config["audio/controller_delay"]);
+		if (key == SDLK_F6) dispInFlash(++config["audio/controller_delay"]);
 		bool seekback = false;
 		if (m_song->danceTracks.empty()) { // Seeking backwards is currently not permitted for dance songs
 			if (key == SDLK_HOME) { m_audio.seekPos(0.0); seekback = true; }
