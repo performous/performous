@@ -5,12 +5,12 @@
 
 template<> ScreenManager* Singleton<ScreenManager>::ms_Singleton = NULL;
 
-ScreenManager::ScreenManager(): m_finished(false), currentScreen(), m_messagePopup(0.0, 1.0), m_textMessage(getThemePath("sing_timetxt.svg")) {
+ScreenManager::ScreenManager(): m_finished(false), currentScreen(), m_messagePopup(0.0, 1.0), m_textMessage(getThemePath("message_text.svg")) {
 	m_timeToFade = 1.0f;
 	m_timeToShow = 3.0f;
 
 	m_messagePopup.setTarget(100.0);
-	m_textMessage.dimensions.fixedWidth(0.5).right(0.5).screenTop(0.01);
+	m_textMessage.dimensions.middle().screenTop(0.05);
 }
 
 void ScreenManager::activateScreen(std::string const& name) {
