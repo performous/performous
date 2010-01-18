@@ -104,6 +104,10 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 			ss->setSong(m_songs.currentPtr());
 			sm->activateScreen("Hiscore");
 		}
+		else if (key == SDLK_F5) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 8); // Vocals
+		else if (key == SDLK_F6) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 4); // Guitars
+		else if (key == SDLK_F7) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 2); // Drums
+		else if (key == SDLK_F8) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 1); // Dance
 	}
 }
 
@@ -259,7 +263,7 @@ void ScreenSongs::drawInstruments(Song const& song, Dimensions const& dim, float
 	float xincr = 0.2f;
 	{
 		// vocals
-		float a = alpha * (!song.notes.empty() ? 1.00 : 0.25);
+		float a = alpha * (song.hasVocals() ? 1.00 : 0.25);
 		bool karaoke = (song.music.find("vocals") != song.music.end());
 		glutil::Begin block(GL_TRIANGLE_STRIP);
 		glColor4f(1.0f, 1.0f, karaoke ? 0.25f : 1.0f, a);

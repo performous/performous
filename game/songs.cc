@@ -16,7 +16,7 @@
 #include <stdexcept>
 #include <cstdlib>
 
-Songs::Songs(Database & database, std::string const& songlist): m_songlist(songlist), math_cover(), m_database(database), m_order(), m_dirty(false), m_loading(false) {
+Songs::Songs(Database & database, std::string const& songlist): m_songlist(songlist), math_cover(), m_typeFilter(), m_database(database), m_order(), m_dirty(false), m_loading(false) {
 	reload();
 }
 
@@ -120,6 +120,12 @@ void Songs::setFilter(std::string const& val) {
 	filter_internal();
 }
 
+void Songs::setTypeFilter(unsigned char filter) {
+	if (m_typeFilter == filter) return;
+	m_typeFilter = filter;
+	filter_internal();
+}
+
 void Songs::filter_internal() {
 	boost::mutex::scoped_lock l(m_mutex);
 	// Print messages when loading has finished
@@ -132,7 +138,12 @@ void Songs::filter_internal() {
 	try {
 		SongVector filtered;
 		for (SongVector::const_iterator it = m_songs.begin(); it != m_songs.end(); ++it) {
-			if (regex_search(it->get()->strFull(), boost::regex(m_filter, boost::regex_constants::icase))) filtered.push_back(*it);
+			Song& s = **it;
+			if ((m_typeFilter & 1) && !s.hasDance()) continue;
+			if ((m_typeFilter & 2) && !s.hasDrums()) continue;
+			if ((m_typeFilter & 4) && !s.hasGuitars()) continue;
+			if ((m_typeFilter & 8) && !s.hasVocals()) continue;
+			if (regex_search(s.strFull(), boost::regex(m_filter, boost::regex_constants::icase))) filtered.push_back(*it);
 		}
 		m_filtered.swap(filtered);
 	} catch (...) {

@@ -46,6 +46,7 @@ class Song: boost::noncopyable {
 	bool hasDance() const { return !danceTracks.empty(); }
 	bool hasDrums() const { return track_map.find("drums") != track_map.end(); }
 	bool hasGuitars() const { return track_map.size() - hasDrums(); }
+	bool hasVocals() const { return !notes.empty(); }
 	int noteMin, ///< lowest note
 	    noteMax; ///< highest note
 	std::string path; ///< path of songfile
