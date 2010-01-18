@@ -219,11 +219,8 @@ void ScreenSongs::draw() {
 				double diff = (i == 0 ? (0.5 - fabs(shift)) * 0.07 : 0.0);
 				double y = 0.27 + 0.5 * diff;
 				s.dimensions.middle(-0.2 + 0.17 * (i - shift)).bottom(y - 0.2 * diff).fitInside(0.14 + diff, 0.14 + diff);
-				Dimensions dim = s.dimensions;
-				dim.ar(m_instrumentList->ar());
-				// Draw the cover and the instruments normally
+				// Draw the cover normally
 				s.draw();
-				drawInstruments(song_display, dim);
 				// Draw the reflection
 				{
 					glutil::PushMatrix m;
@@ -231,10 +228,8 @@ void ScreenSongs::draw() {
 					glScalef(1.0f, -1.0f, 1.0f);
 					glColor4f(1.0f, 1.0f, 1.0f, 0.4f);
 					s.draw();
-					drawInstruments(song_display, dim, 0.4f);
+					glColor3f(1.0f, 1.0f, 1.0f);
 				}
-				//s.dimensions.top(y + 0.2 * diff); s.tex = TexCoords(0, 1, 1, 0); glColor4f(1.0, 1.0, 1.0, 0.4); s.draw();
-				//s.tex = TexCoords(); glColor4f(1.0, 1.0, 1.0, 1.0); // Restore default attributes
 			}
 		}
 		updateMultimedia(song, info);
@@ -245,6 +240,7 @@ void ScreenSongs::draw() {
 		theme->song.draw(oss_song.str());
 		theme->order.draw(oss_order.str());
 		theme->hiscore.draw(oss_hiscore.str());
+		if (!m_songs.empty()) drawInstruments(m_songs.current(), Dimensions(m_instrumentList->ar()).fixedHeight(0.03).center(-0.04));
 	}
 	stopMultimedia(info);
 	if (m_jukebox) {
