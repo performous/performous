@@ -10,7 +10,6 @@
 namespace {
 	const std::string diffv[] = { "Beginner", "Easy", "Medium", "Hard", "Challenge" };
 	const int death_delay = 25; // Delay in notes after which the player is hidden
-	const float not_joined = -100; // A value that indicates player hasn't joined
 	const float join_delay = 7.0f; // Time to select track/difficulty when joining mid-game
 	const float past = -0.3f;
 	const float future = 2.0f;
@@ -93,7 +92,7 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
   m_streak(),
   m_longestStreak(),
   m_bigStreak(),
-  m_jointime(not_joined),
+  m_jointime(getNaN()),
   m_dead()
 {
 	m_popupText.reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
@@ -154,7 +153,7 @@ void DanceGraph::gameMode(int direction) {
 
 /// Are we alive?
 bool DanceGraph::dead() const {
-	return m_jointime == not_joined || m_dead >= death_delay;
+	return m_jointime != m_jointime || m_dead >= death_delay;
 }
 
 /// Get the difficulty as displayable string
@@ -167,7 +166,6 @@ std::string DanceGraph::getDifficultyString() const {
 /// Attempt to change the difficulty by a step
 void DanceGraph::difficultyDelta(int delta) {
 	int newLevel = m_level + delta;
-	std::cout << "difficultyDelta called with " << delta << " (newLevel = " << newLevel << ")" << std::endl;
 	if(newLevel >= DIFFICULTYCOUNT || newLevel < 0) return; // Out of bounds
 	DanceTracks::const_iterator it = m_song.danceTracks.find(m_gamingMode);
 	if(it->second.find((DanceDifficulty)newLevel) != it->second.end())
@@ -185,13 +183,11 @@ void DanceGraph::difficulty(DanceDifficulty level) {
 		m_notes.push_back(DanceNote(*it));
 	std::sort(m_notes.begin(), m_notes.end(), lessEnd()); // for engine's iterators
 	m_notesIt = m_notes.begin();
-//	std::cout << "Difficulty set to: " << level << std::endl;
 	m_level = level;
 	for(size_t i = 0; i < max_panels; i++) m_activeNotes[i] = m_notes.end();
 	m_scoreFactor = 1;
 	if(m_notes.size() != 0)
 		m_scoreFactor = 10000.0 / (50 * m_notes.size()); // maxpoints / (notepoint * notes)
-	std::cout << "Scorefactor: " << m_scoreFactor << std::endl;
 }
 
 /// Handles input and some logic
@@ -208,12 +204,12 @@ void DanceGraph::engine() {
 	// Handle all events
 	for (input::Event ev; m_input.tryPoll(ev);) {
 		m_dead = 0; // Keep alive
-		if (m_jointime == not_joined) { // Handle joining
-			m_jointime = (time < -1.0 ? -1.0 - join_delay : time);
+		if (m_jointime != m_jointime) { // Handle joining
+			m_jointime = time < -1.0 ? -1.0 : time + join_delay;
 			break;
 		}
 		// Difficulty / mode selection
-		if (time < m_jointime + join_delay && ev.type == input::Event::PRESS) {
+		if (time < m_jointime && ev.type == input::Event::PRESS) {
 			if (ev.pressed[STEP_UP]) difficultyDelta(1);
 			else if (ev.pressed[STEP_DOWN]) difficultyDelta(-1);
 			else if (ev.pressed[STEP_LEFT]) gameMode(-1);
@@ -235,14 +231,9 @@ void DanceGraph::engine() {
 	// Notes gone by
 	for (DanceNotes::iterator& it = m_notesIt; it != m_notes.end() && time > it->note.end + maxTolerance; it++) {
 		if(!it->isHit) { // Missed
-			std::cout << "(Engine) Missed note at time " << time
-			  << "(note timing " << it->note.begin << ")" << std::endl;
 			if (it->note.type != Note::MINE) m_streak = 0;
 		} else { // Hit, add score
-			if(it->note.type != Note::MINE) {
-				std::cout << "Note correctly played.." << std::endl;
-				m_score += it->score;
-			}
+			if(it->note.type != Note::MINE) m_score += it->score;
 			if(!it->releaseTime) it->releaseTime = time;
 		}
 		++m_dead;
@@ -253,7 +244,6 @@ void DanceGraph::engine() {
 	for (DanceNotes::iterator it = m_notesIt; it != m_notes.end() && time <= it->note.begin + maxTolerance; it++) {
 		if(!it->isHit && it->note.type == Note::MINE && m_pressed[it->note.note] &&
 		  it->note.begin >= time - maxTolerance && it->note.end <= time + maxTolerance) {
-			std::cout << "Hit mine at " << time << "!" << std::endl;
 			it->isHit = true;
 			m_score -= points(0);
 		}
@@ -275,15 +265,12 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 			if(!it->releaseTime && it->note.end > time + maxTolerance) {
 				it->releaseTime = time;
 				it->score = 0;
-				std::cout << "Failed to hold note " << it->note.note << "! Begin: "
-				  << it->note.begin << "; End: " << it->note.end << std::endl;
 				m_streak = 0;
 			}
 		}
 		return;
 	}
 
-	std::cout << "Hit button " << ev.button << " at " << time << std::endl;
 	for (DanceNotes::iterator it = m_notesIt; it != m_notes.end() && time <= it->note.end + maxTolerance; it++) {
 		if(!it->isHit && std::abs(time - it->note.begin) <= maxTolerance && ev.button == it->note.note) {
 			it->isHit = true;
@@ -493,7 +480,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 /// Draw popups and other info texts
 void DanceGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 	// Draw info
-	if (time < m_jointime + join_delay) {
+	if (time < m_jointime) {
 		m_text.dimensions.screenBottom(-0.075).middle(-0.09 + offsetX);
 		m_text.draw("^ " + getDifficultyString() + " v");
 		m_text.dimensions.screenBottom(-0.050).middle(-0.09 + offsetX);

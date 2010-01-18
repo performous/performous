@@ -18,7 +18,6 @@ namespace {
 	};
 	const size_t diffsz = sizeof(diffv) / sizeof(*diffv);
 	const int death_delay = 20; // Delay in notes after which the player is hidden
-	const float not_joined = -100; // A value that indicates player hasn't joined
 	const float join_delay = 6.0f; // Time to select track/difficulty when joining mid-game
 	const float g_angle = 80.0f;
 	const float past = -0.2f;
@@ -88,7 +87,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number)
   m_streak(),
   m_longestStreak(),
   m_bigStreak(),
-  m_jointime(not_joined),
+  m_jointime(getNaN()),
   m_dead()
 {
 	// Copy all tracks of supported types (either drums or non-drums) to m_track_map
@@ -98,13 +97,8 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number)
 	}
 	if (m_track_map.empty()) throw std::logic_error(m_drums ? "No drum tracks found" : "No guitar tracks found");
 	// Load 3D fret objects
-	try {
-		m_fretObj.load(getThemePath("fret.obj"));
-		m_tappableObj.load(getThemePath("fret_tap.obj"));
-	} catch (std::exception const& e) {
-		std::cout << e.what() << std::endl;
-		m_use3d = false;
-	}
+	m_fretObj.load(getThemePath("fret.obj"));
+	m_tappableObj.load(getThemePath("fret_tap.obj"));
 	// Score calculator (TODO a better one)
 	m_popupText.reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	// Load fail sounds
@@ -207,7 +201,7 @@ void GuitarGraph::engine() {
 		// breaks to be usable with FoF songs.
 		if (dead() && m_input.isKeyboard() && ev.type == input::Event::PICK) continue;
 		m_dead = 0; // Keep alive
-		if (m_jointime == not_joined) m_jointime = (time < -1.0 ? -1.0 - join_delay : time); // Handle joining
+		if (m_jointime != m_jointime) m_jointime = time < -1.0 ? -1.0 : time + join_delay; // Handle joining
 		// Handle Start/Select keypresses
 		if (ev.type == input::Event::PRESS && ev.button > input::STARPOWER_BUTTON) {
 			if (ev.button == 9) ev.button = input::STARPOWER_BUTTON; // Start works for GodMode
@@ -226,7 +220,7 @@ void GuitarGraph::engine() {
 		if (ev.type == input::Event::PRESS) m_hit[!m_drums + ev.button].setValue(1.0);
 		else if (ev.type == input::Event::PICK) m_hit[0].setValue(1.0);
 		// Difficulty and track selection
-		if (time < m_jointime + join_delay) {
+		if (time < m_jointime) {
 			if (ev.type == input::Event::PICK || ev.type == input::Event::PRESS) {
 				if (!m_drums && ev.pressed[4]) nextTrack();
 				if (ev.pressed[0 + m_drums]) difficulty(DIFFICULTY_SUPAEASY);
@@ -300,7 +294,7 @@ void GuitarGraph::engine() {
 
 /// Are we alive?
 bool GuitarGraph::dead() const {
-	return m_jointime == not_joined || m_dead >= death_delay;
+	return m_jointime != m_jointime || m_dead >= death_delay;
 }
 
 /// Attempt to activate GodMode
@@ -333,7 +327,6 @@ void GuitarGraph::endHold(int fret, double time) {
 
 /// Do stuff when a note is played incorrectly
 void GuitarGraph::fail(double time, int fret) {
-	std::cout << "MISS" << std::endl;
 	if (fret == -2) return; // Tapped note
 	if (fret == -1) {
 		for (int i = 0; i < 5; ++i) endHold(i, time);
@@ -362,12 +355,10 @@ void GuitarGraph::drumHit(double time, int fret) {
 			tolerance = error;
 		}
 	}
-	std::cout << "Drum: ";
 	if (best == m_chords.end()) fail(time, fret);
 	else {
 		for (; best != m_chordIt; ++m_chordIt) {
 			if (m_chordIt->status == m_chordIt->polyphony) continue;
-			std::cout << "SKIPPED, ";
 			endStreak();
 		}
 		++m_chordIt->status;
@@ -385,9 +376,6 @@ void GuitarGraph::drumHit(double time, int fret) {
 			//m_score += m_chordIt->score;
 			m_streak += 1;
 			if (m_streak > m_longestStreak) m_longestStreak = m_streak;
-			std::cout << "FULL HIT!" << std::endl;
-		} else {
-			std::cout << "HIT" << std::endl;
 		}
 		m_correctness.setTarget(double(m_chordIt->status) / m_chordIt->polyphony, true);
 	}
@@ -438,12 +426,10 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 			tolerance = error;
 		}
 	}
-	std::cout << (picked ? "Pick: " : "Tap: ");
 	if (best == m_chords.end()) fail(time, picked ? -1 : -2);
 	else { // Correctly hit
 		m_chordIt = best;
 		int& score = m_chordIt->score;
-		std::cout << "HIT, error = " << int(1000.0 * (best->begin - time)) << " ms" << std::endl;
 		m_score -= score;
 		m_starmeter -= score;
 		bool first_time = (score == 0 ? true : false);
@@ -739,7 +725,7 @@ void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, fl
 /// Draw popups and other info texts
 void GuitarGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 	// Draw info
-	if (time < m_jointime + join_delay) {
+	if (time < m_jointime) {
 		m_text.dimensions.screenBottom(-0.041).middle(-0.09 + offsetX);
 		m_text.draw(diffv[m_level].name);
 		m_text.dimensions.screenBottom(-0.015).middle(-0.09 + offsetX);
