@@ -59,5 +59,4 @@ SS Ripper:
 Bugs:
 
 - Segfault when browsing songs in song browser while loading (segfaults before loading finishes), quite rare
-- Players screen displays shit
 

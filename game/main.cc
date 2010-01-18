@@ -167,9 +167,10 @@ void mainLoop(std::string const& songlist) {
 			}
 			sm.updateScreen();  // exit/enter, any exception is fatal error
 			try {
-				checkEvents_SDL(sm, window);
+				// Draw
 				window.blank();
 				sm.getCurrentScreen()->draw();
+				// Display (and wait until next frame)
 				window.swap();
 				if (config["graphic/fps"].b()) {
 					++frames;
@@ -183,6 +184,8 @@ void mainLoop(std::string const& songlist) {
 					time = now();
 					frames = 0;
 				}
+				// Process events for the next frame
+				checkEvents_SDL(sm, window);
 			} catch (std::runtime_error& e) {
 				std::cerr << "ERROR: " << e.what() << std::endl;
 			}
