@@ -73,35 +73,35 @@ class GuitarGraph {
 	void endHold(int fret, double time = 0.0);
 	void endStreak() { m_streak = 0; m_bigStreak = 0; }
 	Audio& m_audio;
-	input::InputDev m_input;
+	input::InputDev m_input; /// input device (guitar/drums/keyboard)
 	Song const& m_song;
 	Surface m_button;
 	Texture m_button_l;
 	Texture m_flame;
 	Texture m_flame_godmode;
-	Surface m_tap;
-	Surface m_neckglow;
+	Surface m_tap; /// image for 2d HOPO note cap
+	Surface m_neckglow; /// image for the glow from the bottom of the neck
 	glutil::Color m_neckglowColor;
-	Object3d m_fretObj;
-	Object3d m_tappableObj;
+	Object3d m_fretObj; /// 3d object for regular note
+	Object3d m_tappableObj; /// 3d object for the HOPO note cap
 	AnimValue m_hit[6];
-	std::vector<Sample> m_samples;
-	boost::scoped_ptr<Texture> m_neck;
-	bool m_drums;
-	bool m_use3d;
-	AnimValue m_starpower;
-	AnimValue m_cx, m_width;
+	std::vector<Sample> m_samples; /// sound effects
+	boost::scoped_ptr<Texture> m_neck; /// necks
+	bool m_drums; /// are we using drums?
+	bool m_use3d; /// are we using 3d?
+	AnimValue m_starpower; /// how long the GodMode lasts (also used in fading the effect)
+	AnimValue m_cx, m_width; /// controls horizontal position and width smoothly
 	std::size_t m_stream;
-	std::vector<AnimValue> m_flames[5];
-	TrackMapConstPtr m_track_map;
+	std::vector<AnimValue> m_flames[5]; /// flame effect queues for each fret
+	TrackMapConstPtr m_track_map; /// tracks
 	TrackMapConstPtr::const_iterator m_track_index;
 	void drumHit(double time, int pad);
 	void guitarPlay(double time, input::Event const& ev);
 	enum Difficulty {
-		DIFFICULTY_SUPAEASY,
-		DIFFICULTY_EASY,
-		DIFFICULTY_MEDIUM,
-		DIFFICULTY_AMAZING,
+		DIFFICULTY_SUPAEASY, // Easy
+		DIFFICULTY_EASY,     // Medium
+		DIFFICULTY_MEDIUM,   // Hard
+		DIFFICULTY_AMAZING,  // Expert
 		DIFFICULTYCOUNT
 	} m_level;
 	struct Event {
@@ -116,7 +116,7 @@ class GuitarGraph {
 	};
 	typedef std::vector<Event> Events;
 	Events m_events;
-	unsigned m_holds[5];
+	unsigned m_holds[5]; /// active hold notes
 	glutil::Color const& color(int fret) const;
 	void drawBar(double time, float h);
 	void drawNote(int fret, glutil::Color, float tBeg, float tEnd, float whammy = 0, bool tappable = false, bool hit = false, double hitAnim = 0.0, double releaseTime = 0.0);
@@ -133,15 +133,15 @@ class GuitarGraph {
 	typedef std::map<Duration const*, unsigned> NoteStatus; // Note in song to m_events[unsigned - 1] or 0 for not played
 	NoteStatus m_notes;
 	AnimValue m_correctness;
-	AnimValue m_streakPopup;
-	AnimValue m_godmodePopup;
-	double m_score;
-	double m_scoreFactor;
-	double m_starmeter;
-	int m_streak;
-	int m_longestStreak;
-	int m_bigStreak;
-	double m_jointime;
-	int m_dead;
+	AnimValue m_streakPopup; /// for animating the popup
+	AnimValue m_godmodePopup; /// for animating the popup
+	double m_score; /// unnormalized scores
+	double m_scoreFactor; /// normalization factor
+	double m_starmeter; /// when this is high enough, GodMode becomes available
+	int m_streak; /// player's current streak/combo
+	int m_longestStreak; /// player's longest streak/combo
+	int m_bigStreak; /// next limit when a popup appears
+	double m_jointime; /// when the player joined
+	int m_dead; /// how many notes has been passed without hitting buttons
 };
 

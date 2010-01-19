@@ -27,32 +27,33 @@ namespace {
 	}
 }
 
-
+/// Load a Wavefront .obj file and possibly scale it also
 void Object3d::loadWavefrontObj(std::string filepath, float scale) {
 	std::string row;
 	std::ifstream file(filepath.c_str(), std::ios::binary);
 	if (!file.is_open()) throw std::runtime_error("Couldn't open object file "+filepath);
+	// Get rid of old data
 	m_vertices.clear();
 	m_faces.clear();
 	m_texcoords.clear();
 	while (!file.eof()) {
-		getline(file, row);
+		getline(file, row); // Read a line
 		std::istringstream srow(row);
 		float x,y,z;
 		std::string tempst;
-		if (row.substr(0,2) == "v ") {			// Vertices
+		if (row.substr(0,2) == "v ") {  // Vertices
 			srow >> tempst >> x >> y >> z;
 			m_vertices.push_back(Vertex(x*scale,y*scale,z*scale));
-		} else if (row.substr(0,2) == "vt") {		// Texture Coordinates
+		} else if (row.substr(0,2) == "vt") {  // Texture Coordinates
 			srow >> tempst >> x >> y;
 			m_texcoords.push_back(TexCoord(x,y));
-		} else if (row.substr(0,2) == "vn") {		// Normals
+		} else if (row.substr(0,2) == "vn") {  // Normals
 			srow >> tempst >> x >> y >> z;
 			double sum = std::abs(x)+std::abs(y)+std::abs(z);
 			if (sum == 0) throw std::runtime_error("Object "+filepath+" has invalid normal(s).");
-			x /= sum; y /= sum; z /= sum;
+			x /= sum; y /= sum; z /= sum; // Normalize components
 			m_normals.push_back(Vertex(x,y,z));
-		} else if (row.substr(0,2) == "f ") {		// Faces
+		} else if (row.substr(0,2) == "f ") {  // Faces
 			Face f;
 			srow >> tempst;
 			int v_id;
@@ -85,11 +86,11 @@ void Object3d::loadWavefrontObj(std::string filepath, float scale) {
 	}
 }
 
-
+/// Generate a display list from the object data parsed earlier
 void Object3d::generateDisplayList() {
-	if (m_displist != 0) glDeleteLists(m_displist, 1);
-	m_displist = glGenLists(1);
-	glutil::DisplayList displist(m_displist, GL_COMPILE);
+	if (m_displist != 0) glDeleteLists(m_displist, 1); // Get rid of old
+	m_displist = glGenLists(1); // Get id for the list
+	glutil::DisplayList displist(m_displist, GL_COMPILE); // From now on, gl-commands go to the list
 	std::vector<Face>::const_iterator it;
 	// Iterate through faces
 	for (it = m_faces.begin(); it != m_faces.end(); it++) {

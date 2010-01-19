@@ -10,6 +10,7 @@
 /// @file
 /// Functions used for parsing the UltraStar TXT song format
 
+/// 'Magick' to check if this file looks like correct format
 bool SongParser::iniCheck(std::vector<char> const& data) {
 	static const std::string header = "[song]";
 	return std::equal(header.begin(), header.end(), data.begin());
@@ -23,6 +24,7 @@ namespace {
 		std::string f = s.path + filename;
 		if (boost::filesystem::exists(f)) s.music[trackid] = f;
 	}
+	/// Parse a double from string and assign it to a variable
 	void assign(double& var, std::string str) {
 		std::replace(str.begin(), str.end(), ',', '.'); // Fix decimal separators
 		try {
@@ -44,6 +46,7 @@ void SongParser::iniParse() {
 		if (!std::getline(iss, key, '=') || !std::getline(iss, value)) std::runtime_error("Invalid format, should be key=value");
 		boost::trim(key); boost::to_lower(key);
 		boost::trim(value);
+		// Supported tags
 		if (key == "name") s.title = value;
 		else if (key == "artist") s.artist = value;
 		else if (key == "cover") s.cover = value;
@@ -54,7 +57,8 @@ void SongParser::iniParse() {
 		// Before adding other tags: they should be checked with the already-existing tags in FoF format; in case any tag doesn't exist there, it should be discussed with FoFiX developers before adding it here.
 	}
 	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
-
+	
+	// Compose regexps to find music files
 	boost::regex midifile("(.*\\.mid)$", boost::regex_constants::icase);
 	boost::regex audiofile_background("(song\\.ogg)$", boost::regex_constants::icase);
 	boost::regex audiofile_guitar("(guitar\\.ogg)$", boost::regex_constants::icase);
@@ -64,7 +68,8 @@ void SongParser::iniParse() {
 	boost::regex audiofile_other("(.*\\.ogg)$", boost::regex_constants::icase);
 	boost::cmatch match;
 	std::string midifilename("notes.mid");
-
+	
+	// Search the dir for the musics
 	for (boost::filesystem::directory_iterator dirIt(s.path), dirEnd; dirIt != dirEnd; ++dirIt) {
 		boost::filesystem::path p = dirIt->path();
 		std::string name = p.leaf(); // File basename (notes.txt)

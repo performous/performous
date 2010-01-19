@@ -39,11 +39,11 @@ void LayoutSinger::drawScore(Position position) {
 		glColor4f(r, g, b,act);
 		m_score_text[i%4]->render((boost::format("%04d") % p->getScore()).str());
 		switch(position) {
-			case LayoutSinger::BOTTOM:
+			case LayoutSinger::BOTTOM: // Fullscreen
 				m_player_icon->dimensions.left(-0.5 + 0.01 + 0.25 * i).fixedWidth(0.075).screenTop(0.055);
 				m_score_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.075).screenTop(0.055);
 				break;
-			case LayoutSinger::MIDDLE:
+			case LayoutSinger::MIDDLE: // Band mode
 				m_player_icon->dimensions.right(0.35).fixedHeight(0.050).screenTop(0.025 + 0.050 * i);
 				m_score_text[i%4]->dimensions().right(0.45).fixedHeight(0.050).screenTop(0.025 + 0.050 * i);
 				break;
@@ -68,10 +68,10 @@ void LayoutSinger::drawScore(Position position) {
 			glColor4f(r, g, b, clamp(fact*2.0f));
 			m_line_rank_text[i%4]->render(prevLineRank);
 			switch(position) {
-				case LayoutSinger::BOTTOM:
+				case LayoutSinger::BOTTOM: // Fullscreen
 					m_line_rank_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.055*fzoom).screenTop(0.11);
 					break;
-				case LayoutSinger::MIDDLE:
+				case LayoutSinger::MIDDLE: // Band mode
 					m_line_rank_text[i%4]->dimensions().right(0.30).fixedHeight(0.05*fzoom).screenTop(0.025 + 0.050 * i);
 					break;
 				case LayoutSinger::LEFT:
@@ -89,10 +89,10 @@ void LayoutSinger::draw(double time, Position position) {
 	// Draw notes and pitch waves (only when not in karaoke mode)
 	if (!config["game/karaoke_mode"].b()) {
 		switch(position) {
-			case LayoutSinger::BOTTOM:
+			case LayoutSinger::BOTTOM: // Fullscreen
 				m_noteGraph.draw(time, m_database, NoteGraph::FULLSCREEN);
 				break;
-			case LayoutSinger::MIDDLE:
+			case LayoutSinger::MIDDLE: // Band mode
 				m_noteGraph.draw(time, m_database, NoteGraph::TOP);
 				break;
 			case LayoutSinger::LEFT:
@@ -106,11 +106,11 @@ void LayoutSinger::draw(double time, Position position) {
 	double linespacing = 0.0;
 	Dimensions pos;
 	switch(position) {
-		case LayoutSinger::BOTTOM:
+		case LayoutSinger::BOTTOM: // Fullscreen
 			pos.screenBottom(-0.1);
 			linespacing = 0.06;
 			break;
-		case LayoutSinger::MIDDLE:
+		case LayoutSinger::MIDDLE: // Band mode
 			pos.center(-0.05);
 			linespacing = 0.04;
 			break;

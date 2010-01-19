@@ -11,8 +11,8 @@
 /// Functions used for parsing the StepMania SM format
 
 namespace {
-
 	// Here are some functions needed in reading the data.
+
 	void assign(int& var, std::string const& str) {
 		try {
 			var = boost::lexical_cast<int>(str);
@@ -37,8 +37,7 @@ namespace {
 	int lower_case (int c) { return tolower (c); }
 }
 
-
-
+/// 'Magick' to check if this file looks like correct format
 bool SongParser::smCheck(std::vector<char> const& data) {
 	if (data[0] != '#' || data[1] < 'A' || data[1] > 'Z') return false;
 	for (std::vector<char>::const_iterator it = data.begin(); it != data.end(); ++it)

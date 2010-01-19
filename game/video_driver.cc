@@ -62,8 +62,11 @@ void Window::screenshot() {
 	img.w = m_fullscreen ? m_fsW : m_windowW;
 	img.h = m_fullscreen ? m_fsH : m_windowH;
 	img.data.resize(((img.w + 3) & ~3) * img.h * 3);
+	// Get pixel data from OpenGL
 	glReadPixels(0, 0, img.w, img.h, GL_RGB, GL_UNSIGNED_BYTE, &img.data[0]);
+	// Compose filename from timestamp
 	fs::path filename = getHomeDir() / ("Performous_" + to_iso_string(boost::posix_time::second_clock::local_time()) + ".png");
+	// Save to disk
 	writePNG(filename.string(), img);
 	std::cout << ">>> Screenshot taken: " << filename << " (" << img.w << "x" << img.h << ")" << std::endl;
 }

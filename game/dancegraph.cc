@@ -11,9 +11,9 @@ namespace {
 	const std::string diffv[] = { "Beginner", "Easy", "Medium", "Hard", "Challenge" };
 	const int death_delay = 25; // Delay in notes after which the player is hidden
 	const float join_delay = 7.0f; // Time to select track/difficulty when joining mid-game
-	const float past = -0.3f;
-	const float future = 2.0f;
-	const float timescale = 12.0f;
+	const float past = -0.3f; // Relative time from cursor that is considered past (out of screen)
+	const float future = 2.0f; // Relative time from cursor that is considered future (out of screen)
+	const float timescale = 12.0f; // Multiplier to get graphics units from time
 	const float texCoordStep = -0.25f; // Four beat lines per beat texture
 	// Note: t is difference from playback time so it must be in range [past, future]
 	float time2y(float t) { return timescale * (t - past) / (future - past); }
@@ -22,7 +22,7 @@ namespace {
 		return std::pow(a, 0.8f); // Nicer curve
 	}
 	float y2a(float y) { return time2a(past - y / timescale * (future - past)); }
-	const double maxTolerance = 0.15;
+	const double maxTolerance = 0.15; // Maximum error in seconds
 	int getNextBigStreak(int prev) { return prev + 10; }
 
 	/// Get an accuracy value [0, 1] for the error offset (in seconds)
@@ -108,7 +108,7 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
 	if(m_song.danceTracks.empty())
 		throw std::runtime_error("Could not find any dance tracks.");
 
-	gameMode(0);
+	gameMode(0); // Get an initial game mode and notes for it
 }
 
 /// Attempt to select next/previous game mode
@@ -271,6 +271,7 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 		return;
 	}
 
+	// So it was a PRESS event
 	for (DanceNotes::iterator it = m_notesIt; it != m_notes.end() && time <= it->note.end + maxTolerance; it++) {
 		if(!it->isHit && std::abs(time - it->note.begin) <= maxTolerance && ev.button == it->note.note) {
 			it->isHit = true;
@@ -314,8 +315,8 @@ namespace {
 /// Draw a dance pad icon using the given texture
 void DanceGraph::drawArrow(int arrow_i, Texture& tex, float x, float y, float scale, float ty1, float ty2) {
 	glutil::PushMatrix pm;
-	glTranslatef(x, y, 0.0f);
-	if (scale != 1.0f) glScalef(scale, scale, scale);
+	glTranslatef(x, y, 0.0f); // Move to place
+	if (scale != 1.0f) glScalef(scale, scale, scale); // Scale if needed
 	{
 		UseTexture tblock(tex);
 		glutil::Begin block(GL_TRIANGLE_STRIP);

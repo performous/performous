@@ -59,16 +59,16 @@ class DanceGraph {
 	float panel2x(int i) { return -(m_pads * 0.5f) + m_arrow_map[i] + 0.5f; } /// Get x for an arrow line
 	Audio& m_audio;
 	Song const& m_song;
-	input::InputDev m_input;
-	DanceNotes m_notes;
-	DanceNotes::iterator m_notesIt;
-	DanceNotes::iterator m_activeNotes[max_panels];
+	input::InputDev m_input; /// input device (keyboard/dance pad)
+	DanceNotes m_notes; /// contains the dancing notes for current game mode and difficulty
+	DanceNotes::iterator m_notesIt; /// the first note that hasn't gone away yet
+	DanceNotes::iterator m_activeNotes[max_panels]; /// hold notes that are currently pressed down
 	Texture m_beat;
 	Texture m_arrows;
 	Texture m_arrows_cursor;
 	Texture m_arrows_hold;
 	Surface m_mine;
-	AnimValue m_cx, m_width;
+	AnimValue m_cx, m_width; /// controls horizontal position and width smoothly
 	std::size_t m_stream;
 	struct Event {
 		double time;
@@ -81,23 +81,23 @@ class DanceGraph {
 	};
 	typedef std::vector<Event> Events;
 	Events m_events;
-	bool m_pressed[max_panels];
-	AnimValue m_pressed_anim[max_panels];
-	int m_arrow_map[max_panels];
-	SvgTxtTheme m_text;
-	boost::scoped_ptr<SvgTxtThemeSimple> m_popupText;
+	bool m_pressed[max_panels]; /// is certain panel pressed currently
+	AnimValue m_pressed_anim[max_panels]; /// animation for panel pressing
+	int m_arrow_map[max_panels]; /// game mode dependant mapping of arrows' ordering at cursor
+	SvgTxtTheme m_text; /// generic text
+	boost::scoped_ptr<SvgTxtThemeSimple> m_popupText; /// generic text for making popups
 	AnimValue m_correctness;
-	AnimValue m_streakPopup;
+	AnimValue m_streakPopup; /// for animating the popup
 	int m_flow_direction;
-	double m_score;
-	double m_scoreFactor;
-	int m_streak;
-	int m_longestStreak;
-	int m_bigStreak;
-	int m_pads;
-	std::string m_gamingMode;
-	DanceTracks::const_iterator m_curTrackIt;
-	double m_jointime;
-	int m_dead;
+	double m_score; /// unnormalized scores
+	double m_scoreFactor; /// normalization factor
+	int m_streak; /// player's current streak/combo
+	int m_longestStreak; /// player's longest streak/combo
+	int m_bigStreak; /// next limit when a popup appears
+	int m_pads; /// how many panels the current gaming mode uses
+	std::string m_gamingMode; /// current game mode
+	DanceTracks::const_iterator m_curTrackIt; /// iterator to the currently selected game mode
+	double m_jointime; /// when the player joined
+	int m_dead; /// how many notes has been passed without hitting buttons
 };
 

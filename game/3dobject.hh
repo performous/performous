@@ -13,7 +13,9 @@
 
 // TODO: Exception handling
 // TODO: Texture loading
+// TODO: Switch to vertex arrays
 
+/// Point in 3d space
 struct Vertex {
 	Vertex(float x = 0, float y = 0, float z = 0): x(x), y(y), z(z) {}
 	float x;
@@ -21,27 +23,30 @@ struct Vertex {
 	float z;
 };
 
+/// 2d texture coordinate
 struct TexCoord {
 	TexCoord(float s = 0, float t = 0): s(s), t(t) {}
 	float s;
 	float t;
 };
 
+/// A polygon containing links to required point data
 struct Face {
 	std::vector<int> vertices;
 	std::vector<int> texcoords;
 	std::vector<int> normals;
 };
 
-
+/// A class representing 3d object
+/// Non-copyable because of display lists getting messed up
 class Object3d: boost::noncopyable {
   private:
-	std::vector<Vertex> m_vertices;
-	std::vector<TexCoord> m_texcoords;
-	std::vector<Vertex> m_normals;
-	std::vector<Face> m_faces;
-	GLuint m_displist;
-	boost::scoped_ptr<Texture> m_texture;
+	std::vector<Vertex> m_vertices; /// vertices
+	std::vector<TexCoord> m_texcoords; /// texture coordinates
+	std::vector<Vertex> m_normals; /// normals
+	std::vector<Face> m_faces; /// faces
+	GLuint m_displist; /// display list id
+	boost::scoped_ptr<Texture> m_texture; /// texture
 	/// load a Wavefront .obj 3d object file
 	void loadWavefrontObj(std::string filepath, float scale = 1.0);
 	/// generates a display list for the object
@@ -65,8 +70,8 @@ class Object3d: boost::noncopyable {
 	/// draws the object
 	void draw(float x = 0, float y = 0, float z = 0, float s = 1.0) const {
 		glutil::PushMatrix pm;
-		glTranslatef(x, y, z);
-		if (s != 1.0) glScalef(s,s,s);
+		glTranslatef(x, y, z); // Move to position
+		if (s != 1.0) glScalef(s,s,s); // Scale if needed
 		if (m_texture) {
 			UseTexture tex(*m_texture);
 			glCallList(m_displist);

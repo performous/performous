@@ -19,10 +19,10 @@ namespace {
 	const size_t diffsz = sizeof(diffv) / sizeof(*diffv);
 	const int death_delay = 20; // Delay in notes after which the player is hidden
 	const float join_delay = 6.0f; // Time to select track/difficulty when joining mid-game
-	const float g_angle = 80.0f;
-	const float past = -0.2f;
-	const float future = 1.5f;
-	const float timescale = 25.0f;
+	const float g_angle = 80.0f; // How much to rotate the fretboards
+	const float past = -0.2f; // Relative time from cursor that is considered past (out of screen)
+	const float future = 1.5f; // Relative time from cursor that is considered future (out of screen)
+	const float timescale = 25.0f; // Multiplier to get graphics units from time
 	const float texCoordStep = -0.5f; // Two beat lines per neck texture => 0.5 tex units per beat
 	const float flameSpd = 6.0f; // Multiplier for flame growth
 	// Note: t is difference from playback time so it must be in range [past, future]
@@ -32,7 +32,7 @@ namespace {
 		return std::pow(a, 0.8f); // Nicer curve
 	}
 	float y2a(float y) { return time2a(past - y / timescale * (future - past)); }
-	const double maxTolerance = 0.15;
+	const double maxTolerance = 0.15; // Maximum error in seconds
 	
 	double points(double error) {
 		double score = 0.0;

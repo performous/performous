@@ -31,6 +31,7 @@ namespace {
 	}
 }
 
+/// 'Magick' to check if this file looks like correct format
 bool SongParser::txtCheck(std::vector<char> const& data) {
 	return data[0] == '#' && data[1] >= 'A' && data[1] <= 'Z';
 }
