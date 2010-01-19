@@ -155,10 +155,10 @@ namespace input {
 
 #ifdef USE_PORTMIDI
 	class MidiDrums {
-	  public:
-		MidiDrums(int devId);
+	public:
+		MidiDrums();
 		void process();
-	  private:
+	private:
 		pm::Input stream;
 		unsigned int devnum;
 		Event event;
@@ -167,5 +167,5 @@ namespace input {
 	};
 #endif
 
-};
+}
 

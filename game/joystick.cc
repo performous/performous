@@ -4,28 +4,32 @@
 #include <boost/lexical_cast.hpp>
 
 #ifdef USE_PORTMIDI
-input::MidiDrums::MidiDrums(int devId): stream(devId), devnum(0x8000 + devId) {
+input::MidiDrums::MidiDrums(): stream(pm::findDevice(true, config["system/midi_input"].s())), devnum(0x8000) {
+	while (detail::devices.find(devnum) != detail::devices.end()) ++devnum;
 	detail::devices[devnum] = detail::InputDevPrivate(detail::DRUMS_MIDI);
 	event.type = Event::PRESS;
 	for (unsigned int i = 0; i < BUTTONS; ++i) event.pressed[i] = false;
 	map[35] = map[36] = 0;  // Bass drum 1/2
 	map[38] = map[40] = 1;  // Snare 1/2
 	map[42] = map[46] = 2;  // Hi-hat closed/open
+	map[52] = map[57] = 2;  // Crash2 1/2
 	map[41] = map[43] = 3;  // Tom low 1/2
 	map[45] = map[47] = 3;  // Tom mid 1/2
 	map[48] = map[50] = 3;  // Tom high 1/2
 	map[49] = map[51] = 4;  // Cymbal crash/ride
 }
 
+#include <iomanip>
+
 void input::MidiDrums::process() {
 	PmEvent ev;
 	while (Pm_Read(stream, &ev, 1) == 1) {
-		if ((ev.message & 0xFF) != 0x99) continue;
-		unsigned char ch = ev.message >> 8;
+		if ((ev.message & 0xFF) != 0x99) continue; // 0x99 = channel 10 (percussion) note ON
+		unsigned char note = ev.message >> 8;
 		//unsigned char vel = ev.message >> 16;
-		Map::const_iterator it = map.find(ch);
+		Map::const_iterator it = map.find(note);
 		if (it == map.end()) {
-			std::cout << "Unassigned MIDI drum event: channel " << ch << std::endl;
+			std::cout << "Unassigned MIDI drum event: note " << note << std::endl;
 			continue;
 		}
 		event.button = it->second;

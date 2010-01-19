@@ -78,12 +78,6 @@ to save the current settings to XML.
 			<long>Enable keyboard as dance pad.</long>
 		</locale>
 	</entry>
-	<entry name="game/midi_drums" type="string">
-		<locale name="C">
-			<short>MIDI drum mapping</short>
-			<long>Mapping of hardware MIDI device: devID:kick,pad1,pad2,pad3,pad4</long>
-		</locale>
-	</entry>
 	<entry name="game/instruments" type="string_list">
 		<!-- Should be SDL_ID:{GUITAR_GUITARHERO|GUITAR_GUITARHERO_XPLORER|GUITAR_ROCKBAND_PS3|GUITAR_ROCKBAND_XB360|DRUMS_GUITARHERO|DRUMS_ROCKBAND_PS3|DRUMS_ROCKBAND_XB360|DRUMS_MIDI|DANCEPAD_GENERIC|DANCEPAD_TIGERGAME}
 		     example:
@@ -223,6 +217,12 @@ to save the current settings to XML.
 	</entry>
 
 	<!-- System preferences -->
+	<entry name="system/midi_input" type="string" value="">
+		<locale name="C">
+			<short>Hardware MIDI input device</short>
+			<long>Part of sound card name or its number or empty to use the first available device. Used currently for MIDI drum controllers. Empty to select the first available device.</long>
+		</locale>
+	</entry>
 	<entry name="system/path_songs" type="string_list">
 		<stringvalue>DATADIR/songs/</stringvalue>
 		<stringvalue>/usr/local/share/games/ultrastar/songs/</stringvalue>

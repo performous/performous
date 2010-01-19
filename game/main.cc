@@ -135,15 +135,22 @@ void audioSetup(Capture& capture, Audio& audio) {
 }
 
 void mainLoop(std::string const& songlist) {
+	Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());
+	ScreenManager sm;
 	try {
+		sm.FlashMessage(_("Loading..."));
+		window.blank();
+		sm.FlashMessages();
+		window.swap();
 		Capture capture;
 		Audio audio;
 		audioSetup(capture, audio);
 		Backgrounds backgrounds;
 		Database database(getConfigDir() / "database.xml");
 		Songs songs(database, songlist);
-		ScreenManager sm;
-		Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());
+		boost::scoped_ptr<input::MidiDrums> midiDrums;
+		// TODO: Proper error handling...
+		try { midiDrums.reset(new input::MidiDrums); } catch (std::runtime_error&) {}
 		sm.addScreen(new ScreenIntro("Intro", audio, capture));
 		sm.addScreen(new ScreenSongs("Songs", audio, songs, database));
 		sm.addScreen(new ScreenSing("Sing", audio, capture, database, backgrounds));
@@ -155,6 +162,7 @@ void mainLoop(std::string const& songlist) {
 		// Main loop
 		boost::xtime time = now();
 		unsigned frames = 0;
+		sm.FlashMessage("");
 		while (!sm.isFinished()) {
 			if( g_take_screenshot ) {
 				fs::path filename;
@@ -188,13 +196,20 @@ void mainLoop(std::string const& songlist) {
 					frames = 0;
 				}
 				// Process events for the next frame
+				if (midiDrums) midiDrums->process();
 				checkEvents_SDL(sm, window);
 			} catch (std::runtime_error& e) {
 				std::cerr << "ERROR: " << e.what() << std::endl;
+				sm.FlashMessage(std::string("ERROR: ") + e.what());
 			}
 		}
 	} catch (std::exception& e) {
-		std::cout << "FATAL ERROR: " << e.what() << std::endl;
+		std::cerr << "FATAL ERROR: " << e.what() << std::endl;
+		sm.FlashMessage(std::string("FATAL ERROR: ") + e.what());
+		window.blank();
+		sm.FlashMessages();
+		window.swap();
+		boost::thread::sleep(now() + 2.0);
 	} catch (QuitNow&) {
 		std::cout << "Terminated." << std::endl;
 	}
@@ -246,7 +261,7 @@ template <typename Container> void confOverride(Container const& c, std::string 
 	std::copy(c.begin(), c.end(), std::back_inserter(sl));
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv) try {
 #ifdef USE_GETTEXT
 	// initialize gettext
 #ifdef _MSC_VER
@@ -344,6 +359,8 @@ int main(int argc, char** argv) {
 		std::cout << std::flush;
 		return 0;
 	}
+	// Dump a list of MIDI input devices
+	pm::dumpDevices(true);
 	// Read config files
 	try {
 		readConfig();
@@ -365,5 +382,7 @@ int main(int argc, char** argv) {
 	// Run the game init and main loop
 	mainLoop(songlist);
 	return 0; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
+} catch (std::exception& e) {
+	std::cerr << "FATAL ERROR: " << e.what() << std::endl;
 }
 

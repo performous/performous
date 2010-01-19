@@ -6,7 +6,7 @@
 template<> ScreenManager* Singleton<ScreenManager>::ms_Singleton = NULL;
 
 ScreenManager::ScreenManager(): m_finished(false), currentScreen(), m_messagePopup(0.0, 1.0), m_textMessage(getThemePath("message_text.svg")) {
-	m_timeToFade = 1.0f;
+	m_timeToFade = 0.0f;
 	m_timeToShow = 3.0f;
 
 	m_messagePopup.setTarget(100.0);
