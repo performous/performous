@@ -17,6 +17,7 @@ Big features:
     * Internet highscore
 - Mic effects (reduce volume for bad singers, perfect pitch, reverb, etc)
 - Ingame Singstar DVD support (integrated ripping + ffmpeg feeding + XML song format)
+- Automatically download songs and other stuff from performous.org
 
 
 Features:
@@ -28,7 +29,6 @@ Features:
 - Better audio card configuration ingame (needs PortAudio backend)
 - Allow playing a single song given as commandline argument (no menus)
 - Kiosk/arcade mode (disable exiting game and limit other functions)
-
 
 Dance features:
 
