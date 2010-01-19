@@ -24,7 +24,7 @@ namespace {
 	/// Add a flash message about the state of a config item
 	void dispInFlash(ConfigItem& ci) {
 		ScreenManager* sm = ScreenManager::getSingletonPtr();
-		sm->FlashMessage(ci.getShortDesc() + ": " + ci.getValue());
+		sm->flashMessage(ci.getShortDesc() + ": " + ci.getValue());
 	}
 }
 

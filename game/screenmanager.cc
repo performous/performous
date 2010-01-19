@@ -6,10 +6,6 @@
 template<> ScreenManager* Singleton<ScreenManager>::ms_Singleton = NULL;
 
 ScreenManager::ScreenManager(): m_finished(false), currentScreen(), m_messagePopup(0.0, 1.0), m_textMessage(getThemePath("message_text.svg")) {
-	m_timeToFade = 0.0f;
-	m_timeToShow = 3.0f;
-
-	m_messagePopup.setTarget(100.0);
 	m_textMessage.dimensions.middle().screenTop(0.05);
 }
 
@@ -34,57 +30,29 @@ Screen* ScreenManager::getScreen(std::string const& name) {
 	}
 }
 
-float ScreenManager::getFadeTime(){ return m_timeToFade; }
-float ScreenManager::getShowTime(){ return m_timeToFade; }
-
-bool ScreenManager::setFadeTime(float fadeTime){
-	if (fadeTime * 2 > m_timeToShow){ //fade in + fade out
-		m_timeToFade = m_timeToShow / 2;
-		return false;
-	} else {
-		m_timeToFade = fadeTime;
-		return true;
-	}
-}
-
-bool ScreenManager::setShowTime(float showTime){
-	if (showTime < m_timeToFade * 2){
-		m_timeToShow = m_timeToFade / 2;
-		return false;
-	} else {
-		m_timeToShow = showTime;
-		return true;
-	}
-}
-
-void ScreenManager::FlashMessages() {
+void ScreenManager::drawFlashMessage() {
 	double time = m_messagePopup.get();
-	if (time > 0.0){
-		bool haveToFadeIn = time < (m_timeToFade);
-		bool haveToFadeOut = time > (m_messagePopup.getTarget() - m_timeToFade);
-		bool haveToStop = time > (m_messagePopup.getTarget() - 0.001);
-		float fadeValue = 1.0f;
-		if (haveToFadeOut){
-			fadeValue = float((m_messagePopup.getTarget() - time) / m_timeToFade);
-			glColor4f(1.0f, 1.0f, 1.0f, (fadeValue));
-			
-			if(haveToStop){
-				m_messagePopup.setTarget(0.0, true);
-			}
-		}else if (haveToFadeIn){
-			fadeValue = float(time / m_timeToFade);
-
-			glColor4f(1.0f, 1.0f, 1.0f, fadeValue);
-		}
-
-		m_textMessage.draw(m_message, fadeValue);
-
-		if (haveToFadeIn || haveToFadeOut) glColor3f(1.0f, 1.0f, 1.0f);
+	if (time == 0.0) return;
+	bool haveToFadeIn = time <= (m_timeToFadeIn); // Is this fade in?
+	bool haveToFadeOut = time >= (m_messagePopup.getTarget() - m_timeToFadeOut); // Is this fade out?
+	float fadeValue = 1.0f;
+	
+	if (haveToFadeIn) { // Fade in
+		fadeValue = float(time / m_timeToFadeIn); // Calculate animation value
+	} else if (haveToFadeOut) { // Fade out
+		fadeValue = float((m_messagePopup.getTarget() - time) / m_timeToFadeOut); // Calculate animation value
+		if (time >= m_messagePopup.getTarget()) m_messagePopup.setTarget(0.0, true); // Reset if fade out finished
 	}
+
+	m_textMessage.draw(m_message, fadeValue); // Draw the message
+	if (haveToFadeIn || haveToFadeOut) glColor3f(1.0f, 1.0f, 1.0f); // Reset alpha
 }
 
-void ScreenManager::FlashMessage(std::string const& message) {
-	m_messagePopup.setTarget(m_timeToShow);
-	m_messagePopup.setValue(0);
+void ScreenManager::flashMessage(std::string const& message, float fadeIn, float hold, float fadeOut) {
 	m_message = message;
+	m_timeToFadeIn = fadeIn;
+	m_timeToShow = hold;
+	m_timeToFadeOut = fadeOut;
+	m_messagePopup.setTarget(fadeIn + hold + fadeOut);
+	m_messagePopup.setValue(0.0);
 }

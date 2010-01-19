@@ -138,9 +138,9 @@ void mainLoop(std::string const& songlist) {
 	Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());
 	ScreenManager sm;
 	try {
-		sm.FlashMessage(_("Loading..."));
+		sm.flashMessage(_("Loading..."), 0.0f, 1.0f, 1.0f); // No fade-in to get it to show
 		window.blank();
-		sm.FlashMessages();
+		sm.drawFlashMessage();
 		window.swap();
 		Capture capture;
 		Audio audio;
@@ -162,16 +162,16 @@ void mainLoop(std::string const& songlist) {
 		// Main loop
 		boost::xtime time = now();
 		unsigned frames = 0;
-		sm.FlashMessage("");
+		sm.flashMessage("");
 		while (!sm.isFinished()) {
 			if( g_take_screenshot ) {
 				fs::path filename;
 				try {
 					window.screenshot();
-					sm.FlashMessage(_("Screenshot taken!"));
+					sm.flashMessage(_("Screenshot taken!"));
 				} catch (std::exception& e) {
 					std::cerr << "ERROR: " << e.what() << std::endl;
-					sm.FlashMessage(_("Screenshot failed!"));
+					sm.flashMessage(_("Screenshot failed!"));
 				}
 				g_take_screenshot = false;
 			}
@@ -180,7 +180,7 @@ void mainLoop(std::string const& songlist) {
 				// Draw
 				window.blank();
 				sm.getCurrentScreen()->draw();
-				sm.FlashMessages();
+				sm.drawFlashMessage();
 				// Display (and wait until next frame)
 				window.swap();
 				if (config["graphic/fps"].b()) {
@@ -200,14 +200,14 @@ void mainLoop(std::string const& songlist) {
 				checkEvents_SDL(sm, window);
 			} catch (std::runtime_error& e) {
 				std::cerr << "ERROR: " << e.what() << std::endl;
-				sm.FlashMessage(std::string("ERROR: ") + e.what());
+				sm.flashMessage(std::string("ERROR: ") + e.what());
 			}
 		}
 	} catch (std::exception& e) {
 		std::cerr << "FATAL ERROR: " << e.what() << std::endl;
-		sm.FlashMessage(std::string("FATAL ERROR: ") + e.what());
+		sm.flashMessage(std::string("FATAL ERROR: ") + e.what(), 0.0f); // No fade-in to get it to show
 		window.blank();
-		sm.FlashMessages();
+		sm.drawFlashMessage();
 		window.swap();
 		boost::thread::sleep(now() + 2.0);
 	} catch (QuitNow&) {
