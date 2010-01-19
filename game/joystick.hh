@@ -165,6 +165,13 @@ namespace input {
 		typedef std::map<unsigned, unsigned> Map;
 		Map map;
 	};
+#else
+	class MidiDrums {
+	public:
+		MidiDrums() {};
+		void process() {};
+	private:
+	};
 #endif
 
 }

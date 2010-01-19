@@ -359,8 +359,10 @@ int main(int argc, char** argv) try {
 		std::cout << std::flush;
 		return 0;
 	}
+#ifdef USE_PORTMIDI
 	// Dump a list of MIDI input devices
 	pm::dumpDevices(true);
+#endif
 	// Read config files
 	try {
 		readConfig();
