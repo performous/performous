@@ -7,15 +7,15 @@
 #include "joystick.hh"
 
 ScreenIntro::ScreenIntro(std::string const& name, Audio& audio, Capture& capture): Screen(name), m_audio(audio), m_capture(capture), selected(), m_first(true) {
-	m_menuOptions.push_back(new MenuOption(_("Perform"), "Songs", "intro_sing.svg", _("Start performing!")));
-	m_menuOptions.push_back(new MenuOption(_("Practice"), "Practice", "intro_practice.svg", _("Check your skills or test the microphones")));
-	m_menuOptions.push_back(new MenuOption(_("Configure"), "Configuration", "intro_configure.svg", _("Configure game options")));
-	m_menuOptions.push_back(new MenuOption(_("Quit"), "", "intro_quit.svg", _("Leave the game")));
 }
 
 void ScreenIntro::enter() {
 	m_audio.playMusic(getThemePath("menu.ogg"), true);
 	theme.reset(new ThemeIntro());
+	m_menuOptions.push_back(new MenuOption(_("Perform"), "Songs", "intro_sing.svg", _("Start performing!")));
+	m_menuOptions.push_back(new MenuOption(_("Practice"), "Practice", "intro_practice.svg", _("Check your skills or test the microphones")));
+	m_menuOptions.push_back(new MenuOption(_("Configure"), "Configuration", "intro_configure.svg", _("Configure game options")));
+	m_menuOptions.push_back(new MenuOption(_("Quit"), "", "intro_quit.svg", _("Leave the game")));
 	if( m_first ) {
 		std::string msg;
 		if (!m_audio.isOpen()) msg = _("No playback devices could be used.\n");
@@ -28,6 +28,7 @@ void ScreenIntro::enter() {
 }
 
 void ScreenIntro::exit() {
+	m_menuOptions.clear();
 	theme.reset();
 	m_dialog.reset();
 }
