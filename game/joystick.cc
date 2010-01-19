@@ -55,7 +55,7 @@ int input::buttonFromSDL(input::detail::Type _type, unsigned int _sdl_button) {
 		// Left  Down  Up  Right  DownL  DownR  UpL    UpR    Start  Select
 		{  0,  1,  2,  3,  6,  7,  4,  5,  9,  8, -1, -1, -1, -1, -1, -1 }, // generic dance pad
 		{  9,  8, -1, -1, -1, -1, -1, -1,  0,  3,  1,  2, -1, -1, -1, -1 }, // TigerGame dance pad
-		{  4,  7,  6,  5, -1, -1, -1, -1,  9,  8, -1, -1,  2,  3,  1,  0 } // generic2 dance pad; with ems ps2/pc adaptater
+		{  4,  7,  6,  5, -1, -1, -1, -1,  9,  8, -1, -1,  2,  3,  1,  0 }  // dance pad with ems ps2/pc adapter
 	};
 	if( _sdl_button >= SDL_BUTTONS ) return -1;
 	using namespace detail;
@@ -271,7 +271,7 @@ void input::SDL::init() {
 					std::cout << "  Detected as: Generic dance pad (forced)" << std::endl;
 					break;
 				case input::detail::DANCEPAD_EMS2:
-					std::cout << "  Detected as: EMS2 dance pad controller converter(forced)" << std::endl;
+					std::cout << "  Detected as: EMS2 dance pad controller converter (forced)" << std::endl;
 					break;
 			}
 			input::detail::devices[i] = input::detail::InputDevPrivate(forced_type[i]);
@@ -325,7 +325,7 @@ void input::SDL::init() {
 			input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::DANCEPAD_GENERIC);
 		} else if( name.find("0b43:0003") != std::string::npos ) {
 			std::cout << "  Detected as: EMS2 Dance Pad controller converter (guessed)" << std::endl;
-			input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::DANCEPAD_GENERIC);
+			input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::DANCEPAD_EMS2);
 		} else {
 			std::cout << "  Detected as: Unknown (please report the name; use config to force detection)" << std::endl;
 			SDL_JoystickClose(joy);
