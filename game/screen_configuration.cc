@@ -32,8 +32,6 @@ void ScreenConfiguration::manageEvent(SDL_Event event) {
 		else if (nav == input::DOWN && selected + 1 < configuration.size()) ++selected;
 		else if (nav == input::LEFT) --*ci;
 		else if (nav == input::RIGHT) ++*ci;
-		else if (nav == input::VOLUME_DOWN) --config["audio/preview_volume"];
-		else if (nav == input::VOLUME_UP) ++config["audio/preview_volume"];
 	} else if (event.type == SDL_KEYDOWN) {
 		int key = event.key.keysym.sym;
 		SDLMod modifier = event.key.keysym.mod;

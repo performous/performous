@@ -83,8 +83,6 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 		else if (nav == input::DOWN) m_songs.sortChange(1);
 		else if (nav == input::MOREUP) m_songs.advance(-10);
 		else if (nav == input::MOREDOWN) m_songs.advance(10);
-		else if (nav == input::VOLUME_DOWN) --config["audio/preview_volume"];
-		else if (nav == input::VOLUME_UP) ++config["audio/preview_volume"];
 		else manageSharedKey(nav);
 	// Handle less common, keyboard only keys
 	} else if (event.type == SDL_KEYDOWN) {

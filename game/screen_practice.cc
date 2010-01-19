@@ -38,8 +38,6 @@ void ScreenPractice::manageEvent(SDL_Event event) {
 	input::NavButton nav(input::getNav(event));
 	if (nav == input::CANCEL || nav == input::START || nav == input::SELECT) sm->activateScreen("Intro");
 	else if (nav == input::PAUSE) m_audio.togglePause();
-	else if (nav == input::VOLUME_DOWN) --config["audio/music_volume"];
-	else if (nav == input::VOLUME_UP) ++config["audio/music_volume"];
 	// FIXME: This should not use stuff from input::detail namespace!
 	else if (event.type == SDL_JOYBUTTONDOWN // Play drum sounds here
 	  && input::detail::devices[event.jbutton.which].type_match(input::DRUMS)) {

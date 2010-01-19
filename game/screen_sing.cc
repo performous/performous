@@ -216,9 +216,6 @@ void ScreenSing::manageEvent(SDL_Event event) {
 				}
 			}
 		}
-		// Volume control
-		if (nav == input::VOLUME_UP) dispInFlash(++config["audio/music_volume"]);
-		if (nav == input::VOLUME_DOWN) dispInFlash(--config["audio/music_volume"]);
 	}
 	// Ctrl combinations that can be used while performing (not when score dialog is displayed)
 	if (event.type == SDL_KEYDOWN && (event.key.keysym.mod & KMOD_CTRL) && !m_score_window.get()) {

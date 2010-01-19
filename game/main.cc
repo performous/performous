@@ -64,10 +64,23 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 			}
 			if (keypressed == SDLK_PRINT || keypressed == SDLK_F12) {
 				g_take_screenshot = true;
-				continue;
+				continue; // Already handled here...
 			}
 			if (keypressed == SDLK_F4 && modifier & KMOD_ALT) {
 				sm.finished();
+				continue; // Already handled here...
+			}
+			// Volume control
+			if ((keypressed == SDLK_UP || keypressed == SDLK_DOWN) && modifier & KMOD_CTRL) {
+				std::string curS = sm.getCurrentScreen()->getName();
+				// Pick proper setting
+				std::string which_vol = (curS == "Sing" || curS == "Practice")
+				  ? "audio/music_volume" : "audio/preview_volume";
+				// Adjust value
+				if (keypressed == SDLK_UP) ++config[which_vol];
+				else --config[which_vol];
+				// Show message
+				sm.flashMessage(config[which_vol].getShortDesc() + ": " + config[which_vol].getValue());
 				continue; // Already handled here...
 			}
 			break;
