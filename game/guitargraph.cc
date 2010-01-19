@@ -201,7 +201,7 @@ void GuitarGraph::engine() {
 		// breaks to be usable with FoF songs.
 		if (dead() && m_input.isKeyboard() && ev.type == input::Event::PICK) continue;
 		m_dead = 0; // Keep alive
-		if (m_jointime != m_jointime) m_jointime = time < -1.0 ? -1.0 : time + join_delay; // Handle joining
+		if (m_jointime != m_jointime) m_jointime = time < 0.0 ? -1.0 : time + join_delay; // Handle joining
 		// Handle Start/Select keypresses
 		if (ev.type == input::Event::PRESS && ev.button > input::STARPOWER_BUTTON) {
 			if (ev.button == 9) ev.button = input::STARPOWER_BUTTON; // Start works for GodMode

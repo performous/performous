@@ -205,7 +205,7 @@ void DanceGraph::engine() {
 	for (input::Event ev; m_input.tryPoll(ev);) {
 		m_dead = 0; // Keep alive
 		if (m_jointime != m_jointime) { // Handle joining
-			m_jointime = time < -1.0 ? -1.0 : time + join_delay;
+			m_jointime = time < 0.0 ? -1.0 : time + join_delay;
 			break;
 		}
 		// Difficulty / mode selection
