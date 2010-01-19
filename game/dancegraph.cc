@@ -313,7 +313,8 @@ namespace {
 
 /// Draw a dance pad icon using the given texture
 void DanceGraph::drawArrow(int arrow_i, Texture& tex, float x, float y, float scale, float ty1, float ty2) {
-	glutil::Translation tr(x, y, 0.0f);
+	glutil::PushMatrix pm;
+	glTranslatef(x, y, 0.0f);
 	if (scale != 1.0f) glScalef(scale, scale, scale);
 	{
 		UseTexture tblock(tex);
@@ -321,17 +322,15 @@ void DanceGraph::drawArrow(int arrow_i, Texture& tex, float x, float y, float sc
 		vertexPair(arrow_i, 0.0f, -arrowSize, ty1);
 		vertexPair(arrow_i, 0.0f, arrowSize, ty2);
 	}
-	if (scale != 1.0f) glScalef(1.0f/scale, 1.0f/scale, 1.0f/scale);
 }
 
 /// Draw a mine note
 void DanceGraph::drawMine(float x, float y, float rot, float scale) {
-	glutil::Translation tr(x, y, 0.0f);
+	glutil::PushMatrix pm;
+	glTranslatef(x, y, 0.0f);
 	if (scale != 1.0f) glScalef(scale, scale, scale);
 	if (rot != 0.0f) glRotatef(rot, 0.0f, 0.0f, 1.0f);
 	m_mine.draw();
-	if (rot != 0.0f) glRotatef(-rot, 0.0f, 0.0f, 1.0f);
-	if (scale != 1.0f) glScalef(1.0f/scale, 1.0f/scale, 1.0f/scale);
 }
 
 /// Draws the dance graph

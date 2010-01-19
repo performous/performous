@@ -56,33 +56,6 @@ namespace glutil {
 		}
 	};
 
-	/// auto-reversing translation
-	struct Translation {
-		Translation(float _x, float _y, float _z = 0.0f): m_x(_x), m_y(_y), m_z(_z) 
-		  { glTranslatef(m_x, m_y, m_z); }
-		~Translation() { glTranslatef(-m_x, -m_y, -m_z); }
-	  private:
-		float m_x, m_y, m_z;
-	};
-
-	/// auto-reversing rotation
-	struct Rotation {
-		Rotation(float _a, float _x, float _y, float _z): m_a(_a), m_x(_x), m_y(_y), m_z(_z) 
-		  { glRotatef(m_a, m_x, m_y, m_z); }
-		~Rotation() { glRotatef(-m_a, m_x, m_y, m_z); }
-	  private:
-		float m_a, m_x, m_y, m_z;
-	};
-
-	/// auto-reversing scaling
-	struct Scale {
-		Scale(float _x, float _y, float _z): m_x(_x), m_y(_y), m_z(_z) 
-		  { glScalef(m_x, m_y, m_z); }
-		~Scale() { glScalef(1.0/m_x, 1.0/m_y, 1.0/m_z); }
-	  private:
-		float m_x, m_y, m_z;
-	};
-
 	/// struct to store color information
 	struct Color {
 		float r, ///< red component
