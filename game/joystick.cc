@@ -70,7 +70,7 @@ int input::buttonFromSDL(input::detail::Type _type, unsigned int _sdl_button) {
 	case DRUMS_MIDI: throw std::logic_error("MIDI drums do not use SDL buttons");
 	case DANCEPAD_GENERIC: return inputmap[7][_sdl_button];
 	case DANCEPAD_TIGERGAME: return inputmap[8][_sdl_button];
-	case DANCEPAD_GENERIC2: return inputmap[9][_sdl_button];
+	case DANCEPAD_EMS2: return inputmap[9][_sdl_button];
 	}
 	throw std::logic_error("Unknown instrument type in buttonFromSDL");
 }
@@ -187,7 +187,7 @@ void input::SDL::init() {
 	using namespace boost::spirit::classic;
 	rule<> type = str_p("GUITAR_GUITARHERO_XPLORER") | "GUITAR_ROCKBAND_PS3" | "GUITAR_ROCKBAND_XB360"
 	  | "GUITAR_GUITARHERO" | "DRUMS_GUITARHERO" | "DRUMS_ROCKBAND_PS3" | "DRUMS_ROCKBAND_XB360"
-	  | "DRUMS_MIDI" | "DANCEPAD_GENERIC2" | "DANCEPAD_GENERIC" | "DANCEPAD_TIGERGAME";
+	  | "DRUMS_MIDI" | "DANCEPAD_EMS2" | "DANCEPAD_GENERIC" | "DANCEPAD_TIGERGAME";
 	rule<> entry = uint_p[assign_a(sdl_id)] >> ":" >> (type)[assign_a(instrument_type)];
 
 	ConfigItem::StringList const& instruments = config["game/instruments"].sl();
@@ -216,8 +216,8 @@ void input::SDL::init() {
 				forced_type[sdl_id] = input::detail::DANCEPAD_GENERIC;
 			} else if (instrument_type == "DANCEPAD_TIGERGAME") {
 				forced_type[sdl_id] = input::detail::DANCEPAD_TIGERGAME;
-			} else if (instrument_type == "DANCEPAD_GENERIC2") {
-				forced_type[sdl_id] = input::detail::DANCEPAD_GENERIC2;
+			} else if (instrument_type == "DANCEPAD_EMS2") {
+				forced_type[sdl_id] = input::detail::DANCEPAD_EMS2;
 			}
 		}
 	}
@@ -270,8 +270,8 @@ void input::SDL::init() {
 				case input::detail::DANCEPAD_GENERIC:
 					std::cout << "  Detected as: Generic dance pad (forced)" << std::endl;
 					break;
-				case input::detail::DANCEPAD_GENERIC2:
-					std::cout << "  Detected as: Generic2 dance pad (forced)" << std::endl;
+				case input::detail::DANCEPAD_EMS2:
+					std::cout << "  Detected as: EMS2 dance pad controller converter(forced)" << std::endl;
 					break;
 			}
 			input::detail::devices[i] = input::detail::InputDevPrivate(forced_type[i]);
@@ -322,6 +322,9 @@ void input::SDL::init() {
 			input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::DANCEPAD_GENERIC);
 		} else if( name.find("Joypad to USB converter") != std::string::npos ) {
 			std::cout << "  Detected as: Generic Dance Pad (guessed)" << std::endl;
+			input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::DANCEPAD_GENERIC);
+		} else if( name.find("0b43:0003") != std::string::npos ) {
+			std::cout << "  Detected as: EMS2 Dance Pad controller converter (guessed)" << std::endl;
 			input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::DANCEPAD_GENERIC);
 		} else {
 			std::cout << "  Detected as: Unknown (please report the name; use config to force detection)" << std::endl;
