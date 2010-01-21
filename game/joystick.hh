@@ -33,7 +33,7 @@ namespace input {
 
 	namespace detail {
 		enum Type { GUITAR_RB_PS3, DRUMS_RB_PS3, GUITAR_RB_XB360, DRUMS_RB_XB360,
-		  GUITAR_GH, GUITAR_GH_XPLORER, DRUMS_GH, DRUMS_MIDI, DANCEPAD_TIGERGAME, DANCEPAD_GENERIC, DANCEPAD_EMS2 };
+		  GUITAR_GH, GUITAR_GH_XPLORER, GUITAR_HAMA_PS2, DRUMS_GH, DRUMS_MIDI, DANCEPAD_TIGERGAME, DANCEPAD_GENERIC, DANCEPAD_EMS2 };
 		static unsigned int KEYBOARD_ID = UINT_MAX;
 		static unsigned int KEYBOARD_ID2 = KEYBOARD_ID-1;
 		static unsigned int KEYBOARD_ID3 = KEYBOARD_ID-2; // Three ids needed for keyboard guitar/drumkit/dancepad
@@ -82,6 +82,7 @@ namespace input {
 				switch (m_type) {
 				case GUITAR_GH:
 				case GUITAR_GH_XPLORER:
+				case GUITAR_HAMA_PS2:
 				case GUITAR_RB_PS3:
 				case GUITAR_RB_XB360:
 					return _type == GUITAR;

@@ -42,12 +42,13 @@ void input::MidiDrums::process() {
 static const unsigned SDL_BUTTONS = 16;
 
 int input::buttonFromSDL(input::detail::Type _type, unsigned int _sdl_button) {
-	static const int inputmap[10][SDL_BUTTONS] = {
+	static const int inputmap[11][SDL_BUTTONS] = {
 		//G  R  Y  B  O  S    // for guitars (S=starpower)
 		{ 2, 0, 1, 3, 4, 5, -1, -1,  8,  9, -1, -1, -1, -1, -1, -1 }, // Guitar Hero guitar
 		{ 0, 1, 3, 2, 4,-1,  8,  9, -1, -1, -1, -1, -1, -1, -1, -1 }, // Guitar Hero X-plorer guitar
 		{ 3, 0, 1, 2, 4, 5, -1, -1,  8,  9, -1, -1, -1, -1, -1, -1 }, // Rock Band guitar PS3
 		{ 0, 1, 3, 2, 4,-1,  8,  9, -1, -1, -1, -1, -1, -1, -1, -1 }, // Rock Band guitar XBOX360
+		{ 2, 1, 3, 4,-1, 0, -1, -1,  8,  9, -1, -1, -1, -1, -1, -1 }, // Hama Wireless Guitar Controller for PS2 with converter
 		//K  R  Y  B  G  O    // for drums
 		{ 3, 4, 1, 2, 0, 4, -1, -1,  8,  9, -1, -1, -1, -1, -1, -1 }, // Guitar Hero drums
 		{ 3, 4, 1, 2, 0,-1, -1, -1,  8,  9, -1, -1, -1, -1, -1, -1 }, // Rock Band drums PS3
@@ -64,13 +65,14 @@ int input::buttonFromSDL(input::detail::Type _type, unsigned int _sdl_button) {
 	case GUITAR_GH_XPLORER: return inputmap[1][_sdl_button];
 	case GUITAR_RB_PS3: return inputmap[2][_sdl_button];
 	case GUITAR_RB_XB360: return inputmap[3][_sdl_button];
-	case DRUMS_GH: return inputmap[4][_sdl_button];
-	case DRUMS_RB_PS3: return inputmap[5][_sdl_button];
-	case DRUMS_RB_XB360: return inputmap[6][_sdl_button];
+	case GUITAR_HAMA_PS2: return inputmap[4][_sdl_button];
+	case DRUMS_GH: return inputmap[5][_sdl_button];
+	case DRUMS_RB_PS3: return inputmap[6][_sdl_button];
+	case DRUMS_RB_XB360: return inputmap[7][_sdl_button];
 	case DRUMS_MIDI: throw std::logic_error("MIDI drums do not use SDL buttons");
-	case DANCEPAD_GENERIC: return inputmap[7][_sdl_button];
-	case DANCEPAD_TIGERGAME: return inputmap[8][_sdl_button];
-	case DANCEPAD_EMS2: return inputmap[9][_sdl_button];
+	case DANCEPAD_GENERIC: return inputmap[8][_sdl_button];
+	case DANCEPAD_TIGERGAME: return inputmap[9][_sdl_button];
+	case DANCEPAD_EMS2: return inputmap[10][_sdl_button];
 	}
 	throw std::logic_error("Unknown instrument type in buttonFromSDL");
 }
@@ -186,9 +188,9 @@ void input::SDL::init() {
 	std::map<unsigned int, input::detail::Type> forced_type;
 
 	using namespace boost::spirit::classic;
-	rule<> type = str_p("GUITAR_GUITARHERO_XPLORER") | "GUITAR_ROCKBAND_PS3" | "GUITAR_ROCKBAND_XB360"
-	  | "GUITAR_GUITARHERO" | "DRUMS_GUITARHERO" | "DRUMS_ROCKBAND_PS3" | "DRUMS_ROCKBAND_XB360"
-	  | "DRUMS_MIDI" | "DANCEPAD_EMS2" | "DANCEPAD_GENERIC" | "DANCEPAD_TIGERGAME";
+	rule<> type = str_p("GUITAR_GUITARHERO_XPLORER") | "GUITAR_HAMA_PS2" | "GUITAR_ROCKBAND_PS3"
+	  | "GUITAR_ROCKBAND_XB360" | "GUITAR_GUITARHERO" | "DRUMS_GUITARHERO" | "DRUMS_ROCKBAND_PS3"
+	  | "DRUMS_ROCKBAND_XB360" | "DRUMS_MIDI" | "DANCEPAD_EMS2" | "DANCEPAD_GENERIC" | "DANCEPAD_TIGERGAME";
 	rule<> entry = uint_p[assign_a(sdl_id)] >> ":" >> (type)[assign_a(instrument_type)];
 
 	ConfigItem::StringList const& instruments = config["game/instruments"].sl();
@@ -201,6 +203,8 @@ void input::SDL::init() {
 				forced_type[sdl_id] = input::detail::GUITAR_GH;
 			} else if (instrument_type == "GUITAR_GUITARHERO_XPLORER") {
 				forced_type[sdl_id] = input::detail::GUITAR_GH_XPLORER;
+			} else if (instrument_type == "GUITAR_HAMA_PS2") {
+				forced_type[sdl_id] = input::detail::GUITAR_HAMA_PS2;
 			} else if (instrument_type == "DRUMS_GUITARHERO") {
 				forced_type[sdl_id] = input::detail::DRUMS_GH;
 			} else if (instrument_type == "GUITAR_ROCKBAND_PS3") {
@@ -247,6 +251,9 @@ void input::SDL::init() {
 				case input::detail::GUITAR_GH_XPLORER:
 					std::cout << "  Detected as: Guitar Hero Guitar X-plorer (forced)" << std::endl;
 					break;
+				case input::detail::GUITAR_HAMA_PS2:
+					std::cout << "  Detected as: Hama Guitar for PS2 with converter (forced)" << std::endl;
+					break;
 				case input::detail::DRUMS_GH:
 					std::cout << "  Detected as: Guitar Hero Drums (forced)" << std::endl;
 					break;
@@ -282,6 +289,9 @@ void input::SDL::init() {
 		} else if( name.find("Guitar Hero X-plorer") != std::string::npos ) {
 			std::cout << "  Detected as: Guitar Hero Guitar X-plorer" << std::endl;
 			input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::GUITAR_GH_XPLORER);
+		} else if( name.find("PS  Converter") != std::string::npos ) {
+			std::cout << "  Detected as: Hama Guitar with converter (guessed)" << std::endl;
+			input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::GUITAR_HAMA_PS2);
 		} else if( name.find("Guitar Hero4") != std::string::npos ) {
 			// here we can have both drumkit or guitar .... let say the drumkit
 			std::cout << "  Detected as: Guitar Hero Drums (guessed)" << std::endl;
@@ -649,7 +659,7 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 		case SDL_JOYAXISMOTION:
 			joy_id = _e.jaxis.which;
 			if(!devices[joy_id].assigned()) return false;
-			if (_e.jaxis.axis == 5 || _e.jaxis.axis == 6) {
+			if (_e.jaxis.axis == 5 || _e.jaxis.axis == 6 || _e.jaxis.axis == 1) {
 				event.type = input::Event::PICK;
 			} else if (_e.jaxis.axis == 2 || (devices[joy_id].type() == input::detail::GUITAR_RB_XB360
 			  && _e.jaxis.axis == 4)) {
