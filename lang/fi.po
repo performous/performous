@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-17 07:21+0200\n"
+"POT-Creation-Date: 2010-01-21 07:58+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Lasse Kärkkäinen <tronic+ndrm@trn.iki.fi>\n"
 "Language-Team: \n"
@@ -12,6 +12,18 @@ msgstr ""
 "X-Poedit-KeywordsList: _\n"
 "X-Poedit-Basepath: .\n"
 "X-Poedit-SearchPath-0: ../game\n"
+
+#: ../game/main.cc:141
+msgid "Loading..."
+msgstr "Käynnistyy..."
+
+#: ../game/main.cc:171
+msgid "Screenshot taken!"
+msgstr "Kuvakaappaus tallennettu!"
+
+#: ../game/main.cc:174
+msgid "Screenshot failed!"
+msgstr "Kuvakaappaus epäonnistui!"
 
 #: ../game/screen_players.cc:110
 msgid "No players found!"
@@ -93,96 +105,96 @@ msgstr ""
 "\n"
 "Säädä ääniasetuksia ennen pelaamista."
 
-#: ../game/screen_sing.cc:322
+#: ../game/screen_sing.cc:313
 msgid "   ENTER to skip instrumental break"
 msgstr "   ENTER hypätäksesi lauluosaan"
 
-#: ../game/screen_sing.cc:323
+#: ../game/screen_sing.cc:314
 msgid "   Remember to wait for grading!"
 msgstr "   Muista odottaa arvostelua!"
 
-#: ../game/screen_sing.cc:411
+#: ../game/screen_sing.cc:402
 msgid "No player!"
 msgstr "Pelaajia ei löytynyt!"
 
-#: ../game/screen_sing.cc:420
+#: ../game/screen_sing.cc:411
 msgid "Hit singer"
 msgstr "Tähti"
 
-#: ../game/screen_sing.cc:421
+#: ../game/screen_sing.cc:412
 msgid "Lead singer"
 msgstr "Solisti"
 
-#: ../game/screen_sing.cc:422
-#: ../game/screen_sing.cc:428
-#: ../game/screen_sing.cc:434
+#: ../game/screen_sing.cc:413
+#: ../game/screen_sing.cc:419
+#: ../game/screen_sing.cc:425
 msgid "Rising star"
 msgstr "Harrastaja"
 
-#: ../game/screen_sing.cc:423
-#: ../game/screen_sing.cc:429
-#: ../game/screen_sing.cc:435
+#: ../game/screen_sing.cc:414
+#: ../game/screen_sing.cc:420
+#: ../game/screen_sing.cc:426
 msgid "Amateur"
 msgstr "Amatööri"
 
-#: ../game/screen_sing.cc:424
-#: ../game/screen_sing.cc:436
+#: ../game/screen_sing.cc:415
+#: ../game/screen_sing.cc:427
 msgid "Tone deaf"
 msgstr "Lahjaton"
 
-#: ../game/screen_sing.cc:426
+#: ../game/screen_sing.cc:417
 msgid "Maniac"
 msgstr "Maanikko"
 
-#: ../game/screen_sing.cc:427
+#: ../game/screen_sing.cc:418
 msgid "Hoofer"
 msgstr "Ekspertti"
 
-#: ../game/screen_sing.cc:430
+#: ../game/screen_sing.cc:421
 msgid "Loser"
 msgstr "Luuseri"
 
-#: ../game/screen_sing.cc:432
+#: ../game/screen_sing.cc:423
 msgid "Virtuoso"
 msgstr "Virtuoosi"
 
-#: ../game/screen_sing.cc:433
+#: ../game/screen_sing.cc:424
 msgid "Rocker"
 msgstr "Rokkari"
 
-#: ../game/songs.cc:181
+#: ../game/songs.cc:192
 msgid "random order"
 msgstr "satunnainen järjestys"
 
-#: ../game/songs.cc:182
+#: ../game/songs.cc:193
 msgid "sorted by song"
 msgstr "järjestetty kappaleen mukaan"
 
-#: ../game/songs.cc:183
+#: ../game/songs.cc:194
 msgid "sorted by artist"
 msgstr "järjestetty esittäjän mukaan"
 
-#: ../game/songs.cc:184
+#: ../game/songs.cc:195
 msgid "sorted by edition"
 msgstr "järjestetty julkaisun mukaan"
 
-#: ../game/songs.cc:185
+#: ../game/songs.cc:196
 msgid "sorted by genre"
 msgstr "järjestetty lajityypin mukaan"
 
-#: ../game/songs.cc:186
+#: ../game/songs.cc:197
 msgid "sorted by path"
 msgstr "järjestetty polun mukaan"
 
-#: ../game/songs.cc:187
+#: ../game/songs.cc:198
 msgid "sorted by language"
 msgstr "järjestetty kielen mukaan"
 
-#: ../game/screen_songs.cc:184
+#: ../game/screen_songs.cc:188
 msgid "No songs found!"
 msgstr "Kappaleita ei löytynyt!"
 
-#: ../game/screen_songs.cc:185
+#: ../game/screen_songs.cc:189
 msgid ""
 "Visit performous.org\n"
 "for free songs"
@@ -190,15 +202,15 @@ msgstr ""
 "Hae ilmaista musiikkia\n"
 "osoitteesta performous.org"
 
-#: ../game/screen_songs.cc:187
+#: ../game/screen_songs.cc:191
 msgid "no songs match search"
 msgstr "yksikään kappale ei vastannut hakuasi"
 
-#: ../game/screen_songs.cc:195
+#: ../game/screen_songs.cc:199
 msgid "(press END to view hiscores)"
 msgstr "(paina END nähdäksesi ennätykset)"
 
-#: ../game/screen_songs.cc:196
+#: ../game/screen_songs.cc:200
 msgid "<type in to search>"
 msgstr "<kirjoita etsiäksesi>"
 
