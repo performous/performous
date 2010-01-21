@@ -51,6 +51,28 @@ template <typename T> void loadSVG(T& target, std::string const& filename) {
 	gdk_pixbuf_unref(pb);
 }
 
+static void loadPNG_internal(png_structp pngPtr, png_infop infoPtr, std::ifstream& file, std::vector<unsigned char>& image, std::vector<png_bytep>& rows, unsigned& w, unsigned& h, unsigned& channels) {
+	if (setjmp(png_jmpbuf(pngPtr))) throw std::runtime_error("Reading PNG failed");
+	png_set_read_fn(pngPtr,(voidp)&file, readPngHelper);
+	png_read_info(pngPtr, infoPtr);
+	png_set_expand(pngPtr);
+	png_set_strip_16(pngPtr);
+	png_set_gray_to_rgb(pngPtr);
+	w = png_get_image_width(pngPtr, infoPtr);
+	h = png_get_image_height(pngPtr, infoPtr);
+	channels = png_get_channels(pngPtr, infoPtr);
+	if (channels == 1) channels = 3;  // Grayscale gets expanded to RGB
+	if (channels == 2) channels = 4;  // Grayscale with alpha gets expanded to RGBA
+	image.resize(w * h * 4);
+	rows.resize(h);
+	unsigned pos = 0;
+	for (unsigned y = 0; y < h; ++y) {
+		rows[y] = reinterpret_cast<png_bytep>(&image[pos]);
+		pos += (w * channels + 3) & ~3;  // Rows need to be word aligned
+	}
+	png_read_image(pngPtr, &rows[0]);
+}
+
 template <typename T> void loadPNG(T& target, std::string const& filename) {
 	std::vector<unsigned char> image;
 	std::ifstream file(filename.c_str(), std::ios::binary);
@@ -66,26 +88,8 @@ template <typename T> void loadPNG(T& target, std::string const& filename) {
 	infoPtr = png_create_info_struct(pngPtr);
 	if (!infoPtr) throw std::runtime_error("png_create_info_struct failed");
 	std::vector<png_bytep> rows;
-	// There must be no C++ objects after the setjmp line! (they won't get properly destructed)
-	if (setjmp(png_jmpbuf(pngPtr))) throw std::runtime_error("Reading PNG failed");
-	png_set_read_fn(pngPtr,(voidp)&file, readPngHelper);
-	png_read_info(pngPtr, infoPtr);
-	png_set_expand(pngPtr);
-	png_set_strip_16(pngPtr);
-	png_set_gray_to_rgb(pngPtr);
-	unsigned w = png_get_image_width(pngPtr, infoPtr);
-	unsigned h = png_get_image_height(pngPtr, infoPtr);
-	unsigned channels = png_get_channels(pngPtr, infoPtr);
-	if (channels == 1) channels = 3;  // Grayscale gets expanded to RGB
-	if (channels == 2) channels = 4;  // Grayscale with alpha gets expanded to RGBA
-	image.resize(w * h * 4);
-	rows.resize(h);
-	unsigned pos = 0;
-	for (unsigned y = 0; y < h; ++y) {
-		rows[y] = reinterpret_cast<png_bytep>(&image[pos]);
-		pos += (w * channels + 3) & ~3;  // Rows need to be word aligned
-	}
-	png_read_image(pngPtr, &rows[0]);
+	unsigned w, h, channels;
+	loadPNG_internal(pngPtr, infoPtr, file, image, rows, w, h, channels);
 	target.load(w, h, channels == 4 ? pix::CHAR_RGBA : pix::RGB, &image[0], float(w)/h);
 }
 
@@ -133,6 +137,22 @@ template <typename T> void loadJPEG(T& target, std::string const& filename) {
 	target.load(w, h, pix::RGB, &image[0], float(w)/h);
 }
 
+static void writePNG_internal(png_structp pngPtr, png_infop infoPtr, std::ofstream& file, Image const& img, std::vector<png_bytep>& rows) {
+	// There must be no objects initialized within this function because longjmp will mess them up
+	if (setjmp(png_jmpbuf(pngPtr))) throw std::runtime_error("Writing PNG failed");
+	png_set_write_fn(pngPtr, &file, writePngHelper, NULL);
+	png_set_IHDR(pngPtr, infoPtr, img.w, img.h, 8, PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
+	png_write_info(pngPtr, infoPtr);
+	unsigned stride = (img.w * 3 + 3) & ~3;  // Number of bytes per row (word-aligned)
+	unsigned pos = img.h * stride;
+	for (unsigned y = 0; y < img.h; ++y) {
+		pos -= stride;
+		rows[y] = (png_bytep)(&img.data[pos]);
+	}
+	png_write_image(pngPtr, &rows[0]);
+	png_write_end(pngPtr, NULL);
+}
+
 static inline void writePNG(std::string const& filename, Image const& img) {
 	std::vector<png_bytep> rows(img.h);
 	std::ofstream file(filename.c_str(), std::ios::binary);
@@ -147,18 +167,6 @@ static inline void writePNG(std::string const& filename, Image const& img) {
 	} cleanup(pngPtr, infoPtr);
 	infoPtr = png_create_info_struct(pngPtr);
 	if (!infoPtr) throw std::runtime_error("png_create_info_struct failed");
-	// There must be no C++ objects after the setjmp line! (they won't get properly destructed)
-	if (setjmp(png_jmpbuf(pngPtr))) throw std::runtime_error("Writing PNG failed");
-	png_set_write_fn(pngPtr, &file, writePngHelper, NULL);
-	png_set_IHDR(pngPtr, infoPtr, img.w, img.h, 8, PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);	
-	png_write_info(pngPtr, infoPtr);
-	unsigned stride = (img.w * 3 + 3) & ~3;  // Number of bytes per row (word-aligned)
-	unsigned pos = img.h * stride;
-	for (unsigned y = 0; y < img.h; ++y) {
-		pos -= stride;
-		rows[y] = (png_bytep)(&img.data[pos]);
-	}
-	png_write_image(pngPtr, &rows[0]);
-	png_write_end(pngPtr, NULL);
+	writePNG_internal(pngPtr, infoPtr, file, img, rows);
 }
 
