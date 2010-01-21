@@ -85,8 +85,10 @@ void SongParser::iniParse() {
 			testAndAdd(s, "drums", name);
 		} else if (regex_match(name.c_str(), match, audiofile_vocals)) {
 			testAndAdd(s, "vocals", name);
+#if 0  // TODO: process preview.ogg properly? In any case, do not print debug to console...
 		} else if (regex_match(name.c_str(), match, audiofile_other)) {
 			std::cout << "Found unknown ogg file: " << name << std::endl;
+#endif
 		}
 	}
 
