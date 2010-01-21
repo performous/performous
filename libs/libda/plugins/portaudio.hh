@@ -32,7 +32,8 @@ namespace portaudio {
 	struct Params {
 		PaStreamParameters params;
 		Params(PaStreamParameters const& init = PaStreamParameters()): params(init) {
-			sampleFormat(paFloat32);
+			// Some useful defaults so that things just work
+			channelCount(2).sampleFormat(paFloat32).suggestedLatency(0.1);
 		}
 		Params& channelCount(int val) { params.channelCount = val; return *this; }
 		Params& device(PaDeviceIndex val) { params.device = val; return *this; }
@@ -42,7 +43,7 @@ namespace portaudio {
 		}
 		Params& sampleFormat(PaSampleFormat val) { params.sampleFormat = val; return *this; }
 		Params& suggestedLatency(PaTime val) { params.suggestedLatency = val; return *this; }
-		// Params& hostAPISpecificStreamInfo(void* val) { params.hostAPISpecificStreamInfo = val; return *this; }
+		Params& hostApiSpecificStreamInfo(void* val) { params.hostApiSpecificStreamInfo = val; return *this; }
 		operator PaStreamParameters const*() const { return &params; }
 	};
 		
@@ -53,7 +54,7 @@ namespace portaudio {
 	class Stream {
 		PaStream* m_handle;
 	public:
-		/*Stream(
+		Stream(
 		  PaStreamParameters const* input,
 		  PaStreamParameters const* output,
 		  double sampleRate,
@@ -63,7 +64,7 @@ namespace portaudio {
 		  void* userData = NULL)
 		{
 			PORTAUDIO_CHECKED(Pa_OpenStream, (&m_handle, input, output, sampleRate, framesPerBuffer, flags, callback, userData));
-		}*/
+		}
 		template <typename Functor> Stream(
 		  Functor& functor,
 		  PaStreamParameters const* input,

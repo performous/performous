@@ -151,13 +151,12 @@ void mainLoop(std::string const& songlist) {
 	Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());
 	ScreenManager sm;
 	try {
-		sm.flashMessage(_("Loading..."), 0.0f, 1.0f, 1.0f); // No fade-in to get it to show
-		window.blank();
-		sm.drawFlashMessage();
-		window.swap();
+		sm.flashMessage(_("Audio capture..."), 0.0f, 1.0f, 1.0f); window.blank(); sm.drawFlashMessage(); window.swap();
 		Capture capture;
+		sm.flashMessage(_("Audio playback..."), 0.0f, 1.0f, 1.0f); window.blank(); sm.drawFlashMessage(); window.swap();
 		Audio audio;
 		audioSetup(capture, audio);
+		sm.flashMessage(_("Miscellaneous..."), 0.0f, 1.0f, 1.0f); window.blank(); sm.drawFlashMessage(); window.swap();
 		Backgrounds backgrounds;
 		Database database(getConfigDir() / "database.xml");
 		Songs songs(database, songlist);
@@ -172,10 +171,12 @@ void mainLoop(std::string const& songlist) {
 		sm.addScreen(new ScreenPlayers("Players", audio, database));
 		sm.addScreen(new ScreenHiscore("Hiscore", audio, songs, database));
 		sm.activateScreen("Intro");
+		sm.flashMessage(_("Main menu..."), 0.0f, 1.0f, 1.0f); window.blank(); sm.drawFlashMessage(); window.swap();
+		sm.updateScreen();  // exit/enter, any exception is fatal error
+		sm.flashMessage("");
 		// Main loop
 		boost::xtime time = now();
 		unsigned frames = 0;
-		sm.flashMessage("");
 		while (!sm.isFinished()) {
 			if( g_take_screenshot ) {
 				fs::path filename;
