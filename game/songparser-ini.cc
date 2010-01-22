@@ -110,7 +110,6 @@ void SongParser::iniParse() {
 		if (name == "GUITAR") name = "guitar";
 		// Process non-vocal tracks
 		if (name != "VOCALS") {
-			bool drums = (name == "drums");
 			int durCount = 0;
 			s.track_map.insert(make_pair(name,Track(name)));
 			NoteMap& nm2 = s.track_map.find(name)->second.nm;
@@ -122,7 +121,6 @@ void SongParser::iniParse() {
 					double end = midi.get_seconds(it3->end);
 					if (end == 0) continue; // Note with no ending
 					if (beg > end) { reversedNoteCount++; continue; } // Reversed note
-					if (drums) end = beg;
 					dur.push_back(Duration(beg, end));
 					durCount++;
 				}

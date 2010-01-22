@@ -67,7 +67,7 @@ class GuitarGraph {
 	std::string getTrack() const { return m_track_index->first; }
 	std::string getDifficultyString() const;
   private:
-	bool canActivateStarpower() { return !m_drums && (m_starmeter > 6000); }
+	bool canActivateStarpower() { return (m_starmeter > 6000); }
 	void activateStarpower();
 	void fail(double time, int fret);
 	void endHold(int fret, double time = 0.0);
@@ -95,7 +95,10 @@ class GuitarGraph {
 	std::vector<AnimValue> m_flames[5]; /// flame effect queues for each fret
 	TrackMapConstPtr m_track_map; /// tracks
 	TrackMapConstPtr::const_iterator m_track_index;
-	std::vector<Duration> m_solos;
+	std::vector<Duration> m_solos; /// holds guitar solos
+	std::vector<Duration> m_drumfills; /// holds drum fills (used for activating GodMode)
+	Durations::const_iterator m_dfIt; /// current drum fill
+	void updateDrumFill(double time);
 	void drumHit(double time, int pad);
 	void guitarPlay(double time, input::Event const& ev);
 	enum Difficulty {
@@ -145,5 +148,6 @@ class GuitarGraph {
 	int m_bigStreak; /// next limit when a popup appears
 	double m_jointime; /// when the player joined
 	int m_dead; /// how many notes has been passed without hitting buttons
+	double m_drumfillScore; /// keeps track that enough hits are scored
 };
 

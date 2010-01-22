@@ -66,6 +66,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number)
   m_width(0.5, 0.4),
   m_stream(),
   m_track_index(m_track_map.end()),
+  m_dfIt(m_drumfills.end()),
   m_level(),
   m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
   m_correctness(0.0, 5.0),
@@ -78,7 +79,8 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number)
   m_longestStreak(),
   m_bigStreak(),
   m_jointime(getNaN()),
-  m_dead()
+  m_dead(),
+  m_drumfillScore()
 {
 	// Copy all tracks of supported types (either drums or non-drums) to m_track_map
 	for (TrackMap::const_iterator it = m_song.track_map.begin(); it != m_song.track_map.end(); ++it) {
@@ -182,6 +184,7 @@ void GuitarGraph::engine() {
 			if (m_input.pressed(i)) m_hit[i + 1].setValue(1.0);
 		}
 	}
+	if (m_drums && !m_drumfills.empty()) updateDrumFill(time); // Drum Fills
 	if (m_starpower.get() > 0.001) m_correctness.setTarget(1.0, true);
 	double whammy = 0;
 	bool difficulty_changed = false;
@@ -331,9 +334,38 @@ void GuitarGraph::fail(double time, int fret) {
 	endStreak();
 }
 
+/// Calculates the start and end times for the next/current drum fill
+/// Also activates GodMode if fill went well
+void GuitarGraph::updateDrumFill(double time) {
+	// Check if fill is over
+	if (m_dfIt != m_drumfills.end()) {
+		if (time > m_dfIt->end - past) {
+			// Check if we can activate GodMode -> requires ~ 6 hits per second
+			if (m_drumfillScore >= 10.0 * (m_dfIt->end - m_dfIt->begin)) activateStarpower();
+			m_drumfillScore = 0;
+		} else return;
+	} else if (canActivateStarpower()) {
+		// Search for the next drum fill
+		for (Durations::const_iterator it = m_drumfills.begin(); it != m_drumfills.end(); ++it) {
+			if (it->begin >= time + future) { m_dfIt = it; return; }
+		}
+	}
+	m_dfIt = m_drumfills.end(); // Reset iterator
+}
+
 /// Handle drum hit scoring
 void GuitarGraph::drumHit(double time, int fret) {
 	if (fret >= 5) return;
+	// Handle drum fills
+	if (m_dfIt != m_drumfills.end() && time >= m_dfIt->begin - maxTolerance
+	  && time <= m_dfIt->end + maxTolerance) {
+		m_drumfillScore += 1;
+		Duration const* dur = &(*m_dfIt);
+		m_events.push_back(Event(time, 1, fret, dur));
+		m_flames[fret].push_back(AnimValue(0.0, flameSpd));
+		m_flames[fret].back().setTarget(1.0);
+		return;
+	}
 	// Find any suitable note within the tolerance
 	double tolerance = maxTolerance;
 	Chords::iterator best = m_chords.end();
@@ -358,6 +390,7 @@ void GuitarGraph::drumHit(double time, int fret) {
 		double score = points(tolerance);
 		m_chordIt->score += score;
 		m_score += score;
+		if (!m_drumfills.empty()) m_starmeter += score; // Only add starmeter if it's possible to activate GodMode
 		m_flames[fret].push_back(AnimValue(0.0, flameSpd));
 		m_flames[fret].back().setTarget(1.0);
 		if (m_chordIt->status == m_chordIt->polyphony) {
@@ -549,17 +582,38 @@ void GuitarGraph::draw(double time) {
 			
 			// Draw the notes
 			{ glutil::UseLighting lighting(m_use3d);
+				// Draw drum fills
+				bool drumfill = m_drums && m_dfIt != m_drumfills.end();
+				if (drumfill) {
+					for (int fret = 1; fret < 5; ++fret) { // Loop through the frets
+						glutil::Color c = color(fret);
+						// Draw long notes to mark drum fills
+						drawNote(fret, c, m_dfIt->begin - time, ((m_dfIt->end > time + future) ?
+						  future : m_dfIt->end - time), 0, false, false, 0, 0);
+					}
+				}
+				// Iterate chords
 				for (Chords::iterator it = m_chords.begin(); it != m_chords.end(); ++it) {
 					float tBeg = it->begin - time;
-					float tEnd = it->end - time;
+					float tEnd = m_drums ? tBeg : it->end - time;
 					if (tBeg > future) break;
 					if (tEnd < past) {
 						if (it->status < 100) it->status += 100; // Mark as past note for rewinding
 						continue;
 					}
-					if (it->status >= 100 || (tBeg > maxTolerance
-					  && it->status > 0)) continue; // Don't show past chords when rewinding
-					for (int fret = 0; fret < 5; ++fret) { // Loop through the frets
+					// Don't show past chords when rewinding
+					if (it->status >= 100 || (tBeg > maxTolerance && it->status > 0)) continue;
+					// Ignore notes inside drum fills when GodMode can be activated
+					if (drumfill && it->begin >= m_dfIt->begin - maxTolerance
+					  && it->begin <= m_dfIt->end + maxTolerance) {
+						if (it->status == 0) {
+							it->status = it->polyphony; // Mark as hit so that streak doesn't reset
+							m_score += it->polyphony * 50.0 * 0.75; // Give 75% points from notes under drum fill
+						}
+						continue;
+					}
+					// Loop through the frets
+					for (int fret = 0; fret < 5; ++fret) {
 						if (!it->fret[fret] || (tBeg > maxTolerance && it->releaseTimes[fret] > 0)) continue;
 						if (tEnd > future) tEnd = future;
 						unsigned event = m_notes[it->dur[fret]];
@@ -741,7 +795,9 @@ void GuitarGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 	if (canActivateStarpower()) {
 		float a = std::abs(std::fmod(time, 1.0) - 0.5f) * 2.0f;
 		m_text.dimensions.screenBottom(-0.02).middle(-0.12 + offsetX);
-		m_text.draw("God Mode Ready!", a);
+		if (m_dfIt != m_drumfills.end() && time >= m_dfIt->begin && time <= m_dfIt->end)
+			m_text.draw("  Drum Fill!  ", a);
+		else m_text.draw("God Mode Ready!", a);
 	} else {
 		// Solo?
 		for (Durations::const_iterator it = m_solos.begin(); it != m_solos.end(); ++it) {
@@ -789,7 +845,7 @@ void GuitarGraph::drawBar(double time, float h) {
 
 /// Create the Chord structures for the current track/difficulty level
 void GuitarGraph::updateChords() {
-	m_chords.clear();
+	m_chords.clear(); m_solos.clear(); m_drumfills.clear();
 	m_scoreFactor = 0;
 	Durations::size_type pos[5] = {}, size[5] = {};
 	Durations const* durations[5] = {};
@@ -841,10 +897,14 @@ void GuitarGraph::updateChords() {
 		m_chords.push_back(c);
 	}
 	m_chordIt = m_chords.begin();
-	m_scoreFactor = 10000.0 / m_scoreFactor; // normalize maximum score factor
+	m_scoreFactor = 10000.0 / m_scoreFactor; // Normalize maximum score factor
 	
 	// Solos
 	NoteMap const& nm = m_track_index->second->nm;
 	NoteMap::const_iterator it = nm.find(103); // 103 = Expert Solo - used for every difficulty
 	if (it != nm.end()) m_solos = it->second;
+	// Drum fills
+	it = nm.find(124); // 124 = drum fills (actually 120-124, but one is enough)
+	if (it != nm.end()) m_drumfills = it->second;
+	m_dfIt = m_drumfills.end();
 }
