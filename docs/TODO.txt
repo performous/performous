@@ -18,6 +18,8 @@ Big features:
 - Mic effects (reduce volume for bad singers, perfect pitch, reverb, etc)
 - Ingame Singstar DVD support (integrated ripping + ffmpeg feeding + XML song format)
 - Automatically download songs and other stuff from performous.org
+- Store instrument/dancepad mappings in configurations files + Allow user to
+  create new mapping
 
 
 Features:
