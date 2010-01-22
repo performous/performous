@@ -46,16 +46,6 @@ namespace {
 	const int streakStarBonus = 500;
 	int getNextBigStreak(int prev) { return prev + 50; }
 	inline float blend(float a, float b, float f) { return a*f + b*(1.0f-f); }
-	
-	glutil::Color starpowerColorize(glutil::Color c, float f) {
-		static glutil::Color starpowerC(0.5f, 0.5f, 1.0f);
-		if ( f < 0.001 ) return c;
-		f = std::sqrt(std::sqrt(f));
-		c.r = blend(starpowerC.r, c.r, f);
-		c.g = blend(starpowerC.g, c.g, f);
-		c.b = blend(starpowerC.b, c.b, f);
-		return c;
-	}
 }
 
 GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number):
@@ -472,6 +462,22 @@ glutil::Color const& GuitarGraph::color(int fret) const {
 	return fretColors[fret];
 }
 
+/// Modify color based on things like GodMode and solos
+glutil::Color const GuitarGraph::colorize(glutil::Color c, double time) const {
+	const static glutil::Color godmodeC(0.5f, 0.5f, 1.0f); // Color for full GodMode
+	const static glutil::Color soloC(0.2f, 0.9f, 0.2f); // Color for solo notes
+	for (Durations::const_iterator it = m_solos.begin(); it != m_solos.end(); ++it) {
+		if (time >= it->begin && time <= it->end) { c = soloC; break; }
+	}
+	double f = m_starpower.get();
+	if (f < 0.001) return c;
+	f = std::sqrt(std::sqrt(f));
+	c.r = blend(godmodeC.r, c.r, f);
+	c.g = blend(godmodeC.g, c.g, f);
+	c.b = blend(godmodeC.b, c.b, f);
+	return c;
+}
+
 namespace {
 	const float fretWid = 0.5f; // The actual width is two times this
 	
@@ -516,7 +522,7 @@ void GuitarGraph::draw(double time) {
 						tEnd = future;
 					}
 					glutil::Color c(1.0f, 1.0f, 1.0f, time2a(tEnd));
-					glColor4fv(starpowerColorize(c, m_starpower.get()));
+					glColor4fv(colorize(c, time + tBeg));
 					glNormal3f(0.0f, 1.0f, 0.0f);
 					glTexCoord2f(0.0f, texCoord); glVertex2f(-w, time2y(tEnd));
 					glNormal3f(0.0f, 1.0f, 0.0f);
@@ -533,7 +539,7 @@ void GuitarGraph::draw(double time) {
 				float x = -2.0f + fret - 0.5f * m_drums;
 				float l = m_hit[fret + !m_drums].get();
 				// Get a color for the fret and adjust it if GodMode is on
-				glColor4fv(starpowerColorize(color(fret), m_starpower.get()));
+				glColor4fv(colorize(color(fret), time));
 				m_button.dimensions.center(time2y(0.0)).middle(x);
 				m_button.draw();
 				glColor3f(l, l, l);
@@ -564,7 +570,7 @@ void GuitarGraph::draw(double time) {
 							whammy = m_events[event - 1].whammy.get();
 						}
 						// Get a color for the fret and adjust it if GodMode is on
-						glutil::Color c = starpowerColorize(color(fret), m_starpower.get());
+						glutil::Color c = colorize(color(fret), it->begin);
 						if (glow > 0.1f) { ng_r+=c.r; ng_g+=c.g; ng_b+=c.b; ng_ccnt++; } // neck glow
 						// Further adjust the color if the note is hit
 						c.r += glow;
@@ -733,9 +739,18 @@ void GuitarGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 	}
 	// Is Starpower ready?
 	if (canActivateStarpower()) {
-		float a = (int(time * 1000.0) % 1000) / 1000.0;
+		float a = std::abs(std::fmod(time, 1.0) - 0.5f) * 2.0f;
 		m_text.dimensions.screenBottom(-0.02).middle(-0.12 + offsetX);
 		m_text.draw("God Mode Ready!", a);
+	} else {
+		// Solo?
+		for (Durations::const_iterator it = m_solos.begin(); it != m_solos.end(); ++it) {
+			if (time >= it->begin && time <= it->end) {
+				float a = std::abs(std::fmod(time, 1.0) - 0.5f) * 2.0f;
+				m_text.dimensions.screenBottom(-0.02).middle(-0.05 + offsetX);
+				m_text.draw("Solo!", a);
+			}
+		}
 	}
 	// Draw streak pop-up for long streak intervals
 	double streakAnim = m_streakPopup.get();
@@ -827,5 +842,9 @@ void GuitarGraph::updateChords() {
 	}
 	m_chordIt = m_chords.begin();
 	m_scoreFactor = 10000.0 / m_scoreFactor; // normalize maximum score factor
+	
+	// Solos
+	NoteMap const& nm = m_track_index->second->nm;
+	NoteMap::const_iterator it = nm.find(103); // 103 = Expert Solo - used for every difficulty
+	if (it != nm.end()) m_solos = it->second;
 }
-

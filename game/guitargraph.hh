@@ -95,6 +95,7 @@ class GuitarGraph {
 	std::vector<AnimValue> m_flames[5]; /// flame effect queues for each fret
 	TrackMapConstPtr m_track_map; /// tracks
 	TrackMapConstPtr::const_iterator m_track_index;
+	std::vector<Duration> m_solos;
 	void drumHit(double time, int pad);
 	void guitarPlay(double time, input::Event const& ev);
 	enum Difficulty {
@@ -118,6 +119,7 @@ class GuitarGraph {
 	Events m_events;
 	unsigned m_holds[5]; /// active hold notes
 	glutil::Color const& color(int fret) const;
+	glutil::Color const colorize(glutil::Color c, double time) const;
 	void drawBar(double time, float h);
 	void drawNote(int fret, glutil::Color, float tBeg, float tEnd, float whammy = 0, bool tappable = false, bool hit = false, double hitAnim = 0.0, double releaseTime = 0.0);
 	void drawInfo(double time, double offsetX, Dimensions dimensions);
