@@ -340,8 +340,8 @@ void GuitarGraph::updateDrumFill(double time) {
 	// Check if fill is over
 	if (m_dfIt != m_drumfills.end()) {
 		if (time > m_dfIt->end - past) {
-			// Check if we can activate GodMode -> requires ~ 6 hits per second
-			if (m_drumfillScore >= 10.0 * (m_dfIt->end - m_dfIt->begin)) activateStarpower();
+			// Check if we can activate GodMode -> requires ~ 7 hits per second
+			if (m_drumfillScore >= 7.0 * (m_dfIt->end - m_dfIt->begin)) activateStarpower();
 			m_drumfillScore = 0;
 		} else return;
 	} else if (canActivateStarpower()) {
