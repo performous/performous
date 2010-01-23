@@ -22,7 +22,10 @@ if(UNIX)
 		message("WARNING: One of the following is missing: help2man, gzip; performous man page will not be generated")
 	endif(HELP2MAN AND GZIP)
 	if(ENABLE_TOOLS AND GZIP)
-		set(TOOLS "ss_pak_extract" "ss_extract" "ss_cover_conv" "ss_adpcm_decode" "ss_ipu_decode" "ss_ipu_conv")
+		set(TOOLS 
+			"ss_pak_extract" "ss_extract" "ss_cover_conv"
+			"ss_adpcm_decode" "ss_ipu_decode" "ss_ipu_conv"
+			"gh_xen_decrypt")
 		set(MAN_SECTION "1")
 		foreach(TOOL ${TOOLS})
 			set(TOOL_MANFILE ${CMAKE_CURRENT_SOURCE_DIR}/${TOOL}.${MAN_SECTION})

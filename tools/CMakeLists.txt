@@ -54,10 +54,11 @@ if (Boost_FOUND)
 	endif()
 endif (Boost_FOUND)
 
+add_executable(gh_xen_decrypt gh_xen_decrypt.cpp)
 add_executable(ss_adpcm_decode adpcm_decode.cpp pak.cpp)
 add_executable(ss_ipu_decode ipu_decode.cpp)
 add_executable(ss_ipu_conv ipu_conv.cpp ipuconvmain.cpp pak.cpp)
-set(targets ${targets} ss_pak_extract ss_adpcm_decode ss_ipu_decode ss_ipu_conv itg_pck)
+set(targets ${targets} gh_xen_decrypt ss_pak_extract ss_adpcm_decode ss_ipu_decode ss_ipu_conv itg_pck)
 
 # add install target:
 install(TARGETS ${targets} DESTINATION bin)
