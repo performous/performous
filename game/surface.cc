@@ -24,12 +24,6 @@ float Dimensions::screenY() const {
 	throw std::logic_error("Dimensions::screenY(): unknown m_screenAnchor value");
 }
 
-bool checkExtension(std::string const& extension) {
-	std::istringstream iss(reinterpret_cast<char const*>(glGetString(GL_EXTENSIONS)));
-	for (std::string ext; iss >> ext;) if (ext == extension) return true;
-	return false;
-}
-
 template <typename T> void loader(T& target, fs::path name) {
 	std::string const filename = name.string();
 	if (!fs::exists(name)) throw std::runtime_error("File not found: " + filename);
@@ -88,20 +82,9 @@ void Texture::load(unsigned int width, unsigned int height, pix::Format format, 
 	PixFmt const& f = getPixFmt(format);
 	glPixelStorei(GL_UNPACK_SWAP_BYTES, f.swap);
 	// Load the data into texture
-	if ((isPow2(width) && isPow2(height)) || 
-	  checkExtension("GL_ARB_texture_non_power_of_two")) { // Use OpenGL 2.0 functionality 
+	if ((isPow2(width) && isPow2(height)) || GL_ARB_texture_non_power_of_two) { // Can directly load the texture
 		glTexImage2D(type(), 0, GL_RGBA, width, height, 0, f.format, f.type, buffer);	
 	} else {
-		// TODO: Test for OpenGL extension GL_ARB_texture_non_power_of_two and if not found,
-		// use gluScaleImage to upscale the texture to nextPow2 dimensions before calling
-		// glTexImage2D (if it isn't pow2 already).
-		// speeds it up... trust me you need it for now at least! :P
-		// TODO: remove when cairo is fixed.
-		//
-		//if (isPow2(width) && isPow2(height))
-		//  gluBuild2DMipmaps(GL_TEXTURE_2D, 3, width, height, fmt, buffer_fmt, buffer);
-		//	int newWidth = nextPow2(width);
-		//	int newHeight = nextPow2(height);
 		int newWidth = prevPow2(width);
 		int newHeight = prevPow2(height);
 		std::vector<uint32_t> outBuf(newWidth * newHeight);
