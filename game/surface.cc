@@ -82,7 +82,7 @@ void Texture::load(unsigned int width, unsigned int height, pix::Format format, 
 	PixFmt const& f = getPixFmt(format);
 	glPixelStorei(GL_UNPACK_SWAP_BYTES, f.swap);
 	// Load the data into texture
-	if ((isPow2(width) && isPow2(height)) || GL_ARB_texture_non_power_of_two) { // Can directly load the texture
+	if ((isPow2(width) && isPow2(height)) || GLEW_ARB_texture_non_power_of_two) { // Can directly load the texture
 		glTexImage2D(type(), 0, GL_RGBA, width, height, 0, f.format, f.type, buffer);	
 	} else {
 		int newWidth = prevPow2(width);
