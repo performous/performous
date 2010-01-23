@@ -54,6 +54,7 @@ if (Boost_FOUND)
 	endif()
 endif (Boost_FOUND)
 
+add_subdirectory(gh_fsb)
 add_executable(gh_xen_decrypt gh_xen_decrypt.cpp)
 add_executable(ss_adpcm_decode adpcm_decode.cpp pak.cpp)
 add_executable(ss_ipu_decode ipu_decode.cpp)

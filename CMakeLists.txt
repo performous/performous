@@ -1,4 +1,4 @@
-project(Performous CXX)
+project(Performous CXX C)
 cmake_minimum_required(VERSION 2.6)
 cmake_policy(VERSION 2.6)
 set(PROJECT_VERSION "0.5.1+")
