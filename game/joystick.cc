@@ -378,7 +378,7 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 			bool dancepad = config["game/keyboard_dancepad"].b();
 
 			if(!guitar && !drumkit && !dancepad) return false;
-			if (_e.key.keysym.mod & (KMOD_CTRL|KMOD_SHIFT|KMOD_ALT|KMOD_META)) return false;
+			if (_e.key.keysym.mod & (KMOD_CTRL|KMOD_ALT|KMOD_META)) return false;
 
 			switch(_e.key.keysym.sym) {
 				case SDLK_RETURN: case SDLK_KP_ENTER:
@@ -527,7 +527,7 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 			bool dancepad = config["game/keyboard_dancepad"].b();
 
 			if(!guitar && !drumkit && !dancepad) return false;
-			if (_e.key.keysym.mod & (KMOD_CTRL|KMOD_SHIFT|KMOD_ALT|KMOD_META)) return false;
+			if (_e.key.keysym.mod & (KMOD_CTRL|KMOD_ALT|KMOD_META)) return false;
 
 			switch(_e.key.keysym.sym) {
 				case SDLK_RETURN: case SDLK_KP_ENTER:
