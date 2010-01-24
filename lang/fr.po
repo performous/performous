@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-21 00:06+0100\n"
+"POT-Creation-Date: 2010-01-25 00:30+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Vincent Le Ligeour <yoda-jm@users.sourceforge.net>\n"
 "Language-Team: \n"
@@ -147,14 +147,26 @@ msgid "Hiscore for "
 msgstr "Records pour "
 
 #: ../game/main.cc:154
-msgid "Loading..."
-msgstr "Chargement..."
+msgid "Audio capture..."
+msgstr "Entrée sonore..."
 
-#: ../game/main.cc:184
+#: ../game/main.cc:156
+msgid "Audio playback..."
+msgstr "Sortie sonore..."
+
+#: ../game/main.cc:159
+msgid "Miscellaneous..."
+msgstr "Divers"
+
+#: ../game/main.cc:174
+msgid "Main menu..."
+msgstr "Menu principal..."
+
+#: ../game/main.cc:185
 msgid "Screenshot taken!"
 msgstr "Capture d'écran effectuée"
 
-#: ../game/main.cc:187
+#: ../game/main.cc:188
 msgid "Screenshot failed!"
 msgstr "Echec de la capture d'écran"
 
@@ -218,6 +230,8 @@ msgstr "classement par chemin"
 msgid "sorted by language"
 msgstr "classement par langue"
 
+#~ msgid "Loading..."
+#~ msgstr "Chargement..."
 #~ msgid "filter: "
 #~ msgstr "filtre: "
 #~ msgid "none"
