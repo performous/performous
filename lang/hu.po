@@ -1,0 +1,230 @@
+#
+# Gegsite <gegsite@freemail.hu>, 2010.
+msgid ""
+msgstr ""
+"Project-Id-Version: Performous\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-01-24 12:31+0100\n"
+"PO-Revision-Date: 2010-01-24 18:19+0100\n"
+"Last-Translator: Gegsite <gegsite@freemail.hu>\n"
+"Language-Team: Hungarian <>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-KeywordsList: _\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-SearchPath-0: ../game\n"
+
+#: ../game/screen_songs.cc:186
+msgid "No songs found!"
+msgstr "Zenét nem találtam!"
+
+#: ../game/screen_songs.cc:187
+msgid ""
+"Visit performous.org\n"
+"for free songs"
+msgstr ""
+"Látogass el a performous.org -ra\n"
+"ingyenes zenékért"
+
+#: ../game/screen_songs.cc:189
+msgid "no songs match search"
+msgstr "A keresett zene nem található"
+
+#: ../game/screen_songs.cc:197
+msgid "(press END to view hiscores)"
+msgstr "(Nyomj END-et a ranglistához)"
+
+#: ../game/screen_songs.cc:198
+msgid "<type in to search>"
+msgstr "<írj a kereséshez>"
+
+#: ../game/main.cc:154
+msgid "Audio capture..."
+msgstr "Hangfelvétel..."
+
+#: ../game/main.cc:156
+msgid "Audio playback..."
+msgstr "Hang lejátszás..."
+
+#: ../game/main.cc:159
+msgid "Miscellaneous..."
+msgstr "Vegyes..."
+
+#: ../game/main.cc:174
+msgid "Main menu..."
+msgstr "Főmenü …"
+
+#: ../game/main.cc:185
+msgid "Screenshot taken!"
+msgstr "Képernyőkép elkészült!"
+
+#: ../game/main.cc:188
+msgid "Screenshot failed!"
+msgstr "Képernyőkép nem sikerült!"
+
+#: ../game/screen_sing.cc:310
+msgid "   ENTER to skip instrumental break"
+msgstr "Nyomj ENTER-et a zenei rész átugrásához"
+
+#: ../game/screen_sing.cc:311
+msgid "   Remember to wait for grading!"
+msgstr "Ne feledd a besorolást megvárni!"
+
+#: ../game/screen_sing.cc:399
+msgid "No player!"
+msgstr "Nincs játékos!"
+
+#: ../game/screen_sing.cc:408
+msgid "Hit singer"
+msgstr "Kiváló énekes"
+
+#: ../game/screen_sing.cc:409
+msgid "Lead singer"
+msgstr "Szólista"
+
+#: ../game/screen_sing.cc:410 ../game/screen_sing.cc:416
+#: ../game/screen_sing.cc:422
+msgid "Rising star"
+msgstr "Születő csillag"
+
+#: ../game/screen_sing.cc:411 ../game/screen_sing.cc:417
+#: ../game/screen_sing.cc:423
+msgid "Amateur"
+msgstr "Amatőr"
+
+#: ../game/screen_sing.cc:412 ../game/screen_sing.cc:424
+msgid "Tone deaf"
+msgstr "Botfülű"
+
+#: ../game/screen_sing.cc:414
+msgid "Maniac"
+msgstr "Mániákus"
+
+#: ../game/screen_sing.cc:415
+msgid "Hoofer"
+msgstr "Profi táncos"
+
+#: ../game/screen_sing.cc:418
+msgid "Loser"
+msgstr "Vesztes"
+
+#: ../game/screen_sing.cc:420
+msgid "Virtuoso"
+msgstr "Virtuóz"
+
+#: ../game/screen_sing.cc:421
+msgid "Rocker"
+msgstr "Rockker"
+
+#: ../game/screen_hiscore.cc:88
+msgid "Hiscore for "
+msgstr "Pontozás"
+
+#: ../game/songs.cc:192
+msgid "random order"
+msgstr "Véletlen elrendezés"
+
+#: ../game/songs.cc:193
+msgid "sorted by song"
+msgstr "Zeneszám alapján"
+
+#: ../game/songs.cc:194
+msgid "sorted by artist"
+msgstr "Előadó alapján"
+
+#: ../game/songs.cc:195
+msgid "sorted by edition"
+msgstr "Kivitel alapján"
+
+#: ../game/songs.cc:196
+msgid "sorted by genre"
+msgstr "Kategória alapján"
+
+#: ../game/songs.cc:197
+msgid "sorted by path"
+msgstr "Elérési út alapján"
+
+#: ../game/songs.cc:198
+msgid "sorted by language"
+msgstr "Nyelv alapján"
+
+#: ../game/screen_players.cc:110
+msgid "No players found!"
+msgstr "Nem találtam játékost!"
+
+#: ../game/screen_players.cc:111
+msgid "Enter a name to create a new player."
+msgstr "Írd be az új játékos nevét."
+
+#: ../game/screen_players.cc:113
+msgid "Press enter to create player!"
+msgstr "Nyomj ENTER-t a létrehozáshoz!"
+
+#: ../game/screen_players.cc:120
+msgid "You reached %1% points!"
+msgstr "%1% pontot kaptál!"
+
+#: ../game/screen_players.cc:121
+msgid "Change player with arrow keys."
+msgstr "Válts a nyilakkal játékost."
+
+#: ../game/screen_players.cc:122
+msgid "Name:"
+msgstr "Név:"
+
+#: ../game/screen_players.cc:125
+msgid "Type text to filter or create a new player."
+msgstr "Írj be szöveget a szűréshez, vagy csinálj egy új játékost."
+
+#: ../game/screen_players.cc:125
+msgid "Search Text:"
+msgstr "Szöveg kereső:"
+
+#: ../game/screen_intro.cc:15
+msgid "Perform"
+msgstr "Előadás"
+
+#: ../game/screen_intro.cc:15
+msgid "Start performing!"
+msgstr "Kezd az előadást!"
+
+#: ../game/screen_intro.cc:16
+msgid "Practice"
+msgstr "Gyakorlás"
+
+#: ../game/screen_intro.cc:16
+msgid "Check your skills or test the microphones"
+msgstr "Énekelj és ellenőrizd a mikrofont"
+
+#: ../game/screen_intro.cc:17
+msgid "Configure"
+msgstr "Beállítás"
+
+#: ../game/screen_intro.cc:17
+msgid "Configure game options"
+msgstr "Játék beállítások"
+
+#: ../game/screen_intro.cc:18
+msgid "Quit"
+msgstr "Kilépés"
+
+#: ../game/screen_intro.cc:18
+msgid "Leave the game"
+msgstr "Játék abbahagyása"
+
+#: ../game/screen_intro.cc:21
+msgid "No playback devices could be used.\n"
+msgstr "Nem találtam használható lejátszó eszközt.\n"
+
+#: ../game/screen_intro.cc:22
+msgid "No microphones found.\n"
+msgstr "Nem találtam mikrofont.\n"
+
+#: ../game/screen_intro.cc:23
+msgid ""
+"\n"
+"Please configure some before playing."
+msgstr ""
+"\n"
+"Állíts be egy-két dolgot a játék előtt."
