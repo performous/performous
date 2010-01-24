@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-16 12:12+0100\n"
+"POT-Creation-Date: 2010-01-24 17:14+0100\n"
 "PO-Revision-Date: \n"
-"Last-Translator: Tim Ooms <timtatanka@users.sourceforge.net>\n"
+"Last-Translator: TatankaT <timtatanka@users.sourceforge.net>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -45,63 +45,63 @@ msgstr "Typ tekst om te zoeken of een nieuwe speler aan te maken."
 msgid "Search Text:"
 msgstr "Zoek op tekst:"
 
-#: ../game/songs.cc:181
+#: ../game/songs.cc:192
 msgid "random order"
 msgstr "willekeurige volgorde"
 
-#: ../game/songs.cc:182
+#: ../game/songs.cc:193
 msgid "sorted by song"
 msgstr "gesorteerd op titel"
 
-#: ../game/songs.cc:183
+#: ../game/songs.cc:194
 msgid "sorted by artist"
 msgstr "gesorteerd op artiest"
 
-#: ../game/songs.cc:184
+#: ../game/songs.cc:195
 msgid "sorted by edition"
 msgstr "gesorteerd op editie"
 
-#: ../game/songs.cc:185
+#: ../game/songs.cc:196
 msgid "sorted by genre"
 msgstr "gesorteerd op genre"
 
-#: ../game/songs.cc:186
+#: ../game/songs.cc:197
 msgid "sorted by path"
 msgstr "gesorteerd op pad"
 
-#: ../game/songs.cc:187
+#: ../game/songs.cc:198
 msgid "sorted by language"
 msgstr "gesorteerd op taal"
 
-#: ../game/screen_intro.cc:10
+#: ../game/screen_intro.cc:15
 msgid "Perform"
 msgstr "Performen"
 
-#: ../game/screen_intro.cc:10
+#: ../game/screen_intro.cc:15
 msgid "Start performing!"
 msgstr "Opvoering starten!"
 
-#: ../game/screen_intro.cc:11
+#: ../game/screen_intro.cc:16
 msgid "Practice"
 msgstr "Oefenen"
 
-#: ../game/screen_intro.cc:11
+#: ../game/screen_intro.cc:16
 msgid "Check your skills or test the microphones"
 msgstr "Je vaardigheden testen en de microfoons controleren"
 
-#: ../game/screen_intro.cc:12
+#: ../game/screen_intro.cc:17
 msgid "Configure"
 msgstr "Opties"
 
-#: ../game/screen_intro.cc:12
+#: ../game/screen_intro.cc:17
 msgid "Configure game options"
 msgstr "Spelopties aanpassen"
 
-#: ../game/screen_intro.cc:13
+#: ../game/screen_intro.cc:18
 msgid "Quit"
 msgstr "Afsluiten"
 
-#: ../game/screen_intro.cc:13
+#: ../game/screen_intro.cc:18
 msgid "Leave the game"
 msgstr "Spel verlaten"
 
@@ -121,68 +121,92 @@ msgstr ""
 "\n"
 "Gelieve eerst de spelopties aan te passen voor het spelen."
 
-#: ../game/screen_sing.cc:322
+#: ../game/main.cc:154
+msgid "Audio capture..."
+msgstr "Audio opname..."
+
+#: ../game/main.cc:156
+msgid "Audio playback..."
+msgstr "Audio weergave..."
+
+#: ../game/main.cc:159
+msgid "Miscellaneous..."
+msgstr "Diversen..."
+
+#: ../game/main.cc:174
+msgid "Main menu..."
+msgstr "Hoofdmenu..."
+
+#: ../game/main.cc:185
+msgid "Screenshot taken!"
+msgstr "Schermafdruk genomen!"
+
+#: ../game/main.cc:188
+msgid "Screenshot failed!"
+msgstr "Schermafdruk nemen mislukt!"
+
+#: ../game/screen_sing.cc:310
 msgid "   ENTER to skip instrumental break"
 msgstr "   ENTER: sla muzikaal stuk over"
 
-#: ../game/screen_sing.cc:323
+#: ../game/screen_sing.cc:311
 msgid "   Remember to wait for grading!"
 msgstr "   Even wachten op de uitslag!"
 
-#: ../game/screen_sing.cc:411
+#: ../game/screen_sing.cc:399
 msgid "No player!"
 msgstr "Geen speler!"
 
-#: ../game/screen_sing.cc:420
+#: ../game/screen_sing.cc:408
 msgid "Hit singer"
 msgstr "Hitzanger"
 
-#: ../game/screen_sing.cc:421
+#: ../game/screen_sing.cc:409
 msgid "Lead singer"
 msgstr "Solozanger"
 
+#: ../game/screen_sing.cc:410
+#: ../game/screen_sing.cc:416
 #: ../game/screen_sing.cc:422
-#: ../game/screen_sing.cc:428
-#: ../game/screen_sing.cc:434
 msgid "Rising star"
 msgstr "Opkomende ster"
 
+#: ../game/screen_sing.cc:411
+#: ../game/screen_sing.cc:417
 #: ../game/screen_sing.cc:423
-#: ../game/screen_sing.cc:429
-#: ../game/screen_sing.cc:435
 msgid "Amateur"
 msgstr "Amateur"
 
+#: ../game/screen_sing.cc:412
 #: ../game/screen_sing.cc:424
-#: ../game/screen_sing.cc:436
 msgid "Tone deaf"
 msgstr "Toondoof"
 
-#: ../game/screen_sing.cc:426
+#: ../game/screen_sing.cc:414
 msgid "Maniac"
 msgstr "Maniak"
 
-#: ../game/screen_sing.cc:427
+#: ../game/screen_sing.cc:415
 msgid "Hoofer"
 msgstr "Professional"
 
-#: ../game/screen_sing.cc:430
+#: ../game/screen_sing.cc:418
 msgid "Loser"
 msgstr "Loser"
 
-#: ../game/screen_sing.cc:432
+#: ../game/screen_sing.cc:420
 msgid "Virtuoso"
 msgstr "Virtuoos"
 
-#: ../game/screen_sing.cc:433
+#: ../game/screen_sing.cc:421
 msgid "Rocker"
 msgstr "Rocker"
 
-#: ../game/screen_songs.cc:184
+#: ../game/screen_songs.cc:186
 msgid "No songs found!"
 msgstr "Geen liedjes gevonden!"
 
-#: ../game/screen_songs.cc:185
+#: ../game/screen_songs.cc:187
 msgid ""
 "Visit performous.org\n"
 "for free songs"
@@ -190,22 +214,24 @@ msgstr ""
 "Bezoek performous.org\n"
 "voor gratis liedjes"
 
-#: ../game/screen_songs.cc:187
+#: ../game/screen_songs.cc:189
 msgid "no songs match search"
 msgstr "filter geeft geen resultaat"
 
-#: ../game/screen_songs.cc:195
+#: ../game/screen_songs.cc:197
 msgid "(press END to view hiscores)"
-msgstr "(duw op END om hoogste scores te zien)"
+msgstr "(duw op END om recordscores te zien)"
 
-#: ../game/screen_songs.cc:196
-msgid "filter: "
-msgstr "filter: "
-
-#: ../game/screen_songs.cc:196
-msgid "none"
-msgstr "geen"
+#: ../game/screen_songs.cc:198
+msgid "<type in to search>"
+msgstr "<typ tekst om te zoeken>"
 
 #: ../game/screen_hiscore.cc:88
 msgid "Hiscore for "
-msgstr "Hoogste scores voor "
+msgstr "Recordscores voor "
+
+#~ msgid "filter: "
+#~ msgstr "filter: "
+#~ msgid "none"
+#~ msgstr "geen"
+
