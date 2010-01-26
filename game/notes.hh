@@ -45,6 +45,14 @@ struct Duration {
 typedef std::vector<Duration> Durations;
 typedef std::map<int, Durations> NoteMap;
 
+/// Sort by instrument track name
+struct CompTrack {
+	bool operator()(std::string const& l, std::string const& r) const {
+		// TODO: Sort other guitar tracks (coop / rhythm) properly
+		return l > r;
+	}
+};
+
 struct Track {
 	// TODO: name should not be needed here (contained into the map)
 	Track(std::string n): name(n) {}
@@ -53,8 +61,8 @@ struct Track {
 };
 
 // keep these ones
-typedef std::map<std::string,Track> TrackMap;
-typedef std::map<std::string,Track const*> TrackMapConstPtr; // this one really needed ? can't we save only the map key for comparison ?
+typedef std::map<std::string, Track, CompTrack> TrackMap;
+typedef std::map<std::string, Track const*, CompTrack> TrackMapConstPtr; // this one really needed ? can't we save only the map key for comparison ?
 
 namespace {
 	bool isTrackInside(TrackMap const& track_map, std::string const& name) {

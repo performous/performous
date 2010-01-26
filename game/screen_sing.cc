@@ -67,12 +67,12 @@ void ScreenSing::enter() {
 			try {
 				if (idx == 0) {
 					if (type == 0 && !m_song->hasDance()) ++type;
-					if (type == 1 && !m_song->hasDrums()) ++type;
-					if (type == 2 && !m_song->hasGuitars()) ++type;
+					if (type == 1 && !m_song->hasGuitars()) ++type;
+					if (type == 2 && !m_song->hasDrums()) ++type;
 					if (type == 3) break;
 				}
 				if (type == 0) m_dancers.push_back(new DanceGraph(m_audio, *m_song));
-				else m_instruments.push_back(new GuitarGraph(m_audio, *m_song, type == 1, idx));
+				else m_instruments.push_back(new GuitarGraph(m_audio, *m_song, type == 2, idx));
 				++idx;
 			} catch (input::NoDevError&) {
 				++type;
