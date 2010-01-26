@@ -6,9 +6,11 @@
 #include <algorithm>
 
 void Song::reload(bool errorIgnore) {
+	loadStatus = NONE;
 	notes.clear();
 	track_map.clear();
 	beats.clear();
+	midifilename.clear();
 	category.clear();
 	genre.clear();
 	edition.clear();

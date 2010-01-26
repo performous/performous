@@ -36,15 +36,26 @@ bool SongParser::txtCheck(std::vector<char> const& data) {
 	return data[0] == '#' && data[1] >= 'A' && data[1] <= 'Z';
 }
 
-void SongParser::txtParse() {
+/// Parse header data for Songs screen
+void SongParser::txtParseHeader() {
 	Song& s = m_song;
 	std::string line;
 	while (getline(line) && txtParseField(line)) {}
 	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
 	if (m_bpm != 0.0) addBPM(0, m_bpm);
-	while (txtParseNote(line) && getline(line)) {}
+	s.notes.push_back(Note()); // Dummy note to indicate there is a track
+}
+
+/// Parse notes
+void SongParser::txtParse() {
+	std::string line;
+	m_song.notes.clear();
+	while (getline(line) && txtParseField(line)) {} // Parse the header again
+	if (m_bpm != 0.0) addBPM(0, m_bpm);
+	while (txtParseNote(line) && getline(line)) {} // Parse notes
 	// Workaround for the terminating : 1 0 0 line, written by some converters
-	if (!s.notes.empty() && s.notes.back().type != Note::SLEEP && s.notes.back().begin == s.notes.back().end) s.notes.pop_back();
+	if (!m_song.notes.empty() && m_song.notes.back().type != Note::SLEEP
+	  && m_song.notes.back().begin == m_song.notes.back().end) m_song.notes.pop_back();
 }
 
 bool SongParser::txtParseField(std::string const& line) {

@@ -1,5 +1,6 @@
 #include "screen_sing.hh"
 
+#include "songparser.hh"
 #include "util.hh"
 #include "record.hh"
 #include "configuration.hh"
@@ -30,6 +31,14 @@ namespace {
 
 void ScreenSing::enter() {
 	theme.reset(new ThemeSing());
+	// Load the rest of the song
+	if (m_song->loadStatus != Song::FULL) {
+		try { SongParser sp(*m_song); }
+		catch (std::exception& e) {
+			std::cout << e.what() << std::endl;
+			ScreenManager::getSingletonPtr()->activateScreen("Songs");
+		}
+	}
 	bool foundbg = false;
 	if (!m_song->background.empty()) {
 		try {

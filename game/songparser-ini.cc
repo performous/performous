@@ -35,7 +35,8 @@ namespace {
 	}
 }
 
-void SongParser::iniParse() {
+/// Parse header data for Songs screen
+void SongParser::iniParseHeader() {
 	Song& s = m_song;
 	std::string line;
 	while (getline(line)) {
@@ -58,6 +59,8 @@ void SongParser::iniParse() {
 	}
 	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
 	
+	// Parse additional data from midi file - required to get tracks info
+	s.midifilename = "notes.mid";
 	// Compose regexps to find music files
 	boost::regex midifile("(.*\\.mid)$", boost::regex_constants::icase);
 	boost::regex audiofile_background("(song\\.ogg)$", boost::regex_constants::icase);
@@ -67,14 +70,13 @@ void SongParser::iniParse() {
 	boost::regex audiofile_vocals("(vocals\\.ogg)$", boost::regex_constants::icase);
 	boost::regex audiofile_other("(.*\\.ogg)$", boost::regex_constants::icase);
 	boost::cmatch match;
-	std::string midifilename("notes.mid");
-	
-	// Search the dir for the musics
+
+	// Search the dir for the music files
 	for (boost::filesystem::directory_iterator dirIt(s.path), dirEnd; dirIt != dirEnd; ++dirIt) {
 		boost::filesystem::path p = dirIt->path();
 		std::string name = p.leaf(); // File basename (notes.txt)
 		if (regex_match(name.c_str(), match, midifile)) {
-			 midifilename = name;
+			 s.midifilename = name;
 		} else if (regex_match(name.c_str(), match, audiofile_background)) {
 			testAndAdd(s, "background", name);
 		} else if (regex_match(name.c_str(), match, audiofile_guitar)) {
@@ -91,8 +93,34 @@ void SongParser::iniParse() {
 #endif
 		}
 	}
+	// Parse tracks from midi
+	MidiFileParser midi(s.path + "/" + s.midifilename);
+	for (MidiFileParser::Tracks::const_iterator it = midi.tracks.begin(); it != midi.tracks.end(); ++it) {
+		// Figure out the track name
+		std::string name = it->name;
+		if (midi.tracks.size() == 1) name = "guitar"; // Original (old) FoF songs only have one track
+		else if (name == "T1 GEMS") name = "guitar"; // Some old MIDI files have a track named T1 GEMS
+		else if (name.substr(0, 5) != "PART ") continue;
+		else name.erase(0, 5);
+		if (name == "GUITAR COOP") name = "coop guitar";
+		else if (name == "RHYTHM") name = "rhythm guitar";
+		else if (name == "DRUM") name = "drums";
+		else if (name == "DRUMS") name = "drums";
+		else if (name == "BASS") name = "bass";
+		else if (name == "GUITAR") name = "guitar";
+		// Add dummy notes to tracks so that they can be seen in song browser
+		if (name != "VOCALS") s.track_map.insert(make_pair(name,Track(name)));
+		else s.notes.push_back(Note());
+	}
+}
 
-	MidiFileParser midi(s.path + "/" + midifilename);
+/// Parse notes
+void SongParser::iniParse() {
+	Song& s = m_song;
+	s.notes.clear();
+	s.track_map.clear();
+	
+	MidiFileParser midi(s.path + "/" + s.midifilename);
 	int reversedNoteCount = 0;
 	for (uint32_t ts = 0, end = midi.ts_last + midi.division; ts < end; ts += midi.division) s.beats.push_back(midi.get_seconds(ts));
 	for (MidiFileParser::Tracks::const_iterator it = midi.tracks.begin(); it != midi.tracks.end(); ++it) {
@@ -103,11 +131,11 @@ void SongParser::iniParse() {
 		else if (name.substr(0, 5) != "PART ") continue;
 		else name.erase(0, 5);
 		if (name == "GUITAR COOP") name = "coop guitar";
-		if (name == "RHYTHM") name = "rhythm guitar";
-		if (name == "DRUM") name = "drums";
-		if (name == "DRUMS") name = "drums";
-		if (name == "BASS") name = "bass";
-		if (name == "GUITAR") name = "guitar";
+		else if (name == "RHYTHM") name = "rhythm guitar";
+		else if (name == "DRUM") name = "drums";
+		else if (name == "DRUMS") name = "drums";
+		else if (name == "BASS") name = "bass";
+		else if (name == "GUITAR") name = "guitar";
 		// Process non-vocal tracks
 		if (name != "VOCALS") {
 			int durCount = 0;
@@ -205,7 +233,7 @@ void SongParser::iniParse() {
 	if (reversedNoteCount > 0) {
 		std::ostringstream oss;
 		oss << "WARNING: Skipping " << reversedNoteCount << " reversed note(s) in ";
-		oss << s.path << midifilename << std::endl;
+		oss << s.path << s.midifilename << std::endl;
 		std::cerr << oss.str(); // More likely to be atomic when written as one string
 	}
 

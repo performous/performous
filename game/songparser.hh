@@ -42,10 +42,24 @@ class SongParser {
 			m_ss.write(&data[0], size);
 		}
 		convertToUTF8(m_ss, s.path + s.filename);
+		// Header already parsed?
+		if (s.loadStatus == Song::HEADER) {
+			try {
+				if (type == TXT) txtParse();
+				else if (type == INI) iniParse();
+				else if (type == SM) smParse();
+			} catch (std::runtime_error& e) {
+				throw SongParserException(e.what(), m_linenum);
+			}
+			finalize(); // Do some adjusting to the notes
+			s.loadStatus = Song::FULL;
+			return;
+		}
+		// Parse only header to speed up loading and conserve memory
 		try {
-			if (type == TXT) txtParse();
-			if (type == INI) iniParse();
-			if (type == SM) smParse();
+			if (type == TXT) txtParseHeader();
+			else if (type == INI) iniParseHeader();
+			else if (type == SM) smParseHeader();
 		} catch (std::runtime_error& e) {
 			throw SongParserException(e.what(), m_linenum);
 		}
@@ -69,26 +83,29 @@ class SongParser {
 				}
 			}
 		}
-
+		s.loadStatus = Song::HEADER;
+	}
+  private:
+	void finalize() {
 		// Adjust negative notes
 		if (m_song.noteMin <= 0) {
 			unsigned int shift = (1 - m_song.noteMin / 12) * 12;
 			m_song.noteMin += shift;
 			m_song.noteMax += shift;
-			for (Notes::iterator it = s.notes.begin(); it != s.notes.end(); ++it) {
+			for (Notes::iterator it = m_song.notes.begin(); it != m_song.notes.end(); ++it) {
 				it->note += shift;
 				it->notePrev += shift;
 			}
 		}
 		// Set begin/end times
-		if (!s.notes.empty()) s.beginTime = s.notes.front().begin, s.endTime = s.notes.back().end;
+		if (!m_song.notes.empty()) m_song.beginTime = m_song.notes.front().begin, m_song.endTime = m_song.notes.back().end;
 		m_song.m_scoreFactor = 1.0 / m_maxScore;
 		if (m_tsPerBeat) {
 			// Add song beat markers
 			for (unsigned ts = 0; ts < m_tsEnd; ts += m_tsPerBeat) m_song.beats.push_back(tsTime(ts));
 		}
 	}
-  private:
+
 	Song& m_song;
 	std::stringstream m_ss;
 	unsigned int m_linenum;
@@ -98,12 +115,15 @@ class SongParser {
 	double m_bpm;
 	
 	bool txtCheck(std::vector<char> const& data);
+	void txtParseHeader();
 	void txtParse();
 	bool txtParseField(std::string const& line);
 	bool txtParseNote(std::string line);
 	bool iniCheck(std::vector<char> const& data);
+	void iniParseHeader();
 	void iniParse();
 	bool smCheck(std::vector<char> const& data);
+	void smParseHeader();
 	void smParse();
 	bool smParseField(std::string line);
 	Notes smParseNotes(std::string line);

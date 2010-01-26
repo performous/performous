@@ -53,7 +53,9 @@ reaches value #NOTES.
 - smParseNotes reads the notes into vector called notes which is a vector of structs (Note);
 */
 
-void SongParser::smParse() {
+/// Parse header data for Songs screen
+// TODO: This actually parses the whole thing
+void SongParser::smParseHeader() {
 	Song& s = m_song;
 	std::string line;
 	// Parse the the entire file
@@ -68,6 +70,13 @@ void SongParser::smParse() {
 	s.stops.resize(m_stops.size());
 	for (std::size_t i = 0; i < m_stops.size(); ++i) s.stops[i] = stopConvert(m_stops[i]);
 	m_tsPerBeat = 4;
+}
+
+/// Parse remaining stuff
+void SongParser::smParse() {
+	m_song.stops.clear();
+	m_song.danceTracks.clear();
+	smParseHeader();
 }
 
 bool SongParser::smParseField(std::string line) {

@@ -5,6 +5,7 @@
 #include "song.hh"
 #include "database.hh"
 #include "i18n.hh"
+#include "profiler.hh"
 
 #include <boost/bind.hpp>
 #include <boost/format.hpp>
@@ -38,6 +39,7 @@ void Songs::reload_internal() {
 		m_songs.clear();
 		m_dirty = true;
 	}
+	Profiler prof("Song loading took");
 	Paths paths = getPathsConfig("system/path_songs");
 	for (Paths::iterator it = paths.begin(); m_loading && it != paths.end(); ++it) {
 		if (!fs::is_directory(*it)) { m_debug << ">>> Not scanning: " << *it << " (no such directory)" << std::endl; continue; }
@@ -47,6 +49,7 @@ void Songs::reload_internal() {
 		size_t diff = m_songs.size() - count;
 		if (diff > 0 && m_loading) m_debug << diff << " songs loaded" << std::endl;
 	}
+	prof("total");
 	if (m_loading) dumpSongs_internal(); // Dump the songlist to file (if requested)
 	m_loading = false;
 }

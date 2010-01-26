@@ -33,6 +33,8 @@ class Song: boost::noncopyable {
 	std::string str() const { return title + "  by  " + artist; }
 	/** Get full song information (used by the search function). **/
 	std::string strFull() const { return title + "\n" + artist + "\n" + genre + "\n" + edition + "\n" + path; }
+	/// Is the song parsed from the file yet?
+	enum LoadStatus { NONE, HEADER, FULL } loadStatus;
 	/// status of song
 	enum Status { NORMAL, INSTRUMENTAL_BREAK, FINISHED };
 	/** Get the song status at a given timestamp **/
@@ -51,6 +53,7 @@ class Song: boost::noncopyable {
 	    noteMax; ///< highest note
 	std::string path; ///< path of songfile
 	std::string filename; ///< name of songfile
+	std::string midifilename; ///< name of midi file in FoF format
 	std::vector<std::string> category; ///< category of song
 	std::string genre; ///< genre
 	std::string edition; ///< license
