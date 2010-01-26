@@ -70,6 +70,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number)
   m_level(),
   m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
   m_correctness(0.0, 5.0),
+  m_drumJump(0.0, 12.0),
   m_streakPopup(0.0, 1.0),
   m_godmodePopup(0.0, 0.666),
   m_score(),
@@ -393,6 +394,7 @@ void GuitarGraph::drumHit(double time, int fret) {
 		if (!m_drumfills.empty()) m_starmeter += score; // Only add starmeter if it's possible to activate GodMode
 		m_flames[fret].push_back(AnimValue(0.0, flameSpd));
 		m_flames[fret].back().setTarget(1.0);
+		if (fret == 0) m_drumJump.setTarget(1.0); // Do a jump for bass drum
 		if (m_chordIt->status == m_chordIt->polyphony) {
 			//m_score -= m_chordIt->score;
 			//m_chordIt->score *= m_chordIt->polyphony;
@@ -535,6 +537,12 @@ void GuitarGraph::draw(double time) {
 		glTranslatef(frac * 2.0 * offsetX, 0.0f, 0.0f);
 		glutil::PushMatrixMode pmb(GL_MODELVIEW);
 		glTranslatef((1.0 - frac) * offsetX, dimensions.y2(), 0.0f);
+		// Do some jumping for drums
+		if (m_drums) {
+			float jumpanim = m_drumJump.get();
+			if (jumpanim == 1.0) m_drumJump.setTarget(0.0);
+			if (jumpanim > 0) glTranslatef(0.0f, -m_drumJump.get() * 0.01, 0.0f);
+		}
 		glRotatef(g_angle, 1.0f, 0.0f, 0.0f);
 		float temp_s = dimensions.w() / 5.0f;
 		glScalef(temp_s, temp_s, temp_s);
