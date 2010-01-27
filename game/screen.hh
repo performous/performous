@@ -3,6 +3,7 @@
 #include "singleton.hh"
 #include "animvalue.hh"
 #include "opengl_text.hh"
+#include "video_driver.hh"
 #include <boost/ptr_container/ptr_map.hpp>
 #include <SDL.h>
 #include <string>
@@ -35,7 +36,7 @@ class Screen {
 class ScreenManager: public Singleton <ScreenManager> {
   public:
 	/// constructor
-	ScreenManager();
+	ScreenManager(Window& window);
 	/// adds a screen to the manager
 	void addScreen(Screen* s) { std::string tmp = s->getName(); screens.insert(tmp, s); };
 	/// Switches active screen
@@ -46,6 +47,8 @@ class ScreenManager: public Singleton <ScreenManager> {
 	Screen* getCurrentScreen() { return currentScreen; };
 	/// returns pointer to Screen for given name
 	Screen* getScreen(std::string const& name);
+	/// returns a reference to the window
+	Window& getWindow() { return window; };
 	
 	/// Set a message to flash in current screen
 	void flashMessage(std::string const& name, float fadeIn=0.5f, float hold=1.5f, float fadeOut=1.0f);
@@ -58,6 +61,7 @@ class ScreenManager: public Singleton <ScreenManager> {
 	bool isFinished() { return m_finished; };
 
   private:
+	Window& window;
 	bool m_finished;
 	float m_timeToFadeIn;
 	float m_timeToFadeOut;

@@ -149,7 +149,7 @@ void audioSetup(Capture& capture, Audio& audio) {
 
 void mainLoop(std::string const& songlist) {
 	Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());
-	ScreenManager sm;
+	ScreenManager sm(window);
 	try {
 		sm.flashMessage(_("Audio capture..."), 0.0f, 1.0f, 1.0f); window.blank(); sm.drawFlashMessage(); window.swap();
 		Capture capture;

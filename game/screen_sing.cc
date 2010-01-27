@@ -30,13 +30,15 @@ namespace {
 }
 
 void ScreenSing::enter() {
+	ScreenManager* sm = ScreenManager::getSingletonPtr();
+	sm->flashMessage(_("Loading song..."), 0.0, 1.0, 0.5);
+	sm->drawFlashMessage(); sm->getWindow().swap(); // Make loading message show
 	theme.reset(new ThemeSing());
 	// Load the rest of the song
 	if (m_song->loadStatus != Song::FULL) {
 		try { SongParser sp(*m_song); }
 		catch (std::exception& e) {
 			std::cout << e.what() << std::endl;
-			ScreenManager* sm = ScreenManager::getSingletonPtr();
 			sm->flashMessage(_("Song is broken!"));
 			sm->activateScreen("Songs");
 		}
