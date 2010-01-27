@@ -74,8 +74,9 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 			else manageSharedKey(nav);
 			return;
 		} else if (nav == input::CANCEL) {
-			if (m_search.text.empty() && m_songs.getTypeFilter() == 0) sm->activateScreen("Intro");
-			else { m_search.text.clear(); m_songs.setFilter(m_search.text); m_songs.setTypeFilter(0); }
+			if (!m_search.text.empty()) { m_search.text.clear(); m_songs.setFilter(m_search.text); }
+			else if (m_songs.getTypeFilter() != 0) m_songs.setTypeFilter(0);
+			else sm->activateScreen("Intro");
 		}
 		// The rest are only available when there are songs available
 		else if (m_songs.empty()) return;
