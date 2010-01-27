@@ -33,6 +33,24 @@ namespace {
 			throw std::runtime_error("\"" + str + "\" is not valid floating point value");
 		}
 	}
+	/// Change the MIDI track name to Performous track name
+	/// Return false if not valid
+	bool mangleTrackName(std::string& name) {
+		if (name == "T1 GEMS") { // Some old MIDI files have a track named T1 GEMS
+			name = "guitar"; return true;
+		}
+		else if (name.substr(0, 5) != "PART ") return false;
+		else name.erase(0, 5);
+		if (name == "GUITAR COOP") name = "coop guitar";
+		else if (name == "RHYTHM") name = "rhythm guitar";
+		else if (name == "DRUM") name = "drums";
+		else if (name == "DRUMS") name = "drums";
+		else if (name == "BASS") name = "bass";
+		else if (name == "GUITAR") name = "guitar";
+		else if (name == "VOCALS") return true;
+		else return false;
+		return true;
+	}
 }
 
 /// Parse header data for Songs screen
@@ -99,15 +117,7 @@ void SongParser::iniParseHeader() {
 		// Figure out the track name
 		std::string name = it->name;
 		if (midi.tracks.size() == 1) name = "guitar"; // Original (old) FoF songs only have one track
-		else if (name == "T1 GEMS") name = "guitar"; // Some old MIDI files have a track named T1 GEMS
-		else if (name.substr(0, 5) != "PART ") continue;
-		else name.erase(0, 5);
-		if (name == "GUITAR COOP") name = "coop guitar";
-		else if (name == "RHYTHM") name = "rhythm guitar";
-		else if (name == "DRUM") name = "drums";
-		else if (name == "DRUMS") name = "drums";
-		else if (name == "BASS") name = "bass";
-		else if (name == "GUITAR") name = "guitar";
+		else if (!mangleTrackName(name)) continue; // Beautify the track name
 		// Add dummy notes to tracks so that they can be seen in song browser
 		if (name != "VOCALS") s.track_map.insert(make_pair(name,Track(name)));
 		else s.notes.push_back(Note());
@@ -127,15 +137,7 @@ void SongParser::iniParse() {
 		// Figure out the track name
 		std::string name = it->name;
 		if (midi.tracks.size() == 1) name = "guitar"; // Original (old) FoF songs only have one track
-		else if (name == "T1 GEMS") name = "guitar"; // Some old MIDI files have a track named T1 GEMS
-		else if (name.substr(0, 5) != "PART ") continue;
-		else name.erase(0, 5);
-		if (name == "GUITAR COOP") name = "coop guitar";
-		else if (name == "RHYTHM") name = "rhythm guitar";
-		else if (name == "DRUM") name = "drums";
-		else if (name == "DRUMS") name = "drums";
-		else if (name == "BASS") name = "bass";
-		else if (name == "GUITAR") name = "guitar";
+		else if (!mangleTrackName(name)) continue; // Beautify the track name
 		// Process non-vocal tracks
 		if (name != "VOCALS") {
 			int durCount = 0;
