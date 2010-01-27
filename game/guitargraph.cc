@@ -185,7 +185,7 @@ void GuitarGraph::engine() {
 			if (m_input.pressed(i)) m_hit[i + 1].setValue(1.0);
 		}
 	}
-	if (m_drums && !m_drumfills.empty()) updateDrumFill(time); // Drum Fills
+	if (!m_drumfills.empty()) updateDrumFill(time); // Drum Fills / BREs
 	if (m_starpower.get() > 0.001) m_correctness.setTarget(1.0, true);
 	double whammy = 0;
 	bool difficulty_changed = false;
@@ -341,15 +341,17 @@ void GuitarGraph::updateDrumFill(double time) {
 	// Check if fill is over
 	if (m_dfIt != m_drumfills.end()) {
 		if (time > m_dfIt->end - past) {
-			// Check if we can activate GodMode -> requires ~ 7 hits per second
-			if (m_drumfillScore >= 7.0 * (m_dfIt->end - m_dfIt->begin)) activateStarpower();
+			// Check if we can activate GodMode (drums) -> requires ~ 7 hits per second
+			if (m_drums && m_drumfillScore >= 7.0 * (m_dfIt->end - m_dfIt->begin)) activateStarpower();
 			m_drumfillScore = 0;
 		} else return;
-	} else if (canActivateStarpower()) {
+	} else if (m_drums && canActivateStarpower()) {
 		// Search for the next drum fill
 		for (Durations::const_iterator it = m_drumfills.begin(); it != m_drumfills.end(); ++it) {
 			if (it->begin >= time + future) { m_dfIt = it; return; }
 		}
+	} else if (!m_drums && m_drumfills.back().begin >= time + future) {
+		m_dfIt = (--m_drumfills.end()); return; // Guitar Big Rock Ending
 	}
 	m_dfIt = m_drumfills.end(); // Reset iterator
 }
@@ -409,6 +411,15 @@ void GuitarGraph::drumHit(double time, int fret) {
 /// Handle guitar events and scoring
 void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 	bool picked = (ev.type == input::Event::PICK);
+	// Handle Big Rock Ending
+	if (m_dfIt != m_drumfills.end() && time >= m_dfIt->begin - maxTolerance
+	  && time <= m_dfIt->end + maxTolerance) {
+		if (!ev.type == input::Event::PRESS) return;
+		m_drumfillScore += 1;
+		m_flames[ev.button].push_back(AnimValue(0.0, flameSpd));
+		m_flames[ev.button].back().setTarget(1.0);
+		return;
+	}
 	bool frets[5] = {};  // The combination about to be played
 	if (picked) {
 		for (int fret = 0; fret < 5; ++fret) {
@@ -590,12 +601,12 @@ void GuitarGraph::draw(double time) {
 			
 			// Draw the notes
 			{ glutil::UseLighting lighting(m_use3d);
-				// Draw drum fills
-				bool drumfill = m_drums && m_dfIt != m_drumfills.end();
+				// Draw drum fills / Big Rock Endings
+				bool drumfill = m_dfIt != m_drumfills.end();
 				if (drumfill) {
-					for (int fret = 1; fret < 5; ++fret) { // Loop through the frets
+					for (int fret = m_drums; fret < 5; ++fret) { // Loop through the frets
 						glutil::Color c = color(fret);
-						// Draw long notes to mark drum fills
+						// Visualize as long notes
 						drawNote(fret, c, m_dfIt->begin - time, ((m_dfIt->end > time + future) ?
 						  future : m_dfIt->end - time), 0, false, false, 0, 0);
 					}
@@ -611,7 +622,7 @@ void GuitarGraph::draw(double time) {
 					}
 					// Don't show past chords when rewinding
 					if (it->status >= 100 || (tBeg > maxTolerance && it->status > 0)) continue;
-					// Ignore notes inside drum fills when GodMode can be activated
+					// Ignore notes during drum fills / BREs
 					if (drumfill && it->begin >= m_dfIt->begin - maxTolerance
 					  && it->begin <= m_dfIt->end + maxTolerance) {
 						if (it->status == 0) {
@@ -803,7 +814,7 @@ void GuitarGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 	if (canActivateStarpower()) {
 		float a = std::abs(std::fmod(time, 1.0) - 0.5f) * 2.0f;
 		m_text.dimensions.screenBottom(-0.02).middle(-0.12 + offsetX);
-		if (m_dfIt != m_drumfills.end() && time >= m_dfIt->begin && time <= m_dfIt->end)
+		if (m_drums && m_dfIt != m_drumfills.end() && time >= m_dfIt->begin && time <= m_dfIt->end)
 			m_text.draw("  Drum Fill!  ", a);
 		else m_text.draw("God Mode Ready!", a);
 	} else {
@@ -811,7 +822,7 @@ void GuitarGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 		for (Durations::const_iterator it = m_solos.begin(); it != m_solos.end(); ++it) {
 			if (time >= it->begin && time <= it->end) {
 				float a = std::abs(std::fmod(time, 1.0) - 0.5f) * 2.0f;
-				m_text.dimensions.screenBottom(-0.02).middle(-0.05 + offsetX);
+				m_text.dimensions.screenBottom(-0.02).middle(-0.03 + offsetX);
 				m_text.draw("Solo!", a);
 			}
 		}
