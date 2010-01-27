@@ -36,9 +36,13 @@ void ScreenSing::enter() {
 		try { SongParser sp(*m_song); }
 		catch (std::exception& e) {
 			std::cout << e.what() << std::endl;
-			ScreenManager::getSingletonPtr()->activateScreen("Songs");
+			ScreenManager* sm = ScreenManager::getSingletonPtr();
+			sm->flashMessage(_("Song is broken!"));
+			sm->activateScreen("Songs");
 		}
 	}
+	// Notify about broken tracks
+	if (m_song->b0rkedTracks) ScreenManager::getSingletonPtr()->flashMessage(_("Song contains broken tracks!"));
 	bool foundbg = false;
 	if (!m_song->background.empty()) {
 		try {

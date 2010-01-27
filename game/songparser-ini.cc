@@ -159,6 +159,7 @@ void SongParser::iniParse() {
 			// This number has been extracted from broken song tracks, but
 			// it is probably DIFFICULTYCOUNT * different_frets.
 			if (durCount <= 20) {
+				s.b0rkedTracks = true;
 				nm2.clear();
 				s.track_map.erase(name);
 			}
@@ -238,7 +239,6 @@ void SongParser::iniParse() {
 		oss << s.path << s.midifilename << std::endl;
 		std::cerr << oss.str(); // More likely to be atomic when written as one string
 	}
-
 	/*if (s.notes.empty()) {
 		Note n;
 		n.begin = 30.0;

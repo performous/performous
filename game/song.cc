@@ -33,6 +33,7 @@ void Song::reload(bool errorIgnore) {
 	preview_start = getNaN();
 	beginTime = endTime = getNaN();
 	m_scoreFactor = 0.0;
+	b0rkedTracks = false;
 	try { SongParser(*this); } catch (...) { if (!errorIgnore) throw; }
 	collateUpdate();
 }
