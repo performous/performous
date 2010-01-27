@@ -55,6 +55,7 @@ reaches value #NOTES.
 
 /// Parse header data for Songs screen
 // TODO: This actually parses the whole thing
+// TODO: Songparser drops parsed notes, remove it when smParseHeader is more intelligent
 void SongParser::smParseHeader() {
 	Song& s = m_song;
 	std::string line;

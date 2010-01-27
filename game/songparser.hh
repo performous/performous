@@ -59,7 +59,7 @@ class SongParser {
 		try {
 			if (type == TXT) txtParseHeader();
 			else if (type == INI) iniParseHeader();
-			else if (type == SM) smParseHeader();
+			else if (type == SM) { smParseHeader(); s.dropNotes(); } // Hack: drop notes here
 		} catch (std::runtime_error& e) {
 			throw SongParserException(e.what(), m_linenum);
 		}
