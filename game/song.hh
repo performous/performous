@@ -29,6 +29,8 @@ class Song: boost::noncopyable {
 	void reload(bool errorIgnore = true);
 	/// parse field
 	bool parseField(std::string const& line);
+	/// drop notes (to conserve memory), but keep info about available tracks
+	void dropNotes();
 	/** Get formatted song label. **/
 	std::string str() const { return title + "  by  " + artist; }
 	/** Get full song information (used by the search function). **/

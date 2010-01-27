@@ -38,6 +38,26 @@ void Song::reload(bool errorIgnore) {
 	collateUpdate();
 }
 
+void Song::dropNotes() {
+	// Singing
+	if (!notes.empty()) {
+		notes.clear();
+		notes.push_back(Note()); // Dummy note to indicate there is a track
+	}
+	// Instruments
+	if (!track_map.empty()) {
+		for (TrackMap::iterator it = track_map.begin(); it != track_map.end(); ++it)
+			it->second.nm.clear();
+	}
+	// Dancing
+	if (!danceTracks.empty()) {
+		for (DanceTracks::iterator it = danceTracks.begin(); it != danceTracks.end(); ++it)
+			it->second.clear();
+	}
+	b0rkedTracks = false;
+	loadStatus = HEADER;
+}
+
 void Song::collateUpdate() {
 	collateByTitle = collate(title + artist) + '\0' + filename;
 	collateByTitleOnly = collate(title);

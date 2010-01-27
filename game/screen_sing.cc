@@ -171,6 +171,7 @@ void ScreenSing::exit() {
 	m_pause_icon.reset();
 	m_video.reset();
 	m_background.reset();
+	m_song->dropNotes();
 	theme.reset();
 	if (m_audio.isPaused()) m_audio.togglePause();
 }
