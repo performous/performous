@@ -27,7 +27,7 @@ namespace {
 	public:
 		pa19_record(settings& s_orig):
 		  s(s_orig),
-		  stream(*this, portaudio::Params().channelCount(s.channels()).device(s.subdev()), NULL, s.rate())
+		  stream(*this, portaudio::Params().channelCount(s.channels()).device(s.subdev(), true), NULL, s.rate())
 		{
 			PaError err = Pa_StartStream(stream);
 			if( err != paNoError ) throw std::runtime_error("Cannot start PortAudio audio stream " + s.subdev() + ": " + Pa_GetErrorText(err));
@@ -53,7 +53,7 @@ namespace {
 	public:
 		pa19_playback(settings& s_orig):
 		  s(s_orig),
-		  stream(*this, NULL, portaudio::Params().channelCount(s.channels()).device(s.subdev()), s.rate())
+		  stream(*this, NULL, portaudio::Params().channelCount(s.channels()).device(s.subdev(), false), s.rate())
 		{
 			PaError err = Pa_StartStream(stream);
 			if( err != paNoError ) throw std::runtime_error("Cannot start PortAudio audio stream " + s.subdev() + ": " + Pa_GetErrorText(err));

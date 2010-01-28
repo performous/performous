@@ -37,8 +37,8 @@ namespace portaudio {
 		}
 		Params& channelCount(int val) { params.channelCount = val; return *this; }
 		Params& device(PaDeviceIndex val) { params.device = val; return *this; }
-		Params& device(std::string const& name) {
-			device(name.empty() ? 0 : std::atoi(name.c_str())); // TODO: Name matching and error handling
+		Params& device(std::string const& name, bool inputDevice) {
+			device(name.empty() ? ((inputDevice) ? Pa_GetDefaultInputDevice() : Pa_GetDefaultOutputDevice()) : std::atoi(name.c_str())); // TODO: Name matching and error handling
 			return *this;
 		}
 		Params& sampleFormat(PaSampleFormat val) { params.sampleFormat = val; return *this; }
