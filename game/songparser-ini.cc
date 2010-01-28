@@ -233,6 +233,11 @@ void SongParser::iniParse() {
 		}
 		if (!s.notes.empty()) break;
 	}
+	// Figure out if we have BRE in the song
+	for (MidiFileParser::CommandEvents::const_iterator it = midi.cmdevents.begin(); it != midi.cmdevents.end(); ++it) {
+		if (*it == "[section big_rock_ending]") s.hasBRE = true;
+	}
+	// Output some warning
 	if (reversedNoteCount > 0) {
 		std::ostringstream oss;
 		oss << "WARNING: Skipping " << reversedNoteCount << " reversed note(s) in ";

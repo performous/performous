@@ -169,8 +169,9 @@ MidiFileParser::Track MidiFileParser::read_track(MidiStream& stream) {
 			std::string data = riff.read_bytes(riff.read_varlen());
 			switch (type) {
 			  case 0x01:
-			  	// Lyrics are hidden here, only [text] are orders
-			  	if( data[0] != '[' ) m_lyric = data;
+				// Lyrics are hidden here, only [text] are orders
+				if (data[0] != '[') m_lyric = data;
+				else cmdevents.push_back(std::string(data));
 #if MIDI_DEBUG_LEVEL > 2
 				std::cout << "Text: " << data << std::endl;
 #endif
@@ -232,7 +233,7 @@ void MidiFileParser::cout_midi_event(uint8_t t, uint8_t arg1, uint8_t arg2, uint
 	std::cout << "Midi event:" << std::setw(12) << miditime << std::fixed << std::setprecision(2) << std::setw(12) << get_seconds(miditime) << "  ";
 	switch (t) {
 	  case 0x8: std::cout << "note off   pitch=" << int(arg1) << " velocity=" << int(arg2); break;
-	  case 0x9: std::cout << "note on	pitch=" << int(arg1) << " velocity=" << int(arg2); break;
+	  case 0x9: std::cout << "note on   pitch=" << int(arg1) << " velocity=" << int(arg2); break;
 	  case 0xA: std::cout << "aftertouch pitch=" << int(arg1) << " value=" << int(arg2); break;
 	  case 0xB: std::cout << "controller num=" << int(arg1) << " value=" << int(arg2); break;
 	  case 0xC: std::cout << "program change num=" << int(arg1); break;
