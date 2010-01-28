@@ -342,7 +342,8 @@ void GuitarGraph::updateDrumFill(double time) {
 	if (m_dfIt != m_drumfills.end()) {
 		if (time > m_dfIt->end - past) {
 			// Check if we can activate GodMode (drums) -> requires ~ 7 hits per second
-			if (m_drums && m_drumfillScore >= 7.0 * (m_dfIt->end - m_dfIt->begin)) activateStarpower();
+			if (m_drums && m_drumfillScore >= 7.0 * (m_dfIt->end - m_dfIt->begin)
+			  && (!m_song.hasBRE || m_dfIt != (--m_drumfills.end()))) activateStarpower();
 			m_drumfillScore = 0;
 		} else return;
 	} else if (m_drums && canActivateStarpower()) {
@@ -352,6 +353,8 @@ void GuitarGraph::updateDrumFill(double time) {
 		}
 	} else if (!m_drums && m_drumfills.back().begin >= time + future) {
 		m_dfIt = (--m_drumfills.end()); return; // Guitar Big Rock Ending
+	} else if (m_drums && m_song.hasBRE && m_drumfills.back().begin <= time + future) {
+		m_dfIt = (--m_drumfills.end()); return; // Drum Big Rock Ending
 	}
 	m_dfIt = m_drumfills.end(); // Reset iterator
 }
@@ -363,8 +366,6 @@ void GuitarGraph::drumHit(double time, int fret) {
 	if (m_dfIt != m_drumfills.end() && time >= m_dfIt->begin - maxTolerance
 	  && time <= m_dfIt->end + maxTolerance) {
 		m_drumfillScore += 1;
-		Duration const* dur = &(*m_dfIt);
-		m_events.push_back(Event(time, 1, fret, dur));
 		m_flames[fret].push_back(AnimValue(0.0, flameSpd));
 		m_flames[fret].back().setTarget(1.0);
 		return;

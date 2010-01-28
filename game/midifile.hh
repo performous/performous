@@ -45,8 +45,6 @@ class MidiFileParser{
 	 */
 	MidiFileParser(std::string name);
 
-//  private:
-
 	struct TempoChange {
 		uint32_t miditime;
 		uint32_t value;
@@ -86,6 +84,8 @@ class MidiFileParser{
 	double get_seconds(uint32_t miditime) { return 1e-6 * get_us(miditime); }
 	void add_tempo_change(uint32_t miditime, uint32_t tempo);
 	uint16_t format;
+	typedef std::vector<std::string> CommandEvents;
+	CommandEvents cmdevents;
 
 	/** Ticks per beat == number of divisions per every quarter note **/
 	uint16_t division;
