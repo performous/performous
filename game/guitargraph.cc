@@ -81,6 +81,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number)
   m_bigStreak(),
   m_jointime(getNaN()),
   m_dead(),
+  m_drumfillHits(),
   m_drumfillScore()
 {
 	// Copy all tracks of supported types (either drums or non-drums) to m_track_map
@@ -335,17 +336,31 @@ void GuitarGraph::fail(double time, int fret) {
 	endStreak();
 }
 
+/// Ends the Big Rock Ending and gives score if appropriate
+void GuitarGraph::endBRE() {
+	float l = m_dfIt->end - m_dfIt->begin;
+	// Completion requires ~ 6 hits per second
+	if (m_drumfillHits / l >= 6.0) {
+		m_score += m_drumfillScore; // Add score from overlapped notes if there were any
+		m_score += 50.0 * l; // Add score as if it were a single long hold
+	}
+	m_drumfillHits = 0;
+	m_drumfillScore = 0;
+	m_dfIt == m_drumfills.end();
+}
+
 /// Calculates the start and end times for the next/current drum fill
 /// Also activates GodMode if fill went well
 void GuitarGraph::updateDrumFill(double time) {
 	// Check if fill is over
 	if (m_dfIt != m_drumfills.end()) {
-		if (time > m_dfIt->end - past) {
-			// Check if we can activate GodMode (drums) -> requires ~ 7 hits per second
-			if (m_drums && m_drumfillScore >= 7.0 * (m_dfIt->end - m_dfIt->begin)
-			  && (!m_song.hasBRE || m_dfIt != (--m_drumfills.end()))) activateStarpower();
+		// Reset stuff for drum fills but not for BREs (handled elsewhere)
+		if (time > m_dfIt->end - past && (m_dfIt != (--m_drumfills.end()) || (m_drums && !m_song.hasBRE))) {
+			m_drumfillHits = 0;
 			m_drumfillScore = 0;
-		} else return;
+			m_dfIt = m_drumfills.end();
+		}
+		return;
 	} else if (m_drums && canActivateStarpower()) {
 		// Search for the next drum fill
 		for (Durations::const_iterator it = m_drumfills.begin(); it != m_drumfills.end(); ++it) {
@@ -365,7 +380,18 @@ void GuitarGraph::drumHit(double time, int fret) {
 	// Handle drum fills
 	if (m_dfIt != m_drumfills.end() && time >= m_dfIt->begin - maxTolerance
 	  && time <= m_dfIt->end + maxTolerance) {
-		m_drumfillScore += 1;
+		m_drumfillHits += 1;
+		// Check if we hit the final note in drum fill to activate starpower and get the points
+		if (fret == 4 && time >= m_dfIt->end - maxTolerance
+		  && (!m_song.hasBRE || m_dfIt != (--m_drumfills.end()))) {
+			// GodMode and scores require ~ 6 hits per second
+			if (m_drumfillHits >= 6.0 * (m_dfIt->end - m_dfIt->begin)) {
+				activateStarpower();
+				m_score += m_drumfillScore;
+			}
+			m_drumfillScore = 0;
+			m_drumfillHits = 0;
+		}
 		m_flames[fret].push_back(AnimValue(0.0, flameSpd));
 		m_flames[fret].back().setTarget(1.0);
 		return;
@@ -404,6 +430,8 @@ void GuitarGraph::drumHit(double time, int fret) {
 			//m_score += m_chordIt->score;
 			m_streak += 1;
 			if (m_streak > m_longestStreak) m_longestStreak = m_streak;
+			// Handle Big Rock Ending scoring
+			if (m_drumfillScore > 0 && *best == m_chords.back()) endBRE();
 		}
 		m_correctness.setTarget(double(m_chordIt->status) / m_chordIt->polyphony, true);
 	}
@@ -416,7 +444,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 	if (m_dfIt != m_drumfills.end() && time >= m_dfIt->begin - maxTolerance
 	  && time <= m_dfIt->end + maxTolerance) {
 		if (!ev.type == input::Event::PRESS) return;
-		m_drumfillScore += 1;
+		m_drumfillHits += 1;
 		m_flames[ev.button].push_back(AnimValue(0.0, flameSpd));
 		m_flames[ev.button].back().setTarget(1.0);
 		return;
@@ -489,6 +517,8 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 				m_flames[fret].back().setTarget(1.0);
 			}
 		}
+		// Handle Big Rock Ending scoring
+		if (m_drumfillScore > 0 && *best == m_chords.back()) endBRE();
 	}
 }
 
@@ -611,6 +641,11 @@ void GuitarGraph::draw(double time) {
 						drawNote(fret, c, m_dfIt->begin - time, ((m_dfIt->end > time + future) ?
 						  future : m_dfIt->end - time), 0, false, false, 0, 0);
 					}
+					// If it is a drum fill, draw the final note
+					if (m_drums && (!m_song.hasBRE || (m_dfIt != (--m_drumfills.end())))) {
+						glutil::Color c = colorize(color(4), m_dfIt->end);
+						drawNote(4, c, m_dfIt->end - time, m_dfIt->end - time, 0, false, false, 0, 0);
+					}
 				}
 				// Iterate chords
 				for (Chords::iterator it = m_chords.begin(); it != m_chords.end(); ++it) {
@@ -623,12 +658,12 @@ void GuitarGraph::draw(double time) {
 					}
 					// Don't show past chords when rewinding
 					if (it->status >= 100 || (tBeg > maxTolerance && it->status > 0)) continue;
-					// Ignore notes during drum fills / BREs
+					// Handle notes during drum fills / BREs
 					if (drumfill && it->begin >= m_dfIt->begin - maxTolerance
 					  && it->begin <= m_dfIt->end + maxTolerance) {
 						if (it->status == 0) {
 							it->status = it->polyphony; // Mark as hit so that streak doesn't reset
-							m_score += it->polyphony * 50.0 * 0.75; // Give 75% points from notes under drum fill
+							m_drumfillScore += it->polyphony * 50.0; // Count points from notes under drum fill
 						}
 						continue;
 					}
@@ -917,7 +952,6 @@ void GuitarGraph::updateChords() {
 		m_chords.push_back(c);
 	}
 	m_chordIt = m_chords.begin();
-	m_scoreFactor = 10000.0 / m_scoreFactor; // Normalize maximum score factor
 	
 	// Solos
 	NoteMap const& nm = m_track_index->second->nm;
@@ -925,6 +959,14 @@ void GuitarGraph::updateChords() {
 	if (it != nm.end()) m_solos = it->second;
 	// Drum fills
 	it = nm.find(124); // 124 = drum fills (actually 120-124, but one is enough)
-	if (it != nm.end()) m_drumfills = it->second;
+	if (it != nm.end()) {
+		m_drumfills = it->second;
+		// Big Rock Ending scoring (single hold note)
+		if (!m_drums || m_song.hasBRE)
+			m_scoreFactor += 50.0 * (m_drumfills.back().end - m_drumfills.back().begin);
+	}
 	m_dfIt = m_drumfills.end();
+	
+	// Normalize maximum score factor
+	m_scoreFactor = 10000.0 / m_scoreFactor;
 }

@@ -71,6 +71,7 @@ class GuitarGraph {
 	void activateStarpower();
 	void fail(double time, int fret);
 	void endHold(int fret, double time = 0.0);
+	void endBRE();
 	void endStreak() { m_streak = 0; m_bigStreak = 0; }
 	Audio& m_audio;
 	input::InputDev m_input; /// input device (guitar/drums/keyboard)
@@ -149,6 +150,7 @@ class GuitarGraph {
 	int m_bigStreak; /// next limit when a popup appears
 	double m_jointime; /// when the player joined
 	int m_dead; /// how many notes has been passed without hitting buttons
-	double m_drumfillScore; /// keeps track that enough hits are scored
+	double m_drumfillHits; /// keeps track that enough hits are scored
+	double m_drumfillScore; /// max score for the notes under drum fill
 };
 
