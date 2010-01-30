@@ -131,6 +131,8 @@ class GuitarGraph {
 	void difficultyAuto(bool tryKeepCurrent = false);
 	bool difficulty(Difficulty level);
 	SvgTxtTheme m_text;
+	boost::scoped_ptr<SvgTxtThemeSimple> m_scoreText;
+	boost::scoped_ptr<SvgTxtThemeSimple> m_streakText;
 	boost::scoped_ptr<SvgTxtThemeSimple> m_popupText;
 	void updateChords();
 	typedef std::vector<Chord> Chords;

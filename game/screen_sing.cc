@@ -108,7 +108,7 @@ bool ScreenSing::instrumentLayout(double time) {
 	// Count active instruments
 	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it)
 		if (!it->dead()) count++;
-	double iw = std::min(0.5, 1.0 / count);
+	double iw = 1.0 / count;
 	typedef std::pair<unsigned, double> CountSum;
 	std::map<std::string, CountSum> volume; // Stream id to (count, sum)
 	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it) {

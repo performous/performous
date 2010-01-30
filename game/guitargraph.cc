@@ -8,6 +8,7 @@
 #include <stdexcept>
 
 #include <boost/lexical_cast.hpp>
+#include <boost/format.hpp>
 
 namespace {
 	struct Diff { std::string name; int basepitch; } diffv[] = {
@@ -94,6 +95,8 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number)
 	m_fretObj.load(getThemePath("fret.obj"));
 	m_tappableObj.load(getThemePath("fret_tap.obj"));
 	// Score calculator (TODO a better one)
+	m_scoreText.reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
+	m_streakText.reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_popupText.reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	// Load fail sounds
 	unsigned int sr = m_audio.getSR();
@@ -569,7 +572,7 @@ namespace {
 /// Main drawing function (projection, neck, cursor...)
 void GuitarGraph::draw(double time) {
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
-	dimensions.screenBottom().middle(m_cx.get()).fixedWidth(m_width.get());
+	dimensions.screenBottom().middle(m_cx.get()).fixedWidth(std::min(m_width.get(),0.5));
 	double offsetX = 0.5 * (dimensions.x1() + dimensions.x2());
 	double frac = 0.75;  // Adjustable: 1.0 means fully separated, 0.0 means fully attached
 	float ng_r = 0, ng_g = 0, ng_b = 0; // neck glow color components
@@ -589,137 +592,137 @@ void GuitarGraph::draw(double time) {
 		float temp_s = dimensions.w() / 5.0f;
 		glScalef(temp_s, temp_s, temp_s);
 		
-			// Draw the neck
-			{
-				UseTexture tex(*m_neck);
-				glutil::Begin block(GL_TRIANGLE_STRIP);
-				float w = (m_drums ? 2.0f : 2.5f);
-				float texCoord = 0.0f;
-				float tBeg = 0.0f, tEnd;
-				for (Song::Beats::const_iterator it = m_song.beats.begin(); it != m_song.beats.end() && tBeg < future; ++it, texCoord += texCoordStep, tBeg = tEnd) {
-					tEnd = *it - time;
-					//if (tEnd < past) continue;
-					if (tEnd > future) {
-						// Crop the end off
-						texCoord -= texCoordStep * (tEnd - future) / (tEnd - tBeg);
-						tEnd = future;
-					}
-					glutil::Color c(1.0f, 1.0f, 1.0f, time2a(tEnd));
-					glColor4fv(colorize(c, time + tBeg));
-					glNormal3f(0.0f, 1.0f, 0.0f);
-					glTexCoord2f(0.0f, texCoord); glVertex2f(-w, time2y(tEnd));
-					glNormal3f(0.0f, 1.0f, 0.0f);
-					glTexCoord2f(1.0f, texCoord); glVertex2f(w, time2y(tEnd));
+		// Draw the neck
+		{
+			UseTexture tex(*m_neck);
+			glutil::Begin block(GL_TRIANGLE_STRIP);
+			float w = (m_drums ? 2.0f : 2.5f);
+			float texCoord = 0.0f;
+			float tBeg = 0.0f, tEnd;
+			for (Song::Beats::const_iterator it = m_song.beats.begin(); it != m_song.beats.end() && tBeg < future; ++it, texCoord += texCoordStep, tBeg = tEnd) {
+				tEnd = *it - time;
+				//if (tEnd < past) continue;
+				if (tEnd > future) {
+					// Crop the end off
+					texCoord -= texCoordStep * (tEnd - future) / (tEnd - tBeg);
+					tEnd = future;
+				}
+				glutil::Color c(1.0f, 1.0f, 1.0f, time2a(tEnd));
+				glColor4fv(colorize(c, time + tBeg));
+				glNormal3f(0.0f, 1.0f, 0.0f);
+				glTexCoord2f(0.0f, texCoord); glVertex2f(-w, time2y(tEnd));
+				glNormal3f(0.0f, 1.0f, 0.0f);
+				glTexCoord2f(1.0f, texCoord); glVertex2f(w, time2y(tEnd));
+			}
+		}
+		
+		// Draw the cursor
+		float level = m_hit[0].get();
+		glColor3f(level, level, level);
+		drawBar(0.0, 0.01f);
+		// Fret buttons on cursor
+		for (int fret = m_drums; fret < 5; ++fret) {
+			float x = -2.0f + fret - 0.5f * m_drums;
+			float l = m_hit[fret + !m_drums].get();
+			// Get a color for the fret and adjust it if GodMode is on
+			glColor4fv(colorize(color(fret), time));
+			m_button.dimensions.center(time2y(0.0)).middle(x);
+			m_button.draw();
+			glColor3f(l, l, l);
+			m_tap.dimensions = m_button.dimensions;
+			m_tap.draw();
+		}
+		
+		// Draw the notes
+		{ glutil::UseLighting lighting(m_use3d);
+			// Draw drum fills / Big Rock Endings
+			bool drumfill = m_dfIt != m_drumfills.end();
+			if (drumfill) {
+				for (int fret = m_drums; fret < 5; ++fret) { // Loop through the frets
+					glutil::Color c = color(fret);
+					// Visualize as long notes
+					drawNote(fret, c, m_dfIt->begin - time, ((m_dfIt->end > time + future) ?
+					  future : m_dfIt->end - time), 0, false, false, 0, 0);
+				}
+				// If it is a drum fill, draw the final note
+				if (m_drums && (!m_song.hasBRE || (m_dfIt != (--m_drumfills.end())))) {
+					glutil::Color c = colorize(color(4), m_dfIt->end);
+					drawNote(4, c, m_dfIt->end - time, m_dfIt->end - time, 0, false, false, 0, 0);
 				}
 			}
-			
-			// Draw the cursor
-			float level = m_hit[0].get();
-			glColor3f(level, level, level);
-			drawBar(0.0, 0.01f);
-			// Fret buttons on cursor
-			for (int fret = m_drums; fret < 5; ++fret) {
-				float x = -2.0f + fret - 0.5f * m_drums;
-				float l = m_hit[fret + !m_drums].get();
-				// Get a color for the fret and adjust it if GodMode is on
-				glColor4fv(colorize(color(fret), time));
-				m_button.dimensions.center(time2y(0.0)).middle(x);
-				m_button.draw();
-				glColor3f(l, l, l);
-				m_tap.dimensions = m_button.dimensions;
-				m_tap.draw();
-			}
-			
-			// Draw the notes
-			{ glutil::UseLighting lighting(m_use3d);
-				// Draw drum fills / Big Rock Endings
-				bool drumfill = m_dfIt != m_drumfills.end();
-				if (drumfill) {
-					for (int fret = m_drums; fret < 5; ++fret) { // Loop through the frets
-						glutil::Color c = color(fret);
-						// Visualize as long notes
-						drawNote(fret, c, m_dfIt->begin - time, ((m_dfIt->end > time + future) ?
-						  future : m_dfIt->end - time), 0, false, false, 0, 0);
-					}
-					// If it is a drum fill, draw the final note
-					if (m_drums && (!m_song.hasBRE || (m_dfIt != (--m_drumfills.end())))) {
-						glutil::Color c = colorize(color(4), m_dfIt->end);
-						drawNote(4, c, m_dfIt->end - time, m_dfIt->end - time, 0, false, false, 0, 0);
-					}
+			// Iterate chords
+			for (Chords::iterator it = m_chords.begin(); it != m_chords.end(); ++it) {
+				float tBeg = it->begin - time;
+				float tEnd = m_drums ? tBeg : it->end - time;
+				if (tBeg > future) break;
+				if (tEnd < past) {
+					if (it->status < 100) it->status += 100; // Mark as past note for rewinding
+					continue;
 				}
-				// Iterate chords
-				for (Chords::iterator it = m_chords.begin(); it != m_chords.end(); ++it) {
-					float tBeg = it->begin - time;
-					float tEnd = m_drums ? tBeg : it->end - time;
-					if (tBeg > future) break;
-					if (tEnd < past) {
-						if (it->status < 100) it->status += 100; // Mark as past note for rewinding
-						continue;
+				// Don't show past chords when rewinding
+				if (it->status >= 100 || (tBeg > maxTolerance && it->status > 0)) continue;
+				// Handle notes during drum fills / BREs
+				if (drumfill && it->begin >= m_dfIt->begin - maxTolerance
+				  && it->begin <= m_dfIt->end + maxTolerance) {
+					if (it->status == 0) {
+						it->status = it->polyphony; // Mark as hit so that streak doesn't reset
+						m_drumfillScore += it->polyphony * 50.0; // Count points from notes under drum fill
 					}
-					// Don't show past chords when rewinding
-					if (it->status >= 100 || (tBeg > maxTolerance && it->status > 0)) continue;
-					// Handle notes during drum fills / BREs
-					if (drumfill && it->begin >= m_dfIt->begin - maxTolerance
-					  && it->begin <= m_dfIt->end + maxTolerance) {
-						if (it->status == 0) {
-							it->status = it->polyphony; // Mark as hit so that streak doesn't reset
-							m_drumfillScore += it->polyphony * 50.0; // Count points from notes under drum fill
-						}
-						continue;
-					}
-					// Loop through the frets
-					for (int fret = 0; fret < 5; ++fret) {
-						if (!it->fret[fret] || (tBeg > maxTolerance && it->releaseTimes[fret] > 0)) continue;
-						if (tEnd > future) tEnd = future;
-						unsigned event = m_notes[it->dur[fret]];
-						float glow = 0.0f;
-						float whammy = 0.0f;
-						if (event > 0) {
-							glow = m_events[event - 1].glow.get();
-							whammy = m_events[event - 1].whammy.get();
-						}
-						// Get a color for the fret and adjust it if GodMode is on
-						glutil::Color c = colorize(color(fret), it->begin);
-						if (glow > 0.1f) { ng_r+=c.r; ng_g+=c.g; ng_b+=c.b; ng_ccnt++; } // neck glow
-						// Further adjust the color if the note is hit
-						c.r += glow;
-						c.g += glow;
-						c.b += glow;
-						if (glow > 0.5f && tEnd < 0.1f && it->hitAnim[fret].get() == 0.0)
-							it->hitAnim[fret].setTarget(1.0);
-						// Call the actual note drawing function
-						drawNote(fret, c, tBeg, tEnd, whammy, it->tappable, glow > 0.5f, it->hitAnim[fret].get(), 
-						  it->releaseTimes[fret] > 0.0 ? it->releaseTimes[fret] - time : 0.0);
-					}
+					continue;
 				}
-			} //< disable lighting
-			
-			// Draw flames
-			for (int fret = 0; fret < 5; ++fret) { // Loop through the frets
-				if (m_drums && fret == 0) { // Skip bass drum
-					m_flames[fret].clear(); continue;
-				}
-				Texture* ftex = &m_flame;
-				if (m_starpower.get() > 0.01) ftex = &m_flame_godmode;
-				float x = -2.0f + fret - 0.5f * m_drums;
-				for (std::vector<AnimValue>::iterator it = m_flames[fret].begin(); it != m_flames[fret].end();) {
-					float flameAnim = it->get();
-					if (flameAnim < 1.0f) {
-						float h = flameAnim * 4.0f * fretWid;
-						UseTexture tblock(*ftex);
-						glutil::Begin block(GL_TRIANGLE_STRIP);
-						glColor4f(1.0f,1.0f,1.0f,1.0f);
-						glTexCoord2f(0.0f, 1.0f); glVertex3f(x - fretWid, time2y(0.0f), 0.0f);
-						glTexCoord2f(1.0f, 1.0f); glVertex3f(x + fretWid, time2y(0.0f), 0.0f);
-						glTexCoord2f(0.0f, 0.0f); glVertex3f(x - fretWid, time2y(0.0f), h);
-						glTexCoord2f(1.0f, 0.0f); glVertex3f(x + fretWid, time2y(0.0f), h);
-					} else {
-						it = m_flames[fret].erase(it);
-						continue;
+				// Loop through the frets
+				for (int fret = 0; fret < 5; ++fret) {
+					if (!it->fret[fret] || (tBeg > maxTolerance && it->releaseTimes[fret] > 0)) continue;
+					if (tEnd > future) tEnd = future;
+					unsigned event = m_notes[it->dur[fret]];
+					float glow = 0.0f;
+					float whammy = 0.0f;
+					if (event > 0) {
+						glow = m_events[event - 1].glow.get();
+						whammy = m_events[event - 1].whammy.get();
 					}
-					++it;
+					// Get a color for the fret and adjust it if GodMode is on
+					glutil::Color c = colorize(color(fret), it->begin);
+					if (glow > 0.1f) { ng_r+=c.r; ng_g+=c.g; ng_b+=c.b; ng_ccnt++; } // neck glow
+					// Further adjust the color if the note is hit
+					c.r += glow;
+					c.g += glow;
+					c.b += glow;
+					if (glow > 0.5f && tEnd < 0.1f && it->hitAnim[fret].get() == 0.0)
+						it->hitAnim[fret].setTarget(1.0);
+					// Call the actual note drawing function
+					drawNote(fret, c, tBeg, tEnd, whammy, it->tappable, glow > 0.5f, it->hitAnim[fret].get(), 
+					  it->releaseTimes[fret] > 0.0 ? it->releaseTimes[fret] - time : 0.0);
 				}
 			}
+		} //< disable lighting
+		
+		// Draw flames
+		for (int fret = 0; fret < 5; ++fret) { // Loop through the frets
+			if (m_drums && fret == 0) { // Skip bass drum
+				m_flames[fret].clear(); continue;
+			}
+			Texture* ftex = &m_flame;
+			if (m_starpower.get() > 0.01) ftex = &m_flame_godmode;
+			float x = -2.0f + fret - 0.5f * m_drums;
+			for (std::vector<AnimValue>::iterator it = m_flames[fret].begin(); it != m_flames[fret].end();) {
+				float flameAnim = it->get();
+				if (flameAnim < 1.0f) {
+					float h = flameAnim * 4.0f * fretWid;
+					UseTexture tblock(*ftex);
+					glutil::Begin block(GL_TRIANGLE_STRIP);
+					glColor4f(1.0f,1.0f,1.0f,1.0f);
+					glTexCoord2f(0.0f, 1.0f); glVertex3f(x - fretWid, time2y(0.0f), 0.0f);
+					glTexCoord2f(1.0f, 1.0f); glVertex3f(x + fretWid, time2y(0.0f), 0.0f);
+					glTexCoord2f(0.0f, 0.0f); glVertex3f(x - fretWid, time2y(0.0f), h);
+					glTexCoord2f(1.0f, 0.0f); glVertex3f(x + fretWid, time2y(0.0f), h);
+				} else {
+					it = m_flames[fret].erase(it);
+					continue;
+				}
+				++it;
+			}
+		}
 	}
 	
 	// Bottom neck glow
@@ -739,7 +742,7 @@ void GuitarGraph::draw(double time) {
 	if (correctness() > 0) {
 		// Glow drawing
 		glColor4fv(m_neckglowColor);
-		m_neckglow.dimensions.screenBottom(0.0).middle(offsetX).fixedWidth(m_width.get());
+		m_neckglow.dimensions.screenBottom(0.0).middle(offsetX).fixedWidth(dimensions.w());
 		m_neckglow.draw();
 	}
 	drawInfo(time, offsetX, dimensions); // Go draw some texts and other interface stuff
@@ -839,12 +842,20 @@ void GuitarGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 		m_text.draw(diffv[m_level].name);
 		m_text.dimensions.screenBottom(-0.015).middle(-0.09 + offsetX);
 		m_text.draw(m_track_index->first);
-	} else { // Draw scores
-		m_text.dimensions.screenBottom(-0.30).middle(0.32 * dimensions.w() + offsetX);
-		m_text.draw(boost::lexical_cast<std::string>(unsigned(getScore())));
-		m_text.dimensions.screenBottom(-0.27).middle(0.32 * dimensions.w() + offsetX);
-		m_text.draw(boost::lexical_cast<std::string>(unsigned(m_streak)) + "/" 
+	} else {
+		float xcor = 0.35 * dimensions.w();
+		float h = 0.064 * 2.0 * dimensions.w();
+		// Draw scores
+		glColor4f(0.1f, 0.3f, 1.0f, 0.90f);
+		m_scoreText->render((boost::format("%04d") % getScore()).str());
+		m_scoreText->dimensions().middle(-xcor + offsetX).fixedHeight(h*1.1).screenBottom(-0.32);
+		m_scoreText->draw();
+		// Draw streak counter
+		glColor4f(0.9f, 0.9f, 0.05f, 0.95f);
+		m_streakText->render(boost::lexical_cast<std::string>(unsigned(m_streak)) + "/"
 		  + boost::lexical_cast<std::string>(unsigned(m_longestStreak)));
+		m_streakText->dimensions().middle(xcor + offsetX).fixedHeight(h).screenBottom(-0.32);
+		m_streakText->draw();
 	}
 	// Is Starpower ready?
 	if (canActivateStarpower()) {
