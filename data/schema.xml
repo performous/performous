@@ -220,7 +220,7 @@ to save the current settings to XML.
 	<entry name="system/midi_input" type="string" value="">
 		<locale name="C">
 			<short>Hardware MIDI input device</short>
-			<long>Part of sound card name or its number or empty to use the first available device. Used currently for MIDI drum controllers. Empty to select the first available device.</long>
+			<long>Part of sound card name or its number or empty to use the first available device. Used currently for MIDI drum controllers.</long>
 		</locale>
 	</entry>
 	<entry name="system/path_songs" type="string_list">
