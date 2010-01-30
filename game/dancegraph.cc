@@ -199,7 +199,7 @@ void DanceGraph::engine() {
 		if (time < it->first + it->second) { time = it->first; break; } // Inside stop
 		time -= it->second;
 	}
-
+	if (time < m_jointime) m_dead = 0; // Disable dead counting while joining
 	bool difficulty_changed = false;
 	// Handle all events
 	for (input::Event ev; m_input.tryPoll(ev);) {

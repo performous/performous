@@ -191,6 +191,7 @@ void GuitarGraph::engine() {
 	}
 	if (!m_drumfills.empty()) updateDrumFill(time); // Drum Fills / BREs
 	if (m_starpower.get() > 0.001) m_correctness.setTarget(1.0, true);
+	if (time < m_jointime) m_dead = 0; // Disable dead counting while joining
 	double whammy = 0;
 	bool difficulty_changed = false;
 	// Handle all events
