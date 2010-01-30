@@ -17,12 +17,12 @@ NoteGraph::NoteGraph(Song const& song):
 	dimensions.stretch(1.0, 0.5); // Initial dimensions, probably overridden from somewhere
 	m_nlTop.setTarget(m_song.noteMax, true);
 	m_nlBottom.setTarget(m_song.noteMin, true);
+	for (Notes::const_iterator it = m_song.notes.begin(); it != m_song.notes.end(); ++it)
+		it->accuracy = 0.0; // Reset accuracy
 	reset();
 }
 
 void NoteGraph::reset() {
-	for (Notes::const_iterator it = m_song.notes.begin(); it != m_song.notes.end(); ++it)
-		it->accuracy = 0.0; // Reset accuracy
 	m_songit = m_song.notes.begin();
 }
 
