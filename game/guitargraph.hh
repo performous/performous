@@ -79,6 +79,7 @@ class GuitarGraph {
 	Surface m_button;
 	Texture m_tail;
 	Texture m_tail_glow;
+	Texture m_tail_drumfill;
 	Texture m_flame;
 	Texture m_flame_godmode;
 	Surface m_tap; /// image for 2d HOPO note cap
@@ -127,6 +128,7 @@ class GuitarGraph {
 	glutil::Color const colorize(glutil::Color c, double time) const;
 	void drawBar(double time, float h);
 	void drawNote(int fret, glutil::Color, float tBeg, float tEnd, float whammy = 0, bool tappable = false, bool hit = false, double hitAnim = 0.0, double releaseTime = 0.0);
+	void drawDrumfill(float tBeg, float tEnd);
 	void drawInfo(double time, double offsetX, Dimensions dimensions);
 	void nextTrack(bool fast = false);
 	void difficultyAuto(bool tryKeepCurrent = false);

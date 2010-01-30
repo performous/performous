@@ -57,6 +57,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number)
   m_button(getThemePath("button.svg")),
   m_tail(getThemePath("tail.svg")),
   m_tail_glow(getThemePath("tail_glow.svg")),
+  m_tail_drumfill(getThemePath("tail_drumfill.svg")),
   m_flame(getThemePath("flame.svg")),
   m_flame_godmode(getThemePath("flame_godmode.svg")),
   m_tap(getThemePath("tap.svg")),
@@ -639,15 +640,10 @@ void GuitarGraph::draw(double time) {
 		// Draw the notes
 		{ glutil::UseLighting lighting(m_use3d);
 			// Draw drum fills / Big Rock Endings
-			bool drumfill = m_dfIt != m_drumfills.end();
+			bool drumfill = m_dfIt != m_drumfills.end() && m_dfIt->begin - time <= future;
 			if (drumfill) {
-				for (int fret = m_drums; fret < 5; ++fret) { // Loop through the frets
-					glutil::Color c = color(fret);
-					// Visualize as long notes
-					drawNote(fret, c, m_dfIt->begin - time, ((m_dfIt->end > time + future) ?
-					  future : m_dfIt->end - time), 0, false, false, 0, 0);
-				}
-				// If it is a drum fill, draw the final note
+				drawDrumfill(m_dfIt->begin - time, m_dfIt->end - time);
+				// If it is a drum fill (not BRE), draw the final note
 				if (m_drums && (!m_song.hasBRE || (m_dfIt != (--m_drumfills.end())))) {
 					glutil::Color c = colorize(color(4), m_dfIt->end);
 					drawNote(4, c, m_dfIt->end - time, m_dfIt->end - time, 0, false, false, 0, 0);
@@ -834,6 +830,28 @@ void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, fl
 			m_tap.dimensions.center(yBeg).middle(x);
 			m_tap.draw();
 		}
+	}
+}
+
+/// Draws a drum fill
+void GuitarGraph::drawDrumfill(float tBeg, float tEnd) {
+	for (int fret = m_drums; fret < 5; ++fret) { // Loop through the frets
+		float x = -2.0f + fret - 0.5f * m_drums;
+		float yBeg = time2y(tBeg);
+		float yEnd = time2y(tEnd <= future ? tEnd : future);
+		float tcEnd = tEnd <= future ? 0.0f : 0.25f;
+		glutil::Color c = color(fret);
+		UseTexture tblock(m_tail_drumfill);
+		glutil::Begin block(GL_TRIANGLE_STRIP);
+		vertexPair(x, yBeg, c, 1.0f); // First vertex pair
+		if (std::abs(yEnd - yBeg) > 4.0 * fretWid) {
+			float y = yBeg - 2.0 * fretWid;
+			vertexPair(x, y, c, 0.75f);
+			while ((y -= 10.0 * fretWid) > yEnd + 2.0 * fretWid)
+				vertexPair(x, y, c, 0.5f);
+			vertexPair(x, yEnd + 2.0 * fretWid, c, 0.25f);
+		}
+		vertexPair(x, yEnd, c, tcEnd); // Last vertex pair
 	}
 }
 
