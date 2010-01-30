@@ -1,11 +1,12 @@
 #include "screen.hh"
 #include "fs.hh"
+#include "configuration.hh"
 
 #include <stdexcept>
 
 template<> ScreenManager* Singleton<ScreenManager>::ms_Singleton = NULL;
 
-ScreenManager::ScreenManager(Window& window): window(window), m_finished(false), currentScreen(), m_messagePopup(0.0, 1.0), m_textMessage(getThemePath("message_text.svg")) {
+ScreenManager::ScreenManager(Window& window): window(window), m_finished(false), currentScreen(), m_messagePopup(0.0, 1.0), m_textMessage(getThemePath("message_text.svg"), config["graphic/text_lod"].f()) {
 	m_textMessage.dimensions.middle().screenTop(0.05);
 }
 
