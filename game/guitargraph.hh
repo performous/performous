@@ -77,7 +77,8 @@ class GuitarGraph {
 	input::InputDev m_input; /// input device (guitar/drums/keyboard)
 	Song const& m_song;
 	Surface m_button;
-	Texture m_button_l;
+	Texture m_tail;
+	Texture m_tail_glow;
 	Texture m_flame;
 	Texture m_flame_godmode;
 	Surface m_tap; /// image for 2d HOPO note cap

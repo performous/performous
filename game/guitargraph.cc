@@ -33,6 +33,7 @@ namespace {
 		return std::pow(a, 0.8f); // Nicer curve
 	}
 	float y2a(float y) { return time2a(past - y / timescale * (future - past)); }
+	float tc(float y) { return y * 0.1; } // Get texture coordinates for animating hold notes
 	const double maxTolerance = 0.15; // Maximum error in seconds
 	
 	double points(double error) {
@@ -54,7 +55,8 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number)
   m_input(drums ? input::DRUMS : input::GUITAR),
   m_song(song),
   m_button(getThemePath("button.svg")),
-  m_button_l(getThemePath("button_l.svg")),
+  m_tail(getThemePath("tail.svg")),
+  m_tail_glow(getThemePath("tail_glow.svg")),
   m_flame(getThemePath("flame.svg")),
   m_flame_godmode(getThemePath("flame_godmode.svg")),
   m_tap(getThemePath("tap.svg")),
@@ -686,9 +688,9 @@ void GuitarGraph::draw(double time) {
 					glutil::Color c = colorize(color(fret), it->begin);
 					if (glow > 0.1f) { ng_r+=c.r; ng_g+=c.g; ng_b+=c.b; ng_ccnt++; } // neck glow
 					// Further adjust the color if the note is hit
-					c.r += glow;
-					c.g += glow;
-					c.b += glow;
+					c.r += glow * 0.2f;
+					c.g += glow * 0.2f;
+					c.b += glow * 0.2f;
 					if (glow > 0.5f && tEnd < 0.1f && it->hitAnim[fret].get() == 0.0)
 						it->hitAnim[fret].setTarget(1.0);
 					// Call the actual note drawing function
@@ -779,7 +781,7 @@ void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, fl
 			m_fretObj.draw(x, y, 0.0f);
 			y -= fretWid;
 		} else { // 2D
-			UseTexture tblock(m_button_l);
+			UseTexture tblock(m_tail);
 			glutil::Begin block(GL_TRIANGLE_STRIP);
 			c.a = time2a(tBeg); glColor4fv(c);
 			vertexPair(x, y, c, 1.0f);
@@ -787,22 +789,22 @@ void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, fl
 			vertexPair(x, y, c, 0.5f);
 		}
 		// Render the middle
-		UseTexture tblock(m_button_l);
+		bool doanim = hit || hitAnim > 0; // Enable glow?
+		Texture const& tex(doanim ? m_tail_glow : m_tail); // Select texture
+		UseTexture tblock(tex);
 		glutil::Begin block(GL_TRIANGLE_STRIP);
-		vertexPair(x, y, c, 0.5f);
-		if (whammy > 0.1) {
-			// Whammy uses more vertices
-			while ((y -= fretWid) > yEnd + fretWid) {
+		double t = m_audio.getPosition() * 10.0; // Get adjusted time value for animation
+		vertexPair(x, y, c, doanim ? tc(y + t) : 1.0f); // First vertex pair
+		while ((y -= fretWid) > yEnd + fretWid) {
+			if (whammy > 0.1) {
 				float r = rand() / double(RAND_MAX);
-				vertexPair(x+cos(y*whammy)/4.0+(r-0.5)/4.0, y, c, 0.5f);
-			}
-		} else {
-			while ((y -= 10.0) > yEnd + fretWid) vertexPair(x, y, c, 0.5f);
+				vertexPair(x+cos(y*whammy)/4.0+(r-0.5)/4.0, y, c, tc(y + t));
+			} else vertexPair(x, y, c, doanim ? tc(y + t) : 0.5f);
 		}
 		// Render the end
 		y = yEnd + fretWid;
-		vertexPair(x, y, c, 0.25f);
-		vertexPair(x, yEnd, c, 0.0f);
+		vertexPair(x, y, c, doanim ? tc(y + t) : 0.20f);
+		vertexPair(x, yEnd, c, doanim ? tc(yEnd + t) : 0.0f);
 	} else {
 		// Too short note: only render the ring
 		if (m_use3d) { // 3D
