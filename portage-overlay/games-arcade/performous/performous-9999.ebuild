@@ -64,11 +64,11 @@ src_unpack() {
 
 src_configure() {
 	local mycmakeargs="
-		$(cmake-utils_use alsa LIBDA_PLUGIN_ALSA)
-		$(cmake-utils_use jack LIBDA_PLUGIN_JACK)
-		$(cmake-utils_use gstreamer LIBDA_PLUGIN_GSTREAMER)
-		$(cmake-utils_use portaudio LIBDA_PLUGIN_PORTAUDIO)
-		$(cmake-utils_use pulseaudio LIBDA_PLUGIN_PULSEAUDIO)
+		$(cmake-utils_use alsa LibDA_PLUGIN_ALSA)
+		$(cmake-utils_use jack LibDA_PLUGIN_JACK)
+		$(cmake-utils_use gstreamer LibDA_PLUGIN_GSTREAMER)
+		$(cmake-utils_use portaudio LibDA_PLUGIN_PORTAUDIO)
+		$(cmake-utils_use pulseaudio LibDA_PLUGIN_PULSEAUDIO)
 		$(cmake-utils_use_enable tools TOOLS)
 		$(cmake-utils_use_enable editor EDITOR)
 		-DCMAKE_INSTALL_PREFIX=${GAMES_PREFIX}
