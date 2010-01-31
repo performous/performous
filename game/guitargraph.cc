@@ -314,10 +314,10 @@ void GuitarGraph::endHold(int fret, double time) {
 	m_events[m_holds[fret] - 1].glow.setTarget(0.0);
 	m_events[m_holds[fret] - 1].whammy.setTarget(0.0, true);
 	m_holds[fret] = 0;
-	if (time > 0) { // Do we set the relaseTime?
+	if (time > 0) { // Do we set the releaseTime?
 		// Search for the Chord this hold belongs to
 		for (Chords::iterator it = m_chords.begin(); it != m_chords.end(); ++it) {
-			if (time >= it->begin && time <= it->end) {
+			if (time > it->begin + maxTolerance && time < it->end - maxTolerance) {
 				it->releaseTimes[fret] = time;
 				if (it->status < 100 && time >= it->end - maxTolerance)
 					it->status += 100; // Mark as past note for rewinding
@@ -691,7 +691,7 @@ void GuitarGraph::draw(double time) {
 						it->hitAnim[fret].setTarget(1.0);
 					// Call the actual note drawing function
 					drawNote(fret, c, tBeg, tEnd, whammy, it->tappable, glow > 0.5f, it->hitAnim[fret].get(), 
-					  it->releaseTimes[fret] > 0.0 ? it->releaseTimes[fret] - time : 0.0);
+					  it->releaseTimes[fret] > 0.0 ? it->releaseTimes[fret] - time : getNaN());
 				}
 			}
 		} //< disable lighting
@@ -765,7 +765,7 @@ void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, fl
 	// Long notes
 	if (yBeg - 2 * fretWid >= yEnd) {
 		// A hold is released? Let it go...
-		if (releaseTime != 0.0 && tEnd - releaseTime > 0.1) yBeg = time2y(releaseTime);
+		if (releaseTime == releaseTime && tEnd - releaseTime > 0.1) yBeg = time2y(releaseTime);
 		// Short note? Render minimum renderable length
 		if (yEnd > yBeg - 3 * fretWid) yEnd = yBeg - 3 * fretWid;
 		// Render the ring
