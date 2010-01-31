@@ -30,7 +30,7 @@ int sleepts = -1;
 xmlpp::Node::PrefixNsMap nsmap;
 std::string ns;
 const bool video = true;
-const bool mkvcompress = true;
+const bool mkvcompress = false;
 const bool oggcompress = true;
 
 // LibXML2 logging facility
