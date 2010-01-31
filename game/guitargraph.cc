@@ -777,12 +777,10 @@ void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, fl
 			m_fretObj.draw(x, y, 0.0f);
 			y -= fretWid;
 		} else { // 2D
-			UseTexture tblock(m_tail);
-			glutil::Begin block(GL_TRIANGLE_STRIP);
 			c.a = time2a(tBeg); glColor4fv(c);
-			vertexPair(x, y, c, 1.0f);
+			m_button.dimensions.center(yBeg).middle(x);
+			m_button.draw();
 			y -= 2 * fretWid;
-			vertexPair(x, y, c, 0.5f);
 		}
 		// Render the middle
 		bool doanim = hit || hitAnim > 0; // Enable glow?
