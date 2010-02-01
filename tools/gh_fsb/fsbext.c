@@ -828,7 +828,7 @@ void fr_FSOUND_FSB_HEADER_FSB1(FILE *fd, FSOUND_FSB_HEADER_FSB1 *fh) {
             "  fh->numsamples %08x\n"
             "  fh->datasize   %08x\n"
             "  fh->dunno_null %08x\n",
-            (u32)ftell(fd) - sizeof(*fh),
+            (u32)(ftell(fd) - sizeof(*fh)),
             fh->id,
             fh->numsamples,
             fh->datasize,
@@ -856,7 +856,7 @@ void fr_FSOUND_FSB_HEADER_FSB2(FILE *fd, FSOUND_FSB_HEADER_FSB2 *fh) {
             "  fh->numsamples %08x\n"
             "  fh->shdrsize   %08x\n"
             "  fh->datasize   %08x\n",
-            (u32)ftell(fd) - sizeof(*fh),
+            (u32)(ftell(fd) - sizeof(*fh)),
             fh->id,
             fh->numsamples,
             fh->shdrsize,
@@ -888,7 +888,7 @@ void fr_FSOUND_FSB_HEADER_FSB3(FILE *fd, FSOUND_FSB_HEADER_FSB3 *fh) {
             "  fh->datasize   %08x\n"
             "  fh->version    %08x\n"
             "  fh->mode       %08x\n",
-            (u32)ftell(fd) - sizeof(*fh),
+            (u32)(ftell(fd) - sizeof(*fh)),
             fh->id,
             fh->numsamples,
             fh->shdrsize,
@@ -924,7 +924,7 @@ void fr_FSOUND_FSB_HEADER_FSB4(FILE *fd, FSOUND_FSB_HEADER_FSB4 *fh) {
             "  fh->datasize   %08x\n"
             "  fh->version    %08x\n"
             "  fh->mode       %08x\n",
-            (u32)ftell(fd) - sizeof(*fh),
+            (u32)(ftell(fd) - sizeof(*fh)),
             fh->id,
             fh->numsamples,
             fh->shdrsize,
@@ -968,8 +968,8 @@ void fr_FSOUND_FSB_SAMPLE_HEADER_1(FILE *fd, FSOUND_FSB_SAMPLE_HEADER_1 *fh) {
             "  fh->mode                  %08x\n"
             "  fh->loopstart             %08x\n"
             "  fh->loopend               %08x\n",
-            (u32)ftell(fd) - sizeof(*fh),
-            sizeof(fh->name), fh->name,
+            (u32)(ftell(fd) - sizeof(*fh)),
+            (u32)sizeof(fh->name), fh->name,
             fh->lengthsamples,
             fh->lengthcompressedbytes,
             fh->deffreq,
@@ -1019,9 +1019,9 @@ void fr_FSOUND_FSB_SAMPLE_HEADER_2(FILE *fd, FSOUND_FSB_SAMPLE_HEADER_2 *fh) {
             "  fh->defpan                %04x\n"
             "  fh->defpri                %04x\n"
             "  fh->numchannels           %04x\n",
-            (u32)ftell(fd) - sizeof(*fh),
+            (u32)(ftell(fd) - sizeof(*fh)),
             fh->size,
-            sizeof(fh->name), fh->name,
+            (u32)sizeof(fh->name), fh->name,
             fh->lengthsamples,
             fh->lengthcompressedbytes,
             fh->loopstart,
@@ -1081,9 +1081,9 @@ void fr_FSOUND_FSB_SAMPLE_HEADER_3_1(FILE *fd, FSOUND_FSB_SAMPLE_HEADER_3_1 *fh)
             "  fh->varfreq               %08x\n"
             "  fh->varvol                %04x\n"
             "  fh->varpan                %04x\n",
-            (u32)ftell(fd) - sizeof(*fh),
+            (u32)(ftell(fd) - sizeof(*fh)),
             fh->size,
-            sizeof(fh->name), fh->name,
+            (u32)sizeof(fh->name), fh->name,
             fh->lengthsamples,
             fh->lengthcompressedbytes,
             fh->loopstart,
@@ -1118,7 +1118,7 @@ void fr_FSOUND_FSB_SAMPLE_HEADER_BASIC(FILE *fd, FSOUND_FSB_SAMPLE_HEADER_BASIC 
             "- %08x fr_FSOUND_FSB_SAMPLE_HEADER_BASIC:\n"
             "  fh->lengthsamples         %08x\n"
             "  fh->lengthcompressedbytes %08x\n",
-            (u32)ftell(fd) - sizeof(*fh),
+            (u32)(ftell(fd) - sizeof(*fh)),
             fh->lengthsamples,
             fh->lengthcompressedbytes);
     }
@@ -1511,7 +1511,7 @@ void add_extension(u8 *fname, int add, int extract, int add_guess) {
     } else {
         oldext = strrchr(fname, '.');
         if(oldext) {
-            sprintf(oldext_buff, "%.*s", sizeof(oldext_buff), oldext);
+            sprintf(oldext_buff, "%.*s", (u32)sizeof(oldext_buff), oldext);
             end    = oldext;
             oldext = oldext_buff;
         } else {
@@ -1645,6 +1645,7 @@ FILE *try_fsbdec(FILE *fd) {
             "  it's possible to see part of the plain-text password in the encrypted file!\n"
             "  ", HEXSIZE);
         fflush(stdin);
+	// TODO: test return value
         fgets(key, sizeof(key), stdin);
         delimit(key);
         if(strcmp(key, "?")) break;

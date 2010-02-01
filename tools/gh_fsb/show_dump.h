@@ -62,6 +62,7 @@ void show_dump(unsigned char *data, unsigned int len, FILE *stream) {
         }
         *bytes++ = '\n';
 
+	// TODO: test return value
         fwrite(buff, bytes - buff, 1, stream);
     }
 }
