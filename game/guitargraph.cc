@@ -867,13 +867,13 @@ void GuitarGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 		// Draw scores
 		glColor4f(0.1f, 0.3f, 1.0f, 0.90f);
 		m_scoreText->render((boost::format("%04d") % getScore()).str());
-		m_scoreText->dimensions().middle(-xcor + offsetX).fixedHeight(h*1.1).screenBottom(-0.32);
+		m_scoreText->dimensions().middle(-xcor + offsetX).fixedHeight(h*1.1).screenBottom(-0.28);
 		m_scoreText->draw();
 		// Draw streak counter
 		glColor4f(0.9f, 0.9f, 0.05f, 0.95f);
 		m_streakText->render(boost::lexical_cast<std::string>(unsigned(m_streak)) + "/"
 		  + boost::lexical_cast<std::string>(unsigned(m_longestStreak)));
-		m_streakText->dimensions().middle(xcor + offsetX).fixedHeight(h).screenBottom(-0.32);
+		m_streakText->dimensions().middle(xcor + offsetX).fixedHeight(h).screenBottom(-0.28);
 		m_streakText->draw();
 	}
 	// Is Starpower ready?
