@@ -985,12 +985,17 @@ void GuitarGraph::updateChords() {
 	
 	// Solos
 	NoteMap const& nm = m_track_index->second->nm;
-	NoteMap::const_iterator it = nm.find(103); // 103 = Expert Solo - used for every difficulty
-	if (it != nm.end()) m_solos = it->second;
+	NoteMap::const_iterator solotrack = nm.find(103); // 103 = Expert Solo - used for every difficulty
+	if (solotrack != nm.end()) {
+		for (Durations::const_iterator it = solotrack->second.begin(); it != solotrack->second.end(); ++it) {
+			// Require at least 6s length in order to avoid starpower sections
+			if (it->end - it->begin >= 6.0) m_solos.push_back(*it);
+		}
+	}
 	// Drum fills
-	it = nm.find(124); // 124 = drum fills (actually 120-124, but one is enough)
-	if (it != nm.end()) {
-		m_drumfills = it->second;
+	NoteMap::const_iterator dfTrack = nm.find(124); // 124 = drum fills (actually 120-124, but one is enough)
+	if (dfTrack != nm.end()) {
+		m_drumfills = dfTrack->second;
 		// Big Rock Ending scoring (single hold note)
 		if (!m_drums || m_song.hasBRE)
 			m_scoreFactor += 50.0 * (m_drumfills.back().end - m_drumfills.back().begin);
