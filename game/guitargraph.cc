@@ -438,7 +438,7 @@ void GuitarGraph::drumHit(double time, int fret) {
 			m_streak += 1;
 			if (m_streak > m_longestStreak) m_longestStreak = m_streak;
 			// Handle Big Rock Ending scoring
-			if (m_drumfillScore > 0 && *best == m_chords.back()) endBRE();
+			if (m_drumfillHits > 0 && *best == m_chords.back()) endBRE();
 		}
 		m_correctness.setTarget(double(m_chordIt->status) / m_chordIt->polyphony, true);
 	}
@@ -450,7 +450,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 	// Handle Big Rock Ending
 	if (m_dfIt != m_drumfills.end() && time >= m_dfIt->begin - maxTolerance
 	  && time <= m_dfIt->end + maxTolerance) {
-		if (!ev.type == input::Event::PRESS) return;
+		if (ev.type != input::Event::PRESS) return;
 		m_drumfillHits += 1;
 		m_flames[ev.button].push_back(AnimValue(0.0, flameSpd));
 		m_flames[ev.button].back().setTarget(1.0);
@@ -525,7 +525,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 			}
 		}
 		// Handle Big Rock Ending scoring
-		if (m_drumfillScore > 0 && *best == m_chords.back()) endBRE();
+		if (m_drumfillHits > 0 && *best == m_chords.back()) endBRE();
 	}
 }
 
