@@ -64,8 +64,13 @@ class SongParser {
 			throw SongParserException(e.what(), m_linenum);
 		}
 
+		// Remove bogus entries
+		if (!boost::filesystem::exists(m_song.path + m_song.cover)) m_song.cover = "";
+		if (!boost::filesystem::exists(m_song.path + m_song.background)) m_song.background = "";
+		if (!boost::filesystem::exists(m_song.path + m_song.video)) m_song.video = "";
+
 		// In case no images/videos were specified, try to guess them
-		if (m_song.cover.empty() || (m_song.background.empty() && m_song.video.empty())) {
+		if (m_song.cover.empty() || m_song.background.empty() || m_song.video.empty()) {
 			boost::regex coverfile("((cover|album|label|\\[co\\])\\.(png|jpeg|jpg|svg))$", boost::regex_constants::icase);
 			boost::regex backgroundfile("((background|bg||\\[bg\\])\\.(png|jpeg|jpg|svg))$", boost::regex_constants::icase);
 			boost::regex videofile("(.*\\.(avi|mpg|mpeg|flv|mov|mp4))$", boost::regex_constants::icase);
@@ -78,7 +83,7 @@ class SongParser {
 					m_song.cover = name;
 				} else if (m_song.background.empty() && regex_match(name.c_str(), match, backgroundfile)) {
 					m_song.background = name;
-				} else if (m_song.background.empty() && m_song.video.empty() && regex_match(name.c_str(), match, videofile)) {
+				} else if (m_song.video.empty() && regex_match(name.c_str(), match, videofile)) {
 					m_song.video = name;
 				}
 			}

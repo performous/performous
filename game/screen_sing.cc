@@ -45,25 +45,29 @@ void ScreenSing::enter() {
 	}
 	// Notify about broken tracks
 	if (m_song->b0rkedTracks) ScreenManager::getSingletonPtr()->flashMessage(_("Song contains broken tracks!"));
+	// Load background
 	bool foundbg = false;
-	if (!m_song->background.empty()) {
+	if (!m_song->background.empty()) { // Load bg image
 		try {
 			m_background.reset(new Surface(m_song->path + m_song->background));
 			foundbg = true;
 		} catch (std::exception& e) {
+			m_song->background = "";
 			std::cerr << e.what() << std::endl;
 		}
 	}
-	if (!m_song->video.empty() && config["graphic/video"].b()) {
+	if (!m_song->video.empty() && config["graphic/video"].b()) { // Load video
 		m_video.reset(new Video(m_song->path + m_song->video, m_song->videoGap));
-		foundbg = true;
 	}
-	if (foundbg == false) {
-		try {
-			std::string bgpath = m_backgrounds.getRandom();
-			m_background.reset(new Surface(bgpath));
-		} catch (std::exception& e) {
-			std::cerr << e.what() << std::endl;
+	if (!foundbg) { // Use random bg if specified fails (also for tracks with video)
+		for (int i = 1; i <= 2; ++i) { // Try two times in case first is b0rked
+			try {
+				std::string bgpath = m_backgrounds.getRandom();
+				m_background.reset(new Surface(bgpath));
+				break;
+			} catch (std::exception& e) {
+				std::cerr << e.what() << std::endl;
+			}
 		}
 	}
 	//FIXME: this line crashes under windows. Have to fix. At moment, just don't use it on Windows
