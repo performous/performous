@@ -119,8 +119,13 @@ void SongParser::iniParseHeader() {
 		if (midi.tracks.size() == 1) name = "guitar"; // Original (old) FoF songs only have one track
 		else if (!mangleTrackName(name)) continue; // Beautify the track name
 		// Add dummy notes to tracks so that they can be seen in song browser
-		if (name != "VOCALS") s.track_map.insert(make_pair(name,Track(name)));
-		else s.notes.push_back(Note());
+		if (name == "VOCALS") s.notes.push_back(Note());
+		else {
+			for (MidiFileParser::NoteMap::const_iterator it2 = it->notes.begin(); it2 != it->notes.end(); ++it2) {
+				// If a track has not enough notes on any level, ignore it
+				if (it2->second.size() > 3) { s.track_map.insert(make_pair(name,Track(name))); break; }
+			}
+		}
 	}
 }
 
