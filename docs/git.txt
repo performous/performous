@@ -45,7 +45,7 @@ To update your working copy do a simple:
 Discover and investigate changes others made:
 
 	$ git log
-	$ git show <commit-hash>		(ommit <commit-hash> to see latest)
+	$ git show <commit-hash>	# (omit <commit-hash> to see latest)
 
 Note that only a few characters (of 40) from the commit hash id is needed.
 
@@ -53,7 +53,7 @@ Discovering and investigating your changes isn't any different than
 subversion:
 
 	$ git status
-	$ git diff <file>				(ommit <file> to see all changes)
+	$ git diff <file>	# (omit <file> to see all changes)
 
 Committing changes in git usually takes two steps. First add the files 
 you want to commit:
@@ -65,10 +65,10 @@ you to enter a commit message and have a last glance at what changed:
 
 	$ git commit
 
-You can also pass -a parameter to add all your changes (and bypass the
-git-add stage). These operations won't interact with the main repository
-in any way and no internet connection is needed. All that is altered is
-your local repository.
+You can also pass the `-a` parameter to `git commit` to add all your
+changes (and bypass the git-add stage). These operations won't interact
+with the main repository in any way and no internet connection is
+necessary. All that is altered is your local repository.
 
 If you are not sure what you should do next, git status usually provides
 some good suggestions.
@@ -92,9 +92,9 @@ can destroy **your local** repository):
 
 	$ git rebase master
 
-Then to finally push your changes into the internet simply do:
+Then to finally push your changes to the internet simply do:
 
-	$ git push
+	$ git push origin master
 
 
 Getting involved
