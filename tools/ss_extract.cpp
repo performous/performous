@@ -237,7 +237,7 @@ void saveTxtFile(xmlpp::NodeSet &sentence, const fs::path &path, const Song &son
 	if (!song.genre.empty()) txtfile << "#GENRE:" << song.genre << std::endl;
 	if (!song.year.empty()) txtfile << "#YEAR:" << song.year << std::endl;
 	if (!song.edition.empty()) txtfile << "#EDITION:" << song.edition << std::endl;
-	//txtfile << "#LANGUAGE:English" << std::endl; // Detect instead of hardcoding? 
+	//txtfile << "#LANGUAGE:English" << std::endl; // Detect instead of hardcoding?
 	if (!song.music.empty()) txtfile << "#MP3:" << filename(song.music) << std::endl;
 	if (!song.vocals.empty()) txtfile << "#VOCALS:" << filename(song.vocals) << std::endl;
 	if (video && mkvcompress) {
@@ -396,11 +396,11 @@ void get_node(const xmlpp::Node* node, std::string& genre, std::string& year, do
 
 	if(nodeText && nodeText->is_white_space()) //Let's ignore the indenting - you don't always want to do this.
 		return;
-    
-	//Treat the various node types differently: 
+
+	//Treat the various node types differently:
 	if(nodeText || nodeComment || nodeContent)
 	{
-		// if any of these exist do nothing! :D      
+		// if any of these exist do nothing! :D
 	}
 	else if(const xmlpp::Element* nodeElement = dynamic_cast<const xmlpp::Element*>(node))
 	{
@@ -415,7 +415,7 @@ void get_node(const xmlpp::Node* node, std::string& genre, std::string& year, do
 			else if (attribute->get_name() == "YEAR") year = normalize(attribute->get_value());
 		}
 	}
-  
+
 	if(!nodeContent)
 	{
 		//Recurse through child nodes:
@@ -537,7 +537,7 @@ int main( int argc, char **argv) {
 	} catch (std::exception& e) {
 		std::cout << cmdline << std::endl;
 		std::cout << "ERROR: " << e.what() << std::endl;
-		return 1;
+		return EXIT_FAILURE;
 	}
 	std::string pack_ee = dvdPath + "/pack_ee.pak"; // Note: lower case (ISO-9660)
 	if (!fs::exists(pack_ee)) {
@@ -555,7 +555,9 @@ int main( int argc, char **argv) {
 	FindSongs f = std::for_each(p.files().begin(), p.files().end(), FindSongs(song));
 	std::cerr << f.songs.size() << " songs found" << std::endl;
 	if (vm.count("list")) {
-		// TODO: dump list of songs
+		for( std::map<std::string, Song>::const_iterator it = f.songs.begin() ; it != f.songs.end();  ++it) {
+			std::cout << "[" << it->first << "] " << it->second.artist << " - " << it->second.title << std::endl;
+		}
 	}
 	else std::for_each(f.songs.begin(), f.songs.end(), Process(p));
 }
