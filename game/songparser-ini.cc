@@ -155,12 +155,15 @@ void SongParser::iniParse() {
 					double beg = midi.get_seconds(it3->begin);
 					double end = midi.get_seconds(it3->end);
 					if (end == 0) continue; // Note with no ending
-					if (beg > end) { reversedNoteCount++; continue; } // Reversed note
+					if (beg > end) { // Reversed note
+						if (beg - end > 0.001) { reversedNoteCount++; continue; }
+						else end = beg; // Allow 1ms error to counter rounding etc errors
+					}
 					dur.push_back(Duration(beg, end));
 					durCount++;
 				}
 			}
-			// If a track has only 20 or less frets it's most likely b0rked.
+			// If a track has only 20 or less notes it's most likely b0rked.
 			// This number has been extracted from broken song tracks, but
 			// it is probably DIFFICULTYCOUNT * different_frets.
 			if (durCount <= 20) {
