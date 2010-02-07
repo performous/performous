@@ -7,7 +7,12 @@
 
 class ChcDecode {
   public:
-	ChcDecode(std::string key[4]) {
+	ChcDecode() {
+		for( unsigned int i = 0 ; i < 4 ; i++ ) {
+			key_crc[i] = 0;
+		}
+	}
+	void load(std::string key[4]) {
 		for( unsigned int i = 0 ; i < 4 ; i++ ) {
 			boost::crc_32_type crc;
 			crc.process_bytes(key[i].c_str(), key[i].size()+1);
@@ -15,7 +20,6 @@ class ChcDecode {
 		}
 	}
 	std::string getMelody(char *buffer, unsigned int buffer_size, unsigned int id) {
-
 		unsigned int *chc_buffer = (unsigned int*)buffer;
 
 		if( buffer_size%8 != 0 ) throw std::runtime_error("CHC file is not 8 bytes padded");

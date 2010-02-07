@@ -258,7 +258,33 @@ void saveTxtFile(xmlpp::NodeSet &sentence, const fs::path &path, const Song &son
 
 struct Process {
 	Pak const& pak;
-	Process(Pak const& p): pak(p) {}
+	ChcDecode chc_decoder;
+	Process(Pak const& p): pak(p) {
+		Pak::files_t::const_iterator it = std::find_if(pak.files().begin(), pak.files().end(), Match("export/config",".xml"));
+		if (it != pak.files().end()) {
+			xmlpp::DomParser dom;
+			dom.set_substitute_entities();
+			{
+				std::vector<char> tmp;
+				it->second.get(tmp);
+				std::string buf = xmlFix(tmp);
+				buf = Glib::convert(buf, "UTF-8", "ISO-8859-1"); // Convert to UTF-8
+				dom.parse_memory(buf);
+			}
+			std::string keys[4];
+			xmlpp::NodeSet n;
+			n = dom.get_document()->get_root_node()->find("/ss:CONFIG/ss:PRODUCT_NAME", nsmap);
+			if(!n.empty()) keys[0] = dynamic_cast<xmlpp::Element&>(*n[0]).get_child_text()->get_content();
+			n = dom.get_document()->get_root_node()->find("/ss:CONFIG/ss:PRODUCT_CODE", nsmap);
+			if(!n.empty()) keys[1] = dynamic_cast<xmlpp::Element&>(*n[0]).get_child_text()->get_content();
+			n = dom.get_document()->get_root_node()->find("/ss:CONFIG/ss:TERRITORY", nsmap);
+			if(!n.empty()) keys[2] = dynamic_cast<xmlpp::Element&>(*n[0]).get_child_text()->get_content();
+			n = dom.get_document()->get_root_node()->find("/ss:CONFIG/ss:DEFAULT_LANG", nsmap);
+			if(!n.empty()) keys[3] = dynamic_cast<xmlpp::Element&>(*n[0]).get_child_text()->get_content();
+
+			chc_decoder.load(keys);
+		}
+	}
 	void operator()(std::pair<std::string const, Song>& songpair) {
 		fs::path remove;
 		try {
@@ -272,9 +298,16 @@ struct Process {
 			{
 				std::vector<char> tmp;
 				Pak::files_t::const_iterator it = std::find_if(pak.files().begin(), pak.files().end(), Match("export/" + id + "/melody", ".xml"));
-				if (it == pak.files().end()) throw std::runtime_error("Melody XML not found");
-				it->second.get(tmp);
-				std::string buf = xmlFix(tmp);
+				std::string buf;
+				if (it == pak.files().end()) {
+					Pak::files_t::const_iterator it2 = std::find_if(pak.files().begin(), pak.files().end(), Match("export/melodies_10", ".chc"));
+					if (it2 == pak.files().end()) throw std::runtime_error("Melody XML not found");
+					it2->second.get(tmp);
+					buf = chc_decoder.getMelody(&tmp[0], tmp.size(), boost::lexical_cast<unsigned int>(id));
+				} else {
+					it->second.get(tmp);
+					buf = xmlFix(tmp);
+				}
 				bool succeeded = false;
 				try {
 					dom.parse_memory(buf);

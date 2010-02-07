@@ -25,7 +25,8 @@ int main(int argc, char ** argv) {
         chc_file.read(&buffer[0], fileSize);
 	chc_file.close();
 
-	ChcDecode chc_decoder(key);
+	ChcDecode chc_decoder;
+	chc_decoder.load(key);
 	std::string xmlMelody = chc_decoder.getMelody(buffer, fileSize, 31318);
 
 	std::cout << xmlMelody << std::endl;
