@@ -17,6 +17,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
 
+#include "chc_decode.hh"
 #include "pak.h"
 #include "ipuconv.hh"
 #include "ss_cover.hh"
