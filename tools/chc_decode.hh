@@ -12,6 +12,7 @@ class ChcDecode {
 			key_crc[i] = 0;
 		}
 	}
+	// TODO: move buffer uncypher inside load instead of getMelody
 	void load(std::string key[4]) {
 		for( unsigned int i = 0 ; i < 4 ; i++ ) {
 			boost::crc_32_type crc;
