@@ -1,9 +1,12 @@
-#include <boost/crc.hpp>
 #pragma once
 
+#include <boost/crc.hpp>
 #include <string>
 #include <stdexcept>
 #include <zlib.h>
+
+// Class freely inspired from ALLconv by Holger Kuhn (hawkear@gmx.de)
+// Thanks for its help
 
 class ChcDecode {
   public:
