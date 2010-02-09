@@ -3,10 +3,11 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <boost/lexical_cast.hpp>
 
 int main(int argc, char ** argv) {
-	if( argc != 6 ) {
-		std::cout << "Usage: " << argv[0] << " chc_file key0 key1 key2 key4" << std::endl;
+	if( argc != 7 ) {
+		std::cout << "Usage: " << argv[0] << " chc_file key0 key1 key2 key4 track_id" << std::endl;
 		return EXIT_FAILURE;
 	}
 	std::string key[4] = {argv[2], argv[3], argv[4], argv[5]};
@@ -27,7 +28,7 @@ int main(int argc, char ** argv) {
 
 	ChcDecode chc_decoder;
 	chc_decoder.load(key);
-	std::string xmlMelody = chc_decoder.getMelody(buffer, fileSize, 31318);
+	std::string xmlMelody = chc_decoder.getMelody(buffer, fileSize, boost::lexical_cast<unsigned int>(argv[6]));
 
 	std::cout << xmlMelody << std::endl;
 

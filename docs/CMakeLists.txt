@@ -25,7 +25,7 @@ if(UNIX)
 		set(TOOLS 
 			"ss_pak_extract" "ss_extract" "ss_cover_conv"
 			"ss_adpcm_decode" "ss_ipu_decode" "ss_ipu_conv"
-			"gh_xen_decrypt")
+			"gh_xen_decrypt" "ss_chc_decode")
 		set(MAN_SECTION "1")
 		foreach(TOOL ${TOOLS})
 			set(TOOL_MANFILE ${CMAKE_CURRENT_SOURCE_DIR}/${TOOL}.${MAN_SECTION})
