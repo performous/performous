@@ -115,7 +115,12 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 	add_definitions("-D__STDC_CONSTANT_MACROS")
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
-add_executable(performous ${SOURCES} ${SDL_SOURCES} ${RESOURCE_OBJECT})
+if(MSVC)
+	set(SUBSYSTEM_WIN32 WIN32)
+	add_executable(performous-cmd "windows-cmd.cpp")
+	install(TARGETS performous-cmd DESTINATION bin)
+endif(MSVC)
+add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL_SOURCES} ${RESOURCE_OBJECT})
 target_link_libraries(performous ${LIBS})
 
 # Store library paths in executable
