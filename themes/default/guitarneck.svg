@@ -15,7 +15,7 @@
    height="520"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.47pre4 r22446"
+   inkscape:version="0.47 r22583"
    sodipodi:docname="guitarneck.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    sodipodi:modified="true">
@@ -32,7 +32,7 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="1026"
+     inkscape:window-height="978"
      inkscape:window-width="1680"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
@@ -41,10 +41,10 @@
      pagecolor="#ffffff"
      id="base"
      inkscape:zoom="2.5115782"
-     inkscape:cx="140.58806"
-     inkscape:cy="117.51819"
-     inkscape:window-x="0"
-     inkscape:window-y="24"
+     inkscape:cx="67.725507"
+     inkscape:cy="324.55932"
+     inkscape:window-x="-4"
+     inkscape:window-y="-3"
      inkscape:current-layer="svg2"
      showgrid="true"
      showguides="false"
@@ -151,6 +151,13 @@
        inkscape:vp_y="0 : 1000 : 0"
        inkscape:vp_x="0 : 0.5 : 1"
        sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3627"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
   </defs>
   <g
      id="g6854">
@@ -199,4 +206,14 @@
        d="m 22,0 0,520"
        id="path4654" />
   </g>
+  <path
+     style="fill:none;stroke:#000000;stroke-width:5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4.5999999;stroke-opacity:1;stroke-dasharray:none"
+     d="m 0,518 250,0 0,0"
+     id="path2845"
+     sodipodi:nodetypes="ccc" />
+  <path
+     style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4.5999999;stroke-opacity:1;stroke-dasharray:none"
+     d="m 0,260 250,0 0,0"
+     id="path2845-2"
+     sodipodi:nodetypes="ccc" />
 </svg>
