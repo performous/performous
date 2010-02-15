@@ -18,7 +18,7 @@ find_path(Png_INCLUDE_DIR
 )
 
 find_library(Png_LIBRARY
-  NAMES png12 png14
+  NAMES png png12 png14
   PATHS ${Png_PKGCONF_LIBRARY_DIRS}
 )
 
