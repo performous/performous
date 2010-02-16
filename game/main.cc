@@ -95,7 +95,7 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 			case GL_INVALID_OPERATION: std::cerr << "OpenGL error: invalid operation" << std::endl; break;
 			case GL_STACK_OVERFLOW: std::cerr << "OpenGL error: stack overflow" << std::endl; break;
 			case GL_STACK_UNDERFLOW: std::cerr << "OpenGL error: stack underflow" << std::endl; break;
-			case GL_OUT_OF_MEMORY: std::cerr << "OpenGL error: invalid enum" << std::endl; break;
+			case GL_OUT_OF_MEMORY: std::cerr << "OpenGL error: out of memory" << std::endl; break;
 		}
 	}
 	if( config["graphic/fullscreen"].b() != window.getFullscreen() )
@@ -107,10 +107,10 @@ void audioSetup(Capture& capture, Audio& audio) {
 	using namespace boost::spirit::classic;
 	unsigned channels, rate, frames;
 	std::string devstr;
-	// channel       ::= "channel=" integer
+	// channels      ::= "channels=" integer
 	// rate          ::= "rate=" integer
-	// frame         ::= "frame=" integer
-	// argument      ::= channel | rate | frame
+	// frames        ::= "frames=" integer
+	// argument      ::= channels | rate | frames
 	// argument_list ::= integer? argument % ","
 	// backend       ::= anychar+
 	// device        ::= argument_list "@" backend | argument_list | backend
