@@ -4,5 +4,4 @@ cmake_minimum_required(VERSION 2.6)
 set(SLAVE_LIB TRUE)
 
 add_subdirectory(plugin++)
-add_subdirectory(libda)
 

@@ -1,19 +1,19 @@
 #include "screen_practice.hh"
 
+#include "audio.hh"
 #include "util.hh"
 #include "fs.hh"
-#include "record.hh"
 #include "joystick.hh"
 
-ScreenPractice::ScreenPractice(std::string const& name, Audio& audio, Capture& capture):
-  Screen(name), m_audio(audio), m_capture(capture)
+ScreenPractice::ScreenPractice(std::string const& name, Audio& audio):
+  Screen(name), m_audio(audio)
 {}
 
 void ScreenPractice::enter() {
 	m_audio.playMusic(getThemePath("practice.ogg"));
 	theme.reset(new ThemePractice());
 	// draw vu meters
-	for (unsigned int i = 0, mics = m_capture.analyzers().size(); i < mics; ++i) {
+	for (unsigned int i = 0, mics = m_audio.analyzers().size(); i < mics; ++i) {
 		ProgressBar* b;
 		m_vumeters.push_back(b = new ProgressBar(getThemePath("vumeter_bg.svg"), getThemePath("vumeter_fg.svg"), ProgressBar::VERTICAL, 0.136, 0.023));
 		b->dimensions.screenBottom().left(-0.4 + i * 0.2).fixedWidth(0.04);
@@ -53,7 +53,7 @@ void ScreenPractice::draw() {
 
 void ScreenPractice::draw_analyzers() {
 	MusicalScale scale;
-	boost::ptr_vector<Analyzer>& analyzers = m_capture.analyzers();
+	boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
 	if (analyzers.empty()) return;
 	double textPower = -getInf();
 	double textFreq = 0.0;

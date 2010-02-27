@@ -8,13 +8,11 @@
 #include "progressbar.hh"
 #include "joystick.hh"
 
-class Capture;
-
 /// screen for practice mode
 class ScreenPractice : public Screen {
   public:
 	/// constructor
-	ScreenPractice(std::string const& name, Audio& audio, Capture& capture);
+	ScreenPractice(std::string const& name, Audio& audio);
 	void enter();
 	void exit();
 	void manageEvent( SDL_Event event );
@@ -25,7 +23,6 @@ class ScreenPractice : public Screen {
 
   private:
 	Audio& m_audio;
-	Capture& m_capture;
 	std::vector<Sample> m_samples;
 	boost::ptr_vector<ProgressBar> m_vumeters;
 	boost::scoped_ptr<ThemePractice> theme;

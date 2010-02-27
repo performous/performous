@@ -7,6 +7,7 @@
 #include <boost/thread/condition.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
+#include <libda/sample.hpp>
 #include <vector>
 
 using boost::uint8_t;
@@ -104,8 +105,6 @@ class VideoFifo {
 	static const unsigned m_max = 50;
 };
 
-#include <libda/audio.hpp>
-
 class AudioBuffer {
   public:
 	AudioBuffer(size_t size = 2000000): m_data(size), m_pos(), m_posReq(), m_sps(), m_duration(getNaN()), m_quit() {}
@@ -138,14 +137,20 @@ class AudioBuffer {
 		m_data.insert(m_data.end(), data.begin(), data.end());
 		m_pos += data.size();
 	}
-	bool operator()(da::pcm_data data, int64_t& pos) {
+	bool prepare(int64_t pos) {
+		boost::mutex::scoped_try_lock l(m_mutex);
+		if (!l.owns_lock()) return false;
+		m_posReq = pos;
+		return m_pos > m_posReq + m_data.capacity() / 4 && m_pos - m_data.size() <= m_pos;
+	}
+	bool operator()(float* begin, float* end, int64_t pos, float volume = 1.0f) {
 		boost::mutex::scoped_lock l(m_mutex);
-		size_t samples = data.frames * data.channels;
 		size_t idx = pos + m_data.size() - m_pos;
+		size_t samples = end - begin;
 		for (size_t s = 0; s < samples; ++s, ++idx) {
-			if (idx < m_data.size()) data.rawbuf[s] += da::conv_from_s16(m_data[idx]);
+			if (idx < m_data.size()) begin[s] += volume * da::conv_from_s16(m_data[idx]);
 		}
-		m_posReq = pos += samples;
+		m_posReq = pos + samples;
 		l.unlock();
 		if (wantSeek()) reset();
 		if (condition()) m_cond.notify_one();

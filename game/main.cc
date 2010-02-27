@@ -1,6 +1,5 @@
 #include "config.hh"
 #include "fs.hh"
-#include "record.hh"
 #include "screen.hh"
 #include "joystick.hh"
 #include "songs.hh"
@@ -23,7 +22,6 @@
 #include <boost/program_options.hpp>
 #include <boost/spirit/include/classic_core.hpp>
 #include <boost/thread.hpp>
-#include <libda/audio.hpp>
 #include <csignal>
 #include <fstream>
 #include <string>
@@ -102,60 +100,12 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 		window.setFullscreen(config["graphic/fullscreen"].b());
 }
 
-void audioSetup(Capture& capture, Audio& audio) {
-	// initialize audio argument parser
-	using namespace boost::spirit::classic;
-	unsigned channels, rate, frames;
-	std::string devstr;
-	// channels      ::= "channels=" integer
-	// rate          ::= "rate=" integer
-	// frames        ::= "frames=" integer
-	// argument      ::= channels | rate | frames
-	// argument_list ::= integer? argument % ","
-	// backend       ::= anychar+
-	// device        ::= argument_list "@" backend | argument_list | backend
-	rule<> channels_r = ("channels=" >> uint_p[assign_a(channels)]) | uint_p[assign_a(channels)];
-	rule<> rate_r = "rate=" >> uint_p[assign_a(rate)];
-	rule<> frames_r = "frames=" >> uint_p[assign_a(frames)];
-	rule<> argument = channels_r | rate_r | frames_r;
-	rule<> argument_list = argument % ',';
-	rule<> device = (!argument_list >> '@' >> (+anychar_p)[assign_a(devstr)]) | argument_list | (*~ch_p('@'))[assign_a(devstr)];
-	// Capture devices
-	ConfigItem::StringList const& cdevs = config["audio/capture"].sl();
-	for (ConfigItem::StringList::const_iterator it = cdevs.begin(); it != cdevs.end(); ++it) {
-		channels = 2; rate = 48000; frames = 512; devstr.clear();
-		if (!parse(it->c_str(), device).full) throw std::runtime_error("Invalid syntax in mics=" + *it);
-		try {
-			capture.addMics(channels, rate, frames, devstr);
-		} catch (std::exception const& e) {
-			std::cerr << "Capture device mics=" << *it << " failed and will be ignored:\n  " << e.what() << std::endl;
-		}
-	}
-	if (capture.analyzers().empty()) std::cerr << "No capture devices could be used. Please use --mics to define some." << std::endl;
-	// Playback devices
-	ConfigItem::StringList const& pdevs = config["audio/playback"].sl();
-	for (ConfigItem::StringList::const_iterator it = pdevs.begin(); it != pdevs.end(); ++it) {
-		channels = 2; rate = 48000; frames = 512; devstr.clear();
-		if (!parse(it->c_str(), device).full) throw std::runtime_error("Invalid syntax in pdev=" + *it);
-		if (channels != 2) throw std::runtime_error("Only stereo playback is supported, error in pdev=" + *it);
-		try {
-			audio.open(devstr, rate, frames);
-		} catch (std::exception const& e) {
-			std::cerr << "Playback device pdev=" << *it << " failed and will be ignored:\n  " << e.what() << std::endl;
-		}
-	}
-	if (!audio.isOpen()) std::cerr << "No playback devices could be used. Please use --pdev to define one." << std::endl;
-}
-
 void mainLoop(std::string const& songlist) {
 	Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());
 	ScreenManager sm(window);
 	try {
-		sm.flashMessage(_("Audio capture..."), 0.0f, 1.0f, 1.0f); window.blank(); sm.drawFlashMessage(); window.swap();
-		Capture capture;
 		sm.flashMessage(_("Audio playback..."), 0.0f, 1.0f, 1.0f); window.blank(); sm.drawFlashMessage(); window.swap();
 		Audio audio;
-		audioSetup(capture, audio);
 		sm.flashMessage(_("Miscellaneous..."), 0.0f, 1.0f, 1.0f); window.blank(); sm.drawFlashMessage(); window.swap();
 		Backgrounds backgrounds;
 		Database database(getConfigDir() / "database.xml");
@@ -163,10 +113,10 @@ void mainLoop(std::string const& songlist) {
 		boost::scoped_ptr<input::MidiDrums> midiDrums;
 		// TODO: Proper error handling...
 		try { midiDrums.reset(new input::MidiDrums); } catch (std::runtime_error&) {}
-		sm.addScreen(new ScreenIntro("Intro", audio, capture));
+		sm.addScreen(new ScreenIntro("Intro", audio));
 		sm.addScreen(new ScreenSongs("Songs", audio, songs, database));
-		sm.addScreen(new ScreenSing("Sing", audio, capture, database, backgrounds));
-		sm.addScreen(new ScreenPractice("Practice", audio, capture));
+		sm.addScreen(new ScreenSing("Sing", audio, database, backgrounds));
+		sm.addScreen(new ScreenPractice("Practice", audio));
 		sm.addScreen(new ScreenConfiguration("Configuration", audio));
 		sm.addScreen(new ScreenPlayers("Players", audio, database));
 		sm.addScreen(new ScreenHiscore("Hiscore", audio, songs, database));
@@ -337,40 +287,6 @@ int main(int argc, char** argv) try {
 	}
 	if (vm.count("help")) {
 		std::cout << cmdline << "  any arguments without a switch are interpreted as song folders.\n" << std::endl;
-		return 0;
-	}
-	// Initialize audio for pdevhelp, michelp and the rest of the program
-	da::initialize libda;
-	if (vm.count("pdevhelp")) {
-		da::playback::devlist_t l = da::playback::devices();
-		std::cout << "Specify with --pdev [OPTIONS@]dev[:settings]]. For example:\n"
-		  "  --pdev jack                       JACK output\n"
-		  "  --pdev rate=44100,frames=512@alsa ALSA with 44.1 kHz and buffers of 512 samples\n"
-		  "                                    Nearest available rate will be used.\n"
-		  "  --pdev alsa:hw:Intel              Use ALSA sound card named Intel.\n\n"
-		  "If multiple pdevs are specified, they will all be tested to find a working one.\n" << std::endl;
-		std::cout << "Playback devices available:" << std::endl;
-		for (da::playback::devlist_t::const_iterator it = l.begin(); it != l.end(); ++it) {
-			std::cout << boost::format("  %1% %|10t|%2%\n") % it->name() % it->desc();
-		}
-		std::cout << std::flush;
-		return 0;
-	}
-	if (vm.count("michelp")) {
-		da::record::devlist_t l = da::record::devices();
-		std::cout << "Specify with --mics [OPTIONS@]dev[:settings]]. For example:\n"
-		  "  --mics channels=2                 Two mics on any sound device\n"
-		  "  --mics channels=2@jack            Two mics on JACK\n"
-		  "  --mics channels=18@alsa:hw:M16DX  18 input channels on ALSA device \"hw:M16DX\"\n"
-		  "                                    Note: only the first four at most will be used\n"
-		  "  --mics channels=1,rate=44100      One mic; will try to get 44100 Hz if available\n\n"
-		  "Multiple --mics options may be specified and all the successfully opened inputs\n"
-		  "are assigned as players until the maximum of four players are configured.\n" << std::endl;
-		std::cout << "Capture devices available:" << std::endl;
-		for (da::record::devlist_t::const_iterator it = l.begin(); it != l.end(); ++it) {
-			std::cout << boost::format("  %1% %|10t|%2%\n") % it->name() % it->desc();
-		}
-		std::cout << std::flush;
 		return 0;
 	}
 #ifdef USE_PORTMIDI
