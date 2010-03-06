@@ -118,7 +118,7 @@ class SongParser {
 	bool m_relative;
 	double m_gap;
 	double m_bpm;
-	
+
 	bool txtCheck(std::vector<char> const& data);
 	void txtParseHeader();
 	void txtParse();
@@ -173,4 +173,3 @@ class SongParser {
 		return s;
 	}
 };
-

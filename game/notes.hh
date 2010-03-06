@@ -115,7 +115,7 @@ struct DanceTrack {
 	//track description
 	std::string description;
 	//container for the actual note data
-	Notes notes;	
+	Notes notes;
 };
 
 enum DanceDifficulty {

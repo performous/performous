@@ -71,12 +71,13 @@ void SongParser::iniParseHeader() {
 		else if (key == "cover") s.cover = value;
 		else if (key == "background") s.background = value;
 		else if (key == "video") s.video = value;
+		else if (key == "delay") { assign(s.start, value); s.start/=1000.0; }
 		else if (key == "video_start_time") { assign(s.videoGap, value); s.videoGap/=1000.0; }
 		else if (key == "preview_start_time") { assign(s.preview_start, value); s.preview_start/=1000.0; }
 		// Before adding other tags: they should be checked with the already-existing tags in FoF format; in case any tag doesn't exist there, it should be discussed with FoFiX developers before adding it here.
 	}
 	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
-	
+
 	// Parse additional data from midi file - required to get tracks info
 	s.midifilename = "notes.mid";
 	// Compose regexps to find music files
@@ -134,10 +135,10 @@ void SongParser::iniParse() {
 	Song& s = m_song;
 	s.notes.clear();
 	s.track_map.clear();
-	
+
 	MidiFileParser midi(s.path + "/" + s.midifilename);
 	int reversedNoteCount = 0;
-	for (uint32_t ts = 0, end = midi.ts_last + midi.division; ts < end; ts += midi.division) s.beats.push_back(midi.get_seconds(ts));
+	for (uint32_t ts = 0, end = midi.ts_last + midi.division; ts < end; ts += midi.division) s.beats.push_back(midi.get_seconds(ts)-s.start);
 	for (MidiFileParser::Tracks::const_iterator it = midi.tracks.begin(); it != midi.tracks.end(); ++it) {
 		// Figure out the track name
 		std::string name = it->name;
@@ -152,8 +153,8 @@ void SongParser::iniParse() {
 				Durations& dur = nm2[it2->first];
 				MidiFileParser::Notes const& notes = it2->second;
 				for (MidiFileParser::Notes::const_iterator it3 = notes.begin(); it3 != notes.end(); ++it3) {
-					double beg = midi.get_seconds(it3->begin);
-					double end = midi.get_seconds(it3->end);
+					double beg = midi.get_seconds(it3->begin)-s.start;
+					double end = midi.get_seconds(it3->end)-s.start;
 					if (end == 0) continue; // Note with no ending
 					if (beg > end) { // Reversed note
 						if (beg - end > 0.001) { reversedNoteCount++; continue; }
@@ -176,8 +177,8 @@ void SongParser::iniParse() {
 		// Process vocal tracks
 		for (MidiFileParser::Lyrics::const_iterator it2 = it->lyrics.begin(); it2 != it->lyrics.end(); ++it2) {
 			Note n;
-			n.begin = midi.get_seconds(it2->begin);
-			n.end = midi.get_seconds(it2->end);
+			n.begin = midi.get_seconds(it2->begin)-s.start;
+			n.end = midi.get_seconds(it2->end)-s.start;
 			n.notePrev = n.note = it2->note;
 			n.type = n.note > 100 ? Note::SLEEP : Note::NORMAL;
 			{
