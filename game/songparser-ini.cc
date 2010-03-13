@@ -138,7 +138,7 @@ void SongParser::iniParse() {
 
 	MidiFileParser midi(s.path + "/" + s.midifilename);
 	int reversedNoteCount = 0;
-	for (uint32_t ts = 0, end = midi.ts_last + midi.division; ts < end; ts += midi.division) s.beats.push_back(midi.get_seconds(ts)-s.start);
+	for (uint32_t ts = 0, end = midi.ts_last + midi.division; ts < end; ts += midi.division) s.beats.push_back(midi.get_seconds(ts)+s.start);
 	for (MidiFileParser::Tracks::const_iterator it = midi.tracks.begin(); it != midi.tracks.end(); ++it) {
 		// Figure out the track name
 		std::string name = it->name;
@@ -153,8 +153,8 @@ void SongParser::iniParse() {
 				Durations& dur = nm2[it2->first];
 				MidiFileParser::Notes const& notes = it2->second;
 				for (MidiFileParser::Notes::const_iterator it3 = notes.begin(); it3 != notes.end(); ++it3) {
-					double beg = midi.get_seconds(it3->begin)-s.start;
-					double end = midi.get_seconds(it3->end)-s.start;
+					double beg = midi.get_seconds(it3->begin)+s.start;
+					double end = midi.get_seconds(it3->end)+s.start;
 					if (end == 0) continue; // Note with no ending
 					if (beg > end) { // Reversed note
 						if (beg - end > 0.001) { reversedNoteCount++; continue; }
@@ -177,8 +177,8 @@ void SongParser::iniParse() {
 		// Process vocal tracks
 		for (MidiFileParser::Lyrics::const_iterator it2 = it->lyrics.begin(); it2 != it->lyrics.end(); ++it2) {
 			Note n;
-			n.begin = midi.get_seconds(it2->begin)-s.start;
-			n.end = midi.get_seconds(it2->end)-s.start;
+			n.begin = midi.get_seconds(it2->begin)+s.start;
+			n.end = midi.get_seconds(it2->end)+s.start;
 			n.notePrev = n.note = it2->note;
 			n.type = n.note > 100 ? Note::SLEEP : Note::NORMAL;
 			{
