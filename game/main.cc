@@ -283,7 +283,7 @@ int main(int argc, char** argv) try {
 #else
 	setlocale (LC_MESSAGES, "");
 #endif
-	bindtextdomain (PACKAGE, LOCALEDIR);
+	bindtextdomain (PACKAGE, getLocaleDir().string().c_str());
 	textdomain (PACKAGE);
 	bind_textdomain_codeset (PACKAGE, "UTF-8");
 #endif

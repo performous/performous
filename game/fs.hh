@@ -12,6 +12,9 @@ fs::path getHomeDir();
 /** Get the users configuration folder **/
 fs::path getConfigDir();
 
+/** Get the localec folder **/
+fs::path getLocaleDir();
+
 /** Do mangling to convert user-entered path into path suitable for use with stdlib etc. **/
 fs::path pathMangle(fs::path const& dir);
 
