@@ -136,7 +136,7 @@ void Database::queryPerSongHiscore_HiscoreDisplay (std::ostream & os, boost::sha
 	
 	for (size_t i=0; ((i<hi.size())&&(i<max_displayed)); ++i)
 	{
-		os << i+1+start_pos << "\t"
+		os << i+start_pos+1 << "\t"
 		   << m_players.lookup(hi[i+start_pos].playerid) << "\t"
 		   << hi[i+start_pos].score << "\t"
 		   << "(" << hi[i+start_pos].track << ")\n";

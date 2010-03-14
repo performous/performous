@@ -77,10 +77,12 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 			return;
 		} else if (show_hiscores) {
 			if (nav == input::CANCEL || m_songs.empty()) show_hiscores = false;
-			else if ((nav == input::UP)&&(hiscore_start_pos)) hiscore_start_pos--;
+			else if ((nav == input::UP)&&(hiscore_start_pos > 0)) hiscore_start_pos--;
 			else if (nav == input::DOWN) hiscore_start_pos++;
-			else if (nav == input::LEFT) m_songs.advance(-1);
-			else if (nav == input::RIGHT) m_songs.advance(1);
+			else if ((nav == input::MOREUP)&&(hiscore_start_pos > 4)) hiscore_start_pos -= 5;
+			else if (nav == input::MOREDOWN) hiscore_start_pos += 5;
+			else if (nav == input::LEFT) { m_songs.advance(-1); hiscore_start_pos=0; }
+			else if (nav == input::RIGHT) { m_songs.advance(1); hiscore_start_pos=0; }
 			else if (nav == input::START) {}; // TODO change hiscore type listed (all, just vocals, guitar easy, guitar medium, guitar hard, guit
 			return;
 		} else if (nav == input::CANCEL) {
@@ -100,16 +102,18 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 		SDL_keysym keysym = event.key.keysym;
 		int key = keysym.sym;
 		SDLMod mod = event.key.keysym.mod;
-		if (key == SDLK_r && mod & KMOD_CTRL) { m_songs.reload(); m_songs.setFilter(m_search.text); }
-		if (!m_jukebox && m_search.process(keysym)) m_songs.setFilter(m_search.text);
-		if (key == SDLK_F5) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 8); // Vocals
-		if (key == SDLK_F6) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 4); // Guitars
-		if (key == SDLK_F7) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 2); // Drums
-		if (key == SDLK_F8) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 1); // Dance
-		// The rest are only available when there are songs available
-		else if (m_songs.empty()) return;
-		else if (!m_jukebox && key == SDLK_F4) m_jukebox = true;
-		else if (key == SDLK_END) show_hiscores ? show_hiscores = false : show_hiscores = true;
+		if (!show_hiscores) {
+			if (key == SDLK_r && mod & KMOD_CTRL) { m_songs.reload(); m_songs.setFilter(m_search.text); }
+			if (!m_jukebox && m_search.process(keysym)) m_songs.setFilter(m_search.text);
+			if (key == SDLK_F5) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 8); // Vocals
+			if (key == SDLK_F6) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 4); // Guitars
+			if (key == SDLK_F7) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 2); // Drums
+			if (key == SDLK_F8) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 1); // Dance
+			// The rest are only available when there are songs available
+			else if (m_songs.empty()) return;
+			else if (!m_jukebox && key == SDLK_F4) m_jukebox = true;
+			else if (key == SDLK_END) show_hiscores ? show_hiscores = false : show_hiscores = true;
+		} else if (key == SDLK_END) show_hiscores ? show_hiscores = false : show_hiscores = true;
 	}
 }
 
