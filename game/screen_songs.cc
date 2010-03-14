@@ -1,8 +1,8 @@
 #include "screen_songs.hh"
 
 #include "screen_sing.hh"
-#include "screen_hiscore.hh"
 #include "configuration.hh"
+#include "hiscore.hh"
 #include "util.hh"
 #include "songs.hh"
 #include "audio.hh"
@@ -13,7 +13,7 @@
 static const double IDLE_TIMEOUT = 45.0; // seconds
 
 ScreenSongs::ScreenSongs(std::string const& name, Audio& audio, Songs& songs, Database& database):
-  Screen(name), m_audio(audio), m_songs(songs), m_database(database), m_covers(20), m_jukebox()
+  Screen(name), m_audio(audio), m_songs(songs), m_database(database), m_covers(20), m_jukebox(), show_hiscores(), hiscore_start_pos()
 {
 	m_songs.setAnimMargins(5.0, 5.0);
 	m_playTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
@@ -29,6 +29,8 @@ void ScreenSongs::enter() {
 	m_songs.setFilter(m_search.text);
 	m_audio.fadeout();
 	m_jukebox = false;
+	show_hiscores = false;
+	hiscore_start_pos = 0;
 }
 
 void ScreenSongs::exit() {
@@ -73,6 +75,14 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 			else if (nav == input::MOREDOWN) m_audio.seek(30);
 			else manageSharedKey(nav);
 			return;
+		} else if (show_hiscores) {
+			if (nav == input::CANCEL || m_songs.empty()) show_hiscores = false;
+			else if ((nav == input::UP)&&(hiscore_start_pos)) hiscore_start_pos--;
+			else if (nav == input::DOWN) hiscore_start_pos++;
+			else if (nav == input::LEFT) m_songs.advance(-1);
+			else if (nav == input::RIGHT) m_songs.advance(1);
+			else if (nav == input::START) {}; // TODO change hiscore type listed (all, just vocals, guitar easy, guitar medium, guitar hard, guit
+			return;
 		} else if (nav == input::CANCEL) {
 			if (!m_search.text.empty()) { m_search.text.clear(); m_songs.setFilter(m_search.text); }
 			else if (m_songs.getTypeFilter() != 0) m_songs.setTypeFilter(0);
@@ -99,14 +109,7 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 		// The rest are only available when there are songs available
 		else if (m_songs.empty()) return;
 		else if (!m_jukebox && key == SDLK_F4) m_jukebox = true;
-		else if (key == SDLK_END) {
-			ScreenManager* sm = ScreenManager::getSingletonPtr();
-			Screen* s = sm->getScreen("Hiscore");
-			ScreenHiscore* ss = dynamic_cast<ScreenHiscore*> (s);
-			assert(ss);
-			ss->setSong(m_songs.currentPtr());
-			sm->activateScreen("Hiscore");
-		}
+		else if (key == SDLK_END) show_hiscores ? show_hiscores = false : show_hiscores = true;
 	}
 }
 
@@ -179,7 +182,7 @@ void ScreenSongs::draw() {
 	info.videoGap = 0.0;
 
 	drawMultimedia();
-	std::ostringstream oss_song, oss_order, oss_hiscore;
+	std::ostringstream oss_song, oss_order, oss_has_hiscore;
 	// Test if there are no songs
 	if (m_songs.empty()) {
 		// Format the song information text
@@ -192,13 +195,19 @@ void ScreenSongs::draw() {
 		}
 	} else {
 		Song& song = m_songs.current();
-		// Format the song information text
-		oss_song << song.title << '\n' << song.artist;
-		if(m_database.hasHiscore(song))
-			oss_hiscore << _("(press END to view hiscores)");
-		oss_order << (m_search.text.empty() ? _("<type in to search>") : m_search.text) << '\n';
-		oss_order << m_songs.sortDesc() << '\n';
-		oss_order << "(" << m_songs.currentId() + 1 << "/" << m_songs.size() << ")";
+		if(!show_hiscores) {
+			// Format the song information text
+			oss_song << song.title << '\n' << song.artist;
+			if(m_database.hasHiscore(song)) oss_has_hiscore << _("(press END to view hiscores)");
+			oss_order << (m_search.text.empty() ? _("<type in to search>") : m_search.text) << '\n';
+			oss_order << m_songs.sortDesc() << '\n';
+			oss_order << "(" << m_songs.currentId() + 1 << "/" << m_songs.size() << ")";
+		} else {
+			// Format the song information text
+			oss_song << _("Hiscore for ") << song.title << "\n";
+			// Get hiscores from database
+			m_database.queryPerSongHiscore_HiscoreDisplay(oss_order, m_songs.currentPtr(), hiscore_start_pos, 5);
+		}
 		double spos = m_songs.currentPosition(); // This needs to be polled to run the animation
 		if (!m_jukebox) {
 			// Draw the covers
@@ -241,9 +250,11 @@ void ScreenSongs::draw() {
 	else {
 		// Draw song and order texts
 		theme->song.draw(oss_song.str());
-		theme->order.draw(oss_order.str());
-		theme->hiscore.draw(oss_hiscore.str());
-		if (!m_songs.empty()) drawInstruments(m_songs.current(), Dimensions(m_instrumentList->ar()).fixedHeight(0.03).center(-0.04));
+		if (!show_hiscores) {
+			theme->order.draw(oss_order.str());
+			theme->has_hiscore.draw(oss_has_hiscore.str());
+		} else theme->hiscores.draw(oss_order.str());
+		if (!m_songs.empty()&&!show_hiscores) drawInstruments(m_songs.current(), Dimensions(m_instrumentList->ar()).fixedHeight(0.03).center(-0.04));
 	}
 	stopMultimedia(info);
 	if (m_jukebox) {

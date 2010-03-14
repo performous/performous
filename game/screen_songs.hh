@@ -58,4 +58,6 @@ protected:
 	boost::scoped_ptr<Texture> m_instrumentList;
 	Cachemap<std::string, Surface> m_covers;
 	bool m_jukebox;
+	bool show_hiscores;
+	unsigned hiscore_start_pos;
 };

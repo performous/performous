@@ -118,6 +118,31 @@ void Database::queryPerSongHiscore (std::ostream & os, boost::shared_ptr<Song> s
 	}
 }
 
+void Database::queryPerSongHiscore_HiscoreDisplay (std::ostream & os, boost::shared_ptr<Song> s, unsigned & start_pos, unsigned max_displayed, std::string const& track) const {
+	int songid = m_songs.lookup(s);
+	std::vector<HiscoreItem> hi = m_hiscores.queryHiscore(10, -1, songid, track);
+
+	if (songid == -1 || hi.size() == 0)
+	{
+		os << "No Items up to now.\n";
+		os << "Be the first to be listed here!\n";
+		return;
+	}
+	
+	if (hi.size()-(start_pos+1) < max_displayed) {
+		if (hi.size() < 6) start_pos = 0;
+		else start_pos -= 1;
+	}
+	
+	for (size_t i=0; ((i<hi.size())&&(i<max_displayed)); ++i)
+	{
+		os << i+1+start_pos << "\t"
+		   << m_players.lookup(hi[i+start_pos].playerid) << "\t"
+		   << hi[i+start_pos].score << "\t"
+		   << "(" << hi[i+start_pos].track << ")\n";
+	}
+}
+
 void Database::queryPerPlayerHiscore (std::ostream & os, std::string const& track) const {
 	int playerid = m_players.lookup(m_players.current().name);
 	std::vector<HiscoreItem> hi = m_hiscores.queryHiscore(3, playerid, -1, track);
