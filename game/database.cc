@@ -128,11 +128,9 @@ void Database::queryPerSongHiscore_HiscoreDisplay (std::ostream & os, boost::sha
 		os << "Be the first to be listed here!\n";
 		return;
 	}
-	
-	if (hi.size()-(start_pos+1) < max_displayed) {
-		if (hi.size() < 6) start_pos = 0;
-		else start_pos -= 1;
-	}
+
+	if((hi.size() > 5)&&(start_pos > hi.size()-6)) start_pos = hi.size()-5;
+	else start_pos = 0;
 	
 	for (size_t i=0; ((i<hi.size())&&(i<max_displayed)); ++i)
 	{

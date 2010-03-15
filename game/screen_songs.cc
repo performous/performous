@@ -79,7 +79,7 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 			if (nav == input::CANCEL || m_songs.empty()) show_hiscores = false;
 			else if ((nav == input::UP)&&(hiscore_start_pos > 0)) hiscore_start_pos--;
 			else if (nav == input::DOWN) hiscore_start_pos++;
-			else if ((nav == input::MOREUP)&&(hiscore_start_pos > 4)) hiscore_start_pos -= 5;
+			else if (nav == input::MOREUP) (hiscore_start_pos > 4) ? hiscore_start_pos -= 5 : hiscore_start_pos = 0;
 			else if (nav == input::MOREDOWN) hiscore_start_pos += 5;
 			else if (nav == input::LEFT) { m_songs.advance(-1); hiscore_start_pos=0; }
 			else if (nav == input::RIGHT) { m_songs.advance(1); hiscore_start_pos=0; }
