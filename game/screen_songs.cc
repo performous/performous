@@ -58,8 +58,8 @@ void ScreenSongs::manageSharedKey(input::NavButton nav) {
 		ss->setSong(m_songs.currentPtr());
 		sm->activateScreen("Sing");
 	}
-	else if (nav == input::LEFT) m_songs.advance(-1);
-	else if (nav == input::RIGHT) m_songs.advance(1);
+	else if (nav == input::LEFT) { m_songs.advance(-1); hiscore_start_pos = 0; }
+	else if (nav == input::RIGHT) { m_songs.advance(1); hiscore_start_pos = 0; }
 }
 
 void ScreenSongs::manageEvent(SDL_Event event) {
@@ -77,13 +77,12 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 			return;
 		} else if (show_hiscores) {
 			if (nav == input::CANCEL || m_songs.empty()) show_hiscores = false;
-			else if ((nav == input::UP)&&(hiscore_start_pos > 0)) hiscore_start_pos--;
+			else if (nav == input::UP) hiscore_start_pos--;
 			else if (nav == input::DOWN) hiscore_start_pos++;
+			// TODO: change hiscore type listed (all, just vocals, guitar easy, guitar medium, guitar hard, guit
 			else if (nav == input::MOREUP) (hiscore_start_pos > 4) ? hiscore_start_pos -= 5 : hiscore_start_pos = 0;
 			else if (nav == input::MOREDOWN) hiscore_start_pos += 5;
-			else if (nav == input::LEFT) { m_songs.advance(-1); hiscore_start_pos=0; }
-			else if (nav == input::RIGHT) { m_songs.advance(1); hiscore_start_pos=0; }
-			else if (nav == input::START) {}; // TODO change hiscore type listed (all, just vocals, guitar easy, guitar medium, guitar hard, guit
+			else manageSharedKey(nav);
 			return;
 		} else if (nav == input::CANCEL) {
 			if (!m_search.text.empty()) { m_search.text.clear(); m_songs.setFilter(m_search.text); }

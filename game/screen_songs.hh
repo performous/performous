@@ -59,5 +59,5 @@ protected:
 	Cachemap<std::string, Surface> m_covers;
 	bool m_jukebox;
 	bool show_hiscores;
-	unsigned hiscore_start_pos;
+	int hiscore_start_pos;
 };

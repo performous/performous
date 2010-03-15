@@ -118,7 +118,7 @@ void Database::queryPerSongHiscore (std::ostream & os, boost::shared_ptr<Song> s
 	}
 }
 
-void Database::queryPerSongHiscore_HiscoreDisplay (std::ostream & os, boost::shared_ptr<Song> s, unsigned & start_pos, unsigned max_displayed, std::string const& track) const {
+void Database::queryPerSongHiscore_HiscoreDisplay (std::ostream & os, boost::shared_ptr<Song> s, int& start_pos, unsigned max_displayed, std::string const& track) const {
 	int songid = m_songs.lookup(s);
 	std::vector<HiscoreItem> hi = m_hiscores.queryHiscore(10, -1, songid, track);
 
@@ -129,10 +129,11 @@ void Database::queryPerSongHiscore_HiscoreDisplay (std::ostream & os, boost::sha
 		return;
 	}
 
-	if((hi.size() > 5)&&(start_pos > hi.size()-6)) start_pos = hi.size()-5;
-	else start_pos = 0;
-	
-	for (size_t i=0; ((i<hi.size())&&(i<max_displayed)); ++i)
+	// Limits
+	if (start_pos > (int)hi.size() - (int)max_displayed) start_pos = hi.size() - max_displayed;
+	if (start_pos < 0 || hi.size() <= max_displayed) start_pos = 0;
+
+	for (size_t i = 0; i < hi.size() && i < max_displayed; ++i)
 	{
 		os << i+start_pos+1 << "\t"
 		   << m_players.lookup(hi[i+start_pos].playerid) << "\t"
