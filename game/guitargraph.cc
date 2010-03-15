@@ -35,7 +35,8 @@ namespace {
 	float y2a(float y) { return time2a(past - y / timescale * (future - past)); }
 	float tc(float y) { return y * 0.1; } // Get texture coordinates for animating hold notes
 	const double maxTolerance = 0.15; // Maximum error in seconds
-	
+
+	const float drumfill_min_rate = 6.0; // The rate of hits per second required to complete a drum fill
 	double points(double error) {
 		double score = 0.0;
 		if (error < maxTolerance) score += 15;
@@ -44,7 +45,7 @@ namespace {
 		if (error < 0.03) score += 5;
 		return score;
 	}
-	
+
 	const int streakStarBonus = 500;
 	int getNextBigStreak(int prev) { return prev + 50; }
 	inline float blend(float a, float b, float f) { return a*f + b*(1.0f-f); }
@@ -241,7 +242,7 @@ void GuitarGraph::engine() {
 	}
 	// Skip missed notes
 	while (m_chordIt != m_chords.end() && m_chordIt->begin + maxTolerance < time) {
-		if ( (m_drums && m_chordIt->status != m_chordIt->polyphony) 
+		if ( (m_drums && m_chordIt->status != m_chordIt->polyphony)
 		  || (!m_drums && m_chordIt->status == 0) ) endStreak();
 		++m_dead;
 		++m_chordIt;
@@ -392,7 +393,7 @@ void GuitarGraph::drumHit(double time, int fret) {
 		if (fret == 4 && time >= m_dfIt->end - maxTolerance
 		  && (!m_song.hasBRE || m_dfIt != (--m_drumfills.end()))) {
 			// GodMode and scores require ~ 6 hits per second
-			if (m_drumfillHits >= 6.0 * (m_dfIt->end - m_dfIt->begin)) {
+			if (m_drumfillHits >= drumfill_min_rate * (m_dfIt->end - m_dfIt->begin)) {
 				activateStarpower();
 				m_score += m_drumfillScore;
 			}
@@ -564,7 +565,7 @@ glutil::Color const GuitarGraph::colorize(glutil::Color c, double time) const {
 
 namespace {
 	const float fretWid = 0.5f; // The actual width is two times this
-	
+
 	/// Create a symmetric vertex pair of given data
 	void vertexPair(float x, float y, glutil::Color c, float ty, float fretW = fretWid) {
 		c.a = y2a(y); glColor4fv(c);
@@ -595,7 +596,7 @@ void GuitarGraph::draw(double time) {
 		glRotatef(g_angle, 1.0f, 0.0f, 0.0f);
 		float temp_s = dimensions.w() / 5.0f;
 		glScalef(temp_s, temp_s, temp_s);
-		
+
 		// Draw the neck
 		{
 			UseTexture tex(*m_neck);
@@ -619,7 +620,7 @@ void GuitarGraph::draw(double time) {
 				glTexCoord2f(1.0f, texCoord); glVertex2f(w, time2y(tEnd));
 			}
 		}
-		
+
 		// Draw the cursor
 		float level = m_hit[0].get();
 		glColor3f(level, level, level);
@@ -636,7 +637,7 @@ void GuitarGraph::draw(double time) {
 			m_tap.dimensions = m_button.dimensions;
 			m_tap.draw();
 		}
-		
+
 		// Draw the notes
 		{ glutil::UseLighting lighting(m_use3d);
 			// Draw drum fills / Big Rock Endings
@@ -645,7 +646,9 @@ void GuitarGraph::draw(double time) {
 				drawDrumfill(m_dfIt->begin - time, m_dfIt->end - time);
 				// If it is a drum fill (not BRE), draw the final note
 				if (m_drums && (!m_song.hasBRE || (m_dfIt != (--m_drumfills.end())))) {
-					glutil::Color c = colorize(color(4), m_dfIt->end);
+					glutil::Color c(0.7f, 0.7f, 0.7f);
+					if (m_drumfillHits >= drumfill_min_rate * (m_dfIt->end - m_dfIt->begin))
+						c = colorize(color(4), m_dfIt->end);
 					drawNote(4, c, m_dfIt->end - time, m_dfIt->end - time, 0, false, false, 0, 0);
 				}
 			}
@@ -690,12 +693,12 @@ void GuitarGraph::draw(double time) {
 					if (glow > 0.5f && tEnd < 0.1f && it->hitAnim[fret].get() == 0.0)
 						it->hitAnim[fret].setTarget(1.0);
 					// Call the actual note drawing function
-					drawNote(fret, c, tBeg, tEnd, whammy, it->tappable, glow > 0.5f, it->hitAnim[fret].get(), 
+					drawNote(fret, c, tBeg, tEnd, whammy, it->tappable, glow > 0.5f, it->hitAnim[fret].get(),
 					  it->releaseTimes[fret] > 0.0 ? it->releaseTimes[fret] - time : getNaN());
 				}
 			}
 		} //< disable lighting
-		
+
 		// Draw flames
 		for (int fret = 0; fret < 5; ++fret) { // Loop through the frets
 			if (m_drums && fret == 0) { // Skip bass drum
@@ -723,7 +726,7 @@ void GuitarGraph::draw(double time) {
 			}
 		}
 	}
-	
+
 	// Bottom neck glow
 	if (ng_ccnt > 0) {
 		// Mangle color
@@ -982,7 +985,7 @@ void GuitarGraph::updateChords() {
 		m_chords.push_back(c);
 	}
 	m_chordIt = m_chords.begin();
-	
+
 	// Solos
 	NoteMap const& nm = m_track_index->second->nm;
 	NoteMap::const_iterator solotrack = nm.find(103); // 103 = Expert Solo - used for every difficulty
@@ -1001,7 +1004,7 @@ void GuitarGraph::updateChords() {
 			m_scoreFactor += 50.0 * (m_drumfills.back().end - m_drumfills.back().begin);
 	}
 	m_dfIt = m_drumfills.end();
-	
+
 	// Normalize maximum score factor
 	m_scoreFactor = 10000.0 / m_scoreFactor;
 }
