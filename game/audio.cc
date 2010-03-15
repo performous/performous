@@ -68,8 +68,10 @@ void Audio::play(Sample const& s, std::string const& volumeSetting) {
 	if (vol > 0) vol = std::pow(10.0, (vol - 100.0) / 100.0 * 2.0);
 	m_volume.level(vol);
 	boost::shared_ptr<da::accumulate> acc(new da::accumulate());
-	acc->add(da::shared_ref(new SampleStream(s.mpeg)));
-	acc->add(da::shared_ref(new da::volume(vol)));
+	boost::shared_ptr<da::chain> ch(new da::chain());
+	ch->add(da::shared_ref(new SampleStream(s.mpeg)));
+	ch->add(da::shared_ref(new da::volume(vol)));
+	acc->add(da::shared_ref(ch));
 	m_mixer.add(da::shared_ref(acc));
 }
 

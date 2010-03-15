@@ -17,7 +17,6 @@
 #include "screen_practice.hh"
 #include "screen_configuration.hh"
 #include "screen_players.hh"
-#include "screen_hiscore.hh"
 
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
@@ -169,7 +168,6 @@ void mainLoop(std::string const& songlist) {
 		sm.addScreen(new ScreenPractice("Practice", audio, capture));
 		sm.addScreen(new ScreenConfiguration("Configuration", audio));
 		sm.addScreen(new ScreenPlayers("Players", audio, database));
-		sm.addScreen(new ScreenHiscore("Hiscore", audio, songs, database));
 		sm.activateScreen("Intro");
 		sm.flashMessage(_("Main menu..."), 0.0f, 1.0f, 1.0f); window.blank(); sm.drawFlashMessage(); window.swap();
 		sm.updateScreen();  // exit/enter, any exception is fatal error
