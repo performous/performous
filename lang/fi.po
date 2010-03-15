@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-27 15:43+0200\n"
+"POT-Creation-Date: 2010-03-15 12:07+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Tapio Vierros <tapiovierros@gmail.com>\n"
 "Language-Team: \n"
@@ -73,60 +73,60 @@ msgstr "Kappale on rikki!"
 msgid "Song contains broken tracks!"
 msgstr "Kappaleessa on rikkinäisiä osia!"
 
-#: ../game/screen_sing.cc:326
+#: ../game/screen_sing.cc:330
 msgid "   ENTER to skip instrumental break"
 msgstr "   ENTER hypätäksesi lauluosaan"
 
-#: ../game/screen_sing.cc:327
+#: ../game/screen_sing.cc:331
 msgid "   Remember to wait for grading!"
 msgstr "   Muista odottaa arvostelua!"
 
-#: ../game/screen_sing.cc:415
+#: ../game/screen_sing.cc:419
 msgid "No player!"
 msgstr "Pelaajia ei löytynyt!"
 
-#: ../game/screen_sing.cc:424
+#: ../game/screen_sing.cc:428
 msgid "Hit singer"
 msgstr "Tähti"
 
-#: ../game/screen_sing.cc:425
+#: ../game/screen_sing.cc:429
 msgid "Lead singer"
 msgstr "Solisti"
 
-#: ../game/screen_sing.cc:426
-#: ../game/screen_sing.cc:432
-#: ../game/screen_sing.cc:438
+#: ../game/screen_sing.cc:430
+#: ../game/screen_sing.cc:436
+#: ../game/screen_sing.cc:442
 msgid "Rising star"
 msgstr "Harrastaja"
 
-#: ../game/screen_sing.cc:427
-#: ../game/screen_sing.cc:433
-#: ../game/screen_sing.cc:439
+#: ../game/screen_sing.cc:431
+#: ../game/screen_sing.cc:437
+#: ../game/screen_sing.cc:443
 msgid "Amateur"
 msgstr "Amatööri"
 
-#: ../game/screen_sing.cc:428
-#: ../game/screen_sing.cc:440
+#: ../game/screen_sing.cc:432
+#: ../game/screen_sing.cc:444
 msgid "Tone deaf"
 msgstr "Lahjaton"
 
-#: ../game/screen_sing.cc:430
+#: ../game/screen_sing.cc:434
 msgid "Maniac"
 msgstr "Maanikko"
 
-#: ../game/screen_sing.cc:431
+#: ../game/screen_sing.cc:435
 msgid "Hoofer"
 msgstr "Ekspertti"
 
-#: ../game/screen_sing.cc:434
+#: ../game/screen_sing.cc:438
 msgid "Loser"
 msgstr "Luuseri"
 
-#: ../game/screen_sing.cc:436
+#: ../game/screen_sing.cc:440
 msgid "Virtuoso"
 msgstr "Virtuoosi"
 
-#: ../game/screen_sing.cc:437
+#: ../game/screen_sing.cc:441
 msgid "Rocker"
 msgstr "Rokkari"
 
@@ -158,11 +158,11 @@ msgstr "järjestetty polun mukaan"
 msgid "sorted by language"
 msgstr "järjestetty kielen mukaan"
 
-#: ../game/screen_songs.cc:186
+#: ../game/screen_songs.cc:187
 msgid "No songs found!"
 msgstr "Kappaleita ei löytynyt!"
 
-#: ../game/screen_songs.cc:187
+#: ../game/screen_songs.cc:188
 msgid ""
 "Visit performous.org\n"
 "for free songs"
@@ -170,15 +170,15 @@ msgstr ""
 "Hae ilmaista musiikkia\n"
 "osoitteesta performous.org"
 
-#: ../game/screen_songs.cc:189
+#: ../game/screen_songs.cc:190
 msgid "no songs match search"
 msgstr "yksikään kappale ei vastannut hakuasi"
 
-#: ../game/screen_songs.cc:197
+#: ../game/screen_songs.cc:198
 msgid "(press END to view hiscores)"
 msgstr "(paina END nähdäksesi ennätykset)"
 
-#: ../game/screen_songs.cc:198
+#: ../game/screen_songs.cc:199
 msgid "<type in to search>"
 msgstr "<kirjoita etsiäksesi>"
 
@@ -241,6 +241,14 @@ msgstr "Kuvakaappaus epäonnistui!"
 #: ../game/screen_hiscore.cc:88
 msgid "Hiscore for "
 msgstr "Ennätykset kappaleelle "
+
+#: ../game/database.cc:107
+msgid "No Items up to now."
+msgstr "Ei pisteitä tähän mennessä."
+
+#: ../game/database.cc:108
+msgid "Be the first to be listed here!"
+msgstr "Ole ensimmäinen!"
 
 #~ msgid "filter: "
 #~ msgstr "suodatin: "

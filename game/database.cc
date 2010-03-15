@@ -1,7 +1,7 @@
 #include "database.hh"
+#include "i18n.hh"
 
 #include <iostream>
-
 #include <libxml++/libxml++.h>
 
 Database::Database(fs::path filename) :
@@ -104,8 +104,8 @@ void Database::queryPerSongHiscore (std::ostream & os, boost::shared_ptr<Song> s
 
 	if (songid == -1 || hi.size() == 0)
 	{
-		os << "No Items up to now.\n";
-		os << "Be the first to be listed here!\n";
+		os << _("No Items up to now.") << '\n';
+		os << _("Be the first to be listed here!") << '\n';
 		return;
 	}
 
