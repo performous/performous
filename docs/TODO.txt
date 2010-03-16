@@ -61,4 +61,6 @@ SS Ripper:
 Bugs:
 
 - Segfault when browsing songs in song browser while loading (segfaults before loading finishes), quite rare
-
+- sample are not always played when a user fail (for example drums). it could
+  be nice that playing a sample reset the privious fail sample (test case :
+  drums rolling)
