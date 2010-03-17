@@ -31,6 +31,7 @@ Features:
 - Better audio card configuration ingame (needs PortAudio backend)
 - Allow playing a single song given as commandline argument (no menus)
 - Kiosk/arcade mode (disable exiting game and limit other functions)
+- Allow left-handed/reversed controllers (guitars, drum kits)
 
 Dance features:
 
