@@ -33,8 +33,19 @@ volatile bool g_quit = false;
 
 bool g_take_screenshot = false;
 
+// Signal handling for Ctrl-C
+
+static void signalSetup();
+
 extern "C" void quit(int) {
+	if (g_quit) std::exit(EXIT_SUCCESS);  // Instant exit if Ctrl+C is pressed again
 	g_quit = true;
+	signalSetup();
+}
+
+static void signalSetup() {
+	std::signal(SIGINT, quit);
+	std::signal(SIGTERM, quit);
 }
 
 /// can be thrown as an exception to quit the game
@@ -287,8 +298,7 @@ int main(int argc, char** argv) try {
 #endif
 
 	std::cout << PACKAGE " " VERSION << std::endl;
-	std::signal(SIGINT, quit);
-	std::signal(SIGTERM, quit);
+	signalSetup();
 	std::ios::sync_with_stdio(false);  // We do not use C stdio
 	std::srand(std::time(NULL));
 	// Parse commandline options
