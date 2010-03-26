@@ -2,6 +2,8 @@
 
 #include <vector>
 #include <boost/ptr_container/ptr_map.hpp>
+
+#include "instrumentgraph.hh"
 #include "animvalue.hh"
 #include "song.hh"
 #include "notes.hh"
@@ -28,7 +30,7 @@ typedef std::vector<DanceNote> DanceNotes;
 const size_t max_panels = 10; // Maximum number of arrow lines
 
 /// handles drawing of notes
-class DanceGraph {
+class DanceGraph: public InstrumentGraph {
   public:
 	/// constructor
 	DanceGraph(Audio& audio, Song const& song);
@@ -37,11 +39,7 @@ class DanceGraph {
 	 */
 	void draw(double time);
 	void engine();
-	void position(double cx, double width) { m_cx.setTarget(cx); m_width.setTarget(width); }
-	unsigned stream() const { return m_stream; }
 	bool dead() const;
-	double correctness() const { return m_correctness.get(); }
-	int getScore() const { return (m_score > 0 ? m_score : 0) * m_scoreFactor; }
 	std::string getGameMode() const { return m_gamingMode; }
 	std::string getDifficultyString() const;
   private:
@@ -57,9 +55,6 @@ class DanceGraph {
 	void drawArrow(int arrow_i, Texture& tex, float x, float y, float scale = 1.0, float ty1 = 0.0, float ty2 = 1.0);
 	void drawMine(float x, float y, float rot = 0.0, float scale = 1.0);
 	float panel2x(int i) { return -(m_pads * 0.5f) + m_arrow_map[i] + 0.5f; } /// Get x for an arrow line
-	Audio& m_audio;
-	Song const& m_song;
-	input::InputDev m_input; /// input device (keyboard/dance pad)
 	DanceNotes m_notes; /// contains the dancing notes for current game mode and difficulty
 	DanceNotes::iterator m_notesIt; /// the first note that hasn't gone away yet
 	DanceNotes::iterator m_activeNotes[max_panels]; /// hold notes that are currently pressed down
@@ -68,7 +63,6 @@ class DanceGraph {
 	Texture m_arrows_cursor;
 	Texture m_arrows_hold;
 	Surface m_mine;
-	AnimValue m_cx, m_width; /// controls horizontal position and width smoothly
 	std::size_t m_stream;
 	struct Event {
 		double time;
@@ -84,20 +78,9 @@ class DanceGraph {
 	bool m_pressed[max_panels]; /// is certain panel pressed currently
 	AnimValue m_pressed_anim[max_panels]; /// animation for panel pressing
 	int m_arrow_map[max_panels]; /// game mode dependant mapping of arrows' ordering at cursor
-	SvgTxtTheme m_text; /// generic text
-	boost::scoped_ptr<SvgTxtThemeSimple> m_popupText; /// generic text for making popups
-	AnimValue m_correctness;
-	AnimValue m_streakPopup; /// for animating the popup
 	int m_flow_direction;
-	double m_score; /// unnormalized scores
-	double m_scoreFactor; /// normalization factor
-	int m_streak; /// player's current streak/combo
-	int m_longestStreak; /// player's longest streak/combo
-	int m_bigStreak; /// next limit when a popup appears
 	int m_pads; /// how many panels the current gaming mode uses
 	std::string m_gamingMode; /// current game mode
 	DanceTracks::const_iterator m_curTrackIt; /// iterator to the currently selected game mode
-	double m_jointime; /// when the player joined
-	int m_dead; /// how many notes has been passed without hitting buttons
 };
 

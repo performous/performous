@@ -1,8 +1,9 @@
 #pragma once
 
 #include <vector>
-
 #include <boost/ptr_container/ptr_map.hpp>
+
+#include "instrumentgraph.hh"
 #include "animvalue.hh"
 #include "notes.hh"
 #include "audio.hh"
@@ -48,7 +49,7 @@ static inline bool operator==(Chord const& a, Chord const& b) {
 }
 
 /// handles drawing of notes and waves
-class GuitarGraph {
+class GuitarGraph: public InstrumentGraph {
   public:
 	/// constructor
 	GuitarGraph(Audio& audio, Song const& song, bool drums, int number);
@@ -58,12 +59,8 @@ class GuitarGraph {
 	void updateNeck();
 	void draw(double time);
 	void engine();
-	void position(double cx, double width) { m_cx.setTarget(cx); m_width.setTarget(width); }
-	unsigned stream() const { return m_stream; }
 	bool dead() const;
-	double correctness() const { return m_correctness.get(); }
 	std::string getTrackIndex() const { return m_track_index->first; }
-	int getScore() const { return m_score * m_scoreFactor; }
 	std::string getTrack() const { return m_track_index->first; }
 	std::string getDifficultyString() const;
   private:
@@ -73,9 +70,6 @@ class GuitarGraph {
 	void endHold(int fret, double time = 0.0);
 	void endBRE();
 	void endStreak() { m_streak = 0; m_bigStreak = 0; }
-	Audio& m_audio;
-	input::InputDev m_input; /// input device (guitar/drums/keyboard)
-	Song const& m_song;
 	Surface m_button;
 	Texture m_tail;
 	Texture m_tail_glow;
@@ -93,8 +87,6 @@ class GuitarGraph {
 	bool m_drums; /// are we using drums?
 	bool m_use3d; /// are we using 3d?
 	AnimValue m_starpower; /// how long the GodMode lasts (also used in fading the effect)
-	AnimValue m_cx, m_width; /// controls horizontal position and width smoothly
-	std::size_t m_stream;
 	std::vector<AnimValue> m_flames[5]; /// flame effect queues for each fret
 	TrackMapConstPtr m_track_map; /// tracks
 	TrackMapConstPtr::const_iterator m_track_index;
@@ -111,18 +103,6 @@ class GuitarGraph {
 		DIFFICULTY_AMAZING,  // Expert
 		DIFFICULTYCOUNT
 	} m_level;
-	struct Event {
-		double time;
-		AnimValue glow;
-		AnimValue whammy;
-		int type; // 0 = miss (pick), 1 = tap, 2 = pick
-		int fret;
-		Duration const* dur;
-		double holdTime;
-		Event(double t, int ty, int f = -1, Duration const* d = NULL): time(t), glow(0.0, 5.0), whammy(0.0, 0.5), type(ty), fret(f), dur(d), holdTime(d ? d->begin : getNaN()) { if (type > 0) glow.setValue(1.0); }
-	};
-	typedef std::vector<Event> Events;
-	Events m_events;
 	unsigned m_holds[5]; /// active hold notes
 	glutil::Color const& color(int fret) const;
 	glutil::Color const colorize(glutil::Color c, double time) const;
@@ -133,28 +113,16 @@ class GuitarGraph {
 	void nextTrack(bool fast = false);
 	void difficultyAuto(bool tryKeepCurrent = false);
 	bool difficulty(Difficulty level);
-	SvgTxtTheme m_text;
 	boost::scoped_ptr<SvgTxtThemeSimple> m_scoreText;
 	boost::scoped_ptr<SvgTxtThemeSimple> m_streakText;
-	boost::scoped_ptr<SvgTxtThemeSimple> m_popupText;
 	void updateChords();
 	typedef std::vector<Chord> Chords;
 	Chords m_chords;
 	Chords::iterator m_chordIt;
 	typedef std::map<Duration const*, unsigned> NoteStatus; // Note in song to m_events[unsigned - 1] or 0 for not played
 	NoteStatus m_notes;
-	AnimValue m_correctness;
 	AnimValue m_drumJump;
-	AnimValue m_streakPopup; /// for animating the popup
-	AnimValue m_godmodePopup; /// for animating the popup
-	double m_score; /// unnormalized scores
-	double m_scoreFactor; /// normalization factor
 	double m_starmeter; /// when this is high enough, GodMode becomes available
-	int m_streak; /// player's current streak/combo
-	int m_longestStreak; /// player's longest streak/combo
-	int m_bigStreak; /// next limit when a popup appears
-	double m_jointime; /// when the player joined
-	int m_dead; /// how many notes has been passed without hitting buttons
 	double m_drumfillHits; /// keeps track that enough hits are scored
 	double m_drumfillScore; /// max score for the notes under drum fill
 };

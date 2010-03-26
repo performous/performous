@@ -1,5 +1,5 @@
 #include "dancegraph.hh"
-
+#include "instrumentgraph.hh"
 #include "fs.hh"
 #include "notes.hh"
 #include "surface.hh"
@@ -71,32 +71,15 @@ namespace {
 
 /// Constructor
 DanceGraph::DanceGraph(Audio& audio, Song const& song):
+  InstrumentGraph(audio, song, input::DANCEPAD),
   m_level(BEGINNER),
-  m_audio(audio),
-  m_song(song),
-  m_input(input::DANCEPAD),
   m_beat(getThemePath("dancebeat.svg")),
   m_arrows(getThemePath("arrows.svg")),
   m_arrows_cursor(getThemePath("arrows_cursor.svg")),
   m_arrows_hold(getThemePath("arrows_hold.svg")),
   m_mine(getThemePath("mine.svg")),
-  m_cx(0.0, 0.2),
-  m_width(0.5, 0.4),
-  m_stream(),
-  m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
-  m_correctness(0.0, 5.0),
-  m_streakPopup(0.0, 1.0),
-  m_flow_direction(1),
-  m_score(),
-  m_scoreFactor(1),
-  m_streak(),
-  m_longestStreak(),
-  m_bigStreak(),
-  m_jointime(getNaN()),
-  m_dead()
+  m_flow_direction(1)
 {
-	m_popupText.reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
-
 	// Initialize some arrays
 	for(size_t i = 0; i < max_panels; i++) {
 		m_activeNotes[i] = m_notes.end();
@@ -492,14 +475,5 @@ void DanceGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 		m_text.draw(boost::lexical_cast<std::string>(unsigned(m_streak)) + "/"
 		  + boost::lexical_cast<std::string>(unsigned(m_longestStreak)));
 	}
-	// Draw streak pop-up for long streak intervals
-	double streakAnim = m_streakPopup.get();
-	if (streakAnim > 0.0) {
-		double s = 0.15 * (1.0 + streakAnim);
-		glColor4f(1.0f, 0.0f, 0.0f, 1.0 - streakAnim);
-		m_popupText->render(boost::lexical_cast<std::string>(unsigned(m_bigStreak)) + "\nStreak!");
-		m_popupText->dimensions().center(0.0).middle(offsetX).stretch(s,s);
-		m_popupText->draw();
-		if (streakAnim > 0.999) m_streakPopup.setTarget(0.0, true);
-	}
+	drawPopups(time, offsetX, dimensions);
 }

@@ -1,5 +1,5 @@
 #include "guitargraph.hh"
-
+#include "instrumentgraph.hh"
 #include "fs.hh"
 #include "song.hh"
 #include "3dobject.hh"
@@ -52,9 +52,7 @@ namespace {
 }
 
 GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number):
-  m_audio(audio),
-  m_input(drums ? input::DRUMS : input::GUITAR),
-  m_song(song),
+  InstrumentGraph(audio, song, drums ? input::DRUMS : input::GUITAR),
   m_button(getThemePath("button.svg")),
   m_tail(getThemePath("tail.svg")),
   m_tail_glow(getThemePath("tail_glow.svg")),
@@ -67,25 +65,11 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number)
   m_drums(drums),
   m_use3d(config["graphic/3d_notes"].b()),
   m_starpower(0.0, 0.1),
-  m_cx(0.0, 0.2),
-  m_width(0.5, 0.4),
-  m_stream(),
   m_track_index(m_track_map.end()),
   m_dfIt(m_drumfills.end()),
   m_level(),
-  m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
-  m_correctness(0.0, 5.0),
   m_drumJump(0.0, 12.0),
-  m_streakPopup(0.0, 1.0),
-  m_godmodePopup(0.0, 0.666),
-  m_score(),
-  m_scoreFactor(),
   m_starmeter(),
-  m_streak(),
-  m_longestStreak(),
-  m_bigStreak(),
-  m_jointime(getNaN()),
-  m_dead(),
   m_drumfillHits(),
   m_drumfillScore()
 {
@@ -101,7 +85,6 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number)
 	// Score calculator (TODO a better one)
 	m_scoreText.reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_streakText.reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
-	m_popupText.reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	// Load fail sounds
 	unsigned int sr = m_audio.getSR();
 	if (m_drums) {
@@ -896,29 +879,7 @@ void GuitarGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 			}
 		}
 	}
-	// Draw streak pop-up for long streak intervals
-	double streakAnim = m_streakPopup.get();
-	if (streakAnim > 0.0) {
-		double s = 0.2 * (1.0 + streakAnim);
-		glColor4f(1.0f, 0.0f, 0.0f, 1.0 - streakAnim);
-		m_popupText->render(boost::lexical_cast<std::string>(unsigned(m_bigStreak)) + "\nStreak!");
-		m_popupText->dimensions().center(0.1).middle(offsetX).stretch(s,s);
-		m_popupText->draw();
-		if (streakAnim > 0.999) m_streakPopup.setTarget(0.0, true);
-	}
-	// Draw godmode activation pop-up
-	double godAnim = m_godmodePopup.get();
-	if (godAnim > 0.0) {
-		float a = 1.0 - godAnim;
-		float s = 0.2 * (1.0 + godAnim);
-		glColor4f(0.3f, 0.0f, 1.0f, a);
-		m_popupText->render("God Mode\nActivated!");
-		m_popupText->dimensions().center(0.1).middle(offsetX).stretch(s,s);
-		m_popupText->draw();
-		m_text.dimensions.screenBottom(-0.02).middle(-0.12 + offsetX);
-		m_text.draw("Mistakes ignored!", 1.0 - godAnim);
-		if (godAnim > 0.999) m_godmodePopup.setTarget(0.0, true);
-	}
+	drawPopups(time, offsetX, dimensions);
 }
 
 /// Draw a bar for drum bass pedal/note
