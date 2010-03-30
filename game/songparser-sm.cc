@@ -40,8 +40,10 @@ namespace {
 /// 'Magick' to check if this file looks like correct format
 bool SongParser::smCheck(std::vector<char> const& data) {
 	if (data[0] != '#' || data[1] < 'A' || data[1] > 'Z') return false;
-	for (std::vector<char>::const_iterator it = data.begin(); it != data.end(); ++it)
-		if (*it == ';') return true;
+	for (std::vector<char>::const_iterator it = data.begin(); it != data.end(); ++it){
+		if (*it == '\n') return false;
+		else if (*it == ';') return true;
+	}
 	return false;
 }
 
