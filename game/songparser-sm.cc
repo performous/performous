@@ -89,7 +89,7 @@ bool SongParser::smParseField(std::string line) {
 	//Here the data contained by the current line is separated in key and value.
 	//However, because of the differing format of notedata the value is analyzed only if key is not NOTES
 	std::string::size_type pos = line.find(':');
-	if (pos == std::string::npos) throw std::runtime_error("Invalid format, should be #key:value");
+	if (pos == std::string::npos) throw std::runtime_error("Invalid sm format, should be #key:value");
 	std::string key = boost::trim_copy(line.substr(1, pos - 1));
 	if (key == "NOTES") {
 		/*All remaining data is parsed here.
