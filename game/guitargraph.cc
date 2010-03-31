@@ -867,6 +867,11 @@ void GuitarGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 	} else {
 		float xcor = 0.35 * dimensions.w();
 		float h = 0.075 * 2.0 * dimensions.w();
+		// Hack to show the scores better when there is more space (1 instrument)
+		if (m_width.get() > 0.99) {
+			xcor += 0.15;
+			h *= 1.2;
+		}
 		// Draw scores
 		glColor4f(0.1f, 0.3f, 1.0f, 0.90f);
 		m_scoreText->render((boost::format("%04d") % getScore()).str());
