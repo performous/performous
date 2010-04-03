@@ -30,7 +30,6 @@ fs::path getLocaleDir() {
 		dir = LOCALEDIR;
 	} else {
 		dir = plugin::execname().parent_path().parent_path() / LOCALEDIR;
-		std::cout << "REL: " << dir << std::endl;
 	}
 
 	return dir;
