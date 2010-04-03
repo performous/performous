@@ -51,7 +51,7 @@ static void signalSetup() {
 /// can be thrown as an exception to quit the game
 struct QuitNow {};
 
-static void checkEvents_SDL(ScreenManager& sm, Window& window) {
+static void checkEvents_SDL(ScreenManager& sm) {
 	if (g_quit) {
 		std::cout << "Terminating, please wait... (or kill the process)" << std::endl;
 		throw QuitNow();
@@ -63,7 +63,7 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 			sm.finished();
 			break;
 		  case SDL_VIDEORESIZE:
-			window.resize(event.resize.w, event.resize.h);
+			sm.window().resize(event.resize.w, event.resize.h);
 			break;
 		  case SDL_KEYDOWN:
 			int keypressed  = event.key.keysym.sym;
@@ -108,8 +108,8 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 			case GL_OUT_OF_MEMORY: std::cerr << "OpenGL error: out of memory" << std::endl; break;
 		}
 	}
-	if( config["graphic/fullscreen"].b() != window.getFullscreen() )
-		window.setFullscreen(config["graphic/fullscreen"].b());
+	if( config["graphic/fullscreen"].b() != sm.window().getFullscreen() )
+		sm.window().setFullscreen(config["graphic/fullscreen"].b());
 }
 
 void audioSetup(Capture& capture, Audio& audio) {
@@ -220,7 +220,7 @@ void mainLoop(std::string const& songlist) {
 				}
 				// Process events for the next frame
 				if (midiDrums) midiDrums->process();
-				checkEvents_SDL(sm, window);
+				checkEvents_SDL(sm);
 			} catch (std::runtime_error& e) {
 				std::cerr << "ERROR: " << e.what() << std::endl;
 				sm.flashMessage(std::string("ERROR: ") + e.what());

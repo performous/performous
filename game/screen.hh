@@ -48,7 +48,7 @@ class ScreenManager: public Singleton <ScreenManager> {
 	/// returns pointer to Screen for given name
 	Screen* getScreen(std::string const& name);
 	/// returns a reference to the window
-	Window& getWindow() { return window; };
+	Window& window() { return m_window; };
 
 	/// Set a message to flash in current screen
 	void flashMessage(std::string const& name, float fadeIn=0.5f, float hold=1.5f, float fadeOut=1.0f);
@@ -61,7 +61,7 @@ class ScreenManager: public Singleton <ScreenManager> {
 	bool isFinished() { return m_finished; };
 
   private:
-	Window& window;
+	Window& m_window;
 	bool m_finished;
 	typedef boost::ptr_map<std::string, Screen> screenmap_t;
 	screenmap_t screens;
