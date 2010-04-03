@@ -31,7 +31,7 @@ class Screen {
 
 /// Manager for screens
 /** manages screens
- * @see Singleton 
+ * @see Singleton
  */
 class ScreenManager: public Singleton <ScreenManager> {
   public:
@@ -49,7 +49,7 @@ class ScreenManager: public Singleton <ScreenManager> {
 	Screen* getScreen(std::string const& name);
 	/// returns a reference to the window
 	Window& getWindow() { return window; };
-	
+
 	/// Set a message to flash in current screen
 	void flashMessage(std::string const& name, float fadeIn=0.5f, float hold=1.5f, float fadeOut=1.0f);
 	/// Draw flash messages in current screen
@@ -63,13 +63,14 @@ class ScreenManager: public Singleton <ScreenManager> {
   private:
 	Window& window;
 	bool m_finished;
-	float m_timeToFadeIn;
-	float m_timeToFadeOut;
-	float m_timeToShow;
 	typedef boost::ptr_map<std::string, Screen> screenmap_t;
 	screenmap_t screens;
 	Screen* newScreen;
 	Screen* currentScreen;
+	// Flash messages members
+	float m_timeToFadeIn;
+	float m_timeToFadeOut;
+	float m_timeToShow;
 	AnimValue m_messagePopup;
 	SvgTxtTheme m_textMessage;
 	std::string m_message;
