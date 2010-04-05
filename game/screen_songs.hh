@@ -36,7 +36,7 @@ public:
 	void drawJukebox(); ///< draw the songbrowser in jukebox mode (fullscreen, full previews, ...)
 
 protected:
-	void drawInstruments(Song const& song, Dimensions const& dim, float alpha = 1.0f) const;
+	void drawInstruments(Dimensions const& dim, float alpha = 1.0f) const;
 	void drawMultimedia();
 	void updateMultimedia(Song& song, ScreenSharedInfo& info);
 	void stopMultimedia(ScreenSharedInfo& info);
