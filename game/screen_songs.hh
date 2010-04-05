@@ -52,9 +52,10 @@ protected:
 	std::map<std::string,std::string> m_playReq;
 	AnimValue m_playTimer;
 	TextInput m_search;
-	boost::scoped_ptr<Surface> m_emptyCover;
+	boost::scoped_ptr<Surface> m_singCover;
 	boost::scoped_ptr<Surface> m_instrumentCover;
 	boost::scoped_ptr<Surface> m_bandCover;
+	boost::scoped_ptr<Surface> m_danceCover;
 	boost::scoped_ptr<Texture> m_instrumentList;
 	Cachemap<std::string, Surface> m_covers;
 	bool m_jukebox;

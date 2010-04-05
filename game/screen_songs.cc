@@ -22,9 +22,10 @@ ScreenSongs::ScreenSongs(std::string const& name, Audio& audio, Songs& songs, Da
 void ScreenSongs::enter() {
 	theme.reset(new ThemeSongs());
 	m_songbg_default.reset(new Surface(getThemePath("songs_bg_default.svg")));
-	m_emptyCover.reset(new Surface(getThemePath("no_cover.svg")));
+	m_singCover.reset(new Surface(getThemePath("no_cover.svg")));
 	m_instrumentCover.reset(new Surface(getThemePath("instrument_cover.svg")));
 	m_bandCover.reset(new Surface(getThemePath("band_cover.svg")));
+	m_danceCover.reset(new Surface(getThemePath("dance_cover.svg")));
 	m_instrumentList.reset(new Texture(getThemePath("instruments.svg")));
 	m_songs.setFilter(m_search.text);
 	m_audio.fadeout();
@@ -35,8 +36,9 @@ void ScreenSongs::enter() {
 
 void ScreenSongs::exit() {
 	m_covers.clear();
-	m_emptyCover.reset();
+	m_singCover.reset();
 	m_instrumentCover.reset();
+	m_danceCover.reset();
 	m_bandCover.reset();
 	m_instrumentList.reset();
 	theme.reset();
@@ -128,7 +130,7 @@ void ScreenSongs::drawJukebox() {
 		/*
 		Surface* cover = NULL;
 		if (!song.cover.empty()) try { cover = &m_covers[song.path + song.cover]; } catch (std::exception const&) {}
-		Surface& s = (cover ? *cover : *m_emptyCover);
+		Surface& s = (cover ? *cover : *m_singCover);
 		s.dimensions.right(theme->song.dimensions.x1()).top(theme->song.dimensions.y1()).fitInside(0.1, 0.1); s.draw();
 		*/
 		// Format && draw the song information text
@@ -222,12 +224,17 @@ void ScreenSongs::draw() {
 				Song& song_display = m_songs[baseidx + i];
 				Surface* cover = NULL;
 				// Fetch cover image from cache or try loading it
-				if (!song_display.cover.empty()) try { cover = &m_covers[song_display.path + song_display.cover]; } catch (std::exception const&) {}
+				if (!song_display.cover.empty()) try { cover = &m_covers[song_display.path + song_display.cover]; } catch (std::exception const&) {cover = NULL;}
 				if (!cover) {
-					size_t tracks = song_display.track_map.size();
-					if (tracks == 0) cover = m_emptyCover.get();
-					else if (tracks == 1) cover = m_instrumentCover.get();
-					else cover = m_bandCover.get();
+					if(song_display.hasDance()) {
+						cover = m_danceCover.get();
+					} else if(song_display.hasDrums()) {
+						cover = m_bandCover.get();
+					} else {
+						size_t tracks = song_display.track_map.size();
+						if (tracks == 0) cover = m_singCover.get();
+						else cover = m_instrumentCover.get();
+					}
 				}
 				Surface& s = *cover;
 				// Calculate dimensions for cover and instrument markers
