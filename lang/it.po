@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-25 00:10+0100\n"
+"POT-Creation-Date: 2010-04-05 23:34+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Xaldyz <xaldyz@users.sourceforge.net>\n"
 "Language-Team: \n"
@@ -13,33 +13,37 @@ msgstr ""
 "X-Poedit-Basepath: .\n"
 "X-Poedit-SearchPath-0: ../game\n"
 
-#: ../game/main.cc:154
+#: ../game/database.cc:107
+msgid "No Items up to now."
+msgstr "Nessun elemento fino ad ora."
+
+#: ../game/database.cc:108
+msgid "Be the first to be listed here!"
+msgstr "Sii il primo a essere qui!"
+
+#: ../game/main.cc:164
 msgid "Audio capture..."
 msgstr "Registramento audio..."
 
-#: ../game/main.cc:156
+#: ../game/main.cc:166
 msgid "Audio playback..."
 msgstr "Riproduzione audio..."
 
-#: ../game/main.cc:159
+#: ../game/main.cc:169
 msgid "Miscellaneous..."
 msgstr "Varie..."
 
-#: ../game/main.cc:174
+#: ../game/main.cc:183
 msgid "Main menu..."
 msgstr "Menu principale..."
 
-#: ../game/main.cc:185
+#: ../game/main.cc:194
 msgid "Screenshot taken!"
 msgstr "Screenshot eseguito!"
 
-#: ../game/main.cc:188
+#: ../game/main.cc:197
 msgid "Screenshot failed!"
 msgstr "Screenshot non eseguito!"
-
-#: ../game/screen_hiscore.cc:88
-msgid "Hiscore for "
-msgstr "Punteggi per "
 
 #: ../game/screen_intro.cc:15
 msgid "Perform"
@@ -121,68 +125,80 @@ msgstr "Inserisci un nome per selezionare un giocatore o crearne uno nuovo."
 msgid "Search Text:"
 msgstr "Testo di ricerca"
 
-#: ../game/screen_sing.cc:310
+#: ../game/screen_sing.cc:34
+msgid "Loading song..."
+msgstr "Caricamento canzoni..."
+
+#: ../game/screen_sing.cc:42
+msgid "Song is broken!"
+msgstr "La canzone è "
+
+#: ../game/screen_sing.cc:47
+msgid "Song contains broken tracks!"
+msgstr "La canzone contiene tracce rovinate!"
+
+#: ../game/screen_sing.cc:330
 msgid "   ENTER to skip instrumental break"
 msgstr "   INVIO per saltare lo stacco musicale"
 
-#: ../game/screen_sing.cc:311
+#: ../game/screen_sing.cc:331
 msgid "   Remember to wait for grading!"
 msgstr "   Ricordati di aspettare per il voto!"
 
-#: ../game/screen_sing.cc:399
+#: ../game/screen_sing.cc:419
 msgid "No player!"
 msgstr "Nessun giocatore trovato!"
 
-#: ../game/screen_sing.cc:408
+#: ../game/screen_sing.cc:428
 msgid "Hit singer"
 msgstr "Star"
 
-#: ../game/screen_sing.cc:409
+#: ../game/screen_sing.cc:429
 msgid "Lead singer"
 msgstr "Cantante"
 
-#: ../game/screen_sing.cc:410
-#: ../game/screen_sing.cc:416
-#: ../game/screen_sing.cc:422
+#: ../game/screen_sing.cc:430
+#: ../game/screen_sing.cc:436
+#: ../game/screen_sing.cc:442
 msgid "Rising star"
 msgstr "Dilettante"
 
-#: ../game/screen_sing.cc:411
-#: ../game/screen_sing.cc:417
-#: ../game/screen_sing.cc:423
+#: ../game/screen_sing.cc:431
+#: ../game/screen_sing.cc:437
+#: ../game/screen_sing.cc:443
 msgid "Amateur"
 msgstr "Amatore"
 
-#: ../game/screen_sing.cc:412
-#: ../game/screen_sing.cc:424
+#: ../game/screen_sing.cc:432
+#: ../game/screen_sing.cc:444
 msgid "Tone deaf"
 msgstr "Stonato"
 
-#: ../game/screen_sing.cc:414
+#: ../game/screen_sing.cc:434
 msgid "Maniac"
 msgstr "Maniaco"
 
-#: ../game/screen_sing.cc:415
+#: ../game/screen_sing.cc:435
 msgid "Hoofer"
 msgstr "Professionista"
 
-#: ../game/screen_sing.cc:418
+#: ../game/screen_sing.cc:438
 msgid "Loser"
 msgstr "Perdente"
 
-#: ../game/screen_sing.cc:420
+#: ../game/screen_sing.cc:440
 msgid "Virtuoso"
 msgstr "Virtuoso"
 
-#: ../game/screen_sing.cc:421
+#: ../game/screen_sing.cc:441
 msgid "Rocker"
 msgstr "Rockstar"
 
-#: ../game/screen_songs.cc:186
+#: ../game/screen_songs.cc:195
 msgid "No songs found!"
 msgstr "Nessuna canzone trovata!"
 
-#: ../game/screen_songs.cc:187
+#: ../game/screen_songs.cc:196
 msgid ""
 "Visit performous.org\n"
 "for free songs"
@@ -190,48 +206,50 @@ msgstr ""
 "Visita performous.org\n"
 "per canzoni gratis"
 
-#: ../game/screen_songs.cc:189
+#: ../game/screen_songs.cc:198
 msgid "no songs match search"
 msgstr "nessuna canzone trovata"
 
-#: ../game/screen_songs.cc:197
+#: ../game/screen_songs.cc:206
 msgid "(press END to view hiscores)"
 msgstr "(premi END per vedere i punteggi migliori)"
 
-#: ../game/screen_songs.cc:198
+#: ../game/screen_songs.cc:207
 msgid "<type in to search>"
 msgstr "<premi qualche lettera per cercare>"
 
-#: ../game/songs.cc:192
+#: ../game/screen_songs.cc:212
+msgid "Hiscore for "
+msgstr "Punteggi per "
+
+#: ../game/songs.cc:195
 msgid "random order"
 msgstr "ordine casuale"
 
-#: ../game/songs.cc:193
+#: ../game/songs.cc:196
 msgid "sorted by song"
 msgstr "ordinato per canzone"
 
-#: ../game/songs.cc:194
+#: ../game/songs.cc:197
 msgid "sorted by artist"
 msgstr "ordinato per artista"
 
-#: ../game/songs.cc:195
+#: ../game/songs.cc:198
 msgid "sorted by edition"
 msgstr "ordinato per edizione"
 
-#: ../game/songs.cc:196
+#: ../game/songs.cc:199
 msgid "sorted by genre"
 msgstr "ordinato per genere"
 
-#: ../game/songs.cc:197
+#: ../game/songs.cc:200
 msgid "sorted by path"
 msgstr "ordinato per percorso"
 
-#: ../game/songs.cc:198
+#: ../game/songs.cc:201
 msgid "sorted by language"
 msgstr "ordinato per lingua"
 
-#~ msgid "Loading..."
-#~ msgstr "Caricamento in corso..."
 #~ msgid "filter: "
 #~ msgstr "filtro:"
 #~ msgid "none"
