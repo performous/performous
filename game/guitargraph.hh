@@ -96,8 +96,8 @@ class GuitarGraph {
 	AnimValue m_cx, m_width; /// controls horizontal position and width smoothly
 	std::size_t m_stream;
 	std::vector<AnimValue> m_flames[5]; /// flame effect queues for each fret
-	TrackMapConstPtr m_track_map; /// tracks
-	TrackMapConstPtr::const_iterator m_track_index;
+	InstrumentTracksConstPtr m_instrumentTracks; /// tracks
+	InstrumentTracksConstPtr::const_iterator m_track_index;
 	std::vector<Duration> m_solos; /// holds guitar solos
 	std::vector<Duration> m_drumfills; /// holds drum fills (used for activating GodMode)
 	Durations::const_iterator m_dfIt; /// current drum fill

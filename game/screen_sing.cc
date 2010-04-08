@@ -350,7 +350,7 @@ void ScreenSing::draw() {
 			}
 		}
 		else if (!m_audio.isPlaying() || (status == Song::FINISHED
-		  && m_audio.getLength() - time <= (m_song->track_map.empty() && m_song->danceTracks.empty() ? 3.0 : 0.2) )) {
+		  && m_audio.getLength() - time <= (m_song->instrumentTracks.empty() && m_song->danceTracks.empty() ? 3.0 : 0.2) )) {
 			// Time to create the score window
 			m_quitTimer.setValue(QUIT_TIMEOUT);
 			m_engine->kill(); // kill the engine thread (to avoid consuming memory)
@@ -394,8 +394,8 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database, Dancers& 
 		item.track_simple = it->getTrack();
 		item.track = it->getTrack() + " - " + it->getDifficultyString();
 		item.track[0] = toupper(item.track[0]); // Capitalize
-		if (item.track_simple == "drums") item.color = glutil::Color(0.1f, 0.1f, 0.1f);
-		else if (item.track_simple == "bass") item.color = glutil::Color(0.5f, 0.3f, 0.1f);
+		if (item.track_simple == TrackName::DRUMS) item.color = glutil::Color(0.1f, 0.1f, 0.1f);
+		else if (item.track_simple == TrackName::BASS) item.color = glutil::Color(0.5f, 0.3f, 0.1f);
 		else item.color = glutil::Color(1.0f, 0.0f, 0.0f);
 
 		m_database.scores.push_back(item);

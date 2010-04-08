@@ -70,7 +70,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number)
   m_cx(0.0, 0.2),
   m_width(0.5, 0.4),
   m_stream(),
-  m_track_index(m_track_map.end()),
+  m_track_index(m_instrumentTracks.end()),
   m_dfIt(m_drumfills.end()),
   m_level(),
   m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
@@ -89,12 +89,12 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number)
   m_drumfillHits(),
   m_drumfillScore()
 {
-	// Copy all tracks of supported types (either drums or non-drums) to m_track_map
-	for (TrackMap::const_iterator it = m_song.track_map.begin(); it != m_song.track_map.end(); ++it) {
+	// Copy all tracks of supported types (either drums or non-drums) to m_instrumentTracks
+	for (InstrumentTracks::const_iterator it = m_song.instrumentTracks.begin(); it != m_song.instrumentTracks.end(); ++it) {
 		std::string index = it->first;
-		if (m_drums == (index == "drums")) m_track_map[index] = &it->second;
+		if (m_drums == (index == TrackName::DRUMS)) m_instrumentTracks[index] = &it->second;
 	}
-	if (m_track_map.empty()) throw std::logic_error(m_drums ? "No drum tracks found" : "No guitar tracks found");
+	if (m_instrumentTracks.empty()) throw std::logic_error(m_drums ? "No drum tracks found" : "No guitar tracks found");
 	// Load 3D fret objects
 	m_fretObj.load(getThemePath("fret.obj"));
 	m_tappableObj.load(getThemePath("fret_tap.obj"));
@@ -121,7 +121,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number)
 	}
 	for (int i = 0; i < 6; ++i) m_hit[i].setRate(5.0);
 	for (int i = 0; i < 5; ++i) m_holds[i] = 0;
-	m_track_index = m_track_map.begin();
+	m_track_index = m_instrumentTracks.begin();
 	while (number--) nextTrack(true);
 	difficultyAuto();
 	updateNeck();
@@ -131,14 +131,14 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number)
 void GuitarGraph::updateNeck() {
 	// TODO: Optimize with texture cache
 	std::string index = m_track_index->first;
-	if (index == "drums") m_neck.reset(new Texture(getThemePath("drumneck.svg")));
-	else if (index == "bass") m_neck.reset(new Texture(getThemePath("bassneck.svg")));
+	if (index == TrackName::DRUMS) m_neck.reset(new Texture(getThemePath("drumneck.svg")));
+	else if (index == TrackName::BASS) m_neck.reset(new Texture(getThemePath("bassneck.svg")));
 	else m_neck.reset(new Texture(getThemePath("guitarneck.svg")));
 }
 
 /// Cycle through the different tracks
 void GuitarGraph::nextTrack(bool fast) {
-	if (++m_track_index == m_track_map.end()) m_track_index = m_track_map.begin();
+	if (++m_track_index == m_instrumentTracks.end()) m_track_index = m_instrumentTracks.begin();
 	if (fast) return;
 	difficultyAuto(true);
 	updateNeck();
@@ -160,9 +160,9 @@ void GuitarGraph::difficultyAuto(bool tryKeep) {
 
 /// Attempt to use a given difficulty level
 bool GuitarGraph::difficulty(Difficulty level) {
-	Track const& track = *m_track_index->second;
+	InstrumentTrack const& track = *m_track_index->second;
 	// Find the stream number
-	for (TrackMap::const_iterator it = m_song.track_map.begin(); it != m_song.track_map.end(); ++it) {
+	for (InstrumentTracks::const_iterator it = m_song.instrumentTracks.begin(); it != m_song.instrumentTracks.end(); ++it) {
 		if (&track == &it->second) break;
 	}
 	// Check if the difficulty level is available

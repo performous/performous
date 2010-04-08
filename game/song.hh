@@ -19,12 +19,20 @@ struct SongParserException: public std::runtime_error {
 
 class SongParser;
 
+namespace TrackName {
+	const std::string GUITAR = "guitar";
+	const std::string GUITAR_COOP = "coop guitar";
+	const std::string GUITAR_RHYTHM = "rhythm guitar";
+	const std::string BASS = "bass";
+	const std::string DRUMS = "drums";
+}
+
 /// class to load and parse songfiles
 class Song: boost::noncopyable {
 	friend class SongParser;
   public:
 	/// constructor
-	Song(std::string const& path_, std::string const& filename_): vocals(std::string("VOCALS")), path(path_), filename(filename_) { reload(false); }
+	Song(std::string const& path_, std::string const& filename_): vocals(std::string("vocals")), path(path_), filename(filename_) { reload(false); }
 	/// reload song
 	void reload(bool errorIgnore = true);
 	/// parse field
@@ -42,19 +50,14 @@ class Song: boost::noncopyable {
 	/** Get the song status at a given timestamp **/
 	Status status(double time) const;
 	int randomIdx; ///< sorting index used for random order
-	/*
-	Notes notes; ///< notes for song (only used for singing)
-	int noteMin, ///< lowest note
-	    noteMax; ///< highest note
-	*/
 	VocalTrack vocals; ///< notes for the sing part
-	TrackMap track_map; ///< guitar etc. notes for this song
+	InstrumentTracks instrumentTracks; ///< guitar etc. notes for this song
 	DanceTracks danceTracks; ///< dance tracks
 	typedef std::vector<double> Beats;
 	Beats beats;
 	bool hasDance() const { return !danceTracks.empty(); }
-	bool hasDrums() const { return track_map.find("drums") != track_map.end(); }
-	bool hasGuitars() const { return track_map.size() - hasDrums(); }
+	bool hasDrums() const { return instrumentTracks.find(TrackName::DRUMS) != instrumentTracks.end(); }
+	bool hasGuitars() const { return instrumentTracks.size() - hasDrums(); }
 	bool hasVocals() const { return !vocals.notes.empty(); }
 	std::string path; ///< path of songfile
 	std::string filename; ///< name of songfile

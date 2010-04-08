@@ -37,16 +37,16 @@ namespace {
 	/// Return false if not valid
 	bool mangleTrackName(std::string& name) {
 		if (name == "T1 GEMS") { // Some old MIDI files have a track named T1 GEMS
-			name = "guitar"; return true;
+			name = TrackName::GUITAR; return true;
 		}
 		else if (name.substr(0, 5) != "PART ") return false;
 		else name.erase(0, 5);
-		if (name == "GUITAR COOP") name = "coop guitar";
-		else if (name == "RHYTHM") name = "rhythm guitar";
-		else if (name == "DRUM") name = "drums";
-		else if (name == "DRUMS") name = "drums";
-		else if (name == "BASS") name = "bass";
-		else if (name == "GUITAR") name = "guitar";
+		if (name == "GUITAR COOP") name = TrackName::GUITAR_COOP;
+		else if (name == "RHYTHM") name = TrackName::GUITAR_RHYTHM;
+		else if (name == "DRUM") name = TrackName::DRUMS;
+		else if (name == "DRUMS") name = TrackName::DRUMS;
+		else if (name == "BASS") name = TrackName::BASS;
+		else if (name == "GUITAR") name = TrackName::GUITAR;
 		else if (name == "VOCALS") return true;
 		else return false;
 		return true;
@@ -99,11 +99,11 @@ void SongParser::iniParseHeader() {
 		} else if (regex_match(name.c_str(), match, audiofile_background)) {
 			testAndAdd(s, "background", name);
 		} else if (regex_match(name.c_str(), match, audiofile_guitar)) {
-			testAndAdd(s, "guitar", name);
+			testAndAdd(s, TrackName::GUITAR, name);
 		} else if (regex_match(name.c_str(), match, audiofile_bass)) {
-			testAndAdd(s, "bass", name);
+			testAndAdd(s, TrackName::BASS, name);
 		} else if (regex_match(name.c_str(), match, audiofile_drums)) {
-			testAndAdd(s, "drums", name);
+			testAndAdd(s, TrackName::GUITAR, name);
 		} else if (regex_match(name.c_str(), match, audiofile_vocals)) {
 			testAndAdd(s, "vocals", name);
 #if 0  // TODO: process preview.ogg properly? In any case, do not print debug to console...
@@ -117,14 +117,14 @@ void SongParser::iniParseHeader() {
 	for (MidiFileParser::Tracks::const_iterator it = midi.tracks.begin(); it != midi.tracks.end(); ++it) {
 		// Figure out the track name
 		std::string name = it->name;
-		if (midi.tracks.size() == 1) name = "guitar"; // Original (old) FoF songs only have one track
+		if (midi.tracks.size() == 1) name = TrackName::GUITAR; // Original (old) FoF songs only have one track
 		else if (!mangleTrackName(name)) continue; // Beautify the track name
 		// Add dummy notes to tracks so that they can be seen in song browser
 		if (name == "VOCALS") s.vocals.notes.push_back(Note());
 		else {
 			for (MidiFileParser::NoteMap::const_iterator it2 = it->notes.begin(); it2 != it->notes.end(); ++it2) {
 				// If a track has not enough notes on any level, ignore it
-				if (it2->second.size() > 3) { s.track_map.insert(make_pair(name,Track(name))); break; }
+				if (it2->second.size() > 3) { s.instrumentTracks.insert(make_pair(name,InstrumentTrack(name))); break; }
 			}
 		}
 	}
@@ -134,7 +134,7 @@ void SongParser::iniParseHeader() {
 void SongParser::iniParse() {
 	Song& s = m_song;
 	s.vocals.notes.clear();
-	s.track_map.clear();
+	s.instrumentTracks.clear();
 
 	MidiFileParser midi(s.path + "/" + s.midifilename);
 	int reversedNoteCount = 0;
@@ -142,13 +142,13 @@ void SongParser::iniParse() {
 	for (MidiFileParser::Tracks::const_iterator it = midi.tracks.begin(); it != midi.tracks.end(); ++it) {
 		// Figure out the track name
 		std::string name = it->name;
-		if (midi.tracks.size() == 1) name = "guitar"; // Original (old) FoF songs only have one track
+		if (midi.tracks.size() == 1) name = TrackName::GUITAR; // Original (old) FoF songs only have one track
 		else if (!mangleTrackName(name)) continue; // Beautify the track name
 		// Process non-vocal tracks
 		if (name != "VOCALS") {
 			int durCount = 0;
-			s.track_map.insert(make_pair(name,Track(name)));
-			NoteMap& nm2 = s.track_map.find(name)->second.nm;
+			s.instrumentTracks.insert(make_pair(name,InstrumentTrack(name)));
+			NoteMap& nm2 = s.instrumentTracks.find(name)->second.nm;
 			for (MidiFileParser::NoteMap::const_iterator it2 = it->notes.begin(); it2 != it->notes.end(); ++it2) {
 				Durations& dur = nm2[it2->first];
 				MidiFileParser::Notes const& notes = it2->second;
@@ -170,7 +170,7 @@ void SongParser::iniParse() {
 			if (durCount <= 20) {
 				s.b0rkedTracks = true;
 				nm2.clear();
-				s.track_map.erase(name);
+				s.instrumentTracks.erase(name);
 			}
 			continue;
 		}

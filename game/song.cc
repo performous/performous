@@ -8,7 +8,7 @@
 void Song::reload(bool errorIgnore) {
 	loadStatus = NONE;
 	vocals.reload();
-	track_map.clear();
+	instrumentTracks.clear();
 	beats.clear();
 	midifilename.clear();
 	category.clear();
@@ -44,8 +44,8 @@ void Song::dropNotes() {
 		vocals.notes.push_back(Note()); // Dummy note to indicate there is a track
 	}
 	// Instruments
-	if (!track_map.empty()) {
-		for (TrackMap::iterator it = track_map.begin(); it != track_map.end(); ++it)
+	if (!instrumentTracks.empty()) {
+		for (InstrumentTracks::iterator it = instrumentTracks.begin(); it != instrumentTracks.end(); ++it)
 			it->second.nm.clear();
 	}
 	// Dancing
