@@ -43,19 +43,19 @@ void SongParser::txtParseHeader() {
 	while (getline(line) && txtParseField(line)) {}
 	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
 	if (m_bpm != 0.0) addBPM(0, m_bpm);
-	s.notes.push_back(Note()); // Dummy note to indicate there is a track
+	s.vocals.notes.push_back(Note()); // Dummy note to indicate there is a track
 }
 
 /// Parse notes
 void SongParser::txtParse() {
 	std::string line;
-	m_song.notes.clear();
+	m_song.vocals.notes.clear();
 	while (getline(line) && txtParseField(line)) {} // Parse the header again
 	if (m_bpm != 0.0) addBPM(0, m_bpm);
 	while (txtParseNote(line) && getline(line)) {} // Parse notes
 	// Workaround for the terminating : 1 0 0 line, written by some converters
-	if (!m_song.notes.empty() && m_song.notes.back().type != Note::SLEEP
-	  && m_song.notes.back().begin == m_song.notes.back().end) m_song.notes.pop_back();
+	if (!m_song.vocals.notes.empty() && m_song.vocals.notes.back().type != Note::SLEEP
+	  && m_song.vocals.notes.back().begin == m_song.vocals.notes.back().end) m_song.vocals.notes.pop_back();
 }
 
 bool SongParser::txtParseField(std::string const& line) {
@@ -132,8 +132,8 @@ bool SongParser::txtParseNote(std::string line) {
 	  default: throw std::runtime_error("Unknown note type");
 	}
 	n.begin = tsTime(ts);
-	Notes& notes = m_song.notes;
-	if (m_relative && m_song.notes.empty()) m_relativeShift = ts;
+	Notes& notes = m_song.vocals.notes;
+	if (m_relative && m_song.vocals.notes.empty()) m_relativeShift = ts;
 	m_prevts = ts;
 	if (n.begin < m_prevtime) {
 		// Oh no, overlapping notes (b0rked file)
@@ -160,8 +160,8 @@ bool SongParser::txtParseNote(std::string line) {
 	double prevtime = m_prevtime;
 	m_prevtime = n.end;
 	if (n.type != Note::SLEEP && n.end > n.begin) {
-		m_song.noteMin = std::min(m_song.noteMin, n.note);
-		m_song.noteMax = std::max(m_song.noteMax, n.note);
+		m_song.vocals.noteMin = std::min(m_song.vocals.noteMin, n.note);
+		m_song.vocals.noteMax = std::max(m_song.vocals.noteMax, n.note);
 		m_maxScore += n.maxScore();
 	}
 	if (n.type == Note::SLEEP) {

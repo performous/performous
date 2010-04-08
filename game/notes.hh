@@ -109,6 +109,16 @@ struct Note {
 
 typedef std::vector<Note> Notes;
 
+struct VocalTrack {
+	VocalTrack(std::string name);
+	void reload();
+	std::string name;
+	Notes notes;
+	int noteMin;
+	int noteMax;
+};
+
+typedef std::map<std::string, VocalTrack> VocalsTracks;
 
 struct DanceTrack {
 	DanceTrack(std::string& description, Notes& notes);

@@ -75,5 +75,10 @@ Duration::Duration(): begin(getNaN()), end(getNaN()) {}
 
 DanceTrack::DanceTrack(std::string& description, Notes& notes) : description(description), notes(notes) {}
 
+VocalTrack::VocalTrack(std::string name) : name(name) {reload();}
 
-
+void VocalTrack::reload() {
+	notes.clear();
+	noteMin = std::numeric_limits<int>::max();
+	noteMax = std::numeric_limits<int>::min();
+}

@@ -221,7 +221,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			return;
 		}
 		// Start button has special functions for skipping things (only in singing for now)
-		if (nav == input::START && m_only_singers_alive && !m_song->notes.empty() && !m_audio.isPaused()) {
+		if (nav == input::START && m_only_singers_alive && !m_song->vocals.notes.empty() && !m_audio.isPaused()) {
 			// Open score dialog early
 			if (status == Song::FINISHED) {
 				m_engine->kill(); // kill the engine thread
@@ -239,7 +239,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 	}
 	// Ctrl combinations that can be used while performing (not when score dialog is displayed)
 	if (event.type == SDL_KEYDOWN && (event.key.keysym.mod & KMOD_CTRL) && !m_score_window.get()) {
-		if (key == SDLK_s) m_audio.toggleSynth(m_song->notes);
+		if (key == SDLK_s) m_audio.toggleSynth(m_song->vocals.notes);
 		if (key == SDLK_v) m_audio.streamFade("vocals", event.key.keysym.mod & KMOD_SHIFT ? 1.0 : 0.0);
 		if (key == SDLK_k) dispInFlash(++config["game/karaoke_mode"]); // Toggle karaoke mode
 		if (key == SDLK_w) dispInFlash(++config["game/pitch"]); // Toggle pitch wave
@@ -326,7 +326,7 @@ void ScreenSing::draw() {
 		unsigned t = clamp(time, 0.0, length);
 		m_progress->draw(songPercent);
 		std::string statustxt = (boost::format("%02u:%02u") % (t / 60) % (t % 60)).str();
-		if (!m_score_window.get() && m_only_singers_alive && !m_song->notes.empty()) {
+		if (!m_score_window.get() && m_only_singers_alive && !m_song->vocals.notes.empty()) {
 			if (status == Song::INSTRUMENTAL_BREAK) statustxt += _("   ENTER to skip instrumental break");
 			if (status == Song::FINISHED && !config["game/karaoke_mode"].b()) statustxt += _("   Remember to wait for grading!");
 		}

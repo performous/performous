@@ -120,7 +120,7 @@ void SongParser::iniParseHeader() {
 		if (midi.tracks.size() == 1) name = "guitar"; // Original (old) FoF songs only have one track
 		else if (!mangleTrackName(name)) continue; // Beautify the track name
 		// Add dummy notes to tracks so that they can be seen in song browser
-		if (name == "VOCALS") s.notes.push_back(Note());
+		if (name == "VOCALS") s.vocals.notes.push_back(Note());
 		else {
 			for (MidiFileParser::NoteMap::const_iterator it2 = it->notes.begin(); it2 != it->notes.end(); ++it2) {
 				// If a track has not enough notes on any level, ignore it
@@ -133,7 +133,7 @@ void SongParser::iniParseHeader() {
 /// Parse notes
 void SongParser::iniParse() {
 	Song& s = m_song;
-	s.notes.clear();
+	s.vocals.notes.clear();
 	s.track_map.clear();
 
 	MidiFileParser midi(s.path + "/" + s.midifilename);
@@ -208,9 +208,9 @@ void SongParser::iniParse() {
 				}
 				// Special processing for slides (which depend on the previous note)
 				if (n.type == Note::SLIDE) {
-					Notes::reverse_iterator prev = s.notes.rbegin();
-					while (prev != s.notes.rend() && prev->type == Note::SLEEP) ++prev;
-					if (prev == s.notes.rend()) throw std::runtime_error("The song begins with a slide note");
+					Notes::reverse_iterator prev = s.vocals.notes.rbegin();
+					while (prev != s.vocals.notes.rend() && prev->type == Note::SLEEP) ++prev;
+					if (prev == s.vocals.notes.rend()) throw std::runtime_error("The song begins with a slide note");
 					eraseLast(prev->syllable); // Erase the space if there is any
 					{
 						// insert new sliding note
@@ -222,9 +222,9 @@ void SongParser::iniParse() {
 						inter.type = Note::SLIDE;
 						inter.syllable = std::string("~");
 						m_maxScore += inter.maxScore();
-						s.noteMin = std::min(s.noteMin, inter.note);
-						s.noteMax = std::max(s.noteMax,inter.note);
-						s.notes.push_back(inter);
+						s.vocals.noteMin = std::min(s.vocals.noteMin, inter.note);
+						s.vocals.noteMax = std::max(s.vocals.noteMax,inter.note);
+						s.vocals.notes.push_back(inter);
 					}
 					{
 						// modifying current note to be normal again
@@ -232,15 +232,15 @@ void SongParser::iniParse() {
 					}
 				}
 				m_maxScore += n.maxScore();
-				s.noteMin = std::min(s.noteMin, n.note);
-				s.noteMax = std::max(s.noteMax, n.note);
-				s.notes.push_back(n);
-			} else if (!s.notes.empty() && s.notes.back().type != Note::SLEEP) {
-				eraseLast(s.notes.back().syllable);
-				s.notes.push_back(n);
+				s.vocals.noteMin = std::min(s.vocals.noteMin, n.note);
+				s.vocals.noteMax = std::max(s.vocals.noteMax, n.note);
+				s.vocals.notes.push_back(n);
+			} else if (!s.vocals.notes.empty() && s.vocals.notes.back().type != Note::SLEEP) {
+				eraseLast(s.vocals.notes.back().syllable);
+				s.vocals.notes.push_back(n);
 			}
 		}
-		if (!s.notes.empty()) break;
+		if (!s.vocals.notes.empty()) break;
 	}
 	// Figure out if we have BRE in the song
 	for (MidiFileParser::CommandEvents::const_iterator it = midi.cmdevents.begin(); it != midi.cmdevents.end(); ++it) {
@@ -253,13 +253,13 @@ void SongParser::iniParse() {
 		oss << s.path << s.midifilename << std::endl;
 		std::cerr << oss.str(); // More likely to be atomic when written as one string
 	}
-	/*if (s.notes.empty()) {
+	/*if (s.vocals.notes.empty()) {
 		Note n;
 		n.begin = 30.0;
 		n.end = 31.0;
 		n.syllable = "TODO";
-		s.noteMin = s.noteMax = n.note = 60;
-		s.notes.push_back(n);
+		s.vocals.noteMin = s.vocals.noteMax = n.note = 60;
+		s.vocals.notes.push_back(n);
 	}*/
 }
 

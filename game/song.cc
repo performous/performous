@@ -7,7 +7,7 @@
 
 void Song::reload(bool errorIgnore) {
 	loadStatus = NONE;
-	notes.clear();
+	vocals.reload();
 	track_map.clear();
 	beats.clear();
 	midifilename.clear();
@@ -26,8 +26,6 @@ void Song::reload(bool errorIgnore) {
 	cover.clear();
 	background.clear();
 	video.clear();
-	noteMin = std::numeric_limits<int>::max();
-	noteMax = std::numeric_limits<int>::min();
 	videoGap = 0.0;
 	start = 0.0;
 	preview_start = getNaN();
@@ -41,9 +39,9 @@ void Song::reload(bool errorIgnore) {
 
 void Song::dropNotes() {
 	// Singing
-	if (!notes.empty()) {
-		notes.clear();
-		notes.push_back(Note()); // Dummy note to indicate there is a track
+	if (!vocals.notes.empty()) {
+		vocals.notes.clear();
+		vocals.notes.push_back(Note()); // Dummy note to indicate there is a track
 	}
 	// Instruments
 	if (!track_map.empty()) {
@@ -77,8 +75,8 @@ namespace {
 
 Song::Status Song::status(double time) const {
 	Note target; target.end = time;
-	Notes::const_iterator it = std::lower_bound(notes.begin(), notes.end(), target, noteEndLessThan);
-	if (it == notes.end()) return FINISHED;
+	Notes::const_iterator it = std::lower_bound(vocals.notes.begin(), vocals.notes.end(), target, noteEndLessThan);
+	if (it == vocals.notes.end()) return FINISHED;
 	if (it->begin > time + 4.0) return INSTRUMENTAL_BREAK;
 	return NORMAL;
 }

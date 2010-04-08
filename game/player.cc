@@ -7,7 +7,7 @@ Player::Player(Song& song, Analyzer& analyzer, size_t frames):
 	  m_song(song), m_analyzer(analyzer), m_pitch(frames, std::make_pair(getNaN(),
 	  -getInf())), m_pos(), m_score(), m_noteScore(), m_lineScore(), m_maxLineScore(),
 	  m_prevLineScore(-1), m_feedbackFader(0.0, 2.0), m_activitytimer(),
-	  m_scoreIt(m_song.notes.begin())
+	  m_scoreIt(m_song.vocals.notes.begin())
 { }
 
 void Player::update() {
@@ -24,7 +24,7 @@ void Player::update() {
 	}
 	double endTime = Engine::TIMESTEP * m_pos;
 	// Iterate over all the notes that are considered for this timestep
-	while (m_scoreIt != m_song.notes.end()) {
+	while (m_scoreIt != m_song.vocals.notes.end()) {
 		if (endTime < m_scoreIt->begin) break;  // The note begins later than on this timestep
 		// If tone was detected, calculate score
 		if (t) {
@@ -49,7 +49,7 @@ void Player::update() {
 		m_noteScore = 0; // Reset noteScore as we are moving on to the next one
 		++m_scoreIt;
 	}
-	if (m_scoreIt == m_song.notes.end()) calcRowRank();
+	if (m_scoreIt == m_song.vocals.notes.end()) calcRowRank();
 	m_score = clamp(m_score, 0.0, 1.0);
 }
 
@@ -60,7 +60,7 @@ void Player::calcRowRank() {
 		Notes::const_reverse_iterator maxScoreIt(m_scoreIt);
 		// FIXME: MacOSX needs the following cast to compile correctly
 		// it is related to the fact that OSX default compiler is 4.0.1 that is buggy when not casting
-		while ((maxScoreIt != static_cast<Notes::const_reverse_iterator>(m_song.notes.rend())) && (maxScoreIt->type != Note::SLEEP)) {
+		while ((maxScoreIt != static_cast<Notes::const_reverse_iterator>(m_song.vocals.notes.rend())) && (maxScoreIt->type != Note::SLEEP)) {
 			m_maxLineScore += m_song.m_scoreFactor * maxScoreIt->maxScore();
 			maxScoreIt++;
 		}

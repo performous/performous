@@ -24,7 +24,7 @@ class Song: boost::noncopyable {
 	friend class SongParser;
   public:
 	/// constructor
-	Song(std::string const& path_, std::string const& filename_): path(path_), filename(filename_) { reload(false); }
+	Song(std::string const& path_, std::string const& filename_): vocals(std::string("VOCALS")), path(path_), filename(filename_) { reload(false); }
 	/// reload song
 	void reload(bool errorIgnore = true);
 	/// parse field
@@ -42,7 +42,12 @@ class Song: boost::noncopyable {
 	/** Get the song status at a given timestamp **/
 	Status status(double time) const;
 	int randomIdx; ///< sorting index used for random order
+	/*
 	Notes notes; ///< notes for song (only used for singing)
+	int noteMin, ///< lowest note
+	    noteMax; ///< highest note
+	*/
+	VocalTrack vocals; ///< notes for the sing part
 	TrackMap track_map; ///< guitar etc. notes for this song
 	DanceTracks danceTracks; ///< dance tracks
 	typedef std::vector<double> Beats;
@@ -50,9 +55,7 @@ class Song: boost::noncopyable {
 	bool hasDance() const { return !danceTracks.empty(); }
 	bool hasDrums() const { return track_map.find("drums") != track_map.end(); }
 	bool hasGuitars() const { return track_map.size() - hasDrums(); }
-	bool hasVocals() const { return !notes.empty(); }
-	int noteMin, ///< lowest note
-	    noteMax; ///< highest note
+	bool hasVocals() const { return !vocals.notes.empty(); }
 	std::string path; ///< path of songfile
 	std::string filename; ///< name of songfile
 	std::string midifilename; ///< name of midi file in FoF format
