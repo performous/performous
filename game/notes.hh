@@ -114,8 +114,10 @@ struct VocalTrack {
 	void reload();
 	std::string name;
 	Notes notes;
-	int noteMin;
-	int noteMax;
+	int noteMin, noteMax; ///< lowest and highest note
+	double beginTime, endTime; ///< the period where there are notes
+	double m_scoreFactor; ///< normalization factor for the scoring system
+	MusicalScale scale; ///< scale in which song is sung
 };
 
 typedef std::map<std::string, VocalTrack> VocalsTracks;

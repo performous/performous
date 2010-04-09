@@ -53,8 +53,6 @@ class Song: boost::noncopyable {
 	VocalTrack vocals; ///< notes for the sing part
 	InstrumentTracks instrumentTracks; ///< guitar etc. notes for this song
 	DanceTracks danceTracks; ///< dance tracks
-	typedef std::vector<double> Beats;
-	Beats beats;
 	bool hasDance() const { return !danceTracks.empty(); }
 	bool hasDrums() const { return instrumentTracks.find(TrackName::DRUMS) != instrumentTracks.end(); }
 	bool hasGuitars() const { return instrumentTracks.size() - hasDrums(); }
@@ -87,15 +85,11 @@ class Song: boost::noncopyable {
 	double videoGap; ///< gap with video
 	double start; ///< start of song
 	double preview_start; ///< starting time for the preview
-	MusicalScale scale; ///< scale in which song is sung
-	std::vector<double> timePitchGraph; ///< time of pitch graph
-	std::vector<double> pitchPitchGraph; ///< pitch of pitch graph
-	std::vector<double> volumePitchGraph; ///< volume of pitch graph
-	std::vector<bool> drawPitchGraph; ///< if pitch graph should be drawn
-	double beginTime, endTime; ///< the period where there are notes
-	double m_scoreFactor; ///< normalization factor for the scoring system
+
 	typedef std::vector<std::pair<double,double> > Stops;
-	Stops stops;
+	Stops stops; ///< related to dance
+	typedef std::vector<double> Beats;
+	Beats beats; ///< related to instrument and dance
 	bool hasBRE; ///< is there a Big Rock Ending? (used for drums only)
 	bool b0rkedTracks; ///< are some tracks broken? (so that user can be notified)
 };

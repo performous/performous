@@ -242,7 +242,7 @@ void NoteGraph::drawWaves(Database const& database) {
 			else if (hasNote) val = noteIt->note;
 			else val = notePrev->note;
 			// Now val contains the active note value. The following calculates note value for current freq:
-			val += Note::diff(val, m_song.scale.getNote(freq));
+			val += Note::diff(val, m_song.vocals.scale.getNote(freq));
 			// Graphics positioning & animation:
 			double y = m_baseY + val * m_noteUnit;
 			double thickness = clamp(1.0 + pitch[idx].second / 60.0) + 0.5;

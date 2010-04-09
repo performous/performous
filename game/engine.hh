@@ -47,10 +47,9 @@ class Engine {
 		m_database.cur.clear();
 		m_database.scores.clear();
 		// Only add players if the vocal track has sensible length (not NaN or extremely long)
-		std::cout << "Endtime: " << song.endTime << std::endl;
-		if (song.endTime < 10000.0) {
+		if (song.vocals.endTime < 10000.0) {
 			// Calculate the space required for pitch frames
-			size_t frames = song.endTime / Engine::TIMESTEP;
+			size_t frames = song.vocals.endTime / Engine::TIMESTEP;
 			while (anBegin != anEnd) m_database.cur.push_back(Player(song, *anBegin++, frames));
 			size_t player = 0;
 			for (std::list<Player>::iterator it = m_database.cur.begin(); it != m_database.cur.end(); ++it, ++player) it->m_color = playerColors[player % playerColorsSize];

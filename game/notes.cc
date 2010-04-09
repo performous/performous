@@ -79,6 +79,7 @@ VocalTrack::VocalTrack(std::string name) : name(name) {reload();}
 
 void VocalTrack::reload() {
 	notes.clear();
-	noteMin = std::numeric_limits<int>::max();
-	noteMax = std::numeric_limits<int>::min();
+	m_scoreFactor = 0.0;
+	noteMin = noteMax = std::numeric_limits<int>::max();
+	beginTime = endTime = getNaN();
 }

@@ -28,9 +28,9 @@ void Player::update() {
 		if (endTime < m_scoreIt->begin) break;  // The note begins later than on this timestep
 		// If tone was detected, calculate score
 		if (t) {
-			double note = m_song.scale.getNote(t->freq);
+			double note = m_song.vocals.scale.getNote(t->freq);
 			// Add score
-			double score_addition = m_song.m_scoreFactor * m_scoreIt->score(note, beginTime, endTime);
+			double score_addition = m_song.vocals.m_scoreFactor * m_scoreIt->score(note, beginTime, endTime);
 			m_score += score_addition;
 			m_noteScore += score_addition;
 			m_lineScore += score_addition;
@@ -45,7 +45,7 @@ void Player::update() {
 		}
 		if (endTime < m_scoreIt->end) break;  // The note continues past this timestep
 		// Set accuracy
-		m_scoreIt->accuracy = std::max(m_scoreIt->accuracy, m_noteScore / m_song.m_scoreFactor / m_scoreIt->maxScore());
+		m_scoreIt->accuracy = std::max(m_scoreIt->accuracy, m_noteScore / m_song.vocals.m_scoreFactor / m_scoreIt->maxScore());
 		m_noteScore = 0; // Reset noteScore as we are moving on to the next one
 		++m_scoreIt;
 	}
@@ -61,7 +61,7 @@ void Player::calcRowRank() {
 		// FIXME: MacOSX needs the following cast to compile correctly
 		// it is related to the fact that OSX default compiler is 4.0.1 that is buggy when not casting
 		while ((maxScoreIt != static_cast<Notes::const_reverse_iterator>(m_song.vocals.notes.rend())) && (maxScoreIt->type != Note::SLEEP)) {
-			m_maxLineScore += m_song.m_scoreFactor * maxScoreIt->maxScore();
+			m_maxLineScore += m_song.vocals.m_scoreFactor * maxScoreIt->maxScore();
 			maxScoreIt++;
 		}
 		if (m_maxLineScore > 0) {
