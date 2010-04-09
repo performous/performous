@@ -231,7 +231,7 @@ void ScreenSongs::draw() {
 					} else if(song_display.hasDrums()) {
 						cover = m_bandCover.get();
 					} else {
-						size_t tracks = song_display.track_map.size();
+						size_t tracks = song_display.instrumentTracks.size();
 						if (tracks == 0) cover = m_singCover.get();
 						else cover = m_instrumentCover.get();
 					}
@@ -290,13 +290,13 @@ void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
 	if( !m_songs.empty() ) {
 		Song const& song = m_songs.current();
 		have_vocals = song.hasVocals();
-		have_bass = isTrackInside(song.track_map,"bass");
+		have_bass = isTrackInside(song.instrumentTracks,TrackName::BASS);
 		have_drums = song.hasDrums();
 		have_dance = song.hasDance();
 		is_karaoke = (song.music.find("vocals") != song.music.end());
-		if (isTrackInside(song.track_map,"guitar")) guitarCount++;
-		if (isTrackInside(song.track_map,"coop guitar")) guitarCount++;
-		if (isTrackInside(song.track_map,"rhythm guitar")) guitarCount++;
+		if (isTrackInside(song.instrumentTracks,TrackName::GUITAR)) guitarCount++;
+		if (isTrackInside(song.instrumentTracks,TrackName::GUITAR_COOP)) guitarCount++;
+		if (isTrackInside(song.instrumentTracks,TrackName::GUITAR_RHYTHM)) guitarCount++;
 	}
 
 	UseTexture tex(*m_instrumentList);

@@ -192,6 +192,13 @@ MidiFileParser::Track MidiFileParser::read_track(MidiStream& stream) {
 			  case 0x51:
 				if (data.size() != 3) throw std::runtime_error("Invalid tempo change event");
 				add_tempo_change(miditime, static_cast<unsigned char>(data[0]) << 16 | static_cast<unsigned char>(data[1]) << 8 | static_cast<unsigned char>(data[2])); break;
+			  case 0x58:
+				if (data.size() != 4) throw std::runtime_error("Invalid time signature event");
+#if MIDI_DEBUG_LEVEL > 3
+				// if none is found "4/4, 24,8" should be assume
+				std::cout << "Time signature: " << int(data[0]) << "/" << int(data[1]) << ", " << int(data[2]) << ", " << int(data[3]) << std::endl;
+#endif
+				break;
 			  default:
 #if MIDI_DEBUG_LEVEL > 1
 				std::cout << "Unhandled meta event  type=" << int(type) << " (" << data.size() << " bytes)" << std::endl;
