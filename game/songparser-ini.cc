@@ -103,7 +103,7 @@ void SongParser::iniParseHeader() {
 		} else if (regex_match(name.c_str(), match, audiofile_bass)) {
 			testAndAdd(s, TrackName::BASS, name);
 		} else if (regex_match(name.c_str(), match, audiofile_drums)) {
-			testAndAdd(s, TrackName::GUITAR, name);
+			testAndAdd(s, TrackName::DRUMS, name);
 		} else if (regex_match(name.c_str(), match, audiofile_vocals)) {
 			testAndAdd(s, "vocals", name);
 #if 0  // TODO: process preview.ogg properly? In any case, do not print debug to console...
