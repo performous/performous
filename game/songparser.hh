@@ -123,7 +123,7 @@ class SongParser {
 	void txtParseHeader();
 	void txtParse();
 	bool txtParseField(std::string const& line);
-	bool txtParseNote(std::string line);
+	bool txtParseNote(std::string line, VocalTrack &vocal);
 	bool iniCheck(std::vector<char> const& data);
 	void iniParseHeader();
 	void iniParse();

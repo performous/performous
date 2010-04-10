@@ -32,7 +32,7 @@ class Song: boost::noncopyable {
 	friend class SongParser;
   public:
 	/// constructor
-	Song(std::string const& path_, std::string const& filename_): vocals(std::string("vocals")), path(path_), filename(filename_) { reload(false); }
+	Song(std::string const& path_, std::string const& filename_): vocals(std::string("VOCALS")), path(path_), filename(filename_) { reload(false); }
 	/// reload song
 	void reload(bool errorIgnore = true);
 	/// parse field

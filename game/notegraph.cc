@@ -206,7 +206,8 @@ namespace {
 }
 
 void NoteGraph::drawWaves(Database const& database) {
-	if (m_song.vocals.notes.empty()) return; // Cannot draw without notes
+	const VocalTrack &vocal = m_song.vocals;
+	if (vocal.notes.empty()) return; // Cannot draw without notes
 	UseTexture tblock(m_wave);
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	for (std::list<Player>::const_iterator p = database.cur.begin(); p != database.cur.end(); ++p) {
@@ -223,7 +224,7 @@ void NoteGraph::drawWaves(Database const& database) {
 		double t = idx * Engine::TIMESTEP;
 		double oldval = getNaN();
 		Points points;
-		Notes::const_iterator noteIt = m_song.vocals.notes.begin();
+		Notes::const_iterator noteIt = vocal.notes.begin();
 		for (; idx < endIdx; ++idx, t += Engine::TIMESTEP) {
 			double const freq = pitch[idx].first;
 			// If freq is NaN, we have nothing to process
@@ -232,17 +233,17 @@ void NoteGraph::drawWaves(Database const& database) {
 			if (idx < beginIdx) continue; // Skip graphics rendering if out of screen
 			double x = -0.2 + (t - m_time) * pixUnit;
 			// Find the currently active note(s)
-			while (noteIt != m_song.vocals.notes.end() && (noteIt->type == Note::SLEEP || t > noteIt->end)) ++noteIt;
+			while (noteIt != vocal.notes.end() && (noteIt->type == Note::SLEEP || t > noteIt->end)) ++noteIt;
 			Notes::const_iterator notePrev = noteIt;
-			while (notePrev != m_song.vocals.notes.begin() && (notePrev->type == Note::SLEEP || t < notePrev->begin)) --notePrev;
-			bool hasNote = (noteIt != m_song.vocals.notes.end());
+			while (notePrev != vocal.notes.begin() && (notePrev->type == Note::SLEEP || t < notePrev->begin)) --notePrev;
+			bool hasNote = (noteIt != vocal.notes.end());
 			bool hasPrev = notePrev->type != Note::SLEEP && t >= notePrev->begin;
 			double val;
 			if (hasNote && hasPrev) val = 0.5 * (noteIt->note + notePrev->note);
 			else if (hasNote) val = noteIt->note;
 			else val = notePrev->note;
 			// Now val contains the active note value. The following calculates note value for current freq:
-			val += Note::diff(val, m_song.vocals.scale.getNote(freq));
+			val += Note::diff(val, vocal.scale.getNote(freq));
 			// Graphics positioning & animation:
 			double y = m_baseY + val * m_noteUnit;
 			double thickness = clamp(1.0 + pitch[idx].second / 60.0) + 0.5;

@@ -103,8 +103,6 @@ src_compile() {
 src_install() {
 	DOCS="docs/*.txt" cmake-utils_src_install
 
-	mv "${D}/${GAMES_PREFIX}/share/locale" "${D}/usr/share/"
-
 	if use songs; then
 		insinto "/usr/share/games/ultrastar"
 		doins -r "${S}/songs" || die "doins songs failed"

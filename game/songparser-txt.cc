@@ -49,13 +49,14 @@ void SongParser::txtParseHeader() {
 /// Parse notes
 void SongParser::txtParse() {
 	std::string line;
-	m_song.vocals.notes.clear();
+	VocalTrack &vocal = m_song.vocals;
+	vocal.notes.clear();
 	while (getline(line) && txtParseField(line)) {} // Parse the header again
 	if (m_bpm != 0.0) addBPM(0, m_bpm);
-	while (txtParseNote(line) && getline(line)) {} // Parse notes
+	while (txtParseNote(line, vocal) && getline(line)) {} // Parse notes
 	// Workaround for the terminating : 1 0 0 line, written by some converters
-	if (!m_song.vocals.notes.empty() && m_song.vocals.notes.back().type != Note::SLEEP
-	  && m_song.vocals.notes.back().begin == m_song.vocals.notes.back().end) m_song.vocals.notes.pop_back();
+	if (!vocal.notes.empty() && vocal.notes.back().type != Note::SLEEP
+	  && vocal.notes.back().begin == vocal.notes.back().end) vocal.notes.pop_back();
 }
 
 bool SongParser::txtParseField(std::string const& line) {
@@ -86,7 +87,7 @@ bool SongParser::txtParseField(std::string const& line) {
 	return true;
 }
 
-bool SongParser::txtParseNote(std::string line) {
+bool SongParser::txtParseNote(std::string line, VocalTrack &vocal) {
 	if (line.empty() || line == "\r") return true;
 	if (line[0] == '#') throw std::runtime_error("Key found in the middle of notes");
 	if (line[line.size() - 1] == '\r') line.erase(line.size() - 1);
@@ -132,8 +133,8 @@ bool SongParser::txtParseNote(std::string line) {
 	  default: throw std::runtime_error("Unknown note type");
 	}
 	n.begin = tsTime(ts);
-	Notes& notes = m_song.vocals.notes;
-	if (m_relative && m_song.vocals.notes.empty()) m_relativeShift = ts;
+	Notes& notes = vocal.notes;
+	if (m_relative && notes.empty()) m_relativeShift = ts;
 	m_prevts = ts;
 	if (n.begin < m_prevtime) {
 		// Oh no, overlapping notes (b0rked file)
@@ -160,8 +161,8 @@ bool SongParser::txtParseNote(std::string line) {
 	double prevtime = m_prevtime;
 	m_prevtime = n.end;
 	if (n.type != Note::SLEEP && n.end > n.begin) {
-		m_song.vocals.noteMin = std::min(m_song.vocals.noteMin, n.note);
-		m_song.vocals.noteMax = std::max(m_song.vocals.noteMax, n.note);
+		vocal.noteMin = std::min(vocal.noteMin, n.note);
+		vocal.noteMax = std::max(vocal.noteMax, n.note);
 		m_maxScore += n.maxScore();
 	}
 	if (n.type == Note::SLEEP) {
