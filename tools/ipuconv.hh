@@ -15,6 +15,6 @@ class IPUConv {
 	outBitFile outfile;
 	int vlc(int write);
   public:
-	IPUConv(std::vector<char> const& indata, std::string const& outfilename);
+	IPUConv(std::vector<char> const& indata, std::string const& outfilename, bool pal = true);
 };
 
