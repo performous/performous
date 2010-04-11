@@ -186,11 +186,13 @@ void video_us(Song& song, PakFile const& iavFile, PakFile const& indFile, fs::pa
 				// first 4 bytes are packet length
 				iavFile.get(data, iav_offset, size);
 				{
-					unsigned int opaque_footer_size = 3 * sizeof(int);
-					unsigned int chunk1 = getLE32(&data[0]);
-					ipudata.insert(ipudata.end(), data.begin() + 4, data.begin() + chunk1 - opaque_footer_size);
-					unsigned int chunk2 = getLE32(&data[chunk1]);
-					ipudata.insert(ipudata.end(), data.begin() + chunk1 + 4, data.begin() + chunk1 + chunk2 - opaque_footer_size);
+					unsigned int consumed = 0;
+					while(consumed < size) {
+						unsigned int opaque_footer_size = 3 * sizeof(int);
+						unsigned int chunk = getLE32(&data[consumed]);
+						ipudata.insert(ipudata.end(), data.begin() + 4 + consumed, data.begin() + consumed + chunk - opaque_footer_size);
+						consumed += chunk;
+					}
 				}
 				iav_offset += size;
 				break;
