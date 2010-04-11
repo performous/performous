@@ -139,6 +139,7 @@ struct Song {
 	fs::path path, music, vocals, video, background, cover;
 	unsigned samplerate;
 	double tempo;
+	bool pal;
 	Song(): samplerate(), tempo() {}
 };
 
@@ -207,7 +208,7 @@ void video_us(Song& song, PakFile const& iavFile, PakFile const& indFile, fs::pa
 		frame++;
 	}
 
-	IPUConv(ipudata, (outPath / "video.mpg").string(), false);
+	IPUConv(ipudata, (outPath / "video.mpg").string(), song.pal);
 	song.video = outPath / "video.mpg";
 }
 
@@ -655,9 +656,13 @@ struct FindSongs {
 			xmlpp::Node* node = dynamic_cast<const xmlpp::Node*>((*it));
 			get_node(node, s.genre, s.year, s.tempo); // get the values for genre, year and tempo
 
-			xmlpp::NodeSet t = elem.find("TEMPO/@BPM");
+			xmlpp::NodeSet t = elem.find(ns + "TEMPO/@BPM", nsmap);
 			if (t.empty()) s.tempo = 0.0; // this will always be 0.0
 			else s.tempo = atof(dynamic_cast<xmlpp::Attribute&>(*t[0]).get_value().c_str());
+
+			xmlpp::NodeSet fr = elem.find(ns + "VIDEO/@FRAME_RATE", nsmap);
+			if (fr.empty()) s.pal = true; // PAL if no framerate is found
+			else s.pal = (atof(dynamic_cast<xmlpp::Attribute&>(*fr[0]).get_value().c_str()) == 25.0);
 
 			s.edition = prettyEdition(edition);
 
