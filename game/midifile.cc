@@ -26,6 +26,9 @@ class MidiStream {
 	 */
 	MidiStream(std::string const& file) {
 		std::ifstream ifs(file.c_str(), std::ios::binary);
+#if MIDI_DEBUG_LEVEL > 1
+		std::cout << "Opening file: " << file << std::endl;
+#endif
 		f << ifs.rdbuf();
 		f.exceptions(std::ios::failbit);
 	}
