@@ -166,6 +166,118 @@ void writeMusic(fs::path const& filename, std::vector<short> const& buf, unsigne
 	f.write(reinterpret_cast<char const*>(&buf[0]), buf.size() * sizeof(short));
 }
 
+void video_us(Song& song, PakFile const& iavFile, PakFile const& indFile, fs::path const& outPath) {
+	// Tracks on my example
+	// 0 => video (ipu)
+	// 1 and 2 => adpcm song (left/right)
+	// 3 and 4 => adpcm vocals (left/right)
+
+	std::vector<char> ipudata;
+	std::vector<char> data;
+	std::vector<char> ind_file;
+	indFile.get(ind_file);
+
+	unsigned int iav_offset = 0;
+	unsigned int frame = 0;
+	for( unsigned int ind_offset = 0x68 ; ind_offset < ind_file.size() ; ind_offset+=2) {
+		unsigned int size = getLE16(&ind_file[ind_offset]) << 4;
+		switch(frame%5) {
+			case 0:
+				// first 4 bytes are packet length
+				iavFile.get(data, iav_offset + 4, size - 4);
+				ipudata.insert(ipudata.end(), data.begin(), data.end());
+				iav_offset += size;
+				break;
+			case 1:
+			case 2:
+			case 3:
+			case 4:
+				// audio
+				iav_offset = size;
+				break;
+		}
+		frame++;
+	}
+
+	IPUConv(ipudata, (outPath / "video.mpg").string());
+	song.video = outPath / "video.mpg";
+}
+
+void music_us(Song& song, PakFile const& iavFile, PakFile const& indFile, fs::path const& outPath) {
+	// Tracks on my example
+	// 0 => video (ipu)
+	// 1 and 2 => adpcm song (left/right)
+	// 3 and 4 => adpcm vocals (left/right)
+	// std::cout << "  >>> IAV file size: " << iavFile.size << std::endl;
+	// std::cout << "  >>> IND file size: " << indFile.size << std::endl;
+
+	std::vector<char> ind_file;
+	indFile.get(ind_file);
+	unsigned int sr = getLE32(&ind_file[0x60]);
+	// std::cout << "  >>> sample rate: " << sr << std::endl;
+
+	const unsigned decodeChannels = 4; // Do not change!
+	Adpcm adpcm(0, decodeChannels);
+	std::vector<short> pcm[2];
+
+	bool karaoke = false;
+	unsigned int iav_offset = 0;
+	unsigned int frame = 0;
+	for( unsigned int ind_offset = 0x68 ; ind_offset < ind_file.size() ; ind_offset+=2) {
+		unsigned int video_size, audio_size = 0;
+		unsigned int size = getLE16(&ind_file[ind_offset]) << 4;
+		switch(frame%5) {
+			case 0:
+				video_size = size;
+				iav_offset += video_size;
+				break;
+			case 1:
+				// song left
+				audio_size = size;
+				break;
+			case 2:
+				// song right
+				audio_size += size;
+				break;
+			case 3:
+				// vocals left
+				audio_size += size;
+				break;
+			case 4:
+				// vocals right
+				audio_size += size;
+				adpcm.interleave(size);
+				for (unsigned pos = 0, end; (end = pos + 2 * adpcm.chunkBytes()) <= audio_size; pos = end) {
+					std::vector<char> data;
+					iavFile.get(data, iav_offset + pos, end - pos);
+					std::vector<short> pcmtmp(adpcm.chunkFrames() * decodeChannels);
+					adpcm.decodeChunk(&data[0], pcmtmp.begin());
+					for (size_t s = 0; s < pcmtmp.size(); s += 4) {
+						short l1 = pcmtmp[s];
+						short r1 = pcmtmp[s + 1];
+						short l2 = pcmtmp[s + 2];
+						short r2 = pcmtmp[s + 3];
+						pcm[0].push_back(l1);
+						pcm[0].push_back(r1);
+						pcm[1].push_back(l2);
+						pcm[1].push_back(r2);
+						if (l2 != 0 || r2 != 0) karaoke = true;
+					}
+				}
+				iav_offset += audio_size;
+				break;
+		}
+		frame++;
+	}
+	std::string ext;
+	writeMusic(song.music = outPath / ("music.wav"), pcm[0], sr);
+	if (karaoke) writeMusic(song.vocals = outPath / ("vocals.wav"), pcm[1], sr);
+	if( oggcompress ) {
+		song.music = outPath / ("music.ogg");
+		if (karaoke) song.vocals = outPath / ("vocals.ogg");
+	}
+}
+
 void music(Song& song, PakFile const& dataFile, PakFile const& headerFile, fs::path const& outPath) {
 	std::vector<char> data;
 	headerFile.get(data);
@@ -241,12 +353,18 @@ void saveTxtFile(xmlpp::NodeSet &sentence, const fs::path &path, const Song &son
 	//txtfile << "#LANGUAGE:English" << std::endl; // Detect instead of hardcoding?
 	if (!song.music.empty()) txtfile << "#MP3:" << filename(song.music) << std::endl;
 	if (!song.vocals.empty()) txtfile << "#VOCALS:" << filename(song.vocals) << std::endl;
+	if (!song.vocals.empty()) txtfile << "#VIDEO:" << filename(song.video) << std::endl;
+	if (!song.cover.empty()) txtfile << "#COVER:" << filename(song.cover) << std::endl;
+	/*
 	if (video && mkvcompress) {
 		txtfile << "#VIDEO:video.m4v" << std::endl;
 	} else {
-		txtfile << "#VIDEO:video.mpg" << std::endl;
+		if(video) {
+			txtfile << "#VIDEO:video.mpg" << std::endl;
+		}
 	}
 	txtfile << "#COVER:cover.jpg" << std::endl;
+	*/
 	//txtfile << "#BACKGROUND:background.jpg" << std::endl;
 	txtfile << "#BPM:" << song.tempo << std::endl;
 	ts = 0;
@@ -338,24 +456,58 @@ struct Process {
 				music(song, dataPak[id + "/music.mib"], pak["export/" + id + "/music.mih"], path);
 			} catch (...) {
 				std::cerr << "  >>> European DVD failed, trying American (WIP)" << std::endl;
-				// Tracks on my example
-				// 0 => video (ipu)
-				// 1 and 2 => adpcm song (left/right)
-				// 3 and 4 => adpcm vocals (left/right)
-				std::vector<char> offsets_header;
-				std::vector<char> offsets_data;
-				dataPak[id + "/mus+vid.ind"].get(offsets_header, 0, 0x68);
-				unsigned int track_count = getLE32(&offsets_header[4]);
-				dataPak[id + "/mus+vid.ind"].get(offsets_data, 0x68);
-				unsigned int offset = 0;
-				/*
-				for( unsigned int i = 0 ; i < offsets_data.size() ; i+=2) {
-					std::vector<char> chunk_data;
-					unsigned int size = getLE16(&offsets_data[i]) << 4;
-					dataPak[id + "/mus+vid.iav"].get(chunk_data, offset, size);
-					offset+=size;
+				try {
+					music_us(song, dataPak[id + "/mus+vid.iav"], dataPak[id + "/mus+vid.ind"], path);
+				} catch (...) {
+					throw std::runtime_error("Unable to find any audio");
 				}
-				*/
+			}
+			std::cerr << ">>> Extracting cover image" << std::endl;
+			try {
+				SingstarCover c = SingstarCover(dvdPath + "/pack_ee.pak", boost::lexical_cast<unsigned int>(id));
+				c.write(path.string() + "/cover.jpg");
+				song.cover = path / "cover.jpg";
+			} catch (...) {}
+			remove = "";
+			// FIXME: use some library (preferrably ffmpeg):
+			if (oggcompress) {
+				std::cerr << ">>> Compressing audio into music.ogg/vocals.ogg" << std::endl;
+				std::string cmd = "oggenc \"" + (path / "music.wav").string() + "\"";
+				std::cerr << cmd << std::endl;
+				if (std::system(cmd.c_str()) == 0) { // FIXME: std::system return value is not portable
+					fs::remove(path / "music.wav");
+				}
+				cmd = "oggenc \"" + (path / "vocals.wav").string() + "\"";
+				std::cerr << cmd << std::endl;
+				if (std::system(cmd.c_str()) == 0) { // FIXME: std::system return value is not portable
+					fs::remove(path / "vocals.wav");
+				}
+			}
+			if (video) {
+				std::cerr << ">>> Extracting video" << std::endl;
+				try {
+					std::vector<char> ipudata;
+					dataPak[id + "/movie.ipu"].get(ipudata);
+					std::cerr << ">>> Converting video" << std::endl;
+					IPUConv(ipudata, (path / "video.mpg").string());
+					song.video = path / "video.mpg";
+				} catch (...) {
+					std::cerr << "  >>> European DVD failed, trying American (WIP)" << std::endl;
+					try {
+						video_us(song, dataPak[id + "/mus+vid.iav"], dataPak[id + "/mus+vid.ind"], path);
+					} catch (...) {
+						song.video.clear();
+					}
+				}
+				if (mkvcompress) {
+					std::cerr << ">>> Compressing video and audio into music.mkv" << std::endl;
+					std::string cmd = "ffmpeg -i \"" + (path / "video.mpg").string() + "\" -vcodec libx264 -vpre hq -crf 25 -threads 0 -metadata album=\"" + song.edition + "\" -metadata author=\"" + song.artist + "\" -metadata comment=\"" + song.genre + "\" -metadata title=\"" + song.title + "\" \"" + (path / "video.m4v\"").string();
+					std::cerr << cmd << std::endl;
+					if (std::system(cmd.c_str()) == 0) { // FIXME: std::system return value is not portable
+						fs::remove(path / "video.mpg");
+					}
+					song.video = path / "video.m4v";
+				}
 			}
 			std::cerr << ">>> Extracting lyrics" << std::endl;
 			xmlpp::NodeSet sentences = dom.get_document()->get_root_node()->find("/" + ns + "MELODY/" + ns + "SENTENCE", nsmap);
@@ -375,41 +527,6 @@ struct Process {
 					}
 				} else {
 					throw std::runtime_error("Unable to find any sentences in melody XML");
-				}
-			}
-			std::cerr << ">>> Extracting cover image" << std::endl;
-			try {
-				SingstarCover c = SingstarCover(dvdPath + "/pack_ee.pak", boost::lexical_cast<unsigned int>(id));
-				c.write(path.string() + "/cover.jpg");
-			} catch (...) {}
-			remove = "";
-			if (video) {
-				std::cerr << ">>> Extracting video" << std::endl;
-				std::vector<char> ipudata;
-				dataPak[id + "/movie.ipu"].get(ipudata);
-				std::cerr << ">>> Converting video" << std::endl;
-				IPUConv(ipudata, (path / "video.mpg").string());
-				// FIXME: use some library (preferrably ffmpeg):
-				if (oggcompress) {
-					std::cerr << ">>> Compressing audio into music.ogg/vocals.ogg" << std::endl;
-					std::string cmd = "oggenc \"" + (path / "music.wav").string() + "\"";
-					std::cerr << cmd << std::endl;
-					if (std::system(cmd.c_str()) == 0) { // FIXME: std::system return value is not portable
-						fs::remove(path / "music.wav");
-					}
-					cmd = "oggenc \"" + (path / "vocals.wav").string() + "\"";
-					std::cerr << cmd << std::endl;
-					if (std::system(cmd.c_str()) == 0) { // FIXME: std::system return value is not portable
-						fs::remove(path / "vocals.wav");
-					}
-				}
-				if (mkvcompress) {
-					std::cerr << ">>> Compressing video and audio into music.mkv" << std::endl;
-					std::string cmd = "ffmpeg -i \"" + (path / "video.mpg").string() + "\" -vcodec libx264 -vpre hq -crf 25 -threads 0 -metadata album=\"" + song.edition + "\" -metadata author=\"" + song.artist + "\" -metadata comment=\"" + song.genre + "\" -metadata title=\"" + song.title + "\" \"" + (path / "video.m4v\"").string();
-					std::cerr << cmd << std::endl;
-					if (std::system(cmd.c_str()) == 0) { // FIXME: std::system return value is not portable
-						fs::remove(path / "video.mpg");
-					}
 				}
 			}
 		} catch (std::exception& e) {
