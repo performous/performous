@@ -223,8 +223,8 @@ void music_us(Song& song, PakFile const& iavFile, PakFile const& indFile, fs::pa
 	bool karaoke = false;
 	unsigned int iav_offset = 0;
 	unsigned int frame = 0;
+	unsigned int video_size, audio_size = 0;
 	for( unsigned int ind_offset = 0x68 ; ind_offset < ind_file.size() ; ind_offset+=2) {
-		unsigned int video_size, audio_size = 0;
 		unsigned int size = getLE16(&ind_file[ind_offset]) << 4;
 		switch(frame%5) {
 			case 0:
@@ -272,10 +272,6 @@ void music_us(Song& song, PakFile const& iavFile, PakFile const& indFile, fs::pa
 	std::string ext;
 	writeMusic(song.music = outPath / ("music.wav"), pcm[0], sr);
 	if (karaoke) writeMusic(song.vocals = outPath / ("vocals.wav"), pcm[1], sr);
-	if( oggcompress ) {
-		song.music = outPath / ("music.ogg");
-		if (karaoke) song.vocals = outPath / ("vocals.ogg");
-	}
 }
 
 void music(Song& song, PakFile const& dataFile, PakFile const& headerFile, fs::path const& outPath) {
@@ -306,10 +302,6 @@ void music(Song& song, PakFile const& dataFile, PakFile const& headerFile, fs::p
 	std::string ext;
 	writeMusic(song.music = outPath / ("music.wav"), pcm[0], sr);
 	if (karaoke) writeMusic(song.vocals = outPath / ("vocals.wav"), pcm[1], sr);
-	if( oggcompress ) {
-		song.music = outPath / ("music.ogg");
-		if (karaoke) song.vocals = outPath / ("vocals.ogg");
-	}
 }
 
 struct Match {
@@ -471,16 +463,23 @@ struct Process {
 			remove = "";
 			// FIXME: use some library (preferrably ffmpeg):
 			if (oggcompress) {
-				std::cerr << ">>> Compressing audio into music.ogg/vocals.ogg" << std::endl;
-				std::string cmd = "oggenc \"" + (path / "music.wav").string() + "\"";
-				std::cerr << cmd << std::endl;
-				if (std::system(cmd.c_str()) == 0) { // FIXME: std::system return value is not portable
-					fs::remove(path / "music.wav");
+				if( !song.music.empty() ) {
+					std::cerr << ">>> Compressing audio into music.ogg" << std::endl;
+					std::string cmd = "oggenc \"" + song.music.string() + "\"";
+					std::cerr << cmd << std::endl;
+					if (std::system(cmd.c_str()) == 0) { // FIXME: std::system return value is not portable
+						fs::remove(song.music);
+						song.music = path / ("music.ogg");
+					}
 				}
-				cmd = "oggenc \"" + (path / "vocals.wav").string() + "\"";
-				std::cerr << cmd << std::endl;
-				if (std::system(cmd.c_str()) == 0) { // FIXME: std::system return value is not portable
-					fs::remove(path / "vocals.wav");
+				if( !song.vocals.empty() ) {
+					std::cerr << ">>> Compressing audio into vocals.ogg" << std::endl;
+					std::string cmd = "oggenc \"" + song.vocals.string() + "\"";
+					std::cerr << cmd << std::endl;
+					if (std::system(cmd.c_str()) == 0) { // FIXME: std::system return value is not portable
+						fs::remove(song.vocals);
+						song.music = path / ("vocals.ogg");
+					}
 				}
 			}
 			if (video) {
@@ -495,7 +494,8 @@ struct Process {
 					std::cerr << "  >>> European DVD failed, trying American (WIP)" << std::endl;
 					try {
 						video_us(song, dataPak[id + "/mus+vid.iav"], dataPak[id + "/mus+vid.ind"], path);
-					} catch (...) {
+					} catch (std::exception& e) {
+						std::cerr << "!!! Unable to extract video: " << e.what() << std::endl;
 						song.video.clear();
 					}
 				}
@@ -505,8 +505,8 @@ struct Process {
 					std::cerr << cmd << std::endl;
 					if (std::system(cmd.c_str()) == 0) { // FIXME: std::system return value is not portable
 						fs::remove(path / "video.mpg");
+						song.video = path / "video.m4v";
 					}
-					song.video = path / "video.m4v";
 				}
 			}
 			std::cerr << ">>> Extracting lyrics" << std::endl;
