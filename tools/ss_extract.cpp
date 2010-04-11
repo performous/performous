@@ -356,16 +356,6 @@ void saveTxtFile(xmlpp::NodeSet &sentence, const fs::path &path, const Song &son
 	if (!song.vocals.empty()) txtfile << "#VOCALS:" << filename(song.vocals) << std::endl;
 	if (!song.vocals.empty()) txtfile << "#VIDEO:" << filename(song.video) << std::endl;
 	if (!song.cover.empty()) txtfile << "#COVER:" << filename(song.cover) << std::endl;
-	/*
-	if (video && mkvcompress) {
-		txtfile << "#VIDEO:video.m4v" << std::endl;
-	} else {
-		if(video) {
-			txtfile << "#VIDEO:video.mpg" << std::endl;
-		}
-	}
-	txtfile << "#COVER:cover.jpg" << std::endl;
-	*/
 	//txtfile << "#BACKGROUND:background.jpg" << std::endl;
 	txtfile << "#BPM:" << song.tempo << std::endl;
 	ts = 0;
@@ -548,7 +538,7 @@ struct Process {
 	}
 };
 
-void get_node(const xmlpp::Node* node, std::string& genre, std::string& year, double& tempo)
+void get_node(const xmlpp::Node* node, std::string& genre, std::string& year)
 {
 	const xmlpp::ContentNode* nodeContent = dynamic_cast<const xmlpp::ContentNode*>(node);
 	const xmlpp::TextNode* nodeText = dynamic_cast<const xmlpp::TextNode*>(node);
@@ -582,7 +572,7 @@ void get_node(const xmlpp::Node* node, std::string& genre, std::string& year, do
 		xmlpp::Node::NodeList list = node->get_children();
 		for(xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
 		{
-			get_node(*iter, genre, year, tempo); //recursive
+			get_node(*iter, genre, year); //recursive
 		}
 	}
 }
@@ -654,11 +644,7 @@ struct FindSongs {
 			s.artist = elem.get_attribute("PERFORMANCE_NAME")->get_value();
 			if (!m_search.empty() && m_search != elem.get_attribute("ID")->get_value() && (s.artist + " - " + s.title).find(m_search) == std::string::npos) continue;
 			xmlpp::Node* node = dynamic_cast<const xmlpp::Node*>((*it));
-			get_node(node, s.genre, s.year, s.tempo); // get the values for genre, year and tempo
-
-			xmlpp::NodeSet t = elem.find(ns + "TEMPO/@BPM", nsmap);
-			if (t.empty()) s.tempo = 0.0; // this will always be 0.0
-			else s.tempo = atof(dynamic_cast<xmlpp::Attribute&>(*t[0]).get_value().c_str());
+			get_node(node, s.genre, s.year); // get the values for genre and year
 
 			xmlpp::NodeSet fr = elem.find(ns + "VIDEO/@FRAME_RATE", nsmap);
 			if (fr.empty()) s.pal = true; // PAL if no framerate is found
