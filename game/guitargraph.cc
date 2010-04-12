@@ -75,6 +75,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number)
   m_level(),
   m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
   m_correctness(0.0, 5.0),
+  m_errorMeter(0.0, 2.0),
   m_drumJump(0.0, 12.0),
   m_streakPopup(0.0, 1.0),
   m_godmodePopup(0.0, 0.666),
@@ -406,6 +407,7 @@ void GuitarGraph::drumHit(double time, int fret) {
 	}
 	// Find any suitable note within the tolerance
 	double tolerance = maxTolerance;
+	double signed_error = maxTolerance;
 	Chords::iterator best = m_chords.end();
 	for (Chords::iterator it = m_chordIt; it != m_chords.end() && it->begin <= time + tolerance; ++it) {
 		if (m_notes[it->dur[fret]]) continue;  // Already played
@@ -413,6 +415,7 @@ void GuitarGraph::drumHit(double time, int fret) {
 		if (error < tolerance) {
 			best = it;
 			tolerance = error;
+			signed_error = it->begin - time;
 		}
 	}
 	if (best == m_chords.end()) fail(time, fret);
@@ -440,6 +443,8 @@ void GuitarGraph::drumHit(double time, int fret) {
 			if (m_streak > m_longestStreak) m_longestStreak = m_streak;
 			// Handle Big Rock Ending scoring
 			if (m_drumfillHits > 0 && *best == m_chords.back()) endBRE();
+			// ErrorMeter
+			m_errorMeter.setTarget(signed_error / maxTolerance, true);
 		}
 		m_correctness.setTarget(double(m_chordIt->status) / m_chordIt->polyphony, true);
 	}
@@ -482,6 +487,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 	}
 	// Find any suitable note within the tolerance
 	double tolerance = maxTolerance;
+	double signed_error = maxTolerance;
 	Chords::iterator best = m_chords.end();
 	for (Chords::iterator it = m_chordIt; it != m_chords.end() && it->begin <= time + tolerance; ++it) {
 		if (it->status > 1) continue; // Already picked, can't play again
@@ -497,6 +503,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 		if (error < tolerance) {
 			best = it;
 			tolerance = error;
+			signed_error = it->begin - time;
 		}
 	}
 	if (best == m_chords.end()) fail(time, picked ? -1 : -2);
@@ -513,6 +520,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 		m_chordIt->status = 1 + picked;
 		m_score += score;
 		m_starmeter += score;
+		m_errorMeter.setTarget(signed_error / maxTolerance, true);
 		m_correctness.setTarget(1.0, true); // Instantly go to one
 		for (int fret = 0; fret < 5; ++fret) {
 			if (!m_chordIt->fret[fret]) continue;
@@ -725,6 +733,32 @@ void GuitarGraph::draw(double time) {
 				++it;
 			}
 		}
+		{ // Accuracy indicator
+			float maxsize = 1.0f;
+			float thickness = 0.1f;
+			float y = time2y(past / 3.0f);
+			glColor4f(0.0f, 0.0f, 0.0f, 0.6f);
+			{ // Indicator background
+				glutil::Begin block(GL_TRIANGLE_STRIP);
+				glVertex3f(-maxsize, y, thickness);
+				glVertex3f( maxsize, y, thickness);
+				glVertex3f(-maxsize, y, 0.0f);
+				glVertex3f( maxsize, y, 0.0f);
+			}
+			float error = m_errorMeter.get();
+			if (error != 0) {
+				float x1 = 0, x2 = 0;
+				if (error > 0) { glColor4f(0.0f, 1.0f, 0.0f, 1.0f); x2 = -maxsize * error; }
+				else { glColor4f(1.0f, 0.0f, 0.0f, 1.0f); x1 = -maxsize * error; }
+				glutil::Begin block(GL_TRIANGLE_STRIP);
+				glVertex3f(x1, y, 0.0f);
+				glVertex3f(x2, y, 0.0f);
+				glVertex3f(x1, y, thickness);
+				glVertex3f(x2, y, thickness);
+				if (m_errorMeter.get() == m_errorMeter.getTarget())
+					m_errorMeter.setTarget(0.0);
+			}
+		}
 	}
 
 	// Bottom neck glow
@@ -747,6 +781,7 @@ void GuitarGraph::draw(double time) {
 		m_neckglow.dimensions.screenBottom(0.0).middle(offsetX).fixedWidth(dimensions.w());
 		m_neckglow.draw();
 	}
+
 	drawInfo(time, offsetX, dimensions); // Go draw some texts and other interface stuff
 	glColor3f(1.0f, 1.0f, 1.0f);
 }

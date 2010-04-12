@@ -144,6 +144,7 @@ class GuitarGraph {
 	typedef std::map<Duration const*, unsigned> NoteStatus; // Note in song to m_events[unsigned - 1] or 0 for not played
 	NoteStatus m_notes;
 	AnimValue m_correctness;
+	AnimValue m_errorMeter;
 	AnimValue m_drumJump;
 	AnimValue m_streakPopup; /// for animating the popup
 	AnimValue m_godmodePopup; /// for animating the popup
