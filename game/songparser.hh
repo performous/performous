@@ -93,18 +93,18 @@ class SongParser {
   private:
 	void finalize() {
 		// Adjust negative notes
-		if (m_song.noteMin <= 0) {
-			unsigned int shift = (1 - m_song.noteMin / 12) * 12;
-			m_song.noteMin += shift;
-			m_song.noteMax += shift;
-			for (Notes::iterator it = m_song.notes.begin(); it != m_song.notes.end(); ++it) {
+		if (m_song.vocals.noteMin <= 0) {
+			unsigned int shift = (1 - m_song.vocals.noteMin / 12) * 12;
+			m_song.vocals.noteMin += shift;
+			m_song.vocals.noteMax += shift;
+			for (Notes::iterator it = m_song.vocals.notes.begin(); it != m_song.vocals.notes.end(); ++it) {
 				it->note += shift;
 				it->notePrev += shift;
 			}
 		}
 		// Set begin/end times
-		if (!m_song.notes.empty()) m_song.beginTime = m_song.notes.front().begin, m_song.endTime = m_song.notes.back().end;
-		m_song.m_scoreFactor = 1.0 / m_maxScore;
+		if (!m_song.vocals.notes.empty()) m_song.vocals.beginTime = m_song.vocals.notes.front().begin, m_song.vocals.endTime = m_song.vocals.notes.back().end;
+		m_song.vocals.m_scoreFactor = 1.0 / m_maxScore;
 		if (m_tsPerBeat) {
 			// Add song beat markers
 			for (unsigned ts = 0; ts < m_tsEnd; ts += m_tsPerBeat) m_song.beats.push_back(tsTime(ts));
@@ -123,7 +123,7 @@ class SongParser {
 	void txtParseHeader();
 	void txtParse();
 	bool txtParseField(std::string const& line);
-	bool txtParseNote(std::string line);
+	bool txtParseNote(std::string line, VocalTrack &vocal);
 	bool iniCheck(std::vector<char> const& data);
 	void iniParseHeader();
 	void iniParse();
@@ -166,7 +166,7 @@ class SongParser {
 		throw std::logic_error("INTERNAL ERROR: BPM data invalid");
 	}
 	/// Stops stored in <ts, duration> format
-	std::vector<std::pair<double, double> > m_stops;
+	Song::Stops m_stops;
 	/// Convert a stop into <time, duration> (as stored in the song)
 	std::pair<double, double> stopConvert(std::pair<double, double> s) {
 		s.first = tsTime(s.first);

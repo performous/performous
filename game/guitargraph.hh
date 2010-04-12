@@ -88,8 +88,8 @@ class GuitarGraph: public InstrumentGraph {
 	bool m_use3d; /// are we using 3d?
 	AnimValue m_starpower; /// how long the GodMode lasts (also used in fading the effect)
 	std::vector<AnimValue> m_flames[5]; /// flame effect queues for each fret
-	TrackMapConstPtr m_track_map; /// tracks
-	TrackMapConstPtr::const_iterator m_track_index;
+	InstrumentTracksConstPtr m_instrumentTracks; /// tracks
+	InstrumentTracksConstPtr::const_iterator m_track_index;
 	std::vector<Duration> m_solos; /// holds guitar solos
 	std::vector<Duration> m_drumfills; /// holds drum fills (used for activating GodMode)
 	Durations::const_iterator m_dfIt; /// current drum fill

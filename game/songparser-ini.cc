@@ -37,16 +37,16 @@ namespace {
 	/// Return false if not valid
 	bool mangleTrackName(std::string& name) {
 		if (name == "T1 GEMS") { // Some old MIDI files have a track named T1 GEMS
-			name = "guitar"; return true;
+			name = TrackName::GUITAR; return true;
 		}
 		else if (name.substr(0, 5) != "PART ") return false;
 		else name.erase(0, 5);
-		if (name == "GUITAR COOP") name = "coop guitar";
-		else if (name == "RHYTHM") name = "rhythm guitar";
-		else if (name == "DRUM") name = "drums";
-		else if (name == "DRUMS") name = "drums";
-		else if (name == "BASS") name = "bass";
-		else if (name == "GUITAR") name = "guitar";
+		if (name == "GUITAR COOP") name = TrackName::GUITAR_COOP;
+		else if (name == "RHYTHM") name = TrackName::GUITAR_RHYTHM;
+		else if (name == "DRUM") name = TrackName::DRUMS;
+		else if (name == "DRUMS") name = TrackName::DRUMS;
+		else if (name == "BASS") name = TrackName::BASS;
+		else if (name == "GUITAR") name = TrackName::GUITAR;
 		else if (name == "VOCALS") return true;
 		else return false;
 		return true;
@@ -99,11 +99,11 @@ void SongParser::iniParseHeader() {
 		} else if (regex_match(name.c_str(), match, audiofile_background)) {
 			testAndAdd(s, "background", name);
 		} else if (regex_match(name.c_str(), match, audiofile_guitar)) {
-			testAndAdd(s, "guitar", name);
+			testAndAdd(s, TrackName::GUITAR, name);
 		} else if (regex_match(name.c_str(), match, audiofile_bass)) {
-			testAndAdd(s, "bass", name);
+			testAndAdd(s, TrackName::BASS, name);
 		} else if (regex_match(name.c_str(), match, audiofile_drums)) {
-			testAndAdd(s, "drums", name);
+			testAndAdd(s, TrackName::DRUMS, name);
 		} else if (regex_match(name.c_str(), match, audiofile_vocals)) {
 			testAndAdd(s, "vocals", name);
 #if 0  // TODO: process preview.ogg properly? In any case, do not print debug to console...
@@ -117,14 +117,14 @@ void SongParser::iniParseHeader() {
 	for (MidiFileParser::Tracks::const_iterator it = midi.tracks.begin(); it != midi.tracks.end(); ++it) {
 		// Figure out the track name
 		std::string name = it->name;
-		if (midi.tracks.size() == 1) name = "guitar"; // Original (old) FoF songs only have one track
+		if (midi.tracks.size() == 1) name = TrackName::GUITAR; // Original (old) FoF songs only have one track
 		else if (!mangleTrackName(name)) continue; // Beautify the track name
 		// Add dummy notes to tracks so that they can be seen in song browser
-		if (name == "VOCALS") s.notes.push_back(Note());
+		if (name == "VOCALS") s.vocals.notes.push_back(Note());
 		else {
 			for (MidiFileParser::NoteMap::const_iterator it2 = it->notes.begin(); it2 != it->notes.end(); ++it2) {
 				// If a track has not enough notes on any level, ignore it
-				if (it2->second.size() > 3) { s.track_map.insert(make_pair(name,Track(name))); break; }
+				if (it2->second.size() > 3) { s.instrumentTracks.insert(make_pair(name,InstrumentTrack(name))); break; }
 			}
 		}
 	}
@@ -133,8 +133,7 @@ void SongParser::iniParseHeader() {
 /// Parse notes
 void SongParser::iniParse() {
 	Song& s = m_song;
-	s.notes.clear();
-	s.track_map.clear();
+	s.instrumentTracks.clear();
 
 	MidiFileParser midi(s.path + "/" + s.midifilename);
 	int reversedNoteCount = 0;
@@ -142,13 +141,13 @@ void SongParser::iniParse() {
 	for (MidiFileParser::Tracks::const_iterator it = midi.tracks.begin(); it != midi.tracks.end(); ++it) {
 		// Figure out the track name
 		std::string name = it->name;
-		if (midi.tracks.size() == 1) name = "guitar"; // Original (old) FoF songs only have one track
+		if (midi.tracks.size() == 1) name = TrackName::GUITAR; // Original (old) FoF songs only have one track
 		else if (!mangleTrackName(name)) continue; // Beautify the track name
 		// Process non-vocal tracks
 		if (name != "VOCALS") {
 			int durCount = 0;
-			s.track_map.insert(make_pair(name,Track(name)));
-			NoteMap& nm2 = s.track_map.find(name)->second.nm;
+			s.instrumentTracks.insert(make_pair(name,InstrumentTrack(name)));
+			NoteMap& nm2 = s.instrumentTracks.find(name)->second.nm;
 			for (MidiFileParser::NoteMap::const_iterator it2 = it->notes.begin(); it2 != it->notes.end(); ++it2) {
 				Durations& dur = nm2[it2->first];
 				MidiFileParser::Notes const& notes = it2->second;
@@ -170,11 +169,13 @@ void SongParser::iniParse() {
 			if (durCount <= 20) {
 				s.b0rkedTracks = true;
 				nm2.clear();
-				s.track_map.erase(name);
+				s.instrumentTracks.erase(name);
 			}
 			continue;
 		}
 		// Process vocal tracks
+		VocalTrack &vocal = s.vocals;
+		vocal.notes.clear();
 		for (MidiFileParser::Lyrics::const_iterator it2 = it->lyrics.begin(); it2 != it->lyrics.end(); ++it2) {
 			Note n;
 			n.begin = midi.get_seconds(it2->begin)+s.start;
@@ -208,9 +209,9 @@ void SongParser::iniParse() {
 				}
 				// Special processing for slides (which depend on the previous note)
 				if (n.type == Note::SLIDE) {
-					Notes::reverse_iterator prev = s.notes.rbegin();
-					while (prev != s.notes.rend() && prev->type == Note::SLEEP) ++prev;
-					if (prev == s.notes.rend()) throw std::runtime_error("The song begins with a slide note");
+					Notes::reverse_iterator prev = vocal.notes.rbegin();
+					while (prev != vocal.notes.rend() && prev->type == Note::SLEEP) ++prev;
+					if (prev == vocal.notes.rend()) throw std::runtime_error("The song begins with a slide note");
 					eraseLast(prev->syllable); // Erase the space if there is any
 					{
 						// insert new sliding note
@@ -222,9 +223,9 @@ void SongParser::iniParse() {
 						inter.type = Note::SLIDE;
 						inter.syllable = std::string("~");
 						m_maxScore += inter.maxScore();
-						s.noteMin = std::min(s.noteMin, inter.note);
-						s.noteMax = std::max(s.noteMax,inter.note);
-						s.notes.push_back(inter);
+						vocal.noteMin = std::min(vocal.noteMin, inter.note);
+						vocal.noteMax = std::max(vocal.noteMax,inter.note);
+						vocal.notes.push_back(inter);
 					}
 					{
 						// modifying current note to be normal again
@@ -232,15 +233,15 @@ void SongParser::iniParse() {
 					}
 				}
 				m_maxScore += n.maxScore();
-				s.noteMin = std::min(s.noteMin, n.note);
-				s.noteMax = std::max(s.noteMax, n.note);
-				s.notes.push_back(n);
-			} else if (!s.notes.empty() && s.notes.back().type != Note::SLEEP) {
-				eraseLast(s.notes.back().syllable);
-				s.notes.push_back(n);
+				vocal.noteMin = std::min(vocal.noteMin, n.note);
+				vocal.noteMax = std::max(vocal.noteMax, n.note);
+				vocal.notes.push_back(n);
+			} else if (!vocal.notes.empty() && vocal.notes.back().type != Note::SLEEP) {
+				eraseLast(vocal.notes.back().syllable);
+				vocal.notes.push_back(n);
 			}
 		}
-		if (!s.notes.empty()) break;
+		if (!vocal.notes.empty()) break;
 	}
 	// Figure out if we have BRE in the song
 	for (MidiFileParser::CommandEvents::const_iterator it = midi.cmdevents.begin(); it != midi.cmdevents.end(); ++it) {
@@ -253,13 +254,13 @@ void SongParser::iniParse() {
 		oss << s.path << s.midifilename << std::endl;
 		std::cerr << oss.str(); // More likely to be atomic when written as one string
 	}
-	/*if (s.notes.empty()) {
+	/*if (s.vocals.notes.empty()) {
 		Note n;
 		n.begin = 30.0;
 		n.end = 31.0;
 		n.syllable = "TODO";
-		s.noteMin = s.noteMax = n.note = 60;
-		s.notes.push_back(n);
+		s.vocals.noteMin = s.vocals.noteMax = n.note = 60;
+		s.vocals.notes.push_back(n);
 	}*/
 }
 

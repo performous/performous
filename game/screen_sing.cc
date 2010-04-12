@@ -32,7 +32,7 @@ namespace {
 void ScreenSing::enter() {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	sm->flashMessage(_("Loading song..."), 0.0, 1.0, 0.5);
-	sm->drawFlashMessage(); sm->getWindow().swap(); // Make loading message show
+	sm->drawFlashMessage(); sm->window().swap(); // Make loading message show
 	theme.reset(new ThemeSing());
 	// Load the rest of the song
 	if (m_song->loadStatus != Song::FULL) {
@@ -221,7 +221,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			return;
 		}
 		// Start button has special functions for skipping things (only in singing for now)
-		if (nav == input::START && m_only_singers_alive && !m_song->notes.empty() && !m_audio.isPaused()) {
+		if (nav == input::START && m_only_singers_alive && !m_song->vocals.notes.empty() && !m_audio.isPaused()) {
 			// Open score dialog early
 			if (status == Song::FINISHED) {
 				m_engine->kill(); // kill the engine thread
@@ -239,7 +239,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 	}
 	// Ctrl combinations that can be used while performing (not when score dialog is displayed)
 	if (event.type == SDL_KEYDOWN && (event.key.keysym.mod & KMOD_CTRL) && !m_score_window.get()) {
-		if (key == SDLK_s) m_audio.toggleSynth(m_song->notes);
+		if (key == SDLK_s) m_audio.toggleSynth(m_song->vocals.notes);
 		if (key == SDLK_v) m_audio.streamFade("vocals", event.key.keysym.mod & KMOD_SHIFT ? 1.0 : 0.0);
 		if (key == SDLK_k) dispInFlash(++config["game/karaoke_mode"]); // Toggle karaoke mode
 		if (key == SDLK_w) dispInFlash(++config["game/pitch"]); // Toggle pitch wave
@@ -326,7 +326,7 @@ void ScreenSing::draw() {
 		unsigned t = clamp(time, 0.0, length);
 		m_progress->draw(songPercent);
 		std::string statustxt = (boost::format("%02u:%02u") % (t / 60) % (t % 60)).str();
-		if (!m_score_window.get() && m_only_singers_alive && !m_song->notes.empty()) {
+		if (!m_score_window.get() && m_only_singers_alive && !m_song->vocals.notes.empty()) {
 			if (status == Song::INSTRUMENTAL_BREAK) statustxt += _("   ENTER to skip instrumental break");
 			if (status == Song::FINISHED && !config["game/karaoke_mode"].b()) statustxt += _("   Remember to wait for grading!");
 		}
@@ -350,7 +350,7 @@ void ScreenSing::draw() {
 			}
 		}
 		else if (!m_audio.isPlaying() || (status == Song::FINISHED
-		  && m_audio.getLength() - time <= (m_song->track_map.empty() && m_song->danceTracks.empty() ? 3.0 : 0.2) )) {
+		  && m_audio.getLength() - time <= (m_song->instrumentTracks.empty() && m_song->danceTracks.empty() ? 3.0 : 0.2) )) {
 			// Time to create the score window
 			m_quitTimer.setValue(QUIT_TIMEOUT);
 			m_engine->kill(); // kill the engine thread (to avoid consuming memory)
@@ -394,8 +394,8 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database, Dancers& 
 		item.track_simple = it->getTrack();
 		item.track = it->getTrack() + " - " + it->getDifficultyString();
 		item.track[0] = toupper(item.track[0]); // Capitalize
-		if (item.track_simple == "drums") item.color = glutil::Color(0.1f, 0.1f, 0.1f);
-		else if (item.track_simple == "bass") item.color = glutil::Color(0.5f, 0.3f, 0.1f);
+		if (item.track_simple == TrackName::DRUMS) item.color = glutil::Color(0.1f, 0.1f, 0.1f);
+		else if (item.track_simple == TrackName::BASS) item.color = glutil::Color(0.5f, 0.3f, 0.1f);
 		else item.color = glutil::Color(1.0f, 0.0f, 0.0f);
 
 		m_database.scores.push_back(item);

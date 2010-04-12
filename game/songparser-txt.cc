@@ -43,26 +43,27 @@ void SongParser::txtParseHeader() {
 	while (getline(line) && txtParseField(line)) {}
 	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
 	if (m_bpm != 0.0) addBPM(0, m_bpm);
-	s.notes.push_back(Note()); // Dummy note to indicate there is a track
+	s.vocals.notes.push_back(Note()); // Dummy note to indicate there is a track
 }
 
 /// Parse notes
 void SongParser::txtParse() {
 	std::string line;
-	m_song.notes.clear();
+	VocalTrack &vocal = m_song.vocals;
+	vocal.notes.clear();
 	while (getline(line) && txtParseField(line)) {} // Parse the header again
 	if (m_bpm != 0.0) addBPM(0, m_bpm);
-	while (txtParseNote(line) && getline(line)) {} // Parse notes
+	while (txtParseNote(line, vocal) && getline(line)) {} // Parse notes
 	// Workaround for the terminating : 1 0 0 line, written by some converters
-	if (!m_song.notes.empty() && m_song.notes.back().type != Note::SLEEP
-	  && m_song.notes.back().begin == m_song.notes.back().end) m_song.notes.pop_back();
+	if (!vocal.notes.empty() && vocal.notes.back().type != Note::SLEEP
+	  && vocal.notes.back().begin == vocal.notes.back().end) vocal.notes.pop_back();
 }
 
 bool SongParser::txtParseField(std::string const& line) {
 	if (line.empty()) return true;
 	if (line[0] != '#') return false;
 	std::string::size_type pos = line.find(':');
-	if (pos == std::string::npos) throw std::runtime_error("Invalid format, should be #key:value");
+	if (pos == std::string::npos) throw std::runtime_error("Invalid txt format, should be #key:value");
 	std::string key = boost::trim_copy(line.substr(1, pos - 1));
 	std::string value = boost::trim_copy(line.substr(pos + 1));
 	if (value.empty()) return true;
@@ -86,7 +87,7 @@ bool SongParser::txtParseField(std::string const& line) {
 	return true;
 }
 
-bool SongParser::txtParseNote(std::string line) {
+bool SongParser::txtParseNote(std::string line, VocalTrack &vocal) {
 	if (line.empty() || line == "\r") return true;
 	if (line[0] == '#') throw std::runtime_error("Key found in the middle of notes");
 	if (line[line.size() - 1] == '\r') line.erase(line.size() - 1);
@@ -132,8 +133,8 @@ bool SongParser::txtParseNote(std::string line) {
 	  default: throw std::runtime_error("Unknown note type");
 	}
 	n.begin = tsTime(ts);
-	Notes& notes = m_song.notes;
-	if (m_relative && m_song.notes.empty()) m_relativeShift = ts;
+	Notes& notes = vocal.notes;
+	if (m_relative && notes.empty()) m_relativeShift = ts;
 	m_prevts = ts;
 	if (n.begin < m_prevtime) {
 		// Oh no, overlapping notes (b0rked file)
@@ -160,8 +161,8 @@ bool SongParser::txtParseNote(std::string line) {
 	double prevtime = m_prevtime;
 	m_prevtime = n.end;
 	if (n.type != Note::SLEEP && n.end > n.begin) {
-		m_song.noteMin = std::min(m_song.noteMin, n.note);
-		m_song.noteMax = std::max(m_song.noteMax, n.note);
+		vocal.noteMin = std::min(vocal.noteMin, n.note);
+		vocal.noteMax = std::max(vocal.noteMax, n.note);
 		m_maxScore += n.maxScore();
 	}
 	if (n.type == Note::SLEEP) {
