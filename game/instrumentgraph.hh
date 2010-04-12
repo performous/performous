@@ -34,12 +34,16 @@ class InstrumentGraph {
 	  m_dead()
 	  {
 		m_popupText.reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
-
 	};
+
+	virtual void draw(double time) = 0;
+	virtual void engine() = 0;
+	virtual bool dead() const = 0;
+	virtual std::string getTrack() const = 0;
+	virtual std::string getDifficultyString() const = 0;
 
 	void position(double cx, double width) { m_cx.setTarget(cx); m_width.setTarget(width); }
 	unsigned stream() const { return m_stream; }
-	bool dead() const;
 	double correctness() const { return m_correctness.get(); }
 	int getScore() const { return (m_score > 0 ? m_score : 0) * m_scoreFactor; }
   protected:

@@ -60,7 +60,6 @@ class GuitarGraph: public InstrumentGraph {
 	void draw(double time);
 	void engine();
 	bool dead() const;
-	std::string getTrackIndex() const { return m_track_index->first; }
 	std::string getTrack() const { return m_track_index->first; }
 	std::string getDifficultyString() const;
   private:

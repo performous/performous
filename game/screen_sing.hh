@@ -6,6 +6,7 @@
 #include "layout_singer.hh"
 #include "animvalue.hh"
 #include "engine.hh"
+#include "instrumentgraph.hh"
 #include "guitargraph.hh"
 #include "dancegraph.hh"
 #include "screen.hh"
@@ -14,7 +15,6 @@
 #include "surface.hh"
 #include "opengl_text.hh"
 #include "progressbar.hh"
-#include "guitargraph.hh"
 
 #include "screen_players.hh"
 
@@ -24,8 +24,8 @@ class Capture;
 class Database;
 class Video;
 
-typedef boost::ptr_vector<GuitarGraph> Instruments;
-typedef boost::ptr_vector<DanceGraph> Dancers;
+typedef boost::ptr_vector<InstrumentGraph> Instruments;
+typedef boost::ptr_vector<InstrumentGraph> Dancers;
 
 /// shows score at end of song
 class ScoreWindow {

@@ -467,7 +467,7 @@ void DanceGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 		m_text.dimensions.screenBottom(-0.075).middle(-0.09 + offsetX);
 		m_text.draw("^ " + getDifficultyString() + " v");
 		m_text.dimensions.screenBottom(-0.050).middle(-0.09 + offsetX);
-		m_text.draw("< " + getGameMode() + " >");
+		m_text.draw("< " + getTrack() + " >");
 	} else { // Draw scores
 		m_text.dimensions.screenBottom(-0.35).middle(0.32 * dimensions.w() + offsetX);
 		m_text.draw(boost::lexical_cast<std::string>(unsigned(getScore())));

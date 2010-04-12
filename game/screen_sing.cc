@@ -119,7 +119,7 @@ bool ScreenSing::instrumentLayout(double time) {
 		it->engine(); // Run engine even when dead so that joining is possible
 		if (!it->dead()) {
 			it->position((0.5 + i - 0.5 * count) * iw, iw); // Do layout stuff
-			CountSum& cs = volume[it->getTrackIndex()];
+			CountSum& cs = volume[it->getTrack()];
 			cs.first++;
 			cs.second += it->correctness();
 			it->draw(time);
@@ -406,8 +406,8 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database, Dancers& 
 		ScoreItem item; item.type = ScoreItem::DANCER;
 		item.score = it->getScore();
 		if (item.score < 100) { it = dancers.erase(it); continue; } // Dead
-		item.track_simple = it->getGameMode();
-		item.track = it->getGameMode() + " - " + it->getDifficultyString();
+		item.track_simple = it->getTrack();
+		item.track = it->getTrack() + " - " + it->getDifficultyString();
 		item.track[0] = toupper(item.track[0]); // Capitalize
 		item.color = glutil::Color(1.0f, 0.4f, 0.1f);
 

@@ -40,7 +40,7 @@ class DanceGraph: public InstrumentGraph {
 	void draw(double time);
 	void engine();
 	bool dead() const;
-	std::string getGameMode() const { return m_gamingMode; }
+	std::string getTrack() const { return m_gamingMode; }
 	std::string getDifficultyString() const;
   private:
 	enum DanceStep { STEP_LEFT, STEP_DOWN, STEP_UP, STEP_RIGHT };

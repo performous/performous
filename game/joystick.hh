@@ -115,7 +115,7 @@ namespace input {
 	struct NoDevError: std::runtime_error {
 		NoDevError(): runtime_error("No instrument of the requested type was available") {}
 	};
-	
+
 	class InputDev {
 	  public:
 		// First gives a correct instrument type
