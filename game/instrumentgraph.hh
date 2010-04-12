@@ -17,8 +17,8 @@ class Song;
 class InstrumentGraph {
   public:
 	/// Constructor
-	InstrumentGraph(Audio& audio, Song const& song, input::InputDev input):
-	  m_audio(audio), m_song(song), m_input(input),
+	InstrumentGraph(Audio& audio, Song const& song, input::DevType inp):
+	  m_audio(audio), m_song(song), m_input(input::DevType(inp)),
 	  m_stream(),
 	  m_cx(0.0, 0.2), m_width(0.5, 0.4),
 	  m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),

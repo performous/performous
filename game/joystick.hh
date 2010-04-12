@@ -4,6 +4,7 @@
 #include <deque>
 #include <iostream>
 #include <stdexcept>
+#include <boost/noncopyable.hpp>
 
 #include "SDL_events.h"
 #include "SDL_joystick.h"
@@ -116,7 +117,7 @@ namespace input {
 		NoDevError(): runtime_error("No instrument of the requested type was available") {}
 	};
 
-	class InputDev {
+	class InputDev: boost::noncopyable {
 	  public:
 		// First gives a correct instrument type
 		// Then gives an unknown instrument type
