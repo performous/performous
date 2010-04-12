@@ -124,5 +124,8 @@ class GuitarGraph: public InstrumentGraph {
 	double m_starmeter; /// when this is high enough, GodMode becomes available
 	double m_drumfillHits; /// keeps track that enough hits are scored
 	double m_drumfillScore; /// max score for the notes under drum fill
+	double m_soloTotal; /// maximum solo score
+	double m_soloScore; /// score during solo
+	bool m_solo; /// are we currently playing a solo
 };
 

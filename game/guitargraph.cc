@@ -71,7 +71,10 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number)
   m_drumJump(0.0, 12.0),
   m_starmeter(),
   m_drumfillHits(),
-  m_drumfillScore()
+  m_drumfillScore(),
+  m_soloTotal(),
+  m_soloScore(),
+  m_solo()
 {
 	// Copy all tracks of supported types (either drums or non-drums) to m_instrumentTracks
 	for (InstrumentTracks::const_iterator it = m_song.instrumentTracks.begin(); it != m_song.instrumentTracks.end(); ++it) {
@@ -227,6 +230,15 @@ void GuitarGraph::engine() {
 	while (m_chordIt != m_chords.end() && m_chordIt->begin + maxTolerance < time) {
 		if ( (m_drums && m_chordIt->status != m_chordIt->polyphony)
 		  || (!m_drums && m_chordIt->status == 0) ) endStreak();
+		// Calculate solo total score
+		if (m_solo) m_soloTotal += m_chordIt->polyphony * points(0);
+		// Solo just ended?
+		else if (m_soloTotal > 0) {
+			m_popups.push_back(Popup(boost::lexical_cast<std::string>(unsigned(m_soloScore / m_soloTotal * 100)) + " %",
+			  glutil::Color(0.0f, 0.8f, 0.0f), 1.0, m_popupText.get()));
+			m_soloScore = 0;
+			m_soloTotal = 0;
+		}
 		++m_dead;
 		++m_chordIt;
 	}
@@ -268,12 +280,17 @@ void GuitarGraph::engine() {
 			if (last == ev.dur->end) endHold(fret, time);
 		}
 	}
+	// Update solo status
+	m_solo = false;
+	for (Durations::const_iterator it = m_solos.begin(); it != m_solos.end(); ++it) {
+		if (time >= it->begin && time <= it->end) { m_solo = true; break; }
+	}
 	// Check if a long streak goal has been reached
 	if (m_streak >= getNextBigStreak(m_bigStreak)) {
 		m_bigStreak = getNextBigStreak(m_bigStreak);
 		m_starmeter += streakStarBonus;
 		m_popups.push_back(Popup(boost::lexical_cast<std::string>(unsigned(m_bigStreak)) + "\nStreak!",
-		  glutil::Color(1.0f, 0.0, 0.0), 1.0, m_popupText.get()));
+		  glutil::Color(1.0f, 0.0f, 0.0f), 1.0, m_popupText.get()));
 	}
 	// During GodMode, correctness is full, no matter what
 	if (m_starpower.get() > 0.01) m_correctness.setTarget(1.0, true);
@@ -498,6 +515,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 		m_chordIt->status = 1 + picked;
 		m_score += score;
 		m_starmeter += score;
+		if (m_solo) m_soloScore += score;
 		m_correctness.setTarget(1.0, true); // Instantly go to one
 		for (int fret = 0; fret < 5; ++fret) {
 			if (!m_chordIt->fret[fret]) continue;
@@ -536,6 +554,7 @@ glutil::Color const& GuitarGraph::color(int fret) const {
 glutil::Color const GuitarGraph::colorize(glutil::Color c, double time) const {
 	const static glutil::Color godmodeC(0.5f, 0.5f, 1.0f); // Color for full GodMode
 	const static glutil::Color soloC(0.2f, 0.9f, 0.2f); // Color for solo notes
+	// Solo? (cannot use m_solo, as time can be in future)
 	for (Durations::const_iterator it = m_solos.begin(); it != m_solos.end(); ++it) {
 		if (time >= it->begin && time <= it->end) { c = soloC; break; }
 	}
@@ -876,15 +895,11 @@ void GuitarGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 		if (m_drums && m_dfIt != m_drumfills.end() && time >= m_dfIt->begin && time <= m_dfIt->end)
 			m_text.draw("  Drum Fill!  ", a);
 		else m_text.draw("God Mode Ready!", a);
-	} else {
-		// Solo?
-		for (Durations::const_iterator it = m_solos.begin(); it != m_solos.end(); ++it) {
-			if (time >= it->begin && time <= it->end) {
-				float a = std::abs(std::fmod(time, 1.0) - 0.5f) * 2.0f;
-				m_text.dimensions.screenBottom(-0.02).middle(-0.03 + offsetX);
-				m_text.draw("Solo!", a);
-			}
-		}
+	} else if (m_solo) {
+		// Solo
+		float a = std::abs(std::fmod(time, 1.0) - 0.5f) * 2.0f;
+		m_text.dimensions.screenBottom(-0.02).middle(-0.03 + offsetX);
+		m_text.draw("Solo!", a);
 	}
 	drawPopups(offsetX);
 }
