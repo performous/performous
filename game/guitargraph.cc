@@ -270,9 +270,10 @@ void GuitarGraph::engine() {
 	}
 	// Check if a long streak goal has been reached
 	if (m_streak >= getNextBigStreak(m_bigStreak)) {
-		m_streakPopup.setTarget(1.0);
 		m_bigStreak = getNextBigStreak(m_bigStreak);
 		m_starmeter += streakStarBonus;
+		m_popups.push_back(Popup(boost::lexical_cast<std::string>(unsigned(m_bigStreak)) + "\nStreak!",
+		  glutil::Color(1.0f, 0.0, 0.0), 1.0, m_popupText.get()));
 	}
 	// During GodMode, correctness is full, no matter what
 	if (m_starpower.get() > 0.01) m_correctness.setTarget(1.0, true);
@@ -288,7 +289,8 @@ void GuitarGraph::activateStarpower() {
 	if (canActivateStarpower()) {
 		m_starmeter = 0;
 		m_starpower.setValue(1.0);
-		m_godmodePopup.setTarget(1.0);
+		m_popups.push_back(Popup("God Mode\nActivated!",
+		  glutil::Color(0.3f, 0.0f, 1.0f), 0.666, m_popupText.get(), "Mistakes ignored!", &m_text));
 	}
 }
 
@@ -884,7 +886,7 @@ void GuitarGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 			}
 		}
 	}
-	drawPopups(time, offsetX, dimensions);
+	drawPopups(offsetX);
 }
 
 /// Draw a bar for drum bass pedal/note

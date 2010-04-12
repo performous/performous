@@ -12,6 +12,44 @@
 #include "glutil.hh"
 #include "fs.hh"
 
+class Popup {
+  public:
+	/// Constructor
+	Popup(std::string msg, glutil::Color c, double speed, SvgTxtThemeSimple* popupText, std::string info = "", SvgTxtTheme* infoText = NULL):
+	  m_msg(msg), m_color(c), m_anim(AnimValue(0.0, speed)), m_popupText(popupText), m_info(info), m_infoText(infoText)
+	  {
+		m_anim.setTarget(1.0, false);
+	}
+	/// Draw the popup
+	/// Returns false if it is expired
+	bool draw(double offsetX) {
+		double anim = m_anim.get();
+		if (anim > 0.0 && m_popupText) {
+			float s = 0.2 * (1.0 + anim);
+			float a = 1.0 - anim;
+			m_color.a = a;
+			glColor4fv(m_color);
+			m_popupText->render(m_msg);
+			m_popupText->dimensions().center(0.1).middle(offsetX).stretch(s,s);
+			m_popupText->draw();
+			if (m_info != "" && m_infoText) {
+				m_infoText->dimensions.screenBottom(-0.02).middle(-0.12 + offsetX);
+				m_infoText->draw(m_info, a);
+			}
+			if (anim > 0.999) m_anim.setTarget(0.0, true);
+		} else return false;
+		return true;
+	}
+  private:
+	std::string m_msg;  /// Popup text
+	glutil::Color m_color;  /// Color
+	AnimValue m_anim;  /// Animation timer
+	SvgTxtThemeSimple* m_popupText;  /// Font for popup
+	std::string m_info;  /// Text to show in the bottom
+	SvgTxtTheme* m_infoText;  /// Font for the additional text
+};
+
+
 class Song;
 
 class InstrumentGraph {
@@ -23,8 +61,6 @@ class InstrumentGraph {
 	  m_cx(0.0, 0.2), m_width(0.5, 0.4),
 	  m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
 	  m_correctness(0.0, 5.0),
-	  m_streakPopup(0.0, 1.0),
-	  m_godmodePopup(0.0, 0.666),
 	  m_score(),
 	  m_scoreFactor(),
 	  m_streak(),
@@ -64,15 +100,15 @@ class InstrumentGraph {
 	};
 	typedef std::vector<Event> Events;
 	Events m_events;
+	typedef std::vector<Popup> Popups;
+	Popups m_popups;
 
-	void drawPopups(double time, double offsetX, Dimensions dimensions);
+	void drawPopups(double offsetX);
 
 	SvgTxtTheme m_text;
 	boost::scoped_ptr<SvgTxtThemeSimple> m_popupText;
 
 	AnimValue m_correctness;
-	AnimValue m_streakPopup; /// for animating the popup
-	AnimValue m_godmodePopup; /// for animating the popup
 	double m_score; /// unnormalized scores
 	double m_scoreFactor; /// normalization factor
 	double m_starmeter; /// when this is high enough, GodMode becomes available
