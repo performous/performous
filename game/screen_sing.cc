@@ -102,7 +102,7 @@ void ScreenSing::enter() {
 	// Startup delay for instruments is longer than for singing only
 	double setup_delay = (m_instruments.empty() && m_dancers.empty() ? -1.0 : -8.0);
 	m_audio.playMusic(m_song->music, false, 0.0, setup_delay);
-	m_engine.reset(new Engine(m_audio, *m_song, analyzers.begin(), analyzers.end(), m_database));
+	m_engine.reset(new Engine(m_audio, m_song->vocals, analyzers.begin(), analyzers.end(), m_database));
 }
 
 /// Manages the instrument drawing
