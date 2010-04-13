@@ -77,7 +77,7 @@ void ScreenSing::enter() {
 	m_progress->dimensions.fixedWidth(0.4).left(-0.5).screenTop();
 	theme->timer.dimensions.screenTop(0.5 * m_progress->dimensions.h());
 	boost::ptr_vector<Analyzer>& analyzers = m_capture.analyzers();
-	m_layout_singer.reset(new LayoutSinger(*m_song, m_database, theme));
+	m_layout_singer.reset(new LayoutSinger(m_song->vocals, m_database, theme));
 	// Load instrument and dance tracks
 	{
 		int type = 0; // 0 for dance, 1 for guitars, 2 for drums
