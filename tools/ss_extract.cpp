@@ -354,7 +354,7 @@ void saveTxtFile(xmlpp::NodeSet &sentence, const fs::path &path, const Song &son
 	//txtfile << "#LANGUAGE:English" << std::endl; // Detect instead of hardcoding?
 	if (!song.music.empty()) txtfile << "#MP3:" << filename(song.music) << std::endl;
 	if (!song.vocals.empty()) txtfile << "#VOCALS:" << filename(song.vocals) << std::endl;
-	if (!song.vocals.empty()) txtfile << "#VIDEO:" << filename(song.video) << std::endl;
+	if (!song.video.empty()) txtfile << "#VIDEO:" << filename(song.video) << std::endl;
 	if (!song.cover.empty()) txtfile << "#COVER:" << filename(song.cover) << std::endl;
 	//txtfile << "#BACKGROUND:background.jpg" << std::endl;
 	txtfile << "#BPM:" << song.tempo << std::endl;
