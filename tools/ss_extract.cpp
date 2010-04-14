@@ -495,7 +495,7 @@ struct Process {
 						video_us(song, dataPak[id + "/mus+vid.iav"], dataPak[id + "/mus+vid.ind"], path);
 					} catch (std::exception& e) {
 						std::cerr << "!!! Unable to extract video: " << e.what() << std::endl;
-						song.video.clear();
+						song.video = "";
 					}
 				}
 				if (mkvcompress) {
