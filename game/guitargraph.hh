@@ -92,6 +92,7 @@ class GuitarGraph {
 	boost::scoped_ptr<Texture> m_neck; /// necks
 	bool m_drums; /// are we using drums?
 	bool m_use3d; /// are we using 3d?
+	bool m_leftymode; /// switch guitar notes to right-to-left direction
 	AnimValue m_starpower; /// how long the GodMode lasts (also used in fading the effect)
 	AnimValue m_cx, m_width; /// controls horizontal position and width smoothly
 	std::size_t m_stream;
@@ -133,6 +134,7 @@ class GuitarGraph {
 	void nextTrack(bool fast = false);
 	void difficultyAuto(bool tryKeepCurrent = false);
 	bool difficulty(Difficulty level);
+	float getFretX(int fret) const { return (-2.0f + fret- (m_drums ? 0.5 : 0)) * (m_leftymode ? -1 : 1); }
 	SvgTxtTheme m_text;
 	boost::scoped_ptr<SvgTxtThemeSimple> m_scoreText;
 	boost::scoped_ptr<SvgTxtThemeSimple> m_streakText;
