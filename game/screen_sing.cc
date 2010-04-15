@@ -77,7 +77,7 @@ void ScreenSing::enter() {
 	m_progress->dimensions.fixedWidth(0.4).left(-0.5).screenTop();
 	theme->timer.dimensions.screenTop(0.5 * m_progress->dimensions.h());
 	boost::ptr_vector<Analyzer>& analyzers = m_capture.analyzers();
-	m_layout_singer.reset(new LayoutSinger(*m_song, m_database, theme));
+	m_layout_singer.reset(new LayoutSinger(m_song->vocals, m_database, theme));
 	// Load instrument and dance tracks
 	{
 		int type = 0; // 0 for dance, 1 for guitars, 2 for drums
@@ -102,7 +102,7 @@ void ScreenSing::enter() {
 	// Startup delay for instruments is longer than for singing only
 	double setup_delay = (m_instruments.empty() && m_dancers.empty() ? -1.0 : -8.0);
 	m_audio.playMusic(m_song->music, false, 0.0, setup_delay);
-	m_engine.reset(new Engine(m_audio, *m_song, analyzers.begin(), analyzers.end(), m_database));
+	m_engine.reset(new Engine(m_audio, m_song->vocals, analyzers.begin(), analyzers.end(), m_database));
 }
 
 /// Manages the instrument drawing

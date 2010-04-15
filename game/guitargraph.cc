@@ -66,6 +66,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number)
   m_neckglowColor(),
   m_drums(drums),
   m_use3d(config["graphic/3d_notes"].b()),
+  m_leftymode(false),
   m_starpower(0.0, 0.1),
   m_cx(0.0, 0.2),
   m_width(0.5, 0.4),
@@ -233,6 +234,9 @@ void GuitarGraph::engine() {
 				else if (ev.pressed[3 + m_drums]) difficulty(DIFFICULTY_AMAZING);
 				difficulty_changed = true;
 			}
+			// Lefty-mode switch
+			if (!m_drums && ev.type == input::Event::PRESS && ev.pressed[0] && ev.pressed[1])
+				m_leftymode = !m_leftymode;
 		// Playing
 		} else if (m_drums) {
 			if (ev.type == input::Event::PRESS) drumHit(time, ev.button);
@@ -635,7 +639,7 @@ void GuitarGraph::draw(double time) {
 		drawBar(0.0, 0.01f);
 		// Fret buttons on cursor
 		for (int fret = m_drums; fret < 5; ++fret) {
-			float x = -2.0f + fret - 0.5f * m_drums;
+			float x = getFretX(fret);
 			float l = m_hit[fret + !m_drums].get();
 			// Get a color for the fret and adjust it if GodMode is on
 			glColor4fv(colorize(color(fret), time));
@@ -714,7 +718,7 @@ void GuitarGraph::draw(double time) {
 			}
 			Texture* ftex = &m_flame;
 			if (m_starpower.get() > 0.01) ftex = &m_flame_godmode;
-			float x = -2.0f + fret - 0.5f * m_drums;
+			float x = getFretX(fret);
 			for (std::vector<AnimValue>::iterator it = m_flames[fret].begin(); it != m_flames[fret].end();) {
 				float flameAnim = it->get();
 				if (flameAnim < 1.0f) {
@@ -789,8 +793,7 @@ void GuitarGraph::draw(double time) {
 /// Draws a single note
 /// The times passed are normalized to [past, future]
 void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, float whammy, bool tappable, bool hit, double hitAnim, double releaseTime) {
-	float x = -2.0f + fret;
-	if (m_drums) x -= 0.5f;
+	float x = getFretX(fret);
 	if (m_drums && fret == 0) { // Bass drum? That's easy
 		if (hit || hitAnim > 0) return;	// Hide it if it's hit
 		c.a = time2a(tBeg); glColor4fv(c);

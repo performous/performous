@@ -13,8 +13,8 @@ class Song;
 
 /// player class
 struct Player {
-	/// currently playing song
-	Song& m_song;
+	/// currently playing vocals track
+	VocalTrack& m_vocals;
 	/// sound analyzer
 	Analyzer& m_analyzer;
 	/// player color for bars, waves, scores
@@ -42,7 +42,7 @@ struct Player {
 	/// score iterator
 	Notes::const_iterator m_scoreIt;
 	/// constructor
-	Player(Song& song, Analyzer& analyzer, size_t frames);
+	Player(VocalTrack& vocals, Analyzer& analyzer, size_t frames);
 	/// prepares analyzer
 	void prepare() { m_analyzer.process(); }
 	/// updates player stats
