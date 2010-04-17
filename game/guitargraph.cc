@@ -77,6 +77,8 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number)
   m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
   m_correctness(0.0, 5.0),
   m_errorMeter(0.0, 2.0),
+  m_errorMeterFlash(0.0, 4.0),
+  m_errorMeterFade(0.0, 0.333),
   m_drumJump(0.0, 12.0),
   m_streakPopup(0.0, 1.0),
   m_godmodePopup(0.0, 0.666),
@@ -314,6 +316,14 @@ void GuitarGraph::activateStarpower() {
 	}
 }
 
+/// New hit for the error indicator
+void GuitarGraph::errorMeter(float error) {
+	error /=  maxTolerance;
+	m_errorMeter.setTarget(error, true);
+	m_errorMeterFade.setValue(1.0);
+	if (std::abs(error) < 0.10) m_errorMeterFlash.setValue(1.0);
+}
+
 /// Mark the holding of a note as ended
 void GuitarGraph::endHold(int fret, double time) {
 	if (fret >= 5 || !m_holds[fret]) return;
@@ -448,7 +458,7 @@ void GuitarGraph::drumHit(double time, int fret) {
 			// Handle Big Rock Ending scoring
 			if (m_drumfillHits > 0 && *best == m_chords.back()) endBRE();
 			// ErrorMeter
-			m_errorMeter.setTarget(signed_error / maxTolerance, true);
+			errorMeter(signed_error);
 		}
 		m_correctness.setTarget(double(m_chordIt->status) / m_chordIt->polyphony, true);
 	}
@@ -524,8 +534,8 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 		m_chordIt->status = 1 + picked;
 		m_score += score;
 		m_starmeter += score;
-		m_errorMeter.setTarget(signed_error / maxTolerance, true);
 		m_correctness.setTarget(1.0, true); // Instantly go to one
+		errorMeter(signed_error);
 		for (int fret = 0; fret < 5; ++fret) {
 			if (!m_chordIt->fret[fret]) continue;
 			Duration const* dur = m_chordIt->dur[fret];
@@ -741,7 +751,9 @@ void GuitarGraph::draw(double time) {
 			float maxsize = 1.0f;
 			float thickness = 0.1f;
 			float y = time2y(past / 3.0f);
-			glColor4f(0.0f, 0.0f, 0.0f, 0.6f);
+			float alpha = m_errorMeterFade.get();
+			float bgcol = m_errorMeterFlash.get();
+			glColor4f(bgcol, bgcol, bgcol, 0.6f * alpha);
 			{ // Indicator background
 				glutil::Begin block(GL_TRIANGLE_STRIP);
 				glVertex3f(-maxsize, y, thickness);
@@ -752,8 +764,8 @@ void GuitarGraph::draw(double time) {
 			float error = m_errorMeter.get();
 			if (error != 0) {
 				float x1 = 0, x2 = 0;
-				if (error > 0) { glColor4f(0.0f, 1.0f, 0.0f, 1.0f); x2 = -maxsize * error; }
-				else { glColor4f(1.0f, 0.0f, 0.0f, 1.0f); x1 = -maxsize * error; }
+				if (error > 0) { glColor4f(0.0f, 1.0f, 0.0f, alpha); x2 = -maxsize * error; }
+				else { glColor4f(1.0f, 0.0f, 0.0f, alpha); x1 = -maxsize * error; }
 				glutil::Begin block(GL_TRIANGLE_STRIP);
 				glVertex3f(x1, y, 0.0f);
 				glVertex3f(x2, y, 0.0f);

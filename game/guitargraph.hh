@@ -69,6 +69,7 @@ class GuitarGraph {
   private:
 	bool canActivateStarpower() { return (m_starmeter > 6000); }
 	void activateStarpower();
+	void errorMeter(float error);
 	void fail(double time, int fret);
 	void endHold(int fret, double time = 0.0);
 	void endBRE();
@@ -147,6 +148,8 @@ class GuitarGraph {
 	NoteStatus m_notes;
 	AnimValue m_correctness;
 	AnimValue m_errorMeter;
+	AnimValue m_errorMeterFlash;
+	AnimValue m_errorMeterFade;
 	AnimValue m_drumJump;
 	AnimValue m_streakPopup; /// for animating the popup
 	AnimValue m_godmodePopup; /// for animating the popup
