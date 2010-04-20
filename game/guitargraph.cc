@@ -748,29 +748,30 @@ void GuitarGraph::draw(double time) {
 			}
 		}
 		{ // Accuracy indicator
-			float maxsize = 1.0f;
-			float thickness = 0.1f;
-			float y = time2y(past / 3.0f);
+			float maxsize = 1.5f;
+			float thickness = 0.12f;
+			float x = -2.5 - thickness;
+			float y = time2y(0.0);
 			float alpha = m_errorMeterFade.get();
 			float bgcol = m_errorMeterFlash.get();
 			glColor4f(bgcol, bgcol, bgcol, 0.6f * alpha);
 			{ // Indicator background
 				glutil::Begin block(GL_TRIANGLE_STRIP);
-				glVertex3f(-maxsize, y, thickness);
-				glVertex3f( maxsize, y, thickness);
-				glVertex3f(-maxsize, y, 0.0f);
-				glVertex3f( maxsize, y, 0.0f);
+				glVertex2f(x - thickness, y + maxsize);
+				glVertex2f(x, y + maxsize);
+				glVertex2f(x - thickness, y - maxsize);
+				glVertex2f(x, y - maxsize);
 			}
 			float error = m_errorMeter.get();
 			if (error != 0) {
-				float x1 = 0, x2 = 0;
-				if (error > 0) { glColor4f(0.0f, 1.0f, 0.0f, alpha); x2 = -maxsize * error; }
-				else { glColor4f(1.0f, 0.0f, 0.0f, alpha); x1 = -maxsize * error; }
+				float y1 = 0, y2 = 0;
+				if (error > 0) { glColor4f(0.0f, 1.0f, 0.0f, alpha); y2 = -maxsize * error; }
+				else { glColor4f(1.0f, 0.0f, 0.0f, alpha); y1 = -maxsize * error; }
 				glutil::Begin block(GL_TRIANGLE_STRIP);
-				glVertex3f(x1, y, 0.0f);
-				glVertex3f(x2, y, 0.0f);
-				glVertex3f(x1, y, thickness);
-				glVertex3f(x2, y, thickness);
+				glVertex2f(x - thickness, y1 + y);
+				glVertex2f(x, y1 + y);
+				glVertex2f(x - thickness, y2 + y);
+				glVertex2f(x, y2 + y);
 				if (m_errorMeter.get() == m_errorMeter.getTarget())
 					m_errorMeter.setTarget(0.0);
 			}
