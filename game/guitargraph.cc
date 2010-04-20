@@ -749,40 +749,28 @@ void GuitarGraph::draw(double time) {
 		}
 		{ // Accuracy indicator
 			float maxsize = 1.0f;
-			float thickness = 0.05f;
-			float x = 0.0;
+			float thickness = 0.1f;
 			float y = time2y(past / 3.0f);
-			float w = maxsize;
-			float h = thickness;
 			float alpha = m_errorMeterFade.get();
 			float bgcol = m_errorMeterFlash.get();
-			// Vertical bar?
-			bool VERTICALMETER = true;
-			if (VERTICALMETER) {
-				std::swap(w, h);
-				x = -2.5 - thickness;
-				y = time2y(0.0);
-			}
 			glColor4f(bgcol, bgcol, bgcol, 0.6f * alpha);
 			{ // Indicator background
 				glutil::Begin block(GL_TRIANGLE_STRIP);
-				glVertex3f(x-w, y, -h);
-				glVertex3f(x+w, y, -h);
-				glVertex3f(x-w, y, h);
-				glVertex3f(x+w, y, h);
+				glVertex3f(-maxsize, y, thickness);
+				glVertex3f( maxsize, y, thickness);
+				glVertex3f(-maxsize, y, 0.0f);
+				glVertex3f( maxsize, y, 0.0f);
 			}
 			float error = m_errorMeter.get();
 			if (error != 0) {
 				float x1 = 0, x2 = 0;
-				float h1 = -thickness, h2 = thickness;
-				if (error > 0) { glColor4f(0.0f, 1.0f, 0.0f, alpha); x2 -= maxsize * error; }
-				else { glColor4f(1.0f, 0.0f, 0.0f, alpha); x1 -= maxsize * error; }
-				if (VERTICALMETER) { std::swap(x1, h1); std::swap(x2,h2); }
+				if (error > 0) { glColor4f(0.0f, 1.0f, 0.0f, alpha); x2 = -maxsize * error; }
+				else { glColor4f(1.0f, 0.0f, 0.0f, alpha); x1 = -maxsize * error; }
 				glutil::Begin block(GL_TRIANGLE_STRIP);
-				glVertex3f(x1+x, y, h1);
-				glVertex3f(x2+x, y, h1);
-				glVertex3f(x1+x, y, h2);
-				glVertex3f(x2+x, y, h2);
+				glVertex3f(x1, y, 0.0f);
+				glVertex3f(x2, y, 0.0f);
+				glVertex3f(x1, y, thickness);
+				glVertex3f(x2, y, thickness);
 				if (m_errorMeter.get() == m_errorMeter.getTarget())
 					m_errorMeter.setTarget(0.0);
 			}
