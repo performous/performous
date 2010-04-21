@@ -222,6 +222,9 @@ void GuitarGraph::engine() {
 			}
 			if (ev.type == input::Event::RELEASE) endHold(ev.button, time);
 			if (ev.type == input::Event::WHAMMY) whammy = (1.0 + ev.button + 2.0*(rand()/double(RAND_MAX))) / 4.0;
+		} else {
+			// Handle drum lefty-mode
+			if (m_leftymode && ev.button > 0) ev.button = 5 - ev.button;
 		}
 		// Keypress anims
 		if (ev.type == input::Event::PRESS) m_hit[!m_drums + ev.button].setValue(1.0);
@@ -237,7 +240,7 @@ void GuitarGraph::engine() {
 				difficulty_changed = true;
 			}
 			// Lefty-mode switch
-			if (!m_drums && ev.type == input::Event::PRESS && ev.pressed[0] && ev.pressed[1])
+			if (ev.type == input::Event::PRESS && ev.pressed[1] && ev.pressed[(m_drums ? 2 : 1)])
 				m_leftymode = !m_leftymode;
 		// Playing
 		} else if (m_drums) {
