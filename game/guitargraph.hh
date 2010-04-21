@@ -127,5 +127,6 @@ class GuitarGraph: public InstrumentGraph {
 	double m_soloTotal; /// maximum solo score
 	double m_soloScore; /// score during solo
 	bool m_solo; /// are we currently playing a solo
+	int m_countdown; /// countdown counter
 };
 
