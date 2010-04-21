@@ -225,7 +225,7 @@ MidiFileParser::Track MidiFileParser::read_track(MidiStream& stream) {
 			case 0xC: case 0xD: break;  // These only take one argument
 			default: throw std::runtime_error("Unknown MIDI event");  // Quite possibly this is impossible, but I am too tired to prove it.
 			}
-			process_midi_event(track, event >> 4, arg1, arg2, miditime);
+			process_midi_event(track, ev, arg1, arg2, miditime);
 		}
 	}
 	if (miditime > ts_last) ts_last = miditime;
