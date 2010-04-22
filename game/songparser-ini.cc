@@ -71,6 +71,8 @@ void SongParser::iniParseHeader() {
 		else if (key == "cover") s.cover = value;
 		else if (key == "background") s.background = value;
 		else if (key == "video") s.video = value;
+		else if (key == "genre") s.genre = value;
+		else if (key == "frets") s.creator = value;
 		else if (key == "delay") { assign(s.start, value); s.start/=1000.0; }
 		else if (key == "video_start_time") { assign(s.videoGap, value); s.videoGap/=1000.0; }
 		else if (key == "preview_start_time") { assign(s.preview_start, value); s.preview_start/=1000.0; }
