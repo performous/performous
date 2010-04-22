@@ -240,7 +240,7 @@ void GuitarGraph::engine() {
 				difficulty_changed = true;
 			}
 			// Lefty-mode switch
-			if (ev.type == input::Event::PRESS && ev.pressed[1] && ev.pressed[(m_drums ? 2 : 1)])
+			if (ev.type == input::Event::PRESS && ev.pressed[1] && ev.pressed[(m_drums ? 2 : 0)])
 				m_leftymode = !m_leftymode;
 		// Playing
 		} else if (m_drums) {
