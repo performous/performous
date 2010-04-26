@@ -42,7 +42,7 @@ void input::MidiDrums::process() {
 static const unsigned SDL_BUTTONS = 16;
 
 int input::buttonFromSDL(input::detail::Type _type, unsigned int _sdl_button) {
-	static const int inputmap[11][SDL_BUTTONS] = {
+	static const int inputmap[12][SDL_BUTTONS] = {
 		//G  R  Y  B  O  S    // for guitars (S=starpower)
 		{ 2, 0, 1, 3, 4, 5, -1, -1,  8,  9, -1, -1, -1, -1, -1, -1 }, // Guitar Hero guitar
 		{ 0, 1, 3, 2, 4,-1,  8,  9, -1, -1, -1, -1, -1, -1, -1, -1 }, // Guitar Hero X-plorer guitar
@@ -56,7 +56,8 @@ int input::buttonFromSDL(input::detail::Type _type, unsigned int _sdl_button) {
 		// Left  Down  Up  Right  DownL  DownR  UpL    UpR    Start  Select
 		{  0,  1,  2,  3,  6,  7,  4,  5,  9,  8, -1, -1, -1, -1, -1, -1 }, // generic dance pad
 		{  9,  8, -1, -1, -1, -1, -1, -1,  0,  3,  1,  2, -1, -1, -1, -1 }, // TigerGame dance pad
-		{  4,  7,  6,  5, -1, -1, -1, -1,  9,  8, -1, -1,  2,  3,  1,  0 }  // dance pad with ems ps2/pc adapter
+		{  4,  7,  6,  5, -1, -1, -1, -1,  9,  8, -1, -1,  2,  3,  1,  0 }, // dance pad with ems ps2/pc adapter
+		{  0,  1,  2,  3,  6,  7,  4,  5,  8,  9, -1, -1, -1, -1, -1, -1 }  // 2-tech usb dance pad
 	};
 	if( _sdl_button >= SDL_BUTTONS ) return -1;
 	using namespace detail;
@@ -73,6 +74,7 @@ int input::buttonFromSDL(input::detail::Type _type, unsigned int _sdl_button) {
 	case DANCEPAD_GENERIC: return inputmap[8][_sdl_button];
 	case DANCEPAD_TIGERGAME: return inputmap[9][_sdl_button];
 	case DANCEPAD_EMS2: return inputmap[10][_sdl_button];
+	case DANCEPAD_2TECH: return inputmap[11][_sdl_button];
 	}
 	throw std::logic_error("Unknown instrument type in buttonFromSDL");
 }
@@ -190,7 +192,7 @@ void input::SDL::init() {
 	using namespace boost::spirit::classic;
 	rule<> type = str_p("GUITAR_GUITARHERO_XPLORER") | "GUITAR_HAMA_PS2" | "GUITAR_ROCKBAND_PS3"
 	  | "GUITAR_ROCKBAND_XB360" | "GUITAR_GUITARHERO" | "DRUMS_GUITARHERO" | "DRUMS_ROCKBAND_PS3"
-	  | "DRUMS_ROCKBAND_XB360" | "DRUMS_MIDI" | "DANCEPAD_EMS2" | "DANCEPAD_GENERIC" | "DANCEPAD_TIGERGAME";
+	  | "DRUMS_ROCKBAND_XB360" | "DRUMS_MIDI" | "DANCEPAD_EMS2" | "DANCEPAD_GENERIC" | "DANCEPAD_TIGERGAME" | "DANCEPAD_2TECH";
 	rule<> entry = uint_p[assign_a(sdl_id)] >> ":" >> (type)[assign_a(instrument_type)];
 
 	ConfigItem::StringList const& instruments = config["game/instruments"].sl();
@@ -223,6 +225,8 @@ void input::SDL::init() {
 				forced_type[sdl_id] = input::detail::DANCEPAD_TIGERGAME;
 			} else if (instrument_type == "DANCEPAD_EMS2") {
 				forced_type[sdl_id] = input::detail::DANCEPAD_EMS2;
+			} else if (instrument_type == "DANCEPAD_2TECH") {
+				forced_type[sdl_id] = input::detail::DANCEPAD_2TECH;
 			}
 		}
 	}
@@ -280,6 +284,9 @@ void input::SDL::init() {
 					break;
 				case input::detail::DANCEPAD_EMS2:
 					std::cout << "  Detected as: EMS2 dance pad controller converter (forced)" << std::endl;
+					break;
+				case input::detail::DANCEPAD_2TECH:
+					std::cout << "  Detected as: 2-TECH USB Dance Pad (forced)" << std::endl;
 					break;
 			}
 			input::detail::devices[i] = input::detail::InputDevPrivate(forced_type[i]);
@@ -340,6 +347,9 @@ void input::SDL::init() {
 		} else if( name.find("0b43:0003") != std::string::npos ) {
 			std::cout << "  Detected as: EMS2 Dance Pad controller converter (guessed)" << std::endl;
 			input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::DANCEPAD_EMS2);
+		} else if( name.find("USB Gamepad") != std::string::npos ) {
+			std::cout << "  Detected as: 2-TECH USB Dance Pad (guessed)" << std::endl;
+			input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::DANCEPAD_2TECH);
 		} else {
 			std::cout << "  Detected as: Unknown (please report the name; use config to force detection)" << std::endl;
 			SDL_JoystickClose(joy);

@@ -33,7 +33,7 @@ namespace input {
 
 	namespace detail {
 		enum Type { GUITAR_RB_PS3, DRUMS_RB_PS3, GUITAR_RB_XB360, DRUMS_RB_XB360,
-		  GUITAR_GH, GUITAR_GH_XPLORER, GUITAR_HAMA_PS2, DRUMS_GH, DRUMS_MIDI, DANCEPAD_TIGERGAME, DANCEPAD_GENERIC, DANCEPAD_EMS2 };
+		  GUITAR_GH, GUITAR_GH_XPLORER, GUITAR_HAMA_PS2, DRUMS_GH, DRUMS_MIDI, DANCEPAD_TIGERGAME, DANCEPAD_GENERIC, DANCEPAD_EMS2, DANCEPAD_2TECH };
 		static unsigned int KEYBOARD_ID = UINT_MAX;
 		static unsigned int KEYBOARD_ID2 = KEYBOARD_ID-1;
 		static unsigned int KEYBOARD_ID3 = KEYBOARD_ID-2; // Three ids needed for keyboard guitar/drumkit/dancepad
@@ -94,6 +94,7 @@ namespace input {
 				case DANCEPAD_GENERIC:
 				case DANCEPAD_EMS2:
 				case DANCEPAD_TIGERGAME:
+				case DANCEPAD_2TECH:
 					return _type == DANCEPAD;
 				}
 				throw std::logic_error("Unhandled DevType");
