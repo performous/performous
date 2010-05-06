@@ -9,6 +9,25 @@ input::MidiDrums::MidiDrums(): stream(pm::findDevice(true, config["system/midi_i
 	detail::devices[devnum] = detail::InputDevPrivate(detail::DRUMS_MIDI);
 	event.type = Event::PRESS;
 	for (unsigned int i = 0; i < BUTTONS; ++i) event.pressed[i] = false;
+#if 1
+	// this config tested with Alesis DM5 Pro Kit/ RockBand 2 songs from FoFiX
+	//--- kick (orange): drum 0
+	map[36] = 0; // Bass Drum
+	//--- red: drum 1
+	map[38] = 1; // Snare
+	// 57 // LiveStick
+	//--- yellow: drum 2
+	map[48] = 2; // Tom high
+	map[46] = 2; // Hi-Hat open
+	// 44 // Hi-Hat closing
+	// 42 // Hi-Hat closed
+	//--- blue
+	map[45] = 3; // Tom mid
+	map[51] = 3; // Ride Cymbal
+	//--- green
+	map[41] = 4; // Tom low
+	map[49] = 4; // Crash Cymbal
+#else
 	map[35] = map[36] = 0;  // Bass drum 1/2
 	map[38] = map[40] = 1;  // Snare 1/2
 	map[42] = map[46] = 2;  // Hi-hat closed/open
@@ -17,6 +36,7 @@ input::MidiDrums::MidiDrums(): stream(pm::findDevice(true, config["system/midi_i
 	map[45] = map[47] = 3;  // Tom mid 1/2
 	map[48] = map[50] = 3;  // Tom high 1/2
 	map[49] = map[51] = 4;  // Cymbal crash/ride
+#endif
 }
 
 #include <iomanip>
@@ -24,9 +44,13 @@ input::MidiDrums::MidiDrums(): stream(pm::findDevice(true, config["system/midi_i
 void input::MidiDrums::process() {
 	PmEvent ev;
 	while (Pm_Read(stream, &ev, 1) == 1) {
-		if ((ev.message & 0xFF) != 0x99) continue; // 0x99 = channel 10 (percussion) note ON
+		unsigned char evnt = ev.message & 0xF0;
+		unsigned char chan = ev.message & 0x0F;
 		unsigned char note = ev.message >> 8;
-		//unsigned char vel = ev.message >> 16;
+		unsigned char vel  = ev.message >> 16;
+		if (evnt != 0x90) continue; // 0x90 = any channel note-on
+		//if (chan != 0x09) continue; // only accept channel 10 (percussion)
+		if (vel  == 0x00) continue; // velocity 0 is often used instead of note-off
 		Map::const_iterator it = map.find(note);
 		if (it == map.end()) {
 			std::cout << "Unassigned MIDI drum event: note " << note << std::endl;
@@ -34,6 +58,8 @@ void input::MidiDrums::process() {
 		}
 		event.button = it->second;
 		event.time = now();
+		for (unsigned int i = 0; i < BUTTONS; ++i) event.pressed[i] = false;
+		event.pressed[it->second] = true;
 		detail::devices[devnum].addEvent(event);
 	}
 }
