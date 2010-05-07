@@ -32,7 +32,12 @@ template <typename T> void loader(T& target, fs::path name) {
 	std::for_each(ext.begin(), ext.end(), static_cast<int(*)(int)>(std::tolower));
 
 	if (ext == ".svg") loadSVG(target, filename);
-	else if (ext == ".png") loadPNG(target, filename);
+	else if (ext == ".png") {
+		try {loadPNG(target, filename);}
+		// FIXME: there is probably a cleaner way to do this
+		// FoFiX songs often come with album art that is JPEG with a PNG extension
+		catch (...) {loadJPEG(target, filename);}
+	}
 	else loadJPEG(target, filename);
 }
 
