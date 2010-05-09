@@ -50,7 +50,7 @@ class ScreenSing: public Screen {
   public:
 	/// constructor
 	ScreenSing(std::string const& name, Audio& audio, Capture& capture, Database& database, Backgrounds& bgs):
-	  Screen(name), m_audio(audio), m_capture(capture), m_database(database), m_backgrounds(bgs), m_latencyAV(), m_only_singers_alive(true), m_cam()
+	  Screen(name), m_audio(audio), m_capture(capture), m_database(database), m_backgrounds(bgs), m_latencyAV(), m_only_singers_alive(true)
 	{}
 	void enter();
 	void exit();
@@ -81,6 +81,7 @@ class ScreenSing: public Screen {
 	boost::scoped_ptr<ProgressBar> m_progress;
 	boost::scoped_ptr<Surface> m_background;
 	boost::scoped_ptr<Video> m_video;
+	boost::scoped_ptr<Webcam> m_cam;
 	boost::scoped_ptr<Surface> m_pause_icon;
 	boost::scoped_ptr<Surface> m_help;
 	boost::scoped_ptr<Engine> m_engine;
@@ -91,6 +92,5 @@ class ScreenSing: public Screen {
 	boost::shared_ptr<ThemeSing> theme;
 	AnimValue m_quitTimer;
 	bool m_only_singers_alive;
-	Webcam m_cam;
 };
 

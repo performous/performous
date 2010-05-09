@@ -6,6 +6,7 @@
 
 class Webcam {
   public:
+	/// cam_id -1 means pick any device
 	Webcam(int cam_id = -1);
 
 	~Webcam() { cvReleaseCapture(&m_capture); }
