@@ -79,15 +79,12 @@ else()
 endif()
 
 # Find all the libs that don't require extra parameters
-foreach(lib ${OUR_LIBS} SDL PangoCairo LibRSVG LibXML++ GLEW AVFormat SWScale OpenGL Z Jpeg Png OpenCV)
+foreach(lib ${OUR_LIBS} SDL PangoCairo LibRSVG LibXML++ GLEW AVFormat SWScale OpenGL Z Jpeg Png)
 	find_package(${lib} REQUIRED)
 	include_directories(${${lib}_INCLUDE_DIRS})
 	list(APPEND LIBS ${${lib}_LIBRARIES})
 	add_definitions(${${lib}_DEFINITIONS})
 endforeach(lib)
-
-	include_directories(${OpenCV_INCLUDE_DIR})
-	list(APPEND LIBS ${OpenCV_cv_LIBRARY} ${OpenCV_cvcore_LIBRARY} ${OpenCV_highgui_LIBRARY})
 
 find_package(Gettext)
 if(Gettext_FOUND)
@@ -108,6 +105,17 @@ if(PortMidi_FOUND)
 else()
 	message(STATUS "MIDI I/O: Disabled (libportmidi not found)")
 endif()
+
+find_package(OpenCV)
+if(OpenCV_FOUND)
+	include_directories(${OpenCV_INCLUDE_DIRS})
+	list(APPEND LIBS ${OpenCV_LIBRARIES})
+	add_definitions("-DUSE_OPENCV")
+	message(STATUS "Webcam support: Enabled")
+else()
+	message(STATUS "Webcam support: Disabled (libcv not found)")
+endif()
+
 
 # Set default compile flags for GCC
 if(CMAKE_COMPILER_IS_GNUCXX)

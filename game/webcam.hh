@@ -1,6 +1,11 @@
+#pragma once
 
+#ifdef USE_OPENCV
 #include <cv.h>
 #include <highgui.h>
+#else
+typedef void CvCapture;
+#endif
 
 #include "surface.hh"
 
@@ -9,7 +14,7 @@ class Webcam {
 	/// cam_id -1 means pick any device
 	Webcam(int cam_id = -1);
 
-	~Webcam() { cvReleaseCapture(&m_capture); }
+	~Webcam();
 
 	/// Is good?
 	bool operator()() { return m_capture != 0; }

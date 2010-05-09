@@ -247,7 +247,9 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		if (key == SDLK_v) m_audio.streamFade("vocals", event.key.keysym.mod & KMOD_SHIFT ? 1.0 : 0.0);
 		if (key == SDLK_k) dispInFlash(++config["game/karaoke_mode"]); // Toggle karaoke mode
 		if (key == SDLK_w) dispInFlash(++config["game/pitch"]); // Toggle pitch wave
+		#ifdef USE_OPENCV
 		if (key == SDLK_a) dispInFlash(++config["graphic/webcam"]); // Toggle webcam
+		#endif
 		// Latency settings
 		if (key == SDLK_F1) dispInFlash(--config["audio/video_delay"]);
 		if (key == SDLK_F2) dispInFlash(++config["audio/video_delay"]);
