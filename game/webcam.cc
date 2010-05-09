@@ -4,7 +4,7 @@
 #include "xtime.hh"
 
 Webcam::Webcam(int cam_id):
-  m_capture(NULL), m_frameAvailable(false), m_running(false), m_quit(false)
+  m_thread(), m_capture(NULL), m_frameAvailable(false), m_running(false), m_quit(false)
   {
 	#ifdef USE_OPENCV
 	m_capture = cvCaptureFromCAM(cam_id);
@@ -21,7 +21,7 @@ Webcam::Webcam(int cam_id):
 Webcam::~Webcam() {
 	m_quit = true;
 	#ifdef USE_OPENCV
-	m_thread->join();
+	if (m_thread) m_thread->join();
 	cvReleaseCapture(&m_capture);
 	#endif
 }
