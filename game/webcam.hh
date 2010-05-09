@@ -7,7 +7,17 @@
 typedef void CvCapture;
 #endif
 
+#include <boost/scoped_ptr.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/thread.hpp>
+
 #include "surface.hh"
+
+struct CamFrame {
+	int width;
+	int height;
+	std::vector<uint8_t> data;
+};
 
 class Webcam {
   public:
@@ -16,16 +26,26 @@ class Webcam {
 
 	~Webcam();
 
-	/// Is good?
-	bool operator()() { return m_capture != 0; }
+	/// Thread runs here, don't call directly
+	void operator()();
 
-	void render(double time);
+	/// Is good?
+	bool is_good() { return m_capture != 0; }
+	/// When paused, does not get or render frames
+	void pause(bool do_pause = true);
+	/// Display frame
+	void render();
 
 	Dimensions& dimensions() { return m_surface.dimensions; }
 	Dimensions const& dimensions() const { return m_surface.dimensions; }
 
   private:
+	boost::scoped_ptr<boost::thread> m_thread;
+	mutable boost::mutex m_mutex;
 	CvCapture* m_capture;
+	CamFrame m_frame;
 	Surface m_surface;
-	double m_timestamp;
+	bool m_frameAvailable;
+	volatile bool m_running;
+	volatile bool m_quit;
 };
