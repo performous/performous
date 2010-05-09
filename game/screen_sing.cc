@@ -307,6 +307,9 @@ void ScreenSing::draw() {
 		theme->bg_top.draw();
 	}
 
+	// Webcam image
+	m_cam.render(time);
+
 	if( !m_dancers.empty() ) {
 		danceLayout(time);
 		//m_layout_singer->draw(time, LayoutSinger::LEFT);

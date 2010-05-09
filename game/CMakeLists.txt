@@ -79,12 +79,15 @@ else()
 endif()
 
 # Find all the libs that don't require extra parameters
-foreach(lib ${OUR_LIBS} SDL PangoCairo LibRSVG LibXML++ GLEW AVFormat SWScale OpenGL Z Jpeg Png)
+foreach(lib ${OUR_LIBS} SDL PangoCairo LibRSVG LibXML++ GLEW AVFormat SWScale OpenGL Z Jpeg Png OpenCV)
 	find_package(${lib} REQUIRED)
 	include_directories(${${lib}_INCLUDE_DIRS})
 	list(APPEND LIBS ${${lib}_LIBRARIES})
 	add_definitions(${${lib}_DEFINITIONS})
 endforeach(lib)
+
+	include_directories(${OpenCV_INCLUDE_DIR})
+	list(APPEND LIBS ${OpenCV_cv_LIBRARY} ${OpenCV_cvcore_LIBRARY} ${OpenCV_highgui_LIBRARY})
 
 find_package(Gettext)
 if(Gettext_FOUND)

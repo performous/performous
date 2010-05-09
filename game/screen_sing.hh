@@ -15,7 +15,7 @@
 #include "opengl_text.hh"
 #include "progressbar.hh"
 #include "guitargraph.hh"
-
+#include "webcam.hh"
 #include "screen_players.hh"
 
 class Players;
@@ -50,7 +50,7 @@ class ScreenSing: public Screen {
   public:
 	/// constructor
 	ScreenSing(std::string const& name, Audio& audio, Capture& capture, Database& database, Backgrounds& bgs):
-	  Screen(name), m_audio(audio), m_capture(capture), m_database(database), m_backgrounds(bgs), m_latencyAV(), m_only_singers_alive(true)
+	  Screen(name), m_audio(audio), m_capture(capture), m_database(database), m_backgrounds(bgs), m_latencyAV(), m_only_singers_alive(true), m_cam()
 	{}
 	void enter();
 	void exit();
@@ -91,5 +91,6 @@ class ScreenSing: public Screen {
 	boost::shared_ptr<ThemeSing> theme;
 	AnimValue m_quitTimer;
 	bool m_only_singers_alive;
+	Webcam m_cam;
 };
 
