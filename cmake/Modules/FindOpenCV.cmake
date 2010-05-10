@@ -39,7 +39,7 @@ ENDMACRO(DBG_MSG)
 # required cv components with header and library if COMPONENTS unspecified
 IF (NOT OpenCV_FIND_COMPONENTS)
 # default
-SET(OpenCV_FIND_REQUIRED_COMPONENTS CV CXCORE CVAUX HIGHGUI )
+SET(OpenCV_FIND_REQUIRED_COMPONENTS CV CXCORE HIGHGUI)
 IF (WIN32)
 LIST(APPEND OpenCV_FIND_REQUIRED_COMPONENTS CVCAM ) # WIN32 only actually
 ENDIF(WIN32)
@@ -62,9 +62,6 @@ SET (OpenCV_POSSIBLE_ROOT_DIRS
 # MIP Uni Kiel /opt/net network installation
 # get correct prefix for current gcc compiler version for gcc 3.x 4.x
 IF (${CMAKE_COMPILER_IS_GNUCXX})
-IF (NOT OpenCV_FIND_QUIETLY)
-MESSAGE(STATUS "Checking GNUCXX version 3/4 to determine OpenCV /opt/net/ path")
-ENDIF (NOT OpenCV_FIND_QUIETLY)
 EXEC_PROGRAM(${CMAKE_CXX_COMPILER} ARGS --version OUTPUT_VARIABLE CXX_COMPILER_VERSION)
 IF (CXX_COMPILER_VERSION MATCHES ".*3\\.[0-9].*")
 SET(IS_GNUCXX3 TRUE)
@@ -183,14 +180,14 @@ FOREACH(NAME ${OpenCV_FIND_REQUIRED_COMPONENTS} )
 
 # only good if header and library both found
 IF (OpenCV_${NAME}_INCLUDE_DIR AND OpenCV_${NAME}_LIBRARY)
-LIST(APPEND OpenCV_INCLUDE_DIRS ${OpenCV_${NAME}_INCLUDE_DIR} )
-LIST(APPEND OpenCV_LIBRARIES ${OpenCV_${NAME}_LIBRARY} )
-#DBG_MSG("appending for NAME=${NAME} ${OpenCV_${NAME}_INCLUDE_DIR} and ${OpenCV_${NAME}_LIBRARY}" )
+	LIST(APPEND OpenCV_INCLUDE_DIRS ${OpenCV_${NAME}_INCLUDE_DIR} )
+	LIST(APPEND OpenCV_LIBRARIES ${OpenCV_${NAME}_LIBRARY} )
+	#DBG_MSG("appending for NAME=${NAME} ${OpenCV_${NAME}_INCLUDE_DIR} and ${OpenCV_${NAME}_LIBRARY}" )
 ELSE (OpenCV_${NAME}_INCLUDE_DIR AND OpenCV_${NAME}_LIBRARY)
-DBG_MSG("OpenCV component NAME=${NAME} not found! "
-"\nOpenCV_${NAME}_INCLUDE_DIR=${OpenCV_${NAME}_INCLUDE_DIR} "
-"\nOpenCV_${NAME}_LIBRARY=${OpenCV_${NAME}_LIBRARY} ")
-SET(OpenCV_FOUND OFF)
+	DBG_MSG("OpenCV component NAME=${NAME} not found! "
+	"\nOpenCV_${NAME}_INCLUDE_DIR=${OpenCV_${NAME}_INCLUDE_DIR} "
+	"\nOpenCV_${NAME}_LIBRARY=${OpenCV_${NAME}_LIBRARY} ")
+	SET(OpenCV_FOUND OFF)
 ENDIF (OpenCV_${NAME}_INCLUDE_DIR AND OpenCV_${NAME}_LIBRARY)
 
 ENDFOREACH(NAME)
@@ -224,13 +221,10 @@ OpenCV_ML_LIBRARY
 OpenCV_TRS_LIBRARY
 )
 
-
 # be backward compatible:
 SET(OPENCV_LIBRARIES ${OpenCV_LIBRARIES} )
 SET(OPENCV_INCLUDE_DIR ${OpenCV_INCLUDE_DIRS} )
 SET(OPENCV_FOUND ${OpenCV_FOUND})
-
-
 
 # display help message
 IF(NOT OpenCV_FOUND)
@@ -239,9 +233,6 @@ IF(NOT OpenCV_FIND_QUIETLY)
 IF(OpenCV_FIND_REQUIRED)
 MESSAGE(FATAL_ERROR
 "OpenCV required but some headers or libs not found. Please specify it's location with OpenCV_ROOT_DIR env. variable.")
-ELSE(OpenCV_FIND_REQUIRED)
-MESSAGE(STATUS
-"ERROR: OpenCV was not found.")
 ENDIF(OpenCV_FIND_REQUIRED)
 ENDIF(NOT OpenCV_FIND_QUIETLY)
 ENDIF(NOT OpenCV_FOUND)

@@ -113,7 +113,7 @@ if(OpenCV_FOUND)
 	add_definitions("-DUSE_OPENCV")
 	message(STATUS "Webcam support: Enabled")
 else()
-	message(STATUS "Webcam support: Disabled (libcv not found)")
+	message(STATUS "Webcam support: Disabled (libcv/libhighgui not found)")
 endif()
 
 
