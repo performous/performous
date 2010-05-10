@@ -307,7 +307,7 @@ void ScreenSing::draw() {
 			m_background->draw();
 		} else fillBG();
 		// Video
-		if (m_video && !m_cam && !m_cam->is_good()) { m_video->render(time); double tmp = m_video->dimensions().ar(); if (tmp > 0.0) ar = tmp; }
+		if (m_video && (!m_cam || !m_cam->is_good())) { m_video->render(time); double tmp = m_video->dimensions().ar(); if (tmp > 0.0) ar = tmp; }
 		// Webcam
 		if (m_cam && config["graphic/webcam"].b()) m_cam->render();
 		// Top/bottom borders

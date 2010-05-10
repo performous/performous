@@ -30,7 +30,7 @@ class Webcam {
 	void operator()();
 
 	/// Is good?
-	bool is_good() { return m_capture != 0; }
+	bool is_good() { return m_capture != 0 && m_running; }
 	/// When paused, does not get or render frames
 	void pause(bool do_pause = true);
 	/// Display frame

@@ -7,6 +7,7 @@ Webcam::Webcam(int cam_id):
   m_thread(), m_capture(NULL), m_frameAvailable(false), m_running(false), m_quit(false)
   {
 	#ifdef USE_OPENCV
+	// Initialize the capture device
 	m_capture = cvCaptureFromCAM(cam_id);
 	if (!m_capture) {
 		std::cout << "Could not initialize webcam capturing!" << std::endl;
@@ -31,15 +32,19 @@ void Webcam::operator()() {
 	m_running = true;
 	while (!m_quit) {
 		IplImage* frame = 0;
+		// Try to get a new frame
 		if (m_running) frame = cvQueryFrame(m_capture);
 		if (frame) {
 			boost::mutex::scoped_lock l(m_mutex);
+			// Copy the frame to storage
 			m_frame.width = frame->width;
 			m_frame.height = frame->height;
 			m_frame.data.assign(frame->imageData, frame->imageData + (m_frame.width * m_frame.height * 3));
+			// Notify renderer
 			m_frameAvailable = true;
 		}
-		boost::thread::sleep(now() + (m_running ? 0.05 : 0.5));
+		// Sleep a little, much if the cam isn't active
+		boost::thread::sleep(now() + (m_running ? 0.015 : 0.5));
 	}
 	#endif
 }
@@ -53,11 +58,13 @@ void Webcam::pause(bool do_pause) {
 void Webcam::render() {
 	#ifdef USE_OPENCV
 	if (!m_capture || !m_running) return;
+	// Do we have a new frame available?
 	if (m_frameAvailable && !m_frame.data.empty()) {
 		boost::mutex::scoped_lock l(m_mutex);
-		m_surface.load(m_frame.width, m_frame.height, pix::RGB, &m_frame.data[0]);
+		// Load the image
+		m_surface.load(m_frame.width, m_frame.height, pix::BGR, &m_frame.data[0]);
 		m_frameAvailable = false;
 	}
-	m_surface.draw();
+	m_surface.draw(); // Draw
 	#endif
 }
