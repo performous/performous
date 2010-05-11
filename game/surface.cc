@@ -59,7 +59,7 @@ namespace {
 		PixFormats() {
 			using namespace pix;
 			m[RGB] = PixFmt(GL_RGB, GL_UNSIGNED_BYTE, false);
-			m[BGR] = PixFmt(GL_RGB, GL_UNSIGNED_BYTE, true);
+			m[BGR] = PixFmt(GL_BGR, GL_UNSIGNED_BYTE, true);
 			m[CHAR_RGBA] = PixFmt(GL_RGBA, GL_UNSIGNED_BYTE, false);
 			m[INT_ARGB] = PixFmt(GL_BGRA, GL_UNSIGNED_INT_8_8_8_8, true);
 		}

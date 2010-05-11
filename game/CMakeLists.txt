@@ -106,6 +106,17 @@ else()
 	message(STATUS "MIDI I/O: Disabled (libportmidi not found)")
 endif()
 
+find_package(OpenCV)
+if(OpenCV_FOUND)
+	include_directories(${OpenCV_INCLUDE_DIRS})
+	list(APPEND LIBS ${OpenCV_LIBRARIES})
+	add_definitions("-DUSE_OPENCV")
+	message(STATUS "Webcam support: Enabled")
+else()
+	message(STATUS "Webcam support: Disabled (libcv/libhighgui not found)")
+endif()
+
+
 # Set default compile flags for GCC
 if(CMAKE_COMPILER_IS_GNUCXX)
 	message(STATUS "GCC detected, adding compile flags")

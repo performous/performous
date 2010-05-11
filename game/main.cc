@@ -279,6 +279,8 @@ template <typename Container> void confOverride(Container const& c, std::string 
 	std::copy(c.begin(), c.end(), std::back_inserter(sl));
 }
 
+void outputOptionalFeatureStatus();
+
 int main(int argc, char** argv) try {
 #ifdef USE_GETTEXT
 	// initialize gettext
@@ -294,6 +296,7 @@ int main(int argc, char** argv) try {
 
 	std::cout << PACKAGE " " VERSION << std::endl;
 	signalSetup();
+	outputOptionalFeatureStatus();
 	std::ios::sync_with_stdio(false);  // We do not use C stdio
 	std::srand(std::time(NULL));
 	// Parse commandline options
@@ -405,3 +408,24 @@ int main(int argc, char** argv) try {
 	std::cerr << "FATAL ERROR: " << e.what() << std::endl;
 }
 
+void outputOptionalFeatureStatus() {
+	std::cout    << "  Internationalization:   " <<
+	#ifdef USE_GETTEXT
+		"Enabled"
+	#else
+		"Disabled"
+	#endif
+	<< std::endl << "  MIDI I/O:               " <<
+	#ifdef USE_PORTMIDI
+		"Enabled"
+	#else
+		"Disabled"
+	#endif
+	<< std::endl << "  Webcam support:         " <<
+	#ifdef USE_OPENCV
+		"Enabled"
+	#else
+		"Disabled"
+	#endif
+	<< std::endl;
+}

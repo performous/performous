@@ -15,7 +15,7 @@
 #include "opengl_text.hh"
 #include "progressbar.hh"
 #include "guitargraph.hh"
-
+#include "webcam.hh"
 #include "screen_players.hh"
 
 class Players;
@@ -81,6 +81,7 @@ class ScreenSing: public Screen {
 	boost::scoped_ptr<ProgressBar> m_progress;
 	boost::scoped_ptr<Surface> m_background;
 	boost::scoped_ptr<Video> m_video;
+	boost::scoped_ptr<Webcam> m_cam;
 	boost::scoped_ptr<Surface> m_pause_icon;
 	boost::scoped_ptr<Surface> m_help;
 	boost::scoped_ptr<Engine> m_engine;
