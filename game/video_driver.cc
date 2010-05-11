@@ -138,6 +138,7 @@ void Window::resize() {
 	const float f = 0.9f; // Avoid texture surface being exactly at the near plane (MacOSX fix)
 	glFrustum(-0.5f * f, 0.5f * f, 0.5f * h * f, -0.5f * h * f, f * near_, far_);
 	glTranslatef(0.0f, 0.0f, -near_);  // So that z = 0.0f is still on monitor surface
-
+	// Check for OpenGL errors
+	glutil::GLErrorChecker glerror("Window::resize");
 }
 

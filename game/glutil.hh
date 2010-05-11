@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string>
+#include <iostream>
+
 #include <GL/glew.h>
 
 namespace glutil {
@@ -38,10 +41,10 @@ namespace glutil {
 			if (doit) {
 				glClear(GL_DEPTH_BUFFER_BIT);
 				glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-				
+
 				GLfloat light_position[] = { -50.0, 15.0, -5.0, 1.0 };
 				glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-				
+
 				glEnable(GL_DEPTH_TEST);
 				glEnable(GL_LIGHTING);
 				glEnable(GL_COLOR_MATERIAL);
@@ -68,6 +71,24 @@ namespace glutil {
 		operator float*() { return reinterpret_cast<float*>(this); }
 		/// overload float const cast
 		operator float const*() const { return reinterpret_cast<float const*>(this); }
+	};
+
+	/// Checks for OpenGL error and displays it with given location info
+	struct GLErrorChecker {
+		GLErrorChecker(std::string info = "") {
+			GLenum err;
+			if ((err = glGetError()) != GL_NO_ERROR) {
+				if (!info.empty()) info = " (" + info +")";
+				switch(err) {
+					case GL_INVALID_ENUM: std::cerr << "OpenGL error: invalid enum" << info << std::endl; break;
+					case GL_INVALID_VALUE: std::cerr << "OpenGL error: invalid value" << info << std::endl; break;
+					case GL_INVALID_OPERATION: std::cerr << "OpenGL error: invalid operation" << info << std::endl; break;
+					case GL_STACK_OVERFLOW: std::cerr << "OpenGL error: stack overflow" << info << std::endl; break;
+					case GL_STACK_UNDERFLOW: std::cerr << "OpenGL error: stack underflow" << info << std::endl; break;
+					case GL_OUT_OF_MEMORY: std::cerr << "OpenGL error: out of memory" << info << std::endl; break;
+				}
+			}
+		}
 	};
 }
 

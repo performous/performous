@@ -101,6 +101,8 @@ void Texture::load(unsigned int width, unsigned int height, pix::Format format, 
 		// Just don't do it in Surface class, thanks. -Tronic
 		glTexImage2D(type(), 0, GL_RGBA, newWidth, newHeight, 0, f.format, f.type, &outBuf[0]);
 	}
+	// Check for OpenGL errors
+	glutil::GLErrorChecker glerror("Texture::load");
 }
 
 void Surface::load(unsigned int width, unsigned int height, pix::Format format, unsigned char const* buffer, float ar) {
@@ -113,6 +115,8 @@ void Surface::load(unsigned int width, unsigned int height, pix::Format format, 
 	PixFmt const& f = getPixFmt(format);
 	glPixelStorei(GL_UNPACK_SWAP_BYTES, f.swap);
 	glTexImage2D(m_texture.type(), 0, GL_RGBA, width, height, 0, f.format, f.type, buffer);
+	// Check for OpenGL errors
+	glutil::GLErrorChecker glerror("Surface::load");
 }
 
 void Surface::draw() const {
