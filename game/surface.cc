@@ -24,12 +24,15 @@ float Dimensions::screenY() const {
 	throw std::logic_error("Dimensions::screenY(): unknown m_screenAnchor value");
 }
 
+
 template <typename T> void loader(T& target, fs::path name) {
 	std::string const filename = name.string();
 	if (!fs::exists(name)) throw std::runtime_error("File not found: " + filename);
 	// Get file extension in lower case
 	std::string ext = name.extension();
-	std::for_each(ext.begin(), ext.end(), static_cast<int(*)(int)>(std::tolower));
+	// somehow this does not convert the extension to lower case:
+	//std::for_each(ext.begin(), ext.end(), static_cast<int(*)(int)>(std::tolower));
+	std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower );
 
 	if (ext == ".svg") loadSVG(target, filename);
 	else if (ext == ".png") {
