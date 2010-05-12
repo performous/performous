@@ -56,7 +56,8 @@ class DanceGraph {
 	void drawInfo(double time, double offsetX, Dimensions dimensions);
 	void drawArrow(int arrow_i, Texture& tex, float x, float y, float scale = 1.0, float ty1 = 0.0, float ty2 = 1.0);
 	void drawMine(float x, float y, float rot = 0.0, float scale = 1.0);
-	float panel2x(int i) { return -(m_pads * 0.5f) + m_arrow_map[i] + 0.5f; } /// Get x for an arrow line
+	float panel2x(int i) { return getScale() * (-(m_pads * 0.5f) + m_arrow_map[i] + 0.5f); } /// Get x for an arrow line
+	float getScale() { return 1.0f / m_pads * 8.0f; }
 	Audio& m_audio;
 	Song const& m_song;
 	input::InputDev m_input; /// input device (keyboard/dance pad)
