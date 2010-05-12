@@ -255,7 +255,10 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		if (key == SDLK_w) dispInFlash(++config["game/pitch"]); // Toggle pitch wave
 		#ifdef USE_OPENCV
 		// Toggle webcam
-		if (key == SDLK_a) { dispInFlash(++config["graphic/webcam"]); m_cam->pause(!config["graphic/webcam"].b()); }
+		if (key == SDLK_a) {
+			if (!m_cam) m_cam.reset(new Webcam());
+			if (m_cam) { dispInFlash(++config["graphic/webcam"]); m_cam->pause(!config["graphic/webcam"].b()); }
+		}
 		#endif
 		// Latency settings
 		if (key == SDLK_F1) dispInFlash(--config["audio/video_delay"]);
