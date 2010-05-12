@@ -121,7 +121,11 @@ endif()
 if(CMAKE_COMPILER_IS_GNUCXX)
 	message(STATUS "GCC detected, adding compile flags")
 	# -pedantic cannot be used because ffmpeg headers are b0rked
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++98 -Wall -Wextra -Wno-missing-field-initializers")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-missing-field-initializers")
+	# -pthread is unrecognized on Windows and ansi standard causes errors
+	if(NOT WIN32)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++98 -pthread")
+	endif(NOT WIN32)
 	# Needed for ffmpeg.cc to compile cleanly on OSX (it's a (unsigned long) long story)
 	add_definitions("-D__STDC_CONSTANT_MACROS")
 endif(CMAKE_COMPILER_IS_GNUCXX)
