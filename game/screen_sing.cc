@@ -56,9 +56,13 @@ void ScreenSing::enter() {
 			std::cerr << e.what() << std::endl;
 		}
 	}
+
+#ifdef USE_OPENCV
 	if (config["graphic/webcam"].b()) { // Initialize webcam
 		m_cam.reset(new Webcam());
 	}
+#endif
+
 	if (!m_song->video.empty() && config["graphic/video"].b()) { // Load video
 		m_video.reset(new Video(m_song->path + m_song->video, m_song->videoGap));
 	}
@@ -178,7 +182,9 @@ void ScreenSing::exit() {
 	m_engine.reset();
 	m_help.reset();
 	m_pause_icon.reset();
+#ifdef USE_OPENCV
 	m_cam.reset();
+#endif
 	m_video.reset();
 	m_background.reset();
 	m_song->dropNotes();
@@ -307,9 +313,15 @@ void ScreenSing::draw() {
 			m_background->draw();
 		} else fillBG();
 		// Video
-		if (m_video && (!m_cam || !m_cam->is_good())) { m_video->render(time); double tmp = m_video->dimensions().ar(); if (tmp > 0.0) ar = tmp; }
+		if (m_video
+	#ifdef USE_OPENCV
+			&& (!m_cam || !m_cam->is_good())
+	#endif
+			) { m_video->render(time); double tmp = m_video->dimensions().ar(); if (tmp > 0.0) ar = tmp; }
+#ifdef USE_OPENCV
 		// Webcam
 		if (m_cam && config["graphic/webcam"].b()) m_cam->render();
+#endif
 		// Top/bottom borders
 		ar = clamp(ar, arMin, arMax);
 		double offset = 0.5 / ar + 0.2;
