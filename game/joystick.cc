@@ -10,24 +10,67 @@ input::MidiDrums::MidiDrums(): stream(pm::findDevice(true, config["system/midi_i
 	event.type = Event::PRESS;
 	for (unsigned int i = 0; i < BUTTONS; ++i) event.pressed[i] = false;
 #if 1
-	// this config tested with Alesis DM5 Pro Kit/ RockBand 2 songs from FoFiX
-	//--- kick (orange): drum 0
-	map[36] = 0; // Bass Drum
-	//--- red: drum 1
-	map[38] = 1; // Snare
-	// 57 // LiveStick
-	//--- yellow: drum 2
-	map[48] = 2; // Tom high
-	map[46] = 2; // Hi-Hat open
-	// 44 // Hi-Hat closing
-	// 42 // Hi-Hat closed
-	//--- blue
-	map[45] = 3; // Tom mid
-	map[51] = 3; // Ride Cymbal
-	//--- green
-	map[41] = 4; // Tom low
-	map[49] = 4; // Crash Cymbal
+	// these are considered "safe" notes that should work with 95% of all modules
+	// notes below 35 and above 81 are non standardized
+
+	// *) these mappings have been verified with an Alesis DM5 Pro Kit and RockBand 2 songs
+	// the remaining mappings have been guessed...
+
+	static const int DRUM0_ORANGE = 0; // kick drum
+	static const int DRUM1_RED    = 1; // snare drum
+	static const int DRUM2_YELLOW = 2; // hi-hat/ hi-mid tom
+	static const int DRUM3_BLUE   = 3; // low tom/ ride cymbal
+	static const int DRUM4_GREEN  = 4; // low floor tom/ crash cymbal
+
+	map[35] = DRUM0_ORANGE;  // 35 - Acoustic Bass Drum 	
+	map[36] = DRUM0_ORANGE;  // 36 - Bass Drum 1 *)
+	map[37] = DRUM1_RED;     // 37 - Side Stick 	
+	map[38] = DRUM1_RED;     // 38 - Acoustic Snare *) 	
+	// 39 - Hand Clap 	
+	map[40] = DRUM1_RED;     // 40 - Electric Snare 	
+	map[41] = DRUM4_GREEN;   // 41 - Low Floor Tom *)
+	map[42] = DRUM2_YELLOW;  // 42 - Closed Hi-Hat 	
+	// 43 - High Floor Tom 	
+	map[44] = DRUM2_YELLOW;  // 44 - Pedal Hi-Hat 	
+	map[45] = DRUM3_BLUE;    // 45 - Low Tom *)
+	map[46] = DRUM2_YELLOW;  // 46 - Open Hi-Hat *)
+	// 47 - Low-Mid Tom 	
+	map[48] = DRUM2_YELLOW;  // 48 - Hi-Mid Tom *)
+	map[49] = DRUM4_GREEN;   // 49 - Crash Cymbal 1 *)
+	// 50 - High Tom
+	map[51] = DRUM3_BLUE;    // 51 - Ride Cymbal 1 *)
+	// 52 - Chinese Cymbal
+	// 53 - Ride Bell 	
+	// 54 - Tambourine 	
+	// 55 - Splash Cymbal 	
+	// 56 - Cowbell 	
+	map[57] = DRUM4_GREEN;   // 57 - Crash Cymbal 2 	
+	// 58 - Vibraslap 	
+	map[59] = DRUM3_BLUE;    // 59 - Ride Cymbal 2
+	// 60 - Hi Bongo
+	// 61 - Low Bongo
+	// 62 - Mute Hi Conga
+	// 63 - Open Hi Conga
+	// 64 - Low Conga
+	// 65 - High Timbale
+	// 66 - Low Timbale
+	// 67 - High Agogo
+	// 68 - Low Agogo
+	// 69 - Cabasa 
+	// 70 - Maracas
+	// 71 - Short Whistle
+	// 72 - Long Whistle
+	// 73 - Short Guiro
+	// 74 - Long Guiro
+	// 75 - Claves
+	// 76 - Hi Wood Block
+	// 77 - Low Wood Block
+	// 78 - Mute Cuica
+	// 79 - Open Cuica
+	// 80 - Mute Triangle
+	// 81 - Open Triangle
 #else
+	// this is the original mapping from Performous 0.5.1
 	map[35] = map[36] = 0;  // Bass drum 1/2
 	map[38] = map[40] = 1;  // Snare 1/2
 	map[42] = map[46] = 2;  // Hi-hat closed/open
@@ -45,11 +88,15 @@ void input::MidiDrums::process() {
 	PmEvent ev;
 	while (Pm_Read(stream, &ev, 1) == 1) {
 		unsigned char evnt = ev.message & 0xF0;
-		unsigned char chan = ev.message & 0x0F;
 		unsigned char note = ev.message >> 8;
 		unsigned char vel  = ev.message >> 16;
+#if 0
+		// it is IMHO not a good idea to filter on the channel. 
+		// code snippet left here for visibility
+		unsigned char chan = ev.message & 0x0F;
+		if (chan != 0x09) continue; // only accept channel 10 (percussion)
+#endif
 		if (evnt != 0x90) continue; // 0x90 = any channel note-on
-		//if (chan != 0x09) continue; // only accept channel 10 (percussion)
 		if (vel  == 0x00) continue; // velocity 0 is often used instead of note-off
 		Map::const_iterator it = map.find(note);
 		if (it == map.end()) {
