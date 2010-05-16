@@ -280,10 +280,10 @@ namespace {
 	const float one_arrow_tex_w = 1.0 / 8.0; // Width of a single arrow in texture coordinates
 
 	/// Create a symmetric vertex pair for arrow drawing
-	void vertexPair(int arrow_i, float x, float y, float ty) {
+	void vertexPair(int arrow_i, float x, float y, float ty, float scale = 1.0f) {
 		if (arrow_i < 0) return;
-		glTexCoord2f(arrow_i * one_arrow_tex_w, ty); glVertex2f(x - arrowSize, y);
-		glTexCoord2f((arrow_i+1) * one_arrow_tex_w, ty); glVertex2f(x + arrowSize, y);
+		glTexCoord2f(arrow_i * one_arrow_tex_w, ty); glVertex2f(x - arrowSize * scale, y);
+		glTexCoord2f((arrow_i+1) * one_arrow_tex_w, ty); glVertex2f(x + arrowSize * scale, y);
 	}
 
 	glutil::Color& colorGlow(glutil::Color& c, double glow) {
@@ -349,7 +349,7 @@ void DanceGraph::draw(double time) {
 			float x = panel2x(arrow_i);
 			float y = time2y(0.0);
 			float l = m_pressed_anim[arrow_i].get();
-			float s = (5.0 - l) / 5.0;
+			float s = getScale() * (5.0 - l) / 5.0;
 			drawArrow(arrow_i, m_arrows_cursor, x, y, s);
 		}
 
@@ -369,7 +369,7 @@ void DanceGraph::drawBeats(double time) {
 	glutil::Begin block(GL_TRIANGLE_STRIP);
 	float texCoord = 0.0f;
 	float tBeg = 0.0f, tEnd;
-	float w = 0.5 * m_pads;
+	float w = 0.5 * m_pads * getScale();
 	for (Song::Beats::const_iterator it = m_song.beats.begin(); it != m_song.beats.end() && tBeg < future; ++it, texCoord += texCoordStep, tBeg = tEnd) {
 		tEnd = *it - time;
 		//if (tEnd < past) continue;
@@ -391,7 +391,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	int arrow_i = note.note.note;
 	bool mine = note.note.type == Note::MINE;
 	float x = panel2x(arrow_i);
-	float s = 1.0;
+	float s = getScale();
 	float yBeg = time2y(tBeg);
 	float yEnd = time2y(tEnd);
 	glutil::Color c(1.0f, 1.0f, 1.0f);
@@ -416,11 +416,11 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 			UseTexture tblock(m_arrows_hold);
 			glutil::Begin block(GL_TRIANGLE_STRIP);
 			// Draw end
-			vertexPair(arrow_i, x, yEnd, 1.0f);
+			vertexPair(arrow_i, x, yEnd, 1.0f, s);
 			float yMid = std::max(yEnd-arrowSize, yBeg+arrowSize);
-			vertexPair(arrow_i, x, yMid, 2.0f/3.0f);
+			vertexPair(arrow_i, x, yMid, 2.0f/3.0f, s);
 			// Draw middle
-			vertexPair(arrow_i, x, yBeg+arrowSize, 1.0f/3.0f);
+			vertexPair(arrow_i, x, yBeg+arrowSize, 1.0f/3.0f, s);
 		}
 		// Draw begin
 		if (note.isHit && tEnd < 0.1) {
@@ -432,7 +432,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 		// Draw short note
 		if (mine) { // Mines need special handling
 			c.a = 1.0 - glow; glColor4fv(c);
-			s = 0.8f + glow * 0.5f;
+			s = getScale() * 0.8f + glow * 0.5f;
 			float rot = int(time*360 * (note.isHit ? 2.0 : 1.0) ) % 360; // They rotate!
 			if (note.isHit) yBeg = time2y(0.0);
 			drawMine(x, yBeg, rot, s);
@@ -453,9 +453,9 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 		}
 		if (!text.empty()) {
 			glColor3f(1.0f, 1.0f, 1.0f);
-			double s = 1.2 * arrowSize * (1.0 + glow);
+			double sc = getScale() * 1.2 * arrowSize * (1.0 + glow);
 			m_popupText->render(text);
-			m_popupText->dimensions().middle(x).center(time2y(0.0)).stretch(s,s/2.0);
+			m_popupText->dimensions().middle(x).center(time2y(0.0)).stretch(sc, sc/2.0);
 			m_popupText->draw();
 		}
 	}

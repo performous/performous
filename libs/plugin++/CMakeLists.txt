@@ -25,7 +25,10 @@ set(LIB_SUFFIX "" CACHE STRING "Optional suffix to use on lib folders (e.g. 64 f
 
 if(CMAKE_COMPILER_IS_GNUCXX)
 	message(STATUS "GCC detected, adding compile flags")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++98 -Wall -Wextra")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+	if(NOT WIN32)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++98")
+	endif(NOT WIN32)
 endif()
 
 add_library(plugin++ STATIC src/dll.cc src/execname.cc src/loader.cc)

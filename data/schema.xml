@@ -79,7 +79,7 @@ to save the current settings to XML.
 		</locale>
 	</entry>
 	<entry name="game/instruments" type="string_list">
-		<!-- Should be SDL_ID:{GUITAR_GUITARHERO|GUITAR_GUITARHERO_XPLORER|GUITAR_ROCKBAND_PS3|GUITAR_ROCKBAND_XB360|DRUMS_GUITARHERO|DRUMS_ROCKBAND_PS3|DRUMS_ROCKBAND_XB360|DRUMS_MIDI|DANCEPAD_GENERIC|DANCEPAD_TIGERGAME}
+		<!-- Should be SDL_ID:{GUITAR_GUITARHERO|GUITAR_GUITARHERO_XPLORER|GUITAR_ROCKBAND_PS3|GUITAR_ROCKBAND_XB360|DRUMS_GUITARHERO|DRUMS_ROCKBAND_PS3|DRUMS_ROCKBAND_XB360|DRUMS_MIDI|DANCEPAD_GENERIC|DANCEPAD_TIGERGAME|DANCEPAD_2TECH}
 		     example:
 			<stringvalue>0:GUITAR_GUITARHERO</stringvalue>
 		-->
@@ -116,6 +116,12 @@ to save the current settings to XML.
 		<locale name="C">
 			<short>Video playback</short>
 			<long>Allows completely disabling background videos. It is recommended to leave this enabled as Performous will still smoothly fade out the video if your computer is not fast enough.</long>
+		</locale>
+	</entry>
+	<entry name="graphic/webcam" type="bool" value="true">
+		<locale name="C">
+			<short>Webcam background</short>
+			<long>Performous can try to use webcam as a background video. You can disable it if it annoys you.</long>
 		</locale>
 	</entry>
 	<entry name="graphic/3d_notes" type="bool" value="true">

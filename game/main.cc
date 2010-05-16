@@ -9,6 +9,7 @@
 #include "xtime.hh"
 #include "video_driver.hh"
 #include "i18n.hh"
+#include "glutil.hh"
 
 // Screens
 #include "screen_intro.hh"
@@ -99,14 +100,8 @@ static void checkEvents_SDL(ScreenManager& sm) {
 		// This is needed to allow navigation (quiting the song) to function even then
 		input::SDL::pushEvent(event);
 		sm.getCurrentScreen()->manageEvent(event);
-		switch(glGetError()) {
-			case GL_INVALID_ENUM: std::cerr << "OpenGL error: invalid enum" << std::endl; break;
-			case GL_INVALID_VALUE: std::cerr << "OpenGL error: invalid value" << std::endl; break;
-			case GL_INVALID_OPERATION: std::cerr << "OpenGL error: invalid operation" << std::endl; break;
-			case GL_STACK_OVERFLOW: std::cerr << "OpenGL error: stack overflow" << std::endl; break;
-			case GL_STACK_UNDERFLOW: std::cerr << "OpenGL error: stack underflow" << std::endl; break;
-			case GL_OUT_OF_MEMORY: std::cerr << "OpenGL error: out of memory" << std::endl; break;
-		}
+		// Check for OpenGL errors
+		glutil::GLErrorChecker glerror;
 	}
 	if( config["graphic/fullscreen"].b() != sm.window().getFullscreen() )
 		sm.window().setFullscreen(config["graphic/fullscreen"].b());
@@ -284,6 +279,8 @@ template <typename Container> void confOverride(Container const& c, std::string 
 	std::copy(c.begin(), c.end(), std::back_inserter(sl));
 }
 
+void outputOptionalFeatureStatus();
+
 int main(int argc, char** argv) try {
 #ifdef USE_GETTEXT
 	// initialize gettext
@@ -299,6 +296,7 @@ int main(int argc, char** argv) try {
 
 	std::cout << PACKAGE " " VERSION << std::endl;
 	signalSetup();
+	outputOptionalFeatureStatus();
 	std::ios::sync_with_stdio(false);  // We do not use C stdio
 	std::srand(std::time(NULL));
 	// Parse commandline options
@@ -410,3 +408,24 @@ int main(int argc, char** argv) try {
 	std::cerr << "FATAL ERROR: " << e.what() << std::endl;
 }
 
+void outputOptionalFeatureStatus() {
+	std::cout    << "  Internationalization:   " <<
+	#ifdef USE_GETTEXT
+		"Enabled"
+	#else
+		"Disabled"
+	#endif
+	<< std::endl << "  MIDI I/O:               " <<
+	#ifdef USE_PORTMIDI
+		"Enabled"
+	#else
+		"Disabled"
+	#endif
+	<< std::endl << "  Webcam support:         " <<
+	#ifdef USE_OPENCV
+		"Enabled"
+	#else
+		"Disabled"
+	#endif
+	<< std::endl;
+}

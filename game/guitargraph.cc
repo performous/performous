@@ -64,10 +64,14 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number)
   m_neckglowColor(),
   m_drums(drums),
   m_use3d(config["graphic/3d_notes"].b()),
+  m_leftymode(false),
   m_starpower(0.0, 0.1),
   m_track_index(m_instrumentTracks.end()),
   m_dfIt(m_drumfills.end()),
   m_level(),
+  m_errorMeter(0.0, 2.0),
+  m_errorMeterFlash(0.0, 4.0),
+  m_errorMeterFade(0.0, 0.333),
   m_drumJump(0.0, 12.0),
   m_starmeter(),
   m_drumfillHits(),
@@ -212,6 +216,9 @@ void GuitarGraph::engine() {
 			}
 			if (ev.type == input::Event::RELEASE) endHold(ev.button, time);
 			if (ev.type == input::Event::WHAMMY) whammy = (1.0 + ev.button + 2.0*(rand()/double(RAND_MAX))) / 4.0;
+		} else {
+			// Handle drum lefty-mode
+			if (m_leftymode && ev.button > 0) ev.button = 5 - ev.button;
 		}
 		// Keypress anims
 		if (ev.type == input::Event::PRESS) m_hit[!m_drums + ev.button].setValue(1.0);
@@ -226,6 +233,9 @@ void GuitarGraph::engine() {
 				else if (ev.pressed[3 + m_drums]) difficulty(DIFFICULTY_AMAZING);
 				difficulty_changed = true;
 			}
+			// Lefty-mode switch
+			if (ev.type == input::Event::PRESS && ev.pressed[2] && ev.pressed[3])
+				m_leftymode = !m_leftymode;
 		// Playing
 		} else if (m_drums) {
 			if (ev.type == input::Event::PRESS) drumHit(time, ev.button);
@@ -317,6 +327,14 @@ void GuitarGraph::activateStarpower() {
 		m_popups.push_back(Popup("God Mode\nActivated!",
 		  glutil::Color(0.3f, 0.0f, 1.0f), 0.666, m_popupText.get(), "Mistakes ignored!", &m_text));
 	}
+}
+
+/// New hit for the error indicator
+void GuitarGraph::errorMeter(float error) {
+	error /=  maxTolerance;
+	m_errorMeter.setTarget(error, true);
+	m_errorMeterFade.setValue(1.0);
+	if (std::abs(error) < 0.10) m_errorMeterFlash.setValue(1.0);
 }
 
 /// Mark the holding of a note as ended
@@ -416,6 +434,7 @@ void GuitarGraph::drumHit(double time, int fret) {
 	}
 	// Find any suitable note within the tolerance
 	double tolerance = maxTolerance;
+	double signed_error = maxTolerance;
 	Chords::iterator best = m_chords.end();
 	for (Chords::iterator it = m_chordIt; it != m_chords.end() && it->begin <= time + tolerance; ++it) {
 		if (m_notes[it->dur[fret]]) continue;  // Already played
@@ -423,6 +442,7 @@ void GuitarGraph::drumHit(double time, int fret) {
 		if (error < tolerance) {
 			best = it;
 			tolerance = error;
+			signed_error = it->begin - time;
 		}
 	}
 	if (best == m_chords.end()) fail(time, fret);
@@ -450,6 +470,8 @@ void GuitarGraph::drumHit(double time, int fret) {
 			if (m_streak > m_longestStreak) m_longestStreak = m_streak;
 			// Handle Big Rock Ending scoring
 			if (m_drumfillHits > 0 && *best == m_chords.back()) endBRE();
+			// ErrorMeter
+			errorMeter(signed_error);
 		}
 		m_correctness.setTarget(double(m_chordIt->status) / m_chordIt->polyphony, true);
 	}
@@ -492,6 +514,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 	}
 	// Find any suitable note within the tolerance
 	double tolerance = maxTolerance;
+	double signed_error = maxTolerance;
 	Chords::iterator best = m_chords.end();
 	for (Chords::iterator it = m_chordIt; it != m_chords.end() && it->begin <= time + tolerance; ++it) {
 		if (it->status > 1) continue; // Already picked, can't play again
@@ -507,6 +530,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 		if (error < tolerance) {
 			best = it;
 			tolerance = error;
+			signed_error = it->begin - time;
 		}
 	}
 	if (best == m_chords.end()) fail(time, picked ? -1 : -2);
@@ -525,6 +549,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 		m_starmeter += score;
 		if (m_solo) m_soloScore += score;
 		m_correctness.setTarget(1.0, true); // Instantly go to one
+		errorMeter(signed_error);
 		for (int fret = 0; fret < 5; ++fret) {
 			if (!m_chordIt->fret[fret]) continue;
 			Duration const* dur = m_chordIt->dur[fret];
@@ -639,7 +664,7 @@ void GuitarGraph::draw(double time) {
 		drawBar(0.0, 0.01f);
 		// Fret buttons on cursor
 		for (int fret = m_drums; fret < 5; ++fret) {
-			float x = -2.0f + fret - 0.5f * m_drums;
+			float x = getFretX(fret);
 			float l = m_hit[fret + !m_drums].get();
 			// Get a color for the fret and adjust it if GodMode is on
 			glColor4fv(colorize(color(fret), time));
@@ -718,7 +743,7 @@ void GuitarGraph::draw(double time) {
 			}
 			Texture* ftex = &m_flame;
 			if (m_starpower.get() > 0.01) ftex = &m_flame_godmode;
-			float x = -2.0f + fret - 0.5f * m_drums;
+			float x = getFretX(fret);
 			for (std::vector<AnimValue>::iterator it = m_flames[fret].begin(); it != m_flames[fret].end();) {
 				float flameAnim = it->get();
 				if (flameAnim < 1.0f) {
@@ -735,6 +760,35 @@ void GuitarGraph::draw(double time) {
 					continue;
 				}
 				++it;
+			}
+		}
+		{ // Accuracy indicator
+			float maxsize = 1.5f;
+			float thickness = 0.12f;
+			float x = -2.5 - thickness;
+			float y = time2y(0.0);
+			float alpha = m_errorMeterFade.get();
+			float bgcol = m_errorMeterFlash.get();
+			glColor4f(bgcol, bgcol, bgcol, 0.6f * alpha);
+			{ // Indicator background
+				glutil::Begin block(GL_TRIANGLE_STRIP);
+				glVertex2f(x - thickness, y + maxsize);
+				glVertex2f(x, y + maxsize);
+				glVertex2f(x - thickness, y - maxsize);
+				glVertex2f(x, y - maxsize);
+			}
+			float error = m_errorMeter.get();
+			if (error != 0) {
+				float y1 = 0, y2 = 0;
+				if (error > 0) { glColor4f(0.0f, 1.0f, 0.0f, alpha); y2 = -maxsize * error; }
+				else { glColor4f(1.0f, 0.0f, 0.0f, alpha); y1 = -maxsize * error; }
+				glutil::Begin block(GL_TRIANGLE_STRIP);
+				glVertex2f(x - thickness, y1 + y);
+				glVertex2f(x, y1 + y);
+				glVertex2f(x - thickness, y2 + y);
+				glVertex2f(x, y2 + y);
+				if (m_errorMeter.get() == m_errorMeter.getTarget())
+					m_errorMeter.setTarget(0.0);
 			}
 		}
 	}
@@ -759,6 +813,7 @@ void GuitarGraph::draw(double time) {
 		m_neckglow.dimensions.screenBottom(0.0).middle(offsetX).fixedWidth(dimensions.w());
 		m_neckglow.draw();
 	}
+
 	drawInfo(time, offsetX, dimensions); // Go draw some texts and other interface stuff
 	glColor3f(1.0f, 1.0f, 1.0f);
 }
@@ -766,8 +821,7 @@ void GuitarGraph::draw(double time) {
 /// Draws a single note
 /// The times passed are normalized to [past, future]
 void GuitarGraph::drawNote(int fret, glutil::Color c, float tBeg, float tEnd, float whammy, bool tappable, bool hit, double hitAnim, double releaseTime) {
-	float x = -2.0f + fret;
-	if (m_drums) x -= 0.5f;
+	float x = getFretX(fret);
 	if (m_drums && fret == 0) { // Bass drum? That's easy
 		if (hit || hitAnim > 0) return;	// Hide it if it's hit
 		c.a = time2a(tBeg); glColor4fv(c);

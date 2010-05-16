@@ -9,6 +9,68 @@ input::MidiDrums::MidiDrums(): stream(pm::findDevice(true, config["system/midi_i
 	detail::devices[devnum] = detail::InputDevPrivate(detail::DRUMS_MIDI);
 	event.type = Event::PRESS;
 	for (unsigned int i = 0; i < BUTTONS; ++i) event.pressed[i] = false;
+#if 1
+	// these are considered "safe" notes that should work with 95% of all modules
+	// notes below 35 and above 81 are non standardized
+
+	// *) these mappings have been verified with an Alesis DM5 Pro Kit and RockBand 2 songs
+	// the remaining mappings have been guessed...
+
+	static const int DRUM0_ORANGE = 0; // kick drum
+	static const int DRUM1_RED    = 1; // snare drum
+	static const int DRUM2_YELLOW = 2; // hi-hat/ hi-mid tom
+	static const int DRUM3_BLUE   = 3; // low tom/ ride cymbal
+	static const int DRUM4_GREEN  = 4; // low floor tom/ crash cymbal
+
+	map[35] = DRUM0_ORANGE;  // 35 - Acoustic Bass Drum 	
+	map[36] = DRUM0_ORANGE;  // 36 - Bass Drum 1 *)
+	map[37] = DRUM1_RED;     // 37 - Side Stick 	
+	map[38] = DRUM1_RED;     // 38 - Acoustic Snare *) 	
+	// 39 - Hand Clap 	
+	map[40] = DRUM1_RED;     // 40 - Electric Snare 	
+	map[41] = DRUM4_GREEN;   // 41 - Low Floor Tom *)
+	map[42] = DRUM2_YELLOW;  // 42 - Closed Hi-Hat 	
+	// 43 - High Floor Tom 	
+	map[44] = DRUM2_YELLOW;  // 44 - Pedal Hi-Hat 	
+	map[45] = DRUM3_BLUE;    // 45 - Low Tom *)
+	map[46] = DRUM2_YELLOW;  // 46 - Open Hi-Hat *)
+	// 47 - Low-Mid Tom 	
+	map[48] = DRUM2_YELLOW;  // 48 - Hi-Mid Tom *)
+	map[49] = DRUM4_GREEN;   // 49 - Crash Cymbal 1 *)
+	// 50 - High Tom
+	map[51] = DRUM3_BLUE;    // 51 - Ride Cymbal 1 *)
+	// 52 - Chinese Cymbal
+	// 53 - Ride Bell 	
+	// 54 - Tambourine 	
+	// 55 - Splash Cymbal 	
+	// 56 - Cowbell 	
+	map[57] = DRUM4_GREEN;   // 57 - Crash Cymbal 2 	
+	// 58 - Vibraslap 	
+	map[59] = DRUM3_BLUE;    // 59 - Ride Cymbal 2
+	// 60 - Hi Bongo
+	// 61 - Low Bongo
+	// 62 - Mute Hi Conga
+	// 63 - Open Hi Conga
+	// 64 - Low Conga
+	// 65 - High Timbale
+	// 66 - Low Timbale
+	// 67 - High Agogo
+	// 68 - Low Agogo
+	// 69 - Cabasa 
+	// 70 - Maracas
+	// 71 - Short Whistle
+	// 72 - Long Whistle
+	// 73 - Short Guiro
+	// 74 - Long Guiro
+	// 75 - Claves
+	// 76 - Hi Wood Block
+	// 77 - Low Wood Block
+	// 78 - Mute Cuica
+	// 79 - Open Cuica
+	// 80 - Mute Triangle
+	// 81 - Open Triangle
+#else
+	// this is the original mapping from Performous 0.5.1
 	map[35] = map[36] = 0;  // Bass drum 1/2
 	map[38] = map[40] = 1;  // Snare 1/2
 	map[42] = map[46] = 2;  // Hi-hat closed/open
@@ -17,6 +79,7 @@ input::MidiDrums::MidiDrums(): stream(pm::findDevice(true, config["system/midi_i
 	map[45] = map[47] = 3;  // Tom mid 1/2
 	map[48] = map[50] = 3;  // Tom high 1/2
 	map[49] = map[51] = 4;  // Cymbal crash/ride
+#endif
 }
 
 #include <iomanip>
@@ -24,9 +87,17 @@ input::MidiDrums::MidiDrums(): stream(pm::findDevice(true, config["system/midi_i
 void input::MidiDrums::process() {
 	PmEvent ev;
 	while (Pm_Read(stream, &ev, 1) == 1) {
-		if ((ev.message & 0xFF) != 0x99) continue; // 0x99 = channel 10 (percussion) note ON
+		unsigned char evnt = ev.message & 0xF0;
 		unsigned char note = ev.message >> 8;
-		//unsigned char vel = ev.message >> 16;
+		unsigned char vel  = ev.message >> 16;
+#if 0
+		// it is IMHO not a good idea to filter on the channel. 
+		// code snippet left here for visibility
+		unsigned char chan = ev.message & 0x0F;
+		if (chan != 0x09) continue; // only accept channel 10 (percussion)
+#endif
+		if (evnt != 0x90) continue; // 0x90 = any channel note-on
+		if (vel  == 0x00) continue; // velocity 0 is often used instead of note-off
 		Map::const_iterator it = map.find(note);
 		if (it == map.end()) {
 			std::cout << "Unassigned MIDI drum event: note " << note << std::endl;
@@ -34,6 +105,8 @@ void input::MidiDrums::process() {
 		}
 		event.button = it->second;
 		event.time = now();
+		for (unsigned int i = 0; i < BUTTONS; ++i) event.pressed[i] = false;
+		event.pressed[it->second] = true;
 		detail::devices[devnum].addEvent(event);
 	}
 }
@@ -42,7 +115,7 @@ void input::MidiDrums::process() {
 static const unsigned SDL_BUTTONS = 16;
 
 int input::buttonFromSDL(input::detail::Type _type, unsigned int _sdl_button) {
-	static const int inputmap[11][SDL_BUTTONS] = {
+	static const int inputmap[12][SDL_BUTTONS] = {
 		//G  R  Y  B  O  S    // for guitars (S=starpower)
 		{ 2, 0, 1, 3, 4, 5, -1, -1,  8,  9, -1, -1, -1, -1, -1, -1 }, // Guitar Hero guitar
 		{ 0, 1, 3, 2, 4,-1,  8,  9, -1, -1, -1, -1, -1, -1, -1, -1 }, // Guitar Hero X-plorer guitar
@@ -56,7 +129,8 @@ int input::buttonFromSDL(input::detail::Type _type, unsigned int _sdl_button) {
 		// Left  Down  Up  Right  DownL  DownR  UpL    UpR    Start  Select
 		{  0,  1,  2,  3,  6,  7,  4,  5,  9,  8, -1, -1, -1, -1, -1, -1 }, // generic dance pad
 		{  9,  8, -1, -1, -1, -1, -1, -1,  0,  3,  1,  2, -1, -1, -1, -1 }, // TigerGame dance pad
-		{  4,  7,  6,  5, -1, -1, -1, -1,  9,  8, -1, -1,  2,  3,  1,  0 }  // dance pad with ems ps2/pc adapter
+		{  4,  7,  6,  5, -1, -1, -1, -1,  9,  8, -1, -1,  2,  3,  1,  0 }, // dance pad with ems ps2/pc adapter
+		{  0,  1,  2,  3,  6,  7,  4,  5,  8,  9, -1, -1, -1, -1, -1, -1 }  // 2-tech usb dance pad
 	};
 	if( _sdl_button >= SDL_BUTTONS ) return -1;
 	using namespace detail;
@@ -73,6 +147,7 @@ int input::buttonFromSDL(input::detail::Type _type, unsigned int _sdl_button) {
 	case DANCEPAD_GENERIC: return inputmap[8][_sdl_button];
 	case DANCEPAD_TIGERGAME: return inputmap[9][_sdl_button];
 	case DANCEPAD_EMS2: return inputmap[10][_sdl_button];
+	case DANCEPAD_2TECH: return inputmap[11][_sdl_button];
 	}
 	throw std::logic_error("Unknown instrument type in buttonFromSDL");
 }
@@ -190,7 +265,7 @@ void input::SDL::init() {
 	using namespace boost::spirit::classic;
 	rule<> type = str_p("GUITAR_GUITARHERO_XPLORER") | "GUITAR_HAMA_PS2" | "GUITAR_ROCKBAND_PS3"
 	  | "GUITAR_ROCKBAND_XB360" | "GUITAR_GUITARHERO" | "DRUMS_GUITARHERO" | "DRUMS_ROCKBAND_PS3"
-	  | "DRUMS_ROCKBAND_XB360" | "DRUMS_MIDI" | "DANCEPAD_EMS2" | "DANCEPAD_GENERIC" | "DANCEPAD_TIGERGAME";
+	  | "DRUMS_ROCKBAND_XB360" | "DRUMS_MIDI" | "DANCEPAD_EMS2" | "DANCEPAD_GENERIC" | "DANCEPAD_TIGERGAME" | "DANCEPAD_2TECH";
 	rule<> entry = uint_p[assign_a(sdl_id)] >> ":" >> (type)[assign_a(instrument_type)];
 
 	ConfigItem::StringList const& instruments = config["game/instruments"].sl();
@@ -223,6 +298,8 @@ void input::SDL::init() {
 				forced_type[sdl_id] = input::detail::DANCEPAD_TIGERGAME;
 			} else if (instrument_type == "DANCEPAD_EMS2") {
 				forced_type[sdl_id] = input::detail::DANCEPAD_EMS2;
+			} else if (instrument_type == "DANCEPAD_2TECH") {
+				forced_type[sdl_id] = input::detail::DANCEPAD_2TECH;
 			}
 		}
 	}
@@ -281,6 +358,9 @@ void input::SDL::init() {
 				case input::detail::DANCEPAD_EMS2:
 					std::cout << "  Detected as: EMS2 dance pad controller converter (forced)" << std::endl;
 					break;
+				case input::detail::DANCEPAD_2TECH:
+					std::cout << "  Detected as: 2-TECH USB Dance Pad (forced)" << std::endl;
+					break;
 			}
 			input::detail::devices[i] = input::detail::InputDevPrivate(forced_type[i]);
 		} else if( name.find("Guitar Hero3") != std::string::npos ) {
@@ -322,6 +402,9 @@ void input::SDL::init() {
 		} else if( name.find("TigerGame") != std::string::npos ) {
 			std::cout << "  Detected as: TigerGame Dance Pad" << std::endl;
 			input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::DANCEPAD_TIGERGAME);
+		} else if( name.find("Redoctane XBOX DDR") != std::string::npos ) {
+			std::cout << "  Detected as: Generic Dance Pad" << std::endl;
+			input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::DANCEPAD_GENERIC);
 		} else if( name.find("Dance mat") != std::string::npos ) {
 			std::cout << "  Detected as: Generic Dance Pad" << std::endl;
 			input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::DANCEPAD_GENERIC);
@@ -337,6 +420,9 @@ void input::SDL::init() {
 		} else if( name.find("0b43:0003") != std::string::npos ) {
 			std::cout << "  Detected as: EMS2 Dance Pad controller converter (guessed)" << std::endl;
 			input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::DANCEPAD_EMS2);
+		} else if( name.find("USB Gamepad") != std::string::npos ) {
+			std::cout << "  Detected as: 2-TECH USB Dance Pad (guessed)" << std::endl;
+			input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::DANCEPAD_2TECH);
 		} else {
 			std::cout << "  Detected as: Unknown (please report the name; use config to force detection)" << std::endl;
 			SDL_JoystickClose(joy);

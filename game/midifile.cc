@@ -218,8 +218,14 @@ MidiFileParser::Track MidiFileParser::read_track(MidiStream& stream) {
 		} else {
 			// Midi event
 			uint8_t arg1 = riff.read_uint8();
-			uint8_t arg2 = riff.read_uint8();
-			process_midi_event(track, event >> 4, arg1, arg2, miditime);
+			uint8_t arg2 = 0;
+			uint8_t ev = event >> 4;
+			switch (ev) {
+			case 0x8: case 0x9: case 0xA: case 0xB: case 0xE: arg2 = riff.read_uint8(); break;
+			case 0xC: case 0xD: break;  // These only take one argument
+			default: throw std::runtime_error("Unknown MIDI event");  // Quite possibly this is impossible, but I am too tired to prove it.
+			}
+			process_midi_event(track, ev, arg1, arg2, miditime);
 		}
 	}
 	if (miditime > ts_last) ts_last = miditime;

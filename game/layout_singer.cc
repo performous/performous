@@ -8,8 +8,8 @@
 #include <list>
 #include <boost/format.hpp>
 
-LayoutSinger::LayoutSinger(Song& song, Database& database, boost::shared_ptr<ThemeSing> theme):
-  m_song(song), m_noteGraph(song),m_lyricit(song.vocals.notes.begin()), m_lyrics(), m_database(database), m_theme(theme) {
+LayoutSinger::LayoutSinger(VocalTrack& vocals, Database& database, boost::shared_ptr<ThemeSing> theme):
+  m_vocals(vocals), m_noteGraph(vocals),m_lyricit(vocals.notes.begin()), m_lyrics(), m_database(database), m_theme(theme) {
 	m_score_text[0].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_score_text[1].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_score_text[2].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
@@ -24,7 +24,7 @@ LayoutSinger::LayoutSinger(Song& song, Database& database, boost::shared_ptr<The
 LayoutSinger::~LayoutSinger() {};
 
 void LayoutSinger::reset() {
-	m_lyricit = m_song.vocals.notes.begin();
+	m_lyricit = m_vocals.notes.begin();
 	m_lyrics.clear();
 }
 
@@ -129,8 +129,8 @@ void LayoutSinger::draw(double time, Position position) {
 			m_lyrics.pop_front();
 			dirty = true;
 		}
-		if (!dirty && m_lyricit != m_song.vocals.notes.end() && m_lyricit->begin < time + 4.0) {
-			m_lyrics.push_back(LyricRow(m_lyricit, m_song.vocals.notes.end()));
+		if (!dirty && m_lyricit != m_vocals.notes.end() && m_lyricit->begin < time + 4.0) {
+			m_lyrics.push_back(LyricRow(m_lyricit, m_vocals.notes.end()));
 			dirty = true;
 		}
 	} while (dirty);

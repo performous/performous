@@ -65,6 +65,7 @@ class GuitarGraph: public InstrumentGraph {
   private:
 	bool canActivateStarpower() { return (m_starmeter > 6000); }
 	void activateStarpower();
+	void errorMeter(float error);
 	void fail(double time, int fret);
 	void endHold(int fret, double time = 0.0);
 	void endBRE();
@@ -85,6 +86,7 @@ class GuitarGraph: public InstrumentGraph {
 	boost::scoped_ptr<Texture> m_neck; /// necks
 	bool m_drums; /// are we using drums?
 	bool m_use3d; /// are we using 3d?
+	bool m_leftymode; /// switch guitar notes to right-to-left direction
 	AnimValue m_starpower; /// how long the GodMode lasts (also used in fading the effect)
 	std::vector<AnimValue> m_flames[5]; /// flame effect queues for each fret
 	InstrumentTracksConstPtr m_instrumentTracks; /// tracks
@@ -112,6 +114,7 @@ class GuitarGraph: public InstrumentGraph {
 	void nextTrack(bool fast = false);
 	void difficultyAuto(bool tryKeepCurrent = false);
 	bool difficulty(Difficulty level);
+	float getFretX(int fret) const { return (-2.0f + fret- (m_drums ? 0.5 : 0)) * (m_leftymode ? -1 : 1); }
 	boost::scoped_ptr<SvgTxtThemeSimple> m_scoreText;
 	boost::scoped_ptr<SvgTxtThemeSimple> m_streakText;
 	void updateChords();
@@ -120,6 +123,9 @@ class GuitarGraph: public InstrumentGraph {
 	Chords::iterator m_chordIt;
 	typedef std::map<Duration const*, unsigned> NoteStatus; // Note in song to m_events[unsigned - 1] or 0 for not played
 	NoteStatus m_notes;
+	AnimValue m_errorMeter;
+	AnimValue m_errorMeterFlash;
+	AnimValue m_errorMeterFade;
 	AnimValue m_drumJump;
 	double m_starmeter; /// when this is high enough, GodMode becomes available
 	double m_drumfillHits; /// keeps track that enough hits are scored

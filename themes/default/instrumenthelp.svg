@@ -49,6 +49,20 @@
        inkscape:vp_y="0 : 1000 : 0"
        inkscape:vp_x="0 : 0.5 : 1"
        sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective2902"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective2935"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
   </defs>
   <sodipodi:namedview
      inkscape:window-height="791"
@@ -65,9 +79,9 @@
      showgrid="false"
      showguides="true"
      inkscape:guide-bbox="true"
-     inkscape:zoom="0.5"
-     inkscape:cx="287.72345"
-     inkscape:cy="261.06756"
+     inkscape:zoom="1.4142136"
+     inkscape:cx="525.81157"
+     inkscape:cy="402.48892"
      inkscape:window-x="58"
      inkscape:window-y="13"
      inkscape:current-layer="svg5215"
@@ -463,4 +477,35 @@
        x="297.83939"
        y="495.83029"
        style="text-align:center;text-anchor:start;stroke-width:1.01400006;stroke-miterlimit:4;stroke-dasharray:none">TO JOIN THE GAME</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-size:28px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;opacity:0.95;fill:#ffffff;fill-opacity:0.95;fill-rule:nonzero;stroke:#000000;stroke-width:0.89999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;font-family:Verdana;-inkscape-font-specification:Verdana"
+     x="695.70026"
+     y="310.90945"
+     id="text3241-6"><tspan
+       sodipodi:role="line"
+       x="695.70026"
+       y="310.90945"
+       id="tspan3245-4"
+       style="fill-rule:nonzero;stroke-width:0.89999998;stroke-miterlimit:4;stroke-dasharray:none">+     Lefty mode</tspan></text>
+  <path
+     sodipodi:type="arc"
+     style="fill:#ffff00;fill-opacity:0.87058824;fill-rule:nonzero;stroke:none"
+     id="path2925"
+     sodipodi:cx="152.38152"
+     sodipodi:cy="418.5715"
+     sodipodi:rx="38.537319"
+     sodipodi:ry="14.849242"
+     d="m 190.91883,418.5715 a 38.537319,14.849242 0 1 1 -77.07463,0 38.537319,14.849242 0 1 1 77.07463,0 z"
+     transform="matrix(0.41518197,0,0,1.0774961,606.80752,-150.6452)" />
+  <path
+     sodipodi:type="arc"
+     style="fill:#0000ff;fill-opacity:0.87058824;fill-rule:nonzero;stroke:none"
+     id="path2925-8"
+     sodipodi:cx="152.38152"
+     sodipodi:cy="418.5715"
+     sodipodi:rx="38.537319"
+     sodipodi:ry="14.849242"
+     d="m 190.91883,418.5715 a 38.537319,14.849242 0 1 1 -77.07463,0 38.537319,14.849242 0 1 1 77.07463,0 z"
+     transform="matrix(0.41518197,0,0,1.0774961,678.48896,-150.6452)" />
 </svg>

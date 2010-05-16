@@ -56,6 +56,13 @@ void ScreenSing::enter() {
 			std::cerr << e.what() << std::endl;
 		}
 	}
+
+#ifdef USE_OPENCV
+	if (config["graphic/webcam"].b()) { // Initialize webcam
+		m_cam.reset(new Webcam());
+	}
+#endif
+
 	if (!m_song->video.empty() && config["graphic/video"].b()) { // Load video
 		m_video.reset(new Video(m_song->path + m_song->video, m_song->videoGap));
 	}
@@ -77,7 +84,7 @@ void ScreenSing::enter() {
 	m_progress->dimensions.fixedWidth(0.4).left(-0.5).screenTop();
 	theme->timer.dimensions.screenTop(0.5 * m_progress->dimensions.h());
 	boost::ptr_vector<Analyzer>& analyzers = m_capture.analyzers();
-	m_layout_singer.reset(new LayoutSinger(*m_song, m_database, theme));
+	m_layout_singer.reset(new LayoutSinger(m_song->vocals, m_database, theme));
 	// Load instrument and dance tracks
 	{
 		int type = 0; // 0 for dance, 1 for guitars, 2 for drums
@@ -102,7 +109,7 @@ void ScreenSing::enter() {
 	// Startup delay for instruments is longer than for singing only
 	double setup_delay = (m_instruments.empty() && m_dancers.empty() ? -1.0 : -8.0);
 	m_audio.playMusic(m_song->music, false, 0.0, setup_delay);
-	m_engine.reset(new Engine(m_audio, *m_song, analyzers.begin(), analyzers.end(), m_database));
+	m_engine.reset(new Engine(m_audio, m_song->vocals, analyzers.begin(), analyzers.end(), m_database));
 }
 
 /// Manages the instrument drawing
@@ -175,6 +182,9 @@ void ScreenSing::exit() {
 	m_engine.reset();
 	m_help.reset();
 	m_pause_icon.reset();
+#ifdef USE_OPENCV
+	m_cam.reset();
+#endif
 	m_video.reset();
 	m_background.reset();
 	m_song->dropNotes();
@@ -243,6 +253,13 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		if (key == SDLK_v) m_audio.streamFade("vocals", event.key.keysym.mod & KMOD_SHIFT ? 1.0 : 0.0);
 		if (key == SDLK_k) dispInFlash(++config["game/karaoke_mode"]); // Toggle karaoke mode
 		if (key == SDLK_w) dispInFlash(++config["game/pitch"]); // Toggle pitch wave
+		#ifdef USE_OPENCV
+		// Toggle webcam
+		if (key == SDLK_a) {
+			if (!m_cam) m_cam.reset(new Webcam());
+			if (m_cam) { dispInFlash(++config["graphic/webcam"]); m_cam->pause(!config["graphic/webcam"].b()); }
+		}
+		#endif
 		// Latency settings
 		if (key == SDLK_F1) dispInFlash(--config["audio/video_delay"]);
 		if (key == SDLK_F2) dispInFlash(++config["audio/video_delay"]);
@@ -298,7 +315,17 @@ void ScreenSing::draw() {
 			if (ar > arMax || (m_video && ar > arMin)) fillBG();  // Fill white background to avoid black borders
 			m_background->draw();
 		} else fillBG();
-		if (m_video) { m_video->render(time); double tmp = m_video->dimensions().ar(); if (tmp > 0.0) ar = tmp; }
+		// Video
+		if (m_video
+	#ifdef USE_OPENCV
+			&& (!m_cam || !m_cam->is_good())
+	#endif
+			) { m_video->render(time); double tmp = m_video->dimensions().ar(); if (tmp > 0.0) ar = tmp; }
+#ifdef USE_OPENCV
+		// Webcam
+		if (m_cam && config["graphic/webcam"].b()) m_cam->render();
+#endif
+		// Top/bottom borders
 		ar = clamp(ar, arMin, arMax);
 		double offset = 0.5 / ar + 0.2;
 		theme->bg_bottom.dimensions.fixedWidth(1.0).bottom(offset);
