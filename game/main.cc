@@ -282,17 +282,8 @@ template <typename Container> void confOverride(Container const& c, std::string 
 void outputOptionalFeatureStatus();
 
 int main(int argc, char** argv) try {
-#ifdef USE_GETTEXT
 	// initialize gettext
-#ifdef _MSC_VER
-	setlocale(LC_ALL, "");//only untill we don't have a better solution. This because LC_MESSAGES cause crash under Visual Studio
-#else
-	setlocale (LC_MESSAGES, "");
-#endif
-	bindtextdomain (PACKAGE, getLocaleDir().string().c_str());
-	textdomain (PACKAGE);
-	bind_textdomain_codeset (PACKAGE, "UTF-8");
-#endif
+	Gettext gettext(PACKAGE);
 
 	std::cout << PACKAGE " " VERSION << std::endl;
 	signalSetup();
@@ -410,11 +401,7 @@ int main(int argc, char** argv) try {
 
 void outputOptionalFeatureStatus() {
 	std::cout    << "  Internationalization:   " <<
-	#ifdef USE_GETTEXT
-		"Enabled"
-	#else
-		"Disabled"
-	#endif
+	(Gettext::enabled() ? "Enabled" : "Disabled")
 	<< std::endl << "  MIDI I/O:               " <<
 	#ifdef USE_PORTMIDI
 		"Enabled"
