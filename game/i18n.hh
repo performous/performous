@@ -22,6 +22,8 @@ class Gettext {
 		bindtextdomain (package, getLocaleDir().string().c_str());
 		textdomain (package);
 		bind_textdomain_codeset (package, "UTF-8");
+#else
+		(void)package;
 #endif
 	};
 	static bool enabled() {
