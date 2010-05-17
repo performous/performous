@@ -115,6 +115,7 @@ class GuitarGraph: public InstrumentGraph {
 	void difficultyAuto(bool tryKeepCurrent = false);
 	bool difficulty(Difficulty level);
 	float getFretX(int fret) const { return (-2.0f + fret- (m_drums ? 0.5 : 0)) * (m_leftymode ? -1 : 1); }
+	double getNotesBeginTime() const { return m_chords.front().begin; }
 	boost::scoped_ptr<SvgTxtThemeSimple> m_scoreText;
 	boost::scoped_ptr<SvgTxtThemeSimple> m_streakText;
 	void updateChords();
@@ -133,6 +134,5 @@ class GuitarGraph: public InstrumentGraph {
 	double m_soloTotal; /// maximum solo score
 	double m_soloScore; /// score during solo
 	bool m_solo; /// are we currently playing a solo
-	int m_countdown; /// countdown counter
 };
 

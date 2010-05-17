@@ -66,6 +66,7 @@ class InstrumentGraph {
 	  m_streak(),
 	  m_longestStreak(),
 	  m_bigStreak(),
+	  m_countdown(3), // Display countdown 3 secs before note start
 	  m_jointime(getNaN()),
 	  m_dead()
 	  {
@@ -104,6 +105,7 @@ class InstrumentGraph {
 	Popups m_popups;
 
 	void drawPopups(double offsetX);
+	void handleCountdown(double time, double beginTime);
 
 	SvgTxtTheme m_text;
 	boost::scoped_ptr<SvgTxtThemeSimple> m_popupText;
@@ -115,6 +117,7 @@ class InstrumentGraph {
 	int m_streak; /// player's current streak/combo
 	int m_longestStreak; /// player's longest streak/combo
 	int m_bigStreak; /// next limit when a popup appears
+	int m_countdown; /// countdown counter
 	double m_jointime; /// when the player joined
 	int m_dead; /// how many notes has been passed without hitting buttons
 };

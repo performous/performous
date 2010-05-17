@@ -210,6 +210,8 @@ void DanceGraph::engine() {
 			m_pressed_anim[ev.button].setValue(1.0);
 		}
 	}
+	// Countdown to start
+	handleCountdown(time, time < getNotesBeginTime() ? getNotesBeginTime() : m_jointime+1);
 
 	// Notes gone by
 	for (DanceNotes::iterator& it = m_notesIt; it != m_notes.end() && time > it->note.end + maxTolerance; it++) {

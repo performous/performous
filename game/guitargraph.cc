@@ -78,8 +78,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number)
   m_drumfillScore(),
   m_soloTotal(),
   m_soloScore(),
-  m_solo(),
-  m_countdown(3)
+  m_solo()
 {
 	// Copy all tracks of supported types (either drums or non-drums) to m_instrumentTracks
 	for (InstrumentTracks::const_iterator it = m_song.instrumentTracks.begin(); it != m_song.instrumentTracks.end(); ++it) {
@@ -184,13 +183,6 @@ void GuitarGraph::engine() {
 			if (m_input.pressed(i)) m_hit[i + 1].setValue(1.0);
 		}
 	}
-	// Countdown
-	if (time < m_chords.front().begin && time >= m_chords.front().begin - m_countdown - 1) {
-		m_popups.push_back(Popup(m_countdown > 0 ?
-		  std::string("- ") +boost::lexical_cast<std::string>(unsigned(m_countdown))+" -" : "Rock On!",
-		  glutil::Color(0.0f, 0.0f, 1.0f), 3.0, m_popupText.get()));
-		  --m_countdown;
-	}
 	if (!m_drumfills.empty()) updateDrumFill(time); // Drum Fills / BREs
 	if (m_starpower.get() > 0.001) m_correctness.setTarget(1.0, true);
 	if (time < m_jointime) m_dead = 0; // Disable dead counting while joining
@@ -244,6 +236,8 @@ void GuitarGraph::engine() {
 		}
 		if (m_score < 0) m_score = 0;
 	}
+	// Countdown to start
+	handleCountdown(time, time < getNotesBeginTime() ? getNotesBeginTime() : m_jointime+1);
 	// Skip missed notes
 	while (m_chordIt != m_chords.end() && m_chordIt->begin + maxTolerance < time) {
 		if ( (m_drums && m_chordIt->status != m_chordIt->polyphony)
