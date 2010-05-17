@@ -244,9 +244,9 @@ void GuitarGraph::engine() {
 		if ( (m_drums && m_chordIt->status != m_chordIt->polyphony)
 		  || (!m_drums && m_chordIt->status == 0) ) endStreak();
 		// Calculate solo total score
-		if (m_solo) m_soloTotal += m_chordIt->polyphony * points(0);
+		if (m_solo) { m_soloScore += m_chordIt->score; m_soloTotal += m_chordIt->polyphony * points(0);
 		// Solo just ended?
-		else if (m_soloTotal > 0) {
+		} else if (m_soloTotal > 0) {
 			m_popups.push_back(Popup(boost::lexical_cast<std::string>(unsigned(m_soloScore / m_soloTotal * 100)) + " %",
 			  glutil::Color(0.0f, 0.8f, 0.0f), 1.0, m_popupText.get()));
 			m_soloScore = 0;
@@ -543,7 +543,6 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 		m_chordIt->status = 1 + picked;
 		m_score += score;
 		m_starmeter += score;
-		if (m_solo) m_soloScore += score;
 		m_correctness.setTarget(1.0, true); // Instantly go to one
 		errorMeter(signed_error);
 		for (int fret = 0; fret < m_pads; ++fret) {
