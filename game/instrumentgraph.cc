@@ -1,5 +1,6 @@
 #include "instrumentgraph.hh"
 
+//const unsigned InstrumentGraph::max_panels = 10; // Maximum number of arrow lines / guitar frets
 
 void InstrumentGraph::drawPopups(double offsetX) {
 	for (Popups::iterator it = m_popups.begin(); it != m_popups.end(); ) {

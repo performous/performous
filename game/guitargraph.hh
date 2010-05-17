@@ -62,7 +62,9 @@ class GuitarGraph: public InstrumentGraph {
 	bool dead() const;
 	std::string getTrack() const { return m_track_index->first; }
 	std::string getDifficultyString() const;
+
   private:
+	// Engine / scoring utils
 	bool canActivateStarpower() { return (m_starmeter > 6000); }
 	void activateStarpower();
 	void errorMeter(float error);
@@ -70,6 +72,11 @@ class GuitarGraph: public InstrumentGraph {
 	void endHold(int fret, double time = 0.0);
 	void endBRE();
 	void endStreak() { m_streak = 0; m_bigStreak = 0; }
+	void updateDrumFill(double time);
+	void drumHit(double time, int pad);
+	void guitarPlay(double time, input::Event const& ev);
+
+	// Media
 	Surface m_button;
 	Texture m_tail;
 	Texture m_tail_glow;
@@ -81,22 +88,17 @@ class GuitarGraph: public InstrumentGraph {
 	glutil::Color m_neckglowColor;
 	Object3d m_fretObj; /// 3d object for regular note
 	Object3d m_tappableObj; /// 3d object for the HOPO note cap
-	AnimValue m_hit[6];
 	std::vector<Sample> m_samples; /// sound effects
 	boost::scoped_ptr<Texture> m_neck; /// necks
+	boost::scoped_ptr<SvgTxtThemeSimple> m_scoreText;
+	boost::scoped_ptr<SvgTxtThemeSimple> m_streakText;
+
+	// Flags
 	bool m_drums; /// are we using drums?
 	bool m_use3d; /// are we using 3d?
 	bool m_leftymode; /// switch guitar notes to right-to-left direction
-	AnimValue m_starpower; /// how long the GodMode lasts (also used in fading the effect)
-	std::vector<AnimValue> m_flames[5]; /// flame effect queues for each fret
-	InstrumentTracksConstPtr m_instrumentTracks; /// tracks
-	InstrumentTracksConstPtr::const_iterator m_track_index;
-	std::vector<Duration> m_solos; /// holds guitar solos
-	std::vector<Duration> m_drumfills; /// holds drum fills (used for activating GodMode)
-	Durations::const_iterator m_dfIt; /// current drum fill
-	void updateDrumFill(double time);
-	void drumHit(double time, int pad);
-	void guitarPlay(double time, input::Event const& ev);
+
+	// Track stuff
 	enum Difficulty {
 		DIFFICULTY_SUPAEASY, // Easy
 		DIFFICULTY_EASY,     // Medium
@@ -104,30 +106,41 @@ class GuitarGraph: public InstrumentGraph {
 		DIFFICULTY_AMAZING,  // Expert
 		DIFFICULTYCOUNT
 	} m_level;
-	unsigned m_holds[5]; /// active hold notes
+	void nextTrack(bool fast = false);
+	void difficultyAuto(bool tryKeepCurrent = false);
+	bool difficulty(Difficulty level);
+	InstrumentTracksConstPtr m_instrumentTracks; /// tracks
+	InstrumentTracksConstPtr::const_iterator m_track_index;
+	unsigned m_holds[max_panels]; /// active hold notes
+
+	// Graphics functions
 	glutil::Color const& color(int fret) const;
 	glutil::Color const colorize(glutil::Color c, double time) const;
 	void drawBar(double time, float h);
 	void drawNote(int fret, glutil::Color, float tBeg, float tEnd, float whammy = 0, bool tappable = false, bool hit = false, double hitAnim = 0.0, double releaseTime = 0.0);
 	void drawDrumfill(float tBeg, float tEnd);
 	void drawInfo(double time, double offsetX, Dimensions dimensions);
-	void nextTrack(bool fast = false);
-	void difficultyAuto(bool tryKeepCurrent = false);
-	bool difficulty(Difficulty level);
 	float getFretX(int fret) const { return (-2.0f + fret- (m_drums ? 0.5 : 0)) * (m_leftymode ? -1 : 1); }
-	double getNotesBeginTime() const { return m_chords.front().begin; }
-	boost::scoped_ptr<SvgTxtThemeSimple> m_scoreText;
-	boost::scoped_ptr<SvgTxtThemeSimple> m_streakText;
+
+	// Chords & notes
 	void updateChords();
+	double getNotesBeginTime() const { return m_chords.front().begin; }
 	typedef std::vector<Chord> Chords;
 	Chords m_chords;
 	Chords::iterator m_chordIt;
 	typedef std::map<Duration const*, unsigned> NoteStatus; // Note in song to m_events[unsigned - 1] or 0 for not played
 	NoteStatus m_notes;
+	std::vector<Duration> m_solos; /// holds guitar solos
+	std::vector<Duration> m_drumfills; /// holds drum fills (used for activating GodMode)
+	Durations::const_iterator m_dfIt; /// current drum fill
+
+	// Animation & misc score keeping
+	std::vector<AnimValue> m_flames[max_panels]; /// flame effect queues for each fret
 	AnimValue m_errorMeter;
 	AnimValue m_errorMeterFlash;
 	AnimValue m_errorMeterFade;
 	AnimValue m_drumJump;
+	AnimValue m_starpower; /// how long the GodMode lasts (also used in fading the effect)
 	double m_starmeter; /// when this is high enough, GodMode becomes available
 	double m_drumfillHits; /// keeps track that enough hits are scored
 	double m_drumfillScore; /// max score for the notes under drum fill

@@ -12,6 +12,8 @@
 #include "glutil.hh"
 #include "fs.hh"
 
+
+/// Represents popup messages
 class Popup {
   public:
 	/// Constructor
@@ -50,6 +52,8 @@ class Popup {
 };
 
 
+const unsigned max_panels = 10; // Maximum number of arrow lines / guitar frets
+
 class Song;
 
 class InstrumentGraph {
@@ -60,6 +64,7 @@ class InstrumentGraph {
 	  m_stream(),
 	  m_cx(0.0, 0.2), m_width(0.5, 0.4),
 	  m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
+	  m_pads(),
 	  m_correctness(0.0, 5.0),
 	  m_score(),
 	  m_scoreFactor(),
@@ -73,17 +78,21 @@ class InstrumentGraph {
 		m_popupText.reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	};
 
+	// Interface functions
 	virtual void draw(double time) = 0;
 	virtual void engine() = 0;
 	virtual bool dead() const = 0;
 	virtual std::string getTrack() const = 0;
 	virtual std::string getDifficultyString() const = 0;
 
+	// General getters
 	void position(double cx, double width) { m_cx.setTarget(cx); m_width.setTarget(width); }
 	unsigned stream() const { return m_stream; }
 	double correctness() const { return m_correctness.get(); }
 	int getScore() const { return (m_score > 0 ? m_score : 0) * m_scoreFactor; }
+
   protected:
+	// Core stuff
 	Audio& m_audio;
 	Song const& m_song;
 	input::InputDev m_input; /// input device (guitar/drums/keyboard)
@@ -104,12 +113,18 @@ class InstrumentGraph {
 	typedef std::vector<Popup> Popups;
 	Popups m_popups;
 
+	// Shared functions for derived classes
 	void drawPopups(double offsetX);
 	void handleCountdown(double time, double beginTime);
 
+	// Media
 	SvgTxtTheme m_text;
 	boost::scoped_ptr<SvgTxtThemeSimple> m_popupText;
 
+	// Misc counters etc.
+	int m_pads; /// how many panels the current gaming mode uses
+	bool m_pressed[max_panels]; /// is certain panel pressed currently
+	AnimValue m_pressed_anim[max_panels]; /// animation for panel pressing
 	AnimValue m_correctness;
 	double m_score; /// unnormalized scores
 	double m_scoreFactor; /// normalization factor
