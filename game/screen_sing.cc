@@ -56,17 +56,16 @@ void ScreenSing::enter() {
 			std::cerr << e.what() << std::endl;
 		}
 	}
-
-#ifdef USE_OPENCV
-	if (config["graphic/webcam"].b()) { // Initialize webcam
+	// Initialize webcam
+	if (config["graphic/webcam"].b() && Webcam::enabled()) {
 		m_cam.reset(new Webcam());
 	}
-#endif
-
-	if (!m_song->video.empty() && config["graphic/video"].b()) { // Load video
+	// Load video
+	if (!m_song->video.empty() && config["graphic/video"].b()) {
 		m_video.reset(new Video(m_song->path + m_song->video, m_song->videoGap));
 	}
-	if (!foundbg) { // Use random bg if specified fails (also for tracks with video)
+	// Use random bg if specified fails (also for tracks with video)
+	if (!foundbg) {
 		for (int i = 1; i <= 2; ++i) { // Try two times in case first is b0rked
 			try {
 				std::string bgpath = m_backgrounds.getRandom();
@@ -182,9 +181,7 @@ void ScreenSing::exit() {
 	m_engine.reset();
 	m_help.reset();
 	m_pause_icon.reset();
-#ifdef USE_OPENCV
 	m_cam.reset();
-#endif
 	m_video.reset();
 	m_background.reset();
 	m_song->dropNotes();
@@ -253,13 +250,11 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		if (key == SDLK_v) m_audio.streamFade("vocals", event.key.keysym.mod & KMOD_SHIFT ? 1.0 : 0.0);
 		if (key == SDLK_k) dispInFlash(++config["game/karaoke_mode"]); // Toggle karaoke mode
 		if (key == SDLK_w) dispInFlash(++config["game/pitch"]); // Toggle pitch wave
-		#ifdef USE_OPENCV
 		// Toggle webcam
-		if (key == SDLK_a) {
-			if (!m_cam) m_cam.reset(new Webcam());
+		if (key == SDLK_a && Webcam::enabled()) {
+			if (!m_cam) m_cam.reset(new Webcam()); // Initialize if we haven't done that already
 			if (m_cam) { dispInFlash(++config["graphic/webcam"]); m_cam->pause(!config["graphic/webcam"].b()); }
 		}
-		#endif
 		// Latency settings
 		if (key == SDLK_F1) dispInFlash(--config["audio/video_delay"]);
 		if (key == SDLK_F2) dispInFlash(++config["audio/video_delay"]);
@@ -310,21 +305,18 @@ void ScreenSing::draw() {
 	// Rendering starts
 	{
 		double ar = arMax;
+		// Background image
 		if (m_background) {
 			ar = m_background->dimensions.ar();
 			if (ar > arMax || (m_video && ar > arMin)) fillBG();  // Fill white background to avoid black borders
 			m_background->draw();
-		} else fillBG();
+		} else fillBG(); // Blank
 		// Video
-		if (m_video
-	#ifdef USE_OPENCV
-			&& (!m_cam || !m_cam->is_good())
-	#endif
-			) { m_video->render(time); double tmp = m_video->dimensions().ar(); if (tmp > 0.0) ar = tmp; }
-#ifdef USE_OPENCV
+		if (m_video && (!m_cam || !m_cam->is_good())) {
+			m_video->render(time); double tmp = m_video->dimensions().ar(); if (tmp > 0.0) ar = tmp;
+		}
 		// Webcam
 		if (m_cam && config["graphic/webcam"].b()) m_cam->render();
-#endif
 		// Top/bottom borders
 		ar = clamp(ar, arMin, arMax);
 		double offset = 0.5 / ar + 0.2;

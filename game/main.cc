@@ -422,10 +422,6 @@ void outputOptionalFeatureStatus() {
 		"Disabled"
 	#endif
 	<< std::endl << "  Webcam support:         " <<
-	#ifdef USE_OPENCV
-		"Enabled"
-	#else
-		"Disabled"
-	#endif
+	(Webcam::enabled() ? "Enabled" : "Disabled")
 	<< std::endl;
 }

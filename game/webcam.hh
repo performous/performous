@@ -49,4 +49,13 @@ class Webcam {
 	bool m_frameAvailable;
 	volatile bool m_running;
 	volatile bool m_quit;
+
+  public:
+	static bool enabled() {
+		#ifdef USE_OPENCV
+		return true;
+		#else
+		return false;
+		#endif
+	}
 };

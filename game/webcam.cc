@@ -50,7 +50,9 @@ void Webcam::operator()() {
 }
 
 void Webcam::pause(bool do_pause) {
+	#ifdef USE_OPENCV
 	boost::mutex::scoped_lock l(m_mutex);
+	#endif
 	m_running = !do_pause;
 	m_frameAvailable = false;
 }
