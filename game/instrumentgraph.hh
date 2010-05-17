@@ -75,7 +75,7 @@ class InstrumentGraph {
 	  m_jointime(getNaN()),
 	  m_dead()
 	  {
-		m_popupText.reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
+		m_popupText.reset(new SvgTxtThemeSimple(getThemePath("sing_popup_text.svg"), config["graphic/text_lod"].f()));
 	};
 
 	// Interface functions
