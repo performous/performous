@@ -1,5 +1,5 @@
 #include "dancegraph.hh"
-
+#include "instrumentgraph.hh"
 #include "fs.hh"
 #include "notes.hh"
 #include "surface.hh"
@@ -71,32 +71,15 @@ namespace {
 
 /// Constructor
 DanceGraph::DanceGraph(Audio& audio, Song const& song):
+  InstrumentGraph(audio, song, input::DANCEPAD),
   m_level(BEGINNER),
-  m_audio(audio),
-  m_song(song),
-  m_input(input::DANCEPAD),
   m_beat(getThemePath("dancebeat.svg")),
   m_arrows(getThemePath("arrows.svg")),
   m_arrows_cursor(getThemePath("arrows_cursor.svg")),
   m_arrows_hold(getThemePath("arrows_hold.svg")),
   m_mine(getThemePath("mine.svg")),
-  m_cx(0.0, 0.2),
-  m_width(0.5, 0.4),
-  m_stream(),
-  m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
-  m_correctness(0.0, 5.0),
-  m_streakPopup(0.0, 1.0),
-  m_flow_direction(1),
-  m_score(),
-  m_scoreFactor(1),
-  m_streak(),
-  m_longestStreak(),
-  m_bigStreak(),
-  m_jointime(getNaN()),
-  m_dead()
+  m_flow_direction(1)
 {
-	m_popupText.reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
-
 	// Initialize some arrays
 	for(size_t i = 0; i < max_panels; i++) {
 		m_activeNotes[i] = m_notes.end();
@@ -227,6 +210,8 @@ void DanceGraph::engine() {
 			m_pressed_anim[ev.button].setValue(1.0);
 		}
 	}
+	// Countdown to start
+	handleCountdown(time, time < getNotesBeginTime() ? getNotesBeginTime() : m_jointime+1);
 
 	// Notes gone by
 	for (DanceNotes::iterator& it = m_notesIt; it != m_notes.end() && time > it->note.end + maxTolerance; it++) {
@@ -251,8 +236,9 @@ void DanceGraph::engine() {
 
 	// Check if a long streak goal has been reached
 	if (m_streak >= getNextBigStreak(m_bigStreak)) {
-		m_streakPopup.setTarget(1.0);
 		m_bigStreak = getNextBigStreak(m_bigStreak);
+		m_popups.push_back(Popup(boost::lexical_cast<std::string>(unsigned(m_bigStreak)) + "\nStreak!",
+		  glutil::Color(1.0f, 0.0, 0.0), 1.0, m_popupText.get()));
 	}
 }
 
@@ -484,7 +470,7 @@ void DanceGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 		m_text.dimensions.screenBottom(-0.075).middle(-0.09 + offsetX);
 		m_text.draw("^ " + getDifficultyString() + " v");
 		m_text.dimensions.screenBottom(-0.050).middle(-0.09 + offsetX);
-		m_text.draw("< " + getGameMode() + " >");
+		m_text.draw("< " + getTrack() + " >");
 	} else { // Draw scores
 		m_text.dimensions.screenBottom(-0.35).middle(0.32 * dimensions.w() + offsetX);
 		m_text.draw(boost::lexical_cast<std::string>(unsigned(getScore())));
@@ -492,14 +478,5 @@ void DanceGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 		m_text.draw(boost::lexical_cast<std::string>(unsigned(m_streak)) + "/"
 		  + boost::lexical_cast<std::string>(unsigned(m_longestStreak)));
 	}
-	// Draw streak pop-up for long streak intervals
-	double streakAnim = m_streakPopup.get();
-	if (streakAnim > 0.0) {
-		double s = 0.15 * (1.0 + streakAnim);
-		glColor4f(1.0f, 0.0f, 0.0f, 1.0 - streakAnim);
-		m_popupText->render(boost::lexical_cast<std::string>(unsigned(m_bigStreak)) + "\nStreak!");
-		m_popupText->dimensions().center(0.0).middle(offsetX).stretch(s,s);
-		m_popupText->draw();
-		if (streakAnim > 0.999) m_streakPopup.setTarget(0.0, true);
-	}
+	drawPopups(offsetX);
 }
