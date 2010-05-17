@@ -31,7 +31,7 @@ input::MidiDrums::MidiDrums(): stream(pm::findDevice(true, config["system/midi_i
 	map[41] = DRUM4_GREEN;   // 41 - Low Floor Tom *)
 	map[42] = DRUM2_YELLOW;  // 42 - Closed Hi-Hat 	
 	// 43 - High Floor Tom 	
-	map[44] = DRUM2_YELLOW;  // 44 - Pedal Hi-Hat 	
+	// map[44] = DRUM2_YELLOW;  // 44 - Pedal Hi-Hat *) - ignore this for playability!
 	map[45] = DRUM3_BLUE;    // 45 - Low Tom *)
 	map[46] = DRUM2_YELLOW;  // 46 - Open Hi-Hat *)
 	// 47 - Low-Mid Tom 	

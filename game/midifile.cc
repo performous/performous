@@ -171,37 +171,56 @@ MidiFileParser::Track MidiFileParser::read_track(MidiStream& stream) {
 			uint8_t type = riff.read_uint8();
 			std::string data = riff.read_bytes(riff.read_varlen());
 			switch (type) {
-			  case 0x01:
+			  // 0x00: Sequence Number
+			  case 0x01: { // Text Event
+				const std::string sect_pfx = "[section ";
 				// Lyrics are hidden here, only [text] are orders
 				if (data[0] != '[') m_lyric = data;
+				else if (!data.compare(0, sect_pfx.length(), sect_pfx)) {// [section verse_1]
+					// TODO: clean up the section name some more
+					const std::string sect_name = data.substr(sect_pfx.length(), data.length()-sect_pfx.length()-1);
+#if MIDI_DEBUG_LEVEL > 2
+					std::cout << "Section: " << sect_name << std::endl;
+#endif
+				}
 				else cmdevents.push_back(std::string(data));
 #if MIDI_DEBUG_LEVEL > 2
 				std::cout << "Text: " << data << std::endl;
 #endif
-				break;
-			  case 0x03:
+			  }  break;
+			  // 0x02: Copyright Notice
+			  case 0x03: // Sequence or Track Name
 				track.name = data;
 #if MIDI_DEBUG_LEVEL > 1
 				std::cout << "Track name: " << data << std::endl;
 #endif
 				break;
-			  case 0x05:
+			  // 0x04: Instrument Name
+			  case 0x05: // Lyric Text
 				m_lyric = data;
 #if MIDI_DEBUG_LEVEL > 2
 				std::cout << "Lyric: " << data << std::endl;
 #endif
 				break;
-			  case 0x2F: end = true; break;
-			  case 0x51:
+			  // 0x06: Marker Text
+			  // 0x07: Cue point
+			  // 0x20: MIDI Channel Prefix Assignment
+			  case 0x2F: // End of Track
+				end = true;
+				break;
+			  case 0x51: // Tempo Setting
 				if (data.size() != 3) throw std::runtime_error("Invalid tempo change event");
 				add_tempo_change(miditime, static_cast<unsigned char>(data[0]) << 16 | static_cast<unsigned char>(data[1]) << 8 | static_cast<unsigned char>(data[2])); break;
-			  case 0x58:
+			  // 0x54: SMPTE Offset
+			  case 0x58: // Time Signature
 				if (data.size() != 4) throw std::runtime_error("Invalid time signature event");
 #if MIDI_DEBUG_LEVEL > 3
 				// if none is found "4/4, 24,8" should be assume
 				std::cout << "Time signature: " << int(data[0]) << "/" << int(data[1]) << ", " << int(data[2]) << ", " << int(data[3]) << std::endl;
 #endif
 				break;
+			  // 0x59: Key Signature
+			  // 0x7f: Sequencer Specific Event
 			  default:
 #if MIDI_DEBUG_LEVEL > 1
 				std::cout << "Unhandled meta event  type=" << int(type) << " (" << data.size() << " bytes)" << std::endl;
