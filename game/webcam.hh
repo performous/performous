@@ -17,7 +17,7 @@ typedef void CvCapture;
 struct CamFrame {
 	int width;
 	int height;
-	std::vector<uint8_t> data;
+	std::vector<boost::uint8_t> data;
 };
 
 class Webcam {
