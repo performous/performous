@@ -484,7 +484,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 		m_flames[ev.button].back().setTarget(1.0);
 		return;
 	}
-	bool frets[m_pads];  // The combination about to be played
+	bool frets[max_panels];  // The combination about to be played
 	if (picked) {
 		for (int fret = 0; fret < m_pads; ++fret) {
 			frets[fret] = ev.pressed[fret];
