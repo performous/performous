@@ -85,7 +85,13 @@ void Texture::load(unsigned int width, unsigned int height, pix::Format format, 
 	glTexParameterf(type(), GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameterf(type(), GL_TEXTURE_WRAP_T, GL_REPEAT);
 	//glTexParameterf(type(), GL_TEXTURE_MAX_LEVEL, 1);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16.0f);
+	glutil::GLErrorChecker glerror1("Texture::load - glTexParameterf");
+
+	// Anisotropy is potential trouble maker
+	if (GLEW_EXT_texture_filter_anisotropic)
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16.0f);
+	glutil::GLErrorChecker glerror2("Texture::load - MAX_ANISOTROPY_EXT");
+
 	glTexParameteri(type(), GL_GENERATE_MIPMAP, GL_TRUE);
 	PixFmt const& f = getPixFmt(format);
 	glPixelStorei(GL_UNPACK_SWAP_BYTES, f.swap);
@@ -105,7 +111,7 @@ void Texture::load(unsigned int width, unsigned int height, pix::Format format, 
 		glTexImage2D(type(), 0, GL_RGBA, newWidth, newHeight, 0, f.format, f.type, &outBuf[0]);
 	}
 	// Check for OpenGL errors
-	glutil::GLErrorChecker glerror("Texture::load");
+	glutil::GLErrorChecker glerror3("Texture::load");
 }
 
 void Surface::load(unsigned int width, unsigned int height, pix::Format format, unsigned char const* buffer, float ar) {
