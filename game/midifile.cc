@@ -177,17 +177,26 @@ MidiFileParser::Track MidiFileParser::read_track(MidiStream& stream) {
 				// Lyrics are hidden here, only [text] are orders
 				if (data[0] != '[') m_lyric = data;
 				else if (!data.compare(0, sect_pfx.length(), sect_pfx)) {// [section verse_1]
-					// TODO: clean up the section name some more
-					const std::string sect_name = data.substr(sect_pfx.length(), data.length()-sect_pfx.length()-1);
+					std::string sect_name = data.substr(sect_pfx.length(), data.length()-sect_pfx.length()-1);
+					if (sect_name != "big_rock_ending") {
+						bool space = true;
+						for (std::string::iterator it = sect_name.begin(); it != sect_name.end(); it++) {
+							if (space) *it = toupper(*it);        // start in uppercase
+							if (*it == '_') {*it = ' '; space = true;} // underscores to spaces
+							else space = false;
+						}
+						// replace gtr => guitar
 #if MIDI_DEBUG_LEVEL > 2
-					std::cout << "Section: " << sect_name << std::endl;
+						std::cout << "Section: " << sect_name << " at " << get_seconds(miditime) << std::endl;
 #endif
+						songsections.push_back(SongSection(sect_name, get_seconds(miditime)));
+					} else cmdevents.push_back(std::string(data)); // see songparser-ini.cc: we need to keep the BRE in cmdevents
 				}
 				else cmdevents.push_back(std::string(data));
 #if MIDI_DEBUG_LEVEL > 2
 				std::cout << "Text: " << data << std::endl;
 #endif
-			  }  break;
+			  } break;
 			  // 0x02: Copyright Notice
 			  case 0x03: // Sequence or Track Name
 				track.name = data;

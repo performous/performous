@@ -76,6 +76,13 @@ class MidiFileParser{
 	};
 	typedef std::vector<Track> Tracks;
 	Tracks tracks;
+	struct SongSection {
+		std::string name;
+		double begin;
+		SongSection(std::string const& name, const double begin): name(name), begin(begin) {}
+	};
+	typedef std::vector<SongSection> SongSections;
+	SongSections songsections; ///< vector of song sections
 	uint16_t parse_header(MidiStream&);
 	Track read_track(MidiStream&);
 	void cout_midi_event(uint8_t type, uint8_t arg1, uint8_t arg2, uint32_t miditime);

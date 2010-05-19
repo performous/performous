@@ -92,6 +92,13 @@ class Song: boost::noncopyable {
 	Beats beats; ///< related to instrument and dance
 	bool hasBRE; ///< is there a Big Rock Ending? (used for drums only)
 	bool b0rkedTracks; ///< are some tracks broken? (so that user can be notified)
+	struct SongSection {
+		std::string name;
+		double begin;
+		SongSection(std::string const& name, const double begin): name(name), begin(begin) {}
+	};
+	typedef std::vector<SongSection> SongSections;
+	SongSections songsections; ///< vector of song sections
 };
 
 static inline bool operator<(Song const& l, Song const& r) { return l.collateByArtist < r.collateByArtist; }

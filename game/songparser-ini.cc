@@ -130,6 +130,12 @@ void SongParser::iniParseHeader() {
 			}
 		}
 	}
+	// populate song sections
+	for (std::vector<MidiFileParser::SongSection>::iterator it= midi.songsections.begin(); it != midi.songsections.end(); it++) {
+		Song::SongSection tmp(it->name, it->begin);
+		s.songsections.push_back(tmp);
+		//std::cout << "Section " << tmp.name << " at " << tmp.begin << std::endl;
+	}
 }
 
 /// Parse notes
