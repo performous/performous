@@ -237,7 +237,7 @@ void DanceGraph::engine() {
 	// Check if a long streak goal has been reached
 	if (m_streak >= getNextBigStreak(m_bigStreak)) {
 		m_bigStreak = getNextBigStreak(m_bigStreak);
-		m_popups.push_back(Popup(boost::lexical_cast<std::string>(unsigned(m_bigStreak)) + "\nStreak!",
+		m_popups.push_back(Popup(boost::lexical_cast<std::string>(unsigned(m_bigStreak)) + "\n" + _("Streak!"),
 		  glutil::Color(1.0f, 0.0, 0.0), 1.0, m_popupText.get()));
 	}
 }

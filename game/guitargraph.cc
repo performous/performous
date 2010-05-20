@@ -302,7 +302,7 @@ void GuitarGraph::engine() {
 	if (m_streak >= getNextBigStreak(m_bigStreak)) {
 		m_bigStreak = getNextBigStreak(m_bigStreak);
 		m_starmeter += streakStarBonus;
-		m_popups.push_back(Popup(boost::lexical_cast<std::string>(unsigned(m_bigStreak)) + "\nStreak!",
+		m_popups.push_back(Popup(boost::lexical_cast<std::string>(unsigned(m_bigStreak)) + "\n" + _("Streak!"),
 		  glutil::Color(1.0f, 0.0f, 0.0f), 1.0, m_popupText.get()));
 	}
 	// During GodMode, correctness is full, no matter what
@@ -319,8 +319,8 @@ void GuitarGraph::activateStarpower() {
 	if (canActivateStarpower()) {
 		m_starmeter = 0;
 		m_starpower.setValue(1.0);
-		m_popups.push_back(Popup("God Mode\nActivated!",
-		  glutil::Color(0.3f, 0.0f, 1.0f), 0.666, m_popupText.get(), "Mistakes ignored!", &m_text));
+		m_popups.push_back(Popup(_("God Mode\nActivated!"),
+		  glutil::Color(0.3f, 0.0f, 1.0f), 0.666, m_popupText.get(), _("Mistakes ignored!"), &m_text));
 	}
 }
 
@@ -950,13 +950,13 @@ void GuitarGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 		float a = std::abs(std::fmod(time, 1.0) - 0.5f) * 2.0f;
 		m_text.dimensions.screenBottom(-0.02).middle(-0.12 + offsetX);
 		if (m_drums && m_dfIt != m_drumfills.end() && time >= m_dfIt->begin && time <= m_dfIt->end)
-			m_text.draw("  Drum Fill!  ", a);
-		else m_text.draw("God Mode Ready!", a);
+			m_text.draw(_("Drum Fill!"), a);
+		else m_text.draw(_("God Mode Ready!"), a);
 	} else if (m_solo) {
 		// Solo
 		float a = std::abs(std::fmod(time, 1.0) - 0.5f) * 2.0f;
 		m_text.dimensions.screenBottom(-0.02).middle(-0.03 + offsetX);
-		m_text.draw("Solo!", a);
+		m_text.draw(_("Solo!"), a);
 	}
 	drawPopups(offsetX);
 }
