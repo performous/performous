@@ -361,7 +361,13 @@ void ScreenSing::draw() {
 	{
 		unsigned t = clamp(time, 0.0, length);
 		m_progress->draw(songPercent);
-		std::string statustxt = (boost::format("%02u:%02u") % (t / 60) % (t % 60)).str();
+
+		Song::SongSection section("error", 0);
+		std::string statustxt;
+		if (m_song->getPrevSection(t - 1.0, section)) {
+			statustxt = (boost::format("%02u:%02u - %s") % (t / 60) % (t % 60) % section.name).str();
+		} else  statustxt = (boost::format("%02u:%02u") % (t / 60) % (t % 60)).str();
+
 		if (!m_score_window.get() && m_only_singers_alive && !m_song->vocals.notes.empty()) {
 			if (status == Song::INSTRUMENTAL_BREAK) statustxt += _("   ENTER to skip instrumental break");
 			if (status == Song::FINISHED && !config["game/karaoke_mode"].b()) statustxt += _("   Remember to wait for grading!");
