@@ -7,16 +7,17 @@
 
 /// abstract theme class
 class Theme: boost::noncopyable {
-  protected:
+protected:
   	Theme();
   	Theme(const std::string path); ///< creates theme from path
-  public:
+public:
 	/// background image for theme
 	Surface bg;
 };
 
 /// theme for song selection
-struct ThemeSongs: Theme {
+class ThemeSongs: public Theme {
+public:
 	ThemeSongs();
 	/// song display
 	SvgTxtTheme song;
@@ -29,7 +30,8 @@ struct ThemeSongs: Theme {
 };
 
 /// theme for practice screen
-struct ThemePractice: Theme {
+class ThemePractice: public Theme {
+public:
 	ThemePractice();
 	/// note
 	Surface note;
@@ -40,7 +42,8 @@ struct ThemePractice: Theme {
 };
 
 /// theme for singing screen
-struct ThemeSing: Theme {
+class ThemeSing: public Theme {
+public:
 	ThemeSing();
 	/// top background
 	Surface bg_top;
@@ -55,7 +58,8 @@ struct ThemeSing: Theme {
 };
 
 /// theme for options screen
-struct ThemeConfiguration: Theme {
+class ThemeConfiguration: public Theme {
+public:
 	ThemeConfiguration();
 	/// configuration item
 	SvgTxtTheme item;
@@ -72,7 +76,8 @@ struct ThemeConfiguration: Theme {
 };
 
 /// theme for intro screen
-struct ThemeIntro: Theme {
+class ThemeIntro: public Theme {
+public:
 	ThemeIntro();
 	/// back highlight for selected option
 	Surface back_h;
