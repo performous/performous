@@ -264,45 +264,25 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		if (key == SDLK_F6) dispInFlash(++config["audio/controller_delay"]);
 		bool seekback = false;
 
-		if (m_song->songsections.empty()) {
-			// standard seeking in 5s increments
-			if (m_song->danceTracks.empty()) { // Seeking backwards is currently not permitted for dance songs
-				if (key == SDLK_HOME) { m_audio.seekPos(0.0); seekback = true; }
-				if (key == SDLK_LEFT) { m_audio.seek(-5.0); seekback = true;}
+		if (m_song->danceTracks.empty()) { // Seeking backwards is currently not permitted for dance songs
+			if (key == SDLK_HOME) { m_audio.seekPos(0.0); seekback = true; }
+			if (key == SDLK_LEFT) {
+				Song::SongSection section("error", 0);
+				if (m_song->getPrevSection(m_audio.getPosition(), section)) {
+					m_audio.seekPos(section.begin);
+					// TODO: display popup with section.name here
+					std::cout << section.name << std::endl;
+				} else m_audio.seek(-5.0);
+				seekback = true;
 			}
-			if (key == SDLK_RIGHT) m_audio.seek(5.0);
-		} else {
-			// seeking to the next song section
-			if (m_song->danceTracks.empty()) { // Seeking backwards is currently not permitted for dance songs
-				if (key == SDLK_HOME) { m_audio.seekPos(0.0); seekback = true; }
-				if (key == SDLK_LEFT) {
-					double pos = m_audio.getPosition();
-					for (std::vector<Song::SongSection>::reverse_iterator it= m_song->songsections.rbegin(); it != m_song->songsections.rend(); it++) {
-						double begin = it->begin;
-						if (begin < pos - 1.0) { // make sure we can jump across a marker!
-							m_audio.seekPos(begin);
-							// TODO: display popup with section name
-							const std::string name = it->name;
-							std::cout << "seek left from " << pos << " to " << name << " at " << begin << std::endl;
-							break;
-						}
-					}
-					seekback = true;
-				}
-			}
-			if (key == SDLK_RIGHT) {
-				double pos = m_audio.getPosition();
-				for (std::vector<Song::SongSection>::iterator it= m_song->songsections.begin(); it != m_song->songsections.end(); it++) {
-					double begin = it->begin;
-					if (begin > pos) {
-						m_audio.seekPos(begin);
-						// TODO: display popup with section name
-						const std::string name = it->name;
-						std::cout << "seek right from " << pos << " to " << name << " at " << begin << std::endl;
-						break;
-					}
-				}
-			}
+		}
+		if (key == SDLK_RIGHT) {
+			Song::SongSection section("error", 0);
+			if (m_song->getNextSection(m_audio.getPosition(), section)) {
+				m_audio.seekPos(section.begin);
+				// TODO: display popup with section.name here
+				std::cout << section.name << std::endl;
+			} else m_audio.seek(5.0);
 		}
 
 		// Some things must be reset after seeking backwards

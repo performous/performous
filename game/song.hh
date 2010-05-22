@@ -99,6 +99,8 @@ class Song: boost::noncopyable {
 	};
 	typedef std::vector<SongSection> SongSections;
 	SongSections songsections; ///< vector of song sections
+	bool getNextSection(double pos, SongSection &section);
+	bool getPrevSection(double pos, SongSection &section);
 };
 
 static inline bool operator<(Song const& l, Song const& r) { return l.collateByArtist < r.collateByArtist; }

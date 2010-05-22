@@ -189,7 +189,7 @@ MidiFileParser::Track MidiFileParser::read_track(MidiStream& stream) {
 #if MIDI_DEBUG_LEVEL > 2
 						std::cout << "Section: " << sect_name << " at " << get_seconds(miditime) << std::endl;
 #endif
-						songsections.push_back(SongSection(sect_name, get_seconds(miditime)));
+						midisections.push_back(MidiSection(sect_name, get_seconds(miditime)));
 					} else cmdevents.push_back(std::string(data)); // see songparser-ini.cc: we need to keep the BRE in cmdevents
 				}
 				else cmdevents.push_back(std::string(data));

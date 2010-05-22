@@ -79,3 +79,27 @@ Song::Status Song::status(double time) const {
 	return NORMAL;
 }
 
+bool Song::getNextSection(double pos, SongSection &section) {
+	if (songsections.empty()) return false;
+	for (std::vector<Song::SongSection>::iterator it= songsections.begin(); it != songsections.end(); it++) {
+		if (it->begin > pos) {
+			section = *it;
+			return true;
+		}
+	}
+	// returning false here will jump forward 5s (see screen_sing.cc)
+	return false;
+}
+
+bool Song::getPrevSection(double pos, SongSection &section) {
+	if (songsections.empty()) return false;
+	for (std::vector<Song::SongSection>::reverse_iterator it= songsections.rbegin(); it != songsections.rend(); it++) {
+		// subtract 1 second so we can jump across a section
+		if (it->begin < pos - 1.0) {
+			section = *it;
+			return true;
+		}
+	}
+	// returning false here will jump backwards by 5s (see screen_sing.cc)
+	return false;
+}
