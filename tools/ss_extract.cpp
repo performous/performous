@@ -643,7 +643,7 @@ struct FindSongs {
 			s.title = elem.get_attribute("TITLE")->get_value();
 			s.artist = elem.get_attribute("PERFORMANCE_NAME")->get_value();
 			if (!m_search.empty() && m_search != elem.get_attribute("ID")->get_value() && (s.artist + " - " + s.title).find(m_search) == std::string::npos) continue;
-			xmlpp::Node* node = dynamic_cast<const xmlpp::Node*>((*it));
+			xmlpp::Node const* node = dynamic_cast<xmlpp::Node const*>(*it);
 			get_node(node, s.genre, s.year); // get the values for genre and year
 
 			xmlpp::NodeSet fr = elem.find(ns + "VIDEO/@FRAME_RATE", nsmap);
