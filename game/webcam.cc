@@ -3,6 +3,11 @@
 #include "webcam.hh"
 #include "xtime.hh"
 
+#ifdef USE_OPENCV
+#include <cv.h>
+#include <highgui.h>
+#endif
+
 Webcam::Webcam(int cam_id):
   m_thread(), m_capture(NULL), m_frameAvailable(false), m_running(false), m_quit(false)
   {

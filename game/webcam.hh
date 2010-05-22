@@ -1,18 +1,13 @@
 #pragma once
 
-#ifdef USE_OPENCV
-#include <cv.h>
-#include <highgui.h>
-#else
-typedef void CvCapture;
-#endif
-
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
 #include <vector>
 
 #include "surface.hh"
+
+class CvCapture;
 
 struct CamFrame {
 	int width;
