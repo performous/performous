@@ -7,7 +7,7 @@
 
 #include "surface.hh"
 
-class CvCapture;
+struct CvCapture;
 
 struct CamFrame {
 	int width;
