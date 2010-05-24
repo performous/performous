@@ -440,23 +440,28 @@ void GuitarGraph::drumHit(double time, int fret) {
 			signed_error = it->begin - time;
 		}
 	}
-	if (best == m_chords.end()) fail(time, fret);
+	if (best == m_chords.end()) fail(time, fret);  // None found
 	else {
+		// Skip all chords earlier than the best fit chord
 		for (; best != m_chordIt; ++m_chordIt) {
 			if (m_chordIt->status == m_chordIt->polyphony) continue;
 			endStreak();
 		}
-		++m_chordIt->status;
+		++m_chordIt->status;  // One more drum belonging to the chord hit
 		Duration const* dur = m_chordIt->dur[fret];
+		// Record the hit event
 		m_events.push_back(Event(time, 1, fret, dur));
 		m_notes[dur] = m_events.size();
+		// Scoring
 		double score = points(tolerance);
 		m_chordIt->score += score;
 		m_score += score;
 		if (!m_drumfills.empty()) m_starmeter += score; // Only add starmeter if it's possible to activate GodMode
+		// Graphical effects
 		m_flames[fret].push_back(AnimValue(0.0, flameSpd));
 		m_flames[fret].back().setTarget(1.0);
 		if (fret == 0) m_drumJump.setTarget(1.0); // Do a jump for bass drum
+		// All drums of the chord hit already?
 		if (m_chordIt->status == m_chordIt->polyphony) {
 			//m_score -= m_chordIt->score;
 			//m_chordIt->score *= m_chordIt->polyphony;
