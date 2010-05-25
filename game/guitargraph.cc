@@ -12,6 +12,7 @@
 
 namespace {
 	struct Diff { std::string name; int basepitch; } diffv[] = {
+		{ "Kids", 0x3C },
 		{ "Easy", 0x3C },
 		{ "Medium", 0x48 },
 		{ "Hard", 0x54 },
@@ -65,6 +66,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number)
   m_drums(drums),
   m_use3d(config["graphic/3d_notes"].b()),
   m_leftymode(false),
+  m_kiddymode(config["game/kids_mode"].b()),
   m_level(),
   m_track_index(m_instrumentTracks.end()),
   m_dfIt(m_drumfills.end()),
@@ -220,7 +222,9 @@ void GuitarGraph::engine() {
 		if (time < m_jointime) {
 			if (ev.type == input::Event::PICK || ev.type == input::Event::PRESS) {
 				if (!m_drums && ev.pressed[4]) nextTrack();
-				if (ev.pressed[0 + m_drums]) difficulty(DIFFICULTY_SUPAEASY);
+				if (ev.pressed[0 + m_drums]) {
+					if (m_kiddymode)          difficulty(DIFFICULTY_KIDS);
+					else                      difficulty(DIFFICULTY_SUPAEASY); }
 				else if (ev.pressed[1 + m_drums]) difficulty(DIFFICULTY_EASY);
 				else if (ev.pressed[2 + m_drums]) difficulty(DIFFICULTY_MEDIUM);
 				else if (ev.pressed[3 + m_drums]) difficulty(DIFFICULTY_AMAZING);
@@ -431,8 +435,16 @@ void GuitarGraph::drumHit(double time, int fret) {
 	double tolerance = maxTolerance;
 	double signed_error = maxTolerance;
 	Chords::iterator best = m_chords.end();
+	// when we get here m_chordIt points to the last best fit chord
 	for (Chords::iterator it = m_chordIt; it != m_chords.end() && it->begin <= time + tolerance; ++it) {
-		if (m_notes[it->dur[fret]]) continue;  // Already played
+		// it->dur[fret]          == NULL for a chord that doesn't include the fret played (pad hit)
+		// m_notes[it->dur[fret]] != 0    when the fret played (pad hit) was already played
+		if (m_level == DIFFICULTY_KIDS) {
+			// in kiddy mode we don't care about the correct pad
+			// all that matters is that there is still a missing note in that chord
+			if (m_chordIt->status == m_chordIt->polyphony) continue;
+		} else if (m_notes[it->dur[fret]]) continue;  // invalid fret/hit or already played
+
 		double error = std::abs(it->begin - time);
 		if (error < tolerance) {
 			best = it;
