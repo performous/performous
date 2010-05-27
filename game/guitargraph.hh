@@ -97,7 +97,6 @@ class GuitarGraph: public InstrumentGraph {
 	bool m_drums; /// are we using drums?
 	bool m_use3d; /// are we using 3d?
 	bool m_leftymode; /// switch guitar notes to right-to-left direction
-	bool m_kiddymode; /// super-easy mode for kids
 
 	// Track stuff
 	enum Difficulty {

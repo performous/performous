@@ -88,12 +88,6 @@ to save the current settings to XML.
 			<long>Force joystick to some kind of instrument.</long>
 		</locale>
 	</entry>
-	<entry name="game/kids_mode" type="bool" value="false">
-		<locale name="C">
-			<short>Use Kids rules for Easy dificulty</short>
-			<long>Use Kids rules for Easy difficuty.</long>
-		</locale>
-	</entry>
 
 	<!-- Graphic preferences -->
 	<entry name="graphic/window_width" type="int" value="800" hidden="true">

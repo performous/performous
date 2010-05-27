@@ -39,6 +39,11 @@ namespace {
 
 	const float drumfill_min_rate = 6.0; // The rate of hits per second required to complete a drum fill
 	double points(double error) {
+		// error    points
+		// 150ms      15
+		// 100ms      30
+		//  50ms      45
+		//  30ms      50
 		double score = 0.0;
 		if (error < maxTolerance) score += 15;
 		if (error < 0.1) score += 15;
@@ -66,7 +71,6 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number)
   m_drums(drums),
   m_use3d(config["graphic/3d_notes"].b()),
   m_leftymode(false),
-  m_kiddymode(config["game/kids_mode"].b()),
   m_level(),
   m_track_index(m_instrumentTracks.end()),
   m_dfIt(m_drumfills.end()),
@@ -222,12 +226,11 @@ void GuitarGraph::engine() {
 		if (time < m_jointime) {
 			if (ev.type == input::Event::PICK || ev.type == input::Event::PRESS) {
 				if (!m_drums && ev.pressed[4]) nextTrack();
-				if (ev.pressed[0 + m_drums]) {
-					if (m_kiddymode)          difficulty(DIFFICULTY_KIDS);
-					else                      difficulty(DIFFICULTY_SUPAEASY); }
+				if (ev.pressed[0 + m_drums])      difficulty(DIFFICULTY_SUPAEASY);
 				else if (ev.pressed[1 + m_drums]) difficulty(DIFFICULTY_EASY);
 				else if (ev.pressed[2 + m_drums]) difficulty(DIFFICULTY_MEDIUM);
 				else if (ev.pressed[3 + m_drums]) difficulty(DIFFICULTY_AMAZING);
+				else if (ev.pressed[4 + m_drums]) difficulty(DIFFICULTY_KIDS);
 				difficulty_changed = true;
 			}
 			// Lefty-mode switch
@@ -366,7 +369,10 @@ void GuitarGraph::fail(double time, int fret) {
 		m_events.push_back(Event(time, 0, fret));
 		if (fret < 0) fret = std::rand();
 		m_audio.play(m_samples[unsigned(fret) % m_samples.size()], "audio/fail_volume");
-		m_score -= 50;
+		// remove equivalent of 1 perfect hit for every note
+		// kids tend to play a lot of extra notes just for the fun of it.
+		// need to make sure they don't end up with a score of zero
+		m_score -= (m_level == DIFFICULTY_KIDS) ? points(0)/2.0 : points(0);
 	}
 	endStreak();
 }
@@ -464,8 +470,8 @@ void GuitarGraph::drumHit(double time, int fret) {
 		// Record the hit event
 		m_events.push_back(Event(time, 1, fret, dur));
 		m_notes[dur] = m_events.size();
-		// Scoring
-		double score = points(tolerance);
+		// Scoring - be a little more generous for kids
+		double score = (m_level == DIFFICULTY_KIDS) ? points(tolerance/2.0) : points(tolerance);
 		m_chordIt->score += score;
 		m_score += score;
 		if (!m_drumfills.empty()) m_starmeter += score; // Only add starmeter if it's possible to activate GodMode
