@@ -119,8 +119,9 @@ void SongParser::iniParseHeader() {
 	for (MidiFileParser::Tracks::const_iterator it = midi.tracks.begin(); it != midi.tracks.end(); ++it) {
 		// Figure out the track name
 		std::string name = it->name;
-		if (midi.tracks.size() == 1) name = TrackName::GUITAR; // Original (old) FoF songs only have one track
-		else if (!mangleTrackName(name)) continue; // Beautify the track name
+		if (mangleTrackName(name)) ; // Beautify the track name
+		else if (midi.tracks.size() == 1) name = TrackName::GUITAR; // Original (old) FoF songs only have one track
+		else continue;
 		// Add dummy notes to tracks so that they can be seen in song browser
 		if (name == "VOCALS") s.vocals.notes.push_back(Note());
 		else {
@@ -143,8 +144,9 @@ void SongParser::iniParse() {
 	for (MidiFileParser::Tracks::const_iterator it = midi.tracks.begin(); it != midi.tracks.end(); ++it) {
 		// Figure out the track name
 		std::string name = it->name;
-		if (midi.tracks.size() == 1) name = TrackName::GUITAR; // Original (old) FoF songs only have one track
-		else if (!mangleTrackName(name)) continue; // Beautify the track name
+		if (mangleTrackName(name)) ; // Beautify the track name
+		else if (midi.tracks.size() == 1) name = TrackName::GUITAR; // Original (old) FoF songs only have one track
+		else continue;
 		// Process non-vocal tracks
 		if (name != "VOCALS") {
 			int durCount = 0;
