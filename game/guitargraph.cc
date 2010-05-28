@@ -226,11 +226,13 @@ void GuitarGraph::engine() {
 		if (time < m_jointime) {
 			if (ev.type == input::Event::PICK || ev.type == input::Event::PRESS) {
 				if (!m_drums && ev.pressed[4]) nextTrack();
-				if (ev.pressed[0 + m_drums])      difficulty(DIFFICULTY_SUPAEASY);
+				else if (ev.pressed[0 + m_drums]) difficulty(DIFFICULTY_SUPAEASY);
 				else if (ev.pressed[1 + m_drums]) difficulty(DIFFICULTY_EASY);
 				else if (ev.pressed[2 + m_drums]) difficulty(DIFFICULTY_MEDIUM);
 				else if (ev.pressed[3 + m_drums]) difficulty(DIFFICULTY_AMAZING);
-				else if (ev.pressed[4 + m_drums]) difficulty(DIFFICULTY_KIDS);
+				// Kiddy mode is currently only available for drums
+				// (and this way of enabling is temporary anyway).
+				else if (ev.pressed[4] && m_drums) difficulty(DIFFICULTY_KIDS);
 				difficulty_changed = true;
 			}
 			// Lefty-mode switch
