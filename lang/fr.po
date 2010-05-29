@@ -2,16 +2,21 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-03 12:25+0100\n"
+"POT-Creation-Date: 2010-05-29 12:51+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Vincent Le Ligeour <yoda-jm@users.sourceforge.net>\n"
 "Language-Team: \n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: _\n"
 "X-Poedit-Basepath: .\n"
 "X-Poedit-SearchPath-0: ../game\n"
+
+#: ../game/dancegraph.cc:240
+msgid "Streak!"
+msgstr "D'affilé"
 
 #: ../game/database.cc:107
 msgid "No Items up to now."
@@ -33,60 +38,60 @@ msgstr "Chanson cassée"
 msgid "Song contains broken tracks!"
 msgstr "Chanson contenant des morceaux cassés"
 
-#: ../game/screen_sing.cc:330
+#: ../game/screen_sing.cc:372
 msgid "   ENTER to skip instrumental break"
 msgstr "   \"Entrée\" pour passer l'instrumental"
 
-#: ../game/screen_sing.cc:331
+#: ../game/screen_sing.cc:373
 msgid "   Remember to wait for grading!"
 msgstr "   N'oubliez pas d'attendre pour votre classement!"
 
-#: ../game/screen_sing.cc:419
+#: ../game/screen_sing.cc:461
 msgid "No player!"
 msgstr "Aucun joueur n'a été trouvé!"
 
-#: ../game/screen_sing.cc:428
+#: ../game/screen_sing.cc:470
 msgid "Hit singer"
 msgstr "Superstar"
 
-#: ../game/screen_sing.cc:429
+#: ../game/screen_sing.cc:471
 msgid "Lead singer"
 msgstr "Soliste"
 
-#: ../game/screen_sing.cc:430
-#: ../game/screen_sing.cc:436
-#: ../game/screen_sing.cc:442
+#: ../game/screen_sing.cc:472
+#: ../game/screen_sing.cc:478
+#: ../game/screen_sing.cc:484
 msgid "Rising star"
 msgstr "Etoile montante"
 
-#: ../game/screen_sing.cc:431
-#: ../game/screen_sing.cc:437
-#: ../game/screen_sing.cc:443
+#: ../game/screen_sing.cc:473
+#: ../game/screen_sing.cc:479
+#: ../game/screen_sing.cc:485
 msgid "Amateur"
 msgstr "Amateur"
 
-#: ../game/screen_sing.cc:432
-#: ../game/screen_sing.cc:444
+#: ../game/screen_sing.cc:474
+#: ../game/screen_sing.cc:486
 msgid "Tone deaf"
 msgstr "Casserole"
 
-#: ../game/screen_sing.cc:434
+#: ../game/screen_sing.cc:476
 msgid "Maniac"
 msgstr "Maniac"
 
-#: ../game/screen_sing.cc:435
+#: ../game/screen_sing.cc:477
 msgid "Hoofer"
 msgstr "Claquettiste"
 
-#: ../game/screen_sing.cc:438
+#: ../game/screen_sing.cc:480
 msgid "Loser"
 msgstr "Perdant"
 
-#: ../game/screen_sing.cc:440
+#: ../game/screen_sing.cc:482
 msgid "Virtuoso"
 msgstr "Virtuose"
 
-#: ../game/screen_sing.cc:441
+#: ../game/screen_sing.cc:483
 msgid "Rocker"
 msgstr "Rockeur"
 
@@ -138,11 +143,11 @@ msgstr ""
 "\n"
 "Veuillez en configurer certains avant de jouer."
 
-#: ../game/screen_songs.cc:193
+#: ../game/screen_songs.cc:195
 msgid "No songs found!"
 msgstr "Aucun morceau trouvé!"
 
-#: ../game/screen_songs.cc:194
+#: ../game/screen_songs.cc:196
 msgid ""
 "Visit performous.org\n"
 "for free songs"
@@ -150,43 +155,43 @@ msgstr ""
 "Visitez performous.org\n"
 "pour des morceaux gratuits"
 
-#: ../game/screen_songs.cc:196
+#: ../game/screen_songs.cc:198
 msgid "no songs match search"
 msgstr "aucun morceau ne satisfait la recherche"
 
-#: ../game/screen_songs.cc:204
+#: ../game/screen_songs.cc:206
 msgid "(press END to view hiscores)"
 msgstr "(presser Fin pour voir le classement)"
 
-#: ../game/screen_songs.cc:205
+#: ../game/screen_songs.cc:207
 msgid "<type in to search>"
 msgstr "<Entrez votre recherche>"
 
-#: ../game/screen_songs.cc:210
+#: ../game/screen_songs.cc:212
 msgid "Hiscore for "
 msgstr "Records pour "
 
-#: ../game/main.cc:164
+#: ../game/main.cc:159
 msgid "Audio capture..."
 msgstr "Entrée sonore..."
 
-#: ../game/main.cc:166
+#: ../game/main.cc:161
 msgid "Audio playback..."
 msgstr "Sortie sonore..."
 
-#: ../game/main.cc:169
+#: ../game/main.cc:164
 msgid "Miscellaneous..."
 msgstr "Divers"
 
-#: ../game/main.cc:183
+#: ../game/main.cc:178
 msgid "Main menu..."
 msgstr "Menu principal..."
 
-#: ../game/main.cc:194
+#: ../game/main.cc:189
 msgid "Screenshot taken!"
 msgstr "Capture d'écran effectuée"
 
-#: ../game/main.cc:197
+#: ../game/main.cc:192
 msgid "Screenshot failed!"
 msgstr "Echec de la capture d'écran"
 
@@ -249,4 +254,28 @@ msgstr "classement par chemin"
 #: ../game/songs.cc:201
 msgid "sorted by language"
 msgstr "classement par langue"
+
+#: ../game/guitargraph.cc:331
+msgid ""
+"God Mode\n"
+"Activated!"
+msgstr ""
+"God Mode\n"
+"Activé"
+
+#: ../game/guitargraph.cc:332
+msgid "Mistakes ignored!"
+msgstr "Erreurs ignorées!"
+
+#: ../game/guitargraph.cc:978
+msgid "Drum Fill!"
+msgstr "Solo Batterie"
+
+#: ../game/guitargraph.cc:979
+msgid "God Mode Ready!"
+msgstr "God Mode Prêt!"
+
+#: ../game/guitargraph.cc:984
+msgid "Solo!"
+msgstr "Solo!"
 
