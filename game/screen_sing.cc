@@ -81,7 +81,7 @@ void ScreenSing::enter() {
 	m_progress.reset(new ProgressBar(getThemePath("sing_progressbg.svg"), getThemePath("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01f, 0.01f, true));
 	m_progress->dimensions.fixedWidth(0.4).left(-0.5).screenTop();
 	theme->timer.dimensions.screenTop(0.5 * m_progress->dimensions.h());
-	boost::ptr_vector<Analyzer>& analyzers = m_capture.analyzers();
+	boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
 	m_layout_singer.reset(new LayoutSinger(m_song->vocals, m_database, theme));
 	// Load instrument and dance tracks
 	{
