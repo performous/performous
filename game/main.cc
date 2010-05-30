@@ -8,6 +8,7 @@
 #include "xtime.hh"
 #include "video_driver.hh"
 #include "i18n.hh"
+#include "glutil.hh"
 
 // Screens
 #include "screen_intro.hh"
@@ -16,7 +17,6 @@
 #include "screen_practice.hh"
 #include "screen_configuration.hh"
 #include "screen_players.hh"
-#include "screen_hiscore.hh"
 
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
@@ -32,14 +32,25 @@ volatile bool g_quit = false;
 
 bool g_take_screenshot = false;
 
+// Signal handling for Ctrl-C
+
+static void signalSetup();
+
 extern "C" void quit(int) {
+	if (g_quit) std::exit(EXIT_SUCCESS);  // Instant exit if Ctrl+C is pressed again
 	g_quit = true;
+	signalSetup();
+}
+
+static void signalSetup() {
+	std::signal(SIGINT, quit);
+	std::signal(SIGTERM, quit);
 }
 
 /// can be thrown as an exception to quit the game
 struct QuitNow {};
 
-static void checkEvents_SDL(ScreenManager& sm, Window& window) {
+static void checkEvents_SDL(ScreenManager& sm) {
 	if (g_quit) {
 		std::cout << "Terminating, please wait... (or kill the process)" << std::endl;
 		throw QuitNow();
@@ -51,7 +62,7 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 			sm.finished();
 			break;
 		  case SDL_VIDEORESIZE:
-			window.resize(event.resize.w, event.resize.h);
+			sm.window().resize(event.resize.w, event.resize.h);
 			break;
 		  case SDL_KEYDOWN:
 			int keypressed  = event.key.keysym.sym;
@@ -87,17 +98,11 @@ static void checkEvents_SDL(ScreenManager& sm, Window& window) {
 		// This is needed to allow navigation (quiting the song) to function even then
 		input::SDL::pushEvent(event);
 		sm.getCurrentScreen()->manageEvent(event);
-		switch(glGetError()) {
-			case GL_INVALID_ENUM: std::cerr << "OpenGL error: invalid enum" << std::endl; break;
-			case GL_INVALID_VALUE: std::cerr << "OpenGL error: invalid value" << std::endl; break;
-			case GL_INVALID_OPERATION: std::cerr << "OpenGL error: invalid operation" << std::endl; break;
-			case GL_STACK_OVERFLOW: std::cerr << "OpenGL error: stack overflow" << std::endl; break;
-			case GL_STACK_UNDERFLOW: std::cerr << "OpenGL error: stack underflow" << std::endl; break;
-			case GL_OUT_OF_MEMORY: std::cerr << "OpenGL error: out of memory" << std::endl; break;
-		}
+		// Check for OpenGL errors
+		glutil::GLErrorChecker glerror;
 	}
-	if( config["graphic/fullscreen"].b() != window.getFullscreen() )
-		window.setFullscreen(config["graphic/fullscreen"].b());
+	if( config["graphic/fullscreen"].b() != sm.window().getFullscreen() )
+		sm.window().setFullscreen(config["graphic/fullscreen"].b());
 }
 
 void mainLoop(std::string const& songlist) {
@@ -119,7 +124,6 @@ void mainLoop(std::string const& songlist) {
 		sm.addScreen(new ScreenPractice("Practice", audio));
 		sm.addScreen(new ScreenConfiguration("Configuration", audio));
 		sm.addScreen(new ScreenPlayers("Players", audio, database));
-		sm.addScreen(new ScreenHiscore("Hiscore", audio, songs, database));
 		sm.activateScreen("Intro");
 		sm.flashMessage(_("Main menu..."), 0.0f, 1.0f, 1.0f); window.blank(); sm.drawFlashMessage(); window.swap();
 		sm.updateScreen();  // exit/enter, any exception is fatal error
@@ -161,7 +165,7 @@ void mainLoop(std::string const& songlist) {
 				}
 				// Process events for the next frame
 				if (midiDrums) midiDrums->process();
-				checkEvents_SDL(sm, window);
+				checkEvents_SDL(sm);
 			} catch (std::runtime_error& e) {
 				std::cerr << "ERROR: " << e.what() << std::endl;
 				sm.flashMessage(std::string("ERROR: ") + e.what());
@@ -225,22 +229,15 @@ template <typename Container> void confOverride(Container const& c, std::string 
 	std::copy(c.begin(), c.end(), std::back_inserter(sl));
 }
 
+void outputOptionalFeatureStatus();
+
 int main(int argc, char** argv) try {
-#ifdef USE_GETTEXT
 	// initialize gettext
-#ifdef _MSC_VER
-	setlocale(LC_ALL, "");//only untill we don't have a better solution. This because LC_MESSAGES cause crash under Visual Studio
-#else
-	setlocale (LC_MESSAGES, "");
-#endif
-	bindtextdomain (PACKAGE, LOCALEDIR);
-	textdomain (PACKAGE);
-	bind_textdomain_codeset (PACKAGE, "UTF-8");
-#endif
+	Gettext gettext(PACKAGE);
 
 	std::cout << PACKAGE " " VERSION << std::endl;
-	std::signal(SIGINT, quit);
-	std::signal(SIGTERM, quit);
+	signalSetup();
+	outputOptionalFeatureStatus();
 	std::ios::sync_with_stdio(false);  // We do not use C stdio
 	std::srand(std::time(NULL));
 	// Parse commandline options
@@ -318,3 +315,16 @@ int main(int argc, char** argv) try {
 	std::cerr << "FATAL ERROR: " << e.what() << std::endl;
 }
 
+void outputOptionalFeatureStatus() {
+	std::cout    << "  Internationalization:   " <<
+	(Gettext::enabled() ? "Enabled" : "Disabled")
+	<< std::endl << "  MIDI I/O:               " <<
+	#ifdef USE_PORTMIDI
+		"Enabled"
+	#else
+		"Disabled"
+	#endif
+	<< std::endl << "  Webcam support:         " <<
+	(Webcam::enabled() ? "Enabled" : "Disabled")
+	<< std::endl;
+}

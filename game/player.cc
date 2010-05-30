@@ -3,11 +3,11 @@
 
 #include "engine.hh" // just for Engine::TIMESTEP
 
-Player::Player(Song& song, Analyzer& analyzer, size_t frames):
-	  m_song(song), m_analyzer(analyzer), m_pitch(frames, std::make_pair(getNaN(),
+Player::Player(VocalTrack& vocals, Analyzer& analyzer, size_t frames):
+	  m_vocals(vocals), m_analyzer(analyzer), m_pitch(frames, std::make_pair(getNaN(),
 	  -getInf())), m_pos(), m_score(), m_noteScore(), m_lineScore(), m_maxLineScore(),
 	  m_prevLineScore(-1), m_feedbackFader(0.0, 2.0), m_activitytimer(),
-	  m_scoreIt(m_song.notes.begin())
+	  m_scoreIt(m_vocals.notes.begin())
 { }
 
 void Player::update() {
@@ -24,13 +24,13 @@ void Player::update() {
 	}
 	double endTime = Engine::TIMESTEP * m_pos;
 	// Iterate over all the notes that are considered for this timestep
-	while (m_scoreIt != m_song.notes.end()) {
+	while (m_scoreIt != m_vocals.notes.end()) {
 		if (endTime < m_scoreIt->begin) break;  // The note begins later than on this timestep
 		// If tone was detected, calculate score
 		if (t) {
-			double note = m_song.scale.getNote(t->freq);
+			double note = m_vocals.scale.getNote(t->freq);
 			// Add score
-			double score_addition = m_song.m_scoreFactor * m_scoreIt->score(note, beginTime, endTime);
+			double score_addition = m_vocals.m_scoreFactor * m_scoreIt->score(note, beginTime, endTime);
 			m_score += score_addition;
 			m_noteScore += score_addition;
 			m_lineScore += score_addition;
@@ -45,11 +45,11 @@ void Player::update() {
 		}
 		if (endTime < m_scoreIt->end) break;  // The note continues past this timestep
 		// Set accuracy
-		m_scoreIt->accuracy = std::max(m_scoreIt->accuracy, m_noteScore / m_song.m_scoreFactor / m_scoreIt->maxScore());
+		m_scoreIt->accuracy = std::max(m_scoreIt->accuracy, m_noteScore / m_vocals.m_scoreFactor / m_scoreIt->maxScore());
 		m_noteScore = 0; // Reset noteScore as we are moving on to the next one
 		++m_scoreIt;
 	}
-	if (m_scoreIt == m_song.notes.end()) calcRowRank();
+	if (m_scoreIt == m_vocals.notes.end()) calcRowRank();
 	m_score = clamp(m_score, 0.0, 1.0);
 }
 
@@ -60,8 +60,8 @@ void Player::calcRowRank() {
 		Notes::const_reverse_iterator maxScoreIt(m_scoreIt);
 		// FIXME: MacOSX needs the following cast to compile correctly
 		// it is related to the fact that OSX default compiler is 4.0.1 that is buggy when not casting
-		while ((maxScoreIt != static_cast<Notes::const_reverse_iterator>(m_song.notes.rend())) && (maxScoreIt->type != Note::SLEEP)) {
-			m_maxLineScore += m_song.m_scoreFactor * maxScoreIt->maxScore();
+		while ((maxScoreIt != static_cast<Notes::const_reverse_iterator>(m_vocals.notes.rend())) && (maxScoreIt->type != Note::SLEEP)) {
+			m_maxLineScore += m_vocals.m_scoreFactor * maxScoreIt->maxScore();
 			maxScoreIt++;
 		}
 		if (m_maxLineScore > 0) {

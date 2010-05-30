@@ -23,6 +23,18 @@ fs::path getHomeDir() {
 	return dir;
 }
 
+fs::path getLocaleDir() {
+	static fs::path dir;
+
+	if(LOCALEDIR[0] == '/') {
+		dir = LOCALEDIR;
+	} else {
+		dir = plugin::execname().parent_path().parent_path() / LOCALEDIR;
+	}
+
+	return dir;
+}
+
 fs::path getConfigDir() {
 
 	static fs::path dir;

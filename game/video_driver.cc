@@ -13,6 +13,22 @@
 namespace {
 	unsigned s_width;
 	unsigned s_height;
+	/// Attempt to set attribute and report errors.
+	/// Tests for success when destoryed.
+	struct GLattrSetter {
+		GLattrSetter(SDL_GLattr attr, int value): m_attr(attr), m_value(value) {
+			if (SDL_GL_SetAttribute(attr, value)) std::cerr << "Error setting GLattr " << m_attr << std::endl;
+		}
+		~GLattrSetter() {
+			int value;
+			SDL_GL_GetAttribute(m_attr, &value);
+			if (value != m_value)
+				std::cerr << "Error setting GLattr " << m_attr
+				<< ": requested " << m_value << ", got " << value << std::endl;
+		}
+		SDL_GLattr m_attr;
+		int m_value;
+	};
 }
 
 unsigned int screenW() { return s_width; }
@@ -75,20 +91,22 @@ void Window::screenshot() {
 void Window::resize() {
 	unsigned width = m_fullscreen ? m_fsW : m_windowW;
 	unsigned height = m_fullscreen ? m_fsH : m_windowH;
-	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
-	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
-	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
-	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
-	SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
-	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
-	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	SDL_GL_SetAttribute(SDL_GL_ACCUM_RED_SIZE, 0);
-	SDL_GL_SetAttribute(SDL_GL_ACCUM_GREEN_SIZE, 0);
-	SDL_GL_SetAttribute(SDL_GL_ACCUM_BLUE_SIZE, 0);
-	SDL_GL_SetAttribute(SDL_GL_ACCUM_ALPHA_SIZE, 0);
-	screen = SDL_SetVideoMode(width, height, 0, SDL_OPENGL | SDL_RESIZABLE | (m_fullscreen ? SDL_FULLSCREEN : 0));
-	if (!screen) throw std::runtime_error(std::string("SDL_SetVideoMode failed: ") + SDL_GetError());
+	{ // Setup GL attributes for context creation
+		GLattrSetter attr_r(SDL_GL_RED_SIZE, 8);
+		GLattrSetter attr_g(SDL_GL_GREEN_SIZE, 8);
+		GLattrSetter attr_b(SDL_GL_BLUE_SIZE, 8);
+		GLattrSetter attr_a(SDL_GL_ALPHA_SIZE, 8);
+		GLattrSetter attr_buf(SDL_GL_BUFFER_SIZE, 32);
+		GLattrSetter attr_d(SDL_GL_DEPTH_SIZE, 16);
+		GLattrSetter attr_s(SDL_GL_STENCIL_SIZE, 8);
+		GLattrSetter attr_db(SDL_GL_DOUBLEBUFFER, 1);
+		GLattrSetter attr_ar(SDL_GL_ACCUM_RED_SIZE, 0);
+		GLattrSetter attr_ag(SDL_GL_ACCUM_GREEN_SIZE, 0);
+		GLattrSetter attr_ab(SDL_GL_ACCUM_BLUE_SIZE, 0);
+		GLattrSetter attr_aa(SDL_GL_ACCUM_ALPHA_SIZE, 0);
+		screen = SDL_SetVideoMode(width, height, 0, SDL_OPENGL | SDL_RESIZABLE | (m_fullscreen ? SDL_FULLSCREEN : 0));
+		if (!screen) throw std::runtime_error(std::string("SDL_SetVideoMode failed: ") + SDL_GetError());
+	}
 
 	s_width = screen->w;
 	s_height = screen->h;
@@ -120,6 +138,7 @@ void Window::resize() {
 	const float f = 0.9f; // Avoid texture surface being exactly at the near plane (MacOSX fix)
 	glFrustum(-0.5f * f, 0.5f * f, 0.5f * h * f, -0.5f * h * f, f * near_, far_);
 	glTranslatef(0.0f, 0.0f, -near_);  // So that z = 0.0f is still on monitor surface
-
+	// Check for OpenGL errors
+	glutil::GLErrorChecker glerror("Window::resize");
 }
 

@@ -11,17 +11,17 @@ class Adpcm {
 	* Typical values for interleave are 0xB800 and 0xBB80. This information can
 	* be extracted from music.mih
 	**/
-	Adpcm(unsigned int interleave_, unsigned int channels_ = 2): interleave(interleave_), headers(channels_) {}
+	Adpcm(unsigned int interleave_, unsigned int channels_ = 2): m_interleave(interleave_), headers(channels_) {}
 
 	/** Decode 16 bytes of each channel, outputting 28 samples/ch. **/
 	template <typename OutIt> OutIt decodeBlock(char const* data, OutIt pcm) {
 		// Read headers
-		for (unsigned ch = 0; ch < headers.size(); ++ch) headers[ch].parse(data + ch * interleave);
+		for (unsigned ch = 0; ch < headers.size(); ++ch) headers[ch].parse(data + ch * m_interleave);
 		for (unsigned n = 0; n < 28; ++n) {
 			for (unsigned ch = 0; ch < headers.size(); ++ch) {
 				Header& h = headers[ch];
 				// Get a nibble and left-align it
-				short sample = (data[2 + n / 2 + ch * interleave] << (n % 2 ? 8 : 12)) & 0xF000;
+				short sample = (data[2 + n / 2 + ch * m_interleave] << (n % 2 ? 8 : 12)) & 0xF000;
 				int i_sample = sample;
 				// Apply ADPCM exponent
 				i_sample >>= h.shift;
@@ -44,16 +44,17 @@ class Adpcm {
 		return pcm;
 	}
 
-	unsigned int chunkFrames() const { return interleave / 16 * 28; }
-	unsigned int chunkBytes() const { return interleave * 2; }
+	unsigned int chunkFrames() const { return m_interleave / 16 * 28; }
+	unsigned int chunkBytes() const { return m_interleave * 2; }
+	void interleave(unsigned int _interleave) {m_interleave = _interleave; }
 
 	/** Decode chunkBytes() bytes, outputting chunkFrames() samples/ch. **/
 	template <typename OutIt> OutIt decodeChunk(char const* data, OutIt pcm) {
-		for (unsigned pos = 0; pos < interleave; pos += 16) pcm = decodeBlock(data + pos, pcm);
+		for (unsigned pos = 0; pos < m_interleave; pos += 16) pcm = decodeBlock(data + pos, pcm);
 		return pcm;
 	}
   private:
-	unsigned int interleave;
+	unsigned int m_interleave;
 	struct Header {
 		Header(): prev1(), prev2() {}
 		int shift;

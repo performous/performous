@@ -31,7 +31,7 @@ namespace {
 void ScreenSing::enter() {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	sm->flashMessage(_("Loading song..."), 0.0, 1.0, 0.5);
-	sm->drawFlashMessage(); sm->getWindow().swap(); // Make loading message show
+	sm->drawFlashMessage(); sm->window().swap(); // Make loading message show
 	theme.reset(new ThemeSing());
 	// Load the rest of the song
 	if (m_song->loadStatus != Song::FULL) {
@@ -55,10 +55,16 @@ void ScreenSing::enter() {
 			std::cerr << e.what() << std::endl;
 		}
 	}
-	if (!m_song->video.empty() && config["graphic/video"].b()) { // Load video
+	// Initialize webcam
+	if (config["graphic/webcam"].b() && Webcam::enabled()) {
+		m_cam.reset(new Webcam());
+	}
+	// Load video
+	if (!m_song->video.empty() && config["graphic/video"].b()) {
 		m_video.reset(new Video(m_song->path + m_song->video, m_song->videoGap));
 	}
-	if (!foundbg) { // Use random bg if specified fails (also for tracks with video)
+	// Use random bg if specified fails (also for tracks with video)
+	if (!foundbg) {
 		for (int i = 1; i <= 2; ++i) { // Try two times in case first is b0rked
 			try {
 				std::string bgpath = m_backgrounds.getRandom();
@@ -75,8 +81,8 @@ void ScreenSing::enter() {
 	m_progress.reset(new ProgressBar(getThemePath("sing_progressbg.svg"), getThemePath("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01f, 0.01f, true));
 	m_progress->dimensions.fixedWidth(0.4).left(-0.5).screenTop();
 	theme->timer.dimensions.screenTop(0.5 * m_progress->dimensions.h());
-	boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
-	m_layout_singer.reset(new LayoutSinger(*m_song, m_database, theme));
+	boost::ptr_vector<Analyzer>& analyzers = m_capture.analyzers();
+	m_layout_singer.reset(new LayoutSinger(m_song->vocals, m_database, theme));
 	// Load instrument and dance tracks
 	{
 		int type = 0; // 0 for dance, 1 for guitars, 2 for drums
@@ -101,7 +107,7 @@ void ScreenSing::enter() {
 	// Startup delay for instruments is longer than for singing only
 	double setup_delay = (m_instruments.empty() && m_dancers.empty() ? -1.0 : -8.0);
 	m_audio.playMusic(m_song->music, false, 0.0, setup_delay);
-	m_engine.reset(new Engine(m_audio, *m_song, analyzers.begin(), analyzers.end(), m_database));
+	m_engine.reset(new Engine(m_audio, m_song->vocals, analyzers.begin(), analyzers.end(), m_database));
 }
 
 /// Manages the instrument drawing
@@ -118,7 +124,7 @@ bool ScreenSing::instrumentLayout(double time) {
 		it->engine(); // Run engine even when dead so that joining is possible
 		if (!it->dead()) {
 			it->position((0.5 + i - 0.5 * count) * iw, iw); // Do layout stuff
-			CountSum& cs = volume[it->getTrackIndex()];
+			CountSum& cs = volume[it->getTrack()];
 			cs.first++;
 			cs.second += it->correctness();
 			it->draw(time);
@@ -174,6 +180,7 @@ void ScreenSing::exit() {
 	m_engine.reset();
 	m_help.reset();
 	m_pause_icon.reset();
+	m_cam.reset();
 	m_video.reset();
 	m_background.reset();
 	m_song->dropNotes();
@@ -220,7 +227,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			return;
 		}
 		// Start button has special functions for skipping things (only in singing for now)
-		if (nav == input::START && m_only_singers_alive && !m_song->notes.empty() && !m_audio.isPaused()) {
+		if (nav == input::START && m_only_singers_alive && !m_song->vocals.notes.empty() && !m_audio.isPaused()) {
 			// Open score dialog early
 			if (status == Song::FINISHED) {
 				m_engine->kill(); // kill the engine thread
@@ -238,10 +245,15 @@ void ScreenSing::manageEvent(SDL_Event event) {
 	}
 	// Ctrl combinations that can be used while performing (not when score dialog is displayed)
 	if (event.type == SDL_KEYDOWN && (event.key.keysym.mod & KMOD_CTRL) && !m_score_window.get()) {
-		if (key == SDLK_s) m_audio.toggleSynth(m_song->notes);
+		if (key == SDLK_s) m_audio.toggleSynth(m_song->vocals.notes);
 		if (key == SDLK_v) m_audio.streamFade("vocals", event.key.keysym.mod & KMOD_SHIFT ? 1.0 : 0.0);
 		if (key == SDLK_k) dispInFlash(++config["game/karaoke_mode"]); // Toggle karaoke mode
 		if (key == SDLK_w) dispInFlash(++config["game/pitch"]); // Toggle pitch wave
+		// Toggle webcam
+		if (key == SDLK_a && Webcam::enabled()) {
+			if (!m_cam) m_cam.reset(new Webcam()); // Initialize if we haven't done that already
+			if (m_cam) { dispInFlash(++config["graphic/webcam"]); m_cam->pause(!config["graphic/webcam"].b()); }
+		}
 		// Latency settings
 		if (key == SDLK_F1) dispInFlash(--config["audio/video_delay"]);
 		if (key == SDLK_F2) dispInFlash(++config["audio/video_delay"]);
@@ -250,11 +262,28 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		if (key == SDLK_F5) dispInFlash(--config["audio/controller_delay"]);
 		if (key == SDLK_F6) dispInFlash(++config["audio/controller_delay"]);
 		bool seekback = false;
+
 		if (m_song->danceTracks.empty()) { // Seeking backwards is currently not permitted for dance songs
 			if (key == SDLK_HOME) { m_audio.seekPos(0.0); seekback = true; }
-			if (key == SDLK_LEFT) { m_audio.seek(-5.0); seekback = true; }
+			if (key == SDLK_LEFT) {
+				Song::SongSection section("error", 0);
+				if (m_song->getPrevSection(m_audio.getPosition(), section)) {
+					m_audio.seekPos(section.begin);
+					// TODO: display popup with section.name here
+					std::cout << section.name << std::endl;
+				} else m_audio.seek(-5.0);
+				seekback = true;
+			}
 		}
-		if (key == SDLK_RIGHT) m_audio.seek(5.0);
+		if (key == SDLK_RIGHT) {
+			Song::SongSection section("error", 0);
+			if (m_song->getNextSection(m_audio.getPosition(), section)) {
+				m_audio.seekPos(section.begin);
+				// TODO: display popup with section.name here
+				std::cout << section.name << std::endl;
+			} else m_audio.seek(5.0);
+		}
+
 		// Some things must be reset after seeking backwards
 		if (seekback) m_layout_singer->reset();
 		// Reload current song
@@ -292,12 +321,19 @@ void ScreenSing::draw() {
 	// Rendering starts
 	{
 		double ar = arMax;
+		// Background image
 		if (m_background) {
 			ar = m_background->dimensions.ar();
 			if (ar > arMax || (m_video && ar > arMin)) fillBG();  // Fill white background to avoid black borders
 			m_background->draw();
-		} else fillBG();
-		if (m_video) { m_video->render(time); double tmp = m_video->dimensions().ar(); if (tmp > 0.0) ar = tmp; }
+		} else fillBG(); // Blank
+		// Video
+		if (m_video && (!m_cam || !m_cam->is_good())) {
+			m_video->render(time); double tmp = m_video->dimensions().ar(); if (tmp > 0.0) ar = tmp;
+		}
+		// Webcam
+		if (m_cam && config["graphic/webcam"].b()) m_cam->render();
+		// Top/bottom borders
 		ar = clamp(ar, arMin, arMax);
 		double offset = 0.5 / ar + 0.2;
 		theme->bg_bottom.dimensions.fixedWidth(1.0).bottom(offset);
@@ -324,8 +360,14 @@ void ScreenSing::draw() {
 	{
 		unsigned t = clamp(time, 0.0, length);
 		m_progress->draw(songPercent);
-		std::string statustxt = (boost::format("%02u:%02u") % (t / 60) % (t % 60)).str();
-		if (!m_score_window.get() && m_only_singers_alive && !m_song->notes.empty()) {
+
+		Song::SongSection section("error", 0);
+		std::string statustxt;
+		if (m_song->getPrevSection(t - 1.0, section)) {
+			statustxt = (boost::format("%02u:%02u - %s") % (t / 60) % (t % 60) % section.name).str();
+		} else  statustxt = (boost::format("%02u:%02u") % (t / 60) % (t % 60)).str();
+
+		if (!m_score_window.get() && m_only_singers_alive && !m_song->vocals.notes.empty()) {
 			if (status == Song::INSTRUMENTAL_BREAK) statustxt += _("   ENTER to skip instrumental break");
 			if (status == Song::FINISHED && !config["game/karaoke_mode"].b()) statustxt += _("   Remember to wait for grading!");
 		}
@@ -349,7 +391,7 @@ void ScreenSing::draw() {
 			}
 		}
 		else if (!m_audio.isPlaying() || (status == Song::FINISHED
-		  && m_audio.getLength() - time <= (m_song->track_map.empty() && m_song->danceTracks.empty() ? 3.0 : 0.2) )) {
+		  && m_audio.getLength() - time <= (m_song->instrumentTracks.empty() && m_song->danceTracks.empty() ? 3.0 : 0.2) )) {
 			// Time to create the score window
 			m_quitTimer.setValue(QUIT_TIMEOUT);
 			m_engine->kill(); // kill the engine thread (to avoid consuming memory)
@@ -393,8 +435,8 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database, Dancers& 
 		item.track_simple = it->getTrack();
 		item.track = it->getTrack() + " - " + it->getDifficultyString();
 		item.track[0] = toupper(item.track[0]); // Capitalize
-		if (item.track_simple == "drums") item.color = glutil::Color(0.1f, 0.1f, 0.1f);
-		else if (item.track_simple == "bass") item.color = glutil::Color(0.5f, 0.3f, 0.1f);
+		if (item.track_simple == TrackName::DRUMS) item.color = glutil::Color(0.1f, 0.1f, 0.1f);
+		else if (item.track_simple == TrackName::BASS) item.color = glutil::Color(0.5f, 0.3f, 0.1f);
 		else item.color = glutil::Color(1.0f, 0.0f, 0.0f);
 
 		m_database.scores.push_back(item);
@@ -405,8 +447,8 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database, Dancers& 
 		ScoreItem item; item.type = ScoreItem::DANCER;
 		item.score = it->getScore();
 		if (item.score < 100) { it = dancers.erase(it); continue; } // Dead
-		item.track_simple = it->getGameMode();
-		item.track = it->getGameMode() + " - " + it->getDifficultyString();
+		item.track_simple = it->getTrack();
+		item.track = it->getTrack() + " - " + it->getDifficultyString();
 		item.track[0] = toupper(item.track[0]); // Capitalize
 		item.color = glutil::Color(1.0f, 0.4f, 0.1f);
 

@@ -1,7 +1,7 @@
 #include "database.hh"
+#include "i18n.hh"
 
 #include <iostream>
-
 #include <libxml++/libxml++.h>
 
 Database::Database(fs::path filename) :
@@ -104,8 +104,8 @@ void Database::queryPerSongHiscore (std::ostream & os, boost::shared_ptr<Song> s
 
 	if (songid == -1 || hi.size() == 0)
 	{
-		os << "No Items up to now.\n";
-		os << "Be the first to be listed here!\n";
+		os << _("No Items up to now.") << '\n';
+		os << _("Be the first to be listed here!") << '\n';
 		return;
 	}
 
@@ -115,6 +115,30 @@ void Database::queryPerSongHiscore (std::ostream & os, boost::shared_ptr<Song> s
 		   << m_players.lookup(hi[i].playerid) << "\t"
 		   << hi[i].score << "\t"
 		   << "(" << hi[i].track << ")\n";
+	}
+}
+
+void Database::queryPerSongHiscore_HiscoreDisplay (std::ostream & os, boost::shared_ptr<Song> s, int& start_pos, unsigned max_displayed, std::string const& track) const {
+	int songid = m_songs.lookup(s);
+	std::vector<HiscoreItem> hi = m_hiscores.queryHiscore(10, -1, songid, track);
+
+	if (songid == -1 || hi.size() == 0)
+	{
+		os << "No Items up to now.\n";
+		os << "Be the first to be listed here!\n";
+		return;
+	}
+
+	// Limits
+	if (start_pos > (int)hi.size() - (int)max_displayed) start_pos = hi.size() - max_displayed;
+	if (start_pos < 0 || hi.size() <= max_displayed) start_pos = 0;
+
+	for (size_t i = 0; i < hi.size() && i < max_displayed; ++i)
+	{
+		os << i+start_pos+1 << "\t"
+		   << m_players.lookup(hi[i+start_pos].playerid) << "\t"
+		   << hi[i+start_pos].score << "\t"
+		   << "(" << hi[i+start_pos].track << ")\n";
 	}
 }
 

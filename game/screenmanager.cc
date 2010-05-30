@@ -6,7 +6,7 @@
 
 template<> ScreenManager* Singleton<ScreenManager>::ms_Singleton = NULL;
 
-ScreenManager::ScreenManager(Window& window): window(window), m_finished(false), currentScreen(), m_messagePopup(0.0, 1.0), m_textMessage(getThemePath("message_text.svg"), config["graphic/text_lod"].f()) {
+ScreenManager::ScreenManager(Window& _window): m_window(_window), m_finished(false), currentScreen(), m_messagePopup(0.0, 1.0), m_textMessage(getThemePath("message_text.svg"), config["graphic/text_lod"].f()) {
 	m_textMessage.dimensions.middle().screenTop(0.05);
 }
 
@@ -37,7 +37,7 @@ void ScreenManager::drawFlashMessage() {
 	bool haveToFadeIn = time <= (m_timeToFadeIn); // Is this fade in?
 	bool haveToFadeOut = time >= (m_messagePopup.getTarget() - m_timeToFadeOut); // Is this fade out?
 	float fadeValue = 1.0f;
-	
+
 	if (haveToFadeIn) { // Fade in
 		fadeValue = float(time / m_timeToFadeIn); // Calculate animation value
 	} else if (haveToFadeOut) { // Fade out

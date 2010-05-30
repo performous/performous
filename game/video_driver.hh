@@ -4,7 +4,7 @@ unsigned int screenW();
 unsigned int screenH();
 static inline float virtH() { return float(screenH()) / screenW(); }
 
-class SDL_Surface;
+struct SDL_Surface;
 
 /// handles the window
 class Window {

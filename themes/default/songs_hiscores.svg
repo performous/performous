@@ -17,7 +17,7 @@
    id="svg559"
    sodipodi:version="0.32"
    inkscape:version="0.47 r22583"
-   sodipodi:docname="practice_txt.svg"
+   sodipodi:docname="songs_hiscores.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <metadata
      id="metadata35">
@@ -27,12 +27,13 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="797"
-     inkscape:window-width="1376"
+     inkscape:window-height="725"
+     inkscape:window-width="1280"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      guidetolerance="10.0"
@@ -42,14 +43,14 @@
      bordercolor="#666666"
      pagecolor="#ffffff"
      id="base"
-     inkscape:zoom="1.26"
-     inkscape:cx="400"
-     inkscape:cy="300"
+     inkscape:zoom="0.44547727"
+     inkscape:cx="-145.86004"
+     inkscape:cy="257.3544"
      inkscape:window-x="0"
-     inkscape:window-y="49"
+     inkscape:window-y="25"
      inkscape:current-layer="svg559"
      showgrid="false"
-     inkscape:window-maximized="0" />
+     inkscape:window-maximized="1" />
   <defs
      id="defs561">
     <inkscape:perspective
@@ -59,16 +60,23 @@
        inkscape:vp_z="800 : 300 : 1"
        inkscape:persp3d-origin="400 : 200 : 1"
        id="perspective8" />
+    <inkscape:perspective
+       id="perspective2864"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
   </defs>
   <text
-     x="450"
-     y="430"
-     style="font-size:40px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#ffd100;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;display:inline;font-family:Verdana"
-     id="text10203"
      xml:space="preserve"
-     sodipodi:linespacing="125%"><tspan
-       x="450"
-       y="430"
-       id="tspan10205"
-       style="font-weight:bold;fill:#ffd100;fill-opacity:1;font-family:DejaVu Sans Mono">A#</tspan></text>
+     style="font-size:19.15192795px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.797997px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Verdana;-inkscape-font-specification:Verdana Bold"
+     x="399.53241"
+     y="307.42026"
+     id="text1990"><tspan
+       sodipodi:role="line"
+       id="tspan1992"
+       x="399.53241"
+       y="307.42026"
+       style="stroke-width:0.797997">hiscores</tspan></text>
 </svg>

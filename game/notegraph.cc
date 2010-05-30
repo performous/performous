@@ -5,8 +5,8 @@
 
 Dimensions dimensions; // Make a public member variable
 
-NoteGraph::NoteGraph(Song const& song):
-  m_song(song),
+NoteGraph::NoteGraph(VocalTrack const& vocals):
+  m_vocals(vocals),
   m_notelines(getThemePath("notelines.svg")),
   m_wave(getThemePath("wave.png")), m_star(getThemePath("star.svg")),
   m_notebar(getThemePath("notebar.svg")), m_notebar_hl(getThemePath("notebar.png")),
@@ -15,15 +15,15 @@ NoteGraph::NoteGraph(Song const& song):
   m_notealpha(0.0f), m_nlTop(0.0, 4.0), m_nlBottom(0.0, 4.0), m_time()
 {
 	dimensions.stretch(1.0, 0.5); // Initial dimensions, probably overridden from somewhere
-	m_nlTop.setTarget(m_song.noteMax, true);
-	m_nlBottom.setTarget(m_song.noteMin, true);
-	for (Notes::const_iterator it = m_song.notes.begin(); it != m_song.notes.end(); ++it)
+	m_nlTop.setTarget(m_vocals.noteMax, true);
+	m_nlBottom.setTarget(m_vocals.noteMin, true);
+	for (Notes::const_iterator it = m_vocals.notes.begin(); it != m_vocals.notes.end(); ++it)
 		it->accuracy = 0.0; // Reset accuracy
 	reset();
 }
 
 void NoteGraph::reset() {
-	m_songit = m_song.notes.begin();
+	m_songit = m_vocals.notes.begin();
 }
 
 namespace {
@@ -60,15 +60,15 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 	if (time < m_time) reset();
 	m_time = time;
 	// Update m_songit (which note to start the rendering from)
-	while (m_songit != m_song.notes.end() && (m_songit->type == Note::SLEEP || m_songit->end < time - (baseLine + 0.5) / pixUnit)) ++m_songit;
+	while (m_songit != m_vocals.notes.end() && (m_songit->type == Note::SLEEP || m_songit->end < time - (baseLine + 0.5) / pixUnit)) ++m_songit;
 
 	// Automatically zooming notelines
 	{
-		int low = m_song.noteMax;
-		int high = m_song.noteMin;
-		int low2 = m_song.noteMax;
-		int high2 = m_song.noteMin;
-		for (Notes::const_iterator it = m_songit; it != m_song.notes.end() && it->begin < time + 15.0; ++it) {
+		int low = m_vocals.noteMax;
+		int high = m_vocals.noteMin;
+		int low2 = m_vocals.noteMax;
+		int high2 = m_vocals.noteMin;
+		for (Notes::const_iterator it = m_songit; it != m_vocals.notes.end() && it->begin < time + 15.0; ++it) {
 			if (it->type == Note::SLEEP) continue;
 			if (it->note < low) low = it->note;
 			if (it->note > high) high = it->note;
@@ -105,7 +105,7 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 	if (config["game/pitch"].b()) drawWaves(database);
 
 	// Draw a star for well sung notes
-	for (Notes::const_iterator it = m_songit; it != m_song.notes.end() && it->begin < m_time - (baseLine - 0.5) / pixUnit; ++it) {
+	for (Notes::const_iterator it = m_songit; it != m_vocals.notes.end() && it->begin < m_time - (baseLine - 0.5) / pixUnit; ++it) {
 			if (it->accuracy >= 0.8 && (it->type == Note::NORMAL || it->type == Note::SLIDE || it->type == Note::GOLDEN)) {
 				double x = m_baseX + it->begin * pixUnit + m_noteUnit; // left x coordinate: begin minus border (side borders -noteUnit wide)
 				double w = (it->end - it->begin) * pixUnit - m_noteUnit * 2.0; // width: including borders on both sides
@@ -125,7 +125,7 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 
 void NoteGraph::drawNotes() {
 	// Draw note lines
-	if (m_songit == m_song.notes.end() || m_songit->begin > m_time + 3.0) m_notealpha -= 0.02f;
+	if (m_songit == m_vocals.notes.end() || m_songit->begin > m_time + 3.0) m_notealpha -= 0.02f;
 	else if (m_notealpha < 1.0f) m_notealpha += 0.02f;
 	if (m_notealpha <= 0.0f) {
 		m_notealpha = 0.0f;
@@ -134,7 +134,7 @@ void NoteGraph::drawNotes() {
 		m_notelines.draw(Dimensions().stretch(dimensions.w(), (m_max - m_min - 13) * m_noteUnit).middle(dimensions.xc()).center(dimensions.yc()), TexCoords(0.0, (-m_min - 7.0) / 12.0f, 1.0, (-m_max + 6.0) / 12.0f));
 
 		// Draw notes
-		for (Notes::const_iterator it = m_songit; it != m_song.notes.end() && it->begin < m_time - (baseLine - 0.5) / pixUnit; ++it) {
+		for (Notes::const_iterator it = m_songit; it != m_vocals.notes.end() && it->begin < m_time - (baseLine - 0.5) / pixUnit; ++it) {
 			if (it->type == Note::SLEEP) continue;
 			double alpha = it->power;
 			Texture* t1;
@@ -179,9 +179,9 @@ namespace {
 		float vy;
 		Point(float tx_, float ty_, float vx_, float vy_): tx(tx_), ty(ty_), vx(vx_), vy(vy_) {}
 	};
-	
+
 	typedef std::vector<Point> Points;
-	
+
 	void strip(Points& points) {
 		size_t s = points.size();
 		if (s > 3) {
@@ -206,7 +206,7 @@ namespace {
 }
 
 void NoteGraph::drawWaves(Database const& database) {
-	if (m_song.notes.empty()) return; // Cannot draw without notes
+	if (m_vocals.notes.empty()) return; // Cannot draw without notes
 	UseTexture tblock(m_wave);
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	for (std::list<Player>::const_iterator p = database.cur.begin(); p != database.cur.end(); ++p) {
@@ -223,7 +223,7 @@ void NoteGraph::drawWaves(Database const& database) {
 		double t = idx * Engine::TIMESTEP;
 		double oldval = getNaN();
 		Points points;
-		Notes::const_iterator noteIt = m_song.notes.begin();
+		Notes::const_iterator noteIt = m_vocals.notes.begin();
 		for (; idx < endIdx; ++idx, t += Engine::TIMESTEP) {
 			double const freq = pitch[idx].first;
 			// If freq is NaN, we have nothing to process
@@ -232,17 +232,17 @@ void NoteGraph::drawWaves(Database const& database) {
 			if (idx < beginIdx) continue; // Skip graphics rendering if out of screen
 			double x = -0.2 + (t - m_time) * pixUnit;
 			// Find the currently active note(s)
-			while (noteIt != m_song.notes.end() && (noteIt->type == Note::SLEEP || t > noteIt->end)) ++noteIt;
+			while (noteIt != m_vocals.notes.end() && (noteIt->type == Note::SLEEP || t > noteIt->end)) ++noteIt;
 			Notes::const_iterator notePrev = noteIt;
-			while (notePrev != m_song.notes.begin() && (notePrev->type == Note::SLEEP || t < notePrev->begin)) --notePrev;
-			bool hasNote = (noteIt != m_song.notes.end());
+			while (notePrev != m_vocals.notes.begin() && (notePrev->type == Note::SLEEP || t < notePrev->begin)) --notePrev;
+			bool hasNote = (noteIt != m_vocals.notes.end());
 			bool hasPrev = notePrev->type != Note::SLEEP && t >= notePrev->begin;
 			double val;
 			if (hasNote && hasPrev) val = 0.5 * (noteIt->note + notePrev->note);
 			else if (hasNote) val = noteIt->note;
 			else val = notePrev->note;
 			// Now val contains the active note value. The following calculates note value for current freq:
-			val += Note::diff(val, m_song.scale.getNote(freq));
+			val += Note::diff(val, m_vocals.scale.getNote(freq));
 			// Graphics positioning & animation:
 			double y = m_baseY + val * m_noteUnit;
 			double thickness = clamp(1.0 + pitch[idx].second / 60.0) + 0.5;

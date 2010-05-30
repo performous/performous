@@ -46,26 +46,26 @@ typedef std::vector<Duration> Durations;
 typedef std::map<int, Durations> NoteMap;
 
 /// Sort by instrument track name
-struct CompTrack {
+struct CompInstrumentTrack {
 	bool operator()(std::string const& l, std::string const& r) const {
 		// TODO: Sort other guitar tracks (coop / rhythm) properly
 		return l > r;
 	}
 };
 
-struct Track {
+struct InstrumentTrack {
 	// TODO: name should not be needed here (contained into the map)
-	Track(std::string n): name(n) {}
+	InstrumentTrack(std::string n): name(n) {}
 	std::string name;
 	NoteMap nm;
 };
 
 // keep these ones
-typedef std::map<std::string, Track, CompTrack> TrackMap;
-typedef std::map<std::string, Track const*, CompTrack> TrackMapConstPtr; // this one really needed ? can't we save only the map key for comparison ?
+typedef std::map<std::string, InstrumentTrack, CompInstrumentTrack> InstrumentTracks;
+typedef std::map<std::string, InstrumentTrack const*, CompInstrumentTrack> InstrumentTracksConstPtr; // this one really needed ? can't we save only the map key for comparison ?
 
 namespace {
-	bool isTrackInside(TrackMap const& track_map, std::string const& name) {
+	bool isTrackInside(InstrumentTracks const& track_map, std::string const& name) {
 		return track_map.find(name) != track_map.end();
 	}
 }
@@ -109,13 +109,25 @@ struct Note {
 
 typedef std::vector<Note> Notes;
 
+struct VocalTrack {
+	VocalTrack(std::string name);
+	void reload();
+	std::string name;
+	Notes notes;
+	int noteMin, noteMax; ///< lowest and highest note
+	double beginTime, endTime; ///< the period where there are notes
+	double m_scoreFactor; ///< normalization factor for the scoring system
+	MusicalScale scale; ///< scale in which song is sung
+};
+
+typedef std::map<std::string, VocalTrack> VocalsTracks;
 
 struct DanceTrack {
 	DanceTrack(std::string& description, Notes& notes);
 	//track description
 	std::string description;
 	//container for the actual note data
-	Notes notes;	
+	Notes notes;
 };
 
 enum DanceDifficulty {

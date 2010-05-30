@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-27 18:47+0100\n"
+"POT-Creation-Date: 2010-05-20 16:47+0100\n"
 "PO-Revision-Date: \n"
-"Last-Translator: Miguel Sánchez de León Peque <peque_msl@hotmail.com>\n"
+"Last-Translator: Miguel Sánchez de León Peque <msdeleonpeque@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -15,9 +15,33 @@ msgstr ""
 "X-Poedit-Country: SPAIN\n"
 "X-Poedit-SearchPath-0: ../game\n"
 
-#: ../game/screen_hiscore.cc:88
-msgid "Hiscore for "
-msgstr "Mejores puntuaciones para "
+#: ../game/guitargraph.cc:305
+msgid "Streak!"
+msgstr "Aciertos!"
+
+#: ../game/guitargraph.cc:322
+msgid ""
+"God Mode\n"
+"Activated!"
+msgstr ""
+"¡Modo Dios\n"
+"Activado!"
+
+#: ../game/guitargraph.cc:323
+msgid "Mistakes ignored!"
+msgstr "¡Se ignoran los fallos!"
+
+#: ../game/guitargraph.cc:953
+msgid "Drum Fill!"
+msgstr "¡Enajenación!"
+
+#: ../game/guitargraph.cc:954
+msgid "God Mode Ready!"
+msgstr "¡Modo Dios Disponible!"
+
+#: ../game/guitargraph.cc:959
+msgid "Solo!"
+msgstr "¡Solo!"
 
 #: ../game/screen_intro.cc:15
 msgid "Perform"
@@ -141,92 +165,92 @@ msgstr "¡Canción defectuosa!"
 msgid "Song contains broken tracks!"
 msgstr "¡La canción contiene pistas defectuosas!"
 
-#: ../game/screen_sing.cc:326
+#: ../game/screen_sing.cc:386
 msgid "   ENTER to skip instrumental break"
 msgstr "   ENTER para pasar la parte instrumental"
 
-#: ../game/screen_sing.cc:327
+#: ../game/screen_sing.cc:387
 msgid "   Remember to wait for grading!"
 msgstr "   Recuerda esperar para ser evaluado!"
 
-#: ../game/screen_sing.cc:415
+#: ../game/screen_sing.cc:475
 msgid "No player!"
 msgstr "¡No se han encontrado jugadores!"
 
-#: ../game/screen_sing.cc:424
+#: ../game/screen_sing.cc:484
 msgid "Hit singer"
 msgstr "Superestrella"
 
-#: ../game/screen_sing.cc:425
+#: ../game/screen_sing.cc:485
 msgid "Lead singer"
 msgstr "Vocalista"
 
-#: ../game/screen_sing.cc:426
-#: ../game/screen_sing.cc:432
-#: ../game/screen_sing.cc:438
+#: ../game/screen_sing.cc:486
+#: ../game/screen_sing.cc:492
+#: ../game/screen_sing.cc:498
 msgid "Rising star"
 msgstr "Aficionado"
 
-#: ../game/screen_sing.cc:427
-#: ../game/screen_sing.cc:433
-#: ../game/screen_sing.cc:439
+#: ../game/screen_sing.cc:487
+#: ../game/screen_sing.cc:493
+#: ../game/screen_sing.cc:499
 msgid "Amateur"
 msgstr "Novato"
 
-#: ../game/screen_sing.cc:428
-#: ../game/screen_sing.cc:440
+#: ../game/screen_sing.cc:488
+#: ../game/screen_sing.cc:500
 msgid "Tone deaf"
 msgstr "Sin oído"
 
-#: ../game/screen_sing.cc:430
+#: ../game/screen_sing.cc:490
 msgid "Maniac"
 msgstr "Maníaco"
 
-#: ../game/screen_sing.cc:431
+#: ../game/screen_sing.cc:491
 msgid "Hoofer"
 msgstr "Artista"
 
-#: ../game/screen_sing.cc:434
+#: ../game/screen_sing.cc:494
 msgid "Loser"
 msgstr "Perdedor"
 
-#: ../game/screen_sing.cc:436
+#: ../game/screen_sing.cc:496
 msgid "Virtuoso"
 msgstr "Virtuoso"
 
-#: ../game/screen_sing.cc:437
+#: ../game/screen_sing.cc:497
 msgid "Rocker"
 msgstr "Rockero"
 
-#: ../game/main.cc:154
+#: ../game/main.cc:159
 msgid "Audio capture..."
 msgstr "Captura de audio..."
 
-#: ../game/main.cc:156
+#: ../game/main.cc:161
 msgid "Audio playback..."
 msgstr "Reproducción de audio..."
 
-#: ../game/main.cc:159
+#: ../game/main.cc:164
 msgid "Miscellaneous..."
 msgstr "Varios..."
 
-#: ../game/main.cc:174
+#: ../game/main.cc:178
 msgid "Main menu..."
 msgstr "Menú principal..."
 
-#: ../game/main.cc:185
+#: ../game/main.cc:189
 msgid "Screenshot taken!"
 msgstr "¡Captura de pantalla exitosa!"
 
-#: ../game/main.cc:188
+#: ../game/main.cc:192
 msgid "Screenshot failed!"
 msgstr "¡Captura de pantalla fallida!"
 
-#: ../game/screen_songs.cc:187
+#: ../game/screen_songs.cc:195
 msgid "No songs found!"
 msgstr "¡No se encontraron canciones!"
 
-#: ../game/screen_songs.cc:188
+#: ../game/screen_songs.cc:196
 msgid ""
 "Visit performous.org\n"
 "for free songs"
@@ -234,20 +258,32 @@ msgstr ""
 "Visita performous.org\n"
 "para descargar canciones gratuitas"
 
-#: ../game/screen_songs.cc:190
+#: ../game/screen_songs.cc:198
 msgid "no songs match search"
 msgstr "ninguna canción satisface el criterio de búsqueda"
 
-#: ../game/screen_songs.cc:198
+#: ../game/screen_songs.cc:206
 msgid "(press END to view hiscores)"
 msgstr "(presiona FIN para ver las mejores puntuaciones)"
 
-#: ../game/screen_songs.cc:199
+#: ../game/screen_songs.cc:207
 msgid "<type in to search>"
 msgstr "<escribe para buscar>"
 
+#: ../game/screen_songs.cc:212
+msgid "Hiscore for "
+msgstr "Mejores puntuaciones para "
+
+#: ../game/database.cc:107
+msgid "No Items up to now."
+msgstr "No hay mejores puntuaciones guardadas."
+
+#: ../game/database.cc:108
+msgid "Be the first to be listed here!"
+msgstr "¡Sé el primero en aparecer aquí!"
+
 #~ msgid "filter: "
 #~ msgstr "filtro: "
+
 #~ msgid "none"
 #~ msgstr "ninguno"
-

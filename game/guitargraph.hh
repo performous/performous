@@ -1,8 +1,9 @@
 #pragma once
 
 #include <vector>
-
 #include <boost/ptr_container/ptr_map.hpp>
+
+#include "instrumentgraph.hh"
 #include "animvalue.hh"
 #include "notes.hh"
 #include "audio.hh"
@@ -48,7 +49,7 @@ static inline bool operator==(Chord const& a, Chord const& b) {
 }
 
 /// handles drawing of notes and waves
-class GuitarGraph {
+class GuitarGraph: public InstrumentGraph {
   public:
 	/// constructor
 	GuitarGraph(Audio& audio, Song const& song, bool drums, int number);
@@ -58,24 +59,24 @@ class GuitarGraph {
 	void updateNeck();
 	void draw(double time);
 	void engine();
-	void position(double cx, double width) { m_cx.setTarget(cx); m_width.setTarget(width); }
-	unsigned stream() const { return m_stream; }
 	bool dead() const;
-	double correctness() const { return m_correctness.get(); }
-	std::string getTrackIndex() const { return m_track_index->first; }
-	int getScore() const { return m_score * m_scoreFactor; }
 	std::string getTrack() const { return m_track_index->first; }
 	std::string getDifficultyString() const;
+
   private:
+	// Engine / scoring utils
 	bool canActivateStarpower() { return (m_starmeter > 6000); }
 	void activateStarpower();
+	void errorMeter(float error);
 	void fail(double time, int fret);
 	void endHold(int fret, double time = 0.0);
 	void endBRE();
 	void endStreak() { m_streak = 0; m_bigStreak = 0; }
-	Audio& m_audio;
-	input::InputDev m_input; /// input device (guitar/drums/keyboard)
-	Song const& m_song;
+	void updateDrumFill(double time);
+	void drumHit(double time, int pad);
+	void guitarPlay(double time, input::Event const& ev);
+
+	// Media
 	Surface m_button;
 	Texture m_tail;
 	Texture m_tail_glow;
@@ -87,75 +88,65 @@ class GuitarGraph {
 	glutil::Color m_neckglowColor;
 	Object3d m_fretObj; /// 3d object for regular note
 	Object3d m_tappableObj; /// 3d object for the HOPO note cap
-	AnimValue m_hit[6];
 	std::vector<Sample> m_samples; /// sound effects
 	boost::scoped_ptr<Texture> m_neck; /// necks
+	boost::scoped_ptr<SvgTxtThemeSimple> m_scoreText;
+	boost::scoped_ptr<SvgTxtThemeSimple> m_streakText;
+
+	// Flags
 	bool m_drums; /// are we using drums?
 	bool m_use3d; /// are we using 3d?
-	AnimValue m_starpower; /// how long the GodMode lasts (also used in fading the effect)
-	AnimValue m_cx, m_width; /// controls horizontal position and width smoothly
-	std::size_t m_stream;
-	std::vector<AnimValue> m_flames[5]; /// flame effect queues for each fret
-	TrackMapConstPtr m_track_map; /// tracks
-	TrackMapConstPtr::const_iterator m_track_index;
-	std::vector<Duration> m_solos; /// holds guitar solos
-	std::vector<Duration> m_drumfills; /// holds drum fills (used for activating GodMode)
-	Durations::const_iterator m_dfIt; /// current drum fill
-	void updateDrumFill(double time);
-	void drumHit(double time, int pad);
-	void guitarPlay(double time, input::Event const& ev);
+	bool m_leftymode; /// switch guitar notes to right-to-left direction
+
+	// Track stuff
 	enum Difficulty {
+		DIFFICULTY_KIDS,     // Kids
 		DIFFICULTY_SUPAEASY, // Easy
 		DIFFICULTY_EASY,     // Medium
 		DIFFICULTY_MEDIUM,   // Hard
 		DIFFICULTY_AMAZING,  // Expert
 		DIFFICULTYCOUNT
 	} m_level;
-	struct Event {
-		double time;
-		AnimValue glow;
-		AnimValue whammy;
-		int type; // 0 = miss (pick), 1 = tap, 2 = pick
-		int fret;
-		Duration const* dur;
-		double holdTime;
-		Event(double t, int ty, int f = -1, Duration const* d = NULL): time(t), glow(0.0, 5.0), whammy(0.0, 0.5), type(ty), fret(f), dur(d), holdTime(d ? d->begin : getNaN()) { if (type > 0) glow.setValue(1.0); }
-	};
-	typedef std::vector<Event> Events;
-	Events m_events;
-	unsigned m_holds[5]; /// active hold notes
+	void nextTrack(bool fast = false);
+	void difficultyAuto(bool tryKeepCurrent = false);
+	bool difficulty(Difficulty level);
+	InstrumentTracksConstPtr m_instrumentTracks; /// tracks
+	InstrumentTracksConstPtr::const_iterator m_track_index;
+	unsigned m_holds[max_panels]; /// active hold notes
+
+	// Graphics functions
 	glutil::Color const& color(int fret) const;
 	glutil::Color const colorize(glutil::Color c, double time) const;
 	void drawBar(double time, float h);
 	void drawNote(int fret, glutil::Color, float tBeg, float tEnd, float whammy = 0, bool tappable = false, bool hit = false, double hitAnim = 0.0, double releaseTime = 0.0);
 	void drawDrumfill(float tBeg, float tEnd);
 	void drawInfo(double time, double offsetX, Dimensions dimensions);
-	void nextTrack(bool fast = false);
-	void difficultyAuto(bool tryKeepCurrent = false);
-	bool difficulty(Difficulty level);
-	SvgTxtTheme m_text;
-	boost::scoped_ptr<SvgTxtThemeSimple> m_scoreText;
-	boost::scoped_ptr<SvgTxtThemeSimple> m_streakText;
-	boost::scoped_ptr<SvgTxtThemeSimple> m_popupText;
+	float getFretX(int fret) const { return (-2.0f + fret- (m_drums ? 0.5 : 0)) * (m_leftymode ? -1 : 1); }
+
+	// Chords & notes
 	void updateChords();
+	double getNotesBeginTime() const { return m_chords.front().begin; }
 	typedef std::vector<Chord> Chords;
 	Chords m_chords;
 	Chords::iterator m_chordIt;
 	typedef std::map<Duration const*, unsigned> NoteStatus; // Note in song to m_events[unsigned - 1] or 0 for not played
 	NoteStatus m_notes;
-	AnimValue m_correctness;
+	std::vector<Duration> m_solos; /// holds guitar solos
+	std::vector<Duration> m_drumfills; /// holds drum fills (used for activating GodMode)
+	Durations::const_iterator m_dfIt; /// current drum fill
+
+	// Animation & misc score keeping
+	std::vector<AnimValue> m_flames[max_panels]; /// flame effect queues for each fret
+	AnimValue m_errorMeter;
+	AnimValue m_errorMeterFlash;
+	AnimValue m_errorMeterFade;
 	AnimValue m_drumJump;
-	AnimValue m_streakPopup; /// for animating the popup
-	AnimValue m_godmodePopup; /// for animating the popup
-	double m_score; /// unnormalized scores
-	double m_scoreFactor; /// normalization factor
+	AnimValue m_starpower; /// how long the GodMode lasts (also used in fading the effect)
 	double m_starmeter; /// when this is high enough, GodMode becomes available
-	int m_streak; /// player's current streak/combo
-	int m_longestStreak; /// player's longest streak/combo
-	int m_bigStreak; /// next limit when a popup appears
-	double m_jointime; /// when the player joined
-	int m_dead; /// how many notes has been passed without hitting buttons
 	double m_drumfillHits; /// keeps track that enough hits are scored
 	double m_drumfillScore; /// max score for the notes under drum fill
+	double m_soloTotal; /// maximum solo score
+	double m_soloScore; /// score during solo
+	bool m_solo; /// are we currently playing a solo
 };
 

@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace xmlpp { struct Element; }  // Forward declaration for libxml++ stuff
+namespace xmlpp { class Element; }  // Forward declaration for libxml++ stuff
 
 /// configuration option
 class ConfigItem {

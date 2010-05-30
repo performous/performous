@@ -6,6 +6,7 @@
 #include "layout_singer.hh"
 #include "animvalue.hh"
 #include "engine.hh"
+#include "instrumentgraph.hh"
 #include "guitargraph.hh"
 #include "dancegraph.hh"
 #include "screen.hh"
@@ -14,8 +15,7 @@
 #include "surface.hh"
 #include "opengl_text.hh"
 #include "progressbar.hh"
-#include "guitargraph.hh"
-
+#include "webcam.hh"
 #include "screen_players.hh"
 
 class Players;
@@ -23,8 +23,8 @@ class Audio;
 class Database;
 class Video;
 
-typedef boost::ptr_vector<GuitarGraph> Instruments;
-typedef boost::ptr_vector<DanceGraph> Dancers;
+typedef boost::ptr_vector<InstrumentGraph> Instruments;
+typedef boost::ptr_vector<InstrumentGraph> Dancers;
 
 /// shows score at end of song
 class ScoreWindow {
@@ -79,6 +79,7 @@ class ScreenSing: public Screen {
 	boost::scoped_ptr<ProgressBar> m_progress;
 	boost::scoped_ptr<Surface> m_background;
 	boost::scoped_ptr<Video> m_video;
+	boost::scoped_ptr<Webcam> m_cam;
 	boost::scoped_ptr<Surface> m_pause_icon;
 	boost::scoped_ptr<Surface> m_help;
 	boost::scoped_ptr<Engine> m_engine;
