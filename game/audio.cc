@@ -145,24 +145,39 @@ void Audio::fadeout(double fadeTime) {
 }
 
 double Audio::getPosition() const {
-	return 0.0;
+	boost::mutex::scoped_lock l(self->mutex);
+	return self->playing.empty() ? getNaN() : self->playing[0].pos();
 }
 
 double Audio::getLength() const {
-	return 0.0;
+	boost::mutex::scoped_lock l(self->mutex);
+	return self->playing.empty() ? getNaN() : self->playing[0].duration();
 }
 
 bool Audio::isPlaying() const {
-	return false;
+	boost::mutex::scoped_lock l(self->mutex);
+	return !self->playing.empty();
 }
 
 void Audio::seek(double offset) {
+	boost::mutex::scoped_lock l(self->mutex);
+	for(boost::ptr_vector<Music>::iterator it = self->playing.begin() ; it != self->playing.end() ; ++it) {
+		it->seek(clamp(it->pos() + offset, 0.0, it->duration()));
+	}
+	pause(false);
 }
 
 void Audio::seekPos(double pos) {
+	boost::mutex::scoped_lock l(self->mutex);
+	for(boost::ptr_vector<Music>::iterator it = self->playing.begin() ; it != self->playing.end() ; ++it) {
+		it->seek(pos);
+	}
+	pause(false);
 }
 
 void Audio::pause(bool state) {
+	boost::mutex::scoped_lock l(self->mutex);
+	pause(state);
 }
 
 void Audio::streamFade(std::string stream_id, double level) {
