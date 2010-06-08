@@ -30,6 +30,7 @@ namespace {
 }
 
 void ScreenSing::enter() {
+	//m_practmode = true; // un-comment this line to play with practice mode. temporary, of course!
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	sm->flashMessage(_("Loading song..."), 0.0, 1.0, 0.5);
 	sm->drawFlashMessage(); sm->window().swap(); // Make loading message show
@@ -97,7 +98,7 @@ void ScreenSing::enter() {
 					if (type == 3) break;
 				}
 				if (type == 0) m_dancers.push_back(new DanceGraph(m_audio, *m_song));
-				else m_instruments.push_back(new GuitarGraph(m_audio, *m_song, type == 2, idx));
+				else m_instruments.push_back(new GuitarGraph(m_audio, *m_song, type == 2, idx, m_practmode));
 				++idx;
 			} catch (input::NoDevError&) {
 				++type;
@@ -401,8 +402,13 @@ void ScreenSing::draw() {
 	}
 
 	if (m_audio.isPaused()) {
-		m_pause_icon->dimensions.middle().center().fixedWidth(.32);
-		m_pause_icon->draw();
+		if (!m_practmode) {
+			m_pause_icon->dimensions.middle().center().fixedWidth(.32);
+			m_pause_icon->draw();
+		} else {
+			// we get here when the song is on hold during practice
+			// TODO: display some (small) info screen here
+		}
 	}
 }
 
