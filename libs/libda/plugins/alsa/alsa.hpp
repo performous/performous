@@ -257,7 +257,8 @@ namespace alsa {
 			std::string::size_type end = prettyfunc.find('(');
 			std::string::size_type begin = prettyfunc.find(' ');
 			if (begin == std::string::npos || begin > end) begin = 0; else ++begin;
-			for (std::string::size_type tmp; (tmp = prettyfunc.rfind(' ', end)) != std::string::npos && tmp > begin; end = tmp) {};
+			if (end == std::string::npos) end = prettyfunc.size();
+			for (std::string::size_type tmp; end > begin && (tmp = prettyfunc.rfind(' ', end - 1)) != std::string::npos && tmp > begin; end = tmp) {};
 			throw error(cfunc, ret, prettyfunc.substr(begin, end - begin));
 		}
 	}
