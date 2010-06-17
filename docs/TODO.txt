@@ -66,5 +66,4 @@ Bugs:
   be nice that playing a sample reset the privious fail sample (test case :
   drums rolling)
 - "Electric - Melocy Club" background and cover load incorrectly (strange PNG pixel format?)
-- filter update on song loading
 

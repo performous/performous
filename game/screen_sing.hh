@@ -49,7 +49,7 @@ class ScreenSing: public Screen {
   public:
 	/// constructor
 	ScreenSing(std::string const& name, Audio& audio, Database& database, Backgrounds& bgs):
-	  Screen(name), m_audio(audio), m_database(database), m_backgrounds(bgs), m_latencyAV(), m_only_singers_alive(true)
+	  Screen(name), m_audio(audio), m_database(database), m_backgrounds(bgs), m_latencyAV(), m_only_singers_alive(true), m_practmode(false)
 	{}
 	void enter();
 	void exit();
@@ -90,5 +90,6 @@ class ScreenSing: public Screen {
 	boost::shared_ptr<ThemeSing> theme;
 	AnimValue m_quitTimer;
 	bool m_only_singers_alive;
+	bool m_practmode;
 };
 

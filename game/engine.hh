@@ -54,7 +54,7 @@ class Engine {
 			size_t player = 0;
 			for (std::list<Player>::iterator it = m_database.cur.begin(); it != m_database.cur.end(); ++it, ++player) it->m_color = playerColors[player % playerColorsSize];
 		}
-		m_thread.reset(new boost::thread(&Engine::operator(), this));
+		m_thread.reset(new boost::thread(boost::ref(*this)));
 	}
 	~Engine() { kill(); }
 	/// Terminates processing
