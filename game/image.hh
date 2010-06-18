@@ -21,6 +21,21 @@ namespace {
 	void writePngHelper(png_structp pngPtr, png_bytep data, png_size_t length) {
 		static_cast<std::ostream*>(png_get_io_ptr(pngPtr))->write((char*)data, length);
 	}
+	void loadPNG_internal(png_structp pngPtr, png_infop infoPtr, std::ifstream& file, std::vector<unsigned char>& image, std::vector<png_bytep>& rows, unsigned& w, unsigned& h) {
+		if (setjmp(png_jmpbuf(pngPtr))) throw std::runtime_error("Reading PNG failed");
+		png_set_read_fn(pngPtr,(voidp)&file, readPngHelper);
+		png_read_info(pngPtr, infoPtr);
+		png_set_expand(pngPtr);  // Expand everything to RGB(A)
+		png_set_strip_16(pngPtr);  // Strip everything down to 8 bit/component
+		png_set_gray_to_rgb(pngPtr);  // Convert even grayscale to RGB(A)
+		png_set_filler(pngPtr, 0xFF, PNG_FILLER_AFTER); // Add alpha channel if it is missing
+		w = png_get_image_width(pngPtr, infoPtr);
+		h = png_get_image_height(pngPtr, infoPtr);
+		image.resize(w * h * 4);
+		rows.resize(h);
+		for (unsigned y = 0; y < h; ++y) rows[y] = reinterpret_cast<png_bytep>(&image[y * w * 4]);
+		png_read_image(pngPtr, &rows[0]);
+	}
 }
 
 template <typename T> void loadSVG(T& target, std::string const& filename) {
@@ -51,22 +66,6 @@ template <typename T> void loadSVG(T& target, std::string const& filename) {
 	gdk_pixbuf_unref(pb);
 }
 
-static void loadPNG_internal(png_structp pngPtr, png_infop infoPtr, std::ifstream& file, std::vector<unsigned char>& image, std::vector<png_bytep>& rows, unsigned& w, unsigned& h) {
-	if (setjmp(png_jmpbuf(pngPtr))) throw std::runtime_error("Reading PNG failed");
-	png_set_read_fn(pngPtr,(voidp)&file, readPngHelper);
-	png_read_info(pngPtr, infoPtr);
-	png_set_expand(pngPtr);  // Expand everything to RGB(A)
-	png_set_strip_16(pngPtr);  // Strip everything down to 8 bit/component
-	png_set_gray_to_rgb(pngPtr);  // Convert even grayscale to RGB(A)
-	png_set_filler(pngPtr, 0xFF, PNG_FILLER_AFTER); // Add alpha channel if it is missing
-	w = png_get_image_width(pngPtr, infoPtr);
-	h = png_get_image_height(pngPtr, infoPtr);
-	image.resize(w * h * 4);
-	rows.resize(h);
-	for (unsigned y = 0; y < h; ++y) rows[y] = reinterpret_cast<png_bytep>(&image[y * w * 4]);
-	png_read_image(pngPtr, &rows[0]);
-}
-
 template <typename T> void loadPNG(T& target, std::string const& filename) {
 	std::vector<unsigned char> image;
 	std::ifstream file(filename.c_str(), std::ios::binary);
@@ -95,6 +94,7 @@ struct my_jpeg_error_mgr {
 typedef struct my_jpeg_error_mgr * my_jpeg_error_mgr_ptr;
 
 static void my_jpeg_error_exit (j_common_ptr cinfo) {
+	(void)my_jpeg_error_exit; // Silence a compile warning about this function being unused (in some source code modules)
 	my_jpeg_error_mgr_ptr myerr = (my_jpeg_error_mgr_ptr) cinfo->err;
 	(*cinfo->err->output_message) (cinfo);
 	longjmp(myerr->setjmp_buffer, 1);
