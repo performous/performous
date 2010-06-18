@@ -51,25 +51,19 @@ template <typename T> void loadSVG(T& target, std::string const& filename) {
 	gdk_pixbuf_unref(pb);
 }
 
-static void loadPNG_internal(png_structp pngPtr, png_infop infoPtr, std::ifstream& file, std::vector<unsigned char>& image, std::vector<png_bytep>& rows, unsigned& w, unsigned& h, unsigned& channels) {
+static void loadPNG_internal(png_structp pngPtr, png_infop infoPtr, std::ifstream& file, std::vector<unsigned char>& image, std::vector<png_bytep>& rows, unsigned& w, unsigned& h) {
 	if (setjmp(png_jmpbuf(pngPtr))) throw std::runtime_error("Reading PNG failed");
 	png_set_read_fn(pngPtr,(voidp)&file, readPngHelper);
 	png_read_info(pngPtr, infoPtr);
-	png_set_expand(pngPtr);
-	png_set_strip_16(pngPtr);
-	png_set_gray_to_rgb(pngPtr);
+	png_set_expand(pngPtr);  // Expand everything to RGB(A)
+	png_set_strip_16(pngPtr);  // Strip everything down to 8 bit/component
+	png_set_gray_to_rgb(pngPtr);  // Convert even grayscale to RGB(A)
+	png_set_filler(pngPtr, 0xFF, PNG_FILLER_AFTER); // Add alpha channel if it is missing
 	w = png_get_image_width(pngPtr, infoPtr);
 	h = png_get_image_height(pngPtr, infoPtr);
-	channels = png_get_channels(pngPtr, infoPtr);
-	if (channels == 1) channels = 3;  // Grayscale gets expanded to RGB
-	if (channels == 2) channels = 4;  // Grayscale with alpha gets expanded to RGBA
 	image.resize(w * h * 4);
 	rows.resize(h);
-	unsigned pos = 0;
-	for (unsigned y = 0; y < h; ++y) {
-		rows[y] = reinterpret_cast<png_bytep>(&image[pos]);
-		pos += (w * channels + 3) & ~3;  // Rows need to be word aligned
-	}
+	for (unsigned y = 0; y < h; ++y) rows[y] = reinterpret_cast<png_bytep>(&image[y * w * 4]);
 	png_read_image(pngPtr, &rows[0]);
 }
 
@@ -88,9 +82,9 @@ template <typename T> void loadPNG(T& target, std::string const& filename) {
 	infoPtr = png_create_info_struct(pngPtr);
 	if (!infoPtr) throw std::runtime_error("png_create_info_struct failed");
 	std::vector<png_bytep> rows;
-	unsigned w, h, channels;
-	loadPNG_internal(pngPtr, infoPtr, file, image, rows, w, h, channels);
-	target.load(w, h, channels == 4 ? pix::CHAR_RGBA : pix::RGB, &image[0], float(w)/h);
+	unsigned w, h;
+	loadPNG_internal(pngPtr, infoPtr, file, image, rows, w, h);
+	target.load(w, h, pix::CHAR_RGBA, &image[0], float(w)/h);
 }
 
 struct my_jpeg_error_mgr {
