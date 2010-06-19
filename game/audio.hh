@@ -38,8 +38,6 @@ public:
 	void playMusic(std::map<std::string,std::string> const& filenames, bool preview = false, double fadeTime = 0.5, double startPos = -0.2);
 	/// plays a sample
 	void play(Sample const& s, std::string const& volumeSetting);
-	/// get pause status
-	bool isPaused() { return m_paused; }
 	/// stops music
 	void stopMusic();
 	/// fades music out
@@ -58,17 +56,11 @@ public:
 	bool isPlaying() const;
 	/** Get the current position. If not known or nothing is playing, NaN is returned. **/
 	double getPosition() const;
-	void operator()(); ///< Thread runs here, don't call directly
-	/// pauses and unpauses playback
-	void togglePause() { pause(!m_paused); }
+	void togglePause() { pause(!isPaused()); }
 	void pause(bool state = true);
-	/// toggles synth playback (F4)
-	void toggleSynth(Notes const& notes) { m_notes = (m_notes ? NULL : &notes); }
+	bool isPaused() const;
+	void toggleSynth(Notes const& notes) { /*m_notes = (m_notes ? NULL : &notes); */} ///< toggles synth playback
 	void streamFade(std::string stream_id, double level);
-	unsigned int getSR() const { return 0; }
-private:
-	bool m_paused;
-	Notes const* volatile m_notes;
-	std::string m_volumeSetting;
+	unsigned int getSR() const { return 48000.0; }
 };
 

@@ -74,7 +74,8 @@ struct Audio::Impl {
 	boost::ptr_vector<Music> playing, disposing;
 	portaudio::Init init;
 	boost::ptr_vector<portaudio::Stream> streams;
-	Impl() {
+	volatile bool paused;
+	Impl(): paused(false) {
 		std::string dev;
 		streams.push_back(new portaudio::Stream(*this, portaudio::Params().channelCount(2).device(dev, true), portaudio::Params().channelCount(2).device(dev, false), 48000));
 		PaError err = Pa_StartStream(streams[0]);
@@ -92,6 +93,7 @@ struct Audio::Impl {
 	void callbackInput(float const* begin, float const* end) {}
 	void callbackOutput(float* begin, float* end) {
 		std::fill(begin, end, 0.0f);
+		if (paused) return;
 		for (size_t i = 0; i < playing.size();) {
 			bool keep = playing[i](begin, end);
 			// Disposing hack
@@ -139,9 +141,13 @@ void Audio::playMusic(std::string const& filename, bool preview, double fadeTime
 }
 
 void Audio::stopMusic() {
+	std::map<std::string,std::string> m;
+	playMusic(m, false, 0.0);
 }
 
 void Audio::fadeout(double fadeTime) {
+	std::map<std::string,std::string> m;
+	playMusic(m, false, fadeTime);
 }
 
 double Audio::getPosition() const {
@@ -176,9 +182,10 @@ void Audio::seekPos(double pos) {
 }
 
 void Audio::pause(bool state) {
-	boost::mutex::scoped_lock l(self->mutex);
-	pause(state);
+	self->paused = state;
 }
+
+bool Audio::isPaused() const { return self->paused; }
 
 void Audio::streamFade(std::string stream_id, double level) {
 }
