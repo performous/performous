@@ -119,16 +119,21 @@ struct Audio::Impl {
 Audio::Audio(): self(new Impl) {}
 Audio::~Audio() {}
 
+bool Audio::isOpen() const {
+	boost::mutex::scoped_lock l(self->mutex);
+	return !self->streams.empty();
+}
+	
 void Audio::play(Sample const& s, std::string const& volumeSetting) {
 }
 
 void Audio::playMusic(std::map<std::string,std::string> const& filenames, bool preview, double fadeTime, double startPos) {
 	boost::mutex::scoped_lock l(self->mutex);
-	self->disposing.clear();
-	self->preloading.reset(new Music(filenames, 48000));
+	self->disposing.clear();  // Delete disposed streams
+	self->preloading.reset(new Music(filenames, getSR()));
 	Music& m = *self->preloading.get();
 	m.seek(startPos);
-	m.fadeRate = fadeTime / 48000.0f;
+	m.fadeRate = 1.0 / getSR() / fadeTime;
 }
 
 void Audio::playMusic(std::string const& filename, bool preview, double fadeTime, double startPos) {
@@ -149,12 +154,12 @@ void Audio::fadeout(double fadeTime) {
 
 double Audio::getPosition() const {
 	boost::mutex::scoped_lock l(self->mutex);
-	return self->playing.empty() ? getNaN() : self->playing[0].pos();
+	return (self->playing.empty() || self->preloading.get()) ? getNaN() : self->playing[0].pos();
 }
 
 double Audio::getLength() const {
 	boost::mutex::scoped_lock l(self->mutex);
-	return self->playing.empty() ? getNaN() : self->playing[0].duration();
+	return (self->playing.empty() || self->preloading.get()) ? getNaN() : self->playing[0].duration();
 }
 
 bool Audio::isPlaying() const {

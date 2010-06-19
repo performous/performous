@@ -23,17 +23,16 @@ public:
 	Audio();
 	~Audio();
 	boost::ptr_vector<Analyzer>& analyzers() { static boost::ptr_vector<Analyzer> ana; return ana; }
-	/// if audio is currently playing
-	bool isOpen() const { return false; }
+	bool isOpen() const;
 	/** Play a song beginning at startPos (defaults to 0)
 	 * @param filename the track filename
 	 * @param preview if the song preview is to play
 	 * @param fadeTime time to fade
 	 * @param startPos starting position
 	 */
-	void playMusic(std::string const& filename, bool preview = false, double fadeTime = 0.5, double startPos = -0.2);
+	void playMusic(std::string const& filename, bool preview = false, double fadeTime = 0.5, double startPos = 0.0);
 	/// plays a list of songs
-	void playMusic(std::map<std::string,std::string> const& filenames, bool preview = false, double fadeTime = 0.5, double startPos = -0.2);
+	void playMusic(std::map<std::string,std::string> const& filenames, bool preview = false, double fadeTime = 0.5, double startPos = 0.0);
 	/// plays a sample
 	void play(Sample const& s, std::string const& volumeSetting);
 	/// stops music
@@ -59,6 +58,6 @@ public:
 	bool isPaused() const;
 	void toggleSynth(Notes const& notes) { /*m_notes = (m_notes ? NULL : &notes); */} ///< toggles synth playback
 	void streamFade(std::string stream_id, double level);
-	unsigned int getSR() const { return 48000.0; }
+	double getSR() const { return 48000.0; }
 };
 

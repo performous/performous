@@ -140,6 +140,7 @@ class AudioBuffer {
 	bool prepare(int64_t pos) {
 		boost::mutex::scoped_try_lock l(m_mutex);
 		if (!l.owns_lock()) return false;
+		if (pos < 0) pos = 0;
 		m_posReq = pos;
 		return m_pos > m_posReq + m_data.capacity() / 4 && m_pos - m_data.size() <= m_pos;
 	}
