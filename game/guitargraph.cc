@@ -194,7 +194,7 @@ void GuitarGraph::engine() {
 	}
 	if (!m_drumfills.empty()) updateDrumFill(time); // Drum Fills / BREs
 	if (m_starpower.get() > 0.001) m_correctness.setTarget(1.0, true);
-	if (time < m_jointime) m_dead = 0; // Disable dead counting while joining
+	if (joining(time)) m_dead = 0; // Disable dead counting while joining
 	double whammy = 0;
 	bool difficulty_changed = false;
 	// Handle all events
@@ -225,7 +225,7 @@ void GuitarGraph::engine() {
 		if (ev.type == input::Event::PRESS) m_pressed_anim[!m_drums + ev.button].setValue(1.0);
 		else if (ev.type == input::Event::PICK) m_pressed_anim[0].setValue(1.0);
 		// Difficulty and track selection
-		if (time < m_jointime) {
+		if (joining(time)) {
 			if (ev.type == input::Event::PICK || ev.type == input::Event::PRESS) {
 				if (!m_drums && ev.pressed[4]) nextTrack();
 				else if (ev.pressed[0 + m_drums]) difficulty(DIFFICULTY_SUPAEASY);
@@ -778,13 +778,17 @@ void GuitarGraph::draw(double time) {
 						glow = m_events[event - 1].glow.get();
 						whammy = m_events[event - 1].whammy.get();
 					}
-					// Get a color for the fret and adjust it if GodMode is on
-					glutil::Color c = colorize(color(fret), it->begin);
-					if (glow > 0.1f) { ng_r+=c.r; ng_g+=c.g; ng_b+=c.b; ng_ccnt++; } // neck glow
-					// Further adjust the color if the note is hit
-					c.r += glow * 0.2f;
-					c.g += glow * 0.2f;
-					c.b += glow * 0.2f;
+					// Set the default color (disabled state)
+					glutil::Color c(0.5f, 0.5f, 0.5f);
+					if (!joining(time)) {
+						// Get a color for the fret and adjust it if GodMode is on
+						c = colorize(color(fret), it->begin);
+						if (glow > 0.1f) { ng_r+=c.r; ng_g+=c.g; ng_b+=c.b; ng_ccnt++; } // neck glow
+						// Further adjust the color if the note is hit
+						c.r += glow * 0.2f;
+						c.g += glow * 0.2f;
+						c.b += glow * 0.2f;
+					}
 					if (glow > 0.5f && tEnd < 0.1f && it->hitAnim[fret].get() == 0.0)
 						it->hitAnim[fret].setTarget(1.0);
 					// Call the actual note drawing function
@@ -983,7 +987,7 @@ void GuitarGraph::drawDrumfill(float tBeg, float tEnd) {
 /// Draw popups and other info texts
 void GuitarGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 	// Draw info
-	if (time < m_jointime) {
+	if (joining(time)) {
 		m_text.dimensions.screenBottom(-0.041).middle(-0.09 + offsetX);
 		m_text.draw(diffv[m_level].name);
 		m_text.dimensions.screenBottom(-0.015).middle(-0.09 + offsetX);

@@ -117,6 +117,7 @@ class InstrumentGraph {
 	// Shared functions for derived classes
 	void drawPopups(double offsetX);
 	void handleCountdown(double time, double beginTime);
+	bool joining(double time) const { return time < m_jointime; }
 
 	// Media
 	SvgTxtTheme m_text;

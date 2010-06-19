@@ -182,7 +182,7 @@ void DanceGraph::engine() {
 		if (time < it->first + it->second) { time = it->first; break; } // Inside stop
 		time -= it->second;
 	}
-	if (time < m_jointime) m_dead = 0; // Disable dead counting while joining
+	if (joining(time)) m_dead = 0; // Disable dead counting while joining
 	bool difficulty_changed = false;
 	// Handle all events
 	for (input::Event ev; m_input.tryPoll(ev);) {
@@ -192,7 +192,7 @@ void DanceGraph::engine() {
 			break;
 		}
 		// Difficulty / mode selection
-		if (time < m_jointime && ev.type == input::Event::PRESS) {
+		if (joining(time) && ev.type == input::Event::PRESS) {
 			if (ev.pressed[STEP_UP]) difficultyDelta(1);
 			else if (ev.pressed[STEP_DOWN]) difficultyDelta(-1);
 			else if (ev.pressed[STEP_LEFT]) gameMode(-1);
@@ -466,7 +466,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 /// Draw popups and other info texts
 void DanceGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 	// Draw info
-	if (time < m_jointime) {
+	if (joining(time)) {
 		m_text.dimensions.screenBottom(-0.075).middle(-0.09 + offsetX);
 		m_text.draw("^ " + getDifficultyString() + " v");
 		m_text.dimensions.screenBottom(-0.050).middle(-0.09 + offsetX);
