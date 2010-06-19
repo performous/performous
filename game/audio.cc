@@ -119,9 +119,6 @@ struct Audio::Impl {
 Audio::Audio(): self(new Impl) {}
 Audio::~Audio() {}
 
-void Audio::open(std::string const& pdev, std::size_t rate, std::size_t frames) {
-}
-
 void Audio::play(Sample const& s, std::string const& volumeSetting) {
 }
 

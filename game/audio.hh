@@ -23,8 +23,6 @@ public:
 	Audio();
 	~Audio();
 	boost::ptr_vector<Analyzer>& analyzers() { static boost::ptr_vector<Analyzer> ana; return ana; }
-	/** Takes libda devstr and sample rate. Throws if the device fails. **/
-	void open(std::string const& pdev, std::size_t rate, std::size_t frames);
 	/// if audio is currently playing
 	bool isOpen() const { return false; }
 	/** Play a song beginning at startPos (defaults to 0)
