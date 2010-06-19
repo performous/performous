@@ -107,10 +107,9 @@ static void checkEvents_SDL(ScreenManager& sm) {
 
 void mainLoop(std::string const& songlist) {
 	Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());
+	Audio audio;
 	ScreenManager sm(window);
 	try {
-		sm.flashMessage(_("Audio playback..."), 0.0f, 1.0f, 1.0f); window.blank(); sm.drawFlashMessage(); window.swap();
-		Audio audio;
 		sm.flashMessage(_("Miscellaneous..."), 0.0f, 1.0f, 1.0f); window.blank(); sm.drawFlashMessage(); window.swap();
 		Backgrounds backgrounds;
 		Database database(getConfigDir() / "database.xml");
