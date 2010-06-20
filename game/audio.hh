@@ -11,9 +11,11 @@
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/scoped_ptr.hpp>
 
+// TODO: should be removed
 struct Sample {
 	Sample(std::string, unsigned) {}
 };
+
 
 /** @short High level audio playback API **/
 class Audio {
@@ -34,7 +36,10 @@ public:
 	/// plays a list of songs
 	void playMusic(std::map<std::string,std::string> const& filenames, bool preview = false, double fadeTime = 0.5, double startPos = 0.0);
 	/// plays a sample
-	void play(Sample const& s, std::string const& volumeSetting);
+	void loadSample(std::string streamId, std::string filename);
+	void playSample(std::string streamId);
+	void unloadSample(std::string streamId);
+	void play(Sample const& s, std::string const& volumeSetting) {};// TODO: remove
 	/// stops music
 	void stopMusic();
 	/// fades music out

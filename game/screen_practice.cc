@@ -19,6 +19,7 @@ void ScreenPractice::enter() {
 		b->dimensions.screenBottom().left(-0.4 + i * 0.2).fixedWidth(0.04);
 	}
 	unsigned int sr = m_audio.getSR();
+	m_audio.loadSample("drum bass", getPath("sounds/drum_bass.ogg"));
 	m_samples.push_back(Sample(getPath("sounds/drum_bass.ogg"), sr));
 	m_samples.push_back(Sample(getPath("sounds/drum_snare.ogg"), sr));
 	m_samples.push_back(Sample(getPath("sounds/drum_hi-hat.ogg"), sr));
@@ -28,6 +29,7 @@ void ScreenPractice::enter() {
 }
 
 void ScreenPractice::exit() {
+	m_audio.unloadSample("drum bass");
 	m_vumeters.clear();
 	m_samples.clear();
 	theme.reset();
@@ -43,6 +45,7 @@ void ScreenPractice::manageEvent(SDL_Event event) {
 	  && input::detail::devices[event.jbutton.which].type_match(input::DRUMS)) {
 		int b = input::buttonFromSDL(input::detail::devices[event.jbutton.which].type(), event.jbutton.button);
 		if (b != -1) m_audio.play(m_samples[unsigned(b) % m_samples.size()], "audio/fail_volume");
+		m_audio.playSample("drum bass");
 	}
 }
 

@@ -32,7 +32,7 @@ struct VideoFrame {
 	int width,  ///< width of frame
 	    height; ///< height of frame
 	/// data array
-	std::vector<uint8_t> data; 
+	std::vector<uint8_t> data;
 	/// constructor
 	VideoFrame(double ts, int w, int h): timestamp(ts), width(w), height(h) {}
 	VideoFrame(): timestamp(getInf()) {} // EOF marker
