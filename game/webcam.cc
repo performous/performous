@@ -2,14 +2,17 @@
 
 #include "webcam.hh"
 #include "xtime.hh"
+#include "fs.hh"
 
 #ifdef USE_OPENCV
 #include <cv.h>
 #include <highgui.h>
+
+#define SAVE_WEBCAM_VIDEO
 #endif
 
 Webcam::Webcam(int cam_id):
-  m_thread(), m_capture(NULL), m_frameAvailable(false), m_running(false), m_quit(false)
+  m_thread(), m_capture(NULL), m_writer(NULL), m_frameAvailable(false), m_running(false), m_quit(false)
   {
 	#ifdef USE_OPENCV
 	// Initialize the capture device
@@ -18,6 +21,17 @@ Webcam::Webcam(int cam_id):
 		std::cout << "Could not initialize webcam capturing!" << std::endl;
 		return;
 	}
+	// Initialize the video writer
+	#ifdef SAVE_WEBCAM_VIDEO
+	float fps = cvGetCaptureProperty(m_capture, CV_CAP_PROP_FPS);
+	int framew = cvGetCaptureProperty(m_capture, CV_CAP_PROP_FRAME_WIDTH);
+	int frameh = cvGetCaptureProperty(m_capture, CV_CAP_PROP_FRAME_HEIGHT);
+	int codec = CV_FOURCC('P','I','M','1'); // MPEG-1
+	std::string out_file((getHomeDir() / std::string("/performous-webcam_out.mpg")).string());
+	m_writer = cvCreateVideoWriter(out_file.c_str(), codec, fps > 0 ? fps : 30.0f, cvSize(framew,frameh));
+	if (!m_writer) std::cout << "Could not initialize webcam video saving!" << std::endl;
+	#endif
+	// Start thread
 	m_thread.reset(new boost::thread(boost::ref(*this)));
 	#else
 	++cam_id; // dummy
@@ -29,6 +43,7 @@ Webcam::~Webcam() {
 	#ifdef USE_OPENCV
 	if (m_thread) m_thread->join();
 	cvReleaseCapture(&m_capture);
+	cvReleaseVideoWriter(&m_writer);
 	#endif
 }
 
@@ -40,6 +55,7 @@ void Webcam::operator()() {
 		// Try to get a new frame
 		if (m_running) frame = cvQueryFrame(m_capture);
 		if (frame) {
+			if (m_writer) cvWriteFrame(m_writer, frame);
 			boost::mutex::scoped_lock l(m_mutex);
 			// Copy the frame to storage
 			m_frame.width = frame->width;
