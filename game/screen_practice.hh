@@ -17,13 +17,13 @@ class ScreenPractice : public Screen {
 	void exit();
 	void manageEvent( SDL_Event event );
 	void draw();
-	
+
 	/// draw analyzers
 	void draw_analyzers();
 
   private:
 	Audio& m_audio;
-	std::vector<Sample> m_samples;
+	std::vector<std::pair<std::string, std::string> > m_samples;
 	boost::ptr_vector<ProgressBar> m_vumeters;
 	boost::scoped_ptr<ThemePractice> theme;
 };

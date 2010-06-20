@@ -68,37 +68,32 @@ public:
 	}
 };
 
-#define MAX_SAMPLE_SIZE 2000000
-
 // rename to Sample once totally implemented
 struct SampleNew {
   private:
-	std::vector<float> sample_buf;
 	unsigned int srate;
 	double m_pos;
+	FFmpeg mpeg;
+	bool eof;
   public:
-	SampleNew(std::string filename, unsigned sr) : srate(sr), m_pos() {
-		FFmpeg mpeg(false, true, filename, sr);
-		// here transfer all the samples to sample_buf
-		//
-		sample_buf.resize(MAX_SAMPLE_SIZE);
-	}
-	bool operator()(float* begin, float* end) {
-		if( m_pos >= sample_buf.size()) {
+	SampleNew(std::string filename, unsigned sr) : srate(sr), m_pos(), mpeg(false, true, filename, sr), eof(true) { }
+	void operator()(float* begin, float* end) {
+		if(eof) {
 			// No more data to play in this sample
-			return false;
+			return;
+		}
+		std::vector<float> mixbuf(end - begin);
+		if(!mpeg.audioQueue(&*mixbuf.begin(), &*mixbuf.end(), m_pos, 1.0)) {
+			eof = true;
 		}
 		for (size_t i = 0, iend = end - begin; i != iend; ++i) {
-			if(m_pos + i > sample_buf.size()) {
-				// no more data to fill
-				break;
-			}
-			begin[i] += sample_buf[m_pos + i];
+			begin[i] += mixbuf[i];
 		}
 		m_pos += end - begin;
 	}
-	void seek(double time) {
-		m_pos = time * srate * 2.0;
+	void reset() {
+		eof = false;
+		m_pos = 0;
 	}
 };
 
@@ -107,7 +102,7 @@ struct Audio::Impl {
 	boost::mutex mutex;
 	std::auto_ptr<Music> preloading;
 	boost::ptr_vector<Music> playing, disposing;
-	boost::ptr_map<std::string, SampleNew> playing_samples, sleeping_samples;
+	boost::ptr_map<std::string, SampleNew> samples;
 	portaudio::Init init;
 	boost::ptr_vector<portaudio::Stream> streams;
 	volatile bool paused;
@@ -137,11 +132,9 @@ struct Audio::Impl {
 			if (!l.owns_lock()) keep = true; // Cannot dispose without lock
 			if (keep) ++i; else disposing.transfer(disposing.end(), playing.begin() + i, playing);
 		}
-		for(boost::ptr_map<std::string, SampleNew>::iterator it = playing_samples.begin() ; it != playing_samples.end() ; ++it) {
+		for(boost::ptr_map<std::string, SampleNew>::iterator it = samples.begin() ; it != samples.end() ; ++it) {
 			boost::mutex::scoped_try_lock l(mutex);
-			if( (*it->second)(begin, end) == false && l.owns_lock()) {
-				sleeping_samples.transfer(sleeping_samples.end(), it, playing_samples);
-			}
+			(*it->second)(begin, end);
 		}
 	}
 	int operator()(void const* input, void* output, unsigned long frames, const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags) try {
@@ -170,31 +163,23 @@ void Audio::loadSample(std::string streamId, std::string filename) {
 	std::cout << ">>> Loading sample \"" << streamId << "\"" << std::endl;
 	{
 		boost::mutex::scoped_lock l(self->mutex);
-		self->sleeping_samples.insert(streamId, new SampleNew(filename, getSR()));
+		self->samples.insert(streamId, new SampleNew(filename, getSR()));
 	}
 }
 void Audio::playSample(std::string streamId) {
 	boost::mutex::scoped_lock l(self->mutex);
-	boost::ptr_map<std::string, SampleNew>::iterator it = self->sleeping_samples.find(streamId);
-	if( it == self->sleeping_samples.end() ) {
-		boost::ptr_map<std::string, SampleNew>::iterator it = self->playing_samples.find(streamId);
-		if( it == self->playing_samples.end() ) {
-			throw std::runtime_error("Cannot play sample : " + streamId);
-		} else {
-			it->second->seek(0.0);
-		}
-	} else {
-		it->second->seek(0.0);
-		self->playing_samples.transfer(self->playing_samples.end(), it, self->sleeping_samples);
+	boost::ptr_map<std::string, SampleNew>::iterator it = self->samples.find(streamId);
+	if( it == self->samples.end() ) {
+		throw std::runtime_error("Cannot play sample : " + streamId);
 	}
+	it->second->reset();
 }
 
 void Audio::unloadSample(std::string streamId) {
 	std::cout << ">>> Unloading sample \"" << streamId << "\"" << std::endl;
 	{
 		boost::mutex::scoped_lock l(self->mutex);
-		self->sleeping_samples.erase(streamId);
-		self->playing_samples.erase(streamId);
+		self->samples.erase(streamId);
 	}
 }
 
