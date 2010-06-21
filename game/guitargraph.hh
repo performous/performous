@@ -62,6 +62,8 @@ class GuitarGraph: public InstrumentGraph {
 	bool dead() const;
 	std::string getTrack() const { return m_track_index->first; }
 	std::string getDifficultyString() const;
+	void changeTrack(int dir = 1);
+	void changeDifficulty(int dir = 1);
 
   private:
 	// Engine / scoring utils

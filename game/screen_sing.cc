@@ -133,7 +133,7 @@ bool ScreenSing::instrumentLayout(double time) {
 			++i;
 		}
 	}
-	if (time < -1.0) {
+	if (time < -1.0 && count == 0) {
 		glColor4f(1.0f, 1.0f, 1.0f, clamp(-2.0 - 2.0 * time));
 		m_help->draw();
 		glColor3f(1.0f, 1.0f, 1.0f);
@@ -167,7 +167,7 @@ void ScreenSing::danceLayout(double time) {
 			++i;
 		}
 	}
-	if (time < -0.5) {
+	if (time < -0.5 && count == 0) {
 		glColor4f(1.0f, 1.0f, 1.0f, clamp(-1.0 - 2.0 * time));
 		m_help->draw();
 		glColor3f(1.0f, 1.0f, 1.0f);

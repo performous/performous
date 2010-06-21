@@ -91,11 +91,16 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
 	if(m_song.danceTracks.empty())
 		throw std::runtime_error("Could not find any dance tracks.");
 
-	gameMode(0); // Get an initial game mode and notes for it
+	changeTrack(0); // Get an initial game mode and notes for it
+
+	// Setup joining menu items
+	m_menu.add(InstrumentMenuOption("Select track", &InstrumentGraph::changeTrack, &InstrumentGraph::getTrack));
+	m_menu.add(InstrumentMenuOption("Select difficulty", &InstrumentGraph::changeDifficulty, &InstrumentGraph::getDifficultyString));
+
 }
 
 /// Attempt to select next/previous game mode
-void DanceGraph::gameMode(int direction) {
+void DanceGraph::changeTrack(int direction) {
 	// Position mappings for panels
 	static const int mapping4[max_panels] = {0, 1, 2, 3,-1,-1,-1,-1,-1,-1};
 	static const int mapping5[max_panels] = {0, 1, 3, 4, 2,-1,-1,-1,-1,-1};
@@ -131,7 +136,7 @@ void DanceGraph::gameMode(int direction) {
 	else if (gm == "para-single") { m_pads = 5; std::copy(mapping5, mapping5+max_panels, m_arrow_map); }
 	else throw std::runtime_error("Unknown track " + gm);
 
-	difficultyDelta(0); // Construct new notes
+	changeDifficulty(0); // Construct new notes
 }
 
 /// Are we alive?
@@ -147,19 +152,19 @@ std::string DanceGraph::getDifficultyString() const {
 }
 
 /// Attempt to change the difficulty by a step
-void DanceGraph::difficultyDelta(int delta) {
+void DanceGraph::changeDifficulty(int delta) {
 	int newLevel = m_level + delta;
 	if(newLevel >= DIFFICULTYCOUNT || newLevel < 0) return; // Out of bounds
 	DanceTracks::const_iterator it = m_song.danceTracks.find(m_gamingMode);
 	if(it->second.find((DanceDifficulty)newLevel) != it->second.end())
 		difficulty((DanceDifficulty)newLevel);
 	else
-		difficultyDelta(delta + (delta < 0 ? -1 : 1));
+		changeDifficulty(delta + (delta < 0 ? -1 : 1));
 }
 
 /// Select a difficulty and construct DanceNotes and score normalizer for it
 void DanceGraph::difficulty(DanceDifficulty level) {
-	// TODO: error handling)
+	// TODO: error handling
 	m_notes.clear();
 	DanceTrack const& track = m_song.danceTracks.find(m_gamingMode)->second.find(level)->second;
 	for(Notes::const_iterator it = track.notes.begin(); it != track.notes.end(); it++)
@@ -191,12 +196,12 @@ void DanceGraph::engine() {
 			m_jointime = time < 0.0 ? -1.0 : time + join_delay;
 			break;
 		}
-		// Difficulty / mode selection
-		if (joining(time) && ev.type == input::Event::PRESS) {
-			if (ev.pressed[STEP_UP]) difficultyDelta(1);
-			else if (ev.pressed[STEP_DOWN]) difficultyDelta(-1);
-			else if (ev.pressed[STEP_LEFT]) gameMode(-1);
-			else if (ev.pressed[STEP_RIGHT]) gameMode(1);
+		// Difficulty and track selection (joining menu keys)
+	   if (joining(time) && ev.type == input::Event::PRESS) {
+			if (ev.pressed[STEP_UP]) m_menu.move(-1);
+			else if (ev.pressed[STEP_DOWN]) m_menu.move(1);
+			else if (ev.pressed[STEP_LEFT]) m_menu.changeValue(-1);
+			else if (ev.pressed[STEP_RIGHT]) m_menu.changeValue(1);
 			difficulty_changed = true;
 		}
 		// Gaming controls
@@ -465,13 +470,11 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 
 /// Draw popups and other info texts
 void DanceGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
-	// Draw info
 	if (joining(time)) {
-		m_text.dimensions.screenBottom(-0.075).middle(-0.09 + offsetX);
-		m_text.draw("^ " + getDifficultyString() + " v");
-		m_text.dimensions.screenBottom(-0.050).middle(-0.09 + offsetX);
-		m_text.draw("< " + getTrack() + " >");
-	} else { // Draw scores
+		// Draw join menu
+		drawMenu(offsetX);
+	} else {
+		// Draw scores
 		m_text.dimensions.screenBottom(-0.35).middle(0.32 * dimensions.w() + offsetX);
 		m_text.draw(boost::lexical_cast<std::string>(unsigned(getScore())));
 		m_text.dimensions.screenBottom(-0.32).middle(0.32 * dimensions.w() + offsetX);

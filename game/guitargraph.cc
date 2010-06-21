@@ -121,9 +121,14 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number,
 	for (int i = 0; i < 5; ++i) m_holds[i] = 0;
 	m_pads = 5;
 	m_track_index = m_instrumentTracks.begin();
-	while (number--) nextTrack(true);
+	while (number--)
+		if (++m_track_index == m_instrumentTracks.end()) m_track_index = m_instrumentTracks.begin();
 	difficultyAuto();
 	updateNeck();
+
+	// Setup joining menu items
+	m_menu.add(InstrumentMenuOption("Select track", &InstrumentGraph::changeTrack, &InstrumentGraph::getTrack));
+	m_menu.add(InstrumentMenuOption("Select difficulty", &InstrumentGraph::changeDifficulty, &InstrumentGraph::getDifficultyString));
 }
 
 /// Load the appropriate neck texture
@@ -136,9 +141,10 @@ void GuitarGraph::updateNeck() {
 }
 
 /// Cycle through the different tracks
-void GuitarGraph::nextTrack(bool fast) {
-	if (++m_track_index == m_instrumentTracks.end()) m_track_index = m_instrumentTracks.begin();
-	if (fast) return;
+void GuitarGraph::changeTrack(int dir) {
+	if (dir >= 0) ++m_track_index; else --m_track_index;
+	if (m_track_index == m_instrumentTracks.end()) m_track_index = m_instrumentTracks.begin();
+	else if (m_track_index == (--m_instrumentTracks.end())) m_track_index = (--m_instrumentTracks.end());
 	difficultyAuto(true);
 	updateNeck();
 }
@@ -148,6 +154,13 @@ std::string GuitarGraph::getDifficultyString() const {
 	std::string ret = diffv[m_level].name;
 	if (m_drums && m_input.isKeyboard()) ret += " (kbd)";
 	return ret;
+}
+
+/// Cycle through difficulties
+void GuitarGraph::changeDifficulty(int dir) {
+	for (int level = ((int)m_level + dir) % DIFFICULTYCOUNT; level != m_level;
+	  level = (level+dir) % DIFFICULTYCOUNT)
+		if (difficulty(Difficulty(level))) return;
 }
 
 /// Find an initial difficulty level to use
@@ -224,22 +237,20 @@ void GuitarGraph::engine() {
 		// Keypress anims
 		if (ev.type == input::Event::PRESS) m_pressed_anim[!m_drums + ev.button].setValue(1.0);
 		else if (ev.type == input::Event::PICK) m_pressed_anim[0].setValue(1.0);
-		// Difficulty and track selection
+		// Difficulty and track selection (joining menu keys)
 		if (joining(time)) {
-			if (ev.type == input::Event::PICK || ev.type == input::Event::PRESS) {
-				if (!m_drums && ev.pressed[4]) nextTrack();
-				else if (ev.pressed[0 + m_drums]) difficulty(DIFFICULTY_SUPAEASY);
-				else if (ev.pressed[1 + m_drums]) difficulty(DIFFICULTY_EASY);
-				else if (ev.pressed[2 + m_drums]) difficulty(DIFFICULTY_MEDIUM);
-				else if (ev.pressed[3 + m_drums]) difficulty(DIFFICULTY_AMAZING);
-				// Kiddy mode is currently only available for drums
-				// (and this way of enabling is temporary anyway).
-				else if (ev.pressed[4] && m_drums) difficulty(DIFFICULTY_KIDS);
-				difficulty_changed = true;
+			// Check first regular keys
+			if (ev.type == input::Event::PRESS && ev.button == 0 + m_drums) m_menu.changeValue(1);
+			else if (ev.type == input::Event::PRESS && ev.button == 1 + m_drums) m_menu.changeValue(-1);
+			else if (ev.type == input::Event::PRESS && ev.button == 2 + m_drums) m_menu.move(1);
+			else if (ev.type == input::Event::PRESS && ev.button == 3 + m_drums) m_menu.move(-1);
+			else if (ev.type == input::Event::PICK && ev.button == 0) m_menu.move(1);
+			else if (ev.type == input::Event::PICK && ev.button == 1) m_menu.move(-1);
+			else { // Try nav keys (arrows)
+				if (ev.nav == input::CANCEL) ; // TODO: exit menu
+				else if (ev.nav == input::DOWN || ev.nav == input::RIGHT) m_menu.move(1);
+				else if (ev.nav == input::UP || ev.nav == input::LEFT) m_menu.move(-1);
 			}
-			// Lefty-mode switch
-			if (ev.type == input::Event::PRESS && ev.pressed[2] && ev.pressed[3])
-				m_leftymode = !m_leftymode;
 		// Playing
 		} else if (m_drums) {
 			if (ev.type == input::Event::PRESS) drumHit(time, ev.button);
@@ -988,10 +999,7 @@ void GuitarGraph::drawDrumfill(float tBeg, float tEnd) {
 void GuitarGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 	// Draw info
 	if (joining(time)) {
-		m_text.dimensions.screenBottom(-0.041).middle(-0.09 + offsetX);
-		m_text.draw(diffv[m_level].name);
-		m_text.dimensions.screenBottom(-0.015).middle(-0.09 + offsetX);
-		m_text.draw(m_track_index->first);
+		drawMenu(offsetX);
 	} else {
 		float xcor = 0.35 * dimensions.w();
 		float h = 0.075 * 2.0 * dimensions.w();

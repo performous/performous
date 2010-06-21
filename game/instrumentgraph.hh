@@ -10,6 +10,7 @@
 #include "opengl_text.hh"
 #include "3dobject.hh"
 #include "glutil.hh"
+#include "menu.hh"
 #include "fs.hh"
 #include "i18n.hh"
 
@@ -64,6 +65,7 @@ class InstrumentGraph {
 	  m_audio(audio), m_song(song), m_input(input::DevType(inp)),
 	  m_stream(),
 	  m_cx(0.0, 0.2), m_width(0.5, 0.4),
+	  m_menu(*this),
 	  m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
 	  m_pads(),
 	  m_correctness(0.0, 5.0),
@@ -85,6 +87,8 @@ class InstrumentGraph {
 	virtual bool dead() const = 0;
 	virtual std::string getTrack() const = 0;
 	virtual std::string getDifficultyString() const = 0;
+	virtual void changeTrack(int dir = 1) = 0;
+	virtual void changeDifficulty(int dir = 1) = 0;
 
 	// General getters
 	void position(double cx, double width) { m_cx.setTarget(cx); m_width.setTarget(width); }
@@ -113,8 +117,10 @@ class InstrumentGraph {
 	Events m_events;
 	typedef std::vector<Popup> Popups;
 	Popups m_popups;
+	InstrumentMenu m_menu;
 
 	// Shared functions for derived classes
+	void drawMenu(double offsetX);
 	void drawPopups(double offsetX);
 	void handleCountdown(double time, double beginTime);
 	bool joining(double time) const { return time < m_jointime; }
@@ -138,3 +144,4 @@ class InstrumentGraph {
 	double m_jointime; /// when the player joined
 	int m_dead; /// how many notes has been passed without hitting buttons
 };
+
