@@ -35,7 +35,7 @@ LICENSE="GPL-2
 SLOT="0"
 KEYWORDS="~x86 ~amd64 ~ppc ~ppc64"
 
-IUSE="debug alsa portaudio pulseaudio jack songs gstreamer tools editor"
+IUSE="debug alsa portaudio pulseaudio jack songs gstreamer tools editor midi webcam"
 
 RDEPEND="gnome-base/librsvg
 	dev-libs/boost
@@ -47,6 +47,7 @@ RDEPEND="gnome-base/librsvg
 	media-libs/jpeg
 	tools? ( media-gfx/imagemagick[png] )
 	editor? ( media-gfx/imagemagick[png] )
+	webcam? ( media-libs/opencv[v4l] )
 	>=media-video/ffmpeg-0.4.9_p20070616-r20
 	alsa? ( media-libs/alsa-lib )
 	jack? ( media-sound/jack-audio-connection-kit )
@@ -55,6 +56,9 @@ RDEPEND="gnome-base/librsvg
 	pulseaudio? ( media-sound/pulseaudio )
 	sys-apps/help2man
 	!games-arcade/ultrastar-ng"
+# Waiting for portmidi to enter portage (#90614)
+#RDEPEND="${RDEPEND}
+#	midi? ( media-libs/portmidi )"
 DEPEND="${RDEPEND}
     >=dev-util/cmake-2.6.0"
 
