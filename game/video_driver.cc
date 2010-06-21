@@ -97,7 +97,7 @@ void Window::resize() {
 		GLattrSetter attr_b(SDL_GL_BLUE_SIZE, 8);
 		GLattrSetter attr_a(SDL_GL_ALPHA_SIZE, 8);
 		GLattrSetter attr_buf(SDL_GL_BUFFER_SIZE, 32);
-		GLattrSetter attr_d(SDL_GL_DEPTH_SIZE, 16);
+		GLattrSetter attr_d(SDL_GL_DEPTH_SIZE, 24);
 		GLattrSetter attr_s(SDL_GL_STENCIL_SIZE, 8);
 		GLattrSetter attr_db(SDL_GL_DOUBLEBUFFER, 1);
 		GLattrSetter attr_ar(SDL_GL_ACCUM_RED_SIZE, 0);
