@@ -11,6 +11,7 @@
 #include "3dobject.hh"
 #include "glutil.hh"
 #include "menu.hh"
+#include "screen.hh"
 #include "fs.hh"
 #include "i18n.hh"
 
@@ -61,25 +62,7 @@ class Song;
 class InstrumentGraph {
   public:
 	/// Constructor
-	InstrumentGraph(Audio& audio, Song const& song, input::DevType inp):
-	  m_audio(audio), m_song(song), m_input(input::DevType(inp)),
-	  m_stream(),
-	  m_cx(0.0, 0.2), m_width(0.5, 0.4),
-	  m_menu(*this),
-	  m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
-	  m_pads(),
-	  m_correctness(0.0, 5.0),
-	  m_score(),
-	  m_scoreFactor(),
-	  m_streak(),
-	  m_longestStreak(),
-	  m_bigStreak(),
-	  m_countdown(3), // Display countdown 3 secs before note start
-	  m_jointime(getNaN()),
-	  m_dead()
-	  {
-		m_popupText.reset(new SvgTxtThemeSimple(getThemePath("sing_popup_text.svg"), config["graphic/text_lod"].f()));
-	};
+	InstrumentGraph(Audio& audio, Song const& song, input::DevType inp);
 
 	// Interface functions
 	virtual void draw(double time) = 0;
@@ -90,7 +73,15 @@ class InstrumentGraph {
 	virtual void changeTrack(int dir = 1) = 0;
 	virtual void changeDifficulty(int dir = 1) = 0;
 
+	void toggleMenu(int dontforce = 1);
+	void togglePause(int) { m_audio.togglePause(); }
+	void restart(int) { /* TODO: Implement */ }
+	void quit(int) { ScreenManager::getSingletonPtr()->activateScreen("Songs"); }
+	std::string noValue() const { return ""; }
+
 	// General getters
+	bool ready() const { return m_ready; };
+	bool menuOpen() const { return m_menuOpen; }
 	void position(double cx, double width) { m_cx.setTarget(cx); m_width.setTarget(width); }
 	unsigned stream() const { return m_stream; }
 	double correctness() const { return m_correctness.get(); }
@@ -118,8 +109,10 @@ class InstrumentGraph {
 	typedef std::vector<Popup> Popups;
 	Popups m_popups;
 	InstrumentMenu m_menu;
+	bool m_menuOpen;
 
 	// Shared functions for derived classes
+	void setupPauseMenu();
 	void drawMenu(double offsetX);
 	void drawPopups(double offsetX);
 	void handleCountdown(double time, double beginTime);
@@ -143,5 +136,6 @@ class InstrumentGraph {
 	int m_countdown; /// countdown counter
 	double m_jointime; /// when the player joined
 	int m_dead; /// how many notes has been passed without hitting buttons
+	bool m_ready;
 };
 

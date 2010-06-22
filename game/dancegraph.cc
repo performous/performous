@@ -90,13 +90,11 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
 
 	if(m_song.danceTracks.empty())
 		throw std::runtime_error("Could not find any dance tracks.");
-
 	changeTrack(0); // Get an initial game mode and notes for it
 
-	// Setup joining menu items
-	m_menu.add(InstrumentMenuOption("Select track", &InstrumentGraph::changeTrack, &InstrumentGraph::getTrack));
-	m_menu.add(InstrumentMenuOption("Select difficulty", &InstrumentGraph::changeDifficulty, &InstrumentGraph::getDifficultyString));
-
+	// Populate menu
+	m_menu.add(InstrumentMenuOption("", _("Select track"), &InstrumentGraph::changeTrack, &InstrumentGraph::getTrack));
+	m_menu.add(InstrumentMenuOption("", _("Select difficulty"), &InstrumentGraph::changeDifficulty, &InstrumentGraph::getDifficultyString));
 }
 
 /// Attempt to select next/previous game mode
@@ -137,6 +135,7 @@ void DanceGraph::changeTrack(int direction) {
 	else throw std::runtime_error("Unknown track " + gm);
 
 	changeDifficulty(0); // Construct new notes
+	m_menu.refreshValues();
 }
 
 /// Are we alive?
@@ -196,12 +195,13 @@ void DanceGraph::engine() {
 			m_jointime = time < 0.0 ? -1.0 : time + join_delay;
 			break;
 		}
-		// Difficulty and track selection (joining menu keys)
-	   if (joining(time) && ev.type == input::Event::PRESS) {
-			if (ev.pressed[STEP_UP]) m_menu.move(-1);
-			else if (ev.pressed[STEP_DOWN]) m_menu.move(1);
-			else if (ev.pressed[STEP_LEFT]) m_menu.changeValue(-1);
-			else if (ev.pressed[STEP_RIGHT]) m_menu.changeValue(1);
+		// Menu keys
+		if (m_menuOpen && ev.type == input::Event::PRESS) {
+			if (ev.nav == input::CANCEL) toggleMenu();
+			else if (ev.nav == input::RIGHT || ev.nav == input::START) m_menu.changeValue(1);
+			else if (ev.nav == input::LEFT) m_menu.changeValue(-1);
+			else if (ev.nav == input::UP) m_menu.move(-1);
+			else if (ev.nav == input::DOWN) m_menu.move(1);
 			difficulty_changed = true;
 		}
 		// Gaming controls
@@ -470,7 +470,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 
 /// Draw popups and other info texts
 void DanceGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
-	if (joining(time)) {
+	if (m_menuOpen) {
 		// Draw join menu
 		drawMenu(offsetX);
 	} else {

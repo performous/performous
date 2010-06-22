@@ -824,6 +824,11 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 			break;
 		case SDL_JOYBALLMOTION:
 		default:
+			if (event.nav != input::NONE) {
+				event.button = 0;
+				event.type = input::Event::PRESS;
+				devices[joy_id].addEvent(event);
+			}
 			return false;
 	}
 	return true;

@@ -3,30 +3,32 @@
 #include "configuration.hh"
 #include "instrumentgraph.hh"
 
-MenuOption::MenuOption(const std::string nm):
-	name(nm)
-{}
-
-
-MainMenuOption::MainMenuOption(const std::string nm, const std::string scrn, const std::string img, const std::string comm):
-	MenuOption(nm),
-	screen(scrn),
-	image(getThemePath(img)),
+MenuOption::MenuOption(const std::string nm, const std::string comm):
+	name(nm),
 	comment(comm)
 {}
 
 
-InstrumentMenuOption::InstrumentMenuOption(const std::string nm, InstrumentMenuAdjustFunc fn1, InstrumentMenuValueFunc fn2):
-	MenuOption(nm),
+MainMenuOption::MainMenuOption(const std::string nm, const std::string scrn, const std::string img, const std::string comm):
+	MenuOption(nm, comm),
+	screen(scrn),
+	image(getThemePath(img))
+{}
+
+
+InstrumentMenuOption::InstrumentMenuOption(const std::string nm, const std::string comm, InstrumentMenuAdjustFunc fn1, InstrumentMenuValueFunc fn2):
+	MenuOption(nm, comm),
 	adjust(fn1),
-	getValue(fn2)
+	getValue(fn2),
+	value()
 {}
 
 
 void InstrumentMenu::add(InstrumentMenuOption opt) {
+	// Cache the caption
+	if (opt.getValue) opt.value = (owner.*opt.getValue)();
+	else opt.value = opt.name;
 	options.push_back(opt);
-	// Cache new value
-	options.back().value = (owner.*(options.back().getValue))();
 	// Reset iterator
 	current = options.begin();
 }
@@ -37,6 +39,14 @@ void InstrumentMenu::move(int dir) {
 }
 
 void InstrumentMenu::changeValue(int dir) {
+	if (!current->adjust) return;
 	(owner.*current->adjust)(dir); // adjust
-	current->value = (owner.*current->getValue)(); // cache value
+	if (current->getValue) current->value = (owner.*current->getValue)(); // cache value
+}
+
+void InstrumentMenu::refreshValues() {
+	for (InstrumentMenuOptions::iterator it = options.begin(); it != options.end(); ++it) {
+		if (it->getValue) it->value = (owner.*it->getValue)();
+		else it->value = it->name;
+	}
 }

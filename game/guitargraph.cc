@@ -125,10 +125,9 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number,
 		if (++m_track_index == m_instrumentTracks.end()) m_track_index = m_instrumentTracks.begin();
 	difficultyAuto();
 	updateNeck();
-
-	// Setup joining menu items
-	m_menu.add(InstrumentMenuOption("Select track", &InstrumentGraph::changeTrack, &InstrumentGraph::getTrack));
-	m_menu.add(InstrumentMenuOption("Select difficulty", &InstrumentGraph::changeDifficulty, &InstrumentGraph::getDifficultyString));
+	// Populate menu
+	m_menu.add(InstrumentMenuOption("", _("Select track"), &InstrumentGraph::changeTrack, &InstrumentGraph::getTrack));
+	m_menu.add(InstrumentMenuOption("", _("Select difficulty"), &InstrumentGraph::changeDifficulty, &InstrumentGraph::getDifficultyString));
 }
 
 /// Load the appropriate neck texture
@@ -147,6 +146,7 @@ void GuitarGraph::changeTrack(int dir) {
 	else if (m_track_index == (--m_instrumentTracks.end())) m_track_index = (--m_instrumentTracks.end());
 	difficultyAuto(true);
 	updateNeck();
+	m_menu.refreshValues();
 }
 
 /// Get the difficulty as displayable string
@@ -216,12 +216,18 @@ void GuitarGraph::engine() {
 		// breaks to be usable with FoF songs.
 		if (dead() && m_input.isKeyboard() && ev.type == input::Event::PICK) continue;
 		m_dead = 0; // Keep alive
-		if (m_jointime != m_jointime) m_jointime = time < 0.0 ? -1.0 : time + join_delay; // Handle joining
-		// Handle Start/Select keypresses
-		if (ev.type == input::Event::PRESS && ev.button > input::STARPOWER_BUTTON) {
-			if (ev.button == 9) ev.button = input::STARPOWER_BUTTON; // Start works for GodMode
-			else continue;
+		// Handle joining
+		if (m_jointime != m_jointime) {
+			m_jointime = time < 0.0 ? -1.0 : time + join_delay;
+			break;
 		}
+		// Handle Start/Select keypresses
+		if (ev.nav == input::CANCEL) toggleMenu();
+		if (ev.nav == input::START && !m_menuOpen) ev.button = input::STARPOWER_BUTTON;
+		//if (ev.type == input::Event::PRESS && ev.button > input::STARPOWER_BUTTON) {
+			//if (ev.button == 9) ev.button = input::STARPOWER_BUTTON; // Start works for GodMode
+			//else continue;
+		//}
 		// Guitar specific actions
 		if (!m_drums) {
 			if ((ev.type == input::Event::PRESS || ev.type == input::Event::RELEASE) && ev.button == input::STARPOWER_BUTTON) {
@@ -237,18 +243,18 @@ void GuitarGraph::engine() {
 		// Keypress anims
 		if (ev.type == input::Event::PRESS) m_pressed_anim[!m_drums + ev.button].setValue(1.0);
 		else if (ev.type == input::Event::PICK) m_pressed_anim[0].setValue(1.0);
-		// Difficulty and track selection (joining menu keys)
-		if (joining(time)) {
+		// Menu keys
+		if (m_menuOpen) {
 			// Check first regular keys
 			if (ev.type == input::Event::PRESS && ev.button == 0 + m_drums) m_menu.changeValue(1);
 			else if (ev.type == input::Event::PRESS && ev.button == 1 + m_drums) m_menu.changeValue(-1);
 			else if (ev.type == input::Event::PRESS && ev.button == 2 + m_drums) m_menu.move(1);
 			else if (ev.type == input::Event::PRESS && ev.button == 3 + m_drums) m_menu.move(-1);
+			// Strum
 			else if (ev.type == input::Event::PICK && ev.button == 0) m_menu.move(1);
 			else if (ev.type == input::Event::PICK && ev.button == 1) m_menu.move(-1);
 			else { // Try nav keys (arrows)
-				if (ev.nav == input::CANCEL) ; // TODO: exit menu
-				else if (ev.nav == input::DOWN || ev.nav == input::RIGHT) m_menu.move(1);
+				if (ev.nav == input::DOWN || ev.nav == input::RIGHT) m_menu.move(1);
 				else if (ev.nav == input::UP || ev.nav == input::LEFT) m_menu.move(-1);
 			}
 		// Playing
@@ -998,7 +1004,7 @@ void GuitarGraph::drawDrumfill(float tBeg, float tEnd) {
 /// Draw popups and other info texts
 void GuitarGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 	// Draw info
-	if (joining(time)) {
+	if (m_menuOpen) {
 		drawMenu(offsetX);
 	} else {
 		float xcor = 0.35 * dimensions.w();
