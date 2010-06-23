@@ -2,7 +2,9 @@
 
 #include "opengl_text.hh"
 #include "surface.hh"
+#include "theme.hh"
 #include <boost/noncopyable.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <string>
 #include <vector>
 
@@ -50,7 +52,7 @@ typedef std::vector<InstrumentMenuOption> InstrumentMenuOptions;
 /// Menu for selecting difficulty etc.
 struct InstrumentMenu {
 	/// constructor
-	InstrumentMenu(InstrumentGraph& ig): owner(ig), current(options.end()) {}
+	InstrumentMenu(InstrumentGraph& ig): owner(ig), current(options.end()) { theme.reset(new ThemeInstrumentMenu()); }
 	/// add a menu option
 	void add(InstrumentMenuOption opt);
 	/// move the selection
@@ -65,4 +67,5 @@ struct InstrumentMenu {
 	InstrumentGraph& owner;
 	InstrumentMenuOptions options;
 	InstrumentMenuOptions::iterator current;
+	boost::scoped_ptr<ThemeInstrumentMenu> theme;
 };

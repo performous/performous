@@ -52,20 +52,26 @@ void InstrumentGraph::toggleMenu(int dontforce) {
 
 void InstrumentGraph::drawMenu(double offsetX) {
 	if (m_menu.options.empty()) return;
-	float step = 0.05;
+	float step = 0.075;
 	float y = -0.5 * m_menu.options.size() * step;
-	m_text.dimensions.screenCenter(0).middle(0);
+	ThemeInstrumentMenu& th = *m_menu.theme;
 	for (InstrumentMenuOptions::iterator it = m_menu.options.begin(); it != m_menu.options.end(); ++it) {
-		// TODO: Use theme
-		m_text.dimensions.center(y).middle(-0.09 + offsetX);
-		std::string value = it->value;
-		if (m_menu.current == it) value = ">  " + value + "  <";
-		m_text.draw(value);
+		if (m_menu.current == it) {
+			//th.back_h.dimensions.middle(0.05 + offsetX).center(y);
+			//th.back_h.draw();
+			th.option_selected.dimensions.middle(-0.1 + offsetX).center(y);
+			th.option_selected.draw(it->value);
+		} else {
+			th.option.dimensions.middle(-0.1 + offsetX).center(y);
+			th.option.draw(it->value);
+		}
 		y += step;
 	}
 	if (m_menu.current->comment != "") {
-		m_text.dimensions.center(y+3*step).middle(-0.09 + offsetX);
-		m_text.draw(m_menu.current->comment);
+		//th.comment_bg.dimensions.middle().screenBottom(-0.2);
+		//th.comment_bg.draw();
+		th.comment.dimensions.middle(-0.1 + offsetX).screenBottom(-0.2);
+		th.comment.draw(m_menu.current->comment);
 	}
 }
 
