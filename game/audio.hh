@@ -54,8 +54,9 @@ public:
 	void togglePause() { pause(!isPaused()); }
 	void pause(bool state = true);
 	bool isPaused() const;
-	void toggleSynth(Notes const& notes) { /*m_notes = (m_notes ? NULL : &notes); */} ///< toggles synth playback
-	void streamFade(std::string stream_id, double level);
+	void toggleSynth(Notes const&) { /*m_notes = (m_notes ? NULL : &notes); */} ///< toggles synth playback
+	/// Adjust volume level of a single track (used for muting incorrectly played instruments). Range 0.0 to 1.0.
+	void streamFade(std::string track, double volume);
 	double getSR() const { return 48000.0; }
 };
 

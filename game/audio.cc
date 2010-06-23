@@ -13,8 +13,8 @@
 class Music {
 	struct Track {
 		FFmpeg mpeg;
-		float volume;
-		Track(std::string const& filename, unsigned int sr): mpeg(false, true, filename, sr), volume(1.0f) {}
+		float fadeLevel;
+		Track(std::string const& filename, unsigned int sr): mpeg(false, true, filename, sr), fadeLevel(1.0f) {}
 	};
 	typedef boost::ptr_map<std::string, Track> Tracks;
 	Tracks tracks; ///< Audio decoders
@@ -35,7 +35,7 @@ public:
 		std::vector<float> mixbuf(end - begin);
 		for (Tracks::iterator it = tracks.begin(), itend = tracks.end(); it != itend; ++it) {
 			Track& t = *it->second;
-			if (t.mpeg.audioQueue(&*mixbuf.begin(), &*mixbuf.end(), m_pos, t.volume)) eof = false;
+			if (t.mpeg.audioQueue(&*mixbuf.begin(), &*mixbuf.end(), m_pos, t.fadeLevel)) eof = false;
 		}
 		m_pos += end - begin;
 		for (size_t i = 0, iend = mixbuf.size(); i != iend; ++i) {
@@ -66,10 +66,10 @@ public:
 		}
 		return ready;
 	}
-	void trackLevel(std::string const& id, double level) {
-		Tracks::iterator it = tracks.find(id);
+	void trackFade(std::string const& name, double fadeLevel) {
+		Tracks::iterator it = tracks.find(name);
 		if (it == tracks.end()) return;
-		it->second->volume = level;
+		it->second->fadeLevel = fadeLevel;
 	}
 };
 
@@ -103,7 +103,11 @@ struct SampleNew {
 };
 
 
-typedef std::pair<std::string, double> Command; ///< <stream ID, volume level>
+struct Command {
+	enum { TRACK_FADE } type;
+	std::string track;
+	double fadeLevel;
+};
 
 struct Audio::Impl {
 	boost::mutex mutex;
@@ -133,9 +137,12 @@ struct Audio::Impl {
 		}
 		// Process commands
 		for (size_t i = 0; i < commands.size(); ++i) {
-			std::string id = commands[i].first;
-			double level = commands[i].second;
-			if (!playing.empty()) playing[0].trackLevel(id, level);
+			Command const& cmd = commands[i];
+			switch (cmd.type) {
+			case Command::TRACK_FADE:
+				if (!playing.empty()) playing[0].trackFade(cmd.track, cmd.fadeLevel);
+				break;
+			}
 		}
 		commands.clear();
 	}
@@ -184,7 +191,6 @@ bool Audio::isOpen() const {
 }
 
 void Audio::loadSample(std::string streamId, std::string filename) {
-	std::cout << ">>> Loading sample \"" << streamId << "\"" << std::endl;
 	{
 		boost::mutex::scoped_lock l(self->mutex);
 		self->samples.insert(streamId, new SampleNew(filename, getSR()));
@@ -200,7 +206,6 @@ void Audio::playSample(std::string streamId) {
 }
 
 void Audio::unloadSample(std::string streamId) {
-	std::cout << ">>> Unloading sample \"" << streamId << "\"" << std::endl;
 	{
 		boost::mutex::scoped_lock l(self->mutex);
 		self->samples.erase(streamId);
@@ -270,9 +275,10 @@ void Audio::pause(bool state) {
 
 bool Audio::isPaused() const { return self->paused; }
 
-void Audio::streamFade(std::string stream_id, double level) {
+void Audio::streamFade(std::string track, double fadeLevel) {
 	boost::mutex::scoped_lock l(self->mutex);
-	self->commands.push_back(Command(stream_id, level));
+	Command cmd = { Command::TRACK_FADE, track, fadeLevel };
+	self->commands.push_back(cmd);
 }
 
 boost::ptr_vector<Analyzer>& Audio::analyzers() { return self->analyzers; }
