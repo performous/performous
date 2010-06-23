@@ -20,12 +20,12 @@ find_path(OpenGL_INCLUDE_DIR
 )
 
 find_library(OpenGL_GL_LIBRARY
-  NAMES GL libOpenGL32.a OpenGL32
+  NAMES GL libopengl32.a opengl32
   PATHS ${OpenGL_PKGCONF_LIBRARY_DIRS}
 )
 
 find_library(OpenGL_GLU_LIBRARY
-  NAMES GLU libGLU32.a GLU32
+  NAMES GLU libglu32.a glu32
   PATHS ${OpenGL_PKGCONF_LIBRARY_DIRS}
 )
 
