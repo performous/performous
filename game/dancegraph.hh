@@ -80,5 +80,6 @@ class DanceGraph: public InstrumentGraph {
 	// Misc
 	int m_arrow_map[max_panels]; /// game mode dependant mapping of arrows' ordering at cursor
 	int m_flow_direction;
+	bool m_insideStop;
 };
 
