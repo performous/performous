@@ -103,12 +103,15 @@ struct Audio::Impl {
 	std::auto_ptr<Music> preloading;
 	boost::ptr_vector<Music> playing, disposing;
 	boost::ptr_map<std::string, SampleNew> samples;
+	boost::ptr_vector<Analyzer> analyzers;
 	portaudio::Init init;
 	boost::ptr_vector<portaudio::Stream> streams;
 	volatile bool paused;
 	Impl(): paused(false) {
 		std::string dev;
-		streams.push_back(new portaudio::Stream(*this, portaudio::Params().channelCount(2).device(dev, true), portaudio::Params().channelCount(2).device(dev, false), 48000));
+		streams.push_back(new portaudio::Stream(*this, portaudio::Params().channelCount(1).device(dev, true), portaudio::Params().channelCount(2).device(dev, false), 48000));
+		// One analyzer for mono input (TODO: fix callbackInput to allow more)
+		analyzers.push_back(new Analyzer(48000.0));
 		PaError err = Pa_StartStream(streams[0]);
 		if( err != paNoError ) throw std::runtime_error("Cannot start PortAudio audio stream " + dev + ": " + Pa_GetErrorText(err));
 	}
@@ -121,17 +124,24 @@ struct Audio::Impl {
 			playing.insert(playing.begin(), preloading);
 		}
 	}
-	void callbackInput(float const* begin, float const* end) {}
+	void callbackInput(float const* begin, float const* end) {
+		analyzers[0].input(begin, end);  // TODO: non-pointer sample iterators and support more analyzers
+	}
 	void callbackOutput(float* begin, float* end) {
 		std::fill(begin, end, 0.0f);
 		if (paused) return;
+		// Mix in from the streams currently playing
 		for (size_t i = 0; i < playing.size();) {
-			bool keep = playing[i](begin, end);
-			// Disposing hack
-			boost::mutex::scoped_try_lock l(mutex);
-			if (!l.owns_lock()) keep = true; // Cannot dispose without lock
-			if (keep) ++i; else disposing.transfer(disposing.end(), playing.begin() + i, playing);
+			bool keep = playing[i](begin, end);  // Do the actual mixing
+			boost::mutex::scoped_try_lock l(mutex, boost::defer_lock);
+			if (!keep && l.try_lock()) {
+				// Dispose streams no longer needed by moving them to another container (that will be cleared by another thread).
+				disposing.transfer(disposing.end(), playing.begin() + i, playing);
+				continue;
+			}
+			++i;
 		}
+		// Mix in the samples currently playing
 		for(boost::ptr_map<std::string, SampleNew>::iterator it = samples.begin() ; it != samples.end() ; ++it) {
 			boost::mutex::scoped_try_lock l(mutex);
 			(*it->second)(begin, end);
@@ -140,10 +150,9 @@ struct Audio::Impl {
 	int operator()(void const* input, void* output, unsigned long frames, const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags) try {
 		float const* in = static_cast<float const*>(input);
 		float* out = static_cast<float*>(output);
-		size_t samples = 2 * frames;
-		callbackInput(in, in + samples);
+		callbackInput(in, in + 1 * frames);  // TODO: no hardcoded channel count
 		callbackUpdate();
-		callbackOutput(out, out + samples);
+		callbackOutput(out, out + 2 * frames);
 		return paContinue;
 	} catch (std::exception& e) {
 		std::cerr << "Exception in audio callback: " << e.what() << std::endl;
@@ -247,4 +256,6 @@ bool Audio::isPaused() const { return self->paused; }
 
 void Audio::streamFade(std::string stream_id, double level) {
 }
+
+boost::ptr_vector<Analyzer>& Audio::analyzers() { return self->analyzers; }
 

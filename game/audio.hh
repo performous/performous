@@ -18,7 +18,7 @@ class Audio {
 public:
 	Audio();
 	~Audio();
-	boost::ptr_vector<Analyzer>& analyzers() { static boost::ptr_vector<Analyzer> ana; return ana; }
+	boost::ptr_vector<Analyzer>& analyzers();
 	bool isOpen() const;
 	/** Play a song beginning at startPos (defaults to 0)
 	 * @param filename the track filename
