@@ -41,8 +41,8 @@ public:
 		for (size_t i = 0, iend = mixbuf.size(); i != iend; ++i) {
 			if (i % 2 == 0) {
 				fadeLevel += fadeRate;
-				if (fadeLevel <= 0.0f) return false;
-				if (fadeLevel > 1.0f) { fadeLevel = 1.0f; fadeRate = 0.0f; }
+				if (fadeLevel <= 0.0) return false;
+				if (fadeLevel > 1.0) { fadeLevel = 1.0; fadeRate = 0.0; }
 			}
 			begin[i] += mixbuf[i] * fadeLevel;
 		}
@@ -65,6 +65,11 @@ public:
 			if (!it->second->mpeg.audioQueue.prepare(m_pos)) ready = false;
 		}
 		return ready;
+	}
+	void trackLevel(std::string const& id, double level) {
+		Tracks::iterator it = tracks.find(id);
+		if (it == tracks.end()) return;
+		it->second->volume = level;
 	}
 };
 
@@ -98,12 +103,15 @@ struct SampleNew {
 };
 
 
+typedef std::pair<std::string, double> Command; ///< <stream ID, volume level>
+
 struct Audio::Impl {
 	boost::mutex mutex;
 	std::auto_ptr<Music> preloading;
 	boost::ptr_vector<Music> playing, disposing;
 	boost::ptr_map<std::string, SampleNew> samples;
 	boost::ptr_vector<Analyzer> analyzers;
+	std::vector<Command> commands;
 	portaudio::Init init;
 	boost::ptr_vector<portaudio::Stream> streams;
 	volatile bool paused;
@@ -123,6 +131,13 @@ struct Audio::Impl {
 			if (!playing.empty()) playing[0].fadeRate = -preloading->fadeRate;  // Fade out the old music
 			playing.insert(playing.begin(), preloading);
 		}
+		// Process commands
+		for (size_t i = 0; i < commands.size(); ++i) {
+			std::string id = commands[i].first;
+			double level = commands[i].second;
+			if (!playing.empty()) playing[0].trackLevel(id, level);
+		}
+		commands.clear();
 	}
 	void callbackInput(float const* begin, float const* end) {
 		analyzers[0].input(begin, end);  // TODO: non-pointer sample iterators and support more analyzers
@@ -199,6 +214,7 @@ void Audio::playMusic(std::map<std::string,std::string> const& filenames, bool p
 	Music& m = *self->preloading.get();
 	m.seek(startPos);
 	m.fadeRate = 1.0 / getSR() / fadeTime;
+	self->commands.clear();  // Remove old unprocessed commands (they should not apply to the new music)
 }
 
 void Audio::playMusic(std::string const& filename, bool preview, double fadeTime, double startPos) {
@@ -255,6 +271,8 @@ void Audio::pause(bool state) {
 bool Audio::isPaused() const { return self->paused; }
 
 void Audio::streamFade(std::string stream_id, double level) {
+	boost::mutex::scoped_lock l(self->mutex);
+	self->commands.push_back(Command(stream_id, level));
 }
 
 boost::ptr_vector<Analyzer>& Audio::analyzers() { return self->analyzers; }
