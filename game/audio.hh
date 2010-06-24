@@ -30,9 +30,9 @@ public:
 	/// plays a list of songs
 	void playMusic(std::map<std::string,std::string> const& filenames, bool preview = false, double fadeTime = 0.5, double startPos = 0.0);
 	/// loads/plays/unloads a sample
-	void loadSample(std::string streamId, std::string filename);
-	void playSample(std::string streamId);
-	void unloadSample(std::string streamId);
+	void loadSample(std::string const& streamId, std::string const& filename);
+	void playSample(std::string const& streamId);
+	void unloadSample(std::string const& streamId);
 	/// stops music
 	void stopMusic();
 	/// fades music out

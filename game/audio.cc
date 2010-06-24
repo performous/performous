@@ -81,7 +81,7 @@ struct SampleNew {
 	FFmpeg mpeg;
 	bool eof;
   public:
-	SampleNew(std::string filename, unsigned sr) : srate(sr), m_pos(), mpeg(false, true, filename, sr), eof(true) { }
+	SampleNew(std::string const& filename, unsigned sr) : srate(sr), m_pos(), mpeg(false, true, filename, sr), eof(true) { }
 	void operator()(float* begin, float* end) {
 		if(eof) {
 			// No more data to play in this sample
@@ -109,24 +109,14 @@ struct Command {
 	double fadeLevel;
 };
 
-struct Audio::Impl {
+struct Output {
 	boost::mutex mutex;
 	std::auto_ptr<Music> preloading;
 	boost::ptr_vector<Music> playing, disposing;
 	boost::ptr_map<std::string, SampleNew> samples;
-	boost::ptr_vector<Analyzer> analyzers;
 	std::vector<Command> commands;
-	portaudio::Init init;
-	boost::ptr_vector<portaudio::Stream> streams;
 	volatile bool paused;
-	Impl(): paused(false) {
-		std::string dev;
-		streams.push_back(new portaudio::Stream(*this, portaudio::Params().channelCount(1).device(dev, true), portaudio::Params().channelCount(2).device(dev, false), 48000));
-		// One analyzer for mono input (TODO: fix callbackInput to allow more)
-		analyzers.push_back(new Analyzer(48000.0));
-		PaError err = Pa_StartStream(streams[0]);
-		if( err != paNoError ) throw std::runtime_error("Cannot start PortAudio audio stream " + dev + ": " + Pa_GetErrorText(err));
-	}
+	Output(): paused(false) {}
 	void callbackUpdate() {
 		boost::mutex::scoped_try_lock l(mutex);
 		if (!l.owns_lock()) return;  // No update now, try again later (cannot stop and wait for mutex to be released)
@@ -146,10 +136,8 @@ struct Audio::Impl {
 		}
 		commands.clear();
 	}
-	void callbackInput(float const* begin, float const* end) {
-		analyzers[0].input(begin, end);  // TODO: non-pointer sample iterators and support more analyzers
-	}
-	void callbackOutput(float* begin, float* end) {
+	void callback(float* begin, float* end) {
+		callbackUpdate();
 		std::fill(begin, end, 0.0f);
 		if (paused) return;
 		// Mix in from the streams currently playing
@@ -169,12 +157,35 @@ struct Audio::Impl {
 			(*it->second)(begin, end);
 		}
 	}
+};
+
+struct Device {
+	// Init
+	unsigned int in, out;
+	double rate;
+	std::string dev;
+	portaudio::Stream stream;
+	std::vector<Analyzer*> mics;
+	Output* outptr;
+	
+	Device(unsigned int in, unsigned int out, double rate, std::string dev):
+	  in(in), out(out), rate(rate), dev(dev),
+	  stream(*this, in ? portaudio::Params().channelCount(in).device(dev, true) : NULL, out ? portaudio::Params().channelCount(out).device(dev, false) : NULL, rate)
+	{
+		mics.resize(in);
+	}
+	void start() {
+		PaError err = Pa_StartStream(stream);
+		if (err != paNoError) throw std::runtime_error("Cannot start PortAudio audio stream " + dev + ": " + Pa_GetErrorText(err));
+	}
 	int operator()(void const* input, void* output, unsigned long frames, const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags) try {
 		float const* in = static_cast<float const*>(input);
 		float* out = static_cast<float*>(output);
-		callbackInput(in, in + 1 * frames);  // TODO: no hardcoded channel count
-		callbackUpdate();
-		callbackOutput(out, out + 2 * frames);
+		for (std::size_t i = 0; i < mics.size(); ++i) {
+			if (!mics[i]) continue;  // Channel not used
+			mics[i]->input(in, in + 1 * frames);
+		}
+		if (outptr) outptr->callback(out, out + 2 * frames);
 		return paContinue;
 	} catch (std::exception& e) {
 		std::cerr << "Exception in audio callback: " << e.what() << std::endl;
@@ -182,44 +193,64 @@ struct Audio::Impl {
 	}
 };
 
+struct Audio::Impl {
+	portaudio::Init init;
+	boost::ptr_vector<Device> devices;
+	boost::ptr_vector<Analyzer> analyzers;
+	Output output;
+	bool playback;
+	Impl() {
+		devices.push_back(new Device(1, 2, 48000.0, ""));
+		// One analyzer for mono input (TODO: fix callbackInput to allow more)
+		analyzers.push_back(new Analyzer(48000.0));
+		devices[0].mics[0] = &analyzers[0];
+		playback = false;
+		for (size_t i = 0; i < devices.size(); ++i) {
+			Device& d = devices[i];
+			// Assign playback output for the first available stereo output
+			if (!playback && d.out == 2) {
+				d.outptr = &output;
+				playback = true;
+			}
+			// Start capture/playback on this device
+			d.start();
+		}
+	}
+};
+
 Audio::Audio(): self(new Impl) {}
 Audio::~Audio() {}
 
 bool Audio::isOpen() const {
-	boost::mutex::scoped_lock l(self->mutex);
-	return !self->streams.empty();
+	return !self->devices.empty();
 }
 
-void Audio::loadSample(std::string streamId, std::string filename) {
-	{
-		boost::mutex::scoped_lock l(self->mutex);
-		self->samples.insert(streamId, new SampleNew(filename, getSR()));
-	}
+void Audio::loadSample(std::string const& streamId, std::string const& filename) {
+	boost::mutex::scoped_lock l(self->output.mutex);
+	self->output.samples.insert(streamId, std::auto_ptr<SampleNew>(new SampleNew(filename, getSR())));
 }
-void Audio::playSample(std::string streamId) {
-	boost::mutex::scoped_lock l(self->mutex);
-	boost::ptr_map<std::string, SampleNew>::iterator it = self->samples.find(streamId);
-	if( it == self->samples.end() ) {
-		throw std::runtime_error("Cannot play sample : " + streamId);
-	}
+
+void Audio::playSample(std::string const& streamId) {
+	boost::mutex::scoped_lock l(self->output.mutex);
+	boost::ptr_map<std::string, SampleNew>::iterator it = self->output.samples.find(streamId);
+	if (it == self->output.samples.end()) throw std::runtime_error("Cannot play sample : " + streamId);
 	it->second->reset();
 }
 
-void Audio::unloadSample(std::string streamId) {
-	{
-		boost::mutex::scoped_lock l(self->mutex);
-		self->samples.erase(streamId);
-	}
+void Audio::unloadSample(std::string const& streamId) {
+	boost::mutex::scoped_lock l(self->output.mutex);
+	self->output.samples.erase(streamId);
 }
 
 void Audio::playMusic(std::map<std::string,std::string> const& filenames, bool preview, double fadeTime, double startPos) {
-	boost::mutex::scoped_lock l(self->mutex);
-	self->disposing.clear();  // Delete disposed streams
-	self->preloading.reset(new Music(filenames, getSR()));
-	Music& m = *self->preloading.get();
+	Output& o = self->output;
+	boost::mutex::scoped_lock l(o.mutex);
+	o.disposing.clear();  // Delete disposed streams
+	o.preloading.reset(new Music(filenames, getSR()));
+	Music& m = *o.preloading.get();
 	m.seek(startPos);
 	m.fadeRate = 1.0 / getSR() / fadeTime;
-	self->commands.clear();  // Remove old unprocessed commands (they should not apply to the new music)
+	o.commands.clear();  // Remove old unprocessed commands (they should not apply to the new music)
 }
 
 void Audio::playMusic(std::string const& filename, bool preview, double fadeTime, double startPos) {
@@ -239,46 +270,49 @@ void Audio::fadeout(double fadeTime) {
 }
 
 double Audio::getPosition() const {
-	boost::mutex::scoped_lock l(self->mutex);
-	return (self->playing.empty() || self->preloading.get()) ? getNaN() : self->playing[0].pos();
+	Output& o = self->output;
+	boost::mutex::scoped_lock l(o.mutex);
+	return (o.playing.empty() || o.preloading.get()) ? getNaN() : o.playing[0].pos();
 }
 
 double Audio::getLength() const {
-	boost::mutex::scoped_lock l(self->mutex);
-	return (self->playing.empty() || self->preloading.get()) ? getNaN() : self->playing[0].duration();
+	Output& o = self->output;
+	boost::mutex::scoped_lock l(o.mutex);
+	return (o.playing.empty() || o.preloading.get()) ? getNaN() : o.playing[0].duration();
 }
 
 bool Audio::isPlaying() const {
-	boost::mutex::scoped_lock l(self->mutex);
-	return !self->playing.empty();
+	Output& o = self->output;
+	boost::mutex::scoped_lock l(o.mutex);
+	return o.preloading.get() || !o.playing.empty();
 }
 
 void Audio::seek(double offset) {
-	boost::mutex::scoped_lock l(self->mutex);
-	for(boost::ptr_vector<Music>::iterator it = self->playing.begin() ; it != self->playing.end() ; ++it) {
+	Output& o = self->output;
+	boost::mutex::scoped_lock l(o.mutex);
+	for(boost::ptr_vector<Music>::iterator it = o.playing.begin() ; it != o.playing.end() ; ++it) {
 		it->seek(clamp(it->pos() + offset, 0.0, it->duration()));
 	}
 	pause(false);
 }
 
 void Audio::seekPos(double pos) {
-	boost::mutex::scoped_lock l(self->mutex);
-	for(boost::ptr_vector<Music>::iterator it = self->playing.begin() ; it != self->playing.end() ; ++it) {
+	Output& o = self->output;
+	boost::mutex::scoped_lock l(o.mutex);
+	for(boost::ptr_vector<Music>::iterator it = o.playing.begin() ; it != o.playing.end() ; ++it) {
 		it->seek(pos);
 	}
 	pause(false);
 }
 
-void Audio::pause(bool state) {
-	self->paused = state;
-}
-
-bool Audio::isPaused() const { return self->paused; }
+void Audio::pause(bool state) { self->output.paused = state; }
+bool Audio::isPaused() const { return self->output.paused; }
 
 void Audio::streamFade(std::string track, double fadeLevel) {
-	boost::mutex::scoped_lock l(self->mutex);
+	Output& o = self->output;
+	boost::mutex::scoped_lock l(o.mutex);
 	Command cmd = { Command::TRACK_FADE, track, fadeLevel };
-	self->commands.push_back(cmd);
+	o.commands.push_back(cmd);
 }
 
 boost::ptr_vector<Analyzer>& Audio::analyzers() { return self->analyzers; }

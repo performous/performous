@@ -178,23 +178,14 @@ to save the current settings to XML.
 			<long>Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to adjust while performing.</long>
 		</locale>
 	</entry>
-	<entry name="audio/capture" type="string_list">
-		<stringvalue>channels=2@alsa:hw:default</stringvalue><!-- SingStar mics -->
-		<stringvalue>channels=1@alsa:hw:Microphone</stringvalue><!-- Rock Band branded Logitech mic -->
-		<stringvalue>channels=2</stringvalue>
+	<entry name="audio/device" type="string_list">
+		<stringvalue>in=2 dev="default" mics="blue,red"</stringvalue><!-- SingStar mics -->
+		<stringvalue>in=1 dev="Microphone"</stringvalue><!-- Rock Band branded Logitech mic -->
+		<stringvalue>in=1</stringvalue><!-- Any other microphone -->
+		<stringvalue>out=2</stringvalue><!-- Any stereo output device -->
 		<locale name="C">
-			<short>Microphones</short>
-			<long>List of capture devices to use. Any failing devices will be ignored.</long>
-		</locale>
-	</entry>
-	<entry name="audio/playback" type="string_list">
-		<stringvalue></stringvalue>
-		<stringvalue>alsa:hw:0</stringvalue>
-		<stringvalue>channels=2</stringvalue>
-		<!-- <stringvalue>channels=2,rate=44100,frames=256@alsa</stringvalue> -->
-		<locale name="C">
-			<short>Playback devices</short>
-			<long>List of playback devices to try. The first working one will be used.</long>
+			<short>Audio devices</short>
+			<long>Press Enter to configure (TODO: implement)</long>
 		</locale>
 	</entry>
 	<entry name="audio/preview_volume" type="int" value="70">
