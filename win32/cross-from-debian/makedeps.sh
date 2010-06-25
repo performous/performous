@@ -269,9 +269,10 @@ if test ! -f "$PREFIX"/build-stamps/portmidi; then
   download http://download.sourceforge.net/portmedia/portmidi-src-200.zip
   unzip -o portmidi-src-200.zip
   cd portmidi
-  $CROSS_GCC -g -O2 -W -Wall -Ipm_common -Iporttime -DNDEBUG -D_WINDLL -mdll -o portmidi.dll -Wl,--out-implib,libportmidi.a pm_win/pmwin.c pm_win/pmwinmm.c porttime/ptwinmm.c pm_common/pmutil.c pm_common/portmidi.c -lwinmm
-  cp -v portmidi.dll "$PREFIX"/bin
-  cp -v libportmidi.a "$PREFIX"/lib
+  $CROSS_GCC -g -O2 -W -Wall -Iporttime -DNDEBUG -D_WINDLL -mdll -o porttime.dll -Wl,--out-implib,libporttime.a porttime/ptwinmm.c -lwinmm
+  $CROSS_GCC -g -O2 -W -Wall -Ipm_common -Iporttime -DNDEBUG -D_WINDLL -mdll -o portmidi.dll -Wl,--out-implib,libportmidi.a pm_win/pmwin.c pm_win/pmwinmm.c pm_common/pmutil.c pm_common/portmidi.c -L. -lporttime -lwinmm
+  cp -v portmidi.dll porttime.dll "$PREFIX"/bin
+  cp -v libportmidi.a libporttime.a "$PREFIX"/lib
   cp -v pm_common/portmidi.h porttime/porttime.h "$PREFIX"/include
   cd ..
   touch "$PREFIX"/build-stamps/portmidi
