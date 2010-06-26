@@ -85,6 +85,10 @@ for root, dirs, files in os.walk('.'):
 
 makensis.stdin.write(r'''  WriteRegStr HKLM "Software\Performous" "" "$INSTDIR"
   WriteUninstaller "$INSTDIR\uninst.exe"
+  SetShellVarContext all
+  CreateDirectory "$SMPROGRAMS\Performous"
+  CreateShortcut "$SMPROGRAMS\Performous\Performous.lnk" "$INSTDIR\bin\performous.exe"
+  CreateShortcut "$SMPROGRAMS\Performous\Uninstall.lnk" "$INSTDIR\uninst.exe"
 SectionEnd
 
 Section Uninstall
@@ -99,6 +103,10 @@ for root, dirs, files in os.walk('.', topdown=False):
 
 makensis.stdin.write(r'''  Delete "$INSTDIR\uninst.exe"
   RmDir "$INSTDIR"
+  SetShellVarContext all
+  Delete "$SMPROGRAMS\Performous\Performous.lnk"
+  Delete "$SMPROGRAMS\Performous\Uninstall.lnk"
+  RmDir "$SMPROGRAMS\Performous"
   DeleteRegKey /ifempty HKLM "Software\Performous"
 SectionEnd
 ''')
