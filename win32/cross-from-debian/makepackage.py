@@ -89,6 +89,10 @@ makensis.stdin.write(r'''  WriteRegStr HKLM "Software\Performous" "" "$INSTDIR"
   CreateDirectory "$SMPROGRAMS\Performous"
   CreateShortcut "$SMPROGRAMS\Performous\Performous.lnk" "$INSTDIR\bin\performous.exe"
   CreateShortcut "$SMPROGRAMS\Performous\Uninstall.lnk" "$INSTDIR\uninst.exe"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Performous" "DisplayName" "Performous"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Performous" "UninstallString" "$\"$INSTDIR\uninst.exe$\""
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Performous" "DisplayIcon" "$INSTDIR\bin\performous.exe"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Performous" "DisplayVersion" "${VERSION}"
 SectionEnd
 
 Section Uninstall
@@ -107,6 +111,7 @@ makensis.stdin.write(r'''  Delete "$INSTDIR\uninst.exe"
   Delete "$SMPROGRAMS\Performous\Performous.lnk"
   Delete "$SMPROGRAMS\Performous\Uninstall.lnk"
   RmDir "$SMPROGRAMS\Performous"
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Performous"
   DeleteRegKey /ifempty HKLM "Software\Performous"
 SectionEnd
 ''')
