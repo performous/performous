@@ -9,7 +9,7 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#include <Shlobj.h>
+#include <shlobj.h>
 #endif
 
 fs::path getHomeDir() {
