@@ -31,6 +31,7 @@ namespace {
 
 void ScreenSing::enter() {
 	//m_practmode = true; // un-comment this line to play with practice mode. temporary, of course!
+	m_speed = 75; // 75% slow-down; falls back to 100% if time-stretch files are not found. temporary, of course!
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	sm->flashMessage(_("Loading song..."), 0.0, 1.0, 0.5);
 	sm->drawFlashMessage(); sm->window().swap(); // Make loading message show
@@ -85,6 +86,7 @@ void ScreenSing::enter() {
 	theme->timer.dimensions.screenTop(0.5 * m_progress->dimensions.h());
 	boost::ptr_vector<Analyzer>& analyzers = m_capture.analyzers();
 	m_layout_singer.reset(new LayoutSinger(m_song->vocals, m_database, theme));
+	
 	// Load instrument and dance tracks
 	{
 		int type = 0; // 0 for dance, 1 for guitars, 2 for drums
@@ -108,7 +110,7 @@ void ScreenSing::enter() {
 	}
 	// Startup delay for instruments is longer than for singing only
 	double setup_delay = (m_instruments.empty() && m_dancers.empty() ? -1.0 : -8.0);
-	m_audio.playMusic(m_song->music, false, 0.0, setup_delay);
+	m_audio.playMusic(m_song->music, false, 0.0, setup_delay, m_speed);
 	m_engine.reset(new Engine(m_audio, m_song->vocals, analyzers.begin(), analyzers.end(), m_database));
 }
 
@@ -317,7 +319,9 @@ void ScreenSing::draw() {
 	// Get the time in the song
 	double length = m_audio.getLength();
 	double time = m_audio.getPosition();
-	time -= config["audio/video_delay"].f();
+	// need to compensate for speed as well. When playing at half speed, 
+	// 1 second from getPosition is actually two seconds in real time
+	time -= config["audio/video_delay"].f() * m_audio.getSpeed()/100.0;
 	double songPercent = clamp(time / length);
 
 	// Rendering starts

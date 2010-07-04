@@ -185,7 +185,9 @@ bool GuitarGraph::difficulty(Difficulty level) {
 /// Core engine
 void GuitarGraph::engine() {
 	double time = m_audio.getPosition();
-	time -= config["audio/controller_delay"].f();
+	// need to compensate for speed as well. When playing at half speed, 
+	// 1 second from getPosition is actually two seconds in real time
+	time -= config["audio/controller_delay"].f() * m_audio.getSpeed()/100.0;
 	// Handle key markers
 	if (!m_drums) {
 		for (int i = 0; i < m_pads; ++i) {

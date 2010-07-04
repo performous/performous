@@ -93,5 +93,6 @@ class ScreenSing: public Screen {
 	AnimValue m_quitTimer;
 	bool m_only_singers_alive;
 	bool m_practmode;
+	int  m_speed; // speed in percent, 100 for normal, 50 for half
 };
 
