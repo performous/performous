@@ -7,8 +7,8 @@ Dimensions dimensions; // Make a public member variable
 
 NoteGraph::NoteGraph(VocalTrack const& vocals):
   m_vocals(vocals),
-  m_notelines(getThemePath("notelines.svg")),
-  m_wave(getThemePath("wave.png")), m_star(getThemePath("star.svg")),
+  m_notelines(getThemePath("notelines.svg")), m_wave(getThemePath("wave.png")),
+  m_star(getThemePath("star.svg")), m_star_hl(getThemePath("star_glow.svg")),
   m_notebar(getThemePath("notebar.svg")), m_notebar_hl(getThemePath("notebar.png")),
   m_notebarfs(getThemePath("notebarfs.svg")), m_notebarfs_hl(getThemePath("notebarfs-hl.png")),
   m_notebargold(getThemePath("notebargold.svg")), m_notebargold_hl(getThemePath("notebargold.png")),
@@ -18,7 +18,7 @@ NoteGraph::NoteGraph(VocalTrack const& vocals):
 	m_nlTop.setTarget(m_vocals.noteMax, true);
 	m_nlBottom.setTarget(m_vocals.noteMin, true);
 	for (Notes::const_iterator it = m_vocals.notes.begin(); it != m_vocals.notes.end(); ++it)
-		it->accuracy = 0.0; // Reset accuracy
+		it->stars.clear(); // Reset stars
 	reset();
 }
 
@@ -106,20 +106,24 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 
 	// Draw a star for well sung notes
 	for (Notes::const_iterator it = m_songit; it != m_vocals.notes.end() && it->begin < m_time - (baseLine - 0.5) / pixUnit; ++it) {
-			if (it->accuracy >= 0.8 && (it->type == Note::NORMAL || it->type == Note::SLIDE || it->type == Note::GOLDEN)) {
-				double x = m_baseX + it->begin * pixUnit + m_noteUnit; // left x coordinate: begin minus border (side borders -noteUnit wide)
-				double w = (it->end - it->begin) * pixUnit - m_noteUnit * 2.0; // width: including borders on both sides
-				float hh = -m_noteUnit;
-				float centery = m_baseY + (it->note + 0.4) * m_noteUnit; // Star is 0.4 notes higher than current note
-				float centerx = x + w - 1.2 * hh; // Star is 1.2 units from end
-				float rot = fmod(time * 360, 360); // They rotate!
-				float zoom = (std::abs((rot-180) / 360.0f) * 0.8f + 0.6f) * (position == NoteGraph::TOP ? 2.3 : 2.0) * hh;
-				glutil::PushMatrix pm;
-				glTranslatef(centerx, centery, 0.0f);
-				glRotatef(rot, 0.0f, 0.0f, 1.0f);
-				m_star.draw(Dimensions().stretch(zoom, zoom).center().middle(), TexCoords());
-			}
-
+		float player_star_offset = 0;
+		for (std::vector<Color>::const_iterator it_col = it->stars.begin(); it_col != it->stars.end(); ++it_col) {
+			double x = m_baseX + it->begin * pixUnit + m_noteUnit; // left x coordinate: begin minus border (side borders -noteUnit wide)
+			double w = (it->end - it->begin) * pixUnit - m_noteUnit * 2.0; // width: including borders on both sides
+			float hh = -m_noteUnit;
+			float centery = m_baseY + (it->note + 0.4) * m_noteUnit; // Star is 0.4 notes higher than current note
+			float centerx = x + w - (player_star_offset + 1.2) * hh; // Star is 1.2 units from end
+			float rot = fmod(time * 360, 360); // They rotate!
+			float zoom = (std::abs((rot-180) / 360.0f) * 0.8f + 0.6f) * (position == NoteGraph::TOP ? 2.3 : 2.0) * hh;
+			glutil::PushMatrix pm;
+			glTranslatef(centerx, centery, 0.0f);
+			glRotatef(rot, 0.0f, 0.0f, 1.0f);
+			glColor4f(it_col->r, it_col->g, it_col->b, it_col->a);
+			m_star_hl.draw(Dimensions().stretch(zoom*1.2, zoom*1.2).center().middle(), TexCoords());
+			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+			m_star.draw(Dimensions().stretch(zoom, zoom).center().middle(), TexCoords());
+			player_star_offset += 0.8;
+		}
 	}
 }
 
