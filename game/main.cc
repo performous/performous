@@ -117,6 +117,20 @@ void mainLoop(std::string const& songlist) {
 		boost::scoped_ptr<input::MidiDrums> midiDrums;
 		// TODO: Proper error handling...
 		try { midiDrums.reset(new input::MidiDrums); } catch (std::runtime_error&) {}
+		// Load audio samples
+		audio.loadSample("drum bass", getPath("sounds/drum_bass.ogg"));
+		audio.loadSample("drum snare", getPath("sounds/drum_snare.ogg"));
+		audio.loadSample("drum hi-hat", getPath("sounds/drum_hi-hat.ogg"));
+		audio.loadSample("drum tom1", getPath("sounds/drum_tom1.ogg"));
+		audio.loadSample("drum cymbal", getPath("sounds/drum_cymbal.ogg"));
+		//audio.loadSample("drum tom2", getPath("sounds/drum_tom2.ogg"));
+		audio.loadSample("guitar fail1", getPath("sounds/guitar_fail1.ogg"));
+		audio.loadSample("guitar fail2", getPath("sounds/guitar_fail2.ogg"));
+		audio.loadSample("guitar fail3", getPath("sounds/guitar_fail3.ogg"));
+		audio.loadSample("guitar fail4", getPath("sounds/guitar_fail4.ogg"));
+		audio.loadSample("guitar fail5", getPath("sounds/guitar_fail5.ogg"));
+		audio.loadSample("guitar fail6", getPath("sounds/guitar_fail6.ogg"));
+		// Load screens
 		sm.addScreen(new ScreenIntro("Intro", audio));
 		sm.addScreen(new ScreenSongs("Songs", audio, songs, database));
 		sm.addScreen(new ScreenSing("Sing", audio, database, backgrounds));

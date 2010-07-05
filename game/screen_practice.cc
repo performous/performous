@@ -18,21 +18,15 @@ void ScreenPractice::enter() {
 		m_vumeters.push_back(b = new ProgressBar(getThemePath("vumeter_bg.svg"), getThemePath("vumeter_fg.svg"), ProgressBar::VERTICAL, 0.136, 0.023));
 		b->dimensions.screenBottom().left(-0.4 + i * 0.2).fixedWidth(0.04);
 	}
-	m_samples.push_back(std::make_pair("drum bass", getPath("sounds/drum_bass.ogg")));
-	m_samples.push_back(std::make_pair("drum snare", getPath("sounds/drum_snare.ogg")));
-	m_samples.push_back(std::make_pair("drum hi-hat", getPath("sounds/drum_hi-hat.ogg")));
-	m_samples.push_back(std::make_pair("drum tom1", getPath("sounds/drum_tom1.ogg")));
-	m_samples.push_back(std::make_pair("drum cymbal", getPath("sounds/drum_cymbal.ogg")));
-	//m_samples.push_back(std::make_pair("drum tom2", getPath("sounds/drum_tom2.ogg")));
-	for(unsigned int i = 0 ; i < m_samples.size() ; i++) {
-		m_audio.loadSample(m_samples[i].first, m_samples[i].second);
-	}
+	m_samples.push_back("drum bass");
+	m_samples.push_back("drum snare");
+	m_samples.push_back("drum hi-hat");
+	m_samples.push_back("drum tom1");
+	m_samples.push_back("drum cymbal");
+	//m_samples.push_back("drum tom2");
 }
 
 void ScreenPractice::exit() {
-	for(unsigned int i = 0 ; i < m_samples.size() ; i++) {
-		m_audio.unloadSample(m_samples[i].first);
-	}
 	m_vumeters.clear();
 	m_samples.clear();
 	theme.reset();
@@ -47,7 +41,7 @@ void ScreenPractice::manageEvent(SDL_Event event) {
 	else if (event.type == SDL_JOYBUTTONDOWN // Play drum sounds here
 	  && input::detail::devices[event.jbutton.which].type_match(input::DRUMS)) {
 		int b = input::buttonFromSDL(input::detail::devices[event.jbutton.which].type(), event.jbutton.button);
-		if (b != -1) m_audio.playSample(m_samples[unsigned(b) % m_samples.size()].first);
+		if (b != -1) m_audio.playSample(m_samples[unsigned(b) % m_samples.size()]);
 	}
 }
 

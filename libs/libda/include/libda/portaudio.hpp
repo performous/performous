@@ -19,7 +19,7 @@ namespace portaudio {
 		PaError m_code;
 		char const* m_func;
 	};
-	
+
 	namespace internal {
 		void check(PaError code, char const* func) { if (code != paNoError) throw Error(code, func); }
 	}
@@ -70,7 +70,7 @@ namespace portaudio {
 		Params& hostApiSpecificStreamInfo(void* val) { params.hostApiSpecificStreamInfo = val; return *this; }
 		operator PaStreamParameters const*() const { return &params; }
 	};
-		
+
 	template <typename Functor> int functorCallback(void const* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* userData) {
 		return (*static_cast<Functor*>(userData))(input, output, frameCount, timeInfo, statusFlags);
 	}

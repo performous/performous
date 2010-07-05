@@ -100,25 +100,20 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number,
 	// Score calculator (TODO a better one)
 	m_scoreText.reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_streakText.reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
-	// Load fail sounds
 	if (m_drums) {
-		m_samples.push_back(std::make_pair("drum bass", getPath("sounds/drum_bass.ogg")));
-		m_samples.push_back(std::make_pair("drum snare", getPath("sounds/drum_snare.ogg")));
-		m_samples.push_back(std::make_pair("drum hi-hat", getPath("sounds/drum_hi-hat.ogg")));
-		m_samples.push_back(std::make_pair("drum tom1", getPath("sounds/drum_tom1.ogg")));
-		m_samples.push_back(std::make_pair("drum cymbal", getPath("sounds/drum_cymbal.ogg")));
-		//m_samples.push_back(std::make_pair("drum tom2", getPath("sounds/drum_tom2.ogg")));
+		m_samples.push_back("drum bass");
+		m_samples.push_back("drum snare");
+		m_samples.push_back("drum hi-hat");
+		m_samples.push_back("drum tom1");
+		m_samples.push_back("drum cymbal");
+		//m_samples.push_back("drum tom2");
 	} else {
-		m_samples.push_back(std::make_pair("guitar fail1", getPath("sounds/guitar_fail1.ogg")));
-		m_samples.push_back(std::make_pair("guitar fail2", getPath("sounds/guitar_fail2.ogg")));
-		m_samples.push_back(std::make_pair("guitar fail3", getPath("sounds/guitar_fail3.ogg")));
-		m_samples.push_back(std::make_pair("guitar fail4", getPath("sounds/guitar_fail4.ogg")));
-		m_samples.push_back(std::make_pair("guitar fail5", getPath("sounds/guitar_fail5.ogg")));
-		m_samples.push_back(std::make_pair("guitar fail6", getPath("sounds/guitar_fail6.ogg")));
-	}
-	// Warning the sample are shared between Guitargraphs, do not unload them
-	for(unsigned int i = 0 ; i < m_samples.size() ; i++) {
-		m_audio.loadSample(m_samples[i].first, m_samples[i].second);
+		m_samples.push_back("guitar fail1");
+		m_samples.push_back("guitar fail2");
+		m_samples.push_back("guitar fail3");
+		m_samples.push_back("guitar fail4");
+		m_samples.push_back("guitar fail5");
+		m_samples.push_back("guitar fail6");
 	}
 	for (int i = 0; i < 6; ++i) m_pressed_anim[i].setRate(5.0);
 	for (int i = 0; i < 5; ++i) m_holds[i] = 0;
@@ -409,7 +404,7 @@ void GuitarGraph::fail(double time, int fret) {
 		// Reduce points and play fail sample only when GodMode is deactivated
 		m_events.push_back(Event(time, 0, fret));
 		if (fret < 0) fret = std::rand();
-		m_audio.playSample(m_samples[unsigned(fret) % m_samples.size()].first);
+		m_audio.playSample(m_samples[unsigned(fret) % m_samples.size()]);
 		// remove equivalent of 1 perfect hit for every note
 		// kids tend to play a lot of extra notes just for the fun of it.
 		// need to make sure they don't end up with a score of zero
