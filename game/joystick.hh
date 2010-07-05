@@ -160,6 +160,7 @@ namespace input {
 #ifdef USE_PORTMIDI
 	class MidiDrums {
 	public:
+		static bool enabled() { return true; }
 		MidiDrums();
 		void process();
 	private:
@@ -172,6 +173,7 @@ namespace input {
 #else
 	class MidiDrums {
 	public:
+		static bool enabled() { return false; }
 		MidiDrums() {};
 		void process() {};
 	private:

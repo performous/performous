@@ -406,11 +406,7 @@ void outputOptionalFeatureStatus() {
 	std::cout    << "  Internationalization:   " <<
 	(Gettext::enabled() ? "Enabled" : "Disabled")
 	<< std::endl << "  MIDI I/O:               " <<
-	#ifdef USE_PORTMIDI
-		"Enabled"
-	#else
-		"Disabled"
-	#endif
+	(input::MidiDrums::enabled() ? "Enabled" : "Disabled")
 	<< std::endl << "  Webcam support:         " <<
 	(Webcam::enabled() ? "Enabled" : "Disabled")
 	<< std::endl;
