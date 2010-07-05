@@ -102,6 +102,36 @@ struct Sample {
 	}
 };
 
+struct Synth {
+  private:
+	Notes m_notes;
+	double srate; ///< Sample rate
+  public:
+	Synth(Notes const& notes, unsigned int sr) : m_notes(notes), srate(sr) {};
+	void operator()(float* begin, float* end, double position) {
+		static double phase = 0.0;
+		for (float *i = begin; i < end; ++i) *i *= 0.3; // Decrease music volume
+
+		std::vector<float> mixbuf(end - begin);
+		Notes::const_iterator it = m_notes.begin();
+
+		while (it != m_notes.end() && it->end < position) ++it;
+		if (it == m_notes.end() || it->type == Note::SLEEP || it->begin > position) { phase = 0.0; return; }
+		int note = it->note % 12;
+		double d = (note + 1) / 13.0;
+		double freq = MusicalScale().getNoteFreq(note + 12);
+		double value = 0.0;
+		// Synthesize tones
+		for (size_t i = 0, iend = mixbuf.size(); i != iend; ++i) {
+			if (i % 2 == 0) {
+				value = d * 0.2 * std::sin(phase) + 0.2 * std::sin(2 * phase) + (1.0 - d) * 0.2 * std::sin(4 * phase);
+				phase += 2.0 * M_PI * freq / srate;
+			}
+			begin[i] += value;
+		}
+	}
+};
+
 
 struct Command {
 	enum { TRACK_FADE, SAMPLE_RESET } type;
@@ -112,6 +142,8 @@ struct Command {
 struct Output {
 	boost::mutex mutex;
 	boost::mutex samples_mutex;
+	boost::mutex synth_mutex;
+	std::auto_ptr<Synth> synth;
 	std::auto_ptr<Music> preloading;
 	boost::ptr_vector<Music> playing, disposing;
 	boost::ptr_map<std::string, Sample> samples;
@@ -165,6 +197,13 @@ struct Output {
 				for(boost::ptr_map<std::string, Sample>::iterator it = samples.begin() ; it != samples.end() ; ++it) {
 					(*it->second)(begin, end);
 				}
+			}
+		}
+		// Mix synth if available (should be done at the end)
+		{
+			boost::mutex::scoped_try_lock l(synth_mutex, boost::defer_lock);
+			if(l.try_lock() && synth.get() && !playing.empty()) {
+				(*synth.get())(begin, end, playing[0].pos());
 			}
 		}
 	}
@@ -324,6 +363,12 @@ void Audio::streamFade(std::string track, double fadeLevel) {
 	boost::mutex::scoped_lock l(o.mutex);
 	Command cmd = { Command::TRACK_FADE, track, fadeLevel };
 	o.commands.push_back(cmd);
+}
+
+void Audio::toggleSynth(Notes const& notes) {
+	Output& o = self->output;
+	boost::mutex::scoped_lock l(o.synth_mutex);
+	o.synth.get() ?  o.synth.reset() : o.synth.reset(new Synth(notes, getSR()));
 }
 
 boost::ptr_vector<Analyzer>& Audio::analyzers() { return self->analyzers; }
