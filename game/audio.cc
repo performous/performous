@@ -20,11 +20,12 @@ class Music {
 	Tracks tracks; ///< Audio decoders
 	double srate; ///< Sample rate
 	int64_t m_pos; ///< Current sample position
+	bool m_preview;
 public:
 	double fadeLevel;
 	double fadeRate;
 	typedef std::map<std::string,std::string> Files;
-	Music(Files const& filenames, unsigned int sr): srate(sr), m_pos(), fadeLevel(), fadeRate() {
+	Music(Files const& filenames, unsigned int sr, bool preview): srate(sr), m_pos(), m_preview(preview), fadeLevel(), fadeRate() {
 		for (Files::const_iterator it = filenames.begin(), end = filenames.end(); it != end; ++it) {
 			tracks.insert(it->first, std::auto_ptr<Track>(new Track(it->second, sr)));
 		}
@@ -73,15 +74,14 @@ public:
 	}
 };
 
-// rename to Sample once totally implemented
-struct SampleNew {
+struct Sample {
   private:
 	unsigned int srate;
 	double m_pos;
 	FFmpeg mpeg;
 	bool eof;
   public:
-	SampleNew(std::string const& filename, unsigned sr) : srate(sr), m_pos(), mpeg(false, true, filename, sr), eof(true) { }
+	Sample(std::string const& filename, unsigned sr) : srate(sr), m_pos(), mpeg(false, true, filename, sr), eof(true) { }
 	void operator()(float* begin, float* end) {
 		if(eof) {
 			// No more data to play in this sample
@@ -104,16 +104,17 @@ struct SampleNew {
 
 
 struct Command {
-	enum { TRACK_FADE } type;
+	enum { TRACK_FADE, SAMPLE_RESET } type;
 	std::string track;
 	double fadeLevel;
 };
 
 struct Output {
 	boost::mutex mutex;
+	boost::mutex samples_mutex;
 	std::auto_ptr<Music> preloading;
 	boost::ptr_vector<Music> playing, disposing;
-	boost::ptr_map<std::string, SampleNew> samples;
+	boost::ptr_map<std::string, Sample> samples;
 	std::vector<Command> commands;
 	volatile bool paused;
 	Output(): paused(false) {}
@@ -131,6 +132,11 @@ struct Output {
 			switch (cmd.type) {
 			case Command::TRACK_FADE:
 				if (!playing.empty()) playing[0].trackFade(cmd.track, cmd.fadeLevel);
+				break;
+			case Command::SAMPLE_RESET:
+				boost::ptr_map<std::string, Sample>::iterator it = samples.find(cmd.track);
+				if (it != samples.end())
+					it->second->reset();
 				break;
 			}
 		}
@@ -152,9 +158,14 @@ struct Output {
 			++i;
 		}
 		// Mix in the samples currently playing
-		for(boost::ptr_map<std::string, SampleNew>::iterator it = samples.begin() ; it != samples.end() ; ++it) {
-			boost::mutex::scoped_try_lock l(mutex);
-			(*it->second)(begin, end);
+		{
+			// samples should not be created/destroyed on the fly
+			boost::mutex::scoped_try_lock l(samples_mutex, boost::defer_lock);
+			if(l.try_lock()) {
+				for(boost::ptr_map<std::string, Sample>::iterator it = samples.begin() ; it != samples.end() ; ++it) {
+					(*it->second)(begin, end);
+				}
+			}
 		}
 	}
 };
@@ -226,19 +237,19 @@ bool Audio::isOpen() const {
 }
 
 void Audio::loadSample(std::string const& streamId, std::string const& filename) {
-	boost::mutex::scoped_lock l(self->output.mutex);
-	self->output.samples.insert(streamId, std::auto_ptr<SampleNew>(new SampleNew(filename, getSR())));
+	boost::mutex::scoped_lock l(self->output.samples_mutex);
+	self->output.samples.insert(streamId, std::auto_ptr<Sample>(new Sample(filename, getSR())));
 }
 
 void Audio::playSample(std::string const& streamId) {
-	boost::mutex::scoped_lock l(self->output.mutex);
-	boost::ptr_map<std::string, SampleNew>::iterator it = self->output.samples.find(streamId);
-	if (it == self->output.samples.end()) throw std::runtime_error("Cannot play sample : " + streamId);
-	it->second->reset();
+	Output& o = self->output;
+	boost::mutex::scoped_lock l(o.mutex);
+	Command cmd = { Command::SAMPLE_RESET, streamId, 0.0 };
+	o.commands.push_back(cmd);
 }
 
 void Audio::unloadSample(std::string const& streamId) {
-	boost::mutex::scoped_lock l(self->output.mutex);
+	boost::mutex::scoped_lock l(self->output.samples_mutex);
 	self->output.samples.erase(streamId);
 }
 
@@ -246,7 +257,7 @@ void Audio::playMusic(std::map<std::string,std::string> const& filenames, bool p
 	Output& o = self->output;
 	boost::mutex::scoped_lock l(o.mutex);
 	o.disposing.clear();  // Delete disposed streams
-	o.preloading.reset(new Music(filenames, getSR()));
+	o.preloading.reset(new Music(filenames, getSR(), preview));
 	Music& m = *o.preloading.get();
 	m.seek(startPos);
 	m.fadeRate = 1.0 / getSR() / fadeTime;
