@@ -94,9 +94,9 @@ class Audio {
 	 * @param fadeTime time to fade
 	 * @param startPos starting position
 	 */
-	void playMusic(std::string const& filename, bool preview = false, double fadeTime = 0.5, double startPos = -0.2, int speed = 100);
+	void playMusic(std::string const& filename, bool preview = false, double fadeTime = 0.5, double startPos = -0.2);
 	/// plays a list of songs
-	void playMusic(std::map<std::string,std::string> const& filenames, bool preview = false, double fadeTime = 0.5, double startPos = -0.2, int speed = 100);
+	void playMusic(std::map<std::string,std::string> const& filenames, bool preview = false, double fadeTime = 0.5, double startPos = -0.2);
 	/// plays a sample
 	void play(Sample const& s, std::string const& volumeSetting);
 	/// get pause status
@@ -107,8 +107,6 @@ class Audio {
 	void fadeout(double time = 1.0);
 	/** Get the length of the currently playing song, in seconds. **/
 	double getLength() const;
-	/// return current speed
-	int getSpeed() {return m_speed;}
 	/**
 	 * This methods seek forward in the stream (backwards if
 	 * argument is negative), and continues playing.
@@ -139,6 +137,5 @@ class Audio {
 	std::string m_volumeSetting;
 	da::mixer m_mixer;
 	std::map<std::string,boost::shared_ptr<Stream> > m_streams;
-	int m_speed;
 };
 

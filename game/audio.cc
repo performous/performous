@@ -5,7 +5,6 @@
 #include <libda/fft.hpp>  // For M_PI
 #include <cmath>
 #include <iostream>
-#include <boost/filesystem.hpp>
 
 struct SampleStream {
 	SampleStream(boost::shared_ptr<FFmpeg> const& mpeg): m_mpeg(mpeg) {}
@@ -76,39 +75,19 @@ void Audio::play(Sample const& s, std::string const& volumeSetting) {
 	m_mixer.add(da::shared_ref(acc));
 }
 
-void Audio::playMusic(std::map<std::string,std::string> const& filenames, bool preview, double fadeTime, double startPos, int speed) {
+void Audio::playMusic(std::map<std::string,std::string> const& filenames, bool preview, double fadeTime, double startPos) {
 	if (!isOpen()) return;
 	da::lock_holder l = m_mixer.lock();
 	fadeout(fadeTime);
 	boost::shared_ptr<da::chain> ch(new da::chain());
 	for(std::map<std::string,std::string>::const_iterator it = filenames.begin() ; it != filenames.end() ; ++it ) {
-		std::string f;
 		try {
-			f = it->second;
-			if (speed != 100) {
-				// instead of real-time time-stretching we use previously created files
-				// best effects have been achieved with SBSMS library
-				// as used by Audacity's Sliding Time Scale/ Pitch Shift plugin
-				std::string f2 = "-" + boost::lexical_cast<std::string>(speed) + ".ogg";
-				f.replace(f.find(".ogg"), 4, f2);
-				// std::cout << "loading time-stretched audio (" << f << ")" << std::endl;
-
-				if (!boost::filesystem::exists(f)) throw std::runtime_error("time-stretched file \"" + f +"\" not found");
-			}
-
-			boost::shared_ptr<Stream> s(new Stream(f, m_rs.rate()));
+			boost::shared_ptr<Stream> s(new Stream(it->second, m_rs.rate()));
 			m_streams[it->first] = s;
 			ch->add(da::shared_ref(s));
 			s->seek(startPos);
 		} catch (std::runtime_error& e) {
-			if (speed != 100) {
-				// in case time-stretching failed let's retry at normal speed
-				// TODO: we could also auto-create time-stretched files here
-				playMusic(filenames, preview, fadeTime, startPos, 100);
-				return;
-			}
-			// in case we are at normal speed we skip this file and try to continue
-			std::cerr << "Error loading " << f << " (" << e.what() << ")" << std::endl;
+			std::cerr << "Error loading " << it->second << " (" << e.what() << ")" << std::endl;
 			continue;
 		}
 	}
@@ -117,14 +96,12 @@ void Audio::playMusic(std::map<std::string,std::string> const& filenames, bool p
 	ch->add(boost::ref(m_volume));
 	m_mixer.fadein(da::shared_ref(ch), fadeTime, startPos);
 	if (!preview) pause(false);
-
-	m_speed = speed;
 }
 
-void Audio::playMusic(std::string const& filename, bool preview, double fadeTime, double startPos, int speed) {
+void Audio::playMusic(std::string const& filename, bool preview, double fadeTime, double startPos) {
 	std::map<std::string,std::string> tmp;
 	tmp["unidentified"] = filename;
-	playMusic(tmp, preview, fadeTime, startPos, speed);
+	playMusic(tmp, preview, fadeTime, startPos);
 }
 
 void Audio::stopMusic() {
@@ -143,13 +120,12 @@ void Audio::fadeout(double fadeTime) {
 
 double Audio::getPosition() const {
 	da::lock_holder l = m_mixer.lock();
-	// only the audio slows down; the game still uses original time base
-	return m_streams.empty() ? getNaN() : m_streams.begin()->second->pos() * m_speed/100.0;
+	return m_streams.empty() ? getNaN() : m_streams.begin()->second->pos();
 }
 
 double Audio::getLength() const {
 	da::lock_holder l = m_mixer.lock();
-	return m_streams.empty() ? getNaN() : m_streams.begin()->second->duration() * m_speed/100.0;
+	return m_streams.empty() ? getNaN() : m_streams.begin()->second->duration();
 }
 
 bool Audio::isPlaying() const {
@@ -157,16 +133,14 @@ bool Audio::isPlaying() const {
 	return m_streams.empty() ? false : !m_streams.begin()->second->eof();
 }
 
-void Audio::seek(double offset2) {
-	double offset = offset2 * 100.0/m_speed;
+void Audio::seek(double offset) {
 	da::lock_holder l = m_mixer.lock();
 	for(std::map<std::string,boost::shared_ptr<Stream> >::iterator it = m_streams.begin() ; it != m_streams.end() ; ++it)
 		it->second->seek(clamp(it->second->pos() + offset, 0.0, it->second->duration()));
 	pause(false);
 }
 
-void Audio::seekPos(double pos2) {
-	double pos = pos2 * 100.0/m_speed;
+void Audio::seekPos(double pos) {
 	da::lock_holder l = m_mixer.lock();
 	for(std::map<std::string,boost::shared_ptr<Stream> >::iterator it = m_streams.begin() ; it != m_streams.end() ; ++it)
 		it->second->seek(pos);
