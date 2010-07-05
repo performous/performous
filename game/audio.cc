@@ -45,7 +45,7 @@ public:
 				if (fadeLevel <= 0.0) return false;
 				if (fadeLevel > 1.0) { fadeLevel = 1.0; fadeRate = 0.0; }
 			}
-			begin[i] += mixbuf[i] * fadeLevel;
+			begin[i] += mixbuf[i] * fadeLevel * static_cast<float>(m_preview ? config["audio/preview_volume"].i() : config["audio/music_volume"].i())/100.0;
 		}
 		return !eof;
 	}
@@ -92,7 +92,7 @@ struct Sample {
 			eof = true;
 		}
 		for (size_t i = 0, iend = end - begin; i != iend; ++i) {
-			begin[i] += mixbuf[i];
+			begin[i] += mixbuf[i] * static_cast<float>(config["audio/fail_volume"].i())/100.0;
 		}
 		m_pos += end - begin;
 	}
