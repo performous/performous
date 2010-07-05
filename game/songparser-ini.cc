@@ -8,7 +8,9 @@
 #include "midifile.hh"
 
 /// @file
-/// Functions used for parsing the UltraStar TXT song format
+/// Functions used for parsing the Frets on Fire INI song format
+
+using namespace SongParserUtil;
 
 /// 'Magick' to check if this file looks like correct format
 bool SongParser::iniCheck(std::vector<char> const& data) {
@@ -17,21 +19,9 @@ bool SongParser::iniCheck(std::vector<char> const& data) {
 }
 
 namespace {
-	void eraseLast(std::string& s, char ch = ' ') {
-		if (!s.empty() && *s.rbegin() == ch) s.erase(s.size() - 1);
-	}
 	void testAndAdd(Song& s, std::string const& trackid, std::string const& filename) {
 		std::string f = s.path + filename;
 		if (boost::filesystem::exists(f)) s.music[trackid] = f;
-	}
-	/// Parse a double from string and assign it to a variable
-	void assign(double& var, std::string str) {
-		std::replace(str.begin(), str.end(), ',', '.'); // Fix decimal separators
-		try {
-			var = boost::lexical_cast<double>(str);
-		} catch (...) {
-			throw std::runtime_error("\"" + str + "\" is not valid floating point value");
-		}
 	}
 	/// Change the MIDI track name to Performous track name
 	/// Return false if not valid
