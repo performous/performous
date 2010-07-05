@@ -145,6 +145,9 @@ void audioSetup(Capture& capture, Audio& audio) {
 		if (channels != 2) throw std::runtime_error("Only stereo playback is supported, error in pdev=" + *it);
 		try {
 			audio.open(devstr, rate, frames);
+			// when we get here, we have successfully opened a device.
+			// let's use it then!
+			break;
 		} catch (std::exception const& e) {
 			std::cerr << "Playback device pdev=" << *it << " failed and will be ignored:\n  " << e.what() << std::endl;
 		}
