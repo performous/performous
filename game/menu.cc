@@ -3,50 +3,80 @@
 #include "configuration.hh"
 #include "instrumentgraph.hh"
 
-MenuOption::MenuOption(const std::string nm, const std::string comm):
+MenuOption::MenuOption(const std::string& nm, const std::string& comm):
+	type(CLOSE_SUBMENU),
 	name(nm),
-	comment(comm)
+	comment(comm),
+	value(NULL),
+	newValue()
+{}
+
+MenuOption::MenuOption(const std::string& nm, const std::string& comm, ConfigItem* val):
+	type(CHANGE_VALUE),
+	name(nm),
+	comment(comm),
+	value(val),
+	newValue()
+{}
+
+MenuOption::MenuOption(const std::string& nm, const std::string& comm, ConfigItem* val, ConfigItem newval):
+	type(SET_AND_CLOSE),
+	name(nm),
+	comment(comm),
+	value(val),
+	newValue(newval)
+{}
+
+MenuOption::MenuOption(const std::string& nm, const std::string& comm, MenuOptions opts):
+	type(OPEN_SUBMENU),
+	name(nm),
+	comment(comm),
+	value(NULL),
+	newValue(),
+	options(opts)
 {}
 
 
 MainMenuOption::MainMenuOption(const std::string nm, const std::string scrn, const std::string img, const std::string comm):
-	MenuOption(nm, comm),
+	name(nm),
+	comment(comm),
 	screen(scrn),
 	image(getThemePath(img))
 {}
 
 
-InstrumentMenuOption::InstrumentMenuOption(const std::string nm, const std::string comm, InstrumentMenuAdjustFunc fn1, InstrumentMenuValueFunc fn2):
-	MenuOption(nm, comm),
-	adjust(fn1),
-	getValue(fn2),
-	value()
-{}
 
-
-void InstrumentMenu::add(InstrumentMenuOption opt) {
-	// Cache the caption
-	if (opt.getValue) opt.value = (owner.*opt.getValue)();
-	else opt.value = opt.name;
-	options.push_back(opt);
-	// Reset iterator
-	current = options.begin();
+void Menu::add(MenuOption opt) {
+	root_options.push_back(opt);
+	options = root_options; // Set current menu to root
+	current = options.begin(); // Reset iterator
 }
 
-void InstrumentMenu::move(int dir) {
+void Menu::move(int dir) {
 	if (dir > 0 && current != (--options.end())) ++current;
 	else if (dir < 0 && current != options.begin()) --current;
 }
 
-void InstrumentMenu::changeValue(int dir) {
-	if (!current->adjust) return;
-	(owner.*current->adjust)(dir); // adjust
-	if (current->getValue) current->value = (owner.*current->getValue)(); // cache value
-}
-
-void InstrumentMenu::refreshValues() {
-	for (InstrumentMenuOptions::iterator it = options.begin(); it != options.end(); ++it) {
-		if (it->getValue) it->value = (owner.*it->getValue)();
-		else it->value = it->name;
+void Menu::action(int dir) {
+	switch (current->type) {
+		case MenuOption::OPEN_SUBMENU:
+			options = current->options;
+			current = options.begin();
+			break;
+		case MenuOption::CHANGE_VALUE:
+			if (current->value) {
+				if (dir > 0) ++(*(current->value));
+				else if (dir < 0) --(*(current->value));
+			}
+			break;
+		case MenuOption::SET_AND_CLOSE:
+			if (current->value) *(current->value) = current->newValue;
+			// Fall-through to closing
+		case MenuOption::CLOSE_SUBMENU:
+			// TODO: Handle more than one level of submenus
+			// TODO: Closing root menu should signal that the menu is closing
+			options = root_options;
+			current = options.begin();
+			break;
 	}
 }

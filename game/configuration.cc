@@ -18,6 +18,16 @@ namespace fs = boost::filesystem;
 
 Config config;
 
+
+ConfigItem::ConfigItem(bool bval): m_value(bval) { }
+
+ConfigItem::ConfigItem(int ival): m_value(ival) { }
+
+ConfigItem::ConfigItem(float fval): m_value(fval) { }
+
+ConfigItem::ConfigItem(std::string sval): m_value(sval) { }
+
+
 ConfigItem& ConfigItem::incdec(int dir) {
 	if (m_type == "int") {
 		int& val = boost::get<int>(m_value);

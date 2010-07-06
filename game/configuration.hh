@@ -12,6 +12,10 @@ class ConfigItem {
   public:
 	typedef std::vector<std::string> StringList; ///< a list of strings
 	ConfigItem() {}
+	ConfigItem(bool bval);
+	ConfigItem(int ival);
+	ConfigItem(float fval);
+	ConfigItem(std::string sval);
 	void update(xmlpp::Element& elem, int mode); ///< Load XML config file, elem = Entry, mode = 0 for schema, 1 for system config and 2 for user config
 	ConfigItem& operator++() { return incdec(1); } ///< increments config value
 	ConfigItem& operator--() { return incdec(-1); } ///< decrements config value

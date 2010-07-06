@@ -92,9 +92,17 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
 		throw std::runtime_error("Could not find any dance tracks.");
 	changeTrack(0); // Get an initial game mode and notes for it
 
-	// Populate menu
-	m_menu.add(InstrumentMenuOption("", _("Select track"), &InstrumentGraph::changeTrack, &InstrumentGraph::getTrack));
-	m_menu.add(InstrumentMenuOption("", _("Select difficulty"), &InstrumentGraph::changeDifficulty, &InstrumentGraph::getDifficultyString));
+	// Create track menu
+	MenuOptions trackmenu;
+	// TODO: Remove "back" and do actual populating
+	trackmenu.push_back(MenuOption("Back", "Back"));
+	// Create difficulty menu
+	MenuOptions diffmenu;
+	// TODO: Remove "back" and do actual populating
+	diffmenu.push_back(MenuOption("Back", "Back"));
+	// Populate root menu
+	m_menu.add(MenuOption(_("Track"), _("Select track to play"), trackmenu));
+	m_menu.add(MenuOption(_("Difficulty"), _("Select difficulty level"), diffmenu));
 }
 
 /// Attempt to select next/previous game mode
@@ -135,7 +143,6 @@ void DanceGraph::changeTrack(int direction) {
 	else throw std::runtime_error("Unknown track " + gm);
 
 	changeDifficulty(0); // Construct new notes
-	m_menu.refreshValues();
 }
 
 /// Are we alive?
@@ -198,8 +205,8 @@ void DanceGraph::engine() {
 		// Menu keys
 		if (m_menuOpen && ev.type == input::Event::PRESS) {
 			if (ev.nav == input::CANCEL) toggleMenu();
-			else if (ev.nav == input::RIGHT || ev.nav == input::START) m_menu.changeValue(1);
-			else if (ev.nav == input::LEFT) m_menu.changeValue(-1);
+			else if (ev.nav == input::RIGHT || ev.nav == input::START) m_menu.action(1);
+			else if (ev.nav == input::LEFT) m_menu.action(-1);
 			else if (ev.nav == input::UP) m_menu.move(-1);
 			else if (ev.nav == input::DOWN) m_menu.move(1);
 			difficulty_changed = true;

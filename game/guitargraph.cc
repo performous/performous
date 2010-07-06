@@ -125,9 +125,17 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number,
 		if (++m_track_index == m_instrumentTracks.end()) m_track_index = m_instrumentTracks.begin();
 	difficultyAuto();
 	updateNeck();
-	// Populate menu
-	m_menu.add(InstrumentMenuOption("", _("Select track"), &InstrumentGraph::changeTrack, &InstrumentGraph::getTrack));
-	m_menu.add(InstrumentMenuOption("", _("Select difficulty"), &InstrumentGraph::changeDifficulty, &InstrumentGraph::getDifficultyString));
+	// Create track menu
+	MenuOptions trackmenu;
+	// TODO: Remove "back" and do actual populating
+	trackmenu.push_back(MenuOption("Back", "Back"));
+	// Create difficulty menu
+	MenuOptions diffmenu;
+	// TODO: Remove "back" and do actual populating
+	diffmenu.push_back(MenuOption("Back", "Back"));
+	// Populate root menu
+	m_menu.add(MenuOption(_("Track"), _("Select track to play"), trackmenu));
+	m_menu.add(MenuOption(_("Difficulty"), _("Select difficulty level"), diffmenu));
 }
 
 /// Load the appropriate neck texture
@@ -146,7 +154,6 @@ void GuitarGraph::changeTrack(int dir) {
 	else if (m_track_index == (--m_instrumentTracks.end())) m_track_index = (--m_instrumentTracks.end());
 	difficultyAuto(true);
 	updateNeck();
-	m_menu.refreshValues();
 }
 
 /// Get the difficulty as displayable string
@@ -246,8 +253,8 @@ void GuitarGraph::engine() {
 		// Menu keys
 		if (m_menuOpen) {
 			// Check first regular keys
-			if (ev.type == input::Event::PRESS && ev.button == 0 + m_drums) m_menu.changeValue(1);
-			else if (ev.type == input::Event::PRESS && ev.button == 1 + m_drums) m_menu.changeValue(-1);
+			if (ev.type == input::Event::PRESS && ev.button == 0 + m_drums) m_menu.action(1);
+			else if (ev.type == input::Event::PRESS && ev.button == 1 + m_drums) m_menu.action(-1);
 			else if (ev.type == input::Event::PRESS && ev.button == 2 + m_drums) m_menu.move(1);
 			else if (ev.type == input::Event::PRESS && ev.button == 3 + m_drums) m_menu.move(-1);
 			// Strum

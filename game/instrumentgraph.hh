@@ -14,6 +14,7 @@
 #include "screen.hh"
 #include "fs.hh"
 #include "i18n.hh"
+#include "theme.hh"
 
 
 /// Represents popup messages
@@ -108,7 +109,7 @@ class InstrumentGraph {
 	Events m_events;
 	typedef std::vector<Popup> Popups;
 	Popups m_popups;
-	InstrumentMenu m_menu;
+	Menu m_menu;
 	bool m_menuOpen;
 
 	// Shared functions for derived classes
@@ -121,6 +122,7 @@ class InstrumentGraph {
 	// Media
 	SvgTxtTheme m_text;
 	boost::scoped_ptr<SvgTxtThemeSimple> m_popupText;
+	boost::scoped_ptr<ThemeInstrumentMenu> m_menuTheme;
 
 	// Misc counters etc.
 	int m_pads; /// how many panels the current gaming mode uses

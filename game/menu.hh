@@ -2,28 +2,48 @@
 
 #include "opengl_text.hh"
 #include "surface.hh"
-#include "theme.hh"
+#include "configuration.hh"
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <string>
 #include <vector>
 
+class MenuOption;
+typedef std::vector<MenuOption> MenuOptions;
 
 /// struct for menu options
 struct MenuOption {
-	MenuOption();
-	MenuOption(const std::string nm, const std::string comm);
+	enum Type { CLOSE_SUBMENU, OPEN_SUBMENU, CHANGE_VALUE, SET_AND_CLOSE} type;
+
+	/// Construct a submenu closer
+	MenuOption(const std::string& nm, const std::string& comm);
+	/// Construct a value changer
+	MenuOption(const std::string& nm, const std::string& comm, ConfigItem* val);
+	/// Construct a value setter
+	MenuOption(const std::string& nm, const std::string& comm, ConfigItem* val, ConfigItem newval);
+	/// Construct a submenu opener
+	MenuOption(const std::string& nm, const std::string& comm, MenuOptions opts);
 	/// option name (it will be displayed as this)
 	std::string name;
 	/// extended information about the option selected
 	std::string comment;
+	/// value
+	ConfigItem* value;
+	/// value-to-be-set
+	ConfigItem newValue;
+	/// submenu
+	MenuOptions options;
 };
 
 
 /// struct for main menu options
-struct MainMenuOption: public MenuOption {
+struct MainMenuOption {
 	MainMenuOption() {};
 	MainMenuOption(const std::string nm, const std::string scrn, const std::string img, const std::string comm);
+	/// option name (it will be displayed as this)
+	std::string name;
+	/// extended information about the option selected
+	std::string comment;
 	/// screen to activate when option is pressed
 	std::string screen;
 	/// image to show when option is selected
@@ -31,41 +51,20 @@ struct MainMenuOption: public MenuOption {
 };
 
 
-class InstrumentGraph;
-typedef void (InstrumentGraph::*InstrumentMenuAdjustFunc)(int dir);
-typedef std::string (InstrumentGraph::*InstrumentMenuValueFunc)() const;
-
-/// struct for instrument joining menu option
-struct InstrumentMenuOption: public MenuOption {
-	InstrumentMenuOption(const std::string nm, const std::string comm,
-	  InstrumentMenuAdjustFunc fn1, InstrumentMenuValueFunc fn2 = NULL);
-	/// function to call to adjust the value
-	InstrumentMenuAdjustFunc adjust;
-	/// function to call to get the value
-	InstrumentMenuValueFunc getValue;
-	/// cached value
-	std::string value;
-};
-
-typedef std::vector<InstrumentMenuOption> InstrumentMenuOptions;
-
 /// Menu for selecting difficulty etc.
-struct InstrumentMenu {
+struct Menu {
 	/// constructor
-	InstrumentMenu(InstrumentGraph& ig): owner(ig), current(options.end()) { theme.reset(new ThemeInstrumentMenu()); }
+	Menu(): current(options.end()) { }
 	/// add a menu option
-	void add(InstrumentMenuOption opt);
+	void add(MenuOption opt);
 	/// move the selection
 	void move(int dir = 1);
 	/// adjust the selected value
-	void changeValue(int dir = 1);
-	/// refresh the cached values
-	void refreshValues();
+	void action(int dir = 1);
 	/// clear items
 	void clear() { options.clear(); }
 
-	InstrumentGraph& owner;
-	InstrumentMenuOptions options;
-	InstrumentMenuOptions::iterator current;
-	boost::scoped_ptr<ThemeInstrumentMenu> theme;
+	MenuOptions options;
+	MenuOptions root_options;
+	MenuOptions::iterator current;
 };

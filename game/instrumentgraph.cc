@@ -8,7 +8,7 @@ InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevType 
   m_audio(audio), m_song(song), m_input(input::DevType(inp)),
   m_stream(),
   m_cx(0.0, 0.2), m_width(0.5, 0.4),
-  m_menu(*this),
+  m_menu(),
   m_menuOpen(true),
   m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
   m_pads(),
@@ -24,19 +24,22 @@ InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevType 
   m_ready()
 {
 	m_popupText.reset(new SvgTxtThemeSimple(getThemePath("sing_popup_text.svg"), config["graphic/text_lod"].f()));
+	m_menuTheme.reset(new ThemeInstrumentMenu());
 
 	// Populate joining menu
-	m_menu.add(InstrumentMenuOption(_("Ready!"), _("Start performing!"), &InstrumentGraph::toggleMenu));
+	// TODO: Replace with option that actually does something
+	m_menu.add(MenuOption(_("Ready!"), _("Start performing!")));
 	// Guitar- / dancegraph specific options can be added in their constructors
 }
 
 
 void InstrumentGraph::setupPauseMenu() {
 	m_menu.clear();
-	m_menu.add(InstrumentMenuOption(_("Resume"), _("Back to performing!"), &InstrumentGraph::toggleMenu));
-	//m_menu.add(InstrumentMenuOption(_("Pause"), _("Toggle pause"), &InstrumentGraph::togglePause));
-	m_menu.add(InstrumentMenuOption(_("Restart"), _("Start the song from the beginning"), &InstrumentGraph::restart));
-	m_menu.add(InstrumentMenuOption(_("Quit"), _("Exit to song browser"), &InstrumentGraph::quit));
+	// TODO: Replace with options that actually do something
+	m_menu.add(MenuOption(_("Resume"), _("Back to performing!")));
+	//m_menu.add(MenuOption(_("Pause"), _("Toggle pause"), &InstrumentGraph::togglePause));
+	m_menu.add(MenuOption(_("Restart"), _("Start the song from the beginning")));
+	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")));
 }
 
 
@@ -54,17 +57,17 @@ void InstrumentGraph::drawMenu(double offsetX) {
 	if (m_menu.options.empty()) return;
 	float step = 0.075;
 	float y = -0.5 * m_menu.options.size() * step;
-	ThemeInstrumentMenu& th = *m_menu.theme;
-	for (InstrumentMenuOptions::iterator it = m_menu.options.begin(); it != m_menu.options.end(); ++it) {
+	ThemeInstrumentMenu& th = *m_menuTheme;
+	for (MenuOptions::iterator it = m_menu.options.begin(); it != m_menu.options.end(); ++it) {
+		SvgTxtTheme* txt = &th.option;
 		if (m_menu.current == it) {
 			//th.back_h.dimensions.middle(0.05 + offsetX).center(y);
 			//th.back_h.draw();
-			th.option_selected.dimensions.middle(-0.1 + offsetX).center(y);
-			th.option_selected.draw(it->value);
-		} else {
-			th.option.dimensions.middle(-0.1 + offsetX).center(y);
-			th.option.draw(it->value);
+			txt = &th.option_selected;
 		}
+		txt->dimensions.middle(-0.1 + offsetX).center(y);
+		txt->draw(it->name);
+
 		y += step;
 	}
 	if (m_menu.current->comment != "") {
