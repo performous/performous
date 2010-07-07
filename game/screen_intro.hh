@@ -26,8 +26,7 @@ class ScreenIntro : public Screen {
 	Audio& m_audio;
 	Capture& m_capture;
 	boost::scoped_ptr<ThemeIntro> theme;
-	boost::ptr_vector<MainMenuOption> m_menuOptions;
 	boost::scoped_ptr<Dialog> m_dialog;
-	unsigned int selected;
+	Menu m_menu;
 	bool m_first;
 };

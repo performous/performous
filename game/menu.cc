@@ -1,4 +1,6 @@
 #include "menu.hh"
+#include "screen.hh"
+#include "surface.hh"
 #include "fs.hh"
 #include "configuration.hh"
 #include "instrumentgraph.hh"
@@ -37,12 +39,15 @@ MenuOption::MenuOption(const std::string& nm, const std::string& comm, MenuOptio
 {}
 
 
-MainMenuOption::MainMenuOption(const std::string nm, const std::string scrn, const std::string img, const std::string comm):
+MenuOption::MenuOption(const std::string& nm, const std::string& comm, const std::string& scrn, const std::string& img):
+	type(ACTIVATE_SCREEN),
 	name(nm),
 	comment(comm),
-	screen(scrn),
-	image(getThemePath(img))
-{}
+	value(NULL),
+	newValue(scrn)
+{
+	if (!img.empty()) image.reset(new Surface(getThemePath(img)));
+}
 
 
 
@@ -79,6 +84,12 @@ void Menu::action(int dir) {
 			else m_level--;
 			options = root_options;
 			current = options.begin();
+			break;
+		case MenuOption::ACTIVATE_SCREEN:
+			ScreenManager* sm = ScreenManager::getSingletonPtr();
+			std::string screen = current->newValue.s();
+			if (screen.empty()) sm->finished();
+			else sm->activateScreen(screen);
 			break;
 	}
 }

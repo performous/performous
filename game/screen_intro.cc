@@ -6,16 +6,17 @@
 #include "i18n.hh"
 #include "joystick.hh"
 
-ScreenIntro::ScreenIntro(std::string const& name, Audio& audio, Capture& capture): Screen(name), m_audio(audio), m_capture(capture), selected(), m_first(true) {
+ScreenIntro::ScreenIntro(std::string const& name, Audio& audio, Capture& capture): Screen(name), m_audio(audio), m_capture(capture), m_first(true) {
 }
 
 void ScreenIntro::enter() {
 	m_audio.playMusic(getThemePath("menu.ogg"), true);
 	theme.reset(new ThemeIntro());
-	m_menuOptions.push_back(new MainMenuOption(_("Perform"), "Songs", "intro_sing.svg", _("Start performing!")));
-	m_menuOptions.push_back(new MainMenuOption(_("Practice"), "Practice", "intro_practice.svg", _("Check your skills or test the microphones")));
-	m_menuOptions.push_back(new MainMenuOption(_("Configure"), "Configuration", "intro_configure.svg", _("Configure game options")));
-	m_menuOptions.push_back(new MainMenuOption(_("Quit"), "", "intro_quit.svg", _("Leave the game")));
+	m_menu.clear();
+	m_menu.add(MenuOption(_("Perform"), _("Start performing!"), "Songs", "intro_sing.svg"));
+	m_menu.add(MenuOption(_("Practice"), _("Check your skills or test the microphones"), "Practice", "intro_practice.svg"));
+	m_menu.add(MenuOption(_("Configure"), _("Configure game options"), "Configuration", "intro_configure.svg"));
+	m_menu.add(MenuOption(_("Quit"), _("Leave the game"), "", "intro_quit.svg"));
 	if( m_first ) {
 		std::string msg;
 		if (!m_audio.isOpen()) msg = _("No playback devices could be used.\n");
@@ -28,49 +29,45 @@ void ScreenIntro::enter() {
 }
 
 void ScreenIntro::exit() {
-	m_menuOptions.clear();
+	m_menu.clear();
 	theme.reset();
 	m_dialog.reset();
 }
 
 void ScreenIntro::manageEvent(SDL_Event event) {
-	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	input::NavButton nav(input::getNav(event));
 	if (nav != input::NONE) {
 		if (m_dialog) { m_dialog.reset(); return; }
-		if (nav == input::CANCEL) selected = m_menuOptions.size() - 1;  // Move cursor to quit
-		else if (nav == input::DOWN || nav == input::RIGHT || nav == input::MOREDOWN) ++selected;
-		else if (nav == input::UP || nav == input::LEFT || nav == input::MOREUP) --selected;
-		else if (nav == input::START) {
-			std::string screen = m_menuOptions[selected].screen;
-			if (screen.empty()) sm->finished(); else sm->activateScreen(screen);
-		} else if (nav == input::PAUSE) m_audio.togglePause();
-		// Normalize selected to [0, size)
-		selected = (m_menuOptions.size() + selected) % m_menuOptions.size();
+		if (nav == input::CANCEL) m_menu.current = --(m_menu.options.end());  // Move cursor to quit
+		else if (nav == input::DOWN || nav == input::RIGHT || nav == input::MOREDOWN) m_menu.move(1);
+		else if (nav == input::UP || nav == input::LEFT || nav == input::MOREUP) m_menu.move(-1);
+		else if (nav == input::START) m_menu.action();
+		else if (nav == input::PAUSE) m_audio.togglePause();
 	}
 }
 
 void ScreenIntro::draw_menu_options() {
-	for (unsigned i = 0; i < m_menuOptions.size(); i++) {
-		if (i == selected) {
+	int i = 0;
+	for (MenuOptions::iterator it = m_menu.options.begin(); it != m_menu.options.end(); ++it, ++i) {
+		if (m_menu.current == it) {
 			theme->back_h.dimensions.left(-0.4).center(-0.097 + i*0.08);
 			theme->back_h.draw();
 			theme->option_selected.dimensions.left(-0.35).center(-0.1 + i*0.08);
-			theme->option_selected.draw(m_menuOptions[i].name);
+			theme->option_selected.draw(it->name);
 		} else {
-			theme->option[i].dimensions.left(-0.35).center(-0.1 + i*0.08);
-			theme->option[i].draw(m_menuOptions[i].name);
+			theme->option.dimensions.left(-0.35).center(-0.1 + i*0.08);
+			theme->option.draw(it->name);
 		}
 	}
 }
 
 void ScreenIntro::draw() {
 	theme->bg.draw();
-	m_menuOptions[selected].image.draw();
+	m_menu.current->image->draw();
 	theme->comment_bg.dimensions.center().screenBottom(-0.01);
 	theme->comment_bg.draw();
 	theme->comment.dimensions.left(-0.48).screenBottom(-0.028);
-	theme->comment.draw(m_menuOptions[selected].comment);
+	theme->comment.draw(m_menu.current->comment);
 	draw_menu_options();
 	if (m_dialog) m_dialog->draw();
 }

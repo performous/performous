@@ -19,13 +19,13 @@ namespace fs = boost::filesystem;
 Config config;
 
 
-ConfigItem::ConfigItem(bool bval): m_value(bval) { }
+ConfigItem::ConfigItem(bool bval): m_type("bool"), m_value(bval) { }
 
-ConfigItem::ConfigItem(int ival): m_value(ival) { }
+ConfigItem::ConfigItem(int ival): m_type("int"), m_value(ival) { }
 
-ConfigItem::ConfigItem(float fval): m_value(fval) { }
+ConfigItem::ConfigItem(float fval): m_type("float"), m_value(fval) { }
 
-ConfigItem::ConfigItem(std::string sval): m_value(sval) { }
+ConfigItem::ConfigItem(std::string sval): m_type("string"), m_value(sval) { }
 
 
 ConfigItem& ConfigItem::incdec(int dir) {

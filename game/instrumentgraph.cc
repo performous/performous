@@ -37,7 +37,7 @@ void InstrumentGraph::setupPauseMenu() {
 	m_menu.add(MenuOption(_("Resume"), _("Back to performing!")));
 	//m_menu.add(MenuOption(_("Pause"), _("Toggle pause"), &InstrumentGraph::togglePause));
 	m_menu.add(MenuOption(_("Restart"), _("Start the song from the beginning")));
-	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")));
+	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
 }
 
 

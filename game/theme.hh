@@ -82,7 +82,7 @@ public:
 	/// back highlight for selected option
 	Surface back_h;
 	/// menu option text
-	boost::ptr_vector<SvgTxtTheme> option;
+	SvgTxtTheme option;
 	/// menu selected option text
 	SvgTxtTheme option_selected;
 	/// menu comment text
