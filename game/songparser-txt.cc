@@ -8,28 +8,7 @@
 /// @file
 /// Functions used for parsing the UltraStar TXT song format
 
-namespace {
-	void assign(int& var, std::string const& str) {
-		try {
-			var = boost::lexical_cast<int>(str);
-		} catch (...) {
-			throw std::runtime_error("\"" + str + "\" is not valid integer value");
-		}
-	}
-	void assign(double& var, std::string str) {
-		std::replace(str.begin(), str.end(), ',', '.'); // Fix decimal separators
-		try {
-			var = boost::lexical_cast<double>(str);
-		} catch (...) {
-			throw std::runtime_error("\"" + str + "\" is not valid floating point value");
-		}
-	}
-	void assign(bool& var, std::string const& str) {
-		if (str == "YES" || str == "yes" || str == "1") var = true;
-		else if (str == "NO" || str == "no" || str == "0") var = false;
-		else throw std::runtime_error("Invalid boolean value: " + str);
-	}
-}
+using namespace SongParserUtil;
 
 /// 'Magick' to check if this file looks like correct format
 bool SongParser::txtCheck(std::vector<char> const& data) {

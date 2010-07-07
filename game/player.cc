@@ -44,8 +44,11 @@ void Player::update() {
 			m_maxLineScore = 0; // Not in SLEEP note anymore, so reset maximum
 		}
 		if (endTime < m_scoreIt->end) break;  // The note continues past this timestep
-		// Set accuracy
-		m_scoreIt->accuracy = std::max(m_scoreIt->accuracy, m_noteScore / m_vocals.m_scoreFactor / m_scoreIt->maxScore());
+		// Check if we got a star
+		if ((m_scoreIt->type == Note::NORMAL || m_scoreIt->type == Note::SLIDE || m_scoreIt->type == Note::GOLDEN)
+		  && (m_noteScore / m_vocals.m_scoreFactor / m_scoreIt->maxScore() > 0.8)) {
+			m_scoreIt->stars.push_back(m_color);
+		}
 		m_noteScore = 0; // Reset noteScore as we are moving on to the next one
 		++m_scoreIt;
 	}

@@ -78,7 +78,8 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
   m_arrows_cursor(getThemePath("arrows_cursor.svg")),
   m_arrows_hold(getThemePath("arrows_hold.svg")),
   m_mine(getThemePath("mine.svg")),
-  m_flow_direction(1)
+  m_flow_direction(1),
+  m_insideStop()
 {
 	// Initialize some arrays
 	for(size_t i = 0; i < max_panels; i++) {
@@ -189,11 +190,22 @@ void DanceGraph::engine() {
 	double time = m_audio.getPosition();
 	time -= config["audio/controller_delay"].f();
 	doUpdates();
+	// Handle stops
+	bool outsideStop = true;
 	for (Song::Stops::const_iterator it = m_song.stops.begin(), end = m_song.stops.end(); it != end; ++it) {
 		if (it->first >= time) break;
-		if (time < it->first + it->second) { time = it->first; break; } // Inside stop
+		if (time < it->first + it->second) {  // Inside stop
+			time = it->first;
+			if (!m_insideStop) {
+				m_popups.push_back(Popup(_("STOP!"),  glutil::Color(1.0f, 0.8f, 0.0), 2.0, m_popupText.get()));
+				m_insideStop = true;
+			}
+			outsideStop = false;
+			break;
+		}
 		time -= it->second;
 	}
+	if (outsideStop && m_insideStop) m_insideStop = false;
 	if (joining(time)) m_dead = 0; // Disable dead counting while joining
 	bool difficulty_changed = false;
 	// Handle all events
