@@ -44,7 +44,7 @@ struct MenuOption {
 /// Menu for selecting difficulty etc.
 struct Menu {
 	/// constructor
-	Menu(): current(options.end()), m_open(true), m_level(0) { }
+	Menu(): current_it(options.end()), m_open(true), m_level(0) { }
 	/// add a menu option
 	void add(MenuOption opt);
 	/// move the selection
@@ -54,16 +54,24 @@ struct Menu {
 	/// clear items
 	void clear();
 
+	bool empty() const { return options.empty(); }
 	bool isOpen() const { return m_open; }
 	void open() { m_open = true; }
 	void close() { m_open = false; }
 	void toggle() { m_open = !m_open; }
+	void moveToLast() { current_it = --(options.end()); }
 
-	MenuOptions options;
-	MenuOptions root_options;
-	MenuOptions::iterator current;
+	MenuOptions::iterator& currentRef() { return current_it; }
+	const MenuOptions::const_iterator current() const { return current_it; }
+	const MenuOptions::const_iterator begin() const { return options.begin(); }
+	const MenuOptions::const_iterator end() const { return options.end(); }
+	const MenuOptions getOptions() const { return options; }
 
   private:
+	MenuOptions::iterator current_it;
+	MenuOptions options;
+	MenuOptions root_options;
+
 	bool m_open;
 	int m_level;
 

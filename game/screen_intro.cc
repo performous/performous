@@ -38,7 +38,7 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 	input::NavButton nav(input::getNav(event));
 	if (nav != input::NONE) {
 		if (m_dialog) { m_dialog.reset(); return; }
-		if (nav == input::CANCEL) m_menu.current = --(m_menu.options.end());  // Move cursor to quit
+		if (nav == input::CANCEL) m_menu.moveToLast();  // Move cursor to quit
 		else if (nav == input::DOWN || nav == input::RIGHT || nav == input::MOREDOWN) m_menu.move(1);
 		else if (nav == input::UP || nav == input::LEFT || nav == input::MOREUP) m_menu.move(-1);
 		else if (nav == input::START) m_menu.action();
@@ -48,8 +48,8 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 
 void ScreenIntro::draw_menu_options() {
 	int i = 0;
-	for (MenuOptions::iterator it = m_menu.options.begin(); it != m_menu.options.end(); ++it, ++i) {
-		if (m_menu.current == it) {
+	for (MenuOptions::const_iterator it = m_menu.begin(); it != m_menu.end(); ++it, ++i) {
+		if (m_menu.current() == it) {
 			theme->back_h.dimensions.left(-0.4).center(-0.097 + i*0.08);
 			theme->back_h.draw();
 			theme->option_selected.dimensions.left(-0.35).center(-0.1 + i*0.08);
@@ -63,11 +63,11 @@ void ScreenIntro::draw_menu_options() {
 
 void ScreenIntro::draw() {
 	theme->bg.draw();
-	m_menu.current->image->draw();
+	m_menu.current()->image->draw();
 	theme->comment_bg.dimensions.center().screenBottom(-0.01);
 	theme->comment_bg.draw();
 	theme->comment.dimensions.left(-0.48).screenBottom(-0.028);
-	theme->comment.draw(m_menu.current->comment);
+	theme->comment.draw(m_menu.current()->comment);
 	draw_menu_options();
 	if (m_dialog) m_dialog->draw();
 }

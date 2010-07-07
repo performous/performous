@@ -56,13 +56,16 @@ void InstrumentGraph::toggleMenu(bool forceopen) {
 
 
 void InstrumentGraph::drawMenu(double offsetX) {
-	if (m_menu.options.empty()) return;
+	if (m_menu.empty()) return;
 	float step = 0.075;
-	float y = -0.5 * m_menu.options.size() * step;
+	float y = -0.5 * m_menu.getOptions().size() * step;
+	// Some helper vars
 	ThemeInstrumentMenu& th = *m_menuTheme;
-	for (MenuOptions::iterator it = m_menu.options.begin(); it != m_menu.options.end(); ++it) {
+	MenuOptions::const_iterator cur = m_menu.current();
+	// Loop through menu items
+	for (MenuOptions::const_iterator it = m_menu.begin(); it != m_menu.end(); ++it) {
 		SvgTxtTheme* txt = &th.option;
-		if (m_menu.current == it) {
+		if (cur == it) {
 			//th.back_h.dimensions.middle(0.05 + offsetX).center(y);
 			//th.back_h.draw();
 			txt = &th.option_selected;
@@ -72,11 +75,11 @@ void InstrumentGraph::drawMenu(double offsetX) {
 
 		y += step;
 	}
-	if (m_menu.current->comment != "") {
+	if (cur->comment != "") {
 		//th.comment_bg.dimensions.middle().screenBottom(-0.2);
 		//th.comment_bg.draw();
 		th.comment.dimensions.middle(-0.1 + offsetX).screenBottom(-0.2);
-		th.comment.draw(m_menu.current->comment);
+		th.comment.draw(cur->comment);
 	}
 }
 

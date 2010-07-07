@@ -53,41 +53,41 @@ MenuOption::MenuOption(const std::string& nm, const std::string& comm, const std
 
 void Menu::add(MenuOption opt) {
 	root_options.push_back(opt);
-	options = root_options; // Set current menu to root
-	current = options.begin(); // Reset iterator
+	options = root_options; // Set active menu to root
+	current_it = options.begin(); // Reset iterator
 }
 
 void Menu::move(int dir) {
-	if (dir > 0 && current != (--options.end())) ++current;
-	else if (dir < 0 && current != options.begin()) --current;
+	if (dir > 0 && current_it != (--options.end())) ++current_it;
+	else if (dir < 0 && current_it != options.begin()) --current_it;
 }
 
 void Menu::action(int dir) {
-	switch (current->type) {
+	switch (current_it->type) {
 		case MenuOption::OPEN_SUBMENU:
-			options = current->options;
-			current = options.begin();
+			options = current_it->options;
+			current_it = options.begin();
 			m_level++;
 			break;
 		case MenuOption::CHANGE_VALUE:
-			if (current->value) {
-				if (dir > 0) ++(*(current->value));
-				else if (dir < 0) --(*(current->value));
+			if (current_it->value) {
+				if (dir > 0) ++(*(current_it->value));
+				else if (dir < 0) --(*(current_it->value));
 			}
 			break;
 		case MenuOption::SET_AND_CLOSE:
-			if (current->value) *(current->value) = current->newValue;
+			if (current_it->value) *(current_it->value) = current_it->newValue;
 			// Fall-through to closing
 		case MenuOption::CLOSE_SUBMENU:
 			// TODO: Handle more than one level of submenus
 			if (m_level == 0) close();
 			else m_level--;
 			options = root_options;
-			current = options.begin();
+			current_it = options.begin();
 			break;
 		case MenuOption::ACTIVATE_SCREEN:
 			ScreenManager* sm = ScreenManager::getSingletonPtr();
-			std::string screen = current->newValue.s();
+			std::string screen = current_it->newValue.s();
 			if (screen.empty()) sm->finished();
 			else sm->activateScreen(screen);
 			break;
@@ -97,5 +97,5 @@ void Menu::action(int dir) {
 void Menu::clear() {
 	options.clear();
 	root_options.clear();
-	current = options.end();
+	current_it = options.end();
 }
