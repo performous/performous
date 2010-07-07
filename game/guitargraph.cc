@@ -206,6 +206,7 @@ bool GuitarGraph::difficulty(Difficulty level) {
 void GuitarGraph::engine() {
 	double time = m_audio.getPosition();
 	time -= config["audio/controller_delay"].f();
+	doUpdates();
 	// Handle key markers
 	if (!m_drums) {
 		for (int i = 0; i < m_pads; ++i) {
@@ -229,8 +230,8 @@ void GuitarGraph::engine() {
 			break;
 		}
 		// Handle Start/Select keypresses
-		if (ev.nav == input::CANCEL) toggleMenu();
-		if (ev.nav == input::START && !m_menuOpen) ev.button = input::STARPOWER_BUTTON;
+		if (ev.nav == input::CANCEL) m_menu.toggle();
+		if (ev.nav == input::START && !menuOpen()) ev.button = input::STARPOWER_BUTTON;
 		//if (ev.type == input::Event::PRESS && ev.button > input::STARPOWER_BUTTON) {
 			//if (ev.button == 9) ev.button = input::STARPOWER_BUTTON; // Start works for GodMode
 			//else continue;
@@ -251,7 +252,7 @@ void GuitarGraph::engine() {
 		if (ev.type == input::Event::PRESS) m_pressed_anim[!m_drums + ev.button].setValue(1.0);
 		else if (ev.type == input::Event::PICK) m_pressed_anim[0].setValue(1.0);
 		// Menu keys
-		if (m_menuOpen) {
+		if (menuOpen()) {
 			// Check first regular keys
 			if (ev.type == input::Event::PRESS && ev.button == 0 + m_drums) m_menu.action(1);
 			else if (ev.type == input::Event::PRESS && ev.button == 1 + m_drums) m_menu.action(-1);
@@ -1011,7 +1012,7 @@ void GuitarGraph::drawDrumfill(float tBeg, float tEnd) {
 /// Draw popups and other info texts
 void GuitarGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 	// Draw info
-	if (m_menuOpen) {
+	if (menuOpen()) {
 		drawMenu(offsetX);
 	} else {
 		float xcor = 0.35 * dimensions.w();

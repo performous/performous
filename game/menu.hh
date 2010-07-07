@@ -54,7 +54,7 @@ struct MainMenuOption {
 /// Menu for selecting difficulty etc.
 struct Menu {
 	/// constructor
-	Menu(): current(options.end()) { }
+	Menu(): current(options.end()), m_open(true), m_level(0) { }
 	/// add a menu option
 	void add(MenuOption opt);
 	/// move the selection
@@ -62,9 +62,19 @@ struct Menu {
 	/// adjust the selected value
 	void action(int dir = 1);
 	/// clear items
-	void clear() { options.clear(); }
+	void clear();
+
+	bool isOpen() const { return m_open; }
+	void open() { m_open = true; }
+	void close() { m_open = false; }
+	void toggle() { m_open = !m_open; }
 
 	MenuOptions options;
 	MenuOptions root_options;
 	MenuOptions::iterator current;
+
+  private:
+	bool m_open;
+	int m_level;
+
 };

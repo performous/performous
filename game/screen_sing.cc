@@ -248,8 +248,8 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		}
 		// Esc-key needs special handling, it is global pause
 		if (event.type == SDL_KEYDOWN && key == SDLK_ESCAPE && !m_audio.isPaused()) {
-			for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it) it->toggleMenu(1);
-			for (Dancers::iterator it = m_dancers.begin(); it != m_dancers.end(); ++it) it->toggleMenu(1);
+			for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it) it->toggleMenu(true);
+			for (Dancers::iterator it = m_dancers.begin(); it != m_dancers.end(); ++it) it->toggleMenu(true);
 		}
 		// Start button has special functions for skipping things (only in singing for now)
 		if (nav == input::START && m_only_singers_alive && !m_song->vocals.notes.empty() && !m_audio.isPaused()) {

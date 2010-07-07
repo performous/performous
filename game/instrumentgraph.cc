@@ -9,7 +9,6 @@ InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevType 
   m_stream(),
   m_cx(0.0, 0.2), m_width(0.5, 0.4),
   m_menu(),
-  m_menuOpen(true),
   m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
   m_pads(),
   m_correctness(0.0, 5.0),
@@ -27,7 +26,6 @@ InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevType 
 	m_menuTheme.reset(new ThemeInstrumentMenu());
 
 	// Populate joining menu
-	// TODO: Replace with option that actually does something
 	m_menu.add(MenuOption(_("Ready!"), _("Start performing!")));
 	// Guitar- / dancegraph specific options can be added in their constructors
 }
@@ -43,13 +41,17 @@ void InstrumentGraph::setupPauseMenu() {
 }
 
 
-void InstrumentGraph::toggleMenu(int dontforce) {
-	if (dontforce == 0) { m_menuOpen = true; return; }
-	if (m_menuOpen && !m_ready) {
+void InstrumentGraph::doUpdates() {
+	if (!menuOpen() && !m_ready) {
 		m_ready = true;
 		setupPauseMenu();
 	}
-	m_menuOpen = !m_menuOpen;
+}
+
+
+void InstrumentGraph::toggleMenu(bool forceopen) {
+	if (forceopen) { m_menu.open(); return; }
+	m_menu.toggle();
 }
 
 

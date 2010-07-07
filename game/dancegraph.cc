@@ -188,6 +188,7 @@ void DanceGraph::difficulty(DanceDifficulty level) {
 void DanceGraph::engine() {
 	double time = m_audio.getPosition();
 	time -= config["audio/controller_delay"].f();
+	doUpdates();
 	for (Song::Stops::const_iterator it = m_song.stops.begin(), end = m_song.stops.end(); it != end; ++it) {
 		if (it->first >= time) break;
 		if (time < it->first + it->second) { time = it->first; break; } // Inside stop
@@ -203,8 +204,8 @@ void DanceGraph::engine() {
 			break;
 		}
 		// Menu keys
-		if (m_menuOpen && ev.type == input::Event::PRESS) {
-			if (ev.nav == input::CANCEL) toggleMenu();
+		if (menuOpen() && ev.type == input::Event::PRESS) {
+			if (ev.nav == input::CANCEL) m_menu.close();
 			else if (ev.nav == input::RIGHT || ev.nav == input::START) m_menu.action(1);
 			else if (ev.nav == input::LEFT) m_menu.action(-1);
 			else if (ev.nav == input::UP) m_menu.move(-1);
@@ -477,7 +478,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 
 /// Draw popups and other info texts
 void DanceGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
-	if (m_menuOpen) {
+	if (menuOpen()) {
 		// Draw join menu
 		drawMenu(offsetX);
 	} else {

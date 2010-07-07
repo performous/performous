@@ -62,6 +62,7 @@ void Menu::action(int dir) {
 		case MenuOption::OPEN_SUBMENU:
 			options = current->options;
 			current = options.begin();
+			m_level++;
 			break;
 		case MenuOption::CHANGE_VALUE:
 			if (current->value) {
@@ -74,9 +75,16 @@ void Menu::action(int dir) {
 			// Fall-through to closing
 		case MenuOption::CLOSE_SUBMENU:
 			// TODO: Handle more than one level of submenus
-			// TODO: Closing root menu should signal that the menu is closing
+			if (m_level == 0) close();
+			else m_level--;
 			options = root_options;
 			current = options.begin();
 			break;
 	}
+}
+
+void Menu::clear() {
+	options.clear();
+	root_options.clear();
+	current = options.end();
 }

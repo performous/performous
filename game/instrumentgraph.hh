@@ -74,7 +74,8 @@ class InstrumentGraph {
 	virtual void changeTrack(int dir = 1) = 0;
 	virtual void changeDifficulty(int dir = 1) = 0;
 
-	void toggleMenu(int dontforce = 1);
+	void doUpdates();
+	void toggleMenu(bool forceopen = false);
 	void togglePause(int) { m_audio.togglePause(); }
 	void restart(int) { /* TODO: Implement */ }
 	void quit(int) { ScreenManager::getSingletonPtr()->activateScreen("Songs"); }
@@ -82,7 +83,7 @@ class InstrumentGraph {
 
 	// General getters
 	bool ready() const { return m_ready; };
-	bool menuOpen() const { return m_menuOpen; }
+	bool menuOpen() const { return m_menu.isOpen(); }
 	void position(double cx, double width) { m_cx.setTarget(cx); m_width.setTarget(width); }
 	unsigned stream() const { return m_stream; }
 	double correctness() const { return m_correctness.get(); }
@@ -110,7 +111,6 @@ class InstrumentGraph {
 	typedef std::vector<Popup> Popups;
 	Popups m_popups;
 	Menu m_menu;
-	bool m_menuOpen;
 
 	// Shared functions for derived classes
 	void setupPauseMenu();
