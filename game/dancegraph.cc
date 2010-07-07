@@ -8,6 +8,13 @@
 #include <algorithm>
 
 namespace {
+	// Position mappings for panels
+	static const int mapping4[max_panels] = {0, 1, 2, 3,-1,-1,-1,-1,-1,-1};
+	static const int mapping5[max_panels] = {0, 1, 3, 4, 2,-1,-1,-1,-1,-1};
+	static const int mapping6[max_panels] = {0, 2, 3, 5, 1, 4,-1,-1,-1,-1};
+	static const int mapping7[max_panels] = {0, 2, 4, 6, 1, 5, 3,-1,-1,-1};
+	static const int mapping8[max_panels] = {0, 3, 4, 7, 1, 6, 2, 5,-1,-1};
+	static const int mapping10[max_panels]= {0, 3, 4, 7, 1, 6, 2, 5,-1,-1};
 	const std::string diffv[] = { "Beginner", "Easy", "Medium", "Hard", "Challenge" };
 	const int death_delay = 25; // Delay in notes after which the player is hidden
 	const float join_delay = 7.0f; // Time to select track/difficulty when joining mid-game
@@ -92,29 +99,34 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
 	if(m_song.danceTracks.empty())
 		throw std::runtime_error("Could not find any dance tracks.");
 	changeTrack(0); // Get an initial game mode and notes for it
+}
 
+
+void DanceGraph::setupJoinMenu() {
+	m_menu.clear();
+	m_selectedTrack = ConfigItem(getTrack());
+	m_selectedDifficulty = ConfigItem(m_level);
 	// Create track menu
 	MenuOptions trackmenu;
-	// TODO: Remove "back" and do actual populating
-	trackmenu.push_back(MenuOption("Back", "Back"));
+	for (DanceTracks::const_iterator it = m_song.danceTracks.begin(); it != m_song.danceTracks.end(); ++it) {
+		trackmenu.push_back(MenuOption(it->first, _("Select track to play"), &m_selectedTrack, ConfigItem(it->first)));
+	}
 	// Create difficulty menu
 	MenuOptions diffmenu;
-	// TODO: Remove "back" and do actual populating
-	diffmenu.push_back(MenuOption("Back", "Back"));
+	for (int level = 0; level < DIFFICULTYCOUNT; ++level) {
+		if (difficulty(DanceDifficulty(level), true))
+			diffmenu.push_back(MenuOption(diffv[level], _("Select difficulty level"), &m_selectedDifficulty, ConfigItem(level)));
+	}
 	// Populate root menu
-	m_menu.add(MenuOption(_("Track"), _("Select track to play"), trackmenu));
-	m_menu.add(MenuOption(_("Difficulty"), _("Select difficulty level"), diffmenu));
+	std::string s(" (");
+	m_menu.add(MenuOption(_("Ready!"), _("Start performing!")));
+	m_menu.add(MenuOption(_("Track"), _("Select track to play") + s + getTrack() + ")", trackmenu));
+	m_menu.add(MenuOption(_("Difficulty"), _("Select difficulty level") + s + getDifficultyString() + ")", diffmenu));
+	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
 }
 
 /// Attempt to select next/previous game mode
 void DanceGraph::changeTrack(int direction) {
-	// Position mappings for panels
-	static const int mapping4[max_panels] = {0, 1, 2, 3,-1,-1,-1,-1,-1,-1};
-	static const int mapping5[max_panels] = {0, 1, 3, 4, 2,-1,-1,-1,-1,-1};
-	static const int mapping6[max_panels] = {0, 2, 3, 5, 1, 4,-1,-1,-1,-1};
-	static const int mapping7[max_panels] = {0, 2, 4, 6, 1, 5, 3,-1,-1,-1};
-	static const int mapping8[max_panels] = {0, 3, 4, 7, 1, 6, 2, 5,-1,-1};
-	static const int mapping10[max_panels]= {0, 3, 4, 7, 1, 6, 2, 5,-1,-1};
 	// Cycling
 	if (direction == 0) {
 		m_curTrackIt = m_song.danceTracks.find("dance-single");
@@ -127,6 +139,18 @@ void DanceGraph::changeTrack(int direction) {
 		if (m_curTrackIt == m_song.danceTracks.begin()) m_curTrackIt = (--m_song.danceTracks.end());
 		else m_curTrackIt--;
 	}
+	finalizeTrackChange();
+}
+
+/// Attempt to select a specific game mode
+void DanceGraph::setTrack(const std::string& track) {
+	DanceTracks::const_iterator it = m_song.danceTracks.find(track);
+	if (it == m_song.danceTracks.end()) return;
+	m_curTrackIt = it;
+	finalizeTrackChange();
+}
+
+void DanceGraph::finalizeTrackChange() {
 	// Determine how many arrow lines are needed
 	m_gamingMode = m_curTrackIt->first;
 	std::string gm = m_gamingMode;
@@ -144,6 +168,7 @@ void DanceGraph::changeTrack(int direction) {
 	else throw std::runtime_error("Unknown track " + gm);
 
 	changeDifficulty(0); // Construct new notes
+	setupJoinMenu();
 }
 
 /// Are we alive?
@@ -170,10 +195,13 @@ void DanceGraph::changeDifficulty(int delta) {
 }
 
 /// Select a difficulty and construct DanceNotes and score normalizer for it
-void DanceGraph::difficulty(DanceDifficulty level) {
+bool DanceGraph::difficulty(DanceDifficulty level, bool check_only) {
 	// TODO: error handling
+	DanceDifficultyMap const& ddm = m_song.danceTracks.find(m_gamingMode)->second;
+	if (ddm.find(level) == ddm.end()) return false;
+	else if (check_only) return true;
 	m_notes.clear();
-	DanceTrack const& track = m_song.danceTracks.find(m_gamingMode)->second.find(level)->second;
+	DanceTrack const& track = ddm.find(level)->second;
 	for(Notes::const_iterator it = track.notes.begin(); it != track.notes.end(); it++)
 		m_notes.push_back(DanceNote(*it));
 	std::sort(m_notes.begin(), m_notes.end(), lessEnd()); // for engine's iterators
@@ -183,6 +211,8 @@ void DanceGraph::difficulty(DanceDifficulty level) {
 	m_scoreFactor = 1;
 	if(m_notes.size() != 0)
 		m_scoreFactor = 10000.0 / (50 * m_notes.size()); // maxpoints / (notepoint * notes)
+	setupJoinMenu();
+	return true;
 }
 
 /// Handles input and some logic
@@ -223,6 +253,9 @@ void DanceGraph::engine() {
 			else if (ev.nav == input::UP) m_menu.move(-1);
 			else if (ev.nav == input::DOWN) m_menu.move(1);
 			difficulty_changed = true;
+			// See if anything changed
+			if (m_selectedTrack.s() != getTrack()) setTrack(m_selectedTrack.s());
+			else if (m_selectedDifficulty.i() != m_level) difficulty(DanceDifficulty(m_selectedDifficulty.i()));
 		}
 		// Gaming controls
 		if (ev.type == input::Event::RELEASE) {

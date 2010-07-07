@@ -110,9 +110,11 @@ class GuitarGraph: public InstrumentGraph {
 		DIFFICULTY_AMAZING,  // Expert
 		DIFFICULTYCOUNT
 	} m_level;
+	void setupJoinMenu();
 	void nextTrack(bool fast = false);
+	void setTrack(const std::string& track);
 	void difficultyAuto(bool tryKeepCurrent = false);
-	bool difficulty(Difficulty level);
+	bool difficulty(Difficulty level, bool check_only = false);
 	InstrumentTracksConstPtr m_instrumentTracks; /// tracks
 	InstrumentTracksConstPtr::const_iterator m_track_index;
 	unsigned m_holds[max_panels]; /// active hold notes

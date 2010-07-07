@@ -125,6 +125,8 @@ class InstrumentGraph {
 	boost::scoped_ptr<ThemeInstrumentMenu> m_menuTheme;
 
 	// Misc counters etc.
+	ConfigItem m_selectedTrack; /// menu modifies this to select track
+	ConfigItem m_selectedDifficulty; /// menu modifies this to select difficulty
 	int m_pads; /// how many panels the current gaming mode uses
 	bool m_pressed[max_panels]; /// is certain panel pressed currently
 	AnimValue m_pressed_anim[max_panels]; /// animation for panel pressing

@@ -10,6 +10,8 @@ InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevType 
   m_cx(0.0, 0.2), m_width(0.5, 0.4),
   m_menu(),
   m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
+  m_selectedTrack(""),
+  m_selectedDifficulty(0),
   m_pads(),
   m_correctness(0.0, 5.0),
   m_score(),
@@ -24,10 +26,6 @@ InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevType 
 {
 	m_popupText.reset(new SvgTxtThemeSimple(getThemePath("sing_popup_text.svg"), config["graphic/text_lod"].f()));
 	m_menuTheme.reset(new ThemeInstrumentMenu());
-
-	// Populate joining menu
-	m_menu.add(MenuOption(_("Ready!"), _("Start performing!")));
-	// Guitar- / dancegraph specific options can be added in their constructors
 }
 
 

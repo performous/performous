@@ -125,17 +125,31 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number,
 		if (++m_track_index == m_instrumentTracks.end()) m_track_index = m_instrumentTracks.begin();
 	difficultyAuto();
 	updateNeck();
+	setupJoinMenu();
+}
+
+
+void GuitarGraph::setupJoinMenu() {
+	m_menu.clear();
+	m_selectedTrack = ConfigItem(getTrack());
+	m_selectedDifficulty = ConfigItem(m_level);
 	// Create track menu
 	MenuOptions trackmenu;
-	// TODO: Remove "back" and do actual populating
-	trackmenu.push_back(MenuOption("Back", "Back"));
+	for (InstrumentTracksConstPtr::const_iterator it = m_instrumentTracks.begin(); it != m_instrumentTracks.end(); ++it) {
+		trackmenu.push_back(MenuOption(it->first, _("Select track to play"), &m_selectedTrack, ConfigItem(it->first)));
+	}
 	// Create difficulty menu
 	MenuOptions diffmenu;
-	// TODO: Remove "back" and do actual populating
-	diffmenu.push_back(MenuOption("Back", "Back"));
+	for (int level = 0; level < DIFFICULTYCOUNT; ++level) {
+		if (difficulty(Difficulty(level), true))
+			diffmenu.push_back(MenuOption(diffv[level].name, _("Select difficulty level"), &m_selectedDifficulty, ConfigItem(level)));
+	}
 	// Populate root menu
-	m_menu.add(MenuOption(_("Track"), _("Select track to play"), trackmenu));
-	m_menu.add(MenuOption(_("Difficulty"), _("Select difficulty level"), diffmenu));
+	std::string s(" (");
+	m_menu.add(MenuOption(_("Ready!"), _("Start performing!")));
+	m_menu.add(MenuOption(_("Track"), _("Select track to play") + s + getTrack() + ")", trackmenu));
+	m_menu.add(MenuOption(_("Difficulty"), _("Select difficulty level") + s + getDifficultyString() + ")", diffmenu));
+	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
 }
 
 /// Load the appropriate neck texture
@@ -154,6 +168,16 @@ void GuitarGraph::changeTrack(int dir) {
 	else if (m_track_index == (--m_instrumentTracks.end())) m_track_index = (--m_instrumentTracks.end());
 	difficultyAuto(true);
 	updateNeck();
+	setupJoinMenu();
+}
+
+/// Set specific track
+void GuitarGraph::setTrack(const std::string& track) {
+	InstrumentTracksConstPtr::const_iterator it = m_instrumentTracks.find(track);
+	if (it != m_instrumentTracks.end()) m_track_index = it;
+	difficultyAuto(true);
+	updateNeck();
+	setupJoinMenu();
 }
 
 /// Get the difficulty as displayable string
@@ -178,7 +202,7 @@ void GuitarGraph::difficultyAuto(bool tryKeep) {
 }
 
 /// Attempt to use a given difficulty level
-bool GuitarGraph::difficulty(Difficulty level) {
+bool GuitarGraph::difficulty(Difficulty level, bool check_only) {
 	InstrumentTrack const& track = *m_track_index->second;
 	// Find the stream number
 	for (InstrumentTracks::const_iterator it = m_song.instrumentTracks.begin(); it != m_song.instrumentTracks.end(); ++it) {
@@ -190,6 +214,7 @@ bool GuitarGraph::difficulty(Difficulty level) {
 	int fail = 0;
 	for (int fret = 0; fret < m_pads; ++fret) if (nm.find(basepitch + fret) == nm.end()) ++fail;
 	if (fail == m_pads) return false;
+	if (check_only) return true;
 	Difficulty prevLevel = m_level;
 	m_level = level;
 	updateChords();
@@ -198,6 +223,7 @@ bool GuitarGraph::difficulty(Difficulty level) {
 		updateChords();
 		return false;
 	}
+	setupJoinMenu();
 	return true;
 }
 
@@ -265,6 +291,9 @@ void GuitarGraph::engine() {
 				if (ev.nav == input::DOWN || ev.nav == input::RIGHT) m_menu.move(1);
 				else if (ev.nav == input::UP || ev.nav == input::LEFT) m_menu.move(-1);
 			}
+			// See if anything changed
+			if (m_selectedTrack.s() != getTrack()) setTrack(m_selectedTrack.s());
+			else if (m_selectedDifficulty.i() != m_level) difficulty(Difficulty(m_selectedDifficulty.i()));
 		// Playing
 		} else if (m_drums) {
 			if (ev.type == input::Event::PRESS) drumHit(time, ev.button);

@@ -47,7 +47,10 @@ class DanceGraph: public InstrumentGraph {
   private:
 	// Difficulty & mode selection
 	enum DanceStep { STEP_LEFT, STEP_DOWN, STEP_UP, STEP_RIGHT };
-	void difficulty(DanceDifficulty level);
+	void setupJoinMenu();
+	void setTrack(const std::string& track);
+	void finalizeTrackChange();
+	bool difficulty(DanceDifficulty level, bool check_only = false);
 	DanceDifficulty m_level;
 	std::string m_gamingMode; /// current game mode
 	DanceTracks::const_iterator m_curTrackIt; /// iterator to the currently selected game mode
