@@ -8,7 +8,7 @@
 #include <vector>
 
 class Surface;
-class MenuOption;
+struct MenuOption;
 
 typedef std::vector<MenuOption> MenuOptions;
 

@@ -146,9 +146,11 @@ void GuitarGraph::setupJoinMenu() {
 	}
 	// Populate root menu
 	std::string s(" (");
+	std::string le = m_leftymode.b() ? _("ON") : _("OFF");
 	m_menu.add(MenuOption(_("Ready!"), _("Start performing!")));
 	m_menu.add(MenuOption(_("Track"), _("Select track to play") + s + getTrack() + ")", trackmenu));
 	m_menu.add(MenuOption(_("Difficulty"), _("Select difficulty level") + s + getDifficultyString() + ")", diffmenu));
+	m_menu.add(MenuOption(_("Lefty-mode"), _("Toggle left-handed mode") + s + le + ")", &m_leftymode));
 	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
 }
 
@@ -272,13 +274,14 @@ void GuitarGraph::engine() {
 			if (ev.type == input::Event::WHAMMY) whammy = (1.0 + ev.button + 2.0*(rand()/double(RAND_MAX))) / 4.0;
 		} else {
 			// Handle drum lefty-mode
-			if (m_leftymode && ev.button > 0) ev.button = m_pads - ev.button;
+			if (m_leftymode.b() && ev.button > 0) ev.button = m_pads - ev.button;
 		}
 		// Keypress anims
 		if (ev.type == input::Event::PRESS) m_pressed_anim[!m_drums + ev.button].setValue(1.0);
 		else if (ev.type == input::Event::PICK) m_pressed_anim[0].setValue(1.0);
 		// Menu keys
 		if (menuOpen()) {
+			bool old_lefty = m_leftymode.b();
 			// Check first regular keys
 			if (ev.type == input::Event::PRESS && ev.button == 0 + m_drums) m_menu.action(1);
 			else if (ev.type == input::Event::PRESS && ev.button == 1 + m_drums) m_menu.action(-1);
@@ -294,6 +297,7 @@ void GuitarGraph::engine() {
 			// See if anything changed
 			if (m_selectedTrack.s() != getTrack()) setTrack(m_selectedTrack.s());
 			else if (m_selectedDifficulty.i() != m_level) difficulty(Difficulty(m_selectedDifficulty.i()));
+			else if (old_lefty != m_leftymode.b()) setupJoinMenu();
 		// Playing
 		} else if (m_drums) {
 			if (ev.type == input::Event::PRESS) drumHit(time, ev.button);

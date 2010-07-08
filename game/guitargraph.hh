@@ -98,7 +98,7 @@ class GuitarGraph: public InstrumentGraph {
 	// Flags
 	bool m_drums; /// are we using drums?
 	bool m_use3d; /// are we using 3d?
-	bool m_leftymode; /// switch guitar notes to right-to-left direction
+	ConfigItem m_leftymode; /// switch guitar notes to right-to-left direction
 	bool m_practmode; /// switch to enable practice mode
 
 	// Track stuff
@@ -126,7 +126,7 @@ class GuitarGraph: public InstrumentGraph {
 	void drawNote(int fret, glutil::Color, float tBeg, float tEnd, float whammy = 0, bool tappable = false, bool hit = false, double hitAnim = 0.0, double releaseTime = 0.0);
 	void drawDrumfill(float tBeg, float tEnd);
 	void drawInfo(double time, double offsetX, Dimensions dimensions);
-	float getFretX(int fret) const { return (-2.0f + fret- (m_drums ? 0.5 : 0)) * (m_leftymode ? -1 : 1); }
+	float getFretX(int fret) { return (-2.0f + fret- (m_drums ? 0.5 : 0)) * (m_leftymode.b() ? -1 : 1); }
 
 	// Chords & notes
 	void updateChords();
