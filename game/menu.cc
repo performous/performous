@@ -65,6 +65,7 @@ void Menu::move(int dir) {
 void Menu::action(int dir) {
 	switch (current_it->type) {
 		case MenuOption::OPEN_SUBMENU:
+			if (current_it->options.empty()) break;
 			options = current_it->options;
 			current_it = options.begin();
 			m_level++;
