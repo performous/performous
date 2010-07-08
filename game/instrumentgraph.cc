@@ -70,13 +70,12 @@ void InstrumentGraph::drawMenu(double offsetX) {
 		}
 		txt->dimensions.middle(-0.1 + offsetX).center(y);
 		txt->draw(it->getName());
-
 		y += step;
 	}
 	if (cur->getComment() != "") {
 		//th.comment_bg.dimensions.middle().screenBottom(-0.2);
 		//th.comment_bg.draw();
-		th.comment.dimensions.middle(-0.1 + offsetX).screenBottom(-0.2);
+		th.comment.dimensions.middle(-0.15 + offsetX).screenBottom(-0.2);
 		th.comment.draw(cur->getComment());
 	}
 }

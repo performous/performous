@@ -40,30 +40,30 @@ ThemeConfiguration::ThemeConfiguration():
 	Theme(getThemePath("configuration_bg.svg")),
 	item(getThemePath("configuration_item.svg"), config["graphic/text_lod"].f()),
 	value(getThemePath("configuration_value.svg"), config["graphic/text_lod"].f()),
-	comment(getThemePath("menu_comment.svg"), config["graphic/text_lod"].f()),
-	short_comment(getThemePath("menu_short_comment.svg"), config["graphic/text_lod"].f()),
-	comment_bg(getThemePath("menu_comment_bg.svg")),
-	short_comment_bg(getThemePath("menu_scomment_bg.svg"))
+	comment(getThemePath("mainmenu_comment.svg"), config["graphic/text_lod"].f()),
+	short_comment(getThemePath("mainmenu_short_comment.svg"), config["graphic/text_lod"].f()),
+	comment_bg(getThemePath("mainmenu_comment_bg.svg")),
+	short_comment_bg(getThemePath("mainmenu_scomment_bg.svg"))
 {}
 
 ThemeIntro::ThemeIntro():
 	Theme(getThemePath("intro_bg.svg")),
-	back_h(getThemePath("menu_back_highlight.svg")),
-	option(getThemePath("menu_option.svg"), config["graphic/text_lod"].f()),
-	option_selected(getThemePath("menu_option_selected.svg"), config["graphic/text_lod"].f()),
-	comment(getThemePath("menu_comment.svg"), config["graphic/text_lod"].f()),
-	comment_bg(getThemePath("menu_comment_bg.svg"))
+	back_h(getThemePath("mainmenu_back_highlight.svg")),
+	option(getThemePath("mainmenu_option.svg"), config["graphic/text_lod"].f()),
+	option_selected(getThemePath("mainmenu_option_selected.svg"), config["graphic/text_lod"].f()),
+	comment(getThemePath("mainmenu_comment.svg"), config["graphic/text_lod"].f()),
+	comment_bg(getThemePath("mainmenu_comment_bg.svg"))
 {
 	back_h.dimensions.fixedHeight(0.08f);
 }
 
 ThemeInstrumentMenu::ThemeInstrumentMenu():
 	Theme(getThemePath("warning.svg")),
-	back_h(getThemePath("menu_back_highlight.svg")),
-	option(getThemePath("menu_option.svg"), config["graphic/text_lod"].f()),
-	option_selected(getThemePath("menu_option_selected.svg"), config["graphic/text_lod"].f()),
-	comment(getThemePath("menu_comment.svg"), config["graphic/text_lod"].f()),
-	comment_bg(getThemePath("menu_comment_bg.svg"))
+	back_h(getThemePath("instrumentmenu_back_highlight.svg")),
+	option(getThemePath("instrumentmenu_option.svg"), config["graphic/text_lod"].f()),
+	option_selected(getThemePath("instrumentmenu_option_selected.svg"), config["graphic/text_lod"].f()),
+	comment(getThemePath("instrumentmenu_comment.svg"), config["graphic/text_lod"].f())
+	//comment_bg(getThemePath("menu_comment_bg.svg"))
 {
 	back_h.dimensions.fixedHeight(0.08f);
 }

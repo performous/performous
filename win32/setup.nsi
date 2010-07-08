@@ -167,20 +167,24 @@ Section "SezionePrincipale" SEC01
   File "${FILES_PATH}\themes\default\icon.svg"
   File "${FILES_PATH}\themes\default\instrument_cover.svg"
   File "${FILES_PATH}\themes\default\instrumenthelp.svg"
+  File "${FILES_PATH}\themes\default\instrumentmenu_back_highlight.svg"
+  File "${FILES_PATH}\themes\default\instrumentmenu_comment.svg"
+  File "${FILES_PATH}\themes\default\instrumentmenu_option.svg"
+  File "${FILES_PATH}\themes\default\instrumentmenu_option_selected.svg"
   File "${FILES_PATH}\themes\default\instruments.svg"
   File "${FILES_PATH}\themes\default\intro_bg.svg"
   File "${FILES_PATH}\themes\default\intro_configure.svg"
   File "${FILES_PATH}\themes\default\intro_practice.svg"
   File "${FILES_PATH}\themes\default\intro_quit.svg"
   File "${FILES_PATH}\themes\default\intro_sing.svg"
+  File "${FILES_PATH}\themes\default\mainmenu_back_highlight.svg"
+  File "${FILES_PATH}\themes\default\mainmenu_comment.svg"
+  File "${FILES_PATH}\themes\default\mainmenu_comment_bg.svg"
+  File "${FILES_PATH}\themes\default\mainmenu_option.svg"
+  File "${FILES_PATH}\themes\default\mainmenu_option_selected.svg"
+  File "${FILES_PATH}\themes\default\mainmenu_scomment_bg.svg"
+  File "${FILES_PATH}\themes\default\mainmenu_short_comment.svg"
   File "${FILES_PATH}\themes\default\menu.ogg"
-  File "${FILES_PATH}\themes\default\menu_back_highlight.svg"
-  File "${FILES_PATH}\themes\default\menu_comment.svg"
-  File "${FILES_PATH}\themes\default\menu_comment_bg.svg"
-  File "${FILES_PATH}\themes\default\menu_option.svg"
-  File "${FILES_PATH}\themes\default\menu_option_selected.svg"
-  File "${FILES_PATH}\themes\default\menu_scomment_bg.svg"
-  File "${FILES_PATH}\themes\default\menu_short_comment.svg"
   File "${FILES_PATH}\themes\default\message_text.svg"
   File "${FILES_PATH}\themes\default\mine.svg"
   File "${FILES_PATH}\themes\default\neck_glow.svg"
@@ -238,7 +242,7 @@ Section "SezionePrincipale" SEC01
   SetOutPath "$INSTDIR\xsl"
   File "${FILES_PATH}\xsl\songlist-to-tex.xsl"
   File "${FILES_PATH}\xsl\songlist-to-xhtml.xsl"
-  
+
   CreateDirectory "$APPDATA\performous\songs"
 SectionEnd
 
@@ -438,16 +442,16 @@ Section Uninstall
   ;Delete "$INSTDIR\performous.version"
 
   SetShellVarContext all
-  
+
   Delete "$SMPROGRAMS\Performous\Uninstall.lnk"
   Delete "$SMPROGRAMS\Performous\Performous.org.lnk"
   Delete "$DESKTOP\Performous.lnk"
   Delete "$SMPROGRAMS\Performous\Performous.lnk"
   Delete "$SMPROGRAMS\Performous\Songs.lnk"
-  
+
   RMDir "$SMPROGRAMS\Performous"
   SetShellVarContext current
-  
+
   RMDir "$SMPROGRAMS\Performous"
   RMDir "$INSTDIR\xsl"
   RMDir "$INSTDIR\themes\default"

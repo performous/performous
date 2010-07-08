@@ -103,5 +103,5 @@ struct ThemeInstrumentMenu: Theme {
 	/// menu comment text
 	SvgTxtTheme comment;
 	/// menu comment background
-	Surface comment_bg;
+	//Surface comment_bg;
 };
