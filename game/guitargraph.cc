@@ -283,11 +283,11 @@ void GuitarGraph::engine() {
 		if (menuOpen()) {
 			bool old_lefty = m_leftymode.b();
 			// Check first regular keys
-			if (ev.type == input::Event::PRESS && ev.button == 0 + m_drums) m_menu.action(1);
-			else if (ev.type == input::Event::PRESS && ev.button == 1 + m_drums) m_menu.action(-1);
-			else if (ev.type == input::Event::PRESS && ev.button == 2 + m_drums) m_menu.move(1);
-			else if (ev.type == input::Event::PRESS && ev.button == 3 + m_drums) m_menu.move(-1);
-			// Strum
+			if (ev.type == input::Event::PRESS && ev.button == 0) m_menu.action(1);
+			else if (ev.type == input::Event::PRESS && ev.button == (m_drums ? 4 : 1)) m_menu.action(-1);
+			else if (ev.type == input::Event::PRESS && ev.button == (m_drums ? 1 : 2)) m_menu.move(1);
+			else if (ev.type == input::Event::PRESS && ev.button == (m_drums ? 2 : 3)) m_menu.move(-1);
+			// Strum (strum of keyboard as guitar doesn't generate nav-events)
 			else if (ev.type == input::Event::PICK && ev.button == 0) m_menu.move(1);
 			else if (ev.type == input::Event::PICK && ev.button == 1) m_menu.move(-1);
 			else { // Try nav keys (arrows)

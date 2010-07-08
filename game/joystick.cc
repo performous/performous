@@ -482,7 +482,7 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 					if (pickPressed[1]) return true; // repeating
 					pickPressed[1] = true;
 					event.type = input::Event::PICK;
-					button = 0;
+					button = 1;
 					is_guitar_event = true;
 					break;
 				case SDLK_BACKSPACE:
