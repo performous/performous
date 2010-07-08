@@ -11,6 +11,7 @@ class Surface;
 struct MenuOption;
 
 typedef std::vector<MenuOption> MenuOptions;
+typedef std::vector<MenuOptions> SubmenuStack;
 
 /// struct for menu options
 struct MenuOption {
@@ -44,7 +45,7 @@ struct MenuOption {
 /// Menu for selecting difficulty etc.
 struct Menu {
 	/// constructor
-	Menu(): current_it(options.end()), m_open(true), m_level(0) { }
+	Menu();
 	/// add a menu option
 	void add(MenuOption opt);
 	/// move the selection
@@ -54,23 +55,23 @@ struct Menu {
 	/// clear items
 	void clear();
 
-	bool empty() const { return options.empty(); }
+	bool empty() const { return (menu_stack.empty() || (menu_stack.size() == 1 && menu_stack.back().empty())); }
 	bool isOpen() const { return m_open; }
 	void open() { m_open = true; }
 	void close() { m_open = false; }
 	void toggle() { m_open = !m_open; }
-	void moveToLast() { current_it = --(options.end()); }
+	void moveToLast() { current_it = --(menu_stack.back().end()); }
 
 	MenuOptions::iterator& currentRef() { return current_it; }
 	const MenuOptions::const_iterator current() const { return current_it; }
-	const MenuOptions::const_iterator begin() const { return options.begin(); }
-	const MenuOptions::const_iterator end() const { return options.end(); }
-	const MenuOptions getOptions() const { return options; }
+	const MenuOptions::const_iterator begin() const { return menu_stack.back().begin(); }
+	const MenuOptions::const_iterator end() const { return menu_stack.back().end(); }
+	const MenuOptions getOptions() const { return menu_stack.back(); }
 
   private:
 	MenuOptions::iterator current_it;
-	MenuOptions options;
 	MenuOptions root_options;
+	SubmenuStack menu_stack;
 
 	bool m_open;
 	int m_level;

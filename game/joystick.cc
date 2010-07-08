@@ -474,7 +474,7 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 					if (pickPressed[0]) return true; // repeating
 					pickPressed[0] = true;
 					event.type = input::Event::PICK;
-					button = 1;
+					button = 0;
 					is_guitar_event = true;
 					break;
 				case SDLK_RSHIFT:

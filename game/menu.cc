@@ -50,24 +50,32 @@ MenuOption::MenuOption(const std::string& nm, const std::string& comm, const std
 }
 
 
+Menu::Menu():
+	m_open(true),
+	m_level(0)
+{
+	menu_stack.push_back(root_options);
+	current_it = menu_stack.back().end();
+}
 
 void Menu::add(MenuOption opt) {
 	root_options.push_back(opt);
-	options = root_options; // Set active menu to root
-	current_it = options.begin(); // Reset iterator
+	menu_stack.clear();
+	menu_stack.push_back(root_options);
+	current_it = menu_stack.back().begin(); // Reset iterator
 }
 
 void Menu::move(int dir) {
-	if (dir > 0 && current_it != (--options.end())) ++current_it;
-	else if (dir < 0 && current_it != options.begin()) --current_it;
+	if (dir > 0 && current_it != (--menu_stack.back().end())) ++current_it;
+	else if (dir < 0 && current_it != menu_stack.back().begin()) --current_it;
 }
 
 void Menu::action(int dir) {
 	switch (current_it->type) {
 		case MenuOption::OPEN_SUBMENU:
 			if (current_it->options.empty()) break;
-			options = current_it->options;
-			current_it = options.begin();
+			menu_stack.push_back(current_it->options);
+			current_it = menu_stack.back().begin();
 			m_level++;
 			break;
 		case MenuOption::CHANGE_VALUE:
@@ -80,15 +88,14 @@ void Menu::action(int dir) {
 			if (current_it->value) *(current_it->value) = current_it->newValue;
 			// Fall-through to closing
 		case MenuOption::CLOSE_SUBMENU:
-			// TODO: Handle more than one level of submenus
-			if (m_level == 0) close();
-			else m_level--;
-			options = root_options;
-			current_it = options.begin();
+			if (menu_stack.size() > 1) menu_stack.pop_back();
+			else close();
+			current_it = menu_stack.back().begin();
 			break;
 		case MenuOption::ACTIVATE_SCREEN:
 			ScreenManager* sm = ScreenManager::getSingletonPtr();
 			std::string screen = current_it->newValue.s();
+			clear();
 			if (screen.empty()) sm->finished();
 			else sm->activateScreen(screen);
 			break;
@@ -96,7 +103,8 @@ void Menu::action(int dir) {
 }
 
 void Menu::clear() {
-	options.clear();
+	menu_stack.clear();
 	root_options.clear();
-	current_it = options.end();
+	menu_stack.push_back(root_options);
+	current_it = menu_stack.back().end();
 }
