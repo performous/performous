@@ -155,11 +155,11 @@ void GuitarGraph::setupJoinMenu() {
 }
 
 void GuitarGraph::updateJoinMenu() {
-	std::string s(" (");
+	std::string s("\n (");
 	std::string le = m_leftymode.b() ? _("ON") : _("OFF");
-	m_trackComment = _("Select track to play") + s + getTrack() + ")";
-	m_difficultyComment =  _("Select difficulty level") + s + getDifficultyString() + ")";
-	m_leftyComment = _("Toggle left-handed mode") + s + le + ")";
+	m_trackComment = _("Select track") + s + getTrack() + ")";
+	m_difficultyComment =  _("Select difficulty") + s + getDifficultyString() + ")";
+	m_leftyComment = _("Toggle lefty-mode") + s + le + ")";
 	m_selectedTrack = ConfigItem(getTrack());
 	m_selectedDifficulty = ConfigItem(m_level);
 }

@@ -31,10 +31,9 @@ InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevType 
 
 void InstrumentGraph::setupPauseMenu() {
 	m_menu.clear();
-	// TODO: Replace with options that actually do something
 	m_menu.add(MenuOption(_("Resume"), _("Back to performing!")));
-	//m_menu.add(MenuOption(_("Pause"), _("Toggle pause"), &InstrumentGraph::togglePause));
-	m_menu.add(MenuOption(_("Restart"), _("Start the song from the beginning")));
+	// TODO: Implement restart
+	//m_menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning")));
 	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
 }
 
@@ -55,8 +54,8 @@ void InstrumentGraph::toggleMenu(bool forceopen) {
 
 void InstrumentGraph::drawMenu(double offsetX) {
 	if (m_menu.empty()) return;
-	float step = 0.075;
-	float y = -0.5 * m_menu.getOptions().size() * step;
+	float step = 0.05;
+	float y = -0.6 * m_menu.getOptions().size() * step;
 	// Some helper vars
 	ThemeInstrumentMenu& th = *m_menuTheme;
 	MenuOptions::const_iterator cur = static_cast<MenuOptions::const_iterator>(&m_menu.current());
@@ -75,7 +74,7 @@ void InstrumentGraph::drawMenu(double offsetX) {
 	if (cur->getComment() != "") {
 		//th.comment_bg.dimensions.middle().screenBottom(-0.2);
 		//th.comment_bg.draw();
-		th.comment.dimensions.middle(-0.15 + offsetX).screenBottom(-0.2);
+		th.comment.dimensions.middle(-0.1 + offsetX).screenBottom(-0.22);
 		th.comment.draw(cur->getComment());
 	}
 }

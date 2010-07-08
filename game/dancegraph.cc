@@ -127,9 +127,9 @@ void DanceGraph::setupJoinMenu() {
 }
 
 void DanceGraph::updateJoinMenu() {
-	std::string s(" (");
-	m_trackComment = _("Select track to play") + s + getTrack() + ")";
-	m_difficultyComment =  _("Select difficulty level") + s + getDifficultyString() + ")";
+	std::string s("\n (");
+	m_trackComment = _("Select track") + s + getTrack() + ")";
+	m_difficultyComment =  _("Select difficulty") + s + getDifficultyString() + ")";
 	m_selectedTrack = ConfigItem(getTrack());
 	m_selectedDifficulty = ConfigItem(m_level);
 }
