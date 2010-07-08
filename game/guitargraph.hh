@@ -111,6 +111,7 @@ class GuitarGraph: public InstrumentGraph {
 		DIFFICULTYCOUNT
 	} m_level;
 	void setupJoinMenu();
+	void updateJoinMenu();
 	void nextTrack(bool fast = false);
 	void setTrack(const std::string& track);
 	void difficultyAuto(bool tryKeepCurrent = false);

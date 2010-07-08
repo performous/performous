@@ -53,10 +53,10 @@ void ScreenIntro::draw_menu_options() {
 			theme->back_h.dimensions.left(-0.4).center(-0.097 + i*0.08);
 			theme->back_h.draw();
 			theme->option_selected.dimensions.left(-0.35).center(-0.1 + i*0.08);
-			theme->option_selected.draw(it->name);
+			theme->option_selected.draw(it->getName());
 		} else {
 			theme->option.dimensions.left(-0.35).center(-0.1 + i*0.08);
-			theme->option.draw(it->name);
+			theme->option.draw(it->getName());
 		}
 	}
 }
@@ -67,7 +67,7 @@ void ScreenIntro::draw() {
 	theme->comment_bg.dimensions.center().screenBottom(-0.01);
 	theme->comment_bg.draw();
 	theme->comment.dimensions.left(-0.48).screenBottom(-0.028);
-	theme->comment.draw(m_menu.current()->comment);
+	theme->comment.draw(m_menu.current()->getComment());
 	draw_menu_options();
 	if (m_dialog) m_dialog->draw();
 }

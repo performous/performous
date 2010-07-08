@@ -118,11 +118,20 @@ void DanceGraph::setupJoinMenu() {
 			diffmenu.push_back(MenuOption(diffv[level], _("Select difficulty level"), &m_selectedDifficulty, ConfigItem(level)));
 	}
 	// Populate root menu
-	std::string s(" (");
 	m_menu.add(MenuOption(_("Ready!"), _("Start performing!")));
-	m_menu.add(MenuOption(_("Track"), _("Select track to play") + s + getTrack() + ")", trackmenu));
-	m_menu.add(MenuOption(_("Difficulty"), _("Select difficulty level") + s + getDifficultyString() + ")", diffmenu));
+	m_menu.add(MenuOption(_("Track"), "", trackmenu));
+	m_menu.back().setDynamicComment(m_trackComment);
+	m_menu.add(MenuOption(_("Difficulty"), "", diffmenu));
+	m_menu.back().setDynamicComment(m_difficultyComment);
 	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
+}
+
+void DanceGraph::updateJoinMenu() {
+	std::string s(" (");
+	m_trackComment = _("Select track to play") + s + getTrack() + ")";
+	m_difficultyComment =  _("Select difficulty level") + s + getDifficultyString() + ")";
+	m_selectedTrack = ConfigItem(getTrack());
+	m_selectedDifficulty = ConfigItem(m_level);
 }
 
 /// Attempt to select next/previous game mode
@@ -211,7 +220,7 @@ bool DanceGraph::difficulty(DanceDifficulty level, bool check_only) {
 	m_scoreFactor = 1;
 	if(m_notes.size() != 0)
 		m_scoreFactor = 10000.0 / (50 * m_notes.size()); // maxpoints / (notepoint * notes)
-	setupJoinMenu();
+	updateJoinMenu();
 	return true;
 }
 
@@ -256,6 +265,8 @@ void DanceGraph::engine() {
 			// See if anything changed
 			if (m_selectedTrack.s() != getTrack()) setTrack(m_selectedTrack.s());
 			else if (m_selectedDifficulty.i() != m_level) difficulty(DanceDifficulty(m_selectedDifficulty.i()));
+			// Sync dynamic stuff
+			updateJoinMenu();
 		}
 		// Gaming controls
 		if (ev.type == input::Event::RELEASE) {

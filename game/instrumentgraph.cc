@@ -69,15 +69,15 @@ void InstrumentGraph::drawMenu(double offsetX) {
 			txt = &th.option_selected;
 		}
 		txt->dimensions.middle(-0.1 + offsetX).center(y);
-		txt->draw(it->name);
+		txt->draw(it->getName());
 
 		y += step;
 	}
-	if (cur->comment != "") {
+	if (cur->getComment() != "") {
 		//th.comment_bg.dimensions.middle().screenBottom(-0.2);
 		//th.comment_bg.draw();
 		th.comment.dimensions.middle(-0.1 + offsetX).screenBottom(-0.2);
-		th.comment.draw(cur->comment);
+		th.comment.draw(cur->getComment());
 	}
 }
 

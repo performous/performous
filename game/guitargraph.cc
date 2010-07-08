@@ -131,8 +131,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number,
 
 void GuitarGraph::setupJoinMenu() {
 	m_menu.clear();
-	m_selectedTrack = ConfigItem(getTrack());
-	m_selectedDifficulty = ConfigItem(m_level);
+	updateJoinMenu();
 	// Create track menu
 	MenuOptions trackmenu;
 	for (InstrumentTracksConstPtr::const_iterator it = m_instrumentTracks.begin(); it != m_instrumentTracks.end(); ++it) {
@@ -145,13 +144,24 @@ void GuitarGraph::setupJoinMenu() {
 			diffmenu.push_back(MenuOption(diffv[level].name, _("Select difficulty level"), &m_selectedDifficulty, ConfigItem(level)));
 	}
 	// Populate root menu
+	m_menu.add(MenuOption(_("Ready!"), _("Start performing!")));
+	m_menu.add(MenuOption(_("Track"), "", trackmenu));
+	m_menu.back().setDynamicComment(m_trackComment);
+	m_menu.add(MenuOption(_("Difficulty"), "", diffmenu));
+	m_menu.back().setDynamicComment(m_difficultyComment);
+	m_menu.add(MenuOption(_("Lefty-mode"), "", &m_leftymode));
+	m_menu.back().setDynamicComment(m_leftyComment);
+	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
+}
+
+void GuitarGraph::updateJoinMenu() {
 	std::string s(" (");
 	std::string le = m_leftymode.b() ? _("ON") : _("OFF");
-	m_menu.add(MenuOption(_("Ready!"), _("Start performing!")));
-	m_menu.add(MenuOption(_("Track"), _("Select track to play") + s + getTrack() + ")", trackmenu));
-	m_menu.add(MenuOption(_("Difficulty"), _("Select difficulty level") + s + getDifficultyString() + ")", diffmenu));
-	m_menu.add(MenuOption(_("Lefty-mode"), _("Toggle left-handed mode") + s + le + ")", &m_leftymode));
-	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
+	m_trackComment = _("Select track to play") + s + getTrack() + ")";
+	m_difficultyComment =  _("Select difficulty level") + s + getDifficultyString() + ")";
+	m_leftyComment = _("Toggle left-handed mode") + s + le + ")";
+	m_selectedTrack = ConfigItem(getTrack());
+	m_selectedDifficulty = ConfigItem(m_level);
 }
 
 /// Load the appropriate neck texture
@@ -225,7 +235,7 @@ bool GuitarGraph::difficulty(Difficulty level, bool check_only) {
 		updateChords();
 		return false;
 	}
-	setupJoinMenu();
+	updateJoinMenu();
 	return true;
 }
 
@@ -281,7 +291,6 @@ void GuitarGraph::engine() {
 		else if (ev.type == input::Event::PICK) m_pressed_anim[0].setValue(1.0);
 		// Menu keys
 		if (menuOpen()) {
-			bool old_lefty = m_leftymode.b();
 			// Check first regular keys
 			if (ev.type == input::Event::PRESS && ev.button == 0) m_menu.action(1);
 			else if (ev.type == input::Event::PRESS && ev.button == (m_drums ? 4 : 1)) m_menu.action(-1);
@@ -297,7 +306,8 @@ void GuitarGraph::engine() {
 			// See if anything changed
 			if (m_selectedTrack.s() != getTrack()) setTrack(m_selectedTrack.s());
 			else if (m_selectedDifficulty.i() != m_level) difficulty(Difficulty(m_selectedDifficulty.i()));
-			else if (old_lefty != m_leftymode.b()) setupJoinMenu();
+			// Sync menu items & captions
+			updateJoinMenu();
 		// Playing
 		} else if (m_drums) {
 			if (ev.type == input::Event::PRESS) drumHit(time, ev.button);

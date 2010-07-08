@@ -124,9 +124,14 @@ class InstrumentGraph {
 	boost::scoped_ptr<SvgTxtThemeSimple> m_popupText;
 	boost::scoped_ptr<ThemeInstrumentMenu> m_menuTheme;
 
-	// Misc counters etc.
+	// Dynamic stuff for join menu
 	ConfigItem m_selectedTrack; /// menu modifies this to select track
 	ConfigItem m_selectedDifficulty; /// menu modifies this to select difficulty
+	std::string m_trackComment;
+	std::string m_difficultyComment;
+	std::string m_leftyComment;
+
+	// Misc counters etc.
 	int m_pads; /// how many panels the current gaming mode uses
 	bool m_pressed[max_panels]; /// is certain panel pressed currently
 	AnimValue m_pressed_anim[max_panels]; /// animation for panel pressing
