@@ -62,28 +62,25 @@ struct Menu {
 	/// adjust the selected value
 	void action(int dir = 1);
 	/// clear items
-	void clear();
+	void clear(bool save_root = false);
 
 	bool empty() const { return (menu_stack.empty() || (menu_stack.size() == 1 && menu_stack.back()->empty())); }
 	bool isOpen() const { return m_open; }
 	void open() { m_open = true; }
 	void close() { m_open = false; }
 	void toggle() { m_open = !m_open; }
-	void moveToLast() { current_it = --(menu_stack.back()->end()); }
+	void moveToLast() { selection_stack.back() = menu_stack.back()->size() - 1; }
 
+	MenuOption& current() { return menu_stack.back()->at(selection_stack.back()); }
 	MenuOption& back() { return root_options.back(); }
-	MenuOptions::iterator& currentRef() { return current_it; }
-	const MenuOptions::const_iterator current() const { return current_it; }
 	const MenuOptions::const_iterator begin() const { return menu_stack.back()->begin(); }
 	const MenuOptions::const_iterator end() const { return menu_stack.back()->end(); }
 	const MenuOptions getOptions() const { return *menu_stack.back(); }
 
   private:
-	MenuOptions::iterator current_it;
 	MenuOptions root_options;
 	SubmenuStack menu_stack;
+	std::vector<size_t> selection_stack;
 
 	bool m_open;
-	int m_level;
-
 };

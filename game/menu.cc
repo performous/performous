@@ -61,50 +61,46 @@ MenuOption::MenuOption(const std::string& nm, const std::string& comm, const std
 
 
 Menu::Menu():
-	m_open(true),
-	m_level(0)
+	m_open(true)
 {
-	menu_stack.push_back(&root_options);
-	current_it = menu_stack.back()->end();
+	clear();
 }
 
 void Menu::add(MenuOption opt) {
 	root_options.push_back(opt);
-	menu_stack.clear();
-	menu_stack.push_back(&root_options);
-	current_it = menu_stack.back()->begin(); // Reset iterator
+	clear(true); // Adding resets menu stack
 }
 
 void Menu::move(int dir) {
-	if (dir > 0 && current_it != (--menu_stack.back()->end())) ++current_it;
-	else if (dir < 0 && current_it != menu_stack.back()->begin()) --current_it;
+	if (dir > 0 && selection_stack.back() < menu_stack.back()->size() - 1) ++selection_stack.back();
+	else if (dir < 0 && selection_stack.back() > 0) --selection_stack.back();
 }
 
 void Menu::action(int dir) {
-	switch (current_it->type) {
+	switch (current().type) {
 		case MenuOption::OPEN_SUBMENU:
-			if (current_it->options.empty()) break;
-			menu_stack.push_back(&current_it->options);
-			current_it = menu_stack.back()->begin();
-			m_level++;
+			if (current().options.empty()) break;
+			menu_stack.push_back(&current().options);
+			selection_stack.push_back(0);
 			break;
 		case MenuOption::CHANGE_VALUE:
-			if (current_it->value) {
-				if (dir > 0) ++(*(current_it->value));
-				else if (dir < 0) --(*(current_it->value));
+			if (current().value) {
+				if (dir > 0) ++(*(current().value));
+				else if (dir < 0) --(*(current().value));
 			}
 			break;
 		case MenuOption::SET_AND_CLOSE:
-			if (current_it->value) *(current_it->value) = current_it->newValue;
+			if (current().value) *(current().value) = current().newValue;
 			// Fall-through to closing
 		case MenuOption::CLOSE_SUBMENU:
-			if (menu_stack.size() > 1) menu_stack.pop_back();
-			else close();
-			current_it = menu_stack.back()->begin();
+			if (menu_stack.size() > 1) {
+				menu_stack.pop_back();
+				selection_stack.pop_back();
+			} else close();
 			break;
 		case MenuOption::ACTIVATE_SCREEN:
 			ScreenManager* sm = ScreenManager::getSingletonPtr();
-			std::string screen = current_it->newValue.s();
+			std::string screen = current().newValue.s();
 			clear();
 			if (screen.empty()) sm->finished();
 			else sm->activateScreen(screen);
@@ -112,9 +108,10 @@ void Menu::action(int dir) {
 	}
 }
 
-void Menu::clear() {
+void Menu::clear(bool save_root) {
+	if (!save_root) root_options.clear();
 	menu_stack.clear();
-	root_options.clear();
+	selection_stack.clear();
 	menu_stack.push_back(&root_options);
-	current_it = menu_stack.back()->end();
+	selection_stack.push_back(0);
 }
