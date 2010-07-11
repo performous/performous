@@ -725,7 +725,7 @@ void GuitarGraph::draw(double time) {
 			float x = getFretX(fret);
 			float l = m_pressed_anim[fret + !m_drums].get();
 			// Get a color for the fret and adjust it if GodMode is on
-			glColor4fv(colorize(color(fret), time));
+			glColor4fv(color(fret));
 			m_button.dimensions.center(time2y(0.0)).middle(x);
 			m_button.draw();
 			glColor3f(l, l, l);
@@ -782,7 +782,7 @@ void GuitarGraph::draw(double time) {
 					glutil::Color c(0.5f, 0.5f, 0.5f);
 					if (!joining(time)) {
 						// Get a color for the fret and adjust it if GodMode is on
-						c = colorize(color(fret), it->begin);
+						c = color(fret);
 						if (glow > 0.1f) { ng_r+=c.r; ng_g+=c.g; ng_b+=c.b; ng_ccnt++; } // neck glow
 						// Further adjust the color if the note is hit
 						c.r += glow * 0.2f;
