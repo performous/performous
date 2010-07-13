@@ -12,6 +12,12 @@ fs::path getHomeDir();
 /** Get the users configuration folder **/
 fs::path getConfigDir();
 
+/** Get the users data folder **/
+fs::path getDataDir();
+
+/** Get the users theme folder **/
+fs::path getThemeDir();
+
 /** Get the localec folder **/
 fs::path getLocaleDir();
 
