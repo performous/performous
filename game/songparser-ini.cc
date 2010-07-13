@@ -176,6 +176,16 @@ void SongParser::iniParse() {
 			n.end = midi.get_seconds(it2->end)+s.start;
 			n.notePrev = n.note = it2->note;
 			n.type = n.note > 100 ? Note::SLEEP : Note::NORMAL;
+			if(n.note == 116 || n.note == 103)
+				// n.type = Note::GOLDEN;
+				continue; // not yet managed by midi parser
+			else if(n.note == 124)
+				// n.type = Note::GOLDEN;
+				continue; // not yet managed by midi parser
+			else if(n.note > 100)
+				n.type = Note::SLEEP;
+			else
+				n.type = Note::NORMAL;
 			{
 				std::stringstream ss(it2->lyric);
 				convertToUTF8(ss);
