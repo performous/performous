@@ -86,10 +86,9 @@ fs::path getCacheDir() {
 		return getConfigDir() / "cache";  // APPDATA/performous
 #else
 		fs::path shortDir = "performous";
-		fs::path shareDir = SHARED_DATA_DIR;
 		char const* xdg_cache_home = getenv("XDG_CACHE_HOME");
 		// FIXME: Should this use "games" or not?
-		return (xdg_cache_home ? xdg_cache_home / shortDir : getHomeDir() / ".cache" / shareDir);
+		return (xdg_cache_home ? xdg_cache_home / shortDir : getHomeDir() / ".cache" / shortDir);
 #endif
 }
 
