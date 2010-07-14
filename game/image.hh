@@ -53,6 +53,10 @@ namespace {
 				png_set_IHDR(pngPtr, infoPtr, w, h, 8, PNG_COLOR_TYPE_RGBA, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 				bpp = 4;
 				break;
+			case pix::INT_ARGB:
+				throw std::runtime_error("Writing PNG failed (pix::INT_ARGB not supported)");
+			case pix::BGR:
+				throw std::runtime_error("Writing PNG failed (pix::BGR not supported)");
 		}
 		png_write_info(pngPtr, infoPtr);
 		unsigned stride = (w * bpp + 3) & ~3;  // Number of bytes per row (word-aligned)
