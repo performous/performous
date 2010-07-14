@@ -55,7 +55,7 @@ namespace {
 				break;
 		}
 		png_write_info(pngPtr, infoPtr);
-		unsigned stride = (w * bpp + bpp) & ~bpp;  // Number of bytes per row (word-aligned)
+		unsigned stride = (w * bpp + 3) & ~3;  // Number of bytes per row (word-aligned)
 		unsigned pos = reverse ? h * stride : -stride;
 		for (unsigned y = 0; y < h; ++y) {
 			if(reverse)
