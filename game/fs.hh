@@ -15,6 +15,9 @@ fs::path getConfigDir();
 /** Get the users data folder **/
 fs::path getDataDir();
 
+/** Get the users cache folder **/
+fs::path getCacheDir();
+
 /** Get the users theme folder **/
 fs::path getThemeDir();
 

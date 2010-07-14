@@ -36,7 +36,6 @@ fs::path getLocaleDir() {
 }
 
 fs::path getConfigDir() {
-
 	static fs::path dir;
 	static bool initialized = false;
 	if (!initialized) {
@@ -79,6 +78,18 @@ fs::path getDataDir() {
 		char const* xdg_data_home = getenv("XDG_DATA_HOME");
 		// FIXME: Should this use "games" or not?
 		return (xdg_data_home ? xdg_data_home / shortDir : getHomeDir() / ".local" / shareDir);
+#endif
+}
+
+fs::path getCacheDir() {
+#ifdef _WIN32
+		return getConfigDir() / "cache";  // APPDATA/performous
+#else
+		fs::path shortDir = "performous";
+		fs::path shareDir = SHARED_DATA_DIR;
+		char const* xdg_cache_home = getenv("XDG_CACHE_HOME");
+		// FIXME: Should this use "games" or not?
+		return (xdg_cache_home ? xdg_cache_home / shortDir : getHomeDir() / ".cache" / shareDir);
 #endif
 }
 

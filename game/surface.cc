@@ -46,7 +46,7 @@ template <typename T> void loader(T& target, fs::path name) {
 			loadSVG(target, filename);
 		} else {
 			std::string cache_basename = name.filename() + ".cache_" + (boost::format("%.2f") % config["graphic/svg_lod"].f()).str() + ".png";
-			fs::path cache_filename = getThemeDir() / cache_basename;
+			fs::path cache_filename = getCacheDir() / cache_basename;
 			if(fs::exists(cache_filename)) {
 				if(fs::last_write_time(filename) > fs::last_write_time(cache_filename)) {
 					// SVG file is newer we should update cache
