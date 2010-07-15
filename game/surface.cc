@@ -13,6 +13,7 @@
 #include <cctype>
 
 #include <boost/cstdint.hpp>
+#include <boost/format.hpp>
 using boost::uint32_t;
 
 float Dimensions::screenY() const {
@@ -34,8 +35,30 @@ template <typename T> void loader(T& target, fs::path name) {
 	//std::for_each(ext.begin(), ext.end(), static_cast<int(*)(int)>(std::tolower));
 	std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower );
 
-	if (ext == ".svg") loadSVG(target, filename);
-	else if (ext == ".png") {
+	if (ext == ".svg") {
+		bool theme_file = false;
+		if(name == getThemePath(name.filename())) {
+			theme_file = true;
+		}
+
+		if(!theme_file) {
+			// do not cache non-theme files
+			loadSVG(target, filename);
+		} else {
+			std::string cache_basename = name.filename() + ".cache_" + (boost::format("%.2f") % config["graphic/svg_lod"].f()).str() + ".png";
+			fs::path cache_filename = getCacheDir() / "themes" / (config["game/theme"].s().empty() ? "default" : config["game/theme"].s()) / cache_basename;
+			if(fs::exists(cache_filename)) {
+				if(fs::last_write_time(filename) > fs::last_write_time(cache_filename)) {
+					// SVG file is newer we should update cache
+					loadSVG(target, filename, cache_filename.string());
+				} else {
+					loadPNG(target, cache_filename.string());
+				}
+			} else {
+				loadSVG(target, filename, cache_filename.string());
+			}
+		}
+	} else if (ext == ".png") {
 		try {loadPNG(target, filename);}
 		// FIXME: there is probably a cleaner way to do this
 		// FoFiX songs often come with album art that is JPEG with a PNG extension
