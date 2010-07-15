@@ -36,7 +36,7 @@ void ScreenConfiguration::manageEvent(SDL_Event event) {
 		int key = event.key.keysym.sym;
 		SDLMod modifier = event.key.keysym.mod;
 		if (configuration.empty()) return; // The rest work if there are any config options
-		else if (key == SDLK_r && modifier & KMOD_CTRL) ci->reset(modifier & KMOD_ALT);
+		else if (key == SDLK_r && modifier & KMOD_CTRL && ci) ci->reset(modifier & KMOD_ALT);
 		else if (key == SDLK_s && modifier & KMOD_CTRL) writeConfig(modifier & KMOD_ALT);
 	}
 }

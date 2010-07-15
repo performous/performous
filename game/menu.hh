@@ -8,7 +8,7 @@
 /// struct for menu options
 struct MenuOption {
 	MenuOption();
-	MenuOption(const std::string nm, const std::string scrn, const std::string img, const std::string comm);
+	MenuOption(const std::string& nm, const std::string& scrn, const std::string& img, const std::string& comm);
 	/// option name (it will be displayed as this)
 	std::string name;
 	/// screen to activate when option is pressed

@@ -269,7 +269,7 @@ void SongParser::iniParse() {
 	// copy midi sections to song section
 	// design goals: (1) keep midi parser free of dependencies on song (2) store data in song as parsers are discarded before song
 	// one option would be to pass a song reference to the midi parser however, that conflicts with goal (1)
-	for (std::vector<MidiFileParser::MidiSection>::iterator it= midi.midisections.begin(); it != midi.midisections.end(); it++) {
+	for (std::vector<MidiFileParser::MidiSection>::iterator it= midi.midisections.begin(); it != midi.midisections.end(); ++it) {
 		Song::SongSection tmp(it->name, it->begin);
 		s.songsections.push_back(tmp);
 		//std::cout << "Section " << tmp.name << " at " << tmp.begin << std::endl;

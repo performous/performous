@@ -8,8 +8,8 @@
 /// abstract theme class
 class Theme: boost::noncopyable {
 protected:
-  	Theme();
-  	Theme(const std::string path); ///< creates theme from path
+	Theme();
+	Theme(const std::string& path); ///< creates theme from path
 public:
 	/// background image for theme
 	Surface bg;

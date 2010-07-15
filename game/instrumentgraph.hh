@@ -69,6 +69,7 @@ class InstrumentGraph {
 	  m_correctness(0.0, 5.0),
 	  m_score(),
 	  m_scoreFactor(),
+	  m_starmeter(),
 	  m_streak(),
 	  m_longestStreak(),
 	  m_bigStreak(),
