@@ -53,10 +53,8 @@ namespace {
 				png_set_IHDR(pngPtr, infoPtr, w, h, 8, PNG_COLOR_TYPE_RGBA, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 				bpp = 4;
 				break;
-			case pix::INT_ARGB:
-				throw std::runtime_error("Writing PNG failed (pix::INT_ARGB not supported)");
-			case pix::BGR:
-				throw std::runtime_error("Writing PNG failed (pix::BGR not supported)");
+			default:
+				throw std::logic_error("Unsupported pixel format in writePNG_internal");
 		}
 		png_write_info(pngPtr, infoPtr);
 		unsigned stride = (w * bpp + 3) & ~3;  // Number of bytes per row (word-aligned)
@@ -131,7 +129,6 @@ template <typename T> void loadSVG(T& target, std::string const& filename, fs::p
 			g_error_free(pError);
 			throw std::runtime_error("Unable to load " + filename);
 		}
-		std::cout << "Caching \"" << filename << "\" into \"" << cache_filename << "\"" << std::endl;
 		fs::create_directories(cache_filename.parent_path());
 		writePNG(cache_filename.string(), w, h, pix::CHAR_RGBA, false, gdk_pixbuf_get_pixels(pb));
 		gdk_pixbuf_unref(pb);
