@@ -27,15 +27,15 @@ public:
 	 * @param startPos starting position
 	 */
 	void playMusic(std::string const& filename, bool preview = false, double fadeTime = 0.5, double startPos = 0.0);
-	/// plays a list of songs
+	/** Plays a list of songs **/
 	void playMusic(std::map<std::string,std::string> const& filenames, bool preview = false, double fadeTime = 0.5, double startPos = 0.0);
-	/// loads/plays/unloads a sample
+	/** Loads/plays/unloads a sample **/
 	void loadSample(std::string const& streamId, std::string const& filename);
 	void playSample(std::string const& streamId);
 	void unloadSample(std::string const& streamId);
-	/// stops music
+	/** Stops music **/
 	void stopMusic();
-	/// fades music out
+	/** Fades music out **/
 	void fadeout(double time = 1.0);
 	/** Get the length of the currently playing song, in seconds. **/
 	double getLength() const;
@@ -54,8 +54,9 @@ public:
 	void togglePause() { pause(!isPaused()); }
 	void pause(bool state = true);
 	bool isPaused() const;
-	void toggleSynth(Notes const&); ///< toggles synth playback
-	/// Adjust volume level of a single track (used for muting incorrectly played instruments). Range 0.0 to 1.0.
+	/** Toggle synth playback **/
+	void toggleSynth(Notes const&);
+	/** Adjust volume level of a single track (used for muting incorrectly played instruments). Range 0.0 to 1.0. **/
 	void streamFade(std::string track, double volume);
 	double getSR() const { return 48000.0; }
 };

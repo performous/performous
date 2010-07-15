@@ -25,7 +25,18 @@ namespace portaudio {
 	}
 
 	struct Init {
-		Init() { PORTAUDIO_CHECKED(Pa_Initialize, ()); }
+		Init()
+		{
+			PORTAUDIO_CHECKED(Pa_Initialize, ());
+			// Print the devices
+			std::cout << "PortAudio devices:\n";
+			for (int i = 0, end = Pa_GetDeviceCount(); i != end; ++i) {
+					PaDeviceInfo const* info = Pa_GetDeviceInfo(i);
+					if (!info) continue;
+					std::cout << "  " << i << "   " << info->name << " (" << info->maxInputChannels << " in, " << info->maxOutputChannels << " out)\n";
+			}
+			std::cout << std::endl;
+		}
 		~Init() { Pa_Terminate(); }
 	};
 

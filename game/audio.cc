@@ -150,6 +150,7 @@ struct Output {
 	std::vector<Command> commands;
 	volatile bool paused;
 	Output(): paused(false) {}
+
 	void callbackUpdate() {
 		boost::mutex::scoped_try_lock l(mutex);
 		if (!l.owns_lock()) return;  // No update now, try again later (cannot stop and wait for mutex to be released)
@@ -174,6 +175,7 @@ struct Output {
 		}
 		commands.clear();
 	}
+
 	void callback(float* begin, float* end) {
 		callbackUpdate();
 		std::fill(begin, end, 0.0f);
@@ -224,10 +226,12 @@ struct Device {
 	{
 		mics.resize(in);
 	}
+
 	void start() {
 		PaError err = Pa_StartStream(stream);
 		if (err != paNoError) throw std::runtime_error("Cannot start PortAudio audio stream " + dev + ": " + Pa_GetErrorText(err));
 	}
+
 	int operator()(void const* input, void* output, unsigned long frames, const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags) try {
 		float const* in = static_cast<float const*>(input);
 		float* out = static_cast<float*>(output);
