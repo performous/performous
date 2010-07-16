@@ -168,6 +168,7 @@ Section "SezionePrincipale" SEC01
   File "${FILES_PATH}\themes\default\instrument_cover.svg"
   File "${FILES_PATH}\themes\default\instrumenthelp.svg"
   File "${FILES_PATH}\themes\default\instrumentmenu_back_highlight.svg"
+  File "${FILES_PATH}\themes\default\instrumentmenu_bg.svg"
   File "${FILES_PATH}\themes\default\instrumentmenu_comment.svg"
   File "${FILES_PATH}\themes\default\instrumentmenu_option.svg"
   File "${FILES_PATH}\themes\default\instrumentmenu_option_selected.svg"

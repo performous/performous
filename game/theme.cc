@@ -58,7 +58,7 @@ ThemeIntro::ThemeIntro():
 }
 
 ThemeInstrumentMenu::ThemeInstrumentMenu():
-	Theme(getThemePath("warning.svg")),
+	Theme(getThemePath("instrumentmenu_bg.svg")),
 	back_h(getThemePath("instrumentmenu_back_highlight.svg")),
 	option(getThemePath("instrumentmenu_option.svg"), config["graphic/text_lod"].f()),
 	option_selected(getThemePath("instrumentmenu_option_selected.svg"), config["graphic/text_lod"].f()),

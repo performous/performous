@@ -62,9 +62,13 @@ void InstrumentGraph::drawMenu() {
 	double offsetX = 0.5 * (dimensions.x1() + dimensions.x2());
 	float step = 0.05;
 	float y = -0.6 * m_menu.getOptions().size() * step;
+	float h = m_menu.getOptions().size() * step + step;
 	// Some helper vars
 	ThemeInstrumentMenu& th = *m_menuTheme;
 	MenuOptions::const_iterator cur = static_cast<MenuOptions::const_iterator>(&m_menu.current());
+	// Background
+	th.bg.dimensions.middle(.05 + offsetX).center((y+step)*.5).stretch(.45, h);
+	th.bg.draw();
 	// Loop through menu items
 	for (MenuOptions::const_iterator it = m_menu.begin(); it != m_menu.end(); ++it) {
 		SvgTxtTheme* txt = &th.option;
