@@ -367,13 +367,15 @@ void ScreenSing::draw() {
 	// Menu mangling
 	// We don't allow instrument menus during global menu
 	// except for joining, in which case global menu is closed
-	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it) {
-		if (!it->dead() && !it->joining(time)) it->toggleMenu(0);
-		else if (!it->dead() && it->joining(time)) m_menu.close();
-	}
-	for (Dancers::iterator it = m_dancers.begin(); it != m_dancers.end(); ++it) {
-		if (!it->dead() && !it->joining(time)) it->toggleMenu(0);
-		else if (!it->dead() && it->joining(time)) m_menu.close();
+	if (m_menu.isOpen()) {
+		for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it) {
+			if (!it->dead() && !it->joining(time)) it->toggleMenu(0);
+			else if (!it->dead() && it->joining(time)) m_menu.close();
+		}
+		for (Dancers::iterator it = m_dancers.begin(); it != m_dancers.end(); ++it) {
+			if (!it->dead() && !it->joining(time)) it->toggleMenu(0);
+			else if (!it->dead() && it->joining(time)) m_menu.close();
+		}
 	}
 
 	// Rendering starts
