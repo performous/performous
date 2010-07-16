@@ -5,7 +5,7 @@
 
 Theme::Theme()
 {}
-Theme::Theme(const std::string path) : bg(path)
+Theme::Theme(const std::string& path) : bg(path)
 {}
 
 ThemeSongs::ThemeSongs():

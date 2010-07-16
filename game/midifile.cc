@@ -180,7 +180,7 @@ MidiFileParser::Track MidiFileParser::read_track(MidiStream& stream) {
 					std::string sect_name = data.substr(sect_pfx.length(), data.length()-sect_pfx.length()-1);
 					if (sect_name != "big_rock_ending") {
 						bool space = true;
-						for (std::string::iterator it = sect_name.begin(); it != sect_name.end(); it++) {
+						for (std::string::iterator it = sect_name.begin(); it != sect_name.end(); ++it) {
 							if (space) *it = toupper(*it);        // start in uppercase
 							if (*it == '_') {*it = ' '; space = true;} // underscores to spaces
 							else space = false;

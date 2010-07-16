@@ -176,6 +176,16 @@ void SongParser::iniParse() {
 			n.end = midi.get_seconds(it2->end)+s.start;
 			n.notePrev = n.note = it2->note;
 			n.type = n.note > 100 ? Note::SLEEP : Note::NORMAL;
+			if(n.note == 116 || n.note == 103)
+				// n.type = Note::GOLDEN;
+				continue; // not yet managed by midi parser
+			else if(n.note == 124)
+				// n.type = Note::GOLDEN;
+				continue; // not yet managed by midi parser
+			else if(n.note > 100)
+				n.type = Note::SLEEP;
+			else
+				n.type = Note::NORMAL;
 			{
 				std::stringstream ss(it2->lyric);
 				convertToUTF8(ss);
@@ -259,7 +269,7 @@ void SongParser::iniParse() {
 	// copy midi sections to song section
 	// design goals: (1) keep midi parser free of dependencies on song (2) store data in song as parsers are discarded before song
 	// one option would be to pass a song reference to the midi parser however, that conflicts with goal (1)
-	for (std::vector<MidiFileParser::MidiSection>::iterator it= midi.midisections.begin(); it != midi.midisections.end(); it++) {
+	for (std::vector<MidiFileParser::MidiSection>::iterator it= midi.midisections.begin(); it != midi.midisections.end(); ++it) {
 		Song::SongSection tmp(it->name, it->begin);
 		s.songsections.push_back(tmp);
 		//std::cout << "Section " << tmp.name << " at " << tmp.begin << std::endl;

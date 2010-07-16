@@ -742,10 +742,10 @@ void GuitarGraph::draw(double time) {
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
 	dimensions.screenBottom().middle(m_cx.get()).fixedWidth(std::min(m_width.get(),0.5));
 	double offsetX = 0.5 * (dimensions.x1() + dimensions.x2());
-	double frac = 0.75;  // Adjustable: 1.0 means fully separated, 0.0 means fully attached
 	float ng_r = 0, ng_g = 0, ng_b = 0; // neck glow color components
 	int ng_ccnt = 0; // neck glow color count
 	{	// Translate, rotate and scale to place
+		double frac = 0.75;  // Adjustable: 1.0 means fully separated, 0.0 means fully attached
 		glutil::PushMatrixMode pmm(GL_PROJECTION);
 		glTranslatef(frac * 2.0 * offsetX, 0.0f, 0.0f);
 		glutil::PushMatrixMode pmb(GL_MODELVIEW);

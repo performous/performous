@@ -60,6 +60,7 @@ MenuOption::MenuOption(const std::string& nm, const std::string& comm, const std
 }
 
 
+
 Menu::Menu():
 	m_open(true)
 {

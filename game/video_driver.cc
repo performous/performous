@@ -78,6 +78,8 @@ void Window::screenshot() {
 	img.w = m_fullscreen ? m_fsW : m_windowW;
 	img.h = m_fullscreen ? m_fsH : m_windowH;
 	img.data.resize(((img.w + 3) & ~3) * img.h * 3);
+	img.format = pix::RGB;
+	img.reverse = true;
 	// Get pixel data from OpenGL
 	glReadPixels(0, 0, img.w, img.h, GL_RGB, GL_UNSIGNED_BYTE, &img.data[0]);
 	// Compose filename from timestamp

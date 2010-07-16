@@ -42,7 +42,7 @@ PPAPATCHDIR="`pwd`"
 		$COPYCMD "$1/tools" "$2"
 	}
 
-cd $TEMPDIR
+cd "$TEMPDIR"
 
 # Download the "old" source package
 version=`apt-cache showsrc $PKG | sed -n 's/^Version: \(.*\)/\1/p' | head -n 1`
@@ -52,17 +52,17 @@ if [ -z "$pkgversion" ] ; then
 	echo "Assuming native package"
 	pkgversion="$version"
 fi
-echo "Working on $pkg $version ($pkgversion)"
+echo "Working on $PKG $version ($pkgversion)"
 mkdir -p $PKG-$version
 cd $PKG-$version
 apt-get --download-only source $PKG
 
 # Download fresh version from git
 echo "Fetch from git..."
-git clone $GITURL $SOURCEDIR
+git clone "$GITURL" "$SOURCEDIR"
 # Get some info from git for changelog
 pushd .
-cd $SOURCEDIR
+cd "$SOURCEDIR"
 headcommit=`git log | head -n 1 | cut --delimiter=" " -f 2 | cut -c 1-10`
 popd
 

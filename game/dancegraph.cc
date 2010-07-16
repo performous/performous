@@ -211,7 +211,7 @@ bool DanceGraph::difficulty(DanceDifficulty level, bool check_only) {
 	else if (check_only) return true;
 	m_notes.clear();
 	DanceTrack const& track = ddm.find(level)->second;
-	for(Notes::const_iterator it = track.notes.begin(); it != track.notes.end(); it++)
+	for(Notes::const_iterator it = track.notes.begin(); it != track.notes.end(); ++it)
 		m_notes.push_back(DanceNote(*it));
 	std::sort(m_notes.begin(), m_notes.end(), lessEnd()); // for engine's iterators
 	m_notesIt = m_notes.begin();
@@ -295,7 +295,7 @@ void DanceGraph::engine() {
 	if (difficulty_changed) m_dead = 0; // if difficulty is changed, m_dead would get incorrect
 
 	// Holding button when mine comes?
-	for (DanceNotes::iterator it = m_notesIt; it != m_notes.end() && time <= it->note.begin + maxTolerance; it++) {
+	for (DanceNotes::iterator it = m_notesIt; it != m_notes.end() && time <= it->note.begin + maxTolerance; ++it) {
 		if(!it->isHit && it->note.type == Note::MINE && m_pressed[it->note.note] &&
 		  it->note.begin >= time - maxTolerance && it->note.end <= time + maxTolerance) {
 			it->isHit = true;
@@ -327,7 +327,7 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 	}
 
 	// So it was a PRESS event
-	for (DanceNotes::iterator it = m_notesIt; it != m_notes.end() && time <= it->note.end + maxTolerance; it++) {
+	for (DanceNotes::iterator it = m_notesIt; it != m_notes.end() && time <= it->note.end + maxTolerance; ++it) {
 		if(!it->isHit && std::abs(time - it->note.begin) <= maxTolerance && ev.button == it->note.note) {
 			it->isHit = true;
 			if (it->note.type != Note::MINE) {
@@ -400,9 +400,9 @@ void DanceGraph::draw(double time) {
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
 	dimensions.screenTop().middle(m_cx.get()).stretch(m_width.get(), 1.0);
 	double offsetX = 0.5 * (dimensions.x1() + dimensions.x2());
-	double frac = 0.75;  // Adjustable: 1.0 means fully separated, 0.0 means fully attached
 
 	{
+		double frac = 0.75;  // Adjustable: 1.0 means fully separated, 0.0 means fully attached
 		// Some matrix magic to get the viewport right
 		glutil::PushMatrixMode pmm(GL_PROJECTION);
 		glTranslatef(frac * 2.0 * offsetX, 0.0f, 0.0f);
