@@ -81,7 +81,6 @@ class InstrumentGraph {
 	void drawMenu();
 	void toggleMenu(int forcestate = -1); // 0 = close, 1 = open, -1 = auto/toggle
 	void togglePause(int) { m_audio.togglePause(); }
-	void restart(int) { /* TODO: Implement */ }
 	void quit(int) { ScreenManager::getSingletonPtr()->activateScreen("Songs"); }
 	std::string noValue() const { return ""; }
 

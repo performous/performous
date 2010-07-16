@@ -8,8 +8,7 @@
 void InstrumentGraph::setupPauseMenu(Menu& menu) {
 	menu.clear();
 	menu.add(MenuOption(_("Resume"), _("Back to performing!")));
-	 //TODO: Implement restart
-	//menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning")));
+	menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning"), "Sing"));
 	menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
 }
 
