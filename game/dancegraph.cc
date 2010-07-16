@@ -1,8 +1,7 @@
 #include "dancegraph.hh"
-#include "instrumentgraph.hh"
-#include "fs.hh"
-#include "notes.hh"
-#include "surface.hh"
+#include "song.hh"
+#include "i18n.hh"
+
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
 #include <algorithm>

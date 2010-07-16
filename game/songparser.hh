@@ -2,10 +2,8 @@
 
 #include "song.hh"
 #include "unicode.hh"
-#include <fstream>
 #include <sstream>
 #include <boost/filesystem.hpp>
-#include <boost/regex.hpp>
 
 namespace SongParserUtil {
 	/// Parse an int from string and assign it to a variable

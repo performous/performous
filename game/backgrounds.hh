@@ -7,7 +7,6 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
-#include <set>
 #include <vector>
 
 /// songs class for songs screen

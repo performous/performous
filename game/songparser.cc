@@ -1,9 +1,8 @@
 #include "songparser.hh"
+
 #include <fstream>
-#include <sstream>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/regex.hpp>
 
 

@@ -5,6 +5,8 @@
 #include "record.hh"
 #include "i18n.hh"
 #include "joystick.hh"
+#include "theme.hh"
+#include "menu.hh"
 
 ScreenIntro::ScreenIntro(std::string const& name, Audio& audio, Capture& capture): Screen(name), m_audio(audio), m_capture(capture), selected(), m_first(true) {
 }

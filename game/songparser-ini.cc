@@ -2,7 +2,6 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/regex.hpp>
 #include <stdexcept>
 #include "midifile.hh"

@@ -1,12 +1,11 @@
 #include "guitargraph.hh"
-#include "instrumentgraph.hh"
 #include "fs.hh"
 #include "song.hh"
-#include "3dobject.hh"
+#include "i18n.hh"
+
 #include <cmath>
 #include <cstdlib>
 #include <stdexcept>
-
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 
