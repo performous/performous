@@ -74,7 +74,9 @@ class InstrumentGraph {
 	virtual void changeTrack(int dir = 1) = 0;
 	virtual void changeDifficulty(int dir = 1) = 0;
 
+	// General shared functions
 	void doUpdates();
+	void drawMenu();
 	void toggleMenu(int forcestate = -1); // 0 = close, 1 = open, -1 = auto/toggle
 	void togglePause(int) { m_audio.togglePause(); }
 	void restart(int) { /* TODO: Implement */ }
@@ -89,6 +91,7 @@ class InstrumentGraph {
 	unsigned stream() const { return m_stream; }
 	double correctness() const { return m_correctness.get(); }
 	int getScore() const { return (m_score > 0 ? m_score : 0) * m_scoreFactor; }
+	input::DevType getGraphType() const { return m_input.getDevType(); }
 
   protected:
 	// Core stuff
@@ -115,7 +118,6 @@ class InstrumentGraph {
 
 	// Shared functions for derived classes
 	void setupPauseMenu();
-	void drawMenu(double offsetX);
 	void drawPopups(double offsetX);
 	void handleCountdown(double time, double beginTime);
 

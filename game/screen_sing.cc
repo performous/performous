@@ -472,7 +472,11 @@ void ScreenSing::draw() {
 		}
 	}
 
-	// Draw menu
+	// Menus on top of everything
+	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it)
+		if (!it->dead() && it->menuOpen()) it->drawMenu();
+	for (Dancers::iterator it = m_dancers.begin(); it != m_dancers.end(); ++it)
+		if (!it->dead() && it->menuOpen()) it->drawMenu();
 	if (m_menu.isOpen()) drawMenu();
 }
 

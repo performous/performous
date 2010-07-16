@@ -54,8 +54,12 @@ void InstrumentGraph::toggleMenu(int forcestate) {
 }
 
 
-void InstrumentGraph::drawMenu(double offsetX) {
+void InstrumentGraph::drawMenu() {
 	if (m_menu.empty()) return;
+	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
+	if (getGraphType() == input::DANCEPAD) dimensions.screenTop().middle(m_cx.get()).stretch(m_width.get(), 1.0);
+	else dimensions.screenBottom().middle(m_cx.get()).fixedWidth(std::min(m_width.get(),0.5));
+	double offsetX = 0.5 * (dimensions.x1() + dimensions.x2());
 	float step = 0.05;
 	float y = -0.6 * m_menu.getOptions().size() * step;
 	// Some helper vars

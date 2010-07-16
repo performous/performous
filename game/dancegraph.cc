@@ -17,7 +17,7 @@ namespace {
 	static const int mapping10[max_panels]= {0, 3, 4, 7, 1, 6, 2, 5,-1,-1};
 	const std::string diffv[] = { "Beginner", "Easy", "Medium", "Hard", "Challenge" };
 	const int death_delay = 25; // Delay in notes after which the player is hidden
-	const float join_delay = 7.0f; // Time to select track/difficulty when joining mid-game
+	const float join_delay = 3.0f; // Time after join menu before playing when joining mid-game
 	const float past = -0.3f; // Relative time from cursor that is considered past (out of screen)
 	const float future = 2.0f; // Relative time from cursor that is considered future (out of screen)
 	const float timescale = 12.0f; // Multiplier to get graphics units from time
@@ -534,10 +534,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 
 /// Draw popups and other info texts
 void DanceGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
-	if (menuOpen()) {
-		// Draw join menu
-		drawMenu(offsetX);
-	} else {
+	if (!menuOpen()) {
 		// Draw scores
 		m_text.dimensions.screenBottom(-0.35).middle(0.32 * dimensions.w() + offsetX);
 		m_text.draw(boost::lexical_cast<std::string>(unsigned(getScore())));

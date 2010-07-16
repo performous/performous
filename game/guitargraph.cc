@@ -20,7 +20,7 @@ namespace {
 	};
 	const size_t diffsz = sizeof(diffv) / sizeof(*diffv);
 	const int death_delay = 20; // Delay in notes after which the player is hidden
-	const float join_delay = 6.0f; // Time to select track/difficulty when joining mid-game
+	const float join_delay = 3.0f; // Time after join menu before playing when joining mid-game
 	const float g_angle = 80.0f; // How much to rotate the fretboards
 	const float past = -0.2f; // Relative time from cursor that is considered past (out of screen)
 	const float future = 1.5f; // Relative time from cursor that is considered future (out of screen)
@@ -1055,9 +1055,7 @@ void GuitarGraph::drawDrumfill(float tBeg, float tEnd) {
 /// Draw popups and other info texts
 void GuitarGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 	// Draw info
-	if (menuOpen()) {
-		drawMenu(offsetX);
-	} else {
+	if (!menuOpen()) {
 		float xcor = 0.35 * dimensions.w();
 		float h = 0.075 * 2.0 * dimensions.w();
 		// Hack to show the scores better when there is more space (1 instrument)
