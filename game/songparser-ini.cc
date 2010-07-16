@@ -176,13 +176,9 @@ void SongParser::iniParse() {
 			n.end = midi.get_seconds(it2->end)+s.start;
 			n.notePrev = n.note = it2->note;
 			n.type = n.note > 100 ? Note::SLEEP : Note::NORMAL;
-			if(n.note == 116 || n.note == 103)
-				// n.type = Note::GOLDEN;
-				continue; // not yet managed by midi parser
-			else if(n.note == 124)
-				// n.type = Note::GOLDEN;
-				continue; // not yet managed by midi parser
-			else if(n.note > 100)
+			if(n.note == 116 || n.note == 103 || n.note == 124)
+				continue; // managed in the next loop (GOLDEN/FREESTYLE notes)
+			else if(n.note > 100) // is it always 105 ?
 				n.type = Note::SLEEP;
 			else
 				n.type = Note::NORMAL;
@@ -243,6 +239,20 @@ void SongParser::iniParse() {
 			} else if (!vocal.notes.empty() && vocal.notes.back().type != Note::SLEEP) {
 				eraseLast(vocal.notes.back().syllable);
 				vocal.notes.push_back(n);
+			}
+		}
+		for (MidiFileParser::Lyrics::const_iterator it2 = it->lyrics.begin(); it2 != it->lyrics.end(); ++it2) {
+			if(it2->note == 116 || it2->note == 103 || it2->note == 124) {
+				for(Notes::iterator it3 = vocal.notes.begin() ; it3 != vocal.notes.end(); ++it3) {
+					if(it3->begin == midi.get_seconds(it2->begin)+s.start && it3->type == Note::NORMAL) {
+						if(it2->note == 124) {
+							it3->type = Note::FREESTYLE;
+						} else {
+							it3->type = Note::GOLDEN;
+						}
+						break;
+					}
+				}
 			}
 		}
 		if (!vocal.notes.empty()) break;
