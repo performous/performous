@@ -62,6 +62,8 @@ class Song;
 
 class InstrumentGraph {
   public:
+	static void setupPauseMenu(Menu& menu);
+
 	/// Constructor
 	InstrumentGraph(Audio& audio, Song const& song, input::DevType inp);
 
@@ -117,7 +119,6 @@ class InstrumentGraph {
 	Menu m_menu;
 
 	// Shared functions for derived classes
-	void setupPauseMenu();
 	void drawPopups(double offsetX);
 	void handleCountdown(double time, double beginTime);
 

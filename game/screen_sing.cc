@@ -9,6 +9,7 @@
 #include "database.hh"
 #include "video.hh"
 #include "guitargraph.hh"
+#include "dancegraph.hh"
 #include "glutil.hh"
 #include "i18n.hh"
 #include "menu.hh"
@@ -111,17 +112,14 @@ void ScreenSing::enter() {
 	// Populate the pause menu
 	// TODO: Refactor this menu population to static
 	//       function that instrumentgraph can also use
-	m_menu.clear();
-	m_menu.add(MenuOption(_("Resume"), _("Back to performing!")));
-	// TODO: Implement restart
-	//m_menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning")));
-	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
+	InstrumentGraph::setupPauseMenu(m_menu);
 	m_menu.close();
 	// Startup delay for instruments is longer than for singing only
 	double setup_delay = (m_instruments.empty() && m_dancers.empty() ? -1.0 : -3.0);
 	m_audio.playMusic(m_song->music, false, 0.0, setup_delay);
 	m_engine.reset(new Engine(m_audio, m_song->vocals, analyzers.begin(), analyzers.end(), m_database));
 }
+
 
 /// Manages the instrument drawing
 /// Returns false if no instuments are alive

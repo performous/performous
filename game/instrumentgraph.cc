@@ -4,6 +4,16 @@
 
 //const unsigned InstrumentGraph::max_panels = 10; // Maximum number of arrow lines / guitar frets
 
+
+void InstrumentGraph::setupPauseMenu(Menu& menu) {
+	menu.clear();
+	menu.add(MenuOption(_("Resume"), _("Back to performing!")));
+	 //TODO: Implement restart
+	//menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning")));
+	menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
+}
+
+
 InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevType inp):
   m_audio(audio), m_song(song), m_input(input::DevType(inp)),
   m_stream(),
@@ -30,19 +40,10 @@ InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevType 
 }
 
 
-void InstrumentGraph::setupPauseMenu() {
-	m_menu.clear();
-	m_menu.add(MenuOption(_("Resume"), _("Back to performing!")));
-	// TODO: Implement restart
-	//m_menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning")));
-	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
-}
-
-
 void InstrumentGraph::doUpdates() {
 	if (!menuOpen() && !m_ready) {
 		m_ready = true;
-		setupPauseMenu();
+		setupPauseMenu(m_menu);
 	}
 }
 

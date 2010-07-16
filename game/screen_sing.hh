@@ -7,8 +7,6 @@
 #include "animvalue.hh"
 #include "engine.hh"
 #include "instrumentgraph.hh"
-#include "guitargraph.hh"
-#include "dancegraph.hh"
 #include "screen.hh"
 #include "backgrounds.hh"
 #include "theme.hh"
