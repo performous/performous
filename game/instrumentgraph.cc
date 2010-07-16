@@ -16,6 +16,7 @@ InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevType 
   m_correctness(0.0, 5.0),
   m_score(),
   m_scoreFactor(),
+  m_starmeter(),
   m_streak(),
   m_longestStreak(),
   m_bigStreak(),
@@ -46,8 +47,9 @@ void InstrumentGraph::doUpdates() {
 }
 
 
-void InstrumentGraph::toggleMenu(bool forceopen) {
-	if (forceopen) { m_menu.open(); return; }
+void InstrumentGraph::toggleMenu(int forcestate) {
+	if (forcestate == 1) { m_menu.open(); return; }
+	else if (forcestate == 0) { m_menu.close(); return; }
 	m_menu.toggle();
 }
 

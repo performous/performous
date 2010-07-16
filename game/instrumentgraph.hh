@@ -75,13 +75,14 @@ class InstrumentGraph {
 	virtual void changeDifficulty(int dir = 1) = 0;
 
 	void doUpdates();
-	void toggleMenu(bool forceopen = false);
+	void toggleMenu(int forcestate = -1); // 0 = close, 1 = open, -1 = auto/toggle
 	void togglePause(int) { m_audio.togglePause(); }
 	void restart(int) { /* TODO: Implement */ }
 	void quit(int) { ScreenManager::getSingletonPtr()->activateScreen("Songs"); }
 	std::string noValue() const { return ""; }
 
 	// General getters
+	bool joining(double time) const { return time < m_jointime; }
 	bool ready() const { return m_ready; };
 	bool menuOpen() const { return m_menu.isOpen(); }
 	void position(double cx, double width) { m_cx.setTarget(cx); m_width.setTarget(width); }
@@ -117,7 +118,6 @@ class InstrumentGraph {
 	void drawMenu(double offsetX);
 	void drawPopups(double offsetX);
 	void handleCountdown(double time, double beginTime);
-	bool joining(double time) const { return time < m_jointime; }
 
 	// Media
 	SvgTxtTheme m_text;

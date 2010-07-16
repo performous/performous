@@ -23,6 +23,7 @@ class Audio;
 class Capture;
 class Database;
 class Video;
+class Menu;
 
 typedef boost::ptr_vector<InstrumentGraph> Instruments;
 typedef boost::ptr_vector<InstrumentGraph> Dancers;
@@ -72,6 +73,7 @@ class ScreenSing: public Screen {
 	void activateNextScreen();
 	bool instrumentLayout(double time);
 	void danceLayout(double time);
+	void drawMenu();
 	Audio& m_audio;
 	Capture& m_capture;
 	Database& m_database;
@@ -86,6 +88,8 @@ class ScreenSing: public Screen {
 	boost::scoped_ptr<Surface> m_help;
 	boost::scoped_ptr<Engine> m_engine;
 	boost::scoped_ptr<LayoutSinger> m_layout_singer;
+	boost::scoped_ptr<ThemeInstrumentMenu> m_menuTheme;
+	Menu m_menu;
 	Instruments m_instruments;
 	Dancers m_dancers;
 	double m_latencyAV;  // Latency between audio and video output (do not confuse with latencyAR)
