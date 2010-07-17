@@ -13,7 +13,7 @@ include(LibFindMacros)
 
 find_path(PortMidi_INCLUDE_DIR NAMES portmidi.h)
 find_library(PortMidi_LIBRARY NAMES portmidi)
-find_library(PortTime_LIBRARY NAMES portmidi)
+find_library(PortTime_LIBRARY NAMES porttime)
 
 set(PortMidi_PROCESS_INCLUDES PortMidi_INCLUDE_DIR)
 set(PortMidi_PROCESS_LIBS PortMidi_LIBRARY PortTime_LIBRARY)
