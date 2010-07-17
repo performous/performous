@@ -254,8 +254,7 @@ int main(int argc, char** argv) try {
 	std::ios::sync_with_stdio(false);  // We do not use C stdio
 	std::srand(std::time(NULL));
 	// Parse commandline options
-	std::vector<std::string> mics;
-	std::vector<std::string> pdevs;
+	std::vector<std::string> devices;
 	std::vector<std::string> songdirs;
 	namespace po = boost::program_options;
 	po::options_description opt1("Generic options");
@@ -266,10 +265,7 @@ int main(int argc, char** argv) try {
 	  ("songlist", po::value<std::string>(&songlist), "save a list of songs in the specified folder");
 	po::options_description opt2("Configuration options");
 	opt2.add_options()
-	  ("mics", po::value<std::vector<std::string> >(&mics)->composing(), "specify the microphones to use")
-	  ("pdev", po::value<std::vector<std::string> >(&pdevs)->composing(), "specify the playback device")
-	  ("michelp", "detailed help and device list for --mics")
-	  ("pdevhelp", "detailed help and device list for --pdev")
+	  ("audio", po::value<std::vector<std::string> >(&devices)->composing(), "specify an audio device to use")
 	  ("jstest", "utility to get joystick button mappings");
 	po::options_description opt3("Hidden options");
 	opt3.add_options()
@@ -312,8 +308,7 @@ int main(int argc, char** argv) try {
 	}
 	// Override XML config for options that were specified from commandline or performous.conf
 	confOverride(songdirs, "system/path_songs");
-	confOverride(mics, "audio/capture");
-	confOverride(pdevs, "audio/playback");
+	confOverride(devices, "audio/devices");
 	getPaths(); // Initialize paths before other threads start
 	if (vm.count("jstest")) { // Joystick test program
 		std::cout << std::endl << "Joystick utility - Touch your joystick to see buttons here" << std::endl
