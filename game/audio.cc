@@ -5,6 +5,7 @@
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/thread/mutex.hpp>
+#include <boost/lexical_cast.hpp>
 #include <libda/fft.hpp>  // For M_PI
 #include <libda/portaudio.hpp>
 #include <cmath>
@@ -254,14 +255,14 @@ struct Device {
 	// Init
 	const unsigned int in, out;
 	const double rate;
-	const std::string dev;
+	const unsigned int dev;
 	portaudio::Stream stream;
 	std::vector<Analyzer*> mics;
 	Output* outptr;
 
-	Device(unsigned int in, unsigned int out, double rate, std::string dev):
+	Device(unsigned int in, unsigned int out, double rate, unsigned int dev):
 	  in(in), out(out), rate(rate), dev(dev),
-	  stream(*this, in ? portaudio::Params().channelCount(in).device(dev, true) : (const PaStreamParameters*)NULL, (out ? portaudio::Params().channelCount(out).device(dev, false) : (const PaStreamParameters*)NULL), rate),
+	  stream(*this, in ? portaudio::Params().channelCount(in).device(dev) : (const PaStreamParameters*)NULL, (out ? portaudio::Params().channelCount(out).device(dev) : (const PaStreamParameters*)NULL), rate),
 	  outptr()
 	{
 		mics.resize(in);
@@ -269,7 +270,8 @@ struct Device {
 
 	void start() {
 		PaError err = Pa_StartStream(stream);
-		if (err != paNoError) throw std::runtime_error("Cannot start PortAudio audio stream " + dev + ": " + Pa_GetErrorText(err));
+		if (err != paNoError) throw std::runtime_error("Cannot start PortAudio audio stream "
+		  + boost::lexical_cast<std::string>(dev) + ": " + Pa_GetErrorText(err));
 	}
 
 	int operator()(void const* input, void* output, unsigned long frames, const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags) try {
@@ -287,6 +289,7 @@ struct Device {
 		return paAbort;
 	}
 };
+
 
 struct Audio::Impl {
 	Output output;
@@ -327,23 +330,60 @@ struct Audio::Impl {
 					else throw std::runtime_error("Unknown device parameter " + key);
 					if (!iss.eof()) throw std::runtime_error("Syntax error parsing device parameter " + key);
 				}
-				devices.push_back(new Device(params.in, params.out, params.rate, params.dev));
-				Device& d = devices.back();
-				// Assign mics for all channels of the device (TODO: proper assignments)
-				for (unsigned int i = 0; i < d.in; ++i) {
-					if (mic_count + i + 1 > 4) break; // Too many mics
-					Analyzer* a = new Analyzer(d.rate);
-					analyzers.push_back(a);
-					d.mics[i] = a;
+				int count = Pa_GetDeviceCount();
+				int dev = -1;
+				// Handle empty device
+				if (params.dev.empty()) dev = params.in ? Pa_GetDefaultInputDevice() : Pa_GetDefaultOutputDevice();
+				// Try numeric value
+				if (dev < 0) {
+					std::istringstream iss(params.dev);
+					int tmp;
+					if (iss >> tmp && iss.get() == EOF && tmp >= 0 && tmp < count) dev = tmp;
 				}
-				// Assign playback output for the first available stereo output
-				if (!playback && d.out == 2) {
-					d.outptr = &output;
-					playback = true;
+				bool skip_partial = false;
+				bool found = false;
+				// Try exact match first, then partial
+				for (int match_partial = 0; match_partial < 2 && !skip_partial; ++match_partial) {
+					// Loop through the devices and try everyting that matches the name
+					for (int i = -1; i < count && (dev < 0 || i == -1); ++i) {
+						if (dev > 0 && i == -1) i = dev;
+						else if (i == -1) continue;
+						PaDeviceInfo const* info = Pa_GetDeviceInfo(i);
+						if (!info) continue;
+						if (params.in && info->maxInputChannels == 0) continue;
+						if (params.out && info->maxOutputChannels == 0) continue;
+						if (!match_partial && info->name != params.dev) continue;
+						if (match_partial && std::string(info->name).find(params.dev) == std::string::npos) continue;
+						// Match found if we got here
+						bool device_init_threw = true;
+						try {
+							devices.push_back(new Device(params.in, params.out, params.rate, i));
+							Device& d = devices.back();
+							device_init_threw = false;
+							// Start capture/playback on this device
+							d.start();
+							// Assign mics for all channels of the device (TODO: proper assignments)
+							for (unsigned int j = 0; j < d.in; ++j) {
+								if (mic_count + 1 > 4) break; // Too many mics
+								Analyzer* a = new Analyzer(d.rate);
+								analyzers.push_back(a);
+								d.mics[j] = a;
+								mic_count++;
+							}
+							// Assign playback output for the first available stereo output
+							if (!playback && d.out == 2) { d.outptr = &output; playback = true; }
+						} catch (...) {
+							if (!device_init_threw) devices.pop_back();
+							if (dev > 0) { skip_partial = true; break; } // Numeric, end search
+							continue;
+						}
+						skip_partial = true;
+						found = true;
+						break;
+					}
 				}
-				// Start capture/playback on this device
-				d.start();
-				mic_count += d.in;
+				// Error handling
+				if (!found) throw std::runtime_error("Not found or already in use.");
 			} catch(std::runtime_error& e) {
 				std::cerr << "Audio device '" << *it << "': " << e.what() << std::endl;
 			}

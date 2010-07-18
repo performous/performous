@@ -48,45 +48,6 @@ namespace portaudio {
 		}
 		Params& channelCount(int val) { params.channelCount = val; return *this; }
 		Params& device(PaDeviceIndex val) { params.device = val; return *this; }
-		Params& device(std::string const& name, bool inputDevice) {
-			static std::vector<bool> used_devices(Pa_GetDeviceCount(), false);
-			int count = Pa_GetDeviceCount();
-			int val = -1;
-			if (name.empty()) val = inputDevice ? Pa_GetDefaultInputDevice() : Pa_GetDefaultOutputDevice();
-			if (val >= 0 && used_devices.at(val)) val = -1; // Don't use default device if it is already in use
-			// Try numeric value
-			if (val < 0) {
-				std::istringstream iss(name);
-				int tmp;
-				if (iss >> tmp && iss.get() == EOF && tmp >= 0 && tmp < count && !used_devices.at(tmp)) val = tmp;
-			}
-			// Try matching exact name
-			if (val < 0) for (int i = 0; i != count; ++i) {
-				if (used_devices.at(i)) continue;
-				PaDeviceInfo const* info = Pa_GetDeviceInfo(i);
-				if (!info) continue;
-				if (inputDevice && info->maxInputChannels == 0) continue;
-				if (!inputDevice && info->maxOutputChannels == 0) continue;
-				if (info->name == name) { val = i; break; }
-			}
-			// Try matching partial name
-			if (val < 0) for (int i = 0; i != count; ++i) {
-				if (used_devices.at(i)) continue;
-				PaDeviceInfo const* info = Pa_GetDeviceInfo(i);
-				if (!info) continue;
-				if (inputDevice && info->maxInputChannels == 0) continue;
-				if (!inputDevice && info->maxOutputChannels == 0) continue;
-				if (std::string(info->name).find(name) != std::string::npos) { val = i; break; }
-			}
-			// Error handling
-			std::string dir = inputDevice ? "input" : "output";
-			if (val < 0) throw std::runtime_error(name.empty() ? "No PortAudio default " + dir + " device found" : "No matching PortAudio " + dir + " device (" + name + ") found");
-			PaDeviceInfo const* info = Pa_GetDeviceInfo(val);
-			if (!info) throw std::runtime_error("The specified " + dir + " device (" + name + ") does not exist."); // FIXME: When does this happen?
-			if ((inputDevice ? info->maxInputChannels : info->maxOutputChannels) == 0) throw std::runtime_error("The PortAudio " + dir + " device specified (" + name + ") has no " + dir + " channels");
-			// Set the device
-			return device(val);
-		}
 		Params& sampleFormat(PaSampleFormat val) { params.sampleFormat = val; return *this; }
 		Params& suggestedLatency(PaTime val) { params.suggestedLatency = val; return *this; }
 		Params& hostApiSpecificStreamInfo(void* val) { params.hostApiSpecificStreamInfo = val; return *this; }
