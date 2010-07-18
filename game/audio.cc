@@ -213,9 +213,9 @@ struct Output {
 
 struct Device {
 	// Init
-	unsigned int in, out;
-	double rate;
-	std::string dev;
+	const unsigned int in, out;
+	const double rate;
+	const std::string dev;
 	portaudio::Stream stream;
 	std::vector<Analyzer*> mics;
 	Output* outptr;
@@ -236,8 +236,8 @@ struct Device {
 		float const* in = static_cast<float const*>(input);
 		float* out = static_cast<float*>(output);
 		for (std::size_t i = 0; i < mics.size(); ++i) {
-			if (!mics[i]) continue;  // Channel not used
-			mics[i]->input(in, in + 1 * frames);
+			if (!mics[i]) continue;  // No analyzer? -> Channel not used
+			mics[i]->input(in, in + 1 * frames); // FIXME: needs libda iterators for multiple channel support
 		}
 		if (outptr) outptr->callback(out, out + 2 * frames);
 		return paContinue;
@@ -253,21 +253,57 @@ struct Audio::Impl {
 	boost::ptr_vector<Analyzer> analyzers;
 	Output output;
 	bool playback;
-	Impl() {
-		devices.push_back(new Device(1, 2, 48000.0, ""));
-		// One analyzer for mono input (TODO: fix callbackInput to allow more)
-		analyzers.push_back(new Analyzer(48000.0));
-		devices[0].mics[0] = &analyzers[0];
-		playback = false;
-		for (size_t i = 0; i < devices.size(); ++i) {
-			Device& d = devices[i];
-			// Assign playback output for the first available stereo output
-			if (!playback && d.out == 2) {
-				d.outptr = &output;
-				playback = true;
+	Impl(): playback() {
+		// Parse audio devices from config
+		ConfigItem::StringList devs = config["audio/devices"].sl();
+		for (ConfigItem::StringList::const_iterator it = devs.begin(), end = devs.end(); it != end; ++it) {
+			try {
+				struct Params {
+					int in, out;
+					unsigned int rate;
+					std::string dev;
+					std::vector<int> mics;
+				} params = Params();
+				params.rate = 48000;
+				// Break into tokens:
+				std::istringstream iss(*it);
+				for (std::string token; std::getline(iss, token, ' '); ) {
+					// Parse key=value
+					std::istringstream iss2(token);
+					std::string key;
+					std::getline(iss2, key, '=');
+					if (key == "out") iss2 >> params.out;
+					else if (key == "in") iss2 >> params.in;
+					else if (key == "rate") iss2 >> params.rate;
+					else if (key == "dev") std::getline(iss2, params.dev);
+					else if (key == "mics") {
+						// Parse a comma-separated list of mics
+						for (std::string mic; std::getline(iss2, mic, ','); ) {
+							params.mics.push_back(0); // TODO/FIXME: implement
+						}
+						
+					}
+					else throw std::runtime_error("Unknown device parameter " + key);
+					if (!iss2.eof()) throw std::runtime_error("Syntax error parsing device parameter " + key);
+				}
+				devices.push_back(new Device(params.in, params.out, params.rate, params.dev));
+				Device& d = devices.back();
+				// Assign mics for all channels of the device (TODO: proper assignments and limit the number of mics)
+				for (unsigned int i = 0; i < d.in; ++i) {
+					Analyzer* a = new Analyzer(d.rate);
+					analyzers.push_back(a);
+					d.mics[i] = a;
+				}
+				// Assign playback output for the first available stereo output
+				if (!playback && d.out == 2) {
+					d.outptr = &output;
+					playback = true;
+				}
+				// Start capture/playback on this device
+				d.start();
+			} catch(std::runtime_error& e) {
+				std::cerr << "Audio device '" << *it << "': " << e.what() << std::endl;
 			}
-			// Start capture/playback on this device
-			d.start();
 		}
 	}
 };
