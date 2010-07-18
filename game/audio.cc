@@ -29,11 +29,11 @@ namespace {
 				continue;
 			}
 			// Space in key (bad)
-			if (st[i] == ' ' && parsing_key)
-				throw std::logic_error("Error: Space in key in string: " + st);
+			if (st[i] == ' ' && parsing_key && !key.empty())
+				throw std::logic_error("Space in key in string: " + st);
 			// Value start
 			if (st[i] == '=' && !inside_quotes) {
-				if (key.empty()) throw std::logic_error("Error: Empty key in string: " + st);
+				if (key.empty()) throw std::logic_error("Empty key in string: " + st);
 				parsing_key = false;
 				continue;
 			}
