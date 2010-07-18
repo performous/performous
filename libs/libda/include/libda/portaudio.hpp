@@ -58,14 +58,21 @@ namespace portaudio {
 				int tmp;
 				if (iss >> tmp && iss.get() == EOF && tmp >= 0 && tmp < count) val = tmp;
 			}
-			// Try name matching
+			// Try matching exact name
 			if (val < 0) for (int i = 0; i != count; ++i) {
 				PaDeviceInfo const* info = Pa_GetDeviceInfo(i);
 				if (!info) continue;
 				if (inputDevice && info->maxInputChannels == 0) continue;
 				if (!inputDevice && info->maxOutputChannels == 0) continue;
-				val = i;
-				break;
+				if (info->name == name) { val = i; break; }
+			}
+			// Try matching partial name
+			if (val < 0) for (int i = 0; i != count; ++i) {
+				PaDeviceInfo const* info = Pa_GetDeviceInfo(i);
+				if (!info) continue;
+				if (inputDevice && info->maxInputChannels == 0) continue;
+				if (!inputDevice && info->maxOutputChannels == 0) continue;
+				if (std::string(info->name).find(name) != std::string::npos) { val = i; break; }
 			}
 			// Error handling
 			std::string dir = inputDevice ? "input" : "output";
