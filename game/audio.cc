@@ -249,10 +249,10 @@ struct Device {
 };
 
 struct Audio::Impl {
+	Output output;
 	portaudio::Init init;
 	boost::ptr_vector<Device> devices;
 	boost::ptr_vector<Analyzer> analyzers;
-	Output output;
 	bool playback;
 	Impl(): playback() {
 		// Parse audio devices from config
