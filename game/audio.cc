@@ -9,6 +9,45 @@
 #include <libda/portaudio.hpp>
 #include <cmath>
 #include <iostream>
+#include <map>
+
+namespace {
+	std::map<std::string, std::string> parseKeyValuePairs(const std::string& st) {
+		std::map<std::string, std::string> ret;
+		bool inside_quotes = false;
+		int parsing_key = true;
+		std::string key = "", value = "";
+		for (size_t i = 0; i < st.size(); ++i) {
+			// Quotes
+			if (st[i] == '"') { inside_quotes = !inside_quotes; continue; }
+			// Value end
+			if (st[i] == ' ' && !inside_quotes && !parsing_key) {
+				if (value.empty()) continue; // Skip whitespace after equals sign
+				ret[key] = value;
+				key = ""; value = "";
+				parsing_key = true;
+				continue;
+			}
+			// Space in key (bad)
+			if (st[i] == ' ' && parsing_key)
+				throw std::logic_error("Error: Space in key in string: " + st);
+			// Value start
+			if (st[i] == '=' && !inside_quotes) {
+				if (key.empty()) throw std::logic_error("Error: Empty key in string: " + st);
+				parsing_key = false;
+				continue;
+			}
+			// Key start
+			if (st[i] != ' ' && parsing_key) { key += st[i]; continue; }
+			// If we got here, it is value
+			value += st[i];
+		}
+		// Handle last key
+		if (!key.empty()) ret[key] = value;
+		return ret;
+	}
+}
+
 
 class Music {
 	struct Track {
@@ -267,25 +306,24 @@ struct Audio::Impl {
 				} params = Params();
 				params.rate = 48000;
 				// Break into tokens:
-				std::istringstream iss(*it);
-				for (std::string token; std::getline(iss, token, ' '); ) {
-					// Parse key=value
-					std::istringstream iss2(token);
-					std::string key;
-					std::getline(iss2, key, '=');
-					if (key == "out") iss2 >> params.out;
-					else if (key == "in") iss2 >> params.in;
-					else if (key == "rate") iss2 >> params.rate;
-					else if (key == "dev") std::getline(iss2, params.dev);
+				std::map<std::string, std::string> keyvalues = parseKeyValuePairs(*it);
+				for (std::map<std::string, std::string>::const_iterator it2 = keyvalues.begin();
+				  it2 != keyvalues.end(); ++it2) {
+					// Handle keys
+					std::string key = it2->first;
+					std::istringstream iss(it2->second);
+					if (key == "out") iss >> params.out;
+					else if (key == "in") iss >> params.in;
+					else if (key == "rate") iss >> params.rate;
+					else if (key == "dev") std::getline(iss, params.dev);
 					else if (key == "mics") {
 						// Parse a comma-separated list of mics
-						for (std::string mic; std::getline(iss2, mic, ','); ) {
+						for (std::string mic; std::getline(iss, mic, ','); ) {
 							params.mics.push_back(0); // TODO/FIXME: implement
 						}
-						
 					}
 					else throw std::runtime_error("Unknown device parameter " + key);
-					if (!iss2.eof()) throw std::runtime_error("Syntax error parsing device parameter " + key);
+					if (!iss.eof()) throw std::runtime_error("Syntax error parsing device parameter " + key);
 				}
 				devices.push_back(new Device(params.in, params.out, params.rate, params.dev));
 				Device& d = devices.back();
