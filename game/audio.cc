@@ -294,6 +294,7 @@ struct Audio::Impl {
 	boost::ptr_vector<Analyzer> analyzers;
 	bool playback;
 	Impl(): playback() {
+		int mic_count = 0;
 		// Parse audio devices from config
 		ConfigItem::StringList devs = config["audio/devices"].sl();
 		for (ConfigItem::StringList::const_iterator it = devs.begin(), end = devs.end(); it != end; ++it) {
@@ -327,8 +328,9 @@ struct Audio::Impl {
 				}
 				devices.push_back(new Device(params.in, params.out, params.rate, params.dev));
 				Device& d = devices.back();
-				// Assign mics for all channels of the device (TODO: proper assignments and limit the number of mics)
+				// Assign mics for all channels of the device (TODO: proper assignments)
 				for (unsigned int i = 0; i < d.in; ++i) {
+					if (mic_count + i + 1 > 4) break; // Too many mics
 					Analyzer* a = new Analyzer(d.rate);
 					analyzers.push_back(a);
 					d.mics[i] = a;
@@ -340,6 +342,7 @@ struct Audio::Impl {
 				}
 				// Start capture/playback on this device
 				d.start();
+				mic_count += d.in;
 			} catch(std::runtime_error& e) {
 				std::cerr << "Audio device '" << *it << "': " << e.what() << std::endl;
 			}
