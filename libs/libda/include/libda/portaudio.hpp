@@ -49,17 +49,20 @@ namespace portaudio {
 		Params& channelCount(int val) { params.channelCount = val; return *this; }
 		Params& device(PaDeviceIndex val) { params.device = val; return *this; }
 		Params& device(std::string const& name, bool inputDevice) {
+			static std::vector<bool> used_devices(Pa_GetDeviceCount(), false);
 			int count = Pa_GetDeviceCount();
 			int val = -1;
 			if (name.empty()) val = inputDevice ? Pa_GetDefaultInputDevice() : Pa_GetDefaultOutputDevice();
+			if (val >= 0 && used_devices.at(val)) val = -1; // Don't use default device if it is already in use
 			// Try numeric value
 			if (val < 0) {
 				std::istringstream iss(name);
 				int tmp;
-				if (iss >> tmp && iss.get() == EOF && tmp >= 0 && tmp < count) val = tmp;
+				if (iss >> tmp && iss.get() == EOF && tmp >= 0 && tmp < count && !used_devices.at(tmp)) val = tmp;
 			}
 			// Try matching exact name
 			if (val < 0) for (int i = 0; i != count; ++i) {
+				if (used_devices.at(i)) continue;
 				PaDeviceInfo const* info = Pa_GetDeviceInfo(i);
 				if (!info) continue;
 				if (inputDevice && info->maxInputChannels == 0) continue;
@@ -68,6 +71,7 @@ namespace portaudio {
 			}
 			// Try matching partial name
 			if (val < 0) for (int i = 0; i != count; ++i) {
+				if (used_devices.at(i)) continue;
 				PaDeviceInfo const* info = Pa_GetDeviceInfo(i);
 				if (!info) continue;
 				if (inputDevice && info->maxInputChannels == 0) continue;
