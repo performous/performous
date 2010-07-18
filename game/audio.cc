@@ -298,16 +298,15 @@ struct Audio::Impl {
 	boost::ptr_vector<Analyzer> analyzers;
 	bool playback;
 	Impl(): playback() {
-		int mic_count = 0;
 		// Parse audio devices from config
 		ConfigItem::StringList devs = config["audio/devices"].sl();
 		for (ConfigItem::StringList::const_iterator it = devs.begin(), end = devs.end(); it != end; ++it) {
 			try {
 				struct Params {
-					int in, out;
+					int out;
 					unsigned int rate;
 					std::string dev;
-					std::vector<int> mics;
+					std::vector<std::string> mics;
 				} params = Params();
 				params.rate = 48000;
 				// Break into tokens:
@@ -318,14 +317,11 @@ struct Audio::Impl {
 					std::string key = it2->first;
 					std::istringstream iss(it2->second);
 					if (key == "out") iss >> params.out;
-					else if (key == "in") iss >> params.in;
 					else if (key == "rate") iss >> params.rate;
 					else if (key == "dev") std::getline(iss, params.dev);
 					else if (key == "mics") {
 						// Parse a comma-separated list of mics
-						for (std::string mic; std::getline(iss, mic, ','); ) {
-							params.mics.push_back(0); // TODO/FIXME: implement
-						}
+						for (std::string mic; std::getline(iss, mic, ','); params.mics.push_back(mic)) {}
 					}
 					else throw std::runtime_error("Unknown device parameter " + key);
 					if (!iss.eof()) throw std::runtime_error("Syntax error parsing device parameter " + key);
@@ -333,7 +329,7 @@ struct Audio::Impl {
 				int count = Pa_GetDeviceCount();
 				int dev = -1;
 				// Handle empty device
-				if (params.dev.empty()) dev = params.in ? Pa_GetDefaultInputDevice() : Pa_GetDefaultOutputDevice();
+				if (params.dev.empty()) dev = (params.out == 0 ? Pa_GetDefaultInputDevice() : Pa_GetDefaultOutputDevice());
 				// Try numeric value
 				if (dev < 0) {
 					std::istringstream iss(params.dev);
@@ -344,31 +340,38 @@ struct Audio::Impl {
 				bool found = false;
 				// Try exact match first, then partial
 				for (int match_partial = 0; match_partial < 2 && !skip_partial; ++match_partial) {
-					// Loop through the devices and try everyting that matches the name
+					// Loop through the devices and try everything that matches the name
 					for (int i = -1; i < count && (dev < 0 || i == -1); ++i) {
 						if (dev > 0 && i == -1) i = dev;
 						else if (i == -1) continue;
 						PaDeviceInfo const* info = Pa_GetDeviceInfo(i);
 						if (!info) continue;
-						if (params.in && info->maxInputChannels == 0) continue;
-						if (params.out && info->maxOutputChannels == 0) continue;
+						if (info->maxInputChannels < int(params.mics.size())) continue;
+						if (info->maxOutputChannels < params.out) continue;
 						if (!match_partial && info->name != params.dev) continue;
 						if (match_partial && std::string(info->name).find(params.dev) == std::string::npos) continue;
 						// Match found if we got here
 						bool device_init_threw = true;
 						try {
-							devices.push_back(new Device(params.in, params.out, params.rate, i));
+							devices.push_back(new Device(params.mics.size(), params.out, params.rate, i));
 							Device& d = devices.back();
 							device_init_threw = false;
 							// Start capture/playback on this device
 							d.start();
-							// Assign mics for all channels of the device (TODO: proper assignments)
+							// Assign mics for all channels of the device
 							for (unsigned int j = 0; j < d.in; ++j) {
-								if (mic_count + 1 > 4) break; // Too many mics
+								if (analyzers.size() >= 4) break; // Too many mics
+								std::string const& m = params.mics[j];
+								if (m.empty()) continue; // Input channel not used
+								// TODO: allow assignment in any order (not sequentially like the following code does)
+								if (m == "blue" && analyzers.size() != 0) continue;
+								if (m == "red" && analyzers.size() != 1) continue;
+								if (m == "green" && analyzers.size() != 2) continue;
+								if (m == "orange" && analyzers.size() != 3) continue;
+								// Add the new analyzer
 								Analyzer* a = new Analyzer(d.rate);
 								analyzers.push_back(a);
 								d.mics[j] = a;
-								mic_count++;
 							}
 							// Assign playback output for the first available stereo output
 							if (!playback && d.out == 2) { d.outptr = &output; playback = true; }

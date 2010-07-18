@@ -179,9 +179,9 @@ to save the current settings to XML.
 		</locale>
 	</entry>
 	<entry name="audio/devices" type="string_list">
-		<stringvalue>in=2 dev="default" mics="blue,red"</stringvalue><!-- SingStar mics -->
-		<stringvalue>in=1 dev="Microphone"</stringvalue><!-- Rock Band branded Logitech mic -->
-		<stringvalue>in=1</stringvalue><!-- Any other microphone -->
+		<stringvalue>dev="USBMIC" mics="blue,red"</stringvalue><!-- SingStar mics -->
+		<stringvalue>dev="Microphone" mics="*"</stringvalue><!-- Rock Band branded Logitech mic -->
+		<stringvalue>mics="blue"</stringvalue><!-- Any other microphone (only if blue is still free) -->
 		<stringvalue>out=2</stringvalue><!-- Any stereo output device -->
 		<locale name="C">
 			<short>Audio devices</short>
