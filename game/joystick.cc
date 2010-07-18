@@ -1,5 +1,4 @@
 #include "joystick.hh"
-#include <iostream>
 
 #include <boost/lexical_cast.hpp>
 
@@ -22,30 +21,30 @@ input::MidiDrums::MidiDrums(): stream(pm::findDevice(true, config["system/midi_i
 	static const int DRUM3_BLUE   = 3; // low tom/ ride cymbal
 	static const int DRUM4_GREEN  = 4; // low floor tom/ crash cymbal
 
-	map[35] = DRUM0_ORANGE;  // 35 - Acoustic Bass Drum 	
+	map[35] = DRUM0_ORANGE;  // 35 - Acoustic Bass Drum
 	map[36] = DRUM0_ORANGE;  // 36 - Bass Drum 1 *)
-	map[37] = DRUM1_RED;     // 37 - Side Stick 	
-	map[38] = DRUM1_RED;     // 38 - Acoustic Snare *) 	
-	// 39 - Hand Clap 	
-	map[40] = DRUM1_RED;     // 40 - Electric Snare 	
+	map[37] = DRUM1_RED;     // 37 - Side Stick
+	map[38] = DRUM1_RED;     // 38 - Acoustic Snare *)
+	// 39 - Hand Clap
+	map[40] = DRUM1_RED;     // 40 - Electric Snare
 	map[41] = DRUM4_GREEN;   // 41 - Low Floor Tom *)
-	map[42] = DRUM2_YELLOW;  // 42 - Closed Hi-Hat 	
-	// 43 - High Floor Tom 	
+	map[42] = DRUM2_YELLOW;  // 42 - Closed Hi-Hat
+	// 43 - High Floor Tom
 	// map[44] = DRUM2_YELLOW;  // 44 - Pedal Hi-Hat *) - ignore this for playability!
 	map[45] = DRUM3_BLUE;    // 45 - Low Tom *)
 	map[46] = DRUM2_YELLOW;  // 46 - Open Hi-Hat *)
-	// 47 - Low-Mid Tom 	
+	// 47 - Low-Mid Tom
 	map[48] = DRUM2_YELLOW;  // 48 - Hi-Mid Tom *)
 	map[49] = DRUM4_GREEN;   // 49 - Crash Cymbal 1 *)
 	// 50 - High Tom
 	map[51] = DRUM3_BLUE;    // 51 - Ride Cymbal 1 *)
 	// 52 - Chinese Cymbal
-	// 53 - Ride Bell 	
-	// 54 - Tambourine 	
-	// 55 - Splash Cymbal 	
-	// 56 - Cowbell 	
-	map[57] = DRUM4_GREEN;   // 57 - Crash Cymbal 2 	
-	// 58 - Vibraslap 	
+	// 53 - Ride Bell
+	// 54 - Tambourine
+	// 55 - Splash Cymbal
+	// 56 - Cowbell
+	map[57] = DRUM4_GREEN;   // 57 - Crash Cymbal 2
+	// 58 - Vibraslap
 	map[59] = DRUM3_BLUE;    // 59 - Ride Cymbal 2
 	// 60 - Hi Bongo
 	// 61 - Low Bongo
@@ -56,7 +55,7 @@ input::MidiDrums::MidiDrums(): stream(pm::findDevice(true, config["system/midi_i
 	// 66 - Low Timbale
 	// 67 - High Agogo
 	// 68 - Low Agogo
-	// 69 - Cabasa 
+	// 69 - Cabasa
 	// 70 - Maracas
 	// 71 - Short Whistle
 	// 72 - Long Whistle
@@ -91,7 +90,7 @@ void input::MidiDrums::process() {
 		unsigned char note = ev.message >> 8;
 		unsigned char vel  = ev.message >> 16;
 #if 0
-		// it is IMHO not a good idea to filter on the channel. 
+		// it is IMHO not a good idea to filter on the channel.
 		// code snippet left here for visibility
 		unsigned char chan = ev.message & 0x0F;
 		if (chan != 0x09) continue; // only accept channel 10 (percussion)
@@ -121,7 +120,7 @@ int input::buttonFromSDL(input::detail::Type _type, unsigned int _sdl_button) {
 		{ 0, 1, 3, 2, 4,-1,  8,  9, -1, -1, -1, -1, -1, -1, -1, -1 }, // Guitar Hero X-plorer guitar
 		{ 3, 0, 1, 2, 4, 5, -1, -1,  8,  9, -1, -1, -1, -1, -1, -1 }, // Rock Band guitar PS3
 		{ 0, 1, 3, 2, 4,-1,  8,  9, -1, -1, -1, -1, -1, -1, -1, -1 }, // Rock Band guitar XBOX360
-		{ 2, 1, 3, 4,-1, 0, -1, -1,  8,  9, -1, -1, -1, -1, -1, -1 }, // Hama Wireless Guitar Controller for PS2 with converter
+		{ 2, 1, 3, 4, 5, 0, -1, -1,  8,  9, -1, -1, -1, -1, -1, -1 }, // Hama Wireless Guitar Controller for PS2 with converter
 		//K  R  Y  B  G  O    // for drums
 		{ 3, 4, 1, 2, 0, 4, -1, -1,  8,  9, -1, -1, -1, -1, -1, -1 }, // Guitar Hero drums
 		{ 3, 4, 1, 2, 0,-1, -1, -1,  8,  9, -1, -1, -1, -1, -1, -1 }, // Rock Band drums PS3

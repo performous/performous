@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include "color.hh"
+
 /// musical scale, defaults to C major
 class MusicalScale {
   private:
@@ -80,8 +82,8 @@ struct Note {
 	double phase; /// Position within a measure, [0, 1)
 	/// power of note (how well it is being hit right now)
 	mutable double power;
-	/// how well the note was sung [0,1] (used for drawing a star)
-	mutable double accuracy;
+	/// which players sung well
+	mutable std::vector<Color> stars;
 	/// note type
 	enum Type { FREESTYLE = 'F', NORMAL = ':', GOLDEN = '*', SLIDE = '+', SLEEP = '-',
 	  TAP = '1', HOLDBEGIN = '2', HOLDEND = '3', ROLL = '4', MINE = 'M', LIFT = 'L'} type;

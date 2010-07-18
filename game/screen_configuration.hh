@@ -1,9 +1,10 @@
 #pragma once
 
-#include "screen.hh"
-#include "audio.hh"
-#include "theme.hh"
 #include <boost/scoped_ptr.hpp>
+#include "screen.hh"
+
+class Audio;
+class ThemeConfiguration;
 
 /// options dialogue
 class ScreenConfiguration: public Screen {

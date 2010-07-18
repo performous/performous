@@ -4,6 +4,8 @@
 #include "util.hh"
 #include "fs.hh"
 #include "joystick.hh"
+#include "theme.hh"
+#include "progressbar.hh"
 
 ScreenPractice::ScreenPractice(std::string const& name, Audio& audio):
   Screen(name), m_audio(audio)

@@ -1,12 +1,13 @@
 #pragma once
 
 #include <boost/scoped_ptr.hpp>
-#include "audio.hh"
 #include "screen.hh"
-#include "theme.hh"
-//#include "opengl_text.hh"
-#include "progressbar.hh"
 #include "joystick.hh"
+
+class Audio;
+class Sample;
+class ProgressBar;
+class ThemePractice;
 
 /// screen for practice mode
 class ScreenPractice : public Screen {

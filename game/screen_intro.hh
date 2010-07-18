@@ -1,12 +1,12 @@
 #pragma once
 
+#include <boost/scoped_ptr.hpp>
 #include "dialog.hh"
 #include "screen.hh"
-#include "theme.hh"
-#include "menu.hh"
-#include <boost/scoped_ptr.hpp>
 
 class Audio;
+class ThemeIntro;
+class MenuOption;
 
 /// intro screen
 class ScreenIntro : public Screen {
@@ -17,7 +17,7 @@ class ScreenIntro : public Screen {
 	void exit();
 	void manageEvent(SDL_Event event);
 	void draw();
-	
+
 	/// draw menu
 	void draw_menu_options();
 

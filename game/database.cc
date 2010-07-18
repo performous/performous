@@ -102,7 +102,7 @@ void Database::queryPerSongHiscore (std::ostream & os, boost::shared_ptr<Song> s
 	int songid = m_songs.lookup(s);
 	std::vector<HiscoreItem> hi = m_hiscores.queryHiscore(10, -1, songid, track);
 
-	if (songid == -1 || hi.size() == 0)
+	if (songid == -1 || hi.empty())
 	{
 		os << _("No Items up to now.") << '\n';
 		os << _("Be the first to be listed here!") << '\n';
@@ -122,7 +122,7 @@ void Database::queryPerSongHiscore_HiscoreDisplay (std::ostream & os, boost::sha
 	int songid = m_songs.lookup(s);
 	std::vector<HiscoreItem> hi = m_hiscores.queryHiscore(10, -1, songid, track);
 
-	if (songid == -1 || hi.size() == 0)
+	if (songid == -1 || hi.empty())
 	{
 		os << "No Items up to now.\n";
 		os << "Be the first to be listed here!\n";

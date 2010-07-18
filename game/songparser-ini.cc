@@ -2,13 +2,14 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/regex.hpp>
 #include <stdexcept>
 #include "midifile.hh"
 
 /// @file
-/// Functions used for parsing the UltraStar TXT song format
+/// Functions used for parsing the Frets on Fire INI song format
+
+using namespace SongParserUtil;
 
 /// 'Magick' to check if this file looks like correct format
 bool SongParser::iniCheck(std::vector<char> const& data) {
@@ -17,21 +18,9 @@ bool SongParser::iniCheck(std::vector<char> const& data) {
 }
 
 namespace {
-	void eraseLast(std::string& s, char ch = ' ') {
-		if (!s.empty() && *s.rbegin() == ch) s.erase(s.size() - 1);
-	}
 	void testAndAdd(Song& s, std::string const& trackid, std::string const& filename) {
 		std::string f = s.path + filename;
 		if (boost::filesystem::exists(f)) s.music[trackid] = f;
-	}
-	/// Parse a double from string and assign it to a variable
-	void assign(double& var, std::string str) {
-		std::replace(str.begin(), str.end(), ',', '.'); // Fix decimal separators
-		try {
-			var = boost::lexical_cast<double>(str);
-		} catch (...) {
-			throw std::runtime_error("\"" + str + "\" is not valid floating point value");
-		}
 	}
 	/// Change the MIDI track name to Performous track name
 	/// Return false if not valid
@@ -186,6 +175,12 @@ void SongParser::iniParse() {
 			n.end = midi.get_seconds(it2->end)+s.start;
 			n.notePrev = n.note = it2->note;
 			n.type = n.note > 100 ? Note::SLEEP : Note::NORMAL;
+			if(n.note == 116 || n.note == 103 || n.note == 124)
+				continue; // managed in the next loop (GOLDEN/FREESTYLE notes)
+			else if(n.note > 100) // is it always 105 ?
+				n.type = Note::SLEEP;
+			else
+				n.type = Note::NORMAL;
 			{
 				std::stringstream ss(it2->lyric);
 				convertToUTF8(ss);
@@ -245,6 +240,20 @@ void SongParser::iniParse() {
 				vocal.notes.push_back(n);
 			}
 		}
+		for (MidiFileParser::Lyrics::const_iterator it2 = it->lyrics.begin(); it2 != it->lyrics.end(); ++it2) {
+			if(it2->note == 116 || it2->note == 103 || it2->note == 124) {
+				for(Notes::iterator it3 = vocal.notes.begin() ; it3 != vocal.notes.end(); ++it3) {
+					if(it3->begin == midi.get_seconds(it2->begin)+s.start && it3->type == Note::NORMAL) {
+						if(it2->note == 124) {
+							it3->type = Note::FREESTYLE;
+						} else {
+							it3->type = Note::GOLDEN;
+						}
+						break;
+					}
+				}
+			}
+		}
 		if (!vocal.notes.empty()) break;
 	}
 	// Figure out if we have BRE in the song
@@ -269,7 +278,7 @@ void SongParser::iniParse() {
 	// copy midi sections to song section
 	// design goals: (1) keep midi parser free of dependencies on song (2) store data in song as parsers are discarded before song
 	// one option would be to pass a song reference to the midi parser however, that conflicts with goal (1)
-	for (std::vector<MidiFileParser::MidiSection>::iterator it= midi.midisections.begin(); it != midi.midisections.end(); it++) {
+	for (std::vector<MidiFileParser::MidiSection>::iterator it= midi.midisections.begin(); it != midi.midisections.end(); ++it) {
 		Song::SongSection tmp(it->name, it->begin);
 		s.songsections.push_back(tmp);
 		//std::cout << "Section " << tmp.name << " at " << tmp.begin << std::endl;

@@ -71,7 +71,7 @@ static void checkEvents_SDL(ScreenManager& sm) {
 				config["graphic/fullscreen"].b() = !config["graphic/fullscreen"].b();
 				continue; // Already handled here...
 			}
-			if (keypressed == SDLK_PRINT || keypressed == SDLK_F12) {
+			if (keypressed == SDLK_PRINT || (keypressed == SDLK_F12 && (modifier & KMOD_CTRL))) {
 				g_take_screenshot = true;
 				continue; // Already handled here...
 			}
@@ -327,11 +327,7 @@ void outputOptionalFeatureStatus() {
 	std::cout    << "  Internationalization:   " <<
 	(Gettext::enabled() ? "Enabled" : "Disabled")
 	<< std::endl << "  MIDI I/O:               " <<
-	#ifdef USE_PORTMIDI
-		"Enabled"
-	#else
-		"Disabled"
-	#endif
+	(input::MidiDrums::enabled() ? "Enabled" : "Disabled")
 	<< std::endl << "  Webcam support:         " <<
 	(Webcam::enabled() ? "Enabled" : "Disabled")
 	<< std::endl;

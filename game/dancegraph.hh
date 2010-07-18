@@ -1,16 +1,8 @@
 #pragma once
 
-#include <vector>
 #include <boost/ptr_container/ptr_map.hpp>
 
 #include "instrumentgraph.hh"
-#include "animvalue.hh"
-#include "song.hh"
-#include "notes.hh"
-#include "audio.hh"
-#include "joystick.hh"
-#include "surface.hh"
-#include "opengl_text.hh"
 
 class Song;
 
@@ -80,5 +72,6 @@ class DanceGraph: public InstrumentGraph {
 	// Misc
 	int m_arrow_map[max_panels]; /// game mode dependant mapping of arrows' ordering at cursor
 	int m_flow_direction;
+	bool m_insideStop;
 };
 

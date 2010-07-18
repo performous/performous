@@ -1,12 +1,11 @@
 #include "guitargraph.hh"
-#include "instrumentgraph.hh"
 #include "fs.hh"
 #include "song.hh"
-#include "3dobject.hh"
+#include "i18n.hh"
+
 #include <cmath>
 #include <cstdlib>
 #include <stdexcept>
-
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 
@@ -192,7 +191,7 @@ void GuitarGraph::engine() {
 	}
 	if (!m_drumfills.empty()) updateDrumFill(time); // Drum Fills / BREs
 	if (m_starpower.get() > 0.001) m_correctness.setTarget(1.0, true);
-	if (time < m_jointime) m_dead = 0; // Disable dead counting while joining
+	if (joining(time)) m_dead = 0; // Disable dead counting while joining
 	double whammy = 0;
 	bool difficulty_changed = false;
 	// Handle all events
@@ -223,7 +222,7 @@ void GuitarGraph::engine() {
 		if (ev.type == input::Event::PRESS) m_pressed_anim[!m_drums + ev.button].setValue(1.0);
 		else if (ev.type == input::Event::PICK) m_pressed_anim[0].setValue(1.0);
 		// Difficulty and track selection
-		if (time < m_jointime) {
+		if (joining(time)) {
 			if (ev.type == input::Event::PICK || ev.type == input::Event::PRESS) {
 				if (!m_drums && ev.pressed[4]) nextTrack();
 				else if (ev.pressed[0 + m_drums]) difficulty(DIFFICULTY_SUPAEASY);
@@ -672,10 +671,10 @@ void GuitarGraph::draw(double time) {
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
 	dimensions.screenBottom().middle(m_cx.get()).fixedWidth(std::min(m_width.get(),0.5));
 	double offsetX = 0.5 * (dimensions.x1() + dimensions.x2());
-	double frac = 0.75;  // Adjustable: 1.0 means fully separated, 0.0 means fully attached
 	float ng_r = 0, ng_g = 0, ng_b = 0; // neck glow color components
 	int ng_ccnt = 0; // neck glow color count
 	{	// Translate, rotate and scale to place
+		double frac = 0.75;  // Adjustable: 1.0 means fully separated, 0.0 means fully attached
 		glutil::PushMatrixMode pmm(GL_PROJECTION);
 		glTranslatef(frac * 2.0 * offsetX, 0.0f, 0.0f);
 		glutil::PushMatrixMode pmb(GL_MODELVIEW);
@@ -776,13 +775,17 @@ void GuitarGraph::draw(double time) {
 						glow = m_events[event - 1].glow.get();
 						whammy = m_events[event - 1].whammy.get();
 					}
-					// Get a color for the fret and adjust it if GodMode is on
-					glutil::Color c = colorize(color(fret), it->begin);
-					if (glow > 0.1f) { ng_r+=c.r; ng_g+=c.g; ng_b+=c.b; ng_ccnt++; } // neck glow
-					// Further adjust the color if the note is hit
-					c.r += glow * 0.2f;
-					c.g += glow * 0.2f;
-					c.b += glow * 0.2f;
+					// Set the default color (disabled state)
+					glutil::Color c(0.5f, 0.5f, 0.5f);
+					if (!joining(time)) {
+						// Get a color for the fret and adjust it if GodMode is on
+						c = colorize(color(fret), it->begin);
+						if (glow > 0.1f) { ng_r+=c.r; ng_g+=c.g; ng_b+=c.b; ng_ccnt++; } // neck glow
+						// Further adjust the color if the note is hit
+						c.r += glow * 0.2f;
+						c.g += glow * 0.2f;
+						c.b += glow * 0.2f;
+					}
 					if (glow > 0.5f && tEnd < 0.1f && it->hitAnim[fret].get() == 0.0)
 						it->hitAnim[fret].setTarget(1.0);
 					// Call the actual note drawing function
@@ -981,7 +984,7 @@ void GuitarGraph::drawDrumfill(float tBeg, float tEnd) {
 /// Draw popups and other info texts
 void GuitarGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 	// Draw info
-	if (time < m_jointime) {
+	if (joining(time)) {
 		m_text.dimensions.screenBottom(-0.041).middle(-0.09 + offsetX);
 		m_text.draw(diffv[m_level].name);
 		m_text.dimensions.screenBottom(-0.015).middle(-0.09 + offsetX);
