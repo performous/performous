@@ -395,11 +395,23 @@ void Audio::playMusic(std::string const& filename, bool preview, double fadeTime
 void Audio::stopMusic() {
 	std::map<std::string,std::string> m;
 	playMusic(m, false, 0.0);
+	{
+		Output& o = self->output;
+		// stop synth when music is stopped
+		boost::mutex::scoped_lock l(o.synth_mutex);
+		o.synth.reset();
+	}
 }
 
 void Audio::fadeout(double fadeTime) {
 	std::map<std::string,std::string> m;
 	playMusic(m, false, fadeTime);
+	{
+		Output& o = self->output;
+		// stop synth when music is stopped
+		boost::mutex::scoped_lock l(o.synth_mutex);
+		o.synth.reset();
+	}
 }
 
 double Audio::getPosition() const {
