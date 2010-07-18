@@ -49,6 +49,22 @@ namespace da {
 	static inline int conv_to_s16_fast(sample_t s) { return static_cast<int>(s * max_s16); }
 	static inline int conv_to_s24_fast(sample_t s) { return static_cast<int>(s * max_s24); }
 	static inline int conv_to_s32_fast(sample_t s) { return static_cast<int>(s * max_s32); }
+
+	template <typename ValueType> class step_iterator: public std::iterator<std::random_access_iterator_tag, ValueType> {
+		ValueType* m_pos;
+		std::ptrdiff_t m_step;
+	  public:
+		step_iterator(ValueType* pos, std::ptrdiff_t step): m_pos(pos), m_step(step) {}
+		ValueType& operator*() { return *m_pos; }
+		step_iterator operator+(std::ptrdiff_t rhs) { return step_iterator(m_pos + m_step * rhs, m_step); }
+		step_iterator& operator++() { m_pos += m_step; return *this; }
+		bool operator!=(step_iterator const& rhs) const { return m_pos != rhs.m_pos; }
+		std::ptrdiff_t operator-(step_iterator const& rhs) const { return (m_pos - rhs.m_pos) / m_step; }
+		// TODO: more operators
+	};
+
+	typedef step_iterator<sample_t> sample_iterator;
+	typedef step_iterator<sample_t const> sample_const_iterator;
 }
 
 #endif

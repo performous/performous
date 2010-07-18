@@ -273,13 +273,14 @@ struct Device {
 	}
 
 	int operator()(void const* input, void* output, unsigned long frames, const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags) try {
-		float const* in = static_cast<float const*>(input);
-		float* out = static_cast<float*>(output);
+		float const* inbuf = static_cast<float const*>(input);
+		float* outbuf = static_cast<float*>(output);
 		for (std::size_t i = 0; i < mics.size(); ++i) {
 			if (!mics[i]) continue;  // No analyzer? -> Channel not used
-			mics[i]->input(in, in + 1 * frames); // FIXME: needs libda iterators for multiple channel support
+			da::sample_const_iterator it = da::sample_const_iterator(inbuf + i, in);
+			mics[i]->input(it, it + frames);
 		}
-		if (outptr) outptr->callback(out, out + 2 * frames);
+		if (outptr) outptr->callback(outbuf, outbuf + 2 * frames);
 		return paContinue;
 	} catch (std::exception& e) {
 		std::cerr << "Exception in audio callback: " << e.what() << std::endl;
