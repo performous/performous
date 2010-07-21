@@ -73,7 +73,7 @@ static void checkEvents_SDL(ScreenManager& sm) {
 				config["graphic/fullscreen"].b() = !config["graphic/fullscreen"].b();
 				continue; // Already handled here...
 			}
-			if (keypressed == SDLK_PRINT || keypressed == SDLK_F12) {
+			if (keypressed == SDLK_PRINT || (keypressed == SDLK_F12 && (modifier & KMOD_CTRL))) {
 				g_take_screenshot = true;
 				continue; // Already handled here...
 			}
@@ -145,6 +145,9 @@ void audioSetup(Capture& capture, Audio& audio) {
 		if (channels != 2) throw std::runtime_error("Only stereo playback is supported, error in pdev=" + *it);
 		try {
 			audio.open(devstr, rate, frames);
+			// when we get here, we have successfully opened a device.
+			// let's use it then!
+			break;
 		} catch (std::exception const& e) {
 			std::cerr << "Playback device pdev=" << *it << " failed and will be ignored:\n  " << e.what() << std::endl;
 		}
@@ -403,11 +406,7 @@ void outputOptionalFeatureStatus() {
 	std::cout    << "  Internationalization:   " <<
 	(Gettext::enabled() ? "Enabled" : "Disabled")
 	<< std::endl << "  MIDI I/O:               " <<
-	#ifdef USE_PORTMIDI
-		"Enabled"
-	#else
-		"Disabled"
-	#endif
+	(input::MidiDrums::enabled() ? "Enabled" : "Disabled")
 	<< std::endl << "  Webcam support:         " <<
 	(Webcam::enabled() ? "Enabled" : "Disabled")
 	<< std::endl;

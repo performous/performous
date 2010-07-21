@@ -3,7 +3,9 @@
 #include "util.hh"
 #include "fs.hh"
 #include "record.hh"
-#include "joystick.hh"
+#include "audio.hh"
+#include "theme.hh"
+#include "progressbar.hh"
 
 ScreenPractice::ScreenPractice(std::string const& name, Audio& audio, Capture& capture):
   Screen(name), m_audio(audio), m_capture(capture)
@@ -12,11 +14,10 @@ ScreenPractice::ScreenPractice(std::string const& name, Audio& audio, Capture& c
 void ScreenPractice::enter() {
 	m_audio.playMusic(getThemePath("practice.ogg"));
 	theme.reset(new ThemePractice());
-	// draw vu meters
+	// Draw vu meters
 	for (unsigned int i = 0, mics = m_capture.analyzers().size(); i < mics; ++i) {
-		ProgressBar* b;
-		m_vumeters.push_back(b = new ProgressBar(getThemePath("vumeter_bg.svg"), getThemePath("vumeter_fg.svg"), ProgressBar::VERTICAL, 0.136, 0.023));
-		b->dimensions.screenBottom().left(-0.4 + i * 0.2).fixedWidth(0.04);
+		m_vumeters.push_back(new ProgressBar(getThemePath("vumeter_bg.svg"), getThemePath("vumeter_fg.svg"), ProgressBar::VERTICAL, 0.136, 0.023));
+		m_vumeters.back().dimensions.screenBottom().left(-0.4 + i * 0.2).fixedWidth(0.04);
 	}
 	unsigned int sr = m_audio.getSR();
 	m_samples.push_back(Sample(getPath("sounds/drum_bass.ogg"), sr));

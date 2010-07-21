@@ -1,14 +1,14 @@
 #pragma once
 
 #include <boost/scoped_ptr.hpp>
-#include "audio.hh"
 #include "screen.hh"
-#include "theme.hh"
-//#include "opengl_text.hh"
-#include "progressbar.hh"
 #include "joystick.hh"
 
+class Audio;
 class Capture;
+class Sample;
+class ProgressBar;
+class ThemePractice;
 
 /// screen for practice mode
 class ScreenPractice : public Screen {
@@ -19,7 +19,7 @@ class ScreenPractice : public Screen {
 	void exit();
 	void manageEvent( SDL_Event event );
 	void draw();
-	
+
 	/// draw analyzers
 	void draw_analyzers();
 

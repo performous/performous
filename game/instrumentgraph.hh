@@ -8,11 +8,8 @@
 #include "joystick.hh"
 #include "surface.hh"
 #include "opengl_text.hh"
-#include "3dobject.hh"
 #include "glutil.hh"
 #include "fs.hh"
-#include "i18n.hh"
-
 
 /// Represents popup messages
 class Popup {
@@ -69,6 +66,7 @@ class InstrumentGraph {
 	  m_correctness(0.0, 5.0),
 	  m_score(),
 	  m_scoreFactor(),
+	  m_starmeter(),
 	  m_streak(),
 	  m_longestStreak(),
 	  m_bigStreak(),

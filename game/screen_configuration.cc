@@ -2,6 +2,9 @@
 
 #include "configuration.hh"
 #include "joystick.hh"
+#include "theme.hh"
+#include "audio.hh"
+
 
 ScreenConfiguration::ScreenConfiguration(std::string const& name, Audio& audio): Screen(name), m_audio(audio), selected() {
 	for (ConfigMenu::const_iterator it = configMenu.begin(); it != configMenu.end(); ++it) {
@@ -36,7 +39,7 @@ void ScreenConfiguration::manageEvent(SDL_Event event) {
 		int key = event.key.keysym.sym;
 		SDLMod modifier = event.key.keysym.mod;
 		if (configuration.empty()) return; // The rest work if there are any config options
-		else if (key == SDLK_r && modifier & KMOD_CTRL) ci->reset(modifier & KMOD_ALT);
+		else if (key == SDLK_r && modifier & KMOD_CTRL && ci) ci->reset(modifier & KMOD_ALT);
 		else if (key == SDLK_s && modifier & KMOD_CTRL) writeConfig(modifier & KMOD_ALT);
 	}
 }

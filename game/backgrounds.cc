@@ -1,7 +1,6 @@
 #include "backgrounds.hh"
 
 #include "configuration.hh"
-#include "fs.hh"
 
 #include <boost/bind.hpp>
 #include <boost/format.hpp>

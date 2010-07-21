@@ -1,11 +1,7 @@
 #pragma once
 
 #include <vector>
-#include <map>
-#include <iostream>
-#include <stdexcept>
 #include <string>
-
 #include <boost/scoped_ptr.hpp>
 #include <boost/noncopyable.hpp>
 #include "surface.hh"

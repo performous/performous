@@ -36,7 +36,6 @@ fs::path getLocaleDir() {
 }
 
 fs::path getConfigDir() {
-
 	static fs::path dir;
 	static bool initialized = false;
 	if (!initialized) {
@@ -69,6 +68,37 @@ fs::path getConfigDir() {
 	}
 	return dir;
 }
+
+fs::path getDataDir() {
+#ifdef _WIN32
+		return getConfigDir();  // APPDATA/performous
+#else
+		fs::path shortDir = "performous";
+		fs::path shareDir = SHARED_DATA_DIR;
+		char const* xdg_data_home = getenv("XDG_DATA_HOME");
+		// FIXME: Should this use "games" or not?
+		return (xdg_data_home ? xdg_data_home / shortDir : getHomeDir() / ".local" / shareDir);
+#endif
+}
+
+fs::path getCacheDir() {
+#ifdef _WIN32
+		return getConfigDir() / "cache";  // APPDATA/performous
+#else
+		fs::path shortDir = "performous";
+		char const* xdg_cache_home = getenv("XDG_CACHE_HOME");
+		// FIXME: Should this use "games" or not?
+		return (xdg_cache_home ? xdg_cache_home / shortDir : getHomeDir() / ".cache" / shortDir);
+#endif
+}
+
+fs::path getThemeDir() {
+	std::string theme = config["game/theme"].s();
+	static const std::string defaultTheme = "default";
+	if (theme.empty()) theme = defaultTheme;
+	return getDataDir() / "themes" / theme;
+}
+
 
 fs::path pathMangle(fs::path const& dir) {
 	fs::path ret;
@@ -124,16 +154,10 @@ Paths const& getPaths(bool refresh) {
 		fs::path shortDir = "performous";
 		fs::path shareDir = SHARED_DATA_DIR;
 		Paths dirs;
-#ifdef _WIN32
-		dirs.push_back(getConfigDir());  // APPDATA/performous
-#else
-		// Adding XDG_DATA_HOME
-		{
-			char const* xdg_data_home = getenv("XDG_DATA_HOME");
-			// FIXME: Should this use "games" or not?
-			dirs.push_back(xdg_data_home ? xdg_data_home / shortDir : getHomeDir() / ".local" / shareDir);
-		}
-#endif
+
+		// Adding users data dir
+		dirs.push_back(getDataDir());
+
 		// Adding relative path from executable
 		dirs.push_back(plugin::execname().parent_path().parent_path() / shareDir);
 #ifndef _WIN32

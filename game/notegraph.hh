@@ -29,6 +29,7 @@ class NoteGraph {
 	Texture m_notelines;
 	Texture m_wave;
 	Texture m_star;
+	Texture m_star_hl;
 	Texture m_notebar;
 	Texture m_notebar_hl;
 	Texture m_notebarfs;

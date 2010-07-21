@@ -1,14 +1,8 @@
 #include "3dobject.hh"
-#include "surface.hh"
-#include "glutil.hh"
 
-#include <vector>
-#include <map>
-#include <iostream>
 #include <sstream>
 #include <fstream>
 #include <stdexcept>
-#include <string>
 #include <cmath>
 
 
@@ -93,7 +87,7 @@ void Object3d::generateDisplayList() {
 	glutil::DisplayList displist(m_displist, GL_COMPILE); // From now on, gl-commands go to the list
 	std::vector<Face>::const_iterator it;
 	// Iterate through faces
-	for (it = m_faces.begin(); it != m_faces.end(); it++) {
+	for (it = m_faces.begin(); it != m_faces.end(); ++it) {
 		// Select a suitable primitive
 		GLenum polyType = GL_POLYGON;
 		switch (it->vertices.size()) {

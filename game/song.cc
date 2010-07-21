@@ -81,7 +81,7 @@ Song::Status Song::status(double time) const {
 
 bool Song::getNextSection(double pos, SongSection &section) {
 	if (songsections.empty()) return false;
-	for (std::vector<Song::SongSection>::iterator it= songsections.begin(); it != songsections.end(); it++) {
+	for (std::vector<Song::SongSection>::iterator it= songsections.begin(); it != songsections.end(); ++it) {
 		if (it->begin > pos) {
 			section = *it;
 			return true;
