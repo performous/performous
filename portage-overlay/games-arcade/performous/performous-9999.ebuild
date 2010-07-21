@@ -25,6 +25,7 @@ if [ "$PV" != "9999" ]; then
 		$SRC_URI"
 else
 	EGIT_REPO_URI="git://performous.git.sourceforge.net/gitroot/performous/performous"
+	EGIT_BRANCH="master"
 fi
 
 LICENSE="GPL-2
