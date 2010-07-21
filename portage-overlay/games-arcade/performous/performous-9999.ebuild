@@ -91,12 +91,16 @@ src_configure() {
 		$(cmake-utils_use pulseaudio LibDA_PLUGIN_PULSEAUDIO)
 		$(cmake-utils_use_enable tools TOOLS)
 		$(cmake-utils_use_enable editor EDITOR)
+		$(cmake-utils_use_no webcam WEBCAM)
 		-DCMAKE_INSTALL_PREFIX=${GAMES_PREFIX}
 		-DSHARE_INSTALL=share/performous
 		-DLOCALE_DIR=/usr/share
 		-DLIBDA_AUTODETECT_PLUGINS=false
 		-DLIBDA_PLUGIN_TESTING=false
 		-DCMAKE_BUILD_TYPE=Release"
+#	local mycmakeargs="
+#		$(cmake-utils_use_no midi MIDI)
+#		${mycmakeargs}"
 
 	cmake-utils_src_configure
 }
