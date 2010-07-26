@@ -33,6 +33,9 @@ std::string getThemePath(std::string const& filename);
 /** Get full path to a share file **/
 std::string getPath(fs::path const& filename);
 
+/** Get full path to a default conguration file **/
+fs::path getDefaultConfig(fs::path const &configFile);
+
 typedef std::vector<fs::path> Paths;
 
 /** Get all shared data paths in preference order **/

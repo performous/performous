@@ -178,6 +178,20 @@ Paths const& getPaths(bool refresh) {
 	return paths;
 }
 
+fs::path getDefaultConfig(fs::path const &configFile) {
+	typedef std::vector<std::string> ConfigList;
+	ConfigList config_list;
+	char const* root = getenv("PERFORMOUS_ROOT");
+	if (root) config_list.push_back(std::string(root) + "/" SHARED_DATA_DIR + configFile.string());
+	fs::path exec = plugin::execname();
+	if (!exec.empty()) config_list.push_back(exec.parent_path().string() + "/../" SHARED_DATA_DIR + configFile.string());
+	ConfigList::const_iterator it = std::find_if(config_list.begin(), config_list.end(), static_cast<bool(&)(fs::path const&)>(fs::exists));
+	if (it == config_list.end()) {
+		throw std::runtime_error("Could not find default config file " + configFile.string());
+	}
+	return *it;
+}
+
 Paths getPathsConfig(std::string const& confOption) {
 	Paths ret;
 	Paths const& paths = getPaths();
