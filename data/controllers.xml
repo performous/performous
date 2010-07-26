@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<controllers>
+	<guitar name="GUITAR_GH">
+		<match>
+			<description>Guitar Hero 3 guitar</description>
+			<regexp match="Guitar Hero3" />
+		</match>
+		<mapping>
+			<button id="0" value="yellow" />
+			<button id="1" value="green" />
+			<button id="2" value="red" />
+			<button id="3" value="blue" />
+			<button id="4" value="orange" />
+			<button id="5" value="godmode" />
+			<button id="8" value="select" />
+			<button id="9" value="start" />
+		</mapping>
+	</guitar>
+        <guitar name="GUITAR_RB_XBOX360">
+		<match>
+			<description>Guitar Hero X-plorer guitar</description>
+	                <regexp match="Guitar Hero X-plorer" />
+		</match>
+		<match>
+			<description>Rock Band guitar Xbox 360</description>
+			<regexp match="Harmonix Guitar .* Xbox" />
+		</match>
+                <mapping> 
+                        <button id="0" value="green" />
+                        <button id="1" value="red" />
+                        <button id="2" value="blue" />
+                        <button id="3" value="yellow" />
+                        <button id="4" value="orange" />
+                        <button id="6" value="select" />
+                        <button id="7" value="start" />
+                </mapping>
+        </guitar>
+	<guitar name="GUITAR_RB_PS3">
+		<match>
+			<description>Rock Band guitar PS3</description>
+			<regexp match="Harmonix Guitar .* PlayStation" />
+		</match>
+		<mapping>
+			<button id="0" value="blue" />
+			<button id="1" value="green" />
+			<button id="2" value="red" />
+			<button id="3" value="yellow" />
+			<button id="4" value="orange" />
+			<button id="5" value="godmode" />
+			<button id="8" value="select" />
+			<button id="9" value="start" />
+		</mapping>
+	</guitar>
+	<guitar name="GUITAR_HAMA_PS2">
+		<match>
+			<description>Hama Guitar for PS2 with converter</description>
+			<regexp match="PS  Converter" />
+		</match>
+		<mapping>
+			<button id="0" value="yellow" />
+			<button id="1" value="red" />
+			<button id="2" value="blue" />
+			<button id="3" value="orange" />
+			<button id="4" value="godmode" />
+			<button id="5" value="green" />
+			<button id="8" value="select" />
+			<button id="9" value="start" />
+		</mapping>
+	</guitar>
+	<drumkit name="DRUMS_GH">
+		<match>
+			<description>Guitar Hero 4 drum kit (guessed, could be a guitar)</description>
+			<regexp match="Guitar Hero4" />
+		</match>
+		<mapping>
+			<button id="0" value="blue" />
+			<button id="1" value="green" />
+			<button id="2" value="red" />
+			<button id="3" value="yellow" />
+			<button id="4" value="kick" />
+			<button id="5" value="green" />
+			<button id="8" value="select" />
+			<button id="9" value="start" />
+		</mapping>
+	</drumkit>
+	<drumkit name="DRUMS_RB_PS3">
+		<match>
+			<description>RockBand Wii drum kit</description>
+			<regexp match="Harmonix Drum Controller for Nintendo Wii" />
+		</match>
+		<match>
+			<description>RockBand PS3 drum kit</description>
+			<regexp match="Harmonix Drum [Kk]it for Playstation" />
+		</match>
+		<mapping>
+			<button id="0" value="blue" />
+			<button id="1" value="green" />
+			<button id="2" value="red" />
+			<button id="3" value="yellow" />
+			<button id="4" value="kick" />
+			<button id="8" value="select" />
+			<button id="9" value="start" />
+		</mapping>
+	</drumkit>
+	<drumkit name="DRUMS_RB_XB360">
+		<match>
+			<description>RockBand XBox drum kit</description>
+			<regexp match="Harmonix Drum [Kk]it for Xbox" />
+		</match>
+		<mapping>
+			<button id="0" value="green" />
+			<button id="1" value="red" />
+			<button id="2" value="blue" />
+			<button id="3" value="yellow" />
+			<button id="4" value="kick" />
+			<button id="6" value="select" />
+			<button id="7" value="start" />
+		</mapping>
+	</drumkit>
+	<dancepad name="DANCEPAD_GENERIC">
+		<match>
+			<description>Generic dancepad</description>
+			<regexp match="Dance mat|RedOctane USB Pad|Redoctane XBOX DDR|Positive Gaming Impact USB pad" />
+		</match>
+		<mapping>
+			<button id="0" value="left" />
+			<button id="1" value="down" />
+			<button id="2" value="up" />
+			<button id="3" value="right" />
+			<button id="4" value="up-left" />
+			<button id="5" value="up-right" />
+			<button id="6" value="down-left" />
+			<button id="7" value="down-right" />
+			<button id="8" value="select" />
+			<button id="9" value="start" />
+		</mapping>
+	</dancepad>
+	<dancepad name="DANCEPAD_TIGERGAME">
+		<match>
+			<description>TigerGame dancepad</description>
+			<regexp match="TigerGame" />
+		</match>
+		<mapping>
+			<button id="0" value="select" />
+			<button id="1" value="start" />
+			<button id="8" value="left" />
+			<button id="9" value="right" />
+			<button id="10" value="down" />
+			<button id="11" value="up" />
+		</mapping>
+	</dancepad>
+	<dancepad name="DANCEPAD_EMS2">
+		<match>
+			<description>EMS PS2/PC dancepad adapter</description>
+			<regexp match="0b43:0003" />
+		</match>
+		<mapping>
+			<button id="0" value="down-left" />
+			<button id="1" value="up-right" />
+			<button id="2" value="up-left" />
+			<button id="3" value="down-right" />
+			<button id="8" value="select" />
+			<button id="9" value="start" />
+			<button id="12" value="up" />
+			<button id="13" value="right" />
+			<button id="14" value="down" />
+			<button id="15" value="left" />
+		</mapping>
+	</dancepad>
+	<dancepad name="DANCEPAD_2TECH">
+		<match>
+			<description>2-tech usb dancepad</description>
+			<regexp match="USB Gamepad" />
+		</match>
+		<mapping>
+			<button id="0" value="left" />
+			<button id="1" value="down" />
+			<button id="2" value="up" />
+			<button id="3" value="right" />
+			<button id="4" value="up-left" />
+			<button id="5" value="up-right" />
+			<button id="6" value="down-left" />
+			<button id="7" value="down-right" />
+			<button id="8" value="start" />
+			<button id="9" value="select" />
+		</mapping>
+	</dancepad>
+</controllers>
