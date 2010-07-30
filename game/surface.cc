@@ -52,7 +52,11 @@ template <typename T> void loader(T& target, fs::path name) {
 					// SVG file is newer we should update cache
 					loadSVG(target, filename, cache_filename.string());
 				} else {
-					loadPNG(target, cache_filename.string());
+					try {
+						loadPNG(target, cache_filename.string());
+					}catch (std::runtime_error){
+						loadSVG(target, filename, cache_filename.string());
+					}
 				}
 			} else {
 				loadSVG(target, filename, cache_filename.string());
