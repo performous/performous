@@ -80,8 +80,8 @@ void InstrumentGraph::drawMenu() {
 	for (MenuOptions::const_iterator it = m_menu.begin(); it != m_menu.end(); ++it, ++i) {
 		SvgTxtTheme* txt = &th.option;
 		// Draw the key hints
-		if (getGraphType() != input::DANCEPAD) {
-			int fret = (getGraphType() == input::DRUMS ? ((i + 1) % 5) : i);
+		if (getGraphType() != input::DANCEPAD && i < m_pads) {
+			int fret = (getGraphType() == input::DRUMS ? ((i + 1) % m_pads) : i);
 			glColor4fv(color(fret));
 			m_button.dimensions.middle(x - button_margin).center(y).stretch(0.05, 0.05);
 			m_button.draw();
@@ -97,12 +97,15 @@ void InstrumentGraph::drawMenu() {
 		w = std::max(w, txt->w() + 2 * step + button_margin * 2); // Calculate the widest entry
 		y += step;
 	}
+	// Draw comment text
 	if (cur->getComment() != "") {
 		//th.comment_bg.dimensions.middle().screenBottom(-0.2);
 		//th.comment_bg.draw();
 		th.comment.dimensions.middle(offsetX).screenBottom(-0.12);
 		th.comment.draw(cur->getComment());
 	}
+	m_button.dimensions.stretch(1.0, 1.0);
+	// Save the calculated menu dimensions
 	m_menu.dimensions.stretch(w, h);
 }
 

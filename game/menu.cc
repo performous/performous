@@ -2,8 +2,7 @@
 #include "screen.hh"
 #include "surface.hh"
 #include "fs.hh"
-#include "configuration.hh"
-#include "instrumentgraph.hh"
+
 
 MenuOption::MenuOption(const std::string& nm, const std::string& comm):
 	type(CLOSE_SUBMENU),

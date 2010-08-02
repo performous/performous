@@ -293,8 +293,8 @@ void GuitarGraph::engine() {
 		// Menu keys
 		if (menuOpen()) {
 			// Check first regular keys
-			if (ev.type == input::Event::PRESS && ev.button >= 0 && ev.button < 5) {
-				int sel = m_drums ? ((ev.button + 5 - 1) % 5) : ev.button;
+			if (ev.type == input::Event::PRESS && ev.button >= 0 && ev.button < m_pads) {
+				int sel = m_drums ? ((ev.button + m_pads - 1) % m_pads) : ev.button;
 				m_menu.select(sel);
 				m_menu.action();
 			}
