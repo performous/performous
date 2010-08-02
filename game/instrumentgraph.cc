@@ -59,15 +59,16 @@ void InstrumentGraph::drawMenu() {
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
 	if (getGraphType() == input::DANCEPAD) dimensions.screenTop().middle(m_cx.get()).stretch(m_width.get(), 1.0);
 	else dimensions.screenBottom().middle(m_cx.get()).fixedWidth(std::min(m_width.get(),0.5));
-	double offsetX = 0.5 * (dimensions.x1() + dimensions.x2());
-	float step = 0.05;
-	float y = -0.6 * m_menu.getOptions().size() * step;
-	float h = m_menu.getOptions().size() * step + step;
 	// Some helper vars
 	ThemeInstrumentMenu& th = *m_menuTheme;
 	MenuOptions::const_iterator cur = static_cast<MenuOptions::const_iterator>(&m_menu.current());
+	const double offsetX = 0.5f * (dimensions.x1() + dimensions.x2());
+	const float txth = th.option.h();
+	const float step = txth * 0.7f;
+	const float h = m_menu.getOptions().size() * step + step;
+	float y = -h * .5f + step;
 	// Background
-	th.bg.dimensions.middle(.05 + offsetX).center((y+step)*.5).stretch(.45, h);
+	th.bg.dimensions.middle(.05 + offsetX).center(0).stretch(.45, h);
 	th.bg.draw();
 	// Loop through menu items
 	for (MenuOptions::const_iterator it = m_menu.begin(); it != m_menu.end(); ++it) {
@@ -84,7 +85,7 @@ void InstrumentGraph::drawMenu() {
 	if (cur->getComment() != "") {
 		//th.comment_bg.dimensions.middle().screenBottom(-0.2);
 		//th.comment_bg.draw();
-		th.comment.dimensions.middle(-0.1 + offsetX).screenBottom(-0.22);
+		th.comment.dimensions.middle(-0.1 + offsetX).screenBottom(-0.12);
 		th.comment.draw(cur->getComment());
 	}
 }

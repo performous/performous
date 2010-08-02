@@ -483,14 +483,15 @@ void ScreenSing::draw() {
 
 void ScreenSing::drawMenu() {
 	if (m_menu.empty()) return;
-	float step = 0.075;
-	float y = -0.6 * m_menu.getOptions().size() * step;
-	float h = m_menu.getOptions().size() * step + step;
 	// Some helper vars
 	ThemeInstrumentMenu& th = *m_menuTheme;
 	MenuOptions::const_iterator cur = static_cast<MenuOptions::const_iterator>(&m_menu.current());
+	const float txth = th.option.h();
+	const float step = txth * 0.85f;
+	const float h = m_menu.getOptions().size() * step + step;
+	float y = -h * .5f + step;
 	// Background
-	th.bg.dimensions.middle(.05).center((y+step)*.5).stretch(.45, h);
+	th.bg.dimensions.middle(.05).center(0).stretch(.45, h);
 	th.bg.draw();
 	// Loop through menu items
 	for (MenuOptions::const_iterator it = m_menu.begin(); it != m_menu.end(); ++it) {
@@ -503,7 +504,7 @@ void ScreenSing::drawMenu() {
 		y += step;
 	}
 	if (cur->getComment() != "") {
-		th.comment.dimensions.middle(-0.1).screenBottom(-0.22);
+		th.comment.dimensions.middle(-0.1).screenBottom(-0.12);
 		th.comment.draw(cur->getComment());
 	}
 }
