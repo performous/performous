@@ -62,6 +62,7 @@ MenuOption::MenuOption(const std::string& nm, const std::string& comm, const std
 
 
 Menu::Menu():
+	dimensions(),
 	m_open(true)
 {
 	clear();

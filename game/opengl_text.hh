@@ -153,6 +153,8 @@ class SvgTxtTheme {
 	double w() const { return m_texture_width; }
 	/// height
 	double h() const { return m_texture_height; }
+	/// set align
+	void setAlign(Align align) { m_align = align; }
 
   private:
 	boost::ptr_vector<OpenGLText> m_opengl_text;

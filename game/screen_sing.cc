@@ -488,27 +488,32 @@ void ScreenSing::drawMenu() {
 	// Some helper vars
 	ThemeInstrumentMenu& th = *m_menuTheme;
 	MenuOptions::const_iterator cur = static_cast<MenuOptions::const_iterator>(&m_menu.current());
+	double w = m_menu.dimensions.w();
 	const float txth = th.option.h();
 	const float step = txth * 0.85f;
 	const float h = m_menu.getOptions().size() * step + step;
 	float y = -h * .5f + step;
+	float x = -w * .5f + step;
 	// Background
-	th.bg.dimensions.middle(.05).center(0).stretch(.45, h);
+	th.bg.dimensions.middle(0).center(0).stretch(w, h);
 	th.bg.draw();
 	// Loop through menu items
+	w = 0;
 	for (MenuOptions::const_iterator it = m_menu.begin(); it != m_menu.end(); ++it) {
 		SvgTxtTheme* txt = &th.option;
 		if (cur == it) {
 			txt = &th.option_selected;
 		}
-		txt->dimensions.middle(-0.1).center(y);
+		txt->dimensions.middle(x).center(y);
 		txt->draw(it->getName());
+		w = std::max(w, txt->w() + 2 * step); // Calculate the widest entry
 		y += step;
 	}
 	if (cur->getComment() != "") {
-		th.comment.dimensions.middle(-0.1).screenBottom(-0.12);
+		th.comment.dimensions.middle(0).screenBottom(-0.12);
 		th.comment.draw(cur->getComment());
 	}
+	m_menu.dimensions.stretch(w, h);
 }
 
 

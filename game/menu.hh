@@ -77,6 +77,8 @@ struct Menu {
 	const MenuOptions::const_iterator end() const { return menu_stack.back()->end(); }
 	const MenuOptions getOptions() const { return *menu_stack.back(); }
 
+	Dimensions dimensions;
+
   private:
 	MenuOptions root_options;
 	SubmenuStack menu_stack;

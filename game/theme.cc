@@ -66,4 +66,5 @@ ThemeInstrumentMenu::ThemeInstrumentMenu():
 	//comment_bg(getThemePath("menu_comment_bg.svg"))
 {
 	back_h.dimensions.fixedHeight(0.08f);
+	comment.setAlign(SvgTxtTheme::CENTER);
 }
