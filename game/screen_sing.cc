@@ -402,6 +402,8 @@ void ScreenSing::draw() {
 		theme->bg_top.draw();
 	}
 
+	m_layout_singer->hideLyrics(m_audio.isPaused());
+
 	// Dancing
 	if( !m_dancers.empty() ) {
 		danceLayout(time);

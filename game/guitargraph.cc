@@ -785,20 +785,22 @@ void GuitarGraph::draw(double time) {
 		}
 
 		// Draw the cursor
-		float level = m_pressed_anim[0].get();
-		glColor3f(level, level, level);
-		drawBar(0.0, 0.01f);
-		// Fret buttons on cursor
-		for (int fret = m_drums; fret < m_pads; ++fret) {
-			float x = getFretX(fret);
-			float l = m_pressed_anim[fret + !m_drums].get();
-			// Get a color for the fret and adjust it if GodMode is on
-			glColor4fv(colorize(color(fret), time));
-			m_button.dimensions.center(time2y(0.0)).middle(x);
-			m_button.draw();
-			glColor3f(l, l, l);
-			m_tap.dimensions = m_button.dimensions;
-			m_tap.draw();
+		if (!menuOpen()) {
+			float level = m_pressed_anim[0].get();
+			glColor3f(level, level, level);
+			drawBar(0.0, 0.01f);
+			// Fret buttons on cursor
+			for (int fret = m_drums; fret < m_pads; ++fret) {
+				float x = getFretX(fret);
+				float l = m_pressed_anim[fret + !m_drums].get();
+				// Get a color for the fret and adjust it if GodMode is on
+				glColor4fv(colorize(color(fret), time));
+				m_button.dimensions.center(time2y(0.0)).middle(x);
+				m_button.draw();
+				glColor3f(l, l, l);
+				m_tap.dimensions = m_button.dimensions;
+				m_tap.draw();
+			}
 		}
 
 		// Draw the notes

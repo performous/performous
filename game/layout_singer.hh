@@ -56,6 +56,7 @@ class LayoutSinger {
 	void draw(double time, Position position = LayoutSinger::BOTTOM);
 	void drawScore(Position position);
 	double lyrics_begin();
+	void hideLyrics(bool hide = true) { m_hideLyrics = hide; };
   private:
 	VocalTrack& m_vocals;
 	NoteGraph m_noteGraph;
@@ -67,4 +68,5 @@ class LayoutSinger {
 	Database& m_database;
 	boost::shared_ptr<ThemeSing> m_theme;
 	AnimValue m_feedbackFader;
+	bool m_hideLyrics;
 };
