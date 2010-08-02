@@ -121,7 +121,11 @@ class InstrumentGraph {
 	void drawPopups(double offsetX);
 	void handleCountdown(double time, double beginTime);
 
+	// Functions not really shared, but needed here
+	glutil::Color const& color(int fret) const;
+
 	// Media
+	Surface m_button;
 	SvgTxtTheme m_text;
 	boost::scoped_ptr<SvgTxtThemeSimple> m_popupText;
 	boost::scoped_ptr<ThemeInstrumentMenu> m_menuTheme;

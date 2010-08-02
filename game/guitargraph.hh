@@ -79,7 +79,6 @@ class GuitarGraph: public InstrumentGraph {
 	void guitarPlay(double time, input::Event const& ev);
 
 	// Media
-	Surface m_button;
 	Texture m_tail;
 	Texture m_tail_glow;
 	Texture m_tail_drumfill;
@@ -121,7 +120,6 @@ class GuitarGraph: public InstrumentGraph {
 	unsigned m_holds[max_panels]; /// active hold notes
 
 	// Graphics functions
-	glutil::Color const& color(int fret) const;
 	glutil::Color const colorize(glutil::Color c, double time) const;
 	void drawBar(double time, float h);
 	void drawNote(int fret, glutil::Color, float tBeg, float tEnd, float whammy = 0, bool tappable = false, bool hit = false, double hitAnim = 0.0, double releaseTime = 0.0);

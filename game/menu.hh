@@ -59,6 +59,8 @@ struct Menu {
 	void add(MenuOption opt);
 	/// move the selection
 	void move(int dir = 1);
+	/// set selection
+	void select(unsigned sel);
 	/// adjust the selected value
 	void action(int dir = 1);
 	/// clear items

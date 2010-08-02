@@ -78,6 +78,11 @@ void Menu::move(int dir) {
 	else if (dir < 0 && selection_stack.back() > 0) --selection_stack.back();
 }
 
+void Menu::select(unsigned sel) {
+	if (sel < menu_stack.back()->size())
+		selection_stack.back() = sel;
+}
+
 void Menu::action(int dir) {
 	switch (current().type) {
 		case MenuOption::OPEN_SUBMENU:

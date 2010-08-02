@@ -59,7 +59,6 @@ namespace {
 
 GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number, bool practmode):
   InstrumentGraph(audio, song, drums ? input::DRUMS : input::GUITAR),
-  m_button(getThemePath("button.svg")),
   m_tail(getThemePath("tail.svg")),
   m_tail_glow(getThemePath("tail_glow.svg")),
   m_tail_drumfill(getThemePath("tail_drumfill.svg")),
@@ -181,6 +180,7 @@ void GuitarGraph::changeTrack(int dir) {
 	difficultyAuto(true);
 	updateNeck();
 	setupJoinMenu();
+	m_menu.select(1); // Restore selection to the track menu item
 }
 
 /// Set specific track
@@ -190,6 +190,7 @@ void GuitarGraph::setTrack(const std::string& track) {
 	difficultyAuto(true);
 	updateNeck();
 	setupJoinMenu();
+	m_menu.select(1); // Restore selection to the track menu item
 }
 
 /// Get the difficulty as displayable string
@@ -284,7 +285,7 @@ void GuitarGraph::engine() {
 			if (ev.type == input::Event::WHAMMY) whammy = (1.0 + ev.button + 2.0*(rand()/double(RAND_MAX))) / 4.0;
 		} else {
 			// Handle drum lefty-mode
-			if (m_leftymode.b() && ev.button > 0) ev.button = m_pads - ev.button;
+			if (m_leftymode.b() && ev.button > 0 && !menuOpen()) ev.button = m_pads - ev.button;
 		}
 		// Keypress anims
 		if (ev.type == input::Event::PRESS) m_pressed_anim[!m_drums + ev.button].setValue(1.0);
@@ -292,17 +293,19 @@ void GuitarGraph::engine() {
 		// Menu keys
 		if (menuOpen()) {
 			// Check first regular keys
-			if (ev.type == input::Event::PRESS && ev.button == 0) m_menu.action(1);
-			else if (ev.type == input::Event::PRESS && ev.button == (m_drums ? 4 : 1)) m_menu.action(-1);
-			else if (ev.type == input::Event::PRESS && ev.button == (m_drums ? 1 : 2)) m_menu.move(1);
-			else if (ev.type == input::Event::PRESS && ev.button == (m_drums ? 2 : 3)) m_menu.move(-1);
-			// Strum (strum of keyboard as guitar doesn't generate nav-events)
-			else if (ev.type == input::Event::PICK && ev.button == 0) m_menu.move(1);
-			else if (ev.type == input::Event::PICK && ev.button == 1) m_menu.move(-1);
-			else { // Try nav keys (arrows)
-				if (ev.nav == input::DOWN || ev.nav == input::RIGHT) m_menu.move(1);
-				else if (ev.nav == input::UP || ev.nav == input::LEFT) m_menu.move(-1);
+			if (ev.type == input::Event::PRESS && ev.button >= 0 && ev.button < 5) {
+				int sel = m_drums ? ((ev.button + 5 - 1) % 5) : ev.button;
+				m_menu.select(sel);
+				m_menu.action();
 			}
+			// Strum (strum of keyboard as guitar doesn't generate nav-events)
+			//else if (ev.type == input::Event::PICK && ev.button == 0) m_menu.move(1);
+			//else if (ev.type == input::Event::PICK && ev.button == 1) m_menu.move(-1);
+			//else { // Try nav keys (arrows)
+			//	if (ev.nav == input::START) m_menu.action();
+			//	else if (ev.nav == input::DOWN || ev.nav == input::RIGHT) m_menu.move(1);
+			//	else if (ev.nav == input::UP || ev.nav == input::LEFT) m_menu.move(-1);
+			//}
 			// See if anything changed
 			if (m_selectedTrack.s() != getTrack()) setTrack(m_selectedTrack.s());
 			else if (m_selectedDifficulty.i() != m_level) difficulty(Difficulty(m_selectedDifficulty.i()));
@@ -690,23 +693,6 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 		// Handle Big Rock Ending scoring
 		if (m_drumfillHits > 0 && *best == m_chords.back()) endBRE();
 	}
-}
-
-/// Get a color based on fret index
-glutil::Color const& GuitarGraph::color(int fret) const {
-	static glutil::Color fretColors[5] = {
-		glutil::Color(0.0f, 0.9f, 0.0f),
-		glutil::Color(0.9f, 0.0f, 0.0f),
-		glutil::Color(0.9f, 0.9f, 0.0f),
-		glutil::Color(0.0f, 0.0f, 1.0f),
-		glutil::Color(0.9f, 0.4f, 0.0f)
-	};
-	if (fret < 0 || fret >= m_pads) throw std::logic_error("Invalid fret number in GuitarGraph::getColor");
-	if (m_drums) {
-		if (fret == 0) fret = 4;
-		else if (fret == 4) fret = 0;
-	}
-	return fretColors[fret];
 }
 
 /// Modify color based on things like GodMode and solos

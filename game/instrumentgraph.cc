@@ -18,6 +18,7 @@ InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevType 
   m_stream(),
   m_cx(0.0, 0.2), m_width(0.5, 0.4),
   m_menu(),
+  m_button(getThemePath("button.svg")),
   m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
   m_selectedTrack(""),
   m_selectedDifficulty(0),
@@ -65,17 +66,27 @@ void InstrumentGraph::drawMenu() {
 	double w = m_menu.dimensions.w();
 	const double offsetX = 0.5f * (dimensions.x1() + dimensions.x2());
 	const float txth = th.option.h();
+	const float button_margin = 0.05f;
 	const float step = txth * 0.7f;
 	const float h = m_menu.getOptions().size() * step + step;
 	float y = -h * .5f + step;
-	float x = -w * .5f + step + offsetX;
+	float x = -w * .5f + step + offsetX + button_margin * 1.5f;
 	// Background
 	th.bg.dimensions.middle(offsetX).center(0).stretch(w, h);
 	th.bg.draw();
 	// Loop through menu items
 	w = 0;
-	for (MenuOptions::const_iterator it = m_menu.begin(); it != m_menu.end(); ++it) {
+	int i = 0;
+	for (MenuOptions::const_iterator it = m_menu.begin(); it != m_menu.end(); ++it, ++i) {
 		SvgTxtTheme* txt = &th.option;
+		// Draw the key hints
+		if (getGraphType() != input::DANCEPAD) {
+			int fret = (getGraphType() == input::DRUMS ? ((i + 1) % 5) : i);
+			glColor4fv(color(fret));
+			m_button.dimensions.middle(x - button_margin).center(y).stretch(0.05, 0.05);
+			m_button.draw();
+		}
+		// Selected item?
 		if (cur == it) {
 			//th.back_h.dimensions.middle(0.05 + offsetX).center(y);
 			//th.back_h.draw();
@@ -83,7 +94,7 @@ void InstrumentGraph::drawMenu() {
 		}
 		txt->dimensions.middle(x).center(y);
 		txt->draw(it->getName());
-		w = std::max(w, txt->w() + 2 * step); // Calculate the widest entry
+		w = std::max(w, txt->w() + 2 * step + button_margin * 2); // Calculate the widest entry
 		y += step;
 	}
 	if (cur->getComment() != "") {
@@ -111,4 +122,21 @@ void InstrumentGraph::handleCountdown(double time, double beginTime) {
 		  glutil::Color(0.0f, 0.0f, 1.0f), 2.0, m_popupText.get()));
 		  --m_countdown;
 	}
+}
+
+
+glutil::Color const& InstrumentGraph::color(int fret) const {
+	static glutil::Color fretColors[5] = {
+		glutil::Color(0.0f, 0.9f, 0.0f),
+		glutil::Color(0.9f, 0.0f, 0.0f),
+		glutil::Color(0.9f, 0.9f, 0.0f),
+		glutil::Color(0.0f, 0.0f, 1.0f),
+		glutil::Color(0.9f, 0.4f, 0.0f)
+	};
+	if (fret < 0 || fret >= m_pads) throw std::logic_error("Invalid fret number in InstrumentGraph::color");
+	if (getGraphType() == input::DRUMS) {
+		if (fret == 0) fret = 4;
+		else if (fret == 4) fret = 0;
+	}
+	return fretColors[fret];
 }
