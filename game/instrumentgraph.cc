@@ -66,7 +66,7 @@ void InstrumentGraph::drawMenu() {
 	double w = m_menu.dimensions.w();
 	const double offsetX = 0.5f * (dimensions.x1() + dimensions.x2());
 	const float txth = th.option.h();
-	const float button_margin = 0.05f;
+	const float button_margin = (getGraphType() == input::DANCEPAD ? 0.0f : 0.05f);
 	const float step = txth * 0.7f;
 	const float h = m_menu.getOptions().size() * step + step;
 	float y = -h * .5f + step;
