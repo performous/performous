@@ -41,11 +41,6 @@ namespace input {
 
 		class InputDevPrivate {
 		  public:
-			InputDevPrivate() : m_assigned(false), m_type(DRUMS_GH) {
-				for(unsigned int i = 0 ; i < BUTTONS ; i++) {
-					m_pressed[i] = false;
-				}
-			};
 			InputDevPrivate(Type _type) : m_assigned(false), m_type(_type) {
 				for(unsigned int i = 0 ; i < BUTTONS ; i++) {
 					m_pressed[i] = false;
@@ -137,7 +132,7 @@ namespace input {
 			throw NoDevError();
 		};
 		~InputDev() {
-			detail::devices[m_device_id].unassign();
+			detail::devices.find(m_device_id)->second.unassign();
 		};
 		bool tryPoll(Event& _e) { return detail::devices.find(m_device_id)->second.tryPoll(_e); };
 		void addEvent(Event _e) { detail::devices.find(m_device_id)->second.addEvent(_e); };

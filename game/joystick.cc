@@ -177,7 +177,7 @@ input::NavButton input::getNav(SDL_Event const &e) {
 	} else if (e.type == SDL_JOYBUTTONDOWN) {
 		// Joystick buttons
 		unsigned int joy_id = e.jbutton.which;
-		input::detail::InputDevPrivate devt = input::detail::devices[joy_id];
+		input::detail::InputDevPrivate devt = input::detail::devices.find(joy_id)->second;
 		int b = buttonFromSDL(devt.type(), e.jbutton.button);
 		if (b == -1) return input::NONE;
 		else if (b == 8) return input::CANCEL;
@@ -214,7 +214,7 @@ input::NavButton input::getNav(SDL_Event const &e) {
 		// HACK: We probably wan't the guitar strum to scroll songs
 		// and main menu items, but they have different orientation.
 		// These are switched so it works for now (menu scrolls also on left/right).
-		if (input::detail::devices[e.jhat.which].type_match(input::GUITAR)) {
+		if (input::detail::devices.find(e.jhat.which)->second.type_match(input::GUITAR)) {
 			if (dir == SDL_HAT_UP) return input::LEFT;
 			else if (dir == SDL_HAT_DOWN) return input::RIGHT;
 			else if (dir == SDL_HAT_LEFT) return input::UP;
@@ -331,7 +331,7 @@ void input::SDL::init() {
 		std::cout << ", Hats: " << SDL_JoystickNumHats(joy) << std::endl;
 		if( forced_type.find(i) != forced_type.end() ) {
 			std::cout << "  Detected as: " << forced_type.find(i)->second.description << " (forced)" << std::endl;
-			input::detail::devices[i] = input::detail::InputDevPrivate(forced_type.find(i)->second.detailed_type);
+			input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(i, input::detail::InputDevPrivate(forced_type.find(i)->second.detailed_type)));
 		} else {
 			bool found = false;
 			for(Instruments::const_iterator it = g_instruments.begin() ; it != g_instruments.end() ; ++it) {
@@ -339,7 +339,7 @@ void input::SDL::init() {
 				boost::cmatch match;
 				if (regex_match(name.c_str(), match, sdl_name)) {
 					std::cout << "  Detected as: " << it->description << std::endl;
-					input::detail::devices[i] = input::detail::InputDevPrivate(it->detailed_type);
+					input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(i, input::detail::InputDevPrivate(it->detailed_type)));
 					found = true;
 					break;
 				}
@@ -358,11 +358,11 @@ void input::SDL::init() {
 	std::cout << "Keyboard as drumkit controller: " << (config["game/keyboard_drumkit"].b() ? "enabled":"disabled") << std::endl;
 	std::cout << "Keyboard as dance pad controller: " << (config["game/keyboard_dancepad"].b() ? "enabled":"disabled") << std::endl;
 	input::SDL::sdl_devices[input::detail::KEYBOARD_ID] = NULL;
-	input::detail::devices[input::detail::KEYBOARD_ID] = input::detail::InputDevPrivate(input::detail::GUITAR_GH);
+	input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(input::detail::KEYBOARD_ID, input::detail::InputDevPrivate(input::detail::GUITAR_GH)));
 	input::SDL::sdl_devices[input::detail::KEYBOARD_ID2] = NULL;
-	input::detail::devices[input::detail::KEYBOARD_ID2] = input::detail::InputDevPrivate(input::detail::DRUMS_GH);
+	input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(input::detail::KEYBOARD_ID2, input::detail::InputDevPrivate(input::detail::DRUMS_GH)));
 	input::SDL::sdl_devices[input::detail::KEYBOARD_ID3] = NULL;
-	input::detail::devices[input::detail::KEYBOARD_ID3] = input::detail::InputDevPrivate(input::detail::DANCEPAD_GENERIC);
+	input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(input::detail::KEYBOARD_ID3, input::detail::InputDevPrivate(input::detail::DANCEPAD_GENERIC)));
 }
 
 bool input::SDL::pushEvent(SDL_Event _e) {
@@ -436,7 +436,7 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 					button++;
 				case SDLK_SPACE:
 					if(!drumkit) return false;
-					if(devices[joy_id].pressed(button)) return true; // repeating
+					if(devices.find(joy_id)->second.pressed(button)) return true; // repeating
 					is_drumkit_event = true;
 					event.type = input::Event::PRESS;
 					event.pressed[button] = true;
@@ -511,14 +511,14 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 				event.button = button;
 				// initialized buttons
 				for(unsigned int i = 0 ; i < BUTTONS ; ++i) {
-					event.pressed[i] = devices[joy_id].pressed(i);
+					event.pressed[i] = devices.find(joy_id)->second.pressed(i);
 				}
 				// if we have a button, set the pushed button to true
 				if(event.type == input::Event::PRESS) {
-					if(devices[joy_id].pressed(event.button)) return true; // repeating
+					if(devices.find(joy_id)->second.pressed(event.button)) return true; // repeating
 					event.pressed[event.button] = true;
 				}
-				devices[joy_id].addEvent(event);
+				devices.find(joy_id)->second.addEvent(event);
 				return true;
 			} else {
 				return false;
@@ -577,7 +577,7 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 					button++;
 				case SDLK_SPACE:
 					if(!drumkit) return false;
-					if(devices[joy_id].pressed(button)) return true; // repeating
+					if(devices.find(joy_id)->second.pressed(button)) return true; // repeating
 					is_drumkit_event = true;
 					event.type = input::Event::RELEASE;
 					event.pressed[button] = true;
@@ -652,13 +652,13 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 				event.button = button;
 				// initialized buttons
 				for(unsigned int i = 0 ; i < BUTTONS ; ++i) {
-					event.pressed[i] = devices[joy_id].pressed(i);
+					event.pressed[i] = devices.find(joy_id)->second.pressed(i);
 				}
 				// if we have a button, set the pushed button to true
 				if(event.type == input::Event::RELEASE) {
 					event.pressed[event.button] = false;
 				}
-				devices[joy_id].addEvent(event);
+				devices.find(joy_id)->second.addEvent(event);
 				return true;
 			} else {
 				return false;
@@ -666,20 +666,20 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 		}
 		case SDL_JOYAXISMOTION:
 			joy_id = _e.jaxis.which;
-			if(!devices[joy_id].assigned()) return false;
+			if(!devices.find(joy_id)->second.assigned()) return false;
 			if (_e.jaxis.axis == 5 || _e.jaxis.axis == 6 || _e.jaxis.axis == 1) {
 				event.type = input::Event::PICK;
-			} else if (_e.jaxis.axis == 2 || (devices[joy_id].type() == input::detail::GUITAR_RB_XB360
+			} else if (_e.jaxis.axis == 2 || (devices.find(joy_id)->second.type() == input::detail::GUITAR_RB_XB360
 			  && _e.jaxis.axis == 4)) {
 				event.type = input::Event::WHAMMY;
 			} else {
 				return false;
 			}
 			for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
-				event.pressed[i] = devices[joy_id].pressed(i);
+				event.pressed[i] = devices.find(joy_id)->second.pressed(i);
 			}
 			// XBox RB guitar's Tilt sensor
-			if (devices[joy_id].type() == input::detail::GUITAR_RB_XB360 && _e.jaxis.axis == 3) {
+			if (devices.find(joy_id)->second.type() == input::detail::GUITAR_RB_XB360 && _e.jaxis.axis == 3) {
 				event.button = input::STARPOWER_BUTTON;
 				if (_e.jaxis.value < -2) {
 					event.type = input::Event::PRESS;
@@ -688,59 +688,59 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 					event.type = input::Event::RELEASE;
 					event.pressed[event.button] = false;
 				}
-				devices[joy_id].addEvent(event);
+				devices.find(joy_id)->second.addEvent(event);
 				break;
 			}
 			// Direction
 			if(_e.jaxis.value > 0 ) { // down
 				event.button = 0;
-				devices[joy_id].addEvent(event);
+				devices.find(joy_id)->second.addEvent(event);
 			} else if(_e.jaxis.value < 0 ) { // up
 				event.button = 1;
-				devices[joy_id].addEvent(event);
+				devices.find(joy_id)->second.addEvent(event);
 			}
 			break;
 		case SDL_JOYHATMOTION:
 			joy_id = _e.jhat.which;
 
-			if(!devices[joy_id].assigned()) return false;
+			if(!devices.find(joy_id)->second.assigned()) return false;
 			event.type = input::Event::PICK;
 			for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
-				event.pressed[i] = devices[joy_id].pressed(i);
+				event.pressed[i] = devices.find(joy_id)->second.pressed(i);
 			}
 			if(_e.jhat.value == SDL_HAT_DOWN ) {
 				event.button = 0;
-				devices[joy_id].addEvent(event);
+				devices.find(joy_id)->second.addEvent(event);
 			} else if(_e.jhat.value == SDL_HAT_UP ) {
 				event.button = 1;
-				devices[joy_id].addEvent(event);
+				devices.find(joy_id)->second.addEvent(event);
 			}
 			break;
 		case SDL_JOYBUTTONDOWN:
 			joy_id = _e.jbutton.which;
-			if(!devices[joy_id].assigned()) return false;
-			button = buttonFromSDL(devices[joy_id].type(),_e.jbutton.button);
+			if(!devices.find(joy_id)->second.assigned()) return false;
+			button = buttonFromSDL(devices.find(joy_id)->second.type(),_e.jbutton.button);
 			if( button == -1 ) return false;
 			for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
-				event.pressed[i] = devices[joy_id].pressed(i);
+				event.pressed[i] = devices.find(joy_id)->second.pressed(i);
 			}
 			event.type = input::Event::PRESS;
 			event.button = button;
 			event.pressed[button] = true;
-			devices[joy_id].addEvent(event);
+			devices.find(joy_id)->second.addEvent(event);
 			break;
 		case SDL_JOYBUTTONUP:
 			joy_id = _e.jbutton.which;
-			if(!devices[joy_id].assigned()) return false;
-			button = buttonFromSDL(devices[joy_id].type(),_e.jbutton.button);
+			if(!devices.find(joy_id)->second.assigned()) return false;
+			button = buttonFromSDL(devices.find(joy_id)->second.type(),_e.jbutton.button);
 			if( button == -1 ) return false;
 			for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
-				event.pressed[i] = devices[joy_id].pressed(i);
+				event.pressed[i] = devices.find(joy_id)->second.pressed(i);
 			}
 			event.type = input::Event::RELEASE;
 			event.button = button;
 			event.pressed[button] = false;
-			devices[joy_id].addEvent(event);
+			devices.find(joy_id)->second.addEvent(event);
 			break;
 		case SDL_JOYBALLMOTION:
 		default:
