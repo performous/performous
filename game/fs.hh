@@ -21,6 +21,9 @@ fs::path getCacheDir();
 /** Get the users theme folder **/
 fs::path getThemeDir();
 
+/** Is the file a theme resource **/
+bool isThemeResource(fs::path);
+
 /** Get the localec folder **/
 fs::path getLocaleDir();
 

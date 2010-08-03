@@ -1,5 +1,6 @@
 #include "surface.hh"
 
+#include "filemagic.hh"
 #include "fs.hh"
 #include "configuration.hh"
 #include "video_driver.hh"
@@ -26,49 +27,23 @@ float Dimensions::screenY() const {
 }
 
 
-template <typename T> void loader(T& target, fs::path name) {
+template <typename T> void loader(T& target, fs::path const& name) {
 	std::string const filename = name.string();
 	if (!fs::exists(name)) throw std::runtime_error("File not found: " + filename);
-	// Get file extension in lower case
-	std::string ext = name.extension();
-	// somehow this does not convert the extension to lower case:
-	//std::for_each(ext.begin(), ext.end(), static_cast<int(*)(int)>(std::tolower));
-	std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower );
 
-	if (ext == ".svg") {
-		bool theme_file = false;
-		if(name == getThemePath(name.filename())) {
-			theme_file = true;
-		}
+	if ( filemagic::SVG(name) ) {
+		// caching is now handled by loadSVG itself.
+		loadSVG(target, filename);
 
-		if(!theme_file) {
-			// do not cache non-theme files
-			loadSVG(target, filename);
-		} else {
-			std::string cache_basename = name.filename() + ".cache_" + (boost::format("%.2f") % config["graphic/svg_lod"].f()).str() + ".png";
-			fs::path cache_filename = getCacheDir() / "themes" / (config["game/theme"].s().empty() ? "default" : config["game/theme"].s()) / cache_basename;
-			if(fs::exists(cache_filename)) {
-				if(fs::last_write_time(filename) > fs::last_write_time(cache_filename)) {
-					// SVG file is newer we should update cache
-					loadSVG(target, filename, cache_filename.string());
-				} else {
-					try {
-						loadPNG(target, cache_filename.string());
-					}catch (std::runtime_error){
-						loadSVG(target, filename, cache_filename.string());
-					}
-				}
-			} else {
-				loadSVG(target, filename, cache_filename.string());
-			}
-		}
-	} else if (ext == ".png") {
-		try {loadPNG(target, filename);}
-		// FIXME: there is probably a cleaner way to do this
-		// FoFiX songs often come with album art that is JPEG with a PNG extension
-		catch (...) {loadJPEG(target, filename);}
-	}
-	else loadJPEG(target, filename);
+	} else if ( filemagic::JPEG(name) ) {
+		// this should catch the case where album art lies about being a PNG but really
+		// is JPEG with a PNG extension. (caught by the file magic being JPEG)
+		loadJPEG(target, filename);
+
+	} else if ( filemagic::PNG(name) ) {
+		loadPNG(target, filename);
+
+	} else throw std::runtime_error("Unable to load the image: " + filename);
 }
 
 Texture::Texture(std::string const& filename) { loader(*this, filename); }

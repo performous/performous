@@ -30,9 +30,26 @@
 #include <vector>
 #include <cstdlib>
 
+#include <boost/iostreams/stream_buffer.hpp>
+
 volatile bool g_quit = false;
 
 bool g_take_screenshot = false;
+bool g_verbose_messages = false;
+
+class VerboseMessageSink : public boost::iostreams::sink {
+public:
+	std::streamsize write(const char* s, std::streamsize n) {
+		if(g_verbose_messages)
+			for(std::streamsize i=0; i<n; i++)
+				std::cout << s[i];
+
+		return n;
+	}
+};
+// defining them in main() causes segfault at exit as they apparently got free'd before that
+boost::iostreams::stream_buffer<VerboseMessageSink> sb;
+VerboseMessageSink vsm;
 
 // Signal handling for Ctrl-C
 
@@ -302,6 +319,7 @@ int main(int argc, char** argv) try {
 	std::string songlist;
 	opt1.add_options()
 	  ("help,h", "you are viewing it")
+	  ("verbose,V", "Be more verbose")
 	  ("version,v", "display version number")
 	  ("songlist", po::value<std::string>(&songlist), "save a list of songs in the specified folder");
 	po::options_description opt2("Configuration options");
@@ -395,6 +413,12 @@ int main(int argc, char** argv) try {
 		jstestLoop();
 		return 0;
 	}
+
+	// initialize the verbose message sink
+	g_verbose_messages = vm.count("verbose")!=0;
+    sb.open(vsm);
+    std::clog.rdbuf(&sb);
+
 	// Run the game init and main loop
 	mainLoop(songlist);
 	return 0; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.

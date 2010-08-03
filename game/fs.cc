@@ -100,7 +100,6 @@ fs::path getThemeDir() {
 	return getDataDir() / "themes" / theme;
 }
 
-
 fs::path pathMangle(fs::path const& dir) {
 	fs::path ret;
 	for (fs::path::const_iterator it = dir.begin(); it != dir.end(); ++it) {
@@ -124,6 +123,10 @@ std::string getThemePath(std::string const& filename) {
 		if (theme == defaultTheme) throw;
 		return getPath(fs::path("themes") / defaultTheme / filename);
 	}
+}
+
+bool isThemeResource(fs::path filename){
+	return filename == getThemePath(filename.filename());
 }
 
 namespace {
