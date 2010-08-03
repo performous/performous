@@ -60,12 +60,20 @@ class Music {
 	Tracks tracks; ///< Audio decoders
 	double srate; ///< Sample rate
 	int64_t m_pos; ///< Current sample position
+	boost::posix_time::ptime m_syncTime; ///< Time of the previous audio timeSync
 	bool m_preview;
+
+	static boost::posix_time::ptime getTime() { return boost::posix_time::microsec_clock::universal_time(); }
+	double pos_internal() const { return double(m_pos) / srate / 2.0; }
+	double seconds(boost::posix_time::time_duration const& d) const { return 1e-6 * d.total_microseconds(); }
+	/// Do stuff for correcting time codes
+	void timeSync() { m_syncTime = getTime(); }
+
 public:
 	double fadeLevel;
 	double fadeRate;
 	typedef std::map<std::string,std::string> Files;
-	Music(Files const& filenames, unsigned int sr, bool preview): srate(sr), m_pos(), m_preview(preview), fadeLevel(), fadeRate() {
+	Music(Files const& filenames, unsigned int sr, bool preview): srate(sr), m_pos(), m_syncTime(getTime()), m_preview(preview), fadeLevel(), fadeRate() {
 		for (Files::const_iterator it = filenames.begin(), end = filenames.end(); it != end; ++it) {
 			tracks.insert(it->first, std::auto_ptr<Track>(new Track(it->second, sr)));
 		}
@@ -79,6 +87,7 @@ public:
 			if (t.mpeg.audioQueue(&*mixbuf.begin(), &*mixbuf.end(), m_pos, t.fadeLevel)) eof = false;
 		}
 		m_pos += end - begin;
+		timeSync(); // Keep audio synced
 		for (size_t i = 0, iend = mixbuf.size(); i != iend; ++i) {
 			if (i % 2 == 0) {
 				fadeLevel += fadeRate;
@@ -91,7 +100,11 @@ public:
 	}
 	void seek(double time) { m_pos = time * srate * 2.0; }
 	/// Get current position in seconds
-	double pos() const { return double(m_pos) / srate / 2.0; }
+	double pos() {
+		double delay = seconds(getTime() - m_syncTime); // Delay since last sync
+		if (delay > 0.150) delay = 0; // If delay gets long, something is fishy (or pause is on)
+		return pos_internal() + delay; // Adjust internal time
+	}
 	double duration() const {
 		double dur = 0.0;
 		for (Tracks::const_iterator it = tracks.begin(), itend = tracks.end(); it != itend; ++it) {
