@@ -1,14 +1,8 @@
 #include "3dobject.hh"
-#include "surface.hh"
-#include "glutil.hh"
 
-#include <vector>
-#include <map>
-#include <iostream>
 #include <sstream>
 #include <fstream>
 #include <stdexcept>
-#include <string>
 #include <cmath>
 
 

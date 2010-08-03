@@ -6,10 +6,11 @@
 #include <cstdlib>
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 
 #ifdef _WIN32
 #include <windows.h>
-#include <Shlobj.h>
+#include <shlobj.h>
 #endif
 
 fs::path getHomeDir() {
@@ -40,31 +41,31 @@ fs::path getConfigDir() {
 	static bool initialized = false;
 	if (!initialized) {
 		initialized = true;
-        #ifndef _WIN32
-        {
-            char const* conf = getenv("XDG_CONFIG_HOME");
-            if (conf) dir = fs::path(conf) / "performous";
-            else dir = getHomeDir() / ".config" / "performous";
-        }
-        #else
-        {
-            //open AppData directory
-            std::string str;
-            ITEMIDLIST* pidl;
-            char AppDir[MAX_PATH];
-            HRESULT hRes = SHGetSpecialFolderLocation( NULL, CSIDL_APPDATA|CSIDL_FLAG_CREATE , &pidl );
-            if (hRes==NOERROR)
-            {
-              SHGetPathFromIDList( pidl, AppDir );
-              int i;
-              for(i = 0; AppDir[i] != '\0'; i++){
-                  if(AppDir[i] == '\\') str += '/';
-                  else                  str += AppDir[i];
-              }
-              dir = fs::path(str) / "performous";
-            }
-        }
-        #endif
+		#ifndef _WIN32
+		{
+			char const* conf = getenv("XDG_CONFIG_HOME");
+			if (conf) dir = fs::path(conf) / "performous";
+			else dir = getHomeDir() / ".config" / "performous";
+		}
+		#else
+		{
+			//open AppData directory
+			std::string str;
+			ITEMIDLIST* pidl;
+			char AppDir[MAX_PATH];
+			HRESULT hRes = SHGetSpecialFolderLocation( NULL, CSIDL_APPDATA|CSIDL_FLAG_CREATE , &pidl );
+			if (hRes==NOERROR)
+			{
+			  SHGetPathFromIDList( pidl, AppDir );
+			  int i;
+			  for(i = 0; AppDir[i] != '\0'; i++){
+				  if(AppDir[i] == '\\') str += '/';
+				  else                  str += AppDir[i];
+			  }
+			  dir = fs::path(str) / "performous";
+			}
+		}
+		#endif
 	}
 	return dir;
 }
@@ -174,6 +175,9 @@ Paths const& getPaths(bool refresh) {
 		// Check if they actually exist and print debug
 		paths.clear();
 		std::remove_copy_if(dirs.begin(), dirs.end(), std::inserter(paths, paths.end()), pathNotExist);
+		// Assure that each path appears only once
+		Paths::iterator it = std::unique(paths.begin(), paths.end());
+		paths.resize(it - paths.begin());
 	}
 	return paths;
 }

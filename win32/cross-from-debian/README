@@ -1,0 +1,59 @@
+These scripts were developed under Debian's mingw32 environment with the
+wine package (and associated binfmt_misc rule, which is part of the package)
+installed, so some programs do not detect that they are being cross-compiled
+and attempt to run just-compiled programs because this works when the scripts
+use the ".exe" suffix when they try to do so (as autoconf scripts do).  So
+we occasionally generate a shell script wrapper under the non-.exe name that
+execs wine to satisfy scripts that fail to use ".exe" (some scripts do this
+because it's perfectly OK to do this under Windows).
+
+For pkg-config handling, we simply wrap the *host* pkg-config in a shell
+script that execs it with options causing it to look absolutely nowhere other
+than deps/lib/pkgconfig for .pc files and we place that script earlier on the
+PATH.  This very neatly avoids the glib/pkg-config chicken-and-egg problem
+that exists under Windows, though we don't bother building a Windows
+pkg-config at all since we don't need it.
+
+The makedeps.sh script builds the dependencies under ./deps and places stamp
+files in deps/build-stamps so it doesn't have to keep rebuilding the same
+things if it is interrupted or experiences an error halfway through.  You can
+force a single package to be rebuilt by deleting the appropriate stamp file
+and re-running makedeps.sh.  (You might do this, for example, to get newer
+ffmpeg code, as makedeps.sh builds the latest SVN of ffmpeg at the time the
+script is run.)
+
+Once the dependencies are built, run makebuilddir.sh to invoke cmake with the
+appropriate arguments for cross-compilation.  (Arguments to makebuilddir.sh
+are passed intact to cmake after the arguments the script itself passes but
+before the final argument [the source directory], which the script provides
+for you.)  It is up to you to run "make" and "make install" in the ./build
+directory (installation will occur to ./stage) after running makebuilddir.sh
+to set up ./build appropriately.
+
+(Regarding installation, it is a good idea to delete or rename ./stage if it
+exists before running "make install" so obsolete files aren't accidentally
+included in the package you are building.)
+
+The copydlls.py script takes two directories as arguments and copies any DLLs
+it can find in the first directory that are needed by PE executables in the
+second directory into the second directory.
+
+The makepackage.py script creates an executable installer from the contents of
+./stage using NSIS (NSIS can be built under non-Windows systems for use as a
+cross-compiler, and many Linux distros package it in this form) and places it
+into ./dist for your testing and distributing pleasure.
+
+In summary:
+  $ ./makedeps.sh
+  $ ./makebuilddir.sh
+  $ cd build
+  $ make
+  $ make install
+  $ cd ..
+  $ ./copydlls.py ./deps/bin ./stage/bin
+    [strip the binaries in ./stage/bin if you want]
+  $ ./makepackage.py
+    [test the file generated in ./dist]
+    [distribute said file if everything looks good]
+
+Happy cross-building!

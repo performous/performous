@@ -8,12 +8,10 @@
 #include "joystick.hh"
 #include "surface.hh"
 #include "opengl_text.hh"
-#include "3dobject.hh"
 #include "glutil.hh"
 #include "menu.hh"
 #include "screen.hh"
 #include "fs.hh"
-#include "i18n.hh"
 #include "theme.hh"
 
 

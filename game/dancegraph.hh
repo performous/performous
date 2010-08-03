@@ -1,16 +1,8 @@
 #pragma once
 
-#include <vector>
 #include <boost/ptr_container/ptr_map.hpp>
 
 #include "instrumentgraph.hh"
-#include "animvalue.hh"
-#include "song.hh"
-#include "notes.hh"
-#include "audio.hh"
-#include "joystick.hh"
-#include "surface.hh"
-#include "opengl_text.hh"
 
 class Song;
 

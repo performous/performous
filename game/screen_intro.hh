@@ -1,13 +1,14 @@
 #pragma once
 
+#include <boost/scoped_ptr.hpp>
 #include "dialog.hh"
 #include "screen.hh"
-#include "theme.hh"
 #include "menu.hh"
-#include <boost/scoped_ptr.hpp>
 
 class Audio;
 class Capture;
+class ThemeIntro;
+class MenuOption;
 
 /// intro screen
 class ScreenIntro : public Screen {

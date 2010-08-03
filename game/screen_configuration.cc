@@ -2,6 +2,9 @@
 
 #include "configuration.hh"
 #include "joystick.hh"
+#include "theme.hh"
+#include "audio.hh"
+
 
 ScreenConfiguration::ScreenConfiguration(std::string const& name, Audio& audio): Screen(name), m_audio(audio), selected() {
 	for (ConfigMenu::const_iterator it = configMenu.begin(); it != configMenu.end(); ++it) {

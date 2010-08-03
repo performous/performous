@@ -1,5 +1,4 @@
 #include "joystick.hh"
-#include <iostream>
 
 #include <boost/lexical_cast.hpp>
 
@@ -382,16 +381,26 @@ void input::SDL::init() {
 			input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::GUITAR_GH);
 		} else if( name.find("Harmonix Guitar") != std::string::npos ) {
 			if (name.find("Xbox") != std::string::npos) {
+				// "Harmonix Guitar for Xbox360 (Controller)"
 				std::cout << "  Detected as: RockBand Guitar Xbox360" << std::endl;
 				input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::GUITAR_RB_XB360);
+			} else if (name.find("Nintendo") != std::string::npos) {
+				// "Licensed by Nintendo of America  Harmonix Guitar Controller for Nintendo Wii"
+				std::cout << "  Detected as: RockBand Guitar PS3 (Wii Guitar)" << std::endl;
+				input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::GUITAR_RB_PS3);
 			} else {
 				std::cout << "  Detected as: RockBand Guitar PS3" << std::endl;
 				input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::GUITAR_RB_PS3);
 			}
-		} else if( name.find("Harmonix Drum Kit") != std::string::npos || name.find("Harmonix Drum kit") != std::string::npos) {
+		} else if( name.find("Harmonix Drum") != std::string::npos) {
+			// Kit / kit / Controller
 			if (name.find("Xbox") != std::string::npos) {
 				std::cout << "  Detected as: RockBand Drums Xbox360" << std::endl;
 				input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::DRUMS_RB_XB360);
+			} else if (name.find("Nintendo") != std::string::npos) {
+				// Licensed by Nintendo of America  Harmonix Drum Controller for Nintendo Wii
+				std::cout << "  Detected as: RockBand Drums PS3 (Wii Drums)" << std::endl;
+				input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::DRUMS_RB_PS3);
 			} else {
 				std::cout << "  Detected as: RockBand Drums PS3" << std::endl;
 				input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::DRUMS_RB_PS3);
