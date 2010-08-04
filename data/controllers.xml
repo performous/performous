@@ -16,11 +16,22 @@
 			<button id="9" value="start" />
 		</mapping>
 	</guitar>
-        <guitar name="GUITAR_RB_XBOX360">
+        <guitar name="GUITAR_GH_XPLORER">
 		<match>
 			<description>Guitar Hero X-plorer guitar</description>
 	                <regexp match="Guitar Hero X-plorer" />
 		</match>
+                <mapping> 
+                        <button id="0" value="green" />
+                        <button id="1" value="red" />
+                        <button id="2" value="blue" />
+                        <button id="3" value="yellow" />
+                        <button id="4" value="orange" />
+                        <button id="6" value="select" />
+                        <button id="7" value="start" />
+                </mapping>
+        </guitar>
+        <guitar name="GUITAR_RB_XBOX360">
 		<match>
 			<description>Rock Band guitar Xbox 360</description>
 			<regexp match="Harmonix Guitar .* Xbox" />
@@ -83,11 +94,22 @@
 			<button id="9" value="start" />
 		</mapping>
 	</drumkit>
-	<drumkit name="DRUMS_RB_PS3">
+	<drumkit name="DRUMS_RB_WII">
 		<match>
 			<description>RockBand Wii drum kit</description>
 			<regexp match="Harmonix Drum Controller for Nintendo Wii" />
 		</match>
+		<mapping>
+			<button id="0" value="blue" />
+			<button id="1" value="green" />
+			<button id="2" value="red" />
+			<button id="3" value="yellow" />
+			<button id="4" value="kick" />
+			<button id="8" value="select" />
+			<button id="9" value="start" />
+		</mapping>
+	</drumkit>
+	<drumkit name="DRUMS_RB_PS3">
 		<match>
 			<description>RockBand PS3 drum kit</description>
 			<regexp match="Harmonix Drum [Kk]it for Playstation" />
