@@ -150,6 +150,7 @@ namespace input {
 	}
 
 #ifdef USE_PORTMIDI
+	// Warning: MidiDrums should be instanciated after Window (that load joysticks)
 	class MidiDrums {
 	public:
 		static bool enabled() { return true; }
