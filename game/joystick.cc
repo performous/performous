@@ -112,46 +112,6 @@ void input::MidiDrums::process() {
 }
 #endif
 
-static const unsigned SDL_BUTTONS = 16;
-
-int input::buttonFromSDL(input::detail::Type _type, unsigned int _sdl_button) {
-	static const int inputmap[12][SDL_BUTTONS] = {
-		//G  R  Y  B  O  S    // for guitars (S=starpower)
-		{ 2, 0, 1, 3, 4, 5, -1, -1,  8,  9, -1, -1, -1, -1, -1, -1 }, // Guitar Hero guitar
-		{ 0, 1, 3, 2, 4,-1,  8,  9, -1, -1, -1, -1, -1, -1, -1, -1 }, // Guitar Hero X-plorer guitar
-		{ 3, 0, 1, 2, 4, 5, -1, -1,  8,  9, -1, -1, -1, -1, -1, -1 }, // Rock Band guitar PS3
-		{ 0, 1, 3, 2, 4,-1,  8,  9, -1, -1, -1, -1, -1, -1, -1, -1 }, // Rock Band guitar XBOX360
-		{ 2, 1, 3, 4, 5, 0, -1, -1,  8,  9, -1, -1, -1, -1, -1, -1 }, // Hama Wireless Guitar Controller for PS2 with converter
-		//K  R  Y  B  G  O    // for drums
-		{ 3, 4, 1, 2, 0, 4, -1, -1,  8,  9, -1, -1, -1, -1, -1, -1 }, // Guitar Hero drums
-		{ 3, 4, 1, 2, 0,-1, -1, -1,  8,  9, -1, -1, -1, -1, -1, -1 }, // Rock Band drums PS3
-		{ 4, 1, 3, 2, 0,-1,  8,  9, -1, -1, -1, -1, -1, -1, -1, -1 }, // Rock Band drums XBOX360
-		// Left  Down  Up  Right  DownL  DownR  UpL    UpR    Start  Select
-		{  0,  1,  2,  3,  6,  7,  4,  5,  9,  8, -1, -1, -1, -1, -1, -1 }, // generic dance pad
-		{  9,  8, -1, -1, -1, -1, -1, -1,  0,  3,  1,  2, -1, -1, -1, -1 }, // TigerGame dance pad
-		{  4,  7,  6,  5, -1, -1, -1, -1,  9,  8, -1, -1,  2,  3,  1,  0 }, // dance pad with ems ps2/pc adapter
-		{  0,  1,  2,  3,  6,  7,  4,  5,  8,  9, -1, -1, -1, -1, -1, -1 }  // 2-tech usb dance pad
-	};
-	if( _sdl_button >= SDL_BUTTONS ) return -1;
-	using namespace detail;
-	switch(_type) {
-	case GUITAR_GH: return inputmap[0][_sdl_button];
-	case GUITAR_GH_XPLORER: return inputmap[1][_sdl_button];
-	case GUITAR_RB_PS3: return inputmap[2][_sdl_button];
-	case GUITAR_RB_XB360: return inputmap[3][_sdl_button];
-	case GUITAR_HAMA_PS2: return inputmap[4][_sdl_button];
-	case DRUMS_GH: return inputmap[5][_sdl_button];
-	case DRUMS_RB_PS3: return inputmap[6][_sdl_button];
-	case DRUMS_RB_XB360: return inputmap[7][_sdl_button];
-	case DRUMS_MIDI: throw std::logic_error("MIDI drums do not use SDL buttons");
-	case DANCEPAD_GENERIC: return inputmap[8][_sdl_button];
-	case DANCEPAD_TIGERGAME: return inputmap[9][_sdl_button];
-	case DANCEPAD_EMS2: return inputmap[10][_sdl_button];
-	case DANCEPAD_2TECH: return inputmap[11][_sdl_button];
-	}
-	throw std::logic_error("Unknown instrument type in buttonFromSDL");
-}
-
 input::detail::InputDevs input::detail::devices;
 input::SDL::SDL_devices input::SDL::sdl_devices;
 
@@ -178,7 +138,7 @@ input::NavButton input::getNav(SDL_Event const &e) {
 		// Joystick buttons
 		unsigned int joy_id = e.jbutton.which;
 		input::detail::InputDevPrivate devt = input::detail::devices.find(joy_id)->second;
-		int b = buttonFromSDL(devt.type(), e.jbutton.button);
+		int b = devt.buttonFromSDL(e.jbutton.button);
 		if (b == -1) return input::NONE;
 		else if (b == 8) return input::CANCEL;
 		else if (b == 9) return input::START;
@@ -257,28 +217,47 @@ void input::SDL::init_devices() {
 
 #include <boost/spirit/include/classic_core.hpp>
 
-input::detail::Instruments g_instruments;
+input::Instruments g_instruments;
 
 void input::SDL::init() {
-	g_instruments.push_back(input::detail::Instrument("GUITAR_GUITARHERO_XPLORER", input::GUITAR, input::detail::GUITAR_GH_XPLORER));
-	g_instruments.push_back(input::detail::Instrument("GUITAR_HAMA_PS2", input::GUITAR, input::detail::GUITAR_HAMA_PS2));
-	g_instruments.push_back(input::detail::Instrument("GUITAR_ROCKBAND_PS3", input::GUITAR, input::detail::GUITAR_RB_PS3));
-	g_instruments.push_back(input::detail::Instrument("GUITAR_ROCKBAND_XB360", input::GUITAR, input::detail::GUITAR_RB_XB360));
-	g_instruments.push_back(input::detail::Instrument("GUITAR_GUITARHERO", input::GUITAR, input::detail::GUITAR_GH));
-	g_instruments.push_back(input::detail::Instrument("DRUMS_GUITARHERO", input::DRUMS, input::detail::DRUMS_GH));
-	g_instruments.push_back(input::detail::Instrument("DRUMS_ROCKBAND_PS3", input::DRUMS, input::detail::DRUMS_RB_PS3));
-	g_instruments.push_back(input::detail::Instrument("DRUMS_ROCKBAND_XB360", input::DRUMS, input::detail::DRUMS_RB_XB360));
-	g_instruments.push_back(input::detail::Instrument("DANCEPAD_EMS2", input::DANCEPAD, input::detail::DANCEPAD_EMS2));
-	g_instruments.push_back(input::detail::Instrument("DANCEPAD_GENERIC", input::DANCEPAD, input::detail::DANCEPAD_GENERIC));
-	g_instruments.push_back(input::detail::Instrument("DANCEPAD_TIGERGAME", input::DANCEPAD, input::detail::DANCEPAD_TIGERGAME));
-	g_instruments.push_back(input::detail::Instrument("DANCEPAD_2TECH", input::DANCEPAD, input::detail::DANCEPAD_2TECH));
+	const unsigned SDL_BUTTONS = 16;
+
+	unsigned int inputmap[12][SDL_BUTTONS] = {
+		//G  R  Y  B  O  S    // for guitars (S=starpower)
+		{ 2, 0, 1, 3, 4, 5, -1, -1,  8,  9, -1, -1, -1, -1, -1, -1 }, // Guitar Hero guitar
+		{ 0, 1, 3, 2, 4,-1,  8,  9, -1, -1, -1, -1, -1, -1, -1, -1 }, // Guitar Hero X-plorer guitar
+		{ 3, 0, 1, 2, 4, 5, -1, -1,  8,  9, -1, -1, -1, -1, -1, -1 }, // Rock Band guitar PS3
+		{ 0, 1, 3, 2, 4,-1,  8,  9, -1, -1, -1, -1, -1, -1, -1, -1 }, // Rock Band guitar XBOX360
+		{ 2, 1, 3, 4, 5, 0, -1, -1,  8,  9, -1, -1, -1, -1, -1, -1 }, // Hama Wireless Guitar Controller for PS2 with converter
+		//K  R  Y  B  G  O    // for drums
+		{ 3, 4, 1, 2, 0, 4, -1, -1,  8,  9, -1, -1, -1, -1, -1, -1 }, // Guitar Hero drums
+		{ 3, 4, 1, 2, 0,-1, -1, -1,  8,  9, -1, -1, -1, -1, -1, -1 }, // Rock Band drums PS3
+		{ 4, 1, 3, 2, 0,-1,  8,  9, -1, -1, -1, -1, -1, -1, -1, -1 }, // Rock Band drums XBOX360
+		// Left  Down  Up  Right  DownL  DownR  UpL    UpR    Start  Select
+		{  0,  1,  2,  3,  6,  7,  4,  5,  9,  8, -1, -1, -1, -1, -1, -1 }, // generic dance pad
+		{  9,  8, -1, -1, -1, -1, -1, -1,  0,  3,  1,  2, -1, -1, -1, -1 }, // TigerGame dance pad
+		{  4,  7,  6,  5, -1, -1, -1, -1,  9,  8, -1, -1,  2,  3,  1,  0 }, // dance pad with ems ps2/pc adapter
+		{  0,  1,  2,  3,  6,  7,  4,  5,  8,  9, -1, -1, -1, -1, -1, -1 }  // 2-tech usb dance pad
+	};
+	g_instruments.push_back(input::Instrument("GUITAR_GUITARHERO_XPLORER", input::GUITAR, std::vector<int>(inputmap[1],inputmap[1]+SDL_BUTTONS)));
+	g_instruments.push_back(input::Instrument("GUITAR_HAMA_PS2", input::GUITAR, std::vector<int>(inputmap[4],inputmap[4]+SDL_BUTTONS)));
+	g_instruments.push_back(input::Instrument("GUITAR_ROCKBAND_PS3", input::GUITAR, std::vector<int>(inputmap[2],inputmap[2]+SDL_BUTTONS)));
+	g_instruments.push_back(input::Instrument("GUITAR_ROCKBAND_XB360", input::GUITAR, std::vector<int>(inputmap[3],inputmap[3]+SDL_BUTTONS)));
+	g_instruments.push_back(input::Instrument("GUITAR_GUITARHERO", input::GUITAR, std::vector<int>(inputmap[0],inputmap[0]+SDL_BUTTONS)));
+	g_instruments.push_back(input::Instrument("DRUMS_GUITARHERO", input::DRUMS, std::vector<int>(inputmap[5],inputmap[5]+SDL_BUTTONS)));
+	g_instruments.push_back(input::Instrument("DRUMS_ROCKBAND_PS3", input::DRUMS, std::vector<int>(inputmap[6],inputmap[6]+SDL_BUTTONS)));
+	g_instruments.push_back(input::Instrument("DRUMS_ROCKBAND_XB360", input::DRUMS, std::vector<int>(inputmap[7],inputmap[7]+SDL_BUTTONS)));
+	g_instruments.push_back(input::Instrument("DANCEPAD_EMS2", input::DANCEPAD, std::vector<int>(inputmap[10],inputmap[10]+SDL_BUTTONS)));
+	g_instruments.push_back(input::Instrument("DANCEPAD_GENERIC", input::DANCEPAD, std::vector<int>(inputmap[8],inputmap[8]+SDL_BUTTONS)));
+	g_instruments.push_back(input::Instrument("DANCEPAD_TIGERGAME", input::DANCEPAD, std::vector<int>(inputmap[9],inputmap[9]+SDL_BUTTONS)));
+	g_instruments.push_back(input::Instrument("DANCEPAD_2TECH", input::DANCEPAD, std::vector<int>(inputmap[11],inputmap[11]+SDL_BUTTONS)));
 	unsigned int sdl_id;
 	std::string instrument_type;
-	std::map<unsigned int, input::detail::Instrument> forced_type;
+	std::map<unsigned int, input::Instrument> forced_type;
 
 	using namespace boost::spirit::classic;
 	rule<> type;
-	for(input::detail::Instruments::const_iterator it = g_instruments.begin() ; it != g_instruments.end() ; ++it) {
+	for(input::Instruments::const_iterator it = g_instruments.begin() ; it != g_instruments.end() ; ++it) {
 		if(it == g_instruments.begin())
 			type = str_p(it->name.c_str());
 		else
@@ -292,9 +271,9 @@ void input::SDL::init() {
 			std::cerr << "Error \"" << *it << "\" is not a valid instrument forced value" << std::endl;
 			continue;
 		} else {
-			for(input::detail::Instruments::const_iterator it2 = g_instruments.begin() ; it2 != g_instruments.end() ; ++it2) {
+			for(input::Instruments::const_iterator it2 = g_instruments.begin() ; it2 != g_instruments.end() ; ++it2) {
 				if(instrument_type == it2->name) {
-					forced_type.insert(std::pair<unsigned int,input::detail::Instrument>(sdl_id, input::detail::Instrument(*it2)));
+					forced_type.insert(std::pair<unsigned int,input::Instrument>(sdl_id, input::Instrument(*it2)));
 					break;
 				}
 			}
@@ -322,7 +301,7 @@ void input::SDL::init() {
 			input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(i, input::detail::InputDevPrivate(forced_type.find(i)->second)));
 		} else {
 			bool found = false;
-			for(input::detail::Instruments::const_iterator it = g_instruments.begin() ; it != g_instruments.end() ; ++it) {
+			for(input::Instruments::const_iterator it = g_instruments.begin() ; it != g_instruments.end() ; ++it) {
 				boost::regex sdl_name(it->match);
 				boost::cmatch match;
 				if (regex_match(name.c_str(), match, sdl_name)) {
@@ -346,11 +325,11 @@ void input::SDL::init() {
 	std::cout << "Keyboard as drumkit controller: " << (config["game/keyboard_drumkit"].b() ? "enabled":"disabled") << std::endl;
 	std::cout << "Keyboard as dance pad controller: " << (config["game/keyboard_dancepad"].b() ? "enabled":"disabled") << std::endl;
 	input::SDL::sdl_devices[input::detail::KEYBOARD_ID] = NULL;
-	input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(input::detail::KEYBOARD_ID, input::detail::InputDevPrivate(input::detail::Instrument("GUITAR_GUITARHERO", input::GUITAR, input::detail::GUITAR_GH))));
+	input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(input::detail::KEYBOARD_ID, input::detail::InputDevPrivate(input::Instrument("GUITAR_GUITARHERO", input::GUITAR, std::vector<int>(inputmap[0],inputmap[0]+SDL_BUTTONS)))));
 	input::SDL::sdl_devices[input::detail::KEYBOARD_ID2] = NULL;
-	input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(input::detail::KEYBOARD_ID2, input::detail::InputDevPrivate(input::detail::Instrument("DRUMS_GUITARHERO", input::DRUMS, input::detail::DRUMS_GH))));
+	input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(input::detail::KEYBOARD_ID2, input::detail::InputDevPrivate(input::Instrument("DRUMS_GUITARHERO", input::DRUMS, std::vector<int>(inputmap[5],inputmap[5]+SDL_BUTTONS)))));
 	input::SDL::sdl_devices[input::detail::KEYBOARD_ID3] = NULL;
-	input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(input::detail::KEYBOARD_ID3, input::detail::InputDevPrivate(input::detail::Instrument("DANCEPAD_GENERIC", input::DANCEPAD, input::detail::DANCEPAD_GENERIC))));
+	input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(input::detail::KEYBOARD_ID3, input::detail::InputDevPrivate(input::Instrument("DANCEPAD_GENERIC", input::DANCEPAD, std::vector<int>(inputmap[8],inputmap[8]+SDL_BUTTONS)))));
 }
 
 bool input::SDL::pushEvent(SDL_Event _e) {
@@ -657,7 +636,7 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 			if(!devices.find(joy_id)->second.assigned()) return false;
 			if (_e.jaxis.axis == 5 || _e.jaxis.axis == 6 || _e.jaxis.axis == 1) {
 				event.type = input::Event::PICK;
-			} else if (_e.jaxis.axis == 2 || (devices.find(joy_id)->second.type() == input::detail::GUITAR_RB_XB360
+			} else if (_e.jaxis.axis == 2 || (devices.find(joy_id)->second.name() == "GUITAR_ROCKBAND_XB360"
 			  && _e.jaxis.axis == 4)) {
 				event.type = input::Event::WHAMMY;
 			} else {
@@ -667,7 +646,7 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 				event.pressed[i] = devices.find(joy_id)->second.pressed(i);
 			}
 			// XBox RB guitar's Tilt sensor
-			if (devices.find(joy_id)->second.type() == input::detail::GUITAR_RB_XB360 && _e.jaxis.axis == 3) {
+			if (devices.find(joy_id)->second.name() == "DRUMS_ROCKBAND_XB360" && _e.jaxis.axis == 3) {
 				event.button = input::STARPOWER_BUTTON;
 				if (_e.jaxis.value < -2) {
 					event.type = input::Event::PRESS;
@@ -707,7 +686,7 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 		case SDL_JOYBUTTONDOWN:
 			joy_id = _e.jbutton.which;
 			if(!devices.find(joy_id)->second.assigned()) return false;
-			button = buttonFromSDL(devices.find(joy_id)->second.type(),_e.jbutton.button);
+			button = devices.find(joy_id)->second.buttonFromSDL(_e.jbutton.button);
 			if( button == -1 ) return false;
 			for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
 				event.pressed[i] = devices.find(joy_id)->second.pressed(i);
@@ -720,7 +699,7 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 		case SDL_JOYBUTTONUP:
 			joy_id = _e.jbutton.which;
 			if(!devices.find(joy_id)->second.assigned()) return false;
-			button = buttonFromSDL(devices.find(joy_id)->second.type(),_e.jbutton.button);
+			button = devices.find(joy_id)->second.buttonFromSDL(_e.jbutton.button);
 			if( button == -1 ) return false;
 			for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
 				event.pressed[i] = devices.find(joy_id)->second.pressed(i);

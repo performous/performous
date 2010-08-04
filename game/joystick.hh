@@ -2,6 +2,7 @@
 
 #include <climits>
 #include <deque>
+#include <vector>
 #include <iostream>
 #include <stdexcept>
 #include <boost/noncopyable.hpp>
@@ -32,24 +33,20 @@ namespace input {
 		boost::xtime time;
 	};
 
+	struct Instrument {
+		Instrument(std::string _name, input::DevType _type, std::vector<int> _mapping) : name(_name), type(_type), mapping(_mapping) {};
+		std::string name;
+		input::DevType type;
+		std::string description;
+		std::string match;
+		std::vector<int> mapping;
+	};
+	typedef std::vector<Instrument> Instruments;
+
 	namespace detail {
-		enum Type { GUITAR_RB_PS3, DRUMS_RB_PS3, GUITAR_RB_XB360, DRUMS_RB_XB360,
-		  GUITAR_GH, GUITAR_GH_XPLORER, GUITAR_HAMA_PS2, DRUMS_GH, DRUMS_MIDI, DANCEPAD_TIGERGAME, DANCEPAD_GENERIC, DANCEPAD_EMS2, DANCEPAD_2TECH };
 		static unsigned int KEYBOARD_ID = UINT_MAX;
 		static unsigned int KEYBOARD_ID2 = KEYBOARD_ID-1;
 		static unsigned int KEYBOARD_ID3 = KEYBOARD_ID-2; // Three ids needed for keyboard guitar/drumkit/dancepad
-
-		struct Instrument {
-			Instrument(std::string _name, input::DevType _type, input::detail::Type _detailed_type) : name(_name), type(_type), detailed_type(_detailed_type) {};
-			std::string name;
-			input::DevType type;
-			input::detail::Type detailed_type;
-			std::string description;
-			std::string match;
-			char mapping; // dummy
-		};
-		typedef std::vector<Instrument> Instruments;
-
 
 		class InputDevPrivate {
 		  public:
@@ -85,10 +82,17 @@ namespace input {
 			void unassign() {m_assigned = false; clearEvents();};
 			bool assigned() {return m_assigned;};
 			bool pressed(int _button) {return m_pressed[_button];};
-			Type type() {return m_instrument.detailed_type;};
+			std::string name() {return m_instrument.name;};
 			bool type_match(DevType _type) {
 				return _type == m_instrument.type;
 			};
+			int buttonFromSDL(unsigned int sdl_button) {
+				try {
+					return m_instrument.mapping.at(sdl_button);
+				} catch(...) {
+					return -1;
+				}
+			}
 		  private:
 			std::deque<Event> m_events;
 			bool m_assigned;
@@ -100,7 +104,6 @@ namespace input {
 		extern InputDevs devices;
 	}
 
-	int buttonFromSDL(detail::Type _type, unsigned int _sdl_button);
 	NavButton getNav(SDL_Event const &e);
 
 	struct NoDevError: std::runtime_error {
