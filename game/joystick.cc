@@ -257,39 +257,28 @@ void input::SDL::init_devices() {
 
 #include <boost/spirit/include/classic_core.hpp>
 
-struct Instrument {
-	Instrument(std::string _name, input::DevType _type, input::detail::Type _detailed_type) : name(_name), type(_type), detailed_type(_detailed_type) {};
-	std::string name;
-	input::DevType type;
-	input::detail::Type detailed_type;
-	std::string description;
-	std::string match;
-	char mapping; // dummy
-};
-
-typedef std::vector<Instrument> Instruments;
-Instruments g_instruments;
+input::detail::Instruments g_instruments;
 
 void input::SDL::init() {
-	g_instruments.push_back(Instrument("GUITAR_GUITARHERO_XPLORER", input::GUITAR, input::detail::GUITAR_GH_XPLORER));
-	g_instruments.push_back(Instrument("GUITAR_HAMA_PS2", input::GUITAR, input::detail::GUITAR_HAMA_PS2));
-	g_instruments.push_back(Instrument("GUITAR_ROCKBAND_PS3", input::GUITAR, input::detail::GUITAR_RB_PS3));
-	g_instruments.push_back(Instrument("GUITAR_ROCKBAND_XB360", input::GUITAR, input::detail::GUITAR_RB_XB360));
-	g_instruments.push_back(Instrument("GUITAR_GUITARHERO", input::GUITAR, input::detail::GUITAR_GH));
-	g_instruments.push_back(Instrument("DRUMS_GUITARHERO", input::DRUMS, input::detail::DRUMS_GH));
-	g_instruments.push_back(Instrument("DRUMS_ROCKBAND_PS3", input::DRUMS, input::detail::DRUMS_RB_PS3));
-	g_instruments.push_back(Instrument("DRUMS_ROCKBAND_XB360", input::DRUMS, input::detail::DRUMS_RB_XB360));
-	g_instruments.push_back(Instrument("DANCEPAD_EMS2", input::DANCEPAD, input::detail::DANCEPAD_EMS2));
-	g_instruments.push_back(Instrument("DANCEPAD_GENERIC", input::DANCEPAD, input::detail::DANCEPAD_GENERIC));
-	g_instruments.push_back(Instrument("DANCEPAD_TIGERGAME", input::DANCEPAD, input::detail::DANCEPAD_TIGERGAME));
-	g_instruments.push_back(Instrument("DANCEPAD_2TECH", input::DANCEPAD, input::detail::DANCEPAD_2TECH));
+	g_instruments.push_back(input::detail::Instrument("GUITAR_GUITARHERO_XPLORER", input::GUITAR, input::detail::GUITAR_GH_XPLORER));
+	g_instruments.push_back(input::detail::Instrument("GUITAR_HAMA_PS2", input::GUITAR, input::detail::GUITAR_HAMA_PS2));
+	g_instruments.push_back(input::detail::Instrument("GUITAR_ROCKBAND_PS3", input::GUITAR, input::detail::GUITAR_RB_PS3));
+	g_instruments.push_back(input::detail::Instrument("GUITAR_ROCKBAND_XB360", input::GUITAR, input::detail::GUITAR_RB_XB360));
+	g_instruments.push_back(input::detail::Instrument("GUITAR_GUITARHERO", input::GUITAR, input::detail::GUITAR_GH));
+	g_instruments.push_back(input::detail::Instrument("DRUMS_GUITARHERO", input::DRUMS, input::detail::DRUMS_GH));
+	g_instruments.push_back(input::detail::Instrument("DRUMS_ROCKBAND_PS3", input::DRUMS, input::detail::DRUMS_RB_PS3));
+	g_instruments.push_back(input::detail::Instrument("DRUMS_ROCKBAND_XB360", input::DRUMS, input::detail::DRUMS_RB_XB360));
+	g_instruments.push_back(input::detail::Instrument("DANCEPAD_EMS2", input::DANCEPAD, input::detail::DANCEPAD_EMS2));
+	g_instruments.push_back(input::detail::Instrument("DANCEPAD_GENERIC", input::DANCEPAD, input::detail::DANCEPAD_GENERIC));
+	g_instruments.push_back(input::detail::Instrument("DANCEPAD_TIGERGAME", input::DANCEPAD, input::detail::DANCEPAD_TIGERGAME));
+	g_instruments.push_back(input::detail::Instrument("DANCEPAD_2TECH", input::DANCEPAD, input::detail::DANCEPAD_2TECH));
 	unsigned int sdl_id;
 	std::string instrument_type;
-	std::map<unsigned int, Instrument> forced_type;
+	std::map<unsigned int, input::detail::Instrument> forced_type;
 
 	using namespace boost::spirit::classic;
 	rule<> type;
-	for(Instruments::const_iterator it = g_instruments.begin() ; it != g_instruments.end() ; ++it) {
+	for(input::detail::Instruments::const_iterator it = g_instruments.begin() ; it != g_instruments.end() ; ++it) {
 		if(it == g_instruments.begin())
 			type = str_p(it->name.c_str());
 		else
@@ -303,10 +292,9 @@ void input::SDL::init() {
 			std::cerr << "Error \"" << *it << "\" is not a valid instrument forced value" << std::endl;
 			continue;
 		} else {
-			for(Instruments::const_iterator it2 = g_instruments.begin() ; it2 != g_instruments.end() ; ++it2) {
+			for(input::detail::Instruments::const_iterator it2 = g_instruments.begin() ; it2 != g_instruments.end() ; ++it2) {
 				if(instrument_type == it2->name) {
-					//Instrument ins(*it2);
-					forced_type.insert(std::pair<unsigned int,Instrument>(sdl_id, Instrument(*it2)));
+					forced_type.insert(std::pair<unsigned int,input::detail::Instrument>(sdl_id, input::detail::Instrument(*it2)));
 					break;
 				}
 			}
@@ -331,15 +319,15 @@ void input::SDL::init() {
 		std::cout << ", Hats: " << SDL_JoystickNumHats(joy) << std::endl;
 		if( forced_type.find(i) != forced_type.end() ) {
 			std::cout << "  Detected as: " << forced_type.find(i)->second.description << " (forced)" << std::endl;
-			input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(i, input::detail::InputDevPrivate(forced_type.find(i)->second.detailed_type)));
+			input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(i, input::detail::InputDevPrivate(forced_type.find(i)->second)));
 		} else {
 			bool found = false;
-			for(Instruments::const_iterator it = g_instruments.begin() ; it != g_instruments.end() ; ++it) {
+			for(input::detail::Instruments::const_iterator it = g_instruments.begin() ; it != g_instruments.end() ; ++it) {
 				boost::regex sdl_name(it->match);
 				boost::cmatch match;
 				if (regex_match(name.c_str(), match, sdl_name)) {
 					std::cout << "  Detected as: " << it->description << std::endl;
-					input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(i, input::detail::InputDevPrivate(it->detailed_type)));
+					input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(i, input::detail::InputDevPrivate(*it)));
 					found = true;
 					break;
 				}
@@ -358,11 +346,11 @@ void input::SDL::init() {
 	std::cout << "Keyboard as drumkit controller: " << (config["game/keyboard_drumkit"].b() ? "enabled":"disabled") << std::endl;
 	std::cout << "Keyboard as dance pad controller: " << (config["game/keyboard_dancepad"].b() ? "enabled":"disabled") << std::endl;
 	input::SDL::sdl_devices[input::detail::KEYBOARD_ID] = NULL;
-	input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(input::detail::KEYBOARD_ID, input::detail::InputDevPrivate(input::detail::GUITAR_GH)));
+	input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(input::detail::KEYBOARD_ID, input::detail::InputDevPrivate(input::detail::Instrument("GUITAR_GUITARHERO", input::GUITAR, input::detail::GUITAR_GH))));
 	input::SDL::sdl_devices[input::detail::KEYBOARD_ID2] = NULL;
-	input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(input::detail::KEYBOARD_ID2, input::detail::InputDevPrivate(input::detail::DRUMS_GH)));
+	input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(input::detail::KEYBOARD_ID2, input::detail::InputDevPrivate(input::detail::Instrument("DRUMS_GUITARHERO", input::DRUMS, input::detail::DRUMS_GH))));
 	input::SDL::sdl_devices[input::detail::KEYBOARD_ID3] = NULL;
-	input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(input::detail::KEYBOARD_ID3, input::detail::InputDevPrivate(input::detail::DANCEPAD_GENERIC)));
+	input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(input::detail::KEYBOARD_ID3, input::detail::InputDevPrivate(input::detail::Instrument("DANCEPAD_GENERIC", input::DANCEPAD, input::detail::DANCEPAD_GENERIC))));
 }
 
 bool input::SDL::pushEvent(SDL_Event _e) {

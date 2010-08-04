@@ -39,9 +39,21 @@ namespace input {
 		static unsigned int KEYBOARD_ID2 = KEYBOARD_ID-1;
 		static unsigned int KEYBOARD_ID3 = KEYBOARD_ID-2; // Three ids needed for keyboard guitar/drumkit/dancepad
 
+		struct Instrument {
+			Instrument(std::string _name, input::DevType _type, input::detail::Type _detailed_type) : name(_name), type(_type), detailed_type(_detailed_type) {};
+			std::string name;
+			input::DevType type;
+			input::detail::Type detailed_type;
+			std::string description;
+			std::string match;
+			char mapping; // dummy
+		};
+		typedef std::vector<Instrument> Instruments;
+
+
 		class InputDevPrivate {
 		  public:
-			InputDevPrivate(Type _type) : m_assigned(false), m_type(_type) {
+			InputDevPrivate(const Instrument &_instrument) : m_assigned(false), m_instrument(_instrument) {
 				for(unsigned int i = 0 ; i < BUTTONS ; i++) {
 					m_pressed[i] = false;
 				}
@@ -73,33 +85,15 @@ namespace input {
 			void unassign() {m_assigned = false; clearEvents();};
 			bool assigned() {return m_assigned;};
 			bool pressed(int _button) {return m_pressed[_button];};
-			Type type() {return m_type;};
+			Type type() {return m_instrument.detailed_type;};
 			bool type_match(DevType _type) {
-				switch (m_type) {
-				case GUITAR_GH:
-				case GUITAR_GH_XPLORER:
-				case GUITAR_HAMA_PS2:
-				case GUITAR_RB_PS3:
-				case GUITAR_RB_XB360:
-					return _type == GUITAR;
-				case DRUMS_GH:
-				case DRUMS_MIDI:
-				case DRUMS_RB_PS3:
-				case DRUMS_RB_XB360:
-					return _type == DRUMS;
-				case DANCEPAD_GENERIC:
-				case DANCEPAD_EMS2:
-				case DANCEPAD_TIGERGAME:
-				case DANCEPAD_2TECH:
-					return _type == DANCEPAD;
-				}
-				throw std::logic_error("Unhandled DevType");
+				return _type == m_instrument.type;
 			};
 		  private:
 			std::deque<Event> m_events;
 			bool m_assigned;
 			bool m_pressed[BUTTONS];
-			Type m_type;
+			const Instrument &m_instrument;
 		};
 
 		typedef std::map<unsigned int,InputDevPrivate> InputDevs;
