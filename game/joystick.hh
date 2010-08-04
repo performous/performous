@@ -41,7 +41,7 @@ namespace input {
 		std::string match;
 		std::vector<int> mapping;
 	};
-	typedef std::vector<Instrument> Instruments;
+	typedef std::map<std::string, Instrument> Instruments;
 
 	namespace detail {
 		static unsigned int KEYBOARD_ID = UINT_MAX;

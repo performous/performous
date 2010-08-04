@@ -216,41 +216,174 @@ void input::SDL::init_devices() {
 }
 
 #include <boost/spirit/include/classic_core.hpp>
+#include "fs.hh"
+#include <libxml++/libxml++.h>
 
 input::Instruments g_instruments;
 
-void input::SDL::init() {
-	const unsigned SDL_BUTTONS = 16;
-
-	unsigned int inputmap[12][SDL_BUTTONS] = {
-		//G  R  Y  B  O  S    // for guitars (S=starpower)
-		{ 2, 0, 1, 3, 4, 5, -1, -1,  8,  9, -1, -1, -1, -1, -1, -1 }, // Guitar Hero guitar
-		{ 0, 1, 3, 2, 4,-1,  8,  9, -1, -1, -1, -1, -1, -1, -1, -1 }, // Guitar Hero X-plorer guitar
-		{ 3, 0, 1, 2, 4, 5, -1, -1,  8,  9, -1, -1, -1, -1, -1, -1 }, // Rock Band guitar PS3
-		{ 0, 1, 3, 2, 4,-1,  8,  9, -1, -1, -1, -1, -1, -1, -1, -1 }, // Rock Band guitar XBOX360
-		{ 2, 1, 3, 4, 5, 0, -1, -1,  8,  9, -1, -1, -1, -1, -1, -1 }, // Hama Wireless Guitar Controller for PS2 with converter
-		//K  R  Y  B  G  O    // for drums
-		{ 3, 4, 1, 2, 0, 4, -1, -1,  8,  9, -1, -1, -1, -1, -1, -1 }, // Guitar Hero drums
-		{ 3, 4, 1, 2, 0,-1, -1, -1,  8,  9, -1, -1, -1, -1, -1, -1 }, // Rock Band drums PS3
-		{ 4, 1, 3, 2, 0,-1,  8,  9, -1, -1, -1, -1, -1, -1, -1, -1 }, // Rock Band drums XBOX360
-		// Left  Down  Up  Right  DownL  DownR  UpL    UpR    Start  Select
-		{  0,  1,  2,  3,  6,  7,  4,  5,  9,  8, -1, -1, -1, -1, -1, -1 }, // generic dance pad
-		{  9,  8, -1, -1, -1, -1, -1, -1,  0,  3,  1,  2, -1, -1, -1, -1 }, // TigerGame dance pad
-		{  4,  7,  6,  5, -1, -1, -1, -1,  9,  8, -1, -1,  2,  3,  1,  0 }, // dance pad with ems ps2/pc adapter
-		{  0,  1,  2,  3,  6,  7,  4,  5,  8,  9, -1, -1, -1, -1, -1, -1 }  // 2-tech usb dance pad
+namespace {
+	struct XMLError {
+		XMLError(xmlpp::Element& e, std::string msg): elem(e), message(msg) {}
+		xmlpp::Element& elem;
+		std::string message;
 	};
-	g_instruments.push_back(input::Instrument("GUITAR_GUITARHERO_XPLORER", input::GUITAR, std::vector<int>(inputmap[1],inputmap[1]+SDL_BUTTONS)));
-	g_instruments.push_back(input::Instrument("GUITAR_HAMA_PS2", input::GUITAR, std::vector<int>(inputmap[4],inputmap[4]+SDL_BUTTONS)));
-	g_instruments.push_back(input::Instrument("GUITAR_ROCKBAND_PS3", input::GUITAR, std::vector<int>(inputmap[2],inputmap[2]+SDL_BUTTONS)));
-	g_instruments.push_back(input::Instrument("GUITAR_ROCKBAND_XB360", input::GUITAR, std::vector<int>(inputmap[3],inputmap[3]+SDL_BUTTONS)));
-	g_instruments.push_back(input::Instrument("GUITAR_GUITARHERO", input::GUITAR, std::vector<int>(inputmap[0],inputmap[0]+SDL_BUTTONS)));
-	g_instruments.push_back(input::Instrument("DRUMS_GUITARHERO", input::DRUMS, std::vector<int>(inputmap[5],inputmap[5]+SDL_BUTTONS)));
-	g_instruments.push_back(input::Instrument("DRUMS_ROCKBAND_PS3", input::DRUMS, std::vector<int>(inputmap[6],inputmap[6]+SDL_BUTTONS)));
-	g_instruments.push_back(input::Instrument("DRUMS_ROCKBAND_XB360", input::DRUMS, std::vector<int>(inputmap[7],inputmap[7]+SDL_BUTTONS)));
-	g_instruments.push_back(input::Instrument("DANCEPAD_EMS2", input::DANCEPAD, std::vector<int>(inputmap[10],inputmap[10]+SDL_BUTTONS)));
-	g_instruments.push_back(input::Instrument("DANCEPAD_GENERIC", input::DANCEPAD, std::vector<int>(inputmap[8],inputmap[8]+SDL_BUTTONS)));
-	g_instruments.push_back(input::Instrument("DANCEPAD_TIGERGAME", input::DANCEPAD, std::vector<int>(inputmap[9],inputmap[9]+SDL_BUTTONS)));
-	g_instruments.push_back(input::Instrument("DANCEPAD_2TECH", input::DANCEPAD, std::vector<int>(inputmap[11],inputmap[11]+SDL_BUTTONS)));
+	std::string getAttribute(xmlpp::Element& elem, std::string const& attr) {
+		xmlpp::Attribute* a = elem.get_attribute(attr);
+		if (!a) throw XMLError(elem, "attribute " + attr + " not found");
+		return a->get_value();
+	}
+}
+
+void readControllers(input::Instruments &instruments, fs::path const& file) {
+	if (!fs::exists(file)) {
+		std::cout << "Skipping " << file << " (not found)" << std::endl;
+		return;
+	}
+	std::cout << "Parsing " << file << std::endl;
+	xmlpp::DomParser domParser(file.string());
+	try {
+		xmlpp::NodeSet n = domParser.get_document()->get_root_node()->find("/controllers/controller");
+		for (xmlpp::NodeSet::const_iterator nodeit = n.begin(), end = n.end(); nodeit != end; ++nodeit) {
+			xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**nodeit);
+			std::string name = getAttribute(elem, "name");
+			std::string type = getAttribute(elem, "type");
+
+			xmlpp::NodeSet ns;
+			// searching description
+			ns = elem.find("description/text()");
+			if(ns.size()==0) continue;
+			std::string description = dynamic_cast<xmlpp::TextNode&>(*ns[0]).get_content();
+
+			// searching the match
+			ns = elem.find("regexp");
+			if(ns.size()==0) continue;
+			std::string regexp = getAttribute(dynamic_cast<xmlpp::Element&>(*ns[0]), "match");
+
+			// setting the type
+			input::DevType devType;
+			if(type == "guitar") {
+				devType = input::GUITAR;
+			} else if(type == "drumkit") {
+				devType = input::DRUMS;
+			} else if(type == "dancepad") {
+				devType = input::DANCEPAD;
+			} else {
+				continue;
+			}
+
+			// setting the mapping
+			std::vector<int> mapping(16, -1);
+			ns = elem.find("mapping/button");
+			static const int SDL_BUTTONS = 16;
+			switch(devType) {
+				case input::GUITAR:
+					for (xmlpp::NodeSet::const_iterator nodeit2 = ns.begin(), end = ns.end(); nodeit2 != end; ++nodeit2) {
+						xmlpp::Element& button_elem = dynamic_cast<xmlpp::Element&>(**nodeit2);
+						int id = boost::lexical_cast<int>(getAttribute(button_elem, "id"));
+						std::string value = getAttribute(button_elem, "value");
+						if(id >= SDL_BUTTONS) break;
+						if(value == "green") {
+							mapping[id] = 0;
+						} else if(value == "red") {
+							mapping[id] = 1;
+						} else if(value == "yellow") {
+							mapping[id] = 2;
+						} else if(value == "blue") {
+							mapping[id] = 3;
+						} else if(value == "orange") {
+							mapping[id] = 4;
+						} else if(value == "starpower") {
+							mapping[id] = 5;
+						} else if(value == "start") {
+							mapping[id] = 8;
+						} else if(value == "select") {
+							mapping[id] = 9;
+						} else {
+							continue;
+						}
+					}
+					break;
+				case input::DRUMS:
+					for (xmlpp::NodeSet::const_iterator nodeit2 = ns.begin(), end = ns.end(); nodeit2 != end; ++nodeit2) {
+						xmlpp::Element& button_elem = dynamic_cast<xmlpp::Element&>(**nodeit2);
+						int id = boost::lexical_cast<int>(getAttribute(button_elem, "id"));
+						std::string value = getAttribute(button_elem, "value");
+						if(id >= SDL_BUTTONS) break;
+						if(value == "green") {
+							mapping[id] = 0;
+						} else if(value == "red") {
+							mapping[id] = 1;
+						} else if(value == "yellow") {
+							mapping[id] = 2;
+						} else if(value == "blue") {
+							mapping[id] = 3;
+						} else if(value == "orange") {
+							mapping[id] = 4;
+						} else if(value == "kick") {
+							mapping[id] = 5;
+						} else if(value == "start") {
+							mapping[id] = 8;
+						} else if(value == "select") {
+							mapping[id] = 9;
+						} else {
+							continue;
+						}
+					}
+					break;
+				case input::DANCEPAD:
+					for (xmlpp::NodeSet::const_iterator nodeit2 = ns.begin(), end = ns.end(); nodeit2 != end; ++nodeit2) {
+						xmlpp::Element& button_elem = dynamic_cast<xmlpp::Element&>(**nodeit2);
+						int id = boost::lexical_cast<int>(getAttribute(button_elem, "id"));
+						std::string value = getAttribute(button_elem, "value");
+						if(id >= SDL_BUTTONS) break;
+						if(value == "left") {
+							mapping[id] = 0;
+						} else if(value == "down") {
+							mapping[id] = 1;
+						} else if(value == "up") {
+							mapping[id] = 2;
+						} else if(value == "right") {
+							mapping[id] = 3;
+						} else if(value == "down-left") {
+							mapping[id] = 4;
+						} else if(value == "down-right") {
+							mapping[id] = 5;
+						} else if(value == "up-left") {
+							mapping[id] = 6;
+						} else if(value == "up-right") {
+							mapping[id] = 7;
+						} else if(value == "start") {
+							mapping[id] = 8;
+						} else if(value == "select") {
+							mapping[id] = 9;
+						} else {
+							continue;
+						}
+					}
+					break;
+			}
+
+			// inserting the instrument
+			if(instruments.find(name) == instruments.end()) {
+				std::cout << "   Adding " << type << ": " << name << std::endl;
+			} else {
+				std::cout << "   Overriding " << type << ": " << name << std::endl;
+			}
+			input::Instrument instrument(name, devType, mapping);
+			instrument.match = regexp;
+			instrument.description = description;
+			instruments.insert(std::make_pair<std::string, input::Instrument>(name, instrument));
+		}
+	} catch (XMLError& e) {
+		int line = e.elem.get_line();
+		std::string name = e.elem.get_name();
+		throw std::runtime_error(file.string() + ":" + boost::lexical_cast<std::string>(line) + " element " + name + " " + e.message);
+	}
+}
+
+void input::SDL::init() {
+	readControllers(g_instruments, getDefaultConfig(fs::path("/config/controllers.xml"))); 
+	readControllers(g_instruments, getConfigDir() / "controllers.xml");
 	unsigned int sdl_id;
 	std::string instrument_type;
 	std::map<unsigned int, input::Instrument> forced_type;
@@ -259,9 +392,9 @@ void input::SDL::init() {
 	rule<> type;
 	for(input::Instruments::const_iterator it = g_instruments.begin() ; it != g_instruments.end() ; ++it) {
 		if(it == g_instruments.begin())
-			type = str_p(it->name.c_str());
+			type = str_p(it->first.c_str());
 		else
-			type = type | it->name.c_str();
+			type = type | it->first.c_str();
 	}
 	rule<> entry = uint_p[assign_a(sdl_id)] >> ":" >> (type)[assign_a(instrument_type)];
 
@@ -272,8 +405,8 @@ void input::SDL::init() {
 			continue;
 		} else {
 			for(input::Instruments::const_iterator it2 = g_instruments.begin() ; it2 != g_instruments.end() ; ++it2) {
-				if(instrument_type == it2->name) {
-					forced_type.insert(std::pair<unsigned int,input::Instrument>(sdl_id, input::Instrument(*it2)));
+				if(instrument_type == it2->first) {
+					forced_type.insert(std::pair<unsigned int,input::Instrument>(sdl_id, input::Instrument(it2->second)));
 					break;
 				}
 			}
@@ -302,11 +435,11 @@ void input::SDL::init() {
 		} else {
 			bool found = false;
 			for(input::Instruments::const_iterator it = g_instruments.begin() ; it != g_instruments.end() ; ++it) {
-				boost::regex sdl_name(it->match);
+				boost::regex sdl_name(it->second.match);
 				boost::cmatch match;
 				if (regex_match(name.c_str(), match, sdl_name)) {
-					std::cout << "  Detected as: " << it->description << std::endl;
-					input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(i, input::detail::InputDevPrivate(*it)));
+					std::cout << "  Detected as: " << it->second.description << std::endl;
+					input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(i, input::detail::InputDevPrivate(it->second)));
 					found = true;
 					break;
 				}
@@ -325,11 +458,11 @@ void input::SDL::init() {
 	std::cout << "Keyboard as drumkit controller: " << (config["game/keyboard_drumkit"].b() ? "enabled":"disabled") << std::endl;
 	std::cout << "Keyboard as dance pad controller: " << (config["game/keyboard_dancepad"].b() ? "enabled":"disabled") << std::endl;
 	input::SDL::sdl_devices[input::detail::KEYBOARD_ID] = NULL;
-	input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(input::detail::KEYBOARD_ID, input::detail::InputDevPrivate(input::Instrument("GUITAR_GUITARHERO", input::GUITAR, std::vector<int>(inputmap[0],inputmap[0]+SDL_BUTTONS)))));
+	input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(input::detail::KEYBOARD_ID, input::detail::InputDevPrivate(g_instruments.find("GUITAR_GUITARHERO")->second)));
 	input::SDL::sdl_devices[input::detail::KEYBOARD_ID2] = NULL;
-	input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(input::detail::KEYBOARD_ID2, input::detail::InputDevPrivate(input::Instrument("DRUMS_GUITARHERO", input::DRUMS, std::vector<int>(inputmap[5],inputmap[5]+SDL_BUTTONS)))));
+	input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(input::detail::KEYBOARD_ID2, input::detail::InputDevPrivate(g_instruments.find("DRUMS_GUITARHERO")->second)));
 	input::SDL::sdl_devices[input::detail::KEYBOARD_ID3] = NULL;
-	input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(input::detail::KEYBOARD_ID3, input::detail::InputDevPrivate(input::Instrument("DANCEPAD_GENERIC", input::DANCEPAD, std::vector<int>(inputmap[8],inputmap[8]+SDL_BUTTONS)))));
+	input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(input::detail::KEYBOARD_ID3, input::detail::InputDevPrivate(g_instruments.find("DANCEPAD_GENERIC")->second)));
 }
 
 bool input::SDL::pushEvent(SDL_Event _e) {
