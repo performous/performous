@@ -21,7 +21,7 @@ find_path(SigC++_INCLUDE_DIR
 find_path(SigC++Config_INCLUDE_DIR
   NAMES sigc++config.h
   PATHS ${SigC++_PKGCONF_INCLUDE_DIRS} /usr
-  PATH_SUFFIXES lib/sigc++-2.0/include
+  PATH_SUFFIXES lib/sigc++-2.0/include ../lib/sigc++-2.0/include
 )
 
 # Finally the library itself

@@ -16,6 +16,7 @@ find_path(LibXML2_INCLUDE_DIR
   NAMES libxml/xpath.h
   PATHS ${LibXML2_PKGCONF_INCLUDE_DIRS}
   PATHS ${LibXML2_PKGCONF_INCLUDE_DIRS}/libxml2
+  PATH_SUFFIXES libxml2
 )
 
 find_library(LibXML2_LIBRARY

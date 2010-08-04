@@ -25,7 +25,7 @@ find_path(Glibmm_INCLUDE_DIR
 find_path(GlibmmConfig_INCLUDE_DIR
   NAMES glibmmconfig.h
   PATHS ${Glibmm_PKGCONF_INCLUDE_DIRS} /usr
-  PATH_SUFFIXES lib/glibmm-2.4/include
+  PATH_SUFFIXES lib/glibmm-2.4/include ../lib/glibmm-2.4/include
 )
 
 # Finally the library itself
