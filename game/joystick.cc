@@ -281,25 +281,15 @@ void readControllers(input::Instruments &instruments, fs::path const& file) {
 						int id = boost::lexical_cast<int>(getAttribute(button_elem, "id"));
 						std::string value = getAttribute(button_elem, "value");
 						if(id >= SDL_BUTTONS) break;
-						if(value == "green") {
-							mapping[id] = 0;
-						} else if(value == "red") {
-							mapping[id] = 1;
-						} else if(value == "yellow") {
-							mapping[id] = 2;
-						} else if(value == "blue") {
-							mapping[id] = 3;
-						} else if(value == "orange") {
-							mapping[id] = 4;
-						} else if(value == "starpower") {
-							mapping[id] = 5;
-						} else if(value == "start") {
-							mapping[id] = 8;
-						} else if(value == "select") {
-							mapping[id] = 9;
-						} else {
-							continue;
-						}
+						if(value == "green") mapping[id] = 0;
+						else if(value == "red") mapping[id] = 1;
+						else if(value == "yellow") mapping[id] = 2;
+						else if(value == "blue") mapping[id] = 3;
+						else if(value == "orange") mapping[id] = 4;
+						else if(value == "starpower") mapping[id] = 5;
+						else if(value == "start") mapping[id] = 8;
+						else if(value == "select") mapping[id] = 9;
+						else continue;
 					}
 					break;
 				case input::DRUMS:
@@ -308,25 +298,15 @@ void readControllers(input::Instruments &instruments, fs::path const& file) {
 						int id = boost::lexical_cast<int>(getAttribute(button_elem, "id"));
 						std::string value = getAttribute(button_elem, "value");
 						if(id >= SDL_BUTTONS) break;
-						if(value == "green") {
-							mapping[id] = 0;
-						} else if(value == "red") {
-							mapping[id] = 1;
-						} else if(value == "yellow") {
-							mapping[id] = 2;
-						} else if(value == "blue") {
-							mapping[id] = 3;
-						} else if(value == "orange") {
-							mapping[id] = 4;
-						} else if(value == "kick") {
-							mapping[id] = 5;
-						} else if(value == "start") {
-							mapping[id] = 8;
-						} else if(value == "select") {
-							mapping[id] = 9;
-						} else {
-							continue;
-						}
+						if(value == "kick") mapping[id] = 0;
+						else if(value == "red") mapping[id] = 1;
+						else if(value == "yellow") mapping[id] = 2;
+						else if(value == "blue") mapping[id] = 3;
+						else if(value == "green") mapping[id] = 4;
+						else if(value == "orange") mapping[id] = 5;
+						else if(value == "start") mapping[id] = 8;
+						else if(value == "select") mapping[id] = 9;
+						else continue;
 					}
 					break;
 				case input::DANCEPAD:
@@ -335,29 +315,17 @@ void readControllers(input::Instruments &instruments, fs::path const& file) {
 						int id = boost::lexical_cast<int>(getAttribute(button_elem, "id"));
 						std::string value = getAttribute(button_elem, "value");
 						if(id >= SDL_BUTTONS) break;
-						if(value == "left") {
-							mapping[id] = 0;
-						} else if(value == "down") {
-							mapping[id] = 1;
-						} else if(value == "up") {
-							mapping[id] = 2;
-						} else if(value == "right") {
-							mapping[id] = 3;
-						} else if(value == "down-left") {
-							mapping[id] = 4;
-						} else if(value == "down-right") {
-							mapping[id] = 5;
-						} else if(value == "up-left") {
-							mapping[id] = 6;
-						} else if(value == "up-right") {
-							mapping[id] = 7;
-						} else if(value == "start") {
-							mapping[id] = 8;
-						} else if(value == "select") {
-							mapping[id] = 9;
-						} else {
-							continue;
-						}
+						if(value == "left") mapping[id] = 0;
+						else if(value == "down") mapping[id] = 1;
+						else if(value == "up") mapping[id] = 2;
+						else if(value == "right") mapping[id] = 3;
+						else if(value == "down-left") mapping[id] = 4;
+						else if(value == "down-right") mapping[id] = 5;
+						else if(value == "up-left") mapping[id] = 6;
+						else if(value == "up-right") mapping[id] = 7;
+						else if(value == "start") mapping[id] = 8;
+						else if(value == "select") mapping[id] = 9;
+						else continue;
 					}
 					break;
 			}
@@ -436,7 +404,7 @@ void input::SDL::init() {
 			for(input::Instruments::const_iterator it = g_instruments.begin() ; it != g_instruments.end() ; ++it) {
 				boost::regex sdl_name(it->second.match);
 				boost::cmatch match;
-				if (regex_match(name.c_str(), match, sdl_name)) {
+				if (regex_search(name.c_str(), sdl_name)) {
 					std::cout << "  Detected as: " << it->second.description << std::endl;
 					input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(i, input::detail::InputDevPrivate(it->second)));
 					found = true;

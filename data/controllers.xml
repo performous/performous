@@ -97,7 +97,7 @@
 	</controller>
 	<controller type="drumkit" name="DRUMS_ROCKBAND_PS3">
 		<description>RockBand PS3 drum kit</description>
-		<regexp match="Harmonix Drum [Kk]it for Playstation" />
+		<regexp match="Harmonix Drum [Kk]it for PlayStation" />
 		<mapping>
 			<button id="0" value="blue" />
 			<button id="1" value="green" />
