@@ -286,7 +286,7 @@ void readControllers(input::Instruments &instruments, fs::path const& file) {
 						else if(value == "yellow") mapping[id] = 2;
 						else if(value == "blue") mapping[id] = 3;
 						else if(value == "orange") mapping[id] = 4;
-						else if(value == "starpower") mapping[id] = 5;
+						else if(value == "godmode") mapping[id] = 5;
 						else if(value == "select") mapping[id] = 8;
 						else if(value == "start") mapping[id] = 9;
 						else continue;
