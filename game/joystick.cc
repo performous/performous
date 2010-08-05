@@ -287,8 +287,8 @@ void readControllers(input::Instruments &instruments, fs::path const& file) {
 						else if(value == "blue") mapping[id] = 3;
 						else if(value == "orange") mapping[id] = 4;
 						else if(value == "starpower") mapping[id] = 5;
-						else if(value == "start") mapping[id] = 8;
-						else if(value == "select") mapping[id] = 9;
+						else if(value == "select") mapping[id] = 8;
+						else if(value == "start") mapping[id] = 9;
 						else continue;
 					}
 					break;
@@ -304,8 +304,8 @@ void readControllers(input::Instruments &instruments, fs::path const& file) {
 						else if(value == "blue") mapping[id] = 3;
 						else if(value == "green") mapping[id] = 4;
 						else if(value == "orange") mapping[id] = 5;
-						else if(value == "start") mapping[id] = 8;
-						else if(value == "select") mapping[id] = 9;
+						else if(value == "select") mapping[id] = 8;
+						else if(value == "start") mapping[id] = 9;
 						else continue;
 					}
 					break;
@@ -349,7 +349,7 @@ void readControllers(input::Instruments &instruments, fs::path const& file) {
 }
 
 void input::SDL::init() {
-	readControllers(g_instruments, getDefaultConfig(fs::path("/config/controllers.xml"))); 
+	readControllers(g_instruments, getDefaultConfig(fs::path("/config/controllers.xml")));
 	readControllers(g_instruments, getConfigDir() / "controllers.xml");
 	unsigned int sdl_id;
 	std::string instrument_type;
