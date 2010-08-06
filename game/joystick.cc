@@ -1,11 +1,14 @@
 #include "joystick.hh"
 
 #include <boost/lexical_cast.hpp>
+#include <boost/regex.hpp>
+
+input::Instruments g_instruments;
 
 #ifdef USE_PORTMIDI
 input::MidiDrums::MidiDrums(): stream(pm::findDevice(true, config["system/midi_input"].s())), devnum(0x8000) {
 	while (detail::devices.find(devnum) != detail::devices.end()) ++devnum;
-	detail::devices[devnum] = detail::InputDevPrivate(detail::DRUMS_MIDI);
+	detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(devnum, detail::InputDevPrivate(g_instruments.find("DRUMS_GUITARHERO")->second)));
 	event.type = Event::PRESS;
 	for (unsigned int i = 0; i < BUTTONS; ++i) event.pressed[i] = false;
 #if 1
@@ -106,54 +109,13 @@ void input::MidiDrums::process() {
 		event.time = now();
 		for (unsigned int i = 0; i < BUTTONS; ++i) event.pressed[i] = false;
 		event.pressed[it->second] = true;
-		detail::devices[devnum].addEvent(event);
+		detail::devices.find(devnum)->second.addEvent(event);
 	}
 }
 #endif
 
-static const unsigned SDL_BUTTONS = 16;
-
-int input::buttonFromSDL(input::detail::Type _type, unsigned int _sdl_button) {
-	static const int inputmap[12][SDL_BUTTONS] = {
-		//G  R  Y  B  O  S    // for guitars (S=starpower)
-		{ 2, 0, 1, 3, 4, 5, -1, -1,  8,  9, -1, -1, -1, -1, -1, -1 }, // Guitar Hero guitar
-		{ 0, 1, 3, 2, 4,-1,  8,  9, -1, -1, -1, -1, -1, -1, -1, -1 }, // Guitar Hero X-plorer guitar
-		{ 3, 0, 1, 2, 4, 5, -1, -1,  8,  9, -1, -1, -1, -1, -1, -1 }, // Rock Band guitar PS3
-		{ 0, 1, 3, 2, 4,-1,  8,  9, -1, -1, -1, -1, -1, -1, -1, -1 }, // Rock Band guitar XBOX360
-		{ 2, 1, 3, 4, 5, 0, -1, -1,  8,  9, -1, -1, -1, -1, -1, -1 }, // Hama Wireless Guitar Controller for PS2 with converter
-		//K  R  Y  B  G  O    // for drums
-		{ 3, 4, 1, 2, 0, 4, -1, -1,  8,  9, -1, -1, -1, -1, -1, -1 }, // Guitar Hero drums
-		{ 3, 4, 1, 2, 0,-1, -1, -1,  8,  9, -1, -1, -1, -1, -1, -1 }, // Rock Band drums PS3
-		{ 4, 1, 3, 2, 0,-1,  8,  9, -1, -1, -1, -1, -1, -1, -1, -1 }, // Rock Band drums XBOX360
-		// Left  Down  Up  Right  DownL  DownR  UpL    UpR    Start  Select
-		{  0,  1,  2,  3,  6,  7,  4,  5,  9,  8, -1, -1, -1, -1, -1, -1 }, // generic dance pad
-		{  9,  8, -1, -1, -1, -1, -1, -1,  0,  3,  1,  2, -1, -1, -1, -1 }, // TigerGame dance pad
-		{  4,  7,  6,  5, -1, -1, -1, -1,  9,  8, -1, -1,  2,  3,  1,  0 }, // dance pad with ems ps2/pc adapter
-		{  0,  1,  2,  3,  6,  7,  4,  5,  8,  9, -1, -1, -1, -1, -1, -1 }  // 2-tech usb dance pad
-	};
-	if( _sdl_button >= SDL_BUTTONS ) return -1;
-	using namespace detail;
-	switch(_type) {
-	case GUITAR_GH: return inputmap[0][_sdl_button];
-	case GUITAR_GH_XPLORER: return inputmap[1][_sdl_button];
-	case GUITAR_RB_PS3: return inputmap[2][_sdl_button];
-	case GUITAR_RB_XB360: return inputmap[3][_sdl_button];
-	case GUITAR_HAMA_PS2: return inputmap[4][_sdl_button];
-	case DRUMS_GH: return inputmap[5][_sdl_button];
-	case DRUMS_RB_PS3: return inputmap[6][_sdl_button];
-	case DRUMS_RB_XB360: return inputmap[7][_sdl_button];
-	case DRUMS_MIDI: throw std::logic_error("MIDI drums do not use SDL buttons");
-	case DANCEPAD_GENERIC: return inputmap[8][_sdl_button];
-	case DANCEPAD_TIGERGAME: return inputmap[9][_sdl_button];
-	case DANCEPAD_EMS2: return inputmap[10][_sdl_button];
-	case DANCEPAD_2TECH: return inputmap[11][_sdl_button];
-	}
-	throw std::logic_error("Unknown instrument type in buttonFromSDL");
-}
-
 input::detail::InputDevs input::detail::devices;
 input::SDL::SDL_devices input::SDL::sdl_devices;
-
 
 /// Abstract navigation actions for different input devices, including keyboard
 input::NavButton input::getNav(SDL_Event const &e) {
@@ -176,8 +138,8 @@ input::NavButton input::getNav(SDL_Event const &e) {
 	} else if (e.type == SDL_JOYBUTTONDOWN) {
 		// Joystick buttons
 		unsigned int joy_id = e.jbutton.which;
-		input::detail::InputDevPrivate devt = input::detail::devices[joy_id];
-		int b = buttonFromSDL(devt.type(), e.jbutton.button);
+		input::detail::InputDevPrivate devt = input::detail::devices.find(joy_id)->second;
+		int b = devt.buttonFromSDL(e.jbutton.button);
 		if (b == -1) return input::NONE;
 		else if (b == 8) return input::CANCEL;
 		else if (b == 9) return input::START;
@@ -213,7 +175,7 @@ input::NavButton input::getNav(SDL_Event const &e) {
 		// HACK: We probably wan't the guitar strum to scroll songs
 		// and main menu items, but they have different orientation.
 		// These are switched so it works for now (menu scrolls also on left/right).
-		if (input::detail::devices[e.jhat.which].type_match(input::GUITAR)) {
+		if (input::detail::devices.find(e.jhat.which)->second.type_match(input::GUITAR)) {
 			if (dir == SDL_HAT_UP) return input::LEFT;
 			else if (dir == SDL_HAT_DOWN) return input::RIGHT;
 			else if (dir == SDL_HAT_LEFT) return input::UP;
@@ -255,16 +217,152 @@ void input::SDL::init_devices() {
 }
 
 #include <boost/spirit/include/classic_core.hpp>
+#include "fs.hh"
+#include <libxml++/libxml++.h>
+
+namespace {
+	struct XMLError {
+		XMLError(xmlpp::Element& e, std::string msg): elem(e), message(msg) {}
+		xmlpp::Element& elem;
+		std::string message;
+	};
+	std::string getAttribute(xmlpp::Element& elem, std::string const& attr) {
+		xmlpp::Attribute* a = elem.get_attribute(attr);
+		if (!a) throw XMLError(elem, "attribute " + attr + " not found");
+		return a->get_value();
+	}
+}
+
+void readControllers(input::Instruments &instruments, fs::path const& file) {
+	if (!fs::exists(file)) {
+		std::cout << "Skipping " << file << " (not found)" << std::endl;
+		return;
+	}
+	std::cout << "Parsing " << file << std::endl;
+	xmlpp::DomParser domParser(file.string());
+	try {
+		xmlpp::NodeSet n = domParser.get_document()->get_root_node()->find("/controllers/controller");
+		for (xmlpp::NodeSet::const_iterator nodeit = n.begin(), end = n.end(); nodeit != end; ++nodeit) {
+			xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**nodeit);
+			std::string name = getAttribute(elem, "name");
+			std::string type = getAttribute(elem, "type");
+
+			xmlpp::NodeSet ns;
+			// searching description
+			ns = elem.find("description/text()");
+			if(ns.size()==0) continue;
+			std::string description = dynamic_cast<xmlpp::TextNode&>(*ns[0]).get_content();
+
+			// searching the match
+			ns = elem.find("regexp");
+			if(ns.size()==0) continue;
+			std::string regexp = getAttribute(dynamic_cast<xmlpp::Element&>(*ns[0]), "match");
+
+			// setting the type
+			input::DevType devType;
+			if(type == "guitar") {
+				devType = input::GUITAR;
+			} else if(type == "drumkit") {
+				devType = input::DRUMS;
+			} else if(type == "dancepad") {
+				devType = input::DANCEPAD;
+			} else {
+				continue;
+			}
+
+			// setting the mapping
+			std::vector<int> mapping(16, -1);
+			ns = elem.find("mapping/button");
+			static const int SDL_BUTTONS = 16;
+			switch(devType) {
+				case input::GUITAR:
+					for (xmlpp::NodeSet::const_iterator nodeit2 = ns.begin(), end = ns.end(); nodeit2 != end; ++nodeit2) {
+						xmlpp::Element& button_elem = dynamic_cast<xmlpp::Element&>(**nodeit2);
+						int id = boost::lexical_cast<int>(getAttribute(button_elem, "id"));
+						std::string value = getAttribute(button_elem, "value");
+						if(id >= SDL_BUTTONS) break;
+						if(value == "green") mapping[id] = 0;
+						else if(value == "red") mapping[id] = 1;
+						else if(value == "yellow") mapping[id] = 2;
+						else if(value == "blue") mapping[id] = 3;
+						else if(value == "orange") mapping[id] = 4;
+						else if(value == "godmode") mapping[id] = 5;
+						else if(value == "select") mapping[id] = 8;
+						else if(value == "start") mapping[id] = 9;
+						else continue;
+					}
+					break;
+				case input::DRUMS:
+					for (xmlpp::NodeSet::const_iterator nodeit2 = ns.begin(), end = ns.end(); nodeit2 != end; ++nodeit2) {
+						xmlpp::Element& button_elem = dynamic_cast<xmlpp::Element&>(**nodeit2);
+						int id = boost::lexical_cast<int>(getAttribute(button_elem, "id"));
+						std::string value = getAttribute(button_elem, "value");
+						if(id >= SDL_BUTTONS) break;
+						if(value == "kick") mapping[id] = 0;
+						else if(value == "red") mapping[id] = 1;
+						else if(value == "yellow") mapping[id] = 2;
+						else if(value == "blue") mapping[id] = 3;
+						else if(value == "green") mapping[id] = 4;
+						else if(value == "orange") mapping[id] = 5;
+						else if(value == "select") mapping[id] = 8;
+						else if(value == "start") mapping[id] = 9;
+						else continue;
+					}
+					break;
+				case input::DANCEPAD:
+					for (xmlpp::NodeSet::const_iterator nodeit2 = ns.begin(), end = ns.end(); nodeit2 != end; ++nodeit2) {
+						xmlpp::Element& button_elem = dynamic_cast<xmlpp::Element&>(**nodeit2);
+						int id = boost::lexical_cast<int>(getAttribute(button_elem, "id"));
+						std::string value = getAttribute(button_elem, "value");
+						if(id >= SDL_BUTTONS) break;
+						if(value == "left") mapping[id] = 0;
+						else if(value == "down") mapping[id] = 1;
+						else if(value == "up") mapping[id] = 2;
+						else if(value == "right") mapping[id] = 3;
+						else if(value == "down-left") mapping[id] = 4;
+						else if(value == "down-right") mapping[id] = 5;
+						else if(value == "up-left") mapping[id] = 6;
+						else if(value == "up-right") mapping[id] = 7;
+						else if(value == "start") mapping[id] = 8;
+						else if(value == "select") mapping[id] = 9;
+						else continue;
+					}
+					break;
+			}
+
+			// inserting the instrument
+			if(instruments.find(name) == instruments.end()) {
+				std::cout << "   Adding " << type << ": " << name << std::endl;
+			} else {
+				std::cout << "   Overriding " << type << ": " << name << std::endl;
+			}
+			input::Instrument instrument(name, devType, mapping);
+			instrument.match = regexp;
+			instrument.description = description;
+			instruments.insert(std::make_pair<std::string, input::Instrument>(name, instrument));
+		}
+	} catch (XMLError& e) {
+		int line = e.elem.get_line();
+		std::string name = e.elem.get_name();
+		throw std::runtime_error(file.string() + ":" + boost::lexical_cast<std::string>(line) + " element " + name + " " + e.message);
+	}
+}
 
 void input::SDL::init() {
+	readControllers(g_instruments, getDefaultConfig(fs::path("/config/controllers.xml")));
+	readControllers(g_instruments, getConfigDir() / "controllers.xml");
 	unsigned int sdl_id;
 	std::string instrument_type;
-	std::map<unsigned int, input::detail::Type> forced_type;
+	std::map<unsigned int, input::Instrument> forced_type;
 
 	using namespace boost::spirit::classic;
-	rule<> type = str_p("GUITAR_GUITARHERO_XPLORER") | "GUITAR_HAMA_PS2" | "GUITAR_ROCKBAND_PS3"
-	  | "GUITAR_ROCKBAND_XB360" | "GUITAR_GUITARHERO" | "DRUMS_GUITARHERO" | "DRUMS_ROCKBAND_PS3"
-	  | "DRUMS_ROCKBAND_XB360" | "DRUMS_MIDI" | "DANCEPAD_EMS2" | "DANCEPAD_GENERIC" | "DANCEPAD_TIGERGAME" | "DANCEPAD_2TECH";
+	rule<> type;
+	for(input::Instruments::const_iterator it = g_instruments.begin() ; it != g_instruments.end() ; ++it) {
+		if(it == g_instruments.begin())
+			type = str_p(it->first.c_str());
+		else
+			type = type | it->first.c_str();
+	}
 	rule<> entry = uint_p[assign_a(sdl_id)] >> ":" >> (type)[assign_a(instrument_type)];
 
 	ConfigItem::StringList const& instruments = config["game/instruments"].sl();
@@ -273,32 +371,11 @@ void input::SDL::init() {
 			std::cerr << "Error \"" << *it << "\" is not a valid instrument forced value" << std::endl;
 			continue;
 		} else {
-			if (instrument_type == "GUITAR_GUITARHERO") {
-				forced_type[sdl_id] = input::detail::GUITAR_GH;
-			} else if (instrument_type == "GUITAR_GUITARHERO_XPLORER") {
-				forced_type[sdl_id] = input::detail::GUITAR_GH_XPLORER;
-			} else if (instrument_type == "GUITAR_HAMA_PS2") {
-				forced_type[sdl_id] = input::detail::GUITAR_HAMA_PS2;
-			} else if (instrument_type == "DRUMS_GUITARHERO") {
-				forced_type[sdl_id] = input::detail::DRUMS_GH;
-			} else if (instrument_type == "GUITAR_ROCKBAND_PS3") {
-				forced_type[sdl_id] = input::detail::GUITAR_RB_PS3;
-			} else if (instrument_type == "GUITAR_ROCKBAND_XB360") {
-				forced_type[sdl_id] = input::detail::GUITAR_RB_XB360;
-			} else if (instrument_type == "DRUMS_ROCKBAND_PS3") {
-				forced_type[sdl_id] = input::detail::DRUMS_RB_PS3;
-			} else if (instrument_type == "DRUMS_ROCKBAND_XB360") {
-				forced_type[sdl_id] = input::detail::DRUMS_RB_XB360;
-			} else if (instrument_type == "DRUMS_MIDI") {
-				forced_type[sdl_id] = input::detail::DRUMS_MIDI;
-			} else if (instrument_type == "DANCEPAD_GENERIC") {
-				forced_type[sdl_id] = input::detail::DANCEPAD_GENERIC;
-			} else if (instrument_type == "DANCEPAD_TIGERGAME") {
-				forced_type[sdl_id] = input::detail::DANCEPAD_TIGERGAME;
-			} else if (instrument_type == "DANCEPAD_EMS2") {
-				forced_type[sdl_id] = input::detail::DANCEPAD_EMS2;
-			} else if (instrument_type == "DANCEPAD_2TECH") {
-				forced_type[sdl_id] = input::detail::DANCEPAD_2TECH;
+			for(input::Instruments::const_iterator it2 = g_instruments.begin() ; it2 != g_instruments.end() ; ++it2) {
+				if(instrument_type == it2->first) {
+					forced_type.insert(std::pair<unsigned int,input::Instrument>(sdl_id, input::Instrument(it2->second)));
+					break;
+				}
 			}
 		}
 	}
@@ -320,122 +397,25 @@ void input::SDL::init() {
 		std::cout << ", Buttons: " << SDL_JoystickNumButtons(joy);
 		std::cout << ", Hats: " << SDL_JoystickNumHats(joy) << std::endl;
 		if( forced_type.find(i) != forced_type.end() ) {
-			switch(forced_type[i]) {
-				case input::detail::GUITAR_GH:
-					std::cout << "  Detected as: Guitar Hero Guitar (forced)" << std::endl;
-					break;
-				case input::detail::GUITAR_GH_XPLORER:
-					std::cout << "  Detected as: Guitar Hero Guitar X-plorer (forced)" << std::endl;
-					break;
-				case input::detail::GUITAR_HAMA_PS2:
-					std::cout << "  Detected as: Hama Guitar for PS2 with converter (forced)" << std::endl;
-					break;
-				case input::detail::DRUMS_GH:
-					std::cout << "  Detected as: Guitar Hero Drums (forced)" << std::endl;
-					break;
-				case input::detail::GUITAR_RB_PS3:
-					std::cout << "  Detected as: RockBand Guitar PS3 (forced)" << std::endl;
-					break;
-				case input::detail::GUITAR_RB_XB360:
-					std::cout << "  Detected as: RockBand Guitar Xbox360 (forced)" << std::endl;
-					break;
-				case input::detail::DRUMS_RB_PS3:
-					std::cout << "  Detected as: RockBand Drums PS3 (forced)" << std::endl;
-					break;
-				case input::detail::DRUMS_RB_XB360:
-					std::cout << "  Detected as: RockBand Drums Xbox360 (forced)" << std::endl;
-					break;
-				case input::detail::DRUMS_MIDI:
-					std::cout << "  Detected as: MIDI Drums (forced)" << std::endl;
-					break;
-				case input::detail::DANCEPAD_TIGERGAME:
-					std::cout << "  Detected as: TigerGame dance pad (forced)" << std::endl;
-					break;
-				case input::detail::DANCEPAD_GENERIC:
-					std::cout << "  Detected as: Generic dance pad (forced)" << std::endl;
-					break;
-				case input::detail::DANCEPAD_EMS2:
-					std::cout << "  Detected as: EMS2 dance pad controller converter (forced)" << std::endl;
-					break;
-				case input::detail::DANCEPAD_2TECH:
-					std::cout << "  Detected as: 2-TECH USB Dance Pad (forced)" << std::endl;
-					break;
-			}
-			input::detail::devices[i] = input::detail::InputDevPrivate(forced_type[i]);
-		} else if( name.find("Guitar Hero3") != std::string::npos ) {
-			std::cout << "  Detected as: Guitar Hero Guitar" << std::endl;
-			input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::GUITAR_GH);
-		} else if( name.find("Guitar Hero X-plorer") != std::string::npos ) {
-			std::cout << "  Detected as: Guitar Hero Guitar X-plorer" << std::endl;
-			input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::GUITAR_GH_XPLORER);
-		} else if( name.find("PS  Converter") != std::string::npos ) {
-			std::cout << "  Detected as: Hama Guitar with converter (guessed)" << std::endl;
-			input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::GUITAR_HAMA_PS2);
-		} else if( name.find("Guitar Hero4") != std::string::npos ) {
-			// here we can have both drumkit or guitar .... let say the drumkit
-			std::cout << "  Detected as: Guitar Hero Drums (guessed)" << std::endl;
-			input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::DRUMS_GH);
-		} else if( name.find("RedOctane MIDI Drum GuitarHero") != std::string::npos ) {
-			// This is GH Metallica guitar
-			std::cout << "  Detected as: Guitar Hero Guitar" << std::endl;
-			input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::GUITAR_GH);
-		} else if( name.find("Harmonix Guitar") != std::string::npos ) {
-			if (name.find("Xbox") != std::string::npos) {
-				// "Harmonix Guitar for Xbox360 (Controller)"
-				std::cout << "  Detected as: RockBand Guitar Xbox360" << std::endl;
-				input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::GUITAR_RB_XB360);
-			} else if (name.find("Nintendo") != std::string::npos) {
-				// "Licensed by Nintendo of America  Harmonix Guitar Controller for Nintendo Wii"
-				std::cout << "  Detected as: RockBand Guitar PS3 (Wii Guitar)" << std::endl;
-				input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::GUITAR_RB_PS3);
-			} else {
-				std::cout << "  Detected as: RockBand Guitar PS3" << std::endl;
-				input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::GUITAR_RB_PS3);
-			}
-		} else if( name.find("Harmonix Drum") != std::string::npos) {
-			// Kit / kit / Controller
-			if (name.find("Xbox") != std::string::npos) {
-				std::cout << "  Detected as: RockBand Drums Xbox360" << std::endl;
-				input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::DRUMS_RB_XB360);
-			} else if (name.find("Nintendo") != std::string::npos) {
-				// Licensed by Nintendo of America  Harmonix Drum Controller for Nintendo Wii
-				std::cout << "  Detected as: RockBand Drums PS3 (Wii Drums)" << std::endl;
-				input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::DRUMS_RB_PS3);
-			} else {
-				std::cout << "  Detected as: RockBand Drums PS3" << std::endl;
-				input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::DRUMS_RB_PS3);
-			}
-		} else if( name.find("Mad Catz Portable Drum") != std::string::npos) {
-			std::cout << "  Detected as: RockBand Drums Xbox360" << std::endl;
-			input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::DRUMS_RB_XB360);
-		} else if( name.find("TigerGame") != std::string::npos ) {
-			std::cout << "  Detected as: TigerGame Dance Pad" << std::endl;
-			input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::DANCEPAD_TIGERGAME);
-		} else if( name.find("Redoctane XBOX DDR") != std::string::npos ) {
-			std::cout << "  Detected as: Generic Dance Pad" << std::endl;
-			input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::DANCEPAD_GENERIC);
-		} else if( name.find("Dance mat") != std::string::npos ) {
-			std::cout << "  Detected as: Generic Dance Pad" << std::endl;
-			input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::DANCEPAD_GENERIC);
-		} else if( name.find("RedOctane USB Pad") != std::string::npos ) {
-			std::cout << "  Detected as: Generic Dance Pad" << std::endl;
-			input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::DANCEPAD_GENERIC);
-		} else if( name.find("Positive Gaming Impact USB pad") != std::string::npos ) {
-			std::cout << "  Detected as: Generic Dance Pad" << std::endl;
-			input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::DANCEPAD_GENERIC);
-		} else if( name.find("Joypad to USB converter") != std::string::npos ) {
-			std::cout << "  Detected as: Generic Dance Pad (guessed)" << std::endl;
-			input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::DANCEPAD_GENERIC);
-		} else if( name.find("0b43:0003") != std::string::npos ) {
-			std::cout << "  Detected as: EMS2 Dance Pad controller converter (guessed)" << std::endl;
-			input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::DANCEPAD_EMS2);
-		} else if( name.find("USB Gamepad") != std::string::npos ) {
-			std::cout << "  Detected as: 2-TECH USB Dance Pad (guessed)" << std::endl;
-			input::detail::devices[i] = input::detail::InputDevPrivate(input::detail::DANCEPAD_2TECH);
+			std::cout << "  Detected as: " << forced_type.find(i)->second.description << " (forced)" << std::endl;
+			input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(i, input::detail::InputDevPrivate(forced_type.find(i)->second)));
 		} else {
-			std::cout << "  Detected as: Unknown (please report the name; use config to force detection)" << std::endl;
-			SDL_JoystickClose(joy);
-			continue;
+			bool found = false;
+			for(input::Instruments::const_iterator it = g_instruments.begin() ; it != g_instruments.end() ; ++it) {
+				boost::regex sdl_name(it->second.match);
+				boost::cmatch match;
+				if (regex_search(name.c_str(), sdl_name)) {
+					std::cout << "  Detected as: " << it->second.description << std::endl;
+					input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(i, input::detail::InputDevPrivate(it->second)));
+					found = true;
+					break;
+				}
+			}
+			if(!found) {
+				std::cout << "  Detected as: Unknown (please report the name; use config to force detection)" << std::endl;
+				SDL_JoystickClose(joy);
+				continue;
+			}
 		}
 	}
 	// Here we should send an event to have correct state buttons
@@ -445,11 +425,11 @@ void input::SDL::init() {
 	std::cout << "Keyboard as drumkit controller: " << (config["game/keyboard_drumkit"].b() ? "enabled":"disabled") << std::endl;
 	std::cout << "Keyboard as dance pad controller: " << (config["game/keyboard_dancepad"].b() ? "enabled":"disabled") << std::endl;
 	input::SDL::sdl_devices[input::detail::KEYBOARD_ID] = NULL;
-	input::detail::devices[input::detail::KEYBOARD_ID] = input::detail::InputDevPrivate(input::detail::GUITAR_GH);
+	input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(input::detail::KEYBOARD_ID, input::detail::InputDevPrivate(g_instruments.find("GUITAR_GUITARHERO")->second)));
 	input::SDL::sdl_devices[input::detail::KEYBOARD_ID2] = NULL;
-	input::detail::devices[input::detail::KEYBOARD_ID2] = input::detail::InputDevPrivate(input::detail::DRUMS_GH);
+	input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(input::detail::KEYBOARD_ID2, input::detail::InputDevPrivate(g_instruments.find("DRUMS_GUITARHERO")->second)));
 	input::SDL::sdl_devices[input::detail::KEYBOARD_ID3] = NULL;
-	input::detail::devices[input::detail::KEYBOARD_ID3] = input::detail::InputDevPrivate(input::detail::DANCEPAD_GENERIC);
+	input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(input::detail::KEYBOARD_ID3, input::detail::InputDevPrivate(g_instruments.find("DANCEPAD_GENERIC")->second)));
 }
 
 bool input::SDL::pushEvent(SDL_Event _e) {
@@ -523,7 +503,7 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 					button++;
 				case SDLK_SPACE:
 					if(!drumkit) return false;
-					if(devices[joy_id].pressed(button)) return true; // repeating
+					if(devices.find(joy_id)->second.pressed(button)) return true; // repeating
 					is_drumkit_event = true;
 					event.type = input::Event::PRESS;
 					event.pressed[button] = true;
@@ -598,14 +578,14 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 				event.button = button;
 				// initialized buttons
 				for(unsigned int i = 0 ; i < BUTTONS ; ++i) {
-					event.pressed[i] = devices[joy_id].pressed(i);
+					event.pressed[i] = devices.find(joy_id)->second.pressed(i);
 				}
 				// if we have a button, set the pushed button to true
 				if(event.type == input::Event::PRESS) {
-					if(devices[joy_id].pressed(event.button)) return true; // repeating
+					if(devices.find(joy_id)->second.pressed(event.button)) return true; // repeating
 					event.pressed[event.button] = true;
 				}
-				devices[joy_id].addEvent(event);
+				devices.find(joy_id)->second.addEvent(event);
 				return true;
 			} else {
 				return false;
@@ -664,7 +644,7 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 					button++;
 				case SDLK_SPACE:
 					if(!drumkit) return false;
-					if(devices[joy_id].pressed(button)) return true; // repeating
+					if(devices.find(joy_id)->second.pressed(button)) return true; // repeating
 					is_drumkit_event = true;
 					event.type = input::Event::RELEASE;
 					event.pressed[button] = true;
@@ -739,13 +719,13 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 				event.button = button;
 				// initialized buttons
 				for(unsigned int i = 0 ; i < BUTTONS ; ++i) {
-					event.pressed[i] = devices[joy_id].pressed(i);
+					event.pressed[i] = devices.find(joy_id)->second.pressed(i);
 				}
 				// if we have a button, set the pushed button to true
 				if(event.type == input::Event::RELEASE) {
 					event.pressed[event.button] = false;
 				}
-				devices[joy_id].addEvent(event);
+				devices.find(joy_id)->second.addEvent(event);
 				return true;
 			} else {
 				return false;
@@ -753,20 +733,20 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 		}
 		case SDL_JOYAXISMOTION:
 			joy_id = _e.jaxis.which;
-			if(!devices[joy_id].assigned()) return false;
+			if(!devices.find(joy_id)->second.assigned()) return false;
 			if (_e.jaxis.axis == 5 || _e.jaxis.axis == 6 || _e.jaxis.axis == 1) {
 				event.type = input::Event::PICK;
-			} else if (_e.jaxis.axis == 2 || (devices[joy_id].type() == input::detail::GUITAR_RB_XB360
+			} else if (_e.jaxis.axis == 2 || (devices.find(joy_id)->second.name() == "GUITAR_ROCKBAND_XB360"
 			  && _e.jaxis.axis == 4)) {
 				event.type = input::Event::WHAMMY;
 			} else {
 				return false;
 			}
 			for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
-				event.pressed[i] = devices[joy_id].pressed(i);
+				event.pressed[i] = devices.find(joy_id)->second.pressed(i);
 			}
 			// XBox RB guitar's Tilt sensor
-			if (devices[joy_id].type() == input::detail::GUITAR_RB_XB360 && _e.jaxis.axis == 3) {
+			if (devices.find(joy_id)->second.name() == "DRUMS_ROCKBAND_XB360" && _e.jaxis.axis == 3) {
 				event.button = input::STARPOWER_BUTTON;
 				if (_e.jaxis.value < -2) {
 					event.type = input::Event::PRESS;
@@ -775,59 +755,59 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 					event.type = input::Event::RELEASE;
 					event.pressed[event.button] = false;
 				}
-				devices[joy_id].addEvent(event);
+				devices.find(joy_id)->second.addEvent(event);
 				break;
 			}
 			// Direction
 			if(_e.jaxis.value > 0 ) { // down
 				event.button = 0;
-				devices[joy_id].addEvent(event);
+				devices.find(joy_id)->second.addEvent(event);
 			} else if(_e.jaxis.value < 0 ) { // up
 				event.button = 1;
-				devices[joy_id].addEvent(event);
+				devices.find(joy_id)->second.addEvent(event);
 			}
 			break;
 		case SDL_JOYHATMOTION:
 			joy_id = _e.jhat.which;
 
-			if(!devices[joy_id].assigned()) return false;
+			if(!devices.find(joy_id)->second.assigned()) return false;
 			event.type = input::Event::PICK;
 			for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
-				event.pressed[i] = devices[joy_id].pressed(i);
+				event.pressed[i] = devices.find(joy_id)->second.pressed(i);
 			}
 			if(_e.jhat.value == SDL_HAT_DOWN ) {
 				event.button = 0;
-				devices[joy_id].addEvent(event);
+				devices.find(joy_id)->second.addEvent(event);
 			} else if(_e.jhat.value == SDL_HAT_UP ) {
 				event.button = 1;
-				devices[joy_id].addEvent(event);
+				devices.find(joy_id)->second.addEvent(event);
 			}
 			break;
 		case SDL_JOYBUTTONDOWN:
 			joy_id = _e.jbutton.which;
-			if(!devices[joy_id].assigned()) return false;
-			button = buttonFromSDL(devices[joy_id].type(),_e.jbutton.button);
+			if(!devices.find(joy_id)->second.assigned()) return false;
+			button = devices.find(joy_id)->second.buttonFromSDL(_e.jbutton.button);
 			if( button == -1 ) return false;
 			for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
-				event.pressed[i] = devices[joy_id].pressed(i);
+				event.pressed[i] = devices.find(joy_id)->second.pressed(i);
 			}
 			event.type = input::Event::PRESS;
 			event.button = button;
 			event.pressed[button] = true;
-			devices[joy_id].addEvent(event);
+			devices.find(joy_id)->second.addEvent(event);
 			break;
 		case SDL_JOYBUTTONUP:
 			joy_id = _e.jbutton.which;
-			if(!devices[joy_id].assigned()) return false;
-			button = buttonFromSDL(devices[joy_id].type(),_e.jbutton.button);
+			if(!devices.find(joy_id)->second.assigned()) return false;
+			button = devices.find(joy_id)->second.buttonFromSDL(_e.jbutton.button);
 			if( button == -1 ) return false;
 			for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
-				event.pressed[i] = devices[joy_id].pressed(i);
+				event.pressed[i] = devices.find(joy_id)->second.pressed(i);
 			}
 			event.type = input::Event::RELEASE;
 			event.button = button;
 			event.pressed[button] = false;
-			devices[joy_id].addEvent(event);
+			devices.find(joy_id)->second.addEvent(event);
 			break;
 		case SDL_JOYBALLMOTION:
 		default:

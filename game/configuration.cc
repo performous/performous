@@ -1,6 +1,5 @@
 #include "configuration.hh"
 
-#include "config.hh"
 #include "fs.hh"
 #include "util.hh"
 #include <boost/filesystem.hpp>
@@ -311,24 +310,15 @@ void readConfigXML(fs::path const& file, int mode) {
 
 void readConfig() {
 	// Find config schema
-	std::string schemafile;
-	{
-		typedef std::vector<std::string> ConfigList;
-		ConfigList config_list;
-		char const* root = getenv("PERFORMOUS_ROOT");
-		if (root) config_list.push_back(std::string(root) + "/" SHARED_DATA_DIR CONFIG_SCHEMA);
-		fs::path exec = plugin::execname();
-		if (!exec.empty()) config_list.push_back(exec.parent_path().string() + "/../" SHARED_DATA_DIR CONFIG_SCHEMA);
-		ConfigList::const_iterator it = std::find_if(config_list.begin(), config_list.end(), static_cast<bool(&)(fs::path const&)>(fs::exists));
-		if (it == config_list.end()) {
-			std::ostringstream oss;
-			oss << "No config schema file found. The following locations were tried:\n";
-			std::copy(config_list.begin(), config_list.end(), std::ostream_iterator<std::string>(oss, "\n"));
-			oss << "Install the file or define environment variable PERFORMOUS_ROOT\n";
-			throw std::runtime_error(oss.str());
-		}
-		schemafile = *it;
+	fs::path schemafile;
+	try {
+		schemafile = getDefaultConfig(fs::path(CONFIG_SCHEMA));
 		origin = fs::path(schemafile).parent_path().parent_path(); // Assuming that two times parent from config file = origin
+	} catch(...) {
+		std::ostringstream oss;
+		oss << "No config schema file found.\n";
+		oss << "Install the file or define environment variable PERFORMOUS_ROOT\n";
+		throw std::runtime_error(oss.str());
 	}
 	readConfigXML(schemafile, 0);  // Read schema and defaults
 	readConfigXML(systemConfFile, 1);  // Update defaults with system config
