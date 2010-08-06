@@ -1,6 +1,7 @@
 #include "instrumentgraph.hh"
 #include "i18n.hh"
 #include "screen.hh"
+#include "glutil.hh"
 
 //const unsigned InstrumentGraph::max_panels = 10; // Maximum number of arrow lines / guitar frets
 
@@ -59,12 +60,18 @@ void InstrumentGraph::drawMenu() {
 	if (m_menu.empty()) return;
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
 	if (getGraphType() == input::DANCEPAD) dimensions.screenTop().middle(m_cx.get()).stretch(m_width.get(), 1.0);
-	else dimensions.screenBottom().middle(m_cx.get()).fixedWidth(std::min(m_width.get(),0.5));
+	else dimensions.screenBottom().middle(m_cx.get()).fixedWidth(std::min(m_width.get(), 0.5));
 	// Some helper vars
 	ThemeInstrumentMenu& th = *m_menuTheme;
 	MenuOptions::const_iterator cur = static_cast<MenuOptions::const_iterator>(&m_menu.current());
+	glutil::PushMatrix pm; // Save scaling state
+	float s = m_width.get();
+	s = (s > 0.49f ? 1.0f : s + 0.3f); // Full scale with 1 or 2 instruments
+	glScalef(s, s, 1.0f);
+	// We need to multiply offset by inverse scale factor to keep it always constant
+	const double offsetX = 0.5f * (dimensions.x1() + dimensions.x2()) / s;
+	// All these vars are ultimately affected by the scaling matrix
 	double w = m_menu.dimensions.w();
-	const double offsetX = 0.5f * (dimensions.x1() + dimensions.x2());
 	const float txth = th.option.h();
 	const float button_margin = (getGraphType() == input::DANCEPAD ? 0.0f : 0.05f);
 	const float step = txth * 0.7f;
