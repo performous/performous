@@ -65,6 +65,10 @@ loader::loader(fs::path const& folder) {
     }
     // Load the contents of each folder
     for (std::set<fs::path>::const_iterator it = paths.begin(); it != paths.end(); ++it) load(*it);
+#ifndef _WIN32
+	// HACK: ifdeffing this message out since it would be consfusing on Windows,
+	// where PortAudio is built into libda (and thus no plugins used).
     if (dlls.empty()) std::cerr << "No plugins found. Try setting PLUGIN_PATH to the folder with the plugins." << std::endl;
-}    
+#endif
+}
 
