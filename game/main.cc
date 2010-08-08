@@ -39,6 +39,8 @@ bool g_verbose_messages = false;
 
 class VerboseMessageSink : public boost::iostreams::sink {
 public:
+	// i.e. make clog like cout, but only if g_verbose_messages is set.
+	// (we could use cerr or any other file if we want)
 	std::streamsize write(const char* s, std::streamsize n) {
 		if(g_verbose_messages)
 			for(std::streamsize i=0; i<n; i++)
@@ -56,6 +58,7 @@ VerboseMessageSink vsm;
 static void signalSetup();
 
 extern "C" void quit(int) {
+// shouldn't "not EXIT_SUCCESS" be sent - ^C^C is an abort, not normal termination?
 	if (g_quit) std::exit(EXIT_SUCCESS);  // Instant exit if Ctrl+C is pressed again
 	g_quit = true;
 	signalSetup();
@@ -349,6 +352,12 @@ int main(int argc, char** argv) try {
 		return 1;
 	}
 	po::notify(vm);
+
+	// initialize the verbose message sink
+	g_verbose_messages = vm.count("verbose")!=0;
+    sb.open(vsm);
+    std::clog.rdbuf(&sb);
+
 	if (vm.count("version")) {
 		// Already printed the version string in the beginning...
 		return 0;
@@ -413,11 +422,6 @@ int main(int argc, char** argv) try {
 		jstestLoop();
 		return 0;
 	}
-
-	// initialize the verbose message sink
-	g_verbose_messages = vm.count("verbose")!=0;
-    sb.open(vsm);
-    std::clog.rdbuf(&sb);
 
 	// Run the game init and main loop
 	mainLoop(songlist);

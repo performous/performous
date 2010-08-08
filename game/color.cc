@@ -37,7 +37,7 @@ Color::Color(std::string const& str) {
 	}
 	ColorNames::Map::const_iterator it = colors.m.find(str);
 	if (it != colors.m.end()) { *this = it->second; return; }
-	std::cerr << "WARNING: Unknown color: " << str << " (using magenta to hilight)" << std::endl;
+	std::clog << "WARNING: Unknown color: " << str << " (using magenta to hilight)" << std::endl;
 	*this = Color(1.0, 0.0, 1.0);
 }
 
