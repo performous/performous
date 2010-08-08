@@ -76,17 +76,6 @@ namespace filemagic {
 		//std::for_each(ext.begin(), ext.end(), static_cast<int(*)(int)>(std::tolower));
 		std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower );
 
-#		ifndef NDEBUG
-		std::string f_ext = filename.extension();
-		std::for_each(f_ext.begin(), f_ext.end(), static_cast<int(*)(int)>(std::tolower));
-
-		std::string t_ext = filename.extension();
-		std::transform(t_ext.begin(), t_ext.end(), t_ext.begin(), ::tolower );
-
-		if(t_ext != f_ext)
-			std::clog << "Nope: \"" << t_ext << "\" != \"" << f_ext << "\"" << std::endl;
-#		endif
-
 		return ext == ".svg" /* || signaturePrefix<1>(filename, {'<') */;
 	}
 
