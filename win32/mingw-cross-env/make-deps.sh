@@ -27,7 +27,7 @@ echo "Make gcc"
 make gcc
 
 echo "Make deps"
-make zlib libpng jpeg glew freeglutnsdl boost atk cairo fontconfig freetype gettext glib gtk libcroco libgsf libiconv librsvg libxml2 pango pixman portaudio libsigc++ libglibmm libxml++ liborc libschroedinger
+make zlib libpng jpeg glew freeglut sdl boost atk cairo fontconfig freetype gettext glib gtk libcroco libgsf libiconv librsvg libxml2 pango pixman portaudio libsigc++ glibmm libxml++ liborc libschroedinger
 
 echo "Make ffmpeg from SVN"
 TARGET=i686-pc-mingw32
