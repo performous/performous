@@ -22,7 +22,8 @@ struct Stream {
 	double fade; ///< Fade level
 	/// constructor
 	Stream(std::string const& filename, unsigned int sr):
-	  mpeg(false, true, filename, sr), srate(sr), fade(1.0), m_time(getTime()), m_syncTime(m_time), m_correction(), m_pos() {}
+	  mpeg(false, true, filename, sr), srate(sr), fade(1.0),
+	  m_syncTime(getTime()), m_baseTime(m_syncTime), m_basePosition(0), m_pos() {}
 	/// crossfades songs
 	bool operator()(da::pcm_data& data) {
 		timeSync();  // Keep audio synced
@@ -42,10 +43,10 @@ struct Stream {
 	/// Get current position in seconds (with corrections applied)
 	double pos() const {
 		boost::posix_time::ptime now = getTime();
-		double delay = seconds(now - m_syncTime); // Since last sync
-		// If more than 100 ms since last sync, freeze time to m_syncTime instead of realtime
-		// In either case, return the clock + correction
-		return seconds((delay > 0.1 ? m_syncTime : now) - m_time) + m_correction;
+		const double syncDelay = seconds(now - m_syncTime); // Since last audio buffer
+		const double baseDelay = seconds(now - m_baseTime); // Since last time base
+		// If more than 100 ms since last sync, freeze time (audio is paused)
+		return (syncDelay > 0.1 ? pos_internal() : m_basePosition + baseDelay);
 	}
 	double duration() const { return mpeg.audioQueue.duration(); }
 	bool eof() const { return mpeg.audioQueue.eof(m_pos); }
@@ -53,25 +54,30 @@ private:
 	static boost::posix_time::ptime getTime() { return boost::posix_time::microsec_clock::universal_time(); }
 	double pos_internal() const { return double(m_pos) / srate / 2.0; }
 	double seconds(boost::posix_time::time_duration const& d) const { return 1e-6 * d.total_microseconds(); }
-	/// Adjust sync, duration of the audio
+	/**
+	 * Adjust sync, duration of the audio.
+	 * This works by using mostly system time and
+	 * syncing it with the audio time every few seconds
+	 * (or when something out-of-the-ordinary happens).
+	 */
 	void timeSync() {
 		boost::posix_time::ptime now = getTime();
-		double t = seconds(now - m_time) + m_correction;
-		double duration = seconds(now - m_syncTime);
-		double diff = t - pos_internal();
+		const double syncDelay = seconds(now - m_syncTime); // Since last audio buffer
+		const double baseDelay = seconds(now - m_baseTime); // Since last time base
+		const double delay = std::abs(pos() - pos_internal()); // Prediction difference
 		m_syncTime = now;
-		if (duration < 0.0 || duration > 1.0) return; // No syncing for weird situations
-		if (std::abs(diff) < 0.1 * duration) {
-			// Apply 5 % adjustment either up or down
-			m_correction += (diff > 0.0 ? -1.0 : 1.0) * 0.05 * duration;
-		} else {
-			// Stepped adjustment to the right time (e.g. after seeking)
-			m_correction -= diff;
+		// Time to create new reference time?
+		// 1. We haven't recieved any audio frames for a while (maybe audio was paused)
+		// 2. Time has been running free for several seconds (so let's sync every once in a while)
+		// 3. Prediction is radically different from last buffer time (due to e.g. seeking)
+		if (syncDelay > 0.1 || baseDelay > 5.0 || delay > 0.2) {
+			m_baseTime = now;
+			m_basePosition = pos_internal();
 		}
 	}
-	boost::posix_time::ptime m_time; ///< The base time (time at the beginning)
 	boost::posix_time::ptime m_syncTime; ///< Time of the previous audio timeSync
-	double m_correction; ///< Offset added to system time to get audio time
+	boost::posix_time::ptime m_baseTime; ///< A reference time
+	double m_basePosition; ///< Position at the base time
 	int64_t m_pos; ///< Current sample position
 };
 
