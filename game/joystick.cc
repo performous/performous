@@ -350,26 +350,28 @@ void readControllers(input::Instruments &instruments, fs::path const& file) {
 void input::SDL::init() {
 	readControllers(g_instruments, getDefaultConfig(fs::path("/config/controllers.xml")));
 	readControllers(g_instruments, getConfigDir() / "controllers.xml");
-	unsigned int sdl_id;
-	std::string instrument_type;
 	std::map<unsigned int, input::Instrument> forced_type;
 
-	std::string regexp_match_force("^[0-9]+:\\(");
+	std::string regexp_match_force("^([0-9]+):(\\(");
 	for(input::Instruments::iterator it = g_instruments.begin() ; it != g_instruments.end() ; ++it) {
 		if(it == g_instruments.begin())
 			regexp_match_force += it->first;
 		else
 			regexp_match_force += "|" + it->first;
 	}
-	regexp_match_force += "\\)$";
+	regexp_match_force += "\\))$";
 	boost::regex match_force(regexp_match_force);
+	boost::match_results<const char*> what;
 
 	ConfigItem::StringList const& instruments = config["game/instruments"].sl();
 	for (ConfigItem::StringList::const_iterator it = instruments.begin(); it != instruments.end(); ++it) {
-		if (!regex_search(it->c_str(), match_force)) {
+		if (!regex_search(it->c_str(), what, match_force)) {
 			std::cerr << "Error \"" << *it << "\" is not a valid instrument forced value" << std::endl;
 			continue;
 		} else {
+			unsigned int sdl_id = boost::lexical_cast<unsigned int>(what[1]);
+			std::string instrument_type(what[2]);
+
 			for(input::Instruments::const_iterator it2 = g_instruments.begin() ; it2 != g_instruments.end() ; ++it2) {
 				if(instrument_type == it2->first) {
 					forced_type.insert(std::pair<unsigned int,input::Instrument>(sdl_id, input::Instrument(it2->second)));
