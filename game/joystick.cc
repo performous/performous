@@ -216,7 +216,6 @@ void input::SDL::init_devices() {
 	}
 }
 
-#include <boost/spirit/include/classic_core.hpp>
 #include "fs.hh"
 #include <libxml++/libxml++.h>
 
@@ -355,19 +354,19 @@ void input::SDL::init() {
 	std::string instrument_type;
 	std::map<unsigned int, input::Instrument> forced_type;
 
-	using namespace boost::spirit::classic;
-	rule<> type;
-	for(input::Instruments::const_iterator it = g_instruments.begin() ; it != g_instruments.end() ; ++it) {
+	std::string regexp_match_force("^[0-9]+:\\(");
+	for(input::Instruments::iterator it = g_instruments.begin() ; it != g_instruments.end() ; ++it) {
 		if(it == g_instruments.begin())
-			type = str_p(it->first.c_str());
+			regexp_match_force += it->first;
 		else
-			type = type | it->first.c_str();
+			regexp_match_force += "|" + it->first;
 	}
-	rule<> entry = uint_p[assign_a(sdl_id)] >> ":" >> (type)[assign_a(instrument_type)];
+	regexp_match_force += "\\)$";
+	boost::regex match_force(regexp_match_force);
 
 	ConfigItem::StringList const& instruments = config["game/instruments"].sl();
 	for (ConfigItem::StringList::const_iterator it = instruments.begin(); it != instruments.end(); ++it) {
-		if (!parse(it->c_str(), entry).full) {
+		if (!regex_search(it->c_str(), match_force)) {
 			std::cerr << "Error \"" << *it << "\" is not a valid instrument forced value" << std::endl;
 			continue;
 		} else {
@@ -403,7 +402,6 @@ void input::SDL::init() {
 			bool found = false;
 			for(input::Instruments::const_iterator it = g_instruments.begin() ; it != g_instruments.end() ; ++it) {
 				boost::regex sdl_name(it->second.match);
-				boost::cmatch match;
 				if (regex_search(name.c_str(), sdl_name)) {
 					std::cout << "  Detected as: " << it->second.description << std::endl;
 					input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(i, input::detail::InputDevPrivate(it->second)));
