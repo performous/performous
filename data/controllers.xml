@@ -14,6 +14,19 @@
 			<button id="9" value="start" />
 		</mapping>
 	</controller>
+	<controller type="guitar" name="GUITAR_GUITARHERO5">
+		<description>Guitar Hero 5/Band Hero guitar</description>
+		<regexp match="Entertainment Guitar Hero5" />
+		<mapping>
+			<button id="0" value="yellow" />
+			<button id="1" value="green" />
+			<button id="2" value="red" />
+			<button id="3" value="blue" />
+			<button id="4" value="orange" />
+			<button id="8" value="select" />
+			<button id="9" value="start" />
+		</mapping>
+	</controller>
 	<controller type="guitar" name="GUITAR_GUITARHERO_XPLORER">
 		<description>Guitar Hero X-plorer guitar</description>
 		<regexp match="Guitar Hero X-plorer" />
@@ -71,6 +84,20 @@
 	<controller type="drumkit" name="DRUMS_GUITARHERO">
 		<description>Guitar Hero 4 drum kit (guessed, could be a guitar)</description>
 		<regexp match="Guitar Hero4" />
+		<mapping>
+			<button id="0" value="blue" />
+			<button id="1" value="green" />
+			<button id="2" value="red" />
+			<button id="3" value="yellow" />
+			<button id="4" value="kick" />
+			<button id="5" value="green" />
+			<button id="8" value="select" />
+			<button id="9" value="start" />
+		</mapping>
+	</controller>
+	<controller type="drumkit" name="DRUMS_GUITARHERO5">
+		<description>Guitar Hero 5/Band Hero drum kit</description>
+		<regexp match="Drum Guitar Hero5" />
 		<mapping>
 			<button id="0" value="blue" />
 			<button id="1" value="green" />
