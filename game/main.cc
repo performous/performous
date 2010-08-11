@@ -349,7 +349,7 @@ int main(int argc, char** argv) try {
 	} catch (std::exception& e) {
 		std::cout << cmdline << std::endl;
 		std::cout << "ERROR: " << e.what() << std::endl;
-		return 1;
+		return EXIT_FAILURE;
 	}
 	po::notify(vm);
 
@@ -360,11 +360,11 @@ int main(int argc, char** argv) try {
 
 	if (vm.count("version")) {
 		// Already printed the version string in the beginning...
-		return 0;
+		return EXIT_SUCCESS;
 	}
 	if (vm.count("help")) {
 		std::cout << cmdline << "  any arguments without a switch are interpreted as song folders.\n" << std::endl;
-		return 0;
+		return EXIT_SUCCESS;
 	}
 	// Initialize audio for pdevhelp, michelp and the rest of the program
 	da::initialize libda;
@@ -381,7 +381,7 @@ int main(int argc, char** argv) try {
 			std::cout << boost::format("  %1% %|10t|%2%\n") % it->name() % it->desc();
 		}
 		std::cout << std::flush;
-		return 0;
+		return EXIT_SUCCESS;
 	}
 	if (vm.count("michelp")) {
 		da::record::devlist_t l = da::record::devices();
@@ -398,7 +398,7 @@ int main(int argc, char** argv) try {
 			std::cout << boost::format("  %1% %|10t|%2%\n") % it->name() % it->desc();
 		}
 		std::cout << std::flush;
-		return 0;
+		return EXIT_SUCCESS;
 	}
 #ifdef USE_PORTMIDI
 	// Dump a list of MIDI input devices
@@ -420,15 +420,15 @@ int main(int argc, char** argv) try {
 		std::cout << std::endl << "Joystick utility - Touch your joystick to see buttons here" << std::endl
 		<< "Hit ESC (window focused) to quit" << std::endl << std::endl;
 		jstestLoop();
-		return 0;
+		return EXIT_SUCCESS;
 	}
 
 	// Run the game init and main loop
 	mainLoop(songlist);
-	return 0; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
+	return EXIT_SUCCESS; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
 } catch (std::exception& e) {
 	std::cerr << "FATAL ERROR: " << e.what() << std::endl;
-	return 1;
+	return EXIT_FAILURE;
 }
 
 void outputOptionalFeatureStatus() {
