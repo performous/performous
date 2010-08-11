@@ -126,7 +126,10 @@ std::string getThemePath(std::string const& filename) {
 }
 
 bool isThemeResource(fs::path filename){
-	return filename == getThemePath(filename.filename());
+	try {
+		std::string themefile = getThemePath(filename.filename());
+		return themefile == filename;
+	} catch (...) { return false; }
 }
 
 namespace {
