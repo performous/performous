@@ -334,6 +334,7 @@ void readControllers(input::Instruments &instruments, fs::path const& file) {
 				std::cout << "   Adding " << type << ": " << name << std::endl;
 			} else {
 				std::cout << "   Overriding " << type << ": " << name << std::endl;
+				instruments.erase(name);
 			}
 			input::Instrument instrument(name, devType, mapping);
 			instrument.match = regexp;
