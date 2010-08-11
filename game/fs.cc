@@ -49,20 +49,20 @@ fs::path getConfigDir() {
 		}
 		#else
 		{
-			//open AppData directory
+			// Open AppData directory
 			std::string str;
 			ITEMIDLIST* pidl;
 			char AppDir[MAX_PATH];
 			HRESULT hRes = SHGetSpecialFolderLocation( NULL, CSIDL_APPDATA|CSIDL_FLAG_CREATE , &pidl );
 			if (hRes==NOERROR)
 			{
-			  SHGetPathFromIDList( pidl, AppDir );
-			  int i;
-			  for(i = 0; AppDir[i] != '\0'; i++){
-				  if(AppDir[i] == '\\') str += '/';
-				  else                  str += AppDir[i];
-			  }
-			  dir = fs::path(str) / "performous";
+				SHGetPathFromIDList( pidl, AppDir );
+				int i;
+				for (i = 0; AppDir[i] != '\0'; i++) {
+					if (AppDir[i] == '\\') str += '/';
+					else str += AppDir[i];
+				}
+				dir = fs::path(str) / "performous";
 			}
 		}
 		#endif
@@ -72,24 +72,24 @@ fs::path getConfigDir() {
 
 fs::path getDataDir() {
 #ifdef _WIN32
-		return getConfigDir();  // APPDATA/performous
+	return getConfigDir();  // APPDATA/performous
 #else
-		fs::path shortDir = "performous";
-		fs::path shareDir = SHARED_DATA_DIR;
-		char const* xdg_data_home = getenv("XDG_DATA_HOME");
-		// FIXME: Should this use "games" or not?
-		return (xdg_data_home ? xdg_data_home / shortDir : getHomeDir() / ".local" / shareDir);
+	fs::path shortDir = "performous";
+	fs::path shareDir = SHARED_DATA_DIR;
+	char const* xdg_data_home = getenv("XDG_DATA_HOME");
+	// FIXME: Should this use "games" or not?
+	return (xdg_data_home ? xdg_data_home / shortDir : getHomeDir() / ".local" / shareDir);
 #endif
 }
 
 fs::path getCacheDir() {
 #ifdef _WIN32
-		return getConfigDir() / "cache";  // APPDATA/performous
+	return getConfigDir() / "cache";  // APPDATA/performous
 #else
-		fs::path shortDir = "performous";
-		char const* xdg_cache_home = getenv("XDG_CACHE_HOME");
-		// FIXME: Should this use "games" or not?
-		return (xdg_cache_home ? xdg_cache_home / shortDir : getHomeDir() / ".cache" / shortDir);
+	fs::path shortDir = "performous";
+	char const* xdg_cache_home = getenv("XDG_CACHE_HOME");
+	// FIXME: Should this use "games" or not?
+	return (xdg_cache_home ? xdg_cache_home / shortDir : getHomeDir() / ".cache" / shortDir);
 #endif
 }
 
