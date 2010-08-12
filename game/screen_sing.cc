@@ -62,7 +62,7 @@ void ScreenSing::enter() {
 	}
 	// Initialize webcam
 	if (config["graphic/webcam"].b() && Webcam::enabled()) {
-		m_cam.reset(new Webcam());
+		m_cam.reset(new Webcam(config["graphic/webcamid"].i()));
 	}
 	// Load video
 	if (!m_song->video.empty() && config["graphic/video"].b()) {
@@ -297,7 +297,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		if (key == SDLK_w) dispInFlash(++config["game/pitch"]); // Toggle pitch wave
 		// Toggle webcam
 		if (key == SDLK_a && Webcam::enabled()) {
-			if (!m_cam) m_cam.reset(new Webcam()); // Initialize if we haven't done that already
+			if (!m_cam) m_cam.reset(new Webcam(config["graphic/webcamid"].i())); // Initialize if we haven't done that already
 			if (m_cam) { dispInFlash(++config["graphic/webcam"]); m_cam->pause(!config["graphic/webcam"].b()); }
 		}
 		// Latency settings

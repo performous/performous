@@ -30,15 +30,35 @@
 #include <vector>
 #include <cstdlib>
 
+#include <boost/iostreams/stream_buffer.hpp>
+
 volatile bool g_quit = false;
 
 bool g_take_screenshot = false;
+bool g_verbose_messages = false;
+
+class VerboseMessageSink : public boost::iostreams::sink {
+public:
+	// i.e. make clog like cout, but only if g_verbose_messages is set.
+	// (we could use cerr or any other file if we want)
+	std::streamsize write(const char* s, std::streamsize n) {
+		if(g_verbose_messages)
+			for(std::streamsize i=0; i<n; i++)
+				std::cout << s[i];
+
+		return n;
+	}
+};
+// defining them in main() causes segfault at exit as they apparently got free'd before that
+boost::iostreams::stream_buffer<VerboseMessageSink> sb;
+VerboseMessageSink vsm;
 
 // Signal handling for Ctrl-C
 
 static void signalSetup();
 
 extern "C" void quit(int) {
+// shouldn't "not EXIT_SUCCESS" be sent - ^C^C is an abort, not normal termination?
 	if (g_quit) std::exit(EXIT_SUCCESS);  // Instant exit if Ctrl+C is pressed again
 	g_quit = true;
 	signalSetup();
@@ -302,6 +322,7 @@ int main(int argc, char** argv) try {
 	std::string songlist;
 	opt1.add_options()
 	  ("help,h", "you are viewing it")
+	  ("verbose,V", "Be more verbose")
 	  ("version,v", "display version number")
 	  ("songlist", po::value<std::string>(&songlist), "save a list of songs in the specified folder");
 	po::options_description opt2("Configuration options");
@@ -328,16 +349,22 @@ int main(int argc, char** argv) try {
 	} catch (std::exception& e) {
 		std::cout << cmdline << std::endl;
 		std::cout << "ERROR: " << e.what() << std::endl;
-		return 1;
+		return EXIT_FAILURE;
 	}
 	po::notify(vm);
+
+	// initialize the verbose message sink
+	g_verbose_messages = vm.count("verbose")!=0;
+    sb.open(vsm);
+    std::clog.rdbuf(&sb);
+
 	if (vm.count("version")) {
 		// Already printed the version string in the beginning...
-		return 0;
+		return EXIT_SUCCESS;
 	}
 	if (vm.count("help")) {
 		std::cout << cmdline << "  any arguments without a switch are interpreted as song folders.\n" << std::endl;
-		return 0;
+		return EXIT_SUCCESS;
 	}
 	// Initialize audio for pdevhelp, michelp and the rest of the program
 	da::initialize libda;
@@ -354,7 +381,7 @@ int main(int argc, char** argv) try {
 			std::cout << boost::format("  %1% %|10t|%2%\n") % it->name() % it->desc();
 		}
 		std::cout << std::flush;
-		return 0;
+		return EXIT_SUCCESS;
 	}
 	if (vm.count("michelp")) {
 		da::record::devlist_t l = da::record::devices();
@@ -371,7 +398,7 @@ int main(int argc, char** argv) try {
 			std::cout << boost::format("  %1% %|10t|%2%\n") % it->name() % it->desc();
 		}
 		std::cout << std::flush;
-		return 0;
+		return EXIT_SUCCESS;
 	}
 #ifdef USE_PORTMIDI
 	// Dump a list of MIDI input devices
@@ -393,13 +420,15 @@ int main(int argc, char** argv) try {
 		std::cout << std::endl << "Joystick utility - Touch your joystick to see buttons here" << std::endl
 		<< "Hit ESC (window focused) to quit" << std::endl << std::endl;
 		jstestLoop();
-		return 0;
+		return EXIT_SUCCESS;
 	}
+
 	// Run the game init and main loop
 	mainLoop(songlist);
-	return 0; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
+	return EXIT_SUCCESS; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
 } catch (std::exception& e) {
 	std::cerr << "FATAL ERROR: " << e.what() << std::endl;
+	return EXIT_FAILURE;
 }
 
 void outputOptionalFeatureStatus() {
@@ -409,5 +438,5 @@ void outputOptionalFeatureStatus() {
 	(input::MidiDrums::enabled() ? "Enabled" : "Disabled")
 	<< std::endl << "  Webcam support:         " <<
 	(Webcam::enabled() ? "Enabled" : "Disabled")
-	<< std::endl;
+	<< std::endl << std::endl;
 }

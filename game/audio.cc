@@ -28,7 +28,7 @@ void Audio::open(std::string const& pdev, std::size_t rate, std::size_t frames) 
 	  .set_channels(2)
 	  .set_rate(rate)
 	  .set_frames(frames)
-	  .set_debug(std::cerr);
+	  .set_debug(std::clog);
 	m_mixer.start(m_rs);
 }
 

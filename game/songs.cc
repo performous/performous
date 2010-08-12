@@ -133,7 +133,7 @@ void Songs::filter_internal() {
 	boost::mutex::scoped_lock l(m_mutex);
 	// Print messages when loading has finished
 	if (!m_loading) {
-		std::cerr << m_debug.str();
+		std::clog << m_debug.str();
 		m_debug.str(""); m_debug.clear();
 	}
 	m_dirty = false;

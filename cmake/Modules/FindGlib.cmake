@@ -21,7 +21,7 @@ find_path(Glib_INCLUDE_DIR
 find_path(GlibConfig_INCLUDE_DIR
   NAMES glibconfig.h
   PATHS ${Glib_PKGCONF_INCLUDE_DIRS} /usr
-  PATH_SUFFIXES lib/glib-2.0/include
+  PATH_SUFFIXES lib/glib-2.0/include ../lib/glib-2.0/include
 )
 
 # Finally the library itself

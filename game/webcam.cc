@@ -18,8 +18,14 @@ Webcam::Webcam(int cam_id):
 	// Initialize the capture device
 	m_capture = cvCaptureFromCAM(cam_id);
 	if (!m_capture) {
-		std::cout << "Could not initialize webcam capturing!" << std::endl;
-		return;
+		if (cam_id != -1) {
+			std::cout << "Webcam id " << cam_id << " failed, trying autodetecting...";
+			m_capture = cvCaptureFromCAM(-1);
+		}
+		if (!m_capture) {
+			std::cout << "Could not initialize webcam capturing!" << std::endl;
+			return;
+		}
 	}
 	// Initialize the video writer
 	#ifdef SAVE_WEBCAM_VIDEO
@@ -27,7 +33,7 @@ Webcam::Webcam(int cam_id):
 	int framew = cvGetCaptureProperty(m_capture, CV_CAP_PROP_FRAME_WIDTH);
 	int frameh = cvGetCaptureProperty(m_capture, CV_CAP_PROP_FRAME_HEIGHT);
 	int codec = CV_FOURCC('P','I','M','1'); // MPEG-1
-	std::string out_file((getHomeDir() / std::string("/performous-webcam_out.mpg")).string());
+	std::string out_file((getHomeDir() / std::string("performous-webcam_out.mpg")).string());
 	m_writer = cvCreateVideoWriter(out_file.c_str(), codec, fps > 0 ? fps : 30.0f, cvSize(framew,frameh));
 	if (!m_writer) std::cout << "Could not initialize webcam video saving!" << std::endl;
 	#endif

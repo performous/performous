@@ -9,13 +9,13 @@ namespace {
 	struct Foo {
 		portaudio::Init init;
 		Foo() {
-			std::clog << "PortAudio devices:\n";
+			std::cout << "PortAudio devices:\n";
 			for (int i = 0, end = Pa_GetDeviceCount(); i != end; ++i) {
 				PaDeviceInfo const* info = Pa_GetDeviceInfo(i);
 				if (!info) continue;
-				std::clog << "  pa19:" << i << "   " << info->name << " (" << info->maxInputChannels << " in, " << info->maxOutputChannels << " out)\n";
+				std::cout << "  pa19:" << i << "   " << info->name << " (" << info->maxInputChannels << " in, " << info->maxOutputChannels << " out)\n";
 			}
-			std::clog << std::endl;
+			std::cout << std::endl;
 		}
 	} foo;
 

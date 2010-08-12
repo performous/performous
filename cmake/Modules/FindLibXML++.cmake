@@ -25,7 +25,7 @@ find_path(LibXML++_INCLUDE_DIR
 find_path(LibXML++Config_INCLUDE_DIR
   NAMES libxml++config.h
   PATHS ${LibXML++_PKGCONF_INCLUDE_DIRS} /usr
-  PATH_SUFFIXES lib/libxml++-2.6/include
+  PATH_SUFFIXES lib/libxml++-2.6/include ../lib/libxml++-2.6/include
 )
 
 # Finally the library itself
