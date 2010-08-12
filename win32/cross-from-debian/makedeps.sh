@@ -63,6 +63,7 @@ assert_binary_on_path tar
 assert_binary_on_path unzip
 assert_binary_on_path wget
 
+SCRIPTDIR="`pwd`"
 export PREFIX="`pwd`"/deps
 export WINEPREFIX="`pwd`"/wine
 mkdir -pv "$PREFIX"/bin "$PREFIX"/lib "$PREFIX"/include "$PREFIX"/lib/pkgconfig "$PREFIX"/build-stamps
@@ -620,3 +621,53 @@ if test ! -f "$PREFIX"/build-stamps/ffmpeg; then
   touch "$PREFIX"/build-stamps/ffmpeg
   $RM_RF ffmpeg
 fi
+
+# VideoInput
+# This is support library for OpenCV to get video input on Windows.
+# This is only needed if you want OpenCV.
+VIDEOINPUT="videoInput0.1995"
+if test ! -f "$PREFIX"/build-stamps/videoinput; then
+  download http://muonics.net/school/spring05/videoInput/files/$VIDEOINPUT.zip
+  unzip -o $VIDEOINPUT.zip
+  # We don't bother compiling this since it has precompiled lib and would
+  # probably be a pain in the ass.
+  cp -v $VIDEOINPUT/compiledLib/compiledByDevCpp/*.a "$PREFIX"/lib
+  cp -v $VIDEOINPUT/compiledLib/compiledByDevCpp/include/*.h "$PREFIX"/include
+  touch "$PREFIX"/build-stamps/videoinput
+  $RM_RF $VIDEOINPUT
+fi
+
+# OpenCV
+# This is optional and is used to enable webcam features.
+OPENCV="OpenCV-2.1.0"
+if test ! -f "$PREFIX"/build-stamps/opencv; then
+  download http://download.sourceforge.net/opencvlibrary/$OPENCV-win.zip
+  unzip -o $OPENCV-win.zip
+  cd $OPENCV
+  ln -s ../deps/include/videoInput.h /src/highgui/videoinput.h
+  mkdir -pv build
+  cd build
+  cmake \
+    -DCMAKE_TOOLCHAIN_FILE="$SCRIPTDIR/Toolchain.cmake" \
+	-DBUILD_NEW_PYTHON_SUPPORT=OFF \
+	-DBUILD_TESTS=OFF \
+	-DWITH_JASPER=OFF -DWITH_JPEG=OFF -DWITH_PNG=OFF -DWITH_TBB=OFF -DWITH_TIFF=OFF \
+    -DCMAKE_INSTALL_PREFIX="$PREFIX" \
+    ..
+  make
+  make install
+  cp -v unix-install/opencv.pc "$PREFIX"/lib/pkgconfig  # No auto-install :(
+  pushd .
+  cd "$PREFIX"/lib
+  # Create some symlinks so the cmake scripts detect it correctly
+  ln -svf libcv210.dll.a libcv.dll.a
+  ln -svf libcxcore210.dll.a libcxcore.dll.a
+  ln -svf libcvaux210.dll.a libcvaux.dll.a
+  ln -svf libhighgui210.dll.a libhighgui.dll.a
+  popd
+  cd ../..
+  touch "$PREFIX"/build-stamps/opencv
+  $RM_RF $OPENCV
+fi
+
+echo "All dependencies done."
