@@ -39,7 +39,7 @@ KEYWORDS="~x86 ~amd64 ~ppc ~ppc64"
 IUSE="debug alsa portaudio pulseaudio jack songs gstreamer tools editor midi webcam"
 
 RDEPEND="gnome-base/librsvg
-	dev-libs/boost
+	>=dev-libs/boost-1.39.0
 	x11-libs/pango
 	dev-cpp/libxmlpp
 	media-libs/glew
@@ -111,6 +111,7 @@ src_compile() {
 
 src_install() {
 	DOCS="docs/*.txt" cmake-utils_src_install
+	mv -f "${D}/${GAMES_PREFIX}/share/man" "${D}/usr/share/"
 
 	if use songs; then
 		insinto "/usr/share/games/ultrastar"
