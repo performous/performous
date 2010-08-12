@@ -2,12 +2,10 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /cvsroot/ultrastar-ng/UltraStar-ng/portage-overlay/games-arcade/performous/performous-9999.ebuild,v 1.10 2007/09/29 13:04:19 yoda-jm Exp $
 
+[[ ${PV} = 9999 ]] && GIT="git"
 EAPI=2
 
-inherit games cmake-utils
-[ "$PV" == "9999" ] && inherit git
-
-RESTRICT="nostrip"
+inherit cmake-utils ${GIT} games
 
 SONGS_PN=ultrastar-songs
 
@@ -34,9 +32,9 @@ LICENSE="GPL-2
 		CCPL-Attribution-NonCommercial-NoDerivs-2.5
 	)"
 SLOT="0"
-KEYWORDS="~x86 ~amd64 ~ppc ~ppc64"
+KEYWORDS="~amd64 ~x86"
 
-IUSE="debug alsa portaudio pulseaudio jack songs gstreamer tools editor midi webcam"
+IUSE="alsa debug editor gstreamer jack midi portaudio pulseaudio songs tools webcam"
 
 RDEPEND="gnome-base/librsvg
 	>=dev-libs/boost-1.39.0
@@ -63,22 +61,17 @@ RDEPEND="gnome-base/librsvg
 DEPEND="${RDEPEND}
     >=dev-util/cmake-2.6.0"
 
-S="${WORKDIR}/${MY_P}"
+S=${WORKDIR}/${MY_P}
 
 src_unpack() {
 	if [ "${PV}" != "9999" ]; then
 		unpack "${MY_P}.tar.bz2"
 	else
 		git_src_unpack
-		cd "${S}"
 	fi
+	cd "${S}"
 	if use songs; then
-		cd "${S}"
-		unpack "${SONGS_PN}-jc-1.zip"
-		unpack "${SONGS_PN}-libre-3.zip"
-		unpack "${SONGS_PN}-restricted-3.zip"
-		unpack "${SONGS_PN}-shearer-1.zip"
-		cd "${S}"
+		unpack "${SONGS_PN}-jc-1.zip" "${SONGS_PN}-libre-3.zip" "${SONGS_PN}-restricted-3.zip" "${SONGS_PN}-shearer-1.zip"
 	fi
 }
 
@@ -114,7 +107,7 @@ src_install() {
 	mv -f "${D}/${GAMES_PREFIX}/share/man" "${D}/usr/share/"
 
 	if use songs; then
-		insinto "/usr/share/games/ultrastar"
+		insinto "${GAMES_PREFIX}/share/performous"
 		doins -r "${S}/songs" || die "doins songs failed"
 	fi
 	doicon "${S}/data/${PN}.xpm"
