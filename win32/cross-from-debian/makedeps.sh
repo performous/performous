@@ -392,7 +392,7 @@ if test ! -f "$PREFIX"/build-stamps/atk; then
   download http://ftp.gnome.org/pub/GNOME/sources/atk/1.30/atk-1.30.0.tar.bz2
   tar jxvf atk-1.30.0.tar.bz2
   cd atk-1.30.0
-  ./configure $COMMON_AUTOCONF_FLAGS
+  ./configure $COMMON_AUTOCONF_FLAGS --disable-glibtest
   make
   make install
   cd ..
@@ -410,7 +410,7 @@ if test ! -f "$PREFIX"/build-stamps/gtk; then
   download http://ftp.gnome.org/pub/GNOME/sources/gtk+/2.20/gtk+-2.20.1.tar.bz2
   tar jxvf gtk+-2.20.1.tar.bz2
   cd gtk+-2.20.1
-  ./configure $COMMON_AUTOCONF_FLAGS --disable-modules --without-libtiff --with-included-loaders=png,jpeg,gif,xpm,xbm
+  ./configure $COMMON_AUTOCONF_FLAGS --disable-glibtest --disable-modules --without-libtiff --with-included-loaders=png,jpeg,gif,xpm,xbm
   make -C gdk-pixbuf
   wine-shwrap gdk-pixbuf/gdk-pixbuf-csource
   wine-shwrap gdk-pixbuf/gdk-pixbuf-query-loaders
@@ -578,7 +578,7 @@ if test ! -f "$PREFIX"/build-stamps/ffmpeg; then
     svn up ffmpeg
   fi
   cd ffmpeg
-  ./configure --prefix="$PREFIX" --cc="$CROSS_GCC" --nm="$CROSS_NM" --target-os=mingw32 --arch=i386 --disable-static --enable-shared --enable-gpl --enable-postproc --enable-avfilter-lavf --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --enable-zlib --enable-libschroedinger --extra-cflags="-I$PREFIX/include" --extra-ldflags="-L$PREFIX/lib"
+  ./configure --prefix="$PREFIX" --cc="$CROSS_GCC" --nm="$CROSS_NM" --target-os=mingw32 --arch=i386 --disable-static --enable-shared --enable-gpl --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --enable-zlib --enable-libschroedinger --extra-cflags="-I$PREFIX/include" --extra-ldflags="-L$PREFIX/lib"
   sed -i -e 's/-Werror=[^ ]*//g' config.mak
   make
   make install
