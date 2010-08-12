@@ -70,16 +70,12 @@ find_package(Boost 1.36 REQUIRED COMPONENTS thread date_time program_options reg
 include_directories(${Boost_INCLUDE_DIRS})
 list(APPEND LIBS ${Boost_LIBRARIES})
 
-# Libraries are part of Performous build process (for now)
-set(SLAVE_LIBS TRUE)
-if(SLAVE_LIBS)
-	list(APPEND LIBS da plugin++)
-else()
-	set(OUR_LIBS Plugin++ LibDA)
-endif()
+# Our own libraries
+list(APPEND LIBS plugin++)
+include_directories(../libs/libda)
 
 # Find all the libs that don't require extra parameters
-foreach(lib ${OUR_LIBS} SDL PangoCairo LibRSVG LibXML++ GLEW AVFormat SWScale OpenGL Z Jpeg Png)
+foreach(lib ${OUR_LIBS} SDL PangoCairo LibRSVG LibXML++ GLEW AVFormat SWScale OpenGL Z Jpeg Png PortAudio)
 	find_package(${lib} REQUIRED)
 	include_directories(${${lib}_INCLUDE_DIRS})
 	list(APPEND LIBS ${${lib}_LIBRARIES})

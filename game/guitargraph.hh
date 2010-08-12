@@ -80,7 +80,7 @@ class GuitarGraph: public InstrumentGraph {
 	glutil::Color m_neckglowColor;
 	Object3d m_fretObj; /// 3d object for regular note
 	Object3d m_tappableObj; /// 3d object for the HOPO note cap
-	std::vector<Sample> m_samples; /// sound effects
+	std::vector<std::string> m_samples; /// sound effects
 	boost::scoped_ptr<Texture> m_neck; /// necks
 	boost::scoped_ptr<SvgTxtThemeSimple> m_scoreText;
 	boost::scoped_ptr<SvgTxtThemeSimple> m_streakText;
