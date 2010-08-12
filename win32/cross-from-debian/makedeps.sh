@@ -116,10 +116,11 @@ fi
 
 # We use win-iconv instead of full-fledged GNU libiconv because it still does
 # everything the other deps need and is far smaller.
+WINICONV="win-iconv-0.0.1"
 if test ! -f "$PREFIX"/build-stamps/win-iconv; then
-  download http://win-iconv.googlecode.com/files/win-iconv-0.0.1.tar.bz2
-  tar jxvf win-iconv-0.0.1.tar.bz2
-  cd win-iconv-0.0.1
+  download http://win-iconv.googlecode.com/files/$WINICONV.tar.bz2
+  tar jxvf $WINICONV.tar.bz2
+  cd $WINICONV
   make clean
   make -n iconv.dll win_iconv.exe | sed -e 's/^/$CROSS_TOOL_PREFIX-/' | sh -ex
   $CROSS_GCC -mdll -o iconv.dll -Wl,--out-implib,libiconv.a iconv.def win_iconv.o
@@ -130,32 +131,34 @@ if test ! -f "$PREFIX"/build-stamps/win-iconv; then
   cp -v libiconv.a "$PREFIX"/lib
   cd ..
   touch "$PREFIX"/build-stamps/win-iconv
-  $RM_RF win-iconv-0.0.1
+  $RM_RF $WINICONV
 fi
 
 # zlib
+ZLIB="zlib-1.2.5"
 if test ! -f "$PREFIX"/build-stamps/zlib; then
-  download http://www.zlib.net/zlib-1.2.5.tar.bz2
-  tar jxvf zlib-1.2.5.tar.bz2
-  cd zlib-1.2.5
+  download http://www.zlib.net/$ZLIB.tar.bz2
+  tar jxvf $ZLIB.tar.bz2
+  cd $ZLIB
   make -f win32/Makefile.gcc PREFIX="$CROSS_TOOL_PREFIX"- zlib1.dll
   cp -v zlib.h zconf.h "$PREFIX"/include
   cp -v zlib1.dll "$PREFIX"/bin
   cp -v libzdll.a "$PREFIX"/lib/libz.a
   cd ..
   touch "$PREFIX"/build-stamps/zlib
-  $RM_RF zlib-1.2.5
+  $RM_RF $ZLIB
 fi
 
 # libpng
+LIBPNG="libpng-1.4.2"
 if test ! -f "$PREFIX"/build-stamps/libpng; then
-  download http://download.sourceforge.net/libpng/libpng-1.4.2.tar.gz
-  tar zxvf libpng-1.4.2.tar.gz
-  cd libpng-1.4.2
+  download http://download.sourceforge.net/libpng/$LIBPNG.tar.gz
+  tar zxvf $LIBPNG.tar.gz
+  cd $LIBPNG
   make -f scripts/makefile.mingw prefix="$PREFIX" CC="$CROSS_GCC" AR="$CROSS_AR" RANLIB="$CROSS_RANLIB" ZLIBINC="$PREFIX"/include ZLIBLIB="$PREFIX"/lib install-shared
   cd ..
   touch "$PREFIX"/build-stamps/libpng
-  $RM_RF libpng-1.4.2
+  $RM_RF $LIBPNG
 fi
 
 # Flags passed to every dependency's ./configure script, for those deps that use autoconf and friends.
@@ -175,36 +178,39 @@ if test ! -f "$PREFIX"/build-stamps/libjpeg; then
 fi
 
 # Runtime (libintl) of GNU Gettext
+GETTEXT="gettext-0.18"
 if test ! -f "$PREFIX"/build-stamps/gettext-runtime; then
-  download http://ftp.gnu.org/gnu/gettext/gettext-0.18.tar.gz
-  tar zxvf gettext-0.18.tar.gz
-  cd gettext-0.18/gettext-runtime
+  download http://ftp.gnu.org/gnu/gettext/$GETTEXT.tar.gz
+  tar zxvf $GETTEXT.tar.gz
+  cd $GETTEXT/gettext-runtime
   ./configure $COMMON_AUTOCONF_FLAGS --enable-relocatable --disable-libasprintf --disable-java --disable-csharp
   make
   make install
   cd ../..
   touch "$PREFIX"/build-stamps/gettext-runtime
-  $RM_RF gettext-0.18
+  $RM_RF $GETTEXT
 fi
 
 # libxml2
+LIBXML2="libxml2-2.7.7"
 if test ! -f "$PREFIX"/build-stamps/libxml2; then
-  download ftp://xmlsoft.org/libxml2/libxml2-2.7.7.tar.gz
-  tar zxvf libxml2-2.7.7.tar.gz
-  cd libxml2-2.7.7
+  download ftp://xmlsoft.org/libxml2/$LIBXML2.tar.gz
+  tar zxvf $LIBXML2.tar.gz
+  cd $LIBXML2
   ./configure $COMMON_AUTOCONF_FLAGS --without-python --without-readline
   make
   make install
   cd ..
   touch "$PREFIX"/build-stamps/libxml2
-  $RM_RF libxml2-2.7.7
+  $RM_RF $LIBXML2
 fi
 
 # The bits of Boost that we need.
+BOOST="boost_1_43_0"
 if test ! -f "$PREFIX"/build-stamps/boost; then
-  download http://download.sourceforge.net/boost/boost_1_43_0.tar.bz2
-  tar jxvf boost_1_43_0.tar.bz2
-  cd boost_1_43_0/tools/jam/src
+  download http://download.sourceforge.net/boost/$BOOST.tar.bz2
+  tar jxvf $BOOST.tar.bz2
+  cd $BOOST/tools/jam/src
   ./build.sh
   cp -v bin.linux*/bjam ../../..
   cd ../../..
@@ -218,7 +224,7 @@ EOF
   ln -svf libboost_thread_win32.dll.a "$PREFIX"/lib/libboost_thread.dll.a  # so the cmake scripts detect it correctly
   cd ..
   touch "$PREFIX"/build-stamps/boost
-  $RM_RF boost_1_43_0
+  $RM_RF $BOOST
 fi
 
 # A package of DirectX headers and implibs kindly made available by the
@@ -280,36 +286,39 @@ if test ! -f "$PREFIX"/build-stamps/portmidi; then
 fi
 
 # SDL
+SDL="SDL-1.2.14"
 if test ! -f "$PREFIX"/build-stamps/sdl; then
-  download http://www.libsdl.org/release/SDL-1.2.14.tar.gz
-  tar zxvf SDL-1.2.14.tar.gz
-  cd SDL-1.2.14
+  download http://www.libsdl.org/release/$SDL.tar.gz
+  tar zxvf $SDL.tar.gz
+  cd $SDL
   ./configure $COMMON_AUTOCONF_FLAGS --disable-stdio-redirect
   make
   make install
   cd ..
   touch "$PREFIX"/build-stamps/sdl
-  $RM_RF SDL-1.2.14
+  $RM_RF $SDL
 fi
 
 # Freetype
+FREETYPE="freetype-2.3.12"
 if test ! -f "$PREFIX"/build-stamps/freetype; then
-  download http://download.sourceforge.net/freetype/freetype-2.3.12.tar.bz2
-  tar jxvf freetype-2.3.12.tar.bz2
-  cd freetype-2.3.12
+  download http://download.sourceforge.net/freetype/$FREETYPE.tar.bz2
+  tar jxvf $FREETYPE.tar.bz2
+  cd $FREETYPE
   ./configure $COMMON_AUTOCONF_FLAGS
   make
   make install
   cd ..
   touch "$PREFIX"/build-stamps/freetype
-  $RM_RF freetype-2.3.12
+  $RM_RF $FREETYPE
 fi
 
 # GLib
+GLIB="glib-2.24.1"
 if test ! -f "$PREFIX"/build-stamps/glib; then
-  download http://ftp.gnome.org/pub/GNOME/sources/glib/2.24/glib-2.24.1.tar.bz2
-  tar jxvf glib-2.24.1.tar.bz2
-  cd glib-2.24.1
+  download http://ftp.gnome.org/pub/GNOME/sources/glib/2.24/$GLIB.tar.bz2
+  tar jxvf $GLIB.tar.bz2
+  cd $GLIB
   ./configure $COMMON_AUTOCONF_FLAGS
   make -C glib
   make -C gthread
@@ -319,14 +328,15 @@ if test ! -f "$PREFIX"/build-stamps/glib; then
   make install
   cd ..
   touch "$PREFIX"/build-stamps/glib
-  $RM_RF glib-2.24.1
+  $RM_RF $GLIB
 fi
 
 # Fontconfig
+FONTCONFIG="fontconfig-2.8.0"
 if test ! -f "$PREFIX"/build-stamps/fontconfig; then
-  download http://fontconfig.org/release/fontconfig-2.8.0.tar.gz
-  tar zxvf fontconfig-2.8.0.tar.gz
-  cd fontconfig-2.8.0
+  download http://fontconfig.org/release/$FONTCONFIG.tar.gz
+  tar zxvf $FONTCONFIG.tar.gz
+  cd $FONTCONFIG
   ./configure $COMMON_AUTOCONF_FLAGS
   make
   # It tries to build its initial cache by invoking the installed binary, so make it happy.
@@ -335,42 +345,45 @@ if test ! -f "$PREFIX"/build-stamps/fontconfig; then
   rm -f "$PREFIX"/bin/fc-cache
   cd ..
   touch "$PREFIX"/build-stamps/fontconfig
-  $RM_RF fontconfig-2.8.0
+  $RM_RF $FONTCONFIG
 fi
 
 # Pixman
+PIXMAN="pixman-0.18.2"
 if test ! -f "$PREFIX"/build-stamps/pixman; then
-  download http://cairographics.org/releases/pixman-0.18.2.tar.gz
-  tar zxvf pixman-0.18.2.tar.gz
-  cd pixman-0.18.2
+  download http://cairographics.org/releases/$PIXMAN.tar.gz
+  tar zxvf $PIXMAN.tar.gz
+  cd $PIXMAN
   ./configure $COMMON_AUTOCONF_FLAGS
   make
   make install
   cd ..
   touch "$PREFIX"/build-stamps/pixman
-  $RM_RF pixman-0.18.2
+  $RM_RF $PIXMAN
 fi
 
 # Cairo
+CAIRO="cairo-1.8.10"
 if test ! -f "$PREFIX"/build-stamps/cairo; then
-  download http://cairographics.org/releases/cairo-1.8.10.tar.gz
-  tar zxvf cairo-1.8.10.tar.gz
-  cd cairo-1.8.10
+  download http://cairographics.org/releases/$CAIRO.tar.gz
+  tar zxvf $CAIRO.tar.gz
+  cd $CAIRO
   ./configure $COMMON_AUTOCONF_FLAGS --disable-xlib
   make
   make install
   cd ..
   touch "$PREFIX"/build-stamps/cairo
-  $RM_RF cairo-1.8.10
+  $RM_RF $CAIRO
 fi
 
 # Pango
 # For some reason, the libraries are installed in an extremely uncharacteristic
 # layout for libtool.  Luckily, we have all that we need to make it sane again.
+PANGO="pango-1.28.1"
 if test ! -f "$PREFIX"/build-stamps/pango; then
-  download http://ftp.gnome.org/pub/GNOME/sources/pango/1.28/pango-1.28.1.tar.bz2
-  tar jxvf pango-1.28.1.tar.bz2
-  cd pango-1.28.1
+  download http://ftp.gnome.org/pub/GNOME/sources/pango/1.28/$PANGO.tar.bz2
+  tar jxvf $PANGO.tar.bz2
+  cd $PANGO
   ./configure $COMMON_AUTOCONF_FLAGS --with-included-modules=yes --with-dynamic-modules=no CXX="$CROSS_GXX \"-D__declspec(x)=__attribute__((x))\""
   make
   make install
@@ -382,22 +395,23 @@ if test ! -f "$PREFIX"/build-stamps/pango; then
   done
   cd ..
   touch "$PREFIX"/build-stamps/pango
-  $RM_RF pango-1.28.1
+  $RM_RF $PANGO
 fi
 
 # ATK
 # We don't really need to build the parts of GTK that use ATK, but GTK's
 # configure script won't be happy otherwise.
+ATK="atk-1.30.0"
 if test ! -f "$PREFIX"/build-stamps/atk; then
-  download http://ftp.gnome.org/pub/GNOME/sources/atk/1.30/atk-1.30.0.tar.bz2
-  tar jxvf atk-1.30.0.tar.bz2
-  cd atk-1.30.0
+  download http://ftp.gnome.org/pub/GNOME/sources/atk/1.30/$ATK.tar.bz2
+  tar jxvf $ATK.tar.bz2
+  cd $ATK
   ./configure $COMMON_AUTOCONF_FLAGS --disable-glibtest
   make
   make install
   cd ..
   touch "$PREFIX"/build-stamps/atk
-  $RM_RF atk-1.30.0
+  $RM_RF $ATK
 fi
 
 # GTK
@@ -406,10 +420,11 @@ fi
 # lets other packages build some handy test programs that can be run
 # under Wine to sanity-check the dependency build.  The choice of included
 # pixbuf loaders is tailored to satisfy said programs.
+GTK="gtk+-2.20.1"
 if test ! -f "$PREFIX"/build-stamps/gtk; then
-  download http://ftp.gnome.org/pub/GNOME/sources/gtk+/2.20/gtk+-2.20.1.tar.bz2
-  tar jxvf gtk+-2.20.1.tar.bz2
-  cd gtk+-2.20.1
+  download http://ftp.gnome.org/pub/GNOME/sources/gtk+/2.20/$GTK.tar.bz2
+  tar jxvf $GTK.tar.bz2
+  cd $GTK
   ./configure $COMMON_AUTOCONF_FLAGS --disable-glibtest --disable-modules --without-libtiff --with-included-loaders=png,jpeg,gif,xpm,xbm
   make -C gdk-pixbuf
   wine-shwrap gdk-pixbuf/gdk-pixbuf-csource
@@ -427,97 +442,104 @@ if test ! -f "$PREFIX"/build-stamps/gtk; then
   cp "$PREFIX"/share/themes/MS-Windows/gtk-2.0/gtkrc "$PREFIX"/etc/gtk-2.0
   cd ..
   touch "$PREFIX"/build-stamps/gtk
-  $RM_RF gtk+-2.20.1
+  $RM_RF $GTK
 fi
 
 # libcroco
+LIBCROCO="libcroco-0.6.2"
 if test ! -f "$PREFIX"/build-stamps/libcroco; then
-  download http://ftp.gnome.org/pub/GNOME/sources/libcroco/0.6/libcroco-0.6.2.tar.bz2
-  tar jxvf libcroco-0.6.2.tar.bz2
-  cd libcroco-0.6.2
+  download http://ftp.gnome.org/pub/GNOME/sources/libcroco/0.6/$LIBCROCO.tar.bz2
+  tar jxvf $LIBCROCO.tar.bz2
+  cd $LIBCROCO
   ./configure $COMMON_AUTOCONF_FLAGS
   make
   make install
   cd ..
   touch "$PREFIX"/build-stamps/libcroco
-  $RM_RF libcroco-0.6.2
+  $RM_RF $LIBCROCO
 fi
 
 # libgsf
 # It will try to install a gconf schema on the host unless we tell it not to,
 # despite the fact that it doesn't have the GNOME libraries it would need to
 # make any use of it...
+LIBGSF="libgsf-1.14.18"
 if test ! -f "$PREFIX"/build-stamps/libgsf; then
-  download http://ftp.gnome.org/pub/GNOME/sources/libgsf/1.14/libgsf-1.14.18.tar.bz2
-  tar jxvf libgsf-1.14.18.tar.bz2
-  cd libgsf-1.14.18
+  download http://ftp.gnome.org/pub/GNOME/sources/libgsf/1.14/$LIBGSF.tar.bz2
+  tar jxvf $LIBGSF.tar.bz2
+  cd $LIBGSF
   ./configure $COMMON_AUTOCONF_FLAGS --without-python --disable-schemas-install
   make
   make install
   cd ..
   touch "$PREFIX"/build-stamps/libgsf
-  $RM_RF libgsf-1.14.18
+  $RM_RF $LIBGSF
 fi
 
 # librsvg
+LIBRSVG="librsvg-2.26.3"
 if test ! -f "$PREFIX"/build-stamps/librsvg; then
-  download http://ftp.gnome.org/pub/GNOME/sources/librsvg/2.26/librsvg-2.26.3.tar.bz2
-  tar jxvf librsvg-2.26.3.tar.bz2
-  cd librsvg-2.26.3
+  download http://ftp.gnome.org/pub/GNOME/sources/librsvg/2.26/$LIBRSVG.tar.bz2
+  tar jxvf $LIBRSVG.tar.bz2
+  cd $LIBRSVG
   ./configure $COMMON_AUTOCONF_FLAGS --disable-pixbuf-loader --disable-gtk-theme
   make
   make install
   cd ..
   touch "$PREFIX"/build-stamps/librsvg
-  $RM_RF librsvg-2.26.3
+  $RM_RF $LIBRSVG
 fi
 
 # libsigc++
+LIBSIGCPP="libsigc++-2.2.8"
 if test ! -f "$PREFIX"/build-stamps/libsigc++; then
-  download http://ftp.gnome.org/pub/GNOME/sources/libsigc++/2.2/libsigc++-2.2.8.tar.bz2
-  tar jxvf libsigc++-2.2.8.tar.bz2
-  cd libsigc++-2.2.8
+  download http://ftp.gnome.org/pub/GNOME/sources/libsigc++/2.2/$LIBSIGCPP.tar.bz2
+  tar jxvf $LIBSIGCPP.tar.bz2
+  cd $LIBSIGCPP
   ./configure $COMMON_AUTOCONF_FLAGS
   make
   make install
   cd ..
   touch "$PREFIX"/build-stamps/libsigc++
-  $RM_RF libsigc++-2.2.8
+  $RM_RF $LIBSIGCPP
 fi
 
 # libglibmm
+GLIBMM="glibmm-2.24.2"
 if test ! -f "$PREFIX"/build-stamps/libglibmm; then
-  download http://ftp.gnome.org/pub/GNOME/sources/glibmm/2.24/glibmm-2.24.2.tar.bz2
-  tar jxvf glibmm-2.24.2.tar.bz2
-  cd glibmm-2.24.2
+  download http://ftp.gnome.org/pub/GNOME/sources/glibmm/2.24/$GLIBMM.tar.bz2
+  tar jxvf $GLIBMM.tar.bz2
+  cd $GLIBMM
   ./configure $COMMON_AUTOCONF_FLAGS
   make
   make install
   cd ..
   touch "$PREFIX"/build-stamps/libglibmm
-  $RM_RF glibmm-2.24.2
+  $RM_RF $GLIBMM
 fi
 
 # libxml++
+LIBXMLPP="libxml++-2.30.1"
 if test ! -f "$PREFIX"/build-stamps/libxml++; then
-  download http://ftp.gnome.org/pub/GNOME/sources/libxml++/2.30/libxml++-2.30.1.tar.bz2
-  tar jxvf libxml++-2.30.1.tar.bz2
-  cd libxml++-2.30.1
+  download http://ftp.gnome.org/pub/GNOME/sources/libxml++/2.30/$LIBXMLPP.tar.bz2
+  tar jxvf $LIBXMLPP.tar.bz2
+  cd $LIBXMLPP
   ./configure $COMMON_AUTOCONF_FLAGS
   make
   make install
   cd ..
   touch "$PREFIX"/build-stamps/libxml++
-  $RM_RF libxml++-2.30.1
+  $RM_RF $LIBXMLPP
 fi
 
 # GLEW, which lacks a build system amenable to cross-compilation.
 # glewinfo and visualinfo are handy if you ever need something
 # similar to glxinfo under Windows.
+GLEW="glew-1.5.4"
 if test ! -f "$PREFIX"/build-stamps/glew; then
-  download http://download.sourceforge.net/glew/glew-1.5.4.tgz
-  tar zxvf glew-1.5.4.tgz
-  cd glew-1.5.4
+  download http://download.sourceforge.net/glew/$GLEW.tgz
+  tar zxvf $GLEW.tgz
+  cd $GLEW
   $CROSS_WINDRES -o glewres.o build/vc6/glew.rc
   $CROSS_GCC -g -O2 -W -Wall -Iinclude -DGLEW_BUILD -mdll -Wl,--out-implib,libGLEW.a -o glew32.dll src/glew.c glewres.o -lopengl32 -lglu32 -lgdi32
   $CROSS_WINDRES -o glewinfores.o build/vc6/glewinfo.rc
@@ -532,33 +554,35 @@ if test ! -f "$PREFIX"/build-stamps/glew; then
   cp -v glew.pc "$PREFIX"/lib/pkgconfig
   cd ..
   touch "$PREFIX"/build-stamps/glew
-  $RM_RF glew-1.5.4
+  $RM_RF $GLEW
 fi
 
 # liborc
+LIBORC="orc-0.4.5"
 if test ! -f "$PREFIX"/build-stamps/liborc; then
-  download http://code.entropywave.com/download/orc/orc-0.4.5.tar.gz
-  tar zxvf orc-0.4.5.tar.gz
-  cd orc-0.4.5
+  download http://code.entropywave.com/download/orc/$LIBORC.tar.gz
+  tar zxvf $LIBORC.tar.gz
+  cd $LIBORC
   ./configure $COMMON_AUTOCONF_FLAGS
   make
   make install
   cd ..
   touch "$PREFIX"/build-stamps/liborc
-  $RM_RF orc-0.4.5
+  $RM_RF $LIBORC
 fi
 
 # libschroedinger
+LIBSCHROE="schroedinger-1.0.9"
 if test ! -f "$PREFIX"/build-stamps/libschroedinger; then
-  download http://diracvideo.org/download/schroedinger/schroedinger-1.0.9.tar.gz
-  tar zxvf schroedinger-1.0.9.tar.gz
-  cd schroedinger-1.0.9
+  download http://diracvideo.org/download/schroedinger/$LIBSCHROE.tar.gz
+  tar zxvf $LIBSCHROE.tar.gz
+  cd $LIBSCHROE
   ./configure $COMMON_AUTOCONF_FLAGS
   make
   make install
   cd ..
   touch "$PREFIX"/build-stamps/libschroedinger
-  $RM_RF schroedinger-1.0.9
+  $RM_RF $LIBSCHROE
 fi
 
 # FFmpeg
