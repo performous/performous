@@ -50,7 +50,7 @@ double FFmpeg::duration() const {
 void FFmpeg::open() {
 	boost::mutex::scoped_lock l(s_avcodec_mutex);
 	av_register_all();
-	//av_log_set_level(AV_LOG_DEBUG);
+	av_log_set_level(AV_LOG_ERROR);
 	if (av_open_input_file(&pFormatCtx, m_filename.c_str(), NULL, 0, NULL)) throw std::runtime_error("Cannot open input file");
 	if (av_find_stream_info(pFormatCtx) < 0) throw std::runtime_error("Cannot find stream information");
 	pFormatCtx->flags |= AVFMT_FLAG_GENPTS;
