@@ -234,10 +234,10 @@ namespace {
 
 void readControllers(input::Instruments &instruments, fs::path const& file) {
 	if (!fs::exists(file)) {
-		std::cout << "Skipping " << file << " (not found)" << std::endl;
+		std::clog << "Skipping " << file << " (not found)" << std::endl;
 		return;
 	}
-	std::cout << "Parsing " << file << std::endl;
+	std::clog << "Parsing " << file << std::endl;
 	xmlpp::DomParser domParser(file.string());
 	try {
 		xmlpp::NodeSet n = domParser.get_document()->get_root_node()->find("/controllers/controller");
@@ -331,7 +331,7 @@ void readControllers(input::Instruments &instruments, fs::path const& file) {
 
 			// inserting the instrument
 			if(instruments.find(name) == instruments.end()) {
-				std::cout << "   Adding " << type << ": " << name << std::endl;
+				std::clog << "   Adding " << type << ": " << name << std::endl;
 			} else {
 				std::cout << "   Overriding " << type << ": " << name << std::endl;
 				instruments.erase(name);
@@ -422,9 +422,9 @@ void input::SDL::init() {
 	// Here we should send an event to have correct state buttons
 	init_devices();
 	// Adding keyboard instruments
-	std::cout << "Keyboard as guitar controller: " << (config["game/keyboard_guitar"].b() ? "enabled":"disabled") << std::endl;
-	std::cout << "Keyboard as drumkit controller: " << (config["game/keyboard_drumkit"].b() ? "enabled":"disabled") << std::endl;
-	std::cout << "Keyboard as dance pad controller: " << (config["game/keyboard_dancepad"].b() ? "enabled":"disabled") << std::endl;
+	std::clog << "Keyboard as guitar controller: " << (config["game/keyboard_guitar"].b() ? "enabled":"disabled") << std::endl;
+	std::clog << "Keyboard as drumkit controller: " << (config["game/keyboard_drumkit"].b() ? "enabled":"disabled") << std::endl;
+	std::clog << "Keyboard as dance pad controller: " << (config["game/keyboard_dancepad"].b() ? "enabled":"disabled") << std::endl;
 	input::SDL::sdl_devices[input::detail::KEYBOARD_ID] = NULL;
 	input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(input::detail::KEYBOARD_ID, input::detail::InputDevPrivate(g_instruments.find("GUITAR_GUITARHERO")->second)));
 	input::SDL::sdl_devices[input::detail::KEYBOARD_ID2] = NULL;

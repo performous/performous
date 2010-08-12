@@ -12,7 +12,7 @@ namespace pm {
 	class Stream {
 	public:
 		operator PortMidiStream*() { return m_handle; }
-		
+
 	protected:
 		PortMidiStream* m_handle;
 		Stream(): m_handle() {}
@@ -27,7 +27,7 @@ namespace pm {
 				PmDeviceInfo const* info = Pm_GetDeviceInfo(devId);
 				if (info->input != input) continue;
 				if (info->opened) continue;
-				std::cout << "  " << info->name << std::endl;
+				std::cout << "  " << info->name << std::endl << std::endl;
 			}
 		}
 		int findDevice(bool input, std::string const& name = "") {
@@ -42,7 +42,7 @@ namespace pm {
 			throw std::runtime_error("No matching PortMidi device found");
 		}
 	}
-		
+
 	class Input: public Stream {
 	public:
 		Input(int devId) {

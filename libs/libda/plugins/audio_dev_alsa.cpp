@@ -29,18 +29,18 @@ namespace {
 				if (snd_ctl_pcm_info(ctl, pcminfo) < 0) continue;
 				std::string device = std::string("alsa:hw:") + snd_ctl_card_info_get_id(info) + "," + boost::lexical_cast<std::string>(dev);
 				std::string desc = std::string(snd_ctl_card_info_get_name(info)) + " (" + snd_pcm_info_get_name(pcminfo) + ")";
-				std::clog << "  " << device << "   " << desc << std::endl;
+				std::cout << "  " << device << "   " << desc << std::endl;
 			}
 		}
 	}
 
 	struct Foo {
 		Foo() {
-			std::clog << "ALSA capture devices:\n";
+			std::cout << "ALSA capture devices:\n";
 			devices(SND_PCM_STREAM_CAPTURE);
-			std::clog << "ALSA playback devices:\n";
+			std::cout << "ALSA playback devices:\n";
 			devices(SND_PCM_STREAM_PLAYBACK);
-			std::clog << std::endl;
+			std::cout << std::endl;
 		}
 	} foo;
 
@@ -95,7 +95,7 @@ namespace {
 		}
 	}
 	*/
-	
+
 	class alsa_record: public record::dev {
 		settings m_s;
 		alsa::pcm m_pcm;
