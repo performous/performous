@@ -49,20 +49,20 @@ fs::path getConfigDir() {
 		}
 		#else
 		{
-			//open AppData directory
+			// Open AppData directory
 			std::string str;
 			ITEMIDLIST* pidl;
 			char AppDir[MAX_PATH];
 			HRESULT hRes = SHGetSpecialFolderLocation( NULL, CSIDL_APPDATA|CSIDL_FLAG_CREATE , &pidl );
 			if (hRes==NOERROR)
 			{
-			  SHGetPathFromIDList( pidl, AppDir );
-			  int i;
-			  for(i = 0; AppDir[i] != '\0'; i++){
-				  if(AppDir[i] == '\\') str += '/';
-				  else                  str += AppDir[i];
-			  }
-			  dir = fs::path(str) / "performous";
+				SHGetPathFromIDList( pidl, AppDir );
+				int i;
+				for (i = 0; AppDir[i] != '\0'; i++) {
+					if (AppDir[i] == '\\') str += '/';
+					else str += AppDir[i];
+				}
+				dir = fs::path(str) / "performous";
 			}
 		}
 		#endif
@@ -72,24 +72,24 @@ fs::path getConfigDir() {
 
 fs::path getDataDir() {
 #ifdef _WIN32
-		return getConfigDir();  // APPDATA/performous
+	return getConfigDir();  // APPDATA/performous
 #else
-		fs::path shortDir = "performous";
-		fs::path shareDir = SHARED_DATA_DIR;
-		char const* xdg_data_home = getenv("XDG_DATA_HOME");
-		// FIXME: Should this use "games" or not?
-		return (xdg_data_home ? xdg_data_home / shortDir : getHomeDir() / ".local" / shareDir);
+	fs::path shortDir = "performous";
+	fs::path shareDir = SHARED_DATA_DIR;
+	char const* xdg_data_home = getenv("XDG_DATA_HOME");
+	// FIXME: Should this use "games" or not?
+	return (xdg_data_home ? xdg_data_home / shortDir : getHomeDir() / ".local" / shareDir);
 #endif
 }
 
 fs::path getCacheDir() {
 #ifdef _WIN32
-		return getConfigDir() / "cache";  // APPDATA/performous
+	return getConfigDir() / "cache";  // APPDATA/performous
 #else
-		fs::path shortDir = "performous";
-		char const* xdg_cache_home = getenv("XDG_CACHE_HOME");
-		// FIXME: Should this use "games" or not?
-		return (xdg_cache_home ? xdg_cache_home / shortDir : getHomeDir() / ".cache" / shortDir);
+	fs::path shortDir = "performous";
+	char const* xdg_cache_home = getenv("XDG_CACHE_HOME");
+	// FIXME: Should this use "games" or not?
+	return (xdg_cache_home ? xdg_cache_home / shortDir : getHomeDir() / ".cache" / shortDir);
 #endif
 }
 
@@ -99,7 +99,6 @@ fs::path getThemeDir() {
 	if (theme.empty()) theme = defaultTheme;
 	return getDataDir() / "themes" / theme;
 }
-
 
 fs::path pathMangle(fs::path const& dir) {
 	fs::path ret;
@@ -126,13 +125,20 @@ std::string getThemePath(std::string const& filename) {
 	}
 }
 
+bool isThemeResource(fs::path filename){
+	try {
+		std::string themefile = getThemePath(filename.filename());
+		return themefile == filename;
+	} catch (...) { return false; }
+}
+
 namespace {
 	bool pathNotExist(fs::path const& p) {
 		if (exists(p)) {
-			std::cout << ">>> Using data path \"" << p.string() << "\"" << std::endl;
+			std::clog << ">>> Using data path \"" << p.string() << "\"" << std::endl;
 			return false;
 		}
-		std::cout << ">>> Not using \"" << p.string() << "\" (does not exist)" << std::endl;
+		std::clog << ">>> Not using \"" << p.string() << "\" (does not exist)" << std::endl;
 		return true;
 	}
 }
@@ -180,6 +186,20 @@ Paths const& getPaths(bool refresh) {
 		paths.resize(it - paths.begin());
 	}
 	return paths;
+}
+
+fs::path getDefaultConfig(fs::path const &configFile) {
+	typedef std::vector<std::string> ConfigList;
+	ConfigList config_list;
+	char const* root = getenv("PERFORMOUS_ROOT");
+	if (root) config_list.push_back(std::string(root) + "/" SHARED_DATA_DIR + configFile.string());
+	fs::path exec = plugin::execname();
+	if (!exec.empty()) config_list.push_back(exec.parent_path().string() + "/../" SHARED_DATA_DIR + configFile.string());
+	ConfigList::const_iterator it = std::find_if(config_list.begin(), config_list.end(), static_cast<bool(&)(fs::path const&)>(fs::exists));
+	if (it == config_list.end()) {
+		throw std::runtime_error("Could not find default config file " + configFile.string());
+	}
+	return *it;
 }
 
 Paths getPathsConfig(std::string const& confOption) {

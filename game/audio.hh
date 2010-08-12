@@ -11,6 +11,7 @@
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/scoped_ptr.hpp>
 
+
 /** @short High level audio playback API **/
 class Audio {
 	struct Impl;

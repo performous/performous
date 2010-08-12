@@ -2,6 +2,7 @@
 
 #include <climits>
 #include <deque>
+#include <vector>
 #include <iostream>
 #include <stdexcept>
 #include <boost/noncopyable.hpp>
@@ -32,21 +33,24 @@ namespace input {
 		boost::xtime time;
 	};
 
+	struct Instrument {
+		Instrument(std::string _name, input::DevType _type, std::vector<int> _mapping) : name(_name), type(_type), mapping(_mapping) {};
+		std::string name;
+		input::DevType type;
+		std::string description;
+		std::string match;
+		std::vector<int> mapping;
+	};
+	typedef std::map<std::string, Instrument> Instruments;
+
 	namespace detail {
-		enum Type { GUITAR_RB_PS3, DRUMS_RB_PS3, GUITAR_RB_XB360, DRUMS_RB_XB360,
-		  GUITAR_GH, GUITAR_GH_XPLORER, GUITAR_HAMA_PS2, DRUMS_GH, DRUMS_MIDI, DANCEPAD_TIGERGAME, DANCEPAD_GENERIC, DANCEPAD_EMS2, DANCEPAD_2TECH };
 		static unsigned int KEYBOARD_ID = UINT_MAX;
 		static unsigned int KEYBOARD_ID2 = KEYBOARD_ID-1;
 		static unsigned int KEYBOARD_ID3 = KEYBOARD_ID-2; // Three ids needed for keyboard guitar/drumkit/dancepad
 
 		class InputDevPrivate {
 		  public:
-			InputDevPrivate() : m_assigned(false), m_type(DRUMS_GH) {
-				for(unsigned int i = 0 ; i < BUTTONS ; i++) {
-					m_pressed[i] = false;
-				}
-			};
-			InputDevPrivate(Type _type) : m_assigned(false), m_type(_type) {
+			InputDevPrivate(const Instrument _instrument) : m_assigned(false), m_instrument(_instrument) {
 				for(unsigned int i = 0 ; i < BUTTONS ; i++) {
 					m_pressed[i] = false;
 				}
@@ -78,40 +82,28 @@ namespace input {
 			void unassign() {m_assigned = false; clearEvents();};
 			bool assigned() {return m_assigned;};
 			bool pressed(int _button) {return m_pressed[_button];};
-			Type type() {return m_type;};
+			std::string name() {return m_instrument.name;};
 			bool type_match(DevType _type) {
-				switch (m_type) {
-				case GUITAR_GH:
-				case GUITAR_GH_XPLORER:
-				case GUITAR_HAMA_PS2:
-				case GUITAR_RB_PS3:
-				case GUITAR_RB_XB360:
-					return _type == GUITAR;
-				case DRUMS_GH:
-				case DRUMS_MIDI:
-				case DRUMS_RB_PS3:
-				case DRUMS_RB_XB360:
-					return _type == DRUMS;
-				case DANCEPAD_GENERIC:
-				case DANCEPAD_EMS2:
-				case DANCEPAD_TIGERGAME:
-				case DANCEPAD_2TECH:
-					return _type == DANCEPAD;
-				}
-				throw std::logic_error("Unhandled DevType");
+				return _type == m_instrument.type;
 			};
+			int buttonFromSDL(unsigned int sdl_button) {
+				try {
+					return m_instrument.mapping.at(sdl_button);
+				} catch(...) {
+					return -1;
+				}
+			}
 		  private:
 			std::deque<Event> m_events;
 			bool m_assigned;
 			bool m_pressed[BUTTONS];
-			Type m_type;
+			Instrument m_instrument;
 		};
 
 		typedef std::map<unsigned int,InputDevPrivate> InputDevs;
 		extern InputDevs devices;
 	}
 
-	int buttonFromSDL(detail::Type _type, unsigned int _sdl_button);
 	NavButton getNav(SDL_Event const &e);
 
 	struct NoDevError: std::runtime_error {
@@ -137,7 +129,7 @@ namespace input {
 			throw NoDevError();
 		};
 		~InputDev() {
-			detail::devices[m_device_id].unassign();
+			detail::devices.find(m_device_id)->second.unassign();
 		};
 		bool tryPoll(Event& _e) { return detail::devices.find(m_device_id)->second.tryPoll(_e); };
 		void addEvent(Event _e) { detail::devices.find(m_device_id)->second.addEvent(_e); };
@@ -158,6 +150,7 @@ namespace input {
 	}
 
 #ifdef USE_PORTMIDI
+	// Warning: MidiDrums should be instanciated after Window (that load joysticks)
 	class MidiDrums {
 	public:
 		static bool enabled() { return true; }

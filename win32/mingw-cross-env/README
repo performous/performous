@@ -1,0 +1,14 @@
+Cross-compiling Performous and dependencies using mingw-cross-env
+=================================================================
+
+This is WIP.
+
+"Mingw cross compiling environment" http://mingw-cross-env.nongnu.org/ provides makefile scripts to download and compile a recent version of gcc cross-compiler and a good amount of additional libraries. Not all of Performous' dependencies are in, but most are and the rest have scripts here.
+
+Use the make-deps.sh script to build the dependencies. Note that it builds a bit more stuff than is strictly required but well just need to live with it. It also builds static libraries, not shared ones.
+
+Note: you could maybe try just building the compiler with this and then try the cross-from-debian scripts with the compiler variables pointing to this, newer mingw.
+
+TODO: Add make-performous.sh script, that creates the needed Toolchain.cmake file and does the manual linking
+
+

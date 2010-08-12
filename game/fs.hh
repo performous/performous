@@ -21,6 +21,9 @@ fs::path getCacheDir();
 /** Get the users theme folder **/
 fs::path getThemeDir();
 
+/** Is the file a theme resource **/
+bool isThemeResource(fs::path);
+
 /** Get the localec folder **/
 fs::path getLocaleDir();
 
@@ -32,6 +35,9 @@ std::string getThemePath(std::string const& filename);
 
 /** Get full path to a share file **/
 std::string getPath(fs::path const& filename);
+
+/** Get full path to a default conguration file **/
+fs::path getDefaultConfig(fs::path const &configFile);
 
 typedef std::vector<fs::path> Paths;
 

@@ -124,6 +124,13 @@ to save the current settings to XML.
 			<long>Performous can try to use webcam as a background video. You can disable it if it annoys you.</long>
 		</locale>
 	</entry>
+	<entry name="graphic/webcamid" type="int" value="-1">
+		<limits min="-1" max="9" step="1" />
+		<locale name="C">
+			<short>Webcam id</short>
+			<long>Use -1 to autodetect or a number starting from 0 to choose specific device.</long>
+		</locale>
+	</entry>
 	<entry name="graphic/3d_notes" type="bool" value="true">
 		<locale name="C">
 			<short>3D notes</short>

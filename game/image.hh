@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cache.hh"
 #include "configuration.hh"
 #include "surface.hh"
 #include "util.hh"
@@ -93,7 +94,14 @@ namespace {
 
 }
 
-template <typename T> void loadSVG(T& target, std::string const& filename, fs::path const& cache_filename = "") {
+template <typename T> void loadSVG(T& target, std::string const& filename) {
+	double factor = config["graphic/svg_lod"].f();
+
+	/* always */ try {
+		cache::loadSVG(target, filename, factor);
+		return;
+	} catch ( ... ) { /* no-op. Failing to read the cache only means more work here */ }
+
 	struct RSVGInit {
 		RSVGInit() { rsvg_init(); }
 		~RSVGInit() { rsvg_term(); }
@@ -108,7 +116,6 @@ template <typename T> void loadSVG(T& target, std::string const& filename, fs::p
 	RsvgDimensionData svgDimension;
 	rsvg_handle_get_dimensions (svgHandle, &svgDimension);
 	rsvg_handle_free(svgHandle);
-	double factor = config["graphic/svg_lod"].f();
 	unsigned int w = nextPow2(svgDimension.width*factor);
 	unsigned int h = nextPow2(svgDimension.height*factor);
 	// Load and raster the SVG
@@ -120,7 +127,10 @@ template <typename T> void loadSVG(T& target, std::string const& filename, fs::p
 	target.load(w, h, pix::CHAR_RGBA, gdk_pixbuf_get_pixels(pb), float(svgDimension.width)/svgDimension.height);
 	gdk_pixbuf_unref(pb);
 
-	if(!cache_filename.empty()) {
+	// write the cache iff the resource is cachable
+	if(cache::cachableSVGResource(filename)) {
+		fs::path const cache_filename = cache::constructSVGCacheFileName(filename, factor);
+
 		// need to reload the svg to have the correct aspect ratio
 		w = svgDimension.width * factor;
 		h = svgDimension.height * factor;
