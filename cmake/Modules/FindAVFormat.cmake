@@ -31,7 +31,7 @@ if(AVFormat_INCLUDE_DIR)
   endforeach(suffix)
 
   if(NOT AVFormat_INCLUDE)
-    message(FATAL_ERROR "Found avformat.h include dir, but not the header file. This is an internal error in FindAVFormat.cmake")
+    message(FATAL_ERROR "Found avformat.h include dir, but not the header file. Perhaps you need to clear CMake cache?")
   endif(NOT AVFormat_INCLUDE)
 endif(AVFormat_INCLUDE_DIR)
 
