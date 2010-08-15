@@ -42,12 +42,16 @@ void Songs::reload_internal() {
 	Profiler prof("Song loading took");
 	Paths paths = getPathsConfig("system/path_songs");
 	for (Paths::iterator it = paths.begin(); m_loading && it != paths.end(); ++it) {
-		if (!fs::is_directory(*it)) { m_debug << ">>> Not scanning: " << *it << " (no such directory)" << std::endl; continue; }
-		m_debug << ">>> Scanning " << *it << std::endl;
-		size_t count = m_songs.size();
-		reload_internal(*it);
-		size_t diff = m_songs.size() - count;
-		if (diff > 0 && m_loading) m_debug << diff << " songs loaded" << std::endl;
+		try {
+			if (!fs::is_directory(*it)) { m_debug << ">>> Not scanning: " << *it << " (no such directory)" << std::endl; continue; }
+			m_debug << ">>> Scanning " << *it << std::endl;
+			size_t count = m_songs.size();
+			reload_internal(*it);
+			size_t diff = m_songs.size() - count;
+			if (diff > 0 && m_loading) m_debug << diff << " songs loaded" << std::endl;
+		} catch (std::exception& e) {
+			m_debug << ">>> Error scanning " << *it << ": " << e.what() << std::endl;
+		}
 	}
 	prof("total");
 	if (m_loading) dumpSongs_internal(); // Dump the songlist to file (if requested)

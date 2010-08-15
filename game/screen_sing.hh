@@ -18,7 +18,6 @@
 
 class Players;
 class Audio;
-class Capture;
 class Database;
 class Video;
 class Menu;
@@ -48,8 +47,8 @@ class ScoreWindow {
 class ScreenSing: public Screen {
   public:
 	/// constructor
-	ScreenSing(std::string const& name, Audio& audio, Capture& capture, Database& database, Backgrounds& bgs):
-	  Screen(name), m_audio(audio), m_capture(capture), m_database(database), m_backgrounds(bgs), m_latencyAV(), m_only_singers_alive(true), m_practmode(false)
+	ScreenSing(std::string const& name, Audio& audio, Database& database, Backgrounds& bgs):
+	  Screen(name), m_audio(audio), m_database(database), m_backgrounds(bgs), m_latencyAV(), m_only_singers_alive(true), m_practmode(false)
 	{}
 	void enter();
 	void exit();
@@ -73,7 +72,6 @@ class ScreenSing: public Screen {
 	void danceLayout(double time);
 	void drawMenu();
 	Audio& m_audio;
-	Capture& m_capture;
 	Database& m_database;
 	Backgrounds& m_backgrounds;
 	boost::shared_ptr<Song> m_song; /// Pointer to the current song

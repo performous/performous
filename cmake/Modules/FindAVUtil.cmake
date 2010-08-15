@@ -29,7 +29,7 @@ if(AVUtil_INCLUDE_DIR)
   endforeach(suffix)
 
   if(NOT AVUtil_INCLUDE)
-    message(FATAL_ERROR "Found avutil.h include dir, but not the header file. This is an internal error in FindAVUtil.cmake")
+    message(FATAL_ERROR "Found avutil.h include dir, but not the header file. Perhaps you need to clear CMake cache?")
   endif(NOT AVUtil_INCLUDE)
 endif(AVUtil_INCLUDE_DIR)
 

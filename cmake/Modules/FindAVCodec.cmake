@@ -33,7 +33,7 @@ if(AVCodec_INCLUDE_DIR)
   endforeach(suffix)
 
   if(NOT AVCodec_INCLUDE)
-    message(FATAL_ERROR "Found avcodec.h include dir, but not the header file. This is an internal error in FindAVCodec.cmake")
+    message(FATAL_ERROR "Found avcodec.h include dir, but not the header file. Perhaps you need to clear CMake cache?")
   endif(NOT AVCodec_INCLUDE)
 endif(AVCodec_INCLUDE_DIR)
 

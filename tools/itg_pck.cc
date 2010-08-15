@@ -46,7 +46,7 @@ struct Extract {
 		std::string ext;
 		if (file.mode == 1) {
 			std::vector<char> buf2(file.size);
-			z_stream strm = {};
+			z_stream strm = z_stream();
 			strm.avail_in = buffer.size();
 			strm.next_in = reinterpret_cast<Bytef*>(&buffer[0]);
 			strm.avail_out = buf2.size();

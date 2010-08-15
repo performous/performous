@@ -78,7 +78,7 @@
 # Force proper redetection (to allow e.g. changed COMPONENTS)
 set(Boost_FOUND false)
 
-find_package(Boost QUIET COMPONENTS ${Boost_FIND_COMPONENTS} NO_MODULE)
+#find_package(Boost QUIET COMPONENTS ${Boost_FIND_COMPONENTS} NO_MODULE)
 
 if (Boost_FOUND)
   if (Boost_FIND_COMPONENTS)

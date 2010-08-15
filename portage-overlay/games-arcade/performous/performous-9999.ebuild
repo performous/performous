@@ -34,7 +34,7 @@ LICENSE="GPL-2
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 
-IUSE="alsa debug editor gstreamer jack midi portaudio pulseaudio songs tools webcam"
+IUSE="debug editor midi songs tools webcam"
 
 RDEPEND="gnome-base/librsvg
 	>=dev-libs/boost-1.39.0
@@ -48,11 +48,7 @@ RDEPEND="gnome-base/librsvg
 	editor? ( media-gfx/imagemagick[png] )
 	webcam? ( media-libs/opencv[v4l] )
 	>=media-video/ffmpeg-0.4.9_p20070616-r20
-	alsa? ( media-libs/alsa-lib )
-	jack? ( media-sound/jack-audio-connection-kit )
-	portaudio? ( media-libs/portaudio )
-	gstreamer? ( media-libs/gstreamer )
-	pulseaudio? ( media-sound/pulseaudio )
+	media-libs/portaudio
 	sys-apps/help2man
 	!games-arcade/ultrastar-ng"
 # Waiting for portmidi to enter portage (#90614)
@@ -77,19 +73,12 @@ src_unpack() {
 
 src_configure() {
 	local mycmakeargs="
-		$(cmake-utils_use alsa LibDA_PLUGIN_ALSA)
-		$(cmake-utils_use jack LibDA_PLUGIN_JACK)
-		$(cmake-utils_use gstreamer LibDA_PLUGIN_GSTREAMER)
-		$(cmake-utils_use portaudio LibDA_PLUGIN_PORTAUDIO)
-		$(cmake-utils_use pulseaudio LibDA_PLUGIN_PULSEAUDIO)
 		$(cmake-utils_use_enable tools TOOLS)
 		$(cmake-utils_use_enable editor EDITOR)
 		$(cmake-utils_use_no webcam WEBCAM)
 		-DCMAKE_INSTALL_PREFIX=${GAMES_PREFIX}
 		-DSHARE_INSTALL=share/performous
 		-DLOCALE_DIR=/usr/share
-		-DLIBDA_AUTODETECT_PLUGINS=false
-		-DLIBDA_PLUGIN_TESTING=false
 		-DCMAKE_BUILD_TYPE=Release"
 #	local mycmakeargs="
 #		$(cmake-utils_use_no midi MIDI)

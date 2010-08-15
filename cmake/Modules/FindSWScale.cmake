@@ -31,7 +31,7 @@ if(SWScale_INCLUDE_DIR)
   endforeach(suffix)
 
   if(NOT SWScale_INCLUDE)
-    message(FATAL_ERROR "Found swscale.h include dir, but not the header file. This is an internal error in FindSWScale.cmake")
+    message(FATAL_ERROR "Found swscale.h include dir, but not the header file. Maybe you need to clear CMake cache?")
   endif(NOT SWScale_INCLUDE)
 endif(SWScale_INCLUDE_DIR)
 

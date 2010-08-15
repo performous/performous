@@ -2,13 +2,12 @@
 
 #include "fs.hh"
 #include "audio.hh"
-#include "record.hh"
 #include "i18n.hh"
 #include "joystick.hh"
 #include "theme.hh"
 #include "menu.hh"
 
-ScreenIntro::ScreenIntro(std::string const& name, Audio& audio, Capture& capture): Screen(name), m_audio(audio), m_capture(capture), m_first(true) {
+ScreenIntro::ScreenIntro(std::string const& name, Audio& audio): Screen(name), m_audio(audio), m_first(true) {
 }
 
 void ScreenIntro::enter() {
@@ -22,7 +21,6 @@ void ScreenIntro::enter() {
 	if( m_first ) {
 		std::string msg;
 		if (!m_audio.isOpen()) msg = _("No playback devices could be used.\n");
-		if (m_capture.analyzers().empty()) msg += _("No microphones found.\n");
 		if (!msg.empty()) m_dialog.reset(new Dialog(msg + _("\nPlease configure some before playing.")));
 		m_first = false;
 	} else {

@@ -6,7 +6,6 @@
 #include "menu.hh"
 
 class Audio;
-class Capture;
 class ThemeIntro;
 class MenuOption;
 
@@ -14,7 +13,7 @@ class MenuOption;
 class ScreenIntro : public Screen {
   public:
 	/// constructor
-	ScreenIntro(std::string const& name, Audio& audio, Capture& capture);
+	ScreenIntro(std::string const& name, Audio& audio);
 	void enter();
 	void exit();
 	void manageEvent(SDL_Event event);
@@ -25,7 +24,6 @@ class ScreenIntro : public Screen {
 
   private:
 	Audio& m_audio;
-	Capture& m_capture;
 	boost::scoped_ptr<ThemeIntro> theme;
 	boost::scoped_ptr<Dialog> m_dialog;
 	Menu m_menu;

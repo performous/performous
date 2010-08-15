@@ -1,31 +1,31 @@
 #include "screen_practice.hh"
 
+#include "audio.hh"
 #include "util.hh"
 #include "fs.hh"
-#include "record.hh"
-#include "audio.hh"
+#include "joystick.hh"
 #include "theme.hh"
 #include "progressbar.hh"
 
-ScreenPractice::ScreenPractice(std::string const& name, Audio& audio, Capture& capture):
-  Screen(name), m_audio(audio), m_capture(capture)
+ScreenPractice::ScreenPractice(std::string const& name, Audio& audio):
+  Screen(name), m_audio(audio)
 {}
 
 void ScreenPractice::enter() {
 	m_audio.playMusic(getThemePath("practice.ogg"));
 	theme.reset(new ThemePractice());
-	// Draw vu meters
-	for (unsigned int i = 0, mics = m_capture.analyzers().size(); i < mics; ++i) {
-		m_vumeters.push_back(new ProgressBar(getThemePath("vumeter_bg.svg"), getThemePath("vumeter_fg.svg"), ProgressBar::VERTICAL, 0.136, 0.023));
-		m_vumeters.back().dimensions.screenBottom().left(-0.4 + i * 0.2).fixedWidth(0.04);
+	// draw vu meters
+	for (unsigned int i = 0, mics = m_audio.analyzers().size(); i < mics; ++i) {
+		ProgressBar* b;
+		m_vumeters.push_back(b = new ProgressBar(getThemePath("vumeter_bg.svg"), getThemePath("vumeter_fg.svg"), ProgressBar::VERTICAL, 0.136, 0.023));
+		b->dimensions.screenBottom().left(-0.4 + i * 0.2).fixedWidth(0.04);
 	}
-	unsigned int sr = m_audio.getSR();
-	m_samples.push_back(Sample(getPath("sounds/drum_bass.ogg"), sr));
-	m_samples.push_back(Sample(getPath("sounds/drum_snare.ogg"), sr));
-	m_samples.push_back(Sample(getPath("sounds/drum_hi-hat.ogg"), sr));
-	m_samples.push_back(Sample(getPath("sounds/drum_tom1.ogg"), sr));
-	m_samples.push_back(Sample(getPath("sounds/drum_cymbal.ogg"), sr));
-	//m_samples.push_back(Sample(getPath("sounds/drum_tom2.ogg"), sr));
+	m_samples.push_back("drum bass");
+	m_samples.push_back("drum snare");
+	m_samples.push_back("drum hi-hat");
+	m_samples.push_back("drum tom1");
+	m_samples.push_back("drum cymbal");
+	//m_samples.push_back("drum tom2");
 }
 
 void ScreenPractice::exit() {
@@ -43,7 +43,7 @@ void ScreenPractice::manageEvent(SDL_Event event) {
 	else if (event.type == SDL_JOYBUTTONDOWN // Play drum sounds here
 	  && input::detail::devices.find(event.jbutton.which)->second.type_match(input::DRUMS)) {
 		int b = input::detail::devices.find(event.jbutton.which)->second.buttonFromSDL(event.jbutton.button);
-		if (b != -1) m_audio.play(m_samples[unsigned(b) % m_samples.size()], "audio/fail_volume");
+		if (b != -1) m_audio.playSample(m_samples[unsigned(b) % m_samples.size()]);
 	}
 }
 
@@ -54,7 +54,7 @@ void ScreenPractice::draw() {
 
 void ScreenPractice::draw_analyzers() {
 	MusicalScale scale;
-	boost::ptr_vector<Analyzer>& analyzers = m_capture.analyzers();
+	boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
 	if (analyzers.empty()) return;
 	double textPower = -getInf();
 	double textFreq = 0.0;
