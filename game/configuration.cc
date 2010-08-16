@@ -2,11 +2,11 @@
 
 #include "fs.hh"
 #include "util.hh"
+#include "execname.hpp"
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 #include <libxml++/libxml++.h>
-#include <plugin++/execname.hpp>
 #include <algorithm>
 #include <iomanip>
 #include <stdexcept>

@@ -1,13 +1,13 @@
 #pragma once
 
 #include "util.hh"
+#include "libda/sample.hpp"
 #include <boost/circular_buffer.hpp>
 #include <boost/ptr_container/ptr_set.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
-#include <libda/sample.hpp>
 #include <vector>
 
 using boost::uint8_t;

@@ -2,12 +2,12 @@
 
 #include "configuration.hh"
 #include "util.hh"
+#include "libda/fft.hpp"  // For M_PI
+#include "libda/portaudio.hpp"
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/lexical_cast.hpp>
-#include <libda/fft.hpp>  // For M_PI
-#include <libda/portaudio.hpp>
 #include <cmath>
 #include <iostream>
 #include <map>

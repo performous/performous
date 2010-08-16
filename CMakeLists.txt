@@ -28,10 +28,6 @@ endif(WIN32)
 
 mark_as_advanced(SHARE_INSTALL)
 
-# Need to find the headers even if they haven't been installed yet:
-include_directories(libs/plugin++/include)
-include_directories(libs/libda/include)
-
 #need to put here do setting LOCALE_DIR variable
 find_package(Gettext)
 if(Gettext_FOUND)
@@ -57,13 +53,10 @@ if(Gettext_FOUND)
 		endif()
 	endif(NOT LOCALE_DIR)
 endif(Gettext_FOUND)
-add_subdirectory(libs)
 add_subdirectory(themes)
 add_subdirectory(data)
 add_subdirectory(game)
 add_subdirectory(docs)
-
-set(LIB_SUFFIX "" CACHE STRING "Optional suffix to use on lib folders (e.g. 64 for lib64)")
 
 option(ENABLE_EDITOR "Enable experimental song editor (doesn't work)" OFF)
 

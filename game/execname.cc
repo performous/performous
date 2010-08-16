@@ -1,4 +1,4 @@
-#include <plugin++/execname.hpp>
+#include "execname.hpp"
 
 namespace fs = boost::filesystem;
 

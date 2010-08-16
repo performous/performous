@@ -2,7 +2,7 @@
 
 #include "config.hh"
 #include "configuration.hh"
-#include <plugin++/execname.hpp>
+#include "execname.hpp"
 #include <cstdlib>
 #include <iostream>
 #include <sstream>
