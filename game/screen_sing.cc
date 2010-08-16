@@ -58,7 +58,9 @@ void ScreenSing::enter() {
 	}
 	// Initialize webcam
 	if (config["graphic/webcam"].b() && Webcam::enabled()) {
-		m_cam.reset(new Webcam(config["graphic/webcamid"].i()));
+		try {
+			m_cam.reset(new Webcam(config["graphic/webcamid"].i()));
+		} catch (std::exception& e) { std::cout << e.what() << std::endl; };
 	}
 	// Load video
 	if (!m_song->video.empty() && config["graphic/video"].b()) {
@@ -76,7 +78,6 @@ void ScreenSing::enter() {
 			}
 		}
 	}
-	//FIXME: this line crashes under windows. Have to fix. At moment, just don't use it on Windows
 	m_pause_icon.reset(new Surface(getThemePath("sing_pause.svg")));
 	m_help.reset(new Surface(getThemePath("instrumenthelp.svg")));
 	m_progress.reset(new ProgressBar(getThemePath("sing_progressbg.svg"), getThemePath("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01f, 0.01f, true));
@@ -252,7 +253,8 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		if (key == SDLK_w) dispInFlash(++config["game/pitch"]); // Toggle pitch wave
 		// Toggle webcam
 		if (key == SDLK_a && Webcam::enabled()) {
-			if (!m_cam) m_cam.reset(new Webcam(config["graphic/webcamid"].i())); // Initialize if we haven't done that already
+			// Initialize if we haven't done that already
+			if (!m_cam) { try { m_cam.reset(new Webcam(config["graphic/webcamid"].i())); } catch (...) { }; }
 			if (m_cam) { dispInFlash(++config["graphic/webcam"]); m_cam->pause(!config["graphic/webcam"].b()); }
 		}
 		// Latency settings
