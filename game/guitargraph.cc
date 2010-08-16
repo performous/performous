@@ -128,36 +128,41 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number,
 void GuitarGraph::setupJoinMenu() {
 	m_menu.clear();
 	updateJoinMenu();
-	// Create track menu
-	MenuOptions trackmenu;
-	for (InstrumentTracksConstPtr::const_iterator it = m_instrumentTracks.begin(); it != m_instrumentTracks.end(); ++it) {
-		trackmenu.push_back(MenuOption(it->first, _("Select track to play"), &m_selectedTrack, ConfigItem(it->first)));
-	}
-	// Create difficulty menu
-	MenuOptions diffmenu;
-	for (int level = 0; level < DIFFICULTYCOUNT; ++level) {
-		if (difficulty(Difficulty(level), true))
-			diffmenu.push_back(MenuOption(diffv[level].name, _("Select difficulty level"), &m_selectedDifficulty, ConfigItem(level)));
-	}
 	// Populate root menu
 	m_menu.add(MenuOption(_("Ready!"), _("Start performing!")));
-	m_menu.add(MenuOption(_("Track"), "", trackmenu));
-	m_menu.back().setDynamicComment(m_trackComment);
-	m_menu.add(MenuOption(_("Difficulty"), "", diffmenu));
-	m_menu.back().setDynamicComment(m_difficultyComment);
+	// Create track option only for guitars
+	if (!m_drums) {
+		ConfigItem::OptionList ol;
+		// Add tracks to option list
+		for (InstrumentTracksConstPtr::const_iterator it = m_instrumentTracks.begin(); it != m_instrumentTracks.end(); ++it) {
+			ol.push_back(it->first);
+		}
+		m_selectedTrack = ConfigItem(ol); // Create a ConfigItem from the option list
+		m_menu.add(MenuOption("", _("Track"), &m_selectedTrack)); // MenuOption that cycles the options
+		m_menu.back().setDynamicName(m_trackOpt); // Set the title to be dynamic
+	}
+	{ // Create difficulty opt
+		ConfigItem::OptionList ol;
+		// Add difficulties to the option list
+		for (int level = 0; level < DIFFICULTYCOUNT; ++level) {
+			if (difficulty(Difficulty(level), true))
+				ol.push_back(boost::lexical_cast<std::string>(level));
+		}
+		m_selectedDifficulty = ConfigItem(ol); // Create a ConfigItem from the option list
+		m_menu.add(MenuOption("", _("Difficulty"), &m_selectedDifficulty)); // MenuOption that cycles the options
+		m_menu.back().setDynamicName(m_difficultyOpt); // Set the title to be dynamic
+	}
 	m_menu.add(MenuOption(_("Lefty-mode"), "", &m_leftymode));
-	m_menu.back().setDynamicComment(m_leftyComment);
+	m_menu.back().setDynamicComment(m_leftyOpt);
 	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
 }
 
 void GuitarGraph::updateJoinMenu() {
 	std::string s("\n (");
 	std::string le = m_leftymode.b() ? _("ON") : _("OFF");
-	m_trackComment = _("Select track") + s + getTrack() + ")";
-	m_difficultyComment =  _("Select difficulty") + s + getDifficultyString() + ")";
-	m_leftyComment = _("Toggle lefty-mode") + s + le + ")";
-	m_selectedTrack = ConfigItem(getTrack());
-	m_selectedDifficulty = ConfigItem(m_level);
+	m_trackOpt = getTrack();
+	m_difficultyOpt =  getDifficultyString();
+	m_leftyOpt = _("Toggle lefty-mode") + s + le + ")";
 }
 
 /// Load the appropriate neck texture
@@ -176,8 +181,6 @@ void GuitarGraph::changeTrack(int dir) {
 	else if (m_track_index == (--m_instrumentTracks.end())) m_track_index = (--m_instrumentTracks.end());
 	difficultyAuto(true);
 	updateNeck();
-	setupJoinMenu();
-	m_menu.select(1); // Restore selection to the track menu item
 }
 
 /// Set specific track
@@ -186,8 +189,6 @@ void GuitarGraph::setTrack(const std::string& track) {
 	if (it != m_instrumentTracks.end()) m_track_index = it;
 	difficultyAuto(true);
 	updateNeck();
-	setupJoinMenu();
-	m_menu.select(1); // Restore selection to the track menu item
 }
 
 /// Get the difficulty as displayable string
@@ -233,7 +234,6 @@ bool GuitarGraph::difficulty(Difficulty level, bool check_only) {
 		updateChords();
 		return false;
 	}
-	updateJoinMenu();
 	return true;
 }
 
@@ -291,21 +291,25 @@ void GuitarGraph::engine() {
 		if (menuOpen()) {
 			// Check first regular keys
 			if (ev.type == input::Event::PRESS && ev.button >= 0 && ev.button < m_pads) {
-				int sel = m_drums ? ((ev.button + m_pads - 1) % m_pads) : ev.button;
-				m_menu.select(sel);
-				m_menu.action();
+				if (m_drums && ev.button == 0) m_menu.action(); // Kick substitutes for strum
+				else {
+					int sel = m_drums ? ((ev.button + m_pads - 1) % m_pads) : ev.button;
+					std::cout << sel << " " << ev.button << std::endl;
+					m_menu.select(sel);
+				}
 			}
 			// Strum (strum of keyboard as guitar doesn't generate nav-events)
-			//else if (ev.type == input::Event::PICK && ev.button == 0) m_menu.move(1);
-			//else if (ev.type == input::Event::PICK && ev.button == 1) m_menu.move(-1);
+			else if (ev.type == input::Event::PICK && ev.button == 0) m_menu.action(1);
+			else if (ev.type == input::Event::PICK && ev.button == 1) m_menu.action(-1);
 			//else { // Try nav keys (arrows)
 			//	if (ev.nav == input::START) m_menu.action();
 			//	else if (ev.nav == input::DOWN || ev.nav == input::RIGHT) m_menu.move(1);
 			//	else if (ev.nav == input::UP || ev.nav == input::LEFT) m_menu.move(-1);
 			//}
 			// See if anything changed
-			if (m_selectedTrack.s() != getTrack()) setTrack(m_selectedTrack.s());
-			else if (m_selectedDifficulty.i() != m_level) difficulty(Difficulty(m_selectedDifficulty.i()));
+			if (!m_drums && m_selectedTrack.so() != getTrack()) setTrack(m_selectedTrack.so());
+			else if (boost::lexical_cast<int>(m_selectedDifficulty.so()) != m_level)
+				difficulty(Difficulty(boost::lexical_cast<int>(m_selectedDifficulty.so())));
 			// Sync menu items & captions
 			updateJoinMenu();
 		// Playing

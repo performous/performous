@@ -131,9 +131,9 @@ class InstrumentGraph {
 	// Dynamic stuff for join menu
 	ConfigItem m_selectedTrack; /// menu modifies this to select track
 	ConfigItem m_selectedDifficulty; /// menu modifies this to select difficulty
-	std::string m_trackComment;
-	std::string m_difficultyComment;
-	std::string m_leftyComment;
+	std::string m_trackOpt;
+	std::string m_difficultyOpt;
+	std::string m_leftyOpt;
 
 	// Misc counters etc.
 	int m_pads; /// how many panels the current gaming mode uses

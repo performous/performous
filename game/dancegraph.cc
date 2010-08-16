@@ -119,16 +119,16 @@ void DanceGraph::setupJoinMenu() {
 	// Populate root menu
 	m_menu.add(MenuOption(_("Ready!"), _("Start performing!")));
 	m_menu.add(MenuOption(_("Track"), "", trackmenu));
-	m_menu.back().setDynamicComment(m_trackComment);
+	m_menu.back().setDynamicComment(m_trackOpt);
 	m_menu.add(MenuOption(_("Difficulty"), "", diffmenu));
-	m_menu.back().setDynamicComment(m_difficultyComment);
+	m_menu.back().setDynamicComment(m_difficultyOpt);
 	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
 }
 
 void DanceGraph::updateJoinMenu() {
 	std::string s("\n (");
-	m_trackComment = _("Select track") + s + getTrack() + ")";
-	m_difficultyComment =  _("Select difficulty") + s + getDifficultyString() + ")";
+	m_trackOpt = _("Select track") + s + getTrack() + ")";
+	m_difficultyOpt =  _("Select difficulty") + s + getDifficultyString() + ")";
 	m_selectedTrack = ConfigItem(getTrack());
 	m_selectedDifficulty = ConfigItem(m_level);
 }
