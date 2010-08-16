@@ -1,9 +1,0 @@
-#ifndef PLUGIN_CONFIG_H
-#define PLUGIN_CONFIG_H
-
-#define PLUGIN_VERSION "@Plugin++_VERSION@"
-#define PLUGIN_VERSION_MAJOR @Plugin++_VERSION_MAJOR@
-#define PLUGIN_VERSION_MINOR @Plugin++_VERSION_MINOR@
-
-#endif
-

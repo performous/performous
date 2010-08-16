@@ -70,10 +70,6 @@ find_package(Boost 1.36 REQUIRED COMPONENTS thread date_time program_options reg
 include_directories(${Boost_INCLUDE_DIRS})
 list(APPEND LIBS ${Boost_LIBRARIES})
 
-# Our own libraries
-list(APPEND LIBS plugin++)
-include_directories(../libs/libda)
-
 # Find all the libs that don't require extra parameters
 foreach(lib ${OUR_LIBS} SDL PangoCairo LibRSVG LibXML++ GLEW AVFormat SWScale OpenGL Z Jpeg Png PortAudio)
 	find_package(${lib} REQUIRED)
