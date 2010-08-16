@@ -75,6 +75,7 @@ public:
 	typedef std::map<std::string,std::string> Files;
 	Music(Files const& filenames, unsigned int sr, bool preview): srate(sr), m_pos(), m_syncTime(getTime()), m_preview(preview), fadeLevel(), fadeRate() {
 		for (Files::const_iterator it = filenames.begin(), end = filenames.end(); it != end; ++it) {
+			if (it->second.empty()) continue; // Skip tracks with no filenames; FIXME: Why do we even have those here, shouldn't they be eliminated earlier?
 			tracks.insert(it->first, std::auto_ptr<Track>(new Track(it->second, sr)));
 		}
 	}
