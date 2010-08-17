@@ -12,6 +12,8 @@
 #include <iostream>
 #include <map>
 
+using namespace boost::posix_time;
+
 namespace {
 	std::map<std::string, std::string> parseKeyValuePairs(const std::string& st) {
 		std::map<std::string, std::string> ret;
@@ -49,7 +51,6 @@ namespace {
 	}
 }
 
-
 class Music {
 	struct Track {
 		FFmpeg mpeg;
@@ -60,34 +61,21 @@ class Music {
 	Tracks tracks; ///< Audio decoders
 	double srate; ///< Sample rate
 	int64_t m_pos; ///< Current sample position
-	boost::posix_time::ptime m_syncTime; ///< Time of the previous audio timeSync
-	boost::posix_time::ptime m_baseTime; ///< A reference time
-	double m_basePosition; ///< Position at the base time
+	ptime m_baseTime; ///< A reference time (the beginning of the song)
+	time_duration m_nextTime; ///< Start of the next audio block (needed for time monotonicity)
 	bool m_preview;
 
-	static boost::posix_time::ptime getTime() { return boost::posix_time::microsec_clock::universal_time(); }
-	double pos_internal() const { return double(m_pos) / srate / 2.0; }
-	double seconds(boost::posix_time::time_duration const& d) const { return 1e-6 * d.total_microseconds(); }
+	static ptime getTime() { return microsec_clock::universal_time(); }
+	time_duration durationOf(size_t samples) const { return microseconds(1e6 * samples / srate / 2.0); }
 	/**
-	* Adjust sync, duration of the audio.
-	* This works by using mostly system time and
-	* syncing it with the audio time every few seconds
-	* (or when something out-of-the-ordinary happens).
+	* Timing code for precise monotonic time. Very simple, far from perfect.
+	* This function is called at a beginning of the audio callback, before modifying m_pos
+	* @param samples the number of samples in the current block (used for calculating block end time)
 	*/
-	void timeSync() {
-		const boost::posix_time::ptime now = getTime();
-		// Time to create a new reference time?
-		// 1. We haven't recieved any audio frames for a while (maybe audio was paused)
-		// 2. Time has been running free for several seconds (so let's sync every once in a while)
-		// 3. Prediction is radically different from last buffer time (due to e.g. seeking)
-		if ( seconds(now - m_syncTime) > 0.2            // Time since last audio buffer
-		  || seconds(now - m_baseTime) > 10.0           // Time since last time base
-		  || std::abs(pos() - pos_internal()) > 1.0 )   // Prediction difference
-		{
-			m_baseTime = now;
-			m_basePosition = pos_internal();
-		}
-		m_syncTime = now;
+	void timeSync(size_t samples) {
+		time_duration begin = durationOf(m_pos);  // Current block begin position in song
+		m_nextTime = begin + durationOf(samples);  // Current block end position in song
+		m_baseTime = getTime() - begin;  // Recalibrate base time to beginning of the song
 	}
 
 
@@ -96,7 +84,7 @@ public:
 	double fadeRate;
 	typedef std::map<std::string,std::string> Files;
 	Music(Files const& filenames, unsigned int sr, bool preview):
-	  srate(sr), m_pos(), m_syncTime(getTime()), m_baseTime(m_syncTime), m_basePosition(0),
+	  srate(sr), m_pos(), m_baseTime(getTime()),
 	  m_preview(preview), fadeLevel(), fadeRate() {
 		for (Files::const_iterator it = filenames.begin(), end = filenames.end(); it != end; ++it) {
 			if (it->second.empty()) continue; // Skip tracks with no filenames; FIXME: Why do we even have those here, shouldn't they be eliminated earlier?
@@ -105,14 +93,15 @@ public:
 	}
 	/// Sums the stream to output sample range, returns true if the stream still has audio left afterwards.
 	bool operator()(float* begin, float* end) {
+		size_t samples = end - begin;
+		timeSync(samples); // Keep audio synced
 		bool eof = true;
 		std::vector<float> mixbuf(end - begin);
 		for (Tracks::iterator it = tracks.begin(), itend = tracks.end(); it != itend; ++it) {
 			Track& t = *it->second;
 			if (t.mpeg.audioQueue(&*mixbuf.begin(), &*mixbuf.end(), m_pos, t.fadeLevel)) eof = false;
 		}
-		m_pos += end - begin;
-		timeSync(); // Keep audio synced
+		m_pos += samples;
 		for (size_t i = 0, iend = mixbuf.size(); i != iend; ++i) {
 			if (i % 2 == 0) {
 				fadeLevel += fadeRate;
@@ -124,13 +113,11 @@ public:
 		return !eof;
 	}
 	void seek(double time) { m_pos = time * srate * 2.0; }
-	/// Get current position in seconds
-	double pos() {
-		const boost::posix_time::ptime now = getTime();
-		// If more than 200 ms since last sync, freeze time (audio is paused)
-		return (seconds(now - m_syncTime) > 0.2            // Time since last audio buffer
-			? pos_internal()                               // Time calculated from sample position
-			: m_basePosition + seconds(now - m_baseTime)); // Time calculated from reference point
+	/// Get the current position in seconds
+	double pos() const {
+		time_duration p = getTime() - m_baseTime;  // Simple precise position
+		if (p > m_nextTime) p = m_nextTime;  // Cap for monotonicity
+		return p.total_microseconds() * 1e-6;
 	}
 	double duration() const {
 		double dur = 0.0;
