@@ -61,19 +61,43 @@ class Music {
 	double srate; ///< Sample rate
 	int64_t m_pos; ///< Current sample position
 	boost::posix_time::ptime m_syncTime; ///< Time of the previous audio timeSync
+	boost::posix_time::ptime m_baseTime; ///< A reference time
+	double m_basePosition; ///< Position at the base time
 	bool m_preview;
 
 	static boost::posix_time::ptime getTime() { return boost::posix_time::microsec_clock::universal_time(); }
 	double pos_internal() const { return double(m_pos) / srate / 2.0; }
 	double seconds(boost::posix_time::time_duration const& d) const { return 1e-6 * d.total_microseconds(); }
-	/// Do stuff for correcting time codes
-	void timeSync() { m_syncTime = getTime(); }
+	/**
+	* Adjust sync, duration of the audio.
+	* This works by using mostly system time and
+	* syncing it with the audio time every few seconds
+	* (or when something out-of-the-ordinary happens).
+	*/
+	void timeSync() {
+		const boost::posix_time::ptime now = getTime();
+		// Time to create a new reference time?
+		// 1. We haven't recieved any audio frames for a while (maybe audio was paused)
+		// 2. Time has been running free for several seconds (so let's sync every once in a while)
+		// 3. Prediction is radically different from last buffer time (due to e.g. seeking)
+		if ( seconds(now - m_syncTime) > 0.2            // Time since last audio buffer
+		  || seconds(now - m_baseTime) > 10.0           // Time since last time base
+		  || std::abs(pos() - pos_internal()) > 1.0 )   // Prediction difference
+		{
+			m_baseTime = now;
+			m_basePosition = pos_internal();
+		}
+		m_syncTime = now;
+	}
+
 
 public:
 	double fadeLevel;
 	double fadeRate;
 	typedef std::map<std::string,std::string> Files;
-	Music(Files const& filenames, unsigned int sr, bool preview): srate(sr), m_pos(), m_syncTime(getTime()), m_preview(preview), fadeLevel(), fadeRate() {
+	Music(Files const& filenames, unsigned int sr, bool preview):
+	  srate(sr), m_pos(), m_syncTime(getTime()), m_baseTime(m_syncTime), m_basePosition(0),
+	  m_preview(preview), fadeLevel(), fadeRate() {
 		for (Files::const_iterator it = filenames.begin(), end = filenames.end(); it != end; ++it) {
 			if (it->second.empty()) continue; // Skip tracks with no filenames; FIXME: Why do we even have those here, shouldn't they be eliminated earlier?
 			tracks.insert(it->first, std::auto_ptr<Track>(new Track(it->second, sr)));
@@ -102,9 +126,11 @@ public:
 	void seek(double time) { m_pos = time * srate * 2.0; }
 	/// Get current position in seconds
 	double pos() {
-		double delay = seconds(getTime() - m_syncTime); // Delay since last sync
-		if (delay > 0.150) delay = 0; // If delay gets long, something is fishy (or pause is on)
-		return pos_internal() + delay; // Adjust internal time
+		const boost::posix_time::ptime now = getTime();
+		// If more than 200 ms since last sync, freeze time (audio is paused)
+		return (seconds(now - m_syncTime) > 0.2            // Time since last audio buffer
+			? pos_internal()                               // Time calculated from sample position
+			: m_basePosition + seconds(now - m_baseTime)); // Time calculated from reference point
 	}
 	double duration() const {
 		double dur = 0.0;
