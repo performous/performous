@@ -266,12 +266,8 @@ void GuitarGraph::engine() {
 			break;
 		}
 		// Handle Start/Select keypresses
-		if (ev.nav == input::CANCEL) m_menu.toggle();
-		if (ev.nav == input::START && !menuOpen()) ev.button = input::STARPOWER_BUTTON;
-		//if (ev.type == input::Event::PRESS && ev.button > input::STARPOWER_BUTTON) {
-			//if (ev.button == 9) ev.button = input::STARPOWER_BUTTON; // Start works for GodMode
-			//else continue;
-		//}
+		if (ev.nav == input::CANCEL && !menuOpen()) ev.button = input::STARPOWER_BUTTON; // Select = GodMode
+		if (ev.nav == input::START && !menuOpen()) { m_menu.open(); continue; }
 		// Guitar specific actions
 		if (!m_drums) {
 			if ((ev.type == input::Event::PRESS || ev.type == input::Event::RELEASE) && ev.button == input::STARPOWER_BUTTON) {
@@ -292,20 +288,15 @@ void GuitarGraph::engine() {
 			// Check first regular keys
 			if (ev.type == input::Event::PRESS && ev.button >= 0 && ev.button < m_pads) {
 				if (m_drums && ev.button == 0) m_menu.action(); // Kick substitutes for strum
-				else {
+				else { // Hilight item
 					int sel = m_drums ? ((ev.button + m_pads - 1) % m_pads) : ev.button;
-					std::cout << sel << " " << ev.button << std::endl;
 					m_menu.select(sel);
 				}
 			}
-			// Strum (strum of keyboard as guitar doesn't generate nav-events)
+			// Strum (strum of keyboard-as-guitar doesn't generate nav-events)
 			else if (ev.type == input::Event::PICK && ev.button == 0) m_menu.action(1);
 			else if (ev.type == input::Event::PICK && ev.button == 1) m_menu.action(-1);
-			//else { // Try nav keys (arrows)
-			//	if (ev.nav == input::START) m_menu.action();
-			//	else if (ev.nav == input::DOWN || ev.nav == input::RIGHT) m_menu.move(1);
-			//	else if (ev.nav == input::UP || ev.nav == input::LEFT) m_menu.move(-1);
-			//}
+			else if (ev.nav == input::START) m_menu.action();
 			// See if anything changed
 			if (!m_drums && m_selectedTrack.so() != getTrack()) setTrack(m_selectedTrack.so());
 			else if (boost::lexical_cast<int>(m_selectedDifficulty.so()) != m_level)
