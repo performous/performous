@@ -133,23 +133,31 @@ void GuitarGraph::setupJoinMenu() {
 	// Create track option only for guitars
 	if (!m_drums) {
 		ConfigItem::OptionList ol;
+		int i = 0, cur = 0;
 		// Add tracks to option list
-		for (InstrumentTracksConstPtr::const_iterator it = m_instrumentTracks.begin(); it != m_instrumentTracks.end(); ++it) {
+		for (InstrumentTracksConstPtr::const_iterator it = m_instrumentTracks.begin(); it != m_instrumentTracks.end(); ++it, ++i) {
 			ol.push_back(it->first);
+			if (m_trackOpt == it->first) cur = i; // Find the index of current track
 		}
 		m_selectedTrack = ConfigItem(ol); // Create a ConfigItem from the option list
-		m_menu.add(MenuOption("", _("Track"), &m_selectedTrack)); // MenuOption that cycles the options
+		m_selectedTrack.select(cur); // Set the selection to current track
+		m_menu.add(MenuOption("", _("Select track"), &m_selectedTrack)); // MenuOption that cycles the options
 		m_menu.back().setDynamicName(m_trackOpt); // Set the title to be dynamic
 	}
 	{ // Create difficulty opt
 		ConfigItem::OptionList ol;
+		int i = 0, cur = 0;
 		// Add difficulties to the option list
 		for (int level = 0; level < DIFFICULTYCOUNT; ++level) {
-			if (difficulty(Difficulty(level), true))
+			if (difficulty(Difficulty(level), true)) {
 				ol.push_back(boost::lexical_cast<std::string>(level));
+				if (Difficulty(i) == m_level) cur = i;
+				++i;
+			}
 		}
 		m_selectedDifficulty = ConfigItem(ol); // Create a ConfigItem from the option list
-		m_menu.add(MenuOption("", _("Difficulty"), &m_selectedDifficulty)); // MenuOption that cycles the options
+		m_selectedDifficulty.select(cur); // Set the selection to current level
+		m_menu.add(MenuOption("", _("Select difficulty"), &m_selectedDifficulty)); // MenuOption that cycles the options
 		m_menu.back().setDynamicName(m_difficultyOpt); // Set the title to be dynamic
 	}
 	m_menu.add(MenuOption(_("Lefty-mode"), "", &m_leftymode));
@@ -158,10 +166,10 @@ void GuitarGraph::setupJoinMenu() {
 }
 
 void GuitarGraph::updateJoinMenu() {
-	std::string s("\n (");
-	std::string le = m_leftymode.b() ? _("ON") : _("OFF");
 	m_trackOpt = getTrack();
 	m_difficultyOpt =  getDifficultyString();
+	std::string s("\n (");
+	std::string le = m_leftymode.b() ? _("ON") : _("OFF");
 	m_leftyOpt = _("Toggle lefty-mode") + s + le + ")";
 }
 
@@ -181,6 +189,8 @@ void GuitarGraph::changeTrack(int dir) {
 	else if (m_track_index == (--m_instrumentTracks.end())) m_track_index = (--m_instrumentTracks.end());
 	difficultyAuto(true);
 	updateNeck();
+	setupJoinMenu();  // Reset menu as difficulties might have changed
+	m_menu.select(1); // Restore selection to the track item
 }
 
 /// Set specific track
@@ -189,6 +199,8 @@ void GuitarGraph::setTrack(const std::string& track) {
 	if (it != m_instrumentTracks.end()) m_track_index = it;
 	difficultyAuto(true);
 	updateNeck();
+	setupJoinMenu();  // Reset menu as difficulties might have changed
+	m_menu.select(1); // Restore selection to the track item
 }
 
 /// Get the difficulty as displayable string
@@ -265,24 +277,6 @@ void GuitarGraph::engine() {
 			m_jointime = time < 0.0 ? -1.0 : time + join_delay;
 			break;
 		}
-		// Handle Start/Select keypresses
-		if (ev.nav == input::CANCEL && !menuOpen()) ev.button = input::STARPOWER_BUTTON; // Select = GodMode
-		if (ev.nav == input::START && !menuOpen()) { m_menu.open(); continue; }
-		// Guitar specific actions
-		if (!m_drums) {
-			if ((ev.type == input::Event::PRESS || ev.type == input::Event::RELEASE) && ev.button == input::STARPOWER_BUTTON) {
-				if (ev.type == input::Event::PRESS) activateStarpower();
-				continue;
-			}
-			if (ev.type == input::Event::RELEASE) endHold(ev.button, time);
-			if (ev.type == input::Event::WHAMMY) whammy = (1.0 + ev.button + 2.0*(rand()/double(RAND_MAX))) / 4.0;
-		} else {
-			// Handle drum lefty-mode
-			if (m_leftymode.b() && ev.button > 0 && !menuOpen()) ev.button = m_pads - ev.button;
-		}
-		// Keypress anims
-		if (ev.type == input::Event::PRESS) m_pressed_anim[!m_drums + ev.button].setValue(1.0);
-		else if (ev.type == input::Event::PICK) m_pressed_anim[0].setValue(1.0);
 		// Menu keys
 		if (menuOpen()) {
 			// Check first regular keys
@@ -303,8 +297,29 @@ void GuitarGraph::engine() {
 				difficulty(Difficulty(boost::lexical_cast<int>(m_selectedDifficulty.so())));
 			// Sync menu items & captions
 			updateJoinMenu();
+			break;
+		} else if (!m_input.isKeyboard()) {
+			// Handle Start/Select keypresses
+			if (ev.nav == input::CANCEL) ev.button = input::STARPOWER_BUTTON; // Select = GodMode
+			if (ev.nav == input::START) { m_menu.open(); continue; }
+		}
+		// Guitar specific actions
+		if (!m_drums) {
+			if ((ev.type == input::Event::PRESS || ev.type == input::Event::RELEASE) && ev.button == input::STARPOWER_BUTTON) {
+				if (ev.type == input::Event::PRESS) activateStarpower();
+				continue;
+			}
+			if (ev.type == input::Event::RELEASE) endHold(ev.button, time);
+			if (ev.type == input::Event::WHAMMY) whammy = (1.0 + ev.button + 2.0*(rand()/double(RAND_MAX))) / 4.0;
+		} else {
+			// Handle drum lefty-mode
+			if (m_leftymode.b() && ev.button > 0 && !menuOpen()) ev.button = m_pads - ev.button;
+		}
+		// Keypress anims
+		if (ev.type == input::Event::PRESS) m_pressed_anim[!m_drums + ev.button].setValue(1.0);
+		else if (ev.type == input::Event::PICK) m_pressed_anim[0].setValue(1.0);
 		// Playing
-		} else if (m_drums) {
+		if (m_drums) {
 			if (ev.type == input::Event::PRESS) drumHit(time, ev.button);
 		} else {
 			guitarPlay(time, ev);

@@ -76,6 +76,8 @@ ConfigItem::StringList& ConfigItem::sl() { verifyType("string_list"); return boo
 ConfigItem::OptionList& ConfigItem::ol() { verifyType("option_list"); return boost::get<OptionList>(m_value); }
 std::string& ConfigItem::so() { verifyType("option_list"); return boost::get<OptionList>(m_value).at(m_sel); }
 
+void ConfigItem::select(int i) { verifyType("option_list"); m_sel = clamp<int>(i, 0, boost::get<OptionList>(m_value).size()-1); }
+
 namespace {
 	template <typename T, typename VariantAll, typename VariantNum> std::string numericFormat(VariantAll const& value, VariantNum const& multiplier, VariantNum const& step) {
 		T m = boost::get<T>(multiplier);

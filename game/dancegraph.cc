@@ -98,39 +98,50 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
 	if(m_song.danceTracks.empty())
 		throw std::runtime_error("Could not find any dance tracks.");
 	changeTrack(0); // Get an initial game mode and notes for it
+	setupJoinMenu(); // Finally setup the menu
 }
 
 
 void DanceGraph::setupJoinMenu() {
 	m_menu.clear();
-	m_selectedTrack = ConfigItem(getTrack());
-	m_selectedDifficulty = ConfigItem(m_level);
-	// Create track menu
-	MenuOptions trackmenu;
-	for (DanceTracks::const_iterator it = m_song.danceTracks.begin(); it != m_song.danceTracks.end(); ++it) {
-		trackmenu.push_back(MenuOption(it->first, _("Select track to play"), &m_selectedTrack, ConfigItem(it->first)));
-	}
-	// Create difficulty menu
-	MenuOptions diffmenu;
-	for (int level = 0; level < DIFFICULTYCOUNT; ++level) {
-		if (difficulty(DanceDifficulty(level), true))
-			diffmenu.push_back(MenuOption(diffv[level], _("Select difficulty level"), &m_selectedDifficulty, ConfigItem(level)));
-	}
+	updateJoinMenu();
 	// Populate root menu
 	m_menu.add(MenuOption(_("Ready!"), _("Start performing!")));
-	m_menu.add(MenuOption(_("Track"), "", trackmenu));
-	m_menu.back().setDynamicComment(m_trackOpt);
-	m_menu.add(MenuOption(_("Difficulty"), "", diffmenu));
-	m_menu.back().setDynamicComment(m_difficultyOpt);
+	{ // Create track selector
+		ConfigItem::OptionList ol;
+		int i = 0, cur = 0;
+		// Add tracks to option list
+		for (DanceTracks::const_iterator it = m_song.danceTracks.begin(); it != m_song.danceTracks.end(); ++it, ++i) {
+			ol.push_back(it->first);
+			if (m_trackOpt == it->first) cur = i; // Find the index of current track
+		}
+		m_selectedTrack = ConfigItem(ol); // Create a ConfigItem from the option list
+		m_selectedTrack.select(cur); // Set the selection to current level
+		m_menu.add(MenuOption("", _("Select track"), &m_selectedTrack)); // MenuOption that cycles the options
+		m_menu.back().setDynamicName(m_trackOpt); // Set the title to be dynamic
+	}
+	{ // Create difficulty opt
+		ConfigItem::OptionList ol;
+		int i = 0, cur = 0;
+		// Add difficulties to the option list
+		for (int level = 0; level < DIFFICULTYCOUNT; ++level) {
+			if (difficulty(DanceDifficulty(level), true)) {
+				ol.push_back(boost::lexical_cast<std::string>(level));
+				if (DanceDifficulty(level) == m_level) cur = i;
+				++i;
+			}
+		}
+		m_selectedDifficulty = ConfigItem(ol); // Create a ConfigItem from the option list
+		m_selectedDifficulty.select(cur); // Set the selection to current level
+		m_menu.add(MenuOption("", _("Select difficulty"), &m_selectedDifficulty)); // MenuOption that cycles the options
+		m_menu.back().setDynamicName(m_difficultyOpt); // Set the title to be dynamic
+	}
 	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
 }
 
 void DanceGraph::updateJoinMenu() {
-	std::string s("\n (");
-	m_trackOpt = _("Select track") + s + getTrack() + ")";
-	m_difficultyOpt =  _("Select difficulty") + s + getDifficultyString() + ")";
-	m_selectedTrack = ConfigItem(getTrack());
-	m_selectedDifficulty = ConfigItem(m_level);
+	m_trackOpt = getTrack();
+	m_difficultyOpt = getDifficultyString();
 }
 
 /// Attempt to select next/previous game mode
@@ -177,6 +188,7 @@ void DanceGraph::finalizeTrackChange() {
 
 	changeDifficulty(0); // Construct new notes
 	setupJoinMenu();
+	m_menu.select(1); // Restore selection to the track item
 }
 
 /// Are we alive?
@@ -262,10 +274,14 @@ void DanceGraph::engine() {
 			else if (ev.nav == input::DOWN) m_menu.move(1);
 			difficulty_changed = true;
 			// See if anything changed
-			if (m_selectedTrack.s() != getTrack()) setTrack(m_selectedTrack.s());
-			else if (m_selectedDifficulty.i() != m_level) difficulty(DanceDifficulty(m_selectedDifficulty.i()));
+			if (m_selectedTrack.so() != getTrack()) setTrack(m_selectedTrack.so());
+			else if (boost::lexical_cast<int>(m_selectedDifficulty.so()) != m_level)
+				difficulty(DanceDifficulty(boost::lexical_cast<int>(m_selectedDifficulty.so())));
 			// Sync dynamic stuff
 			updateJoinMenu();
+		// Open Menu
+		} else if (!menuOpen() && ev.type == input::Event::PRESS) {
+			if (ev.nav == input::CANCEL || ev.nav == input::START) m_menu.open();
 		}
 		// Gaming controls
 		if (ev.type == input::Event::RELEASE) {
