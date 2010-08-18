@@ -89,6 +89,7 @@ class InstrumentGraph {
 	unsigned stream() const { return m_stream; }
 	double correctness() const { return m_correctness.get(); }
 	int getScore() const { return (m_score > 0 ? m_score : 0) * m_scoreFactor; }
+	virtual double getWhammy() const { return 0; }
 
   protected:
 	// Core stuff
