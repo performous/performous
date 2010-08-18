@@ -66,7 +66,7 @@ class Music {
 	bool m_preview;
 
 	static ptime getTime() { return microsec_clock::universal_time(); }
-	time_duration durationOf(size_t samples) const { return microseconds(1e6 * samples / srate / 2.0); }
+	time_duration durationOf(int64_t samples) const { return microseconds(1e6 * samples / srate / 2.0); }
 	/**
 	* Timing code for precise monotonic time. Very simple, far from perfect.
 	* This function is called at a beginning of the audio callback, before modifying m_pos
@@ -77,7 +77,6 @@ class Music {
 		m_nextTime = begin + durationOf(samples);  // Current block end position in song
 		m_baseTime = getTime() - begin;  // Recalibrate base time to beginning of the song
 	}
-
 
 public:
 	double fadeLevel;
