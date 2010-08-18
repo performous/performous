@@ -1,0 +1,51 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index c887394..941369e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -24,6 +24,9 @@ else(WIN32)
+ 	if(NOT SHARE_INSTALL)
+ 		set(SHARE_INSTALL "share/games/performous" CACHE STRING "Data file install path. Must be a relative path (from CMAKE_INSTALL_PREFIX), with no trailing slash.")
+ 	endif(NOT SHARE_INSTALL)
++	if(NOT GENTOO_DATA_DIR)
++		SET (GENTOO_DATA_DIR "/usr/share/games/performous" CACHE PATH "data directory prefix")
++	endif(NOT GENTOO_DATA_DIR)
+ endif(WIN32)
+ 
+ mark_as_advanced(SHARE_INSTALL)
+diff --git a/game/config.cmake.hh b/game/config.cmake.hh
+index 300ba05..83b38d2 100644
+--- a/game/config.cmake.hh
++++ b/game/config.cmake.hh
+@@ -10,6 +10,7 @@
+ #define VERSION "@PROJECT_VERSION@"
+ 
+ #define SHARED_DATA_DIR "@SHARE_INSTALL@"
++#define GENTOO_DATA_DIR "@GENTOO_DATA_DIR@"
+ 
+ // FFMPEG libraries use changing include file names... Get them from CMake.
+ #define AVCODEC_INCLUDE <@AVCodec_INCLUDE@>
+diff --git a/game/fs.cc b/game/fs.cc
+index 5e74c77..faa96f9 100644
+--- a/game/fs.cc
++++ b/game/fs.cc
+@@ -165,6 +165,9 @@ Paths const& getPaths(bool refresh) {
+ 		// Adding users data dir
+ 		dirs.push_back(getDataDir());
+ 
++		// Adding gentoo path
++		dirs.push_back(std::string(GENTOO_DATA_DIR));
++
+ 		// Adding relative path from executable
+ 		dirs.push_back(plugin::execname().parent_path().parent_path() / shareDir);
+ #ifndef _WIN32
+@@ -192,7 +195,9 @@ fs::path getDefaultConfig(fs::path const &configFile) {
+ 	typedef std::vector<std::string> ConfigList;
+ 	ConfigList config_list;
+ 	char const* root = getenv("PERFORMOUS_ROOT");
+-	if (root) config_list.push_back(std::string(root) + "/" SHARED_DATA_DIR + configFile.string());
++	if (root) config_list.push_back(std::string(root) + "/" + configFile.string());
++	// Adding gentoo specific directory (keeping PERFORMOUS_ROOT first)
++	config_list.push_back(std::string(GENTOO_DATA_DIR) + configFile.string());
+ 	fs::path exec = plugin::execname();
+ 	if (!exec.empty()) config_list.push_back(exec.parent_path().string() + "/../" SHARED_DATA_DIR + configFile.string());
+ 	ConfigList::const_iterator it = std::find_if(config_list.begin(), config_list.end(), static_cast<bool(&)(fs::path const&)>(fs::exists));

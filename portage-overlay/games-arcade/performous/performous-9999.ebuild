@@ -77,7 +77,7 @@ src_configure() {
 		$(cmake-utils_use_enable editor EDITOR)
 		$(cmake-utils_use_no webcam WEBCAM)
 		-DCMAKE_INSTALL_PREFIX=${GAMES_PREFIX}
-		-DSHARE_INSTALL=share/performous
+		-DGENTOO_DATA_DIR=${GAMES_DATADIR}/${PN}
 		-DLOCALE_DIR=/usr/share
 		-DCMAKE_BUILD_TYPE=Release"
 #	local mycmakeargs="
@@ -94,9 +94,11 @@ src_compile() {
 src_install() {
 	DOCS="docs/*.txt" cmake-utils_src_install
 	mv -f "${D}/${GAMES_PREFIX}/share/man" "${D}/usr/share/"
+	mkdir -p "${D}/${GAMES_DATADIR}/${PN}"
+	mv -f "${D}/${GAMES_PREFIX}/share" "${D}/${GAMES_DATADIR}/${PN}"
 
 	if use songs; then
-		insinto "${GAMES_PREFIX}/share/performous"
+		insinto "${GAMES_DATADIR}/${PN}"
 		doins -r "${S}/songs" || die "doins songs failed"
 	fi
 	doicon "${S}/data/${PN}.xpm"
