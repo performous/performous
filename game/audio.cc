@@ -325,7 +325,8 @@ struct Device {
 
 	Device(unsigned int in, unsigned int out, double rate, unsigned int dev):
 	  in(in), out(out), rate(rate), dev(dev),
-	  stream(*this, in ? portaudio::Params().channelCount(in).device(dev) : (const PaStreamParameters*)NULL, (out ? portaudio::Params().channelCount(out).device(dev) : (const PaStreamParameters*)NULL), rate),
+	  stream(*this, in ? portaudio::Params().channelCount(in).device(dev).suggestedLatency(config["audio/latency"].f()): (const PaStreamParameters*)NULL,
+	    (out ? portaudio::Params().channelCount(out).device(dev).suggestedLatency(config["audio/latency"].f()) : (const PaStreamParameters*)NULL), rate),
 	  outptr()
 	{
 		mics.resize(in);
