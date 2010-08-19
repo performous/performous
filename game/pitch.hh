@@ -3,8 +3,10 @@
 #include <complex>
 #include <vector>
 #include <list>
+#include <deque>
 #include <algorithm>
 #include <cmath>
+#include <boost/thread.hpp>
 
 /// struct to represent tones
 struct Tone {
@@ -15,7 +17,7 @@ struct Tone {
 	double stabledb; ///< stable decibels
 	double harmonics[MAXHARM]; ///< harmonics array
 	std::size_t age; ///< age
-	Tone(); 
+	Tone();
 	void print() const; ///< prints Tone
 	bool operator==(double f) const; ///< equality operator
 	void update(Tone const& t); ///< update Tone
@@ -47,8 +49,11 @@ class Analyzer {
 	Analyzer(double rate, std::size_t step = 200);
 	/** Add input data to buffer. This is thread-safe (against other functions). **/
 	template <typename InIt> void input(InIt begin, InIt end) {
+		std::vector<float> tempbuf; // Values to be inserted to the pass-through buffer
+		tempbuf.reserve(1024); // Let's reserve some space already in advance
 		while (begin != end) {
 			float s = *begin;
+			tempbuf.push_back(s); // Add to pass-through buffer
 			++begin;
 			m_peak *= 0.999;
 			float p = s * s;
@@ -60,6 +65,10 @@ class Analyzer {
 			m_buf[w] = s;
 			m_bufWrite = w2;
 		}
+		// No need to lock the mutex before this
+		boost::mutex::scoped_lock l(m_mutex);
+		// Insert the new values to the pass-through buffer
+		outbuf.insert(outbuf.end(), tempbuf.begin(), tempbuf.end());
 	}
 	/** Call this to process all data input so far. **/
 	void process();
@@ -87,8 +96,12 @@ class Analyzer {
 		m_oldfreq = (best ? best->freq : 0.0);
 		return best;
 	}
+	/** Give data away for mic pass-through */
+	void output(float* begin, float* end);
 
   private:
+	boost::mutex m_mutex;
+	std::deque<float> outbuf;
 	std::size_t m_step;
 	double m_rate;
 	std::vector<float> m_window;

@@ -246,6 +246,7 @@ struct Output {
 	std::auto_ptr<Synth> synth;
 	std::auto_ptr<Music> preloading;
 	boost::ptr_vector<Music> playing, disposing;
+	std::vector<Analyzer*> mics;
 	boost::ptr_map<std::string, Sample> samples;
 	std::vector<Command> commands;
 	volatile bool paused;
@@ -293,6 +294,15 @@ struct Output {
 				continue;
 			}
 			++i;
+		}
+		// Mix in microphones (if pass-through is enabled)
+		// TODO: Create a config var for enable/disable
+		if (mics.size() > 0) {
+			for (float *i = begin; i < end; ++i) *i *= 0.3; // Decrease music volume
+			for (size_t i = 0; i < mics.size(); ++i) {
+				if (mics[i])
+					mics[i]->output(begin, end);  // Do the actual mixing
+			}
 		}
 		// Mix in the samples currently playing
 		{
@@ -454,6 +464,9 @@ struct Audio::Impl {
 				std::cerr << "Audio device '" << *it << "': " << e.what() << std::endl;
 			}
 		}
+		// Assign mic buffers to the output for pass-through
+		for (size_t i = 0; i < analyzers.size(); ++i)
+			output.mics.push_back(&analyzers[i]);
 	}
 };
 
