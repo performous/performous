@@ -406,14 +406,16 @@ struct Audio::Impl {
 				for (int match_partial = 0; match_partial < 2 && !skip_partial; ++match_partial) {
 					// Loop through the devices and try everything that matches the name
 					for (int i = -1; i < count && (dev < 0 || i == -1); ++i) {
-						if (dev > 0 && i == -1) i = dev;
+						if (dev >= 0 && i == -1) i = dev;
 						else if (i == -1) continue;
 						PaDeviceInfo const* info = Pa_GetDeviceInfo(i);
 						if (!info) continue;
 						if (info->maxInputChannels < int(params.mics.size())) continue;
 						if (info->maxOutputChannels < params.out) continue;
-						if (!match_partial && info->name != params.dev) continue;
-						if (match_partial && std::string(info->name).find(params.dev) == std::string::npos) continue;
+						if (dev < 0) { // Try matching by name
+							if (!match_partial && info->name != params.dev) continue;
+							if (match_partial && std::string(info->name).find(params.dev) == std::string::npos) continue;
+						}
 						// Match found if we got here
 						bool device_init_threw = true;
 						try {
