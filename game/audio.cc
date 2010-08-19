@@ -15,6 +15,9 @@
 using namespace boost::posix_time;
 
 namespace {
+	/**
+	 * A function to parse key=value pairs with quoting capabilites.
+	 */
 	std::map<std::string, std::string> parseKeyValuePairs(const std::string& st) {
 		std::map<std::string, std::string> ret;
 		bool inside_quotes = false;
@@ -49,13 +52,26 @@ namespace {
 		if (!key.empty()) ret[key] = value;
 		return ret;
 	}
+
+	/**
+	 * Pitch shifter.
+	 * @param begin start of the buffer
+	 * @param end end of the buffer
+	 * @param factor shift factor from 0 (no shift) to 1 (maximum)
+	 */
+	template <typename It> void PitchShift(It begin, It end, double factor) {
+		//FIXME: Dummy volume bender
+		for (It i = begin; i != end; ++i)
+			*i *= factor * factor; // Decrease music volume
+	}
 }
 
 class Music {
 	struct Track {
 		FFmpeg mpeg;
 		float fadeLevel;
-		Track(std::string const& filename, unsigned int sr): mpeg(false, true, filename, sr), fadeLevel(1.0f) {}
+		float pitchFactor;
+		Track(std::string const& filename, unsigned int sr): mpeg(false, true, filename, sr), fadeLevel(1.0f), pitchFactor(0.0f) {}
 	};
 	typedef boost::ptr_map<std::string, Track> Tracks;
 	Tracks tracks; ///< Audio decoders
@@ -66,7 +82,7 @@ class Music {
 	bool m_preview;
 
 	static ptime getTime() { return microsec_clock::universal_time(); }
-	time_duration durationOf(size_t samples) const { return microseconds(1e6 * samples / srate / 2.0); }
+	time_duration durationOf(int64_t samples) const { return microseconds(1e6 * samples / srate / 2.0); }
 	/**
 	* Timing code for precise monotonic time. Very simple, far from perfect.
 	* This function is called at a beginning of the audio callback, before modifying m_pos
@@ -78,11 +94,11 @@ class Music {
 		m_baseTime = getTime() - begin;  // Recalibrate base time to beginning of the song
 	}
 
-
 public:
 	double fadeLevel;
 	double fadeRate;
 	typedef std::map<std::string,std::string> Files;
+	typedef std::vector<float> Buffer;
 	Music(Files const& filenames, unsigned int sr, bool preview):
 	  srate(sr), m_pos(), m_baseTime(getTime()),
 	  m_preview(preview), fadeLevel(), fadeRate() {
@@ -96,10 +112,23 @@ public:
 		size_t samples = end - begin;
 		timeSync(samples); // Keep audio synced
 		bool eof = true;
-		std::vector<float> mixbuf(end - begin);
+		Buffer mixbuf(end - begin);
 		for (Tracks::iterator it = tracks.begin(), itend = tracks.end(); it != itend; ++it) {
 			Track& t = *it->second;
-			if (t.mpeg.audioQueue(&*mixbuf.begin(), &*mixbuf.end(), m_pos, t.fadeLevel)) eof = false;
+//			if (it->first == "guitar") std::cout << t.pitchFactor << std::endl;
+			if (t.pitchFactor != 0) { // Pitch shift
+				Buffer tempbuf(end - begin);
+				// Get audio to temp buffer
+				if (t.mpeg.audioQueue(&*tempbuf.begin(), &*tempbuf.end(), m_pos, t.fadeLevel)) eof = false;
+				// Do the magic
+				PitchShift(&*tempbuf.begin(), &*tempbuf.end(), t.pitchFactor);
+				// Mix with other tracks
+				Buffer::iterator m = mixbuf.begin();
+				Buffer::iterator b = tempbuf.begin();
+				while (b != tempbuf.end())
+					*m++ += (*b++);
+			// Otherwise just get the audio and mix it straight away
+			} else if (t.mpeg.audioQueue(&*mixbuf.begin(), &*mixbuf.end(), m_pos, t.fadeLevel)) eof = false;
 		}
 		m_pos += samples;
 		for (size_t i = 0, iend = mixbuf.size(); i != iend; ++i) {
@@ -138,6 +167,11 @@ public:
 		Tracks::iterator it = tracks.find(name);
 		if (it == tracks.end()) return;
 		it->second->fadeLevel = fadeLevel;
+	}
+	void trackPitchBend(std::string const& name, double pitchFactor) {
+		Tracks::iterator it = tracks.find(name);
+		if (it == tracks.end()) return;
+		it->second->pitchFactor = pitchFactor;
 	}
 };
 
@@ -199,11 +233,10 @@ struct Synth {
 	}
 };
 
-
 struct Command {
-	enum { TRACK_FADE, SAMPLE_RESET } type;
+	enum { TRACK_FADE, TRACK_PITCHBEND, SAMPLE_RESET } type;
 	std::string track;
-	double fadeLevel;
+	double factor;
 };
 
 struct Output {
@@ -231,7 +264,10 @@ struct Output {
 			Command const& cmd = commands[i];
 			switch (cmd.type) {
 			case Command::TRACK_FADE:
-				if (!playing.empty()) playing[0].trackFade(cmd.track, cmd.fadeLevel);
+				if (!playing.empty()) playing[0].trackFade(cmd.track, cmd.factor);
+				break;
+			case Command::TRACK_PITCHBEND:
+				if (!playing.empty()) playing[0].trackPitchBend(cmd.track, cmd.factor);
 				break;
 			case Command::SAMPLE_RESET:
 				boost::ptr_map<std::string, Sample>::iterator it = samples.find(cmd.track);
@@ -527,6 +563,13 @@ void Audio::streamFade(std::string track, double fadeLevel) {
 	Output& o = self->output;
 	boost::mutex::scoped_lock l(o.mutex);
 	Command cmd = { Command::TRACK_FADE, track, fadeLevel };
+	o.commands.push_back(cmd);
+}
+
+void Audio::streamBend(std::string track, double pitchFactor) {
+	Output& o = self->output;
+	boost::mutex::scoped_lock l(o.mutex);
+	Command cmd = { Command::TRACK_PITCHBEND, track, pitchFactor };
 	o.commands.push_back(cmd);
 }
 

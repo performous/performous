@@ -122,13 +122,20 @@ bool ScreenSing::instrumentLayout(double time) {
 	double iw = 1.0 / count;
 	typedef std::pair<unsigned, double> CountSum;
 	std::map<std::string, CountSum> volume; // Stream id to (count, sum)
+	std::map<std::string, CountSum> pitchbend; // Stream id to (count, sum)
 	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it) {
 		it->engine(); // Run engine even when dead so that joining is possible
 		if (!it->dead()) {
 			it->position((0.5 + i - 0.5 * count) * iw, iw); // Do layout stuff
-			CountSum& cs = volume[it->getTrack()];
-			cs.first++;
-			cs.second += it->correctness();
+			{
+				CountSum& cs = volume[it->getTrack()];
+				cs.first++;
+				cs.second += it->correctness();
+			}{
+				CountSum& cs = pitchbend[it->getTrack()];
+				cs.first++;
+				cs.second += it->getWhammy();
+			}
 			it->draw(time);
 			++i;
 		}
@@ -141,13 +148,18 @@ bool ScreenSing::instrumentLayout(double time) {
 	// Set volume levels (averages of all instruments playing that track)
 	for( std::map<std::string,std::string>::iterator it = m_song->music.begin() ; it != m_song->music.end() ; ++it ) {
 		double level = 1.0;
-		if( volume.find(it->first) == volume.end() ) {
+		if (volume.find(it->first) == volume.end()) {
 			m_audio.streamFade(it->first, level);
 		} else {
 			CountSum cs = volume[it->first];
 			if (cs.first > 0) level = cs.second / cs.first;
 			if (m_song->music.size() <= 1) level = std::max(0.333, level);
 			m_audio.streamFade(it->first, level);
+		}
+		if (pitchbend.find(it->first) != pitchbend.end()) {
+			CountSum cs = pitchbend[it->first];
+			level = cs.second;
+			m_audio.streamBend(it->first, level);
 		}
 	}
 	return (count > 0);
