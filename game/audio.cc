@@ -372,6 +372,7 @@ struct Audio::Impl {
 					std::string dev;
 					std::vector<std::string> mics;
 				} params = Params();
+				params.out = 0;
 				params.rate = 48000;
 				// Break into tokens:
 				std::map<std::string, std::string> keyvalues = parseKeyValuePairs(*it);
