@@ -1,3 +1,9 @@
+#pragma once
+
+/**
+ * @file portaudio.hpp OOP / RAII wrappers & utilities for PortAudio library.
+ */
+
 #include <portaudio.h>
 #include <cstdlib>
 #include <stdexcept>
@@ -87,4 +93,3 @@ namespace portaudio {
 	};
 
 }
-

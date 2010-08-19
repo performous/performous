@@ -1,11 +1,8 @@
-#ifndef AUDIO_FFT_HPP_INCLUDED
-#define AUDIO_FFT_HPP_INCLUDED
+#pragma once
 
 /**
-@file fft.hpp FFT and related facilities.
-
-Header only, no need to link with libda.
-**/
+ * @file fft.hpp FFT and related facilities.
+ */
 
 #include <complex>
 #include <cstddef>
@@ -21,7 +18,7 @@ namespace da {
 
 		/** Calculate the square of val. **/
 		static inline double sqr(double val) { return val * val; }
-		
+
 		template <unsigned M, unsigned N, unsigned B, unsigned A> struct SinCosSeries {
 			static double value() {
 				return 1 - sqr(A * M_PI / B) / M / (M+1) * SinCosSeries<M + 2, N, B, A>::value();
@@ -38,14 +35,14 @@ namespace da {
 		template <unsigned A, unsigned B> struct Cos {
 			static double value() { return SinCosSeries<1, 33, B, A>::value(); }
 		};
-		
+
 		/** Calculate sin(2 pi A / B). **/
 		template <unsigned A, unsigned B> double sin() { return Sin<A, B>::value(); }
 
 		/** Calculate cos(2 pi A / B). **/
 		template <unsigned A, unsigned B> double cos() { return Cos<A, B>::value(); }
 	}
-	
+
 	namespace fourier {
 		// Based on the description of Volodymyr Myrnyy in
 		// http://www.dspdesignline.com/showArticle.jhtml?printableArticle=true&articleId=199903272
@@ -106,6 +103,3 @@ namespace da {
 	}
 
 }
-
-#endif
-
