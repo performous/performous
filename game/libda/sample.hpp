@@ -1,17 +1,14 @@
-#ifndef LIBDA_SAMPLE_HPP_INCLUDED
-#define LIBDA_SAMPLE_HPP_INCLUDED
+#pragma once
 
 /**
-@file sample.hpp Sample format definition and format conversions.
-
-Header-only, no need to link to LibDA.
-**/
+ * @file sample.hpp Sample format definition and format conversions.
+ */
 
 namespace da {
 
 	// Implement mathematical rounding (which C++ unfortunately currently lacks)
 	template <typename T> T round(T val) { return static_cast<T>(static_cast<int>(val + (val >= 0 ? 0.5 : -0.5))); }
-	
+
 	// WARNING: changing this breaks binary compatibility on the library!
 	typedef float sample_t;
 
@@ -21,7 +18,7 @@ namespace da {
 		if (val > max) val = max;
 		return val;
 	}
-	
+
 	const sample_t max_s16 = 32767.0f, min_s16 = -max_s16 - 1.0f;
 	const sample_t max_s24 = 8388607.0f, min_s24 = -max_s24 - 1.0f;
 	const sample_t max_s32 = 2147483647.0f, min_s32= -max_s32 - 1.0f;
@@ -66,6 +63,3 @@ namespace da {
 	typedef step_iterator<sample_t> sample_iterator;
 	typedef step_iterator<sample_t const> sample_const_iterator;
 }
-
-#endif
-

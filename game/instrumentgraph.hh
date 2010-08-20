@@ -76,7 +76,8 @@ class InstrumentGraph {
 	  {
 		m_popupText.reset(new SvgTxtThemeSimple(getThemePath("sing_popup_text.svg"), config["graphic/text_lod"].f()));
 	};
-
+	virtual ~InstrumentGraph() {}
+	
 	// Interface functions
 	virtual void draw(double time) = 0;
 	virtual void engine() = 0;

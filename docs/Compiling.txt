@@ -29,16 +29,11 @@ Dependencies:
 
 	- libxml++ : XML parser, used for themes etc.
 
-    - Magick++ : loading images (some internal graphics and song cover/bg)
-
-	- One or more of the following for audio capture and playback
-		* ALSA
-		* GStreamer
-		* JACK
-		* PortAudio v18 or v19
-		* Pulseaudio
+	- PortAudio v19 : audio capture and playback
 
 	- PortMidi (optional) for MIDI drum support
+
+	- OpenCV (optional) for webcam support
 
 	Please refer to http://performous.org/develop.html for packages to install.
 	

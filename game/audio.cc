@@ -335,7 +335,8 @@ struct Device {
 
 	Device(unsigned int in, unsigned int out, double rate, unsigned int dev):
 	  in(in), out(out), rate(rate), dev(dev),
-	  stream(*this, in ? portaudio::Params().channelCount(in).device(dev) : (const PaStreamParameters*)NULL, (out ? portaudio::Params().channelCount(out).device(dev) : (const PaStreamParameters*)NULL), rate),
+	  stream(*this, in ? portaudio::Params().channelCount(in).device(dev).suggestedLatency(config["audio/latency"].f()): (const PaStreamParameters*)NULL,
+	    (out ? portaudio::Params().channelCount(out).device(dev).suggestedLatency(config["audio/latency"].f()) : (const PaStreamParameters*)NULL), rate),
 	  outptr()
 	{
 		mics.resize(in);
@@ -415,14 +416,16 @@ struct Audio::Impl {
 				for (int match_partial = 0; match_partial < 2 && !skip_partial; ++match_partial) {
 					// Loop through the devices and try everything that matches the name
 					for (int i = -1; i < count && (dev < 0 || i == -1); ++i) {
-						if (dev > 0 && i == -1) i = dev;
+						if (dev >= 0 && i == -1) i = dev;
 						else if (i == -1) continue;
 						PaDeviceInfo const* info = Pa_GetDeviceInfo(i);
 						if (!info) continue;
 						if (info->maxInputChannels < int(params.mics.size())) continue;
 						if (info->maxOutputChannels < params.out) continue;
-						if (!match_partial && info->name != params.dev) continue;
-						if (match_partial && std::string(info->name).find(params.dev) == std::string::npos) continue;
+						if (dev < 0) { // Try matching by name
+							if (!match_partial && info->name != params.dev) continue;
+							if (match_partial && std::string(info->name).find(params.dev) == std::string::npos) continue;
+						}
 						// Match found if we got here
 						bool device_init_threw = true;
 						try {

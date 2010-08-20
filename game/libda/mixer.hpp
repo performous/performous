@@ -1,14 +1,11 @@
-#ifndef LIBDA_MIXER_HPP_INCLUDED
-#define LIBDA_MIXER_HPP_INCLUDED
+#pragma once
 
 /**
-@file mixer.hpp LibDA mixer interface, version 1.
-
-This appears to be too complex and will probably be removed in later release in
-favor of something easier and faster.
-
-Link with libda when you use this.
-**/
+ * @file mixer.hpp LibDA mixer interface, version 1.
+ *
+ * This appears to be too complex and will probably be removed in later release in
+ * favor of something easier and faster. Actually it is not even used currently.
+ */
 
 #include "audio.hpp"
 #include <boost/scoped_ptr.hpp>
@@ -39,7 +36,7 @@ namespace da {
 		return shared_reference_wrapper<T>(ptr);
 	}
 
-	
+
 	class chain: boost::noncopyable {
 	  public:
 		typedef std::vector<callback_t> streams_t;
@@ -173,7 +170,7 @@ namespace da {
 	  public:
 		template <typename T> scoped_lock(T& obj): boost::recursive_mutex::scoped_lock(obj.m_mutex) {}
 	};
-	
+
 	class mutex_stream: boost::noncopyable {
 	  public:
 		mutex_stream(callback_t const& stream): m_stream(stream) {}
@@ -191,7 +188,7 @@ namespace da {
 		mutable boost::recursive_mutex m_mutex;
 		friend class scoped_lock;
 	};
-	
+
 	typedef std::auto_ptr<scoped_lock> lock_holder;
 
 	template <typename Key> class select {
@@ -215,7 +212,7 @@ namespace da {
 		Key m_key;
 		callback_t m_stream;
 	};
-	
+
 	class mixer {
 	  public:
 		mixer(): m_mutex(boost::ref(m_select)) { init(); }
@@ -304,6 +301,3 @@ namespace da {
 		boost::scoped_ptr<playback> m_playback;
 	};
 }
-
-#endif
-

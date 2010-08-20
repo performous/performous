@@ -3,7 +3,6 @@ Where to find the files you are looking for:
 share/      icons and other such binary files
 themes/     all graphics, menu music, etc
 game/       the source code of the game
-libda/      the source code of libda (the audio I/O library)
 
 When adding new data files, you may need to edit the CMakeLists.txt file in that
 folder to have CMake actually install it. When adding new source code files,
@@ -26,7 +25,7 @@ You may currently access ScreenManager by a singleton, but this is discouraged
 and the singleton is to be removed because singletons are evil (but it is not
 buggy at the moment, so we are not rushing that).
 
-Notes of the song and TXT file parsing are in song.cc/hh.
+Notes of the song and music file parsing are in songparser*.cc/hh.
 
 Most other files either implement little helpers for loading and displaying
 images (surface), playing sound (audio), decoding video/audio (ffmpeg),
