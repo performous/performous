@@ -8,13 +8,14 @@
 #include <vector>
 
 class Surface;
-struct MenuOption;
+class MenuOption;
 
 typedef std::vector<MenuOption> MenuOptions;
 typedef std::vector<MenuOptions*> SubmenuStack;
 
 /// Struct for menu options
-struct MenuOption {
+class MenuOption {
+  public:
 	enum Type { CLOSE_SUBMENU, OPEN_SUBMENU, CHANGE_VALUE, SET_AND_CLOSE, ACTIVATE_SCREEN } type;
 
 	/// Construct a submenu closer
@@ -52,7 +53,8 @@ struct MenuOption {
 
 
 /// Menu for selecting difficulty etc.
-struct Menu {
+class Menu {
+  public:
 	/// constructor
 	Menu();
 	/// add a menu option
