@@ -296,6 +296,7 @@ void GuitarGraph::engine() {
 			if (!m_drums && m_selectedTrack.so() != getTrack()) setTrack(m_selectedTrack.so());
 			else if (boost::lexical_cast<int>(m_selectedDifficulty.so()) != m_level)
 				difficulty(Difficulty(boost::lexical_cast<int>(m_selectedDifficulty.so())));
+			else if (m_rejoin.b()) { unjoin(); setupJoinMenu(); }
 			// Sync menu items & captions
 			updateJoinMenu();
 			break;

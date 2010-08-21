@@ -60,8 +60,6 @@ class Song;
 
 class InstrumentGraph {
   public:
-	static void setupPauseMenu(Menu& menu);
-
 	/// Constructor
 	InstrumentGraph(Audio& audio, Song const& song, input::DevType inp);
 	/// Virtual destructor
@@ -77,12 +75,13 @@ class InstrumentGraph {
 	virtual void changeDifficulty(int dir = 1) = 0;
 
 	// General shared functions
+	void setupPauseMenu();
 	void doUpdates();
 	void drawMenu();
 	void toggleMenu(int forcestate = -1); // 0 = close, 1 = open, -1 = auto/toggle
 	void togglePause(int) { m_audio.togglePause(); }
 	void quit(int) { ScreenManager::getSingletonPtr()->activateScreen("Songs"); }
-	std::string noValue() const { return ""; }
+	void unjoin();
 
 	// General getters
 	bool joining(double time) const { return time < m_jointime; }
@@ -134,6 +133,7 @@ class InstrumentGraph {
 	// Dynamic stuff for join menu
 	ConfigItem m_selectedTrack; /// menu modifies this to select track
 	ConfigItem m_selectedDifficulty; /// menu modifies this to select difficulty
+	ConfigItem m_rejoin; /// menu sets this if we want to re-join
 	std::string m_trackOpt;
 	std::string m_difficultyOpt;
 	std::string m_leftyOpt;

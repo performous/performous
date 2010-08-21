@@ -277,6 +277,7 @@ void DanceGraph::engine() {
 			if (m_selectedTrack.so() != getTrack()) setTrack(m_selectedTrack.so());
 			else if (boost::lexical_cast<int>(m_selectedDifficulty.so()) != m_level)
 				difficulty(DanceDifficulty(boost::lexical_cast<int>(m_selectedDifficulty.so())));
+			else if (m_rejoin.b()) { unjoin(); setupJoinMenu(); }
 			// Sync dynamic stuff
 			updateJoinMenu();
 		// Open Menu

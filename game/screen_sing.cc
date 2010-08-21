@@ -110,9 +110,10 @@ void ScreenSing::enter() {
 		}
 	}
 	// Populate the pause menu
-	// TODO: Refactor this menu population to static
-	//       function that instrumentgraph can also use
-	InstrumentGraph::setupPauseMenu(m_menu);
+	m_menu.clear();
+	m_menu.add(MenuOption(_("Resume"), _("Back to performing!")));
+	m_menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning"), "Sing"));
+	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
 	m_menu.close();
 	// Startup delay for instruments is longer than for singing only
 	double setup_delay = (m_instruments.empty() && m_dancers.empty() ? -1.0 : -3.0);

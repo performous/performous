@@ -6,14 +6,6 @@
 //const unsigned InstrumentGraph::max_panels = 10; // Maximum number of arrow lines / guitar frets
 
 
-void InstrumentGraph::setupPauseMenu(Menu& menu) {
-	menu.clear();
-	menu.add(MenuOption(_("Resume"), _("Back to performing!")));
-	menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning"), "Sing"));
-	menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
-}
-
-
 InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevType inp):
   m_audio(audio), m_song(song), m_input(input::DevType(inp)),
   m_stream(),
@@ -23,6 +15,7 @@ InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevType 
   m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
   m_selectedTrack(""),
   m_selectedDifficulty(0),
+  m_rejoin(false),
   m_pads(),
   m_correctness(0.0, 5.0),
   m_score(),
@@ -41,10 +34,19 @@ InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevType 
 }
 
 
+void InstrumentGraph::setupPauseMenu() {
+	m_menu.clear();
+	m_menu.add(MenuOption(_("Resume"), _("Back to performing!")));
+	m_menu.add(MenuOption(_("Rejoin"), _("Change selections"), &m_rejoin));
+	m_menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning"), "Sing"));
+	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
+}
+
+
 void InstrumentGraph::doUpdates() {
 	if (!menuOpen() && !m_ready) {
 		m_ready = true;
-		setupPauseMenu(m_menu);
+		setupPauseMenu();
 	}
 }
 
@@ -149,4 +151,17 @@ glutil::Color const& InstrumentGraph::color(int fret) const {
 		else if (fret == 4) fret = 0;
 	}
 	return fretColors[fret];
+}
+
+
+void InstrumentGraph::unjoin() {
+	m_jointime = getNaN();
+	m_rejoin = false;
+	m_score = 0;
+	m_starmeter = 0;
+	m_streak = 0;
+	m_longestStreak = 0;
+	m_bigStreak = 0;
+	m_countdown = 3;
+	m_ready = false;
 }
