@@ -507,7 +507,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 			float yMid = std::max(yEnd-arrowSize, yBeg+arrowSize);
 			vertexPair(arrow_i, x, yMid, 2.0f/3.0f, s);
 			// Draw middle
-			vertexPair(arrow_i, x, yBeg+arrowSize, 1.0f/3.0f, s);
+			vertexPair(arrow_i, x, yBeg + 2*arrowSize, 1.0f/3.0f, s);
 		}
 		// Draw begin
 		if (note.isHit && tEnd < 0.1) {
