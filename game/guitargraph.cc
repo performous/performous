@@ -118,8 +118,10 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number,
 		m_samples.push_back("guitar fail5");
 		m_samples.push_back("guitar fail6");
 	}
-	for (int i = 0; i < 6; ++i) m_pressed_anim[i].setRate(5.0);
-	for (int i = 0; i < 5; ++i) m_holds[i] = 0;
+	for (size_t i = 0; i < max_panels; ++i) {
+		m_pressed_anim[i].setRate(5.0);
+		m_holds[i] = 0;
+	}
 	m_pads = 5;
 	m_track_index = m_instrumentTracks.begin();
 	while (number--)

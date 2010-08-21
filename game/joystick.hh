@@ -51,7 +51,7 @@ namespace input {
 
 		class InputDevPrivate {
 		  public:
-			InputDevPrivate(const Instrument _instrument) : m_assigned(false), m_instrument(_instrument) {
+			InputDevPrivate(const Instrument& _instrument) : m_assigned(false), m_instrument(_instrument) {
 				for(unsigned int i = 0 ; i < BUTTONS ; i++) {
 					m_pressed[i] = false;
 				}

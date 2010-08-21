@@ -91,9 +91,8 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
   m_insideStop()
 {
 	// Initialize some arrays
-	for(size_t i = 0; i < max_panels; i++) {
+	for (size_t i = 0; i < max_panels; i++) {
 		m_activeNotes[i] = m_notes.end();
-		m_pressed[i] = false;
 		m_pressed_anim[i] = AnimValue(0.0, 4.0);
 		m_arrow_map[i] = -1;
 	}

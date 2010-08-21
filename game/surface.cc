@@ -52,7 +52,7 @@ Surface::Surface(std::string const& filename) { loader(*this, filename); }
 // Stuff for converting pix::Format into OpenGL enum values
 namespace {
 	struct PixFmt {
-		PixFmt() {} // Required by std::map
+		PixFmt(): swap() {} // Required by std::map
 		PixFmt(GLenum f, GLenum t, bool s): format(f), type(t), swap(s) {}
 		GLenum format;
 		GLenum type;

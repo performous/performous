@@ -31,6 +31,7 @@ InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevType 
 {
 	m_popupText.reset(new SvgTxtThemeSimple(getThemePath("sing_popup_text.svg"), config["graphic/text_lod"].f()));
 	m_menuTheme.reset(new ThemeInstrumentMenu());
+	for (size_t i = 0; i < max_panels; ++i) m_pressed[i] = false;
 }
 
 

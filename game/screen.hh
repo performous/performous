@@ -72,8 +72,8 @@ class ScreenManager: public Singleton <ScreenManager> {
 	float m_timeToFadeIn;
 	float m_timeToFadeOut;
 	float m_timeToShow;
+	std::string m_message;
 	AnimValue m_messagePopup;
 	SvgTxtTheme m_textMessage;
-	std::string m_message;
 };
 
