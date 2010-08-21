@@ -9,7 +9,7 @@
 #include <boost/format.hpp>
 
 LayoutSinger::LayoutSinger(VocalTrack& vocals, Database& database, boost::shared_ptr<ThemeSing> theme):
-  m_vocals(vocals), m_noteGraph(vocals),m_lyricit(vocals.notes.begin()), m_lyrics(), m_database(database), m_theme(theme) {
+  m_vocals(vocals), m_noteGraph(vocals),m_lyricit(vocals.notes.begin()), m_lyrics(), m_database(database), m_theme(theme), m_hideLyrics() {
 	m_score_text[0].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_score_text[1].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_score_text[2].reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
@@ -103,43 +103,45 @@ void LayoutSinger::draw(double time, Position position) {
 	}
 
 	// Draw the lyrics
-	double linespacing = 0.0;
-	Dimensions pos;
-	switch(position) {
-		case LayoutSinger::BOTTOM: // Fullscreen
-			pos.screenBottom(-0.1);
-			linespacing = 0.06;
-			break;
-		case LayoutSinger::MIDDLE: // Band mode
-			pos.center(-0.05);
-			linespacing = 0.04;
-			break;
-		case LayoutSinger::LEFT:
-		case LayoutSinger::RIGHT:
-			pos.screenBottom(-0.1);
-			linespacing = 0.06;
-			break;
-	}
-	bool dirty;
-	do {
-		dirty = false;
-		if (!m_lyrics.empty() && m_lyrics[0].expired(time)) {
-			// Add extra spacing to replace the removed row
-			if (m_lyrics.size() > 1) m_lyrics[1].extraspacing.move(m_lyrics[0].extraspacing.get() + 1.0);
-			m_lyrics.pop_front();
-			dirty = true;
+	if (!m_hideLyrics) {
+		double linespacing = 0.0;
+		Dimensions pos;
+		switch(position) {
+			case LayoutSinger::BOTTOM: // Fullscreen
+				pos.screenBottom(-0.1);
+				linespacing = 0.06;
+				break;
+			case LayoutSinger::MIDDLE: // Band mode
+				pos.center(-0.05);
+				linespacing = 0.04;
+				break;
+			case LayoutSinger::LEFT:
+			case LayoutSinger::RIGHT:
+				pos.screenBottom(-0.1);
+				linespacing = 0.06;
+				break;
 		}
-		if (!dirty && m_lyricit != m_vocals.notes.end() && m_lyricit->begin < time + 4.0) {
-			m_lyrics.push_back(LyricRow(m_lyricit, m_vocals.notes.end()));
-			dirty = true;
-		}
-	} while (dirty);
-	if (m_theme.get()) // if there is a theme, draw the lyrics with it
-	{
-		for (size_t i = 0; i < m_lyrics.size(); ++i, pos.move(0.0, linespacing)) {
-			pos.move(0.0, m_lyrics[i].extraspacing.get() * linespacing);
-			if (i == 0) m_lyrics[0].draw(m_theme->lyrics_now, time, pos);
-			else if (i == 1 && position == LayoutSinger::BOTTOM) m_lyrics[1].draw(m_theme->lyrics_next, time, pos);
+		bool dirty;
+		do {
+			dirty = false;
+			if (!m_lyrics.empty() && m_lyrics[0].expired(time)) {
+				// Add extra spacing to replace the removed row
+				if (m_lyrics.size() > 1) m_lyrics[1].extraspacing.move(m_lyrics[0].extraspacing.get() + 1.0);
+				m_lyrics.pop_front();
+				dirty = true;
+			}
+			if (!dirty && m_lyricit != m_vocals.notes.end() && m_lyricit->begin < time + 4.0) {
+				m_lyrics.push_back(LyricRow(m_lyricit, m_vocals.notes.end()));
+				dirty = true;
+			}
+		} while (dirty);
+		if (m_theme.get()) // if there is a theme, draw the lyrics with it
+		{
+			for (size_t i = 0; i < m_lyrics.size(); ++i, pos.move(0.0, linespacing)) {
+				pos.move(0.0, m_lyrics[i].extraspacing.get() * linespacing);
+				if (i == 0) m_lyrics[0].draw(m_theme->lyrics_now, time, pos);
+				else if (i == 1 && position == LayoutSinger::BOTTOM) m_lyrics[1].draw(m_theme->lyrics_next, time, pos);
+			}
 		}
 	}
 

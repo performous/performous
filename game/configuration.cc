@@ -17,6 +17,18 @@ namespace fs = boost::filesystem;
 
 Config config;
 
+
+ConfigItem::ConfigItem(bool bval): m_type("bool"), m_value(bval) { }
+
+ConfigItem::ConfigItem(int ival): m_type("int"), m_value(ival) { }
+
+ConfigItem::ConfigItem(float fval): m_type("float"), m_value(fval) { }
+
+ConfigItem::ConfigItem(std::string sval): m_type("string"), m_value(sval) { }
+
+ConfigItem::ConfigItem(OptionList opts): m_type("option_list"), m_value(opts), m_sel(0) { }
+
+
 ConfigItem& ConfigItem::incdec(int dir) {
 	if (m_type == "int") {
 		int& val = boost::get<int>(m_value);
@@ -29,6 +41,8 @@ ConfigItem& ConfigItem::incdec(int dir) {
 	} else if (m_type == "bool") {
 		bool& val = boost::get<bool>(m_value);
 		val = !val;
+	} else if (m_type == "option_list") {
+		m_sel = clamp<int>(m_sel + dir, 0, boost::get<OptionList>(m_value).size()-1);
 	}
 	return *this;
 }
@@ -39,6 +53,7 @@ bool ConfigItem::isDefaultImpl(ConfigItem::Value const& defaultValue) const {
 	if (m_type == "float") return boost::get<double>(m_value) == boost::get<double>(defaultValue);
 	if (m_type == "string") return boost::get<std::string>(m_value) == boost::get<std::string>(defaultValue);
 	if (m_type == "string_list") return boost::get<StringList>(m_value) == boost::get<StringList>(defaultValue);
+	if (m_type == "option_list") return boost::get<OptionList>(m_value) == boost::get<OptionList>(defaultValue);
 	throw std::logic_error("ConfigItem::is_default doesn't know type '" + m_type + "'");
 }
 
@@ -58,6 +73,10 @@ bool& ConfigItem::b() { verifyType("bool"); return boost::get<bool>(m_value); }
 double& ConfigItem::f() { verifyType("float"); return boost::get<double>(m_value); }
 std::string& ConfigItem::s() { verifyType("string"); return boost::get<std::string>(m_value); }
 ConfigItem::StringList& ConfigItem::sl() { verifyType("string_list"); return boost::get<StringList>(m_value); }
+ConfigItem::OptionList& ConfigItem::ol() { verifyType("option_list"); return boost::get<OptionList>(m_value); }
+std::string& ConfigItem::so() { verifyType("option_list"); return boost::get<OptionList>(m_value).at(m_sel); }
+
+void ConfigItem::select(int i) { verifyType("option_list"); m_sel = clamp<int>(i, 0, boost::get<OptionList>(m_value).size()-1); }
 
 namespace {
 	template <typename T, typename VariantAll, typename VariantNum> std::string numericFormat(VariantAll const& value, VariantNum const& multiplier, VariantNum const& step) {
@@ -84,6 +103,7 @@ std::string ConfigItem::getValue() const {
 		StringList const& sl = boost::get<StringList>(m_value);
 		return sl.size() == 1 ? "{" + sl[0] + "}" : (boost::format("%d items") % sl.size()).str();
 	}
+	if (m_type == "option_list") return boost::get<OptionList>(m_value).at(m_sel);
 	throw std::logic_error("ConfigItem::getValue doesn't know type '" + m_type + "'");
 }
 
@@ -169,7 +189,8 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) {
 			value = elem2.get_content();
 		}
 		m_value = value;
-	} else if (m_type == "string_list") {
+	} else if (m_type == "string_list" || m_type == "option_list") {
+		//TODO: Option list should also update selection (from attribute?)
 		std::vector<std::string> value;
 		xmlpp::NodeSet n2 = elem.find("stringvalue/text()");
 		for (xmlpp::NodeSet::const_iterator it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
@@ -222,6 +243,14 @@ void writeConfig(bool system) {
 		else if (item.get_type() == "string_list") {
 			std::vector<std::string> const& value = item.sl();
 			for(std::vector<std::string>::const_iterator it = value.begin(); it != value.end(); ++it) {
+				xmlpp::Element* stringvalueNode = entryNode->add_child("stringvalue");
+				stringvalueNode->add_child_text(*it);
+			}
+		}
+		else if (item.get_type() == "option_list") {
+			//TODO: Write selected also (as attribute?)
+			ConfigItem::OptionList const& value = item.ol();
+			for(ConfigItem::OptionList::const_iterator it = value.begin(); it != value.end(); ++it) {
 				xmlpp::Element* stringvalueNode = entryNode->add_child("stringvalue");
 				stringvalueNode->add_child_text(*it);
 			}

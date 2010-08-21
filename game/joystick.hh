@@ -29,6 +29,7 @@ namespace input {
 		Type type;
 		int button; // Translated button number for press/release events. 0 for pick down, 1 for pick up (NOTE: these are NOT pick press/release events but rather different directions)
 		bool pressed[BUTTONS]; // All events tell the button state right after the event happened
+		NavButton nav; // Event translated to NavButton
 		// More stuff later, when it is actually used
 		boost::xtime time;
 	};
@@ -115,7 +116,7 @@ namespace input {
 		// First gives a correct instrument type
 		// Then gives an unknown instrument type
 		// Finally throw an exception if only wrong (or none) instrument are available
-		InputDev(DevType _type) {
+		InputDev(DevType _type): m_dev_type(_type) {
 			for (detail::InputDevs::iterator it = detail::devices.begin() ; it != detail::devices.end() ; ++it) {
 				if (it->first == detail::KEYBOARD_ID && !config["game/keyboard_guitar"].b()) continue;
 				if (it->first == detail::KEYBOARD_ID2 && !config["game/keyboard_drumkit"].b()) continue;
@@ -135,8 +136,10 @@ namespace input {
 		void addEvent(Event _e) { detail::devices.find(m_device_id)->second.addEvent(_e); };
 		bool pressed(int _button) { return detail::devices.find(m_device_id)->second.pressed(_button); }; // Current state
 		bool isKeyboard() const { return (m_device_id == detail::KEYBOARD_ID || m_device_id == detail::KEYBOARD_ID2 || m_device_id == detail::KEYBOARD_ID3); };
+		DevType getDevType() const { return m_dev_type; }
 	  private:
 		unsigned int m_device_id; // should be some kind of reference
+		DevType m_dev_type;
 	};
 
 	namespace SDL {

@@ -219,27 +219,27 @@ void SvgTxtTheme::draw(std::vector<TZoomText> const& _text, float alpha) {
 	}
 	double text_x = 0.0;
 	double text_y = 0.0;
-	// first compute maximum height and whole length
+	// First compute maximum height and whole length
 	for (unsigned int i = 0; i < _text.size(); i++ ) {
 		text_x += m_opengl_text[i].x();
 		text_y = std::max(text_y, m_opengl_text[i].y());
 	}
 
-	double texture_ar = text_x/text_y;
-	double texture_width = std::min(0.96, text_x/800.);
-	double texture_height = texture_width / texture_ar;
+	double texture_ar = text_x / text_y;
+	m_texture_width = std::min(0.96, text_x/800.);
+	m_texture_height = m_texture_width / texture_ar;
 
 	double position_x = dimensions.x1();
-	if (m_align == CENTER) position_x -= 0.5 * texture_width;
-	if (m_align == RIGHT) position_x -= texture_width;
+	if (m_align == CENTER) position_x -= 0.5 * m_texture_width;
+	if (m_align == RIGHT) position_x -= m_texture_width;
 
 	for (unsigned int i = 0; i < _text.size(); i++ ) {
 		double syllable_x = m_opengl_text[i].x();
-		double syllable_width = syllable_x *  texture_width / text_x;
-		double syllable_height = texture_height;
+		double syllable_width = syllable_x *  m_texture_width / text_x;
+		double syllable_height = m_texture_height;
 		double syllable_ar = syllable_width / syllable_height;
 		Dimensions dim(syllable_ar);
-		dim.fixedHeight(texture_height).center(dimensions.y1());
+		dim.fixedHeight(m_texture_height).center(dimensions.y1());
 		dim.middle(position_x + 0.5 * dim.w());
 		TexCoords tex;
 		double factor = _text[i].factor;

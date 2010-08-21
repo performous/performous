@@ -33,13 +33,17 @@ class DanceGraph: public InstrumentGraph {
 	bool dead() const;
 	std::string getTrack() const { return m_gamingMode; }
 	std::string getDifficultyString() const;
+	void changeTrack(int dir = 1);
+	void changeDifficulty(int dir = 1);
 
   private:
 	// Difficulty & mode selection
 	enum DanceStep { STEP_LEFT, STEP_DOWN, STEP_UP, STEP_RIGHT };
-	void gameMode(int direction);
-	void difficultyDelta(int delta);
-	void difficulty(DanceDifficulty level);
+	void setupJoinMenu();
+	void updateJoinMenu();
+	void setTrack(const std::string& track);
+	void finalizeTrackChange();
+	bool difficulty(DanceDifficulty level, bool check_only = false);
 	DanceDifficulty m_level;
 	std::string m_gamingMode; /// current game mode
 	DanceTracks::const_iterator m_curTrackIt; /// iterator to the currently selected game mode

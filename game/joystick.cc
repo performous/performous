@@ -441,6 +441,8 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 	Event event;
 	// Add event time
 	event.time = now();
+	// Translate to NavButton
+	event.nav = getNav(_e);
 	static bool pickPressed[2] = {}; // HACK for tracking enter and rshift status
 	switch(_e.type) {
 		case SDL_KEYDOWN: {
@@ -462,7 +464,7 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 					if (pickPressed[0]) return true; // repeating
 					pickPressed[0] = true;
 					event.type = input::Event::PICK;
-					button = 1;
+					button = 0;
 					is_guitar_event = true;
 					break;
 				case SDLK_RSHIFT:
@@ -470,7 +472,7 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 					if (pickPressed[1]) return true; // repeating
 					pickPressed[1] = true;
 					event.type = input::Event::PICK;
-					button = 0;
+					button = 1;
 					is_guitar_event = true;
 					break;
 				case SDLK_BACKSPACE:
@@ -812,6 +814,11 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 			break;
 		case SDL_JOYBALLMOTION:
 		default:
+			if (event.nav != input::NONE) {
+				event.button = 0;
+				event.type = input::Event::PRESS;
+				devices.find(joy_id)->second.addEvent(event);
+			}
 			return false;
 	}
 	return true;
