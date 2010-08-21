@@ -65,6 +65,75 @@ namespace {
 			*i *= factor * factor; // Decrease music volume
 	}
 }
+/**
+* Advanced audio sync code.
+* Produces precise monotonic clock synced to audio output callback (which may suffer of major jitter).
+* Uses system clock as timebase but the clock is skewed (made slower or faster) depending on whether
+* it is late or early. The clock is also stopped if audio output pauses.
+**/
+class AudioClock {
+	static ptime getTime() { return microsec_clock::universal_time(); }
+	// Conversion helpers
+	static double getSeconds(time_duration t) { return 1e-6 * t.total_microseconds(); }
+	static time_duration getDuration(double seconds) { return microseconds(1e6 * seconds); }
+
+	mutable boost::mutex m_mutex;
+	ptime m_baseTime; ///< A reference time (corresponds to m_basePos)
+	double m_basePos; ///< A reference position in song
+	double m_skew; ///< The skew ratio applied to system time (since baseTime)
+	volatile float m_max; ///< Maximum output value for the clock (end of the current audio block)
+	/// Get the current position (current time via parameter, no locking)
+	double pos_internal(ptime now) const {
+		double t = m_basePos + (1.0 + m_skew) * getSeconds(now - m_baseTime);
+		return std::min<double>(t, m_max);
+	}
+public:
+	AudioClock(): m_baseTime(), m_basePos(), m_skew(), m_max() {}
+	/**
+	* Called from audio callback to keep the clock synced.
+	* @param audioPos the current position in the song
+	* @param length the duration of the current audio block
+	*/
+	void timeSync(time_duration audioPos, time_duration length) {
+		const double maxError = 0.1;  // Step the clock instead of skewing if over 100 ms off
+		const double fudgeFactor = 0.1;  // Adjustment ratio
+		// Full correction requires locking, but we can update max without lock too
+		boost::mutex::scoped_try_lock l(m_mutex, boost::defer_lock);
+		double max = getSeconds(audioPos + length);
+		if (!l.try_lock()) {
+			if (max > m_max) m_max = max; // Allow increasing m_max
+			return;
+		}
+		// Mutex locked - do a full update
+		ptime now = getTime();
+		double sys = pos_internal(now);  // Current position (based on system clock + corrections)
+		double audio = getSeconds(audioPos);  // Audio time
+		double diff = audio - sys;
+		// Skew-based correction only if going forward and relatively well synced
+		if (max > m_max && std::abs(diff) < maxError) {
+			// Update base position (this should not affect the clock)
+			m_baseTime = now;
+			m_basePos = sys;
+			// Apply a VERY ARTIFICIAL correction for clock!
+			double valadj = getSeconds(length) * 0.1 * rand() / RAND_MAX;  // Dither
+			m_skew = 0.99 * m_skew + 0.01 * (diff < valadj ? -1.0 : 1.0) * fudgeFactor;
+			// Limits to keep things sane in abnormal situations
+			if (m_skew > 0.01) m_skew = 0.01;
+			else if (m_skew < -0.01) m_skew = -0.01;
+		} else {
+			// Off too much, step to correct time
+			m_baseTime = now;
+			m_basePos = audio;
+			m_skew = 0.0;
+		}
+		m_max = max;
+	}
+	/// Get the current position in seconds
+	double pos() const {
+		boost::mutex::scoped_lock l(m_mutex);
+		return pos_internal(getTime());
+	}
+};
 
 class Music {
 	struct Track {
@@ -77,31 +146,17 @@ class Music {
 	Tracks tracks; ///< Audio decoders
 	double srate; ///< Sample rate
 	int64_t m_pos; ///< Current sample position
-	ptime m_baseTime; ///< A reference time (the beginning of the song)
-	time_duration m_nextTime; ///< Start of the next audio block (needed for time monotonicity)
 	bool m_preview;
-
-	static ptime getTime() { return microsec_clock::universal_time(); }
+	AudioClock m_clock;
 	time_duration durationOf(int64_t samples) const { return microseconds(1e6 * samples / srate / 2.0); }
-	/**
-	* Timing code for precise monotonic time. Very simple, far from perfect.
-	* This function is called at a beginning of the audio callback, before modifying m_pos
-	* @param samples the number of samples in the current block (used for calculating block end time)
-	*/
-	void timeSync(size_t samples) {
-		time_duration begin = durationOf(m_pos);  // Current block begin position in song
-		m_nextTime = begin + durationOf(samples);  // Current block end position in song
-		m_baseTime = getTime() - begin;  // Recalibrate base time to beginning of the song
-	}
-
 public:
 	double fadeLevel;
 	double fadeRate;
 	typedef std::map<std::string,std::string> Files;
 	typedef std::vector<float> Buffer;
 	Music(Files const& filenames, unsigned int sr, bool preview):
-	  srate(sr), m_pos(), m_baseTime(getTime()),
-	  m_preview(preview), fadeLevel(), fadeRate() {
+	  srate(sr), m_pos(), m_preview(preview), fadeLevel(), fadeRate()
+	{
 		for (Files::const_iterator it = filenames.begin(), end = filenames.end(); it != end; ++it) {
 			if (it->second.empty()) continue; // Skip tracks with no filenames; FIXME: Why do we even have those here, shouldn't they be eliminated earlier?
 			tracks.insert(it->first, std::auto_ptr<Track>(new Track(it->second, sr)));
@@ -110,7 +165,7 @@ public:
 	/// Sums the stream to output sample range, returns true if the stream still has audio left afterwards.
 	bool operator()(float* begin, float* end) {
 		size_t samples = end - begin;
-		timeSync(samples); // Keep audio synced
+		m_clock.timeSync(durationOf(m_pos), durationOf(samples)); // Keep the clock synced
 		bool eof = true;
 		Buffer mixbuf(end - begin);
 		for (Tracks::iterator it = tracks.begin(), itend = tracks.end(); it != itend; ++it) {
@@ -143,11 +198,7 @@ public:
 	}
 	void seek(double time) { m_pos = time * srate * 2.0; }
 	/// Get the current position in seconds
-	double pos() const {
-		time_duration p = getTime() - m_baseTime;  // Simple precise position
-		if (p > m_nextTime) p = m_nextTime;  // Cap for monotonicity
-		return p.total_microseconds() * 1e-6;
-	}
+	double pos() const { return m_clock.pos(); }
 	double duration() const {
 		double dur = 0.0;
 		for (Tracks::const_iterator it = tracks.begin(), itend = tracks.end(); it != itend; ++it) {
