@@ -3,7 +3,8 @@
 dir=$(dirname "$0")
 export PATH=$PATH:"$dir"
 export FONTCONFIG_PATH="$dir/../Resources/etc/fonts"
-# somehow this doesn't work on a MacBookPro under 10.5.8:
-#performous 2>&1 --pdev pa19 --mics pa19
+# Without this line, pixbuf tries to use the config file from macports
+# environment. Apparently it works just fine without it too.
+export GDK_PIXBUF_MODULE_FILE=""
 # TODO: might be a good idea to turn-off all console output
 performous
