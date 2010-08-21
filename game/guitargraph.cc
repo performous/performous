@@ -10,6 +10,10 @@
 #include <boost/format.hpp>
 
 namespace {
+	#if 0 // Here is some dummy gettext calls to populate the dictionary
+	_("guitar") _("bass") _("drums")
+	_("Kids") _("Easy") _("Medium") _("Hard") _("Expert")
+	#endif
 	struct Diff { std::string name; int basepitch; } diffv[] = {
 		{ "Kids", 0x3C },
 		{ "Easy", 0x3C },
@@ -167,8 +171,8 @@ void GuitarGraph::setupJoinMenu() {
 }
 
 void GuitarGraph::updateJoinMenu() {
-	m_trackOpt = getTrack();
-	m_difficultyOpt =  getDifficultyString();
+	m_trackOpt = _(getTrack().c_str());
+	m_difficultyOpt =  _(getDifficultyString().c_str());
 	std::string s("\n (");
 	std::string le = m_leftymode.b() ? _("ON") : _("OFF");
 	m_leftyOpt = _("Toggle lefty-mode") + s + le + ")";
@@ -204,11 +208,20 @@ void GuitarGraph::setTrack(const std::string& track) {
 	m_menu.select(1); // Restore selection to the track item
 }
 
+/// Get the trackname string
+std::string GuitarGraph::getTrack() const {
+	return _(m_track_index->first.c_str());
+}
+
 /// Get the difficulty as displayable string
 std::string GuitarGraph::getDifficultyString() const {
-	std::string ret = diffv[m_level].name;
-	if (m_drums && m_input.isKeyboard()) ret += " (kbd)";
-	return ret;
+	return _(diffv[m_level].name.c_str());
+}
+
+/// Get a string id for track and difficulty
+std::string GuitarGraph::getModeId() const {
+	return m_track_index->first + diffv[m_level].name
+		+ (m_drums && m_input.isKeyboard() ? " (kbd)" : "");
 }
 
 /// Cycle through difficulties

@@ -71,6 +71,7 @@ class InstrumentGraph {
 	virtual bool dead() const = 0;
 	virtual std::string getTrack() const = 0;
 	virtual std::string getDifficultyString() const = 0;
+	virtual std::string getModeId() const = 0;
 	virtual void changeTrack(int dir = 1) = 0;
 	virtual void changeDifficulty(int dir = 1) = 0;
 

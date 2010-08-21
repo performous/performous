@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-08-21 23:32-0000\n"
+"POT-Creation-Date: 2010-08-22 01:29-0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Tapio Vierros <tapiovierros@gmail.com>\n"
 "Language-Team: \n"
@@ -41,37 +41,57 @@ msgstr "<kirjoita etsiäksesi>"
 msgid "Hiscore for "
 msgstr "Ennätykset kappaleelle "
 
-#: ../game/dancegraph.cc:109
+#: ../game/dancegraph.cc:18
+msgid "Beginner"
+msgstr "Aloittelija"
+
+#: ../game/dancegraph.cc:18
+msgid "Easy"
+msgstr "Helppo"
+
+#: ../game/dancegraph.cc:18
+msgid "Medium"
+msgstr "Keskitaso"
+
+#: ../game/dancegraph.cc:18
+msgid "Hard"
+msgstr "Vaikea"
+
+#: ../game/dancegraph.cc:18
+msgid "Challenge"
+msgstr "Haastavin"
+
+#: ../game/dancegraph.cc:112
 msgid "Ready!"
 msgstr "Valmis!"
 
-#: ../game/dancegraph.cc:109
+#: ../game/dancegraph.cc:112
 msgid "Start performing!"
 msgstr "Aloita esiintyminen!"
 
-#: ../game/dancegraph.cc:120
+#: ../game/dancegraph.cc:123
 msgid "Select track"
 msgstr "Valitse pelimuoto"
 
-#: ../game/dancegraph.cc:136
+#: ../game/dancegraph.cc:139
 msgid "Select difficulty"
 msgstr "Valitse vaikeusaste"
 
-#: ../game/dancegraph.cc:139
+#: ../game/dancegraph.cc:142
 #: ../game/screen_sing.cc:116
 msgid "Quit"
 msgstr "Lopeta"
 
-#: ../game/dancegraph.cc:139
+#: ../game/dancegraph.cc:142
 #: ../game/screen_sing.cc:116
 msgid "Exit to song browser"
 msgstr "Poistu kappale valintaan"
 
-#: ../game/dancegraph.cc:250
+#: ../game/dancegraph.cc:261
 msgid "STOP!"
 msgstr "SEIS!"
 
-#: ../game/dancegraph.cc:325
+#: ../game/dancegraph.cc:336
 msgid "Streak!"
 msgstr "Sarja!"
 
@@ -248,23 +268,43 @@ msgstr "Kirjoita etsiäksesi tai luodaksesi uuden pelaajan."
 msgid "Search Text:"
 msgstr "Etsi:"
 
-#: ../game/guitargraph.cc:164
+#: ../game/guitargraph.cc:14
+msgid "guitar"
+msgstr "kitara"
+
+#: ../game/guitargraph.cc:14
+msgid "bass"
+msgstr "basso"
+
+#: ../game/guitargraph.cc:14
+msgid "drums"
+msgstr "rummut"
+
+#: ../game/guitargraph.cc:15
+msgid "Kids"
+msgstr "Lapset"
+
+#: ../game/guitargraph.cc:15
+msgid "Expert"
+msgstr "Ekspertti"
+
+#: ../game/guitargraph.cc:168
 msgid "Lefty-mode"
 msgstr "Vasuritila"
 
-#: ../game/guitargraph.cc:173
+#: ../game/guitargraph.cc:177
 msgid "ON"
 msgstr "Päällä"
 
-#: ../game/guitargraph.cc:173
+#: ../game/guitargraph.cc:177
 msgid "OFF"
 msgstr "Pois"
 
-#: ../game/guitargraph.cc:174
+#: ../game/guitargraph.cc:178
 msgid "Toggle lefty-mode"
 msgstr "Vasenkätisyystila"
 
-#: ../game/guitargraph.cc:447
+#: ../game/guitargraph.cc:460
 msgid ""
 "God Mode\n"
 "Activated!"
@@ -272,19 +312,19 @@ msgstr ""
 "Jumalmoodi\n"
 "Aktivoitu!"
 
-#: ../game/guitargraph.cc:448
+#: ../game/guitargraph.cc:461
 msgid "Mistakes ignored!"
 msgstr "Virheitä ei huomioida!"
 
-#: ../game/guitargraph.cc:1081
+#: ../game/guitargraph.cc:1094
 msgid "Drum Fill!"
 msgstr "Rumpufilli!"
 
-#: ../game/guitargraph.cc:1082
+#: ../game/guitargraph.cc:1095
 msgid "God Mode Ready!"
 msgstr "Jumalmoodi valmis!"
 
-#: ../game/guitargraph.cc:1087
+#: ../game/guitargraph.cc:1100
 msgid "Solo!"
 msgstr "Soolo!"
 
@@ -331,6 +371,24 @@ msgstr "Liity uudelleen"
 #: ../game/instrumentgraph.cc:40
 msgid "Change selections"
 msgstr "Vaihda valintoja"
+
+#~ msgid " (kbd)"
+#~ msgstr "(näp.)"
+
+#~ msgid "Kids (kbd)"
+#~ msgstr "Lapset (näp.)"
+
+#~ msgid "Easy (kbd)"
+#~ msgstr "Helppo (näp.)"
+
+#~ msgid "Medium (kbd)"
+#~ msgstr "Keskitaso (näp.)"
+
+#~ msgid "Hard (kbd)"
+#~ msgstr "Vaikea (näp.)"
+
+#~ msgid "Expert (kbd)"
+#~ msgstr "Ekspertti (näp.)"
 
 #~ msgid "No microphones found.\n"
 #~ msgstr "Mikrofoneja ei löytynyt.\n"

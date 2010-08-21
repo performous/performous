@@ -14,6 +14,9 @@ namespace {
 	static const int mapping7[max_panels] = {0, 2, 4, 6, 1, 5, 3,-1,-1,-1};
 	static const int mapping8[max_panels] = {0, 3, 4, 7, 1, 6, 2, 5,-1,-1};
 	static const int mapping10[max_panels]= {0, 3, 4, 7, 1, 6, 2, 5,-1,-1};
+	#if 0 // Here is some dummy gettext calls to populate the dictionary
+	_("Beginner") _("Easy") _("Medium") _("Hard") _("Challenge")
+	#endif
 	const std::string diffv[] = { "Beginner", "Easy", "Medium", "Hard", "Challenge" };
 	const int death_delay = 25; // Delay in notes after which the player is hidden
 	const float join_delay = 3.0f; // Time after join menu before playing when joining mid-game
@@ -196,11 +199,19 @@ bool DanceGraph::dead() const {
 	return m_jointime != m_jointime || m_dead >= death_delay;
 }
 
+/// Get the track string
+std::string DanceGraph::getTrack() const {
+	return _(m_gamingMode.c_str());
+}
+
 /// Get the difficulty as displayable string
 std::string DanceGraph::getDifficultyString() const {
-	std::string ret = diffv[m_level];
-	if (m_input.isKeyboard()) ret += " (kbd)";
-	return ret;
+	return _(diffv[m_level].c_str());
+}
+
+/// Get a string id for track and difficulty
+std::string DanceGraph::getModeId() const {
+	return m_gamingMode + diffv[m_level] + (m_input.isKeyboard() ? " (kbd)" : "");
 }
 
 /// Attempt to change the difficulty by a step

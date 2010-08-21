@@ -560,7 +560,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database, Dancers& 
 		item.score = it->getScore();
 		if (item.score < 100) { it = instruments.erase(it); continue; } // Dead
 		item.track_simple = it->getTrack();
-		item.track = it->getTrack() + " - " + it->getDifficultyString();
+		item.track = it->getModeId();
 		item.track[0] = toupper(item.track[0]); // Capitalize
 		if (item.track_simple == TrackName::DRUMS) item.color = glutil::Color(0.1f, 0.1f, 0.1f);
 		else if (item.track_simple == TrackName::BASS) item.color = glutil::Color(0.5f, 0.3f, 0.1f);
@@ -575,7 +575,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database, Dancers& 
 		item.score = it->getScore();
 		if (item.score < 100) { it = dancers.erase(it); continue; } // Dead
 		item.track_simple = it->getTrack();
-		item.track = it->getTrack() + " - " + it->getDifficultyString();
+		item.track = it->getModeId();
 		item.track[0] = toupper(item.track[0]); // Capitalize
 		item.color = glutil::Color(1.0f, 0.4f, 0.1f);
 

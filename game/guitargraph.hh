@@ -52,8 +52,9 @@ class GuitarGraph: public InstrumentGraph {
 	void draw(double time);
 	void engine();
 	bool dead() const;
-	std::string getTrack() const { return m_track_index->first; }
+	std::string getTrack() const;
 	std::string getDifficultyString() const;
+	std::string getModeId() const;
 	void changeTrack(int dir = 1);
 	void changeDifficulty(int dir = 1);
 	double getWhammy() const { return m_whammy; }
