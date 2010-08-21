@@ -170,6 +170,8 @@ public:
 		Buffer mixbuf(end - begin);
 		for (Tracks::iterator it = tracks.begin(), itend = tracks.end(); it != itend; ++it) {
 			Track& t = *it->second;
+// FIXME: Include this code bit once there is a sane pitch shifting algorithm
+#if 0
 //			if (it->first == "guitar") std::cout << t.pitchFactor << std::endl;
 			if (t.pitchFactor != 0) { // Pitch shift
 				Buffer tempbuf(end - begin);
@@ -183,7 +185,9 @@ public:
 				while (b != tempbuf.end())
 					*m++ += (*b++);
 			// Otherwise just get the audio and mix it straight away
-			} else if (t.mpeg.audioQueue(&*mixbuf.begin(), &*mixbuf.end(), m_pos, t.fadeLevel)) eof = false;
+			} else
+#endif
+			if (t.mpeg.audioQueue(&*mixbuf.begin(), &*mixbuf.end(), m_pos, t.fadeLevel)) eof = false;
 		}
 		m_pos += samples;
 		for (size_t i = 0, iend = mixbuf.size(); i != iend; ++i) {
