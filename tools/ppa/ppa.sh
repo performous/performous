@@ -18,7 +18,7 @@ export DEBEMAIL="`gpg --list-keys | grep uid | sed 's/ *(.*)//; s/>.*//; s/.*[:<
 PKG="performous"
 PPAVERSIONNUM="1"
 VERSIONCOMMON="+git"`date '+%Y%m%d'`"~ppa${PPAVERSIONNUM}"
-SUITES="lucid karmic"
+SUITES="karmic lucid maverick"
 GITURL="git://git.performous.org/gitroot/performous/performous"
 DESTINATIONPPA="ppa:performous-team/ppa"
 
@@ -37,9 +37,9 @@ PPAPATCHDIR="`pwd`"
 		$COPYCMD "$1/editor" "$2"
 		$COPYCMD "$1/game" "$2"
 		$COPYCMD "$1/lang" "$2"
-		$COPYCMD "$1/libs" "$2"
 		$COPYCMD "$1/themes" "$2"
 		$COPYCMD "$1/tools" "$2"
+		rm -rf "$2"/libs   # Old libs dir not used anymore
 	}
 
 cd "$TEMPDIR"
