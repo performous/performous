@@ -56,6 +56,7 @@ class GuitarGraph: public InstrumentGraph {
 	std::string getDifficultyString() const;
 	void changeTrack(int dir = 1);
 	void changeDifficulty(int dir = 1);
+	double getWhammy() const { return m_whammy; }
 
   private:
 	// Engine / scoring utils
@@ -145,5 +146,6 @@ class GuitarGraph: public InstrumentGraph {
 	double m_soloScore; /// score during solo
 	bool m_solo; /// are we currently playing a solo
 	bool m_practHold; /// true if holding a chord during practice
+	double m_whammy; /// whammy value for pitch shift
 };
 

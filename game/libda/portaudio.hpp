@@ -1,3 +1,9 @@
+#pragma once
+
+/**
+ * @file portaudio.hpp OOP / RAII wrappers & utilities for PortAudio library.
+ */
+
 #include <portaudio.h>
 #include <cstdlib>
 #include <stdexcept>
@@ -44,7 +50,7 @@ namespace portaudio {
 		PaStreamParameters params;
 		Params(PaStreamParameters const& init = PaStreamParameters()): params(init) {
 			// Some useful defaults so that things just work
-			channelCount(2).sampleFormat(paFloat32).suggestedLatency(0.02);
+			channelCount(2).sampleFormat(paFloat32).suggestedLatency(0.05);
 		}
 		Params& channelCount(int val) { params.channelCount = val; return *this; }
 		Params& device(PaDeviceIndex val) { params.device = val; return *this; }
@@ -87,4 +93,3 @@ namespace portaudio {
 	};
 
 }
-

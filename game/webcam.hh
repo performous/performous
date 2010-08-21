@@ -7,8 +7,11 @@
 
 #include "surface.hh"
 
-struct CvCapture;
-struct CvVideoWriter;
+namespace cv {
+	// Forward declarations
+	class VideoCapture;
+	class VideoWriter;
+}
 
 struct CamFrame {
 	int width;
@@ -39,8 +42,8 @@ class Webcam {
   private:
 	boost::scoped_ptr<boost::thread> m_thread;
 	mutable boost::mutex m_mutex;
-	CvCapture* m_capture;
-	CvVideoWriter* m_writer;
+	boost::scoped_ptr<cv::VideoCapture> m_capture;
+	boost::scoped_ptr<cv::VideoWriter> m_writer;
 	CamFrame m_frame;
 	Surface m_surface;
 	bool m_frameAvailable;

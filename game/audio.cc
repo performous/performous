@@ -12,7 +12,12 @@
 #include <iostream>
 #include <map>
 
+using namespace boost::posix_time;
+
 namespace {
+	/**
+	 * A function to parse key=value pairs with quoting capabilites.
+	 */
 	std::map<std::string, std::string> parseKeyValuePairs(const std::string& st) {
 		std::map<std::string, std::string> ret;
 		bool inside_quotes = false;
@@ -47,47 +52,140 @@ namespace {
 		if (!key.empty()) ret[key] = value;
 		return ret;
 	}
-}
 
+	/**
+	 * Pitch shifter.
+	 * @param begin start of the buffer
+	 * @param end end of the buffer
+	 * @param factor shift factor from 0 (no shift) to 1 (maximum)
+	 */
+	template <typename It> void PitchShift(It begin, It end, double factor) {
+		//FIXME: Dummy volume bender
+		for (It i = begin; i != end; ++i)
+			*i *= factor * factor; // Decrease music volume
+	}
+}
+/**
+* Advanced audio sync code.
+* Produces precise monotonic clock synced to audio output callback (which may suffer of major jitter).
+* Uses system clock as timebase but the clock is skewed (made slower or faster) depending on whether
+* it is late or early. The clock is also stopped if audio output pauses.
+**/
+class AudioClock {
+	static ptime getTime() { return microsec_clock::universal_time(); }
+	// Conversion helpers
+	static double getSeconds(time_duration t) { return 1e-6 * t.total_microseconds(); }
+	static time_duration getDuration(double seconds) { return microseconds(1e6 * seconds); }
+
+	mutable boost::mutex m_mutex;
+	ptime m_baseTime; ///< A reference time (corresponds to m_basePos)
+	double m_basePos; ///< A reference position in song
+	double m_skew; ///< The skew ratio applied to system time (since baseTime)
+	volatile float m_max; ///< Maximum output value for the clock (end of the current audio block)
+	/// Get the current position (current time via parameter, no locking)
+	double pos_internal(ptime now) const {
+		double t = m_basePos + (1.0 + m_skew) * getSeconds(now - m_baseTime);
+		return std::min<double>(t, m_max);
+	}
+public:
+	AudioClock(): m_baseTime(), m_basePos(), m_skew(), m_max() {}
+	/**
+	* Called from audio callback to keep the clock synced.
+	* @param audioPos the current position in the song
+	* @param length the duration of the current audio block
+	*/
+	void timeSync(time_duration audioPos, time_duration length) {
+		const double maxError = 0.1;  // Step the clock instead of skewing if over 100 ms off
+		const double fudgeFactor = 0.1;  // Adjustment ratio
+		// Full correction requires locking, but we can update max without lock too
+		boost::mutex::scoped_try_lock l(m_mutex, boost::defer_lock);
+		double max = getSeconds(audioPos + length);
+		if (!l.try_lock()) {
+			if (max > m_max) m_max = max; // Allow increasing m_max
+			return;
+		}
+		// Mutex locked - do a full update
+		ptime now = getTime();
+		double sys = pos_internal(now);  // Current position (based on system clock + corrections)
+		double audio = getSeconds(audioPos);  // Audio time
+		double diff = audio - sys;
+		// Skew-based correction only if going forward and relatively well synced
+		if (max > m_max && std::abs(diff) < maxError) {
+			// Update base position (this should not affect the clock)
+			m_baseTime = now;
+			m_basePos = sys;
+			// Apply a VERY ARTIFICIAL correction for clock!
+			double valadj = getSeconds(length) * 0.1 * rand() / RAND_MAX;  // Dither
+			m_skew = 0.99 * m_skew + 0.01 * (diff < valadj ? -1.0 : 1.0) * fudgeFactor;
+			// Limits to keep things sane in abnormal situations
+			if (m_skew > 0.01) m_skew = 0.01;
+			else if (m_skew < -0.01) m_skew = -0.01;
+		} else {
+			// Off too much, step to correct time
+			m_baseTime = now;
+			m_basePos = audio;
+			m_skew = 0.0;
+		}
+		m_max = max;
+	}
+	/// Get the current position in seconds
+	double pos() const {
+		boost::mutex::scoped_lock l(m_mutex);
+		return pos_internal(getTime());
+	}
+};
 
 class Music {
 	struct Track {
 		FFmpeg mpeg;
 		float fadeLevel;
-		Track(std::string const& filename, unsigned int sr): mpeg(false, true, filename, sr), fadeLevel(1.0f) {}
+		float pitchFactor;
+		Track(std::string const& filename, unsigned int sr): mpeg(false, true, filename, sr), fadeLevel(1.0f), pitchFactor(0.0f) {}
 	};
 	typedef boost::ptr_map<std::string, Track> Tracks;
 	Tracks tracks; ///< Audio decoders
 	double srate; ///< Sample rate
 	int64_t m_pos; ///< Current sample position
-	boost::posix_time::ptime m_syncTime; ///< Time of the previous audio timeSync
 	bool m_preview;
-
-	static boost::posix_time::ptime getTime() { return boost::posix_time::microsec_clock::universal_time(); }
-	double pos_internal() const { return double(m_pos) / srate / 2.0; }
-	double seconds(boost::posix_time::time_duration const& d) const { return 1e-6 * d.total_microseconds(); }
-	/// Do stuff for correcting time codes
-	void timeSync() { m_syncTime = getTime(); }
-
+	AudioClock m_clock;
+	time_duration durationOf(int64_t samples) const { return microseconds(1e6 * samples / srate / 2.0); }
 public:
 	double fadeLevel;
 	double fadeRate;
 	typedef std::map<std::string,std::string> Files;
-	Music(Files const& filenames, unsigned int sr, bool preview): srate(sr), m_pos(), m_syncTime(getTime()), m_preview(preview), fadeLevel(), fadeRate() {
+	typedef std::vector<float> Buffer;
+	Music(Files const& filenames, unsigned int sr, bool preview):
+	  srate(sr), m_pos(), m_preview(preview), fadeLevel(), fadeRate()
+	{
 		for (Files::const_iterator it = filenames.begin(), end = filenames.end(); it != end; ++it) {
+			if (it->second.empty()) continue; // Skip tracks with no filenames; FIXME: Why do we even have those here, shouldn't they be eliminated earlier?
 			tracks.insert(it->first, std::auto_ptr<Track>(new Track(it->second, sr)));
 		}
 	}
 	/// Sums the stream to output sample range, returns true if the stream still has audio left afterwards.
 	bool operator()(float* begin, float* end) {
+		size_t samples = end - begin;
+		m_clock.timeSync(durationOf(m_pos), durationOf(samples)); // Keep the clock synced
 		bool eof = true;
-		std::vector<float> mixbuf(end - begin);
+		Buffer mixbuf(end - begin);
 		for (Tracks::iterator it = tracks.begin(), itend = tracks.end(); it != itend; ++it) {
 			Track& t = *it->second;
-			if (t.mpeg.audioQueue(&*mixbuf.begin(), &*mixbuf.end(), m_pos, t.fadeLevel)) eof = false;
+//			if (it->first == "guitar") std::cout << t.pitchFactor << std::endl;
+			if (t.pitchFactor != 0) { // Pitch shift
+				Buffer tempbuf(end - begin);
+				// Get audio to temp buffer
+				if (t.mpeg.audioQueue(&*tempbuf.begin(), &*tempbuf.end(), m_pos, t.fadeLevel)) eof = false;
+				// Do the magic
+				PitchShift(&*tempbuf.begin(), &*tempbuf.end(), t.pitchFactor);
+				// Mix with other tracks
+				Buffer::iterator m = mixbuf.begin();
+				Buffer::iterator b = tempbuf.begin();
+				while (b != tempbuf.end())
+					*m++ += (*b++);
+			// Otherwise just get the audio and mix it straight away
+			} else if (t.mpeg.audioQueue(&*mixbuf.begin(), &*mixbuf.end(), m_pos, t.fadeLevel)) eof = false;
 		}
-		m_pos += end - begin;
-		timeSync(); // Keep audio synced
+		m_pos += samples;
 		for (size_t i = 0, iend = mixbuf.size(); i != iend; ++i) {
 			if (i % 2 == 0) {
 				fadeLevel += fadeRate;
@@ -99,12 +197,8 @@ public:
 		return !eof;
 	}
 	void seek(double time) { m_pos = time * srate * 2.0; }
-	/// Get current position in seconds
-	double pos() {
-		double delay = seconds(getTime() - m_syncTime); // Delay since last sync
-		if (delay > 0.150) delay = 0; // If delay gets long, something is fishy (or pause is on)
-		return pos_internal() + delay; // Adjust internal time
-	}
+	/// Get the current position in seconds
+	double pos() const { return m_clock.pos(); }
 	double duration() const {
 		double dur = 0.0;
 		for (Tracks::const_iterator it = tracks.begin(), itend = tracks.end(); it != itend; ++it) {
@@ -124,6 +218,11 @@ public:
 		Tracks::iterator it = tracks.find(name);
 		if (it == tracks.end()) return;
 		it->second->fadeLevel = fadeLevel;
+	}
+	void trackPitchBend(std::string const& name, double pitchFactor) {
+		Tracks::iterator it = tracks.find(name);
+		if (it == tracks.end()) return;
+		it->second->pitchFactor = pitchFactor;
 	}
 };
 
@@ -185,11 +284,10 @@ struct Synth {
 	}
 };
 
-
 struct Command {
-	enum { TRACK_FADE, SAMPLE_RESET } type;
+	enum { TRACK_FADE, TRACK_PITCHBEND, SAMPLE_RESET } type;
 	std::string track;
-	double fadeLevel;
+	double factor;
 };
 
 struct Output {
@@ -217,7 +315,10 @@ struct Output {
 			Command const& cmd = commands[i];
 			switch (cmd.type) {
 			case Command::TRACK_FADE:
-				if (!playing.empty()) playing[0].trackFade(cmd.track, cmd.fadeLevel);
+				if (!playing.empty()) playing[0].trackFade(cmd.track, cmd.factor);
+				break;
+			case Command::TRACK_PITCHBEND:
+				if (!playing.empty()) playing[0].trackPitchBend(cmd.track, cmd.factor);
 				break;
 			case Command::SAMPLE_RESET:
 				boost::ptr_map<std::string, Sample>::iterator it = samples.find(cmd.track);
@@ -275,7 +376,8 @@ struct Device {
 
 	Device(unsigned int in, unsigned int out, double rate, unsigned int dev):
 	  in(in), out(out), rate(rate), dev(dev),
-	  stream(*this, in ? portaudio::Params().channelCount(in).device(dev) : (const PaStreamParameters*)NULL, (out ? portaudio::Params().channelCount(out).device(dev) : (const PaStreamParameters*)NULL), rate),
+	  stream(*this, in ? portaudio::Params().channelCount(in).device(dev).suggestedLatency(config["audio/latency"].f()): (const PaStreamParameters*)NULL,
+	    (out ? portaudio::Params().channelCount(out).device(dev).suggestedLatency(config["audio/latency"].f()) : (const PaStreamParameters*)NULL), rate),
 	  outptr()
 	{
 		mics.resize(in);
@@ -321,6 +423,7 @@ struct Audio::Impl {
 					std::string dev;
 					std::vector<std::string> mics;
 				} params = Params();
+				params.out = 0;
 				params.rate = 48000;
 				// Break into tokens:
 				std::map<std::string, std::string> keyvalues = parseKeyValuePairs(*it);
@@ -355,14 +458,16 @@ struct Audio::Impl {
 				for (int match_partial = 0; match_partial < 2 && !skip_partial; ++match_partial) {
 					// Loop through the devices and try everything that matches the name
 					for (int i = -1; i < count && (dev < 0 || i == -1); ++i) {
-						if (dev > 0 && i == -1) i = dev;
+						if (dev >= 0 && i == -1) i = dev;
 						else if (i == -1) continue;
 						PaDeviceInfo const* info = Pa_GetDeviceInfo(i);
 						if (!info) continue;
 						if (info->maxInputChannels < int(params.mics.size())) continue;
 						if (info->maxOutputChannels < params.out) continue;
-						if (!match_partial && info->name != params.dev) continue;
-						if (match_partial && std::string(info->name).find(params.dev) == std::string::npos) continue;
+						if (dev < 0) { // Try matching by name
+							if (!match_partial && info->name != params.dev) continue;
+							if (match_partial && std::string(info->name).find(params.dev) == std::string::npos) continue;
+						}
 						// Match found if we got here
 						bool device_init_threw = true;
 						try {
@@ -513,6 +618,13 @@ void Audio::streamFade(std::string track, double fadeLevel) {
 	Output& o = self->output;
 	boost::mutex::scoped_lock l(o.mutex);
 	Command cmd = { Command::TRACK_FADE, track, fadeLevel };
+	o.commands.push_back(cmd);
+}
+
+void Audio::streamBend(std::string track, double pitchFactor) {
+	Output& o = self->output;
+	boost::mutex::scoped_lock l(o.mutex);
+	Command cmd = { Command::TRACK_PITCHBEND, track, pitchFactor };
 	o.commands.push_back(cmd);
 }
 

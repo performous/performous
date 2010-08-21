@@ -59,6 +59,9 @@ public:
 	void toggleSynth(Notes const&);
 	/** Adjust volume level of a single track (used for muting incorrectly played instruments). Range 0.0 to 1.0. **/
 	void streamFade(std::string track, double volume);
+	/** Do a pitch shift - used for guitar whammy bar */
+	void streamBend(std::string track, double pitchFactor);
+	/** Get sample rate */
 	double getSR() const { return 48000.0; }
 };
 

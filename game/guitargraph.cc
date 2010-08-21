@@ -84,7 +84,8 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number,
   m_soloTotal(),
   m_soloScore(),
   m_solo(),
-  m_practHold(false)
+  m_practHold(false),
+  m_whammy(0)
 {
 	// Copy all tracks of supported types (either drums or non-drums) to m_instrumentTracks
 	for (InstrumentTracks::const_iterator it = m_song.instrumentTracks.begin(); it != m_song.instrumentTracks.end(); ++it) {
@@ -264,7 +265,7 @@ void GuitarGraph::engine() {
 	if (!m_drumfills.empty()) updateDrumFill(time); // Drum Fills / BREs
 	if (m_starpower.get() > 0.001) m_correctness.setTarget(1.0, true);
 	if (joining(time)) m_dead = 0; // Disable dead counting while joining
-	double whammy = 0;
+	m_whammy = 0;
 	bool difficulty_changed = false;
 	// Handle all events
 	for (input::Event ev; m_input.tryPoll(ev);) {
@@ -310,7 +311,7 @@ void GuitarGraph::engine() {
 				continue;
 			}
 			if (ev.type == input::Event::RELEASE) endHold(ev.button, time);
-			if (ev.type == input::Event::WHAMMY) whammy = (1.0 + ev.button + 2.0*(rand()/double(RAND_MAX))) / 4.0;
+			if (ev.type == input::Event::WHAMMY) m_whammy = (1.0 + ev.button + 2.0*(rand()/double(RAND_MAX))) / 4.0;
 		} else {
 			// Handle drum lefty-mode
 			if (m_leftymode.b() && ev.button > 0 && !menuOpen()) ev.button = m_pads - ev.button;
@@ -395,8 +396,8 @@ void GuitarGraph::engine() {
 			Event& ev = m_events[m_holds[fret] - 1];
 			ev.glow.setTarget(1.0, true);
 			// Whammy animvalue mangling
-			ev.whammy.setTarget(whammy);
-			if (whammy > 0) {
+			ev.whammy.setTarget(m_whammy);
+			if (m_whammy > 0) {
 				ev.whammy.move(0.5);
 				if (ev.whammy.get() > 1.0) ev.whammy.setValue(1.0);
 			}

@@ -61,7 +61,9 @@ void ScreenSing::enter() {
 	}
 	// Initialize webcam
 	if (config["graphic/webcam"].b() && Webcam::enabled()) {
-		m_cam.reset(new Webcam(config["graphic/webcamid"].i()));
+		try {
+			m_cam.reset(new Webcam(config["graphic/webcamid"].i()));
+		} catch (std::exception& e) { std::cout << e.what() << std::endl; };
 	}
 	// Load video
 	if (!m_song->video.empty() && config["graphic/video"].b()) {
@@ -79,7 +81,6 @@ void ScreenSing::enter() {
 			}
 		}
 	}
-	//FIXME: this line crashes under windows. Have to fix. At moment, just don't use it on Windows
 	m_pause_icon.reset(new Surface(getThemePath("sing_pause.svg")));
 	m_help.reset(new Surface(getThemePath("instrumenthelp.svg")));
 	m_progress.reset(new ProgressBar(getThemePath("sing_progressbg.svg"), getThemePath("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01f, 0.01f, true));
@@ -139,13 +140,20 @@ bool ScreenSing::instrumentLayout(double time) {
 	double iw = 1.0 / count_alive;
 	typedef std::pair<unsigned, double> CountSum;
 	std::map<std::string, CountSum> volume; // Stream id to (count, sum)
+	std::map<std::string, CountSum> pitchbend; // Stream id to (count, sum)
 	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it) {
 		it->engine(); // Run engine even when dead so that joining is possible
 		if (!it->dead()) {
 			it->position((0.5 + i - 0.5 * count_alive) * iw, iw); // Do layout stuff
-			CountSum& cs = volume[it->getTrack()];
-			cs.first++;
-			cs.second += it->correctness();
+			{
+				CountSum& cs = volume[it->getTrack()];
+				cs.first++;
+				cs.second += it->correctness();
+			}{
+				CountSum& cs = pitchbend[it->getTrack()];
+				cs.first++;
+				cs.second += it->getWhammy();
+			}
 			it->draw(time);
 			++i;
 		}
@@ -158,13 +166,18 @@ bool ScreenSing::instrumentLayout(double time) {
 	// Set volume levels (averages of all instruments playing that track)
 	for( std::map<std::string,std::string>::iterator it = m_song->music.begin() ; it != m_song->music.end() ; ++it ) {
 		double level = 1.0;
-		if( volume.find(it->first) == volume.end() ) {
+		if (volume.find(it->first) == volume.end()) {
 			m_audio.streamFade(it->first, level);
 		} else {
 			CountSum cs = volume[it->first];
 			if (cs.first > 0) level = cs.second / cs.first;
 			if (m_song->music.size() <= 1) level = std::max(0.333, level);
 			m_audio.streamFade(it->first, level);
+		}
+		if (pitchbend.find(it->first) != pitchbend.end()) {
+			CountSum cs = pitchbend[it->first];
+			level = cs.second;
+			m_audio.streamBend(it->first, level);
 		}
 	}
 	return (count_alive > 0);
@@ -296,7 +309,8 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		if (key == SDLK_w) dispInFlash(++config["game/pitch"]); // Toggle pitch wave
 		// Toggle webcam
 		if (key == SDLK_a && Webcam::enabled()) {
-			if (!m_cam) m_cam.reset(new Webcam(config["graphic/webcamid"].i())); // Initialize if we haven't done that already
+			// Initialize if we haven't done that already
+			if (!m_cam) { try { m_cam.reset(new Webcam(config["graphic/webcamid"].i())); } catch (...) { }; }
 			if (m_cam) { dispInFlash(++config["graphic/webcam"]); m_cam->pause(!config["graphic/webcam"].b()); }
 		}
 		// Latency settings

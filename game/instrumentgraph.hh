@@ -64,6 +64,8 @@ class InstrumentGraph {
 
 	/// Constructor
 	InstrumentGraph(Audio& audio, Song const& song, input::DevType inp);
+	/// Virtual destructor
+	virtual ~InstrumentGraph() {}
 
 	// Interface functions
 	virtual void draw(double time) = 0;
@@ -91,6 +93,7 @@ class InstrumentGraph {
 	double correctness() const { return m_correctness.get(); }
 	int getScore() const { return (m_score > 0 ? m_score : 0) * m_scoreFactor; }
 	input::DevType getGraphType() const { return m_input.getDevType(); }
+	virtual double getWhammy() const { return 0; }
 
   protected:
 	// Core stuff
