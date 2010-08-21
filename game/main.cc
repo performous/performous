@@ -20,7 +20,6 @@
 
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
-#include <boost/spirit/include/classic_core.hpp>
 #include <boost/thread.hpp>
 #include <csignal>
 #include <fstream>
