@@ -1,6 +1,7 @@
 #pragma once
 
 #include "notes.hh"
+#include "i18n.hh"
 #include <boost/noncopyable.hpp>
 
 #include <stdexcept>
@@ -20,11 +21,14 @@ struct SongParserException: public std::runtime_error {
 class SongParser;
 
 namespace TrackName {
-	const std::string GUITAR = "guitar";
-	const std::string GUITAR_COOP = "coop guitar";
-	const std::string GUITAR_RHYTHM = "rhythm guitar";
-	const std::string BASS = "bass";
-	const std::string DRUMS = "drums";
+	const std::string GUITAR = "Guitar";
+	const std::string GUITAR_COOP = "Coop guitar";
+	const std::string GUITAR_RHYTHM = "Rhythm guitar";
+	const std::string BASS = "Bass";
+	const std::string DRUMS = "Drums";
+	#if 0 // Here is some dummy gettext calls to populate the dictionary
+	_("Guitar") _("Coop guitar") _("Rhythm guitar") _("Bass") _("Drums")
+	#endif
 }
 
 /// class to load and parse songfiles

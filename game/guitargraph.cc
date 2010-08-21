@@ -11,7 +11,6 @@
 
 namespace {
 	#if 0 // Here is some dummy gettext calls to populate the dictionary
-	_("guitar") _("bass") _("drums")
 	_("Kids") _("Easy") _("Medium") _("Hard") _("Expert")
 	#endif
 	struct Diff { std::string name; int basepitch; } diffv[] = {
@@ -173,8 +172,8 @@ void GuitarGraph::setupJoinMenu() {
 }
 
 void GuitarGraph::updateJoinMenu() {
-	m_trackOpt = _(getTrack().c_str());
-	m_difficultyOpt =  _(getDifficultyString().c_str());
+	m_trackOpt = getTrack();
+	m_difficultyOpt =  getDifficultyString();
 	std::string s("\n (");
 	std::string le = m_leftymode.b() ? _("ON") : _("OFF");
 	m_leftyOpt = _("Toggle lefty-mode") + s + le + ")";
