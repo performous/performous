@@ -9,8 +9,6 @@
 #include <cv.h>
 #include <highgui.h>
 
-#define SAVE_WEBCAM_VIDEO
-
 #else
 // Dummy classes
 namespace cv {
