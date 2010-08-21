@@ -441,10 +441,12 @@ void DanceGraph::draw(double time) {
 		}
 
 		// Draw the notes
-		for (DanceNotes::iterator it = m_notes.begin(); it != m_notes.end(); ++it) {
-			if (it->note.end - time < past) continue;
-			if (it->note.begin - time > future) continue;
-			drawNote(*it, time); // Let's just do all the calculating in the sub, instead of passing them as a long list
+		if (time == time) { // Check that time is not NaN
+			for (DanceNotes::iterator it = m_notes.begin(); it != m_notes.end(); ++it) {
+				if (it->note.end - time < past) continue;
+				if (it->note.begin - time > future) continue;
+				drawNote(*it, time); // Let's just do all the calculating in the sub, instead of passing them as a long list
+			}
 		}
 	}
 	drawInfo(time, offsetX, dimensions); // Go draw some texts and other interface stuff

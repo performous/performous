@@ -812,57 +812,58 @@ void GuitarGraph::draw(double time) {
 					drawNote(4, c, m_dfIt->end - time, m_dfIt->end - time, 0, false, false, 0, 0);
 				}
 			}
-			// Iterate chords
-			for (Chords::iterator it = m_chords.begin(); it != m_chords.end(); ++it) {
-				float tBeg = it->begin - time;
-				float tEnd = m_drums ? tBeg : it->end - time;
-				if (tBeg > future) break;
-				if (tEnd < past) {
-					if (it->status < 100) it->status += 100; // Mark as past note for rewinding
-					continue;
-				}
-				// Don't show past chords when rewinding
-				if (it->status >= 100 || (tBeg > maxTolerance && it->status > 0)) continue;
-				// Handle notes during drum fills / BREs
-				if (drumfill && it->begin >= m_dfIt->begin - maxTolerance
-				  && it->begin <= m_dfIt->end + maxTolerance) {
-					if (it->status == 0) {
-						it->status = it->polyphony; // Mark as hit so that streak doesn't reset
-						m_drumfillScore += it->polyphony * 50.0; // Count points from notes under drum fill
+			if (time == time) { // Check that time is not NaN
+				// Iterate chords
+				for (Chords::iterator it = m_chords.begin(); it != m_chords.end(); ++it) {
+					float tBeg = it->begin - time;
+					float tEnd = m_drums ? tBeg : it->end - time;
+					if (tBeg > future) break;
+					if (tEnd < past) {
+						if (it->status < 100) it->status += 100; // Mark as past note for rewinding
+						continue;
 					}
-					continue;
-				}
-				// Loop through the frets
-				for (int fret = 0; fret < m_pads; ++fret) {
-					if (!it->fret[fret] || (tBeg > maxTolerance && it->releaseTimes[fret] > 0)) continue;
-					if (tEnd > future) tEnd = future;
-					unsigned event = m_notes[it->dur[fret]];
-					float glow = 0.0f;
-					float whammy = 0.0f;
-					if (event > 0) {
-						glow = m_events[event - 1].glow.get();
-						whammy = m_events[event - 1].whammy.get();
+					// Don't show past chords when rewinding
+					if (it->status >= 100 || (tBeg > maxTolerance && it->status > 0)) continue;
+					// Handle notes during drum fills / BREs
+					if (drumfill && it->begin >= m_dfIt->begin - maxTolerance
+					  && it->begin <= m_dfIt->end + maxTolerance) {
+						if (it->status == 0) {
+							it->status = it->polyphony; // Mark as hit so that streak doesn't reset
+							m_drumfillScore += it->polyphony * 50.0; // Count points from notes under drum fill
+						}
+						continue;
 					}
-					// Set the default color (disabled state)
-					glutil::Color c(0.5f, 0.5f, 0.5f);
-					if (!joining(time)) {
-						// Get a color for the fret and adjust it if GodMode is on
-						c = colorize(color(fret), it->begin);
-						if (glow > 0.1f) { ng_r+=c.r; ng_g+=c.g; ng_b+=c.b; ng_ccnt++; } // neck glow
-						// Further adjust the color if the note is hit
-						c.r += glow * 0.2f;
-						c.g += glow * 0.2f;
-						c.b += glow * 0.2f;
+					// Loop through the frets
+					for (int fret = 0; fret < m_pads; ++fret) {
+						if (!it->fret[fret] || (tBeg > maxTolerance && it->releaseTimes[fret] > 0)) continue;
+						if (tEnd > future) tEnd = future;
+						unsigned event = m_notes[it->dur[fret]];
+						float glow = 0.0f;
+						float whammy = 0.0f;
+						if (event > 0) {
+							glow = m_events[event - 1].glow.get();
+							whammy = m_events[event - 1].whammy.get();
+						}
+						// Set the default color (disabled state)
+						glutil::Color c(0.5f, 0.5f, 0.5f);
+						if (!joining(time)) {
+							// Get a color for the fret and adjust it if GodMode is on
+							c = colorize(color(fret), it->begin);
+							if (glow > 0.1f) { ng_r+=c.r; ng_g+=c.g; ng_b+=c.b; ng_ccnt++; } // neck glow
+							// Further adjust the color if the note is hit
+							c.r += glow * 0.2f;
+							c.g += glow * 0.2f;
+							c.b += glow * 0.2f;
+						}
+						if (glow > 0.5f && tEnd < 0.1f && it->hitAnim[fret].get() == 0.0)
+							it->hitAnim[fret].setTarget(1.0);
+						// Call the actual note drawing function
+						drawNote(fret, c, tBeg, tEnd, whammy, it->tappable, glow > 0.5f, it->hitAnim[fret].get(),
+						  it->releaseTimes[fret] > 0.0 ? it->releaseTimes[fret] - time : getNaN());
 					}
-					if (glow > 0.5f && tEnd < 0.1f && it->hitAnim[fret].get() == 0.0)
-						it->hitAnim[fret].setTarget(1.0);
-					// Call the actual note drawing function
-					drawNote(fret, c, tBeg, tEnd, whammy, it->tappable, glow > 0.5f, it->hitAnim[fret].get(),
-					  it->releaseTimes[fret] > 0.0 ? it->releaseTimes[fret] - time : getNaN());
 				}
 			}
 		} //< disable lighting
-
 		// Draw flames
 		for (int fret = 0; fret < m_pads; ++fret) { // Loop through the frets
 			if (m_drums && fret == 0) { // Skip bass drum
