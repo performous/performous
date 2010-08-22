@@ -280,12 +280,13 @@ int main(int argc, char** argv) try {
 	std::string songlist;
 	opt1.add_options()
 	  ("help,h", "you are viewing it")
-	  ("verbose,V", "Be more verbose")
+	  ("verbose,V", "be more verbose")
 	  ("version,v", "display version number")
 	  ("songlist", po::value<std::string>(&songlist), "save a list of songs in the specified folder");
 	po::options_description opt2("Configuration options");
 	opt2.add_options()
 	  ("audio", po::value<std::vector<std::string> >(&devices)->composing(), "specify an audio device to use")
+	  ("audiohelp", "print audio related information")
 	  ("jstest", "utility to get joystick button mappings");
 	po::options_description opt3("Hidden options");
 	opt3.add_options()
@@ -331,6 +332,15 @@ int main(int argc, char** argv) try {
 	} catch (std::exception& e) {
 		std::cerr << e.what() << std::endl;
 		return EXIT_FAILURE;
+	}
+	if (vm.count("audiohelp")) {
+		Audio audio;
+		std::cout << "Example --audio parameters" << std::endl;
+		std::cout << "  --audio \"out=2\"         # Pick first working two-channel playback device" << std::endl;
+		std::cout << "  --audio \"dev=1 out=2\"   # Pick device id 1 and assign stereo playback" << std::endl;
+		std::cout << "  --audio 'dev=\"HDA Intel\" mics=blue,red'   # HDA Intel with two mics" << std::endl;
+		std::cout << "  --audio 'dev=pulse out=2 mics=blue'       # PulseAudio with input and output" << std::endl;
+		return EXIT_SUCCESS;
 	}
 	// Override XML config for options that were specified from commandline or performous.conf
 	confOverride(songdirs, "system/path_songs");
