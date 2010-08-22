@@ -71,6 +71,10 @@ src_unpack() {
 	fi
 }
 
+src_prepare() {
+	epatch "${FILESDIR}"/${PN}-gentoopaths.patch
+}
+
 src_configure() {
 	local mycmakeargs="
 		$(cmake-utils_use_enable tools TOOLS)
@@ -95,7 +99,7 @@ src_install() {
 	DOCS="docs/*.txt" cmake-utils_src_install
 	mv -f "${D}/${GAMES_PREFIX}/share/man" "${D}/usr/share/"
 	mkdir -p "${D}/${GAMES_DATADIR}/${PN}"
-	mv -f "${D}/${GAMES_PREFIX}/share" "${D}/${GAMES_DATADIR}/${PN}"
+	mv -f "${D}/${GAMES_PREFIX}/share/games/performous" "${D}/${GAMES_DATADIR}/"
 
 	if use songs; then
 		insinto "${GAMES_DATADIR}/${PN}"
