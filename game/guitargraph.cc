@@ -143,7 +143,7 @@ void GuitarGraph::setupJoinMenu() {
 		// Add tracks to option list
 		for (InstrumentTracksConstPtr::const_iterator it = m_instrumentTracks.begin(); it != m_instrumentTracks.end(); ++it, ++i) {
 			ol.push_back(it->first);
-			if (m_trackOpt == it->first) cur = i; // Find the index of current track
+			if (m_track_index->first == it->first) cur = i; // Find the index of current track
 		}
 		m_selectedTrack = ConfigItem(ol); // Create a ConfigItem from the option list
 		m_selectedTrack.select(cur); // Set the selection to current track
@@ -307,7 +307,7 @@ void GuitarGraph::engine() {
 			else if (ev.type == input::Event::PICK && ev.button == 1) m_menu.action(-1);
 			else if (ev.nav == input::START) m_menu.action();
 			// See if anything changed
-			if (!m_drums && m_selectedTrack.so() != getTrack()) setTrack(m_selectedTrack.so());
+			if (!m_drums && m_selectedTrack.so() != m_track_index->first) setTrack(m_selectedTrack.so());
 			else if (boost::lexical_cast<int>(m_selectedDifficulty.so()) != m_level)
 				difficulty(Difficulty(boost::lexical_cast<int>(m_selectedDifficulty.so())));
 			else if (m_rejoin.b()) { unjoin(); setupJoinMenu(); m_input.addEvent(input::Event()); }

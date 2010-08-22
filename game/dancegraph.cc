@@ -115,7 +115,7 @@ void DanceGraph::setupJoinMenu() {
 		// Add tracks to option list
 		for (DanceTracks::const_iterator it = m_song.danceTracks.begin(); it != m_song.danceTracks.end(); ++it, ++i) {
 			ol.push_back(it->first);
-			if (m_trackOpt == it->first) cur = i; // Find the index of current track
+			if (m_gamingMode == it->first) cur = i; // Find the index of current track
 		}
 		m_selectedTrack = ConfigItem(ol); // Create a ConfigItem from the option list
 		m_selectedTrack.select(cur); // Set the selection to current level
@@ -284,7 +284,7 @@ void DanceGraph::engine() {
 			else if (ev.nav == input::DOWN) m_menu.move(1);
 			difficulty_changed = true;
 			// See if anything changed
-			if (m_selectedTrack.so() != getTrack()) setTrack(m_selectedTrack.so());
+			if (m_selectedTrack.so() != m_gamingMode) setTrack(m_selectedTrack.so());
 			else if (boost::lexical_cast<int>(m_selectedDifficulty.so()) != m_level)
 				difficulty(DanceDifficulty(boost::lexical_cast<int>(m_selectedDifficulty.so())));
 			else if (m_rejoin.b()) { unjoin(); setupJoinMenu(); m_input.addEvent(input::Event()); }
