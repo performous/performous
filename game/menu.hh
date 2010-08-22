@@ -36,6 +36,8 @@ class MenuOption {
 	const std::string& getName() const { if (namePtr) return *namePtr; else return name; }
 	/// Return comment
 	const std::string& getComment() const { if (commentPtr) return *commentPtr; else return comment; }
+	/// Check if this option can be selected
+	bool isActive() const;
 	/// Value
 	ConfigItem* value;
 	/// Value-to-be-set

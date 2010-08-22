@@ -58,6 +58,16 @@ MenuOption::MenuOption(const std::string& nm, const std::string& comm, const std
 	if (!img.empty()) image.reset(new Surface(getThemePath(img)));
 }
 
+bool MenuOption::isActive() const {
+	if (type == OPEN_SUBMENU && options.empty()) return false;
+	else if (type == CHANGE_VALUE) {
+		if (!value) return false;
+		if (value->get_type() == "option_list" && value->ol().size() <= 1)
+			return false;
+	}
+	return true;
+}
+
 
 
 Menu::Menu():

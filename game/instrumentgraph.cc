@@ -103,7 +103,7 @@ void InstrumentGraph::drawMenu() {
 			txt = &th.option_selected;
 		}
 		txt->dimensions.middle(x).center(y);
-		txt->draw(it->getName());
+		txt->draw(it->getName(), it->isActive() ? 1.0f : 0.5f);
 		w = std::max(w, txt->w() + 2 * step + button_margin * 2); // Calculate the widest entry
 		y += step;
 	}
