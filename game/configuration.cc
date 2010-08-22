@@ -42,7 +42,8 @@ ConfigItem& ConfigItem::incdec(int dir) {
 		bool& val = boost::get<bool>(m_value);
 		val = !val;
 	} else if (m_type == "option_list") {
-		m_sel = clamp<int>(m_sel + dir, 0, boost::get<OptionList>(m_value).size()-1);
+		size_t s = boost::get<OptionList>(m_value).size();
+		m_sel = (m_sel + dir + s) % s;
 	}
 	return *this;
 }
