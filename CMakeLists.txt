@@ -72,4 +72,5 @@ endif (ENABLE_TOOLS)
 
 if(WIN32)
 	option(ENABLE_VERSIONING "Add number version information. This allows to add version information to exe. Be carefull, in beta (and a lot useless)" OFF)
+	install(FILES win32/ConfigureSongDirectory.bat DESTINATION bin)
 endif(WIN32)
