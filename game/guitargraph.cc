@@ -144,11 +144,11 @@ void GuitarGraph::setupJoinMenu() {
 	// Create track option only for guitars
 	if (!m_drums) {
 		ConfigItem::OptionList ol;
-		int i = 0, cur = 0;
+		int cur = 0;
 		// Add tracks to option list
-		for (InstrumentTracksConstPtr::const_iterator it = m_instrumentTracks.begin(); it != m_instrumentTracks.end(); ++it, ++i) {
+		for (InstrumentTracksConstPtr::const_iterator it = m_instrumentTracks.begin(); it != m_instrumentTracks.end(); ++it) {
 			ol.push_back(it->first);
-			if (m_track_index->first == it->first) cur = i; // Find the index of current track
+			if (m_track_index->first == it->first) cur = ol.size()-1; // Find the index of current track
 		}
 		m_selectedTrack = ConfigItem(ol); // Create a ConfigItem from the option list
 		m_selectedTrack.select(cur); // Set the selection to current track
@@ -157,13 +157,12 @@ void GuitarGraph::setupJoinMenu() {
 	}
 	{ // Create difficulty opt
 		ConfigItem::OptionList ol;
-		int i = 0, cur = 0;
+		int cur = 0;
 		// Add difficulties to the option list
 		for (int level = 0; level < DIFFICULTYCOUNT; ++level) {
 			if (difficulty(Difficulty(level), true)) {
 				ol.push_back(boost::lexical_cast<std::string>(level));
-				if (Difficulty(i) == m_level) cur = i;
-				++i;
+				if (Difficulty(level) == m_level) cur = ol.size()-1;
 			}
 		}
 		m_selectedDifficulty = ConfigItem(ol); // Create a ConfigItem from the option list
