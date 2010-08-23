@@ -301,15 +301,20 @@ void GuitarGraph::engine() {
 		if (menuOpen()) {
 			// Check first regular keys
 			if (ev.type == input::Event::PRESS && ev.button >= 0 && ev.button < m_pads) {
-				if (m_drums && ev.button == 0) m_menu.action(); // Kick substitutes for strum
-				else { // Hilight item
-					int sel = m_drums ? ((ev.button + m_pads - 1) % m_pads) : ev.button;
-					m_menu.select(sel);
+				if (m_drums) { // Drums
+					 if (ev.button == 0) m_menu.action(); // Kick for action
+					 else if (ev.button == 1) m_menu.action(-1); // Red for left
+					 else if (ev.button == 2) m_menu.move(-1); // Yellow for up
+					 else if (ev.button == 3) m_menu.move(1); // Blue for down
+					 else if (ev.button == 4) m_menu.action(1); // Green for right
+				} else { // Guitar
+					 if (ev.button == 0) m_menu.action(-1); // Green for left
+					 else if (ev.button == 1) m_menu.action(1); // Red for right
 				}
 			}
 			// Strum (strum of keyboard-as-guitar doesn't generate nav-events)
-			else if (ev.type == input::Event::PICK && ev.button == 0) m_menu.action(1);
-			else if (ev.type == input::Event::PICK && ev.button == 1) m_menu.action(-1);
+			else if (ev.type == input::Event::PICK && ev.button == 0) m_menu.move(1);
+			else if (ev.type == input::Event::PICK && ev.button == 1) m_menu.move(-1);
 			else if (ev.nav == input::START) m_menu.action();
 			// See if anything changed
 			if (!m_drums && m_selectedTrack.so() != m_track_index->first) setTrack(m_selectedTrack.so());
