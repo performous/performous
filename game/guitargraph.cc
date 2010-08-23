@@ -125,7 +125,12 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number,
 	m_track_index = m_instrumentTracks.begin();
 	while (number--)
 		if (++m_track_index == m_instrumentTracks.end()) m_track_index = m_instrumentTracks.begin();
-	difficultyAuto();
+	// Pick a nice default difficulty
+	if (difficulty(DIFFICULTY_EASY));
+	else if (difficulty(DIFFICULTY_SUPAEASY));
+	else if (difficulty(DIFFICULTY_MEDIUM));
+	else if (difficulty(DIFFICULTY_AMAZING));
+	else difficultyAuto();
 	updateNeck();
 	setupJoinMenu();
 }
