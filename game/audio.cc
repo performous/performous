@@ -456,6 +456,8 @@ struct Audio::Impl {
 					int tmp;
 					if (iss >> tmp && iss.get() == EOF && tmp >= 0 && tmp < count) dev = tmp;
 				}
+				std::clog << "Trying audio device \"" << params.dev << "\", id: " << dev
+					<< ", in: " << params.mics.size() << ", out: " << params.out << std::endl;
 				bool skip_partial = false;
 				bool found = false;
 				// Try exact match first, then partial
@@ -473,6 +475,7 @@ struct Audio::Impl {
 							if (match_partial && std::string(info->name).find(params.dev) == std::string::npos) continue;
 						}
 						// Match found if we got here
+						int assigned_mics = 0;
 						bool device_init_threw = true;
 						try {
 							devices.push_back(new Device(params.mics.size(), params.out, params.rate, i));
@@ -494,6 +497,7 @@ struct Audio::Impl {
 								Analyzer* a = new Analyzer(d.rate);
 								analyzers.push_back(a);
 								d.mics[j] = a;
+								++assigned_mics;
 							}
 							// Assign playback output for the first available stereo output
 							if (!playback && d.out == 2) { d.outptr = &output; playback = true; }
@@ -504,6 +508,10 @@ struct Audio::Impl {
 						}
 						skip_partial = true;
 						found = true;
+						std::clog << "Using audio device: " << i;
+						if (assigned_mics) std::clog << ", input channels: " << assigned_mics;
+						if (params.out) std::clog << ", output channels: " << params.out;
+						std::clog << std::endl;
 						break;
 					}
 				}
