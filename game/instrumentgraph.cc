@@ -68,13 +68,12 @@ void InstrumentGraph::drawMenu() {
 	ThemeInstrumentMenu& th = *m_menuTheme;
 	MenuOptions::const_iterator cur = static_cast<MenuOptions::const_iterator>(&m_menu.current());
 	glutil::PushMatrix pm; // Save scaling state
-	float s = m_width.get();
-	s = (s > 0.49f ? 1.0f : s + 0.3f); // Full scale with 1 or 2 instruments
+	double w = m_menu.dimensions.w();
+	const float s = std::min(m_width.get(), 0.5) / w;
 	glScalef(s, s, 1.0f);
 	// We need to multiply offset by inverse scale factor to keep it always constant
-	const double offsetX = 0.5f * (dimensions.x1() + dimensions.x2()) / s;
 	// All these vars are ultimately affected by the scaling matrix
-	double w = m_menu.dimensions.w();
+	const double offsetX = 0.5f * (dimensions.x1() + dimensions.x2()) / s;
 	const float txth = th.option.h();
 	const float button_margin = (getGraphType() == input::DANCEPAD ? 0.0f : 0.05f);
 	const float step = txth * 0.7f;
