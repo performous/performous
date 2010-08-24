@@ -79,26 +79,43 @@ void InstrumentGraph::drawMenu() {
 	const float step = txth * 0.7f;
 	const float h = m_menu.getOptions().size() * step + step;
 	float y = -h * .5f + step;
-	float x = -w * .5f + step + offsetX + button_margin * 1.5f;
+	float x = offsetX - w*.5f + step + button_margin*1.0f;
+	float xx = offsetX + w*.5f - step - button_margin*1.0f;
 	// Background
 	th.bg.dimensions.middle(offsetX).center(0).stretch(w, h);
 	th.bg.draw();
 	// Loop through menu items
 	w = 0;
-	int i = 0;
+	unsigned i = 0;
+	m_button.dimensions.stretch(0.05, 0.05);
 	for (MenuOptions::const_iterator it = m_menu.begin(); it != m_menu.end(); ++it, ++i) {
 		SvgTxtTheme* txt = &th.option;
-		// Draw the key hints
-		if (getGraphType() != input::DANCEPAD && i < m_pads) {
-			int fret = (getGraphType() == input::DRUMS ? ((i + 1) % m_pads) : i);
-			glColor4fv(color(fret));
-			m_button.dimensions.middle(x - button_margin).center(y).stretch(0.05, 0.05);
-			m_button.draw();
-		}
 		// Selected item?
 		if (cur == it) {
+			// Draw the key hints
+			if (getGraphType() != input::DANCEPAD) {
+				glColor4fv(color(getGraphType() == input::GUITAR ? 0 : 1));
+				m_button.dimensions.middle(x - button_margin).center(y);
+				m_button.draw();
+				glColor4fv(color(getGraphType() == input::GUITAR ? 1 : 4));
+				m_button.dimensions.middle(xx + button_margin);
+				m_button.draw();
+			}
+			// Drum up hint
+			if (getGraphType() == input::DRUMS && i > 0) {
+				glColor4fv(color(2));
+				m_button.dimensions.middle(x - button_margin).center(y - step);
+				m_button.draw();
+			}
+			// Drum down hint
+			if (getGraphType() == input::DRUMS && i < m_menu.getOptions().size()-1) {
+				glColor4fv(color(3));
+				m_button.dimensions.middle(x - button_margin).center(y + step);
+				m_button.draw();
+			}
 			//th.back_h.dimensions.middle(0.05 + offsetX).center(y);
 			//th.back_h.draw();
+			// Switch to the "selected" font
 			txt = &th.option_selected;
 		}
 		txt->dimensions.middle(x).center(y);
@@ -113,6 +130,7 @@ void InstrumentGraph::drawMenu() {
 		th.comment.dimensions.middle(offsetX).screenBottom(-0.12);
 		th.comment.draw(cur->getComment());
 	}
+	// Reset button size
 	m_button.dimensions.stretch(1.0, 1.0);
 	// Save the calculated menu dimensions
 	m_menu.dimensions.stretch(w, h);
