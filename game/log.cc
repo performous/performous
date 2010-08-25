@@ -5,6 +5,7 @@
 
 #include <boost/iostreams/stream_buffer.hpp>
 #include <boost/regex.hpp>
+#include <boost/thread/mutex.hpp>
 
 #ifndef NDEBUG
 #	include <boost/algorithm/string/trim.hpp>
@@ -29,6 +30,11 @@
  **/
 
 namespace logger {
+	/** \internal
+	 * Guard to ensure we're atomically printing to cout/cerr.
+	 * \attention This only guards from multiple clog interleaving, not other console I/O.
+	 */
+	boost::mutex log_lock;
 
 	/** \internal The implementation of the stream filter that handles the message filtering. **/
 	class VerboseMessageSink : public boost::iostreams::sink {
@@ -62,7 +68,10 @@ namespace logger {
 			//throw std::runtime_error(tmp);
 			// It seems throwing an exception here doesn't work,
 			// so for now, do the next best thing: make some noise
-			std::cerr << tmp << std::endl;
+			{
+				boost::mutex::scoped_lock l(log_lock);
+				std::cerr << tmp << std::endl;
+			}
 			return n;
 		}
 #		endif
@@ -74,7 +83,10 @@ namespace logger {
 
 		std::string prefix(line, 0, i);
 
-		if(boost::regex_match(prefix, *level_regex)) std::cout << line;
+		if(boost::regex_match(prefix, *level_regex)){
+			boost::mutex::scoped_lock l(log_lock);
+			std::cout << line;
+		}
 
 		return n;
 	}
@@ -93,10 +105,13 @@ namespace logger {
 
 		level_regex = new boost::regex(level_regexp_str);
 
-		sb.open(vsm);
-		__default_ClogBuf = std::clog.rdbuf();
-		std::clog.rdbuf(&sb);
+		{ // scope here lest we might dead lock (if showing .*/info).
+			boost::mutex::scoped_lock l(log_lock);
 
+			sb.open(vsm);
+			__default_ClogBuf = std::clog.rdbuf();
+			std::clog.rdbuf(&sb);
+		}
 		std::clog << "logger/info: Log level is: " << level_regexp_str << std::endl;
 	}
 
@@ -105,6 +120,7 @@ namespace logger {
 	void teardown(){
 		if(__default_ClogBuf == 0) throw std::runtime_error("Internal logger error #2");
 		if(level_regex == 0) throw std::runtime_error("Internal logger error #3");
+		boost::mutex::scoped_lock l(log_lock);
 
 		std::clog.rdbuf(__default_ClogBuf);
 		sb.close();
