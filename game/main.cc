@@ -9,6 +9,7 @@
 #include "video_driver.hh"
 #include "i18n.hh"
 #include "glutil.hh"
+#include "log.hh"
 
 // Screens
 #include "screen_intro.hh"
@@ -27,35 +28,16 @@
 #include <vector>
 #include <cstdlib>
 
-#include <boost/iostreams/stream_buffer.hpp>
-
 volatile bool g_quit = false;
 
 bool g_take_screenshot = false;
-bool g_verbose_messages = false;
-
-class VerboseMessageSink : public boost::iostreams::sink {
-public:
-	// i.e. make clog like cout, but only if g_verbose_messages is set.
-	// (we could use cerr or any other file if we want)
-	std::streamsize write(const char* s, std::streamsize n) {
-		if(g_verbose_messages)
-			for(std::streamsize i=0; i<n; i++)
-				std::cout << s[i];
-
-		return n;
-	}
-};
-// defining them in main() causes segfault at exit as they apparently got free'd before that
-boost::iostreams::stream_buffer<VerboseMessageSink> sb;
-VerboseMessageSink vsm;
 
 // Signal handling for Ctrl-C
 
 static void signalSetup();
 
 extern "C" void quit(int) {
-// shouldn't "not EXIT_SUCCESS" be sent - ^C^C is an abort, not normal termination?
+	// shouldn't "not EXIT_SUCCESS" be sent - ^C^C is an abort, not normal termination?
 	if (g_quit) std::exit(EXIT_SUCCESS);  // Instant exit if Ctrl+C is pressed again
 	g_quit = true;
 	signalSetup();
@@ -278,9 +260,10 @@ int main(int argc, char** argv) try {
 	namespace po = boost::program_options;
 	po::options_description opt1("Generic options");
 	std::string songlist;
+	std::string loglevel_regexp;
 	opt1.add_options()
 	  ("help,h", "you are viewing it")
-	  ("verbose,V", "be more verbose")
+	  ("log,l", po::value<std::string>(&loglevel_regexp)->default_value(logger::default_log_level), "selects log level")
 	  ("version,v", "display version number")
 	  ("songlist", po::value<std::string>(&songlist), "save a list of songs in the specified folder");
 	po::options_description opt2("Configuration options");
@@ -310,9 +293,9 @@ int main(int argc, char** argv) try {
 	po::notify(vm);
 
 	// initialize the verbose message sink
-	g_verbose_messages = vm.count("verbose")!=0;
-    sb.open(vsm);
-    std::clog.rdbuf(&sb);
+	//logger::__log_hh_test(); // debug
+	logger::setup(loglevel_regexp);
+
 
 	if (vm.count("version")) {
 		// Already printed the version string in the beginning...
