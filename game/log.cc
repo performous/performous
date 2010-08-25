@@ -14,6 +14,7 @@
  * \brief The std::clog logger.
  *
  * The classification is \e discretionary, meaning that you can specify any message class you want but there are only 4 recommended classes: \p debug, \p info, \p warning and \p error.
+ * \attention Each new line (ended by <tt>std::endl</tt>) must be prefixed with the message classification. New lines by <tt>"\n"</tt> will belong to the previous line as far as the filter is concerned.
  *
  * The default log level is specified by logger::default_log_level.
  *
