@@ -518,7 +518,7 @@ struct Audio::Impl {
 				// Error handling
 				if (!found) throw std::runtime_error("Not found or already in use.");
 			} catch(std::runtime_error& e) {
-				std::cerr << "Audio device '" << *it << "': " << e.what() << std::endl;
+				std::clog << "audio/error: Audio device '" << *it << "': " << e.what() << std::endl;
 			}
 		}
 	}

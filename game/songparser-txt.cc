@@ -131,8 +131,8 @@ bool SongParser::txtParseNote(std::string line, VocalTrack &vocal) {
 			if (p.begin <= n.begin) p.end = n.begin;
 			else { // Nothing to do, warn and skip
 				std::ostringstream oss;
-				oss << "WARNING: Skipping overlapping note in " << m_song.path << m_song.filename << std::endl;
-				std::clog << "unkown/warning: " << oss.str(); // More likely to be atomic when written as one string
+				oss << "Skipping overlapping note in " << m_song.path << m_song.filename << std::endl;
+				std::clog << "songparser/warning: " << oss.str(); // More likely to be atomic when written as one string
 				return true;
 			}
 		} else throw std::runtime_error("The first note has negative timestamp");

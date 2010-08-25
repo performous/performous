@@ -25,7 +25,7 @@ Webcam::Webcam(int cam_id):
 	m_capture.reset(new cv::VideoCapture(cam_id));
 	if (!m_capture->isOpened()) {
 		if (cam_id != -1) {
-			std::clog << "unkown/unkown: Webcam id " << cam_id << " failed, trying autodetecting...";
+			std::clog << "Webcam/warning: Webcam id " << cam_id << " failed, trying autodetecting...";
 			m_capture.reset(new cv::VideoCapture(-1));
 		}
 		if (!m_capture->isOpened())
