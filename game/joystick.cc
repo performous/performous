@@ -367,7 +367,7 @@ void input::SDL::init() {
 	ConfigItem::StringList const& instruments = config["game/instruments"].sl();
 	for (ConfigItem::StringList::const_iterator it = instruments.begin(); it != instruments.end(); ++it) {
 		if (!regex_search(it->c_str(), what, match_force)) {
-			std::cerr << "Error \"" << *it << "\" is not a valid instrument forced value" << std::endl;
+			std::clog << "controllers/error:  " << *it << "\" is not a valid instrument forced value" << std::endl;
 			continue;
 		} else {
 			unsigned int sdl_id = boost::lexical_cast<unsigned int>(what[1]);
