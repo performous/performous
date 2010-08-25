@@ -456,7 +456,7 @@ struct Audio::Impl {
 					int tmp;
 					if (iss >> tmp && iss.get() == EOF && tmp >= 0 && tmp < count) dev = tmp;
 				}
-				std::clog << "Trying audio device \"" << params.dev << "\", id: " << dev
+				std::clog << "audio/info: Trying audio device \"" << params.dev << "\", id: " << dev
 					<< ", in: " << params.mics.size() << ", out: " << params.out << std::endl;
 				bool skip_partial = false;
 				bool found = false;
@@ -508,7 +508,7 @@ struct Audio::Impl {
 						}
 						skip_partial = true;
 						found = true;
-						std::clog << "Using audio device: " << i;
+						std::clog << "audio/info: Using audio device: " << i;
 						if (assigned_mics) std::clog << ", input channels: " << assigned_mics;
 						if (params.out) std::clog << ", output channels: " << params.out;
 						std::clog << std::endl;

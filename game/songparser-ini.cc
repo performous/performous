@@ -265,7 +265,7 @@ void SongParser::iniParse() {
 		std::ostringstream oss;
 		oss << "WARNING: Skipping " << reversedNoteCount << " reversed note(s) in ";
 		oss << s.path << s.midifilename << std::endl;
-		std::clog << oss.str(); // More likely to be atomic when written as one string
+		std::clog << "unkown/warning: " << oss.str(); // More likely to be atomic when written as one string
 	}
 	/*if (s.vocals.notes.empty()) {
 		Note n;

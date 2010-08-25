@@ -292,10 +292,10 @@ void readMenuXML(xmlpp::Node* node) {
 
 void readConfigXML(fs::path const& file, int mode) {
 	if (!fs::exists(file)) {
-		std::clog << "Skipping " << file << " (not found)" << std::endl;
+		std::clog << "unkown/info: Skipping " << file << " (not found)" << std::endl;
 		return;
 	}
-	std::clog << "Parsing " << file << std::endl;
+	std::clog << "unkown/info: Parsing " << file << std::endl;
 	xmlpp::DomParser domParser(file.string());
 	try {
 		xmlpp::NodeSet n = domParser.get_document()->get_root_node()->find("/performous/menu/entry");
@@ -323,7 +323,7 @@ void readConfigXML(fs::path const& file, int mode) {
 				}
 			} else {
 				if (it == config.end()) {
-					std::clog << "  Entry " << name << " ignored (does not exist in config schema)." << std::endl;
+					std::clog << "unkown/warning:   Entry " << name << " ignored (does not exist in config schema)." << std::endl;
 					continue;
 				}
 				it->second.update(elem, mode);

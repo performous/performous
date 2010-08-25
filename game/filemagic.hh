@@ -46,19 +46,19 @@ namespace filemagic {
 		}
 
 #		ifdef DEBUG_FILEMAGIC_PREFIX
-		std::clog << "--- prefix check: want: " << std::flush;
+		std::clog << "filemagic/debug: prefix check: want: " << std::hex;
 		for(unsigned int i=0; i < prefix_size; i++)
-			std::clog << std::hex << (unsigned int)(bytes[i]) << "," << std::dec << std::flush;
-		std::clog << std::endl << "--- prefix check:  got: " << std::flush;
+			std::clog << (unsigned int)(bytes[i]) << ",";
+		std::clog << std::endl << "filemagic/debug: prefix check:  got: ";
 #		endif
 		for(unsigned int i=offset; i < prefix_size; i++){
 #			ifdef DEBUG_FILEMAGIC_PREFIX
-			std::clog << std::hex << (unsigned int)(buf[i]) << "," << std::dec << std::flush;
+			std::clog << (unsigned int)(buf[i]) << ",";
 #			endif
 			if(buf[i] != bytes[i]) return false;
 		}
 #		ifdef DEBUG_FILEMAGIC_PREFIX
-		std::clog << std::endl << "--- prefix check: match!" << std::endl;
+		std::clog::endl << "filemagic/debug: prefix check: match!" << std::endl;
 #		endif
 		return true;
 	}
