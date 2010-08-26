@@ -155,8 +155,7 @@ input::NavButton input::getNav(SDL_Event const &e) {
 			else return input::NONE;
 		} else if (devt.type_match(input::DRUMS)) {
 			// Drums can be used for navigation
-			if (b == 0) return input::START;
-			else if (b == 1) return input::LEFT;
+			if (b == 1) return input::LEFT;
 			else if (b == 2) return input::UP;
 			else if (b == 3) return input::DOWN;
 			else if (b == 4) return input::RIGHT;
