@@ -338,6 +338,9 @@ int main(int argc, char** argv) try {
 
 	// Run the game init and main loop
 	mainLoop(songlist);
+
+	logger::teardown();
+
 	return EXIT_SUCCESS; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
 } catch (std::exception& e) {
 	std::cerr << "FATAL ERROR: " << e.what() << std::endl;
