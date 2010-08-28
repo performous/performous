@@ -115,8 +115,7 @@ namespace logger {
 		std::clog << "logger/info: Log level is: " << level_regexp_str << std::endl;
 	}
 
-	/* this function might not be called, it's ok not to call it at regular shutdown.
-	 * This is mainly for debugging purposes. */
+	// Note: not calling this at exit time introduces a use/dtor-race, which may cause a crash.
 	void teardown(){
 		if(__default_ClogBuf == 0) throw std::runtime_error("Internal logger error #2");
 		if(level_regex == 0) throw std::runtime_error("Internal logger error #3");
