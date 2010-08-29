@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-08-29 21:26+0100\n"
-"PO-Revision-Date: 2010-08-29 21:40+0100\n"
+"PO-Revision-Date: 2010-08-29 21:59+0100\n"
 "Last-Translator: Fredrik Klasson <scientica@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -33,14 +33,15 @@ msgstr "Skärmdump tagen!"
 msgid "Screenshot failed!"
 msgstr "Misslyckades ta skärmdump!"
 
-# Uppträd?
+# ...
 #: ../game/screen_intro.cc:17
 msgid "Perform"
-msgstr ""
+msgstr "Uppträd"
 
+# ...
 #: ../game/screen_intro.cc:17
 msgid "Start performing!"
-msgstr ""
+msgstr "Börja uppträd!"
 
 #: ../game/screen_intro.cc:18
 msgid "Practice"
@@ -97,9 +98,10 @@ msgstr "Låten/Sången innehåller trasiga spår!"
 msgid "Resume"
 msgstr "Återupta"
 
+# ...
 #: ../game/screen_sing.cc:114
 msgid "Back to performing!"
-msgstr ""
+msgstr "Tillbaks till uppträdande"
 
 #: ../game/screen_sing.cc:115
 msgid "Restart"
@@ -387,9 +389,8 @@ msgid "STOP!"
 msgstr "STANNA!"
 
 #: xml2gettext.phNc9WvrlU.c:2
-#, fuzzy
 msgid "Game"
-msgstr "Namn:"
+msgstr "Spel"
 
 #: xml2gettext.phNc9WvrlU.c:3
 msgid "Gameplay settings."
@@ -397,27 +398,27 @@ msgstr ""
 
 #: xml2gettext.phNc9WvrlU.c:4
 msgid "Graphic"
-msgstr ""
+msgstr "Grafik"
 
 #: xml2gettext.phNc9WvrlU.c:5
 msgid "Video and rendering settings."
-msgstr ""
+msgstr "Video och renderings inställningar"
 
 #: xml2gettext.phNc9WvrlU.c:6
 msgid "Audio"
-msgstr ""
+msgstr "Ljud"
 
 #: xml2gettext.phNc9WvrlU.c:7
 msgid "Audio-related settings."
-msgstr ""
+msgstr "Ljud relaterade inställningar"
 
 #: xml2gettext.phNc9WvrlU.c:8
 msgid "System"
-msgstr ""
+msgstr "System"
 
 #: xml2gettext.phNc9WvrlU.c:9
 msgid "System paths."
-msgstr ""
+msgstr "System sökvägar"
 
 #: xml2gettext.phNc9WvrlU.c:10
 msgid "Karaoke mode"
@@ -429,79 +430,85 @@ msgstr "Döljer tonhöjdsvågorna, noterna och poängräkningen"
 
 #: xml2gettext.phNc9WvrlU.c:12
 msgid "Pitch waves"
-msgstr ""
+msgstr "Tonhöjdsvågor"
 
 #: xml2gettext.phNc9WvrlU.c:13
 msgid "Enable singing pitch display (when not in karaoke mode)."
-msgstr ""
+msgstr "Aktivera tonhöjds visning (när ej i karaoke läge)"
 
 #: xml2gettext.phNc9WvrlU.c:14
 msgid "Theme"
-msgstr ""
+msgstr "Tema"
 
 #: xml2gettext.phNc9WvrlU.c:15
 msgid "Name of the theme to use or absolute path to theme folder."
-msgstr ""
+msgstr "Namnet på temat att använda eller absolut sökväg till tema katalogen"
 
 #: xml2gettext.phNc9WvrlU.c:16
 msgid "Keyboard as guitar"
-msgstr ""
+msgstr "Tangentbord som gitarr"
 
+# ...
+# Enable -> Use?
 #: xml2gettext.phNc9WvrlU.c:17
 msgid "Enable keyboard as guitar (Frets on Fire mode)."
-msgstr ""
+msgstr "Använd tangentbordet som gitarr (Frets on Fire läge)"
 
 #: xml2gettext.phNc9WvrlU.c:18
 msgid "Keyboard as drumkit"
-msgstr ""
+msgstr "Tangentbord som trummkit"
 
+# ...
+# Enable -> Use?
 #: xml2gettext.phNc9WvrlU.c:19
 msgid "Enable keyboard as drumkit."
-msgstr ""
+msgstr "Använd tangetbordet som trummkit "
 
 #: xml2gettext.phNc9WvrlU.c:20
 msgid "Keyboard as dance pad"
-msgstr ""
+msgstr "Tangentbord som dansmatta"
 
+# ...
+# Enable -> Use?
 #: xml2gettext.phNc9WvrlU.c:21
 msgid "Enable keyboard as dance pad."
-msgstr ""
+msgstr "Använd tangentbord som dansmatta"
 
 #: xml2gettext.phNc9WvrlU.c:22
 msgid "Joystick configuration"
-msgstr ""
+msgstr "Joystick konfiguration"
 
 #: xml2gettext.phNc9WvrlU.c:23
 msgid "Force joystick to some kind of instrument."
-msgstr ""
+msgstr "Tvinga joysticken till något instrument"
 
 #: xml2gettext.phNc9WvrlU.c:24
 msgid "Windowed width"
-msgstr ""
+msgstr "Fönsterbredd"
 
 #: xml2gettext.phNc9WvrlU.c:25
 msgid "The width of the window."
-msgstr ""
+msgstr "Fönstrets bredd i fönsterläge"
 
 #: xml2gettext.phNc9WvrlU.c:26
 msgid "Windowed height"
-msgstr ""
+msgstr "Fönsterhöjd"
 
 #: xml2gettext.phNc9WvrlU.c:27
 msgid "The height of the window."
-msgstr ""
+msgstr "Fönstrets höjd i fönsterläge"
 
 #: xml2gettext.phNc9WvrlU.c:28
 msgid "Fullscreen mode"
-msgstr ""
+msgstr "Helskärmsläge"
 
 #: xml2gettext.phNc9WvrlU.c:29
 msgid "Enable fullscreen mode on startup."
-msgstr ""
+msgstr "Aktivera helskärmsläge vid uppstart"
 
 #: xml2gettext.phNc9WvrlU.c:30
 msgid "Video playback"
-msgstr ""
+msgstr "Video uppspelning"
 
 #: xml2gettext.phNc9WvrlU.c:31
 msgid "Allows completely disabling background videos. It is recommended to leave this enabled as Performous will still smoothly fade out the video if your computer is not fast enough."
@@ -509,7 +516,7 @@ msgstr ""
 
 #: xml2gettext.phNc9WvrlU.c:32
 msgid "Webcam background"
-msgstr ""
+msgstr "Webkamera bakgrund"
 
 #: xml2gettext.phNc9WvrlU.c:33
 msgid "Performous can try to use webcam as a background video. You can disable it if it annoys you."
@@ -517,7 +524,7 @@ msgstr ""
 
 #: xml2gettext.phNc9WvrlU.c:34
 msgid "Webcam id"
-msgstr ""
+msgstr "Webkamera id"
 
 #: xml2gettext.phNc9WvrlU.c:35
 msgid "Use -1 to autodetect or a number starting from 0 to choose specific device."
@@ -525,7 +532,7 @@ msgstr ""
 
 #: xml2gettext.phNc9WvrlU.c:36
 msgid "3D notes"
-msgstr ""
+msgstr "3D Noter"
 
 #: xml2gettext.phNc9WvrlU.c:37
 msgid "Draw instrument notes as 3-dimensional objects. May hurt performance on older hardware."
@@ -533,7 +540,7 @@ msgstr ""
 
 #: xml2gettext.phNc9WvrlU.c:38
 msgid "SVG quality"
-msgstr ""
+msgstr "SVG kvalitet"
 
 #: xml2gettext.phNc9WvrlU.c:39
 msgid "Larger numbers cause vector graphics to be rendered in higher resolution. Decrease this to make navigating in menus faster."
@@ -541,7 +548,7 @@ msgstr ""
 
 #: xml2gettext.phNc9WvrlU.c:40
 msgid "Text quality"
-msgstr ""
+msgstr "Text kvalitet"
 
 #: xml2gettext.phNc9WvrlU.c:41
 msgid "Larger numbers cause text to be rendered in higher resolution. Decrease this to make everything a little faster."
@@ -549,7 +556,7 @@ msgstr ""
 
 #: xml2gettext.phNc9WvrlU.c:42
 msgid "Benchmark mode"
-msgstr ""
+msgstr "Prestandamätnings läge"
 
 #: xml2gettext.phNc9WvrlU.c:43
 msgid "Framerate limit of 100 FPS is removed and the game instead renders at full speed. FPS values are printed to console. Please note that the display drivers may still limit the rendering speed to the screen refresh rate."
@@ -557,7 +564,7 @@ msgstr ""
 
 #: xml2gettext.phNc9WvrlU.c:44
 msgid "Suggested latency"
-msgstr ""
+msgstr "Föreslagen fördröjning"
 
 #: xml2gettext.phNc9WvrlU.c:45
 msgid "This is a hint for the audio engine about the desired latency. Set this as low as possible while retaining clear audio playback. Requires restart."
@@ -565,7 +572,7 @@ msgstr ""
 
 #: xml2gettext.phNc9WvrlU.c:46
 msgid "Audio/video latency"
-msgstr ""
+msgstr "Ljud/video fördröjning"
 
 #: xml2gettext.phNc9WvrlU.c:47
 msgid "Affects all modes. Use negative value if your display input lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal. This should be set so that the notes pass the cursor at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while performing."
@@ -581,7 +588,7 @@ msgstr ""
 
 #: xml2gettext.phNc9WvrlU.c:50
 msgid "Audio/controller latency"
-msgstr ""
+msgstr "Ljud/kontroll fördröjning"
 
 #: xml2gettext.phNc9WvrlU.c:51
 msgid "Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to adjust while performing."
@@ -589,7 +596,7 @@ msgstr ""
 
 #: xml2gettext.phNc9WvrlU.c:52
 msgid "Audio devices"
-msgstr ""
+msgstr "Ljudenheter"
 
 #: xml2gettext.phNc9WvrlU.c:53
 msgid "Press Enter to configure (TODO: implement)"
@@ -597,7 +604,7 @@ msgstr ""
 
 #: xml2gettext.phNc9WvrlU.c:54
 msgid "Menu volume"
-msgstr ""
+msgstr "Meny volym"
 
 #: xml2gettext.phNc9WvrlU.c:55
 msgid "The volume level of menus, song previews and jukebox mode."
@@ -605,7 +612,7 @@ msgstr ""
 
 #: xml2gettext.phNc9WvrlU.c:56
 msgid "Music volume"
-msgstr ""
+msgstr "Musik volym"
 
 #: xml2gettext.phNc9WvrlU.c:57
 msgid "The ingame music volume. Values above 90 are not recommended as distortion may occur."
@@ -613,7 +620,7 @@ msgstr ""
 
 #: xml2gettext.phNc9WvrlU.c:58
 msgid "Failure volume"
-msgstr ""
+msgstr "Misslyckande volym"
 
 #: xml2gettext.phNc9WvrlU.c:59
 msgid "The ingame fail sound volume. Values above 90 are not recommended as distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
@@ -621,15 +628,16 @@ msgstr ""
 
 #: xml2gettext.phNc9WvrlU.c:60
 msgid "Hardware MIDI input device"
-msgstr ""
+msgstr "Hårdvaru MIDI indataenhet"
 
 #: xml2gettext.phNc9WvrlU.c:61
 msgid "Part of sound card name or its number or empty to use the first available device. Used currently for MIDI drum controllers."
 msgstr ""
 
+# Låt/Sång
 #: xml2gettext.phNc9WvrlU.c:62
 msgid "Song folders"
-msgstr ""
+msgstr "Låt kataloger"
 
 #: xml2gettext.phNc9WvrlU.c:63
 msgid "Where to recursively look for songs. DATADIR at the beginning means all Performous data folders."
@@ -637,7 +645,7 @@ msgstr ""
 
 #: xml2gettext.phNc9WvrlU.c:64
 msgid "Base folders for data"
-msgstr ""
+msgstr "Baskatalog för data"
 
 #: xml2gettext.phNc9WvrlU.c:65
 msgid "System defaults are included automatically. Additional paths can be added here."
