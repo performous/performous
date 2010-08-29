@@ -4,6 +4,7 @@
 #include "joystick.hh"
 #include "theme.hh"
 #include "audio.hh"
+#include "i18n.hh"
 
 
 ScreenConfiguration::ScreenConfiguration(std::string const& name, Audio& audio): Screen(name), m_audio(audio), selected() {
@@ -48,19 +49,19 @@ void ScreenConfiguration::draw() {
 	theme->bg.draw();
 	if (!configuration.empty()) {
 		ConfigItem const& ci = config[configuration[selected]];
-		theme->item.draw(ci.getShortDesc());
+		theme->item.draw(_(ci.getShortDesc().c_str()));
 		theme->value.draw(ci.getValue());
 		// Key help
 		theme->short_comment_bg.dimensions.fixedHeight(0.025);
 		theme->short_comment_bg.dimensions.right(-0.04).screenBottom(-0.054);
 		theme->short_comment_bg.draw();
 		theme->short_comment.dimensions.left(-0.48).screenBottom(-0.067);
-		theme->short_comment.draw("Ctrl + S to save, Ctrl + R to reset defaults");
+		theme->short_comment.draw(_("Ctrl + S to save, Ctrl + R to reset defaults"));
 		// Long description
 		theme->comment_bg.dimensions.middle().screenBottom(-0.01);
 		theme->comment_bg.draw();
 		theme->comment.dimensions.left(-0.48).screenBottom(-0.028);
-		theme->comment.draw(ci.getLongDesc());
+		theme->comment.draw(_(ci.getLongDesc().c_str()));
 	}
 }
 
