@@ -19,10 +19,22 @@
 
 #include "chc_decode.hh"
 #include "pak.h"
-#include "ipuconv.hh"
 #include "ss_cover.hh"
 
+#include "ss_helpers.hh"
+
 namespace fs = boost::filesystem;
+
+struct Song {
+	std::string dataPakName, title, artist, genre, edition, year;
+	fs::path path, music, vocals, video, background, cover;
+	unsigned samplerate;
+	double tempo;
+	bool pal;
+	Song(): samplerate(), tempo() {}
+};
+
+#include "ss_binary.hh"
 
 std::string dvdPath;
 std::ofstream txtfile;
@@ -33,71 +45,6 @@ std::string ns;
 const bool video = true;
 const bool mkvcompress = false;
 const bool oggcompress = true;
-
-// LibXML2 logging facility
-extern "C" void xmlLogger(void* logger, char const* msg, ...) { if (logger) *(std::ostream*)logger << msg; }
-void enableXMLLogger(std::ostream& os = std::cerr) { xmlSetGenericErrorFunc(&os, xmlLogger); }
-void disableXMLLogger() { xmlSetGenericErrorFunc(NULL, xmlLogger); }
-
-void safeErase(Glib::ustring& str, Glib::ustring const& del) {
-	do {
-		Glib::ustring::size_type pos = str.find(del);
-		if (pos != Glib::ustring::npos) { str.erase(pos, del.size()); continue; }
-	} while (0);
-}
-
-Glib::ustring prettyEdition(Glib::ustring str) {
-	safeErase(str, "®");
-	safeErase(str, "™");
-	if (str == "SingStar") return "SingStar Original";
-	if (str == "SingStar '80s") return "SingStar 80s";
-	if (str == "SingStar Schlager") return "SingStar Svenska Hits Schlager";
-	if (str == "SingStar Suomi Rock") return "SingStar SuomiRock";
-	return str;
-}
-
-Glib::ustring normalize(Glib::ustring const& str) {
-	Glib::ustring ret;
-	bool first = true;
-	bool ws = true;
-	for (Glib::ustring::const_iterator it = str.begin(); it != str.end(); ++it) {
-		if (std::isspace(*it)) { ws = true; continue; }
-		if (first) {
-			first = false;
-			ws = false;
-			ret = Glib::ustring(1, *it).uppercase();
-			continue;
-		}
-		if (ws) { ws = false; ret += ' '; }
-		ret += *it;
-	}
-	return ret;
-}
-
-/** Automatic conversion helper, not to be used directly. **/
-struct Filename_: public std::string {
-	Filename_(Glib::ustring const& str_): std::string(str_) {}
-	operator char const*() { return c_str(); }
-};
-
-/** Sanitize a string into a form that can be safely used as a filename. **/
-Filename_ safename(Glib::ustring const& str) {
-	Glib::ustring ret;
-	Glib::ustring forbidden("\"*/:;<>?\\^`|~");
-	for (Glib::ustring::const_iterator it = str.begin(); it != str.end(); ++it) {
-		bool first = it == str.begin();
-		if (*it < 0x20) continue; // Control characters
-		if (*it >= 0x7F && *it < 0xA0) continue; // Additional control characters
-		if (first && *it == '.') continue;
-		if (first && *it == '-') continue;
-		if (*it == '&') { ret += " and "; continue; }
-		if (*it == '%') { ret += " percent "; continue; }
-		if (*it == '$') { ret += " dollar "; continue; }
-		if (forbidden.find(*it) != Glib::ustring::npos) { ret += "_"; continue; }
-		ret += *it;
-	}
-	return Filename_(normalize(ret));
-}
 
 void parseNote(xmlpp::Node* node) {
 	xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(*node);
@@ -110,8 +57,8 @@ void parseNote(xmlpp::Node* node) {
 	} else {
 		lyric += ' ';
 	}
-	int note = std::atoi(elem.get_attribute("MidiNote")->get_value().c_str());
-	int duration = std::atoi(elem.get_attribute("Duration")->get_value().c_str());
+	unsigned note = boost::lexical_cast<unsigned>(elem.get_attribute("MidiNote")->get_value().c_str());
+	unsigned duration = boost::lexical_cast<unsigned>(elem.get_attribute("Duration")->get_value().c_str());
 	if (elem.get_attribute("FreeStyle")) type = 'F';
 	if (elem.get_attribute("Bonus")) type = '*';
 	if (note) {
@@ -129,190 +76,6 @@ void parseSentence(xmlpp::Node* node) {
 	std::for_each(n.begin(), n.end(), parseNote);
 }
 
-#include "adpcm.h"
-
-unsigned getLE16(char* buf) { unsigned char* b = reinterpret_cast<unsigned char*>(buf); return b[0] | (b[1] << 8); }
-unsigned getLE32(char* buf) { unsigned char* b = reinterpret_cast<unsigned char*>(buf); return b[0] | (b[1] << 8) | (b[2] << 16) | (b[3] << 24); }
-
-struct Song {
-	std::string dataPakName, title, artist, genre, edition, year;
-	fs::path path, music, vocals, video, background, cover;
-	unsigned samplerate;
-	double tempo;
-	bool pal;
-	Song(): samplerate(), tempo() {}
-};
-
-void writeWavHeader(std::ostream& outfile, unsigned ch, unsigned sr, unsigned samples) {
-	unsigned bps = ch * 2; // Bytes per sample
-	unsigned datasize = bps * samples;
-	unsigned size = datasize + 0x2C;
-	outfile.write("RIFF" ,4); // RIFF chunk
-	{ unsigned int tmp=size-0x8 ; outfile.write((char*)(&tmp),4); } // RIFF chunk size
-	outfile.write("WAVEfmt ",8); // WAVEfmt header
-	{ int   tmp=0x00000010 ; outfile.write((char*)(&tmp),4); } // Always 0x10
-	{ short tmp=0x0001     ; outfile.write((char*)(&tmp),2); } // Always 1
-	{ short tmp = ch; outfile.write((char*)(&tmp),2); } // Number of channels
-	{ int   tmp = sr; outfile.write((char*)(&tmp),4); } // Sample rate
-	{ int   tmp = bps * sr; outfile.write((char*)(&tmp),4); } // Bytes per second
-	{ short tmp = bps; outfile.write((char*)(&tmp),2); } // Bytes per frame
-	{ short tmp = 16; outfile.write((char*)(&tmp),2); } // Bits per sample
-	outfile.write("data",4); // data chunk
-	{ int   tmp = datasize; outfile.write((char*)(&tmp),4); }
-}
-
-void writeMusic(fs::path const& filename, std::vector<short> const& buf, unsigned sr) {
-	std::ofstream f(filename.string().c_str(), std::ios::binary);
-	writeWavHeader(f, 2, sr, buf.size());
-	f.write(reinterpret_cast<char const*>(&buf[0]), buf.size() * sizeof(short));
-}
-
-void video_us(Song& song, PakFile const& iavFile, PakFile const& indFile, fs::path const& outPath) {
-	// Tracks on my example
-	// 0 => video (ipu)
-	// 1 and 2 => adpcm song (left/right)
-	// 3 and 4 => adpcm vocals (left/right)
-
-	std::vector<char> ipudata;
-	std::vector<char> data;
-	std::vector<char> ind_file;
-	indFile.get(ind_file);
-
-	unsigned int iav_offset = 0;
-	unsigned int frame = 0;
-	for( unsigned int ind_offset = 0x68 ; ind_offset < ind_file.size() ; ind_offset+=2) {
-		unsigned int size = getLE16(&ind_file[ind_offset]) << 4;
-		switch(frame%5) {
-			case 0:
-				// first 4 bytes are packet length
-				iavFile.get(data, iav_offset, size);
-				{
-					unsigned int consumed = 0;
-					while(consumed < size) {
-						unsigned int opaque_footer_size = 3 * sizeof(int);
-						unsigned int chunk = getLE32(&data[consumed]);
-						ipudata.insert(ipudata.end(), data.begin() + 4 + consumed, data.begin() + consumed + chunk - opaque_footer_size);
-						consumed += chunk;
-					}
-				}
-				iav_offset += size;
-				break;
-			case 1:
-			case 2:
-			case 3:
-			case 4:
-				// audio
-				iav_offset += size;
-				break;
-		}
-		frame++;
-	}
-
-	IPUConv(ipudata, (outPath / "video.mpg").string(), song.pal);
-	song.video = outPath / "video.mpg";
-}
-
-void music_us(Song& song, PakFile const& iavFile, PakFile const& indFile, fs::path const& outPath) {
-	// Tracks on my example
-	// 0 => video (ipu)
-	// 1 and 2 => adpcm song (left/right)
-	// 3 and 4 => adpcm vocals (left/right)
-	// std::cout << "  >>> IAV file size: " << iavFile.size << std::endl;
-	// std::cout << "  >>> IND file size: " << indFile.size << std::endl;
-
-	std::vector<char> ind_file;
-	indFile.get(ind_file);
-	unsigned int sr = getLE32(&ind_file[0x60]);
-	// std::cout << "  >>> sample rate: " << sr << std::endl;
-
-	const unsigned decodeChannels = 4; // Do not change!
-	Adpcm adpcm(0, decodeChannels);
-	std::vector<short> pcm[2];
-
-	bool karaoke = false;
-	unsigned int iav_offset = 0;
-	unsigned int frame = 0;
-	unsigned int video_size, audio_size = 0;
-	for( unsigned int ind_offset = 0x68 ; ind_offset < ind_file.size() ; ind_offset+=2) {
-		unsigned int size = getLE16(&ind_file[ind_offset]) << 4;
-		switch(frame%5) {
-			case 0:
-				video_size = size;
-				iav_offset += video_size;
-				break;
-			case 1:
-				// song left
-				audio_size = size;
-				break;
-			case 2:
-				// song right
-				audio_size += size;
-				break;
-			case 3:
-				// vocals left
-				audio_size += size;
-				break;
-			case 4:
-				// vocals right
-				audio_size += size;
-				adpcm.interleave(size);
-				for (unsigned pos = 0, end; (end = pos + 2 * adpcm.chunkBytes()) <= audio_size; pos = end) {
-					std::vector<char> data;
-					iavFile.get(data, iav_offset + pos, end - pos);
-					std::vector<short> pcmtmp(adpcm.chunkFrames() * decodeChannels);
-					adpcm.decodeChunk(&data[0], pcmtmp.begin());
-					for (size_t s = 0; s < pcmtmp.size(); s += 4) {
-						short l1 = pcmtmp[s];
-						short r1 = pcmtmp[s + 1];
-						short l2 = pcmtmp[s + 2];
-						short r2 = pcmtmp[s + 3];
-						pcm[0].push_back(l1);
-						pcm[0].push_back(r1);
-						pcm[1].push_back(l2);
-						pcm[1].push_back(r2);
-						if (l2 != 0 || r2 != 0) karaoke = true;
-					}
-				}
-				iav_offset += audio_size;
-				break;
-		}
-		frame++;
-	}
-	std::string ext;
-	writeMusic(song.music = outPath / ("music.wav"), pcm[0], sr);
-	if (karaoke) writeMusic(song.vocals = outPath / ("vocals.wav"), pcm[1], sr);
-}
-
-void music(Song& song, PakFile const& dataFile, PakFile const& headerFile, fs::path const& outPath) {
-	std::vector<char> data;
-	headerFile.get(data);
-	unsigned sr = getLE16(&data[12]);
-	unsigned interleave = getLE16(&data[16]);
-	const unsigned decodeChannels = 4; // Do not change!
-	Adpcm adpcm(interleave, decodeChannels);
-	std::vector<short> pcm[2];
-	bool karaoke = false;
-	for (unsigned pos = 0, end; (end = pos + 2 * adpcm.chunkBytes()) <= dataFile.size; pos = end) {
-		dataFile.get(data, pos, end - pos);
-		std::vector<short> pcmtmp(adpcm.chunkFrames() * decodeChannels);
-		adpcm.decodeChunk(&data[0], pcmtmp.begin());
-		for (size_t s = 0; s < pcmtmp.size(); s += 4) {
-			short l1 = pcmtmp[s];
-			short r1 = pcmtmp[s + 1];
-			short l2 = pcmtmp[s + 2];
-			short r2 = pcmtmp[s + 3];
-			pcm[0].push_back(l1);
-			pcm[0].push_back(r1);
-			pcm[1].push_back(l2);
-			pcm[1].push_back(r2);
-			if (l2 != 0 || r2 != 0) karaoke = true;
-		}
-	}
-	std::string ext;
-	writeMusic(song.music = outPath / ("music.wav"), pcm[0], sr);
-	if (karaoke) writeMusic(song.vocals = outPath / ("vocals.wav"), pcm[1], sr);
-}
-
 struct Match {
 	std::string left, right;
 	Match(std::string l, std::string r): left(l), right(r) {}
@@ -321,17 +84,6 @@ struct Match {
 		return n.substr(0, left.size()) == left && n.substr(n.size() - right.size()) == right;
 	}
 };
-
-/** Fix Singstar's b0rked XML **/
-std::string xmlFix(std::vector<char> const& data) {
-	std::string ret;
-	for(std::size_t i = 0; i < data.size(); ++i) {
-		if (data[i] != '&') ret += data[i]; else ret += "&amp;";
-	}
-	return ret;
-}
-
-std::string filename(boost::filesystem::path const& p) { return *--p.end(); }
 
 void saveTxtFile(xmlpp::NodeSet &sentence, const fs::path &path, const Song &song, const std::string singer = "") {
 	fs::path file_path;
@@ -381,16 +133,11 @@ struct Process {
 				dom.parse_memory(buf);
 			}
 			std::string keys[4];
-			xmlpp::NodeSet n;
-			n = dom.get_document()->get_root_node()->find("/ss:CONFIG/ss:PRODUCT_NAME", nsmap);
-			if(!n.empty()) keys[0] = dynamic_cast<xmlpp::Element&>(*n[0]).get_child_text()->get_content();
-			n = dom.get_document()->get_root_node()->find("/ss:CONFIG/ss:PRODUCT_CODE", nsmap);
-			if(!n.empty()) keys[1] = dynamic_cast<xmlpp::Element&>(*n[0]).get_child_text()->get_content();
-			n = dom.get_document()->get_root_node()->find("/ss:CONFIG/ss:TERRITORY", nsmap);
-			if(!n.empty()) keys[2] = dynamic_cast<xmlpp::Element&>(*n[0]).get_child_text()->get_content();
-			n = dom.get_document()->get_root_node()->find("/ss:CONFIG/ss:DEFAULT_LANG", nsmap);
-			if(!n.empty()) keys[3] = dynamic_cast<xmlpp::Element&>(*n[0]).get_child_text()->get_content();
-
+			char const* xpath[] = { "/ss:CONFIG/ss:PRODUCT_NAME", "/ss:CONFIG/ss:PRODUCT_CODE", "/ss:CONFIG/ss:TERRITORY", "/ss:CONFIG/ss:DEFAULT_LANG" };
+			for (int i = 0; i < 4; ++i) {
+				xmlpp::NodeSet n = dom.get_document()->get_root_node()->find(xpath[i], nsmap);
+				if(!n.empty()) keys[i] = dynamic_cast<xmlpp::Element&>(*n[0]).get_child_text()->get_content();
+			}
 			chc_decoder.load(keys);
 		}
 	}
@@ -577,6 +324,25 @@ void get_node(const xmlpp::Node* node, std::string& genre, std::string& year)
 	}
 }
 
+struct SSDom: public xmlpp::DomParser {
+	std::string ns;
+	SSDom(PakFile const& file) {
+		set_substitute_entities();
+		std::vector<char> tmp;
+		file.get(tmp);
+		std::string buf = xmlFix(tmp);
+		disableXMLLogger();
+		try {
+			parse_memory(buf);
+		} catch (...) {
+			enableXMLLogger();
+			buf = Glib::convert(buf, "UTF-8", "ISO-8859-1"); // Convert to UTF-8
+			parse_memory(buf);
+		}
+		enableXMLLogger();
+	}
+};
+
 struct FindSongs {
 	std::string edition;
 	std::map<std::string, Song> songs;
@@ -585,51 +351,19 @@ struct FindSongs {
 	void operator()(Pak::files_t::value_type const& p) {
 		std::string name = p.first;
 		if (name.substr(0, 17) == "export/config.xml"){
-			// get the singstar edition
-			xmlpp::DomParser dom;
-			dom.set_substitute_entities();
-			{
-				std::vector<char> tmp;
-				p.second.get(tmp);
-				std::string buf = xmlFix(tmp);
-				disableXMLLogger();
-				try {
-					dom.parse_memory(buf);
-				} catch (...) {
-					enableXMLLogger();
-					buf = Glib::convert(buf, "UTF-8", "ISO-8859-1"); // Convert to UTF-8
-					dom.parse_memory(buf);
-				}
-				enableXMLLogger();
+			SSDom dom(p.second);  // Read config XML
+			xmlpp::NodeSet n;
+			// Get the singstar edition (game name)
+			char const* xpaths[] = { "/CONFIG/PRODUCT_NAME", "/CONFIG/PRODUCT_DESC", "/ss:CONFIG/ss:PRODUCT_NAME", "/ss:CONFIG/ss:PRODUCT_DESC" };
+			for (int i = 0; i < 4; ++i) {
+				n = dom.get_document()->get_root_node()->find(xpaths[i], nsmap);
+				ns = (i < 2 ? "" : "ss:");
+				if (!n.empty()) break;
 			}
-			ns.clear();
-
-			// only get product name node
-			xmlpp::NodeSet n = dom.get_document()->get_root_node()->find("/CONFIG/PRODUCT_DESC");
-			if (n.empty()) { ns = "ss:"; n = dom.get_document()->get_root_node()->find("/ss:CONFIG/ss:PRODUCT_DESC", nsmap); }
-			if (n.empty()) n = dom.get_document()->get_root_node()->find("/CONFIG/PRODUCT_NAME");
-			if (n.empty()) { ns = "ss:"; n = dom.get_document()->get_root_node()->find("/ss:CONFIG/ss:PRODUCT_NAME", nsmap); }
-
 			edition = n.empty() ? "Other" : dynamic_cast<xmlpp::Element&>(*n[0]).get_child_text()->get_content();
 		}
 		if (name.substr(0, 12) != "export/songs" || name.substr(name.size() - 4) != ".xml") return;
-		xmlpp::DomParser dom;
-		dom.set_substitute_entities();
-		{
-			std::vector<char> tmp;
-			p.second.get(tmp);
-			std::string buf = xmlFix(tmp);
-			disableXMLLogger();
-			try {
-				dom.parse_memory(buf);
-			} catch (...) {
-				enableXMLLogger();
-				buf = Glib::convert(buf, "UTF-8", "ISO-8859-1"); // Convert to UTF-8
-				dom.parse_memory(buf);
-			}
-			enableXMLLogger();
-		}
-		ns.clear();
+		SSDom dom(p.second);  // Read song XML
 
 		xmlpp::NodeSet n = dom.get_document()->get_root_node()->find("/SONG_SET/SONG");
 		if (n.empty()) {
