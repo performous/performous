@@ -9,6 +9,7 @@
 #include "i18n.hh"
 #include <iostream>
 #include <sstream>
+#include <boost/format.hpp>
 
 static const double IDLE_TIMEOUT = 45.0; // seconds
 
@@ -209,7 +210,7 @@ void ScreenSongs::draw() {
 			oss_order << "(" << m_songs.currentId() + 1 << "/" << m_songs.size() << ")";
 		} else {
 			// Format the song information text
-			oss_song << _("Hiscore for ") << song.title << "\n";
+			oss_song << boost::format(_("Hisccore for %1%\n")) % song.title;
 			// Get hiscores from database
 			m_database.queryPerSongHiscore_HiscoreDisplay(oss_order, m_songs.currentPtr(), hiscore_start_pos, 5);
 		}
