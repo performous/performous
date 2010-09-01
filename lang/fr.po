@@ -2,77 +2,79 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-08-22 11:47+0100\n"
+"POT-Creation-Date: 2010-09-01 16:37+0100\n"
 "PO-Revision-Date: \n"
-"Last-Translator: Vincent Le Ligeour <yoda-jm@users.sourceforge.net>\n"
+"Last-Translator: Fredrik Klasson <scientica@gmail.com>\n"
 "Language-Team: \n"
-"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: \n"
 "X-Poedit-KeywordsList: _\n"
 "X-Poedit-Basepath: .\n"
 "X-Poedit-SearchPath-0: ../game\n"
+"X-Poedit-SearchPath-1: ../data\n"
 
-#: ../game/dancegraph.cc:18
-msgid "Beginner"
-msgstr "Débutant"
+#: ../game/main.cc:114
+msgid "Miscellaneous..."
+msgstr "Divers"
 
-#: ../game/dancegraph.cc:18
-msgid "Easy"
-msgstr "Facile"
+#: ../game/main.cc:142
+msgid "Main menu..."
+msgstr "Menu principal..."
 
-#: ../game/dancegraph.cc:18
-msgid "Medium"
-msgstr "Moyen"
+#: ../game/main.cc:153
+msgid "Screenshot taken!"
+msgstr "Capture d'écran effectuée"
 
-#: ../game/dancegraph.cc:18
-msgid "Hard"
-msgstr "Difficile"
+#: ../game/main.cc:156
+msgid "Screenshot failed!"
+msgstr "Echec de la capture d'écran"
 
-#: ../game/dancegraph.cc:18
-msgid "Challenge"
-msgstr "Défi"
+#: ../game/screen_intro.cc:17
+msgid "Perform"
+msgstr "Jouer"
 
-#: ../game/dancegraph.cc:111
-msgid "Ready!"
-msgstr "Prêt!"
-
-#: ../game/dancegraph.cc:111
+#: ../game/screen_intro.cc:17
 msgid "Start performing!"
 msgstr "Commencer une partie!"
 
-#: ../game/dancegraph.cc:122
-msgid "Select track"
-msgstr "Sélectionner la piste"
+#: ../game/screen_intro.cc:18
+msgid "Practice"
+msgstr "S'exercer"
 
-#: ../game/dancegraph.cc:138
-msgid "Select difficulty"
-msgstr "Sélectionner la difficulté"
+#: ../game/screen_intro.cc:18
+msgid "Check your skills or test the microphones"
+msgstr "Chauffer votre voix et tester les micros"
 
-#: ../game/dancegraph.cc:141
+#: ../game/screen_intro.cc:19
+msgid "Configure"
+msgstr "Options"
+
+#: ../game/screen_intro.cc:19
+msgid "Configure game options"
+msgstr "Configurer les options de jeu"
+
+#: ../game/screen_intro.cc:20
+#: ../game/screen_sing.cc:116
 msgid "Quit"
 msgstr "Quitter"
 
-#: ../game/dancegraph.cc:141
-msgid "Exit to song browser"
-msgstr "Quitter vers la liste des morceaux"
+#: ../game/screen_intro.cc:20
+msgid "Leave the game"
+msgstr "Sortir du jeu"
 
-#: ../game/dancegraph.cc:260
-msgid "STOP!"
-msgstr "STOP!"
+#: ../game/screen_intro.cc:23
+msgid "No playback devices could be used.\n"
+msgstr "Aucun périférique audio de sortie n'est utilisable.\n"
 
-#: ../game/dancegraph.cc:335
-msgid "Streak!"
-msgstr "D'affilé"
-
-#: ../game/database.cc:107
-msgid "No Items up to now."
-msgstr "Aucun élément jusqu'à présent"
-
-#: ../game/database.cc:108
-msgid "Be the first to be listed here!"
-msgstr "Soyez le premier à être listé ici!"
+#: ../game/screen_intro.cc:24
+msgid ""
+"\n"
+"Please configure some before playing."
+msgstr ""
+"\n"
+"Veuillez en configurer certains avant de jouer."
 
 #: ../game/screen_sing.cc:36
 msgid "Loading song..."
@@ -87,28 +89,28 @@ msgid "Song contains broken tracks!"
 msgstr "Chanson contenant des morceaux cassés"
 
 #: ../game/screen_sing.cc:114
-#: ../game/instrumentgraph.cc:40
 msgid "Resume"
 msgstr "Reprendre"
 
 #: ../game/screen_sing.cc:114
-#: ../game/instrumentgraph.cc:40
 msgid "Back to performing!"
 msgstr "Retourner à la partie!"
 
 #: ../game/screen_sing.cc:115
-#: ../game/instrumentgraph.cc:42
 msgid "Restart"
 msgstr "Redémarrer"
 
 #: ../game/screen_sing.cc:115
-#: ../game/instrumentgraph.cc:42
 msgid ""
 "Start the song\n"
 "from the beginning"
 msgstr ""
 "Démarrer le morceau\n"
 "depuis le début"
+
+#: ../game/screen_sing.cc:116
+msgid "Exit to song browser"
+msgstr "Quitter vers la liste des morceaux"
 
 #: ../game/screen_sing.cc:450
 msgid "   ENTER to skip instrumental break"
@@ -167,125 +169,13 @@ msgstr "Virtuose"
 msgid "Rocker"
 msgstr "Rockeur"
 
-#: ../game/screen_intro.cc:17
-msgid "Perform"
-msgstr "Jouer"
+#: ../game/database.cc:107
+msgid "No Items up to now."
+msgstr "Aucun élément jusqu'à présent"
 
-#: ../game/screen_intro.cc:18
-msgid "Practice"
-msgstr "S'exercer"
-
-#: ../game/screen_intro.cc:18
-msgid "Check your skills or test the microphones"
-msgstr "Chauffer votre voix et tester les micros"
-
-#: ../game/screen_intro.cc:19
-msgid "Configure"
-msgstr "Options"
-
-#: ../game/screen_intro.cc:19
-msgid "Configure game options"
-msgstr "Configurer les options de jeu"
-
-#: ../game/screen_intro.cc:20
-msgid "Leave the game"
-msgstr "Sortir du jeu"
-
-#: ../game/screen_intro.cc:23
-msgid "No playback devices could be used.\n"
-msgstr "Aucun périférique audio de sortie n'est utilisable.\n"
-
-#: ../game/screen_intro.cc:24
-msgid ""
-"\n"
-"Please configure some before playing."
-msgstr ""
-"\n"
-"Veuillez en configurer certains avant de jouer."
-
-#: ../game/screen_songs.cc:195
-msgid "No songs found!"
-msgstr "Aucun morceau trouvé!"
-
-#: ../game/screen_songs.cc:196
-msgid ""
-"Visit performous.org\n"
-"for free songs"
-msgstr ""
-"Visitez performous.org\n"
-"pour des morceaux gratuits"
-
-#: ../game/screen_songs.cc:198
-msgid "no songs match search"
-msgstr "aucun morceau ne satisfait la recherche"
-
-#: ../game/screen_songs.cc:206
-msgid "(press END to view hiscores)"
-msgstr "(presser Fin pour voir le classement)"
-
-#: ../game/screen_songs.cc:207
-msgid "<type in to search>"
-msgstr "<Entrez votre recherche>"
-
-#: ../game/screen_songs.cc:212
-msgid "Hiscore for "
-msgstr "Records pour "
-
-#: ../game/instrumentgraph.cc:41
-msgid "Rejoin"
-msgstr "Rejoindre"
-
-#: ../game/instrumentgraph.cc:41
-msgid "Change selections"
-msgstr "Changer les paramètres"
-
-#: ../game/main.cc:132
-msgid "Miscellaneous..."
-msgstr "Divers"
-
-#: ../game/main.cc:160
-msgid "Main menu..."
-msgstr "Menu principal..."
-
-#: ../game/main.cc:171
-msgid "Screenshot taken!"
-msgstr "Capture d'écran effectuée"
-
-#: ../game/main.cc:174
-msgid "Screenshot failed!"
-msgstr "Echec de la capture d'écran"
-
-#: ../game/screen_players.cc:110
-msgid "No players found!"
-msgstr "Aucun joueur n'a été trouvé!"
-
-#: ../game/screen_players.cc:111
-msgid "Enter a name to create a new player."
-msgstr "Entrez un nom pour créer un nouveau joueur."
-
-#: ../game/screen_players.cc:113
-msgid "Press enter to create player!"
-msgstr "Pressez Entrer pour créer un nouveau joueur!"
-
-#: ../game/screen_players.cc:120
-msgid "You reached %1% points!"
-msgstr "%1% points marqués!"
-
-#: ../game/screen_players.cc:121
-msgid "Change player with arrow keys."
-msgstr "Changez de joueur avec les flèches"
-
-#: ../game/screen_players.cc:122
-msgid "Name:"
-msgstr "Nom:"
-
-#: ../game/screen_players.cc:125
-msgid "Type text to filter or create a new player."
-msgstr "Entrez un nom pour créer un nouveau joueur."
-
-#: ../game/screen_players.cc:125
-msgid "Search Text:"
-msgstr "Recherche:"
+#: ../game/database.cc:108
+msgid "Be the first to be listed here!"
+msgstr "Soyez le premier à être listé ici!"
 
 #: ../game/songs.cc:199
 msgid "random order"
@@ -320,26 +210,54 @@ msgid "Kids"
 msgstr "Enfantin"
 
 #: ../game/guitargraph.cc:14
+msgid "Easy"
+msgstr "Facile"
+
+#: ../game/guitargraph.cc:14
+msgid "Medium"
+msgstr "Moyen"
+
+#: ../game/guitargraph.cc:14
+msgid "Hard"
+msgstr "Difficile"
+
+#: ../game/guitargraph.cc:14
 msgid "Expert"
 msgstr "Expert"
 
-#: ../game/guitargraph.cc:169
+#: ../game/guitargraph.cc:143
+msgid "Ready!"
+msgstr "Prêt!"
+
+#: ../game/guitargraph.cc:155
+msgid "Select track"
+msgstr "Sélectionner la piste"
+
+#: ../game/guitargraph.cc:170
+msgid "Select difficulty"
+msgstr "Sélectionner la difficulté"
+
+#: ../game/guitargraph.cc:173
 msgid "Lefty-mode"
 msgstr "Mode gaucher"
 
-#: ../game/guitargraph.cc:178
+#: ../game/guitargraph.cc:182
 msgid "ON"
 msgstr "Activé"
 
-#: ../game/guitargraph.cc:178
+#: ../game/guitargraph.cc:182
 msgid "OFF"
 msgstr "Desactivé"
 
-#: ../game/guitargraph.cc:179
+#: ../game/guitargraph.cc:183
 msgid "Toggle lefty-mode"
 msgstr "Basculer en mode gaucher"
 
-#: ../game/guitargraph.cc:461
+#: ../game/guitargraph.cc:453
+msgid "Streak!"
+msgstr "D'affilé"
+
+#: ../game/guitargraph.cc:470
 msgid ""
 "God Mode\n"
 "Activated!"
@@ -347,27 +265,360 @@ msgstr ""
 "God Mode\n"
 "Activé"
 
-#: ../game/guitargraph.cc:462
+#: ../game/guitargraph.cc:471
 msgid "Mistakes ignored!"
 msgstr "Erreurs ignorées!"
 
-#: ../game/guitargraph.cc:1095
+#: ../game/guitargraph.cc:1104
 msgid "Drum Fill!"
 msgstr "Solo Batterie"
 
-#: ../game/guitargraph.cc:1096
+#: ../game/guitargraph.cc:1105
 msgid "God Mode Ready!"
 msgstr "God Mode Prêt!"
 
-#: ../game/guitargraph.cc:1101
+#: ../game/guitargraph.cc:1110
 msgid "Solo!"
 msgstr "Solo!"
 
-#~ msgid "No microphones found.\n"
-#~ msgstr "Aucun micro n'a été trouvé.\n"
+#: ../game/screen_players.cc:110
+msgid "No players found!"
+msgstr "Aucun joueur n'a été trouvé!"
 
-#~ msgid "Audio capture..."
-#~ msgstr "Entrée sonore..."
+#: ../game/screen_players.cc:111
+msgid "Enter a name to create a new player."
+msgstr "Entrez un nom pour créer un nouveau joueur."
 
-#~ msgid "Audio playback..."
-#~ msgstr "Sortie sonore..."
+#: ../game/screen_players.cc:113
+msgid "Press enter to create player!"
+msgstr "Pressez Entrer pour créer un nouveau joueur!"
+
+#: ../game/screen_players.cc:120
+msgid "You reached %1% points!"
+msgstr "%1% points marqués!"
+
+#: ../game/screen_players.cc:121
+msgid "Change player with arrow keys."
+msgstr "Changez de joueur avec les flèches"
+
+#: ../game/screen_players.cc:122
+msgid "Name:"
+msgstr "Nom:"
+
+#: ../game/screen_players.cc:125
+msgid "Type text to filter or create a new player."
+msgstr "Entrez un nom pour créer un nouveau joueur."
+
+#: ../game/screen_players.cc:125
+msgid "Search Text:"
+msgstr "Recherche:"
+
+#: ../game/screen_songs.cc:196
+msgid "No songs found!"
+msgstr "Aucun morceau trouvé!"
+
+#: ../game/screen_songs.cc:197
+msgid ""
+"Visit performous.org\n"
+"for free songs"
+msgstr ""
+"Visitez performous.org\n"
+"pour des morceaux gratuits"
+
+#: ../game/screen_songs.cc:199
+msgid "no songs match search"
+msgstr "aucun morceau ne satisfait la recherche"
+
+#: ../game/screen_songs.cc:207
+msgid "(press END to view hiscores)"
+msgstr "(presser Fin pour voir le classement)"
+
+#: ../game/screen_songs.cc:208
+msgid "<type in to search>"
+msgstr "<Entrez votre recherche>"
+
+#: ../game/screen_songs.cc:213
+msgid "Hisccore for %1%\n"
+msgstr "Records pour %1%\n"
+
+#: ../game/screen_configuration.cc:59
+msgid "Ctrl + S to save, Ctrl + R to reset defaults"
+msgstr ""
+
+#: ../game/instrumentgraph.cc:41
+msgid "Rejoin"
+msgstr "Rejoindre"
+
+#: ../game/instrumentgraph.cc:41
+msgid "Change selections"
+msgstr "Changer les paramètres"
+
+#: ../game/dancegraph.cc:18
+msgid "Beginner"
+msgstr "Débutant"
+
+#: ../game/dancegraph.cc:18
+msgid "Challenge"
+msgstr "Défi"
+
+#: ../game/dancegraph.cc:260
+msgid "STOP!"
+msgstr "STOP!"
+
+#: xml2gettext.wIRAI0kwij.c:2
+msgid "Game"
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:3
+msgid "Gameplay settings."
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:4
+msgid "Graphic"
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:5
+msgid "Video and rendering settings."
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:6
+msgid "Audio"
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:7
+msgid "Audio-related settings."
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:8
+msgid "System"
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:9
+msgid "System paths."
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:10
+msgid "Karaoke mode"
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:11
+msgid "Hide pitch wave, notes and scoring."
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:12
+msgid "Pitch waves"
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:13
+msgid "Enable singing pitch display (when not in karaoke mode)."
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:14
+msgid "Theme"
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:15
+msgid "Name of the theme to use or absolute path to theme folder."
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:16
+msgid "Keyboard as guitar"
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:17
+msgid "Enable keyboard as guitar (Frets on Fire mode)."
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:18
+msgid "Keyboard as drumkit"
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:19
+msgid "Enable keyboard as drumkit."
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:20
+msgid "Keyboard as dance pad"
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:21
+msgid "Enable keyboard as dance pad."
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:22
+msgid "Joystick configuration"
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:23
+msgid "Force joystick to some kind of instrument."
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:24
+msgid "Windowed width"
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:25
+msgid "The width of the window."
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:26
+msgid "Windowed height"
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:27
+msgid "The height of the window."
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:28
+msgid "Fullscreen mode"
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:29
+msgid "Enable fullscreen mode on startup."
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:30
+#, fuzzy
+msgid "Video playback"
+msgstr "Sortie sonore..."
+
+#: xml2gettext.wIRAI0kwij.c:31
+msgid "Allows completely disabling background videos. It is recommended to leave this enabled as Performous will still smoothly fade out the video if your computer is not fast enough."
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:32
+msgid "Webcam background"
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:33
+msgid "Performous can try to use webcam as a background video. You can disable it if it annoys you."
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:34
+msgid "Webcam id"
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:35
+msgid "Use -1 to autodetect or a number starting from 0 to choose specific device."
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:36
+msgid "3D notes"
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:37
+msgid "Draw instrument notes as 3-dimensional objects. May hurt performance on older hardware."
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:38
+msgid "SVG quality"
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:39
+msgid "Larger numbers cause vector graphics to be rendered in higher resolution. Decrease this to make navigating in menus faster."
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:40
+msgid "Text quality"
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:41
+msgid "Larger numbers cause text to be rendered in higher resolution. Decrease this to make everything a little faster."
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:42
+msgid "Benchmark mode"
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:43
+msgid "Framerate limit of 100 FPS is removed and the game instead renders at full speed. FPS values are printed to console. Please note that the display drivers may still limit the rendering speed to the screen refresh rate."
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:44
+msgid "Suggested latency"
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:45
+msgid "This is a hint for the audio engine about the desired latency. Set this as low as possible while retaining clear audio playback. Requires restart."
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:46
+msgid "Audio/video latency"
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:47
+msgid "Affects all modes. Use negative value if your display input lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal. This should be set so that the notes pass the cursor at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while performing."
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:48
+msgid "Audio round-trip latency"
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:49
+msgid "Affects singing only. The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. While performing, press Ctrl+S for synth mode and adjust with Ctrl+F3/F4."
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:50
+msgid "Audio/controller latency"
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:51
+msgid "Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to adjust while performing."
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:52
+msgid "Audio devices"
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:53
+msgid "Press Enter to configure (TODO: implement)"
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:54
+msgid "Menu volume"
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:55
+msgid "The volume level of menus, song previews and jukebox mode."
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:56
+msgid "Music volume"
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:57
+msgid "The ingame music volume. Values above 90 are not recommended as distortion may occur."
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:58
+msgid "Failure volume"
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:59
+msgid "The ingame fail sound volume. Values above 90 are not recommended as distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:60
+msgid "Hardware MIDI input device"
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:61
+msgid "Part of sound card name or its number or empty to use the first available device. Used currently for MIDI drum controllers."
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:62
+msgid "Song folders"
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:63
+msgid "Where to recursively look for songs. DATADIR at the beginning means all Performous data folders."
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:64
+msgid "Base folders for data"
+msgstr ""
+
+#: xml2gettext.wIRAI0kwij.c:65
+msgid "System defaults are included automatically. Additional paths can be added here."
+msgstr ""
+

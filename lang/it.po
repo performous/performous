@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-05 23:34+0100\n"
+"POT-Creation-Date: 2010-09-01 16:38+0100\n"
 "PO-Revision-Date: \n"
-"Last-Translator: Xaldyz <xaldyz@users.sourceforge.net>\n"
+"Last-Translator: Fredrik Klasson <scientica@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -12,6 +12,160 @@ msgstr ""
 "X-Poedit-KeywordsList: _\n"
 "X-Poedit-Basepath: .\n"
 "X-Poedit-SearchPath-0: ../game\n"
+"X-Poedit-SearchPath-1: ../data\n"
+
+#: ../game/main.cc:114
+msgid "Miscellaneous..."
+msgstr "Varie..."
+
+#: ../game/main.cc:142
+msgid "Main menu..."
+msgstr "Menu principale..."
+
+#: ../game/main.cc:153
+msgid "Screenshot taken!"
+msgstr "Screenshot eseguito!"
+
+#: ../game/main.cc:156
+msgid "Screenshot failed!"
+msgstr "Screenshot non eseguito!"
+
+#: ../game/screen_intro.cc:17
+msgid "Perform"
+msgstr "Gioca"
+
+#: ../game/screen_intro.cc:17
+msgid "Start performing!"
+msgstr "Comincia a cantare"
+
+#: ../game/screen_intro.cc:18
+msgid "Practice"
+msgstr "Pratica"
+
+#: ../game/screen_intro.cc:18
+msgid "Check your skills or test the microphones"
+msgstr "Controlla la tua bravura! / Test microfono"
+
+#: ../game/screen_intro.cc:19
+msgid "Configure"
+msgstr "Configura"
+
+#: ../game/screen_intro.cc:19
+msgid "Configure game options"
+msgstr "Opzioni di configurazione gioco"
+
+#: ../game/screen_intro.cc:20
+#: ../game/screen_sing.cc:116
+msgid "Quit"
+msgstr "Esci"
+
+#: ../game/screen_intro.cc:20
+msgid "Leave the game"
+msgstr "Lascia il gioco"
+
+#: ../game/screen_intro.cc:23
+msgid "No playback devices could be used.\n"
+msgstr "Nessun dispositivo di riproduzione può essere usato.\n"
+
+#: ../game/screen_intro.cc:24
+msgid ""
+"\n"
+"Please configure some before playing."
+msgstr ""
+"\n"
+"Per favore entra in configurazione prima di giocare"
+
+#: ../game/screen_sing.cc:36
+msgid "Loading song..."
+msgstr "Caricamento canzoni..."
+
+#: ../game/screen_sing.cc:45
+msgid "Song is broken!"
+msgstr "La canzone è "
+
+#: ../game/screen_sing.cc:50
+msgid "Song contains broken tracks!"
+msgstr "La canzone contiene tracce rovinate!"
+
+#: ../game/screen_sing.cc:114
+msgid "Resume"
+msgstr ""
+
+#: ../game/screen_sing.cc:114
+#, fuzzy
+msgid "Back to performing!"
+msgstr "Comincia a cantare"
+
+#: ../game/screen_sing.cc:115
+msgid "Restart"
+msgstr ""
+
+#: ../game/screen_sing.cc:115
+msgid ""
+"Start the song\n"
+"from the beginning"
+msgstr ""
+
+#: ../game/screen_sing.cc:116
+msgid "Exit to song browser"
+msgstr ""
+
+#: ../game/screen_sing.cc:450
+msgid "   ENTER to skip instrumental break"
+msgstr "   INVIO per saltare lo stacco musicale"
+
+#: ../game/screen_sing.cc:451
+msgid "   Remember to wait for grading!"
+msgstr "   Ricordati di aspettare per il voto!"
+
+#: ../game/screen_sing.cc:587
+msgid "No player!"
+msgstr "Nessun giocatore trovato!"
+
+#: ../game/screen_sing.cc:596
+msgid "Hit singer"
+msgstr "Star"
+
+#: ../game/screen_sing.cc:597
+msgid "Lead singer"
+msgstr "Cantante"
+
+#: ../game/screen_sing.cc:598
+#: ../game/screen_sing.cc:604
+#: ../game/screen_sing.cc:610
+msgid "Rising star"
+msgstr "Dilettante"
+
+#: ../game/screen_sing.cc:599
+#: ../game/screen_sing.cc:605
+#: ../game/screen_sing.cc:611
+msgid "Amateur"
+msgstr "Amatore"
+
+#: ../game/screen_sing.cc:600
+#: ../game/screen_sing.cc:612
+msgid "Tone deaf"
+msgstr "Stonato"
+
+#: ../game/screen_sing.cc:602
+msgid "Maniac"
+msgstr "Maniaco"
+
+#: ../game/screen_sing.cc:603
+msgid "Hoofer"
+msgstr "Professionista"
+
+#: ../game/screen_sing.cc:606
+msgid "Loser"
+msgstr "Perdente"
+
+#: ../game/screen_sing.cc:608
+msgid "Virtuoso"
+msgstr "Virtuoso"
+
+#: ../game/screen_sing.cc:609
+msgid "Rocker"
+msgstr "Rockstar"
 
 #: ../game/database.cc:107
 msgid "No Items up to now."
@@ -21,77 +175,107 @@ msgstr "Nessun elemento fino ad ora."
 msgid "Be the first to be listed here!"
 msgstr "Sii il primo a essere qui!"
 
-#: ../game/main.cc:164
-msgid "Audio capture..."
-msgstr "Registramento audio..."
+#: ../game/songs.cc:199
+msgid "random order"
+msgstr "ordine casuale"
 
-#: ../game/main.cc:166
-msgid "Audio playback..."
-msgstr "Riproduzione audio..."
+#: ../game/songs.cc:200
+msgid "sorted by song"
+msgstr "ordinato per canzone"
 
-#: ../game/main.cc:169
-msgid "Miscellaneous..."
-msgstr "Varie..."
+#: ../game/songs.cc:201
+msgid "sorted by artist"
+msgstr "ordinato per artista"
 
-#: ../game/main.cc:183
-msgid "Main menu..."
-msgstr "Menu principale..."
+#: ../game/songs.cc:202
+msgid "sorted by edition"
+msgstr "ordinato per edizione"
 
-#: ../game/main.cc:194
-msgid "Screenshot taken!"
-msgstr "Screenshot eseguito!"
+#: ../game/songs.cc:203
+msgid "sorted by genre"
+msgstr "ordinato per genere"
 
-#: ../game/main.cc:197
-msgid "Screenshot failed!"
-msgstr "Screenshot non eseguito!"
+#: ../game/songs.cc:204
+msgid "sorted by path"
+msgstr "ordinato per percorso"
 
-#: ../game/screen_intro.cc:15
-msgid "Perform"
-msgstr "Gioca"
+#: ../game/songs.cc:205
+msgid "sorted by language"
+msgstr "ordinato per lingua"
 
-#: ../game/screen_intro.cc:15
-msgid "Start performing!"
-msgstr "Comincia a cantare"
-
-#: ../game/screen_intro.cc:16
-msgid "Practice"
-msgstr "Pratica"
-
-#: ../game/screen_intro.cc:16
-msgid "Check your skills or test the microphones"
-msgstr "Controlla la tua bravura! / Test microfono"
-
-#: ../game/screen_intro.cc:17
-msgid "Configure"
-msgstr "Configura"
-
-#: ../game/screen_intro.cc:17
-msgid "Configure game options"
-msgstr "Opzioni di configurazione gioco"
-
-#: ../game/screen_intro.cc:18
-msgid "Quit"
-msgstr "Esci"
-
-#: ../game/screen_intro.cc:18
-msgid "Leave the game"
-msgstr "Lascia il gioco"
-
-#: ../game/screen_intro.cc:21
-msgid "No playback devices could be used.\n"
-msgstr "Nessun dispositivo di riproduzione può essere usato.\n"
-
-#: ../game/screen_intro.cc:22
-msgid "No microphones found.\n"
-msgstr "Nessun microfono trovato.\n"
-
-#: ../game/screen_intro.cc:23
-msgid ""
-"\n"
-"Please configure some before playing."
+#: ../game/guitargraph.cc:14
+msgid "Kids"
 msgstr ""
-"\n"
-"Per favore entra in configurazione prima di giocare"
+
+#: ../game/guitargraph.cc:14
+msgid "Easy"
+msgstr ""
+
+#: ../game/guitargraph.cc:14
+msgid "Medium"
+msgstr ""
+
+#: ../game/guitargraph.cc:14
+msgid "Hard"
+msgstr ""
+
+#: ../game/guitargraph.cc:14
+msgid "Expert"
+msgstr ""
+
+#: ../game/guitargraph.cc:143
+msgid "Ready!"
+msgstr ""
+
+#: ../game/guitargraph.cc:155
+msgid "Select track"
+msgstr ""
+
+#: ../game/guitargraph.cc:170
+msgid "Select difficulty"
+msgstr ""
+
+#: ../game/guitargraph.cc:173
+msgid "Lefty-mode"
+msgstr ""
+
+#: ../game/guitargraph.cc:182
+msgid "ON"
+msgstr ""
+
+#: ../game/guitargraph.cc:182
+msgid "OFF"
+msgstr ""
+
+#: ../game/guitargraph.cc:183
+msgid "Toggle lefty-mode"
+msgstr ""
+
+#: ../game/guitargraph.cc:453
+msgid "Streak!"
+msgstr ""
+
+#: ../game/guitargraph.cc:470
+msgid ""
+"God Mode\n"
+"Activated!"
+msgstr ""
+
+#: ../game/guitargraph.cc:471
+msgid "Mistakes ignored!"
+msgstr ""
+
+#: ../game/guitargraph.cc:1104
+msgid "Drum Fill!"
+msgstr ""
+
+#: ../game/guitargraph.cc:1105
+msgid "God Mode Ready!"
+msgstr ""
+
+#: ../game/guitargraph.cc:1110
+msgid "Solo!"
+msgstr ""
 
 #: ../game/screen_players.cc:110
 msgid "No players found!"
@@ -125,80 +309,11 @@ msgstr "Inserisci un nome per selezionare un giocatore o crearne uno nuovo."
 msgid "Search Text:"
 msgstr "Testo di ricerca"
 
-#: ../game/screen_sing.cc:34
-msgid "Loading song..."
-msgstr "Caricamento canzoni..."
-
-#: ../game/screen_sing.cc:42
-msgid "Song is broken!"
-msgstr "La canzone è "
-
-#: ../game/screen_sing.cc:47
-msgid "Song contains broken tracks!"
-msgstr "La canzone contiene tracce rovinate!"
-
-#: ../game/screen_sing.cc:330
-msgid "   ENTER to skip instrumental break"
-msgstr "   INVIO per saltare lo stacco musicale"
-
-#: ../game/screen_sing.cc:331
-msgid "   Remember to wait for grading!"
-msgstr "   Ricordati di aspettare per il voto!"
-
-#: ../game/screen_sing.cc:419
-msgid "No player!"
-msgstr "Nessun giocatore trovato!"
-
-#: ../game/screen_sing.cc:428
-msgid "Hit singer"
-msgstr "Star"
-
-#: ../game/screen_sing.cc:429
-msgid "Lead singer"
-msgstr "Cantante"
-
-#: ../game/screen_sing.cc:430
-#: ../game/screen_sing.cc:436
-#: ../game/screen_sing.cc:442
-msgid "Rising star"
-msgstr "Dilettante"
-
-#: ../game/screen_sing.cc:431
-#: ../game/screen_sing.cc:437
-#: ../game/screen_sing.cc:443
-msgid "Amateur"
-msgstr "Amatore"
-
-#: ../game/screen_sing.cc:432
-#: ../game/screen_sing.cc:444
-msgid "Tone deaf"
-msgstr "Stonato"
-
-#: ../game/screen_sing.cc:434
-msgid "Maniac"
-msgstr "Maniaco"
-
-#: ../game/screen_sing.cc:435
-msgid "Hoofer"
-msgstr "Professionista"
-
-#: ../game/screen_sing.cc:438
-msgid "Loser"
-msgstr "Perdente"
-
-#: ../game/screen_sing.cc:440
-msgid "Virtuoso"
-msgstr "Virtuoso"
-
-#: ../game/screen_sing.cc:441
-msgid "Rocker"
-msgstr "Rockstar"
-
-#: ../game/screen_songs.cc:195
+#: ../game/screen_songs.cc:196
 msgid "No songs found!"
 msgstr "Nessuna canzone trovata!"
 
-#: ../game/screen_songs.cc:196
+#: ../game/screen_songs.cc:197
 msgid ""
 "Visit performous.org\n"
 "for free songs"
@@ -206,52 +321,300 @@ msgstr ""
 "Visita performous.org\n"
 "per canzoni gratis"
 
-#: ../game/screen_songs.cc:198
+#: ../game/screen_songs.cc:199
 msgid "no songs match search"
 msgstr "nessuna canzone trovata"
 
-#: ../game/screen_songs.cc:206
+#: ../game/screen_songs.cc:207
 msgid "(press END to view hiscores)"
 msgstr "(premi END per vedere i punteggi migliori)"
 
-#: ../game/screen_songs.cc:207
+#: ../game/screen_songs.cc:208
 msgid "<type in to search>"
 msgstr "<premi qualche lettera per cercare>"
 
-#: ../game/screen_songs.cc:212
-msgid "Hiscore for "
-msgstr "Punteggi per "
+#: ../game/screen_songs.cc:213
+msgid "Hisccore for %1%\n"
+msgstr "Punteggi per %1%\n"
 
-#: ../game/songs.cc:195
-msgid "random order"
-msgstr "ordine casuale"
+#: ../game/screen_configuration.cc:59
+msgid "Ctrl + S to save, Ctrl + R to reset defaults"
+msgstr ""
 
-#: ../game/songs.cc:196
-msgid "sorted by song"
-msgstr "ordinato per canzone"
+#: ../game/instrumentgraph.cc:41
+msgid "Rejoin"
+msgstr ""
 
-#: ../game/songs.cc:197
-msgid "sorted by artist"
-msgstr "ordinato per artista"
+#: ../game/instrumentgraph.cc:41
+msgid "Change selections"
+msgstr ""
 
-#: ../game/songs.cc:198
-msgid "sorted by edition"
-msgstr "ordinato per edizione"
+#: ../game/dancegraph.cc:18
+msgid "Beginner"
+msgstr ""
 
-#: ../game/songs.cc:199
-msgid "sorted by genre"
-msgstr "ordinato per genere"
+#: ../game/dancegraph.cc:18
+msgid "Challenge"
+msgstr ""
 
-#: ../game/songs.cc:200
-msgid "sorted by path"
-msgstr "ordinato per percorso"
+#: ../game/dancegraph.cc:260
+msgid "STOP!"
+msgstr ""
 
-#: ../game/songs.cc:201
-msgid "sorted by language"
-msgstr "ordinato per lingua"
+#: xml2gettext.2KLbvh3hbJ.c:2
+msgid "Game"
+msgstr ""
 
-#~ msgid "filter: "
-#~ msgstr "filtro:"
-#~ msgid "none"
-#~ msgstr "niente"
+#: xml2gettext.2KLbvh3hbJ.c:3
+msgid "Gameplay settings."
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:4
+msgid "Graphic"
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:5
+msgid "Video and rendering settings."
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:6
+msgid "Audio"
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:7
+msgid "Audio-related settings."
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:8
+msgid "System"
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:9
+msgid "System paths."
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:10
+msgid "Karaoke mode"
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:11
+msgid "Hide pitch wave, notes and scoring."
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:12
+msgid "Pitch waves"
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:13
+msgid "Enable singing pitch display (when not in karaoke mode)."
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:14
+msgid "Theme"
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:15
+msgid "Name of the theme to use or absolute path to theme folder."
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:16
+msgid "Keyboard as guitar"
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:17
+msgid "Enable keyboard as guitar (Frets on Fire mode)."
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:18
+msgid "Keyboard as drumkit"
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:19
+msgid "Enable keyboard as drumkit."
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:20
+msgid "Keyboard as dance pad"
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:21
+msgid "Enable keyboard as dance pad."
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:22
+msgid "Joystick configuration"
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:23
+msgid "Force joystick to some kind of instrument."
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:24
+msgid "Windowed width"
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:25
+msgid "The width of the window."
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:26
+msgid "Windowed height"
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:27
+msgid "The height of the window."
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:28
+msgid "Fullscreen mode"
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:29
+msgid "Enable fullscreen mode on startup."
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:30
+#, fuzzy
+msgid "Video playback"
+msgstr "Riproduzione audio..."
+
+#: xml2gettext.2KLbvh3hbJ.c:31
+msgid "Allows completely disabling background videos. It is recommended to leave this enabled as Performous will still smoothly fade out the video if your computer is not fast enough."
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:32
+msgid "Webcam background"
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:33
+msgid "Performous can try to use webcam as a background video. You can disable it if it annoys you."
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:34
+msgid "Webcam id"
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:35
+msgid "Use -1 to autodetect or a number starting from 0 to choose specific device."
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:36
+msgid "3D notes"
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:37
+msgid "Draw instrument notes as 3-dimensional objects. May hurt performance on older hardware."
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:38
+msgid "SVG quality"
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:39
+msgid "Larger numbers cause vector graphics to be rendered in higher resolution. Decrease this to make navigating in menus faster."
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:40
+msgid "Text quality"
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:41
+msgid "Larger numbers cause text to be rendered in higher resolution. Decrease this to make everything a little faster."
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:42
+msgid "Benchmark mode"
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:43
+msgid "Framerate limit of 100 FPS is removed and the game instead renders at full speed. FPS values are printed to console. Please note that the display drivers may still limit the rendering speed to the screen refresh rate."
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:44
+msgid "Suggested latency"
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:45
+msgid "This is a hint for the audio engine about the desired latency. Set this as low as possible while retaining clear audio playback. Requires restart."
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:46
+msgid "Audio/video latency"
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:47
+msgid "Affects all modes. Use negative value if your display input lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal. This should be set so that the notes pass the cursor at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while performing."
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:48
+msgid "Audio round-trip latency"
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:49
+msgid "Affects singing only. The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. While performing, press Ctrl+S for synth mode and adjust with Ctrl+F3/F4."
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:50
+msgid "Audio/controller latency"
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:51
+msgid "Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to adjust while performing."
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:52
+msgid "Audio devices"
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:53
+msgid "Press Enter to configure (TODO: implement)"
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:54
+msgid "Menu volume"
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:55
+msgid "The volume level of menus, song previews and jukebox mode."
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:56
+msgid "Music volume"
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:57
+msgid "The ingame music volume. Values above 90 are not recommended as distortion may occur."
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:58
+msgid "Failure volume"
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:59
+msgid "The ingame fail sound volume. Values above 90 are not recommended as distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:60
+msgid "Hardware MIDI input device"
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:61
+msgid "Part of sound card name or its number or empty to use the first available device. Used currently for MIDI drum controllers."
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:62
+msgid "Song folders"
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:63
+msgid "Where to recursively look for songs. DATADIR at the beginning means all Performous data folders."
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:64
+msgid "Base folders for data"
+msgstr ""
+
+#: xml2gettext.2KLbvh3hbJ.c:65
+msgid "System defaults are included automatically. Additional paths can be added here."
+msgstr ""
 
