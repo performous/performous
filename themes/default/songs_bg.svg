@@ -17,7 +17,7 @@
    height="800"
    id="svg559"
    sodipodi:version="0.32"
-   inkscape:version="0.47pre4 r22446"
+   inkscape:version="0.47 r22583"
    sodipodi:docname="songs_bg.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <metadata
@@ -32,8 +32,8 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="726"
-     inkscape:window-width="1280"
+     inkscape:window-height="992"
+     inkscape:window-width="1920"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      guidetolerance="10.0"
@@ -47,7 +47,7 @@
      inkscape:cx="445.08607"
      inkscape:cy="383.70921"
      inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:window-y="29"
      inkscape:current-layer="svg559"
      showgrid="false"
      inkscape:window-maximized="1" />
@@ -115,15 +115,11 @@
          id="feGaussianBlur3871" />
     </filter>
   </defs>
-  <rect
+  <path
      style="fill:#ffffff;fill-opacity:0.2739131"
+     d="M 49.884998,210 950.115,210 C 966.67129,210 980,223.3225 980,239.87109 l 0,230.25782 C 980,486.6775 966.67129,500 950.115,500 l -533.01146,0 c 0,0 -119.40515,68.26767 -119.40515,68.26767 0,0 -101.15081,-68.26767 -101.15081,-68.26767 0,0 -146.662582,0 -146.662582,0 C 33.328709,500 20,486.6775 20,470.12891 L 20,239.87109 C 20,223.3225 33.328709,210 49.884998,210 z"
      id="rect3394"
-     width="960"
-     height="290"
-     x="20"
-     y="210"
-     ry="29.871086"
-     rx="29.884998" />
+     sodipodi:nodetypes="cccccccccccc" />
   <text
      xml:space="preserve"
      style="font-size:24.89476013px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
