@@ -125,12 +125,12 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number,
 	m_track_index = m_instrumentTracks.begin();
 	while (number--)
 		if (++m_track_index == m_instrumentTracks.end()) m_track_index = m_instrumentTracks.begin();
-	// Pick a nice default difficulty
-	if (difficulty(DIFFICULTY_EASY));
-	else if (difficulty(DIFFICULTY_SUPAEASY));
-	else if (difficulty(DIFFICULTY_MEDIUM));
-	else if (difficulty(DIFFICULTY_AMAZING));
-	else difficultyAuto();
+	// Pick a nice default difficulty (note: the execution of || stops when true is returned)
+	difficulty(DIFFICULTY_EASY) ||
+	difficulty(DIFFICULTY_SUPAEASY) ||
+	difficulty(DIFFICULTY_MEDIUM) ||
+	difficulty(DIFFICULTY_AMAZING) ||
+	(difficultyAuto(), true);
 	updateNeck();
 	setupJoinMenu();
 }
