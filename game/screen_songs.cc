@@ -214,47 +214,7 @@ void ScreenSongs::draw() {
 			// Get hiscores from database
 			m_database.queryPerSongHiscore_HiscoreDisplay(oss_order, m_songs.currentPtr(), hiscore_start_pos, 5);
 		}
-		double spos = m_songs.currentPosition(); // This needs to be polled to run the animation
-		if (!m_jukebox) {
-			// Draw the covers
-			std::size_t ss = m_songs.size();
-			int baseidx = spos + 1.5; --baseidx; // Round correctly
-			double shift = spos - baseidx;
-			for (int i = -2; i < 5; ++i) {
-				if (baseidx + i < 0 || baseidx + i >= int(ss)) continue;
-				Song& song_display = m_songs[baseidx + i];
-				Surface* cover = NULL;
-				// Fetch cover image from cache or try loading it
-				if (!song_display.cover.empty()) try { cover = &m_covers[song_display.path + song_display.cover]; } catch (std::exception const&) {cover = NULL;}
-				if (!cover) {
-					if(song_display.hasDance()) {
-						cover = m_danceCover.get();
-					} else if(song_display.hasDrums()) {
-						cover = m_bandCover.get();
-					} else {
-						size_t tracks = song_display.instrumentTracks.size();
-						if (tracks == 0) cover = m_singCover.get();
-						else cover = m_instrumentCover.get();
-					}
-				}
-				Surface& s = *cover;
-				// Calculate dimensions for cover and instrument markers
-				double diff = (i == 0 ? (0.5 - fabs(shift)) * 0.07 : 0.0);
-				double y = 0.27 + 0.5 * diff;
-				s.dimensions.middle(-0.2 + 0.17 * (i - shift)).bottom(y - 0.2 * diff).fitInside(0.14 + diff, 0.14 + diff);
-				// Draw the cover normally
-				s.draw();
-				// Draw the reflection
-				{
-					glutil::PushMatrix m;
-					glTranslatef(0.0f, 2.0 * y, 0.0f);
-					glScalef(1.0f, -1.0f, 1.0f);
-					glColor4f(1.0f, 1.0f, 1.0f, 0.4f);
-					s.draw();
-					glColor3f(1.0f, 1.0f, 1.0f);
-				}
-			}
-		}
+		if (!m_jukebox) drawCovers();
 		updateMultimedia(song, info);
 	}
 	if (m_jukebox) drawJukebox();
@@ -276,6 +236,50 @@ void ScreenSongs::draw() {
 			m_playing.clear();
 		}
 	} else if (!m_audio.isPaused() && m_playTimer.get() > IDLE_TIMEOUT) m_songs.advance(1);  // Switch if song hasn't changed for IDLE_TIMEOUT seconds
+}
+
+void ScreenSongs::drawCovers() {
+	double spos = m_songs.currentPosition(); // This needs to be polled to run the animation
+	std::size_t ss = m_songs.size();
+	int baseidx = spos + 1.5; --baseidx; // Round correctly
+	double shift = spos - baseidx;
+	for (int i = -2; i < 5; ++i) {
+		if (baseidx + i < 0 || baseidx + i >= int(ss)) continue;
+		Song& song = m_songs[baseidx + i];
+		Surface& s = getCover(song);
+		// Calculate dimensions for cover and instrument markers
+		double diff = (i == 0 ? (0.5 - fabs(shift)) * 0.07 : 0.0);
+		double y = 0.27 + 0.5 * diff;
+		s.dimensions.middle(-0.2 + 0.17 * (i - shift)).bottom(y - 0.2 * diff).fitInside(0.14 + diff, 0.14 + diff);
+		// Draw the cover normally
+		s.draw();
+		// Draw the reflection
+		glutil::PushMatrix m;
+		glTranslatef(0.0f, 2.0 * y, 0.0f);
+		glScalef(1.0f, -1.0f, 1.0f);
+		glColor4f(1.0f, 1.0f, 1.0f, 0.4f);
+		s.draw();
+		glColor3f(1.0f, 1.0f, 1.0f);
+	}
+}
+
+Surface& ScreenSongs::getCover(Song const& song) {
+	Surface* cover = NULL;
+	// Fetch cover image from cache or try loading it
+	if (!song.cover.empty()) try { cover = &m_covers[song.path + song.cover]; } catch (std::exception const&) {cover = NULL;}
+	// Use empty cover
+	if (!cover) {
+		if(song.hasDance()) {
+			cover = m_danceCover.get();
+		} else if(song.hasDrums()) {
+			cover = m_bandCover.get();
+		} else {
+			size_t tracks = song.instrumentTracks.size();
+			if (tracks == 0) cover = m_singCover.get();
+			else cover = m_instrumentCover.get();
+		}
+	}
+	return *cover;
 }
 
 void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
