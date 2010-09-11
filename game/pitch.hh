@@ -8,18 +8,17 @@
 
 /// struct to represent tones
 struct Tone {
-	static const std::size_t MAXHARM = 48; ///< maximum harmonics
-	static const std::size_t MINAGE = 2; ///< minimum age
-	double freq; ///< frequency
-	double db; ///< dezibels
-	double stabledb; ///< stable decibels
-	double harmonics[MAXHARM]; ///< harmonics array
-	std::size_t age; ///< age
+	static const std::size_t MAXHARM = 48; ///< The maximum number of harmonics tracked
+	static const std::size_t MINAGE = 2; ///< The minimum age required for a tone to be output
+	double freq; ///< Frequency (Hz)
+	double db; ///< Level (dB)
+	double stabledb; ///< Stable level, useful for graphics rendering
+	double harmonics[MAXHARM]; ///< Harmonics' levels
+	std::size_t age; ///< How many times the tone has been detected in row
 	Tone(); 
-	void print() const; ///< prints Tone
-	bool operator==(double f) const; ///< equality operator
-	void update(Tone const& t); ///< update Tone
-	/// compares left and right volume
+	void print() const; ///< Prints Tone to std::cout
+	bool operator==(double f) const; ///< Compare for rough frequency match
+	/// Less-than compare by levels (instead of frequencies like operator< does)
 	static bool dbCompare(Tone const& l, Tone const& r) { return l.db < r.db; }
 };
 
@@ -47,19 +46,22 @@ class Analyzer {
 	Analyzer(double rate, std::size_t step = 200);
 	/** Add input data to buffer. This is thread-safe (against other functions). **/
 	template <typename InIt> void input(InIt begin, InIt end) {
+		size_t r = m_bufRead;  // The read position
+		size_t w = m_bufWrite;  // The write position
+		size_t wNext;  // The next write position
+		bool overflow = false;
 		while (begin != end) {
-			float s = *begin;
-			++begin;
-			m_peak *= 0.999;
+			float s = *begin++;  // Read input sample
+			// Peak level calculation
 			float p = s * s;
-			if (p > m_peak) m_peak = p;
-			size_t w = m_bufWrite;
-			size_t w2 = (m_bufWrite + 1) % BUF_N;
-			size_t r = m_bufRead;
-			if (w2 == r) m_bufRead = (r + 1) % BUF_N;
-			m_buf[w] = s;
-			m_bufWrite = w2;
+			if (p > m_peak) m_peak = p; else m_peak *= 0.999;
+			// Cursor updates
+			wNext = (w + 1) % BUF_N;
+			if (wNext == r) overflow = true;
+			w = wNext;
 		}
+		m_bufWrite = w;
+		if (overflow) m_bufRead = wNext;  // Reset read pointer on overflow
 	}
 	/** Call this to process all data input so far. **/
 	void process();

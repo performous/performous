@@ -55,6 +55,7 @@ namespace da {
 		ValueType& operator*() { return *m_pos; }
 		step_iterator operator+(std::ptrdiff_t rhs) { return step_iterator(m_pos + m_step * rhs, m_step); }
 		step_iterator& operator++() { m_pos += m_step; return *this; }
+		step_iterator operator++(int) { step_iterator ret = *this; ++*this; return ret; }		
 		bool operator!=(step_iterator const& rhs) const { return m_pos != rhs.m_pos; }
 		std::ptrdiff_t operator-(step_iterator const& rhs) const { return (m_pos - rhs.m_pos) / m_step; }
 		// TODO: more operators
