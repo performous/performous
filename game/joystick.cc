@@ -476,8 +476,8 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 					break;
 				case SDLK_BACKSPACE:
 					if(!guitar) return false;
-					event.type = input::Event::WHAMMY;
-					button = 1;
+					event.type = input::Event::PRESS;
+					button = input::WHAMMY_BUTTON;
 					is_guitar_event = true;
 					break;
 				case SDLK_F6: case SDLK_6:
@@ -617,8 +617,8 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 					return true;
 				case SDLK_BACKSPACE:
 					if(!guitar) return false;
-					event.type = input::Event::WHAMMY;
-					button = 0;
+					event.type = input::Event::RELEASE;
+					button = WHAMMY_BUTTON;
 					is_guitar_event = true;
 					break;
 				case SDLK_F6: case SDLK_6:
@@ -738,9 +738,10 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 			if(!devices.find(joy_id)->second.assigned()) return false;
 			if (_e.jaxis.axis == 5 || _e.jaxis.axis == 6 || _e.jaxis.axis == 1) {
 				event.type = input::Event::PICK;
-			} else if (_e.jaxis.axis == 2 || (devices.find(joy_id)->second.name() == "GUITAR_ROCKBAND_XB360"
-			  && _e.jaxis.axis == 4)) {
-				event.type = input::Event::WHAMMY;
+			} else if (_e.jaxis.axis == 2 || (devices.find(joy_id)->second.name() == "GUITAR_ROCKBAND_XB360" && _e.jaxis.axis == 4)) {
+				// nothing to do here
+			} else if (devices.find(joy_id)->second.name() == "DRUMS_ROCKBAND_XB360" && _e.jaxis.axis == 3) { // <= WTF HERE !!!
+				// nothing to do here
 			} else {
 				return false;
 			}
@@ -751,6 +752,17 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 			if (devices.find(joy_id)->second.name() == "DRUMS_ROCKBAND_XB360" && _e.jaxis.axis == 3) {
 				event.button = input::GODMODE_BUTTON;
 				if (_e.jaxis.value < -2) {
+					event.type = input::Event::PRESS;
+					event.pressed[event.button] = true;
+				} else {
+					event.type = input::Event::RELEASE;
+					event.pressed[event.button] = false;
+				}
+				devices.find(joy_id)->second.addEvent(event);
+				break;
+			} else if (_e.jaxis.axis == 2 || (devices.find(joy_id)->second.name() == "GUITAR_ROCKBAND_XB360" && _e.jaxis.axis == 4)) {
+				event.button = input::WHAMMY_BUTTON;
+				if (_e.jaxis.value > 0) {
 					event.type = input::Event::PRESS;
 					event.pressed[event.button] = true;
 				} else {

@@ -29,6 +29,7 @@ namespace input {
 	static const int BLUE_FRET_BUTTON = 3;
 	static const int ORANGE_FRET_BUTTON = 4;
 	static const int GODMODE_BUTTON = 5;
+	static const int WHAMMY_BUTTON = 6;
 	// Drums buttons
 	static const int KICK_BUTTON = 0;
 	static const int RED_TOM_BUTTON = 1;
@@ -50,7 +51,7 @@ namespace input {
 	static const int START_BUTTON = 9;
 
 	struct Event {
-		enum Type { PRESS, RELEASE, PICK, WHAMMY };
+		enum Type { PRESS, RELEASE, PICK };
 		Type type;
 		int button; // Translated button number for press/release events. 0 for pick down, 1 for pick up (NOTE: these are NOT pick press/release events but rather different directions)
 		bool pressed[BUTTONS]; // All events tell the button state right after the event happened

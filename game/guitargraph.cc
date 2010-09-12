@@ -334,8 +334,19 @@ void GuitarGraph::engine() {
 				if (ev.type == input::Event::PRESS) activateStarpower();
 				continue;
 			}
+			if (ev.button == input::WHAMMY_BUTTON) {
+				switch(ev.type) {
+					case input::Event::RELEASE:
+						m_whammy = (1.0 + 0.0 + 2.0*(rand()/double(RAND_MAX))) / 4.0;
+						break;
+					case input::Event::PRESS:
+						m_whammy = (1.0 + 1.0 + 2.0*(rand()/double(RAND_MAX))) / 4.0;
+						break;
+					default:
+						break;
+				}
+			}
 			if (ev.type == input::Event::RELEASE) endHold(ev.button, time);
-			if (ev.type == input::Event::WHAMMY) m_whammy = (1.0 + ev.button + 2.0*(rand()/double(RAND_MAX))) / 4.0;
 		} else {
 			// Handle drum lefty-mode
 			if (m_leftymode.b() && ev.button > 0 && !menuOpen()) ev.button = m_pads - ev.button;
