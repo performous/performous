@@ -22,7 +22,32 @@ namespace input {
 	enum NavButton { NONE, UP, DOWN, LEFT, RIGHT, START, SELECT, CANCEL, PAUSE, MOREUP, MOREDOWN, VOLUME_UP, VOLUME_DOWN };
 
 	static const std::size_t BUTTONS = 10;
-	static const int STARPOWER_BUTTON = 5;
+	// Guitar buttons
+	static const int GREEN_FRET_BUTTON = 0;
+	static const int RED_FRET_BUTTON = 1;
+	static const int YELLOW_FRET_BUTTON = 2;
+	static const int BLUE_FRET_BUTTON = 3;
+	static const int ORANGE_FRET_BUTTON = 4;
+	static const int GODMODE_BUTTON = 5;
+	// Drums buttons
+	static const int KICK_BUTTON = 0;
+	static const int RED_TOM_BUTTON = 1;
+	static const int YELLOW_TOM_BUTTON = 2;
+	static const int BLUE_TOM_BUTTON = 3;
+	static const int GREEN_TOM_BUTTON = 4;
+	static const int ORANGE_TOM_BUTTON = 5;
+	// Dance buttons
+	static const int LEFT_DANCE_BUTTON = 0;
+	static const int DOWN_DANCE_BUTTON = 1;
+	static const int UP_DANCE_BUTTON = 2;
+	static const int RIGHT_DANCE_BUTTON = 3;
+	static const int DOWN_LEFT_DANCE_BUTTON = 4;
+	static const int DOWN_RIGHT_DANCE_BUTTON = 5;
+	static const int UP_LEFT_DANCE_BUTTON = 6;
+	static const int UP_RIGHT_DANCE_BUTTON = 7;
+	// Global buttons
+	static const int SELECT_BUTTON = 8;
+	static const int START_BUTTON = 9;
 
 	struct Event {
 		enum Type { PRESS, RELEASE, PICK, WHAMMY };

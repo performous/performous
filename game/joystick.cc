@@ -279,14 +279,14 @@ void readControllers(input::Instruments &instruments, fs::path const& file) {
 						int id = boost::lexical_cast<int>(getAttribute(button_elem, "id"));
 						std::string value = getAttribute(button_elem, "value");
 						if(id >= SDL_BUTTONS) break;
-						if(value == "green") mapping[id] = 0;
-						else if(value == "red") mapping[id] = 1;
-						else if(value == "yellow") mapping[id] = 2;
-						else if(value == "blue") mapping[id] = 3;
-						else if(value == "orange") mapping[id] = 4;
-						else if(value == "godmode") mapping[id] = 5;
-						else if(value == "select") mapping[id] = 8;
-						else if(value == "start") mapping[id] = 9;
+						if(value == "green") mapping[id] = input::GREEN_FRET_BUTTON;
+						else if(value == "red") mapping[id] = input::RED_FRET_BUTTON;
+						else if(value == "yellow") mapping[id] = input::YELLOW_FRET_BUTTON;
+						else if(value == "blue") mapping[id] = input::BLUE_FRET_BUTTON;
+						else if(value == "orange") mapping[id] = input::ORANGE_FRET_BUTTON;
+						else if(value == "godmode") mapping[id] = input::GODMODE_BUTTON;
+						else if(value == "select") mapping[id] = input::SELECT_BUTTON;
+						else if(value == "start") mapping[id] = input::START_BUTTON;
 						else continue;
 					}
 					break;
@@ -296,14 +296,14 @@ void readControllers(input::Instruments &instruments, fs::path const& file) {
 						int id = boost::lexical_cast<int>(getAttribute(button_elem, "id"));
 						std::string value = getAttribute(button_elem, "value");
 						if(id >= SDL_BUTTONS) break;
-						if(value == "kick") mapping[id] = 0;
-						else if(value == "red") mapping[id] = 1;
-						else if(value == "yellow") mapping[id] = 2;
-						else if(value == "blue") mapping[id] = 3;
-						else if(value == "green") mapping[id] = 4;
-						else if(value == "orange") mapping[id] = 5;
-						else if(value == "select") mapping[id] = 8;
-						else if(value == "start") mapping[id] = 9;
+						if(value == "kick") mapping[id] = input::KICK_BUTTON;
+						else if(value == "red") mapping[id] = input::RED_TOM_BUTTON;
+						else if(value == "yellow") mapping[id] = input::YELLOW_TOM_BUTTON;
+						else if(value == "blue") mapping[id] = input::BLUE_TOM_BUTTON;
+						else if(value == "green") mapping[id] = input::GREEN_TOM_BUTTON;
+						else if(value == "orange") mapping[id] = input::ORANGE_TOM_BUTTON;
+						else if(value == "select") mapping[id] = input::SELECT_BUTTON;
+						else if(value == "start") mapping[id] = input::START_BUTTON;
 						else continue;
 					}
 					break;
@@ -313,16 +313,16 @@ void readControllers(input::Instruments &instruments, fs::path const& file) {
 						int id = boost::lexical_cast<int>(getAttribute(button_elem, "id"));
 						std::string value = getAttribute(button_elem, "value");
 						if(id >= SDL_BUTTONS) break;
-						if(value == "left") mapping[id] = 0;
-						else if(value == "down") mapping[id] = 1;
-						else if(value == "up") mapping[id] = 2;
-						else if(value == "right") mapping[id] = 3;
-						else if(value == "down-left") mapping[id] = 4;
-						else if(value == "down-right") mapping[id] = 5;
-						else if(value == "up-left") mapping[id] = 6;
-						else if(value == "up-right") mapping[id] = 7;
-						else if(value == "start") mapping[id] = 8;
-						else if(value == "select") mapping[id] = 9;
+						if(value == "left") mapping[id] = input::LEFT_DANCE_BUTTON;
+						else if(value == "down") mapping[id] = input::DOWN_DANCE_BUTTON;
+						else if(value == "up") mapping[id] = input::UP_DANCE_BUTTON;
+						else if(value == "right") mapping[id] = input::RIGHT_DANCE_BUTTON;
+						else if(value == "down-left") mapping[id] = input::DOWN_LEFT_DANCE_BUTTON;
+						else if(value == "down-right") mapping[id] = input::DOWN_RIGHT_DANCE_BUTTON;
+						else if(value == "up-left") mapping[id] = input::UP_LEFT_DANCE_BUTTON;
+						else if(value == "up-right") mapping[id] = input::UP_RIGHT_DANCE_BUTTON;
+						else if(value == "start") mapping[id] = input::START_BUTTON;
+						else if(value == "select") mapping[id] = input::SELECT_BUTTON;
 						else continue;
 					}
 					break;
@@ -514,55 +514,55 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 					if(!dancepad) return false;
 					is_dancepad_event = true;
 					event.type = input::Event::PRESS;
-					button = 5;
+					button = DOWN_RIGHT_DANCE_BUTTON;
 					break;
 				case SDLK_KP8: case SDLK_UP:
 					if(!dancepad) return false;
 					is_dancepad_event = true;
 					event.type = input::Event::PRESS;
-					button = 2;
+					button = UP_DANCE_BUTTON;
 					break;
 				case SDLK_KP7:
 					if(!dancepad) return false;
 					is_dancepad_event = true;
 					event.type = input::Event::PRESS;
-					button = 4;
+					button = DOWN_LEFT_DANCE_BUTTON;
 					break;
 				case SDLK_KP6: case SDLK_RIGHT:
 					if(!dancepad) return false;
 					is_dancepad_event = true;
 					event.type = input::Event::PRESS;
-					button = 3;
+					button = RIGHT_DANCE_BUTTON;
 					break;
 				case SDLK_KP5:
 					if(!dancepad) return false;
 					is_dancepad_event = true;
 					event.type = input::Event::PRESS;
-					button = 1;
+					button = DOWN_DANCE_BUTTON;
 					break; // 5 is also down
 				case SDLK_KP4: case SDLK_LEFT:
 					if(!dancepad) return false;
 					is_dancepad_event = true;
 					event.type = input::Event::PRESS;
-					button = 0;
+					button = LEFT_DANCE_BUTTON;
 					break;
 				case SDLK_KP3:
 					if(!dancepad) return false;
 					is_dancepad_event = true;
 					event.type = input::Event::PRESS;
-					button = 7;
+					button = UP_RIGHT_DANCE_BUTTON;
 					break;
 				case SDLK_KP2: case SDLK_DOWN:
 					if(!dancepad) return false;
 					is_dancepad_event = true;
 					event.type = input::Event::PRESS;
-					button = 1;
+					button = DOWN_DANCE_BUTTON;
 					break;
 				case SDLK_KP1:
 					if(!dancepad) return false;
 					is_dancepad_event = true;
 					event.type = input::Event::PRESS;
-					button = 6;
+					button = UP_LEFT_DANCE_BUTTON;
 					break;
 				default:
 					return false;
@@ -655,55 +655,55 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 					if(!dancepad) return false;
 					is_dancepad_event = true;
 					event.type = input::Event::RELEASE;
-					button = 5;
+					button = DOWN_RIGHT_DANCE_BUTTON;
 					break;
 				case SDLK_KP8: case SDLK_UP:
 					if(!dancepad) return false;
 					is_dancepad_event = true;
 					event.type = input::Event::RELEASE;
-					button = 2;
+					button = UP_DANCE_BUTTON;
 					break;
 				case SDLK_KP7:
 					if(!dancepad) return false;
 					is_dancepad_event = true;
 					event.type = input::Event::RELEASE;
-					button = 4;
+					button = DOWN_LEFT_DANCE_BUTTON;
 					break;
 				case SDLK_KP6: case SDLK_RIGHT:
 					if(!dancepad) return false;
 					is_dancepad_event = true;
 					event.type = input::Event::RELEASE;
-					button = 3;
+					button = RIGHT_DANCE_BUTTON;
 					break;
 				case SDLK_KP5:
 					if(!dancepad) return false;
 					is_dancepad_event = true;
 					event.type = input::Event::RELEASE;
-					button = 1;
+					button = DOWN_DANCE_BUTTON;
 					break; // 5 is also down
 				case SDLK_KP4: case SDLK_LEFT:
 					if(!dancepad) return false;
 					is_dancepad_event = true;
 					event.type = input::Event::RELEASE;
-					button = 0;
+					button = LEFT_DANCE_BUTTON;
 					break;
 				case SDLK_KP3:
 					if(!dancepad) return false;
 					is_dancepad_event = true;
 					event.type = input::Event::RELEASE;
-					button = 7;
+					button = UP_RIGHT_DANCE_BUTTON;
 					break;
 				case SDLK_KP2: case SDLK_DOWN:
 					if(!dancepad) return false;
 					is_dancepad_event = true;
 					event.type = input::Event::RELEASE;
-					button = 1;
+					button = DOWN_DANCE_BUTTON;
 					break;
 				case SDLK_KP1:
 					if(!dancepad) return false;
 					is_dancepad_event = true;
 					event.type = input::Event::RELEASE;
-					button = 6;
+					button = UP_LEFT_DANCE_BUTTON;
 					break;
 				default:
 					return false;
@@ -749,7 +749,7 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 			}
 			// XBox RB guitar's Tilt sensor
 			if (devices.find(joy_id)->second.name() == "DRUMS_ROCKBAND_XB360" && _e.jaxis.axis == 3) {
-				event.button = input::STARPOWER_BUTTON;
+				event.button = input::GODMODE_BUTTON;
 				if (_e.jaxis.value < -2) {
 					event.type = input::Event::PRESS;
 					event.pressed[event.button] = true;
