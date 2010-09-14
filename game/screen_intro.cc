@@ -57,17 +57,24 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 
 void ScreenIntro::draw_menu_options() {
 	int i = 0;
+	double wcounter = 0;
+	const float x = -0.35;
+	const float sel_margin = 0.05;
+	theme->back_h.dimensions.stretch(m_menu.dimensions.w(), theme->back_h.dimensions.h());
 	for (MenuOptions::const_iterator it = m_menu.begin(); it != m_menu.end(); ++it, ++i) {
 		if (static_cast<MenuOptions::const_iterator>(&m_menu.current()) == it) {
-			theme->back_h.dimensions.left(-0.4).center(-0.097 + i*0.08);
+			theme->back_h.dimensions.left(x - sel_margin).center(-0.097 + i*0.08);
 			theme->back_h.draw();
-			theme->option_selected.dimensions.left(-0.35).center(-0.1 + i*0.08);
+			theme->option_selected.dimensions.left(x).center(-0.1 + i*0.08);
 			theme->option_selected.draw(it->getName());
+			wcounter = std::max(wcounter, theme->option_selected.w() + 2 * sel_margin); // Calculate the widest entry
 		} else {
-			theme->option.dimensions.left(-0.35).center(-0.1 + i*0.08);
+			theme->option.dimensions.left(x).center(-0.1 + i*0.08);
 			theme->option.draw(it->getName());
+			wcounter = std::max(wcounter, theme->option.w() + 2 * sel_margin); // Calculate the widest entry
 		}
 	}
+	m_menu.dimensions.stretch(wcounter, 1);
 }
 
 void ScreenIntro::draw() {
