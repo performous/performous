@@ -9,6 +9,10 @@ Lasse Kärkkäinen  <tronic+ndrm at trn.iki.fi>
 	* Core developer
 	* FFT/Analyzer, LibDA and a lot of other things
 
+Tapio Vierros <aave000 at users.sourceforge.net>
+	* Core developer
+	* Lots of stuff in various areas
+
 Topnob <topnob at users.sourceforge.net>
 	* Non-power-of-two texture loading on older hardware
 	* Many other fixes
@@ -30,9 +34,6 @@ dex7 <dex7 at users.sourceforge.net>
 Fabian Fingerle  <fabian at datensalat.eu>
 	* Dependency testing
 
-Tapio Vierros <aave000 at users.sourceforge.net>
-	* Various things and features
-
 Miguel Sánchez de León Peque <msdeleonpeque at gmail.com>
 	* Main menu
 	* SVG design
@@ -41,14 +42,21 @@ Xaldyz <xaldyz at users.sourceforge.net>
 	* Windows build fixes and testing
 
 Markus Raab <ich at markus-raab.org>
-	* hiscore (xml + ultrastar format)
+	* Hiscore (xml + ultrastar format)
 
 Matti Kemppainen <mpkemppa at users.sf.net>
-	* prototyping dance game
+	* Prototyping dance game
 	
 Jaakko Nikkola <jnikkola at users.sourceforge.net>
 	* Dance game developer
-	
+
+John Stumpo <stump at jstump.com>
+	* Windows compilation scripts
+
+Fredrik Klasson <scientica at gmail.com>
+	* Logging stuff, xml i18n, image loading tweaks
+
+
 INACTIVE DEVELOPERS
 -------------------
 
