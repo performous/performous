@@ -26,10 +26,8 @@ Features:
    * Audio roundtrip by analyzing the sound captured by the microphone
    * Controller/audio latency by playing blindly (listening to the beat only)
    * Audio/video by playing visually without audio? (needs controller/audio calibrated)
-- Better audio card configuration ingame (needs PortAudio backend)
 - Allow playing a single song given as commandline argument (no menus)
 - Kiosk/arcade mode (disable exiting game and limit other functions)
-- Allow left-handed/reversed controllers (guitars, drum kits)
 
 
 Dance features:

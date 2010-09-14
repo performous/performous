@@ -17,11 +17,13 @@ To install from git:
 	
 Dependencies:
 
+	- OpenGL : graphics
+
 	- Boost : threads, parsers/conversions, pointer containers, ...
 
 	- SDL : window management and input
 
-	- FFMpeg (avcodec, avformat and swscale): A/V decoding
+	- FFmpeg (avcodec, avformat and swscale): A/V decoding
 	
 	- Cairo >= 1.2 : scalable graphical support
 
@@ -30,6 +32,8 @@ Dependencies:
 	- libxml++ : XML parser, used for themes etc.
 
 	- PortAudio v19 : audio capture and playback
+
+	- Gettext (optional) for internationalization
 
 	- PortMidi (optional) for MIDI drum support
 
