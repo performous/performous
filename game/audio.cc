@@ -369,45 +369,37 @@ struct Output {
 	}
 };
 
-struct Device {
-	// Init
-	const unsigned int in, out;
-	const double rate;
-	const unsigned int dev;
-	portaudio::Stream stream;
-	std::vector<Analyzer*> mics;
-	Output* outptr;
 
-	Device(unsigned int in, unsigned int out, double rate, unsigned int dev):
-	  in(in), out(out), rate(rate), dev(dev),
-	  stream(*this, in ? portaudio::Params().channelCount(in).device(dev).suggestedLatency(config["audio/latency"].f()): (const PaStreamParameters*)NULL,
-	    (out ? portaudio::Params().channelCount(out).device(dev).suggestedLatency(config["audio/latency"].f()) : (const PaStreamParameters*)NULL), rate),
-	  outptr()
-	{
-		mics.resize(in);
-	}
+Device::Device(unsigned int in, unsigned int out, double rate, unsigned int dev):
+  in(in), out(out), rate(rate), dev(dev),
+  stream(*this, in ? portaudio::Params().channelCount(in).device(dev).suggestedLatency(config["audio/latency"].f()): (const PaStreamParameters*)NULL,
+	(out ? portaudio::Params().channelCount(out).device(dev).suggestedLatency(config["audio/latency"].f()) : (const PaStreamParameters*)NULL), rate),
+  outptr()
+{
+	mics.resize(in);
+}
 
-	void start() {
-		PaError err = Pa_StartStream(stream);
-		if (err != paNoError) throw std::runtime_error("Cannot start PortAudio audio stream "
-		  + boost::lexical_cast<std::string>(dev) + ": " + Pa_GetErrorText(err));
-	}
+void Device::start() {
+	PaError err = Pa_StartStream(stream);
+	if (err != paNoError) throw std::runtime_error("Cannot start PortAudio audio stream "
+	  + boost::lexical_cast<std::string>(dev) + ": " + Pa_GetErrorText(err));
+}
 
-	int operator()(void const* input, void* output, unsigned long frames, const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags) try {
-		float const* inbuf = static_cast<float const*>(input);
-		float* outbuf = static_cast<float*>(output);
-		for (std::size_t i = 0; i < mics.size(); ++i) {
-			if (!mics[i]) continue;  // No analyzer? -> Channel not used
-			da::sample_const_iterator it = da::sample_const_iterator(inbuf + i, in);
-			mics[i]->input(it, it + frames);
-		}
-		if (outptr) outptr->callback(outbuf, outbuf + 2 * frames);
-		return paContinue;
-	} catch (std::exception& e) {
-		std::cerr << "Exception in audio callback: " << e.what() << std::endl;
-		return paAbort;
+int Device::operator()(void const* input, void* output, unsigned long frames, const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags) try {
+	float const* inbuf = static_cast<float const*>(input);
+	float* outbuf = static_cast<float*>(output);
+	for (std::size_t i = 0; i < mics.size(); ++i) {
+		if (!mics[i]) continue;  // No analyzer? -> Channel not used
+		da::sample_const_iterator it = da::sample_const_iterator(inbuf + i, in);
+		mics[i]->input(it, it + frames);
 	}
-};
+	if (outptr) outptr->callback(outbuf, outbuf + 2 * frames);
+	return paContinue;
+} catch (std::exception& e) {
+	std::cerr << "Exception in audio callback: " << e.what() << std::endl;
+	return paAbort;
+}
+
 
 
 struct Audio::Impl {
@@ -494,7 +486,7 @@ struct Audio::Impl {
 								if (m == "green" && analyzers.size() != 2) continue;
 								if (m == "orange" && analyzers.size() != 3) continue;
 								// Add the new analyzer
-								Analyzer* a = new Analyzer(d.rate);
+								Analyzer* a = new Analyzer(d.rate, m);
 								analyzers.push_back(a);
 								d.mics[j] = a;
 								++assigned_mics;
@@ -526,6 +518,8 @@ struct Audio::Impl {
 
 Audio::Audio(): self(new Impl) {}
 Audio::~Audio() {}
+
+void Audio::reset() { self.reset(new Impl); };
 
 bool Audio::isOpen() const {
 	return !self->devices.empty();
@@ -648,3 +642,4 @@ void Audio::toggleSynth(Notes const& notes) {
 
 boost::ptr_vector<Analyzer>& Audio::analyzers() { return self->analyzers; }
 
+boost::ptr_vector<Device>& Audio::devices() { return self->devices; }

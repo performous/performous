@@ -73,6 +73,26 @@ namespace glutil {
 		operator float const*() const { return reinterpret_cast<float const*>(this); }
 	};
 
+	/// easy line
+	struct Line {
+		Line(float x1, float y1, float x2, float y2) {
+			Begin line(GL_LINES);
+			glVertex2f(x1,y1);
+			glVertex2f(x2,y2);
+		}
+	};
+
+	/// easy square
+	struct Square {
+		Square(float cx, float cy, float r) {
+			Begin line(GL_LINE_LOOP);
+			glVertex2f(cx-r,cy+r);
+			glVertex2f(cx-r,cy-r);
+			glVertex2f(cx+r,cy-r);
+			glVertex2f(cx+r,cy+r);
+		}
+	};
+
 	/// Checks for OpenGL error and displays it with given location info
 	struct GLErrorChecker {
 		GLErrorChecker(std::string info = "") {

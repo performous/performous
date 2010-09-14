@@ -17,6 +17,7 @@
 #include "screen_sing.hh"
 #include "screen_practice.hh"
 #include "screen_configuration.hh"
+#include "screen_audiodevices.hh"
 #include "screen_players.hh"
 
 #include <boost/format.hpp>
@@ -137,6 +138,7 @@ void mainLoop(std::string const& songlist) {
 		sm.addScreen(new ScreenSing("Sing", audio, database, backgrounds));
 		sm.addScreen(new ScreenPractice("Practice", audio));
 		sm.addScreen(new ScreenConfiguration("Configuration", audio));
+		sm.addScreen(new ScreenAudioDevices("AudioDevices", audio));
 		sm.addScreen(new ScreenPlayers("Players", audio, database));
 		sm.activateScreen("Intro");
 		sm.flashMessage(_("Main menu..."), 0.0f, 1.0f, 1.0f); window.blank(); sm.drawFlashMessage(); window.swap();

@@ -16,7 +16,16 @@ void ScreenIntro::enter() {
 	m_menu.clear();
 	m_menu.add(MenuOption(_("Perform"), _("Start performing!"), "Songs", "intro_sing.svg"));
 	m_menu.add(MenuOption(_("Practice"), _("Check your skills or test the microphones"), "Practice", "intro_practice.svg"));
-	m_menu.add(MenuOption(_("Configure"), _("Configure game options"), "Configuration", "intro_configure.svg"));
+	{	// Config submenu
+		MenuOptions submenu;
+		submenu.push_back(MenuOption(_("Audio Devices"), _("Setup microphones and playback"), "AudioDevices", "intro_configure.svg"));
+		submenu.push_back(MenuOption(_("Configure"), _("Configure game options"), "Configuration", "intro_configure.svg"));
+		submenu.push_back(MenuOption(_("Back"), _("Got back to main menu")));
+		submenu.back().image.reset(new Surface(getThemePath("intro_quit.svg")));
+		m_menu.add(MenuOption(_("Configure"), _("Configure audio and game options"), submenu));
+		m_menu.back().image.reset(new Surface(getThemePath("intro_configure.svg")));
+	} // Uncomment below (comment above) to hide audiodevices menu
+	//m_menu.add(MenuOption(_("Configure"), _("Configure game options"), "Configuration", "intro_configure.svg"));
 	m_menu.add(MenuOption(_("Quit"), _("Leave the game"), "", "intro_quit.svg"));
 	if( m_first ) {
 		std::string msg;

@@ -43,7 +43,7 @@ class Analyzer {
 	/// list of tones
 	typedef std::list<Tone> tones_t;
 	/// constructor
-	Analyzer(double rate, std::size_t step = 200);
+	Analyzer(double rate, std::string id, std::size_t step = 200);
 	/** Add input data to buffer. This is thread-safe (against other functions). **/
 	template <typename InIt> void input(InIt begin, InIt end) {
 		size_t r = m_bufRead;  // The read position
@@ -89,10 +89,12 @@ class Analyzer {
 		m_oldfreq = (best ? best->freq : 0.0);
 		return best;
 	}
+	std::string const& getId() const { return m_id; }
 
   private:
 	std::size_t m_step;
 	double m_rate;
+	std::string m_id;
 	std::vector<float> m_window;
 	float m_buf[2 * BUF_N];
 	volatile size_t m_bufRead, m_bufWrite;

@@ -27,21 +27,51 @@ namespace portaudio {
 	};
 
 	namespace internal {
-		void check(PaError code, char const* func) { if (code != paNoError) throw Error(code, func); }
+		void inline check(PaError code, char const* func) { if (code != paNoError) throw Error(code, func); }
 	}
+
+	struct DeviceInfo {
+		DeviceInfo(std::string n = "", unsigned i = 0, unsigned o = 0): name(n), in(i), out(o) {}
+		std::string desc() {
+			std::ostringstream oss;
+			oss << name << " (";
+			if (in) oss << in << " in";
+			if (in && out) oss << ", ";
+			if (out) oss << out << " out)";
+			return oss.str();
+		}
+		std::string name;
+		unsigned int in, out;
+	};
+
+	typedef std::vector<DeviceInfo> DeviceInfos;
+
+	struct AudioDevices {
+		/// Constructor gets the PA devices into a vector
+		AudioDevices() {
+			for (unsigned i = 0, end = Pa_GetDeviceCount(); i != end; ++i) {
+				PaDeviceInfo const* info = Pa_GetDeviceInfo(i);
+				if (!info) devices.push_back(DeviceInfo());
+				else devices.push_back(DeviceInfo(info->name, info->maxInputChannels, info->maxOutputChannels));
+			}
+		}
+		/// Print the devices
+		void dump() {
+			std::cout << "PortAudio devices:" << std::endl;
+			for (unsigned i = 0; i < devices.size(); ++i)
+				std::cout << "  " << i << "   " << devices[i].name << " (" << devices[i].in << " in, " << devices[i].out << " out)" << std::endl;
+			std::cout << std::endl;
+		}
+		DeviceInfos devices;
+	};
 
 	struct Init {
 		Init()
 		{
 			PORTAUDIO_CHECKED(Pa_Initialize, ());
 			// Print the devices
-			std::cout << "PortAudio devices:\n";
-			for (int i = 0, end = Pa_GetDeviceCount(); i != end; ++i) {
-					PaDeviceInfo const* info = Pa_GetDeviceInfo(i);
-					if (!info) continue;
-					std::cout << "  " << i << "   " << info->name << " (" << info->maxInputChannels << " in, " << info->maxOutputChannels << " out)\n";
-			}
-			std::cout << std::endl;
+			AudioDevices ads;
+			ads.dump();
 		}
 		~Init() { Pa_Terminate(); }
 	};
