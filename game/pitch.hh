@@ -55,13 +55,14 @@ class Analyzer {
 			// Peak level calculation
 			float p = s * s;
 			if (p > m_peak) m_peak = p; else m_peak *= 0.999;
+			m_buf[w] = s;
 			// Cursor updates
 			wNext = (w + 1) % BUF_N;
 			if (wNext == r) overflow = true;
 			w = wNext;
 		}
 		m_bufWrite = w;
-		if (overflow) m_bufRead = wNext;  // Reset read pointer on overflow
+		if (overflow) m_bufRead = (wNext + 1) % BUF_N;  // Reset read pointer on overflow
 	}
 	/** Call this to process all data input so far. **/
 	void process();
