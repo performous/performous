@@ -20,7 +20,7 @@ void ScreenIntro::enter() {
 		MenuOptions submenu;
 		submenu.push_back(MenuOption(_("Audio Devices"), _("Setup microphones and playback"), "AudioDevices", "intro_configure.svg"));
 		submenu.push_back(MenuOption(_("Configure"), _("Configure game options"), "Configuration", "intro_configure.svg"));
-		submenu.push_back(MenuOption(_("Back"), _("Got back to main menu")));
+		submenu.push_back(MenuOption(_("Back"), _("Go back to main menu")));
 		submenu.back().image.reset(new Surface(getThemePath("intro_quit.svg")));
 		m_menu.add(MenuOption(_("Configure"), _("Configure audio and game options"), submenu));
 		m_menu.back().image.reset(new Surface(getThemePath("intro_configure.svg")));

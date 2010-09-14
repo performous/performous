@@ -3,6 +3,7 @@
 #include "fs.hh"
 #include "util.hh"
 #include "execname.hpp"
+#include "i18n.hh"
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
@@ -98,11 +99,11 @@ namespace {
 std::string ConfigItem::getValue() const {
 	if (m_type == "int") return numericFormat<int>(m_value, m_multiplier, m_step) + m_unit;
 	if (m_type == "float") return numericFormat<double>(m_value, m_multiplier, m_step) + m_unit;
-	if (m_type == "bool") return boost::get<bool>(m_value) ? "Enabled" : "Disabled";
+	if (m_type == "bool") return boost::get<bool>(m_value) ? _("Enabled") : _("Disabled");
 	if (m_type == "string") return boost::get<std::string>(m_value);
 	if (m_type == "string_list") {
 		StringList const& sl = boost::get<StringList>(m_value);
-		return sl.size() == 1 ? "{" + sl[0] + "}" : (boost::format("%d items") % sl.size()).str();
+		return sl.size() == 1 ? "{" + sl[0] + "}" : (boost::format(_("%d items")) % sl.size()).str();
 	}
 	if (m_type == "option_list") return boost::get<OptionList>(m_value).at(m_sel);
 	throw std::logic_error("ConfigItem::getValue doesn't know type '" + m_type + "'");
