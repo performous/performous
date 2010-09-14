@@ -36,24 +36,6 @@ Screen* ScreenManager::getScreen(std::string const& name) {
 	}
 }
 
-void ScreenManager::drawFlashMessage() {
-	double time = m_messagePopup.get();
-	if (time == 0.0) return;
-	bool haveToFadeIn = time <= (m_timeToFadeIn); // Is this fade in?
-	bool haveToFadeOut = time >= (m_messagePopup.getTarget() - m_timeToFadeOut); // Is this fade out?
-	float fadeValue = 1.0f;
-
-	if (haveToFadeIn) { // Fade in
-		fadeValue = float(time / m_timeToFadeIn); // Calculate animation value
-	} else if (haveToFadeOut) { // Fade out
-		fadeValue = float((m_messagePopup.getTarget() - time) / m_timeToFadeOut); // Calculate animation value
-		if (time >= m_messagePopup.getTarget()) m_messagePopup.setTarget(0.0, true); // Reset if fade out finished
-	}
-
-	m_textMessage.draw(m_message, fadeValue); // Draw the message
-	if (haveToFadeIn || haveToFadeOut) glColor3f(1.0f, 1.0f, 1.0f); // Reset alpha
-}
-
 void ScreenManager::flashMessage(std::string const& message, float fadeIn, float hold, float fadeOut) {
 	m_message = message;
 	m_timeToFadeIn = fadeIn;
@@ -61,4 +43,35 @@ void ScreenManager::flashMessage(std::string const& message, float fadeIn, float
 	m_timeToFadeOut = fadeOut;
 	m_messagePopup.setTarget(fadeIn + hold + fadeOut);
 	m_messagePopup.setValue(0.0);
+}
+
+void ScreenManager::dialog(std::string const& text) {
+	m_dialog.reset(new Dialog(text));
+}
+
+bool ScreenManager::closeDialog() {
+	bool ret = m_dialog;
+	m_dialog.reset();
+	return ret;
+}
+
+void ScreenManager::drawNotifications() {
+	double time = m_messagePopup.get();
+	if (time != 0.0) {
+		bool haveToFadeIn = time <= (m_timeToFadeIn); // Is this fade in?
+		bool haveToFadeOut = time >= (m_messagePopup.getTarget() - m_timeToFadeOut); // Is this fade out?
+		float fadeValue = 1.0f;
+
+		if (haveToFadeIn) { // Fade in
+			fadeValue = float(time / m_timeToFadeIn); // Calculate animation value
+		} else if (haveToFadeOut) { // Fade out
+			fadeValue = float((m_messagePopup.getTarget() - time) / m_timeToFadeOut); // Calculate animation value
+			if (time >= m_messagePopup.getTarget()) m_messagePopup.setTarget(0.0, true); // Reset if fade out finished
+		}
+
+		m_textMessage.draw(m_message, fadeValue); // Draw the message
+		if (haveToFadeIn || haveToFadeOut) glColor3f(1.0f, 1.0f, 1.0f); // Reset alpha
+	}
+	// Dialog
+	if (m_dialog) m_dialog->draw();
 }

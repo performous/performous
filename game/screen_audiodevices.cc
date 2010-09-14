@@ -30,7 +30,6 @@ ScreenAudioDevices::ScreenAudioDevices(std::string const& name, Audio& audio): S
 
 void ScreenAudioDevices::enter() {
 	m_theme.reset(new ThemeAudioDevices());
-	m_dialog.reset();
 	portaudio::AudioDevices ads;
 	m_devs = ads.devices;
 	// FIXME: Uncomment to test how different amount of devices behave
@@ -51,7 +50,8 @@ void ScreenAudioDevices::enter() {
 			if (!countRow("out=", *it, countmap["out="])) { ok = false; break; }
 		}
 		if (!ok)
-			m_dialog.reset(new Dialog(_("It seems you have some manual configurations\nincompatible with this user interface.\nSaving these settings will override\nall existing audio device configuration.\nYour other options changes will be saved too.")));
+			ScreenManager::getSingletonPtr()->dialog(
+				_("It seems you have some manual configurations\nincompatible with this user interface.\nSaving these settings will override\nall existing audio device configuration.\nYour other options changes will be saved too."));
 	}
 	// Populate the mics vector and check open devices
 	load();
@@ -61,20 +61,16 @@ void ScreenAudioDevices::enter() {
 	m_pdev_icon->dimensions.fixedWidth(s);
 }
 
-void ScreenAudioDevices::exit() {
-	m_theme.reset();
-	m_dialog.reset();
-}
+void ScreenAudioDevices::exit() { m_theme.reset(); }
 
 void ScreenAudioDevices::manageEvent(SDL_Event event) {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	input::NavButton nav(input::getNav(event));
 	if (nav != input::NONE) {
-		if (m_dialog) { m_dialog.reset(); return; }
 		if (nav == input::CANCEL || nav == input::SELECT) sm->activateScreen("Intro");
 		else if (nav == input::PAUSE) m_audio.togglePause();
 		else if (m_devs.empty()) return; // The rest work if there are any devices
-		else if (nav == input::START) { save(); if (!m_dialog) sm->activateScreen("Intro"); }
+		else if (nav == input::START) { if (save()) sm->activateScreen("Intro"); }
 		else if (nav == input::LEFT && m_selected_column > 0) --m_selected_column;
 		else if (nav == input::RIGHT && m_selected_column < m_mics.size()-1) ++m_selected_column;
 		else if (nav == input::UP && m_mics[m_selected_column].dev > 0) --m_mics[m_selected_column].dev;
@@ -129,8 +125,6 @@ void ScreenAudioDevices::draw() {
 	m_theme->comment_bg.draw();
 	m_theme->comment.dimensions.left(-0.48).screenBottom(-0.023);
 	m_theme->comment.draw(_("For advanced device configuration, use command line parameter --audio (use --audiohelp for details)."));
-	// Warning dialog
-	if (m_dialog) m_dialog->draw();
 }
 
 void ScreenAudioDevices::load() {
@@ -152,7 +146,7 @@ void ScreenAudioDevices::load() {
 	}
 }
 
-void ScreenAudioDevices::save(bool skip_ui_config) {
+bool ScreenAudioDevices::save(bool skip_ui_config) {
 	if (!skip_ui_config) {
 		ConfigItem::StringList devconf;
 		// Loop through the devices and if there is mics/pdev assigned, form a config line
@@ -181,10 +175,11 @@ void ScreenAudioDevices::save(bool skip_ui_config) {
 	m_audio.reset(); // Reload audio to take the new settings into use
 	m_audio.playMusic(getThemePath("menu.ogg"), true); // Start music again
 	// Check that all went well
-	if (!verify(unassigned_id))
-		m_dialog.reset(new Dialog(_("Some devices failed to open!")));
+	bool ret = verify(unassigned_id);
+	if (!ret) ScreenManager::getSingletonPtr()->dialog(_("Some devices failed to open!"));
 	// Load the new config back for UI
 	load();
+	return ret;
 }
 
 bool ScreenAudioDevices::verify(size_t unassigned_id) {

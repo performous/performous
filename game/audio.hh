@@ -50,6 +50,7 @@ public:
 	boost::ptr_vector<Analyzer>& analyzers();
 	boost::ptr_vector<Device>& devices();
 	bool isOpen() const;
+	bool hasPlayback() const;
 	/** Play a song beginning at startPos (defaults to 0)
 	 * @param filename the track filename
 	 * @param preview if the song preview is to play

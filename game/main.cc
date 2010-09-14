@@ -94,6 +94,8 @@ static void checkEvents_SDL(ScreenManager& sm) {
 				sm.flashMessage(config[which_vol].getShortDesc() + ": " + config[which_vol].getValue());
 				continue; // Already handled here...
 			}
+			// Eat away the event if there was a dialog open
+			if (sm.closeDialog()) continue;
 			break;
 		}
 		// Forward to screen even if the input system takes it (ignoring pushEvent return value)
@@ -112,7 +114,7 @@ void mainLoop(std::string const& songlist) {
 	Audio audio;
 	ScreenManager sm(window);
 	try {
-		sm.flashMessage(_("Miscellaneous..."), 0.0f, 1.0f, 1.0f); window.blank(); sm.drawFlashMessage(); window.swap();
+		sm.flashMessage(_("Miscellaneous..."), 0.0f, 1.0f, 1.0f); window.blank(); sm.drawNotifications(); window.swap();
 		Backgrounds backgrounds;
 		Database database(getConfigDir() / "database.xml");
 		Songs songs(database, songlist);
@@ -141,7 +143,7 @@ void mainLoop(std::string const& songlist) {
 		sm.addScreen(new ScreenAudioDevices("AudioDevices", audio));
 		sm.addScreen(new ScreenPlayers("Players", audio, database));
 		sm.activateScreen("Intro");
-		sm.flashMessage(_("Main menu..."), 0.0f, 1.0f, 1.0f); window.blank(); sm.drawFlashMessage(); window.swap();
+		sm.flashMessage(_("Main menu..."), 0.0f, 1.0f, 1.0f); window.blank(); sm.drawNotifications(); window.swap();
 		sm.updateScreen();  // exit/enter, any exception is fatal error
 		sm.flashMessage("");
 		// Main loop
@@ -164,7 +166,7 @@ void mainLoop(std::string const& songlist) {
 				// Draw
 				window.blank();
 				sm.getCurrentScreen()->draw();
-				sm.drawFlashMessage();
+				sm.drawNotifications();
 				// Display (and wait until next frame)
 				window.swap();
 				if (config["graphic/fps"].b()) {
@@ -191,7 +193,7 @@ void mainLoop(std::string const& songlist) {
 		std::cerr << "FATAL ERROR: " << e.what() << std::endl;
 		sm.flashMessage(std::string("FATAL ERROR: ") + e.what(), 0.0f); // No fade-in to get it to show
 		window.blank();
-		sm.drawFlashMessage();
+		sm.drawNotifications();
 		window.swap();
 		boost::thread::sleep(now() + 2.0);
 	} catch (QuitNow&) {

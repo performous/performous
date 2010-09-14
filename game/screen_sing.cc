@@ -34,7 +34,7 @@ void ScreenSing::enter() {
 	//m_practmode = true; // un-comment this line to play with practice mode. temporary, of course!
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	sm->flashMessage(_("Loading song..."), 0.0, 1.0, 0.5);
-	sm->drawFlashMessage(); sm->window().swap(); // Make loading message show
+	sm->drawNotifications(); sm->window().swap(); // Make loading message show
 	theme.reset(new ThemeSing());
 	m_menuTheme.reset(new ThemeInstrumentMenu());
 	// Load the rest of the song

@@ -526,6 +526,12 @@ bool Audio::isOpen() const {
 	return !self->devices.empty();
 }
 
+bool Audio::hasPlayback() const {
+	for (size_t i = 0; i < self->devices.size(); ++i)
+		if (self->devices[i].isOutput()) return true;
+	return false;
+}
+
 void Audio::loadSample(std::string const& streamId, std::string const& filename) {
 	boost::mutex::scoped_lock l(self->output.samples_mutex);
 	self->output.samples.insert(streamId, std::auto_ptr<Sample>(new Sample(filename, getSR())));

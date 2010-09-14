@@ -29,24 +29,20 @@ void ScreenIntro::enter() {
 	m_menu.add(MenuOption(_("Quit"), _("Leave the game"), "", "intro_quit.svg"));
 	if( m_first ) {
 		std::string msg;
-		if (!m_audio.isOpen()) msg = _("No playback devices could be used.\n");
-		if (!msg.empty()) m_dialog.reset(new Dialog(msg + _("\nPlease configure some before playing.")));
+		if (!m_audio.hasPlayback()) msg = _("No playback devices could be used.\n");
+		if (!msg.empty()) ScreenManager::getSingletonPtr()->dialog(msg + _("\nPlease configure some before playing."));
 		m_first = false;
-	} else {
-		m_dialog.reset();
 	}
 }
 
 void ScreenIntro::exit() {
 	m_menu.clear();
 	theme.reset();
-	m_dialog.reset();
 }
 
 void ScreenIntro::manageEvent(SDL_Event event) {
 	input::NavButton nav(input::getNav(event));
 	if (nav != input::NONE) {
-		if (m_dialog) { m_dialog.reset(); return; }
 		if (nav == input::CANCEL) m_menu.moveToLast();  // Move cursor to quit
 		else if (nav == input::DOWN || nav == input::RIGHT || nav == input::MOREDOWN) m_menu.move(1);
 		else if (nav == input::UP || nav == input::LEFT || nav == input::MOREUP) m_menu.move(-1);
@@ -85,5 +81,4 @@ void ScreenIntro::draw() {
 	theme->comment.dimensions.left(-0.48).screenBottom(-0.028);
 	theme->comment.draw(m_menu.current().getComment());
 	draw_menu_options();
-	if (m_dialog) m_dialog->draw();
 }

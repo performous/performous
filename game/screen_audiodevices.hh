@@ -4,7 +4,6 @@
 #include <boost/scoped_ptr.hpp>
 #include "screen.hh"
 #include "glutil.hh"
-#include "dialog.hh"
 #include "libda/portaudio.hpp"
 
 class Audio;
@@ -27,12 +26,11 @@ class ScreenAudioDevices: public Screen {
 		unsigned dev;
 	};
 	void load(); ///< Check what devices are open
-	void save(bool skip_ui_config = false); ///< Save the config to disk xml
+	bool save(bool skip_ui_config = false); ///< Save the config to disk xml and then reload
 	bool verify(size_t unassigned_id); ///< Check that all were opened after audio reset
 
 	Audio& m_audio;
 	boost::scoped_ptr<ThemeAudioDevices> m_theme;
-	boost::scoped_ptr<Dialog> m_dialog;
 	unsigned int m_selected_column;
 	portaudio::DeviceInfos m_devs;
 	std::vector<Mic> m_mics;
