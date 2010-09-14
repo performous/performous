@@ -53,8 +53,10 @@ class ScreenManager: public Singleton <ScreenManager> {
 	/// Returns a reference to the window
 	Window& window() { return m_window; };
 
+	/// Draw a loading progress indication
+	void loading(std::string const& message, float progress);
 	/// Set a message to flash in current screen
-	void flashMessage(std::string const& name, float fadeIn=0.5f, float hold=1.5f, float fadeOut=1.0f);
+	void flashMessage(std::string const& message, float fadeIn=0.5f, float hold=1.5f, float fadeOut=1.0f);
 	/// Create a new dialog message
 	void dialog(std::string const& text);
 	/// Close dialog and return true if it was opened in the first place

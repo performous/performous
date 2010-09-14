@@ -2,6 +2,7 @@
 #include "fs.hh"
 #include "configuration.hh"
 
+#include <boost/lexical_cast.hpp>
 #include <stdexcept>
 
 template<> ScreenManager* Singleton<ScreenManager>::ms_Singleton = NULL;
@@ -34,6 +35,14 @@ Screen* ScreenManager::getScreen(std::string const& name) {
 	} catch (boost::bad_ptr_container_operation&) {
 		throw std::invalid_argument("Screen " + name + " does not exist");
 	}
+}
+
+void ScreenManager::loading(std::string const& message, float progress) {
+	// TODO: Create a better one, this is quite ugly
+	flashMessage(message + " " + boost::lexical_cast<std::string>(progress*100) + "%", 0.0f, 1.0f, 1.0f);
+	m_window.blank();
+	drawNotifications();
+	m_window.swap();
 }
 
 void ScreenManager::flashMessage(std::string const& message, float fadeIn, float hold, float fadeOut) {

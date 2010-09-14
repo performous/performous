@@ -33,10 +33,10 @@ namespace {
 void ScreenSing::enter() {
 	//m_practmode = true; // un-comment this line to play with practice mode. temporary, of course!
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
-	sm->flashMessage(_("Loading song..."), 0.0, 1.0, 0.5);
-	sm->drawNotifications(); sm->window().swap(); // Make loading message show
+	sm->loading(_("Loading theme..."), 0.0);
 	theme.reset(new ThemeSing());
 	m_menuTheme.reset(new ThemeInstrumentMenu());
+	sm->loading(_("Loading song..."), 0.3);
 	// Load the rest of the song
 	if (m_song->loadStatus != Song::FULL) {
 		try { SongParser sp(*m_song); }
@@ -46,9 +46,8 @@ void ScreenSing::enter() {
 			sm->activateScreen("Songs");
 		}
 	}
-	// Notify about broken tracks
-	if (m_song->b0rkedTracks) ScreenManager::getSingletonPtr()->flashMessage(_("Song contains broken tracks!"));
 	// Load background
+	sm->loading(_("Loading background..."), 0.4);
 	bool foundbg = false;
 	if (!m_song->background.empty()) { // Load bg image
 		try {
@@ -60,17 +59,20 @@ void ScreenSing::enter() {
 		}
 	}
 	// Initialize webcam
+	sm->loading(_("Initializing webcam..."), 0.5);
 	if (config["graphic/webcam"].b() && Webcam::enabled()) {
 		try {
 			m_cam.reset(new Webcam(config["graphic/webcamid"].i()));
 		} catch (std::exception& e) { std::cout << e.what() << std::endl; };
 	}
 	// Load video
+	sm->loading(_("Loading video..."), 0.6);
 	if (!m_song->video.empty() && config["graphic/video"].b()) {
 		m_video.reset(new Video(m_song->path + m_song->video, m_song->videoGap));
 	}
 	// Use random bg if specified fails (also for tracks with video)
 	if (!foundbg) {
+		sm->loading(_("Random background..."), 0.65);
 		for (int i = 1; i <= 2; ++i) { // Try two times in case first is b0rked
 			try {
 				std::string bgpath = m_backgrounds.getRandom();
@@ -81,6 +83,7 @@ void ScreenSing::enter() {
 			}
 		}
 	}
+	sm->loading(_("Loading user interface..."), 0.7);
 	m_pause_icon.reset(new Surface(getThemePath("sing_pause.svg")));
 	m_help.reset(new Surface(getThemePath("instrumenthelp.svg")));
 	m_progress.reset(new ProgressBar(getThemePath("sing_progressbg.svg"), getThemePath("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01f, 0.01f, true));
@@ -89,6 +92,7 @@ void ScreenSing::enter() {
 	boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
 	m_layout_singer.reset(new LayoutSinger(m_song->vocals, m_database, theme));
 	// Load instrument and dance tracks
+	sm->loading(_("Loading instruments..."), 0.8);
 	{
 		int type = 0; // 0 for dance, 1 for guitars, 2 for drums
 		int idx = 0;
@@ -110,6 +114,7 @@ void ScreenSing::enter() {
 		}
 	}
 	// Populate the pause menu
+	sm->loading(_("Loading menu..."), 0.9);
 	m_menu.clear();
 	m_menu.add(MenuOption(_("Resume"), _("Back to performing!")));
 	m_menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning"), "Sing"));
@@ -117,8 +122,12 @@ void ScreenSing::enter() {
 	m_menu.close();
 	// Startup delay for instruments is longer than for singing only
 	double setup_delay = (m_instruments.empty() && m_dancers.empty() ? -1.0 : -3.0);
+	sm->loading(_("Finalizing..."), 0.95);
 	m_audio.playMusic(m_song->music, false, 0.0, setup_delay);
 	m_engine.reset(new Engine(m_audio, m_song->vocals, analyzers.begin(), analyzers.end(), m_database));
+	sm->loading(_("Loading complete"), 1.0);
+	// Notify about broken tracks
+	if (m_song->b0rkedTracks) ScreenManager::getSingletonPtr()->dialog(_("Song contains broken tracks!"));
 }
 
 
