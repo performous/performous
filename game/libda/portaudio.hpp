@@ -73,7 +73,7 @@ namespace portaudio {
 			AudioDevices ads;
 			ads.dump();
 		}
-		~Init() { Pa_Terminate(); }
+		~Init() { std::cout << "Pa_Terminate..."; std::cout.flush(); Pa_Terminate(); std::cout << "ok" << std::endl; }
 	};
 
 	struct Params {

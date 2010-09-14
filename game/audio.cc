@@ -408,7 +408,7 @@ struct Audio::Impl {
 	boost::ptr_vector<Device> devices;
 	boost::ptr_vector<Analyzer> analyzers;
 	bool playback;
-	Impl(): playback() {
+	Impl(): init(), playback() {
 		// Parse audio devices from config
 		ConfigItem::StringList devs = config["audio/devices"].sl();
 		for (ConfigItem::StringList::const_iterator it = devs.begin(), end = devs.end(); it != end; ++it) {
@@ -480,11 +480,12 @@ struct Audio::Impl {
 								if (analyzers.size() >= 4) break; // Too many mics
 								std::string const& m = params.mics[j];
 								if (m.empty()) continue; // Input channel not used
-								// TODO: allow assignment in any order (not sequentially like the following code does)
-								if (m == "blue" && analyzers.size() != 0) continue;
-								if (m == "red" && analyzers.size() != 1) continue;
-								if (m == "green" && analyzers.size() != 2) continue;
-								if (m == "orange" && analyzers.size() != 3) continue;
+								// Check that the color is not already taken
+								bool mic_used = false;
+								for (size_t mi = 0; mi < analyzers.size(); ++mi) {
+									if (analyzers[mi].getId() == m) { mic_used = true; break; }
+								}
+								if (mic_used) continue;
 								// Add the new analyzer
 								Analyzer* a = new Analyzer(d.rate, m);
 								analyzers.push_back(a);

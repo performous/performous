@@ -1,14 +1,21 @@
 #include "player.hh"
 #include "song.hh"
-
 #include "engine.hh" // just for Engine::TIMESTEP
+
 
 Player::Player(VocalTrack& vocals, Analyzer& analyzer, size_t frames):
 	  m_vocals(vocals), m_analyzer(analyzer), m_pitch(frames, std::make_pair(getNaN(),
 	  -getInf())), m_pos(), m_score(), m_noteScore(), m_lineScore(), m_maxLineScore(),
 	  m_prevLineScore(-1), m_feedbackFader(0.0, 2.0), m_activitytimer(),
 	  m_scoreIt(m_vocals.notes.begin())
-{ }
+{
+	// Assign colors
+	if (m_analyzer.getId() == "blue") m_color = Color(0.2, 0.5, 0.7);
+	else if (m_analyzer.getId() == "red") m_color = Color(0.8, 0.3, 0.3);
+	else if (m_analyzer.getId() == "green") m_color = Color(0.2, 0.9, 0.2);
+	else if (m_analyzer.getId() == "orange") m_color = Color(1.0, 0.6, 0.0);
+	else m_color = Color(0.5, 0.5, 0.5);
+}
 
 void Player::update() {
 	if (m_pos == m_pitch.size()) return; // End of song already
