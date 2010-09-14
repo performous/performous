@@ -17,6 +17,7 @@
 #include "screen_sing.hh"
 #include "screen_practice.hh"
 #include "screen_configuration.hh"
+#include "screen_audiodevices.hh"
 #include "screen_players.hh"
 
 #include <boost/format.hpp>
@@ -93,6 +94,8 @@ static void checkEvents_SDL(ScreenManager& sm) {
 				sm.flashMessage(config[which_vol].getShortDesc() + ": " + config[which_vol].getValue());
 				continue; // Already handled here...
 			}
+			// Eat away the event if there was a dialog open
+			if (sm.closeDialog()) continue;
 			break;
 		}
 		// Forward to screen even if the input system takes it (ignoring pushEvent return value)
@@ -108,10 +111,11 @@ static void checkEvents_SDL(ScreenManager& sm) {
 
 void mainLoop(std::string const& songlist) {
 	Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());
-	Audio audio;
 	ScreenManager sm(window);
+	sm.loading(_("Audio..."), 0.1);
+	Audio audio;
 	try {
-		sm.flashMessage(_("Miscellaneous..."), 0.0f, 1.0f, 1.0f); window.blank(); sm.drawFlashMessage(); window.swap();
+		sm.loading(_("Launching background loaders..."), 0.4);
 		Backgrounds backgrounds;
 		Database database(getConfigDir() / "database.xml");
 		Songs songs(database, songlist);
@@ -119,6 +123,7 @@ void mainLoop(std::string const& songlist) {
 		// TODO: Proper error handling...
 		try { midiDrums.reset(new input::MidiDrums); } catch (std::runtime_error&) {}
 		// Load audio samples
+		sm.loading(_("Loading audio samples..."), 0.5);
 		audio.loadSample("drum bass", getPath("sounds/drum_bass.ogg"));
 		audio.loadSample("drum snare", getPath("sounds/drum_snare.ogg"));
 		audio.loadSample("drum hi-hat", getPath("sounds/drum_hi-hat.ogg"));
@@ -132,16 +137,18 @@ void mainLoop(std::string const& songlist) {
 		audio.loadSample("guitar fail5", getPath("sounds/guitar_fail5.ogg"));
 		audio.loadSample("guitar fail6", getPath("sounds/guitar_fail6.ogg"));
 		// Load screens
+		sm.loading(_("Creating screens..."), 0.7);
 		sm.addScreen(new ScreenIntro("Intro", audio));
 		sm.addScreen(new ScreenSongs("Songs", audio, songs, database));
 		sm.addScreen(new ScreenSing("Sing", audio, database, backgrounds));
 		sm.addScreen(new ScreenPractice("Practice", audio));
 		sm.addScreen(new ScreenConfiguration("Configuration", audio));
+		sm.addScreen(new ScreenAudioDevices("AudioDevices", audio));
 		sm.addScreen(new ScreenPlayers("Players", audio, database));
 		sm.activateScreen("Intro");
-		sm.flashMessage(_("Main menu..."), 0.0f, 1.0f, 1.0f); window.blank(); sm.drawFlashMessage(); window.swap();
+		sm.loading(_("Entering main menu"), 0.8);
 		sm.updateScreen();  // exit/enter, any exception is fatal error
-		sm.flashMessage("");
+		sm.loading(_("Loading complete"), 1.0);
 		// Main loop
 		boost::xtime time = now();
 		unsigned frames = 0;
@@ -162,7 +169,7 @@ void mainLoop(std::string const& songlist) {
 				// Draw
 				window.blank();
 				sm.getCurrentScreen()->draw();
-				sm.drawFlashMessage();
+				sm.drawNotifications();
 				// Display (and wait until next frame)
 				window.swap();
 				if (config["graphic/fps"].b()) {
@@ -189,7 +196,7 @@ void mainLoop(std::string const& songlist) {
 		std::cerr << "FATAL ERROR: " << e.what() << std::endl;
 		sm.flashMessage(std::string("FATAL ERROR: ") + e.what(), 0.0f); // No fade-in to get it to show
 		window.blank();
-		sm.drawFlashMessage();
+		sm.drawNotifications();
 		window.swap();
 		boost::thread::sleep(now() + 2.0);
 	} catch (QuitNow&) {

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <boost/scoped_ptr.hpp>
-#include "dialog.hh"
 #include "screen.hh"
 #include "menu.hh"
 
@@ -25,7 +24,6 @@ class ScreenIntro : public Screen {
   private:
 	Audio& m_audio;
 	boost::scoped_ptr<ThemeIntro> theme;
-	boost::scoped_ptr<Dialog> m_dialog;
 	Menu m_menu;
 	bool m_first;
 };

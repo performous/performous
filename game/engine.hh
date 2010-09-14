@@ -1,24 +1,12 @@
 #pragma once
 
 #include "audio.hh"
-#include "color.hh"
 #include "song.hh"
 #include "configuration.hh"
 #include "database.hh"
 #include <boost/bind.hpp>
 #include <boost/thread/thread.hpp>
 #include <list>
-
-namespace {
-	const Color playerColors[] = {
-		Color(0.2, 0.5, 0.7),
-		Color(0.8, 0.3, 0.3),
-		Color(0.2, 0.9, 0.2),
-		Color(1.0, 0.6, 0.0)
-	};
-	size_t playerColorsSize = sizeof(playerColors) / sizeof(*playerColors);
-}
-
 #include <iostream>
 
 /// performous engine
@@ -51,8 +39,6 @@ class Engine {
 			// Calculate the space required for pitch frames
 			size_t frames = vocals.endTime / Engine::TIMESTEP;
 			while (anBegin != anEnd) m_database.cur.push_back(Player(vocals, *anBegin++, frames));
-			size_t player = 0;
-			for (std::list<Player>::iterator it = m_database.cur.begin(); it != m_database.cur.end(); ++it, ++player) it->m_color = playerColors[player % playerColorsSize];
 		}
 		m_thread.reset(new boost::thread(boost::ref(*this)));
 	}

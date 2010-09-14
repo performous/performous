@@ -36,7 +36,7 @@ void LayoutSinger::drawScore(Position position) {
 		float r = p->m_color.r;
 		float g = p->m_color.g;
 		float b = p->m_color.b;
-		glColor4f(r, g, b,act);
+		glColor4f(r, g, b, act);
 		m_score_text[i%4]->render((boost::format("%04d") % p->getScore()).str());
 		switch(position) {
 			case LayoutSinger::BOTTOM: // Fullscreen

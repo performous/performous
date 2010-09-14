@@ -301,14 +301,14 @@ void GuitarGraph::engine() {
 			// Check first regular keys
 			if (ev.type == input::Event::PRESS && ev.button >= 0 && ev.button < m_pads) {
 				if (m_drums) { // Drums
-					 if (ev.button == 0) m_menu.action(); // Kick for action
-					 else if (ev.button == 1) m_menu.action(-1); // Red for left
-					 else if (ev.button == 2) m_menu.move(-1); // Yellow for up
-					 else if (ev.button == 3) m_menu.move(1); // Blue for down
-					 else if (ev.button == 4) m_menu.action(1); // Green for right
+					 if (ev.button == input::KICK_BUTTON) m_menu.action(); // Kick for action
+					 else if (ev.button == input::RED_TOM_BUTTON) m_menu.action(-1); // Red for left
+					 else if (ev.button == input::YELLOW_TOM_BUTTON) m_menu.move(-1); // Yellow for up
+					 else if (ev.button == input::BLUE_TOM_BUTTON) m_menu.move(1); // Blue for down
+					 else if (ev.button == input::GREEN_TOM_BUTTON) m_menu.action(1); // Green for right
 				} else { // Guitar
-					 if (ev.button == 0) m_menu.action(-1); // Green for left
-					 else if (ev.button == 1) m_menu.action(1); // Red for right
+					 if (ev.button == input::GREEN_FRET_BUTTON) m_menu.action(-1); // Green for left
+					 else if (ev.button == input::RED_FRET_BUTTON) m_menu.action(1); // Red for right
 				}
 			}
 			// Strum (strum of keyboard-as-guitar doesn't generate nav-events)
@@ -325,17 +325,28 @@ void GuitarGraph::engine() {
 			break;
 		} else if (!m_input.isKeyboard()) {
 			// Handle Start/Select keypresses
-			if (ev.nav == input::CANCEL) ev.button = input::STARPOWER_BUTTON; // Select = GodMode
+			if (ev.nav == input::CANCEL) ev.button = input::GODMODE_BUTTON; // Select = GodMode
 			if (ev.nav == input::START) { m_menu.open(); continue; }
 		}
 		// Guitar specific actions
 		if (!m_drums) {
-			if ((ev.type == input::Event::PRESS || ev.type == input::Event::RELEASE) && ev.button == input::STARPOWER_BUTTON) {
+			if ((ev.type == input::Event::PRESS || ev.type == input::Event::RELEASE) && ev.button == input::GODMODE_BUTTON) {
 				if (ev.type == input::Event::PRESS) activateStarpower();
 				continue;
 			}
+			if (ev.button == input::WHAMMY_BUTTON) {
+				switch(ev.type) {
+					case input::Event::RELEASE:
+						m_whammy = (1.0 + 0.0 + 2.0*(rand()/double(RAND_MAX))) / 4.0;
+						break;
+					case input::Event::PRESS:
+						m_whammy = (1.0 + 1.0 + 2.0*(rand()/double(RAND_MAX))) / 4.0;
+						break;
+					default:
+						break;
+				}
+			}
 			if (ev.type == input::Event::RELEASE) endHold(ev.button, time);
-			if (ev.type == input::Event::WHAMMY) m_whammy = (1.0 + ev.button + 2.0*(rand()/double(RAND_MAX))) / 4.0;
 		} else {
 			// Handle drum lefty-mode
 			if (m_leftymode.b() && ev.button > 0 && !menuOpen()) ev.button = m_pads - ev.button;

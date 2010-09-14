@@ -75,6 +75,20 @@ public:
 	Surface short_comment_bg;
 };
 
+/// theme for audio device screen
+class ThemeAudioDevices: public Theme {
+public:
+	ThemeAudioDevices();
+	/// device item
+	SvgTxtTheme device;
+	/// device item background
+	Surface device_bg;
+	/// comment text
+	SvgTxtTheme comment;
+	/// comment background
+	Surface comment_bg;
+};
+
 /// theme for intro screen
 class ThemeIntro: public Theme {
 public:

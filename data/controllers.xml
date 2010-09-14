@@ -160,16 +160,16 @@
 			<button id="5" value="up-right" />
 			<button id="6" value="down-left" />
 			<button id="7" value="down-right" />
-			<button id="8" value="select" />
-			<button id="9" value="start" />
+			<button id="8" value="start" />
+			<button id="9" value="select" />
 		</mapping>
 	</controller>
 	<controller type="dancepad" name="DANCEPAD_TIGERGAME">
 		<description>TigerGame dancepad</description>
 		<regexp match="TigerGame" />
 		<mapping>
-			<button id="0" value="select" />
-			<button id="1" value="start" />
+			<button id="0" value="start" />
+			<button id="1" value="select" />
 			<button id="8" value="left" />
 			<button id="9" value="right" />
 			<button id="10" value="down" />
@@ -184,8 +184,8 @@
 			<button id="1" value="up-right" />
 			<button id="2" value="up-left" />
 			<button id="3" value="down-right" />
-			<button id="8" value="select" />
-			<button id="9" value="start" />
+			<button id="8" value="start" />
+			<button id="9" value="select" />
 			<button id="12" value="up" />
 			<button id="13" value="right" />
 			<button id="14" value="down" />
@@ -204,8 +204,8 @@
 			<button id="5" value="up-right" />
 			<button id="6" value="down-left" />
 			<button id="7" value="down-right" />
-			<button id="8" value="start" />
-			<button id="9" value="select" />
+			<button id="8" value="select" />
+			<button id="9" value="start" />
 		</mapping>
 	</controller>
 </controllers>
