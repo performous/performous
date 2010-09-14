@@ -26,7 +26,9 @@ class ScreenAudioDevices: public Screen {
 		std::string name;
 		unsigned dev;
 	};
-	void save();
+	void load(); ///< Check what devices are open
+	void save(bool skip_ui_config = false); ///< Save the config to disk xml
+	bool verify(size_t unassigned_id); ///< Check that all were opened after audio reset
 
 	Audio& m_audio;
 	boost::scoped_ptr<ThemeAudioDevices> m_theme;
