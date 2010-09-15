@@ -60,7 +60,7 @@ class Analyzer {
 			if (w == r) overflow = true;
 		}
 		m_bufWrite = w;
-		if (overflow) m_bufRead = w;  // Reset read pointer on overflow
+		if (overflow) m_bufRead = (w + 1) % BUF_N;  // Reset read pointer on overflow
 	}
 	/** Call this to process all data input so far. **/
 	void process();
