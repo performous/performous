@@ -97,10 +97,14 @@ void ScreenAudioDevices::draw() {
 		m_theme->device_bg.dimensions.stretch(std::abs(xoff*2), m_mic_icon->dimensions.h()*0.9).middle();
 		for (size_t i = 0; i <= m_devs.size(); ++i) {
 			const float y = -yoff + i*ystep;
+			float alpha = 1.0f;
+			// "Grey out" devices that doesn't fit the selection
+			if (m_mics[m_selected_column].name == "OUT" && !m_devs[i].out) alpha = 0.5f;
+			else if (m_mics[m_selected_column].name != "OUT" && !m_devs[i].in) alpha = 0.5f;
 			m_theme->device_bg.dimensions.center(y);
 			m_theme->device_bg.draw();
 			m_theme->device.dimensions.middle(-xstep*0.5).center(y);
-			m_theme->device.draw(i < m_devs.size() ? m_devs[i].desc() : _("- Unassigned -"));
+			m_theme->device.draw(i < m_devs.size() ? m_devs[i].desc() : _("- Unassigned -"), alpha);
 		}
 		// Icons
 		for (size_t i = 0; i < m_mics.size(); ++i) {
