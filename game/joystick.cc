@@ -505,7 +505,6 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 					button++;
 				case SDLK_SPACE:
 					if(!drumkit) return false;
-					if(devices.find(joy_id)->second.pressed(button)) return true; // repeating
 					is_drumkit_event = true;
 					event.type = input::Event::PRESS;
 					event.pressed[button] = true;
@@ -646,7 +645,6 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 					button++;
 				case SDLK_SPACE:
 					if(!drumkit) return false;
-					if(devices.find(joy_id)->second.pressed(button)) return true; // repeating
 					is_drumkit_event = true;
 					event.type = input::Event::RELEASE;
 					event.pressed[button] = true;
