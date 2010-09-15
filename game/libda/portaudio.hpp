@@ -37,8 +37,8 @@ namespace portaudio {
 			oss << name << " (";
 			if (in) oss << in << " in";
 			if (in && out) oss << ", ";
-			if (out) oss << out << " out)";
-			return oss.str();
+			if (out) oss << out << " out";
+			return oss.str() + ")";
 		}
 		std::string name;
 		unsigned int in, out;
