@@ -16,8 +16,7 @@ export DEBEMAIL="`gpg --list-keys | grep uid | sed 's/ *(.*)//; s/>.*//; s/.*[:<
 
 # Config
 PKG="performous"
-PPAVERSIONNUM="1"
-VERSIONCOMMON="+git"`date '+%Y%m%d'`"~ppa${PPAVERSIONNUM}"
+VERSIONCOMMON="0.5.1-9+git"`date '+%Y%m%d'`"~ppa1"
 SUITES="karmic lucid maverick"
 GITURL="git://git.performous.org/gitroot/performous/performous"
 DESTINATIONPPA="ppa:performous-team/ppa"
@@ -44,63 +43,56 @@ PPAPATCHDIR="`pwd`"
 
 cd "$TEMPDIR"
 
-# Download the "old" source package
+# Figure out the version of the "old" official package
 version=`apt-cache showsrc $PKG | sed -n 's/^Version: \(.*\)/\1/p' | head -n 1`
-pkgversion=`apt-cache showsrc $PKG | sed -n 's/^Version: \(.*\)-.*/\1/p' | head -n 1`
-pkgversion=${pkgversion##*:}
-if [ -z "$pkgversion" ] ; then
-	echo "Assuming native package"
-	pkgversion="$version"
-fi
-echo "Working on $PKG $version ($pkgversion)"
+echo "Working on $PKG $version"
+
 mkdir -p $PKG-$version
 cd $PKG-$version
+
+# Download the "old" source package we use as a base
 apt-get --download-only source $PKG
 
 # Download fresh version from git
 echo "Fetch from git..."
 git clone "$GITURL" "$SOURCEDIR"
+
 # Get some info from git for changelog
 pushd .
 cd "$SOURCEDIR"
+# 10 chars from the HEAD commit hash
 headcommit=`git log | head -n 1 | cut --delimiter=" " -f 2 | cut -c 1-10`
 popd
 
-filenameversion=${version##*:}
 # Loop suites
 for suite in $SUITES ; do
-	versionsuffix="${VERSIONCOMMON}~${suite}"
-	ppaversion="${version}${versionsuffix}"
-	filenameppaversion="${filenameversion}${versionsuffix}"
-	rm -rf $suite
-	mkdir $suite
+	newversion="${VERSIONCOMMON}~${suite}"
+	rm -rf $suite; mkdir $suite
 	cd $suite
 	ln ../${PKG}_* .
-	dpkg-source -x ${PKG}_$filenameversion.dsc
-	cd $PKG-$pkgversion
+	dpkg-source -x ${PKG}_${version}.dsc extracted
+	cd extracted
+		# Copy new files
+		echo "Copy new files..."
+		CopyNewFiles "$SOURCEDIR" .
+		# Apply patches
+		echo "Apply some patches..."
+		cp "$PPAPATCHDIR/"*.patch .
+		patch -p0 < *.patch
+		rm *.patch
 
-	# Copy new files
-	echo "Copy new files..."
-	CopyNewFiles "$SOURCEDIR" .
-	# Apply patches
-	echo "Apply some patches..."
-	cp "$PPAPATCHDIR/"*.patch .
-	patch -p0 < *.patch
-	rm *.patch
-
-	# Do changelog
-	# Dch complains about unknown suites
-	yes '' | dch -b -v $ppaversion -D $suite "Upload development version from Git $headcommit to Ubuntu PPA for $suite."
-	if [ -f debian/source/format -a ! -f debian/patches/series ] ; then
-		rm debian/source/format
-	fi
-	# Build package
-	#dpkg-buildpackage -sa -S    # Full .orig.gz
-	dpkg-buildpackage -sd -S    # Only .diff.gz
-	pwd
+		# Do changelog
+		# Dch complains about unknown suites
+		yes '' | dch -b -v $newversion -D $suite "Upload development version from Git $headcommit to Ubuntu PPA for $suite."
+		if [ -f debian/source/format -a ! -f debian/patches/series ] ; then
+			rm debian/source/format
+		fi
+		# Build package
+		#dpkg-buildpackage -sa -S    # Full .orig.gz
+		dpkg-buildpackage -sd -S    # Only .diff.gz
 	cd ..
 	# Upload to PPA
-	dput $DESTINATIONPPA ${PKG}_${filenameppaversion}_source.changes
+	dput $DESTINATIONPPA ${PKG}_${newversion}_source.changes
 	cd ..
 done
 cd ..
