@@ -79,8 +79,8 @@ void InstrumentGraph::drawMenu() {
 	const float step = txth * 0.7f;
 	const float h = m_menu.getOptions().size() * step + step;
 	float y = -h * .5f + step;
-	float x = offsetX - w*.5f + step + button_margin*1.0f;
-	float xx = offsetX + w*.5f - step - button_margin*1.0f;
+	float x = offsetX - w*.5f + step + button_margin;
+	float xx = offsetX + w*.5f - step - button_margin;
 	// Background
 	th.bg.dimensions.middle(offsetX).center(0).stretch(w, h);
 	th.bg.draw();
@@ -94,24 +94,41 @@ void InstrumentGraph::drawMenu() {
 		if (cur == it) {
 			// Draw the key hints
 			if (getGraphType() != input::DANCEPAD) {
-				glColor4fv(color(getGraphType() == input::GUITAR ? 0 : 1));
-				m_button.dimensions.middle(x - button_margin).center(y);
-				m_button.draw();
-				glColor4fv(color(getGraphType() == input::GUITAR ? 1 : 4));
-				m_button.dimensions.middle(xx + button_margin);
-				m_button.draw();
+				if (m_input.isKeyboard()) { // Key letters for keyboard
+					txt->dimensions.middle(x - button_margin - m_button.dimensions.w()*0.5f).center(y);
+					txt->draw(getGraphType() == input::GUITAR ? "1" : "U");
+					txt->dimensions.middle(xx + button_margin - m_button.dimensions.w()*0.5f).center(y);
+					txt->draw(getGraphType() == input::GUITAR ? "2" : "P");
+				} else { // Colored icons for real instruments
+					glColor4fv(color(getGraphType() == input::GUITAR ? 0 : 1));
+					m_button.dimensions.middle(x - button_margin).center(y);
+					m_button.draw();
+					glColor4fv(color(getGraphType() == input::GUITAR ? 1 : 4));
+					m_button.dimensions.middle(xx + button_margin);
+					m_button.draw();
+				}
 			}
 			// Drum up hint
 			if (getGraphType() == input::DRUMS && i > 0) {
-				glColor4fv(color(2));
-				m_button.dimensions.middle(x - button_margin).center(y - step);
-				m_button.draw();
+				if (m_input.isKeyboard()) { // Key letters for keyboard
+					txt->dimensions.middle(x - button_margin - m_button.dimensions.w()*0.5f).center(y - step);
+					txt->draw("I");
+				} else { // Colored icons for real instruments
+					glColor4fv(color(2));
+					m_button.dimensions.middle(x - button_margin).center(y - step);
+					m_button.draw();
+				}
 			}
 			// Drum down hint
 			if (getGraphType() == input::DRUMS && i < m_menu.getOptions().size()-1) {
-				glColor4fv(color(3));
-				m_button.dimensions.middle(x - button_margin).center(y + step);
-				m_button.draw();
+				if (m_input.isKeyboard()) {
+					txt->dimensions.middle(x - button_margin - m_button.dimensions.w()*0.5f).center(y + step);
+					txt->draw("O");
+				} else {
+					glColor4fv(color(3));
+					m_button.dimensions.middle(x - button_margin).center(y + step);
+					m_button.draw();
+				}
 			}
 			//th.back_h.dimensions.middle(0.05 + offsetX).center(y);
 			//th.back_h.draw();
