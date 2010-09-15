@@ -452,7 +452,8 @@ if test ! -f "$PREFIX"/build-stamps/libcroco; then
   download http://ftp.gnome.org/pub/GNOME/sources/libcroco/0.6/$LIBCROCO.tar.bz2
   tar jxvf $LIBCROCO.tar.bz2
   cd $LIBCROCO
-  ./configure $COMMON_AUTOCONF_FLAGS
+  # We bypass a file magick check here
+  lt_cv_deplibs_check_method=pass_all ./configure $COMMON_AUTOCONF_FLAGS
   make
   make install
   cd ..
@@ -644,7 +645,7 @@ if test ! -f "$PREFIX"/build-stamps/opencv; then
   download http://download.sourceforge.net/opencvlibrary/$OPENCV-win.zip
   unzip -o $OPENCV-win.zip
   cd $OPENCV
-  ln -s ../deps/include/videoInput.h /src/highgui/videoinput.h
+  ln -s "$PREFIX/include/videoInput.h" src/highgui/videoinput.h
   mkdir -pv build
   cd build
   cmake \
@@ -657,15 +658,13 @@ if test ! -f "$PREFIX"/build-stamps/opencv; then
   make
   make install
   cp -v unix-install/opencv.pc "$PREFIX"/lib/pkgconfig  # No auto-install :(
-  pushd .
   cd "$PREFIX"/lib
   # Create some symlinks so the cmake scripts detect it correctly
   ln -svf libcv210.dll.a libcv.dll.a
   ln -svf libcxcore210.dll.a libcxcore.dll.a
   ln -svf libcvaux210.dll.a libcvaux.dll.a
   ln -svf libhighgui210.dll.a libhighgui.dll.a
-  popd
-  cd ../..
+  cd "$PREFIX/.."
   touch "$PREFIX"/build-stamps/opencv
   $RM_RF $OPENCV
 fi
