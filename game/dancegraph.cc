@@ -561,7 +561,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 }
 
 /// Draw popups and other info texts
-void DanceGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
+void DanceGraph::drawInfo(double /*time*/, double offsetX, Dimensions dimensions) {
 	if (!menuOpen()) {
 		// Draw scores
 		m_text.dimensions.screenBottom(-0.35).middle(0.32 * dimensions.w() + offsetX);
