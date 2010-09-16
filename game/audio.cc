@@ -520,7 +520,8 @@ struct Audio::Impl {
 Audio::Audio(): self(new Impl) {}
 Audio::~Audio() {}
 
-void Audio::reset() { self.reset(new Impl); };
+void Audio::restart() { self.reset(new Impl); };
+void Audio::close() { self.reset(); };
 
 bool Audio::isOpen() const {
 	return !self->devices.empty();

@@ -46,7 +46,8 @@ class Audio {
 public:
 	Audio();
 	~Audio();
-	void reset();
+	void restart();
+	void close();
 	boost::ptr_vector<Analyzer>& analyzers();
 	boost::ptr_vector<Device>& devices();
 	bool isOpen() const;

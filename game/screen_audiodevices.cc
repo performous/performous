@@ -5,7 +5,9 @@
 #include "theme.hh"
 #include "audio.hh"
 #include "i18n.hh"
-
+#include <cstdlib>
+#include <boost/thread.hpp>
+#include <boost/bind.hpp>
 
 namespace {
 	const float yoff = 0.18; // Offset from center where to place top row
@@ -175,8 +177,14 @@ bool ScreenAudioDevices::save(bool skip_ui_config) {
 	}
 	writeConfig(); // Save the new config
 	size_t unassigned_id = m_devs.size();
-	// TODO: Make sure this isn't particularly prone to crashes
-	m_audio.reset(); // Reload audio to take the new settings into use
+	// Give audio a little time to shutdown but then just quit
+	boost::thread audiokiller(boost::bind(&Audio::close, boost::ref(m_audio)));
+	if (!audiokiller.timed_join(boost::posix_time::milliseconds(4000))) {
+		// FIXME: Notify user
+		std::cout << "Audio hung. Please restart Performous" << std::endl;
+		std::exit(EXIT_FAILURE);
+	}
+	m_audio.restart(); // Reload audio to take the new settings into use
 	m_audio.playMusic(getThemePath("menu.ogg"), true); // Start music again
 	// Check that all went well
 	bool ret = verify(unassigned_id);

@@ -202,6 +202,12 @@ void mainLoop(std::string const& songlist) {
 	} catch (QuitNow&) {
 		std::cout << "Terminated." << std::endl;
 	}
+	// Give audio a little time to shutdown but then just quit
+	boost::thread audiokiller(boost::bind(&Audio::close, boost::ref(audio)));
+	if (!audiokiller.timed_join(boost::posix_time::milliseconds(2000))) {
+		std::cout << "Audio hung." << std::endl;
+		exit(EXIT_SUCCESS);
+	}
 }
 
 /// Simple test utility to make mapping of joystick buttons/axes easier
@@ -299,10 +305,10 @@ int main(int argc, char** argv) try {
 	}
 	po::notify(vm);
 
-	// initialize the verbose message sink
+	// Initialize the verbose message sink
 	//logger::__log_hh_test(); // debug
 	logger::setup(loglevel_regexp);
-
+	atexit(logger::teardown); // We might exit from many places due to audio hangs
 
 	if (vm.count("version")) {
 		// Already printed the version string in the beginning...
@@ -345,8 +351,6 @@ int main(int argc, char** argv) try {
 
 	// Run the game init and main loop
 	mainLoop(songlist);
-
-	logger::teardown();
 
 	return EXIT_SUCCESS; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
 } catch (std::exception& e) {
