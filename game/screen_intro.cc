@@ -14,6 +14,7 @@ ScreenIntro::ScreenIntro(std::string const& name, Audio& audio): Screen(name), m
 void ScreenIntro::enter() {
 	m_audio.playMusic(getThemePath("menu.ogg"), true);
 	m_selAnim = AnimValue(0.0, 10.0);
+	m_submenuAnim = AnimValue(0.0, 3.0);
 	theme.reset(new ThemeIntro());
 	populateMenu();
 	if( m_first ) {
@@ -52,7 +53,9 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 			m_menu.current().value->reset(modifier & KMOD_ALT);
 		else if (key == SDLK_s && modifier & KMOD_CTRL) writeConfig(modifier & KMOD_ALT);
 	}
+	// Animation targets
 	m_selAnim.setTarget(m_menu.curIndex());
+	m_submenuAnim.setTarget(m_menu.getSubmenuLevel());
 }
 
 void ScreenIntro::draw_menu_options() {
@@ -62,6 +65,7 @@ void ScreenIntro::draw_menu_options() {
 	const float start_y = -0.1;
 	const float sel_margin = 0.05;
 	const MenuOptions opts = m_menu.getOptions();
+	double submenuanim = 1.0 - std::min(1.0, std::abs(m_submenuAnim.get()-m_menu.getSubmenuLevel()));
 	theme->back_h.dimensions.stretch(m_menu.dimensions.w(), theme->back_h.dimensions.h());
 	// Determine from which item to start
 	int start_i = std::min((int)m_menu.curIndex(), (int)opts.size() - (int)showopts 
@@ -77,17 +81,17 @@ void ScreenIntro::draw_menu_options() {
 			theme->back_h.draw();
 			// Draw the text, dim if option not available
 			theme->option_selected.dimensions.left(x).center(start_y + ii*0.08);
-			theme->option_selected.draw(opt.getName(), opt.isActive() ? 1.0f : 0.5f);
+			theme->option_selected.draw(opt.getName(), submenuanim * (opt.isActive() ? 1.0f : 0.5f));
 			wcounter = std::max(wcounter, theme->option_selected.w() + 2 * sel_margin); // Calculate the widest entry
 			// If this is a config item, show the value below
 			if (opt.type == MenuOption::CHANGE_VALUE) {
 				++ii; // Use a slot for the value
 				theme->option_selected.dimensions.left(x + sel_margin).center(-0.1 + ii*0.08);
-				theme->option_selected.draw(opt.value->getValue());
+				theme->option_selected.draw(opt.value->getValue(), submenuanim);
 			}
 		} else { // Regular option (not selected)
 			theme->option.dimensions.left(x).center(start_y + ii*0.08);
-			theme->option.draw(opt.getName(), opt.isActive() ? 1.0f : 0.5f);
+			theme->option.draw(opt.getName(), submenuanim * (opt.isActive() ? 1.0f : 0.5f));
 			wcounter = std::max(wcounter, theme->option.w() + 2 * sel_margin); // Calculate the widest entry
 		}
 	}

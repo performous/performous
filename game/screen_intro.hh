@@ -30,4 +30,5 @@ class ScreenIntro : public Screen {
 	Menu m_menu;
 	bool m_first;
 	AnimValue m_selAnim;
+	AnimValue m_submenuAnim;
 };
