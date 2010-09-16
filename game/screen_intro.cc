@@ -68,13 +68,13 @@ void ScreenIntro::draw_menu_options() {
 	double submenuanim = 1.0 - std::min(1.0, std::abs(m_submenuAnim.get()-m_menu.getSubmenuLevel()));
 	theme->back_h.dimensions.stretch(m_menu.dimensions.w(), theme->back_h.dimensions.h());
 	// Determine from which item to start
-	int start_i = std::min((int)m_menu.curIndex(), (int)opts.size() - (int)showopts 
+	int start_i = std::min((int)m_menu.curIndex() - 1, (int)opts.size() - (int)showopts
 		+ (m_menu.getSubmenuLevel() == 2 ? 1 : 0)); // Hack to counter side-effects from displaying the value inside the menu
 	if (start_i < 0 || opts.size() == showopts) start_i = 0;
 	for (size_t i = start_i, ii = 0; ii < showopts && i < opts.size(); ++i, ++ii) {
 		MenuOption const& opt = opts[i];
 		if (i == m_menu.curIndex()) { // Selection
-			// Animate highlight moving
+			// Animate selection higlight moving
 			double selanim = m_selAnim.get() - start_i;
 			if (selanim < 0) selanim = 0;
 			theme->back_h.dimensions.left(x - sel_margin).center(start_y+0.003 + selanim*0.08);
@@ -86,8 +86,8 @@ void ScreenIntro::draw_menu_options() {
 			// If this is a config item, show the value below
 			if (opt.type == MenuOption::CHANGE_VALUE) {
 				++ii; // Use a slot for the value
-				theme->option_selected.dimensions.left(x + sel_margin).center(-0.1 + ii*0.08);
-				theme->option_selected.draw(opt.value->getValue(), submenuanim);
+				theme->option_selected.dimensions.left(x + sel_margin).center(-0.1 + (selanim+1)*0.08);
+				theme->option_selected.draw("<  " + opt.value->getValue() + "  >", submenuanim);
 			}
 		} else { // Regular option (not selected)
 			theme->option.dimensions.left(x).center(start_y + ii*0.08);
