@@ -22,6 +22,8 @@ class ScreenIntro : public Screen {
 	void draw_menu_options();
 
   private:
+	void populateMenu();
+
 	Audio& m_audio;
 	boost::scoped_ptr<ThemeIntro> theme;
 	Menu m_menu;

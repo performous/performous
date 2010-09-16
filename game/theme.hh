@@ -57,24 +57,6 @@ public:
 	SvgTxtTheme timer;
 };
 
-/// theme for options screen
-class ThemeConfiguration: public Theme {
-public:
-	ThemeConfiguration();
-	/// configuration item
-	SvgTxtTheme item;
-	/// configuration value
-	SvgTxtTheme value;
-	/// configuration comment text
-	SvgTxtTheme comment;
-	/// configuration comment text (short tip)
-	SvgTxtTheme short_comment;
-	/// configuration comment background
-	Surface comment_bg;
-	/// configuration comment background (short tip)
-	Surface short_comment_bg;
-};
-
 /// theme for audio device screen
 class ThemeAudioDevices: public Theme {
 public:
@@ -101,8 +83,12 @@ public:
 	SvgTxtTheme option_selected;
 	/// menu comment text
 	SvgTxtTheme comment;
-	/// menu comment background
+	/// configuration comment text (short tip)
+	SvgTxtTheme short_comment;
+	/// configuration comment background
 	Surface comment_bg;
+	/// configuration comment background (short tip)
+	Surface short_comment_bg;
 };
 
 /// theme for instrument menu

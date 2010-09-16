@@ -25,7 +25,7 @@ class MenuOption {
 	/// Construct a value setter
 	MenuOption(const std::string& nm, const std::string& comm, ConfigItem* val, ConfigItem newval);
 	/// Construct a submenu opener
-	MenuOption(const std::string& nm, const std::string& comm, MenuOptions opts);
+	MenuOption(const std::string& nm, const std::string& comm, MenuOptions opts, const std::string& img = "");
 	/// Construct a screen changer
 	MenuOption(const std::string& nm, const std::string& comm, const std::string& scrn, const std::string& img = "");
 	/// Sets name to follow a reference
@@ -69,14 +69,18 @@ class Menu {
 	void action(int dir = 1);
 	/// clear items
 	void clear(bool save_root = false);
+	/// closes submenu or if in root menu, closes the whole menu
+	void closeSubmenu();
 
 	bool empty() const { return (menu_stack.empty() || (menu_stack.size() == 1 && menu_stack.back()->empty())); }
 	bool isOpen() const { return m_open; }
+	size_t getSubmenuLevel() const { return menu_stack.size() - 1; }
 	void open() { m_open = true; }
 	void close() { m_open = false; }
 	void toggle() { m_open = !m_open; }
 	void moveToLast() { selection_stack.back() = menu_stack.back()->size() - 1; }
 
+	size_t curIndex() { return selection_stack.back(); }
 	MenuOption& current() { return menu_stack.back()->at(selection_stack.back()); }
 	MenuOption& back() { return root_options.back(); }
 	const MenuOptions::const_iterator begin() const { return menu_stack.back()->begin(); }

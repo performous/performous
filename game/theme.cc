@@ -36,16 +36,6 @@ ThemeSing::ThemeSing():
 	lyrics_now.setHighlight(getThemePath("sing_lyricshighlight.svg"));
 }
 
-ThemeConfiguration::ThemeConfiguration():
-	Theme(getThemePath("configuration_bg.svg")),
-	item(getThemePath("configuration_item.svg"), config["graphic/text_lod"].f()),
-	value(getThemePath("configuration_value.svg"), config["graphic/text_lod"].f()),
-	comment(getThemePath("mainmenu_comment.svg"), config["graphic/text_lod"].f()),
-	short_comment(getThemePath("mainmenu_short_comment.svg"), config["graphic/text_lod"].f()),
-	comment_bg(getThemePath("mainmenu_comment_bg.svg")),
-	short_comment_bg(getThemePath("mainmenu_scomment_bg.svg"))
-{}
-
 ThemeAudioDevices::ThemeAudioDevices():
 	Theme(getThemePath("audiodevices_bg.svg")),
 	device(getThemePath("mainmenu_comment.svg"), config["graphic/text_lod"].f()),
@@ -60,7 +50,9 @@ ThemeIntro::ThemeIntro():
 	option(getThemePath("mainmenu_option.svg"), config["graphic/text_lod"].f()),
 	option_selected(getThemePath("mainmenu_option_selected.svg"), config["graphic/text_lod"].f()),
 	comment(getThemePath("mainmenu_comment.svg"), config["graphic/text_lod"].f()),
-	comment_bg(getThemePath("mainmenu_comment_bg.svg"))
+	short_comment(getThemePath("mainmenu_short_comment.svg"), config["graphic/text_lod"].f()),
+	comment_bg(getThemePath("mainmenu_comment_bg.svg")),
+	short_comment_bg(getThemePath("mainmenu_scomment_bg.svg"))
 {
 	back_h.dimensions.fixedHeight(0.08f);
 }

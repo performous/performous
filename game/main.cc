@@ -16,7 +16,6 @@
 #include "screen_songs.hh"
 #include "screen_sing.hh"
 #include "screen_practice.hh"
-#include "screen_configuration.hh"
 #include "screen_audiodevices.hh"
 #include "screen_players.hh"
 
@@ -144,7 +143,6 @@ void mainLoop(std::string const& songlist) {
 		sm.addScreen(new ScreenSongs("Songs", audio, songs, database));
 		sm.addScreen(new ScreenSing("Sing", audio, database, backgrounds));
 		sm.addScreen(new ScreenPractice("Practice", audio));
-		sm.addScreen(new ScreenConfiguration("Configuration", audio));
 		sm.addScreen(new ScreenAudioDevices("AudioDevices", audio));
 		sm.addScreen(new ScreenPlayers("Players", audio, database));
 		sm.activateScreen("Intro");
@@ -341,7 +339,7 @@ int main(int argc, char** argv) try {
 		return EXIT_SUCCESS;
 	}
 	// Override XML config for options that were specified from commandline or performous.conf
-	confOverride(songdirs, "system/path_songs");
+	confOverride(songdirs, "paths/songs");
 	confOverride(devices, "audio/devices");
 	getPaths(); // Initialize paths before other threads start
 	if (vm.count("jstest")) { // Joystick test program

@@ -33,13 +33,14 @@ to save the current settings to XML.
 				<long>Audio-related settings.</long>
 			</locale>
 		</entry>
-		<entry name="system">
+		<entry name="paths">
 			<locale name="C">
-				<short>System</short>
+				<short>Paths</short>
 				<long>System paths.</long>
 			</locale>
 		</entry>
 	</menu>
+
 	<!-- Gameplay preferences -->
 	<entry name="game/karaoke_mode" type="bool" value="false">
 		<locale name="C">
@@ -86,6 +87,12 @@ to save the current settings to XML.
 		<locale name="C">
 			<short>Joystick configuration</short>
 			<long>Force joystick to some kind of instrument.</long>
+		</locale>
+	</entry>
+	<entry name="game/midi_input" type="string" value="">
+		<locale name="C">
+			<short>Hardware MIDI input device</short>
+			<long>Part of sound card name or its number or empty to use the first available device. Used currently for MIDI drum controllers.</long>
 		</locale>
 	</entry>
 
@@ -228,14 +235,8 @@ to save the current settings to XML.
 		</locale>
 	</entry>
 
-	<!-- System preferences -->
-	<entry name="system/midi_input" type="string" value="">
-		<locale name="C">
-			<short>Hardware MIDI input device</short>
-			<long>Part of sound card name or its number or empty to use the first available device. Used currently for MIDI drum controllers.</long>
-		</locale>
-	</entry>
-	<entry name="system/path_songs" type="string_list">
+	<!-- Paths -->
+	<entry name="paths/songs" type="string_list">
 		<stringvalue>DATADIR/songs/</stringvalue>
 		<stringvalue>/usr/local/share/games/ultrastar/songs/</stringvalue>
 		<stringvalue>/usr/local/share/games/fretsonfire/data/songs/</stringvalue>
@@ -247,7 +248,7 @@ to save the current settings to XML.
 			<long>Where to recursively look for songs. DATADIR at the beginning means all Performous data folders.</long>
 		</locale>
 	</entry>
-	<entry name="system/path" type="string_list">
+	<entry name="paths/system" type="string_list">
 		<locale name="C">
 			<short>Base folders for data</short>
 			<long>System defaults are included automatically. Additional paths can be added here.</long>

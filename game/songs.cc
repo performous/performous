@@ -40,7 +40,7 @@ void Songs::reload_internal() {
 		m_dirty = true;
 	}
 	Profiler prof("Song loading took");
-	Paths paths = getPathsConfig("system/path_songs");
+	Paths paths = getPathsConfig("paths/songs");
 	for (Paths::iterator it = paths.begin(); m_loading && it != paths.end(); ++it) {
 		try {
 			if (!fs::is_directory(*it)) { m_debug << "Songs/info: >>> Not scanning: " << *it << " (no such directory)" << std::endl; continue; }

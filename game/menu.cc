@@ -34,7 +34,7 @@ MenuOption::MenuOption(const std::string& nm, const std::string& comm, ConfigIte
 	commentPtr(NULL)
 {}
 
-MenuOption::MenuOption(const std::string& nm, const std::string& comm, MenuOptions opts):
+MenuOption::MenuOption(const std::string& nm, const std::string& comm, MenuOptions opts, const std::string& img):
 	type(OPEN_SUBMENU),
 	value(NULL),
 	newValue(),
@@ -43,7 +43,9 @@ MenuOption::MenuOption(const std::string& nm, const std::string& comm, MenuOptio
 	comment(comm),
 	namePtr(NULL),
 	commentPtr(NULL)
-{}
+{
+	if (!img.empty()) image.reset(new Surface(getThemePath(img)));
+}
 
 
 MenuOption::MenuOption(const std::string& nm, const std::string& comm, const std::string& scrn, const std::string& img):
@@ -109,10 +111,7 @@ void Menu::action(int dir) {
 			if (current().value) *(current().value) = current().newValue;
 			// Fall-through to closing
 		case MenuOption::CLOSE_SUBMENU:
-			if (menu_stack.size() > 1) {
-				menu_stack.pop_back();
-				selection_stack.pop_back();
-			} else close();
+			closeSubmenu();
 			break;
 		case MenuOption::ACTIVATE_SCREEN:
 			ScreenManager* sm = ScreenManager::getSingletonPtr();
@@ -130,4 +129,11 @@ void Menu::clear(bool save_root) {
 	selection_stack.clear();
 	menu_stack.push_back(&root_options);
 	selection_stack.push_back(0);
+}
+
+void Menu::closeSubmenu() {
+	if (menu_stack.size() > 1) {
+		menu_stack.pop_back();
+		selection_stack.pop_back();
+	} else close();
 }
