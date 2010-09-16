@@ -84,8 +84,8 @@ namespace glutil {
 
 	/// easy square
 	struct Square {
-		Square(float cx, float cy, float r) {
-			Begin line(GL_LINE_LOOP);
+		Square(float cx, float cy, float r, bool filled = false) {
+			Begin line(filled ? GL_QUADS : GL_LINE_LOOP);
 			glVertex2f(cx-r,cy+r);
 			glVertex2f(cx-r,cy-r);
 			glVertex2f(cx+r,cy-r);

@@ -1,6 +1,7 @@
 #include "screen.hh"
 #include "fs.hh"
 #include "configuration.hh"
+#include "glutil.hh"
 
 #include <boost/thread.hpp>
 #include <boost/lexical_cast.hpp>
@@ -44,6 +45,14 @@ void ScreenManager::loading(std::string const& message, float progress) {
 	flashMessage(message + " " + boost::lexical_cast<std::string>(progress*100) + "%", 0.0f, 1.0f, 1.0f);
 	m_window.blank();
 	drawNotifications();
+	const int maxi = 20;
+	const float x = 0.3;
+	const float spacing = 0.01;
+	const float sq_size = (2*x - (maxi-1)*spacing) / maxi;
+	for (int i = 0; i <= progress * maxi; ++i) {
+		glColor4f(0.2f, 0.7f, 0.7f, (progress + 1)*0.5f);
+		glutil::Square(-x + i * (sq_size + spacing), 0, sq_size/2, true);
+	}
 	m_window.swap();
 }
 
