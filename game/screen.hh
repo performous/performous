@@ -61,11 +61,13 @@ class ScreenManager: public Singleton <ScreenManager> {
 	void dialog(std::string const& text);
 	/// Close dialog and return true if it was opened in the first place
 	bool closeDialog();
+	/// Returns true if dialog is open
+	bool isDialogOpen() { return m_dialog; }
 	/// Draw dialogs & flash messages in current screen
 	void drawNotifications();
 
 	/// Sets finished to true
-	void finished() { m_finished=true; };
+	void finished() { m_finished = true; };
 	/// Returns finished state
 	bool isFinished() { return m_finished; };
 

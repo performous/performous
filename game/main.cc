@@ -98,6 +98,8 @@ static void checkEvents_SDL(ScreenManager& sm) {
 			if (sm.closeDialog()) continue;
 			break;
 		}
+		// Close dialog in case of a nav event
+		if (sm.isDialogOpen() && input::getNav(event) != input::NONE) { sm.closeDialog(); continue; }
 		// Forward to screen even if the input system takes it (ignoring pushEvent return value)
 		// This is needed to allow navigation (quiting the song) to function even then
 		input::SDL::pushEvent(event);
