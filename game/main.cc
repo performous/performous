@@ -347,6 +347,10 @@ int main(int argc, char** argv) try {
 		std::cout << "  --audio \"dev=1 out=2\"   # Pick device id 1 and assign stereo playback" << std::endl;
 		std::cout << "  --audio 'dev=\"HDA Intel\" mics=blue,red'   # HDA Intel with two mics" << std::endl;
 		std::cout << "  --audio 'dev=pulse out=2 mics=blue'       # PulseAudio with input and output" << std::endl;
+		// Give audio a little time to shutdown but then just quit
+		boost::thread audiokiller(boost::bind(&Audio::close, boost::ref(audio)));
+		if (!audiokiller.timed_join(boost::posix_time::milliseconds(2000)))
+			std::cout << "Audio hung." << std::endl;
 		return EXIT_SUCCESS;
 	}
 	// Override XML config for options that were specified from commandline or performous.conf
