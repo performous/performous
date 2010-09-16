@@ -55,6 +55,8 @@ class ScreenManager: public Singleton <ScreenManager> {
 
 	/// Draw a loading progress indication
 	void loading(std::string const& message, float progress);
+	/// Draw an error notification and quit
+	void fatalError(std::string const& message);
 	/// Set a message to flash in current screen
 	void flashMessage(std::string const& message, float fadeIn=0.5f, float hold=1.5f, float fadeOut=1.0f);
 	/// Create a new dialog message

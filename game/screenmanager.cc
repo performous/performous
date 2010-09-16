@@ -2,8 +2,10 @@
 #include "fs.hh"
 #include "configuration.hh"
 
+#include <boost/thread.hpp>
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
+#include <cstdlib>
 
 template<> ScreenManager* Singleton<ScreenManager>::ms_Singleton = NULL;
 
@@ -43,6 +45,16 @@ void ScreenManager::loading(std::string const& message, float progress) {
 	m_window.blank();
 	drawNotifications();
 	m_window.swap();
+}
+
+void ScreenManager::fatalError(std::string const& message) {
+	std::cerr << "FATAL ERROR: " << message << std::endl;
+	dialog(message);
+	m_window.blank();
+	drawNotifications();
+	m_window.swap();
+	boost::thread::sleep(now() + 4.0);
+	std::exit(EXIT_FAILURE);
 }
 
 void ScreenManager::flashMessage(std::string const& message, float fadeIn, float hold, float fadeOut) {
