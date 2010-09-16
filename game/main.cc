@@ -115,6 +115,10 @@ void mainLoop(std::string const& songlist) {
 	ScreenManager sm(window);
 	sm.loading(_("Audio..."), 0.1);
 	Audio audio;
+	{ // Print the devices
+		portaudio::AudioDevices ads;
+		std::clog << "audio/info:\n" << ads.dump();
+	}
 	try {
 		sm.loading(_("Launching background loaders..."), 0.4);
 		Backgrounds backgrounds;
@@ -334,6 +338,10 @@ int main(int argc, char** argv) try {
 	}
 	if (vm.count("audiohelp")) {
 		Audio audio;
+		// Print the devices
+		portaudio::AudioDevices ads;
+		std::cout << ads.dump();
+		// Some examples
 		std::cout << "Example --audio parameters" << std::endl;
 		std::cout << "  --audio \"out=2\"         # Pick first working two-channel playback device" << std::endl;
 		std::cout << "  --audio \"dev=1 out=2\"   # Pick device id 1 and assign stereo playback" << std::endl;

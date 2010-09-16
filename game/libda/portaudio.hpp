@@ -55,24 +55,20 @@ namespace portaudio {
 				else devices.push_back(DeviceInfo(info->name, info->maxInputChannels, info->maxOutputChannels));
 			}
 		}
-		/// Print the devices
-		void dump() {
-			std::cout << "PortAudio devices:" << std::endl;
+		/// Get a printable dump of the devices
+		std::string dump() {
+			std::ostringstream oss;
+			oss << "PortAudio devices:" << std::endl;
 			for (unsigned i = 0; i < devices.size(); ++i)
-				std::cout << "  " << i << "   " << devices[i].name << " (" << devices[i].in << " in, " << devices[i].out << " out)" << std::endl;
-			std::cout << std::endl;
+				oss << "  " << i << "   " << devices[i].name << " (" << devices[i].in << " in, " << devices[i].out << " out)" << std::endl;
+			oss << std::endl;
+			return oss.str();
 		}
 		DeviceInfos devices;
 	};
 
 	struct Init {
-		Init()
-		{
-			PORTAUDIO_CHECKED(Pa_Initialize, ());
-			// Print the devices
-			AudioDevices ads;
-			ads.dump();
-		}
+		Init() { PORTAUDIO_CHECKED(Pa_Initialize, ()); }
 		~Init() { std::cout << "Pa_Terminate..."; std::cout.flush(); Pa_Terminate(); std::cout << "ok" << std::endl; }
 	};
 
