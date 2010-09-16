@@ -210,7 +210,7 @@ std::string DanceGraph::getDifficultyString() const {
 
 /// Get a string id for track and difficulty
 std::string DanceGraph::getModeId() const {
-	return m_gamingMode + diffv[m_level] + (m_input.isKeyboard() ? " (kbd)" : "");
+	return m_gamingMode + " - " + diffv[m_level] + (m_input.isKeyboard() ? " (kbd)" : "");
 }
 
 /// Attempt to change the difficulty by a step

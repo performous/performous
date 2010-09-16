@@ -225,7 +225,7 @@ std::string GuitarGraph::getDifficultyString() const {
 
 /// Get a string id for track and difficulty
 std::string GuitarGraph::getModeId() const {
-	return m_track_index->first + diffv[m_level].name
+	return m_track_index->first + " - " + diffv[m_level].name
 		+ (m_drums && m_input.isKeyboard() ? " (kbd)" : "");
 }
 
