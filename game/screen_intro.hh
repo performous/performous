@@ -3,6 +3,7 @@
 #include <boost/scoped_ptr.hpp>
 #include "screen.hh"
 #include "menu.hh"
+#include "animvalue.hh"
 
 class Audio;
 class ThemeIntro;
@@ -28,4 +29,5 @@ class ScreenIntro : public Screen {
 	boost::scoped_ptr<ThemeIntro> theme;
 	Menu m_menu;
 	bool m_first;
+	AnimValue m_selAnim;
 };

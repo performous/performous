@@ -13,6 +13,7 @@ ScreenIntro::ScreenIntro(std::string const& name, Audio& audio): Screen(name), m
 
 void ScreenIntro::enter() {
 	m_audio.playMusic(getThemePath("menu.ogg"), true);
+	m_selAnim = AnimValue(0.0, 10.0);
 	theme.reset(new ThemeIntro());
 	populateMenu();
 	if( m_first ) {
@@ -51,6 +52,7 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 			m_menu.current().value->reset(modifier & KMOD_ALT);
 		else if (key == SDLK_s && modifier & KMOD_CTRL) writeConfig(modifier & KMOD_ALT);
 	}
+	m_selAnim.setTarget(m_menu.curIndex());
 }
 
 void ScreenIntro::draw_menu_options() {
@@ -68,8 +70,12 @@ void ScreenIntro::draw_menu_options() {
 	for (size_t i = start_i, ii = 0; ii < showopts && i < opts.size(); ++i, ++ii) {
 		MenuOption const& opt = opts[i];
 		if (i == m_menu.curIndex()) { // Selection
-			theme->back_h.dimensions.left(x - sel_margin).center(start_y+0.003 + ii*0.08);
+			// Animate highlight moving
+			double selanim = m_selAnim.get() - start_i;
+			if (selanim < 0) selanim = 0;
+			theme->back_h.dimensions.left(x - sel_margin).center(start_y+0.003 + selanim*0.08);
 			theme->back_h.draw();
+			// Draw the text, dim if option not available
 			theme->option_selected.dimensions.left(x).center(start_y + ii*0.08);
 			theme->option_selected.draw(opt.getName(), opt.isActive() ? 1.0f : 0.5f);
 			wcounter = std::max(wcounter, theme->option_selected.w() + 2 * sel_margin); // Calculate the widest entry
