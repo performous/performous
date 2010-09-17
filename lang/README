@@ -1,27 +1,27 @@
-To add new languages:
+Translation guide
+=================
 
-Download POEdit (http://www.poedit.net/)
+We recommend using POEdit (http://www.poedit.net/)
+For Windows, download it from the website.
+Most Linux distros have it in their repositories.
 
-Creating the catalog
---------------------
-   1. Start POEdit
-   2. Click File -> New Catalog
-   3. Enter a project name (performous)
-   4. Click the Paths tab at the top
-   5. Click the New Item icon (second one, looks like a little square)
-   6. Enter the path to the directory containing your plug-in file ("." tells POEdit to scan the directory that you will save the file to, usually only need to include ../game and ../data), press enter
-   7. Click the Keywords tab at the top
-   8. Click the New Item icon
-   9. Enter _ (that's underscore), press enter
-  12. Click Okay
-  13. Choose a name for your .po file (performous) 
+NOTE: Don't generate the binary .mo files - they are
+      compiled (and installed) with Performous build
 
-REMEMBER TO SAVE WITH YOU LOCALE NAME
+Updating existing translations
+------------------------------
+  1. Open the .po file in POEdit.
+  2. Hit the Synchronize to source button in the toolbar.
+  3. Start translating.
+  4. Remember to save.
 
-Example for English:
-en.po
+NOTES:
+  * Setup your name and email in POEdit preferences if you haven't used it before
+  * Also setup the Performous XML parser as instructed below
+  * POEdit C/C++ parser might not recognize .hh extension by default, so add that:
+    Edit -> Preferences -> Parsers -> C/C++ -> Edit -> List of extensions
 
-Configuring the performous XML parser
+Configuring the Performous XML parser
 -------------------------------------
 These steps enable translation of the XML locate bits.
   1. Click Edit -> Preferences
@@ -36,6 +36,30 @@ These steps enable translation of the XML locate bits.
      Where $SOURCE_ROOT is the path to the performous sources root.
   4. Click Okay
 
+Creating a new catalog
+----------------------
+These are the steps to create a new catalog, but easiest
+is probably just copy one of the existing ones and start
+from there (in which case you can skip these steps.)
+
+   1. Start POEdit
+   2. Click File -> New Catalog
+   3. Enter a project name (performous)
+   4. Click the Paths tab at the top
+   5. Click the New Item icon (second one, looks like a little square)
+   6. Enter the path to the directory containing your plug-in file ("." tells POEdit to scan the directory that you will save the file to, usually only need to include ../game and ../data), press enter
+   7. Click the Keywords tab at the top
+   8. Click the New Item icon
+   9. Enter _ (that's underscore), press enter
+  12. Click Okay
+  13. Choose a name for your .po file (performous) 
+  14. Follow the instructions above to enable XML translation
+
+REMEMBER TO SAVE WITH YOU LOCALE NAME
+
+Example for English:
+en.po
+
 Acknowledgements
---------------
+----------------
 Thanks to guide at http://codex.wordpress.org/User:Skippy/Creating_POT_Files
