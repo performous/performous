@@ -736,9 +736,9 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 			if(!devices.find(joy_id)->second.assigned()) return false;
 			if (_e.jaxis.axis == 5 || _e.jaxis.axis == 6 || _e.jaxis.axis == 1) {
 				event.type = input::Event::PICK;
-			} else if (_e.jaxis.axis == 2 || (devices.find(joy_id)->second.name() == "GUITAR_ROCKBAND_XB360" && _e.jaxis.axis == 4)) {
+			} else if (_e.jaxis.axis == 2 || (devices.find(joy_id)->second.name() == "GUITAR_ROCKBAND_XBOX360" && _e.jaxis.axis == 4)) {
 				// nothing to do here
-			} else if (devices.find(joy_id)->second.name() == "DRUMS_ROCKBAND_XB360" && _e.jaxis.axis == 3) { // <= WTF HERE !!!
+			} else if (devices.find(joy_id)->second.name() == "GUITAR_ROCKBAND_XBOX360" && _e.jaxis.axis == 3) { // <= WTF HERE !!!
 				// nothing to do here
 			} else {
 				return false;
@@ -747,7 +747,7 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 				event.pressed[i] = devices.find(joy_id)->second.pressed(i);
 			}
 			// XBox RB guitar's Tilt sensor
-			if (devices.find(joy_id)->second.name() == "DRUMS_ROCKBAND_XB360" && _e.jaxis.axis == 3) {
+			if (devices.find(joy_id)->second.name() == "GUITAR_ROCKBAND_XBOX360" && _e.jaxis.axis == 3) {
 				event.button = input::GODMODE_BUTTON;
 				if (_e.jaxis.value < -2) {
 					event.type = input::Event::PRESS;
@@ -758,7 +758,7 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 				}
 				devices.find(joy_id)->second.addEvent(event);
 				break;
-			} else if (_e.jaxis.axis == 2 || (devices.find(joy_id)->second.name() == "GUITAR_ROCKBAND_XB360" && _e.jaxis.axis == 4)) {
+			} else if (_e.jaxis.axis == 2 || (devices.find(joy_id)->second.name() == "GUITAR_ROCKBAND_XBOX360" && _e.jaxis.axis == 4)) {
 				event.button = input::WHAMMY_BUTTON;
 				if (_e.jaxis.value > 0) {
 					event.type = input::Event::PRESS;
