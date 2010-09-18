@@ -30,7 +30,7 @@ namespace {
 
 Pak::Pak(std::string const& filename) {
 	std::ifstream f(filename.c_str(), std::ios::binary);
-	if (!f.is_open()) throw std::runtime_error("Could not open PAK file");
+	if (!f.is_open()) throw std::runtime_error("Could not open PAK file " + filename);
 	f.exceptions(std::ios::failbit);
 	bool enable_crc;
 	{

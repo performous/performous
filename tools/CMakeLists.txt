@@ -54,6 +54,10 @@ if (Boost_FOUND)
 	target_link_libraries(ss_pak_extract ${Boost_LIBRARIES})
 	set(targets ${targets} ss_pak_extract)
 
+	add_executable(ss_archive_extract archive_extract.cpp)
+	target_link_libraries(ss_archive_extract ${Boost_LIBRARIES})
+	set(targets ${targets} ss_archive_extract)
+
 	if (Z_FOUND)
 		add_executable(itg_pck itg_pck.cc)
 		target_link_libraries(itg_pck ${Boost_LIBRARIES} ${Z_LIBRARIES})
