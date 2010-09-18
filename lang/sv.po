@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-09-17 16:03+0100\n"
-"PO-Revision-Date: 2010-09-17 16:58+0100\n"
+"PO-Revision-Date: 2010-09-18 13:13+0100\n"
 "Last-Translator: Fredrik Klasson <scientica@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -61,7 +61,7 @@ msgid ""
 "Please configure some before playing."
 msgstr ""
 "\n"
-"Vänligen konfigurera något för spel."
+"Var god och konfigurera något innan du spelar."
 
 # add "ESC returns" to it?
 #: ../game/screen_intro.cc:115
@@ -151,11 +151,11 @@ msgstr "Laddar tema..."
 
 #: ../game/screen_sing.cc:39
 msgid "Loading song..."
-msgstr "Laddar låt/sång..."
+msgstr "Laddar låt..."
 
 #: ../game/screen_sing.cc:45
 msgid "Song is broken!"
-msgstr "Låten/Sången år trasig!"
+msgstr "Låten år trasig!"
 
 #: ../game/screen_sing.cc:50
 msgid "Loading background..."
@@ -198,11 +198,14 @@ msgstr "Tillbaks till uppträdande"
 msgid "Restart"
 msgstr "Börja om"
 
+# start <-> restart?
 #: ../game/screen_sing.cc:120
 msgid ""
 "Start the song\n"
 "from the beginning"
 msgstr ""
+"Börja låten\n"
+"från början"
 
 # låt/sång
 #: ../game/screen_sing.cc:121
@@ -215,12 +218,13 @@ msgstr "Slutför..."
 
 #: ../game/screen_sing.cc:130
 msgid "Song contains broken tracks!"
-msgstr "Låten/Sången innehåller trasiga spår!"
+msgstr "Låten innehåller trasiga spår!"
 
-# ...
+# skippa/hoppa över
+# ... instrumentalt mellanspel ...
 #: ../game/screen_sing.cc:459
 msgid "   ENTER to skip instrumental break"
-msgstr "   tryck ENTER för att skippa/hoppa över instrumentaliskt mellanspel"
+msgstr "   tryck ENTER för att skippa instrumentalt mellanspel"
 
 # gradering eller betygsättning?
 #: ../game/screen_sing.cc:460
@@ -278,9 +282,10 @@ msgstr "Virtuos"
 msgid "Rocker"
 msgstr "Rockare"
 
+# items -> players?
 #: ../game/database.cc:107
 msgid "No Items up to now."
-msgstr ""
+msgstr "Inga spelare ännu."
 
 #: ../game/database.cc:108
 msgid "Be the first to be listed here!"
@@ -292,7 +297,7 @@ msgstr "slumpmässig ordning"
 
 #: ../game/songs.cc:200
 msgid "sorted by song"
-msgstr "sorterat efter låt/sång"
+msgstr "sorterat efter låt"
 
 #: ../game/songs.cc:201
 msgid "sorted by artist"
@@ -460,20 +465,21 @@ msgstr "Sök text:"
 
 #: ../game/screen_songs.cc:196
 msgid "No songs found!"
-msgstr "Inga låtar/sånger funna"
+msgstr "Inga låtar funna"
 
 # gratis eller fria?
+# (tysk översättning ger freie)
 #: ../game/screen_songs.cc:197
 msgid ""
 "Visit performous.org\n"
 "for free songs"
 msgstr ""
 "Besök performous,org\n"
-"för gratis/fria låtar/sånger"
+"för fria låtar"
 
 #: ../game/screen_songs.cc:199
 msgid "no songs match search"
-msgstr "inga låtar/sånger matchar sökningen"
+msgstr "inga låtar matchar sökningen"
 
 # ...
 #: ../game/screen_songs.cc:207
@@ -655,7 +661,7 @@ msgstr "Webkamera bakgrund"
 
 #: /tmp/.private/frekla/xml2gettext.p052kkZhHw.c:35
 msgid "Performous can try to use webcam as a background video. You can disable it if it annoys you."
-msgstr ""
+msgstr "Performous kan försöka använda web-kameran som bakgrundsvideo. Du kan stänga av detta om det stör dig."
 
 #: /tmp/.private/frekla/xml2gettext.p052kkZhHw.c:36
 msgid "Webcam id"
