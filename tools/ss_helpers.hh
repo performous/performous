@@ -33,6 +33,7 @@ Glib::ustring prettyEdition(Glib::ustring str) {
 	if (str == "SingStar '80s") return "SingStar 80s";
 	if (str == "SingStar Schlager") return "SingStar Svenska Hits Schlager";
 	if (str == "SingStar Suomi Rock") return "SingStar SuomiRock";
+	if (str == "SS SuomiHitit") return "SingStar SuomiHitit";
 	return str;
 }
 
