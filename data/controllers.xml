@@ -137,7 +137,7 @@
 	</controller>
 	<controller type="drumkit" name="DRUMS_ROCKBAND_XBOX360">
 		<description>RockBand XBox drum kit</description>
-		<regexp match="Harmonix Drum [Kk]it for Xbox" />
+		<regexp match="Harmonix Drum [Kk]it for Xbox|Harmonix Rock Band Drumkit" />
 		<mapping>
 			<button id="0" value="green" />
 			<button id="1" value="red" />
