@@ -11,14 +11,11 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
-#include <libxml++/libxml++.h>
-
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
 
 #include "chc_decode.hh"
-#include "pak.h"
 #include "ss_cover.hh"
 
 #include "ss_helpers.hh"
@@ -40,8 +37,6 @@ std::string dvdPath;
 std::ofstream txtfile;
 int ts = 0;
 int sleepts = -1;
-xmlpp::Node::PrefixNsMap nsmap;
-std::string ns;
 const bool video = true;
 const bool mkvcompress = false;
 const bool oggcompress = true;
@@ -71,7 +66,11 @@ void parseNote(xmlpp::Node* node) {
 
 void parseSentence(xmlpp::Node* node) {
 	xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(*node);
-	xmlpp::NodeSet n = elem.find(ns + "NOTE", nsmap);
+	// FIXME: Get rid of this or use SSDom's find
+	xmlpp::Node::PrefixNsMap nsmap;
+	nsmap["ss"] = "http://www.singstargame.com";
+	xmlpp::NodeSet n = elem.find("ss:NOTE", nsmap);
+	if (n.empty()) n = elem.find("NOTE");
 	if (sleepts != -1) sleepts = ts;
 	std::for_each(n.begin(), n.end(), parseNote);
 }
@@ -117,30 +116,11 @@ void saveTxtFile(xmlpp::NodeSet &sentence, const fs::path &path, const Song &son
 	txtfile.close();
 }
 
+ChcDecode chc_decoder;
+
 struct Process {
 	Pak const& pak;
-	ChcDecode chc_decoder;
-	Process(Pak const& p): pak(p) {
-		Pak::files_t::const_iterator it = std::find_if(pak.files().begin(), pak.files().end(), Match("export/config",".xml"));
-		if (it != pak.files().end()) {
-			xmlpp::DomParser dom;
-			dom.set_substitute_entities();
-			{
-				std::vector<char> tmp;
-				it->second.get(tmp);
-				std::string buf = xmlFix(tmp);
-				buf = Glib::convert(buf, "UTF-8", "ISO-8859-1"); // Convert to UTF-8
-				dom.parse_memory(buf);
-			}
-			std::string keys[4];
-			char const* xpath[] = { "/ss:CONFIG/ss:PRODUCT_NAME", "/ss:CONFIG/ss:PRODUCT_CODE", "/ss:CONFIG/ss:TERRITORY", "/ss:CONFIG/ss:DEFAULT_LANG" };
-			for (int i = 0; i < 4; ++i) {
-				xmlpp::NodeSet n = dom.get_document()->get_root_node()->find(xpath[i], nsmap);
-				if(!n.empty()) keys[i] = dynamic_cast<xmlpp::Element&>(*n[0]).get_child_text()->get_content();
-			}
-			chc_decoder.load(keys);
-		}
-	}
+	Process(Pak const& p): pak(p) {}
 	void operator()(std::pair<std::string const, Song>& songpair) {
 		fs::path remove;
 		try {
@@ -149,39 +129,28 @@ struct Process {
 			std::cerr << "\n[" << id << "] " << song.artist << " - " << song.title << std::endl;
 			fs::path path = safename(song.edition);
 			path /= safename(song.artist + " - " + song.title);
-			xmlpp::DomParser dom;
-			dom.set_substitute_entities();
+			SSDom dom;
 			{
 				std::vector<char> tmp;
 				Pak::files_t::const_iterator it = std::find_if(pak.files().begin(), pak.files().end(), Match("export/" + id + "/melody", ".xml"));
-				std::string buf;
 				if (it == pak.files().end()) {
-					Pak::files_t::const_iterator it2 = std::find_if(pak.files().begin(), pak.files().end(), Match("export/melodies_10", ".chc"));
-					if (it2 == pak.files().end()) throw std::runtime_error("Melody XML not found");
-					it2->second.get(tmp);
-					buf = chc_decoder.getMelody(&tmp[0], tmp.size(), boost::lexical_cast<unsigned int>(id));
+					it = std::find_if(pak.files().begin(), pak.files().end(), Match("export/melodies_10", ".chc"));
+					if (it == pak.files().end()) throw std::runtime_error("Melody XML not found");
+					it->second.get(tmp);
+					dom.load(chc_decoder.getMelody(&tmp[0], tmp.size(), boost::lexical_cast<unsigned int>(id)));
 				} else {
 					it->second.get(tmp);
-					buf = xmlFix(tmp);
-				}
-				bool succeeded = false;
-				try {
-					dom.parse_memory(buf);
-					succeeded = true;
-				} catch (...) {}
-				if (!succeeded) {
-					buf = Glib::convert(buf, "UTF-8", "ISO-8859-1"); // Convert to UTF-8
-					dom.parse_memory(buf);
+					dom.load(xmlFix(tmp));
 				}
 			}
 			if (song.tempo == 0.0) {
-				xmlpp::NodeSet n = dom.get_document()->get_root_node()->find("/" + ns + "MELODY", nsmap);
-				if (n.empty()) n = dom.get_document()->get_root_node()->find("/MELODY");
-				if (n.empty()) throw std::runtime_error("Unable to find BPM info anywhere");
+				xmlpp::NodeSet n;
+				dom.find("/ss:MELODY", n) || dom.find("/MELODY", n);
+				if (n.empty()) throw std::runtime_error("Unable to find BPM info");
 				xmlpp::Element& e = dynamic_cast<xmlpp::Element&>(*n[0]);
 				std::string res = e.get_attribute("Resolution")->get_value();
-				song.tempo = atof(e.get_attribute("Tempo")->get_value().c_str());
-				if (res == "Semiquaver") void();
+				song.tempo = boost::lexical_cast<double>(e.get_attribute("Tempo")->get_value().c_str());
+				if (res == "Semiquaver") {}
 				else if (res == "Demisemiquaver") song.tempo *= 2.0;
 				else throw std::runtime_error("Unknown tempo resolution: " + res);
 			}
@@ -193,12 +162,7 @@ struct Process {
 			try {
 				music(song, dataPak[id + "/music.mib"], pak["export/" + id + "/music.mih"], path);
 			} catch (...) {
-				std::cerr << "  >>> European DVD failed, trying American (WIP)" << std::endl;
-				try {
-					music_us(song, dataPak[id + "/mus+vid.iav"], dataPak[id + "/mus+vid.ind"], path);
-				} catch (...) {
-					throw std::runtime_error("Unable to find any audio");
-				}
+				music_us(song, dataPak[id + "/mus+vid.iav"], dataPak[id + "/mus+vid.ind"], path);
 			}
 			std::cerr << ">>> Extracting cover image" << std::endl;
 			try {
@@ -255,24 +219,22 @@ struct Process {
 					}
 				}
 			}
+
 			std::cerr << ">>> Extracting lyrics" << std::endl;
-			xmlpp::NodeSet sentences = dom.get_document()->get_root_node()->find("/" + ns + "MELODY/" + ns + "SENTENCE", nsmap);
-			if(!sentences.empty()) {
+			xmlpp::NodeSet sentences;
+			if(dom.find("/ss:MELODY/ss:SENTENCE", sentences)) {
 				// Sentences not inside tracks (normal songs)
 				std::cerr << "  >>> Solo track" << std::endl;
 				saveTxtFile(sentences, path, song);
 			} else {
-				xmlpp::NodeSet tracks = dom.get_document()->get_root_node()->find("/" + ns + "MELODY/" + ns + "TRACK", nsmap);
-				if( !tracks.empty()) {
-					for( xmlpp::NodeSet::iterator it = tracks.begin() ; it != tracks.end() ; ++it ) {
-						xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**it);
-						std::string singer = elem.get_attribute("Artist")->get_value();
-						std::cerr << "  >>> Track from " << singer << std::endl;
-						sentences = dom.get_document()->get_root_node()->find((*it)->get_path() + "/" + ns + "SENTENCE", nsmap);
-						saveTxtFile(sentences, path, song, singer);
-					}
-				} else {
-					throw std::runtime_error("Unable to find any sentences in melody XML");
+				xmlpp::NodeSet tracks;
+				if (!dom.find("/ss:MELODY/ss:TRACK", tracks)) throw std::runtime_error("Unable to find any sentences in melody XML");
+				for (xmlpp::NodeSet::iterator it = tracks.begin(); it != tracks.end(); ++it ) {
+					xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**it);
+					std::string singer = elem.get_attribute("Artist")->get_value();
+					std::cerr << "  >>> Track from " << singer << std::endl;
+					dom.find(elem, "ss:SENTENCE", sentences);
+					saveTxtFile(sentences, path, song, singer);
 				}
 			}
 		} catch (std::exception& e) {
@@ -324,68 +286,55 @@ void get_node(const xmlpp::Node* node, std::string& genre, std::string& year)
 	}
 }
 
-struct SSDom: public xmlpp::DomParser {
-	std::string ns;
-	SSDom(PakFile const& file) {
-		set_substitute_entities();
-		std::vector<char> tmp;
-		file.get(tmp);
-		std::string buf = xmlFix(tmp);
-		disableXMLLogger();
-		try {
-			parse_memory(buf);
-		} catch (...) {
-			enableXMLLogger();
-			buf = Glib::convert(buf, "UTF-8", "ISO-8859-1"); // Convert to UTF-8
-			parse_memory(buf);
-		}
-		enableXMLLogger();
-	}
-};
-
 struct FindSongs {
 	std::string edition;
+	std::string language;
 	std::map<std::string, Song> songs;
-	FindSongs(std::string const& search = ""): m_search(search) {
-	}
+	FindSongs(std::string const& search = ""): m_search(search) {}
 	void operator()(Pak::files_t::value_type const& p) {
 		std::string name = p.first;
 		if (name.substr(0, 17) == "export/config.xml"){
 			SSDom dom(p.second);  // Read config XML
-			xmlpp::NodeSet n;
-			// Get the singstar edition (game name)
-			char const* xpaths[] = { "/CONFIG/PRODUCT_NAME", "/CONFIG/PRODUCT_DESC", "/ss:CONFIG/ss:PRODUCT_NAME", "/ss:CONFIG/ss:PRODUCT_DESC" };
-			for (int i = 0; i < 4; ++i) {
-				n = dom.get_document()->get_root_node()->find(xpaths[i], nsmap);
-				ns = (i < 2 ? "" : "ss:");
-				if (!n.empty()) break;
-			}
-			edition = n.empty() ? "Other" : dynamic_cast<xmlpp::Element&>(*n[0]).get_child_text()->get_content();
+			// Load decryption keys required for some SingStar games (since 2009 or so)
+			std::string keys[4];
+			dom.getValue("/ss:CONFIG/ss:PRODUCT_NAME", keys[0]);
+			dom.getValue("/ss:CONFIG/ss:PRODUCT_CODE", keys[1]);
+			dom.getValue("/ss:CONFIG/ss:TERRITORY", keys[2]);
+			dom.getValue("/ss:CONFIG/ss:DEFAULT_LANG", keys[3]);
+			chc_decoder.load(keys);
+			// Get the singstar edition, use PRODUCT_NAME as fallback for SS Original and SS Party
+			if (!dom.getValue("/ss:CONFIG/ss:PRODUCT_DESC", edition)) edition = keys[0];
+			if (edition.empty()) throw std::runtime_error("No PRODUCT_DESC or PRODUCT_NAME found");
+			edition = prettyEdition(edition);
+			std::cout << "### " << edition << std::endl;
+			// Get language if available
+			language = keys[3];
 		}
+
 		if (name.substr(0, 12) != "export/songs" || name.substr(name.size() - 4) != ".xml") return;
 		SSDom dom(p.second);  // Read song XML
 
-		xmlpp::NodeSet n = dom.get_document()->get_root_node()->find("/SONG_SET/SONG");
-		if (n.empty()) {
-			ns = "ss:";
-			n = dom.get_document()->get_root_node()->find("/ss:SONG_SET/ss:SONG", nsmap);
-		}
+
+		xmlpp::NodeSet n;
+		dom.find("/ss:SONG_SET/ss:SONG", n);
 		Song s;
 		s.dataPakName = dvdPath + "/pak_iop" + name[name.size() - 5] + ".pak";
+		s.edition = edition;
 		for (xmlpp::NodeSet::const_iterator it = n.begin(), end = n.end(); it != end; ++it) {
+			// Extract song info
 			xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**it);
 			s.title = elem.get_attribute("TITLE")->get_value();
 			s.artist = elem.get_attribute("PERFORMANCE_NAME")->get_value();
 			if (!m_search.empty() && m_search != elem.get_attribute("ID")->get_value() && (s.artist + " - " + s.title).find(m_search) == std::string::npos) continue;
 			xmlpp::Node const* node = dynamic_cast<xmlpp::Node const*>(*it);
 			get_node(node, s.genre, s.year); // get the values for genre and year
-
-			xmlpp::NodeSet fr = elem.find(ns + "VIDEO/@FRAME_RATE", nsmap);
-			if (fr.empty()) s.pal = true; // PAL if no framerate is found
-			else s.pal = (atof(dynamic_cast<xmlpp::Attribute&>(*fr[0]).get_value().c_str()) == 25.0);
-
-			s.edition = prettyEdition(edition);
-
+			// Get video FPS
+			double fps = 25.0;
+			xmlpp::NodeSet fr;
+			if (dom.find(elem, "ss:VIDEO/@FRAME_RATE", fr))
+			  fps = boost::lexical_cast<double>(dynamic_cast<xmlpp::Attribute&>(*fr[0]).get_value().c_str());
+			if (fps == 25.0) s.pal = true;
+			// Store song info to songs container
 			songs[elem.get_attribute("ID")->get_value()] = s;
 		}
 	}
@@ -434,7 +383,6 @@ int main( int argc, char **argv) {
 		} else std::cerr << "No Singstar DVD found. Enter a path to a folder with pack_ee.pak in it." << std::endl;
 		return EXIT_FAILURE;
 	}
-	nsmap["ss"] = "http://www.singstargame.com";
 	Pak p(pack_ee);
 	FindSongs f = std::for_each(p.files().begin(), p.files().end(), FindSongs(song));
 	std::cerr << f.songs.size() << " songs found" << std::endl;
