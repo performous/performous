@@ -4,7 +4,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-09-01 16:28+0100\n"
 "PO-Revision-Date: \n"
-"Last-Translator: Fredrik Klasson <scientica@gmail.com>\n"
+"Last-Translator: Phil <4prophy@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -44,7 +44,7 @@ msgstr "Üben"
 
 #: ../game/screen_intro.cc:18
 msgid "Check your skills or test the microphones"
-msgstr "Prüfe deine Fähigkeiten oder teste das Mikrofon"
+msgstr "Teste deine Fähigkeiten - oder das Mikro!"
 
 #: ../game/screen_intro.cc:19
 msgid "Configure"
@@ -52,7 +52,7 @@ msgstr "Konfigurieren"
 
 #: ../game/screen_intro.cc:19
 msgid "Configure game options"
-msgstr "Spiele-Optionen konfigurieren"
+msgstr "Spieloptionen konfigurieren"
 
 #: ../game/screen_intro.cc:20
 #: ../game/screen_sing.cc:116
@@ -65,7 +65,7 @@ msgstr "Spiel verlassen"
 
 #: ../game/screen_intro.cc:23
 msgid "No playback devices could be used.\n"
-msgstr "Kann keine Abspielgeräte benutzen.\n"
+msgstr "Kann keine Wiedergabegeräte benutzen.\n"
 
 #: ../game/screen_intro.cc:24
 msgid ""
@@ -73,50 +73,49 @@ msgid ""
 "Please configure some before playing."
 msgstr ""
 "\n"
-"Du musst zuerst die Ein- und Ausgabegerate konfigurieren, bevor du spielst."
+"Du musst zuerst die Ein- und Ausgabegeräte konfigurieren, bevor du spielst."
 
 #: ../game/screen_sing.cc:36
 msgid "Loading song..."
-msgstr ""
+msgstr "Lade Song ..."
 
 #: ../game/screen_sing.cc:45
 msgid "Song is broken!"
-msgstr ""
+msgstr "Der Song ist fehlerhaft!"
 
 #: ../game/screen_sing.cc:50
 msgid "Song contains broken tracks!"
-msgstr ""
+msgstr "Der Song enthält fehlerhafte Tonspuren!"
 
 #: ../game/screen_sing.cc:114
 msgid "Resume"
-msgstr ""
+msgstr "Weiter machen"
 
 #: ../game/screen_sing.cc:114
-#, fuzzy
 msgid "Back to performing!"
-msgstr "Starte deinen Auftritt!"
+msgstr "Zurück zu deinem Auftritt!"
 
 #: ../game/screen_sing.cc:115
 msgid "Restart"
-msgstr ""
+msgstr "Neustarten"
 
 #: ../game/screen_sing.cc:115
 msgid ""
 "Start the song\n"
 "from the beginning"
-msgstr ""
+msgstr "Den Song von Neuem beginnen"
 
 #: ../game/screen_sing.cc:116
 msgid "Exit to song browser"
-msgstr ""
+msgstr "Zurück zum Songbrowser."
 
 #: ../game/screen_sing.cc:450
 msgid "   ENTER to skip instrumental break"
-msgstr "ENTER um "
+msgstr "ENTER um Vorbereitung abzubrechen"
 
 #: ../game/screen_sing.cc:451
 msgid "   Remember to wait for grading!"
-msgstr "Nicht auf die Beurteilung vergessen"
+msgstr "Bitte Warte auf die Bewertung!"
 
 #: ../game/screen_sing.cc:587
 msgid "No player!"
@@ -169,15 +168,15 @@ msgstr "Rocker"
 
 #: ../game/database.cc:107
 msgid "No Items up to now."
-msgstr ""
+msgstr "Hier steht noch nichts."
 
 #: ../game/database.cc:108
 msgid "Be the first to be listed here!"
-msgstr ""
+msgstr "Trag dich als Erster in diese Liste ein!"
 
 #: ../game/songs.cc:199
 msgid "random order"
-msgstr "zufällige reihenfolge"
+msgstr "Zufällige Reihenfolge"
 
 #: ../game/songs.cc:200
 msgid "sorted by song"
@@ -205,51 +204,51 @@ msgstr "nach Sprache sortiert"
 
 #: ../game/guitargraph.cc:14
 msgid "Kids"
-msgstr ""
+msgstr "Kinderleicht"
 
 #: ../game/guitargraph.cc:14
 msgid "Easy"
-msgstr ""
+msgstr "Leicht"
 
 #: ../game/guitargraph.cc:14
 msgid "Medium"
-msgstr ""
+msgstr "Medium"
 
 #: ../game/guitargraph.cc:14
 msgid "Hard"
-msgstr ""
+msgstr "Schwer"
 
 #: ../game/guitargraph.cc:14
 msgid "Expert"
-msgstr ""
+msgstr "Experte"
 
 #: ../game/guitargraph.cc:143
 msgid "Ready!"
-msgstr ""
+msgstr "Bereit?!"
 
 #: ../game/guitargraph.cc:155
 msgid "Select track"
-msgstr ""
+msgstr "Titel auswählen"
 
 #: ../game/guitargraph.cc:170
 msgid "Select difficulty"
-msgstr ""
+msgstr "Schwierigkeit auswählen"
 
 #: ../game/guitargraph.cc:173
 msgid "Lefty-mode"
-msgstr ""
+msgstr "Linkshänder"
 
 #: ../game/guitargraph.cc:182
 msgid "ON"
-msgstr ""
+msgstr "AN"
 
 #: ../game/guitargraph.cc:182
 msgid "OFF"
-msgstr ""
+msgstr "AUS"
 
 #: ../game/guitargraph.cc:183
 msgid "Toggle lefty-mode"
-msgstr ""
+msgstr "Modus Linkshänder auswählen"
 
 #: ../game/guitargraph.cc:453
 msgid "Streak!"
@@ -259,23 +258,23 @@ msgstr ""
 msgid ""
 "God Mode\n"
 "Activated!"
-msgstr ""
+msgstr "God Mode aktiviert"
 
 #: ../game/guitargraph.cc:471
 msgid "Mistakes ignored!"
-msgstr ""
+msgstr "Fehler ignoriert!"
 
 #: ../game/guitargraph.cc:1104
 msgid "Drum Fill!"
-msgstr ""
+msgstr "Drummer Einsatz!"
 
 #: ../game/guitargraph.cc:1105
 msgid "God Mode Ready!"
-msgstr ""
+msgstr "God Mode bereit!"
 
 #: ../game/guitargraph.cc:1110
 msgid "Solo!"
-msgstr ""
+msgstr "Solo!"
 
 #: ../game/screen_players.cc:110
 msgid "No players found!"
@@ -283,11 +282,11 @@ msgstr "Keine Spieler gefunden!"
 
 #: ../game/screen_players.cc:111
 msgid "Enter a name to create a new player."
-msgstr "Namen eingeben um neuen Spieler zu erzeugen."
+msgstr "Namen eingeben um neuen Spieler zu erstellen."
 
 #: ../game/screen_players.cc:113
 msgid "Press enter to create player!"
-msgstr "Enter drücken um einen Spieler zu erzeugen!"
+msgstr "Enter drücken um einen Spieler zu erstellen!"
 
 #: ../game/screen_players.cc:120
 msgid "You reached %1% points!"
@@ -295,7 +294,7 @@ msgstr "Du hast %1% punkte erreicht!"
 
 #: ../game/screen_players.cc:121
 msgid "Change player with arrow keys."
-msgstr "Spieler mit Pfeiltasten wechseln."
+msgstr "Du kannst die Spieler mit den Pfeiltasten wechseln"
 
 #: ../game/screen_players.cc:122
 msgid "Name:"
@@ -303,7 +302,7 @@ msgstr "Name:"
 
 #: ../game/screen_players.cc:125
 msgid "Type text to filter or create a new player."
-msgstr "Namen eingeben Spieler zu suchen oder neu anzulegen."
+msgstr "Tippen um Spieler herauszufiltern oder einen Neuen zu erstellen."
 
 #: ../game/screen_players.cc:125
 msgid "Search Text:"
@@ -335,212 +334,213 @@ msgstr "<für Suche tippen>"
 
 #: ../game/screen_songs.cc:213
 msgid "Hisccore for %1%\n"
-msgstr "Punktzahl für %1%\n"
+msgstr "Punkte für %1%\n"
 
 #: ../game/screen_configuration.cc:59
 msgid "Ctrl + S to save, Ctrl + R to reset defaults"
-msgstr ""
+msgstr "Drücke die Kombinationen Strg + S zum Speichern oder Strg + R um die Standardeinstellung wiederherzustellen"
 
 #: ../game/instrumentgraph.cc:41
 msgid "Rejoin"
-msgstr ""
+msgstr "Wieder einsteigen"
 
 #: ../game/instrumentgraph.cc:41
 msgid "Change selections"
-msgstr ""
+msgstr "Auswahl ändern"
 
 #: ../game/dancegraph.cc:18
 msgid "Beginner"
-msgstr ""
+msgstr "Anfänger"
 
 #: ../game/dancegraph.cc:18
 msgid "Challenge"
-msgstr ""
+msgstr "Herausforderung"
 
 #: ../game/dancegraph.cc:260
 msgid "STOP!"
-msgstr ""
+msgstr "STOP!"
 
 #: xml2gettext.YswqkSjt2R.c:2
 msgid "Game"
-msgstr ""
+msgstr "Spiel"
 
 #: xml2gettext.YswqkSjt2R.c:3
 msgid "Gameplay settings."
-msgstr ""
+msgstr "Spieleinstellungen"
 
 #: xml2gettext.YswqkSjt2R.c:4
 msgid "Graphic"
-msgstr ""
+msgstr "Grafik"
 
 #: xml2gettext.YswqkSjt2R.c:5
 msgid "Video and rendering settings."
-msgstr ""
+msgstr "Video- und Rendereinstellungen"
 
 #: xml2gettext.YswqkSjt2R.c:6
 msgid "Audio"
-msgstr ""
+msgstr "Audio"
 
 #: xml2gettext.YswqkSjt2R.c:7
 msgid "Audio-related settings."
-msgstr ""
+msgstr "Audioeinstellungen"
 
 #: xml2gettext.YswqkSjt2R.c:8
 msgid "System"
-msgstr ""
+msgstr "System"
 
 #: xml2gettext.YswqkSjt2R.c:9
 msgid "System paths."
-msgstr ""
+msgstr "Systempfad"
 
 #: xml2gettext.YswqkSjt2R.c:10
 msgid "Karaoke mode"
-msgstr ""
+msgstr "Karaokemodus"
 
 #: xml2gettext.YswqkSjt2R.c:11
+#, fuzzy
 msgid "Hide pitch wave, notes and scoring."
-msgstr ""
+msgstr "Verstecke Pitch Wave, Noten und Punkte."
 
 #: xml2gettext.YswqkSjt2R.c:12
 msgid "Pitch waves"
-msgstr ""
+msgstr "Tonhöhe"
 
 #: xml2gettext.YswqkSjt2R.c:13
+#, fuzzy
 msgid "Enable singing pitch display (when not in karaoke mode)."
-msgstr ""
+msgstr "Aktiviere Gesangsanzeige"
 
 #: xml2gettext.YswqkSjt2R.c:14
 msgid "Theme"
-msgstr ""
+msgstr "Thema"
 
 #: xml2gettext.YswqkSjt2R.c:15
 msgid "Name of the theme to use or absolute path to theme folder."
-msgstr ""
+msgstr "Wähle ein Thema oder nutze den absoluten Pfad zu deinem Themenordner."
 
 #: xml2gettext.YswqkSjt2R.c:16
 msgid "Keyboard as guitar"
-msgstr ""
+msgstr "Tastatur als Gitarre nutzen"
 
 #: xml2gettext.YswqkSjt2R.c:17
 msgid "Enable keyboard as guitar (Frets on Fire mode)."
-msgstr ""
+msgstr "Aktivier Tastatur als Gitarre (\"Frets on Fire\"-Modus)."
 
 #: xml2gettext.YswqkSjt2R.c:18
 msgid "Keyboard as drumkit"
-msgstr ""
+msgstr "Tastatur als Schlagzeug nutzen"
 
 #: xml2gettext.YswqkSjt2R.c:19
 msgid "Enable keyboard as drumkit."
-msgstr ""
+msgstr "Aktiviere Tastatur als Schlagzeug"
 
 #: xml2gettext.YswqkSjt2R.c:20
 msgid "Keyboard as dance pad"
-msgstr ""
+msgstr "Tastatur als Dancepad nutzen"
 
 #: xml2gettext.YswqkSjt2R.c:21
 msgid "Enable keyboard as dance pad."
-msgstr ""
+msgstr "Aktiviere Keyboard als Dancepad"
 
 #: xml2gettext.YswqkSjt2R.c:22
 msgid "Joystick configuration"
-msgstr ""
+msgstr "Eingabegeräte konfigurieren"
 
 #: xml2gettext.YswqkSjt2R.c:23
 msgid "Force joystick to some kind of instrument."
-msgstr ""
+msgstr "Erzwinge Eingabegerät als spezielles Instrument"
 
 #: xml2gettext.YswqkSjt2R.c:24
 msgid "Windowed width"
-msgstr ""
+msgstr "Fensterbreite"
 
 #: xml2gettext.YswqkSjt2R.c:25
 msgid "The width of the window."
-msgstr ""
+msgstr "Breite des Fensters"
 
 #: xml2gettext.YswqkSjt2R.c:26
 msgid "Windowed height"
-msgstr ""
+msgstr "Fensterhöhe"
 
 #: xml2gettext.YswqkSjt2R.c:27
 msgid "The height of the window."
-msgstr ""
+msgstr "Höhe des Fensters"
 
 #: xml2gettext.YswqkSjt2R.c:28
 msgid "Fullscreen mode"
-msgstr ""
+msgstr "Vollbildmodus"
 
 #: xml2gettext.YswqkSjt2R.c:29
 msgid "Enable fullscreen mode on startup."
-msgstr ""
+msgstr "Aktivere Vollbild beim Start"
 
 #: xml2gettext.YswqkSjt2R.c:30
-#, fuzzy
 msgid "Video playback"
-msgstr "Audio-Wiedergabe …"
+msgstr "Video-Wiedergabe …"
 
 #: xml2gettext.YswqkSjt2R.c:31
 msgid "Allows completely disabling background videos. It is recommended to leave this enabled as Performous will still smoothly fade out the video if your computer is not fast enough."
-msgstr ""
+msgstr "Erlaubt es Hintergrundvideos komplett zu deaktivieren. Es ist empfehlenswert dies Option aktiviert zu lassen - Performous wird das Video trotzdem flüssig ausblenden, wenn dein Computer nicht schnell genug ist."
 
 #: xml2gettext.YswqkSjt2R.c:32
 msgid "Webcam background"
-msgstr ""
+msgstr "Webcam als Hintergrund"
 
 #: xml2gettext.YswqkSjt2R.c:33
 msgid "Performous can try to use webcam as a background video. You can disable it if it annoys you."
-msgstr ""
+msgstr "Performous kann deine Webcam für Hintergrundvideos nutzen. Du kannst diese Option deaktivieren, wenn es dir nicht gefällt."
 
 #: xml2gettext.YswqkSjt2R.c:34
 msgid "Webcam id"
-msgstr ""
+msgstr "Webcam ID"
 
 #: xml2gettext.YswqkSjt2R.c:35
 msgid "Use -1 to autodetect or a number starting from 0 to choose specific device."
-msgstr ""
+msgstr "Benutze -1 für Autoerkennung oder wähle eine Zahl für ein spezielles Geräte"
 
 #: xml2gettext.YswqkSjt2R.c:36
 msgid "3D notes"
-msgstr ""
+msgstr "3D Noten"
 
 #: xml2gettext.YswqkSjt2R.c:37
 msgid "Draw instrument notes as 3-dimensional objects. May hurt performance on older hardware."
-msgstr ""
+msgstr "Zeichnet die Noten der Instrumente als dreidimensionale Objekte. Deaktivieren kann auf älterer Hardware die Performance verbessern."
 
 #: xml2gettext.YswqkSjt2R.c:38
 msgid "SVG quality"
-msgstr ""
+msgstr "SVG Grafikqualität"
 
 #: xml2gettext.YswqkSjt2R.c:39
 msgid "Larger numbers cause vector graphics to be rendered in higher resolution. Decrease this to make navigating in menus faster."
-msgstr ""
+msgstr "Bei Hohen Werten rendert Performous Vektorgraphiken in höherer Auflösung. Niedrigere Werte ermöglichen eine schnellere Navigation in den Menüs."
 
 #: xml2gettext.YswqkSjt2R.c:40
 msgid "Text quality"
-msgstr ""
+msgstr "Textqualität"
 
 #: xml2gettext.YswqkSjt2R.c:41
 msgid "Larger numbers cause text to be rendered in higher resolution. Decrease this to make everything a little faster."
-msgstr ""
+msgstr "Bei hohen Werten rendert Performous Texte in höherer Auflösung. Niedrigere Werte erhöhen die allgemeine Performance ein wenig."
 
 #: xml2gettext.YswqkSjt2R.c:42
 msgid "Benchmark mode"
-msgstr ""
+msgstr "Benchmarkmodus"
 
 #: xml2gettext.YswqkSjt2R.c:43
 msgid "Framerate limit of 100 FPS is removed and the game instead renders at full speed. FPS values are printed to console. Please note that the display drivers may still limit the rendering speed to the screen refresh rate."
-msgstr ""
+msgstr "Das Limit für die Bildwiederholrate wird aufgehoben und die maximal möglichen Werte in der Konsole ausgegeben. Bemerkung: Es ist möglich, dass der Grafiktreiber die Geschwindigkeit immer noch auf die Bildwiederholrate des Bildschirms beschränkt."
 
 #: xml2gettext.YswqkSjt2R.c:44
 msgid "Suggested latency"
-msgstr ""
+msgstr "Empfohlene Latenz"
 
 #: xml2gettext.YswqkSjt2R.c:45
 msgid "This is a hint for the audio engine about the desired latency. Set this as low as possible while retaining clear audio playback. Requires restart."
-msgstr ""
+msgstr "Die Audioengine nutzt diesen Wert für die gewünschte Latenz im Spiel. Diese Wert beeinflusst die Audiowiedergabequalität im Spiel. Bemerkung: So niedrig, wie möglich, so hoch wie nötig - Erfordert einen Neustart."
 
 #: xml2gettext.YswqkSjt2R.c:46
 msgid "Audio/video latency"
-msgstr ""
+msgstr "Audio-/Videolatenz"
 
 #: xml2gettext.YswqkSjt2R.c:47
 msgid "Affects all modes. Use negative value if your display input lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal. This should be set so that the notes pass the cursor at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while performing."
@@ -548,73 +548,74 @@ msgstr ""
 
 #: xml2gettext.YswqkSjt2R.c:48
 msgid "Audio round-trip latency"
-msgstr ""
+msgstr "Gesangslatenz"
 
 #: xml2gettext.YswqkSjt2R.c:49
 msgid "Affects singing only. The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. While performing, press Ctrl+S for synth mode and adjust with Ctrl+F3/F4."
-msgstr ""
+msgstr "Betrifft nur den Gesang. Er markiert die Zeit von der Wiedergabe an den Lautsprechern, zum Mikrofon und den gesamten Weg bis zur Aufnahme und Analyse durch Performous. Kann durch während des Spiels direkt durch das betätigen von Strg+S für den Synth-Modus und durch die Tasten Strg+F3/F4 reguliert werden."
 
 #: xml2gettext.YswqkSjt2R.c:50
 msgid "Audio/controller latency"
-msgstr ""
+msgstr "Audio/Controller Latenz"
 
 #: xml2gettext.YswqkSjt2R.c:51
 msgid "Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to adjust while performing."
-msgstr ""
+msgstr "Betrifft nur Instrumente und Tanzpads. So einstellen, dass du die Noten gut nach Gehör spielen kannst. Es ist möglich, diesen Wert während des Spiels mit den Tasten Strg+F5/F6 zu regulieren."
 
 #: xml2gettext.YswqkSjt2R.c:52
 msgid "Audio devices"
-msgstr ""
+msgstr "Wiedergabegeräte"
 
 #: xml2gettext.YswqkSjt2R.c:53
+#, fuzzy
 msgid "Press Enter to configure (TODO: implement)"
-msgstr ""
+msgstr "Bestätige Enter, um dies zu Konfigurieren"
 
 #: xml2gettext.YswqkSjt2R.c:54
 msgid "Menu volume"
-msgstr ""
+msgstr "Menü Lautstärke"
 
 #: xml2gettext.YswqkSjt2R.c:55
 msgid "The volume level of menus, song previews and jukebox mode."
-msgstr ""
+msgstr "Lautstärke in den Menüs, Songpreviews und im Jukeboxmodus"
 
 #: xml2gettext.YswqkSjt2R.c:56
 msgid "Music volume"
-msgstr ""
+msgstr "Musik Lautstärke"
 
 #: xml2gettext.YswqkSjt2R.c:57
 msgid "The ingame music volume. Values above 90 are not recommended as distortion may occur."
-msgstr ""
+msgstr "Lautstärke im Spiel. Werte über 90 sind nicht zu empfehlen aufgrund von Verzerrungen und anderen Störungen."
 
 #: xml2gettext.YswqkSjt2R.c:58
 msgid "Failure volume"
-msgstr ""
+msgstr "Versager Lautstärke"
 
 #: xml2gettext.YswqkSjt2R.c:59
 msgid "The ingame fail sound volume. Values above 90 are not recommended as distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
-msgstr ""
+msgstr "Die Lautstärke der Musik im Falle des Verspielens. Werte über 90 werden nicht empfohlen aufgrund von Verzerrungen und anderen Störungen."
 
 #: xml2gettext.YswqkSjt2R.c:60
 msgid "Hardware MIDI input device"
-msgstr ""
+msgstr "MIDI Eingabegerät"
 
 #: xml2gettext.YswqkSjt2R.c:61
 msgid "Part of sound card name or its number or empty to use the first available device. Used currently for MIDI drum controllers."
-msgstr ""
+msgstr "Teil der Bezeichnung der Soundkarte oder die Nummer oder Freilassen für das erste verfügbare Gerät. Momentan für MIDI Schlagzeug genutzt."
 
 #: xml2gettext.YswqkSjt2R.c:62
 msgid "Song folders"
-msgstr ""
+msgstr "Songordner"
 
 #: xml2gettext.YswqkSjt2R.c:63
 msgid "Where to recursively look for songs. DATADIR at the beginning means all Performous data folders."
-msgstr ""
+msgstr "Dieser Ordner wird (rekursiv, d.h. mit allen Unterordnern) nach Songs durchsucht. Die Verwendung von DATADIR bezeichnet hierbei den Datenordner von Performous"
 
 #: xml2gettext.YswqkSjt2R.c:64
 msgid "Base folders for data"
-msgstr ""
+msgstr "Ordner für Daten"
 
 #: xml2gettext.YswqkSjt2R.c:65
 msgid "System defaults are included automatically. Additional paths can be added here."
-msgstr ""
+msgstr "Standardpfade werden automatisch eingefügt. Hier können Neue hinzugefügt werden."
 
