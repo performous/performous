@@ -188,7 +188,7 @@ struct Process {
 					std::cerr << cmd << std::endl;
 					if (std::system(cmd.c_str()) == 0) { // FIXME: std::system return value is not portable
 						fs::remove(song.vocals);
-						song.music = path / ("vocals.ogg");
+						song.vocals = path / ("vocals.ogg");
 					}
 				}
 			}
