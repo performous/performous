@@ -323,11 +323,19 @@ void GuitarGraph::engine() {
 			// Sync menu items & captions
 			updateJoinMenu();
 			break;
+
+		// If the songs hasn't yet started, we want key presses to bring join menu back (not pause menu)
+		} else if (time < 0 && ev.type == input::Event::PRESS) {
+			setupJoinMenu();
+			m_menu.open();
+			break;
+
 		} else if (!m_input.isKeyboard()) {
 			// Handle Start/Select keypresses
 			if (ev.nav == input::CANCEL) ev.button = input::GODMODE_BUTTON; // Select = GodMode
 			if (ev.nav == input::START) { m_menu.open(); continue; }
 		}
+
 		// Guitar specific actions
 		if (!m_drums) {
 			if ((ev.type == input::Event::PRESS || ev.type == input::Event::RELEASE) && ev.button == input::GODMODE_BUTTON) {

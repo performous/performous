@@ -59,6 +59,7 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 }
 
 void ScreenIntro::draw_menu_options() {
+	// Variables used for positioning and other stuff
 	double wcounter = 0;
 	const size_t showopts = 4; // Show at most 4 options simultaneously
 	const float x = -0.35;
@@ -71,9 +72,13 @@ void ScreenIntro::draw_menu_options() {
 	int start_i = std::min((int)m_menu.curIndex() - 1, (int)opts.size() - (int)showopts
 		+ (m_menu.getSubmenuLevel() == 2 ? 1 : 0)); // Hack to counter side-effects from displaying the value inside the menu
 	if (start_i < 0 || opts.size() == showopts) start_i = 0;
+
+	// Loop the currently visible options
 	for (size_t i = start_i, ii = 0; ii < showopts && i < opts.size(); ++i, ++ii) {
 		MenuOption const& opt = opts[i];
-		if (i == m_menu.curIndex()) { // Selection
+
+		// Selection
+		if (i == m_menu.curIndex()) {
 			// Animate selection higlight moving
 			double selanim = m_selAnim.get() - start_i;
 			if (selanim < 0) selanim = 0;
@@ -89,7 +94,9 @@ void ScreenIntro::draw_menu_options() {
 				theme->option_selected.dimensions.left(x + sel_margin).center(-0.1 + (selanim+1)*0.08);
 				theme->option_selected.draw("<  " + opt.value->getValue() + "  >", submenuanim);
 			}
-		} else { // Regular option (not selected)
+
+		// Regular option (not selected)
+		} else {
 			theme->option.dimensions.left(x).center(start_y + ii*0.08);
 			theme->option.draw(opt.getName(), submenuanim * (opt.isActive() ? 1.0f : 0.5f));
 			wcounter = std::max(wcounter, theme->option.w() + 2 * sel_margin); // Calculate the widest entry
@@ -108,8 +115,8 @@ void ScreenIntro::draw() {
 	theme->comment.draw(m_menu.current().getComment());
 	// Key help for config
 	if (m_menu.getSubmenuLevel() > 0) {
-		theme->short_comment_bg.dimensions.fixedHeight(0.025);
-		theme->short_comment_bg.dimensions.right(-0.04).screenBottom(-0.054);
+		theme->short_comment_bg.dimensions.stretch(theme->short_comment.w() + 0.08, 0.025);
+		theme->short_comment_bg.dimensions.left(-0.54).screenBottom(-0.054);
 		theme->short_comment_bg.draw();
 		theme->short_comment.dimensions.left(-0.48).screenBottom(-0.067);
 		theme->short_comment.draw(_("Ctrl + S to save, Ctrl + R to reset defaults"));
@@ -128,7 +135,7 @@ void ScreenIntro::populateMenu() {
 		MenuOptions audiomenu;
 		MenuOptions gfxmenu;
 		MenuOptions gamemenu;
-		MenuOptions pathsmenu; // Dummy
+		MenuOptions pathsmenu; // FIXME: Dummy (just to get a gray option to the menu)
 		// Populate the submenus
 		for (Config::iterator it = config.begin(); it != config.end(); ++it) {
 			// Skip items that are configured elsewhere
@@ -146,6 +153,7 @@ void ScreenIntro::populateMenu() {
 		configmain.push_back(MenuOption(_("Audio"), _("Configure general audio settings"), audiomenu, "intro_configure.svg"));
 		configmain.push_back(MenuOption(_("Graphics"), _("Configure rendering and video settings"), gfxmenu, "intro_configure.svg"));
 		configmain.push_back(MenuOption(_("Game"), _("Gameplay related options"), gamemenu, "intro_configure.svg"));
+		// FIXME: 'Paths' should open a screen
 		configmain.push_back(MenuOption(_("Paths"), _("Setup song and data paths"), pathsmenu, "intro_configure.svg"));
 		configmain.back().image.reset(new Surface(getThemePath("intro_quit.svg")));
 		// Add to root menu
