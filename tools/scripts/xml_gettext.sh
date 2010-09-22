@@ -98,8 +98,9 @@ shift
 shift
 
 # create the temporary file securely.
-TEMP_SRC=$(mktemp --tmpdir xml2gettext.XXXXXXXXXX).c
-append_temp_src "/* This is a automatically generated temp file, it's safe to remove*/"
+TEMP_SRC="$(mktemp --tmpdir xml2gettext.XXXXXXXXXX)"
+
+append_temp_src "/* This is a automatically generated temp file, it's safe to remove */"
 
 # Start the dirty work
 for file in $* ; do
@@ -107,7 +108,7 @@ for file in $* ; do
 done
 
 # Invoke xgettext, poedit will merge this with the rest of the strings
-xgettext --force-po -L C -o "$POEDIT_FILE" --from-code="$ENC" -k_ "$TEMP_SRC"
+xgettext --force-po --language=C -o "$POEDIT_FILE" --from-code="$ENC" -k_ "$TEMP_SRC"
 RV=$?
 
 # clean up
