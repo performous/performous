@@ -100,10 +100,10 @@ void InstrumentGraph::drawMenu() {
 					txt->dimensions.middle(xx + button_margin - m_button.dimensions.w()*0.5f).center(y);
 					txt->draw(getGraphType() == input::GUITAR ? "2" : "P");
 				} else { // Colored icons for real instruments
-					glColor4fv(color(getGraphType() == input::GUITAR ? 0 : 1));
+					color(getGraphType() == input::GUITAR ? 0 : 1)();
 					m_button.dimensions.middle(x - button_margin).center(y);
 					m_button.draw();
-					glColor4fv(color(getGraphType() == input::GUITAR ? 1 : 4));
+					color(getGraphType() == input::GUITAR ? 1 : 4)();
 					m_button.dimensions.middle(xx + button_margin);
 					m_button.draw();
 				}
@@ -114,7 +114,7 @@ void InstrumentGraph::drawMenu() {
 					txt->dimensions.middle(x - button_margin - m_button.dimensions.w()*0.5f).center(y - step);
 					txt->draw("I");
 				} else { // Colored icons for real instruments
-					glColor4fv(color(2));
+					color(2)();
 					m_button.dimensions.middle(x - button_margin).center(y - step);
 					m_button.draw();
 				}
@@ -125,7 +125,7 @@ void InstrumentGraph::drawMenu() {
 					txt->dimensions.middle(x - button_margin - m_button.dimensions.w()*0.5f).center(y + step);
 					txt->draw("O");
 				} else {
-					glColor4fv(color(3));
+					color(3)();
 					m_button.dimensions.middle(x - button_margin).center(y + step);
 					m_button.draw();
 				}

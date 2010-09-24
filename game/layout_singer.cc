@@ -36,7 +36,7 @@ void LayoutSinger::drawScore(Position position) {
 		float r = p->m_color.r;
 		float g = p->m_color.g;
 		float b = p->m_color.b;
-		glColor4f(r, g, b, act);
+		glutil::Color(r, g, b, act)();
 		m_score_text[i%4]->render((boost::format("%04d") % p->getScore()).str());
 		switch(position) {
 			case LayoutSinger::BOTTOM: // Fullscreen
@@ -65,7 +65,7 @@ void LayoutSinger::drawScore(Position position) {
 			else if (p->m_prevLineScore > 0.8) prevLineRank = "Great";
 			else if (p->m_prevLineScore > 0.6) prevLineRank = "Good";
 			else if (p->m_prevLineScore > 0.4) prevLineRank = "OK";
-			glColor4f(r, g, b, clamp(fact*2.0f));
+			glutil::Color(r, g, b, clamp(fact*2.0f))();
 			m_line_rank_text[i%4]->render(prevLineRank);
 			switch(position) {
 				case LayoutSinger::BOTTOM: // Fullscreen
@@ -81,7 +81,7 @@ void LayoutSinger::drawScore(Position position) {
 			}
 			m_line_rank_text[i%4]->draw();
 		}
-		glColor4f(1.0, 1.0, 1.0, 1.0);
+		glutil::Color::reset();
 	}
 }
 

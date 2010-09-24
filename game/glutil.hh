@@ -5,6 +5,8 @@
 
 #include <GL/glew.h>
 
+#include "color.hh"
+
 namespace glutil {
 	/// wrapper struct for RAII
 	struct PushMatrix {
@@ -67,6 +69,35 @@ namespace glutil {
 		      a; ///< alpha value
 		/// create nec Color object with given channels
 		Color(float r_ = 0.0, float g_ = 0.0, float b_ = 0.0, float a_ = 1.0): r(r_), g(g_), b(b_), a(a_) {}
+		/// create nec Color object from the Color object
+		Color(::Color const& c): r(c.r), g(c.g), b(c.b), a(c.a) {}
+		/// overload float cast
+		operator float*() { return reinterpret_cast<float*>(this); }
+		/// overload float const cast
+		operator float const*() const { return reinterpret_cast<float const*>(this); }
+		/** Apply the color **/
+		void operator()() const { glColor4fv(*this); }
+		/*
+		void operator()() const {
+			GLfloat ColorVect[] = {r, g, b, a};
+			glEnableClientState(GL_COLOR_ARRAY);
+			glColorPointer (4,GL_FLOAT,0,ColorVect);
+			glDisableClientState (GL_COLOR_ARRAY);
+		}
+		*/
+		static void reset() { Color(1.0f, 1.0f, 1.0f)(); }
+	};
+
+	struct ColorRIIA {
+		float r, ///< red component
+		      g, ///< green
+		      b, ///< blue
+		      a; ///< alpha value
+		/// create nec Color object from the Color object
+		ColorRIIA(::Color const& c): r(c.r), g(c.g), b(c.b), a(c.a) {
+			glColor4fv(*this);
+		}
+		~ColorRIIA() { r = g = b = a = 1.0f; glColor4fv(*this); }
 		/// overload float cast
 		operator float*() { return reinterpret_cast<float*>(this); }
 		/// overload float const cast

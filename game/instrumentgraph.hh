@@ -32,7 +32,7 @@ class Popup {
 			float s = 0.2 * (1.0 + anim);
 			float a = 1.0 - anim;
 			m_color.a = a;
-			glColor4fv(m_color);
+			m_color();
 			m_popupText->render(m_msg);
 			m_popupText->dimensions().center(0.1).middle(offsetX).stretch(s,s);
 			m_popupText->draw();

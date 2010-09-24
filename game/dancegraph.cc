@@ -441,7 +441,7 @@ void DanceGraph::draw(double time) {
 		drawBeats(time);
 
 		// Arrows on cursor
-		glColor3f(1.0f, 1.0f, 1.0f);
+		glutil::Color::reset();
 		for (int arrow_i = 0; arrow_i < m_pads; ++arrow_i) {
 			float x = panel2x(arrow_i);
 			float y = time2y(0.0);
@@ -460,7 +460,7 @@ void DanceGraph::draw(double time) {
 		}
 	}
 	drawInfo(time, offsetX, dimensions); // Go draw some texts and other interface stuff
-	glColor3f(1.0f, 1.0f, 1.0f);
+	glutil::Color::reset();
 }
 
 void DanceGraph::drawBeats(double time) {
@@ -504,11 +504,11 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 
 	if (yEnd - yBeg > arrowSize) {
 		// Draw holds
-		glColor4fv(c);
+		c();
 		if (note.isHit && note.releaseTime <= 0) { // The note is being held down
 			yBeg = std::max(time2y(0.0), yBeg);
 			yEnd = std::max(time2y(0.0), yEnd);
-			glColor3f(1.0f, 1.0f, 1.0f);
+			glutil::Color::reset();
 		}
 		if (note.releaseTime > 0) yBeg = time2y(note.releaseTime - time); // Oh noes, it got released!
 		if (yEnd - yBeg > 0) {
@@ -523,21 +523,21 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 		}
 		// Draw begin
 		if (note.isHit && tEnd < 0.1) {
-			glColor4fv(colorGlow(c,glow));
+			colorGlow(c,glow)();
 			s += glow;
 		}
 		drawArrow(arrow_i, m_arrows_hold, x, yBeg, s, 0.0f, 1.0f/3.0f);
 	} else {
 		// Draw short note
 		if (mine) { // Mines need special handling
-			c.a = 1.0 - glow; glColor4fv(c);
+			c.a = 1.0 - glow; c();
 			s = getScale() * 0.8f + glow * 0.5f;
 			float rot = int(time*360 * (note.isHit ? 2.0 : 1.0) ) % 360; // They rotate!
 			if (note.isHit) yBeg = time2y(0.0);
 			drawMine(x, yBeg, rot, s);
 		} else { // Regular arrows
 			s += glow;
-			glColor4fv(colorGlow(c, glow));
+			colorGlow(c, glow)();
 			drawArrow(arrow_i, m_arrows, x, yBeg, s);
 		}
 	}
@@ -551,7 +551,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 			text = note.score ? getRank(note.error) : "FAIL!";
 		}
 		if (!text.empty()) {
-			glColor3f(1.0f, 1.0f, 1.0f);
+			glutil::Color::reset();
 			double sc = getScale() * 1.2 * arrowSize * (1.0 + glow);
 			m_popupText->render(text);
 			m_popupText->dimensions().middle(x).center(time2y(0.0)).stretch(sc, sc/2.0);

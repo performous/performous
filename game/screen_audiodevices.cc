@@ -110,7 +110,7 @@ void ScreenAudioDevices::draw() {
 		// Icons
 		for (size_t i = 0; i < m_mics.size(); ++i) {
 			Surface& srf = (i < m_mics.size()-1) ? *m_mic_icon : *m_pdev_icon;
-			glColor4fv(m_colorMap[m_mics[i].name]);
+			m_colorMap[m_mics[i].name]();
 			srf.dimensions.middle(-xoff + xstep*0.5 + i*xstep).center(-yoff+m_mics[i].dev*ystep);
 			srf.draw();
 			// Selection indicator
@@ -119,7 +119,7 @@ void ScreenAudioDevices::draw() {
 				glutil::Square sq(srf.dimensions.xc(), srf.dimensions.yc(), m_mic_icon->dimensions.w()*0.75);
 		}
 	}
-	glColor3f(1.0f, 1.0f, 1.0f);
+	glutil::Color::reset();
 	// Key help
 	m_theme->comment_bg.dimensions.stretch(1.0, 0.025).middle().screenBottom(-0.054);
 	m_theme->comment_bg.draw();

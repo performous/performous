@@ -169,9 +169,9 @@ bool ScreenSing::instrumentLayout(double time) {
 		}
 	}
 	if (time < -1.0 && count_alive == 0) {
-		glColor4f(1.0f, 1.0f, 1.0f, clamp(-2.0 - 2.0 * time));
+		glutil::Color(1.0f, 1.0f, 1.0f, clamp(-2.0 - 2.0 * time))();
 		m_help->draw();
-		glColor3f(1.0f, 1.0f, 1.0f);
+		glutil::Color::reset();
 	}
 	// Set volume levels (averages of all instruments playing that track)
 	for( std::map<std::string,std::string>::iterator it = m_song->music.begin() ; it != m_song->music.end() ; ++it ) {
@@ -217,9 +217,9 @@ void ScreenSing::danceLayout(double time) {
 		}
 	}
 	if (time < -0.5 && count_alive == 0) {
-		glColor4f(1.0f, 1.0f, 1.0f, clamp(-1.0 - 2.0 * time));
+		glutil::Color(1.0f, 1.0f, 1.0f, clamp(-1.0 - 2.0 * time))();
 		m_help->draw();
-		glColor3f(1.0f, 1.0f, 1.0f);
+		glutil::Color::reset();
 	}
 }
 
@@ -634,7 +634,7 @@ void ScoreWindow::draw() {
 
 	for (Database::cur_scores_t::const_iterator p = m_database.scores.begin(); p != m_database.scores.end(); ++p, ++i) {
 		int score = p->score;
-		glColor4fv(p->color);
+		p->color();
 		double x = -0.12 + spacing * (0.5 + i - 0.5 * m_database.scores.size());
 		m_scoreBar.dimensions.middle(x).bottom(0.20);
 		m_scoreBar.draw(score / 10000.0);
@@ -644,7 +644,6 @@ void ScoreWindow::draw() {
 		m_score_text.render(p->track_simple);
 		m_score_text.dimensions().middle(x).top(0.20).fixedHeight(0.05);
 		m_score_text.draw();
-		glColor3f(1.0f, 1.0f, 1.0f);
 	}
 	m_score_rank.draw(m_rank);
 }
