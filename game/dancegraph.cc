@@ -475,7 +475,7 @@ void DanceGraph::drawBeats(double time) {
 			texCoord -= texCoordStep * (tEnd - future) / (tEnd - tBeg);
 			tEnd = future;
 		}*/
-		glutil::ColorRIIA c(Color(1.0f, 1.0f, 1.0f, time2a(tEnd)));
+		glutil::Color c(Color(1.0f, 1.0f, 1.0f, time2a(tEnd)));
 		glNormal3f(0.0f, 1.0f, 0.0f); glTexCoord2f(0.0f, texCoord); glVertex2f(-w, time2y(tEnd));
 		glNormal3f(0.0f, 1.0f, 0.0f); glTexCoord2f(1.0f, texCoord); glVertex2f(w, time2y(tEnd));
 	}
@@ -509,7 +509,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 		if (note.releaseTime > 0) yBeg = time2y(note.releaseTime - time); // Oh noes, it got released!
 		if (yEnd - yBeg > 0) {
 			UseTexture tblock(m_arrows_hold);
-			glutil::ColorRIIA c(color);
+			glutil::Color c(color);
 			glutil::Begin block(GL_TRIANGLE_STRIP);
 			// Draw end
 			vertexPair(arrow_i, x, yEnd, 1.0f, s);
@@ -524,7 +524,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 			s += glow;
 		}
 		{
-			glutil::ColorRIIA c(color);
+			glutil::Color c(color);
 			drawArrow(arrow_i, m_arrows_hold, x, yBeg, s, 0.0f, 1.0f/3.0f);
 		}
 	} else {
@@ -535,14 +535,14 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 			float rot = int(time*360 * (note.isHit ? 2.0 : 1.0) ) % 360; // They rotate!
 			if (note.isHit) yBeg = time2y(0.0);
 			{
-				glutil::ColorRIIA c(color);
+				glutil::Color c(color);
 				drawMine(x, yBeg, rot, s);
 			}
 		} else { // Regular arrows
 			s += glow;
 			color = colorGlow(color, glow);
 			{
-				glutil::ColorRIIA c(color);
+				glutil::Color c(color);
 				drawArrow(arrow_i, m_arrows, x, yBeg, s);
 			}
 		}
@@ -557,7 +557,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 			text = note.score ? getRank(note.error) : "FAIL!";
 		}
 		if (!text.empty()) {
-			glutil::ColorRIIA c(Color(1.0f, 1.0f, 1.0f));
+			glutil::Color c(Color(1.0f, 1.0f, 1.0f));
 			double sc = getScale() * 1.2 * arrowSize * (1.0 + glow);
 			m_popupText->render(text);
 			m_popupText->dimensions().middle(x).center(time2y(0.0)).stretch(sc, sc/2.0);

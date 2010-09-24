@@ -169,7 +169,7 @@ bool ScreenSing::instrumentLayout(double time) {
 		}
 	}
 	if (time < -1.0 && count_alive == 0) {
-		glutil::ColorRIIA c(Color(1.0f, 1.0f, 1.0f, clamp(-2.0 - 2.0 * time)));
+		glutil::Color c(Color(1.0f, 1.0f, 1.0f, clamp(-2.0 - 2.0 * time)));
 		m_help->draw();
 	}
 	// Set volume levels (averages of all instruments playing that track)
@@ -216,7 +216,7 @@ void ScreenSing::danceLayout(double time) {
 		}
 	}
 	if (time < -0.5 && count_alive == 0) {
-		glutil::ColorRIIA c(Color(1.0f, 1.0f, 1.0f, clamp(-1.0 - 2.0 * time)));
+		glutil::Color c(Color(1.0f, 1.0f, 1.0f, clamp(-1.0 - 2.0 * time)));
 		m_help->draw();
 	}
 }
@@ -632,7 +632,7 @@ void ScoreWindow::draw() {
 
 	for (Database::cur_scores_t::const_iterator p = m_database.scores.begin(); p != m_database.scores.end(); ++p, ++i) {
 		int score = p->score;
-		glutil::ColorRIIA(p->color);
+		glutil::Color(p->color);
 		double x = -0.12 + spacing * (0.5 + i - 0.5 * m_database.scores.size());
 		m_scoreBar.dimensions.middle(x).bottom(0.20);
 		m_scoreBar.draw(score / 10000.0);

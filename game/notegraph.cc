@@ -119,7 +119,7 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 			glTranslatef(centerx, centery, 0.0f);
 			glRotatef(rot, 0.0f, 0.0f, 1.0f);
 			{
-				glutil::ColorRIIA c(Color(it_col->r, it_col->g, it_col->b, it_col->a));
+				glutil::Color c(Color(it_col->r, it_col->g, it_col->b, it_col->a));
 				m_star_hl.draw(Dimensions().stretch(zoom*1.2, zoom*1.2).center().middle(), TexCoords());
 			}
 			m_star.draw(Dimensions().stretch(zoom, zoom).center().middle(), TexCoords());
@@ -135,7 +135,7 @@ void NoteGraph::drawNotes() {
 	if (m_notealpha <= 0.0f) {
 		m_notealpha = 0.0f;
 	} else {
-		glutil::ColorRIIA c(Color(1.0, 1.0, 1.0, m_notealpha));
+		glutil::Color c(Color(1.0, 1.0, 1.0, m_notealpha));
 		m_notelines.draw(Dimensions().stretch(dimensions.w(), (m_max - m_min - 13) * m_noteUnit).middle(dimensions.xc()).center(dimensions.yc()), TexCoords(0.0, (-m_min - 7.0) / 12.0f, 1.0, (-m_max + 6.0) / 12.0f));
 
 		// Draw notes
@@ -168,7 +168,7 @@ void NoteGraph::drawNotes() {
 			double h = -m_noteUnit * 2.0; // height: 0.5 border + 1.0 bar + 0.5 border = 2.0
 			drawNotebar(*t1, x, ybeg, yend, w, h);
 			if (alpha > 0.0) {
-				glutil::ColorRIIA c(Color(1.0f, 1.0f, 1.0f, alpha * m_notealpha));
+				glutil::Color c(Color(1.0f, 1.0f, 1.0f, alpha * m_notealpha));
 				drawNotebar(*t2, x, ybeg, yend, w, h);
 			}
 		}
@@ -227,7 +227,7 @@ void NoteGraph::drawWaves(Database const& database) {
 		double oldval = getNaN();
 		Points points;
 		Notes::const_iterator noteIt = m_vocals.notes.begin();
-		glutil::ColorRIIA c(Color(p->m_color.r, p->m_color.g, p->m_color.b, m_notealpha));
+		glutil::Color c(Color(p->m_color.r, p->m_color.g, p->m_color.b, m_notealpha));
 		for (; idx < endIdx; ++idx, t += Engine::TIMESTEP) {
 			double const freq = pitch[idx].first;
 			// If freq is NaN, we have nothing to process

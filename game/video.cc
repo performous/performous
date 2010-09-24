@@ -26,7 +26,7 @@ void Video::render(double time) {
 			color = Color(1.0f, 1.0f, 1.0f);
 		}
 		{
-			glutil::ColorRIIA c(color);
+			glutil::Color c(color);
 			m_surface.draw();
 		}
 	}

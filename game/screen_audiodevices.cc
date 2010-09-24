@@ -110,7 +110,7 @@ void ScreenAudioDevices::draw() {
 		// Icons
 		for (size_t i = 0; i < m_mics.size(); ++i) {
 			Surface& srf = (i < m_mics.size()-1) ? *m_mic_icon : *m_pdev_icon;
-			glutil::ColorRIIA c(m_colorMap[m_mics[i].name]);
+			glutil::Color c(m_colorMap[m_mics[i].name]);
 			srf.dimensions.middle(-xoff + xstep*0.5 + i*xstep).center(-yoff+m_mics[i].dev*ystep);
 			srf.draw();
 			// Selection indicator

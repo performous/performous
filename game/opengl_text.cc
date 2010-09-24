@@ -250,7 +250,7 @@ void SvgTxtTheme::draw(std::vector<TZoomText> const& _text, float alpha) {
 			dim.fixedWidth(dim.w() * factor);
 		}
 		{
-			glutil::ColorRIIA c(color);
+			glutil::Color c(color);
 			m_opengl_text[i].draw(dim, tex);
 		}
 		position_x += syllable_width;
