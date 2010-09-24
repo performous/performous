@@ -257,7 +257,7 @@ void DanceGraph::engine() {
 		if (time < it->first + it->second) {  // Inside stop
 			time = it->first;
 			if (!m_insideStop) {
-				m_popups.push_back(Popup(_("STOP!"),  glutil::Color(1.0f, 0.8f, 0.0), 2.0, m_popupText.get()));
+				m_popups.push_back(Popup(_("STOP!"),  Color(1.0f, 0.8f, 0.0), 2.0, m_popupText.get()));
 				m_insideStop = true;
 			}
 			outsideStop = false;
@@ -333,7 +333,7 @@ void DanceGraph::engine() {
 	if (m_streak >= getNextBigStreak(m_bigStreak)) {
 		m_bigStreak = getNextBigStreak(m_bigStreak);
 		m_popups.push_back(Popup(boost::lexical_cast<std::string>(unsigned(m_bigStreak)) + "\n" + _("Streak!"),
-		  glutil::Color(1.0f, 0.0, 0.0), 1.0, m_popupText.get()));
+		  Color(1.0f, 0.0, 0.0), 1.0, m_popupText.get()));
 	}
 }
 
@@ -383,7 +383,7 @@ namespace {
 		glTexCoord2f((arrow_i+1) * one_arrow_tex_w, ty); glVertex2f(x + arrowSize * scale, y);
 	}
 
-	glutil::Color& colorGlow(glutil::Color& c, double glow) {
+	Color& colorGlow(Color& c, double glow) {
 		//c.a = std::sqrt(1.0 - glow);
 		c.a = 1.0 - glow;
 		c.r += glow *.5;
@@ -441,7 +441,6 @@ void DanceGraph::draw(double time) {
 		drawBeats(time);
 
 		// Arrows on cursor
-		glutil::Color::reset();
 		for (int arrow_i = 0; arrow_i < m_pads; ++arrow_i) {
 			float x = panel2x(arrow_i);
 			float y = time2y(0.0);
@@ -460,7 +459,6 @@ void DanceGraph::draw(double time) {
 		}
 	}
 	drawInfo(time, offsetX, dimensions); // Go draw some texts and other interface stuff
-	glutil::Color::reset();
 }
 
 void DanceGraph::drawBeats(double time) {
@@ -477,7 +475,7 @@ void DanceGraph::drawBeats(double time) {
 			texCoord -= texCoordStep * (tEnd - future) / (tEnd - tBeg);
 			tEnd = future;
 		}*/
-		glutil::Color c(1.0f, 1.0f, 1.0f, time2a(tEnd));
+		glutil::ColorRIIA c(Color(1.0f, 1.0f, 1.0f, time2a(tEnd)));
 		glNormal3f(0.0f, 1.0f, 0.0f); glTexCoord2f(0.0f, texCoord); glVertex2f(-w, time2y(tEnd));
 		glNormal3f(0.0f, 1.0f, 0.0f); glTexCoord2f(1.0f, texCoord); glVertex2f(w, time2y(tEnd));
 	}
@@ -493,7 +491,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	float s = getScale();
 	float yBeg = time2y(tBeg);
 	float yEnd = time2y(tEnd);
-	glutil::Color c(1.0f, 1.0f, 1.0f);
+	Color color(1.0f, 1.0f, 1.0f);
 
 	// Did we hit it?
 	if (note.isHit && (note.releaseTime > 0.0 || std::abs(tEnd) < maxTolerance) && note.hitAnim.getTarget() == 0.0) {
@@ -504,15 +502,14 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 
 	if (yEnd - yBeg > arrowSize) {
 		// Draw holds
-		c();
 		if (note.isHit && note.releaseTime <= 0) { // The note is being held down
 			yBeg = std::max(time2y(0.0), yBeg);
 			yEnd = std::max(time2y(0.0), yEnd);
-			glutil::Color::reset();
 		}
 		if (note.releaseTime > 0) yBeg = time2y(note.releaseTime - time); // Oh noes, it got released!
 		if (yEnd - yBeg > 0) {
 			UseTexture tblock(m_arrows_hold);
+			glutil::ColorRIIA c(color);
 			glutil::Begin block(GL_TRIANGLE_STRIP);
 			// Draw end
 			vertexPair(arrow_i, x, yEnd, 1.0f, s);
@@ -523,22 +520,31 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 		}
 		// Draw begin
 		if (note.isHit && tEnd < 0.1) {
-			colorGlow(c,glow)();
+			color = colorGlow(color,glow);
 			s += glow;
 		}
-		drawArrow(arrow_i, m_arrows_hold, x, yBeg, s, 0.0f, 1.0f/3.0f);
+		{
+			glutil::ColorRIIA c(color);
+			drawArrow(arrow_i, m_arrows_hold, x, yBeg, s, 0.0f, 1.0f/3.0f);
+		}
 	} else {
 		// Draw short note
 		if (mine) { // Mines need special handling
-			c.a = 1.0 - glow; c();
+			color.a = 1.0 - glow;;
 			s = getScale() * 0.8f + glow * 0.5f;
 			float rot = int(time*360 * (note.isHit ? 2.0 : 1.0) ) % 360; // They rotate!
 			if (note.isHit) yBeg = time2y(0.0);
-			drawMine(x, yBeg, rot, s);
+			{
+				glutil::ColorRIIA c(color);
+				drawMine(x, yBeg, rot, s);
+			}
 		} else { // Regular arrows
 			s += glow;
-			colorGlow(c, glow)();
-			drawArrow(arrow_i, m_arrows, x, yBeg, s);
+			color = colorGlow(color, glow);
+			{
+				glutil::ColorRIIA c(color);
+				drawArrow(arrow_i, m_arrows, x, yBeg, s);
+			}
 		}
 	}
 	// Draw a text telling how well we hit
@@ -551,7 +557,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 			text = note.score ? getRank(note.error) : "FAIL!";
 		}
 		if (!text.empty()) {
-			glutil::Color::reset();
+			glutil::ColorRIIA c(Color(1.0f, 1.0f, 1.0f));
 			double sc = getScale() * 1.2 * arrowSize * (1.0 + glow);
 			m_popupText->render(text);
 			m_popupText->dimensions().middle(x).center(time2y(0.0)).stretch(sc, sc/2.0);

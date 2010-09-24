@@ -36,7 +36,6 @@ void LayoutSinger::drawScore(Position position) {
 		float r = p->m_color.r;
 		float g = p->m_color.g;
 		float b = p->m_color.b;
-		glutil::Color(r, g, b, act)();
 		m_score_text[i%4]->render((boost::format("%04d") % p->getScore()).str());
 		switch(position) {
 			case LayoutSinger::BOTTOM: // Fullscreen
@@ -53,8 +52,11 @@ void LayoutSinger::drawScore(Position position) {
 				m_score_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.075).screenTop(0.055);
 				break;
 		}
-		m_player_icon->draw();
-		m_score_text[i%4]->draw();
+		{
+			glutil::ColorRIIA c(Color(r, g, b, act));
+			m_player_icon->draw();
+			m_score_text[i%4]->draw();
+		}
 		// Give some feedback on how well the last lyrics row went
 		float fact = p->m_feedbackFader.get();
 		if (p->m_prevLineScore > 0.5 && fact > 0) {
@@ -65,7 +67,6 @@ void LayoutSinger::drawScore(Position position) {
 			else if (p->m_prevLineScore > 0.8) prevLineRank = "Great";
 			else if (p->m_prevLineScore > 0.6) prevLineRank = "Good";
 			else if (p->m_prevLineScore > 0.4) prevLineRank = "OK";
-			glutil::Color(r, g, b, clamp(fact*2.0f))();
 			m_line_rank_text[i%4]->render(prevLineRank);
 			switch(position) {
 				case LayoutSinger::BOTTOM: // Fullscreen
@@ -79,9 +80,11 @@ void LayoutSinger::drawScore(Position position) {
 					m_line_rank_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.055*fzoom).screenTop(0.11);
 					break;
 			}
-			m_line_rank_text[i%4]->draw();
+			{
+				glutil::ColorRIIA c(Color(r, g, b, clamp(fact*2.0f)));
+				m_line_rank_text[i%4]->draw();
+			}
 		}
-		glutil::Color::reset();
 	}
 }
 

@@ -19,7 +19,7 @@
 class Popup {
   public:
 	/// Constructor
-	Popup(std::string msg, glutil::Color c, double speed, SvgTxtThemeSimple* popupText, std::string info = "", SvgTxtTheme* infoText = NULL):
+	Popup(std::string msg, Color c, double speed, SvgTxtThemeSimple* popupText, std::string info = "", SvgTxtTheme* infoText = NULL):
 	  m_msg(msg), m_color(c), m_anim(AnimValue(0.0, speed)), m_popupText(popupText), m_info(info), m_infoText(infoText)
 	  {
 		m_anim.setTarget(1.0, false);
@@ -32,7 +32,7 @@ class Popup {
 			float s = 0.2 * (1.0 + anim);
 			float a = 1.0 - anim;
 			m_color.a = a;
-			m_color();
+			glutil::ColorRIIA color(m_color);
 			m_popupText->render(m_msg);
 			m_popupText->dimensions().center(0.1).middle(offsetX).stretch(s,s);
 			m_popupText->draw();
@@ -46,7 +46,7 @@ class Popup {
 	}
   private:
 	std::string m_msg;  /// Popup text
-	glutil::Color m_color;  /// Color
+	Color m_color;  /// Color
 	AnimValue m_anim;  /// Animation timer
 	SvgTxtThemeSimple* m_popupText;  /// Font for popup
 	std::string m_info;  /// Text to show in the bottom
@@ -123,7 +123,7 @@ class InstrumentGraph {
 	void handleCountdown(double time, double beginTime);
 
 	// Functions not really shared, but needed here
-	glutil::Color const& color(int fret) const;
+	Color const& color(int fret) const;
 
 	// Media
 	Surface m_button;

@@ -100,12 +100,16 @@ void InstrumentGraph::drawMenu() {
 					txt->dimensions.middle(xx + button_margin - m_button.dimensions.w()*0.5f).center(y);
 					txt->draw(getGraphType() == input::GUITAR ? "2" : "P");
 				} else { // Colored icons for real instruments
-					color(getGraphType() == input::GUITAR ? 0 : 1)();
-					m_button.dimensions.middle(x - button_margin).center(y);
-					m_button.draw();
-					color(getGraphType() == input::GUITAR ? 1 : 4)();
-					m_button.dimensions.middle(xx + button_margin);
-					m_button.draw();
+					{
+						glutil::ColorRIIA c(color(getGraphType() == input::GUITAR ? 0 : 1));
+						m_button.dimensions.middle(x - button_margin).center(y);
+						m_button.draw();
+					}
+					{
+						glutil::ColorRIIA c(color(getGraphType() == input::GUITAR ? 1 : 4));
+						m_button.dimensions.middle(xx + button_margin);
+						m_button.draw();
+					}
 				}
 			}
 			// Drum up hint
@@ -114,7 +118,7 @@ void InstrumentGraph::drawMenu() {
 					txt->dimensions.middle(x - button_margin - m_button.dimensions.w()*0.5f).center(y - step);
 					txt->draw("I");
 				} else { // Colored icons for real instruments
-					color(2)();
+					glutil::ColorRIIA c(color(2));
 					m_button.dimensions.middle(x - button_margin).center(y - step);
 					m_button.draw();
 				}
@@ -125,7 +129,7 @@ void InstrumentGraph::drawMenu() {
 					txt->dimensions.middle(x - button_margin - m_button.dimensions.w()*0.5f).center(y + step);
 					txt->draw("O");
 				} else {
-					color(3)();
+					glutil::ColorRIIA c(color(3));
 					m_button.dimensions.middle(x - button_margin).center(y + step);
 					m_button.draw();
 				}
@@ -166,19 +170,19 @@ void InstrumentGraph::handleCountdown(double time, double beginTime) {
 	if (!dead() && time < beginTime && time >= beginTime - m_countdown - 1) {
 		m_popups.push_back(Popup(m_countdown > 0 ?
 		  std::string("- ") +boost::lexical_cast<std::string>(unsigned(m_countdown))+" -" : "Rock On!",
-		  glutil::Color(0.0f, 0.0f, 1.0f), 2.0, m_popupText.get()));
+		  Color(0.0f, 0.0f, 1.0f), 2.0, m_popupText.get()));
 		  --m_countdown;
 	}
 }
 
 
-glutil::Color const& InstrumentGraph::color(int fret) const {
-	static glutil::Color fretColors[5] = {
-		glutil::Color(0.0f, 0.9f, 0.0f),
-		glutil::Color(0.9f, 0.0f, 0.0f),
-		glutil::Color(0.9f, 0.9f, 0.0f),
-		glutil::Color(0.0f, 0.0f, 1.0f),
-		glutil::Color(0.9f, 0.4f, 0.0f)
+Color const& InstrumentGraph::color(int fret) const {
+	static Color fretColors[5] = {
+		Color(0.0f, 0.9f, 0.0f),
+		Color(0.9f, 0.0f, 0.0f),
+		Color(0.9f, 0.9f, 0.0f),
+		Color(0.0f, 0.0f, 1.0f),
+		Color(0.9f, 0.4f, 0.0f)
 	};
 	if (fret < 0 || fret >= m_pads) throw std::logic_error("Invalid fret number in InstrumentGraph::color");
 	if (getGraphType() == input::DRUMS) {

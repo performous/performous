@@ -169,9 +169,8 @@ bool ScreenSing::instrumentLayout(double time) {
 		}
 	}
 	if (time < -1.0 && count_alive == 0) {
-		glutil::Color(1.0f, 1.0f, 1.0f, clamp(-2.0 - 2.0 * time))();
+		glutil::ColorRIIA c(Color(1.0f, 1.0f, 1.0f, clamp(-2.0 - 2.0 * time)));
 		m_help->draw();
-		glutil::Color::reset();
 	}
 	// Set volume levels (averages of all instruments playing that track)
 	for( std::map<std::string,std::string>::iterator it = m_song->music.begin() ; it != m_song->music.end() ; ++it ) {
@@ -217,9 +216,8 @@ void ScreenSing::danceLayout(double time) {
 		}
 	}
 	if (time < -0.5 && count_alive == 0) {
-		glutil::Color(1.0f, 1.0f, 1.0f, clamp(-1.0 - 2.0 * time))();
+		glutil::ColorRIIA c(Color(1.0f, 1.0f, 1.0f, clamp(-1.0 - 2.0 * time)));
 		m_help->draw();
-		glutil::Color::reset();
 	}
 }
 
@@ -558,7 +556,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database, Dancers& 
 		if (item.score < 500) { p = m_database.cur.erase(p); continue; } // Dead
 		item.track = "Vocals"; // For database
 		item.track_simple = "vocals"; // For ScoreWindow
-		item.color = glutil::Color(p->m_color.r, p->m_color.g, p->m_color.b);
+		item.color = Color(p->m_color.r, p->m_color.g, p->m_color.b);
 
 		m_database.scores.push_back(item);
 		++p;
@@ -571,9 +569,9 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database, Dancers& 
 		item.track_simple = it->getTrack();
 		item.track = it->getModeId();
 		item.track[0] = toupper(item.track[0]); // Capitalize
-		if (item.track_simple == TrackName::DRUMS) item.color = glutil::Color(0.1f, 0.1f, 0.1f);
-		else if (item.track_simple == TrackName::BASS) item.color = glutil::Color(0.5f, 0.3f, 0.1f);
-		else item.color = glutil::Color(1.0f, 0.0f, 0.0f);
+		if (item.track_simple == TrackName::DRUMS) item.color = Color(0.1f, 0.1f, 0.1f);
+		else if (item.track_simple == TrackName::BASS) item.color = Color(0.5f, 0.3f, 0.1f);
+		else item.color = Color(1.0f, 0.0f, 0.0f);
 
 		m_database.scores.push_back(item);
 		++it;
@@ -586,7 +584,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database, Dancers& 
 		item.track_simple = it->getTrack();
 		item.track = it->getModeId();
 		item.track[0] = toupper(item.track[0]); // Capitalize
-		item.color = glutil::Color(1.0f, 0.4f, 0.1f);
+		item.color = Color(1.0f, 0.4f, 0.1f);
 
 		m_database.scores.push_back(item);
 		++it;
@@ -634,7 +632,7 @@ void ScoreWindow::draw() {
 
 	for (Database::cur_scores_t::const_iterator p = m_database.scores.begin(); p != m_database.scores.end(); ++p, ++i) {
 		int score = p->score;
-		p->color();
+		glutil::ColorRIIA(p->color);
 		double x = -0.12 + spacing * (0.5 + i - 0.5 * m_database.scores.size());
 		m_scoreBar.dimensions.middle(x).bottom(0.20);
 		m_scoreBar.draw(score / 10000.0);

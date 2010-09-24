@@ -19,9 +19,16 @@ void Video::render(double time) {
 	m_alpha.setTarget(tdist < 0.4 ? 1.2f : -0.5f);
 	float alpha = clamp(m_alpha.get());
 	if (alpha > 0.0f) {
-		if (alpha < 1.0f) glutil::Color(1.0f, 1.0f, 1.0f, alpha)();
-		m_surface.draw();
-		if (alpha < 1.0f) glutil::Color(1.0f, 1.0f, 1.0f, 1.0f)();
+		Color color;
+		if (alpha < 1.0f) {
+			color = Color(1.0f, 1.0f, 1.0f, alpha);
+		} else {
+			color = Color(1.0f, 1.0f, 1.0f);
+		}
+		{
+			glutil::ColorRIIA c(color);
+			m_surface.draw();
+		}
 	}
 	// Preload the next future frame
 	if (fr.data.empty()) while (m_mpeg.videoQueue.tryPop(fr) && fr.timestamp < time) {};

@@ -80,7 +80,7 @@ class GuitarGraph: public InstrumentGraph {
 	Texture m_flame_godmode;
 	Surface m_tap; /// image for 2d HOPO note cap
 	Surface m_neckglow; /// image for the glow from the bottom of the neck
-	glutil::Color m_neckglowColor;
+	Color m_neckglowColor;
 	Object3d m_fretObj; /// 3d object for regular note
 	Object3d m_tappableObj; /// 3d object for the HOPO note cap
 	std::vector<std::string> m_samples; /// sound effects
@@ -114,9 +114,9 @@ class GuitarGraph: public InstrumentGraph {
 	unsigned m_holds[max_panels]; /// active hold notes
 
 	// Graphics functions
-	glutil::Color const colorize(glutil::Color c, double time) const;
+	Color const colorize(Color c, double time) const;
 	void drawBar(double time, float h);
-	void drawNote(int fret, glutil::Color, float tBeg, float tEnd, float whammy = 0, bool tappable = false, bool hit = false, double hitAnim = 0.0, double releaseTime = 0.0);
+	void drawNote(int fret, Color, float tBeg, float tEnd, float whammy = 0, bool tappable = false, bool hit = false, double hitAnim = 0.0, double releaseTime = 0.0);
 	void drawDrumfill(float tBeg, float tEnd);
 	void drawInfo(double time, double offsetX, Dimensions dimensions);
 	float getFretX(int fret) { return (-2.0f + fret- (m_drums ? 0.5 : 0)) * (m_leftymode.b() ? -1 : 1); }

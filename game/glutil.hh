@@ -75,16 +75,14 @@ namespace glutil {
 		operator float*() { return reinterpret_cast<float*>(this); }
 		/// overload float const cast
 		operator float const*() const { return reinterpret_cast<float const*>(this); }
-		/** Apply the color **/
+		/// Apply the color
 		void operator()() const { glColor4fv(*this); }
-		/*
-		void operator()() const {
-			GLfloat ColorVect[] = {r, g, b, a};
-			glEnableClientState(GL_COLOR_ARRAY);
-			glColorPointer (4,GL_FLOAT,0,ColorVect);
-			glDisableClientState (GL_COLOR_ARRAY);
-		}
-		*/
+		//void operator()() const {
+		//	GLfloat ColorVect[] = {r, g, b, a};
+		//	glEnableClientState(GL_COLOR_ARRAY);
+		//	glColorPointer (4,GL_FLOAT,0,ColorVect);
+		//	glDisableClientState (GL_COLOR_ARRAY);
+		//}
 		static void reset() { Color(1.0f, 1.0f, 1.0f)(); }
 	};
 

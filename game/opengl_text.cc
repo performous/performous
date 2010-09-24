@@ -243,13 +243,16 @@ void SvgTxtTheme::draw(std::vector<TZoomText> const& _text, float alpha) {
 		dim.middle(position_x + 0.5 * dim.w());
 		TexCoords tex;
 		double factor = _text[i].factor;
-		if (factor == 1.0) glutil::Color(1.0f, 1.0f, 1.0f, alpha)();
+		Color color;
+		if (factor == 1.0) color = Color(1.0f, 1.0f, 1.0f, alpha);
 		else {
-			glutil::Color(m_text_highlight.fill_col.r, m_text_highlight.fill_col.g, m_text_highlight.fill_col.b, alpha)();
+			color = Color(m_text_highlight.fill_col.r, m_text_highlight.fill_col.g, m_text_highlight.fill_col.b, alpha);
 			dim.fixedWidth(dim.w() * factor);
 		}
-		m_opengl_text[i].draw(dim, tex);
-		glutil::Color::reset();
+		{
+			glutil::ColorRIIA c(color);
+			m_opengl_text[i].draw(dim, tex);
+		}
 		position_x += syllable_width;
 	}
 }

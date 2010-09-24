@@ -118,9 +118,10 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 			glutil::PushMatrix pm;
 			glTranslatef(centerx, centery, 0.0f);
 			glRotatef(rot, 0.0f, 0.0f, 1.0f);
-			glutil::Color(it_col->r, it_col->g, it_col->b, it_col->a)();
-			m_star_hl.draw(Dimensions().stretch(zoom*1.2, zoom*1.2).center().middle(), TexCoords());
-			glutil::Color::reset();
+			{
+				glutil::ColorRIIA c(Color(it_col->r, it_col->g, it_col->b, it_col->a));
+				m_star_hl.draw(Dimensions().stretch(zoom*1.2, zoom*1.2).center().middle(), TexCoords());
+			}
 			m_star.draw(Dimensions().stretch(zoom, zoom).center().middle(), TexCoords());
 			player_star_offset += 0.8;
 		}
@@ -134,7 +135,7 @@ void NoteGraph::drawNotes() {
 	if (m_notealpha <= 0.0f) {
 		m_notealpha = 0.0f;
 	} else {
-		glutil::Color(1.0, 1.0, 1.0, m_notealpha)();
+		glutil::ColorRIIA c(Color(1.0, 1.0, 1.0, m_notealpha));
 		m_notelines.draw(Dimensions().stretch(dimensions.w(), (m_max - m_min - 13) * m_noteUnit).middle(dimensions.xc()).center(dimensions.yc()), TexCoords(0.0, (-m_min - 7.0) / 12.0f, 1.0, (-m_max + 6.0) / 12.0f));
 
 		// Draw notes
@@ -167,9 +168,8 @@ void NoteGraph::drawNotes() {
 			double h = -m_noteUnit * 2.0; // height: 0.5 border + 1.0 bar + 0.5 border = 2.0
 			drawNotebar(*t1, x, ybeg, yend, w, h);
 			if (alpha > 0.0) {
-				glutil::Color(1.0f, 1.0f, 1.0f, alpha * m_notealpha)();
+				glutil::ColorRIIA c(Color(1.0f, 1.0f, 1.0f, alpha * m_notealpha));
 				drawNotebar(*t2, x, ybeg, yend, w, h);
-				glutil::Color(1.0f, 1.0f, 1.0f, m_notealpha)();
 			}
 		}
 	}
@@ -214,7 +214,6 @@ void NoteGraph::drawWaves(Database const& database) {
 	UseTexture tblock(m_wave);
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	for (std::list<Player>::const_iterator p = database.cur.begin(); p != database.cur.end(); ++p) {
-		glutil::Color(p->m_color.r, p->m_color.g, p->m_color.b, m_notealpha)();
 		float const texOffset = 2.0 * m_time; // Offset for animating the wave texture
 		Player::pitch_t const& pitch = p->m_pitch;
 		size_t const beginIdx = std::max(0.0, m_time - 0.5 / pixUnit) / Engine::TIMESTEP; // At which pitch idx to start displaying the wave
@@ -228,6 +227,7 @@ void NoteGraph::drawWaves(Database const& database) {
 		double oldval = getNaN();
 		Points points;
 		Notes::const_iterator noteIt = m_vocals.notes.begin();
+		glutil::ColorRIIA c(Color(p->m_color.r, p->m_color.g, p->m_color.b, m_notealpha));
 		for (; idx < endIdx; ++idx, t += Engine::TIMESTEP) {
 			double const freq = pitch[idx].first;
 			// If freq is NaN, we have nothing to process
@@ -264,7 +264,6 @@ void NoteGraph::drawWaves(Database const& database) {
 		}
 		strip(points);
 	}
-	glutil::Color::reset();
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
