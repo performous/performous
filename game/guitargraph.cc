@@ -298,6 +298,8 @@ void GuitarGraph::engine() {
 		}
 		// Menu keys
 		if (menuOpen()) {
+			// Pick lefty-mode reversing
+			if (ev.type == input::Event::PICK && m_leftymode.b()) ev.button = (ev.button ? 0 : 1);
 			// Check first regular keys
 			if (ev.type == input::Event::PRESS && ev.button >= 0 && ev.button < m_pads) {
 				if (m_drums) { // Drums
@@ -330,18 +332,20 @@ void GuitarGraph::engine() {
 			m_menu.open();
 			break;
 
+		// Handle Start/Select keypresses
 		} else if (!m_input.isKeyboard()) {
-			// Handle Start/Select keypresses
 			if (ev.nav == input::CANCEL) ev.button = input::GODMODE_BUTTON; // Select = GodMode
 			if (ev.nav == input::START) { m_menu.open(); continue; }
 		}
 
 		// Guitar specific actions
 		if (!m_drums) {
+			// GodMode
 			if ((ev.type == input::Event::PRESS || ev.type == input::Event::RELEASE) && ev.button == input::GODMODE_BUTTON) {
 				if (ev.type == input::Event::PRESS) activateStarpower();
 				continue;
 			}
+			// Whammy bar
 			if (ev.button == input::WHAMMY_BUTTON) {
 				switch(ev.type) {
 					case input::Event::RELEASE:
@@ -354,11 +358,15 @@ void GuitarGraph::engine() {
 						break;
 				}
 			}
+			// End hold
 			if (ev.type == input::Event::RELEASE) endHold(ev.button, time);
+
+		// Drum specific actions
 		} else {
 			// Handle drum lefty-mode
 			if (m_leftymode.b() && ev.button > 0 && !menuOpen()) ev.button = m_pads - ev.button;
 		}
+
 		// Keypress anims
 		if (ev.type == input::Event::PRESS) m_pressed_anim[!m_drums + ev.button].setValue(1.0);
 		else if (ev.type == input::Event::PICK) m_pressed_anim[0].setValue(1.0);
