@@ -207,7 +207,7 @@ to save the current settings to XML.
 		<stringvalue>out=2</stringvalue><!-- Any stereo output device -->
 		<locale name="C">
 			<short>Audio devices</short>
-			<long>Press Enter to configure (TODO: implement)</long>
+			<long>List of audio devices to try.</long>
 		</locale>
 	</entry>
 	<entry name="audio/preview_volume" type="int" value="70">

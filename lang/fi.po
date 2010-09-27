@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-09-16 11:01+0200\n"
+"POT-Creation-Date: 2010-09-27 18:29+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Tapio Vierros <tapiovierros@gmail.com>\n"
 "Language-Team: \n"
@@ -59,41 +59,41 @@ msgid "Challenge"
 msgstr "Haastavin"
 
 #: ../game/dancegraph.cc:111
-#: ../game/guitargraph.cc:143
+#: ../game/guitargraph.cc:142
 msgid "Ready!"
 msgstr "Valmis!"
 
 #: ../game/dancegraph.cc:111
-#: ../game/guitargraph.cc:143
+#: ../game/guitargraph.cc:142
 msgid "Start performing!"
 msgstr "Aloita esiintyminen!"
 
 #: ../game/dancegraph.cc:122
-#: ../game/guitargraph.cc:155
+#: ../game/guitargraph.cc:154
 msgid "Select track"
 msgstr "Valitse pelimuoto"
 
 #: ../game/dancegraph.cc:138
-#: ../game/guitargraph.cc:170
+#: ../game/guitargraph.cc:169
 msgid "Select difficulty"
 msgstr "Valitse vaikeusaste"
 
 #: ../game/dancegraph.cc:141
-#: ../game/guitargraph.cc:175
+#: ../game/guitargraph.cc:174
 msgid "Quit"
 msgstr "Lopeta"
 
 #: ../game/dancegraph.cc:141
-#: ../game/guitargraph.cc:175
+#: ../game/guitargraph.cc:174
 msgid "Exit to song browser"
-msgstr "Poistu kappale valintaan"
+msgstr "Poistu kappalevalintaan"
 
 #: ../game/dancegraph.cc:260
 msgid "STOP!"
 msgstr "SEIS!"
 
 #: ../game/dancegraph.cc:335
-#: ../game/guitargraph.cc:464
+#: ../game/guitargraph.cc:479
 msgid "Streak!"
 msgstr "Sarja!"
 
@@ -105,23 +105,23 @@ msgstr "Lapset"
 msgid "Expert"
 msgstr "Ekspertti"
 
-#: ../game/guitargraph.cc:173
+#: ../game/guitargraph.cc:172
 msgid "Lefty-mode"
 msgstr "Vasuritila"
 
-#: ../game/guitargraph.cc:182
+#: ../game/guitargraph.cc:181
 msgid "ON"
 msgstr "Päällä"
 
-#: ../game/guitargraph.cc:182
+#: ../game/guitargraph.cc:181
 msgid "OFF"
 msgstr "Pois"
 
-#: ../game/guitargraph.cc:183
+#: ../game/guitargraph.cc:182
 msgid "Toggle lefty-mode"
 msgstr "Vasenkätisyystila"
 
-#: ../game/guitargraph.cc:481
+#: ../game/guitargraph.cc:496
 msgid ""
 "God Mode\n"
 "Activated!"
@@ -129,19 +129,19 @@ msgstr ""
 "Jumalmoodi\n"
 "Aktivoitu!"
 
-#: ../game/guitargraph.cc:482
+#: ../game/guitargraph.cc:497
 msgid "Mistakes ignored!"
 msgstr "Virheitä ei huomioida!"
 
-#: ../game/guitargraph.cc:1115
+#: ../game/guitargraph.cc:1162
 msgid "Drum Fill!"
 msgstr "Rumpufilli!"
 
-#: ../game/guitargraph.cc:1116
+#: ../game/guitargraph.cc:1163
 msgid "God Mode Ready!"
 msgstr "Jumalmoodi valmis!"
 
-#: ../game/guitargraph.cc:1121
+#: ../game/guitargraph.cc:1168
 msgid "Solo!"
 msgstr "Soolo!"
 
@@ -157,10 +157,6 @@ msgstr "Pois"
 #, c-format
 msgid "%d items"
 msgstr "%d kohtaa"
-
-#: ../game/screen_configuration.cc:59
-msgid "Ctrl + S to save, Ctrl + R to reset defaults"
-msgstr "Ctrl + S tallentaaksesi, Ctrl + R palauttaaksesi oletusarvot"
 
 #: ../game/screen_sing.cc:36
 msgid "Loading theme..."
@@ -227,6 +223,7 @@ msgid "Finalizing..."
 msgstr "Viimeistellään..."
 
 #: ../game/screen_sing.cc:128
+#: ../game/main.cc:155
 msgid "Loading complete"
 msgstr "Lataaminen valmis"
 
@@ -234,60 +231,60 @@ msgstr "Lataaminen valmis"
 msgid "Song contains broken tracks!"
 msgstr "Kappaleessa on rikkinäisiä osia!"
 
-#: ../game/screen_sing.cc:459
+#: ../game/screen_sing.cc:457
 msgid "   ENTER to skip instrumental break"
 msgstr "   ENTER hypätäksesi lauluosaan"
 
-#: ../game/screen_sing.cc:460
+#: ../game/screen_sing.cc:458
 msgid "   Remember to wait for grading!"
 msgstr "   Muista odottaa arvostelua!"
 
-#: ../game/screen_sing.cc:596
+#: ../game/screen_sing.cc:594
 msgid "No player!"
 msgstr "Pelaajia ei löytynyt!"
 
-#: ../game/screen_sing.cc:605
+#: ../game/screen_sing.cc:603
 msgid "Hit singer"
 msgstr "Tähti"
 
-#: ../game/screen_sing.cc:606
+#: ../game/screen_sing.cc:604
 msgid "Lead singer"
 msgstr "Solisti"
 
-#: ../game/screen_sing.cc:607
-#: ../game/screen_sing.cc:613
-#: ../game/screen_sing.cc:619
+#: ../game/screen_sing.cc:605
+#: ../game/screen_sing.cc:611
+#: ../game/screen_sing.cc:617
 msgid "Rising star"
 msgstr "Harrastaja"
 
-#: ../game/screen_sing.cc:608
-#: ../game/screen_sing.cc:614
-#: ../game/screen_sing.cc:620
+#: ../game/screen_sing.cc:606
+#: ../game/screen_sing.cc:612
+#: ../game/screen_sing.cc:618
 msgid "Amateur"
 msgstr "Amatööri"
 
-#: ../game/screen_sing.cc:609
-#: ../game/screen_sing.cc:621
+#: ../game/screen_sing.cc:607
+#: ../game/screen_sing.cc:619
 msgid "Tone deaf"
 msgstr "Lahjaton"
 
-#: ../game/screen_sing.cc:611
+#: ../game/screen_sing.cc:609
 msgid "Maniac"
 msgstr "Maanikko"
 
-#: ../game/screen_sing.cc:612
+#: ../game/screen_sing.cc:610
 msgid "Hoofer"
 msgstr "Ekspertti"
 
-#: ../game/screen_sing.cc:615
+#: ../game/screen_sing.cc:613
 msgid "Loser"
 msgstr "Luuseri"
 
-#: ../game/screen_sing.cc:617
+#: ../game/screen_sing.cc:615
 msgid "Virtuoso"
 msgstr "Virtuoosi"
 
-#: ../game/screen_sing.cc:618
+#: ../game/screen_sing.cc:616
 msgid "Rocker"
 msgstr "Rokkari"
 
@@ -351,35 +348,35 @@ msgstr "Kirjoita etsiäksesi tai luodaksesi uuden pelaajan."
 msgid "Search Text:"
 msgstr "Etsi:"
 
-#: ../game/main.cc:117
+#: ../game/main.cc:116
 msgid "Audio..."
 msgstr "Ääni..."
 
-#: ../game/main.cc:120
+#: ../game/main.cc:123
 msgid "Launching background loaders..."
 msgstr "Käynnistetään taustalataajat..."
 
-#: ../game/main.cc:128
+#: ../game/main.cc:131
 msgid "Loading audio samples..."
 msgstr "Ladataan ääniä..."
 
-#: ../game/main.cc:142
+#: ../game/main.cc:145
 msgid "Creating screens..."
 msgstr "Luodaan näkymät..."
 
-#: ../game/main.cc:151
+#: ../game/main.cc:153
 msgid "Entering main menu"
 msgstr "Päävalikko..."
 
-#: ../game/main.cc:162
+#: ../game/main.cc:164
 msgid "Screenshot taken!"
 msgstr "Kuvakaappaus tallennettu!"
 
-#: ../game/main.cc:165
+#: ../game/main.cc:167
 msgid "Screenshot failed!"
 msgstr "Kuvakaappaus epäonnistui!"
 
-#: ../game/screen_audiodevices.cc:56
+#: ../game/screen_audiodevices.cc:55
 msgid ""
 "It seems you have some manual configurations\n"
 "incompatible with this user interface.\n"
@@ -393,19 +390,19 @@ msgstr ""
 "äänilaitevalintasi. Muut mahdolliset säädöt\n"
 "tallennetaan samalla."
 
-#: ../game/screen_audiodevices.cc:109
+#: ../game/screen_audiodevices.cc:108
 msgid "- Unassigned -"
 msgstr "- Ei asetettu -"
 
-#: ../game/screen_audiodevices.cc:128
+#: ../game/screen_audiodevices.cc:126
 msgid "Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select to cancel. Ctrl + R to reset defaults"
 msgstr "Nuolinäppäimet säätävät. Enter/Start tallentaa ja testaa, Esc/Select peruuttaa. Ctrl + R palauttaaksesi oletukset."
 
-#: ../game/screen_audiodevices.cc:133
+#: ../game/screen_audiodevices.cc:131
 msgid "For advanced device configuration, use command line parameter --audio (use --audiohelp for details)."
 msgstr "Monimutkaisempia asetuksia halutessasi, käytä --audio komentoriviparametriä (--audiohelp auttaa)."
 
-#: ../game/screen_audiodevices.cc:191
+#: ../game/screen_audiodevices.cc:186
 msgid "Some devices failed to open!"
 msgstr "Jotkin laitteista eivät olleet saatavilla!"
 
@@ -437,19 +434,19 @@ msgstr "<kirjoita etsiäksesi>"
 msgid "Hisccore for %1%\n"
 msgstr "Ennätykset kappaleelle %1%\n"
 
-#: ../game/instrumentgraph.cc:41
+#: ../game/instrumentgraph.cc:42
 msgid "Rejoin"
 msgstr "Liity uudelleen"
 
-#: ../game/instrumentgraph.cc:41
+#: ../game/instrumentgraph.cc:42
 msgid "Change selections"
 msgstr "Vaihda valintoja"
 
-#: ../game/screen_intro.cc:20
+#: ../game/screen_intro.cc:22
 msgid "No playback devices could be used.\n"
 msgstr "Äänen ulostulolaitteita ei löytynyt.\n"
 
-#: ../game/screen_intro.cc:21
+#: ../game/screen_intro.cc:23
 msgid ""
 "\n"
 "Please configure some before playing."
@@ -457,67 +454,71 @@ msgstr ""
 "\n"
 "Säädä ääniasetuksia ennen pelaamista."
 
-#: ../game/screen_intro.cc:79
+#: ../game/screen_intro.cc:122
+msgid "Ctrl + S to save, Ctrl + R to reset defaults"
+msgstr "Ctrl + S tallentaaksesi, Ctrl + R palauttaaksesi oletusarvot"
+
+#: ../game/screen_intro.cc:131
 msgid "Perform"
 msgstr "Esiinny"
 
-#: ../game/screen_intro.cc:80
+#: ../game/screen_intro.cc:132
 msgid "Practice"
 msgstr "Harjoittele"
 
-#: ../game/screen_intro.cc:80
+#: ../game/screen_intro.cc:132
 msgid "Check your skills or test the microphones"
 msgstr "Tarkista taitosi tai testaa mikrofonit"
 
-#: ../game/screen_intro.cc:100
+#: ../game/screen_intro.cc:152
 msgid "Audio Devices"
 msgstr "Äänilaitteet"
 
-#: ../game/screen_intro.cc:100
+#: ../game/screen_intro.cc:152
 msgid "Setup microphones and playback"
-msgstr "Tee mikrofoni ja äänentoisto asetukset"
+msgstr "Tee mikrofoni- ja äänentoistoasetukset"
 
-#: ../game/screen_intro.cc:101
+#: ../game/screen_intro.cc:153
 msgid "Audio"
 msgstr "Ääni"
 
-#: ../game/screen_intro.cc:101
+#: ../game/screen_intro.cc:153
 msgid "Configure general audio settings"
-msgstr "Muokkaa yleisiä ääni asetuksia"
+msgstr "Muokkaa yleisiä ääniasetuksia"
 
-#: ../game/screen_intro.cc:102
+#: ../game/screen_intro.cc:154
 msgid "Graphics"
 msgstr "Grafiikka"
 
-#: ../game/screen_intro.cc:102
+#: ../game/screen_intro.cc:154
 msgid "Configure rendering and video settings"
-msgstr "Muokkaa grafiikka ja video asetuksia"
+msgstr "Muokkaa grafiikka- ja videoasetuksia"
 
-#: ../game/screen_intro.cc:103
+#: ../game/screen_intro.cc:155
 msgid "Game"
 msgstr "Peli"
 
-#: ../game/screen_intro.cc:103
+#: ../game/screen_intro.cc:155
 msgid "Gameplay related options"
 msgstr "Peliasetukset"
 
-#: ../game/screen_intro.cc:104
+#: ../game/screen_intro.cc:157
 msgid "Paths"
 msgstr "Tiedostopolut"
 
-#: ../game/screen_intro.cc:104
+#: ../game/screen_intro.cc:157
 msgid "Setup song and data paths"
-msgstr "Aseta kappale ja datakansioiden polut"
+msgstr "Aseta musiikki- ja datakansioiden polut"
 
-#: ../game/screen_intro.cc:107
+#: ../game/screen_intro.cc:160
 msgid "Configure"
 msgstr "Asetukset"
 
-#: ../game/screen_intro.cc:107
+#: ../game/screen_intro.cc:160
 msgid "Configure audio and game options"
 msgstr "Muokkaa pelin asetuksia"
 
-#: ../game/screen_intro.cc:110
+#: ../game/screen_intro.cc:163
 msgid "Leave the game"
 msgstr "Poistu pelistä"
 
@@ -529,250 +530,252 @@ msgstr "Ei pisteitä tähän mennessä."
 msgid "Be the first to be listed here!"
 msgstr "Ole ensimmäinen!"
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:3
+#: /tmp/xml2gettext.fghicOohN2:3
 msgid "Gameplay settings."
 msgstr "Peliasetukset."
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:4
+#: /tmp/xml2gettext.fghicOohN2:4
 msgid "Graphic"
 msgstr "Grafiikka"
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:5
+#: /tmp/xml2gettext.fghicOohN2:5
 msgid "Video and rendering settings."
-msgstr "Video ja kuva asetukset."
+msgstr "Video ja kuva-asetukset."
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:7
+#: /tmp/xml2gettext.fghicOohN2:7
 msgid "Audio-related settings."
 msgstr "Ääniasetukset."
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:9
+#: /tmp/xml2gettext.fghicOohN2:9
 msgid "System paths."
 msgstr "Järjestelmän tiedostopolut."
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:10
+#: /tmp/xml2gettext.fghicOohN2:10
 msgid "Karaoke mode"
-msgstr "Karaoke pelimuoto"
+msgstr "Karaoketila"
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:11
+#: /tmp/xml2gettext.fghicOohN2:11
 msgid "Hide pitch wave, notes and scoring."
-msgstr "Piilota aaltomuoto, nuotit ja pisteytys."
+msgstr "Piilota ääniaallon piirto, nuotit ja pisteytys."
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:12
+#: /tmp/xml2gettext.fghicOohN2:12
 msgid "Pitch waves"
-msgstr "Aaltomuoto"
+msgstr "Äänenkorkeusaallot"
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:13
+#: /tmp/xml2gettext.fghicOohN2:13
 msgid "Enable singing pitch display (when not in karaoke mode)."
 msgstr "Ota käyttöön laulun äänenkorkeuden näyttäminen (kun ei olla karaokemoodissa)."
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:14
+#: /tmp/xml2gettext.fghicOohN2:14
 msgid "Theme"
 msgstr "Teema"
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:15
+#: /tmp/xml2gettext.fghicOohN2:15
 msgid "Name of the theme to use or absolute path to theme folder."
 msgstr "Käytettävän teeman nimi tai absoluuttinen polku teemakansioon."
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:16
+#: /tmp/xml2gettext.fghicOohN2:16
 msgid "Keyboard as guitar"
 msgstr "Näppäimistö kitarana"
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:17
+#: /tmp/xml2gettext.fghicOohN2:17
 msgid "Enable keyboard as guitar (Frets on Fire mode)."
-msgstr "Käytä näppäimistöä kitarana (Frets on Fire moodi)."
+msgstr "Käytä näppäimistöä kitarana (Frets on Fire -pelitila)."
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:18
+#: /tmp/xml2gettext.fghicOohN2:18
 msgid "Keyboard as drumkit"
 msgstr "Näppäimistö rumpuina"
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:19
+#: /tmp/xml2gettext.fghicOohN2:19
 msgid "Enable keyboard as drumkit."
 msgstr "Käytä näppäimistöä rumpusettinä."
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:20
+#: /tmp/xml2gettext.fghicOohN2:20
 msgid "Keyboard as dance pad"
 msgstr "Näppäimistö tanssimattona"
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:21
+#: /tmp/xml2gettext.fghicOohN2:21
 msgid "Enable keyboard as dance pad."
 msgstr "Käytä näppäimistöä tanssimattona."
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:22
+#: /tmp/xml2gettext.fghicOohN2:22
 msgid "Joystick configuration"
 msgstr "Peliohjain säädöt"
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:23
+#: /tmp/xml2gettext.fghicOohN2:23
 msgid "Force joystick to some kind of instrument."
 msgstr "Pakota peliohjain jonkinlaiseksi instrumentiksi."
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:24
+#: /tmp/xml2gettext.fghicOohN2:24
 msgid "Hardware MIDI input device"
 msgstr "MIDI sisääntulolaite."
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:25
+#: /tmp/xml2gettext.fghicOohN2:25
 msgid "Part of sound card name or its number or empty to use the first available device. Used currently for MIDI drum controllers."
 msgstr "Osa äänikortin nimestä tai sen numero. Tyhjä arvo valitsee ensimmäisen mahdollisen. Käytetään MIDI rumpujen kanssa."
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:26
+#: /tmp/xml2gettext.fghicOohN2:26
 msgid "Windowed width"
 msgstr "Ikkunoitu leveys"
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:27
+#: /tmp/xml2gettext.fghicOohN2:27
 msgid "The width of the window."
 msgstr "Ikkunan leveys."
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:28
+#: /tmp/xml2gettext.fghicOohN2:28
 msgid "Windowed height"
 msgstr "Ikkunoitu korkeus"
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:29
+#: /tmp/xml2gettext.fghicOohN2:29
 msgid "The height of the window."
 msgstr "Ikkunan korkeus."
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:30
+#: /tmp/xml2gettext.fghicOohN2:30
 msgid "Fullscreen mode"
-msgstr "Koko näytön tila"
+msgstr "Kokoruututila"
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:31
+#: /tmp/xml2gettext.fghicOohN2:31
 msgid "Enable fullscreen mode on startup."
-msgstr "Ota koko näytön tila käyttöön."
+msgstr "Ota kokoruututila käyttöön."
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:32
+#: /tmp/xml2gettext.fghicOohN2:32
 msgid "Video playback"
 msgstr "Videotoisto"
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:33
+#: /tmp/xml2gettext.fghicOohN2:33
 msgid "Allows completely disabling background videos. It is recommended to leave this enabled as Performous will still smoothly fade out the video if your computer is not fast enough."
-msgstr "Poista musiikkivideot kokonaan käytöstä. Suositeltavaa on jättää ne päälle, koska Performous osaa kytkeä ne automaattisesti pois päältä, jos tietokoneesta näyttää loppuvan tehot."
+msgstr "Poista musiikkivideot käytöstä. Suositeltavaa on jättää ne päälle, koska Performous osaa häivyttää ne automaattisesti, jos tietokoneesta näyttää loppuvan tehot."
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:34
+#: /tmp/xml2gettext.fghicOohN2:34
 msgid "Webcam background"
-msgstr "Webkamera tausta"
+msgstr "Web-kamera taustana"
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:35
+#: /tmp/xml2gettext.fghicOohN2:35
 msgid "Performous can try to use webcam as a background video. You can disable it if it annoys you."
-msgstr "Performous voi yrittää käyttää webkameraa taustana."
+msgstr "Performous voi yrittää käyttää web-kameran videota kappaleiden taustakuvana."
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:36
+#: /tmp/xml2gettext.fghicOohN2:36
 msgid "Webcam id"
-msgstr "Webkameran tunniste"
+msgstr "Web-kameran tunniste"
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:37
+#: /tmp/xml2gettext.fghicOohN2:37
 msgid "Use -1 to autodetect or a number starting from 0 to choose specific device."
 msgstr "Arvo -1 valitsee kameran automaattisesti, sitä suuremmat kokonaisluvut valitsevat tietyn laitteen."
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:38
+#: /tmp/xml2gettext.fghicOohN2:38
 msgid "3D notes"
 msgstr "3D nuotit"
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:39
+#: /tmp/xml2gettext.fghicOohN2:39
 msgid "Draw instrument notes as 3-dimensional objects. May hurt performance on older hardware."
 msgstr "Piirrä instrumenttinuotit kolmiulotteisina objekteina."
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:40
+#: /tmp/xml2gettext.fghicOohN2:40
 msgid "SVG quality"
 msgstr "Vektorikuvien laatu"
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:41
+#: /tmp/xml2gettext.fghicOohN2:41
 msgid "Larger numbers cause vector graphics to be rendered in higher resolution. Decrease this to make navigating in menus faster."
-msgstr "Isoilla luvuilla vektorikuvat luodaan korkeammalla tarkkuudella. Pienentämällä arvoa valikoissa liikkuminen nopeutuu."
+msgstr "Suuremmilla luvuilla vektorikuvat luodaan korkeammalla tarkkuudella. Pienentämällä arvoa valikoissa liikkuminen nopeutuu."
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:42
+#: /tmp/xml2gettext.fghicOohN2:42
 msgid "Text quality"
 msgstr "Tekstin laatu"
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:43
+#: /tmp/xml2gettext.fghicOohN2:43
 msgid "Larger numbers cause text to be rendered in higher resolution. Decrease this to make everything a little faster."
-msgstr "Isommilla arvoilla teksti piirretään tarkempana. Tämä vaikuttaa hieman suorituskykyyn lähes kaikkialla."
+msgstr "Suuremmilla arvoilla teksti piirretään tarkempana. Tämä vaikuttaa hieman suorituskykyyn lähes kaikkialla."
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:44
+#: /tmp/xml2gettext.fghicOohN2:44
 msgid "Benchmark mode"
 msgstr "Suorituskyvynmittaustila"
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:45
+#: /tmp/xml2gettext.fghicOohN2:45
 msgid "Framerate limit of 100 FPS is removed and the game instead renders at full speed. FPS values are printed to console. Please note that the display drivers may still limit the rendering speed to the screen refresh rate."
 msgstr "Ruudunpäivitysnopeuden raja 100 FPS poistetaan ja sen nopeusarvoja tulostetaan terminaaliin. Huomaa, että näytönohjainajurit saattavat vielä rajoittaa nopeutta."
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:46
+#: /tmp/xml2gettext.fghicOohN2:46
 msgid "Suggested latency"
 msgstr "Toivottu latenssi"
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:47
+#: /tmp/xml2gettext.fghicOohN2:47
 msgid "This is a hint for the audio engine about the desired latency. Set this as low as possible while retaining clear audio playback. Requires restart."
 msgstr "Vihje äänilaitteille kuinka pieni latenssi halutaan. Aseta niin matalaksi kuin mahdollista ilman äänen häiriöitä. Vaatii uudelleenkäynnistyksen. "
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:48
+#: /tmp/xml2gettext.fghicOohN2:48
 msgid "Audio/video latency"
 msgstr "Ääni/video latenssi"
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:49
+#: /tmp/xml2gettext.fghicOohN2:49
 msgid "Affects all modes. Use negative value if your display input lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal. This should be set so that the notes pass the cursor at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while performing."
-msgstr "Vaikuttaa kaikkiin pelimuotoihin. Käytä negatiivista arvoa jos näytön sisääntulo viive on suurempi kuin äänikortin ulostulo latenssi ja päin vastoin. Tämän pitäisi olla säädetty siten, että nuotit ohittavat \"kursorin\" samaan aikaan kun ääni kuullaan. Ctrl+F1/F2 säätävät pelin aikana."
+msgstr "Vaikuttaa kaikkiin pelimuotoihin. Käytä negatiivista arvoa jos näytön sisääntuloviive on suurempi kuin äänikortin ulostulolatenssi ja päinvastoin. Tämän pitäisi olla säädetty siten, että nuotit ohittavat \"kursorin\" samaan aikaan kun ääni kuullaan. Ctrl+F1/F2 säätävät pelin aikana."
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:50
+#: /tmp/xml2gettext.fghicOohN2:50
 msgid "Audio round-trip latency"
 msgstr "Äänen edestakainen latenssi"
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:51
+#: /tmp/xml2gettext.fghicOohN2:51
 msgid "Affects singing only. The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. While performing, press Ctrl+S for synth mode and adjust with Ctrl+F3/F4."
-msgstr "Vaikuttaa ainoastaan laulamiseen. Tämä on aika joka Performouksen ääniltä kestää saavuttaa kaiuttimesi, lentää mikrofoniin ja takaisin Performouksen kaapattavaksi ja analysoitavaksi. Pelatessa, paina Ctrl+S aktivoidaksesi syntetisaattoritilan ja säädä Ctrl+F3/F4 näppäimillä."
+msgstr "Vaikuttaa ainoastaan laulamiseen. Tämä on aika, joka Performouksen ääniltä kestää saavuttaa kaiuttimesi, lentää mikrofoniin ja takaisin Performouksen kaapattavaksi ja analysoitavaksi. Pelatessa, paina Ctrl+S aktivoidaksesi syntetisaattoritilan ja säädä Ctrl+F3/F4 näppäimillä."
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:52
+#: /tmp/xml2gettext.fghicOohN2:52
 msgid "Audio/controller latency"
 msgstr "Ääni/peliohjain latenssi"
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:53
+#: /tmp/xml2gettext.fghicOohN2:53
 msgid "Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to adjust while performing."
 msgstr "Vaikuttaa vain soittamiseen ja tanssimiseen. Tämä on USB:n viive yhdistettynä äänen ulostuloviiveeseen. Säädä siten, että osut nuotteihin hyvin pelkän kuulon avulla. Ctrl+F5/F6 pelin aikana."
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:54
+#: /tmp/xml2gettext.fghicOohN2:54
 msgid "Audio devices"
 msgstr "Äänilaitteet"
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:55
-msgid "Press Enter to configure (TODO: implement)"
-msgstr "Käytä Äänilaitteet-työkalua."
+#: /tmp/xml2gettext.fghicOohN2:55
+msgid "List of audio devices to try."
+msgstr "Lista kokeiltavista äänilaitteista."
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:56
+#: /tmp/xml2gettext.fghicOohN2:56
 msgid "Menu volume"
-msgstr "Valikko äänenvoimakkuus"
+msgstr "Valikkojen äänenvoimakkuus"
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:57
+#: /tmp/xml2gettext.fghicOohN2:57
 msgid "The volume level of menus, song previews and jukebox mode."
 msgstr "Äänenvoimakkuus valikoissa, kappaleiden esikuunteluissa ja jukeboksi tilassa."
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:58
+#: /tmp/xml2gettext.fghicOohN2:58
 msgid "Music volume"
 msgstr "Musiikin voimakkuus"
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:59
+#: /tmp/xml2gettext.fghicOohN2:59
 msgid "The ingame music volume. Values above 90 are not recommended as distortion may occur."
 msgstr "Pelin äänenvoimakkuus. Arvot yli 90 eivät ole suositeltuja mahdollisen äänen vääristymisen takia."
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:60
+#: /tmp/xml2gettext.fghicOohN2:60
 msgid "Failure volume"
 msgstr "Virheiden äänenvoimakkuus"
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:61
+#: /tmp/xml2gettext.fghicOohN2:61
 msgid "The ingame fail sound volume. Values above 90 are not recommended as distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
 msgstr "Virheäänien voimakkuus. Arvot yli 90 eivät ole suositeltuja mahdollisen äänen vääristymisen takia."
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:62
+#: /tmp/xml2gettext.fghicOohN2:62
 msgid "Song folders"
 msgstr "Kappaleiden sijainnit"
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:63
+#: /tmp/xml2gettext.fghicOohN2:63
 msgid "Where to recursively look for songs. DATADIR at the beginning means all Performous data folders."
 msgstr "Mistä etsiä rekursiivisesti kappaleita. DATADIR alussa tarkoittaa kaikkia Performouksen järjestelmäkansioita."
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:64
+#: /tmp/xml2gettext.fghicOohN2:64
 msgid "Base folders for data"
 msgstr "Järjestelmäkansiot"
 
-#: /tmp/xml2gettext.GEsWrAeldy.c:65
+#: /tmp/xml2gettext.fghicOohN2:65
 msgid "System defaults are included automatically. Additional paths can be added here."
 msgstr "Järjestelmän oletuskansiot sisällytetään automaattisesti. Omia voi lisätä tähän."
 
+#~ msgid "Press Enter to configure (TODO: implement)"
+#~ msgstr "Käytä Äänilaitteet-työkalua."
 #~ msgid "Back"
 #~ msgstr "Takaisin"
 #~ msgid "Go back to main menu"
