@@ -91,7 +91,6 @@ class GuitarGraph: public InstrumentGraph {
 	// Flags
 	bool m_drums; /// are we using drums?
 	bool m_use3d; /// are we using 3d?
-	ConfigItem m_leftymode; /// switch guitar notes to right-to-left direction
 	bool m_practmode; /// switch to enable practice mode
 
 	// Track stuff

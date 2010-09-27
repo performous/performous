@@ -16,6 +16,7 @@ InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevType 
   m_selectedTrack(""),
   m_selectedDifficulty(0),
   m_rejoin(false),
+  m_leftymode(false),
   m_pads(),
   m_correctness(0.0, 5.0),
   m_score(),
@@ -96,9 +97,9 @@ void InstrumentGraph::drawMenu() {
 			if (getGraphType() != input::DANCEPAD) {
 				if (m_input.isKeyboard()) { // Key letters for keyboard
 					txt->dimensions.middle(x - button_margin - m_button.dimensions.w()*0.5f).center(y);
-					txt->draw(getGraphType() == input::GUITAR ? "1" : "U");
+					txt->draw(getGraphType() == input::GUITAR ? (m_leftymode.b() ? "Z" : "1") : "U");
 					txt->dimensions.middle(xx + button_margin - m_button.dimensions.w()*0.5f).center(y);
-					txt->draw(getGraphType() == input::GUITAR ? "2" : "P");
+					txt->draw(getGraphType() == input::GUITAR ? (m_leftymode.b() ? "X" : "2") : "P");
 				} else { // Colored icons for real instruments
 					{
 						glutil::Color c(color(getGraphType() == input::GUITAR ? 0 : 1));

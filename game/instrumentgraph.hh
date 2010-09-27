@@ -135,6 +135,7 @@ class InstrumentGraph {
 	ConfigItem m_selectedTrack; /// menu modifies this to select track
 	ConfigItem m_selectedDifficulty; /// menu modifies this to select difficulty
 	ConfigItem m_rejoin; /// menu sets this if we want to re-join
+	ConfigItem m_leftymode; /// switch guitar notes to right-to-left direction
 	std::string m_trackOpt;
 	std::string m_difficultyOpt;
 	std::string m_leftyOpt;
