@@ -170,9 +170,7 @@ void GuitarGraph::setupJoinMenu() {
 		m_menu.add(MenuOption("", _("Select difficulty"), &m_selectedDifficulty)); // MenuOption that cycles the options
 		m_menu.back().setDynamicName(m_difficultyOpt); // Set the title to be dynamic
 	}
-	// Lefty-mode is not available with keyboard guitar
-	if (m_drums || !m_input.isKeyboard())
-		m_menu.add(MenuOption(_("Lefty-mode"), "", &m_leftymode));
+	m_menu.add(MenuOption(_("Lefty-mode"), "", &m_leftymode));
 	m_menu.back().setDynamicComment(m_leftyOpt);
 	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
 }
