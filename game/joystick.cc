@@ -480,17 +480,17 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 					button = input::WHAMMY_BUTTON;
 					is_guitar_event = true;
 					break;
-				case SDLK_F6: case SDLK_6:
+				case SDLK_F6: case SDLK_6: case SDLK_n:
 					button++;
-				case SDLK_F5: case SDLK_5:
+				case SDLK_F5: case SDLK_5: case SDLK_b:
 					button++;
-				case SDLK_F4: case SDLK_4:
+				case SDLK_F4: case SDLK_4: case SDLK_v:
 					button++;
-				case SDLK_F3: case SDLK_3:
+				case SDLK_F3: case SDLK_3: case SDLK_c:
 					button++;
-				case SDLK_F2: case SDLK_2:
+				case SDLK_F2: case SDLK_2: case SDLK_x:
 					button++;
-				case SDLK_F1: case SDLK_1:
+				case SDLK_F1: case SDLK_1: case SDLK_z: case SDLK_w: case SDLK_y:
 					if(!guitar) return false;
 					is_guitar_event = true;
 					event.type = input::Event::PRESS;
@@ -620,17 +620,17 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 					button = WHAMMY_BUTTON;
 					is_guitar_event = true;
 					break;
-				case SDLK_F6: case SDLK_6:
+				case SDLK_F6: case SDLK_6: case SDLK_n:
 					button++;
-				case SDLK_F5: case SDLK_5:
+				case SDLK_F5: case SDLK_5: case SDLK_b:
 					button++;
-				case SDLK_F4: case SDLK_4:
+				case SDLK_F4: case SDLK_4: case SDLK_v:
 					button++;
-				case SDLK_F3: case SDLK_3:
+				case SDLK_F3: case SDLK_3: case SDLK_c:
 					button++;
-				case SDLK_F2: case SDLK_2:
+				case SDLK_F2: case SDLK_2: case SDLK_x:
 					button++;
-				case SDLK_F1: case SDLK_1:
+				case SDLK_F1: case SDLK_1: case SDLK_z: case SDLK_w: case SDLK_y:
 					if(!guitar) return false;
 					is_guitar_event = true;
 					event.type = input::Event::RELEASE;
