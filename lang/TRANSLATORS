@@ -1,0 +1,32 @@
+# -*- coding: utf-8 -*-
+#
+# Lines like this one (starting with a # are comments)
+# The rest of the lines have the following format:
+#  "$1:$2 Single line of text"
+#
+# Where $1 is the ISO-369-1 two letter language code
+# (the same as for the PO file name)
+#
+# The $2 is one of:
+#  COMMENT  - The comment that shows up on the wiki
+#             translation overview page
+#  CONTACT  - The contact for the translation
+#  STATUS   - The status of the translation, keep this short.
+#             ideally one of: active, inactive, not yet ready
+#
+# TRANSLATOR and LEAD is not yet known by translation_wiki_helper.sh.
+#
+# Also, presently only one CONTACT field per language is allowed
+# for now. (This limitation is indented to be fixed later)
+
+fr:STATUS active
+fr:CONTACT [[User:Yoda|yoda]] (French native speaker)
+
+ja:COMMENT Translations not yet commited to the tree.
+ja:STATUS not yet ready
+#ja:TRANSLATOR [[User:Scientica|scientica]] (not native speaker)
+ja:CONTACT [[User:Scientica|scientica]] (not native speaker)
+
+sv:STATUS active
+#sv:LEAD [[User:Scientica|scientica]] (Swedish native speaker)
+sv:CONTACT [[User:Scientica|scientica]] (Swedish native speaker)
