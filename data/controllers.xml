@@ -15,8 +15,8 @@
 		</mapping>
 	</controller>
 	<controller type="guitar" name="GUITAR_GUITARHERO5">
-		<description>Guitar Hero 5/Band Hero guitar</description>
-		<regexp match="Entertainment Guitar Hero5" />
+		<description>Guitar Hero 5/Band Hero/Warriors of Rock guitar</description>
+		<regexp match="Entertainment Guitar Hero5|GuitarHero for Playstation" />
 		<mapping>
 			<button id="0" value="yellow" />
 			<button id="1" value="green" />
