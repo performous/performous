@@ -22,6 +22,15 @@ namespace {
 		std::string f = s.path + filename;
 		if (boost::filesystem::exists(f)) s.music[trackid] = f;
 	}
+	bool isVocalTrack(std::string name) {
+		if(name == TrackName::LEAD_VOCAL) return true;
+		/*
+		else if(name == TrackName::HARMONIC_1) return true;
+		else if(name == TrackName::HARMONIC_2) return true;
+		else if(name == TrackName::HARMONIC_3) return true;
+		*/
+		return false;
+	}
 	/// Change the MIDI track name to Performous track name
 	/// Return false if not valid
 	bool mangleTrackName(std::string& name) {
@@ -36,7 +45,10 @@ namespace {
 		else if (name == "DRUMS") name = TrackName::DRUMS;
 		else if (name == "BASS") name = TrackName::BASS;
 		else if (name == "GUITAR") name = TrackName::GUITAR;
-		else if (name == "VOCALS") return true;
+		else if (name == "VOCALS") name = TrackName::LEAD_VOCAL;
+		else if (name == "HARM1") name = TrackName::HARMONIC_1;
+		else if (name == "HARM2") name = TrackName::HARMONIC_2;
+		else if (name == "HARM3") name = TrackName::HARMONIC_3;
 		else return false;
 		return true;
 	}
@@ -112,7 +124,7 @@ void SongParser::iniParseHeader() {
 		else if (midi.tracks.size() == 1) name = TrackName::GUITAR; // Original (old) FoF songs only have one track
 		else continue;
 		// Add dummy notes to tracks so that they can be seen in song browser
-		if (name == "VOCALS") s.vocals.notes.push_back(Note());
+		if (isVocalTrack(name)) s.vocals.notes.push_back(Note());
 		else {
 			for (MidiFileParser::NoteMap::const_iterator it2 = it->notes.begin(); it2 != it->notes.end(); ++it2) {
 				// If a track has not enough notes on any level, ignore it
@@ -137,7 +149,7 @@ void SongParser::iniParse() {
 		else if (midi.tracks.size() == 1) name = TrackName::GUITAR; // Original (old) FoF songs only have one track
 		else continue;
 		// Process non-vocal tracks
-		if (name != "VOCALS") {
+		if (!isVocalTrack(name)) {
 			int durCount = 0;
 			s.instrumentTracks.insert(make_pair(name,InstrumentTrack(name)));
 			NoteMap& nm2 = s.instrumentTracks.find(name)->second.nm;
@@ -254,7 +266,6 @@ void SongParser::iniParse() {
 				}
 			}
 		}
-		if (!vocal.notes.empty()) break;
 	}
 	// Figure out if we have BRE in the song
 	for (MidiFileParser::CommandEvents::const_iterator it = midi.cmdevents.begin(); it != midi.cmdevents.end(); ++it) {

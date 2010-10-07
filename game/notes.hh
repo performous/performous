@@ -122,7 +122,7 @@ struct VocalTrack {
 	MusicalScale scale; ///< scale in which song is sung
 };
 
-typedef std::map<std::string, VocalTrack> VocalsTracks;
+typedef std::map<std::string, VocalTrack> VocalTracks;
 
 struct DanceTrack {
 	DanceTrack(std::string& description, Notes& notes);

@@ -317,7 +317,7 @@ void MidiFileParser::process_midi_event(Track& track, uint8_t t, uint8_t arg1, u
 		pitch.push_back(Note(miditime));
 	}
 	// special management for lyrics
-	if (track.name == "PART VOCALS") {
+	if (track.name == "PART VOCALS" || track.name == "PART HARM1" || track.name == "PART HARM2" || track.name == "PART HARM3") {
 		// Discard note effects
 		if( arg1 < 20 ) return;
 		if (t == 8 || (t == 9 && arg2 == 0)) {

@@ -26,8 +26,12 @@ namespace TrackName {
 	const std::string GUITAR_RHYTHM = "Rhythm guitar";
 	const std::string BASS = "Bass";
 	const std::string DRUMS = "Drums";
+	const std::string LEAD_VOCAL = "Vocals";
+	const std::string HARMONIC_1 = "Harmonic 1";
+	const std::string HARMONIC_2 = "Harmonic 2";
+	const std::string HARMONIC_3 = "Harmonic 3";
 	#if 0 // Here is some dummy gettext calls to populate the dictionary
-	_("Guitar") _("Coop guitar") _("Rhythm guitar") _("Bass") _("Drums")
+	_("Guitar") _("Coop guitar") _("Rhythm guitar") _("Bass") _("Drums") _("Vocals")  _("Harmonic 1") _("Harmonic 2") _("Harmonic 3")
 	#endif
 }
 
@@ -36,7 +40,7 @@ class Song: boost::noncopyable {
 	friend class SongParser;
   public:
 	/// constructor
-	Song(std::string const& path_, std::string const& filename_): vocals(std::string("VOCALS")), path(path_), filename(filename_) { reload(false); }
+	Song(std::string const& path_, std::string const& filename_): vocals(TrackName::LEAD_VOCAL), path(path_), filename(filename_) { reload(false); }
 	/// reload song
 	void reload(bool errorIgnore = true);
 	/// parse field
