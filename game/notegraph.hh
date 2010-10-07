@@ -12,7 +12,7 @@ class NoteGraph {
   public:
 	enum Position {FULLSCREEN, TOP, LEFT, RIGHT};
 	/// constructor
-	NoteGraph(VocalTrack const& vocals);
+	NoteGraph(VocalTrack const& vocal);
 	/// resets NoteGraph and Notes
 	void reset();
 	/** draws NoteGraph (notelines, notes, waves)
@@ -25,7 +25,7 @@ class NoteGraph {
 	void drawNotes();
 	/// draw waves (what players are singing)
 	void drawWaves(Database const& database);
-	VocalTrack const& m_vocals;
+	VocalTrack const& m_vocal;
 	Texture m_notelines;
 	Texture m_wave;
 	Texture m_star;
