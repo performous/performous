@@ -174,6 +174,10 @@ void SongParser::iniParse() {
 			if (durCount <= 20) {
 				s.b0rkedTracks = true;
 				nm2.clear();
+				std::ostringstream oss;
+				oss << "Track " << name << " is broken in ";
+				oss << s.path << s.midifilename << std::endl;
+				std::clog << "songparser/warning: " << oss.str(); // More likely to be atomic when written as one string
 				s.instrumentTracks.erase(name);
 			}
 		} else {
