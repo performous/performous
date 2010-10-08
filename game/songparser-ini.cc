@@ -24,11 +24,9 @@ namespace {
 	}
 	bool isVocalTrack(std::string name) {
 		if(name == TrackName::LEAD_VOCAL) return true;
-		/*
 		else if(name == TrackName::HARMONIC_1) return true;
 		else if(name == TrackName::HARMONIC_2) return true;
 		else if(name == TrackName::HARMONIC_3) return true;
-		*/
 		return false;
 	}
 	/// Change the MIDI track name to Performous track name
@@ -46,11 +44,9 @@ namespace {
 		else if (name == "BASS") name = TrackName::BASS;
 		else if (name == "GUITAR") name = TrackName::GUITAR;
 		else if (name == "VOCALS") name = TrackName::LEAD_VOCAL;
-		/*
 		else if (name == "HARM1") name = TrackName::HARMONIC_1;
 		else if (name == "HARM2") name = TrackName::HARMONIC_2;
 		else if (name == "HARM3") name = TrackName::HARMONIC_3;
-		*/
 		else return false;
 		return true;
 	}
@@ -126,7 +122,7 @@ void SongParser::iniParseHeader() {
 		else if (midi.tracks.size() == 1) name = TrackName::GUITAR; // Original (old) FoF songs only have one track
 		else continue; // not a valid track
 		// Add dummy notes to tracks so that they can be seen in song browser
-		if (isVocalTrack(name)) s.getVocalTrack().notes.push_back(Note());
+		if (isVocalTrack(name)) s.insertVocalTrack(name, VocalTrack(name));
 		else {
 			for (MidiFileParser::NoteMap::const_iterator it2 = it->notes.begin(); it2 != it->notes.end(); ++it2) {
 				// If a track has not enough notes on any level, ignore it
@@ -270,8 +266,7 @@ void SongParser::iniParse() {
 					}
 				}
 			}
-			s.getVocalTrack().notes.clear();
-			s.getVocalTrack() = vocal;
+			s.insertVocalTrack(name, vocal);
 		}
 	}
 	// Figure out if we have BRE in the song

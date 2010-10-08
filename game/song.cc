@@ -7,7 +7,7 @@
 
 void Song::reload(bool errorIgnore) {
 	loadStatus = NONE;
-	vocals.reload();
+	vocalTracks.clear();
 	instrumentTracks.clear();
 	beats.clear();
 	midifilename.clear();
@@ -37,9 +37,9 @@ void Song::reload(bool errorIgnore) {
 
 void Song::dropNotes() {
 	// Singing
-	if (!vocals.notes.empty()) {
-		vocals.notes.clear();
-		vocals.notes.push_back(Note()); // Dummy note to indicate there is a track
+	if (!vocalTracks.empty()) {
+		for (VocalTracks::iterator it = vocalTracks.begin(); it != vocalTracks.end(); ++it)
+			it->second.notes.clear();
 	}
 	// Instruments
 	if (!instrumentTracks.empty()) {
@@ -71,10 +71,10 @@ namespace {
 	bool noteEndLessThan(Note const& a, Note const& b) { return a.end < b.end; }
 }
 
-Song::Status Song::status(double time) const {
+Song::Status Song::status(double time) {
 	Note target; target.end = time;
-	Notes::const_iterator it = std::lower_bound(vocals.notes.begin(), vocals.notes.end(), target, noteEndLessThan);
-	if (it == vocals.notes.end()) return FINISHED;
+	Notes::const_iterator it = std::lower_bound(getVocalTrack().notes.begin(), getVocalTrack().notes.end(), target, noteEndLessThan);
+	if (it == getVocalTrack().notes.end()) return FINISHED;
 	if (it->begin > time + 4.0) return INSTRUMENTAL_BREAK;
 	return NORMAL;
 }

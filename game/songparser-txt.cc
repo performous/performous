@@ -22,20 +22,20 @@ void SongParser::txtParseHeader() {
 	while (getline(line) && txtParseField(line)) {}
 	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
 	if (m_bpm != 0.0) addBPM(0, m_bpm);
-	s.getVocalTrack().notes.push_back(Note()); // Dummy note to indicate there is a track
+	s.insertVocalTrack(TrackName::LEAD_VOCAL, VocalTrack(TrackName::LEAD_VOCAL)); // Dummy note to indicate there is a track
 }
 
 /// Parse notes
 void SongParser::txtParse() {
 	std::string line;
-	VocalTrack &vocal = m_song.getVocalTrack();
-	vocal.notes.clear();
+	VocalTrack vocal(TrackName::LEAD_VOCAL);
 	while (getline(line) && txtParseField(line)) {} // Parse the header again
 	if (m_bpm != 0.0) addBPM(0, m_bpm);
 	while (txtParseNote(line, vocal) && getline(line)) {} // Parse notes
 	// Workaround for the terminating : 1 0 0 line, written by some converters
 	if (!vocal.notes.empty() && vocal.notes.back().type != Note::SLEEP
 	  && vocal.notes.back().begin == vocal.notes.back().end) vocal.notes.pop_back();
+	m_song.insertVocalTrack(TrackName::LEAD_VOCAL, vocal);
 }
 
 bool SongParser::txtParseField(std::string const& line) {
