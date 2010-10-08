@@ -38,6 +38,7 @@ namespace TrackName {
 /// class to load and parse songfiles
 class Song: boost::noncopyable {
 	friend class SongParser;
+	VocalTrack vocals; ///< notes for the sing part
   public:
 	/// constructor
 	Song(std::string const& path_, std::string const& filename_): vocals(TrackName::LEAD_VOCAL), path(path_), filename(filename_) { reload(false); }
@@ -58,7 +59,7 @@ class Song: boost::noncopyable {
 	/** Get the song status at a given timestamp **/
 	Status status(double time) const;
 	int randomIdx; ///< sorting index used for random order
-	VocalTrack vocals; ///< notes for the sing part
+	VocalTrack& getVocalTrack(std::string vocalTrack = TrackName::LEAD_VOCAL) { (void) vocalTrack; return vocals; };
 	InstrumentTracks instrumentTracks; ///< guitar etc. notes for this song
 	DanceTracks danceTracks; ///< dance tracks
 	bool hasDance() const { return !danceTracks.empty(); }

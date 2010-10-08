@@ -22,13 +22,13 @@ void SongParser::txtParseHeader() {
 	while (getline(line) && txtParseField(line)) {}
 	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
 	if (m_bpm != 0.0) addBPM(0, m_bpm);
-	s.vocals.notes.push_back(Note()); // Dummy note to indicate there is a track
+	s.getVocalTrack().notes.push_back(Note()); // Dummy note to indicate there is a track
 }
 
 /// Parse notes
 void SongParser::txtParse() {
 	std::string line;
-	VocalTrack &vocal = m_song.vocals;
+	VocalTrack &vocal = m_song.getVocalTrack();
 	vocal.notes.clear();
 	while (getline(line) && txtParseField(line)) {} // Parse the header again
 	if (m_bpm != 0.0) addBPM(0, m_bpm);
