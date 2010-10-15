@@ -48,7 +48,8 @@ class ScreenSing: public Screen {
   public:
 	/// constructor
 	ScreenSing(std::string const& name, Audio& audio, Database& database, Backgrounds& bgs):
-	  Screen(name), m_audio(audio), m_database(database), m_backgrounds(bgs), m_latencyAV(), m_only_singers_alive(true), m_practmode(false)
+	  Screen(name), m_audio(audio), m_database(database), m_backgrounds(bgs), m_latencyAV(), m_only_singers_alive(true), m_practmode(false),
+	  m_selectedTrack(TrackName::LEAD_VOCAL)
 	{}
 	void enter();
 	void exit();
@@ -93,5 +94,6 @@ class ScreenSing: public Screen {
 	AnimValue m_quitTimer;
 	bool m_only_singers_alive;
 	bool m_practmode;
+	std::string m_selectedTrack;
 };
 
