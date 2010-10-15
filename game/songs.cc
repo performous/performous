@@ -273,7 +273,7 @@ void Songs::dumpSongs_internal() const {
 	SongVector svec = m_songs;
 	std::sort(svec.begin(), svec.end(), comparator(&Song::collateByArtist));
 	fs::path coverpath = fs::path(m_songlist) / "covers";
-	fs::create_directory(coverpath);
+	fs::create_directories(coverpath);
 	dumpXML(svec, m_songlist + "/songlist.xml");
 }
 
