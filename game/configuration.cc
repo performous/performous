@@ -66,7 +66,7 @@ void ConfigItem::verifyType(std::string const& type) const {
 	for (Config::const_iterator it = config.begin(); it != config.end(); ++it) {
 		if (&it->second == this) { name = it->first; break; }
 	}
-	if (m_type.empty()) throw std::logic_error("Config item " + name + " used in C++ but missing from config schema");
+	if (m_type.empty()) throw std::logic_error("Config item " + name + ", requested_type=" + type + " used in C++ but missing from config schema");
 	throw std::logic_error("Config item type mismatch: item=" + name + ", type=" + m_type + ", requested=" + type);
 }
 

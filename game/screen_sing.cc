@@ -2,7 +2,6 @@
 
 #include "songparser.hh"
 #include "util.hh"
-#include "configuration.hh"
 #include "screen_players.hh"
 #include "fs.hh"
 #include "database.hh"
@@ -118,6 +117,22 @@ void ScreenSing::enter() {
 	m_menu.clear();
 	m_menu.add(MenuOption(_("Resume"), _("Back to performing!")));
 	m_menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning"), "Sing"));
+	{	// Vocal tracks
+		ConfigItem::OptionList opts;
+		std::vector<std::string> voctracks = m_song->getVocalTrackNames();
+		int cur = 0;
+		// Add vocal tracks to option list
+		for (std::vector<std::string>::const_iterator it = voctracks.begin(); it != voctracks.end(); ++it) {
+			if (m_selectedTrack == *it) cur = opts.size(); // Find the index of current track
+			opts.push_back(*it);
+		}
+		m_vocalTrackOpts = ConfigItem(opts); // Create a ConfigItem from the option list
+		if (opts.size() > 1) { // Vocal track changer only if there is options
+			m_vocalTrackOpts.select(cur); // Set the selection to current track
+			m_menu.add(MenuOption("", _("Change vocal track\n(restart required)"), &m_vocalTrackOpts));
+			m_menu.back().setDynamicName(m_selectedTrack); // Set the title to be dynamic
+		}
+	}
 	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
 	m_menu.close();
 	// Startup delay for instruments is longer than for singing only
@@ -287,6 +302,8 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			if (nav == input::START) {
 				m_menu.action();
 				if (!m_menu.isOpen() && m_audio.isPaused()) m_audio.togglePause();
+				// Handle updates
+				if (m_selectedTrack != m_vocalTrackOpts.so()) m_selectedTrack = m_vocalTrackOpts.so();
 				return;
 			}
 			else if (nav == input::DOWN) { m_menu.move(1); return; }

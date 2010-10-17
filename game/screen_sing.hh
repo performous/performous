@@ -15,6 +15,7 @@
 #include "progressbar.hh"
 #include "webcam.hh"
 #include "screen_players.hh"
+#include "configuration.hh"
 
 class Players;
 class Audio;
@@ -95,5 +96,6 @@ class ScreenSing: public Screen {
 	bool m_only_singers_alive;
 	bool m_practmode;
 	std::string m_selectedTrack;
+	ConfigItem m_vocalTrackOpts;
 };
 
