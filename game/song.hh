@@ -65,12 +65,20 @@ class Song: boost::noncopyable {
 		vocalTracks.erase(vocalTrack);
 		vocalTracks.insert(std::make_pair<std::string, VocalTrack>(vocalTrack, track));
 	};
-	// Change default value to HARMONIC_{1,2,3} to sing harmonics
+	// Get a selected track, or LEAD_VOCAL if not found or the first one if not found
 	VocalTrack& getVocalTrack(std::string vocalTrack = TrackName::LEAD_VOCAL) {
 		if(vocalTracks.find(vocalTrack) != vocalTracks.end()) {
 			return vocalTracks.find(vocalTrack)->second;
 		} else {
-			return dummyVocal;
+			if(vocalTracks.find(TrackName::LEAD_VOCAL) != vocalTracks.end()) {
+				return vocalTracks.find(TrackName::LEAD_VOCAL)->second;
+			} else {
+				if(!vocalTracks.empty()) {
+					vocalTracks.begin()->second;
+				} else {
+					return dummyVocal;
+				}
+			}
 		}
 	};
 	std::vector<std::string> getVocalTrackNames() {
