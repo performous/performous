@@ -74,7 +74,7 @@ class Song: boost::noncopyable {
 				return vocalTracks.find(TrackName::LEAD_VOCAL)->second;
 			} else {
 				if(!vocalTracks.empty()) {
-					vocalTracks.begin()->second;
+					return vocalTracks.begin()->second;
 				} else {
 					return dummyVocal;
 				}
