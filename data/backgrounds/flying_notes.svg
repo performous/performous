@@ -15,7 +15,7 @@
    id="svg1901"
    sodipodi:version="0.32"
    inkscape:version="0.48.0 r9654"
-   sodipodi:docname="notes.svg"
+   sodipodi:docname="flying_notes.svg"
    version="1.1">
   <defs
      id="defs1903">
@@ -60,15 +60,6 @@
        y2="118.35866"
        gradientUnits="userSpaceOnUse" />
     <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient3905-3"
-       id="linearGradient3911-4"
-       x1="44.101856"
-       y1="118.35866"
-       x2="185.40169"
-       y2="118.35866"
-       gradientUnits="userSpaceOnUse" />
-    <linearGradient
        id="linearGradient3905-3">
       <stop
          style="stop-color:#ffe000;stop-opacity:1;"
@@ -89,15 +80,6 @@
        xlink:href="#linearGradient3905-3"
        inkscape:collect="always" />
     <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient3905-0"
-       id="linearGradient3911-1"
-       x1="44.101856"
-       y1="118.35866"
-       x2="185.40169"
-       y2="118.35866"
-       gradientUnits="userSpaceOnUse" />
-    <linearGradient
        id="linearGradient3905-0">
       <stop
          style="stop-color:#ffe000;stop-opacity:1;"
@@ -117,15 +99,6 @@
        id="linearGradient3928-3"
        xlink:href="#linearGradient3905-0"
        inkscape:collect="always" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient3905-6"
-       id="linearGradient3911-14"
-       x1="44.101856"
-       y1="118.35866"
-       x2="185.40169"
-       y2="118.35866"
-       gradientUnits="userSpaceOnUse" />
     <linearGradient
        id="linearGradient3905-6">
       <stop
@@ -155,7 +128,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.7"
-     inkscape:cx="635.6089"
+     inkscape:cx="638.46604"
      inkscape:cy="387.38216"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -173,7 +146,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
