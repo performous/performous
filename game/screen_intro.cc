@@ -135,7 +135,6 @@ void ScreenIntro::populateMenu() {
 		MenuOptions audiomenu;
 		MenuOptions gfxmenu;
 		MenuOptions gamemenu;
-		MenuOptions pathsmenu; // FIXME: Dummy (just to get a gray option to the menu)
 		// Populate the submenus
 		for (Config::iterator it = config.begin(); it != config.end(); ++it) {
 			// Skip items that are configured elsewhere
@@ -153,8 +152,7 @@ void ScreenIntro::populateMenu() {
 		configmain.push_back(MenuOption(_("Audio"), _("Configure general audio settings"), audiomenu, "intro_configure.svg"));
 		configmain.push_back(MenuOption(_("Graphics"), _("Configure rendering and video settings"), gfxmenu, "intro_configure.svg"));
 		configmain.push_back(MenuOption(_("Game"), _("Gameplay related options"), gamemenu, "intro_configure.svg"));
-		// FIXME: 'Paths' should open a screen
-		configmain.push_back(MenuOption(_("Paths"), _("Setup song and data paths"), pathsmenu, "intro_configure.svg"));
+		configmain.push_back(MenuOption(_("Paths"), _("Setup song and data paths"), "Paths", "intro_configure.svg"));
 		configmain.back().image.reset(new Surface(getThemePath("intro_quit.svg")));
 		// Add to root menu
 		m_menu.add(MenuOption(_("Configure"), _("Configure audio and game options"), configmain, "intro_configure.svg"));
