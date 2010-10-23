@@ -116,20 +116,23 @@ SongParser::SongParser(Song& s):
 
 
 void SongParser::finalize() {
-	// Adjust negative notes
-	VocalTrack& vocal = m_song.getVocalTrack();
-	if (vocal.noteMin <= 0) {
-		unsigned int shift = (1 - vocal.noteMin / 12) * 12;
-		vocal.noteMin += shift;
-		vocal.noteMax += shift;
-		for (Notes::iterator it = vocal.notes.begin(); it != vocal.notes.end(); ++it) {
-			it->note += shift;
-			it->notePrev += shift;
+	std::vector<std::string> tracks = m_song.getVocalTrackNames();
+	for(std::vector<std::string>::const_iterator it = tracks.begin() ; it != tracks.end() ; ++it) {
+		// Adjust negative notes
+		VocalTrack& vocal = m_song.getVocalTrack(*it);
+		if (vocal.noteMin <= 0) {
+			unsigned int shift = (1 - vocal.noteMin / 12) * 12;
+			vocal.noteMin += shift;
+			vocal.noteMax += shift;
+			for (Notes::iterator it = vocal.notes.begin(); it != vocal.notes.end(); ++it) {
+				it->note += shift;
+				it->notePrev += shift;
+			}
 		}
+		// Set begin/end times
+		if (!vocal.notes.empty()) vocal.beginTime = vocal.notes.front().begin, vocal.endTime = vocal.notes.back().end;
+		vocal.m_scoreFactor = 1.0 / m_maxScore;
 	}
-	// Set begin/end times
-	if (!vocal.notes.empty()) vocal.beginTime = vocal.notes.front().begin, vocal.endTime = vocal.notes.back().end;
-	vocal.m_scoreFactor = 1.0 / m_maxScore;
 	if (m_tsPerBeat) {
 		// Add song beat markers
 		for (unsigned ts = 0; ts < m_tsEnd; ts += m_tsPerBeat) m_song.beats.push_back(tsTime(ts));
