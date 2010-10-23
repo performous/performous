@@ -124,8 +124,8 @@ void Database::queryPerSongHiscore_HiscoreDisplay (std::ostream & os, boost::sha
 
 	if (songid == -1 || hi.empty())
 	{
-		os << "No Items up to now.\n";
-		os << "Be the first to be listed here!\n";
+		os << _("No Items up to now.") << '\n';
+		os << _("Be the first to be listed here!") << '\n';
 		return;
 	}
 
