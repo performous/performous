@@ -4,6 +4,7 @@
  * @file portaudio.hpp OOP / RAII wrappers & utilities for PortAudio library.
  */
 
+#include <boost/thread.hpp>
 #include <portaudio.h>
 #include <cstdlib>
 #include <stdexcept>
@@ -69,7 +70,14 @@ namespace portaudio {
 
 	struct Init {
 		Init() { PORTAUDIO_CHECKED(Pa_Initialize, ()); }
-		~Init() { std::cout << "Pa_Terminate..."; std::cout.flush(); Pa_Terminate(); std::cout << "ok" << std::endl; }
+		~Init() {
+			// Give audio a little time to shutdown but then just quit
+			boost::thread audiokiller(Pa_Terminate);
+			if (!audiokiller.timed_join(boost::posix_time::milliseconds(2000))) {
+				std::cout << "PortAudio BUG: Pa_Terminate hung for more than two seconds. Exiting program." << std::endl;
+				exit(1);
+			}
+		}
 	};
 
 	struct Params {
@@ -114,7 +122,14 @@ namespace portaudio {
 		{
 			PORTAUDIO_CHECKED(Pa_OpenStream, (&m_handle, input, output, sampleRate, framesPerBuffer, flags, functorCallback<Functor>, &functor));
 		}
-		~Stream() { Pa_CloseStream(m_handle); }
+		~Stream() {
+			// Give audio a little time to shutdown but then just quit
+			boost::thread audiokiller(Pa_CloseStream, m_handle);
+			if (!audiokiller.timed_join(boost::posix_time::milliseconds(2000))) {
+				std::cout << "PortAudio BUG: Pa_CloseStream hung for more than two seconds. Exiting program." << std::endl;
+				exit(1);
+			}
+		}
 		operator PaStream*() { return m_handle; }
 	};
 
