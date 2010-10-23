@@ -153,7 +153,6 @@ void ScreenIntro::populateMenu() {
 		configmain.push_back(MenuOption(_("Graphics"), _("Configure rendering and video settings"), gfxmenu, "intro_configure.svg"));
 		configmain.push_back(MenuOption(_("Game"), _("Gameplay related options"), gamemenu, "intro_configure.svg"));
 		configmain.push_back(MenuOption(_("Paths"), _("Setup song and data paths"), "Paths", "intro_configure.svg"));
-		configmain.back().image.reset(new Surface(getThemePath("intro_quit.svg")));
 		// Add to root menu
 		m_menu.add(MenuOption(_("Configure"), _("Configure audio and game options"), configmain, "intro_configure.svg"));
 	}
