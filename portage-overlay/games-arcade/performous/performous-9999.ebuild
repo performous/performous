@@ -34,7 +34,7 @@ LICENSE="GPL-2
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 
-IUSE="debug editor midi songs tools webcam"
+IUSE="debug midi songs tools webcam"
 
 RDEPEND="gnome-base/librsvg
 	>=dev-libs/boost-1.39.0
@@ -45,7 +45,6 @@ RDEPEND="gnome-base/librsvg
 	media-libs/libpng
 	media-libs/jpeg
 	tools? ( media-gfx/imagemagick[png] )
-	editor? ( media-gfx/imagemagick[png] )
 	webcam? ( media-libs/opencv[v4l] )
 	>=media-video/ffmpeg-0.4.9_p20070616-r20
 	media-libs/portaudio
@@ -78,7 +77,6 @@ src_prepare() {
 src_configure() {
 	local mycmakeargs="
 		$(cmake-utils_use_enable tools TOOLS)
-		$(cmake-utils_use_enable editor EDITOR)
 		$(cmake-utils_use_no webcam WEBCAM)
 		-DCMAKE_INSTALL_PREFIX=${GAMES_PREFIX}
 		-DGENTOO_DATA_DIR=${GAMES_DATADIR}/${PN}
