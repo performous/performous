@@ -116,13 +116,12 @@ static void checkEvents_SDL(ScreenManager& sm) {
 
 void mainLoop(std::string const& songlist) {
 	Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());
-	ScreenManager sm(window);
-	sm.loading(_("Audio..."), 0.1);
 	Audio audio;
 	{ // Print the devices
 		portaudio::AudioDevices ads;
 		std::clog << "audio/info:\n" << ads.dump();
 	}
+	ScreenManager sm(window);
 	try {
 		sm.loading(_("Launching background loaders..."), 0.4);
 		Backgrounds backgrounds;
@@ -213,12 +212,6 @@ void mainLoop(std::string const& songlist) {
 		boost::thread::sleep(now() + 2.0);
 	} catch (QuitNow&) {
 		std::cout << "Terminated." << std::endl;
-	}
-	// Give audio a little time to shutdown but then just quit
-	boost::thread audiokiller(boost::bind(&Audio::close, boost::ref(audio)));
-	if (!audiokiller.timed_join(boost::posix_time::milliseconds(2000))) {
-		std::cout << "Audio hung." << std::endl;
-		exit(EXIT_SUCCESS);
 	}
 }
 
