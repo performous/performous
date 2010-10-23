@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-10-23 15:31+0100\n"
+"POT-Creation-Date: 2010-10-23 15:47+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Vincent Le Ligeour <yoda-jm@users.sourceforge.net>\n"
 "Language-Team: \n"
@@ -533,247 +533,283 @@ msgstr "God Mode Prêt!"
 msgid "Solo!"
 msgstr "Solo!"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:3
+#: ../game/song.hh:35
+msgid "Guitar"
+msgstr "Guitare"
+
+#: ../game/song.hh:35
+msgid "Coop guitar"
+msgstr "Guitare Coop"
+
+#: ../game/song.hh:35
+msgid "Rhythm guitar"
+msgstr "Guitare rythmique"
+
+#: ../game/song.hh:35
+msgid "Bass"
+msgstr "Basse"
+
+#: ../game/song.hh:35
+msgid "Drums"
+msgstr "Batterie"
+
+#: ../game/song.hh:35
+msgid "Vocals"
+msgstr "Voix principale"
+
+#: ../game/song.hh:35
+msgid "Harmonic 1"
+msgstr "Harmonique 1"
+
+#: ../game/song.hh:35
+msgid "Harmonic 2"
+msgstr "Harmonique 2"
+
+#: ../game/song.hh:35
+msgid "Harmonic 3"
+msgstr "Harmonique 3"
+
+#: /tmp/xml2gettext.hw13TQiVaB:3
 msgid "Gameplay settings."
 msgstr "Options de jeu"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:4
+#: /tmp/xml2gettext.hw13TQiVaB:4
 msgid "Graphic"
 msgstr "Graphique"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:5
+#: /tmp/xml2gettext.hw13TQiVaB:5
 msgid "Video and rendering settings."
 msgstr "Options vidéo et de rendu"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:7
+#: /tmp/xml2gettext.hw13TQiVaB:7
 msgid "Audio-related settings."
 msgstr "Options audio"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:9
+#: /tmp/xml2gettext.hw13TQiVaB:9
 msgid "System paths."
 msgstr "Chemins système"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:10
+#: /tmp/xml2gettext.hw13TQiVaB:10
 msgid "Karaoke mode"
 msgstr "Mode karaoké"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:11
+#: /tmp/xml2gettext.hw13TQiVaB:11
 msgid "Hide pitch wave, notes and scoring."
 msgstr "Cache la hauteur chantée, les notes et le score."
 
-#: /tmp/xml2gettext.4IQh1IQiQc:12
+#: /tmp/xml2gettext.hw13TQiVaB:12
 msgid "Pitch waves"
 msgstr "Hauteur chantée"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:13
+#: /tmp/xml2gettext.hw13TQiVaB:13
 msgid "Enable singing pitch display (when not in karaoke mode)."
 msgstr "Active l'affichage de la hauteur du chant (pas dans le mode karaoké)"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:14
+#: /tmp/xml2gettext.hw13TQiVaB:14
 msgid "Theme"
 msgstr "Theme"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:15
+#: /tmp/xml2gettext.hw13TQiVaB:15
 msgid "Name of the theme to use or absolute path to theme folder."
 msgstr "Nom du thème ou chemin absolu vers le répertoire de ce dernier."
 
-#: /tmp/xml2gettext.4IQh1IQiQc:16
+#: /tmp/xml2gettext.hw13TQiVaB:16
 msgid "Keyboard as guitar"
 msgstr "Guitare au clavier"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:17
+#: /tmp/xml2gettext.hw13TQiVaB:17
 msgid "Enable keyboard as guitar (Frets on Fire mode)."
 msgstr "Activer la guitare au clavier (mode Frets on Fire)"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:18
+#: /tmp/xml2gettext.hw13TQiVaB:18
 msgid "Keyboard as drumkit"
 msgstr "Batterie au clavier"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:19
+#: /tmp/xml2gettext.hw13TQiVaB:19
 msgid "Enable keyboard as drumkit."
 msgstr "Activer la batterie au clavier"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:20
+#: /tmp/xml2gettext.hw13TQiVaB:20
 msgid "Keyboard as dance pad"
 msgstr "Tapis de dance au clavier"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:21
+#: /tmp/xml2gettext.hw13TQiVaB:21
 msgid "Enable keyboard as dance pad."
 msgstr "Activer le tapis de dance au clavier"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:22
+#: /tmp/xml2gettext.hw13TQiVaB:22
 msgid "Joystick configuration"
 msgstr "Configuration des joysticks"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:23
+#: /tmp/xml2gettext.hw13TQiVaB:23
 msgid "Force joystick to some kind of instrument."
 msgstr "Force une manette sur un type d'instrument"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:24
+#: /tmp/xml2gettext.hw13TQiVaB:24
 msgid "Hardware MIDI input device"
 msgstr "Périphérique MIDI d'entrée"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:25
+#: /tmp/xml2gettext.hw13TQiVaB:25
 msgid "Part of sound card name or its number or empty to use the first available device. Used currently for MIDI drum controllers."
 msgstr "Partie du nom de la carte son ou son numéro ou vide pour utiliser la première disponible. Utilisé pour les batteries MIDI pour le moment."
 
-#: /tmp/xml2gettext.4IQh1IQiQc:26
+#: /tmp/xml2gettext.hw13TQiVaB:26
 msgid "Windowed width"
 msgstr "Largeur de la fenêtre"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:27
+#: /tmp/xml2gettext.hw13TQiVaB:27
 msgid "The width of the window."
 msgstr "La largeur de la fenêtre"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:28
+#: /tmp/xml2gettext.hw13TQiVaB:28
 msgid "Windowed height"
 msgstr "Hauteur de la fenêtre"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:29
+#: /tmp/xml2gettext.hw13TQiVaB:29
 msgid "The height of the window."
 msgstr "La hauteur de la fenêtre"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:30
+#: /tmp/xml2gettext.hw13TQiVaB:30
 msgid "Fullscreen mode"
 msgstr "Mode plein écran"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:31
+#: /tmp/xml2gettext.hw13TQiVaB:31
 msgid "Enable fullscreen mode on startup."
 msgstr "Activer le mode plein écran au démarage"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:32
+#: /tmp/xml2gettext.hw13TQiVaB:32
 msgid "Video playback"
 msgstr "Rejeu vidéo"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:33
+#: /tmp/xml2gettext.hw13TQiVaB:33
 msgid "Allows completely disabling background videos. It is recommended to leave this enabled as Performous will still smoothly fade out the video if your computer is not fast enough."
 msgstr "Autorise a totalement désactiver les vidéos. Il est recommandé de garder cette option activée car Performous va automatiquement désactiver la vidéo en cas de problème de performances"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:34
+#: /tmp/xml2gettext.hw13TQiVaB:34
 msgid "Webcam background"
 msgstr "Webcam en fond d'écran"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:35
+#: /tmp/xml2gettext.hw13TQiVaB:35
 msgid "Performous can try to use webcam as a background video. You can disable it if it annoys you."
 msgstr "Performous peut essayer d'utiliser une webcam comme vidéo. Desactivez si vous ne le souhaitez pas."
 
-#: /tmp/xml2gettext.4IQh1IQiQc:36
+#: /tmp/xml2gettext.hw13TQiVaB:36
 msgid "Webcam id"
 msgstr "Id de la webcam"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:37
+#: /tmp/xml2gettext.hw13TQiVaB:37
 msgid "Use -1 to autodetect or a number starting from 0 to choose specific device."
 msgstr "Utilisez -1 pour l'autodétection ou un numéro en partant de 0 pour un périphérique spécifique."
 
-#: /tmp/xml2gettext.4IQh1IQiQc:38
+#: /tmp/xml2gettext.hw13TQiVaB:38
 msgid "3D notes"
 msgstr "Notes 3D"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:39
+#: /tmp/xml2gettext.hw13TQiVaB:39
 msgid "Draw instrument notes as 3-dimensional objects. May hurt performance on older hardware."
 msgstr "Dessinne les notes des instruments en 3D"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:40
+#: /tmp/xml2gettext.hw13TQiVaB:40
 msgid "SVG quality"
 msgstr "Qualité SVG"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:41
+#: /tmp/xml2gettext.hw13TQiVaB:41
 msgid "Larger numbers cause vector graphics to be rendered in higher resolution. Decrease this to make navigating in menus faster."
 msgstr "Les grandes valeurs font que les images vectorielles sont générées en haute résolution. Diminuez en cas de problèmes de performance."
 
-#: /tmp/xml2gettext.4IQh1IQiQc:42
+#: /tmp/xml2gettext.hw13TQiVaB:42
 msgid "Text quality"
 msgstr "Qualié texte"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:43
+#: /tmp/xml2gettext.hw13TQiVaB:43
 msgid "Larger numbers cause text to be rendered in higher resolution. Decrease this to make everything a little faster."
 msgstr "Les grandes valeurs font que les textes sont générées en haute résolution. Diminuez en cas de problèmes de performance."
 
-#: /tmp/xml2gettext.4IQh1IQiQc:44
+#: /tmp/xml2gettext.hw13TQiVaB:44
 msgid "Benchmark mode"
 msgstr "Mode perfomance"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:45
+#: /tmp/xml2gettext.hw13TQiVaB:45
 msgid "Framerate limit of 100 FPS is removed and the game instead renders at full speed. FPS values are printed to console. Please note that the display drivers may still limit the rendering speed to the screen refresh rate."
 msgstr "La limite de 100 images par seconde est supprimée et le jeu tourne a vitesse maximale. les IPS sont affichées dans la console. Veuillez noter que le driver peut néanmoins le limiter au taux de rafraîchissement."
 
-#: /tmp/xml2gettext.4IQh1IQiQc:46
+#: /tmp/xml2gettext.hw13TQiVaB:46
 msgid "Suggested latency"
 msgstr "Latence suggérée"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:47
+#: /tmp/xml2gettext.hw13TQiVaB:47
 msgid "This is a hint for the audio engine about the desired latency. Set this as low as possible while retaining clear audio playback. Requires restart."
 msgstr "Ceci est une aide donnée au moteur audio pour la latence souhaitée. Choisir la valeur la plus petite possible qui ne nuit pas à la jouabilité."
 
-#: /tmp/xml2gettext.4IQh1IQiQc:48
+#: /tmp/xml2gettext.hw13TQiVaB:48
 msgid "Audio/video latency"
 msgstr "Latence audio/vidéo"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:49
+#: /tmp/xml2gettext.hw13TQiVaB:49
 msgid "Affects all modes. Use negative value if your display input lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal. This should be set so that the notes pass the cursor at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while performing."
 msgstr "Affecte tous les modes. Latence entre le rendu graphique et sonore. Utilisez Ctrl+F1/F2 pour l'ajuster pendant une chanson"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:50
+#: /tmp/xml2gettext.hw13TQiVaB:50
 msgid "Audio round-trip latency"
 msgstr "Latence audio/audio"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:51
+#: /tmp/xml2gettext.hw13TQiVaB:51
 msgid "Affects singing only. The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. While performing, press Ctrl+S for synth mode and adjust with Ctrl+F3/F4."
 msgstr "Affecte uniquement la voix. Latence entre la capture du micro et le son des enceintes. Utilisez Ctrl+F3/F4 pour l'ajuster pendant une chanson"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:52
+#: /tmp/xml2gettext.hw13TQiVaB:52
 msgid "Audio/controller latency"
 msgstr "Latence audio/controlleur"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:53
+#: /tmp/xml2gettext.hw13TQiVaB:53
 msgid "Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to adjust while performing."
 msgstr "Affecte uniquement les instruments et les tapis de danse. Latence entre le périphérique USB et la sortie sonore. Utilisez Ctrl+F5/F6 pour l'ajuster pendant une chanson"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:54
+#: /tmp/xml2gettext.hw13TQiVaB:54
 msgid "Audio devices"
 msgstr "Périphériques audio"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:55
+#: /tmp/xml2gettext.hw13TQiVaB:55
 msgid "List of audio devices to try."
 msgstr "Liste des périphériques audio à tester"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:56
+#: /tmp/xml2gettext.hw13TQiVaB:56
 msgid "Menu volume"
 msgstr "Volume du menu"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:57
+#: /tmp/xml2gettext.hw13TQiVaB:57
 msgid "The volume level of menus, song previews and jukebox mode."
 msgstr "Le volume sonore des menus, de l'aperçu des chansons et du mode jukebox"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:58
+#: /tmp/xml2gettext.hw13TQiVaB:58
 msgid "Music volume"
 msgstr "Volume de la musique"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:59
+#: /tmp/xml2gettext.hw13TQiVaB:59
 msgid "The ingame music volume. Values above 90 are not recommended as distortion may occur."
 msgstr "Le volume de la musique pendant le jeu. Les valeurs supérieures à 90 ne sont pas reocmmandée (distorsion)"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:60
+#: /tmp/xml2gettext.hw13TQiVaB:60
 msgid "Failure volume"
 msgstr "Volume des erreurs"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:61
+#: /tmp/xml2gettext.hw13TQiVaB:61
 msgid "The ingame fail sound volume. Values above 90 are not recommended as distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
 msgstr "Le volume des morceaux en cas d'erreur. Les valeurs supérieures à 90 ne sont pas recommandées (distorsion)"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:62
+#: /tmp/xml2gettext.hw13TQiVaB:62
 msgid "Song folders"
 msgstr "Répertoire de chansons"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:63
+#: /tmp/xml2gettext.hw13TQiVaB:63
 msgid "Where to recursively look for songs. DATADIR at the beginning means all Performous data folders."
 msgstr "Où chercher récursivement pour des morceux. DATADIR au début signifie tous les répertoires de données."
 
-#: /tmp/xml2gettext.4IQh1IQiQc:64
+#: /tmp/xml2gettext.hw13TQiVaB:64
 msgid "Base folders for data"
 msgstr "Répertoire de base pour les données"
 
-#: /tmp/xml2gettext.4IQh1IQiQc:65
+#: /tmp/xml2gettext.hw13TQiVaB:65
 msgid "System defaults are included automatically. Additional paths can be added here."
 msgstr "Les valeurs par défaut sytème sont incluses automatique. D'autres chemins peuvent être ajoutés ici."
 
