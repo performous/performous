@@ -39,7 +39,9 @@ Dependencies:
 
 	- OpenCV (optional) for webcam support
 
-	Please refer to http://performous.org/develop.html for packages to install.
+	http://wiki.performous.org/index.php/Building_and_installing_from_source
+	for package names on various systems (or just performous.org if the above no
+	longer works).
 	
 
 You can find songs online by Google or at your favorite Torrent sites. We
