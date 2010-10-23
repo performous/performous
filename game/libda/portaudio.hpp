@@ -73,8 +73,8 @@ namespace portaudio {
 		~Init() {
 			// Give audio a little time to shutdown but then just quit
 			boost::thread audiokiller(Pa_Terminate);
-			if (!audiokiller.timed_join(boost::posix_time::milliseconds(2000))) {
-				std::cout << "PortAudio BUG: Pa_Terminate hung for more than two seconds. Exiting program." << std::endl;
+			if (!audiokiller.timed_join(boost::posix_time::milliseconds(5000))) {
+				std::cout << "PortAudio BUG: Pa_Terminate hung for more than five seconds. Exiting program." << std::endl;
 				exit(1);
 			}
 		}
@@ -125,8 +125,8 @@ namespace portaudio {
 		~Stream() {
 			// Give audio a little time to shutdown but then just quit
 			boost::thread audiokiller(Pa_CloseStream, m_handle);
-			if (!audiokiller.timed_join(boost::posix_time::milliseconds(2000))) {
-				std::cout << "PortAudio BUG: Pa_CloseStream hung for more than two seconds. Exiting program." << std::endl;
+			if (!audiokiller.timed_join(boost::posix_time::milliseconds(5000))) {
+				std::cout << "PortAudio BUG: Pa_CloseStream hung for more than five seconds. Exiting program." << std::endl;
 				exit(1);
 			}
 		}
