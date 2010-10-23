@@ -115,18 +115,17 @@ static void checkEvents_SDL(ScreenManager& sm) {
 }
 
 void mainLoop(std::string const& songlist) {
-	Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());
 	Audio audio;
 	{ // Print the devices
 		portaudio::AudioDevices ads;
 		std::clog << "audio/info:\n" << ads.dump();
 	}
+	Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());
+	Backgrounds backgrounds;
+	Database database(getConfigDir() / "database.xml");
+	Songs songs(database, songlist);
 	ScreenManager sm(window);
 	try {
-		sm.loading(_("Launching background loaders..."), 0.4);
-		Backgrounds backgrounds;
-		Database database(getConfigDir() / "database.xml");
-		Songs songs(database, songlist);
 		boost::scoped_ptr<input::MidiDrums> midiDrums;
 		// TODO: Proper error handling...
 		try { midiDrums.reset(new input::MidiDrums); } catch (std::runtime_error&) {}
