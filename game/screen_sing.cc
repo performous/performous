@@ -304,7 +304,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 				m_menu.action();
 				if (!m_menu.isOpen() && m_audio.isPaused()) m_audio.togglePause();
 				// Handle updates
-				if (m_selectedTrack != m_vocalTrackOpts.so()) {
+				if (m_vocalTrackOpts.ol().size() && m_selectedTrack != m_vocalTrackOpts.so()) {
 					m_selectedTrack = m_vocalTrackOpts.so();
 					m_selectedTrackLocalized = _(m_selectedTrack.c_str());
 				}
