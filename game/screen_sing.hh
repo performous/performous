@@ -96,6 +96,7 @@ class ScreenSing: public Screen {
 	bool m_only_singers_alive;
 	bool m_practmode;
 	std::string m_selectedTrack;
+	std::string m_selectedTrackLocalized;
 	ConfigItem m_vocalTrackOpts;
 };
 

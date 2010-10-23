@@ -130,7 +130,8 @@ void ScreenSing::enter() {
 		if (opts.size() > 1) { // Vocal track changer only if there is options
 			m_vocalTrackOpts.select(cur); // Set the selection to current track
 			m_menu.add(MenuOption("", _("Change vocal track\n(restart required)"), &m_vocalTrackOpts));
-			m_menu.back().setDynamicName(m_selectedTrack); // Set the title to be dynamic
+			m_selectedTrackLocalized = _(m_selectedTrack.c_str());
+			m_menu.back().setDynamicName(m_selectedTrackLocalized); // Set the title to be dynamic
 		}
 	}
 	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
@@ -303,7 +304,10 @@ void ScreenSing::manageEvent(SDL_Event event) {
 				m_menu.action();
 				if (!m_menu.isOpen() && m_audio.isPaused()) m_audio.togglePause();
 				// Handle updates
-				if (m_selectedTrack != m_vocalTrackOpts.so()) m_selectedTrack = m_vocalTrackOpts.so();
+				if (m_selectedTrack != m_vocalTrackOpts.so()) {
+					m_selectedTrack = m_vocalTrackOpts.so();
+					m_selectedTrackLocalized = _(m_selectedTrack.c_str());
+				}
 				return;
 			}
 			else if (nav == input::DOWN) { m_menu.move(1); return; }
