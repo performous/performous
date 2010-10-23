@@ -22,6 +22,7 @@ Big features:
 
 Features:
 
+- Paths config GUI
 - Latency calibration
    * Audio roundtrip by analyzing the sound captured by the microphone
    * Controller/audio latency by playing blindly (listening to the beat only)
@@ -42,13 +43,6 @@ Text rendering bugs:
 - Correct vertical alignment
 - Use dimensions to specify bounding box (possibly init from SVG)
 - Lyric hilighted should be rendered in front of the others
-
-
-New config menu:
-
-- Multiple items visible at once
-- Modifying strings and stringlist items
-- Predefined options from config schema and libda device enumeration
 
 
 SS Ripper:
