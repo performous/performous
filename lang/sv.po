@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-10-23 16:29+0100\n"
-"PO-Revision-Date: 2010-10-23 16:29+0100\n"
+"POT-Creation-Date: 2010-10-24 13:06+0100\n"
+"PO-Revision-Date: 2010-10-24 13:06+0100\n"
 "Last-Translator: Fredrik Klasson <scientica@gmail.com>\n"
 "Language-Team: \n"
 "Language: \n"
@@ -18,36 +18,28 @@ msgstr ""
 "X-Poedit-SearchPath-0: ../game\n"
 "X-Poedit-SearchPath-1: ../data\n"
 
-#: ../game/main.cc:120
-msgid "Audio..."
-msgstr "Ljud..."
-
-#: ../game/main.cc:127
-msgid "Launching background loaders..."
-msgstr "Startar bakgrundsladdare..."
-
-#: ../game/main.cc:135
+#: ../game/main.cc:133
 msgid "Loading audio samples..."
 msgstr "Laddar ljud..."
 
-#: ../game/main.cc:149
+#: ../game/main.cc:147
 msgid "Creating screens..."
 msgstr "Skapar skärmar..."
 
-#: ../game/main.cc:158
+#: ../game/main.cc:156
 msgid "Entering main menu"
 msgstr "Går in i huvudmenyn"
 
-#: ../game/main.cc:160
+#: ../game/main.cc:158
 #: ../game/screen_sing.cc:144
 msgid "Loading complete"
 msgstr "Laddning klar"
 
-#: ../game/main.cc:169
+#: ../game/main.cc:167
 msgid "Screenshot taken!"
 msgstr "Skärmdump tagen!"
 
-#: ../game/main.cc:172
+#: ../game/main.cc:170
 msgid "Screenshot failed!"
 msgstr "Misslyckades att ta skärmdump!"
 
@@ -128,21 +120,21 @@ msgstr "Sökvägar"
 msgid "Setup song and data paths"
 msgstr "Ställ in låt- och datasökvägar"
 
-#: ../game/screen_intro.cc:158
+#: ../game/screen_intro.cc:157
 msgid "Configure"
 msgstr "Konfigurera"
 
-#: ../game/screen_intro.cc:158
+#: ../game/screen_intro.cc:157
 msgid "Configure audio and game options"
 msgstr "Ställ in ljud- och spelalternativ"
 
-#: ../game/screen_intro.cc:161
+#: ../game/screen_intro.cc:160
 #: ../game/screen_sing.cc:137
 msgid "Quit"
 msgstr "Avsluta"
 
 # Avsluta/Lämna
-#: ../game/screen_intro.cc:161
+#: ../game/screen_intro.cc:160
 msgid "Leave the game"
 msgstr "Avsluta spelet"
 
@@ -606,260 +598,265 @@ msgid "Harmonic 3"
 msgstr "Överton 3"
 
 # Gameplay skulle nog tom kunna funka...
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:3
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:3
 msgid "Gameplay settings."
 msgstr "Spelstils alternativ."
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:4
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:4
 msgid "Graphic"
 msgstr "Grafik"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:5
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:5
 msgid "Video and rendering settings."
 msgstr "Video- och renderingsinställningar"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:7
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:7
 msgid "Audio-related settings."
 msgstr "Ljud relaterade inställningar"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:9
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:9
 msgid "System paths."
 msgstr "Systemsökvägar"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:10
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:10
 msgid "Karaoke mode"
 msgstr "Karaoke-läge"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:11
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:11
 msgid "Hide pitch wave, notes and scoring."
 msgstr "Döljer tonhöjdsvågorna, noterna och poängräkningen"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:12
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:12
 msgid "Pitch waves"
 msgstr "Tonhöjdsvågor"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:13
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:13
 msgid "Enable singing pitch display (when not in karaoke mode)."
 msgstr "Aktivera tonhöjds visning (när ej i karaoke-läge)"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:14
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:14
 msgid "Theme"
 msgstr "Tema"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:15
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:15
 msgid "Name of the theme to use or absolute path to theme folder."
 msgstr "Namnet på temat att använda eller absolut sökväg till temakatalogen"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:16
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:16
 msgid "Keyboard as guitar"
 msgstr "Tangentbord som gitarr"
 
 # ...
 # Enable -> Use?
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:17
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:17
 msgid "Enable keyboard as guitar (Frets on Fire mode)."
 msgstr "Använd tangentbordet som gitarr (Frets on Fire läge)"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:18
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:18
 msgid "Keyboard as drumkit"
 msgstr "Tangentbord som trumkit"
 
 # ...
 # Enable -> Use?
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:19
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:19
 msgid "Enable keyboard as drumkit."
 msgstr "Använd tangentbordet som trumkit "
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:20
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:20
 msgid "Keyboard as dance pad"
 msgstr "Tangentbord som dansmatta"
 
 # ...
 # Enable -> Use?
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:21
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:21
 msgid "Enable keyboard as dance pad."
 msgstr "Använd tangentbordet som dansmatta"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:22
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:22
 msgid "Joystick configuration"
 msgstr "Joystick-konfiguration"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:23
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:23
 msgid "Force joystick to some kind of instrument."
 msgstr "Tvinga joysticken till något from av instrument"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:24
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:24
 msgid "Hardware MIDI input device"
 msgstr "Hårdvaru MIDI indataenhet"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:25
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:25
 msgid "Part of sound card name or its number or empty to use the first available device. Used currently for MIDI drum controllers."
 msgstr "Del av ljudkortsnamnet, dess nummer eller lämna tomt för att välja första tillgängliga enhet. Används för närvarande bara för MIDI-trum kontroller."
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:26
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:26
 msgid "Windowed width"
 msgstr "Fönsterbredd"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:27
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:27
 msgid "The width of the window."
 msgstr "Fönstrets bredd i fönsterläge"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:28
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:28
 msgid "Windowed height"
 msgstr "Fönsterhöjd"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:29
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:29
 msgid "The height of the window."
 msgstr "Fönstrets höjd i fönsterläge"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:30
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:30
 msgid "Fullscreen mode"
 msgstr "Helskärmsläge"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:31
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:31
 msgid "Enable fullscreen mode on startup."
 msgstr "Aktivera helskärmsläge vid uppstart"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:32
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:32
 msgid "Video playback"
 msgstr "Video uppspelning"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:33
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:33
 msgid "Allows completely disabling background videos. It is recommended to leave this enabled as Performous will still smoothly fade out the video if your computer is not fast enough."
 msgstr "Möjliggör total avstängning av bakgrundsvideor. Det är rekommenderat att lämna detta aktiverat eftersom Performous automatiskt tonar ut video om din dator inte är snabb nog."
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:34
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:34
 msgid "Webcam background"
 msgstr "Web-kamerabakgrund"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:35
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:35
 msgid "Performous can try to use webcam as a background video. You can disable it if it annoys you."
 msgstr "Performous kan försöka använda web-kameran som bakgrundsvideo. Du kan stänga av detta om det stör dig."
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:36
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:36
 msgid "Webcam id"
 msgstr "Web-kamera id"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:37
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:37
 msgid "Use -1 to autodetect or a number starting from 0 to choose specific device."
 msgstr "Använd -1 för autodetektering eller ett tal med början från 0 för att välja en specifik enhet."
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:38
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:38
 msgid "3D notes"
 msgstr "3D-noter"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:39
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:39
 msgid "Draw instrument notes as 3-dimensional objects. May hurt performance on older hardware."
 msgstr "Rita instrumentnoterna som 3D objekt. Kan minska prestandarden på äldre hårdvara."
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:40
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:40
 msgid "SVG quality"
 msgstr "SVG-kvalitet"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:41
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:41
 msgid "Larger numbers cause vector graphics to be rendered in higher resolution. Decrease this to make navigating in menus faster."
 msgstr "Större tal gör att vektorgrafiken renderas is högre upplösning. Minska detta för att göra menynavigation snabbare."
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:42
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:42
 msgid "Text quality"
 msgstr "Textkvalitet"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:43
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:43
 msgid "Larger numbers cause text to be rendered in higher resolution. Decrease this to make everything a little faster."
 msgstr "Större tal gör att text renderas is högre upplösning. Minska detta för att göra allt lite snabbare."
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:44
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:44
 msgid "Benchmark mode"
 msgstr "Prestandamätnings-läge"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:45
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:45
 msgid "Framerate limit of 100 FPS is removed and the game instead renders at full speed. FPS values are printed to console. Please note that the display drivers may still limit the rendering speed to the screen refresh rate."
 msgstr "Ramhastighetsbegränsningen på 100 FPS tas bort och spelet renderas istället i full hastighet. FPS värden skrivs ut till konsollen. Notera att skärmens drivrutin fortfarande kan begränsa renderingshastigheten till skärmens uppdateringshastighet."
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:46
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:46
 msgid "Suggested latency"
 msgstr "Föreslagen fördröjning"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:47
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:47
 msgid "This is a hint for the audio engine about the desired latency. Set this as low as possible while retaining clear audio playback. Requires restart."
 msgstr "Detta är en ledtråd till ljudmotorn om den önskade fördröjningen. Ställ in detta till lägsta möjliga värde med bibehållet klar ljuduppspelning. Kräver omstart."
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:48
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:48
 msgid "Audio/video latency"
 msgstr "Ljud/video-fördröjning"
 
 # display input lag.
 # sound card output latency.
 # IMO: the details ("Use neg...") should be *after* the "This should be set". (translation preserves current order.)
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:49
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:49
 msgid "Affects all modes. Use negative value if your display input lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal. This should be set so that the notes pass the cursor at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while performing."
 msgstr "Påverkar alla lägen. Använd negativa värden om skräm in eftersläpet är större än ljudkortets ut fördröjning, välj positiva värden om det är tvärtom och noll om de lika stora. Detta bör ställas in så att noterna passerar markören samtidigt som ljudet hörs. Använd Ctrl+F1/F2 för att justera under pågående uppträdande."
 
 # ...
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:50
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:50
 msgid "Audio round-trip latency"
 msgstr "Ljud round-trip fördröjning"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:51
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:51
 msgid "Affects singing only. The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. While performing, press Ctrl+S for synth mode and adjust with Ctrl+F3/F4."
 msgstr "Påverkar endast sjungande. Tiden det tar för Performous ljuduppspelning att från högtalarna, till mikrofonen och hela vägen tillbaks tills Performous plockar upp det och analyserar det. Tryck Ctrl+S för synt-läge under pågående uppträdande och justera med Ctrl+F3/F4."
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:52
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:52
 msgid "Audio/controller latency"
 msgstr "Ljud/kontroll-fördröjning"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:53
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:53
 msgid "Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to adjust while performing."
 msgstr "Påverkar endast instrument och dans. Den totala USB (gitarr eller dansmatta) fördröjningen kombinerat med utgående ljud-fördröjning. Justera så att du kan träffa noterna när du spelar efter känsla (inte ser på skärmen). Använd Ctrl+F5/F6 för att justera under uppträdande."
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:54
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:54
 msgid "Audio devices"
 msgstr "Ljudenheter"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:55
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:55
 msgid "List of audio devices to try."
 msgstr "Lista med ljudenheter att prova."
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:56
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:56
 msgid "Menu volume"
 msgstr "Meny-volym"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:57
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:57
 msgid "The volume level of menus, song previews and jukebox mode."
 msgstr "Ljudvolymen i menyer, vid förhandsgranskning av låtar och jukebox-läge"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:58
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:58
 msgid "Music volume"
 msgstr "Musik-volym"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:59
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:59
 msgid "The ingame music volume. Values above 90 are not recommended as distortion may occur."
 msgstr "Ljudvolymen i spelet. Värden över 90 rekommenderas inte då distortion kan ske."
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:60
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:60
 msgid "Failure volume"
 msgstr "Misslyckande-volym"
 
 # ... heh?
 # Following the german trans: ignoring "89 louder!"
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:61
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:61
 msgid "The ingame fail sound volume. Values above 90 are not recommended as distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
 msgstr "Ljudvolymen vid misslyckande under spel. Värden över 90 rekommenderas inte eftersom förvrängning kan ske. 11 är högre än 10, men dessa går upp till 100."
 
 # Låt/Sång
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:62
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:62
 msgid "Song folders"
 msgstr "Låtkataloger"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:63
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:63
 msgid "Where to recursively look for songs. DATADIR at the beginning means all Performous data folders."
 msgstr "Anger var rekursiv sökning efter låtar sker. DATADIR i början innebär alla Performous datakataloger."
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:64
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:64
 msgid "Base folders for data"
 msgstr "Baskatalog för data"
 
-#: /tmp/.private/frekla/xml2gettext.fYBlJY4nE2:65
+#: /tmp/.private/frekla/xml2gettext.23yf2zFe3x:65
 msgid "System defaults are included automatically. Additional paths can be added here."
 msgstr "Systemets standardvärden inkluderas automatiskt. Extra sökvägar kan läggas till här."
 
+#~ msgid "Audio..."
+#~ msgstr "Ljud..."
+
+#~ msgid "Launching background loaders..."
+#~ msgstr "Startar bakgrundsladdare..."
