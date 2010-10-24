@@ -42,7 +42,7 @@ if(UNIX)
 		set(CPACK_GENERATOR "DEB")
 		set(CPACK_DEBIAN_PACKAGE_PRIORITY "extra")
 		set(CPACK_DEBIAN_PACKAGE_SECTION "universe/games")
-		set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "ultrastar-songs, ultrastar-songs-restricted, msttcorefonts")
+		set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "ultrastar-songs, ultrastar-songs-restricted, ttf-mscorefonts-installer")
 		# We need to alter the architecture names as per distro rules
 		if("${CPACK_PACKAGE_ARCHITECTURE}" MATCHES "i[3-6]86")
 			set(CPACK_PACKAGE_ARCHITECTURE i386)
@@ -50,16 +50,31 @@ if(UNIX)
 		if("${CPACK_PACKAGE_ARCHITECTURE}" MATCHES "x86_64")
 			set(CPACK_PACKAGE_ARCHITECTURE amd64)
 		endif("${CPACK_PACKAGE_ARCHITECTURE}" MATCHES "x86_64")
+
 		# Set the dependencies based on the distro version
+
+		# Ubuntu
 		if("${LSB_DISTRIB}" MATCHES "Ubuntu9.10")
 			set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsdl1.2debian, libcairo2, librsvg2-2, libboost-thread1.38.0, libboost-program-options1.38.0, libboost-regex1.38.0, libboost-filesystem1.38.0, libboost-date-time1.38.0, libavcodec52, libavformat52, libswscale0, libmagick++2, libxml++2.6-2, libglew1.5, libpng12-0, libjpeg62")
 		endif("${LSB_DISTRIB}" MATCHES "Ubuntu9.10")
+
+		if("${LSB_DISTRIB}" MATCHES "Ubuntu10.04")
+			set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsdl1.2debian, libcairo2, librsvg2-2, libboost-thread1.40.0, libboost-program-options1.40.0, libboost-regex1.40.0, libboost-filesystem1.40.0, libboost-date-time1.40.0, libavcodec52|libavcodec-extra-52, libavformat52|libavformat-extra-52, libswscale0, libmagick++2, libxml++2.6-2, libglew1.5, libpng12-0, libjpeg62, libportmidi0, libcv4, libhighgui4")
+		endif("${LSB_DISTRIB}" MATCHES "Ubuntu10.04")
+
+		if("${LSB_DISTRIB}" MATCHES "Ubuntu10.10")
+			set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsdl1.2debian, libcairo2, librsvg2-2, libboost-thread1.42.0, libboost-program-options1.42.0, libboost-regex1.42.0, libboost-filesystem1.42.0, libboost-date-time1.42.0, libavcodec52|libavcodec-extra-52, libavformat52|libavformat-extra-52, libswscale0, libmagick++2, libxml++2.6-2, libglew1.5, libpng12-0, libjpeg62, libportmidi0, libcv2.1, libhighgui2.1")
+		endif("${LSB_DISTRIB}" MATCHES "Ubuntu10.10")
+
+		# Debian
 		if("${LSB_DISTRIB}" MATCHES "Debian5.*")
 			set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsdl1.2debian, libcairo2, librsvg2-2, libboost-dev, libavcodec51, libavformat52, libswscale0, libmagick++10, libxml++2.6-2, libglew1.5")
 		endif("${LSB_DISTRIB}" MATCHES "Debian5.*")
+
 		if("${LSB_DISTRIB}" MATCHES "Debiantesting")
                         set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsdl1.2debian, libcairo2, librsvg2-2, libboost-dev, libavcodec52, libavformat52, libswscale0, libmagick++3, libxml++2.6-2, libglew1.5")
                 endif("${LSB_DISTRIB}" MATCHES "Debiantesting")
+
 		if(NOT CPACK_DEBIAN_PACKAGE_DEPENDS)
 			message("WARNING: ${LSB_DISTRIB} not supported yet.\nPlease set deps in cmake/performous-packaging.cmake before packaging.")
 		endif(NOT CPACK_DEBIAN_PACKAGE_DEPENDS)
