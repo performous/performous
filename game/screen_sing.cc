@@ -189,18 +189,19 @@ bool ScreenSing::instrumentLayout(double time) {
 		m_help->draw();
 	}
 	// Set volume levels (averages of all instruments playing that track)
+	// FIXME: There should NOT be gettext calls here!
 	for( std::map<std::string,std::string>::iterator it = m_song->music.begin() ; it != m_song->music.end() ; ++it ) {
 		double level = 1.0;
-		if (volume.find(it->first) == volume.end()) {
+		if (volume.find(_(it->first.c_str())) == volume.end()) {
 			m_audio.streamFade(it->first, level);
 		} else {
-			CountSum cs = volume[it->first];
+			CountSum cs = volume[_(it->first.c_str())];
 			if (cs.first > 0) level = cs.second / cs.first;
 			if (m_song->music.size() <= 1) level = std::max(0.333, level);
 			m_audio.streamFade(it->first, level);
 		}
-		if (pitchbend.find(it->first) != pitchbend.end()) {
-			CountSum cs = pitchbend[it->first];
+		if (pitchbend.find(_(it->first.c_str())) != pitchbend.end()) {
+			CountSum cs = pitchbend[_(it->first.c_str())];
 			level = cs.second;
 			m_audio.streamBend(it->first, level);
 		}
