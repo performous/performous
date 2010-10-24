@@ -1,7 +1,7 @@
 project(Performous CXX C)
 cmake_minimum_required(VERSION 2.6)
 cmake_policy(VERSION 2.6)
-set(PROJECT_VERSION "0.6.0")
+set(PROJECT_VERSION "0.6.0+")
 
 # Avoid source tree pollution
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
