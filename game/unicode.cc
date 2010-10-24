@@ -4,6 +4,11 @@
 #include <glibmm/convert.h>
 #include <sstream>
 
+// FIXME: Glib::convert may throw a Glib::ConvertError that doesn't
+//        get caught in Windows builds with dynamic glibmm.
+#ifdef _WIN32
+void convertToUTF8( std::stringstream &, std::string ) {
+#else
 void convertToUTF8( std::stringstream &_stream, std::string _filename ) {
 	try {
 		Glib::convert(_stream.str(), "UTF-8", "UTF-8"); // Test if input is UTF-8
@@ -17,6 +22,7 @@ void convertToUTF8( std::stringstream &_stream, std::string _filename ) {
 			for (char ch; _stream.get(ch);) tmp += (ch >= 0x20 && ch < 0x7F) ? ch : '?';
 		}
 	}
+#endif
 }
 
 std::string unicodeCollate(std::string const& str) {
