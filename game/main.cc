@@ -159,12 +159,24 @@ void mainLoop(std::string const& songlist) {
 		// Main loop
 		boost::xtime time = now();
 		unsigned frames = 0;
+		#if 0
+		// Screenshot spammer utility
+		boost::xtime shottimer = now();
 		while (!sm.isFinished()) {
+			const std::string shotmsg = "";
+			if (now() - shottimer > 2.0) {
+				g_take_screenshot = true;
+				shottimer = now();
+			}
+		#else
+		while (!sm.isFinished()) {
+			const std::string shotmsg = _("Screenshot taken!");
+		#endif
 			if( g_take_screenshot ) {
 				fs::path filename;
 				try {
 					window.screenshot();
-					sm.flashMessage(_("Screenshot taken!"));
+					sm.flashMessage(shotmsg);
 				} catch (std::exception& e) {
 					std::cerr << "ERROR: " << e.what() << std::endl;
 					sm.flashMessage(_("Screenshot failed!"));
