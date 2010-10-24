@@ -2,6 +2,7 @@
 #include "fs.hh"
 #include "screen.hh"
 #include "joystick.hh"
+#include "profiler.hh"
 #include "songs.hh"
 #include "backgrounds.hh"
 #include "database.hh"
@@ -160,6 +161,7 @@ void mainLoop(std::string const& songlist) {
 		boost::xtime time = now();
 		unsigned frames = 0;
 		while (!sm.isFinished()) {
+			Profiler prof("mainloop");
 			if( g_take_screenshot ) {
 				fs::path filename;
 				try {
@@ -172,13 +174,16 @@ void mainLoop(std::string const& songlist) {
 				g_take_screenshot = false;
 			}
 			sm.updateScreen();  // exit/enter, any exception is fatal error
+			prof("misc");
 			try {
 				// Draw
 				window.blank();
 				sm.getCurrentScreen()->draw();
 				sm.drawNotifications();
+				prof("draw");
 				// Display (and wait until next frame)
 				window.swap();
+				prof("swap");
 				if (config["graphic/fps"].b()) {
 					++frames;
 					if (now() - time > 1.0) {
@@ -191,9 +196,11 @@ void mainLoop(std::string const& songlist) {
 					time = now();
 					frames = 0;
 				}
+				prof("fpsctrl");
 				// Process events for the next frame
 				if (midiDrums) midiDrums->process();
 				checkEvents_SDL(sm);
+				prof("events");
 			} catch (std::runtime_error& e) {
 				std::cerr << "ERROR: " << e.what() << std::endl;
 				sm.flashMessage(std::string("ERROR: ") + e.what());
