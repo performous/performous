@@ -214,7 +214,11 @@ public:
 	bool prepare() {
 		bool ready = true;
 		for (Tracks::iterator it = tracks.begin(), itend = tracks.end(); it != itend; ++it) {
-			if (!it->second->mpeg.audioQueue.prepare(m_pos)) ready = false;
+			FFmpeg& mpeg = it->second->mpeg;
+			if (mpeg.terminating()) continue;  // Song loading failed or other error, won't ever get ready
+			if (mpeg.audioQueue.prepare(m_pos)) continue;  // Buffering done
+			ready = false;  // Need to wait for buffering
+			break;
 		}
 		return ready;
 	}
