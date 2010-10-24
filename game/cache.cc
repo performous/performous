@@ -1,8 +1,9 @@
 #include "cache.hh"
-
 #include "fs.hh"
 
 #include <boost/format.hpp>
+#include <algorithm>
+#include <boost/algorithm/string/classification.hpp>
 
 namespace cache {
 	fs::path constructSVGCacheFileName(fs::path const& svgfilename, double factor){
@@ -16,7 +17,10 @@ namespace cache {
 		} else {
 			// We use the full path under cache to avoid name collisions
 			// with images other than theme files (mostly backgrounds).
-			cache_filename = getCacheDir() / "misc" / svgfilename.parent_path() / cache_basename;
+			std::string fullpath = svgfilename.parent_path().string();
+			// Windows drive name handling
+			std::replace_if(fullpath.begin(), fullpath.end(), boost::is_any_of(":"), '_');
+			cache_filename = getCacheDir() / "misc" / fullpath / cache_basename;
 		}
 
 		return cache_filename;
