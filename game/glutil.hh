@@ -5,6 +5,8 @@
 
 #include <GL/glew.h>
 
+#include "color.hh"
+
 namespace glutil {
 	/// wrapper struct for RAII
 	struct PushMatrix {
@@ -59,18 +61,47 @@ namespace glutil {
 		}
 	};
 
-	/// struct to store color information
 	struct Color {
 		float r, ///< red component
 		      g, ///< green
 		      b, ///< blue
 		      a; ///< alpha value
-		/// create nec Color object with given channels
-		Color(float r_ = 0.0, float g_ = 0.0, float b_ = 0.0, float a_ = 1.0): r(r_), g(g_), b(b_), a(a_) {}
+		/// create nec Color object from the Color object
+		Color(::Color const& c): r(c.r), g(c.g), b(c.b), a(c.a) {
+			glColor4fv(*this);
+		//	GLfloat ColorVect[] = {r, g, b, a};
+		//	glEnableClientState(GL_COLOR_ARRAY);
+		//	glColorPointer (4,GL_FLOAT,0,ColorVect);
+		}
+		~Color() {
+			r = g = b = a = 1.0f;
+			glColor4fv(*this);
+		//	glDisableClientState (GL_COLOR_ARRAY);
+		}
 		/// overload float cast
 		operator float*() { return reinterpret_cast<float*>(this); }
 		/// overload float const cast
 		operator float const*() const { return reinterpret_cast<float const*>(this); }
+	};
+
+	/// easy line
+	struct Line {
+		Line(float x1, float y1, float x2, float y2) {
+			Begin line(GL_LINES);
+			glVertex2f(x1,y1);
+			glVertex2f(x2,y2);
+		}
+	};
+
+	/// easy square
+	struct Square {
+		Square(float cx, float cy, float r, bool filled = false) {
+			Begin line(filled ? GL_QUADS : GL_LINE_LOOP);
+			glVertex2f(cx-r,cy+r);
+			glVertex2f(cx-r,cy-r);
+			glVertex2f(cx+r,cy-r);
+			glVertex2f(cx+r,cy+r);
+		}
 	};
 
 	/// Checks for OpenGL error and displays it with given location info

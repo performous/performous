@@ -40,17 +40,17 @@ void Songs::reload_internal() {
 		m_dirty = true;
 	}
 	Profiler prof("Song loading took");
-	Paths paths = getPathsConfig("system/path_songs");
+	Paths paths = getPathsConfig("paths/songs");
 	for (Paths::iterator it = paths.begin(); m_loading && it != paths.end(); ++it) {
 		try {
-			if (!fs::is_directory(*it)) { m_debug << ">>> Not scanning: " << *it << " (no such directory)" << std::endl; continue; }
-			m_debug << ">>> Scanning " << *it << std::endl;
+			if (!fs::is_directory(*it)) { m_debug << "Songs/info: >>> Not scanning: " << *it << " (no such directory)" << std::endl; continue; }
+			m_debug << "Songs/info: >>> Scanning " << *it << std::endl;
 			size_t count = m_songs.size();
 			reload_internal(*it);
 			size_t diff = m_songs.size() - count;
 			if (diff > 0 && m_loading) m_debug << diff << " songs loaded" << std::endl;
 		} catch (std::exception& e) {
-			m_debug << ">>> Error scanning " << *it << ": " << e.what() << std::endl;
+			m_debug << "Songs/error: >>> Error scanning " << *it << ": " << e.what() << std::endl;
 		}
 	}
 	prof("total");
@@ -60,7 +60,7 @@ void Songs::reload_internal() {
 
 void Songs::reload_internal(fs::path const& parent) {
 	namespace fs = fs;
-	if (std::distance(parent.begin(), parent.end()) > 20) { m_debug << ">>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)" << std::endl; return; }
+	if (std::distance(parent.begin(), parent.end()) > 20) { m_debug << "Songs/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)" << std::endl; return; }
 	try {
 		boost::regex expression("(.*\\.txt|^song\\.ini|.*\\.sm)$", boost::regex_constants::icase);
 		boost::cmatch match;
@@ -80,13 +80,13 @@ void Songs::reload_internal(fs::path const& parent) {
 			} catch (SongParserException& e) {
 				if (e.silent()) continue;
 				// Construct error message
-				m_debug << "-!- Error in " << path << "\n    " << name;
+				m_debug << "Songs/error: -!- Error in " << path << "\n    " << name;
 				if (e.line()) m_debug << " line " << e.line();
 				m_debug << ": " << e.what() << std::endl;
 			}
 		}
 	} catch (std::exception const& e) {
-		m_debug << "Error accessing " << parent << e.what() << std::endl;
+		m_debug << "Songs/error: Error accessing " << parent << e.what() << std::endl;
 	}
 }
 
@@ -273,7 +273,7 @@ void Songs::dumpSongs_internal() const {
 	SongVector svec = m_songs;
 	std::sort(svec.begin(), svec.end(), comparator(&Song::collateByArtist));
 	fs::path coverpath = fs::path(m_songlist) / "covers";
-	fs::create_directory(coverpath);
+	fs::create_directories(coverpath);
 	dumpXML(svec, m_songlist + "/songlist.xml");
 }
 

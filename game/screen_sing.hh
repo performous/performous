@@ -7,8 +7,6 @@
 #include "animvalue.hh"
 #include "engine.hh"
 #include "instrumentgraph.hh"
-#include "guitargraph.hh"
-#include "dancegraph.hh"
 #include "screen.hh"
 #include "backgrounds.hh"
 #include "theme.hh"
@@ -17,11 +15,13 @@
 #include "progressbar.hh"
 #include "webcam.hh"
 #include "screen_players.hh"
+#include "configuration.hh"
 
 class Players;
 class Audio;
 class Database;
 class Video;
+class Menu;
 
 typedef boost::ptr_vector<InstrumentGraph> Instruments;
 typedef boost::ptr_vector<InstrumentGraph> Dancers;
@@ -49,7 +49,8 @@ class ScreenSing: public Screen {
   public:
 	/// constructor
 	ScreenSing(std::string const& name, Audio& audio, Database& database, Backgrounds& bgs):
-	  Screen(name), m_audio(audio), m_database(database), m_backgrounds(bgs), m_latencyAV(), m_only_singers_alive(true), m_practmode(false)
+	  Screen(name), m_audio(audio), m_database(database), m_backgrounds(bgs), m_latencyAV(), m_only_singers_alive(true), m_practmode(false),
+	  m_selectedTrack(TrackName::LEAD_VOCAL)
 	{}
 	void enter();
 	void exit();
@@ -71,6 +72,7 @@ class ScreenSing: public Screen {
 	void activateNextScreen();
 	bool instrumentLayout(double time);
 	void danceLayout(double time);
+	void drawMenu();
 	Audio& m_audio;
 	Database& m_database;
 	Backgrounds& m_backgrounds;
@@ -84,6 +86,8 @@ class ScreenSing: public Screen {
 	boost::scoped_ptr<Surface> m_help;
 	boost::scoped_ptr<Engine> m_engine;
 	boost::scoped_ptr<LayoutSinger> m_layout_singer;
+	boost::scoped_ptr<ThemeInstrumentMenu> m_menuTheme;
+	Menu m_menu;
 	Instruments m_instruments;
 	Dancers m_dancers;
 	double m_latencyAV;  // Latency between audio and video output (do not confuse with latencyAR)
@@ -91,5 +95,8 @@ class ScreenSing: public Screen {
 	AnimValue m_quitTimer;
 	bool m_only_singers_alive;
 	bool m_practmode;
+	std::string m_selectedTrack;
+	std::string m_selectedTrackLocalized;
+	ConfigItem m_vocalTrackOpts;
 };
 

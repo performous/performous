@@ -50,14 +50,15 @@ class LayoutSinger {
   public:
 	enum Position {BOTTOM, MIDDLE, LEFT, RIGHT};
 	/// ThemeSing is optional if you want to use drawScore only
-	LayoutSinger(VocalTrack& vocals, Database& database, boost::shared_ptr<ThemeSing> theme = boost::shared_ptr<ThemeSing>());
+	LayoutSinger(VocalTrack& vocal, Database& database, boost::shared_ptr<ThemeSing> theme = boost::shared_ptr<ThemeSing>());
 	~LayoutSinger();
 	void reset();
 	void draw(double time, Position position = LayoutSinger::BOTTOM);
 	void drawScore(Position position);
 	double lyrics_begin();
+	void hideLyrics(bool hide = true) { m_hideLyrics = hide; };
   private:
-	VocalTrack& m_vocals;
+	VocalTrack& m_vocal;
 	NoteGraph m_noteGraph;
 	Notes::const_iterator m_lyricit;
 	std::deque<LyricRow> m_lyrics;
@@ -67,4 +68,5 @@ class LayoutSinger {
 	Database& m_database;
 	boost::shared_ptr<ThemeSing> m_theme;
 	AnimValue m_feedbackFader;
+	bool m_hideLyrics;
 };

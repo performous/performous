@@ -1,8 +1,22 @@
+NOTICE
+======
+**Developer guides are now located at the wiki: http://wiki.performous.org/index.php/Developing**
+
+**This file is out dated.**
+
 Where to find the files you are looking for:
 
-share/      icons and other such binary files
-themes/     all graphics, menu music, etc
-game/       the source code of the game
+	docs/              documentation and man pages
+	data/              sounds and other such binaries + configuration files
+	themes/            all graphics, menu music, etc
+	game/              the source code of the game
+	tools/             various tools and scripts for both end-users and developers
+	lang/              translations
+	osx-utils/         OSX packaging tools
+	win32/             Windows specific stuff and packaging utilities
+	editor/            defunct song editor
+	portage-overlay/   ebuilds for Gentoo
+	cmake/             CMake modules
 
 When adding new data files, you may need to edit the CMakeLists.txt file in that
 folder to have CMake actually install it. When adding new source code files,
@@ -165,7 +179,4 @@ TDD hasn't been used, as it doesn't seem suitable for game developement where
 there are no specifications to follow (you only find out what you will be doing
 after implementing some of it). Writing useful tests for code dealing with
 graphics, threads etc. is also very difficult.
-
-
-TODO: move the documentation in this file to the website developers page?
 

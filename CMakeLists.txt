@@ -1,7 +1,7 @@
 project(Performous CXX C)
 cmake_minimum_required(VERSION 2.6)
 cmake_policy(VERSION 2.6)
-set(PROJECT_VERSION "0.5.1+")
+set(PROJECT_VERSION "0.6.0+")
 
 # Avoid source tree pollution
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
@@ -58,12 +58,6 @@ add_subdirectory(data)
 add_subdirectory(game)
 add_subdirectory(docs)
 
-option(ENABLE_EDITOR "Enable experimental song editor (doesn't work)" OFF)
-
-if (ENABLE_EDITOR)
-  add_subdirectory(editor)
-endif (ENABLE_EDITOR)
-
 option(ENABLE_TOOLS "Enable extra tools (e.g. Singstar ripper)" ON)
 
 if (ENABLE_TOOLS)
@@ -72,4 +66,5 @@ endif (ENABLE_TOOLS)
 
 if(WIN32)
 	option(ENABLE_VERSIONING "Add number version information. This allows to add version information to exe. Be carefull, in beta (and a lot useless)" OFF)
+	install(FILES win32/ConfigureSongDirectory.bat DESTINATION bin)
 endif(WIN32)

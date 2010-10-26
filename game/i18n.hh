@@ -4,6 +4,7 @@
 /* Internationalization Dependances */
 #include <libintl.h>
 #include <locale.h>
+#include "fs.hh"
 #define _(x) gettext(x)
 #else
 #define _(x) (x)

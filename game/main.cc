@@ -2,6 +2,7 @@
 #include "fs.hh"
 #include "screen.hh"
 #include "joystick.hh"
+#include "profiler.hh"
 #include "songs.hh"
 #include "backgrounds.hh"
 #include "database.hh"
@@ -9,18 +10,19 @@
 #include "video_driver.hh"
 #include "i18n.hh"
 #include "glutil.hh"
+#include "log.hh"
 
 // Screens
 #include "screen_intro.hh"
 #include "screen_songs.hh"
 #include "screen_sing.hh"
 #include "screen_practice.hh"
-#include "screen_configuration.hh"
+#include "screen_audiodevices.hh"
+#include "screen_paths.hh"
 #include "screen_players.hh"
 
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
-#include <boost/spirit/include/classic_core.hpp>
 #include <boost/thread.hpp>
 #include <csignal>
 #include <fstream>
@@ -28,35 +30,16 @@
 #include <vector>
 #include <cstdlib>
 
-#include <boost/iostreams/stream_buffer.hpp>
-
 volatile bool g_quit = false;
 
 bool g_take_screenshot = false;
-bool g_verbose_messages = false;
-
-class VerboseMessageSink : public boost::iostreams::sink {
-public:
-	// i.e. make clog like cout, but only if g_verbose_messages is set.
-	// (we could use cerr or any other file if we want)
-	std::streamsize write(const char* s, std::streamsize n) {
-		if(g_verbose_messages)
-			for(std::streamsize i=0; i<n; i++)
-				std::cout << s[i];
-
-		return n;
-	}
-};
-// defining them in main() causes segfault at exit as they apparently got free'd before that
-boost::iostreams::stream_buffer<VerboseMessageSink> sb;
-VerboseMessageSink vsm;
 
 // Signal handling for Ctrl-C
 
 static void signalSetup();
 
 extern "C" void quit(int) {
-// shouldn't "not EXIT_SUCCESS" be sent - ^C^C is an abort, not normal termination?
+	// shouldn't "not EXIT_SUCCESS" be sent - ^C^C is an abort, not normal termination?
 	if (g_quit) std::exit(EXIT_SUCCESS);  // Instant exit if Ctrl+C is pressed again
 	g_quit = true;
 	signalSetup();
@@ -112,8 +95,12 @@ static void checkEvents_SDL(ScreenManager& sm) {
 				sm.flashMessage(config[which_vol].getShortDesc() + ": " + config[which_vol].getValue());
 				continue; // Already handled here...
 			}
+			// Eat away the event if there was a dialog open
+			if (sm.closeDialog()) continue;
 			break;
 		}
+		// Close dialog in case of a nav event
+		if (sm.isDialogOpen() && input::getNav(event) != input::NONE) { sm.closeDialog(); continue; }
 		// Forward to screen even if the input system takes it (ignoring pushEvent return value)
 		// This is needed to allow navigation (quiting the song) to function even then
 		input::SDL::pushEvent(event);
@@ -121,23 +108,30 @@ static void checkEvents_SDL(ScreenManager& sm) {
 		// Check for OpenGL errors
 		glutil::GLErrorChecker glerror;
 	}
-	if( config["graphic/fullscreen"].b() != sm.window().getFullscreen() )
+	if (config["graphic/fullscreen"].b() != sm.window().getFullscreen()) {
 		sm.window().setFullscreen(config["graphic/fullscreen"].b());
+		// Reloading the screen seems to counter window going white on Windows and possibly OSX
+		sm.activateScreen(sm.getCurrentScreen()->getName());
+	}
 }
 
 void mainLoop(std::string const& songlist) {
-	Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());
 	Audio audio;
+	{ // Print the devices
+		portaudio::AudioDevices ads;
+		std::clog << "audio/info:\n" << ads.dump();
+	}
+	Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());
+	Backgrounds backgrounds;
+	Database database(getConfigDir() / "database.xml");
+	Songs songs(database, songlist);
 	ScreenManager sm(window);
 	try {
-		sm.flashMessage(_("Miscellaneous..."), 0.0f, 1.0f, 1.0f); window.blank(); sm.drawFlashMessage(); window.swap();
-		Backgrounds backgrounds;
-		Database database(getConfigDir() / "database.xml");
-		Songs songs(database, songlist);
 		boost::scoped_ptr<input::MidiDrums> midiDrums;
 		// TODO: Proper error handling...
 		try { midiDrums.reset(new input::MidiDrums); } catch (std::runtime_error&) {}
 		// Load audio samples
+		sm.loading(_("Loading audio samples..."), 0.5);
 		audio.loadSample("drum bass", getPath("sounds/drum_bass.ogg"));
 		audio.loadSample("drum snare", getPath("sounds/drum_snare.ogg"));
 		audio.loadSample("drum hi-hat", getPath("sounds/drum_hi-hat.ogg"));
@@ -151,20 +145,23 @@ void mainLoop(std::string const& songlist) {
 		audio.loadSample("guitar fail5", getPath("sounds/guitar_fail5.ogg"));
 		audio.loadSample("guitar fail6", getPath("sounds/guitar_fail6.ogg"));
 		// Load screens
+		sm.loading(_("Creating screens..."), 0.7);
 		sm.addScreen(new ScreenIntro("Intro", audio));
 		sm.addScreen(new ScreenSongs("Songs", audio, songs, database));
 		sm.addScreen(new ScreenSing("Sing", audio, database, backgrounds));
 		sm.addScreen(new ScreenPractice("Practice", audio));
-		sm.addScreen(new ScreenConfiguration("Configuration", audio));
+		sm.addScreen(new ScreenAudioDevices("AudioDevices", audio));
+		sm.addScreen(new ScreenPaths("Paths", audio));
 		sm.addScreen(new ScreenPlayers("Players", audio, database));
 		sm.activateScreen("Intro");
-		sm.flashMessage(_("Main menu..."), 0.0f, 1.0f, 1.0f); window.blank(); sm.drawFlashMessage(); window.swap();
+		sm.loading(_("Entering main menu"), 0.8);
 		sm.updateScreen();  // exit/enter, any exception is fatal error
-		sm.flashMessage("");
+		sm.loading(_("Loading complete"), 1.0);
 		// Main loop
 		boost::xtime time = now();
 		unsigned frames = 0;
 		while (!sm.isFinished()) {
+			Profiler prof("mainloop");
 			if( g_take_screenshot ) {
 				fs::path filename;
 				try {
@@ -177,13 +174,16 @@ void mainLoop(std::string const& songlist) {
 				g_take_screenshot = false;
 			}
 			sm.updateScreen();  // exit/enter, any exception is fatal error
+			prof("misc");
 			try {
 				// Draw
 				window.blank();
 				sm.getCurrentScreen()->draw();
-				sm.drawFlashMessage();
+				sm.drawNotifications();
+				prof("draw");
 				// Display (and wait until next frame)
 				window.swap();
+				prof("swap");
 				if (config["graphic/fps"].b()) {
 					++frames;
 					if (now() - time > 1.0) {
@@ -196,19 +196,24 @@ void mainLoop(std::string const& songlist) {
 					time = now();
 					frames = 0;
 				}
+				prof("fpsctrl");
 				// Process events for the next frame
 				if (midiDrums) midiDrums->process();
 				checkEvents_SDL(sm);
+				prof("events");
 			} catch (std::runtime_error& e) {
 				std::cerr << "ERROR: " << e.what() << std::endl;
 				sm.flashMessage(std::string("ERROR: ") + e.what());
 			}
 		}
 	} catch (std::exception& e) {
+		// This should use ScreenManager fatalError, but it cannot
+		// yet split the message to multiple lines automatically, so
+		// better use flashMessage, which zooms to fit.
 		std::cerr << "FATAL ERROR: " << e.what() << std::endl;
 		sm.flashMessage(std::string("FATAL ERROR: ") + e.what(), 0.0f); // No fade-in to get it to show
 		window.blank();
-		sm.drawFlashMessage();
+		sm.drawNotifications();
 		window.swap();
 		boost::thread::sleep(now() + 2.0);
 	} catch (QuitNow&) {
@@ -279,14 +284,16 @@ int main(int argc, char** argv) try {
 	namespace po = boost::program_options;
 	po::options_description opt1("Generic options");
 	std::string songlist;
+	std::string loglevel_regexp;
 	opt1.add_options()
 	  ("help,h", "you are viewing it")
-	  ("verbose,V", "Be more verbose")
+	  ("log,l", po::value<std::string>(&loglevel_regexp)->default_value(logger::default_log_level), "selects log level")
 	  ("version,v", "display version number")
 	  ("songlist", po::value<std::string>(&songlist), "save a list of songs in the specified folder");
 	po::options_description opt2("Configuration options");
 	opt2.add_options()
 	  ("audio", po::value<std::vector<std::string> >(&devices)->composing(), "specify an audio device to use")
+	  ("audiohelp", "print audio related information")
 	  ("jstest", "utility to get joystick button mappings");
 	po::options_description opt3("Hidden options");
 	opt3.add_options()
@@ -309,10 +316,10 @@ int main(int argc, char** argv) try {
 	}
 	po::notify(vm);
 
-	// initialize the verbose message sink
-	g_verbose_messages = vm.count("verbose")!=0;
-    sb.open(vsm);
-    std::clog.rdbuf(&sb);
+	// Initialize the verbose message sink
+	//logger::__log_hh_test(); // debug
+	logger::setup(loglevel_regexp);
+	atexit(logger::teardown); // We might exit from many places due to audio hangs
 
 	if (vm.count("version")) {
 		// Already printed the version string in the beginning...
@@ -333,8 +340,25 @@ int main(int argc, char** argv) try {
 		std::cerr << e.what() << std::endl;
 		return EXIT_FAILURE;
 	}
+	if (vm.count("audiohelp")) {
+		Audio audio;
+		// Print the devices
+		portaudio::AudioDevices ads;
+		std::cout << ads.dump();
+		// Some examples
+		std::cout << "Example --audio parameters" << std::endl;
+		std::cout << "  --audio \"out=2\"         # Pick first working two-channel playback device" << std::endl;
+		std::cout << "  --audio \"dev=1 out=2\"   # Pick device id 1 and assign stereo playback" << std::endl;
+		std::cout << "  --audio 'dev=\"HDA Intel\" mics=blue,red'   # HDA Intel with two mics" << std::endl;
+		std::cout << "  --audio 'dev=pulse out=2 mics=blue'       # PulseAudio with input and output" << std::endl;
+		// Give audio a little time to shutdown but then just quit
+		boost::thread audiokiller(boost::bind(&Audio::close, boost::ref(audio)));
+		if (!audiokiller.timed_join(boost::posix_time::milliseconds(2000)))
+			std::cout << "Audio hung." << std::endl;
+		return EXIT_SUCCESS;
+	}
 	// Override XML config for options that were specified from commandline or performous.conf
-	confOverride(songdirs, "system/path_songs");
+	confOverride(songdirs, "paths/songs");
 	confOverride(devices, "audio/devices");
 	getPaths(); // Initialize paths before other threads start
 	if (vm.count("jstest")) { // Joystick test program
@@ -346,6 +370,7 @@ int main(int argc, char** argv) try {
 
 	// Run the game init and main loop
 	mainLoop(songlist);
+
 	return EXIT_SUCCESS; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
 } catch (std::exception& e) {
 	std::cerr << "FATAL ERROR: " << e.what() << std::endl;

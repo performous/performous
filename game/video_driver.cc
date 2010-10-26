@@ -17,13 +17,13 @@ namespace {
 	/// Tests for success when destoryed.
 	struct GLattrSetter {
 		GLattrSetter(SDL_GLattr attr, int value): m_attr(attr), m_value(value) {
-			if (SDL_GL_SetAttribute(attr, value)) std::cerr << "Error setting GLattr " << m_attr << std::endl;
+			if (SDL_GL_SetAttribute(attr, value)) std::clog << "video/warning: Error setting GLattr " << m_attr << std::endl;
 		}
 		~GLattrSetter() {
 			int value;
 			SDL_GL_GetAttribute(m_attr, &value);
 			if (value != m_value)
-				std::cerr << "Error setting GLattr " << m_attr
+				std::clog << "video/warning: Error setting GLattr " << m_attr
 				<< ": requested " << m_value << ", got " << value << std::endl;
 		}
 		SDL_GLattr m_attr;
@@ -86,7 +86,7 @@ void Window::screenshot() {
 	fs::path filename = getHomeDir() / ("Performous_" + to_iso_string(boost::posix_time::second_clock::local_time()) + ".png");
 	// Save to disk
 	writePNG(filename.string(), img);
-	std::cout << ">>> Screenshot taken: " << filename << " (" << img.w << "x" << img.h << ")" << std::endl;
+	std::clog << "video/info: Screenshot taken: " << filename << " (" << img.w << "x" << img.h << ")" << std::endl;
 }
 
 

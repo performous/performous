@@ -22,13 +22,40 @@ namespace input {
 	enum NavButton { NONE, UP, DOWN, LEFT, RIGHT, START, SELECT, CANCEL, PAUSE, MOREUP, MOREDOWN, VOLUME_UP, VOLUME_DOWN };
 
 	static const std::size_t BUTTONS = 10;
-	static const int STARPOWER_BUTTON = 5;
+	// Guitar buttons
+	static const int GREEN_FRET_BUTTON = 0;
+	static const int RED_FRET_BUTTON = 1;
+	static const int YELLOW_FRET_BUTTON = 2;
+	static const int BLUE_FRET_BUTTON = 3;
+	static const int ORANGE_FRET_BUTTON = 4;
+	static const int GODMODE_BUTTON = 5;
+	static const int WHAMMY_BUTTON = 6;
+	// Drums buttons
+	static const int KICK_BUTTON = 0;
+	static const int RED_TOM_BUTTON = 1;
+	static const int YELLOW_TOM_BUTTON = 2;
+	static const int BLUE_TOM_BUTTON = 3;
+	static const int GREEN_TOM_BUTTON = 4;
+	static const int ORANGE_TOM_BUTTON = 5;
+	// Dance buttons
+	static const int LEFT_DANCE_BUTTON = 0;
+	static const int DOWN_DANCE_BUTTON = 1;
+	static const int UP_DANCE_BUTTON = 2;
+	static const int RIGHT_DANCE_BUTTON = 3;
+	static const int DOWN_LEFT_DANCE_BUTTON = 4;
+	static const int DOWN_RIGHT_DANCE_BUTTON = 5;
+	static const int UP_LEFT_DANCE_BUTTON = 6;
+	static const int UP_RIGHT_DANCE_BUTTON = 7;
+	// Global buttons
+	static const int SELECT_BUTTON = 8;
+	static const int START_BUTTON = 9;
 
 	struct Event {
-		enum Type { PRESS, RELEASE, PICK, WHAMMY };
+		enum Type { PRESS, RELEASE, PICK };
 		Type type;
 		int button; // Translated button number for press/release events. 0 for pick down, 1 for pick up (NOTE: these are NOT pick press/release events but rather different directions)
 		bool pressed[BUTTONS]; // All events tell the button state right after the event happened
+		NavButton nav; // Event translated to NavButton
 		// More stuff later, when it is actually used
 		boost::xtime time;
 	};
@@ -50,7 +77,7 @@ namespace input {
 
 		class InputDevPrivate {
 		  public:
-			InputDevPrivate(const Instrument _instrument) : m_assigned(false), m_instrument(_instrument) {
+			InputDevPrivate(const Instrument& _instrument) : m_assigned(false), m_instrument(_instrument) {
 				for(unsigned int i = 0 ; i < BUTTONS ; i++) {
 					m_pressed[i] = false;
 				}
@@ -115,7 +142,7 @@ namespace input {
 		// First gives a correct instrument type
 		// Then gives an unknown instrument type
 		// Finally throw an exception if only wrong (or none) instrument are available
-		InputDev(DevType _type) {
+		InputDev(DevType _type): m_dev_type(_type) {
 			for (detail::InputDevs::iterator it = detail::devices.begin() ; it != detail::devices.end() ; ++it) {
 				if (it->first == detail::KEYBOARD_ID && !config["game/keyboard_guitar"].b()) continue;
 				if (it->first == detail::KEYBOARD_ID2 && !config["game/keyboard_drumkit"].b()) continue;
@@ -135,8 +162,10 @@ namespace input {
 		void addEvent(Event _e) { detail::devices.find(m_device_id)->second.addEvent(_e); };
 		bool pressed(int _button) { return detail::devices.find(m_device_id)->second.pressed(_button); }; // Current state
 		bool isKeyboard() const { return (m_device_id == detail::KEYBOARD_ID || m_device_id == detail::KEYBOARD_ID2 || m_device_id == detail::KEYBOARD_ID3); };
+		DevType getDevType() const { return m_dev_type; }
 	  private:
 		unsigned int m_device_id; // should be some kind of reference
+		DevType m_dev_type;
 	};
 
 	namespace SDL {

@@ -31,9 +31,10 @@ bool Tone::operator==(double f) const {
 	return std::abs(freq / f - 1.0) < 0.05;
 }
 
-Analyzer::Analyzer(double rate, std::size_t step):
+Analyzer::Analyzer(double rate, std::string id, std::size_t step):
   m_step(step),
   m_rate(rate),
+  m_id(id),
   m_window(FFT_N),
   m_bufRead(0),
   m_bufWrite(0),
@@ -94,10 +95,10 @@ namespace {
 bool Analyzer::calcFFT() {
 	float pcm[FFT_N];
 	size_t r = m_bufRead;
+	// Test if there is enough audio available
 	if ((BUF_N + m_bufWrite - r) % BUF_N <= FFT_N) return false;
-	for (size_t i = 0; i < FFT_N; ++i) {
-		pcm[i] = m_buf[(r + i) % BUF_N];
-	}
+	// Copy audio to local buffer
+	for (size_t i = 0; i < FFT_N; ++i) pcm[i] = m_buf[(r + i) % BUF_N];
 	m_bufRead = (r + m_step) % BUF_N;
 	// Calculate FFT
 	m_fft = da::fft<FFT_P>(pcm, m_window);
@@ -190,23 +191,27 @@ void Analyzer::calcTones() {
 void Analyzer::mergeWithOld(tones_t& tones) const {
 	tones.sort();
 	tones_t::iterator it = tones.begin();
+	// Iterate over old tones
 	for (tones_t::const_iterator oldit = m_tones.begin(); oldit != m_tones.end(); ++oldit) {
+		// Try to find a matching new tone
 		while (it != tones.end() && *it < *oldit) ++it;
-		if (it == tones.end() || *it != *oldit) {
-			if (oldit->db > -80.0) {
-				Tone& t = *tones.insert(it, *oldit);
-				t.db -= 5.0;
-				t.stabledb -= 0.1;
-			}
-		} else if (*it == *oldit) {
+		// If match found
+		if (it != tones.end() && *it == *oldit) {
+			// Merge the old tone into the new tone
 			it->age = oldit->age + 1;
 			it->stabledb = 0.8 * oldit->stabledb + 0.2 * it->db;
 			it->freq = 0.5 * oldit->freq + 0.5 * it->freq;
+		} else if (oldit->db > -80.0) {
+			// Insert a decayed version of the old tone into new tones
+			Tone& t = *tones.insert(it, *oldit);
+			t.db -= 5.0;
+			t.stabledb -= 0.1;
 		}
 	}
 }
 
 void Analyzer::process() {
+	// Try calculating FFT and calculate tones until no more data in input buffer
 	while (calcFFT()) calcTones();
 }
 

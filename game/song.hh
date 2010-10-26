@@ -1,7 +1,9 @@
 #pragma once
 
 #include "notes.hh"
+#include "i18n.hh"
 #include <boost/noncopyable.hpp>
+#include <boost/foreach.hpp>
 
 #include <stdexcept>
 #include <string>
@@ -20,19 +22,28 @@ struct SongParserException: public std::runtime_error {
 class SongParser;
 
 namespace TrackName {
-	const std::string GUITAR = "guitar";
-	const std::string GUITAR_COOP = "coop guitar";
-	const std::string GUITAR_RHYTHM = "rhythm guitar";
-	const std::string BASS = "bass";
-	const std::string DRUMS = "drums";
+	const std::string GUITAR = "Guitar";
+	const std::string GUITAR_COOP = "Coop guitar";
+	const std::string GUITAR_RHYTHM = "Rhythm guitar";
+	const std::string BASS = "Bass";
+	const std::string DRUMS = "Drums";
+	const std::string LEAD_VOCAL = "Vocals";
+	const std::string HARMONIC_1 = "Harmonic 1";
+	const std::string HARMONIC_2 = "Harmonic 2";
+	const std::string HARMONIC_3 = "Harmonic 3";
+	#if 0 // Here is some dummy gettext calls to populate the dictionary
+	_("Guitar") _("Coop guitar") _("Rhythm guitar") _("Bass") _("Drums") _("Vocals")  _("Harmonic 1") _("Harmonic 2") _("Harmonic 3")
+	#endif
 }
 
 /// class to load and parse songfiles
 class Song: boost::noncopyable {
 	friend class SongParser;
+	VocalTracks vocalTracks; ///< notes for the sing part
+	VocalTrack dummyVocal; ///< notes for the sing part
   public:
 	/// constructor
-	Song(std::string const& path_, std::string const& filename_): vocals(std::string("VOCALS")), path(path_), filename(filename_) { reload(false); }
+	Song(std::string const& path_, std::string const& filename_): dummyVocal(TrackName::LEAD_VOCAL), path(path_), filename(filename_) { reload(false); }
 	/// reload song
 	void reload(bool errorIgnore = true);
 	/// parse field
@@ -48,15 +59,41 @@ class Song: boost::noncopyable {
 	/// status of song
 	enum Status { NORMAL, INSTRUMENTAL_BREAK, FINISHED };
 	/** Get the song status at a given timestamp **/
-	Status status(double time) const;
+	Status status(double time);
 	int randomIdx; ///< sorting index used for random order
-	VocalTrack vocals; ///< notes for the sing part
+	void insertVocalTrack(std::string vocalTrack, VocalTrack track) {
+		vocalTracks.erase(vocalTrack);
+		vocalTracks.insert(std::make_pair<std::string, VocalTrack>(vocalTrack, track));
+	};
+	// Get a selected track, or LEAD_VOCAL if not found or the first one if not found
+	VocalTrack& getVocalTrack(std::string vocalTrack = TrackName::LEAD_VOCAL) {
+		if(vocalTracks.find(vocalTrack) != vocalTracks.end()) {
+			return vocalTracks.find(vocalTrack)->second;
+		} else {
+			if(vocalTracks.find(TrackName::LEAD_VOCAL) != vocalTracks.end()) {
+				return vocalTracks.find(TrackName::LEAD_VOCAL)->second;
+			} else {
+				if(!vocalTracks.empty()) {
+					return vocalTracks.begin()->second;
+				} else {
+					return dummyVocal;
+				}
+			}
+		}
+	};
+	std::vector<std::string> getVocalTrackNames() {
+		std::vector<std::string> result;
+		BOOST_FOREACH(VocalTracks::value_type &it, vocalTracks) {
+			result.push_back(it.first);
+		}
+		return result;
+	}
 	InstrumentTracks instrumentTracks; ///< guitar etc. notes for this song
 	DanceTracks danceTracks; ///< dance tracks
 	bool hasDance() const { return !danceTracks.empty(); }
 	bool hasDrums() const { return instrumentTracks.find(TrackName::DRUMS) != instrumentTracks.end(); }
 	bool hasGuitars() const { return instrumentTracks.size() - hasDrums(); }
-	bool hasVocals() const { return !vocals.notes.empty(); }
+	bool hasVocals() const { return !vocalTracks.empty(); }
 	std::string path; ///< path of songfile
 	std::string filename; ///< name of songfile
 	std::string midifilename; ///< name of midi file in FoF format

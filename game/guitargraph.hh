@@ -52,8 +52,11 @@ class GuitarGraph: public InstrumentGraph {
 	void draw(double time);
 	void engine();
 	bool dead() const;
-	std::string getTrack() const { return m_track_index->first; }
+	std::string getTrack() const;
 	std::string getDifficultyString() const;
+	std::string getModeId() const;
+	void changeTrack(int dir = 1);
+	void changeDifficulty(int dir = 1);
 	double getWhammy() const { return m_whammy; }
 
   private:
@@ -70,7 +73,6 @@ class GuitarGraph: public InstrumentGraph {
 	void guitarPlay(double time, input::Event const& ev);
 
 	// Media
-	Surface m_button;
 	Texture m_tail;
 	Texture m_tail_glow;
 	Texture m_tail_drumfill;
@@ -78,7 +80,7 @@ class GuitarGraph: public InstrumentGraph {
 	Texture m_flame_godmode;
 	Surface m_tap; /// image for 2d HOPO note cap
 	Surface m_neckglow; /// image for the glow from the bottom of the neck
-	glutil::Color m_neckglowColor;
+	Color m_neckglowColor;
 	Object3d m_fretObj; /// 3d object for regular note
 	Object3d m_tappableObj; /// 3d object for the HOPO note cap
 	std::vector<std::string> m_samples; /// sound effects
@@ -89,7 +91,6 @@ class GuitarGraph: public InstrumentGraph {
 	// Flags
 	bool m_drums; /// are we using drums?
 	bool m_use3d; /// are we using 3d?
-	bool m_leftymode; /// switch guitar notes to right-to-left direction
 	bool m_practmode; /// switch to enable practice mode
 
 	// Track stuff
@@ -101,21 +102,23 @@ class GuitarGraph: public InstrumentGraph {
 		DIFFICULTY_AMAZING,  // Expert
 		DIFFICULTYCOUNT
 	} m_level;
+	void setupJoinMenu();
+	void updateJoinMenu();
 	void nextTrack(bool fast = false);
+	void setTrack(const std::string& track);
 	void difficultyAuto(bool tryKeepCurrent = false);
-	bool difficulty(Difficulty level);
+	bool difficulty(Difficulty level, bool check_only = false);
 	InstrumentTracksConstPtr m_instrumentTracks; /// tracks
 	InstrumentTracksConstPtr::const_iterator m_track_index;
 	unsigned m_holds[max_panels]; /// active hold notes
 
 	// Graphics functions
-	glutil::Color const& color(int fret) const;
-	glutil::Color const colorize(glutil::Color c, double time) const;
+	Color const colorize(Color c, double time) const;
 	void drawBar(double time, float h);
-	void drawNote(int fret, glutil::Color, float tBeg, float tEnd, float whammy = 0, bool tappable = false, bool hit = false, double hitAnim = 0.0, double releaseTime = 0.0);
+	void drawNote(int fret, Color, float tBeg, float tEnd, float whammy = 0, bool tappable = false, bool hit = false, double hitAnim = 0.0, double releaseTime = 0.0);
 	void drawDrumfill(float tBeg, float tEnd);
 	void drawInfo(double time, double offsetX, Dimensions dimensions);
-	float getFretX(int fret) const { return (-2.0f + fret- (m_drums ? 0.5 : 0)) * (m_leftymode ? -1 : 1); }
+	float getFretX(int fret) { return (-2.0f + fret- (m_drums ? 0.5 : 0)) * (m_leftymode.b() ? -1 : 1); }
 
 	// Chords & notes
 	void updateChords();

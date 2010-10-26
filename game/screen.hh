@@ -4,7 +4,9 @@
 #include "animvalue.hh"
 #include "opengl_text.hh"
 #include "video_driver.hh"
+#include "dialog.hh"
 #include <boost/ptr_container/ptr_map.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <SDL.h>
 #include <string>
 
@@ -38,27 +40,37 @@ class ScreenManager: public Singleton <ScreenManager> {
 	/// constructor
 	ScreenManager(Window& window);
 	~ScreenManager() { if (currentScreen) currentScreen->exit(); }
-	/// adds a screen to the manager
+	/// Adds a screen to the manager
 	void addScreen(Screen* s) { std::string tmp = s->getName(); screens.insert(tmp, s); };
 	/// Switches active screen
 	void activateScreen(std::string const& name);
 	/// Does actual switching of screens (if necessary)
 	void updateScreen();
-	/// returns pointer to current Screen
+	/// Returns pointer to current Screen
 	Screen* getCurrentScreen() { return currentScreen; };
-	/// returns pointer to Screen for given name
+	/// Returns pointer to Screen for given name
 	Screen* getScreen(std::string const& name);
-	/// returns a reference to the window
+	/// Returns a reference to the window
 	Window& window() { return m_window; };
 
+	/// Draw a loading progress indication
+	void loading(std::string const& message, float progress);
+	/// Draw an error notification and quit
+	void fatalError(std::string const& message);
 	/// Set a message to flash in current screen
-	void flashMessage(std::string const& name, float fadeIn=0.5f, float hold=1.5f, float fadeOut=1.0f);
-	/// Draw flash messages in current screen
-	void drawFlashMessage();
+	void flashMessage(std::string const& message, float fadeIn=0.5f, float hold=1.5f, float fadeOut=1.0f);
+	/// Create a new dialog message
+	void dialog(std::string const& text);
+	/// Close dialog and return true if it was opened in the first place
+	bool closeDialog();
+	/// Returns true if dialog is open
+	bool isDialogOpen() { return m_dialog; }
+	/// Draw dialogs & flash messages in current screen
+	void drawNotifications();
 
-	/// sets finished to true
-	void finished() { m_finished=true; };
-	/// returns finished state
+	/// Sets finished to true
+	void finished() { m_finished = true; };
+	/// Returns finished state
 	bool isFinished() { return m_finished; };
 
   private:
@@ -72,8 +84,10 @@ class ScreenManager: public Singleton <ScreenManager> {
 	float m_timeToFadeIn;
 	float m_timeToFadeOut;
 	float m_timeToShow;
+	std::string m_message;
 	AnimValue m_messagePopup;
 	SvgTxtTheme m_textMessage;
-	std::string m_message;
+	// Dialog members
+	boost::scoped_ptr<Dialog> m_dialog;
 };
 

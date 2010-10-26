@@ -1,0 +1,44 @@
+# Copyright 1999-2010 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header: $
+
+EAPI=3
+
+inherit games subversion
+
+DESCRIPTION="Song editor for the game Frets On Fire"
+HOMEPAGE="http://code.google.com/p/editor-on-fire/"
+ESVN_REPO_URI="http://editor-on-fire.googlecode.com/svn/trunk/"
+
+LICENSE=""
+SLOT="0"
+KEYWORDS="~amd64 ~x86"
+IUSE=""
+
+DEPEND="
+	media-libs/allegro
+	media-sound/vorbis-tools
+	media-sound/lame"
+RDEPEND="${DEPEND}"
+
+src_compile() {
+	cd ${S}/src/
+	emake -f makefile.linux || die "emake failed"
+}
+
+src_install() {
+	cd ${S}
+	cat >> bin/eof.script <<-EOF
+		#!/bin/bash
+		TMP_DIR=\`mktemp -d || echo "/tmp/falback"\`
+		echo ">> Using \\"\${TMP_DIR}\\" as temporary location"
+		cp /usr/share/eof/* "\${TMP_DIR}"
+		cd "\${TMP_DIR}"
+		eof.bin
+		rm -rf "\${TMP_DIR}"
+	EOF
+	newbin bin/eof eof.bin
+	newbin bin/eof.script eof
+	insinto "/usr/share/${PN}"
+	doins bin/eof.dat bin/check.wav
+}

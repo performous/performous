@@ -10,18 +10,17 @@
 
 /// struct to represent tones
 struct Tone {
-	static const std::size_t MAXHARM = 48; ///< maximum harmonics
-	static const std::size_t MINAGE = 2; ///< minimum age
-	double freq; ///< frequency
-	double db; ///< dezibels
-	double stabledb; ///< stable decibels
-	double harmonics[MAXHARM]; ///< harmonics array
-	std::size_t age; ///< age
-	Tone();
-	void print() const; ///< prints Tone
-	bool operator==(double f) const; ///< equality operator
-	void update(Tone const& t); ///< update Tone
-	/// compares left and right volume
+	static const std::size_t MAXHARM = 48; ///< The maximum number of harmonics tracked
+	static const std::size_t MINAGE = 2; ///< The minimum age required for a tone to be output
+	double freq; ///< Frequency (Hz)
+	double db; ///< Level (dB)
+	double stabledb; ///< Stable level, useful for graphics rendering
+	double harmonics[MAXHARM]; ///< Harmonics' levels
+	std::size_t age; ///< How many times the tone has been detected in row
+	Tone(); 
+	void print() const; ///< Prints Tone to std::cout
+	bool operator==(double f) const; ///< Compare for rough frequency match
+	/// Less-than compare by levels (instead of frequencies like operator< does)
 	static bool dbCompare(Tone const& l, Tone const& r) { return l.db < r.db; }
 };
 
@@ -46,25 +45,27 @@ class Analyzer {
 	/// list of tones
 	typedef std::list<Tone> tones_t;
 	/// constructor
-	Analyzer(double rate, std::size_t step = 200);
+	Analyzer(double rate, std::string id, std::size_t step = 200);
 	/** Add input data to buffer. This is thread-safe (against other functions). **/
 	template <typename InIt> void input(InIt begin, InIt end) {
-		std::vector<float> tempbuf; // Values to be inserted to the pass-through buffer
-		tempbuf.reserve(1024); // Let's reserve some space already in advance
+		std::vector<float> tempbuf;  // Values to be inserted to the pass-through buffer
+		tempbuf.reserve(1024);  // Let's reserve some space already in advance
+		size_t r = m_bufRead;  // The read position
+		size_t w = m_bufWrite;  // The write position
+		bool overflow = false;
 		while (begin != end) {
-			float s = *begin;
-			tempbuf.push_back(s); // Add to pass-through buffer
-			++begin;
-			m_peak *= 0.999;
+			float s = *begin++;  // Read input sample
+			tempbuf.push_back(s);  // Add to pass-through buffer
+			// Peak level calculation
 			float p = s * s;
-			if (p > m_peak) m_peak = p;
-			size_t w = m_bufWrite;
-			size_t w2 = (m_bufWrite + 1) % BUF_N;
-			size_t r = m_bufRead;
-			if (w2 == r) m_bufRead = (r + 1) % BUF_N;
+			if (p > m_peak) m_peak = p; else m_peak *= 0.999;
 			m_buf[w] = s;
-			m_bufWrite = w2;
+			// Cursor updates
+			w = (w + 1) % BUF_N;
+			if (w == r) overflow = true;
 		}
+		m_bufWrite = w;
+		if (overflow) m_bufRead = (w + 1) % BUF_N;  // Reset read pointer on overflow
 		// No need to lock the mutex before this
 		boost::mutex::scoped_lock l(m_mutex);
 		// Insert the new values to the pass-through buffer
@@ -98,12 +99,15 @@ class Analyzer {
 	}
 	/** Give data away for mic pass-through */
 	void output(float* begin, float* end);
+	/** Returns the id (color name) of the mic */
+	std::string const& getId() const { return m_id; }
 
   private:
 	boost::mutex m_mutex;
 	std::deque<float> outbuf;
 	std::size_t m_step;
 	double m_rate;
+	std::string m_id;
 	std::vector<float> m_window;
 	float m_buf[2 * BUF_N];
 	volatile size_t m_bufRead, m_bufWrite;

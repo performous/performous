@@ -149,6 +149,12 @@ class SvgTxtTheme {
 	void draw(std::string _text, float alpha = 1.0f);
 	/// sets highlight
 	void setHighlight(std::string _theme_file);
+	/// width
+	double w() const { return m_texture_width; }
+	/// height
+	double h() const { return m_texture_height; }
+	/// set align
+	void setAlign(Align align) { m_align = align; }
 
   private:
 	boost::ptr_vector<OpenGLText> m_opengl_text;
@@ -158,6 +164,8 @@ class SvgTxtTheme {
 	double m_width;
 	double m_height;
 	double m_factor;
+	double m_texture_width;
+	double m_texture_height;
 	std::string m_cache_text;
 	TThemeTxtOpenGL m_text;
 	TThemeTxtOpenGL m_text_highlight;

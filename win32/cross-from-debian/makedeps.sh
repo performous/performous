@@ -151,7 +151,7 @@ if test ! -f "$PREFIX"/build-stamps/zlib; then
 fi
 
 # libpng
-LIBPNG="libpng-1.4.2"
+LIBPNG="libpng-1.4.4"
 if test ! -f "$PREFIX"/build-stamps/libpng; then
   download http://download.sourceforge.net/libpng/$LIBPNG.tar.gz
   tar zxvf $LIBPNG.tar.gz
@@ -179,7 +179,7 @@ if test ! -f "$PREFIX"/build-stamps/libjpeg; then
 fi
 
 # Runtime (libintl) of GNU Gettext
-GETTEXT="gettext-0.18"
+GETTEXT="gettext-0.18.1.1"
 if test ! -f "$PREFIX"/build-stamps/gettext-runtime; then
   download http://ftp.gnu.org/gnu/gettext/$GETTEXT.tar.gz
   tar zxvf $GETTEXT.tar.gz
@@ -301,7 +301,7 @@ if test ! -f "$PREFIX"/build-stamps/sdl; then
 fi
 
 # Freetype
-FREETYPE="freetype-2.3.12"
+FREETYPE="freetype-2.4.3"
 if test ! -f "$PREFIX"/build-stamps/freetype; then
   download http://download.sourceforge.net/freetype/$FREETYPE.tar.bz2
   tar jxvf $FREETYPE.tar.bz2
@@ -315,9 +315,9 @@ if test ! -f "$PREFIX"/build-stamps/freetype; then
 fi
 
 # GLib
-GLIB="glib-2.24.1"
+GLIB="glib-2.26.0"
 if test ! -f "$PREFIX"/build-stamps/glib; then
-  download http://ftp.gnome.org/pub/GNOME/sources/glib/2.24/$GLIB.tar.bz2
+  download http://ftp.gnome.org/pub/GNOME/sources/glib/2.26/$GLIB.tar.bz2
   tar jxvf $GLIB.tar.bz2
   cd $GLIB
   ./configure $COMMON_AUTOCONF_FLAGS
@@ -350,7 +350,7 @@ if test ! -f "$PREFIX"/build-stamps/fontconfig; then
 fi
 
 # Pixman
-PIXMAN="pixman-0.18.2"
+PIXMAN="pixman-0.19.6"
 if test ! -f "$PREFIX"/build-stamps/pixman; then
   download http://cairographics.org/releases/$PIXMAN.tar.gz
   tar zxvf $PIXMAN.tar.gz
@@ -380,7 +380,7 @@ fi
 # Pango
 # For some reason, the libraries are installed in an extremely uncharacteristic
 # layout for libtool.  Luckily, we have all that we need to make it sane again.
-PANGO="pango-1.28.1"
+PANGO="pango-1.28.3"
 if test ! -f "$PREFIX"/build-stamps/pango; then
   download http://ftp.gnome.org/pub/GNOME/sources/pango/1.28/$PANGO.tar.bz2
   tar jxvf $PANGO.tar.bz2
@@ -402,9 +402,9 @@ fi
 # ATK
 # We don't really need to build the parts of GTK that use ATK, but GTK's
 # configure script won't be happy otherwise.
-ATK="atk-1.30.0"
+ATK="atk-1.32.0"
 if test ! -f "$PREFIX"/build-stamps/atk; then
-  download http://ftp.gnome.org/pub/GNOME/sources/atk/1.30/$ATK.tar.bz2
+  download http://ftp.gnome.org/pub/GNOME/sources/atk/1.32/$ATK.tar.bz2
   tar jxvf $ATK.tar.bz2
   cd $ATK
   ./configure $COMMON_AUTOCONF_FLAGS --disable-glibtest
@@ -415,21 +415,35 @@ if test ! -f "$PREFIX"/build-stamps/atk; then
   $RM_RF $ATK
 fi
 
+# Gdk-pixbuf
+# New versions of GTK require this separately
+GDKPIXBUF="gdk-pixbuf-2.22.0"
+if test ! -f "$PREFIX"/build-stamps/gdkpixbuf; then
+  download http://ftp.gnome.org/pub/GNOME/sources/gdk-pixbuf/2.22/$GDKPIXBUF.tar.bz2
+  tar jxvf $GDKPIXBUF.tar.bz2
+  cd $GDKPIXBUF
+  ./configure $COMMON_AUTOCONF_FLAGS --without-libtiff
+  make
+  wine-shwrap gdk-pixbuf/gdk-pixbuf-csource
+  wine-shwrap gdk-pixbuf/gdk-pixbuf-query-loaders
+  make install
+  cd ..
+  touch "$PREFIX"/build-stamps/gdkpixbuf
+  $RM_RF $ATK
+fi
+
 # GTK
 # Even though Performous only needs libgdk_pixbuf (and then only because
 # that's how librsvg likes to play ball), having the rest of GTK around
 # lets other packages build some handy test programs that can be run
 # under Wine to sanity-check the dependency build.  The choice of included
 # pixbuf loaders is tailored to satisfy said programs.
-GTK="gtk+-2.20.1"
+GTK="gtk+-2.22.0"
 if test ! -f "$PREFIX"/build-stamps/gtk; then
-  download http://ftp.gnome.org/pub/GNOME/sources/gtk+/2.20/$GTK.tar.bz2
+  download http://ftp.gnome.org/pub/GNOME/sources/gtk+/2.22/$GTK.tar.bz2
   tar jxvf $GTK.tar.bz2
   cd $GTK
   ./configure $COMMON_AUTOCONF_FLAGS --disable-glibtest --disable-modules --without-libtiff --with-included-loaders=png,jpeg,gif,xpm,xbm
-  make -C gdk-pixbuf
-  wine-shwrap gdk-pixbuf/gdk-pixbuf-csource
-  wine-shwrap gdk-pixbuf/gdk-pixbuf-query-loaders
   make -C gdk
   make -C gtk gtk-update-icon-cache.exe
   wine-shwrap gtk/gtk-update-icon-cache
@@ -452,7 +466,8 @@ if test ! -f "$PREFIX"/build-stamps/libcroco; then
   download http://ftp.gnome.org/pub/GNOME/sources/libcroco/0.6/$LIBCROCO.tar.bz2
   tar jxvf $LIBCROCO.tar.bz2
   cd $LIBCROCO
-  ./configure $COMMON_AUTOCONF_FLAGS
+  # We bypass a file magick check here
+  lt_cv_deplibs_check_method=pass_all ./configure $COMMON_AUTOCONF_FLAGS
   make
   make install
   cd ..
@@ -464,7 +479,7 @@ fi
 # It will try to install a gconf schema on the host unless we tell it not to,
 # despite the fact that it doesn't have the GNOME libraries it would need to
 # make any use of it...
-LIBGSF="libgsf-1.14.18"
+LIBGSF="libgsf-1.14.19"
 if test ! -f "$PREFIX"/build-stamps/libgsf; then
   download http://ftp.gnome.org/pub/GNOME/sources/libgsf/1.14/$LIBGSF.tar.bz2
   tar jxvf $LIBGSF.tar.bz2
@@ -478,9 +493,9 @@ if test ! -f "$PREFIX"/build-stamps/libgsf; then
 fi
 
 # librsvg
-LIBRSVG="librsvg-2.26.3"
+LIBRSVG="librsvg-2.32.0"
 if test ! -f "$PREFIX"/build-stamps/librsvg; then
-  download http://ftp.gnome.org/pub/GNOME/sources/librsvg/2.26/$LIBRSVG.tar.bz2
+  download http://ftp.gnome.org/pub/GNOME/sources/librsvg/2.32/$LIBRSVG.tar.bz2
   tar jxvf $LIBRSVG.tar.bz2
   cd $LIBRSVG
   ./configure $COMMON_AUTOCONF_FLAGS --disable-pixbuf-loader --disable-gtk-theme
@@ -506,9 +521,9 @@ if test ! -f "$PREFIX"/build-stamps/libsigc++; then
 fi
 
 # libglibmm
-GLIBMM="glibmm-2.24.2"
+GLIBMM="glibmm-2.25.2"
 if test ! -f "$PREFIX"/build-stamps/libglibmm; then
-  download http://ftp.gnome.org/pub/GNOME/sources/glibmm/2.24/$GLIBMM.tar.bz2
+  download http://ftp.gnome.org/pub/GNOME/sources/glibmm/2.25/$GLIBMM.tar.bz2
   tar jxvf $GLIBMM.tar.bz2
   cd $GLIBMM
   ./configure $COMMON_AUTOCONF_FLAGS
@@ -520,9 +535,9 @@ if test ! -f "$PREFIX"/build-stamps/libglibmm; then
 fi
 
 # libxml++
-LIBXMLPP="libxml++-2.30.1"
+LIBXMLPP="libxml++-2.32.0"
 if test ! -f "$PREFIX"/build-stamps/libxml++; then
-  download http://ftp.gnome.org/pub/GNOME/sources/libxml++/2.30/$LIBXMLPP.tar.bz2
+  download http://ftp.gnome.org/pub/GNOME/sources/libxml++/2.32/$LIBXMLPP.tar.bz2
   tar jxvf $LIBXMLPP.tar.bz2
   cd $LIBXMLPP
   ./configure $COMMON_AUTOCONF_FLAGS
@@ -536,7 +551,7 @@ fi
 # GLEW, which lacks a build system amenable to cross-compilation.
 # glewinfo and visualinfo are handy if you ever need something
 # similar to glxinfo under Windows.
-GLEW="glew-1.5.4"
+GLEW="glew-1.5.6"
 if test ! -f "$PREFIX"/build-stamps/glew; then
   download http://download.sourceforge.net/glew/$GLEW.tgz
   tar zxvf $GLEW.tgz
@@ -559,7 +574,7 @@ if test ! -f "$PREFIX"/build-stamps/glew; then
 fi
 
 # liborc
-LIBORC="orc-0.4.5"
+LIBORC="orc-0.4.10"
 if test ! -f "$PREFIX"/build-stamps/liborc; then
   download http://code.entropywave.com/download/orc/$LIBORC.tar.gz
   tar zxvf $LIBORC.tar.gz
@@ -573,12 +588,14 @@ if test ! -f "$PREFIX"/build-stamps/liborc; then
 fi
 
 # libschroedinger
-LIBSCHROE="schroedinger-1.0.9"
+LIBSCHROE="schroedinger-1.0.10"
 if test ! -f "$PREFIX"/build-stamps/libschroedinger; then
   download http://diracvideo.org/download/schroedinger/$LIBSCHROE.tar.gz
   tar zxvf $LIBSCHROE.tar.gz
   cd $LIBSCHROE
   ./configure $COMMON_AUTOCONF_FLAGS
+  # We don't want testsuite, so create a dummy Makefile
+  echo "all:\n\ninstall:" > testsuite/Makefile
   make
   make install
   cd ..
@@ -644,7 +661,7 @@ if test ! -f "$PREFIX"/build-stamps/opencv; then
   download http://download.sourceforge.net/opencvlibrary/$OPENCV-win.zip
   unzip -o $OPENCV-win.zip
   cd $OPENCV
-  ln -s ../deps/include/videoInput.h /src/highgui/videoinput.h
+  ln -s "$PREFIX/include/videoInput.h" src/highgui/videoinput.h
   mkdir -pv build
   cd build
   cmake \
@@ -657,15 +674,13 @@ if test ! -f "$PREFIX"/build-stamps/opencv; then
   make
   make install
   cp -v unix-install/opencv.pc "$PREFIX"/lib/pkgconfig  # No auto-install :(
-  pushd .
   cd "$PREFIX"/lib
   # Create some symlinks so the cmake scripts detect it correctly
   ln -svf libcv210.dll.a libcv.dll.a
   ln -svf libcxcore210.dll.a libcxcore.dll.a
   ln -svf libcvaux210.dll.a libcvaux.dll.a
   ln -svf libhighgui210.dll.a libhighgui.dll.a
-  popd
-  cd ../..
+  cd "$PREFIX/.."
   touch "$PREFIX"/build-stamps/opencv
   $RM_RF $OPENCV
 fi

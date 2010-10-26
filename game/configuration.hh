@@ -11,7 +11,13 @@ namespace xmlpp { class Element; }  // Forward declaration for libxml++ stuff
 class ConfigItem {
   public:
 	typedef std::vector<std::string> StringList; ///< a list of strings
+	typedef std::vector<std::string> OptionList; ///< a list of string options
 	ConfigItem() {}
+	ConfigItem(bool bval);
+	ConfigItem(int ival);
+	ConfigItem(float fval);
+	ConfigItem(std::string sval);
+	ConfigItem(OptionList opts);
 	void update(xmlpp::Element& elem, int mode); ///< Load XML config file, elem = Entry, mode = 0 for schema, 1 for system config and 2 for user config
 	ConfigItem& operator++() { return incdec(1); } ///< increments config value
 	ConfigItem& operator--() { return incdec(-1); } ///< decrements config value
@@ -23,6 +29,9 @@ class ConfigItem {
 	double& f(); ///< Access floating-point item
 	std::string& s(); ///< Access string item
 	StringList& sl(); ///< Access stringlist item
+	OptionList& ol(); ///< Access optionlist item
+	std::string& so(); ///< Access currently selected string option
+	void select(int i); ///< Set optionlist selected item index
 	void reset(bool factory = false) { m_value = factory ? m_factoryDefaultValue : m_defaultValue; } ///< Reset to default
 	void makeSystem() { m_defaultValue = m_value; } ///< Make current value the system default (used when saving system config)
 	std::string getValue() const; ///< Get a human-readable representation of the current value
@@ -45,6 +54,7 @@ class ConfigItem {
 	boost::variant<int, double> m_step, m_min, m_max;
 	boost::variant<int, double> m_multiplier;
 	std::string m_unit;
+	int m_sel;
 };
 
 typedef std::map<std::string, ConfigItem> Config;

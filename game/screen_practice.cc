@@ -16,9 +16,8 @@ void ScreenPractice::enter() {
 	theme.reset(new ThemePractice());
 	// draw vu meters
 	for (unsigned int i = 0, mics = m_audio.analyzers().size(); i < mics; ++i) {
-		ProgressBar* b;
-		m_vumeters.push_back(b = new ProgressBar(getThemePath("vumeter_bg.svg"), getThemePath("vumeter_fg.svg"), ProgressBar::VERTICAL, 0.136, 0.023));
-		b->dimensions.screenBottom().left(-0.4 + i * 0.2).fixedWidth(0.04);
+		m_vumeters.push_back(new ProgressBar(getThemePath("vumeter_bg.svg"), getThemePath("vumeter_fg.svg"), ProgressBar::VERTICAL, 0.136, 0.023));
+		m_vumeters.back().dimensions.screenBottom().left(-0.4 + i * 0.2).fixedWidth(0.04);
 	}
 	m_samples.push_back("drum bass");
 	m_samples.push_back("drum snare");

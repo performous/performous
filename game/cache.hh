@@ -22,9 +22,9 @@ namespace cache {
 	fs::path constructSVGCacheFileName(fs::path const& svgfilename, double factor);
 
 	/** Given a path to an SVG the caching policy is returned **/
-	inline bool cachableSVGResource(fs::path const& svgfilename) {
-		// currently only theme files are cachable
-		return isThemeResource(svgfilename);
+	inline bool cachableSVGResource(fs::path const& /*svgfilename*/ ) {
+		// FIXME: Currently all is cached, so should this be removed?
+		return true;
 	}
 
 	/** Load an SVG from the cache, if loading fails invalid_cache_error is thrown **/

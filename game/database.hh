@@ -6,7 +6,7 @@
 #include "players.hh"
 #include "hiscore.hh"
 #include "songitems.hh"
-#include "glutil.hh"
+#include "color.hh"
 #include "fs.hh"
 
 struct ScoreItem {
@@ -14,7 +14,7 @@ struct ScoreItem {
 	enum Type { SINGER, INSTRUMENT, DANCER } type;
 	std::string track; // includes difficulty
 	std::string track_simple; // no difficulty
-	glutil::Color color;
+	Color color;
 	bool operator < (ScoreItem const& other) { return score < other.score; }
 };
 

@@ -9,8 +9,6 @@
 #include <cv.h>
 #include <highgui.h>
 
-#define SAVE_WEBCAM_VIDEO
-
 #else
 // Dummy classes
 namespace cv {
@@ -27,7 +25,7 @@ Webcam::Webcam(int cam_id):
 	m_capture.reset(new cv::VideoCapture(cam_id));
 	if (!m_capture->isOpened()) {
 		if (cam_id != -1) {
-			std::clog << "Webcam id " << cam_id << " failed, trying autodetecting...";
+			std::clog << "Webcam/warning: Webcam id " << cam_id << " failed, trying autodetecting...";
 			m_capture.reset(new cv::VideoCapture(-1));
 		}
 		if (!m_capture->isOpened())
@@ -65,17 +63,19 @@ void Webcam::operator()() {
 	m_running = true;
 	while (!m_quit) {
 		if (m_running) {
-			// Get a new frame
-			cv::Mat frame;
-			*m_capture >> frame;
-			if (m_writer) *m_writer << frame;
-			boost::mutex::scoped_lock l(m_mutex);
-			// Copy the frame to storage
-			m_frame.width = frame.cols;
-			m_frame.height = frame.rows;
-			m_frame.data.assign(frame.data, frame.data + (m_frame.width * m_frame.height * 3));
-			// Notify renderer
-			m_frameAvailable = true;
+			try {
+				// Get a new frame
+				cv::Mat frame;
+				*m_capture >> frame;
+				if (m_writer) *m_writer << frame;
+				boost::mutex::scoped_lock l(m_mutex);
+				// Copy the frame to storage
+				m_frame.width = frame.cols;
+				m_frame.height = frame.rows;
+				m_frame.data.assign(frame.data, frame.data + (m_frame.width * m_frame.height * 3));
+				// Notify renderer
+				m_frameAvailable = true;
+			} catch (std::exception&) { std::cerr << "Error capturing webcam frame!" << std::endl; }
 		}
 		// Sleep a little, much if the cam isn't active
 		boost::thread::sleep(now() + (m_running ? 0.015 : 0.5));

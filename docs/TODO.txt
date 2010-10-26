@@ -4,7 +4,6 @@ fixable should not be recorded here, but should rather be fixed in the code.
 
 Structural:
 
-- PortAudio as the only audio backend (instead of libda plugin system) [WIP]
 - Rename ScreenManager to Game and put globally used resources into it
 - Switch to GStreamer? (both the ripper and the game)
 
@@ -16,27 +15,27 @@ Big features:
 - Recording performances
     * Internet highscore
 - Mic effects (reduce volume for bad singers, perfect pitch, reverb, etc)
+- Guitar whammy bar pitch shifting effect [WIP]
 - Ingame Singstar DVD support (integrated ripping + ffmpeg feeding + XML song format)
 - Automatically download songs and other stuff from performous.org
-- Store instrument/dancepad mappings in configurations files + Allow user to
-  create new mapping
 
 
 Features:
 
+- Paths config GUI
 - Latency calibration
    * Audio roundtrip by analyzing the sound captured by the microphone
    * Controller/audio latency by playing blindly (listening to the beat only)
    * Audio/video by playing visually without audio? (needs controller/audio calibrated)
-- Better audio card configuration ingame (needs PortAudio backend)
 - Allow playing a single song given as commandline argument (no menus)
 - Kiosk/arcade mode (disable exiting game and limit other functions)
-- Allow left-handed/reversed controllers (guitars, drum kits)
+
 
 Dance features:
 
 - Colored arrows for timing
 - BGCHANGE support for SM format (background videos)
+- Roll and lift notes
 
 
 Text rendering bugs:
@@ -44,13 +43,6 @@ Text rendering bugs:
 - Correct vertical alignment
 - Use dimensions to specify bounding box (possibly init from SVG)
 - Lyric hilighted should be rendered in front of the others
-
-
-New config menu:
-
-- Multiple items visible at once
-- Modifying strings and stringlist items.
-- Predefined options from config schema and libda device enumeration
 
 
 SS Ripper:

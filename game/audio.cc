@@ -65,6 +65,75 @@ namespace {
 			*i *= factor * factor; // Decrease music volume
 	}
 }
+/**
+* Advanced audio sync code.
+* Produces precise monotonic clock synced to audio output callback (which may suffer of major jitter).
+* Uses system clock as timebase but the clock is skewed (made slower or faster) depending on whether
+* it is late or early. The clock is also stopped if audio output pauses.
+**/
+class AudioClock {
+	static ptime getTime() { return microsec_clock::universal_time(); }
+	// Conversion helpers
+	static double getSeconds(time_duration t) { return 1e-6 * t.total_microseconds(); }
+	static time_duration getDuration(double seconds) { return microseconds(1e6 * seconds); }
+
+	mutable boost::mutex m_mutex;
+	ptime m_baseTime; ///< A reference time (corresponds to m_basePos)
+	double m_basePos; ///< A reference position in song
+	double m_skew; ///< The skew ratio applied to system time (since baseTime)
+	volatile float m_max; ///< Maximum output value for the clock (end of the current audio block)
+	/// Get the current position (current time via parameter, no locking)
+	double pos_internal(ptime now) const {
+		double t = m_basePos + (1.0 + m_skew) * getSeconds(now - m_baseTime);
+		return std::min<double>(t, m_max);
+	}
+public:
+	AudioClock(): m_baseTime(), m_basePos(), m_skew(), m_max() {}
+	/**
+	* Called from audio callback to keep the clock synced.
+	* @param audioPos the current position in the song
+	* @param length the duration of the current audio block
+	*/
+	void timeSync(time_duration audioPos, time_duration length) {
+		const double maxError = 0.1;  // Step the clock instead of skewing if over 100 ms off
+		const double fudgeFactor = 0.1;  // Adjustment ratio
+		// Full correction requires locking, but we can update max without lock too
+		boost::mutex::scoped_try_lock l(m_mutex, boost::defer_lock);
+		double max = getSeconds(audioPos + length);
+		if (!l.try_lock()) {
+			if (max > m_max) m_max = max; // Allow increasing m_max
+			return;
+		}
+		// Mutex locked - do a full update
+		ptime now = getTime();
+		double sys = pos_internal(now);  // Current position (based on system clock + corrections)
+		double audio = getSeconds(audioPos);  // Audio time
+		double diff = audio - sys;
+		// Skew-based correction only if going forward and relatively well synced
+		if (max > m_max && std::abs(diff) < maxError) {
+			// Update base position (this should not affect the clock)
+			m_baseTime = now;
+			m_basePos = sys;
+			// Apply a VERY ARTIFICIAL correction for clock!
+			double valadj = getSeconds(length) * 0.1 * rand() / RAND_MAX;  // Dither
+			m_skew = 0.99 * m_skew + 0.01 * (diff < valadj ? -1.0 : 1.0) * fudgeFactor;
+			// Limits to keep things sane in abnormal situations
+			if (m_skew > 0.01) m_skew = 0.01;
+			else if (m_skew < -0.01) m_skew = -0.01;
+		} else {
+			// Off too much, step to correct time
+			m_baseTime = now;
+			m_basePos = audio;
+			m_skew = 0.0;
+		}
+		m_max = max;
+	}
+	/// Get the current position in seconds
+	double pos() const {
+		boost::mutex::scoped_lock l(m_mutex);
+		return pos_internal(getTime());
+	}
+};
 
 class Music {
 	struct Track {
@@ -77,31 +146,17 @@ class Music {
 	Tracks tracks; ///< Audio decoders
 	double srate; ///< Sample rate
 	int64_t m_pos; ///< Current sample position
-	ptime m_baseTime; ///< A reference time (the beginning of the song)
-	time_duration m_nextTime; ///< Start of the next audio block (needed for time monotonicity)
 	bool m_preview;
-
-	static ptime getTime() { return microsec_clock::universal_time(); }
+	AudioClock m_clock;
 	time_duration durationOf(int64_t samples) const { return microseconds(1e6 * samples / srate / 2.0); }
-	/**
-	* Timing code for precise monotonic time. Very simple, far from perfect.
-	* This function is called at a beginning of the audio callback, before modifying m_pos
-	* @param samples the number of samples in the current block (used for calculating block end time)
-	*/
-	void timeSync(size_t samples) {
-		time_duration begin = durationOf(m_pos);  // Current block begin position in song
-		m_nextTime = begin + durationOf(samples);  // Current block end position in song
-		m_baseTime = getTime() - begin;  // Recalibrate base time to beginning of the song
-	}
-
 public:
 	double fadeLevel;
 	double fadeRate;
 	typedef std::map<std::string,std::string> Files;
 	typedef std::vector<float> Buffer;
 	Music(Files const& filenames, unsigned int sr, bool preview):
-	  srate(sr), m_pos(), m_baseTime(getTime()),
-	  m_preview(preview), fadeLevel(), fadeRate() {
+	  srate(sr), m_pos(), m_preview(preview), fadeLevel(), fadeRate()
+	{
 		for (Files::const_iterator it = filenames.begin(), end = filenames.end(); it != end; ++it) {
 			if (it->second.empty()) continue; // Skip tracks with no filenames; FIXME: Why do we even have those here, shouldn't they be eliminated earlier?
 			tracks.insert(it->first, std::auto_ptr<Track>(new Track(it->second, sr)));
@@ -110,11 +165,13 @@ public:
 	/// Sums the stream to output sample range, returns true if the stream still has audio left afterwards.
 	bool operator()(float* begin, float* end) {
 		size_t samples = end - begin;
-		timeSync(samples); // Keep audio synced
+		m_clock.timeSync(durationOf(m_pos), durationOf(samples)); // Keep the clock synced
 		bool eof = true;
 		Buffer mixbuf(end - begin);
 		for (Tracks::iterator it = tracks.begin(), itend = tracks.end(); it != itend; ++it) {
 			Track& t = *it->second;
+// FIXME: Include this code bit once there is a sane pitch shifting algorithm
+#if 0
 //			if (it->first == "guitar") std::cout << t.pitchFactor << std::endl;
 			if (t.pitchFactor != 0) { // Pitch shift
 				Buffer tempbuf(end - begin);
@@ -128,7 +185,9 @@ public:
 				while (b != tempbuf.end())
 					*m++ += (*b++);
 			// Otherwise just get the audio and mix it straight away
-			} else if (t.mpeg.audioQueue(&*mixbuf.begin(), &*mixbuf.end(), m_pos, t.fadeLevel)) eof = false;
+			} else
+#endif
+			if (t.mpeg.audioQueue(&*mixbuf.begin(), &*mixbuf.end(), m_pos, t.fadeLevel)) eof = false;
 		}
 		m_pos += samples;
 		for (size_t i = 0, iend = mixbuf.size(); i != iend; ++i) {
@@ -143,11 +202,7 @@ public:
 	}
 	void seek(double time) { m_pos = time * srate * 2.0; }
 	/// Get the current position in seconds
-	double pos() const {
-		time_duration p = getTime() - m_baseTime;  // Simple precise position
-		if (p > m_nextTime) p = m_nextTime;  // Cap for monotonicity
-		return p.total_microseconds() * 1e-6;
-	}
+	double pos() const { return m_clock.pos(); }
 	double duration() const {
 		double dur = 0.0;
 		for (Tracks::const_iterator it = tracks.begin(), itend = tracks.end(); it != itend; ++it) {
@@ -159,7 +214,11 @@ public:
 	bool prepare() {
 		bool ready = true;
 		for (Tracks::iterator it = tracks.begin(), itend = tracks.end(); it != itend; ++it) {
-			if (!it->second->mpeg.audioQueue.prepare(m_pos)) ready = false;
+			FFmpeg& mpeg = it->second->mpeg;
+			if (mpeg.terminating()) continue;  // Song loading failed or other error, won't ever get ready
+			if (mpeg.audioQueue.prepare(m_pos)) continue;  // Buffering done
+			ready = false;  // Need to wait for buffering
+			break;
 		}
 		return ready;
 	}
@@ -324,45 +383,37 @@ struct Output {
 	}
 };
 
-struct Device {
-	// Init
-	const unsigned int in, out;
-	const double rate;
-	const unsigned int dev;
-	portaudio::Stream stream;
-	std::vector<Analyzer*> mics;
-	Output* outptr;
 
-	Device(unsigned int in, unsigned int out, double rate, unsigned int dev):
-	  in(in), out(out), rate(rate), dev(dev),
-	  stream(*this, in ? portaudio::Params().channelCount(in).device(dev).suggestedLatency(config["audio/latency"].f()): (const PaStreamParameters*)NULL,
-	    (out ? portaudio::Params().channelCount(out).device(dev).suggestedLatency(config["audio/latency"].f()) : (const PaStreamParameters*)NULL), rate),
-	  outptr()
-	{
-		mics.resize(in);
-	}
+Device::Device(unsigned int in, unsigned int out, double rate, unsigned int dev):
+  in(in), out(out), rate(rate), dev(dev),
+  stream(*this, in ? portaudio::Params().channelCount(in).device(dev).suggestedLatency(config["audio/latency"].f()): (const PaStreamParameters*)NULL,
+	(out ? portaudio::Params().channelCount(out).device(dev).suggestedLatency(config["audio/latency"].f()) : (const PaStreamParameters*)NULL), rate),
+  outptr()
+{
+	mics.resize(in);
+}
 
-	void start() {
-		PaError err = Pa_StartStream(stream);
-		if (err != paNoError) throw std::runtime_error("Cannot start PortAudio audio stream "
-		  + boost::lexical_cast<std::string>(dev) + ": " + Pa_GetErrorText(err));
-	}
+void Device::start() {
+	PaError err = Pa_StartStream(stream);
+	if (err != paNoError) throw std::runtime_error("Cannot start PortAudio audio stream "
+	  + boost::lexical_cast<std::string>(dev) + ": " + Pa_GetErrorText(err));
+}
 
-	int operator()(void const* input, void* output, unsigned long frames, const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags) try {
-		float const* inbuf = static_cast<float const*>(input);
-		float* outbuf = static_cast<float*>(output);
-		for (std::size_t i = 0; i < mics.size(); ++i) {
-			if (!mics[i]) continue;  // No analyzer? -> Channel not used
-			da::sample_const_iterator it = da::sample_const_iterator(inbuf + i, in);
-			mics[i]->input(it, it + frames);
-		}
-		if (outptr) outptr->callback(outbuf, outbuf + 2 * frames);
-		return paContinue;
-	} catch (std::exception& e) {
-		std::cerr << "Exception in audio callback: " << e.what() << std::endl;
-		return paAbort;
+int Device::operator()(void const* input, void* output, unsigned long frames, const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags) try {
+	float const* inbuf = static_cast<float const*>(input);
+	float* outbuf = static_cast<float*>(output);
+	for (std::size_t i = 0; i < mics.size(); ++i) {
+		if (!mics[i]) continue;  // No analyzer? -> Channel not used
+		da::sample_const_iterator it = da::sample_const_iterator(inbuf + i, in);
+		mics[i]->input(it, it + frames);
 	}
-};
+	if (outptr) outptr->callback(outbuf, outbuf + 2 * frames);
+	return paContinue;
+} catch (std::exception& e) {
+	std::cerr << "Exception in audio callback: " << e.what() << std::endl;
+	return paAbort;
+}
+
 
 
 struct Audio::Impl {
@@ -371,7 +422,7 @@ struct Audio::Impl {
 	boost::ptr_vector<Device> devices;
 	boost::ptr_vector<Analyzer> analyzers;
 	bool playback;
-	Impl(): playback() {
+	Impl(): init(), playback() {
 		// Parse audio devices from config
 		ConfigItem::StringList devs = config["audio/devices"].sl();
 		for (ConfigItem::StringList::const_iterator it = devs.begin(), end = devs.end(); it != end; ++it) {
@@ -382,6 +433,7 @@ struct Audio::Impl {
 					std::string dev;
 					std::vector<std::string> mics;
 				} params = Params();
+				params.out = 0;
 				params.rate = 48000;
 				// Break into tokens:
 				std::map<std::string, std::string> keyvalues = parseKeyValuePairs(*it);
@@ -410,6 +462,8 @@ struct Audio::Impl {
 					int tmp;
 					if (iss >> tmp && iss.get() == EOF && tmp >= 0 && tmp < count) dev = tmp;
 				}
+				std::clog << "audio/info: Trying audio device \"" << params.dev << "\", id: " << dev
+					<< ", in: " << params.mics.size() << ", out: " << params.out << std::endl;
 				bool skip_partial = false;
 				bool found = false;
 				// Try exact match first, then partial
@@ -427,6 +481,7 @@ struct Audio::Impl {
 							if (match_partial && std::string(info->name).find(params.dev) == std::string::npos) continue;
 						}
 						// Match found if we got here
+						int assigned_mics = 0;
 						bool device_init_threw = true;
 						try {
 							devices.push_back(new Device(params.mics.size(), params.out, params.rate, i));
@@ -439,15 +494,17 @@ struct Audio::Impl {
 								if (analyzers.size() >= 4) break; // Too many mics
 								std::string const& m = params.mics[j];
 								if (m.empty()) continue; // Input channel not used
-								// TODO: allow assignment in any order (not sequentially like the following code does)
-								if (m == "blue" && analyzers.size() != 0) continue;
-								if (m == "red" && analyzers.size() != 1) continue;
-								if (m == "green" && analyzers.size() != 2) continue;
-								if (m == "orange" && analyzers.size() != 3) continue;
+								// Check that the color is not already taken
+								bool mic_used = false;
+								for (size_t mi = 0; mi < analyzers.size(); ++mi) {
+									if (analyzers[mi].getId() == m) { mic_used = true; break; }
+								}
+								if (mic_used) continue;
 								// Add the new analyzer
-								Analyzer* a = new Analyzer(d.rate);
+								Analyzer* a = new Analyzer(d.rate, m);
 								analyzers.push_back(a);
 								d.mics[j] = a;
+								++assigned_mics;
 							}
 							// Assign playback output for the first available stereo output
 							if (!playback && d.out == 2) { d.outptr = &output; playback = true; }
@@ -458,13 +515,17 @@ struct Audio::Impl {
 						}
 						skip_partial = true;
 						found = true;
+						std::clog << "audio/info: Using audio device: " << i;
+						if (assigned_mics) std::clog << ", input channels: " << assigned_mics;
+						if (params.out) std::clog << ", output channels: " << params.out;
+						std::clog << std::endl;
 						break;
 					}
 				}
 				// Error handling
 				if (!found) throw std::runtime_error("Not found or already in use.");
 			} catch(std::runtime_error& e) {
-				std::cerr << "Audio device '" << *it << "': " << e.what() << std::endl;
+				std::clog << "audio/error: Audio device '" << *it << "': " << e.what() << std::endl;
 			}
 		}
 		// Assign mic buffers to the output for pass-through
@@ -476,8 +537,17 @@ struct Audio::Impl {
 Audio::Audio(): self(new Impl) {}
 Audio::~Audio() {}
 
+void Audio::restart() { self.reset(new Impl); };
+void Audio::close() { self.reset(); };
+
 bool Audio::isOpen() const {
 	return !self->devices.empty();
+}
+
+bool Audio::hasPlayback() const {
+	for (size_t i = 0; i < self->devices.size(); ++i)
+		if (self->devices[i].isOutput()) return true;
+	return false;
 }
 
 void Audio::loadSample(std::string const& streamId, std::string const& filename) {
@@ -597,3 +667,4 @@ void Audio::toggleSynth(Notes const& notes) {
 
 boost::ptr_vector<Analyzer>& Audio::analyzers() { return self->analyzers; }
 
+boost::ptr_vector<Device>& Audio::devices() { return self->devices; }

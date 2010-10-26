@@ -84,11 +84,12 @@ Toggle pitch wave rendering (only when karaoke mode is disabled)
 Hot reload song from disk (useful for making or repairing songs)
 
 [audio device configuration]
-Performous normally autodetects microphones and playback devices correctly, but if this fails on your machine, you will need to configure them from command line because in-game configuration is not yet implemented. Once you have them working, enter the configuration menu and press \fBCtrl+S\fR to save them to your config file so that they don't need to specified when starting the program.
+Performous normally autodetects microphones and playback devices correctly, but if this fails on your machine, you will need to configure them in the Audio Devices -screen. Advanced configuration is possible through the command line, just remember to enter the configuration menu and press \fBCtrl+S\fR to save them to your config file so that they don't need to be specified every time the program starts.
 
-Additionally, the current version prints a list of ALSA devices detected to console. Use this as a reference for your configuration.
+The list of available PortAudio devices is printed to the console, but it can also be seen from the GUI.
 
 [see also]
 You can find more information at http://performous.org/ or
+http://wiki.performous.org or
 http://sourceforge.net/projects/performous/
 

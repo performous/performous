@@ -9,13 +9,17 @@
 #include "surface.hh"
 #include "opengl_text.hh"
 #include "glutil.hh"
+#include "menu.hh"
+#include "screen.hh"
 #include "fs.hh"
+#include "theme.hh"
+
 
 /// Represents popup messages
 class Popup {
   public:
 	/// Constructor
-	Popup(std::string msg, glutil::Color c, double speed, SvgTxtThemeSimple* popupText, std::string info = "", SvgTxtTheme* infoText = NULL):
+	Popup(std::string msg, Color c, double speed, SvgTxtThemeSimple* popupText, std::string info = "", SvgTxtTheme* infoText = NULL):
 	  m_msg(msg), m_color(c), m_anim(AnimValue(0.0, speed)), m_popupText(popupText), m_info(info), m_infoText(infoText)
 	  {
 		m_anim.setTarget(1.0, false);
@@ -28,7 +32,7 @@ class Popup {
 			float s = 0.2 * (1.0 + anim);
 			float a = 1.0 - anim;
 			m_color.a = a;
-			glColor4fv(m_color);
+			glutil::Color color(m_color);
 			m_popupText->render(m_msg);
 			m_popupText->dimensions().center(0.1).middle(offsetX).stretch(s,s);
 			m_popupText->draw();
@@ -42,7 +46,7 @@ class Popup {
 	}
   private:
 	std::string m_msg;  /// Popup text
-	glutil::Color m_color;  /// Color
+	Color m_color;  /// Color
 	AnimValue m_anim;  /// Animation timer
 	SvgTxtThemeSimple* m_popupText;  /// Font for popup
 	std::string m_info;  /// Text to show in the bottom
@@ -57,39 +61,38 @@ class Song;
 class InstrumentGraph {
   public:
 	/// Constructor
-	InstrumentGraph(Audio& audio, Song const& song, input::DevType inp):
-	  m_audio(audio), m_song(song), m_input(input::DevType(inp)),
-	  m_stream(),
-	  m_cx(0.0, 0.2), m_width(0.5, 0.4),
-	  m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
-	  m_pads(),
-	  m_correctness(0.0, 5.0),
-	  m_score(),
-	  m_scoreFactor(),
-	  m_starmeter(),
-	  m_streak(),
-	  m_longestStreak(),
-	  m_bigStreak(),
-	  m_countdown(3), // Display countdown 3 secs before note start
-	  m_jointime(getNaN()),
-	  m_dead()
-	  {
-		m_popupText.reset(new SvgTxtThemeSimple(getThemePath("sing_popup_text.svg"), config["graphic/text_lod"].f()));
-	};
+	InstrumentGraph(Audio& audio, Song const& song, input::DevType inp);
+	/// Virtual destructor
 	virtual ~InstrumentGraph() {}
-	
+
 	// Interface functions
 	virtual void draw(double time) = 0;
 	virtual void engine() = 0;
 	virtual bool dead() const = 0;
 	virtual std::string getTrack() const = 0;
 	virtual std::string getDifficultyString() const = 0;
+	virtual std::string getModeId() const = 0;
+	virtual void changeTrack(int dir = 1) = 0;
+	virtual void changeDifficulty(int dir = 1) = 0;
+
+	// General shared functions
+	void setupPauseMenu();
+	void doUpdates();
+	void drawMenu();
+	void toggleMenu(int forcestate = -1); // 0 = close, 1 = open, -1 = auto/toggle
+	void togglePause(int) { m_audio.togglePause(); }
+	void quit(int) { ScreenManager::getSingletonPtr()->activateScreen("Songs"); }
+	void unjoin();
 
 	// General getters
+	bool joining(double time) const { return time < m_jointime; }
+	bool ready() const { return m_ready; };
+	bool menuOpen() const { return m_menu.isOpen(); }
 	void position(double cx, double width) { m_cx.setTarget(cx); m_width.setTarget(width); }
 	unsigned stream() const { return m_stream; }
 	double correctness() const { return m_correctness.get(); }
 	int getScore() const { return (m_score > 0 ? m_score : 0) * m_scoreFactor; }
+	input::DevType getGraphType() const { return m_input.getDevType(); }
 	virtual double getWhammy() const { return 0; }
 
   protected:
@@ -113,15 +116,29 @@ class InstrumentGraph {
 	Events m_events;
 	typedef std::vector<Popup> Popups;
 	Popups m_popups;
+	Menu m_menu;
 
 	// Shared functions for derived classes
 	void drawPopups(double offsetX);
 	void handleCountdown(double time, double beginTime);
-	bool joining(double time) const { return time < m_jointime; }
+
+	// Functions not really shared, but needed here
+	Color const& color(int fret) const;
 
 	// Media
+	Surface m_button;
 	SvgTxtTheme m_text;
 	boost::scoped_ptr<SvgTxtThemeSimple> m_popupText;
+	boost::scoped_ptr<ThemeInstrumentMenu> m_menuTheme;
+
+	// Dynamic stuff for join menu
+	ConfigItem m_selectedTrack; /// menu modifies this to select track
+	ConfigItem m_selectedDifficulty; /// menu modifies this to select difficulty
+	ConfigItem m_rejoin; /// menu sets this if we want to re-join
+	ConfigItem m_leftymode; /// switch guitar notes to right-to-left direction
+	std::string m_trackOpt;
+	std::string m_difficultyOpt;
+	std::string m_leftyOpt;
 
 	// Misc counters etc.
 	int m_pads; /// how many panels the current gaming mode uses
@@ -137,4 +154,6 @@ class InstrumentGraph {
 	int m_countdown; /// countdown counter
 	double m_jointime; /// when the player joined
 	int m_dead; /// how many notes has been passed without hitting buttons
+	bool m_ready;
 };
+

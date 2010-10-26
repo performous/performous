@@ -10,7 +10,7 @@ fi
 # first compile performous, build dir shouldn't exist at this stage
 mkdir build
 cd build
-cmake ../../ -DCMAKE_INSTALL_PREFIX=./out/Performous.app/Contents
+cmake ../../ -DCMAKE_INSTALL_PREFIX=./out/Performous.app/Contents -DENABLE_TOOLS=OFF
 make install
 
 # then create the rest of the app bundle

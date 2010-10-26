@@ -135,10 +135,10 @@ bool isThemeResource(fs::path filename){
 namespace {
 	bool pathNotExist(fs::path const& p) {
 		if (exists(p)) {
-			std::cout << ">>> Using data path \"" << p.string() << "\"" << std::endl;
+			std::clog << "fs/info: Using data path \"" << p.string() << "\"" << std::endl;
 			return false;
 		}
-		std::cout << ">>> Not using \"" << p.string() << "\" (does not exist)" << std::endl;
+		std::clog << "fs/info: Not using \"" << p.string() << "\" (does not exist)" << std::endl;
 		return true;
 	}
 }
@@ -176,7 +176,7 @@ Paths const& getPaths(bool refresh) {
 		}
 #endif
 		// Adding paths from config file
-		std::vector<std::string> const& confPaths = config["system/path"].sl();
+		std::vector<std::string> const& confPaths = config["paths/system"].sl();
 		std::transform(confPaths.begin(), confPaths.end(), std::inserter(dirs, dirs.end()), pathMangle);
 		// Check if they actually exist and print debug
 		paths.clear();

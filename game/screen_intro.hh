@@ -1,8 +1,9 @@
 #pragma once
 
 #include <boost/scoped_ptr.hpp>
-#include "dialog.hh"
 #include "screen.hh"
+#include "menu.hh"
+#include "animvalue.hh"
 
 class Audio;
 class ThemeIntro;
@@ -22,10 +23,12 @@ class ScreenIntro : public Screen {
 	void draw_menu_options();
 
   private:
+	void populateMenu();
+
 	Audio& m_audio;
 	boost::scoped_ptr<ThemeIntro> theme;
-	boost::ptr_vector<MenuOption> m_menuOptions;
-	boost::scoped_ptr<Dialog> m_dialog;
-	unsigned int selected;
+	Menu m_menu;
 	bool m_first;
+	AnimValue m_selAnim;
+	AnimValue m_submenuAnim;
 };

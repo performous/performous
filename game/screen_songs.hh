@@ -33,6 +33,8 @@ public:
 	void manageSharedKey(input::NavButton nav); ///< same behaviour for jukebox and normal mode
 	void manageEvent(SDL_Event event);
 	void draw();
+	void drawCovers(); ///< draw the cover browser
+	Surface& getCover(Song const& song); ///< get appropriate cover image for the song (incl. no cover)
 	void drawJukebox(); ///< draw the songbrowser in jukebox mode (fullscreen, full previews, ...)
 
 protected:

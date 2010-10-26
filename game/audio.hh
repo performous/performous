@@ -10,6 +10,33 @@
 #include <boost/date_time.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/scoped_ptr.hpp>
+#include "libda/portaudio.hpp"
+
+struct Output;
+
+struct Device {
+	// Init
+	const unsigned int in, out;
+	const double rate;
+	const unsigned int dev;
+	portaudio::Stream stream;
+	std::vector<Analyzer*> mics;
+	Output* outptr;
+
+	Device(unsigned int in, unsigned int out, double rate, unsigned int dev);
+	/// Start
+	void start();
+	/// Callback
+	int operator()(void const* input, void* output, unsigned long frames, const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags);
+	/// Returns true if this device is opened for output
+	bool isOutput() const { return outptr != NULL; }
+	/// Returns true if this device has the given mic color assigned
+	bool isMic(std::string mic_id) const {
+		for (std::vector<Analyzer*>::const_iterator it = mics.begin(); it != mics.end(); ++it)
+			if (*it && (*it)->getId() == mic_id) return true;
+		return false;
+	}
+};
 
 
 /** @short High level audio playback API **/
@@ -19,8 +46,12 @@ class Audio {
 public:
 	Audio();
 	~Audio();
+	void restart();
+	void close();
 	boost::ptr_vector<Analyzer>& analyzers();
+	boost::ptr_vector<Device>& devices();
 	bool isOpen() const;
+	bool hasPlayback() const;
 	/** Play a song beginning at startPos (defaults to 0)
 	 * @param filename the track filename
 	 * @param preview if the song preview is to play

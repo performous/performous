@@ -3,6 +3,7 @@
 #include "fs.hh"
 #include "util.hh"
 #include "execname.hpp"
+#include "i18n.hh"
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
@@ -17,6 +18,18 @@ namespace fs = boost::filesystem;
 
 Config config;
 
+
+ConfigItem::ConfigItem(bool bval): m_type("bool"), m_value(bval) { }
+
+ConfigItem::ConfigItem(int ival): m_type("int"), m_value(ival) { }
+
+ConfigItem::ConfigItem(float fval): m_type("float"), m_value(fval) { }
+
+ConfigItem::ConfigItem(std::string sval): m_type("string"), m_value(sval) { }
+
+ConfigItem::ConfigItem(OptionList opts): m_type("option_list"), m_value(opts), m_sel(0) { }
+
+
 ConfigItem& ConfigItem::incdec(int dir) {
 	if (m_type == "int") {
 		int& val = boost::get<int>(m_value);
@@ -29,6 +42,9 @@ ConfigItem& ConfigItem::incdec(int dir) {
 	} else if (m_type == "bool") {
 		bool& val = boost::get<bool>(m_value);
 		val = !val;
+	} else if (m_type == "option_list") {
+		size_t s = boost::get<OptionList>(m_value).size();
+		m_sel = (m_sel + dir + s) % s;
 	}
 	return *this;
 }
@@ -39,6 +55,7 @@ bool ConfigItem::isDefaultImpl(ConfigItem::Value const& defaultValue) const {
 	if (m_type == "float") return boost::get<double>(m_value) == boost::get<double>(defaultValue);
 	if (m_type == "string") return boost::get<std::string>(m_value) == boost::get<std::string>(defaultValue);
 	if (m_type == "string_list") return boost::get<StringList>(m_value) == boost::get<StringList>(defaultValue);
+	if (m_type == "option_list") return boost::get<OptionList>(m_value) == boost::get<OptionList>(defaultValue);
 	throw std::logic_error("ConfigItem::is_default doesn't know type '" + m_type + "'");
 }
 
@@ -49,7 +66,7 @@ void ConfigItem::verifyType(std::string const& type) const {
 	for (Config::const_iterator it = config.begin(); it != config.end(); ++it) {
 		if (&it->second == this) { name = it->first; break; }
 	}
-	if (m_type.empty()) throw std::logic_error("Config item " + name + " used in C++ but missing from config schema");
+	if (m_type.empty()) throw std::logic_error("Config item " + name + ", requested_type=" + type + " used in C++ but missing from config schema");
 	throw std::logic_error("Config item type mismatch: item=" + name + ", type=" + m_type + ", requested=" + type);
 }
 
@@ -58,6 +75,10 @@ bool& ConfigItem::b() { verifyType("bool"); return boost::get<bool>(m_value); }
 double& ConfigItem::f() { verifyType("float"); return boost::get<double>(m_value); }
 std::string& ConfigItem::s() { verifyType("string"); return boost::get<std::string>(m_value); }
 ConfigItem::StringList& ConfigItem::sl() { verifyType("string_list"); return boost::get<StringList>(m_value); }
+ConfigItem::OptionList& ConfigItem::ol() { verifyType("option_list"); return boost::get<OptionList>(m_value); }
+std::string& ConfigItem::so() { verifyType("option_list"); return boost::get<OptionList>(m_value).at(m_sel); }
+
+void ConfigItem::select(int i) { verifyType("option_list"); m_sel = clamp<int>(i, 0, boost::get<OptionList>(m_value).size()-1); }
 
 namespace {
 	template <typename T, typename VariantAll, typename VariantNum> std::string numericFormat(VariantAll const& value, VariantNum const& multiplier, VariantNum const& step) {
@@ -78,12 +99,13 @@ namespace {
 std::string ConfigItem::getValue() const {
 	if (m_type == "int") return numericFormat<int>(m_value, m_multiplier, m_step) + m_unit;
 	if (m_type == "float") return numericFormat<double>(m_value, m_multiplier, m_step) + m_unit;
-	if (m_type == "bool") return boost::get<bool>(m_value) ? "Enabled" : "Disabled";
+	if (m_type == "bool") return boost::get<bool>(m_value) ? _("Enabled") : _("Disabled");
 	if (m_type == "string") return boost::get<std::string>(m_value);
 	if (m_type == "string_list") {
 		StringList const& sl = boost::get<StringList>(m_value);
-		return sl.size() == 1 ? "{" + sl[0] + "}" : (boost::format("%d items") % sl.size()).str();
+		return sl.size() == 1 ? "{" + sl[0] + "}" : (boost::format(_("%d items")) % sl.size()).str();
 	}
+	if (m_type == "option_list") return boost::get<OptionList>(m_value).at(m_sel);
 	throw std::logic_error("ConfigItem::getValue doesn't know type '" + m_type + "'");
 }
 
@@ -169,7 +191,8 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) {
 			value = elem2.get_content();
 		}
 		m_value = value;
-	} else if (m_type == "string_list") {
+	} else if (m_type == "string_list" || m_type == "option_list") {
+		//TODO: Option list should also update selection (from attribute?)
 		std::vector<std::string> value;
 		xmlpp::NodeSet n2 = elem.find("stringvalue/text()");
 		for (xmlpp::NodeSet::const_iterator it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
@@ -226,6 +249,14 @@ void writeConfig(bool system) {
 				stringvalueNode->add_child_text(*it);
 			}
 		}
+		else if (item.get_type() == "option_list") {
+			//TODO: Write selected also (as attribute?)
+			ConfigItem::OptionList const& value = item.ol();
+			for(ConfigItem::OptionList::const_iterator it = value.begin(); it != value.end(); ++it) {
+				xmlpp::Element* stringvalueNode = entryNode->add_child("stringvalue");
+				stringvalueNode->add_child_text(*it);
+			}
+		}
 	}
 	fs::path const& conf = system ? systemConfFile : userConfFile;
 	std::string tmp = conf.string() + "tmp";
@@ -262,10 +293,10 @@ void readMenuXML(xmlpp::Node* node) {
 
 void readConfigXML(fs::path const& file, int mode) {
 	if (!fs::exists(file)) {
-		std::clog << "Skipping " << file << " (not found)" << std::endl;
+		std::clog << "config/info: Skipping " << file << " (not found)" << std::endl;
 		return;
 	}
-	std::clog << "Parsing " << file << std::endl;
+	std::clog << "config/info: Parsing " << file << std::endl;
 	xmlpp::DomParser domParser(file.string());
 	try {
 		xmlpp::NodeSet n = domParser.get_document()->get_root_node()->find("/performous/menu/entry");
@@ -293,7 +324,7 @@ void readConfigXML(fs::path const& file, int mode) {
 				}
 			} else {
 				if (it == config.end()) {
-					std::clog << "  Entry " << name << " ignored (does not exist in config schema)." << std::endl;
+					std::clog << "config/warning:   Entry " << name << " ignored (does not exist in config schema)." << std::endl;
 					continue;
 				}
 				it->second.update(elem, mode);
