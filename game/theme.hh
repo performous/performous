@@ -2,6 +2,7 @@
 
 #include "opengl_text.hh"
 #include "surface.hh"
+#include "cachemap.hh"
 #include <boost/noncopyable.hpp>
 #include <string>
 
@@ -77,9 +78,9 @@ public:
 	ThemeIntro();
 	/// back highlight for selected option
 	Surface back_h;
-	/// menu option text
-	SvgTxtTheme option;
-	/// menu selected option text
+	/// menu option texts
+	Cachemap<std::string, SvgTxtTheme> options;
+	/// selected menu option text
 	SvgTxtTheme option_selected;
 	/// menu comment text
 	SvgTxtTheme comment;
