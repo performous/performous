@@ -442,7 +442,7 @@ struct Audio::Impl {
 					else throw std::runtime_error("Unknown device parameter " + key);
 					if (!iss.eof()) throw std::runtime_error("Syntax error parsing device parameter " + key);
 				}
-				int count = Pa_GetDeviceCount();
+				int count = portaudio::AudioDevices::count();
 				int dev = -1;
 				// Handle empty device
 				if (params.dev.empty()) dev = (params.out == 0 ? Pa_GetDefaultInputDevice() : Pa_GetDefaultOutputDevice());
@@ -456,19 +456,20 @@ struct Audio::Impl {
 					<< ", in: " << params.mics.size() << ", out: " << params.out << std::endl;
 				bool skip_partial = false;
 				bool found = false;
+				portaudio::AudioDevices ad;
 				// Try exact match first, then partial
 				for (int match_partial = 0; match_partial < 2 && !skip_partial; ++match_partial) {
 					// Loop through the devices and try everything that matches the name
 					for (int i = -1; i < count && (dev < 0 || i == -1); ++i) {
 						if (dev >= 0 && i == -1) i = dev;
 						else if (i == -1) continue;
-						PaDeviceInfo const* info = Pa_GetDeviceInfo(i);
-						if (!info) continue;
-						if (info->maxInputChannels < int(params.mics.size())) continue;
-						if (info->maxOutputChannels < params.out) continue;
+						portaudio::DeviceInfo& info = ad.devices[i];
+						if (info.name.empty()) continue;
+						if (info.in < int(params.mics.size())) continue;
+						if (info.out < params.out) continue;
 						if (dev < 0) { // Try matching by name
-							if (!match_partial && info->name != params.dev) continue;
-							if (match_partial && std::string(info->name).find(params.dev) == std::string::npos) continue;
+							if (!match_partial && info.name != params.dev) continue;
+							if (match_partial && info.name.find(params.dev) == std::string::npos) continue;
 						}
 						// Match found if we got here
 						int assigned_mics = 0;
