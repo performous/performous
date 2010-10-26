@@ -23,7 +23,7 @@ namespace {
 	}
 }
 
-void convertToUTF8( std::stringstream &_stream, std::string _filename ) {
+void convertToUTF8(std::stringstream &_stream, std::string _filename) {
 	try {
 		convert(_stream.str(), "UTF-8", "UTF-8"); // Test if input is UTF-8
 	} catch(...) {
@@ -36,6 +36,12 @@ void convertToUTF8( std::stringstream &_stream, std::string _filename ) {
 			for (char ch; _stream.get(ch);) tmp += (ch >= 0x20 && ch < 0x7F) ? ch : '?';
 		}
 	}
+}
+
+std::string convertToUTF8(std::string const& str) {
+	std::stringstream ss(str);
+	convertToUTF8(ss, "");
+	return ss.str();
 }
 
 std::string unicodeCollate(std::string const& str) {
