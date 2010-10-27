@@ -84,7 +84,7 @@ void InstrumentGraph::drawMenu() {
 	// All these vars are ultimately affected by the scaling matrix
 	const double offsetX = 0.5f * (dimensions.x1() + dimensions.x2()) / s;
 	const float txth = th.option.h();
-	const float button_margin = m_arrow_up.dimensions.w();
+	const float button_margin = m_arrow_up.dimensions.w() * (m_input.isKeyboard() ? 2.0f : 1.0f);
 	const float step = txth * 0.7f;
 	const float h = m_menu.getOptions().size() * step + step;
 	float y = -h * .5f + step;
@@ -100,42 +100,44 @@ void InstrumentGraph::drawMenu() {
 		SvgTxtTheme* txt = &th.option;
 		// Selected item?
 		if (cur == it) {
-			// Draw the key hints
-			if (m_input.isKeyboard() && getGraphType() != input::DANCEPAD) { // Key letters for keyboard
-				txt->dimensions.middle(x - button_margin - button_margin*0.5f).center(y);
-				txt->draw(getGraphType() == input::GUITAR ? (m_leftymode.b() ? "Z" : "1") : "U");
-				txt->dimensions.middle(xx + button_margin - button_margin*0.5f).center(y);
-				txt->draw(getGraphType() == input::GUITAR ? (m_leftymode.b() ? "X" : "2") : "P");
-			} else { // Colored icons for real instruments
-				if (getGraphType() == input::DRUMS) {
-					// Drum colors are mirrored
-					m_arrow_left.dimensions.middle(xx + button_margin).center(y);
-					m_arrow_right.dimensions.middle(x - button_margin).center(y);
-				} else {
-					m_arrow_left.dimensions.middle(x - button_margin).center(y);
-					m_arrow_right.dimensions.middle(xx + button_margin).center(y);
-				}
-				m_arrow_left.draw();
-				m_arrow_right.draw();
+			// Left/right Icons
+			if (getGraphType() == input::DRUMS) {
+				// Drum colors are mirrored
+				m_arrow_left.dimensions.middle(xx + button_margin).center(y);
+				m_arrow_right.dimensions.middle(x - button_margin).center(y);
+			} else {
+				m_arrow_left.dimensions.middle(x - button_margin).center(y);
+				m_arrow_right.dimensions.middle(xx + button_margin).center(y);
 			}
-			// Up hint
-			if (getGraphType() != input::GUITAR && i > 0) {
-				if (m_input.isKeyboard() && getGraphType() == input::DRUMS) { // Key letters for keyboard drums
-					txt->dimensions.middle(x - button_margin - button_margin*0.5f).center(y - step);
-					txt->draw("I");
-				} else { // Colored icons for real instruments
+			m_arrow_left.draw();
+			m_arrow_right.draw();
+
+			// Up/down icons
+			if (getGraphType() != input::GUITAR) {
+				if (i > 0) { // Up
 					m_arrow_up.dimensions.middle(x - button_margin).center(y - step);
 					m_arrow_up.draw();
 				}
-			}
-			// Drum down hint
-			if (getGraphType() != input::GUITAR && i < m_menu.getOptions().size()-1) {
-				if (m_input.isKeyboard() && getGraphType() == input::DRUMS) { // Key letters for keyboard drums
-					txt->dimensions.middle(x - button_margin - button_margin*0.5f).center(y + step);
-					txt->draw("O");
-				} else { // Colored icons for real instruments
+				if (i < m_menu.getOptions().size()-1) { // Down
 					m_arrow_down.dimensions.middle(x - button_margin).center(y + step);
 					m_arrow_down.draw();
+				}
+			}
+
+			// Draw the key letters for keyboard (not for dancepad)
+			if (m_input.isKeyboard() && getGraphType() != input::DANCEPAD) {
+				float leftx = x - button_margin*0.75f;
+				float rightx = xx + button_margin*0.25f;
+				txt->dimensions.left(leftx).center(y);
+				txt->draw(getGraphType() == input::GUITAR ? (m_leftymode.b() ? "Z" : "1") : "U");
+				txt->dimensions.right(rightx).center(y);
+				txt->draw(getGraphType() == input::GUITAR ? (m_leftymode.b() ? "X" : "2") : "P");
+				// Only drums has up/down
+				if (getGraphType() == input::DRUMS) {
+					txt->dimensions.left(leftx).center(y - step);
+					if (i > 0) txt->draw("I"); // Up
+					txt->dimensions.left(leftx).center(y + step);
+					if (m_menu.getOptions().size()-1) txt->draw("O"); // Down
 				}
 			}
 			//th.back_h.dimensions.middle(0.05 + offsetX).center(y);
