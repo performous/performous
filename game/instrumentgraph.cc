@@ -84,7 +84,8 @@ void InstrumentGraph::drawMenu() {
 	// All these vars are ultimately affected by the scaling matrix
 	const double offsetX = 0.5f * (dimensions.x1() + dimensions.x2()) / s;
 	const float txth = th.option.h();
-	const float button_margin = m_arrow_up.dimensions.w() * (m_input.isKeyboard() ? 2.0f : 1.0f);
+	const float button_margin = m_arrow_up.dimensions.w()
+		* (m_input.isKeyboard() && getGraphType() != input::DANCEPAD ? 2.0f : 1.0f);
 	const float step = txth * 0.7f;
 	const float h = m_menu.getOptions().size() * step + step;
 	float y = -h * .5f + step;
