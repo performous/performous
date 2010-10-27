@@ -35,6 +35,7 @@ class ScreenAudioDevices: public Screen {
 	portaudio::DeviceInfos m_devs;
 	std::vector<Mic> m_mics;
 	std::map<std::string, Color> m_colorMap;
+	boost::scoped_ptr<Surface> m_selector;
 	boost::scoped_ptr<Surface> m_mic_icon;
 	boost::scoped_ptr<Surface> m_pdev_icon;
 };
