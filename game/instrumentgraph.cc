@@ -83,7 +83,7 @@ void InstrumentGraph::drawMenu() {
 	// We need to multiply offset by inverse scale factor to keep it always constant
 	// All these vars are ultimately affected by the scaling matrix
 	const double offsetX = 0.5f * (dimensions.x1() + dimensions.x2()) / s;
-	const float txth = th.option.h();
+	const float txth = th.option_selected.h();
 	const float button_margin = m_arrow_up.dimensions.w()
 		* (m_input.isKeyboard() && getGraphType() != input::DANCEPAD ? 2.0f : 1.0f);
 	const float step = txth * 0.7f;
@@ -98,9 +98,14 @@ void InstrumentGraph::drawMenu() {
 	w = 0;
 	unsigned i = 0;
 	for (MenuOptions::const_iterator it = m_menu.begin(); it != m_menu.end(); ++it, ++i) {
-		SvgTxtTheme* txt = &th.option;
-		// Selected item?
-		if (cur == it) {
+		std::string menutext = it->getName();
+		SvgTxtTheme* txt = &th.option_selected; // Default: font for selected menu item
+
+		if (cur != it) { // Unselected menuoption
+			txt = &(th.getCachedOption(menutext));
+
+		// Selected item
+		} else {
 			// Left/right Icons
 			if (getGraphType() == input::DRUMS) {
 				// Drum colors are mirrored
@@ -129,27 +134,37 @@ void InstrumentGraph::drawMenu() {
 			if (m_input.isKeyboard() && getGraphType() != input::DANCEPAD) {
 				float leftx = x - button_margin*0.75f;
 				float rightx = xx + button_margin*0.25f;
-				txt->dimensions.left(leftx).center(y);
-				txt->draw(getGraphType() == input::GUITAR ? (m_leftymode.b() ? "Z" : "1") : "U");
-				txt->dimensions.right(rightx).center(y);
-				txt->draw(getGraphType() == input::GUITAR ? (m_leftymode.b() ? "X" : "2") : "P");
+				{
+					std::string hintletter = (getGraphType() == input::GUITAR ? (m_leftymode.b() ? "Z" : "1") : "U");
+					SvgTxtTheme& hintfont = th.getCachedOption(hintletter);
+					hintfont.dimensions.left(leftx).center(y);
+					hintfont.draw(hintletter);
+				}{
+					std::string hintletter = (getGraphType() == input::GUITAR ? (m_leftymode.b() ? "X" : "2") : "P");
+					SvgTxtTheme& hintfont = th.getCachedOption(hintletter);
+					hintfont.dimensions.right(rightx).center(y);
+					hintfont.draw(hintletter);
+				}
 				// Only drums has up/down
 				if (getGraphType() == input::DRUMS) {
-					txt->dimensions.left(leftx).center(y - step);
-					if (i > 0) txt->draw("I"); // Up
-					txt->dimensions.left(leftx).center(y + step);
-					if (m_menu.getOptions().size()-1) txt->draw("O"); // Down
+					if (i > 0) {  // Up
+						SvgTxtTheme& hintfont = th.getCachedOption("I");
+						hintfont.dimensions.left(leftx).center(y - step);
+						hintfont.draw("I");
+					}
+					if (m_menu.getOptions().size()-1) {  // Down
+						SvgTxtTheme& hintfont = th.getCachedOption("O");
+						hintfont.dimensions.left(leftx).center(y + step);
+						hintfont.draw("O");
+					}
 				}
 			}
-			//th.back_h.dimensions.middle(0.05 + offsetX).center(y);
-			//th.back_h.draw();
-			// Switch to the "selected" font
-			txt = &th.option_selected;
 		}
+		// Finally we are at the actual menu item text drawing
 		txt->dimensions.middle(x).center(y);
-		txt->draw(it->getName(), it->isActive() ? 1.0f : 0.5f);
+		txt->draw(menutext, it->isActive() ? 1.0f : 0.5f);
 		w = std::max(w, txt->w() + 2 * step + button_margin * 2); // Calculate the widest entry
-		y += step;
+		y += step; // Move draw position down for the next option
 	}
 	// Draw comment text
 	if (cur->getComment() != "") {

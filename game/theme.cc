@@ -60,11 +60,16 @@ ThemeIntro::ThemeIntro():
 ThemeInstrumentMenu::ThemeInstrumentMenu():
 	Theme(getThemePath("instrumentmenu_bg.svg")),
 	back_h(getThemePath("instrumentmenu_back_highlight.svg")),
-	option(getThemePath("instrumentmenu_option.svg"), config["graphic/text_lod"].f()),
+	options(30),
 	option_selected(getThemePath("instrumentmenu_option_selected.svg"), config["graphic/text_lod"].f()),
 	comment(getThemePath("instrumentmenu_comment.svg"), config["graphic/text_lod"].f())
 	//comment_bg(getThemePath("menu_comment_bg.svg"))
 {
 	back_h.dimensions.fixedHeight(0.08f);
 	comment.setAlign(SvgTxtTheme::CENTER);
+}
+
+SvgTxtTheme& ThemeInstrumentMenu::getCachedOption(const std::string& text) {
+	if (options.contains(text)) return options[text];
+	return *options.insert(text, new SvgTxtTheme(getThemePath("instrumentmenu_option.svg"), config["graphic/text_lod"].f()))->second;
 }
