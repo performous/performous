@@ -47,7 +47,7 @@ ThemeAudioDevices::ThemeAudioDevices():
 ThemeIntro::ThemeIntro():
 	Theme(getThemePath("intro_bg.svg")),
 	back_h(getThemePath("mainmenu_back_highlight.svg")),
-	option(getThemePath("mainmenu_option.svg"), config["graphic/text_lod"].f()),
+	options(30),
 	option_selected(getThemePath("mainmenu_option_selected.svg"), config["graphic/text_lod"].f()),
 	comment(getThemePath("mainmenu_comment.svg"), config["graphic/text_lod"].f()),
 	short_comment(getThemePath("mainmenu_short_comment.svg"), config["graphic/text_lod"].f()),

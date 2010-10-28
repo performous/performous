@@ -2,10 +2,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-10-07 16:50+0100\n"
-"PO-Revision-Date: 2010-10-07 17:07+0100\n"
+"POT-Creation-Date: 2010-10-24 13:06+0100\n"
+"PO-Revision-Date: 2010-10-24 13:06+0100\n"
 "Last-Translator: Fredrik Klasson <scientica@gmail.com>\n"
 "Language-Team: \n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -17,37 +18,29 @@ msgstr ""
 "X-Poedit-SearchPath-0: ../game\n"
 "X-Poedit-SearchPath-1: ../data\n"
 
-#: ../game/main.cc:116
-msgid "Audio..."
-msgstr "オーディオ…"
-
-#: ../game/main.cc:123
-msgid "Launching background loaders..."
-msgstr ""
-
 # note: says "music" instead of "audio samples"
-#: ../game/main.cc:131
+#: ../game/main.cc:133
 msgid "Loading audio samples..."
 msgstr "音楽を読み替えていまうす…"
 
-#: ../game/main.cc:145
+#: ../game/main.cc:147
 msgid "Creating screens..."
 msgstr ""
 
-#: ../game/main.cc:153
+#: ../game/main.cc:156
 msgid "Entering main menu"
 msgstr "メインメニューに入っています"
 
-#: ../game/main.cc:155
-#: ../game/screen_sing.cc:128
+#: ../game/main.cc:158
+#: ../game/screen_sing.cc:144
 msgid "Loading complete"
 msgstr ""
 
-#: ../game/main.cc:164
+#: ../game/main.cc:167
 msgid "Screenshot taken!"
 msgstr ""
 
-#: ../game/main.cc:167
+#: ../game/main.cc:170
 msgid "Screenshot failed!"
 msgstr ""
 
@@ -88,132 +81,138 @@ msgstr "トレーニング"
 msgid "Check your skills or test the microphones"
 msgstr ""
 
-#: ../game/screen_intro.cc:152
+#: ../game/screen_intro.cc:151
 msgid "Audio Devices"
 msgstr ""
 
-#: ../game/screen_intro.cc:152
+#: ../game/screen_intro.cc:151
 msgid "Setup microphones and playback"
 msgstr ""
 
-#: ../game/screen_intro.cc:153
+#: ../game/screen_intro.cc:152
 msgid "Audio"
 msgstr "オーディオ"
 
-#: ../game/screen_intro.cc:153
+#: ../game/screen_intro.cc:152
 msgid "Configure general audio settings"
 msgstr "全般オーディオのオプションを設定する"
 
-#: ../game/screen_intro.cc:154
+#: ../game/screen_intro.cc:153
 msgid "Graphics"
 msgstr ""
 
-#: ../game/screen_intro.cc:154
+#: ../game/screen_intro.cc:153
 msgid "Configure rendering and video settings"
 msgstr "Ｒｅｎｄｅｒｉｎｇとビデオのオプションを設定する"
 
-#: ../game/screen_intro.cc:155
+#: ../game/screen_intro.cc:154
 msgid "Game"
 msgstr "ゲーム"
 
-#: ../game/screen_intro.cc:155
+#: ../game/screen_intro.cc:154
 msgid "Gameplay related options"
 msgstr ""
 
-#: ../game/screen_intro.cc:157
+#: ../game/screen_intro.cc:155
 msgid "Paths"
 msgstr "パス"
 
-#: ../game/screen_intro.cc:157
+#: ../game/screen_intro.cc:155
 msgid "Setup song and data paths"
 msgstr ""
 
-#: ../game/screen_intro.cc:160
+#: ../game/screen_intro.cc:157
 msgid "Configure"
 msgstr "設定"
 
-#: ../game/screen_intro.cc:160
+#: ../game/screen_intro.cc:157
 msgid "Configure audio and game options"
 msgstr "オーディオとゲームのオプションを設定する"
 
-#: ../game/screen_intro.cc:163
-#: ../game/screen_sing.cc:121
+#: ../game/screen_intro.cc:160
+#: ../game/screen_sing.cc:137
 msgid "Quit"
 msgstr "終了"
 
-#: ../game/screen_intro.cc:163
+#: ../game/screen_intro.cc:160
 msgid "Leave the game"
 msgstr "ゲームを終了する"
 
 # Skin or theme, I think both are the same for this matter.
-#: ../game/screen_sing.cc:36
+#: ../game/screen_sing.cc:35
 msgid "Loading theme..."
 msgstr "スキンを読み替えていまうす…"
 
-#: ../game/screen_sing.cc:39
+#: ../game/screen_sing.cc:38
 msgid "Loading song..."
 msgstr "音楽を読み替えていまうす…"
 
-#: ../game/screen_sing.cc:45
+#: ../game/screen_sing.cc:44
 msgid "Song is broken!"
 msgstr "音楽が壊れています！"
 
-#: ../game/screen_sing.cc:50
+#: ../game/screen_sing.cc:49
 msgid "Loading background..."
 msgstr "背景を読み替えていまうす…"
 
-#: ../game/screen_sing.cc:62
+#: ../game/screen_sing.cc:61
 msgid "Initializing webcam..."
 msgstr ""
 
-#: ../game/screen_sing.cc:69
+#: ../game/screen_sing.cc:68
 msgid "Loading video..."
 msgstr "ビデオを読み替えていまうす…"
 
-#: ../game/screen_sing.cc:75
+#: ../game/screen_sing.cc:74
 msgid "Random background..."
 msgstr ""
 
 # 「ユーザーインターフェース」は長い過ぎるね?
-#: ../game/screen_sing.cc:86
+#: ../game/screen_sing.cc:85
 msgid "Loading user interface..."
 msgstr "ＵＩを読み替えていまうす…"
 
-#: ../game/screen_sing.cc:95
+#: ../game/screen_sing.cc:94
 msgid "Loading instruments..."
 msgstr "楽器を読み替えています…"
 
-#: ../game/screen_sing.cc:117
+#: ../game/screen_sing.cc:116
 msgid "Loading menu..."
 msgstr "メニューを読み込みます…"
 
-#: ../game/screen_sing.cc:119
+#: ../game/screen_sing.cc:118
 msgid "Resume"
 msgstr "再会"
 
-#: ../game/screen_sing.cc:119
+#: ../game/screen_sing.cc:118
 msgid "Back to performing!"
 msgstr "演奏に再会する"
 
-#: ../game/screen_sing.cc:120
+#: ../game/screen_sing.cc:119
 msgid "Restart"
 msgstr ""
 
-#: ../game/screen_sing.cc:120
+#: ../game/screen_sing.cc:119
 msgid ""
 "Start the song\n"
 "from the beginning"
 msgstr ""
 
-#: ../game/screen_sing.cc:121
+#: ../game/screen_sing.cc:132
+msgid ""
+"Change vocal track\n"
+"(restart required)"
+msgstr ""
+
+#: ../game/screen_sing.cc:137
 msgid "Exit to song browser"
 msgstr "音楽ブラウザに終了する"
 
-#: ../game/screen_sing.cc:125
+#: ../game/screen_sing.cc:141
 msgid "Finalizing..."
 msgstr ""
 
-#: ../game/screen_sing.cc:130
+#: ../game/screen_sing.cc:146
 msgid "Song contains broken tracks!"
 msgstr "音楽には壊れてトラックが含まれます"
 
@@ -221,68 +220,70 @@ msgstr "音楽には壊れてトラックが含まれます"
 # is 場合は superflous?
 # インストゥルメンタル could work instead of 楽器の休憩
 # or should a のに construction be used?
-#: ../game/screen_sing.cc:457
+#: ../game/screen_sing.cc:478
 msgid "   ENTER to skip instrumental break"
 msgstr "   楽器の休憩をスキップ欲しい場合は、エンターキーを押す"
 
-#: ../game/screen_sing.cc:458
+#: ../game/screen_sing.cc:479
 msgid "   Remember to wait for grading!"
 msgstr "   採点を待って忘れないで"
 
-#: ../game/screen_sing.cc:594
+#: ../game/screen_sing.cc:615
 msgid "No player!"
 msgstr "選手がいません！"
 
-#: ../game/screen_sing.cc:603
+#: ../game/screen_sing.cc:624
 msgid "Hit singer"
 msgstr ""
 
-#: ../game/screen_sing.cc:604
+#: ../game/screen_sing.cc:625
 msgid "Lead singer"
 msgstr ""
 
-#: ../game/screen_sing.cc:605
-#: ../game/screen_sing.cc:611
-#: ../game/screen_sing.cc:617
+#: ../game/screen_sing.cc:626
+#: ../game/screen_sing.cc:632
+#: ../game/screen_sing.cc:638
 msgid "Rising star"
 msgstr ""
 
-#: ../game/screen_sing.cc:606
-#: ../game/screen_sing.cc:612
-#: ../game/screen_sing.cc:618
+#: ../game/screen_sing.cc:627
+#: ../game/screen_sing.cc:633
+#: ../game/screen_sing.cc:639
 msgid "Amateur"
 msgstr ""
 
-#: ../game/screen_sing.cc:607
-#: ../game/screen_sing.cc:619
+#: ../game/screen_sing.cc:628
+#: ../game/screen_sing.cc:640
 msgid "Tone deaf"
 msgstr ""
 
-#: ../game/screen_sing.cc:609
+#: ../game/screen_sing.cc:630
 msgid "Maniac"
 msgstr ""
 
-#: ../game/screen_sing.cc:610
+#: ../game/screen_sing.cc:631
 msgid "Hoofer"
 msgstr ""
 
-#: ../game/screen_sing.cc:613
+#: ../game/screen_sing.cc:634
 msgid "Loser"
 msgstr ""
 
-#: ../game/screen_sing.cc:615
+#: ../game/screen_sing.cc:636
 msgid "Virtuoso"
 msgstr ""
 
-#: ../game/screen_sing.cc:616
+#: ../game/screen_sing.cc:637
 msgid "Rocker"
 msgstr ""
 
 #: ../game/database.cc:107
+#: ../game/database.cc:127
 msgid "No Items up to now."
 msgstr ""
 
 #: ../game/database.cc:108
+#: ../game/database.cc:128
 msgid "Be the first to be listed here!"
 msgstr ""
 
@@ -390,6 +391,22 @@ msgstr ""
 
 #: ../game/guitargraph.cc:1168
 msgid "Solo!"
+msgstr ""
+
+#: ../game/screen_paths.cc:24
+msgid ""
+"This tool is not yet available.\n"
+"Configure paths by adding them\n"
+"as command line parameters and\n"
+"then save them in configuration menu."
+msgstr ""
+
+#: ../game/screen_paths.cc:69
+msgid "Press any key to exit."
+msgstr ""
+
+#: ../game/screen_paths.cc:74
+msgid "Windows users can also use ConfigureSongDirectory.bat in the bin-directory."
 msgstr ""
 
 #: ../game/screen_audiodevices.cc:55
@@ -517,250 +534,288 @@ msgstr ""
 msgid "%d items"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:3
+#: ../game/song.hh:35
+msgid "Guitar"
+msgstr ""
+
+#: ../game/song.hh:35
+msgid "Coop guitar"
+msgstr ""
+
+#: ../game/song.hh:35
+msgid "Rhythm guitar"
+msgstr ""
+
+#: ../game/song.hh:35
+msgid "Bass"
+msgstr ""
+
+#: ../game/song.hh:35
+msgid "Drums"
+msgstr ""
+
+#: ../game/song.hh:35
+msgid "Vocals"
+msgstr ""
+
+#: ../game/song.hh:35
+msgid "Harmonic 1"
+msgstr ""
+
+#: ../game/song.hh:35
+msgid "Harmonic 2"
+msgstr ""
+
+#: ../game/song.hh:35
+msgid "Harmonic 3"
+msgstr ""
+
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:3
 msgid "Gameplay settings."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:4
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:4
 msgid "Graphic"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:5
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:5
 msgid "Video and rendering settings."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:7
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:7
 msgid "Audio-related settings."
 msgstr ""
 
 # assuming search path makes more sence than just path? (or will パス be fine?)
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:9
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:9
 msgid "System paths."
 msgstr "システムのサーチパス"
 
 # could 開式 be used for this?
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:10
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:10
 msgid "Karaoke mode"
 msgstr "カラオケモード"
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:11
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:11
 msgid "Hide pitch wave, notes and scoring."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:12
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:12
 msgid "Pitch waves"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:13
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:13
 msgid "Enable singing pitch display (when not in karaoke mode)."
 msgstr ""
 
 # Note: skin
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:14
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:14
 msgid "Theme"
 msgstr "スキン"
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:15
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:15
 msgid "Name of the theme to use or absolute path to theme folder."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:16
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:16
 msgid "Keyboard as guitar"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:17
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:17
 msgid "Enable keyboard as guitar (Frets on Fire mode)."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:18
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:18
 msgid "Keyboard as drumkit"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:19
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:19
 msgid "Enable keyboard as drumkit."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:20
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:20
 msgid "Keyboard as dance pad"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:21
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:21
 msgid "Enable keyboard as dance pad."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:22
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:22
 msgid "Joystick configuration"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:23
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:23
 msgid "Force joystick to some kind of instrument."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:24
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:24
 msgid "Hardware MIDI input device"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:25
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:25
 msgid "Part of sound card name or its number or empty to use the first available device. Used currently for MIDI drum controllers."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:26
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:26
 msgid "Windowed width"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:27
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:27
 msgid "The width of the window."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:28
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:28
 msgid "Windowed height"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:29
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:29
 msgid "The height of the window."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:30
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:30
 msgid "Fullscreen mode"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:31
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:31
 msgid "Enable fullscreen mode on startup."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:32
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:32
 msgid "Video playback"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:33
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:33
 msgid "Allows completely disabling background videos. It is recommended to leave this enabled as Performous will still smoothly fade out the video if your computer is not fast enough."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:34
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:34
 msgid "Webcam background"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:35
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:35
 msgid "Performous can try to use webcam as a background video. You can disable it if it annoys you."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:36
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:36
 msgid "Webcam id"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:37
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:37
 msgid "Use -1 to autodetect or a number starting from 0 to choose specific device."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:38
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:38
 msgid "3D notes"
 msgstr "３D音符"
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:39
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:39
 msgid "Draw instrument notes as 3-dimensional objects. May hurt performance on older hardware."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:40
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:40
 msgid "SVG quality"
 msgstr "SVGの品質"
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:41
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:41
 msgid "Larger numbers cause vector graphics to be rendered in higher resolution. Decrease this to make navigating in menus faster."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:42
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:42
 msgid "Text quality"
 msgstr "テクストの品質"
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:43
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:43
 msgid "Larger numbers cause text to be rendered in higher resolution. Decrease this to make everything a little faster."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:44
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:44
 msgid "Benchmark mode"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:45
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:45
 msgid "Framerate limit of 100 FPS is removed and the game instead renders at full speed. FPS values are printed to console. Please note that the display drivers may still limit the rendering speed to the screen refresh rate."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:46
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:46
 msgid "Suggested latency"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:47
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:47
 msgid "This is a hint for the audio engine about the desired latency. Set this as low as possible while retaining clear audio playback. Requires restart."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:48
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:48
 msgid "Audio/video latency"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:49
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:49
 msgid "Affects all modes. Use negative value if your display input lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal. This should be set so that the notes pass the cursor at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while performing."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:50
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:50
 msgid "Audio round-trip latency"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:51
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:51
 msgid "Affects singing only. The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. While performing, press Ctrl+S for synth mode and adjust with Ctrl+F3/F4."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:52
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:52
 msgid "Audio/controller latency"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:53
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:53
 msgid "Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to adjust while performing."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:54
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:54
 msgid "Audio devices"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:55
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:55
 msgid "List of audio devices to try."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:56
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:56
 msgid "Menu volume"
 msgstr "メニューの音量"
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:57
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:57
 msgid "The volume level of menus, song previews and jukebox mode."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:58
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:58
 msgid "Music volume"
 msgstr "音楽の音量"
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:59
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:59
 msgid "The ingame music volume. Values above 90 are not recommended as distortion may occur."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:60
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:60
 msgid "Failure volume"
 msgstr "失敗の音量"
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:61
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:61
 msgid "The ingame fail sound volume. Values above 90 are not recommended as distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:62
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:62
 msgid "Song folders"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:63
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:63
 msgid "Where to recursively look for songs. DATADIR at the beginning means all Performous data folders."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:64
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:64
 msgid "Base folders for data"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.q9f0NfPZfX:65
+#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:65
 msgid "System defaults are included automatically. Additional paths can be added here."
 msgstr ""
 
+#~ msgid "Audio..."
+#~ msgstr "オーディオ…"

@@ -2,6 +2,7 @@
 #include "fs.hh"
 #include "screen.hh"
 #include "joystick.hh"
+#include "profiler.hh"
 #include "songs.hh"
 #include "backgrounds.hh"
 #include "database.hh"
@@ -115,19 +116,17 @@ static void checkEvents_SDL(ScreenManager& sm) {
 }
 
 void mainLoop(std::string const& songlist) {
-	Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());
-	ScreenManager sm(window);
-	sm.loading(_("Audio..."), 0.1);
 	Audio audio;
 	{ // Print the devices
 		portaudio::AudioDevices ads;
 		std::clog << "audio/info:\n" << ads.dump();
 	}
+	Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());
+	Backgrounds backgrounds;
+	Database database(getConfigDir() / "database.xml");
+	Songs songs(database, songlist);
+	ScreenManager sm(window);
 	try {
-		sm.loading(_("Launching background loaders..."), 0.4);
-		Backgrounds backgrounds;
-		Database database(getConfigDir() / "database.xml");
-		Songs songs(database, songlist);
 		boost::scoped_ptr<input::MidiDrums> midiDrums;
 		// TODO: Proper error handling...
 		try { midiDrums.reset(new input::MidiDrums); } catch (std::runtime_error&) {}
@@ -162,6 +161,7 @@ void mainLoop(std::string const& songlist) {
 		boost::xtime time = now();
 		unsigned frames = 0;
 		while (!sm.isFinished()) {
+			Profiler prof("mainloop");
 			if( g_take_screenshot ) {
 				fs::path filename;
 				try {
@@ -174,13 +174,16 @@ void mainLoop(std::string const& songlist) {
 				g_take_screenshot = false;
 			}
 			sm.updateScreen();  // exit/enter, any exception is fatal error
+			prof("misc");
 			try {
 				// Draw
 				window.blank();
 				sm.getCurrentScreen()->draw();
 				sm.drawNotifications();
+				prof("draw");
 				// Display (and wait until next frame)
 				window.swap();
+				prof("swap");
 				if (config["graphic/fps"].b()) {
 					++frames;
 					if (now() - time > 1.0) {
@@ -193,9 +196,11 @@ void mainLoop(std::string const& songlist) {
 					time = now();
 					frames = 0;
 				}
+				prof("fpsctrl");
 				// Process events for the next frame
 				if (midiDrums) midiDrums->process();
 				checkEvents_SDL(sm);
+				prof("events");
 			} catch (std::runtime_error& e) {
 				std::cerr << "ERROR: " << e.what() << std::endl;
 				sm.flashMessage(std::string("ERROR: ") + e.what());
@@ -213,12 +218,6 @@ void mainLoop(std::string const& songlist) {
 		boost::thread::sleep(now() + 2.0);
 	} catch (QuitNow&) {
 		std::cout << "Terminated." << std::endl;
-	}
-	// Give audio a little time to shutdown but then just quit
-	boost::thread audiokiller(boost::bind(&Audio::close, boost::ref(audio)));
-	if (!audiokiller.timed_join(boost::posix_time::milliseconds(2000))) {
-		std::cout << "Audio hung." << std::endl;
-		exit(EXIT_SUCCESS);
 	}
 }
 

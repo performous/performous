@@ -51,7 +51,7 @@ makensis.stdin.write(r'''!include "MUI2.nsh"
 !define VERSION "%s"
 
 Name "Performous ${VERSION}"
-OutFile "dist\Performous-${VERSION}-win32.exe"
+OutFile "dist\Performous-${VERSION}.exe"
 
 SetCompressor /SOLID lzma
 
@@ -85,9 +85,12 @@ for root, dirs, files in os.walk('.'):
 
 makensis.stdin.write(r'''  WriteRegStr HKLM "Software\Performous" "" "$INSTDIR"
   WriteUninstaller "$INSTDIR\uninst.exe"
+  CreateDirectory "$APPDATA\performous\songs"
   SetShellVarContext all
   CreateDirectory "$SMPROGRAMS\Performous"
   CreateShortcut "$SMPROGRAMS\Performous\Performous.lnk" "$INSTDIR\bin\performous.exe"
+  CreateShortCut "$SMPROGRAMS\Performous\ConfigureSongDirectory.lnk" "$INSTDIR\bin\ConfigureSongDirectory.bat"
+  CreateShortCut "$SMPROGRAMS\Performous\Songs.lnk" "$APPDATA\performous\songs"
   CreateShortcut "$SMPROGRAMS\Performous\Uninstall.lnk" "$INSTDIR\uninst.exe"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Performous" "DisplayName" "Performous"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Performous" "UninstallString" "$\"$INSTDIR\uninst.exe$\""
@@ -109,6 +112,8 @@ makensis.stdin.write(r'''  Delete "$INSTDIR\uninst.exe"
   RmDir "$INSTDIR"
   SetShellVarContext all
   Delete "$SMPROGRAMS\Performous\Performous.lnk"
+  Delete "$SMPROGRAMS\Performous\ConfigureSongDirectory.lnk"
+  Delete "$SMPROGRAMS\Performous\Songs.lnk"
   Delete "$SMPROGRAMS\Performous\Uninstall.lnk"
   RmDir "$SMPROGRAMS\Performous"
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Performous"
@@ -121,4 +126,4 @@ if makensis.wait() != 0:
     print >>sys.stderr, 'Installer compilation failed.'
     sys.exit(1)
 else:
-    print '\ndist/Performous-%s-win32.exe is ready.' % version
+    print '\ndist/Performous-%s.exe is ready.' % version

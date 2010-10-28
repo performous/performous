@@ -211,6 +211,7 @@ class FFmpeg {
 	double duration() const;
 	/// return current position
 	double position() { return videoQueue.position(); /* FIXME: remove */ }
+	bool terminating() const { return m_quit; }
 
   private:
 	class eof_error: public std::exception {};

@@ -97,9 +97,11 @@ void ScreenIntro::draw_menu_options() {
 
 		// Regular option (not selected)
 		} else {
-			theme->option.dimensions.left(x).center(start_y + ii*0.08);
-			theme->option.draw(opt.getName(), submenuanim * (opt.isActive() ? 1.0f : 0.5f));
-			wcounter = std::max(wcounter, theme->option.w() + 2 * sel_margin); // Calculate the widest entry
+			std::string title = opt.getName();
+			SvgTxtTheme& txt = getTextObject(title);
+			txt.dimensions.left(x).center(start_y + ii*0.08);
+			txt.draw(title, submenuanim * (opt.isActive() ? 1.0f : 0.5f));
+			wcounter = std::max(wcounter, txt.w() + 2 * sel_margin); // Calculate the widest entry
 		}
 	}
 	m_menu.dimensions.stretch(wcounter, 1);
@@ -123,6 +125,11 @@ void ScreenIntro::draw() {
 	}
 	// Menu
 	draw_menu_options();
+}
+
+SvgTxtTheme& ScreenIntro::getTextObject(std::string const& txt) {
+	if (theme->options.contains(txt)) return theme->options[txt];
+	return *theme->options.insert(txt, new SvgTxtTheme(getThemePath("mainmenu_option.svg"), config["graphic/text_lod"].f()))->second;
 }
 
 void ScreenIntro::populateMenu() {
@@ -153,7 +160,6 @@ void ScreenIntro::populateMenu() {
 		configmain.push_back(MenuOption(_("Graphics"), _("Configure rendering and video settings"), gfxmenu, "intro_configure.svg"));
 		configmain.push_back(MenuOption(_("Game"), _("Gameplay related options"), gamemenu, "intro_configure.svg"));
 		configmain.push_back(MenuOption(_("Paths"), _("Setup song and data paths"), "Paths", "intro_configure.svg"));
-		configmain.back().image.reset(new Surface(getThemePath("intro_quit.svg")));
 		// Add to root menu
 		m_menu.add(MenuOption(_("Configure"), _("Configure audio and game options"), configmain, "intro_configure.svg"));
 	}

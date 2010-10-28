@@ -2,6 +2,7 @@
 #include "fs.hh"
 #include "configuration.hh"
 #include "glutil.hh"
+#include "util.hh"
 
 #include <boost/thread.hpp>
 #include <boost/lexical_cast.hpp>
@@ -42,7 +43,7 @@ Screen* ScreenManager::getScreen(std::string const& name) {
 
 void ScreenManager::loading(std::string const& message, float progress) {
 	// TODO: Create a better one, this is quite ugly
-	flashMessage(message + " " + boost::lexical_cast<std::string>(progress*100) + "%", 0.0f, 1.0f, 1.0f);
+	flashMessage(message + " " + boost::lexical_cast<std::string>(int(round(progress*100))) + "%", 0.0f, 1.0f, 1.0f);
 	m_window.blank();
 	drawNotifications();
 	const int maxi = 20;

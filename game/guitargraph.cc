@@ -326,7 +326,7 @@ void GuitarGraph::engine() {
 			break;
 
 		// If the songs hasn't yet started, we want key presses to bring join menu back (not pause menu)
-		} else if (time < 0 && ev.type == input::Event::PRESS) {
+		} else if (time < -2 && ev.type == input::Event::PRESS) {
 			setupJoinMenu();
 			m_menu.open();
 			break;
@@ -822,7 +822,7 @@ void GuitarGraph::draw(double time) {
 					texCoord -= texCoordStep * (tEnd - future) / (tEnd - tBeg);
 					tEnd = future;
 				}
-				glutil::Color(colorize(Color(1.0f, 1.0f, 1.0f, time2a(tEnd)), time + tBeg));
+				glutil::Color c(colorize(Color(1.0f, 1.0f, 1.0f, time2a(tEnd)), time + tBeg));
 				glNormal3f(0.0f, 1.0f, 0.0f);
 				glTexCoord2f(0.0f, texCoord); glVertex2f(-w, time2y(tEnd));
 				glNormal3f(0.0f, 1.0f, 0.0f);

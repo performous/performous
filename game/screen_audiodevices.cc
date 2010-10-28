@@ -177,7 +177,7 @@ bool ScreenAudioDevices::save(bool skip_ui_config) {
 	size_t unassigned_id = m_devs.size();
 	// Give audio a little time to shutdown but then just quit
 	boost::thread audiokiller(boost::bind(&Audio::close, boost::ref(m_audio)));
-	if (!audiokiller.timed_join(boost::posix_time::milliseconds(4000)))
+	if (!audiokiller.timed_join(boost::posix_time::milliseconds(2500)))
 		ScreenManager::getSingletonPtr()->fatalError("Audio hung for some reason.\nPlease restart Performous.");
 	m_audio.restart(); // Reload audio to take the new settings into use
 	m_audio.playMusic(getThemePath("menu.ogg"), true); // Start music again

@@ -137,7 +137,7 @@ void ScreenSing::enter() {
 	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
 	m_menu.close();
 	// Startup delay for instruments is longer than for singing only
-	double setup_delay = (m_instruments.empty() && m_dancers.empty() ? -1.0 : -3.0);
+	double setup_delay = (m_instruments.empty() && m_dancers.empty() ? -1.0 : -5.0);
 	sm->loading(_("Finalizing..."), 0.95);
 	m_audio.playMusic(m_song->music, false, 0.0, setup_delay);
 	m_engine.reset(new Engine(m_audio, m_song->getVocalTrack(m_selectedTrack), analyzers.begin(), analyzers.end(), m_database));
@@ -189,18 +189,19 @@ bool ScreenSing::instrumentLayout(double time) {
 		m_help->draw();
 	}
 	// Set volume levels (averages of all instruments playing that track)
+	// FIXME: There should NOT be gettext calls here!
 	for( std::map<std::string,std::string>::iterator it = m_song->music.begin() ; it != m_song->music.end() ; ++it ) {
 		double level = 1.0;
-		if (volume.find(it->first) == volume.end()) {
+		if (volume.find(_(it->first.c_str())) == volume.end()) {
 			m_audio.streamFade(it->first, level);
 		} else {
-			CountSum cs = volume[it->first];
+			CountSum cs = volume[_(it->first.c_str())];
 			if (cs.first > 0) level = cs.second / cs.first;
 			if (m_song->music.size() <= 1) level = std::max(0.333, level);
 			m_audio.streamFade(it->first, level);
 		}
-		if (pitchbend.find(it->first) != pitchbend.end()) {
-			CountSum cs = pitchbend[it->first];
+		if (pitchbend.find(_(it->first.c_str())) != pitchbend.end()) {
+			CountSum cs = pitchbend[_(it->first.c_str())];
 			level = cs.second;
 			m_audio.streamBend(it->first, level);
 		}
@@ -238,12 +239,12 @@ void ScreenSing::danceLayout(double time) {
 }
 
 void ScreenSing::exit() {
+	m_engine.reset();
 	m_score_window.reset();
 	m_menu.clear();
 	m_instruments.clear();
 	m_dancers.clear();
 	m_layout_singer.reset();
-	m_engine.reset();
 	m_help.reset();
 	m_pause_icon.reset();
 	m_cam.reset();
@@ -304,7 +305,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 				m_menu.action();
 				if (!m_menu.isOpen() && m_audio.isPaused()) m_audio.togglePause();
 				// Handle updates
-				if (m_selectedTrack != m_vocalTrackOpts.so()) {
+				if (m_vocalTrackOpts.ol().size() && m_selectedTrack != m_vocalTrackOpts.so()) {
 					m_selectedTrack = m_vocalTrackOpts.so();
 					m_selectedTrackLocalized = _(m_selectedTrack.c_str());
 				}
@@ -653,7 +654,7 @@ void ScoreWindow::draw() {
 
 	for (Database::cur_scores_t::const_iterator p = m_database.scores.begin(); p != m_database.scores.end(); ++p, ++i) {
 		int score = p->score;
-		glutil::Color(p->color);
+		glutil::Color c(p->color);
 		double x = -0.12 + spacing * (0.5 + i - 0.5 * m_database.scores.size());
 		m_scoreBar.dimensions.middle(x).bottom(0.20);
 		m_scoreBar.draw(score / 10000.0);
