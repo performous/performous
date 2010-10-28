@@ -97,12 +97,14 @@ struct ThemeInstrumentMenu: Theme {
 	ThemeInstrumentMenu();
 	/// back highlight for selected option
 	Surface back_h;
-	/// menu option text
-	SvgTxtTheme option;
+	/// menu option texts
+	Cachemap<std::string, SvgTxtTheme> options;
 	/// menu selected option text
 	SvgTxtTheme option_selected;
 	/// menu comment text
 	SvgTxtTheme comment;
 	/// menu comment background
 	//Surface comment_bg;
+	/// get a cached option test
+	SvgTxtTheme& getCachedOption(const std::string& text);
 };

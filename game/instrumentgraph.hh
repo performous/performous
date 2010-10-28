@@ -127,6 +127,10 @@ class InstrumentGraph {
 
 	// Media
 	Surface m_button;
+	Surface m_arrow_up;
+	Surface m_arrow_down;
+	Surface m_arrow_left;
+	Surface m_arrow_right;
 	SvgTxtTheme m_text;
 	boost::scoped_ptr<SvgTxtThemeSimple> m_popupText;
 	boost::scoped_ptr<ThemeInstrumentMenu> m_menuTheme;

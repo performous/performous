@@ -315,7 +315,7 @@ void GuitarGraph::engine() {
 			// Strum (strum of keyboard-as-guitar doesn't generate nav-events)
 			else if (ev.type == input::Event::PICK && ev.button == 0) m_menu.move(1);
 			else if (ev.type == input::Event::PICK && ev.button == 1) m_menu.move(-1);
-			else if (ev.nav == input::START) m_menu.action();
+			else if (ev.nav == input::START || ev.nav == input::CANCEL) m_menu.close();
 			// See if anything changed
 			if (!m_drums && m_selectedTrack.so() != m_track_index->first) setTrack(m_selectedTrack.so());
 			else if (boost::lexical_cast<int>(m_selectedDifficulty.so()) != m_level)

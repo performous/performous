@@ -29,6 +29,7 @@ Features:
    * Audio/video by playing visually without audio? (needs controller/audio calibrated)
 - Allow playing a single song given as commandline argument (no menus)
 - Kiosk/arcade mode (disable exiting game and limit other functions)
+- Expert+ track, drum pro mode (using tom switch in midi)
 
 
 Dance features:
@@ -54,7 +55,3 @@ SS Ripper:
 Bugs:
 
 - Segfault when browsing songs in song browser while loading (segfaults before loading finishes), quite rare
-- sample are not always played when a user fail (for example drums). it could
-  be nice that playing a sample reset the privious fail sample (test case :
-  drums rolling)
-

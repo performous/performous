@@ -6,7 +6,6 @@
 
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <glibmm/convert.h>
 
 #include <libxml/parser.h>
 #include <libxml/tree.h>

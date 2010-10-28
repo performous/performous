@@ -2,6 +2,7 @@
 
 #include <boost/algorithm/string.hpp>
 #include <libxml++/libxml++.h>
+#include <glibmm/convert.h>
 #include "pak.h"
 
 // LibXML2 logging facility

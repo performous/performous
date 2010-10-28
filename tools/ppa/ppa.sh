@@ -16,7 +16,7 @@ export DEBEMAIL="`gpg --list-keys | grep uid | sed 's/ *(.*)//; s/>.*//; s/.*[:<
 
 # Config
 PKG="performous"
-VERSIONCOMMON="0.5.1-9+git"`date '+%Y%m%d'`"~ppa1"
+VERSIONCOMMON="0.6.0-99+git"`date '+%Y%m%d'`"~ppa1"
 SUITES="lucid maverick"
 GITURL="git://git.performous.org/gitroot/performous/performous"
 DESTINATIONPPA="ppa:performous-team/ppa"
@@ -33,12 +33,12 @@ PPAPATCHDIR="`pwd`"
 		$COPYCMD "$1/cmake" "$2"
 		$COPYCMD "$1/data" "$2"
 		$COPYCMD "$1/docs" "$2"
-		$COPYCMD "$1/editor" "$2"
 		$COPYCMD "$1/game" "$2"
 		$COPYCMD "$1/lang" "$2"
 		$COPYCMD "$1/themes" "$2"
 		$COPYCMD "$1/tools" "$2"
 		rm -rf "$2"/libs   # Old libs dir not used anymore
+		rm -rf "$2/editor" # Editor removed
 	}
 
 cd "$TEMPDIR"
@@ -80,6 +80,10 @@ for suite in $SUITES ; do
 		cp "$PPAPATCHDIR/"*.patch .
 		patch -p0 < *.patch
 		rm *.patch
+
+		# Hack hack
+		echo "// Dummy" > game/screen_configuration.hh
+		echo "// Dummy" > game/screen_configuration.cc
 
 		# Do changelog
 		# Dch complains about unknown suites
