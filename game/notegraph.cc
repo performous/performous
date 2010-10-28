@@ -28,28 +28,36 @@ void NoteGraph::reset() {
 
 namespace {
 	void drawNotebar(Texture const& texture, double x, double ybeg, double yend, double w, double h) {
+		std::vector<glutil::tPoint> p;
+
 		UseTexture tblock(texture);
-		glutil::Begin block(GL_TRIANGLE_STRIP);
-		glTexCoord2f(0.0f, 0.0f); glVertex2f(x, ybeg);
-		glTexCoord2f(0.0f, 1.0f); glVertex2f(x, ybeg + h);
+
+		p.push_back(glutil::tPoint(0.0f, 0.0f, x, ybeg));
+		p.push_back(glutil::tPoint(0.0f, 1.0f, x, ybeg + h));
+
 		if (w >= 2.0 * h) {
 			double tmp = h / w;
 			double y1 = (1.0 - tmp) * ybeg + tmp * yend;
 			double y2 = tmp * ybeg + (1.0 - tmp) * yend;
-			glTexCoord2f(0.5f, 0.0f); glVertex2f(x + h, y1);
-			glTexCoord2f(0.5f, 1.0f); glVertex2f(x + h, y1 + h);
-			glTexCoord2f(0.5f, 0.0f); glVertex2f(x + w - h, y2);
-			glTexCoord2f(0.5f, 1.0f); glVertex2f(x + w - h, y2 + h);
+			p.push_back(glutil::tPoint(0.5f, 0.0f, x + h, y1));
+			p.push_back(glutil::tPoint(0.5f, 1.0f, x + h, y1 + h));
+			p.push_back(glutil::tPoint(0.5f, 0.0f, x + w - h, y2));
+			p.push_back(glutil::tPoint(0.5f, 1.0f, x + w - h, y2 + h));
 		} else {
 			double ymid = 0.5 * (ybeg + yend);
 			float crop = 0.25f * w / h;
-			glTexCoord2f(crop, 0.0f); glVertex2f(x + 0.5 * w, ymid);
-			glTexCoord2f(crop, 1.0f); glVertex2f(x + 0.5 * w, ymid + h);
-			glTexCoord2f(1.0f - crop, 0.0f); glVertex2f(x + 0.5 * w, ymid);
-			glTexCoord2f(1.0f - crop, 1.0f); glVertex2f(x + 0.5 * w, ymid + h);
+			p.push_back(glutil::tPoint(crop, 0.0f, x + 0.5 * w, ymid));
+			p.push_back(glutil::tPoint(crop, 1.0f, x + 0.5 * w, ymid + h));
+			p.push_back(glutil::tPoint(1.0f - crop, 0.0f, x + 0.5 * w, ymid));
+			p.push_back(glutil::tPoint(1.0f - crop, 1.0f, x + 0.5 * w, ymid + h));
 		}
-		glTexCoord2f(1.0f, 0.0f); glVertex2f(x + w, yend);
-		glTexCoord2f(1.0f, 1.0f); glVertex2f(x + w, yend + h);
+		p.push_back(glutil::tPoint(1.0f, 0.0f, x + w, yend));
+		p.push_back(glutil::tPoint(1.0f, 1.0f, x + w, yend + h));
+
+		glutil::DrawTextured(GL_TRIANGLE_STRIP, p);
+
+		p.clear();
+
 	}
 }
 
@@ -176,22 +184,12 @@ void NoteGraph::drawNotes() {
 }
 
 namespace {
-	struct Point {
-		float tx;
-		float ty;
-		float vx;
-		float vy;
-		Point(float tx_, float ty_, float vx_, float vy_): tx(tx_), ty(ty_), vx(vx_), vy(vy_) {}
-	};
-
-	typedef std::vector<Point> Points;
-
-	void strip(Points& points) {
+	void strip(std::vector<glutil::tPoint>& points) {
 		size_t s = points.size();
 		if (s > 3) {
 			// Combine the two last points into a terminating point
 			{
-				Point& p = points[s-2];
+				glutil::tPoint& p = points[s-2];
 				p.ty = 0.5f;
 				p.vy = 0.5f * (p.vy + points[s-1].vy);
 			}
@@ -199,8 +197,8 @@ namespace {
 			// Render them as a triangle stripe
 			glEnableClientState(GL_VERTEX_ARRAY);
 			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-			glTexCoordPointer(2, GL_FLOAT, sizeof(Point), &points.front().tx);
-			glVertexPointer(2, GL_FLOAT, sizeof(Point), &points.front().vx);
+			glTexCoordPointer(2, GL_FLOAT, sizeof(glutil::tPoint), &points.front().tx);
+			glVertexPointer(2, GL_FLOAT, sizeof(glutil::tPoint), &points.front().vx);
 			glDrawArrays(GL_TRIANGLE_STRIP, 0, points.size());
 			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 			glDisableClientState(GL_VERTEX_ARRAY);
@@ -225,7 +223,7 @@ void NoteGraph::drawWaves(Database const& database) {
 		float tex = texOffset;
 		double t = idx * Engine::TIMESTEP;
 		double oldval = getNaN();
-		Points points;
+		std::vector<glutil::tPoint> points;
 		Notes::const_iterator noteIt = m_vocal.notes.begin();
 		glutil::Color c(Color(p->m_color.r, p->m_color.g, p->m_color.b, m_notealpha));
 		for (; idx < endIdx; ++idx, t += Engine::TIMESTEP) {
@@ -255,10 +253,10 @@ void NoteGraph::drawWaves(Database const& database) {
 			// If there has been a break or if the pitch change is too fast, terminate and begin a new one
 			if (oldval != oldval || std::abs(oldval - val) > 1) strip(points);
 			// Add a point or a pair of points
-			if (points.empty()) points.push_back(Point(tex, 0.5f, x, y));
+			if (points.empty()) points.push_back(glutil::tPoint(tex, 0.5f, x, y));
 			else {
-				points.push_back(Point(tex, 0.0f, x, y - thickness));
-				points.push_back(Point(tex, 1.0f, x, y + thickness));
+				points.push_back(glutil::tPoint(tex, 0.0f, x, y - thickness));
+				points.push_back(glutil::tPoint(tex, 1.0f, x, y + thickness));
 			}
 			oldval = val;
 		}

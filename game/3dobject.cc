@@ -80,38 +80,82 @@ void Object3d::loadWavefrontObj(std::string filepath, float scale) {
 	}
 }
 
-/// Generate a display list from the object data parsed earlier
-void Object3d::generateDisplayList() {
-	if (m_displist != 0) glDeleteLists(m_displist, 1); // Get rid of old
-	m_displist = glGenLists(1); // Get id for the list
-	glutil::DisplayList displist(m_displist, GL_COMPILE); // From now on, gl-commands go to the list
-	std::vector<Face>::const_iterator it;
-	// Iterate through faces
-	for (it = m_faces.begin(); it != m_faces.end(); ++it) {
-		// Select a suitable primitive
-		GLenum polyType = GL_POLYGON;
-		switch (it->vertices.size()) {
-			case 3: polyType = GL_TRIANGLES; break;
-			case 4: polyType = GL_QUADS; break;
-		}
-		glutil::Begin block(polyType);
-		// Iterate through face's points
-		std::vector<int>::const_iterator it2;
-		for (size_t i = 0; i < it->vertices.size(); i++) {
-			// Texture coordinates
-			if (!it->texcoords.empty())
-			  glTexCoord2f(m_texcoords[it->texcoords[i]].s, m_texcoords[it->texcoords[i]].t);
-			// Normals
-			if (!it->normals.empty())
-			  glNormal3f(
-				m_normals[it->normals[i]].x,
-				m_normals[it->normals[i]].y,
-				m_normals[it->normals[i]].z);
-			// Vertices
-			glVertex3f(
-			  m_vertices[it->vertices[i]].x,
-			  m_vertices[it->vertices[i]].y,
-			  m_vertices[it->vertices[i]].z);
+void Object3d::drawVBO() {
+	int stride = 3*sizeof(GLfloat);
+	int offset = 0;
+	if (m_vboStructure & _3DOBJECT_TEXCOORDS) stride += 2*sizeof(GLfloat);
+	if (m_vboStructure & _3DOBJECT_NORMALS) stride += 3*sizeof(GLfloat);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glVertexPointer(3, GL_FLOAT, stride, (const GLvoid *)offset);
+	offset += 3*sizeof(GLfloat);
+
+	if (m_vboStructure & _3DOBJECT_TEXCOORDS) {
+		if (m_texture) UseTexture tex(*m_texture);
+
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		glTexCoordPointer(2, GL_FLOAT, stride, (const GLvoid *)offset);
+		offset += 2*sizeof(GLfloat);
+	}
+	if (m_vboStructure & _3DOBJECT_NORMALS) {
+		glEnableClientState(GL_NORMAL_ARRAY);
+		glNormalPointer(GL_FLOAT, stride, (const GLvoid *)offset);
+	}
+
+	glDrawArrays(m_polyType, 0, m_numvertices*stride);
+
+	glDisableClientState(GL_NORMAL_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void Object3d::generateVBO() {
+	std::vector<GLfloat> data;
+
+	if (m_vbo != 0) glDeleteBuffers(1, &m_vbo);
+	glGenBuffers(1, &m_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+
+	m_numvertices = m_vertices.size();
+
+	m_polyType = GL_POLYGON;
+	switch (m_vertices.size()) {
+		case 3: m_polyType = GL_TRIANGLES; break;
+		case 4: m_polyType = GL_QUADS; break;
+	}
+
+	m_vboStructure = 0;
+	if (!m_texcoords.empty()) m_vboStructure |= _3DOBJECT_TEXCOORDS;
+	if (!m_normals.empty()) m_vboStructure |= _3DOBJECT_NORMALS;
+
+	std::vector<Face>::const_iterator i;
+	for (i = m_faces.begin(); i != m_faces.end(); ++i) {
+		for (size_t j = 0; j < i->vertices.size(); j++) {
+			data.push_back(m_vertices[i->vertices[j]].x);
+			data.push_back(m_vertices[i->vertices[j]].y);
+			data.push_back(m_vertices[i->vertices[j]].z);
+
+			if (m_vboStructure & _3DOBJECT_TEXCOORDS) {
+				data.push_back(m_texcoords[i->texcoords[j]].s);
+				data.push_back(m_texcoords[i->texcoords[j]].t);
+			}
+
+			if (m_vboStructure & _3DOBJECT_NORMALS) {
+				data.push_back(m_normals[i->normals[j]].x);
+				data.push_back(m_normals[i->normals[j]].y);
+				data.push_back(m_normals[i->normals[j]].z);
+			}
 		}
 	}
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*data.size(), &data.front(), GL_STATIC_DRAW);
+	data.clear();
+	m_vertices.clear();
+	m_normals.clear();
+	m_texcoords.clear();
+	m_faces.clear();
 }

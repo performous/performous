@@ -5,6 +5,9 @@
 #include <string>
 #include <boost/noncopyable.hpp>
 #include <cairo.h>
+#include <vector>
+
+extern struct glshader::Shader shader;
 
 /// class for geometry stuff
 class Dimensions {
@@ -119,22 +122,47 @@ class UseTexture: boost::noncopyable {
   public:
 	/// constructor
 	template <GLenum Type> UseTexture(OpenGLTexture<Type> const& s): m_type(s.type()) {
+		GLint texmodeloc = glGetUniformLocation(shader.program, "texMode");
+		GLint texloc = glGetUniformLocation(shader.program, "tex");
+		GLint texrectloc = glGetUniformLocation(shader.program, "texrect");
+
+		glUniform1i(texloc, 0);
+		glUniform1i(texrectloc, 1);
+
 		glEnable(m_type);
+
+		switch (Type) {
+		  case GL_TEXTURE_2D:	glActiveTexture(GL_TEXTURE0); glUniform1i(texmodeloc, 1); break;
+		  case GL_TEXTURE_RECTANGLE_ARB:	glActiveTexture(GL_TEXTURE0+1); glUniform1i(texmodeloc, 2); break;
+		  default:	glUniform1i(texmodeloc, 3); break;
+		}
+
 		glBindTexture(m_type, s.id());
 	}
-	~UseTexture() { glDisable(m_type); }
+	~UseTexture() {
+		GLint texmodeloc = glGetUniformLocation(shader.program, "texMode");
+
+		glDisable(m_type);
+		glUniform1i(texmodeloc, 0);
+	}
 
   private:
 	GLenum m_type;
 };
 
 template <GLenum Type> void OpenGLTexture<Type>::draw(Dimensions const& dim, TexCoords const& tex) const {
+	std::vector<glutil::tPoint> p;
+
 	UseTexture texture(*this);
-	glutil::Begin block(GL_TRIANGLE_STRIP);
-	glTexCoord2f(tex.x1, tex.y1); glVertex2f(dim.x1(), dim.y1());
-	glTexCoord2f(tex.x2, tex.y1); glVertex2f(dim.x2(), dim.y1());
-	glTexCoord2f(tex.x1, tex.y2); glVertex2f(dim.x1(), dim.y2());
-	glTexCoord2f(tex.x2, tex.y2); glVertex2f(dim.x2(), dim.y2());
+
+	p.push_back(glutil::tPoint(tex.x1, tex.y1, dim.x1(), dim.y1()));
+	p.push_back(glutil::tPoint(tex.x2, tex.y1, dim.x2(), dim.y1()));
+	p.push_back(glutil::tPoint(tex.x1, tex.y2, dim.x1(), dim.y2()));
+	p.push_back(glutil::tPoint(tex.x2, tex.y2, dim.x2(), dim.y2()));
+
+	glutil::DrawTextured(GL_TRIANGLE_STRIP, p);
+
+	p.clear();
 }
 
 template <GLenum Type> void OpenGLTexture<Type>::drawCropped(Dimensions const& orig, TexCoords const& tex) const {

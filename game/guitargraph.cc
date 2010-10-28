@@ -1172,12 +1172,14 @@ void GuitarGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 
 /// Draw a bar for drum bass pedal/note
 void GuitarGraph::drawBar(double time, float h) {
-	glutil::Begin block(GL_TRIANGLE_STRIP);
+	std::vector<glutil::Point> p;
 	glNormal3f(0.0f, 1.0f, 0.0f);
-	glVertex2f(-2.5f, time2y(time + h));
-	glVertex2f(2.5f, time2y(time + h));
-	glVertex2f(-2.5f, time2y(time - h));
-	glVertex2f(2.5f, time2y(time - h));
+	p.push_back(glutil::Point(-2.5f, time2y(time + h)));
+	p.push_back(glutil::Point(2.5f, time2y(time + h)));
+	p.push_back(glutil::Point(-2.5f, time2y(time - h)));
+	p.push_back(glutil::Point(2.5f, time2y(time - h)));
+	glutil::DrawVertices(GL_TRIANGLE_STRIP, p);
+	p.clear();
 }
 
 /// Create the Chord structures for the current track/difficulty level

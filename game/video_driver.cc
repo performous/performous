@@ -10,6 +10,8 @@
 #include <fstream>
 #include <SDL.h>
 
+struct glshader::Shader shader;
+
 namespace {
 	unsigned s_width;
 	unsigned s_height;
@@ -52,9 +54,10 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	SDL_EnableUNICODE(SDL_ENABLE);
 	if (glewInit() != GLEW_OK) throw std::runtime_error("Initializing GLEW failed (is your OpenGL broken?)");
 	input::SDL::init();
+	glshader::newShader(&shader);
 }
 
-Window::~Window() { }
+Window::~Window() { glshader::deleteShader(&shader); }
 
 void Window::blank() {
 	glClear(GL_COLOR_BUFFER_BIT);

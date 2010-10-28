@@ -2,12 +2,28 @@
 
 #include <string>
 #include <iostream>
+#include <vector>
 
 #include <GL/glew.h>
 
 #include "color.hh"
+#include "glshader.hh"
 
 namespace glutil {
+	struct Point {
+		float vx;
+		float vy;
+		Point(float vx_, float vy_): vx(vx_), vy(vy_) {}
+	};
+
+	struct tPoint {
+		float tx;
+		float ty;
+		float vx;
+		float vy;
+		tPoint(float tx_, float ty_, float vx_, float vy_): tx(tx_), ty(ty_), vx(vx_), vy(vy_) {}
+	};
+
 	/// wrapper struct for RAII
 	struct PushMatrix {
 		PushMatrix() { glPushMatrix(); }
@@ -101,6 +117,27 @@ namespace glutil {
 			glVertex2f(cx-r,cy-r);
 			glVertex2f(cx+r,cy-r);
 			glVertex2f(cx+r,cy+r);
+		}
+	};
+
+	struct DrawVertices {
+		DrawVertices(GLint mode, std::vector<Point> const& p) {
+			glEnableClientState(GL_VERTEX_ARRAY);
+			glVertexPointer(2, GL_FLOAT, sizeof(Point), &p.front().vx);
+			glDrawArrays(mode, 0, p.size());
+			glDisableClientState(GL_VERTEX_ARRAY);
+		}
+	};
+
+	struct DrawTextured {
+		DrawTextured(GLint mode, std::vector<tPoint> const& p) {
+			glEnableClientState(GL_VERTEX_ARRAY);
+			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+			glTexCoordPointer(2, GL_FLOAT, sizeof(tPoint), &p.front().tx);
+			glVertexPointer(2, GL_FLOAT, sizeof(tPoint), &p.front().vx);
+			glDrawArrays(mode, 0, p.size());
+			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+			glDisableClientState(GL_VERTEX_ARRAY);
 		}
 	};
 
