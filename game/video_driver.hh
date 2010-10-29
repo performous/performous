@@ -1,5 +1,7 @@
 #pragma once
 
+#include "glshader.hh"
+
 unsigned int screenW();
 unsigned int screenH();
 static inline float virtH() { return float(screenH()) / screenW(); }
@@ -35,6 +37,8 @@ class Window {
 	bool getFullscreen();
 	/// take a screenshot
 	void screenshot();
+
+	static Shader shader; // Core shader program for general drawing
 
   private:
 	SDL_Surface* screen;

@@ -1,13 +1,12 @@
 #pragma once
 
 #include "glutil.hh"
+#include "video_driver.hh"
 #include <stdexcept>
 #include <string>
 #include <boost/noncopyable.hpp>
 #include <cairo.h>
 #include <vector>
-
-extern struct glshader::Shader shader;
 
 /// class for geometry stuff
 class Dimensions {
@@ -122,9 +121,9 @@ class UseTexture: boost::noncopyable {
   public:
 	/// constructor
 	template <GLenum Type> UseTexture(OpenGLTexture<Type> const& s): m_type(s.type()) {
-		GLint texmodeloc = glGetUniformLocation(shader.program, "texMode");
-		GLint texloc = glGetUniformLocation(shader.program, "tex");
-		GLint texrectloc = glGetUniformLocation(shader.program, "texrect");
+		GLint texmodeloc = glGetUniformLocation(Window::shader.program, "texMode");
+		GLint texloc = glGetUniformLocation(Window::shader.program, "tex");
+		GLint texrectloc = glGetUniformLocation(Window::shader.program, "texrect");
 
 		glUniform1i(texloc, 0);
 		glUniform1i(texrectloc, 1);
@@ -132,16 +131,15 @@ class UseTexture: boost::noncopyable {
 		glEnable(m_type);
 
 		switch (Type) {
-		  case GL_TEXTURE_2D:	glActiveTexture(GL_TEXTURE0); glUniform1i(texmodeloc, 1); break;
-		  case GL_TEXTURE_RECTANGLE_ARB:	glActiveTexture(GL_TEXTURE0+1); glUniform1i(texmodeloc, 2); break;
-		  default:	glUniform1i(texmodeloc, 3); break;
+		  case GL_TEXTURE_2D:             glActiveTexture(GL_TEXTURE0); glUniform1i(texmodeloc, 1); break;
+		  case GL_TEXTURE_RECTANGLE_ARB:  glActiveTexture(GL_TEXTURE0+1); glUniform1i(texmodeloc, 2); break;
+		  default:                        glUniform1i(texmodeloc, 3); break;
 		}
 
 		glBindTexture(m_type, s.id());
 	}
 	~UseTexture() {
-		GLint texmodeloc = glGetUniformLocation(shader.program, "texMode");
-
+		GLint texmodeloc = glGetUniformLocation(Window::shader.program, "texMode");
 		glDisable(m_type);
 		glUniform1i(texmodeloc, 0);
 	}

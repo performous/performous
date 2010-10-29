@@ -1,11 +1,14 @@
 #pragma once
 
-namespace glshader {
-	struct Shader {
-		GLuint program, vert_shader, frag_shader;
-		int gl_response;
-	};
+#include <string>
+#include <GL/glew.h>
 
-	void newShader(struct Shader *s);
-	void deleteShader(struct Shader *s);
-}
+struct Shader {
+	Shader(const char* vertex_shader, const char* fragment_shader);
+	Shader() {};
+	~Shader();
+
+	GLuint program, vert_shader, frag_shader;
+	int gl_response;
+};
+

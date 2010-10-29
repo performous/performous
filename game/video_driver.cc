@@ -10,7 +10,6 @@
 #include <fstream>
 #include <SDL.h>
 
-struct glshader::Shader shader;
 
 namespace {
 	unsigned s_width;
@@ -31,10 +30,44 @@ namespace {
 		SDL_GLattr m_attr;
 		int m_value;
 	};
+
+	// FIXME: In general, shaders should be loaded from theme files.
+	//        Does that apply to these core shaders too?
+
+	const char *vertex_glsl = 
+		"void main()"
+		"{"
+		"	gl_FrontColor = gl_Color;"
+		"	gl_BackColor = gl_Color;"
+		"	gl_TexCoord[0] = gl_MultiTexCoord0;"
+		"	gl_Position = ftransform();"
+		"}\000";
+
+	const char *fragment_glsl =
+		"uniform int texMode;"
+		"uniform sampler2D tex;"
+		"uniform sampler2DRect texrect;"
+		"void main()"
+		"{"
+		"	vec4 texel;"
+		"	vec4 color;"
+		"	if (texMode == 1) {"
+		"		texel = texture2D(tex,gl_TexCoord[0].st).rgba;"
+		"	} else if (texMode == 2) {"
+		"		texel = texture(texrect,gl_TexCoord[0].st).rgba;"
+		"	} else if (texMode == 0) {"
+		"		texel = gl_Color;"
+		"	} else {"
+		"		texel = vec4(1.0,0.0,0.0,1.0);"
+		"	}"
+		"	gl_FragColor = vec4(texel.rgb*gl_Color.rgb,texel.a*gl_Color.a);"
+		"}\000";
 }
 
 unsigned int screenW() { return s_width; }
 unsigned int screenH() { return s_height; }
+
+Shader Window::shader;
 
 Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(width), m_windowH(height), m_fullscreen(fs) {
 	std::atexit(SDL_Quit);
@@ -54,10 +87,10 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	SDL_EnableUNICODE(SDL_ENABLE);
 	if (glewInit() != GLEW_OK) throw std::runtime_error("Initializing GLEW failed (is your OpenGL broken?)");
 	input::SDL::init();
-	glshader::newShader(&shader);
+	shader = Shader(vertex_glsl, fragment_glsl);
 }
 
-Window::~Window() { glshader::deleteShader(&shader); }
+Window::~Window() { }
 
 void Window::blank() {
 	glClear(GL_COLOR_BUFFER_BIT);
