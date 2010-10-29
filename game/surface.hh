@@ -151,18 +151,16 @@ class UseTexture: boost::noncopyable {
 };
 
 template <GLenum Type> void OpenGLTexture<Type>::draw(Dimensions const& dim, TexCoords const& tex) const {
-	std::vector<glutil::tPoint> p;
+	glutil::VertexArray va;
 
 	UseTexture texture(*this);
 
-	p.push_back(glutil::tPoint(tex.x1, tex.y1, dim.x1(), dim.y1()));
-	p.push_back(glutil::tPoint(tex.x2, tex.y1, dim.x2(), dim.y1()));
-	p.push_back(glutil::tPoint(tex.x1, tex.y2, dim.x1(), dim.y2()));
-	p.push_back(glutil::tPoint(tex.x2, tex.y2, dim.x2(), dim.y2()));
+	va.TexCoord(tex.x1, tex.y1); va.Vertex(dim.x1(), dim.y1());
+	va.TexCoord(tex.x2, tex.y1); va.Vertex(dim.x2(), dim.y1());
+	va.TexCoord(tex.x1, tex.y2); va.Vertex(dim.x1(), dim.y2());
+	va.TexCoord(tex.x2, tex.y2); va.Vertex(dim.x2(), dim.y2());
 
-	glutil::DrawTextured(GL_TRIANGLE_STRIP, p);
-
-	p.clear();
+	va.Draw(GL_TRIANGLE_STRIP);
 }
 
 template <GLenum Type> void OpenGLTexture<Type>::drawCropped(Dimensions const& orig, TexCoords const& tex) const {

@@ -774,12 +774,12 @@ namespace {
 	const float fretWid = 0.5f; // The actual width is two times this
 
 	/// Create a symmetric vertex pair of given data
-	void vertexPair(float x, float y, Color color, float ty, float fretW = fretWid) {
+	void vertexPair(glutil::VertexArray& va, float x, float y, Color color, float ty, float fretW = fretWid) {
 		color.a = y2a(y);
 		{
 			glutil::Color c(color);
-			glNormal3f(0.0f,1.0f,0.0f); glTexCoord2f(0.0f, ty); glVertex2f(x - fretW, y);
-			glNormal3f(0.0f,1.0f,0.0f); glTexCoord2f(1.0f, ty); glVertex2f(x + fretW, y);
+			va.Color(c); va.Normal(0.0f, 1.0f, 0.0f); va.TexCoord(0.0f, ty); va.Vertex(x - fretW, y);
+			va.Color(c); va.Normal(0.0f, 1.0f, 0.0f); va.TexCoord(1.0f, ty); va.Vertex(x + fretW, y);
 		}
 	}
 }
@@ -810,7 +810,7 @@ void GuitarGraph::draw(double time) {
 		// Draw the neck
 		{
 			UseTexture tex(*m_neck);
-			glutil::Begin block(GL_TRIANGLE_STRIP);
+			glutil::VertexArray va;
 			float w = (m_drums ? 2.0f : 2.5f);
 			float texCoord = 0.0f;
 			float tBeg = 0.0f, tEnd;
@@ -823,11 +823,10 @@ void GuitarGraph::draw(double time) {
 					tEnd = future;
 				}
 				glutil::Color c(colorize(Color(1.0f, 1.0f, 1.0f, time2a(tEnd)), time + tBeg));
-				glNormal3f(0.0f, 1.0f, 0.0f);
-				glTexCoord2f(0.0f, texCoord); glVertex2f(-w, time2y(tEnd));
-				glNormal3f(0.0f, 1.0f, 0.0f);
-				glTexCoord2f(1.0f, texCoord); glVertex2f(w, time2y(tEnd));
+				va.Normal(0.0f, 1.0f, 0.0f); va.Color(c); va.TexCoord(0.0f, texCoord); va.Vertex(-w, time2y(tEnd));
+				va.Normal(0.0f, 1.0f, 0.0f); va.Color(c); va.TexCoord(1.0f, texCoord); va.Vertex(w, time2y(tEnd));
 			}
+			va.Draw(GL_TRIANGLE_STRIP);
 		}
 
 		// Draw the cursor
@@ -934,12 +933,13 @@ void GuitarGraph::draw(double time) {
 				if (flameAnim < 1.0f) {
 					float h = flameAnim * 4.0f * fretWid;
 					UseTexture tblock(*ftex);
-					glutil::Begin block(GL_TRIANGLE_STRIP);
+					glutil::VertexArray va;
 					glutil::Color c(Color(1.0f, 1.0f, 1.0f));
-					glTexCoord2f(0.0f, 1.0f); glVertex3f(x - fretWid, time2y(0.0f), 0.0f);
-					glTexCoord2f(1.0f, 1.0f); glVertex3f(x + fretWid, time2y(0.0f), 0.0f);
-					glTexCoord2f(0.0f, 0.0f); glVertex3f(x - fretWid, time2y(0.0f), h);
-					glTexCoord2f(1.0f, 0.0f); glVertex3f(x + fretWid, time2y(0.0f), h);
+					va.TexCoord(0.0f, 1.0f); va.Color(c); va.Vertex(x - fretWid, time2y(0.0f), 0.0f);
+					va.TexCoord(1.0f, 1.0f); va.Color(c); va.Vertex(x + fretWid, time2y(0.0f), 0.0f);
+					va.TexCoord(0.0f, 0.0f); va.Color(c); va.Vertex(x - fretWid, time2y(0.0f), h);
+					va.TexCoord(1.0f, 0.0f); va.Color(c); va.Vertex(x + fretWid, time2y(0.0f), h);
+					va.Draw(GL_TRIANGLE_STRIP);
 				} else {
 					it = m_flames[fret].erase(it);
 					continue;
@@ -956,11 +956,12 @@ void GuitarGraph::draw(double time) {
 			float bgcol = m_errorMeterFlash.get();
 			{ // Indicator background
 				glutil::Color c(Color(bgcol, bgcol, bgcol, 0.6f * alpha));
-				glutil::Begin block(GL_TRIANGLE_STRIP);
-				glVertex2f(x - thickness, y + maxsize);
-				glVertex2f(x, y + maxsize);
-				glVertex2f(x - thickness, y - maxsize);
-				glVertex2f(x, y - maxsize);
+				glutil::VertexArray va;
+				va.Color(c); va.Vertex(x - thickness, y + maxsize);
+				va.Color(c); va.Vertex(x, y + maxsize);
+				va.Color(c); va.Vertex(x - thickness, y - maxsize);
+				va.Color(c); va.Vertex(x, y - maxsize);
+				va.Draw(GL_TRIANGLE_STRIP);
 			}
 			float error = m_errorMeter.get();
 			if (error != 0) {
@@ -970,11 +971,12 @@ void GuitarGraph::draw(double time) {
 				else { color = Color(1.0f, 0.0f, 0.0f, alpha); y1 = -maxsize * error; }
 				{
 					glutil::Color c(color);
-					glutil::Begin block(GL_TRIANGLE_STRIP);
-					glVertex2f(x - thickness, y1 + y);
-					glVertex2f(x, y1 + y);
-					glVertex2f(x - thickness, y2 + y);
-					glVertex2f(x, y2 + y);
+					glutil::VertexArray va;
+					va.Color(c); va.Vertex(x - thickness, y1 + y);
+					va.Color(c); va.Vertex(x, y1 + y);
+					va.Color(c); va.Vertex(x - thickness, y2 + y);
+					va.Color(c); va.Vertex(x, y2 + y);
+					va.Draw(GL_TRIANGLE_STRIP);
 				}
 				if (m_errorMeter.get() == m_errorMeter.getTarget())
 					m_errorMeter.setTarget(0.0);
@@ -1051,19 +1053,20 @@ void GuitarGraph::drawNote(int fret, Color color, float tBeg, float tEnd, float 
 		bool doanim = hit || hitAnim > 0; // Enable glow?
 		Texture const& tex(doanim ? m_tail_glow : m_tail); // Select texture
 		UseTexture tblock(tex);
-		glutil::Begin block(GL_TRIANGLE_STRIP);
+		glutil::VertexArray va;
 		double t = m_audio.getPosition() * 10.0; // Get adjusted time value for animation
-		vertexPair(x, y, color, doanim ? tc(y + t) : 1.0f); // First vertex pair
+		vertexPair(va, x, y, color, doanim ? tc(y + t) : 1.0f); // First vertex pair
 		while ((y -= fretWid) > yEnd + fretWid) {
 			if (whammy > 0.1) {
 				float r = rand() / double(RAND_MAX);
-				vertexPair(x+cos(y*whammy)/4.0+(r-0.5)/4.0, y, color, tc(y + t));
-			} else vertexPair(x, y, color, doanim ? tc(y + t) : 0.5f);
+				vertexPair(va, x+cos(y*whammy)/4.0+(r-0.5)/4.0, y, color, tc(y + t));
+			} else vertexPair(va, x, y, color, doanim ? tc(y + t) : 0.5f);
 		}
 		// Render the end
 		y = yEnd + fretWid;
-		vertexPair(x, y, color, doanim ? tc(y + t) : 0.20f);
-		vertexPair(x, yEnd, color, doanim ? tc(yEnd + t) : 0.0f);
+		vertexPair(va, x, y, color, doanim ? tc(y + t) : 0.20f);
+		vertexPair(va, x, yEnd, color, doanim ? tc(yEnd + t) : 0.0f);
+		va.Draw(GL_TRIANGLE_STRIP);
 	} else {
 		// Too short note: only render the ring
 		if (m_use3d) { // 3D
@@ -1114,16 +1117,17 @@ void GuitarGraph::drawDrumfill(float tBeg, float tEnd) {
 		float tcEnd = tEnd <= future ? 0.0f : 0.25f;
 		Color c = color(fret);
 		UseTexture tblock(m_tail_drumfill);
-		glutil::Begin block(GL_TRIANGLE_STRIP);
-		vertexPair(x, yBeg, c, 1.0f); // First vertex pair
+		glutil::VertexArray va;
+		vertexPair(va, x, yBeg, c, 1.0f); // First vertex pair
 		if (std::abs(yEnd - yBeg) > 4.0 * fretWid) {
 			float y = yBeg - 2.0 * fretWid;
-			vertexPair(x, y, c, 0.75f);
+			vertexPair(va, x, y, c, 0.75f);
 			while ((y -= 10.0 * fretWid) > yEnd + 2.0 * fretWid)
-				vertexPair(x, y, c, 0.5f);
-			vertexPair(x, yEnd + 2.0 * fretWid, c, 0.25f);
+				vertexPair(va, x, y, c, 0.5f);
+			vertexPair(va, x, yEnd + 2.0 * fretWid, c, 0.25f);
 		}
-		vertexPair(x, yEnd, c, tcEnd); // Last vertex pair
+		vertexPair(va, x, yEnd, c, tcEnd); // Last vertex pair
+		va.Draw(GL_TRIANGLE_STRIP);
 	}
 }
 
@@ -1172,14 +1176,14 @@ void GuitarGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 
 /// Draw a bar for drum bass pedal/note
 void GuitarGraph::drawBar(double time, float h) {
-	std::vector<glutil::Point> p;
-	glNormal3f(0.0f, 1.0f, 0.0f);
-	p.push_back(glutil::Point(-2.5f, time2y(time + h)));
-	p.push_back(glutil::Point(2.5f, time2y(time + h)));
-	p.push_back(glutil::Point(-2.5f, time2y(time - h)));
-	p.push_back(glutil::Point(2.5f, time2y(time - h)));
-	glutil::DrawVertices(GL_TRIANGLE_STRIP, p);
-	p.clear();
+	glutil::VertexArray va;
+
+	va.Normal(0.0f, 1.0f, 0.0f); va.Vertex(-2.5f, time2y(time + h));
+	va.Normal(0.0f, 1.0f, 0.0f); va.Vertex(2.5f, time2y(time + h));
+	va.Normal(0.0f, 1.0f, 0.0f); va.Vertex(-2.5f, time2y(time - h));
+	va.Normal(0.0f, 1.0f, 0.0f); va.Vertex(2.5f, time2y(time - h));
+
+	va.Draw(GL_TRIANGLE_STRIP);
 }
 
 /// Create the Chord structures for the current track/difficulty level

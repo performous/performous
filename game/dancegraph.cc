@@ -377,10 +377,10 @@ namespace {
 	const float one_arrow_tex_w = 1.0 / 8.0; // Width of a single arrow in texture coordinates
 
 	/// Create a symmetric vertex pair for arrow drawing
-	void vertexPair(int arrow_i, float x, float y, float ty, float scale = 1.0f) {
+	void vertexPair(glutil::VertexArray& va, int arrow_i, float x, float y, float ty, float scale = 1.0f) {
 		if (arrow_i < 0) return;
-		glTexCoord2f(arrow_i * one_arrow_tex_w, ty); glVertex2f(x - arrowSize * scale, y);
-		glTexCoord2f((arrow_i+1) * one_arrow_tex_w, ty); glVertex2f(x + arrowSize * scale, y);
+		va.TexCoord(arrow_i * one_arrow_tex_w, ty); va.Vertex(x - arrowSize * scale, y);
+		va.TexCoord((arrow_i+1) * one_arrow_tex_w, ty); va.Vertex(x + arrowSize * scale, y);
 	}
 
 	Color& colorGlow(Color& c, double glow) {
@@ -400,9 +400,10 @@ void DanceGraph::drawArrow(int arrow_i, Texture& tex, float x, float y, float sc
 	if (scale != 1.0f) glScalef(scale, scale, scale); // Scale if needed
 	{
 		UseTexture tblock(tex);
-		glutil::Begin block(GL_TRIANGLE_STRIP);
-		vertexPair(arrow_i, 0.0f, -arrowSize, ty1);
-		vertexPair(arrow_i, 0.0f, arrowSize, ty2);
+		glutil::VertexArray va;
+		vertexPair(va, arrow_i, 0.0f, -arrowSize, ty1);
+		vertexPair(va, arrow_i, 0.0f, arrowSize, ty2);
+		va.Draw(GL_TRIANGLE_STRIP);
 	}
 }
 
@@ -463,7 +464,7 @@ void DanceGraph::draw(double time) {
 
 void DanceGraph::drawBeats(double time) {
 	UseTexture tex(m_beat);
-	glutil::Begin block(GL_TRIANGLE_STRIP);
+	glutil::VertexArray va;
 	float texCoord = 0.0f;
 	float tBeg = 0.0f, tEnd;
 	float w = 0.5 * m_pads * getScale();
@@ -476,9 +477,10 @@ void DanceGraph::drawBeats(double time) {
 			tEnd = future;
 		}*/
 		glutil::Color c(Color(1.0f, 1.0f, 1.0f, time2a(tEnd)));
-		glNormal3f(0.0f, 1.0f, 0.0f); glTexCoord2f(0.0f, texCoord); glVertex2f(-w, time2y(tEnd));
-		glNormal3f(0.0f, 1.0f, 0.0f); glTexCoord2f(1.0f, texCoord); glVertex2f(w, time2y(tEnd));
+		va.Color(c); va.Normal(0.0f, 1.0f, 0.0f); va.TexCoord(0.0f, texCoord); va.Vertex(-w, time2y(tEnd));
+		va.Color(c); va.Normal(0.0f, 1.0f, 0.0f); va.TexCoord(1.0f, texCoord); va.Vertex(w, time2y(tEnd));
 	}
+	va.Draw(GL_TRIANGLE_STRIP);
 }
 
 /// Draws a single note (or hold)
@@ -510,13 +512,14 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 		if (yEnd - yBeg > 0) {
 			UseTexture tblock(m_arrows_hold);
 			glutil::Color c(color);
-			glutil::Begin block(GL_TRIANGLE_STRIP);
+			glutil::VertexArray va;
 			// Draw end
-			vertexPair(arrow_i, x, yEnd, 1.0f, s);
+			vertexPair(va, arrow_i, x, yEnd, 1.0f, s);
 			float yMid = std::max(yEnd-arrowSize, yBeg+arrowSize);
-			vertexPair(arrow_i, x, yMid, 2.0f/3.0f, s);
+			vertexPair(va, arrow_i, x, yMid, 2.0f/3.0f, s);
 			// Draw middle
-			vertexPair(arrow_i, x, yBeg + 2*arrowSize, 1.0f/3.0f, s);
+			vertexPair(va, arrow_i, x, yBeg + 2*arrowSize, 1.0f/3.0f, s);
+			va.Draw(GL_TRIANGLE_STRIP);
 		}
 		// Draw begin
 		if (note.isHit && tEnd < 0.1) {

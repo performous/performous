@@ -312,14 +312,15 @@ void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
 		// vocals
 		float a = alpha * (have_vocals ? 1.00 : 0.25);
 		float m = !(typeFilter & 8);
-		glutil::Begin block(GL_TRIANGLE_STRIP);
+		glutil::VertexArray va;
 		glutil::Color c(Color(m * 1.0f, 1.0f, m * (is_karaoke ? 0.25f : 1.0f), a));
 		x = dim.x1()+0.00*(dim.x2()-dim.x1());
-		glTexCoord2f(getIconTex(1), 0.0f); glVertex2f(x, dim.y1());
-		glTexCoord2f(getIconTex(1), 1.0f); glVertex2f(x, dim.y2());
+		va.Color(c); va.TexCoord(getIconTex(1), 0.0f); va.Vertex(x, dim.y1());
+		va.Color(c); va.TexCoord(getIconTex(1), 1.0f); va.Vertex(x, dim.y2());
 		x = dim.x1()+xincr*(dim.x2()-dim.x1());
-		glTexCoord2f(getIconTex(2), 0.0f); glVertex2f(x, dim.y1());
-		glTexCoord2f(getIconTex(2), 1.0f); glVertex2f(x, dim.y2());
+		va.Color(c); va.TexCoord(getIconTex(2), 0.0f); va.Vertex(x, dim.y1());
+		va.Color(c); va.TexCoord(getIconTex(2), 1.0f); va.Vertex(x, dim.y2());
+		va.Draw(GL_TRIANGLE_STRIP);
 	}
 	{
 		// guitars
@@ -327,54 +328,58 @@ void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
 		float m = !(typeFilter & 4);
 		if (guitarCount == 0) { guitarCount = 1; a *= 0.25f; }
 		for (int i = guitarCount-1; i >= 0; i--) {
-			glutil::Begin block(GL_TRIANGLE_STRIP);
+			glutil::VertexArray va;
 			glutil::Color c(Color(m * 1.0f, 1.0f, m * 1.0f, a));
 			x = dim.x1()+(xincr+i*0.04)*(dim.x2()-dim.x1());
-			glTexCoord2f(getIconTex(2), 0.0f); glVertex2f(x, dim.y1());
-			glTexCoord2f(getIconTex(2), 1.0f); glVertex2f(x, dim.y2());
+			va.Color(c); va.TexCoord(getIconTex(2), 0.0f); va.Vertex(x, dim.y1());
+			va.Color(c); va.TexCoord(getIconTex(2), 1.0f); va.Vertex(x, dim.y2());
 			x = dim.x1()+(2*xincr+i*0.04)*(dim.x2()-dim.x1());
-			glTexCoord2f(getIconTex(3), 0.0f); glVertex2f(x, dim.y1());
-			glTexCoord2f(getIconTex(3), 1.0f); glVertex2f(x, dim.y2());
+			va.Color(c); va.TexCoord(getIconTex(3), 0.0f); va.Vertex(x, dim.y1());
+			va.Color(c); va.TexCoord(getIconTex(3), 1.0f); va.Vertex(x, dim.y2());
+			va.Draw(GL_TRIANGLE_STRIP);
 		}
 	}
 	{
 		// bass
 		float a = alpha * (have_bass ? 1.00f : 0.25f);
 		float m = !(typeFilter & 4);
-		glutil::Begin block(GL_TRIANGLE_STRIP);
+		glutil::VertexArray va;
 		glutil::Color c(Color(m * 1.0f, 1.0f, m * 1.0f, a));
 		x = dim.x1()+2*xincr*(dim.x2()-dim.x1());
-		glTexCoord2f(getIconTex(3), 0.0f); glVertex2f(x, dim.y1());
-		glTexCoord2f(getIconTex(3), 1.0f); glVertex2f(x, dim.y2());
+		va.Color(c); va.TexCoord(getIconTex(3), 0.0f); va.Vertex(x, dim.y1());
+		va.Color(c); va.TexCoord(getIconTex(3), 1.0f); va.Vertex(x, dim.y2());
 		x = dim.x1()+3*xincr*(dim.x2()-dim.x1());
-		glTexCoord2f(getIconTex(4), 0.0f); glVertex2f(x, dim.y1());
-		glTexCoord2f(getIconTex(4), 1.0f); glVertex2f(x, dim.y2());
+		va.Color(c); va.TexCoord(getIconTex(4), 0.0f); va.Vertex(x, dim.y1());
+		va.Color(c); va.TexCoord(getIconTex(4), 1.0f); va.Vertex(x, dim.y2());
+		va.Draw(GL_TRIANGLE_STRIP);
 	}
 	{
 		// drums
 		float a = alpha * (have_drums ? 1.00f : 0.25f);
 		float m = !(typeFilter & 2);
-		glutil::Begin block(GL_TRIANGLE_STRIP);
+		glutil::VertexArray va;
 		glutil::Color c(Color(m * 1.0f, 1.0f, m * 1.0f, a));
 		x = dim.x1()+3*xincr*(dim.x2()-dim.x1());
-		glTexCoord2f(getIconTex(4), 0.0f); glVertex2f(x, dim.y1());
-		glTexCoord2f(getIconTex(4), 1.0f); glVertex2f(x, dim.y2());
+		va.Color(c); va.TexCoord(getIconTex(4), 0.0f); va.Vertex(x, dim.y1());
+		va.Color(c); va.TexCoord(getIconTex(4), 1.0f); va.Vertex(x, dim.y2());
 		x = dim.x1()+4*xincr*(dim.x2()-dim.x1());
-		glTexCoord2f(getIconTex(5), 0.0f); glVertex2f(x, dim.y1());
-		glTexCoord2f(getIconTex(5), 1.0f); glVertex2f(x, dim.y2());
+		va.Color(c); va.TexCoord(getIconTex(5), 0.0f); va.Vertex(x, dim.y1());
+		va.Color(c); va.TexCoord(getIconTex(5), 1.0f); va.Vertex(x, dim.y2());
+		va.Draw(GL_TRIANGLE_STRIP);
 	}
 	{
 		// dancing
 		float a = alpha * (have_dance ? 1.00f : 0.25f);
 		float m = !(typeFilter & 1);
-		glutil::Begin block(GL_TRIANGLE_STRIP);
+		glutil::VertexArray va;
 		glutil::Color c(Color(m * 1.0f, 1.0f, m * 1.0f, a));
 		x = dim.x1()+4*xincr*(dim.x2()-dim.x1());
-		glTexCoord2f(getIconTex(5), 0.0f); glVertex2f(x, dim.y1());
-		glTexCoord2f(getIconTex(5), 1.0f); glVertex2f(x, dim.y2());
+		va.Color(c); va.TexCoord(getIconTex(5), 0.0f); va.Vertex(x, dim.y1());
+		va.Color(c); va.TexCoord(getIconTex(5), 1.0f); va.Vertex(x, dim.y2());
 		x = dim.x1()+5*xincr*(dim.x2()-dim.x1());
-		glTexCoord2f(getIconTex(6), 0.0f); glVertex2f(x, dim.y1());
-		glTexCoord2f(getIconTex(6), 1.0f); glVertex2f(x, dim.y2());
+		va.Color(c); va.TexCoord(getIconTex(6), 0.0f); va.Vertex(x, dim.y1());
+		va.Color(c); va.TexCoord(getIconTex(6), 1.0f); va.Vertex(x, dim.y2());
+		va.Draw(GL_TRIANGLE_STRIP);
 	}
 }
 

@@ -39,13 +39,6 @@ namespace glutil {
 	};
 
 	/// wrapper struct for RAII
-	struct Begin {
-		/// call glBegin with given mode
-		Begin(GLint mode) { glBegin(mode); }
-		~Begin() { glEnd(); }
-	};
-
-	/// wrapper struct for RAII
 	struct DisplayList {
 		/// call glNewList with given list id and mode
 		DisplayList(GLuint id, GLenum mode) { glNewList(id, mode); }
@@ -100,44 +93,112 @@ namespace glutil {
 		operator float const*() const { return reinterpret_cast<float const*>(this); }
 	};
 
+	class VertexArray {
+	  private:
+		int m_dimension;
+		std::vector<float> m_vertices;
+		std::vector<float> m_normals;
+		std::vector<float> m_texcoords;
+		std::vector<float> m_colors;
+
+	  public:
+		void Vertex(float x, float y) {
+			m_dimension = 2;
+			m_vertices.push_back(x);
+			m_vertices.push_back(y);
+		}
+
+		void Vertex(float x, float y, float z) {
+			m_dimension = 3;
+			m_vertices.push_back(x);
+			m_vertices.push_back(y);
+			m_vertices.push_back(z);
+		}
+
+		void Normal(float x, float y, float z) {
+			m_normals.push_back(x);
+			m_normals.push_back(y);
+			m_normals.push_back(z);
+		}
+
+		void TexCoord(float s, float t) {
+			m_texcoords.push_back(s);
+			m_texcoords.push_back(t);
+		}
+
+		void Color(float r, float g, float b, float a) {
+			m_colors.push_back(r);
+			m_colors.push_back(g);
+			m_colors.push_back(b);
+			m_colors.push_back(a);
+		}
+
+		void Color(glutil::Color& c) {
+			m_colors.push_back(c.r);
+			m_colors.push_back(c.g);
+			m_colors.push_back(c.b);
+			m_colors.push_back(c.a);
+		}
+
+		void Draw(GLint mode) {
+			glEnableClientState(GL_VERTEX_ARRAY);
+			glVertexPointer(m_dimension, GL_FLOAT, 0, &m_vertices.front());
+			if (m_texcoords.size()) {
+				glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+				glTexCoordPointer(2, GL_FLOAT, 0, &m_texcoords.front());
+			}
+			if (m_normals.size()) {
+				glEnableClientState(GL_NORMAL_ARRAY);
+				glNormalPointer(GL_FLOAT, 0, &m_normals.front());
+			}
+			if (m_colors.size()) {
+				glEnableClientState(GL_COLOR_ARRAY);
+				glColorPointer(4, GL_FLOAT, 0, &m_colors.front());
+			}
+			glDrawArrays(mode, 0, m_vertices.size()/m_dimension);
+
+			glDisableClientState(GL_COLOR_ARRAY);
+			glDisableClientState(GL_NORMAL_ARRAY);
+			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+			glDisableClientState(GL_VERTEX_ARRAY);
+		}
+
+		VertexArray() {}
+		~VertexArray() {
+			m_vertices.clear();
+			m_normals.clear();
+			m_texcoords.clear();
+			m_colors.clear();
+		}
+	};
+
 	/// easy line
 	struct Line {
 		Line(float x1, float y1, float x2, float y2) {
-			Begin line(GL_LINES);
-			glVertex2f(x1,y1);
-			glVertex2f(x2,y2);
+			VertexArray va;
+			va.Vertex(x1, y1);
+			va.Vertex(x2, y2);
+			va.Draw(GL_LINES);
 		}
 	};
 
 	/// easy square
 	struct Square {
 		Square(float cx, float cy, float r, bool filled = false) {
-			Begin line(filled ? GL_QUADS : GL_LINE_LOOP);
-			glVertex2f(cx-r,cy+r);
-			glVertex2f(cx-r,cy-r);
-			glVertex2f(cx+r,cy-r);
-			glVertex2f(cx+r,cy+r);
-		}
-	};
-
-	struct DrawVertices {
-		DrawVertices(GLint mode, std::vector<Point> const& p) {
-			glEnableClientState(GL_VERTEX_ARRAY);
-			glVertexPointer(2, GL_FLOAT, sizeof(Point), &p.front().vx);
-			glDrawArrays(mode, 0, p.size());
-			glDisableClientState(GL_VERTEX_ARRAY);
-		}
-	};
-
-	struct DrawTextured {
-		DrawTextured(GLint mode, std::vector<tPoint> const& p) {
-			glEnableClientState(GL_VERTEX_ARRAY);
-			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-			glTexCoordPointer(2, GL_FLOAT, sizeof(tPoint), &p.front().tx);
-			glVertexPointer(2, GL_FLOAT, sizeof(tPoint), &p.front().vx);
-			glDrawArrays(mode, 0, p.size());
-			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-			glDisableClientState(GL_VERTEX_ARRAY);
+			VertexArray va;
+			if (filled) {
+				va.Vertex(cx - r, cy + r);
+				va.Vertex(cx + r, cy + r);
+				va.Vertex(cx - r, cy - r);
+				va.Vertex(cx + r, cy - r);
+				va.Draw(GL_TRIANGLE_STRIP);
+			} else {
+				va.Vertex(cx - r, cy + r);
+				va.Vertex(cx + r, cy + r);
+				va.Vertex(cx + r, cy - r);
+				va.Vertex(cx - r, cy - r);
+				va.Draw(GL_LINE_LOOP);
+			}
 		}
 	};
 

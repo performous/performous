@@ -28,36 +28,35 @@ void NoteGraph::reset() {
 
 namespace {
 	void drawNotebar(Texture const& texture, double x, double ybeg, double yend, double w, double h) {
-		std::vector<glutil::tPoint> p;
+		glutil::VertexArray va;
 
 		UseTexture tblock(texture);
 
-		p.push_back(glutil::tPoint(0.0f, 0.0f, x, ybeg));
-		p.push_back(glutil::tPoint(0.0f, 1.0f, x, ybeg + h));
+		va.TexCoord(0.0f, 0.0f); va.Vertex(x, ybeg);
+		va.TexCoord(0.0f, 1.0f); va.Vertex(x, ybeg + h);
 
 		if (w >= 2.0 * h) {
 			double tmp = h / w;
 			double y1 = (1.0 - tmp) * ybeg + tmp * yend;
 			double y2 = tmp * ybeg + (1.0 - tmp) * yend;
-			p.push_back(glutil::tPoint(0.5f, 0.0f, x + h, y1));
-			p.push_back(glutil::tPoint(0.5f, 1.0f, x + h, y1 + h));
-			p.push_back(glutil::tPoint(0.5f, 0.0f, x + w - h, y2));
-			p.push_back(glutil::tPoint(0.5f, 1.0f, x + w - h, y2 + h));
+
+			va.TexCoord(0.5f, 0.0f); va.Vertex(x + h, y1);
+			va.TexCoord(0.5f, 1.0f); va.Vertex(x + h, y1 + h);
+			va.TexCoord(0.5f, 0.0f); va.Vertex(x + w - h, y2);
+			va.TexCoord(0.5f, 1.0f); va.Vertex(x + w - h, y2 + h);
 		} else {
 			double ymid = 0.5 * (ybeg + yend);
 			float crop = 0.25f * w / h;
-			p.push_back(glutil::tPoint(crop, 0.0f, x + 0.5 * w, ymid));
-			p.push_back(glutil::tPoint(crop, 1.0f, x + 0.5 * w, ymid + h));
-			p.push_back(glutil::tPoint(1.0f - crop, 0.0f, x + 0.5 * w, ymid));
-			p.push_back(glutil::tPoint(1.0f - crop, 1.0f, x + 0.5 * w, ymid + h));
+
+			va.TexCoord(crop, 0.0f); va.Vertex(x + 0.5 * w, ymid);
+			va.TexCoord(crop, 1.0f); va.Vertex(x + 0.5 * w, ymid + h);
+			va.TexCoord(1.0f - crop, 0.0f); va.Vertex(x + 0.5 * w, ymid);
+			va.TexCoord(1.0f - crop, 1.0f); va.Vertex(x + 0.5 * w, ymid + h);
 		}
-		p.push_back(glutil::tPoint(1.0f, 0.0f, x + w, yend));
-		p.push_back(glutil::tPoint(1.0f, 1.0f, x + w, yend + h));
+		va.TexCoord(1.0f, 0.0f); va.Vertex(x + w, yend);
+		va.TexCoord(1.0f, 1.0f); va.Vertex(x + w, yend + h);
 
-		glutil::DrawTextured(GL_TRIANGLE_STRIP, p);
-
-		p.clear();
-
+		va.Draw(GL_TRIANGLE_STRIP);
 	}
 }
 

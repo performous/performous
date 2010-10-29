@@ -391,11 +391,12 @@ namespace {
 	void fillBG() {
 		Dimensions dim(arMin);
 		dim.fixedWidth(1.0);
-		glutil::Begin block(GL_QUADS);
-		glVertex2f(dim.x1(), dim.y1());
-		glVertex2f(dim.x2(), dim.y1());
-		glVertex2f(dim.x2(), dim.y2());
-		glVertex2f(dim.x1(), dim.y2());
+		glutil::VertexArray va;
+		va.Vertex(dim.x1(), dim.y1());
+		va.Vertex(dim.x2(), dim.y1());
+		va.Vertex(dim.x1(), dim.y2());
+		va.Vertex(dim.x2(), dim.y2());
+		va.Draw(GL_TRIANGLE_STRIP);
 	}
 
 }
