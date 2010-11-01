@@ -86,6 +86,11 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	SDL_ShowCursor(SDL_DISABLE);
 	SDL_EnableUNICODE(SDL_ENABLE);
 	if (glewInit() != GLEW_OK) throw std::runtime_error("Initializing GLEW failed (is your OpenGL broken?)");
+	// Dump some OpenGL info
+	std::clog << "video/info: GL_VENDOR:     " << glGetString(GL_VENDOR) << std::endl;
+	std::clog << "video/info: GL_VERSION:    " << glGetString(GL_VERSION) << std::endl;
+	std::clog << "video/info: GL_RENDERER:   " << glGetString(GL_RENDERER) << std::endl;
+	std::clog << "video/info: GL_EXTENSIONS: " << glGetString(GL_EXTENSIONS) << std::endl; 
 	input::SDL::init();
 	shader = Shader(vertex_glsl, fragment_glsl);
 }
