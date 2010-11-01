@@ -573,6 +573,21 @@ if test ! -f "$PREFIX"/build-stamps/glew; then
   $RM_RF $GLEW
 fi
 
+# ImageMagick
+# Needed for tools (ss_extract) only.
+IM="ImageMagick-6.6.5-5"
+if test ! -f "$PREFIX"/build-stamps/imagemagick; then
+  download http://image_magick.veidrodis.com/image_magick/ImageMagick-6.6.5-5.tar.bz2
+  tar jxvf $IM.tar.bz2
+  cd $IM
+  ./configure $COMMON_AUTOCONF_FLAGS --without-rsvg --without-gslib --without-gvc --without-wmf --without-frozenpaths --without-x
+  make
+  make install
+  cd ..
+  touch "$PREFIX"/build-stamps/imagemagick
+  $RM_RF $IM
+fi
+
 # liborc
 LIBORC="orc-0.4.10"
 if test ! -f "$PREFIX"/build-stamps/liborc; then
