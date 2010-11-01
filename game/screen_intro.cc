@@ -49,9 +49,13 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 		// These are only available in config menu
 		int key = event.key.keysym.sym;
 		SDLMod modifier = event.key.keysym.mod;
-		if (key == SDLK_r && modifier & KMOD_CTRL && m_menu.current().value)
+		if (key == SDLK_r && modifier & KMOD_CTRL && m_menu.current().value) {
 			m_menu.current().value->reset(modifier & KMOD_ALT);
-		else if (key == SDLK_s && modifier & KMOD_CTRL) writeConfig(modifier & KMOD_ALT);
+		} else if (key == SDLK_s && modifier & KMOD_CTRL) {
+			writeConfig(modifier & KMOD_ALT);
+			ScreenManager::getSingletonPtr()->flashMessage((modifier & KMOD_ALT)
+				? _("Settings saved as system defaults.") : _("Settings saved."));
+		}
 	}
 	// Animation targets
 	m_selAnim.setTarget(m_menu.curIndex());
