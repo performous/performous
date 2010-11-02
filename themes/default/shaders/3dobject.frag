@@ -17,7 +17,7 @@ void main()
 	} else if (texMode == 0) {
 		texel = vec4(1.0, 1.0, 1.0, 1.0);
 	} else {
-		texel = vec4(1.0, 0.0, 0.0, 1.0);
+		texel = vec4(1.0, 0.0, 1.0, 1.0); // Magenta to highlight
 	}
 
 	float NdotL = max(dot(normalize(normal), lightDir), 0.0);
