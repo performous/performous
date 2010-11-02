@@ -778,8 +778,8 @@ namespace {
 		color.a = y2a(y);
 		{
 			glutil::Color c(color);
-			va.Color(c).Normal(0.0f, 1.0f, 0.0f).TexCoord(0.0f, ty).Vertex(x - fretW, y);
-			va.Color(c).Normal(0.0f, 1.0f, 0.0f).TexCoord(1.0f, ty).Vertex(x + fretW, y);
+			va.Color(c).TexCoord(0.0f, ty).Vertex(x - fretW, y);
+			va.Color(c).TexCoord(1.0f, ty).Vertex(x + fretW, y);
 		}
 	}
 }
@@ -855,8 +855,7 @@ void GuitarGraph::draw(double time) {
 		}
 
 		// Draw the notes
-		{	UseShader objectShader(*Object3d::shader);
-			glutil::UseDepthTest depthtest;
+		{	glutil::UseDepthTest depthtest;
 			// Draw drum fills / Big Rock Endings
 			bool drumfill = m_dfIt != m_drumfills.end() && m_dfIt->begin - time <= future;
 			if (drumfill) {
@@ -922,7 +921,7 @@ void GuitarGraph::draw(double time) {
 			}
 			glutil::GLErrorChecker::reset(); // FIXME: There are errors here.
 			//glutil::GLErrorChecker glerror("GuitarGraph::draw - objects");
-		} //< restore core shader and disable depth test
+		} //< disable depth test
 		// Draw flames
 		for (int fret = 0; fret < m_pads; ++fret) { // Loop through the frets
 			if (m_drums && fret == 0) { // Skip bass drum

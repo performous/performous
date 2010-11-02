@@ -70,6 +70,7 @@ class Object3d: boost::noncopyable {
 		glutil::PushMatrix pm;
 		glTranslatef(x, y, z); // Move to position
 		if (s != 1.0) glScalef(s,s,s); // Scale if needed
+		UseShader objectShader(*shader); // Switch shader
 		if (m_texture) {
 			UseTexture tex(*m_texture, *shader);
 			drawVBO();
