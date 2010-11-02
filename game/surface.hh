@@ -120,36 +120,28 @@ template <GLenum Type> class OpenGLTexture: boost::noncopyable {
 class UseTexture: boost::noncopyable {
   public:
 	/// constructor
-	template <GLenum Type> UseTexture(OpenGLTexture<Type> const& s, GLuint prog = 0):
-	  m_type(s.type()), m_program(prog) {
-		if (m_program == 0) m_program = Window::shader->program; // Default shader
-
-		GLint texmodeloc = glGetUniformLocation(m_program, "texMode");
-		GLint texloc = glGetUniformLocation(m_program, "tex");
-		GLint texrectloc = glGetUniformLocation(m_program, "texrect");
-
-		glUniform1i(texloc, 0);
-		glUniform1i(texrectloc, 1);
-
+	template <GLenum Type> UseTexture(OpenGLTexture<Type> const& s, Shader& shdr = *Window::shader):
+	  m_type(s.type()), m_shader(shdr) {
 		glEnable(m_type);
+		glUniform1i(m_shader.tex, 0);
+		glUniform1i(m_shader.texRect, 1);
 
 		switch (Type) {
-		  case GL_TEXTURE_2D:             glActiveTexture(GL_TEXTURE0); glUniform1i(texmodeloc, 1); break;
-		  case GL_TEXTURE_RECTANGLE_ARB:  glActiveTexture(GL_TEXTURE0+1); glUniform1i(texmodeloc, 2); break;
-		  default:                        glUniform1i(texmodeloc, 3); break;
+		  case GL_TEXTURE_2D:             glActiveTexture(GL_TEXTURE0); glUniform1i(m_shader.texMode, 1); break;
+		  case GL_TEXTURE_RECTANGLE_ARB:  glActiveTexture(GL_TEXTURE0+1); glUniform1i(m_shader.texMode, 2); break;
+		  default:                        glUniform1i(m_shader.texMode, 3); break;
 		}
 
 		glBindTexture(m_type, s.id());
 	}
 	~UseTexture() {
-		GLint texmodeloc = glGetUniformLocation(m_program, "texMode");
 		glDisable(m_type);
-		glUniform1i(texmodeloc, 0);
+		glUniform1i(m_shader.texMode, 0);
 	}
 
   private:
 	GLenum m_type;
-	GLuint m_program;
+	Shader& m_shader;
 };
 
 template <GLenum Type> void OpenGLTexture<Type>::draw(Dimensions const& dim, TexCoords const& tex) const {

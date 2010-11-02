@@ -4,6 +4,7 @@
 #include <GL/glew.h>
 #include <boost/noncopyable.hpp>
 
+
 struct Shader: public boost::noncopyable {
 	Shader();
 	Shader(const std::string& vert_path, const std::string& frag_path, bool use = false);
@@ -17,7 +18,8 @@ struct Shader: public boost::noncopyable {
 	/** Binds the shader into use. */
 	void bind();
 
-	GLuint program, vert_shader, frag_shader;
+	GLuint program, vert_shader, frag_shader; ///< shader object ids
+	GLint tex, texRect, texMode; ///< uniform locations
 	int gl_response;
 };
 

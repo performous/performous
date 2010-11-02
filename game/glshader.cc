@@ -107,6 +107,12 @@ void Shader::loadFromMemory(const char* vert_source, const char* frag_source, bo
 	}
 	glutil::GLErrorChecker linkerror("Shader::loadFromMemory - glLinkProgram");
 
+	// Cache uniform locations
+	tex = glGetUniformLocation(program, "tex");
+	texRect = glGetUniformLocation(program, "texRect");
+	texMode = glGetUniformLocation(program, "texMode");
+	glutil::GLErrorChecker uniformerror("Shader::loadFromMemory - glGetUniformLocation");
+
 	if (use) bind();
 }
 

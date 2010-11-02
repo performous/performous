@@ -1,6 +1,6 @@
 uniform int texMode;
 uniform sampler2D tex;
-uniform sampler2DRect texrect;
+uniform sampler2DRect texRect;
 
 void main()
 {
@@ -9,7 +9,7 @@ void main()
 	if (texMode == 1) {
 		texel = texture2D(tex, gl_TexCoord[0].st).rgba;
 	} else if (texMode == 2) {
-		texel = texture2DRect(texrect, gl_TexCoord[0].st).rgba;
+		texel = texture2DRect(texRect, gl_TexCoord[0].st).rgba;
 	} else if (texMode == 0) {
 		texel = gl_Color;
 	} else {

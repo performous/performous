@@ -74,7 +74,7 @@ class Object3d: boost::noncopyable {
 		glTranslatef(x, y, z); // Move to position
 		if (s != 1.0) glScalef(s,s,s); // Scale if needed
 		if (m_texture) {
-			UseTexture tex(*m_texture, shader->program);
+			UseTexture tex(*m_texture, *shader);
 			drawVBO();
 		} else {
 			drawVBO();

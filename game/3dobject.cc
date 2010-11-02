@@ -95,8 +95,6 @@ void Object3d::drawVBO() {
 	offset += 3*sizeof(GLfloat);
 
 	if (m_vboStructure & _3DOBJECT_TEXCOORDS) {
-		if (m_texture) UseTexture tex(*m_texture);
-
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 		glTexCoordPointer(2, GL_FLOAT, stride, (const GLvoid *)offset);
 		offset += 2*sizeof(GLfloat);
