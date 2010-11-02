@@ -11,6 +11,9 @@
 
 
 namespace {
+	static const int HAS_TEXCOORDS = 1;
+	static const int HAS_NORMALS = 2;
+
 	/// Returns a word (delimited by delim) in a string st at position pos (1-based)
 	std::string getWord(std::string& st, size_t pos, char delim) {
 		std::istringstream iss(st);
@@ -85,8 +88,8 @@ void Object3d::loadWavefrontObj(std::string filepath, float scale) {
 void Object3d::drawVBO() {
 	int stride = 3*sizeof(GLfloat);
 	int offset = 0;
-	if (m_vboStructure & _3DOBJECT_TEXCOORDS) stride += 2*sizeof(GLfloat);
-	if (m_vboStructure & _3DOBJECT_NORMALS) stride += 3*sizeof(GLfloat);
+	if (m_vboStructure & HAS_TEXCOORDS) stride += 2*sizeof(GLfloat);
+	if (m_vboStructure & HAS_NORMALS) stride += 3*sizeof(GLfloat);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	
@@ -94,12 +97,12 @@ void Object3d::drawVBO() {
 	glVertexPointer(3, GL_FLOAT, stride, (const GLvoid *)offset);
 	offset += 3*sizeof(GLfloat);
 
-	if (m_vboStructure & _3DOBJECT_TEXCOORDS) {
+	if (m_vboStructure & HAS_TEXCOORDS) {
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 		glTexCoordPointer(2, GL_FLOAT, stride, (const GLvoid *)offset);
 		offset += 2*sizeof(GLfloat);
 	}
-	if (m_vboStructure & _3DOBJECT_NORMALS) {
+	if (m_vboStructure & HAS_NORMALS) {
 		glEnableClientState(GL_NORMAL_ARRAY);
 		glNormalPointer(GL_FLOAT, stride, (const GLvoid *)offset);
 	}
@@ -129,8 +132,8 @@ void Object3d::generateVBO() {
 	}
 
 	m_vboStructure = 0;
-	if (!m_texcoords.empty()) m_vboStructure |= _3DOBJECT_TEXCOORDS;
-	if (!m_normals.empty()) m_vboStructure |= _3DOBJECT_NORMALS;
+	if (!m_texcoords.empty()) m_vboStructure |= HAS_TEXCOORDS;
+	if (!m_normals.empty()) m_vboStructure |= HAS_NORMALS;
 
 	std::vector<Face>::const_iterator i;
 	for (i = m_faces.begin(); i != m_faces.end(); ++i) {
@@ -139,12 +142,12 @@ void Object3d::generateVBO() {
 			data.push_back(m_vertices[i->vertices[j]].y);
 			data.push_back(m_vertices[i->vertices[j]].z);
 
-			if (m_vboStructure & _3DOBJECT_TEXCOORDS) {
+			if (m_vboStructure & HAS_TEXCOORDS) {
 				data.push_back(m_texcoords[i->texcoords[j]].s);
 				data.push_back(m_texcoords[i->texcoords[j]].t);
 			}
 
-			if (m_vboStructure & _3DOBJECT_NORMALS) {
+			if (m_vboStructure & HAS_NORMALS) {
 				data.push_back(m_normals[i->normals[j]].x);
 				data.push_back(m_normals[i->normals[j]].y);
 				data.push_back(m_normals[i->normals[j]].z);

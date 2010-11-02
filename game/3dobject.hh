@@ -7,9 +7,6 @@
 #include "surface.hh"
 #include "glutil.hh"
 
-#define _3DOBJECT_TEXCOORDS	1
-#define _3DOBJECT_NORMALS	2
-
 // TODO: Exception handling
 // TODO: Texture loading
 
