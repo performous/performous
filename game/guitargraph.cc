@@ -855,7 +855,7 @@ void GuitarGraph::draw(double time) {
 		}
 
 		// Draw the notes
-		{	UseShader objectShader(*Object3d::shader, *Window::shader);
+		{	UseShader objectShader(*Object3d::shader);
 			glutil::UseDepthTest depthtest;
 			// Draw drum fills / Big Rock Endings
 			bool drumfill = m_dfIt != m_drumfills.end() && m_dfIt->begin - time <= future;

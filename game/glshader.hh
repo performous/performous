@@ -26,12 +26,13 @@ struct Shader: public boost::noncopyable {
 
 /** Temporarily switch shader in a RAII manner. */
 struct UseShader {
-	UseShader(Shader& new_shader, Shader& old_shader): m_old(old_shader) {
+	UseShader(Shader& new_shader) {
+		glGetIntegerv(GL_CURRENT_PROGRAM, &m_old);
 		new_shader.bind();
 	}
-	~UseShader() { m_old.bind(); }
+	~UseShader() { glUseProgram(m_old); }
   private:
-	Shader& m_old;
+	GLint m_old;
 };
 
 
