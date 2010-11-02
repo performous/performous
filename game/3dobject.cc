@@ -21,6 +21,8 @@ namespace {
 	}
 }
 
+boost::scoped_ptr<Shader> Object3d::shader;
+
 /// Load a Wavefront .obj file and possibly scale it also
 void Object3d::loadWavefrontObj(std::string filepath, float scale) {
 	std::string row;

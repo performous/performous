@@ -12,7 +12,6 @@
 
 // TODO: Exception handling
 // TODO: Texture loading
-// TODO: Switch to vertex arrays
 
 /// Point in 3d space
 struct Vertex {
@@ -75,10 +74,12 @@ class Object3d: boost::noncopyable {
 		glTranslatef(x, y, z); // Move to position
 		if (s != 1.0) glScalef(s,s,s); // Scale if needed
 		if (m_texture) {
-			UseTexture tex(*m_texture);
+			UseTexture tex(*m_texture, shader->program);
 			drawVBO();
 		} else {
 			drawVBO();
 		}
 	}
+
+	static boost::scoped_ptr<Shader> shader; ///< shader used for 3d objects
 };

@@ -1,5 +1,8 @@
 #include "glshader.hh"
 #include "glutil.hh"
+#include "video_driver.hh"
+#include "3dobject.hh"
+#include "fs.hh"
 
 #include <fstream>
 #include <stdexcept>
@@ -51,6 +54,7 @@ Shader::~Shader() {
 	glDeleteProgram(program);
 	glDeleteShader(vert_shader);
 	glDeleteShader(frag_shader);
+	//std::clog << "shader/info: Shader program " << (unsigned)program << " deleted." << std::endl;
 }
 
 
@@ -104,5 +108,17 @@ void Shader::loadFromMemory(const char* vert_source, const char* frag_source, bo
 	glutil::GLErrorChecker linkerror("Shader::loadFromMemory - glLinkProgram");
 
 	if (use) bind();
-	glutil::GLErrorChecker glerror("Shader::loadFromMemory - bind");
+}
+
+
+void Shader::bind() {
+	glUseProgram(program);
+	glutil::GLErrorChecker glerror("Shader::bind");
+}
+
+
+
+void loadShaders() {
+	Window::shader.reset(new Shader(getThemePath("shaders/core.vert"), getThemePath("shaders/core.frag"), true));
+	Object3d::shader.reset(new Shader(getThemePath("shaders/3dobject.vert"), getThemePath("shaders/3dobject.frag")));
 }

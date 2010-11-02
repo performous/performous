@@ -36,7 +36,7 @@ namespace {
 unsigned int screenW() { return s_width; }
 unsigned int screenH() { return s_height; }
 
-Shader Window::shader;
+boost::scoped_ptr<Shader> Window::shader;
 
 Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(width), m_windowH(height), m_fullscreen(fs) {
 	std::atexit(SDL_Quit);
@@ -62,10 +62,8 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	// Extensions would need more complex outputting, otherwise they will break clog.
 	//std::clog << "video/info: GL_EXTENSIONS: " << glGetString(GL_EXTENSIONS) << std::endl; 
 
-	// Joystick etc. initialization
-	input::SDL::init();
-	// Shaders
-	shader = Shader(getThemePath("shaders/core.vert"), getThemePath("shaders/core.frag"));
+	input::SDL::init(); // Joysticks etc.
+	loadShaders(); // Shaders
 }
 
 Window::~Window() { }

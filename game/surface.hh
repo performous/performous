@@ -120,10 +120,13 @@ template <GLenum Type> class OpenGLTexture: boost::noncopyable {
 class UseTexture: boost::noncopyable {
   public:
 	/// constructor
-	template <GLenum Type> UseTexture(OpenGLTexture<Type> const& s): m_type(s.type()) {
-		GLint texmodeloc = glGetUniformLocation(Window::shader.program, "texMode");
-		GLint texloc = glGetUniformLocation(Window::shader.program, "tex");
-		GLint texrectloc = glGetUniformLocation(Window::shader.program, "texrect");
+	template <GLenum Type> UseTexture(OpenGLTexture<Type> const& s, GLuint prog = 0):
+	  m_type(s.type()), m_program(prog) {
+		if (m_program == 0) m_program = Window::shader->program; // Default shader
+
+		GLint texmodeloc = glGetUniformLocation(m_program, "texMode");
+		GLint texloc = glGetUniformLocation(m_program, "tex");
+		GLint texrectloc = glGetUniformLocation(m_program, "texrect");
 
 		glUniform1i(texloc, 0);
 		glUniform1i(texrectloc, 1);
@@ -139,13 +142,14 @@ class UseTexture: boost::noncopyable {
 		glBindTexture(m_type, s.id());
 	}
 	~UseTexture() {
-		GLint texmodeloc = glGetUniformLocation(Window::shader.program, "texMode");
+		GLint texmodeloc = glGetUniformLocation(m_program, "texMode");
 		glDisable(m_type);
 		glUniform1i(texmodeloc, 0);
 	}
 
   private:
 	GLenum m_type;
+	GLuint m_program;
 };
 
 template <GLenum Type> void OpenGLTexture<Type>::draw(Dimensions const& dim, TexCoords const& tex) const {

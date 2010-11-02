@@ -1,6 +1,7 @@
 #pragma once
 
 #include "glshader.hh"
+#include <boost/scoped_ptr.hpp>
 
 unsigned int screenW();
 unsigned int screenH();
@@ -38,7 +39,7 @@ class Window {
 	/// take a screenshot
 	void screenshot();
 
-	static Shader shader; // Core shader program for general drawing
+	static boost::scoped_ptr<Shader> shader; ///< core shader used for general drawing
 
   private:
 	SDL_Surface* screen;
