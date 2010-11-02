@@ -218,6 +218,7 @@ namespace glutil {
 				}
 			}
 		}
+		static void reset() { glGetError(); }
 	};
 }
 
