@@ -856,7 +856,7 @@ void GuitarGraph::draw(double time) {
 
 		// Draw the notes
 		{	UseShader objectShader(*Object3d::shader, *Window::shader);
-			//glutil::UseLighting lighting(m_use3d);
+			glutil::UseDepthTest depthtest;
 			// Draw drum fills / Big Rock Endings
 			bool drumfill = m_dfIt != m_drumfills.end() && m_dfIt->begin - time <= future;
 			if (drumfill) {
@@ -922,7 +922,7 @@ void GuitarGraph::draw(double time) {
 			}
 			glutil::GLErrorChecker::reset(); // FIXME: There are errors here.
 			//glutil::GLErrorChecker glerror("GuitarGraph::draw - objects");
-		} //< restore core shader
+		} //< restore core shader and disable depth test
 		// Draw flames
 		for (int fret = 0; fret < m_pads; ++fret) { // Loop through the frets
 			if (m_drums && fret == 0) { // Skip bass drum
