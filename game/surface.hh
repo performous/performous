@@ -121,8 +121,7 @@ class UseTexture: boost::noncopyable {
   public:
 	/// constructor
 	template <GLenum Type> UseTexture(OpenGLTexture<Type> const& s, Shader& shdr = *Window::shader):
-	  m_type(s.type()), m_shader(shdr) {
-		glEnable(m_type);
+	  m_shader(shdr) {
 		glUniform1i(m_shader.tex, 0);
 		glUniform1i(m_shader.texRect, 1);
 
@@ -132,15 +131,13 @@ class UseTexture: boost::noncopyable {
 		  default:                        glUniform1i(m_shader.texMode, 3); break;
 		}
 
-		glBindTexture(m_type, s.id());
+		glBindTexture(Type, s.id());
 	}
 	~UseTexture() {
-		glDisable(m_type);
 		glUniform1i(m_shader.texMode, 0);
 	}
 
   private:
-	GLenum m_type;
 	Shader& m_shader;
 };
 
