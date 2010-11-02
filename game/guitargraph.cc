@@ -826,7 +826,7 @@ void GuitarGraph::draw(double time) {
 				va.Normal(0.0f, 1.0f, 0.0f); va.Color(c); va.TexCoord(0.0f, texCoord); va.Vertex(-w, time2y(tEnd));
 				va.Normal(0.0f, 1.0f, 0.0f); va.Color(c); va.TexCoord(1.0f, texCoord); va.Vertex(w, time2y(tEnd));
 			}
-			va.Draw(GL_TRIANGLE_STRIP);
+			va.Draw();
 		}
 
 		// Draw the cursor
@@ -942,7 +942,7 @@ void GuitarGraph::draw(double time) {
 					va.TexCoord(1.0f, 1.0f); va.Color(c); va.Vertex(x + fretWid, time2y(0.0f), 0.0f);
 					va.TexCoord(0.0f, 0.0f); va.Color(c); va.Vertex(x - fretWid, time2y(0.0f), h);
 					va.TexCoord(1.0f, 0.0f); va.Color(c); va.Vertex(x + fretWid, time2y(0.0f), h);
-					va.Draw(GL_TRIANGLE_STRIP);
+					va.Draw();
 				} else {
 					it = m_flames[fret].erase(it);
 					continue;
@@ -964,7 +964,7 @@ void GuitarGraph::draw(double time) {
 				va.Color(c); va.Vertex(x, y + maxsize);
 				va.Color(c); va.Vertex(x - thickness, y - maxsize);
 				va.Color(c); va.Vertex(x, y - maxsize);
-				va.Draw(GL_TRIANGLE_STRIP);
+				va.Draw();
 			}
 			float error = m_errorMeter.get();
 			if (error != 0) {
@@ -979,7 +979,7 @@ void GuitarGraph::draw(double time) {
 					va.Color(c); va.Vertex(x, y1 + y);
 					va.Color(c); va.Vertex(x - thickness, y2 + y);
 					va.Color(c); va.Vertex(x, y2 + y);
-					va.Draw(GL_TRIANGLE_STRIP);
+					va.Draw();
 				}
 				if (m_errorMeter.get() == m_errorMeter.getTarget())
 					m_errorMeter.setTarget(0.0);
@@ -1069,7 +1069,7 @@ void GuitarGraph::drawNote(int fret, Color color, float tBeg, float tEnd, float 
 		y = yEnd + fretWid;
 		vertexPair(va, x, y, color, doanim ? tc(y + t) : 0.20f);
 		vertexPair(va, x, yEnd, color, doanim ? tc(yEnd + t) : 0.0f);
-		va.Draw(GL_TRIANGLE_STRIP);
+		va.Draw();
 	} else {
 		// Too short note: only render the ring
 		if (m_use3d) { // 3D
@@ -1130,7 +1130,7 @@ void GuitarGraph::drawDrumfill(float tBeg, float tEnd) {
 			vertexPair(va, x, yEnd + 2.0 * fretWid, c, 0.25f);
 		}
 		vertexPair(va, x, yEnd, c, tcEnd); // Last vertex pair
-		va.Draw(GL_TRIANGLE_STRIP);
+		va.Draw();
 	}
 }
 
@@ -1186,7 +1186,7 @@ void GuitarGraph::drawBar(double time, float h) {
 	va.Normal(0.0f, 1.0f, 0.0f); va.Vertex(-2.5f, time2y(time - h));
 	va.Normal(0.0f, 1.0f, 0.0f); va.Vertex(2.5f, time2y(time - h));
 
-	va.Draw(GL_TRIANGLE_STRIP);
+	va.Draw();
 }
 
 /// Create the Chord structures for the current track/difficulty level

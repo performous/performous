@@ -140,7 +140,7 @@ namespace glutil {
 			m_colors.push_back(c.a);
 		}
 
-		void Draw(GLint mode) {
+		void Draw(GLint mode = GL_TRIANGLE_STRIP) {
 			glEnableClientState(GL_VERTEX_ARRAY);
 			glVertexPointer(m_dimension, GL_FLOAT, 0, &m_vertices.front());
 			if (m_texcoords.size()) {
@@ -164,12 +164,6 @@ namespace glutil {
 		}
 
 		VertexArray() {}
-		~VertexArray() {
-			m_vertices.clear();
-			m_normals.clear();
-			m_texcoords.clear();
-			m_colors.clear();
-		}
 	};
 
 	/// easy line

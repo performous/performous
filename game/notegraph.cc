@@ -56,7 +56,7 @@ namespace {
 		va.TexCoord(1.0f, 0.0f); va.Vertex(x + w, yend);
 		va.TexCoord(1.0f, 1.0f); va.Vertex(x + w, yend + h);
 
-		va.Draw(GL_TRIANGLE_STRIP);
+		va.Draw();
 	}
 }
 

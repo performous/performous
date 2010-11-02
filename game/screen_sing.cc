@@ -396,7 +396,7 @@ namespace {
 		va.Vertex(dim.x2(), dim.y1());
 		va.Vertex(dim.x1(), dim.y2());
 		va.Vertex(dim.x2(), dim.y2());
-		va.Draw(GL_TRIANGLE_STRIP);
+		va.Draw();
 	}
 
 }

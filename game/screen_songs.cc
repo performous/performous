@@ -320,7 +320,7 @@ void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
 		x = dim.x1()+xincr*(dim.x2()-dim.x1());
 		va.Color(c); va.TexCoord(getIconTex(2), 0.0f); va.Vertex(x, dim.y1());
 		va.Color(c); va.TexCoord(getIconTex(2), 1.0f); va.Vertex(x, dim.y2());
-		va.Draw(GL_TRIANGLE_STRIP);
+		va.Draw();
 	}
 	{
 		// guitars
@@ -336,7 +336,7 @@ void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
 			x = dim.x1()+(2*xincr+i*0.04)*(dim.x2()-dim.x1());
 			va.Color(c); va.TexCoord(getIconTex(3), 0.0f); va.Vertex(x, dim.y1());
 			va.Color(c); va.TexCoord(getIconTex(3), 1.0f); va.Vertex(x, dim.y2());
-			va.Draw(GL_TRIANGLE_STRIP);
+			va.Draw();
 		}
 	}
 	{
@@ -351,7 +351,7 @@ void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
 		x = dim.x1()+3*xincr*(dim.x2()-dim.x1());
 		va.Color(c); va.TexCoord(getIconTex(4), 0.0f); va.Vertex(x, dim.y1());
 		va.Color(c); va.TexCoord(getIconTex(4), 1.0f); va.Vertex(x, dim.y2());
-		va.Draw(GL_TRIANGLE_STRIP);
+		va.Draw();
 	}
 	{
 		// drums
@@ -365,7 +365,7 @@ void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
 		x = dim.x1()+4*xincr*(dim.x2()-dim.x1());
 		va.Color(c); va.TexCoord(getIconTex(5), 0.0f); va.Vertex(x, dim.y1());
 		va.Color(c); va.TexCoord(getIconTex(5), 1.0f); va.Vertex(x, dim.y2());
-		va.Draw(GL_TRIANGLE_STRIP);
+		va.Draw();
 	}
 	{
 		// dancing
@@ -379,7 +379,7 @@ void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
 		x = dim.x1()+5*xincr*(dim.x2()-dim.x1());
 		va.Color(c); va.TexCoord(getIconTex(6), 0.0f); va.Vertex(x, dim.y1());
 		va.Color(c); va.TexCoord(getIconTex(6), 1.0f); va.Vertex(x, dim.y2());
-		va.Draw(GL_TRIANGLE_STRIP);
+		va.Draw();
 	}
 }
 

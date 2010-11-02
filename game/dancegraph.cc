@@ -403,7 +403,7 @@ void DanceGraph::drawArrow(int arrow_i, Texture& tex, float x, float y, float sc
 		glutil::VertexArray va;
 		vertexPair(va, arrow_i, 0.0f, -arrowSize, ty1);
 		vertexPair(va, arrow_i, 0.0f, arrowSize, ty2);
-		va.Draw(GL_TRIANGLE_STRIP);
+		va.Draw();
 	}
 }
 
@@ -480,7 +480,7 @@ void DanceGraph::drawBeats(double time) {
 		va.Color(c); va.Normal(0.0f, 1.0f, 0.0f); va.TexCoord(0.0f, texCoord); va.Vertex(-w, time2y(tEnd));
 		va.Color(c); va.Normal(0.0f, 1.0f, 0.0f); va.TexCoord(1.0f, texCoord); va.Vertex(w, time2y(tEnd));
 	}
-	va.Draw(GL_TRIANGLE_STRIP);
+	va.Draw();
 }
 
 /// Draws a single note (or hold)
@@ -519,7 +519,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 			vertexPair(va, arrow_i, x, yMid, 2.0f/3.0f, s);
 			// Draw middle
 			vertexPair(va, arrow_i, x, yBeg + 2*arrowSize, 1.0f/3.0f, s);
-			va.Draw(GL_TRIANGLE_STRIP);
+			va.Draw();
 		}
 		// Draw begin
 		if (note.isHit && tEnd < 0.1) {
