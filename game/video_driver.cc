@@ -59,7 +59,9 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	std::clog << "video/info: GL_VENDOR:     " << glGetString(GL_VENDOR) << std::endl;
 	std::clog << "video/info: GL_VERSION:    " << glGetString(GL_VERSION) << std::endl;
 	std::clog << "video/info: GL_RENDERER:   " << glGetString(GL_RENDERER) << std::endl;
-	std::clog << "video/info: GL_EXTENSIONS: " << glGetString(GL_EXTENSIONS) << std::endl;
+	// Extensions would need more complex outputting, otherwise they will break clog.
+	//std::clog << "video/info: GL_EXTENSIONS: " << glGetString(GL_EXTENSIONS) << std::endl; 
+
 	// Joystick etc. initialization
 	input::SDL::init();
 	// Shaders
