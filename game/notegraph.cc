@@ -32,29 +32,29 @@ namespace {
 
 		UseTexture tblock(texture);
 
-		va.TexCoord(0.0f, 0.0f); va.Vertex(x, ybeg);
-		va.TexCoord(0.0f, 1.0f); va.Vertex(x, ybeg + h);
+		va.TexCoord(0.0f, 0.0f).Vertex(x, ybeg);
+		va.TexCoord(0.0f, 1.0f).Vertex(x, ybeg + h);
 
 		if (w >= 2.0 * h) {
 			double tmp = h / w;
 			double y1 = (1.0 - tmp) * ybeg + tmp * yend;
 			double y2 = tmp * ybeg + (1.0 - tmp) * yend;
 
-			va.TexCoord(0.5f, 0.0f); va.Vertex(x + h, y1);
-			va.TexCoord(0.5f, 1.0f); va.Vertex(x + h, y1 + h);
-			va.TexCoord(0.5f, 0.0f); va.Vertex(x + w - h, y2);
-			va.TexCoord(0.5f, 1.0f); va.Vertex(x + w - h, y2 + h);
+			va.TexCoord(0.5f, 0.0f).Vertex(x + h, y1);
+			va.TexCoord(0.5f, 1.0f).Vertex(x + h, y1 + h);
+			va.TexCoord(0.5f, 0.0f).Vertex(x + w - h, y2);
+			va.TexCoord(0.5f, 1.0f).Vertex(x + w - h, y2 + h);
 		} else {
 			double ymid = 0.5 * (ybeg + yend);
 			float crop = 0.25f * w / h;
 
-			va.TexCoord(crop, 0.0f); va.Vertex(x + 0.5 * w, ymid);
-			va.TexCoord(crop, 1.0f); va.Vertex(x + 0.5 * w, ymid + h);
-			va.TexCoord(1.0f - crop, 0.0f); va.Vertex(x + 0.5 * w, ymid);
-			va.TexCoord(1.0f - crop, 1.0f); va.Vertex(x + 0.5 * w, ymid + h);
+			va.TexCoord(crop, 0.0f).Vertex(x + 0.5 * w, ymid);
+			va.TexCoord(crop, 1.0f).Vertex(x + 0.5 * w, ymid + h);
+			va.TexCoord(1.0f - crop, 0.0f).Vertex(x + 0.5 * w, ymid);
+			va.TexCoord(1.0f - crop, 1.0f).Vertex(x + 0.5 * w, ymid + h);
 		}
-		va.TexCoord(1.0f, 0.0f); va.Vertex(x + w, yend);
-		va.TexCoord(1.0f, 1.0f); va.Vertex(x + w, yend + h);
+		va.TexCoord(1.0f, 0.0f).Vertex(x + w, yend);
+		va.TexCoord(1.0f, 1.0f).Vertex(x + w, yend + h);
 
 		va.Draw();
 	}

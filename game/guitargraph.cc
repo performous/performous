@@ -778,8 +778,8 @@ namespace {
 		color.a = y2a(y);
 		{
 			glutil::Color c(color);
-			va.Color(c); va.Normal(0.0f, 1.0f, 0.0f); va.TexCoord(0.0f, ty); va.Vertex(x - fretW, y);
-			va.Color(c); va.Normal(0.0f, 1.0f, 0.0f); va.TexCoord(1.0f, ty); va.Vertex(x + fretW, y);
+			va.Color(c).Normal(0.0f, 1.0f, 0.0f).TexCoord(0.0f, ty).Vertex(x - fretW, y);
+			va.Color(c).Normal(0.0f, 1.0f, 0.0f).TexCoord(1.0f, ty).Vertex(x + fretW, y);
 		}
 	}
 }
@@ -823,8 +823,8 @@ void GuitarGraph::draw(double time) {
 					tEnd = future;
 				}
 				glutil::Color c(colorize(Color(1.0f, 1.0f, 1.0f, time2a(tEnd)), time + tBeg));
-				va.Normal(0.0f, 1.0f, 0.0f); va.Color(c); va.TexCoord(0.0f, texCoord); va.Vertex(-w, time2y(tEnd));
-				va.Normal(0.0f, 1.0f, 0.0f); va.Color(c); va.TexCoord(1.0f, texCoord); va.Vertex(w, time2y(tEnd));
+				va.Normal(0.0f, 1.0f, 0.0f).Color(c).TexCoord(0.0f, texCoord).Vertex(-w, time2y(tEnd));
+				va.Normal(0.0f, 1.0f, 0.0f).Color(c).TexCoord(1.0f, texCoord).Vertex(w, time2y(tEnd));
 			}
 			va.Draw();
 		}
@@ -938,10 +938,10 @@ void GuitarGraph::draw(double time) {
 					UseTexture tblock(*ftex);
 					glutil::VertexArray va;
 					glutil::Color c(Color(1.0f, 1.0f, 1.0f));
-					va.TexCoord(0.0f, 1.0f); va.Color(c); va.Vertex(x - fretWid, time2y(0.0f), 0.0f);
-					va.TexCoord(1.0f, 1.0f); va.Color(c); va.Vertex(x + fretWid, time2y(0.0f), 0.0f);
-					va.TexCoord(0.0f, 0.0f); va.Color(c); va.Vertex(x - fretWid, time2y(0.0f), h);
-					va.TexCoord(1.0f, 0.0f); va.Color(c); va.Vertex(x + fretWid, time2y(0.0f), h);
+					va.TexCoord(0.0f, 1.0f).Color(c).Vertex(x - fretWid, time2y(0.0f), 0.0f);
+					va.TexCoord(1.0f, 1.0f).Color(c).Vertex(x + fretWid, time2y(0.0f), 0.0f);
+					va.TexCoord(0.0f, 0.0f).Color(c).Vertex(x - fretWid, time2y(0.0f), h);
+					va.TexCoord(1.0f, 0.0f).Color(c).Vertex(x + fretWid, time2y(0.0f), h);
 					va.Draw();
 				} else {
 					it = m_flames[fret].erase(it);
@@ -960,10 +960,10 @@ void GuitarGraph::draw(double time) {
 			{ // Indicator background
 				glutil::Color c(Color(bgcol, bgcol, bgcol, 0.6f * alpha));
 				glutil::VertexArray va;
-				va.Color(c); va.Vertex(x - thickness, y + maxsize);
-				va.Color(c); va.Vertex(x, y + maxsize);
-				va.Color(c); va.Vertex(x - thickness, y - maxsize);
-				va.Color(c); va.Vertex(x, y - maxsize);
+				va.Color(c).Vertex(x - thickness, y + maxsize);
+				va.Color(c).Vertex(x, y + maxsize);
+				va.Color(c).Vertex(x - thickness, y - maxsize);
+				va.Color(c).Vertex(x, y - maxsize);
 				va.Draw();
 			}
 			float error = m_errorMeter.get();
@@ -975,10 +975,10 @@ void GuitarGraph::draw(double time) {
 				{
 					glutil::Color c(color);
 					glutil::VertexArray va;
-					va.Color(c); va.Vertex(x - thickness, y1 + y);
-					va.Color(c); va.Vertex(x, y1 + y);
-					va.Color(c); va.Vertex(x - thickness, y2 + y);
-					va.Color(c); va.Vertex(x, y2 + y);
+					va.Color(c).Vertex(x - thickness, y1 + y);
+					va.Color(c).Vertex(x, y1 + y);
+					va.Color(c).Vertex(x - thickness, y2 + y);
+					va.Color(c).Vertex(x, y2 + y);
 					va.Draw();
 				}
 				if (m_errorMeter.get() == m_errorMeter.getTarget())
@@ -1181,10 +1181,10 @@ void GuitarGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 void GuitarGraph::drawBar(double time, float h) {
 	glutil::VertexArray va;
 
-	va.Normal(0.0f, 1.0f, 0.0f); va.Vertex(-2.5f, time2y(time + h));
-	va.Normal(0.0f, 1.0f, 0.0f); va.Vertex(2.5f, time2y(time + h));
-	va.Normal(0.0f, 1.0f, 0.0f); va.Vertex(-2.5f, time2y(time - h));
-	va.Normal(0.0f, 1.0f, 0.0f); va.Vertex(2.5f, time2y(time - h));
+	va.Normal(0.0f, 1.0f, 0.0f).Vertex(-2.5f, time2y(time + h));
+	va.Normal(0.0f, 1.0f, 0.0f).Vertex(2.5f, time2y(time + h));
+	va.Normal(0.0f, 1.0f, 0.0f).Vertex(-2.5f, time2y(time - h));
+	va.Normal(0.0f, 1.0f, 0.0f).Vertex(2.5f, time2y(time - h));
 
 	va.Draw();
 }

@@ -379,8 +379,8 @@ namespace {
 	/// Create a symmetric vertex pair for arrow drawing
 	void vertexPair(glutil::VertexArray& va, int arrow_i, float x, float y, float ty, float scale = 1.0f) {
 		if (arrow_i < 0) return;
-		va.TexCoord(arrow_i * one_arrow_tex_w, ty); va.Vertex(x - arrowSize * scale, y);
-		va.TexCoord((arrow_i+1) * one_arrow_tex_w, ty); va.Vertex(x + arrowSize * scale, y);
+		va.TexCoord(arrow_i * one_arrow_tex_w, ty).Vertex(x - arrowSize * scale, y);
+		va.TexCoord((arrow_i+1) * one_arrow_tex_w, ty).Vertex(x + arrowSize * scale, y);
 	}
 
 	Color& colorGlow(Color& c, double glow) {
@@ -477,8 +477,8 @@ void DanceGraph::drawBeats(double time) {
 			tEnd = future;
 		}*/
 		glutil::Color c(Color(1.0f, 1.0f, 1.0f, time2a(tEnd)));
-		va.Color(c); va.Normal(0.0f, 1.0f, 0.0f); va.TexCoord(0.0f, texCoord); va.Vertex(-w, time2y(tEnd));
-		va.Color(c); va.Normal(0.0f, 1.0f, 0.0f); va.TexCoord(1.0f, texCoord); va.Vertex(w, time2y(tEnd));
+		va.Color(c).Normal(0.0f, 1.0f, 0.0f).TexCoord(0.0f, texCoord).Vertex(-w, time2y(tEnd));
+		va.Color(c).Normal(0.0f, 1.0f, 0.0f).TexCoord(1.0f, texCoord).Vertex(w, time2y(tEnd));
 	}
 	va.Draw();
 }

@@ -157,10 +157,10 @@ template <GLenum Type> void OpenGLTexture<Type>::draw(Dimensions const& dim, Tex
 
 	UseTexture texture(*this);
 
-	va.TexCoord(tex.x1, tex.y1); va.Vertex(dim.x1(), dim.y1());
-	va.TexCoord(tex.x2, tex.y1); va.Vertex(dim.x2(), dim.y1());
-	va.TexCoord(tex.x1, tex.y2); va.Vertex(dim.x1(), dim.y2());
-	va.TexCoord(tex.x2, tex.y2); va.Vertex(dim.x2(), dim.y2());
+	va.TexCoord(tex.x1, tex.y1).Vertex(dim.x1(), dim.y1());
+	va.TexCoord(tex.x2, tex.y1).Vertex(dim.x2(), dim.y1());
+	va.TexCoord(tex.x1, tex.y2).Vertex(dim.x1(), dim.y2());
+	va.TexCoord(tex.x2, tex.y2).Vertex(dim.x2(), dim.y2());
 
 	va.Draw();
 }

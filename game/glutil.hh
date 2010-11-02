@@ -102,42 +102,48 @@ namespace glutil {
 		std::vector<float> m_colors;
 
 	  public:
-		void Vertex(float x, float y) {
+		VertexArray& Vertex(float x, float y) {
 			m_dimension = 2;
 			m_vertices.push_back(x);
 			m_vertices.push_back(y);
+			return *this;
 		}
 
-		void Vertex(float x, float y, float z) {
+		VertexArray& Vertex(float x, float y, float z) {
 			m_dimension = 3;
 			m_vertices.push_back(x);
 			m_vertices.push_back(y);
 			m_vertices.push_back(z);
+			return *this;
 		}
 
-		void Normal(float x, float y, float z) {
+		VertexArray& Normal(float x, float y, float z) {
 			m_normals.push_back(x);
 			m_normals.push_back(y);
 			m_normals.push_back(z);
+			return *this;
 		}
 
-		void TexCoord(float s, float t) {
+		VertexArray& TexCoord(float s, float t) {
 			m_texcoords.push_back(s);
 			m_texcoords.push_back(t);
+			return *this;
 		}
 
-		void Color(float r, float g, float b, float a) {
+		VertexArray& Color(float r, float g, float b, float a) {
 			m_colors.push_back(r);
 			m_colors.push_back(g);
 			m_colors.push_back(b);
 			m_colors.push_back(a);
+			return *this;
 		}
 
-		void Color(glutil::Color& c) {
+		VertexArray& Color(glutil::Color& c) {
 			m_colors.push_back(c.r);
 			m_colors.push_back(c.g);
 			m_colors.push_back(c.b);
 			m_colors.push_back(c.a);
+			return *this;
 		}
 
 		void Draw(GLint mode = GL_TRIANGLE_STRIP) {
