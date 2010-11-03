@@ -4,6 +4,7 @@
 #include <fstream>
 #include <stdexcept>
 #include <cmath>
+#include <boost/lexical_cast.hpp>
 
 
 // TODO: test & fix faces that doesn't have texcoords in the file
@@ -28,6 +29,7 @@ boost::scoped_ptr<Shader> Object3d::shader;
 
 /// Load a Wavefront .obj file and possibly scale it also
 void Object3d::loadWavefrontObj(std::string filepath, float scale) {
+	int linenumber = 0;
 	std::string row;
 	std::ifstream file(filepath.c_str(), std::ios::binary);
 	if (!file.is_open()) throw std::runtime_error("Couldn't open object file "+filepath);
@@ -37,6 +39,7 @@ void Object3d::loadWavefrontObj(std::string filepath, float scale) {
 	m_texcoords.clear();
 	while (!file.eof()) {
 		getline(file, row); // Read a line
+		++linenumber;
 		std::istringstream srow(row);
 		float x,y,z;
 		std::string tempst;
@@ -49,37 +52,40 @@ void Object3d::loadWavefrontObj(std::string filepath, float scale) {
 		} else if (row.substr(0,2) == "vn") {  // Normals
 			srow >> tempst >> x >> y >> z;
 			double sum = std::abs(x)+std::abs(y)+std::abs(z);
-			if (sum == 0) throw std::runtime_error("Object "+filepath+" has invalid normal(s).");
+			if (sum == 0) throw std::runtime_error("Invalid normal in "+filepath+":"+boost::lexical_cast<std::string>(linenumber));
 			x /= sum; y /= sum; z /= sum; // Normalize components
 			m_normals.push_back(Vertex(x,y,z));
 		} else if (row.substr(0,2) == "f ") {  // Faces
 			Face f;
-			srow >> tempst;
-			int v_id;
+			srow >> tempst; // Eat away prefix
 			// Parse face point's coordinate references
 			while (!srow.eof()) {
-				srow >> tempst;
-				for (size_t i = 1; i <= 3; i++) {
-					std::string st_id(getWord(tempst,i,'/'));
+				std::string fpoint;
+				srow >> fpoint;
+				for (size_t i = 1; i <= 3; ++i) {
+					std::string st_id(getWord(fpoint,i,'/'));
 					if (!st_id.empty()) {
-						std::istringstream conv_int(st_id);
-						conv_int >> v_id;
+						// Vertex indices are 1-based in the file
+						int v_id = boost::lexical_cast<int>(st_id) - 1;
 						switch (i) {
-							// Vertex indices are 1-based in the file
-							case 1: f.vertices.push_back(v_id-1); break;
-							case 2: f.texcoords.push_back(v_id-1); break;
-							case 3: f.normals.push_back(v_id-1); break;
+							case 1: f.vertices.push_back(v_id); break;
+							case 2: f.texcoords.push_back(v_id); break;
+							case 3: f.normals.push_back(v_id); break;
 						}
 					}
 				}
 			}
+			// FIXME: We only allow triangle faces since the VBO generator/drawer
+			//        cannot handle anything else (at least for now).
+			if (f.vertices.size() > 0 && f.vertices.size() != 3)
+				throw std::runtime_error("Only triangle faces allowed in "+filepath+":"+boost::lexical_cast<std::string>(linenumber));
 			// Face must have equal number of v, vt, vn or none of a kind
 			if (f.vertices.size() > 0
 			  && (f.texcoords.empty() || (f.texcoords.size() == f.vertices.size()))
 			  && (f.normals.empty()   || (f.normals.size() == f.vertices.size()))) {
 				m_faces.push_back(f);
 			} else {
-				throw std::runtime_error("Object "+filepath+" has invalid face(s).");
+				throw std::runtime_error("Invalid face in "+filepath+":"+boost::lexical_cast<std::string>(linenumber));
 			}
 		}
 	}
@@ -125,11 +131,9 @@ void Object3d::generateVBO() {
 
 	m_numvertices = m_vertices.size();
 
-	m_polyType = GL_POLYGON;
-	switch (m_vertices.size()) {
-		case 3: m_polyType = GL_TRIANGLES; break;
-		case 4: m_polyType = GL_QUADS; break;
-	}
+	// TODO: We should tessellate everything into triangles somehow
+	//       in order to allow non-triangle based meshes.
+	m_polyType = GL_TRIANGLES;
 
 	m_vboStructure = 0;
 	if (!m_texcoords.empty()) m_vboStructure |= HAS_TEXCOORDS;
