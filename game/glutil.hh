@@ -10,6 +10,7 @@
 #include "glshader.hh"
 
 namespace glutil {
+
 	struct Point {
 		float vx;
 		float vy;
@@ -39,13 +40,6 @@ namespace glutil {
 	};
 
 	/// wrapper struct for RAII
-	struct DisplayList {
-		/// call glNewList with given list id and mode
-		DisplayList(GLuint id, GLenum mode) { glNewList(id, mode); }
-		~DisplayList() { glEndList(); }
-	};
-
-	/// wrapper struct for RAII
 	struct UseDepthTest {
 		/// enable depth test (for 3d objects)
 		UseDepthTest() {
@@ -57,6 +51,7 @@ namespace glutil {
 		}
 	};
 
+	/// wrapper struct for RAII
 	struct Color {
 		float r, ///< red component
 		      g, ///< green
@@ -207,5 +202,6 @@ namespace glutil {
 		}
 		static void reset() { glGetError(); }
 	};
+
 }
 
