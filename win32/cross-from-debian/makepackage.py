@@ -85,12 +85,12 @@ for root, dirs, files in os.walk('.'):
 
 makensis.stdin.write(r'''  WriteRegStr HKLM "Software\Performous" "" "$INSTDIR"
   WriteUninstaller "$INSTDIR\uninst.exe"
-  CreateDirectory "$APPDATA\performous\songs"
   SetShellVarContext all
+  CreateDirectory "$INSTDIR\songs"
   CreateDirectory "$SMPROGRAMS\Performous"
   CreateShortcut "$SMPROGRAMS\Performous\Performous.lnk" "$INSTDIR\bin\performous.exe"
   CreateShortCut "$SMPROGRAMS\Performous\ConfigureSongDirectory.lnk" "$INSTDIR\bin\ConfigureSongDirectory.bat"
-  CreateShortCut "$SMPROGRAMS\Performous\Songs.lnk" "$APPDATA\performous\songs"
+  CreateShortCut "$SMPROGRAMS\Performous\Songs.lnk" "$INSTDIR\songs"
   CreateShortcut "$SMPROGRAMS\Performous\Uninstall.lnk" "$INSTDIR\uninst.exe"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Performous" "DisplayName" "Performous"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Performous" "UninstallString" "$\"$INSTDIR\uninst.exe$\""

@@ -16,7 +16,7 @@ export DEBEMAIL="`gpg --list-keys | grep uid | sed 's/ *(.*)//; s/>.*//; s/.*[:<
 
 # Config
 PKG="performous"
-VERSIONCOMMON="0.6.0-99+git"`date '+%Y%m%d'`"~ppa1"
+VERSIONCOMMON="0.6.1-99+git"`date '+%Y%m%d'`"~ppa1"
 SUITES="lucid maverick"
 GITURL="git://git.performous.org/gitroot/performous/performous"
 DESTINATIONPPA="ppa:performous-team/ppa"

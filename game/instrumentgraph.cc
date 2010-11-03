@@ -1,6 +1,5 @@
 #include "instrumentgraph.hh"
 #include "i18n.hh"
-#include "screen.hh"
 #include "glutil.hh"
 
 //const unsigned InstrumentGraph::max_panels = 10; // Maximum number of arrow lines / guitar frets
