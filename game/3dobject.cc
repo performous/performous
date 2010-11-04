@@ -6,7 +6,6 @@
 #include <cmath>
 #include <boost/lexical_cast.hpp>
 
-
 // TODO: test & fix faces that doesn't have texcoords in the file
 // TODO: group handling for loader
 
@@ -98,22 +97,23 @@ void Object3d::drawVBO() {
 	if (m_vboStructure & HAS_NORMALS) stride += 3*sizeof(GLfloat);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	
+
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_FLOAT, stride, (const GLvoid *)offset);
 	offset += 3*sizeof(GLfloat);
 
-	if (m_vboStructure & HAS_TEXCOORDS) {
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointer(2, GL_FLOAT, stride, (const GLvoid *)offset);
-		offset += 2*sizeof(GLfloat);
-	}
 	if (m_vboStructure & HAS_NORMALS) {
 		glEnableClientState(GL_NORMAL_ARRAY);
 		glNormalPointer(GL_FLOAT, stride, (const GLvoid *)offset);
+		offset += 3*sizeof(GLfloat);
 	}
 
-	glDrawArrays(m_polyType, 0, m_numvertices*stride);
+	if (m_vboStructure & HAS_TEXCOORDS) {
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		glTexCoordPointer(2, GL_FLOAT, stride, (const GLvoid *)offset);
+	}
+
+	glDrawArrays(m_polyType, 0, m_numvertices);
 
 	glDisableClientState(GL_NORMAL_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -129,11 +129,10 @@ void Object3d::generateVBO() {
 	glGenBuffers(1, &m_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 
-	m_numvertices = m_vertices.size();
-
 	// TODO: We should tessellate everything into triangles somehow
 	//       in order to allow non-triangle based meshes.
 	m_polyType = GL_TRIANGLES;
+	m_numvertices = m_faces.size() * 3; // Triangle faces
 
 	m_vboStructure = 0;
 	if (!m_texcoords.empty()) m_vboStructure |= HAS_TEXCOORDS;
@@ -141,20 +140,20 @@ void Object3d::generateVBO() {
 
 	std::vector<Face>::const_iterator i;
 	for (i = m_faces.begin(); i != m_faces.end(); ++i) {
-		for (size_t j = 0; j < i->vertices.size(); j++) {
+		for (size_t j = 0; j < i->vertices.size(); ++j) {
 			data.push_back(m_vertices[i->vertices[j]].x);
 			data.push_back(m_vertices[i->vertices[j]].y);
 			data.push_back(m_vertices[i->vertices[j]].z);
-
-			if (m_vboStructure & HAS_TEXCOORDS) {
-				data.push_back(m_texcoords[i->texcoords[j]].s);
-				data.push_back(m_texcoords[i->texcoords[j]].t);
-			}
 
 			if (m_vboStructure & HAS_NORMALS) {
 				data.push_back(m_normals[i->normals[j]].x);
 				data.push_back(m_normals[i->normals[j]].y);
 				data.push_back(m_normals[i->normals[j]].z);
+			}
+
+			if (m_vboStructure & HAS_TEXCOORDS) {
+				data.push_back(m_texcoords[i->texcoords[j]].s);
+				data.push_back(m_texcoords[i->texcoords[j]].t);
 			}
 		}
 	}
