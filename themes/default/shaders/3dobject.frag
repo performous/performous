@@ -1,3 +1,5 @@
+#extension GL_ARB_texture_rectangle : enable
+
 uniform int texMode;
 uniform sampler2D tex;
 uniform sampler2DRect texRect;
