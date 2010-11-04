@@ -6,7 +6,7 @@ varying vec3 normal;
 
 void main()
 {
-	const vec3 lightDir = normalize(vec3(-50.0, 5.0, -15.0));
+	vec3 lightDir = normalize(vec3(-50.0, 5.0, -15.0));
 	const vec3 ambient = vec3(0.1, 0.1, 0.1);
 	vec4 texel;
 
