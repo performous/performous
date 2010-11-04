@@ -160,6 +160,7 @@ void Object3d::generateVBO() {
 	}
 
 	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*data.size(), &data.front(), GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	data.clear();
 	m_vertices.clear();
 	m_normals.clear();
