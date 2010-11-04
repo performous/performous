@@ -72,7 +72,7 @@ class Object3d: boost::noncopyable {
 		if (s != 1.0) glScalef(s,s,s); // Scale if needed
 		UseShader objectShader(*shader); // Switch shader
 		if (m_texture) {
-			UseTexture tex(*m_texture, *shader);
+			UseTexture tex(*m_texture);
 			drawVBO();
 		} else {
 			drawVBO();

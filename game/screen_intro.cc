@@ -6,6 +6,7 @@
 #include "joystick.hh"
 #include "theme.hh"
 #include "menu.hh"
+#include "xtime.hh"
 
 
 ScreenIntro::ScreenIntro(std::string const& name, Audio& audio): Screen(name), m_audio(audio), m_first(true) {
@@ -112,7 +113,12 @@ void ScreenIntro::draw_menu_options() {
 }
 
 void ScreenIntro::draw() {
-	theme->bg.draw();
+	{
+		UseShader s(*ThemeIntro::shader);
+		float anim = std::abs((((SDL_GetTicks() % 10000) / 10000.f) - 0.5f) * 2.0f);
+		glUniform1f(ThemeIntro::shader->anim, anim);
+		theme->bg.draw();
+	}
 	if (m_menu.current().image) m_menu.current().image->draw();
 	// Comment
 	theme->comment_bg.dimensions.center().screenBottom(-0.01);

@@ -120,8 +120,8 @@ template <GLenum Type> class OpenGLTexture: boost::noncopyable {
 class UseTexture: boost::noncopyable {
   public:
 	/// constructor
-	template <GLenum Type> UseTexture(OpenGLTexture<Type> const& s, Shader& shdr = *Window::shader):
-	  m_shader(shdr) {
+	template <GLenum Type> UseTexture(OpenGLTexture<Type> const& s):
+	  m_shader(*Shader::current()) {
 		glUniform1i(m_shader.tex, 0);
 		glUniform1i(m_shader.texRect, 1);
 

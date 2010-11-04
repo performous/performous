@@ -4,7 +4,11 @@
 #include "surface.hh"
 #include "cachemap.hh"
 #include <boost/noncopyable.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <string>
+
+
+class Shader;
 
 /// abstract theme class
 class Theme: boost::noncopyable {
@@ -90,6 +94,8 @@ public:
 	Surface comment_bg;
 	/// configuration comment background (short tip)
 	Surface short_comment_bg;
+	/// Custom background shader
+	static boost::scoped_ptr<Shader> shader;
 };
 
 /// theme for instrument menu
