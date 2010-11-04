@@ -442,12 +442,15 @@ void DanceGraph::draw(double time) {
 		drawBeats(time);
 
 		// Arrows on cursor
-		for (int arrow_i = 0; arrow_i < m_pads; ++arrow_i) {
-			float x = panel2x(arrow_i);
-			float y = time2y(0.0);
-			float l = m_pressed_anim[arrow_i].get();
-			float s = getScale() * (5.0 - l) / 5.0;
-			drawArrow(arrow_i, m_arrows_cursor, x, y, s);
+		{
+			glutil::Color c(Color(1.0f, 1.0f, 1.0f, 1.0f));
+			for (int arrow_i = 0; arrow_i < m_pads; ++arrow_i) {
+				float x = panel2x(arrow_i);
+				float y = time2y(0.0);
+				float l = m_pressed_anim[arrow_i].get();
+				float s = getScale() * (5.0 - l) / 5.0;
+				drawArrow(arrow_i, m_arrows_cursor, x, y, s);
+			}
 		}
 
 		// Draw the notes
