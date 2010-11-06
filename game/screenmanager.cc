@@ -12,7 +12,7 @@
 template<> ScreenManager* Singleton<ScreenManager>::ms_Singleton = NULL;
 
 ScreenManager::ScreenManager(Window& _window):
-  m_window(_window), m_finished(false), newScreen(), currentScreen(),
+  m_window(_window), m_fbo(), m_finished(false), newScreen(), currentScreen(),
   m_timeToFadeIn(), m_timeToFadeOut(), m_timeToShow(), m_message(),
   m_messagePopup(0.0, 1.0), m_textMessage(getThemePath("message_text.svg"), config["graphic/text_lod"].f())
 
@@ -40,6 +40,17 @@ Screen* ScreenManager::getScreen(std::string const& name) {
 		throw std::invalid_argument("Screen " + name + " does not exist");
 	}
 }
+
+void ScreenManager::drawScreen() {
+	// FIXME: Rendering using FBO doesn't work
+	{
+		//UseFBO fbo(m_fbo);
+		getCurrentScreen()->draw();
+		drawNotifications();
+	}
+	//m_fbo.getTexture().draw(Dimensions().fixedWidth(1.0));
+}
+
 
 void ScreenManager::loading(std::string const& message, float progress) {
 	// TODO: Create a better one, this is quite ugly

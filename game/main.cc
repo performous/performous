@@ -178,8 +178,7 @@ void mainLoop(std::string const& songlist) {
 			try {
 				// Draw
 				window.blank();
-				sm.getCurrentScreen()->draw();
-				sm.drawNotifications();
+				sm.drawScreen();
 				prof("draw");
 				// Display (and wait until next frame)
 				window.swap();

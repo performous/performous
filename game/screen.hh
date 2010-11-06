@@ -5,6 +5,7 @@
 #include "opengl_text.hh"
 #include "video_driver.hh"
 #include "dialog.hh"
+#include "fbo.hh"
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <SDL.h>
@@ -46,6 +47,8 @@ class ScreenManager: public Singleton <ScreenManager> {
 	void activateScreen(std::string const& name);
 	/// Does actual switching of screens (if necessary)
 	void updateScreen();
+	/// Draws the current screen and possible transition effects
+	void drawScreen();
 	/// Returns pointer to current Screen
 	Screen* getCurrentScreen() { return currentScreen; };
 	/// Returns pointer to Screen for given name
@@ -65,7 +68,7 @@ class ScreenManager: public Singleton <ScreenManager> {
 	bool closeDialog();
 	/// Returns true if dialog is open
 	bool isDialogOpen() { return m_dialog; }
-	/// Draw dialogs & flash messages in current screen
+	/// Draw dialogs & flash messages, called automatically by drawScreen
 	void drawNotifications();
 
 	/// Sets finished to true
@@ -75,6 +78,7 @@ class ScreenManager: public Singleton <ScreenManager> {
 
   private:
 	Window& m_window;
+	FBO m_fbo;
 	bool m_finished;
 	typedef boost::ptr_map<std::string, Screen> screenmap_t;
 	screenmap_t screens;
