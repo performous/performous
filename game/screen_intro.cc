@@ -116,7 +116,7 @@ void ScreenIntro::draw() {
 	{
 		UseShader s(*ThemeIntro::shader);
 		float anim = std::abs((((SDL_GetTicks() % 10000) / 10000.f) - 0.5f) * 2.0f);
-		glUniform1f(ThemeIntro::shader->anim, anim);
+		ThemeIntro::shader->setUniform("anim", anim);
 		theme->bg.draw();
 	}
 	if (m_menu.current().image) m_menu.current().image->draw();

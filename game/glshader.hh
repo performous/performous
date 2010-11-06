@@ -19,11 +19,19 @@ struct Shader: public boost::noncopyable {
 	/** Binds the shader into use. */
 	void bind();
 
-	GLuint program, vert_shader, frag_shader; ///< shader object ids
-	// TODO: Should probably use an std::map for these and cache on-the-fly/on-demand.
-	//       Also provide a nice access to setting the uniform.
-	GLint tex, texRect, texMode, anim; ///< uniform locations
-	int gl_response;
+	/** Get uniform location. Uses caching internally. */
+	GLint operator[](const std::string& uniform);
+
+	/** Allow setting uniforms in a chain. Shader needs to be in use.*/
+
+	Shader& setUniform(const std::string& uniform, int value) {
+		glUniform1i((*this)[uniform], value);
+		return *this;
+	}
+	Shader& setUniform(const std::string& uniform, float value) {
+		glUniform1f((*this)[uniform], value);
+		return *this;
+	}
 
 	// Some operators
 	operator bool() const { return program != 0; }
@@ -37,8 +45,15 @@ struct Shader: public boost::noncopyable {
 		return shaders[i];
 	}
 
+	GLuint program, vert_shader, frag_shader; ///< shader object ids
+	int gl_response;
+
+  private:
+	typedef std::map<std::string, GLint> UniformMap;
+	UniformMap uniforms; ///< Cached uniform locations, use operator[] to access
+
 	typedef std::map<GLint, Shader*> ShaderMap;
-	static ShaderMap shaders;
+	static ShaderMap shaders; ///< Shader objects for reverse look-up by id
 };
 
 
@@ -49,6 +64,7 @@ struct UseShader {
 		new_shader.bind();
 	}
 	~UseShader() { glUseProgram(m_old); }
+
   private:
 	GLint m_old;
 };

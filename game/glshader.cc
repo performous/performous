@@ -53,6 +53,7 @@ Shader::Shader(const std::string& vert_path, const std::string& frag_path, bool 
 
 
 Shader::~Shader() {
+	shaders[program] = NULL;
 	glDeleteProgram(program);
 	glDeleteShader(vert_shader);
 	glDeleteShader(frag_shader);
@@ -109,13 +110,6 @@ void Shader::loadFromMemory(const char* vert_source, const char* frag_source, bo
 	}
 	glutil::GLErrorChecker linkerror("Shader::loadFromMemory - glLinkProgram");
 
-	// Cache uniform locations
-	tex = glGetUniformLocation(program, "tex");
-	texRect = glGetUniformLocation(program, "texRect");
-	texMode = glGetUniformLocation(program, "texMode");
-	anim = glGetUniformLocation(program, "anim");
-	glutil::GLErrorChecker uniformerror("Shader::loadFromMemory - glGetUniformLocation");
-
 	shaders[program] = this;
 
 	if (use) bind();
@@ -127,6 +121,13 @@ void Shader::bind() {
 	glutil::GLErrorChecker glerror("Shader::bind");
 }
 
+
+GLint Shader::operator[](const std::string& uniform) {
+	UniformMap::iterator it = uniforms.find(uniform);
+	if (it == uniforms.end())
+		it->second = glGetUniformLocation(program, uniform.c_str());
+	return it->second;
+}
 
 
 void loadShaders() {

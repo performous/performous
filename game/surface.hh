@@ -122,19 +122,18 @@ class UseTexture: boost::noncopyable {
 	/// constructor
 	template <GLenum Type> UseTexture(OpenGLTexture<Type> const& s):
 	  m_shader(*Shader::current()) {
-		glUniform1i(m_shader.tex, 0);
-		glUniform1i(m_shader.texRect, 1);
+		m_shader.setUniform("tex", 0).setUniform("texRect", 1);
 
 		switch (Type) {
-		  case GL_TEXTURE_2D:             glActiveTexture(GL_TEXTURE0); glUniform1i(m_shader.texMode, 1); break;
-		  case GL_TEXTURE_RECTANGLE_ARB:  glActiveTexture(GL_TEXTURE0+1); glUniform1i(m_shader.texMode, 2); break;
-		  default:                        glUniform1i(m_shader.texMode, 3); break;
+		  case GL_TEXTURE_2D:             glActiveTexture(GL_TEXTURE0); m_shader.setUniform("texMode", 1); break;
+		  case GL_TEXTURE_RECTANGLE_ARB:  glActiveTexture(GL_TEXTURE0+1); m_shader.setUniform("texMode", 2); break;
+		  default:                        m_shader.setUniform("texMode", 3); break;
 		}
 
 		glBindTexture(Type, s.id());
 	}
 	~UseTexture() {
-		glUniform1i(m_shader.texMode, 0);
+		m_shader.setUniform("texMode", 0);
 	}
 
   private:
