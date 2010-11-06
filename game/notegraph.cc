@@ -183,26 +183,19 @@ void NoteGraph::drawNotes() {
 }
 
 namespace {
-	void strip(std::vector<glutil::tPoint>& points) {
-		size_t s = points.size();
-		if (s > 3) {
+	void strip(glutil::VertexArray& va) {
+		if (va.size() > 3) {
 			// Combine the two last points into a terminating point
-			{
-				glutil::tPoint& p = points[s-2];
-				p.ty = 0.5f;
-				p.vy = 0.5f * (p.vy + points[s-1].vy);
-			}
-			points.pop_back();
-			// Render them as a triangle stripe
-			glEnableClientState(GL_VERTEX_ARRAY);
-			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-			glTexCoordPointer(2, GL_FLOAT, sizeof(glutil::tPoint), &points.front().tx);
-			glVertexPointer(2, GL_FLOAT, sizeof(glutil::tPoint), &points.front().vx);
-			glDrawArrays(GL_TRIANGLE_STRIP, 0, points.size());
-			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-			glDisableClientState(GL_VERTEX_ARRAY);
+			size_t s = va.getVertices().size();
+			va.getTexCoords()[s-3] = 0.5f; // y of second-to-last texcoord
+			float& vy = va.getVertices()[s-3]; // y of second-to-last vertex
+			vy = 0.5f * (vy + va.getVertices()[s-1]); // here is y of last vertex
+			va.getVertices().pop_back();
+			va.getTexCoords().pop_back();
+			// Now ready to draw
+			va.Draw();
 		}
-		points.clear();
+		va.clear();
 	}
 }
 
@@ -222,7 +215,7 @@ void NoteGraph::drawWaves(Database const& database) {
 		float tex = texOffset;
 		double t = idx * Engine::TIMESTEP;
 		double oldval = getNaN();
-		std::vector<glutil::tPoint> points;
+		glutil::VertexArray va;
 		Notes::const_iterator noteIt = m_vocal.notes.begin();
 		glutil::Color c(Color(p->m_color.r, p->m_color.g, p->m_color.b, m_notealpha));
 		for (; idx < endIdx; ++idx, t += Engine::TIMESTEP) {
@@ -250,16 +243,16 @@ void NoteGraph::drawWaves(Database const& database) {
 			thickness *= 1.0 + 0.2 * std::sin(tex - 2.0 * texOffset); // Further animation :)
 			thickness *= -m_noteUnit;
 			// If there has been a break or if the pitch change is too fast, terminate and begin a new one
-			if (oldval != oldval || std::abs(oldval - val) > 1) strip(points);
+			if (oldval != oldval || std::abs(oldval - val) > 1) strip(va);
 			// Add a point or a pair of points
-			if (points.empty()) points.push_back(glutil::tPoint(tex, 0.5f, x, y));
+			if (!va.size()) va.TexCoord(tex, 0.5f).Vertex(x, y);
 			else {
-				points.push_back(glutil::tPoint(tex, 0.0f, x, y - thickness));
-				points.push_back(glutil::tPoint(tex, 1.0f, x, y + thickness));
+				va.TexCoord(tex, 0.0f).Vertex(x, y - thickness);
+				va.TexCoord(tex, 1.0f).Vertex(x, y + thickness);
 			}
 			oldval = val;
 		}
-		strip(points);
+		strip(va);
 	}
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }

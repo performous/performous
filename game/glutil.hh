@@ -11,20 +11,6 @@
 
 namespace glutil {
 
-	struct Point {
-		float vx;
-		float vy;
-		Point(float vx_, float vy_): vx(vx_), vy(vy_) {}
-	};
-
-	struct tPoint {
-		float tx;
-		float ty;
-		float vx;
-		float vy;
-		tPoint(float tx_, float ty_, float vx_, float vy_): tx(tx_), ty(ty_), vx(vx_), vy(vy_) {}
-	};
-
 	/// wrapper struct for RAII
 	struct PushMatrix {
 		PushMatrix() { glPushMatrix(); }
@@ -75,6 +61,7 @@ namespace glutil {
 		operator float const*() const { return reinterpret_cast<float const*>(this); }
 	};
 
+	/// handy vertex array capable of drawing itself
 	class VertexArray {
 	  private:
 		int m_dimension;
@@ -84,6 +71,8 @@ namespace glutil {
 		std::vector<float> m_colors;
 
 	  public:
+		VertexArray(): m_dimension(1) {}
+
 		VertexArray& Vertex(float x, float y) {
 			m_dimension = 2;
 			m_vertices.push_back(x);
@@ -120,7 +109,7 @@ namespace glutil {
 			return *this;
 		}
 
-		VertexArray& Color(glutil::Color& c) {
+		VertexArray& Color(const glutil::Color& c) {
 			m_colors.push_back(c.r);
 			m_colors.push_back(c.g);
 			m_colors.push_back(c.b);
@@ -128,7 +117,7 @@ namespace glutil {
 			return *this;
 		}
 
-		void Draw(GLint mode = GL_TRIANGLE_STRIP) {
+		void Draw(GLint mode = GL_TRIANGLE_STRIP) const {
 			glEnableClientState(GL_VERTEX_ARRAY);
 			glVertexPointer(m_dimension, GL_FLOAT, 0, &m_vertices.front());
 			if (m_texcoords.size()) {
@@ -143,7 +132,7 @@ namespace glutil {
 				glEnableClientState(GL_COLOR_ARRAY);
 				glColorPointer(4, GL_FLOAT, 0, &m_colors.front());
 			}
-			glDrawArrays(mode, 0, m_vertices.size()/m_dimension);
+			glDrawArrays(mode, 0, size());
 
 			glDisableClientState(GL_COLOR_ARRAY);
 			glDisableClientState(GL_NORMAL_ARRAY);
@@ -151,7 +140,22 @@ namespace glutil {
 			glDisableClientState(GL_VERTEX_ARRAY);
 		}
 
-		VertexArray() {}
+		bool empty() const {
+			return m_vertices.empty() && m_normals.empty() && m_texcoords.empty() && m_colors.empty();
+		}
+
+		unsigned size() const {
+			return m_vertices.size() / m_dimension;
+		}
+
+		void clear() {
+			m_vertices.clear(); m_normals.clear(); m_texcoords.clear(); m_colors.clear();
+		}
+
+		std::vector<float>& getVertices() { return m_vertices; }
+		std::vector<float>& getNormals() { return m_normals; }
+		std::vector<float>& getTexCoords() { return m_texcoords; }
+		std::vector<float>& getColors() { return m_colors; }
 	};
 
 	/// easy line

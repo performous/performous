@@ -1,9 +1,10 @@
 #pragma once
 
+#include <boost/noncopyable.hpp>
 #include "video_driver.hh"
 
 /// Frame Buffer Object class
-class FBO {
+class FBO: public boost::noncopyable {
   public:
 	/// Generate the FBO and attach a fresh texture to it
 	FBO(): m_texture() {
