@@ -25,18 +25,36 @@ struct Shader: public boost::noncopyable {
 	/** Allow setting uniforms in a chain. Shader needs to be in use.*/
 
 	Shader& setUniform(const std::string& uniform, int value) {
-		glUniform1i((*this)[uniform], value);
-		return *this;
+		glUniform1i((*this)[uniform], value); return *this;
 	}
 	Shader& setUniform(const std::string& uniform, float value) {
-		glUniform1f((*this)[uniform], value);
-		return *this;
+		glUniform1f((*this)[uniform], value); return *this;
+	}
+	Shader& setUniform(const std::string& uniform, int x, int y) {
+		glUniform2i((*this)[uniform], x, y); return *this;
+	}
+	Shader& setUniform(const std::string& uniform, float x, float y) {
+		glUniform2f((*this)[uniform], x, y); return *this;
+	}
+	Shader& setUniform(const std::string& uniform, int x, int y, int z) {
+		glUniform3i((*this)[uniform], x, y, z); return *this;
+	}
+	Shader& setUniform(const std::string& uniform, float x, float y, float z) {
+		glUniform3f((*this)[uniform], x, y, z); return *this;
+	}
+	Shader& setUniform(const std::string& uniform, int x, int y, int z, int w) {
+		glUniform4i((*this)[uniform], x, y, z, w); return *this;
+	}
+	Shader& setUniform(const std::string& uniform, float x, float y, float z, float w) {
+		glUniform4f((*this)[uniform], x, y, z, w); return *this;
 	}
 
 	// Some operators
 	operator bool() const { return program != 0; }
 	bool operator==(const Shader& rhs) const { return program == rhs.program; }
 	bool operator!=(const Shader& rhs) const { return program != rhs.program; }
+
+	GLuint program, vert_shader, frag_shader; ///< shader object ids
 
 	/** Returns pointer to the currently used shader. */
 	static Shader* current() {
@@ -45,10 +63,9 @@ struct Shader: public boost::noncopyable {
 		return shaders[i];
 	}
 
-	GLuint program, vert_shader, frag_shader; ///< shader object ids
+  private:
 	int gl_response;
 
-  private:
 	typedef std::map<std::string, GLint> UniformMap;
 	UniformMap uniforms; ///< Cached uniform locations, use operator[] to access
 
