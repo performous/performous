@@ -2,6 +2,7 @@ uniform int noteType;
 uniform float hitAnim;
 uniform float clock;
 uniform float scale;
+uniform vec2 position;
 
 #define deg2rad 0.0174532925
 
@@ -45,10 +46,11 @@ void main()
 	// Mines
 	} else if (noteType == 3) {
 		trans *= scaleMat(1.0 + hitAnim);
-		float r = (int(clock*360) % 360) * deg2rad; // They rotate!
+		float r = float(mod(int(clock*360), 360)) * deg2rad; // They rotate!
 		trans *= rotMat(r);
 	}
 
 	gl_Position = gl_ModelViewProjectionMatrix * trans * gl_Vertex;
+	gl_Position += gl_ModelViewProjectionMatrix * vec4(position.xy, 0, 0);
 }
 
