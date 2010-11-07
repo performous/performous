@@ -78,6 +78,8 @@ namespace {
 }
 
 
+boost::scoped_ptr<Shader> DanceGraph::shader_note;
+
 /// Constructor
 DanceGraph::DanceGraph(Audio& audio, Song const& song):
   InstrumentGraph(audio, song, input::DANCEPAD),
@@ -377,43 +379,26 @@ namespace {
 	const float one_arrow_tex_w = 1.0 / 8.0; // Width of a single arrow in texture coordinates
 
 	/// Create a symmetric vertex pair for arrow drawing
-	void vertexPair(glutil::VertexArray& va, int arrow_i, float x, float y, float ty, float scale = 1.0f) {
-		if (arrow_i < 0) return;
-		va.TexCoord(arrow_i * one_arrow_tex_w, ty).Vertex(x - arrowSize * scale, y);
-		va.TexCoord((arrow_i+1) * one_arrow_tex_w, ty).Vertex(x + arrowSize * scale, y);
-	}
-
-	Color& colorGlow(Color& c, double glow) {
-		//c.a = std::sqrt(1.0 - glow);
-		c.a = 1.0 - glow;
-		c.r += glow *.5;
-		c.g += glow *.5;
-		c.b += glow *.5;
-		return c;
+	void vertexPair(glutil::VertexArray& va, int arrow_i, float y, float ty) {
+		if (arrow_i < 0) {
+			// Single thing in a texture (e.g. mine)
+			va.TexCoord(0.0f, ty).Vertex(-arrowSize, y);
+			va.TexCoord(1.0f, ty).Vertex(arrowSize, y);
+		} else {
+			// Arrow from a texture atlas
+			va.TexCoord(arrow_i * one_arrow_tex_w, ty).Vertex(-arrowSize, y);
+			va.TexCoord((arrow_i+1) * one_arrow_tex_w, ty).Vertex(arrowSize, y);
+		}
 	}
 }
 
 /// Draw a dance pad icon using the given texture
-void DanceGraph::drawArrow(int arrow_i, Texture& tex, float x, float y, float scale, float ty1, float ty2) {
-	glutil::PushMatrix pm;
-	glTranslatef(x, y, 0.0f); // Move to place
-	if (scale != 1.0f) glScalef(scale, scale, scale); // Scale if needed
-	{
-		UseTexture tblock(tex);
-		glutil::VertexArray va;
-		vertexPair(va, arrow_i, 0.0f, -arrowSize, ty1);
-		vertexPair(va, arrow_i, 0.0f, arrowSize, ty2);
-		va.Draw();
-	}
-}
-
-/// Draw a mine note
-void DanceGraph::drawMine(float x, float y, float rot, float scale) {
-	glutil::PushMatrix pm;
-	glTranslatef(x, y, 0.0f);
-	if (scale != 1.0f) glScalef(scale, scale, scale);
-	if (rot != 0.0f) glRotatef(rot, 0.0f, 0.0f, 1.0f);
-	m_mine.draw();
+void DanceGraph::drawArrow(int arrow_i, Texture& tex, float ty1, float ty2) {
+	UseTexture tblock(tex);
+	glutil::VertexArray va;
+	vertexPair(va, arrow_i, -arrowSize, ty1);
+	vertexPair(va, arrow_i,  arrowSize, ty2);
+	va.Draw();
 }
 
 /// Draws the dance graph
@@ -432,7 +417,7 @@ void DanceGraph::draw(double time) {
 		double frac = 0.75;  // Adjustable: 1.0 means fully separated, 0.0 means fully attached
 		// Some matrix magic to get the viewport right
 		glutil::PushMatrixMode pmm(GL_PROJECTION);
-		glTranslatef(frac * 2.0 * offsetX, 0.0f, 0.0f);
+		glTranslatef((2.0 * frac) * offsetX, 0.0f, 0.0f);
 		glutil::PushMatrixMode pmb(GL_MODELVIEW);
 		glTranslatef((1.0 - frac) * offsetX, dimensions.y1(), 0.0f);
 		float temp_s = dimensions.w() / 8.0f; // Allow for 8 pads to fit on a track
@@ -443,13 +428,18 @@ void DanceGraph::draw(double time) {
 
 		// Arrows on cursor
 		{
-			glutil::Color c(Color(1.0f, 1.0f, 1.0f, 1.0f));
+			UseShader us(*DanceGraph::shader_note);
+			us().setUniform("clock", float(time))
+			    .setUniform("noteType", 0)
+			    .setUniform("scale", getScale());
 			for (int arrow_i = 0; arrow_i < m_pads; ++arrow_i) {
 				float x = panel2x(arrow_i);
 				float y = time2y(0.0);
 				float l = m_pressed_anim[arrow_i].get();
-				float s = getScale() * (5.0 - l) / 5.0;
-				drawArrow(arrow_i, m_arrows_cursor, x, y, s);
+				us().setUniform("hitAnim", float(l));
+				glutil::PushMatrix pm;
+				glTranslatef(x, y, 0.0f);
+				drawArrow(arrow_i, m_arrows_cursor);
 			}
 		}
 
@@ -493,10 +483,8 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	int arrow_i = note.note.note;
 	bool mine = note.note.type == Note::MINE;
 	float x = panel2x(arrow_i);
-	float s = getScale();
 	float yBeg = time2y(tBeg);
 	float yEnd = time2y(tEnd);
-	Color color(1.0f, 1.0f, 1.0f);
 
 	// Did we hit it?
 	if (note.isHit && (note.releaseTime > 0.0 || std::abs(tEnd) < maxTolerance) && note.hitAnim.getTarget() == 0.0) {
@@ -505,54 +493,45 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	}
 	double glow = note.hitAnim.get();
 
-	if (yEnd - yBeg > arrowSize) {
-		// Draw holds
-		if (note.isHit && note.releaseTime <= 0) { // The note is being held down
-			yBeg = std::max(time2y(0.0), yBeg);
-			yEnd = std::max(time2y(0.0), yEnd);
-		}
-		if (note.releaseTime > 0) yBeg = time2y(note.releaseTime - time); // Oh noes, it got released!
-		if (yEnd - yBeg > 0) {
-			UseTexture tblock(m_arrows_hold);
-			glutil::Color c(color);
-			glutil::VertexArray va;
-			// Draw end
-			vertexPair(va, arrow_i, x, yEnd, 1.0f, s);
-			float yMid = std::max(yEnd-arrowSize, yBeg+arrowSize);
-			vertexPair(va, arrow_i, x, yMid, 2.0f/3.0f, s);
-			// Draw middle
-			vertexPair(va, arrow_i, x, yBeg + 2*arrowSize, 1.0f/3.0f, s);
-			va.Draw();
-		}
-		// Draw begin
-		if (note.isHit && tEnd < 0.1) {
-			color = colorGlow(color,glow);
-			s += glow;
-		}
-		{
-			glutil::Color c(color);
-			drawArrow(arrow_i, m_arrows_hold, x, yBeg, s, 0.0f, 1.0f/3.0f);
-		}
-	} else {
-		// Draw short note
-		if (mine) { // Mines need special handling
-			color.a = 1.0 - glow;;
-			s = getScale() * 0.8f + glow * 0.5f;
-			float rot = int(time*360 * (note.isHit ? 2.0 : 1.0) ) % 360; // They rotate!
-			if (note.isHit) yBeg = time2y(0.0);
-			{
-				glutil::Color c(color);
-				drawMine(x, yBeg, rot, s);
+	{
+		glutil::PushMatrix pm;
+		UseShader us(*DanceGraph::shader_note);
+		us().setUniform("hitAnim", float(glow))
+		    .setUniform("clock", float(time))
+		    .setUniform("scale", getScale());
+
+		if (yEnd - yBeg > arrowSize) {
+			// Draw holds
+			us().setUniform("noteType", 2);
+			if (note.isHit && note.releaseTime <= 0) { // The note is being held down
+				yBeg = std::max(time2y(0.0), yBeg);
+				yEnd = std::max(time2y(0.0), yEnd);
 			}
-		} else { // Regular arrows
-			s += glow;
-			color = colorGlow(color, glow);
-			{
-				glutil::Color c(color);
-				drawArrow(arrow_i, m_arrows, x, yBeg, s);
+			if (note.releaseTime > 0) yBeg = time2y(note.releaseTime - time); // Oh noes, it got released!
+			glTranslatef(x, yBeg, 0.0f); // Move to place
+			// Draw begin
+			drawArrow(arrow_i, m_arrows_hold, 0.0f, 1.0f/3.0f);
+			if (yEnd - yBeg > 0) {
+				UseTexture tblock(m_arrows_hold);
+				glutil::VertexArray va;
+				// Middle
+				vertexPair(va, arrow_i, arrowSize, 1.0f/3.0f);
+				float l = (yEnd - yBeg) / getScale();
+				float yMid = std::max(l-arrowSize, arrowSize);
+				vertexPair(va, arrow_i, yMid, 2.0f/3.0f);
+				// End
+				vertexPair(va, arrow_i, l, 1.0f);
+				va.Draw();
 			}
+		} else {
+			// Draw short note
+			us().setUniform("noteType", (mine ? 3 : 1));
+			if (mine && note.isHit) yBeg = time2y(0.0);
+			glTranslatef(x, yBeg, 0.0f); // Move to place
+			drawArrow((mine ? -1 : arrow_i), (mine ? m_mine : m_arrows));
 		}
 	}
+
 	// Draw a text telling how well we hit
 	if (!mine && note.isHit) {
 		std::string text;

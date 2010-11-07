@@ -4,6 +4,7 @@
 #include "3dobject.hh"
 #include "theme.hh"
 #include "fs.hh"
+#include "dancegraph.hh"
 
 #include <fstream>
 #include <stdexcept>
@@ -134,4 +135,5 @@ void loadShaders() {
 	Window::shader.reset(new Shader(getThemePath("shaders/core.vert"), getThemePath("shaders/core.frag"), true));
 	Object3d::shader.reset(new Shader(getThemePath("shaders/3dobject.vert"), getThemePath("shaders/3dobject.frag")));
 	ThemeIntro::shader.reset(new Shader(getThemePath("shaders/intro.vert"), getThemePath("shaders/intro.frag")));
+	DanceGraph::shader_note.reset(new Shader(getThemePath("shaders/dancenote.vert"), getThemePath("shaders/dancenote.frag")));
 }

@@ -37,6 +37,9 @@ class DanceGraph: public InstrumentGraph {
 	void changeTrack(int dir = 1);
 	void changeDifficulty(int dir = 1);
 
+	// Shaders
+	static boost::scoped_ptr<Shader> shader_note; /// note/arrow/mine etc. shader
+
   private:
 	// Difficulty & mode selection
 	enum DanceStep { STEP_LEFT, STEP_DOWN, STEP_UP, STEP_RIGHT };
@@ -54,8 +57,7 @@ class DanceGraph: public InstrumentGraph {
 	void drawBeats(double time);
 	void drawNote(DanceNote& note, double time);
 	void drawInfo(double time, double offsetX, Dimensions dimensions);
-	void drawArrow(int arrow_i, Texture& tex, float x, float y, float scale = 1.0, float ty1 = 0.0, float ty2 = 1.0);
-	void drawMine(float x, float y, float rot = 0.0, float scale = 1.0);
+	void drawArrow(int arrow_i, Texture& tex, float ty1 = 0.0, float ty2 = 1.0);
 
 	// Helpers
 	float panel2x(int i) const { return getScale() * (-(m_pads * 0.5f) + m_arrow_map[i] + 0.5f); } /// Get x for an arrow line
@@ -72,7 +74,7 @@ class DanceGraph: public InstrumentGraph {
 	Texture m_arrows;
 	Texture m_arrows_cursor;
 	Texture m_arrows_hold;
-	Surface m_mine;
+	Texture m_mine;
 
 	// Misc
 	int m_arrow_map[max_panels]; /// game mode dependant mapping of arrows' ordering at cursor
