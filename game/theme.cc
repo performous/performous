@@ -44,8 +44,6 @@ ThemeAudioDevices::ThemeAudioDevices():
 	comment_bg(getThemePath("mainmenu_comment_bg.svg"))
 {}
 
-boost::scoped_ptr<Shader> ThemeIntro::shader;
-
 ThemeIntro::ThemeIntro():
 	Theme(getThemePath("intro_bg.svg")),
 	back_h(getThemePath("mainmenu_back_highlight.svg")),
@@ -54,7 +52,8 @@ ThemeIntro::ThemeIntro():
 	comment(getThemePath("mainmenu_comment.svg"), config["graphic/text_lod"].f()),
 	short_comment(getThemePath("mainmenu_short_comment.svg"), config["graphic/text_lod"].f()),
 	comment_bg(getThemePath("mainmenu_comment_bg.svg")),
-	short_comment_bg(getThemePath("mainmenu_scomment_bg.svg"))
+	short_comment_bg(getThemePath("mainmenu_scomment_bg.svg")),
+	bg_shader(new Shader(getThemePath("shaders/intro.vert"), getThemePath("shaders/intro.frag")))
 {
 	back_h.dimensions.fixedHeight(0.08f);
 }

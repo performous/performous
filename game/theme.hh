@@ -95,7 +95,7 @@ public:
 	/// configuration comment background (short tip)
 	Surface short_comment_bg;
 	/// Custom background shader
-	static boost::scoped_ptr<Shader> shader;
+	boost::scoped_ptr<Shader> bg_shader;
 };
 
 /// theme for instrument menu

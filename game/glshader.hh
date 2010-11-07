@@ -88,7 +88,3 @@ struct UseShader {
 	Shader& m_shader;
 	GLint m_old;
 };
-
-
-/** Load shaders. */
-void loadShaders();

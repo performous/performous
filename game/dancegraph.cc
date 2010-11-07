@@ -78,8 +78,6 @@ namespace {
 }
 
 
-boost::scoped_ptr<Shader> DanceGraph::shader_note;
-
 /// Constructor
 DanceGraph::DanceGraph(Audio& audio, Song const& song):
   InstrumentGraph(audio, song, input::DANCEPAD),
@@ -92,6 +90,7 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
   m_flow_direction(1),
   m_insideStop()
 {
+	m_shader_note.reset(new Shader(getThemePath("shaders/dancenote.vert"), getThemePath("shaders/dancenote.frag")));
 	// Initialize some arrays
 	for (size_t i = 0; i < max_panels; i++) {
 		m_activeNotes[i] = m_notes.end();
@@ -428,7 +427,7 @@ void DanceGraph::draw(double time) {
 
 		// Arrows on cursor
 		{
-			UseShader us(*DanceGraph::shader_note);
+			UseShader us(*m_shader_note);
 			us().setUniform("clock", float(time))
 			    .setUniform("noteType", 0)
 			    .setUniform("scale", getScale());
@@ -491,7 +490,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	double glow = note.hitAnim.get();
 
 	{
-		UseShader us(*DanceGraph::shader_note);
+		UseShader us(*m_shader_note);
 		us().setUniform("hitAnim", float(glow))
 		    .setUniform("clock", float(time))
 		    .setUniform("scale", getScale());

@@ -39,12 +39,11 @@ class Window {
 	/// take a screenshot
 	void screenshot();
 
-	static boost::scoped_ptr<Shader> shader; ///< core shader used for general drawing
-
   private:
 	SDL_Surface* screen;
 	unsigned int m_windowW, m_windowH;
 	unsigned int m_fsW, m_fsH;
 	bool m_fullscreen;
+	boost::scoped_ptr<Shader> m_shader; ///< core shader used for general drawing
 };
 

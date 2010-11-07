@@ -36,8 +36,6 @@ namespace {
 unsigned int screenW() { return s_width; }
 unsigned int screenH() { return s_height; }
 
-boost::scoped_ptr<Shader> Window::shader;
-
 Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(width), m_windowH(height), m_fullscreen(fs) {
 	std::atexit(SDL_Quit);
 	if( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK) ==  -1 ) throw std::runtime_error("SDL_Init failed");
@@ -63,7 +61,7 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	//std::clog << "video/info: GL_EXTENSIONS: " << glGetString(GL_EXTENSIONS) << std::endl; 
 
 	input::SDL::init(); // Joysticks etc.
-	loadShaders(); // Shaders
+	m_shader.reset(new Shader(getThemePath("shaders/core.vert"), getThemePath("shaders/core.frag"), true));
 }
 
 Window::~Window() { }

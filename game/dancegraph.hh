@@ -37,9 +37,6 @@ class DanceGraph: public InstrumentGraph {
 	void changeTrack(int dir = 1);
 	void changeDifficulty(int dir = 1);
 
-	// Shaders
-	static boost::scoped_ptr<Shader> shader_note; /// note/arrow/mine etc. shader
-
   private:
 	// Difficulty & mode selection
 	enum DanceStep { STEP_LEFT, STEP_DOWN, STEP_UP, STEP_RIGHT };

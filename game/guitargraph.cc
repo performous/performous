@@ -89,6 +89,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number,
   m_practHold(false),
   m_whammy(0)
 {
+	m_shader_note.reset(new Shader(getThemePath("shaders/3dobject.vert"), getThemePath("shaders/3dobject.frag")));
 	// Copy all tracks of supported types (either drums or non-drums) to m_instrumentTracks
 	for (InstrumentTracks::const_iterator it = m_song.instrumentTracks.begin(); it != m_song.instrumentTracks.end(); ++it) {
 		std::string index = it->first;
@@ -1039,6 +1040,7 @@ void GuitarGraph::drawNote(int fret, Color color, float tBeg, float tEnd, float 
 			color.a = clamp(time2a(tBeg)*2.0f,0.0f,1.0f);
 			{
 				glutil::Color c(color);
+				UseShader us(*m_shader_note); // Switch shader
 				m_fretObj.draw(x, y, 0.0f);
 			}
 			y -= fretWid;
@@ -1077,12 +1079,14 @@ void GuitarGraph::drawNote(int fret, Color color, float tBeg, float tEnd, float 
 				color.a = s;
 				{
 					glutil::Color c(color);
+					UseShader us(*m_shader_note); // Switch shader
 					m_fretObj.draw(x, yBeg, 0.0f, s);
 				}
 			} else {
 				color.a = clamp(time2a(tBeg)*2.0f,0.0f,1.0f);
 				{
 					glutil::Color c(color);
+					UseShader us(*m_shader_note); // Switch shader
 					m_fretObj.draw(x, yBeg, 0.0f);
 				}
 			}
@@ -1101,6 +1105,7 @@ void GuitarGraph::drawNote(int fret, Color color, float tBeg, float tEnd, float 
 		if (m_use3d) { // 3D
 			float s = 1.0 - hitAnim;
 			glutil::Color c(Color(l, l, l, s));
+			UseShader us(*m_shader_note); // Switch shader
 			m_tappableObj.draw(x, yBeg, 0.0f, s);
 		} else { // 2D
 			glutil::Color c(Color(l, l, l));
