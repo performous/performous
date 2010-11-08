@@ -2,6 +2,7 @@
 
 #include <string>
 #include <map>
+#include <vector>
 #include <GL/glew.h>
 #include <boost/noncopyable.hpp>
 
@@ -13,14 +14,13 @@ struct Shader: public boost::noncopyable {
 
 	/** Loads the shader from files. */
 	void loadFromFile(const std::string& vert_path, const std::string& frag_path, bool use = false);
-	/** Loads the shader from memory. */
-	void loadFromMemory(const char* vert_source, const char* frag_source, bool use = false);
+	/** Compiles a shader of a given type. */
+	void compile(const char* source, GLenum type);
+	/** Links all compiled shaders to a shader program. */
+	void link();
 
 	/** Binds the shader into use. */
 	void bind();
-
-	/** Get uniform location. Uses caching internally. */
-	GLint operator[](const std::string& uniform);
 
 	/** Allow setting uniforms in a chain. Shader needs to be in use.*/
 
@@ -49,28 +49,35 @@ struct Shader: public boost::noncopyable {
 		glUniform4f((*this)[uniform], x, y, z, w); return *this;
 	}
 
+	/** Get uniform location. Uses caching internally. */
+	GLint operator[](const std::string& uniform);
+
 	// Some operators
+	GLuint operator*() { return program; }
+	operator GLuint() { return program; }
 	operator bool() const { return program != 0; }
 	bool operator==(const Shader& rhs) const { return program == rhs.program; }
 	bool operator!=(const Shader& rhs) const { return program != rhs.program; }
-
-	GLuint program, vert_shader, frag_shader; ///< shader object ids
 
 	/** Returns pointer to the currently used shader. */
 	static Shader* current() {
 		GLint i;
 		glGetIntegerv(GL_CURRENT_PROGRAM, &i);
-		return shaders[i];
+		return shader_progs[i];
 	}
 
   private:
-	int gl_response;
+	GLuint program; ///< shader program object id
+	int gl_response; ///< save last return state
+
+	typedef std::vector<GLuint> ShaderObjects;
+	ShaderObjects shader_ids;
 
 	typedef std::map<std::string, GLint> UniformMap;
 	UniformMap uniforms; ///< Cached uniform locations, use operator[] to access
 
 	typedef std::map<GLint, Shader*> ShaderMap;
-	static ShaderMap shaders; ///< Shader objects for reverse look-up by id
+	static ShaderMap shader_progs; ///< Shader objects for reverse look-up by id
 };
 
 

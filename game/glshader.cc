@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <stdexcept>
+#include <algorithm>
 
 
 namespace {
@@ -39,20 +40,19 @@ namespace {
 	}
 }
 
-Shader::ShaderMap Shader::shaders;
+Shader::ShaderMap Shader::shader_progs;
 
-Shader::Shader(): program(0), vert_shader(), frag_shader() {}
+Shader::Shader(): program(0) {}
 
-Shader::Shader(const std::string& vert_path, const std::string& frag_path, bool use) {
+Shader::Shader(const std::string& vert_path, const std::string& frag_path, bool use): program(0) {
 	loadFromFile(vert_path, frag_path, use);
 }
 
 
 Shader::~Shader() {
-	shaders[program] = NULL;
+	shader_progs[program] = NULL;
 	glDeleteProgram(program);
-	glDeleteShader(vert_shader);
-	glDeleteShader(frag_shader);
+	std::for_each(shader_ids.begin(), shader_ids.end(), glDeleteShader);
 	//std::clog << "shader/info: Shader program " << (unsigned)program << " deleted." << std::endl;
 }
 
@@ -62,53 +62,54 @@ void Shader::loadFromFile(const std::string& vert_path, const std::string& frag_
 	std::string fragstr = loadFile(frag_path);
 	const char* vert = vertstr.c_str();
 	const char* frag = fragstr.c_str();
-	loadFromMemory(vert, frag, use);
+	compile(vert, GL_VERTEX_SHADER);
+	compile(frag, GL_FRAGMENT_SHADER);
+	link();
+	if (use) bind();
 }
 
 
-void Shader::loadFromMemory(const char* vert_source, const char* frag_source, bool use) {
+void Shader::compile(const char* source, GLenum type) {
 	glutil::GLErrorChecker::reset();
-	vert_shader = glCreateShader(GL_VERTEX_SHADER);
-	frag_shader = glCreateShader(GL_FRAGMENT_SHADER);
-	glutil::GLErrorChecker shadererror("Shader::loadFromMemory - glCreateShader");
+	GLenum new_shader = glCreateShader(type);
+	glutil::GLErrorChecker shadererror("Shader::compile - glCreateShader");
 
-	glShaderSource(vert_shader, 1, &vert_source, NULL);
-	glShaderSource(frag_shader, 1, &frag_source, NULL);
-	glutil::GLErrorChecker shadersourceerror("Shader::loadFromMemory - glShaderSource");
+	glShaderSource(new_shader, 1, &source, NULL);
+	glutil::GLErrorChecker shadersourceerror("Shader::compile - glShaderSource");
 
-	glCompileShader(vert_shader);
-	glGetShaderiv(vert_shader, GL_COMPILE_STATUS, &gl_response);
+	glCompileShader(new_shader);
+	glGetShaderiv(new_shader, GL_COMPILE_STATUS, &gl_response);
 	if (gl_response != GL_TRUE) {
-		dumpInfoLog(vert_shader);
-		throw std::runtime_error("Something went wrong compiling the vertex shader.");
+		dumpInfoLog(new_shader);
+		throw std::runtime_error("Something went wrong compiling the shader.");
 	}
 
-	glCompileShader(frag_shader);
-	glGetShaderiv(frag_shader, GL_COMPILE_STATUS, &gl_response);
-	if (gl_response != GL_TRUE) {
-		dumpInfoLog(frag_shader);
-		throw std::runtime_error("Something went wrong compiling the fragment shader.");
-	}
+	shader_ids.push_back(new_shader);
+}
 
+
+void Shader::link() {
 	glutil::GLErrorChecker::reset();
+	if (program) throw std::runtime_error("Shader already linked.");
+	// Create the program id
 	program = glCreateProgram();
-	glutil::GLErrorChecker createprogramerror("Shader::loadFromMemory - glCreateProgram");
+	glutil::GLErrorChecker createprogramerror("Shader::link - glCreateProgram");
 
-	glAttachShader(program, vert_shader);
-	glAttachShader(program, frag_shader);
-	glutil::GLErrorChecker attachshadererror("Shader::loadFromMemory - glAttachShader");
+	// Attach all compiled shaders to it
+	for (ShaderObjects::const_iterator it = shader_ids.begin(); it != shader_ids.end(); ++it)
+		glAttachShader(program, *it);
+	glutil::GLErrorChecker attachshadererror("Shader::link - glAttachShader");
 
+	// Link and check status
 	glLinkProgram(program);
 	glGetProgramiv(program, GL_LINK_STATUS, &gl_response);
 	if (gl_response != GL_TRUE) {
 		dumpInfoLog(program);
-		throw std::runtime_error("Something went wrong linking shader program.");
+		throw std::runtime_error("Something went wrong linking the shader program.");
 	}
-	glutil::GLErrorChecker linkerror("Shader::loadFromMemory - glLinkProgram");
+	glutil::GLErrorChecker linkerror("Shader::link - glLinkProgram");
 
-	shaders[program] = this;
-
-	if (use) bind();
+	shader_progs[program] = this;
 }
 
 
