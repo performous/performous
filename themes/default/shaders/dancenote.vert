@@ -46,7 +46,7 @@ void main()
 	// Mines
 	} else if (noteType == 3) {
 		trans *= scaleMat(1.0 + hitAnim);
-		float r = float(mod(int(clock*360), 360)) * deg2rad; // They rotate!
+		float r = float(mod(int(clock*360.0), 360)) * deg2rad; // They rotate!
 		trans *= rotMat(r);
 	}
 
