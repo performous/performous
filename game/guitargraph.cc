@@ -915,8 +915,15 @@ void GuitarGraph::draw(double time) {
 						if (glow > 0.5f && tEnd < 0.1f && it->hitAnim[fret].get() == 0.0)
 							it->hitAnim[fret].setTarget(1.0);
 						// Call the actual note drawing function
-						drawNote(fret, c, tBeg, tEnd, whammy, it->tappable, glow > 0.5f, it->hitAnim[fret].get(),
-						  it->releaseTimes[fret] > 0.0 ? it->releaseTimes[fret] - time : getNaN());
+						if(m_drums && it->fret_tom[fret]) {
+							// FIXME : new design here
+							// this note should be a tom
+							drawNote(fret, c, tBeg, tEnd, whammy, true, glow > 0.5f, it->hitAnim[fret].get(),
+							  it->releaseTimes[fret] > 0.0 ? it->releaseTimes[fret] - time : getNaN());
+						} else {
+							drawNote(fret, c, tBeg, tEnd, whammy, it->tappable, glow > 0.5f, it->hitAnim[fret].get(),
+							  it->releaseTimes[fret] > 0.0 ? it->releaseTimes[fret] - time : getNaN());
+						}
 					}
 				}
 			}
@@ -1180,14 +1187,43 @@ void GuitarGraph::drawBar(double time, float h) {
 	glVertex2f(2.5f, time2y(time - h));
 }
 
+void GuitarGraph::updateTom(unsigned int tomTrack, unsigned int fretId) {
+	// HiHat/Rack Tom 1 detection
+	NoteMap::const_iterator tomTrackIt = m_track_index->second->nm.find(tomTrack);
+	if (tomTrackIt != m_track_index->second->nm.end()) {
+		if(tomTrack == 110) {
+			// std::cout << "HiHat/Rack Tom 1 detected" << std::endl;
+		} else if(tomTrack == 111) {
+			// std::cout << "Ride Cymbal/Rack Tom 2 detected" << std::endl;
+		} else if(tomTrack == 112) {
+			// std::cout << "Crash Cymbal/Floor Tom detected" << std::endl;
+		} else {
+			// std::cout << "Unknown Tom detected" << std::endl;
+		}
+		for (Durations::const_iterator it = tomTrackIt->second.begin(); it != tomTrackIt->second.end(); ++it) {
+			// std::cout << " ++ @" << it->begin << "->@" << it->end << std::endl;
+			for (Chords::iterator it2 = m_chords.begin(); it2 != m_chords.end() ; ++it2) {
+				if(it2->begin >= it->begin && it2->begin < it->end && it2->fret[fretId]) {
+					// std::cout << " FOUND !!!!" << it2->begin << std::endl;
+					it2->fret_tom[fretId] = true;
+				} else if(it2->begin >= it->end) {
+					// std::cout << " NO MORE !!!! (next @" << it2->begin << ")" << std::endl;
+					break;
+				}
+			}
+		}
+	}
+}
+
 /// Create the Chord structures for the current track/difficulty level
 void GuitarGraph::updateChords() {
 	m_chords.clear(); m_solos.clear(); m_drumfills.clear();
 	m_scoreFactor = 0;
+	NoteMap const& nm = m_track_index->second->nm;
+
 	Durations::size_type pos[5] = {}, size[5] = {};
 	Durations const* durations[5] = {};
 	for (int fret = 0; fret < 5; ++fret) {
-		NoteMap const& nm = m_track_index->second->nm;
 		int basepitch = diffv[m_level].basepitch;
 		NoteMap::const_iterator it = nm.find(basepitch + fret);
 		if (it == nm.end()) continue;
@@ -1235,8 +1271,16 @@ void GuitarGraph::updateChords() {
 	}
 	m_chordIt = m_chords.begin();
 
+	if(m_drums) {
+		// HiHat/Rack Tom 1 detection
+		updateTom(110, 2);
+		// Ride Cymbal/Rack Tom 2 detection
+		updateTom(111, 3);
+		// Crash Cymbal/Floor Tom detection
+		updateTom(112, 4);
+	}
+
 	// Solos
-	NoteMap const& nm = m_track_index->second->nm;
 	NoteMap::const_iterator solotrack = nm.find(103); // 103 = Expert Solo - used for every difficulty
 	if (solotrack != nm.end()) {
 		for (Durations::const_iterator it = solotrack->second.begin(); it != solotrack->second.end(); ++it) {
