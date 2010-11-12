@@ -124,7 +124,7 @@ class GuitarGraph: public InstrumentGraph {
 
 	// Chords & notes
 	void updateChords();
-	void updateTom(unsigned int tomTrack, unsigned int fretId);
+	bool updateTom(unsigned int tomTrack, unsigned int fretId); // returns true if this tom track exists
 	double getNotesBeginTime() const { return m_chords.front().begin; }
 	typedef std::vector<Chord> Chords;
 	Chords m_chords;
@@ -149,6 +149,7 @@ class GuitarGraph: public InstrumentGraph {
 	double m_soloScore; /// score during solo
 	bool m_solo; /// are we currently playing a solo
 	bool m_practHold; /// true if holding a chord during practice
+	bool m_hasTomTrack; /// true if the track has at least one tom track
 	double m_whammy; /// whammy value for pitch shift
 };
 

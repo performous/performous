@@ -87,6 +87,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number,
   m_soloScore(),
   m_solo(),
   m_practHold(false),
+  m_hasTomTrack(false),
   m_whammy(0)
 {
 	// Copy all tracks of supported types (either drums or non-drums) to m_instrumentTracks
@@ -647,7 +648,7 @@ void GuitarGraph::drumHit(double time, int fret) {
 		// Graphical effects
 		m_flames[fret].push_back(AnimValue(0.0, flameSpd));
 		m_flames[fret].back().setTarget(1.0);
-		if (fret == 0) m_drumJump.setTarget(1.0); // Do a jump for bass drum
+		if (fret == input::KICK_BUTTON) m_drumJump.setTarget(1.0); // Do a jump for bass drum
 		// All drums of the chord hit already?
 		if (m_chordIt->status == m_chordIt->polyphony) {
 			//m_score -= m_chordIt->score;
@@ -915,14 +916,26 @@ void GuitarGraph::draw(double time) {
 						if (glow > 0.5f && tEnd < 0.1f && it->hitAnim[fret].get() == 0.0)
 							it->hitAnim[fret].setTarget(1.0);
 						// Call the actual note drawing function
-						if(m_drums && it->fret_tom[fret]) {
-							// FIXME : new design here
-							// this note should be a tom
-							drawNote(fret, c, tBeg, tEnd, whammy, true, glow > 0.5f, it->hitAnim[fret].get(),
-							  it->releaseTimes[fret] > 0.0 ? it->releaseTimes[fret] - time : getNaN());
+						if(!m_hasTomTrack) {
+							// no tom track, normal display (only tom)
+							if(m_drums) {
+								drawNote(fret, c, tBeg, tEnd, whammy, false, glow > 0.5f, it->hitAnim[fret].get(),
+								  it->releaseTimes[fret] > 0.0 ? it->releaseTimes[fret] - time : getNaN());
+							} else {
+								drawNote(fret, c, tBeg, tEnd, whammy, it->tappable, glow > 0.5f, it->hitAnim[fret].get(),
+								  it->releaseTimes[fret] > 0.0 ? it->releaseTimes[fret] - time : getNaN());
+							}
 						} else {
-							drawNote(fret, c, tBeg, tEnd, whammy, it->tappable, glow > 0.5f, it->hitAnim[fret].get(),
-							  it->releaseTimes[fret] > 0.0 ? it->releaseTimes[fret] - time : getNaN());
+							// here there is a tom track
+							if(!it->fret_tom[fret] && (fret == input::YELLOW_TOM_BUTTON || fret == input::BLUE_TOM_BUTTON || fret == input::GREEN_TOM_BUTTON)){
+								// here we should draw a cymbal/HiHat (yellow/blue/green pad with no tom track event)
+								drawNote(fret, c, tBeg, tEnd, whammy, false, glow > 0.5f, it->hitAnim[fret].get(),
+								  it->releaseTimes[fret] > 0.0 ? it->releaseTimes[fret] - time : getNaN());
+							} else {
+								// here we should draw a tom (either red, or a yellow/blue/green pad with tom marker
+								drawNote(fret, c, tBeg, tEnd, whammy, true, glow > 0.5f, it->hitAnim[fret].get(),
+								  it->releaseTimes[fret] > 0.0 ? it->releaseTimes[fret] - time : getNaN());
+							}
 						}
 					}
 				}
@@ -930,7 +943,7 @@ void GuitarGraph::draw(double time) {
 		} //< disable lighting
 		// Draw flames
 		for (int fret = 0; fret < m_pads; ++fret) { // Loop through the frets
-			if (m_drums && fret == 0) { // Skip bass drum
+			if (m_drums && fret == input::KICK_BUTTON) { // Skip bass drum
 				m_flames[fret].clear(); continue;
 			}
 			Texture* ftex = &m_flame;
@@ -1017,7 +1030,7 @@ void GuitarGraph::draw(double time) {
 /// The times passed are normalized to [past, future]
 void GuitarGraph::drawNote(int fret, Color color, float tBeg, float tEnd, float whammy, bool tappable, bool hit, double hitAnim, double releaseTime) {
 	float x = getFretX(fret);
-	if (m_drums && fret == 0) { // Bass drum? That's easy
+	if (m_drums && fret == input::KICK_BUTTON) { // Bass drum? That's easy
 		if (hit || hitAnim > 0) return;	// Hide it if it's hit
 		color.a = time2a(tBeg);
 		{
@@ -1187,31 +1200,34 @@ void GuitarGraph::drawBar(double time, float h) {
 	glVertex2f(2.5f, time2y(time - h));
 }
 
-void GuitarGraph::updateTom(unsigned int tomTrack, unsigned int fretId) {
+bool GuitarGraph::updateTom(unsigned int tomTrack, unsigned int fretId) {
 	// HiHat/Rack Tom 1 detection
 	NoteMap::const_iterator tomTrackIt = m_track_index->second->nm.find(tomTrack);
 	if (tomTrackIt != m_track_index->second->nm.end()) {
 		if(tomTrack == 110) {
-			// std::cout << "HiHat/Rack Tom 1 detected" << std::endl;
+			//std::cout << "HiHat/Rack Tom 1 detected" << std::endl;
 		} else if(tomTrack == 111) {
-			// std::cout << "Ride Cymbal/Rack Tom 2 detected" << std::endl;
+			//std::cout << "Ride Cymbal/Rack Tom 2 detected" << std::endl;
 		} else if(tomTrack == 112) {
-			// std::cout << "Crash Cymbal/Floor Tom detected" << std::endl;
+			//std::cout << "Crash Cymbal/Floor Tom detected" << std::endl;
 		} else {
-			// std::cout << "Unknown Tom detected" << std::endl;
+			//std::cout << "Unknown Tom detected" << std::endl;
 		}
 		for (Durations::const_iterator it = tomTrackIt->second.begin(); it != tomTrackIt->second.end(); ++it) {
-			// std::cout << " ++ @" << it->begin << "->@" << it->end << std::endl;
+			//std::cout << " ++ @" << it->begin << "->@" << it->end << std::endl;
 			for (Chords::iterator it2 = m_chords.begin(); it2 != m_chords.end() ; ++it2) {
 				if(it2->begin >= it->begin && it2->begin < it->end && it2->fret[fretId]) {
-					// std::cout << " FOUND !!!!" << it2->begin << std::endl;
+					//std::cout << " FOUND !!!!" << it2->begin << std::endl;
 					it2->fret_tom[fretId] = true;
 				} else if(it2->begin >= it->end) {
-					// std::cout << " NO MORE !!!! (next @" << it2->begin << ")" << std::endl;
+					//std::cout << " NO MORE !!!! (next @" << it2->begin << ")" << std::endl;
 					break;
 				}
 			}
 		}
+		return true;
+	} else {
+		return false;
 	}
 }
 
@@ -1271,13 +1287,14 @@ void GuitarGraph::updateChords() {
 	}
 	m_chordIt = m_chords.begin();
 
+	m_hasTomTrack = false;
 	if(m_drums) {
 		// HiHat/Rack Tom 1 detection
-		updateTom(110, 2);
+		m_hasTomTrack = updateTom(110, input::YELLOW_TOM_BUTTON) || m_hasTomTrack;
 		// Ride Cymbal/Rack Tom 2 detection
-		updateTom(111, 3);
+		m_hasTomTrack = updateTom(111, input::BLUE_TOM_BUTTON) || m_hasTomTrack;
 		// Crash Cymbal/Floor Tom detection
-		updateTom(112, 4);
+		m_hasTomTrack = updateTom(112, input::GREEN_TOM_BUTTON) || m_hasTomTrack;
 	}
 
 	// Solos
