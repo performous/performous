@@ -151,7 +151,7 @@ void InstrumentGraph::drawMenu() {
 						hintfont.dimensions.left(leftx).center(y - step);
 						hintfont.draw("I");
 					}
-					if (m_menu.getOptions().size()-1) {  // Down
+					if (i < m_menu.getOptions().size()-1) {  // Down
 						SvgTxtTheme& hintfont = th.getCachedOption("O");
 						hintfont.dimensions.left(leftx).center(y + step);
 						hintfont.draw("O");
