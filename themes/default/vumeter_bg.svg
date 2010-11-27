@@ -79,7 +79,7 @@
        ry="5" />
     <text
        xml:space="preserve"
-       style="font-size:29.48888778999999971px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#d9d9d9;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Liberation Sans"
+       style="font-size:29.48888778999999971px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#d9d9d9;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Liberation Sans,Verdana,sans-serif"
        x="18.861689"
        y="199.61098"
        id="text3152"
@@ -90,7 +90,7 @@
          y="199.61098">dB</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:20.84702301px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#808080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Liberation Sans"
+       style="font-size:20.84702301px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#808080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Liberation Sans,Verdana,sans-serif"
        x="4.7968478"
        y="21.889374"
        id="text3156"
@@ -101,7 +101,7 @@
          y="21.889374">CLIP</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#808080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Liberation Sans"
+       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#808080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Liberation Sans,Verdana,sans-serif"
        x="15"
        y="111"
        id="text3160"><tspan
@@ -111,7 +111,7 @@
          y="111">-20</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;opacity:1;fill:#808080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Liberation Sans"
+       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;opacity:1;fill:#808080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Liberation Sans,Verdana,sans-serif"
        x="15"
        y="61"
        id="text3166"><tspan
@@ -121,7 +121,7 @@
          y="61">-10</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;opacity:1;fill:#808080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Liberation Sans"
+       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;opacity:1;fill:#808080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Liberation Sans,Verdana,sans-serif"
        x="15"
        y="211"
        id="text3170"><tspan
@@ -131,7 +131,7 @@
          y="211">-40</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;opacity:1;fill:#808080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Liberation Sans"
+       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;opacity:1;fill:#808080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Liberation Sans,Verdana,sans-serif"
        x="15"
        y="161"
        id="text3174"><tspan
