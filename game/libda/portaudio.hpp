@@ -10,6 +10,8 @@
 #include <stdexcept>
 #include <stdint.h>
 
+#include "../unicode.hh"
+
 #define PORTAUDIO_CHECKED(func, args) portaudio::internal::check(func args, #func)
 
 namespace portaudio {
@@ -32,7 +34,7 @@ namespace portaudio {
 	}
 
 	struct DeviceInfo {
-		DeviceInfo(std::string n = "", unsigned i = 0, unsigned o = 0): name(n), in(i), out(o) {}
+		DeviceInfo(std::string n = "", int i = 0, int o = 0): name(n), in(i), out(o) {}
 		std::string desc() {
 			std::ostringstream oss;
 			oss << name << " (";
@@ -42,18 +44,19 @@ namespace portaudio {
 			return oss.str() + ")";
 		}
 		std::string name;
-		unsigned int in, out;
+		int in, out;
 	};
 
 	typedef std::vector<DeviceInfo> DeviceInfos;
 
 	struct AudioDevices {
+		static int count() { return Pa_GetDeviceCount(); }
 		/// Constructor gets the PA devices into a vector
 		AudioDevices() {
 			for (unsigned i = 0, end = Pa_GetDeviceCount(); i != end; ++i) {
 				PaDeviceInfo const* info = Pa_GetDeviceInfo(i);
 				if (!info) devices.push_back(DeviceInfo());
-				else devices.push_back(DeviceInfo(info->name, info->maxInputChannels, info->maxOutputChannels));
+				else devices.push_back(DeviceInfo(convertToUTF8(info->name), info->maxInputChannels, info->maxOutputChannels));
 			}
 		}
 		/// Get a printable dump of the devices

@@ -20,6 +20,7 @@ namespace {
 }
 
 ScreenAudioDevices::ScreenAudioDevices(std::string const& name, Audio& audio): Screen(name), m_audio(audio) {
+	m_selector.reset(new Surface(getThemePath("device_selector.svg")));
 	m_mic_icon.reset(new Surface(getThemePath("sing_pbox.svg")));
 	m_pdev_icon.reset(new Surface(getThemePath("icon_pdev.svg")));
 	m_colorMap["blue"] = Color(0.2, 0.5, 0.7);
@@ -96,6 +97,7 @@ void ScreenAudioDevices::draw() {
 		const float ystep = yoff*2 / m_devs.size();
 		// Device text & bg
 		m_theme->device_bg.dimensions.stretch(std::abs(xoff*2), m_mic_icon->dimensions.h()*0.9).middle();
+		m_selector->dimensions.stretch(m_mic_icon->dimensions.w() * 1.75, m_mic_icon->dimensions.h() * 1.75);
 		for (size_t i = 0; i <= m_devs.size(); ++i) {
 			const float y = -yoff + i*ystep;
 			float alpha = 1.0f;
@@ -110,14 +112,16 @@ void ScreenAudioDevices::draw() {
 		// Icons
 		for (size_t i = 0; i < m_mics.size(); ++i) {
 			Surface& srf = (i < m_mics.size()-1) ? *m_mic_icon : *m_pdev_icon;
-			glutil::Color c(m_colorMap[m_mics[i].name]);
-			srf.dimensions.middle(-xoff + xstep*0.5 + i*xstep).center(-yoff+m_mics[i].dev*ystep);
-			srf.draw();
+			{
+				glutil::Color c(m_colorMap[m_mics[i].name]);
+				srf.dimensions.middle(-xoff + xstep*0.5 + i*xstep).center(-yoff+m_mics[i].dev*ystep);
+				srf.draw();
+			}
 			// Selection indicator
-			// TODO: Some nice arrow icons would be nice, in any case, current square is temporary
 			if (m_selected_column == i)
-				glutil::Square sq(srf.dimensions.xc(), srf.dimensions.yc(), m_mic_icon->dimensions.w()*0.75);
+				m_selector->dimensions.middle(srf.dimensions.xc()).center(srf.dimensions.yc());
 		}
+		m_selector->draw(); // Position already set in the loop
 	}
 	// Key help
 	m_theme->comment_bg.dimensions.stretch(1.0, 0.025).middle().screenBottom(-0.054);

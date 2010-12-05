@@ -28,6 +28,10 @@ template <typename Key, typename Value> class Cachemap {
 		if (it == m_map.end()) it = insert(key, new Value(key)); else access(key);
 		return *it->second;
 	}
+	/// does it have a certain key
+	bool contains(Key const& key) const {
+		return m_map.find(key) != m_map.end();
+	}
 	/// clears history and cachemap
 	void clear() {
 		m_history.clear();

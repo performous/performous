@@ -7,6 +7,7 @@
 
 class Audio;
 class ThemeIntro;
+class SvgTxtTheme;
 class MenuOption;
 
 /// intro screen
@@ -24,6 +25,7 @@ class ScreenIntro : public Screen {
 
   private:
 	void populateMenu();
+	SvgTxtTheme& getTextObject(std::string const& txt);
 
 	Audio& m_audio;
 	boost::scoped_ptr<ThemeIntro> theme;

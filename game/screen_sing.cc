@@ -532,7 +532,7 @@ void ScreenSing::drawMenu() {
 	ThemeInstrumentMenu& th = *m_menuTheme;
 	MenuOptions::const_iterator cur = static_cast<MenuOptions::const_iterator>(&m_menu.current());
 	double w = m_menu.dimensions.w();
-	const float txth = th.option.h();
+	const float txth = th.option_selected.h();
 	const float step = txth * 0.85f;
 	const float h = m_menu.getOptions().size() * step + step;
 	float y = -h * .5f + step;
@@ -543,10 +543,10 @@ void ScreenSing::drawMenu() {
 	// Loop through menu items
 	w = 0;
 	for (MenuOptions::const_iterator it = m_menu.begin(); it != m_menu.end(); ++it) {
-		SvgTxtTheme* txt = &th.option;
-		if (cur == it) {
-			txt = &th.option_selected;
-		}
+		// Pick the font object
+		SvgTxtTheme* txt = &th.option_selected;
+		if (cur != it) txt = &(th.getCachedOption(it->getName()));
+		// Set dimensions and draw
 		txt->dimensions.middle(x).center(y);
 		txt->draw(it->getName());
 		w = std::max(w, txt->w() + 2 * step); // Calculate the widest entry

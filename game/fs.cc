@@ -18,7 +18,11 @@ fs::path getHomeDir() {
 	static bool initialized = false;
 	if (!initialized) {
 		initialized = true;
+		#ifdef _WIN32
+		char const* home = getenv("USERPROFILE");
+		#else
 		char const* home = getenv("HOME");
+		#endif
 		if (home) dir = home;
 	}
 	return dir;

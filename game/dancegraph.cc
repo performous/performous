@@ -277,8 +277,8 @@ void DanceGraph::engine() {
 		}
 		// Menu keys
 		if (menuOpen() && ev.type == input::Event::PRESS) {
-			if (ev.nav == input::CANCEL) m_menu.close();
-			else if (ev.nav == input::RIGHT || ev.nav == input::START) m_menu.action(1);
+			if (ev.nav == input::START || ev.nav == input::CANCEL) m_menu.close();
+			else if (ev.nav == input::RIGHT) m_menu.action(1);
 			else if (ev.nav == input::LEFT) m_menu.action(-1);
 			else if (ev.nav == input::UP) m_menu.move(-1);
 			else if (ev.nav == input::DOWN) m_menu.move(1);

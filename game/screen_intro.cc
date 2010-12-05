@@ -49,9 +49,13 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 		// These are only available in config menu
 		int key = event.key.keysym.sym;
 		SDLMod modifier = event.key.keysym.mod;
-		if (key == SDLK_r && modifier & KMOD_CTRL && m_menu.current().value)
+		if (key == SDLK_r && modifier & KMOD_CTRL && m_menu.current().value) {
 			m_menu.current().value->reset(modifier & KMOD_ALT);
-		else if (key == SDLK_s && modifier & KMOD_CTRL) writeConfig(modifier & KMOD_ALT);
+		} else if (key == SDLK_s && modifier & KMOD_CTRL) {
+			writeConfig(modifier & KMOD_ALT);
+			ScreenManager::getSingletonPtr()->flashMessage((modifier & KMOD_ALT)
+				? _("Settings saved as system defaults.") : _("Settings saved."));
+		}
 	}
 	// Animation targets
 	m_selAnim.setTarget(m_menu.curIndex());
@@ -97,9 +101,11 @@ void ScreenIntro::draw_menu_options() {
 
 		// Regular option (not selected)
 		} else {
-			theme->option.dimensions.left(x).center(start_y + ii*0.08);
-			theme->option.draw(opt.getName(), submenuanim * (opt.isActive() ? 1.0f : 0.5f));
-			wcounter = std::max(wcounter, theme->option.w() + 2 * sel_margin); // Calculate the widest entry
+			std::string title = opt.getName();
+			SvgTxtTheme& txt = getTextObject(title);
+			txt.dimensions.left(x).center(start_y + ii*0.08);
+			txt.draw(title, submenuanim * (opt.isActive() ? 1.0f : 0.5f));
+			wcounter = std::max(wcounter, txt.w() + 2 * sel_margin); // Calculate the widest entry
 		}
 	}
 	m_menu.dimensions.stretch(wcounter, 1);
@@ -123,6 +129,11 @@ void ScreenIntro::draw() {
 	}
 	// Menu
 	draw_menu_options();
+}
+
+SvgTxtTheme& ScreenIntro::getTextObject(std::string const& txt) {
+	if (theme->options.contains(txt)) return theme->options[txt];
+	return *theme->options.insert(txt, new SvgTxtTheme(getThemePath("mainmenu_option.svg"), config["graphic/text_lod"].f()))->second;
 }
 
 void ScreenIntro::populateMenu() {
