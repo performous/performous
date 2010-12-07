@@ -4,7 +4,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-10-24 13:06+0100\n"
 "PO-Revision-Date: \n"
-"Last-Translator: Fredrik Klasson <scientica@gmail.com>\n"
+"Last-Translator: TatankaT <timtatanka@users.sourceforge.net>\n"
 "Language-Team: \n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -17,20 +17,20 @@ msgstr ""
 
 #: ../game/main.cc:133
 msgid "Loading audio samples..."
-msgstr ""
+msgstr "Laden geluiden..."
 
 #: ../game/main.cc:147
 msgid "Creating screens..."
-msgstr ""
+msgstr "Schermen aanmaken..."
 
 #: ../game/main.cc:156
 msgid "Entering main menu"
-msgstr ""
+msgstr "Hoofdmenu tonen"
 
 #: ../game/main.cc:158
 #: ../game/screen_sing.cc:144
 msgid "Loading complete"
-msgstr ""
+msgstr "Laden vervolledigd"
 
 #: ../game/main.cc:167
 msgid "Screenshot taken!"
@@ -42,7 +42,7 @@ msgstr "Schermafdruk nemen mislukt!"
 
 #: ../game/screen_intro.cc:22
 msgid "No playback devices could be used.\n"
-msgstr "Er konden geen afspeelapparaten gebruikt worden.\n"
+msgstr "Geen bruikbare afspeelapparaten.\n"
 
 #: ../game/screen_intro.cc:23
 msgid ""
@@ -50,11 +50,11 @@ msgid ""
 "Please configure some before playing."
 msgstr ""
 "\n"
-"Gelieve eerst de spelopties aan te passen voor het spelen."
+"Gelieve dit eerst in te stellen."
 
 #: ../game/screen_intro.cc:122
 msgid "Ctrl + S to save, Ctrl + R to reset defaults"
-msgstr ""
+msgstr "Ctrl + S: opslaan, Ctrl + R: standaardinstellingen"
 
 #: ../game/screen_intro.cc:131
 msgid "Perform"
@@ -74,54 +74,51 @@ msgstr "Je vaardigheden testen en de microfoons controleren"
 
 #: ../game/screen_intro.cc:151
 msgid "Audio Devices"
-msgstr ""
+msgstr "Geluidsapparaten"
 
 #: ../game/screen_intro.cc:151
 msgid "Setup microphones and playback"
-msgstr ""
+msgstr "Regel microfoons en afspelen"
 
 #: ../game/screen_intro.cc:152
 msgid "Audio"
-msgstr ""
+msgstr "Geluid"
 
 #: ../game/screen_intro.cc:152
-#, fuzzy
 msgid "Configure general audio settings"
-msgstr "Spelopties aanpassen"
+msgstr "Aanpassen algemene geluidsinstellingen"
 
 #: ../game/screen_intro.cc:153
 msgid "Graphics"
-msgstr ""
+msgstr "Beeld"
 
 #: ../game/screen_intro.cc:153
-#, fuzzy
 msgid "Configure rendering and video settings"
-msgstr "Spelopties aanpassen"
+msgstr "Aanpassen render- en video-instellingen"
 
 #: ../game/screen_intro.cc:154
 msgid "Game"
-msgstr ""
+msgstr "Spel"
 
 #: ../game/screen_intro.cc:154
 msgid "Gameplay related options"
-msgstr ""
+msgstr "Opties voor spelvorm"
 
 #: ../game/screen_intro.cc:155
 msgid "Paths"
-msgstr ""
+msgstr "Locaties"
 
 #: ../game/screen_intro.cc:155
 msgid "Setup song and data paths"
-msgstr ""
+msgstr "Aanpassen locatie van liedjes en bestanden"
 
 #: ../game/screen_intro.cc:157
 msgid "Configure"
 msgstr "Opties"
 
 #: ../game/screen_intro.cc:157
-#, fuzzy
 msgid "Configure audio and game options"
-msgstr "Spelopties aanpassen"
+msgstr "Aanpassen geluids- en spelinstellingen"
 
 #: ../game/screen_intro.cc:160
 #: ../game/screen_sing.cc:137
@@ -133,83 +130,84 @@ msgid "Leave the game"
 msgstr "Spel verlaten"
 
 #: ../game/screen_sing.cc:35
-#, fuzzy
 msgid "Loading theme..."
-msgstr "Hoofdmenu..."
+msgstr "Laden thema..."
 
 #: ../game/screen_sing.cc:38
 msgid "Loading song..."
-msgstr ""
+msgstr "Laden lied..."
 
 #: ../game/screen_sing.cc:44
 msgid "Song is broken!"
-msgstr ""
+msgstr "Muziekbestand is kapot!"
 
 #: ../game/screen_sing.cc:49
 msgid "Loading background..."
-msgstr ""
+msgstr "Laden achtergrond..."
 
 #: ../game/screen_sing.cc:61
 msgid "Initializing webcam..."
-msgstr ""
+msgstr "Initialiseren webcam..."
 
 #: ../game/screen_sing.cc:68
 msgid "Loading video..."
-msgstr ""
+msgstr "Laden video..."
 
 #: ../game/screen_sing.cc:74
 msgid "Random background..."
-msgstr ""
+msgstr "Willekeurige achtergrond"
 
 #: ../game/screen_sing.cc:85
 msgid "Loading user interface..."
-msgstr ""
+msgstr "Laden gebruikersinterface..."
 
 #: ../game/screen_sing.cc:94
 msgid "Loading instruments..."
-msgstr ""
+msgstr "Laden instrumenten..."
 
 #: ../game/screen_sing.cc:116
-#, fuzzy
 msgid "Loading menu..."
-msgstr "Hoofdmenu..."
+msgstr "Laden menu..."
 
 #: ../game/screen_sing.cc:118
 msgid "Resume"
-msgstr ""
+msgstr "Hervatten"
 
 #: ../game/screen_sing.cc:118
-#, fuzzy
 msgid "Back to performing!"
-msgstr "Opvoering starten!"
+msgstr "Terug naar opvoering!"
 
 #: ../game/screen_sing.cc:119
 msgid "Restart"
-msgstr ""
+msgstr "Herstart"
 
 #: ../game/screen_sing.cc:119
 msgid ""
 "Start the song\n"
 "from the beginning"
 msgstr ""
+"Start het lied\n"
+"vanaf het begin"
 
 #: ../game/screen_sing.cc:132
 msgid ""
 "Change vocal track\n"
 "(restart required)"
 msgstr ""
+"Verander van zanglijn\n"
+"(herstart vereist)"
 
 #: ../game/screen_sing.cc:137
 msgid "Exit to song browser"
-msgstr ""
+msgstr "Ga naar liedjesverkenner"
 
 #: ../game/screen_sing.cc:141
 msgid "Finalizing..."
-msgstr ""
+msgstr "Beëindigen"
 
 #: ../game/screen_sing.cc:146
 msgid "Song contains broken tracks!"
-msgstr ""
+msgstr "Lied bevat kapotte tracks!"
 
 #: ../game/screen_sing.cc:478
 msgid "   ENTER to skip instrumental break"
@@ -271,12 +269,12 @@ msgstr "Rocker"
 #: ../game/database.cc:107
 #: ../game/database.cc:127
 msgid "No Items up to now."
-msgstr ""
+msgstr "Geen item tot nu toe."
 
 #: ../game/database.cc:108
 #: ../game/database.cc:128
 msgid "Be the first to be listed here!"
-msgstr ""
+msgstr "Wees de eerste hier!"
 
 #: ../game/songs.cc:199
 msgid "random order"
@@ -308,77 +306,79 @@ msgstr "gesorteerd op taal"
 
 #: ../game/guitargraph.cc:14
 msgid "Kids"
-msgstr ""
+msgstr "Kinderen"
 
 #: ../game/guitargraph.cc:14
 msgid "Easy"
-msgstr ""
+msgstr "Gemakkelijk"
 
 #: ../game/guitargraph.cc:14
 msgid "Medium"
-msgstr ""
+msgstr "Medium"
 
 #: ../game/guitargraph.cc:14
 msgid "Hard"
-msgstr ""
+msgstr "Moeilijk"
 
 #: ../game/guitargraph.cc:14
 msgid "Expert"
-msgstr ""
+msgstr "Expert"
 
 #: ../game/guitargraph.cc:142
 msgid "Ready!"
-msgstr ""
+msgstr "Klaar!"
 
 #: ../game/guitargraph.cc:154
 msgid "Select track"
-msgstr ""
+msgstr "Selecteer track"
 
 #: ../game/guitargraph.cc:169
 msgid "Select difficulty"
-msgstr ""
+msgstr "Selecteer moeilijkheidsgraad"
 
 #: ../game/guitargraph.cc:172
 msgid "Lefty-mode"
-msgstr ""
+msgstr "Linkse modus"
 
 #: ../game/guitargraph.cc:181
 msgid "ON"
-msgstr ""
+msgstr "AAN"
 
 #: ../game/guitargraph.cc:181
 msgid "OFF"
-msgstr ""
+msgstr "UIT"
 
 #: ../game/guitargraph.cc:182
 msgid "Toggle lefty-mode"
-msgstr ""
+msgstr "Linkse modus aan/uit"
 
 #: ../game/guitargraph.cc:479
 msgid "Streak!"
-msgstr ""
+msgstr "Streak!"
 
 #: ../game/guitargraph.cc:496
 msgid ""
 "God Mode\n"
 "Activated!"
 msgstr ""
+"God Mode\n"
+"Geactiveerd!"
 
 #: ../game/guitargraph.cc:497
 msgid "Mistakes ignored!"
-msgstr ""
+msgstr "Fouten genegeerd!"
 
 #: ../game/guitargraph.cc:1162
 msgid "Drum Fill!"
-msgstr ""
+msgstr "Drum Fill!"
 
 #: ../game/guitargraph.cc:1163
 msgid "God Mode Ready!"
-msgstr ""
+msgstr "God Mode Klaar!"
 
 #: ../game/guitargraph.cc:1168
 msgid "Solo!"
-msgstr ""
+msgstr "Solo!"
 
 #: ../game/screen_paths.cc:24
 msgid ""
@@ -387,14 +387,18 @@ msgid ""
 "as command line parameters and\n"
 "then save them in configuration menu."
 msgstr ""
+"Deze functie is nog niet beschikbaar.\n"
+"Pas de locaties aan door deze toe te voegen\n"
+"als commando parameters en\n"
+"daarna op te slaan in het optie menu."
 
 #: ../game/screen_paths.cc:69
 msgid "Press any key to exit."
-msgstr ""
+msgstr "Druk een toets om dit scherm te verlaten."
 
 #: ../game/screen_paths.cc:74
 msgid "Windows users can also use ConfigureSongDirectory.bat in the bin-directory."
-msgstr ""
+msgstr "Windowsgebruikers kunnen ook gebruik maken van ConfigureSongDirectory.bat in de bin-directory."
 
 #: ../game/screen_audiodevices.cc:55
 msgid ""
@@ -404,22 +408,27 @@ msgid ""
 "all existing audio device configuration.\n"
 "Your other options changes will be saved too."
 msgstr ""
+"Het lijkt erop dat je enkele manuele opties hebt\n"
+"die niet compatibel zijn met deze interface.\n"
+"Opslaan van deze instellingen zal de bestaande\n"
+"opties voor audio-apparaten overschrijven.\n"
+"De andere optiewijzigingen zullen ook opgeslaan worden."
 
 #: ../game/screen_audiodevices.cc:108
 msgid "- Unassigned -"
-msgstr ""
+msgstr "- Niet toegewezen -"
 
 #: ../game/screen_audiodevices.cc:126
 msgid "Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select to cancel. Ctrl + R to reset defaults"
-msgstr ""
+msgstr "Gebruik de pijltjestoetsen om aan te passen. Duw Enter/Start om op te slaan en te testen of Esc/Select om te annuleren. Ctrl + R laadt de standaardopties"
 
 #: ../game/screen_audiodevices.cc:131
 msgid "For advanced device configuration, use command line parameter --audio (use --audiohelp for details)."
-msgstr ""
+msgstr "Voor geavanceerde apparaatinstellingen, gebruik de commandolijnparameter --audio (voor details: --audiohelp)."
 
 #: ../game/screen_audiodevices.cc:186
 msgid "Some devices failed to open!"
-msgstr ""
+msgstr "Openen van sommige apparaten is gefaald!"
 
 #: ../game/screen_players.cc:110
 msgid "No players found!"
@@ -483,318 +492,317 @@ msgstr "Recordscores voor %1%\n"
 
 #: ../game/instrumentgraph.cc:42
 msgid "Rejoin"
-msgstr ""
+msgstr "Terug meedoen"
 
 #: ../game/instrumentgraph.cc:42
 msgid "Change selections"
-msgstr ""
+msgstr "Wijzig selecties"
 
 #: ../game/dancegraph.cc:18
 msgid "Beginner"
-msgstr ""
+msgstr "Beginner"
 
 #: ../game/dancegraph.cc:18
 msgid "Challenge"
-msgstr ""
+msgstr "Daag uit"
 
 #: ../game/dancegraph.cc:260
 msgid "STOP!"
-msgstr ""
+msgstr "STOP!"
 
 #: ../game/configuration.cc:102
 msgid "Enabled"
-msgstr ""
+msgstr "Ingeschakeld"
 
 #: ../game/configuration.cc:102
 msgid "Disabled"
-msgstr ""
+msgstr "Uitgeschakeld"
 
 #: ../game/configuration.cc:106
 #, c-format
 msgid "%d items"
-msgstr ""
+msgstr "%d items"
 
 #: ../game/song.hh:35
-#, fuzzy
 msgid "Guitar"
-msgstr "Afsluiten"
+msgstr "Gitaar"
 
 #: ../game/song.hh:35
 msgid "Coop guitar"
-msgstr ""
+msgstr "Coop gitaar"
 
 #: ../game/song.hh:35
 msgid "Rhythm guitar"
-msgstr ""
+msgstr "Ritmegitaar"
 
 #: ../game/song.hh:35
 msgid "Bass"
-msgstr ""
+msgstr "Bas"
 
 #: ../game/song.hh:35
 msgid "Drums"
-msgstr ""
+msgstr "Drum"
 
 #: ../game/song.hh:35
 msgid "Vocals"
-msgstr ""
+msgstr "Stemmen"
 
 #: ../game/song.hh:35
 msgid "Harmonic 1"
-msgstr ""
+msgstr "Harmonische 1"
 
 #: ../game/song.hh:35
 msgid "Harmonic 2"
-msgstr ""
+msgstr "Harmonische 2"
 
 #: ../game/song.hh:35
 msgid "Harmonic 3"
-msgstr ""
+msgstr "Harmonische 3"
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:3
 msgid "Gameplay settings."
-msgstr ""
+msgstr "Spelopties."
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:4
 msgid "Graphic"
-msgstr ""
+msgstr "Beeld"
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:5
 msgid "Video and rendering settings."
-msgstr ""
+msgstr "Beeld- en renderopties."
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:7
 msgid "Audio-related settings."
-msgstr ""
+msgstr "Geluidgerelateerde opties."
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:9
 msgid "System paths."
-msgstr ""
+msgstr "Systeemlocaties"
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:10
 msgid "Karaoke mode"
-msgstr ""
+msgstr "Karaokemode"
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:11
 msgid "Hide pitch wave, notes and scoring."
-msgstr ""
+msgstr "Verberg toonhoogte, noten en sores."
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:12
 msgid "Pitch waves"
-msgstr ""
+msgstr "Toonhoogte golven"
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:13
 msgid "Enable singing pitch display (when not in karaoke mode)."
-msgstr ""
+msgstr "Toon toonhoogte (indien niet in karaoke modus)."
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:14
 msgid "Theme"
-msgstr ""
+msgstr "Thema"
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:15
 msgid "Name of the theme to use or absolute path to theme folder."
-msgstr ""
+msgstr "Naam van het thema of absoluut pad naar themamap."
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:16
 msgid "Keyboard as guitar"
-msgstr ""
+msgstr "Keyboard als gitaar"
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:17
 msgid "Enable keyboard as guitar (Frets on Fire mode)."
-msgstr ""
+msgstr "Gebruik keyboard als gitaar (Frets on Fire modus)."
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:18
 msgid "Keyboard as drumkit"
-msgstr ""
+msgstr "Keyboard als drumstel"
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:19
 msgid "Enable keyboard as drumkit."
-msgstr ""
+msgstr "Gebruik keyboard als drumstel."
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:20
 msgid "Keyboard as dance pad"
-msgstr ""
+msgstr "Keyboard als dance pad"
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:21
 msgid "Enable keyboard as dance pad."
-msgstr ""
+msgstr "Gebruik keyboard als dance pad."
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:22
 msgid "Joystick configuration"
-msgstr ""
+msgstr "Joystickinstellingen"
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:23
 msgid "Force joystick to some kind of instrument."
-msgstr ""
+msgstr "Forceer joystick als een soort instrument."
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:24
 msgid "Hardware MIDI input device"
-msgstr ""
+msgstr "Hardware MIDI invoerapparaat"
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:25
 msgid "Part of sound card name or its number or empty to use the first available device. Used currently for MIDI drum controllers."
-msgstr ""
+msgstr "Deel van de geluidskaartnaam of zijn nummer of leeg om het eerste beschikbare apparaat te gebruiken. Momenteel gebruikt voor MIDI drum controllers."
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:26
 msgid "Windowed width"
-msgstr ""
+msgstr "Breedte in venstermodus"
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:27
 msgid "The width of the window."
-msgstr ""
+msgstr "De breedte van het venster."
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:28
 msgid "Windowed height"
-msgstr ""
+msgstr "Hoogte in venstermodus"
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:29
 msgid "The height of the window."
-msgstr ""
+msgstr "De hoogte van het venster."
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:30
 msgid "Fullscreen mode"
-msgstr ""
+msgstr "Fullscreen modus"
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:31
 msgid "Enable fullscreen mode on startup."
-msgstr ""
+msgstr "Gebruik fullscreen modus vanaf het starten."
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:32
-#, fuzzy
 msgid "Video playback"
-msgstr "Audio weergave..."
+msgstr "Video weergave..."
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:33
 msgid "Allows completely disabling background videos. It is recommended to leave this enabled as Performous will still smoothly fade out the video if your computer is not fast enough."
-msgstr ""
+msgstr "Staat je toe de achtergrondvideo's volledig af te zetten. Het is aangeraden om dit aan te laten aangezien Performous de video zacht zal uitfaden als je computer niet snel genoeg is."
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:34
 msgid "Webcam background"
-msgstr ""
+msgstr "Webcam achtergrond"
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:35
 msgid "Performous can try to use webcam as a background video. You can disable it if it annoys you."
-msgstr ""
+msgstr "Performous kan een webcam als achtergrond proberen te gebruiken. Je kan dit afzetten als dit jou ergert."
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:36
 msgid "Webcam id"
-msgstr ""
+msgstr "Webcam id"
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:37
 msgid "Use -1 to autodetect or a number starting from 0 to choose specific device."
-msgstr ""
+msgstr "Gebruik -1 om automatisch te detecteren of een nummer vanaf 0 om een specifiek apparaat te kiezen."
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:38
 msgid "3D notes"
-msgstr ""
+msgstr "3D noten"
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:39
 msgid "Draw instrument notes as 3-dimensional objects. May hurt performance on older hardware."
-msgstr ""
+msgstr "Teken instrumentnoten als 3-dimensionale objecten. Kan een negatieve invloed hebben op prestaties op oudere hardware."
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:40
 msgid "SVG quality"
-msgstr ""
+msgstr "SVG-kwaliteit"
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:41
 msgid "Larger numbers cause vector graphics to be rendered in higher resolution. Decrease this to make navigating in menus faster."
-msgstr ""
+msgstr "Grotere getallen zorgen voor het renderen van vectorafbeeldingen in hogere resolutie. Verlaag dit om het navigeren in menu's vlugger te maken."
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:42
 msgid "Text quality"
-msgstr ""
+msgstr "Tekstkwaliteit"
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:43
 msgid "Larger numbers cause text to be rendered in higher resolution. Decrease this to make everything a little faster."
-msgstr ""
+msgstr "Grotere getallen zorgen voor een rendering in hogere resolutie. Verlaag dit om alles wat vlugger te maken."
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:44
 msgid "Benchmark mode"
-msgstr ""
+msgstr "Benchmark modus"
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:45
 msgid "Framerate limit of 100 FPS is removed and the game instead renders at full speed. FPS values are printed to console. Please note that the display drivers may still limit the rendering speed to the screen refresh rate."
-msgstr ""
+msgstr "De framerate limiet van 100 FPS is verwijderd en het spel rendert nu op volle snelheid. FPS waarden worden geprint in de console. De beeldkaartdrivers kunnen nog altijd de rendersnelheid beperking tot de refresh rate van het scherm"
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:46
 msgid "Suggested latency"
-msgstr ""
+msgstr "Voorgestelde latency"
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:47
 msgid "This is a hint for the audio engine about the desired latency. Set this as low as possible while retaining clear audio playback. Requires restart."
-msgstr ""
+msgstr "Dit is een suggestie voor de latency voor de geluidverwerking. Zet dit zo laag mogelijk terwijl je goed geluid behoudt. Vereist een herstart."
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:48
 msgid "Audio/video latency"
-msgstr ""
+msgstr "Geluid/video latency"
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:49
 msgid "Affects all modes. Use negative value if your display input lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal. This should be set so that the notes pass the cursor at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while performing."
-msgstr ""
+msgstr "Heeft effect op alle modussen. Gebruik negatieve waarden als je scherminvoervertraging groter is dan de geluidskaard outputlatency, gebruik positieve waarden in het omgekeerde geval en nul als ze gelijk zijn. Dit zou zo gezet moeten worden dat de noten de cursor passeren op hetzelfde moment dat het geluid te horen is. Gebruik Ctrl+F1/F2 om aan te passen tijdens het opvoeren."
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:50
 msgid "Audio round-trip latency"
-msgstr ""
+msgstr "Geluid round-trip latency"
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:51
 msgid "Affects singing only. The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. While performing, press Ctrl+S for synth mode and adjust with Ctrl+F3/F4."
-msgstr ""
+msgstr "Heeft enkel effect tijdens het zingen. De tijd die het Performousgeluid nodig heeft om de luidsprekers te bereiken, naar de microfoons te vliegen en de ganse weg terug tot Performous het opvangt en analyseert. Gebruik Ctrl+S voor synth mode en Ctrl+F3/F4 om aan te passen tijdens het opvoeren."
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:52
 msgid "Audio/controller latency"
-msgstr ""
+msgstr "Geluid/controller latency"
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:53
 msgid "Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to adjust while performing."
-msgstr ""
+msgstr "Heeft enkel effect op instrumenten en dansen. De totale USB- (gitaar of dancepad) latency, gecombineerd met de geluidlatency. Aanpassen zodat je de noten goed kunt treffen tijdens het spelen op gehoor (zonder te kijken op het scherm). Gebruik Ctrl+F5/F6 om aan te passen tijdens het opvoeren."
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:54
 msgid "Audio devices"
-msgstr ""
+msgstr "Geluidsapparaten"
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:55
 msgid "List of audio devices to try."
-msgstr ""
+msgstr "Lijst van te proberen geluidsapparaten."
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:56
 msgid "Menu volume"
-msgstr ""
+msgstr "Menu volume"
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:57
 msgid "The volume level of menus, song previews and jukebox mode."
-msgstr ""
+msgstr "Het volumeniveau voor menu's, liedvoorbeelden en jukebox modus."
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:58
 msgid "Music volume"
-msgstr ""
+msgstr "Muziekvolume"
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:59
 msgid "The ingame music volume. Values above 90 are not recommended as distortion may occur."
-msgstr ""
+msgstr "Volume voor muziek tijdens het spel. Waarden boven 90 zijn niet aangeraden aangezien dan vervorming kan voorkomen."
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:60
 msgid "Failure volume"
-msgstr ""
+msgstr "Foutboodschapvolume"
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:61
 msgid "The ingame fail sound volume. Values above 90 are not recommended as distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
-msgstr ""
+msgstr "Volume voor foutboodschappen tijdens het spel. Waarden boven 90 zijn niet aangeraden aangezien dan vervorming kan voorkomen. 11 is luider dan 10, maar het gaat tot 100."
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:62
 msgid "Song folders"
-msgstr ""
+msgstr "Mappen voor liedjes"
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:63
 msgid "Where to recursively look for songs. DATADIR at the beginning means all Performous data folders."
-msgstr ""
+msgstr "Locatie om recursief te zoeken naar liedjes. DATADIR in het begin betekent alle Performous mappen voor data."
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:64
 msgid "Base folders for data"
-msgstr ""
+msgstr "Basismappen voor data"
 
 #: /tmp/.private/frekla/xml2gettext.dzsQDs5o3b:65
 msgid "System defaults are included automatically. Additional paths can be added here."
-msgstr ""
+msgstr "Systeem standaardinstellingen worden automatisch geladen. Extra locaties kunnen hier toegevoegd worden."
 
 #~ msgid "Miscellaneous..."
 #~ msgstr "Diversen..."
+
