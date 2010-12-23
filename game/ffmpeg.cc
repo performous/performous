@@ -101,7 +101,7 @@ void FFmpeg::open() {
 	}
 	// Setup software scaling context for YUV to RGB conversion
 	if (videoStream != -1 && decodeVideo) {
-		width = (pVideoCodecCtx->width+15)&~15;
+		width = pVideoCodecCtx->width;
 		height = pVideoCodecCtx->height;
 		img_convert_ctx = sws_getContext(
 		  pVideoCodecCtx->width, pVideoCodecCtx->height, pVideoCodecCtx->pix_fmt,
