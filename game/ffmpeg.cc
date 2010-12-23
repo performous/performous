@@ -102,7 +102,7 @@ void FFmpeg::open() {
 	// Setup software scaling context for YUV to RGB conversion
 	if (videoStream != -1 && decodeVideo) {
 		width = (pVideoCodecCtx->width+15)&~15;
-		height = (pVideoCodecCtx->height+15)&~15;
+		height = pVideoCodecCtx->height;
 		img_convert_ctx = sws_getContext(
 		  pVideoCodecCtx->width, pVideoCodecCtx->height, pVideoCodecCtx->pix_fmt,
 		  width, height, PIX_FMT_RGB24,
@@ -243,7 +243,7 @@ void FFmpeg::decodeNextFrame() {
 				if (frameFinished) {
 					// Convert into RGB and scale the data
 					int w = (pVideoCodecCtx->width+15)&~15;
-					int h = (pVideoCodecCtx->height+15)&~15;
+					int h = pVideoCodecCtx->height;
 					std::vector<uint8_t> buffer(w * h * 3);
 					{
 						uint8_t* data = &buffer[0];
