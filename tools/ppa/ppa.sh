@@ -17,7 +17,10 @@ export DEBEMAIL="`gpg --list-keys | grep uid | sed 's/ *(.*)//; s/>.*//; s/.*[:<
 # Config
 PKG="performous"
 VERSIONCOMMON="0.6.1-99+git"`date '+%Y%m%d'`"~ppa1"
-SUITES="lucid maverick"
+BASEPKGVERSION="0.6.1" # base version of the base package
+BASEPKGADD="-1" # additional version suffix of the base package
+BASEURL="http://archive.ubuntu.com/ubuntu/pool/universe/p/performous"
+SUITES="lucid maverick natty"
 GITURL="git://git.performous.org/gitroot/performous/performous"
 DESTINATIONPPA="ppa:performous-team/ppa"
 
@@ -25,11 +28,18 @@ TEMPDIR=`mktemp -dt $PKG-ppa.XXXXXXXXXX`
 SOURCEDIR="$TEMPDIR/git"
 PPAPATCHDIR="`pwd`"
 
+	# Print a status message
+	status()
+	{
+		echo -e "\e[0;31m"$@"\e[0m"
+	}
+
 	# Copy the new files for source package
 	CopyNewFiles()
 	{
 		COPYCMD="cp -r"
 		$COPYCMD "$1/CMakeLists.txt" "$2"
+		$COPYCMD "$1/README.txt" "$2"
 		$COPYCMD "$1/cmake" "$2"
 		$COPYCMD "$1/data" "$2"
 		$COPYCMD "$1/docs" "$2"
@@ -37,69 +47,75 @@ PPAPATCHDIR="`pwd`"
 		$COPYCMD "$1/lang" "$2"
 		$COPYCMD "$1/themes" "$2"
 		$COPYCMD "$1/tools" "$2"
-		rm -rf "$2"/libs   # Old libs dir not used anymore
-		rm -rf "$2/editor" # Editor removed
 	}
 
 cd "$TEMPDIR"
+status "Tempdir: `pwd`"
 
 # Figure out the version of the "old" official package
-version=`apt-cache showsrc $PKG | sed -n 's/^Version: \(.*\)/\1/p' | head -n 1`
-echo "Working on $PKG $version"
+status "Working on $PKG ${BASEPKGVERSION}${BASEPKGADD}"
 
-mkdir -p $PKG-$version
-cd $PKG-$version
+mkdir -p $PKG-$BASEPKGVERSION
+cd $PKG-$BASEPKGVERSION
 
 # Download the "old" source package we use as a base
-apt-get --download-only source $PKG
+wget $BASEURL/${PKG}_${BASEPKGVERSION}${BASEPKGADD}.dsc
+wget $BASEURL/${PKG}_${BASEPKGVERSION}.orig.tar.bz2
+wget $BASEURL/${PKG}_${BASEPKGVERSION}${BASEPKGADD}.debian.tar.bz2
 
 # Download fresh version from git
-echo "Fetch from git..."
+status "Fetch from git..."
 git clone "$GITURL" "$SOURCEDIR"
 
 # Get some info from git for changelog
-pushd .
-cd "$SOURCEDIR"
-# 10 chars from the HEAD commit hash
-headcommit=`git log | head -n 1 | cut --delimiter=" " -f 2 | cut -c 1-10`
-popd
+(
+	cd "$SOURCEDIR"
+	# 10 chars from the HEAD commit hash
+	headcommit=`git log | head -n 1 | cut --delimiter=" " -f 2 | cut -c 1-10`
+)
 
 # Loop suites
+status "Do each suite..."
 for suite in $SUITES ; do
 	newversion="${VERSIONCOMMON}~${suite}"
 	rm -rf $suite; mkdir $suite
-	cd $suite
-	ln ../${PKG}_* .
-	dpkg-source -x ${PKG}_${version}.dsc extracted
-	cd extracted
-		# Copy new files
-		echo "Copy new files..."
-		CopyNewFiles "$SOURCEDIR" .
-		# Apply patches
-		echo "Apply some patches..."
-		cp "$PPAPATCHDIR/"*.patch .
-		patch -p0 < *.patch
-		rm *.patch
+	(
+		cd $suite
+		status "Extracting source for $suite..."
+		ln ../${PKG}_* .
+		dpkg-source -x ${PKG}_${BASEPKGVERSION}${BASEPKGADD}.dsc extracted
+		(
+			cd extracted
 
-		# Hack hack
-		echo "// Dummy" > game/screen_configuration.hh
-		echo "// Dummy" > game/screen_configuration.cc
+			# Copy new files
+			status "Copy new files..."
+			CopyNewFiles "$SOURCEDIR" .
 
-		# Do changelog
-		# Dch complains about unknown suites
-		yes '' | dch -b -v $newversion -D $suite "Upload development version from Git $headcommit to Ubuntu PPA for $suite."
-		if [ -f debian/source/format -a ! -f debian/patches/series ] ; then
-			rm debian/source/format
-		fi
-		# Build package
-		#dpkg-buildpackage -sa -S    # Full .orig.gz
-		dpkg-buildpackage -sd -S    # Only .diff.gz
-	cd ..
-	# Upload to PPA
-	dput $DESTINATIONPPA ${PKG}_${newversion}_source.changes
-	cd ..
+			# Apply patches
+			status "Apply some patches..."
+			cp "$PPAPATCHDIR/"*.patch .
+			for p in *.patch; do
+				patch -p0 < "$p"
+			done
+			rm *.patch
+
+			# Hack hack
+			#TODO: Get rid of these
+			status "Apply some hacks..."
+			rm -rf debian/patches # Delete troublesome patch
+
+			# Do changelog
+			# Dch complains about unknown suites
+			yes '' | dch -b -v $newversion -D $suite "Upload development version from Git $headcommit to Ubuntu PPA for $suite."
+
+			# Build package
+			#dpkg-buildpackage -sa -S    # Full .orig.gz
+			dpkg-buildpackage -sd -S    # Only .diff.gz
+		)
+		# Upload to PPA
+		dput $DESTINATIONPPA ${PKG}_${newversion}_source.changes
+	)
 done
-cd ..
 
-echo "Files were kept in $TEMPDIR"
+status "Files were kept in $TEMPDIR"
 
