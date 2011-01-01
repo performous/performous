@@ -208,4 +208,20 @@
 			<button id="9" value="start" />
 		</mapping>
 	</controller>
+	<controller type="dancepad" name="DANCEPAD_THRUST">
+		<description>Thrustmaster dancepad</description>
+		<regexp match="DDR2SET DDR2SET" />
+		<mapping>
+			<button id="0" value="down" />
+			<button id="1" value="right" />
+			<button id="2" value="up-right" />
+			<button id="3" value="left" />
+			<button id="4" value="up" />
+			<button id="5" value="up-left" />
+			<button id="6" value="down-left" />
+			<button id="7" value="down-right" />
+			<button id="8" value="start" />
+			<button id="9" value="select" />
+		</mapping>
+	</controller>
 </controllers>

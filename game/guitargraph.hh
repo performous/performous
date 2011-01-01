@@ -10,6 +10,7 @@ class Song;
 struct Chord {
 	double begin, end;
 	bool fret[5];
+	bool fret_tom[5];
 	Duration const* dur[5];
 	int polyphony;
 	bool tappable;
@@ -19,6 +20,7 @@ struct Chord {
 	double releaseTimes[5];
 	Chord(): begin(), end(), polyphony(), tappable(), status(), score() {
 		std::fill(fret, fret + 5, false);
+		std::fill(fret_tom, fret_tom + 5, false);
 		std::fill(dur, dur + 5, static_cast<Duration const*>(NULL));
 		std::fill(hitAnim, hitAnim + 5, AnimValue(0.0, 1.5));
 		std::fill(releaseTimes, releaseTimes + 5, 0.0);
@@ -122,6 +124,7 @@ class GuitarGraph: public InstrumentGraph {
 
 	// Chords & notes
 	void updateChords();
+	bool updateTom(unsigned int tomTrack, unsigned int fretId); // returns true if this tom track exists
 	double getNotesBeginTime() const { return m_chords.front().begin; }
 	typedef std::vector<Chord> Chords;
 	Chords m_chords;
@@ -146,6 +149,7 @@ class GuitarGraph: public InstrumentGraph {
 	double m_soloScore; /// score during solo
 	bool m_solo; /// are we currently playing a solo
 	bool m_practHold; /// true if holding a chord during practice
+	bool m_hasTomTrack; /// true if the track has at least one tom track
 	double m_whammy; /// whammy value for pitch shift
 };
 
