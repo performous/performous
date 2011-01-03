@@ -733,10 +733,12 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 		}
 		case SDL_JOYAXISMOTION:
 		{
+			//FIXME: XML axis config is really needed so that these horrible
+			//       quirks for RB XBOX360 and GH XPLORER guitars can be removed
 			joy_id = _e.jaxis.which;
 			InputDevPrivate& dev = devices.find(joy_id)->second;
 			if(!dev.assigned()) return false;
-			if (_e.jaxis.axis == 5 || _e.jaxis.axis == 6 || _e.jaxis.axis == 1) {
+			if (dev.name() != "GUITAR_GUITARHERO_XPLORER" && (_e.jaxis.axis == 5 || _e.jaxis.axis == 6 || _e.jaxis.axis == 1)) {
 				event.type = input::Event::PICK;
 				// Direction
 				if(_e.jaxis.value > 0 ) {
@@ -749,7 +751,8 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 					dev.addEvent(event);
 				}
 				break;
-			} else if (_e.jaxis.axis == 2 || (dev.name() == "GUITAR_ROCKBAND_XBOX360" && _e.jaxis.axis == 4)) {
+			} else if ((dev.name() != "GUITAR_GUITARHERO_XPLORER" && _e.jaxis.axis == 2 )
+			  || (dev.name() == "GUITAR_ROCKBAND_XBOX360" && _e.jaxis.axis == 4)) {
 				// Whammy bar (special case for XBox RB guitar
 				for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
 					event.pressed[i] = dev.pressed(i);
@@ -764,8 +767,9 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 				}
 				dev.addEvent(event);
 				break;
-			} else if (dev.name() == "GUITAR_ROCKBAND_XBOX360" && _e.jaxis.axis == 3) {
-				// XBox RB guitar's Tilt sensor
+			} else if ((dev.name() == "GUITAR_ROCKBAND_XBOX360" && _e.jaxis.axis == 3)
+			  || (dev.name() == "GUITAR_GUITARHERO_XPLORER" && _e.jaxis.axis == 2)) {
+				// Tilt sensor as an axis on some guitars
 				for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
 					event.pressed[i] = dev.pressed(i);
 				}
