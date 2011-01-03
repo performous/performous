@@ -732,25 +732,27 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 			}
 		}
 		case SDL_JOYAXISMOTION:
+		{
 			joy_id = _e.jaxis.which;
-			if(!devices.find(joy_id)->second.assigned()) return false;
+			InputDevPrivate& dev = devices.find(joy_id)->second;
+			if(!dev.assigned()) return false;
 			if (_e.jaxis.axis == 5 || _e.jaxis.axis == 6 || _e.jaxis.axis == 1) {
 				event.type = input::Event::PICK;
 				// Direction
 				if(_e.jaxis.value > 0 ) {
 					// down
 					event.button = 0;
-					devices.find(joy_id)->second.addEvent(event);
+					dev.addEvent(event);
 				} else if(_e.jaxis.value < 0 ) {
 					// up
 					event.button = 1;
-					devices.find(joy_id)->second.addEvent(event);
+					dev.addEvent(event);
 				}
 				break;
-			} else if (_e.jaxis.axis == 2 || (devices.find(joy_id)->second.name() == "GUITAR_ROCKBAND_XBOX360" && _e.jaxis.axis == 4)) {
+			} else if (_e.jaxis.axis == 2 || (dev.name() == "GUITAR_ROCKBAND_XBOX360" && _e.jaxis.axis == 4)) {
 				// Whammy bar (special case for XBox RB guitar
 				for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
-					event.pressed[i] = devices.find(joy_id)->second.pressed(i);
+					event.pressed[i] = dev.pressed(i);
 				}
 				event.button = input::WHAMMY_BUTTON;
 				if (_e.jaxis.value > 0) {
@@ -760,12 +762,12 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 					event.type = input::Event::RELEASE;
 					event.pressed[event.button] = false;
 				}
-				devices.find(joy_id)->second.addEvent(event);
+				dev.addEvent(event);
 				break;
-			} else if (devices.find(joy_id)->second.name() == "GUITAR_ROCKBAND_XBOX360" && _e.jaxis.axis == 3) {
+			} else if (dev.name() == "GUITAR_ROCKBAND_XBOX360" && _e.jaxis.axis == 3) {
 				// XBox RB guitar's Tilt sensor
 				for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
-					event.pressed[i] = devices.find(joy_id)->second.pressed(i);
+					event.pressed[i] = dev.pressed(i);
 				}
 				event.button = input::GODMODE_BUTTON;
 				if (_e.jaxis.value < -2) {
@@ -775,13 +777,14 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 					event.type = input::Event::RELEASE;
 					event.pressed[event.button] = false;
 				}
-				devices.find(joy_id)->second.addEvent(event);
+				dev.addEvent(event);
 				break;
 			} else {
 				return false;
 			}
 			// we should never be there
 			break;
+		}
 		case SDL_JOYHATMOTION:
 			joy_id = _e.jhat.which;
 
