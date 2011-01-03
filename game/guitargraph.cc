@@ -327,7 +327,8 @@ void GuitarGraph::engine() {
 			break;
 
 		// If the songs hasn't yet started, we want key presses to bring join menu back (not pause menu)
-		} else if (time < -2 && ev.type == input::Event::PRESS) {
+		} else if (time < -2 && ev.type == input::Event::PRESS
+		  && ev.button != input::WHAMMY_BUTTON && ev.button != input::GODMODE_BUTTON) {
 			setupJoinMenu();
 			m_menu.open();
 			break;
