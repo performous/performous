@@ -244,17 +244,12 @@ void SvgTxtTheme::draw(std::vector<TZoomText> const& _text, float alpha) {
 		TexCoords tex;
 		double factor = _text[i].factor;
 		Color color;
-		glutil::PushMatrix pm;
 		if (factor == 1.0) color = Color(1.0f, 1.0f, 1.0f, alpha);
 		else {
 			color = Color(m_text_highlight.fill_col.r, m_text_highlight.fill_col.g, m_text_highlight.fill_col.b, alpha);
-			glTranslatef(0.0f, 0.0f, factor - 1.0f);
+			dim.fixedWidth(dim.w() * factor);
 		}
 		{
-			glutil::PushMatrixMode ppm(GL_PROJECTION);
-			glTranslatef(2.0f * dim.xc(), -4.0f * dim.yc(), 0.0f);
-			dim.middle(0.0f).center(0.0f);
-			glutil::PushMatrixMode(GL_MODELVIEW);
 			glutil::Color c(color);
 			m_opengl_text[i].draw(dim, tex);
 		}

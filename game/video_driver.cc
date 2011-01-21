@@ -147,7 +147,7 @@ void Window::resize() {
 	// Set model-view matrix
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	const float f = 0.8f; // Add some margin in front of nearplane (needed for 3D effects and OSX to avoid clipping)
+	const float f = 0.9f; // Avoid texture surface being exactly at the near plane (MacOSX fix)
 	glFrustum(-0.5f * f, 0.5f * f, 0.5f * h * f, -0.5f * h * f, f * near_, far_);
 	glTranslatef(0.0f, 0.0f, -near_);  // So that z = 0.0f is still on monitor surface
 	// Check for OpenGL errors
