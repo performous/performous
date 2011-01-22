@@ -26,6 +26,7 @@ namespace TrackName {
 	const std::string GUITAR_COOP = "Coop guitar";
 	const std::string GUITAR_RHYTHM = "Rhythm guitar";
 	const std::string BASS = "Bass";
+	const std::string KEYBOARD = "Keyboard";
 	const std::string DRUMS = "Drums";
 	const std::string LEAD_VOCAL = "Vocals";
 	const std::string HARMONIC_1 = "Harmonic 1";

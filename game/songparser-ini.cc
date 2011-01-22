@@ -96,6 +96,7 @@ void SongParser::iniParseHeader() {
 	boost::regex audiofile_guitar("(guitar\\.ogg)$", boost::regex_constants::icase);
 	boost::regex audiofile_drums("(drums\\.ogg)$", boost::regex_constants::icase);
 	boost::regex audiofile_bass("(rhythm\\.ogg)$", boost::regex_constants::icase);
+	boost::regex audiofile_keyboard("(keyboard\\.ogg)$", boost::regex_constants::icase);
 	boost::regex audiofile_vocals("(vocals\\.ogg)$", boost::regex_constants::icase);
 	boost::regex audiofile_other("(.*\\.ogg)$", boost::regex_constants::icase);
 	boost::cmatch match;
@@ -112,6 +113,8 @@ void SongParser::iniParseHeader() {
 			testAndAdd(s, TrackName::GUITAR, name);
 		} else if (regex_match(name.c_str(), match, audiofile_bass)) {
 			testAndAdd(s, TrackName::BASS, name);
+		} else if (regex_match(name.c_str(), match, audiofile_keyboard)) {
+			testAndAdd(s, TrackName::KEYBOARD, name);
 		} else if (regex_match(name.c_str(), match, audiofile_drums)) {
 			testAndAdd(s, TrackName::DRUMS, name);
 		} else if (regex_match(name.c_str(), match, audiofile_vocals)) {
