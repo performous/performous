@@ -53,6 +53,7 @@ namespace {
 		else if (name == "REAL_KEYS_H") return false; // TODO: RB3 pro keyboard hard track
 		else if (name == "REAL_KEYS_M") return false; // TODO: RB3 pro keyboard medium track
 		else if (name == "REAL_KEYS_E") return false; // TODO: RB3 pro keyboard easy track
+		else if (name == "REAL_BASS") return false; // TODO: RB3 pro bass track
 		else if (name == "REAL_GUITAR") return false; // TODO: RB3 pro guitar 17 frets (Mustang) track
 		else if (name == "REAL_GUITAR_22") return false; // TODO: RB3 pro guitar 22 frets (Squier) track
 		else return false;
