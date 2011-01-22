@@ -42,6 +42,8 @@ namespace {
 		else if (name == "DRUM") name = TrackName::DRUMS;
 		else if (name == "DRUMS") name = TrackName::DRUMS;
 		else if (name == "BASS") name = TrackName::BASS;
+		else if (name == "KEYS") return false; // TODO: RB3 5 lane keyboard track
+		else if (name == "REAL_KEYS_X") return false; // TODO: RB3 pro keyboard track
 		else if (name == "GUITAR") name = TrackName::GUITAR;
 		else if (name == "VOCALS") name = TrackName::LEAD_VOCAL;
 		else if (name == "HARM1") name = TrackName::HARMONIC_1;
