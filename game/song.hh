@@ -93,7 +93,8 @@ class Song: boost::noncopyable {
 	DanceTracks danceTracks; ///< dance tracks
 	bool hasDance() const { return !danceTracks.empty(); }
 	bool hasDrums() const { return instrumentTracks.find(TrackName::DRUMS) != instrumentTracks.end(); }
-	bool hasGuitars() const { return instrumentTracks.size() - hasDrums(); }
+	bool hasKeyboard() const { return instrumentTracks.find(TrackName::KEYBOARD) != instrumentTracks.end(); }
+	bool hasGuitars() const { return instrumentTracks.size() - hasDrums() - hasKeyboard(); }
 	bool hasVocals() const { return !vocalTracks.empty(); }
 	std::string path; ///< path of songfile
 	std::string filename; ///< name of songfile

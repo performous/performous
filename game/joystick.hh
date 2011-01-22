@@ -18,7 +18,7 @@
 #endif
 
 namespace input {
-	enum DevType { GUITAR, DRUMS, DANCEPAD };
+	enum DevType { GUITAR, DRUMS, KEYBOARD, DANCEPAD };
 	enum NavButton { NONE, UP, DOWN, LEFT, RIGHT, START, SELECT, CANCEL, PAUSE, MOREUP, MOREDOWN, VOLUME_UP, VOLUME_DOWN };
 
 	static const std::size_t BUTTONS = 10;
@@ -37,6 +37,14 @@ namespace input {
 	static const int BLUE_TOM_BUTTON = 3;
 	static const int GREEN_TOM_BUTTON = 4;
 	static const int ORANGE_TOM_BUTTON = 5;
+	// Keyboard buttons
+	static const int C_BUTTON = 0;
+	static const int D_BUTTON = 1;
+	static const int E_BUTTON = 2;
+	static const int F_BUTTON = 3;
+	static const int G_BUTTON = 4;
+	//static const int GODMODE_BUTTON = 5;
+	//static const int WHAMMY_BUTTON = 6;
 	// Dance buttons
 	static const int LEFT_DANCE_BUTTON = 0;
 	static const int DOWN_DANCE_BUTTON = 1;
@@ -73,7 +81,8 @@ namespace input {
 	namespace detail {
 		static unsigned int KEYBOARD_ID = UINT_MAX;
 		static unsigned int KEYBOARD_ID2 = KEYBOARD_ID-1;
-		static unsigned int KEYBOARD_ID3 = KEYBOARD_ID-2; // Three ids needed for keyboard guitar/drumkit/dancepad
+		static unsigned int KEYBOARD_ID3 = KEYBOARD_ID-2;
+		static unsigned int KEYBOARD_ID4 = KEYBOARD_ID-3; // Four ids needed for keyboard guitar/drumkit/dancepad/keyboard
 
 		class InputDevPrivate {
 		  public:
@@ -147,6 +156,7 @@ namespace input {
 				if (it->first == detail::KEYBOARD_ID && !config["game/keyboard_guitar"].b()) continue;
 				if (it->first == detail::KEYBOARD_ID2 && !config["game/keyboard_drumkit"].b()) continue;
 				if (it->first == detail::KEYBOARD_ID3 && !config["game/keyboard_dancepad"].b()) continue;
+				if (it->first == detail::KEYBOARD_ID4 && !config["game/keyboard_keyboard"].b()) continue;
 				if (!it->second.assigned() && it->second.type_match(_type)) {
 					m_device_id = it->first;
 					it->second.assign();
@@ -161,7 +171,7 @@ namespace input {
 		bool tryPoll(Event& _e) { return detail::devices.find(m_device_id)->second.tryPoll(_e); };
 		void addEvent(Event _e) { detail::devices.find(m_device_id)->second.addEvent(_e); };
 		bool pressed(int _button) { return detail::devices.find(m_device_id)->second.pressed(_button); }; // Current state
-		bool isKeyboard() const { return (m_device_id == detail::KEYBOARD_ID || m_device_id == detail::KEYBOARD_ID2 || m_device_id == detail::KEYBOARD_ID3); };
+		bool isKeyboard() const { return (m_device_id == detail::KEYBOARD_ID || m_device_id == detail::KEYBOARD_ID2 || m_device_id == detail::KEYBOARD_ID3 || m_device_id == detail::KEYBOARD_ID4); };
 		DevType getDevType() const { return m_dev_type; }
 	  private:
 		unsigned int m_device_id; // should be some kind of reference
