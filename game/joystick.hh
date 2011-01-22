@@ -189,17 +189,18 @@ namespace input {
 	}
 
 #ifdef USE_PORTMIDI
+
 	// Warning: MidiDrums should be instanciated after Window (that load joysticks)
 	class MidiDrums {
 	public:
 		static bool enabled() { return true; }
 		MidiDrums();
 		void process();
+		typedef std::map<unsigned, unsigned> Map;
 	private:
 		pm::Input stream;
 		unsigned int devnum;
 		Event event;
-		typedef std::map<unsigned, unsigned> Map;
 		Map map;
 	};
 #else

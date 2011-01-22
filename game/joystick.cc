@@ -5,83 +5,64 @@
 
 input::Instruments g_instruments;
 
+#include <libxml++/libxml++.h>
+#include "fs.hh"
+
+namespace {
+	struct XMLError {
+		XMLError(xmlpp::Element& e, std::string msg): elem(e), message(msg) {}
+		xmlpp::Element& elem;
+		std::string message;
+	};
+	std::string getAttribute(xmlpp::Element& elem, std::string const& attr) {
+		xmlpp::Attribute* a = elem.get_attribute(attr);
+		if (!a) throw XMLError(elem, "attribute " + attr + " not found");
+		return a->get_value();
+	}
+}
+
 #ifdef USE_PORTMIDI
+
+void readConfig(input::MidiDrums::Map& map, fs::path const& file) {
+	if (!fs::exists(file)) {
+		std::clog << "controllers/info: Skipping " << file << " (not found)" << std::endl;
+		return;
+	}
+	std::clog << "controllers/info: Parsing " << file << std::endl;
+	xmlpp::DomParser domParser(file.string());
+	try {
+		xmlpp::NodeSet n = domParser.get_document()->get_root_node()->find("/mididrums/note");
+		for (xmlpp::NodeSet::const_iterator nodeit = n.begin(), end = n.end(); nodeit != end; ++nodeit) {
+			xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**nodeit);
+			int id = boost::lexical_cast<int>(getAttribute(elem, "id"));
+			std::string value = getAttribute(elem, "value");
+			std::string name = getAttribute(elem, "name");
+
+			// lets erase old mapping for this note
+			map.erase(id);
+
+			if(value == "kick") map[id] = input::KICK_BUTTON;
+			else if(value == "red") map[id] = input::RED_TOM_BUTTON;
+			else if(value == "yellow") map[id] = input::YELLOW_TOM_BUTTON;
+			else if(value == "blue") map[id] = input::BLUE_TOM_BUTTON;
+			else if(value == "green") map[id] = input::GREEN_TOM_BUTTON;
+			else if(value == "orange") map[id] = input::ORANGE_TOM_BUTTON;
+		}
+	} catch (XMLError& e) {
+		int line = e.elem.get_line();
+		std::string name = e.elem.get_name();
+		throw std::runtime_error(file.string() + ":" + boost::lexical_cast<std::string>(line) + " element " + name + " " + e.message);
+	}
+}
+
 input::MidiDrums::MidiDrums(): stream(pm::findDevice(true, config["game/midi_input"].s())), devnum(0x8000) {
+	readConfig(map, getDefaultConfig(fs::path("/config/mididrums.xml")));
+	readConfig(map, getConfigDir() / "mididrums.xml");
+
 	while (detail::devices.find(devnum) != detail::devices.end()) ++devnum;
 	detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(devnum, detail::InputDevPrivate(g_instruments.find("DRUMS_GUITARHERO")->second)));
 	event.type = Event::PRESS;
 	for (unsigned int i = 0; i < BUTTONS; ++i) event.pressed[i] = false;
-#if 1
-	// these are considered "safe" notes that should work with 95% of all modules
-	// notes below 35 and above 81 are non standardized
-
-	// *) these mappings have been verified with an Alesis DM5 Pro Kit and RockBand 2 songs
-	// the remaining mappings have been guessed...
-
-	static const int DRUM0_ORANGE = 0; // kick drum
-	static const int DRUM1_RED    = 1; // snare drum
-	static const int DRUM2_YELLOW = 2; // hi-hat/ hi-mid tom
-	static const int DRUM3_BLUE   = 3; // low tom/ ride cymbal
-	static const int DRUM4_GREEN  = 4; // low floor tom/ crash cymbal
-
-	map[35] = DRUM0_ORANGE;  // 35 - Acoustic Bass Drum
-	map[36] = DRUM0_ORANGE;  // 36 - Bass Drum 1 *)
-	map[37] = DRUM1_RED;     // 37 - Side Stick
-	map[38] = DRUM1_RED;     // 38 - Acoustic Snare *)
-	// 39 - Hand Clap
-	map[40] = DRUM1_RED;     // 40 - Electric Snare
-	map[41] = DRUM4_GREEN;   // 41 - Low Floor Tom *)
-	map[42] = DRUM2_YELLOW;  // 42 - Closed Hi-Hat
-	// 43 - High Floor Tom
-	// map[44] = DRUM2_YELLOW;  // 44 - Pedal Hi-Hat *) - ignore this for playability!
-	map[45] = DRUM3_BLUE;    // 45 - Low Tom *)
-	map[46] = DRUM2_YELLOW;  // 46 - Open Hi-Hat *)
-	// 47 - Low-Mid Tom
-	map[48] = DRUM2_YELLOW;  // 48 - Hi-Mid Tom *)
-	map[49] = DRUM4_GREEN;   // 49 - Crash Cymbal 1 *)
-	// 50 - High Tom
-	map[51] = DRUM3_BLUE;    // 51 - Ride Cymbal 1 *)
-	// 52 - Chinese Cymbal
-	// 53 - Ride Bell
-	// 54 - Tambourine
-	// 55 - Splash Cymbal
-	// 56 - Cowbell
-	map[57] = DRUM4_GREEN;   // 57 - Crash Cymbal 2
-	// 58 - Vibraslap
-	map[59] = DRUM3_BLUE;    // 59 - Ride Cymbal 2
-	// 60 - Hi Bongo
-	// 61 - Low Bongo
-	// 62 - Mute Hi Conga
-	// 63 - Open Hi Conga
-	// 64 - Low Conga
-	// 65 - High Timbale
-	// 66 - Low Timbale
-	// 67 - High Agogo
-	// 68 - Low Agogo
-	// 69 - Cabasa
-	// 70 - Maracas
-	// 71 - Short Whistle
-	// 72 - Long Whistle
-	// 73 - Short Guiro
-	// 74 - Long Guiro
-	// 75 - Claves
-	// 76 - Hi Wood Block
-	// 77 - Low Wood Block
-	// 78 - Mute Cuica
-	// 79 - Open Cuica
-	// 80 - Mute Triangle
-	// 81 - Open Triangle
-#else
-	// this is the original mapping from Performous 0.5.1
-	map[35] = map[36] = 0;  // Bass drum 1/2
-	map[38] = map[40] = 1;  // Snare 1/2
-	map[42] = map[46] = 2;  // Hi-hat closed/open
-	map[52] = map[57] = 2;  // Crash2 1/2
-	map[41] = map[43] = 3;  // Tom low 1/2
-	map[45] = map[47] = 3;  // Tom mid 1/2
-	map[48] = map[50] = 3;  // Tom high 1/2
-	map[49] = map[51] = 4;  // Cymbal crash/ride
-#endif
 }
 
 #include <iomanip>
@@ -212,22 +193,6 @@ void input::SDL::init_devices() {
 			event.jbutton.button = i;
 			input::SDL::pushEvent(event);
 		}
-	}
-}
-
-#include "fs.hh"
-#include <libxml++/libxml++.h>
-
-namespace {
-	struct XMLError {
-		XMLError(xmlpp::Element& e, std::string msg): elem(e), message(msg) {}
-		xmlpp::Element& elem;
-		std::string message;
-	};
-	std::string getAttribute(xmlpp::Element& elem, std::string const& attr) {
-		xmlpp::Attribute* a = elem.get_attribute(attr);
-		if (!a) throw XMLError(elem, "attribute " + attr + " not found");
-		return a->get_value();
 	}
 }
 

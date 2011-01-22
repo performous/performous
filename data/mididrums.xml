@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mididrums>
+	<!--
+	     these are considered "safe" notes that should work with 95% of all modules
+	     notes below 35 and above 81 are non standardized
+	-->
+	<note id="35" value="kick" name="Acoustic Bass Drum" />
+	<note id="36" value="kick" name="Bass Drum 1" />
+	<note id="37" value="red" name="Side Stick" />
+	<note id="38" value="red" name="Acoustic Snare" />
+	<note id="39" value="NONE" name="Hand Clap" />
+	<note id="40" value="red" name="Electric Snare" />
+	<note id="41" value="green" name="Low Floor Tom" />
+	<note id="42" value="yellow" name="Closed Hi-Hat" />
+	<note id="43" value="NONE" name="High Floor Tom" />
+	<note id="44" value="NONE" name="Pedal Hi-Hat" />
+	<note id="45" value="blue" name="Low Tom" />
+	<note id="46" value="yellow" name="Open Hi-Hat" />
+	<note id="47" value="NONE" name="Low-Mid Tom" />
+	<note id="48" value="yellow" name="Hi-Mid Tom" />
+	<note id="49" value="green" name="Crash Cymbal 1" />
+	<note id="50" value="NONE" name="High Tom" />
+	<note id="51" value="blue" name="Ride Cymbal 1" />
+	<note id="52" value="NONE" name="Chinese Cymbal" />
+	<note id="53" value="NONE" name="Ride Bell" />
+	<note id="54" value="NONE" name="Tambourine" />
+	<note id="55" value="NONE" name="Splash Cymbal" />
+	<note id="56" value="NONE" name="Cowbell" />
+	<note id="57" value="green" name="Crash Cymbal 2" />
+	<note id="58" value="NONE" name="Vibraslap" />
+	<note id="59" value="blue" name="Ride Cymbal 2" />
+	<note id="60" value="NONE" name="Hi Bongo" />
+	<note id="61" value="NONE" name="Low Bongo" />
+	<note id="62" value="NONE" name="Mute Hi Conga" />
+	<note id="63" value="NONE" name="Open Hi Conga" />
+	<note id="64" value="NONE" name="Low Conga" />
+	<note id="65" value="NONE" name="High Timbale" />
+	<note id="66" value="NONE" name="Low Timbale" />
+	<note id="67" value="NONE" name="High Agogo" />
+	<note id="68" value="NONE" name="Low Agogo" />
+	<note id="69" value="NONE" name="Cabasa" />
+	<note id="70" value="NONE" name="Maracas" />
+	<note id="71" value="NONE" name="Short Whistle" />
+	<note id="72" value="NONE" name="Long Whistle" />
+	<note id="73" value="NONE" name="Short Guiro" />
+	<note id="74" value="NONE" name="Long Guiro" />
+	<note id="75" value="NONE" name="Claves" />
+	<note id="76" value="NONE" name="Hi Wood Block" />
+	<note id="77" value="NONE" name="Low Wood Block" />
+	<note id="78" value="NONE" name="Mute Cuica" />
+	<note id="79" value="NONE" name="Open Cuica" />
+	<note id="80" value="NONE" name="Mute Triangle" />
+	<note id="81" value="NONE" name="Open Triangle" />
+	<!--
+	     this is the original mapping from Performous 0.5.1
+	-->
+	<!--
+	<note id="35" value="kick" name="" />
+	<note id="35" value="kick" name="" />
+	<note id="38" value="red" name="" />
+	<note id="40" value="red" name="" />
+	<note id="42" value="yellow" name="" />
+	<note id="46" value="yellow" name="" />
+	<note id="52" value="yellow" name="" />
+	<note id="57" value="yellow" name="" />
+	<note id="41" value="blue" name="" />
+	<note id="43" value="blue" name="" />
+	<note id="45" value="blue" name="" />
+	<note id="47" value="blue" name="" />
+	<note id="48" value="blue" name="" />
+	<note id="50" value="blue" name="" />
+	<note id="49" value="green" name="" />
+	<note id="51" value="green" name="" />
+	-->
+</mididrums>
