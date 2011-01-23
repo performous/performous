@@ -50,7 +50,6 @@ class GuitarGraph: public InstrumentGraph {
 	/** draws GuitarGraph
 	 * @param time at which time to draw
 	 */
-	void updateNeck();
 	void draw(double time);
 	void engine();
 	bool dead() const;
@@ -62,7 +61,14 @@ class GuitarGraph: public InstrumentGraph {
 	double getWhammy() const { return m_whammy; }
 
   private:
+	// refactoring methods
+	void initDrums();
+	void initGuitar();
+	void setupJoinMenuDifficulty();
+	void setupJoinMenuDrums();
+	void setupJoinMenuGuitar();
 	// Engine / scoring utils
+	void updateNeck();
 	bool canActivateStarpower() { return (m_starmeter > 6000); }
 	void activateStarpower();
 	void errorMeter(float error);

@@ -59,6 +59,40 @@ namespace {
 	inline float blend(float a, float b, float f) { return a*f + b*(1.0f-f); }
 }
 
+void GuitarGraph::initGuitar() {
+	// Copy all tracks of guitar types (not DRUMS and not KEYBOARD) to m_instrumentTracks
+	for (InstrumentTracks::const_iterator it = m_song.instrumentTracks.begin(); it != m_song.instrumentTracks.end(); ++it) {
+		std::string index = it->first;
+		if (index != TrackName::DRUMS && index != TrackName::KEYBOARD) m_instrumentTracks[index] = &it->second;
+	}
+	if (m_instrumentTracks.empty()) throw std::logic_error("No guitar tracks found");
+
+	// Adding fail samples
+	m_samples.push_back("guitar fail1");
+	m_samples.push_back("guitar fail2");
+	m_samples.push_back("guitar fail3");
+	m_samples.push_back("guitar fail4");
+	m_samples.push_back("guitar fail5");
+	m_samples.push_back("guitar fail6");
+}
+
+void GuitarGraph::initDrums() {
+	// Copy all tracks of drum type  to m_instrumentTracks
+	for (InstrumentTracks::const_iterator it = m_song.instrumentTracks.begin(); it != m_song.instrumentTracks.end(); ++it) {
+		std::string index = it->first;
+		if (index == TrackName::DRUMS) m_instrumentTracks[index] = &it->second;
+	}
+	if (m_instrumentTracks.empty()) throw std::logic_error("No drum tracks found");
+
+	// Adding fail samples
+	m_samples.push_back("drum bass");
+	m_samples.push_back("drum snare");
+	m_samples.push_back("drum hi-hat");
+	m_samples.push_back("drum tom1");
+	m_samples.push_back("drum cymbal");
+	//m_samples.push_back("drum tom2");
+}
+
 GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number, bool practmode):
   InstrumentGraph(audio, song, drums ? input::DRUMS : input::GUITAR),
   m_tail(getThemePath("tail.svg")),
@@ -90,33 +124,17 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number,
   m_hasTomTrack(false),
   m_whammy(0)
 {
-	// Copy all tracks of supported types (either drums or non-drums) to m_instrumentTracks
-	for (InstrumentTracks::const_iterator it = m_song.instrumentTracks.begin(); it != m_song.instrumentTracks.end(); ++it) {
-		std::string index = it->first;
-		if (m_drums == (index == TrackName::DRUMS)) m_instrumentTracks[index] = &it->second;
+	if(m_drums) {
+		initDrums();
+	} else {
+		initGuitar();
 	}
-	if (m_instrumentTracks.empty()) throw std::logic_error(m_drums ? "No drum tracks found" : "No guitar tracks found");
 	// Load 3D fret objects
 	m_fretObj.load(getThemePath("fret.obj"));
 	m_tappableObj.load(getThemePath("fret_tap.obj"));
 	// Score calculator (TODO a better one)
 	m_scoreText.reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_streakText.reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
-	if (m_drums) {
-		m_samples.push_back("drum bass");
-		m_samples.push_back("drum snare");
-		m_samples.push_back("drum hi-hat");
-		m_samples.push_back("drum tom1");
-		m_samples.push_back("drum cymbal");
-		//m_samples.push_back("drum tom2");
-	} else {
-		m_samples.push_back("guitar fail1");
-		m_samples.push_back("guitar fail2");
-		m_samples.push_back("guitar fail3");
-		m_samples.push_back("guitar fail4");
-		m_samples.push_back("guitar fail5");
-		m_samples.push_back("guitar fail6");
-	}
 	for (size_t i = 0; i < max_panels; ++i) {
 		m_pressed_anim[i].setRate(5.0);
 		m_holds[i] = 0;
@@ -135,43 +153,55 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number,
 	setupJoinMenu();
 }
 
+void GuitarGraph::setupJoinMenuDifficulty() {
+	ConfigItem::OptionList ol;
+	int cur = 0;
+	// Add difficulties to the option list
+	for (int level = 0; level < DIFFICULTYCOUNT; ++level) {
+		if (difficulty(Difficulty(level), true)) {
+			ol.push_back(boost::lexical_cast<std::string>(level));
+			if (Difficulty(level) == m_level) cur = ol.size()-1;
+		}
+	}
+	m_selectedDifficulty = ConfigItem(ol); // Create a ConfigItem from the option list
+	m_selectedDifficulty.select(cur); // Set the selection to current level
+	m_menu.add(MenuOption("", _("Select difficulty"), &m_selectedDifficulty)); // MenuOption that cycles the options
+	m_menu.back().setDynamicName(m_difficultyOpt); // Set the title to be dynamic
+}
+
+void GuitarGraph::setupJoinMenuDrums() {
+	setupJoinMenuDifficulty();
+	m_menu.add(MenuOption(_("Lefty-mode"), "", &m_leftymode));
+	m_menu.back().setDynamicComment(m_leftyOpt);
+}
+
+void GuitarGraph::setupJoinMenuGuitar() {
+	ConfigItem::OptionList ol;
+	int cur = 0;
+	// Add tracks to option list
+	for (InstrumentTracksConstPtr::const_iterator it = m_instrumentTracks.begin(); it != m_instrumentTracks.end(); ++it) {
+		ol.push_back(it->first);
+		if (m_track_index->first == it->first) cur = ol.size()-1; // Find the index of current track
+	}
+	m_selectedTrack = ConfigItem(ol); // Create a ConfigItem from the option list
+	m_selectedTrack.select(cur); // Set the selection to current track
+	m_menu.add(MenuOption("", _("Select track"), &m_selectedTrack)); // MenuOption that cycles the options
+	m_menu.back().setDynamicName(m_trackOpt); // Set the title to be dynamic
+	setupJoinMenuDifficulty();
+	m_menu.add(MenuOption(_("Lefty-mode"), "", &m_leftymode));
+	m_menu.back().setDynamicComment(m_leftyOpt);
+}
 
 void GuitarGraph::setupJoinMenu() {
 	m_menu.clear();
 	updateJoinMenu();
 	// Populate root menu
 	m_menu.add(MenuOption(_("Ready!"), _("Start performing!")));
-	// Create track option only for guitars
-	if (!m_drums) {
-		ConfigItem::OptionList ol;
-		int cur = 0;
-		// Add tracks to option list
-		for (InstrumentTracksConstPtr::const_iterator it = m_instrumentTracks.begin(); it != m_instrumentTracks.end(); ++it) {
-			ol.push_back(it->first);
-			if (m_track_index->first == it->first) cur = ol.size()-1; // Find the index of current track
-		}
-		m_selectedTrack = ConfigItem(ol); // Create a ConfigItem from the option list
-		m_selectedTrack.select(cur); // Set the selection to current track
-		m_menu.add(MenuOption("", _("Select track"), &m_selectedTrack)); // MenuOption that cycles the options
-		m_menu.back().setDynamicName(m_trackOpt); // Set the title to be dynamic
+	if(m_drums) {
+		setupJoinMenuDrums();
+	} else {
+		setupJoinMenuGuitar();
 	}
-	{ // Create difficulty opt
-		ConfigItem::OptionList ol;
-		int cur = 0;
-		// Add difficulties to the option list
-		for (int level = 0; level < DIFFICULTYCOUNT; ++level) {
-			if (difficulty(Difficulty(level), true)) {
-				ol.push_back(boost::lexical_cast<std::string>(level));
-				if (Difficulty(level) == m_level) cur = ol.size()-1;
-			}
-		}
-		m_selectedDifficulty = ConfigItem(ol); // Create a ConfigItem from the option list
-		m_selectedDifficulty.select(cur); // Set the selection to current level
-		m_menu.add(MenuOption("", _("Select difficulty"), &m_selectedDifficulty)); // MenuOption that cycles the options
-		m_menu.back().setDynamicName(m_difficultyOpt); // Set the title to be dynamic
-	}
-	m_menu.add(MenuOption(_("Lefty-mode"), "", &m_leftymode));
-	m_menu.back().setDynamicComment(m_leftyOpt);
 	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
 }
 
@@ -188,6 +218,7 @@ void GuitarGraph::updateNeck() {
 	// TODO: Optimize with texture cache
 	std::string index = m_track_index->first;
 	if (index == TrackName::DRUMS) m_neck.reset(new Texture(getThemePath("drumneck.svg")));
+	else if (index == TrackName::KEYBOARD) m_neck.reset(new Texture(getThemePath("guitarneck.svg")));
 	else if (index == TrackName::BASS) m_neck.reset(new Texture(getThemePath("bassneck.svg")));
 	else m_neck.reset(new Texture(getThemePath("guitarneck.svg")));
 }
@@ -226,7 +257,7 @@ std::string GuitarGraph::getDifficultyString() const {
 /// Get a string id for track and difficulty
 std::string GuitarGraph::getModeId() const {
 	return m_track_index->first + " - " + diffv[m_level].name
-		+ (m_drums && m_input.isKeyboard() ? " (kbd)" : "");
+		+ (m_input.isKeyboard() ? " (kbd)" : "");
 }
 
 /// Cycle through difficulties
