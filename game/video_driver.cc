@@ -142,14 +142,15 @@ void Window::resize() {
 	glLoadIdentity();
 	float h = virtH();
 	// stump: under MSVC, near and far are #defined to nothing for compatibility with ancient code, hence the underscores.
-	const float near_ = 1.5f; // This determines FOV: the value is your distance from the monitor (the unit being the width of the Performous window)
+	const float near_ = 0.5f; // This determines the near clipping distance (must be > 0)
 	const float far_ = 100.0f; // How far away can things be seen
+	const float z0 = 1.5f; // This determines FOV: the value is your distance from the monitor (the unit being the width of the Performous window)
 	// Set model-view matrix
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	const float f = 0.9f; // Avoid texture surface being exactly at the near plane (MacOSX fix)
-	glFrustum(-0.5f * f, 0.5f * f, 0.5f * h * f, -0.5f * h * f, f * near_, far_);
-	glTranslatef(0.0f, 0.0f, -near_);  // So that z = 0.0f is still on monitor surface
+	const float f = near_ / z0;
+	glFrustum(-0.5f * f, 0.5f * f, 0.5f * h * f, -0.5f * h * f, near_, far_);
+	glTranslatef(0.0f, 0.0f, -z0);  // Move back the world so that z = 0.0f is the monitor surface
 	// Check for OpenGL errors
 	glutil::GLErrorChecker glerror("Window::resize");
 }
