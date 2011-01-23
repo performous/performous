@@ -18,6 +18,8 @@ class Dialog {
 	}
 	/// draws dialogue
 	void draw() {
+		glutil::PushMatrix pm;
+		glTranslatef(0.0f, 0.0f, 0.1f);  // Raise a bit in 3D
 		m_dialog.draw();
 		m_svgText.draw(m_text);
 	}
