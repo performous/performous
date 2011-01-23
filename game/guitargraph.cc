@@ -93,7 +93,7 @@ void GuitarGraph::initDrums() {
 	//m_samples.push_back("drum tom2");
 }
 
-GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number, bool practmode):
+GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number):
   InstrumentGraph(audio, song, drums ? input::DRUMS : input::GUITAR),
   m_tail(getThemePath("tail.svg")),
   m_tail_glow(getThemePath("tail_glow.svg")),
@@ -105,7 +105,6 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number,
   m_neckglowColor(),
   m_drums(drums),
   m_use3d(config["graphic/3d_notes"].b()),
-  m_practmode(practmode),
   m_level(),
   m_track_index(m_instrumentTracks.end()),
   m_dfIt(m_drumfills.end()),
@@ -120,7 +119,6 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number,
   m_soloTotal(),
   m_soloScore(),
   m_solo(),
-  m_practHold(false),
   m_hasTomTrack(false),
   m_whammy(0)
 {
@@ -413,31 +411,14 @@ void GuitarGraph::engine() {
 	// Countdown to start
 	handleCountdown(time, time < getNotesBeginTime() ? getNotesBeginTime() : m_jointime+1);
 
-	// FIXME: this is a band aid to release m_practHold
-	// this may happen in conjunction with the regular pause feature
-	if (m_practHold && !m_audio.isPaused()) m_practHold = false;
-
 	// Skip missed notes
 	// we hold the note a litle bit *before* they go out of the tolerance window
 	// this is important in order for the hit-detection to still accept the notes
 	// FIXME: need to confirm that this timing is reliable,
 	// if a note gets marked as 'past' completing the chord does not re-start the song
-	double past = time - maxTolerance + (m_practmode ? 0.05 : 0.0);
-	while (!m_practHold && m_chordIt != m_chords.end() && m_chordIt->begin < past) {
+	while (m_chordIt != m_chords.end() && m_chordIt->begin + maxTolerance < time) {
 		if ( (m_drums && m_chordIt->status != m_chordIt->polyphony)
-		  || (!m_drums && m_chordIt->status == 0) ) {
-			endStreak();
-			if (m_practmode && !dead()) {
-				// in practice mode hold the chord here
-				// m_chordIt must not change until finishing the chord
-				m_audio.seekPos(m_chordIt->begin);
-				m_audio.pause(true);
-				m_practHold = true;
-				endStreak();
-				std::cout << "practice: hold chord at " << m_chordIt->begin << ", status = "<< m_chordIt->status << std::endl;
-				break;
-			}
-		}
+		  || (!m_drums && m_chordIt->status == 0) ) endStreak();
 		// Calculate solo total score
 		if (m_solo) { m_soloScore += m_chordIt->score; m_soloTotal += m_chordIt->polyphony * points(0);
 		// Solo just ended?
@@ -449,17 +430,6 @@ void GuitarGraph::engine() {
 		}
 		++m_dead;
 		++m_chordIt;
-	}
-
-	// just finished a chord in practice mode
-	if (m_practHold &&
-	(  (m_drums && m_chordIt->status == m_chordIt->polyphony)
-	|| (!m_drums && m_chordIt->status != 0) ) ) {
-		// now we have completed the chord
-		// m_chordIt must not change from holding the chord until we get here
-		if (m_audio.isPaused()) m_audio.togglePause();
-		m_practHold = false;
-		std::cout << "practice: finish chord at " << m_chordIt->begin << std::endl;
 	}
 
 	if (difficulty_changed) m_dead = 0; // if difficulty is changed, m_dead would get incorrect
@@ -649,18 +619,16 @@ void GuitarGraph::drumHit(double time, int fret) {
 			// in kiddy mode we don't care about the correct pad
 			// all that matters is that there is still a missing note in that chord
 			if (m_chordIt->status == m_chordIt->polyphony) continue;
-		} else if ((!it->dur[fret]) || (m_notes[it->dur[fret]])) continue;  // invalid fret/hit or already played
+		} else if (m_notes[it->dur[fret]]) continue;  // invalid fret/hit or already played
 
 		double error = std::abs(it->begin - time);
 		if (error < tolerance) {
 			best = it;
 			tolerance = error;
 			signed_error = it->begin - time;
-			if (m_practHold) break; // during practice hold the chord will always be m_chordIt
 		}
 	}
-	if ((best == m_chords.end())
-	|| (m_practHold && best != m_chordIt)) fail(time, fret);  // None found
+	if (best == m_chords.end()) fail(time, fret);  // None found
 	else {
 		// Skip all chords earlier than the best fit chord
 		for (; best != m_chordIt; ++m_chordIt) {

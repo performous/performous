@@ -46,7 +46,7 @@ static inline bool operator==(Chord const& a, Chord const& b) {
 class GuitarGraph: public InstrumentGraph {
   public:
 	/// constructor
-	GuitarGraph(Audio& audio, Song const& song, bool drums, int number, bool practmode=false);
+	GuitarGraph(Audio& audio, Song const& song, bool drums, int number);
 	/** draws GuitarGraph
 	 * @param time at which time to draw
 	 */
@@ -99,7 +99,6 @@ class GuitarGraph: public InstrumentGraph {
 	// Flags
 	bool m_drums; /// are we using drums?
 	bool m_use3d; /// are we using 3d?
-	bool m_practmode; /// switch to enable practice mode
 
 	// Track stuff
 	enum Difficulty {
@@ -154,7 +153,6 @@ class GuitarGraph: public InstrumentGraph {
 	double m_soloTotal; /// maximum solo score
 	double m_soloScore; /// score during solo
 	bool m_solo; /// are we currently playing a solo
-	bool m_practHold; /// true if holding a chord during practice
 	bool m_hasTomTrack; /// true if the track has at least one tom track
 	double m_whammy; /// whammy value for pitch shift
 };
