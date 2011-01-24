@@ -17,7 +17,7 @@
    height="800"
    id="svg559"
    sodipodi:version="0.32"
-   inkscape:version="0.47 r22583"
+   inkscape:version="0.48.0 r9654"
    sodipodi:docname="songs_bg.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <metadata
@@ -44,7 +44,7 @@
      pagecolor="#ffffff"
      id="base"
      inkscape:zoom="0.61522534"
-     inkscape:cx="445.08607"
+     inkscape:cx="448.33691"
      inkscape:cy="383.70921"
      inkscape:window-x="0"
      inkscape:window-y="29"
@@ -117,9 +117,10 @@
   </defs>
   <path
      style="fill:#ffffff;fill-opacity:0.2739131"
-     d="M 49.884998,210 950.115,210 C 966.67129,210 980,223.3225 980,239.87109 l 0,230.25782 C 980,486.6775 966.67129,500 950.115,500 l -533.01146,0 c 0,0 -119.40515,68.26767 -119.40515,68.26767 0,0 -101.15081,-68.26767 -101.15081,-68.26767 0,0 -146.662582,0 -146.662582,0 C 33.328709,500 20,486.6775 20,470.12891 L 20,239.87109 C 20,223.3225 33.328709,210 49.884998,210 z"
+     d="M 49.884998,210 950.115,210 C 966.67129,210 980,223.3225 980,239.87109 l 0,230.25782 C 980,486.6775 966.67129,500 950.115,500 610.93509,500.50433 352.98475,500 49.884998,500 33.328709,500 20,486.6775 20,470.12891 L 20,239.87109 C 20,223.3225 33.328709,210 49.884998,210 z"
      id="rect3394"
-     sodipodi:nodetypes="cccccccccccc" />
+     sodipodi:nodetypes="ccccccccc"
+     inkscape:connector-curvature="0" />
   <text
      xml:space="preserve"
      style="font-size:24.89476013px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"

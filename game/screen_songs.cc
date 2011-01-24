@@ -142,10 +142,13 @@ void ScreenSongs::drawJukebox() {
 }
 
 void ScreenSongs::drawMultimedia() {
-	double length = m_audio.getLength();
-	double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
-	if (m_songbg.get()) m_songbg->draw(); else m_songbg_default->draw();
-	if (m_video.get()) m_video->render(time);
+	{
+		FarTransform ft;  // 3D effect
+		double length = m_audio.getLength();
+		double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
+		if (m_songbg.get()) m_songbg->draw(); else m_songbg_default->draw();
+		if (m_video.get()) m_video->render(time);
+	}
 	if (!m_jukebox) theme->bg.draw();
 }
 
@@ -248,9 +251,13 @@ void ScreenSongs::drawCovers() {
 		Song& song = m_songs[baseidx + i];
 		Surface& s = getCover(song);
 		// Calculate dimensions for cover and instrument markers
-		double diff = (i == 0 ? (0.5 - fabs(shift)) * 0.07 : 0.0);
-		double y = 0.27 + 0.5 * diff;
-		s.dimensions.middle(-0.2 + 0.17 * (i - shift)).bottom(y - 0.2 * diff).fitInside(0.14 + diff, 0.14 + diff);
+		double diff = (i == 0 ? 2.0 * (0.5 - fabs(shift)) : 0.0);  // 0..1 for current cover hilight level
+		double y = 0.26;
+		glutil::PushMatrix pm;
+		glTranslatef(0.0f, 0.0f, -0.05 * (1.0 - diff));  // Move other covers further back
+		double c = 0.6 + 0.4 * diff;
+		glColor3f(c, c, c);
+		s.dimensions.middle(-0.2 + 0.17 * (i - shift)).bottom(y - 0.01 * diff).fitInside(0.15, 0.15);
 		// Draw the cover normally
 		s.draw();
 		// Draw the reflection
