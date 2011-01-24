@@ -424,10 +424,7 @@ void ScreenSing::draw() {
 
 	// Rendering starts
 	{
-		glutil::PushMatrix pm;
-		float s = 70.0f;
-		glTranslatef(0.0f, 0.0f, -90.0f);
-		glScalef(s, s, s);
+		FarTransform ft;
 		double ar = arMax;
 		// Background image
 		if (m_background) {
