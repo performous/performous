@@ -796,7 +796,7 @@ void GuitarGraph::draw(double time) {
 	{	// Translate, rotate and scale to place
 		double frac = 0.75;  // Adjustable: 1.0 means fully separated, 0.0 means fully attached
 		glutil::PushMatrixMode pmm(GL_PROJECTION);
-		glTranslatef(frac * 2.0 * offsetX, 0.0f, 0.0f);
+		glTranslatef(frac * offsetX, 0.0f, 0.0f);
 		glutil::PushMatrixMode pmb(GL_MODELVIEW);
 		glTranslatef((1.0 - frac) * offsetX, dimensions.y2(), 0.0f);
 		// Do some jumping for drums

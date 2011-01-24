@@ -1,6 +1,7 @@
 #pragma once
 
 #include "glshader.hh"
+#include "glutil.hh"
 #include <boost/scoped_ptr.hpp>
 
 unsigned int screenW();
@@ -9,9 +10,17 @@ static inline float virtH() { return float(screenH()) / screenW(); }
 
 struct SDL_Surface;
 
+/// Performs a GL transform for displaying background image at far distance
+class FarTransform {
+public:
+	FarTransform();
+private:
+	glutil::PushMatrix pm;
+};
+
 /// handles the window
 class Window {
-  public:
+public:
 	/// constructor
 	Window(unsigned int windowW, unsigned int windowH, bool fullscreen);
 	/// destructor
@@ -39,7 +48,7 @@ class Window {
 	/// take a screenshot
 	void screenshot();
 
-  private:
+private:
 	SDL_Surface* screen;
 	unsigned int m_windowW, m_windowH;
 	unsigned int m_fsW, m_fsH;

@@ -46,7 +46,7 @@ void ScreenManager::drawScreen() {
 	{
 		glViewport(0, 0, 1920, 540);
 		glutil::PushMatrixMode pp(GL_PROJECTION);
-		glTranslatef(0.04f, 0.0f, 0.0f);
+		glTranslatef(0.02f, 0.0f, 0.0f);
 		glutil::PushMatrixMode pmv(GL_MODELVIEW);
 		glTranslatef(-0.02f, 0.0f, 0.0f);
 		//UseFBO fbo(m_fbo);
@@ -56,7 +56,7 @@ void ScreenManager::drawScreen() {
 	{
 		glViewport(0, 540, 1920, 540);
 		glutil::PushMatrixMode pp(GL_PROJECTION);
-		glTranslatef(-0.04f, 0.0f, 0.0f);
+		glTranslatef(-0.02f, 0.0f, 0.0f);
 		glutil::PushMatrixMode pmv(GL_MODELVIEW);
 		glTranslatef(0.02f, 0.0f, 0.0f);
 		//UseFBO fbo(m_fbo);

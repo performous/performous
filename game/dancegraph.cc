@@ -416,7 +416,7 @@ void DanceGraph::draw(double time) {
 		double frac = 0.75;  // Adjustable: 1.0 means fully separated, 0.0 means fully attached
 		// Some matrix magic to get the viewport right
 		glutil::PushMatrixMode pmm(GL_PROJECTION);
-		glTranslatef((2.0 * frac) * offsetX, 0.0f, 0.0f);
+		glTranslatef(frac * offsetX, 0.0f, 0.0f);
 		glutil::PushMatrixMode pmb(GL_MODELVIEW);
 		glTranslatef((1.0 - frac) * offsetX, dimensions.y1(), 0.0f);
 		float temp_s = dimensions.w() / 8.0f; // Allow for 8 pads to fit on a track

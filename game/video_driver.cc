@@ -1,7 +1,6 @@
 #include "video_driver.hh"
 
 #include "config.hh"
-#include "glutil.hh"
 #include "fs.hh"
 #include "image.hh"
 #include "util.hh"
@@ -30,6 +29,11 @@ namespace {
 		SDL_GLattr m_attr;
 		int m_value;
 	};
+
+	// stump: under MSVC, near and far are #defined to nothing for compatibility with ancient code, hence the underscores.
+	const float near_ = 0.1f; // This determines the near clipping distance (must be > 0)
+	const float far_ = 110.0f; // How far away can things be seen
+	const float z0 = 1.5f; // This determines FOV: the value is your distance from the monitor (the unit being the width of the Performous window)
 
 }
 
@@ -67,7 +71,7 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 Window::~Window() { }
 
 void Window::blank() {
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void Window::swap() {
@@ -137,21 +141,29 @@ void Window::resize() {
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_BLEND);
-	// Set projection
+	// Setup the projection matrix for 2D translates
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	float h = virtH();
-	// stump: under MSVC, near and far are #defined to nothing for compatibility with ancient code, hence the underscores.
-	const float near_ = 0.5f; // This determines the near clipping distance (must be > 0)
-	const float far_ = 100.0f; // How far away can things be seen
-	const float z0 = 1.5f; // This determines FOV: the value is your distance from the monitor (the unit being the width of the Performous window)
-	// Set model-view matrix
+	// OpenGL normalized coordinates go from -1 to 1, change scale so that our 2D translates can use the Performous normalized coordinates instead
+	glScalef(2.0f, 2.0f / h, 1.0f);
+	// Note: we do the frustum on MODELVIEW so that 2D positioning can be done via projection matrix.
+	// glTranslatef on that will move the image, not the camera (i.e. far-away and nearby objects move the same amount)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+	glScalef(0.5f, 0.5f * h, 1.0f);  // Invert the scaling done on projection matrix
 	const float f = near_ / z0;
 	glFrustum(-0.5f * f, 0.5f * f, 0.5f * h * f, -0.5f * h * f, near_, far_);
 	glTranslatef(0.0f, 0.0f, -z0);  // Move back the world so that z = 0.0f is the monitor surface
 	// Check for OpenGL errors
 	glutil::GLErrorChecker glerror("Window::resize");
+}
+
+FarTransform::FarTransform() {
+	float z = far_ - 0.1f;  // Very near the far plane but just a bit closer to avoid accidental clipping
+	float s = z / z0;  // Scale the image so that it looks the same size
+	s *= 1.04; // A bit more for stereo3d (avoid black borders)
+	glTranslatef(0.0f, 0.0f, -z + z0); // Very near the farplane
+	glScalef(s, s, s);
 }
 
