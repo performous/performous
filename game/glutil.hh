@@ -1,13 +1,12 @@
 #pragma once
 
-#include <string>
-#include <iostream>
-#include <vector>
-
-#include <GL/glew.h>
 
 #include "color.hh"
 #include "glshader.hh"
+#include <GL/glew.h>
+#include <string>
+#include <iostream>
+#include <vector>
 
 namespace glutil {
 
@@ -206,6 +205,6 @@ namespace glutil {
 		}
 		static void reset() { glGetError(); }
 	};
-
 }
+
 

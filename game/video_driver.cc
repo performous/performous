@@ -2,6 +2,7 @@
 
 #include "config.hh"
 #include "fs.hh"
+#include "glmath.hh"
 #include "image.hh"
 #include "util.hh"
 #include "joystick.hh"
@@ -142,19 +143,20 @@ void Window::resize() {
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_BLEND);
 	// Setup the projection matrix for 2D translates
+	using namespace glmath;
 	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
 	float h = virtH();
 	// OpenGL normalized coordinates go from -1 to 1, change scale so that our 2D translates can use the Performous normalized coordinates instead
-	glScalef(2.0f, 2.0f / h, 1.0f);
+	upload(scale(Vec3(2.0f, 2.0f / h, 1.0f)));
 	// Note: we do the frustum on MODELVIEW so that 2D positioning can be done via projection matrix.
 	// glTranslatef on that will move the image, not the camera (i.e. far-away and nearby objects move the same amount)
 	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glScalef(0.5f, 0.5f * h, 1.0f);  // Invert the scaling done on projection matrix
 	const float f = near_ / z0;
-	glFrustum(-0.5f * f, 0.5f * f, 0.5f * h * f, -0.5f * h * f, near_, far_);
-	glTranslatef(0.0f, 0.0f, -z0);  // Move back the world so that z = 0.0f is the monitor surface
+	upload(
+	  scale(Vec3(0.5, 0.5 * h, 1.0))
+	  * frustum(-0.5f * f, 0.5f * f, 0.5f * h * f, -0.5f * h * f, near_, far_)
+	  * translate(Vec3(0.0, 0.0, -z0))
+	);
 	// Check for OpenGL errors
 	glutil::GLErrorChecker glerror("Window::resize");
 }
