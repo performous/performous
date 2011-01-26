@@ -150,6 +150,7 @@ void Songs::filter_internal() {
 			if ((m_typeFilter & 2) && !s.hasDrums()) continue;
 			if ((m_typeFilter & 4) && !s.hasGuitars()) continue;
 			if ((m_typeFilter & 8) && !s.hasVocals()) continue;
+			if ((m_typeFilter & 16) && !s.hasKeyboard()) continue;
 			if (regex_search(s.strFull(), boost::regex(m_filter, boost::regex_constants::icase))) filtered.push_back(*it);
 		}
 		m_filtered.swap(filtered);

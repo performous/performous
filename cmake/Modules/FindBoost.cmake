@@ -90,7 +90,7 @@ if (Boost_FOUND)
 else()
   # MESSAGE(STATUS "Finding Boost libraries.... ")
 
-  SET( _boost_TEST_VERSIONS ${Boost_ADDITIONAL_VERSIONS} "1.42" "1.41" "1.40" "1.39.0" "1.39" "1.38.0" "1.38" "1.37.0" "1.37" "1.36.0" "1.36" "1.34.1" "1.34.0" "1.34" "1.33.1" "1.33.0" "1.33")
+  SET( _boost_TEST_VERSIONS ${Boost_ADDITIONAL_VERSIONS} "1.45" "1.44" "1.43" "1.42" "1.41" "1.40" "1.39.0" "1.39" "1.38.0" "1.38" "1.37.0" "1.37" "1.36.0" "1.36" "1.34.1" "1.34.0" "1.34" "1.33.1" "1.33.0" "1.33")
 
   ############################################
   #
@@ -297,6 +297,9 @@ else()
     IF (MSVC90)
       SET (_boost_COMPILER "-vc90")
     ENDIF(MSVC90)
+    IF (MSVC10)
+      SET (_boost_COMPILER "-vc100")
+    ENDIF(MSVC10)
     IF (MINGW)
       SET (_boost_COMPILER "-mgw44")
     ENDIF(MINGW)

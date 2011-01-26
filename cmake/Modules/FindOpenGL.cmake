@@ -19,16 +19,25 @@ find_path(OpenGL_INCLUDE_DIR
   PATHS ${OpenGL_PKGCONF_INCLUDE_DIRS}
 )
 
-find_library(OpenGL_GL_LIBRARY
-  NAMES GL libopengl32.a opengl32
-  PATHS ${OpenGL_PKGCONF_LIBRARY_DIRS}
-)
+if(MSVC) #In MSVC, no need to link, just this hack to get CMake happy
+  find_file(OpenGL_GL_LIBRARY
+    opengl32.dll
+  )
 
-find_library(OpenGL_GLU_LIBRARY
-  NAMES GLU libglu32.a glu32
-  PATHS ${OpenGL_PKGCONF_LIBRARY_DIRS}
-)
+  find_file(OpenGL_GLU_LIBRARY
+    glu32.dll
+  )
+else()
+  find_library(OpenGL_GL_LIBRARY
+    NAMES GL libopengl32.a opengl32
+    PATHS ${OpenGL_PKGCONF_LIBRARY_DIRS}
+  )
 
+  find_library(OpenGL_GLU_LIBRARY
+    NAMES GLU libglu32.a glu32
+    PATHS ${OpenGL_PKGCONF_LIBRARY_DIRS}
+  )
+endif(MSVC)
 set(OpenGL_PROCESS_INCLUDES OpenGL_INCLUDE_DIR)
 set(OpenGL_PROCESS_LIBS OpenGL_GL_LIBRARY OpenGL_GLU_LIBRARY)
 libfind_process(OpenGL)

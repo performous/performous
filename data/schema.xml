@@ -79,6 +79,12 @@ to save the current settings to XML.
 			<long>Enable keyboard as dance pad.</long>
 		</locale>
 	</entry>
+	<entry name="game/keyboard_keyboard" type="bool" value="true">
+		<locale name="C">
+			<short>Keyboard as keyboard</short>
+			<long>Enable keyboard as keyboard.</long>
+		</locale>
+	</entry>
 	<entry name="game/instruments" type="string_list">
 		<!-- Should be SDL_ID:{GUITAR_GUITARHERO|GUITAR_GUITARHERO_XPLORER|GUITAR_ROCKBAND_PS3|GUITAR_ROCKBAND_XB360|DRUMS_GUITARHERO|DRUMS_ROCKBAND_PS3|DRUMS_ROCKBAND_XB360|DRUMS_MIDI|DANCEPAD_GENERIC|DANCEPAD_TIGERGAME|DANCEPAD_2TECH}
 		     example:

@@ -129,7 +129,9 @@ void mainLoop(std::string const& songlist) {
 	try {
 		boost::scoped_ptr<input::MidiDrums> midiDrums;
 		// TODO: Proper error handling...
-		try { midiDrums.reset(new input::MidiDrums); } catch (std::runtime_error&) {}
+		try { midiDrums.reset(new input::MidiDrums); } catch (std::runtime_error& e) {
+			std::clog << "controllers/info: " << e.what() << std::endl;
+		}
 		// Load audio samples
 		sm.loading(_("Loading audio samples..."), 0.5);
 		audio.loadSample("drum bass", getPath("sounds/drum_bass.ogg"));
