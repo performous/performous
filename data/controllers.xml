@@ -224,4 +224,16 @@
 			<button id="9" value="select" />
 		</mapping>
 	</controller>
+	<controller type="keyboard" name="KEYBOARD_GENERIC">
+		<description>Generic keybard</description>
+		<regexp match="NO MATCH" />
+		<mapping>
+			<button id="0" value="C" />
+			<button id="1" value="D" />
+			<button id="2" value="E" />
+			<button id="3" value="F" />
+			<button id="4" value="G" />
+			<button id="5" value="godmode" />
+		</mapping>
+	</controller>
 </controllers>

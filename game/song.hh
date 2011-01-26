@@ -26,6 +26,7 @@ namespace TrackName {
 	const std::string GUITAR_COOP = "Coop guitar";
 	const std::string GUITAR_RHYTHM = "Rhythm guitar";
 	const std::string BASS = "Bass";
+	const std::string KEYBOARD = "Keyboard";
 	const std::string DRUMS = "Drums";
 	const std::string LEAD_VOCAL = "Vocals";
 	const std::string HARMONIC_1 = "Harmonic 1";
@@ -92,7 +93,8 @@ class Song: boost::noncopyable {
 	DanceTracks danceTracks; ///< dance tracks
 	bool hasDance() const { return !danceTracks.empty(); }
 	bool hasDrums() const { return instrumentTracks.find(TrackName::DRUMS) != instrumentTracks.end(); }
-	bool hasGuitars() const { return instrumentTracks.size() - hasDrums(); }
+	bool hasKeyboard() const { return instrumentTracks.find(TrackName::KEYBOARD) != instrumentTracks.end(); }
+	bool hasGuitars() const { return instrumentTracks.size() - hasDrums() - hasKeyboard(); }
 	bool hasVocals() const { return !vocalTracks.empty(); }
 	std::string path; ///< path of songfile
 	std::string filename; ///< name of songfile

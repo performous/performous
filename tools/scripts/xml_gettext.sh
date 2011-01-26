@@ -98,7 +98,7 @@ shift
 shift
 
 # create the temporary file securely.
-TEMP_SRC="$(mktemp --tmpdir xml2gettext.XXXXXXXXXX)"
+TEMP_SRC="$(mktemp -t xml2gettext.XXXXXXXXXX)"
 
 append_temp_src "/* This is a automatically generated temp file, it's safe to remove */"
 

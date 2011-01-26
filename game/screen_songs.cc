@@ -110,7 +110,8 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 			if (key == SDLK_F5) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 8); // Vocals
 			if (key == SDLK_F6) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 4); // Guitars
 			if (key == SDLK_F7) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 2); // Drums
-			if (key == SDLK_F8) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 1); // Dance
+			if (key == SDLK_F8) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 16); // Keyboard
+			if (key == SDLK_F9) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 1); // Dance
 			// The rest are only available when there are songs available
 			else if (m_songs.empty()) return;
 			else if (!m_jukebox && key == SDLK_F4) m_jukebox = true;
@@ -295,6 +296,7 @@ void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
 	bool have_vocals = false;
 	bool have_bass = false;
 	bool have_drums = false;
+	bool have_keyboard = false;
 	bool have_dance = false;
 	bool is_karaoke = false;
 	unsigned char typeFilter = m_songs.getTypeFilter();
@@ -305,6 +307,7 @@ void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
 		have_vocals = song.hasVocals();
 		have_bass = isTrackInside(song.instrumentTracks,TrackName::BASS);
 		have_drums = song.hasDrums();
+		have_keyboard = song.hasKeyboard();
 		have_dance = song.hasDance();
 		is_karaoke = (song.music.find("vocals") != song.music.end());
 		if (isTrackInside(song.instrumentTracks,TrackName::GUITAR)) guitarCount++;
@@ -372,6 +375,20 @@ void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
 		x = dim.x1()+4*xincr*(dim.x2()-dim.x1());
 		va.Color(c).TexCoord(getIconTex(5), 0.0f).Vertex(x, dim.y1());
 		va.Color(c).TexCoord(getIconTex(5), 1.0f).Vertex(x, dim.y2());
+		va.Draw();
+	}
+	{
+		// keyboard
+		float a = alpha * (have_keyboard ? 1.00f : 0.25f);
+		float m = !(typeFilter & 16);
+		glutil::VertexArray va;
+		glutil::Color c(Color(m * 1.0f, 1.0f, m * 1.0f, a));
+		x = dim.x1()+4*xincr*(dim.x2()-dim.x1());
+		va.Color(c).TexCoord(getIconTex(5), 0.0f).Vertex(x, dim.y1());
+		va.Color(c).TexCoord(getIconTex(5), 1.0f).Vertex(x, dim.y2());
+		x = dim.x1()+5*xincr*(dim.x2()-dim.x1());
+		va.Color(c).TexCoord(getIconTex(6), 0.0f).Vertex(x, dim.y1());
+		va.Color(c).TexCoord(getIconTex(6), 1.0f).Vertex(x, dim.y2());
 		va.Draw();
 	}
 	{

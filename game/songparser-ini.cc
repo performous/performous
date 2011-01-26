@@ -42,11 +42,20 @@ namespace {
 		else if (name == "DRUM") name = TrackName::DRUMS;
 		else if (name == "DRUMS") name = TrackName::DRUMS;
 		else if (name == "BASS") name = TrackName::BASS;
+		else if (name == "KEYS") return false; // TODO: RB3 5 lane keyboard track
 		else if (name == "GUITAR") name = TrackName::GUITAR;
 		else if (name == "VOCALS") name = TrackName::LEAD_VOCAL;
 		else if (name == "HARM1") name = TrackName::HARMONIC_1;
 		else if (name == "HARM2") name = TrackName::HARMONIC_2;
 		else if (name == "HARM3") name = TrackName::HARMONIC_3;
+		// expert stuffs
+		else if (name == "REAL_KEYS_X") return false; // TODO: RB3 pro keyboard expert track
+		else if (name == "REAL_KEYS_H") return false; // TODO: RB3 pro keyboard hard track
+		else if (name == "REAL_KEYS_M") return false; // TODO: RB3 pro keyboard medium track
+		else if (name == "REAL_KEYS_E") return false; // TODO: RB3 pro keyboard easy track
+		else if (name == "REAL_BASS") return false; // TODO: RB3 pro bass track
+		else if (name == "REAL_GUITAR") return false; // TODO: RB3 pro guitar 17 frets (Mustang) track
+		else if (name == "REAL_GUITAR_22") return false; // TODO: RB3 pro guitar 22 frets (Squier) track
 		else return false;
 		return true;
 	}
@@ -87,6 +96,7 @@ void SongParser::iniParseHeader() {
 	boost::regex audiofile_guitar("(guitar\\.ogg)$", boost::regex_constants::icase);
 	boost::regex audiofile_drums("(drums\\.ogg)$", boost::regex_constants::icase);
 	boost::regex audiofile_bass("(rhythm\\.ogg)$", boost::regex_constants::icase);
+	boost::regex audiofile_keyboard("(keyboard\\.ogg)$", boost::regex_constants::icase);
 	boost::regex audiofile_vocals("(vocals\\.ogg)$", boost::regex_constants::icase);
 	boost::regex audiofile_other("(.*\\.ogg)$", boost::regex_constants::icase);
 	boost::cmatch match;
@@ -103,6 +113,8 @@ void SongParser::iniParseHeader() {
 			testAndAdd(s, TrackName::GUITAR, name);
 		} else if (regex_match(name.c_str(), match, audiofile_bass)) {
 			testAndAdd(s, TrackName::BASS, name);
+		} else if (regex_match(name.c_str(), match, audiofile_keyboard)) {
+			testAndAdd(s, TrackName::KEYBOARD, name);
 		} else if (regex_match(name.c_str(), match, audiofile_drums)) {
 			testAndAdd(s, TrackName::DRUMS, name);
 		} else if (regex_match(name.c_str(), match, audiofile_vocals)) {
