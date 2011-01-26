@@ -799,6 +799,7 @@ void GuitarGraph::draw(double time) {
 		glTranslatef(frac * offsetX, 0.0f, 0.0f);
 		glutil::PushMatrixMode pmb(GL_MODELVIEW);
 		glTranslatef((1.0 - frac) * offsetX, dimensions.y2(), 0.0f);
+		drawInfo(time); // Go draw some texts and other interface stuff
 		// Do some jumping for drums
 		if (m_drums) {
 			float jumpanim = m_drumJump.get();
@@ -1028,7 +1029,6 @@ void GuitarGraph::draw(double time) {
 		m_neckglow.draw();
 	}
 
-	drawInfo(time, offsetX, dimensions); // Go draw some texts and other interface stuff
 }
 
 /// Draws a single note
@@ -1159,21 +1159,19 @@ void GuitarGraph::drawDrumfill(float tBeg, float tEnd) {
 }
 
 /// Draw popups and other info texts
-void GuitarGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
+void GuitarGraph::drawInfo(double time) {
 	// Draw info
 	if (!menuOpen()) {
-		float xcor = 0.35 * dimensions.w();
-		float h = 0.075 * 2.0 * dimensions.w();
-		// Hack to show the scores better when there is more space (1 instrument)
-		if (m_width.get() > 0.99) {
-			xcor += 0.15;
-			h *= 1.2;
-		}
+		float ycor = -0.05;
+		float xcor = 0.50;
+		float h = 0.075 * 2.0;
+		glutil::PushMatrix pm;
+		glTranslatef(0.0f, 0.0f, -2.5f);
 		// Draw scores
 		{
 			glutil::Color c(Color(0.1f, 0.3f, 1.0f, 0.90f));
 			m_scoreText->render((boost::format("%04d") % getScore()).str());
-			m_scoreText->dimensions().middle(-xcor + offsetX).fixedHeight(h).screenBottom(-0.24);
+			m_scoreText->dimensions().middle(-xcor).fixedHeight(h).bottom(ycor);
 			m_scoreText->draw();
 		}
 		// Draw streak counter
@@ -1181,24 +1179,24 @@ void GuitarGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 			glutil::Color c(Color(0.6f, 0.6f, 0.7f, 0.95f));
 			m_streakText->render(boost::lexical_cast<std::string>(unsigned(m_streak)) + "/"
 			  + boost::lexical_cast<std::string>(unsigned(m_longestStreak)));
-			m_streakText->dimensions().middle(-xcor + offsetX).fixedHeight(h*0.75).screenBottom(-0.20);
+			m_streakText->dimensions().middle(-xcor).fixedHeight(h*0.75).bottom(ycor);
 			m_streakText->draw();
 		}
 	}
 	// Is Starpower ready?
 	if (canActivateStarpower()) {
 		float a = std::abs(std::fmod(time, 1.0) - 0.5f) * 2.0f;
-		m_text.dimensions.screenBottom(-0.02).middle(-0.12 + offsetX);
+		m_text.dimensions.screenBottom(-0.02).middle(-0.12);
 		if (m_drums && m_dfIt != m_drumfills.end() && time >= m_dfIt->begin && time <= m_dfIt->end)
 			m_text.draw(_("Drum Fill!"), a);
 		else m_text.draw(_("God Mode Ready!"), a);
 	} else if (m_solo) {
 		// Solo
 		float a = std::abs(std::fmod(time, 1.0) - 0.5f) * 2.0f;
-		m_text.dimensions.screenBottom(-0.02).middle(-0.03 + offsetX);
+		m_text.dimensions.screenBottom(-0.02).middle(-0.03);
 		m_text.draw(_("Solo!"), a);
 	}
-	drawPopups(offsetX);
+	drawPopups(0.0f);
 }
 
 /// Draw a bar for drum bass pedal/note

@@ -119,7 +119,7 @@ class GuitarGraph: public InstrumentGraph {
 	void drawBar(double time, float h);
 	void drawNote(int fret, Color, float tBeg, float tEnd, float whammy = 0, bool tappable = false, bool hit = false, double hitAnim = 0.0, double releaseTime = 0.0);
 	void drawDrumfill(float tBeg, float tEnd);
-	void drawInfo(double time, double offsetX, Dimensions dimensions);
+	void drawInfo(double time);
 	float getFretX(int fret) { return (-2.0f + fret- (m_drums ? 0.5 : 0)) * (m_leftymode.b() ? -1 : 1); }
 
 	// Chords & notes
