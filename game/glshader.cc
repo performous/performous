@@ -118,8 +118,12 @@ void Shader::bind() {
 
 
 GLint Shader::operator[](const std::string& uniform) {
+	// Try to use a cached value
 	UniformMap::iterator it = uniforms.find(uniform);
-	if (it == uniforms.end())
-		it->second = glGetUniformLocation(program, uniform.c_str());
-	return it->second;
+	if (it != uniforms.end()) return it->second;
+	// Get the value and cache it
+	GLint var = glGetUniformLocation(program, uniform.c_str());
+	if (var == -1) throw std::logic_error("GLSL shader uniform variable not found: " + uniform);
+	return uniforms[uniform] = var;
 }
+

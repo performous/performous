@@ -48,6 +48,13 @@ struct Shader: public boost::noncopyable {
 	Shader& setUniform(const std::string& uniform, float x, float y, float z, float w) {
 		glUniform4f((*this)[uniform], x, y, z, w); return *this;
 	}
+	Shader& setUniformMatrix(const std::string& uniform, GLfloat const* m) {
+		glUniformMatrix4fv((*this)[uniform], 1, GL_FALSE, m); return *this;
+	}
+	Shader& setUniformMatrix(const std::string& uniform, GLdouble const* m) {
+		// Note: need to convert into float because glUniformMatrix4dv is NULL on my machine
+		GLfloat arr[16]; std::copy(m, m + 16, arr); return setUniformMatrix(uniform, arr);
+	}
 
 	/** Get uniform location. Uses caching internally. */
 	GLint operator[](const std::string& uniform);
@@ -66,7 +73,7 @@ struct Shader: public boost::noncopyable {
 		return shader_progs[i];
 	}
 
-  private:
+private:
 	GLuint program; ///< shader program object id
 	int gl_response; ///< save last return state
 
