@@ -189,21 +189,27 @@ namespace glutil {
 
 	/// Checks for OpenGL error and displays it with given location info
 	struct GLErrorChecker {
-		GLErrorChecker(std::string info = "") {
-			GLenum err;
-			if ((err = glGetError()) != GL_NO_ERROR) {
-				if (!info.empty()) info = " (" + info +")";
-				switch(err) {
-					case GL_INVALID_ENUM: std::cerr << "OpenGL error: invalid enum" << info << std::endl; break;
-					case GL_INVALID_VALUE: std::cerr << "OpenGL error: invalid value" << info << std::endl; break;
-					case GL_INVALID_OPERATION: std::cerr << "OpenGL error: invalid operation" << info << std::endl; break;
-					case GL_STACK_OVERFLOW: std::cerr << "OpenGL error: stack overflow" << info << std::endl; break;
-					case GL_STACK_UNDERFLOW: std::cerr << "OpenGL error: stack underflow" << info << std::endl; break;
-					case GL_OUT_OF_MEMORY: std::cerr << "OpenGL error: out of memory" << info << std::endl; break;
-				}
-			}
+		std::string info;
+		GLErrorChecker(std::string const& info): info(info) { check("precondition"); }
+		~GLErrorChecker() { check("postcondition"); }
+		void check(std::string const& what = "check()") {
+			GLenum err = glGetError();
+			if (err == GL_NO_ERROR) return;
+			std::clog << "opengl/error: " << msg(err) << " in " << info << " " << what << std::endl;
 		}
 		static void reset() { glGetError(); }
+		static std::string msg(GLenum err) {
+			switch(err) {
+				case GL_NO_ERROR: return std::string();
+				case GL_INVALID_ENUM: return "Invalid enum";
+				case GL_INVALID_VALUE: return "Invalid value";
+				case GL_INVALID_OPERATION: return "Invalid operation";
+				case GL_STACK_OVERFLOW: return "Stack overflow";
+				case GL_STACK_UNDERFLOW: return "Stack underflow";
+				case GL_OUT_OF_MEMORY: return "Out of memory";
+				default: return "Unknown error";
+			}
+		}
 	};
 }
 

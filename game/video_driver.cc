@@ -152,6 +152,7 @@ void Window::screenshot() {
 
 
 void Window::resize() {
+	glutil::GLErrorChecker glerror("Window::resize");
 	unsigned width = m_fullscreen ? m_fsW : m_windowW;
 	unsigned height = m_fullscreen ? m_fsH : m_windowH;
 	{ // Setup GL attributes for context creation
@@ -170,7 +171,7 @@ void Window::resize() {
 		screen = SDL_SetVideoMode(width, height, 0, SDL_OPENGL | SDL_RESIZABLE | (m_fullscreen ? SDL_FULLSCREEN : 0));
 		if (!screen) throw std::runtime_error(std::string("SDL_SetVideoMode failed: ") + SDL_GetError());
 	}
-
+	glerror.check("SetVideoMode");
 	s_width = screen->w;
 	s_height = screen->h;
 	if (!m_fullscreen) {
@@ -187,8 +188,6 @@ void Window::resize() {
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_BLEND);
-	// Check for OpenGL errors
-	glutil::GLErrorChecker glerror("Window::resize");
 }
 
 FarTransform::FarTransform() {

@@ -70,12 +70,11 @@ void Shader::loadFromFile(const std::string& vert_path, const std::string& frag_
 
 
 void Shader::compile(const char* source, GLenum type) {
-	glutil::GLErrorChecker::reset();
+	glutil::GLErrorChecker ec("Shader::compile");
 	GLenum new_shader = glCreateShader(type);
-	glutil::GLErrorChecker shadererror("Shader::compile - glCreateShader");
-
+	ec.check("glCreateShader");
 	glShaderSource(new_shader, 1, &source, NULL);
-	glutil::GLErrorChecker shadersourceerror("Shader::compile - glShaderSource");
+	ec.check("glShaderSource");
 
 	glCompileShader(new_shader);
 	glGetShaderiv(new_shader, GL_COMPILE_STATUS, &gl_response);
@@ -89,16 +88,15 @@ void Shader::compile(const char* source, GLenum type) {
 
 
 void Shader::link() {
-	glutil::GLErrorChecker::reset();
+	glutil::GLErrorChecker ec("Shader::link");
 	if (program) throw std::runtime_error("Shader already linked.");
 	// Create the program id
 	program = glCreateProgram();
-	glutil::GLErrorChecker createprogramerror("Shader::link - glCreateProgram");
-
+	ec.check("glCreateProgram");
 	// Attach all compiled shaders to it
 	for (ShaderObjects::const_iterator it = shader_ids.begin(); it != shader_ids.end(); ++it)
 		glAttachShader(program, *it);
-	glutil::GLErrorChecker attachshadererror("Shader::link - glAttachShader");
+	ec.check("glAttachShader");
 
 	// Link and check status
 	glLinkProgram(program);
@@ -107,15 +105,15 @@ void Shader::link() {
 		dumpInfoLog(program);
 		throw std::runtime_error("Something went wrong linking the shader program.");
 	}
-	glutil::GLErrorChecker linkerror("Shader::link - glLinkProgram");
+	ec.check("glLinkProgram");
 
 	shader_progs[program] = this;
 }
 
 
 void Shader::bind() {
+	glutil::GLErrorChecker ec("Shader::bind");
 	glUseProgram(program);
-	glutil::GLErrorChecker glerror("Shader::bind");
 }
 
 
