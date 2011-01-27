@@ -25,6 +25,10 @@ public:
 	Window(unsigned int windowW, unsigned int windowH, bool fullscreen);
 	/// destructor
 	~Window();
+	/// Setup everything for drawing a view.
+	/// @param num should be 0 the first time each frame then incremented for each additional view
+	/// @returns true if the view should be rendered, false if no more views are available
+	bool view(unsigned num);
 	/// clears window
 	void blank();
 	/// swaps buffers

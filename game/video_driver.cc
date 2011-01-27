@@ -75,6 +75,52 @@ void Window::blank() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+bool Window::view(unsigned num) {
+	// Setup the projection matrix for 2D translates
+	using namespace glmath;
+	glMatrixMode(GL_PROJECTION);
+	float h = virtH();
+	// OpenGL normalized coordinates go from -1 to 1, change scale so that our 2D translates can use the Performous normalized coordinates instead
+	upload(scale(Vec3(2.0f, 2.0f / h, 1.0f)));
+	// Note: we do the frustum on MODELVIEW so that 2D positioning can be done via projection matrix.
+	// glTranslatef on that will move the image, not the camera (i.e. far-away and nearby objects move the same amount)
+	glMatrixMode(GL_MODELVIEW);
+	const float f = near_ / z0;
+	upload(
+	  scale(Vec3(0.5, 0.5 * h, 1.0))
+	  * frustum(-0.5f * f, 0.5f * f, 0.5f * h * f, -0.5f * h * f, near_, far_)
+	  * translate(Vec3(0.0, 0.0, -z0))
+	);
+	// Setup views
+	bool stereo = config["graphic/stereo3d"].b();
+	int type = config["graphic/stereo3dtype"].i();
+	if (type == 1 && !m_fullscreen) stereo = false;  // Over/under only in full screen mode
+	// Viewport parameters (defaults)
+	double vx = 0.5f * (screen->w - s_width);
+	double vy = 0.5f * (screen->h - s_height);
+	double vw = s_width, vh = s_height;
+	if (stereo) {
+		if (num > 1) return false;
+		double separation = 0.0004f * (num ? -1 : 1) * config["graphic/stereo3dseparation"].f();
+		glMatrixMode(GL_PROJECTION);
+		glTranslatef(separation, 0.0f, 0.0f);
+		glMatrixMode(GL_MODELVIEW);
+		glTranslatef(-separation, 0.0f, 0.0f);
+		if (type == 0) {
+			// TODO: implement color shaders for red/cyan
+		}
+		if (type == 1) {
+			double margin = screen->h - s_height;
+			vy = 0.25 * margin + (num ? 0.5 * screen->h : 0.0);
+			vh *= 0.5;
+		}
+	} else {
+		if (num != 0) return false;
+	}
+	glViewport(vx, vy, vw, vh);
+	return true;
+}
+
 void Window::swap() {
 	SDL_GL_SwapBuffers();
 }
@@ -133,7 +179,6 @@ void Window::resize() {
 	}
 	if (s_height < 0.56f * s_width) s_width = round(s_height / 0.56f);
 	if (s_height > 0.8f * s_width) s_height = round(0.8f * s_width);
-	glViewport(0.5f * (screen->w - s_width), 0.5f * (screen->h - s_height), s_width, s_height);
 	// Set flags
 	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
 	glDisable(GL_DEPTH_TEST);
@@ -142,21 +187,6 @@ void Window::resize() {
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_BLEND);
-	// Setup the projection matrix for 2D translates
-	using namespace glmath;
-	glMatrixMode(GL_PROJECTION);
-	float h = virtH();
-	// OpenGL normalized coordinates go from -1 to 1, change scale so that our 2D translates can use the Performous normalized coordinates instead
-	upload(scale(Vec3(2.0f, 2.0f / h, 1.0f)));
-	// Note: we do the frustum on MODELVIEW so that 2D positioning can be done via projection matrix.
-	// glTranslatef on that will move the image, not the camera (i.e. far-away and nearby objects move the same amount)
-	glMatrixMode(GL_MODELVIEW);
-	const float f = near_ / z0;
-	upload(
-	  scale(Vec3(0.5, 0.5 * h, 1.0))
-	  * frustum(-0.5f * f, 0.5f * f, 0.5f * h * f, -0.5f * h * f, near_, far_)
-	  * translate(Vec3(0.0, 0.0, -z0))
-	);
 	// Check for OpenGL errors
 	glutil::GLErrorChecker glerror("Window::resize");
 }

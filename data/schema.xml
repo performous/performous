@@ -125,6 +125,27 @@ to save the current settings to XML.
 			<long>Enable fullscreen mode on startup.</long>
 		</locale>
 	</entry>
+	<entry name="graphic/stereo3d" type="bool" value="false">
+		<locale name="C">
+			<short>Stereoscopic 3D</short>
+			<long>Enable 3D rendering of Performous.</long>
+		</locale>
+	</entry>
+	<entry name="graphic/stereo3dtype" type="int" value="0">
+		<limits min="0" max="1" step="1" />
+		<locale name="C">
+			<short>Stereo3D type</short>
+			<long>Some modes may only be activated in FullHD mode. 0 = red/cyan, 1 = over/under.</long>
+		</locale>
+	</entry>
+	<entry name="graphic/stereo3dseparation" type="float" value="50">
+		<ui unit=" %" />
+		<limits min="0" max="100" step="1" />
+		<locale name="C">
+			<short>Stereo3D separation</short>
+			<long>The strenght of the effect. Experiment with different settings for best results.</long>
+		</locale>
+	</entry>
 	<entry name="graphic/video" type="bool" value="true">
 		<locale name="C">
 			<short>Video playback</short>

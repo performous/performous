@@ -42,28 +42,11 @@ Screen* ScreenManager::getScreen(std::string const& name) {
 }
 
 void ScreenManager::drawScreen() {
-	// FIXME: Rendering using FBO doesn't work
-	{
-		glViewport(0, 0, 1920, 540);
-		glutil::PushMatrixMode pp(GL_PROJECTION);
-		glTranslatef(0.02f, 0.0f, 0.0f);
-		glutil::PushMatrixMode pmv(GL_MODELVIEW);
-		glTranslatef(-0.02f, 0.0f, 0.0f);
-		//UseFBO fbo(m_fbo);
+	// Draw current frame for all the views
+	for (unsigned i = 0; window().view(i); ++i) {
 		getCurrentScreen()->draw();
 		drawNotifications();
 	}
-	{
-		glViewport(0, 540, 1920, 540);
-		glutil::PushMatrixMode pp(GL_PROJECTION);
-		glTranslatef(-0.02f, 0.0f, 0.0f);
-		glutil::PushMatrixMode pmv(GL_MODELVIEW);
-		glTranslatef(0.02f, 0.0f, 0.0f);
-		//UseFBO fbo(m_fbo);
-		getCurrentScreen()->draw();
-		drawNotifications();
-	}
-	//m_fbo.getTexture().draw(Dimensions().fixedWidth(1.0));
 }
 
 
