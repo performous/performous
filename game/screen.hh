@@ -78,7 +78,6 @@ class ScreenManager: public Singleton <ScreenManager> {
 
   private:
 	Window& m_window;
-	FBO m_fbo;
 	bool m_finished;
 	typedef boost::ptr_map<std::string, Screen> screenmap_t;
 	screenmap_t screens;
