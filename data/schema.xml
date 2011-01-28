@@ -140,7 +140,7 @@ to save the current settings to XML.
 	</entry>
 	<entry name="graphic/stereo3dseparation" type="float" value="50">
 		<ui unit=" %" />
-		<limits min="0" max="100" step="1" />
+		<limits min="0" max="100" step="2" />
 		<locale name="C">
 			<short>Stereo3D separation</short>
 			<long>The strenght of the effect. Experiment with different settings for best results.</long>

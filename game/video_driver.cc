@@ -31,6 +31,10 @@ namespace {
 		int m_value;
 	};
 
+	double getSeparation() {
+		return config["graphic/stereo3d"].b() ? 0.001f * config["graphic/stereo3dseparation"].f() : 0.0;
+	}
+	
 	// stump: under MSVC, near and far are #defined to nothing for compatibility with ancient code, hence the underscores.
 	const float near_ = 0.1f; // This determines the near clipping distance (must be > 0)
 	const float far_ = 110.0f; // How far away can things be seen
@@ -102,7 +106,7 @@ bool Window::view(unsigned num) {
 	glmath::Matrix colorMatrix;
 	if (stereo) {
 		if (num > 1) return false;
-		double separation = 0.0004f * (num ? -1 : 1) * config["graphic/stereo3dseparation"].f();
+		double separation = (num ? -1 : 1) * getSeparation();
 		glMatrixMode(GL_PROJECTION);
 		glTranslatef(separation, 0.0f, 0.0f);
 		glMatrixMode(GL_MODELVIEW);
@@ -197,7 +201,7 @@ void Window::resize() {
 FarTransform::FarTransform() {
 	float z = far_ - 0.1f;  // Very near the far plane but just a bit closer to avoid accidental clipping
 	float s = z / z0;  // Scale the image so that it looks the same size
-	s *= 1.04; // A bit more for stereo3d (avoid black borders)
+	s *= 1.0 + 2.0 * getSeparation(); // A bit more for stereo3d (avoid black borders)
 	glTranslatef(0.0f, 0.0f, -z + z0); // Very near the farplane
 	glScalef(s, s, s);
 }
