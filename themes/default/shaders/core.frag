@@ -1,5 +1,6 @@
 #extension GL_ARB_texture_rectangle : enable
 
+uniform float4x4 colorMatrix;
 uniform int texMode;
 uniform sampler2D tex;
 uniform sampler2DRect texRect;
@@ -18,5 +19,6 @@ void main()
 		texel = vec4(1.0, 0.0, 1.0, 1.0); // Magenta to highlight
 	}
 
-	gl_FragColor = texel * gl_Color;
+	gl_FragColor = colorMatrix * gl_Color * texel;
 }
+

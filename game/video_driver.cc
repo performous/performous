@@ -99,6 +99,7 @@ bool Window::view(unsigned num) {
 	double vx = 0.5f * (screen->w - s_width);
 	double vy = 0.5f * (screen->h - s_height);
 	double vw = s_width, vh = s_height;
+	glmath::Matrix colorMatrix;
 	if (stereo) {
 		if (num > 1) return false;
 		double separation = 0.0004f * (num ? -1 : 1) * config["graphic/stereo3dseparation"].f();
@@ -107,7 +108,9 @@ bool Window::view(unsigned num) {
 		glMatrixMode(GL_MODELVIEW);
 		glTranslatef(-separation, 0.0f, 0.0f);
 		if (type == 0) {
-			// TODO: implement color shaders for red/cyan
+			// FIXME: This is somewhat b0rked because what we really want is eye1 + eye2, not eye2 alpha-blended on top of eye1...
+			if (!num) colorMatrix.cols[0] = Vec4(0.0, 1.0, 1.0);
+			else { colorMatrix.cols[2] = colorMatrix.cols[1] = Vec4(1.0, 0.0, 0.0); colorMatrix(3,3) = 0.5; }
 		}
 		if (type == 1) {
 			double margin = screen->h - s_height;
@@ -117,6 +120,7 @@ bool Window::view(unsigned num) {
 	} else {
 		if (num != 0) return false;
 	}
+	m_shader->setUniformMatrix("colorMatrix", colorMatrix);
 	glViewport(vx, vy, vw, vh);
 	return true;
 }
