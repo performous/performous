@@ -1,6 +1,6 @@
 #extension GL_ARB_texture_rectangle : enable
 
-uniform float4x4 colorMatrix;
+uniform mat4 colorMatrix;
 uniform int texMode;
 uniform sampler2D tex;
 uniform sampler2DRect texRect;
