@@ -95,7 +95,6 @@ void Texture::load(unsigned int width, unsigned int height, pix::Format format, 
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16.0f);
 	glerror.check("MAX_ANISOTROPY_EXT");
 
-	glTexParameteri(type(), GL_GENERATE_MIPMAP, GL_TRUE);
 	PixFmt const& f = getPixFmt(format);
 	glPixelStorei(GL_UNPACK_SWAP_BYTES, f.swap);
 	// Load the data into texture
@@ -113,6 +112,7 @@ void Texture::load(unsigned int width, unsigned int height, pix::Format format, 
 		// Just don't do it in Surface class, thanks. -Tronic
 		glTexImage2D(type(), 0, GL_RGBA, newWidth, newHeight, 0, f.format, f.type, &outBuf[0]);
 	}
+	glGenerateMipmap(type());
 }
 
 void Surface::load(unsigned int width, unsigned int height, pix::Format format, unsigned char const* buffer, float ar) {
