@@ -1,5 +1,8 @@
-uniform sampler2D tex;
+#extension GL_ARB_texture_rectangle : enable
 
+uniform int texMode;
+uniform sampler2D tex;
+uniform sampler2DRect texRect;
 uniform int noteType;
 uniform float hitAnim;
 uniform float clock;
@@ -17,7 +20,17 @@ void colorGlow(inout vec4 c) {
 
 void main()
 {
-	vec4 texel = texture2D(tex, gl_TexCoord[0].st).rgba;
+	vec4 texel;
+
+	if (texMode == 1) {
+		texel = texture2D(tex, gl_TexCoord[0].st).rgba;
+	} else if (texMode == 2) {
+		texel = texture2DRect(texRect, gl_TexCoord[0].st).rgba;
+	} else if (texMode == 0) {
+		texel = vec4(1.0, 1.0, 1.0, 1.0);
+	} else {
+		texel = vec4(1.0, 0.0, 1.0, 1.0); // Magenta to highlight
+	}
 
 	// Cursor arrows
 	if (noteType == 0) {
