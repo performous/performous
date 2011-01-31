@@ -1,6 +1,7 @@
 #include "video_driver.hh"
 
 #include "config.hh"
+#include "fbo.hh"
 #include "fs.hh"
 #include "glmath.hh"
 #include "image.hh"
@@ -77,6 +78,21 @@ Window::~Window() { }
 
 void Window::blank() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void Window::render(boost::function<void (void)> drawFunc) {
+	// Draw current frame for all the views
+	FBO fbo[2];
+	for (unsigned i = 0; view(i); ++i) {
+		UseFBO user(fbo[i]);
+		drawFunc();
+	}
+	{
+		UseTexture use(fbo[0].getTexture());
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	//getCurrentScreen()->draw();
+	//fbo[0].getTexture().draw(Dimensions(1.0).center(0.0).middle(0.0), TexCoords());
 }
 
 bool Window::view(unsigned num) {

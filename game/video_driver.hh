@@ -2,6 +2,7 @@
 
 #include "glshader.hh"
 #include "glutil.hh"
+#include <boost/function.hpp>
 #include <boost/scoped_ptr.hpp>
 
 unsigned int screenW();
@@ -25,6 +26,7 @@ public:
 	Window(unsigned int windowW, unsigned int windowH, bool fullscreen);
 	/// destructor
 	~Window();
+	void render(boost::function<void (void)> drawFunc);
 	/// Setup everything for drawing a view.
 	/// @param num should be 0 the first time each frame then incremented for each additional view
 	/// @returns true if the view should be rendered, false if no more views are available

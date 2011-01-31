@@ -21,6 +21,7 @@
 #include "screen_paths.hh"
 #include "screen_players.hh"
 
+#include <boost/bind.hpp>
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
@@ -65,7 +66,7 @@ static void checkEvents_SDL(ScreenManager& sm) {
 			sm.finished();
 			break;
 		  case SDL_VIDEORESIZE:
-			sm.window().resize(event.resize.w, event.resize.h);
+			//sm.window().resize(event.resize.w, event.resize.h);
 			break;
 		  case SDL_KEYDOWN:
 			int keypressed  = event.key.keysym.sym;
@@ -179,7 +180,7 @@ void mainLoop(std::string const& songlist) {
 			try {
 				// Draw
 				window.blank();
-				sm.drawScreen();
+				window.render(boost::bind(&ScreenManager::drawScreen, &sm));
 				prof("draw");
 				// Display (and wait until next frame)
 				window.swap();

@@ -42,11 +42,8 @@ Screen* ScreenManager::getScreen(std::string const& name) {
 }
 
 void ScreenManager::drawScreen() {
-	// Draw current frame for all the views
-	for (unsigned i = 0; window().view(i); ++i) {
-		getCurrentScreen()->draw();
-		drawNotifications();
-	}
+	getCurrentScreen()->draw();
+	drawNotifications();
 }
 
 

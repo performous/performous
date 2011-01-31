@@ -1,6 +1,7 @@
 #pragma once
 
 #include <boost/noncopyable.hpp>
+#include "surface.hh"
 #include "video_driver.hh"
 
 /// Frame Buffer Object class
@@ -12,9 +13,9 @@ class FBO: public boost::noncopyable {
 		bind();
 		{
 			UseTexture tex(m_texture);
-			glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA, screenW(), screenH(), 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screenW(), screenH(), 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 			// Bind texture as COLOR_ATTACHMENT0
-			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_RECTANGLE_ARB, m_texture.id(), 0);
+			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, m_texture.id(), 0);
 		}
 		unbind();
 	}
@@ -23,7 +24,7 @@ class FBO: public boost::noncopyable {
 		if (m_fbo) glDeleteFramebuffersEXT(1, &m_fbo);
 	}
 	/// Returns a reference to the attached texture
-	OpenGLTexture<GL_TEXTURE_RECTANGLE_ARB>& getTexture() {
+	OpenGLTexture<GL_TEXTURE_2D>& getTexture() {
 		return m_texture;
 	}
 	/// Bind the FBO into use
@@ -37,7 +38,7 @@ class FBO: public boost::noncopyable {
 
   private:
 	GLuint m_fbo;
-	OpenGLTexture<GL_TEXTURE_RECTANGLE_ARB> m_texture;
+	OpenGLTexture<GL_TEXTURE_2D> m_texture;
 };
 
 /// RAII FBO binder
