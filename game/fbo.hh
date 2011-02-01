@@ -9,14 +9,21 @@ class FBO: public boost::noncopyable {
   public:
 	/// Generate the FBO and attach a fresh texture to it
 	FBO(): m_texture() {
-		glGenFramebuffersEXT(1, &m_fbo);
-		bind();
 		{
 			UseTexture tex(m_texture);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screenW(), screenH(), 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-			// Bind texture as COLOR_ATTACHMENT0
-			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, m_texture.id(), 0);
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+			// When texture area is large, bilinear filter the original
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			// The texture wraps over at the edges (repeat)
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		}
+		// Create FBO
+		glGenFramebuffersEXT(1, &m_fbo);
+		// Bind texture as COLOR_ATTACHMENT0
+		bind();
+		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, m_texture.id(), 0);
 		unbind();
 	}
 	/// Handle clean-up

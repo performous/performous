@@ -19,6 +19,6 @@ void main()
 		texel = vec4(1.0, 0.0, 1.0, 1.0); // Magenta to highlight
 	}
 
-	gl_FragColor = colorMatrix * gl_Color * texel;
+	gl_FragColor = colorMatrix * (gl_Color * texel);
 }
 

@@ -81,18 +81,60 @@ void Window::blank() {
 }
 
 void Window::render(boost::function<void (void)> drawFunc) {
-	// Draw current frame for all the views
+	bool stereo = config["graphic/stereo3d"].b();
+	int type = config["graphic/stereo3dtype"].i();
+	if (type == 1 && !m_fullscreen) stereo = false;  // Over/under only in full screen mode
+	// Viewport parameters (defaults)
+	double vx = 0.5f * (screen->w - s_width);
+	double vy = 0.5f * (screen->h - s_height);
+	double vw = s_width, vh = s_height;
+	glViewport(vx, vy, vw, vh);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	m_shader->setUniformMatrix("colorMatrix", glmath::Matrix());
+	if (!stereo) {
+		view(0);
+		drawFunc();
+		return;
+	}
+	// Render each eye to FBO
 	FBO fbo[2];
-	for (unsigned i = 0; view(i); ++i) {
+	for (unsigned i = 0; i < 2; ++i) {
 		UseFBO user(fbo[i]);
+		view(i);
 		drawFunc();
 	}
-	{
-		UseTexture use(fbo[0].getTexture());
-		glGenerateMipmap(GL_TEXTURE_2D);
+	// Render to actual framebuffer from FBOs
+	for (int num = 0; num < 2; ++num) {
+		if (type == 0) {
+			using namespace glmath;
+			Matrix colorMatrix;
+			float saturation = 0.6;  // (0..1)
+			float col = (1.0 + 2.0 * saturation) / 3.0;
+			float gry = 0.5 * (1.0 - col);
+			if (num == 0) {
+				// Left eye
+				colorMatrix.cols[0] = Vec4(col, 0.0, 0.0);  // Red in original becomes
+				colorMatrix.cols[1] = Vec4(gry, 0.0, 0.0);  // Green in original becomes
+				colorMatrix.cols[2] = Vec4(gry, 0.0, 0.0);  // Blue in original becomes
+			} else {
+				// Right eye
+				colorMatrix.cols[0] = Vec4(0.0, gry, gry);  // Red in original becomes
+				colorMatrix.cols[1] = Vec4(0.0, col, gry);  // Green in original becomes
+				colorMatrix.cols[2] = Vec4(0.0, gry, col);  // Blue in original becomes
+			}
+			m_shader->setUniformMatrix("colorMatrix", colorMatrix);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		} else {
+			double margin = screen->h - s_height;
+			glViewport(vx, 0.25 * margin + (num ? 0.0 : 0.5 * screen->h), vw, 0.5 * vh);
+		}
+		{
+			UseTexture use(fbo[num].getTexture());
+			glGenerateMipmap(GL_TEXTURE_2D);
+			//drawFunc();
+			fbo[num].getTexture().draw(Dimensions().stretch(1.0, virtH()), TexCoords(0.0, 1.0, 1.0, 0.0));
+		}
 	}
-	//getCurrentScreen()->draw();
-	//fbo[0].getTexture().draw(Dimensions(1.0).center(0.0).middle(0.0), TexCoords());
 }
 
 bool Window::view(unsigned num) {
@@ -113,35 +155,16 @@ bool Window::view(unsigned num) {
 	);
 	// Setup views
 	bool stereo = config["graphic/stereo3d"].b();
-	int type = config["graphic/stereo3dtype"].i();
-	if (type == 1 && !m_fullscreen) stereo = false;  // Over/under only in full screen mode
-	// Viewport parameters (defaults)
-	double vx = 0.5f * (screen->w - s_width);
-	double vy = 0.5f * (screen->h - s_height);
-	double vw = s_width, vh = s_height;
-	glmath::Matrix colorMatrix;
 	if (stereo) {
 		if (num > 1) return false;
-		double separation = (num ? -1 : 1) * getSeparation();
+		double separation = (num == 0 ? -1 : 1) * getSeparation();
 		glMatrixMode(GL_PROJECTION);
 		glTranslatef(separation, 0.0f, 0.0f);
 		glMatrixMode(GL_MODELVIEW);
 		glTranslatef(-separation, 0.0f, 0.0f);
-		if (type == 0) {
-			// FIXME: This is somewhat b0rked because what we really want is eye1 + eye2, not eye2 alpha-blended on top of eye1...
-			if (!num) colorMatrix.cols[0] = Vec4(0.0, 1.0, 1.0);
-			else { colorMatrix.cols[2] = colorMatrix.cols[1] = Vec4(1.0, 0.0, 0.0); colorMatrix(3,3) = 0.5; }
-		}
-		if (type == 1) {
-			double margin = screen->h - s_height;
-			vy = 0.25 * margin + (num ? 0.5 * screen->h : 0.0);
-			vh *= 0.5;
-		}
 	} else {
 		if (num != 0) return false;
 	}
-	m_shader->setUniformMatrix("colorMatrix", colorMatrix);
-	glViewport(vx, vy, vw, vh);
 	return true;
 }
 
