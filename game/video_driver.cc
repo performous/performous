@@ -132,8 +132,7 @@ void Window::render(boost::function<void (void)> drawFunc) {
 		}
 		{
 			UseTexture use(fbo[num].getTexture());
-			glGenerateMipmap(GL_TEXTURE_2D);
-			fbo[num].getTexture().draw(Dimensions().stretch(1.0, virtH()), TexCoords(0.0, 1.0, 1.0, 0.0));
+			fbo[num].getTexture().draw(Dimensions().stretch(1.0, virtH()), TexCoords(0.0, screenH(), screenW(), 0.0));
 		}
 	}
 }

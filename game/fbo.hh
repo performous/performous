@@ -11,19 +11,13 @@ class FBO: public boost::noncopyable {
 	FBO(): m_texture() {
 		{
 			UseTexture tex(m_texture);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screenW(), screenH(), 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-			// When texture area is large, bilinear filter the original
-			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			// The texture wraps over at the edges (repeat)
-			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, screenW(), screenH(), 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 		}
 		// Create FBO
 		glGenFramebuffersEXT(1, &m_fbo);
 		// Bind texture as COLOR_ATTACHMENT0
 		bind();
-		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, m_texture.id(), 0);
+		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_RECTANGLE, m_texture.id(), 0);
 		unbind();
 	}
 	/// Handle clean-up
@@ -31,7 +25,7 @@ class FBO: public boost::noncopyable {
 		if (m_fbo) glDeleteFramebuffersEXT(1, &m_fbo);
 	}
 	/// Returns a reference to the attached texture
-	OpenGLTexture<GL_TEXTURE_2D>& getTexture() {
+	OpenGLTexture<GL_TEXTURE_RECTANGLE>& getTexture() {
 		return m_texture;
 	}
 	/// Bind the FBO into use
@@ -45,7 +39,7 @@ class FBO: public boost::noncopyable {
 
   private:
 	GLuint m_fbo;
-	OpenGLTexture<GL_TEXTURE_2D> m_texture;
+	OpenGLTexture<GL_TEXTURE_RECTANGLE> m_texture;
 };
 
 /// RAII FBO binder
