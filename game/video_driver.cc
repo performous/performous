@@ -104,6 +104,7 @@ void Window::render(boost::function<void (void)> drawFunc) {
 		drawFunc();
 	}
 	// Render to actual framebuffer from FBOs
+	glDisable(GL_BLEND);
 	for (int num = 0; num < 2; ++num) {
 		if (type == 0) {
 			using namespace glmath;
@@ -118,12 +119,13 @@ void Window::render(boost::function<void (void)> drawFunc) {
 				colorMatrix.cols[2] = Vec4(gry, 0.0, 0.0);  // Blue in original becomes
 			} else {
 				// Right eye
+				glEnable(GL_BLEND);
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 				colorMatrix.cols[0] = Vec4(0.0, gry, gry);  // Red in original becomes
 				colorMatrix.cols[1] = Vec4(0.0, col, gry);  // Green in original becomes
 				colorMatrix.cols[2] = Vec4(0.0, gry, col);  // Blue in original becomes
 			}
 			m_shader->setUniformMatrix("colorMatrix", colorMatrix);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 		} else {
 			double margin = screen->h - s_height;
 			glViewport(vx, 0.25 * margin + (num ? 0.0 : 0.5 * screen->h), vw, 0.5 * vh);
@@ -131,13 +133,20 @@ void Window::render(boost::function<void (void)> drawFunc) {
 		{
 			UseTexture use(fbo[num].getTexture());
 			glGenerateMipmap(GL_TEXTURE_2D);
-			//drawFunc();
 			fbo[num].getTexture().draw(Dimensions().stretch(1.0, virtH()), TexCoords(0.0, 1.0, 1.0, 0.0));
 		}
 	}
 }
 
 bool Window::view(unsigned num) {
+	// Set flags
+	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+	glShadeModel(GL_SMOOTH);
+	glEnable(GL_BLEND);
 	// Setup the projection matrix for 2D translates
 	using namespace glmath;
 	glMatrixMode(GL_PROJECTION);
@@ -227,14 +236,6 @@ void Window::resize() {
 	}
 	if (s_height < 0.56f * s_width) s_width = round(s_height / 0.56f);
 	if (s_height > 0.8f * s_width) s_height = round(0.8f * s_width);
-	// Set flags
-	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_CULL_FACE);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-	glShadeModel(GL_SMOOTH);
-	glEnable(GL_BLEND);
 }
 
 FarTransform::FarTransform() {

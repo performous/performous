@@ -179,11 +179,12 @@ void mainLoop(std::string const& songlist) {
 			prof("misc");
 			try {
 				// Draw
-				window.blank();
 				window.render(boost::bind(&ScreenManager::drawScreen, &sm));
+				glFinish();
 				prof("draw");
 				// Display (and wait until next frame)
 				window.swap();
+				glFinish();
 				prof("swap");
 				if (config["graphic/fps"].b()) {
 					++frames;
