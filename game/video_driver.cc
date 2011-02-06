@@ -94,7 +94,7 @@ void Window::blank() {
 void Window::render(boost::function<void (void)> drawFunc) {
 	bool stereo = config["graphic/stereo3d"].b();
 	int type = config["graphic/stereo3dtype"].i();
-	if (type == 1 && !m_fullscreen) stereo = false;  // Over/under only in full screen mode
+	if (type == 2 && !m_fullscreen) stereo = false;  // Over/under only in full screen mode
 	// Viewport parameters (defaults)
 	double vx = 0.5f * (screen->w - s_width);
 	double vy = 0.5f * (screen->h - s_height);
@@ -116,36 +116,42 @@ void Window::render(boost::function<void (void)> drawFunc) {
 	// Render to actual framebuffer from FBOs
 	glDisable(GL_BLEND);
 	Shader& sh = shader("surface");
+	glmath::Matrix colorMatrix;
 	for (int num = 0; num < 2; ++num) {
-		if (type == 0) {
-			using namespace glmath;
-			Matrix colorMatrix;
-			float saturation = 0.6;  // (0..1)
-			float col = (1.0 + 2.0 * saturation) / 3.0;
-			float gry = 0.5 * (1.0 - col);
-			if (num == 0) {
-				// Left eye
-				colorMatrix.cols[0] = Vec4(col, 0.0, 0.0);  // Red in original becomes
-				colorMatrix.cols[1] = Vec4(gry, 0.0, 0.0);  // Green in original becomes
-				colorMatrix.cols[2] = Vec4(gry, 0.0, 0.0);  // Blue in original becomes
-			} else {
-				// Right eye
-				glEnable(GL_BLEND);
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-				colorMatrix.cols[0] = Vec4(0.0, gry, gry);  // Red in original becomes
-				colorMatrix.cols[1] = Vec4(0.0, col, gry);  // Green in original becomes
-				colorMatrix.cols[2] = Vec4(0.0, gry, col);  // Blue in original becomes
+		if (type == 0 || type == 1) {  // Anaglyph
+			{
+				float saturation = 0.6;  // (0..1)
+				float col = (1.0 + 2.0 * saturation) / 3.0;
+				float gry = 0.5 * (1.0 - col);
+				bool out[3] = {};  // Which colors to output
+				if (type == 0 && num == 0) { out[0] = true; }  // Red
+				if (type == 0 && num == 1) { out[1] = out[2] = true; }  // Cyan
+				if (type == 1 && num == 0) { out[1] = true; }  // Green
+				if (type == 1 && num == 1) { out[0] = out[2] = true; }  // Magenta
+				for (unsigned i = 0; i < 3; ++i) {
+					for (unsigned j = 0; j < 3; ++j) {
+						double val = 0.0;
+						if (out[i]) val = (i == j ? col : gry);
+						colorMatrix(i, j) = val;
+					}
+				}
 			}
-			sh.setUniformMatrix("colorMatrix", colorMatrix);
-		} else {
+			if (num == 1) {
+				// Right eye blends over the left eye
+				glEnable(GL_BLEND);
+				glBlendFunc(GL_ONE, GL_ONE);
+			}
+			sh.bind();
+		} else if (type == 2) {  // Over/under
 			double margin = screen->h - s_height;
 			glViewport(vx, 0.25 * margin + (num ? 0.0 : 0.5 * screen->h), vw, 0.5 * vh);
 		}
 		{
 			UseTexture use(fbo[num].getTexture());
+			sh.setUniformMatrix("colorMatrix", colorMatrix);
 			fbo[num].getTexture().draw(Dimensions().stretch(1.0, virtH()), TexCoords(0.0, screenH(), screenW(), 0.0));
+			sh.setUniformMatrix("colorMatrix", glmath::Matrix());
 		}
-		sh.setUniformMatrix("colorMatrix", glmath::Matrix());
 	}
 }
 

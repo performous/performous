@@ -132,10 +132,10 @@ to save the current settings to XML.
 		</locale>
 	</entry>
 	<entry name="graphic/stereo3dtype" type="int" value="0">
-		<limits min="0" max="1" step="1" />
+		<limits min="0" max="2" step="1" />
 		<locale name="C">
 			<short>Stereo3D type</short>
-			<long>Some modes may only be activated in FullHD mode. 0 = red/cyan, 1 = over/under.</long>
+			<long>Some modes may only be activated in FullHD mode. 0 = red/cyan, 1 = green/magenta, 2 = over/under.</long>
 		</locale>
 	</entry>
 	<entry name="graphic/stereo3dseparation" type="float" value="50">
