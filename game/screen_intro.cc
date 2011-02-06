@@ -117,6 +117,7 @@ void ScreenIntro::draw() {
 	{
 		float anim = SDL_GetTicks() % 20000 / 20000.0;
 		Shader& sh = theme->bg.shader();
+		sh.bind();
 		sh.setUniformMatrix("colorMatrix", glmath::rotate(2.0 * M_PI * anim, glmath::Vec3(1.0, 1.0, 1.0)));
 		theme->bg.draw();
 		sh.setUniformMatrix("colorMatrix", glmath::Matrix());
