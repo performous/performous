@@ -252,13 +252,13 @@ void ScreenSongs::drawCovers() {
 		Song& song = m_songs[baseidx + i];
 		Surface& s = getCover(song);
 		// Calculate dimensions for cover and instrument markers
-		double diff = (i == 0 ? 2.0 * (0.5 - fabs(shift)) : 0.0);  // 0..1 for current cover hilight level
-		double y = 0.26;
+		double diff = 0.5 * (1.0 + std::cos(std::min(M_PI, std::abs(i - shift))));  // 0..1 for current cover hilight level
+		double y = 0.5 * virtH();
 		glutil::PushMatrix pm;
-		glTranslatef(0.0f, 0.0f, -0.05 * (1.0 - diff));  // Move other covers further back
-		double c = 0.6 + 0.4 * diff;
-		glColor3f(c, c, c);
-		s.dimensions.middle(-0.2 + 0.17 * (i - shift)).bottom(y - 0.01 * diff).fitInside(0.15, 0.15);
+		glTranslatef(0.0f, 0.0f, -0.2 - 0.2 * (1.0 - diff));  // Move other covers further back
+		double c = 0.4 + 0.6 * diff;
+		glutil::Color c1(Color(c, c, c));
+		s.dimensions.middle(-0.2 + 0.20 * (i - shift)).bottom(y - 0.0 * diff).fitInside(0.17, 0.17);
 		// Draw the cover normally
 		s.draw();
 		// Draw the reflection
@@ -266,7 +266,7 @@ void ScreenSongs::drawCovers() {
 		glTranslatef(0.0f, 2.0 * y, 0.0f);
 		glScalef(1.0f, -1.0f, 1.0f);
 		{
-			glutil::Color c(Color(1.0f, 1.0f, 1.0f, 0.4f));
+			glutil::Color c2(Color(1.0f, 1.0f, 1.0f, 0.4f));
 			s.draw();
 		}
 	}
