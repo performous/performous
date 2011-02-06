@@ -1,5 +1,3 @@
-#extension GL_ARB_texture_rectangle : enable
-
 varying vec3 normal;
 
 void main()

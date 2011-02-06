@@ -13,7 +13,6 @@
 #include "screen.hh"
 #include "fs.hh"
 #include "theme.hh"
-#include "glshader.hh"
 
 
 /// Represents popup messages
@@ -135,9 +134,6 @@ class InstrumentGraph {
 	SvgTxtTheme m_text;
 	boost::scoped_ptr<SvgTxtThemeSimple> m_popupText;
 	boost::scoped_ptr<ThemeInstrumentMenu> m_menuTheme;
-
-	// Shaders
-	boost::scoped_ptr<Shader> m_shader_note;
 
 	// Dynamic stuff for join menu
 	ConfigItem m_selectedTrack; /// menu modifies this to select track

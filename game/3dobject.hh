@@ -67,6 +67,7 @@ class Object3d: boost::noncopyable {
 	void drawVBO();
 	/// draws the object
 	void draw(float x = 0, float y = 0, float z = 0, float s = 1.0) {
+		UseShader us(getShader("3dobject"));
 		glutil::PushMatrix pm;
 		glTranslatef(x, y, z); // Move to position
 		if (s != 1.0) glScalef(s,s,s); // Scale if needed

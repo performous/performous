@@ -90,8 +90,6 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
   m_flow_direction(1),
   m_insideStop()
 {
-	m_shader_note.reset(new Shader);
-	m_shader_note->compileFile(getThemePath("shaders/dancenote.vert")).compileFile(getThemePath("shaders/dancenote.frag")).link();
 	// Initialize some arrays
 	for (size_t i = 0; i < max_panels; i++) {
 		m_activeNotes[i] = m_notes.end();
@@ -428,14 +426,8 @@ void DanceGraph::draw(double time) {
 
 		// Arrows on cursor
 		{
-			UseShader us(*m_shader_note);
-			us().setUniform("clock", float(time))
-			    .setUniform("noteType", 0)
-			    .setUniform("scale", getScale());
 			for (int arrow_i = 0; arrow_i < m_pads; ++arrow_i) {
 				float l = m_pressed_anim[arrow_i].get();
-				us().setUniform("hitAnim", l)
-				    .setUniform("position", panel2x(arrow_i), time2y(0.0));
 				drawArrow(arrow_i, m_arrows_cursor);
 			}
 		}
@@ -491,11 +483,6 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	double glow = note.hitAnim.get();
 
 	{
-		UseShader us(*m_shader_note);
-		us().setUniform("hitAnim", float(glow))
-		    .setUniform("clock", float(time))
-		    .setUniform("scale", getScale());
-
 		if (yEnd - yBeg > arrowSize) {
 			// Draw holds
 			if (note.isHit && note.releaseTime <= 0) { // The note is being held down
@@ -503,7 +490,6 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 				yEnd = std::max(time2y(0.0), yEnd);
 			}
 			if (note.releaseTime > 0) yBeg = time2y(note.releaseTime - time); // Oh noes, it got released!
-			us().setUniform("noteType", 2).setUniform("position", x, yBeg);
 			// Draw begin
 			drawArrow(arrow_i, m_arrows_hold, 0.0f, 1.0f/3.0f);
 			if (yEnd - yBeg > 0) {
@@ -521,7 +507,6 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 		} else {
 			// Draw short note
 			if (mine && note.isHit) yBeg = time2y(0.0);
-			us().setUniform("noteType", (mine ? 3 : 1)).setUniform("position", x, yBeg);
 			drawArrow((mine ? -1 : arrow_i), (mine ? m_mine : m_arrows));
 		}
 	}

@@ -83,6 +83,10 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	  .link()
 	  .bind()
 	  .setUniformMatrix("colorMatrix", glmath::Matrix());
+	shader("3dobject")
+	  .compileFile(getThemePath("shaders/3dobject.vert"))
+	  .compileFile(getThemePath("shaders/3dobject.frag"))
+	  .link();
 }
 
 Window::~Window() { }
