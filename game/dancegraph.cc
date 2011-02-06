@@ -392,7 +392,8 @@ namespace {
 
 /// Draw a dance pad icon using the given texture
 void DanceGraph::drawArrow(int arrow_i, Texture& tex, float ty1, float ty2) {
-	UseTexture tblock(tex);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(tex.type(), tex.id());
 	glutil::VertexArray va;
 	vertexPair(va, arrow_i, -arrowSize, ty1);
 	vertexPair(va, arrow_i,  arrowSize, ty2);
@@ -426,8 +427,14 @@ void DanceGraph::draw(double time) {
 
 		// Arrows on cursor
 		{
+			UseShader us(getShader("dancenote"));
+			us().setUniform("clock", float(time))
+			    .setUniform("noteType", 0)
+			    .setUniform("scale", getScale());
 			for (int arrow_i = 0; arrow_i < m_pads; ++arrow_i) {
 				float l = m_pressed_anim[arrow_i].get();
+				us().setUniform("hitAnim", l)
+				    .setUniform("position", panel2x(arrow_i), time2y(0.0));
 				drawArrow(arrow_i, m_arrows_cursor);
 			}
 		}
@@ -483,6 +490,11 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	double glow = note.hitAnim.get();
 
 	{
+		UseShader us(getShader("dancenote"));
+		us().setUniform("hitAnim", float(glow))
+		    .setUniform("clock", float(time))
+		    .setUniform("scale", getScale());
+
 		if (yEnd - yBeg > arrowSize) {
 			// Draw holds
 			if (note.isHit && note.releaseTime <= 0) { // The note is being held down
@@ -490,10 +502,12 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 				yEnd = std::max(time2y(0.0), yEnd);
 			}
 			if (note.releaseTime > 0) yBeg = time2y(note.releaseTime - time); // Oh noes, it got released!
+			us().setUniform("noteType", 2).setUniform("position", x, yBeg);
 			// Draw begin
 			drawArrow(arrow_i, m_arrows_hold, 0.0f, 1.0f/3.0f);
 			if (yEnd - yBeg > 0) {
-				UseTexture tblock(m_arrows_hold);
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(m_arrows_hold.type(), m_arrows_hold.id());
 				glutil::VertexArray va;
 				// Middle
 				vertexPair(va, arrow_i, arrowSize, 1.0f/3.0f);
@@ -507,6 +521,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 		} else {
 			// Draw short note
 			if (mine && note.isHit) yBeg = time2y(0.0);
+			us().setUniform("noteType", (mine ? 3 : 1)).setUniform("position", x, yBeg);
 			drawArrow((mine ? -1 : arrow_i), (mine ? m_mine : m_arrows));
 		}
 	}

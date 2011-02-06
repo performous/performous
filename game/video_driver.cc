@@ -87,6 +87,10 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	  .compileFile(getThemePath("shaders/3dobject.vert"))
 	  .compileFile(getThemePath("shaders/3dobject.frag"))
 	  .link();
+	shader("dancenote")
+	  .compileFile(getThemePath("shaders/dancenote.vert"))
+	  .compileFile(getThemePath("shaders/dancenote.frag"))
+	  .link();
 }
 
 Window::~Window() { }
