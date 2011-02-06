@@ -92,28 +92,42 @@ void Window::blank() {
 }
 
 void Window::render(boost::function<void (void)> drawFunc) {
+	if (s_width < screen->w || s_height < screen->h) glClear(GL_COLOR_BUFFER_BIT);  // Black bars
 	bool stereo = config["graphic/stereo3d"].b();
 	int type = config["graphic/stereo3dtype"].i();
 	if (type == 2 && !m_fullscreen) stereo = false;  // Over/under only in full screen mode
-	// Viewport parameters (defaults)
-	double vx = 0.5f * (screen->w - s_width);
-	double vy = 0.5f * (screen->h - s_height);
-	double vw = s_width, vh = s_height;
-	glViewport(vx, vy, vw, vh);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	if (!stereo) {
+		double vx = 0.5f * (screen->w - s_width);
+		double vy = 0.5f * (screen->h - s_height);
+		double vw = s_width, vh = s_height;
+		glViewport(vx, vy, vw, vh);  // Drawable area of the window (excluding black bars)
 		view(0);
 		drawFunc();
 		return;
 	}
 	// Render each eye to FBO
-	FBO fbo[2];
+	unsigned w = s_width;
+	unsigned h = s_height;
+	if (type == 2) h /= 2;  // Half-height mode
+	FBO fboleft(w, h), fboright(w, h);
+	FBO* fbo[] = { &fboleft, &fboright };
 	for (unsigned i = 0; i < 2; ++i) {
-		UseFBO user(fbo[i]);
+		UseFBO user(*fbo[i]);
+		glViewport(0, 0, w, h);  // Full FBO
 		view(i);
 		drawFunc();
 	}
 	// Render to actual framebuffer from FBOs
+	glViewport(0, 0, screen->w, screen->h);  // Entire window
+	{
+		// Use normalized eye coordinates for composition
+		using namespace glmath;
+		glMatrixMode(GL_PROJECTION);
+		upload(Matrix());
+		glMatrixMode(GL_MODELVIEW);
+		upload(Matrix());
+	}
 	glDisable(GL_BLEND);
 	Shader& sh = shader("surface");
 	glmath::Matrix colorMatrix;
@@ -142,14 +156,14 @@ void Window::render(boost::function<void (void)> drawFunc) {
 				glBlendFunc(GL_ONE, GL_ONE);
 			}
 			sh.bind();
-		} else if (type == 2) {  // Over/under
-			double margin = screen->h - s_height;
-			glViewport(vx, 0.25 * margin + (num ? 0.0 : 0.5 * screen->h), vw, 0.5 * vh);
 		}
 		{
-			UseTexture use(fbo[num].getTexture());
+			// Render FBO with 1:1 pixels, properly filtered/positioned for 3d
+			UseTexture use(fbo[num]->getTexture());
 			sh.setUniformMatrix("colorMatrix", colorMatrix);
-			fbo[num].getTexture().draw(Dimensions().stretch(1.0, virtH()), TexCoords(0.0, screenH(), screenW(), 0.0));
+			Dimensions dim = Dimensions().stretch(2.0 * w / screen->w, 2.0 * h / screen->h);
+			if (type == 2) dim.center(num == 0 ? 0.5 : -0.5);
+			fbo[num]->getTexture().draw(dim, TexCoords(0.0, 0.0, w, h));
 			sh.setUniformMatrix("colorMatrix", glmath::Matrix());
 		}
 	}
