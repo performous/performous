@@ -27,10 +27,6 @@ public:
 	/// destructor
 	~Window();
 	void render(boost::function<void (void)> drawFunc);
-	/// Setup everything for drawing a view.
-	/// @param num should be 0 the first time each frame then incremented for each additional view
-	/// @returns true if the view should be rendered, false if no more views are available
-	bool view(unsigned num);
 	/// clears window
 	void blank();
 	/// swaps buffers
@@ -57,6 +53,9 @@ public:
 	/// Construct a new shader or return an existing one by name
 	Shader& shader(std::string const& name) { return m_shaders[name]; }
 private:
+	/// Setup everything for drawing a view.
+	/// @param num 0 = no stereo, 1 = left eye, 2 = right eye
+	void view(unsigned num);
 	SDL_Surface* screen;
 	unsigned int m_windowW, m_windowH;
 	unsigned int m_fsW, m_fsH;

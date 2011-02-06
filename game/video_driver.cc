@@ -123,7 +123,7 @@ void Window::render(boost::function<void (void)> drawFunc) {
 	for (unsigned i = 0; i < 2; ++i) {
 		UseFBO user(*fbo[i]);
 		glViewport(0, 0, w, h);  // Full FBO
-		view(i);
+		view(i + 1);
 		drawFunc();
 	}
 	// Render to actual framebuffer from FBOs
@@ -177,7 +177,7 @@ void Window::render(boost::function<void (void)> drawFunc) {
 	}
 }
 
-bool Window::view(unsigned num) {
+void Window::view(unsigned num) {
 	// Set flags
 	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
 	glDisable(GL_DEPTH_TEST);
@@ -202,18 +202,13 @@ bool Window::view(unsigned num) {
 	  * translate(Vec3(0.0, 0.0, -z0))
 	);
 	// Setup views
-	bool stereo = config["graphic/stereo3d"].b();
-	if (stereo) {
-		if (num > 1) return false;
-		double separation = (num == 0 ? -1 : 1) * getSeparation();
-		glMatrixMode(GL_PROJECTION);
-		glTranslatef(separation, 0.0f, 0.0f);
-		glMatrixMode(GL_MODELVIEW);
-		glTranslatef(-separation, 0.0f, 0.0f);
-	} else {
-		if (num != 0) return false;
-	}
-	return true;
+	if (num == 0) return;  // Center (non-stereo)
+	// Stereo separation
+	double separation = (num == 1 ? -1 : 1) * getSeparation();
+	glMatrixMode(GL_PROJECTION);
+	glTranslatef(separation, 0.0f, 0.0f);
+	glMatrixMode(GL_MODELVIEW);
+	glTranslatef(-separation, 0.0f, 0.0f);
 }
 
 void Window::swap() {
