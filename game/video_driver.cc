@@ -244,7 +244,6 @@ void Window::resize() {
 		screen = SDL_SetVideoMode(width, height, 0, SDL_OPENGL | SDL_RESIZABLE | (m_fullscreen ? SDL_FULLSCREEN : 0));
 		if (!screen) throw std::runtime_error(std::string("SDL_SetVideoMode failed: ") + SDL_GetError());
 	}
-	glerror.check("SetVideoMode");
 	s_width = screen->w;
 	s_height = screen->h;
 	if (!m_fullscreen) {

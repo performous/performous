@@ -66,7 +66,7 @@ static void checkEvents_SDL(ScreenManager& sm) {
 			sm.finished();
 			break;
 		  case SDL_VIDEORESIZE:
-			//sm.window().resize(event.resize.w, event.resize.h);
+			sm.window().resize(event.resize.w, event.resize.h);
 			break;
 		  case SDL_KEYDOWN:
 			int keypressed  = event.key.keysym.sym;
