@@ -71,7 +71,8 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	//std::clog << "video/info: GL_EXTENSIONS: " << glGetString(GL_EXTENSIONS) << std::endl; 
 
 	input::SDL::init(); // Joysticks etc.
-	m_shader.reset(new Shader(getThemePath("shaders/core.vert"), getThemePath("shaders/core.frag"), true));
+	m_shader.reset(new Shader);
+	m_shader->compileFile(getThemePath("shaders/core.vert")).compileFile(getThemePath("shaders/core.frag"), "#define TEXTURE_RECT\n").link().bind();
 }
 
 Window::~Window() { }

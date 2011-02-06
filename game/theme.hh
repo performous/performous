@@ -94,8 +94,6 @@ public:
 	Surface comment_bg;
 	/// configuration comment background (short tip)
 	Surface short_comment_bg;
-	/// Custom background shader
-	boost::scoped_ptr<Shader> bg_shader;
 };
 
 /// theme for instrument menu

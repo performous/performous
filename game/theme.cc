@@ -52,8 +52,7 @@ ThemeIntro::ThemeIntro():
 	comment(getThemePath("mainmenu_comment.svg"), config["graphic/text_lod"].f()),
 	short_comment(getThemePath("mainmenu_short_comment.svg"), config["graphic/text_lod"].f()),
 	comment_bg(getThemePath("mainmenu_comment_bg.svg")),
-	short_comment_bg(getThemePath("mainmenu_scomment_bg.svg")),
-	bg_shader(new Shader(getThemePath("shaders/intro.vert"), getThemePath("shaders/intro.frag")))
+	short_comment_bg(getThemePath("mainmenu_scomment_bg.svg"))
 {
 	back_h.dimensions.fixedHeight(0.08f);
 }

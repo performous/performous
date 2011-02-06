@@ -1,6 +1,7 @@
 #include "screen_intro.hh"
 
 #include "fs.hh"
+#include "glmath.hh"
 #include "audio.hh"
 #include "i18n.hh"
 #include "joystick.hh"
@@ -114,10 +115,10 @@ void ScreenIntro::draw_menu_options() {
 
 void ScreenIntro::draw() {
 	{
-		UseShader us(*theme->bg_shader);
-		float anim = std::abs((((SDL_GetTicks() % 10000) / 10000.f) - 0.5f) * 2.0f);
-		us().setUniform("anim", anim);
+		float anim = SDL_GetTicks() % 20000 / 20000.0;
+		Shader::current()->setUniformMatrix("colorMatrix", glmath::rotate(2.0 * M_PI * anim, glmath::Vec3(1.0, 1.0, 1.0)));
 		theme->bg.draw();
+		Shader::current()->setUniformMatrix("colorMatrix", glmath::Matrix());
 	}
 	if (m_menu.current().image) m_menu.current().image->draw();
 	// Comment

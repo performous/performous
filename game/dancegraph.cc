@@ -90,7 +90,8 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song):
   m_flow_direction(1),
   m_insideStop()
 {
-	m_shader_note.reset(new Shader(getThemePath("shaders/dancenote.vert"), getThemePath("shaders/dancenote.frag")));
+	m_shader_note.reset(new Shader);
+	m_shader_note->compileFile(getThemePath("shaders/dancenote.vert")).compileFile(getThemePath("shaders/dancenote.frag")).link();
 	// Initialize some arrays
 	for (size_t i = 0; i < max_panels; i++) {
 		m_activeNotes[i] = m_notes.end();

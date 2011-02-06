@@ -44,11 +44,6 @@ Shader::ShaderMap Shader::shader_progs;
 
 Shader::Shader(): program(0) {}
 
-Shader::Shader(const std::string& vert_path, const std::string& frag_path, bool use): program(0) {
-	loadFromFile(vert_path, frag_path, use);
-}
-
-
 Shader::~Shader() {
 	shader_progs[program] = NULL;
 	glDeleteProgram(program);
@@ -57,22 +52,28 @@ Shader::~Shader() {
 }
 
 
-void Shader::loadFromFile(const std::string& vert_path, const std::string& frag_path, bool use) {
-	std::string vertstr = loadFile(vert_path);
-	std::string fragstr = loadFile(frag_path);
-	const char* vert = vertstr.c_str();
-	const char* frag = fragstr.c_str();
-	compile(vert, GL_VERTEX_SHADER);
-	compile(frag, GL_FRAGMENT_SHADER);
-	link();
-	if (use) bind();
+Shader& Shader::compileFile(std::string const& filename, std::string const& defines) {
+	std::string ext = filename.substr(filename.size() - 5);
+	GLenum type;
+	if (ext == ".vert") type = GL_VERTEX_SHADER;
+	else if (ext == ".geom") type = GL_GEOMETRY_SHADER;
+	else if (ext == ".frag") type = GL_FRAGMENT_SHADER;
+	else throw std::logic_error("Unknown file extension on shader " + filename);
+	std::string srccode = loadFile(filename);
+	if (!defines.empty()) {
+		std::string::size_type pos = srccode.find("//DEFINES");
+		if (pos == std::string::npos) throw std::runtime_error("Shader " + filename + " missing //DEFINES (needed for injected code)");
+		srccode = srccode.substr(0, pos) + defines + srccode.substr(pos + 9);
+	}
+	return compileCode(srccode, type);
 }
 
 
-void Shader::compile(const char* source, GLenum type) {
+Shader& Shader::compileCode(std::string const& srccode, GLenum type) {
 	glutil::GLErrorChecker ec("Shader::compile");
 	GLenum new_shader = glCreateShader(type);
 	ec.check("glCreateShader");
+	char const* source = srccode.c_str();
 	glShaderSource(new_shader, 1, &source, NULL);
 	ec.check("glShaderSource");
 
@@ -84,10 +85,11 @@ void Shader::compile(const char* source, GLenum type) {
 	}
 
 	shader_ids.push_back(new_shader);
+	return *this;
 }
 
 
-void Shader::link() {
+Shader& Shader::link() {
 	glutil::GLErrorChecker ec("Shader::link");
 	if (program) throw std::runtime_error("Shader already linked.");
 	// Create the program id
@@ -108,12 +110,14 @@ void Shader::link() {
 	ec.check("glLinkProgram");
 
 	shader_progs[program] = this;
+	return *this;
 }
 
 
-void Shader::bind() {
+Shader& Shader::bind() {
 	glutil::GLErrorChecker ec("Shader::bind");
 	glUseProgram(program);
+	return *this;
 }
 
 

@@ -127,7 +127,8 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number)
 	} else {
 		initGuitar();
 	}
-	m_shader_note.reset(new Shader(getThemePath("shaders/3dobject.vert"), getThemePath("shaders/3dobject.frag")));
+	m_shader_note.reset(new Shader);
+	m_shader_note->compileFile(getThemePath("shaders/3dobject.vert")).compileFile(getThemePath("shaders/3dobject.frag"));
 	// Load 3D fret objects
 	m_fretObj.load(getThemePath("fret.obj"));
 	m_tappableObj.load(getThemePath("fret_tap.obj"));

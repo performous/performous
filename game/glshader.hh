@@ -9,18 +9,17 @@
 
 struct Shader: public boost::noncopyable {
 	Shader();
-	Shader(const std::string& vert_path, const std::string& frag_path, bool use = false);
 	~Shader();
 
-	/** Loads the shader from files. */
-	void loadFromFile(const std::string& vert_path, const std::string& frag_path, bool use = false);
+	/// Load shader from file, add optional defines before the loaded code and compile.
+	Shader& compileFile(std::string const& filename, std::string const& defines = std::string());
 	/** Compiles a shader of a given type. */
-	void compile(const char* source, GLenum type);
+	Shader& compileCode(std::string const& srccode, GLenum type);
 	/** Links all compiled shaders to a shader program. */
-	void link();
+	Shader& link();
 
 	/** Binds the shader into use. */
-	void bind();
+	Shader& bind();
 
 	/** Allow setting uniforms in a chain. Shader needs to be in use.*/
 
