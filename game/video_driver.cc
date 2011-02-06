@@ -71,8 +71,18 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	//std::clog << "video/info: GL_EXTENSIONS: " << glGetString(GL_EXTENSIONS) << std::endl; 
 
 	input::SDL::init(); // Joysticks etc.
-	m_shader.reset(new Shader);
-	m_shader->compileFile(getThemePath("shaders/core.vert")).compileFile(getThemePath("shaders/core.frag"), "#define TEXTURE_RECT\n").link().bind();
+	shader("surface")
+	  .compileFile(getThemePath("shaders/core.vert"))
+	  .compileFile(getThemePath("shaders/core.frag"), "#define SURFACE\n")
+	  .link()
+	  .bind()
+	  .setUniformMatrix("colorMatrix", glmath::Matrix());
+	shader("texture")
+	  .compileFile(getThemePath("shaders/core.vert"))
+	  .compileFile(getThemePath("shaders/core.frag"), "#define TEXTURE\n")
+	  .link()
+	  .bind()
+	  .setUniformMatrix("colorMatrix", glmath::Matrix());
 }
 
 Window::~Window() { }
@@ -91,7 +101,6 @@ void Window::render(boost::function<void (void)> drawFunc) {
 	double vw = s_width, vh = s_height;
 	glViewport(vx, vy, vw, vh);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	m_shader->setUniformMatrix("colorMatrix", glmath::Matrix());
 	if (!stereo) {
 		view(0);
 		drawFunc();
@@ -106,6 +115,7 @@ void Window::render(boost::function<void (void)> drawFunc) {
 	}
 	// Render to actual framebuffer from FBOs
 	glDisable(GL_BLEND);
+	Shader& sh = shader("surface");
 	for (int num = 0; num < 2; ++num) {
 		if (type == 0) {
 			using namespace glmath;
@@ -126,7 +136,7 @@ void Window::render(boost::function<void (void)> drawFunc) {
 				colorMatrix.cols[1] = Vec4(0.0, col, gry);  // Green in original becomes
 				colorMatrix.cols[2] = Vec4(0.0, gry, col);  // Blue in original becomes
 			}
-			m_shader->setUniformMatrix("colorMatrix", colorMatrix);
+			sh.setUniformMatrix("colorMatrix", colorMatrix);
 		} else {
 			double margin = screen->h - s_height;
 			glViewport(vx, 0.25 * margin + (num ? 0.0 : 0.5 * screen->h), vw, 0.5 * vh);
@@ -135,6 +145,7 @@ void Window::render(boost::function<void (void)> drawFunc) {
 			UseTexture use(fbo[num].getTexture());
 			fbo[num].getTexture().draw(Dimensions().stretch(1.0, virtH()), TexCoords(0.0, screenH(), screenW(), 0.0));
 		}
+		sh.setUniformMatrix("colorMatrix", glmath::Matrix());
 	}
 }
 

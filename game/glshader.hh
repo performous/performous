@@ -65,13 +65,6 @@ struct Shader: public boost::noncopyable {
 	bool operator==(const Shader& rhs) const { return program == rhs.program; }
 	bool operator!=(const Shader& rhs) const { return program != rhs.program; }
 
-	/** Returns pointer to the currently used shader. */
-	static Shader* current() {
-		GLint i;
-		glGetIntegerv(GL_CURRENT_PROGRAM, &i);
-		return shader_progs[i];
-	}
-
 private:
 	GLuint program; ///< shader program object id
 	int gl_response; ///< save last return state
@@ -82,8 +75,6 @@ private:
 	typedef std::map<std::string, GLint> UniformMap;
 	UniformMap uniforms; ///< Cached uniform locations, use operator[] to access
 
-	typedef std::map<GLint, Shader*> ShaderMap;
-	static ShaderMap shader_progs; ///< Shader objects for reverse look-up by id
 };
 
 

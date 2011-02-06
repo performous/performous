@@ -1,19 +1,24 @@
 
 //DEFINES
 
-#ifdef TEXTURE_RECT
-#extension GL_ARB_texture_rectangle : enable
-#define SAMPLER sampler2DRect
-#define TEXTURE texture2DRect
-#else
-#define SAMPLER sampler2D
-#define TEXTURE texture2D
+uniform mat4 colorMatrix;
+
+#ifdef SURFACE
+#extension GL_ARB_texture_rectangle : require
+uniform sampler2DRect tex;
+#define TFUNC texture2DRect
 #endif
 
-uniform mat4 colorMatrix;
-uniform SAMPLER tex;
+#ifdef TEXTURE
+uniform sampler2D tex;
+#define TFUNC texture2D
+#endif
 
 void main() {
-	gl_FragColor = colorMatrix * (gl_Color * TEXTURE(tex, gl_TexCoord[0].st).rgba);
+	gl_FragColor = colorMatrix * (gl_Color
+#ifdef TFUNC
+	  * TFUNC(tex, gl_TexCoord[0].st).rgba
+#endif
+	  );
 }
 

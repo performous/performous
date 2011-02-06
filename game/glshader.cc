@@ -40,12 +40,9 @@ namespace {
 	}
 }
 
-Shader::ShaderMap Shader::shader_progs;
-
 Shader::Shader(): program(0) {}
 
 Shader::~Shader() {
-	shader_progs[program] = NULL;
 	glDeleteProgram(program);
 	std::for_each(shader_ids.begin(), shader_ids.end(), glDeleteShader);
 	//std::clog << "shader/info: Shader program " << (unsigned)program << " deleted." << std::endl;
@@ -109,7 +106,6 @@ Shader& Shader::link() {
 	}
 	ec.check("glLinkProgram");
 
-	shader_progs[program] = this;
 	return *this;
 }
 

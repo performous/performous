@@ -5,6 +5,7 @@
 #include "configuration.hh"
 #include "video_driver.hh"
 #include "image.hh"
+#include "screen.hh"
 
 #include <fstream>
 #include <stdexcept>
@@ -16,6 +17,10 @@
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 using boost::uint32_t;
+
+Shader& getShader(std::string const& name) {
+	return ScreenManager::getSingletonPtr()->window().shader(name);  // FIXME
+}
 
 float Dimensions::screenY() const {
 	switch (m_screenAnchor) {

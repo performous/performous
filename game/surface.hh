@@ -99,11 +99,21 @@ struct TexCoords {
 	  x1(x1_), y1(y1_), x2(x2_), y2(y2_) {}
 };
 
+/// This function hides the ugly global vari-- I mean singleton access to ScreenManager...
+Shader& getShader(std::string const& name);
+
 /** @short A RAII wrapper for allocating/deallocating OpenGL texture ID **/
 template <GLenum Type> class OpenGLTexture: boost::noncopyable {
   public:
 	/// return Type
 	static GLenum type() { return Type; };
+	static Shader& shader() {
+		switch (Type) {
+		case GL_TEXTURE_2D: return getShader("texture");
+		case GL_TEXTURE_RECTANGLE: return getShader("surface");
+		}
+		throw std::logic_error("Unknown texture type");
+	}
 	OpenGLTexture(): m_id() { glGenTextures(1, &m_id); }
 	~OpenGLTexture() { glDeleteTextures(1, &m_id); }
 	/// returns id
@@ -120,22 +130,11 @@ template <GLenum Type> class OpenGLTexture: boost::noncopyable {
 class UseTexture: boost::noncopyable {
   public:
 	/// constructor
-	template <GLenum Type> UseTexture(OpenGLTexture<Type> const& s):
-	  m_shader(*Shader::current()) {
-		switch (Type) {
-		  //case GL_TEXTURE_2D:             glActiveTexture(GL_TEXTURE0); /*m_shader.setUniform("texMode", 1); */break;
-		  case GL_TEXTURE_RECTANGLE_ARB:  glActiveTexture(GL_TEXTURE0); /*m_shader.setUniform("texMode", 2);*/ break;
-		  //default:                        m_shader.setUniform("texMode", 3); break;
-		}
-		glEnable(Type);
-		glBindTexture(Type, s.id());
-	}
-	~UseTexture() {
-		//m_shader.setUniform("texMode", 0);
-	}
-
+	template <GLenum Type> UseTexture(OpenGLTexture<Type> const& tex):
+	  m_shader(/* hack of the year */ (glutil::GLErrorChecker("UseTexture"), glActiveTexture(GL_TEXTURE0), glBindTexture(Type, tex.id()), tex.shader())) {}
+	
   private:
-	Shader& m_shader;
+	UseShader m_shader;
 };
 
 template <GLenum Type> void OpenGLTexture<Type>::draw(Dimensions const& dim, TexCoords const& tex) const {
@@ -200,8 +199,8 @@ class Surface {
 	void draw() const;
 	/// loads surface into buffer
 	void load(unsigned int width, unsigned int height, pix::Format format, unsigned char const* buffer, float ar = 0.0f);
-
+	Shader& shader() { return m_texture.shader(); }
   private:
 	unsigned int m_width, m_height;
-	OpenGLTexture<GL_TEXTURE_RECTANGLE_ARB> m_texture;
+	OpenGLTexture<GL_TEXTURE_RECTANGLE> m_texture;
 };

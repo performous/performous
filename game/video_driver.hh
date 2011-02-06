@@ -3,7 +3,7 @@
 #include "glshader.hh"
 #include "glutil.hh"
 #include <boost/function.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <boost/ptr_container/ptr_map.hpp>
 
 unsigned int screenW();
 unsigned int screenH();
@@ -54,11 +54,14 @@ public:
 	/// take a screenshot
 	void screenshot();
 
+	/// Construct a new shader or return an existing one by name
+	Shader& shader(std::string const& name) { return m_shaders[name]; }
 private:
 	SDL_Surface* screen;
 	unsigned int m_windowW, m_windowH;
 	unsigned int m_fsW, m_fsH;
 	bool m_fullscreen;
-	boost::scoped_ptr<Shader> m_shader; ///< core shader used for general drawing
+	typedef boost::ptr_map<std::string, Shader> ShaderMap;
+	ShaderMap m_shaders; ///< Shader programs by name
 };
 
