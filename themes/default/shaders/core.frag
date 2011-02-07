@@ -1,10 +1,10 @@
+#extension GL_ARB_texture_rectangle : require
 
 //DEFINES
 
 uniform mat4 colorMatrix;
 
 #ifdef SURFACE
-#extension GL_ARB_texture_rectangle : require
 uniform sampler2DRect tex;
 #define TFUNC texture2DRect
 #endif
