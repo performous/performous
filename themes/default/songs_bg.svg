@@ -44,8 +44,8 @@
      pagecolor="#ffffff"
      id="base"
      inkscape:zoom="0.61522534"
-     inkscape:cx="448.33691"
-     inkscape:cy="383.70921"
+     inkscape:cx="858.00312"
+     inkscape:cy="322.34636"
      inkscape:window-x="0"
      inkscape:window-y="29"
      inkscape:current-layer="svg559"
@@ -114,6 +114,17 @@
          stdDeviation="3.4581674"
          id="feGaussianBlur3871" />
     </filter>
+    <linearGradient
+       id="linearGradient3751">
+      <stop
+         id="stop3753"
+         offset="0"
+         style="stop-color:#ffffff;stop-opacity:1;" />
+      <stop
+         id="stop3755"
+         offset="1"
+         style="stop-color:#ffffff;stop-opacity:0;" />
+    </linearGradient>
   </defs>
   <path
      style="fill:#ffffff;fill-opacity:0.2739131"
@@ -131,14 +142,6 @@
        id="tspan2510"
        x="266.96185"
        y="759.88806" /></text>
-  <rect
-     y="-800"
-     x="0"
-     height="200"
-     width="1000"
-     id="rect6051"
-     style="fill:url(#linearGradient3242);fill-opacity:1"
-     transform="scale(1,-1)" />
   <g
      id="g3873"
      transform="matrix(0.98065768,0,0,0.97754687,39.46475,6.5150502)">

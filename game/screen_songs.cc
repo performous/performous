@@ -23,6 +23,7 @@ ScreenSongs::ScreenSongs(std::string const& name, Audio& audio, Songs& songs, Da
 void ScreenSongs::enter() {
 	theme.reset(new ThemeSongs());
 	m_songbg_default.reset(new Surface(getThemePath("songs_bg_default.svg")));
+	m_songbg_ground.reset(new Surface(getThemePath("songs_bg_ground.svg")));
 	m_singCover.reset(new Surface(getThemePath("no_cover.svg")));
 	m_instrumentCover.reset(new Surface(getThemePath("instrument_cover.svg")));
 	m_bandCover.reset(new Surface(getThemePath("band_cover.svg")));
@@ -45,6 +46,8 @@ void ScreenSongs::exit() {
 	theme.reset();
 	m_video.reset();
 	m_songbg.reset();
+	m_songbg_default.reset();
+	m_songbg_ground.reset();
 	m_playing.clear();
 	m_playReq.clear();
 }
@@ -147,10 +150,15 @@ void ScreenSongs::drawMultimedia() {
 		FarTransform ft;  // 3D effect
 		double length = m_audio.getLength();
 		double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
-		if (m_songbg.get()) m_songbg->draw(); else m_songbg_default->draw();
+		m_songbg_default->draw();   // Default bg
+		if (m_songbg.get()) m_songbg->draw();
 		if (m_video.get()) m_video->render(time);
 	}
-	if (!m_jukebox) theme->bg.draw();
+	if (!m_jukebox) {
+		m_songbg_ground->draw();
+		drawCovers();
+		theme->bg.draw();
+	}
 }
 
 void ScreenSongs::updateMultimedia(Song& song, ScreenSharedInfo& info) {
@@ -218,7 +226,6 @@ void ScreenSongs::draw() {
 			// Get hiscores from database
 			m_database.queryPerSongHiscore_HiscoreDisplay(oss_order, m_songs.currentPtr(), hiscore_start_pos, 5);
 		}
-		if (!m_jukebox) drawCovers();
 		updateMultimedia(song, info);
 	}
 	if (m_jukebox) drawJukebox();
@@ -255,15 +262,15 @@ void ScreenSongs::drawCovers() {
 		double diff = 0.5 * (1.0 + std::cos(std::min(M_PI, std::abs(i - shift))));  // 0..1 for current cover hilight level
 		double y = 0.5 * virtH();
 		glutil::PushMatrix pm;
-		glTranslatef(0.0f, 0.0f, -0.2 - 0.2 * (1.0 - diff));  // Move other covers further back
+		glTranslatef(-0.2 + 0.20 * (i - shift), y, -0.2 - 0.3 * (1.0 - diff));
+		glRotatef(20.0 * std::sin(std::min(M_PI, i - shift)), 0.0, 1.0, 0.0);
 		double c = 0.4 + 0.6 * diff;
 		glutil::Color c1(Color(c, c, c));
-		s.dimensions.middle(-0.2 + 0.20 * (i - shift)).bottom(y - 0.0 * diff).fitInside(0.17, 0.17);
+		s.dimensions.middle(0.0).bottom(0.0).fitInside(0.17, 0.17);
 		// Draw the cover normally
 		s.draw();
 		// Draw the reflection
 		glutil::PushMatrix m;
-		glTranslatef(0.0f, 2.0 * y, 0.0f);
 		glScalef(1.0f, -1.0f, 1.0f);
 		{
 			glutil::Color c2(Color(1.0f, 1.0f, 1.0f, 0.4f));
