@@ -91,6 +91,12 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	  .compileFile(getThemePath("shaders/dancenote.vert"))
 	  .compileFile(getThemePath("shaders/dancenote.frag"))
 	  .link();
+
+	double vx = 0.5f * (screen->w - s_width);
+	double vy = 0.5f * (screen->h - s_height);
+	double vw = s_width, vh = s_height;
+	glViewport(vx, vy, vw, vh);  // Drawable area of the window (excluding black bars)
+	view(0);
 }
 
 Window::~Window() { }
