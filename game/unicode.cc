@@ -18,8 +18,9 @@ namespace {
 		  0, &bytes_written, &gerror);
 
 		if (gerror) throw std::runtime_error("Conversion error"); // Throw on error
-
-		return std::string(boost::scoped_ptr<char>(buf).get(), bytes_written);
+		std::string ret(buf, bytes_written);
+		g_free(buf);
+		return ret;
 	}
 }
 
