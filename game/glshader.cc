@@ -19,24 +19,24 @@ namespace {
 		data.back() = '\0';
 		return std::string(&data[0]);
 	}
+}
 
-	/// Dumps Shader/Program InfoLog
-	void dumpInfoLog(GLuint id) {
-		int infologLength = 0;
-		int maxLength;
+/// Dumps Shader/Program InfoLog
+void Shader::dumpInfoLog(GLuint id) {
+	int infologLength = 0;
+	int maxLength;
 
-		if (glIsShader(id)) glGetShaderiv(id, GL_INFO_LOG_LENGTH, &maxLength);
-		else glGetProgramiv(id, GL_INFO_LOG_LENGTH, &maxLength);
+	if (glIsShader(id)) glGetShaderiv(id, GL_INFO_LOG_LENGTH, &maxLength);
+	else glGetProgramiv(id, GL_INFO_LOG_LENGTH, &maxLength);
 
-		char infoLog[maxLength];
+	char infoLog[maxLength];
 
-		if (glIsShader(id)) glGetShaderInfoLog(id, maxLength, &infologLength, infoLog);
-		else glGetProgramInfoLog(id, maxLength, &infologLength, infoLog);
+	if (glIsShader(id)) glGetShaderInfoLog(id, maxLength, &infologLength, infoLog);
+	else glGetProgramInfoLog(id, maxLength, &infologLength, infoLog);
 
-		if (infologLength > 0) {
-			std::cout << std::endl << "Shader info log:" << std::endl;
-			std::cout << infoLog << std::endl;
-		}
+	if (infologLength > 0) {
+		std::cout << std::endl << "Shader info log:" << std::endl;
+		std::cout << infoLog << std::endl;
 	}
 }
 
@@ -81,8 +81,8 @@ Shader& Shader::compileCode(std::string const& srccode, GLenum type) {
 	glCompileShader(new_shader);
 	ec.check("glCompileShader");
 	glGetShaderiv(new_shader, GL_COMPILE_STATUS, &gl_response);
+	dumpInfoLog(new_shader);
 	if (gl_response != GL_TRUE) {
-		dumpInfoLog(new_shader);
 		throw std::runtime_error("Shader compile error");
 	}
 
@@ -105,8 +105,8 @@ Shader& Shader::link() {
 	// Link and check status
 	glLinkProgram(program);
 	glGetProgramiv(program, GL_LINK_STATUS, &gl_response);
+	dumpInfoLog(program);
 	if (gl_response != GL_TRUE) {
-		dumpInfoLog(program);
 		throw std::runtime_error("Something went wrong linking the shader program.");
 	}
 	ec.check("glLinkProgram");

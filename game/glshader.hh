@@ -8,6 +8,10 @@
 
 
 struct Shader: public boost::noncopyable {
+	/// Print compile errors and such
+	/// @param id of shader or program
+	static void dumpInfoLog(GLuint id);
+
 	Shader();
 	~Shader();
 
