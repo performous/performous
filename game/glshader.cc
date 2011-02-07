@@ -62,7 +62,11 @@ Shader& Shader::compileFile(std::string const& filename, std::string const& defi
 		if (pos == std::string::npos) throw std::runtime_error("Shader " + filename + " missing //DEFINES (needed for injected code)");
 		srccode = srccode.substr(0, pos) + defines + srccode.substr(pos + 9);
 	}
-	return compileCode(srccode, type);
+	try {
+		compileCode(srccode, type);
+	} catch (std::runtime_error& e) {
+		throw std::runtime_error(filename + ": " + e.what());
+	}
 }
 
 
@@ -75,10 +79,11 @@ Shader& Shader::compileCode(std::string const& srccode, GLenum type) {
 	ec.check("glShaderSource");
 
 	glCompileShader(new_shader);
+	ec.check("glCompileShader");
 	glGetShaderiv(new_shader, GL_COMPILE_STATUS, &gl_response);
 	if (gl_response != GL_TRUE) {
 		dumpInfoLog(new_shader);
-		throw std::runtime_error("Something went wrong compiling the shader.");
+		throw std::runtime_error("Shader compile error");
 	}
 
 	shader_ids.push_back(new_shader);
