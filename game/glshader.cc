@@ -63,7 +63,7 @@ Shader& Shader::compileFile(std::string const& filename, std::string const& defi
 		srccode = srccode.substr(0, pos) + defines + srccode.substr(pos + 9);
 	}
 	try {
-		compileCode(srccode, type);
+		return compileCode(srccode, type);
 	} catch (std::runtime_error& e) {
 		throw std::runtime_error(filename + ": " + e.what());
 	}
