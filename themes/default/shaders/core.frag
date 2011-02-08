@@ -1,9 +1,7 @@
-#version 120
+#version 330
 #extension GL_ARB_texture_rectangle : require
 
 //DEFINES
-
-uniform mat4 colorMatrix;
 
 #ifdef SURFACE
 uniform sampler2DRect tex;
@@ -15,10 +13,15 @@ uniform sampler2D tex;
 #define TFUNC texture2D
 #endif
 
+uniform mat4 colorMatrix;
+
+in vec4 color;
+in vec2 texcoord;
+
 void main() {
-	gl_FragColor = colorMatrix * (gl_Color
+	gl_FragColor = colorMatrix * (color
 #ifdef TFUNC
-	  * TFUNC(tex, gl_TexCoord[0].st).rgba
+	  * TFUNC(tex, texcoord).rgba
 #endif
 	  );
 }
