@@ -22,3 +22,6 @@ install(FILES ${SOUND_FILES} DESTINATION "${SHARE_INSTALL}/sounds/")
 file(GLOB BG_FILES "backgrounds/*.svg")
 install(FILES ${BG_FILES} DESTINATION "${SHARE_INSTALL}/backgrounds/")
 
+file(GLOB SHADER_FILES "shaders/*")
+install(FILES ${SHADER_FILES} DESTINATION "${SHARE_INSTALL}/shaders/")
+
