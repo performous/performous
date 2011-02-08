@@ -1,5 +1,6 @@
 #pragma once
 
+#include "glmath.hh"
 #include "glshader.hh"
 #include "glutil.hh"
 #include <boost/function.hpp>
@@ -56,6 +57,7 @@ private:
 	/// Setup everything for drawing a view.
 	/// @param num 0 = no stereo, 1 = left eye, 2 = right eye
 	void view(unsigned num);
+	void updateStereo(glmath::Matrix const& left = glmath::Matrix(), glmath::Matrix const& right = glmath::Matrix::zero());
 	SDL_Surface* screen;
 	unsigned int m_windowW, m_windowH;
 	unsigned int m_fsW, m_fsH;

@@ -32,6 +32,11 @@ namespace glmath {
 	static inline Vec3 normalize(Vec3 const& v) { return (1 / len(v)) * v; }
 	
 	struct Matrix {
+		static Matrix zero() {
+			Matrix ret;
+			ret(0,0) = ret(1,1) = ret(2,2) = ret(3,3) = 0.0;
+			return ret;
+		}
 		Vec4 cols[4];
 		/// Identity matrix
 		Matrix() { for (unsigned k = 0; k < 4; ++k) cols[k][k] = 1.0; }

@@ -73,25 +73,28 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	input::SDL::init(); // Joysticks etc.
 	shader("surface")
 	  .compileFile(getThemePath("shaders/core.vert"))
+	  .compileFile(getThemePath("shaders/stereo3d.geom"))
 	  .compileFile(getThemePath("shaders/core.frag"), "#define SURFACE\n")
 	  .link()
 	  .bind()
 	  .setUniformMatrix("colorMatrix", glmath::Matrix());
 	shader("texture")
 	  .compileFile(getThemePath("shaders/core.vert"))
+	  .compileFile(getThemePath("shaders/stereo3d.geom"))
 	  .compileFile(getThemePath("shaders/core.frag"), "#define TEXTURE\n")
 	  .link()
 	  .bind()
 	  .setUniformMatrix("colorMatrix", glmath::Matrix());
 	shader("3dobject")
 	  .compileFile(getThemePath("shaders/3dobject.vert"))
+	  .compileFile(getThemePath("shaders/stereo3d.geom"))
 	  .compileFile(getThemePath("shaders/3dobject.frag"))
 	  .link();
 	shader("dancenote")
 	  .compileFile(getThemePath("shaders/dancenote.vert"))
+	  .compileFile(getThemePath("shaders/stereo3d.geom"))
 	  .compileFile(getThemePath("shaders/dancenote.frag"))
 	  .link();
-
 	double vx = 0.5f * (screen->w - s_width);
 	double vy = 0.5f * (screen->h - s_height);
 	double vw = s_width, vh = s_height;
@@ -105,6 +108,15 @@ void Window::blank() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+void Window::updateStereo(glmath::Matrix const& left, glmath::Matrix const& right) {
+	for (ShaderMap::iterator it = m_shaders.begin(); it != m_shaders.end(); ++it) {
+		Shader& sh = *it->second;
+		sh.bind();
+		sh.setUniformMatrix("leftTransform", left);
+		sh.setUniformMatrix("rightTransform", right);
+	}
+}
+
 void Window::render(boost::function<void (void)> drawFunc) {
 	if (s_width < screen->w || s_height < screen->h) glClear(GL_COLOR_BUFFER_BIT);  // Black bars
 	bool stereo = config["graphic/stereo3d"].b();
@@ -116,21 +128,28 @@ void Window::render(boost::function<void (void)> drawFunc) {
 		double vy = 0.5f * (screen->h - s_height);
 		double vw = s_width, vh = s_height;
 		glViewport(vx, vy, vw, vh);  // Drawable area of the window (excluding black bars)
+		updateStereo();
 		view(0);
 		drawFunc();
 		return;
 	}
-	// Render each eye to FBO
+	// Render both eyes to FBO
 	unsigned w = s_width;
 	unsigned h = s_height;
-	if (type == 2) h /= 2;  // Half-height mode
-	FBO fboleft(w, h), fboright(w, h);
-	FBO* fbo[] = { &fboleft, &fboright };
-	for (unsigned i = 0; i < 2; ++i) {
-		UseFBO user(*fbo[i]);
-		glViewport(0, 0, w, h);  // Full FBO
-		view(i + 1);
+	if (type < 2) h *= 2;  // Full resolution stereo
+	FBO fbo(w, h);
+	{
+		UseFBO user(fbo);
+		glViewportIndexedf(0, 0, 0, w, h / 2);
+		glViewportIndexedf(1, 0, h / 2, w, h / 2);
+		double separation = getSeparation();
+		glmath::Matrix l, r;
+		l(0,3) = -separation; l(0,2) = 0.5 * separation;
+		r(0,3) = separation; r(0,2) = -0.5 * separation;
+		updateStereo(l, r);
+		view(0);
 		drawFunc();
+		updateStereo();
 	}
 	// Render to actual framebuffer from FBOs
 	glViewport(0, 0, screen->w, screen->h);  // Entire window
@@ -173,11 +192,11 @@ void Window::render(boost::function<void (void)> drawFunc) {
 		}
 		{
 			// Render FBO with 1:1 pixels, properly filtered/positioned for 3d
-			UseTexture use(fbo[num]->getTexture());
+			UseTexture use(fbo.getTexture());
 			sh.setUniformMatrix("colorMatrix", colorMatrix);
 			Dimensions dim = Dimensions().stretch(2.0 * w / screen->w, 2.0 * h / screen->h);
-			if (type == 2) dim.center(num == 0 ? 0.5 : -0.5);
-			fbo[num]->getTexture().draw(dim, TexCoords(0.0, 0.0, w, h));
+			if (type != 2) dim.center((num == 0 ? -0.25 : 0.25) * dim.h());
+			fbo.getTexture().draw(dim, TexCoords(0.0, 0.0, w, h));
 			sh.setUniformMatrix("colorMatrix", glmath::Matrix());
 		}
 	}
