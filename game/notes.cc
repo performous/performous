@@ -63,7 +63,24 @@ double Note::score(double n, double b, double e) const {
 	return scoreMultiplier() * powerFactor(n) * len;
 }
 
-double Note::scoreMultiplier() const { return type == GOLDEN ? 2.0 : 1.0; }
+double Note::scoreMultiplier() const {
+	switch(type) {
+		case GOLDEN:
+			return 2.0;
+		case SLEEP:
+			return 0.0;
+		case FREESTYLE:
+		case NORMAL:
+		case SLIDE:
+		case TAP:
+		case HOLDBEGIN:
+		case HOLDEND:
+		case ROLL:
+		case MINE:
+		case LIFT:
+			return 1.0;
+	}
+}
 
 double Note::powerFactor(double note) const {
 	if (type == FREESTYLE) return 1.0;

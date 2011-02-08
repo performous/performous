@@ -245,7 +245,6 @@ void SongParser::iniParse() {
 							inter.note = n.note;
 							inter.type = Note::SLIDE;
 							inter.syllable = std::string("~");
-							m_maxScore += inter.maxScore();
 							vocal.noteMin = std::min(vocal.noteMin, inter.note);
 							vocal.noteMax = std::max(vocal.noteMax,inter.note);
 							vocal.notes.push_back(inter);
@@ -255,7 +254,6 @@ void SongParser::iniParse() {
 							n.type = Note::NORMAL;
 						}
 					}
-					m_maxScore += n.maxScore();
 					vocal.noteMin = std::min(vocal.noteMin, n.note);
 					vocal.noteMax = std::max(vocal.noteMax, n.note);
 					vocal.notes.push_back(n);

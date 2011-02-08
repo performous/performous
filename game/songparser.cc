@@ -43,7 +43,6 @@ SongParser::SongParser(Song& s):
   m_prevtime(),
   m_prevts(),
   m_relativeShift(),
-  m_maxScore(),
   m_tsPerBeat(),
   m_tsEnd()
 {
@@ -131,7 +130,12 @@ void SongParser::finalize() {
 		}
 		// Set begin/end times
 		if (!vocal.notes.empty()) vocal.beginTime = vocal.notes.front().begin, vocal.endTime = vocal.notes.back().end;
-		vocal.m_scoreFactor = 1.0 / m_maxScore;
+		// Compute maximum score
+		double max_score = 0.0;
+		for (Notes::iterator it = vocal.notes.begin(); it != vocal.notes.end(); ++it) {
+			max_score += it->maxScore();
+		}
+		vocal.m_scoreFactor = 1.0 / max_score;
 	}
 	if (m_tsPerBeat) {
 		// Add song beat markers

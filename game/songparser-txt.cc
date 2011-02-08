@@ -142,7 +142,6 @@ bool SongParser::txtParseNote(std::string line, VocalTrack &vocal) {
 	if (n.type != Note::SLEEP && n.end > n.begin) {
 		vocal.noteMin = std::min(vocal.noteMin, n.note);
 		vocal.noteMax = std::max(vocal.noteMax, n.note);
-		m_maxScore += n.maxScore();
 	}
 	if (n.type == Note::SLEEP) {
 		if (notes.empty()) return true; // Ignore sleeps at song beginning
