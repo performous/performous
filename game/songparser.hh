@@ -48,7 +48,6 @@ class SongParser {
 	double m_prevtime;
 	unsigned int m_prevts;
 	unsigned int m_relativeShift;
-	double m_maxScore;
 	struct BPM {
 		BPM(double _begin, double _ts, double bpm): begin(_begin), step(0.25 * 60.0 / bpm), ts(_ts) {}
 		double begin; // Time in seconds
