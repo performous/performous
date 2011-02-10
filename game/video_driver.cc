@@ -70,32 +70,41 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	// Extensions would need more complex outputting, otherwise they will break clog.
 	//std::clog << "video/info: GL_EXTENSIONS: " << glGetString(GL_EXTENSIONS) << std::endl;
 
-	if (!GLEW_VERSION_2_0) throw std::runtime_error("OpenGL 2.0 not available");
+	if (!GLEW_VERSION_2_1) throw std::runtime_error("OpenGL 2.1 is required but not available");
 
+	if (!GLEW_VERSION_3_3 && config["graphic/stereo3d"].b()) {
+		std::clog << "video/warning: Stereo requested but OpenGL 3.3 not available, disabling stereo" << std::endl;
+		config["graphic/stereo3d"].b() = false;
+	}
 
 	input::SDL::init(); // Joysticks etc.
+
+	if(config["graphic/stereo3d"].b()) {
+		// Compile geometry shaders when stereo is requested
+		shader("surface").compileFile(getThemePath("shaders/stereo3d.geom"));
+		shader("texture").compileFile(getThemePath("shaders/stereo3d.geom"));
+		shader("3dobject").compileFile(getThemePath("shaders/stereo3d.geom"));
+		shader("dancenote").compileFile(getThemePath("shaders/stereo3d.geom"));
+	}
+
 	shader("surface")
 	  .compileFile(getThemePath("shaders/core.vert"))
-	  .compileFile(getThemePath("shaders/stereo3d.geom"))
 	  .compileFile(getThemePath("shaders/core.frag"), "#define SURFACE\n")
 	  .link()
 	  .bind()
 	  .setUniformMatrix("colorMatrix", glmath::Matrix());
 	shader("texture")
 	  .compileFile(getThemePath("shaders/core.vert"))
-	  .compileFile(getThemePath("shaders/stereo3d.geom"))
 	  .compileFile(getThemePath("shaders/core.frag"), "#define TEXTURE\n")
 	  .link()
 	  .bind()
 	  .setUniformMatrix("colorMatrix", glmath::Matrix());
 	shader("3dobject")
 	  .compileFile(getThemePath("shaders/3dobject.vert"))
-	  .compileFile(getThemePath("shaders/stereo3d.geom"))
 	  .compileFile(getThemePath("shaders/3dobject.frag"))
 	  .link();
 	shader("dancenote")
 	  .compileFile(getThemePath("shaders/dancenote.vert"))
-	  .compileFile(getThemePath("shaders/stereo3d.geom"))
 	  .compileFile(getThemePath("shaders/dancenote.frag"))
 	  .link();
 	double vx = 0.5f * (screen->w - s_width);
@@ -124,7 +133,21 @@ void Window::render(boost::function<void (void)> drawFunc) {
 	if (s_width < screen->w || s_height < screen->h) glClear(GL_COLOR_BUFFER_BIT);  // Black bars
 	bool stereo = config["graphic/stereo3d"].b();
 	int type = config["graphic/stereo3dtype"].i();
-	if (type == 2 && !m_fullscreen) stereo = false;  // Over/under only in full screen mode
+
+	if (!GLEW_VERSION_3_3 && stereo) {
+		std::string message("Stereo requested but OpenGL 3.3 not available, disabling stereo");
+		std::clog << "video/warning: " << message << std::endl;
+		config["graphic/stereo3d"].b() = false;
+		stereo = false;
+	}
+
+	if (stereo && type == 2 && !m_fullscreen) {
+		std::string message("Over/under stereo requested but not in fullscreen, disabling stereo");
+		std::clog << "video/warning: " << message << std::endl;
+		config["graphic/stereo3d"].b() = false;
+		stereo = false;
+	}
+
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	updateStereo(stereo ? getSeparation() : 0.0);
 	// Can we do direct to framebuffer rendering (no FBO)?
