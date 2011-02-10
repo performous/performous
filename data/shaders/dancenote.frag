@@ -1,4 +1,7 @@
-#extension GL_ARB_texture_rectangle : enable
+#version 120
+
+in float bogus;  // Nvidia will overwrite the first in variable with bogus data, so as a workaround we put a bogus variable here
+in mat4 colorMat;
 
 uniform sampler2D tex;
 uniform int noteType;
@@ -25,6 +28,6 @@ void main()
 	// Regular arrows or holds
 	if (noteType == 1 || noteType == 2) colorGlow(texel);
 
-	gl_FragColor = texel;
+	gl_FragColor = vec4(0,0,0,bogus * 1e-10) + colorMat * texel;
 }
 

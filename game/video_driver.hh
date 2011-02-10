@@ -52,12 +52,17 @@ public:
 	void screenshot();
 
 	/// Construct a new shader or return an existing one by name
-	Shader& shader(std::string const& name) { return m_shaders[name]; }
+	Shader& shader(std::string const& name) {
+		ShaderMap::iterator it = m_shaders.find(name);
+		if (it != m_shaders.end()) return *it->second;
+		// const_cast required to workaround ptr_map's protection against construction of temporaries
+		return *m_shaders.insert(const_cast<std::string&>(name), new Shader(name)).first->second;
+	}
 private:
 	/// Setup everything for drawing a view.
 	/// @param num 0 = no stereo, 1 = left eye, 2 = right eye
 	void view(unsigned num);
-	void updateStereo(glmath::Matrix const& left = glmath::Matrix(), glmath::Matrix const& right = glmath::Matrix::zero());
+	void updateStereo(float separation);
 	SDL_Surface* screen;
 	unsigned int m_windowW, m_windowH;
 	unsigned int m_fsW, m_fsH;

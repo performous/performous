@@ -1,8 +1,16 @@
+#version 120
+
 uniform int noteType;
 uniform float hitAnim;
 uniform float clock;
 uniform float scale;
 uniform vec2 position;
+
+uniform mat4 colorMatrix;
+varying mat4 colorMat;
+varying vec2 texcoord;
+
+in vec4 vertex;
 
 #define deg2rad 0.0174532925
 
@@ -23,12 +31,17 @@ mat4 rotMat(in float ang) {
 }
 
 
-void main()
-{
+void main() {
+	// Supply color matrix for fragment shader
+	colorMat = colorMatrix;
+	for (int i = 0; i < 4; ++i) {
+		float c = gl_Color[i];
+		for (int j = 0; j < 4; ++j) colorMat[j][i] *= c;
+	}
 	gl_FrontColor = gl_Color;
-	gl_BackColor = gl_Color;
 	gl_TexCoord[0] = gl_MultiTexCoord0;
-
+	texcoord = gl_MultiTexCoord0.st;
+	
 	mat4 trans = scaleMat(scale);
 
 	// Cursor arrows
@@ -50,7 +63,7 @@ void main()
 		trans *= rotMat(r);
 	}
 
-	gl_Position = gl_ModelViewProjectionMatrix * trans * gl_Vertex;
+	gl_Position = gl_ModelViewProjectionMatrix * trans * vertex;
 	gl_Position += gl_ModelViewProjectionMatrix * vec4(position.xy, 0, 0);
 }
 

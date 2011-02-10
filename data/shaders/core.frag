@@ -3,6 +3,9 @@
 
 //DEFINES
 
+in float bogus;  // Nvidia will overwrite the first in variable with bogus data, so as a workaround we put a bogus variable here
+in mat4 colorMat;
+
 #ifdef SURFACE
 uniform sampler2DRect tex;
 in vec2 texcoord;
@@ -19,9 +22,7 @@ in vec2 texcoord;
 #define TEXFUNC vec4(1,1,1,1)
 #endif
 
-uniform mat4 colorMatrix;
-
 void main() {
-	gl_FragColor = colorMatrix * TEXFUNC;
+	gl_FragColor = vec4(0,0,0,bogus * 1e-10) + colorMat * TEXFUNC;
 }
 

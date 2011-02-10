@@ -108,12 +108,12 @@ void Window::blank() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void Window::updateStereo(glmath::Matrix const& left, glmath::Matrix const& right) {
+void Window::updateStereo(float sepFactor) {
 	for (ShaderMap::iterator it = m_shaders.begin(); it != m_shaders.end(); ++it) {
 		Shader& sh = *it->second;
 		sh.bind();
-		sh.setUniformMatrix("leftTransform", left);
-		sh.setUniformMatrix("rightTransform", right);
+		sh.setUniform("sepFactor", sepFactor);
+		sh.setUniform("z0", z0 - 2.0f * near_);  // Why minus two times zNear, I have no idea -Tronic
 	}
 }
 
@@ -123,83 +123,56 @@ void Window::render(boost::function<void (void)> drawFunc) {
 	int type = config["graphic/stereo3dtype"].i();
 	if (type == 2 && !m_fullscreen) stereo = false;  // Over/under only in full screen mode
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	if (!stereo) {
-		double vx = 0.5f * (screen->w - s_width);
-		double vy = 0.5f * (screen->h - s_height);
-		double vw = s_width, vh = s_height;
-		glViewport(vx, vy, vw, vh);  // Drawable area of the window (excluding black bars)
-		updateStereo();
-		view(0);
-		drawFunc();
-		return;
-	}
-	// Render both eyes to FBO
+	updateStereo(stereo ? getSeparation() : 0.0);
+	// Can we do direct to framebuffer rendering (no FBO)?
+	if (!stereo || type == 2) { view(stereo); drawFunc(); return; }
+	// Render both eyes to FBO (full resolution top/bottom)
 	unsigned w = s_width;
-	unsigned h = s_height;
-	if (type < 2) h *= 2;  // Full resolution stereo
+	unsigned h = 2 * s_height;
 	FBO fbo(w, h);
 	{
 		UseFBO user(fbo);
-		glViewportIndexedf(0, 0, 0, w, h / 2);
-		glViewportIndexedf(1, 0, h / 2, w, h / 2);
-		double separation = getSeparation();
-		glmath::Matrix l, r;
-		l(0,3) = -separation; l(0,2) = 0.5 * separation;
-		r(0,3) = separation; r(0,2) = -0.5 * separation;
-		updateStereo(l, r);
 		view(0);
+		glViewportIndexedf(0, 0, h / 2, w, h / 2);
+		glViewportIndexedf(1, 0, 0, w, h / 2);
 		drawFunc();
-		updateStereo();
 	}
 	// Render to actual framebuffer from FBOs
-	glViewport(0, 0, screen->w, screen->h);  // Entire window
-	{
-		// Use normalized eye coordinates for composition
-		using namespace glmath;
-		glMatrixMode(GL_PROJECTION);
-		upload(Matrix());
-		glMatrixMode(GL_MODELVIEW);
-		upload(Matrix());
-	}
+	UseTexture use(fbo.getTexture());
+	view(0);  // Viewport for drawable area
 	glDisable(GL_BLEND);
-	Shader& sh = shader("surface");
 	glmath::Matrix colorMatrix;
+	updateStereo(0.0);  // Disable stereo mode while we composite
 	for (int num = 0; num < 2; ++num) {
-		if (type == 0 || type == 1) {  // Anaglyph
-			{
-				float saturation = 0.6;  // (0..1)
-				float col = (1.0 + 2.0 * saturation) / 3.0;
-				float gry = 0.5 * (1.0 - col);
-				bool out[3] = {};  // Which colors to output
-				if (type == 0 && num == 0) { out[0] = true; }  // Red
-				if (type == 0 && num == 1) { out[1] = out[2] = true; }  // Cyan
-				if (type == 1 && num == 0) { out[1] = true; }  // Green
-				if (type == 1 && num == 1) { out[0] = out[2] = true; }  // Magenta
-				for (unsigned i = 0; i < 3; ++i) {
-					for (unsigned j = 0; j < 3; ++j) {
-						double val = 0.0;
-						if (out[i]) val = (i == j ? col : gry);
-						colorMatrix(i, j) = val;
-					}
+		{
+			float saturation = 0.6;  // (0..1)
+			float col = (1.0 + 2.0 * saturation) / 3.0;
+			float gry = 0.5 * (1.0 - col);
+			bool out[3] = {};  // Which colors to output
+			if (type == 0 && num == 0) { out[0] = true; }  // Red
+			if (type == 0 && num == 1) { out[1] = out[2] = true; }  // Cyan
+			if (type == 1 && num == 0) { out[1] = true; }  // Green
+			if (type == 1 && num == 1) { out[0] = out[2] = true; }  // Magenta
+			for (unsigned i = 0; i < 3; ++i) {
+				for (unsigned j = 0; j < 3; ++j) {
+					double val = 0.0;
+					if (out[i]) val = (i == j ? col : gry);
+					colorMatrix(i, j) = val;
 				}
 			}
-			if (num == 1) {
-				// Right eye blends over the left eye
-				glEnable(GL_BLEND);
-				glBlendFunc(GL_ONE, GL_ONE);
-			}
-			sh.bind();
 		}
-		{
-			// Render FBO with 1:1 pixels, properly filtered/positioned for 3d
-			UseTexture use(fbo.getTexture());
-			sh.setUniformMatrix("colorMatrix", colorMatrix);
-			Dimensions dim = Dimensions().stretch(2.0 * w / screen->w, 2.0 * h / screen->h);
-			if (type != 2) dim.center((num == 0 ? -0.25 : 0.25) * dim.h());
-			fbo.getTexture().draw(dim, TexCoords(0.0, 0.0, w, h));
-			sh.setUniformMatrix("colorMatrix", glmath::Matrix());
+		if (num == 1) {
+			// Right eye blends over the left eye
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_ONE, GL_ONE);
 		}
+		// Render FBO with 1:1 pixels, properly filtered/positioned for 3d
+		shader("surface").bind().setUniformMatrix("colorMatrix", colorMatrix);
+		Dimensions dim = Dimensions(double(w) / h).fixedWidth(1.0);
+		dim.center((num == 0 ? 0.25 : -0.25) * dim.h());
+		fbo.getTexture().draw(dim, TexCoords(0.0, h, w, 0));
 	}
+	shader("surface").bind().setUniformMatrix("colorMatrix", glmath::Matrix());
 }
 
 void Window::view(unsigned num) {
@@ -227,13 +200,16 @@ void Window::view(unsigned num) {
 	  * translate(Vec3(0.0, 0.0, -z0))
 	);
 	// Setup views
-	if (num == 0) return;  // Center (non-stereo)
-	// Stereo separation
-	double separation = (num == 1 ? -1 : 1) * getSeparation();
-	glMatrixMode(GL_PROJECTION);
-	glTranslatef(separation, 0.0f, 0.0f);
-	glMatrixMode(GL_MODELVIEW);
-	glTranslatef(-separation, 0.0f, 0.0f);
+	double vx = 0.5f * (screen->w - s_width);
+	double vy = 0.5f * (screen->h - s_height);
+	double vw = s_width, vh = s_height;
+	if (num == 0) {
+		glViewport(vx, vy, vw, vh);  // Drawable area of the window (excluding black bars)
+	} else {
+		glViewportIndexedf(0, 0, vh / 2, vw, vh / 2);  // Top half of the drawable area
+		glViewportIndexedf(1, 0, 0, vw, vh / 2);  // Bottom half of the drawable area
+	}
+
 }
 
 void Window::swap() {

@@ -12,7 +12,7 @@ struct Shader: public boost::noncopyable {
 	/// @param id of shader or program
 	static void dumpInfoLog(GLuint id);
 
-	Shader();
+	Shader(std::string const& name);
 	~Shader();
 
 	/// Load shader from file, add optional defines before the loaded code and compile.
@@ -70,6 +70,7 @@ struct Shader: public boost::noncopyable {
 	bool operator!=(const Shader& rhs) const { return program != rhs.program; }
 
 private:
+	std::string name; ///< for debugging purposes only
 	GLuint program; ///< shader program object id
 	int gl_response; ///< save last return state
 
