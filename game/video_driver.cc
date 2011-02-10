@@ -35,7 +35,7 @@ namespace {
 	double getSeparation() {
 		return config["graphic/stereo3d"].b() ? 0.001f * config["graphic/stereo3dseparation"].f() : 0.0;
 	}
-	
+
 	// stump: under MSVC, near and far are #defined to nothing for compatibility with ancient code, hence the underscores.
 	const float near_ = 0.1f; // This determines the near clipping distance (must be > 0)
 	const float far_ = 110.0f; // How far away can things be seen
@@ -48,7 +48,7 @@ unsigned int screenH() { return s_height; }
 
 Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(width), m_windowH(height), m_fullscreen(fs) {
 	std::atexit(SDL_Quit);
-	if( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK) ==  -1 ) throw std::runtime_error("SDL_Init failed");
+	if( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK) == -1 ) throw std::runtime_error("SDL_Init failed");
 	SDL_WM_SetCaption(PACKAGE " " VERSION, PACKAGE);
 	{
 		SDL_Surface* icon = SDL_LoadBMP(getThemePath("icon.bmp").c_str());
@@ -68,7 +68,10 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	std::clog << "video/info: GL_VERSION:    " << glGetString(GL_VERSION) << std::endl;
 	std::clog << "video/info: GL_RENDERER:   " << glGetString(GL_RENDERER) << std::endl;
 	// Extensions would need more complex outputting, otherwise they will break clog.
-	//std::clog << "video/info: GL_EXTENSIONS: " << glGetString(GL_EXTENSIONS) << std::endl; 
+	//std::clog << "video/info: GL_EXTENSIONS: " << glGetString(GL_EXTENSIONS) << std::endl;
+
+	if (!GLEW_VERSION_2_0) throw std::runtime_error("OpenGL 2.0 not available");
+
 
 	input::SDL::init(); // Joysticks etc.
 	shader("surface")
