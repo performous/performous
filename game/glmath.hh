@@ -37,6 +37,11 @@ namespace glmath {
 			ret(0,0) = ret(1,1) = ret(2,2) = ret(3,3) = 0.0;
 			return ret;
 		}
+		static Matrix diagonal(Vec4 const& v) {
+			Matrix ret;
+			for (unsigned i = 0; i < 4; ++i) ret(i,i) = v[i];
+			return ret;
+		}
 		Vec4 cols[4];
 		/// Identity matrix
 		Matrix() { for (unsigned k = 0; k < 4; ++k) cols[k][k] = 1.0; }
