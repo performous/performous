@@ -1,11 +1,13 @@
 #pragma once
 
+#include "glmath.hh"
 #include <string>
 #include <map>
 #include <vector>
 #include <GL/glew.h>
 #include <boost/noncopyable.hpp>
 
+glmath::Matrix& getColorMatrix();  ///< A temporary hack for global access to the color matrix (so that glutil::Color can write it and Shader::bind can read it)
 
 struct Shader: public boost::noncopyable {
 	/// Print compile errors and such
@@ -53,10 +55,6 @@ struct Shader: public boost::noncopyable {
 	}
 	Shader& setUniformMatrix(const std::string& uniform, GLfloat const* m) {
 		glUniformMatrix4fv((*this)[uniform], 1, GL_FALSE, m); return *this;
-	}
-	Shader& setUniformMatrix(const std::string& uniform, GLdouble const* m) {
-		// Note: need to convert into float because glUniformMatrix4dv is NULL on my machine
-		GLfloat arr[16]; std::copy(m, m + 16, arr); return setUniformMatrix(uniform, arr);
 	}
 
 	/** Get uniform location. Uses caching internally. */

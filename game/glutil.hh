@@ -2,6 +2,7 @@
 
 
 #include "color.hh"
+#include "glmath.hh"
 #include "glshader.hh"
 #include <GL/glew.h>
 #include <string>
@@ -44,14 +45,19 @@ namespace glutil {
 		      a; ///< alpha value
 		/// create nec Color object from the Color object
 		Color(::Color const& c): r(c.r), g(c.g), b(c.b), a(c.a) {
-			glColor4fv(*this);
+			getColorMatrix() = glmath::Matrix::diagonal(glmath::Vec4(*this));
+		//	glColor4fv(*this);
 		//	GLfloat ColorVect[] = {r, g, b, a};
 		//	glEnableClientState(GL_COLOR_ARRAY);
 		//	glColorPointer (4,GL_FLOAT,0,ColorVect);
 		}
+		Color(glmath::Matrix const& mat): r(), g(), b(), a() {
+			getColorMatrix() = mat;
+		}
 		~Color() {
 			r = g = b = a = 1.0f;
-			glColor4fv(*this);
+			getColorMatrix() = glmath::Matrix::diagonal(glmath::Vec4(*this));
+		//	glColor4fv(*this);
 		//	glDisableClientState (GL_COLOR_ARRAY);
 		}
 		/// overload float cast

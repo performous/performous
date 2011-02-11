@@ -12,13 +12,7 @@ out mat4 colorMat;
 out vec2 texcoord;
 
 void main() {
-	// Supply color matrix for fragment shader
-	colorMat = colorMatrix;
-	vec4 color = gl_in[0].gl_FrontColor;
-	for (int i = 0; i < 4; ++i) {
-		float c = color[i];
-		for (int j = 0; j < 4; ++j) colorMat[j][i] *= c;
-	}
+	colorMat = colorMatrix;  // Supply color matrix for fragment shader
 	// Fix Nvidia compile warnings ("might be used uninitialized")
 	texcoord = vec2(0);
 	gl_Position = vec4(0);

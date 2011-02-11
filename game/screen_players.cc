@@ -94,6 +94,7 @@ void ScreenPlayers::manageEvent(SDL_Event event) {
 }
 
 void ScreenPlayers::draw() {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	m_players.update(); // Poll for new players
 	double length = m_audio.getLength();
 	double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);

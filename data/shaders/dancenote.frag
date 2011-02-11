@@ -2,6 +2,7 @@
 
 in float bogus;  // Nvidia will overwrite the first in variable with bogus data, so as a workaround we put a bogus variable here
 in mat4 colorMat;
+in vec2 texcoord;
 
 uniform sampler2D tex;
 uniform int noteType;
@@ -21,9 +22,7 @@ void colorGlow(inout vec4 c) {
 
 void main()
 {
-	vec4 texel;
-
-	texel = texture2D(tex, gl_TexCoord[0].st).rgba;
+	vec4 texel = texture2D(tex, texcoord);
 
 	// Regular arrows or holds
 	if (noteType == 1 || noteType == 2) colorGlow(texel);

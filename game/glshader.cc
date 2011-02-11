@@ -5,6 +5,10 @@
 #include <stdexcept>
 #include <algorithm>
 
+glmath::Matrix& getColorMatrix() {
+	static glmath::Matrix colorMatrix;
+	return colorMatrix;
+}
 
 namespace {
 	/// Loads a file into memory
@@ -118,6 +122,7 @@ Shader& Shader::link() {
 Shader& Shader::bind() {
 	glutil::GLErrorChecker ec("Shader::bind");
 	glUseProgram(program);
+	setUniformMatrix("colorMatrix", getColorMatrix());
 	return *this;
 }
 

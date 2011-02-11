@@ -12,8 +12,6 @@ varying vec2 texcoord;
 
 in vec4 vertex;
 
-#define deg2rad 0.0174532925
-
 mat4 scaleMat(in float sc) {
 	return mat4(sc,  0,  0,  0,
 	             0, sc,  0,  0,
@@ -32,13 +30,7 @@ mat4 rotMat(in float ang) {
 
 
 void main() {
-	// Supply color matrix for fragment shader
-	colorMat = colorMatrix;
-	for (int i = 0; i < 4; ++i) {
-		float c = gl_Color[i];
-		for (int j = 0; j < 4; ++j) colorMat[j][i] *= c;
-	}
-	gl_FrontColor = gl_Color;
+	colorMat = colorMatrix;  // Supply color matrix for fragment shader
 	gl_TexCoord[0] = gl_MultiTexCoord0;
 	texcoord = gl_MultiTexCoord0.st;
 	
@@ -59,7 +51,7 @@ void main() {
 	// Mines
 	} else if (noteType == 3) {
 		trans *= scaleMat(1.0 + hitAnim);
-		float r = mod(clock*360.0, 360.0) * deg2rad; // They rotate!
+		float r = radians(mod(clock*360.0, 360.0)); // They rotate!
 		trans *= rotMat(r);
 	}
 

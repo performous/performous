@@ -1,6 +1,7 @@
 #pragma once
 
 #include <GL/glew.h>
+#include <algorithm>
 #include <cmath>
 #include <iomanip>
 #include <iostream>
@@ -10,25 +11,26 @@
 namespace glmath {
 
 	struct Vec3 {
-		GLdouble x, y, z;
-		explicit Vec3(double x = 0.0, double y = 0.0, double z = 0.0): x(x), y(y), z(z) {}
+		GLfloat x, y, z;
+		explicit Vec3(float x = 0.0, float y = 0.0, float z = 0.0): x(x), y(y), z(z) {}
 	};
 
 	struct Vec4 {
-		GLdouble x, y, z, w;
-		explicit Vec4(double x = 0.0, double y = 0.0, double z = 0.0, double w = 0.0): x(x), y(y), z(z), w(w) {}
-		explicit Vec4(Vec3 const& v, double w = 1.0): x(v.x), y(v.y), z(v.z), w(w) {}
-		GLdouble& operator[](unsigned j) { return (&x)[j]; }
-		GLdouble const& operator[](unsigned j) const { return (&x)[j]; }
+		GLfloat x, y, z, w;
+		explicit Vec4(GLfloat const* arr) { std::copy(arr, arr + 4, &x); }
+		explicit Vec4(float x = 0.0, float y = 0.0, float z = 0.0, float w = 0.0): x(x), y(y), z(z), w(w) {}
+		explicit Vec4(Vec3 const& v, float w = 1.0): x(v.x), y(v.y), z(v.z), w(w) {}
+		GLfloat& operator[](unsigned j) { return (&x)[j]; }
+		GLfloat const& operator[](unsigned j) const { return (&x)[j]; }
 	};
 
-	static inline Vec3 operator*(double k, Vec3 const& v) { return Vec3(k * v.x, k * v.y, k * v.z); }
+	static inline Vec3 operator*(float k, Vec3 const& v) { return Vec3(k * v.x, k * v.y, k * v.z); }
 	
-	static inline double dot(Vec3 const& a, Vec3 const& b) {
+	static inline float dot(Vec3 const& a, Vec3 const& b) {
 		return a.x * b.x + a.y * b.y + a.z * b.z;
 	}	
 
-	static inline double len(Vec3 const& v) { return std::sqrt(dot(v, v)); }
+	static inline float len(Vec3 const& v) { return std::sqrt(dot(v, v)); }
 	static inline Vec3 normalize(Vec3 const& v) { return (1 / len(v)) * v; }
 	
 	struct Matrix {
@@ -45,10 +47,10 @@ namespace glmath {
 		Vec4 cols[4];
 		/// Identity matrix
 		Matrix() { for (unsigned k = 0; k < 4; ++k) cols[k][k] = 1.0; }
-		operator GLdouble*() { return &cols[0][0]; }
-		operator GLdouble const*() const { return &cols[0][0]; }
-		GLdouble& operator()(unsigned i, unsigned j) { return cols[j][i]; }
-		GLdouble const& operator()(unsigned i, unsigned j) const { return cols[j][i]; }
+		operator GLfloat*() { return &cols[0][0]; }
+		operator GLfloat const*() const { return &cols[0][0]; }
+		GLfloat& operator()(unsigned i, unsigned j) { return cols[j][i]; }
+		GLfloat const& operator()(unsigned i, unsigned j) const { return cols[j][i]; }
 	};
 
 	static inline std::ostream& operator<<(std::ostream& os, Matrix const& m) {
@@ -66,7 +68,7 @@ namespace glmath {
 
 	static inline Matrix get(GLenum mode_matrix) {
 		Matrix ret;
-		glGetDoublev(mode_matrix, ret);
+		glGetFloatv(mode_matrix, ret);
 		return ret;
 	}
 
@@ -78,7 +80,7 @@ namespace glmath {
 		if (mode == GL_TEXTURE) return get(GL_TEXTURE_MATRIX);
 		throw std::logic_error("Unknown current matrix mode in glmath::get()");
 	}
-	static inline void upload(Matrix const& m) { glLoadMatrixd(m); }
+	static inline void upload(Matrix const& m) { glLoadMatrixf(m); }
 
 	static inline Matrix operator*(Matrix const& a, Matrix const& b) {
 		Matrix ret;
@@ -110,15 +112,15 @@ namespace glmath {
 		return ret;
 	}
 
-	static inline Matrix scale(double k) { return scale(Vec3(k, k, k)); }
+	static inline Matrix scale(float k) { return scale(Vec3(k, k, k)); }
 
-	static inline Matrix rotate(double rad, Vec3 axis) {
+	static inline Matrix rotate(float rad, Vec3 axis) {
 		Matrix ret;
 		Vec3 u = normalize(axis);
 		// Based on http://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle
-		double s = std::sin(rad);
-		double c = std::cos(rad);
-		double nc = 1 - c;
+		float s = std::sin(rad);
+		float c = std::cos(rad);
+		float nc = 1 - c;
 		// Column 0
 		ret(0,0) = c + u.x * u.x * nc;
 		ret(1,0) = u.y * u.x * nc + u.z * s;
@@ -134,10 +136,10 @@ namespace glmath {
 		return ret;
 	}
 
-	static inline Matrix frustum(double l, double r, double b, double t, double n, double f) {
-		double w = r - l;
-		double h = t - b;
-		double d = n - f;
+	static inline Matrix frustum(float l, float r, float b, float t, float n, float f) {
+		float w = r - l;
+		float h = t - b;
+		float d = n - f;
 		Matrix ret;
 		ret(0,0) = 2 * n / w;
 		ret(1,1) = 2 * n / h;
