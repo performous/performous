@@ -100,9 +100,11 @@ namespace glutil {
 			return *this;
 		}
 
-		VertexArray& TexCoord(float s, float t) {
+		VertexArray& TexCoord(float s, float t, float u = 0.0f, float v = 0.0f) {
 			m_texcoords.push_back(s);
 			m_texcoords.push_back(t);
+			m_texcoords.push_back(u);
+			m_texcoords.push_back(v);
 			return *this;
 		}
 
@@ -123,26 +125,26 @@ namespace glutil {
 		}
 
 		void Draw(GLint mode = GL_TRIANGLE_STRIP) const {
-			glEnableClientState(GL_VERTEX_ARRAY);
-			glVertexPointer(m_dimension, GL_FLOAT, 0, &m_vertices.front());
+			glEnableVertexAttribArray(0);
+			glVertexAttribPointer(0, m_dimension, GL_FLOAT, GL_FALSE, 0, &m_vertices.front());
 			if (m_texcoords.size()) {
-				glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-				glTexCoordPointer(2, GL_FLOAT, 0, &m_texcoords.front());
+				glEnableVertexAttribArray(1);
+				glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, &m_texcoords.front());
 			}
 			if (m_normals.size()) {
-				glEnableClientState(GL_NORMAL_ARRAY);
-				glNormalPointer(GL_FLOAT, 0, &m_normals.front());
+				glEnableVertexAttribArray(2);
+				glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, &m_normals.front());
 			}
 			if (m_colors.size()) {
-				glEnableClientState(GL_COLOR_ARRAY);
-				glColorPointer(4, GL_FLOAT, 0, &m_colors.front());
+				glEnableVertexAttribArray(3);
+				glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 0, &m_colors.front());
 			}
 			glDrawArrays(mode, 0, size());
 
-			glDisableClientState(GL_COLOR_ARRAY);
-			glDisableClientState(GL_NORMAL_ARRAY);
-			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-			glDisableClientState(GL_VERTEX_ARRAY);
+			glDisableVertexAttribArray(0);
+			glDisableVertexAttribArray(1);
+			glDisableVertexAttribArray(2);
+			glDisableVertexAttribArray(3);
 		}
 
 		bool empty() const {

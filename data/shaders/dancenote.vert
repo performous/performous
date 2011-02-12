@@ -1,5 +1,10 @@
 #version 120
 
+in vec4 vertPos;
+in vec4 vertTexCoord;
+
+varying float bogus;
+
 uniform int noteType;
 uniform float hitAnim;
 uniform float clock;
@@ -8,9 +13,7 @@ uniform vec2 position;
 
 uniform mat4 colorMatrix;
 varying mat4 colorMat;
-varying vec2 texcoord;
-
-in vec4 vertex;
+varying vec4 texCoord;
 
 mat4 scaleMat(in float sc) {
 	return mat4(sc,  0,  0,  0,
@@ -30,9 +33,10 @@ mat4 rotMat(in float ang) {
 
 
 void main() {
+	bogus = 0.0;
+	
 	colorMat = colorMatrix;  // Supply color matrix for fragment shader
-	gl_TexCoord[0] = gl_MultiTexCoord0;
-	texcoord = gl_MultiTexCoord0.st;
+	texCoord = vertTexCoord;
 	
 	mat4 trans = scaleMat(scale);
 
@@ -55,7 +59,7 @@ void main() {
 		trans *= rotMat(r);
 	}
 
-	gl_Position = gl_ModelViewProjectionMatrix * trans * vertex;
+	gl_Position = gl_ModelViewProjectionMatrix * trans * vertPos;
 	gl_Position += gl_ModelViewProjectionMatrix * vec4(position.xy, 0, 0);
 }
 

@@ -1,16 +1,20 @@
 #version 120
 
+in vec4 vertPos;
+in vec4 vertTexCoord;
+in vec3 vertNormal;
+
+varying float bogus;
+
 uniform mat4 colorMatrix;
 varying mat4 colorMat;
-varying vec2 texcoord;
+varying vec4 texCoord;
 varying vec3 normal;
 
-in vec4 vertex;
-
 void main() {
+	bogus = 0.0;
 	colorMat = colorMatrix;  // Supply color matrix for fragment shader
-	gl_TexCoord[0] = gl_MultiTexCoord0;
-	texcoord = gl_MultiTexCoord0.st;
-	gl_Position = gl_ModelViewProjectionMatrix * vertex;
-	normal = normalize(gl_NormalMatrix * gl_Normal);
+	texCoord = vertTexCoord;
+	gl_Position = gl_ModelViewProjectionMatrix * vertPos;
+	normal = normalize(gl_NormalMatrix * vertNormal);
 }

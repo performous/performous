@@ -8,14 +8,14 @@ in mat4 colorMat;
 
 #ifdef SURFACE
 uniform sampler2DRect tex;
-in vec2 texcoord;
-#define TEXFUNC texture2DRect(tex, texcoord)
+in vec4 texCoord;
+#define TEXFUNC texture2DRect(tex, texCoord.st)
 #endif
 
 #ifdef TEXTURE
 uniform sampler2D tex;
-in vec2 texcoord;
-#define TEXFUNC texture2D(tex, texcoord)
+in vec4 texCoord;
+#define TEXFUNC texture2D(tex, texCoord.st)
 #endif
 
 #ifndef TEXFUNC
