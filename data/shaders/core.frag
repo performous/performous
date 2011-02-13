@@ -34,6 +34,6 @@ void main() {
 	frag = vec4(ambient + frag.rgb * NdotL, frag.a);
 #endif
 
-	gl_FragColor = vec4(0,0,0,bogus * 1e-10) + colorMat * frag;
+	gl_FragColor = vec4(0,0,0,bogus * 1e-10) + colorMat * (color * frag);
 }
 

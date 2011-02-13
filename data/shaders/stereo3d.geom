@@ -17,6 +17,13 @@ uniform mat4 colorMatrix;
 uniform float sepFactor;
 uniform float z0;
 
+void passthru(in int i) {
+	gl_Position = gl_in[i].gl_Position;
+	texCoord = vTexCoord[i];
+	normal = vNormal[i];
+	color = vColor[i];
+}
+
 void main() {
 	colorMat = colorMatrix;  // Supply color matrix for fragment shader
 	// Fix Nvidia compile warnings ("might be used uninitialized")
@@ -28,9 +35,7 @@ void main() {
 		// No stereo
 		gl_ViewportIndex = 0;
 		for(int i=0; i < gl_in.length(); ++i) {
-			gl_Position = gl_in[i].gl_Position;
-			texCoord = vTexCoord[i];
-			normal = vNormal[i];
+			passthru(i);
 			EmitVertex();
 		}
 		EndPrimitive();
@@ -38,20 +43,16 @@ void main() {
 		// Render the left eye
 		gl_ViewportIndex = 0;
 		for(int i=0; i < gl_in.length(); ++i) {
-			gl_Position = gl_in[i].gl_Position;
+			passthru(i);
 			gl_Position.x -= sepFactor * (gl_Position.z - z0);
-			texCoord = vTexCoord[i];
-			normal = vNormal[i];
 			EmitVertex();
 		}
 		EndPrimitive();
 		// Render the right eye
 		gl_ViewportIndex = 1;
 		for(int i=0; i < gl_in.length(); ++i) {
-			gl_Position = gl_in[i].gl_Position;
+			passthru(i);
 			gl_Position.x += sepFactor * (gl_Position.z - z0);
-			texCoord = vTexCoord[i];
-			normal = vNormal[i];
 			EmitVertex();
 		}
 		EndPrimitive();
