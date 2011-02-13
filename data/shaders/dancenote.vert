@@ -1,19 +1,32 @@
 #version 120
 
-in vec4 vertPos;
-in vec4 vertTexCoord;
+// Input from glVertexAttribPointer
+/* layout (location = 0) */ in vec4 vertPos;
+/* layout (location = 1) */ in vec4 vertTexCoord;
+/* layout (location = 2) */ in vec3 vertNormal;
+/* layout (location = 3) */ in vec4 vertColor;
 
 varying float bogus;
+
+uniform mat4 colorMatrix;
+varying mat4 colorMat;
+
+// Per-vextex for fragment shader (if no geometry shader)
+varying vec4 texCoord;
+varying vec3 normal;
+varying vec4 color;
+
+// Per-vertex for geometry shader (if one exists)
+varying vec4 vTexCoord;
+varying vec3 vNormal;
+varying vec4 vColor;
+
 
 uniform int noteType;
 uniform float hitAnim;
 uniform float clock;
 uniform float scale;
 uniform vec2 position;
-
-uniform mat4 colorMatrix;
-varying mat4 colorMat;
-varying vec4 texCoord;
 
 mat4 scaleMat(in float sc) {
 	return mat4(sc,  0,  0,  0,
@@ -31,12 +44,12 @@ mat4 rotMat(in float ang) {
 	             0,   0, 0, 1);
 }
 
-
 void main() {
 	bogus = 0.0;
-	
-	colorMat = colorMatrix;  // Supply color matrix for fragment shader
-	texCoord = vertTexCoord;
+	colorMat = colorMatrix;  // In case no geometry shader is used (otherwise it sets this)
+	vTexCoord = texCoord = vertTexCoord;
+	vNormal = normal = normalize(gl_NormalMatrix * vertNormal);
+	vColor = color = vertColor;
 	
 	mat4 trans = scaleMat(scale);
 
@@ -57,6 +70,16 @@ void main() {
 		trans *= scaleMat(1.0 + hitAnim);
 		float r = radians(mod(clock*360.0, 360.0)); // They rotate!
 		trans *= rotMat(r);
+	}
+
+	// Glow color for regular arrows or holds
+	if (noteType == 1 || noteType == 2) {
+		vColor = color = vec4(
+		  min(color.r + hitAnim *.5, 1.0),
+		  min(color.g + hitAnim *.5, 1.0),
+		  min(color.b + hitAnim *.5, 1.0),
+		  max(color.a - hitAnim, 0.0)
+		);
 	}
 
 	gl_Position = gl_ModelViewProjectionMatrix * trans * vertPos;

@@ -33,7 +33,9 @@ void main() {
 	float NdotL = max(dot(normalize(normal), lightDir), 0.0);
 	frag = vec4(ambient + frag.rgb * NdotL, frag.a);
 #endif
-
-	gl_FragColor = vec4(0,0,0,bogus * 1e-10) + colorMat * (color * frag);
+#ifdef ENABLE_VERTEX_COLOR
+	frag *= color;
+#endif
+	gl_FragColor = vec4(0,0,0,bogus * 1e-10) + colorMat * frag;
 }
 

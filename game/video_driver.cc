@@ -84,13 +84,13 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 
 	shader("surface")
 	  .compileFile(getThemePath("shaders/core.vert"))
-	  .compileFile(getThemePath("shaders/core.frag"), "#define SURFACE\n")
+	  .compileFile(getThemePath("shaders/core.frag"), "#define SURFACE\n#define ENABLE_VERTEX_COLOR\n")
 	  .link()
 	  .bind()
 	  .setUniformMatrix("colorMatrix", glmath::Matrix());
 	shader("texture")
 	  .compileFile(getThemePath("shaders/core.vert"))
-	  .compileFile(getThemePath("shaders/core.frag"), "#define TEXTURE\n")
+	  .compileFile(getThemePath("shaders/core.frag"), "#define TEXTURE\n#define ENABLE_VERTEX_COLOR\n")
 	  .link()
 	  .bind()
 	  .setUniformMatrix("colorMatrix", glmath::Matrix());
@@ -100,7 +100,7 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	  .link();
 	shader("dancenote")
 	  .compileFile(getThemePath("shaders/dancenote.vert"))
-	  .compileFile(getThemePath("shaders/dancenote.frag"))
+	  .compileFile(getThemePath("shaders/core.frag"), "#define TEXTURE\n#define ENABLE_VERTEX_COLOR\n")
 	  .link();
 	double vx = 0.5f * (screen->w - s_width);
 	double vy = 0.5f * (screen->h - s_height);

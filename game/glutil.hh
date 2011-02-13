@@ -125,7 +125,7 @@ namespace glutil {
 		}
 
 		void Draw(GLint mode = GL_TRIANGLE_STRIP) {
-			if (m_colors.size() < m_vertices.size()) m_colors.resize(m_vertices.size(), 1.0f);
+			if (m_colors.size() < m_vertices.size()) m_colors.resize(m_vertices.size() / m_dimension * 4, 1.0f);
 			glEnableVertexAttribArray(0);
 			glVertexAttribPointer(0, m_dimension, GL_FLOAT, GL_FALSE, 0, &m_vertices.front());
 			if (m_texcoords.size()) {

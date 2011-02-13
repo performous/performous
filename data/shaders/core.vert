@@ -23,8 +23,7 @@ varying vec4 vColor;
 
 void main() {
 	bogus = 0.0;
-	// Supply color matrix for fragment shader
-	colorMat = colorMatrix;
+	colorMat = colorMatrix;  // In case no geometry shader is used (otherwise it sets this)
 	gl_Position = gl_ModelViewProjectionMatrix * vertPos;
 	vTexCoord = texCoord = vertTexCoord;
 	vNormal = normal = normalize(gl_NormalMatrix * vertNormal);
