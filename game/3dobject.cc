@@ -89,6 +89,7 @@ void Object3d::loadWavefrontObj(std::string filepath, float scale) {
 }
 
 void Object3d::drawVBO() {
+	UseShader us(getShader("3dobject"));
 	int stride = 3*sizeof(GLfloat);
 	int offset = 0;
 	if (m_vboStructure & HAS_TEXCOORDS) stride += 2*sizeof(GLfloat);
