@@ -2,6 +2,7 @@
 #include "fs.hh"
 #include "configuration.hh"
 #include "glutil.hh"
+#include "glmath.hh"
 #include "util.hh"
 
 #include <boost/thread.hpp>
@@ -17,7 +18,7 @@ ScreenManager::ScreenManager(Window& _window):
   m_messagePopup(0.0, 1.0), m_textMessage(getThemePath("message_text.svg"), config["graphic/text_lod"].f()),
   m_logo(getThemePath("logo.svg")), m_logoAnim(0.0, 0.5)
 {
-	m_textMessage.dimensions.middle().screenTop(0.05);
+	m_textMessage.dimensions.middle().center(-0.05);
 }
 
 void ScreenManager::activateScreen(std::string const& name) {
@@ -49,6 +50,7 @@ void ScreenManager::drawScreen() {
 
 
 void ScreenManager::loading(std::string const& message, float progress) {
+	drawLogo();
 	// TODO: Create a better one, this is quite ugly
 	flashMessage(message + " " + boost::lexical_cast<std::string>(int(round(progress*100))) + "%", 0.0f, 1.0f, 1.0f);
 	m_window.blank();
@@ -61,7 +63,6 @@ void ScreenManager::loading(std::string const& message, float progress) {
 		glutil::Color c(Color(0.2f, 0.7f, 0.7f, (progress + 1)*0.5f));
 		glutil::Square(-x + i * (sq_size + spacing), 0, sq_size/2, true);
 	}
-	drawLogo();
 	m_window.swap();
 }
 
