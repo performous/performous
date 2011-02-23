@@ -76,6 +76,9 @@ class ScreenManager: public Singleton <ScreenManager> {
 	/// Returns finished state
 	bool isFinished() { return m_finished; };
 
+	void showLogo(bool show = true) { m_logoAnim.setTarget(show ? 1.0 : 0.0); }
+	void drawLogo();
+
   private:
 	Window& m_window;
 	bool m_finished;
@@ -90,6 +93,8 @@ class ScreenManager: public Singleton <ScreenManager> {
 	std::string m_message;
 	AnimValue m_messagePopup;
 	SvgTxtTheme m_textMessage;
+	Surface m_logo;
+	AnimValue m_logoAnim;
 	// Dialog members
 	boost::scoped_ptr<Dialog> m_dialog;
 };

@@ -14,8 +14,8 @@ template<> ScreenManager* Singleton<ScreenManager>::ms_Singleton = NULL;
 ScreenManager::ScreenManager(Window& _window):
   m_window(_window), m_finished(false), newScreen(), currentScreen(),
   m_timeToFadeIn(), m_timeToFadeOut(), m_timeToShow(), m_message(),
-  m_messagePopup(0.0, 1.0), m_textMessage(getThemePath("message_text.svg"), config["graphic/text_lod"].f())
-
+  m_messagePopup(0.0, 1.0), m_textMessage(getThemePath("message_text.svg"), config["graphic/text_lod"].f()),
+  m_logo(getThemePath("logo.svg")), m_logoAnim(0.0, 0.5)
 {
 	m_textMessage.dimensions.middle().screenTop(0.05);
 }
@@ -43,6 +43,7 @@ Screen* ScreenManager::getScreen(std::string const& name) {
 
 void ScreenManager::drawScreen() {
 	getCurrentScreen()->draw();
+	drawLogo();
 	drawNotifications();
 }
 
@@ -60,6 +61,7 @@ void ScreenManager::loading(std::string const& message, float progress) {
 		glutil::Color c(Color(0.2f, 0.7f, 0.7f, (progress + 1)*0.5f));
 		glutil::Square(-x + i * (sq_size + spacing), 0, sq_size/2, true);
 	}
+	drawLogo();
 	m_window.swap();
 }
 
@@ -90,6 +92,12 @@ bool ScreenManager::closeDialog() {
 	bool ret = m_dialog;
 	m_dialog.reset();
 	return ret;
+}
+
+void ScreenManager::drawLogo() {
+	double v = 0.5 - 0.5 * std::cos(M_PI * m_logoAnim.get());
+	m_logo.dimensions.fixedHeight(0.1).left(-0.45).screenTop(-0.1 + 0.11 * v);
+	m_logo.draw();
 }
 
 void ScreenManager::drawNotifications() {

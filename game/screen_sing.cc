@@ -143,6 +143,7 @@ void ScreenSing::enter() {
 	sm->loading(_("Loading complete"), 1.0);
 	// Notify about broken tracks
 	if (m_song->b0rkedTracks) ScreenManager::getSingletonPtr()->dialog(_("Song contains broken tracks!"));
+	sm->showLogo(false);
 }
 
 
@@ -253,6 +254,7 @@ void ScreenSing::exit() {
 	m_menuTheme.reset();
 	theme.reset();
 	if (m_audio.isPaused()) m_audio.togglePause();
+	ScreenManager::getSingletonPtr()->showLogo();
 }
 
 void ScreenSing::activateNextScreen()
@@ -566,6 +568,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database, Dancers& 
   m_score_text(getThemePath("score_txt.svg")),
   m_score_rank(getThemePath("score_rank.svg"))
 {
+	ScreenManager::getSingletonPtr()->showLogo();
 	m_pos.setTarget(0.0);
 	m_database.scores.clear();
 	// Singers
