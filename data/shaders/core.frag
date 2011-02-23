@@ -3,20 +3,40 @@
 
 //DEFINES
 
+#ifdef ENABLE_BOGUS
 in float bogus;  // Nvidia will overwrite the first in variable with bogus data, so as a workaround we put a bogus variable here
-in mat4 colorMat;
-in vec4 texCoord;
-in vec3 normal;
-in vec4 color;
-
-#ifdef SURFACE
-uniform sampler2DRect tex;
-#define TEXFUNC texture2DRect(tex, texCoord.st)
 #endif
 
-#ifdef TEXTURE
+in mat4 colorMat;
+
+#ifdef ENABLE_LIGHTING
+in vec3 normal;
+#endif
+
+#ifdef ENABLE_VERTEX_COLOR
+in vec4 color;
+#endif
+
+#ifdef SURFACE
+#endif
+
+#ifdef ENABLE_TEXTURING
+
+in vec4 texCoord;
+
+#if ENABLE_TEXTURING == 1
+
+uniform sampler2DRect tex;
+#define TEXFUNC texture2DRect(tex, texCoord.st)
+
+#elif ENABLE_TEXTURING == 2
+
 uniform sampler2D tex;
 #define TEXFUNC texture2D(tex, texCoord.st)
+
+#else
+#error Unknown texturing mode in ENABLE_TEXTURING
+#endif
 #endif
 
 #ifndef TEXFUNC
@@ -36,6 +56,9 @@ void main() {
 #ifdef ENABLE_VERTEX_COLOR
 	frag *= color;
 #endif
-	gl_FragColor = vec4(0,0,0,bogus * 1e-10) + colorMat * frag;
+	gl_FragColor = colorMat * frag;
+#ifdef ENABLE_BOGUS
+	gl_FragColor += vec4(0,0,0,bogus * 1e-10)
+#endif
 }
 

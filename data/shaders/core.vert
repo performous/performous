@@ -1,32 +1,47 @@
 #version 120
 
-// Input from glVertexAttribPointer
-/* layout (location = 0) */ in vec4 vertPos;
-/* layout (location = 1) */ in vec4 vertTexCoord;
-/* layout (location = 2) */ in vec3 vertNormal;
-/* layout (location = 3) */ in vec4 vertColor;
+//DEFINES
 
+#ifdef ENABLE_BOGUS
 varying float bogus;
+#endif
 
+in vec4 vertPos;
 uniform mat4 colorMatrix;
 varying mat4 colorMat;
 
-// Per-vextex for fragment shader (if no geometry shader)
+#ifdef ENABLE_TEXTURING
+in vec4 vertTexCoord;
 varying vec4 texCoord;
-varying vec3 normal;
-varying vec4 color;
-
-// Per-vertex for geometry shader (if one exists)
 varying vec4 vTexCoord;
+#endif
+
+#ifdef ENABLE_LIGHTING
+in vec3 vertNormal;
+varying vec3 normal;
 varying vec3 vNormal;
+#endif
+
+#ifdef ENABLE_VERTEX_COLOR
+in vec4 vertColor;
+varying vec4 color;
 varying vec4 vColor;
+#endif
 
 void main() {
+#ifdef ENABLE_BOGUS
 	bogus = 0.0;
+#endif
 	colorMat = colorMatrix;  // In case no geometry shader is used (otherwise it sets this)
 	gl_Position = gl_ModelViewProjectionMatrix * vertPos;
+#ifdef ENABLE_TEXTURING
 	vTexCoord = texCoord = vertTexCoord;
+#endif
+#ifdef ENABLE_LIGHTING
 	vNormal = normal = normalize(gl_NormalMatrix * vertNormal);
+#endif
+#ifdef ENABLE_VERTEX_COLOR
 	vColor = color = vertColor;
+#endif
 }
 

@@ -3,11 +3,12 @@
 
 #include "color.hh"
 #include "glmath.hh"
-#include "glshader.hh"
 #include <GL/glew.h>
 #include <string>
 #include <iostream>
 #include <vector>
+
+glmath::Matrix& getColorMatrix();  ///< A temporary hack for global access to the color matrix (so that glutil::Color can write it and Shader::bind can read it)
 
 namespace glutil {
 
@@ -64,136 +65,6 @@ namespace glutil {
 		operator float*() { return reinterpret_cast<float*>(this); }
 		/// overload float const cast
 		operator float const*() const { return reinterpret_cast<float const*>(this); }
-	};
-
-	/// handy vertex array capable of drawing itself
-	class VertexArray {
-	  private:
-		int m_dimension;
-		std::vector<float> m_vertices;
-		std::vector<float> m_normals;
-		std::vector<float> m_texcoords;
-		std::vector<float> m_colors;
-
-	  public:
-		VertexArray(): m_dimension(1) {}
-
-		VertexArray& Vertex(float x, float y) {
-			m_dimension = 2;
-			m_vertices.push_back(x);
-			m_vertices.push_back(y);
-			return *this;
-		}
-
-		VertexArray& Vertex(float x, float y, float z) {
-			m_dimension = 3;
-			m_vertices.push_back(x);
-			m_vertices.push_back(y);
-			m_vertices.push_back(z);
-			return *this;
-		}
-
-		VertexArray& Normal(float x, float y, float z) {
-			m_normals.push_back(x);
-			m_normals.push_back(y);
-			m_normals.push_back(z);
-			return *this;
-		}
-
-		VertexArray& TexCoord(float s, float t, float u = 0.0f, float v = 0.0f) {
-			m_texcoords.push_back(s);
-			m_texcoords.push_back(t);
-			m_texcoords.push_back(u);
-			m_texcoords.push_back(v);
-			return *this;
-		}
-
-		VertexArray& Color(float r, float g, float b, float a) {
-			m_colors.push_back(r);
-			m_colors.push_back(g);
-			m_colors.push_back(b);
-			m_colors.push_back(a);
-			return *this;
-		}
-
-		VertexArray& Color(const glutil::Color& c) {
-			m_colors.push_back(c.r);
-			m_colors.push_back(c.g);
-			m_colors.push_back(c.b);
-			m_colors.push_back(c.a);
-			return *this;
-		}
-
-		void Draw(GLint mode = GL_TRIANGLE_STRIP) {
-			if (m_colors.size() < m_vertices.size()) m_colors.resize(m_vertices.size() / m_dimension * 4, 1.0f);
-			glEnableVertexAttribArray(0);
-			glVertexAttribPointer(0, m_dimension, GL_FLOAT, GL_FALSE, 0, &m_vertices.front());
-			if (m_texcoords.size()) {
-				glEnableVertexAttribArray(1);
-				glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, &m_texcoords.front());
-			}
-			if (m_normals.size()) {
-				glEnableVertexAttribArray(2);
-				glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, &m_normals.front());
-			}
-			if (m_colors.size()) {
-				glEnableVertexAttribArray(3);
-				glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 0, &m_colors.front());
-			}
-			glDrawArrays(mode, 0, size());
-
-			glDisableVertexAttribArray(0);
-			glDisableVertexAttribArray(1);
-			glDisableVertexAttribArray(2);
-			glDisableVertexAttribArray(3);
-		}
-
-		bool empty() const {
-			return m_vertices.empty() && m_normals.empty() && m_texcoords.empty() && m_colors.empty();
-		}
-
-		unsigned size() const {
-			return m_vertices.size() / m_dimension;
-		}
-
-		void clear() {
-			m_vertices.clear(); m_normals.clear(); m_texcoords.clear(); m_colors.clear();
-		}
-
-		std::vector<float>& getVertices() { return m_vertices; }
-		std::vector<float>& getNormals() { return m_normals; }
-		std::vector<float>& getTexCoords() { return m_texcoords; }
-		std::vector<float>& getColors() { return m_colors; }
-	};
-
-	/// easy line
-	struct Line {
-		Line(float x1, float y1, float x2, float y2) {
-			VertexArray va;
-			va.Vertex(x1, y1);
-			va.Vertex(x2, y2);
-			va.Draw(GL_LINES);
-		}
-	};
-
-	/// easy square
-	struct Square {
-		Square(float cx, float cy, float r, bool filled = false) {
-			VertexArray va;
-			if (filled) {
-				va.Vertex(cx - r, cy + r);
-				va.Vertex(cx + r, cy + r);
-				va.Vertex(cx - r, cy - r);
-				va.Vertex(cx + r, cy - r);
-				va.Draw(GL_TRIANGLE_STRIP);
-			} else {
-				va.Vertex(cx - r, cy + r);
-				va.Vertex(cx + r, cy + r);
-				va.Vertex(cx + r, cy - r);
-				va.Vertex(cx - r, cy - r);
-				va.Draw(GL_LINE_LOOP);
-			}
-		}
 	};
 
 	/// Checks for OpenGL error and displays it with given location info

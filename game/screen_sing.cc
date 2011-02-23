@@ -391,10 +391,11 @@ namespace {
 		Dimensions dim(arMin);
 		dim.fixedWidth(1.0);
 		glutil::VertexArray va;
-		va.Vertex(dim.x1(), dim.y1());
-		va.Vertex(dim.x2(), dim.y1());
-		va.Vertex(dim.x1(), dim.y2());
-		va.Vertex(dim.x2(), dim.y2());
+		va.TexCoord(0,0).Vertex(dim.x1(), dim.y1());
+		va.TexCoord(0,0).Vertex(dim.x2(), dim.y1());
+		va.TexCoord(0,0).Vertex(dim.x1(), dim.y2());
+		va.TexCoord(0,0).Vertex(dim.x2(), dim.y2());
+		getShader("texture").bind();
 		va.Draw();
 	}
 

@@ -5,6 +5,8 @@
 #include <stdexcept>
 #include <algorithm>
 
+using namespace glutil;
+
 glmath::Matrix& getColorMatrix() {
 	static glmath::Matrix colorMatrix;
 	return colorMatrix;
@@ -39,7 +41,7 @@ void Shader::dumpInfoLog(GLuint id) {
 	else glGetProgramInfoLog(id, maxLength, &infologLength, infoLog);
 
 	if (infologLength > 0) {
-		std::cout << std::endl << "Shader info log:" << std::endl;
+		std::cout << std::endl << "Errors in shader '" << name << "':\n";
 		std::cout << infoLog << std::endl;
 	}
 }
@@ -52,8 +54,7 @@ Shader::~Shader() {
 	//std::clog << "shader/info: Shader program " << (unsigned)program << " deleted." << std::endl;
 }
 
-
-Shader& Shader::compileFile(std::string const& filename, std::string const& defines) {
+Shader& Shader::compileFile(std::string const& filename) {
 	std::string ext = filename.substr(filename.size() - 5);
 	GLenum type;
 	if (ext == ".vert") type = GL_VERTEX_SHADER;
@@ -61,10 +62,10 @@ Shader& Shader::compileFile(std::string const& filename, std::string const& defi
 	else if (ext == ".frag") type = GL_FRAGMENT_SHADER;
 	else throw std::logic_error("Unknown file extension on shader " + filename);
 	std::string srccode = loadFile(filename);
-	if (!defines.empty()) {
+	// Replace "//DEFINES" with defs
+	if (!defs.empty()) {
 		std::string::size_type pos = srccode.find("//DEFINES");
-		if (pos == std::string::npos) throw std::runtime_error("Shader " + filename + " missing //DEFINES (needed for injected code)");
-		srccode = srccode.substr(0, pos) + defines + srccode.substr(pos + 9);
+		if (pos != std::string::npos) srccode = srccode.substr(0, pos) + defs + srccode.substr(pos + 9);
 	}
 	try {
 		return compileCode(srccode, type);
@@ -135,5 +136,42 @@ GLint Shader::operator[](const std::string& uniform) {
 	GLint var = glGetUniformLocation(program, uniform.c_str());
 	if (var == -1) throw std::logic_error("GLSL shader '" + name + "' uniform variable '" + uniform + "' not found.");
 	return uniforms[uniform] = var;
+}
+
+void VertexArray::Draw(GLint mode) {
+	GLint program;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &program);
+	GLint vertPos = glGetAttribLocation(program, "vertPos");
+	GLint vertTexCoord = glGetAttribLocation(program, "vertTexCoord");
+	GLint vertNormal = glGetAttribLocation(program, "vertNormal");
+	GLint vertColor = glGetAttribLocation(program, "vertColor");
+	unsigned vertices = size();
+	if (vertPos != -1) {
+		glEnableVertexAttribArray(vertPos);
+		glVertexAttribPointer(vertPos, 3, GL_FLOAT, GL_FALSE, 0, &m_vertices.front());
+	}
+	if (vertTexCoord != -1) {
+		if (m_texcoords.empty()) m_texcoords.resize(4 * vertices, 0.0f);  // FIXME: Shouldn't be using a texturing shader if not texturing...
+		if (m_texcoords.size() != 4 * vertices) throw std::logic_error("Invalid number of vertex texture coordinates");
+		glEnableVertexAttribArray(vertTexCoord);
+		glVertexAttribPointer(vertTexCoord, 4, GL_FLOAT, GL_FALSE, 0, &m_texcoords.front());
+	}
+	if (vertNormal != -1) {
+		if (m_normals.size() != 3 * vertices) throw std::logic_error("Invalid number of vertex normals");
+		glEnableVertexAttribArray(vertNormal);
+		glVertexAttribPointer(vertNormal, 3, GL_FLOAT, GL_FALSE, 0, &m_normals.front());
+	}
+	if (vertColor != 1) {
+		if (m_colors.empty()) m_colors.resize(4 * vertices, 1.0f);
+		if (m_colors.size() != 4 * vertices) throw std::logic_error("Invalid number of vertex colors");
+		glEnableVertexAttribArray(vertColor);
+		glVertexAttribPointer(vertColor, 4, GL_FLOAT, GL_FALSE, 0, &m_colors.front());
+	}
+	glDrawArrays(mode, 0, size());
+
+	if (vertPos != -1) glDisableVertexAttribArray(vertPos);
+	if (vertTexCoord != -1) glDisableVertexAttribArray(vertTexCoord);
+	if (vertNormal != -1) glDisableVertexAttribArray(vertNormal);
+	if (vertColor != -1) glDisableVertexAttribArray(vertColor);
 }
 

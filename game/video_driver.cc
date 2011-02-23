@@ -82,25 +82,36 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 		shader("dancenote").compileFile(getThemePath("shaders/stereo3d.geom"));
 	}
 
-	shader("surface")
+	shader("color")
+	  .setDefines("#define ENABLE_VERTEX_COLOR\n")
 	  .compileFile(getThemePath("shaders/core.vert"))
-	  .compileFile(getThemePath("shaders/core.frag"), "#define SURFACE\n#define ENABLE_VERTEX_COLOR\n")
+	  .compileFile(getThemePath("shaders/core.frag"))
+	  .link()
+	  .bind()
+	  .setUniformMatrix("colorMatrix", glmath::Matrix());
+	shader("surface")
+	  .setDefines("#define ENABLE_TEXTURING 1\n#define ENABLE_VERTEX_COLOR\n")
+	  .compileFile(getThemePath("shaders/core.vert"))
+	  .compileFile(getThemePath("shaders/core.frag"))
 	  .link()
 	  .bind()
 	  .setUniformMatrix("colorMatrix", glmath::Matrix());
 	shader("texture")
+	  .setDefines("#define ENABLE_TEXTURING 2\n#define ENABLE_VERTEX_COLOR\n")
 	  .compileFile(getThemePath("shaders/core.vert"))
-	  .compileFile(getThemePath("shaders/core.frag"), "#define TEXTURE\n#define ENABLE_VERTEX_COLOR\n")
+	  .compileFile(getThemePath("shaders/core.frag"))
 	  .link()
 	  .bind()
 	  .setUniformMatrix("colorMatrix", glmath::Matrix());
 	shader("3dobject")
+	  .setDefines("#define ENABLE_LIGHTING\n")
 	  .compileFile(getThemePath("shaders/core.vert"))
-	  .compileFile(getThemePath("shaders/core.frag"), "#define ENABLE_LIGHTING\n")
+	  .compileFile(getThemePath("shaders/core.frag"))
 	  .link();
 	shader("dancenote")
+	  .setDefines("#define ENABLE_TEXTURING 2\n#define ENABLE_VERTEX_COLOR\n")
 	  .compileFile(getThemePath("shaders/dancenote.vert"))
-	  .compileFile(getThemePath("shaders/core.frag"), "#define TEXTURE\n#define ENABLE_VERTEX_COLOR\n")
+	  .compileFile(getThemePath("shaders/core.frag"))
 	  .link();
 	double vx = 0.5f * (screen->w - s_width);
 	double vy = 0.5f * (screen->h - s_height);
@@ -195,6 +206,7 @@ void Window::view(unsigned num) {
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_BLEND);
+	shader("color").bind();
 	// Setup the projection matrix for 2D translates
 	using namespace glmath;
 	glMatrixMode(GL_PROJECTION);

@@ -184,17 +184,7 @@ void NoteGraph::drawNotes() {
 
 namespace {
 	void strip(glutil::VertexArray& va) {
-		if (va.size() > 3) {
-			// Combine the two last points into a terminating point
-			size_t s = va.getVertices().size();
-			va.getTexCoords()[s-3] = 0.5f; // y of second-to-last texcoord
-			float& vy = va.getVertices()[s-3]; // y of second-to-last vertex
-			vy = 0.5f * (vy + va.getVertices()[s-1]); // here is y of last vertex
-			va.getVertices().pop_back();
-			va.getTexCoords().pop_back();
-			// Now ready to draw
-			va.Draw();
-		}
+		if (va.size() > 3) va.Draw();
 		va.clear();
 	}
 }
