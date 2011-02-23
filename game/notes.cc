@@ -80,6 +80,7 @@ double Note::scoreMultiplier() const {
 		case LIFT:
 			return 1.0;
 	}
+	return 0.0;
 }
 
 double Note::powerFactor(double note) const {
