@@ -768,7 +768,9 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 				}
 				break;
 			} else if ((dev.name() != "GUITAR_GUITARHERO_XPLORER" && _e.jaxis.axis == 2 )
-			  || (dev.name() == "GUITAR_ROCKBAND_XBOX360" && _e.jaxis.axis == 4)) {
+			  || (dev.name() == "GUITAR_ROCKBAND_XBOX360" && _e.jaxis.axis == 4)
+			  || (dev.name() == "GUITAR_ROCKBAND_XBOXADAPTER" && _e.jaxis.axis == 3))
+			{
 				// Whammy bar (special case for XBox RB guitar
 				for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
 					event.pressed[i] = dev.pressed(i);
@@ -784,7 +786,9 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 				dev.addEvent(event);
 				break;
 			} else if ((dev.name() == "GUITAR_ROCKBAND_XBOX360" && _e.jaxis.axis == 3)
-			  || (dev.name() == "GUITAR_GUITARHERO_XPLORER" && _e.jaxis.axis == 2)) {
+			  || (dev.name() == "GUITAR_GUITARHERO_XPLORER" && _e.jaxis.axis == 2)
+			  || (dev.name() == "GUITAR_ROCKBAND_XBOXADAPTER" && _e.jaxis.axis ==4))
+			{
 				// Tilt sensor as an axis on some guitars
 				for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
 					event.pressed[i] = dev.pressed(i);

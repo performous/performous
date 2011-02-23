@@ -53,6 +53,21 @@
 			<button id="7" value="start" />
 		</mapping>
 	</controller>
+	<controller type="guitar" name="GUITAR_ROCKBAND_XBOXADAPTER">
+		<description>Rock Band guitar Xbox with USB adapter</description>
+		<regexp match="Generic X-Box pad" />
+		<mapping> 
+			<button id="0" value="green" />
+			<button id="1" value="red" />
+			<button id="2" value="blue" />
+			<button id="3" value="yellow" />
+			<button id="4" value="orange" />
+			<button id="10" value="select" />
+			<button id="6" value="start" />
+			<axis id="4" range="-32768" value="godmode" />
+			<axis id="3" range="-32768:32767" value="whammy" />
+		</mapping>
+	</controller>
 	<controller type="guitar" name="GUITAR_ROCKBAND_PS3">
 		<description>Rock Band guitar PS3</description>
 		<regexp match="Harmonix Guitar .* PlayStation" />
