@@ -131,10 +131,10 @@ to save the current settings to XML.
 			<long>Allows completely disabling background videos. It is recommended to leave this enabled as Performous will still smoothly fade out the video if your computer is not fast enough.</long>
 		</locale>
 	</entry>
-	<entry name="graphic/webcam" type="bool" value="true">
+	<entry name="graphic/webcam" type="bool" value="false">
 		<locale name="C">
 			<short>Webcam background</short>
-			<long>Performous can try to use webcam as a background video. You can disable it if it annoys you.</long>
+			<long>Performous can use webcam as a background video. Disable it if Performous crashes while entering a song.</long>
 		</locale>
 	</entry>
 	<entry name="graphic/webcamid" type="int" value="-1">
