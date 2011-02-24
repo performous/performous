@@ -1199,6 +1199,7 @@ void GuitarGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 
 /// Draw a bar for drum bass pedal/note
 void GuitarGraph::drawBar(double time, float h) {
+	UseShader shader(getShader("color"));
 	glutil::VertexArray va;
 
 	va.Normal(0.0f, 1.0f, 0.0f).TexCoord(0,0).Vertex(-2.5f, time2y(time + h));
