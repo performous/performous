@@ -87,12 +87,11 @@ void Texture::load(unsigned int width, unsigned int height, pix::Format format, 
 	// The texture wraps over at the edges (repeat)
 	glTexParameterf(type(), GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameterf(type(), GL_TEXTURE_WRAP_T, GL_REPEAT);
-	//glTexParameterf(type(), GL_TEXTURE_MAX_LEVEL, 1);
+	glTexParameterf(type(), GL_TEXTURE_MAX_LEVEL, GLEW_VERSION_3_0 ? 4 : 0);  // Mipmaps currently b0rked on Intel, so disable them...
 	glerror.check("glTexParameterf");
 
 	// Anisotropy is potential trouble maker
-	if (GLEW_EXT_texture_filter_anisotropic)
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16.0f);
+	if (GLEW_EXT_texture_filter_anisotropic) glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16.0f);
 	glerror.check("MAX_ANISOTROPY_EXT");
 
 	glTexParameteri(type(), GL_GENERATE_MIPMAP, GL_TRUE);
