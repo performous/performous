@@ -49,7 +49,7 @@ void main() {
 	vTexCoord = texCoord = vertTexCoord;
 	vNormal = normal = normalize(gl_NormalMatrix * vertNormal);
 	vColor = color = vertColor;
-	
+
 	mat4 trans = scaleMat(scale);
 
 	// Cursor arrows

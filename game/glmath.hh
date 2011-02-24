@@ -25,14 +25,14 @@ namespace glmath {
 	};
 
 	static inline Vec3 operator*(float k, Vec3 const& v) { return Vec3(k * v.x, k * v.y, k * v.z); }
-	
+
 	static inline float dot(Vec3 const& a, Vec3 const& b) {
 		return a.x * b.x + a.y * b.y + a.z * b.z;
-	}	
+	}
 
 	static inline float len(Vec3 const& v) { return std::sqrt(dot(v, v)); }
 	static inline Vec3 normalize(Vec3 const& v) { return (1 / len(v)) * v; }
-	
+
 	struct Matrix {
 		static Matrix zero() {
 			Matrix ret;
@@ -150,6 +150,6 @@ namespace glmath {
 		ret(2,3) = 2 * f * n / d;
 		ret(3,3) = 0.0;
 		return ret;
-	}	
+	}
 }
 

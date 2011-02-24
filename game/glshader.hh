@@ -73,7 +73,7 @@ private:
 	int gl_response; ///< save last return state
 
 	std::string defs;
-	
+
 	typedef std::vector<GLuint> ShaderObjects;
 	ShaderObjects shader_ids;
 
@@ -123,7 +123,7 @@ namespace glutil {
 		VertexArray& Vertex(float x, float y, float z = 0.0f) {
 			return Vertex(glmath::Vec4(x, y, z, 1.0f));
 		}
-		
+
 		VertexArray& Vertex(glmath::Vec4 const& v) {
 			m_vert.position = v;
 			m_vertices.push_back(m_vert);

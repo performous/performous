@@ -132,7 +132,7 @@ class UseTexture: boost::noncopyable {
 	/// constructor
 	template <GLenum Type> UseTexture(OpenGLTexture<Type> const& tex):
 	  m_shader(/* hack of the year */ (glutil::GLErrorChecker("UseTexture"), glActiveTexture(GL_TEXTURE0), glBindTexture(Type, tex.id()), tex.shader())) {}
-	
+
   private:
 	UseShader m_shader;
 };
@@ -187,8 +187,8 @@ class Texture: public OpenGLTexture<GL_TEXTURE_2D> {
 class Surface {
   public:
 	/// dimensions
- 	Dimensions dimensions;
- 	/// texture coordinates
+	Dimensions dimensions;
+	/// texture coordinates
 	TexCoords tex;
 	Surface(): m_width(0), m_height(0) {}
 	/// creates surface from cairo surface

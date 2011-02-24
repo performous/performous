@@ -34,7 +34,7 @@ class FBO: boost::noncopyable {
 		return m_texture;
 	}
 	/// Bind the FBO into use
-	void bind() { 
+	void bind() {
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_fbo);
 	}
 	/// Unbind any FBO
