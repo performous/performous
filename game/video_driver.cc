@@ -138,6 +138,7 @@ void Window::updateStereo(float sepFactor) {
 }
 
 void Window::render(boost::function<void (void)> drawFunc) {
+	glutil::GLErrorChecker glerror("Window::render");
 	if (s_width < screen->w || s_height < screen->h) glClear(GL_COLOR_BUFFER_BIT);  // Black bars
 	bool stereo = config["graphic/stereo3d"].b();
 	int type = config["graphic/stereo3dtype"].i();
@@ -147,12 +148,14 @@ void Window::render(boost::function<void (void)> drawFunc) {
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	updateStereo(stereo ? getSeparation() : 0.0);
+	glerror.check("setup");
 	// Can we do direct to framebuffer rendering (no FBO)?
 	if (!stereo || type == 2) { view(stereo); drawFunc(); return; }
 	// Render both eyes to FBO (full resolution top/bottom)
 	unsigned w = s_width;
 	unsigned h = 2 * s_height;
 	FBO fbo(w, h);
+	glerror.check("FBO");
 	{
 		UseFBO user(fbo);
 		view(0);
@@ -160,12 +163,14 @@ void Window::render(boost::function<void (void)> drawFunc) {
 		glViewportIndexedf(1, 0, 0, w, h / 2);
 		drawFunc();
 	}
+	glerror.check("Render to FBO");
 	// Render to actual framebuffer from FBOs
 	UseTexture use(fbo.getTexture());
 	view(0);  // Viewport for drawable area
 	glDisable(GL_BLEND);
 	glmath::Matrix colorMatrix;
 	updateStereo(0.0);  // Disable stereo mode while we composite
+	glerror.check("FBO->FB setup");
 	for (int num = 0; num < 2; ++num) {
 		{
 			float saturation = 0.6;  // (0..1)
@@ -195,9 +200,11 @@ void Window::render(boost::function<void (void)> drawFunc) {
 		dim.center((num == 0 ? 0.25 : -0.25) * dim.h());
 		fbo.getTexture().draw(dim, TexCoords(0.0, h, w, 0));
 	}
+	glerror.check("FBO->FB postcondition");
 }
 
 void Window::view(unsigned num) {
+	glutil::GLErrorChecker glerror("Window::view");
 	// Set flags
 	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
 	glDisable(GL_DEPTH_TEST);

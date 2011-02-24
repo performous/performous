@@ -161,7 +161,6 @@ void mainLoop(std::string const& songlist) {
 		// Main loop
 		boost::xtime time = now();
 		unsigned frames = 0;
-		glutil::GLErrorChecker glerror("mainloop");
 		while (!sm.isFinished()) {
 			Profiler prof("mainloop");
 			if( g_take_screenshot ) {
@@ -207,7 +206,6 @@ void mainLoop(std::string const& songlist) {
 				std::cerr << "ERROR: " << e.what() << std::endl;
 				sm.flashMessage(std::string("ERROR: ") + e.what());
 			}
-			glerror.check("frame");
 		}
 	} catch (std::exception& e) {
 		// This should use ScreenManager fatalError, but it cannot
