@@ -1156,6 +1156,8 @@ void GuitarGraph::drawDrumfill(float tBeg, float tEnd) {
 void GuitarGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 	// Draw info
 	if (!menuOpen()) {
+		glutil::PushMatrix mat;
+		glTranslatef(0.0f, 0.0f, -0.5f);
 		float xcor = 0.35 * dimensions.w();
 		float h = 0.075 * 2.0 * dimensions.w();
 		// Hack to show the scores better when there is more space (1 instrument)

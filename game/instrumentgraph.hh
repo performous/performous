@@ -29,13 +29,16 @@ class Popup {
 	bool draw(double offsetX) {
 		double anim = m_anim.get();
 		if (anim > 0.0 && m_popupText) {
-			float s = 0.2 * (1.0 + anim);
 			float a = 1.0 - anim;
 			m_color.a = a;
 			glutil::Color color(m_color);
 			m_popupText->render(m_msg);
-			m_popupText->dimensions().center(0.1).middle(offsetX).stretch(s,s);
-			m_popupText->draw();
+			{
+				glutil::PushMatrix mat;
+				glTranslatef(0.0f, 0.0f, 0.5f * anim);
+				m_popupText->dimensions().center(0.1 - 0.03 * anim).middle(offsetX).stretch(0.2f, 0.2f);
+				m_popupText->draw();
+			}
 			if (m_info != "" && m_infoText) {
 				m_infoText->dimensions.screenBottom(-0.02).middle(-0.12 + offsetX);
 				m_infoText->draw(m_info, a);
