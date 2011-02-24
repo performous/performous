@@ -475,7 +475,7 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 					is_keyboard_event = true;
 					event.type = input::Event::PRESS;
 					break;
-				case SDLK_F6: case SDLK_6: case SDLK_n:
+				case SDLK_RCTRL:  // Godmode
 					button++;
 				case SDLK_F5: case SDLK_5: case SDLK_b:
 					button++;
