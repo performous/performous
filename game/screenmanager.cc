@@ -50,10 +50,10 @@ void ScreenManager::drawScreen() {
 
 
 void ScreenManager::loading(std::string const& message, float progress) {
-	drawLogo();
 	// TODO: Create a better one, this is quite ugly
 	flashMessage(message + " " + boost::lexical_cast<std::string>(int(round(progress*100))) + "%", 0.0f, 1.0f, 1.0f);
 	m_window.blank();
+	drawLogo();
 	drawNotifications();
 	const int maxi = 20;
 	const float x = 0.3;
