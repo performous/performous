@@ -160,7 +160,7 @@ void VertexArray::Draw(GLint mode) {
 		glEnableVertexAttribArray(vertNormal);
 		glVertexAttribPointer(vertNormal, 4, GL_FLOAT, GL_FALSE, stride, ptr + 2);
 	}
-	if (vertColor != 1) {
+	if (vertColor != -1) {
 		glEnableVertexAttribArray(vertColor);
 		glVertexAttribPointer(vertColor, 4, GL_FLOAT, GL_FALSE, stride, ptr + 3);
 	}
