@@ -1,10 +1,9 @@
 #version 120
 
-// Input from glVertexAttribPointer
-/* layout (location = 0) */ in vec4 vertPos;
-/* layout (location = 1) */ in vec4 vertTexCoord;
-/* layout (location = 2) */ in vec3 vertNormal;
-/* layout (location = 3) */ in vec4 vertColor;
+in vec4 vertPos;
+in vec4 vertTexCoord;
+in vec3 vertNormal;
+in vec4 vertColor;
 
 varying float bogus;
 
