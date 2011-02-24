@@ -120,13 +120,10 @@ std::string getThemePath(std::string const& filename) {
 	std::string theme = config["game/theme"].s();
 	static const std::string defaultTheme = "default";
 	if (theme.empty()) theme = defaultTheme;
-	// Try current theme and if that fails, try default theme.
-	try {
-		return getPath(fs::path("themes") / theme / filename);
-	} catch (std::runtime_error&) {
-		if (theme == defaultTheme) throw;
-		return getPath(fs::path("themes") / defaultTheme / filename);
-	}
+	// Try current theme and if that fails, try default theme and finally data dir
+	try { return getPath(fs::path("themes") / theme / filename); } catch (std::runtime_error&) {}
+	if (theme == defaultTheme) try { return getPath(fs::path("themes") / defaultTheme / filename); } catch (std::runtime_error&) {}
+	return getPath(filename);
 }
 
 bool isThemeResource(fs::path filename){
