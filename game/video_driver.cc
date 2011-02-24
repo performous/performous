@@ -91,6 +91,7 @@ void Window::screenshot() {
 
 
 void Window::resize() {
+	glutil::GLErrorChecker glerror("Window::resize");
 	unsigned width = m_fullscreen ? m_fsW : m_windowW;
 	unsigned height = m_fullscreen ? m_fsH : m_windowH;
 	{ // Setup GL attributes for context creation
@@ -109,7 +110,7 @@ void Window::resize() {
 		screen = SDL_SetVideoMode(width, height, 0, SDL_OPENGL | SDL_RESIZABLE | (m_fullscreen ? SDL_FULLSCREEN : 0));
 		if (!screen) throw std::runtime_error(std::string("SDL_SetVideoMode failed: ") + SDL_GetError());
 	}
-
+	glerror.check("SetVideoMode");
 	s_width = screen->w;
 	s_height = screen->h;
 	if (!m_fullscreen) {
@@ -140,7 +141,5 @@ void Window::resize() {
 	const float f = 0.9f; // Avoid texture surface being exactly at the near plane (MacOSX fix)
 	glFrustum(-0.5f * f, 0.5f * f, 0.5f * h * f, -0.5f * h * f, f * near_, far_);
 	glTranslatef(0.0f, 0.0f, -near_);  // So that z = 0.0f is still on monitor surface
-	// Check for OpenGL errors
-	glutil::GLErrorChecker glerror("Window::resize");
 }
 

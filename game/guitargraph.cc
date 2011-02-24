@@ -787,6 +787,7 @@ namespace {
 
 /// Main drawing function (projection, neck, cursor...)
 void GuitarGraph::draw(double time) {
+	// FIXME: There are errors here... glutil::GLErrorChecker ec("GuitarGraph::draw");
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
 	dimensions.screenBottom().middle(m_cx.get()).fixedWidth(std::min(m_width.get(),0.5));
 	double offsetX = 0.5 * (dimensions.x1() + dimensions.x2());
@@ -940,7 +941,7 @@ void GuitarGraph::draw(double time) {
 					}
 				}
 			}
-		} //< disable lighting
+		} //< disable depth test
 		// Draw flames
 		for (int fret = 0; fret < m_pads; ++fret) { // Loop through the frets
 			if (m_drums && fret == input::KICK_BUTTON) { // Skip bass drum

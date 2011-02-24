@@ -77,6 +77,7 @@ namespace {
 }
 
 void Texture::load(unsigned int width, unsigned int height, pix::Format format, unsigned char const* buffer, float ar) {
+	glutil::GLErrorChecker glerror("Texture::load");
 	m_ar = ar ? ar : double(width) / height;
 	UseTexture texture(*this);
 	// When texture area is small, bilinear filter the closest mipmap
@@ -87,12 +88,12 @@ void Texture::load(unsigned int width, unsigned int height, pix::Format format, 
 	glTexParameterf(type(), GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameterf(type(), GL_TEXTURE_WRAP_T, GL_REPEAT);
 	//glTexParameterf(type(), GL_TEXTURE_MAX_LEVEL, 1);
-	glutil::GLErrorChecker glerror1("Texture::load - glTexParameterf");
+	glerror.check("glTexParameterf");
 
 	// Anisotropy is potential trouble maker
 	if (GLEW_EXT_texture_filter_anisotropic)
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16.0f);
-	glutil::GLErrorChecker glerror2("Texture::load - MAX_ANISOTROPY_EXT");
+	glerror.check("MAX_ANISOTROPY_EXT");
 
 	glTexParameteri(type(), GL_GENERATE_MIPMAP, GL_TRUE);
 	PixFmt const& f = getPixFmt(format);
@@ -112,11 +113,10 @@ void Texture::load(unsigned int width, unsigned int height, pix::Format format, 
 		// Just don't do it in Surface class, thanks. -Tronic
 		glTexImage2D(type(), 0, GL_RGBA, newWidth, newHeight, 0, f.format, f.type, &outBuf[0]);
 	}
-	// Check for OpenGL errors
-	glutil::GLErrorChecker glerror3("Texture::load");
 }
 
 void Surface::load(unsigned int width, unsigned int height, pix::Format format, unsigned char const* buffer, float ar) {
+	glutil::GLErrorChecker glerror("Surface::load");
 	using namespace pix;
 	// Initialize dimensions
 	m_width = width; m_height = height;
@@ -126,8 +126,6 @@ void Surface::load(unsigned int width, unsigned int height, pix::Format format, 
 	PixFmt const& f = getPixFmt(format);
 	glPixelStorei(GL_UNPACK_SWAP_BYTES, f.swap);
 	glTexImage2D(m_texture.type(), 0, GL_RGBA, width, height, 0, f.format, f.type, buffer);
-	// Check for OpenGL errors
-	glutil::GLErrorChecker glerror("Surface::load");
 }
 
 void Surface::draw() const {
