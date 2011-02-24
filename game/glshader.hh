@@ -121,19 +121,31 @@ namespace glutil {
 		VertexArray() {}
 
 		VertexArray& Vertex(float x, float y, float z = 0.0f) {
-			m_vert.position = glmath::Vec4(x, y, z, 1.0f);
+			return Vertex(glmath::Vec4(x, y, z, 1.0f));
+		}
+		
+		VertexArray& Vertex(glmath::Vec4 const& v) {
+			m_vert.position = v;
 			m_vertices.push_back(m_vert);
 			m_vert = VertexInfo();
 			return *this;
 		}
 
 		VertexArray& Normal(float x, float y, float z) {
-			m_vert.normal = glmath::Vec4(x, y, z, 1.0f);
+			return Normal(glmath::Vec4(x, y, z, 1.0f));
+		}
+
+		VertexArray& Normal(glmath::Vec4 const& v) {
+			m_vert.normal = v;
 			return *this;
 		}
 
 		VertexArray& TexCoord(float s, float t, float u = 0.0f, float v = 0.0f) {
-			m_vert.texCoord = glmath::Vec4(s, t, u, v);
+			return TexCoord(glmath::Vec4(s, t, u, v));
+		}
+
+		VertexArray& TexCoord(glmath::Vec4 const& v) {
+			m_vert.texCoord = v;
 			return *this;
 		}
 
