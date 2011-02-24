@@ -99,67 +99,65 @@ struct UseShader {
 };
 
 namespace glutil {
+	// Note: if you reorder or otherwise change the contents of this, VertexShader::Draw() must be modified accordingly
+	struct VertexInfo {
+		glmath::Vec4 position;
+		glmath::Vec4 texCoord;
+		glmath::Vec4 normal;
+		glmath::Vec4 color;
+		VertexInfo():
+		  position(0.0, 0.0, 0.0, 1.0),
+		  texCoord(0.0, 0.0, 0.0, 0.0),
+		  normal(0.0, 0.0, 0.0, 0.0),
+		  color(1.0, 1.0, 1.0, 1.0)
+		{}
+	};
 	/// handy vertex array capable of drawing itself
 	class VertexArray {
 	  private:
-		std::vector<float> m_vertices;
-		std::vector<float> m_normals;
-		std::vector<float> m_texcoords;
-		std::vector<float> m_colors;
-
+		std::vector<VertexInfo> m_vertices;
+		VertexInfo m_vert;
 	  public:
 		VertexArray() {}
 
 		VertexArray& Vertex(float x, float y, float z = 0.0f) {
-			m_vertices.push_back(x);
-			m_vertices.push_back(y);
-			m_vertices.push_back(z);
+			m_vert.position = glmath::Vec4(x, y, z, 1.0f);
+			m_vertices.push_back(m_vert);
+			m_vert = VertexInfo();
 			return *this;
 		}
 
 		VertexArray& Normal(float x, float y, float z) {
-			m_normals.push_back(x);
-			m_normals.push_back(y);
-			m_normals.push_back(z);
+			m_vert.normal = glmath::Vec4(x, y, z, 1.0f);
 			return *this;
 		}
 
 		VertexArray& TexCoord(float s, float t, float u = 0.0f, float v = 0.0f) {
-			m_texcoords.push_back(s);
-			m_texcoords.push_back(t);
-			m_texcoords.push_back(u);
-			m_texcoords.push_back(v);
+			m_vert.texCoord = glmath::Vec4(s, t, u, v);
 			return *this;
 		}
 
-		VertexArray& Color(float r, float g, float b, float a) {
-			m_colors.push_back(r);
-			m_colors.push_back(g);
-			m_colors.push_back(b);
-			m_colors.push_back(a);
+		VertexArray& Color(float r, float g, float b, float a = 1.0f) {
+			m_vert.color = glmath::Vec4(r, g, b, a);
 			return *this;
 		}
 
 		VertexArray& Color(const glutil::Color& c) {
-			m_colors.push_back(c.r);
-			m_colors.push_back(c.g);
-			m_colors.push_back(c.b);
-			m_colors.push_back(c.a);
-			return *this;
+			return Color(c.r, c.g, c.b, c.a);
 		}
 
 		void Draw(GLint mode = GL_TRIANGLE_STRIP);
 
 		bool empty() const {
-			return m_vertices.empty() && m_normals.empty() && m_texcoords.empty() && m_colors.empty();
+			return m_vertices.empty();
 		}
 
 		unsigned size() const {
-			return m_vertices.size() / 3;
+			return m_vertices.size();
 		}
 
 		void clear() {
-			m_vertices.clear(); m_normals.clear(); m_texcoords.clear(); m_colors.clear();
+			m_vertices.clear();
 		}
 
 	};

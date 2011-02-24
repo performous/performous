@@ -139,33 +139,30 @@ GLint Shader::operator[](const std::string& uniform) {
 }
 
 void VertexArray::Draw(GLint mode) {
+	if (empty()) return;
 	GLint program;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &program);
 	GLint vertPos = glGetAttribLocation(program, "vertPos");
 	GLint vertTexCoord = glGetAttribLocation(program, "vertTexCoord");
 	GLint vertNormal = glGetAttribLocation(program, "vertNormal");
 	GLint vertColor = glGetAttribLocation(program, "vertColor");
-	unsigned vertices = size();
+	glmath::Vec4 const* ptr = &m_vertices[0].position;
+	unsigned stride = sizeof(VertexInfo);
 	if (vertPos != -1) {
 		glEnableVertexAttribArray(vertPos);
-		glVertexAttribPointer(vertPos, 3, GL_FLOAT, GL_FALSE, 0, &m_vertices.front());
+		glVertexAttribPointer(vertPos, 4, GL_FLOAT, GL_FALSE, stride, ptr);
 	}
 	if (vertTexCoord != -1) {
-		if (m_texcoords.empty()) m_texcoords.resize(4 * vertices, 0.0f);  // FIXME: Shouldn't be using a texturing shader if not texturing...
-		if (m_texcoords.size() != 4 * vertices) throw std::logic_error("Invalid number of vertex texture coordinates");
 		glEnableVertexAttribArray(vertTexCoord);
-		glVertexAttribPointer(vertTexCoord, 4, GL_FLOAT, GL_FALSE, 0, &m_texcoords.front());
+		glVertexAttribPointer(vertTexCoord, 4, GL_FLOAT, GL_FALSE, stride, ptr + 1);
 	}
 	if (vertNormal != -1) {
-		if (m_normals.size() != 3 * vertices) throw std::logic_error("Invalid number of vertex normals");
 		glEnableVertexAttribArray(vertNormal);
-		glVertexAttribPointer(vertNormal, 3, GL_FLOAT, GL_FALSE, 0, &m_normals.front());
+		glVertexAttribPointer(vertNormal, 4, GL_FLOAT, GL_FALSE, stride, ptr + 2);
 	}
 	if (vertColor != 1) {
-		if (m_colors.empty()) m_colors.resize(4 * vertices, 1.0f);
-		if (m_colors.size() != 4 * vertices) throw std::logic_error("Invalid number of vertex colors");
 		glEnableVertexAttribArray(vertColor);
-		glVertexAttribPointer(vertColor, 4, GL_FLOAT, GL_FALSE, 0, &m_colors.front());
+		glVertexAttribPointer(vertColor, 4, GL_FLOAT, GL_FALSE, stride, ptr + 3);
 	}
 	glDrawArrays(mode, 0, size());
 
