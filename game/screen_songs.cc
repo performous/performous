@@ -118,6 +118,7 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 			else if (key == SDLK_END) show_hiscores ? show_hiscores = false : show_hiscores = true;
 		} else if (key == SDLK_END) show_hiscores ? show_hiscores = false : show_hiscores = true;
 	}
+	sm->showLogo(!m_jukebox);
 }
 
 void ScreenSongs::drawJukebox() {

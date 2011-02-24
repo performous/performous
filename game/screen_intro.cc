@@ -12,6 +12,7 @@ ScreenIntro::ScreenIntro(std::string const& name, Audio& audio): Screen(name), m
 }
 
 void ScreenIntro::enter() {
+	ScreenManager::getSingletonPtr()->showLogo();
 	m_audio.playMusic(getThemePath("menu.ogg"), true);
 	m_selAnim = AnimValue(0.0, 10.0);
 	m_submenuAnim = AnimValue(0.0, 3.0);
