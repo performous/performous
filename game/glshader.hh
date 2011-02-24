@@ -99,7 +99,7 @@ struct UseShader {
 };
 
 namespace glutil {
-	// Note: if you reorder or otherwise change the contents of this, VertexShader::Draw() must be modified accordingly
+	// Note: if you reorder or otherwise change the contents of this, VertexArray::Draw() must be modified accordingly
 	struct VertexInfo {
 		glmath::Vec4 position;
 		glmath::Vec4 texCoord;
