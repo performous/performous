@@ -207,7 +207,7 @@ void NoteGraph::drawWaves(Database const& database) {
 		double oldval = getNaN();
 		glutil::VertexArray va;
 		Notes::const_iterator noteIt = m_vocal.notes.begin();
-		glutil::Color c(Color(p->m_color.r, p->m_color.g, p->m_color.b, m_notealpha));
+		Color c(p->m_color.r, p->m_color.g, p->m_color.b, m_notealpha);
 		for (; idx < endIdx; ++idx, t += Engine::TIMESTEP) {
 			double const freq = pitch[idx].first;
 			// If freq is NaN, we have nothing to process
@@ -235,10 +235,10 @@ void NoteGraph::drawWaves(Database const& database) {
 			// If there has been a break or if the pitch change is too fast, terminate and begin a new one
 			if (oldval != oldval || std::abs(oldval - val) > 1) strip(va);
 			// Add a point or a pair of points
-			if (!va.size()) va.TexCoord(tex, 0.5f).Vertex(x, y);
+			if (!va.size()) va.TexCoord(tex, 0.5f).Color(c).Vertex(x, y);
 			else {
-				va.TexCoord(tex, 0.0f).Vertex(x, y - thickness);
-				va.TexCoord(tex, 1.0f).Vertex(x, y + thickness);
+				va.TexCoord(tex, 0.0f).Color(c).Vertex(x, y - thickness);
+				va.TexCoord(tex, 1.0f).Color(c).Vertex(x, y + thickness);
 			}
 			oldval = val;
 		}
