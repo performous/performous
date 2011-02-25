@@ -29,6 +29,10 @@ namespace {
 		SDL_GLattr m_attr;
 		int m_value;
 	};
+
+	const float near_ = 0.1f; // This determines the near clipping distance (must be > 0)
+	const float far_ = 110.0f; // How far away can things be seen
+	const float z0 = 1.5f; // This determines FOV: the value is your distance from the monitor (the unit being the width of the Performous window)
 }
 
 unsigned int screenW() { return s_width; }
@@ -36,7 +40,7 @@ unsigned int screenH() { return s_height; }
 
 Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(width), m_windowH(height), m_fullscreen(fs) {
 	std::atexit(SDL_Quit);
-	if( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK) ==  -1 ) throw std::runtime_error("SDL_Init failed");
+	if( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK) == -1 ) throw std::runtime_error("SDL_Init failed");
 	SDL_WM_SetCaption(PACKAGE " " VERSION, PACKAGE);
 	{
 		SDL_Surface* icon = SDL_LoadBMP(getThemePath("icon.bmp").c_str());
@@ -51,14 +55,63 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	SDL_ShowCursor(SDL_DISABLE);
 	SDL_EnableUNICODE(SDL_ENABLE);
 	if (glewInit() != GLEW_OK) throw std::runtime_error("Initializing GLEW failed (is your OpenGL broken?)");
+	// Dump some OpenGL info
+	std::clog << "video/info: GL_VENDOR:     " << glGetString(GL_VENDOR) << std::endl;
+	std::clog << "video/info: GL_VERSION:    " << glGetString(GL_VERSION) << std::endl;
+	std::clog << "video/info: GL_RENDERER:   " << glGetString(GL_RENDERER) << std::endl;
+	// Extensions would need more complex outputting, otherwise they will break clog.
+	//std::clog << "video/info: GL_EXTENSIONS: " << glGetString(GL_EXTENSIONS) << std::endl;
+
 	input::SDL::init();
 }
 
 Window::~Window() { }
 
 void Window::blank() {
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
+
+void Window::render(boost::function<void (void)> drawFunc) {
+	glutil::GLErrorChecker glerror("Window::render");
+	if (s_width < screen->w || s_height < screen->h) glClear(GL_COLOR_BUFFER_BIT);  // Black bars
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	view();
+	drawFunc();
+}
+
+void Window::view() {
+	glutil::GLErrorChecker glerror("Window::view");
+	// Set flags
+	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+	glShadeModel(GL_SMOOTH);
+	glEnable(GL_BLEND);
+	// Setup the projection matrix for 2D translates
+	using namespace glmath;
+	glMatrixMode(GL_PROJECTION);
+	float h = virtH();
+	// OpenGL normalized coordinates go from -1 to 1, change scale so that our 2D translates can use the Performous normalized coordinates instead
+	upload(scale(Vec3(2.0f, 2.0f / h, 1.0f)));
+	// Note: we do the frustum on MODELVIEW so that 2D positioning can be done via projection matrix.
+	// glTranslatef on that will move the image, not the camera (i.e. far-away and nearby objects move the same amount)
+	glMatrixMode(GL_MODELVIEW);
+	const float f = near_ / z0;
+	upload(
+	  scale(Vec3(0.5, 0.5 * h, 1.0))
+	  * frustum(-0.5f * f, 0.5f * f, 0.5f * h * f, -0.5f * h * f, near_, far_)
+	  * translate(Vec3(0.0, 0.0, -z0))
+	);
+	// Setup views
+	double vx = 0.5f * (screen->w - s_width);
+	double vy = 0.5f * (screen->h - s_height);
+	double vw = s_width, vh = s_height;
+		glViewport(vx, vy, vw, vh);  // Drawable area of the window (excluding black bars)
+}
+
 
 void Window::swap() {
 	SDL_GL_SwapBuffers();
@@ -110,7 +163,6 @@ void Window::resize() {
 		screen = SDL_SetVideoMode(width, height, 0, SDL_OPENGL | SDL_RESIZABLE | (m_fullscreen ? SDL_FULLSCREEN : 0));
 		if (!screen) throw std::runtime_error(std::string("SDL_SetVideoMode failed: ") + SDL_GetError());
 	}
-	glerror.check("SetVideoMode");
 	s_width = screen->w;
 	s_height = screen->h;
 	if (!m_fullscreen) {
@@ -143,3 +195,9 @@ void Window::resize() {
 	glTranslatef(0.0f, 0.0f, -near_);  // So that z = 0.0f is still on monitor surface
 }
 
+FarTransform::FarTransform() {
+	float z = far_ - 0.1f;  // Very near the far plane but just a bit closer to avoid accidental clipping
+	float s = z / z0;  // Scale the image so that it looks the same size
+	glTranslatef(0.0f, 0.0f, -z + z0); // Very near the farplane
+	glScalef(s, s, s);
+}

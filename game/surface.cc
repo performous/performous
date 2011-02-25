@@ -119,7 +119,7 @@ void Surface::load(unsigned int width, unsigned int height, pix::Format format, 
 	using namespace pix;
 	// Initialize dimensions
 	m_width = width; m_height = height;
-	dimensions = Dimensions(ar != 0.0f ? ar : float(width) / height).fixedWidth(1.0f);
+	if (dimensions.ar() == 0.0) dimensions = Dimensions(ar != 0.0f ? ar : float(width) / height).fixedWidth(1.0f);
 	// Load the data into texture
 	UseTexture texture(m_texture);
 	PixFmt const& f = getPixFmt(format);

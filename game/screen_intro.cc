@@ -1,11 +1,13 @@
 #include "screen_intro.hh"
 
 #include "fs.hh"
+#include "glmath.hh"
 #include "audio.hh"
 #include "i18n.hh"
 #include "joystick.hh"
 #include "theme.hh"
 #include "menu.hh"
+#include "xtime.hh"
 
 
 ScreenIntro::ScreenIntro(std::string const& name, Audio& audio): Screen(name), m_audio(audio), m_first(true) {
@@ -113,7 +115,13 @@ void ScreenIntro::draw_menu_options() {
 }
 
 void ScreenIntro::draw() {
-	theme->bg.draw();
+	glutil::GLErrorChecker glerror("ScreenIntro::draw()");
+	{
+		float anim = SDL_GetTicks() % 20000 / 20000.0;
+		glutil::Color c(glmath::rotate(2.0 * M_PI * anim, glmath::Vec3(1.0, 1.0, 1.0)));
+		theme->bg.draw();
+	}
+	glerror.check("bg");
 	if (m_menu.current().image) m_menu.current().image->draw();
 	// Comment
 	theme->comment_bg.dimensions.center().screenBottom(-0.01);

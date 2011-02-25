@@ -39,7 +39,7 @@ void Songs::reload_internal() {
 		m_songs.clear();
 		m_dirty = true;
 	}
-	Profiler prof("Song loading took");
+	Profiler prof("songloader");
 	Paths paths = getPathsConfig("paths/songs");
 	for (Paths::iterator it = paths.begin(); m_loading && it != paths.end(); ++it) {
 		try {
