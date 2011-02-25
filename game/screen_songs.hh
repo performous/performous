@@ -46,8 +46,7 @@ protected:
 	Audio& m_audio;
 	Songs& m_songs;
 	Database& m_database;
-	boost::scoped_ptr<Surface> m_songbg;
-	boost::scoped_ptr<Surface> m_songbg_default;
+	boost::scoped_ptr<Surface> m_songbg, m_songbg_ground, m_songbg_default;
 	boost::scoped_ptr<Video> m_video;
 	boost::scoped_ptr<ThemeSongs> theme;
 	std::map<std::string,std::string> m_playing;

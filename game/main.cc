@@ -21,6 +21,7 @@
 #include "screen_paths.hh"
 #include "screen_players.hh"
 
+#include <boost/bind.hpp>
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
@@ -160,7 +161,6 @@ void mainLoop(std::string const& songlist) {
 		// Main loop
 		boost::xtime time = now();
 		unsigned frames = 0;
-		glutil::GLErrorChecker glerror("mainloop");
 		while (!sm.isFinished()) {
 			Profiler prof("mainloop");
 			if( g_take_screenshot ) {
@@ -178,12 +178,12 @@ void mainLoop(std::string const& songlist) {
 			prof("misc");
 			try {
 				// Draw
-				window.blank();
-				sm.getCurrentScreen()->draw();
-				sm.drawNotifications();
+				window.render(boost::bind(&ScreenManager::drawScreen, &sm));
+				glFinish();
 				prof("draw");
 				// Display (and wait until next frame)
 				window.swap();
+				glFinish();
 				prof("swap");
 				if (config["graphic/fps"].b()) {
 					++frames;
@@ -206,7 +206,6 @@ void mainLoop(std::string const& songlist) {
 				std::cerr << "ERROR: " << e.what() << std::endl;
 				sm.flashMessage(std::string("ERROR: ") + e.what());
 			}
-			glerror.check("frame");
 		}
 	} catch (std::exception& e) {
 		// This should use ScreenManager fatalError, but it cannot

@@ -1,11 +1,13 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include <iostream>
 
 #include <GL/glew.h>
 
 #include "color.hh"
+#include "glmath.hh"
 
 namespace glutil {
 	/// wrapper struct for RAII
@@ -61,6 +63,18 @@ namespace glutil {
 		}
 	};
 
+	/// wrapper struct for RAII
+	struct UseDepthTest {
+		/// enable depth test (for 3d objects)
+		UseDepthTest() {
+			glClear(GL_DEPTH_BUFFER_BIT);
+			glEnable(GL_DEPTH_TEST);
+		}
+		~UseDepthTest() {
+			glDisable(GL_DEPTH_TEST);
+		}
+	};
+
 	struct Color {
 		float r, ///< red component
 		      g, ///< green
@@ -69,9 +83,9 @@ namespace glutil {
 		/// create nec Color object from the Color object
 		Color(::Color const& c): r(c.r), g(c.g), b(c.b), a(c.a) {
 			glColor4fv(*this);
-		//	GLfloat ColorVect[] = {r, g, b, a};
-		//	glEnableClientState(GL_COLOR_ARRAY);
-		//	glColorPointer (4,GL_FLOAT,0,ColorVect);
+		}
+		Color(glmath::Matrix const& mat): r(), g(), b(), a() {
+			// TODO: FIXME
 		}
 		~Color() {
 			r = g = b = a = 1.0f;
@@ -84,23 +98,129 @@ namespace glutil {
 		operator float const*() const { return reinterpret_cast<float const*>(this); }
 	};
 
+	// Note: if you reorder or otherwise change the contents of this, VertexArray::Draw() must be modified accordingly
+	struct VertexInfo {
+		glmath::Vec4 position;
+		glmath::Vec4 texCoord;
+		glmath::Vec4 normal;
+		glmath::Vec4 color;
+		bool has_texCoord;
+		bool has_normal;
+		bool has_color;
+		VertexInfo():
+		  position(0.0, 0.0, 0.0, 1.0),
+		  texCoord(0.0, 0.0, 0.0, 0.0),
+		  normal(0.0, 0.0, 0.0, 0.0),
+		  color(1.0, 1.0, 1.0, 1.0),
+		  has_texCoord(),
+		  has_normal(),
+		  has_color()
+		{}
+	};
+	/// handy vertex array capable of drawing itself
+	class VertexArray {
+	  private:
+		std::vector<VertexInfo> m_vertices;
+		VertexInfo m_vert;
+	  public:
+		VertexArray() {}
+
+		VertexArray& Vertex(float x, float y, float z = 0.0f) {
+			return Vertex(glmath::Vec4(x, y, z, 1.0f));
+		}
+
+		VertexArray& Vertex(glmath::Vec4 const& v) {
+			m_vert.position = v;
+			m_vertices.push_back(m_vert);
+			m_vert = VertexInfo();
+			return *this;
+		}
+
+		VertexArray& Normal(float x, float y, float z) {
+			return Normal(glmath::Vec4(x, y, z, 1.0f));
+		}
+
+		VertexArray& Normal(glmath::Vec4 const& v) {
+			m_vert.normal = v;
+			m_vert.has_normal = true;
+			return *this;
+		}
+
+		VertexArray& TexCoord(float s, float t, float u = 0.0f, float v = 0.0f) {
+			return TexCoord(glmath::Vec4(s, t, u, v));
+		}
+
+		VertexArray& TexCoord(glmath::Vec4 const& v) {
+			m_vert.texCoord = v;
+			m_vert.has_texCoord = true;
+			return *this;
+		}
+
+		VertexArray& Color(float r, float g, float b, float a = 1.0f) {
+			m_vert.color = glmath::Vec4(r, g, b, a);
+			m_vert.has_color = true;
+			return *this;
+		}
+
+		VertexArray& Color(const glutil::Color& c) {
+			return Color(c.r, c.g, c.b, c.a);
+		}
+
+		void Draw(GLint mode = GL_TRIANGLE_STRIP) {
+			glutil::Begin block(mode);
+			for(std::vector<VertexInfo>::const_iterator it = m_vertices.begin() ; it != m_vertices.end() ; ++it) {
+				//glTexCoord4f(it->texCoord[0], it->texCoord[1], it->texCoord[2], it->texCoord[3]);
+				if(it->has_texCoord)
+					glTexCoord2f(it->texCoord[0], it->texCoord[1]);
+				if(it->has_normal)
+					glNormal3f(it->normal[0], it->normal[1], it->normal[2]);
+				if(it->has_color)
+					glColor4f(it->color[0], it->color[1], it->color[2], it->color[3]);
+				glVertex3f(it->position[0], it->position[1], it->position[2]);
+			}
+		}
+
+		bool empty() const {
+			return m_vertices.empty();
+		}
+
+		unsigned size() const {
+			return m_vertices.size();
+		}
+
+		void clear() {
+			m_vertices.clear();
+		}
+
+	};
+
 	/// easy line
 	struct Line {
 		Line(float x1, float y1, float x2, float y2) {
-			Begin line(GL_LINES);
-			glVertex2f(x1,y1);
-			glVertex2f(x2,y2);
+			VertexArray va;
+			va.Vertex(x1, y1);
+			va.Vertex(x2, y2);
+			va.Draw(GL_LINES);
 		}
 	};
 
 	/// easy square
 	struct Square {
 		Square(float cx, float cy, float r, bool filled = false) {
-			Begin line(filled ? GL_QUADS : GL_LINE_LOOP);
-			glVertex2f(cx-r,cy+r);
-			glVertex2f(cx-r,cy-r);
-			glVertex2f(cx+r,cy-r);
-			glVertex2f(cx+r,cy+r);
+			VertexArray va;
+			if (filled) {
+				va.Vertex(cx - r, cy + r);
+				va.Vertex(cx + r, cy + r);
+				va.Vertex(cx - r, cy - r);
+				va.Vertex(cx + r, cy - r);
+				va.Draw(GL_TRIANGLE_STRIP);
+			} else {
+				va.Vertex(cx - r, cy + r);
+				va.Vertex(cx + r, cy + r);
+				va.Vertex(cx + r, cy - r);
+				va.Vertex(cx - r, cy - r);
+				va.Draw(GL_LINE_LOOP);
+			}
 		}
 	};
 
@@ -121,6 +241,7 @@ namespace glutil {
 				case GL_INVALID_ENUM: return "Invalid enum";
 				case GL_INVALID_VALUE: return "Invalid value";
 				case GL_INVALID_OPERATION: return "Invalid operation";
+				case GL_INVALID_FRAMEBUFFER_OPERATION: return "FBO is not complete";
 				case GL_STACK_OVERFLOW: return "Stack overflow";
 				case GL_STACK_UNDERFLOW: return "Stack underflow";
 				case GL_OUT_OF_MEMORY: return "Out of memory";

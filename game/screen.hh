@@ -67,7 +67,7 @@ class ScreenManager: public Singleton <ScreenManager> {
 	bool closeDialog();
 	/// Returns true if dialog is open
 	bool isDialogOpen() { return m_dialog; }
-	/// Draw dialogs & flash messages in current screen
+	/// Draw dialogs & flash messages, called automatically by drawScreen
 	void drawNotifications();
 
 	/// Sets finished to true

@@ -129,12 +129,16 @@ class UseTexture: boost::noncopyable {
 };
 
 template <GLenum Type> void OpenGLTexture<Type>::draw(Dimensions const& dim, TexCoords const& tex) const {
+	glutil::VertexArray va;
+
 	UseTexture texture(*this);
-	glutil::Begin block(GL_TRIANGLE_STRIP);
-	glTexCoord2f(tex.x1, tex.y1); glVertex2f(dim.x1(), dim.y1());
-	glTexCoord2f(tex.x2, tex.y1); glVertex2f(dim.x2(), dim.y1());
-	glTexCoord2f(tex.x1, tex.y2); glVertex2f(dim.x1(), dim.y2());
-	glTexCoord2f(tex.x2, tex.y2); glVertex2f(dim.x2(), dim.y2());
+
+	va.TexCoord(tex.x1, tex.y1).Vertex(dim.x1(), dim.y1());
+	va.TexCoord(tex.x2, tex.y1).Vertex(dim.x2(), dim.y1());
+	va.TexCoord(tex.x1, tex.y2).Vertex(dim.x1(), dim.y2());
+	va.TexCoord(tex.x2, tex.y2).Vertex(dim.x2(), dim.y2());
+
+	va.Draw();
 }
 
 template <GLenum Type> void OpenGLTexture<Type>::drawCropped(Dimensions const& orig, TexCoords const& tex) const {
@@ -174,8 +178,8 @@ class Texture: public OpenGLTexture<GL_TEXTURE_2D> {
 class Surface {
   public:
 	/// dimensions
- 	Dimensions dimensions;
- 	/// texture coordinates
+	Dimensions dimensions;
+	/// texture coordinates
 	TexCoords tex;
 	Surface(): m_width(0), m_height(0) {}
 	/// creates surface from cairo surface
@@ -189,5 +193,5 @@ class Surface {
 
   private:
 	unsigned int m_width, m_height;
-	OpenGLTexture<GL_TEXTURE_RECTANGLE_ARB> m_texture;
+	OpenGLTexture<GL_TEXTURE_RECTANGLE> m_texture;
 };

@@ -23,6 +23,7 @@ ScreenSongs::ScreenSongs(std::string const& name, Audio& audio, Songs& songs, Da
 void ScreenSongs::enter() {
 	theme.reset(new ThemeSongs());
 	m_songbg_default.reset(new Surface(getThemePath("songs_bg_default.svg")));
+	m_songbg_ground.reset(new Surface(getThemePath("songs_bg_ground.svg")));
 	m_singCover.reset(new Surface(getThemePath("no_cover.svg")));
 	m_instrumentCover.reset(new Surface(getThemePath("instrument_cover.svg")));
 	m_bandCover.reset(new Surface(getThemePath("band_cover.svg")));
@@ -45,6 +46,8 @@ void ScreenSongs::exit() {
 	theme.reset();
 	m_video.reset();
 	m_songbg.reset();
+	m_songbg_default.reset();
+	m_songbg_ground.reset();
 	m_playing.clear();
 	m_playReq.clear();
 }
@@ -144,11 +147,19 @@ void ScreenSongs::drawJukebox() {
 }
 
 void ScreenSongs::drawMultimedia() {
-	double length = m_audio.getLength();
-	double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
-	if (m_songbg.get()) m_songbg->draw(); else m_songbg_default->draw();
-	if (m_video.get()) m_video->render(time);
-	if (!m_jukebox) theme->bg.draw();
+	{
+		FarTransform ft;  // 3D effect
+		double length = m_audio.getLength();
+		double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
+		m_songbg_default->draw();   // Default bg
+		if (m_songbg.get()) m_songbg->draw();
+		if (m_video.get()) m_video->render(time);
+	}
+	if (!m_jukebox) {
+		m_songbg_ground->draw();
+		drawCovers();
+		theme->bg.draw();
+	}
 }
 
 void ScreenSongs::updateMultimedia(Song& song, ScreenSharedInfo& info) {
@@ -216,7 +227,6 @@ void ScreenSongs::draw() {
 			// Get hiscores from database
 			m_database.queryPerSongHiscore_HiscoreDisplay(oss_order, m_songs.currentPtr(), hiscore_start_pos, 5);
 		}
-		if (!m_jukebox) drawCovers();
 		updateMultimedia(song, info);
 	}
 	if (m_jukebox) drawJukebox();
@@ -250,17 +260,21 @@ void ScreenSongs::drawCovers() {
 		Song& song = m_songs[baseidx + i];
 		Surface& s = getCover(song);
 		// Calculate dimensions for cover and instrument markers
-		double diff = (i == 0 ? (0.5 - fabs(shift)) * 0.07 : 0.0);
-		double y = 0.27 + 0.5 * diff;
-		s.dimensions.middle(-0.2 + 0.17 * (i - shift)).bottom(y - 0.2 * diff).fitInside(0.14 + diff, 0.14 + diff);
+		double diff = 0.5 * (1.0 + std::cos(std::min(M_PI, std::abs(i - shift))));  // 0..1 for current cover hilight level
+		double y = 0.5 * virtH();
+		glutil::PushMatrix pm;
+		glTranslatef(-0.2 + 0.20 * (i - shift), y, -0.2 - 0.3 * (1.0 - diff));
+		glRotatef(20.0 * std::sin(std::min(M_PI, i - shift)), 0.0, 1.0, 0.0);
+		double c = 0.4 + 0.6 * diff;
+		glutil::Color c1(Color(c, c, c));
+		s.dimensions.middle(0.0).bottom(0.0).fitInside(0.17, 0.17);
 		// Draw the cover normally
 		s.draw();
 		// Draw the reflection
 		glutil::PushMatrix m;
-		glTranslatef(0.0f, 2.0 * y, 0.0f);
 		glScalef(1.0f, -1.0f, 1.0f);
 		{
-			glutil::Color c(Color(1.0f, 1.0f, 1.0f, 0.4f));
+			glutil::Color c2(Color(1.0f, 1.0f, 1.0f, 0.4f));
 			s.draw();
 		}
 	}
@@ -316,14 +330,15 @@ void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
 		// vocals
 		float a = alpha * (have_vocals ? 1.00 : 0.25);
 		float m = !(typeFilter & 8);
-		glutil::Begin block(GL_TRIANGLE_STRIP);
+		glutil::VertexArray va;
 		glutil::Color c(Color(m * 1.0f, 1.0f, m * (is_karaoke ? 0.25f : 1.0f), a));
 		x = dim.x1()+0.00*(dim.x2()-dim.x1());
-		glTexCoord2f(getIconTex(1), 0.0f); glVertex2f(x, dim.y1());
-		glTexCoord2f(getIconTex(1), 1.0f); glVertex2f(x, dim.y2());
+		va.Color(c).TexCoord(getIconTex(1), 0.0f).Vertex(x, dim.y1());
+		va.Color(c).TexCoord(getIconTex(1), 1.0f).Vertex(x, dim.y2());
 		x = dim.x1()+xincr*(dim.x2()-dim.x1());
-		glTexCoord2f(getIconTex(2), 0.0f); glVertex2f(x, dim.y1());
-		glTexCoord2f(getIconTex(2), 1.0f); glVertex2f(x, dim.y2());
+		va.Color(c).TexCoord(getIconTex(2), 0.0f).Vertex(x, dim.y1());
+		va.Color(c).TexCoord(getIconTex(2), 1.0f).Vertex(x, dim.y2());
+		va.Draw();
 	}
 	{
 		// guitars
@@ -331,67 +346,72 @@ void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
 		float m = !(typeFilter & 4);
 		if (guitarCount == 0) { guitarCount = 1; a *= 0.25f; }
 		for (int i = guitarCount-1; i >= 0; i--) {
-			glutil::Begin block(GL_TRIANGLE_STRIP);
+			glutil::VertexArray va;
 			glutil::Color c(Color(m * 1.0f, 1.0f, m * 1.0f, a));
 			x = dim.x1()+(xincr+i*0.04)*(dim.x2()-dim.x1());
-			glTexCoord2f(getIconTex(2), 0.0f); glVertex2f(x, dim.y1());
-			glTexCoord2f(getIconTex(2), 1.0f); glVertex2f(x, dim.y2());
+			va.Color(c).TexCoord(getIconTex(2), 0.0f).Vertex(x, dim.y1());
+			va.Color(c).TexCoord(getIconTex(2), 1.0f).Vertex(x, dim.y2());
 			x = dim.x1()+(2*xincr+i*0.04)*(dim.x2()-dim.x1());
-			glTexCoord2f(getIconTex(3), 0.0f); glVertex2f(x, dim.y1());
-			glTexCoord2f(getIconTex(3), 1.0f); glVertex2f(x, dim.y2());
+			va.Color(c).TexCoord(getIconTex(3), 0.0f).Vertex(x, dim.y1());
+			va.Color(c).TexCoord(getIconTex(3), 1.0f).Vertex(x, dim.y2());
+			va.Draw();
 		}
 	}
 	{
 		// bass
 		float a = alpha * (have_bass ? 1.00f : 0.25f);
 		float m = !(typeFilter & 4);
-		glutil::Begin block(GL_TRIANGLE_STRIP);
+		glutil::VertexArray va;
 		glutil::Color c(Color(m * 1.0f, 1.0f, m * 1.0f, a));
 		x = dim.x1()+2*xincr*(dim.x2()-dim.x1());
-		glTexCoord2f(getIconTex(3), 0.0f); glVertex2f(x, dim.y1());
-		glTexCoord2f(getIconTex(3), 1.0f); glVertex2f(x, dim.y2());
+		va.Color(c).TexCoord(getIconTex(3), 0.0f).Vertex(x, dim.y1());
+		va.Color(c).TexCoord(getIconTex(3), 1.0f).Vertex(x, dim.y2());
 		x = dim.x1()+3*xincr*(dim.x2()-dim.x1());
-		glTexCoord2f(getIconTex(4), 0.0f); glVertex2f(x, dim.y1());
-		glTexCoord2f(getIconTex(4), 1.0f); glVertex2f(x, dim.y2());
+		va.Color(c).TexCoord(getIconTex(4), 0.0f).Vertex(x, dim.y1());
+		va.Color(c).TexCoord(getIconTex(4), 1.0f).Vertex(x, dim.y2());
+		va.Draw();
 	}
 	{
 		// drums
 		float a = alpha * (have_drums ? 1.00f : 0.25f);
 		float m = !(typeFilter & 2);
-		glutil::Begin block(GL_TRIANGLE_STRIP);
+		glutil::VertexArray va;
 		glutil::Color c(Color(m * 1.0f, 1.0f, m * 1.0f, a));
 		x = dim.x1()+3*xincr*(dim.x2()-dim.x1());
-		glTexCoord2f(getIconTex(4), 0.0f); glVertex2f(x, dim.y1());
-		glTexCoord2f(getIconTex(4), 1.0f); glVertex2f(x, dim.y2());
+		va.Color(c).TexCoord(getIconTex(4), 0.0f).Vertex(x, dim.y1());
+		va.Color(c).TexCoord(getIconTex(4), 1.0f).Vertex(x, dim.y2());
 		x = dim.x1()+4*xincr*(dim.x2()-dim.x1());
-		glTexCoord2f(getIconTex(5), 0.0f); glVertex2f(x, dim.y1());
-		glTexCoord2f(getIconTex(5), 1.0f); glVertex2f(x, dim.y2());
+		va.Color(c).TexCoord(getIconTex(5), 0.0f).Vertex(x, dim.y1());
+		va.Color(c).TexCoord(getIconTex(5), 1.0f).Vertex(x, dim.y2());
+		va.Draw();
 	}
 	{
 		// keyboard
 		float a = alpha * (have_keyboard ? 1.00f : 0.25f);
 		float m = !(typeFilter & 16);
-		glutil::Begin block(GL_TRIANGLE_STRIP);
+		glutil::VertexArray va;
 		glutil::Color c(Color(m * 1.0f, 1.0f, m * 1.0f, a));
 		x = dim.x1()+4*xincr*(dim.x2()-dim.x1());
-		glTexCoord2f(getIconTex(5), 0.0f); glVertex2f(x, dim.y1());
-		glTexCoord2f(getIconTex(5), 1.0f); glVertex2f(x, dim.y2());
+		va.Color(c).TexCoord(getIconTex(5), 0.0f).Vertex(x, dim.y1());
+		va.Color(c).TexCoord(getIconTex(5), 1.0f).Vertex(x, dim.y2());
 		x = dim.x1()+5*xincr*(dim.x2()-dim.x1());
-		glTexCoord2f(getIconTex(6), 0.0f); glVertex2f(x, dim.y1());
-		glTexCoord2f(getIconTex(6), 1.0f); glVertex2f(x, dim.y2());
+		va.Color(c).TexCoord(getIconTex(6), 0.0f).Vertex(x, dim.y1());
+		va.Color(c).TexCoord(getIconTex(6), 1.0f).Vertex(x, dim.y2());
+		va.Draw();
 	}
 	{
 		// dancing
 		float a = alpha * (have_dance ? 1.00f : 0.25f);
 		float m = !(typeFilter & 1);
-		glutil::Begin block(GL_TRIANGLE_STRIP);
+		glutil::VertexArray va;
 		glutil::Color c(Color(m * 1.0f, 1.0f, m * 1.0f, a));
 		x = dim.x1()+5*xincr*(dim.x2()-dim.x1());
-		glTexCoord2f(getIconTex(6), 0.0f); glVertex2f(x, dim.y1());
-		glTexCoord2f(getIconTex(6), 1.0f); glVertex2f(x, dim.y2());
+		va.Color(c).TexCoord(getIconTex(6), 0.0f).Vertex(x, dim.y1());
+		va.Color(c).TexCoord(getIconTex(6), 1.0f).Vertex(x, dim.y2());
 		x = dim.x1()+6*xincr*(dim.x2()-dim.x1());
-		glTexCoord2f(getIconTex(7), 0.0f); glVertex2f(x, dim.y1());
-		glTexCoord2f(getIconTex(7), 1.0f); glVertex2f(x, dim.y2());
+		va.Color(c).TexCoord(getIconTex(7), 0.0f).Vertex(x, dim.y1());
+		va.Color(c).TexCoord(getIconTex(7), 1.0f).Vertex(x, dim.y2());
+		va.Draw();
 	}
 }
 

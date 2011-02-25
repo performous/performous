@@ -392,11 +392,12 @@ namespace {
 	void fillBG() {
 		Dimensions dim(arMin);
 		dim.fixedWidth(1.0);
-		glutil::Begin block(GL_QUADS);
-		glVertex2f(dim.x1(), dim.y1());
-		glVertex2f(dim.x2(), dim.y1());
-		glVertex2f(dim.x2(), dim.y2());
-		glVertex2f(dim.x1(), dim.y2());
+		glutil::VertexArray va;
+		va.TexCoord(0,0).Vertex(dim.x1(), dim.y1());
+		va.TexCoord(0,0).Vertex(dim.x2(), dim.y1());
+		va.TexCoord(0,0).Vertex(dim.x1(), dim.y2());
+		va.TexCoord(0,0).Vertex(dim.x2(), dim.y2());
+		va.Draw();
 	}
 
 }
@@ -424,6 +425,7 @@ void ScreenSing::draw() {
 
 	// Rendering starts
 	{
+		FarTransform ft;
 		double ar = arMax;
 		// Background image
 		if (m_background) {
