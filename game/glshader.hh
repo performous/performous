@@ -101,10 +101,10 @@ struct UseShader {
 namespace glutil {
 	// Note: if you reorder or otherwise change the contents of this, VertexArray::Draw() must be modified accordingly
 	struct VertexInfo {
-		glmath::Vec4 position;
-		glmath::Vec4 texCoord;
-		glmath::Vec4 normal;
-		glmath::Vec4 color;
+		glmath::vec4 position;
+		glmath::vec4 texCoord;
+		glmath::vec4 normal;
+		glmath::vec4 color;
 		VertexInfo():
 		  position(0.0, 0.0, 0.0, 1.0),
 		  texCoord(0.0, 0.0, 0.0, 0.0),
@@ -121,10 +121,10 @@ namespace glutil {
 		VertexArray() {}
 
 		VertexArray& Vertex(float x, float y, float z = 0.0f) {
-			return Vertex(glmath::Vec4(x, y, z, 1.0f));
+			return Vertex(glmath::vec4(x, y, z, 1.0f));
 		}
 
-		VertexArray& Vertex(glmath::Vec4 const& v) {
+		VertexArray& Vertex(glmath::vec4 const& v) {
 			m_vert.position = v;
 			m_vertices.push_back(m_vert);
 			m_vert = VertexInfo();
@@ -132,25 +132,25 @@ namespace glutil {
 		}
 
 		VertexArray& Normal(float x, float y, float z) {
-			return Normal(glmath::Vec4(x, y, z, 1.0f));
+			return Normal(glmath::vec4(x, y, z, 1.0f));
 		}
 
-		VertexArray& Normal(glmath::Vec4 const& v) {
+		VertexArray& Normal(glmath::vec4 const& v) {
 			m_vert.normal = v;
 			return *this;
 		}
 
 		VertexArray& TexCoord(float s, float t, float u = 0.0f, float v = 0.0f) {
-			return TexCoord(glmath::Vec4(s, t, u, v));
+			return TexCoord(glmath::vec4(s, t, u, v));
 		}
 
-		VertexArray& TexCoord(glmath::Vec4 const& v) {
+		VertexArray& TexCoord(glmath::vec4 const& v) {
 			m_vert.texCoord = v;
 			return *this;
 		}
 
 		VertexArray& Color(float r, float g, float b, float a = 1.0f) {
-			m_vert.color = glmath::Vec4(r, g, b, a);
+			m_vert.color = glmath::vec4(r, g, b, a);
 			return *this;
 		}
 

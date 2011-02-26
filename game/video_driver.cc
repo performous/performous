@@ -76,6 +76,7 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 
 	if (GLEW_VERSION_3_3) {
 		// Compile geometry shaders when stereo is requested
+		shader("color").compileFile(getThemePath("shaders/stereo3d.geom"));
 		shader("surface").compileFile(getThemePath("shaders/stereo3d.geom"));
 		shader("texture").compileFile(getThemePath("shaders/stereo3d.geom"));
 		shader("3dobject").compileFile(getThemePath("shaders/stereo3d.geom"));
@@ -88,35 +89,35 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	  .compileFile(getThemePath("shaders/core.frag"))
 	  .link()
 	  .bind()
-	  .setUniformMatrix("colorMatrix", glmath::Matrix());
+	  .setUniformMatrix("colorMatrix", glmath::mat4::identity());
 	shader("surface")
 	  .setDefines("#define ENABLE_TEXTURING 1\n")
 	  .compileFile(getThemePath("shaders/core.vert"))
 	  .compileFile(getThemePath("shaders/core.frag"))
 	  .link()
 	  .bind()
-	  .setUniformMatrix("colorMatrix", glmath::Matrix());
+	  .setUniformMatrix("colorMatrix", glmath::mat4::identity());
 	shader("texture")
 	  .setDefines("#define ENABLE_TEXTURING 2\n#define ENABLE_VERTEX_COLOR\n")
 	  .compileFile(getThemePath("shaders/core.vert"))
 	  .compileFile(getThemePath("shaders/core.frag"))
 	  .link()
 	  .bind()
-	  .setUniformMatrix("colorMatrix", glmath::Matrix());
+	  .setUniformMatrix("colorMatrix", glmath::mat4::identity());
 	shader("3dobject")
 	  .setDefines("#define ENABLE_LIGHTING\n")
 	  .compileFile(getThemePath("shaders/core.vert"))
 	  .compileFile(getThemePath("shaders/core.frag"))
 	  .link()
 	  .bind()
-	  .setUniformMatrix("colorMatrix", glmath::Matrix());
+	  .setUniformMatrix("colorMatrix", glmath::mat4::identity());
 	shader("dancenote")
 	  .setDefines("#define ENABLE_TEXTURING 2\n#define ENABLE_VERTEX_COLOR\n")
 	  .compileFile(getThemePath("shaders/dancenote.vert"))
 	  .compileFile(getThemePath("shaders/core.frag"))
 	  .link()
 	  .bind()
-	  .setUniformMatrix("colorMatrix", glmath::Matrix());
+	  .setUniformMatrix("colorMatrix", glmath::mat4::identity());
 	view(0);  // For loading screens
 }
 
@@ -168,7 +169,7 @@ void Window::render(boost::function<void (void)> drawFunc) {
 	UseTexture use(fbo.getTexture());
 	view(0);  // Viewport for drawable area
 	glDisable(GL_BLEND);
-	glmath::Matrix colorMatrix;
+	glmath::mat4 colorMatrix = glmath::mat4::identity();
 	updateStereo(0.0);  // Disable stereo mode while we composite
 	glerror.check("FBO->FB setup");
 	for (int num = 0; num < 2; ++num) {
@@ -219,16 +220,16 @@ void Window::view(unsigned num) {
 	glMatrixMode(GL_PROJECTION);
 	float h = virtH();
 	// OpenGL normalized coordinates go from -1 to 1, change scale so that our 2D translates can use the Performous normalized coordinates instead
-	upload(scale(Vec3(2.0f, 2.0f / h, 1.0f)));
+	//upload(scale(vec3(2.0f, 2.0f / h, 1.0f)));
 	// Note: we do the frustum on MODELVIEW so that 2D positioning can be done via projection matrix.
 	// glTranslatef on that will move the image, not the camera (i.e. far-away and nearby objects move the same amount)
 	glMatrixMode(GL_MODELVIEW);
 	const float f = near_ / z0;
-	upload(
-	  scale(Vec3(0.5, 0.5 * h, 1.0))
+	/*upload(
+	  scale(vec3(0.5, 0.5 * h, 1.0))
 	  * frustum(-0.5f * f, 0.5f * f, 0.5f * h * f, -0.5f * h * f, near_, far_)
-	  * translate(Vec3(0.0, 0.0, -z0))
-	);
+	  * translate(vec3(0.0, 0.0, -z0))
+	);*/
 	// Setup views
 	double vx = 0.5f * (screen->w - s_width);
 	double vy = 0.5f * (screen->h - s_height);

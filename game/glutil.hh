@@ -8,7 +8,7 @@
 #include <iostream>
 #include <vector>
 
-glmath::Matrix& getColorMatrix();  ///< A temporary hack for global access to the color matrix (so that glutil::Color can write it and Shader::bind can read it)
+glmath::mat4& getColorMatrix();  ///< A temporary hack for global access to the color matrix (so that glutil::Color can write it and Shader::bind can read it)
 
 namespace glutil {
 
@@ -46,18 +46,18 @@ namespace glutil {
 		      a; ///< alpha value
 		/// create nec Color object from the Color object
 		Color(::Color const& c): r(c.r), g(c.g), b(c.b), a(c.a) {
-			getColorMatrix() = glmath::Matrix::diagonal(glmath::Vec4(*this));
+			getColorMatrix() = glmath::mat4::diagonal(glmath::vec4(*this));
 		//	glColor4fv(*this);
 		//	GLfloat ColorVect[] = {r, g, b, a};
 		//	glEnableClientState(GL_COLOR_ARRAY);
 		//	glColorPointer (4,GL_FLOAT,0,ColorVect);
 		}
-		Color(glmath::Matrix const& mat): r(), g(), b(), a() {
+		Color(glmath::mat4 const& mat): r(), g(), b(), a() {
 			getColorMatrix() = mat;
 		}
 		~Color() {
 			r = g = b = a = 1.0f;
-			getColorMatrix() = glmath::Matrix::diagonal(glmath::Vec4(*this));
+			getColorMatrix() = glmath::mat4::diagonal(glmath::vec4(*this));
 		//	glColor4fv(*this);
 		//	glDisableClientState (GL_COLOR_ARRAY);
 		}

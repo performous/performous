@@ -7,8 +7,8 @@
 
 using namespace glutil;
 
-glmath::Matrix& getColorMatrix() {
-	static glmath::Matrix colorMatrix;
+glmath::mat4& getColorMatrix() {
+	static glmath::mat4 colorMatrix = glmath::mat4::identity();
 	return colorMatrix;
 }
 
@@ -141,7 +141,7 @@ GLint Shader::operator[](const std::string& uniform) {
 void VertexArray::Draw(GLint mode) {
 	if (empty()) return;
 	unsigned stride = sizeof(VertexInfo);
-	glmath::Vec4 const* ptr = &m_vertices[0].position;
+	glmath::vec4 const* ptr = &m_vertices[0].position;
 	GLint program;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &program);
 	GLint vertPos = glGetAttribLocation(program, "vertPos");
