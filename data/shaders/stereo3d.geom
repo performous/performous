@@ -8,12 +8,10 @@ in vec4 vTexCoord[];
 in vec3 vNormal[];
 in vec4 vColor[];
 
-out mat4 colorMat;
 out vec4 texCoord;
 out vec3 normal;
 out vec4 color;
 
-uniform mat4 colorMatrix;
 uniform float sepFactor;
 uniform float z0;
 
@@ -25,7 +23,6 @@ void passthru(in int i) {
 }
 
 void main() {
-	colorMat = colorMatrix;  // Supply color matrix for fragment shader
 	// Fix Nvidia compile warnings ("might be used uninitialized")
 	gl_Position = vec4(0);
 	texCoord = vec4(0);

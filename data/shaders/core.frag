@@ -3,8 +3,8 @@
 
 //DEFINES
 
-in float bogus;  // Nvidia will overwrite the first in variable with bogus data, so as a workaround we put a bogus variable here
-in mat4 colorMat;
+uniform mat4 colorMatrix;
+
 in vec3 normal;
 in vec4 color;
 
@@ -38,9 +38,6 @@ void main() {
 #ifdef ENABLE_VERTEX_COLOR
 	frag *= color;
 #endif
-	gl_FragColor = colorMat * frag;
-#ifdef ENABLE_BOGUS
-	gl_FragColor += vec4(0,0,0,bogus * 1e-10)
-#endif
+	gl_FragColor = colorMatrix * frag;
 }
 
