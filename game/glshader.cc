@@ -142,7 +142,6 @@ void VertexArray::Draw(GLint mode) {
 	if (empty()) return;
 	unsigned stride = sizeof(VertexInfo);
 	glmath::Vec4 const* ptr = &m_vertices[0].position;
-#if 1
 	GLint program;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &program);
 	GLint vertPos = glGetAttribLocation(program, "vertPos");
@@ -171,31 +170,5 @@ void VertexArray::Draw(GLint mode) {
 	if (vertTexCoord != -1) glDisableVertexAttribArray(vertTexCoord);
 	if (vertNormal != -1) glDisableVertexAttribArray(vertNormal);
 	if (vertColor != -1) glDisableVertexAttribArray(vertColor);
-#else
-	// VBO
-	glmath::Vec4 const* ptr_ = NULL;
-	GLuint bufferName;
-	glGenBuffers(1, &bufferName);
-	glBindBuffer(GL_ARRAY_BUFFER, bufferName);
-	glBufferData(GL_ARRAY_BUFFER, size(), ptr, GL_STREAM_DRAW);
-
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glEnableClientState(GL_NORMAL_ARRAY);
-	glEnableClientState(GL_COLOR_ARRAY);
-
-	glVertexPointer(4, GL_FLOAT, stride, ptr_);
-	glTexCoordPointer(4, GL_FLOAT, stride, ptr_ + 1);
-	glNormalPointer(GL_FLOAT, stride, ptr_ + 2);
-	glColorPointer(4, GL_FLOAT, stride, ptr_ + 3);
-	glDrawArrays(mode, 0, size());
-
-	glDisableClientState(GL_COLOR_ARRAY);
-	glDisableClientState(GL_NORMAL_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	glDisableClientState(GL_VERTEX_ARRAY);
-
-	glBindBuffer(GL_ARRAY_BUFFER, bufferName);
-#endif
 }
 
