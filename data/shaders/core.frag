@@ -28,6 +28,10 @@ uniform sampler2D tex;
 void main() {
 	vec4 frag = TEXFUNC;
 
+#ifdef ENABLE_VERTEX_COLOR
+	frag *= color;
+#endif
+
 #ifdef ENABLE_LIGHTING
 	vec3 lightDir = normalize(vec3(-50.0, 5.0, -15.0));
 	const vec3 ambient = vec3(0.1, 0.1, 0.1);
@@ -35,9 +39,7 @@ void main() {
 	float NdotL = max(dot(normalize(normal), lightDir), 0.0);
 	frag = vec4(ambient + frag.rgb * NdotL, frag.a);
 #endif
-#ifdef ENABLE_VERTEX_COLOR
-	frag *= color;
-#endif
+
 	gl_FragColor = colorMatrix * frag;
 }
 
