@@ -89,35 +89,35 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	  .compileFile(getThemePath("shaders/core.frag"))
 	  .link()
 	  .bind()
-	  .setUniformMatrix("colorMatrix", glmath::mat4::identity());
+	  .setUniformMat4("colorMatrix", glmath::mat4::identity());
 	shader("surface")
 	  .setDefines("#define ENABLE_TEXTURING 1\n")
 	  .compileFile(getThemePath("shaders/core.vert"))
 	  .compileFile(getThemePath("shaders/core.frag"))
 	  .link()
 	  .bind()
-	  .setUniformMatrix("colorMatrix", glmath::mat4::identity());
+	  .setUniformMat4("colorMatrix", glmath::mat4::identity());
 	shader("texture")
 	  .setDefines("#define ENABLE_TEXTURING 2\n#define ENABLE_VERTEX_COLOR\n")
 	  .compileFile(getThemePath("shaders/core.vert"))
 	  .compileFile(getThemePath("shaders/core.frag"))
 	  .link()
 	  .bind()
-	  .setUniformMatrix("colorMatrix", glmath::mat4::identity());
+	  .setUniformMat4("colorMatrix", glmath::mat4::identity());
 	shader("3dobject")
 	  .setDefines("#define ENABLE_LIGHTING\n")
 	  .compileFile(getThemePath("shaders/core.vert"))
 	  .compileFile(getThemePath("shaders/core.frag"))
 	  .link()
 	  .bind()
-	  .setUniformMatrix("colorMatrix", glmath::mat4::identity());
+	  .setUniformMat4("colorMatrix", glmath::mat4::identity());
 	shader("dancenote")
 	  .setDefines("#define ENABLE_TEXTURING 2\n#define ENABLE_VERTEX_COLOR\n")
 	  .compileFile(getThemePath("shaders/dancenote.vert"))
 	  .compileFile(getThemePath("shaders/core.frag"))
 	  .link()
 	  .bind()
-	  .setUniformMatrix("colorMatrix", glmath::mat4::identity());
+	  .setUniformMat4("colorMatrix", glmath::mat4::identity());
 	view(0);  // For loading screens
 }
 
@@ -138,8 +138,26 @@ void Window::updateStereo(float sepFactor) {
 	}
 }
 
+void Window::updateTransforms() {
+	// Setup the projection matrix for 2D translates
+	using namespace glmath;
+	float h = virtH();
+	const float f = near_ / z0;
+	mat4 position = frustum(-0.5f * f, 0.5f * f, 0.5f * h * f, -0.5f * h * f, near_, far_) * translate(vec3(0.0, 0.0, -z0));
+	mat3 normal(position);
+	for (ShaderMap::iterator it = m_shaders.begin(); it != m_shaders.end(); ++it) {
+		Shader& sh = *it->second;
+		sh.bind();
+		sh.setUniformMat4("positionMatrix", position);
+		try {
+			sh.setUniformMat3("normalMatrix", normal);
+		} catch(...) {}  // Not fatal if normalMatrix is missing (only 3d objects use it)
+	}
+}
+
 void Window::render(boost::function<void (void)> drawFunc) {
 	glutil::GLErrorChecker glerror("Window::render");
+	updateTransforms();
 	if (s_width < screen->w || s_height < screen->h) glClear(GL_COLOR_BUFFER_BIT);  // Black bars
 	bool stereo = config["graphic/stereo3d"].b();
 	int type = config["graphic/stereo3dtype"].i();
@@ -215,21 +233,6 @@ void Window::view(unsigned num) {
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_BLEND);
 	shader("color").bind();
-	// Setup the projection matrix for 2D translates
-	using namespace glmath;
-	glMatrixMode(GL_PROJECTION);
-	float h = virtH();
-	// OpenGL normalized coordinates go from -1 to 1, change scale so that our 2D translates can use the Performous normalized coordinates instead
-	//upload(scale(vec3(2.0f, 2.0f / h, 1.0f)));
-	// Note: we do the frustum on MODELVIEW so that 2D positioning can be done via projection matrix.
-	// glTranslatef on that will move the image, not the camera (i.e. far-away and nearby objects move the same amount)
-	glMatrixMode(GL_MODELVIEW);
-	const float f = near_ / z0;
-	/*upload(
-	  scale(vec3(0.5, 0.5 * h, 1.0))
-	  * frustum(-0.5f * f, 0.5f * f, 0.5f * h * f, -0.5f * h * f, near_, far_)
-	  * translate(vec3(0.0, 0.0, -z0))
-	);*/
 	// Setup views
 	double vx = 0.5f * (screen->w - s_width);
 	double vy = 0.5f * (screen->h - s_height);

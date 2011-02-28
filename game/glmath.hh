@@ -10,9 +10,15 @@
 
 namespace glmath {
 
+	struct vec4;
+	
 	struct vec3 {
 		GLfloat x, y, z;
+		explicit vec3(GLfloat const* arr) { std::copy(arr, arr + 3, &x); }
 		explicit vec3(float x = 0.0, float y = 0.0, float z = 0.0): x(x), y(y), z(z) {}
+		explicit vec3(vec4 const& v);
+		GLfloat& operator[](unsigned j) { return (&x)[j]; }
+		GLfloat const& operator[](unsigned j) const { return (&x)[j]; }
 	};
 
 	struct vec4 {
@@ -23,6 +29,8 @@ namespace glmath {
 		GLfloat& operator[](unsigned j) { return (&x)[j]; }
 		GLfloat const& operator[](unsigned j) const { return (&x)[j]; }
 	};
+
+	inline vec3::vec3(vec4 const& v): x(v.x), y(v.y), z(v.z) {}
 
 	static inline vec3 operator*(float k, vec3 const& v) { return vec3(k * v.x, k * v.y, k * v.z); }
 

@@ -63,6 +63,7 @@ private:
 	/// @param num 0 = no stereo, 1 = left eye, 2 = right eye
 	void view(unsigned num);
 	void updateStereo(float separation);
+	void updateTransforms();
 	SDL_Surface* screen;
 	unsigned int m_windowW, m_windowH;
 	unsigned int m_fsW, m_fsH;

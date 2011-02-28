@@ -53,7 +53,10 @@ struct Shader: public boost::noncopyable {
 	Shader& setUniform(const std::string& uniform, float x, float y, float z, float w) {
 		glUniform4f((*this)[uniform], x, y, z, w); return *this;
 	}
-	Shader& setUniformMatrix(const std::string& uniform, GLfloat const* m) {
+	Shader& setUniformMat3(const std::string& uniform, GLfloat const* m) {
+		glUniformMatrix3fv((*this)[uniform], 1, GL_FALSE, m); return *this;
+	}
+	Shader& setUniformMat4(const std::string& uniform, GLfloat const* m) {
 		glUniformMatrix4fv((*this)[uniform], 1, GL_FALSE, m); return *this;
 	}
 

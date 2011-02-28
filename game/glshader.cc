@@ -123,7 +123,7 @@ Shader& Shader::link() {
 Shader& Shader::bind() {
 	glutil::GLErrorChecker ec("Shader::bind");
 	glUseProgram(program);
-	setUniformMatrix("colorMatrix", getColorMatrix());
+	setUniformMat4("colorMatrix", getColorMatrix());
 	return *this;
 }
 
@@ -158,7 +158,7 @@ void VertexArray::Draw(GLint mode) {
 	}
 	if (vertNormal != -1) {
 		glEnableVertexAttribArray(vertNormal);
-		glVertexAttribPointer(vertNormal, 4, GL_FLOAT, GL_FALSE, stride, ptr + 2);
+		glVertexAttribPointer(vertNormal, 3, GL_FLOAT, GL_FALSE, stride, ptr + 2);
 	}
 	if (vertColor != -1) {
 		glEnableVertexAttribArray(vertColor);
