@@ -857,7 +857,9 @@ void GuitarGraph::draw(double time) {
 		}
 
 		// Draw the notes
-		{	glutil::UseDepthTest depthtest;
+		{
+			glutil::UseLighting lighting(m_use3d);
+			glutil::UseDepthTest depthtest;
 			// Draw drum fills / Big Rock Endings
 			bool drumfill = m_dfIt != m_drumfills.end() && m_dfIt->begin - time <= future;
 			if (drumfill) {
