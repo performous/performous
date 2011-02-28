@@ -26,11 +26,12 @@ void ScreenManager::activateScreen(std::string const& name) {
 
 void ScreenManager::updateScreen() {
 	if (!newScreen) return;
+	Screen* s = newScreen;  // A local copy in case exit() or enter() want to change screens again
+	newScreen = NULL;
 	if (currentScreen) currentScreen->exit();
 	currentScreen = NULL;  // Exception safety, do not remove
-	newScreen->enter();
-	currentScreen = newScreen;
-	newScreen = NULL;
+	s->enter();
+	currentScreen = s;
 }
 
 Screen* ScreenManager::getScreen(std::string const& name) {
