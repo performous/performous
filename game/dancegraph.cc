@@ -377,6 +377,17 @@ namespace {
 	const float one_arrow_tex_w = 1.0 / 8.0; // Width of a single arrow in texture coordinates
 
 	/// Create a symmetric vertex pair for arrow drawing
+	void vertexPair(glutil::VertexArray& va, int arrow_i, float y, float ty) {
+		if (arrow_i < 0) {
+			// Single thing in a texture (e.g. mine)
+			va.TexCoord(0.0f, ty).Vertex(-arrowSize, y);
+			va.TexCoord(1.0f, ty).Vertex(arrowSize, y);
+		} else {
+			// Arrow from a texture atlas
+			va.TexCoord(arrow_i * one_arrow_tex_w, ty).Vertex(-arrowSize, y);
+			va.TexCoord((arrow_i+1) * one_arrow_tex_w, ty).Vertex(arrowSize, y);
+		}
+	}
 	void vertexPair(int arrow_i, float x, float y, float ty, float scale = 1.0f) {
 		if (arrow_i < 0) return;
 		glTexCoord2f(arrow_i * one_arrow_tex_w, ty); glVertex2f(x - arrowSize * scale, y);
@@ -463,7 +474,7 @@ void DanceGraph::draw(double time) {
 
 void DanceGraph::drawBeats(double time) {
 	UseTexture tex(m_beat);
-	glutil::Begin block(GL_TRIANGLE_STRIP);
+	glutil::VertexArray va;
 	float texCoord = 0.0f;
 	float tBeg = 0.0f, tEnd;
 	float w = 0.5 * m_pads * getScale();
@@ -476,9 +487,10 @@ void DanceGraph::drawBeats(double time) {
 			tEnd = future;
 		}*/
 		glutil::Color c(Color(1.0f, 1.0f, 1.0f, time2a(tEnd)));
-		glNormal3f(0.0f, 1.0f, 0.0f); glTexCoord2f(0.0f, texCoord); glVertex2f(-w, time2y(tEnd));
-		glNormal3f(0.0f, 1.0f, 0.0f); glTexCoord2f(1.0f, texCoord); glVertex2f(w, time2y(tEnd));
+		va.Color(c).Normal(0.0f, 1.0f, 0.0f).TexCoord(0.0f, texCoord).Vertex(-w, time2y(tEnd));
+		va.Color(c).Normal(0.0f, 1.0f, 0.0f).TexCoord(1.0f, texCoord).Vertex(w, time2y(tEnd));
 	}
+	va.Draw();
 }
 
 /// Draws a single note (or hold)
