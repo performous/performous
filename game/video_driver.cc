@@ -178,8 +178,8 @@ void Window::render(boost::function<void (void)> drawFunc) {
 	{
 		UseFBO user(fbo);
 		view(0);
-		glViewportIndexedf(0, 0, h / 2, w, h / 2);
-		glViewportIndexedf(1, 0, 0, w, h / 2);
+		glViewportIndexedf(1, 0, h / 2, w, h / 2);
+		glViewportIndexedf(2, 0, 0, w, h / 2);
 		drawFunc();
 	}
 	glerror.check("Render to FBO");
@@ -240,8 +240,8 @@ void Window::view(unsigned num) {
 	if (num == 0) {
 		glViewport(vx, vy, vw, vh);  // Drawable area of the window (excluding black bars)
 	} else {
-		glViewportIndexedf(0, 0, vh / 2, vw, vh / 2);  // Top half of the drawable area
-		glViewportIndexedf(1, 0, 0, vw, vh / 2);  // Bottom half of the drawable area
+		glViewportIndexedf(1, 0, vh / 2, vw, vh / 2);  // Top half of the drawable area
+		glViewportIndexedf(2, 0, 0, vw, vh / 2);  // Bottom half of the drawable area
 	}
 
 }
