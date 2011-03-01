@@ -32,15 +32,15 @@ class SongParser {
 	double m_gap;
 	double m_bpm;
 
-	bool txtCheck(std::vector<char> const& data);
+	bool txtCheck(std::vector<char> const& data) const;
 	void txtParseHeader();
 	void txtParse();
 	bool txtParseField(std::string const& line);
 	bool txtParseNote(std::string line, VocalTrack &vocal);
-	bool iniCheck(std::vector<char> const& data);
+	bool iniCheck(std::vector<char> const& data) const;
 	void iniParseHeader();
 	void iniParse();
-	bool smCheck(std::vector<char> const& data);
+	bool smCheck(std::vector<char> const& data) const;
 	void smParseHeader();
 	void smParse();
 	bool smParseField(std::string line);
