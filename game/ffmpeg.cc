@@ -18,7 +18,7 @@ extern "C" {
 /*static*/ boost::mutex FFmpeg::s_avcodec_mutex;
 
 FFmpeg::FFmpeg(bool _decodeVideo, bool _decodeAudio, std::string const& _filename, unsigned int rate):
-  m_filename(_filename), m_rate(rate), m_quit(), m_running(), m_eof(), m_seekTarget(getNaN()),
+  width(), height(), m_filename(_filename), m_rate(rate), m_quit(), m_running(), m_eof(), m_seekTarget(getNaN()),
   pFormatCtx(), pResampleCtx(), img_convert_ctx(), pVideoCodecCtx(), pAudioCodecCtx(), pVideoCodec(), pAudioCodec(),
   videoStream(-1), audioStream(-1), decodeVideo(_decodeVideo), decodeAudio(_decodeAudio), m_position(),
   m_thread(new boost::thread(boost::ref(*this)))

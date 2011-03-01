@@ -125,7 +125,7 @@ class AudioBuffer {
 	/// set samples per second
 	void setSamplesPerSecond(unsigned sps) { m_sps = sps; }
 	/// get samples per second
-	unsigned getSamplesPerSecond() { return m_sps; }
+	unsigned getSamplesPerSecond() const { return m_sps; }
 	void push(std::vector<int16_t> const& data, double timestamp) {
 		boost::mutex::scoped_lock l(m_mutex);
 		while (!condition()) m_cond.wait(l);

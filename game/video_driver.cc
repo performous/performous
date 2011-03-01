@@ -122,7 +122,7 @@ void Window::setFullscreen(bool _fs) {
 	resize();
 }
 
-bool Window::getFullscreen() {
+bool Window::getFullscreen() const {
 	return m_fullscreen;
 }
 

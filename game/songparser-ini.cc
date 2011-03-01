@@ -12,7 +12,7 @@
 using namespace SongParserUtil;
 
 /// 'Magick' to check if this file looks like correct format
-bool SongParser::iniCheck(std::vector<char> const& data) {
+bool SongParser::iniCheck(std::vector<char> const& data) const {
 	static const std::string header = "[song]";
 	return std::equal(header.begin(), header.end(), data.begin());
 }

@@ -15,7 +15,7 @@ struct ScoreItem {
 	std::string track; // includes difficulty
 	std::string track_simple; // no difficulty
 	Color color;
-	bool operator < (ScoreItem const& other) { return score < other.score; }
+	bool operator < (ScoreItem const& other) const { return score < other.score; }
 };
 
 /**Access to a database for performous which holds

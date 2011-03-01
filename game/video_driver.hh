@@ -44,7 +44,7 @@ class Window {
 	 */
 	void setFullscreen(bool _fs);
 	/// gets fullscreen state
-	bool getFullscreen();
+	bool getFullscreen() const;
 	/// take a screenshot
 	void screenshot();
 

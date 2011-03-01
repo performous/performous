@@ -151,6 +151,6 @@ void LayoutSinger::draw(double time, Position position) {
 	if (!config["game/karaoke_mode"].b() ) drawScore(position); // draw score if not in karaoke mode
 }
 
-double LayoutSinger::lyrics_begin() {
+double LayoutSinger::lyrics_begin() const {
 	return m_lyricit->begin;
 }
