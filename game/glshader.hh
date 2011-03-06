@@ -16,7 +16,7 @@ struct Shader: public boost::noncopyable {
 	Shader(std::string const& name);
 	~Shader();
 	/// Set a string that will replace "//DEFINES" in anything loaded by compileFile
-	Shader& setDefines(std::string const& defines) { defs = defines; return *this; }
+	Shader& addDefines(std::string const& defines) { defs += defines; return *this; }
 	/// Load shader from file
 	Shader& compileFile(std::string const& filename);
 	/** Compiles a shader of a given type. */

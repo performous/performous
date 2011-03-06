@@ -81,38 +81,47 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 		shader("texture").compileFile(getThemePath("shaders/stereo3d.geom"));
 		shader("3dobject").compileFile(getThemePath("shaders/stereo3d.geom"));
 		shader("dancenote").compileFile(getThemePath("shaders/stereo3d.geom"));
+		if (!GLEW_VERSION_4_1) {
+			// Enable bugfix for some older Nvidia cards
+			for (ShaderMap::iterator it = m_shaders.begin(); it != m_shaders.end(); ++it) {
+				Shader& sh = *it->second;
+				sh.addDefines("#define ENABLE_BOGUS\n");
+			}
+		}
 	}
 
 	shader("color")
-	  .setDefines("#define ENABLE_VERTEX_COLOR\n")
+	  .addDefines("#define ENABLE_VERTEX_COLOR\n")
 	  .compileFile(getThemePath("shaders/core.vert"))
 	  .compileFile(getThemePath("shaders/core.frag"))
 	  .link()
 	  .bind()
 	  .setUniformMat4("colorMatrix", glmath::mat4::identity());
 	shader("surface")
-	  .setDefines("#define ENABLE_TEXTURING 1\n")
+	  .addDefines("#define ENABLE_TEXTURING 1\n")
 	  .compileFile(getThemePath("shaders/core.vert"))
 	  .compileFile(getThemePath("shaders/core.frag"))
 	  .link()
 	  .bind()
 	  .setUniformMat4("colorMatrix", glmath::mat4::identity());
 	shader("texture")
-	  .setDefines("#define ENABLE_TEXTURING 2\n#define ENABLE_VERTEX_COLOR\n")
+	  .addDefines("#define ENABLE_TEXTURING 2\n")
+	  .addDefines("#define ENABLE_VERTEX_COLOR\n")
 	  .compileFile(getThemePath("shaders/core.vert"))
 	  .compileFile(getThemePath("shaders/core.frag"))
 	  .link()
 	  .bind()
 	  .setUniformMat4("colorMatrix", glmath::mat4::identity());
 	shader("3dobject")
-	  .setDefines("#define ENABLE_LIGHTING\n")
+	  .addDefines("#define ENABLE_LIGHTING\n")
 	  .compileFile(getThemePath("shaders/core.vert"))
 	  .compileFile(getThemePath("shaders/core.frag"))
 	  .link()
 	  .bind()
 	  .setUniformMat4("colorMatrix", glmath::mat4::identity());
 	shader("dancenote")
-	  .setDefines("#define ENABLE_TEXTURING 2\n#define ENABLE_VERTEX_COLOR\n")
+	  .addDefines("#define ENABLE_TEXTURING 2\n")
+	  .addDefines("#define ENABLE_VERTEX_COLOR\n")
 	  .compileFile(getThemePath("shaders/dancenote.vert"))
 	  .compileFile(getThemePath("shaders/core.frag"))
 	  .link()

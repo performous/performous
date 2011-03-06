@@ -5,6 +5,10 @@
 
 uniform mat4 colorMatrix;
 
+#ifdef ENABLE_BOGUS
+in float bogus;  // Workaround for http://www.nvnews.net/vbulletin/showthread.php?p=2401097
+#endif
+
 in vec3 normal;
 in vec4 color;
 
@@ -27,6 +31,10 @@ uniform sampler2D tex;
 
 void main() {
 	vec4 frag = TEXFUNC;
+
+#ifdef ENABLE_BOGUS
+	frag.a += 1e-14 * bogus;  // Convince the compiler not to optimize away the bogus variable
+#endif
 
 #ifdef ENABLE_VERTEX_COLOR
 	frag *= color;
