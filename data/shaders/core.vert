@@ -20,7 +20,7 @@ varying vec4 vColor;
 void main() {
 	gl_Position = positionMatrix * vertPos;
 	vTexCoord = texCoord = vertTexCoord;
-	vNormal = normal = normalMatrix * vertNormal;
+	vNormal = normal = normalize(normalMatrix * vertNormal);
 	vColor = color = vertColor;
 }
 
