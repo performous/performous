@@ -26,7 +26,12 @@ namespace {
 
 void convertToUTF8(std::stringstream &_stream, std::string _filename) {
 	try {
-		convert(_stream.str(), "UTF-8", "UTF-8"); // Test if input is UTF-8
+		std::string data = _stream.str();
+		convert(data, "UTF-8", "UTF-8"); // Test if input is UTF-8
+		if (data.substr(0, 3) == "\xEF\xBB\xBF") {
+			std::clog << "unicode/warning: " << _filename << " UTF-8 BOM ignored. Please avoid editors that use BOMs (e.g. Notepad)." << std::endl;
+			_stream.str(data.substr(3)); // Remove BOM if there is one
+		}
 	} catch(...) {
 		if (!_filename.empty()) std::clog << "unicode/warning: " << _filename << " is not UTF-8.\n  Assuming CP1252 for now. Use recode CP1252..UTF-8 */*.txt to convert your files." << std::endl;
 		try {
