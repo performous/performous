@@ -7,6 +7,7 @@
 #include "image.hh"
 #include "util.hh"
 #include "joystick.hh"
+#include "screen.hh"
 #include <boost/date_time.hpp>
 #include <fstream>
 #include <SDL.h>
@@ -40,6 +41,9 @@ namespace {
 	const float near_ = 0.1f; // This determines the near clipping distance (must be > 0)
 	const float far_ = 110.0f; // How far away can things be seen
 	const float z0 = 1.5f; // This determines FOV: the value is your distance from the monitor (the unit being the width of the Performous window)
+
+	glmath::mat4 g_projection = glmath::mat4::identity();
+	glmath::mat4 g_modelview =  glmath::translate(glmath::vec3(0.0, 0.0, -z0));
 
 }
 
@@ -94,39 +98,35 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	  .addDefines("#define ENABLE_VERTEX_COLOR\n")
 	  .compileFile(getThemePath("shaders/core.vert"))
 	  .compileFile(getThemePath("shaders/core.frag"))
-	  .link()
-	  .bind()
-	  .setUniformMat4("colorMatrix", glmath::mat4::identity());
+	  .link();
 	shader("surface")
 	  .addDefines("#define ENABLE_TEXTURING 1\n")
 	  .compileFile(getThemePath("shaders/core.vert"))
 	  .compileFile(getThemePath("shaders/core.frag"))
-	  .link()
-	  .bind()
-	  .setUniformMat4("colorMatrix", glmath::mat4::identity());
+	  .link();
 	shader("texture")
 	  .addDefines("#define ENABLE_TEXTURING 2\n")
 	  .addDefines("#define ENABLE_VERTEX_COLOR\n")
 	  .compileFile(getThemePath("shaders/core.vert"))
 	  .compileFile(getThemePath("shaders/core.frag"))
-	  .link()
-	  .bind()
-	  .setUniformMat4("colorMatrix", glmath::mat4::identity());
+	  .link();
 	shader("3dobject")
 	  .addDefines("#define ENABLE_LIGHTING\n")
 	  .compileFile(getThemePath("shaders/core.vert"))
 	  .compileFile(getThemePath("shaders/core.frag"))
-	  .link()
-	  .bind()
-	  .setUniformMat4("colorMatrix", glmath::mat4::identity());
+	  .link();
 	shader("dancenote")
 	  .addDefines("#define ENABLE_TEXTURING 2\n")
 	  .addDefines("#define ENABLE_VERTEX_COLOR\n")
 	  .compileFile(getThemePath("shaders/dancenote.vert"))
 	  .compileFile(getThemePath("shaders/core.frag"))
-	  .link()
-	  .bind()
-	  .setUniformMat4("colorMatrix", glmath::mat4::identity());
+	  .link();
+
+	for (ShaderMap::iterator it = m_shaders.begin(); it != m_shaders.end(); ++it) {
+		Shader& sh = *it->second;
+		sh["colorMatrix"].setMat4(glmath::mat4::identity());
+	}
+
 	view(0);  // For loading screens
 }
 
@@ -141,8 +141,8 @@ void Window::updateStereo(float sepFactor) {
 		Shader& sh = *it->second;
 		sh.bind();
 		try {
-			sh.setUniform("sepFactor", sepFactor);
-			sh.setUniform("z0", z0 - 2.0f * near_);  // Why minus two times zNear, I have no idea -Tronic
+			sh["sepFactor"].set(sepFactor);
+			sh["z0"].set(z0 - 2.0f * near_);  // Why minus two times zNear, I have no idea -Tronic
 		} catch(...) {}  // Not fatal if 3d shader is missing
 	}
 }
@@ -150,16 +150,19 @@ void Window::updateStereo(float sepFactor) {
 void Window::updateTransforms() {
 	// Setup the projection matrix for 2D translates
 	using namespace glmath;
-	float h = virtH();
-	const float f = near_ / z0;
-	mat4 position = frustum(-0.5f * f, 0.5f * f, 0.5f * h * f, -0.5f * h * f, near_, far_) * translate(vec3(0.0, 0.0, -z0));
-	mat3 normal(position);
+	{
+		float h = virtH();
+		const float f = near_ / z0;
+		g_projection = frustum(-0.5f * f, 0.5f * f, 0.5f * h * f, -0.5f * h * f, near_, far_);
+	}
+	mat4 position = g_projection * g_modelview;
+	mat3 normal(g_modelview);
 	for (ShaderMap::iterator it = m_shaders.begin(); it != m_shaders.end(); ++it) {
 		Shader& sh = *it->second;
 		sh.bind();
-		sh.setUniformMat4("positionMatrix", position);
+		sh["positionMatrix"].setMat4(position);
 		try {
-			sh.setUniformMat3("normalMatrix", normal);
+			sh["normalMatrix"].setMat3(normal);
 		} catch(...) {}  // Not fatal if normalMatrix is missing (only 3d objects use it)
 	}
 }
@@ -313,6 +316,16 @@ void Window::resize() {
 	}
 	if (s_height < 0.56f * s_width) s_width = round(s_height / 0.56f);
 	if (s_height > 0.8f * s_width) s_height = round(0.8f * s_width);
+}
+
+Transform::Transform(glmath::mat4 const& m): m_old(g_modelview) {
+	g_modelview = g_modelview * m;
+	ScreenManager::getSingletonPtr()->window().updateTransforms();
+}
+
+Transform::~Transform() {
+	g_modelview = m_old;
+	ScreenManager::getSingletonPtr()->window().updateTransforms();
 }
 
 FarTransform::FarTransform() {

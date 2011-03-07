@@ -9,6 +9,7 @@ using namespace glutil;
 
 glmath::mat4& getColorMatrix() {
 	static glmath::mat4 colorMatrix = glmath::mat4::identity();
+	//(*this)["colorMatrix"].setMat4(getColorMatrix());  // FIXME: Doesn't belong here
 	return colorMatrix;
 }
 
@@ -123,19 +124,19 @@ Shader& Shader::link() {
 Shader& Shader::bind() {
 	glutil::GLErrorChecker ec("Shader::bind");
 	glUseProgram(program);
-	setUniformMat4("colorMatrix", getColorMatrix());
 	return *this;
 }
 
 
-GLint Shader::operator[](const std::string& uniform) {
+Uniform Shader::operator[](const std::string& uniform) {
+	bind();
 	// Try to use a cached value
 	UniformMap::iterator it = uniforms.find(uniform);
-	if (it != uniforms.end()) return it->second;
+	if (it != uniforms.end()) return Uniform(it->second);
 	// Get the value and cache it
 	GLint var = glGetUniformLocation(program, uniform.c_str());
 	if (var == -1) throw std::logic_error("GLSL shader '" + name + "' uniform variable '" + uniform + "' not found.");
-	return uniforms[uniform] = var;
+	return Uniform(uniforms[uniform] = var);
 }
 
 void VertexArray::Draw(GLint mode) {

@@ -8,6 +8,21 @@
 #include <GL/glew.h>
 #include <boost/noncopyable.hpp>
 
+struct Uniform {
+	GLint id;
+	explicit Uniform(GLint id): id(id) {}
+	void set(int value) { glUniform1i(id, value); }
+	void set(float value) { glUniform1f(id, value); }
+	void set(int x, int y) { glUniform2i(id, x, y); }
+	void set(float x, float y) { glUniform2f(id, x, y); }
+	void set(int x, int y, int z) { glUniform3i(id, x, y, z); }
+	void set(float x, float y, float z) { glUniform3f(id, x, y, z); }
+	void set(int x, int y, int z, int w) { glUniform4i(id, x, y, z, w); }
+	void set(float x, float y, float z, float w) { glUniform4f(id, x, y, z, w); }
+	void setMat3(GLfloat const* m) { glUniformMatrix3fv(id, 1, GL_FALSE, m); }
+	void setMat4(GLfloat const* m) { glUniformMatrix4fv(id, 1, GL_FALSE, m); }
+};
+
 struct Shader: public boost::noncopyable {
 	/// Print compile errors and such
 	/// @param id of shader or program
@@ -29,44 +44,11 @@ struct Shader: public boost::noncopyable {
 
 	/** Allow setting uniforms in a chain. Shader needs to be in use.*/
 
-	Shader& setUniform(const std::string& uniform, int value) {
-		glUniform1i((*this)[uniform], value); return *this;
-	}
-	Shader& setUniform(const std::string& uniform, float value) {
-		glUniform1f((*this)[uniform], value); return *this;
-	}
-	Shader& setUniform(const std::string& uniform, int x, int y) {
-		glUniform2i((*this)[uniform], x, y); return *this;
-	}
-	Shader& setUniform(const std::string& uniform, float x, float y) {
-		glUniform2f((*this)[uniform], x, y); return *this;
-	}
-	Shader& setUniform(const std::string& uniform, int x, int y, int z) {
-		glUniform3i((*this)[uniform], x, y, z); return *this;
-	}
-	Shader& setUniform(const std::string& uniform, float x, float y, float z) {
-		glUniform3f((*this)[uniform], x, y, z); return *this;
-	}
-	Shader& setUniform(const std::string& uniform, int x, int y, int z, int w) {
-		glUniform4i((*this)[uniform], x, y, z, w); return *this;
-	}
-	Shader& setUniform(const std::string& uniform, float x, float y, float z, float w) {
-		glUniform4f((*this)[uniform], x, y, z, w); return *this;
-	}
-	Shader& setUniformMat3(const std::string& uniform, GLfloat const* m) {
-		glUniformMatrix3fv((*this)[uniform], 1, GL_FALSE, m); return *this;
-	}
-	Shader& setUniformMat4(const std::string& uniform, GLfloat const* m) {
-		glUniformMatrix4fv((*this)[uniform], 1, GL_FALSE, m); return *this;
-	}
 
 	/** Get uniform location. Uses caching internally. */
-	GLint operator[](const std::string& uniform);
+	Uniform operator[](const std::string& uniform);
 
 	// Some operators
-	GLuint operator*() { return program; }
-	operator GLuint() { return program; }
-	operator bool() const { return program != 0; }
 	bool operator==(const Shader& rhs) const { return program == rhs.program; }
 	bool operator!=(const Shader& rhs) const { return program != rhs.program; }
 

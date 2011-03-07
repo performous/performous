@@ -12,6 +12,14 @@ static inline float virtH() { return float(screenH()) / screenW(); }
 
 struct SDL_Surface;
 
+class Transform {
+public:
+	Transform(glmath::mat4 const& m);
+	~Transform();
+private:
+	glmath::mat4 m_old;
+};
+
 /// Performs a GL transform for displaying background image at far distance
 class FarTransform {
 public:
@@ -58,12 +66,12 @@ public:
 		// const_cast required to workaround ptr_map's protection against construction of temporaries
 		return *m_shaders.insert(const_cast<std::string&>(name), new Shader(name)).first->second;
 	}
+	void updateTransforms();
 private:
 	/// Setup everything for drawing a view.
 	/// @param num 0 = no stereo, 1 = left eye, 2 = right eye
 	void view(unsigned num);
 	void updateStereo(float separation);
-	void updateTransforms();
 	SDL_Surface* screen;
 	unsigned int m_windowW, m_windowH;
 	unsigned int m_fsW, m_fsH;

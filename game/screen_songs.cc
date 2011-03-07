@@ -262,21 +262,20 @@ void ScreenSongs::drawCovers() {
 		// Calculate dimensions for cover and instrument markers
 		double diff = 0.5 * (1.0 + std::cos(std::min(M_PI, std::abs(i - shift))));  // 0..1 for current cover hilight level
 		double y = 0.5 * virtH();
-		glutil::PushMatrix pm;
-		glTranslatef(-0.2 + 0.20 * (i - shift), y, -0.2 - 0.3 * (1.0 - diff));
-		glRotatef(20.0 * std::sin(std::min(M_PI, i - shift)), 0.0, 1.0, 0.0);
+		using namespace glmath;
+		Transform trans(
+		  translate(vec3(-0.2 + 0.20 * (i - shift), y, -0.2 - 0.3 * (1.0 - diff)))
+		  * rotate(0.4 * std::sin(std::min(M_PI, i - shift)), vec3(0.0, 1.0, 0.0))
+		);
 		double c = 0.4 + 0.6 * diff;
 		glutil::Color c1(Color(c, c, c));
 		s.dimensions.middle(0.0).bottom(0.0).fitInside(0.17, 0.17);
 		// Draw the cover normally
 		s.draw();
 		// Draw the reflection
-		glutil::PushMatrix m;
-		glScalef(1.0f, -1.0f, 1.0f);
-		{
-			glutil::Color c2(Color(1.0f, 1.0f, 1.0f, 0.4f));
-			s.draw();
-		}
+		Transform transMirror(scale(vec3(1.0f, -1.0f, 1.0f)));
+		glutil::Color c2(Color(1.0f, 1.0f, 1.0f, 0.4f));
+		s.draw();
 	}
 }
 
