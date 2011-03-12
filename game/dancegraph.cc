@@ -413,14 +413,10 @@ void DanceGraph::draw(double time) {
 	double offsetX = 0.5 * (dimensions.x1() + dimensions.x2());
 
 	{
-		double frac = 0.75;  // Adjustable: 1.0 means fully separated, 0.0 means fully attached
+		using namespace glmath;
 		// Some matrix magic to get the viewport right
-		glutil::PushMatrixMode pmm(GL_PROJECTION);
-		glTranslatef(frac * offsetX, 0.0f, 0.0f);
-		glutil::PushMatrixMode pmb(GL_MODELVIEW);
-		glTranslatef((1.0 - frac) * offsetX, dimensions.y1(), 0.0f);
 		float temp_s = dimensions.w() / 8.0f; // Allow for 8 pads to fit on a track
-		glScalef(temp_s, temp_s, temp_s);
+		Transform trans(translate(vec3(offsetX, dimensions.y1(), 0.0)) * scale(temp_s));
 
 		// Draw the "neck" graph (beat lines)
 		drawBeats(time);
