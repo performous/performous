@@ -21,12 +21,7 @@ private:
 };
 
 /// Performs a GL transform for displaying background image at far distance
-class FarTransform {
-public:
-	FarTransform();
-private:
-	glutil::PushMatrix pm;
-};
+glmath::mat4 farTransform();
 
 /// handles the window
 class Window {

@@ -148,7 +148,7 @@ void ScreenSongs::drawJukebox() {
 
 void ScreenSongs::drawMultimedia() {
 	{
-		FarTransform ft;  // 3D effect
+		Transform ft(farTransform());  // 3D effect
 		double length = m_audio.getLength();
 		double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
 		m_songbg_default->draw();   // Default bg

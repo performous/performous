@@ -328,11 +328,11 @@ Transform::~Transform() {
 	ScreenManager::getSingletonPtr()->window().updateTransforms();
 }
 
-FarTransform::FarTransform() {
+glmath::mat4 farTransform() {
 	float z = far_ - 0.1f;  // Very near the far plane but just a bit closer to avoid accidental clipping
 	float s = z / z0;  // Scale the image so that it looks the same size
 	s *= 1.0 + 2.0 * getSeparation(); // A bit more for stereo3d (avoid black borders)
-	glTranslatef(0.0f, 0.0f, -z + z0); // Very near the farplane
-	glScalef(s, s, s);
+	using namespace glmath;
+	return translate(vec3(0.0f, 0.0f, -z + z0)) * scale(s); // Very near the farplane
 }
 

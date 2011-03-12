@@ -426,7 +426,7 @@ void ScreenSing::draw() {
 
 	// Rendering starts
 	{
-		FarTransform ft;
+		Transform ft(farTransform());
 		double ar = arMax;
 		// Background image
 		if (m_background) {
