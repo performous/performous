@@ -83,6 +83,7 @@ void ScreenIntro::draw_menu_options() {
 	// Loop the currently visible options
 	for (size_t i = start_i, ii = 0; ii < showopts && i < opts.size(); ++i, ++ii) {
 		MenuOption const& opt = opts[i];
+		ColorTrans c(Color(1.0, 1.0, 1.0, submenuanim));
 
 		// Selection
 		if (i == m_menu.curIndex()) {
@@ -92,22 +93,26 @@ void ScreenIntro::draw_menu_options() {
 			theme->back_h.dimensions.left(x - sel_margin).center(start_y+0.003 + selanim*0.08);
 			theme->back_h.draw();
 			// Draw the text, dim if option not available
-			theme->option_selected.dimensions.left(x).center(start_y + ii*0.08);
-			theme->option_selected.draw(opt.getName(), submenuanim * (opt.isActive() ? 1.0f : 0.5f));
+			{
+				ColorTrans c(Color(1.0, 1.0, 1.0, opt.isActive() ? 1.0f : 0.5f));
+				theme->option_selected.dimensions.left(x).center(start_y + ii*0.08);
+				theme->option_selected.draw(opt.getName());
+			}
 			wcounter = std::max(wcounter, theme->option_selected.w() + 2 * sel_margin); // Calculate the widest entry
 			// If this is a config item, show the value below
 			if (opt.type == MenuOption::CHANGE_VALUE) {
 				++ii; // Use a slot for the value
 				theme->option_selected.dimensions.left(x + sel_margin).center(-0.1 + (selanim+1)*0.08);
-				theme->option_selected.draw("<  " + opt.value->getValue() + "  >", submenuanim);
+				theme->option_selected.draw("<  " + opt.value->getValue() + "  >");
 			}
 
 		// Regular option (not selected)
 		} else {
 			std::string title = opt.getName();
 			SvgTxtTheme& txt = getTextObject(title);
+			ColorTrans c(Color(1.0, 1.0, 1.0, opt.isActive() ? 1.0f : 0.5f));
 			txt.dimensions.left(x).center(start_y + ii*0.08);
-			txt.draw(title, submenuanim * (opt.isActive() ? 1.0f : 0.5f));
+			txt.draw(title);
 			wcounter = std::max(wcounter, txt.w() + 2 * sel_margin); // Calculate the widest entry
 		}
 	}
@@ -118,7 +123,7 @@ void ScreenIntro::draw() {
 	glutil::GLErrorChecker glerror("ScreenIntro::draw()");
 	{
 		float anim = SDL_GetTicks() % 20000 / 20000.0;
-		glutil::Color c(glmath::rotate(2.0 * M_PI * anim, glmath::vec3(1.0, 1.0, 1.0)));
+		ColorTrans c(glmath::rotate(2.0 * M_PI * anim, glmath::vec3(1.0, 1.0, 1.0)));
 		theme->bg.draw();
 	}
 	glerror.check("bg");

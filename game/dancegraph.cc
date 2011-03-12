@@ -533,7 +533,6 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 			text = note.score ? getRank(note.error) : "FAIL!";
 		}
 		if (!text.empty()) {
-			glutil::Color c(Color(1.0f, 1.0f, 1.0f));
 			double sc = getScale() * 1.2 * arrowSize * (1.0 + glow);
 			m_popupText->render(text);
 			m_popupText->dimensions().middle(x).center(time2y(0.0)).stretch(sc, sc/2.0);

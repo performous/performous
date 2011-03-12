@@ -831,21 +831,22 @@ void GuitarGraph::draw(double time) {
 		if (!menuOpen()) {
 			float level = m_pressed_anim[0].get();
 			{
-				glutil::Color c(Color(level, level, level));
+				ColorTrans c(Color(level, level, level));
 				drawBar(0.0, 0.01f);
 			}
 			// Fret buttons on cursor
 			for (int fret = m_drums; fret < m_pads; ++fret) {
 				float x = getFretX(fret);
 				float l = m_pressed_anim[fret + !m_drums].get();
-				// Get a color for the fret and adjust it if GodMode is on
+				// The note head
 				{
-					glutil::Color c(colorize(color(fret), time));
+					ColorTrans c(colorize(color(fret), time)); // Get a color for the fret and adjust it if GodMode is on
 					m_button.dimensions.center(time2y(0.0)).middle(x);
 					m_button.draw();
 				}
+				// Tap note indicator
 				{
-					glutil::Color c(Color(l, l, l));
+					ColorTrans c(Color(l, l, l));
 					m_tap.dimensions = m_button.dimensions;
 					m_tap.draw();
 				}
@@ -1016,7 +1017,7 @@ void GuitarGraph::draw(double time) {
 	}
 	if (correctness() > 0) {
 		// Glow drawing
-		glutil::Color c(m_neckglowColor);
+		ColorTrans c(m_neckglowColor);
 		m_neckglow.dimensions.screenBottom(0.0).middle().fixedWidth(dimensions.w());
 		m_neckglow.draw();
 	}
@@ -1032,7 +1033,7 @@ void GuitarGraph::drawNote(int fret, Color color, float tBeg, float tEnd, float 
 		if (hit || hitAnim > 0) return;	// Hide it if it's hit
 		color.a = time2a(tBeg);
 		{
-			glutil::Color c(color);
+			ColorTrans c(color);
 			drawBar(tBeg, 0.015f);
 		}
 		return;
@@ -1052,14 +1053,14 @@ void GuitarGraph::drawNote(int fret, Color color, float tBeg, float tEnd, float 
 			y -= fretWid;
 			color.a = clamp(time2a(tBeg)*2.0f,0.0f,1.0f);
 			{
-				glutil::Color c(color);
+				ColorTrans c(color);
 				m_fretObj.draw(x, y, 0.0f);
 			}
 			y -= fretWid;
 		} else { // 2D
 			color.a = time2a(tBeg);
 			{
-				glutil::Color c(color);
+				ColorTrans c(color);
 				m_button.dimensions.center(yBeg).middle(x);
 				m_button.draw();
 			}
@@ -1090,20 +1091,20 @@ void GuitarGraph::drawNote(int fret, Color color, float tBeg, float tEnd, float 
 				float s = 1.0 - hitAnim;
 				color.a = s;
 				{
-					glutil::Color c(color);
+					ColorTrans c(color);
 					m_fretObj.draw(x, yBeg, 0.0f, s);
 				}
 			} else {
 				color.a = clamp(time2a(tBeg)*2.0f,0.0f,1.0f);
 				{
-					glutil::Color c(color);
+					ColorTrans c(color);
 					m_fretObj.draw(x, yBeg, 0.0f);
 				}
 			}
 		} else { // 2D
 			color.a = time2a(tBeg);
 			{
-				glutil::Color c(color);
+				ColorTrans c(color);
 				m_button.dimensions.center(yBeg).middle(x);
 				m_button.draw();
 			}
@@ -1114,10 +1115,10 @@ void GuitarGraph::drawNote(int fret, Color color, float tBeg, float tEnd, float 
 		float l = std::max(0.3, m_correctness.get());
 		if (m_use3d) { // 3D
 			float s = 1.0 - hitAnim;
-			glutil::Color c(Color(l, l, l, s));
+			ColorTrans c(Color(l, l, l, s));
 			m_tappableObj.draw(x, yBeg, 0.0f, s);
 		} else { // 2D
-			glutil::Color c(Color(l, l, l));
+			ColorTrans c(Color(l, l, l));
 			m_tap.dimensions.center(yBeg).middle(x);
 			m_tap.draw();
 		}
@@ -1162,32 +1163,31 @@ void GuitarGraph::drawInfo(double time, Dimensions dimensions) {
 		}
 		// Draw scores
 		{
-			glutil::Color c(Color(0.1f, 0.3f, 1.0f, 0.90f));
+			ColorTrans c(Color(0.1f, 0.3f, 1.0f, 0.90f));
 			m_scoreText->render((boost::format("%04d") % getScore()).str());
 			m_scoreText->dimensions().middle(-xcor).fixedHeight(h).screenBottom(-0.24);
 			m_scoreText->draw();
 		}
 		// Draw streak counter
 		{
-			glutil::Color c(Color(0.6f, 0.6f, 0.7f, 0.95f));
+			ColorTrans c(Color(0.6f, 0.6f, 0.7f, 0.95f));
 			m_streakText->render(boost::lexical_cast<std::string>(unsigned(m_streak)) + "/"
 			  + boost::lexical_cast<std::string>(unsigned(m_longestStreak)));
 			m_streakText->dimensions().middle(-xcor).fixedHeight(h*0.75).screenBottom(-0.20);
 			m_streakText->draw();
 		}
 	}
-	// Is Starpower ready?
-	if (canActivateStarpower()) {
-		float a = std::abs(std::fmod(time, 1.0) - 0.5f) * 2.0f;
-		m_text.dimensions.screenBottom(-0.02).middle(-0.12);
-		if (m_drums && m_dfIt != m_drumfills.end() && time >= m_dfIt->begin && time <= m_dfIt->end)
-			m_text.draw(_("Drum Fill!"), a);
-		else m_text.draw(_("God Mode Ready!"), a);
-	} else if (m_solo) {
-		// Solo
-		float a = std::abs(std::fmod(time, 1.0) - 0.5f) * 2.0f;
-		m_text.dimensions.screenBottom(-0.02).middle(-0.03);
-		m_text.draw(_("Solo!"), a);
+	// Status text at the bottom
+	{
+		ColorTrans c(Color(1.0, 1.0, 1.0, std::abs(std::fmod(time, 1.0) - 0.5f) * 2.0f));
+		if (canActivateStarpower()) {
+			m_text.dimensions.screenBottom(-0.02).middle(-0.12);
+			if (m_drums && m_dfIt != m_drumfills.end() && time >= m_dfIt->begin && time <= m_dfIt->end) m_text.draw(_("Drum Fill!"));
+			else m_text.draw(_("God Mode Ready!"));
+		} else if (m_solo) {
+			m_text.dimensions.screenBottom(-0.02).middle(-0.03);
+			m_text.draw(_("Solo!"));
+		}
 	}
 	drawPopups();
 }

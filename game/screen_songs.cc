@@ -268,13 +268,13 @@ void ScreenSongs::drawCovers() {
 		  * rotate(0.4 * std::sin(std::min(M_PI, i - shift)), vec3(0.0, 1.0, 0.0))
 		);
 		double c = 0.4 + 0.6 * diff;
-		glutil::Color c1(Color(c, c, c));
+		ColorTrans c1(Color(c, c, c));
 		s.dimensions.middle(0.0).bottom(0.0).fitInside(0.17, 0.17);
 		// Draw the cover normally
 		s.draw();
 		// Draw the reflection
 		Transform transMirror(scale(vec3(1.0f, -1.0f, 1.0f)));
-		glutil::Color c2(Color(1.0f, 1.0f, 1.0f, 0.4f));
+		ColorTrans c2(Color(1.0f, 1.0f, 1.0f, 0.4f));
 		s.draw();
 	}
 }

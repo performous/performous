@@ -42,6 +42,7 @@ namespace {
 	const float far_ = 110.0f; // How far away can things be seen
 	const float z0 = 1.5f; // This determines FOV: the value is your distance from the monitor (the unit being the width of the Performous window)
 
+	glmath::mat4 g_color = glmath::mat4::identity();
 	glmath::mat4 g_projection = glmath::mat4::identity();
 	glmath::mat4 g_modelview =  glmath::translate(glmath::vec3(0.0, 0.0, -z0));
 
@@ -122,7 +123,7 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	  .compileFile(getThemePath("shaders/core.frag"))
 	  .link();
 
-	updateColor(glmath::mat4::identity());
+	updateColor();
 	view(0);  // For loading screens
 }
 
@@ -143,10 +144,10 @@ void Window::updateStereo(float sepFactor) {
 	}
 }
 
-void Window::updateColor(glmath::mat4 const& m) {
+void Window::updateColor() {
 	for (ShaderMap::iterator it = m_shaders.begin(); it != m_shaders.end(); ++it) {
 		Shader& sh = *it->second;
-		sh["colorMatrix"].setMat4(m);
+		sh["colorMatrix"].setMat4(g_color);
 	}
 }
 
@@ -223,7 +224,7 @@ void Window::render(boost::function<void (void)> drawFunc) {
 			glBlendFunc(GL_ONE, GL_ONE);
 		}
 		// Render FBO with 1:1 pixels, properly filtered/positioned for 3d
-		glutil::Color c(colorMatrix);
+		ColorTrans c(colorMatrix);
 		Dimensions dim = Dimensions(double(w) / h).fixedWidth(1.0);
 		dim.center((num == 0 ? 0.25 : -0.25) * dim.h());
 		fbo.getTexture().draw(dim, TexCoords(0.0, h, w, 0));
@@ -333,8 +334,20 @@ ViewTrans::ViewTrans(double offsetX, double offsetY, double frac): m_old(g_proje
 	ScreenManager::getSingletonPtr()->window().updateTransforms();
 }
 
-void glutil::Color::update(glmath::mat4 const& m) {
-	ScreenManager::getSingletonPtr()->window().updateColor(m);
+ColorTrans::ColorTrans(Color const& c): m_old(g_color) {
+	using namespace glmath;
+	g_color = g_color * mat4::diagonal(vec4(c.r, c.g, c.b, c.a));
+	ScreenManager::getSingletonPtr()->window().updateColor();
+}
+
+ColorTrans::ColorTrans(glmath::mat4 const& mat): m_old(g_color) {
+	g_color = g_color * mat;
+	ScreenManager::getSingletonPtr()->window().updateColor();
+}
+
+ColorTrans::~ColorTrans() {
+	g_color = m_old;
+	ScreenManager::getSingletonPtr()->window().updateColor();
 }
 
 ViewTrans::~ViewTrans() {

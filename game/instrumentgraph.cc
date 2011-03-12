@@ -159,8 +159,9 @@ void InstrumentGraph::drawMenu() {
 			}
 		}
 		// Finally we are at the actual menu item text drawing
+		ColorTrans c(Color(1.0, 1.0, 1.0, it->isActive() ? 1.0f : 0.5f));
 		txt->dimensions.middle(x).center(y);
-		txt->draw(menutext, it->isActive() ? 1.0f : 0.5f);
+		txt->draw(menutext);
 		w = std::max(w, txt->w() + 2 * step + button_margin * 2); // Calculate the widest entry
 		y += step; // Move draw position down for the next option
 	}

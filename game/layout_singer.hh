@@ -38,8 +38,9 @@ class LyricRow {
 			bool current = (time >= it->begin && time < it->end);
 			sentence.back().factor = current ? 1.2 - 0.2 * (time - it->begin) / (it->end - it->begin) : 1.0;
 		}
+		ColorTrans c(Color(1.0, 1.0, 1.0, fade.get()));
 		txt.dimensions = dim;
-		txt.draw(sentence, fade.get());
+		txt.draw(sentence);
 	}
 
   private:

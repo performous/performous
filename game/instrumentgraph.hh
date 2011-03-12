@@ -31,7 +31,7 @@ class Popup {
 		if (anim <= 0.0 || !m_popupText) return false;
 		float a = 1.0 - anim;
 		m_color.a = a;
-		glutil::Color color(m_color);
+		ColorTrans color(m_color);
 		m_popupText->render(m_msg);
 		{
 			using namespace glmath;
@@ -41,7 +41,7 @@ class Popup {
 		}
 		if (m_info != "" && m_infoText) {
 			m_infoText->dimensions.screenBottom(-0.02).middle(-0.12);
-			m_infoText->draw(m_info, a);
+			m_infoText->draw(m_info);
 		}
 		if (anim > 0.999) m_anim.setTarget(0.0, true);
 		return true;
