@@ -790,13 +790,11 @@ void GuitarGraph::draw(double time) {
 	// FIXME: There are errors here... glutil::GLErrorChecker ec("GuitarGraph::draw");
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
 	dimensions.screenBottom().middle(m_cx.get()).fixedWidth(std::min(m_width.get(),0.5));
-	double offsetX = 0.5 * (dimensions.x1() + dimensions.x2());
+	ViewTrans view(0.5 * (dimensions.x1() + dimensions.x2()), 0.0, 0.75);  // Apply a per-player local perspective
 	float ng_r = 0, ng_g = 0, ng_b = 0; // neck glow color components
 	int ng_ccnt = 0; // neck glow color count
-	{	// Translate, rotate and scale to place
+	{	// neck 3d alignment
 		using namespace glmath;
-		double frac = 0.75;  // Adjustable: 1.0 means fully separated, 0.0 means fully attached
-		ViewTrans view(offsetX, 0.0, frac);
 		mat4 m = translate(vec3(0.0f, dimensions.y2(), 0.0f)) * rotate(g_angle, vec3(1.0f, 0.0f, 0.0f)) * scale(dimensions.w() / 5.0f);
 		// Do some jumping for drums
 		if (m_drums) {
@@ -1019,11 +1017,11 @@ void GuitarGraph::draw(double time) {
 	if (correctness() > 0) {
 		// Glow drawing
 		glutil::Color c(m_neckglowColor);
-		m_neckglow.dimensions.screenBottom(0.0).middle(offsetX).fixedWidth(dimensions.w());
+		m_neckglow.dimensions.screenBottom(0.0).middle().fixedWidth(dimensions.w());
 		m_neckglow.draw();
 	}
 
-	drawInfo(time, offsetX, dimensions); // Go draw some texts and other interface stuff
+	drawInfo(time, dimensions); // Go draw some texts and other interface stuff
 }
 
 /// Draws a single note
@@ -1150,7 +1148,7 @@ void GuitarGraph::drawDrumfill(float tBeg, float tEnd) {
 }
 
 /// Draw popups and other info texts
-void GuitarGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
+void GuitarGraph::drawInfo(double time, Dimensions dimensions) {
 	// Draw info
 	if (!menuOpen()) {
 		using namespace glmath;
@@ -1166,7 +1164,7 @@ void GuitarGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 		{
 			glutil::Color c(Color(0.1f, 0.3f, 1.0f, 0.90f));
 			m_scoreText->render((boost::format("%04d") % getScore()).str());
-			m_scoreText->dimensions().middle(-xcor + offsetX).fixedHeight(h).screenBottom(-0.24);
+			m_scoreText->dimensions().middle(-xcor).fixedHeight(h).screenBottom(-0.24);
 			m_scoreText->draw();
 		}
 		// Draw streak counter
@@ -1174,24 +1172,24 @@ void GuitarGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 			glutil::Color c(Color(0.6f, 0.6f, 0.7f, 0.95f));
 			m_streakText->render(boost::lexical_cast<std::string>(unsigned(m_streak)) + "/"
 			  + boost::lexical_cast<std::string>(unsigned(m_longestStreak)));
-			m_streakText->dimensions().middle(-xcor + offsetX).fixedHeight(h*0.75).screenBottom(-0.20);
+			m_streakText->dimensions().middle(-xcor).fixedHeight(h*0.75).screenBottom(-0.20);
 			m_streakText->draw();
 		}
 	}
 	// Is Starpower ready?
 	if (canActivateStarpower()) {
 		float a = std::abs(std::fmod(time, 1.0) - 0.5f) * 2.0f;
-		m_text.dimensions.screenBottom(-0.02).middle(-0.12 + offsetX);
+		m_text.dimensions.screenBottom(-0.02).middle(-0.12);
 		if (m_drums && m_dfIt != m_drumfills.end() && time >= m_dfIt->begin && time <= m_dfIt->end)
 			m_text.draw(_("Drum Fill!"), a);
 		else m_text.draw(_("God Mode Ready!"), a);
 	} else if (m_solo) {
 		// Solo
 		float a = std::abs(std::fmod(time, 1.0) - 0.5f) * 2.0f;
-		m_text.dimensions.screenBottom(-0.02).middle(-0.03 + offsetX);
+		m_text.dimensions.screenBottom(-0.02).middle(-0.03);
 		m_text.draw(_("Solo!"), a);
 	}
-	drawPopups(offsetX);
+	drawPopups();
 }
 
 /// Draw a bar for drum bass pedal/note

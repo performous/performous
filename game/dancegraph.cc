@@ -410,13 +410,12 @@ void DanceGraph::draw(double time) {
 
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
 	dimensions.screenTop().middle(m_cx.get()).stretch(m_width.get(), 1.0);
-	double offsetX = 0.5 * (dimensions.x1() + dimensions.x2());
-
+	ViewTrans view(0.5 * (dimensions.x1() + dimensions.x2()), 0.0, 0.75);  // Apply a per-player local perspective
 	{
 		using namespace glmath;
 		// Some matrix magic to get the viewport right
 		float temp_s = dimensions.w() / 8.0f; // Allow for 8 pads to fit on a track
-		Transform trans(translate(vec3(offsetX, dimensions.y1(), 0.0)) * scale(temp_s));
+		Transform trans(translate(vec3(0.0f, dimensions.y1(), 0.0)) * scale(temp_s));
 
 		// Draw the "neck" graph (beat lines)
 		drawBeats(time);
@@ -444,7 +443,7 @@ void DanceGraph::draw(double time) {
 			}
 		}
 	}
-	drawInfo(time, offsetX, dimensions); // Go draw some texts and other interface stuff
+	drawInfo(time, dimensions); // Go draw some texts and other interface stuff
 }
 
 void DanceGraph::drawBeats(double time) {
@@ -544,14 +543,14 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 }
 
 /// Draw popups and other info texts
-void DanceGraph::drawInfo(double /*time*/, double offsetX, Dimensions dimensions) {
+void DanceGraph::drawInfo(double /*time*/, Dimensions dimensions) {
 	if (!menuOpen()) {
 		// Draw scores
-		m_text.dimensions.screenBottom(-0.35).middle(0.32 * dimensions.w() + offsetX);
+		m_text.dimensions.screenBottom(-0.35).middle(0.32 * dimensions.w());
 		m_text.draw(boost::lexical_cast<std::string>(unsigned(getScore())));
-		m_text.dimensions.screenBottom(-0.32).middle(0.32 * dimensions.w() + offsetX);
+		m_text.dimensions.screenBottom(-0.32).middle(0.32 * dimensions.w());
 		m_text.draw(boost::lexical_cast<std::string>(unsigned(m_streak)) + "/"
 		  + boost::lexical_cast<std::string>(unsigned(m_longestStreak)));
 	}
-	drawPopups(offsetX);
+	drawPopups();
 }
