@@ -1,17 +1,11 @@
 #include "glshader.hh"
-#include "glutil.hh"
 
+#include "glutil.hh"
+#include <algorithm>
 #include <fstream>
 #include <stdexcept>
-#include <algorithm>
 
 using namespace glutil;
-
-glmath::mat4& getColorMatrix() {
-	static glmath::mat4 colorMatrix = glmath::mat4::identity();
-	//(*this)["colorMatrix"].setMat4(getColorMatrix());  // FIXME: Doesn't belong here
-	return colorMatrix;
-}
 
 namespace {
 	/// Loads a file into memory

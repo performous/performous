@@ -778,7 +778,7 @@ namespace {
 	void vertexPair(glutil::VertexArray& va, float x, float y, Color color, float ty, float fretW = fretWid) {
 		color.a = y2a(y);
 		{
-			glutil::Color c(color);
+			glmath::vec4 c(color.r, color.g, color.b, color.a);
 			va.Color(c).TexCoord(0.0f, ty).Vertex(x - fretW, y);
 			va.Color(c).TexCoord(1.0f, ty).Vertex(x + fretW, y);
 		}
@@ -819,7 +819,8 @@ void GuitarGraph::draw(double time) {
 					texCoord -= texCoordStep * (tEnd - future) / (tEnd - tBeg);
 					tEnd = future;
 				}
-				glutil::Color c(colorize(Color(1.0f, 1.0f, 1.0f, time2a(tEnd)), time + tBeg));
+				Color ctmp(colorize(Color(1.0f, 1.0f, 1.0f, time2a(tEnd)), time + tBeg));
+				glmath::vec4 c(ctmp.r, ctmp.g, ctmp.b, ctmp.a);
 				va.Normal(0.0f, 1.0f, 0.0f).Color(c).TexCoord(0.0f, texCoord).Vertex(-w, time2y(tEnd));
 				va.Normal(0.0f, 1.0f, 0.0f).Color(c).TexCoord(1.0f, texCoord).Vertex(w, time2y(tEnd));
 			}
@@ -950,7 +951,7 @@ void GuitarGraph::draw(double time) {
 					float h = flameAnim * 4.0f * fretWid;
 					UseTexture tblock(*ftex);
 					glutil::VertexArray va;
-					glutil::Color c(Color(1.0f, 1.0f, 1.0f));
+					glmath::vec4 c(1.0f, 1.0f, 1.0f);
 					va.TexCoord(0.0f, 1.0f).Color(c).Vertex(x - fretWid, time2y(0.0f), 0.0f);
 					va.TexCoord(1.0f, 1.0f).Color(c).Vertex(x + fretWid, time2y(0.0f), 0.0f);
 					va.TexCoord(0.0f, 0.0f).Color(c).Vertex(x - fretWid, time2y(0.0f), h);
@@ -971,7 +972,7 @@ void GuitarGraph::draw(double time) {
 			float alpha = m_errorMeterFade.get();
 			float bgcol = m_errorMeterFlash.get();
 			{ // Indicator background
-				glutil::Color c(Color(bgcol, bgcol, bgcol, 0.6f * alpha));
+				glmath::vec4 c(bgcol, bgcol, bgcol, 0.6f * alpha);
 				glutil::VertexArray va;
 				va.Color(c).TexCoord(0,0).Vertex(x - thickness, y + maxsize);
 				va.Color(c).TexCoord(0,0).Vertex(x, y + maxsize);
@@ -982,11 +983,10 @@ void GuitarGraph::draw(double time) {
 			float error = m_errorMeter.get();
 			if (error != 0) {
 				float y1 = 0, y2 = 0;
-				Color color;
-				if (error > 0) { color = Color(0.0f, 1.0f, 0.0f, alpha); y2 = -maxsize * error; }
-				else { color = Color(1.0f, 0.0f, 0.0f, alpha); y1 = -maxsize * error; }
+				glmath::vec4 c;
+				if (error > 0) { c = glmath::vec4(0.0f, 1.0f, 0.0f, alpha); y2 = -maxsize * error; }
+				else { c = glmath::vec4(1.0f, 0.0f, 0.0f, alpha); y1 = -maxsize * error; }
 				{
-					glutil::Color c(color);
 					glutil::VertexArray va;
 					va.Color(c).TexCoord(0,0).Vertex(x - thickness, y1 + y);
 					va.Color(c).TexCoord(0,0).Vertex(x, y1 + y);

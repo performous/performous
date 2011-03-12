@@ -134,13 +134,9 @@ namespace glutil {
 			return *this;
 		}
 
-		VertexArray& Color(float r, float g, float b, float a = 1.0f) {
-			m_vert.color = glmath::vec4(r, g, b, a);
+		VertexArray& Color(glmath::vec4 const& v) {
+			m_vert.color = v;
 			return *this;
-		}
-
-		VertexArray& Color(const glutil::Color& c) {
-			return Color(c.r, c.g, c.b, c.a);
 		}
 
 		void Draw(GLint mode = GL_TRIANGLE_STRIP);

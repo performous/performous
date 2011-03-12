@@ -122,11 +122,7 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	  .compileFile(getThemePath("shaders/core.frag"))
 	  .link();
 
-	for (ShaderMap::iterator it = m_shaders.begin(); it != m_shaders.end(); ++it) {
-		Shader& sh = *it->second;
-		sh["colorMatrix"].setMat4(glmath::mat4::identity());
-	}
-
+	updateColor(glmath::mat4::identity());
 	view(0);  // For loading screens
 }
 
@@ -144,6 +140,13 @@ void Window::updateStereo(float sepFactor) {
 			sh["sepFactor"].set(sepFactor);
 			sh["z0"].set(z0 - 2.0f * near_);  // Why minus two times zNear, I have no idea -Tronic
 		} catch(...) {}  // Not fatal if 3d shader is missing
+	}
+}
+
+void Window::updateColor(glmath::mat4 const& m) {
+	for (ShaderMap::iterator it = m_shaders.begin(); it != m_shaders.end(); ++it) {
+		Shader& sh = *it->second;
+		sh["colorMatrix"].setMat4(m);
 	}
 }
 
@@ -328,6 +331,10 @@ ViewTrans::ViewTrans(double offsetX, double offsetY, double frac): m_old(g_proje
 	g_projection = frustum(f * x1, f * x2, f * y1, f * y2, near_, far_)
 	  * translate(vec3(offsetX - persX, offsetY - persY, 0.0));
 	ScreenManager::getSingletonPtr()->window().updateTransforms();
+}
+
+void glutil::Color::update(glmath::mat4 const& m) {
+	ScreenManager::getSingletonPtr()->window().updateColor(m);
 }
 
 ViewTrans::~ViewTrans() {

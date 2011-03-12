@@ -206,7 +206,7 @@ void NoteGraph::drawWaves(Database const& database) {
 		double oldval = getNaN();
 		glutil::VertexArray va;
 		Notes::const_iterator noteIt = m_vocal.notes.begin();
-		Color c(p->m_color.r, p->m_color.g, p->m_color.b, m_notealpha);
+		glmath::vec4 c(p->m_color.r, p->m_color.g, p->m_color.b, m_notealpha);
 		for (; idx < endIdx; ++idx, t += Engine::TIMESTEP) {
 			double const freq = pitch[idx].first;
 			// If freq is NaN, we have nothing to process

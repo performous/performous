@@ -12,6 +12,19 @@ static inline float virtH() { return float(screenH()) / screenW(); }
 
 struct SDL_Surface;
 
+namespace glutil {
+	struct Color {
+		Color(::Color const& c) {
+			using namespace glmath;
+			update(mat4::diagonal(vec4(c.r, c.g, c.b, c.a)));
+		}
+		Color(glmath::mat4 const& mat) { update(mat); }
+		~Color() { update(glmath::mat4::identity()); }
+	private:
+		static void update(glmath::mat4 const&);
+	};
+}
+
 /// Apply a transform to current modelview stack
 class Transform {
 public:
@@ -71,6 +84,7 @@ public:
 		// const_cast required to workaround ptr_map's protection against construction of temporaries
 		return *m_shaders.insert(const_cast<std::string&>(name), new Shader(name)).first->second;
 	}
+	void updateColor(glmath::mat4 const&);
 	void updateTransforms();
 private:
 	/// Setup everything for drawing a view.

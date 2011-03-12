@@ -8,8 +8,6 @@
 #include <iostream>
 #include <vector>
 
-glmath::mat4& getColorMatrix();  ///< A temporary hack for global access to the color matrix (so that glutil::Color can write it and Shader::bind can read it)
-
 namespace glutil {
 
 	/// wrapper struct for RAII
@@ -22,35 +20,6 @@ namespace glutil {
 		~UseDepthTest() {
 			glDisable(GL_DEPTH_TEST);
 		}
-	};
-
-	/// wrapper struct for RAII
-	struct Color {
-		float r, ///< red component
-		      g, ///< green
-		      b, ///< blue
-		      a; ///< alpha value
-		/// create nec Color object from the Color object
-		Color(::Color const& c): r(c.r), g(c.g), b(c.b), a(c.a) {
-			getColorMatrix() = glmath::mat4::diagonal(glmath::vec4(*this));
-		//	glColor4fv(*this);
-		//	GLfloat ColorVect[] = {r, g, b, a};
-		//	glEnableClientState(GL_COLOR_ARRAY);
-		//	glColorPointer (4,GL_FLOAT,0,ColorVect);
-		}
-		Color(glmath::mat4 const& mat): r(), g(), b(), a() {
-			getColorMatrix() = mat;
-		}
-		~Color() {
-			r = g = b = a = 1.0f;
-			getColorMatrix() = glmath::mat4::diagonal(glmath::vec4(*this));
-		//	glColor4fv(*this);
-		//	glDisableClientState (GL_COLOR_ARRAY);
-		}
-		/// overload float cast
-		operator float*() { return reinterpret_cast<float*>(this); }
-		/// overload float const cast
-		operator float const*() const { return reinterpret_cast<float const*>(this); }
 	};
 
 	/// Checks for OpenGL error and displays it with given location info

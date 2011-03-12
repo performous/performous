@@ -460,7 +460,7 @@ void DanceGraph::drawBeats(double time) {
 			texCoord -= texCoordStep * (tEnd - future) / (tEnd - tBeg);
 			tEnd = future;
 		}*/
-		glutil::Color c(Color(1.0f, 1.0f, 1.0f, time2a(tEnd)));
+		glmath::vec4 c(1.0f, 1.0f, 1.0f, time2a(tEnd));
 		va.Color(c).Normal(0.0f, 1.0f, 0.0f).TexCoord(0.0f, texCoord).Vertex(-w, time2y(tEnd));
 		va.Color(c).Normal(0.0f, 1.0f, 0.0f).TexCoord(1.0f, texCoord).Vertex(w, time2y(tEnd));
 	}
