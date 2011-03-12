@@ -646,8 +646,8 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database, Dancers& 
 }
 
 void ScoreWindow::draw() {
-	glutil::PushMatrix block;
-	glTranslatef(0.0, m_pos.get(), 0.0);
+	using namespace glmath;
+	Transform trans(translate(vec3(0.0, m_pos.get(), 0.0)));
 	m_bg.draw();
 	const double spacing = 0.1 + 0.1 / m_database.scores.size();
 	unsigned i = 0;

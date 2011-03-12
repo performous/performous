@@ -34,8 +34,8 @@ class Popup {
 			glutil::Color color(m_color);
 			m_popupText->render(m_msg);
 			{
-				glutil::PushMatrix mat;
-				glTranslatef(0.0f, 0.0f, 0.5f * anim);
+				using namespace glmath;
+				Transform trans(translate(vec3(0.0f, 0.0f, 0.5f * anim)));
 				m_popupText->dimensions().center(0.1 - 0.03 * anim).middle(offsetX).stretch(0.2f, 0.2f);
 				m_popupText->draw();
 			}

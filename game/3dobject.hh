@@ -33,9 +33,8 @@ class Object3d: boost::noncopyable {
 	void drawVBO();
 	/// draws the object
 	void draw(float x = 0, float y = 0, float z = 0, float s = 1.0) {
-		glutil::PushMatrix pm;
-		glTranslatef(x, y, z); // Move to position
-		if (s != 1.0) glScalef(s,s,s); // Scale if needed
+		using namespace glmath;
+		Transform trans(translate(vec3(x, y, z)) * scale(s));  // Move to position and scale
 		if (m_texture) {
 			UseTexture tex(*m_texture);
 			drawVBO();

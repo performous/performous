@@ -75,10 +75,9 @@ void InstrumentGraph::drawMenu() {
 	// Some helper vars
 	ThemeInstrumentMenu& th = *m_menuTheme;
 	MenuOptions::const_iterator cur = static_cast<MenuOptions::const_iterator>(&m_menu.current());
-	glutil::PushMatrix pm; // Save scaling state
 	double w = m_menu.dimensions.w();
 	const float s = std::min(m_width.get(), 0.5) / w;
-	glScalef(s, s, 1.0f);
+	Transform trans(glmath::scale(s));  // Fit better menu on screen
 	// We need to multiply offset by inverse scale factor to keep it always constant
 	// All these vars are ultimately affected by the scaling matrix
 	const double offsetX = 0.5f * (dimensions.x1() + dimensions.x2()) / s;

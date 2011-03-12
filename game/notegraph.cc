@@ -122,9 +122,8 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 			float centerx = x + w - (player_star_offset + 1.2) * hh; // Star is 1.2 units from end
 			float rot = fmod(time * 360, 360); // They rotate!
 			float zoom = (std::abs((rot-180) / 360.0f) * 0.8f + 0.6f) * (position == NoteGraph::TOP ? 2.3 : 2.0) * hh;
-			glutil::PushMatrix pm;
-			glTranslatef(centerx, centery, 0.0f);
-			glRotatef(rot, 0.0f, 0.0f, 1.0f);
+			using namespace glmath;
+			Transform trans(translate(vec3(centerx, centery, 0.0f)) * rotate(rot, vec3(0.0f, 0.0f, 1.0f)));
 			{
 				glutil::Color c(Color(it_col->r, it_col->g, it_col->b, it_col->a));
 				m_star_hl.draw(Dimensions().stretch(zoom*1.2, zoom*1.2).center().middle(), TexCoords());

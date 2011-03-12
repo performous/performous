@@ -23,7 +23,7 @@ namespace {
 	const size_t diffsz = sizeof(diffv) / sizeof(*diffv);
 	const int death_delay = 20; // Delay in notes after which the player is hidden
 	const float join_delay = 3.0f; // Time after join menu before playing when joining mid-game
-	const float g_angle = 80.0f; // How much to rotate the fretboards
+	const float g_angle = 1.4f; // How many radians to rotate the fretboards
 	const float past = -0.2f; // Relative time from cursor that is considered past (out of screen)
 	const float future = 1.5f; // Relative time from cursor that is considered future (out of screen)
 	const float timescale = 25.0f; // Multiplier to get graphics units from time
@@ -794,20 +794,22 @@ void GuitarGraph::draw(double time) {
 	float ng_r = 0, ng_g = 0, ng_b = 0; // neck glow color components
 	int ng_ccnt = 0; // neck glow color count
 	{	// Translate, rotate and scale to place
+		using namespace glmath;
 		double frac = 0.75;  // Adjustable: 1.0 means fully separated, 0.0 means fully attached
+		/*
 		glutil::PushMatrixMode pmm(GL_PROJECTION);
 		glTranslatef(frac * offsetX, 0.0f, 0.0f);
 		glutil::PushMatrixMode pmb(GL_MODELVIEW);
-		glTranslatef((1.0 - frac) * offsetX, dimensions.y2(), 0.0f);
+		glTranslatef((1.0 - frac) * offsetX, 0.0f, 0.0f);
+		*/
+		mat4 m = translate(vec3(0.0f, dimensions.y2(), 0.0f)) * rotate(g_angle, vec3(1.0f, 0.0f, 0.0f)) * scale(dimensions.w() / 5.0f);
 		// Do some jumping for drums
 		if (m_drums) {
 			float jumpanim = m_drumJump.get();
 			if (jumpanim == 1.0) m_drumJump.setTarget(0.0);
-			if (jumpanim > 0) glTranslatef(0.0f, -m_drumJump.get() * 0.01, 0.0f);
+			if (jumpanim > 0) m = translate(vec3(0.0f, -m_drumJump.get() * 0.01, 0.0f)) * m;
 		}
-		glRotatef(g_angle, 1.0f, 0.0f, 0.0f);
-		float temp_s = dimensions.w() / 5.0f;
-		glScalef(temp_s, temp_s, temp_s);
+		Transform trans(m);
 
 		// Draw the neck
 		{
@@ -1156,8 +1158,8 @@ void GuitarGraph::drawDrumfill(float tBeg, float tEnd) {
 void GuitarGraph::drawInfo(double time, double offsetX, Dimensions dimensions) {
 	// Draw info
 	if (!menuOpen()) {
-		glutil::PushMatrix mat;
-		glTranslatef(0.0f, 0.0f, -0.5f);
+		using namespace glmath;
+		Transform trans(translate(vec3(0.0f, 0.0f, -0.5f)));
 		float xcor = 0.35 * dimensions.w();
 		float h = 0.075 * 2.0 * dimensions.w();
 		// Hack to show the scores better when there is more space (1 instrument)
