@@ -796,12 +796,7 @@ void GuitarGraph::draw(double time) {
 	{	// Translate, rotate and scale to place
 		using namespace glmath;
 		double frac = 0.75;  // Adjustable: 1.0 means fully separated, 0.0 means fully attached
-		/*
-		glutil::PushMatrixMode pmm(GL_PROJECTION);
-		glTranslatef(frac * offsetX, 0.0f, 0.0f);
-		glutil::PushMatrixMode pmb(GL_MODELVIEW);
-		glTranslatef((1.0 - frac) * offsetX, 0.0f, 0.0f);
-		*/
+		ViewTrans view(offsetX, 0.0, frac);
 		mat4 m = translate(vec3(0.0f, dimensions.y2(), 0.0f)) * rotate(g_angle, vec3(1.0f, 0.0f, 0.0f)) * scale(dimensions.w() / 5.0f);
 		// Do some jumping for drums
 		if (m_drums) {

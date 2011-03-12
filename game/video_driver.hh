@@ -12,10 +12,20 @@ static inline float virtH() { return float(screenH()) / screenW(); }
 
 struct SDL_Surface;
 
+/// Apply a transform to current modelview stack
 class Transform {
 public:
 	Transform(glmath::mat4 const& m);
 	~Transform();
+private:
+	glmath::mat4 m_old;
+};
+
+/// Apply a subviewport with different perspective projection
+class ViewTrans {
+public:
+	ViewTrans(double offsetX = 0.0, double offsetY = 0.0, double frac = 1.0);
+	~ViewTrans();
 private:
 	glmath::mat4 m_old;
 };

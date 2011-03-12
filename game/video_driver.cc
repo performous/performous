@@ -148,13 +148,7 @@ void Window::updateStereo(float sepFactor) {
 }
 
 void Window::updateTransforms() {
-	// Setup the projection matrix for 2D translates
 	using namespace glmath;
-	{
-		float h = virtH();
-		const float f = near_ / z0;
-		g_projection = frustum(-0.5f * f, 0.5f * f, 0.5f * h * f, -0.5f * h * f, near_, far_);
-	}
 	mat4 position = g_projection * g_modelview;
 	mat3 normal(g_modelview);
 	for (ShaderMap::iterator it = m_shaders.begin(); it != m_shaders.end(); ++it) {
@@ -169,7 +163,7 @@ void Window::updateTransforms() {
 
 void Window::render(boost::function<void (void)> drawFunc) {
 	glutil::GLErrorChecker glerror("Window::render");
-	updateTransforms();
+	ViewTrans trans;  // Default frustum
 	if (s_width < screen->w || s_height < screen->h) glClear(GL_COLOR_BUFFER_BIT);  // Black bars
 	bool stereo = config["graphic/stereo3d"].b();
 	int type = config["graphic/stereo3dtype"].i();
@@ -317,6 +311,30 @@ void Window::resize() {
 	if (s_height < 0.56f * s_width) s_width = round(s_height / 0.56f);
 	if (s_height > 0.8f * s_width) s_height = round(0.8f * s_width);
 }
+
+ViewTrans::ViewTrans(double offsetX, double offsetY, double frac): m_old(g_projection) {
+	// Setup the projection matrix for 2D translates
+	using namespace glmath;
+	double h = virtH();
+	const double f = near_ / z0;  // z0 to nearplane conversion factor
+	// Corners of the screen at z0
+	double x1 = -0.5, x2 = 0.5;
+	double y1 = 0.5 * h, y2 = -0.5 * h;
+	// Move the perspective point by frac of offset (i.e. move the image)
+	double persX = frac * offsetX, persY = frac * offsetY;
+	x1 -= persX; x2 -= persX;
+	y1 -= persY; y2 -= persY;
+	// Perspective projection + the rest of the offset in eye (world) space
+	g_projection = frustum(f * x1, f * x2, f * y1, f * y2, near_, far_)
+	  * translate(vec3(offsetX - persX, offsetY - persY, 0.0));
+	ScreenManager::getSingletonPtr()->window().updateTransforms();
+}
+
+ViewTrans::~ViewTrans() {
+	g_projection = m_old;
+	ScreenManager::getSingletonPtr()->window().updateTransforms();
+}
+
 
 Transform::Transform(glmath::mat4 const& m): m_old(g_modelview) {
 	g_modelview = g_modelview * m;
