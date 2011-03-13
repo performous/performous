@@ -784,10 +784,6 @@ namespace {
 		}
 	}
 
-	// EVIL GLOBALS, FIXME!
-	float ng_r = 0, ng_g = 0, ng_b = 0; // neck glow color components
-	int ng_ccnt = 0; // neck glow color count
-
 }
 
 void GuitarGraph::drawNotes(double time) {
@@ -805,6 +801,9 @@ void GuitarGraph::drawNotes(double time) {
 		}
 	}
 	if (time != time) return;  // Check that time is not NaN
+	
+	glmath::vec4 neckglow;  // Used for calculating the average neck color
+	
 	// Iterate chords
 	for (Chords::iterator it = m_chords.begin(); it != m_chords.end(); ++it) {
 		float tBeg = it->begin - time;
@@ -841,7 +840,7 @@ void GuitarGraph::drawNotes(double time) {
 			if (!joining(time)) {
 				// Get a color for the fret and adjust it if GodMode is on
 				c = colorize(color(fret), it->begin);
-				if (glow > 0.1f) { ng_r+=c.r; ng_g+=c.g; ng_b+=c.b; ng_ccnt++; } // neck glow
+				if (glow > 0.1f) { neckglow = neckglow + glmath::vec4(c.r, c.g, c.b, 1.0); } // neck glow tracking
 				// Further adjust the color if the note is hit
 				c.r += glow * 0.2f;
 				c.g += glow * 0.2f;
@@ -873,6 +872,11 @@ void GuitarGraph::drawNotes(double time) {
 			}
 		}
 	}
+	// Mangle neck glow color as needed
+	// Convert sum into average and apply correctness as premultiplied alpha
+	if (neckglow.w > 0.0) neckglow = (correctness() / neckglow.w) * neckglow;
+	// Blend into use slowly
+	m_neckglowColor = glmath::mix(m_neckglowColor, neckglow, 0.05);
 }
 
 double GuitarGraph::neckWidth() const { return std::min(0.5, m_width.get()); }
@@ -1006,24 +1010,13 @@ void GuitarGraph::draw(double time) {
 	ViewTrans view(m_cx.get(), 0.0, 0.75);  // Apply a per-player local perspective
 
 	drawNeckStuff(time);
-	
-	// Bottom neck glow
-	if (ng_ccnt > 0) {
-		// Mangle color
-		if (m_neckglowColor.r > 0 || m_neckglowColor.g > 0 || m_neckglowColor.b > 0) {
-			m_neckglowColor.r = blend(m_neckglowColor.r, ng_r / ng_ccnt, 0.95);
-			m_neckglowColor.g = blend(m_neckglowColor.g, ng_g / ng_ccnt, 0.95);
-			m_neckglowColor.b = blend(m_neckglowColor.b, ng_b / ng_ccnt, 0.95);
-		} else { // We don't want to fade from black in the start
-			m_neckglowColor.r = ng_r / ng_ccnt;
-			m_neckglowColor.g = ng_g / ng_ccnt;
-			m_neckglowColor.b = ng_b / ng_ccnt;
-		}
-		m_neckglowColor.a = correctness();
-	}
-	if (correctness() > 0) {
-		// Glow drawing
-		ColorTrans c(m_neckglowColor);
+
+	if (m_neckglowColor.w > 0.0) {
+		// Neck glow drawing
+		using namespace glmath;
+		double a = m_neckglowColor.w;
+		vec4 color((1.0 / a) *  vec3(m_neckglowColor), a);  // Convert into non-premultiplied
+		ColorTrans c(glmath::mat4::diagonal(color));
 		m_neckglow.dimensions.screenBottom(0.0).middle().fixedWidth(neckWidth());
 		m_neckglow.draw();
 	}

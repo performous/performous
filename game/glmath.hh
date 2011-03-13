@@ -9,6 +9,10 @@
 
 namespace glmath {
 
+	template <typename T> T mix(T const& a, T const& b, double blend) {
+		return (1.0-blend) * a + blend * b;
+	}
+	
 	struct vec4;
 	
 	struct vec3 {
@@ -32,6 +36,10 @@ namespace glmath {
 	inline vec3::vec3(vec4 const& v): x(v.x), y(v.y), z(v.z) {}
 
 	static inline vec3 operator*(float k, vec3 const& v) { return vec3(k * v.x, k * v.y, k * v.z); }
+	static inline vec4 operator*(float k, vec4 const& v) { return vec4(k * v.x, k * v.y, k * v.z, k * v.w); }
+
+	static inline vec3 operator+(vec3 const& a, vec4 const& b) { return vec3(a.x + b.x, a.y + b.y, a.z + b.z); }
+	static inline vec4 operator+(vec4 const& a, vec4 const& b) { return vec4(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w); }
 
 	static inline float dot(vec3 const& a, vec3 const& b) {
 		return a.x * b.x + a.y * b.y + a.z * b.z;
