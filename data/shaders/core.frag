@@ -3,8 +3,12 @@
 
 //DEFINES
 
-in float bogus;  // Nvidia will overwrite the first in variable with bogus data, so as a workaround we put a bogus variable here
-in mat4 colorMat;
+uniform mat4 colorMatrix;
+
+#ifdef ENABLE_BOGUS
+in float bogus;  // Workaround for http://www.nvnews.net/vbulletin/showthread.php?p=2401097
+#endif
+
 in vec3 normal;
 in vec4 color;
 
@@ -28,6 +32,14 @@ uniform sampler2D tex;
 void main() {
 	vec4 frag = TEXFUNC;
 
+#ifdef ENABLE_BOGUS
+	frag.a += 1e-14 * bogus;  // Convince the compiler not to optimize away the bogus variable
+#endif
+
+#ifdef ENABLE_VERTEX_COLOR
+	frag *= color;
+#endif
+
 #ifdef ENABLE_LIGHTING
 	vec3 lightDir = normalize(vec3(-50.0, 5.0, -15.0));
 	const vec3 ambient = vec3(0.1, 0.1, 0.1);
@@ -35,12 +47,7 @@ void main() {
 	float NdotL = max(dot(normalize(normal), lightDir), 0.0);
 	frag = vec4(ambient + frag.rgb * NdotL, frag.a);
 #endif
-#ifdef ENABLE_VERTEX_COLOR
-	frag *= color;
-#endif
-	gl_FragColor = colorMat * frag;
-#ifdef ENABLE_BOGUS
-	gl_FragColor += vec4(0,0,0,bogus * 1e-10)
-#endif
+
+	gl_FragColor = colorMatrix * frag;
 }
 

@@ -37,7 +37,7 @@ void Object3d::loadWavefrontObj(std::string filepath, float scale) {
 	std::string row;
 	std::ifstream file(filepath.c_str(), std::ios::binary);
 	if (!file.is_open()) throw std::runtime_error("Couldn't open object file "+filepath);
-	std::vector<glmath::Vec4> m_vertices, m_normals, m_texcoords;
+	std::vector<glmath::vec4> m_vertices, m_normals, m_texcoords;
 	std::vector<Face> m_faces;
 	while (getline(file, row)) {
 		++linenumber;
@@ -46,16 +46,16 @@ void Object3d::loadWavefrontObj(std::string filepath, float scale) {
 		std::string tempst;
 		if (row.substr(0,2) == "v ") {  // Vertices
 			srow >> tempst >> x >> y >> z;
-			m_vertices.push_back(glmath::Vec4(x*scale, y*scale, z*scale, 1.0f));
+			m_vertices.push_back(glmath::vec4(x*scale, y*scale, z*scale, 1.0f));
 		} else if (row.substr(0,2) == "vt") {  // Texture Coordinates
 			srow >> tempst >> x >> y;
-			m_texcoords.push_back(glmath::Vec4(x, y, 0.0f, 0.0f));
+			m_texcoords.push_back(glmath::vec4(x, y, 0.0f, 0.0f));
 		} else if (row.substr(0,2) == "vn") {  // Normals
 			srow >> tempst >> x >> y >> z;
 			double sum = std::abs(x)+std::abs(y)+std::abs(z);
 			if (sum == 0) throw std::runtime_error("Invalid normal in "+filepath+":"+boost::lexical_cast<std::string>(linenumber));
 			x /= sum; y /= sum; z /= sum; // Normalize components
-			m_normals.push_back(glmath::Vec4(x, y, z, 0.0));
+			m_normals.push_back(glmath::vec4(x, y, z, 0.0));
 		} else if (row.substr(0,2) == "f ") {  // Faces
 			Face f;
 			srow >> tempst; // Eat away prefix

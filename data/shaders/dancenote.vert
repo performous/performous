@@ -1,14 +1,17 @@
 #version 120
 
+uniform mat4 positionMatrix;
+uniform mat3 normalMatrix;
+uniform int noteType;
+uniform float hitAnim;
+uniform float clock;
+uniform float scale;
+uniform vec2 position;
+
 in vec4 vertPos;
 in vec4 vertTexCoord;
 in vec3 vertNormal;
 in vec4 vertColor;
-
-varying float bogus;
-
-uniform mat4 colorMatrix;
-varying mat4 colorMat;
 
 // Per-vextex for fragment shader (if no geometry shader)
 varying vec4 texCoord;
@@ -19,13 +22,6 @@ varying vec4 color;
 varying vec4 vTexCoord;
 varying vec3 vNormal;
 varying vec4 vColor;
-
-
-uniform int noteType;
-uniform float hitAnim;
-uniform float clock;
-uniform float scale;
-uniform vec2 position;
 
 mat4 scaleMat(in float sc) {
 	return mat4(sc,  0,  0,  0,
@@ -44,10 +40,8 @@ mat4 rotMat(in float ang) {
 }
 
 void main() {
-	bogus = 0.0;
-	colorMat = colorMatrix;  // In case no geometry shader is used (otherwise it sets this)
 	vTexCoord = texCoord = vertTexCoord;
-	vNormal = normal = normalize(gl_NormalMatrix * vertNormal);
+	vNormal = normal = normalMatrix * vertNormal;
 	vColor = color = vertColor;
 
 	mat4 trans = scaleMat(scale);
@@ -81,7 +75,6 @@ void main() {
 		);
 	}
 
-	gl_Position = gl_ModelViewProjectionMatrix * trans * vertPos;
-	gl_Position += gl_ModelViewProjectionMatrix * vec4(position.xy, 0, 0);
+	gl_Position = positionMatrix * (vec4(position, 0, 0) + trans * vertPos);
 }
 

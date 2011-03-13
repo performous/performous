@@ -1,16 +1,11 @@
 #include "glshader.hh"
-#include "glutil.hh"
 
+#include "glutil.hh"
+#include <algorithm>
 #include <fstream>
 #include <stdexcept>
-#include <algorithm>
 
 using namespace glutil;
-
-glmath::Matrix& getColorMatrix() {
-	static glmath::Matrix colorMatrix;
-	return colorMatrix;
-}
 
 namespace {
 	/// Loads a file into memory
@@ -123,26 +118,25 @@ Shader& Shader::link() {
 Shader& Shader::bind() {
 	glutil::GLErrorChecker ec("Shader::bind");
 	glUseProgram(program);
-	setUniformMatrix("colorMatrix", getColorMatrix());
 	return *this;
 }
 
 
-GLint Shader::operator[](const std::string& uniform) {
+Uniform Shader::operator[](const std::string& uniform) {
+	bind();
 	// Try to use a cached value
 	UniformMap::iterator it = uniforms.find(uniform);
-	if (it != uniforms.end()) return it->second;
+	if (it != uniforms.end()) return Uniform(it->second);
 	// Get the value and cache it
 	GLint var = glGetUniformLocation(program, uniform.c_str());
 	if (var == -1) throw std::logic_error("GLSL shader '" + name + "' uniform variable '" + uniform + "' not found.");
-	return uniforms[uniform] = var;
+	return Uniform(uniforms[uniform] = var);
 }
 
 void VertexArray::Draw(GLint mode) {
 	if (empty()) return;
 	unsigned stride = sizeof(VertexInfo);
-	glmath::Vec4 const* ptr = &m_vertices[0].position;
-#if 1
+	glmath::vec4 const* ptr = &m_vertices[0].position;
 	GLint program;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &program);
 	GLint vertPos = glGetAttribLocation(program, "vertPos");
@@ -159,7 +153,7 @@ void VertexArray::Draw(GLint mode) {
 	}
 	if (vertNormal != -1) {
 		glEnableVertexAttribArray(vertNormal);
-		glVertexAttribPointer(vertNormal, 4, GL_FLOAT, GL_FALSE, stride, ptr + 2);
+		glVertexAttribPointer(vertNormal, 3, GL_FLOAT, GL_FALSE, stride, ptr + 2);
 	}
 	if (vertColor != -1) {
 		glEnableVertexAttribArray(vertColor);
@@ -171,31 +165,5 @@ void VertexArray::Draw(GLint mode) {
 	if (vertTexCoord != -1) glDisableVertexAttribArray(vertTexCoord);
 	if (vertNormal != -1) glDisableVertexAttribArray(vertNormal);
 	if (vertColor != -1) glDisableVertexAttribArray(vertColor);
-#else
-	// VBO
-	glmath::Vec4 const* ptr_ = NULL;
-	GLuint bufferName;
-	glGenBuffers(1, &bufferName);
-	glBindBuffer(GL_ARRAY_BUFFER, bufferName);
-	glBufferData(GL_ARRAY_BUFFER, size(), ptr, GL_STREAM_DRAW);
-
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glEnableClientState(GL_NORMAL_ARRAY);
-	glEnableClientState(GL_COLOR_ARRAY);
-
-	glVertexPointer(4, GL_FLOAT, stride, ptr_);
-	glTexCoordPointer(4, GL_FLOAT, stride, ptr_ + 1);
-	glNormalPointer(GL_FLOAT, stride, ptr_ + 2);
-	glColorPointer(4, GL_FLOAT, stride, ptr_ + 3);
-	glDrawArrays(mode, 0, size());
-
-	glDisableClientState(GL_COLOR_ARRAY);
-	glDisableClientState(GL_NORMAL_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	glDisableClientState(GL_VERTEX_ARRAY);
-
-	glBindBuffer(GL_ARRAY_BUFFER, bufferName);
-#endif
 }
 

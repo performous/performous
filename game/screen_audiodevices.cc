@@ -106,14 +106,15 @@ void ScreenAudioDevices::draw() {
 			else if (m_mics[m_selected_column].name != "OUT" && !m_devs[i].in) alpha = 0.5f;
 			m_theme->device_bg.dimensions.center(y);
 			m_theme->device_bg.draw();
+			ColorTrans c(Color(1.0, 1.0, 1.0, alpha));
 			m_theme->device.dimensions.middle(-xstep*0.5).center(y);
-			m_theme->device.draw(i < m_devs.size() ? m_devs[i].desc() : _("- Unassigned -"), alpha);
+			m_theme->device.draw(i < m_devs.size() ? m_devs[i].desc() : _("- Unassigned -"));
 		}
 		// Icons
 		for (size_t i = 0; i < m_mics.size(); ++i) {
 			Surface& srf = (i < m_mics.size()-1) ? *m_mic_icon : *m_pdev_icon;
 			{
-				glutil::Color c(m_colorMap[m_mics[i].name]);
+				ColorTrans c(m_colorMap[m_mics[i].name]);
 				srf.dimensions.middle(-xoff + xstep*0.5 + i*xstep).center(-yoff+m_mics[i].dev*ystep);
 				srf.draw();
 			}

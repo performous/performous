@@ -142,11 +142,11 @@ class SvgTxtTheme {
 	/// constructor
 	SvgTxtTheme(std::string _theme_file, double factor = 1.0);
 	/// draws text with alpha
-	void draw(std::vector<TZoomText> const& _text, float alpha = 1.0f);
+	void draw(std::vector<TZoomText> const& _text);
 	/// draw texts
 	void draw(std::vector<std::string> const& _text);
 	/// draw text with alpha
-	void draw(std::string _text, float alpha = 1.0f);
+	void draw(std::string _text);
 	/// sets highlight
 	void setHighlight(std::string _theme_file);
 	/// width

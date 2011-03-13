@@ -1,9 +1,9 @@
 #pragma once
 
-#include "opengl_text.hh"
-#include "fs.hh"
-#include "surface.hh"
 #include "configuration.hh"
+#include "fs.hh"
+#include "opengl_text.hh"
+#include "surface.hh"
 
 /// class for printing dialogues
 class Dialog {
@@ -18,8 +18,8 @@ class Dialog {
 	}
 	/// draws dialogue
 	void draw() {
-		glutil::PushMatrix pm;
-		glTranslatef(0.0f, 0.0f, 0.1f);  // Raise a bit in 3D
+		using namespace glmath;
+		Transform(translate(vec3(0.0f, 0.0f, 0.1f)));  // Raise a bit in 3D
 		m_dialog.draw();
 		m_svgText.draw(m_text);
 	}

@@ -12,13 +12,34 @@ static inline float virtH() { return float(screenH()) / screenW(); }
 
 struct SDL_Surface;
 
-/// Performs a GL transform for displaying background image at far distance
-class FarTransform {
-public:
-	FarTransform();
+struct ColorTrans {
+	ColorTrans(Color const& c);
+	ColorTrans(glmath::mat4 const& mat);
+	~ColorTrans();
 private:
-	glutil::PushMatrix pm;
+	glmath::mat4 m_old;
 };
+
+/// Apply a subviewport with different perspective projection
+class ViewTrans {
+public:
+	ViewTrans(double offsetX = 0.0, double offsetY = 0.0, double frac = 1.0);
+	~ViewTrans();
+private:
+	glmath::mat4 m_old;
+};
+
+/// Apply a transform to current modelview stack
+class Transform {
+public:
+	Transform(glmath::mat4 const& m);
+	~Transform();
+private:
+	glmath::mat4 m_old;
+};
+
+/// Performs a GL transform for displaying background image at far distance
+glmath::mat4 farTransform();
 
 /// handles the window
 class Window {
@@ -58,6 +79,8 @@ public:
 		// const_cast required to workaround ptr_map's protection against construction of temporaries
 		return *m_shaders.insert(const_cast<std::string&>(name), new Shader(name)).first->second;
 	}
+	void updateColor();
+	void updateTransforms();
 private:
 	/// Setup everything for drawing a view.
 	/// @param num 0 = no stereo, 1 = left eye, 2 = right eye

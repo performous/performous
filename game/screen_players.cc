@@ -131,6 +131,7 @@ void ScreenPlayers::draw() {
 		std::size_t ss = m_players.size();
 		int baseidx = spos + 1.5; --baseidx; // Round correctly
 		double shift = spos - baseidx;
+		// FIXME: 3D browser
 		for (int i = -2; i < 5; ++i) {
 			PlayerItem player_display = m_players[baseidx + i];
 			if (baseidx + i < 0 || baseidx + i >= int(ss)) continue;
@@ -148,7 +149,7 @@ void ScreenPlayers::draw() {
 			// Draw the reflection
 			s.dimensions.top(y + 0.2 * diff); s.tex = TexCoords(0, 1, 1, 0);
 			{
-				glutil::Color c(Color(1.0, 1.0, 1.0, 0.4));
+				ColorTrans c(Color(1.0, 1.0, 1.0, 0.4));
 				s.draw();
 			}
 			s.tex = TexCoords();

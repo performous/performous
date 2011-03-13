@@ -410,17 +410,12 @@ void DanceGraph::draw(double time) {
 
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
 	dimensions.screenTop().middle(m_cx.get()).stretch(m_width.get(), 1.0);
-	double offsetX = 0.5 * (dimensions.x1() + dimensions.x2());
-
+	ViewTrans view(0.5 * (dimensions.x1() + dimensions.x2()), 0.0, 0.75);  // Apply a per-player local perspective
 	{
-		double frac = 0.75;  // Adjustable: 1.0 means fully separated, 0.0 means fully attached
+		using namespace glmath;
 		// Some matrix magic to get the viewport right
-		glutil::PushMatrixMode pmm(GL_PROJECTION);
-		glTranslatef(frac * offsetX, 0.0f, 0.0f);
-		glutil::PushMatrixMode pmb(GL_MODELVIEW);
-		glTranslatef((1.0 - frac) * offsetX, dimensions.y1(), 0.0f);
 		float temp_s = dimensions.w() / 8.0f; // Allow for 8 pads to fit on a track
-		glScalef(temp_s, temp_s, temp_s);
+		Transform trans(translate(vec3(0.0f, dimensions.y1(), 0.0)) * scale(temp_s));
 
 		// Draw the "neck" graph (beat lines)
 		drawBeats(time);
@@ -428,13 +423,13 @@ void DanceGraph::draw(double time) {
 		// Arrows on cursor
 		{
 			UseShader us(getShader("dancenote"));
-			us().setUniform("clock", float(time))
-			    .setUniform("noteType", 0)
-			    .setUniform("scale", getScale());
+			us()["clock"].set(float(time));
+			us()["noteType"].set(0);
+			us()["scale"].set(getScale());
 			for (int arrow_i = 0; arrow_i < m_pads; ++arrow_i) {
 				float l = m_pressed_anim[arrow_i].get();
-				us().setUniform("hitAnim", l)
-				    .setUniform("position", panel2x(arrow_i), time2y(0.0));
+				us()["hitAnim"].set(l);
+				us()["position"].set(panel2x(arrow_i), time2y(0.0));
 				drawArrow(arrow_i, m_arrows_cursor);
 			}
 		}
@@ -448,7 +443,7 @@ void DanceGraph::draw(double time) {
 			}
 		}
 	}
-	drawInfo(time, offsetX, dimensions); // Go draw some texts and other interface stuff
+	drawInfo(time, dimensions); // Go draw some texts and other interface stuff
 }
 
 void DanceGraph::drawBeats(double time) {
@@ -465,7 +460,7 @@ void DanceGraph::drawBeats(double time) {
 			texCoord -= texCoordStep * (tEnd - future) / (tEnd - tBeg);
 			tEnd = future;
 		}*/
-		glutil::Color c(Color(1.0f, 1.0f, 1.0f, time2a(tEnd)));
+		glmath::vec4 c(1.0f, 1.0f, 1.0f, time2a(tEnd));
 		va.Color(c).Normal(0.0f, 1.0f, 0.0f).TexCoord(0.0f, texCoord).Vertex(-w, time2y(tEnd));
 		va.Color(c).Normal(0.0f, 1.0f, 0.0f).TexCoord(1.0f, texCoord).Vertex(w, time2y(tEnd));
 	}
@@ -491,9 +486,9 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 
 	{
 		UseShader us(getShader("dancenote"));
-		us().setUniform("hitAnim", float(glow))
-		    .setUniform("clock", float(time))
-		    .setUniform("scale", getScale());
+		us()["hitAnim"].set(float(glow));
+		us()["clock"].set(float(time));
+		us()["scale"].set(getScale());
 
 		if (yEnd - yBeg > arrowSize) {
 			// Draw holds
@@ -502,7 +497,8 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 				yEnd = std::max(time2y(0.0), yEnd);
 			}
 			if (note.releaseTime > 0) yBeg = time2y(note.releaseTime - time); // Oh noes, it got released!
-			us().setUniform("noteType", 2).setUniform("position", x, yBeg);
+			us()["noteType"].set(2);
+			us()["position"].set(x, yBeg);
 			// Draw begin
 			drawArrow(arrow_i, m_arrows_hold, 0.0f, 1.0f/3.0f);
 			if (yEnd - yBeg > 0) {
@@ -521,7 +517,8 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 		} else {
 			// Draw short note
 			if (mine && note.isHit) yBeg = time2y(0.0);
-			us().setUniform("noteType", (mine ? 3 : 1)).setUniform("position", x, yBeg);
+			us()["noteType"].set(mine ? 3 : 1);
+			us()["position"].set(x, yBeg);
 			drawArrow((mine ? -1 : arrow_i), (mine ? m_mine : m_arrows));
 		}
 	}
@@ -536,7 +533,6 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 			text = note.score ? getRank(note.error) : "FAIL!";
 		}
 		if (!text.empty()) {
-			glutil::Color c(Color(1.0f, 1.0f, 1.0f));
 			double sc = getScale() * 1.2 * arrowSize * (1.0 + glow);
 			m_popupText->render(text);
 			m_popupText->dimensions().middle(x).center(time2y(0.0)).stretch(sc, sc/2.0);
@@ -546,14 +542,14 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 }
 
 /// Draw popups and other info texts
-void DanceGraph::drawInfo(double /*time*/, double offsetX, Dimensions dimensions) {
+void DanceGraph::drawInfo(double /*time*/, Dimensions dimensions) {
 	if (!menuOpen()) {
 		// Draw scores
-		m_text.dimensions.screenBottom(-0.35).middle(0.32 * dimensions.w() + offsetX);
+		m_text.dimensions.screenBottom(-0.35).middle(0.32 * dimensions.w());
 		m_text.draw(boost::lexical_cast<std::string>(unsigned(getScore())));
-		m_text.dimensions.screenBottom(-0.32).middle(0.32 * dimensions.w() + offsetX);
+		m_text.dimensions.screenBottom(-0.32).middle(0.32 * dimensions.w());
 		m_text.draw(boost::lexical_cast<std::string>(unsigned(m_streak)) + "/"
 		  + boost::lexical_cast<std::string>(unsigned(m_longestStreak)));
 	}
-	drawPopups(offsetX);
+	drawPopups();
 }

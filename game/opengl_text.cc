@@ -196,16 +196,16 @@ void SvgTxtTheme::draw(std::vector<std::string> const& _text) {
 	draw(tmp);
 }
 
-void SvgTxtTheme::draw(std::string _text, float alpha) {
+void SvgTxtTheme::draw(std::string _text) {
 	std::vector<TZoomText> tmp;
 	TZoomText t;
 	t.string = _text;
 	t.factor = 1.0;
 	tmp.push_back(t);
-	draw(tmp, alpha);
+	draw(tmp);
 }
 
-void SvgTxtTheme::draw(std::vector<TZoomText> const& _text, float alpha) {
+void SvgTxtTheme::draw(std::vector<TZoomText> const& _text) {
 	std::string tmp;
 	for (unsigned int i = 0 ; i < _text.size(); i++ ) tmp += _text[i].string;
 
@@ -243,16 +243,11 @@ void SvgTxtTheme::draw(std::vector<TZoomText> const& _text, float alpha) {
 		dim.middle(position_x + 0.5 * dim.w());
 		TexCoords tex;
 		double factor = _text[i].factor;
-		Color color;
-		if (factor == 1.0) color = Color(1.0f, 1.0f, 1.0f, alpha);
-		else {
-			color = Color(m_text_highlight.fill_col.r, m_text_highlight.fill_col.g, m_text_highlight.fill_col.b, alpha);
+		if (factor > 1.0) {
+			ColorTrans c(Color(m_text_highlight.fill_col.r, m_text_highlight.fill_col.g, m_text_highlight.fill_col.b));
 			dim.fixedWidth(dim.w() * factor);
-		}
-		{
-			glutil::Color c(color);
 			m_opengl_text[i].draw(dim, tex);
-		}
+		} else m_opengl_text[i].draw(dim, tex);
 		position_x += syllable_width;
 	}
 }

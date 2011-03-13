@@ -61,7 +61,7 @@ void ScreenManager::loading(std::string const& message, float progress) {
 	const float spacing = 0.01;
 	const float sq_size = (2*x - (maxi-1)*spacing) / maxi;
 	for (int i = 0; i <= progress * maxi; ++i) {
-		glutil::Color c(Color(0.2f, 0.7f, 0.7f, (progress + 1)*0.5f));
+		ColorTrans c(Color(0.2f, 0.7f, 0.7f, (progress + 1)*0.5f));
 		UseShader shader(getShader("color"));
 		glutil::Square(-x + i * (sq_size + spacing), 0, sq_size/2, true);
 	}
@@ -117,7 +117,8 @@ void ScreenManager::drawNotifications() {
 			if (time >= m_messagePopup.getTarget()) m_messagePopup.setTarget(0.0, true); // Reset if fade out finished
 		}
 
-		m_textMessage.draw(m_message, fadeValue); // Draw the message
+		ColorTrans c(Color(1.0, 1.0, 1.0, fadeValue));
+		m_textMessage.draw(m_message); // Draw the message
 	}
 	// Dialog
 	if (m_dialog) m_dialog->draw();

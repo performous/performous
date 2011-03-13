@@ -7,6 +7,7 @@
 #include "image.hh"
 #include "util.hh"
 #include "joystick.hh"
+#include "screen.hh"
 #include <boost/date_time.hpp>
 #include <fstream>
 #include <SDL.h>
@@ -40,6 +41,10 @@ namespace {
 	const float near_ = 0.1f; // This determines the near clipping distance (must be > 0)
 	const float far_ = 110.0f; // How far away can things be seen
 	const float z0 = 1.5f; // This determines FOV: the value is your distance from the monitor (the unit being the width of the Performous window)
+
+	glmath::mat4 g_color = glmath::mat4::identity();
+	glmath::mat4 g_projection = glmath::mat4::identity();
+	glmath::mat4 g_modelview =  glmath::translate(glmath::vec3(0.0, 0.0, -z0));
 
 }
 
@@ -76,47 +81,49 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 
 	if (GLEW_VERSION_3_3) {
 		// Compile geometry shaders when stereo is requested
+		shader("color").compileFile(getThemePath("shaders/stereo3d.geom"));
 		shader("surface").compileFile(getThemePath("shaders/stereo3d.geom"));
 		shader("texture").compileFile(getThemePath("shaders/stereo3d.geom"));
 		shader("3dobject").compileFile(getThemePath("shaders/stereo3d.geom"));
 		shader("dancenote").compileFile(getThemePath("shaders/stereo3d.geom"));
+		if (!GLEW_VERSION_4_1) {
+			// Enable bugfix for some older Nvidia cards
+			for (ShaderMap::iterator it = m_shaders.begin(); it != m_shaders.end(); ++it) {
+				Shader& sh = *it->second;
+				sh.addDefines("#define ENABLE_BOGUS\n");
+			}
+		}
 	}
 
 	shader("color")
-	  .setDefines("#define ENABLE_VERTEX_COLOR\n")
+	  .addDefines("#define ENABLE_VERTEX_COLOR\n")
 	  .compileFile(getThemePath("shaders/core.vert"))
 	  .compileFile(getThemePath("shaders/core.frag"))
-	  .link()
-	  .bind()
-	  .setUniformMatrix("colorMatrix", glmath::Matrix());
+	  .link();
 	shader("surface")
-	  .setDefines("#define ENABLE_TEXTURING 1\n")
+	  .addDefines("#define ENABLE_TEXTURING 1\n")
 	  .compileFile(getThemePath("shaders/core.vert"))
 	  .compileFile(getThemePath("shaders/core.frag"))
-	  .link()
-	  .bind()
-	  .setUniformMatrix("colorMatrix", glmath::Matrix());
+	  .link();
 	shader("texture")
-	  .setDefines("#define ENABLE_TEXTURING 2\n#define ENABLE_VERTEX_COLOR\n")
+	  .addDefines("#define ENABLE_TEXTURING 2\n")
+	  .addDefines("#define ENABLE_VERTEX_COLOR\n")
 	  .compileFile(getThemePath("shaders/core.vert"))
 	  .compileFile(getThemePath("shaders/core.frag"))
-	  .link()
-	  .bind()
-	  .setUniformMatrix("colorMatrix", glmath::Matrix());
+	  .link();
 	shader("3dobject")
-	  .setDefines("#define ENABLE_LIGHTING\n")
+	  .addDefines("#define ENABLE_LIGHTING\n")
 	  .compileFile(getThemePath("shaders/core.vert"))
 	  .compileFile(getThemePath("shaders/core.frag"))
-	  .link()
-	  .bind()
-	  .setUniformMatrix("colorMatrix", glmath::Matrix());
+	  .link();
 	shader("dancenote")
-	  .setDefines("#define ENABLE_TEXTURING 2\n#define ENABLE_VERTEX_COLOR\n")
+	  .addDefines("#define ENABLE_TEXTURING 2\n")
+	  .addDefines("#define ENABLE_VERTEX_COLOR\n")
 	  .compileFile(getThemePath("shaders/dancenote.vert"))
 	  .compileFile(getThemePath("shaders/core.frag"))
-	  .link()
-	  .bind()
-	  .setUniformMatrix("colorMatrix", glmath::Matrix());
+	  .link();
+
+	updateColor();
 	view(0);  // For loading screens
 }
 
@@ -131,14 +138,36 @@ void Window::updateStereo(float sepFactor) {
 		Shader& sh = *it->second;
 		sh.bind();
 		try {
-			sh.setUniform("sepFactor", sepFactor);
-			sh.setUniform("z0", z0 - 2.0f * near_);  // Why minus two times zNear, I have no idea -Tronic
+			sh["sepFactor"].set(sepFactor);
+			sh["z0"].set(z0 - 2.0f * near_);  // Why minus two times zNear, I have no idea -Tronic
 		} catch(...) {}  // Not fatal if 3d shader is missing
+	}
+}
+
+void Window::updateColor() {
+	for (ShaderMap::iterator it = m_shaders.begin(); it != m_shaders.end(); ++it) {
+		Shader& sh = *it->second;
+		sh["colorMatrix"].setMat4(g_color);
+	}
+}
+
+void Window::updateTransforms() {
+	using namespace glmath;
+	mat4 position = g_projection * g_modelview;
+	mat3 normal(g_modelview);
+	for (ShaderMap::iterator it = m_shaders.begin(); it != m_shaders.end(); ++it) {
+		Shader& sh = *it->second;
+		sh.bind();
+		sh["positionMatrix"].setMat4(position);
+		try {
+			sh["normalMatrix"].setMat3(normal);
+		} catch(...) {}  // Not fatal if normalMatrix is missing (only 3d objects use it)
 	}
 }
 
 void Window::render(boost::function<void (void)> drawFunc) {
 	glutil::GLErrorChecker glerror("Window::render");
+	ViewTrans trans;  // Default frustum
 	if (s_width < screen->w || s_height < screen->h) glClear(GL_COLOR_BUFFER_BIT);  // Black bars
 	bool stereo = config["graphic/stereo3d"].b();
 	int type = config["graphic/stereo3dtype"].i();
@@ -159,8 +188,8 @@ void Window::render(boost::function<void (void)> drawFunc) {
 	{
 		UseFBO user(fbo);
 		view(0);
-		glViewportIndexedf(0, 0, h / 2, w, h / 2);
-		glViewportIndexedf(1, 0, 0, w, h / 2);
+		glViewportIndexedf(1, 0, h / 2, w, h / 2);
+		glViewportIndexedf(2, 0, 0, w, h / 2);
 		drawFunc();
 	}
 	glerror.check("Render to FBO");
@@ -168,7 +197,7 @@ void Window::render(boost::function<void (void)> drawFunc) {
 	UseTexture use(fbo.getTexture());
 	view(0);  // Viewport for drawable area
 	glDisable(GL_BLEND);
-	glmath::Matrix colorMatrix;
+	glmath::mat4 colorMatrix = glmath::mat4::identity();
 	updateStereo(0.0);  // Disable stereo mode while we composite
 	glerror.check("FBO->FB setup");
 	for (int num = 0; num < 2; ++num) {
@@ -195,7 +224,7 @@ void Window::render(boost::function<void (void)> drawFunc) {
 			glBlendFunc(GL_ONE, GL_ONE);
 		}
 		// Render FBO with 1:1 pixels, properly filtered/positioned for 3d
-		glutil::Color c(colorMatrix);
+		ColorTrans c(colorMatrix);
 		Dimensions dim = Dimensions(double(w) / h).fixedWidth(1.0);
 		dim.center((num == 0 ? 0.25 : -0.25) * dim.h());
 		fbo.getTexture().draw(dim, TexCoords(0.0, h, w, 0));
@@ -214,21 +243,6 @@ void Window::view(unsigned num) {
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_BLEND);
 	shader("color").bind();
-	// Setup the projection matrix for 2D translates
-	using namespace glmath;
-	glMatrixMode(GL_PROJECTION);
-	float h = virtH();
-	// OpenGL normalized coordinates go from -1 to 1, change scale so that our 2D translates can use the Performous normalized coordinates instead
-	upload(scale(Vec3(2.0f, 2.0f / h, 1.0f)));
-	// Note: we do the frustum on MODELVIEW so that 2D positioning can be done via projection matrix.
-	// glTranslatef on that will move the image, not the camera (i.e. far-away and nearby objects move the same amount)
-	glMatrixMode(GL_MODELVIEW);
-	const float f = near_ / z0;
-	upload(
-	  scale(Vec3(0.5, 0.5 * h, 1.0))
-	  * frustum(-0.5f * f, 0.5f * f, 0.5f * h * f, -0.5f * h * f, near_, far_)
-	  * translate(Vec3(0.0, 0.0, -z0))
-	);
 	// Setup views
 	double vx = 0.5f * (screen->w - s_width);
 	double vy = 0.5f * (screen->h - s_height);
@@ -236,8 +250,8 @@ void Window::view(unsigned num) {
 	if (num == 0) {
 		glViewport(vx, vy, vw, vh);  // Drawable area of the window (excluding black bars)
 	} else {
-		glViewportIndexedf(0, 0, vh / 2, vw, vh / 2);  // Top half of the drawable area
-		glViewportIndexedf(1, 0, 0, vw, vh / 2);  // Bottom half of the drawable area
+		glViewportIndexedf(1, 0, vh / 2, vw, vh / 2);  // Top half of the drawable area
+		glViewportIndexedf(2, 0, 0, vw, vh / 2);  // Bottom half of the drawable area
 	}
 
 }
@@ -302,11 +316,61 @@ void Window::resize() {
 	if (s_height > 0.8f * s_width) s_height = round(0.8f * s_width);
 }
 
-FarTransform::FarTransform() {
+ViewTrans::ViewTrans(double offsetX, double offsetY, double frac): m_old(g_projection) {
+	// Setup the projection matrix for 2D translates
+	using namespace glmath;
+	double h = virtH();
+	const double f = near_ / z0;  // z0 to nearplane conversion factor
+	// Corners of the screen at z0
+	double x1 = -0.5, x2 = 0.5;
+	double y1 = 0.5 * h, y2 = -0.5 * h;
+	// Move the perspective point by frac of offset (i.e. move the image)
+	double persX = frac * offsetX, persY = frac * offsetY;
+	x1 -= persX; x2 -= persX;
+	y1 -= persY; y2 -= persY;
+	// Perspective projection + the rest of the offset in eye (world) space
+	g_projection = frustum(f * x1, f * x2, f * y1, f * y2, near_, far_)
+	  * translate(vec3(offsetX - persX, offsetY - persY, 0.0));
+	ScreenManager::getSingletonPtr()->window().updateTransforms();
+}
+
+ColorTrans::ColorTrans(Color const& c): m_old(g_color) {
+	using namespace glmath;
+	g_color = g_color * mat4::diagonal(vec4(c.r, c.g, c.b, c.a));
+	ScreenManager::getSingletonPtr()->window().updateColor();
+}
+
+ColorTrans::ColorTrans(glmath::mat4 const& mat): m_old(g_color) {
+	g_color = g_color * mat;
+	ScreenManager::getSingletonPtr()->window().updateColor();
+}
+
+ColorTrans::~ColorTrans() {
+	g_color = m_old;
+	ScreenManager::getSingletonPtr()->window().updateColor();
+}
+
+ViewTrans::~ViewTrans() {
+	g_projection = m_old;
+	ScreenManager::getSingletonPtr()->window().updateTransforms();
+}
+
+
+Transform::Transform(glmath::mat4 const& m): m_old(g_modelview) {
+	g_modelview = g_modelview * m;
+	ScreenManager::getSingletonPtr()->window().updateTransforms();
+}
+
+Transform::~Transform() {
+	g_modelview = m_old;
+	ScreenManager::getSingletonPtr()->window().updateTransforms();
+}
+
+glmath::mat4 farTransform() {
 	float z = far_ - 0.1f;  // Very near the far plane but just a bit closer to avoid accidental clipping
 	float s = z / z0;  // Scale the image so that it looks the same size
 	s *= 1.0 + 2.0 * getSeparation(); // A bit more for stereo3d (avoid black borders)
-	glTranslatef(0.0f, 0.0f, -z + z0); // Very near the farplane
-	glScalef(s, s, s);
+	using namespace glmath;
+	return translate(vec3(0.0f, 0.0f, -z + z0)) * scale(s); // Very near the farplane
 }
 

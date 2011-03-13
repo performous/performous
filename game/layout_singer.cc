@@ -53,7 +53,7 @@ void LayoutSinger::drawScore(Position position) {
 				break;
 		}
 		{
-			glutil::Color c(Color(r, g, b, act));
+			ColorTrans c(Color(r, g, b, act));
 			m_player_icon->draw();
 			m_score_text[i%4]->draw();
 		}
@@ -81,7 +81,7 @@ void LayoutSinger::drawScore(Position position) {
 					break;
 			}
 			{
-				glutil::Color c(Color(r, g, b, clamp(fact*2.0f)));
+				ColorTrans c(Color(r, g, b, clamp(fact*2.0f)));
 				m_line_rank_text[i%4]->draw();
 			}
 		}
