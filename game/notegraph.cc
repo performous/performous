@@ -108,6 +108,13 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 	m_baseY = -0.5 * (m_min + m_max) * m_noteUnit + dimensions.yc();
 	m_baseX = baseLine - m_time * pixUnit + dimensions.xc();  // FIXME: Moving in X direction requires additional love (is b0rked now, keep it centered at zero)
 
+	// Fading notelines handing
+	if (m_songit == m_vocal.notes.end() || m_songit->begin > m_time + 3.0) m_notealpha -= 0.02f;
+	else if (m_notealpha < 1.0f) m_notealpha += 0.02f;
+	if (m_notealpha <= 0.0f) { m_notealpha = 0.0f; return; }
+
+	ColorTrans c(Color(1.0, 1.0, 1.0, m_notealpha));
+
 	drawNotes();
 	if (config["game/pitch"].b()) drawWaves(database);
 
@@ -120,7 +127,7 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 			float hh = -m_noteUnit;
 			float centery = m_baseY + (it->note + 0.4) * m_noteUnit; // Star is 0.4 notes higher than current note
 			float centerx = x + w - (player_star_offset + 1.2) * hh; // Star is 1.2 units from end
-			float rot = fmod(time * 360, 360); // They rotate!
+			float rot = fmod(time * 5.0, 2.0 * M_PI); // They rotate!
 			float zoom = (std::abs((rot-180) / 360.0f) * 0.8f + 0.6f) * (position == NoteGraph::TOP ? 2.3 : 2.0) * hh;
 			using namespace glmath;
 			Transform trans(translate(vec3(centerx, centery, 0.0f)) * rotate(rot, vec3(0.0f, 0.0f, 1.0f)));
@@ -136,47 +143,40 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 
 void NoteGraph::drawNotes() {
 	// Draw note lines
-	if (m_songit == m_vocal.notes.end() || m_songit->begin > m_time + 3.0) m_notealpha -= 0.02f;
-	else if (m_notealpha < 1.0f) m_notealpha += 0.02f;
-	if (m_notealpha <= 0.0f) {
-		m_notealpha = 0.0f;
-	} else {
-		ColorTrans c(Color(1.0, 1.0, 1.0, m_notealpha));
-		m_notelines.draw(Dimensions().stretch(dimensions.w(), (m_max - m_min - 13) * m_noteUnit).middle(dimensions.xc()).center(dimensions.yc()), TexCoords(0.0, (-m_min - 7.0) / 12.0f, 1.0, (-m_max + 6.0) / 12.0f));
+	m_notelines.draw(Dimensions().stretch(dimensions.w(), (m_max - m_min - 13) * m_noteUnit).middle(dimensions.xc()).center(dimensions.yc()), TexCoords(0.0, (-m_min - 7.0) / 12.0f, 1.0, (-m_max + 6.0) / 12.0f));
 
-		// Draw notes
-		for (Notes::const_iterator it = m_songit; it != m_vocal.notes.end() && it->begin < m_time - (baseLine - 0.5) / pixUnit; ++it) {
-			if (it->type == Note::SLEEP) continue;
-			double alpha = it->power;
-			Texture* t1;
-			Texture* t2;
-			switch (it->type) {
-			  case Note::NORMAL: case Note::SLIDE: t1 = &m_notebar; t2 = &m_notebar_hl; break;
-			  case Note::GOLDEN: t1 = &m_notebargold; t2 = &m_notebargold_hl; break;
-			  case Note::FREESTYLE:  // Freestyle notes use custom handling
-				{
-					Dimensions dim;
-					dim.middle(m_baseX + 0.5 * (it->begin + it->end) * pixUnit).center(m_baseY + it->note * m_noteUnit).stretch((it->end - it->begin) * pixUnit, -m_noteUnit * 12.0);
-					float xoffset = 0.1 * m_time / m_notebarfs.ar();
-					m_notebarfs.draw(dim, TexCoords(xoffset, 0.0, xoffset + dim.ar() / m_notebarfs.ar(), 1.0));
-					if (alpha > 0.0) {
-						float xoffset = rand() / double(RAND_MAX);
-						m_notebarfs_hl.draw(dim, TexCoords(xoffset, 0.0, xoffset + dim.ar() / m_notebarfs_hl.ar(), 1.0));
-					}
+	// Draw notes
+	for (Notes::const_iterator it = m_songit; it != m_vocal.notes.end() && it->begin < m_time - (baseLine - 0.5) / pixUnit; ++it) {
+		if (it->type == Note::SLEEP) continue;
+		double alpha = it->power;
+		Texture* t1;
+		Texture* t2;
+		switch (it->type) {
+		  case Note::NORMAL: case Note::SLIDE: t1 = &m_notebar; t2 = &m_notebar_hl; break;
+		  case Note::GOLDEN: t1 = &m_notebargold; t2 = &m_notebargold_hl; break;
+		  case Note::FREESTYLE:  // Freestyle notes use custom handling
+			{
+				Dimensions dim;
+				dim.middle(m_baseX + 0.5 * (it->begin + it->end) * pixUnit).center(m_baseY + it->note * m_noteUnit).stretch((it->end - it->begin) * pixUnit, -m_noteUnit * 12.0);
+				float xoffset = 0.1 * m_time / m_notebarfs.ar();
+				m_notebarfs.draw(dim, TexCoords(xoffset, 0.0, xoffset + dim.ar() / m_notebarfs.ar(), 1.0));
+				if (alpha > 0.0) {
+					float xoffset = rand() / double(RAND_MAX);
+					m_notebarfs_hl.draw(dim, TexCoords(xoffset, 0.0, xoffset + dim.ar() / m_notebarfs_hl.ar(), 1.0));
 				}
-				continue;
-			  default: throw std::logic_error("Unknown note type: don't know how to render");
 			}
-			double x = m_baseX + it->begin * pixUnit + m_noteUnit; // left x coordinate: begin minus border (side borders -noteUnit wide)
-			double ybeg = m_baseY + (it->notePrev + 1) * m_noteUnit; // top y coordinate (on the one higher note line)
-			double yend = m_baseY + (it->note + 1) * m_noteUnit; // top y coordinate (on the one higher note line)
-			double w = (it->end - it->begin) * pixUnit - m_noteUnit * 2.0; // width: including borders on both sides
-			double h = -m_noteUnit * 2.0; // height: 0.5 border + 1.0 bar + 0.5 border = 2.0
-			drawNotebar(*t1, x, ybeg, yend, w, h);
-			if (alpha > 0.0) {
-				ColorTrans c(Color(1.0f, 1.0f, 1.0f, alpha));
-				drawNotebar(*t2, x, ybeg, yend, w, h);
-			}
+			continue;
+		  default: throw std::logic_error("Unknown note type: don't know how to render");
+		}
+		double x = m_baseX + it->begin * pixUnit + m_noteUnit; // left x coordinate: begin minus border (side borders -noteUnit wide)
+		double ybeg = m_baseY + (it->notePrev + 1) * m_noteUnit; // top y coordinate (on the one higher note line)
+		double yend = m_baseY + (it->note + 1) * m_noteUnit; // top y coordinate (on the one higher note line)
+		double w = (it->end - it->begin) * pixUnit - m_noteUnit * 2.0; // width: including borders on both sides
+		double h = -m_noteUnit * 2.0; // height: 0.5 border + 1.0 bar + 0.5 border = 2.0
+		drawNotebar(*t1, x, ybeg, yend, w, h);
+		if (alpha > 0.0) {
+			ColorTrans c(Color(1.0f, 1.0f, 1.0f, alpha));
+			drawNotebar(*t2, x, ybeg, yend, w, h);
 		}
 	}
 }
@@ -206,7 +206,7 @@ void NoteGraph::drawWaves(Database const& database) {
 		double oldval = getNaN();
 		glutil::VertexArray va;
 		Notes::const_iterator noteIt = m_vocal.notes.begin();
-		glmath::vec4 c(p->m_color.r, p->m_color.g, p->m_color.b, m_notealpha);
+		glmath::vec4 c(p->m_color.r, p->m_color.g, p->m_color.b, 1.0);
 		for (; idx < endIdx; ++idx, t += Engine::TIMESTEP) {
 			double const freq = pitch[idx].first;
 			// If freq is NaN, we have nothing to process
