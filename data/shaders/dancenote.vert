@@ -74,7 +74,17 @@ void main() {
 		  max(color.a - hitAnim, 0.0)
 		);
 	}
-
-	gl_Position = positionMatrix * (vec4(position, 0, 0) + trans * vertPos);
+	float x = 0.0, y = 0.0;
+	if (position.x != 0.0) {
+		int arrow =  int(4 + position.x) / 2;
+		float a = radians(45.0);
+		if (arrow == 0) a = radians(270.0);
+		if (arrow == 1) a = radians(0.0);
+		if (arrow == 2) a = radians(180.0);
+		if (arrow == 3) a = radians(90.0);
+		x = 2.0 * sin(a);
+		y = 2.0 * cos(a);
+	}
+	gl_Position = positionMatrix * (vec4(x, y, - 1.0 * position.y, 0) + trans * vertPos);
 }
 

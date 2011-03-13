@@ -20,8 +20,8 @@ namespace {
 	const std::string diffv[] = { "Beginner", "Easy", "Medium", "Hard", "Challenge" };
 	const int death_delay = 25; // Delay in notes after which the player is hidden
 	const float join_delay = 3.0f; // Time after join menu before playing when joining mid-game
-	const float past = -0.3f; // Relative time from cursor that is considered past (out of screen)
-	const float future = 2.0f; // Relative time from cursor that is considered future (out of screen)
+	const float past = 0.0f; // Relative time from cursor that is considered past (out of screen)
+	const float future = 3.0f; // Relative time from cursor that is considered future (out of screen)
 	const float timescale = 12.0f; // Multiplier to get graphics units from time
 	const float texCoordStep = -0.25f; // Four beat lines per beat texture
 	// Note: t is difference from playback time so it must be in range [past, future]
@@ -415,13 +415,44 @@ void DanceGraph::draw(double time) {
 		using namespace glmath;
 		// Some matrix magic to get the viewport right
 		float temp_s = dimensions.w() / 8.0f; // Allow for 8 pads to fit on a track
-		Transform trans(translate(vec3(0.0f, dimensions.y1(), 0.0)) * scale(temp_s));
+		//Transform trans(translate(vec3(0.0f, dimensions.y1(), 0.0)) * scale(temp_s));
+		Transform trans(scale(vec3(0.1,0.1,1.0)));
 
 		// Draw the "neck" graph (beat lines)
-		drawBeats(time);
+		//drawBeats(time);
 
+		// Draw the notes
+		if (time == time) { // Check that time is not NaN
+			Song::Beats::const_reverse_iterator bit = m_song.beats.rbegin(), bend = m_song.beats.rend();
+			for (DanceNotes::reverse_iterator it = m_notes.rbegin(); it != m_notes.rend(); ++it) {
+				for (; bit != bend && it->note.begin <= *bit; ++bit) {
+					double t = *bit - time;
+					if (t < 0) continue;
+					if (t > 2.0) continue;
+					bool div4 = (&*bit - &*m_song.beats.begin()) % 4 == 0;
+					ColorTrans c(Color(div4 ? 1.0 : 0.5, 0.5, div4 ? 0.5 : 1.0, 0.5 * (2.0 - t)));
+					Transform trans(rotate(1.0 * std::sin(0.1 * *bit), vec3(0,0,1)));
+					glActiveTexture(GL_TEXTURE0);
+					glBindTexture(m_beat.type(), m_beat.id());
+					UseShader us(getShader("dancenote"));
+					us()["noteType"].set(10);
+					us()["position"].set(0.0, time2y(*bit - time));
+					glutil::VertexArray va;
+					double s = 25.0;
+					va.TexCoord(0.0f, 1.0f).Vertex(-s, -s);
+					va.TexCoord(1.0f, 1.0f).Vertex(s, -s);
+					va.TexCoord(0.0f, 0.0f).Vertex(-s, s);
+					va.TexCoord(1.0f, 0.0f).Vertex(s, s);
+					va.Draw();
+				}
+				if (it->note.end - time < past) continue;
+				if (it->note.begin - time > future) continue;
+				drawNote(*it, time); // Let's just do all the calculating in the sub, instead of passing them as a long list
+			}
+		}
 		// Arrows on cursor
 		{
+			ColorTrans c(mat4::diagonal(vec4(1.0,1.0,1.0,0.5)));
 			UseShader us(getShader("dancenote"));
 			us()["clock"].set(float(time));
 			us()["noteType"].set(0);
@@ -431,15 +462,7 @@ void DanceGraph::draw(double time) {
 				us()["hitAnim"].set(l);
 				us()["position"].set(panel2x(arrow_i), time2y(0.0));
 				drawArrow(arrow_i, m_arrows_cursor);
-			}
-		}
-
-		// Draw the notes
-		if (time == time) { // Check that time is not NaN
-			for (DanceNotes::iterator it = m_notes.begin(); it != m_notes.end(); ++it) {
-				if (it->note.end - time < past) continue;
-				if (it->note.begin - time > future) continue;
-				drawNote(*it, time); // Let's just do all the calculating in the sub, instead of passing them as a long list
+				us()["hitAnim"].set(0.0f);
 			}
 		}
 	}
@@ -521,6 +544,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 			us()["position"].set(x, yBeg);
 			drawArrow((mine ? -1 : arrow_i), (mine ? m_mine : m_arrows));
 		}
+		us()["hitAnim"].set(0.0f);
 	}
 
 	// Draw a text telling how well we hit
