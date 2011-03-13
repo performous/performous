@@ -524,16 +524,19 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	}
 
 	// Draw a text telling how well we hit
+	double alpha = 1.0 - glow;
 	if (!mine && note.isHit) {
 		std::string text;
 		if (note.releaseTime <= 0.0 && tBeg < tEnd) { // Is being held down and is a hold note
 			text = "HOLD";
-			glow = 1.0;
+			alpha = glow = 1.0;
 		} else if (glow > 0.0) { // Released already, display rank
 			text = note.score ? getRank(note.error) : "FAIL!";
 		}
 		if (!text.empty()) {
-			double sc = getScale() * 1.2 * arrowSize * (1.0 + glow);
+			double sc = getScale() * 0.6 * arrowSize * (3.0 + glow);
+			Transform trans(glmath::translate(glmath::vec3(0.0, 0.0, 0.5 * glow))); // Slightly elevated
+			ColorTrans c(Color(1.0, 1.0, 1.0, std::sqrt(alpha)));
 			m_popupText->render(text);
 			m_popupText->dimensions().middle(x).center(time2y(0.0)).stretch(sc, sc/2.0);
 			m_popupText->draw();
