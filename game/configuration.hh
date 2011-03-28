@@ -51,6 +51,7 @@ class ConfigItem {
 	Value m_value; ///< The current value
 	Value m_factoryDefaultValue; ///< The value from config schema
 	Value m_defaultValue; ///< The value from config schema or system config
+	std::vector<std::string> m_enums; ///< Enum value titles
 	boost::variant<int, double> m_step, m_min, m_max;
 	boost::variant<int, double> m_multiplier;
 	std::string m_unit;
