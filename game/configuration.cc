@@ -97,7 +97,11 @@ namespace {
 }
 
 std::string ConfigItem::getValue() const {
-	if (m_type == "int") return numericFormat<int>(m_value, m_multiplier, m_step) + m_unit;
+	if (m_type == "int") {
+		int val = boost::get<int>(m_value);
+		if (val >= 0 && val < m_enums.size()) return m_enums[val];
+		return numericFormat<int>(m_value, m_multiplier, m_step) + m_unit;
+	}
 	if (m_type == "float") return numericFormat<double>(m_value, m_multiplier, m_step) + m_unit;
 	if (m_type == "bool") return boost::get<bool>(m_value) ? _("Enabled") : _("Disabled");
 	if (m_type == "string") return boost::get<std::string>(m_value);
@@ -131,12 +135,12 @@ namespace {
 	}
 
 	template <typename T, typename V> void setLimits(xmlpp::Element& e, V& min, V& max, V& step) {
-		std::string value = getAttribute(e, "min");
-		if (!value.empty()) min = boost::lexical_cast<T>(value);
-		value = getAttribute(e, "max");
-		if (!value.empty()) max = boost::lexical_cast<T>(value);
-		value = getAttribute(e, "step");
-		if (!value.empty()) step = boost::lexical_cast<T>(value);
+		xmlpp::Attribute* a = e.get_attribute("min");
+		if (a) min = boost::lexical_cast<T>(a->get_value());
+		a = e.get_attribute("max");
+		if (a) max = boost::lexical_cast<T>(a->get_value());
+		a = e.get_attribute("step");
+		if (a) step = boost::lexical_cast<T>(a->get_value());
 	}
 }
 
@@ -162,10 +166,14 @@ template <typename T> void ConfigItem::updateNumeric(xmlpp::Element& elem, int m
 	}
 }
 
-void ConfigItem::update(xmlpp::Element& elem, int mode) {
+
+void ConfigItem::update(xmlpp::Element& elem, int mode) try {
 	if (mode == 0) {
 		m_type = getAttribute(elem, "type");
 		if (m_type.empty()) throw std::runtime_error("Entry type attribute is missing");
+	} else {
+		std::string type = getAttribute(elem, "type");
+		if (!type.empty() && type != m_type) throw std::runtime_error("Entry type mismatch: " + getAttribute(elem, "name") + ": schema type = " + m_type + ", config type = " + type);
 	}
 	if (m_type == "bool") {
 		std::string value_string = getAttribute(elem, "value");
@@ -177,6 +185,19 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) {
 	} else if (m_type == "int") {
 		std::string value_string = getAttribute(elem, "value");
 		if (!value_string.empty()) m_value = boost::lexical_cast<int>(value_string);
+		// Enum handling
+		if (mode == 0) {
+			xmlpp::NodeSet n2 = elem.find("limits/enum");
+			if (!n2.empty()) {
+				for (xmlpp::NodeSet::const_iterator it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
+					xmlpp::Element& elem2 = dynamic_cast<xmlpp::Element&>(**it2);
+					m_enums.push_back(elem2.get_child_text()->get_content());
+				}
+				m_min = 0;
+				m_max = int(m_enums.size() - 1);
+				m_step = 1;
+			}
+		}
 		updateNumeric<int>(elem, mode);
 	} else if (m_type == "float") {
 		std::string value_string = getAttribute(elem, "value");
@@ -200,8 +221,7 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) {
 			value.push_back(elem2.get_content());
 		}
 		m_value = value;
-	}
-
+	} else if (!m_type.empty()) throw std::runtime_error("Invalid value type in config schema: " + m_type);
 	{
 		// Update short description
 		xmlpp::NodeSet n2 = elem.find("locale/short/text()");
@@ -220,6 +240,9 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) {
 	}
 	if (mode < 1) m_factoryDefaultValue = m_defaultValue = m_value;
 	if (mode < 2) m_defaultValue = m_value;
+} catch (std::exception& e) {
+	int line = elem.get_line();
+	throw std::runtime_error(boost::lexical_cast<std::string>(line) + ": Error while reading entry: " + e.what());
 }
 
 fs::path systemConfFile = "/etc/xdg/performous/config.xml";
@@ -334,6 +357,8 @@ void readConfigXML(fs::path const& file, int mode) {
 		int line = e.elem.get_line();
 		std::string name = e.elem.get_name();
 		throw std::runtime_error(file.string() + ":" + boost::lexical_cast<std::string>(line) + " element " + name + " " + e.message);
+	} catch (std::exception& e) {
+		throw std::runtime_error(file.string() + ":" + e.what());
 	}
 }
 
