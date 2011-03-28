@@ -94,6 +94,16 @@ namespace {
 	}
 
 	fs::path origin;  // The primary shared data folder
+	
+	std::string getText(xmlpp::Element const& elem) {
+		return elem.get_child_text()->get_content();
+	}
+	
+	std::string getText(xmlpp::Element const& elem, std::string const& path) {
+		xmlpp::NodeSet ns = elem.find(path);
+		if (ns.empty()) return std::string();
+		return getText(dynamic_cast<xmlpp::Element const&>(*ns[0]));
+	}
 }
 
 std::string ConfigItem::getValue() const {
@@ -124,16 +134,6 @@ namespace {
 		if (!a) throw XMLError(elem, "attribute " + attr + " not found");
 		return a->get_value();
 	}
-	std::string getLocaleText(xmlpp::Element& elem, std::string const& name) {
-		std::string str;
-		xmlpp::NodeSet n = elem.find("locale/" + name + "/text()"); // TODO: could pick specific locale
-		for (xmlpp::NodeSet::const_iterator it = n.begin(), end = n.end(); it != end; ++it) {
-			xmlpp::TextNode& elem2 = dynamic_cast<xmlpp::TextNode&>(**it);
-			str = elem2.get_content();
-		}
-		return str;
-	}
-
 	template <typename T, typename V> void setLimits(xmlpp::Element& e, V& min, V& max, V& step) {
 		xmlpp::Attribute* a = e.get_attribute("min");
 		if (a) min = boost::lexical_cast<T>(a->get_value());
@@ -224,7 +224,7 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) try {
 	} else if (!m_type.empty()) throw std::runtime_error("Invalid value type in config schema: " + m_type);
 	{
 		// Update short description
-		xmlpp::NodeSet n2 = elem.find("locale/short/text()");
+		xmlpp::NodeSet n2 = elem.find("short/text()");
 		for (xmlpp::NodeSet::const_iterator it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
 			xmlpp::TextNode& elem2 = dynamic_cast<xmlpp::TextNode&>(**it2);
 			m_shortDesc = elem2.get_content();
@@ -232,7 +232,7 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) try {
 	}
 	{
 		// Update long description
-		xmlpp::NodeSet n2 = elem.find("locale/long/text()");
+		xmlpp::NodeSet n2 = elem.find("long/text()");
 		for (xmlpp::NodeSet::const_iterator it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
 			xmlpp::TextNode& elem2 = dynamic_cast<xmlpp::TextNode&>(**it2);
 			m_longDesc = elem2.get_content();
@@ -309,8 +309,8 @@ void readMenuXML(xmlpp::Node* node) {
 	xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(*node);
 	MenuEntry me;
 	me.name = getAttribute(elem, "name");
-	me.shortDesc = getLocaleText(elem, "short");
-	me.longDesc = getLocaleText(elem, "long");
+	me.shortDesc = getText(elem, "short");
+	me.longDesc = getText(elem, "long");
 	configMenu.push_back(me);
 }
 
