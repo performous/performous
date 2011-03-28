@@ -171,6 +171,9 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) try {
 	if (mode == 0) {
 		m_type = getAttribute(elem, "type");
 		if (m_type.empty()) throw std::runtime_error("Entry type attribute is missing");
+		// Menu text
+		m_shortDesc = getText(elem, "short");
+		m_longDesc = getText(elem, "long");
 	} else {
 		std::string type = getAttribute(elem, "type");
 		if (!type.empty() && type != m_type) throw std::runtime_error("Entry type mismatch: " + getAttribute(elem, "name") + ": schema type = " + m_type + ", config type = " + type);
@@ -191,7 +194,7 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) try {
 			if (!n2.empty()) {
 				for (xmlpp::NodeSet::const_iterator it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
 					xmlpp::Element& elem2 = dynamic_cast<xmlpp::Element&>(**it2);
-					m_enums.push_back(elem2.get_child_text()->get_content());
+					m_enums.push_back(getText(elem2));
 				}
 				m_min = 0;
 				m_max = int(m_enums.size() - 1);
@@ -204,40 +207,17 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) try {
 		if (!value_string.empty()) m_value = boost::lexical_cast<double>(value_string);
 		updateNumeric<double>(elem, mode);
 	} else if (m_type == "string") {
-		xmlpp::NodeSet n2 = elem.find("stringvalue/text()");
-		// FIXME: WTF does this loop do? Does find actually return many elements and why?
-		std::string value;
-		for (xmlpp::NodeSet::const_iterator it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
-			xmlpp::TextNode& elem2 = dynamic_cast<xmlpp::TextNode&>(**it2);
-			value = elem2.get_content();
-		}
-		m_value = value;
+		m_value = getText(elem, "stringvalue");
 	} else if (m_type == "string_list" || m_type == "option_list") {
 		//TODO: Option list should also update selection (from attribute?)
 		std::vector<std::string> value;
-		xmlpp::NodeSet n2 = elem.find("stringvalue/text()");
+		xmlpp::NodeSet n2 = elem.find("stringvalue");
 		for (xmlpp::NodeSet::const_iterator it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
-			xmlpp::TextNode& elem2 = dynamic_cast<xmlpp::TextNode&>(**it2);
-			value.push_back(elem2.get_content());
+			value.push_back(getText(dynamic_cast<xmlpp::Element const&>(**it2)));
 		}
 		m_value = value;
 	} else if (!m_type.empty()) throw std::runtime_error("Invalid value type in config schema: " + m_type);
-	{
-		// Update short description
-		xmlpp::NodeSet n2 = elem.find("short/text()");
-		for (xmlpp::NodeSet::const_iterator it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
-			xmlpp::TextNode& elem2 = dynamic_cast<xmlpp::TextNode&>(**it2);
-			m_shortDesc = elem2.get_content();
-		}
-	}
-	{
-		// Update long description
-		xmlpp::NodeSet n2 = elem.find("long/text()");
-		for (xmlpp::NodeSet::const_iterator it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
-			xmlpp::TextNode& elem2 = dynamic_cast<xmlpp::TextNode&>(**it2);
-			m_longDesc = elem2.get_content();
-		}
-	}
+	// Schema sets all defaults, system config sets the system default
 	if (mode < 1) m_factoryDefaultValue = m_defaultValue = m_value;
 	if (mode < 2) m_defaultValue = m_value;
 } catch (std::exception& e) {
