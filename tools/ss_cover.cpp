@@ -88,7 +88,12 @@ SingstarCover::SingstarCover(const std::string pak_file, unsigned int track_id) 
 	std::string tmp( buf.begin(), buf.end() );
 	dom.parse_memory(tmp);
 	xmlpp::NodeSet n = dom.get_document()->get_root_node()->find(xpath, nsmap);
-	if (n.empty()) throw std::runtime_error("Unable to find cover informations");
+	if (n.empty()) {
+		std::string xpath_old = std::string("/TPAGE_BIT_SET/TPAGE_BIT[@NAME='") + id + "']";
+		n = dom.get_document()->get_root_node()->find(xpath_old, nsmap);
+		if (n.empty())
+			throw std::runtime_error("Unable to find cover informations");
+	}
 	xmlpp::Element& e = dynamic_cast<xmlpp::Element&>(*n[0]);
 	m_u = boost::lexical_cast<unsigned int>(e.get_attribute("U")->get_value());
 	m_v = boost::lexical_cast<unsigned int>(e.get_attribute("V")->get_value());
