@@ -36,9 +36,10 @@ std::string dvdPath;
 std::ofstream txtfile;
 int ts = 0;
 int sleepts = -1;
-const bool video = true;
-const bool mkvcompress = false;
-const bool oggcompress = true;
+bool g_video = true;
+bool g_audio = true;
+bool g_mkvcompress = true;
+bool g_oggcompress = true;
 
 void parseNote(xmlpp::Node* node) {
 	xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(*node);
@@ -157,11 +158,13 @@ struct Process {
 			remove = path;
 			dom.get_document()->write_to_file((path / "notes.xml").string(), "UTF-8");
 			Pak dataPak(song.dataPakName);
-			std::cerr << ">>> Extracting and decoding music" << std::endl;
-			try {
-				music(song, dataPak[id + "/music.mib"], pak["export/" + id + "/music.mih"], path);
-			} catch (...) {
-				music_us(song, dataPak[id + "/mus+vid.iav"], dataPak[id + "/mus+vid.ind"], path);
+			if (g_audio) {
+				std::cerr << ">>> Extracting and decoding music" << std::endl;
+				try {
+					music(song, dataPak[id + "/music.mib"], pak["export/" + id + "/music.mih"], path);
+				} catch (...) {
+					music_us(song, dataPak[id + "/mus+vid.iav"], dataPak[id + "/mus+vid.ind"], path);
+				}
 			}
 			std::cerr << ">>> Extracting cover image" << std::endl;
 			try {
@@ -171,7 +174,7 @@ struct Process {
 			} catch (...) {}
 			remove = "";
 			// FIXME: use some library (preferrably ffmpeg):
-			if (oggcompress) {
+			if (g_oggcompress) {
 				if( !song.music.empty() ) {
 					std::cerr << ">>> Compressing audio into music.ogg" << std::endl;
 					std::string cmd = "oggenc \"" + song.music.string() + "\"";
@@ -191,7 +194,7 @@ struct Process {
 					}
 				}
 			}
-			if (video) {
+			if (g_video) {
 				std::cerr << ">>> Extracting video" << std::endl;
 				try {
 					std::vector<char> ipudata;
@@ -208,7 +211,7 @@ struct Process {
 						song.video = "";
 					}
 				}
-				if (mkvcompress) {
+				if (g_mkvcompress) {
 					std::cerr << ">>> Compressing video and audio into music.mkv" << std::endl;
 					std::string cmd = "ffmpeg -i \"" + (path / "video.mpg").string() + "\" -vcodec libx264 -vpre hq -crf 25 -threads 0 -metadata album=\"" + song.edition + "\" -metadata author=\"" + song.artist + "\" -metadata comment=\"" + song.genre + "\" -metadata title=\"" + song.title + "\" \"" + (path / "video.m4v\"").string();
 					std::cerr << cmd << std::endl;
@@ -365,7 +368,34 @@ int main( int argc, char **argv) {
 		po::store(po::command_line_parser(argc, argv).options(opt).positional(pos).run(), vm);
 		po::notify(vm);
 		if (dvdPath.empty()) throw std::runtime_error("No Singstar DVD path specified. Enter a path to a folder with pack_ee.pak in it.");
-		// TODO: process audio and video options and throw if they have incorrect values
+		// Process video flag
+		if (video == "none") {
+			g_video = false;
+			g_mkvcompress = false;
+		} else if (video == "mkv") {
+			g_video = true;
+			g_mkvcompress = true;
+		} else if (video == "mpeg2") {
+			g_video = true;
+			g_mkvcompress = false;
+		} else {
+			throw std::runtime_error("Invalid video flag. Value must be {none, mkv, mpeg2}");
+		}
+		std::cerr << ">>> Using video flag: \"" << video << "\"" << std::endl;
+		// Process audio flag
+		if (audio == "none") {
+			g_audio = false;
+			g_oggcompress = false;
+		} else if (audio == "ogg") {
+			g_audio = true;
+			g_oggcompress = true;
+		} else if (audio == "wav") {
+			g_audio = true;
+			g_oggcompress = false;
+		} else {
+			throw std::runtime_error("Invalid audio flag. Value must be {none, ogg, wav}");
+		}
+		std::cerr << ">>> Using audio flag: \"" << audio << "\"" << std::endl;
 	} catch (std::exception& e) {
 		std::cout << cmdline << std::endl;
 		std::cout << "ERROR: " << e.what() << std::endl;
