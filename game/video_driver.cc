@@ -77,6 +77,8 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 
 	if (!GLEW_VERSION_2_1) throw std::runtime_error("OpenGL 2.1 is required but not available");
 
+	if (!GLEW_ARB_viewport_array && config["graphic/stereo3d"].b()) throw std::runtime_error("OpenGL extension ARB_viewport_array is required but not available when using stereo mode");
+
 	input::SDL::init(); // Joysticks etc.
 
 	if (GLEW_VERSION_3_3) {
