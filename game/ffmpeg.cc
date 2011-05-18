@@ -280,11 +280,12 @@ void FFmpeg::decodeNextFrame() {
 				std::vector<int16_t> resampled(AVCODEC_MAX_AUDIO_FRAME_SIZE);
 				int frames = audio_resample(pResampleCtx, &resampled[0], audioFrames, outsize);
 				resampled.resize(frames * AUDIO_CHANNELS);
-				// Calculate new positions
+				// Use timecode from packet if available
 				if (packet.time() == packet.time()) m_position = packet.time();
-				else m_position += double(resampled.size())/double(audioQueue.getSamplesPerSecond());
 				// Push to output queue (may block)
 				audioQueue.push(resampled, m_position);
+				// Increment current time
+				m_position += double(resampled.size())/double(audioQueue.getSamplesPerSecond());
 			}
 			// Audio frames are always finished
 			frameFinished = 1;
