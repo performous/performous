@@ -67,8 +67,13 @@ void Songs::reload_internal(fs::path const& parent) {
 		for (fs::directory_iterator dirIt(parent), dirEnd; m_loading && dirIt != dirEnd; ++dirIt) {
 			fs::path p = dirIt->path();
 			if (fs::is_directory(p)) { reload_internal(p); continue; }
+#if BOOST_FILESYSTEM_VERSION < 3
 			std::string name = p.leaf(); // File basename (notes.txt)
 			std::string path = p.directory_string(); // Path without filename
+#else
+			std::string name = p.filename().string(); // File basename (notes.txt)
+			std::string path = p.string(); // Path without filename
+#endif
 			path.erase(path.size() - name.size());
 			if (!regex_match(name.c_str(), match, expression)) continue;
 			try {
