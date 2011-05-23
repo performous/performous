@@ -71,7 +71,11 @@ namespace filemagic {
 		// For now, just check the extension an assume it's not lying.
 
 		// Get file extension in lower case
+#if BOOST_FILESYSTEM_VERSION < 3
 		std::string ext = filename.extension();
+#else
+		std::string ext = filename.extension().string();
+#endif
 		// somehow this does not convert the extension to lower case:
 		//std::for_each(ext.begin(), ext.end(), static_cast<int(*)(int)>(std::tolower));
 		std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower );

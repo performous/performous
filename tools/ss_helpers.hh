@@ -10,7 +10,11 @@ extern "C" void xmlLogger(void* logger, char const* msg, ...) { if (logger) *(st
 void enableXMLLogger(std::ostream& os = std::cerr) { xmlSetGenericErrorFunc(&os, xmlLogger); }
 void disableXMLLogger() { xmlSetGenericErrorFunc(NULL, xmlLogger); }
 
+#if BOOST_FILESYSTEM_VERSION < 3
 std::string filename(boost::filesystem::path const& p) { return *--p.end(); }
+#else
+std::string filename(boost::filesystem::path const& p) { return p.filename().string(); }
+#endif
 
 /** Fix Singstar's b0rked XML **/
 std::string xmlFix(std::vector<char> const& data) {
