@@ -289,7 +289,6 @@ void Window::screenshot() {
 
 
 void Window::resize() {
-	glutil::GLErrorChecker glerror("Window::resize");
 	unsigned width = m_fullscreen ? m_fsW : m_windowW;
 	unsigned height = m_fullscreen ? m_fsH : m_windowH;
 	{ // Setup GL attributes for context creation
