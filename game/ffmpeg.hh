@@ -162,7 +162,7 @@ class AudioBuffer {
 	void setDuration(double seconds) { m_duration = seconds; }
 	bool wantSeek() {
 		size_t oldest = m_pos - m_data.size();
-		return m_posReq + int64_t(m_sps) * 2.0 /* seconds tolerance */ < int64_t(oldest);
+		return oldest > 0 && m_posReq < int64_t(oldest);
 	}
   private:
 	bool wantMore() { return int64_t(m_pos) - int64_t(m_data.capacity() / 2) < m_posReq; }
