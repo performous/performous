@@ -9,11 +9,11 @@ uniform mat4 colorMatrix;
 in float bogus;  // Workaround for http://www.nvnews.net/vbulletin/showthread.php?p=2401097
 #endif
 
-in vec3 normal;
-in vec4 color;
+varying vec3 normal;
+varying vec4 color;
 
 #ifdef ENABLE_TEXTURING
-in vec4 texCoord;
+varying vec4 texCoord;
 #if ENABLE_TEXTURING == 1
 uniform sampler2DRect tex;
 #define TEXFUNC texture2DRect(tex, texCoord.st)

@@ -5,10 +5,10 @@
 uniform mat4 positionMatrix;
 uniform mat3 normalMatrix;
 
-in vec4 vertPos;
-in vec4 vertTexCoord;
-in vec3 vertNormal;
-in vec4 vertColor;
+attribute vec4 vertPos;
+attribute vec4 vertTexCoord;
+attribute vec3 vertNormal;
+attribute vec4 vertColor;
 
 varying vec4 texCoord;
 varying vec4 vTexCoord;
