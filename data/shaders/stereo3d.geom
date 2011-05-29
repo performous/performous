@@ -26,7 +26,7 @@ void passthru() {
 }
 
 // Process all the vertices, applying code to them before emitting (do-while to convince Nvidia of the code getting executed)
-#define PROCESS(code) i = 0; do { passthru(); code; EmitVertex(); } while (++i < gl_in.length()); EndPrimitive();
+#define PROCESS(code) i = 0; do { passthru(); code; EmitVertex(); } while (++i < gl_in.length); EndPrimitive();
 
 void main() {
 	bogus = 0.0;
