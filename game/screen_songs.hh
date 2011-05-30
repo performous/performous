@@ -30,6 +30,7 @@ public:
 	ScreenSongs(std::string const& name, Audio& audio, Songs& songs, Database& database);
 	void enter();
 	void exit();
+	void reloadGL();
 	void manageSharedKey(input::NavButton nav); ///< same behaviour for jukebox and normal mode
 	void manageEvent(SDL_Event event);
 	void draw();

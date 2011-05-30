@@ -21,6 +21,15 @@ ScreenSongs::ScreenSongs(std::string const& name, Audio& audio, Songs& songs, Da
 }
 
 void ScreenSongs::enter() {
+	m_songs.setFilter(m_search.text);
+	m_audio.fadeout();
+	m_jukebox = false;
+	show_hiscores = false;
+	hiscore_start_pos = 0;
+	reloadGL();
+}
+
+void ScreenSongs::reloadGL() {
 	theme.reset(new ThemeSongs());
 	m_songbg_default.reset(new Surface(getThemePath("songs_bg_default.svg")));
 	m_songbg_ground.reset(new Surface(getThemePath("songs_bg_ground.svg")));
@@ -29,11 +38,6 @@ void ScreenSongs::enter() {
 	m_bandCover.reset(new Surface(getThemePath("band_cover.svg")));
 	m_danceCover.reset(new Surface(getThemePath("dance_cover.svg")));
 	m_instrumentList.reset(new Texture(getThemePath("instruments.svg")));
-	m_songs.setFilter(m_search.text);
-	m_audio.fadeout();
-	m_jukebox = false;
-	show_hiscores = false;
-	hiscore_start_pos = 0;
 }
 
 void ScreenSongs::exit() {

@@ -18,7 +18,6 @@ void ScreenIntro::enter() {
 	m_audio.playMusic(getThemePath("menu.ogg"), true);
 	m_selAnim = AnimValue(0.0, 10.0);
 	m_submenuAnim = AnimValue(0.0, 3.0);
-	theme.reset(new ThemeIntro());
 	populateMenu();
 	if( m_first ) {
 		std::string msg;
@@ -26,6 +25,11 @@ void ScreenIntro::enter() {
 		if (!msg.empty()) ScreenManager::getSingletonPtr()->dialog(msg + _("\nPlease configure some before playing."));
 		m_first = false;
 	}
+	reloadGL();
+}
+
+void ScreenIntro::reloadGL() {
+	theme.reset(new ThemeIntro());
 }
 
 void ScreenIntro::exit() {
