@@ -109,8 +109,7 @@ static void checkEvents_SDL(ScreenManager& sm) {
 	}
 	if (config["graphic/fullscreen"].b() != sm.window().getFullscreen()) {
 		sm.window().setFullscreen(config["graphic/fullscreen"].b());
-		// Reloading the screen seems to counter window going white on Windows and possibly OSX
-		sm.activateScreen(sm.getCurrentScreen()->getName());
+		sm.reloadGL();
 	}
 }
 

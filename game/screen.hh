@@ -25,6 +25,8 @@ class Screen {
 	virtual void enter() = 0;
 	/// exits screen
 	virtual void exit() = 0;
+	/// reloads OpenGL textures but avoids restarting music etc.
+	virtual void reloadGL() { exit(); enter(); }
 	/// returns screen name
 	std::string getName() const { return m_name; }
 
@@ -49,6 +51,8 @@ class ScreenManager: public Singleton <ScreenManager> {
 	void updateScreen();
 	/// Draws the current screen and possible transition effects
 	void drawScreen();
+	/// Reload OpenGL resources (after fullscreen toggle etc)
+	void reloadGL() { if (currentScreen) currentScreen->reloadGL(); }
 	/// Returns pointer to current Screen
 	Screen* getCurrentScreen() { return currentScreen; };
 	/// Returns pointer to Screen for given name
