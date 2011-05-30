@@ -51,7 +51,7 @@ namespace {
 unsigned int screenW() { return s_width; }
 unsigned int screenH() { return s_height; }
 
-Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(width), m_windowH(height), m_fullscreen(fs) {
+Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(width), m_windowH(height), m_fullscreen(fs), screen() {
 	std::atexit(SDL_Quit);
 	if( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK) == -1 ) throw std::runtime_error("SDL_Init failed");
 	SDL_WM_SetCaption(PACKAGE " " VERSION, PACKAGE);
@@ -263,30 +263,10 @@ void Window::swap() {
 }
 
 void Window::setFullscreen(bool _fs) {
+	if (m_fullscreen == _fs) return;
 	m_fullscreen = _fs;
 	resize();
 }
-
-bool Window::getFullscreen() const {
-	return m_fullscreen;
-}
-
-void Window::screenshot() {
-	Image img;
-	img.w = m_fullscreen ? m_fsW : m_windowW;
-	img.h = m_fullscreen ? m_fsH : m_windowH;
-	img.data.resize(((img.w + 3) & ~3) * img.h * 3);
-	img.format = pix::RGB;
-	img.reverse = true;
-	// Get pixel data from OpenGL
-	glReadPixels(0, 0, img.w, img.h, GL_RGB, GL_UNSIGNED_BYTE, &img.data[0]);
-	// Compose filename from timestamp
-	fs::path filename = getHomeDir() / ("Performous_" + to_iso_string(boost::posix_time::second_clock::local_time()) + ".png");
-	// Save to disk
-	writePNG(filename.string(), img);
-	std::clog << "video/info: Screenshot taken: " << filename << " (" << img.w << "x" << img.h << ")" << std::endl;
-}
-
 
 void Window::resize() {
 	unsigned width = m_fullscreen ? m_fsW : m_windowW;
@@ -304,7 +284,8 @@ void Window::resize() {
 		GLattrSetter attr_ag(SDL_GL_ACCUM_GREEN_SIZE, 0);
 		GLattrSetter attr_ab(SDL_GL_ACCUM_BLUE_SIZE, 0);
 		GLattrSetter attr_aa(SDL_GL_ACCUM_ALPHA_SIZE, 0);
-		screen = SDL_SetVideoMode(width, height, 0, SDL_OPENGL | SDL_RESIZABLE | (m_fullscreen ? SDL_FULLSCREEN : 0));
+		SDL_FreeSurface(screen);
+		screen = SDL_SetVideoMode(width, height, 0, SDL_OPENGL | (m_fullscreen ? SDL_FULLSCREEN : SDL_RESIZABLE));
 		if (!screen) throw std::runtime_error(std::string("SDL_SetVideoMode failed: ") + SDL_GetError());
 	}
 	s_width = screen->w;
@@ -313,8 +294,25 @@ void Window::resize() {
 		config["graphic/window_width"].i() = s_width;
 		config["graphic/window_height"].i() = s_height;
 	}
+	// Enforce aspect ratio limits
 	if (s_height < 0.56f * s_width) s_width = round(s_height / 0.56f);
 	if (s_height > 0.8f * s_width) s_height = round(0.8f * s_width);
+}
+
+void Window::screenshot() {
+	Image img;
+	img.w = m_fullscreen ? m_fsW : m_windowW;
+	img.h = m_fullscreen ? m_fsH : m_windowH;
+	img.data.resize(((img.w + 3) & ~3) * img.h * 3);
+	img.format = pix::RGB;
+	img.reverse = true;
+	// Get pixel data from OpenGL
+	glReadPixels(0, 0, img.w, img.h, GL_RGB, GL_UNSIGNED_BYTE, &img.data[0]);
+	// Compose filename from timestamp
+	fs::path filename = getHomeDir() / ("Performous_" + to_iso_string(boost::posix_time::second_clock::local_time()) + ".png");
+	// Save to disk
+	writePNG(filename.string(), img);
+	std::clog << "video/info: Screenshot taken: " << filename << " (" << img.w << "x" << img.h << ")" << std::endl;
 }
 
 ViewTrans::ViewTrans(double offsetX, double offsetY, double frac): m_old(g_projection) {

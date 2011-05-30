@@ -53,22 +53,22 @@ public:
 	void blank();
 	/// swaps buffers
 	void swap();
-	/// resizes window to given dimensions
+	/// Handler for SDL_VIDEORESIZE event (window resized by the user)
 	/** @param width the new width
 	 * @param height the new height
 	 */
 	void resize(unsigned width, unsigned height) {
-		if (!m_fullscreen) { m_windowW = width; m_windowH = height; }
+		if (m_fullscreen) return;  // Ignore window resize events when in fullscreen (gives bogus size on Gnome 3 and others).
+		m_windowW = width; m_windowH = height;
 		resize();
 	}
-	/// does the resizing
+	/// Resize window (contents) / toggle full screen according to m_fullscreen
 	void resize();
 	/// sets fullscreen
 	/** @param _fs true for fullscreen
 	 */
 	void setFullscreen(bool _fs);
-	/// gets fullscreen state
-	bool getFullscreen() const;
+	bool getFullscreen() const { return m_fullscreen; }
 	/// take a screenshot
 	void screenshot();
 
