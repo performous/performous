@@ -54,6 +54,7 @@ void ScreenSing::enter() {
 		m_video.reset(new Video(m_song->path + m_song->video, m_song->videoGap));
 	}
 	boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
+	reloadGL();
 	m_layout_singer.reset(new LayoutSinger(m_song->getVocalTrack(m_selectedTrack), m_database, theme));
 	// Load instrument and dance tracks
 	sm->loading(_("Loading instruments..."), 0.8);
@@ -110,7 +111,6 @@ void ScreenSing::enter() {
 	if (m_song->b0rkedTracks) ScreenManager::getSingletonPtr()->dialog(_("Song contains broken tracks!"));
 	sm->showLogo(false);
 	sm->loading(_("Loading graphics..."), 0.9);
-	reloadGL();
 	sm->loading(_("Loading complete"), 1.0);
 }
 
