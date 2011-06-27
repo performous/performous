@@ -26,12 +26,12 @@ void passthru() {
 }
 
 // Process all the vertices, applying code to them before emitting (do-while to convince Nvidia of the code getting executed)
-#define PROCESS(code) i = 0; do { passthru(); code; EmitVertex(); } while (++i < gl_in.length); EndPrimitive();
+#define PROCESS(code) i = 0; do { passthru(); code; EmitVertex(); } while (++i < 3); EndPrimitive();
 
 void main() {
 	bogus = 0.0;
 	if (sepFactor == 0.0) {
-		gl_ViewportIndex = 0; PROCESS(); // No stereo
+		gl_ViewportIndex = 0; PROCESS(;); // No stereo
 	} else {
 		gl_ViewportIndex = 1; PROCESS(gl_Position.x -= sepFactor * (gl_Position.z - z0));  // Left eye
 		gl_ViewportIndex = 2; PROCESS(gl_Position.x += sepFactor * (gl_Position.z - z0));  // Right eye
