@@ -31,9 +31,6 @@ namespace {
 
 void ScreenSing::enter() {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
-	sm->loading(_("Loading theme..."), 0.0);
-	theme.reset(new ThemeSing());
-	m_menuTheme.reset(new ThemeInstrumentMenu());
 	sm->loading(_("Loading song..."), 0.3);
 	// Load the rest of the song
 	if (m_song->loadStatus != Song::FULL) {
@@ -42,18 +39,6 @@ void ScreenSing::enter() {
 			std::cout << e.what() << std::endl;
 			sm->flashMessage(_("Song is broken!"));
 			sm->activateScreen("Songs");
-		}
-	}
-	// Load background
-	sm->loading(_("Loading background..."), 0.4);
-	bool foundbg = false;
-	if (!m_song->background.empty()) { // Load bg image
-		try {
-			m_background.reset(new Surface(m_song->path + m_song->background));
-			foundbg = true;
-		} catch (std::exception& e) {
-			m_song->background = "";
-			std::cerr << e.what() << std::endl;
 		}
 	}
 	// Initialize webcam
@@ -68,26 +53,8 @@ void ScreenSing::enter() {
 	if (!m_song->video.empty() && config["graphic/video"].b()) {
 		m_video.reset(new Video(m_song->path + m_song->video, m_song->videoGap));
 	}
-	// Use random bg if specified fails (also for tracks with video)
-	if (!foundbg) {
-		sm->loading(_("Random background..."), 0.65);
-		for (int i = 1; i <= 2; ++i) { // Try two times in case first is b0rked
-			try {
-				std::string bgpath = m_backgrounds.getRandom();
-				m_background.reset(new Surface(bgpath));
-				break;
-			} catch (std::exception& e) {
-				std::cerr << e.what() << std::endl;
-			}
-		}
-	}
-	sm->loading(_("Loading user interface..."), 0.7);
-	m_pause_icon.reset(new Surface(getThemePath("sing_pause.svg")));
-	m_help.reset(new Surface(getThemePath("instrumenthelp.svg")));
-	m_progress.reset(new ProgressBar(getThemePath("sing_progressbg.svg"), getThemePath("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01f, 0.01f, true));
-	m_progress->dimensions.fixedWidth(0.4).left(-0.5).screenTop();
-	theme->timer.dimensions.screenTop(0.5 * m_progress->dimensions.h());
 	boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
+	reloadGL();
 	m_layout_singer.reset(new LayoutSinger(m_song->getVocalTrack(m_selectedTrack), m_database, theme));
 	// Load instrument and dance tracks
 	sm->loading(_("Loading instruments..."), 0.8);
@@ -140,11 +107,65 @@ void ScreenSing::enter() {
 	sm->loading(_("Finalizing..."), 0.95);
 	m_audio.playMusic(m_song->music, false, 0.0, setup_delay);
 	m_engine.reset(new Engine(m_audio, m_song->getVocalTrack(m_selectedTrack), analyzers.begin(), analyzers.end(), m_database));
-	sm->loading(_("Loading complete"), 1.0);
 	// Notify about broken tracks
 	if (m_song->b0rkedTracks) ScreenManager::getSingletonPtr()->dialog(_("Song contains broken tracks!"));
 	sm->showLogo(false);
+	sm->loading(_("Loading graphics..."), 0.9);
+	sm->loading(_("Loading complete"), 1.0);
 }
+
+void ScreenSing::reloadGL() {
+	ScreenManager* sm = ScreenManager::getSingletonPtr();
+	// Load UI graphics
+	theme.reset(new ThemeSing());
+	m_menuTheme.reset(new ThemeInstrumentMenu());
+	m_pause_icon.reset(new Surface(getThemePath("sing_pause.svg")));
+	m_help.reset(new Surface(getThemePath("instrumenthelp.svg")));
+	m_progress.reset(new ProgressBar(getThemePath("sing_progressbg.svg"), getThemePath("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01f, 0.01f, true));
+	m_progress->dimensions.fixedWidth(0.4).left(-0.5).screenTop();
+	theme->timer.dimensions.screenTop(0.5 * m_progress->dimensions.h());
+	// Load background
+	bool foundbg = false;
+	if (!m_song->background.empty()) { // Load bg image
+		try {
+			m_background.reset(new Surface(m_song->path + m_song->background));
+			foundbg = true;
+		} catch (std::exception& e) {
+			m_song->background = "";
+			std::cerr << e.what() << std::endl;
+		}
+	}
+	// Use random bg if specified fails (also for tracks with video)
+	if (!foundbg) {
+		sm->loading(_("Random background..."), 0.65);
+		try {
+			std::string bgpath = m_backgrounds.getRandom();
+			m_background.reset(new Surface(bgpath));
+		} catch (std::exception& e) {
+			std::cerr << e.what() << std::endl;
+		}
+	}
+}
+
+void ScreenSing::exit() {
+	m_engine.reset();
+	m_score_window.reset();
+	m_menu.clear();
+	m_instruments.clear();
+	m_dancers.clear();
+	m_layout_singer.reset();
+	m_help.reset();
+	m_pause_icon.reset();
+	m_cam.reset();
+	m_video.reset();
+	m_background.reset();
+	m_song->dropNotes();
+	m_menuTheme.reset();
+	theme.reset();
+	if (m_audio.isPaused()) m_audio.togglePause();
+	ScreenManager::getSingletonPtr()->showLogo();
+}
+
 
 
 /// Manages the instrument drawing
@@ -236,25 +257,6 @@ void ScreenSing::danceLayout(double time) {
 		ColorTrans c(Color(1.0f, 1.0f, 1.0f, clamp(-1.0 - 2.0 * time)));
 		m_help->draw();
 	}
-}
-
-void ScreenSing::exit() {
-	m_engine.reset();
-	m_score_window.reset();
-	m_menu.clear();
-	m_instruments.clear();
-	m_dancers.clear();
-	m_layout_singer.reset();
-	m_help.reset();
-	m_pause_icon.reset();
-	m_cam.reset();
-	m_video.reset();
-	m_background.reset();
-	m_song->dropNotes();
-	m_menuTheme.reset();
-	theme.reset();
-	if (m_audio.isPaused()) m_audio.togglePause();
-	ScreenManager::getSingletonPtr()->showLogo();
 }
 
 void ScreenSing::activateNextScreen()

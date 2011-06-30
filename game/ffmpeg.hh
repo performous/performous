@@ -125,7 +125,7 @@ class AudioBuffer {
 	/// set samples per second
 	void setSamplesPerSecond(unsigned sps) { m_sps = sps; }
 	/// get samples per second
-	unsigned getSamplesPerSecond() { return m_sps; }
+	unsigned getSamplesPerSecond() const { return m_sps; }
 	void push(std::vector<int16_t> const& data, double timestamp) {
 		boost::mutex::scoped_lock l(m_mutex);
 		while (!condition()) m_cond.wait(l);
@@ -162,7 +162,7 @@ class AudioBuffer {
 	void setDuration(double seconds) { m_duration = seconds; }
 	bool wantSeek() {
 		size_t oldest = m_pos - m_data.size();
-		return m_posReq + int64_t(m_sps) * 2.0 /* seconds tolerance */ < int64_t(oldest);
+		return m_posReq > 0 && m_posReq + int64_t(m_sps) * 2.0 /* seconds tolerance */ < int64_t(oldest);
 	}
   private:
 	bool wantMore() { return int64_t(m_pos) - int64_t(m_data.capacity() / 2) < m_posReq; }

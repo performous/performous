@@ -128,7 +128,11 @@ std::string getThemePath(std::string const& filename) {
 
 bool isThemeResource(fs::path filename){
 	try {
+#if BOOST_FILESYSTEM_VERSION < 3
 		std::string themefile = getThemePath(filename.filename());
+#else
+		std::string themefile = getThemePath(filename.filename().string());
+#endif
 		return themefile == filename;
 	} catch (...) { return false; }
 }

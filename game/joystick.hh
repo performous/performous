@@ -113,13 +113,13 @@ namespace input {
 					m_pressed[i] = _event.pressed[i];
 				}
 			};
-			void clearEvents() {m_events.clear();};
-			void assign() {m_assigned = true;};
-			void unassign() {m_assigned = false; clearEvents();};
-			bool assigned() {return m_assigned;};
-			bool pressed(int _button) {return m_pressed[_button];};
-			std::string name() {return m_instrument.name;};
-			bool type_match(DevType _type) {
+			void clearEvents() { m_events.clear(); }
+			void assign() { m_assigned = true; }
+			void unassign() { m_assigned = false; clearEvents(); }
+			bool assigned() const { return m_assigned; }
+			bool pressed(int _button) const { return m_pressed[_button]; }
+			std::string name() const { return m_instrument.name; }
+			bool type_match(DevType _type) const {
 				return _type == m_instrument.type;
 			};
 			int buttonFromSDL(unsigned int sdl_button) {

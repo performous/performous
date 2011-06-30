@@ -53,6 +53,7 @@ class ScreenSing: public Screen {
 	{}
 	void enter();
 	void exit();
+	void reloadGL();
 	void manageEvent(SDL_Event event);
 	void draw();
 

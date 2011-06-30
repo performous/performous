@@ -756,6 +756,9 @@ bool input::SDL::pushEvent(SDL_Event _e) {
 			if(!dev.assigned()) return false;
 			if (dev.name() != "GUITAR_GUITARHERO_XPLORER" && (_e.jaxis.axis == 5 || _e.jaxis.axis == 6 || _e.jaxis.axis == 1)) {
 				event.type = input::Event::PICK;
+				for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
+					event.pressed[i] = dev.pressed(i);
+				}
 				// Direction
 				if(_e.jaxis.value > 0 ) {
 					// down

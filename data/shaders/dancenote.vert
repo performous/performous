@@ -8,10 +8,10 @@ uniform float clock;
 uniform float scale;
 uniform vec2 position;
 
-in vec4 vertPos;
-in vec4 vertTexCoord;
-in vec3 vertNormal;
-in vec4 vertColor;
+attribute vec4 vertPos;
+attribute vec4 vertTexCoord;
+attribute vec3 vertNormal;
+attribute vec4 vertColor;
 
 // Per-vextex for fragment shader (if no geometry shader)
 varying vec4 texCoord;

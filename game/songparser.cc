@@ -100,7 +100,11 @@ SongParser::SongParser(Song& s):
 
 		for (boost::filesystem::directory_iterator dirIt(s.path), dirEnd; dirIt != dirEnd; ++dirIt) {
 			boost::filesystem::path p = dirIt->path();
+#if BOOST_FILESYSTEM_VERSION < 3
 			std::string name = p.leaf(); // File basename
+#else
+			std::string name = p.filename().string(); // File basename
+#endif
 			if (m_song.cover.empty() && regex_match(name.c_str(), match, coverfile)) {
 				m_song.cover = name;
 			} else if (m_song.background.empty() && regex_match(name.c_str(), match, backgroundfile)) {

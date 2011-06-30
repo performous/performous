@@ -96,6 +96,14 @@
 			<button id="9" value="start" />
 		</mapping>
 	</controller>
+	<!-- Not managed
+	<controller type="guitar" name="GUITAR_PRO_PS3">
+		<description>Rock Band Pro Guitar for PS3</description>
+		<regexp match="Licensed by Sony Computer Entertainment America Harmonix RB3 Mustang Guitar for PlayStation" />
+		<mapping>
+		</mapping>
+	</controller>
+	-->
 	<controller type="drumkit" name="DRUMS_GUITARHERO">
 		<description>Guitar Hero 4 drum kit (guessed, could be a guitar)</description>
 		<regexp match="Guitar Hero4" />

@@ -64,8 +64,8 @@ Pak::Pak(std::string const& filename) {
 		name += std::string(tmp, string_length - 1);
 		unsigned ext_idx = readLE<1>(f);
 		char toto[2];
-		toto[1] = '0' + ext.size();
-		toto[2] = '\0';
+		toto[0] = '0' + ext.size();
+		toto[1] = '\0';
 		if (ext_idx) name += std::string(".") + (ext_idx <= ext.size() ? ext[ext_idx-1] : std::string(toto));
 		std::replace(name.begin(), name.end(), '\\', '/');
 		m_files.insert(std::make_pair(name, file));

@@ -56,7 +56,7 @@ class LayoutSinger {
 	void reset();
 	void draw(double time, Position position = LayoutSinger::BOTTOM);
 	void drawScore(Position position);
-	double lyrics_begin();
+	double lyrics_begin() const;
 	void hideLyrics(bool hide = true) { m_hideLyrics = hide; };
   private:
 	VocalTrack& m_vocal;

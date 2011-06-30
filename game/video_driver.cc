@@ -51,7 +51,7 @@ namespace {
 unsigned int screenW() { return s_width; }
 unsigned int screenH() { return s_height; }
 
-Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(width), m_windowH(height), m_fullscreen(fs) {
+Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(width), m_windowH(height), m_fullscreen(fs), screen() {
 	std::atexit(SDL_Quit);
 	if( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK) == -1 ) throw std::runtime_error("SDL_Init failed");
 	SDL_WM_SetCaption(PACKAGE " " VERSION, PACKAGE);
@@ -76,6 +76,8 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	//std::clog << "video/info: GL_EXTENSIONS: " << glGetString(GL_EXTENSIONS) << std::endl;
 
 	if (!GLEW_VERSION_2_1) throw std::runtime_error("OpenGL 2.1 is required but not available");
+
+	if (!GLEW_ARB_viewport_array && config["graphic/stereo3d"].b()) throw std::runtime_error("OpenGL extension ARB_viewport_array is required but not available when using stereo mode");
 
 	input::SDL::init(); // Joysticks etc.
 
@@ -261,12 +263,40 @@ void Window::swap() {
 }
 
 void Window::setFullscreen(bool _fs) {
+	if (m_fullscreen == _fs) return;
 	m_fullscreen = _fs;
 	resize();
 }
 
-bool Window::getFullscreen() {
-	return m_fullscreen;
+void Window::resize() {
+	unsigned width = m_fullscreen ? m_fsW : m_windowW;
+	unsigned height = m_fullscreen ? m_fsH : m_windowH;
+	{ // Setup GL attributes for context creation
+		GLattrSetter attr_r(SDL_GL_RED_SIZE, 8);
+		GLattrSetter attr_g(SDL_GL_GREEN_SIZE, 8);
+		GLattrSetter attr_b(SDL_GL_BLUE_SIZE, 8);
+		GLattrSetter attr_a(SDL_GL_ALPHA_SIZE, 8);
+		GLattrSetter attr_buf(SDL_GL_BUFFER_SIZE, 32);
+		GLattrSetter attr_d(SDL_GL_DEPTH_SIZE, 24);
+		GLattrSetter attr_s(SDL_GL_STENCIL_SIZE, 8);
+		GLattrSetter attr_db(SDL_GL_DOUBLEBUFFER, 1);
+		GLattrSetter attr_ar(SDL_GL_ACCUM_RED_SIZE, 0);
+		GLattrSetter attr_ag(SDL_GL_ACCUM_GREEN_SIZE, 0);
+		GLattrSetter attr_ab(SDL_GL_ACCUM_BLUE_SIZE, 0);
+		GLattrSetter attr_aa(SDL_GL_ACCUM_ALPHA_SIZE, 0);
+		SDL_FreeSurface(screen);
+		screen = SDL_SetVideoMode(width, height, 0, SDL_OPENGL | (m_fullscreen ? SDL_FULLSCREEN : SDL_RESIZABLE));
+		if (!screen) throw std::runtime_error(std::string("SDL_SetVideoMode failed: ") + SDL_GetError());
+	}
+	s_width = screen->w;
+	s_height = screen->h;
+	if (!m_fullscreen) {
+		config["graphic/window_width"].i() = s_width;
+		config["graphic/window_height"].i() = s_height;
+	}
+	// Enforce aspect ratio limits
+	if (s_height < 0.56f * s_width) s_width = round(s_height / 0.56f);
+	if (s_height > 0.8f * s_width) s_height = round(0.8f * s_width);
 }
 
 void Window::screenshot() {
@@ -283,37 +313,6 @@ void Window::screenshot() {
 	// Save to disk
 	writePNG(filename.string(), img);
 	std::clog << "video/info: Screenshot taken: " << filename << " (" << img.w << "x" << img.h << ")" << std::endl;
-}
-
-
-void Window::resize() {
-	glutil::GLErrorChecker glerror("Window::resize");
-	unsigned width = m_fullscreen ? m_fsW : m_windowW;
-	unsigned height = m_fullscreen ? m_fsH : m_windowH;
-	{ // Setup GL attributes for context creation
-		GLattrSetter attr_r(SDL_GL_RED_SIZE, 8);
-		GLattrSetter attr_g(SDL_GL_GREEN_SIZE, 8);
-		GLattrSetter attr_b(SDL_GL_BLUE_SIZE, 8);
-		GLattrSetter attr_a(SDL_GL_ALPHA_SIZE, 8);
-		GLattrSetter attr_buf(SDL_GL_BUFFER_SIZE, 32);
-		GLattrSetter attr_d(SDL_GL_DEPTH_SIZE, 24);
-		GLattrSetter attr_s(SDL_GL_STENCIL_SIZE, 8);
-		GLattrSetter attr_db(SDL_GL_DOUBLEBUFFER, 1);
-		GLattrSetter attr_ar(SDL_GL_ACCUM_RED_SIZE, 0);
-		GLattrSetter attr_ag(SDL_GL_ACCUM_GREEN_SIZE, 0);
-		GLattrSetter attr_ab(SDL_GL_ACCUM_BLUE_SIZE, 0);
-		GLattrSetter attr_aa(SDL_GL_ACCUM_ALPHA_SIZE, 0);
-		screen = SDL_SetVideoMode(width, height, 0, SDL_OPENGL | SDL_RESIZABLE | (m_fullscreen ? SDL_FULLSCREEN : 0));
-		if (!screen) throw std::runtime_error(std::string("SDL_SetVideoMode failed: ") + SDL_GetError());
-	}
-	s_width = screen->w;
-	s_height = screen->h;
-	if (!m_fullscreen) {
-		config["graphic/window_width"].i() = s_width;
-		config["graphic/window_height"].i() = s_height;
-	}
-	if (s_height < 0.56f * s_width) s_width = round(s_height / 0.56f);
-	if (s_height > 0.8f * s_width) s_height = round(0.8f * s_width);
 }
 
 ViewTrans::ViewTrans(double offsetX, double offsetY, double frac): m_old(g_projection) {
