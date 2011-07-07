@@ -1,6 +1,7 @@
 #version 120
 
-uniform mat4 positionMatrix;
+uniform mat4 projMatrix;
+uniform mat4 mvMatrix;
 uniform mat3 normalMatrix;
 uniform int noteType;
 uniform float hitAnim;
@@ -75,6 +76,6 @@ void main() {
 		);
 	}
 
-	gl_Position = positionMatrix * (vec4(position, 0, 0) + trans * vertPos);
+	gl_Position = projMatrix * mvMatrix * (vec4(position, 0, 0) + trans * vertPos);
 }
 

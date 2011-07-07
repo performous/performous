@@ -20,9 +20,11 @@ private:
 	glmath::mat4 m_old;
 };
 
-/// Apply a subviewport with different perspective projection
 class ViewTrans {
 public:
+	/// Apply a translation on top of current viewport translation
+	ViewTrans(glmath::mat4 const& m);
+	/// Apply a subviewport with different perspective projection
 	ViewTrans(double offsetX = 0.0, double offsetY = 0.0, double frac = 1.0);
 	~ViewTrans();
 private:

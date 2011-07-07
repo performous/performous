@@ -890,7 +890,8 @@ void GuitarGraph::drawNeckStuff(double time) {
 		if (jumpanim == 1.0) m_drumJump.setTarget(0.0);
 		if (jumpanim > 0) m = translate(vec3(0.0f, -m_drumJump.get() * 0.01, 0.0f)) * m;
 	}
-	Transform trans(m);
+	//Transform trans(m);
+	ViewTrans trans(m);
 
 	// Draw the neck
 	{
