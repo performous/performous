@@ -244,6 +244,7 @@ void Window::view(unsigned num) {
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_BLEND);
+	if (GL_EXT_framebuffer_sRGB) glEnable(GL_FRAMEBUFFER_SRGB);
 	shader("color").bind();
 	// Setup views
 	double vx = 0.5f * (screen->w - s_width);

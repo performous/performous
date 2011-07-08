@@ -79,6 +79,7 @@ namespace {
 		if (it != pixFormats.m.end()) return it->second;
 		throw std::logic_error("Unknown pixel format");
 	}
+	GLint internalFormat() { return GL_EXT_framebuffer_sRGB ? GL_SRGB_ALPHA : GL_RGBA; }
 }
 
 void Texture::load(unsigned int width, unsigned int height, pix::Format format, unsigned char const* buffer, float ar) {
@@ -103,7 +104,7 @@ void Texture::load(unsigned int width, unsigned int height, pix::Format format, 
 	glPixelStorei(GL_UNPACK_SWAP_BYTES, f.swap);
 	// Load the data into texture
 	if ((isPow2(width) && isPow2(height)) || GLEW_ARB_texture_non_power_of_two) { // Can directly load the texture
-		glTexImage2D(type(), 0, GL_RGBA, width, height, 0, f.format, f.type, buffer);
+		glTexImage2D(type(), 0, internalFormat(), width, height, 0, f.format, f.type, buffer);
 	} else {
 		int newWidth = prevPow2(width);
 		int newHeight = prevPow2(height);
@@ -114,7 +115,7 @@ void Texture::load(unsigned int width, unsigned int height, pix::Format format, 
 		// (1) no repeat => cannot texture
 		// (2) coordinates not normalized => would require special hackery elsewhere
 		// Just don't do it in Surface class, thanks. -Tronic
-		glTexImage2D(type(), 0, GL_RGBA, newWidth, newHeight, 0, f.format, f.type, &outBuf[0]);
+		glTexImage2D(type(), 0, internalFormat(), newWidth, newHeight, 0, f.format, f.type, &outBuf[0]);
 	}
 	glGenerateMipmap(type());
 }
@@ -129,7 +130,7 @@ void Surface::load(unsigned int width, unsigned int height, pix::Format format, 
 	UseTexture texture(m_texture);
 	PixFmt const& f = getPixFmt(format);
 	glPixelStorei(GL_UNPACK_SWAP_BYTES, f.swap);
-	glTexImage2D(m_texture.type(), 0, GL_RGBA, width, height, 0, f.format, f.type, buffer);
+	glTexImage2D(m_texture.type(), 0, internalFormat(), width, height, 0, f.format, f.type, buffer);
 }
 
 void Surface::draw() const {
