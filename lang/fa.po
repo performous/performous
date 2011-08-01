@@ -1,0 +1,565 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: performous\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-08-01 00:00-0500\n"
+"PO-Revision-Date: \n"
+"Last-Translator: sajjadG <sajjad.gerami@gmail.com>\n"
+"Language-Team: GeramiBros <sajjad.gerami@gmail.com>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-KeywordsList: _\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-Language: Persian\n"
+"X-Poedit-Country: IRAN, ISLAMIC REPUBLIC OF\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-SearchPath-0: ../game\n"
+"X-Poedit-SearchPath-1: ../data\n"
+
+#: ../game/screen_songs.cc:213
+msgid "No songs found!"
+msgstr "هیچ آهنگی یافت نشد!"
+
+#: ../game/screen_songs.cc:214
+msgid ""
+"Visit performous.org\n"
+"for free songs"
+msgstr ""
+"برای دریافت موسیقی رایگان\n"
+"به سایت www.performous.org مراجعه کنید."
+
+#: ../game/screen_songs.cc:216
+msgid "no songs match search"
+msgstr "هیچ آهنگی با واژه جستجو شده مطابقت ندارد"
+
+#: ../game/screen_songs.cc:224
+msgid "(press END to view hiscores)"
+msgstr "(برای مشاهده جدول امتیازات END را بزنید)"
+
+#: ../game/screen_songs.cc:225
+msgid "<type in to search>"
+msgstr "<تایپ کن تا بگردم>"
+
+# \n
+#: ../game/screen_songs.cc:230
+msgid "Hisccore for %1%\n"
+msgstr "بالاترین امتیاز %1%\n"
+
+#: ../game/main.cc:134
+msgid "Loading audio samples..."
+msgstr "در حال بارگزاری آهنگ ..."
+
+#: ../game/main.cc:148
+msgid "Creating screens..."
+msgstr "در حال ایجاد صفحات ..."
+
+#: ../game/main.cc:157
+msgid "Entering main menu"
+msgstr "ورود به منو اصلی"
+
+#: ../game/main.cc:159
+msgid "Loading complete"
+msgstr "بارگزاری کامل شد"
+
+#: ../game/main.cc:169
+msgid "Screenshot taken!"
+msgstr "عکس صفحه گرفته شد!"
+
+#: ../game/main.cc:172
+msgid "Screenshot failed!"
+msgstr "گرفتن عکس صفحه با شکست مواجه شد!"
+
+#: ../game/screen_paths.cc:24
+msgid ""
+"This tool is not yet available.\n"
+"Configure paths by adding them\n"
+"as command line parameters and\n"
+"then save them in configuration menu."
+msgstr ""
+"این ابزار هنوز موجود نیست.\n"
+"مسیرها را با اضافه کردن آنها به عنوان\n"
+"پارامترهای خط فرمان پیکربندی کنید سپس\n"
+"آنها را در منو پیکربندی(تنظیمات) ذخیره کنید."
+
+#: ../game/screen_paths.cc:69
+msgid "Press any key to exit."
+msgstr "برای خروج کلیدی را بفشارید."
+
+#: ../game/screen_paths.cc:74
+msgid "Windows users can also use ConfigureSongDirectory.bat in the bin-directory."
+msgstr "کاربران ویندوز همچنین می توانند از ConfigureSongDirectory.bat در bin-directory استفاده کنند."
+
+# تا کنون هیچ موردی
+# یا
+# هیچ موردی تا کنون
+# یا
+# تا این لحظه هیچ موردی
+# یا
+# هیچ موردی تا این لحظه
+#: ../game/database.cc:107
+#: ../game/database.cc:127
+msgid "No Items up to now."
+msgstr "تا به حال هیچ موردی."
+
+# اولین نفری باشید که اینجا فهرست می شود.
+# یا
+# اولین نفری باشید که اینجا ثبت می شود.
+# یا
+# اولین نفری باشید که اینجا لیست می شود.
+#: ../game/database.cc:108
+#: ../game/database.cc:128
+msgid "Be the first to be listed here!"
+msgstr "اولین نفری باشید که در فهرست ثبت می شود."
+
+#: ../game/screen_players.cc:111
+msgid "No players found!"
+msgstr "هیچ بازیکنی یافت نشد."
+
+#: ../game/screen_players.cc:112
+msgid "Enter a name to create a new player."
+msgstr "برای ایجاد بازیکن جدید نامی را وارد کنید."
+
+#: ../game/screen_players.cc:114
+msgid "Press enter to create player!"
+msgstr "برای ساختن بازیکن Enter را بزنید!"
+
+#: ../game/screen_players.cc:121
+msgid "You reached %1% points!"
+msgstr "به امتیاز %1% رسیدی!"
+
+#: ../game/screen_players.cc:122
+msgid "Change player with arrow keys."
+msgstr "با کلید های جهت نما  بازیکن را تغییر دهید."
+
+#: ../game/screen_players.cc:123
+msgid "Name:"
+msgstr "اسم:"
+
+#: ../game/screen_players.cc:126
+msgid "Type text to filter or create a new player."
+msgstr "برای فیلتر کردن یا ایجاد بازیکن جدید‍‍‍‍ متنی را وارد کنید."
+
+#: ../game/screen_players.cc:126
+msgid "Search Text:"
+msgstr "متن جستجو:"
+
+#: ../game/songs.cc:205
+msgid "random order"
+msgstr "ترتیب تصادفی"
+
+#: ../game/songs.cc:206
+msgid "sorted by song"
+msgstr "مرتب شده توسط آهنگ"
+
+#: ../game/songs.cc:207
+msgid "sorted by artist"
+msgstr "مرتب شده بر اساس خواننده"
+
+#: ../game/songs.cc:208
+msgid "sorted by edition"
+msgstr "مرتب شده بر اساس ویرایش"
+
+#: ../game/songs.cc:209
+msgid "sorted by genre"
+msgstr "مرتب شده بر اساس سبک"
+
+#: ../game/songs.cc:210
+msgid "sorted by path"
+msgstr "مرتب شده بر اساس مسیر"
+
+#: ../game/songs.cc:211
+msgid "sorted by language"
+msgstr "مرتب شده بر اساس زبان"
+
+#: ../game/screen_sing.cc:34
+msgid "Loading song..."
+msgstr "در حال بارگذاری آهنگ..."
+
+#: ../game/screen_sing.cc:40
+msgid "Song is broken!"
+msgstr "آهنگ خراب است!"
+
+#: ../game/screen_sing.cc:45
+msgid "Initializing webcam..."
+msgstr "در حال راه اندازی دوربین..."
+
+#: ../game/screen_sing.cc:52
+msgid "Loading video..."
+msgstr "در حال بارگیری تصویر"
+
+#: ../game/screen_sing.cc:60
+msgid "Loading instruments..."
+msgstr "در حال بارگیری سازها..."
+
+#: ../game/screen_sing.cc:82
+msgid "Loading menu..."
+msgstr "در حال بارگیری فهرست..."
+
+#: ../game/screen_sing.cc:84
+msgid "Resume"
+msgstr "ادامه دادن"
+
+#: ../game/screen_sing.cc:84
+msgid "Back to performing!"
+msgstr "بازگشت به اجرا"
+
+#: ../game/screen_sing.cc:85
+msgid "Restart"
+msgstr "شروع مجدد"
+
+#: ../game/screen_sing.cc:85
+msgid ""
+"Start the song\n"
+"from the beginning"
+msgstr ""
+"آهنگ رو از ابتدا\n"
+"شروع کن"
+
+#: ../game/screen_sing.cc:98
+msgid ""
+"Change vocal track\n"
+"(restart required)"
+msgstr ""
+"تغییر شیار صوتی\n"
+"(نیازمند اجرای مجدد بازیست)"
+
+#: ../game/screen_sing.cc:103
+#: ../game/guitargraph.cc:203
+#: ../game/dancegraph.cc:141
+msgid "Quit"
+msgstr "خروج"
+
+#: ../game/screen_sing.cc:103
+#: ../game/guitargraph.cc:203
+#: ../game/dancegraph.cc:141
+msgid "Exit to song browser"
+msgstr "خروج به مرورگر آهنگ"
+
+#: ../game/screen_sing.cc:107
+msgid "Finalizing..."
+msgstr "نهایی سازی..."
+
+# آهنگ شامل موردهای خراب است
+#: ../game/screen_sing.cc:111
+msgid "Song contains broken tracks!"
+msgstr "قسمتی از آهنگ خراب است!"
+
+# در حال بارگزاری گرافیک...
+#: ../game/screen_sing.cc:113
+msgid "Loading graphics..."
+msgstr "در حال بارگیری نگاره ها..."
+
+#: ../game/screen_sing.cc:140
+msgid "Random background..."
+msgstr "تصویر زمینه تصادفی..."
+
+#: ../game/screen_sing.cc:485
+msgid "   ENTER to skip instrumental break"
+msgstr "    کلید Enter بزنید برای پخش نشدن صدای خراب کردن ساز"
+
+#: ../game/screen_sing.cc:486
+msgid "   Remember to wait for grading!"
+msgstr "  بیاد آورید که برای درجه بندی صبر کنید!"
+
+#: ../game/screen_sing.cc:618
+msgid "No player!"
+msgstr "هیچ بازیکنی!"
+
+#: ../game/screen_sing.cc:627
+#, fuzzy
+msgid "Hit singer"
+msgstr "خواننده رو انتخاب کن"
+
+#: ../game/screen_sing.cc:628
+msgid "Lead singer"
+msgstr "خواننده را بارگیری کن"
+
+#: ../game/screen_sing.cc:629
+#: ../game/screen_sing.cc:635
+#: ../game/screen_sing.cc:641
+msgid "Rising star"
+msgstr "افزایش ستاره"
+
+#: ../game/screen_sing.cc:630
+#: ../game/screen_sing.cc:636
+#: ../game/screen_sing.cc:642
+msgid "Amateur"
+msgstr "مبتدی"
+
+#: ../game/screen_sing.cc:631
+#: ../game/screen_sing.cc:643
+msgid "Tone deaf"
+msgstr "کر"
+
+# ديوانه‌
+# مجنون
+#: ../game/screen_sing.cc:633
+#, fuzzy
+msgid "Maniac"
+msgstr "ديوانه‌ وار"
+
+#: ../game/screen_sing.cc:634
+msgid "Hoofer"
+msgstr "رقاص‌ حرفه‌ اي‌"
+
+#: ../game/screen_sing.cc:637
+msgid "Loser"
+msgstr "بازنده‌"
+
+#: ../game/screen_sing.cc:639
+msgid "Virtuoso"
+msgstr "هنرشناس‌"
+
+#: ../game/screen_sing.cc:640
+msgid "Rocker"
+msgstr "گیتاریست"
+
+#: ../game/guitargraph.cc:14
+msgid "Kids"
+msgstr "بچه ها"
+
+#: ../game/guitargraph.cc:14
+#: ../game/dancegraph.cc:18
+msgid "Easy"
+msgstr "آسان"
+
+#: ../game/guitargraph.cc:14
+#: ../game/dancegraph.cc:18
+msgid "Medium"
+msgstr "متوسط"
+
+#: ../game/guitargraph.cc:14
+#: ../game/dancegraph.cc:18
+msgid "Hard"
+msgstr "دشوار"
+
+#: ../game/guitargraph.cc:14
+msgid "Expert"
+msgstr "حرفه ای"
+
+#: ../game/guitargraph.cc:166
+#: ../game/dancegraph.cc:138
+msgid "Select difficulty"
+msgstr "انتخاب میزان سختی"
+
+#: ../game/guitargraph.cc:172
+#: ../game/guitargraph.cc:189
+msgid "Lefty-mode"
+msgstr "چپ دست"
+
+#: ../game/guitargraph.cc:186
+#: ../game/dancegraph.cc:122
+msgid "Select track"
+msgstr "انتخاب قطعه"
+
+#: ../game/guitargraph.cc:197
+#: ../game/dancegraph.cc:111
+msgid "Ready!"
+msgstr "آماده!"
+
+#: ../game/guitargraph.cc:197
+#: ../game/dancegraph.cc:111
+msgid "Start performing!"
+msgstr "اجرا رو شروع کن!"
+
+#: ../game/guitargraph.cc:210
+msgid "ON"
+msgstr "روشن"
+
+#: ../game/guitargraph.cc:210
+msgid "OFF"
+msgstr "خاموش"
+
+#: ../game/guitargraph.cc:211
+msgid "Toggle lefty-mode"
+msgstr "تعویض به چپ دست"
+
+# نوار باریک
+# خط
+#: ../game/guitargraph.cc:482
+#: ../game/dancegraph.cc:335
+#, fuzzy
+msgid "Streak!"
+msgstr "سرعت!"
+
+#: ../game/guitargraph.cc:499
+msgid ""
+"God Mode\n"
+"Activated!"
+msgstr ""
+"حالت فوق العده\n"
+"فعال شد!"
+
+#: ../game/guitargraph.cc:500
+msgid "Mistakes ignored!"
+msgstr "از اشتباهات صرف نظر شد!"
+
+#: ../game/guitargraph.cc:1181
+#, fuzzy
+msgid "Drum Fill!"
+msgstr "درام پر است!"
+
+#: ../game/guitargraph.cc:1182
+msgid "God Mode Ready!"
+msgstr "حالت فوق العاده آماده است!"
+
+#: ../game/guitargraph.cc:1185
+msgid "Solo!"
+msgstr "تک نوازی!"
+
+#: ../game/dancegraph.cc:18
+msgid "Beginner"
+msgstr "تازه کار"
+
+# مسابقه
+#: ../game/dancegraph.cc:18
+msgid "Challenge"
+msgstr "رقابت"
+
+#: ../game/dancegraph.cc:260
+msgid "STOP!"
+msgstr "توقف!"
+
+#: ../game/instrumentgraph.cc:49
+msgid "Rejoin"
+msgstr "پیوستن"
+
+#: ../game/instrumentgraph.cc:49
+msgid "Change selections"
+msgstr "تغییر انتخاب ها"
+
+#: ../game/screen_audiodevices.cc:56
+msgid ""
+"It seems you have some manual configurations\n"
+"incompatible with this user interface.\n"
+"Saving these settings will override\n"
+"all existing audio device configuration.\n"
+"Your other options changes will be saved too."
+msgstr ""
+"به نظر میرسد که شما کمی تنظیمات دستی دارید\n"
+"که با این رابط کاربری مطابقت ندارد\n"
+"ذخیره کردن این تنظیمات باعث پاک شدن تمام\n"
+"تنظیمات مربوط به دستگاه ها می شود\n"
+"تغییرات دیگر شما در تنظیمات نیز ذخیره می شود."
+
+#: ../game/screen_audiodevices.cc:111
+msgid "- Unassigned -"
+msgstr "-تخصیص نیافته-"
+
+#: ../game/screen_audiodevices.cc:131
+msgid "Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select to cancel. Ctrl + R to reset defaults"
+msgstr "از کلیدهای جهت نما جهت پیکربندی استفاده کنید. برای ذخیره Enter/Start و برای لغو test یا Esc/Select بزنید. Ctrl + R برای بازگشت به حالت اولیه"
+
+#: ../game/screen_audiodevices.cc:136
+msgid "For advanced device configuration, use command line parameter --audio (use --audiohelp for details)."
+msgstr "برای پیکربندی پیشرفته دستگاه از پارامتر audio-- خط فرمان استفاده کنید (برای اطلاعات بیشتر از audiohelp-- استفاده کنید)."
+
+#: ../game/screen_audiodevices.cc:191
+msgid "Some devices failed to open!"
+msgstr "باز کردن بعضی از دستگاه ها با مشکل مواجه شد!"
+
+#: ../game/screen_intro.cc:24
+#, fuzzy
+msgid "No playback devices could be used.\n"
+msgstr "هیچ دستگاهی با قابلیت پخش قابل استفاده نیست. \n"
+
+#: ../game/screen_intro.cc:25
+msgid ""
+"\n"
+"Please configure some before playing."
+msgstr ""
+"\n"
+"لطفا قبل از بازی پیکربندی کنید."
+
+#: ../game/screen_intro.cc:64
+msgid "Settings saved as system defaults."
+msgstr "تنظیمان به عنوان پیش فرض سیستم ذخیره شد."
+
+#: ../game/screen_intro.cc:64
+msgid "Settings saved."
+msgstr "تنظیمات ذخیره شد."
+
+#: ../game/screen_intro.cc:146
+msgid "Ctrl + S to save, Ctrl + R to reset defaults"
+msgstr "برای ذخیره Ctrl + S و برای تنظیمات اولیه Ctrl + R"
+
+#: ../game/screen_intro.cc:160
+msgid "Perform"
+msgstr "اجرا"
+
+#: ../game/screen_intro.cc:161
+msgid "Practice"
+msgstr "تمرین"
+
+#: ../game/screen_intro.cc:161
+msgid "Check your skills or test the microphones"
+msgstr "مهارتتان را بررسی و یا میکروفن را تست کنید"
+
+#: ../game/screen_intro.cc:180
+msgid "Audio Devices"
+msgstr "دستگاه های صوتی"
+
+#: ../game/screen_intro.cc:180
+msgid "Setup microphones and playback"
+msgstr "راه اندازی میکروفن(دهنی) و بازبخش"
+
+#: ../game/screen_intro.cc:181
+msgid "Audio"
+msgstr "صوت"
+
+#: ../game/screen_intro.cc:181
+msgid "Configure general audio settings"
+msgstr "پیکربندی کلی تنظیمات صوتی"
+
+#: ../game/screen_intro.cc:182
+msgid "Graphics"
+msgstr "گرافیک (نگاره)"
+
+#: ../game/screen_intro.cc:182
+msgid "Configure rendering and video settings"
+msgstr "پیکربندی رندر کردن و تنظیمات تصویر"
+
+#: ../game/screen_intro.cc:183
+msgid "Game"
+msgstr "بازی"
+
+# ترجمه جایگزین برای گیم پلی چیست؟
+#: ../game/screen_intro.cc:183
+msgid "Gameplay related options"
+msgstr "تنظیمات مریوط به گیم پلی"
+
+#: ../game/screen_intro.cc:184
+msgid "Paths"
+msgstr "مسیر"
+
+#: ../game/screen_intro.cc:184
+msgid "Setup song and data paths"
+msgstr "راه اندازی آهنگ و مسیرهای داده"
+
+#: ../game/screen_intro.cc:186
+msgid "Configure"
+msgstr "پیکربندی"
+
+#: ../game/screen_intro.cc:186
+msgid "Configure audio and game options"
+msgstr "پیکربندی صوت و تنظیمات بازی"
+
+#: ../game/screen_intro.cc:189
+msgid "Leave the game"
+msgstr "ترک کردن بازی"
+
+#: ../game/configuration.cc:116
+msgid "Enabled"
+msgstr "فعال شد"
+
+#: ../game/configuration.cc:116
+msgid "Disabled"
+msgstr "غیر فعال شد"
+
+#: ../game/configuration.cc:120
+#, c-format
+msgid "%d items"
+msgstr "مورد %d"
+
