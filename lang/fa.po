@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-08-01 00:00-0500\n"
+"POT-Creation-Date: 2011-08-01 03:13-0500\n"
 "PO-Revision-Date: \n"
 "Last-Translator: sajjadG <sajjad.gerami@gmail.com>\n"
 "Language-Team: GeramiBros <sajjad.gerami@gmail.com>\n"
@@ -397,7 +397,6 @@ msgid "Mistakes ignored!"
 msgstr "از اشتباهات صرف نظر شد!"
 
 #: ../game/guitargraph.cc:1181
-#, fuzzy
 msgid "Drum Fill!"
 msgstr "درام پر است!"
 
@@ -461,9 +460,8 @@ msgid "Some devices failed to open!"
 msgstr "باز کردن بعضی از دستگاه ها با مشکل مواجه شد!"
 
 #: ../game/screen_intro.cc:24
-#, fuzzy
 msgid "No playback devices could be used.\n"
-msgstr "هیچ دستگاهی با قابلیت پخش قابل استفاده نیست. \n"
+msgstr "از هیچ دستگاهی با قابلیت پخش نمی توان استفاده کرد. \n"
 
 #: ../game/screen_intro.cc:25
 msgid ""
@@ -562,4 +560,281 @@ msgstr "غیر فعال شد"
 #, c-format
 msgid "%d items"
 msgstr "مورد %d"
+
+# ترجمه جایگزین برای گیم پلی چیست؟
+#: /tmp/xml2gettext.wyUIn5n55o:3
+msgid "Gameplay settings."
+msgstr "تنظیمات مریوط به گیم پلی"
+
+#: /tmp/xml2gettext.wyUIn5n55o:4
+msgid "Graphic"
+msgstr "گرافیک (نگاره)"
+
+#: /tmp/xml2gettext.wyUIn5n55o:5
+msgid "Video and rendering settings."
+msgstr "تنظیمات تصویر و رندر(نگاره) کردن"
+
+#: /tmp/xml2gettext.wyUIn5n55o:7
+msgid "Audio-related settings."
+msgstr "تنظیمات صدا"
+
+#: /tmp/xml2gettext.wyUIn5n55o:9
+msgid "System paths."
+msgstr "مسیر سیستم."
+
+#: /tmp/xml2gettext.wyUIn5n55o:10
+msgid "Karaoke mode"
+msgstr "حالت همخوانی"
+
+#: /tmp/xml2gettext.wyUIn5n55o:11
+msgid "Hide pitch wave, notes and scoring."
+msgstr "مخفی کردن دانگ صدا نت ها و امتیازها"
+
+#: /tmp/xml2gettext.wyUIn5n55o:12
+msgid "Pitch waves"
+msgstr "دانگ‌ اصوات"
+
+#: /tmp/xml2gettext.wyUIn5n55o:13
+msgid "Enable singing pitch display (when not in karaoke mode)."
+msgstr "فعال کردن نمایش زیر و بمی صدا (زمانی که در حالت همخوانی نیستید)"
+
+#: /tmp/xml2gettext.wyUIn5n55o:14
+msgid "Theme"
+msgstr "پوسته"
+
+#: /tmp/xml2gettext.wyUIn5n55o:15
+msgid "Name of the theme to use or absolute path to theme folder."
+msgstr "اسم پوسته یا مسیر پوشه ی پوسته ها"
+
+#: /tmp/xml2gettext.wyUIn5n55o:16
+msgid "Keyboard as guitar"
+msgstr "صفحه کلید به جای گیتار"
+
+#: /tmp/xml2gettext.wyUIn5n55o:17
+msgid "Enable keyboard as guitar (Frets on Fire mode)."
+msgstr "فعال کردن صفحه کلید بجای گیتار(حالت Frets on Fire)"
+
+#: /tmp/xml2gettext.wyUIn5n55o:18
+msgid "Keyboard as drumkit"
+msgstr "صفحه کلید بجای درام"
+
+#: /tmp/xml2gettext.wyUIn5n55o:19
+msgid "Enable keyboard as drumkit."
+msgstr "فعال کردن صفحه کلید بجای درام"
+
+#: /tmp/xml2gettext.wyUIn5n55o:20
+msgid "Keyboard as dance pad"
+msgstr "صفحه کلید بجای تخته رقص"
+
+#: /tmp/xml2gettext.wyUIn5n55o:21
+msgid "Enable keyboard as dance pad."
+msgstr "فعال کردن صفحه کلید بجای تخته رقص."
+
+#: /tmp/xml2gettext.wyUIn5n55o:22
+msgid "Keyboard as keyboard"
+msgstr "صفحه کلید بجای صفحه کلید"
+
+#: /tmp/xml2gettext.wyUIn5n55o:23
+msgid "Enable keyboard as keyboard."
+msgstr "فعال کردن صفحه کلید بجای صفحه کلید"
+
+#: /tmp/xml2gettext.wyUIn5n55o:24
+msgid "Joystick configuration"
+msgstr "پیکربندی دسته فرمان"
+
+#: /tmp/xml2gettext.wyUIn5n55o:25
+msgid "Force joystick to some kind of instrument."
+msgstr "اجبار کردن دسته فرمان برای ساز"
+
+#: /tmp/xml2gettext.wyUIn5n55o:26
+msgid "Hardware MIDI input device"
+msgstr "دستگاه سخت افزار ورودی MIDI"
+
+#: /tmp/xml2gettext.wyUIn5n55o:27
+msgid "Part of sound card name or its number or empty to use the first available device. Used currently for MIDI drum controllers."
+msgstr "قسمتی از اسم کارت صدا یا شماره آن برای استفاده از دستگاه اول خالی است. به عنوان کنترلر درام در حال استفاده است."
+
+#: /tmp/xml2gettext.wyUIn5n55o:28
+msgid "Windowed width"
+msgstr "عرض صفحه"
+
+#: /tmp/xml2gettext.wyUIn5n55o:29
+msgid "The width of the window."
+msgstr "عرض صفحه"
+
+#: /tmp/xml2gettext.wyUIn5n55o:30
+msgid "Windowed height"
+msgstr "ارتفاع صفحه"
+
+#: /tmp/xml2gettext.wyUIn5n55o:31
+msgid "The height of the window."
+msgstr "ارتفاع صفحه"
+
+#: /tmp/xml2gettext.wyUIn5n55o:32
+msgid "Fullscreen mode"
+msgstr "حالت تمام صفحه"
+
+#: /tmp/xml2gettext.wyUIn5n55o:33
+msgid "Enable fullscreen mode on startup."
+msgstr "فعال کردن حالت تمام صفحه هنگام شروع"
+
+#: /tmp/xml2gettext.wyUIn5n55o:34
+msgid "Stereoscopic 3D"
+msgstr "برجسته بین سه بعدی"
+
+#: /tmp/xml2gettext.wyUIn5n55o:35
+msgid "Enable 3D rendering of Performous."
+msgstr "فعال کردن حالت سه یعدی پرفورمیوس"
+
+#: /tmp/xml2gettext.wyUIn5n55o:36
+msgid "Stereo3D type"
+msgstr "حالت سه بعدی"
+
+#: /tmp/xml2gettext.wyUIn5n55o:37
+msgid "Some modes may only get activated in fullscreen mode."
+msgstr "بعضی از حالات فقط در حالت تمام صفحه فعال می شوند"
+
+#: /tmp/xml2gettext.wyUIn5n55o:38
+msgid "Stereo3D separation"
+msgstr "تفکیک سه بعدی"
+
+#: /tmp/xml2gettext.wyUIn5n55o:39
+msgid "The strength of the effect. Experiment with different settings for best results."
+msgstr "قدرت اثر. برای نتیجه بهتر با یک تنظیم دیگر امتحان کنید."
+
+#: /tmp/xml2gettext.wyUIn5n55o:40
+msgid "Video playback"
+msgstr "پخش تصویر"
+
+#: /tmp/xml2gettext.wyUIn5n55o:41
+msgid "Allows completely disabling background videos. It is recommended to leave this enabled as Performous will still smoothly fade out the video if your computer is not fast enough."
+msgstr "اجازه دادن برای غیر فعال کردن کامل پس ضمینه ی تصویری. توصیه می شود این گزینه را در حالت فعال قرار دهید چون که اگر رایانه شما به اندازه کافی سریع نباشد پرفورمیوس تصویر را به نرمی محو می کند."
+
+#: /tmp/xml2gettext.wyUIn5n55o:42
+msgid "Webcam background"
+msgstr "تصویر زمینه دوربین..."
+
+#: /tmp/xml2gettext.wyUIn5n55o:43
+msgid "Performous can use webcam as a background video. Disable it if Performous crashes while entering a song."
+msgstr "پرفورمیوس میتواند از دوربین به عنوان تصویر پس ضمینه استفاده کند. اگر پرفورمیوس موقع ورود به یک آهنگ متوقف شد این گزینه را غیر فعال کنید."
+
+#: /tmp/xml2gettext.wyUIn5n55o:44
+msgid "Webcam id"
+msgstr "شماره دوربین"
+
+#: /tmp/xml2gettext.wyUIn5n55o:45
+msgid "Use -1 to autodetect or a number starting from 0 to choose specific device."
+msgstr "برای شناسایی خودکار -۱ و یا یک عدد که با ۰ شروع می شود را برای انتخاب دستگاه خاص وارد کنید."
+
+#: /tmp/xml2gettext.wyUIn5n55o:46
+msgid "3D notes"
+msgstr "نت های سه بعدی"
+
+#: /tmp/xml2gettext.wyUIn5n55o:47
+msgid "Draw instrument notes as 3-dimensional objects. May hurt performance on older hardware."
+msgstr "نت های سازها را سه بعدی نمایش ده. روی کامپیوتر های قدیمی مشکل ساز است."
+
+#: /tmp/xml2gettext.wyUIn5n55o:48
+msgid "SVG quality"
+msgstr "کیفیت SVG"
+
+#: /tmp/xml2gettext.wyUIn5n55o:49
+msgid "Larger numbers cause vector graphics to be rendered in higher resolution. Decrease this to make navigating in menus faster."
+msgstr "مقادیر بزرگ باعث می شود که بردارهای گرافیکی با کیفیت بالا نقش شوند. کاهش مقادیر باعث سرعت منو می شود."
+
+#: /tmp/xml2gettext.wyUIn5n55o:50
+msgid "Text quality"
+msgstr "کیفیت متن"
+
+#: /tmp/xml2gettext.wyUIn5n55o:51
+msgid "Larger numbers cause text to be rendered in higher resolution. Decrease this to make everything a little faster."
+msgstr "مقادیر بزرگ باعث می شود که متون با کیفیت بالا نقش شوند. کاهش مقادیر باعث سرعت اندکی در همه چیز می شود."
+
+#: /tmp/xml2gettext.wyUIn5n55o:52
+msgid "Benchmark mode"
+msgstr "حالت محک"
+
+#: /tmp/xml2gettext.wyUIn5n55o:53
+msgid "Framerate limit of 100 FPS is removed and the game instead renders at full speed. FPS values are printed to console. Please note that the display drivers may still limit the rendering speed to the screen refresh rate."
+msgstr "حد نرخ عبور تصویر(FPS) برابر ۱۰۰ حذف گردید و بازی با سرعت بالا نگاره می شود. مقادیر FPS در کنسول چاپ می شود. لطفا توجه داشته باشید که درایور صفحه نمایش هنوز هم ممکن است سرعت نگاره را با سرعت جاروب صفحه نمایش محدود کند."
+
+#: /tmp/xml2gettext.wyUIn5n55o:54
+msgid "Suggested latency"
+msgstr "زمان تاخیر پیشنهادی"
+
+#: /tmp/xml2gettext.wyUIn5n55o:55
+msgid "This is a hint for the audio engine about the desired latency. Set this as low as possible while retaining clear audio playback. Requires restart."
+msgstr "این یک تذکر برای متور صدا درمورد تاخیر خواسته شده است. اگر کیفیت صدای پایین دارید این مقدار را پایین بیاورید. نیاز به شروع مجدد دارد."
+
+#: /tmp/xml2gettext.wyUIn5n55o:56
+msgid "Audio/video latency"
+msgstr "تاخیر صدا و تصویر"
+
+#: /tmp/xml2gettext.wyUIn5n55o:57
+msgid "Affects all modes. Use negative value if your display input lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal. This should be set so that the notes pass the cursor at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while performing."
+msgstr "روی همه ی حالت ها تاثر دارد. اگر تاخیر در ورودی نمایش بزرگتر از تاخیر کارت صداست از مقادیر منفی استفاده کنید در حالت برعکس از مقادیر مثبت و صفر اگر باهم برابر است. این مقدار باید تنظیم شود تا نت همان زمانی که صدایش شنیده می شود از خط عبور کند. از کلید Ctrl+F1/F2 در حال اجرا برای تنظیم استفاده کنید."
+
+#: /tmp/xml2gettext.wyUIn5n55o:58
+msgid "Audio round-trip latency"
+msgstr "تاخیر در رفت و آمد صدا"
+
+#: /tmp/xml2gettext.wyUIn5n55o:59
+msgid "Affects singing only. The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. While performing, press Ctrl+S for synth mode and adjust with Ctrl+F3/F4."
+msgstr "فقط روی خواندن تاثیر میگذارد. زمانی که طول می کشد که پخش پرفورمیوس به بلندگوی شما برسد از میکروفن عبور کند و پرفورمیوس آن را دریافت کند و تجزیه و تحلیل کند. در زمان اجرا Ctrl+S بزنید تا به حالت تنظیم بروید و با Ctrl+F3/F4 تنظیم کنید."
+
+#: /tmp/xml2gettext.wyUIn5n55o:60
+msgid "Audio/controller latency"
+msgstr "تاخیر در صدا و کنترلر"
+
+#: /tmp/xml2gettext.wyUIn5n55o:61
+msgid "Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to adjust while performing."
+msgstr "فقط روی ساز و رقص تاثیر دارد. کل تاخیر یو اس بی (گیتار و تخته رقص) به همراه تاخیر خروجی صدا. تنظیم کنید تا بتوانید در بهترین حالت زمانی که نت را می شنوید بزنید (نه زمانی که نت را روی صفحه می بینید). از کلید Ctrl+F5/F6 برای تنظیم حین اجرا استفاده کنید."
+
+#: /tmp/xml2gettext.wyUIn5n55o:62
+msgid "Audio devices"
+msgstr "دستگاه های صوتی"
+
+#: /tmp/xml2gettext.wyUIn5n55o:63
+msgid "List of audio devices to try."
+msgstr "فهرستی از دستگاه های صدا برای آزمایش کردن."
+
+#: /tmp/xml2gettext.wyUIn5n55o:64
+msgid "Menu volume"
+msgstr "میزان صدای منو"
+
+#: /tmp/xml2gettext.wyUIn5n55o:65
+msgid "The volume level of menus, song previews and jukebox mode."
+msgstr "میزان صدای منوها پیش نمایش آهنگ ها و حالت جعبه موزیک"
+
+#: /tmp/xml2gettext.wyUIn5n55o:66
+msgid "Music volume"
+msgstr "میزان صدای آهنگ"
+
+#: /tmp/xml2gettext.wyUIn5n55o:67
+msgid "The ingame music volume. Values above 90 are not recommended as distortion may occur."
+msgstr "میزان صدای آهنگ داخل بازی. مقادیر بالاتر از ۹۰ توصیه نمی شوند چون ممکن است باعث اغتشاش صوتی گردند."
+
+#: /tmp/xml2gettext.wyUIn5n55o:68
+msgid "Failure volume"
+msgstr "میزان صدای خراب کردن آهنگ"
+
+#: /tmp/xml2gettext.wyUIn5n55o:69
+msgid "The ingame fail sound volume. Values above 90 are not recommended as distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
+msgstr "میزان صدای خراب کردن آهنگ داخل بازی. مقادیر بالاتر از ۹۰ توصیه نمی شوند چون ممکن است باعث اغتشاش صوتی گردند. 11 بلندتر از 9 است اما تا ۱۰۰ می رود. 89 بلندترین"
+
+#: /tmp/xml2gettext.wyUIn5n55o:70
+msgid "Song folders"
+msgstr "پوشه آهنگ ها"
+
+#: /tmp/xml2gettext.wyUIn5n55o:71
+msgid "Where to recursively look for songs. DATADIR at the beginning means all Performous data folders."
+msgstr "جایی که به صورت بازگشتی به دنبال آهنگ میگردد. DATADIR در آغاز به معنی تمامی پوشه های پرفورمیوس است."
+
+#: /tmp/xml2gettext.wyUIn5n55o:72
+msgid "Base folders for data"
+msgstr "پوشه اصلی اطلاعات"
+
+#: /tmp/xml2gettext.wyUIn5n55o:73
+msgid "System defaults are included automatically. Additional paths can be added here."
+msgstr "پیش فرض های سیستم بصورت خودکار اضافه شده اند. مسیر های اضافی را اینجا وارد کنید."
 
