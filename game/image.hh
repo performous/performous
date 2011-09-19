@@ -26,7 +26,7 @@ namespace {
 	}
 	void loadPNG_internal(png_structp pngPtr, png_infop infoPtr, std::ifstream& file, std::vector<unsigned char>& image, std::vector<png_bytep>& rows, unsigned& w, unsigned& h) {
 		if (setjmp(png_jmpbuf(pngPtr))) throw std::runtime_error("Reading PNG failed");
-		png_set_read_fn(pngPtr,(voidp)&file, readPngHelper);
+		png_set_read_fn(pngPtr,(png_voidp)&file, readPngHelper);
 		png_read_info(pngPtr, infoPtr);
 		png_set_expand(pngPtr);  // Expand everything to RGB(A)
 		png_set_strip_16(pngPtr);  // Strip everything down to 8 bit/component
