@@ -173,7 +173,10 @@ elif [[ "$1" == "--infoboxes" ]] ; then
 			generate_infoboxes "$a"
 		done
 	else
-		# FIXME: make sure $2 is sane.
+	    	if [[ -d lang ]] && [[ ! -f "lang/${2}.po" ]] ; then
+		    echo "There is no translation (.po) file for <$2>!"
+		    exit -1
+		fi
 		generate_infoboxes "$2"
 	fi
 else
