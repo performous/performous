@@ -7,11 +7,28 @@ TOT=
 UNT=
 FUZ=
 TPC=
+ISO_639_XML="/usr/share/xml/iso-codes/iso_639.xml"
+
+die(){
+    echo "$*" >&2
+    exit -1
+}
+
+show_usage(){
+    echo "USAGE: $0 <--overview|--infoboxes [lang]> [--iso-639 file]"
+    echo
+    echo " --overview           Generates the language overview table."
+    echo " --infoboxes [lang]   The two letter ISO-369-1 langauge code used in the PO"
+    echo "                       filename, or the 3-letter terminology code (ISO-639-2T),"
+    echo "                       if no two letter code exits. If none is given infoboxes"
+    echo "                       for all languages found is generated."
+    echo " [--iso-639 file]   Override the location of the ISO-639-1 XML database."
+    echo "                       This defaults to: /usr/share/xml/iso-codes/iso_639.xml"
+}
 
 if [[ "$(basename $PWD)" != "performous" ]] || [[ ! -d ".git" ]] ; then
-	echo "Error: Not in the performous root dir!"
 	echo "This script must be run from the perfourmous source folder"
-	exit
+	die "Error: Not in the performous root dir!"
 fi
 
 # Colorize
@@ -42,14 +59,35 @@ colorize(){
 # This assumes the file /usr/share/xml/iso-codes/iso_639.xml exists
 # and has a very strict format (not only valid XML!)
 get_full_language_name(){
-	if [[ ! -f /usr/share/xml/iso-codes/iso_639.xml ]] ; then
-		echo "<!> Missing /usr/share/xml/iso-codes/iso_639.xml"
-		echo "FATAL ERROR: Missing ISO-639-1 mappings."
-		exit -1
+	if [[ ! -f "$ISO_639_XML" ]] ; then
+		echo "<!> Missing file \"$(basename "$ISO_639_XML")\""
+		die "FATAL ERROR: Missing ISO-639 mappings."
 	fi
 
+	# Note assumptions about the XML file formatting:
+	# (lines marked with * are the important ones, -/... is ignored data)
+	# - <iso_639_entry                      - <iso_639_entry
+	# - ...                                 - ...
+	# * iso_639_1_code="xx"     -- XOR --   * iso_639_2T_code="xxx"
+	# * name="Xyzuvw; ..." />               * name="Xyzuvw; ..." />
+
 	# only pick the first name if many (see XML for examples on eg "nl")
-	grep -A1 "iso_639_1_code=\"$1\"" /usr/share/xml/iso-codes/iso_639.xml | grep name | sed -re 's:[ \t]*name="([^;\"]+).*:\1:'
+	NAME=$(grep -A1 "iso_639_1_code=\"$1\"" "$ISO_639_XML" | grep name | sed -re 's:[ \t]*name="([^;\"]+).*:\1:')
+	if [[ -z "$NAME" ]] ; then
+	    # Try the 3-letter terminology form before giving up
+	    # <http://www.opentag.com/xfaq_lang.htm>
+	    NAME=$(grep -A1 "iso_639_2T_code=\"$1\"" "$ISO_639_XML" | grep name= | sed -re 's:[ \t]*name="([^;\"]+).*:\1:') 
+
+	    if [[ -z "$NAME" ]] ; then
+			# causes: no 2 or 3 letter code exists, or both exists and the 3 letter
+			# version was used (causing -A1 to give the iso_639_1_code line, grepping
+			# for name= will fail => NAME="")
+
+			# Fall back to something other than an empty string
+			NAME="Unkown"
+	    fi
+	fi
+	echo "$NAME"
 }
 
 # get_translator_field: ISO-369-1 Lang × STRING -> STRING
@@ -123,9 +161,10 @@ update_vars(){
 
 # internal use by generate_overview
 overview_wikify(){
-	YYYY_MM_DD="$(LC_ALL=C date +%F)"
 	I_LANG="$(echo "$1" | sed -re 's:lang/([a-z]+)\.po:\1:')"
+	YYYY_MM_DD="$(LC_ALL=C git log -1 --format="%ar" lang/$I_LANG.po)"
 	LONG_LANG="$(get_full_language_name "$I_LANG")"
+	[[ $? -eq 0 ]] || die "$LONG_LANG"
 	update_vars "$I_LANG"
 
 	# find overview translation comments (if any)
@@ -152,11 +191,12 @@ EOH
 }
 
 generate_infoboxes(){
-	YYYY_MM_DD="$(LC_ALL=C date +%F)"
+	I_LANG="$(echo "$1" | sed -re 's:lang/([a-z]+)\.po:\1:')"
+	YYYY_MM_DD="$(LC_ALL=C git log -1 --format="%ci" lang/$I_LANG.po)"
 
 	OUT="$( LC_ALL=C msgfmt --statistics "$1" 2>&1 )"
-	I_LANG="$(echo "$1" | sed -re 's:lang/([a-z]+)\.po:\1:')"
 	LONG_LANG="$(get_full_language_name "$I_LANG")"
+	[[ $? -eq 0 ]] || die "$LONG_LANG"
 	update_vars "$I_LANG"
 
 	STATUS="$(get_translator_fields "$I_LANG" "STATUS")"
@@ -166,24 +206,43 @@ generate_infoboxes(){
 }
 
 if [[ "$1" == "--overview" ]] ; then
+    if [[ "$2" == "--iso-639" ]] && [[ -n "$3" ]] ; then
+	    [[ -f "$3" ]] || die "The <$3> doesn't exist!"
+	    ISO_639_XML="$3"
+	elif [[ $# -ne 1 ]] ; then
+	    show_usage
+	    die "Error: Invalid commandline."
+	fi
 	generate_overview
 elif [[ "$1" == "--infoboxes" ]] ; then
-	if [[ -z "$2" ]] ; then
+    L="$2"
+
+	shift # of the --infoboxes arg
+	if [[ "$L" == "--iso-639" ]] ; then
+	    # lang to --infoboxes was omitted, clear it.
+	    L=""
+	else
+	    shift # of the lang argument
+	fi
+
+	if [[ $# -eq 2 ]] && [[ "$1" == "--iso-639" ]] && [[ -n "$1" ]] ; then
+	    [[ -f "$2" ]] || die "The <$2> doesn't exist!"
+	    ISO_639_XML="$2"
+	elif [[ $# -ne 0 ]] ; then
+	    show_usage
+	    die "Error: Invalid commandline."
+	fi
+
+	if [[ -z "$L" ]] ; then
 		for a in $(ls -1 lang/*po) ; do
 			generate_infoboxes "$a"
 		done
 	else
-	    	if [[ -d lang ]] && [[ ! -f "lang/${2}.po" ]] ; then
-		    echo "There is no translation (.po) file for <$2>!"
-		    exit -1
+	    if [[ -d lang ]] && [[ ! -f "lang/${L}.po" ]] ; then
+			die "There is no translation (.po) file for <$L>!"
 		fi
-		generate_infoboxes "$2"
+		generate_infoboxes "$L"
 	fi
 else
-	echo "USAGE: $0 <--overview|--infoboxes [lang]>"
-	echo
-	echo " --overview           Generates the language overview table."
-	echo " --inforboxes [lang]  The two letter ISO-369-1 langauge code used in the PO"
-	echo "                       filename. If none is given infoboxes for all languages"
-	echo "                       found is generated."
+    show_usage
 fi
