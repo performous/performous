@@ -4,27 +4,27 @@
 # See instructions in lang/README.
 #
 # As long as the xml files are well-formed XML documents with
-# locale blocks like the following one (from scheme.xml) this
+# entry blocks like the following one (from scheme.xml) this
 # script should have no problems extracting the strings.
-#		<locale name="C">
+#		<entry ...>
 #			<short>Karaoke mode</short>
 #			<long>Hide pitch wave, notes and scoring.</long>
-#		</locale>
+#		</entry>
 
 # adds a line to the temporary source file
 append_temp_src(){
 	echo "$*" >> "$TEMP_SRC"
 }
 
-# match <locale name="C">, ignoring allowed whitespace.
-match_locale_start(){
-	echo "$1" | grep -qE '^[[:space:]]*<[[:space:]]*locale[[:space:]]+name="C"[[:space:]]*>[[:space:]]*$'
+# match <entry, ignoring allowed whitespace.
+match_entry_start(){
+	echo "$1" | grep -qE '^[[:space:]]*<[[:space:]]*entry.*>[[:space:]]*$'
 	return $?
 }
 
-# match </locale>, ignoring allowed whitespace.
-match_locale_end(){
-	echo "$1" | grep -qE '^[[:space:]]*<[[:space:]]*/[[:space:]]*locale>[[:space:]]*$'
+# match </entry>, ignoring allowed whitespace.
+match_entry_end(){
+	echo "$1" | grep -qE '^[[:space:]]*<[[:space:]]*/[[:space:]]*entry>[[:space:]]*$'
 	return $?
 }
 
@@ -58,24 +58,24 @@ process_xml(){
 	do
 		line_no=$(($line_no + 1))
 
-		# A simple 2-state automata, either we're in a <locale/>-block
+		# A simple 2-state automata, either we're in a <entry/>-block
 		# or we're not. Limited detection and bail-out on malformed XML
 		if [[ $IN_BLOCK -eq 1 ]] ; then
-			match_locale_end "$line"
+			match_entry_end "$line"
 			if [[ $? -eq 0 ]] ; then
 				IN_BLOCK=0
 			else
 				process_locale_block_line "$line"
 			fi
 
-			# <locale...> with out </locale> found:
-			match_locale_start "$line" && (echo "Malformed XML $file:$line_no: Opening locale-tag found while already inside a locale block." >&2 ;exit -1)
+			# <entry...> with out </entry> found:
+			match_entry_start "$line" && (echo "Malformed XML $file:$line_no: Opening entry-tag found while already inside an entry block." >&2 ;exit -1)
 
 		else
-			# </locale> with out <locale> found:
-			match_locale_end "$line" && (echo "Malformed XML $file:$line_no:: Closing locale-tag without prior opening tag." >&2 ;exit -1)
+			# </entry> with out <entry> found:
+			match_entry_end "$line" && (echo "Malformed XML $file:$line_no:: Closing entry-tag without prior opening tag." >&2 ;exit -1)
 
-			match_locale_start "$line"
+			match_entry_start "$line"
 			if [[ $? -eq 0 ]] ; then
 				IN_BLOCK=1
 			fi

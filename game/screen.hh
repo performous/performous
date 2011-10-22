@@ -62,6 +62,8 @@ class ScreenManager: public Singleton <ScreenManager> {
 
 	/// Draw a loading progress indication
 	void loading(std::string const& message, float progress);
+	/// Internal rendering function for loading indicator
+	void drawLoading();
 	/// Draw an error notification and quit
 	void fatalError(std::string const& message);
 	/// Set a message to flash in current screen
@@ -97,6 +99,7 @@ class ScreenManager: public Singleton <ScreenManager> {
 	std::string m_message;
 	AnimValue m_messagePopup;
 	SvgTxtTheme m_textMessage;
+	float m_loadingProgress;
 	Surface m_logo;
 	AnimValue m_logoAnim;
 	// Dialog members

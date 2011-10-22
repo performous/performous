@@ -12,6 +12,10 @@ in float bogus;  // Workaround for http://www.nvnews.net/vbulletin/showthread.ph
 varying vec3 normal;
 varying vec4 color;
 
+#ifdef ENABLE_LIGHTING
+varying vec3 lightDir;
+#endif
+
 #ifdef ENABLE_TEXTURING
 varying vec4 texCoord;
 #if ENABLE_TEXTURING == 1
@@ -41,13 +45,29 @@ void main() {
 #endif
 
 #ifdef ENABLE_LIGHTING
-	vec3 lightDir = normalize(vec3(-50.0, 5.0, -15.0));
-	const vec3 ambient = vec3(0.1, 0.1, 0.1);
+	vec3 n = normalize(normal);
+	vec3 l = normalize(lightDir);
 
-	float NdotL = max(dot(normalize(normal), lightDir), 0.0);
-	frag = vec4(ambient + frag.rgb * NdotL, frag.a);
+	// Diffuse
+	float diff = max(dot(n, l), 0.0);
+	float power = 1.0 - 0.02 * length(lightDir);
+	frag = vec4(frag.rgb * power * diff, frag.a);
+	
 #endif
 
-	gl_FragColor = colorMatrix * frag;
+	frag = colorMatrix * frag;  // Colorize
+
+#ifdef ENABLE_LIGHTING
+
+	// Specular
+	vec3 refl = reflect(-l, n);
+	float spec = dot(refl, n);
+	if (power > 0.0) {
+		power *= pow(spec, 100);
+		frag.rgb += vec3(power, power, power);
+	}
+#endif
+
+	gl_FragColor = frag;
 }
 

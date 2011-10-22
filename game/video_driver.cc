@@ -12,6 +12,25 @@
 #include <fstream>
 #include <SDL.h>
 
+#ifndef GLEW_ARB_viewport_array
+# define GLEW_ARB_viewport_array GL_FALSE
+# define glViewportIndexedf(index, x, y,  w,  h) {}
+# warning "Your version of GLEW is too old, Performous is smart and let you compile it anyway"
+#endif
+#ifndef GLEW_VERSION_3_3
+# define GLEW_VERSION_3_3 GL_FALSE
+# warning "Your version of GLEW is too old, Performous is smart and let you compile it anyway"
+#endif
+#ifndef GLEW_VERSION_4_1
+# define GLEW_VERSION_4_1 GL_FALSE
+# warning "Your version of GLEW is too old, Performous is smart and let you compile it anyway"
+#endif
+
+/*
+/home/yoda/performous/game/video_driver.cc: In member function âid Window::render(boost::function<void()>)â/home/yoda/performous/game/video_driver.cc:193:43: error: âViewportIndexedfâas not declared in this scope
+/home/yoda/performous/game/video_driver.cc: In member function âid Window::view(unsigned int)â/home/yoda/performous/game/video_driver.cc:256:46: error: âViewportIndexedfâas not declared in this scope
+*/
+
 
 namespace {
 	unsigned s_width;
@@ -44,7 +63,7 @@ namespace {
 
 	glmath::mat4 g_color = glmath::mat4::identity();
 	glmath::mat4 g_projection = glmath::mat4::identity();
-	glmath::mat4 g_modelview =  glmath::translate(glmath::vec3(0.0, 0.0, -z0));
+	glmath::mat4 g_modelview =  glmath::mat4::identity();
 
 }
 
@@ -155,12 +174,12 @@ void Window::updateColor() {
 
 void Window::updateTransforms() {
 	using namespace glmath;
-	mat4 position = g_projection * g_modelview;
 	mat3 normal(g_modelview);
 	for (ShaderMap::iterator it = m_shaders.begin(); it != m_shaders.end(); ++it) {
 		Shader& sh = *it->second;
 		sh.bind();
-		sh["positionMatrix"].setMat4(position);
+		sh["projMatrix"].setMat4(g_projection);
+		sh["mvMatrix"].setMat4(g_modelview);
 		try {
 			sh["normalMatrix"].setMat3(normal);
 		} catch(...) {}  // Not fatal if normalMatrix is missing (only 3d objects use it)
@@ -204,7 +223,7 @@ void Window::render(boost::function<void (void)> drawFunc) {
 	glerror.check("FBO->FB setup");
 	for (int num = 0; num < 2; ++num) {
 		{
-			float saturation = 0.6;  // (0..1)
+			float saturation = 0.5;  // (0..1)
 			float col = (1.0 + 2.0 * saturation) / 3.0;
 			float gry = 0.5 * (1.0 - col);
 			bool out[3] = {};  // Which colors to output
@@ -220,15 +239,15 @@ void Window::render(boost::function<void (void)> drawFunc) {
 				}
 			}
 		}
+		// Render FBO with 1:1 pixels, properly filtered/positioned for 3d
+		ColorTrans c(colorMatrix);
+		Dimensions dim = Dimensions(double(w) / h).fixedWidth(1.0);
+		dim.center((num == 0 ? 0.25 : -0.25) * dim.h());
 		if (num == 1) {
 			// Right eye blends over the left eye
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_ONE, GL_ONE);
 		}
-		// Render FBO with 1:1 pixels, properly filtered/positioned for 3d
-		ColorTrans c(colorMatrix);
-		Dimensions dim = Dimensions(double(w) / h).fixedWidth(1.0);
-		dim.center((num == 0 ? 0.25 : -0.25) * dim.h());
 		fbo.getTexture().draw(dim, TexCoords(0.0, h, w, 0));
 	}
 	glerror.check("FBO->FB postcondition");
@@ -244,6 +263,7 @@ void Window::view(unsigned num) {
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_BLEND);
+	if (GL_EXT_framebuffer_sRGB) glEnable(GL_FRAMEBUFFER_SRGB);
 	shader("color").bind();
 	// Setup views
 	double vx = 0.5f * (screen->w - s_width);
@@ -315,24 +335,6 @@ void Window::screenshot() {
 	std::clog << "video/info: Screenshot taken: " << filename << " (" << img.w << "x" << img.h << ")" << std::endl;
 }
 
-ViewTrans::ViewTrans(double offsetX, double offsetY, double frac): m_old(g_projection) {
-	// Setup the projection matrix for 2D translates
-	using namespace glmath;
-	double h = virtH();
-	const double f = near_ / z0;  // z0 to nearplane conversion factor
-	// Corners of the screen at z0
-	double x1 = -0.5, x2 = 0.5;
-	double y1 = 0.5 * h, y2 = -0.5 * h;
-	// Move the perspective point by frac of offset (i.e. move the image)
-	double persX = frac * offsetX, persY = frac * offsetY;
-	x1 -= persX; x2 -= persX;
-	y1 -= persY; y2 -= persY;
-	// Perspective projection + the rest of the offset in eye (world) space
-	g_projection = frustum(f * x1, f * x2, f * y1, f * y2, near_, far_)
-	  * translate(vec3(offsetX - persX, offsetY - persY, 0.0));
-	ScreenManager::getSingletonPtr()->window().updateTransforms();
-}
-
 ColorTrans::ColorTrans(Color const& c): m_old(g_color) {
 	using namespace glmath;
 	g_color = g_color * mat4::diagonal(vec4(c.r, c.g, c.b, c.a));
@@ -349,11 +351,33 @@ ColorTrans::~ColorTrans() {
 	ScreenManager::getSingletonPtr()->window().updateColor();
 }
 
+ViewTrans::ViewTrans(double offsetX, double offsetY, double frac): m_old(g_projection) {
+	// Setup the projection matrix for 2D translates
+	using namespace glmath;
+	double h = virtH();
+	const double f = near_ / z0;  // z0 to nearplane conversion factor
+	// Corners of the screen at z0
+	double x1 = -0.5, x2 = 0.5;
+	double y1 = 0.5 * h, y2 = -0.5 * h;
+	// Move the perspective point by frac of offset (i.e. move the image)
+	double persX = frac * offsetX, persY = frac * offsetY;
+	x1 -= persX; x2 -= persX;
+	y1 -= persY; y2 -= persY;
+	// Perspective projection + the rest of the offset in eye (world) space
+	g_projection = frustum(f * x1, f * x2, f * y1, f * y2, near_, far_)
+	  * translate(vec3(offsetX - persX, offsetY - persY, -z0));
+	ScreenManager::getSingletonPtr()->window().updateTransforms();
+}
+
+ViewTrans::ViewTrans(glmath::mat4 const& m): m_old(g_projection) {
+	g_projection = g_projection * m;
+	ScreenManager::getSingletonPtr()->window().updateTransforms();
+}
+
 ViewTrans::~ViewTrans() {
 	g_projection = m_old;
 	ScreenManager::getSingletonPtr()->window().updateTransforms();
 }
-
 
 Transform::Transform(glmath::mat4 const& m): m_old(g_modelview) {
 	g_modelview = g_modelview * m;

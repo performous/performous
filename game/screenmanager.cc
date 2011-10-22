@@ -16,7 +16,7 @@ ScreenManager::ScreenManager(Window& _window):
   m_window(_window), m_finished(false), newScreen(), currentScreen(),
   m_timeToFadeIn(), m_timeToFadeOut(), m_timeToShow(), m_message(),
   m_messagePopup(0.0, 1.0), m_textMessage(getThemePath("message_text.svg"), config["graphic/text_lod"].f()),
-  m_logo(getThemePath("logo.svg")), m_logoAnim(0.0, 0.5)
+  m_loadingProgress(0.0f), m_logo(getThemePath("logo.svg")), m_logoAnim(0.0, 0.5)
 {
 	m_textMessage.dimensions.middle().center(-0.05);
 }
@@ -49,23 +49,27 @@ void ScreenManager::drawScreen() {
 	drawNotifications();
 }
 
-
 void ScreenManager::loading(std::string const& message, float progress) {
 	// TODO: Create a better one, this is quite ugly
 	flashMessage(message + " " + boost::lexical_cast<std::string>(int(round(progress*100))) + "%", 0.0f, 1.0f, 1.0f);
+	m_loadingProgress = progress;
 	m_window.blank();
+	m_window.render(boost::bind(&ScreenManager::drawLoading, this));
+	m_window.swap();
+}
+
+void ScreenManager::drawLoading() {
 	drawLogo();
 	drawNotifications();
 	const int maxi = 20;
 	const float x = 0.3;
 	const float spacing = 0.01;
 	const float sq_size = (2*x - (maxi-1)*spacing) / maxi;
-	for (int i = 0; i <= progress * maxi; ++i) {
-		ColorTrans c(Color(0.2f, 0.7f, 0.7f, (progress + 1)*0.5f));
+	for (int i = 0; i <= m_loadingProgress * maxi; ++i) {
+		ColorTrans c(Color(0.2f, 0.7f, 0.7f, (m_loadingProgress + 1)*0.5f));
 		UseShader shader(getShader("color"));
 		glutil::Square(-x + i * (sq_size + spacing), 0, sq_size/2, true);
 	}
-	m_window.swap();
 }
 
 void ScreenManager::fatalError(std::string const& message) {

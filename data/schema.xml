@@ -110,7 +110,7 @@ to save the current settings to XML.
 		<ui unit=" %" />
 		<limits min="0" max="100" step="2" />
 		<short>Stereo3D separation</short>
-		<long>The strenght of the effect. Experiment with different settings for best results.</long>
+		<long>The strength of the effect. Experiment with different settings for best results.</long>
 	</entry>
 	<entry name="graphic/video" type="bool" value="true">
 		<short>Video playback</short>

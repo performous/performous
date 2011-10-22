@@ -11,11 +11,11 @@ class FBO: boost::noncopyable {
 	FBO(unsigned w, unsigned h) {
 		{
 			UseTexture tex(m_texture);
-			glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+			glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_FLOAT, NULL);
 		}
 		{
 			UseTexture tex(m_depth);
-			glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_DEPTH_COMPONENT24, w, h, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
+			glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_DEPTH_COMPONENT, w, h, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
 		}
 		// Create FBO
 		glGenFramebuffersEXT(1, &m_fbo);

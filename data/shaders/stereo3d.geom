@@ -7,11 +7,13 @@ uniform float z0;
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 6) out;
 
+in vec3 vLightDir[];
 in vec4 vTexCoord[];
 in vec3 vNormal[];
 in vec4 vColor[];
 
 out float bogus;  // Workaround for http://www.nvnews.net/vbulletin/showthread.php?p=2401097
+out vec3 lightDir;
 out vec4 texCoord;
 out vec3 normal;
 out vec4 color;
@@ -20,6 +22,7 @@ int i;
 
 void passthru() {
 	gl_Position = gl_in[i].gl_Position;
+	lightDir = vLightDir[i];
 	texCoord = vTexCoord[i];
 	normal = vNormal[i];
 	color = vColor[i];
