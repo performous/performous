@@ -223,7 +223,7 @@ void Window::render(boost::function<void (void)> drawFunc) {
 	glerror.check("FBO->FB setup");
 	for (int num = 0; num < 2; ++num) {
 		{
-			float saturation = 0.6;  // (0..1)
+			float saturation = 0.5;  // (0..1)
 			float col = (1.0 + 2.0 * saturation) / 3.0;
 			float gry = 0.5 * (1.0 - col);
 			bool out[3] = {};  // Which colors to output
