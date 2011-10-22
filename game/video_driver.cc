@@ -239,15 +239,15 @@ void Window::render(boost::function<void (void)> drawFunc) {
 				}
 			}
 		}
+		// Render FBO with 1:1 pixels, properly filtered/positioned for 3d
+		ColorTrans c(colorMatrix);
+		Dimensions dim = Dimensions(double(w) / h).fixedWidth(1.0);
+		dim.center((num == 0 ? 0.25 : -0.25) * dim.h());
 		if (num == 1) {
 			// Right eye blends over the left eye
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_ONE, GL_ONE);
 		}
-		// Render FBO with 1:1 pixels, properly filtered/positioned for 3d
-		ColorTrans c(colorMatrix);
-		Dimensions dim = Dimensions(double(w) / h).fixedWidth(1.0);
-		dim.center((num == 0 ? 0.25 : -0.25) * dim.h());
 		fbo.getTexture().draw(dim, TexCoords(0.0, h, w, 0));
 	}
 	glerror.check("FBO->FB postcondition");
