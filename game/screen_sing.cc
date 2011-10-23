@@ -436,12 +436,12 @@ void ScreenSing::draw() {
 			if (ar > arMax || (m_video && ar > arMin)) fillBG();  // Fill white background to avoid black borders
 			m_background->draw();
 		} else fillBG(); // Blank
-		// Video
-		if (m_video && (!m_cam || !m_cam->is_good())) {
-			m_video->render(time); double tmp = m_video->dimensions().ar(); if (tmp > 0.0) ar = tmp;
-		}
 		// Webcam
 		if (m_cam && config["graphic/webcam"].b()) m_cam->render();
+		// Video
+		if (m_video /* && (!m_cam || !m_cam->is_good()) */) {
+			m_video->render(time); double tmp = m_video->dimensions().ar(); if (tmp > 0.0) ar = tmp;
+		}
 		// Top/bottom borders
 		ar = clamp(ar, arMin, arMax);
 		double offset = 0.5 / ar + 0.2;
