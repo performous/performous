@@ -71,7 +71,7 @@ class Analyzer {
 	/** Get a list of all tones detected. **/
 	tones_t const& getTones() const { return m_tones; }
 	/** Find a tone within the singing range; prefers strong tones around 200-400 Hz. **/
-	Tone const* findTone(double minfreq = 70.0, double maxfreq = 700.0) const {
+	Tone const* findTone(double minfreq = 65.0, double maxfreq = 1000.0) const {
 		if (m_tones.empty()) { m_oldfreq = 0.0; return NULL; }
 		double db = std::max_element(m_tones.begin(), m_tones.end(), Tone::dbCompare)->db;
 		Tone const* best = NULL;
