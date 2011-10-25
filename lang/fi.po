@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-08-01 21:45+0200\n"
+"POT-Creation-Date: 2011-10-25 21:27+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Tapio Vierros <tapiovierros@gmail.com>\n"
 "Language-Team: \n"
@@ -568,279 +568,287 @@ msgstr "Ei pisteitä tähän mennessä."
 msgid "Be the first to be listed here!"
 msgstr "Ole ensimmäinen!"
 
-#: /tmp/xml2gettext.n68PNWaJWN:3
+#: /tmp/xml2gettext.iTnU6qPJQg:3
 msgid "Gameplay settings."
 msgstr "Peliasetukset."
 
-#: /tmp/xml2gettext.n68PNWaJWN:4
+#: /tmp/xml2gettext.iTnU6qPJQg:4
 msgid "Graphic"
 msgstr "Grafiikka"
 
-#: /tmp/xml2gettext.n68PNWaJWN:5
+#: /tmp/xml2gettext.iTnU6qPJQg:5
 msgid "Video and rendering settings."
 msgstr "Video ja kuva-asetukset."
 
-#: /tmp/xml2gettext.n68PNWaJWN:7
+#: /tmp/xml2gettext.iTnU6qPJQg:7
 msgid "Audio-related settings."
 msgstr "Ääniasetukset."
 
-#: /tmp/xml2gettext.n68PNWaJWN:9
+#: /tmp/xml2gettext.iTnU6qPJQg:9
 msgid "System paths."
 msgstr "Järjestelmän tiedostopolut."
 
-#: /tmp/xml2gettext.n68PNWaJWN:10
+#: /tmp/xml2gettext.iTnU6qPJQg:10
 msgid "Karaoke mode"
 msgstr "Karaoketila"
 
-#: /tmp/xml2gettext.n68PNWaJWN:11
+#: /tmp/xml2gettext.iTnU6qPJQg:11
 msgid "Hide pitch wave, notes and scoring."
 msgstr "Piilota ääniaallon piirto, nuotit ja pisteytys."
 
-#: /tmp/xml2gettext.n68PNWaJWN:12
+#: /tmp/xml2gettext.iTnU6qPJQg:12
 msgid "Pitch waves"
 msgstr "Äänenkorkeusaallot"
 
-#: /tmp/xml2gettext.n68PNWaJWN:13
+#: /tmp/xml2gettext.iTnU6qPJQg:13
 msgid "Enable singing pitch display (when not in karaoke mode)."
 msgstr "Ota käyttöön laulun äänenkorkeuden näyttäminen (kun ei olla karaokemoodissa)."
 
-#: /tmp/xml2gettext.n68PNWaJWN:14
+#: /tmp/xml2gettext.iTnU6qPJQg:14
 msgid "Theme"
 msgstr "Teema"
 
-#: /tmp/xml2gettext.n68PNWaJWN:15
+#: /tmp/xml2gettext.iTnU6qPJQg:15
 msgid "Name of the theme to use or absolute path to theme folder."
 msgstr "Käytettävän teeman nimi tai absoluuttinen polku teemakansioon."
 
-#: /tmp/xml2gettext.n68PNWaJWN:16
+#: /tmp/xml2gettext.iTnU6qPJQg:16
 msgid "Keyboard as guitar"
 msgstr "Näppäimistö kitarana"
 
-#: /tmp/xml2gettext.n68PNWaJWN:17
+#: /tmp/xml2gettext.iTnU6qPJQg:17
 msgid "Enable keyboard as guitar (Frets on Fire mode)."
 msgstr "Käytä näppäimistöä kitarana (Frets on Fire -pelitila)."
 
-#: /tmp/xml2gettext.n68PNWaJWN:18
+#: /tmp/xml2gettext.iTnU6qPJQg:18
 msgid "Keyboard as drumkit"
 msgstr "Näppäimistö rumpuina"
 
-#: /tmp/xml2gettext.n68PNWaJWN:19
+#: /tmp/xml2gettext.iTnU6qPJQg:19
 msgid "Enable keyboard as drumkit."
 msgstr "Käytä näppäimistöä rumpusettinä."
 
-#: /tmp/xml2gettext.n68PNWaJWN:20
+#: /tmp/xml2gettext.iTnU6qPJQg:20
 msgid "Keyboard as dance pad"
 msgstr "Näppäimistö tanssimattona"
 
-#: /tmp/xml2gettext.n68PNWaJWN:21
+#: /tmp/xml2gettext.iTnU6qPJQg:21
 msgid "Enable keyboard as dance pad."
 msgstr "Käytä näppäimistöä tanssimattona."
 
-#: /tmp/xml2gettext.n68PNWaJWN:22
+#: /tmp/xml2gettext.iTnU6qPJQg:22
 msgid "Keyboard as keyboard"
 msgstr "Näppäimistö pianona"
 
-#: /tmp/xml2gettext.n68PNWaJWN:23
+#: /tmp/xml2gettext.iTnU6qPJQg:23
 msgid "Enable keyboard as keyboard."
 msgstr "Käytä näppäimistöä pianona."
 
-#: /tmp/xml2gettext.n68PNWaJWN:24
+#: /tmp/xml2gettext.iTnU6qPJQg:24
 msgid "Joystick configuration"
 msgstr "Peliohjain säädöt"
 
-#: /tmp/xml2gettext.n68PNWaJWN:25
+#: /tmp/xml2gettext.iTnU6qPJQg:25
 msgid "Force joystick to some kind of instrument."
 msgstr "Pakota peliohjain jonkinlaiseksi instrumentiksi."
 
-#: /tmp/xml2gettext.n68PNWaJWN:26
+#: /tmp/xml2gettext.iTnU6qPJQg:26
 msgid "Hardware MIDI input device"
 msgstr "MIDI sisääntulolaite"
 
-#: /tmp/xml2gettext.n68PNWaJWN:27
+#: /tmp/xml2gettext.iTnU6qPJQg:27
 msgid "Part of sound card name or its number or empty to use the first available device. Used currently for MIDI drum controllers."
 msgstr "Osa äänikortin nimestä tai sen numero. Tyhjä arvo valitsee ensimmäisen mahdollisen. Käytetään MIDI rumpujen kanssa."
 
-#: /tmp/xml2gettext.n68PNWaJWN:28
+#: /tmp/xml2gettext.iTnU6qPJQg:28
+msgid "Fallback song encoding"
+msgstr "Tekstin varakoodaus"
+
+#: /tmp/xml2gettext.iTnU6qPJQg:29
+msgid "Pick the text codec used for song files that are not UTF-8."
+msgstr "Tekstin koodaus jos se ei ole UTF-8."
+
+#: /tmp/xml2gettext.iTnU6qPJQg:30
 msgid "Windowed width"
 msgstr "Ikkunoitu leveys"
 
-#: /tmp/xml2gettext.n68PNWaJWN:29
+#: /tmp/xml2gettext.iTnU6qPJQg:31
 msgid "The width of the window."
 msgstr "Ikkunan leveys."
 
-#: /tmp/xml2gettext.n68PNWaJWN:30
+#: /tmp/xml2gettext.iTnU6qPJQg:32
 msgid "Windowed height"
 msgstr "Ikkunoitu korkeus"
 
-#: /tmp/xml2gettext.n68PNWaJWN:31
+#: /tmp/xml2gettext.iTnU6qPJQg:33
 msgid "The height of the window."
 msgstr "Ikkunan korkeus."
 
-#: /tmp/xml2gettext.n68PNWaJWN:32
+#: /tmp/xml2gettext.iTnU6qPJQg:34
 msgid "Fullscreen mode"
 msgstr "Kokoruututila"
 
-#: /tmp/xml2gettext.n68PNWaJWN:33
+#: /tmp/xml2gettext.iTnU6qPJQg:35
 msgid "Enable fullscreen mode on startup."
 msgstr "Ota kokoruututila käyttöön."
 
-#: /tmp/xml2gettext.n68PNWaJWN:34
+#: /tmp/xml2gettext.iTnU6qPJQg:36
 msgid "Stereoscopic 3D"
 msgstr "Stereo 3D"
 
-#: /tmp/xml2gettext.n68PNWaJWN:35
+#: /tmp/xml2gettext.iTnU6qPJQg:37
 msgid "Enable 3D rendering of Performous."
 msgstr "Aktivoi Performouksen 3D renderöinti."
 
-#: /tmp/xml2gettext.n68PNWaJWN:36
+#: /tmp/xml2gettext.iTnU6qPJQg:38
 msgid "Stereo3D type"
 msgstr "Stereo 3D:n tyyppi"
 
-#: /tmp/xml2gettext.n68PNWaJWN:37
+#: /tmp/xml2gettext.iTnU6qPJQg:39
 msgid "Some modes may only get activated in fullscreen mode."
 msgstr "Jotkin tilat aktivoituvat vain kokoruudun tilassa."
 
-#: /tmp/xml2gettext.n68PNWaJWN:38
+#: /tmp/xml2gettext.iTnU6qPJQg:40
 msgid "Stereo3D separation"
 msgstr "Stereoerotus"
 
-#: /tmp/xml2gettext.n68PNWaJWN:39
+#: /tmp/xml2gettext.iTnU6qPJQg:41
 msgid "The strength of the effect. Experiment with different settings for best results."
 msgstr "Efektin voimakkuus. Kokeile erilaisia arvoja saavuttaaksesi parhaan tuloksen."
 
-#: /tmp/xml2gettext.n68PNWaJWN:40
+#: /tmp/xml2gettext.iTnU6qPJQg:42
 msgid "Video playback"
 msgstr "Videotoisto"
 
-#: /tmp/xml2gettext.n68PNWaJWN:41
+#: /tmp/xml2gettext.iTnU6qPJQg:43
 msgid "Allows completely disabling background videos. It is recommended to leave this enabled as Performous will still smoothly fade out the video if your computer is not fast enough."
 msgstr "Poista musiikkivideot käytöstä. Suositeltavaa on jättää ne päälle, koska Performous osaa häivyttää ne automaattisesti, jos tietokoneesta näyttää loppuvan tehot."
 
-#: /tmp/xml2gettext.n68PNWaJWN:42
+#: /tmp/xml2gettext.iTnU6qPJQg:44
 msgid "Webcam background"
 msgstr "Web-kamera taustana"
 
-#: /tmp/xml2gettext.n68PNWaJWN:43
+#: /tmp/xml2gettext.iTnU6qPJQg:45
 msgid "Performous can use webcam as a background video. Disable it if Performous crashes while entering a song."
 msgstr "Performous voi yrittää käyttää web-kameran videota kappaleiden taustakuvana. Poista käytöstä jos peli kaatuu kappaletta ladatessa."
 
-#: /tmp/xml2gettext.n68PNWaJWN:44
+#: /tmp/xml2gettext.iTnU6qPJQg:46
 msgid "Webcam id"
 msgstr "Web-kameran tunniste"
 
-#: /tmp/xml2gettext.n68PNWaJWN:45
+#: /tmp/xml2gettext.iTnU6qPJQg:47
 msgid "Use -1 to autodetect or a number starting from 0 to choose specific device."
 msgstr "Arvo -1 valitsee kameran automaattisesti, sitä suuremmat kokonaisluvut valitsevat tietyn laitteen."
 
-#: /tmp/xml2gettext.n68PNWaJWN:46
+#: /tmp/xml2gettext.iTnU6qPJQg:48
 msgid "3D notes"
 msgstr "3D nuotit"
 
-#: /tmp/xml2gettext.n68PNWaJWN:47
+#: /tmp/xml2gettext.iTnU6qPJQg:49
 msgid "Draw instrument notes as 3-dimensional objects. May hurt performance on older hardware."
 msgstr "Piirrä instrumenttinuotit kolmiulotteisina objekteina."
 
-#: /tmp/xml2gettext.n68PNWaJWN:48
+#: /tmp/xml2gettext.iTnU6qPJQg:50
 msgid "SVG quality"
 msgstr "Vektorikuvien laatu"
 
-#: /tmp/xml2gettext.n68PNWaJWN:49
+#: /tmp/xml2gettext.iTnU6qPJQg:51
 msgid "Larger numbers cause vector graphics to be rendered in higher resolution. Decrease this to make navigating in menus faster."
 msgstr "Suuremmilla luvuilla vektorikuvat luodaan korkeammalla tarkkuudella. Pienentämällä arvoa valikoissa liikkuminen nopeutuu."
 
-#: /tmp/xml2gettext.n68PNWaJWN:50
+#: /tmp/xml2gettext.iTnU6qPJQg:52
 msgid "Text quality"
 msgstr "Tekstin laatu"
 
-#: /tmp/xml2gettext.n68PNWaJWN:51
+#: /tmp/xml2gettext.iTnU6qPJQg:53
 msgid "Larger numbers cause text to be rendered in higher resolution. Decrease this to make everything a little faster."
 msgstr "Suuremmilla arvoilla teksti piirretään tarkempana. Tämä vaikuttaa hieman suorituskykyyn lähes kaikkialla."
 
-#: /tmp/xml2gettext.n68PNWaJWN:52
+#: /tmp/xml2gettext.iTnU6qPJQg:54
 msgid "Benchmark mode"
 msgstr "Suorituskyvynmittaustila"
 
-#: /tmp/xml2gettext.n68PNWaJWN:53
+#: /tmp/xml2gettext.iTnU6qPJQg:55
 msgid "Framerate limit of 100 FPS is removed and the game instead renders at full speed. FPS values are printed to console. Please note that the display drivers may still limit the rendering speed to the screen refresh rate."
 msgstr "Ruudunpäivitysnopeuden raja 100 FPS poistetaan ja sen nopeusarvoja tulostetaan terminaaliin. Huomaa, että näytönohjainajurit saattavat vielä rajoittaa nopeutta."
 
-#: /tmp/xml2gettext.n68PNWaJWN:54
+#: /tmp/xml2gettext.iTnU6qPJQg:56
 msgid "Suggested latency"
 msgstr "Toivottu latenssi"
 
-#: /tmp/xml2gettext.n68PNWaJWN:55
+#: /tmp/xml2gettext.iTnU6qPJQg:57
 msgid "This is a hint for the audio engine about the desired latency. Set this as low as possible while retaining clear audio playback. Requires restart."
 msgstr "Vihje äänilaitteille kuinka pieni latenssi halutaan. Aseta niin matalaksi kuin mahdollista ilman äänen häiriöitä. Vaatii uudelleenkäynnistyksen. "
 
-#: /tmp/xml2gettext.n68PNWaJWN:56
+#: /tmp/xml2gettext.iTnU6qPJQg:58
 msgid "Audio/video latency"
 msgstr "Ääni/video latenssi"
 
-#: /tmp/xml2gettext.n68PNWaJWN:57
+#: /tmp/xml2gettext.iTnU6qPJQg:59
 msgid "Affects all modes. Use negative value if your display input lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal. This should be set so that the notes pass the cursor at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while performing."
 msgstr "Vaikuttaa kaikkiin pelimuotoihin. Käytä negatiivista arvoa jos näytön sisääntuloviive on suurempi kuin äänikortin ulostulolatenssi ja päinvastoin. Tämän pitäisi olla säädetty siten, että nuotit ohittavat \"kursorin\" samaan aikaan kun ääni kuullaan. Ctrl+F1/F2 säätävät pelin aikana."
 
-#: /tmp/xml2gettext.n68PNWaJWN:58
+#: /tmp/xml2gettext.iTnU6qPJQg:60
 msgid "Audio round-trip latency"
 msgstr "Äänen edestakainen latenssi"
 
-#: /tmp/xml2gettext.n68PNWaJWN:59
+#: /tmp/xml2gettext.iTnU6qPJQg:61
 msgid "Affects singing only. The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. While performing, press Ctrl+S for synth mode and adjust with Ctrl+F3/F4."
 msgstr "Vaikuttaa ainoastaan laulamiseen. Tämä on aika, joka Performouksen ääniltä kestää saavuttaa kaiuttimesi, lentää mikrofoniin ja takaisin Performouksen kaapattavaksi ja analysoitavaksi. Pelatessa, paina Ctrl+S aktivoidaksesi syntetisaattoritilan ja säädä Ctrl+F3/F4 näppäimillä."
 
-#: /tmp/xml2gettext.n68PNWaJWN:60
+#: /tmp/xml2gettext.iTnU6qPJQg:62
 msgid "Audio/controller latency"
 msgstr "Ääni/peliohjain latenssi"
 
-#: /tmp/xml2gettext.n68PNWaJWN:61
+#: /tmp/xml2gettext.iTnU6qPJQg:63
 msgid "Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to adjust while performing."
 msgstr "Vaikuttaa vain soittamiseen ja tanssimiseen. Tämä on USB:n viive yhdistettynä äänen ulostuloviiveeseen. Säädä siten, että osut nuotteihin hyvin pelkän kuulon avulla. Ctrl+F5/F6 pelin aikana."
 
-#: /tmp/xml2gettext.n68PNWaJWN:62
+#: /tmp/xml2gettext.iTnU6qPJQg:64
 msgid "Audio devices"
 msgstr "Äänilaitteet"
 
-#: /tmp/xml2gettext.n68PNWaJWN:63
+#: /tmp/xml2gettext.iTnU6qPJQg:65
 msgid "List of audio devices to try."
 msgstr "Lista kokeiltavista äänilaitteista."
 
-#: /tmp/xml2gettext.n68PNWaJWN:64
+#: /tmp/xml2gettext.iTnU6qPJQg:66
 msgid "Menu volume"
 msgstr "Valikkojen äänenvoimakkuus"
 
-#: /tmp/xml2gettext.n68PNWaJWN:65
+#: /tmp/xml2gettext.iTnU6qPJQg:67
 msgid "The volume level of menus, song previews and jukebox mode."
 msgstr "Äänenvoimakkuus valikoissa, kappaleiden esikuunteluissa ja jukeboksi tilassa."
 
-#: /tmp/xml2gettext.n68PNWaJWN:66
+#: /tmp/xml2gettext.iTnU6qPJQg:68
 msgid "Music volume"
 msgstr "Musiikin voimakkuus"
 
-#: /tmp/xml2gettext.n68PNWaJWN:67
+#: /tmp/xml2gettext.iTnU6qPJQg:69
 msgid "The ingame music volume. Values above 90 are not recommended as distortion may occur."
 msgstr "Pelin äänenvoimakkuus. Arvot yli 90 eivät ole suositeltuja mahdollisen äänen vääristymisen takia."
 
-#: /tmp/xml2gettext.n68PNWaJWN:68
+#: /tmp/xml2gettext.iTnU6qPJQg:70
 msgid "Failure volume"
 msgstr "Virheiden äänenvoimakkuus"
 
-#: /tmp/xml2gettext.n68PNWaJWN:69
+#: /tmp/xml2gettext.iTnU6qPJQg:71
 msgid "The ingame fail sound volume. Values above 90 are not recommended as distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
 msgstr "Virheäänien voimakkuus. Arvot yli 90 eivät ole suositeltuja mahdollisen äänen vääristymisen takia."
 
-#: /tmp/xml2gettext.n68PNWaJWN:70
+#: /tmp/xml2gettext.iTnU6qPJQg:72
 msgid "Song folders"
 msgstr "Kappaleiden sijainnit"
 
-#: /tmp/xml2gettext.n68PNWaJWN:71
+#: /tmp/xml2gettext.iTnU6qPJQg:73
 msgid "Where to recursively look for songs. DATADIR at the beginning means all Performous data folders."
 msgstr "Mistä etsiä rekursiivisesti kappaleita. DATADIR alussa tarkoittaa kaikkia Performouksen järjestelmäkansioita."
 
-#: /tmp/xml2gettext.n68PNWaJWN:72
+#: /tmp/xml2gettext.iTnU6qPJQg:74
 msgid "Base folders for data"
 msgstr "Järjestelmäkansiot"
 
-#: /tmp/xml2gettext.n68PNWaJWN:73
+#: /tmp/xml2gettext.iTnU6qPJQg:75
 msgid "System defaults are included automatically. Additional paths can be added here."
 msgstr "Järjestelmän oletuskansiot sisällytetään automaattisesti. Omia voi lisätä tähän."
 
