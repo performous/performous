@@ -95,6 +95,9 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 		case NoteGraph::TOP:
 			dimensions.stretch(1.0, 0.32).bottom(0.0);
 			break;
+		case NoteGraph::BOTTOM:
+			dimensions.stretch(1.0, 0.32).top(0.0);
+			break;
 		case NoteGraph::LEFT:
 			dimensions.stretch(0.50, 0.50).center().left(-0.5);
 			break;
@@ -128,7 +131,8 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 			float centery = m_baseY + (it->note + 0.4) * m_noteUnit; // Star is 0.4 notes higher than current note
 			float centerx = x + w - (player_star_offset + 1.2) * hh; // Star is 1.2 units from end
 			float rot = fmod(time * 5.0, 2.0 * M_PI); // They rotate!
-			float zoom = (std::abs((rot-180) / 360.0f) * 0.8f + 0.6f) * (position == NoteGraph::TOP ? 2.3 : 2.0) * hh;
+			bool smallerNoteGraph = ((position == NoteGraph::TOP) || (position == NoteGraph::BOTTOM));
+			float zoom = (std::abs((rot-180) / 360.0f) * 0.8f + 0.6f) * (smallerNoteGraph ? 2.3 : 2.0) * hh;
 			using namespace glmath;
 			Transform trans(translate(vec3(centerx, centery, 0.0f)) * rotate(rot, vec3(0.0f, 0.0f, 1.0f)));
 			{
