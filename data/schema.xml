@@ -75,10 +75,17 @@ to save the current settings to XML.
 		<short>Hardware MIDI input device</short>
 		<long>Part of sound card name or its number or empty to use the first available device. Used currently for MIDI drum controllers.</long>
 	</entry>
-	<entry name="game/fallback_encoding" type="int" value="1">
+	<entry name="game/fallback_encoding" type="int" value="2">
 		<limits>
 			<enum>CP1250</enum>
+			<enum>CP1251</enum>
 			<enum>CP1252</enum>
+			<enum>CP1253</enum>
+			<enum>CP1254</enum>
+			<enum>CP1255</enum>
+			<enum>CP1256</enum>
+			<enum>CP1257</enum>
+			<enum>CP1258</enum>
 		</limits>
 		<short>Fallback song encoding</short>
 		<long>Pick the text codec used for song files that are not UTF-8.</long>

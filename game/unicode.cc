@@ -9,7 +9,7 @@
 
 namespace {
 	// Codepage choices from config
-	static const char* codesets[] = { "CP1250", "CP1252" };
+	static const char* codesets[] = { "CP1250", "CP1251", "CP1252", "CP1253", "CP1254", "CP1255", "CP1256", "CP1257", "CP1258" };
 
 	// Convert a string using Glib, throw exception on error.
 	// This is in fact (slightly modified) Glib::convert from glibmm.
