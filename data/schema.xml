@@ -75,6 +75,14 @@ to save the current settings to XML.
 		<short>Hardware MIDI input device</short>
 		<long>Part of sound card name or its number or empty to use the first available device. Used currently for MIDI drum controllers.</long>
 	</entry>
+	<entry name="game/fallback_encoding" type="int" value="1">
+		<limits>
+			<enum>CP1250</enum>
+			<enum>CP1252</enum>
+		</limits>
+		<short>Fallback song encoding</short>
+		<long>Pick the text codec used for song files that are not UTF-8.</long>
+	</entry>
 
 	<!-- Graphic preferences -->
 	<entry name="graphic/window_width" type="int" value="800" hidden="true">
@@ -103,8 +111,8 @@ to save the current settings to XML.
 			<enum>Green/Magenta</enum>
 			<enum>Over/Under</enum>
 		</limits>
-	<short>Stereo3D type</short>
-	<long>Some modes may only get activated in fullscreen mode.</long>
+		<short>Stereo3D type</short>
+		<long>Some modes may only get activated in fullscreen mode.</long>
 	</entry>
 	<entry name="graphic/stereo3dseparation" type="float" value="50">
 		<ui unit=" %" />
