@@ -40,6 +40,9 @@ class SongParser {
 	bool iniCheck(std::vector<char> const& data) const;
 	void iniParseHeader();
 	void iniParse();
+	bool midCheck(std::vector<char> const& data) const;
+	void midParseHeader();
+	void midParse();
 	bool smCheck(std::vector<char> const& data) const;
 	void smParseHeader();
 	void smParse();
