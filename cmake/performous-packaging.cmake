@@ -66,6 +66,14 @@ if(UNIX)
 			set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsdl1.2debian, libcairo2, librsvg2-2, libboost-thread1.42.0, libboost-program-options1.42.0, libboost-regex1.42.0, libboost-filesystem1.42.0, libboost-date-time1.42.0, libavcodec52|libavcodec-extra-52, libavformat52|libavformat-extra-52, libswscale0, libmagick++2, libxml++2.6-2, libglew1.5, libpng12-0, libjpeg62, libportmidi0, libcv2.1, libhighgui2.1")
 		endif("${LSB_DISTRIB}" MATCHES "Ubuntu10.10")
 
+		if("${LSB_DISTRIB}" MATCHES "Ubuntu11.04")
+			set(CPACK_DEBIAN_PACKAGE_DEPENDS "libavcodec52|libavcodec-extra-52, libavformat52|libavformat-extra-52, libavutil50|libavutil-extra-50, libboost-filesystem1.42.0, libboost-program-options1.42.0, libboost-regex1.42.0, libboost-system1.42.0, libboost-thread1.42.0, libc6, libcairo2, libfreetype6, libgcc1, libgdk-pixbuf2.0-0, libgl1-mesa-glx|libgl1, libglew1.5, libglib2.0-0, libglibmm-2.4-1c2a, libglu1-mesa|libglu1, libjpeg62, libpango1.0-0, libpng12-0, libportaudio2, librsvg2-2, libsdl1.2debian, libsigc++-2.0-0c2a, libstdc++6, libswscale0|libswscale-extra-0, libxml++2.6-2, libxml2, zlib1g")
+		endif("${LSB_DISTRIB}" MATCHES "Ubuntu11.04")
+
+		if("${LSB_DISTRIB}" MATCHES "Ubuntu11.10")
+			set(CPACK_DEBIAN_PACKAGE_DEPENDS "libavcodec53|libavcodec-extra-53, libavformat53|libavformat-extra-53, libavutil51|libavutil-extra-51, libboost-filesystem1.46.1, libboost-program-options1.46.1, libboost-regex1.46.1, libboost-system1.46.1, libboost-thread1.46.1, libc6, libcairo2, libgcc1, libgdk-pixbuf2.0-0, libgl1-mesa-glx|libgl1, libglew1.5, libglib2.0-0, libglibmm-2.4-1c2a, libglu1-mesa|libglu1, libjpeg62, libpango1.0-0, libpng12-0, libportaudio2, librsvg2-2, libsdl1.2debian, libstdc++6, libswscale2|libswscale-extra-2, libxml++2.6-2")
+		endif("${LSB_DISTRIB}" MATCHES "Ubuntu11.10")
+
 		# Debian
 		if("${LSB_DISTRIB}" MATCHES "Debian5.*")
 			set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsdl1.2debian, libcairo2, librsvg2-2, libboost-thread1.42.0, libboost-program-options1.42.0, libboost-regex1.42.0, libboost-filesystem1.42.0, libboost-date-time1.42.0, libavcodec51, libavformat52, libswscale0, libmagick++10, libxml++2.6-2, libglew1.5, libpng12-0, libjpeg62, libportmidi0, libcv2.1, libhighgui2.1")
