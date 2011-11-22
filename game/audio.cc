@@ -279,7 +279,7 @@ struct Synth {
 		if (it == m_notes.end() || it->type == Note::SLEEP || it->begin > position) { phase = 0.0; return; }
 		int note = it->note % 12;
 		double d = (note + 1) / 13.0;
-		double freq = MusicalScale().getNoteFreq(note + 12);
+		double freq = MusicalScale().getNoteFreq(note + 4 * 12);
 		double value = 0.0;
 		// Synthesize tones
 		for (size_t i = 0, iend = mixbuf.size(); i != iend; ++i) {
