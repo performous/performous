@@ -214,8 +214,7 @@ Paths const& getPaths(bool refresh) {
 		paths.clear();
 		std::remove_copy_if(dirs.begin(), dirs.end(), std::inserter(paths, paths.end()), pathNotExist);
 		// Assure that each path appears only once
-		Paths::iterator it = std::unique(paths.begin(), paths.end());
-		paths.resize(it - paths.begin());
+		paths.erase(std::unique(paths.begin(), paths.end()), paths.end());
 	}
 	return paths;
 }

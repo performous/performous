@@ -1,7 +1,7 @@
 #pragma once
 
 #include <boost/filesystem.hpp>
-#include <vector>
+#include <list>
 
 // Define this useful alias for the overlong namespace name (yes, for everyone who includes this header)
 namespace fs = boost::filesystem;
@@ -42,7 +42,7 @@ std::string getPath(fs::path const& filename);
 /** Get full path to a default conguration file **/
 fs::path getDefaultConfig(fs::path const &configFile);
 
-typedef std::vector<fs::path> Paths;
+typedef std::list<fs::path> Paths;
 
 /** Get all shared data paths in preference order **/
 Paths const& getPaths(bool refresh = false);
