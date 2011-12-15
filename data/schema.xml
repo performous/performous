@@ -63,6 +63,38 @@ to save the current settings to XML.
 		<short>Keyboard as keyboard</short>
 		<long>Enable keyboard as keyboard.</long>
 	</entry>
+	<entry name="game/instrument0" type="int" value="0">
+		<limits>
+			<enum>Auto</enum>
+			<!-- Options added dynamically from controllers.xml -->
+		</limits>
+		<short>Force controller A's type</short>
+		<long>Override autodetection and force the first controller to the given type.</long>
+	</entry>
+	<entry name="game/instrument1" type="int" value="0">
+		<limits>
+			<enum>Auto</enum>
+			<!-- Options added dynamically from controllers.xml -->
+		</limits>
+		<short>Force controller B's type</short>
+		<long>Override autodetection and force the second controller to the given type.</long>
+	</entry>
+	<entry name="game/instrument2" type="int" value="0">
+		<limits>
+			<enum>Auto</enum>
+			<!-- Options added dynamically from controllers.xml -->
+		</limits>
+		<short>Force controller C's type</short>
+		<long>Override autodetection and force the third controller to the given type.</long>
+	</entry>
+	<entry name="game/instrument3" type="int" value="0">
+		<limits>
+			<enum>Auto</enum>
+			<!-- Options added dynamically from controllers.xml -->
+		</limits>
+		<short>Force controller D's type</short>
+		<long>Override autodetection and force the fourth controller to the given type.</long>
+	</entry>
 	<entry name="game/instruments" type="string_list">
 		<!-- Should be SDL_ID:{GUITAR_GUITARHERO|GUITAR_GUITARHERO_XPLORER|GUITAR_ROCKBAND_PS3|GUITAR_ROCKBAND_XB360|DRUMS_GUITARHERO|DRUMS_ROCKBAND_PS3|DRUMS_ROCKBAND_XB360|DRUMS_MIDI|DANCEPAD_GENERIC|DANCEPAD_TIGERGAME|DANCEPAD_2TECH}
 		     example:
