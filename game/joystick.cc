@@ -333,8 +333,29 @@ void input::SDL::init() {
 	readControllers(g_instruments, getDefaultConfig(fs::path("/config/controllers.xml")));
 	readControllers(g_instruments, getConfigDir() / "controllers.xml");
 	std::map<unsigned int, input::Instrument> forced_type;
+	ConfigItem::StringList instruments = config["game/instruments"].sl();
 
-	ConfigItem::StringList const& instruments = config["game/instruments"].sl();
+	// Populate controller forcing config items
+	ConfigItem& ci0 = config["game/instrument0"];
+	ConfigItem& ci1 = config["game/instrument1"];
+	ConfigItem& ci2 = config["game/instrument2"];
+	ConfigItem& ci3 = config["game/instrument3"];
+	int i = 0;
+	for (input::Instruments::const_iterator it = g_instruments.begin(); it != g_instruments.end(); ++it, ++i) {
+		// Add the enum
+		std::string title = it->second.description;
+		ci0.addEnum(title);
+		ci1.addEnum(title);
+		ci2.addEnum(title);
+		ci3.addEnum(title);
+		// Check for active items
+		if (i == ci0.i()-1) instruments.push_back("0:" + it->first);
+		if (i == ci1.i()-1) instruments.push_back("1:" + it->first);
+		if (i == ci2.i()-1) instruments.push_back("2:" + it->first);
+		if (i == ci3.i()-1) instruments.push_back("3:" + it->first);
+	}
+
+	// Check all forced instruments
 	for (ConfigItem::StringList::const_iterator it = instruments.begin(); it != instruments.end(); ++it) {
 		std::istringstream iss(*it);
 		unsigned sdl_id;
