@@ -144,6 +144,14 @@ namespace {
 	}
 }
 
+void ConfigItem::addEnum(std::string name) {
+	verifyType("int");
+	m_enums.push_back(name);
+	m_min = 0;
+	m_max = int(m_enums.size() - 1);
+	m_step = 1;
+}
+
 template <typename T> void ConfigItem::updateNumeric(xmlpp::Element& elem, int mode) {
 	xmlpp::NodeSet ns = elem.find("limits");
 	if (!ns.empty()) setLimits<T>(dynamic_cast<xmlpp::Element&>(*ns[0]), m_min, m_max, m_step);
