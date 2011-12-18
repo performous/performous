@@ -388,7 +388,7 @@ void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
 		va.Color(c).TexCoord(getIconTex(5), 1.0f).Vertex(x, dim.y2());
 		va.Draw();
 	}
-	{
+	/*{
 		// keyboard
 		float a = alpha * (have_keyboard ? 1.00f : 0.25f);
 		float m = !(typeFilter & 16);
@@ -401,17 +401,17 @@ void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
 		va.Color(c).TexCoord(getIconTex(6), 0.0f).Vertex(x, dim.y1());
 		va.Color(c).TexCoord(getIconTex(6), 1.0f).Vertex(x, dim.y2());
 		va.Draw();
-	}
+	}*/
 	{
 		// dancing
 		float a = alpha * (have_dance ? 1.00f : 0.25f);
 		float m = !(typeFilter & 1);
 		glutil::VertexArray va;
 		glmath::vec4 c(m * 1.0f, 1.0f, m * 1.0f, a);
-		x = dim.x1()+5*xincr*(dim.x2()-dim.x1());
+		x = dim.x1()+4*xincr*(dim.x2()-dim.x1());
 		va.Color(c).TexCoord(getIconTex(6), 0.0f).Vertex(x, dim.y1());
 		va.Color(c).TexCoord(getIconTex(6), 1.0f).Vertex(x, dim.y2());
-		x = dim.x1()+6*xincr*(dim.x2()-dim.x1());
+		x = dim.x1()+5*xincr*(dim.x2()-dim.x1());
 		va.Color(c).TexCoord(getIconTex(7), 0.0f).Vertex(x, dim.y1());
 		va.Color(c).TexCoord(getIconTex(7), 1.0f).Vertex(x, dim.y2());
 		va.Draw();
