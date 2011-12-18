@@ -316,9 +316,10 @@ void GuitarGraph::engine() {
 	bool difficulty_changed = false;
 	// Handle all events
 	for (input::Event ev; m_input.tryPoll(ev);) {
-		// This hack disallows joining with Enter-key for skipping instrumental
-		// breaks to be usable with FoF songs.
-		if (dead() && m_input.isKeyboard() && ev.type == input::Event::PICK) continue;
+		// This hack disallows joining with Enter and CTRL-key
+		// since they cause issues due to also being used in other places
+		if (dead() && m_input.isKeyboard()
+		  && (ev.type == input::Event::PICK || ev.button == input::GODMODE_BUTTON)) continue;
 		m_dead = 0; // Keep alive
 		// Handle joining
 		if (m_jointime != m_jointime) {
