@@ -460,12 +460,12 @@ void ScreenSing::draw() {
 		m_only_singers_alive = false;
 	// Singing only
 	} else if( m_instruments.empty() ) {
-		m_layout_singer->draw(time, LayoutSinger::BOTTOM);
+		m_layout_singer->draw(time, LayoutSinger::FULL);
 		m_only_singers_alive = true;
 	// Band
 	} else {
 		m_only_singers_alive = !instrumentLayout(time);
-		m_layout_singer->draw(time, m_only_singers_alive ? LayoutSinger::BOTTOM : LayoutSinger::MIDDLE);
+		m_layout_singer->draw(time, m_only_singers_alive ? LayoutSinger::FULL : LayoutSinger::BAND);
 	}
 
 	Song::Status status = m_song->status(time);
