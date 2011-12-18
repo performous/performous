@@ -38,11 +38,12 @@ void LayoutSinger::drawScore(PositionMode position) {
 		float b = p->m_color.b;
 		m_score_text[i%4]->render((boost::format("%04d") % p->getScore()).str());
 		switch(position) {
-			case LayoutSinger::FULL: // Fullscreen
+			case LayoutSinger::DUET:
+			case LayoutSinger::FULL:
 				m_player_icon->dimensions.left(-0.5 + 0.01 + 0.25 * i).fixedWidth(0.075).screenTop(0.055);
 				m_score_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.075).screenTop(0.055);
 				break;
-			case LayoutSinger::BAND: // Band mode
+			case LayoutSinger::BAND:
 				m_player_icon->dimensions.right(0.35).fixedHeight(0.050).screenTop(0.025 + 0.050 * i);
 				m_score_text[i%4]->dimensions().right(0.45).fixedHeight(0.050).screenTop(0.025 + 0.050 * i);
 				break;
@@ -69,10 +70,11 @@ void LayoutSinger::drawScore(PositionMode position) {
 			else if (p->m_prevLineScore > 0.4) prevLineRank = "OK";
 			m_line_rank_text[i%4]->render(prevLineRank);
 			switch(position) {
-				case LayoutSinger::FULL: // Fullscreen
+				case LayoutSinger::DUET:
+				case LayoutSinger::FULL:
 					m_line_rank_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.055*fzoom).screenTop(0.11);
 					break;
-				case LayoutSinger::BAND: // Band mode
+				case LayoutSinger::BAND:
 					m_line_rank_text[i%4]->dimensions().right(0.30).fixedHeight(0.05*fzoom).screenTop(0.025 + 0.050 * i);
 					break;
 				case LayoutSinger::LEFT:
@@ -92,10 +94,15 @@ void LayoutSinger::draw(double time, PositionMode position) {
 	// Draw notes and pitch waves (only when not in karaoke mode)
 	if (!config["game/karaoke_mode"].b()) {
 		switch(position) {
-			case LayoutSinger::FULL: // Fullscreen
+			case LayoutSinger::DUET:
+				// TODO: Individual NoteGraphs
+				m_noteGraph.draw(time, m_database, NoteGraph::TOP);
+				m_noteGraph.draw(time, m_database, NoteGraph::BOTTOM);
+				break;
+			case LayoutSinger::FULL:
 				m_noteGraph.draw(time, m_database, NoteGraph::FULLSCREEN);
 				break;
-			case LayoutSinger::BAND: // Band mode
+			case LayoutSinger::BAND:
 				m_noteGraph.draw(time, m_database, NoteGraph::TOP);
 				break;
 			case LayoutSinger::LEFT:
@@ -110,11 +117,14 @@ void LayoutSinger::draw(double time, PositionMode position) {
 		double linespacing = 0.0;
 		Dimensions pos;
 		switch(position) {
-			case LayoutSinger::FULL: // Fullscreen
+			case LayoutSinger::FULL:
 				pos.screenBottom(-0.1);
 				linespacing = 0.06;
 				break;
-			case LayoutSinger::BAND: // Band mode
+			case LayoutSinger::DUET:
+				// TODO: Implement
+				//break;
+			case LayoutSinger::BAND:
 				pos.center(-0.05);
 				linespacing = 0.04;
 				break;
