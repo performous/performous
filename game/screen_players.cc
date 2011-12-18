@@ -175,6 +175,6 @@ void ScreenPlayers::draw() {
 		if (!video.empty() && config["graphic/video"].b()) m_video.reset(new Video(video, videoGap));
 		m_playing = music;
 	}
-	m_layout_singer->drawScore(LayoutSinger::BAND);
+	m_layout_singer->drawScore(LayoutSinger::TOP);
 }
 

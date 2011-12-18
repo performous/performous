@@ -49,7 +49,7 @@ class LyricRow {
 
 class LayoutSinger {
   public:
-	enum PositionMode {FULL, DUET, BAND, LEFT, RIGHT};
+	enum PositionMode {FULL, TOP, BOTTOM, LEFT, RIGHT};
 	/// ThemeSing is optional if you want to use drawScore only
 	LayoutSinger(VocalTrack& vocal, Database& database, boost::shared_ptr<ThemeSing> theme = boost::shared_ptr<ThemeSing>());
 	~LayoutSinger();

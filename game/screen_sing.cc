@@ -465,7 +465,7 @@ void ScreenSing::draw() {
 	// Band
 	} else {
 		m_only_singers_alive = !instrumentLayout(time);
-		m_layout_singer->draw(time, m_only_singers_alive ? LayoutSinger::FULL : LayoutSinger::BAND);
+		m_layout_singer->draw(time, m_only_singers_alive ? LayoutSinger::FULL : LayoutSinger::TOP);
 	}
 
 	Song::Status status = m_song->status(time);
