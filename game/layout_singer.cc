@@ -129,7 +129,7 @@ void LayoutSinger::draw(double time, PositionMode position) {
 				linespacing = 0.04;
 				break;
 			case LayoutSinger::BOTTOM:
-				pos.screenBottom(-0.1);
+				pos.screenBottom(-0.05);
 				linespacing = 0.04;
 				break;
 			case LayoutSinger::LEFT:
