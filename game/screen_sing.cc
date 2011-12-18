@@ -55,7 +55,14 @@ void ScreenSing::enter() {
 	}
 	boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
 	reloadGL();
-	m_layout_singer.reset(new LayoutSinger(m_song->getVocalTrack(m_selectedTrack), m_database, theme));
+	// Add a singer layout
+	m_layout_singer.clear();
+	m_layout_singer.push_back(new LayoutSinger(m_song->getVocalTrack(m_selectedTrack), m_database, theme));
+	// Find out if we have multiple vocal tracks and create layouts for them, up to a total of 2
+	std::vector<std::string> tracks = m_song->getVocalTrackNames();
+	for (size_t i = 1; i < std::min((int)tracks.size(), 2); ++i) {
+		m_layout_singer.push_back(new LayoutSinger(m_song->getVocalTrack(tracks[i]), m_database, theme));
+	}
 	// Load instrument and dance tracks
 	sm->loading(_("Loading instruments..."), 0.8);
 	{
@@ -153,7 +160,7 @@ void ScreenSing::exit() {
 	m_menu.clear();
 	m_instruments.clear();
 	m_dancers.clear();
-	m_layout_singer.reset();
+	m_layout_singer.clear();
 	m_help.reset();
 	m_pause_icon.reset();
 	m_cam.reset();
@@ -328,7 +335,8 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			else if (status == Song::INSTRUMENTAL_BREAK) {
 				if (time < 0) m_audio.seek(0.0);
 				else {
-					double diff = m_layout_singer->lyrics_begin() - 3.0 - time;
+					// FIXME: Should check for all layout singers
+					double diff = m_layout_singer[0].lyrics_begin() - 3.0 - time;
 					if (diff > 0.0) m_audio.seek(diff);
 				}
 			}
@@ -377,7 +385,9 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		}
 
 		// Some things must be reset after seeking backwards
-		if (seekback) m_layout_singer->reset();
+		if (seekback)
+			for (int i = 0; i < m_layout_singer.size(); ++i)
+				m_layout_singer[i].reset();
 		// Reload current song
 		if (key == SDLK_r) {
 			exit(); m_song->reload(); enter();
@@ -451,21 +461,23 @@ void ScreenSing::draw() {
 		theme->bg_top.draw();
 	}
 
-	m_layout_singer->hideLyrics(m_audio.isPaused());
+	for (int i = 0; i < m_layout_singer.size(); ++i)
+		m_layout_singer[i].hideLyrics(m_audio.isPaused());
 
 	// Dancing
-	if( !m_dancers.empty() ) {
+	if (!m_dancers.empty()) {
 		danceLayout(time);
 		//m_layout_singer->draw(time, LayoutSinger::LEFT);
 		m_only_singers_alive = false;
-	// Singing only
-	} else if( m_instruments.empty() ) {
-		m_layout_singer->draw(time, LayoutSinger::FULL);
-		m_only_singers_alive = true;
-	// Band
+	// Singing & band
 	} else {
-		m_only_singers_alive = !instrumentLayout(time);
-		m_layout_singer->draw(time, m_only_singers_alive ? LayoutSinger::FULL : LayoutSinger::TOP);
+		if (m_instruments.empty()) m_only_singers_alive = true;
+		else m_only_singers_alive = !instrumentLayout(time);
+
+		bool fullSinger = m_only_singers_alive && m_layout_singer.size() <= 1;
+		m_layout_singer[0].draw(time, fullSinger ? LayoutSinger::FULL : LayoutSinger::TOP);
+		if (m_layout_singer.size() > 1)
+			m_layout_singer[1].draw(time, LayoutSinger::BOTTOM);
 	}
 
 	Song::Status status = m_song->status(time);

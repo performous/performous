@@ -85,7 +85,7 @@ class ScreenSing: public Screen {
 	boost::scoped_ptr<Surface> m_pause_icon;
 	boost::scoped_ptr<Surface> m_help;
 	boost::scoped_ptr<Engine> m_engine;
-	boost::scoped_ptr<LayoutSinger> m_layout_singer;
+	boost::ptr_vector<LayoutSinger> m_layout_singer;
 	boost::scoped_ptr<ThemeInstrumentMenu> m_menuTheme;
 	Menu m_menu;
 	Instruments m_instruments;
