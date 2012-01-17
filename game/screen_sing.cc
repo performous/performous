@@ -56,12 +56,15 @@ void ScreenSing::enter() {
 	boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
 	reloadGL();
 	// Add a singer layout
+	Engine::VocalTrackPtrs selectedTracks;
+	selectedTracks.push_back(&m_song->getVocalTrack(m_selectedTrack));
 	m_layout_singer.clear();
-	m_layout_singer.push_back(new LayoutSinger(m_song->getVocalTrack(m_selectedTrack), m_database, theme));
+	m_layout_singer.push_back(new LayoutSinger(*selectedTracks.back(), m_database, theme));
 	// Find out if we have multiple vocal tracks and create layouts for them, up to a total of 2
 	std::vector<std::string> tracks = m_song->getVocalTrackNames();
 	for (size_t i = 1; i < std::min((int)tracks.size(), 2); ++i) {
-		m_layout_singer.push_back(new LayoutSinger(m_song->getVocalTrack(tracks[i]), m_database, theme));
+		selectedTracks.push_back(&m_song->getVocalTrack(tracks[i]));
+		m_layout_singer.push_back(new LayoutSinger(*selectedTracks.back(), m_database, theme));
 	}
 	// Load instrument and dance tracks
 	sm->loading(_("Loading instruments..."), 0.8);
@@ -100,12 +103,13 @@ void ScreenSing::enter() {
 			opts.push_back(*it);
 		}
 		m_vocalTrackOpts = ConfigItem(opts); // Create a ConfigItem from the option list
-		if (opts.size() > 1) { // Vocal track changer only if there is options
+		// FIXME: Add a duet option without breaking track selector
+		/*if (opts.size() > 1) { // Vocal track changer only if there is options
 			m_vocalTrackOpts.select(cur); // Set the selection to current track
 			m_menu.add(MenuOption("", _("Change vocal track\n(restart required)"), &m_vocalTrackOpts));
 			m_selectedTrackLocalized = _(m_selectedTrack.c_str());
 			m_menu.back().setDynamicName(m_selectedTrackLocalized); // Set the title to be dynamic
-		}
+		}*/
 	}
 	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
 	m_menu.close();
@@ -113,7 +117,7 @@ void ScreenSing::enter() {
 	double setup_delay = (m_instruments.empty() && m_dancers.empty() ? -1.0 : -5.0);
 	sm->loading(_("Finalizing..."), 0.95);
 	m_audio.playMusic(m_song->music, false, 0.0, setup_delay);
-	m_engine.reset(new Engine(m_audio, m_song->getVocalTrack(m_selectedTrack), analyzers.begin(), analyzers.end(), m_database));
+	m_engine.reset(new Engine(m_audio, selectedTracks, analyzers.begin(), analyzers.end(), m_database));
 	// Notify about broken tracks
 	if (m_song->b0rkedTracks) ScreenManager::getSingletonPtr()->dialog(_("Song contains broken tracks!"));
 	sm->showLogo(false);
