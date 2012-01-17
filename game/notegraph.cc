@@ -197,6 +197,8 @@ void NoteGraph::drawWaves(Database const& database) {
 	UseTexture tblock(m_wave);
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	for (std::list<Player>::const_iterator p = database.cur.begin(); p != database.cur.end(); ++p) {
+		if (p->m_vocal.name != m_vocal.name)
+			continue;
 		float const texOffset = 2.0 * m_time; // Offset for animating the wave texture
 		Player::pitch_t const& pitch = p->m_pitch;
 		size_t const beginIdx = std::max(0.0, m_time - 0.5 / pixUnit) / Engine::TIMESTEP; // At which pitch idx to start displaying the wave
