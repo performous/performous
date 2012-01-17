@@ -29,8 +29,9 @@ void LayoutSinger::reset() {
 }
 
 void LayoutSinger::drawScore(PositionMode position) {
-	unsigned int i = 0;
+	unsigned int i = 0, j = 0;
 	for (std::list<Player>::const_iterator p = m_database.cur.begin(); p != m_database.cur.end(); ++p, ++i) {
+		if (p->m_vocal.name != m_vocal.name) continue;
 		float act = p->activity();
 		if (act == 0.0f) continue;
 		float r = p->m_color.r;
@@ -39,21 +40,21 @@ void LayoutSinger::drawScore(PositionMode position) {
 		m_score_text[i%4]->render((boost::format("%04d") % p->getScore()).str());
 		switch(position) {
 			case LayoutSinger::FULL:
-				m_player_icon->dimensions.left(-0.5 + 0.01 + 0.25 * i).fixedWidth(0.075).screenTop(0.055);
-				m_score_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.075).screenTop(0.055);
+				m_player_icon->dimensions.left(-0.5 + 0.01 + 0.25 * j).fixedWidth(0.075).screenTop(0.055);
+				m_score_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * j).fixedHeight(0.075).screenTop(0.055);
 				break;
 			case LayoutSinger::TOP:
-				m_player_icon->dimensions.right(0.35).fixedHeight(0.050).screenTop(0.025 + 0.050 * i);
-				m_score_text[i%4]->dimensions().right(0.45).fixedHeight(0.050).screenTop(0.025 + 0.050 * i);
+				m_player_icon->dimensions.right(0.35).fixedHeight(0.050).screenTop(0.025 + 0.050 * j);
+				m_score_text[i%4]->dimensions().right(0.45).fixedHeight(0.050).screenTop(0.025 + 0.050 * j);
 				break;
 			case LayoutSinger::BOTTOM:
-				m_player_icon->dimensions.right(0.35).fixedHeight(0.050).center(0.025 + 0.050 * i);
-				m_score_text[i%4]->dimensions().right(0.45).fixedHeight(0.050).center(0.025 + 0.050 * i);
+				m_player_icon->dimensions.right(0.35).fixedHeight(0.050).center(0.025 + 0.050 * j);
+				m_score_text[i%4]->dimensions().right(0.45).fixedHeight(0.050).center(0.025 + 0.050 * j);
 				break;
 			case LayoutSinger::LEFT:
 			case LayoutSinger::RIGHT:
-				m_player_icon->dimensions.left(-0.5 + 0.01 + 0.25 * i).fixedWidth(0.075).screenTop(0.055);
-				m_score_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.075).screenTop(0.055);
+				m_player_icon->dimensions.left(-0.5 + 0.01 + 0.25 * j).fixedWidth(0.075).screenTop(0.055);
+				m_score_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * j).fixedHeight(0.075).screenTop(0.055);
 				break;
 		}
 		{
@@ -74,17 +75,17 @@ void LayoutSinger::drawScore(PositionMode position) {
 			m_line_rank_text[i%4]->render(prevLineRank);
 			switch(position) {
 				case LayoutSinger::FULL:
-					m_line_rank_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.055*fzoom).screenTop(0.11);
+					m_line_rank_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * j).fixedHeight(0.055*fzoom).screenTop(0.11);
 					break;
 				case LayoutSinger::TOP:
-					m_line_rank_text[i%4]->dimensions().right(0.30).fixedHeight(0.05*fzoom).screenTop(0.025 + 0.050 * i);
+					m_line_rank_text[i%4]->dimensions().right(0.30).fixedHeight(0.05*fzoom).screenTop(0.025 + 0.050 * j);
 					break;
 				case LayoutSinger::BOTTOM:
-					m_line_rank_text[i%4]->dimensions().right(0.30).fixedHeight(0.05*fzoom).center(0.025 + 0.050 * i);
+					m_line_rank_text[i%4]->dimensions().right(0.30).fixedHeight(0.05*fzoom).center(0.025 + 0.050 * j);
 					break;
 				case LayoutSinger::LEFT:
 				case LayoutSinger::RIGHT:
-					m_line_rank_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.055*fzoom).screenTop(0.11);
+					m_line_rank_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * j).fixedHeight(0.055*fzoom).screenTop(0.11);
 					break;
 			}
 			{
@@ -92,6 +93,7 @@ void LayoutSinger::drawScore(PositionMode position) {
 				m_line_rank_text[i%4]->draw();
 			}
 		}
+		++j;
 	}
 }
 
