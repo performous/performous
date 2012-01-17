@@ -48,6 +48,7 @@ class SongParser {
 	void smParse();
 	bool smParseField(std::string line);
 	Notes smParseNotes(std::string line);
+	void resetNoteParsingState();
 	double m_prevtime;
 	unsigned int m_prevts;
 	unsigned int m_relativeShift;

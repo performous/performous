@@ -30,12 +30,12 @@ void SongParser::txtParse() {
 	std::string line;
 	VocalTrack vocal(TrackName::LEAD_VOCAL);
 	while (getline(line) && txtParseField(line)) {} // Parse the header again
-	if (m_bpm != 0.0) addBPM(0, m_bpm);
+	resetNoteParsingState();
 	while (txtParseNote(line, vocal) && getline(line)) {} // Parse notes
 	// Workaround for the terminating : 1 0 0 line, written by some converters
 	if (!vocal.notes.empty() && vocal.notes.back().type != Note::SLEEP
 	  && vocal.notes.back().begin == vocal.notes.back().end) vocal.notes.pop_back();
-	m_song.insertVocalTrack(TrackName::LEAD_VOCAL, vocal);
+	m_song.insertVocalTrack(vocal.name, vocal);
 }
 
 bool SongParser::txtParseField(std::string const& line) {
@@ -80,7 +80,16 @@ bool SongParser::txtParseNote(std::string line, VocalTrack &vocal) {
 		addBPM(ts, bpm);
 		return true;
 	}
-	if (line[0] == 'P') return true; //We ignore player information for now (multiplayer hack)
+	if (line[0] == 'P') {
+		if (line.size() < 2) throw std::runtime_error("Invalid player info line");
+		if (line[1] == '1') return true;
+		else if (line[1] == '2') {
+			m_song.insertVocalTrack(vocal.name, vocal);
+			vocal = VocalTrack(TrackName::HARMONIC_1);
+			resetNoteParsingState();
+		}
+		return true;
+	}
 	Note n;
 	n.type = Note::Type(iss.get());
 	unsigned int ts = m_prevts;

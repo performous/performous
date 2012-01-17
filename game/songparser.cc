@@ -117,6 +117,15 @@ SongParser::SongParser(Song& s):
 	s.loadStatus = Song::HEADER;
 }
 
+void SongParser::resetNoteParsingState() {
+	m_prevtime = 0;
+	m_prevts = 0;
+	m_relativeShift = 0;
+	m_tsPerBeat = 0;
+	m_tsEnd = 0;
+	m_bpms.clear();
+	if (m_bpm != 0.0) addBPM(0, m_bpm);
+}
 
 void SongParser::finalize() {
 	std::vector<std::string> tracks = m_song.getVocalTrackNames();
