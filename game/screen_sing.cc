@@ -60,10 +60,11 @@ void ScreenSing::enter() {
 	selectedTracks.push_back(&m_song->getVocalTrack(m_selectedTrack));
 	m_layout_singer.clear();
 	m_layout_singer.push_back(new LayoutSinger(*selectedTracks.back(), m_database, theme));
-	// Find out if we have multiple vocal tracks and create layouts for them, up to a total of 2
+	// Do we have a second vocal track and a singer for it?
 	std::vector<std::string> tracks = m_song->getVocalTrackNames();
-	for (size_t i = 1; i < std::min((int)tracks.size(), 2); ++i) {
-		selectedTracks.push_back(&m_song->getVocalTrack(tracks[i]));
+	if (tracks.size() > 1 && analyzers.size() > 1) {
+		// TODO: Maybe should check that tracks[1] is not LEAD_VOCALS
+		selectedTracks.push_back(&m_song->getVocalTrack(tracks[1]));
 		m_layout_singer.push_back(new LayoutSinger(*selectedTracks.back(), m_database, theme));
 	}
 	// Load instrument and dance tracks
