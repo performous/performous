@@ -46,7 +46,7 @@ SongParser::SongParser(Song& s):
   m_tsPerBeat(),
   m_tsEnd()
 {
-	enum { NONE, TXT, INI, SM } type = NONE;
+	enum { NONE, TXT, XML, INI, SM } type = NONE;
 	// Read the file, determine the type and do some initial validation checks
 	{
 		std::ifstream f((s.path + s.filename).c_str(), std::ios::binary);
@@ -60,6 +60,7 @@ SongParser::SongParser(Song& s):
 		if (smCheck(data)) type = SM;
 		else if (txtCheck(data)) type = TXT;
 		else if (iniCheck(data)) type = INI;
+		else if (xmlCheck(data)) type = XML;
 		else throw SongParserException("Does not look like a song file (wrong header)", 1, true);
 		m_ss.write(&data[0], size);
 	}
@@ -69,6 +70,7 @@ SongParser::SongParser(Song& s):
 		try {
 			if (type == TXT) txtParse();
 			else if (type == INI) iniParse();
+			else if (type == XML) xmlParse();
 			else if (type == SM) smParse();
 		} catch (std::runtime_error& e) {
 			throw SongParserException(e.what(), m_linenum);
@@ -81,6 +83,7 @@ SongParser::SongParser(Song& s):
 	try {
 		if (type == TXT) txtParseHeader();
 		else if (type == INI) iniParseHeader();
+		else if (type == XML) xmlParseHeader();
 		else if (type == SM) { smParseHeader(); s.dropNotes(); } // Hack: drop notes here
 	} catch (std::runtime_error& e) {
 		throw SongParserException(e.what(), m_linenum);

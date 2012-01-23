@@ -43,6 +43,9 @@ class SongParser {
 	bool midCheck(std::vector<char> const& data) const;
 	void midParseHeader();
 	void midParse();
+	bool xmlCheck(std::vector<char> const& data) const;
+	void xmlParseHeader();
+	void xmlParse();
 	bool smCheck(std::vector<char> const& data) const;
 	void smParseHeader();
 	void smParse();
