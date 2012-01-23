@@ -62,23 +62,19 @@ class Song: boost::noncopyable {
 	void insertVocalTrack(std::string vocalTrack, VocalTrack track) {
 		vocalTracks.erase(vocalTrack);
 		vocalTracks.insert(std::make_pair<std::string, VocalTrack>(vocalTrack, track));
-	};
+	}
 	// Get a selected track, or LEAD_VOCAL if not found or the first one if not found
 	VocalTrack& getVocalTrack(std::string vocalTrack = TrackName::LEAD_VOCAL) {
-		if(vocalTracks.find(vocalTrack) != vocalTracks.end()) {
-			return vocalTracks.find(vocalTrack)->second;
+		VocalTracks::iterator it = vocalTracks.find(vocalTrack);
+		if (it != vocalTracks.end()) {
+			return it->second;
 		} else {
-			if(vocalTracks.find(TrackName::LEAD_VOCAL) != vocalTracks.end()) {
-				return vocalTracks.find(TrackName::LEAD_VOCAL)->second;
-			} else {
-				if(!vocalTracks.empty()) {
-					return vocalTracks.begin()->second;
-				} else {
-					return dummyVocal;
-				}
-			}
+			it = vocalTracks.find(TrackName::LEAD_VOCAL);
+			if (it != vocalTracks.end()) return it->second;
+			else if (!vocalTracks.empty()) return vocalTracks.begin()->second;
+			else return dummyVocal;
 		}
-	};
+	}
 	std::vector<std::string> getVocalTrackNames() {
 		std::vector<std::string> result;
 		BOOST_FOREACH(VocalTracks::value_type &it, vocalTracks) {
