@@ -11,6 +11,10 @@
 
 using namespace SongParserUtil;
 
+const std::string HARMONIC_1 = "Harmonic 1";
+const std::string HARMONIC_2 = "Harmonic 2";
+const std::string HARMONIC_3 = "Harmonic 3";
+
 namespace {
 	void testAndAdd(Song& s, std::string const& trackid, std::string const& filename) {
 		std::string f = s.path + filename;
@@ -18,9 +22,9 @@ namespace {
 	}
 	bool isVocalTrack(std::string name) {
 		if(name == TrackName::LEAD_VOCAL) return true;
-		else if(name == TrackName::HARMONIC_1) return true;
-		else if(name == TrackName::HARMONIC_2) return true;
-		else if(name == TrackName::HARMONIC_3) return true;
+		else if(name == HARMONIC_1) return true;
+		else if(name == HARMONIC_2) return true;
+		else if(name == HARMONIC_3) return true;
 		return false;
 	}
 	/// Change the MIDI track name to Performous track name
@@ -39,9 +43,9 @@ namespace {
 		else if (name == "KEYS") return false; // TODO: RB3 5 lane keyboard track
 		else if (name == "GUITAR") name = TrackName::GUITAR;
 		else if (name == "VOCALS") name = TrackName::LEAD_VOCAL;
-		else if (name == "HARM1") name = TrackName::HARMONIC_1;
-		else if (name == "HARM2") name = TrackName::HARMONIC_2;
-		else if (name == "HARM3") name = TrackName::HARMONIC_3;
+		else if (name == "HARM1") name = HARMONIC_1;
+		else if (name == "HARM2") name = HARMONIC_2;
+		else if (name == "HARM3") name = HARMONIC_3;
 		// expert stuffs
 		else if (name == "REAL_KEYS_X") return false; // TODO: RB3 pro keyboard expert track
 		else if (name == "REAL_KEYS_H") return false; // TODO: RB3 pro keyboard hard track

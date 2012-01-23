@@ -85,7 +85,7 @@ bool SongParser::txtParseNote(std::string line, VocalTrack &vocal) {
 		if (line[1] == '1') return true;
 		else if (line[1] == '2') {
 			m_song.insertVocalTrack(vocal.name, vocal);
-			vocal = VocalTrack(TrackName::HARMONIC_1);
+			vocal = VocalTrack("Singer 2"); // FIXME
 			resetNoteParsingState();
 		}
 		return true;
