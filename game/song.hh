@@ -60,8 +60,11 @@ class Song: boost::noncopyable {
 	Status status(double time);
 	int randomIdx; ///< sorting index used for random order
 	void insertVocalTrack(std::string vocalTrack, VocalTrack track) {
-		vocalTracks.erase(vocalTrack);
+		eraseVocalTrack(vocalTrack);
 		vocalTracks.insert(std::make_pair<std::string, VocalTrack>(vocalTrack, track));
+	}
+	void eraseVocalTrack(std::string vocalTrack = TrackName::LEAD_VOCAL) {
+		vocalTracks.erase(vocalTrack);
 	}
 	// Get a selected track, or LEAD_VOCAL if not found or the first one if not found
 	VocalTrack& getVocalTrack(std::string vocalTrack = TrackName::LEAD_VOCAL) {
@@ -82,6 +85,7 @@ class Song: boost::noncopyable {
 		}
 		return result;
 	}
+
 	InstrumentTracks instrumentTracks; ///< guitar etc. notes for this song
 	DanceTracks danceTracks; ///< dance tracks
 	bool hasDance() const { return !danceTracks.empty(); }

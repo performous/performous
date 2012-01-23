@@ -10,6 +10,10 @@
 
 using namespace SongParserUtil;
 
+namespace {
+	const std::string DUET_P2 = "Duet singer"; // FIXME
+}
+
 /// 'Magick' to check if this file looks like correct format
 bool SongParser::txtCheck(std::vector<char> const& data) const {
 	return data[0] == '#' && data[1] >= 'A' && data[1] <= 'Z';
@@ -28,14 +32,28 @@ void SongParser::txtParseHeader() {
 /// Parse notes
 void SongParser::txtParse() {
 	std::string line;
-	VocalTrack vocal(TrackName::LEAD_VOCAL);
+	m_curSinger = P1;
+	m_song.insertVocalTrack(TrackName::LEAD_VOCAL, VocalTrack(TrackName::LEAD_VOCAL));
+	m_song.insertVocalTrack(DUET_P2, VocalTrack(DUET_P2));
 	while (getline(line) && txtParseField(line)) {} // Parse the header again
 	resetNoteParsingState();
-	while (txtParseNote(line, vocal) && getline(line)) {} // Parse notes
-	// Workaround for the terminating : 1 0 0 line, written by some converters
-	if (!vocal.notes.empty() && vocal.notes.back().type != Note::SLEEP
-	  && vocal.notes.back().begin == vocal.notes.back().end) vocal.notes.pop_back();
-	m_song.insertVocalTrack(vocal.name, vocal);
+	while (txtParseNote(line) && getline(line)) {} // Parse notes
+
+	{
+		// Workaround for the terminating : 1 0 0 line, written by some converters
+		VocalTrack& vocal = m_song.getVocalTrack(TrackName::LEAD_VOCAL);
+		if (!vocal.notes.empty() && vocal.notes.back().type != Note::SLEEP
+		  && vocal.notes.back().begin == vocal.notes.back().end) vocal.notes.pop_back();
+	}{
+		// Workaround for the terminating : 1 0 0 line, written by some converters
+		VocalTrack& vocal = m_song.getVocalTrack(DUET_P2);
+		if (!vocal.notes.empty() && vocal.notes.back().type != Note::SLEEP
+		  && vocal.notes.back().begin == vocal.notes.back().end) vocal.notes.pop_back();
+		// Erase if empty
+		else if (vocal.notes.empty())
+			m_song.eraseVocalTrack(vocal.name);
+	}
+
 }
 
 bool SongParser::txtParseField(std::string const& line) {
@@ -66,7 +84,7 @@ bool SongParser::txtParseField(std::string const& line) {
 	return true;
 }
 
-bool SongParser::txtParseNote(std::string line, VocalTrack &vocal) {
+bool SongParser::txtParseNote(std::string line) {
 	if (line.empty() || line == "\r") return true;
 	if (line[0] == '#') throw std::runtime_error("Key found in the middle of notes");
 	if (line[line.size() - 1] == '\r') line.erase(line.size() - 1);
@@ -81,13 +99,14 @@ bool SongParser::txtParseNote(std::string line, VocalTrack &vocal) {
 		return true;
 	}
 	if (line[0] == 'P') {
+		if (m_relative) // FIXME?
+			throw std::runtime_error("Relative note timing not supported with multiple singers");
 		if (line.size() < 2) throw std::runtime_error("Invalid player info line");
-		if (line[1] == '1') return true;
-		else if (line[1] == '2') {
-			m_song.insertVocalTrack(vocal.name, vocal);
-			vocal = VocalTrack("Singer 2"); // FIXME
-			resetNoteParsingState();
-		}
+		if (line[1] == '1') m_curSinger = P1;
+		else if (line[1] == '2') m_curSinger = P2;
+		else if (line[1] == '3') m_curSinger = BOTH;
+		else throw std::runtime_error("Invalid player info line");
+		resetNoteParsingState();
 		return true;
 	}
 	Note n;
@@ -121,9 +140,13 @@ bool SongParser::txtParseNote(std::string line, VocalTrack &vocal) {
 	  default: throw std::runtime_error("Unknown note type");
 	}
 	n.begin = tsTime(ts);
+	VocalTrack& vocal = (m_curSinger & P1)
+	  ? m_song.getVocalTrack(TrackName::LEAD_VOCAL)
+	  : m_song.getVocalTrack(DUET_P2);
 	Notes& notes = vocal.notes;
 	if (m_relative && notes.empty()) m_relativeShift = ts;
 	m_prevts = ts;
+	// FIXME: These work-arounds don't work for P3 (both singers) case
 	if (n.begin < m_prevtime) {
 		// Oh no, overlapping notes (b0rked file)
 		// Can't do this because too many songs are b0rked: throw std::runtime_error("Note overlaps with previous note");
@@ -157,6 +180,8 @@ bool SongParser::txtParseNote(std::string line, VocalTrack &vocal) {
 		n.begin = n.end = prevtime; // Normalize sleep notes
 	}
 	notes.push_back(n);
+	if (m_curSinger == BOTH)
+		m_song.getVocalTrack(DUET_P2).notes.push_back(n);
 	return true;
 }
 
