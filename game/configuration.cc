@@ -283,7 +283,7 @@ void writeConfig(bool system) {
 		if (exists(conf)) remove(conf);
 		if (dirty) {
 			rename(tmp, conf);
-			std::cerr << "Saved configuration to \"" << conf << "\"" << std::endl;
+			std::cerr << "Saved configuration to " << conf << std::endl;
 		} else {
 			std::cerr << "Using default settings, no configuration file needed." << std::endl;
 		}
