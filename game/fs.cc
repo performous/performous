@@ -122,7 +122,7 @@ std::string getThemePath(std::string const& filename) {
 	if (theme.empty()) theme = defaultTheme;
 	// Try current theme and if that fails, try default theme and finally data dir
 	try { return getPath(fs::path("themes") / theme / filename); } catch (std::runtime_error&) {}
-	if (theme == defaultTheme) try { return getPath(fs::path("themes") / defaultTheme / filename); } catch (std::runtime_error&) {}
+	if (theme != defaultTheme) try { return getPath(fs::path("themes") / defaultTheme / filename); } catch (std::runtime_error&) {}
 	return getPath(filename);
 }
 
