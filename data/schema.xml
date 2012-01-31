@@ -42,10 +42,11 @@ to save the current settings to XML.
 		<short>Pitch waves</short>
 		<long>Enable singing pitch display (when not in karaoke mode).</long>
 	</entry>
-	<entry name="game/theme" type="string">
-		<stringvalue>default</stringvalue>
+	<entry name="game/theme" type="int" value="-1">
+		<limits min="-1" max="-1" step="0" />
+		<!-- Enum options added dynamically by scanning theme folders -->
 		<short>Theme</short>
-		<long>Name of the theme to use or absolute path to theme folder.</long>
+		<long>Name of the theme to use.</long>
 	</entry>
 	<entry name="game/keyboard_guitar" type="bool" value="true">
 		<short>Keyboard as guitar</short>

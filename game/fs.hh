@@ -33,6 +33,9 @@ fs::path pathMangle(fs::path const& dir);
 /** Get full path to a file from the current theme **/
 std::string getThemePath(std::string const& filename);
 
+/** Get available theme names **/
+std::vector<std::string> getThemes();
+
 /** Get full path to a share file **/
 std::string getPath(fs::path const& filename);
 
