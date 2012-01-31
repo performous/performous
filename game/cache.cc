@@ -16,7 +16,7 @@ namespace cache {
 #endif
 
 		if (isThemeResource(svgfilename)) {
-			std::string const theme_name = (config["game/theme"].s().empty() ? "default" : config["game/theme"].s());
+			std::string const theme_name = (config["game/theme"].getEnumName().empty() ? "default" : config["game/theme"].getEnumName());
 			cache_filename = getCacheDir() / "themes" / theme_name / cache_basename;
 		} else {
 			// We use the full path under cache to avoid name collisions
