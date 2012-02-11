@@ -46,7 +46,7 @@ class Songs: boost::noncopyable {
 	/// sets margins for animation
 	void setAnimMargins(double left, double right) { math_cover.setMargins(left, right); }
 	/// @return current song
-	boost::shared_ptr<Song> currentPtr() { return m_filtered[math_cover.getTarget()]; }
+	boost::shared_ptr<Song> currentPtr() { return m_filtered.empty() ? boost::shared_ptr<Song>() : m_filtered[math_cover.getTarget()]; }
 	/// @return current song
 	Song& current() { return *m_filtered[math_cover.getTarget()]; }
 	/// @return current Song
