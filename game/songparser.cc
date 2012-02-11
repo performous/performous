@@ -85,6 +85,8 @@ SongParser::SongParser(Song& s):
 		else if (type == INI) iniParseHeader();
 		else if (type == XML) xmlParseHeader();
 		else if (type == SM) { smParseHeader(); s.dropNotes(); } // Hack: drop notes here
+		// Default for preview position if none was specified in header
+		if (s.preview_start != s.preview_start) s.preview_start = (type == INI ? 5.0 : 30.0);  // 5 s for band mode, 30 s for others
 	} catch (std::runtime_error& e) {
 		throw SongParserException(e.what(), m_linenum);
 	}

@@ -178,13 +178,8 @@ void ScreenSongs::stopMultimedia(ScreenSharedInfo& info) {
 	// Play/stop preview playback (if it is the time)
 	if (info.music != m_playing && m_playTimer.get() > 0.3) {
 		m_songbg.reset(); m_video.reset();
-		double pstart = 0;
-		if (!m_songs.empty() && !m_jukebox) {
-			pstart = m_songs.current().preview_start;
-			if (pstart != pstart) pstart = 100; // true if NaN, 100 is caught in the next min
-			// 5.0s is for performance (don't make it higher unless you implement better seeking method in songs)
-			pstart = std::min(pstart, (info.music.size() == 1 ? 30.0 : 5.0)); // we can seek further in 1-track songs
-		}
+		double pstart = 0.0;  // Playback starting time
+		if (!m_songs.empty() && !m_jukebox) pstart = m_songs.current().preview_start;  // In regular mode
 		if (info.music.empty()) m_audio.fadeout(1.0); else m_audio.playMusic(info.music, true, 2.0, pstart);
 		if (!info.songbg.empty()) try { m_songbg.reset(new Surface(info.songbg)); } catch (std::exception const&) {}
 		if (!info.video.empty() && config["graphic/video"].b()) m_video.reset(new Video(info.video, info.videoGap));
