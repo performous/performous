@@ -207,15 +207,8 @@ void mainLoop(std::string const& songlist) {
 			}
 		}
 	} catch (std::exception& e) {
-		// This should use ScreenManager fatalError, but it cannot
-		// yet split the message to multiple lines automatically, so
-		// better use flashMessage, which zooms to fit.
-		std::cerr << "FATAL ERROR: " << e.what() << std::endl;
-		sm.flashMessage(std::string("FATAL ERROR: ") + e.what(), 0.0f); // No fade-in to get it to show
-		window.blank();
-		sm.drawNotifications();
-		window.swap();
-		boost::thread::sleep(now() + 2.0);
+		sm.fatalError(e.what());  // Notify the user
+		throw;
 	} catch (QuitNow&) {
 		std::cout << "Terminated." << std::endl;
 	}
