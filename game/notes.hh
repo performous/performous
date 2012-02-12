@@ -71,15 +71,17 @@ struct Note {
 	double diff(double n) const { return diff(note, n); }
 	/// Difference of n from note, so that note + diff(note, n) is n (mod 12)
 	static double diff(double note, double n);
-	/// maximum score
+	/// Maximum score
 	double maxScore() const;
-	/// score when singing over time period (a, b), which needs not to be entirely within the note
+	/// The length of the time period [a,b] that falls within the note in seconds
+	double clampDuration(double b, double e) const;
+	/// Score when singing over time period (a, b), which needs not to be entirely within the note
 	double score(double freq, double b, double e) const;
 	/// How precisely the note is hit (always 1.0 for freestyle, 0..1 for others)
 	double powerFactor(double note) const;
-	/// compares begin of two notes
+	/// Compares begin of two notes
 	static bool ltBegin(Note const& a, Note const& b) { return a.begin < b.begin; }
-	/// compares end of two notes
+	/// Compares end of two notes
 	static bool ltEnd(Note const& a, Note const& b) { return a.end < b.end; }
   private:
 	double scoreMultiplier() const;

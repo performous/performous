@@ -10,10 +10,13 @@ Note::Note(): begin(getNaN()), end(getNaN()), phase(getNaN()), power(getNaN()), 
 double Note::diff(double note, double n) { return remainder(n - note, 12.0); }
 double Note::maxScore() const { return scoreMultiplier() * (end - begin); }
 
-double Note::score(double n, double b, double e) const {
+double Note::clampDuration(double b, double e) const {
 	double len = std::min(e, end) - std::max(b, begin);
-	if (len <= 0.0 || !(n > 0.0)) return 0.0;
-	return scoreMultiplier() * powerFactor(n) * len;
+	return len > 0.0 ? len : 0.0;
+}
+
+double Note::score(double n, double b, double e) const {
+	return scoreMultiplier() * powerFactor(n) * clampDuration(b, e);
 }
 
 double Note::scoreMultiplier() const {

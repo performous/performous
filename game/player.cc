@@ -9,6 +9,8 @@ Player::Player(VocalTrack& vocal, Analyzer& analyzer, size_t frames):
 	  m_prevLineScore(-1), m_feedbackFader(0.0, 2.0), m_activitytimer(),
 	  m_scoreIt(m_vocal.notes.begin())
 {
+	// Initialize note powers
+	for (Notes::const_iterator it = m_vocal.notes.begin(); it != m_vocal.notes.end(); ++it) it->power = 0.0f;
 	// Assign colors
 	if (m_analyzer.getId() == "blue") m_color = Color(0.2, 0.5, 0.7);
 	else if (m_analyzer.getId() == "red") m_color = Color(0.8, 0.3, 0.3);
@@ -34,6 +36,7 @@ void Player::update() {
 	while (m_scoreIt != m_vocal.notes.end()) {
 		if (endTime < m_scoreIt->begin) break;  // The note begins later than on this timestep
 		// If tone was detected, calculate score
+		m_scoreIt->power *= std::pow(0.05, m_scoreIt->clampDuration(beginTime, endTime));  // Fade glow
 		if (t) {
 			double note = m_vocal.scale.getNote(t->freq);
 			// Add score
@@ -57,6 +60,7 @@ void Player::update() {
 			m_scoreIt->stars.push_back(m_color);
 		}
 		m_noteScore = 0; // Reset noteScore as we are moving on to the next one
+		m_scoreIt->power = 0.0; // Remove glow
 		++m_scoreIt;
 	}
 	if (m_scoreIt == m_vocal.notes.end()) calcRowRank();
@@ -68,7 +72,7 @@ void Player::calcRowRank() {
 		m_prevLineScore = m_lineScore;
 		// Calculate max score of the completed row
 		Notes::const_reverse_iterator maxScoreIt(m_scoreIt);
-		// FIXME: MacOSX needs the following cast to compile correctly
+		// NOTE: MacOSX needs the following cast to compile correctly
 		// it is related to the fact that OSX default compiler is 4.0.1 that is buggy when not casting
 		while ((maxScoreIt != static_cast<Notes::const_reverse_iterator>(m_vocal.notes.rend())) && (maxScoreIt->type != Note::SLEEP)) {
 			m_maxLineScore += m_vocal.m_scoreFactor * maxScoreIt->maxScore();

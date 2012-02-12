@@ -59,8 +59,6 @@ class Engine {
 			double timeLeft = m_time * TIMESTEP - t;
 			if (timeLeft != timeLeft || timeLeft > 1.0) timeLeft = 1.0;  // FIXME: Workaround for NaN values and other weirdness (should fix the weirdness instead)
 			if (timeLeft > 0.0) { boost::thread::sleep(now() + std::min(TIMESTEP, timeLeft)); continue; }
-			// FIXME: Implement
-			//for (Notes::const_iterator it = m_vocal.notes.begin(); it != m_vocal.notes.end(); ++it) it->power = 0.0f;
 			std::for_each(m_database.cur.begin(), m_database.cur.end(), boost::bind(&Player::update, _1));
 			++m_time;
 		}
