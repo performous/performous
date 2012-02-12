@@ -12,7 +12,6 @@ extern "C" {
 #include SWSCALE_INCLUDE
 }
 
-// #define USE_FFMPEG_CRASH_RECOVERY
 #define AUDIO_CHANNELS 2
 
 /*static*/ boost::mutex FFmpeg::s_avcodec_mutex;
@@ -28,11 +27,6 @@ FFmpeg::~FFmpeg() {
 	m_quit = true;
 	videoQueue.reset();
 	audioQueue.quit();
-	if (!m_thread) {
-		std::cerr << "FFMPEG crashed at some point, decoding " << m_filename << std::endl;
-		std::cerr << "Please restart Performous to avoid resource leaks and program crashes!" << std::endl;
-		return;
-	}
 	m_thread->join();
 	// TODO: use RAII for freeing resources (to prevent memory leaks)
 	boost::mutex::scoped_lock l(s_avcodec_mutex); // avcodec_close is not thread-safe
@@ -46,12 +40,6 @@ double FFmpeg::duration() const {
 	double d = m_running ? pFormatCtx->duration / double(AV_TIME_BASE) : getNaN();
 	return d >= 0.0 ? d : getInf();
 }
-
-// FFMPEG has fluctuating API
-#if LIBAVCODEC_VERSION_INT < ((52<<16)+(64<<8)+0)
-#define AVMEDIA_TYPE_VIDEO CODEC_TYPE_VIDEO
-#define AVMEDIA_TYPE_AUDIO CODEC_TYPE_AUDIO
-#endif
 
 void FFmpeg::open() {
 	boost::mutex::scoped_lock l(s_avcodec_mutex);
@@ -81,27 +69,10 @@ void FFmpeg::open() {
 	if (decodeAudio) {
 		AVCodecContext* cc = pFormatCtx->streams[audioStream]->codec;
 		pAudioCodec = avcodec_find_decoder(cc->codec_id);
-		// Awesome HACK for AAC to work (unfortunately libavformat fails to decode this information from MPEG ADTS)
-		if (pAudioCodec->name == std::string("aac") && cc->extradata_size == 0) {
-			cc->extradata = static_cast<uint8_t*>(malloc(2));
-			unsigned profile = 1; // 0 = MAIN, 1 = LC/LOW
-			unsigned srate_idx = 3; // 3 = 48000 Hz
-			unsigned channels = 2; // Just the number of channels
-			cc->extradata[0] = ((profile + 1) << 3) | ((srate_idx & 0xE) >> 1);
-			cc->extradata[1] = ((srate_idx & 0x1) << 7) | (channels << 3);
-			cc->extradata_size = 2;
-			cc->sample_rate = 48000;
-			cc->channels = 2;
-		}
 		if (!pAudioCodec) throw std::runtime_error("Cannot find audio codec");
 		if (avcodec_open(cc, pAudioCodec) < 0) throw std::runtime_error("Cannot open audio codec");
 		pAudioCodecCtx = cc;
-#if LIBAVCODEC_VERSION_INT > ((52<<16)+(12<<8)+0)
-		pResampleCtx = av_audio_resample_init(AUDIO_CHANNELS, cc->channels, m_rate, cc->sample_rate,
-			SAMPLE_FMT_S16, SAMPLE_FMT_S16, 16, 10, 0, 0.8);
-#else
-		pResampleCtx = audio_resample_init(AUDIO_CHANNELS, cc->channels, m_rate, cc->sample_rate);
-#endif
+		pResampleCtx = av_audio_resample_init(AUDIO_CHANNELS, cc->channels, m_rate, cc->sample_rate, SAMPLE_FMT_S16, SAMPLE_FMT_S16, 16, 10, 0, 0.8);
 		if (!pResampleCtx) throw std::runtime_error("Cannot create resampling context");
 		audioQueue.setSamplesPerSecond(AUDIO_CHANNELS * m_rate);
 	}
@@ -116,38 +87,8 @@ void FFmpeg::open() {
 	}
 }
 
-#ifdef USE_FFMPEG_CRASH_RECOVERY
-#include <boost/thread/tss.hpp>
-#include <csignal>
-
-namespace {
-	boost::thread_specific_ptr<FFmpeg*> ffmpeg_ptr;
-	typedef void (*sighandler)(int);
-	sighandler sigabrt, sigsegv;
-}
-
-extern "C" void performous_ffmpeg_crash_hack(int sig) {
-	if (ffmpeg_ptr.get()) {
-		std::signal(SIGABRT, sigabrt);
-		std::signal(SIGSEGV, sigsegv);
-		(*ffmpeg_ptr)->crash();
-		while (1) boost::thread::sleep(now() + 1000.0);
-	} // Uh-oh, FFMPEG goes again; wait here until eternity
-	sighandler h = (sig == SIGABRT ? sigabrt : sigsegv);
-	if (h && h != performous_ffmpeg_crash_hack) h(sig); // From another thread, call original handler
-	std::abort();
-}
-#endif
-
 void FFmpeg::operator()() {
-#ifdef USE_FFMPEG_CRASH_RECOVERY
-	// A hack to avoid ffmpeg crashing the program :)
-	ffmpeg_ptr.reset(new FFmpeg*);
-	*ffmpeg_ptr = this;
-	sigabrt = std::signal(SIGABRT, performous_ffmpeg_crash_hack);
-	sigsegv = std::signal(SIGSEGV, performous_ffmpeg_crash_hack);
-#endif
-	try { open(); } catch (std::exception const& e) { std::cerr << "FFMPEG failed to open " << m_filename << ": " << e.what() << std::endl; m_quit = true; return; }
+	try { open(); } catch (std::exception const& e) { std::clog << "ffmpeg/error: Failed to open " << m_filename << ": " << e.what() << std::endl; m_quit = true; return; }
 	m_running = true;
 	audioQueue.setDuration(duration());
 	int errors = 0;
@@ -155,7 +96,7 @@ void FFmpeg::operator()() {
 		try {
 			if (audioQueue.wantSeek()) m_seekTarget = 0.0;
 			if (m_seekTarget == m_seekTarget) seek_internal();
-			decodeNextFrame();
+			decodePacket();
 			m_eof = false;
 			errors = 0;
 		} catch (eof_error&) {
@@ -163,8 +104,8 @@ void FFmpeg::operator()() {
 			videoQueue.push(new VideoFrame()); // EOF marker
 			boost::thread::sleep(now() + 0.1);
 		} catch (std::exception& e) {
-			std::cerr << "FFMPEG error: " << e.what() << std::endl;
-			if (++errors > 2) { std::cerr << "FFMPEG terminating due to errors" << std::endl; m_quit = true; }
+			std::clog << "ffmpeg/error: " << m_filename << ": " << e.what() << std::endl;
+			if (++errors > 2) { std::clog << "ffmpeg/error: FFMPEG terminating due to multiple errors" << std::endl; m_quit = true; }
 		}
 	}
 	m_running = false;
@@ -193,29 +134,66 @@ void FFmpeg::seek_internal() {
 	m_seekTarget = getNaN(); // Signal that seeking is done
 }
 
-void FFmpeg::decodeNextFrame() {
-	struct ReadFramePacket: public AVPacket {
-		AVFormatContext* m_s;
-		ReadFramePacket(AVFormatContext* s): m_s(s) {
-			if (av_read_frame(s, this) < 0) throw eof_error();
-		}
-		~ReadFramePacket() { av_free_packet(this); }
-		double time() {
-			return uint64_t(dts) == uint64_t(AV_NOPTS_VALUE) ?
-			  getNaN() : double(dts) * av_q2d(m_s->streams[stream_index]->time_base);
-		}
-	};
+struct ReadFramePacket: public AVPacket {
+	AVFormatContext* m_s;
+	ReadFramePacket(AVFormatContext* s): m_s(s) {
+		if (av_read_frame(s, this) < 0) throw FFmpeg::eof_error();
+	}
+	~ReadFramePacket() { av_free_packet(this); }
+	double time() {
+		return uint64_t(dts) == uint64_t(AV_NOPTS_VALUE) ?
+		  getNaN() : double(dts) * av_q2d(m_s->streams[stream_index]->time_base);
+	}
+};
 
-	struct AVFrameWrapper {
-		AVFrame* m_frame;
-		AVFrameWrapper(): m_frame(avcodec_alloc_frame()) {
-			if (!m_frame) throw std::runtime_error("Unable to allocate AVFrame");
-		}
-		~AVFrameWrapper() { av_free(m_frame); }
-		operator AVFrame*() { return m_frame; }
-		AVFrame* operator->() { return m_frame; }
-	} videoFrame;
+struct AVFrameWrapper {
+	AVFrame* m_frame;
+	AVFrameWrapper(): m_frame(avcodec_alloc_frame()) {
+		if (!m_frame) throw std::runtime_error("Unable to allocate AVFrame");
+	}
+	~AVFrameWrapper() { av_free(m_frame); }
+	operator AVFrame*() { return m_frame; }
+	AVFrame* operator->() { return m_frame; }
+} videoFrame;
 
+void FFmpeg::decodePacket() {
+	ReadFramePacket packet(pFormatCtx);
+	int packetSize = packet.size;
+	while (packetSize) {
+		if (packetSize < 0) throw std::logic_error("negative packet size?!");
+		if (m_quit || m_seekTarget == m_seekTarget) return;
+		int decodeSize = 0;
+		if (decodeVideo && packet.stream_index == videoStream) decodeSize = decodeVideoFrame(packet);
+		else if (decodeAudio && packet.stream_index == audioStream) decodeSize = decodeAudioFrame(packet);
+		else return;
+		packetSize -= decodeSize; // Move forward within the packet
+	}
+}
+
+int FFmpeg::decodeVideoFrame(ReadFramePacket& packet) {
+	int frameFinished = 0;
+	int decodeSize = avcodec_decode_video2(pVideoCodecCtx, videoFrame, &frameFinished, &packet);
+	if (decodeSize < 0) throw std::runtime_error("cannot decode video frame");
+	if (frameFinished) {
+		// Convert into RGB and scale the data
+		int w = (pVideoCodecCtx->width+15)&~15;
+		int h = pVideoCodecCtx->height;
+		std::vector<uint8_t> buffer(w * h * 3);
+		{
+			uint8_t* data = &buffer[0];
+			int linesize = w * 3;
+			sws_scale(img_convert_ctx, videoFrame->data, videoFrame->linesize, 0, h, &data, &linesize);
+		}
+		if (packet.time() == packet.time()) m_position = packet.time();
+		// Construct a new video frame and push it to output queue
+		VideoFrame* tmp = new VideoFrame(m_position, w, h);
+		tmp->data.swap(buffer);
+		videoQueue.push(tmp); // Takes ownership and may block
+	}
+	return decodeSize;
+}
+
+int FFmpeg::decodeAudioFrame(ReadFramePacket& packet) {
 	class AudioBuffer {
 	  public:
 		AudioBuffer(size_t _size): m_buffer((int16_t*)av_malloc(_size*sizeof(int16_t))) {
@@ -226,76 +204,24 @@ void FFmpeg::decodeNextFrame() {
 		int16_t* operator->() { return m_buffer; }
 	  private:
 		int16_t* m_buffer;
-	};
-
-	int frameFinished=0;
-	while (!frameFinished) {
-		ReadFramePacket packet(pFormatCtx);
-		int packetSize = packet.size;
-		uint8_t *packetData = packet.data;
-		if (decodeVideo && packet.stream_index == videoStream) {
-			while (packetSize) {
-				if (packetSize < 0) throw std::logic_error("negative video packet size?!");
-				if (m_quit || m_seekTarget == m_seekTarget) return;
-#if LIBAVCODEC_VERSION_INT > ((52<<16)+(25<<8)+0)
-				int decodeSize = avcodec_decode_video2(pVideoCodecCtx, videoFrame, &frameFinished, &packet);
-#else
-				int decodeSize = avcodec_decode_video(pVideoCodecCtx, videoFrame, &frameFinished, packetData, packetSize);
-#endif
-				if (decodeSize < 0) throw std::runtime_error("cannot decode video frame");
-				// Move forward within the packet
-				packetSize -= decodeSize;
-				packetData += decodeSize;
-				if (frameFinished) {
-					// Convert into RGB and scale the data
-					int w = (pVideoCodecCtx->width+15)&~15;
-					int h = pVideoCodecCtx->height;
-					std::vector<uint8_t> buffer(w * h * 3);
-					{
-						uint8_t* data = &buffer[0];
-						int linesize = w * 3;
-						sws_scale(img_convert_ctx, videoFrame->data, videoFrame->linesize, 0, h, &data, &linesize);
-					}
-					if (packet.time() == packet.time()) m_position = packet.time();
-					// Construct a new video frame and push it to output queue
-					VideoFrame* tmp = new VideoFrame(m_position, w, h);
-					tmp->data.swap(buffer);
-					videoQueue.push(tmp); // Takes ownership and may block
-				}
-			}
-		} else if (decodeAudio && packet.stream_index==audioStream) {
-			while (packetSize) {
-				if (packetSize < 0) throw std::logic_error("negative audio packet size?!");
-				if (m_quit || m_seekTarget == m_seekTarget) return;
-				AudioBuffer audioFrames(AVCODEC_MAX_AUDIO_FRAME_SIZE);
-				int outsize = AVCODEC_MAX_AUDIO_FRAME_SIZE*sizeof(int16_t);
-#if LIBAVCODEC_VERSION_INT > ((52<<16)+(25<<8)+0)
-				int decodeSize = avcodec_decode_audio3(pAudioCodecCtx, audioFrames, &outsize, &packet);
-#else
-				int decodeSize = avcodec_decode_audio2(pAudioCodecCtx, audioFrames, &outsize, packetData, packetSize);
-#endif
-				// Handle special cases
-				if (decodeSize == 0) break;
-				if (outsize == 0) continue;
-				if (decodeSize < 0) throw std::runtime_error("cannot decode audio frame");
-				// Move forward within the packet
-				packetSize -= decodeSize;
-				packetData += decodeSize;
-				// Convert outsize from bytes into number of frames (samples)
-				outsize /= sizeof(int16_t) * pAudioCodecCtx->channels;
-				std::vector<int16_t> resampled(AVCODEC_MAX_AUDIO_FRAME_SIZE);
-				int frames = audio_resample(pResampleCtx, &resampled[0], audioFrames, outsize);
-				resampled.resize(frames * AUDIO_CHANNELS);
-				// Use timecode from packet if available
-				if (packet.time() == packet.time()) m_position = packet.time();
-				// Push to output queue (may block)
-				audioQueue.push(resampled, m_position);
-				// Increment current time
-				m_position += double(resampled.size())/double(audioQueue.getSamplesPerSecond());
-			}
-			// Audio frames are always finished
-			frameFinished = 1;
-		}
+	} audioFrames(AVCODEC_MAX_AUDIO_FRAME_SIZE);
+	
+	int outsize = AVCODEC_MAX_AUDIO_FRAME_SIZE*sizeof(int16_t);
+	int decodeSize = avcodec_decode_audio3(pAudioCodecCtx, audioFrames, &outsize, &packet);
+	if (decodeSize < 0) throw std::runtime_error("cannot decode audio frame");
+	if (outsize > 0) {
+		// Convert outsize from bytes into number of frames (samples)
+		outsize /= sizeof(int16_t) * pAudioCodecCtx->channels;
+		std::vector<int16_t> resampled(AVCODEC_MAX_AUDIO_FRAME_SIZE);
+		int frames = audio_resample(pResampleCtx, &resampled[0], audioFrames, outsize);
+		resampled.resize(frames * AUDIO_CHANNELS);
+		// Use timecode from packet if available
+		if (packet.time() == packet.time()) m_position = packet.time();
+		// Push to output queue (may block)
+		audioQueue.push(resampled, m_position);
+		// Increment current time
+		m_position += double(resampled.size())/double(audioQueue.getSamplesPerSecond());
 	}
+	return decodeSize;
 }
 

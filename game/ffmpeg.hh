@@ -131,7 +131,7 @@ class AudioBuffer {
 		while (!condition()) m_cond.wait(l);
 		if (m_quit) return;
 		if (m_pos == 0 && timestamp != 0.0) {
-			//std::cerr << "Warning: The first audio frame begins at " << timestamp << " seconds instead of zero, compensating." << std::endl;
+			std::clog << "ffmpeg/info: The first audio frame begins at " << timestamp << " seconds instead of zero." << std::endl;
 			m_pos = timestamp * m_sps;
 		}
 		m_data.insert(m_data.end(), data.begin(), data.end());
@@ -140,9 +140,12 @@ class AudioBuffer {
 	bool prepare(int64_t pos) {
 		boost::mutex::scoped_try_lock l(m_mutex);
 		if (!l.owns_lock()) return false;
+		if (eof(pos)) return true;
 		if (pos < 0) pos = 0;
 		m_posReq = pos;
-		return m_pos > m_posReq + m_data.capacity() / 4 && m_pos - m_data.size() <= m_pos;
+		// Has enough been prebuffered already and is the requested position still within buffer
+		bool test = m_pos > m_posReq + m_data.capacity() / 16 && m_pos <= m_posReq + m_data.size();
+		return test;
 	}
 	bool operator()(float* begin, float* end, int64_t pos, float volume = 1.0f) {
 		boost::mutex::scoped_lock l(m_mutex);
@@ -161,8 +164,8 @@ class AudioBuffer {
 	double duration() const { return m_duration; }
 	void setDuration(double seconds) { m_duration = seconds; }
 	bool wantSeek() {
-		size_t oldest = m_pos - m_data.size();
-		return m_posReq > 0 && m_posReq + int64_t(m_sps) * 2.0 /* seconds tolerance */ < int64_t(oldest);
+		// Are we already past the requested position? (need to seek backward or back to beginning)
+		return m_posReq > 0 && m_posReq + m_sps * 2 /* seconds tolerance */ + m_data.size() < m_pos;
 	}
   private:
 	bool wantMore() { return int64_t(m_pos) - int64_t(m_data.capacity() / 2) < m_posReq; }
@@ -186,18 +189,14 @@ extern "C" {
   struct SwsContext;
 }
 
+struct ReadFramePacket;
+
 /// ffmpeg class
 class FFmpeg {
   public:
 	/// constructor
 	FFmpeg(bool decodeVideo, bool decodeAudio, std::string const& file, unsigned int rate = 48000);
 	~FFmpeg();
-	/**
-	* This function is called by the crash handler to indicate that FFMPEG has
-	* crashed or has gotten stuck, and that the destructor should not wait for
-	* it to finish before exiting.
-	**/
-	void crash() { m_thread.reset(); m_quit = true; }
 	void operator()(); ///< Thread runs here, don't call directly
 	unsigned width, ///< width of video
 	         height; ///< height of video
@@ -213,11 +212,13 @@ class FFmpeg {
 	double position() { return videoQueue.position(); /* FIXME: remove */ }
 	bool terminating() const { return m_quit; }
 
-  private:
 	class eof_error: public std::exception {};
+  private:
 	void seek_internal();
 	void open();
-	void decodeNextFrame();
+	void decodePacket();
+	int decodeVideoFrame(ReadFramePacket& packet);
+	int decodeAudioFrame(ReadFramePacket& packet);
 	std::string m_filename;
 	unsigned int m_rate;
 	volatile bool m_quit;
