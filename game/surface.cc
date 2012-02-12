@@ -114,7 +114,7 @@ void Texture::load(unsigned int width, unsigned int height, pix::Format format, 
 		// Every developer of the game so far has tried doing so, but it just cannot work.
 		// (1) no repeat => cannot texture
 		// (2) coordinates not normalized => would require special hackery elsewhere
-		// Just don't do it in Surface class, thanks. -Tronic
+		// Just don't do it in Texture class, thanks. -Tronic
 		glTexImage2D(type(), 0, internalFormat(), newWidth, newHeight, 0, f.format, f.type, &outBuf[0]);
 	}
 	glGenerateMipmap(type());
