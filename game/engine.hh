@@ -31,12 +31,11 @@ class Engine {
 	template <typename FwdIt> Engine(Audio& audio, VocalTrackPtrs vocals, FwdIt anBegin, FwdIt anEnd, Database& database):
 	  m_audio(audio), m_time(), m_quit(), m_database(database)
 	{
-		if (vocals.empty())
-			throw std::runtime_error("Engine needs at least one vocal track");
-		// Remove unsensibly long tracks
-		for (VocalTrackPtrs::iterator it = vocals.begin(); it != vocals.end(); )
-			if (!(*it) || (*it)->endTime > 10000.0) it = vocals.erase(it);
-			else ++it;
+		if (vocals.empty()) throw std::runtime_error("Engine needs at least one vocal track");
+		// Remove unsensibly long tracks (also NaN)
+		for (VocalTrackPtrs::iterator it = vocals.begin(); it != vocals.end(); ) {
+			if ((*it) && (*it)->endTime < 10000.0) ++it; else it = vocals.erase(it);
+		}
 		// Clear old player information
 		m_database.cur.clear();
 		m_database.scores.clear();
