@@ -29,30 +29,31 @@ void NoteGraph::reset() {
 namespace {
 	void drawNotebar(Texture const& texture, double x, double ybeg, double yend, double w, double h) {
 		glutil::VertexArray va;
-
 		UseTexture tblock(texture);
 
+		// The front cap begins
 		va.TexCoord(0.0f, 0.0f).Vertex(x, ybeg);
 		va.TexCoord(0.0f, 1.0f).Vertex(x, ybeg + h);
-
 		if (w >= 2.0 * h) {
-			double tmp = h / w;
+			// Calculate the y coordinates of the middle part
+			double tmp = h / w;  // h = cap size (because it is a h by h square)
 			double y1 = (1.0 - tmp) * ybeg + tmp * yend;
 			double y2 = tmp * ybeg + (1.0 - tmp) * yend;
-
+			// The middle part between caps
 			va.TexCoord(0.5f, 0.0f).Vertex(x + h, y1);
 			va.TexCoord(0.5f, 1.0f).Vertex(x + h, y1 + h);
 			va.TexCoord(0.5f, 0.0f).Vertex(x + w - h, y2);
 			va.TexCoord(0.5f, 1.0f).Vertex(x + w - h, y2 + h);
 		} else {
+			// Note is too short to even fit caps, crop to fit.
 			double ymid = 0.5 * (ybeg + yend);
 			float crop = 0.25f * w / h;
-
 			va.TexCoord(crop, 0.0f).Vertex(x + 0.5 * w, ymid);
 			va.TexCoord(crop, 1.0f).Vertex(x + 0.5 * w, ymid + h);
 			va.TexCoord(1.0f - crop, 0.0f).Vertex(x + 0.5 * w, ymid);
 			va.TexCoord(1.0f - crop, 1.0f).Vertex(x + 0.5 * w, ymid + h);
 		}
+		// The rear cap ends
 		va.TexCoord(1.0f, 0.0f).Vertex(x + w, yend);
 		va.TexCoord(1.0f, 1.0f).Vertex(x + w, yend + h);
 
