@@ -110,6 +110,7 @@ void FFmpeg::operator()() {
 	}
 	m_running = false;
 	m_eof = true;
+	audioQueue.setEof();
 	videoQueue.push(new VideoFrame()); // EOF marker
 }
 
