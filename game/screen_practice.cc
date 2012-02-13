@@ -85,7 +85,7 @@ void ScreenPractice::draw_analyzers() {
 				int octave = note / 12 - 1;
 				double noteOffset = scale.getNoteNum(note);
 				bool sharp = scale.isSharp(note);
-				noteOffset += octave*7;
+				noteOffset += (octave - 3) * 7;
 				noteOffset += 0.4 * scale.getNoteOffset(t->freq);
 				float posXnote = -0.25 + 0.2 * i + 0.002 * t->stabledb;
 				float posYnote = .075-noteOffset*0.015;
