@@ -1062,6 +1062,7 @@ void GuitarGraph::drawNote(int fret, Color color, float tBeg, float tEnd, float 
 		vertexPair(va, x, y, color, doanim ? tc(y + t) : 1.0f); // First vertex pair
 		while ((y -= fretWid) > yEnd + fretWid) {
 			if (whammy > 0.1) {
+				// FIXME: Should use Boost/C++11 random, and use the same seed for both eyes in stereo3d.
 				float r1 = rand() / double(RAND_MAX) - 0.5;
 				float r2 = rand() / double(RAND_MAX) - 0.5;
 				vertexPair(va, x+0.2*(cos(y*whammy)+r1), y, color, tc(y + t), fretWid, 0.1*(sin(y*whammy)+r2));
