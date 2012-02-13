@@ -45,7 +45,7 @@ void FFmpeg::open() {
 	boost::mutex::scoped_lock l(s_avcodec_mutex);
 	av_register_all();
 	av_log_set_level(AV_LOG_ERROR);
-	if (av_open_input_file(&pFormatCtx, m_filename.c_str(), NULL, 0, NULL)) throw std::runtime_error("Cannot open input file");
+	if (avformat_open_input(&pFormatCtx, m_filename.c_str(), NULL, NULL)) throw std::runtime_error("Cannot open input file");
 	if (av_find_stream_info(pFormatCtx) < 0) throw std::runtime_error("Cannot find stream information");
 	pFormatCtx->flags |= AVFMT_FLAG_GENPTS;
 	videoStream = -1;
@@ -63,14 +63,14 @@ void FFmpeg::open() {
 		AVCodecContext* cc = pFormatCtx->streams[videoStream]->codec;
 		pVideoCodec = avcodec_find_decoder(cc->codec_id);
 		if (!pVideoCodec) throw std::runtime_error("Cannot find video codec");
-		if (avcodec_open(cc, pVideoCodec) < 0) throw std::runtime_error("Cannot open video codec");
+		if (avcodec_open2(cc, pVideoCodec, NULL) < 0) throw std::runtime_error("Cannot open video codec");
 		pVideoCodecCtx = cc;
 	}
 	if (decodeAudio) {
 		AVCodecContext* cc = pFormatCtx->streams[audioStream]->codec;
 		pAudioCodec = avcodec_find_decoder(cc->codec_id);
 		if (!pAudioCodec) throw std::runtime_error("Cannot find audio codec");
-		if (avcodec_open(cc, pAudioCodec) < 0) throw std::runtime_error("Cannot open audio codec");
+		if (avcodec_open2(cc, pAudioCodec, NULL) < 0) throw std::runtime_error("Cannot open audio codec");
 		pAudioCodecCtx = cc;
 		pResampleCtx = av_audio_resample_init(AUDIO_CHANNELS, cc->channels, m_rate, cc->sample_rate, SAMPLE_FMT_S16, SAMPLE_FMT_S16, 16, 10, 0, 0.8);
 		if (!pResampleCtx) throw std::runtime_error("Cannot create resampling context");
@@ -146,16 +146,6 @@ struct ReadFramePacket: public AVPacket {
 	}
 };
 
-struct AVFrameWrapper {
-	AVFrame* m_frame;
-	AVFrameWrapper(): m_frame(avcodec_alloc_frame()) {
-		if (!m_frame) throw std::runtime_error("Unable to allocate AVFrame");
-	}
-	~AVFrameWrapper() { av_free(m_frame); }
-	operator AVFrame*() { return m_frame; }
-	AVFrame* operator->() { return m_frame; }
-} videoFrame;
-
 void FFmpeg::decodePacket() {
 	ReadFramePacket packet(pFormatCtx);
 	int packetSize = packet.size;
@@ -171,6 +161,16 @@ void FFmpeg::decodePacket() {
 }
 
 int FFmpeg::decodeVideoFrame(ReadFramePacket& packet) {
+	struct AVFrameWrapper {
+		AVFrame* m_frame;
+		AVFrameWrapper(): m_frame(avcodec_alloc_frame()) {
+			if (!m_frame) throw std::runtime_error("Unable to allocate AVFrame");
+		}
+		~AVFrameWrapper() { av_free(m_frame); }
+		operator AVFrame*() { return m_frame; }
+		AVFrame* operator->() { return m_frame; }
+	} videoFrame;
+
 	int frameFinished = 0;
 	int decodeSize = avcodec_decode_video2(pVideoCodecCtx, videoFrame, &frameFinished, &packet);
 	if (decodeSize < 0) throw std::runtime_error("cannot decode video frame");
