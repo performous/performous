@@ -1047,14 +1047,11 @@ void GuitarGraph::drawNote(int fret, Color color, float tBeg, float tEnd, float 
 		if (releaseTime == releaseTime && tEnd - releaseTime > 0.1) yBeg = time2y(releaseTime);
 		// Short note? Render minimum renderable length
 		if (yEnd > yBeg - 3 * fretWid) yEnd = yBeg - 3 * fretWid;
-		// Render the ring
+		// Skip the fret head
 		float y = yBeg + fretWid;
 		y -= fretWid;
+		float fretY = y;
 		color.a = clamp(time2a(tBeg)*2.0f,0.0f,1.0f);
-		{
-			ColorTrans c(color);
-			m_fretObj.draw(x, y, 0.0f);
-		}
 		y -= fretWid;
 		// Render the middle
 		bool doanim = hit || hitAnim > 0; // Enable glow?
@@ -1074,7 +1071,14 @@ void GuitarGraph::drawNote(int fret, Color color, float tBeg, float tEnd, float 
 		y = yEnd + fretWid;
 		vertexPair(va, x, y, color, doanim ? tc(y + t) : 0.20f);
 		vertexPair(va, x, yEnd, color, doanim ? tc(yEnd + t) : 0.0f);
+		glDisable(GL_DEPTH_TEST);
 		va.Draw();
+		glEnable(GL_DEPTH_TEST);
+		// Render the fret object
+		{
+			ColorTrans c(color);
+			m_fretObj.draw(x, fretY, 0.0f);
+		}
 	} else {
 		// Too short note: only render the ring
 		if (hitAnim > 0.0 && tEnd <= maxTolerance) {
