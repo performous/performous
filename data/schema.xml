@@ -173,10 +173,6 @@ to save the current settings to XML.
 		<short>Webcam id</short>
 		<long>Use -1 to autodetect or a number starting from 0 to choose specific device.</long>
 	</entry>
-	<entry name="graphic/3d_notes" type="bool" value="true">
-		<short>3D notes</short>
-		<long>Draw instrument notes as 3-dimensional objects. May hurt performance on older hardware.</long>
-	</entry>
 	<entry name="graphic/svg_lod" type="float" value="1.0">
 		<ui unit="x" />
 		<limits min="0.5" max="3.0" step="0.1" />

@@ -104,7 +104,6 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number)
   m_neckglow(getThemePath("neck_glow.svg")),
   m_neckglowColor(),
   m_drums(drums),
-  m_use3d(config["graphic/3d_notes"].b()),
   m_level(),
   m_track_index(m_instrumentTracks.end()),
   m_dfIt(m_drumfills.end()),
@@ -1050,23 +1049,13 @@ void GuitarGraph::drawNote(int fret, Color color, float tBeg, float tEnd, float 
 		if (yEnd > yBeg - 3 * fretWid) yEnd = yBeg - 3 * fretWid;
 		// Render the ring
 		float y = yBeg + fretWid;
-		if (m_use3d) { // 3D
-			y -= fretWid;
-			color.a = clamp(time2a(tBeg)*2.0f,0.0f,1.0f);
-			{
-				ColorTrans c(color);
-				m_fretObj.draw(x, y, 0.0f);
-			}
-			y -= fretWid;
-		} else { // 2D
-			color.a = time2a(tBeg);
-			{
-				ColorTrans c(color);
-				m_button.dimensions.center(yBeg).middle(x);
-				m_button.draw();
-			}
-			y -= 2 * fretWid;
+		y -= fretWid;
+		color.a = clamp(time2a(tBeg)*2.0f,0.0f,1.0f);
+		{
+			ColorTrans c(color);
+			m_fretObj.draw(x, y, 0.0f);
 		}
+		y -= fretWid;
 		// Render the middle
 		bool doanim = hit || hitAnim > 0; // Enable glow?
 		Texture const& tex(doanim ? m_tail_glow : m_tail); // Select texture
@@ -1088,42 +1077,27 @@ void GuitarGraph::drawNote(int fret, Color color, float tBeg, float tEnd, float 
 		va.Draw();
 	} else {
 		// Too short note: only render the ring
-		if (m_use3d) { // 3D
-			if (hitAnim > 0.0 && tEnd <= maxTolerance) {
-				float s = 1.0 - hitAnim;
-				color.a = s;
-				{
-					ColorTrans c(color);
-					m_fretObj.draw(x, yBeg, 0.0f, s);
-				}
-			} else {
-				color.a = clamp(time2a(tBeg)*2.0f,0.0f,1.0f);
-				{
-					ColorTrans c(color);
-					m_fretObj.draw(x, yBeg, 0.0f);
-				}
-			}
-		} else { // 2D
-			color.a = time2a(tBeg);
+		if (hitAnim > 0.0 && tEnd <= maxTolerance) {
+			float s = 1.0 - hitAnim;
+			color.a = s;
 			{
 				ColorTrans c(color);
-				m_button.dimensions.center(yBeg).middle(x);
-				m_button.draw();
+				m_fretObj.draw(x, yBeg, 0.0f, s);
+			}
+		} else {
+			color.a = clamp(time2a(tBeg)*2.0f,0.0f,1.0f);
+			{
+				ColorTrans c(color);
+				m_fretObj.draw(x, yBeg, 0.0f);
 			}
 		}
 	}
 	// Hammer note caps
 	if (tappable) {
 		float l = std::max(0.3, m_correctness.get());
-		if (m_use3d) { // 3D
-			float s = 1.0 - hitAnim;
-			ColorTrans c(Color(l, l, l, s));
-			m_tappableObj.draw(x, yBeg, 0.0f, s);
-		} else { // 2D
-			ColorTrans c(Color(l, l, l));
-			m_tap.dimensions.center(yBeg).middle(x);
-			m_tap.draw();
-		}
+		float s = 1.0 - hitAnim;
+		ColorTrans c(Color(l, l, l, s));
+		m_tappableObj.draw(x, yBeg, 0.0f, s);
 	}
 }
 
