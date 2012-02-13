@@ -69,6 +69,7 @@ class Songs: boost::noncopyable {
 	typedef std::vector<boost::shared_ptr<Song> > SongVector;
 	std::string m_songlist;
 	SongVector m_songs, m_filtered;
+	AnimValue m_updateTimer;
 	AnimAcceleration math_cover;
 	std::string m_filter;
 	unsigned char m_typeFilter;
