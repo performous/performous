@@ -776,12 +776,12 @@ namespace {
 	const float fretWid = 0.5f; // The actual width is two times this
 
 	/// Create a symmetric vertex pair of given data
-	void vertexPair(glutil::VertexArray& va, float x, float y, Color color, float ty, float fretW = fretWid) {
+	void vertexPair(glutil::VertexArray& va, float x, float y, Color color, float ty, float fretW = fretWid, float zn = 0.0) {
 		color.a = y2a(y);
 		{
 			glmath::vec4 c(color.r, color.g, color.b, color.a);
-			va.Color(c).TexCoord(0.0f, ty).Vertex(x - fretW, y);
-			va.Color(c).TexCoord(1.0f, ty).Vertex(x + fretW, y);
+			va.Color(c).TexCoord(0.0f, ty).Vertex(x - fretW, y, 0.1 + zn);
+			va.Color(c).TexCoord(1.0f, ty).Vertex(x + fretW, y, 0.1 - zn);
 		}
 	}
 
@@ -1076,8 +1076,9 @@ void GuitarGraph::drawNote(int fret, Color color, float tBeg, float tEnd, float 
 		vertexPair(va, x, y, color, doanim ? tc(y + t) : 1.0f); // First vertex pair
 		while ((y -= fretWid) > yEnd + fretWid) {
 			if (whammy > 0.1) {
-				float r = rand() / double(RAND_MAX);
-				vertexPair(va, x+cos(y*whammy)/4.0+(r-0.5)/4.0, y, color, tc(y + t));
+				float r1 = rand() / double(RAND_MAX) - 0.5;
+				float r2 = rand() / double(RAND_MAX) - 0.5;
+				vertexPair(va, x+0.2*(cos(y*whammy)+r1), y, color, tc(y + t), fretWid, 0.1*(sin(y*whammy)+r2));
 			} else vertexPair(va, x, y, color, doanim ? tc(y + t) : 0.5f);
 		}
 		// Render the end
