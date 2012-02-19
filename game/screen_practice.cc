@@ -16,7 +16,6 @@ void ScreenPractice::enter() {
 	// draw vu meters
 	for (unsigned int i = 0, mics = m_audio.analyzers().size(); i < mics; ++i) {
 		m_vumeters.push_back(new ProgressBar(getThemePath("vumeter_bg.svg"), getThemePath("vumeter_fg.svg"), ProgressBar::VERTICAL, 0.136, 0.023));
-		m_vumeters.back().dimensions.screenBottom().left(-0.4 + i * 0.2).fixedWidth(0.04);
 	}
 	m_samples.push_back("drum bass");
 	m_samples.push_back("drum snare");
@@ -56,6 +55,8 @@ void ScreenPractice::draw() {
 }
 
 void ScreenPractice::draw_analyzers() {
+	theme->note.dimensions.fixedHeight(0.03f);
+	theme->sharp.dimensions.fixedHeight(0.09f);
 	MusicalScale scale;
 	boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
 	if (analyzers.empty()) return;
@@ -73,6 +74,7 @@ void ScreenPractice::draw_analyzers() {
 		}
 		// getPeak returns 0.0 when clipping, negative values when not that loud.
 		// Normalizing to [0,1], where 0 is -43 dB or less (to match the vumeter graphic)
+		m_vumeters[i].dimensions.screenBottom().left(-0.4 + i * 0.2).fixedWidth(0.04);
 		m_vumeters[i].draw(analyzer.getPeak() / 43.0 + 1.0);
 
 		if (freq != 0.0) {

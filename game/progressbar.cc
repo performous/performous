@@ -40,4 +40,6 @@ void ProgressBar::draw(float value) {
 		break;
 	  default: throw std::logic_error("ProgressBar::draw(): unknown m_mode value");
 	}
+	// Reset dimensions due to async image loading
+	dimensions = Dimensions(m_bg.ar());
 }

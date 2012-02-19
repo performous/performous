@@ -134,8 +134,6 @@ void ScreenSing::reloadGL() {
 	m_pause_icon.reset(new Surface(getThemePath("sing_pause.svg")));
 	m_help.reset(new Surface(getThemePath("instrumenthelp.svg")));
 	m_progress.reset(new ProgressBar(getThemePath("sing_progressbg.svg"), getThemePath("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01f, 0.01f, true));
-	m_progress->dimensions.fixedWidth(0.4).left(-0.5).screenTop();
-	theme->timer.dimensions.screenTop(0.5 * m_progress->dimensions.h());
 	// Load background
 	bool foundbg = false;
 	if (!m_song->background.empty()) { // Load bg image
@@ -490,6 +488,8 @@ void ScreenSing::draw() {
 	// Compute and draw the timer and the progressbar
 	{
 		unsigned t = clamp(time, 0.0, length);
+		m_progress->dimensions.fixedWidth(0.4).left(-0.5).screenTop();
+		theme->timer.dimensions.screenTop(0.5 * m_progress->dimensions.h());
 		m_progress->draw(songPercent);
 
 		Song::SongSection section("error", 0);
@@ -661,7 +661,6 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database, Dancers& 
 		}
 	}
 	m_bg.dimensions.middle().center();
-	m_scoreBar.dimensions.fixedWidth(0.09);
 }
 
 void ScoreWindow::draw() {
@@ -675,7 +674,7 @@ void ScoreWindow::draw() {
 		int score = p->score;
 		ColorTrans c(p->color);
 		double x = -0.12 + spacing * (0.5 + i - 0.5 * m_database.scores.size());
-		m_scoreBar.dimensions.middle(x).bottom(0.20);
+		m_scoreBar.dimensions.fixedWidth(0.09).middle(x).bottom(0.20);
 		m_scoreBar.draw(score / 10000.0);
 		m_score_text.render(boost::lexical_cast<std::string>(score));
 		m_score_text.dimensions().middle(x).top(0.24).fixedHeight(0.05);
