@@ -157,10 +157,10 @@ void ScreenSongs::update() {
 	double pstart = (!m_jukebox && song ? song->preview_start : 0.0);
 	m_audio.playMusic(music, true, 2.0, pstart);
 	if (song) {
-		std::string background = song->path + song->background;
-		std::string video = song->path + song->video;
-		if (!background.empty()) try { m_songbg.reset(new Surface(background)); } catch (std::exception const&) {}
-		if (!video.empty() && config["graphic/video"].b()) m_video.reset(new Video(video, song->videoGap));
+		std::string background = song->background;
+		std::string video = song->video;
+		if (!background.empty()) try { m_songbg.reset(new Surface(song->path + background)); } catch (std::exception const&) {}
+		if (!video.empty() && config["graphic/video"].b()) m_video.reset(new Video(song->path + video, song->videoGap));
 	}
 }
 
