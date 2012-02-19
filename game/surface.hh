@@ -171,7 +171,7 @@ struct Bitmap {
 	pix::Format fmt;
 	Bitmap(): width(), height(), ar(), fmt(pix::CHAR_RGBA) {}
 	void resize(unsigned w, unsigned h) {
-		buf.resize(w * h * 4, 0x80);
+		buf.resize(w * h * 4);
 		width = w;
 		height = h;
 		ar = float(w) / h;

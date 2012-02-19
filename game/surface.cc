@@ -115,8 +115,9 @@ struct Loader {
 void updateSurfaces() { ldr.apply(); }
 
 template <typename T> void loader(T* target, fs::path const& name) {
-	// Temporarily add 1x1 pixel gray block
+	// Temporarily add 1x1 pixel black texture
 	Bitmap bitmap;
+	bitmap.fmt = pix::RGB;
 	bitmap.resize(1, 1);
 	target->load(bitmap);
 	// Ask the loader to retrieve the image
