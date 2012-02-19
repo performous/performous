@@ -11,8 +11,11 @@ void Video::render(double time) {
 	VideoFrame& fr = m_videoFrame;
 	// Time to switch frame?
 	if (!fr.data.empty() && time >= fr.timestamp) {
-		m_surface.load(fr.width, fr.height, pix::RGB, &fr.data[0]);
-		fr.data.clear();
+		Bitmap bitmap;
+		bitmap.fmt = pix::RGB;
+		bitmap.buf.swap(fr.data);
+		bitmap.resize(fr.width, fr.height);
+		m_surface.load(bitmap);
 		m_surfaceTime = fr.timestamp;
 	}
 	double tdist = std::abs(m_surfaceTime - time);

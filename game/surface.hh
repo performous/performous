@@ -2,10 +2,12 @@
 
 #include "glutil.hh"
 #include "video_driver.hh"
+#include <boost/noncopyable.hpp>
+#include <boost/shared_ptr.hpp>
+#include <cairo.h>
+#include <algorithm>
 #include <stdexcept>
 #include <string>
-#include <boost/noncopyable.hpp>
-#include <cairo.h>
 #include <vector>
 
 /// class for geometry stuff
@@ -162,6 +164,29 @@ template <GLenum Type> void OpenGLTexture<Type>::drawCropped(Dimensions const& o
 
 namespace pix { enum Format { INT_ARGB, CHAR_RGBA, RGB, BGR }; }
 
+struct Bitmap {
+	std::vector<unsigned char> buf;
+	unsigned width, height;
+	float ar;
+	pix::Format fmt;
+	Bitmap(): width(), height(), ar(), fmt(pix::CHAR_RGBA) {}
+	void resize(unsigned w, unsigned h) {
+		buf.resize(w * h * 4, 0x80);
+		width = w;
+		height = h;
+		ar = float(w) / h;
+	}
+	void swap(Bitmap& b) {
+		buf.swap(b.buf);
+		std::swap(width, b.width);
+		std::swap(height, b.height);
+		std::swap(ar, b.ar);
+		std::swap(fmt, b.fmt);
+	}
+};
+
+void updateSurfaces();
+
 /**
 * @short Texture wrapper.
 * Textures with non-power-of-two dimensions may be slow to load.
@@ -171,10 +196,11 @@ class Texture: public OpenGLTexture<GL_TEXTURE_2D> {
   public:
 	/** Initialize from SVG or PNG file **/
 	Texture(std::string const& filename);
+	~Texture();
 	/** Get aspect ratio (1.0 for square, > 1.0 for wider). **/
 	float ar() const { return m_ar; }
 	/// loads texture into buffer
-	void load(unsigned int width, unsigned int height, pix::Format format, unsigned char const* buffer, float ar = 0.0f);
+	void load(Bitmap const& bitmap);
 
   private:
 	float m_ar;
@@ -186,21 +212,22 @@ class Texture: public OpenGLTexture<GL_TEXTURE_2D> {
 **/
 class Surface {
   public:
+	struct Impl;
 	/// dimensions
 	Dimensions dimensions;
 	/// texture coordinates
 	TexCoords tex;
 	Surface(): m_width(0), m_height(0) {}
-	/// creates surface from cairo surface
-	Surface(cairo_surface_t* _surf);
 	/// creates surface from file
 	Surface(std::string const& filename);
+	~Surface();
 	/// draws surface
 	void draw() const;
 	/// loads surface into buffer
-	void load(unsigned int width, unsigned int height, pix::Format format, unsigned char const* buffer, float ar = 0.0f);
+	void load(Bitmap const& bitmap);
 	Shader& shader() { return m_texture.shader(); }
   private:
 	unsigned int m_width, m_height;
 	OpenGLTexture<GL_TEXTURE_RECTANGLE> m_texture;
 };
+

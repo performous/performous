@@ -78,7 +78,12 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL& _text, double m) {
 	cairo_restore(dc);
 	g_object_unref(layout);
 
-	m_surface.load(cairo_image_surface_get_width(surface), cairo_image_surface_get_height(surface), pix::INT_ARGB, cairo_image_surface_get_data(surface));
+	// TODO: Avoid copying of bitmap data?
+	Bitmap bitmap;
+	bitmap.fmt = pix::INT_ARGB;
+	bitmap.resize(cairo_image_surface_get_width(surface), cairo_image_surface_get_height(surface));
+	std::memcpy(&bitmap.buf[0], cairo_image_surface_get_data(surface), bitmap.buf.size());
+	m_surface.load(bitmap);
 
 	// delete surface
 	cairo_destroy(dc);

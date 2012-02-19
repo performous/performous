@@ -98,7 +98,12 @@ void Webcam::render() {
 	if (m_frameAvailable && !m_frame.data.empty()) {
 		boost::mutex::scoped_lock l(m_mutex);
 		// Load the image
-		m_surface.load(m_frame.width, m_frame.height, pix::BGR, &m_frame.data[0]);
+		Bitmap bitmap;
+		bitmap.fmt = pix::BGR;
+		bitmap.buf.swap(m_frame.data);
+		bitmap.resize(m_frame.width, m_frame.height);
+		m_surface.load(bitmap);
+		bitmap.buf.swap(m_frame.data);  // Get back our buffer (FIXME: do we need to?)
 		m_frameAvailable = false;
 	}
 	m_surface.draw(); // Draw

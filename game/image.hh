@@ -24,7 +24,7 @@ namespace {
 	void writePngHelper(png_structp pngPtr, png_bytep data, png_size_t length) {
 		static_cast<std::ostream*>(png_get_io_ptr(pngPtr))->write((char*)data, length);
 	}
-	void loadPNG_internal(png_structp pngPtr, png_infop infoPtr, std::ifstream& file, std::vector<unsigned char>& image, std::vector<png_bytep>& rows, unsigned& w, unsigned& h) {
+	void loadPNG_internal(png_structp pngPtr, png_infop infoPtr, std::ifstream& file, Bitmap& bitmap, std::vector<png_bytep>& rows) {
 		if (setjmp(png_jmpbuf(pngPtr))) throw std::runtime_error("Reading PNG failed");
 		png_set_read_fn(pngPtr,(png_voidp)&file, readPngHelper);
 		png_read_info(pngPtr, infoPtr);
@@ -32,11 +32,9 @@ namespace {
 		png_set_strip_16(pngPtr);  // Strip everything down to 8 bit/component
 		png_set_gray_to_rgb(pngPtr);  // Convert even grayscale to RGB(A)
 		png_set_filler(pngPtr, 0xFF, PNG_FILLER_AFTER); // Add alpha channel if it is missing
-		w = png_get_image_width(pngPtr, infoPtr);
-		h = png_get_image_height(pngPtr, infoPtr);
-		image.resize(w * h * 4);
-		rows.resize(h);
-		for (unsigned y = 0; y < h; ++y) rows[y] = reinterpret_cast<png_bytep>(&image[y * w * 4]);
+		bitmap.resize(png_get_image_width(pngPtr, infoPtr), png_get_image_height(pngPtr, infoPtr));
+		rows.resize(bitmap.height);
+		for (unsigned y = 0; y < bitmap.height; ++y) rows[y] = reinterpret_cast<png_bytep>(&bitmap.buf[y * bitmap.width * 4]);
 		png_read_image(pngPtr, &rows[0]);
 	}
 
@@ -94,11 +92,11 @@ namespace {
 
 }
 
-template <typename T> void loadSVG(T& target, std::string const& filename) {
+static inline void loadSVG(Bitmap& bitmap, std::string const& filename) {
 	double factor = config["graphic/svg_lod"].f();
 
 	/* always */ try {
-		cache::loadSVG(target, filename, factor);
+		cache::loadSVG(bitmap, filename, factor);
 		return;
 	} catch ( ... ) { /* no-op. Failing to read the cache only means more work here */ }
 
@@ -124,7 +122,9 @@ template <typename T> void loadSVG(T& target, std::string const& filename) {
 		g_error_free(pError);
 		throw std::runtime_error("Unable to load " + filename);
 	}
-	target.load(w, h, pix::CHAR_RGBA, gdk_pixbuf_get_pixels(pb), float(svgDimension.width)/svgDimension.height);
+	bitmap.resize(w, h);
+	std::memcpy(&bitmap.buf[0], gdk_pixbuf_get_pixels(pb), bitmap.buf.size());
+	bitmap.ar = float(svgDimension.width)/svgDimension.height;
 	gdk_pixbuf_unref(pb);
 
 	// write the cache iff the resource is cachable
@@ -145,8 +145,7 @@ template <typename T> void loadSVG(T& target, std::string const& filename) {
 	}
 }
 
-template <typename T> void loadPNG(T& target, std::string const& filename) {
-	std::vector<unsigned char> image;
+static inline void loadPNG(Bitmap& bitmap, std::string const& filename) {
 	std::ifstream file(filename.c_str(), std::ios::binary);
 	png_structp pngPtr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	if (!pngPtr) throw std::runtime_error("png_create_read_struct failed");
@@ -160,9 +159,7 @@ template <typename T> void loadPNG(T& target, std::string const& filename) {
 	infoPtr = png_create_info_struct(pngPtr);
 	if (!infoPtr) throw std::runtime_error("png_create_info_struct failed");
 	std::vector<png_bytep> rows;
-	unsigned w, h;
-	loadPNG_internal(pngPtr, infoPtr, file, image, rows, w, h);
-	target.load(w, h, pix::CHAR_RGBA, &image[0], float(w)/h);
+	loadPNG_internal(pngPtr, infoPtr, file, bitmap, rows);
 }
 
 struct my_jpeg_error_mgr {
@@ -179,8 +176,8 @@ static void my_jpeg_error_exit (j_common_ptr cinfo) {
 	longjmp(myerr->setjmp_buffer, 1);
 }
 
-template <typename T> void loadJPEG(T& target, std::string const& filename) {
-	std::vector<unsigned char> image;
+static inline void loadJPEG(Bitmap& bitmap, std::string const& filename) {
+	bitmap.fmt = pix::RGB;
 	struct my_jpeg_error_mgr jerr;
 	FILE* infile = fopen(filename.c_str(), "rb");
 	if (!infile) throw std::runtime_error("Cannot open " + filename);
@@ -196,16 +193,14 @@ template <typename T> void loadJPEG(T& target, std::string const& filename) {
 	jpeg_stdio_src(&cinfo, infile);
 	if( jpeg_read_header(&cinfo, true) != JPEG_HEADER_OK) throw std::runtime_error("Cannot read header of " + filename);
 	jpeg_start_decompress(&cinfo);
-	unsigned w = cinfo.output_width;
-	unsigned h = cinfo.output_height;
-	image.resize(w * h * 4);
-	//unsigned stride = (w * 3 + 3) & ~3;  // Number of bytes per row (word-aligned)
-	unsigned char* ptr = &image[0];
-	while (cinfo.output_scanline < h) {
+	bitmap.resize(cinfo.output_width, cinfo.output_height);
+	unsigned stride = (bitmap.width * 3 + 3) & ~3;  // Number of bytes per row (word-aligned)
+	unsigned char* ptr = &bitmap.buf[0];
+	while (cinfo.output_scanline < bitmap.height) {
 		jpeg_read_scanlines(&cinfo, &ptr, 1);
-		ptr += (w * 3 + 3) & ~3;  // Rows need to be word aligned
+		ptr += stride;
 	}
 	jpeg_destroy_decompress(&cinfo);
 	fclose(infile);
-	target.load(w, h, pix::RGB, &image[0], float(w)/h);
 }
+
