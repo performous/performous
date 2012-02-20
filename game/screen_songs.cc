@@ -256,7 +256,7 @@ void ScreenSongs::drawCovers() {
 	std::size_t ss = m_songs.size();
 	int baseidx = spos + 1.5; --baseidx; // Round correctly
 	double shift = spos - baseidx;
-	for (int i = -2; i < 5; ++i) {
+	for (int i = -2; i < 6; ++i) {
 		if (baseidx + i < 0 || baseidx + i >= int(ss)) continue;
 		Song& song = m_songs[baseidx + i];
 		Surface& s = getCover(song);
