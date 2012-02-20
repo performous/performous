@@ -221,6 +221,7 @@ class Surface {
 	/// creates surface from file
 	Surface(std::string const& filename);
 	~Surface();
+	bool empty() const { return m_width * m_height == 0; } ///< Test if the loading has failed
 	/// draws surface
 	void draw() const;
 	/// loads surface into buffer

@@ -195,6 +195,6 @@ void Surface::load(Bitmap const& bitmap) {
 }
 
 void Surface::draw() const {
-	if (m_width * m_height > 0.0) m_texture.draw(dimensions, TexCoords(tex.x1 * m_width, tex.y1 * m_height, tex.x2 * m_width, tex.y2 * m_height));
+	if (!empty()) m_texture.draw(dimensions, TexCoords(tex.x1 * m_width, tex.y1 * m_height, tex.x2 * m_width, tex.y2 * m_height));
 }
 

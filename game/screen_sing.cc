@@ -135,26 +135,7 @@ void ScreenSing::reloadGL() {
 	m_help.reset(new Surface(getThemePath("instrumenthelp.svg")));
 	m_progress.reset(new ProgressBar(getThemePath("sing_progressbg.svg"), getThemePath("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01f, 0.01f, true));
 	// Load background
-	bool foundbg = false;
-	if (!m_song->background.empty()) { // Load bg image
-		try {
-			m_background.reset(new Surface(m_song->path + m_song->background));
-			foundbg = true;
-		} catch (std::exception& e) {
-			m_song->background = "";
-			std::cerr << e.what() << std::endl;
-		}
-	}
-	// Use random bg if specified fails (also for tracks with video)
-	if (!foundbg) {
-		sm->loading(_("Random background..."), 0.65);
-		try {
-			std::string bgpath = m_backgrounds.getRandom();
-			m_background.reset(new Surface(bgpath));
-		} catch (std::exception& e) {
-			std::cerr << e.what() << std::endl;
-		}
-	}
+	if (!m_song->background.empty()) m_background.reset(new Surface(m_song->path + m_song->background));
 }
 
 void ScreenSing::exit() {
@@ -444,11 +425,10 @@ void ScreenSing::draw() {
 		Transform ft(farTransform());
 		double ar = arMax;
 		// Background image
-		if (m_background) {
-			ar = m_background->dimensions.ar();
-			if (ar > arMax || (m_video && ar > arMin)) fillBG();  // Fill white background to avoid black borders
-			m_background->draw();
-		} else fillBG(); // Blank
+		if (!m_background || m_background->empty()) m_background.reset(new Surface(m_backgrounds.getRandom()));
+		ar = m_background->dimensions.ar();
+		if (ar > arMax || (m_video && ar > arMin)) fillBG();  // Fill white background to avoid black borders
+		m_background->draw();
 		// Webcam
 		if (m_cam && config["graphic/webcam"].b()) m_cam->render();
 		// Video
