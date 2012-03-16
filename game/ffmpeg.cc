@@ -125,13 +125,7 @@ void FFmpeg::seek_internal() {
 	audioQueue.reset();
 	int flags = 0;
 	if (m_seekTarget < position()) flags |= AVSEEK_FLAG_BACKWARD;
-	int stream = -1;
-	if (decodeVideo) stream = videoStream;
-	if (decodeAudio) stream = audioStream;
-	int64_t target = m_seekTarget * AV_TIME_BASE;
-	const AVRational time_base_q = { 1, AV_TIME_BASE };  // AV_TIME_BASE_Q is the same thing with C99 struct literal (not supported by MSVC)
-	if (stream != -1) target = av_rescale_q(target, time_base_q, pFormatCtx->streams[stream]->time_base);
-	av_seek_frame(pFormatCtx, stream, target, flags);
+	av_seek_frame(pFormatCtx, -1, m_seekTarget * AV_TIME_BASE, flags);
 	m_seekTarget = getNaN(); // Signal that seeking is done
 }
 
