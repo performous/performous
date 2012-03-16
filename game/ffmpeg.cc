@@ -33,7 +33,7 @@ FFmpeg::~FFmpeg() {
 	if (pResampleCtx) audio_resample_close(pResampleCtx);
 	if (pAudioCodecCtx) avcodec_close(pAudioCodecCtx);
 	if (pVideoCodecCtx) avcodec_close(pVideoCodecCtx);
-	if (pFormatCtx) av_close_input_file(pFormatCtx);
+	if (pFormatCtx) avformat_close_input(&pFormatCtx);
 }
 
 double FFmpeg::duration() const {
@@ -46,7 +46,7 @@ void FFmpeg::open() {
 	av_register_all();
 	av_log_set_level(AV_LOG_ERROR);
 	if (avformat_open_input(&pFormatCtx, m_filename.c_str(), NULL, NULL)) throw std::runtime_error("Cannot open input file");
-	if (av_find_stream_info(pFormatCtx) < 0) throw std::runtime_error("Cannot find stream information");
+	if (avformat_find_stream_info(pFormatCtx, NULL) < 0) throw std::runtime_error("Cannot find stream information");
 	pFormatCtx->flags |= AVFMT_FLAG_GENPTS;
 	videoStream = -1;
 	audioStream = -1;
