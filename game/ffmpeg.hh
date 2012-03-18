@@ -10,6 +10,7 @@
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/thread/thread.hpp>
 #include <vector>
+#include <iostream>
 
 using boost::uint8_t;
 using boost::int16_t;
