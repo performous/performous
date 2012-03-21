@@ -135,10 +135,6 @@ struct ReadFramePacket: public AVPacket {
 		if (av_read_frame(s, this) < 0) throw FFmpeg::eof_error();
 	}
 	~ReadFramePacket() { av_free_packet(this); }
-	double time() {
-		return uint64_t(dts) == uint64_t(AV_NOPTS_VALUE) ?
-		  getNaN() : double(dts) * av_q2d(m_s->streams[stream_index]->time_base);
-	}
 };
 
 void FFmpeg::decodePacket() {
@@ -179,7 +175,8 @@ int FFmpeg::decodeVideoFrame(ReadFramePacket& packet) {
 			int linesize = w * 3;
 			sws_scale(img_convert_ctx, videoFrame->data, videoFrame->linesize, 0, h, &data, &linesize);
 		}
-		if (packet.time() == packet.time()) m_position = packet.time();
+		// Timecode calculation
+		m_position = double(videoFrame->pkt_pts) * av_q2d(pFormatCtx->streams[videoStream]->time_base);
 		// Construct a new video frame and push it to output queue
 		VideoFrame* tmp = new VideoFrame(m_position, w, h);
 		tmp->data.swap(buffer);
@@ -211,7 +208,9 @@ int FFmpeg::decodeAudioFrame(ReadFramePacket& packet) {
 		int frames = audio_resample(pResampleCtx, &resampled[0], audioFrames, outsize);
 		resampled.resize(frames * AUDIO_CHANNELS);
 		// Use timecode from packet if available
-		if (packet.time() == packet.time()) m_position = packet.time();
+		if (uint64_t(packet.pts) != uint64_t(AV_NOPTS_VALUE)) {
+			m_position = double(packet.pts) * av_q2d(pFormatCtx->streams[audioStream]->time_base);
+		}
 		// Push to output queue (may block)
 		audioQueue.push(resampled, m_position);
 		// Increment current time
