@@ -33,7 +33,11 @@ FFmpeg::~FFmpeg() {
 	if (pResampleCtx) audio_resample_close(pResampleCtx);
 	if (pAudioCodecCtx) avcodec_close(pAudioCodecCtx);
 	if (pVideoCodecCtx) avcodec_close(pVideoCodecCtx);
+#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(53, 17, 0)
 	if (pFormatCtx) avformat_close_input(&pFormatCtx);
+#else
+	if (pFormatCtx) av_close_input_file(pFormatCtx);
+#endif
 }
 
 double FFmpeg::duration() const {
