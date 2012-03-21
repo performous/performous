@@ -133,9 +133,14 @@ class AudioBuffer {
 		mutex::scoped_lock l(m_mutex);
 		while (!condition()) m_cond.wait(l);
 		if (m_quit) return;
-		if (m_pos == 0 && timestamp != 0.0) {
-			std::clog << "ffmpeg/info: The first audio frame begins at " << timestamp << " seconds instead of zero." << std::endl;
+		if (timestamp < 0.0) {
+			std::clog << "ffmpeg/warn: Negative audio timestamp " << timestamp << " seconds, frame ignored." << std::endl;
+			return;
+		}
+		// Insert silence at the beginning if the stream starts later than 0.0
+		if (m_pos == 0 && timestamp > 0.0) {
 			m_pos = timestamp * m_sps;
+			m_data.resize(m_pos, 0);
 		}
 		m_data.insert(m_data.end(), data.begin(), data.end());
 		m_pos += data.size();
