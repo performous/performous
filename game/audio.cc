@@ -418,12 +418,13 @@ struct Audio::Impl {
 		for (ConfigItem::StringList::const_iterator it = devs.begin(), end = devs.end(); it != end; ++it) {
 			try {
 				struct Params {
-					int out;
+					int out, in;
 					unsigned int rate;
 					std::string dev;
 					std::vector<std::string> mics;
 				} params = Params();
 				params.out = 0;
+				params.in = 0;
 				params.rate = 48000;
 				// Break into tokens:
 				std::map<std::string, std::string> keyvalues = parseKeyValuePairs(*it);
@@ -433,6 +434,7 @@ struct Audio::Impl {
 					std::string key = it2->first;
 					std::istringstream iss(it2->second);
 					if (key == "out") iss >> params.out;
+					else if (key == "in") iss >> params.in;
 					else if (key == "rate") iss >> params.rate;
 					else if (key == "dev") std::getline(iss, params.dev);
 					else if (key == "mics") {
@@ -442,6 +444,9 @@ struct Audio::Impl {
 					else throw std::runtime_error("Unknown device parameter " + key);
 					if (!iss.eof()) throw std::runtime_error("Syntax error parsing device parameter " + key);
 				}
+				// Sync mics/in settings together
+				if (params.in == 0) params.in = params.mics.size();
+				else params.mics.resize(params.in);
 				int count = portaudio::AudioDevices::count();
 				int dev = -1;
 				// Handle empty device
@@ -453,7 +458,7 @@ struct Audio::Impl {
 					if (iss >> tmp && iss.get() == EOF && tmp >= 0 && tmp < count) dev = tmp;
 				}
 				std::clog << "audio/info: Trying audio device \"" << params.dev << "\", id: " << dev
-					<< ", in: " << params.mics.size() << ", out: " << params.out << std::endl;
+					<< ", in: " << params.in << ", out: " << params.out << std::endl;
 				bool skip_partial = false;
 				bool found = false;
 				portaudio::AudioDevices ad;
@@ -475,13 +480,13 @@ struct Audio::Impl {
 						int assigned_mics = 0;
 						bool device_init_threw = true;
 						try {
-							devices.push_back(new Device(params.mics.size(), params.out, params.rate, i));
+							devices.push_back(new Device(params.in, params.out, params.rate, i));
 							Device& d = devices.back();
 							device_init_threw = false;
 							// Start capture/playback on this device
 							d.start();
 							// Assign mics for all channels of the device
-							for (unsigned int j = 0; j < d.in; ++j) {
+							for (unsigned int j = 0; j < params.in; ++j) {
 								if (analyzers.size() >= 4) break; // Too many mics
 								std::string const& m = params.mics[j];
 								if (m.empty()) continue; // Input channel not used
