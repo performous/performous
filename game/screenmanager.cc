@@ -43,6 +43,10 @@ Screen* ScreenManager::getScreen(std::string const& name) {
 	}
 }
 
+void ScreenManager::prepareScreen() {
+	getCurrentScreen()->prepare();
+}
+
 void ScreenManager::drawScreen() {
 	getCurrentScreen()->draw();
 	drawLogo();

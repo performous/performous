@@ -185,6 +185,7 @@ void mainLoop(std::string const& songlist) {
 				glFinish();
 				prof("swap");
 				updateSurfaces();
+				sm.prepareScreen();
 				glFinish();
 				prof("surfaces");
 				if (config["graphic/fps"].b()) {
