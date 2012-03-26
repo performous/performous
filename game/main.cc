@@ -190,7 +190,9 @@ void mainLoop(std::string const& songlist) {
 				if (config["graphic/fps"].b()) {
 					++frames;
 					if (now() - time > 1.0) {
-						std::cout << frames << " FPS" << std::endl;
+						std::ostringstream oss;
+						oss << frames << " FPS";
+						sm.flashMessage(oss.str());
 						time += 1.0;
 						frames = 0;
 					}
