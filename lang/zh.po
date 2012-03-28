@@ -1,0 +1,798 @@
+# Traditional Chinese Messages for performous.
+# Copyright (C) 2010 The performous Project (msgids)
+# This file is distributed under the same license as the performous package.
+# Wei-Lun Chao <william.chao@ossii.com.tw>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: performous 0.6.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-10-24 13:04+0100\n"
+"PO-Revision-Date: 2010-10-27 15:23+0800\n"
+"Last-Translator: Wei-Lun Chao <william.chao@ossii.com.tw>\n"
+"Language-Team: Chinese (traditional) <zh-l10n@linux.org.tw>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: ../game/main.cc:133
+msgid "Loading audio samples..."
+msgstr "載入音效樣本…"
+
+#: ../game/main.cc:147
+msgid "Creating screens..."
+msgstr "建立畫面…"
+
+#: ../game/main.cc:156
+msgid "Entering main menu"
+msgstr "進入主選單"
+
+#: ../game/main.cc:158 ../game/screen_sing.cc:144
+msgid "Loading complete"
+msgstr "載入完成"
+
+#: ../game/main.cc:167
+msgid "Screenshot taken!"
+msgstr "拍下螢幕快照！"
+
+#: ../game/main.cc:170
+msgid "Screenshot failed!"
+msgstr "螢幕快照失敗！"
+
+#: ../game/screen_intro.cc:22
+msgid "No playback devices could be used.\n"
+msgstr "沒有播放控制裝置可供使用。\n"
+
+#: ../game/screen_intro.cc:23
+msgid ""
+"\n"
+"Please configure some before playing."
+msgstr ""
+"\n"
+"請於播放前設定一些項目。"
+
+#: ../game/screen_intro.cc:122
+msgid "Ctrl + S to save, Ctrl + R to reset defaults"
+msgstr "Ctrl + S 以儲存，Ctrl + R 以重置預設值"
+
+#: ../game/screen_intro.cc:131
+msgid "Perform"
+msgstr "開唱"
+
+#: ../game/screen_intro.cc:131
+msgid "Start performing!"
+msgstr "開始歡唱！"
+
+#: ../game/screen_intro.cc:132
+msgid "Practice"
+msgstr "練習"
+
+#: ../game/screen_intro.cc:132
+msgid "Check your skills or test the microphones"
+msgstr "檢查您的技巧或測試一下麥克風"
+
+#: ../game/screen_intro.cc:151
+msgid "Audio Devices"
+msgstr "音效裝置"
+
+#: ../game/screen_intro.cc:151
+msgid "Setup microphones and playback"
+msgstr "設定麥克風和播放控制"
+
+#: ../game/screen_intro.cc:152
+msgid "Audio"
+msgstr "音效"
+
+#: ../game/screen_intro.cc:152
+msgid "Configure general audio settings"
+msgstr "組配一般音效設定值"
+
+#: ../game/screen_intro.cc:153
+msgid "Graphics"
+msgstr "圖形"
+
+#: ../game/screen_intro.cc:153
+msgid "Configure rendering and video settings"
+msgstr "組配潤算和影像設定值"
+
+#: ../game/screen_intro.cc:154
+msgid "Game"
+msgstr "遊戲"
+
+#: ../game/screen_intro.cc:154
+msgid "Gameplay related options"
+msgstr "遊戲相關的選項"
+
+#: ../game/screen_intro.cc:155
+msgid "Paths"
+msgstr "路徑"
+
+#: ../game/screen_intro.cc:155
+msgid "Setup song and data paths"
+msgstr "設定歌曲和資料路徑"
+
+#: ../game/screen_intro.cc:157
+msgid "Configure"
+msgstr "設定"
+
+#: ../game/screen_intro.cc:157
+msgid "Configure audio and game options"
+msgstr "組配音效和遊戲選項"
+
+#: ../game/screen_intro.cc:160 ../game/screen_sing.cc:137
+msgid "Quit"
+msgstr "離開"
+
+#: ../game/screen_intro.cc:160
+msgid "Leave the game"
+msgstr "離開遊戲"
+
+#: ../game/screen_sing.cc:35
+msgid "Loading theme..."
+msgstr "載入布景主題…"
+
+#: ../game/screen_sing.cc:38
+msgid "Loading song..."
+msgstr "載入歌曲…"
+
+#: ../game/screen_sing.cc:44
+msgid "Song is broken!"
+msgstr "歌曲已損壞！"
+
+#: ../game/screen_sing.cc:49
+msgid "Loading background..."
+msgstr "載入背景…"
+
+#: ../game/screen_sing.cc:61
+msgid "Initializing webcam..."
+msgstr "初始化網路攝影機…"
+
+#: ../game/screen_sing.cc:68
+msgid "Loading video..."
+msgstr "載入影像…"
+
+#: ../game/screen_sing.cc:74
+msgid "Random background..."
+msgstr "隨機背景…"
+
+#: ../game/screen_sing.cc:85
+msgid "Loading user interface..."
+msgstr "載入使用者介面…"
+
+#: ../game/screen_sing.cc:94
+msgid "Loading instruments..."
+msgstr "載入樂器…"
+
+#: ../game/screen_sing.cc:116
+msgid "Loading menu..."
+msgstr "載入選單…"
+
+#: ../game/screen_sing.cc:118
+msgid "Resume"
+msgstr "再續"
+
+#: ../game/screen_sing.cc:118
+msgid "Back to performing!"
+msgstr "回到歡唱！"
+
+#: ../game/screen_sing.cc:119
+msgid "Restart"
+msgstr "重新啟動"
+
+#: ../game/screen_sing.cc:119
+msgid ""
+"Start the song\n"
+"from the beginning"
+msgstr ""
+"從開始部分\n"
+"播放歌曲"
+
+#: ../game/screen_sing.cc:132
+msgid ""
+"Change vocal track\n"
+"(restart required)"
+msgstr ""
+"變更人聲軌段\n"
+"(需要重新啟動)"
+
+#: ../game/screen_sing.cc:137
+msgid "Exit to song browser"
+msgstr "離開到歌曲瀏覽器"
+
+#: ../game/screen_sing.cc:141
+msgid "Finalizing..."
+msgstr "結束…"
+
+#: ../game/screen_sing.cc:146
+msgid "Song contains broken tracks!"
+msgstr "歌曲含有不完整的軌段！"
+
+#: ../game/screen_sing.cc:478
+msgid "   ENTER to skip instrumental break"
+msgstr "   按下輸入鍵以跳過樂器演奏中斷時間"
+
+#: ../game/screen_sing.cc:479
+msgid "   Remember to wait for grading!"
+msgstr "   記得等一下看評分！"
+
+#: ../game/screen_sing.cc:615
+msgid "No player!"
+msgstr "沒有演唱者！"
+
+#: ../game/screen_sing.cc:624
+msgid "Hit singer"
+msgstr "熱門歌手"
+
+#: ../game/screen_sing.cc:625
+msgid "Lead singer"
+msgstr "領先歌手"
+
+#: ../game/screen_sing.cc:626 ../game/screen_sing.cc:632
+#: ../game/screen_sing.cc:638
+msgid "Rising star"
+msgstr "上升之星"
+
+#: ../game/screen_sing.cc:627 ../game/screen_sing.cc:633
+#: ../game/screen_sing.cc:639
+msgid "Amateur"
+msgstr "業餘"
+
+#: ../game/screen_sing.cc:628 ../game/screen_sing.cc:640
+msgid "Tone deaf"
+msgstr "音癡"
+
+#: ../game/screen_sing.cc:630
+msgid "Maniac"
+msgstr "瘋子"
+
+#: ../game/screen_sing.cc:631
+msgid "Hoofer"
+msgstr "舞者"
+
+#: ../game/screen_sing.cc:634
+msgid "Loser"
+msgstr "輸家"
+
+#: ../game/screen_sing.cc:636
+msgid "Virtuoso"
+msgstr "鑒賞家"
+
+#: ../game/screen_sing.cc:637
+msgid "Rocker"
+msgstr "搖滾者"
+
+#: ../game/database.cc:107 ../game/database.cc:127
+msgid "No Items up to now."
+msgstr "目前還沒有名單。"
+
+#: ../game/database.cc:108 ../game/database.cc:128
+msgid "Be the first to be listed here!"
+msgstr "在此成為清單中的第一位！"
+
+#: ../game/songs.cc:199
+msgid "random order"
+msgstr "隨機排序"
+
+#: ../game/songs.cc:200
+msgid "sorted by song"
+msgstr "依歌曲排序"
+
+#: ../game/songs.cc:201
+msgid "sorted by artist"
+msgstr "依歌手排序"
+
+#: ../game/songs.cc:202
+msgid "sorted by edition"
+msgstr "依專輯排序"
+
+#: ../game/songs.cc:203
+msgid "sorted by genre"
+msgstr "依類型排序"
+
+#: ../game/songs.cc:204
+msgid "sorted by path"
+msgstr "依路徑排序"
+
+#: ../game/songs.cc:205
+msgid "sorted by language"
+msgstr "依語言排序"
+
+#: ../game/guitargraph.cc:14
+msgid "Kids"
+msgstr "兒童"
+
+#: ../game/guitargraph.cc:14
+msgid "Easy"
+msgstr "輕鬆"
+
+#: ../game/guitargraph.cc:14
+msgid "Medium"
+msgstr "中等"
+
+#: ../game/guitargraph.cc:14
+msgid "Hard"
+msgstr "硬底"
+
+#: ../game/guitargraph.cc:14
+msgid "Expert"
+msgstr "專家"
+
+#: ../game/guitargraph.cc:142
+msgid "Ready!"
+msgstr "就緒！"
+
+#: ../game/guitargraph.cc:154
+msgid "Select track"
+msgstr "選取軌段"
+
+#: ../game/guitargraph.cc:169
+msgid "Select difficulty"
+msgstr "選取難度"
+
+#: ../game/guitargraph.cc:172
+msgid "Lefty-mode"
+msgstr "左手模式"
+
+#: ../game/guitargraph.cc:181
+msgid "ON"
+msgstr "開"
+
+#: ../game/guitargraph.cc:181
+msgid "OFF"
+msgstr "關閉"
+
+#: ../game/guitargraph.cc:182
+msgid "Toggle lefty-mode"
+msgstr "切換左手模式"
+
+#: ../game/guitargraph.cc:479
+msgid "Streak!"
+msgstr "劃線！"
+
+#: ../game/guitargraph.cc:496
+msgid ""
+"God Mode\n"
+"Activated!"
+msgstr ""
+"上帝模式\n"
+"啟用！"
+
+#: ../game/guitargraph.cc:497
+msgid "Mistakes ignored!"
+msgstr "忽略錯誤！"
+
+#: ../game/guitargraph.cc:1162
+msgid "Drum Fill!"
+msgstr "填滿鼓聲！"
+
+#: ../game/guitargraph.cc:1163
+msgid "God Mode Ready!"
+msgstr "上帝模式就緒！"
+
+#: ../game/guitargraph.cc:1168
+msgid "Solo!"
+msgstr "獨唱！"
+
+#: ../game/screen_paths.cc:24
+msgid ""
+"This tool is not yet available.\n"
+"Configure paths by adding them\n"
+"as command line parameters and\n"
+"then save them in configuration menu."
+msgstr ""
+"這個工具尚不可用。\n"
+"經由做為命令列參數\n"
+"加入它們以組配路徑\n"
+"然後將它們儲存在組態選單中。"
+
+#: ../game/screen_paths.cc:69
+msgid "Press any key to exit."
+msgstr "按下任何鍵以離開。"
+
+#: ../game/screen_paths.cc:74
+msgid "Windows users can also use ConfigureSongDirectory.bat in the bin-directory."
+msgstr "Windows 使用者也可以使用在 bin-directory 中的 ConfigureSongDirectory.bat。"
+
+#: ../game/screen_audiodevices.cc:55
+msgid ""
+"It seems you have some manual configurations\n"
+"incompatible with this user interface.\n"
+"Saving these settings will override\n"
+"all existing audio device configuration.\n"
+"Your other options changes will be saved too."
+msgstr ""
+"您似乎有某些手動的組態\n"
+"與這個使用者介面不相容。\n"
+"儲存這些設定值將會強制變更\n"
+"所有現存音效裝置的組態。\n"
+"您的其他選項變更也將被儲存。"
+
+#: ../game/screen_audiodevices.cc:108
+msgid "- Unassigned -"
+msgstr "- 未賦值的 -"
+
+#: ../game/screen_audiodevices.cc:126
+msgid "Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select to cancel. Ctrl + R to reset defaults"
+msgstr "使用方向鍵以組配。點擊 輸入/開始 以儲存與測試，或 Esc/選取 以取消。Ctrl + R 以重置預設值"
+
+#: ../game/screen_audiodevices.cc:131
+msgid "For advanced device configuration, use command line parameter --audio (use --audiohelp for details)."
+msgstr "使用命令列參數 --audio (使用 --audiohelp 以瞭解細節) 用於進階裝置組態。"
+
+#: ../game/screen_audiodevices.cc:186
+msgid "Some devices failed to open!"
+msgstr "無法開啟某些裝置！"
+
+#: ../game/screen_players.cc:110
+msgid "No players found!"
+msgstr "找不到演唱者！"
+
+#: ../game/screen_players.cc:111
+msgid "Enter a name to create a new player."
+msgstr "輸入名稱以建立新的演唱者。"
+
+#: ../game/screen_players.cc:113
+msgid "Press enter to create player!"
+msgstr "按下輸入以建立演唱者！"
+
+#: ../game/screen_players.cc:120
+msgid "You reached %1% points!"
+msgstr "您得到了 %1% 分！"
+
+#: ../game/screen_players.cc:121
+msgid "Change player with arrow keys."
+msgstr "利用方向鍵變更演唱者。"
+
+#: ../game/screen_players.cc:122
+msgid "Name:"
+msgstr "名稱："
+
+#: ../game/screen_players.cc:125
+msgid "Type text to filter or create a new player."
+msgstr "輸入文字到篩選器或建立新的演唱者。"
+
+#: ../game/screen_players.cc:125
+msgid "Search Text:"
+msgstr "搜尋文字："
+
+#: ../game/screen_songs.cc:196
+msgid "No songs found!"
+msgstr "找不到歌曲！"
+
+#: ../game/screen_songs.cc:197
+msgid ""
+"Visit performous.org\n"
+"for free songs"
+msgstr ""
+"造訪 performous.org\n"
+"以取得免費歌曲"
+
+#: ../game/screen_songs.cc:199
+msgid "no songs match search"
+msgstr "沒有符合搜尋的歌曲"
+
+#: ../game/screen_songs.cc:207
+msgid "(press END to view hiscores)"
+msgstr "(按下結束以檢視評分結果)"
+
+#: ../game/screen_songs.cc:208
+msgid "<type in to search>"
+msgstr "<輸入以搜尋>"
+
+#: ../game/screen_songs.cc:213
+msgid "Hisccore for %1%\n"
+msgstr "%1% 的評分結果\n"
+
+#: ../game/instrumentgraph.cc:42
+msgid "Rejoin"
+msgstr "重新連結"
+
+#: ../game/instrumentgraph.cc:42
+msgid "Change selections"
+msgstr "變更選擇"
+
+#: ../game/dancegraph.cc:18
+msgid "Beginner"
+msgstr "初學者"
+
+#: ../game/dancegraph.cc:18
+msgid "Challenge"
+msgstr "挑戰"
+
+#: ../game/dancegraph.cc:260
+msgid "STOP!"
+msgstr "停止！"
+
+#: ../game/configuration.cc:102
+msgid "Enabled"
+msgstr "已啟用"
+
+#: ../game/configuration.cc:102
+msgid "Disabled"
+msgstr "已停用"
+
+#: ../game/configuration.cc:106
+#, c-format
+msgid "%d items"
+msgstr "%d 項"
+
+#: ../game/song.hh:35
+msgid "Guitar"
+msgstr "吉他"
+
+#: ../game/song.hh:35
+msgid "Coop guitar"
+msgstr "合奏吉他"
+
+#: ../game/song.hh:35
+msgid "Rhythm guitar"
+msgstr "節奏吉他"
+
+#: ../game/song.hh:35
+msgid "Bass"
+msgstr "低音"
+
+#: ../game/song.hh:35
+msgid "Drums"
+msgstr "鼓聲"
+
+#: ../game/song.hh:35
+msgid "Vocals"
+msgstr "人聲"
+
+#: ../game/song.hh:35
+msgid "Harmonic 1"
+msgstr "調和 1"
+
+#: ../game/song.hh:35
+msgid "Harmonic 2"
+msgstr "調和 2"
+
+#: ../game/song.hh:35
+msgid "Harmonic 3"
+msgstr "調和 3"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:3
+msgid "Gameplay settings."
+msgstr "遊戲設定值。"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:4
+msgid "Graphic"
+msgstr "圖形"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:5
+msgid "Video and rendering settings."
+msgstr "影像和潤算設定值。"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:7
+msgid "Audio-related settings."
+msgstr "音效相關設定值。"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:9
+msgid "System paths."
+msgstr "系統路徑。"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:10
+msgid "Karaoke mode"
+msgstr "卡拉ＯＫ模式"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:11
+msgid "Hide pitch wave, notes and scoring."
+msgstr "隱藏音高、音符和評分。"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:12
+msgid "Pitch waves"
+msgstr "音波"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:13
+msgid "Enable singing pitch display (when not in karaoke mode)."
+msgstr "啟用歌唱音高顯示 (當不在卡拉ＯＫ模式下)。"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:14
+msgid "Theme"
+msgstr "布景主題"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:15
+msgid "Name of the theme to use or absolute path to theme folder."
+msgstr "使用的布景主題名稱或是布景主題資料夾的絕對路徑。"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:16
+msgid "Keyboard as guitar"
+msgstr "鍵盤做為吉他"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:17
+msgid "Enable keyboard as guitar (Frets on Fire mode)."
+msgstr "啟用鍵盤做為吉他 (Frets on Fire 模式)。"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:18
+msgid "Keyboard as drumkit"
+msgstr "鍵盤做為爵士鼓"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:19
+msgid "Enable keyboard as drumkit."
+msgstr "啟用鍵盤做為爵士鼓。"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:20
+msgid "Keyboard as dance pad"
+msgstr "鍵盤做為舞墊"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:21
+msgid "Enable keyboard as dance pad."
+msgstr "啟用鍵盤做為舞墊。"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:22
+msgid "Joystick configuration"
+msgstr "搖桿組態"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:23
+msgid "Force joystick to some kind of instrument."
+msgstr "強制搖桿成為某種樂器。"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:24
+msgid "Hardware MIDI input device"
+msgstr "硬體 MIDI 輸入裝置"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:25
+msgid "Part of sound card name or its number or empty to use the first available device. Used currently for MIDI drum controllers."
+msgstr "音效卡的部分名稱、它的編號或是空白，以使用第一個可用裝置。使用目前的做為 MIDI 鼓聲控制器。"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:26
+msgid "Windowed width"
+msgstr "視窗寬度"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:27
+msgid "The width of the window."
+msgstr "視窗的寬度。"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:28
+msgid "Windowed height"
+msgstr "視窗高度"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:29
+msgid "The height of the window."
+msgstr "視窗的高度。"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:30
+msgid "Fullscreen mode"
+msgstr "全螢幕模式"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:31
+msgid "Enable fullscreen mode on startup."
+msgstr "啟動時啟用全螢幕模式。"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:32
+msgid "Video playback"
+msgstr "影像播放控制"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:33
+msgid "Allows completely disabling background videos. It is recommended to leave this enabled as Performous will still smoothly fade out the video if your computer is not fast enough."
+msgstr "允許完全停用背景影像。建議保持其為啟用，因為如果您的電腦不夠快，Performous 仍將平滑淡出影像。"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:34
+msgid "Webcam background"
+msgstr "網路攝影機背景"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:35
+msgid "Performous can try to use webcam as a background video. You can disable it if it annoys you."
+msgstr "Performous 可以試著使用網路攝影機做為背景影像。如果它使您厭煩，您可以停用它。"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:36
+msgid "Webcam id"
+msgstr "網路攝影機識別號"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:37
+msgid "Use -1 to autodetect or a number starting from 0 to choose specific device."
+msgstr "使用 -1 以自動偵測，或是一個從 0 開始的數字以選擇特定的裝置。"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:38
+msgid "3D notes"
+msgstr "立體音符"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:39
+msgid "Draw instrument notes as 3-dimensional objects. May hurt performance on older hardware."
+msgstr "以立體物件繪製樂器音符。在舊硬體上也許有損效能。"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:40
+msgid "SVG quality"
+msgstr "SVG 品質"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:41
+msgid "Larger numbers cause vector graphics to be rendered in higher resolution. Decrease this to make navigating in menus faster."
+msgstr "較大的數字會造成向量圖形以較高解析度進行潤算。減少它以便較快巡覽選單。"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:42
+msgid "Text quality"
+msgstr "文字品質"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:43
+msgid "Larger numbers cause text to be rendered in higher resolution. Decrease this to make everything a little faster."
+msgstr "較大的數字會造成文字以較高解析度進行潤算。減少它好讓所有東西快一點。"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:44
+msgid "Benchmark mode"
+msgstr "效能評定模式"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:45
+msgid "Framerate limit of 100 FPS is removed and the game instead renders at full speed. FPS values are printed to console. Please note that the display drivers may still limit the rendering speed to the screen refresh rate."
+msgstr "已移除 100 FPS 的影格率限制，遊戲則以全速進行潤算。FPS 值已印出至主控臺。要注意的是，顯示卡驅動程式也許仍然會限制潤算速度為螢幕重新整理速率。"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:46
+msgid "Suggested latency"
+msgstr "建議的延時"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:47
+msgid "This is a hint for the audio engine about the desired latency. Set this as low as possible while retaining clear audio playback. Requires restart."
+msgstr "這是關於所設想延時用於音效引擎的提示。在保持乾淨的音效播放條件下，儘可能將它設低一點。需要重新啟動。"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:48
+msgid "Audio/video latency"
+msgstr "音效/影像延時"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:49
+msgid "Affects all modes. Use negative value if your display input lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal. This should be set so that the notes pass the cursor at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while performing."
+msgstr "會影響所有模式。如果您的顯示輸入滯後大於音效卡輸出延時就使用負值，反之則用正值，如果它們相等就為零。這個應該要設定才會讓音符經過游標的同時也會聽到音效。執行時期可以使用 Ctrl+F1/F2 來調整它。"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:50
+msgid "Audio round-trip latency"
+msgstr "音效往返延時"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:51
+msgid "Affects singing only. The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. While performing, press Ctrl+S for synth mode and adjust with Ctrl+F3/F4."
+msgstr "只會影響歌唱。Performous 的播放控制到達您的揚聲器所需的時間，傳到麥克風然後一路回來直到 Performous 擷取並分析它。執行時期可以按下 Ctrl+S 進入同步模式，並利用 Ctrl+F3/F4 來調整。"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:52
+msgid "Audio/controller latency"
+msgstr "音效/控制器延時"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:53
+msgid "Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to adjust while performing."
+msgstr "只會影響樂器和跳舞。USB 裝置(吉他或舞墊) 與音效輸出延時合併的延時總計。如此調整您就可以很好地經由聽聲音而點擊音符 (不需要看著螢幕)。執行時期可以使用 Ctrl+F5/F6 來調整它。"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:54
+msgid "Audio devices"
+msgstr "音效裝置"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:55
+msgid "List of audio devices to try."
+msgstr "要嘗試的音效裝置清單。"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:56
+msgid "Menu volume"
+msgstr "選單音量"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:57
+msgid "The volume level of menus, song previews and jukebox mode."
+msgstr "選單、歌曲預覽和媒體櫃模式的音量等級。"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:58
+msgid "Music volume"
+msgstr "音樂音量"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:59
+msgid "The ingame music volume. Values above 90 are not recommended as distortion may occur."
+msgstr "遊戲時音樂音量。不建議 90 以上的值，因為也許會發生扭曲。"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:60
+msgid "Failure volume"
+msgstr "失敗音量"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:61
+msgid "The ingame fail sound volume. Values above 90 are not recommended as distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
+msgstr "遊戲時失敗音量。不建議 90 以上的值，因為也許會發生扭曲。11 要比 10 大聲，但是這些會到 100。89 比較大聲！"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:62
+msgid "Song folders"
+msgstr "歌曲資料夾"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:63
+msgid "Where to recursively look for songs. DATADIR at the beginning means all Performous data folders."
+msgstr "遞迴找尋歌曲的位置。起始部分的 DATADIR 表示所有 Performous 的資料夾。"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:64
+msgid "Base folders for data"
+msgstr "資料的基底資料夾"
+
+#: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:65
+msgid "System defaults are included automatically. Additional paths can be added here."
+msgstr "自動會包含系統預設值。可以在此加入額外路徑。"
