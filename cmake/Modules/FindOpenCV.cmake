@@ -196,6 +196,9 @@ if(EXISTS "${OpenCV_DIR}")
         set(OpenCV_LIBS ${OpenCV_LIBS} ${OpenCV_${__CVLIB}_LIBRARY})
       endif(OpenCV_${__CVLIB}_LIBRARY)
 
+      #Avoid pollution
+      mark_as_advanced(OpenCV_${__CVLIB}_LIBRARY OpenCV_${__CVLIB}_LIBRARY_RELEASE OpenCV_${__CVLIB}_LIBRARY_DEBUG)
+
     endforeach(__CVLIB)
 
 
@@ -243,7 +246,9 @@ if(EXISTS "${OpenCV_DIR}")
         set(OpenCV_LIBS ${OpenCV_LIBS} ${OpenCV_${__CVLIB}_LIBRARY})
       endif(OpenCV_${__CVLIB}_LIBRARY)
 
-      
+      #Avoid pollution
+      mark_as_advanced(OpenCV_${__CVLIB}_LIBRARY OpenCV_${__CVLIB}_LIBRARY_RELEASE OpenCV_${__CVLIB}_LIBRARY_DEBUG)
+
     endforeach(__CVLIB)
 
 
@@ -285,3 +290,6 @@ if(OpenCV_FOUND)
   endif(OpenCV_BACKWARD_COMPA)
 endif(OpenCV_FOUND)
 ##====================================================
+
+mark_as_advanced(OpenCV_DIR OpenCV_FOUND)
+
