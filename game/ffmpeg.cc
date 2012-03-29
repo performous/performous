@@ -36,7 +36,7 @@ FFmpeg::~FFmpeg() {
 	boost::mutex::scoped_lock l(s_avcodec_mutex); // avcodec_close is not thread-safe
 	if (m_resampleContext) audio_resample_close(m_resampleContext);
 	if (m_codecContext) avcodec_close(m_codecContext);
-#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(53, 2, 0)
+#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(53, 17, 0)
 	if (m_formatContext) avformat_close_input(&m_formatContext);
 #else
 	if (m_formatContext) av_close_input_file(m_formatContext);
