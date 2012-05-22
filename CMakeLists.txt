@@ -28,6 +28,8 @@ endif(WIN32)
 
 mark_as_advanced(SHARE_INSTALL)
 
+#add_subdirectory(libs/cpp-netlib)
+
 #need to put here do setting LOCALE_DIR variable
 find_package(Gettext)
 if(Gettext_FOUND)

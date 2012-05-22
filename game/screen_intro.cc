@@ -176,6 +176,8 @@ void ScreenIntro::populateMenu() {
 			opts->push_back(MenuOption(_(it->second.getShortDesc().c_str()), _(it->second.getLongDesc().c_str()), &it->second));
 			opts->back().image = config_bg;
 		}
+		// Main DLC menu
+		m_menu.add(MenuOption(_("Download"), _("Get free songs or manage DLC"), "Downloads", "intro_dlc.svg"));
 		// Main config menu
 		MenuOptions configmain;
 		configmain.push_back(MenuOption(_("Audio Devices"), _("Setup microphones and playback"), "AudioDevices", "intro_configure.svg"));

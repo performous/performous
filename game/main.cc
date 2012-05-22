@@ -1,4 +1,5 @@
 #include "config.hh"
+#include "downloader.hh"
 #include "fs.hh"
 #include "screen.hh"
 #include "joystick.hh"
@@ -17,6 +18,7 @@
 #include "screen_songs.hh"
 #include "screen_sing.hh"
 #include "screen_practice.hh"
+#include "screen_downloads.hh"
 #include "screen_audiodevices.hh"
 #include "screen_paths.hh"
 #include "screen_players.hh"
@@ -119,6 +121,7 @@ void mainLoop(std::string const& songlist) {
 		portaudio::AudioDevices ads;
 		std::clog << "audio/info:\n" << ads.dump();
 	}
+	Downloader downloader;
 	Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());
 	Backgrounds backgrounds;
 	Database database(getConfigDir() / "database.xml");
@@ -150,6 +153,7 @@ void mainLoop(std::string const& songlist) {
 		sm.addScreen(new ScreenSongs("Songs", audio, songs, database));
 		sm.addScreen(new ScreenSing("Sing", audio, database, backgrounds));
 		sm.addScreen(new ScreenPractice("Practice", audio));
+		sm.addScreen(new ScreenDownloads("Downloads", audio));
 		sm.addScreen(new ScreenAudioDevices("AudioDevices", audio));
 		sm.addScreen(new ScreenPaths("Paths", audio));
 		sm.addScreen(new ScreenPlayers("Players", audio, database));
@@ -200,6 +204,7 @@ void mainLoop(std::string const& songlist) {
 					frames = 0;
 				}
 				prof("fpsctrl");
+				downloader.poll();
 				// Process events for the next frame
 				if (midiDrums) midiDrums->process();
 				checkEvents_SDL(sm);

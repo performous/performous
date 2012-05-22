@@ -27,6 +27,10 @@ to save the current settings to XML.
 			<short>Audio</short>
 			<long>Audio-related settings.</long>
 		</entry>
+		<entry name="dlc">
+			<short>DLC</short>
+			<long>Content downloading settings.</long>
+		</entry>
 		<entry name="paths">
 			<short>Paths</short>
 			<long>System paths.</long>
