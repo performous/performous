@@ -25,6 +25,7 @@ public:
 	void reloadGL();
 	void manageSharedKey(input::NavButton nav); ///< same behaviour for jukebox and normal mode
 	void manageEvent(SDL_Event event);
+	void prepare();
 	void draw();
 	void drawCovers(); ///< draw the cover browser
 	Surface& getCover(Song const& song); ///< get appropriate cover image for the song (incl. no cover)
