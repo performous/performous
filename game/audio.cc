@@ -385,8 +385,7 @@ Device::Device(unsigned int in, unsigned int out, double rate, unsigned int dev)
 
 void Device::start() {
 	PaError err = Pa_StartStream(stream);
-	if (err != paNoError) throw std::runtime_error("Cannot start PortAudio audio stream "
-	  + boost::lexical_cast<std::string>(dev) + ": " + Pa_GetErrorText(err));
+	if (err != paNoError) throw std::runtime_error(std::string("Pa_StartStream: ") + Pa_GetErrorText(err));
 }
 
 int Device::operator()(void const* input, void* output, unsigned long frames, const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags) try {
@@ -478,13 +477,13 @@ struct Audio::Impl {
 						}
 						// Match found if we got here
 						int assigned_mics = 0;
-						bool device_init_threw = true;
 						try {
-							devices.push_back(new Device(params.in, params.out, params.rate, i));
-							Device& d = devices.back();
-							device_init_threw = false;
-							// Start capture/playback on this device
-							d.start();
+							Device* d = new Device(params.in, params.out, params.rate, i);
+							devices.push_back(d);
+							// Start capture/playback on this device (likely to throw due to audio system errors)
+							// NOTE: When it throws we want to keep the device in devices to avoid calling ~Device
+							// which often would hit the Pa_CloseStream hang bug and terminate the application.
+							d->start();
 							// Assign mics for all channels of the device
 							for (unsigned int j = 0; j < params.in; ++j) {
 								if (analyzers.size() >= 4) break; // Too many mics
@@ -497,15 +496,15 @@ struct Audio::Impl {
 								}
 								if (mic_used) continue;
 								// Add the new analyzer
-								Analyzer* a = new Analyzer(d.rate, m);
+								Analyzer* a = new Analyzer(d->rate, m);
 								analyzers.push_back(a);
-								d.mics[j] = a;
+								d->mics[j] = a;
 								++assigned_mics;
 							}
 							// Assign playback output for the first available stereo output
-							if (!playback && d.out == 2) { d.outptr = &output; playback = true; }
-						} catch (...) {
-							if (!device_init_threw) devices.pop_back();
+							if (!playback && d->out == 2) { d->outptr = &output; playback = true; }
+						} catch (std::runtime_error& e) {
+							std::clog << "audio/warning: " << info.name << ": " << e.what() << std::endl;
 							if (dev > 0) { skip_partial = true; break; } // Numeric, end search
 							continue;
 						}
