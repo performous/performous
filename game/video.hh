@@ -10,8 +10,8 @@ class Video {
   public:
 	/// opens given video file
 	Video(std::string const& videoFile, double videoGap = 0.0);
-	/// renders video
-	void render(double time);
+	void prepare(double time);  ///< Load the current video frame into a texture
+	void render(double time);  ///< Render the prepared video frame
 	/// returns Dimensions of video clip
 	Dimensions& dimensions() { return m_surface.dimensions; }
 	/// returns Dimensions of video clip

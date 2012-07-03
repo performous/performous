@@ -164,6 +164,11 @@ void ScreenSongs::update() {
 	}
 }
 
+void ScreenSongs::prepare() {
+	double time = m_audio.getPosition();
+	if (m_video) m_video->prepare(time);
+}
+
 void ScreenSongs::drawJukebox() {
 	double pos = m_audio.getPosition();
 	double len = m_audio.getLength();

@@ -399,6 +399,11 @@ namespace {
 
 }
 
+void ScreenSing::prepare() {
+	double time = m_audio.getPosition();
+	if (m_video) m_video->prepare(time);
+}
+
 void ScreenSing::draw() {
 	// Get the time in the song
 	double length = m_audio.getLength();
@@ -432,7 +437,7 @@ void ScreenSing::draw() {
 		// Webcam
 		if (m_cam && config["graphic/webcam"].b()) m_cam->render();
 		// Video
-		if (m_video /* && (!m_cam || !m_cam->is_good()) */) {
+		if (m_video) {
 			m_video->render(time); double tmp = m_video->dimensions().ar(); if (tmp > 0.0) ar = tmp;
 		}
 		// Top/bottom borders

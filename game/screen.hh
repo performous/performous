@@ -19,6 +19,8 @@ class Screen {
 	virtual ~Screen() {}
 	/// eventhandler
 	virtual void manageEvent(SDL_Event event) = 0;
+	/// prepare screen for drawing
+	virtual void prepare() {}
 	/// draws screen
 	virtual void draw() = 0;
 	/// enters screen
@@ -49,6 +51,8 @@ class ScreenManager: public Singleton <ScreenManager> {
 	void activateScreen(std::string const& name);
 	/// Does actual switching of screens (if necessary)
 	void updateScreen();
+	/// Prepare (slow loading operations) of the current screen for rendering
+	void prepareScreen();
 	/// Draws the current screen and possible transition effects
 	void drawScreen();
 	/// Reload OpenGL resources (after fullscreen toggle etc)

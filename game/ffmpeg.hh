@@ -10,6 +10,7 @@
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/thread/thread.hpp>
 #include <vector>
+#include <iostream>
 
 using boost::uint8_t;
 using boost::int16_t;
@@ -132,9 +133,14 @@ class AudioBuffer {
 		mutex::scoped_lock l(m_mutex);
 		while (!condition()) m_cond.wait(l);
 		if (m_quit) return;
-		if (m_pos == 0 && timestamp != 0.0) {
-			std::clog << "ffmpeg/info: The first audio frame begins at " << timestamp << " seconds instead of zero." << std::endl;
+		if (timestamp < 0.0) {
+			std::clog << "ffmpeg/warn: Negative audio timestamp " << timestamp << " seconds, frame ignored." << std::endl;
+			return;
+		}
+		// Insert silence at the beginning if the stream starts later than 0.0
+		if (m_pos == 0 && timestamp > 0.0) {
 			m_pos = timestamp * m_sps;
+			m_data.resize(m_pos, 0);
 		}
 		m_data.insert(m_data.end(), data.begin(), data.end());
 		m_pos += data.size();
@@ -232,20 +238,16 @@ class FFmpeg {
 	volatile bool m_running;
 	volatile bool m_eof;
 	volatile double m_seekTarget;
-	AVFormatContext* pFormatCtx;
-	ReSampleContext* pResampleCtx;
-	SwsContext* img_convert_ctx;
-
-	AVCodecContext* pVideoCodecCtx;
-	AVCodecContext* pAudioCodecCtx;
-	AVCodec* pVideoCodec;
-	AVCodec* pAudioCodec;
-
-	int videoStream;
-	int audioStream;
-	bool decodeVideo;
-	bool decodeAudio;
 	double m_position;
+	// libav-specific variables
+	int m_streamId;
+	int m_mediaType;  // enum AVMediaType
+	AVFormatContext* m_formatContext;
+	AVCodecContext* m_codecContext;
+	AVCodec* m_codec;
+	ReSampleContext* m_resampleContext;
+	SwsContext* m_swsContext;
+	// Make sure the thread starts only after initializing everything else
 	boost::scoped_ptr<boost::thread> m_thread;
 	static boost::mutex s_avcodec_mutex; // Used for avcodec_open/close (which use some static crap and are thus not thread-safe)
 };

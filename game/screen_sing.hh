@@ -55,6 +55,7 @@ class ScreenSing: public Screen {
 	void exit();
 	void reloadGL();
 	void manageEvent(SDL_Event event);
+	void prepare();
 	void draw();
 
 	void setSong (boost::shared_ptr<Song> song_)
