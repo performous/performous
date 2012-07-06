@@ -125,6 +125,22 @@ static inline void loadSVG(Bitmap& bitmap, std::string const& filename) {
 }
 
 static inline void loadPNG(Bitmap& bitmap, std::string const& filename) {
+	// Raster with Cairo
+	boost::shared_ptr<cairo_surface_t> surface(
+	  cairo_image_surface_create_from_png(filename.c_str()),
+	  cairo_surface_destroy);
+	cairo_surface_flush(surface.get());
+	unsigned char* buf = cairo_image_surface_get_data(surface.get());
+	// Prepare the pixel buffer
+	bitmap.resize(
+	  cairo_image_surface_get_width(surface.get()),
+	  cairo_image_surface_get_height(surface.get()));
+	bitmap.fmt = pix::INT_ARGB;
+	std::copy(buf, buf + bitmap.buf.size(), bitmap.buf.begin());
+}
+
+/*
+static inline void loadPNG(Bitmap& bitmap, std::string const& filename) {
 	std::ifstream file(filename.c_str(), std::ios::binary);
 	png_structp pngPtr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	if (!pngPtr) throw std::runtime_error("png_create_read_struct failed");
@@ -140,7 +156,7 @@ static inline void loadPNG(Bitmap& bitmap, std::string const& filename) {
 	std::vector<png_bytep> rows;
 	loadPNG_internal(pngPtr, infoPtr, file, bitmap, rows);
 }
-
+*/
 struct my_jpeg_error_mgr {
 	struct jpeg_error_mgr pub;	/* "public" fields */
 	jmp_buf setjmp_buffer;	/* for return to caller */
