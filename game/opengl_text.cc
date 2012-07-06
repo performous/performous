@@ -37,7 +37,7 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL& _text, double m) {
 
 	// compute text extents
 	{
-		PangoContext* ctx = pango_cairo_font_map_create_context ((PangoCairoFontMap*)pango_cairo_font_map_get_default());
+		PangoContext* ctx = pango_font_map_create_context(pango_cairo_font_map_get_default());
 		PangoLayout* layout = pango_layout_new(ctx);
 		pango_layout_set_alignment(layout, alignment);
 		pango_layout_set_font_description (layout, desc);
