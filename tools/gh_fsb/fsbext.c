@@ -1644,9 +1644,7 @@ FILE *try_fsbdec(FILE *fd) {
             "  type ? for viewing the hex dump of the first %d bytes of the file because\n"
             "  it's possible to see part of the plain-text password in the encrypted file!\n"
             "  ", HEXSIZE);
-        fflush(stdin);
-	// TODO: test return value
-        fgets(key, sizeof(key), stdin);
+        if (!fgets(key, sizeof(key), stdin)) exit(1);
         delimit(key);
         if(strcmp(key, "?")) break;
 
