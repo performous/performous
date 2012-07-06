@@ -3,7 +3,7 @@
 
 #include <boost/scoped_ptr.hpp>
 #include <glibmm/ustring.h>
-#include <glib/gconvert.h>
+#include <glib.h>
 #include <sstream>
 #include <stdexcept>
 
