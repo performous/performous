@@ -34,7 +34,7 @@ void Video::render(double time) {
 	if (alpha > 0.0f) {
 		Color color;
 		if (alpha < 1.0f) {
-			color = Color(1.0f, 1.0f, 1.0f, alpha);
+			color = Color(alpha, alpha, alpha, alpha);
 		} else {
 			color = Color(1.0f, 1.0f, 1.0f);
 		}
