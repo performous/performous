@@ -198,11 +198,10 @@ extern "C" {
   struct AVCodec;
   struct AVCodecContext;
   struct AVFormatContext;
+  struct AVFrame;
   struct ReSampleContext;
   struct SwsContext;
 }
-
-struct ReadFramePacket;
 
 /// ffmpeg class
 class FFmpeg {
@@ -230,8 +229,8 @@ class FFmpeg {
 	void seek_internal();
 	void open();
 	void decodePacket();
-	int decodeVideoFrame(ReadFramePacket& packet);
-	int decodeAudioFrame(ReadFramePacket& packet);
+	void processVideo(AVFrame* frame);
+	void processAudio(AVFrame* frame);
 	std::string m_filename;
 	unsigned int m_rate;
 	volatile bool m_quit;
