@@ -148,16 +148,18 @@ void FFmpeg::decodePacket() {
 	}
 }
 
+struct AVFrameWrapper {
+	AVFrame* m_frame;
+	AVFrameWrapper(): m_frame(avcodec_alloc_frame()) {
+		if (!m_frame) throw std::runtime_error("Unable to allocate AVFrame");
+	}
+	~AVFrameWrapper() { av_free(m_frame); }
+	operator AVFrame*() { return m_frame; }
+	AVFrame* operator->() { return m_frame; }
+};
+
 int FFmpeg::decodeVideoFrame(ReadFramePacket& packet) {
-	struct AVFrameWrapper {
-		AVFrame* m_frame;
-		AVFrameWrapper(): m_frame(avcodec_alloc_frame()) {
-			if (!m_frame) throw std::runtime_error("Unable to allocate AVFrame");
-		}
-		~AVFrameWrapper() { av_free(m_frame); }
-		operator AVFrame*() { return m_frame; }
-		AVFrame* operator->() { return m_frame; }
-	} videoFrame;
+	struct AVFrameWrapper videoFrame;
 
 	int frameFinished = 0;
 	int decodeSize = avcodec_decode_video2(m_codecContext, videoFrame, &frameFinished, &packet);
@@ -183,26 +185,15 @@ int FFmpeg::decodeVideoFrame(ReadFramePacket& packet) {
 }
 
 int FFmpeg::decodeAudioFrame(ReadFramePacket& packet) {
-	class AudioBuffer {
-	  public:
-		AudioBuffer(size_t _size): m_buffer((int16_t*)av_malloc(_size*sizeof(int16_t))) {
-			if (!m_buffer) throw std::runtime_error("Unable to allocate AudioBuffer");
-		}
-		~AudioBuffer() { av_free(m_buffer); }
-		operator  int16_t*() { return m_buffer; }
-		int16_t* operator->() { return m_buffer; }
-	  private:
-		int16_t* m_buffer;
-	} audioFrames(AVCODEC_MAX_AUDIO_FRAME_SIZE);
-	
-	int outsize = AVCODEC_MAX_AUDIO_FRAME_SIZE*sizeof(int16_t);
-	int decodeSize = avcodec_decode_audio3(m_codecContext, audioFrames, &outsize, &packet);
+	struct AVFrameWrapper audioFrame;
+
+	int gotFrame = 0;
+	int decodeSize = avcodec_decode_audio4(m_codecContext, audioFrame, &gotFrame, &packet);
 	if (decodeSize < 0) throw std::runtime_error("cannot decode audio frame");
-	if (outsize > 0) {
-		// Convert outsize from bytes into number of frames (samples)
-		outsize /= sizeof(int16_t) * m_codecContext->channels;
+	if (gotFrame) {
 		std::vector<int16_t> resampled(AVCODEC_MAX_AUDIO_FRAME_SIZE);
-		int frames = audio_resample(m_resampleContext, &resampled[0], audioFrames, outsize);
+		// Use number of samples from AVFrame
+		int frames = audio_resample(m_resampleContext, &resampled[0], (short*)audioFrame->data[0], audioFrame->nb_samples);
 		resampled.resize(frames * AUDIO_CHANNELS);
 		// Use timecode from packet if available
 		if (uint64_t(packet.pts) != uint64_t(AV_NOPTS_VALUE)) {
