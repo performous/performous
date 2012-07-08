@@ -4,7 +4,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-08-01 22:09+0200\n"
 "PO-Revision-Date: \n"
-"Last-Translator: Tapio Vierros <tapiovierros@gmail.com>\n"
+"Last-Translator: Alvaro Fernando García <alvarofernandogarcía@gmail.com>\n"
 "Language-Team: \n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -473,11 +473,11 @@ msgstr ""
 
 #: ../game/screen_intro.cc:64
 msgid "Settings saved as system defaults."
-msgstr ""
+msgstr "Configuración guardada como predeterminada."
 
 #: ../game/screen_intro.cc:64
 msgid "Settings saved."
-msgstr ""
+msgstr "Configuración guardada."
 
 #: ../game/screen_intro.cc:146
 msgid "Ctrl + S to save, Ctrl + R to reset defaults"
@@ -697,27 +697,29 @@ msgstr "Habilita el modo pantalla completa al iniciar la aplicación."
 
 #: /tmp/xml2gettext.kDjC6MN5nr:34
 msgid "Stereoscopic 3D"
-msgstr ""
+msgstr "3D Esteroscópico"
 
 #: /tmp/xml2gettext.kDjC6MN5nr:35
 msgid "Enable 3D rendering of Performous."
-msgstr ""
+msgstr "Habilitar renderizado 3D de Performous."
 
 #: /tmp/xml2gettext.kDjC6MN5nr:36
+#, fuzzy
 msgid "Stereo3D type"
-msgstr ""
+msgstr "Tipo de 3D Esteoscópico"
 
 #: /tmp/xml2gettext.kDjC6MN5nr:37
 msgid "Some modes may only get activated in fullscreen mode."
-msgstr ""
+msgstr "Algunos modos pueden activarse solo en modo pantalla completa."
 
 #: /tmp/xml2gettext.kDjC6MN5nr:38
+#, fuzzy
 msgid "Stereo3D separation"
-msgstr ""
+msgstr "Separación de 3D Estereoscópico"
 
 #: /tmp/xml2gettext.kDjC6MN5nr:39
 msgid "The strength of the effect. Experiment with different settings for best results."
-msgstr ""
+msgstr "Fuerza del efecto. Experimentar con diferentes configuraciones para mejores resultados."
 
 #: /tmp/xml2gettext.kDjC6MN5nr:40
 msgid "Video playback"
