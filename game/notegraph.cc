@@ -196,7 +196,6 @@ namespace {
 void NoteGraph::drawWaves(Database const& database) {
 	if (m_vocal.notes.empty()) return; // Cannot draw without notes
 	UseTexture tblock(m_wave);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	for (std::list<Player>::const_iterator p = database.cur.begin(); p != database.cur.end(); ++p) {
 		if (p->m_vocal.name != m_vocal.name)
 			continue;
@@ -250,6 +249,5 @@ void NoteGraph::drawWaves(Database const& database) {
 		}
 		strip(va);
 	}
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 

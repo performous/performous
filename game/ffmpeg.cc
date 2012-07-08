@@ -126,29 +126,15 @@ void FFmpeg::seek_internal() {
 	m_seekTarget = getNaN(); // Signal that seeking is done
 }
 
-struct ReadFramePacket: public AVPacket {
-	AVFormatContext* m_s;
-	ReadFramePacket(AVFormatContext* s): m_s(s) {
-		if (av_read_frame(s, this) < 0) throw FFmpeg::eof_error();
-	}
-	~ReadFramePacket() { av_free_packet(this); }
-};
-
 void FFmpeg::decodePacket() {
-	ReadFramePacket packet(m_formatContext);
-	int packetSize = packet.size;
-	while (packetSize) {
-		if (packetSize < 0) throw std::logic_error("negative packet size?!");
-		if (m_quit || m_seekTarget == m_seekTarget) return;
-		if (packet.stream_index != m_streamId) return;
-		int decodeSize = 0;
-		if (m_mediaType == AVMEDIA_TYPE_VIDEO) decodeSize = decodeVideoFrame(packet);
-		if (m_mediaType == AVMEDIA_TYPE_AUDIO) decodeSize = decodeAudioFrame(packet);
-		packetSize -= decodeSize; // Move forward within the packet
-	}
-}
+	struct ReadFramePacket: public AVPacket {
+		AVFormatContext* m_s;
+		ReadFramePacket(AVFormatContext* s): m_s(s) {
+			if (av_read_frame(s, this) < 0) throw FFmpeg::eof_error();
+		}
+		~ReadFramePacket() { av_free_packet(this); }
+	};
 
-int FFmpeg::decodeVideoFrame(ReadFramePacket& packet) {
 	struct AVFrameWrapper {
 		AVFrame* m_frame;
 		AVFrameWrapper(): m_frame(avcodec_alloc_frame()) {
@@ -157,62 +143,53 @@ int FFmpeg::decodeVideoFrame(ReadFramePacket& packet) {
 		~AVFrameWrapper() { av_free(m_frame); }
 		operator AVFrame*() { return m_frame; }
 		AVFrame* operator->() { return m_frame; }
-	} videoFrame;
+	};
 
-	int frameFinished = 0;
-	int decodeSize = avcodec_decode_video2(m_codecContext, videoFrame, &frameFinished, &packet);
-	if (decodeSize < 0) throw std::runtime_error("cannot decode video frame");
-	if (frameFinished) {
-		// Convert into RGB and scale the data
-		int w = (m_codecContext->width+15)&~15;
-		int h = m_codecContext->height;
-		std::vector<uint8_t> buffer(w * h * 3);
-		{
-			uint8_t* data = &buffer[0];
-			int linesize = w * 3;
-			sws_scale(m_swsContext, videoFrame->data, videoFrame->linesize, 0, h, &data, &linesize);
+	// Read an AVPacket and decode it into AVFrames
+	ReadFramePacket packet(m_formatContext);
+	int packetSize = packet.size;
+	while (packetSize) {
+		if (packetSize < 0) throw std::logic_error("negative packet size?!");
+		if (m_quit || m_seekTarget == m_seekTarget) return;
+		if (packet.stream_index != m_streamId) return;
+		AVFrameWrapper frame;
+		int frameFinished = 0;
+		int decodeSize = (m_mediaType == AVMEDIA_TYPE_VIDEO ?
+							  avcodec_decode_video2(m_codecContext, frame, &frameFinished, &packet) :
+							  avcodec_decode_audio4(m_codecContext, frame, &frameFinished, &packet));
+		if (decodeSize < 0) throw std::runtime_error("cannot decode avframe");
+		packetSize -= decodeSize; // Move forward within the packet
+		if (!frameFinished) continue;
+		// Update current position if timecode is available
+		if (frame->pkt_pts != uint64_t(AV_NOPTS_VALUE)) {
+			m_position = double(frame->pkt_pts) * av_q2d(m_formatContext->streams[m_streamId]->time_base);
 		}
-		// Timecode calculation
-		m_position = double(videoFrame->pkt_pts) * av_q2d(m_formatContext->streams[m_streamId]->time_base);
-		// Construct a new video frame and push it to output queue
-		VideoFrame* tmp = new VideoFrame(m_position, w, h);
-		tmp->data.swap(buffer);
-		videoQueue.push(tmp); // Takes ownership and may block
+		if (m_mediaType == AVMEDIA_TYPE_VIDEO) processVideo(frame); else processAudio(frame);
 	}
-	return decodeSize;
 }
 
-int FFmpeg::decodeAudioFrame(ReadFramePacket& packet) {
-	class AudioBuffer {
-	  public:
-		AudioBuffer(size_t _size): m_buffer((int16_t*)av_malloc(_size*sizeof(int16_t))) {
-			if (!m_buffer) throw std::runtime_error("Unable to allocate AudioBuffer");
-		}
-		~AudioBuffer() { av_free(m_buffer); }
-		operator  int16_t*() { return m_buffer; }
-		int16_t* operator->() { return m_buffer; }
-	  private:
-		int16_t* m_buffer;
-	} audioFrames(AVCODEC_MAX_AUDIO_FRAME_SIZE);
-	
-	int outsize = AVCODEC_MAX_AUDIO_FRAME_SIZE*sizeof(int16_t);
-	int decodeSize = avcodec_decode_audio3(m_codecContext, audioFrames, &outsize, &packet);
-	if (decodeSize < 0) throw std::runtime_error("cannot decode audio frame");
-	if (outsize > 0) {
-		// Convert outsize from bytes into number of frames (samples)
-		outsize /= sizeof(int16_t) * m_codecContext->channels;
-		std::vector<int16_t> resampled(AVCODEC_MAX_AUDIO_FRAME_SIZE);
-		int frames = audio_resample(m_resampleContext, &resampled[0], audioFrames, outsize);
-		resampled.resize(frames * AUDIO_CHANNELS);
-		// Use timecode from packet if available
-		if (uint64_t(packet.pts) != uint64_t(AV_NOPTS_VALUE)) {
-			m_position = double(packet.pts) * av_q2d(m_formatContext->streams[m_streamId]->time_base);
-		}
-		// Push to output queue (may block)
-		audioQueue.push(resampled, m_position);
-		// Increment current time
-		m_position += double(resampled.size())/double(audioQueue.getSamplesPerSecond());
+void FFmpeg::processVideo(AVFrame* frame) {
+	// Convert into RGB and scale the data
+	int w = (m_codecContext->width+15)&~15;
+	int h = m_codecContext->height;
+	std::vector<uint8_t> buffer(w * h * 3);
+	{
+		uint8_t* data = &buffer[0];
+		int linesize = w * 3;
+		sws_scale(m_swsContext, frame->data, frame->linesize, 0, h, &data, &linesize);
 	}
-	return decodeSize;
+	// Construct a new video frame and push it to output queue
+	VideoFrame* tmp = new VideoFrame(m_position, w, h);
+	tmp->data.swap(buffer);
+	videoQueue.push(tmp);  // Takes ownership and may block
+}
+
+void FFmpeg::processAudio(AVFrame* frame) {
+	// Resample to output sample rate, then push to audio queue and increment timecode
+	std::vector<int16_t> resampled(AVCODEC_MAX_AUDIO_FRAME_SIZE);
+	int frames = audio_resample(m_resampleContext, &resampled[0], (short*)frame->data[0], frame->nb_samples);
+	resampled.resize(frames * AUDIO_CHANNELS);
+	audioQueue.push(resampled, m_position);  // May block
+	m_position += double(frames)/m_formatContext->streams[m_streamId]->codec->sample_rate;
 }
 

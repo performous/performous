@@ -280,7 +280,7 @@ void ScreenSongs::drawCovers() {
 		s.draw();
 		// Draw the reflection
 		Transform transMirror(scale(vec3(1.0f, -1.0f, 1.0f)));
-		ColorTrans c2(Color(1.0f, 1.0f, 1.0f, 0.4f));
+		ColorTrans c2(Color(0.4f, 0.4f, 0.4f, 0.4f));
 		s.draw();
 	}
 }
@@ -336,7 +336,7 @@ void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
 		float a = alpha * (have_vocals ? 1.00 : 0.25);
 		float m = !(typeFilter & 8);
 		glutil::VertexArray va;
-		glmath::vec4 c(m * 1.0f, 1.0f, m * (is_karaoke ? 0.25f : 1.0f), a);
+		glmath::vec4 c(m * a, a, m * (is_karaoke ? 0.25f : 1.0f) * a, a);
 		x = dim.x1()+0.00*(dim.x2()-dim.x1());
 		va.Color(c).TexCoord(getIconTex(1), 0.0f).Vertex(x, dim.y1());
 		va.Color(c).TexCoord(getIconTex(1), 1.0f).Vertex(x, dim.y2());
@@ -352,7 +352,7 @@ void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
 		if (guitarCount == 0) { guitarCount = 1; a *= 0.25f; }
 		for (int i = guitarCount-1; i >= 0; i--) {
 			glutil::VertexArray va;
-			glmath::vec4 c(m * 1.0f, 1.0f, m * 1.0f, a);
+			glmath::vec4 c(m * a, a, m * a, a);
 			x = dim.x1()+(xincr+i*0.04)*(dim.x2()-dim.x1());
 			va.Color(c).TexCoord(getIconTex(2), 0.0f).Vertex(x, dim.y1());
 			va.Color(c).TexCoord(getIconTex(2), 1.0f).Vertex(x, dim.y2());
@@ -367,7 +367,7 @@ void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
 		float a = alpha * (have_bass ? 1.00f : 0.25f);
 		float m = !(typeFilter & 4);
 		glutil::VertexArray va;
-		glmath::vec4 c(m * 1.0f, 1.0f, m * 1.0f, a);
+		glmath::vec4 c(m * a, a, m * a, a);
 		x = dim.x1()+2*xincr*(dim.x2()-dim.x1());
 		va.Color(c).TexCoord(getIconTex(3), 0.0f).Vertex(x, dim.y1());
 		va.Color(c).TexCoord(getIconTex(3), 1.0f).Vertex(x, dim.y2());
@@ -381,7 +381,7 @@ void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
 		float a = alpha * (have_drums ? 1.00f : 0.25f);
 		float m = !(typeFilter & 2);
 		glutil::VertexArray va;
-		glmath::vec4 c(m * 1.0f, 1.0f, m * 1.0f, a);
+		glmath::vec4 c(m * a, a, m * a, a);
 		x = dim.x1()+3*xincr*(dim.x2()-dim.x1());
 		va.Color(c).TexCoord(getIconTex(4), 0.0f).Vertex(x, dim.y1());
 		va.Color(c).TexCoord(getIconTex(4), 1.0f).Vertex(x, dim.y2());
@@ -409,7 +409,7 @@ void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
 		float a = alpha * (have_dance ? 1.00f : 0.25f);
 		float m = !(typeFilter & 1);
 		glutil::VertexArray va;
-		glmath::vec4 c(m * 1.0f, 1.0f, m * 1.0f, a);
+		glmath::vec4 c(m * a, a, m * a, a);
 		x = dim.x1()+4*xincr*(dim.x2()-dim.x1());
 		va.Color(c).TexCoord(getIconTex(6), 0.0f).Vertex(x, dim.y1());
 		va.Color(c).TexCoord(getIconTex(6), 1.0f).Vertex(x, dim.y2());

@@ -1015,9 +1015,7 @@ void GuitarGraph::draw(double time) {
 	if (m_neckglowColor.w > 0.0) {
 		// Neck glow drawing
 		using namespace glmath;
-		double a = m_neckglowColor.w;
-		vec4 color((1.0 / a) *  vec3(m_neckglowColor), a);  // Convert into non-premultiplied
-		ColorTrans c(glmath::mat4::diagonal(color));
+		ColorTrans c(glmath::mat4::diagonal(m_neckglowColor));
 		m_neckglow.dimensions.screenBottom(0.0).middle().fixedWidth(neckWidth());
 		m_neckglow.draw();
 	}
