@@ -155,8 +155,8 @@ void FFmpeg::decodePacket() {
 		AVFrameWrapper frame;
 		int frameFinished = 0;
 		int decodeSize = (m_mediaType == AVMEDIA_TYPE_VIDEO ?
-							  avcodec_decode_video2(m_codecContext, frame, &frameFinished, &packet) :
-							  avcodec_decode_audio4(m_codecContext, frame, &frameFinished, &packet));
+		  avcodec_decode_video2(m_codecContext, frame, &frameFinished, &packet) :
+		  avcodec_decode_audio4(m_codecContext, frame, &frameFinished, &packet));
 		if (decodeSize < 0) throw std::runtime_error("cannot decode avframe");
 		packetSize -= decodeSize; // Move forward within the packet
 		if (!frameFinished) continue;
