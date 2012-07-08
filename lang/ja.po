@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-08-01 22:10+0200\n"
-"PO-Revision-Date: 2011-08-01 22:10+0200\n"
-"Last-Translator: Tapio Vierros <tapiovierros@gmail.com>\n"
+"PO-Revision-Date: 2012-07-08 03:57-0300\n"
+"Last-Translator: Alvaro Fernando García <alvarofernandogarcía@gmail.com>\n"
 "Language-Team: \n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -20,7 +20,7 @@ msgstr ""
 
 #: ../game/song.hh:36
 msgid "Guitar"
-msgstr ""
+msgstr "ギタ−"
 
 #: ../game/song.hh:36
 msgid "Coop guitar"
@@ -28,19 +28,19 @@ msgstr ""
 
 #: ../game/song.hh:36
 msgid "Rhythm guitar"
-msgstr ""
+msgstr "リズムギター"
 
 #: ../game/song.hh:36
 msgid "Bass"
-msgstr ""
+msgstr "ベースギター"
 
 #: ../game/song.hh:36
 msgid "Drums"
-msgstr ""
+msgstr "ドラム"
 
 #: ../game/song.hh:36
 msgid "Vocals"
-msgstr ""
+msgstr "ボーカル"
 
 #: ../game/song.hh:36
 msgid "Harmonic 1"
@@ -76,7 +76,7 @@ msgstr "難しい"
 
 #: ../game/dancegraph.cc:18
 msgid "Challenge"
-msgstr ""
+msgstr "挑戦"
 
 # There's probably a better word
 #: ../game/dancegraph.cc:111
@@ -152,6 +152,8 @@ msgid ""
 "God Mode\n"
 "Activated!"
 msgstr ""
+"神モード\n"
+"活性化！"
 
 #: ../game/guitargraph.cc:500
 msgid "Mistakes ignored!"
@@ -171,7 +173,7 @@ msgstr ""
 
 #: ../game/configuration.cc:116
 msgid "Enabled"
-msgstr ""
+msgstr "使用可能"
 
 #: ../game/configuration.cc:116
 msgid "Disabled"
@@ -216,7 +218,7 @@ msgstr "演奏に再会する"
 
 #: ../game/screen_sing.cc:85
 msgid "Restart"
-msgstr ""
+msgstr "再起動"
 
 #: ../game/screen_sing.cc:85
 msgid ""
