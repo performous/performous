@@ -17,7 +17,7 @@ ScreenSongs::ScreenSongs(std::string const& name, Audio& audio, Songs& songs, Da
   Screen(name), m_audio(audio), m_songs(songs), m_database(database), m_covers(20), m_jukebox(), show_hiscores(), hiscore_start_pos()
 {
 	m_songs.setAnimMargins(5.0, 5.0);
-	m_playTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
+	m_idleTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
 }
 
 void ScreenSongs::enter() {
@@ -53,7 +53,6 @@ void ScreenSongs::exit() {
 	m_songbg_default.reset();
 	m_songbg_ground.reset();
 	m_playing.clear();
-	m_playReq.clear();
 }
 
 /**Add actions here which should effect both the
@@ -77,6 +76,7 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 	input::NavButton nav(input::getNav(event));
 	// Handle basic navigational input that is possible also with instruments
 	if (nav != input::NONE) {
+		m_idleTimer.setValue(0.0);  // Reset idle timer
 		if (m_jukebox) {
 			if (nav == input::CANCEL || m_songs.empty()) m_jukebox = false;
 			else if (nav == input::UP) m_audio.seek(5);
@@ -128,6 +128,47 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 	sm->showLogo(!m_jukebox);
 }
 
+void ScreenSongs::update() {
+	if (m_idleTimer.get() < 0.3) return;  // Only update when the user gives us a break
+	m_songs.update(); // Poll for new songs
+	bool songChange = false;  // Do we need to switch songs?
+	// Automatic song browsing
+	if (!m_audio.isPaused() && m_idleTimer.get() > 1.0) {
+		// If playback has ended or hasn't started
+		if (!m_audio.isPlaying() || m_audio.getPosition() > m_audio.getLength()) {
+			songChange = true;  // Force reload even if the music happens to stay the same
+		}
+		// If the above, or if in regular mode and idle too long, advance to next song
+		if (songChange || (!m_jukebox && m_idleTimer.get() > IDLE_TIMEOUT)) {
+			m_songs.advance(1);
+			m_idleTimer.setValue(0.0);
+		}
+	}
+	// Check out if the music has changed
+	boost::shared_ptr<Song> song = m_songs.currentPtr();
+	Song::Music music;
+	if (song) music = song->music;
+	if (m_playing != music) songChange = true;
+	// Switch songs if needed, only when the user is not browsing for a moment
+	if (!songChange) return;
+	m_playing = music;
+	// Clear the old content and load new content if available
+	m_songbg.reset(); m_video.reset();
+	double pstart = (!m_jukebox && song ? song->preview_start : 0.0);
+	m_audio.playMusic(music, true, 2.0, pstart);
+	if (song) {
+		std::string background = song->background;
+		std::string video = song->video;
+		if (!background.empty()) try { m_songbg.reset(new Surface(song->path + background)); } catch (std::exception const&) {}
+		if (!video.empty() && config["graphic/video"].b()) m_video.reset(new Video(song->path + video, song->videoGap));
+	}
+}
+
+void ScreenSongs::prepare() {
+	double time = m_audio.getPosition();
+	if (m_video) m_video->prepare(time);
+}
+
 void ScreenSongs::drawJukebox() {
 	double pos = m_audio.getPosition();
 	double len = m_audio.getLength();
@@ -166,32 +207,6 @@ void ScreenSongs::drawMultimedia() {
 	}
 }
 
-void ScreenSongs::updateMultimedia(Song& song, ScreenSharedInfo& info) {
-	if (!song.music.empty()) info.music = song.music; // TODO it is always empty?
-	if (!song.background.empty()) info.songbg = song.path + song.background;
-	if (!song.video.empty()) { info.video = song.path + song.video; info.videoGap = song.videoGap; }
-}
-
-void ScreenSongs::stopMultimedia(ScreenSharedInfo& info) {
-	// Schedule playback change if the chosen song has changed
-	if (info.music != m_playReq) { m_playReq = info.music; m_playTimer.setValue(0.0); }
-	// Play/stop preview playback (if it is the time)
-	if (info.music != m_playing && m_playTimer.get() > 0.3) {
-		m_songbg.reset(); m_video.reset();
-		double pstart = 0;
-		if (!m_songs.empty() && !m_jukebox) {
-			pstart = m_songs.current().preview_start;
-			if (pstart != pstart) pstart = 100; // true if NaN, 100 is caught in the next min
-			// 5.0s is for performance (don't make it higher unless you implement better seeking method in songs)
-			pstart = std::min(pstart, (info.music.size() == 1 ? 30.0 : 5.0)); // we can seek further in 1-track songs
-		}
-		if (info.music.empty()) m_audio.fadeout(1.0); else m_audio.playMusic(info.music, true, 2.0, pstart);
-		if (!info.songbg.empty()) try { m_songbg.reset(new Surface(info.songbg)); } catch (std::exception const&) {}
-		if (!info.video.empty() && config["graphic/video"].b()) m_video.reset(new Video(info.video, info.videoGap));
-		m_playing = info.music;
-	}
-}
-
 namespace {
 	float getIconTex(int i) {
 		static int iconcount = 8;
@@ -200,10 +215,7 @@ namespace {
 }
 
 void ScreenSongs::draw() {
-	m_songs.update(); // Poll for new songs
-	ScreenSharedInfo info;
-	info.videoGap = 0.0;
-
+	update();
 	drawMultimedia();
 	std::ostringstream oss_song, oss_order, oss_has_hiscore;
 	// Test if there are no songs
@@ -231,7 +243,6 @@ void ScreenSongs::draw() {
 			// Get hiscores from database
 			m_database.queryPerSongHiscore_HiscoreDisplay(oss_order, m_songs.currentPtr(), hiscore_start_pos, 5);
 		}
-		updateMultimedia(song, info);
 	}
 	if (m_jukebox) drawJukebox();
 	else {
@@ -243,15 +254,6 @@ void ScreenSongs::draw() {
 		} else theme->hiscores.draw(oss_order.str());
 		if (!show_hiscores) drawInstruments(Dimensions(m_instrumentList->ar()).fixedHeight(0.03).center(-0.04));
 	}
-	stopMultimedia(info);
-	if (m_jukebox) {
-		// Switch if at song end
-		if (!m_audio.isPlaying() || m_audio.getPosition() + 1.3 > m_audio.getLength()) {
-			m_songs.advance(1);
-			// Force reload of data
-			m_playing.clear();
-		}
-	} else if (!m_audio.isPaused() && m_playTimer.get() > IDLE_TIMEOUT) m_songs.advance(1);  // Switch if song hasn't changed for IDLE_TIMEOUT seconds
 }
 
 void ScreenSongs::drawCovers() {
@@ -259,7 +261,7 @@ void ScreenSongs::drawCovers() {
 	std::size_t ss = m_songs.size();
 	int baseidx = spos + 1.5; --baseidx; // Round correctly
 	double shift = spos - baseidx;
-	for (int i = -2; i < 5; ++i) {
+	for (int i = -2; i < 6; ++i) {
 		if (baseidx + i < 0 || baseidx + i >= int(ss)) continue;
 		Song& song = m_songs[baseidx + i];
 		Surface& s = getCover(song);
@@ -278,7 +280,7 @@ void ScreenSongs::drawCovers() {
 		s.draw();
 		// Draw the reflection
 		Transform transMirror(scale(vec3(1.0f, -1.0f, 1.0f)));
-		ColorTrans c2(Color(1.0f, 1.0f, 1.0f, 0.4f));
+		ColorTrans c2(Color(0.4f, 0.4f, 0.4f, 0.4f));
 		s.draw();
 	}
 }
@@ -334,7 +336,7 @@ void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
 		float a = alpha * (have_vocals ? 1.00 : 0.25);
 		float m = !(typeFilter & 8);
 		glutil::VertexArray va;
-		glmath::vec4 c(m * 1.0f, 1.0f, m * (is_karaoke ? 0.25f : 1.0f), a);
+		glmath::vec4 c(m * a, a, m * (is_karaoke ? 0.25f : 1.0f) * a, a);
 		x = dim.x1()+0.00*(dim.x2()-dim.x1());
 		va.Color(c).TexCoord(getIconTex(1), 0.0f).Vertex(x, dim.y1());
 		va.Color(c).TexCoord(getIconTex(1), 1.0f).Vertex(x, dim.y2());
@@ -350,7 +352,7 @@ void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
 		if (guitarCount == 0) { guitarCount = 1; a *= 0.25f; }
 		for (int i = guitarCount-1; i >= 0; i--) {
 			glutil::VertexArray va;
-			glmath::vec4 c(m * 1.0f, 1.0f, m * 1.0f, a);
+			glmath::vec4 c(m * a, a, m * a, a);
 			x = dim.x1()+(xincr+i*0.04)*(dim.x2()-dim.x1());
 			va.Color(c).TexCoord(getIconTex(2), 0.0f).Vertex(x, dim.y1());
 			va.Color(c).TexCoord(getIconTex(2), 1.0f).Vertex(x, dim.y2());
@@ -365,7 +367,7 @@ void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
 		float a = alpha * (have_bass ? 1.00f : 0.25f);
 		float m = !(typeFilter & 4);
 		glutil::VertexArray va;
-		glmath::vec4 c(m * 1.0f, 1.0f, m * 1.0f, a);
+		glmath::vec4 c(m * a, a, m * a, a);
 		x = dim.x1()+2*xincr*(dim.x2()-dim.x1());
 		va.Color(c).TexCoord(getIconTex(3), 0.0f).Vertex(x, dim.y1());
 		va.Color(c).TexCoord(getIconTex(3), 1.0f).Vertex(x, dim.y2());
@@ -379,7 +381,7 @@ void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
 		float a = alpha * (have_drums ? 1.00f : 0.25f);
 		float m = !(typeFilter & 2);
 		glutil::VertexArray va;
-		glmath::vec4 c(m * 1.0f, 1.0f, m * 1.0f, a);
+		glmath::vec4 c(m * a, a, m * a, a);
 		x = dim.x1()+3*xincr*(dim.x2()-dim.x1());
 		va.Color(c).TexCoord(getIconTex(4), 0.0f).Vertex(x, dim.y1());
 		va.Color(c).TexCoord(getIconTex(4), 1.0f).Vertex(x, dim.y2());
@@ -388,7 +390,7 @@ void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
 		va.Color(c).TexCoord(getIconTex(5), 1.0f).Vertex(x, dim.y2());
 		va.Draw();
 	}
-	{
+	/*{
 		// keyboard
 		float a = alpha * (have_keyboard ? 1.00f : 0.25f);
 		float m = !(typeFilter & 16);
@@ -401,17 +403,17 @@ void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
 		va.Color(c).TexCoord(getIconTex(6), 0.0f).Vertex(x, dim.y1());
 		va.Color(c).TexCoord(getIconTex(6), 1.0f).Vertex(x, dim.y2());
 		va.Draw();
-	}
+	}*/
 	{
 		// dancing
 		float a = alpha * (have_dance ? 1.00f : 0.25f);
 		float m = !(typeFilter & 1);
 		glutil::VertexArray va;
-		glmath::vec4 c(m * 1.0f, 1.0f, m * 1.0f, a);
-		x = dim.x1()+5*xincr*(dim.x2()-dim.x1());
+		glmath::vec4 c(m * a, a, m * a, a);
+		x = dim.x1()+4*xincr*(dim.x2()-dim.x1());
 		va.Color(c).TexCoord(getIconTex(6), 0.0f).Vertex(x, dim.y1());
 		va.Color(c).TexCoord(getIconTex(6), 1.0f).Vertex(x, dim.y2());
-		x = dim.x1()+6*xincr*(dim.x2()-dim.x1());
+		x = dim.x1()+5*xincr*(dim.x2()-dim.x1());
 		va.Color(c).TexCoord(getIconTex(7), 0.0f).Vertex(x, dim.y1());
 		va.Color(c).TexCoord(getIconTex(7), 1.0f).Vertex(x, dim.y2());
 		va.Draw();

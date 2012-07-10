@@ -55,6 +55,7 @@ class ScreenSing: public Screen {
 	void exit();
 	void reloadGL();
 	void manageEvent(SDL_Event event);
+	void prepare();
 	void draw();
 
 	void setSong (boost::shared_ptr<Song> song_)
@@ -85,7 +86,7 @@ class ScreenSing: public Screen {
 	boost::scoped_ptr<Surface> m_pause_icon;
 	boost::scoped_ptr<Surface> m_help;
 	boost::scoped_ptr<Engine> m_engine;
-	boost::scoped_ptr<LayoutSinger> m_layout_singer;
+	boost::ptr_vector<LayoutSinger> m_layout_singer;
 	boost::scoped_ptr<ThemeInstrumentMenu> m_menuTheme;
 	Menu m_menu;
 	Instruments m_instruments;

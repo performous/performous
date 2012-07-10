@@ -43,6 +43,10 @@ Screen* ScreenManager::getScreen(std::string const& name) {
 	}
 }
 
+void ScreenManager::prepareScreen() {
+	getCurrentScreen()->prepare();
+}
+
 void ScreenManager::drawScreen() {
 	getCurrentScreen()->draw();
 	drawLogo();
@@ -73,13 +77,11 @@ void ScreenManager::drawLoading() {
 }
 
 void ScreenManager::fatalError(std::string const& message) {
-	std::cerr << "FATAL ERROR: " << message << std::endl;
-	dialog(message);
+	dialog("FATAL ERROR\n\n" + message);
 	m_window.blank();
-	drawNotifications();
+	m_window.render(boost::bind(&ScreenManager::drawNotifications, this));
 	m_window.swap();
 	boost::thread::sleep(now() + 4.0);
-	std::exit(EXIT_FAILURE);
 }
 
 void ScreenManager::flashMessage(std::string const& message, float fadeIn, float hold, float fadeOut) {

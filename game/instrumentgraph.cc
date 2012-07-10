@@ -36,10 +36,6 @@ InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevType 
 	m_popupText.reset(new SvgTxtThemeSimple(getThemePath("sing_popup_text.svg"), config["graphic/text_lod"].f()));
 	m_menuTheme.reset(new ThemeInstrumentMenu());
 	for (size_t i = 0; i < max_panels; ++i) m_pressed[i] = false;
-	m_arrow_up.dimensions.stretch(0.05, 0.05);
-	m_arrow_down.dimensions.stretch(0.05, 0.05);
-	m_arrow_left.dimensions.stretch(0.05, 0.05);
-	m_arrow_right.dimensions.stretch(0.05, 0.05);
 }
 
 
@@ -73,8 +69,12 @@ void InstrumentGraph::drawMenu() {
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
 	if (getGraphType() == input::DANCEPAD) dimensions.screenTop().middle().stretch(m_width.get(), 1.0);
 	else dimensions.screenBottom().middle().fixedWidth(std::min(m_width.get(), 0.5));
-	// Some helper vars
 	ThemeInstrumentMenu& th = *m_menuTheme;
+	th.back_h.dimensions.fixedHeight(0.08f);
+	m_arrow_up.dimensions.stretch(0.05, 0.05);
+	m_arrow_down.dimensions.stretch(0.05, 0.05);
+	m_arrow_left.dimensions.stretch(0.05, 0.05);
+	m_arrow_right.dimensions.stretch(0.05, 0.05);
 	MenuOptions::const_iterator cur = static_cast<MenuOptions::const_iterator>(&m_menu.current());
 	double w = m_menu.dimensions.w();
 	const float s = std::min(m_width.get(), 0.5) / w;

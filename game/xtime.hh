@@ -1,5 +1,6 @@
 #pragma once
 
+#include <boost/version.hpp>
 #include <boost/thread/xtime.hpp>
 #include <cmath>
 
@@ -20,7 +21,11 @@ namespace {
 	}
 	boost::xtime now() {
 		boost::xtime time;
+#if (BOOST_VERSION / 100 % 1000 >= 50)
+		boost::xtime_get(&time, boost::TIME_UTC_);
+#else
 		boost::xtime_get(&time, boost::TIME_UTC);
+#endif
 		return time;
 	}
 	double seconds(boost::xtime const& time) {

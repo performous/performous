@@ -15,14 +15,6 @@ class Song;
 class Audio;
 class Songs;
 
-struct ScreenSharedInfo
-{
-	std::map<std::string,std::string> music;
-	std::string songbg;
-	std::string video;
-	double videoGap;
-};
-
 /// song chooser screen
 class ScreenSongs : public Screen {
 public:
@@ -33,6 +25,7 @@ public:
 	void reloadGL();
 	void manageSharedKey(input::NavButton nav); ///< same behaviour for jukebox and normal mode
 	void manageEvent(SDL_Event event);
+	void prepare();
 	void draw();
 	void drawCovers(); ///< draw the cover browser
 	Surface& getCover(Song const& song); ///< get appropriate cover image for the song (incl. no cover)
@@ -41,8 +34,7 @@ public:
 protected:
 	void drawInstruments(Dimensions const& dim, float alpha = 1.0f) const;
 	void drawMultimedia();
-	void updateMultimedia(Song& song, ScreenSharedInfo& info);
-	void stopMultimedia(ScreenSharedInfo& info);
+	void update();
 
 	Audio& m_audio;
 	Songs& m_songs;
@@ -50,9 +42,8 @@ protected:
 	boost::scoped_ptr<Surface> m_songbg, m_songbg_ground, m_songbg_default;
 	boost::scoped_ptr<Video> m_video;
 	boost::scoped_ptr<ThemeSongs> theme;
-	std::map<std::string,std::string> m_playing;
-	std::map<std::string,std::string> m_playReq;
-	AnimValue m_playTimer;
+	Song::Music m_playing;
+	AnimValue m_idleTimer;
 	TextInput m_search;
 	boost::scoped_ptr<Surface> m_singCover;
 	boost::scoped_ptr<Surface> m_instrumentCover;

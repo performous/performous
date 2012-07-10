@@ -36,18 +36,26 @@ class SongParser {
 	void txtParseHeader();
 	void txtParse();
 	bool txtParseField(std::string const& line);
-	bool txtParseNote(std::string line, VocalTrack &vocal);
+	bool txtParseNote(std::string line);
 	bool iniCheck(std::vector<char> const& data) const;
 	void iniParseHeader();
 	void iniParse();
+	bool midCheck(std::vector<char> const& data) const;
+	void midParseHeader();
+	void midParse();
+	bool xmlCheck(std::vector<char> const& data) const;
+	void xmlParseHeader();
+	void xmlParse();
 	bool smCheck(std::vector<char> const& data) const;
 	void smParseHeader();
 	void smParse();
 	bool smParseField(std::string line);
 	Notes smParseNotes(std::string line);
+	void resetNoteParsingState();
 	double m_prevtime;
 	unsigned int m_prevts;
 	unsigned int m_relativeShift;
+	enum CurrentSinger { P1 = 1, P2 = 2, BOTH = P1 | P2 } m_curSinger;
 	struct BPM {
 		BPM(double _begin, double _ts, double bpm): begin(_begin), step(0.25 * 60.0 / bpm), ts(_ts) {}
 		double begin; // Time in seconds

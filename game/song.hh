@@ -29,9 +29,6 @@ namespace TrackName {
 	const std::string KEYBOARD = "Keyboard";
 	const std::string DRUMS = "Drums";
 	const std::string LEAD_VOCAL = "Vocals";
-	const std::string HARMONIC_1 = "Harmonic 1";
-	const std::string HARMONIC_2 = "Harmonic 2";
-	const std::string HARMONIC_3 = "Harmonic 3";
 	#if 0 // Here is some dummy gettext calls to populate the dictionary
 	_("Guitar") _("Coop guitar") _("Rhythm guitar") _("Bass") _("Drums") _("Vocals")  _("Harmonic 1") _("Harmonic 2") _("Harmonic 3")
 	#endif
@@ -63,25 +60,24 @@ class Song: boost::noncopyable {
 	Status status(double time);
 	int randomIdx; ///< sorting index used for random order
 	void insertVocalTrack(std::string vocalTrack, VocalTrack track) {
-		vocalTracks.erase(vocalTrack);
+		eraseVocalTrack(vocalTrack);
 		vocalTracks.insert(std::make_pair<std::string, VocalTrack>(vocalTrack, track));
-	};
+	}
+	void eraseVocalTrack(std::string vocalTrack = TrackName::LEAD_VOCAL) {
+		vocalTracks.erase(vocalTrack);
+	}
 	// Get a selected track, or LEAD_VOCAL if not found or the first one if not found
 	VocalTrack& getVocalTrack(std::string vocalTrack = TrackName::LEAD_VOCAL) {
-		if(vocalTracks.find(vocalTrack) != vocalTracks.end()) {
-			return vocalTracks.find(vocalTrack)->second;
+		VocalTracks::iterator it = vocalTracks.find(vocalTrack);
+		if (it != vocalTracks.end()) {
+			return it->second;
 		} else {
-			if(vocalTracks.find(TrackName::LEAD_VOCAL) != vocalTracks.end()) {
-				return vocalTracks.find(TrackName::LEAD_VOCAL)->second;
-			} else {
-				if(!vocalTracks.empty()) {
-					return vocalTracks.begin()->second;
-				} else {
-					return dummyVocal;
-				}
-			}
+			it = vocalTracks.find(TrackName::LEAD_VOCAL);
+			if (it != vocalTracks.end()) return it->second;
+			else if (!vocalTracks.empty()) return vocalTracks.begin()->second;
+			else return dummyVocal;
 		}
-	};
+	}
 	std::vector<std::string> getVocalTrackNames() {
 		std::vector<std::string> result;
 		BOOST_FOREACH(VocalTracks::value_type &it, vocalTracks) {
@@ -89,6 +85,7 @@ class Song: boost::noncopyable {
 		}
 		return result;
 	}
+
 	InstrumentTracks instrumentTracks; ///< guitar etc. notes for this song
 	DanceTracks danceTracks; ///< dance tracks
 	bool hasDance() const { return !danceTracks.empty(); }
@@ -107,7 +104,8 @@ class Song: boost::noncopyable {
 	std::string text; ///< songtext
 	std::string creator; ///< creator
 	std::string language; ///< language
-	std::map<std::string,std::string> music; ///< music files (background, guitar, rhythm/bass, drums, vocals)
+	typedef std::map<std::string,std::string> Music;
+	Music music; ///< music files (background, guitar, rhythm/bass, drums, vocals)
 	std::string cover; ///< cd cover
 	std::string background; ///< background image
 	std::string video; ///< video

@@ -144,6 +144,20 @@ namespace {
 	}
 }
 
+void ConfigItem::addEnum(std::string name) {
+	verifyType("int");
+	m_enums.push_back(name);
+	m_min = 0;
+	m_max = int(m_enums.size() - 1);
+	m_step = 1;
+}
+
+std::string ConfigItem::getEnumName() {
+	int val = i();
+	if (val >= 0 && val < m_enums.size()) return m_enums[val];
+	return "";
+}
+
 template <typename T> void ConfigItem::updateNumeric(xmlpp::Element& elem, int mode) {
 	xmlpp::NodeSet ns = elem.find("limits");
 	if (!ns.empty()) setLimits<T>(dynamic_cast<xmlpp::Element&>(*ns[0]), m_min, m_max, m_step);
@@ -269,7 +283,7 @@ void writeConfig(bool system) {
 		if (exists(conf)) remove(conf);
 		if (dirty) {
 			rename(tmp, conf);
-			std::cerr << "Saved configuration to \"" << conf << "\"" << std::endl;
+			std::cerr << "Saved configuration to " << conf << std::endl;
 		} else {
 			std::cerr << "Using default settings, no configuration file needed." << std::endl;
 		}
@@ -359,4 +373,15 @@ void readConfig() {
 	readConfigXML(schemafile, 0);  // Read schema and defaults
 	readConfigXML(systemConfFile, 1);  // Update defaults with system config
 	readConfigXML(userConfFile, 2);  // Read user settings
+	{ // Populate themes
+		ConfigItem& ci = config["game/theme"];
+		std::vector<std::string> themes = getThemes();
+		bool useDefaultTheme = (ci.i() == -1);
+		for (int i = 0; i < themes.size(); ++i) {
+			ci.addEnum(themes[i]);
+			// Select the default theme is no other is selected
+			if (useDefaultTheme && themes[i] == "default")
+				ci.i() = i;
+		}
+	}
 }

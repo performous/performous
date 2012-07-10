@@ -42,10 +42,11 @@ to save the current settings to XML.
 		<short>Pitch waves</short>
 		<long>Enable singing pitch display (when not in karaoke mode).</long>
 	</entry>
-	<entry name="game/theme" type="string">
-		<stringvalue>default</stringvalue>
+	<entry name="game/theme" type="int" value="-1">
+		<limits min="-1" max="-1" step="0" />
+		<!-- Enum options added dynamically by scanning theme folders -->
 		<short>Theme</short>
-		<long>Name of the theme to use or absolute path to theme folder.</long>
+		<long>Name of the theme to use.</long>
 	</entry>
 	<entry name="game/keyboard_guitar" type="bool" value="true">
 		<short>Keyboard as guitar</short>
@@ -63,6 +64,38 @@ to save the current settings to XML.
 		<short>Keyboard as keyboard</short>
 		<long>Enable keyboard as keyboard.</long>
 	</entry>
+	<entry name="game/instrument0" type="int" value="0">
+		<limits>
+			<enum>Auto</enum>
+			<!-- Options added dynamically from controllers.xml -->
+		</limits>
+		<short>Force controller A's type</short>
+		<long>Override autodetection and force the first controller to the given type.</long>
+	</entry>
+	<entry name="game/instrument1" type="int" value="0">
+		<limits>
+			<enum>Auto</enum>
+			<!-- Options added dynamically from controllers.xml -->
+		</limits>
+		<short>Force controller B's type</short>
+		<long>Override autodetection and force the second controller to the given type.</long>
+	</entry>
+	<entry name="game/instrument2" type="int" value="0">
+		<limits>
+			<enum>Auto</enum>
+			<!-- Options added dynamically from controllers.xml -->
+		</limits>
+		<short>Force controller C's type</short>
+		<long>Override autodetection and force the third controller to the given type.</long>
+	</entry>
+	<entry name="game/instrument3" type="int" value="0">
+		<limits>
+			<enum>Auto</enum>
+			<!-- Options added dynamically from controllers.xml -->
+		</limits>
+		<short>Force controller D's type</short>
+		<long>Override autodetection and force the fourth controller to the given type.</long>
+	</entry>
 	<entry name="game/instruments" type="string_list">
 		<!-- Should be SDL_ID:{GUITAR_GUITARHERO|GUITAR_GUITARHERO_XPLORER|GUITAR_ROCKBAND_PS3|GUITAR_ROCKBAND_XB360|DRUMS_GUITARHERO|DRUMS_ROCKBAND_PS3|DRUMS_ROCKBAND_XB360|DRUMS_MIDI|DANCEPAD_GENERIC|DANCEPAD_TIGERGAME|DANCEPAD_2TECH}
 		     example:
@@ -74,6 +107,21 @@ to save the current settings to XML.
 	<entry name="game/midi_input" type="string" value="">
 		<short>Hardware MIDI input device</short>
 		<long>Part of sound card name or its number or empty to use the first available device. Used currently for MIDI drum controllers.</long>
+	</entry>
+	<entry name="game/fallback_encoding" type="int" value="2">
+		<limits>
+			<enum>CP1250</enum>
+			<enum>CP1251</enum>
+			<enum>CP1252</enum>
+			<enum>CP1253</enum>
+			<enum>CP1254</enum>
+			<enum>CP1255</enum>
+			<enum>CP1256</enum>
+			<enum>CP1257</enum>
+			<enum>CP1258</enum>
+		</limits>
+		<short>Fallback song encoding</short>
+		<long>Pick the text codec used for song files that are not UTF-8.</long>
 	</entry>
 
 	<!-- Graphic preferences -->
@@ -103,8 +151,8 @@ to save the current settings to XML.
 			<enum>Green/Magenta</enum>
 			<enum>Over/Under</enum>
 		</limits>
-	<short>Stereo3D type</short>
-	<long>Some modes may only get activated in fullscreen mode.</long>
+		<short>Stereo3D type</short>
+		<long>Some modes may only get activated in fullscreen mode.</long>
 	</entry>
 	<entry name="graphic/stereo3dseparation" type="float" value="50">
 		<ui unit=" %" />
@@ -124,10 +172,6 @@ to save the current settings to XML.
 		<limits min="-1" max="9" step="1" />
 		<short>Webcam id</short>
 		<long>Use -1 to autodetect or a number starting from 0 to choose specific device.</long>
-	</entry>
-	<entry name="graphic/3d_notes" type="bool" value="true">
-		<short>3D notes</short>
-		<long>Draw instrument notes as 3-dimensional objects. May hurt performance on older hardware.</long>
 	</entry>
 	<entry name="graphic/svg_lod" type="float" value="1.0">
 		<ui unit="x" />

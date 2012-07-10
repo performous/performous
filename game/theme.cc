@@ -21,10 +21,7 @@ ThemePractice::ThemePractice():
 	note(getThemePath("practice_note.svg")),
 	sharp(getThemePath("practice_sharp.svg")),
 	note_txt(getThemePath("practice_txt.svg"), config["graphic/text_lod"].f())
-{
-	note.dimensions.fixedHeight(0.03f);
-	sharp.dimensions.fixedHeight(0.09f);
-}
+{}
 
 ThemeSing::ThemeSing():
 	bg_top(getThemePath("sing_bg_top.svg")),
@@ -53,9 +50,7 @@ ThemeIntro::ThemeIntro():
 	short_comment(getThemePath("mainmenu_short_comment.svg"), config["graphic/text_lod"].f()),
 	comment_bg(getThemePath("mainmenu_comment_bg.svg")),
 	short_comment_bg(getThemePath("mainmenu_scomment_bg.svg"))
-{
-	back_h.dimensions.fixedHeight(0.08f);
-}
+{}
 
 ThemeInstrumentMenu::ThemeInstrumentMenu():
 	Theme(getThemePath("instrumentmenu_bg.svg")),
@@ -65,7 +60,6 @@ ThemeInstrumentMenu::ThemeInstrumentMenu():
 	comment(getThemePath("instrumentmenu_comment.svg"), config["graphic/text_lod"].f())
 	//comment_bg(getThemePath("menu_comment_bg.svg"))
 {
-	back_h.dimensions.fixedHeight(0.08f);
 	comment.setAlign(SvgTxtTheme::CENTER);
 }
 

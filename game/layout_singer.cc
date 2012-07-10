@@ -21,16 +21,17 @@ LayoutSinger::LayoutSinger(VocalTrack& vocal, Database& database, boost::shared_
 	m_player_icon.reset(new Surface(getThemePath("sing_pbox.svg")));
 }
 
-LayoutSinger::~LayoutSinger() {};
+LayoutSinger::~LayoutSinger() {}
 
 void LayoutSinger::reset() {
 	m_lyricit = m_vocal.notes.begin();
 	m_lyrics.clear();
 }
 
-void LayoutSinger::drawScore(Position position) {
-	unsigned int i = 0;
+void LayoutSinger::drawScore(PositionMode position) {
+	unsigned int i = 0, j = 0;
 	for (std::list<Player>::const_iterator p = m_database.cur.begin(); p != m_database.cur.end(); ++p, ++i) {
+		if (p->m_vocal.name != m_vocal.name) continue;
 		float act = p->activity();
 		if (act == 0.0f) continue;
 		float r = p->m_color.r;
@@ -38,18 +39,22 @@ void LayoutSinger::drawScore(Position position) {
 		float b = p->m_color.b;
 		m_score_text[i%4]->render((boost::format("%04d") % p->getScore()).str());
 		switch(position) {
-			case LayoutSinger::BOTTOM: // Fullscreen
-				m_player_icon->dimensions.left(-0.5 + 0.01 + 0.25 * i).fixedWidth(0.075).screenTop(0.055);
-				m_score_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.075).screenTop(0.055);
+			case LayoutSinger::FULL:
+				m_player_icon->dimensions.left(-0.5 + 0.01 + 0.25 * j).fixedWidth(0.075).screenTop(0.055);
+				m_score_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * j).fixedHeight(0.075).screenTop(0.055);
 				break;
-			case LayoutSinger::MIDDLE: // Band mode
-				m_player_icon->dimensions.right(0.35).fixedHeight(0.050).screenTop(0.025 + 0.050 * i);
-				m_score_text[i%4]->dimensions().right(0.45).fixedHeight(0.050).screenTop(0.025 + 0.050 * i);
+			case LayoutSinger::TOP:
+				m_player_icon->dimensions.right(0.35).fixedHeight(0.050).screenTop(0.025 + 0.050 * j);
+				m_score_text[i%4]->dimensions().right(0.45).fixedHeight(0.050).screenTop(0.025 + 0.050 * j);
+				break;
+			case LayoutSinger::BOTTOM:
+				m_player_icon->dimensions.right(0.35).fixedHeight(0.050).center(0.025 + 0.050 * j);
+				m_score_text[i%4]->dimensions().right(0.45).fixedHeight(0.050).center(0.025 + 0.050 * j);
 				break;
 			case LayoutSinger::LEFT:
 			case LayoutSinger::RIGHT:
-				m_player_icon->dimensions.left(-0.5 + 0.01 + 0.25 * i).fixedWidth(0.075).screenTop(0.055);
-				m_score_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.075).screenTop(0.055);
+				m_player_icon->dimensions.left(-0.5 + 0.01 + 0.25 * j).fixedWidth(0.075).screenTop(0.055);
+				m_score_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * j).fixedHeight(0.075).screenTop(0.055);
 				break;
 		}
 		{
@@ -69,15 +74,18 @@ void LayoutSinger::drawScore(Position position) {
 			else if (p->m_prevLineScore > 0.4) prevLineRank = "OK";
 			m_line_rank_text[i%4]->render(prevLineRank);
 			switch(position) {
-				case LayoutSinger::BOTTOM: // Fullscreen
-					m_line_rank_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.055*fzoom).screenTop(0.11);
+				case LayoutSinger::FULL:
+					m_line_rank_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * j).fixedHeight(0.055*fzoom).screenTop(0.11);
 					break;
-				case LayoutSinger::MIDDLE: // Band mode
-					m_line_rank_text[i%4]->dimensions().right(0.30).fixedHeight(0.05*fzoom).screenTop(0.025 + 0.050 * i);
+				case LayoutSinger::TOP:
+					m_line_rank_text[i%4]->dimensions().right(0.30).fixedHeight(0.05*fzoom).screenTop(0.025 + 0.050 * j);
+					break;
+				case LayoutSinger::BOTTOM:
+					m_line_rank_text[i%4]->dimensions().right(0.30).fixedHeight(0.05*fzoom).center(0.025 + 0.050 * j);
 					break;
 				case LayoutSinger::LEFT:
 				case LayoutSinger::RIGHT:
-					m_line_rank_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * i).fixedHeight(0.055*fzoom).screenTop(0.11);
+					m_line_rank_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * j).fixedHeight(0.055*fzoom).screenTop(0.11);
 					break;
 			}
 			{
@@ -85,18 +93,22 @@ void LayoutSinger::drawScore(Position position) {
 				m_line_rank_text[i%4]->draw();
 			}
 		}
+		++j;
 	}
 }
 
-void LayoutSinger::draw(double time, Position position) {
+void LayoutSinger::draw(double time, PositionMode position) {
 	// Draw notes and pitch waves (only when not in karaoke mode)
 	if (!config["game/karaoke_mode"].b()) {
 		switch(position) {
-			case LayoutSinger::BOTTOM: // Fullscreen
+			case LayoutSinger::FULL:
 				m_noteGraph.draw(time, m_database, NoteGraph::FULLSCREEN);
 				break;
-			case LayoutSinger::MIDDLE: // Band mode
+			case LayoutSinger::TOP:
 				m_noteGraph.draw(time, m_database, NoteGraph::TOP);
+				break;
+			case LayoutSinger::BOTTOM:
+				m_noteGraph.draw(time, m_database, NoteGraph::BOTTOM);
 				break;
 			case LayoutSinger::LEFT:
 			case LayoutSinger::RIGHT:
@@ -110,12 +122,16 @@ void LayoutSinger::draw(double time, Position position) {
 		double linespacing = 0.0;
 		Dimensions pos;
 		switch(position) {
-			case LayoutSinger::BOTTOM: // Fullscreen
+			case LayoutSinger::FULL:
 				pos.screenBottom(-0.1);
 				linespacing = 0.06;
 				break;
-			case LayoutSinger::MIDDLE: // Band mode
+			case LayoutSinger::TOP:
 				pos.center(-0.05);
+				linespacing = 0.04;
+				break;
+			case LayoutSinger::BOTTOM:
+				pos.screenBottom(-0.05);
 				linespacing = 0.04;
 				break;
 			case LayoutSinger::LEFT:
@@ -143,7 +159,7 @@ void LayoutSinger::draw(double time, Position position) {
 			for (size_t i = 0; i < m_lyrics.size(); ++i, pos.move(0.0, linespacing)) {
 				pos.move(0.0, m_lyrics[i].extraspacing.get() * linespacing);
 				if (i == 0) m_lyrics[0].draw(m_theme->lyrics_now, time, pos);
-				else if (i == 1 && position == LayoutSinger::BOTTOM) m_lyrics[1].draw(m_theme->lyrics_next, time, pos);
+				else if (i == 1 && position == LayoutSinger::FULL) m_lyrics[1].draw(m_theme->lyrics_next, time, pos);
 			}
 		}
 	}

@@ -37,6 +37,8 @@ class ConfigItem {
 	std::string getValue() const; ///< Get a human-readable representation of the current value
 	std::string const& getShortDesc() const { return m_shortDesc; } ///< get the short description for this ConfigItem
 	std::string const& getLongDesc() const { return m_longDesc; } ///< get the long description for this ConfigItem
+	void addEnum(std::string name); ///< Dynamically adds an enum to all values
+	std::string getEnumName(); ///< Returns the selected enum option's text
 
   private:
 	template <typename T> void updateNumeric(xmlpp::Element& elem, int mode); ///< Used internally for loading XML

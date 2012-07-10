@@ -37,7 +37,7 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL& _text, double m) {
 
 	// compute text extents
 	{
-		PangoContext* ctx = pango_cairo_font_map_create_context ((PangoCairoFontMap*)pango_cairo_font_map_get_default());
+		PangoContext* ctx = pango_font_map_create_context(pango_cairo_font_map_get_default());
 		PangoLayout* layout = pango_layout_new(ctx);
 		pango_layout_set_alignment(layout, alignment);
 		pango_layout_set_font_description (layout, desc);
@@ -78,7 +78,12 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL& _text, double m) {
 	cairo_restore(dc);
 	g_object_unref(layout);
 
-	m_surface.load(cairo_image_surface_get_width(surface), cairo_image_surface_get_height(surface), pix::INT_ARGB, cairo_image_surface_get_data(surface));
+	// TODO: Avoid copying of bitmap data?
+	Bitmap bitmap;
+	bitmap.fmt = pix::INT_ARGB;
+	bitmap.resize(cairo_image_surface_get_width(surface), cairo_image_surface_get_height(surface));
+	std::memcpy(&bitmap.buf[0], cairo_image_surface_get_data(surface), bitmap.buf.size());
+	m_surface.load(bitmap);
 
 	// delete surface
 	cairo_destroy(dc);

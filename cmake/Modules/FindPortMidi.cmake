@@ -24,4 +24,5 @@ if (${PortTime_LIBRARY})
 endif (${PortTime_LIBRARY})
 
 libfind_process(PortMidi)
+mark_as_advanced(PortTime_LIBRARY)
 

@@ -7,6 +7,9 @@
 #include "image.hh"
 #include "screen.hh"
 
+#include <boost/thread/condition.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/thread.hpp>
 #include <fstream>
 #include <stdexcept>
 #include <sstream>
@@ -31,28 +34,100 @@ float Dimensions::screenY() const {
 	throw std::logic_error("Dimensions::screenY(): unknown m_screenAnchor value");
 }
 
+struct Job {
+	fs::path name;
+	typedef boost::function<void (Bitmap& bitmap)> ApplyFunc;
+	ApplyFunc apply;
+	Bitmap bitmap;
+	Job() {}
+	Job(fs::path const& n, ApplyFunc const& a): name(n), apply(a) {}
+};
 
-template <typename T> void loader(T& target, fs::path const& name) {
-	std::string const filename = name.string();
-	if (!fs::exists(name)) throw std::runtime_error("File not found: " + filename);
+struct Loader {
+	volatile bool m_quit;
+	boost::thread m_thread;
+	boost::mutex m_mutex;
+	boost::condition m_condition;
+	typedef std::map<void const*, Job> Jobs;
+	Jobs m_jobs;
+	Loader(): m_quit(), m_thread(&Loader::run, this) {}
+	~Loader() { m_quit = true; m_condition.notify_one(); m_thread.join(); }
+	void run() {
+		while (!m_quit) {
+			void const* target = NULL;
+			fs::path name;
+			{
+				// Poll for jobs to be done
+				boost::mutex::scoped_lock l(m_mutex);
+				for (Jobs::iterator it = m_jobs.begin(); it != m_jobs.end(); ++it) {
+					if (it->second.name.empty()) continue;  // Job already done
+					name = it->second.name;
+					target = it->first;
+				}
+				// If not found, wait for one
+				if (!target) {
+					m_condition.wait(l);
+					continue;
+				}
+			}
+			Bitmap bitmap;
+			try {
+				// Load bitmap from disk
+				std::string const filename = name.string();
+				if (!fs::exists(name) || fs::is_directory(name)) throw std::runtime_error("File not found: " + filename);
+				else if (filemagic::SVG(name)) loadSVG(bitmap, filename);
+				else if (filemagic::JPEG(name)) loadJPEG(bitmap, filename);
+				else if (filemagic::PNG(name)) loadPNG(bitmap, filename);
+				else throw std::runtime_error("Unable to load the image: " + filename);
+			} catch (std::exception& e) {
+				std::clog << "image/error: " << e.what() << std::endl;
+			}
+			// Store the result
+			boost::mutex::scoped_lock l(m_mutex);
+			Jobs::iterator it = m_jobs.find(target);
+			if (it == m_jobs.end()) continue;  // The job has been removed already
+			it->second.name.clear();  // Mark the job completed
+			it->second.bitmap.swap(bitmap);  // Store the bitmap (if we got any)
+		}
+	}
+	void push(void const* t, Job const& job) {
+		boost::mutex::scoped_lock l(m_mutex);
+		m_jobs[t] = job;
+		m_condition.notify_one();
+	}
+	void remove(void const* t) {
+		boost::mutex::scoped_lock l(m_mutex);
+		m_jobs.erase(t);
+	}
+	void apply() {
+		boost::mutex::scoped_lock l(m_mutex);
+		for (Jobs::iterator it = m_jobs.begin(); it != m_jobs.end();) {
+			{
+				Job& j = it->second;
+				if (!j.name.empty()) { ++it; continue; }  // Job incomplete, skip it
+				j.apply(j.bitmap);  // Load to OpenGL
+			}
+			m_jobs.erase(it++);
+		}
+	}
+} ldr;
 
-	if ( filemagic::SVG(name) ) {
-		// caching is now handled by loadSVG itself.
-		loadSVG(target, filename);
+void updateSurfaces() { ldr.apply(); }
 
-	} else if ( filemagic::JPEG(name) ) {
-		// this should catch the case where album art lies about being a PNG but really
-		// is JPEG with a PNG extension. (caught by the file magic being JPEG)
-		loadJPEG(target, filename);
-
-	} else if ( filemagic::PNG(name) ) {
-		loadPNG(target, filename);
-
-	} else throw std::runtime_error("Unable to load the image: " + filename);
+template <typename T> void loader(T* target, fs::path const& name) {
+	// Temporarily add 1x1 pixel black texture
+	Bitmap bitmap;
+	bitmap.fmt = pix::RGB;
+	bitmap.resize(1, 1);
+	target->load(bitmap);
+	// Ask the loader to retrieve the image
+	ldr.push(target, Job(name, boost::bind(&T::load, target, _1)));
 }
 
-Texture::Texture(std::string const& filename) { loader(*this, filename); }
-Surface::Surface(std::string const& filename) { loader(*this, filename); }
+Texture::Texture(std::string const& filename) { loader(this, filename); }
+Surface::Surface(std::string const& filename) { loader(this, filename); }
+Texture::~Texture() { ldr.remove(this); }
+Surface::~Surface() { ldr.remove(this); }
 
 // Stuff for converting pix::Format into OpenGL enum values
 namespace {
@@ -82,9 +157,9 @@ namespace {
 	GLint internalFormat() { return GL_EXT_framebuffer_sRGB ? GL_SRGB_ALPHA : GL_RGBA; }
 }
 
-void Texture::load(unsigned int width, unsigned int height, pix::Format format, unsigned char const* buffer, float ar) {
+void Texture::load(Bitmap const& bitmap) {
 	glutil::GLErrorChecker glerror("Texture::load");
-	m_ar = ar ? ar : double(width) / height;
+	m_ar = bitmap.ar;
 	UseTexture texture(*this);
 	// When texture area is small, bilinear filter the closest mipmap
 	glTexParameterf(type(), GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
@@ -100,46 +175,26 @@ void Texture::load(unsigned int width, unsigned int height, pix::Format format, 
 	if (GLEW_EXT_texture_filter_anisotropic) glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16.0f);
 	glerror.check("MAX_ANISOTROPY_EXT");
 
-	PixFmt const& f = getPixFmt(format);
+	PixFmt const& f = getPixFmt(bitmap.fmt);
 	glPixelStorei(GL_UNPACK_SWAP_BYTES, f.swap);
 	// Load the data into texture
-	if ((isPow2(width) && isPow2(height)) || GLEW_ARB_texture_non_power_of_two) { // Can directly load the texture
-		glTexImage2D(type(), 0, internalFormat(), width, height, 0, f.format, f.type, buffer);
-	} else {
-		int newWidth = prevPow2(width);
-		int newHeight = prevPow2(height);
-		std::vector<uint32_t> outBuf(newWidth * newHeight);
-		gluScaleImage(f.format, width, height, f.type, buffer, newWidth, newHeight, f.type, &outBuf[0]);
-		// BIG FAT WARNING: Do not even think of using ARB_texture_rectangle here!
-		// Every developer of the game so far has tried doing so, but it just cannot work.
-		// (1) no repeat => cannot texture
-		// (2) coordinates not normalized => would require special hackery elsewhere
-		// Just don't do it in Surface class, thanks. -Tronic
-		glTexImage2D(type(), 0, internalFormat(), newWidth, newHeight, 0, f.format, f.type, &outBuf[0]);
-	}
+	glTexImage2D(type(), 0, internalFormat(), bitmap.width, bitmap.height, 0, f.format, f.type, &bitmap.buf[0]);
 	glGenerateMipmap(type());
 }
 
-void Surface::load(unsigned int width, unsigned int height, pix::Format format, unsigned char const* buffer, float ar) {
+void Surface::load(Bitmap const& bitmap) {
 	glutil::GLErrorChecker glerror("Surface::load");
-	using namespace pix;
 	// Initialize dimensions
-	m_width = width; m_height = height;
-	if (dimensions.ar() == 0.0) dimensions = Dimensions(ar != 0.0f ? ar : float(width) / height).fixedWidth(1.0f);
+	m_width = bitmap.width; m_height = bitmap.height;
+	dimensions = Dimensions(bitmap.ar).fixedWidth(1.0f);
 	// Load the data into texture
 	UseTexture texture(m_texture);
-	PixFmt const& f = getPixFmt(format);
+	PixFmt const& f = getPixFmt(bitmap.fmt);
 	glPixelStorei(GL_UNPACK_SWAP_BYTES, f.swap);
-	glTexImage2D(m_texture.type(), 0, internalFormat(), width, height, 0, f.format, f.type, buffer);
+	glTexImage2D(m_texture.type(), 0, internalFormat(), bitmap.width, bitmap.height, 0, f.format, f.type, &bitmap.buf[0]);
 }
 
 void Surface::draw() const {
-	if (m_width * m_height > 0.0) m_texture.draw(dimensions, TexCoords(tex.x1 * m_width, tex.y1 * m_height, tex.x2 * m_width, tex.y2 * m_height));
-}
-
-Surface::Surface(cairo_surface_t* _surf) {
-	unsigned int w = cairo_image_surface_get_width(_surf);
-	unsigned int h = cairo_image_surface_get_height(_surf);
-	load(w, h, pix::INT_ARGB, cairo_image_surface_get_data(_surf));
+	if (!empty()) m_texture.draw(dimensions, TexCoords(tex.x1 * m_width, tex.y1 * m_height, tex.x2 * m_width, tex.y2 * m_height));
 }
 

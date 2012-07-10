@@ -1,12 +1,16 @@
 #include "unicode.hh"
+#include "configuration.hh"
 
 #include <boost/scoped_ptr.hpp>
 #include <glibmm/ustring.h>
-#include <glib/gconvert.h>
+#include <glib.h>
 #include <sstream>
 #include <stdexcept>
 
 namespace {
+	// Codepage choices from config
+	static const char* codesets[] = { "CP1250", "CP1251", "CP1252", "CP1253", "CP1254", "CP1255", "CP1256", "CP1257", "CP1258" };
+
 	// Convert a string using Glib, throw exception on error.
 	// This is in fact (slightly modified) Glib::convert from glibmm.
 	std::string convert(const std::string& str, const std::string& to_codeset, const std::string& from_codeset) {
@@ -33,9 +37,12 @@ void convertToUTF8(std::stringstream &_stream, std::string _filename) {
 			_stream.str(data.substr(3)); // Remove BOM if there is one
 		}
 	} catch(...) {
-		if (!_filename.empty()) std::clog << "unicode/warning: " << _filename << " is not UTF-8.\n  Assuming CP1252 for now. Use recode CP1252..UTF-8 */*.txt to convert your files." << std::endl;
+		const char* codeset = codesets[config["game/fallback_encoding"].i()];
+		if (!_filename.empty())
+			std::clog << "unicode/warning: " << _filename << " is not UTF-8.\n  Assuming " << codeset
+				<< ". Use recode " << codeset << "..UTF-8 */*.txt to convert your files." << std::endl;
 		try {
-			_stream.str(convert(_stream.str(), "UTF-8", "CP1252")); // Convert from Microsoft CP1252
+			_stream.str(convert(_stream.str(), "UTF-8", codeset)); // Convert from fallback encoding
 		} catch (...) {
 			// Filter out anything but ASCII
 			std::string tmp;

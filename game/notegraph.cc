@@ -29,30 +29,31 @@ void NoteGraph::reset() {
 namespace {
 	void drawNotebar(Texture const& texture, double x, double ybeg, double yend, double w, double h) {
 		glutil::VertexArray va;
-
 		UseTexture tblock(texture);
 
+		// The front cap begins
 		va.TexCoord(0.0f, 0.0f).Vertex(x, ybeg);
 		va.TexCoord(0.0f, 1.0f).Vertex(x, ybeg + h);
-
 		if (w >= 2.0 * h) {
-			double tmp = h / w;
+			// Calculate the y coordinates of the middle part
+			double tmp = h / w;  // h = cap size (because it is a h by h square)
 			double y1 = (1.0 - tmp) * ybeg + tmp * yend;
 			double y2 = tmp * ybeg + (1.0 - tmp) * yend;
-
+			// The middle part between caps
 			va.TexCoord(0.5f, 0.0f).Vertex(x + h, y1);
 			va.TexCoord(0.5f, 1.0f).Vertex(x + h, y1 + h);
 			va.TexCoord(0.5f, 0.0f).Vertex(x + w - h, y2);
 			va.TexCoord(0.5f, 1.0f).Vertex(x + w - h, y2 + h);
 		} else {
+			// Note is too short to even fit caps, crop to fit.
 			double ymid = 0.5 * (ybeg + yend);
 			float crop = 0.25f * w / h;
-
 			va.TexCoord(crop, 0.0f).Vertex(x + 0.5 * w, ymid);
 			va.TexCoord(crop, 1.0f).Vertex(x + 0.5 * w, ymid + h);
 			va.TexCoord(1.0f - crop, 0.0f).Vertex(x + 0.5 * w, ymid);
 			va.TexCoord(1.0f - crop, 1.0f).Vertex(x + 0.5 * w, ymid + h);
 		}
+		// The rear cap ends
 		va.TexCoord(1.0f, 0.0f).Vertex(x + w, yend);
 		va.TexCoord(1.0f, 1.0f).Vertex(x + w, yend + h);
 
@@ -95,6 +96,9 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 		case NoteGraph::TOP:
 			dimensions.stretch(1.0, 0.32).bottom(0.0);
 			break;
+		case NoteGraph::BOTTOM:
+			dimensions.stretch(1.0, 0.32).top(0.0);
+			break;
 		case NoteGraph::LEFT:
 			dimensions.stretch(0.50, 0.50).center().left(-0.5);
 			break;
@@ -128,7 +132,8 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 			float centery = m_baseY + (it->note + 0.4) * m_noteUnit; // Star is 0.4 notes higher than current note
 			float centerx = x + w - (player_star_offset + 1.2) * hh; // Star is 1.2 units from end
 			float rot = fmod(time * 5.0, 2.0 * M_PI); // They rotate!
-			float zoom = (std::abs((rot-180) / 360.0f) * 0.8f + 0.6f) * (position == NoteGraph::TOP ? 2.3 : 2.0) * hh;
+			bool smallerNoteGraph = ((position == NoteGraph::TOP) || (position == NoteGraph::BOTTOM));
+			float zoom = (std::abs((rot-180) / 360.0f) * 0.8f + 0.6f) * (smallerNoteGraph ? 2.3 : 2.0) * hh;
 			using namespace glmath;
 			Transform trans(translate(vec3(centerx, centery, 0.0f)) * rotate(rot, vec3(0.0f, 0.0f, 1.0f)));
 			{
@@ -191,8 +196,9 @@ namespace {
 void NoteGraph::drawWaves(Database const& database) {
 	if (m_vocal.notes.empty()) return; // Cannot draw without notes
 	UseTexture tblock(m_wave);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	for (std::list<Player>::const_iterator p = database.cur.begin(); p != database.cur.end(); ++p) {
+		if (p->m_vocal.name != m_vocal.name)
+			continue;
 		float const texOffset = 2.0 * m_time; // Offset for animating the wave texture
 		Player::pitch_t const& pitch = p->m_pitch;
 		size_t const beginIdx = std::max(0.0, m_time - 0.5 / pixUnit) / Engine::TIMESTEP; // At which pitch idx to start displaying the wave
@@ -243,6 +249,5 @@ void NoteGraph::drawWaves(Database const& database) {
 		}
 		strip(va);
 	}
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 

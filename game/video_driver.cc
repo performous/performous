@@ -196,12 +196,12 @@ void Window::render(boost::function<void (void)> drawFunc) {
 	// Over/under only available in fullscreen
 	if (stereo && type == 2 && !m_fullscreen) stereo = false;
 
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 	updateStereo(stereo ? getSeparation() : 0.0);
 	glerror.check("setup");
 	// Can we do direct to framebuffer rendering (no FBO)?
 	if (!stereo || type == 2) { view(stereo); drawFunc(); return; }
-	// Render both eyes to FBO (full resolution top/bottom)
+	// Render both eyes to FBO (full resolution top/bottom for anaglyph)
 	unsigned w = s_width;
 	unsigned h = 2 * s_height;
 	FBO fbo(w, h);
@@ -259,21 +259,34 @@ void Window::view(unsigned num) {
 	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_BLEND);
 	if (GL_EXT_framebuffer_sRGB) glEnable(GL_FRAMEBUFFER_SRGB);
 	shader("color").bind();
-	// Setup views
+	// Setup views (with black bars for cropping)
 	double vx = 0.5f * (screen->w - s_width);
 	double vy = 0.5f * (screen->h - s_height);
 	double vw = s_width, vh = s_height;
 	if (num == 0) {
 		glViewport(vx, vy, vw, vh);  // Drawable area of the window (excluding black bars)
 	} else {
-		glViewportIndexedf(1, 0, vh / 2, vw, vh / 2);  // Top half of the drawable area
-		glViewportIndexedf(2, 0, 0, vw, vh / 2);  // Bottom half of the drawable area
+		// Splitscreen stereo3d
+		if (screen->w == 1280 && screen->h == 1470) {  // HDMI 720p 3D mode
+			glViewportIndexedf(1, 0, 750, 1280, 720);
+			glViewportIndexedf(2, 0, 0, 1280, 720);
+			s_width = 1280;
+			s_height = 720;
+		} else if (screen->w == 1920 && screen->h == 2205) {  // HDMI 1080p 3D mode
+			glViewportIndexedf(1, 0, 1125, 1920, 1080);
+			glViewportIndexedf(2, 0, 0, 1920, 1080);
+			s_width = 1920;
+			s_height = 1080;
+		} else {  // Regular top/bottom 3d
+			glViewportIndexedf(1, 0, vh / 2, vw, vh / 2);  // Top half of the drawable area
+			glViewportIndexedf(2, 0, 0, vw, vh / 2);  // Bottom half of the drawable area
+		}
 	}
 
 }

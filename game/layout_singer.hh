@@ -49,15 +49,15 @@ class LyricRow {
 
 class LayoutSinger {
   public:
-	enum Position {BOTTOM, MIDDLE, LEFT, RIGHT};
+	enum PositionMode {FULL, TOP, BOTTOM, LEFT, RIGHT};
 	/// ThemeSing is optional if you want to use drawScore only
 	LayoutSinger(VocalTrack& vocal, Database& database, boost::shared_ptr<ThemeSing> theme = boost::shared_ptr<ThemeSing>());
 	~LayoutSinger();
 	void reset();
-	void draw(double time, Position position = LayoutSinger::BOTTOM);
-	void drawScore(Position position);
+	void draw(double time, PositionMode position = LayoutSinger::FULL);
+	void drawScore(PositionMode position);
 	double lyrics_begin() const;
-	void hideLyrics(bool hide = true) { m_hideLyrics = hide; };
+	void hideLyrics(bool hide = true) { m_hideLyrics = hide; }
   private:
 	VocalTrack& m_vocal;
 	NoteGraph m_noteGraph;

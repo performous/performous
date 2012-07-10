@@ -98,7 +98,6 @@ class GuitarGraph: public InstrumentGraph {
 
 	// Flags
 	bool m_drums; /// are we using drums?
-	bool m_use3d; /// are we using 3d?
 
 	// Track stuff
 	enum Difficulty {

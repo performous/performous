@@ -104,7 +104,6 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number)
   m_neckglow(getThemePath("neck_glow.svg")),
   m_neckglowColor(),
   m_drums(drums),
-  m_use3d(config["graphic/3d_notes"].b()),
   m_level(),
   m_track_index(m_instrumentTracks.end()),
   m_dfIt(m_drumfills.end()),
@@ -316,9 +315,10 @@ void GuitarGraph::engine() {
 	bool difficulty_changed = false;
 	// Handle all events
 	for (input::Event ev; m_input.tryPoll(ev);) {
-		// This hack disallows joining with Enter-key for skipping instrumental
-		// breaks to be usable with FoF songs.
-		if (dead() && m_input.isKeyboard() && ev.type == input::Event::PICK) continue;
+		// This hack disallows joining with Enter and CTRL-key
+		// since they cause issues due to also being used in other places
+		if (dead() && m_input.isKeyboard()
+		  && (ev.type == input::Event::PICK || ev.button == input::GODMODE_BUTTON)) continue;
 		m_dead = 0; // Keep alive
 		// Handle joining
 		if (m_jointime != m_jointime) {
@@ -775,12 +775,12 @@ namespace {
 	const float fretWid = 0.5f; // The actual width is two times this
 
 	/// Create a symmetric vertex pair of given data
-	void vertexPair(glutil::VertexArray& va, float x, float y, Color color, float ty, float fretW = fretWid) {
+	void vertexPair(glutil::VertexArray& va, float x, float y, Color color, float ty, float fretW = fretWid, float zn = 0.0) {
 		color.a = y2a(y);
 		{
 			glmath::vec4 c(color.r, color.g, color.b, color.a);
-			va.Color(c).TexCoord(0.0f, ty).Vertex(x - fretW, y);
-			va.Color(c).TexCoord(1.0f, ty).Vertex(x + fretW, y);
+			va.Color(c).TexCoord(0.0f, ty).Vertex(x - fretW, y, 0.1 + zn);
+			va.Color(c).TexCoord(1.0f, ty).Vertex(x + fretW, y, 0.1 - zn);
 		}
 	}
 
@@ -1015,9 +1015,7 @@ void GuitarGraph::draw(double time) {
 	if (m_neckglowColor.w > 0.0) {
 		// Neck glow drawing
 		using namespace glmath;
-		double a = m_neckglowColor.w;
-		vec4 color((1.0 / a) *  vec3(m_neckglowColor), a);  // Convert into non-premultiplied
-		ColorTrans c(glmath::mat4::diagonal(color));
+		ColorTrans c(glmath::mat4::diagonal(m_neckglowColor));
 		m_neckglow.dimensions.screenBottom(0.0).middle().fixedWidth(neckWidth());
 		m_neckglow.draw();
 	}
@@ -1047,25 +1045,12 @@ void GuitarGraph::drawNote(int fret, Color color, float tBeg, float tEnd, float 
 		if (releaseTime == releaseTime && tEnd - releaseTime > 0.1) yBeg = time2y(releaseTime);
 		// Short note? Render minimum renderable length
 		if (yEnd > yBeg - 3 * fretWid) yEnd = yBeg - 3 * fretWid;
-		// Render the ring
+		// Skip the fret head
 		float y = yBeg + fretWid;
-		if (m_use3d) { // 3D
-			y -= fretWid;
-			color.a = clamp(time2a(tBeg)*2.0f,0.0f,1.0f);
-			{
-				ColorTrans c(color);
-				m_fretObj.draw(x, y, 0.0f);
-			}
-			y -= fretWid;
-		} else { // 2D
-			color.a = time2a(tBeg);
-			{
-				ColorTrans c(color);
-				m_button.dimensions.center(yBeg).middle(x);
-				m_button.draw();
-			}
-			y -= 2 * fretWid;
-		}
+		y -= fretWid;
+		float fretY = y;
+		color.a = clamp(time2a(tBeg)*2.0f,0.0f,1.0f);
+		y -= fretWid;
 		// Render the middle
 		bool doanim = hit || hitAnim > 0; // Enable glow?
 		Texture const& tex(doanim ? m_tail_glow : m_tail); // Select texture
@@ -1075,53 +1060,47 @@ void GuitarGraph::drawNote(int fret, Color color, float tBeg, float tEnd, float 
 		vertexPair(va, x, y, color, doanim ? tc(y + t) : 1.0f); // First vertex pair
 		while ((y -= fretWid) > yEnd + fretWid) {
 			if (whammy > 0.1) {
-				float r = rand() / double(RAND_MAX);
-				vertexPair(va, x+cos(y*whammy)/4.0+(r-0.5)/4.0, y, color, tc(y + t));
+				// FIXME: Should use Boost/C++11 random, and use the same seed for both eyes in stereo3d.
+				float r1 = rand() / double(RAND_MAX) - 0.5;
+				float r2 = rand() / double(RAND_MAX) - 0.5;
+				vertexPair(va, x+0.2*(cos(y*whammy)+r1), y, color, tc(y + t), fretWid, 0.1*(sin(y*whammy)+r2));
 			} else vertexPair(va, x, y, color, doanim ? tc(y + t) : 0.5f);
 		}
 		// Render the end
 		y = yEnd + fretWid;
 		vertexPair(va, x, y, color, doanim ? tc(y + t) : 0.20f);
 		vertexPair(va, x, yEnd, color, doanim ? tc(yEnd + t) : 0.0f);
+		glDisable(GL_DEPTH_TEST);
 		va.Draw();
+		glEnable(GL_DEPTH_TEST);
+		// Render the fret object
+		{
+			ColorTrans c(color);
+			m_fretObj.draw(x, fretY, 0.0f);
+		}
 	} else {
 		// Too short note: only render the ring
-		if (m_use3d) { // 3D
-			if (hitAnim > 0.0 && tEnd <= maxTolerance) {
-				float s = 1.0 - hitAnim;
-				color.a = s;
-				{
-					ColorTrans c(color);
-					m_fretObj.draw(x, yBeg, 0.0f, s);
-				}
-			} else {
-				color.a = clamp(time2a(tBeg)*2.0f,0.0f,1.0f);
-				{
-					ColorTrans c(color);
-					m_fretObj.draw(x, yBeg, 0.0f);
-				}
-			}
-		} else { // 2D
-			color.a = time2a(tBeg);
+		if (hitAnim > 0.0 && tEnd <= maxTolerance) {
+			float s = 1.0 - hitAnim;
+			color.a = s;
 			{
 				ColorTrans c(color);
-				m_button.dimensions.center(yBeg).middle(x);
-				m_button.draw();
+				m_fretObj.draw(x, yBeg, 0.0f, s);
+			}
+		} else {
+			color.a = clamp(time2a(tBeg)*2.0f,0.0f,1.0f);
+			{
+				ColorTrans c(color);
+				m_fretObj.draw(x, yBeg, 0.0f);
 			}
 		}
 	}
 	// Hammer note caps
 	if (tappable) {
 		float l = std::max(0.3, m_correctness.get());
-		if (m_use3d) { // 3D
-			float s = 1.0 - hitAnim;
-			ColorTrans c(Color(l, l, l, s));
-			m_tappableObj.draw(x, yBeg, 0.0f, s);
-		} else { // 2D
-			ColorTrans c(Color(l, l, l));
-			m_tap.dimensions.center(yBeg).middle(x);
-			m_tap.draw();
-		}
+		float s = 1.0 - hitAnim;
+		ColorTrans c(Color(l, l, l, s));
+		m_tappableObj.draw(x, yBeg, 0.0f, s);
 	}
 }
 
