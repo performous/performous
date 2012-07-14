@@ -105,6 +105,8 @@ void Webcam::render() {
 		bitmap.buf.swap(m_frame.data);  // Get back our buffer (FIXME: do we need to?)
 		m_frameAvailable = false;
 	}
+	using namespace glmath;
+	Transform trans(scale(vec3(-1.0, 1.0, 1.0)));
 	m_surface.draw(); // Draw
 	#endif
 }
