@@ -12,6 +12,10 @@ extern "C" {
 #include SWSCALE_INCLUDE
 }
 
+#if (LIBAVCODEC_VERSION_INT) < (AV_VERSION_INT(52,94,3))
+#	define AV_SAMPLE_FMT_S16 SAMPLE_FMT_S16
+#endif
+
 #define AUDIO_CHANNELS 2
 
 /*static*/ boost::mutex FFmpeg::s_avcodec_mutex;
@@ -66,7 +70,7 @@ void FFmpeg::open() {
 
 	switch (m_mediaType) {
 	case AVMEDIA_TYPE_AUDIO:
-		m_resampleContext = av_audio_resample_init(AUDIO_CHANNELS, cc->channels, m_rate, cc->sample_rate, SAMPLE_FMT_S16, SAMPLE_FMT_S16, 16, 10, 0, 0.8);
+		m_resampleContext = av_audio_resample_init(AUDIO_CHANNELS, cc->channels, m_rate, cc->sample_rate, AV_SAMPLE_FMT_S16, AV_SAMPLE_FMT_S16, 16, 10, 0, 0.8);
 		if (!m_resampleContext) throw std::runtime_error("Cannot create resampling context");
 		audioQueue.setSamplesPerSecond(AUDIO_CHANNELS * m_rate);
 		break;
