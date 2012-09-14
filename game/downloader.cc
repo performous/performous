@@ -29,7 +29,7 @@ struct Downloader::Impl {
 		pause(true);
 		
 		add_torrent_params p;
-		p.save_path = getDataDir() / "songs" / "dlc";
+		p.save_path = (getDataDir() / "songs" / "dlc").string();
 		add_magnet_uri(s, "magnet:?xt=urn:btih:7ea1b59cce1737437a66e29a2843b5ce3a0c8cd9", p);
 		pause(false);
 	} catch (std::exception& e) {
