@@ -30,7 +30,10 @@ struct Downloader::Impl {
 		
 		add_torrent_params p;
 		p.save_path = (getDataDir() / "songs" / "dlc").string();
-		add_magnet_uri(s, "magnet:?xt=urn:btih:7ea1b59cce1737437a66e29a2843b5ce3a0c8cd9", p);
+		error_code ec;
+		add_torrent_params params;
+		params.url = "magnet:?xt=urn:btih:7ea1b59cce1737437a66e29a2843b5ce3a0c8cd9";
+		s.add_torrent(params, ec);
 		pause(false);
 	} catch (std::exception& e) {
 		std::clog << "downloader/error: " << e.what() << std::endl;
@@ -43,7 +46,10 @@ struct Downloader::Impl {
 			s.stop_lsd();
 			s.stop_dht();
 		} else {
-			if (!s.is_listening()) s.listen_on(std::make_pair(6881, 6889));
+			if (!s.is_listening()) {
+				error_code ec;
+				s.listen_on(std::make_pair(6881, 6889), ec);
+			}
 			s.start_dht();
 			s.start_lsd();
 			s.start_upnp();
