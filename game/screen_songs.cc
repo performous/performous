@@ -202,8 +202,8 @@ void ScreenSongs::drawMultimedia() {
 	}
 	if (!m_jukebox) {
 		m_songbg_ground->draw();
-		drawCovers();
 		theme->bg.draw();
+		drawCovers();
 	}
 }
 
