@@ -44,7 +44,6 @@ ThemeAudioDevices::ThemeAudioDevices():
 ThemeDownloads::ThemeDownloads():
 	Theme(getThemePath("audiodevices_bg.svg")),
 	device(getThemePath("mainmenu_comment.svg"), config["graphic/text_lod"].f()),
-	device_bg(getThemePath("audiodevices_dev_bg.svg")),
 	comment(getThemePath("mainmenu_comment.svg"), config["graphic/text_lod"].f()),
 	comment_bg(getThemePath("mainmenu_comment_bg.svg"))
 {}

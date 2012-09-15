@@ -261,4 +261,15 @@ to save the current settings to XML.
 		<short>Base folders for data</short>
 		<long>System defaults are included automatically. Additional paths can be added here.</long>
 	</entry>
+
+	<!-- DLC -->
+	<entry name="dlc/torrent_urls" type="string_list">
+		<short>Torrent URLs</short>
+		<long>The list of the torrent URLs</long>
+	</entry>
+	<entry name="dlc/save_path" type="string">
+		<stringvalue>DATADIR/songs/dlc</stringvalue>
+		<short>DLC save directory</short>
+		<long>Where to save DLC. DATADIR at the beginning means all Performous data folders.</long>
+	</entry>
 </performous>

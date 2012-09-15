@@ -153,7 +153,7 @@ void mainLoop(std::string const& songlist) {
 		sm.addScreen(new ScreenSongs("Songs", audio, songs, database));
 		sm.addScreen(new ScreenSing("Sing", audio, database, backgrounds));
 		sm.addScreen(new ScreenPractice("Practice", audio));
-		sm.addScreen(new ScreenDownloads("Downloads", audio));
+		sm.addScreen(new ScreenDownloads("Downloads", audio, downloader));
 		sm.addScreen(new ScreenAudioDevices("AudioDevices", audio));
 		sm.addScreen(new ScreenPaths("Paths", audio));
 		sm.addScreen(new ScreenPlayers("Players", audio, database));
@@ -207,7 +207,6 @@ void mainLoop(std::string const& songlist) {
 					frames = 0;
 				}
 				prof("fpsctrl");
-				downloader.poll();
 				// Process events for the next frame
 				if (midiDrums) midiDrums->process();
 				checkEvents_SDL(sm);

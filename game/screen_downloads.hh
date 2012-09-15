@@ -7,23 +7,21 @@
 
 class Audio;
 class ThemeDownloads;
+class Downloader;
 
 /// options dialogue
 class ScreenDownloads: public Screen {
   public:
 	/// constructor
-	ScreenDownloads(std::string const& name, Audio& audio);
+	ScreenDownloads(std::string const& name, Audio& audio, Downloader &downloader);
 	void enter();
 	void exit();
 	void manageEvent(SDL_Event event);
 	void draw();
-
   private:
 	Audio& m_audio;
+	Downloader& m_downloader;
 	boost::scoped_ptr<ThemeDownloads> m_theme;
-	unsigned int m_selected_column;
-	boost::scoped_ptr<Surface> m_selector;
-	boost::scoped_ptr<Surface> m_mic_icon;
-	boost::scoped_ptr<Surface> m_pdev_icon;
+	unsigned int m_selectedTorrent;
 };
 

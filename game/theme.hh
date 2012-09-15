@@ -83,8 +83,6 @@ public:
 	ThemeDownloads();
 	/// device item
 	SvgTxtTheme device;
-	/// device item background
-	Surface device_bg;
 	/// comment text
 	SvgTxtTheme comment;
 	/// comment background
