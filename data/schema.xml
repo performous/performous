@@ -272,4 +272,8 @@ to save the current settings to XML.
 		<short>DLC save directory</short>
 		<long>Where to save DLC. DATADIR at the beginning means all Performous data folders.</long>
 	</entry>
+	<entry name="dlc/autostart" type="bool" value="false">
+		<short>Automatically start DLC</short>
+		<short>Automatically start DLC (seeding and downloading) when performous starts.</short>
+	</entry>
 </performous>

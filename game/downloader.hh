@@ -8,6 +8,7 @@ struct Torrent {
 	Torrent() {};
 	std::string name;
 	std::string state;
+	std::string sha1;
 	float progress;
 };
 
@@ -16,7 +17,9 @@ class Downloader : boost::noncopyable {
 	Downloader();
 	~Downloader();
 	void pause(bool state);
+	void pauseResume(std::string sha1);
 	void addTorrent(std::string url);
+	void removeTorrent(std::string sha1);
 	std::vector<Torrent> getTorrents() const;
   private:
 	class Impl;

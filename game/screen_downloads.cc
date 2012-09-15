@@ -30,6 +30,17 @@ void ScreenDownloads::manageEvent(SDL_Event event) {
 	} else if (event.type == SDL_KEYDOWN) {
 		int key = event.key.keysym.sym;
 		SDLMod modifier = event.key.keysym.mod;
+		if (key == SDLK_SPACE) {
+			std::vector<Torrent> torrents = m_downloader.getTorrents();
+			if(m_selectedTorrent < torrents.size()) {
+				m_downloader.pauseResume(torrents[m_selectedTorrent].sha1);
+			}
+		} else if(key == SDLK_BACKSPACE) {
+			std::vector<Torrent> torrents = m_downloader.getTorrents();
+			if(m_selectedTorrent < torrents.size()) {
+				m_downloader.removeTorrent(torrents[m_selectedTorrent].sha1);
+			}
+		}
 	}
 }
 

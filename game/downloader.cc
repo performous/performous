@@ -69,8 +69,13 @@ class Downloader::Impl {
 				torrent_status status = h.status();
 				Torrent t;
 				t.name = h.name();
-				t.state = state_str[status.state];
+				if(status.paused) {
+					t.state = "paused";
+				} else {
+					t.state = state_str[status.state];
+				}
 				t.progress = status.progress;
+				t.sha1 = h.info_hash().to_string();
 
 				std::string percent =  boost::lexical_cast<std::string>(int(round(t.progress*100)));
 				std::clog << "torrent/debug: " << t.name << " (" << t.state << ":" << percent << "%)" << std::endl;
@@ -95,6 +100,21 @@ class Downloader::Impl {
 			}
 			// Sleep a little, much if the cam isn't active
 			boost::thread::sleep(now() + 0.5);
+		}
+	}
+
+	void removeTorrent(std::string sha1) {
+		torrent_handle h = s.find_torrent(sha1_hash(sha1));
+		s.remove_torrent(h);
+	}
+
+	void pauseResume(std::string sha1) {
+		torrent_handle h = s.find_torrent(sha1_hash(sha1));
+		if(h.status().paused) {
+			h.resume();
+		} else {
+			h.auto_managed(false);
+			h.pause();
 		}
 	}
 
@@ -133,6 +153,11 @@ class Downloader::Impl {
 		add_torrent_params params;
 		params.save_path = savePath.string();
 		params.url = url;
+		if(config["dlc/autostart"].b()) {
+			params.flags |= add_torrent_params::flag_auto_managed;
+		} else {
+			params.flags &= ~add_torrent_params::flag_auto_managed;
+		}
 		std::clog << "torrent/info: adding " << url << " (saving in " << savePath << ")" << std::endl;
 		s.add_torrent(params, ec);
 		if(ec) {
@@ -161,6 +186,10 @@ Downloader::~Downloader() {}
 
 void Downloader::pause(bool state) { self->pause(state); }
 
+void Downloader::pauseResume(std::string sha1) { self->pauseResume(sha1); }
+
 void Downloader::addTorrent(std::string url) { self->addTorrent(url); }
+
+void Downloader::removeTorrent(std::string sha1) { self->removeTorrent(sha1); }
 
 std::vector<Torrent> Downloader::getTorrents() const { return self->getTorrents(); };
