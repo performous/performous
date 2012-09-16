@@ -18,6 +18,7 @@
 #include <fstream>
 #include <iterator>
 #include <iomanip>
+#include <boost/algorithm/string/predicate.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
@@ -114,7 +115,7 @@ class Downloader::Impl {
 				m_torrents = torrents;
 			}
 			// Sleep a little, much if the cam isn't active
-			boost::thread::sleep(now() + 0.5);
+			boost::thread::sleep(now() + 0.2);
 		}
 	}
 
@@ -167,7 +168,20 @@ class Downloader::Impl {
 		error_code ec;
 		add_torrent_params params;
 		params.save_path = savePath.string();
-		params.url = url;
+		if (boost::starts_with(url, "hash:")) {
+			// we have a hash
+			params.info_hash = sha1_hash(url.substr(sizeof("hash:")-1));
+		} else if (boost::starts_with(url, "torrent:")) {
+			// we have a torrent file
+			params.ti = new torrent_info(url.substr(sizeof("torrent:")-1).c_str(), ec);
+			if(ec) {
+				std::clog << "torrent/error: cannot add torrent file: " << ec.message() << std::endl;
+				return;
+			}
+		} else {
+			// we have an url (http, magnet, https, other)
+			params.url = url;
+		}
 		if(config["dlc/autostart"].b()) {
 			params.flags |= add_torrent_params::flag_auto_managed;
 		} else {

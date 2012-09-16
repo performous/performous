@@ -4,6 +4,7 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/noncopyable.hpp>
 #include <vector>
+#include <string>
 
 struct Torrent {
 	Torrent() {};
