@@ -165,6 +165,7 @@ void ScreenIntro::populateMenu() {
 		MenuOptions audiomenu;
 		MenuOptions gfxmenu;
 		MenuOptions gamemenu;
+		MenuOptions dlcmenu;
 		// Populate the submenus
 		for (Config::iterator it = config.begin(); it != config.end(); ++it) {
 			// Skip items that are configured elsewhere
@@ -172,6 +173,7 @@ void ScreenIntro::populateMenu() {
 			MenuOptions* opts = &gamemenu; // Default to game menu
 			if (it->first.find("audio/") != std::string::npos) opts = &audiomenu;
 			else if (it->first.find("graphic/") != std::string::npos) opts = &gfxmenu;
+			else if (it->first.find("dlc/") != std::string::npos) opts = &dlcmenu;
 			// Push the ConfigItem to the submenu
 			opts->push_back(MenuOption(_(it->second.getShortDesc().c_str()), _(it->second.getLongDesc().c_str()), &it->second));
 			opts->back().image = config_bg;
@@ -184,6 +186,7 @@ void ScreenIntro::populateMenu() {
 		configmain.push_back(MenuOption(_("Audio"), _("Configure general audio settings"), audiomenu, "intro_configure.svg"));
 		configmain.push_back(MenuOption(_("Graphics"), _("Configure rendering and video settings"), gfxmenu, "intro_configure.svg"));
 		configmain.push_back(MenuOption(_("Game"), _("Gameplay related options"), gamemenu, "intro_configure.svg"));
+		configmain.push_back(MenuOption(_("DLC"), _("DLC related settings"), dlcmenu, "intro_configure.svg"));
 		configmain.push_back(MenuOption(_("Paths"), _("Setup song and data paths"), "Paths", "intro_configure.svg"));
 		// Add to root menu
 		m_menu.add(MenuOption(_("Configure"), _("Configure audio and game options"), configmain, "intro_configure.svg"));
