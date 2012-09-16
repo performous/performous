@@ -28,6 +28,13 @@ class Downloader : boost::noncopyable {
 	std::vector<Torrent> getTorrents() const;
 	int getUploadRate() const;
 	int getDownloadRate() const;
+	static bool enabled() {
+		#ifdef USE_TORRENT
+		return true;
+		#else
+		return false;
+		#endif
+	}
   private:
 	class Impl;
 	boost::scoped_ptr<Impl> self;

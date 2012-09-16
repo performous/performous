@@ -5,16 +5,6 @@
 #include "fs.hh"
 #include "config.hh"
 #include "configuration.hh"
-#include "libtorrent/entry.hpp"
-#include "libtorrent/bencode.hpp"
-#include "libtorrent/magnet_uri.hpp"
-#include "libtorrent/torrent_info.hpp"
-#include "libtorrent/file.hpp"
-#include "libtorrent/session.hpp"
-#include "libtorrent/storage.hpp"
-#include "libtorrent/hasher.hpp"
-#include "libtorrent/create_torrent.hpp"
-#include "libtorrent/torrent_info.hpp"
 #include "xtime.hh"
 #include <iostream>
 #include <fstream>
@@ -26,7 +16,22 @@
 #include <boost/thread/thread.hpp>
 
 using namespace boost::filesystem;
+
+#ifdef USE_TORRENT
+
+#include "libtorrent/entry.hpp"
+#include "libtorrent/bencode.hpp"
+#include "libtorrent/magnet_uri.hpp"
+#include "libtorrent/torrent_info.hpp"
+#include "libtorrent/file.hpp"
+#include "libtorrent/session.hpp"
+#include "libtorrent/storage.hpp"
+#include "libtorrent/hasher.hpp"
+#include "libtorrent/create_torrent.hpp"
+#include "libtorrent/torrent_info.hpp"
+
 using namespace libtorrent;
+
 static char const* state_str[] = {"checking (q)", "checking", "dl metadata", "downloading", "finished", "seeding", "allocating", "checking (r)"};
 
 class Downloader::Impl {
@@ -205,6 +210,23 @@ class Downloader::Impl {
 		return result;
 	}
 };
+#else
+class Downloader::Impl {
+  public:
+	Impl() : m_uploadRate(0), m_downloadRate(0) {}
+	void pause(bool state) {}
+	void pauseResume(std::string sha1) {}
+	void addTorrent(std::string url) {}
+	void removeTorrent(std::string sha1) {}
+	std::vector<Torrent> getTorrents() const {
+		std::vector<Torrent> result;
+		return result;
+	}
+  public:
+	int m_uploadRate;
+	int m_downloadRate;
+};
+#endif
 
 Downloader::Downloader(): self(new Impl) {
 	ConfigItem::StringList urls = config["dlc/torrent_urls"].sl();

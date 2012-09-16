@@ -82,6 +82,8 @@ void ScreenDownloads::draw() {
 			<< ", " << boost::lexical_cast<std::string>(int(round(torrent.progress*100))) << "%"
 			<< ", size: " << addSuffix(torrent.size)
 			<< " (down: " << addSuffix(torrent.downloadRate,"/s") << ", up: " << addSuffix(torrent.uploadRate,"/s") << ")";
+	} else if(!Downloader::enabled()) {
+		info << _("Torrent support disabled");
 	} else {
 		info << _("No torrent available");
 	}

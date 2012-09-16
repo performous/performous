@@ -387,5 +387,7 @@ void outputOptionalFeatureStatus() {
 	(input::MidiDrums::enabled() ? "Enabled" : "Disabled")
 	<< std::endl << "  Webcam support:         " <<
 	(Webcam::enabled() ? "Enabled" : "Disabled")
+	<< std::endl << "  Torrent support:         " <<
+	(Downloader::enabled() ? "Enabled" : "Disabled")
 	<< std::endl << std::endl;
 }
