@@ -6,6 +6,7 @@
 #include "joystick.hh"
 #include "theme.hh"
 #include "i18n.hh"
+#include <boost/assign.hpp>
 #include <boost/bind.hpp>
 #include <boost/format.hpp>
 
@@ -44,6 +45,25 @@ void ScreenDownloads::manageEvent(SDL_Event event) {
 	}
 }
 
+namespace {
+	std::string addSuffix(boost::int64_t val, std::string suffix = "") {
+		std::string unit = "b";
+		std::vector<std::string> modifier = boost::assign::list_of("")("k")("M")("H")("T")("P");
+		std::string chosenModifier = modifier.back();
+		for(std::vector<std::string>::const_iterator it = modifier.begin() ; it != modifier.end() ; ++it) {
+			if(val < 1024) {
+				chosenModifier = *it;
+				break;
+			} else {
+				val /= 1024;
+			}
+		}
+		std::ostringstream ret;
+		ret << boost::lexical_cast<std::string>(val) << " " << chosenModifier << unit << suffix;
+		return ret.str();
+	}
+}
+
 void ScreenDownloads::draw() {
 	m_theme->bg.draw();
 	std::vector<Torrent> torrents = m_downloader.getTorrents();
@@ -59,7 +79,9 @@ void ScreenDownloads::draw() {
 			<< "Torrent " << (m_selectedTorrent+1) << "/" << torrents.size() << ": "
 			<< torrent.name
 			<< ", state=" << torrent.state
-			<< ", " << boost::lexical_cast<std::string>(int(round(torrent.progress*100))) << "%";
+			<< ", " << boost::lexical_cast<std::string>(int(round(torrent.progress*100))) << "%"
+			<< ", size: " << addSuffix(torrent.size)
+			<< " (down: " << addSuffix(torrent.downloadRate,"/s") << ", up: " << addSuffix(torrent.uploadRate,"/s") << ")";
 	} else {
 		info << _("No torrent available");
 	}
@@ -69,7 +91,7 @@ void ScreenDownloads::draw() {
 	m_theme->comment.draw(info.str());
 	// Additional info
 	std::ostringstream message;
-	message << boost::format(_("Use left/right keys to scoll accross the %1% torrent(s)")) % torrents.size();
+	message << boost::format(_("Use left/right keys to scoll accross the %1% torrent(s) (down: %2%, up: %3%)")) % torrents.size() % addSuffix(m_downloader.getDownloadRate(),"/s") % addSuffix(m_downloader.getUploadRate(),"/s");
 	m_theme->comment_bg.dimensions.middle().screenBottom(-0.01);
 	m_theme->comment_bg.draw();
 	m_theme->comment.dimensions.left(-0.48).screenBottom(-0.023);

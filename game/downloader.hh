@@ -1,5 +1,6 @@
 #pragma once
 
+#include <boost/cstdint.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/noncopyable.hpp>
 #include <vector>
@@ -10,6 +11,9 @@ struct Torrent {
 	std::string state;
 	std::string sha1;
 	float progress;
+	int uploadRate;
+	int downloadRate;
+	boost::int64_t size;
 };
 
 class Downloader : boost::noncopyable {
@@ -21,6 +25,8 @@ class Downloader : boost::noncopyable {
 	void addTorrent(std::string url);
 	void removeTorrent(std::string sha1);
 	std::vector<Torrent> getTorrents() const;
+	int getUploadRate() const;
+	int getDownloadRate() const;
   private:
 	class Impl;
 	boost::scoped_ptr<Impl> self;

@@ -36,6 +36,8 @@ class Downloader::Impl {
 	std::vector<Torrent> m_torrents;
 
   public:
+	int m_uploadRate;
+	int m_downloadRate;
 	Impl() try {
 		m_quit = false;
 		session_settings settings;
@@ -58,10 +60,14 @@ class Downloader::Impl {
 			std::deque<alert*> alerts;
 			s.pop_alerts(&alerts);
 			for(std::deque<alert*>::const_iterator ita = alerts.begin() ; ita != alerts.end(); ++ita) {
-				std::clog << "torrent/error: " << (*ita)->what() << std::endl;
+				std::clog << "torrent/error: " << (*ita)->what() << ": " << (*ita)->message() << std::endl;
 			}
 
-			// update torrent informations
+			// update session information
+			session_status ss = s.status();
+			m_uploadRate = ss.upload_rate;
+			m_downloadRate = ss.download_rate;
+			// update torrent information
 			std::vector<Torrent> torrents;
 			std::vector<torrent_handle> torrent_handles = s.get_torrents();
 			for(std::vector<torrent_handle>::const_iterator it = torrent_handles.begin() ; it != torrent_handles.end() ; ++it) {
@@ -75,11 +81,20 @@ class Downloader::Impl {
 					t.state = state_str[status.state];
 				}
 				t.progress = status.progress;
+				t.uploadRate = status.upload_rate;
+				t.downloadRate = status.download_rate;
 				t.sha1 = h.info_hash().to_string();
+				try {
+					torrent_info const& info = h.get_torrent_info();
+					t.size = info.total_size();
+				} catch(libtorrent_exception &ex) {
+					// do nothing, info are just not available
+					t.size = 0;
+				}
+				torrents.push_back(t);
 
 				std::string percent =  boost::lexical_cast<std::string>(int(round(t.progress*100)));
 				std::clog << "torrent/debug: " << t.name << " (" << t.state << ":" << percent << "%)" << std::endl;
-				torrents.push_back(t);
 				/*
 				// display files when metadata are here
 				try {
@@ -193,3 +208,7 @@ void Downloader::addTorrent(std::string url) { self->addTorrent(url); }
 void Downloader::removeTorrent(std::string sha1) { self->removeTorrent(sha1); }
 
 std::vector<Torrent> Downloader::getTorrents() const { return self->getTorrents(); };
+
+int Downloader::getUploadRate() const { return self->m_uploadRate; };
+
+int Downloader::getDownloadRate() const { return self->m_downloadRate; };
