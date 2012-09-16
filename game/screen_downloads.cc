@@ -91,7 +91,8 @@ void ScreenDownloads::draw() {
 	m_theme->comment.draw(info.str());
 	// Additional info
 	std::ostringstream message;
-	message << boost::format(_("Use left/right keys to scoll accross the %1% torrent(s) (down: %2%, up: %3%)")) % torrents.size() % addSuffix(m_downloader.getDownloadRate(),"/s") % addSuffix(m_downloader.getUploadRate(),"/s");
+	message << boost::format(_("Use left/right keys to scroll across the %1% torrent(s) (down: %2%, up: %3%)"))
+		% torrents.size() % addSuffix(m_downloader.getDownloadRate(),"/s") % addSuffix(m_downloader.getUploadRate(),"/s");
 	m_theme->comment_bg.dimensions.middle().screenBottom(-0.01);
 	m_theme->comment_bg.draw();
 	m_theme->comment.dimensions.left(-0.48).screenBottom(-0.023);
