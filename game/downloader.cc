@@ -1,5 +1,7 @@
 #include "downloader.hh"
 
+#define BOOST_ASIO_DYN_LINK
+
 #include "fs.hh"
 #include "config.hh"
 #include "configuration.hh"
