@@ -1,14 +1,14 @@
 #include "3dobject.hh"
 
+#include "surface.hh"
+
 #include <sstream>
 #include <fstream>
 #include <stdexcept>
-#include <cmath>
 #include <boost/lexical_cast.hpp>
 
 // TODO: test & fix faces that doesn't have texcoords in the file
 // TODO: group handling for loader
-
 
 namespace {
 	static const int HAS_TEXCOORDS = 1;
@@ -101,8 +101,23 @@ void Object3d::loadWavefrontObj(std::string filepath, float scale) {
 
 }
 
+void Object3d::load(std::string filepath, std::string texturepath, float scale) {
+	if (!texturepath.empty()) m_texture.reset(new Texture(texturepath));
+	loadWavefrontObj(filepath, scale);
+}
+
 void Object3d::drawVBO() {
 	UseShader us(getShader("3dobject"));
 	m_va.Draw(GL_TRIANGLES);
 }
 
+void Object3d::draw(float x, float y, float z, float s) {
+	using namespace glmath;
+	Transform trans(translate(vec3(x, y, z)) * scale(s));  // Move to position and scale
+	if (m_texture) {
+		UseTexture tex(*m_texture);
+		drawVBO();
+	} else {
+		drawVBO();
+	}
+}
