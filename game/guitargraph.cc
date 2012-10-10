@@ -557,7 +557,7 @@ void GuitarGraph::endBRE() {
 	}
 	m_drumfillHits = 0;
 	m_drumfillScore = 0;
-	m_dfIt == m_drumfills.end();
+	m_dfIt = m_drumfills.end();
 }
 
 /// Calculates the start and end times for the next/current drum fill

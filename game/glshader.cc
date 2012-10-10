@@ -24,21 +24,22 @@ namespace {
 
 /// Dumps Shader/Program InfoLog
 void Shader::dumpInfoLog(GLuint id) {
-	int infologLength = 0;
 	int maxLength;
 
 	if (glIsShader(id)) glGetShaderiv(id, GL_INFO_LOG_LENGTH, &maxLength);
 	else glGetProgramiv(id, GL_INFO_LOG_LENGTH, &maxLength);
 
 	char infoLog[maxLength];
+	int infoLogLength = 0;
 
-	if (glIsShader(id)) glGetShaderInfoLog(id, maxLength, &infologLength, infoLog);
-	else glGetProgramInfoLog(id, maxLength, &infologLength, infoLog);
+	if (glIsShader(id)) glGetShaderInfoLog(id, maxLength, &infoLogLength, infoLog);
+	else glGetProgramInfoLog(id, maxLength, &infoLogLength, infoLog);
 
-	if (infologLength > 0 && infoLog != "Vertex shader(s) linked, fragment shader(s) linked, geometry shader(s) linked." /* What the Radeon drivers always say */) {
-		// FIXME: The logging facility probably won't handle this right, especially when infoLog contains many lines.
-		std::clog << "opengl/error: Shader " << name << ": " << infoLog << std::endl;
-	}
+	// Ignore success messages that the Radeon driver always seems to give
+	if (std::equal(infoLog, infoLog + infoLogLength, "Vertex shader(s) linked, fragment shader(s) linked, geometry shader(s) linked.")) return;
+
+	// FIXME: The logging facility probably won't handle this right, especially when infoLog contains many lines.
+	std::clog << "opengl/error: Shader " << name << ": " << infoLog << std::endl;
 }
 
 Shader::Shader(std::string const& name): name(name), program(0) {}
