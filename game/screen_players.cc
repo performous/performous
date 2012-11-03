@@ -9,7 +9,7 @@
 #include "theme.hh"
 #include "video.hh"
 #include "i18n.hh"
-#include "joystick.hh"
+#include "controllers.hh"
 
 #include <iostream>
 #include <sstream>

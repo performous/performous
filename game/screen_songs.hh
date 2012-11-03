@@ -9,7 +9,7 @@
 #include "textinput.hh"
 #include "theme.hh"
 #include "video.hh"
-#include "joystick.hh"
+#include "controllers.hh"
 
 class Song;
 class Audio;

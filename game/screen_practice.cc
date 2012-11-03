@@ -3,7 +3,7 @@
 #include "audio.hh"
 #include "util.hh"
 #include "fs.hh"
-#include "joystick.hh"
+#include "controllers.hh"
 #include "theme.hh"
 #include "progressbar.hh"
 

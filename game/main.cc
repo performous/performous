@@ -1,7 +1,7 @@
 #include "config.hh"
 #include "fs.hh"
 #include "screen.hh"
-#include "joystick.hh"
+#include "controllers.hh"
 #include "profiler.hh"
 #include "songs.hh"
 #include "backgrounds.hh"
