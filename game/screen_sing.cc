@@ -318,8 +318,12 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			else if (status == Song::INSTRUMENTAL_BREAK) {
 				if (time < 0) m_audio.seek(0.0);
 				else {
-					// FIXME: Should check for all layout singers
-					double diff = m_layout_singer[0].lyrics_begin() - 3.0 - time;
+					// TODO: Instead of calculating here, calculate instrumental breaks right after song loading and store in Song data structures
+					double diff = getNaN();
+					for (size_t i = 0; i < m_layout_singer.size(); ++i) {
+						double d = m_layout_singer[i].lyrics_begin() - 3.0 - time;
+						if (!(d > diff)) diff = d;  // Store smallest d in diff (notice NaN handling)
+					}
 					if (diff > 0.0) m_audio.seek(diff);
 				}
 			}
