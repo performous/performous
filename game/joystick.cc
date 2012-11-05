@@ -60,7 +60,7 @@ input::MidiDrums::MidiDrums(): stream(pm::findDevice(true, config["game/midi_inp
 	readConfig(map, getConfigDir() / "mididrums.xml");
 
 	while (detail::devices.find(devnum) != detail::devices.end()) ++devnum;
-	detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(devnum, detail::InputDevPrivate(g_instruments.find("DRUMS_GUITARHERO")->second)));
+	detail::devices.insert(std::make_pair(devnum, detail::InputDevPrivate(g_instruments.find("DRUMS_GUITARHERO")->second)));
 	event.type = Event::PRESS;
 	for (unsigned int i = 0; i < BUTTONS; ++i) event.pressed[i] = false;
 }
@@ -320,7 +320,7 @@ void readControllers(input::Instruments &instruments, fs::path const& file) {
 			input::Instrument instrument(name, devType, mapping);
 			instrument.match = regexp;
 			instrument.description = description;
-			instruments.insert(std::make_pair<std::string, input::Instrument>(name, instrument));
+			instruments.insert(std::make_pair(name, instrument));
 		}
 	} catch (XMLError& e) {
 		int line = e.elem.get_line();
@@ -395,14 +395,14 @@ void input::SDL::init() {
 		std::cout << ", Hats: " << SDL_JoystickNumHats(joy) << std::endl;
 		if( forced_type.find(i) != forced_type.end() ) {
 			std::cout << "  Detected as: " << forced_type.find(i)->second.description << " (forced)" << std::endl;
-			input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(i, input::detail::InputDevPrivate(forced_type.find(i)->second)));
+			input::detail::devices.insert(std::make_pair(i, input::detail::InputDevPrivate(forced_type.find(i)->second)));
 		} else {
 			bool found = false;
 			for(input::Instruments::const_iterator it = g_instruments.begin() ; it != g_instruments.end() ; ++it) {
 				boost::regex sdl_name(it->second.match);
 				if (regex_search(name.c_str(), sdl_name)) {
 					std::cout << "  Detected as: " << it->second.description << std::endl;
-					input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(i, input::detail::InputDevPrivate(it->second)));
+					input::detail::devices.insert(std::make_pair(i, input::detail::InputDevPrivate(it->second)));
 					found = true;
 					break;
 				}
@@ -422,13 +422,13 @@ void input::SDL::init() {
 	std::clog << "controllers/info: Keyboard as dance pad controller: " << (config["game/keyboard_dancepad"].b() ? "enabled":"disabled") << std::endl;
 	std::clog << "controllers/info: Keyboard as keyboard controller: " << (config["game/keyboard_keyboard"].b() ? "enabled":"disabled") << std::endl;
 	input::SDL::sdl_devices[input::detail::KEYBOARD_ID] = NULL;
-	input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(input::detail::KEYBOARD_ID, input::detail::InputDevPrivate(g_instruments.find("GUITAR_GUITARHERO")->second)));
+	input::detail::devices.insert(std::make_pair(input::detail::KEYBOARD_ID, input::detail::InputDevPrivate(g_instruments.find("GUITAR_GUITARHERO")->second)));
 	input::SDL::sdl_devices[input::detail::KEYBOARD_ID2] = NULL;
-	input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(input::detail::KEYBOARD_ID2, input::detail::InputDevPrivate(g_instruments.find("DRUMS_GUITARHERO")->second)));
+	input::detail::devices.insert(std::make_pair(input::detail::KEYBOARD_ID2, input::detail::InputDevPrivate(g_instruments.find("DRUMS_GUITARHERO")->second)));
 	input::SDL::sdl_devices[input::detail::KEYBOARD_ID3] = NULL;
-	input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(input::detail::KEYBOARD_ID3, input::detail::InputDevPrivate(g_instruments.find("DANCEPAD_GENERIC")->second)));
+	input::detail::devices.insert(std::make_pair(input::detail::KEYBOARD_ID3, input::detail::InputDevPrivate(g_instruments.find("DANCEPAD_GENERIC")->second)));
 	input::SDL::sdl_devices[input::detail::KEYBOARD_ID4] = NULL;
-	input::detail::devices.insert(std::make_pair<unsigned int, input::detail::InputDevPrivate>(input::detail::KEYBOARD_ID4, input::detail::InputDevPrivate(g_instruments.find("KEYBOARD_GENERIC")->second)));
+	input::detail::devices.insert(std::make_pair(input::detail::KEYBOARD_ID4, input::detail::InputDevPrivate(g_instruments.find("KEYBOARD_GENERIC")->second)));
 }
 
 bool input::SDL::pushEvent(SDL_Event _e) {
