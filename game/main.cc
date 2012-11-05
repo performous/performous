@@ -1,7 +1,7 @@
 #include "config.hh"
 #include "fs.hh"
 #include "screen.hh"
-#include "joystick.hh"
+#include "controllers.hh"
 #include "profiler.hh"
 #include "songs.hh"
 #include "backgrounds.hh"
@@ -104,7 +104,8 @@ static void checkEvents_SDL(ScreenManager& sm) {
 		if (sm.isDialogOpen() && input::getNav(event) != input::NONE) { sm.closeDialog(); continue; }
 		// Forward to screen even if the input system takes it (ignoring pushEvent return value)
 		// This is needed to allow navigation (quiting the song) to function even then
-		input::SDL::pushEvent(event);
+		boost::xtime eventTime = now();
+		input::SDL::pushEvent(event, eventTime);
 		sm.getCurrentScreen()->manageEvent(event);
 	}
 	if (config["graphic/fullscreen"].b() != sm.window().getFullscreen()) {
