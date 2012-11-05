@@ -308,7 +308,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			else if (nav == input::UP) { m_menu.move(-1); return; }
 		}
 		// Start button has special functions for skipping things (only in singing for now)
-		if (nav == input::START && m_only_singers_alive && !m_song->getVocalTrack(m_selectedTrack).notes.empty() && !m_audio.isPaused()) {
+		if (nav == input::START && m_only_singers_alive && !m_layout_singer.empty() && !m_audio.isPaused()) {
 			// Open score dialog early
 			if (status == Song::FINISHED) {
 				m_engine->kill(); // Kill the engine thread
@@ -486,7 +486,7 @@ void ScreenSing::draw() {
 			statustxt = (boost::format("%02u:%02u - %s") % (t / 60) % (t % 60) % section.name).str();
 		} else  statustxt = (boost::format("%02u:%02u") % (t / 60) % (t % 60)).str();
 
-		if (!m_score_window.get() && m_only_singers_alive && !m_song->getVocalTrack(m_selectedTrack).notes.empty()) {
+		if (!m_score_window.get() && m_only_singers_alive && !m_layout_singer.empty()) {
 			if (status == Song::INSTRUMENTAL_BREAK) statustxt += _("   ENTER to skip instrumental break");
 			if (status == Song::FINISHED && !config["game/karaoke_mode"].b()) statustxt += _("   Remember to wait for grading!");
 		}
