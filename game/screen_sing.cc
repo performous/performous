@@ -97,10 +97,10 @@ void ScreenSing::enter() {
 	{	// Vocal tracks
 		ConfigItem::OptionList opts;
 		std::vector<std::string> voctracks = m_song->getVocalTrackNames();
-		int cur = 0;
+		//int cur = 0;
 		// Add vocal tracks to option list
 		for (std::vector<std::string>::const_iterator it = voctracks.begin(); it != voctracks.end(); ++it) {
-			if (m_selectedTrack == *it) cur = opts.size(); // Find the index of current track
+			//if (m_selectedTrack == *it) cur = opts.size(); // Find the index of current track
 			opts.push_back(*it);
 		}
 		m_vocalTrackOpts = ConfigItem(opts); // Create a ConfigItem from the option list
@@ -127,7 +127,6 @@ void ScreenSing::enter() {
 }
 
 void ScreenSing::reloadGL() {
-	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	// Load UI graphics
 	theme.reset(new ThemeSing());
 	m_menuTheme.reset(new ThemeInstrumentMenu());
