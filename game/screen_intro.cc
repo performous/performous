@@ -4,7 +4,7 @@
 #include "glmath.hh"
 #include "audio.hh"
 #include "i18n.hh"
-#include "joystick.hh"
+#include "controllers.hh"
 #include "theme.hh"
 #include "menu.hh"
 #include "xtime.hh"

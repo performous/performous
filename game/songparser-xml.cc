@@ -184,9 +184,9 @@ void SongParser::xmlParse() {
 				std::string artist = name;
 				if(trackNode.get_attribute("Artist")) artist = trackNode.get_attribute("Artist")->get_value();
 				if(name == "Player1") {
-					singerList.insert(std::make_pair<std::string, std::string>("Solo 1", artist));
+					singerList.insert(std::make_pair("Solo 1", artist));
 				} else if(name == "Player2") {
-					singerList.insert(std::make_pair<std::string, std::string>("Solo 2", artist));
+					singerList.insert(std::make_pair("Solo 2", artist));
 				} else {
 					std::cout << "Unknown track name: " << name << std::endl;
 				}
@@ -209,7 +209,7 @@ void SongParser::xmlParse() {
 					singers += " & " + it->second;
 				}
 			}
-			sentencesList.insert(std::make_pair<std::string, xmlpp::NodeSet>(singers, sentences));
+			sentencesList.insert(std::make_pair(singers, sentences));
 		} else {
 			xmlpp::NodeSet tracks;
 			if (!dom.find("/ss:MELODY/ss:TRACK", tracks)) throw std::runtime_error("Unable to find any sentences in melody XML");
@@ -217,7 +217,7 @@ void SongParser::xmlParse() {
 				xmlpp::Element& trackNode = dynamic_cast<xmlpp::Element&>(**it);
 				std::string singer = trackNode.get_attribute("Artist")->get_value();
 				dom.find(trackNode, "ss:SENTENCE", sentences);
-				sentencesList.insert(std::make_pair<std::string, xmlpp::NodeSet>(singer, sentences));
+				sentencesList.insert(std::make_pair(singer, sentences));
 			}
 		}
 	}
@@ -228,18 +228,18 @@ void SongParser::xmlParse() {
 		// Add group track
 		std::string trackSinger = sentencesList.begin()->first;
 		VocalTrack vocalBoth(trackSinger);
-		vocalTracks.insert(std::make_pair<std::string, VocalTrack>(trackSinger, vocalBoth));
+		vocalTracks.insert(std::make_pair(trackSinger, vocalBoth));
 		// add each singer track
 		for(std::map<std::string, std::string>::const_iterator it = singerList.begin() ; it != singerList.end() ; ++it) {
 			trackSinger = it->second;
 			VocalTrack vocal(trackSinger);
-			vocalTracks.insert(std::make_pair<std::string, VocalTrack>(trackSinger, vocal));
+			vocalTracks.insert(std::make_pair(trackSinger, vocal));
 		}
 	} else {
 		for(std::map<std::string, xmlpp::NodeSet>::const_iterator it = sentencesList.begin() ; it != sentencesList.end() ; ++it) {
 			std::string trackSinger = it->first;
 			VocalTrack vocal(trackSinger);
-			vocalTracks.insert(std::make_pair<std::string, VocalTrack>(trackSinger, vocal));
+			vocalTracks.insert(std::make_pair(trackSinger, vocal));
 		}
 	}
 

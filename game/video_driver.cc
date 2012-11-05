@@ -6,7 +6,7 @@
 #include "glmath.hh"
 #include "image.hh"
 #include "util.hh"
-#include "joystick.hh"
+#include "controllers.hh"
 #include "screen.hh"
 #include <boost/date_time.hpp>
 #include <fstream>
