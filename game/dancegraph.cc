@@ -257,7 +257,7 @@ void DanceGraph::engine() {
 		if (time < it->first + it->second) {  // Inside stop
 			time = it->first;
 			if (!m_insideStop) {
-				m_popups.push_back(Popup(_("STOP!"),  Color(1.0f, 0.8f, 0.0), 2.0, m_popupText.get()));
+				m_popups.push_back(Popup(_("STOP!"),  Color(1.0, 0.8, 0.0), 2.0, m_popupText.get()));
 				m_insideStop = true;
 			}
 			outsideStop = false;
@@ -333,7 +333,7 @@ void DanceGraph::engine() {
 	if (m_streak >= getNextBigStreak(m_bigStreak)) {
 		m_bigStreak = getNextBigStreak(m_bigStreak);
 		m_popups.push_back(Popup(boost::lexical_cast<std::string>(unsigned(m_bigStreak)) + "\n" + _("Streak!"),
-		  Color(1.0f, 0.0, 0.0), 1.0, m_popupText.get()));
+		  Color(1.0, 0.0, 0.0), 1.0, m_popupText.get()));
 	}
 }
 
@@ -536,7 +536,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 		if (!text.empty()) {
 			double sc = getScale() * 0.6 * arrowSize * (3.0 + glow);
 			Transform trans(glmath::translate(glmath::vec3(0.0, 0.0, 0.5 * glow))); // Slightly elevated
-			ColorTrans c(Color(1.0, 1.0, 1.0, std::sqrt(alpha)));
+			ColorTrans c(Color::alpha(std::sqrt(alpha)));
 			m_popupText->render(text);
 			m_popupText->dimensions().middle(x).center(time2y(0.0)).stretch(sc, sc/2.0);
 			m_popupText->draw();

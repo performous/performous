@@ -280,7 +280,7 @@ void ScreenSongs::drawCovers() {
 		s.draw();
 		// Draw the reflection
 		Transform transMirror(scale(vec3(1.0f, -1.0f, 1.0f)));
-		ColorTrans c2(Color(0.4f, 0.4f, 0.4f, 0.4f));
+		ColorTrans c2(Color::alpha(0.4));
 		s.draw();
 	}
 }

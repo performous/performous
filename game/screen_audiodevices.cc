@@ -106,7 +106,7 @@ void ScreenAudioDevices::draw() {
 			else if (m_mics[m_selected_column].name != "OUT" && !m_devs[i].in) alpha = 0.5f;
 			m_theme->device_bg.dimensions.center(y);
 			m_theme->device_bg.draw();
-			ColorTrans c(Color(1.0, 1.0, 1.0, alpha));
+			ColorTrans c(Color::alpha(alpha));
 			m_theme->device.dimensions.middle(-xstep*0.5).center(y);
 			m_theme->device.draw(i < m_devs.size() ? m_devs[i].desc() : _("- Unassigned -"));
 		}

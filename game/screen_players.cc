@@ -149,7 +149,7 @@ void ScreenPlayers::draw() {
 			// Draw the reflection
 			s.dimensions.top(y + 0.2 * diff); s.tex = TexCoords(0, 1, 1, 0);
 			{
-				ColorTrans c(Color(1.0, 1.0, 1.0, 0.4));
+				ColorTrans c(Color::alpha(0.4));
 				s.draw();
 			}
 			s.tex = TexCoords();

@@ -30,18 +30,9 @@ void Video::prepare(double time) {
 void Video::render(double time) {
 	double tdist = std::abs(m_surfaceTime - time);
 	m_alpha.setTarget(tdist < 0.4 ? 1.2f : -0.5f);
-	float alpha = clamp(m_alpha.get());
-	if (alpha > 0.0f) {
-		Color color;
-		if (alpha < 1.0f) {
-			color = Color(alpha, alpha, alpha, alpha);
-		} else {
-			color = Color(1.0f, 1.0f, 1.0f);
-		}
-		{
-			ColorTrans c(color);
-			m_surface.draw();
-		}
-	}
+	double alpha = clamp(m_alpha.get());
+	if (alpha == 0.0) return;
+	ColorTrans c(Color::alpha(alpha));
+	m_surface.draw();
 }
 

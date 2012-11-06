@@ -350,7 +350,7 @@ void Window::screenshot() {
 
 ColorTrans::ColorTrans(Color const& c): m_old(g_color) {
 	using namespace glmath;
-	g_color = g_color * mat4::diagonal(vec4(c.r, c.g, c.b, c.a));
+	g_color = g_color * mat4::diagonal(c.linear());
 	ScreenManager::getSingletonPtr()->window().updateColor();
 }
 

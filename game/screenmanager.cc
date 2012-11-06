@@ -66,11 +66,11 @@ void ScreenManager::drawLoading() {
 	drawLogo();
 	drawNotifications();
 	const int maxi = 20;
-	const float x = 0.3;
-	const float spacing = 0.01;
-	const float sq_size = (2*x - (maxi-1)*spacing) / maxi;
+	const double x = 0.3;
+	const double spacing = 0.01;
+	const double sq_size = (2*x - (maxi-1)*spacing) / maxi;
 	for (int i = 0; i <= m_loadingProgress * maxi; ++i) {
-		ColorTrans c(Color(0.2f, 0.7f, 0.7f, (m_loadingProgress + 1)*0.5f));
+		ColorTrans c(Color(0.2, 0.7, 0.7, (m_loadingProgress + 1.0)*0.5));
 		UseShader shader(getShader("color"));
 		glutil::Square(-x + i * (sq_size + spacing), 0, sq_size/2, true);
 	}
@@ -123,7 +123,7 @@ void ScreenManager::drawNotifications() {
 			if (time >= m_messagePopup.getTarget()) m_messagePopup.setTarget(0.0, true); // Reset if fade out finished
 		}
 
-		ColorTrans c(Color(1.0, 1.0, 1.0, fadeValue));
+		ColorTrans c(Color::alpha(fadeValue));
 		m_textMessage.draw(m_message); // Draw the message
 	}
 	// Dialog

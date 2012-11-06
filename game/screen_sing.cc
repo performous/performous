@@ -196,7 +196,7 @@ bool ScreenSing::instrumentLayout(double time) {
 		}
 	}
 	if (time < -1.0 && count_alive == 0) {
-		ColorTrans c(Color(1.0f, 1.0f, 1.0f, clamp(-2.0 - 2.0 * time)));
+		ColorTrans c(Color::alpha(clamp(-2.0 - 2.0 * time)));
 		m_help->draw();
 	}
 	// Set volume levels (averages of all instruments playing that track)
@@ -244,7 +244,7 @@ void ScreenSing::danceLayout(double time) {
 		}
 	}
 	if (time < -0.5 && count_alive == 0) {
-		ColorTrans c(Color(1.0f, 1.0f, 1.0f, clamp(-1.0 - 2.0 * time)));
+		ColorTrans c(Color::alpha(clamp(-1.0 - 2.0 * time)));
 		m_help->draw();
 	}
 }
@@ -598,9 +598,9 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database, Dancers& 
 		item.track_simple = it->getTrack();
 		item.track = it->getModeId();
 		item.track[0] = toupper(item.track[0]); // Capitalize
-		if (item.track_simple == TrackName::DRUMS) item.color = Color(0.1f, 0.1f, 0.1f);
-		else if (item.track_simple == TrackName::BASS) item.color = Color(0.5f, 0.3f, 0.1f);
-		else item.color = Color(1.0f, 0.0f, 0.0f);
+		if (item.track_simple == TrackName::DRUMS) item.color = Color(0.1, 0.1, 0.1);
+		else if (item.track_simple == TrackName::BASS) item.color = Color(0.5, 0.3, 0.1);
+		else item.color = Color(1.0, 0.0, 0.0);
 
 		m_database.scores.push_back(item);
 		++it;
@@ -613,7 +613,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database, Dancers& 
 		item.track_simple = it->getTrack();
 		item.track = it->getModeId();
 		item.track[0] = toupper(item.track[0]); // Capitalize
-		item.color = Color(1.0f, 0.4f, 0.1f);
+		item.color = Color(1.0, 0.4, 0.1);
 
 		m_database.scores.push_back(item);
 		++it;

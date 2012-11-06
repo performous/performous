@@ -424,7 +424,7 @@ void GuitarGraph::engine() {
 		// Solo just ended?
 		} else if (m_soloTotal > 0) {
 			m_popups.push_back(Popup(boost::lexical_cast<std::string>(unsigned(m_soloScore / m_soloTotal * 100)) + " %",
-			  Color(0.0f, 0.8f, 0.0f), 1.0, m_popupText.get()));
+			  Color(0.0, 0.8, 0.0), 1.0, m_popupText.get()));
 			m_soloScore = 0;
 			m_soloTotal = 0;
 		}
@@ -480,7 +480,7 @@ void GuitarGraph::engine() {
 		m_bigStreak = getNextBigStreak(m_bigStreak);
 		m_starmeter += streakStarBonus;
 		m_popups.push_back(Popup(boost::lexical_cast<std::string>(unsigned(m_bigStreak)) + "\n" + _("Streak!"),
-		  Color(1.0f, 0.0f, 0.0f), 1.0, m_popupText.get()));
+		  Color(1.0, 0.0, 0.0), 1.0, m_popupText.get()));
 	}
 	// During GodMode, correctness is full, no matter what
 	if (m_starpower.get() > 0.01) m_correctness.setTarget(1.0, true);
@@ -497,7 +497,7 @@ void GuitarGraph::activateStarpower() {
 		m_starmeter = 0;
 		m_starpower.setValue(1.0);
 		m_popups.push_back(Popup(_("God Mode\nActivated!"),
-		  Color(0.3f, 0.0f, 1.0f), 0.666, m_popupText.get(), _("Mistakes ignored!"), &m_text));
+		  Color(0.3, 0.0, 1.0), 0.666, m_popupText.get(), _("Mistakes ignored!"), &m_text));
 	}
 }
 
@@ -908,8 +908,7 @@ void GuitarGraph::drawNeckStuff(double time) {
 				texCoord -= texCoordStep * (tEnd - future) / (tEnd - tBeg);
 				tEnd = future;
 			}
-			Color ctmp(colorize(Color(1.0f, 1.0f, 1.0f, time2a(tEnd)), time + tBeg));
-			glmath::vec4 c(ctmp.r, ctmp.g, ctmp.b, ctmp.a);
+			glmath::vec4 c = colorize(Color::alpha(time2a(tEnd)), time + tBeg).linear();
 			va.Normal(0.0f, 1.0f, 0.0f).Color(c).TexCoord(0.0f, texCoord).Vertex(-w, time2y(tEnd));
 			va.Normal(0.0f, 1.0f, 0.0f).Color(c).TexCoord(1.0f, texCoord).Vertex(w, time2y(tEnd));
 		}
@@ -1138,14 +1137,14 @@ void GuitarGraph::drawInfo(double time) {
 		double h = 0.15 * w;
 		// Draw scores
 		{
-			ColorTrans c(Color(0.1f, 0.3f, 1.0f, 0.90f));
+			ColorTrans c(Color(0.1, 0.3, 1.0, 0.9));
 			m_scoreText->render((boost::format("%04d") % getScore()).str());
 			m_scoreText->dimensions().middle(-xcor).fixedHeight(h).screenBottom(-0.22);
 			m_scoreText->draw();
 		}
 		// Draw streak counter
 		{
-			ColorTrans c(Color(0.6f, 0.6f, 0.7f, 0.95f));
+			ColorTrans c(Color(0.6, 0.6, 0.7, 0.95));
 			m_streakText->render(boost::lexical_cast<std::string>(unsigned(m_streak)) + "/"
 			  + boost::lexical_cast<std::string>(unsigned(m_longestStreak)));
 			m_streakText->dimensions().middle(-xcor).fixedHeight(h*0.75).screenBottom(-0.18);
@@ -1154,7 +1153,7 @@ void GuitarGraph::drawInfo(double time) {
 	}
 	// Status text at the bottom
 	{
-		ColorTrans c(Color(1.0, 1.0, 1.0, std::abs(std::fmod(time, 1.0) - 0.5f) * 2.0f));
+		ColorTrans c(Color::alpha(std::abs(std::fmod(time, 1.0) - 0.5f) * 2.0f));
 		if (canActivateStarpower()) {
 			m_text.dimensions.screenBottom(-0.02).middle(-0.12);
 			if (m_drums && m_dfIt != m_drumfills.end() && time >= m_dfIt->begin && time <= m_dfIt->end) m_text.draw(_("Drum Fill!"));
