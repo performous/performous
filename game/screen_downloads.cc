@@ -3,7 +3,7 @@
 #include "audio.hh"
 #include "configuration.hh"
 #include "downloader.hh"
-#include "joystick.hh"
+#include "controllers.hh"
 #include "theme.hh"
 #include "i18n.hh"
 #include <boost/assign.hpp>
