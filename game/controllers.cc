@@ -462,7 +462,8 @@ bool keybutton(input::Event event, SDL_Event const& _e, bool state) {
 
 	switch(_e.key.keysym.sym) {
 		// Guitar picking on keyboard
-		case SDLK_RSHIFT: case SDLK_RETURN: case SDLK_KP_ENTER:
+		case SDLK_RSHIFT: button++; // Button number allows using secondary pick for menu navigation
+		case SDLK_RETURN: case SDLK_KP_ENTER:
 			if (!guitar) return false;
 			if (!state) return true;
 			event.type = input::Event::PICK;
