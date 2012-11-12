@@ -78,9 +78,9 @@ class Song: boost::noncopyable {
 			else return dummyVocal;
 		}
 	}
-	std::vector<std::string> getVocalTrackNames() {
+	std::vector<std::string> getVocalTrackNames() const {
 		std::vector<std::string> result;
-		BOOST_FOREACH(VocalTracks::value_type &it, vocalTracks) {
+		BOOST_FOREACH(VocalTracks::value_type const &it, vocalTracks) {
 			result.push_back(it.first);
 		}
 		return result;
