@@ -117,8 +117,9 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 			if (key == SDLK_F5) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 8); // Vocals
 			if (key == SDLK_F6) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 4); // Guitars
 			if (key == SDLK_F7) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 2); // Drums
-			if (key == SDLK_F8) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 16); // Keyboard
-			if (key == SDLK_F9) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 1); // Dance
+			// TODO: Re-enable when other keyboard features are enabled
+			//if (key == SDLK_F8) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 16); // Keyboard
+			if (key == SDLK_F8) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 1); // Dance
 			// The rest are only available when there are songs available
 			else if (m_songs.empty()) return;
 			else if (!m_jukebox && key == SDLK_F4) m_jukebox = true;
