@@ -8,7 +8,10 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
 	message(FATAL_ERROR "In-source builds are not permitted. Make a separate folder for building:\nmkdir build; cd build; cmake ..\nBefore that, remove the files already created:\nrm -rf CMakeCache.txt CMakeFiles")
 endif(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
 
-include(cmake/performous-packaging.cmake)
+# Packaging support (CPack) is disabled since Performous 0.7 release.
+# If you are still using this, uncomment the following line (and update the file).
+# Let us know if you still need it because otherwise we'll remove it entirely.
+#include(cmake/performous-packaging.cmake)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
