@@ -23,7 +23,7 @@ public:
 	void enter();
 	void exit();
 	void reloadGL();
-	void manageSharedKey(input::NavButton nav); ///< same behaviour for jukebox and normal mode
+	void menuBrowse(int dir); ///< Left/Right on menu options
 	void manageEvent(SDL_Event event);
 	void prepare();
 	void draw();
@@ -51,7 +51,6 @@ protected:
 	boost::scoped_ptr<Surface> m_danceCover;
 	boost::scoped_ptr<Texture> m_instrumentList;
 	Cachemap<std::string, Surface> m_covers;
+	int m_menuPos, m_infoPos;
 	bool m_jukebox;
-	bool show_hiscores;
-	int hiscore_start_pos;
 };

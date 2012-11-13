@@ -14,7 +14,7 @@
 static const double IDLE_TIMEOUT = 45.0; // seconds
 
 ScreenSongs::ScreenSongs(std::string const& name, Audio& audio, Songs& songs, Database& database):
-  Screen(name), m_audio(audio), m_songs(songs), m_database(database), m_covers(20), m_jukebox(), show_hiscores(), hiscore_start_pos()
+  Screen(name), m_audio(audio), m_songs(songs), m_database(database), m_covers(20)
 {
 	m_songs.setAnimMargins(5.0, 5.0);
 	m_idleTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
@@ -23,9 +23,9 @@ ScreenSongs::ScreenSongs(std::string const& name, Audio& audio, Songs& songs, Da
 void ScreenSongs::enter() {
 	m_songs.setFilter(m_search.text);
 	m_audio.fadeout();
+	m_menuPos = 0;
+	m_infoPos = 0;
 	m_jukebox = false;
-	show_hiscores = false;
-	hiscore_start_pos = 0;
 	reloadGL();
 }
 
@@ -55,45 +55,28 @@ void ScreenSongs::exit() {
 	m_playing.clear();
 }
 
-/**Add actions here which should effect both the
-  jukebox and the normal screen*/
-void ScreenSongs::manageSharedKey(input::NavButton nav) {
-	if (nav == input::PAUSE) m_audio.togglePause();
-	else if (nav == input::START) {
-		ScreenManager* sm = ScreenManager::getSingletonPtr();
-		Screen* s = sm->getScreen("Sing");
-		ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
-		assert(ss);
-		ss->setSong(m_songs.currentPtr());
-		sm->activateScreen("Sing");
+/// Implement left/right on menu
+void ScreenSongs::menuBrowse(int dir) {
+	switch (m_menuPos) {
+		case 0: m_songs.advance(dir); break;
+		case 1: m_songs.sortChange(dir); break;
+		case 2: m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 8 /* FIXME */); break;
+		case 3: m_infoPos = (m_infoPos + dir + 5) % 5; break;
 	}
-	else if (nav == input::LEFT) { m_songs.advance(-1); hiscore_start_pos = 0; }
-	else if (nav == input::RIGHT) { m_songs.advance(1); hiscore_start_pos = 0; }
 }
 
 void ScreenSongs::manageEvent(SDL_Event event) {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	input::NavButton nav(input::getNav(event));
-	// Handle basic navigational input that is possible also with instruments
-	if (nav != input::NONE) {
+	if (nav != input::NONE) {  // Handle generic navigation (also possible with instruments)
 		m_idleTimer.setValue(0.0);  // Reset idle timer
-		if (m_jukebox) {
-			if (nav == input::CANCEL || m_songs.empty()) m_jukebox = false;
+		if (nav == input::PAUSE) m_audio.togglePause();
+		else if (m_jukebox) {
+			if (nav == input::CANCEL) m_jukebox = false;
 			else if (nav == input::UP) m_audio.seek(5);
 			else if (nav == input::DOWN) m_audio.seek(-5);
 			else if (nav == input::MOREUP) m_audio.seek(-30);
 			else if (nav == input::MOREDOWN) m_audio.seek(30);
-			else manageSharedKey(nav);
-			return;
-		} else if (show_hiscores) {
-			if (nav == input::CANCEL || m_songs.empty()) show_hiscores = false;
-			else if (nav == input::UP) hiscore_start_pos--;
-			else if (nav == input::DOWN) hiscore_start_pos++;
-			// TODO: change hiscore type listed (all, just vocals, guitar easy, guitar medium, guitar hard, guit
-			else if (nav == input::MOREUP) (hiscore_start_pos > 4) ? hiscore_start_pos -= 5 : hiscore_start_pos = 0;
-			else if (nav == input::MOREDOWN) hiscore_start_pos += 5;
-			else manageSharedKey(nav);
-			return;
 		} else if (nav == input::CANCEL) {
 			if (!m_search.text.empty()) { m_search.text.clear(); m_songs.setFilter(m_search.text); }
 			else if (m_songs.getTypeFilter() != 0) m_songs.setTypeFilter(0);
@@ -101,31 +84,39 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 		}
 		// The rest are only available when there are songs available
 		else if (m_songs.empty()) return;
-		else if (nav == input::UP) m_songs.sortChange(-1);
-		else if (nav == input::DOWN) m_songs.sortChange(1);
+		else if (nav == input::START) {
+			if (m_menuPos == 0) {
+				dynamic_cast<ScreenSing&>(*sm->getScreen("Sing")).setSong(m_songs.currentPtr());
+				sm->activateScreen("Sing");
+			}
+			else if (m_menuPos == 3) {
+				m_menuPos = 0;
+				m_jukebox = true;
+			}
+		}
+		else if (nav == input::LEFT) menuBrowse(-1);
+		else if (nav == input::RIGHT) menuBrowse(1);
+		else if (nav == input::UP && m_menuPos < 3) ++m_menuPos;
+		else if (nav == input::DOWN && m_menuPos > 0) --m_menuPos;
 		else if (nav == input::MOREUP) m_songs.advance(-10);
 		else if (nav == input::MOREDOWN) m_songs.advance(10);
-		else manageSharedKey(nav);
-	// Handle less common, keyboard only keys
-	} else if (event.type == SDL_KEYDOWN) {
+	} else if (event.type == SDL_KEYDOWN) {  // Handle keyboard-only navigation
 		SDL_keysym keysym = event.key.keysym;
 		int key = keysym.sym;
 		SDLMod mod = event.key.keysym.mod;
-		if (!show_hiscores) {
+		if (key == SDLK_F4) m_jukebox = !m_jukebox;
+		else if (!m_jukebox) {
 			if (key == SDLK_r && mod & KMOD_CTRL) { m_songs.reload(); m_songs.setFilter(m_search.text); }
-			if (!m_jukebox && m_search.process(keysym)) m_songs.setFilter(m_search.text);
-			if (key == SDLK_F5) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 8); // Vocals
-			if (key == SDLK_F6) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 4); // Guitars
-			if (key == SDLK_F7) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 2); // Drums
+			else if (m_search.process(keysym)) m_songs.setFilter(m_search.text);
+			else if (key == SDLK_F5) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 8); // Vocals
+			else if (key == SDLK_F6) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 4); // Guitars
+			else if (key == SDLK_F7) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 2); // Drums
 			// TODO: Re-enable when other keyboard features are enabled
-			//if (key == SDLK_F8) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 16); // Keyboard
-			if (key == SDLK_F8) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 1); // Dance
-			// The rest are only available when there are songs available
-			else if (m_songs.empty()) return;
-			else if (!m_jukebox && key == SDLK_F4) m_jukebox = true;
-			else if (key == SDLK_END) show_hiscores ? show_hiscores = false : show_hiscores = true;
-		} else if (key == SDLK_END) show_hiscores ? show_hiscores = false : show_hiscores = true;
+			//else if (key == SDLK_F8) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 16); // Keyboard
+			else if (key == SDLK_F8) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 1); // Dance
+		}
 	}
+	if (m_songs.empty()) m_jukebox = false;
 	sm->showLogo(!m_jukebox);
 }
 
@@ -218,7 +209,7 @@ namespace {
 void ScreenSongs::draw() {
 	update();
 	drawMultimedia();
-	std::ostringstream oss_song, oss_order, oss_has_hiscore;
+	std::ostringstream oss_song, oss_order, oss_hiscore;
 	// Test if there are no songs
 	if (m_songs.empty()) {
 		// Format the song information text
@@ -231,29 +222,25 @@ void ScreenSongs::draw() {
 		}
 	} else {
 		Song& song = m_songs.current();
-		if(!show_hiscores) {
-			// Format the song information text
-			oss_song << song.title << '\n' << song.artist;
-			if(m_database.hasHiscore(song)) oss_has_hiscore << _("(press END to view hiscores)");
-			oss_order << (m_search.text.empty() ? _("<type in to search>") : m_search.text) << '\n';
-			oss_order << m_songs.sortDesc() << '\n';
-			oss_order << "(" << m_songs.currentId() + 1 << "/" << m_songs.size() << ")";
-		} else {
-			// Format the song information text
-			oss_song << boost::format(_("Hisccore for %1%\n")) % song.title;
-			// Get hiscores from database
-			m_database.queryPerSongHiscore_HiscoreDisplay(oss_order, m_songs.currentPtr(), hiscore_start_pos, 5);
-		}
+		// Format the song information text
+		oss_song << song.title << '\n' << song.artist;
+		oss_order << (m_search.text.empty() ? _("<type in to search>") : m_search.text) << '\n';
+		oss_order << m_songs.sortDesc() << '\n';
+		oss_order << "(" << m_songs.currentId() + 1 << "/" << m_songs.size() << ")";
+		// Format the song information text
+		oss_hiscore << boost::format(_("Hisccore for %1%\n")) % song.title;
+		// Get hiscores from database
+		m_database.queryPerSongHiscore_HiscoreDisplay(oss_hiscore, m_songs.currentPtr(), m_infoPos, 5);
 	}
 	if (m_jukebox) drawJukebox();
 	else {
 		// Draw song and order texts
 		theme->song.draw(oss_song.str());
-		if (!show_hiscores) {
-			theme->order.draw(oss_order.str());
-			theme->has_hiscore.draw(oss_has_hiscore.str());
-		} else theme->hiscores.draw(oss_order.str());
-		if (!show_hiscores) drawInstruments(Dimensions(m_instrumentList->ar()).fixedHeight(0.03).center(-0.04));
+		theme->order.draw(oss_order.str());
+		drawInstruments(Dimensions(m_instrumentList->ar()).fixedHeight(0.03).center(-0.04));
+		using namespace glmath;
+		Transform trans(translate(vec3(0.25, 0.0, 0.0)) * scale(vec3(0.2, 1.0, 1.0)));
+		theme->hiscores.draw(oss_hiscore.str());
 	}
 }
 
