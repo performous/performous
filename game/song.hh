@@ -93,6 +93,7 @@ class Song: boost::noncopyable {
 	bool hasKeyboard() const { return instrumentTracks.find(TrackName::KEYBOARD) != instrumentTracks.end(); }
 	bool hasGuitars() const { return instrumentTracks.size() - hasDrums() - hasKeyboard(); }
 	bool hasVocals() const { return !vocalTracks.empty(); }
+	bool hasDuet() const { return vocalTracks.size() > 1; }
 	std::string path; ///< path of songfile
 	std::string filename; ///< name of songfile
 	std::string midifilename; ///< name of midi file in FoF format

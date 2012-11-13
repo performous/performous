@@ -17,7 +17,7 @@
 #include <stdexcept>
 #include <cstdlib>
 
-Songs::Songs(Database & database, std::string const& songlist): m_songlist(songlist), math_cover(), m_typeFilter(), m_database(database), m_order(), m_dirty(false), m_loading(false) {
+Songs::Songs(Database & database, std::string const& songlist): m_songlist(songlist), math_cover(), m_database(database), m_type(), m_order(), m_dirty(false), m_loading(false) {
 	m_updateTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
 	reload();
 }
@@ -133,12 +133,6 @@ void Songs::setFilter(std::string const& val) {
 	filter_internal();
 }
 
-void Songs::setTypeFilter(unsigned char filter) {
-	if (m_typeFilter == filter) return;
-	m_typeFilter = filter;
-	filter_internal();
-}
-
 void Songs::filter_internal() {
 	m_updateTimer.setValue(0.0);
 	boost::mutex::scoped_lock l(m_mutex);
@@ -153,11 +147,12 @@ void Songs::filter_internal() {
 		SongVector filtered;
 		for (SongVector::const_iterator it = m_songs.begin(); it != m_songs.end(); ++it) {
 			Song& s = **it;
-			if ((m_typeFilter & 1) && !s.hasDance()) continue;
-			if ((m_typeFilter & 2) && !s.hasDrums()) continue;
-			if ((m_typeFilter & 4) && !s.hasGuitars()) continue;
-			if ((m_typeFilter & 8) && !s.hasVocals()) continue;
-			if ((m_typeFilter & 16) && !s.hasKeyboard()) continue;
+			// All, Dance, Vocals, Duet, Guitar, Band
+			if (m_type == 1 && !s.hasDance()) continue;
+			if (m_type == 2 && !s.hasVocals()) continue;
+			if (m_type == 3 && !s.hasDuet()) continue;
+			if (m_type == 4 && !s.hasGuitars()) continue;
+			if (m_type == 5 && !s.hasDrums() && !s.hasKeyboard()) continue;
 			if (regex_search(s.strFull(), boost::regex(m_filter, boost::regex_constants::icase))) filtered.push_back(*it);
 		}
 		m_filtered.swap(filtered);
@@ -197,12 +192,33 @@ namespace {
 		return path.substr(pos, path.size() - pos - 1);
 	}
 
-	static const int orders = 7;
+	static const int types = 6, orders = 7;
 
 }
 
+std::string Songs::typeDesc() const {
+	switch (m_type) {
+	  case 0: return _("show all songs");
+	  case 1: return _("only dance");
+	  case 2: return _("has vocals");
+	  case 3: return _("has duet");
+	  case 4: return _("has guitar");
+	  case 5: return _("drums or keytar");
+	}
+	throw std::logic_error("Internal error: unknown type filter in Songs::typeDesc");
+}
+
+void Songs::typeChange(int diff) {
+	if (diff == 0) m_type = 0;
+	else {
+		m_type = (m_type + diff) % types;
+		if (m_type < 0) m_type += types;
+	}
+	filter_internal();
+}
+
 std::string Songs::sortDesc() const {
-	std::string str = "";
+	std::string str;
 	switch (m_order) {
 	  case 0: str = _("random order"); break;
 	  case 1: str = _("sorted by song"); break;

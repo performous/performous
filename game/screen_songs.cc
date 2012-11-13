@@ -60,7 +60,7 @@ void ScreenSongs::menuBrowse(int dir) {
 	switch (m_menuPos) {
 		case 0: m_songs.advance(dir); break;
 		case 1: m_songs.sortChange(dir); break;
-		case 2: m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 8 /* FIXME */); break;
+		case 2: m_songs.typeChange(dir); break;
 		case 3: m_infoPos = (m_infoPos + dir + 5) % 5; break;
 	}
 }
@@ -78,8 +78,9 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 			else if (nav == input::MOREUP) m_audio.seek(-30);
 			else if (nav == input::MOREDOWN) m_audio.seek(30);
 		} else if (nav == input::CANCEL) {
-			if (!m_search.text.empty()) { m_search.text.clear(); m_songs.setFilter(m_search.text); }
-			else if (m_songs.getTypeFilter() != 0) m_songs.setTypeFilter(0);
+			if (m_menuPos) m_menuPos = 0;  // Exit menu (back to song selection)
+			else if (!m_search.text.empty()) { m_search.text.clear(); m_songs.setFilter(m_search.text); }  // Clear search
+			else if (m_songs.typeNum()) m_songs.typeChange(0);  // Clear type filter
 			else sm->activateScreen("Intro");
 		}
 		// The rest are only available when there are songs available
@@ -108,12 +109,6 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 		else if (!m_jukebox) {
 			if (key == SDLK_r && mod & KMOD_CTRL) { m_songs.reload(); m_songs.setFilter(m_search.text); }
 			else if (m_search.process(keysym)) m_songs.setFilter(m_search.text);
-			else if (key == SDLK_F5) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 8); // Vocals
-			else if (key == SDLK_F6) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 4); // Guitars
-			else if (key == SDLK_F7) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 2); // Drums
-			// TODO: Re-enable when other keyboard features are enabled
-			//else if (key == SDLK_F8) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 16); // Keyboard
-			else if (key == SDLK_F8) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 1); // Dance
 		}
 	}
 	if (m_songs.empty()) m_jukebox = false;
@@ -300,7 +295,7 @@ void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
 	bool have_keyboard = false;
 	bool have_dance = false;
 	bool is_karaoke = false;
-	unsigned char typeFilter = m_songs.getTypeFilter();
+	unsigned char typeFilter = 0;  // FIXME: Remove
 	int guitarCount = 0;
 	int vocalCount = 0;
 

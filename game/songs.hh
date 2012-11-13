@@ -53,13 +53,15 @@ class Songs: boost::noncopyable {
 	Song const& current() const { return *m_filtered[math_cover.getTarget()]; }
 	/// filters songlist by regular expression
 	void setFilter(std::string const& regex);
-	/// filters songlist by instrument type (bitmask)
-	void setTypeFilter(unsigned char filter);
-	/// get current type filter (bitmask)
-	unsigned char getTypeFilter() const { return m_typeFilter; }
-	/// sort descending
+	/// Get the current song type filter number
+	int typeNum() const { return m_type; }
+	/// Description of the current song type filter
+	std::string typeDesc() const;
+	/// Change song type filter (diff is normally -1 or 1; 0 has special meaning of reset)
+	void typeChange(int diff);
+	/// Description of the current sort mode
 	std::string sortDesc() const;
-	/// changes sorting
+	/// Change sorting mode (diff is normally -1 or 1)
 	void sortChange(int diff);
 	/// parses file into Song &tmp
 	void parseFile(Song& tmp);
@@ -72,9 +74,8 @@ class Songs: boost::noncopyable {
 	AnimValue m_updateTimer;
 	AnimAcceleration math_cover;
 	std::string m_filter;
-	unsigned char m_typeFilter;
 	Database & m_database;
-	int m_order;
+	int m_type, m_order;
 	void dumpSongs_internal() const;
 	void reload_internal();
 	void reload_internal(fs::path const& p);
