@@ -208,7 +208,7 @@ void ScreenSongs::draw() {
 	// Test if there are no songs
 	if (m_songs.empty()) {
 		// Format the song information text
-		if (m_search.text.empty()) {
+		if (m_search.text.empty() && !m_songs.typeNum()) {
 			oss_song << _("No songs found!");
 			oss_order << _("Visit performous.org\nfor free songs");
 		} else {
@@ -219,14 +219,19 @@ void ScreenSongs::draw() {
 		Song& song = m_songs.current();
 		// Format the song information text
 		oss_song << song.title << '\n' << song.artist;
-		oss_order << (m_search.text.empty() ? _("<type in to search>") : m_search.text) << '\n';
-		oss_order << m_songs.sortDesc() << '\n';
-		oss_order << "(" << m_songs.currentId() + 1 << "/" << m_songs.size() << ")";
+		oss_order << (m_search.text.empty() ? _("<type in to search>") : m_search.text) << "\n\n";
 		// Format the song information text
 		oss_hiscore << boost::format(_("Hisccore for %1%\n")) % song.title;
 		// Get hiscores from database
 		m_database.queryPerSongHiscore_HiscoreDisplay(oss_hiscore, m_songs.currentPtr(), m_infoPos, 5);
 	}
+	switch (m_menuPos) {
+		case 0: if (!m_songs.empty()) oss_order << "(" << m_songs.currentId() + 1 << "/" << m_songs.size() << ")"; break;
+		case 1: oss_order << _("↔ sort order: ") << m_songs.sortDesc(); break;
+		case 2: oss_order << _("↔ type filter: ") << m_songs.typeDesc(); break;
+		case 3: oss_order << _("↔ hiscores   ↵ jukebox mode"); break;
+	}	
+
 	if (m_jukebox) drawJukebox();
 	else {
 		// Draw song and order texts
