@@ -5,10 +5,15 @@
 #include "surface.hh"
 #include "util.hh"
 #include <jpeglib.h>
-#include <librsvg/rsvg.h>
-#include <librsvg/rsvg-cairo.h>
 #include <png.h>
 #include <fstream>
+
+#include <librsvg/rsvg.h>
+
+// Avoid deprecation messages with new versions since Ubuntu 12.10.
+#if LIBRSVG_MAJOR_VERSION * 10000 + LIBRSVG_MINOR_VERSION * 100 + LIBRSVG_MICRO_VERSION < 23602
+#include <librsvg/rsvg-cairo.h>
+#endif
 
 struct Image {
 	std::vector<unsigned char> data;

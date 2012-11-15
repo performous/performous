@@ -456,69 +456,54 @@ struct Audio::Impl {
 					int tmp;
 					if (iss >> tmp && iss.get() == EOF && tmp >= 0 && tmp < count) dev = tmp;
 				}
+				portaudio::AudioDevices ad;
+				// Try name search with full match
+				for (unsigned i = 0; i < ad.devices.size() && dev < 0; ++i) {
+					portaudio::DeviceInfo& info = ad.devices[i];
+					if (info.name == params.dev) dev = info.idx;
+				}
+				// Try name search with partial match
+				for (unsigned i = 0; i < ad.devices.size() && dev < 0; ++i) {
+					portaudio::DeviceInfo& info = ad.devices[i];
+					if (info.name.find(params.dev) != std::string::npos) dev = info.idx;
+				}
+				if (dev < 0) throw std::runtime_error("No such device.");
 				std::clog << "audio/info: Trying audio device \"" << params.dev << "\", id: " << dev
 					<< ", in: " << params.in << ", out: " << params.out << std::endl;
-				bool skip_partial = false;
-				bool found = false;
-				portaudio::AudioDevices ad;
-				// Try exact match first, then partial
-				for (int match_partial = 0; match_partial < 2 && !skip_partial; ++match_partial) {
-					// Loop through the devices and try everything that matches the name
-					for (int i = -1; i < count && (dev < 0 || i == -1); ++i) {
-						if (dev >= 0 && i == -1) i = dev;
-						else if (i == -1) continue;
-						portaudio::DeviceInfo& info = ad.devices[i];
-						if (info.name.empty()) continue;
-						if (info.in < int(params.mics.size())) continue;
-						if (info.out < params.out) continue;
-						if (dev < 0) { // Try matching by name
-							if (!match_partial && info.name != params.dev) continue;
-							if (match_partial && info.name.find(params.dev) == std::string::npos) continue;
-						}
-						// Match found if we got here
-						int assigned_mics = 0;
-						try {
-							Device* d = new Device(params.in, params.out, params.rate, i);
-							devices.push_back(d);
-							// Start capture/playback on this device (likely to throw due to audio system errors)
-							// NOTE: When it throws we want to keep the device in devices to avoid calling ~Device
-							// which often would hit the Pa_CloseStream hang bug and terminate the application.
-							d->start();
-							// Assign mics for all channels of the device
-							for (unsigned int j = 0; j < params.in; ++j) {
-								if (analyzers.size() >= 4) break; // Too many mics
-								std::string const& m = params.mics[j];
-								if (m.empty()) continue; // Input channel not used
-								// Check that the color is not already taken
-								bool mic_used = false;
-								for (size_t mi = 0; mi < analyzers.size(); ++mi) {
-									if (analyzers[mi].getId() == m) { mic_used = true; break; }
-								}
-								if (mic_used) continue;
-								// Add the new analyzer
-								Analyzer* a = new Analyzer(d->rate, m);
-								analyzers.push_back(a);
-								d->mics[j] = a;
-								++assigned_mics;
-							}
-							// Assign playback output for the first available stereo output
-							if (!playback && d->out == 2) { d->outptr = &output; playback = true; }
-						} catch (std::runtime_error& e) {
-							std::clog << "audio/warning: " << info.name << ": " << e.what() << std::endl;
-							if (dev > 0) { skip_partial = true; break; } // Numeric, end search
-							continue;
-						}
-						skip_partial = true;
-						found = true;
-						std::clog << "audio/info: Using audio device: " << i;
-						if (assigned_mics) std::clog << ", input channels: " << assigned_mics;
-						if (params.out) std::clog << ", output channels: " << params.out;
-						std::clog << std::endl;
-						break;
+				portaudio::DeviceInfo& info = ad.devices[dev];
+				if (info.in < int(params.mics.size())) throw std::runtime_error("Device doesn't have enough input channels");
+				if (info.out < params.out) throw std::runtime_error("Device doesn't have enough output channels");
+				// Match found if we got here, construct a device
+				Device* d = new Device(params.in, params.out, params.rate, info.idx);
+				devices.push_back(d);
+				// Start capture/playback on this device (likely to throw due to audio system errors)
+				// NOTE: When it throws we want to keep the device in devices to avoid calling ~Device
+				// which often would hit the Pa_CloseStream hang bug and terminate the application.
+				d->start();
+				// Assign mics for all channels of the device
+				int assigned_mics = 0;
+				for (unsigned int j = 0; j < params.in; ++j) {
+					if (analyzers.size() >= 4) break; // Too many mics
+					std::string const& m = params.mics[j];
+					if (m.empty()) continue; // Input channel not used
+					// Check that the color is not already taken
+					bool mic_used = false;
+					for (size_t mi = 0; mi < analyzers.size(); ++mi) {
+						if (analyzers[mi].getId() == m) { mic_used = true; break; }
 					}
+					if (mic_used) continue;
+					// Add the new analyzer
+					Analyzer* a = new Analyzer(d->rate, m);
+					analyzers.push_back(a);
+					d->mics[j] = a;
+					++assigned_mics;
 				}
-				// Error handling
-				if (!found) throw std::runtime_error("Not found or already in use.");
+				// Assign playback output for the first available stereo output
+				if (!playback && d->out == 2) { d->outptr = &output; playback = true; }
+				std::clog << "audio/info: Using audio device: " << dev;
+				if (assigned_mics) std::clog << ", input channels: " << assigned_mics;
+				if (params.out) std::clog << ", output channels: " << params.out;
+				std::clog << std::endl;
 			} catch(std::runtime_error& e) {
 				std::clog << "audio/error: Audio device '" << *it << "': " << e.what() << std::endl;
 			}

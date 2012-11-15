@@ -135,8 +135,22 @@ void SongParser::resetNoteParsingState() {
 void SongParser::finalize() {
 	std::vector<std::string> tracks = m_song.getVocalTrackNames();
 	for(std::vector<std::string>::const_iterator it = tracks.begin() ; it != tracks.end() ; ++it) {
-		// Adjust negative notes
 		VocalTrack& vocal = m_song.getVocalTrack(*it);
+		// Remove empty sentences
+		{
+			Note::Type lastType = Note::NORMAL;
+			for (Notes::iterator itn = vocal.notes.begin(); itn != vocal.notes.end();) {
+				Note::Type type = itn->type;
+				if(type == Note::SLEEP && lastType == Note::SLEEP) {
+					std::clog << "songparser/warning: Discarding empty sentence" << std::endl;
+					itn = vocal.notes.erase(itn);
+				} else {
+					++itn;
+				}
+				lastType = type;
+			}
+		}
+		// Adjust negative notes
 		if (vocal.noteMin <= 0) {
 			unsigned int shift = (1 - vocal.noteMin / 12) * 12;
 			vocal.noteMin += shift;
@@ -150,8 +164,8 @@ void SongParser::finalize() {
 		if (!vocal.notes.empty()) vocal.beginTime = vocal.notes.front().begin, vocal.endTime = vocal.notes.back().end;
 		// Compute maximum score
 		double max_score = 0.0;
-		for (Notes::iterator it = vocal.notes.begin(); it != vocal.notes.end(); ++it) {
-			max_score += it->maxScore();
+		for (Notes::iterator itn = vocal.notes.begin(); itn != vocal.notes.end(); ++itn) {
+			max_score += itn->maxScore();
 		}
 		vocal.m_scoreFactor = 1.0 / max_score;
 	}

@@ -61,7 +61,7 @@ class Song: boost::noncopyable {
 	int randomIdx; ///< sorting index used for random order
 	void insertVocalTrack(std::string vocalTrack, VocalTrack track) {
 		eraseVocalTrack(vocalTrack);
-		vocalTracks.insert(std::make_pair<std::string, VocalTrack>(vocalTrack, track));
+		vocalTracks.insert(std::make_pair(vocalTrack, track));
 	}
 	void eraseVocalTrack(std::string vocalTrack = TrackName::LEAD_VOCAL) {
 		vocalTracks.erase(vocalTrack);
@@ -78,9 +78,9 @@ class Song: boost::noncopyable {
 			else return dummyVocal;
 		}
 	}
-	std::vector<std::string> getVocalTrackNames() {
+	std::vector<std::string> getVocalTrackNames() const {
 		std::vector<std::string> result;
-		BOOST_FOREACH(VocalTracks::value_type &it, vocalTracks) {
+		BOOST_FOREACH(VocalTracks::value_type const &it, vocalTracks) {
 			result.push_back(it.first);
 		}
 		return result;

@@ -1,7 +1,7 @@
 #include "screen_audiodevices.hh"
 
 #include "configuration.hh"
-#include "joystick.hh"
+#include "controllers.hh"
 #include "theme.hh"
 #include "audio.hh"
 #include "i18n.hh"
@@ -34,8 +34,6 @@ void ScreenAudioDevices::enter() {
 	m_theme.reset(new ThemeAudioDevices());
 	portaudio::AudioDevices ads;
 	m_devs = ads.devices;
-	// FIXME: Uncomment to test how different amount of devices behave
-	//m_devs.resize(4);
 	// FIXME: Something more elegant, like a warning box
 	if (m_devs.empty()) throw std::runtime_error("No audio devices found!");
 	m_selected_column = 0;
@@ -106,7 +104,7 @@ void ScreenAudioDevices::draw() {
 			else if (m_mics[m_selected_column].name != "OUT" && !m_devs[i].in) alpha = 0.5f;
 			m_theme->device_bg.dimensions.center(y);
 			m_theme->device_bg.draw();
-			ColorTrans c(Color(1.0, 1.0, 1.0, alpha));
+			ColorTrans c(Color::alpha(alpha));
 			m_theme->device.dimensions.middle(-xstep*0.5).center(y);
 			m_theme->device.draw(i < m_devs.size() ? m_devs[i].desc() : _("- Unassigned -"));
 		}
@@ -162,7 +160,7 @@ bool ScreenAudioDevices::save(bool skip_ui_config) {
 		for (size_t d = 0; d < m_devs.size(); ++d) {
 			std::string mics = "", pdev = "";
 			for (size_t m = 0; m < m_mics.size(); ++m) {
-				if (m_mics[m].dev == d) {
+				if (m_mics[m].dev == m_devs[d].idx) {
 					if (m_mics[m].name == "OUT") pdev = "out=2"; // Pdev, only stereo supported
 					else { // Mic
 						if (!mics.empty()) mics += ","; // Add separator if needed

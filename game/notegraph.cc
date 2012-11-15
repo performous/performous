@@ -117,7 +117,7 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 	else if (m_notealpha < 1.0f) m_notealpha += 0.02f;
 	if (m_notealpha <= 0.0f) { m_notealpha = 0.0f; return; }
 
-	ColorTrans c(Color(1.0, 1.0, 1.0, m_notealpha));
+	ColorTrans c(Color::alpha(m_notealpha));
 
 	drawNotes();
 	if (config["game/pitch"].b()) drawWaves(database);
@@ -180,7 +180,7 @@ void NoteGraph::drawNotes() {
 		double h = -m_noteUnit * 2.0; // height: 0.5 border + 1.0 bar + 0.5 border = 2.0
 		drawNotebar(*t1, x, ybeg, yend, w, h);
 		if (alpha > 0.0) {
-			ColorTrans c(Color(1.0f, 1.0f, 1.0f, alpha));
+			ColorTrans c(Color::alpha(alpha));
 			drawNotebar(*t2, x, ybeg, yend, w, h);
 		}
 	}

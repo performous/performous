@@ -97,10 +97,10 @@ void ScreenSing::enter() {
 	{	// Vocal tracks
 		ConfigItem::OptionList opts;
 		std::vector<std::string> voctracks = m_song->getVocalTrackNames();
-		int cur = 0;
+		//int cur = 0;
 		// Add vocal tracks to option list
 		for (std::vector<std::string>::const_iterator it = voctracks.begin(); it != voctracks.end(); ++it) {
-			if (m_selectedTrack == *it) cur = opts.size(); // Find the index of current track
+			//if (m_selectedTrack == *it) cur = opts.size(); // Find the index of current track
 			opts.push_back(*it);
 		}
 		m_vocalTrackOpts = ConfigItem(opts); // Create a ConfigItem from the option list
@@ -127,7 +127,6 @@ void ScreenSing::enter() {
 }
 
 void ScreenSing::reloadGL() {
-	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	// Load UI graphics
 	theme.reset(new ThemeSing());
 	m_menuTheme.reset(new ThemeInstrumentMenu());
@@ -197,7 +196,7 @@ bool ScreenSing::instrumentLayout(double time) {
 		}
 	}
 	if (time < -1.0 && count_alive == 0) {
-		ColorTrans c(Color(1.0f, 1.0f, 1.0f, clamp(-2.0 - 2.0 * time)));
+		ColorTrans c(Color::alpha(clamp(-2.0 - 2.0 * time)));
 		m_help->draw();
 	}
 	// Set volume levels (averages of all instruments playing that track)
@@ -245,7 +244,7 @@ void ScreenSing::danceLayout(double time) {
 		}
 	}
 	if (time < -0.5 && count_alive == 0) {
-		ColorTrans c(Color(1.0f, 1.0f, 1.0f, clamp(-1.0 - 2.0 * time)));
+		ColorTrans c(Color::alpha(clamp(-1.0 - 2.0 * time)));
 		m_help->draw();
 	}
 }
@@ -309,7 +308,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			else if (nav == input::UP) { m_menu.move(-1); return; }
 		}
 		// Start button has special functions for skipping things (only in singing for now)
-		if (nav == input::START && m_only_singers_alive && !m_song->getVocalTrack(m_selectedTrack).notes.empty() && !m_audio.isPaused()) {
+		if (nav == input::START && m_only_singers_alive && !m_layout_singer.empty() && !m_audio.isPaused()) {
 			// Open score dialog early
 			if (status == Song::FINISHED) {
 				m_engine->kill(); // Kill the engine thread
@@ -319,8 +318,12 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			else if (status == Song::INSTRUMENTAL_BREAK) {
 				if (time < 0) m_audio.seek(0.0);
 				else {
-					// FIXME: Should check for all layout singers
-					double diff = m_layout_singer[0].lyrics_begin() - 3.0 - time;
+					// TODO: Instead of calculating here, calculate instrumental breaks right after song loading and store in Song data structures
+					double diff = getNaN();
+					for (size_t i = 0; i < m_layout_singer.size(); ++i) {
+						double d = m_layout_singer[i].lyrics_begin() - 3.0 - time;
+						if (!(d > diff)) diff = d;  // Store smallest d in diff (notice NaN handling)
+					}
 					if (diff > 0.0) m_audio.seek(diff);
 				}
 			}
@@ -483,7 +486,7 @@ void ScreenSing::draw() {
 			statustxt = (boost::format("%02u:%02u - %s") % (t / 60) % (t % 60) % section.name).str();
 		} else  statustxt = (boost::format("%02u:%02u") % (t / 60) % (t % 60)).str();
 
-		if (!m_score_window.get() && m_only_singers_alive && !m_song->getVocalTrack(m_selectedTrack).notes.empty()) {
+		if (!m_score_window.get() && m_only_singers_alive && !m_layout_singer.empty()) {
 			if (status == Song::INSTRUMENTAL_BREAK) statustxt += _("   ENTER to skip instrumental break");
 			if (status == Song::FINISHED && !config["game/karaoke_mode"].b()) statustxt += _("   Remember to wait for grading!");
 		}
@@ -595,9 +598,9 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database, Dancers& 
 		item.track_simple = it->getTrack();
 		item.track = it->getModeId();
 		item.track[0] = toupper(item.track[0]); // Capitalize
-		if (item.track_simple == TrackName::DRUMS) item.color = Color(0.1f, 0.1f, 0.1f);
-		else if (item.track_simple == TrackName::BASS) item.color = Color(0.5f, 0.3f, 0.1f);
-		else item.color = Color(1.0f, 0.0f, 0.0f);
+		if (item.track_simple == TrackName::DRUMS) item.color = Color(0.1, 0.1, 0.1);
+		else if (item.track_simple == TrackName::BASS) item.color = Color(0.5, 0.3, 0.1);
+		else item.color = Color(1.0, 0.0, 0.0);
 
 		m_database.scores.push_back(item);
 		++it;
@@ -610,7 +613,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database, Dancers& 
 		item.track_simple = it->getTrack();
 		item.track = it->getModeId();
 		item.track[0] = toupper(item.track[0]); // Capitalize
-		item.color = Color(1.0f, 0.4f, 0.1f);
+		item.color = Color(1.0, 0.4, 0.1);
 
 		m_database.scores.push_back(item);
 		++it;

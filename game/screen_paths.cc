@@ -1,7 +1,7 @@
 #include "screen_paths.hh"
 
 #include "configuration.hh"
-#include "joystick.hh"
+#include "controllers.hh"
 #include "theme.hh"
 #include "audio.hh"
 #include "i18n.hh"

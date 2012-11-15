@@ -159,7 +159,7 @@ void InstrumentGraph::drawMenu() {
 			}
 		}
 		// Finally we are at the actual menu item text drawing
-		ColorTrans c(Color(1.0, 1.0, 1.0, it->isActive() ? 1.0f : 0.5f));
+		ColorTrans c(Color::alpha(it->isActive() ? 1.0 : 0.5));
 		txt->dimensions.middle(x).center(y);
 		txt->draw(menutext);
 		w = std::max(w, txt->w() + 2 * step + button_margin * 2); // Calculate the widest entry
@@ -189,7 +189,7 @@ void InstrumentGraph::handleCountdown(double time, double beginTime) {
 	if (!dead() && time < beginTime && time >= beginTime - m_countdown - 1) {
 		m_popups.push_back(Popup(m_countdown > 0 ?
 		  std::string("- ") +boost::lexical_cast<std::string>(unsigned(m_countdown))+" -" : "Rock On!",
-		  Color(0.0f, 0.0f, 1.0f), 2.0, m_popupText.get()));
+		  Color(0.0, 0.0, 1.0), 2.0, m_popupText.get()));
 		  --m_countdown;
 	}
 }
@@ -197,11 +197,11 @@ void InstrumentGraph::handleCountdown(double time, double beginTime) {
 
 Color const& InstrumentGraph::color(int fret) const {
 	static Color fretColors[5] = {
-		Color(0.0f, 0.9f, 0.0f),
-		Color(0.9f, 0.0f, 0.0f),
-		Color(0.9f, 0.9f, 0.0f),
-		Color(0.0f, 0.0f, 1.0f),
-		Color(0.9f, 0.4f, 0.0f)
+		Color(0.0, 0.9, 0.0),
+		Color(0.9, 0.0, 0.0),
+		Color(0.9, 0.9, 0.0),
+		Color(0.0, 0.0, 1.0),
+		Color(0.9, 0.4, 0.0)
 	};
 	if (fret < 0 || fret >= m_pads) throw std::logic_error("Invalid fret number in InstrumentGraph::color");
 	if (getGraphType() == input::DRUMS) {

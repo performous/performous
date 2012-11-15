@@ -4,7 +4,7 @@
 #include "glmath.hh"
 #include "audio.hh"
 #include "i18n.hh"
-#include "joystick.hh"
+#include "controllers.hh"
 #include "theme.hh"
 #include "menu.hh"
 #include "xtime.hh"
@@ -88,7 +88,7 @@ void ScreenIntro::draw_menu_options() {
 	// Loop the currently visible options
 	for (size_t i = start_i, ii = 0; ii < showopts && i < opts.size(); ++i, ++ii) {
 		MenuOption const& opt = opts[i];
-		ColorTrans c(Color(1.0, 1.0, 1.0, submenuanim));
+		ColorTrans c(Color::alpha(submenuanim));
 
 		// Selection
 		if (i == m_menu.curIndex()) {
@@ -99,7 +99,7 @@ void ScreenIntro::draw_menu_options() {
 			theme->back_h.draw();
 			// Draw the text, dim if option not available
 			{
-				ColorTrans c(Color(1.0, 1.0, 1.0, opt.isActive() ? 1.0f : 0.5f));
+				ColorTrans c(Color::alpha(opt.isActive() ? 1.0 : 0.5));
 				theme->option_selected.dimensions.left(x).center(start_y + ii*0.08);
 				theme->option_selected.draw(opt.getName());
 			}
@@ -115,7 +115,7 @@ void ScreenIntro::draw_menu_options() {
 		} else {
 			std::string title = opt.getName();
 			SvgTxtTheme& txt = getTextObject(title);
-			ColorTrans c(Color(1.0, 1.0, 1.0, opt.isActive() ? 1.0f : 0.5f));
+			ColorTrans c(Color::alpha(opt.isActive() ? 1.0 : 0.5));
 			txt.dimensions.left(x).center(start_y + ii*0.08);
 			txt.draw(title);
 			wcounter = std::max(wcounter, txt.w() + 2 * sel_margin); // Calculate the widest entry

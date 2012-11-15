@@ -30,6 +30,17 @@ Webcam::Webcam(int cam_id):
 		if (!m_capture->isOpened())
 			throw std::runtime_error("Could not initialize webcam capturing!");
 	}
+	// Try to get at least VGA resolution
+	if (m_capture->get(CV_CAP_PROP_FRAME_WIDTH) < 640
+	  || m_capture->get(CV_CAP_PROP_FRAME_HEIGHT) < 480) {
+		m_capture->set(CV_CAP_PROP_FRAME_WIDTH, 640);
+		m_capture->set(CV_CAP_PROP_FRAME_HEIGHT, 480);
+	}
+	// Print actual values
+	std::cout << "Webcam frame properties: "
+	  << m_capture->get(CV_CAP_PROP_FRAME_WIDTH) << "x"
+	  << m_capture->get(CV_CAP_PROP_FRAME_HEIGHT) << std::endl;
+
 	// Initialize the video writer
 	#ifdef SAVE_WEBCAM_VIDEO
 	float fps = m_capture->get(CV_CAP_PROP_FPS);
@@ -105,6 +116,8 @@ void Webcam::render() {
 		bitmap.buf.swap(m_frame.data);  // Get back our buffer (FIXME: do we need to?)
 		m_frameAvailable = false;
 	}
+	using namespace glmath;
+	Transform trans(scale(vec3(-1.0, 1.0, 1.0)));
 	m_surface.draw(); // Draw
 	#endif
 }

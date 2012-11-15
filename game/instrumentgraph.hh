@@ -5,7 +5,7 @@
 #include "animvalue.hh"
 #include "notes.hh"
 #include "audio.hh"
-#include "joystick.hh"
+#include "controllers.hh"
 #include "surface.hh"
 #include "opengl_text.hh"
 #include "glutil.hh"

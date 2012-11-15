@@ -32,11 +32,8 @@ void LayoutSinger::drawScore(PositionMode position) {
 	unsigned int i = 0, j = 0;
 	for (std::list<Player>::const_iterator p = m_database.cur.begin(); p != m_database.cur.end(); ++p, ++i) {
 		if (p->m_vocal.name != m_vocal.name) continue;
-		float act = p->activity();
-		if (act == 0.0f) continue;
-		float r = p->m_color.r;
-		float g = p->m_color.g;
-		float b = p->m_color.b;
+		Color color(p->m_color.r, p->m_color.g, p->m_color.b, p->activity());
+		if (color.a == 0.0) continue;
 		m_score_text[i%4]->render((boost::format("%04d") % p->getScore()).str());
 		switch(position) {
 			case LayoutSinger::FULL:
@@ -58,15 +55,15 @@ void LayoutSinger::drawScore(PositionMode position) {
 				break;
 		}
 		{
-			ColorTrans c(Color(r, g, b, act));
+			ColorTrans c(color);
 			m_player_icon->draw();
 			m_score_text[i%4]->draw();
 		}
 		// Give some feedback on how well the last lyrics row went
-		float fact = p->m_feedbackFader.get();
+		double fact = p->m_feedbackFader.get();
 		if (p->m_prevLineScore > 0.5 && fact > 0) {
 			std::string prevLineRank;
-			float fzoom = 3.0 / (2.0 + fact);
+			double fzoom = 3.0 / (2.0 + fact);
 			if (p->m_prevLineScore > 0.95) prevLineRank = "Perfect";
 			else if (p->m_prevLineScore > 0.9) prevLineRank = "Excellent";
 			else if (p->m_prevLineScore > 0.8) prevLineRank = "Great";
@@ -89,7 +86,8 @@ void LayoutSinger::drawScore(PositionMode position) {
 					break;
 			}
 			{
-				ColorTrans c(Color(r, g, b, clamp(fact*2.0f)));
+				color.a = clamp(fact*2.0);
+				ColorTrans c(color);
 				m_line_rank_text[i%4]->draw();
 			}
 		}

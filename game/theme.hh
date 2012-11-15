@@ -4,11 +4,7 @@
 #include "surface.hh"
 #include "cachemap.hh"
 #include <boost/noncopyable.hpp>
-#include <boost/scoped_ptr.hpp>
 #include <string>
-
-
-class Shader;
 
 /// abstract theme class
 class Theme: boost::noncopyable {

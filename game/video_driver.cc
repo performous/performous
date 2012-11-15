@@ -6,7 +6,7 @@
 #include "glmath.hh"
 #include "image.hh"
 #include "util.hh"
-#include "joystick.hh"
+#include "controllers.hh"
 #include "screen.hh"
 #include <boost/date_time.hpp>
 #include <fstream>
@@ -350,7 +350,7 @@ void Window::screenshot() {
 
 ColorTrans::ColorTrans(Color const& c): m_old(g_color) {
 	using namespace glmath;
-	g_color = g_color * mat4::diagonal(vec4(c.r, c.g, c.b, c.a));
+	g_color = g_color * mat4::diagonal(c.linear());
 	ScreenManager::getSingletonPtr()->window().updateColor();
 }
 

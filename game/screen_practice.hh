@@ -2,7 +2,7 @@
 
 #include <boost/scoped_ptr.hpp>
 #include "screen.hh"
-#include "joystick.hh"
+#include "controllers.hh"
 
 class Audio;
 class Sample;
