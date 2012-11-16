@@ -123,10 +123,11 @@ void SongParser::xmlParseHeader() {
 		}
 	}
 	// debug: uncomment this to test parsing on all your song database
-	//xmlParse();
+	xmlParse();
 }
 
-void addNoteToTrack(VocalTrack& vocal, const Note& note) {
+void addNoteToTrack(Song& song, std::string const& name, const Note& note) {
+	VocalTrack& vocal = song.vocalTracks.find(name)->second;
 	if(note.type != Note::SLEEP) {
 		vocal.noteMin = std::min(vocal.noteMin, note.note);
 		vocal.noteMax = std::max(vocal.noteMax, note.note);
@@ -135,23 +136,20 @@ void addNoteToTrack(VocalTrack& vocal, const Note& note) {
 	vocal.notes.push_back(note);
 }
 
-void addNoteToTracks(std::string sentenceSinger, std::string trackSinger, bool multiTrackInOne, std::map<std::string, std::string> singerList, std::map<std::string, VocalTrack> &vocalTracks, const Note& note) {
+void addNoteToTracks(std::string sentenceSinger, std::string trackSinger, bool multiTrackInOne, std::map<std::string, std::string> singerList, Song& song, const Note& note) {
 	if(multiTrackInOne) {
-		if(sentenceSinger == "Solo 1") {
-			addNoteToTrack(vocalTracks.find(singerList["Solo 1"])->second, note);
-			addNoteToTrack(vocalTracks.find(trackSinger)->second, note);
-		} else if(sentenceSinger == "Solo 2") {
-			addNoteToTrack(vocalTracks.find(singerList["Solo 2"])->second, note);
-			addNoteToTrack(vocalTracks.find(trackSinger)->second, note);
+		if(sentenceSinger == "Solo 1" || sentenceSinger == "Solo 2") {
+			addNoteToTrack(song, singerList[sentenceSinger], note);  // Add to a solo track
+			addNoteToTrack(song, trackSinger, note);  // Add to the combined track
 		} else if(sentenceSinger == "Group") {
-			addNoteToTrack(vocalTracks.find(singerList["Solo 1"])->second, note);
-			addNoteToTrack(vocalTracks.find(singerList["Solo 2"])->second, note);
-			addNoteToTrack(vocalTracks.find(trackSinger)->second, note);
+			addNoteToTrack(song, singerList["Solo 1"], note);
+			addNoteToTrack(song, singerList["Solo 2"], note);
+			addNoteToTrack(song, trackSinger, note);
 		} else {
 			std::cout << "Unknown singer: " << sentenceSinger << std::endl;
 		}
 	} else {
-		addNoteToTrack(vocalTracks.find(trackSinger)->second, note);
+		addNoteToTrack(song, trackSinger, note);
 	}
 }
 
@@ -222,24 +220,23 @@ void SongParser::xmlParse() {
 		}
 	}
 
-	std::map<std::string, VocalTrack> vocalTracks;
 	if(multiTrackInOne) {
 		//std::cout << "Duet mode in a single track in " << m_song.path << std::endl;
 		// Add group track
 		std::string trackSinger = sentencesList.begin()->first;
 		VocalTrack vocalBoth(trackSinger);
-		vocalTracks.insert(std::make_pair(trackSinger, vocalBoth));
+		m_song.insertVocalTrack(trackSinger, vocalBoth);
 		// add each singer track
 		for(std::map<std::string, std::string>::const_iterator it = singerList.begin() ; it != singerList.end() ; ++it) {
 			trackSinger = it->second;
 			VocalTrack vocal(trackSinger);
-			vocalTracks.insert(std::make_pair(trackSinger, vocal));
+			m_song.insertVocalTrack(trackSinger, vocal);
 		}
 	} else {
 		for(std::map<std::string, xmlpp::NodeSet>::const_iterator it = sentencesList.begin() ; it != sentencesList.end() ; ++it) {
 			std::string trackSinger = it->first;
 			VocalTrack vocal(trackSinger);
-			vocalTracks.insert(std::make_pair(trackSinger, vocal));
+			m_song.insertVocalTrack(trackSinger, vocal);
 		}
 	}
 
@@ -251,7 +248,7 @@ void SongParser::xmlParse() {
 		nsmap["ss"] = "http://www.singstargame.com";
 		double ts = 0;
 		double sleepts = -1;
-		std::string sentenceSinger = trackSinger;
+		std::string sentenceSinger = (multiTrackInOne ? "Solo 1" : trackSinger);  // Defaults if sentence doesn't specify singer
 
 		for (xmlpp::NodeSet::const_iterator it = sentences.begin(); it != sentences.end(); ++it ) {
 			xmlpp::Element& sentenceNode = dynamic_cast<xmlpp::Element&>(**it);
@@ -294,7 +291,7 @@ void SongParser::xmlParse() {
 						sleep.type = Note::SLEEP;
 						sleep.begin = tsTime(sleepts);
 						sleep.end = tsTime(sleepts);
-						addNoteToTracks(sentenceSinger, trackSinger, multiTrackInOne, singerList, vocalTracks, sleep);
+						addNoteToTracks(sentenceSinger, trackSinger, multiTrackInOne, singerList, m_song, sleep);
 					}
 					sleepts = 0;
 
@@ -304,17 +301,13 @@ void SongParser::xmlParse() {
 					n.note = note;
 					n.notePrev = note;
 					//std::cout << "N/F/B" << " - " << n.begin << " - " << n.end << " - " << lyric << std::endl;
-					addNoteToTracks(sentenceSinger, trackSinger, multiTrackInOne, singerList, vocalTracks, n);
+					addNoteToTracks(sentenceSinger, trackSinger, multiTrackInOne, singerList, m_song, n);
 				}
 
 
 				ts += duration;
 			}
 		}
-	}
-	for(std::map<std::string, VocalTrack>::const_iterator it = vocalTracks.begin() ; it != vocalTracks.end() ; ++it) {
-		VocalTrack vocal = it->second;
-		m_song.insertVocalTrack(vocal.name, vocal);
 	}
 }
 
