@@ -33,9 +33,9 @@ class MenuOption {
 	/// Sets comment to follow a reference
 	void setDynamicComment(std::string& comm) { commentPtr = &comm; }
 	/// Return name
-	const std::string& getName() const { if (namePtr) return *namePtr; else return name; }
+	std::string getName() const;
 	/// Return comment
-	const std::string& getComment() const { if (commentPtr) return *commentPtr; else return comment; }
+	const std::string& getComment() const;
 	/// Check if this option can be selected
 	bool isActive() const;
 	/// Value

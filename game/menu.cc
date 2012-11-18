@@ -60,6 +60,19 @@ MenuOption::MenuOption(const std::string& nm, const std::string& comm, const std
 	if (!img.empty()) image.reset(new Surface(getThemePath(img)));
 }
 
+
+std::string MenuOption::getName() const {
+	if (namePtr) return *namePtr;
+	else if (!name.empty()) return name;
+	else if (value) return value->getValue();
+	else return "";
+}
+
+const std::string& MenuOption::getComment() const {
+	if (commentPtr) return *commentPtr;
+	else return comment;
+}
+
 bool MenuOption::isActive() const {
 	if (type == OPEN_SUBMENU && options.empty()) return false;
 	else if (type == CHANGE_VALUE) {
