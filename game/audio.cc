@@ -356,7 +356,11 @@ struct Output {
 		}
 		// Mix in microphones (if pass-through is enabled)
 		if (mics.size() > 0 && config["audio/pass-through"].b()) {
-			for (float *i = begin; i < end; ++i) *i *= 0.5; // Decrease music volume
+			// Decrease music volume
+			float amp = 1.0f / config["audio/pass-through_ratio"].f();
+			if (amp != 1.0f)
+				for (float *i = begin; i < end; ++i) *i *= amp;
+			// All mics included
 			for (size_t i = 0; i < mics.size(); ++i) {
 				if (mics[i])
 					mics[i]->output(begin, end);  // Do the actual mixing

@@ -245,6 +245,12 @@ to save the current settings to XML.
 		<short>Microphone pass-through</short>
 		<long>Send captured singing voice to speakers.</long>
 	</entry>
+	<entry name="audio/pass-through_ratio" type="float" value="2.0">
+		<ui unit=" x" />
+		<limits min="0.5" max="4.0" step="0.1" />
+		<short>Pass-through volume ratio</short>
+		<long>How much voice is amplified compared to the music.</long>
+	</entry>
 
 	<!-- Paths -->
 	<entry name="paths/songs" type="string_list">
