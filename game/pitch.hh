@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <cmath>
 #include <boost/thread.hpp>
+#include "configuration.hh"
 
 /// struct to represent tones
 struct Tone {
@@ -48,14 +49,16 @@ class Analyzer {
 	Analyzer(double rate, std::string id, std::size_t step = 200);
 	/** Add input data to buffer. This is thread-safe (against other functions). **/
 	template <typename InIt> void input(InIt begin, InIt end) {
+		bool saveOutput = config["audio/pass-through"].b();
+		// TODO: For perfomance, a re-usable member buffer should probably be created
 		std::vector<float> tempbuf;  // Values to be inserted to the pass-through buffer
-		tempbuf.reserve(1024);  // Let's reserve some space already in advance
+		if (saveOutput) tempbuf.reserve(1024);  // Let's reserve some space already in advance
 		size_t r = m_bufRead;  // The read position
 		size_t w = m_bufWrite;  // The write position
 		bool overflow = false;
 		while (begin != end) {
 			float s = *begin++;  // Read input sample
-			tempbuf.push_back(s);  // Add to pass-through buffer
+			if (saveOutput) tempbuf.push_back(s);  // Add to pass-through buffer
 			// Peak level calculation
 			float p = s * s;
 			if (p > m_peak) m_peak = p; else m_peak *= 0.999;
@@ -66,6 +69,7 @@ class Analyzer {
 		}
 		m_bufWrite = w;
 		if (overflow) m_bufRead = (w + 1) % BUF_N;  // Reset read pointer on overflow
+		if (!saveOutput) return;
 		// No need to lock the mutex before this
 		boost::mutex::scoped_lock l(m_mutex);
 		// Insert the new values to the pass-through buffer
