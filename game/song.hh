@@ -37,9 +37,9 @@ namespace TrackName {
 /// class to load and parse songfiles
 class Song: boost::noncopyable {
 	friend class SongParser;
+  public:
 	VocalTracks vocalTracks; ///< notes for the sing part
 	VocalTrack dummyVocal; ///< notes for the sing part
-  public:
 	/// constructor
 	Song(std::string const& path_, std::string const& filename_): dummyVocal(TrackName::LEAD_VOCAL), path(path_), filename(filename_) { reload(false); }
 	/// reload song

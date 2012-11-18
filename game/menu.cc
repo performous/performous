@@ -11,7 +11,9 @@ MenuOption::MenuOption(const std::string& nm, const std::string& comm):
 	name(nm),
 	comment(comm),
 	namePtr(NULL),
-	commentPtr(NULL)
+	commentPtr(NULL),
+	callback(NULL),
+	callbackData(NULL)
 {}
 
 MenuOption::MenuOption(const std::string& nm, const std::string& comm, ConfigItem* val):
@@ -21,7 +23,9 @@ MenuOption::MenuOption(const std::string& nm, const std::string& comm, ConfigIte
 	name(nm),
 	comment(comm),
 	namePtr(NULL),
-	commentPtr(NULL)
+	commentPtr(NULL),
+	callback(NULL),
+	callbackData(NULL)
 {}
 
 MenuOption::MenuOption(const std::string& nm, const std::string& comm, ConfigItem* val, ConfigItem newval):
@@ -31,7 +35,9 @@ MenuOption::MenuOption(const std::string& nm, const std::string& comm, ConfigIte
 	name(nm),
 	comment(comm),
 	namePtr(NULL),
-	commentPtr(NULL)
+	commentPtr(NULL),
+	callback(NULL),
+	callbackData(NULL)
 {}
 
 MenuOption::MenuOption(const std::string& nm, const std::string& comm, MenuOptions opts, const std::string& img):
@@ -42,11 +48,12 @@ MenuOption::MenuOption(const std::string& nm, const std::string& comm, MenuOptio
 	name(nm),
 	comment(comm),
 	namePtr(NULL),
-	commentPtr(NULL)
+	commentPtr(NULL),
+	callback(NULL),
+	callbackData(NULL)
 {
 	if (!img.empty()) image.reset(new Surface(getThemePath(img)));
 }
-
 
 MenuOption::MenuOption(const std::string& nm, const std::string& comm, const std::string& scrn, const std::string& img):
 	type(ACTIVATE_SCREEN),
@@ -55,9 +62,36 @@ MenuOption::MenuOption(const std::string& nm, const std::string& comm, const std
 	name(nm),
 	comment(comm),
 	namePtr(NULL),
-	commentPtr(NULL)
+	commentPtr(NULL),
+	callback(NULL),
+	callbackData(NULL)
 {
 	if (!img.empty()) image.reset(new Surface(getThemePath(img)));
+}
+
+MenuOption::MenuOption(const std::string& nm, const std::string& comm, MenuOptionCallback callback, void* data):
+	type(CALLBACK),
+	value(NULL),
+	newValue(),
+	name(nm),
+	comment(comm),
+	namePtr(NULL),
+	commentPtr(NULL),
+	callback(callback),
+	callbackData(data)
+{}
+
+
+std::string MenuOption::getName() const {
+	if (namePtr) return *namePtr;
+	else if (!name.empty()) return name;
+	else if (value) return value->getValue();
+	else return "";
+}
+
+const std::string& MenuOption::getComment() const {
+	if (commentPtr) return *commentPtr;
+	else return comment;
 }
 
 bool MenuOption::isActive() const {
@@ -96,30 +130,39 @@ void Menu::select(unsigned sel) {
 
 void Menu::action(int dir) {
 	switch (current().type) {
-		case MenuOption::OPEN_SUBMENU:
+		case MenuOption::OPEN_SUBMENU: {
 			if (current().options.empty()) break;
 			menu_stack.push_back(&current().options);
 			selection_stack.push_back(0);
 			break;
-		case MenuOption::CHANGE_VALUE:
+		}
+		case MenuOption::CHANGE_VALUE: {
 			if (current().value) {
 				if (dir > 0) ++(*(current().value));
 				else if (dir < 0) --(*(current().value));
 			}
 			break;
-		case MenuOption::SET_AND_CLOSE:
+		}
+		case MenuOption::SET_AND_CLOSE: {
 			if (current().value) *(current().value) = current().newValue;
 			// Fall-through to closing
-		case MenuOption::CLOSE_SUBMENU:
+		}
+		case MenuOption::CLOSE_SUBMENU: {
 			closeSubmenu();
 			break;
-		case MenuOption::ACTIVATE_SCREEN:
+		}
+		case MenuOption::ACTIVATE_SCREEN: {
 			ScreenManager* sm = ScreenManager::getSingletonPtr();
 			std::string screen = current().newValue.s();
 			clear();
 			if (screen.empty()) sm->finished();
 			else sm->activateScreen(screen);
 			break;
+		}
+		case MenuOption::CALLBACK: {
+			if (current().callback) current().callback(*this, current().callbackData);
+			break;
+		}
 	}
 }
 
