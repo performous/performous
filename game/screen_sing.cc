@@ -91,11 +91,11 @@ void ScreenSing::enter() {
 	m_vocalTrackOpts = ConfigItem(ConfigItem::OptionList()); // Dummy
 	// Do we have a second vocal track and a singer for it?
 	std::vector<std::string> tracks = m_song->getVocalTrackNames();
-	if (tracks.size() > 1 && analyzers.size() > 1) {
+	if (tracks.size() > 1) {
 		m_menu.clear();
 		m_menu.add(MenuOption(_("Start"), _("Start performing"), &startSingingCallback, (void*)this));
-		{	// Duet toggle
-			m_duet = ConfigItem(0);
+		m_duet = ConfigItem(0);
+		if (analyzers.size() > 1) { // Duet toggle
 			m_duet.addEnum(_("Duet mode"));
 			m_duet.addEnum(_("Normal mode"));
 			m_menu.add(MenuOption("", _("Switch between duet and regular singing mode"), &m_duet));
