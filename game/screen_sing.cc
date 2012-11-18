@@ -304,6 +304,8 @@ void ScreenSing::manageEvent(SDL_Event event) {
 				}
 				return;
 			}
+			else if (nav == input::LEFT) { m_menu.action(-1); return; }
+			else if (nav == input::RIGHT) { m_menu.action(1); return; }
 			else if (nav == input::DOWN) { m_menu.move(1); return; }
 			else if (nav == input::UP) { m_menu.move(-1); return; }
 		}
