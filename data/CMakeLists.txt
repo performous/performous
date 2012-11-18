@@ -19,7 +19,7 @@ install(FILES ${XSL_FILES} DESTINATION "${SHARE_INSTALL}/xsl/")
 file(GLOB SOUND_FILES "sounds/*.ogg")
 install(FILES ${SOUND_FILES} DESTINATION "${SHARE_INSTALL}/sounds/")
 
-file(GLOB BG_FILES "backgrounds/*.svg")
+file(GLOB BG_FILES "backgrounds/*")
 install(FILES ${BG_FILES} DESTINATION "${SHARE_INSTALL}/backgrounds/")
 
 file(GLOB SHADER_FILES "shaders/*")
