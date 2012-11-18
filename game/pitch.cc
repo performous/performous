@@ -32,6 +32,8 @@ bool Tone::operator==(double f) const {
 }
 
 Analyzer::Analyzer(double rate, std::string id, std::size_t step):
+  m_outbuf(),
+  m_outbufSwap(1024),
   m_step(step),
   m_rate(rate),
   m_id(id),
@@ -42,7 +44,7 @@ Analyzer::Analyzer(double rate, std::string id, std::size_t step):
   m_peak(0.0),
   m_oldfreq(0.0)
 {
-  	// Hamming window
+	// Hamming window
 	for (size_t i=0; i < FFT_N; i++) {
 		m_window[i] = 0.53836 - 0.46164 * std::cos(2.0 * M_PI * i / (FFT_N - 1));
 	}

@@ -50,15 +50,15 @@ class Analyzer {
 	/** Add input data to buffer. This is thread-safe (against other functions). **/
 	template <typename InIt> void input(InIt begin, InIt end) {
 		bool saveOutput = config["audio/pass-through"].b();
-		// TODO: For perfomance, a re-usable member buffer should probably be created
-		std::vector<float> tempbuf;  // Values to be inserted to the pass-through buffer
-		if (saveOutput) tempbuf.reserve(1024);  // Let's reserve some space already in advance
+		if (saveOutput && end - begin > m_outbufSwap.size())
+			m_outbufSwap.resize(end - begin + 10);
 		size_t r = m_bufRead;  // The read position
 		size_t w = m_bufWrite;  // The write position
+		size_t i = 0;
 		bool overflow = false;
 		while (begin != end) {
 			float s = *begin++;  // Read input sample
-			if (saveOutput) tempbuf.push_back(s);  // Add to pass-through buffer
+			if (saveOutput) m_outbufSwap[i++] = s;  // Add to pass-through buffer
 			// Peak level calculation
 			float p = s * s;
 			if (p > m_peak) m_peak = p; else m_peak *= 0.999;
@@ -73,7 +73,7 @@ class Analyzer {
 		// No need to lock the mutex before this
 		boost::mutex::scoped_lock l(m_mutex);
 		// Insert the new values to the pass-through buffer
-		m_outbuf.insert(m_outbuf.end(), tempbuf.begin(), tempbuf.end());
+		m_outbuf.insert(m_outbuf.end(), m_outbufSwap.begin(), m_outbufSwap.begin() + i);
 	}
 	/** Call this to process all data input so far. **/
 	void process();
@@ -109,6 +109,7 @@ class Analyzer {
   private:
 	boost::mutex m_mutex;
 	std::deque<float> m_outbuf;
+	std::vector<float> m_outbufSwap;
 	std::size_t m_step;
 	double m_rate;
 	std::string m_id;
