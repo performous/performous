@@ -49,19 +49,18 @@ Analyzer::Analyzer(double rate, std::string id, std::size_t step):
 }
 
 void Analyzer::output(float* begin, float* end) {
-	size_t frames = end - begin;
-	if (frames > outbuf.size() * 2) return;
 	size_t i = 0;
+	size_t available = outbuf.size();
 	boost::mutex::scoped_lock l(m_mutex);
-	while (begin != end) {
-		float value = outbuf[i] * 15.0; // Amplify
+	while (begin != end && i < available) {
+		float value = outbuf[i] * 2.0; // Amplify
 		*begin++ += value; // L channel
 		*begin++ += value; // R channel
 		++i;
 	}
 	// Remove used data from the buffer
-	outbuf.erase(outbuf.begin(), outbuf.begin() + frames/2);
-	// If the ouput buffer grows very big, reset it
+	outbuf.erase(outbuf.begin(), outbuf.begin() + i);
+	// If the output buffer grows very big, reset it
 	if (outbuf.size() > 5000) outbuf.clear();
 }
 

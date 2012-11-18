@@ -357,7 +357,7 @@ struct Output {
 		// Mix in microphones (if pass-through is enabled)
 		// TODO: Create a config var for enable/disable
 		if (mics.size() > 0) {
-			for (float *i = begin; i < end; ++i) *i *= 0.3; // Decrease music volume
+			for (float *i = begin; i < end; ++i) *i *= 0.5; // Decrease music volume
 			for (size_t i = 0; i < mics.size(); ++i) {
 				if (mics[i])
 					mics[i]->output(begin, end);  // Do the actual mixing
