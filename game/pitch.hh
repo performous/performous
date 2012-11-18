@@ -73,7 +73,7 @@ class Analyzer {
 		// No need to lock the mutex before this
 		boost::mutex::scoped_lock l(m_mutex);
 		// Insert the new values to the pass-through buffer
-		outbuf.insert(outbuf.end(), tempbuf.begin(), tempbuf.end());
+		m_outbuf.insert(m_outbuf.end(), tempbuf.begin(), tempbuf.end());
 	}
 	/** Call this to process all data input so far. **/
 	void process();
@@ -108,7 +108,7 @@ class Analyzer {
 
   private:
 	boost::mutex m_mutex;
-	std::deque<float> outbuf;
+	std::deque<float> m_outbuf;
 	std::size_t m_step;
 	double m_rate;
 	std::string m_id;
