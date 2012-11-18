@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-10-24 13:06+0100\n"
-"PO-Revision-Date: 2010-10-24 13:06+0100\n"
-"Last-Translator: Fredrik Klasson <scientica@gmail.com>\n"
+"POT-Creation-Date: 2011-08-01 22:10+0200\n"
+"PO-Revision-Date: 2012-07-08 03:57-0300\n"
+"Last-Translator: Alvaro Fernando García <alvarofernandogarcía@gmail.com>\n"
 "Language-Team: \n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -18,43 +18,469 @@ msgstr ""
 "X-Poedit-SearchPath-0: ../game\n"
 "X-Poedit-SearchPath-1: ../data\n"
 
-# note: says "music" instead of "audio samples"
-#: ../game/main.cc:133
-msgid "Loading audio samples..."
-msgstr "音楽を読み替えていまうす…"
+#: ../game/song.hh:36
+msgid "Guitar"
+msgstr "ギタ−"
 
-#: ../game/main.cc:147
-msgid "Creating screens..."
+#: ../game/song.hh:36
+msgid "Coop guitar"
 msgstr ""
 
-#: ../game/main.cc:156
-msgid "Entering main menu"
-msgstr "メインメニューに入っています"
+#: ../game/song.hh:36
+msgid "Rhythm guitar"
+msgstr "リズムギター"
 
-#: ../game/main.cc:158
-#: ../game/screen_sing.cc:144
+#: ../game/song.hh:36
+msgid "Bass"
+msgstr "ベースギター"
+
+#: ../game/song.hh:36
+msgid "Drums"
+msgstr "ドラム"
+
+#: ../game/song.hh:36
+msgid "Vocals"
+msgstr "ボーカル"
+
+#: ../game/song.hh:36
+msgid "Harmonic 1"
+msgstr ""
+
+#: ../game/song.hh:36
+msgid "Harmonic 2"
+msgstr ""
+
+#: ../game/song.hh:36
+msgid "Harmonic 3"
+msgstr ""
+
+#: ../game/dancegraph.cc:18
+msgid "Beginner"
+msgstr "初心者"
+
+#: ../game/dancegraph.cc:18
+#: ../game/guitargraph.cc:14
+msgid "Easy"
+msgstr "易しい"
+
+#: ../game/dancegraph.cc:18
+#: ../game/guitargraph.cc:14
+#, fuzzy
+msgid "Medium"
+msgstr "中間"
+
+#: ../game/dancegraph.cc:18
+#: ../game/guitargraph.cc:14
+msgid "Hard"
+msgstr "難しい"
+
+#: ../game/dancegraph.cc:18
+msgid "Challenge"
+msgstr "挑戦"
+
+# There's probably a better word
+#: ../game/dancegraph.cc:111
+#: ../game/guitargraph.cc:197
+msgid "Ready!"
+msgstr "レディー！"
+
+# See comment about Perform
+#: ../game/dancegraph.cc:111
+#: ../game/guitargraph.cc:197
+msgid "Start performing!"
+msgstr "演奏しはじめて"
+
+# or would トラックにして下さい work?
+#: ../game/dancegraph.cc:122
+#: ../game/guitargraph.cc:186
+msgid "Select track"
+msgstr "トラックを決めて下さい"
+
+# or would 難しさにして下さい work?
+#: ../game/dancegraph.cc:138
+#: ../game/guitargraph.cc:166
+msgid "Select difficulty"
+msgstr "難しさを決めて下さい"
+
+#: ../game/dancegraph.cc:141
+#: ../game/guitargraph.cc:203
+msgid "Quit"
+msgstr "終了"
+
+#: ../game/dancegraph.cc:141
+#: ../game/guitargraph.cc:203
+msgid "Exit to song browser"
+msgstr "音楽ブラウザに終了する"
+
+# 止まって or 止めて, not sure which english stop that's indented.
+#: ../game/dancegraph.cc:260
+msgid "STOP!"
+msgstr "止まって！"
+
+#: ../game/dancegraph.cc:335
+#: ../game/guitargraph.cc:482
+msgid "Streak!"
+msgstr ""
+
+#: ../game/guitargraph.cc:14
+msgid "Kids"
+msgstr "子供"
+
+#: ../game/guitargraph.cc:14
+msgid "Expert"
+msgstr "専門家"
+
+#: ../game/guitargraph.cc:172
+#: ../game/guitargraph.cc:189
+msgid "Lefty-mode"
+msgstr ""
+
+#: ../game/guitargraph.cc:210
+msgid "ON"
+msgstr "オン"
+
+#: ../game/guitargraph.cc:210
+msgid "OFF"
+msgstr "オフ"
+
+#: ../game/guitargraph.cc:211
+msgid "Toggle lefty-mode"
+msgstr ""
+
+#: ../game/guitargraph.cc:499
+msgid ""
+"God Mode\n"
+"Activated!"
+msgstr ""
+"神モード\n"
+"活性化！"
+
+#: ../game/guitargraph.cc:500
+msgid "Mistakes ignored!"
+msgstr ""
+
+#: ../game/guitargraph.cc:1181
+msgid "Drum Fill!"
+msgstr ""
+
+#: ../game/guitargraph.cc:1182
+msgid "God Mode Ready!"
+msgstr ""
+
+#: ../game/guitargraph.cc:1185
+msgid "Solo!"
+msgstr ""
+
+#: ../game/configuration.cc:116
+msgid "Enabled"
+msgstr "使用可能"
+
+#: ../game/configuration.cc:116
+msgid "Disabled"
+msgstr ""
+
+#: ../game/configuration.cc:120
+#, c-format
+msgid "%d items"
+msgstr ""
+
+#: ../game/screen_sing.cc:34
+msgid "Loading song..."
+msgstr "音楽を読み替えていまうす…"
+
+#: ../game/screen_sing.cc:40
+msgid "Song is broken!"
+msgstr "音楽が壊れています！"
+
+#: ../game/screen_sing.cc:45
+msgid "Initializing webcam..."
+msgstr ""
+
+#: ../game/screen_sing.cc:52
+msgid "Loading video..."
+msgstr "ビデオを読み替えていまうす…"
+
+#: ../game/screen_sing.cc:60
+msgid "Loading instruments..."
+msgstr "楽器を読み替えています…"
+
+#: ../game/screen_sing.cc:82
+msgid "Loading menu..."
+msgstr "メニューを読み込みます…"
+
+#: ../game/screen_sing.cc:84
+msgid "Resume"
+msgstr "再会"
+
+#: ../game/screen_sing.cc:84
+msgid "Back to performing!"
+msgstr "演奏に再会する"
+
+#: ../game/screen_sing.cc:85
+msgid "Restart"
+msgstr "再起動"
+
+#: ../game/screen_sing.cc:85
+msgid ""
+"Start the song\n"
+"from the beginning"
+msgstr ""
+
+#: ../game/screen_sing.cc:98
+msgid ""
+"Change vocal track\n"
+"(restart required)"
+msgstr ""
+
+#: ../game/screen_sing.cc:107
+msgid "Finalizing..."
+msgstr ""
+
+#: ../game/screen_sing.cc:111
+msgid "Song contains broken tracks!"
+msgstr "音楽には壊れてトラックが含まれます"
+
+#: ../game/screen_sing.cc:113
+#, fuzzy
+msgid "Loading graphics..."
+msgstr "音楽を読み替えていまうす…"
+
+#: ../game/screen_sing.cc:114
 msgid "Loading complete"
 msgstr ""
 
-#: ../game/main.cc:167
+#: ../game/screen_sing.cc:140
+msgid "Random background..."
+msgstr ""
+
+# maybe 無視 instead of skip?
+# is 場合は superflous?
+# インストゥルメンタル could work instead of 楽器の休憩
+# or should a のに construction be used?
+#: ../game/screen_sing.cc:485
+msgid "   ENTER to skip instrumental break"
+msgstr "   楽器の休憩をスキップ欲しい場合は、エンターキーを押す"
+
+#: ../game/screen_sing.cc:486
+msgid "   Remember to wait for grading!"
+msgstr "   採点を待って忘れないで"
+
+#: ../game/screen_sing.cc:618
+msgid "No player!"
+msgstr "選手がいません！"
+
+#: ../game/screen_sing.cc:627
+msgid "Hit singer"
+msgstr ""
+
+#: ../game/screen_sing.cc:628
+msgid "Lead singer"
+msgstr ""
+
+#: ../game/screen_sing.cc:629
+#: ../game/screen_sing.cc:635
+#: ../game/screen_sing.cc:641
+msgid "Rising star"
+msgstr ""
+
+#: ../game/screen_sing.cc:630
+#: ../game/screen_sing.cc:636
+#: ../game/screen_sing.cc:642
+msgid "Amateur"
+msgstr ""
+
+#: ../game/screen_sing.cc:631
+#: ../game/screen_sing.cc:643
+msgid "Tone deaf"
+msgstr ""
+
+#: ../game/screen_sing.cc:633
+msgid "Maniac"
+msgstr ""
+
+#: ../game/screen_sing.cc:634
+msgid "Hoofer"
+msgstr ""
+
+#: ../game/screen_sing.cc:637
+msgid "Loser"
+msgstr ""
+
+#: ../game/screen_sing.cc:639
+msgid "Virtuoso"
+msgstr ""
+
+#: ../game/screen_sing.cc:640
+msgid "Rocker"
+msgstr ""
+
+#: ../game/songs.cc:205
+msgid "random order"
+msgstr "無作為並べ替え"
+
+#: ../game/songs.cc:206
+msgid "sorted by song"
+msgstr "歌順に並べ替えた"
+
+#: ../game/songs.cc:207
+msgid "sorted by artist"
+msgstr "アーティスト順に並べ替えた"
+
+#: ../game/songs.cc:208
+msgid "sorted by edition"
+msgstr "版順に並べ替えた"
+
+#: ../game/songs.cc:209
+msgid "sorted by genre"
+msgstr "ジャンル順に並べ替えた"
+
+#: ../game/songs.cc:210
+msgid "sorted by path"
+msgstr "パス順に並べ替えた"
+
+#: ../game/songs.cc:211
+msgid "sorted by language"
+msgstr "言語に並べ替え"
+
+# or perhaps a less polite for would do?
+# 見つからなかった, but that's only 2 kana less.
+#: ../game/screen_players.cc:111
+msgid "No players found!"
+msgstr "千住が見つかりませんでした"
+
+# Unless I'm wrong:
+# [S1]なら[S2] = if S1 then S2 will happen
+# or is 名前に入れば... better?
+#: ../game/screen_players.cc:112
+msgid "Enter a name to create a new player."
+msgstr "名前に入るなら千住を作ります"
+
+#: ../game/screen_players.cc:114
+msgid "Press enter to create player!"
+msgstr "エンターキーを押せば千住を作って"
+
+#: ../game/screen_players.cc:121
+msgid "You reached %1% points!"
+msgstr "%1%点をとりました"
+
+#: ../game/screen_players.cc:122
+msgid "Change player with arrow keys."
+msgstr "矢印キーで千住を変えます。"
+
+#: ../game/screen_players.cc:123
+msgid "Name:"
+msgstr "名前："
+
+#: ../game/screen_players.cc:126
+msgid "Type text to filter or create a new player."
+msgstr ""
+
+# will search criteria do? 検索テクスト feels wrong to me (僕がでもが外人だ… ;)
+#: ../game/screen_players.cc:126
+msgid "Search Text:"
+msgstr "検索条件："
+
+# note: says "music" instead of "audio samples"
+#: ../game/main.cc:134
+msgid "Loading audio samples..."
+msgstr "音楽を読み替えていまうす…"
+
+#: ../game/main.cc:148
+msgid "Creating screens..."
+msgstr ""
+
+#: ../game/main.cc:157
+msgid "Entering main menu"
+msgstr "メインメニューに入っています"
+
+#: ../game/main.cc:169
 msgid "Screenshot taken!"
 msgstr ""
 
-#: ../game/main.cc:170
+#: ../game/main.cc:172
 msgid "Screenshot failed!"
 msgstr ""
 
-#: ../game/screen_intro.cc:22
+#: ../game/screen_audiodevices.cc:56
+msgid ""
+"It seems you have some manual configurations\n"
+"incompatible with this user interface.\n"
+"Saving these settings will override\n"
+"all existing audio device configuration.\n"
+"Your other options changes will be saved too."
+msgstr ""
+
+#: ../game/screen_audiodevices.cc:111
+msgid "- Unassigned -"
+msgstr ""
+
+#: ../game/screen_audiodevices.cc:131
+msgid "Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select to cancel. Ctrl + R to reset defaults"
+msgstr ""
+
+#: ../game/screen_audiodevices.cc:136
+msgid "For advanced device configuration, use command line parameter --audio (use --audiohelp for details)."
+msgstr ""
+
+#: ../game/screen_audiodevices.cc:191
+msgid "Some devices failed to open!"
+msgstr ""
+
+#: ../game/screen_songs.cc:213
+msgid "No songs found!"
+msgstr ""
+
+#: ../game/screen_songs.cc:214
+msgid ""
+"Visit performous.org\n"
+"for free songs"
+msgstr ""
+
+#: ../game/screen_songs.cc:216
+msgid "no songs match search"
+msgstr ""
+
+# ハイスコア or 高得点?
+#: ../game/screen_songs.cc:224
+msgid "(press END to view hiscores)"
+msgstr "（ハイスコアを見るばあいは、エンドキーを押す）"
+
+#: ../game/screen_songs.cc:225
+msgid "<type in to search>"
+msgstr ""
+
+# ハイスコア or 高得点?
+#: ../game/screen_songs.cc:230
+msgid "Hisccore for %1%\n"
+msgstr "%1%の高得点\n"
+
+#: ../game/instrumentgraph.cc:49
+msgid "Rejoin"
+msgstr ""
+
+#: ../game/instrumentgraph.cc:49
+msgid "Change selections"
+msgstr ""
+
+#: ../game/screen_intro.cc:24
 msgid "No playback devices could be used.\n"
 msgstr ""
 
-#: ../game/screen_intro.cc:23
+#: ../game/screen_intro.cc:25
 msgid ""
 "\n"
 "Please configure some before playing."
 msgstr ""
 
-#: ../game/screen_intro.cc:122
+#: ../game/screen_intro.cc:64
+msgid "Settings saved as system defaults."
+msgstr ""
+
+#: ../game/screen_intro.cc:64
+msgid "Settings saved."
+msgstr ""
+
+#: ../game/screen_intro.cc:146
 msgid "Ctrl + S to save, Ctrl + R to reset defaults"
 msgstr ""
 
@@ -63,335 +489,70 @@ msgstr ""
 # I get the feeling that 演じろ is more theatrical.
 # パフォーマンスする feels to english imo
 # Perhaps suru should be dropped?
-#: ../game/screen_intro.cc:131
+#: ../game/screen_intro.cc:160
 msgid "Perform"
 msgstr "演奏する"
 
-# See comment about Perform
-#: ../game/screen_intro.cc:131
-msgid "Start performing!"
-msgstr "演奏しはじめて"
-
 # not sure this is the best word
-#: ../game/screen_intro.cc:132
+#: ../game/screen_intro.cc:161
 msgid "Practice"
 msgstr "トレーニング"
 
-#: ../game/screen_intro.cc:132
+#: ../game/screen_intro.cc:161
 msgid "Check your skills or test the microphones"
 msgstr ""
 
-#: ../game/screen_intro.cc:151
+#: ../game/screen_intro.cc:180
 msgid "Audio Devices"
 msgstr ""
 
-#: ../game/screen_intro.cc:151
+#: ../game/screen_intro.cc:180
 msgid "Setup microphones and playback"
 msgstr ""
 
-#: ../game/screen_intro.cc:152
+#: ../game/screen_intro.cc:181
 msgid "Audio"
 msgstr "オーディオ"
 
-#: ../game/screen_intro.cc:152
+#: ../game/screen_intro.cc:181
 msgid "Configure general audio settings"
 msgstr "全般オーディオのオプションを設定する"
 
-#: ../game/screen_intro.cc:153
+#: ../game/screen_intro.cc:182
 msgid "Graphics"
 msgstr ""
 
-#: ../game/screen_intro.cc:153
+#: ../game/screen_intro.cc:182
 msgid "Configure rendering and video settings"
 msgstr "Ｒｅｎｄｅｒｉｎｇとビデオのオプションを設定する"
 
-#: ../game/screen_intro.cc:154
+#: ../game/screen_intro.cc:183
 msgid "Game"
 msgstr "ゲーム"
 
-#: ../game/screen_intro.cc:154
+#: ../game/screen_intro.cc:183
 msgid "Gameplay related options"
 msgstr ""
 
-#: ../game/screen_intro.cc:155
+#: ../game/screen_intro.cc:184
 msgid "Paths"
 msgstr "パス"
 
-#: ../game/screen_intro.cc:155
+#: ../game/screen_intro.cc:184
 msgid "Setup song and data paths"
 msgstr ""
 
-#: ../game/screen_intro.cc:157
+#: ../game/screen_intro.cc:186
 msgid "Configure"
 msgstr "設定"
 
-#: ../game/screen_intro.cc:157
+#: ../game/screen_intro.cc:186
 msgid "Configure audio and game options"
 msgstr "オーディオとゲームのオプションを設定する"
 
-#: ../game/screen_intro.cc:160
-#: ../game/screen_sing.cc:137
-msgid "Quit"
-msgstr "終了"
-
-#: ../game/screen_intro.cc:160
+#: ../game/screen_intro.cc:189
 msgid "Leave the game"
 msgstr "ゲームを終了する"
-
-# Skin or theme, I think both are the same for this matter.
-#: ../game/screen_sing.cc:35
-msgid "Loading theme..."
-msgstr "スキンを読み替えていまうす…"
-
-#: ../game/screen_sing.cc:38
-msgid "Loading song..."
-msgstr "音楽を読み替えていまうす…"
-
-#: ../game/screen_sing.cc:44
-msgid "Song is broken!"
-msgstr "音楽が壊れています！"
-
-#: ../game/screen_sing.cc:49
-msgid "Loading background..."
-msgstr "背景を読み替えていまうす…"
-
-#: ../game/screen_sing.cc:61
-msgid "Initializing webcam..."
-msgstr ""
-
-#: ../game/screen_sing.cc:68
-msgid "Loading video..."
-msgstr "ビデオを読み替えていまうす…"
-
-#: ../game/screen_sing.cc:74
-msgid "Random background..."
-msgstr ""
-
-# 「ユーザーインターフェース」は長い過ぎるね?
-#: ../game/screen_sing.cc:85
-msgid "Loading user interface..."
-msgstr "ＵＩを読み替えていまうす…"
-
-#: ../game/screen_sing.cc:94
-msgid "Loading instruments..."
-msgstr "楽器を読み替えています…"
-
-#: ../game/screen_sing.cc:116
-msgid "Loading menu..."
-msgstr "メニューを読み込みます…"
-
-#: ../game/screen_sing.cc:118
-msgid "Resume"
-msgstr "再会"
-
-#: ../game/screen_sing.cc:118
-msgid "Back to performing!"
-msgstr "演奏に再会する"
-
-#: ../game/screen_sing.cc:119
-msgid "Restart"
-msgstr ""
-
-#: ../game/screen_sing.cc:119
-msgid ""
-"Start the song\n"
-"from the beginning"
-msgstr ""
-
-#: ../game/screen_sing.cc:132
-msgid ""
-"Change vocal track\n"
-"(restart required)"
-msgstr ""
-
-#: ../game/screen_sing.cc:137
-msgid "Exit to song browser"
-msgstr "音楽ブラウザに終了する"
-
-#: ../game/screen_sing.cc:141
-msgid "Finalizing..."
-msgstr ""
-
-#: ../game/screen_sing.cc:146
-msgid "Song contains broken tracks!"
-msgstr "音楽には壊れてトラックが含まれます"
-
-# maybe 無視 instead of skip?
-# is 場合は superflous?
-# インストゥルメンタル could work instead of 楽器の休憩
-# or should a のに construction be used?
-#: ../game/screen_sing.cc:478
-msgid "   ENTER to skip instrumental break"
-msgstr "   楽器の休憩をスキップ欲しい場合は、エンターキーを押す"
-
-#: ../game/screen_sing.cc:479
-msgid "   Remember to wait for grading!"
-msgstr "   採点を待って忘れないで"
-
-#: ../game/screen_sing.cc:615
-msgid "No player!"
-msgstr "選手がいません！"
-
-#: ../game/screen_sing.cc:624
-msgid "Hit singer"
-msgstr ""
-
-#: ../game/screen_sing.cc:625
-msgid "Lead singer"
-msgstr ""
-
-#: ../game/screen_sing.cc:626
-#: ../game/screen_sing.cc:632
-#: ../game/screen_sing.cc:638
-msgid "Rising star"
-msgstr ""
-
-#: ../game/screen_sing.cc:627
-#: ../game/screen_sing.cc:633
-#: ../game/screen_sing.cc:639
-msgid "Amateur"
-msgstr ""
-
-#: ../game/screen_sing.cc:628
-#: ../game/screen_sing.cc:640
-msgid "Tone deaf"
-msgstr ""
-
-#: ../game/screen_sing.cc:630
-msgid "Maniac"
-msgstr ""
-
-#: ../game/screen_sing.cc:631
-msgid "Hoofer"
-msgstr ""
-
-#: ../game/screen_sing.cc:634
-msgid "Loser"
-msgstr ""
-
-#: ../game/screen_sing.cc:636
-msgid "Virtuoso"
-msgstr ""
-
-#: ../game/screen_sing.cc:637
-msgid "Rocker"
-msgstr ""
-
-#: ../game/database.cc:107
-#: ../game/database.cc:127
-msgid "No Items up to now."
-msgstr ""
-
-#: ../game/database.cc:108
-#: ../game/database.cc:128
-msgid "Be the first to be listed here!"
-msgstr ""
-
-#: ../game/songs.cc:199
-msgid "random order"
-msgstr "無作為並べ替え"
-
-#: ../game/songs.cc:200
-msgid "sorted by song"
-msgstr "歌順に並べ替えた"
-
-#: ../game/songs.cc:201
-msgid "sorted by artist"
-msgstr "アーティスト順に並べ替えた"
-
-#: ../game/songs.cc:202
-msgid "sorted by edition"
-msgstr "版順に並べ替えた"
-
-#: ../game/songs.cc:203
-msgid "sorted by genre"
-msgstr "ジャンル順に並べ替えた"
-
-#: ../game/songs.cc:204
-msgid "sorted by path"
-msgstr "パス順に並べ替えた"
-
-#: ../game/songs.cc:205
-msgid "sorted by language"
-msgstr "言語に並べ替え"
-
-#: ../game/guitargraph.cc:14
-msgid "Kids"
-msgstr "子供"
-
-#: ../game/guitargraph.cc:14
-msgid "Easy"
-msgstr "易しい"
-
-#: ../game/guitargraph.cc:14
-#, fuzzy
-msgid "Medium"
-msgstr "中間"
-
-#: ../game/guitargraph.cc:14
-msgid "Hard"
-msgstr "難しい"
-
-#: ../game/guitargraph.cc:14
-msgid "Expert"
-msgstr "専門家"
-
-# There's probably a better word
-#: ../game/guitargraph.cc:142
-msgid "Ready!"
-msgstr "レディー！"
-
-# or would トラックにして下さい work?
-#: ../game/guitargraph.cc:154
-msgid "Select track"
-msgstr "トラックを決めて下さい"
-
-# or would 難しさにして下さい work?
-#: ../game/guitargraph.cc:169
-msgid "Select difficulty"
-msgstr "難しさを決めて下さい"
-
-#: ../game/guitargraph.cc:172
-msgid "Lefty-mode"
-msgstr ""
-
-#: ../game/guitargraph.cc:181
-msgid "ON"
-msgstr "オン"
-
-#: ../game/guitargraph.cc:181
-msgid "OFF"
-msgstr "オフ"
-
-#: ../game/guitargraph.cc:182
-msgid "Toggle lefty-mode"
-msgstr ""
-
-#: ../game/guitargraph.cc:479
-msgid "Streak!"
-msgstr ""
-
-#: ../game/guitargraph.cc:496
-msgid ""
-"God Mode\n"
-"Activated!"
-msgstr ""
-
-#: ../game/guitargraph.cc:497
-msgid "Mistakes ignored!"
-msgstr ""
-
-#: ../game/guitargraph.cc:1162
-msgid "Drum Fill!"
-msgstr ""
-
-#: ../game/guitargraph.cc:1163
-msgid "God Mode Ready!"
-msgstr ""
-
-#: ../game/guitargraph.cc:1168
-msgid "Solo!"
-msgstr ""
 
 #: ../game/screen_paths.cc:24
 msgid ""
@@ -409,413 +570,292 @@ msgstr ""
 msgid "Windows users can also use ConfigureSongDirectory.bat in the bin-directory."
 msgstr ""
 
-#: ../game/screen_audiodevices.cc:55
-msgid ""
-"It seems you have some manual configurations\n"
-"incompatible with this user interface.\n"
-"Saving these settings will override\n"
-"all existing audio device configuration.\n"
-"Your other options changes will be saved too."
+#: ../game/database.cc:107
+#: ../game/database.cc:127
+msgid "No Items up to now."
 msgstr ""
 
-#: ../game/screen_audiodevices.cc:108
-msgid "- Unassigned -"
+#: ../game/database.cc:108
+#: ../game/database.cc:128
+msgid "Be the first to be listed here!"
 msgstr ""
 
-#: ../game/screen_audiodevices.cc:126
-msgid "Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select to cancel. Ctrl + R to reset defaults"
-msgstr ""
-
-#: ../game/screen_audiodevices.cc:131
-msgid "For advanced device configuration, use command line parameter --audio (use --audiohelp for details)."
-msgstr ""
-
-#: ../game/screen_audiodevices.cc:186
-msgid "Some devices failed to open!"
-msgstr ""
-
-# or perhaps a less polite for would do?
-# 見つからなかった, but that's only 2 kana less.
-#: ../game/screen_players.cc:110
-msgid "No players found!"
-msgstr "千住が見つかりませんでした"
-
-# Unless I'm wrong:
-# [S1]なら[S2] = if S1 then S2 will happen
-# or is 名前に入れば... better?
-#: ../game/screen_players.cc:111
-msgid "Enter a name to create a new player."
-msgstr "名前に入るなら千住を作ります"
-
-#: ../game/screen_players.cc:113
-msgid "Press enter to create player!"
-msgstr "エンターキーを押せば千住を作って"
-
-#: ../game/screen_players.cc:120
-msgid "You reached %1% points!"
-msgstr "%1%点をとりました"
-
-#: ../game/screen_players.cc:121
-msgid "Change player with arrow keys."
-msgstr "矢印キーで千住を変えます。"
-
-#: ../game/screen_players.cc:122
-msgid "Name:"
-msgstr "名前："
-
-#: ../game/screen_players.cc:125
-msgid "Type text to filter or create a new player."
-msgstr ""
-
-# will search criteria do? 検索テクスト feels wrong to me (僕がでもが外人だ… ;)
-#: ../game/screen_players.cc:125
-msgid "Search Text:"
-msgstr "検索条件："
-
-#: ../game/screen_songs.cc:196
-msgid "No songs found!"
-msgstr ""
-
-#: ../game/screen_songs.cc:197
-msgid ""
-"Visit performous.org\n"
-"for free songs"
-msgstr ""
-
-#: ../game/screen_songs.cc:199
-msgid "no songs match search"
-msgstr ""
-
-# ハイスコア or 高得点?
-#: ../game/screen_songs.cc:207
-msgid "(press END to view hiscores)"
-msgstr "（ハイスコアを見るばあいは、エンドキーを押す）"
-
-#: ../game/screen_songs.cc:208
-msgid "<type in to search>"
-msgstr ""
-
-# ハイスコア or 高得点?
-#: ../game/screen_songs.cc:213
-msgid "Hisccore for %1%\n"
-msgstr "%1%の高得点\n"
-
-#: ../game/instrumentgraph.cc:42
-msgid "Rejoin"
-msgstr ""
-
-#: ../game/instrumentgraph.cc:42
-msgid "Change selections"
-msgstr ""
-
-#: ../game/dancegraph.cc:18
-msgid "Beginner"
-msgstr "初心者"
-
-#: ../game/dancegraph.cc:18
-msgid "Challenge"
-msgstr ""
-
-# 止まって or 止めて, not sure which english stop that's indented.
-#: ../game/dancegraph.cc:260
-msgid "STOP!"
-msgstr "止まって！"
-
-#: ../game/configuration.cc:102
-msgid "Enabled"
-msgstr ""
-
-#: ../game/configuration.cc:102
-msgid "Disabled"
-msgstr ""
-
-#: ../game/configuration.cc:106
-#, c-format
-msgid "%d items"
-msgstr ""
-
-#: ../game/song.hh:35
-msgid "Guitar"
-msgstr ""
-
-#: ../game/song.hh:35
-msgid "Coop guitar"
-msgstr ""
-
-#: ../game/song.hh:35
-msgid "Rhythm guitar"
-msgstr ""
-
-#: ../game/song.hh:35
-msgid "Bass"
-msgstr ""
-
-#: ../game/song.hh:35
-msgid "Drums"
-msgstr ""
-
-#: ../game/song.hh:35
-msgid "Vocals"
-msgstr ""
-
-#: ../game/song.hh:35
-msgid "Harmonic 1"
-msgstr ""
-
-#: ../game/song.hh:35
-msgid "Harmonic 2"
-msgstr ""
-
-#: ../game/song.hh:35
-msgid "Harmonic 3"
-msgstr ""
-
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:3
+#: /tmp/xml2gettext.ynfS6LeU64:3
 msgid "Gameplay settings."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:4
+#: /tmp/xml2gettext.ynfS6LeU64:4
 msgid "Graphic"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:5
+#: /tmp/xml2gettext.ynfS6LeU64:5
 msgid "Video and rendering settings."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:7
+#: /tmp/xml2gettext.ynfS6LeU64:7
 msgid "Audio-related settings."
 msgstr ""
 
 # assuming search path makes more sence than just path? (or will パス be fine?)
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:9
+#: /tmp/xml2gettext.ynfS6LeU64:9
 msgid "System paths."
 msgstr "システムのサーチパス"
 
 # could 開式 be used for this?
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:10
+#: /tmp/xml2gettext.ynfS6LeU64:10
 msgid "Karaoke mode"
 msgstr "カラオケモード"
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:11
+#: /tmp/xml2gettext.ynfS6LeU64:11
 msgid "Hide pitch wave, notes and scoring."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:12
+#: /tmp/xml2gettext.ynfS6LeU64:12
 msgid "Pitch waves"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:13
+#: /tmp/xml2gettext.ynfS6LeU64:13
 msgid "Enable singing pitch display (when not in karaoke mode)."
 msgstr ""
 
 # Note: skin
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:14
+#: /tmp/xml2gettext.ynfS6LeU64:14
 msgid "Theme"
 msgstr "スキン"
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:15
+#: /tmp/xml2gettext.ynfS6LeU64:15
 msgid "Name of the theme to use or absolute path to theme folder."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:16
+#: /tmp/xml2gettext.ynfS6LeU64:16
 msgid "Keyboard as guitar"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:17
+#: /tmp/xml2gettext.ynfS6LeU64:17
 msgid "Enable keyboard as guitar (Frets on Fire mode)."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:18
+#: /tmp/xml2gettext.ynfS6LeU64:18
 msgid "Keyboard as drumkit"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:19
+#: /tmp/xml2gettext.ynfS6LeU64:19
 msgid "Enable keyboard as drumkit."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:20
+#: /tmp/xml2gettext.ynfS6LeU64:20
 msgid "Keyboard as dance pad"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:21
+#: /tmp/xml2gettext.ynfS6LeU64:21
 msgid "Enable keyboard as dance pad."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:22
+#: /tmp/xml2gettext.ynfS6LeU64:22
+msgid "Keyboard as keyboard"
+msgstr ""
+
+#: /tmp/xml2gettext.ynfS6LeU64:23
+msgid "Enable keyboard as keyboard."
+msgstr ""
+
+#: /tmp/xml2gettext.ynfS6LeU64:24
 msgid "Joystick configuration"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:23
+#: /tmp/xml2gettext.ynfS6LeU64:25
 msgid "Force joystick to some kind of instrument."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:24
+#: /tmp/xml2gettext.ynfS6LeU64:26
 msgid "Hardware MIDI input device"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:25
+#: /tmp/xml2gettext.ynfS6LeU64:27
 msgid "Part of sound card name or its number or empty to use the first available device. Used currently for MIDI drum controllers."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:26
+#: /tmp/xml2gettext.ynfS6LeU64:28
 msgid "Windowed width"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:27
+#: /tmp/xml2gettext.ynfS6LeU64:29
 msgid "The width of the window."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:28
+#: /tmp/xml2gettext.ynfS6LeU64:30
 msgid "Windowed height"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:29
+#: /tmp/xml2gettext.ynfS6LeU64:31
 msgid "The height of the window."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:30
+#: /tmp/xml2gettext.ynfS6LeU64:32
 msgid "Fullscreen mode"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:31
+#: /tmp/xml2gettext.ynfS6LeU64:33
 msgid "Enable fullscreen mode on startup."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:32
+#: /tmp/xml2gettext.ynfS6LeU64:34
+msgid "Stereoscopic 3D"
+msgstr ""
+
+#: /tmp/xml2gettext.ynfS6LeU64:35
+msgid "Enable 3D rendering of Performous."
+msgstr ""
+
+#: /tmp/xml2gettext.ynfS6LeU64:36
+msgid "Stereo3D type"
+msgstr ""
+
+#: /tmp/xml2gettext.ynfS6LeU64:37
+msgid "Some modes may only get activated in fullscreen mode."
+msgstr ""
+
+#: /tmp/xml2gettext.ynfS6LeU64:38
+msgid "Stereo3D separation"
+msgstr ""
+
+#: /tmp/xml2gettext.ynfS6LeU64:39
+msgid "The strength of the effect. Experiment with different settings for best results."
+msgstr ""
+
+#: /tmp/xml2gettext.ynfS6LeU64:40
 msgid "Video playback"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:33
+#: /tmp/xml2gettext.ynfS6LeU64:41
 msgid "Allows completely disabling background videos. It is recommended to leave this enabled as Performous will still smoothly fade out the video if your computer is not fast enough."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:34
+#: /tmp/xml2gettext.ynfS6LeU64:42
 msgid "Webcam background"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:35
-msgid "Performous can try to use webcam as a background video. You can disable it if it annoys you."
+#: /tmp/xml2gettext.ynfS6LeU64:43
+msgid "Performous can use webcam as a background video. Disable it if Performous crashes while entering a song."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:36
+#: /tmp/xml2gettext.ynfS6LeU64:44
 msgid "Webcam id"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:37
+#: /tmp/xml2gettext.ynfS6LeU64:45
 msgid "Use -1 to autodetect or a number starting from 0 to choose specific device."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:38
+#: /tmp/xml2gettext.ynfS6LeU64:46
 msgid "3D notes"
 msgstr "３D音符"
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:39
+#: /tmp/xml2gettext.ynfS6LeU64:47
 msgid "Draw instrument notes as 3-dimensional objects. May hurt performance on older hardware."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:40
+#: /tmp/xml2gettext.ynfS6LeU64:48
 msgid "SVG quality"
 msgstr "SVGの品質"
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:41
+#: /tmp/xml2gettext.ynfS6LeU64:49
 msgid "Larger numbers cause vector graphics to be rendered in higher resolution. Decrease this to make navigating in menus faster."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:42
+#: /tmp/xml2gettext.ynfS6LeU64:50
 msgid "Text quality"
 msgstr "テクストの品質"
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:43
+#: /tmp/xml2gettext.ynfS6LeU64:51
 msgid "Larger numbers cause text to be rendered in higher resolution. Decrease this to make everything a little faster."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:44
+#: /tmp/xml2gettext.ynfS6LeU64:52
 msgid "Benchmark mode"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:45
+#: /tmp/xml2gettext.ynfS6LeU64:53
 msgid "Framerate limit of 100 FPS is removed and the game instead renders at full speed. FPS values are printed to console. Please note that the display drivers may still limit the rendering speed to the screen refresh rate."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:46
+#: /tmp/xml2gettext.ynfS6LeU64:54
 msgid "Suggested latency"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:47
+#: /tmp/xml2gettext.ynfS6LeU64:55
 msgid "This is a hint for the audio engine about the desired latency. Set this as low as possible while retaining clear audio playback. Requires restart."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:48
+#: /tmp/xml2gettext.ynfS6LeU64:56
 msgid "Audio/video latency"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:49
+#: /tmp/xml2gettext.ynfS6LeU64:57
 msgid "Affects all modes. Use negative value if your display input lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal. This should be set so that the notes pass the cursor at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while performing."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:50
+#: /tmp/xml2gettext.ynfS6LeU64:58
 msgid "Audio round-trip latency"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:51
+#: /tmp/xml2gettext.ynfS6LeU64:59
 msgid "Affects singing only. The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. While performing, press Ctrl+S for synth mode and adjust with Ctrl+F3/F4."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:52
+#: /tmp/xml2gettext.ynfS6LeU64:60
 msgid "Audio/controller latency"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:53
+#: /tmp/xml2gettext.ynfS6LeU64:61
 msgid "Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to adjust while performing."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:54
+#: /tmp/xml2gettext.ynfS6LeU64:62
 msgid "Audio devices"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:55
+#: /tmp/xml2gettext.ynfS6LeU64:63
 msgid "List of audio devices to try."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:56
+#: /tmp/xml2gettext.ynfS6LeU64:64
 msgid "Menu volume"
 msgstr "メニューの音量"
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:57
+#: /tmp/xml2gettext.ynfS6LeU64:65
 msgid "The volume level of menus, song previews and jukebox mode."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:58
+#: /tmp/xml2gettext.ynfS6LeU64:66
 msgid "Music volume"
 msgstr "音楽の音量"
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:59
+#: /tmp/xml2gettext.ynfS6LeU64:67
 msgid "The ingame music volume. Values above 90 are not recommended as distortion may occur."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:60
+#: /tmp/xml2gettext.ynfS6LeU64:68
 msgid "Failure volume"
 msgstr "失敗の音量"
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:61
+#: /tmp/xml2gettext.ynfS6LeU64:69
 msgid "The ingame fail sound volume. Values above 90 are not recommended as distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:62
+#: /tmp/xml2gettext.ynfS6LeU64:70
 msgid "Song folders"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:63
+#: /tmp/xml2gettext.ynfS6LeU64:71
 msgid "Where to recursively look for songs. DATADIR at the beginning means all Performous data folders."
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:64
+#: /tmp/xml2gettext.ynfS6LeU64:72
 msgid "Base folders for data"
 msgstr ""
 
-#: /tmp/.private/frekla/xml2gettext.aNjUgGkJh6:65
+#: /tmp/xml2gettext.ynfS6LeU64:73
 msgid "System defaults are included automatically. Additional paths can be added here."
 msgstr ""
 
-#~ msgid "Audio..."
-#~ msgstr "オーディオ…"

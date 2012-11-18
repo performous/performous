@@ -5,6 +5,7 @@
 #include "opengl_text.hh"
 #include "video_driver.hh"
 #include "dialog.hh"
+#include "fbo.hh"
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <SDL.h>
@@ -18,12 +19,16 @@ class Screen {
 	virtual ~Screen() {}
 	/// eventhandler
 	virtual void manageEvent(SDL_Event event) = 0;
+	/// prepare screen for drawing
+	virtual void prepare() {}
 	/// draws screen
 	virtual void draw() = 0;
 	/// enters screen
 	virtual void enter() = 0;
 	/// exits screen
 	virtual void exit() = 0;
+	/// reloads OpenGL textures but avoids restarting music etc.
+	virtual void reloadGL() { exit(); enter(); }
 	/// returns screen name
 	std::string getName() const { return m_name; }
 
@@ -46,6 +51,12 @@ class ScreenManager: public Singleton <ScreenManager> {
 	void activateScreen(std::string const& name);
 	/// Does actual switching of screens (if necessary)
 	void updateScreen();
+	/// Prepare (slow loading operations) of the current screen for rendering
+	void prepareScreen();
+	/// Draws the current screen and possible transition effects
+	void drawScreen();
+	/// Reload OpenGL resources (after fullscreen toggle etc)
+	void reloadGL() { if (currentScreen) currentScreen->reloadGL(); }
 	/// Returns pointer to current Screen
 	Screen* getCurrentScreen() { return currentScreen; };
 	/// Returns pointer to Screen for given name
@@ -55,6 +66,8 @@ class ScreenManager: public Singleton <ScreenManager> {
 
 	/// Draw a loading progress indication
 	void loading(std::string const& message, float progress);
+	/// Internal rendering function for loading indicator
+	void drawLoading();
 	/// Draw an error notification and quit
 	void fatalError(std::string const& message);
 	/// Set a message to flash in current screen
@@ -65,13 +78,16 @@ class ScreenManager: public Singleton <ScreenManager> {
 	bool closeDialog();
 	/// Returns true if dialog is open
 	bool isDialogOpen() { return m_dialog; }
-	/// Draw dialogs & flash messages in current screen
+	/// Draw dialogs & flash messages, called automatically by drawScreen
 	void drawNotifications();
 
 	/// Sets finished to true
 	void finished() { m_finished = true; };
 	/// Returns finished state
 	bool isFinished() { return m_finished; };
+
+	void showLogo(bool show = true) { m_logoAnim.setTarget(show ? 1.0 : 0.0); }
+	void drawLogo();
 
   private:
 	Window& m_window;
@@ -87,6 +103,9 @@ class ScreenManager: public Singleton <ScreenManager> {
 	std::string m_message;
 	AnimValue m_messagePopup;
 	SvgTxtTheme m_textMessage;
+	float m_loadingProgress;
+	Surface m_logo;
+	AnimValue m_logoAnim;
 	// Dialog members
 	boost::scoped_ptr<Dialog> m_dialog;
 };

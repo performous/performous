@@ -6,8 +6,7 @@
 #include "fs.hh"
 
 #ifdef USE_OPENCV
-#include <cv.h>
-#include <highgui.h>
+#include <opencv2/opencv.hpp>
 
 #else
 // Dummy classes
@@ -31,6 +30,17 @@ Webcam::Webcam(int cam_id):
 		if (!m_capture->isOpened())
 			throw std::runtime_error("Could not initialize webcam capturing!");
 	}
+	// Try to get at least VGA resolution
+	if (m_capture->get(CV_CAP_PROP_FRAME_WIDTH) < 640
+	  || m_capture->get(CV_CAP_PROP_FRAME_HEIGHT) < 480) {
+		m_capture->set(CV_CAP_PROP_FRAME_WIDTH, 640);
+		m_capture->set(CV_CAP_PROP_FRAME_HEIGHT, 480);
+	}
+	// Print actual values
+	std::cout << "Webcam frame properties: "
+	  << m_capture->get(CV_CAP_PROP_FRAME_WIDTH) << "x"
+	  << m_capture->get(CV_CAP_PROP_FRAME_HEIGHT) << std::endl;
+
 	// Initialize the video writer
 	#ifdef SAVE_WEBCAM_VIDEO
 	float fps = m_capture->get(CV_CAP_PROP_FPS);
@@ -98,9 +108,16 @@ void Webcam::render() {
 	if (m_frameAvailable && !m_frame.data.empty()) {
 		boost::mutex::scoped_lock l(m_mutex);
 		// Load the image
-		m_surface.load(m_frame.width, m_frame.height, pix::BGR, &m_frame.data[0]);
+		Bitmap bitmap;
+		bitmap.fmt = pix::BGR;
+		bitmap.buf.swap(m_frame.data);
+		bitmap.resize(m_frame.width, m_frame.height);
+		m_surface.load(bitmap);
+		bitmap.buf.swap(m_frame.data);  // Get back our buffer (FIXME: do we need to?)
 		m_frameAvailable = false;
 	}
+	using namespace glmath;
+	Transform trans(scale(vec3(-1.0, 1.0, 1.0)));
 	m_surface.draw(); // Draw
 	#endif
 }

@@ -30,11 +30,7 @@ namespace {
 }
 
 void ScreenSing::enter() {
-	//m_practmode = true; // un-comment this line to play with practice mode. temporary, of course!
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
-	sm->loading(_("Loading theme..."), 0.0);
-	theme.reset(new ThemeSing());
-	m_menuTheme.reset(new ThemeInstrumentMenu());
 	sm->loading(_("Loading song..."), 0.3);
 	// Load the rest of the song
 	if (m_song->loadStatus != Song::FULL) {
@@ -43,18 +39,6 @@ void ScreenSing::enter() {
 			std::cout << e.what() << std::endl;
 			sm->flashMessage(_("Song is broken!"));
 			sm->activateScreen("Songs");
-		}
-	}
-	// Load background
-	sm->loading(_("Loading background..."), 0.4);
-	bool foundbg = false;
-	if (!m_song->background.empty()) { // Load bg image
-		try {
-			m_background.reset(new Surface(m_song->path + m_song->background));
-			foundbg = true;
-		} catch (std::exception& e) {
-			m_song->background = "";
-			std::cerr << e.what() << std::endl;
 		}
 	}
 	// Initialize webcam
@@ -69,27 +53,20 @@ void ScreenSing::enter() {
 	if (!m_song->video.empty() && config["graphic/video"].b()) {
 		m_video.reset(new Video(m_song->path + m_song->video, m_song->videoGap));
 	}
-	// Use random bg if specified fails (also for tracks with video)
-	if (!foundbg) {
-		sm->loading(_("Random background..."), 0.65);
-		for (int i = 1; i <= 2; ++i) { // Try two times in case first is b0rked
-			try {
-				std::string bgpath = m_backgrounds.getRandom();
-				m_background.reset(new Surface(bgpath));
-				break;
-			} catch (std::exception& e) {
-				std::cerr << e.what() << std::endl;
-			}
-		}
-	}
-	sm->loading(_("Loading user interface..."), 0.7);
-	m_pause_icon.reset(new Surface(getThemePath("sing_pause.svg")));
-	m_help.reset(new Surface(getThemePath("instrumenthelp.svg")));
-	m_progress.reset(new ProgressBar(getThemePath("sing_progressbg.svg"), getThemePath("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01f, 0.01f, true));
-	m_progress->dimensions.fixedWidth(0.4).left(-0.5).screenTop();
-	theme->timer.dimensions.screenTop(0.5 * m_progress->dimensions.h());
 	boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
-	m_layout_singer.reset(new LayoutSinger(m_song->getVocalTrack(m_selectedTrack), m_database, theme));
+	reloadGL();
+	// Add a singer layout
+	Engine::VocalTrackPtrs selectedTracks;
+	selectedTracks.push_back(&m_song->getVocalTrack(m_selectedTrack));
+	m_layout_singer.clear();
+	m_layout_singer.push_back(new LayoutSinger(*selectedTracks.back(), m_database, theme));
+	// Do we have a second vocal track and a singer for it?
+	std::vector<std::string> tracks = m_song->getVocalTrackNames();
+	if (tracks.size() > 1 && analyzers.size() > 1) {
+		// TODO: Maybe should check that tracks[1] is not LEAD_VOCALS
+		selectedTracks.push_back(&m_song->getVocalTrack(tracks[1]));
+		m_layout_singer.push_back(new LayoutSinger(*selectedTracks.back(), m_database, theme));
+	}
 	// Load instrument and dance tracks
 	sm->loading(_("Loading instruments..."), 0.8);
 	{
@@ -104,7 +81,7 @@ void ScreenSing::enter() {
 					if (type == 3) break;
 				}
 				if (type == 0) m_dancers.push_back(new DanceGraph(m_audio, *m_song));
-				else m_instruments.push_back(new GuitarGraph(m_audio, *m_song, type == 2, idx, m_practmode));
+				else m_instruments.push_back(new GuitarGraph(m_audio, *m_song, type == 2, idx));
 				++idx;
 			} catch (input::NoDevError&) {
 				++type;
@@ -120,19 +97,20 @@ void ScreenSing::enter() {
 	{	// Vocal tracks
 		ConfigItem::OptionList opts;
 		std::vector<std::string> voctracks = m_song->getVocalTrackNames();
-		int cur = 0;
+		//int cur = 0;
 		// Add vocal tracks to option list
 		for (std::vector<std::string>::const_iterator it = voctracks.begin(); it != voctracks.end(); ++it) {
-			if (m_selectedTrack == *it) cur = opts.size(); // Find the index of current track
+			//if (m_selectedTrack == *it) cur = opts.size(); // Find the index of current track
 			opts.push_back(*it);
 		}
 		m_vocalTrackOpts = ConfigItem(opts); // Create a ConfigItem from the option list
-		if (opts.size() > 1) { // Vocal track changer only if there is options
+		// FIXME: Add a duet option without breaking track selector
+		/*if (opts.size() > 1) { // Vocal track changer only if there is options
 			m_vocalTrackOpts.select(cur); // Set the selection to current track
 			m_menu.add(MenuOption("", _("Change vocal track\n(restart required)"), &m_vocalTrackOpts));
 			m_selectedTrackLocalized = _(m_selectedTrack.c_str());
 			m_menu.back().setDynamicName(m_selectedTrackLocalized); // Set the title to be dynamic
-		}
+		}*/
 	}
 	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
 	m_menu.close();
@@ -140,11 +118,44 @@ void ScreenSing::enter() {
 	double setup_delay = (m_instruments.empty() && m_dancers.empty() ? -1.0 : -5.0);
 	sm->loading(_("Finalizing..."), 0.95);
 	m_audio.playMusic(m_song->music, false, 0.0, setup_delay);
-	m_engine.reset(new Engine(m_audio, m_song->getVocalTrack(m_selectedTrack), analyzers.begin(), analyzers.end(), m_database));
-	sm->loading(_("Loading complete"), 1.0);
+	m_engine.reset(new Engine(m_audio, selectedTracks, analyzers.begin(), analyzers.end(), m_database));
 	// Notify about broken tracks
 	if (m_song->b0rkedTracks) ScreenManager::getSingletonPtr()->dialog(_("Song contains broken tracks!"));
+	sm->showLogo(false);
+	sm->loading(_("Loading graphics..."), 0.9);
+	sm->loading(_("Loading complete"), 1.0);
 }
+
+void ScreenSing::reloadGL() {
+	// Load UI graphics
+	theme.reset(new ThemeSing());
+	m_menuTheme.reset(new ThemeInstrumentMenu());
+	m_pause_icon.reset(new Surface(getThemePath("sing_pause.svg")));
+	m_help.reset(new Surface(getThemePath("instrumenthelp.svg")));
+	m_progress.reset(new ProgressBar(getThemePath("sing_progressbg.svg"), getThemePath("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01f, 0.01f, true));
+	// Load background
+	if (!m_song->background.empty()) m_background.reset(new Surface(m_song->path + m_song->background));
+}
+
+void ScreenSing::exit() {
+	m_engine.reset();
+	m_score_window.reset();
+	m_menu.clear();
+	m_instruments.clear();
+	m_dancers.clear();
+	m_layout_singer.clear();
+	m_help.reset();
+	m_pause_icon.reset();
+	m_cam.reset();
+	m_video.reset();
+	m_background.reset();
+	m_song->dropNotes();
+	m_menuTheme.reset();
+	theme.reset();
+	if (m_audio.isPaused()) m_audio.togglePause();
+	ScreenManager::getSingletonPtr()->showLogo();
+}
+
 
 
 /// Manages the instrument drawing
@@ -185,7 +196,7 @@ bool ScreenSing::instrumentLayout(double time) {
 		}
 	}
 	if (time < -1.0 && count_alive == 0) {
-		glutil::Color c(Color(1.0f, 1.0f, 1.0f, clamp(-2.0 - 2.0 * time)));
+		ColorTrans c(Color::alpha(clamp(-2.0 - 2.0 * time)));
 		m_help->draw();
 	}
 	// Set volume levels (averages of all instruments playing that track)
@@ -233,27 +244,9 @@ void ScreenSing::danceLayout(double time) {
 		}
 	}
 	if (time < -0.5 && count_alive == 0) {
-		glutil::Color c(Color(1.0f, 1.0f, 1.0f, clamp(-1.0 - 2.0 * time)));
+		ColorTrans c(Color::alpha(clamp(-1.0 - 2.0 * time)));
 		m_help->draw();
 	}
-}
-
-void ScreenSing::exit() {
-	m_engine.reset();
-	m_score_window.reset();
-	m_menu.clear();
-	m_instruments.clear();
-	m_dancers.clear();
-	m_layout_singer.reset();
-	m_help.reset();
-	m_pause_icon.reset();
-	m_cam.reset();
-	m_video.reset();
-	m_background.reset();
-	m_song->dropNotes();
-	m_menuTheme.reset();
-	theme.reset();
-	if (m_audio.isPaused()) m_audio.togglePause();
 }
 
 void ScreenSing::activateNextScreen()
@@ -315,7 +308,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			else if (nav == input::UP) { m_menu.move(-1); return; }
 		}
 		// Start button has special functions for skipping things (only in singing for now)
-		if (nav == input::START && m_only_singers_alive && !m_song->getVocalTrack(m_selectedTrack).notes.empty() && !m_audio.isPaused()) {
+		if (nav == input::START && m_only_singers_alive && !m_layout_singer.empty() && !m_audio.isPaused()) {
 			// Open score dialog early
 			if (status == Song::FINISHED) {
 				m_engine->kill(); // Kill the engine thread
@@ -325,7 +318,12 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			else if (status == Song::INSTRUMENTAL_BREAK) {
 				if (time < 0) m_audio.seek(0.0);
 				else {
-					double diff = m_layout_singer->lyrics_begin() - 3.0 - time;
+					// TODO: Instead of calculating here, calculate instrumental breaks right after song loading and store in Song data structures
+					double diff = getNaN();
+					for (size_t i = 0; i < m_layout_singer.size(); ++i) {
+						double d = m_layout_singer[i].lyrics_begin() - 3.0 - time;
+						if (!(d > diff)) diff = d;  // Store smallest d in diff (notice NaN handling)
+					}
 					if (diff > 0.0) m_audio.seek(diff);
 				}
 			}
@@ -374,7 +372,9 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		}
 
 		// Some things must be reset after seeking backwards
-		if (seekback) m_layout_singer->reset();
+		if (seekback)
+			for (int i = 0; i < m_layout_singer.size(); ++i)
+				m_layout_singer[i].reset();
 		// Reload current song
 		if (key == SDLK_r) {
 			exit(); m_song->reload(); enter();
@@ -391,13 +391,20 @@ namespace {
 	void fillBG() {
 		Dimensions dim(arMin);
 		dim.fixedWidth(1.0);
-		glutil::Begin block(GL_QUADS);
-		glVertex2f(dim.x1(), dim.y1());
-		glVertex2f(dim.x2(), dim.y1());
-		glVertex2f(dim.x2(), dim.y2());
-		glVertex2f(dim.x1(), dim.y2());
+		glutil::VertexArray va;
+		va.TexCoord(0,0).Vertex(dim.x1(), dim.y1());
+		va.TexCoord(0,0).Vertex(dim.x2(), dim.y1());
+		va.TexCoord(0,0).Vertex(dim.x1(), dim.y2());
+		va.TexCoord(0,0).Vertex(dim.x2(), dim.y2());
+		getShader("texture").bind();
+		va.Draw();
 	}
 
+}
+
+void ScreenSing::prepare() {
+	double time = m_audio.getPosition();
+	if (m_video) m_video->prepare(time);
 }
 
 void ScreenSing::draw() {
@@ -423,19 +430,19 @@ void ScreenSing::draw() {
 
 	// Rendering starts
 	{
+		Transform ft(farTransform());
 		double ar = arMax;
 		// Background image
-		if (m_background) {
-			ar = m_background->dimensions.ar();
-			if (ar > arMax || (m_video && ar > arMin)) fillBG();  // Fill white background to avoid black borders
-			m_background->draw();
-		} else fillBG(); // Blank
-		// Video
-		if (m_video && (!m_cam || !m_cam->is_good())) {
-			m_video->render(time); double tmp = m_video->dimensions().ar(); if (tmp > 0.0) ar = tmp;
-		}
+		if (!m_background || m_background->empty()) m_background.reset(new Surface(m_backgrounds.getRandom()));
+		ar = m_background->dimensions.ar();
+		if (ar > arMax || (m_video && ar > arMin)) fillBG();  // Fill white background to avoid black borders
+		m_background->draw();
 		// Webcam
 		if (m_cam && config["graphic/webcam"].b()) m_cam->render();
+		// Video
+		if (m_video) {
+			m_video->render(time); double tmp = m_video->dimensions().ar(); if (tmp > 0.0) ar = tmp;
+		}
 		// Top/bottom borders
 		ar = clamp(ar, arMin, arMax);
 		double offset = 0.5 / ar + 0.2;
@@ -445,21 +452,23 @@ void ScreenSing::draw() {
 		theme->bg_top.draw();
 	}
 
-	m_layout_singer->hideLyrics(m_audio.isPaused());
+	for (int i = 0; i < m_layout_singer.size(); ++i)
+		m_layout_singer[i].hideLyrics(m_audio.isPaused());
 
 	// Dancing
-	if( !m_dancers.empty() ) {
+	if (!m_dancers.empty()) {
 		danceLayout(time);
 		//m_layout_singer->draw(time, LayoutSinger::LEFT);
 		m_only_singers_alive = false;
-	// Singing only
-	} else if( m_instruments.empty() ) {
-		m_layout_singer->draw(time, LayoutSinger::BOTTOM);
-		m_only_singers_alive = true;
-	// Band
+	// Singing & band
 	} else {
-		m_only_singers_alive = !instrumentLayout(time);
-		m_layout_singer->draw(time, m_only_singers_alive ? LayoutSinger::BOTTOM : LayoutSinger::MIDDLE);
+		if (m_instruments.empty()) m_only_singers_alive = true;
+		else m_only_singers_alive = !instrumentLayout(time);
+
+		bool fullSinger = m_only_singers_alive && m_layout_singer.size() <= 1;
+		m_layout_singer[0].draw(time, fullSinger ? LayoutSinger::FULL : LayoutSinger::TOP);
+		if (m_layout_singer.size() > 1)
+			m_layout_singer[1].draw(time, LayoutSinger::BOTTOM);
 	}
 
 	Song::Status status = m_song->status(time);
@@ -467,6 +476,8 @@ void ScreenSing::draw() {
 	// Compute and draw the timer and the progressbar
 	{
 		unsigned t = clamp(time, 0.0, length);
+		m_progress->dimensions.fixedWidth(0.4).left(-0.5).screenTop();
+		theme->timer.dimensions.screenTop(0.5 * m_progress->dimensions.h());
 		m_progress->draw(songPercent);
 
 		Song::SongSection section("error", 0);
@@ -475,7 +486,7 @@ void ScreenSing::draw() {
 			statustxt = (boost::format("%02u:%02u - %s") % (t / 60) % (t % 60) % section.name).str();
 		} else  statustxt = (boost::format("%02u:%02u") % (t / 60) % (t % 60)).str();
 
-		if (!m_score_window.get() && m_only_singers_alive && !m_song->getVocalTrack(m_selectedTrack).notes.empty()) {
+		if (!m_score_window.get() && m_only_singers_alive && !m_layout_singer.empty()) {
 			if (status == Song::INSTRUMENTAL_BREAK) statustxt += _("   ENTER to skip instrumental break");
 			if (status == Song::FINISHED && !config["game/karaoke_mode"].b()) statustxt += _("   Remember to wait for grading!");
 		}
@@ -508,13 +519,8 @@ void ScreenSing::draw() {
 	}
 
 	if (m_audio.isPaused()) {
-		if (!m_practmode) {
-			//m_pause_icon->dimensions.middle().center().fixedWidth(.32);
-			//m_pause_icon->draw();
-		} else {
-			// we get here when the song is on hold during practice
-			// TODO: display some (small) info screen here
-		}
+		//m_pause_icon->dimensions.middle().center().fixedWidth(.32);
+		//m_pause_icon->draw();
 	}
 
 	// Menus on top of everything
@@ -569,6 +575,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database, Dancers& 
   m_score_text(getThemePath("score_txt.svg")),
   m_score_rank(getThemePath("score_rank.svg"))
 {
+	ScreenManager::getSingletonPtr()->showLogo();
 	m_pos.setTarget(0.0);
 	m_database.scores.clear();
 	// Singers
@@ -591,9 +598,9 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database, Dancers& 
 		item.track_simple = it->getTrack();
 		item.track = it->getModeId();
 		item.track[0] = toupper(item.track[0]); // Capitalize
-		if (item.track_simple == TrackName::DRUMS) item.color = Color(0.1f, 0.1f, 0.1f);
-		else if (item.track_simple == TrackName::BASS) item.color = Color(0.5f, 0.3f, 0.1f);
-		else item.color = Color(1.0f, 0.0f, 0.0f);
+		if (item.track_simple == TrackName::DRUMS) item.color = Color(0.1, 0.1, 0.1);
+		else if (item.track_simple == TrackName::BASS) item.color = Color(0.5, 0.3, 0.1);
+		else item.color = Color(1.0, 0.0, 0.0);
 
 		m_database.scores.push_back(item);
 		++it;
@@ -606,7 +613,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database, Dancers& 
 		item.track_simple = it->getTrack();
 		item.track = it->getModeId();
 		item.track[0] = toupper(item.track[0]); // Capitalize
-		item.color = Color(1.0f, 0.4f, 0.1f);
+		item.color = Color(1.0, 0.4, 0.1);
 
 		m_database.scores.push_back(item);
 		++it;
@@ -642,21 +649,20 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database, Dancers& 
 		}
 	}
 	m_bg.dimensions.middle().center();
-	m_scoreBar.dimensions.fixedWidth(0.09);
 }
 
 void ScoreWindow::draw() {
-	glutil::PushMatrix block;
-	glTranslatef(0.0, m_pos.get(), 0.0);
+	using namespace glmath;
+	Transform trans(translate(vec3(0.0, m_pos.get(), 0.0)));
 	m_bg.draw();
 	const double spacing = 0.1 + 0.1 / m_database.scores.size();
 	unsigned i = 0;
 
 	for (Database::cur_scores_t::const_iterator p = m_database.scores.begin(); p != m_database.scores.end(); ++p, ++i) {
 		int score = p->score;
-		glutil::Color c(p->color);
+		ColorTrans c(p->color);
 		double x = -0.12 + spacing * (0.5 + i - 0.5 * m_database.scores.size());
-		m_scoreBar.dimensions.middle(x).bottom(0.20);
+		m_scoreBar.dimensions.fixedWidth(0.09).middle(x).bottom(0.20);
 		m_scoreBar.draw(score / 10000.0);
 		m_score_text.render(boost::lexical_cast<std::string>(score));
 		m_score_text.dimensions().middle(x).top(0.24).fixedHeight(0.05);

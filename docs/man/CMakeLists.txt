@@ -22,8 +22,8 @@ endif(HELP2MAN AND GZIP)
 if(ENABLE_TOOLS AND GZIP)
 	set(TOOLS 
 		"ss_pak_extract" "ss_extract" "ss_cover_conv"
-		"ss_adpcm_decode" "ss_ipu_decode" "ss_ipu_conv"
-		"gh_xen_decrypt" "ss_chc_decode")
+		"ss_adpcm_decode" "ss_ipu_conv" "ss_chc_decode"
+		"gh_fsb_decrypt" "gh_xen_decrypt")
 	set(MAN_SECTION "1")
 	foreach(TOOL ${TOOLS})
 		set(TOOL_MANFILE ${CMAKE_CURRENT_SOURCE_DIR}/${TOOL}.${MAN_SECTION})

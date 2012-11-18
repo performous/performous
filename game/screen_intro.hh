@@ -17,6 +17,7 @@ class ScreenIntro : public Screen {
 	ScreenIntro(std::string const& name, Audio& audio);
 	void enter();
 	void exit();
+	void reloadGL();
 	void manageEvent(SDL_Event event);
 	void draw();
 

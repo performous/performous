@@ -9,7 +9,7 @@
 #include "theme.hh"
 #include "video.hh"
 #include "i18n.hh"
-#include "joystick.hh"
+#include "controllers.hh"
 
 #include <iostream>
 #include <sstream>
@@ -94,6 +94,7 @@ void ScreenPlayers::manageEvent(SDL_Event event) {
 }
 
 void ScreenPlayers::draw() {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	m_players.update(); // Poll for new players
 	double length = m_audio.getLength();
 	double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
@@ -130,6 +131,7 @@ void ScreenPlayers::draw() {
 		std::size_t ss = m_players.size();
 		int baseidx = spos + 1.5; --baseidx; // Round correctly
 		double shift = spos - baseidx;
+		// FIXME: 3D browser
 		for (int i = -2; i < 5; ++i) {
 			PlayerItem player_display = m_players[baseidx + i];
 			if (baseidx + i < 0 || baseidx + i >= int(ss)) continue;
@@ -147,7 +149,7 @@ void ScreenPlayers::draw() {
 			// Draw the reflection
 			s.dimensions.top(y + 0.2 * diff); s.tex = TexCoords(0, 1, 1, 0);
 			{
-				glutil::Color c(Color(1.0, 1.0, 1.0, 0.4));
+				ColorTrans c(Color::alpha(0.4));
 				s.draw();
 			}
 			s.tex = TexCoords();
@@ -173,6 +175,6 @@ void ScreenPlayers::draw() {
 		if (!video.empty() && config["graphic/video"].b()) m_video.reset(new Video(video, videoGap));
 		m_playing = music;
 	}
-	m_layout_singer->drawScore(LayoutSinger::MIDDLE);
+	m_layout_singer->drawScore(LayoutSinger::TOP);
 }
 

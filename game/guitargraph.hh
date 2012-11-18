@@ -46,11 +46,10 @@ static inline bool operator==(Chord const& a, Chord const& b) {
 class GuitarGraph: public InstrumentGraph {
   public:
 	/// constructor
-	GuitarGraph(Audio& audio, Song const& song, bool drums, int number, bool practmode=false);
+	GuitarGraph(Audio& audio, Song const& song, bool drums, int number);
 	/** draws GuitarGraph
 	 * @param time at which time to draw
 	 */
-	void updateNeck();
 	void draw(double time);
 	void engine();
 	bool dead() const;
@@ -62,7 +61,14 @@ class GuitarGraph: public InstrumentGraph {
 	double getWhammy() const { return m_whammy; }
 
   private:
+	// refactoring methods
+	void initDrums();
+	void initGuitar();
+	void setupJoinMenuDifficulty();
+	void setupJoinMenuDrums();
+	void setupJoinMenuGuitar();
 	// Engine / scoring utils
+	void updateNeck();
 	bool canActivateStarpower() { return (m_starmeter > 6000); }
 	void activateStarpower();
 	void errorMeter(float error);
@@ -82,7 +88,7 @@ class GuitarGraph: public InstrumentGraph {
 	Texture m_flame_godmode;
 	Surface m_tap; /// image for 2d HOPO note cap
 	Surface m_neckglow; /// image for the glow from the bottom of the neck
-	Color m_neckglowColor;
+	glmath::vec4 m_neckglowColor;
 	Object3d m_fretObj; /// 3d object for regular note
 	Object3d m_tappableObj; /// 3d object for the HOPO note cap
 	std::vector<std::string> m_samples; /// sound effects
@@ -92,8 +98,6 @@ class GuitarGraph: public InstrumentGraph {
 
 	// Flags
 	bool m_drums; /// are we using drums?
-	bool m_use3d; /// are we using 3d?
-	bool m_practmode; /// switch to enable practice mode
 
 	// Track stuff
 	enum Difficulty {
@@ -116,12 +120,14 @@ class GuitarGraph: public InstrumentGraph {
 
 	// Graphics functions
 	Color const colorize(Color c, double time) const;
+	void drawNeckStuff(double time);  ///< Anything in neck coordinates
+	void drawNotes(double time);  ///< Frets etc.
 	void drawBar(double time, float h);
 	void drawNote(int fret, Color, float tBeg, float tEnd, float whammy = 0, bool tappable = false, bool hit = false, double hitAnim = 0.0, double releaseTime = 0.0);
 	void drawDrumfill(float tBeg, float tEnd);
-	void drawInfo(double time, double offsetX, Dimensions dimensions);
+	void drawInfo(double time);
 	float getFretX(int fret) { return (-2.0f + fret- (m_drums ? 0.5 : 0)) * (m_leftymode.b() ? -1 : 1); }
-
+	double neckWidth() const; ///< Get the currently effective neck width (0.5 or less)
 	// Chords & notes
 	void updateChords();
 	bool updateTom(unsigned int tomTrack, unsigned int fretId); // returns true if this tom track exists
@@ -148,7 +154,6 @@ class GuitarGraph: public InstrumentGraph {
 	double m_soloTotal; /// maximum solo score
 	double m_soloScore; /// score during solo
 	bool m_solo; /// are we currently playing a solo
-	bool m_practHold; /// true if holding a chord during practice
 	bool m_hasTomTrack; /// true if the track has at least one tom track
 	double m_whammy; /// whammy value for pitch shift
 };

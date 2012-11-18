@@ -94,10 +94,24 @@ namespace {
 	}
 
 	fs::path origin;  // The primary shared data folder
+	
+	std::string getText(xmlpp::Element const& elem) {
+		return elem.get_child_text()->get_content();
+	}
+	
+	std::string getText(xmlpp::Element const& elem, std::string const& path) {
+		xmlpp::NodeSet ns = elem.find(path);
+		if (ns.empty()) return std::string();
+		return getText(dynamic_cast<xmlpp::Element const&>(*ns[0]));
+	}
 }
 
 std::string ConfigItem::getValue() const {
-	if (m_type == "int") return numericFormat<int>(m_value, m_multiplier, m_step) + m_unit;
+	if (m_type == "int") {
+		int val = boost::get<int>(m_value);
+		if (val >= 0 && val < m_enums.size()) return m_enums[val];
+		return numericFormat<int>(m_value, m_multiplier, m_step) + m_unit;
+	}
 	if (m_type == "float") return numericFormat<double>(m_value, m_multiplier, m_step) + m_unit;
 	if (m_type == "bool") return boost::get<bool>(m_value) ? _("Enabled") : _("Disabled");
 	if (m_type == "string") return boost::get<std::string>(m_value);
@@ -120,24 +134,28 @@ namespace {
 		if (!a) throw XMLError(elem, "attribute " + attr + " not found");
 		return a->get_value();
 	}
-	std::string getLocaleText(xmlpp::Element& elem, std::string const& name) {
-		std::string str;
-		xmlpp::NodeSet n = elem.find("locale/" + name + "/text()"); // TODO: could pick specific locale
-		for (xmlpp::NodeSet::const_iterator it = n.begin(), end = n.end(); it != end; ++it) {
-			xmlpp::TextNode& elem2 = dynamic_cast<xmlpp::TextNode&>(**it);
-			str = elem2.get_content();
-		}
-		return str;
-	}
-
 	template <typename T, typename V> void setLimits(xmlpp::Element& e, V& min, V& max, V& step) {
-		std::string value = getAttribute(e, "min");
-		if (!value.empty()) min = boost::lexical_cast<T>(value);
-		value = getAttribute(e, "max");
-		if (!value.empty()) max = boost::lexical_cast<T>(value);
-		value = getAttribute(e, "step");
-		if (!value.empty()) step = boost::lexical_cast<T>(value);
+		xmlpp::Attribute* a = e.get_attribute("min");
+		if (a) min = boost::lexical_cast<T>(a->get_value());
+		a = e.get_attribute("max");
+		if (a) max = boost::lexical_cast<T>(a->get_value());
+		a = e.get_attribute("step");
+		if (a) step = boost::lexical_cast<T>(a->get_value());
 	}
+}
+
+void ConfigItem::addEnum(std::string name) {
+	verifyType("int");
+	m_enums.push_back(name);
+	m_min = 0;
+	m_max = int(m_enums.size() - 1);
+	m_step = 1;
+}
+
+std::string ConfigItem::getEnumName() {
+	int val = i();
+	if (val >= 0 && val < m_enums.size()) return m_enums[val];
+	return "";
 }
 
 template <typename T> void ConfigItem::updateNumeric(xmlpp::Element& elem, int mode) {
@@ -162,10 +180,17 @@ template <typename T> void ConfigItem::updateNumeric(xmlpp::Element& elem, int m
 	}
 }
 
-void ConfigItem::update(xmlpp::Element& elem, int mode) {
+
+void ConfigItem::update(xmlpp::Element& elem, int mode) try {
 	if (mode == 0) {
 		m_type = getAttribute(elem, "type");
 		if (m_type.empty()) throw std::runtime_error("Entry type attribute is missing");
+		// Menu text
+		m_shortDesc = getText(elem, "short");
+		m_longDesc = getText(elem, "long");
+	} else {
+		std::string type = getAttribute(elem, "type");
+		if (!type.empty() && type != m_type) throw std::runtime_error("Entry type mismatch: " + getAttribute(elem, "name") + ": schema type = " + m_type + ", config type = " + type);
 	}
 	if (m_type == "bool") {
 		std::string value_string = getAttribute(elem, "value");
@@ -177,49 +202,41 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) {
 	} else if (m_type == "int") {
 		std::string value_string = getAttribute(elem, "value");
 		if (!value_string.empty()) m_value = boost::lexical_cast<int>(value_string);
+		// Enum handling
+		if (mode == 0) {
+			xmlpp::NodeSet n2 = elem.find("limits/enum");
+			if (!n2.empty()) {
+				for (xmlpp::NodeSet::const_iterator it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
+					xmlpp::Element& elem2 = dynamic_cast<xmlpp::Element&>(**it2);
+					m_enums.push_back(getText(elem2));
+				}
+				m_min = 0;
+				m_max = int(m_enums.size() - 1);
+				m_step = 1;
+			}
+		}
 		updateNumeric<int>(elem, mode);
 	} else if (m_type == "float") {
 		std::string value_string = getAttribute(elem, "value");
 		if (!value_string.empty()) m_value = boost::lexical_cast<double>(value_string);
 		updateNumeric<double>(elem, mode);
 	} else if (m_type == "string") {
-		xmlpp::NodeSet n2 = elem.find("stringvalue/text()");
-		// FIXME: WTF does this loop do? Does find actually return many elements and why?
-		std::string value;
-		for (xmlpp::NodeSet::const_iterator it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
-			xmlpp::TextNode& elem2 = dynamic_cast<xmlpp::TextNode&>(**it2);
-			value = elem2.get_content();
-		}
-		m_value = value;
+		m_value = getText(elem, "stringvalue");
 	} else if (m_type == "string_list" || m_type == "option_list") {
 		//TODO: Option list should also update selection (from attribute?)
 		std::vector<std::string> value;
-		xmlpp::NodeSet n2 = elem.find("stringvalue/text()");
+		xmlpp::NodeSet n2 = elem.find("stringvalue");
 		for (xmlpp::NodeSet::const_iterator it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
-			xmlpp::TextNode& elem2 = dynamic_cast<xmlpp::TextNode&>(**it2);
-			value.push_back(elem2.get_content());
+			value.push_back(getText(dynamic_cast<xmlpp::Element const&>(**it2)));
 		}
 		m_value = value;
-	}
-
-	{
-		// Update short description
-		xmlpp::NodeSet n2 = elem.find("locale/short/text()");
-		for (xmlpp::NodeSet::const_iterator it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
-			xmlpp::TextNode& elem2 = dynamic_cast<xmlpp::TextNode&>(**it2);
-			m_shortDesc = elem2.get_content();
-		}
-	}
-	{
-		// Update long description
-		xmlpp::NodeSet n2 = elem.find("locale/long/text()");
-		for (xmlpp::NodeSet::const_iterator it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
-			xmlpp::TextNode& elem2 = dynamic_cast<xmlpp::TextNode&>(**it2);
-			m_longDesc = elem2.get_content();
-		}
-	}
+	} else if (!m_type.empty()) throw std::runtime_error("Invalid value type in config schema: " + m_type);
+	// Schema sets all defaults, system config sets the system default
 	if (mode < 1) m_factoryDefaultValue = m_defaultValue = m_value;
 	if (mode < 2) m_defaultValue = m_value;
+} catch (std::exception& e) {
+	int line = elem.get_line();
+	throw std::runtime_error(boost::lexical_cast<std::string>(line) + ": Error while reading entry: " + e.what());
 }
 
 fs::path systemConfFile = "/etc/xdg/performous/config.xml";
@@ -266,7 +283,7 @@ void writeConfig(bool system) {
 		if (exists(conf)) remove(conf);
 		if (dirty) {
 			rename(tmp, conf);
-			std::cerr << "Saved configuration to \"" << conf << "\"" << std::endl;
+			std::cerr << "Saved configuration to " << conf << std::endl;
 		} else {
 			std::cerr << "Using default settings, no configuration file needed." << std::endl;
 		}
@@ -286,8 +303,8 @@ void readMenuXML(xmlpp::Node* node) {
 	xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(*node);
 	MenuEntry me;
 	me.name = getAttribute(elem, "name");
-	me.shortDesc = getLocaleText(elem, "short");
-	me.longDesc = getLocaleText(elem, "long");
+	me.shortDesc = getText(elem, "short");
+	me.longDesc = getText(elem, "long");
 	configMenu.push_back(me);
 }
 
@@ -334,6 +351,8 @@ void readConfigXML(fs::path const& file, int mode) {
 		int line = e.elem.get_line();
 		std::string name = e.elem.get_name();
 		throw std::runtime_error(file.string() + ":" + boost::lexical_cast<std::string>(line) + " element " + name + " " + e.message);
+	} catch (std::exception& e) {
+		throw std::runtime_error(file.string() + ":" + e.what());
 	}
 }
 
@@ -354,4 +373,15 @@ void readConfig() {
 	readConfigXML(schemafile, 0);  // Read schema and defaults
 	readConfigXML(systemConfFile, 1);  // Update defaults with system config
 	readConfigXML(userConfFile, 2);  // Read user settings
+	{ // Populate themes
+		ConfigItem& ci = config["game/theme"];
+		std::vector<std::string> themes = getThemes();
+		bool useDefaultTheme = (ci.i() == -1);
+		for (int i = 0; i < themes.size(); ++i) {
+			ci.addEnum(themes[i]);
+			// Select the default theme is no other is selected
+			if (useDefaultTheme && themes[i] == "default")
+				ci.i() = i;
+		}
+	}
 }

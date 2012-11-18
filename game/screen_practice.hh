@@ -2,7 +2,7 @@
 
 #include <boost/scoped_ptr.hpp>
 #include "screen.hh"
-#include "joystick.hh"
+#include "controllers.hh"
 
 class Audio;
 class Sample;
@@ -16,6 +16,7 @@ class ScreenPractice : public Screen {
 	ScreenPractice(std::string const& name, Audio& audio);
 	void enter();
 	void exit();
+	void reloadGL();
 	void manageEvent( SDL_Event event );
 	void draw();
 

@@ -1,9 +1,10 @@
-# Copyright 1999-2006 Gentoo Foundation
+# Copyright 1999-2012 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /cvsroot/ultrastar-ng/UltraStar-ng/portage-overlay/games-arcade/performous/performous-9999.ebuild,v 1.10 2007/09/29 13:04:19 yoda-jm Exp $
+# $Header: $
 
-[[ ${PV} = 9999 ]] && GIT="git"
-EAPI=2
+EAPI=4
+
+[[ ${PV} = 9999 ]] && GIT="git-2"
 
 inherit cmake-utils ${GIT} games
 
@@ -19,13 +20,14 @@ SRC_URI="songs? (
 	)"
 
 if [ "$PV" != "9999" ]; then
-	MY_PN=Performous
-	MY_P=${MY_PN}-${PV}-Source
-	SRC_URI=" mirror://sourceforge/${PN}/${MY_P}.tar.bz2
+	SRC_URI=" mirror://sourceforge/${PN}/${P}.tar.bz2
 		$SRC_URI"
 else
 	EGIT_REPO_URI="git://performous.git.sourceforge.net/gitroot/performous/performous"
-	EGIT_BRANCH="master"
+	# git-2 default branch is master
+	#EGIT_BRANCH="master"
+	# use performous_LIVE_BRANCH env var to install another branch (for example
+	# legacy or torrent)
 fi
 
 LICENSE="GPL-2
@@ -36,7 +38,7 @@ LICENSE="GPL-2
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 
-IUSE="debug midi songs tools webcam"
+IUSE="debug bittorrent midi songs tools webcam"
 
 RDEPEND="gnome-base/librsvg
 	>=dev-libs/boost-1.39.0
@@ -45,26 +47,23 @@ RDEPEND="gnome-base/librsvg
 	media-libs/glew
 	media-libs/libsdl[joystick,opengl]
 	media-libs/libpng
-	media-libs/jpeg
+	virtual/jpeg
 	tools? ( media-gfx/imagemagick[png] )
+	midi? ( media-libs/portmidi )
 	webcam? ( media-libs/opencv[v4l] )
+	bittorrent? ( >=net-libs/rb_libtorrent-0.16.3 )
 	>=media-video/ffmpeg-0.4.9_p20070616-r20
 	media-libs/portaudio
 	sys-apps/help2man
 	!games-arcade/ultrastar-ng"
-# Waiting for portmidi to enter portage (#90614)
-#RDEPEND="${RDEPEND}
-#	midi? ( media-libs/portmidi )"
 DEPEND="${RDEPEND}
     >=dev-util/cmake-2.6.0"
 
-S=${WORKDIR}/${MY_P}
-
 src_unpack() {
 	if [ "${PV}" != "9999" ]; then
-		unpack "${MY_P}.tar.bz2"
+		unpack "${P}.tar.bz2"
 	else
-		git_src_unpack
+		git-2_src_unpack
 	fi
 	cd "${S}"
 	if use songs; then
@@ -80,13 +79,12 @@ src_configure() {
 	local mycmakeargs="
 		$(cmake-utils_use_enable tools TOOLS)
 		$(cmake-utils_use_no webcam WEBCAM)
+		$(cmake-utils_use_no bittorrent TORRENT)
+		$(cmake-utils_use_no midi PORTMIDI)
 		-DCMAKE_INSTALL_PREFIX=${GAMES_PREFIX}
 		-DGENTOO_DATA_DIR=${GAMES_DATADIR}/${PN}
 		-DLOCALE_DIR=/usr/share
 		-DCMAKE_BUILD_TYPE=Release"
-#	local mycmakeargs="
-#		$(cmake-utils_use_no midi MIDI)
-#		${mycmakeargs}"
 
 	cmake-utils_src_configure
 }

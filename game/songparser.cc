@@ -43,11 +43,10 @@ SongParser::SongParser(Song& s):
   m_prevtime(),
   m_prevts(),
   m_relativeShift(),
-  m_maxScore(),
   m_tsPerBeat(),
   m_tsEnd()
 {
-	enum { NONE, TXT, INI, SM } type = NONE;
+	enum { NONE, TXT, XML, INI, SM } type = NONE;
 	// Read the file, determine the type and do some initial validation checks
 	{
 		std::ifstream f((s.path + s.filename).c_str(), std::ios::binary);
@@ -61,6 +60,7 @@ SongParser::SongParser(Song& s):
 		if (smCheck(data)) type = SM;
 		else if (txtCheck(data)) type = TXT;
 		else if (iniCheck(data)) type = INI;
+		else if (xmlCheck(data)) type = XML;
 		else throw SongParserException("Does not look like a song file (wrong header)", 1, true);
 		m_ss.write(&data[0], size);
 	}
@@ -70,6 +70,7 @@ SongParser::SongParser(Song& s):
 		try {
 			if (type == TXT) txtParse();
 			else if (type == INI) iniParse();
+			else if (type == XML) xmlParse();
 			else if (type == SM) smParse();
 		} catch (std::runtime_error& e) {
 			throw SongParserException(e.what(), m_linenum);
@@ -82,7 +83,10 @@ SongParser::SongParser(Song& s):
 	try {
 		if (type == TXT) txtParseHeader();
 		else if (type == INI) iniParseHeader();
+		else if (type == XML) xmlParseHeader();
 		else if (type == SM) { smParseHeader(); s.dropNotes(); } // Hack: drop notes here
+		// Default for preview position if none was specified in header
+		if (s.preview_start != s.preview_start) s.preview_start = (type == INI ? 5.0 : 30.0);  // 5 s for band mode, 30 s for others
 	} catch (std::runtime_error& e) {
 		throw SongParserException(e.what(), m_linenum);
 	}
@@ -101,7 +105,11 @@ SongParser::SongParser(Song& s):
 
 		for (boost::filesystem::directory_iterator dirIt(s.path), dirEnd; dirIt != dirEnd; ++dirIt) {
 			boost::filesystem::path p = dirIt->path();
+#if BOOST_FILESYSTEM_VERSION < 3
 			std::string name = p.leaf(); // File basename
+#else
+			std::string name = p.filename().string(); // File basename
+#endif
 			if (m_song.cover.empty() && regex_match(name.c_str(), match, coverfile)) {
 				m_song.cover = name;
 			} else if (m_song.background.empty() && regex_match(name.c_str(), match, backgroundfile)) {
@@ -114,12 +122,35 @@ SongParser::SongParser(Song& s):
 	s.loadStatus = Song::HEADER;
 }
 
+void SongParser::resetNoteParsingState() {
+	m_prevtime = 0;
+	m_prevts = 0;
+	m_relativeShift = 0;
+	m_tsPerBeat = 0;
+	m_tsEnd = 0;
+	m_bpms.clear();
+	if (m_bpm != 0.0) addBPM(0, m_bpm);
+}
 
 void SongParser::finalize() {
 	std::vector<std::string> tracks = m_song.getVocalTrackNames();
 	for(std::vector<std::string>::const_iterator it = tracks.begin() ; it != tracks.end() ; ++it) {
-		// Adjust negative notes
 		VocalTrack& vocal = m_song.getVocalTrack(*it);
+		// Remove empty sentences
+		{
+			Note::Type lastType = Note::NORMAL;
+			for (Notes::iterator itn = vocal.notes.begin(); itn != vocal.notes.end();) {
+				Note::Type type = itn->type;
+				if(type == Note::SLEEP && lastType == Note::SLEEP) {
+					std::clog << "songparser/warning: Discarding empty sentence" << std::endl;
+					itn = vocal.notes.erase(itn);
+				} else {
+					++itn;
+				}
+				lastType = type;
+			}
+		}
+		// Adjust negative notes
 		if (vocal.noteMin <= 0) {
 			unsigned int shift = (1 - vocal.noteMin / 12) * 12;
 			vocal.noteMin += shift;
@@ -131,7 +162,12 @@ void SongParser::finalize() {
 		}
 		// Set begin/end times
 		if (!vocal.notes.empty()) vocal.beginTime = vocal.notes.front().begin, vocal.endTime = vocal.notes.back().end;
-		vocal.m_scoreFactor = 1.0 / m_maxScore;
+		// Compute maximum score
+		double max_score = 0.0;
+		for (Notes::iterator itn = vocal.notes.begin(); itn != vocal.notes.end(); ++itn) {
+			max_score += itn->maxScore();
+		}
+		vocal.m_scoreFactor = 1.0 / max_score;
 	}
 	if (m_tsPerBeat) {
 		// Add song beat markers

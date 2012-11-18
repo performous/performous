@@ -28,28 +28,36 @@ void NoteGraph::reset() {
 
 namespace {
 	void drawNotebar(Texture const& texture, double x, double ybeg, double yend, double w, double h) {
+		glutil::VertexArray va;
 		UseTexture tblock(texture);
-		glutil::Begin block(GL_TRIANGLE_STRIP);
-		glTexCoord2f(0.0f, 0.0f); glVertex2f(x, ybeg);
-		glTexCoord2f(0.0f, 1.0f); glVertex2f(x, ybeg + h);
+
+		// The front cap begins
+		va.TexCoord(0.0f, 0.0f).Vertex(x, ybeg);
+		va.TexCoord(0.0f, 1.0f).Vertex(x, ybeg + h);
 		if (w >= 2.0 * h) {
-			double tmp = h / w;
+			// Calculate the y coordinates of the middle part
+			double tmp = h / w;  // h = cap size (because it is a h by h square)
 			double y1 = (1.0 - tmp) * ybeg + tmp * yend;
 			double y2 = tmp * ybeg + (1.0 - tmp) * yend;
-			glTexCoord2f(0.5f, 0.0f); glVertex2f(x + h, y1);
-			glTexCoord2f(0.5f, 1.0f); glVertex2f(x + h, y1 + h);
-			glTexCoord2f(0.5f, 0.0f); glVertex2f(x + w - h, y2);
-			glTexCoord2f(0.5f, 1.0f); glVertex2f(x + w - h, y2 + h);
+			// The middle part between caps
+			va.TexCoord(0.5f, 0.0f).Vertex(x + h, y1);
+			va.TexCoord(0.5f, 1.0f).Vertex(x + h, y1 + h);
+			va.TexCoord(0.5f, 0.0f).Vertex(x + w - h, y2);
+			va.TexCoord(0.5f, 1.0f).Vertex(x + w - h, y2 + h);
 		} else {
+			// Note is too short to even fit caps, crop to fit.
 			double ymid = 0.5 * (ybeg + yend);
 			float crop = 0.25f * w / h;
-			glTexCoord2f(crop, 0.0f); glVertex2f(x + 0.5 * w, ymid);
-			glTexCoord2f(crop, 1.0f); glVertex2f(x + 0.5 * w, ymid + h);
-			glTexCoord2f(1.0f - crop, 0.0f); glVertex2f(x + 0.5 * w, ymid);
-			glTexCoord2f(1.0f - crop, 1.0f); glVertex2f(x + 0.5 * w, ymid + h);
+			va.TexCoord(crop, 0.0f).Vertex(x + 0.5 * w, ymid);
+			va.TexCoord(crop, 1.0f).Vertex(x + 0.5 * w, ymid + h);
+			va.TexCoord(1.0f - crop, 0.0f).Vertex(x + 0.5 * w, ymid);
+			va.TexCoord(1.0f - crop, 1.0f).Vertex(x + 0.5 * w, ymid + h);
 		}
-		glTexCoord2f(1.0f, 0.0f); glVertex2f(x + w, yend);
-		glTexCoord2f(1.0f, 1.0f); glVertex2f(x + w, yend + h);
+		// The rear cap ends
+		va.TexCoord(1.0f, 0.0f).Vertex(x + w, yend);
+		va.TexCoord(1.0f, 1.0f).Vertex(x + w, yend + h);
+
+		va.Draw();
 	}
 }
 
@@ -88,6 +96,9 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 		case NoteGraph::TOP:
 			dimensions.stretch(1.0, 0.32).bottom(0.0);
 			break;
+		case NoteGraph::BOTTOM:
+			dimensions.stretch(1.0, 0.32).top(0.0);
+			break;
 		case NoteGraph::LEFT:
 			dimensions.stretch(0.50, 0.50).center().left(-0.5);
 			break;
@@ -101,6 +112,13 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 	m_baseY = -0.5 * (m_min + m_max) * m_noteUnit + dimensions.yc();
 	m_baseX = baseLine - m_time * pixUnit + dimensions.xc();  // FIXME: Moving in X direction requires additional love (is b0rked now, keep it centered at zero)
 
+	// Fading notelines handing
+	if (m_songit == m_vocal.notes.end() || m_songit->begin > m_time + 3.0) m_notealpha -= 0.02f;
+	else if (m_notealpha < 1.0f) m_notealpha += 0.02f;
+	if (m_notealpha <= 0.0f) { m_notealpha = 0.0f; return; }
+
+	ColorTrans c(Color::alpha(m_notealpha));
+
 	drawNotes();
 	if (config["game/pitch"].b()) drawWaves(database);
 
@@ -113,13 +131,13 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 			float hh = -m_noteUnit;
 			float centery = m_baseY + (it->note + 0.4) * m_noteUnit; // Star is 0.4 notes higher than current note
 			float centerx = x + w - (player_star_offset + 1.2) * hh; // Star is 1.2 units from end
-			float rot = fmod(time * 360, 360); // They rotate!
-			float zoom = (std::abs((rot-180) / 360.0f) * 0.8f + 0.6f) * (position == NoteGraph::TOP ? 2.3 : 2.0) * hh;
-			glutil::PushMatrix pm;
-			glTranslatef(centerx, centery, 0.0f);
-			glRotatef(rot, 0.0f, 0.0f, 1.0f);
+			float rot = fmod(time * 5.0, 2.0 * M_PI); // They rotate!
+			bool smallerNoteGraph = ((position == NoteGraph::TOP) || (position == NoteGraph::BOTTOM));
+			float zoom = (std::abs((rot-180) / 360.0f) * 0.8f + 0.6f) * (smallerNoteGraph ? 2.3 : 2.0) * hh;
+			using namespace glmath;
+			Transform trans(translate(vec3(centerx, centery, 0.0f)) * rotate(rot, vec3(0.0f, 0.0f, 1.0f)));
 			{
-				glutil::Color c(Color(it_col->r, it_col->g, it_col->b, it_col->a));
+				ColorTrans c(Color(it_col->r, it_col->g, it_col->b, it_col->a));
 				m_star_hl.draw(Dimensions().stretch(zoom*1.2, zoom*1.2).center().middle(), TexCoords());
 			}
 			m_star.draw(Dimensions().stretch(zoom, zoom).center().middle(), TexCoords());
@@ -130,90 +148,57 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 
 void NoteGraph::drawNotes() {
 	// Draw note lines
-	if (m_songit == m_vocal.notes.end() || m_songit->begin > m_time + 3.0) m_notealpha -= 0.02f;
-	else if (m_notealpha < 1.0f) m_notealpha += 0.02f;
-	if (m_notealpha <= 0.0f) {
-		m_notealpha = 0.0f;
-	} else {
-		glutil::Color c(Color(1.0, 1.0, 1.0, m_notealpha));
-		m_notelines.draw(Dimensions().stretch(dimensions.w(), (m_max - m_min - 13) * m_noteUnit).middle(dimensions.xc()).center(dimensions.yc()), TexCoords(0.0, (-m_min - 7.0) / 12.0f, 1.0, (-m_max + 6.0) / 12.0f));
+	m_notelines.draw(Dimensions().stretch(dimensions.w(), (m_max - m_min - 13) * m_noteUnit).middle(dimensions.xc()).center(dimensions.yc()), TexCoords(0.0, (-m_min - 7.0) / 12.0f, 1.0, (-m_max + 6.0) / 12.0f));
 
-		// Draw notes
-		for (Notes::const_iterator it = m_songit; it != m_vocal.notes.end() && it->begin < m_time - (baseLine - 0.5) / pixUnit; ++it) {
-			if (it->type == Note::SLEEP) continue;
-			double alpha = it->power;
-			Texture* t1;
-			Texture* t2;
-			switch (it->type) {
-			  case Note::NORMAL: case Note::SLIDE: t1 = &m_notebar; t2 = &m_notebar_hl; break;
-			  case Note::GOLDEN: t1 = &m_notebargold; t2 = &m_notebargold_hl; break;
-			  case Note::FREESTYLE:  // Freestyle notes use custom handling
-				{
-					Dimensions dim;
-					dim.middle(m_baseX + 0.5 * (it->begin + it->end) * pixUnit).center(m_baseY + it->note * m_noteUnit).stretch((it->end - it->begin) * pixUnit, -m_noteUnit * 12.0);
-					float xoffset = 0.1 * m_time / m_notebarfs.ar();
-					m_notebarfs.draw(dim, TexCoords(xoffset, 0.0, xoffset + dim.ar() / m_notebarfs.ar(), 1.0));
-					if (alpha > 0.0) {
-						float xoffset = rand() / double(RAND_MAX);
-						m_notebarfs_hl.draw(dim, TexCoords(xoffset, 0.0, xoffset + dim.ar() / m_notebarfs_hl.ar(), 1.0));
-					}
+	// Draw notes
+	for (Notes::const_iterator it = m_songit; it != m_vocal.notes.end() && it->begin < m_time - (baseLine - 0.5) / pixUnit; ++it) {
+		if (it->type == Note::SLEEP) continue;
+		double alpha = it->power;
+		Texture* t1;
+		Texture* t2;
+		switch (it->type) {
+		  case Note::NORMAL: case Note::SLIDE: t1 = &m_notebar; t2 = &m_notebar_hl; break;
+		  case Note::GOLDEN: t1 = &m_notebargold; t2 = &m_notebargold_hl; break;
+		  case Note::FREESTYLE:  // Freestyle notes use custom handling
+			{
+				Dimensions dim;
+				dim.middle(m_baseX + 0.5 * (it->begin + it->end) * pixUnit).center(m_baseY + it->note * m_noteUnit).stretch((it->end - it->begin) * pixUnit, -m_noteUnit * 12.0);
+				float xoffset = 0.1 * m_time / m_notebarfs.ar();
+				m_notebarfs.draw(dim, TexCoords(xoffset, 0.0, xoffset + dim.ar() / m_notebarfs.ar(), 1.0));
+				if (alpha > 0.0) {
+					float xoffset = rand() / double(RAND_MAX);
+					m_notebarfs_hl.draw(dim, TexCoords(xoffset, 0.0, xoffset + dim.ar() / m_notebarfs_hl.ar(), 1.0));
 				}
-				continue;
-			  default: throw std::logic_error("Unknown note type: don't know how to render");
 			}
-			double x = m_baseX + it->begin * pixUnit + m_noteUnit; // left x coordinate: begin minus border (side borders -noteUnit wide)
-			double ybeg = m_baseY + (it->notePrev + 1) * m_noteUnit; // top y coordinate (on the one higher note line)
-			double yend = m_baseY + (it->note + 1) * m_noteUnit; // top y coordinate (on the one higher note line)
-			double w = (it->end - it->begin) * pixUnit - m_noteUnit * 2.0; // width: including borders on both sides
-			double h = -m_noteUnit * 2.0; // height: 0.5 border + 1.0 bar + 0.5 border = 2.0
-			drawNotebar(*t1, x, ybeg, yend, w, h);
-			if (alpha > 0.0) {
-				glutil::Color c(Color(1.0f, 1.0f, 1.0f, alpha * m_notealpha));
-				drawNotebar(*t2, x, ybeg, yend, w, h);
-			}
+			continue;
+		  default: throw std::logic_error("Unknown note type: don't know how to render");
+		}
+		double x = m_baseX + it->begin * pixUnit + m_noteUnit; // left x coordinate: begin minus border (side borders -noteUnit wide)
+		double ybeg = m_baseY + (it->notePrev + 1) * m_noteUnit; // top y coordinate (on the one higher note line)
+		double yend = m_baseY + (it->note + 1) * m_noteUnit; // top y coordinate (on the one higher note line)
+		double w = (it->end - it->begin) * pixUnit - m_noteUnit * 2.0; // width: including borders on both sides
+		double h = -m_noteUnit * 2.0; // height: 0.5 border + 1.0 bar + 0.5 border = 2.0
+		drawNotebar(*t1, x, ybeg, yend, w, h);
+		if (alpha > 0.0) {
+			ColorTrans c(Color::alpha(alpha));
+			drawNotebar(*t2, x, ybeg, yend, w, h);
 		}
 	}
 }
 
 namespace {
-	struct Point {
-		float tx;
-		float ty;
-		float vx;
-		float vy;
-		Point(float tx_, float ty_, float vx_, float vy_): tx(tx_), ty(ty_), vx(vx_), vy(vy_) {}
-	};
-
-	typedef std::vector<Point> Points;
-
-	void strip(Points& points) {
-		size_t s = points.size();
-		if (s > 3) {
-			// Combine the two last points into a terminating point
-			{
-				Point& p = points[s-2];
-				p.ty = 0.5f;
-				p.vy = 0.5f * (p.vy + points[s-1].vy);
-			}
-			points.pop_back();
-			// Render them as a triangle stripe
-			glEnableClientState(GL_VERTEX_ARRAY);
-			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-			glTexCoordPointer(2, GL_FLOAT, sizeof(Point), &points.front().tx);
-			glVertexPointer(2, GL_FLOAT, sizeof(Point), &points.front().vx);
-			glDrawArrays(GL_TRIANGLE_STRIP, 0, points.size());
-			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-			glDisableClientState(GL_VERTEX_ARRAY);
-		}
-		points.clear();
+	void strip(glutil::VertexArray& va) {
+		if (va.size() > 3) va.Draw();
+		va.clear();
 	}
 }
 
 void NoteGraph::drawWaves(Database const& database) {
 	if (m_vocal.notes.empty()) return; // Cannot draw without notes
 	UseTexture tblock(m_wave);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	for (std::list<Player>::const_iterator p = database.cur.begin(); p != database.cur.end(); ++p) {
+		if (p->m_vocal.name != m_vocal.name)
+			continue;
 		float const texOffset = 2.0 * m_time; // Offset for animating the wave texture
 		Player::pitch_t const& pitch = p->m_pitch;
 		size_t const beginIdx = std::max(0.0, m_time - 0.5 / pixUnit) / Engine::TIMESTEP; // At which pitch idx to start displaying the wave
@@ -225,9 +210,9 @@ void NoteGraph::drawWaves(Database const& database) {
 		float tex = texOffset;
 		double t = idx * Engine::TIMESTEP;
 		double oldval = getNaN();
-		Points points;
+		glutil::VertexArray va;
 		Notes::const_iterator noteIt = m_vocal.notes.begin();
-		glutil::Color c(Color(p->m_color.r, p->m_color.g, p->m_color.b, m_notealpha));
+		glmath::vec4 c(p->m_color.r, p->m_color.g, p->m_color.b, 1.0);
 		for (; idx < endIdx; ++idx, t += Engine::TIMESTEP) {
 			double const freq = pitch[idx].first;
 			// If freq is NaN, we have nothing to process
@@ -253,17 +238,16 @@ void NoteGraph::drawWaves(Database const& database) {
 			thickness *= 1.0 + 0.2 * std::sin(tex - 2.0 * texOffset); // Further animation :)
 			thickness *= -m_noteUnit;
 			// If there has been a break or if the pitch change is too fast, terminate and begin a new one
-			if (oldval != oldval || std::abs(oldval - val) > 1) strip(points);
+			if (oldval != oldval || std::abs(oldval - val) > 1) strip(va);
 			// Add a point or a pair of points
-			if (points.empty()) points.push_back(Point(tex, 0.5f, x, y));
+			if (!va.size()) va.TexCoord(tex, 0.5f).Color(c).Vertex(x, y);
 			else {
-				points.push_back(Point(tex, 0.0f, x, y - thickness));
-				points.push_back(Point(tex, 1.0f, x, y + thickness));
+				va.TexCoord(tex, 0.0f).Color(c).Vertex(x, y - thickness);
+				va.TexCoord(tex, 1.0f).Color(c).Vertex(x, y + thickness);
 			}
 			oldval = val;
 		}
-		strip(points);
+		strip(va);
 	}
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 

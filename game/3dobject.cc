@@ -1,16 +1,19 @@
 #include "3dobject.hh"
 
+#include "surface.hh"
+
 #include <sstream>
 #include <fstream>
 #include <stdexcept>
-#include <cmath>
-
+#include <boost/lexical_cast.hpp>
 
 // TODO: test & fix faces that doesn't have texcoords in the file
 // TODO: group handling for loader
 
-
 namespace {
+	static const int HAS_TEXCOORDS = 1;
+	static const int HAS_NORMALS = 2;
+
 	/// Returns a word (delimited by delim) in a string st at position pos (1-based)
 	std::string getWord(std::string& st, size_t pos, char delim) {
 		std::istringstream iss(st);
@@ -21,97 +24,100 @@ namespace {
 	}
 }
 
+/// A polygon containing links to required point data
+struct Face {
+	std::vector<int> vertices;
+	std::vector<int> texcoords;
+	std::vector<int> normals;
+};
+
 /// Load a Wavefront .obj file and possibly scale it also
 void Object3d::loadWavefrontObj(std::string filepath, float scale) {
+	int linenumber = 0;
 	std::string row;
 	std::ifstream file(filepath.c_str(), std::ios::binary);
 	if (!file.is_open()) throw std::runtime_error("Couldn't open object file "+filepath);
-	// Get rid of old data
-	m_vertices.clear();
-	m_faces.clear();
-	m_texcoords.clear();
-	while (!file.eof()) {
-		getline(file, row); // Read a line
+	std::vector<glmath::vec4> m_vertices, m_normals, m_texcoords;
+	std::vector<Face> m_faces;
+	while (getline(file, row)) {
+		++linenumber;
 		std::istringstream srow(row);
 		float x,y,z;
 		std::string tempst;
 		if (row.substr(0,2) == "v ") {  // Vertices
 			srow >> tempst >> x >> y >> z;
-			m_vertices.push_back(Vertex(x*scale,y*scale,z*scale));
+			m_vertices.push_back(glmath::vec4(x*scale, y*scale, z*scale, 1.0f));
 		} else if (row.substr(0,2) == "vt") {  // Texture Coordinates
 			srow >> tempst >> x >> y;
-			m_texcoords.push_back(TexCoord(x,y));
+			m_texcoords.push_back(glmath::vec4(x, y, 0.0f, 0.0f));
 		} else if (row.substr(0,2) == "vn") {  // Normals
 			srow >> tempst >> x >> y >> z;
 			double sum = std::abs(x)+std::abs(y)+std::abs(z);
-			if (sum == 0) throw std::runtime_error("Object "+filepath+" has invalid normal(s).");
+			if (sum == 0) throw std::runtime_error("Invalid normal in "+filepath+":"+boost::lexical_cast<std::string>(linenumber));
 			x /= sum; y /= sum; z /= sum; // Normalize components
-			m_normals.push_back(Vertex(x,y,z));
+			m_normals.push_back(glmath::vec4(x, y, z, 0.0));
 		} else if (row.substr(0,2) == "f ") {  // Faces
 			Face f;
-			srow >> tempst;
-			int v_id;
+			srow >> tempst; // Eat away prefix
 			// Parse face point's coordinate references
-			while (!srow.eof()) {
-				srow >> tempst;
-				for (size_t i = 1; i <= 3; i++) {
-					std::string st_id(getWord(tempst,i,'/'));
+			for (std::string fpoint; srow >> fpoint; ) {
+				for (size_t i = 1; i <= 3; ++i) {
+					std::string st_id(getWord(fpoint,i,'/'));
 					if (!st_id.empty()) {
-						std::istringstream conv_int(st_id);
-						conv_int >> v_id;
+						// Vertex indices are 1-based in the file
+						int v_id = boost::lexical_cast<int>(st_id) - 1;
 						switch (i) {
-							// Vertex indices are 1-based in the file
-							case 1: f.vertices.push_back(v_id-1); break;
-							case 2: f.texcoords.push_back(v_id-1); break;
-							case 3: f.normals.push_back(v_id-1); break;
+							case 1: f.vertices.push_back(v_id); break;
+							case 2: f.texcoords.push_back(v_id); break;
+							case 3: f.normals.push_back(v_id); break;
 						}
 					}
 				}
 			}
+			// FIXME: We only allow triangle faces since the VBO generator/drawer
+			//        cannot handle anything else (at least for now).
+			if (f.vertices.size() > 0 && f.vertices.size() != 3)
+				throw std::runtime_error("Only triangle faces allowed in "+filepath+":"+boost::lexical_cast<std::string>(linenumber));
 			// Face must have equal number of v, vt, vn or none of a kind
 			if (f.vertices.size() > 0
 			  && (f.texcoords.empty() || (f.texcoords.size() == f.vertices.size()))
 			  && (f.normals.empty()   || (f.normals.size() == f.vertices.size()))) {
 				m_faces.push_back(f);
 			} else {
-				throw std::runtime_error("Object "+filepath+" has invalid face(s).");
+				throw std::runtime_error("Invalid face in "+filepath+":"+boost::lexical_cast<std::string>(linenumber));
 			}
 		}
 	}
+	// Construct a vertex array
+	for (std::vector<Face>::const_iterator i = m_faces.begin(); i != m_faces.end(); ++i) {
+		bool hasNormals = !i->normals.empty();
+		bool hasTexCoords = !i->texcoords.empty();
+		for (size_t j = 0; j < i->vertices.size(); ++j) {
+			if (hasNormals) m_va.Normal(m_normals[i->normals[j]]);
+			if (hasTexCoords) m_va.TexCoord(m_texcoords[i->texcoords[j]]);
+			m_va.Vertex(m_vertices[i->vertices[j]]);
+		}
+	}
+
 }
 
-/// Generate a display list from the object data parsed earlier
-void Object3d::generateDisplayList() {
-	if (m_displist != 0) glDeleteLists(m_displist, 1); // Get rid of old
-	m_displist = glGenLists(1); // Get id for the list
-	glutil::DisplayList displist(m_displist, GL_COMPILE); // From now on, gl-commands go to the list
-	std::vector<Face>::const_iterator it;
-	// Iterate through faces
-	for (it = m_faces.begin(); it != m_faces.end(); ++it) {
-		// Select a suitable primitive
-		GLenum polyType = GL_POLYGON;
-		switch (it->vertices.size()) {
-			case 3: polyType = GL_TRIANGLES; break;
-			case 4: polyType = GL_QUADS; break;
-		}
-		glutil::Begin block(polyType);
-		// Iterate through face's points
-		std::vector<int>::const_iterator it2;
-		for (size_t i = 0; i < it->vertices.size(); i++) {
-			// Texture coordinates
-			if (!it->texcoords.empty())
-			  glTexCoord2f(m_texcoords[it->texcoords[i]].s, m_texcoords[it->texcoords[i]].t);
-			// Normals
-			if (!it->normals.empty())
-			  glNormal3f(
-				m_normals[it->normals[i]].x,
-				m_normals[it->normals[i]].y,
-				m_normals[it->normals[i]].z);
-			// Vertices
-			glVertex3f(
-			  m_vertices[it->vertices[i]].x,
-			  m_vertices[it->vertices[i]].y,
-			  m_vertices[it->vertices[i]].z);
-		}
+void Object3d::load(std::string filepath, std::string texturepath, float scale) {
+	if (!texturepath.empty()) m_texture.reset(new Texture(texturepath));
+	loadWavefrontObj(filepath, scale);
+}
+
+void Object3d::drawVBO() {
+	UseShader us(getShader("3dobject"));
+	m_va.Draw(GL_TRIANGLES);
+}
+
+void Object3d::draw(float x, float y, float z, float s) {
+	using namespace glmath;
+	Transform trans(translate(vec3(x, y, z)) * scale(s));  // Move to position and scale
+	if (m_texture) {
+		UseTexture tex(*m_texture);
+		drawVBO();
+	} else {
+		drawVBO();
 	}
 }

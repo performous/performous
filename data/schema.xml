@@ -16,223 +16,230 @@ to save the current settings to XML.
 	-->
 	<menu>
 		<entry name="game">
-			<locale name="C">
-				<short>Game</short>
-				<long>Gameplay settings.</long>
-			</locale>
+			<short>Game</short>
+			<long>Gameplay settings.</long>
 		</entry>
 		<entry name="graphic">
-			<locale name="C">
-				<short>Graphic</short>
-				<long>Video and rendering settings.</long>
-			</locale>
+			<short>Graphic</short>
+			<long>Video and rendering settings.</long>
 		</entry>
 		<entry name="audio">
-			<locale name="C">
-				<short>Audio</short>
-				<long>Audio-related settings.</long>
-			</locale>
+			<short>Audio</short>
+			<long>Audio-related settings.</long>
 		</entry>
 		<entry name="paths">
-			<locale name="C">
-				<short>Paths</short>
-				<long>System paths.</long>
-			</locale>
+			<short>Paths</short>
+			<long>System paths.</long>
 		</entry>
 	</menu>
 
 	<!-- Gameplay preferences -->
 	<entry name="game/karaoke_mode" type="bool" value="false">
-		<locale name="C">
-			<short>Karaoke mode</short>
-			<long>Hide pitch wave, notes and scoring.</long>
-		</locale>
+		<short>Karaoke mode</short>
+		<long>Hide pitch wave, notes and scoring.</long>
 	</entry>
 	<entry name="game/pitch" type="bool" value="true">
-		<locale name="C">
-			<short>Pitch waves</short>
-			<long>Enable singing pitch display (when not in karaoke mode).</long>
-		</locale>
+		<short>Pitch waves</short>
+		<long>Enable singing pitch display (when not in karaoke mode).</long>
 	</entry>
-	<entry name="game/theme" type="string">
-		<stringvalue>default</stringvalue>
-		<locale name="C">
-			<short>Theme</short>
-			<long>Name of the theme to use or absolute path to theme folder.</long>
-		</locale>
+	<entry name="game/theme" type="int" value="-1">
+		<limits min="-1" max="-1" step="0" />
+		<!-- Enum options added dynamically by scanning theme folders -->
+		<short>Theme</short>
+		<long>Name of the theme to use.</long>
 	</entry>
 	<entry name="game/keyboard_guitar" type="bool" value="true">
-		<locale name="C">
-			<short>Keyboard as guitar</short>
-			<long>Enable keyboard as guitar (Frets on Fire mode).</long>
-		</locale>
+		<short>Keyboard as guitar</short>
+		<long>Enable keyboard as guitar (Frets on Fire mode).</long>
 	</entry>
 	<entry name="game/keyboard_drumkit" type="bool" value="true">
-		<locale name="C">
-			<short>Keyboard as drumkit</short>
-			<long>Enable keyboard as drumkit.</long>
-		</locale>
+		<short>Keyboard as drumkit</short>
+		<long>Enable keyboard as drumkit.</long>
 	</entry>
 	<entry name="game/keyboard_dancepad" type="bool" value="true">
-		<locale name="C">
-			<short>Keyboard as dance pad</short>
-			<long>Enable keyboard as dance pad.</long>
-		</locale>
+		<short>Keyboard as dance pad</short>
+		<long>Enable keyboard as dance pad.</long>
+	</entry>
+	<entry name="game/keyboard_keyboard" type="bool" value="true">
+		<short>Keyboard as keyboard</short>
+		<long>Enable keyboard as keyboard.</long>
+	</entry>
+	<entry name="game/instrument0" type="int" value="0">
+		<limits>
+			<enum>Auto</enum>
+			<!-- Options added dynamically from controllers.xml -->
+		</limits>
+		<short>Force controller A's type</short>
+		<long>Override autodetection and force the first controller to the given type.</long>
+	</entry>
+	<entry name="game/instrument1" type="int" value="0">
+		<limits>
+			<enum>Auto</enum>
+			<!-- Options added dynamically from controllers.xml -->
+		</limits>
+		<short>Force controller B's type</short>
+		<long>Override autodetection and force the second controller to the given type.</long>
+	</entry>
+	<entry name="game/instrument2" type="int" value="0">
+		<limits>
+			<enum>Auto</enum>
+			<!-- Options added dynamically from controllers.xml -->
+		</limits>
+		<short>Force controller C's type</short>
+		<long>Override autodetection and force the third controller to the given type.</long>
+	</entry>
+	<entry name="game/instrument3" type="int" value="0">
+		<limits>
+			<enum>Auto</enum>
+			<!-- Options added dynamically from controllers.xml -->
+		</limits>
+		<short>Force controller D's type</short>
+		<long>Override autodetection and force the fourth controller to the given type.</long>
 	</entry>
 	<entry name="game/instruments" type="string_list">
 		<!-- Should be SDL_ID:{GUITAR_GUITARHERO|GUITAR_GUITARHERO_XPLORER|GUITAR_ROCKBAND_PS3|GUITAR_ROCKBAND_XB360|DRUMS_GUITARHERO|DRUMS_ROCKBAND_PS3|DRUMS_ROCKBAND_XB360|DRUMS_MIDI|DANCEPAD_GENERIC|DANCEPAD_TIGERGAME|DANCEPAD_2TECH}
 		     example:
 			<stringvalue>0:GUITAR_GUITARHERO</stringvalue>
 		-->
-		<locale name="C">
-			<short>Joystick configuration</short>
-			<long>Force joystick to some kind of instrument.</long>
-		</locale>
+		<short>Joystick configuration</short>
+		<long>Force joystick to some kind of instrument.</long>
 	</entry>
 	<entry name="game/midi_input" type="string" value="">
-		<locale name="C">
-			<short>Hardware MIDI input device</short>
-			<long>Part of sound card name or its number or empty to use the first available device. Used currently for MIDI drum controllers.</long>
-		</locale>
+		<short>Hardware MIDI input device</short>
+		<long>Part of sound card name or its number or empty to use the first available device. Used currently for MIDI drum controllers.</long>
+	</entry>
+	<entry name="game/fallback_encoding" type="int" value="2">
+		<limits>
+			<enum>CP1250</enum>
+			<enum>CP1251</enum>
+			<enum>CP1252</enum>
+			<enum>CP1253</enum>
+			<enum>CP1254</enum>
+			<enum>CP1255</enum>
+			<enum>CP1256</enum>
+			<enum>CP1257</enum>
+			<enum>CP1258</enum>
+		</limits>
+		<short>Fallback song encoding</short>
+		<long>Pick the text codec used for song files that are not UTF-8.</long>
 	</entry>
 
 	<!-- Graphic preferences -->
 	<entry name="graphic/window_width" type="int" value="800" hidden="true">
 		<ui unit=" pixels" />
 		<limits min="320" max="4096" step="16" />
-		<locale name="C">
-			<short>Windowed width</short>
-			<long>The width of the window.</long>
-		</locale>
+		<short>Windowed width</short>
+		<long>The width of the window.</long>
 	</entry>
 	<entry name="graphic/window_height" type="int" value="600" hidden="true">
 		<ui unit=" pixels" />
 		<limits min="240" max="2048" step="16" />
-		<locale name="C">
-			<short>Windowed height</short>
-			<long>The height of the window.</long>
-		</locale>
+		<short>Windowed height</short>
+		<long>The height of the window.</long>
 	</entry>
 	<entry name="graphic/fullscreen" type="bool" value="false">
-		<locale name="C">
-			<short>Fullscreen mode</short>
-			<long>Enable fullscreen mode on startup.</long>
-		</locale>
+		<short>Fullscreen mode</short>
+		<long>Enable fullscreen mode on startup.</long>
+	</entry>
+	<entry name="graphic/stereo3d" type="bool" value="false">
+		<short>Stereoscopic 3D</short>
+		<long>Enable 3D rendering of Performous.</long>
+	</entry>
+	<entry name="graphic/stereo3dtype" type="int" value="0">
+		<limits>
+			<enum>Red/Cyan</enum>
+			<enum>Green/Magenta</enum>
+			<enum>Over/Under</enum>
+		</limits>
+		<short>Stereo3D type</short>
+		<long>Some modes may only get activated in fullscreen mode.</long>
+	</entry>
+	<entry name="graphic/stereo3dseparation" type="float" value="50">
+		<ui unit=" %" />
+		<limits min="0" max="100" step="2" />
+		<short>Stereo3D separation</short>
+		<long>The strength of the effect. Experiment with different settings for best results.</long>
 	</entry>
 	<entry name="graphic/video" type="bool" value="true">
-		<locale name="C">
-			<short>Video playback</short>
-			<long>Allows completely disabling background videos. It is recommended to leave this enabled as Performous will still smoothly fade out the video if your computer is not fast enough.</long>
-		</locale>
+		<short>Video playback</short>
+		<long>Allows completely disabling background videos. It is recommended to leave this enabled as Performous will still smoothly fade out the video if your computer is not fast enough.</long>
 	</entry>
-	<entry name="graphic/webcam" type="bool" value="true">
-		<locale name="C">
-			<short>Webcam background</short>
-			<long>Performous can try to use webcam as a background video. You can disable it if it annoys you.</long>
-		</locale>
+	<entry name="graphic/webcam" type="bool" value="false">
+		<short>Webcam background</short>
+		<long>Performous can use webcam as a background video. Disable it if Performous crashes while entering a song.</long>
 	</entry>
 	<entry name="graphic/webcamid" type="int" value="-1">
 		<limits min="-1" max="9" step="1" />
-		<locale name="C">
-			<short>Webcam id</short>
-			<long>Use -1 to autodetect or a number starting from 0 to choose specific device.</long>
-		</locale>
-	</entry>
-	<entry name="graphic/3d_notes" type="bool" value="true">
-		<locale name="C">
-			<short>3D notes</short>
-			<long>Draw instrument notes as 3-dimensional objects. May hurt performance on older hardware.</long>
-		</locale>
+		<short>Webcam id</short>
+		<long>Use -1 to autodetect or a number starting from 0 to choose specific device.</long>
 	</entry>
 	<entry name="graphic/svg_lod" type="float" value="1.0">
 		<ui unit="x" />
 		<limits min="0.5" max="3.0" step="0.1" />
-		<locale name="C">
-			<short>SVG quality</short>
-			<long>Larger numbers cause vector graphics to be rendered in higher resolution. Decrease this to make navigating in menus faster.</long>
-		</locale>
+		<short>SVG quality</short>
+		<long>Larger numbers cause vector graphics to be rendered in higher resolution. Decrease this to make navigating in menus faster.</long>
 	</entry>
 	<entry name="graphic/text_lod" type="float" value="1.0">
 		<ui unit="x" />
 		<limits min="0.5" max="3.0" step="0.1" />
-		<locale name="C">
-			<short>Text quality</short>
-			<long>Larger numbers cause text to be rendered in higher resolution. Decrease this to make everything a little faster.</long>
-		</locale>
+		<short>Text quality</short>
+		<long>Larger numbers cause text to be rendered in higher resolution. Decrease this to make everything a little faster.</long>
 	</entry>
 	<entry name="graphic/fps" type="bool" value="false">
-		<locale name="C">
-			<short>Benchmark mode</short>
-			<long>Framerate limit of 100 FPS is removed and the game instead renders at full speed. FPS values are printed to console. Please note that the display drivers may still limit the rendering speed to the screen refresh rate.</long>
-		</locale>
+		<short>Benchmark mode</short>
+		<long>Framerate limit of 100 FPS is removed and the game instead renders at full speed. FPS values are printed to console. Please note that the display drivers may still limit the rendering speed to the screen refresh rate.</long>
 	</entry>
 
 	<!-- Audio preferences -->
 	<entry name="audio/latency" type="float" value="0.075">
 		<ui unit=" ms" multiplier="1000" />
 		<limits min="0.0" max="0.25" step="0.005" />
-		<locale name="C">
-			<short>Suggested latency</short>
-			<long>This is a hint for the audio engine about the desired latency. Set this as low as possible while retaining clear audio playback. Requires restart.</long>
-		</locale>
+		<short>Suggested latency</short>
+		<long>This is a hint for the audio engine about the desired latency. Set this as low as possible while retaining clear audio playback. Requires restart.</long>
 	</entry>
 	<entry name="audio/video_delay" type="float" value="0.06">
 		<ui unit=" ms" multiplier="1000" />
 		<limits min="-0.5" max="0.5" step="0.01" />
-		<locale name="C">
-			<short>Audio/video latency</short>
-			<long>Affects all modes. Use negative value if your display input lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal. This should be set so that the notes pass the cursor at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while performing.</long>
-		</locale>
+		<short>Audio/video latency</short>
+		<long>Affects all modes. Use negative value if your display input lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal. This should be set so that the notes pass the cursor at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while performing.</long>
 	</entry>
 	<entry name="audio/round-trip" type="float" value="0.09">
 		<ui unit=" ms" multiplier="1000" />
 		<limits min="0.0" max="0.5" step="0.01" />
-		<locale name="C">
-			<short>Audio round-trip latency</short>
-			<long>Affects singing only. The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. While performing, press Ctrl+S for synth mode and adjust with Ctrl+F3/F4.</long>
-		</locale>
+		<short>Audio round-trip latency</short>
+		<long>Affects singing only. The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. While performing, press Ctrl+S for synth mode and adjust with Ctrl+F3/F4.</long>
 	</entry>
 	<entry name="audio/controller_delay" type="float" value="0.08">
 		<ui unit=" ms" multiplier="1000" />
 		<limits min="0.0" max="0.5" step="0.01" />
-		<locale name="C">
-			<short>Audio/controller latency</short>
-			<long>Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to adjust while performing.</long>
-		</locale>
+		<short>Audio/controller latency</short>
+		<long>Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to adjust while performing.</long>
 	</entry>
 	<entry name="audio/devices" type="string_list">
 		<stringvalue>dev="USBMIC" mics="blue,red"</stringvalue><!-- SingStar mics -->
 		<stringvalue>dev="Microphone" mics="*"</stringvalue><!-- Rock Band branded Logitech mic -->
 		<stringvalue>mics="blue"</stringvalue><!-- Any other microphone (only if blue is still free) -->
 		<stringvalue>out=2</stringvalue><!-- Any stereo output device -->
-		<locale name="C">
-			<short>Audio devices</short>
-			<long>List of audio devices to try.</long>
-		</locale>
+		<short>Audio devices</short>
+		<long>List of audio devices to try.</long>
 	</entry>
 	<entry name="audio/preview_volume" type="int" value="70">
 		<ui unit=" %" />
 		<limits min="0" max="100" step="5" />
-		<locale name="C">
-			<short>Menu volume</short>
-			<long>The volume level of menus, song previews and jukebox mode.</long>
-		</locale>
+		<short>Menu volume</short>
+		<long>The volume level of menus, song previews and jukebox mode.</long>
 	</entry>
 	<entry name="audio/music_volume" type="int" value="90">
 		<ui unit=" %" />
 		<limits min="0" max="100" step="5" />
-		<locale name="C">
-			<short>Music volume</short>
-			<long>The ingame music volume. Values above 90 are not recommended as distortion may occur.</long>
-		</locale>
+		<short>Music volume</short>
+		<long>The ingame music volume. Values above 90 are not recommended as distortion may occur.</long>
 	</entry>
 	<entry name="audio/fail_volume" type="int" value="90">
 		<ui unit=" %" />
 		<limits min="0" max="100" step="5" />
-		<locale name="C">
-			<short>Failure volume</short>
-			<long>The ingame fail sound volume. Values above 90 are not recommended as distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!</long>
-		</locale>
+		<short>Failure volume</short>
+		<long>The ingame fail sound volume. Values above 90 are not recommended as distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!</long>
 	</entry>
 
 	<!-- Paths -->
@@ -243,15 +250,11 @@ to save the current settings to XML.
 		<stringvalue>/usr/share/games/ultrastar/songs/</stringvalue>
 		<stringvalue>/usr/share/games/fretsonfire/data/songs/</stringvalue>
 		<stringvalue>~/.ultrastar/songs/</stringvalue>
-		<locale name="C">
-			<short>Song folders</short>
-			<long>Where to recursively look for songs. DATADIR at the beginning means all Performous data folders.</long>
-		</locale>
+		<short>Song folders</short>
+		<long>Where to recursively look for songs. DATADIR at the beginning means all Performous data folders.</long>
 	</entry>
 	<entry name="paths/system" type="string_list">
-		<locale name="C">
-			<short>Base folders for data</short>
-			<long>System defaults are included automatically. Additional paths can be added here.</long>
-		</locale>
+		<short>Base folders for data</short>
+		<long>System defaults are included automatically. Additional paths can be added here.</long>
 	</entry>
 </performous>

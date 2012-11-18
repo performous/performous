@@ -66,7 +66,7 @@ set(SOURCES ${SOURCE_FILES} ${HEADER_FILES} ${RESOURCE_FILES})
 
 # Libraries
 
-find_package(Boost 1.36 REQUIRED COMPONENTS thread date_time program_options regex filesystem)
+find_package(Boost 1.36 REQUIRED COMPONENTS thread date_time program_options regex filesystem system)
 include_directories(${Boost_INCLUDE_DIRS})
 list(APPEND LIBS ${Boost_LIBRARIES})
 
@@ -106,7 +106,7 @@ if(NOT NO_WEBCAM)
 	find_package(OpenCV)
 	if(OpenCV_FOUND)
 		include_directories(${OpenCV_INCLUDE_DIRS})
-		list(APPEND LIBS ${OpenCV_LIBRARIES})
+		list(APPEND LIBS ${OpenCV_LIBS})
 		add_definitions("-DUSE_OPENCV")
 		message(STATUS "Webcam support: Enabled")
 	else()
@@ -117,18 +117,16 @@ else()
 endif()
 
 
-# Set default compile flags for GCC
-if(CMAKE_COMPILER_IS_GNUCXX)
-	message(STATUS "GCC detected, adding compile flags")
-	# -pedantic cannot be used because ffmpeg headers are b0rked
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-missing-field-initializers")
-	# -pthread is unrecognized on Windows and ansi standard causes errors
-	if(NOT WIN32)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++98 -pthread")
-	endif(NOT WIN32)
+if(APPLE)
 	# Needed for ffmpeg.cc to compile cleanly on OSX (it's a (unsigned long) long story)
 	add_definitions("-D__STDC_CONSTANT_MACROS")
-endif(CMAKE_COMPILER_IS_GNUCXX)
+endif(APPLE)
+
+if(UNIX)
+	# Note: cannot use list APPEND here because it inserts semicolons instead of spaces
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
+endif(UNIX)
 
 if(MSVC)
 	set(SUBSYSTEM_WIN32 WIN32)

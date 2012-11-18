@@ -1,10 +1,14 @@
 #pragma once
 
 #include "glutil.hh"
+#include "video_driver.hh"
+#include <boost/noncopyable.hpp>
+#include <boost/shared_ptr.hpp>
+#include <cairo.h>
+#include <algorithm>
 #include <stdexcept>
 #include <string>
-#include <boost/noncopyable.hpp>
-#include <cairo.h>
+#include <vector>
 
 /// class for geometry stuff
 class Dimensions {
@@ -97,11 +101,21 @@ struct TexCoords {
 	  x1(x1_), y1(y1_), x2(x2_), y2(y2_) {}
 };
 
+/// This function hides the ugly global vari-- I mean singleton access to ScreenManager...
+Shader& getShader(std::string const& name);
+
 /** @short A RAII wrapper for allocating/deallocating OpenGL texture ID **/
 template <GLenum Type> class OpenGLTexture: boost::noncopyable {
   public:
 	/// return Type
 	static GLenum type() { return Type; };
+	static Shader& shader() {
+		switch (Type) {
+		case GL_TEXTURE_2D: return getShader("texture");
+		case GL_TEXTURE_RECTANGLE: return getShader("surface");
+		}
+		throw std::logic_error("Unknown texture type");
+	}
 	OpenGLTexture(): m_id() { glGenTextures(1, &m_id); }
 	~OpenGLTexture() { glDeleteTextures(1, &m_id); }
 	/// returns id
@@ -118,23 +132,24 @@ template <GLenum Type> class OpenGLTexture: boost::noncopyable {
 class UseTexture: boost::noncopyable {
   public:
 	/// constructor
-	template <GLenum Type> UseTexture(OpenGLTexture<Type> const& s): m_type(s.type()) {
-		glEnable(m_type);
-		glBindTexture(m_type, s.id());
-	}
-	~UseTexture() { glDisable(m_type); }
+	template <GLenum Type> UseTexture(OpenGLTexture<Type> const& tex):
+	  m_shader(/* hack of the year */ (glutil::GLErrorChecker("UseTexture"), glActiveTexture(GL_TEXTURE0), glBindTexture(Type, tex.id()), tex.shader())) {}
 
   private:
-	GLenum m_type;
+	UseShader m_shader;
 };
 
 template <GLenum Type> void OpenGLTexture<Type>::draw(Dimensions const& dim, TexCoords const& tex) const {
+	glutil::VertexArray va;
+
 	UseTexture texture(*this);
-	glutil::Begin block(GL_TRIANGLE_STRIP);
-	glTexCoord2f(tex.x1, tex.y1); glVertex2f(dim.x1(), dim.y1());
-	glTexCoord2f(tex.x2, tex.y1); glVertex2f(dim.x2(), dim.y1());
-	glTexCoord2f(tex.x1, tex.y2); glVertex2f(dim.x1(), dim.y2());
-	glTexCoord2f(tex.x2, tex.y2); glVertex2f(dim.x2(), dim.y2());
+
+	va.TexCoord(tex.x1, tex.y1).Vertex(dim.x1(), dim.y1());
+	va.TexCoord(tex.x2, tex.y1).Vertex(dim.x2(), dim.y1());
+	va.TexCoord(tex.x1, tex.y2).Vertex(dim.x1(), dim.y2());
+	va.TexCoord(tex.x2, tex.y2).Vertex(dim.x2(), dim.y2());
+
+	va.Draw();
 }
 
 template <GLenum Type> void OpenGLTexture<Type>::drawCropped(Dimensions const& orig, TexCoords const& tex) const {
@@ -149,6 +164,29 @@ template <GLenum Type> void OpenGLTexture<Type>::drawCropped(Dimensions const& o
 
 namespace pix { enum Format { INT_ARGB, CHAR_RGBA, RGB, BGR }; }
 
+struct Bitmap {
+	std::vector<unsigned char> buf;
+	unsigned width, height;
+	float ar;
+	pix::Format fmt;
+	Bitmap(): width(), height(), ar(), fmt(pix::CHAR_RGBA) {}
+	void resize(unsigned w, unsigned h) {
+		buf.resize(w * h * 4);
+		width = w;
+		height = h;
+		ar = float(w) / h;
+	}
+	void swap(Bitmap& b) {
+		buf.swap(b.buf);
+		std::swap(width, b.width);
+		std::swap(height, b.height);
+		std::swap(ar, b.ar);
+		std::swap(fmt, b.fmt);
+	}
+};
+
+void updateSurfaces();
+
 /**
 * @short Texture wrapper.
 * Textures with non-power-of-two dimensions may be slow to load.
@@ -158,10 +196,11 @@ class Texture: public OpenGLTexture<GL_TEXTURE_2D> {
   public:
 	/** Initialize from SVG or PNG file **/
 	Texture(std::string const& filename);
+	~Texture();
 	/** Get aspect ratio (1.0 for square, > 1.0 for wider). **/
 	float ar() const { return m_ar; }
 	/// loads texture into buffer
-	void load(unsigned int width, unsigned int height, pix::Format format, unsigned char const* buffer, float ar = 0.0f);
+	void load(Bitmap const& bitmap);
 
   private:
 	float m_ar;
@@ -173,21 +212,23 @@ class Texture: public OpenGLTexture<GL_TEXTURE_2D> {
 **/
 class Surface {
   public:
+	struct Impl;
 	/// dimensions
- 	Dimensions dimensions;
- 	/// texture coordinates
+	Dimensions dimensions;
+	/// texture coordinates
 	TexCoords tex;
 	Surface(): m_width(0), m_height(0) {}
-	/// creates surface from cairo surface
-	Surface(cairo_surface_t* _surf);
 	/// creates surface from file
 	Surface(std::string const& filename);
+	~Surface();
+	bool empty() const { return m_width * m_height == 0; } ///< Test if the loading has failed
 	/// draws surface
 	void draw() const;
 	/// loads surface into buffer
-	void load(unsigned int width, unsigned int height, pix::Format format, unsigned char const* buffer, float ar = 0.0f);
-
+	void load(Bitmap const& bitmap);
+	Shader& shader() { return m_texture.shader(); }
   private:
 	unsigned int m_width, m_height;
-	OpenGLTexture<GL_TEXTURE_RECTANGLE_ARB> m_texture;
+	OpenGLTexture<GL_TEXTURE_RECTANGLE> m_texture;
 };
+

@@ -5,31 +5,7 @@
 #include <vector>
 
 #include "color.hh"
-
-/// musical scale, defaults to C major
-class MusicalScale {
-  private:
-	double m_baseFreq;
-	static const int m_baseId = 33;
-
-  public:
-	/// constructor
-	MusicalScale(double baseFreq = 440.0): m_baseFreq(baseFreq) {}
-	/// get name of note
-	std::string getNoteStr(double freq) const;
-	/// get note number for id
-	unsigned int getNoteNum(int id) const;
-	/// true if sharp note
-	bool isSharp(int id) const;
-	/// get frequence for note id
-	double getNoteFreq(int id) const;
-	/// get note id for frequence
-	int getNoteId(double freq) const;
-	/// get note for frequence
-	double getNote(double freq) const;
-	/// get note offset for frequence
-	double getNoteOffset(double freq) const;
-};
+#include "musicalscale.hh"
 
 /// stores duration of a note
 struct Duration {
@@ -95,15 +71,17 @@ struct Note {
 	double diff(double n) const { return diff(note, n); }
 	/// Difference of n from note, so that note + diff(note, n) is n (mod 12)
 	static double diff(double note, double n);
-	/// maximum score
+	/// Maximum score
 	double maxScore() const;
-	/// score when singing over time period (a, b), which needs not to be entirely within the note
+	/// The length of the time period [a,b] that falls within the note in seconds
+	double clampDuration(double b, double e) const;
+	/// Score when singing over time period (a, b), which needs not to be entirely within the note
 	double score(double freq, double b, double e) const;
 	/// How precisely the note is hit (always 1.0 for freestyle, 0..1 for others)
 	double powerFactor(double note) const;
-	/// compares begin of two notes
+	/// Compares begin of two notes
 	static bool ltBegin(Note const& a, Note const& b) { return a.begin < b.begin; }
-	/// compares end of two notes
+	/// Compares end of two notes
 	static bool ltEnd(Note const& a, Note const& b) { return a.end < b.end; }
   private:
 	double scoreMultiplier() const;

@@ -49,12 +49,13 @@ class ScreenSing: public Screen {
   public:
 	/// constructor
 	ScreenSing(std::string const& name, Audio& audio, Database& database, Backgrounds& bgs):
-	  Screen(name), m_audio(audio), m_database(database), m_backgrounds(bgs), m_latencyAV(), m_only_singers_alive(true), m_practmode(false),
-	  m_selectedTrack(TrackName::LEAD_VOCAL)
+	  Screen(name), m_audio(audio), m_database(database), m_backgrounds(bgs), m_latencyAV(), m_only_singers_alive(true), m_selectedTrack(TrackName::LEAD_VOCAL)
 	{}
 	void enter();
 	void exit();
+	void reloadGL();
 	void manageEvent(SDL_Event event);
+	void prepare();
 	void draw();
 
 	void setSong (boost::shared_ptr<Song> song_)
@@ -85,7 +86,7 @@ class ScreenSing: public Screen {
 	boost::scoped_ptr<Surface> m_pause_icon;
 	boost::scoped_ptr<Surface> m_help;
 	boost::scoped_ptr<Engine> m_engine;
-	boost::scoped_ptr<LayoutSinger> m_layout_singer;
+	boost::ptr_vector<LayoutSinger> m_layout_singer;
 	boost::scoped_ptr<ThemeInstrumentMenu> m_menuTheme;
 	Menu m_menu;
 	Instruments m_instruments;
@@ -94,7 +95,6 @@ class ScreenSing: public Screen {
 	boost::shared_ptr<ThemeSing> theme;
 	AnimValue m_quitTimer;
 	bool m_only_singers_alive;
-	bool m_practmode;
 	std::string m_selectedTrack;
 	std::string m_selectedTrackLocalized;
 	ConfigItem m_vocalTrackOpts;

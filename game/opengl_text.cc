@@ -37,7 +37,7 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL& _text, double m) {
 
 	// compute text extents
 	{
-		PangoContext* ctx = pango_cairo_font_map_create_context ((PangoCairoFontMap*)pango_cairo_font_map_get_default());
+		PangoContext* ctx = pango_font_map_create_context(pango_cairo_font_map_get_default());
 		PangoLayout* layout = pango_layout_new(ctx);
 		pango_layout_set_alignment(layout, alignment);
 		pango_layout_set_font_description (layout, desc);
@@ -78,7 +78,12 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL& _text, double m) {
 	cairo_restore(dc);
 	g_object_unref(layout);
 
-	m_surface.load(cairo_image_surface_get_width(surface), cairo_image_surface_get_height(surface), pix::INT_ARGB, cairo_image_surface_get_data(surface));
+	// TODO: Avoid copying of bitmap data?
+	Bitmap bitmap;
+	bitmap.fmt = pix::INT_ARGB;
+	bitmap.resize(cairo_image_surface_get_width(surface), cairo_image_surface_get_height(surface));
+	std::memcpy(&bitmap.buf[0], cairo_image_surface_get_data(surface), bitmap.buf.size());
+	m_surface.load(bitmap);
 
 	// delete surface
 	cairo_destroy(dc);
@@ -196,16 +201,16 @@ void SvgTxtTheme::draw(std::vector<std::string> const& _text) {
 	draw(tmp);
 }
 
-void SvgTxtTheme::draw(std::string _text, float alpha) {
+void SvgTxtTheme::draw(std::string _text) {
 	std::vector<TZoomText> tmp;
 	TZoomText t;
 	t.string = _text;
 	t.factor = 1.0;
 	tmp.push_back(t);
-	draw(tmp, alpha);
+	draw(tmp);
 }
 
-void SvgTxtTheme::draw(std::vector<TZoomText> const& _text, float alpha) {
+void SvgTxtTheme::draw(std::vector<TZoomText> const& _text) {
 	std::string tmp;
 	for (unsigned int i = 0 ; i < _text.size(); i++ ) tmp += _text[i].string;
 
@@ -243,16 +248,11 @@ void SvgTxtTheme::draw(std::vector<TZoomText> const& _text, float alpha) {
 		dim.middle(position_x + 0.5 * dim.w());
 		TexCoords tex;
 		double factor = _text[i].factor;
-		Color color;
-		if (factor == 1.0) color = Color(1.0f, 1.0f, 1.0f, alpha);
-		else {
-			color = Color(m_text_highlight.fill_col.r, m_text_highlight.fill_col.g, m_text_highlight.fill_col.b, alpha);
+		if (factor > 1.0) {
+			ColorTrans c(Color(m_text_highlight.fill_col.r, m_text_highlight.fill_col.g, m_text_highlight.fill_col.b));
 			dim.fixedWidth(dim.w() * factor);
-		}
-		{
-			glutil::Color c(color);
 			m_opengl_text[i].draw(dim, tex);
-		}
+		} else m_opengl_text[i].draw(dim, tex);
 		position_x += syllable_width;
 	}
 }

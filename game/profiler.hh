@@ -1,23 +1,69 @@
 #pragma once
 
 #include "xtime.hh"
+#include <iomanip>
 #include <iostream>
+#include <map>
 #include <sstream>
 #include <string>
+#include <vector>
 
-/// easy access for profiling code
+struct ProfCP {
+	unsigned long samples;
+	double total;
+	double peak;
+	double avg;
+	ProfCP(): samples(), total(), peak(), avg() {}
+	void add(double t) {
+		++samples;
+		total += t;
+		avg = total / samples;
+		if (peak < t) peak = t;
+	}
+};
+
+static inline std::ostream& operator<<(std::ostream& os, ProfCP const& cp) {
+	os << std::fixed << std::setprecision(1);
+	if (cp.samples == 0) return os << "no data";
+	if (cp.samples > 1) os << cp.samples << "x ";
+	os << cp.avg * 1000.0 << " ms";
+	if (cp.peak > 2.0 * cp.avg) os << " peak " << cp.peak * 1000.0 << " ms";
+	return os;
+}
+
+/// @short A simple performance profiling tool
 class Profiler {
-	std::ostringstream m_oss;
+	typedef std::map<std::string, ProfCP> Checkpoints;
+	typedef std::pair<std::string, ProfCP> Pair;
+	Checkpoints m_checkpoints;
+	std::string m_name;
 	boost::xtime m_time;
+	static bool cmpFunc(Pair const& a, Pair const& b) { return a.second.total > b.second.total; }
   public:
-  /// create a new profiler with a given name
-	Profiler(std::string const& name): m_time(now()) { m_oss << name << ": "; }
-	~Profiler() { std::clog << "Profiler/info: " << m_oss.str() << std::endl; }
-	/// calling the object as a function will return the time since the start
-	void operator()(std::string const& tag) {
+	/// Start a profiler with the given name
+	Profiler(std::string const& name): m_name(name), m_time(now()) {}
+	~Profiler() { dump(); }
+	/// Profiling checkpoint: record the duration since construction or previous checkpoint.
+	/// If no tag is specified, no recording is done.
+	void operator()(std::string const& tag = std::string()) {
 		boost::xtime n = now();
 		std::swap(n, m_time);
-		m_oss << unsigned((m_time - n) * 1000.0 + 0.5) << " ms (" << tag << ")  ";
+		double t = m_time - n;
+		m_checkpoints[tag].add(t);
+	}
+	/// Dump current stats to log and reset
+	void dump(std::string const& level = "info") {
+		if (m_checkpoints.empty()) return;
+		if (level.empty()) { m_checkpoints.clear(); return; }
+		std::vector<Pair> cps(m_checkpoints.begin(), m_checkpoints.end());
+		m_checkpoints.clear();
+		std::sort(cps.begin(), cps.end(), cmpFunc);
+		std::ostringstream oss;
+		oss << "profiler-" << m_name << "/" << level << ":";
+		for (std::vector<Pair>::const_iterator it = cps.begin(); it != cps.end(); ++it) {
+			oss << "  " << it->first << " (" << it->second << ")";
+		}
+		std::clog << oss.str() << std::endl;
 	}
 };
 

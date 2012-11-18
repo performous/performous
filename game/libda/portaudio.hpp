@@ -34,7 +34,7 @@ namespace portaudio {
 	}
 
 	struct DeviceInfo {
-		DeviceInfo(std::string n = "", int i = 0, int o = 0): name(n), in(i), out(o) {}
+		DeviceInfo(int id, std::string n = "", int i = 0, int o = 0): name(n), idx(id), in(i), out(o) {}
 		std::string desc() {
 			std::ostringstream oss;
 			oss << name << " (";
@@ -44,10 +44,14 @@ namespace portaudio {
 			return oss.str() + ")";
 		}
 		std::string name;
+		int idx;
 		int in, out;
 	};
 
 	typedef std::vector<DeviceInfo> DeviceInfos;
+
+	/// List of useless legacy devices of PortAudio that we want to omit...
+	static char const* g_ignored[] = { "front", "surround40", "surround41", "surround50", "surround51", "surround71", "iec958", "spdif", "dmix", NULL };
 
 	struct AudioDevices {
 		static int count() { return Pa_GetDeviceCount(); }
@@ -55,8 +59,12 @@ namespace portaudio {
 		AudioDevices() {
 			for (unsigned i = 0, end = Pa_GetDeviceCount(); i != end; ++i) {
 				PaDeviceInfo const* info = Pa_GetDeviceInfo(i);
-				if (!info) devices.push_back(DeviceInfo());
-				else devices.push_back(DeviceInfo(convertToUTF8(info->name), info->maxInputChannels, info->maxOutputChannels));
+				if (!info) continue;
+				std::string name = convertToUTF8(info->name);
+				for (unsigned j = 0; g_ignored[j] && !name.empty(); ++j) {
+					if (name.find(g_ignored[j]) != std::string::npos) name.clear();
+				}
+				if (!name.empty()) devices.push_back(DeviceInfo(i, name, info->maxInputChannels, info->maxOutputChannels));
 			}
 		}
 		/// Get a printable dump of the devices

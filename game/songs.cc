@@ -18,6 +18,7 @@
 #include <cstdlib>
 
 Songs::Songs(Database & database, std::string const& songlist): m_songlist(songlist), math_cover(), m_typeFilter(), m_database(database), m_order(), m_dirty(false), m_loading(false) {
+	m_updateTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
 	reload();
 }
 
@@ -39,18 +40,18 @@ void Songs::reload_internal() {
 		m_songs.clear();
 		m_dirty = true;
 	}
-	Profiler prof("Song loading took");
+	Profiler prof("songloader");
 	Paths paths = getPathsConfig("paths/songs");
 	for (Paths::iterator it = paths.begin(); m_loading && it != paths.end(); ++it) {
 		try {
 			if (!fs::is_directory(*it)) { m_debug << "Songs/info: >>> Not scanning: " << *it << " (no such directory)" << std::endl; continue; }
-			m_debug << "Songs/info: >>> Scanning " << *it << std::endl;
+			m_debug << "songs/info: >>> Scanning " << *it << std::endl;
 			size_t count = m_songs.size();
 			reload_internal(*it);
 			size_t diff = m_songs.size() - count;
 			if (diff > 0 && m_loading) m_debug << diff << " songs loaded" << std::endl;
 		} catch (std::exception& e) {
-			m_debug << "Songs/error: >>> Error scanning " << *it << ": " << e.what() << std::endl;
+			m_debug << "songs/error: >>> Error scanning " << *it << ": " << e.what() << std::endl;
 		}
 	}
 	prof("total");
@@ -60,15 +61,20 @@ void Songs::reload_internal() {
 
 void Songs::reload_internal(fs::path const& parent) {
 	namespace fs = fs;
-	if (std::distance(parent.begin(), parent.end()) > 20) { m_debug << "Songs/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)" << std::endl; return; }
+	if (std::distance(parent.begin(), parent.end()) > 20) { m_debug << "songs/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)" << std::endl; return; }
 	try {
-		boost::regex expression("(.*\\.txt|^song\\.ini|.*\\.sm)$", boost::regex_constants::icase);
+		boost::regex expression("(.*\\.txt|^song\\.ini|notes\\.xml|.*\\.sm)$", boost::regex_constants::icase);
 		boost::cmatch match;
 		for (fs::directory_iterator dirIt(parent), dirEnd; m_loading && dirIt != dirEnd; ++dirIt) {
 			fs::path p = dirIt->path();
 			if (fs::is_directory(p)) { reload_internal(p); continue; }
+#if BOOST_FILESYSTEM_VERSION < 3
 			std::string name = p.leaf(); // File basename (notes.txt)
 			std::string path = p.directory_string(); // Path without filename
+#else
+			std::string name = p.filename().string(); // File basename (notes.txt)
+			std::string path = p.string(); // Path without filename
+#endif
 			path.erase(path.size() - name.size());
 			if (!regex_match(name.c_str(), match, expression)) continue;
 			try {
@@ -80,13 +86,13 @@ void Songs::reload_internal(fs::path const& parent) {
 			} catch (SongParserException& e) {
 				if (e.silent()) continue;
 				// Construct error message
-				m_debug << "Songs/error: -!- Error in " << path << "\n    " << name;
+				m_debug << "songs/error: -!- Error in " << path << "\n    " << name;
 				if (e.line()) m_debug << " line " << e.line();
 				m_debug << ": " << e.what() << std::endl;
 			}
 		}
 	} catch (std::exception const& e) {
-		m_debug << "Songs/error: Error accessing " << parent << e.what() << std::endl;
+		m_debug << "songs/error: Error accessing " << parent << e.what() << std::endl;
 	}
 }
 
@@ -115,7 +121,7 @@ class Songs::RestoreSel {
 };
 
 void Songs::update() {
-	if (m_dirty) filter_internal(); // Update with newly loaded songs
+	if (m_dirty && m_updateTimer.get() > 0.5) filter_internal(); // Update with newly loaded songs
 	// A hack to move to the first song when the song screen is entered the first time
 	static bool first = true;
 	if (first) { first = false; math_cover.setTarget(0, 0); math_cover.setTarget(0, size()); }
@@ -134,6 +140,7 @@ void Songs::setTypeFilter(unsigned char filter) {
 }
 
 void Songs::filter_internal() {
+	m_updateTimer.setValue(0.0);
 	boost::mutex::scoped_lock l(m_mutex);
 	// Print messages when loading has finished
 	if (!m_loading) {
@@ -150,6 +157,7 @@ void Songs::filter_internal() {
 			if ((m_typeFilter & 2) && !s.hasDrums()) continue;
 			if ((m_typeFilter & 4) && !s.hasGuitars()) continue;
 			if ((m_typeFilter & 8) && !s.hasVocals()) continue;
+			if ((m_typeFilter & 16) && !s.hasKeyboard()) continue;
 			if (regex_search(s.strFull(), boost::regex(m_filter, boost::regex_constants::icase))) filtered.push_back(*it);
 		}
 		m_filtered.swap(filtered);

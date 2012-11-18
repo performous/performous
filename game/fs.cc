@@ -98,7 +98,7 @@ fs::path getCacheDir() {
 }
 
 fs::path getThemeDir() {
-	std::string theme = config["game/theme"].s();
+	std::string theme = config["game/theme"].getEnumName();
 	static const std::string defaultTheme = "default";
 	if (theme.empty()) theme = defaultTheme;
 	return getDataDir() / "themes" / theme;
@@ -117,21 +117,49 @@ fs::path pathMangle(fs::path const& dir) {
 }
 
 std::string getThemePath(std::string const& filename) {
-	std::string theme = config["game/theme"].s();
+	std::string theme = config["game/theme"].getEnumName();
 	static const std::string defaultTheme = "default";
 	if (theme.empty()) theme = defaultTheme;
-	// Try current theme and if that fails, try default theme.
-	try {
-		return getPath(fs::path("themes") / theme / filename);
-	} catch (std::runtime_error&) {
-		if (theme == defaultTheme) throw;
-		return getPath(fs::path("themes") / defaultTheme / filename);
+	// Try current theme and if that fails, try default theme and finally data dir
+	try { return getPath(fs::path("themes") / theme / filename); } catch (std::runtime_error&) {}
+	if (theme != defaultTheme) try { return getPath(fs::path("themes") / defaultTheme / filename); } catch (std::runtime_error&) {}
+	return getPath(filename);
+}
+
+std::vector<std::string> getThemes() {
+	std::vector<std::string> themes;
+	// Search all paths for themes folders and add them
+	Paths const& paths = getPaths();
+	for (Paths::const_iterator it = paths.begin(); it != paths.end(); ++it) {
+		fs::path p = *it;
+		p /= fs::path("themes");
+		if (fs::is_directory(p)) {
+			// Gather the themes in this folder
+			for (fs::directory_iterator dirIt(p), dirEnd; dirIt != dirEnd; ++dirIt) {
+				fs::path p2 = dirIt->path();
+				if (fs::is_directory(p2)) {
+				#if BOOST_FILESYSTEM_VERSION < 3
+					themes.push_back(p2.leaf());
+				#else
+					themes.push_back(p2.filename().string());
+				#endif
+				}
+			}
+		}
 	}
+	// No duplicates allowed
+	std::sort(themes.begin(), themes.end());
+	std::unique(themes.begin(), themes.end());
+	return themes;
 }
 
 bool isThemeResource(fs::path filename){
 	try {
+#if BOOST_FILESYSTEM_VERSION < 3
 		std::string themefile = getThemePath(filename.filename());
+#else
+		std::string themefile = getThemePath(filename.filename().string());
+#endif
 		return themefile == filename;
 	} catch (...) { return false; }
 }
@@ -186,8 +214,7 @@ Paths const& getPaths(bool refresh) {
 		paths.clear();
 		std::remove_copy_if(dirs.begin(), dirs.end(), std::inserter(paths, paths.end()), pathNotExist);
 		// Assure that each path appears only once
-		Paths::iterator it = std::unique(paths.begin(), paths.end());
-		paths.resize(it - paths.begin());
+		paths.erase(std::unique(paths.begin(), paths.end()), paths.end());
 	}
 	return paths;
 }

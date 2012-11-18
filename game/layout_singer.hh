@@ -38,8 +38,9 @@ class LyricRow {
 			bool current = (time >= it->begin && time < it->end);
 			sentence.back().factor = current ? 1.2 - 0.2 * (time - it->begin) / (it->end - it->begin) : 1.0;
 		}
+		ColorTrans c(Color::alpha(fade.get()));
 		txt.dimensions = dim;
-		txt.draw(sentence, fade.get());
+		txt.draw(sentence);
 	}
 
   private:
@@ -48,15 +49,15 @@ class LyricRow {
 
 class LayoutSinger {
   public:
-	enum Position {BOTTOM, MIDDLE, LEFT, RIGHT};
+	enum PositionMode {FULL, TOP, BOTTOM, LEFT, RIGHT};
 	/// ThemeSing is optional if you want to use drawScore only
 	LayoutSinger(VocalTrack& vocal, Database& database, boost::shared_ptr<ThemeSing> theme = boost::shared_ptr<ThemeSing>());
 	~LayoutSinger();
 	void reset();
-	void draw(double time, Position position = LayoutSinger::BOTTOM);
-	void drawScore(Position position);
-	double lyrics_begin();
-	void hideLyrics(bool hide = true) { m_hideLyrics = hide; };
+	void draw(double time, PositionMode position = LayoutSinger::FULL);
+	void drawScore(PositionMode position);
+	double lyrics_begin() const;
+	void hideLyrics(bool hide = true) { m_hideLyrics = hide; }
   private:
 	VocalTrack& m_vocal;
 	NoteGraph m_noteGraph;

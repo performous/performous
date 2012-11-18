@@ -5,7 +5,7 @@
 #include "animvalue.hh"
 #include "notes.hh"
 #include "audio.hh"
-#include "joystick.hh"
+#include "controllers.hh"
 #include "surface.hh"
 #include "opengl_text.hh"
 #include "glutil.hh"
@@ -21,27 +21,29 @@ class Popup {
 	/// Constructor
 	Popup(std::string msg, Color c, double speed, SvgTxtThemeSimple* popupText, std::string info = "", SvgTxtTheme* infoText = NULL):
 	  m_msg(msg), m_color(c), m_anim(AnimValue(0.0, speed)), m_popupText(popupText), m_info(info), m_infoText(infoText)
-	  {
+	{
 		m_anim.setTarget(1.0, false);
 	}
 	/// Draw the popup
 	/// Returns false if it is expired
-	bool draw(double offsetX) {
+	bool draw() {
 		double anim = m_anim.get();
-		if (anim > 0.0 && m_popupText) {
-			float s = 0.2 * (1.0 + anim);
-			float a = 1.0 - anim;
-			m_color.a = a;
-			glutil::Color color(m_color);
-			m_popupText->render(m_msg);
-			m_popupText->dimensions().center(0.1).middle(offsetX).stretch(s,s);
+		if (anim <= 0.0 || !m_popupText) return false;
+		float a = 1.0 - anim;
+		m_color.a = a;
+		ColorTrans color(m_color);
+		m_popupText->render(m_msg);
+		{
+			using namespace glmath;
+			Transform trans(translate(vec3(0.0f, 0.0f, 0.5f * anim)));
+			m_popupText->dimensions().center(0.1 - 0.03 * anim).middle().stretch(0.2f, 0.2f);
 			m_popupText->draw();
-			if (m_info != "" && m_infoText) {
-				m_infoText->dimensions.screenBottom(-0.02).middle(-0.12 + offsetX);
-				m_infoText->draw(m_info, a);
-			}
-			if (anim > 0.999) m_anim.setTarget(0.0, true);
-		} else return false;
+		}
+		if (m_info != "" && m_infoText) {
+			m_infoText->dimensions.screenBottom(-0.02).middle(-0.12);
+			m_infoText->draw(m_info);
+		}
+		if (anim > 0.999) m_anim.setTarget(0.0, true);
 		return true;
 	}
   private:
@@ -119,7 +121,7 @@ class InstrumentGraph {
 	Menu m_menu;
 
 	// Shared functions for derived classes
-	void drawPopups(double offsetX);
+	void drawPopups();
 	void handleCountdown(double time, double beginTime);
 
 	// Functions not really shared, but needed here

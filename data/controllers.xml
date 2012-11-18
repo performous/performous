@@ -53,6 +53,21 @@
 			<button id="7" value="start" />
 		</mapping>
 	</controller>
+	<controller type="guitar" name="GUITAR_ROCKBAND_XBOXADAPTER">
+		<description>Rock Band guitar Xbox with USB adapter</description>
+		<regexp match="Generic X-Box pad" />
+		<mapping> 
+			<button id="0" value="green" />
+			<button id="1" value="red" />
+			<button id="2" value="blue" />
+			<button id="3" value="yellow" />
+			<button id="4" value="orange" />
+			<button id="10" value="select" />
+			<button id="6" value="start" />
+			<axis id="4" range="-32768" value="godmode" />
+			<axis id="3" range="-32768:32767" value="whammy" />
+		</mapping>
+	</controller>
 	<controller type="guitar" name="GUITAR_ROCKBAND_PS3">
 		<description>Rock Band guitar PS3</description>
 		<regexp match="Harmonix Guitar .* PlayStation" />
@@ -81,6 +96,14 @@
 			<button id="9" value="start" />
 		</mapping>
 	</controller>
+	<!-- Not managed
+	<controller type="guitar" name="GUITAR_PRO_PS3">
+		<description>Rock Band Pro Guitar for PS3</description>
+		<regexp match="Licensed by Sony Computer Entertainment America Harmonix RB3 Mustang Guitar for PlayStation" />
+		<mapping>
+		</mapping>
+	</controller>
+	-->
 	<controller type="drumkit" name="DRUMS_GUITARHERO">
 		<description>Guitar Hero 4 drum kit (guessed, could be a guitar)</description>
 		<regexp match="Guitar Hero4" />
@@ -206,6 +229,34 @@
 			<button id="7" value="down-right" />
 			<button id="8" value="select" />
 			<button id="9" value="start" />
+		</mapping>
+	</controller>
+	<controller type="dancepad" name="DANCEPAD_THRUST">
+		<description>Thrustmaster dancepad</description>
+		<regexp match="DDR2SET DDR2SET" />
+		<mapping>
+			<button id="0" value="down" />
+			<button id="1" value="right" />
+			<button id="2" value="up-right" />
+			<button id="3" value="left" />
+			<button id="4" value="up" />
+			<button id="5" value="up-left" />
+			<button id="6" value="down-left" />
+			<button id="7" value="down-right" />
+			<button id="8" value="start" />
+			<button id="9" value="select" />
+		</mapping>
+	</controller>
+	<controller type="keyboard" name="KEYBOARD_GENERIC">
+		<description>Generic keybard</description>
+		<regexp match="NO MATCH" />
+		<mapping>
+			<button id="0" value="C" />
+			<button id="1" value="D" />
+			<button id="2" value="E" />
+			<button id="3" value="F" />
+			<button id="4" value="G" />
+			<button id="5" value="godmode" />
 		</mapping>
 	</controller>
 </controllers>

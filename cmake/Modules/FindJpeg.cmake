@@ -13,7 +13,7 @@ include(LibFindMacros)
 libfind_pkg_check_modules(Jpeg_PKGCONF jpeg)
 
 find_path(Jpeg_INCLUDE_DIR
-  NAMES jconfig.h
+  NAMES jconfig.h jpeglib.h
   PATHS ${Jpeg_PKGCONF_INCLUDE_DIRS}
 )
 

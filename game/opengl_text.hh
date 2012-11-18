@@ -49,13 +49,13 @@ class OpenGLText {
 	/// draws full texture
 	void draw();
 	/// @return x
-	double x() {return m_x;};
+	double x() const { return m_x; }
 	/// @return y
-	double y() {return m_y;};
+	double y() const { return m_y; }
 	/// @return x_advance
-	double x_advance() {return m_x_advance;};
+	double x_advance() const { return m_x_advance; }
 	/// @return y_advance
-	double y_advance() {return m_y_advance;};
+	double y_advance() const { return m_y_advance; }
 	/// @returns dimension of texture
 	Dimensions& dimensions() { return m_surface.dimensions; }
 
@@ -142,11 +142,11 @@ class SvgTxtTheme {
 	/// constructor
 	SvgTxtTheme(std::string _theme_file, double factor = 1.0);
 	/// draws text with alpha
-	void draw(std::vector<TZoomText> const& _text, float alpha = 1.0f);
+	void draw(std::vector<TZoomText> const& _text);
 	/// draw texts
 	void draw(std::vector<std::string> const& _text);
 	/// draw text with alpha
-	void draw(std::string _text, float alpha = 1.0f);
+	void draw(std::string _text);
 	/// sets highlight
 	void setHighlight(std::string _theme_file);
 	/// width

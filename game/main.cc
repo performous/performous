@@ -1,7 +1,7 @@
 #include "config.hh"
 #include "fs.hh"
 #include "screen.hh"
-#include "joystick.hh"
+#include "controllers.hh"
 #include "profiler.hh"
 #include "songs.hh"
 #include "backgrounds.hh"
@@ -21,6 +21,7 @@
 #include "screen_paths.hh"
 #include "screen_players.hh"
 
+#include <boost/bind.hpp>
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
@@ -103,15 +104,13 @@ static void checkEvents_SDL(ScreenManager& sm) {
 		if (sm.isDialogOpen() && input::getNav(event) != input::NONE) { sm.closeDialog(); continue; }
 		// Forward to screen even if the input system takes it (ignoring pushEvent return value)
 		// This is needed to allow navigation (quiting the song) to function even then
-		input::SDL::pushEvent(event);
+		boost::xtime eventTime = now();
+		input::SDL::pushEvent(event, eventTime);
 		sm.getCurrentScreen()->manageEvent(event);
-		// Check for OpenGL errors
-		glutil::GLErrorChecker glerror;
 	}
 	if (config["graphic/fullscreen"].b() != sm.window().getFullscreen()) {
 		sm.window().setFullscreen(config["graphic/fullscreen"].b());
-		// Reloading the screen seems to counter window going white on Windows and possibly OSX
-		sm.activateScreen(sm.getCurrentScreen()->getName());
+		sm.reloadGL();
 	}
 }
 
@@ -129,7 +128,9 @@ void mainLoop(std::string const& songlist) {
 	try {
 		boost::scoped_ptr<input::MidiDrums> midiDrums;
 		// TODO: Proper error handling...
-		try { midiDrums.reset(new input::MidiDrums); } catch (std::runtime_error&) {}
+		try { midiDrums.reset(new input::MidiDrums); } catch (std::runtime_error& e) {
+			std::clog << "controllers/info: " << e.what() << std::endl;
+		}
 		// Load audio samples
 		sm.loading(_("Loading audio samples..."), 0.5);
 		audio.loadSample("drum bass", getPath("sounds/drum_bass.ogg"));
@@ -177,17 +178,23 @@ void mainLoop(std::string const& songlist) {
 			prof("misc");
 			try {
 				// Draw
-				window.blank();
-				sm.getCurrentScreen()->draw();
-				sm.drawNotifications();
+				window.render(boost::bind(&ScreenManager::drawScreen, &sm));
+				glFinish();
 				prof("draw");
 				// Display (and wait until next frame)
 				window.swap();
+				glFinish();
 				prof("swap");
+				updateSurfaces();
+				sm.prepareScreen();
+				glFinish();
+				prof("surfaces");
 				if (config["graphic/fps"].b()) {
 					++frames;
 					if (now() - time > 1.0) {
-						std::cout << frames << " FPS" << std::endl;
+						std::ostringstream oss;
+						oss << frames << " FPS";
+						sm.flashMessage(oss.str());
 						time += 1.0;
 						frames = 0;
 					}
@@ -207,15 +214,8 @@ void mainLoop(std::string const& songlist) {
 			}
 		}
 	} catch (std::exception& e) {
-		// This should use ScreenManager fatalError, but it cannot
-		// yet split the message to multiple lines automatically, so
-		// better use flashMessage, which zooms to fit.
-		std::cerr << "FATAL ERROR: " << e.what() << std::endl;
-		sm.flashMessage(std::string("FATAL ERROR: ") + e.what(), 0.0f); // No fade-in to get it to show
-		window.blank();
-		sm.drawNotifications();
-		window.swap();
-		boost::thread::sleep(now() + 2.0);
+		sm.fatalError(e.what());  // Notify the user
+		throw;
 	} catch (QuitNow&) {
 		std::cout << "Terminated." << std::endl;
 	}

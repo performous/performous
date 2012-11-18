@@ -1,6 +1,6 @@
 --- debian/control
 +++ debian/control
 @@ -7,2 +7,3 @@
-  cmake (>= 2.6), pkg-config, quilt, help2man,
+  cmake (>= 2.6), pkg-config, quilt, help2man, gettext,
 + libportmidi-dev, libcv-dev, libhighgui-dev,
   libgl1-mesa-dev, libsdl1.2-dev, libcairo2-dev, librsvg2-dev,

@@ -18,7 +18,7 @@
 #endif
 
 namespace input {
-	enum DevType { GUITAR, DRUMS, DANCEPAD };
+	enum DevType { GUITAR, DRUMS, KEYBOARD, DANCEPAD };
 	enum NavButton { NONE, UP, DOWN, LEFT, RIGHT, START, SELECT, CANCEL, PAUSE, MOREUP, MOREDOWN, VOLUME_UP, VOLUME_DOWN };
 
 	static const std::size_t BUTTONS = 10;
@@ -37,6 +37,14 @@ namespace input {
 	static const int BLUE_TOM_BUTTON = 3;
 	static const int GREEN_TOM_BUTTON = 4;
 	static const int ORANGE_TOM_BUTTON = 5;
+	// Keyboard buttons
+	static const int C_BUTTON = 0;
+	static const int D_BUTTON = 1;
+	static const int E_BUTTON = 2;
+	static const int F_BUTTON = 3;
+	static const int G_BUTTON = 4;
+	//static const int GODMODE_BUTTON = 5;
+	//static const int WHAMMY_BUTTON = 6;
 	// Dance buttons
 	static const int LEFT_DANCE_BUTTON = 0;
 	static const int DOWN_DANCE_BUTTON = 1;
@@ -56,8 +64,8 @@ namespace input {
 		int button; // Translated button number for press/release events. 0 for pick down, 1 for pick up (NOTE: these are NOT pick press/release events but rather different directions)
 		bool pressed[BUTTONS]; // All events tell the button state right after the event happened
 		NavButton nav; // Event translated to NavButton
-		// More stuff later, when it is actually used
 		boost::xtime time;
+		// More stuff later, when it is actually used
 	};
 
 	struct Instrument {
@@ -71,9 +79,10 @@ namespace input {
 	typedef std::map<std::string, Instrument> Instruments;
 
 	namespace detail {
-		static unsigned int KEYBOARD_ID = UINT_MAX;
-		static unsigned int KEYBOARD_ID2 = KEYBOARD_ID-1;
-		static unsigned int KEYBOARD_ID3 = KEYBOARD_ID-2; // Three ids needed for keyboard guitar/drumkit/dancepad
+		static unsigned int KEYBOARD_GUITAR = UINT_MAX;
+		static unsigned int KEYBOARD_DRUMS = KEYBOARD_GUITAR-1;
+		static unsigned int KEYBOARD_DANCEPAD = KEYBOARD_GUITAR-2;
+		static unsigned int KEYBOARD_KEYBOARD = KEYBOARD_GUITAR-3; // Four ids needed for keyboard guitar/drumkit/dancepad/keyboard
 
 		class InputDevPrivate {
 		  public:
@@ -104,13 +113,13 @@ namespace input {
 					m_pressed[i] = _event.pressed[i];
 				}
 			};
-			void clearEvents() {m_events.clear();};
-			void assign() {m_assigned = true;};
-			void unassign() {m_assigned = false; clearEvents();};
-			bool assigned() {return m_assigned;};
-			bool pressed(int _button) {return m_pressed[_button];};
-			std::string name() {return m_instrument.name;};
-			bool type_match(DevType _type) {
+			void clearEvents() { m_events.clear(); }
+			void assign() { m_assigned = true; }
+			void unassign() { m_assigned = false; clearEvents(); }
+			bool assigned() const { return m_assigned; }
+			bool pressed(int _button) const { return m_pressed[_button]; }
+			std::string name() const { return m_instrument.name; }
+			bool type_match(DevType _type) const {
 				return _type == m_instrument.type;
 			};
 			int buttonFromSDL(unsigned int sdl_button) {
@@ -144,9 +153,10 @@ namespace input {
 		// Finally throw an exception if only wrong (or none) instrument are available
 		InputDev(DevType _type): m_dev_type(_type) {
 			for (detail::InputDevs::iterator it = detail::devices.begin() ; it != detail::devices.end() ; ++it) {
-				if (it->first == detail::KEYBOARD_ID && !config["game/keyboard_guitar"].b()) continue;
-				if (it->first == detail::KEYBOARD_ID2 && !config["game/keyboard_drumkit"].b()) continue;
-				if (it->first == detail::KEYBOARD_ID3 && !config["game/keyboard_dancepad"].b()) continue;
+				if (it->first == detail::KEYBOARD_GUITAR && !config["game/keyboard_guitar"].b()) continue;
+				if (it->first == detail::KEYBOARD_DRUMS && !config["game/keyboard_drumkit"].b()) continue;
+				if (it->first == detail::KEYBOARD_DANCEPAD && !config["game/keyboard_dancepad"].b()) continue;
+				if (it->first == detail::KEYBOARD_KEYBOARD && !config["game/keyboard_keyboard"].b()) continue;
 				if (!it->second.assigned() && it->second.type_match(_type)) {
 					m_device_id = it->first;
 					it->second.assign();
@@ -161,7 +171,7 @@ namespace input {
 		bool tryPoll(Event& _e) { return detail::devices.find(m_device_id)->second.tryPoll(_e); };
 		void addEvent(Event _e) { detail::devices.find(m_device_id)->second.addEvent(_e); };
 		bool pressed(int _button) { return detail::devices.find(m_device_id)->second.pressed(_button); }; // Current state
-		bool isKeyboard() const { return (m_device_id == detail::KEYBOARD_ID || m_device_id == detail::KEYBOARD_ID2 || m_device_id == detail::KEYBOARD_ID3); };
+		bool isKeyboard() const { return (m_device_id == detail::KEYBOARD_GUITAR || m_device_id == detail::KEYBOARD_DRUMS || m_device_id == detail::KEYBOARD_DANCEPAD || m_device_id == detail::KEYBOARD_KEYBOARD); };
 		DevType getDevType() const { return m_dev_type; }
 	  private:
 		unsigned int m_device_id; // should be some kind of reference
@@ -175,21 +185,22 @@ namespace input {
 		// Initialize all event stuffs
 		void init();
 		// Returns true if event is taken, feed an InputDev by transforming SDL_Event into Event
-		bool pushEvent(SDL_Event);
+		bool pushEvent(SDL_Event event, boost::xtime t);
 	}
 
 #ifdef USE_PORTMIDI
+
 	// Warning: MidiDrums should be instanciated after Window (that load joysticks)
 	class MidiDrums {
 	public:
 		static bool enabled() { return true; }
 		MidiDrums();
 		void process();
+		typedef std::map<unsigned, unsigned> Map;
 	private:
 		pm::Input stream;
 		unsigned int devnum;
 		Event event;
-		typedef std::map<unsigned, unsigned> Map;
 		Map map;
 	};
 #else

@@ -36,10 +36,6 @@ InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevType 
 	m_popupText.reset(new SvgTxtThemeSimple(getThemePath("sing_popup_text.svg"), config["graphic/text_lod"].f()));
 	m_menuTheme.reset(new ThemeInstrumentMenu());
 	for (size_t i = 0; i < max_panels; ++i) m_pressed[i] = false;
-	m_arrow_up.dimensions.stretch(0.05, 0.05);
-	m_arrow_down.dimensions.stretch(0.05, 0.05);
-	m_arrow_left.dimensions.stretch(0.05, 0.05);
-	m_arrow_right.dimensions.stretch(0.05, 0.05);
 }
 
 
@@ -68,30 +64,33 @@ void InstrumentGraph::toggleMenu(int forcestate) {
 
 
 void InstrumentGraph::drawMenu() {
+	ViewTrans view(m_cx.get(), 0.0, 0.75);  // Apply a per-player local perspective
 	if (m_menu.empty()) return;
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
-	if (getGraphType() == input::DANCEPAD) dimensions.screenTop().middle(m_cx.get()).stretch(m_width.get(), 1.0);
-	else dimensions.screenBottom().middle(m_cx.get()).fixedWidth(std::min(m_width.get(), 0.5));
-	// Some helper vars
+	if (getGraphType() == input::DANCEPAD) dimensions.screenTop().middle().stretch(m_width.get(), 1.0);
+	else dimensions.screenBottom().middle().fixedWidth(std::min(m_width.get(), 0.5));
 	ThemeInstrumentMenu& th = *m_menuTheme;
+	th.back_h.dimensions.fixedHeight(0.08f);
+	m_arrow_up.dimensions.stretch(0.05, 0.05);
+	m_arrow_down.dimensions.stretch(0.05, 0.05);
+	m_arrow_left.dimensions.stretch(0.05, 0.05);
+	m_arrow_right.dimensions.stretch(0.05, 0.05);
 	MenuOptions::const_iterator cur = static_cast<MenuOptions::const_iterator>(&m_menu.current());
-	glutil::PushMatrix pm; // Save scaling state
 	double w = m_menu.dimensions.w();
 	const float s = std::min(m_width.get(), 0.5) / w;
-	glScalef(s, s, 1.0f);
+	Transform trans(glmath::scale(s));  // Fit better menu on screen
 	// We need to multiply offset by inverse scale factor to keep it always constant
 	// All these vars are ultimately affected by the scaling matrix
-	const double offsetX = 0.5f * (dimensions.x1() + dimensions.x2()) / s;
 	const float txth = th.option_selected.h();
 	const float button_margin = m_arrow_up.dimensions.w()
 		* (m_input.isKeyboard() && getGraphType() != input::DANCEPAD ? 2.0f : 1.0f);
 	const float step = txth * 0.7f;
 	const float h = m_menu.getOptions().size() * step + step;
 	float y = -h * .5f + step;
-	float x = offsetX - w*.5f + step + button_margin;
-	float xx = offsetX + w*.5f - step - button_margin;
+	float x = -w*.5f + step + button_margin;
+	float xx = w*.5f - step - button_margin;
 	// Background
-	th.bg.dimensions.middle(offsetX).center(0).stretch(w, h);
+	th.bg.dimensions.middle().center().stretch(w, h);
 	th.bg.draw();
 	// Loop through menu items
 	w = 0;
@@ -160,8 +159,9 @@ void InstrumentGraph::drawMenu() {
 			}
 		}
 		// Finally we are at the actual menu item text drawing
+		ColorTrans c(Color::alpha(it->isActive() ? 1.0 : 0.5));
 		txt->dimensions.middle(x).center(y);
-		txt->draw(menutext, it->isActive() ? 1.0f : 0.5f);
+		txt->draw(menutext);
 		w = std::max(w, txt->w() + 2 * step + button_margin * 2); // Calculate the widest entry
 		y += step; // Move draw position down for the next option
 	}
@@ -169,7 +169,7 @@ void InstrumentGraph::drawMenu() {
 	if (cur->getComment() != "") {
 		//th.comment_bg.dimensions.middle().screenBottom(-0.2);
 		//th.comment_bg.draw();
-		th.comment.dimensions.middle(offsetX).screenBottom(-0.12);
+		th.comment.dimensions.middle().screenBottom(-0.12);
 		th.comment.draw(cur->getComment());
 	}
 	// Save the calculated menu dimensions
@@ -177,9 +177,9 @@ void InstrumentGraph::drawMenu() {
 }
 
 
-void InstrumentGraph::drawPopups(double offsetX) {
+void InstrumentGraph::drawPopups() {
 	for (Popups::iterator it = m_popups.begin(); it != m_popups.end(); ) {
-		if (!it->draw(offsetX)) { it = m_popups.erase(it); continue; }
+		if (!it->draw()) { it = m_popups.erase(it); continue; }
 		++it;
 	}
 }
@@ -189,7 +189,7 @@ void InstrumentGraph::handleCountdown(double time, double beginTime) {
 	if (!dead() && time < beginTime && time >= beginTime - m_countdown - 1) {
 		m_popups.push_back(Popup(m_countdown > 0 ?
 		  std::string("- ") +boost::lexical_cast<std::string>(unsigned(m_countdown))+" -" : "Rock On!",
-		  Color(0.0f, 0.0f, 1.0f), 2.0, m_popupText.get()));
+		  Color(0.0, 0.0, 1.0), 2.0, m_popupText.get()));
 		  --m_countdown;
 	}
 }
@@ -197,11 +197,11 @@ void InstrumentGraph::handleCountdown(double time, double beginTime) {
 
 Color const& InstrumentGraph::color(int fret) const {
 	static Color fretColors[5] = {
-		Color(0.0f, 0.9f, 0.0f),
-		Color(0.9f, 0.0f, 0.0f),
-		Color(0.9f, 0.9f, 0.0f),
-		Color(0.0f, 0.0f, 1.0f),
-		Color(0.9f, 0.4f, 0.0f)
+		Color(0.0, 0.9, 0.0),
+		Color(0.9, 0.0, 0.0),
+		Color(0.9, 0.9, 0.0),
+		Color(0.0, 0.0, 1.0),
+		Color(0.9, 0.4, 0.0)
 	};
 	if (fret < 0 || fret >= m_pads) throw std::logic_error("Invalid fret number in InstrumentGraph::color");
 	if (getGraphType() == input::DRUMS) {

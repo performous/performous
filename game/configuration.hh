@@ -37,6 +37,8 @@ class ConfigItem {
 	std::string getValue() const; ///< Get a human-readable representation of the current value
 	std::string const& getShortDesc() const { return m_shortDesc; } ///< get the short description for this ConfigItem
 	std::string const& getLongDesc() const { return m_longDesc; } ///< get the long description for this ConfigItem
+	void addEnum(std::string name); ///< Dynamically adds an enum to all values
+	std::string getEnumName(); ///< Returns the selected enum option's text
 
   private:
 	template <typename T> void updateNumeric(xmlpp::Element& elem, int mode); ///< Used internally for loading XML
@@ -51,6 +53,7 @@ class ConfigItem {
 	Value m_value; ///< The current value
 	Value m_factoryDefaultValue; ///< The value from config schema
 	Value m_defaultValue; ///< The value from config schema or system config
+	std::vector<std::string> m_enums; ///< Enum value titles
 	boost::variant<int, double> m_step, m_min, m_max;
 	boost::variant<int, double> m_multiplier;
 	std::string m_unit;

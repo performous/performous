@@ -3,7 +3,7 @@
 #include "audio.hh"
 #include "util.hh"
 #include "fs.hh"
-#include "joystick.hh"
+#include "controllers.hh"
 #include "theme.hh"
 #include "progressbar.hh"
 
@@ -13,11 +13,9 @@ ScreenPractice::ScreenPractice(std::string const& name, Audio& audio):
 
 void ScreenPractice::enter() {
 	m_audio.playMusic(getThemePath("practice.ogg"));
-	theme.reset(new ThemePractice());
 	// draw vu meters
 	for (unsigned int i = 0, mics = m_audio.analyzers().size(); i < mics; ++i) {
 		m_vumeters.push_back(new ProgressBar(getThemePath("vumeter_bg.svg"), getThemePath("vumeter_fg.svg"), ProgressBar::VERTICAL, 0.136, 0.023));
-		m_vumeters.back().dimensions.screenBottom().left(-0.4 + i * 0.2).fixedWidth(0.04);
 	}
 	m_samples.push_back("drum bass");
 	m_samples.push_back("drum snare");
@@ -25,6 +23,11 @@ void ScreenPractice::enter() {
 	m_samples.push_back("drum tom1");
 	m_samples.push_back("drum cymbal");
 	//m_samples.push_back("drum tom2");
+	reloadGL();
+}
+
+void ScreenPractice::reloadGL() {
+	theme.reset(new ThemePractice());
 }
 
 void ScreenPractice::exit() {
@@ -52,6 +55,8 @@ void ScreenPractice::draw() {
 }
 
 void ScreenPractice::draw_analyzers() {
+	theme->note.dimensions.fixedHeight(0.03f);
+	theme->sharp.dimensions.fixedHeight(0.09f);
 	MusicalScale scale;
 	boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
 	if (analyzers.empty()) return;
@@ -69,6 +74,7 @@ void ScreenPractice::draw_analyzers() {
 		}
 		// getPeak returns 0.0 when clipping, negative values when not that loud.
 		// Normalizing to [0,1], where 0 is -43 dB or less (to match the vumeter graphic)
+		m_vumeters[i].dimensions.screenBottom().left(-0.4 + i * 0.2).fixedWidth(0.04);
 		m_vumeters[i].draw(analyzer.getPeak() / 43.0 + 1.0);
 
 		if (freq != 0.0) {
@@ -81,7 +87,7 @@ void ScreenPractice::draw_analyzers() {
 				int octave = note / 12 - 1;
 				double noteOffset = scale.getNoteNum(note);
 				bool sharp = scale.isSharp(note);
-				noteOffset += octave*7;
+				noteOffset += (octave - 3) * 7;
 				noteOffset += 0.4 * scale.getNoteOffset(t->freq);
 				float posXnote = -0.25 + 0.2 * i + 0.002 * t->stabledb;
 				float posYnote = .075-noteOffset*0.015;

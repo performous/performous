@@ -1,21 +1,23 @@
 #include "screen_intro.hh"
 
 #include "fs.hh"
+#include "glmath.hh"
 #include "audio.hh"
 #include "i18n.hh"
-#include "joystick.hh"
+#include "controllers.hh"
 #include "theme.hh"
 #include "menu.hh"
+#include "xtime.hh"
 
 
 ScreenIntro::ScreenIntro(std::string const& name, Audio& audio): Screen(name), m_audio(audio), m_first(true) {
 }
 
 void ScreenIntro::enter() {
+	ScreenManager::getSingletonPtr()->showLogo();
 	m_audio.playMusic(getThemePath("menu.ogg"), true);
 	m_selAnim = AnimValue(0.0, 10.0);
 	m_submenuAnim = AnimValue(0.0, 3.0);
-	theme.reset(new ThemeIntro());
 	populateMenu();
 	if( m_first ) {
 		std::string msg;
@@ -23,6 +25,11 @@ void ScreenIntro::enter() {
 		if (!msg.empty()) ScreenManager::getSingletonPtr()->dialog(msg + _("\nPlease configure some before playing."));
 		m_first = false;
 	}
+	reloadGL();
+}
+
+void ScreenIntro::reloadGL() {
+	theme.reset(new ThemeIntro());
 }
 
 void ScreenIntro::exit() {
@@ -71,6 +78,7 @@ void ScreenIntro::draw_menu_options() {
 	const float sel_margin = 0.05;
 	const MenuOptions opts = m_menu.getOptions();
 	double submenuanim = 1.0 - std::min(1.0, std::abs(m_submenuAnim.get()-m_menu.getSubmenuLevel()));
+	theme->back_h.dimensions.fixedHeight(0.08f);
 	theme->back_h.dimensions.stretch(m_menu.dimensions.w(), theme->back_h.dimensions.h());
 	// Determine from which item to start
 	int start_i = std::min((int)m_menu.curIndex() - 1, (int)opts.size() - (int)showopts
@@ -80,6 +88,7 @@ void ScreenIntro::draw_menu_options() {
 	// Loop the currently visible options
 	for (size_t i = start_i, ii = 0; ii < showopts && i < opts.size(); ++i, ++ii) {
 		MenuOption const& opt = opts[i];
+		ColorTrans c(Color::alpha(submenuanim));
 
 		// Selection
 		if (i == m_menu.curIndex()) {
@@ -89,22 +98,26 @@ void ScreenIntro::draw_menu_options() {
 			theme->back_h.dimensions.left(x - sel_margin).center(start_y+0.003 + selanim*0.08);
 			theme->back_h.draw();
 			// Draw the text, dim if option not available
-			theme->option_selected.dimensions.left(x).center(start_y + ii*0.08);
-			theme->option_selected.draw(opt.getName(), submenuanim * (opt.isActive() ? 1.0f : 0.5f));
+			{
+				ColorTrans c(Color::alpha(opt.isActive() ? 1.0 : 0.5));
+				theme->option_selected.dimensions.left(x).center(start_y + ii*0.08);
+				theme->option_selected.draw(opt.getName());
+			}
 			wcounter = std::max(wcounter, theme->option_selected.w() + 2 * sel_margin); // Calculate the widest entry
 			// If this is a config item, show the value below
 			if (opt.type == MenuOption::CHANGE_VALUE) {
 				++ii; // Use a slot for the value
 				theme->option_selected.dimensions.left(x + sel_margin).center(-0.1 + (selanim+1)*0.08);
-				theme->option_selected.draw("<  " + opt.value->getValue() + "  >", submenuanim);
+				theme->option_selected.draw("<  " + opt.value->getValue() + "  >");
 			}
 
 		// Regular option (not selected)
 		} else {
 			std::string title = opt.getName();
 			SvgTxtTheme& txt = getTextObject(title);
+			ColorTrans c(Color::alpha(opt.isActive() ? 1.0 : 0.5));
 			txt.dimensions.left(x).center(start_y + ii*0.08);
-			txt.draw(title, submenuanim * (opt.isActive() ? 1.0f : 0.5f));
+			txt.draw(title);
 			wcounter = std::max(wcounter, txt.w() + 2 * sel_margin); // Calculate the widest entry
 		}
 	}
@@ -112,7 +125,13 @@ void ScreenIntro::draw_menu_options() {
 }
 
 void ScreenIntro::draw() {
-	theme->bg.draw();
+	glutil::GLErrorChecker glerror("ScreenIntro::draw()");
+	{
+		float anim = SDL_GetTicks() % 20000 / 20000.0;
+		ColorTrans c(glmath::rotate(2.0 * M_PI * anim, glmath::vec3(1.0, 1.0, 1.0)));
+		theme->bg.draw();
+	}
+	glerror.check("bg");
 	if (m_menu.current().image) m_menu.current().image->draw();
 	// Comment
 	theme->comment_bg.dimensions.center().screenBottom(-0.01);

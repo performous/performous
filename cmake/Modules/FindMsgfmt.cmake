@@ -11,3 +11,6 @@ if(Msgfmt_BIN)
 else()
 	set(Msgfmt_FOUND 0)
 endif(Msgfmt_BIN)
+
+mark_as_advanced(Msgfmt_BIN)
+

@@ -45,7 +45,7 @@ class MidiStream {
 		size_t offset;
 		Riff(MidiStream& ms);
 		~Riff();
-		bool has_more_data() { return offset < size; }
+		bool has_more_data() const { return offset < size; }
 		uint8_t read_uint8() { consume(1); return ms.f.get(); }
 		uint16_t read_uint16() { consume(2); return ms.read_uint16(); }
 		uint32_t read_uint32() { consume(4); return ms.read_uint32(); }

@@ -1,7 +1,7 @@
 To install from git:
 
 	# Checkout the git
-	git clone git://performous.git.sourceforge.net/gitroot/performous/performous
+	git clone git://github.com/performous/performous.git
 	# Create separate build folder under trunk to avoid polluting the source tree
 	mkdir performous/build
 	cd performous/build
@@ -39,7 +39,8 @@ Dependencies:
 
 	- OpenCV (optional) for webcam support
 
-	http://wiki.performous.org/index.php/Building_and_installing_from_source
+	https://github.com/performous/performous/wiki/Building-and-installing-from-source
+	
 	for package names on various systems (or just performous.org if the above no
 	longer works).
 	
