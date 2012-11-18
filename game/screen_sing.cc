@@ -27,6 +27,11 @@ namespace {
 		ScreenManager* sm = ScreenManager::getSingletonPtr();
 		sm->flashMessage(ci.getShortDesc() + ": " + ci.getValue());
 	}
+
+	void startSingingCallback(Menu&, void* screenSing) {
+		ScreenSing* ss = static_cast<ScreenSing*>(screenSing);
+		ss->startDuet();
+	}
 }
 
 void ScreenSing::enter() {
@@ -60,13 +65,6 @@ void ScreenSing::enter() {
 	selectedTracks.push_back(&m_song->getVocalTrack(m_selectedTrack));
 	m_layout_singer.clear();
 	m_layout_singer.push_back(new LayoutSinger(*selectedTracks.back(), m_database, theme));
-	// Do we have a second vocal track and a singer for it?
-	std::vector<std::string> tracks = m_song->getVocalTrackNames();
-	if (tracks.size() > 1 && analyzers.size() > 1) {
-		// TODO: Maybe should check that tracks[1] is not LEAD_VOCALS
-		selectedTracks.push_back(&m_song->getVocalTrack(tracks[1]));
-		m_layout_singer.push_back(new LayoutSinger(*selectedTracks.back(), m_database, theme));
-	}
 	// Load instrument and dance tracks
 	sm->loading(_("Loading instruments..."), 0.8);
 	{
@@ -89,31 +87,37 @@ void ScreenSing::enter() {
 			}
 		}
 	}
-	// Populate the pause menu
 	sm->loading(_("Loading menu..."), 0.9);
-	m_menu.clear();
-	m_menu.add(MenuOption(_("Resume"), _("Back to performing!")));
-	m_menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning"), "Sing"));
-	{	// Vocal tracks
-		ConfigItem::OptionList opts;
-		std::vector<std::string> voctracks = m_song->getVocalTrackNames();
-		//int cur = 0;
-		// Add vocal tracks to option list
-		for (std::vector<std::string>::const_iterator it = voctracks.begin(); it != voctracks.end(); ++it) {
-			//if (m_selectedTrack == *it) cur = opts.size(); // Find the index of current track
-			opts.push_back(*it);
-		}
-		m_vocalTrackOpts = ConfigItem(opts); // Create a ConfigItem from the option list
-		// FIXME: Add a duet option without breaking track selector
-		/*if (opts.size() > 1) { // Vocal track changer only if there is options
+	m_vocalTrackOpts = ConfigItem(ConfigItem::OptionList()); // Dummy
+	// Do we have a second vocal track and a singer for it?
+	std::vector<std::string> tracks = m_song->getVocalTrackNames();
+	if (tracks.size() > 1 && analyzers.size() > 1) {
+		m_menu.clear();
+		m_menu.add(MenuOption(_("Start"), _("Start performing"), &startSingingCallback, (void*)this));
+		{	// Duet toggle
+			m_duet = ConfigItem(0);
+			m_duet.addEnum(_("Duet mode"));
+			m_duet.addEnum(_("Normal mode"));
+			m_menu.add(MenuOption("", _("Switch between duet and regular singing mode"), &m_duet));
+		}{	// Vocal tracks
+			ConfigItem::OptionList opts;
+			std::vector<std::string> voctracks = m_song->getVocalTrackNames();
+			int cur = 0;
+			// Add vocal tracks to option list
+			for (std::vector<std::string>::const_iterator it = voctracks.begin(); it != voctracks.end(); ++it) {
+				if (m_selectedTrack == *it) cur = opts.size(); // Find the index of current track
+				opts.push_back(*it);
+			}
+			m_vocalTrackOpts = ConfigItem(opts); // Create a ConfigItem from the option list
 			m_vocalTrackOpts.select(cur); // Set the selection to current track
-			m_menu.add(MenuOption("", _("Change vocal track\n(restart required)"), &m_vocalTrackOpts));
+			m_menu.add(MenuOption("", _("Change vocal track"), &m_vocalTrackOpts));
 			m_selectedTrackLocalized = _(m_selectedTrack.c_str());
 			m_menu.back().setDynamicName(m_selectedTrackLocalized); // Set the title to be dynamic
-		}*/
-	}
-	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
-	m_menu.close();
+		}
+		m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
+		m_menu.open();
+		m_audio.pause();
+	} else createPauseMenu();
 	// Startup delay for instruments is longer than for singing only
 	double setup_delay = (m_instruments.empty() && m_dancers.empty() ? -1.0 : -5.0);
 	sm->loading(_("Finalizing..."), 0.95);
@@ -124,6 +128,30 @@ void ScreenSing::enter() {
 	sm->showLogo(false);
 	sm->loading(_("Loading graphics..."), 0.9);
 	sm->loading(_("Loading complete"), 1.0);
+}
+
+void ScreenSing::startDuet() {
+	if (m_duet.i() == 0) {
+		m_layout_singer.clear();
+		Engine::VocalTrackPtrs selectedTracks;
+		selectedTracks.push_back(&m_song->getVocalTrack(m_selectedTrack));
+		m_layout_singer.push_back(new LayoutSinger(*selectedTracks.back(), m_database, theme));
+		// TODO: Maybe should check that tracks[1] is not LEAD_VOCALS
+		selectedTracks.push_back(&m_song->getVocalTrack(m_song->getVocalTrackNames()[1]));
+		m_layout_singer.push_back(new LayoutSinger(*selectedTracks.back(), m_database, theme));
+		boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
+		m_engine.reset(new Engine(m_audio, selectedTracks, analyzers.begin(), analyzers.end(), m_database));
+	}
+	createPauseMenu();
+	m_audio.pause(false);
+}
+
+void ScreenSing::createPauseMenu() {
+	m_menu.clear();
+	m_menu.add(MenuOption(_("Resume"), _("Back to performing!")));
+	m_menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning"), "Sing"));
+	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
+	m_menu.close();
 }
 
 void ScreenSing::reloadGL() {
