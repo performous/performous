@@ -240,7 +240,7 @@ void ScreenSongs::draw() {
 		oss_song << song.title << '\n' << song.artist;
 		oss_order << (m_search.text.empty() ? _("<type in to search>") : m_search.text) << "\n\n";
 		// Format the song information text
-		oss_hiscore << boost::format(_("Hisccore for %1%\n")) % song.title;
+		oss_hiscore << _("Hiscore\n");
 		// Get hiscores from database
 		m_database.queryPerSongHiscore_HiscoreDisplay(oss_hiscore, m_songs.currentPtr(), m_infoPos, 5);
 	}
@@ -258,7 +258,7 @@ void ScreenSongs::draw() {
 		theme->order.draw(oss_order.str());
 		drawInstruments(Dimensions(m_instrumentList->ar()).fixedHeight(0.03).center(-0.04));
 		using namespace glmath;
-		Transform trans(translate(vec3(0.25, 0.0, 0.0)) * scale(vec3(0.2, 1.0, 1.0)));
+		Transform trans(translate(vec3(0.32, -0.03, 0.0)) * scale(vec3(0.75, 0.75, 1.0)));
 		theme->hiscores.draw(oss_hiscore.str());
 	}
 }
