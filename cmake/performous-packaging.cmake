@@ -9,8 +9,6 @@ set(CPACK_SOURCE_IGNORE_FILES
    "/build/"
    "/.svn/"
    "/.git/"
-   "/win32/wget.exe"
-   "/win32/gcc/pkg-config.exe"
 )
 set(CPACK_PACKAGE_EXECUTABLES performous)
 set(CPACK_SOURCE_GENERATOR "TBZ2")
