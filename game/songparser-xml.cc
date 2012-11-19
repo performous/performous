@@ -73,33 +73,8 @@ struct SSDom: public xmlpp::DomParser {
 /// Parse header data for Songs screen
 void SongParser::xmlParseHeader() {
 	Song& s = m_song;
-	std::string line;
-	// only look for artist and title
-	bool artistFound = false;
-	bool titleFound = false;
-	unsigned int i = 0;
+
 	boost::cmatch match;
-
-	boost::regex artistRegex("^\\s*<!--.*Artist:(.*)-->", boost::regex_constants::icase);
-	boost::regex titleRegex("^\\s*<!--.*Title:(.*)-->", boost::regex_constants::icase);
-
-	while (getline(line)) {
-		if (regex_match(line.c_str(), match, artistRegex)) {
-			s.artist = match[1];
-			boost::trim(s.artist);
-			if(titleFound) break;
-			artistFound = true;
-		} else if (regex_match(line.c_str(), match, titleRegex)) {
-			s.title = match[1];
-			boost::trim(s.title);
-			if(artistFound) break;
-			titleFound = true;
-		}
-		if (i > 15) break;
-		++i;
-	}
-	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
-
 	boost::regex coverfile("(cover\\..*)$", boost::regex_constants::icase);
 	boost::regex videofile("(video\\..*)$", boost::regex_constants::icase);
 	boost::regex musicfile("(music\\..*)$", boost::regex_constants::icase);
@@ -122,8 +97,9 @@ void SongParser::xmlParseHeader() {
 			testAndAdd(s, "vocals", name);
 		}
 	}
-	// debug: uncomment this to test parsing on all your song database
+
 	xmlParse();
+	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
 }
 
 void addNoteToTrack(Song& song, std::string const& name, const Note& note) {
@@ -155,11 +131,20 @@ void SongParser::xmlParse() {
 	// parse content
 	SSDom dom(m_ss);
 	Song& s = m_song;
+	// Extract artist and title from XML comments
 	{
-		// extract tempo
+		xmlpp::NodeSet comments;
+		dom.find("/ss:MELODY/comment()", comments);
+		for (xmlpp::NodeSet::iterator it = comments.begin(); it != comments.end(); ++it) {
+			std::string c = dynamic_cast<xmlpp::CommentNode&>(**it).get_content();
+			if (boost::starts_with(c, "Artist:")) s.artist = boost::trim_copy(c.substr(7));
+			else if (boost::starts_with(c, "Title:")) s.title = boost::trim_copy(c.substr(6));
+		}
+	}
+	// Extract tempo
+	{
 		xmlpp::NodeSet n;
-		dom.find("/ss:MELODY", n);
-		if (n.empty()) throw std::runtime_error("Unable to find BPM info");
+		if (!dom.find("/ss:MELODY", n)) throw std::runtime_error("Unable to find BPM info");
 		xmlpp::Element& e = dynamic_cast<xmlpp::Element&>(*n[0]);
 		std::string res = e.get_attribute("Resolution")->get_value();
 		m_bpm = boost::lexical_cast<double>(e.get_attribute("Tempo")->get_value().c_str());
@@ -168,9 +153,9 @@ void SongParser::xmlParse() {
 		else throw std::runtime_error("Unknown tempo resolution: " + res);
 	}
 	addBPM(0, m_bpm);
+	// Extract tracks (singerList)
 	std::map<std::string, std::string> singerList;
 	{
-		// extract tracks
 		xmlpp::NodeSet tracks;
 		if (dom.find("/ss:MELODY/ss:TRACK", tracks)) {
 			for (xmlpp::NodeSet::iterator it = tracks.begin(); it != tracks.end(); ++it ) {
@@ -188,6 +173,7 @@ void SongParser::xmlParse() {
 			}
 		}
 	}
+	// Construct sentencesLists
 	std::map<std::string, xmlpp::NodeSet> sentencesList;
 	bool multiTrackInOne = false;
 	{
@@ -198,11 +184,7 @@ void SongParser::xmlParse() {
 			std::string singers = m_song.artist;
 			if(singerList.size() > 1) multiTrackInOne = true;
 			for(std::map<std::string, std::string>::const_iterator it = singerList.begin() ; it != singerList.end() ; ++it) {
-				if(it == singerList.begin()) {
-					singers = it->second;
-				} else {
-					singers += " & " + it->second;
-				}
+				if(it == singerList.begin()) singers = it->second; else singers += " & " + it->second;
 			}
 			sentencesList.insert(std::make_pair(singers, sentences));
 		} else {
@@ -217,6 +199,7 @@ void SongParser::xmlParse() {
 		}
 	}
 
+	// Add vocal tracks to song
 	if (multiTrackInOne) {
 		//std::cout << "Duet mode in a single track in " << m_song.path << std::endl;
 		// Add group track, e.g. "Group" -> VocalTrack("Alice & Bob")
