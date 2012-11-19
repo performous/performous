@@ -16,6 +16,8 @@ namespace SongParserUtil {
 	void eraseLast(std::string& s, char ch = ' ');
 }
 
+namespace xmlpp { class Element; };
+
 /// parses songfiles
 class SongParser {
   public:
@@ -46,6 +48,7 @@ class SongParser {
 	bool xmlCheck(std::vector<char> const& data) const;
 	void xmlParseHeader();
 	void xmlParse();
+	Note xmlParseNote(xmlpp::Element const& noteNode, unsigned& ts);
 	bool smCheck(std::vector<char> const& data) const;
 	void smParseHeader();
 	void smParse();
