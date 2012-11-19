@@ -106,7 +106,10 @@ void addNoteToTrack(Song& song, std::string const& name, const Note& note) {
 	VocalTracks::iterator it = song.vocalTracks.find(name);
 	if (it == song.vocalTracks.end()) throw std::logic_error("songparser-xml internal error: track not found");  // FIXME: I think this is not getting caught properly and instead crashes
 	VocalTrack& vocal = it->second;
-	if(note.type != Note::SLEEP) {
+	if (note.type == Note::SLEEP) {
+		// Skip extra sleep notes
+		if (vocal.notes.empty() || vocal.notes.back().type == Note::SLEEP) return;
+	} else {
 		vocal.noteMin = std::min(vocal.noteMin, note.note);
 		vocal.noteMax = std::max(vocal.noteMax, note.note);
 	}
@@ -226,7 +229,6 @@ void SongParser::xmlParse() {
 		const xmlpp::NodeSet sentences = it0->second;
 		std::string trackName = "Solo " + (num++);  //it0->first;
 		unsigned ts = 0;
-		bool needSleep = false;
 		std::string sentenceSinger = (multiTrackInOne ? "Solo 1" : trackName);  // Defaults if sentence doesn't specify singer
 
 		for (xmlpp::NodeSet::const_iterator it = sentences.begin(); it != sentences.end(); ++it ) {
@@ -242,25 +244,22 @@ void SongParser::xmlParse() {
 				// Singer is only interesting in multiTrackInOne
 				sentenceSinger = sentenceNode.get_attribute("Singer")->get_value();
 			}
+			// Begin each sentence with sleep (extras will be purged elsewhere)
+			{
+				Note sleep;
+				sleep.type = Note::SLEEP;
+				sleep.begin = sleep.end = tsTime(ts);
+				addNoteToTracks(sentenceSinger, m_song, sleep);
+			}
+			// Notes of a sentence
 			xmlpp::NodeSet notes;
 			dom.find(sentenceNode, "ss:NOTE", notes);
-
 			for (xmlpp::NodeSet::iterator it2 = notes.begin(); it2 != notes.end(); ++it2 ) {
-				unsigned oldts = ts;
 				xmlpp::Element& noteNode = dynamic_cast<xmlpp::Element&>(**it2);
 				Note n = xmlParseNote(noteNode, ts);
 				if (n.note == 0) continue;
-				// first note of a sentence is a sleep (for the previous sentence)
-				if (needSleep) {
-					needSleep = false;
-					Note sleep;
-					sleep.type = Note::SLEEP;
-					sleep.begin = sleep.end = tsTime(oldts);
-					addNoteToTracks(sentenceSinger, m_song, sleep);
-				}
 				addNoteToTracks(sentenceSinger, m_song, n);
 			}  // notes
-			needSleep = true;
 		}  // sentences
 	} // sentencesList (tracks)
 }
