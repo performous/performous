@@ -99,12 +99,12 @@ void ScreenSing::enter() {
 			m_duet.addEnum(_("Duet mode"));
 			m_duet.addEnum(_("Normal mode"));
 			m_menu.add(MenuOption("", _("Switch between duet and regular singing mode"), &m_duet));
-		}{	// Vocal tracks
+		}
+		{	// Vocal tracks
 			ConfigItem::OptionList opts;
-			std::vector<std::string> voctracks = m_song->getVocalTrackNames();
 			int cur = 0;
 			// Add vocal tracks to option list
-			for (std::vector<std::string>::const_iterator it = voctracks.begin(); it != voctracks.end(); ++it) {
+			for (std::vector<std::string>::const_iterator it = tracks.begin(); it != tracks.end(); ++it) {
 				if (m_selectedTrack == *it) cur = opts.size(); // Find the index of current track
 				opts.push_back(*it);
 			}
