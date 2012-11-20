@@ -139,9 +139,11 @@ void SongParser::xmlParse() {
 		xmlpp::NodeSet comments;
 		dom.find("/ss:MELODY/comment()", comments);
 		for (xmlpp::NodeSet::iterator it = comments.begin(); it != comments.end(); ++it) {
-			std::string c = dynamic_cast<xmlpp::CommentNode&>(**it).get_content();
-			if (boost::starts_with(c, "Artist:")) s.artist = boost::trim_copy(c.substr(7));
-			else if (boost::starts_with(c, "Title:")) s.title = boost::trim_copy(c.substr(6));
+			xmlpp::CommentNode* n = dynamic_cast<xmlpp::CommentNode*>(*it);
+			if (!n) std::cout << "Invalid type comment node" << std::endl;
+			std::string c = boost::trim_copy(n->get_content());
+			if (boost::starts_with(c, "Artist:")) s.artist = boost::trim_left_copy(c.substr(7));
+			else if (boost::starts_with(c, "Title:")) s.title = boost::trim_left_copy(c.substr(6));
 		}
 	}
 	// Extract tempo
