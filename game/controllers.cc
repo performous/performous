@@ -442,7 +442,7 @@ bool joybutton(input::Event event, SDL_Event const& _e, bool state) {
 	for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
 		event.pressed[i] = devices.find(joy_id)->second.pressed(i);
 	}
-	event.type = input::Event::PRESS;
+	event.type = (state ? input::Event::PRESS : input::Event::RELEASE);
 	event.button = button;
 	event.pressed[button] = state;
 	devices.find(joy_id)->second.addEvent(event);
