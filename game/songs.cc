@@ -86,13 +86,15 @@ void Songs::reload_internal(fs::path const& parent) {
 			} catch (SongParserException& e) {
 				if (e.silent()) continue;
 				// Construct error message
-				m_debug << "songs/error: -!- Error in " << path << "\n    " << name;
+				m_debug << "songs/error: Error loading " << path << "\n    " << name;
 				if (e.line()) m_debug << " line " << e.line();
 				m_debug << ": " << e.what() << std::endl;
+			} catch (std::exception& e) {
+				m_debug << "songs/error: Internal error loading " << path << ": " << e.what() << std::endl;
 			}
 		}
 	} catch (std::exception const& e) {
-		m_debug << "songs/error: Error accessing " << parent << e.what() << std::endl;
+		m_debug << "songs/error: Error accessing " << parent << ": " << e.what() << std::endl;
 	}
 }
 
