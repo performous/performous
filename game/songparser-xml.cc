@@ -1,6 +1,5 @@
 #include "songparser.hh"
 
-#include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>
 #include <stdexcept>
@@ -152,7 +151,7 @@ void SongParser::xmlParse() {
 		if (!dom.find("/ss:MELODY", n)) throw std::runtime_error("Unable to find BPM info");
 		xmlpp::Element& e = dynamic_cast<xmlpp::Element&>(*n[0]);
 		std::string res = e.get_attribute("Resolution")->get_value();
-		m_bpm = boost::lexical_cast<double>(e.get_attribute("Tempo")->get_value().c_str());
+		SongParserUtil::assign(m_bpm, e.get_attribute("Tempo")->get_value().c_str());
 		if (res == "Semiquaver") {}
 		else if (res == "Demisemiquaver") m_bpm *= 2.0;
 		else throw std::runtime_error("Unknown tempo resolution: " + res);
@@ -276,8 +275,9 @@ Note SongParser::xmlParseNote(xmlpp::Element const& noteNode, unsigned& ts) {
 	} else {
 		lyric += ' ';
 	}
-	unsigned note = boost::lexical_cast<unsigned>(noteNode.get_attribute("MidiNote")->get_value().c_str());
-	unsigned duration = boost::lexical_cast<unsigned>(noteNode.get_attribute("Duration")->get_value().c_str());
+	unsigned note, duration;
+	SongParserUtil::assign(note, noteNode.get_attribute("MidiNote")->get_value().c_str());
+	SongParserUtil::assign(duration, noteNode.get_attribute("Duration")->get_value().c_str());
 	if (noteNode.get_attribute("FreeStyle")) n.type = Note::FREESTYLE;
 	else if (noteNode.get_attribute("Bonus")) n.type = Note::GOLDEN;
 	else n.type = Note::NORMAL;

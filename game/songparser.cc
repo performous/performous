@@ -14,6 +14,13 @@ namespace SongParserUtil {
 			throw std::runtime_error("\"" + str + "\" is not valid integer value");
 		}
 	}
+	void assign(unsigned& var, std::string const& str) {
+		try {
+			var = boost::lexical_cast<int>(str);
+		} catch (...) {
+			throw std::runtime_error("\"" + str + "\" is not valid unsigned integer value");
+		}
+	}
 	void assign(double& var, std::string str) {
 		std::replace(str.begin(), str.end(), ',', '.'); // Fix decimal separators
 		try {

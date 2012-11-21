@@ -8,6 +8,8 @@
 namespace SongParserUtil {
 	/// Parse an int from string and assign it to a variable
 	void assign(int& var, std::string const& str);
+	/// Parse an unsigned int from string and assign it to a variable
+	void assign(unsigned& var, std::string const& str);
 	/// Parse a double from string and assign it to a variable
 	void assign(double& var, std::string str);
 	/// Parse a boolean from string and assign it to a variable
