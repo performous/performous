@@ -68,13 +68,8 @@ void Songs::reload_internal(fs::path const& parent) {
 		for (fs::directory_iterator dirIt(parent), dirEnd; m_loading && dirIt != dirEnd; ++dirIt) {
 			fs::path p = dirIt->path();
 			if (fs::is_directory(p)) { reload_internal(p); continue; }
-#if BOOST_FILESYSTEM_VERSION < 3
-			std::string name = p.leaf(); // File basename (notes.txt)
-			std::string path = p.directory_string(); // Path without filename
-#else
 			std::string name = p.filename().string(); // File basename (notes.txt)
 			std::string path = p.string(); // Path without filename
-#endif
 			path.erase(path.size() - name.size());
 			if (!regex_match(name.c_str(), match, expression)) continue;
 			try {
@@ -84,13 +79,7 @@ void Songs::reload_internal(fs::path const& parent) {
 				m_songs.push_back(s);
 				m_dirty = true;
 			} catch (SongParserException& e) {
-				if (e.silent()) continue;
-				// Construct error message
-				m_debug << "songs/error: Error loading " << path << "\n    " << name;
-				if (e.line()) m_debug << " line " << e.line();
-				m_debug << ": " << e.what() << std::endl;
-			} catch (std::exception& e) {
-				m_debug << "songs/error: Internal error loading " << path << ": " << e.what() << std::endl;
+				m_debug << e; // Prints formatted message in our log format
 			}
 		}
 	} catch (std::exception const& e) {

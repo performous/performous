@@ -30,7 +30,7 @@ void Song::reload(bool errorIgnore) {
 	start = 0.0;
 	preview_start = getNaN();
 	hasBRE = false;
-	b0rkedTracks = false;
+	b0rked.clear();
 	try { SongParser(*this); } catch (...) { if (!errorIgnore) throw; }
 	collateUpdate();
 }
@@ -51,7 +51,7 @@ void Song::dropNotes() {
 		for (DanceTracks::iterator it = danceTracks.begin(); it != danceTracks.end(); ++it)
 			it->second.clear();
 	}
-	b0rkedTracks = false;
+	b0rked.clear();
 	loadStatus = HEADER;
 }
 

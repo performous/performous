@@ -36,25 +36,15 @@ namespace {
 
 void ScreenSing::enter() {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
-	sm->loading(_("Loading song..."), 0.3);
-	// Load the rest of the song
-	if (m_song->loadStatus != Song::FULL) {
-		try { SongParser sp(*m_song); }
-		catch (std::exception& e) {
-			std::cout << e.what() << std::endl;
-			sm->flashMessage(_("Song is broken!"));
-			sm->activateScreen("Songs");
-		}
-	}
 	// Initialize webcam
-	sm->loading(_("Initializing webcam..."), 0.5);
+	sm->loading(_("Initializing webcam..."), 0.1);
 	if (config["graphic/webcam"].b() && Webcam::enabled()) {
 		try {
 			m_cam.reset(new Webcam(config["graphic/webcamid"].i()));
 		} catch (std::exception& e) { std::cout << e.what() << std::endl; };
 	}
 	// Load video
-	sm->loading(_("Loading video..."), 0.6);
+	sm->loading(_("Loading video..."), 0.2);
 	if (!m_song->video.empty() && config["graphic/video"].b()) {
 		m_video.reset(new Video(m_song->path + m_song->video, m_song->videoGap));
 	}
@@ -66,7 +56,7 @@ void ScreenSing::enter() {
 	m_layout_singer.clear();
 	m_layout_singer.push_back(new LayoutSinger(*selectedTracks.back(), m_database, theme));
 	// Load instrument and dance tracks
-	sm->loading(_("Loading instruments..."), 0.8);
+	sm->loading(_("Loading instruments..."), 0.3);
 	{
 		int type = 0; // 0 for dance, 1 for guitars, 2 for drums
 		int idx = 0;
@@ -87,7 +77,7 @@ void ScreenSing::enter() {
 			}
 		}
 	}
-	sm->loading(_("Loading menu..."), 0.9);
+	sm->loading(_("Loading menu..."), 0.4);
 	m_vocalTrackOpts = ConfigItem(ConfigItem::OptionList()); // Dummy
 	// Do we have a second vocal track and a singer for it?
 	std::vector<std::string> tracks = m_song->getVocalTrackNames();
@@ -120,13 +110,21 @@ void ScreenSing::enter() {
 	} else createPauseMenu();
 	// Startup delay for instruments is longer than for singing only
 	double setup_delay = (m_instruments.empty() && m_dancers.empty() ? -1.0 : -5.0);
+	sm->loading(_("Loading song..."), 0.8);
+	// Load the rest of the song
+	if (m_song->loadStatus != Song::FULL) {
+		try { SongParser sp(*m_song); }
+		catch (SongParserException& e) {
+			std::clog << e;
+			sm->activateScreen("Songs");
+		}
+	}
 	sm->loading(_("Finalizing..."), 0.95);
 	m_audio.playMusic(m_song->music, false, 0.0, setup_delay);
 	m_engine.reset(new Engine(m_audio, selectedTracks, analyzers.begin(), analyzers.end(), m_database));
 	// Notify about broken tracks
-	if (m_song->b0rkedTracks) ScreenManager::getSingletonPtr()->dialog(_("Song contains broken tracks!"));
+	if (!m_song->b0rked.empty()) sm->dialog(_("Song contains broken tracks!") + std::string("\n\n") + m_song->b0rked);
 	sm->showLogo(false);
-	sm->loading(_("Loading graphics..."), 0.9);
 	sm->loading(_("Loading complete"), 1.0);
 }
 
