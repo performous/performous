@@ -50,13 +50,22 @@ void ScreenSing::enter() {
 	}
 	boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
 	reloadGL();
+	// Load song notes
+	sm->loading(_("Loading song..."), 0.4);
+	if (m_song->loadStatus != Song::FULL) {
+		try { SongParser sp(*m_song); }
+		catch (SongParserException& e) {
+			std::clog << e;
+			sm->activateScreen("Songs");
+		}
+	}
 	// Add a singer layout
 	Engine::VocalTrackPtrs selectedTracks;
 	selectedTracks.push_back(&m_song->getVocalTrack(m_selectedTrack));
 	m_layout_singer.clear();
 	m_layout_singer.push_back(new LayoutSinger(*selectedTracks.back(), m_database, theme));
 	// Load instrument and dance tracks
-	sm->loading(_("Loading instruments..."), 0.3);
+	sm->loading(_("Loading instruments..."), 0.5);
 	{
 		int type = 0; // 0 for dance, 1 for guitars, 2 for drums
 		int idx = 0;
@@ -77,7 +86,7 @@ void ScreenSing::enter() {
 			}
 		}
 	}
-	sm->loading(_("Loading menu..."), 0.4);
+	sm->loading(_("Loading menu..."), 0.7);
 	m_vocalTrackOpts = ConfigItem(ConfigItem::OptionList()); // Dummy
 	// Do we have a second vocal track and a singer for it?
 	std::vector<std::string> tracks = m_song->getVocalTrackNames();
@@ -110,15 +119,6 @@ void ScreenSing::enter() {
 	} else createPauseMenu();
 	// Startup delay for instruments is longer than for singing only
 	double setup_delay = (m_instruments.empty() && m_dancers.empty() ? -1.0 : -5.0);
-	sm->loading(_("Loading song..."), 0.8);
-	// Load the rest of the song
-	if (m_song->loadStatus != Song::FULL) {
-		try { SongParser sp(*m_song); }
-		catch (SongParserException& e) {
-			std::clog << e;
-			sm->activateScreen("Songs");
-		}
-	}
 	sm->loading(_("Finalizing..."), 0.95);
 	m_audio.playMusic(m_song->music, false, 0.0, setup_delay);
 	m_engine.reset(new Engine(m_audio, selectedTracks, analyzers.begin(), analyzers.end(), m_database));
