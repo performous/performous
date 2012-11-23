@@ -1,5 +1,6 @@
 #include "songparser.hh"
 
+#include "util.hh"
 #include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>
 #include <stdexcept>
@@ -97,42 +98,8 @@ void SongParser::xmlParseHeader() {
 		}
 	}
 
-	xmlParse();
-	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
-}
-
-void addNoteToTrack(Song& song, std::string const& name, const Note& note) {
-	VocalTracks::iterator it = song.vocalTracks.find(name);
-	if (it == song.vocalTracks.end()) throw std::logic_error("songparser-xml internal error: track not found");  // FIXME: I think this is not getting caught properly and instead crashes
-	VocalTrack& vocal = it->second;
-	if (note.type == Note::SLEEP) {
-		// Skip extra sleep notes
-		if (vocal.notes.empty() || vocal.notes.back().type == Note::SLEEP) return;
-	} else {
-		vocal.noteMin = std::min(vocal.noteMin, note.note);
-		vocal.noteMax = std::max(vocal.noteMax, note.note);
-	}
-	vocal.notes.push_back(note);
-}
-
-void addNoteToTracks(std::string sentenceSinger, Song& song, const Note& note) {
-	//std::cout << sentenceSinger << " (" << note.begin << "-" << note.end << "): " << note.syllable << std::endl;
-	if (sentenceSinger == "Group") {
-		// Add to all tracks
-		addNoteToTrack(song, "Group", note);
-		addNoteToTrack(song, "Solo 1", note);
-		addNoteToTrack(song, "Solo 2", note);
-	} else {
-		// Add to specified track only
-		addNoteToTrack(song, sentenceSinger, note);
-	}
-}
-
-/// Parse notes
-void SongParser::xmlParse() {
-	// parse content
+	// Parse notes.xml
 	SSDom dom(m_ss);
-	Song& s = m_song;
 	// Extract artist and title from XML comments
 	{
 		xmlpp::NodeSet comments;
@@ -143,7 +110,41 @@ void SongParser::xmlParse() {
 			if (boost::starts_with(str, "Artist:")) s.artist = boost::trim_left_copy(str.substr(7));
 			else if (boost::starts_with(str, "Title:")) s.title = boost::trim_left_copy(str.substr(6));
 		}
+		if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
 	}
+	// Read TRACK elements (singer names), if available
+	std::string singers;  // Only used for "Together" track
+	xmlpp::NodeSet tracks;
+	dom.find("/ss:MELODY/ss:TRACK", tracks);
+	for (xmlpp::NodeSet::iterator it = tracks.begin(); it != tracks.end(); ++it ) {
+		xmlpp::Element& trackNode = dynamic_cast<xmlpp::Element&>(**it);
+		std::string name = trackNode.get_attribute("Name")->get_value();  // "Player1" or "Player2"
+		xmlpp::Attribute* attr = trackNode.get_attribute("Artist");
+		std::string artist = attr ? std::string(attr->get_value()) : name;  // Singer name
+		if (attr) singers += (singers.empty() ? "" : " & ") + artist;
+		m_song.insertVocalTrack(name, VocalTrack(artist));
+	}
+	// If no tracks are specified, we can assume that it isn't duet
+	if (tracks.empty()) m_song.insertVocalTrack("Player1", VocalTrack(s.artist));
+	else if (tracks.size() > 1) m_song.insertVocalTrack("Together", VocalTrack(singers));
+}
+
+void addNoteToTrack(VocalTrack& vocal, const Note& note) {
+	if (note.type == Note::SLEEP) {
+		// Skip extra sleep notes
+		if (vocal.notes.empty() || vocal.notes.back().type == Note::SLEEP) return;
+	} else {
+		vocal.noteMin = std::min(vocal.noteMin, note.note);
+		vocal.noteMax = std::max(vocal.noteMax, note.note);
+	}
+	vocal.notes.push_back(note);
+}
+
+/// Parse notes
+void SongParser::xmlParse() {
+	// Parse notes.xml
+	SSDom dom(m_ss);
+	Song& s = m_song;
 	// Extract tempo
 	{
 		xmlpp::NodeSet n;
@@ -156,100 +157,38 @@ void SongParser::xmlParse() {
 		else throw std::runtime_error("Unknown tempo resolution: " + res);
 	}
 	addBPM(0, m_bpm);
-	// Extract tracks (singerList)
-	std::map<std::string, std::string> singerList;
-	{
-		xmlpp::NodeSet tracks;
-		if (dom.find("/ss:MELODY/ss:TRACK", tracks)) {
-			for (xmlpp::NodeSet::iterator it = tracks.begin(); it != tracks.end(); ++it ) {
-				xmlpp::Element& trackNode = dynamic_cast<xmlpp::Element&>(**it);
-				std::string name = trackNode.get_attribute("Name")->get_value();
-				std::string artist = name;
-				if(trackNode.get_attribute("Artist")) artist = trackNode.get_attribute("Artist")->get_value();
-				if(name == "Player1") {
-					singerList.insert(std::make_pair("Solo 1", artist));
-				} else if(name == "Player2") {
-					singerList.insert(std::make_pair("Solo 2", artist));
-				} else {
-					std::cout << "Unknown track name: " << name << std::endl;
-				}
-			}
-		}
-	}
-	// Construct sentencesLists
-	std::map<std::string, xmlpp::NodeSet> sentencesList;
-	bool multiTrackInOne = false;
-	{
+
+	// Parse each track...
+	xmlpp::NodeSet tracks;
+	// First try version 1 (MELODY/SENTENCE), fallback to version 2/4 (MELODY/TRACK/SENTENCE).
+	dom.find("/ss:MELODY[ss:SENTENCE]", tracks) || dom.find("/ss:MELODY/ss:TRACK[ss:SENTENCE]", tracks);
+	if (tracks.empty()) throw std::runtime_error("No valid tracks or sentences found");
+	// Process each vocalTrack separately; use the same XML (version 1) track twice if needed
+	unsigned players = clamp<unsigned>(s.vocalTracks.size(), 1, 2);  // Don't count "Together" track
+	VocalTracks::iterator vocalIt = s.vocalTracks.begin();
+	for (unsigned player = 0; player < players; ++player, ++vocalIt) {
+		if (vocalIt == s.vocalTracks.end()) throw std::logic_error("SongParser-xml vocalIt past the end");
+		VocalTrack& vocal = vocalIt->second;
+		xmlpp::Element& trackElem = dynamic_cast<xmlpp::Element&>(*tracks[player % tracks.size()]);
+		std::string sentenceSinger = "Solo 1";  // The default value
 		xmlpp::NodeSet sentences;
-		// extract sentences
-		if(dom.find("/ss:MELODY/ss:SENTENCE", sentences)) {
-			// all stuff here (watch SENTENCE.Singer ("Solo 1", "Solo 2" or "Group")
-			std::string singers = m_song.artist;
-			if(singerList.size() > 1) multiTrackInOne = true;
-			for(std::map<std::string, std::string>::const_iterator it = singerList.begin() ; it != singerList.end() ; ++it) {
-				if(it == singerList.begin()) singers = it->second; else singers += " & " + it->second;
-			}
-			sentencesList.insert(std::make_pair(singers, sentences));
-		} else {
-			xmlpp::NodeSet tracks;
-			if (!dom.find("/ss:MELODY/ss:TRACK", tracks)) throw std::runtime_error("Unable to find any sentences in melody XML");
-			for (xmlpp::NodeSet::iterator it = tracks.begin(); it != tracks.end(); ++it ) {
-				xmlpp::Element& trackNode = dynamic_cast<xmlpp::Element&>(**it);
-				std::string singer = trackNode.get_attribute("Artist")->get_value();
-				dom.find(trackNode, "ss:SENTENCE", sentences);
-				sentencesList.insert(std::make_pair(singer, sentences));
-			}
-		}
-	}
-
-	// Add vocal tracks to song
-	if (multiTrackInOne) {
-		//std::cout << "Duet mode in a single track in " << m_song.path << std::endl;
-		// Add group track, e.g. "Group" -> VocalTrack("Alice & Bob")
-		{
-			std::string trackSingers = sentencesList.begin()->first;
-			m_song.insertVocalTrack("Group", VocalTrack(trackSingers));
-		}
-		// Add each singer track, e.g. "Solo 1" -> VocalTrack("Bob")
-		for(std::map<std::string, std::string>::const_iterator it = singerList.begin() ; it != singerList.end() ; ++it) {
-			m_song.insertVocalTrack(it->first, VocalTrack(it->second));
-		}
-	} else {
-		// Add each singer track
-		char num = '1';
-		for(std::map<std::string, xmlpp::NodeSet>::const_iterator it = sentencesList.begin() ; it != sentencesList.end() ; ++it) {
-			m_song.insertVocalTrack("Solo " + (num++), VocalTrack(it->first));
-		}
-	}
-
-	// Actual note parsing starts here...
-	char num = '1';
-	for (std::map<std::string, xmlpp::NodeSet>::const_iterator it0 = sentencesList.begin() ; it0 != sentencesList.end() ; ++it0) {
-		// Track start
-		const xmlpp::NodeSet sentences = it0->second;
-		std::string trackName = "Solo " + (num++);  //it0->first;
+		dom.find(trackElem, "ss:SENTENCE", sentences);
 		unsigned ts = 0;
-		std::string sentenceSinger = (multiTrackInOne ? "Solo 1" : trackName);  // Defaults if sentence doesn't specify singer
-
 		for (xmlpp::NodeSet::const_iterator it = sentences.begin(); it != sentences.end(); ++it ) {
 			xmlpp::Element& sentenceNode = dynamic_cast<xmlpp::Element&>(**it);
-
-			if(sentenceNode.get_attribute("Part") != NULL) {
-				std::string section = sentenceNode.get_attribute("Part")->get_value();
-				//std::cout << "New section: " << section << ", ts=" << tsTime(ts) << std::endl;
-				Song::SongSection tmp(section, tsTime(ts));
-				m_song.songsections.push_back(tmp);
+			// Check if SENTENCE has new attributes
+			{
+				xmlpp::Attribute* attr = sentenceNode.get_attribute("Part");
+				if (attr) m_song.songsections.push_back(Song::SongSection(attr->get_value(), tsTime(ts)));
+				attr = sentenceNode.get_attribute("Singer");
+				if (attr) sentenceSinger = attr->get_value();
 			}
-			if(multiTrackInOne && sentenceNode.get_attribute("Singer") != NULL) {
-				// Singer is only interesting in multiTrackInOne
-				sentenceSinger = sentenceNode.get_attribute("Singer")->get_value();
-			}
-			// Begin each sentence with sleep (extras will be purged elsewhere)
+			// Begin each sentence with sleep (extras will be purged in addNoteToTrack)
 			{
 				Note sleep;
 				sleep.type = Note::SLEEP;
 				sleep.begin = sleep.end = tsTime(ts);
-				addNoteToTracks(sentenceSinger, m_song, sleep);
+				addNoteToTrack(vocal, sleep);
 			}
 			// Notes of a sentence
 			xmlpp::NodeSet notes;
@@ -258,10 +197,14 @@ void SongParser::xmlParse() {
 				xmlpp::Element& noteNode = dynamic_cast<xmlpp::Element&>(**it2);
 				Note n = xmlParseNote(noteNode, ts);
 				if (n.note == 0) continue;
-				addNoteToTracks(sentenceSinger, m_song, n);
+				// Skip sentences that do not belong to current player
+				if (sentenceSinger == "Solo 1" && player != 0) continue;
+				if (sentenceSinger == "Solo 2" && player != 1) continue;
+				// Actually add the note to current player's track...
+				addNoteToTrack(vocal, n);
 			}  // notes
 		}  // sentences
-	} // sentencesList (tracks)
+	} // players (vocal tracks)
 }
 
 Note SongParser::xmlParseNote(xmlpp::Element const& noteNode, unsigned& ts) {
