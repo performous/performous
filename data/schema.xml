@@ -104,9 +104,10 @@ to save the current settings to XML.
 		<short>Joystick configuration</short>
 		<long>Force joystick to some kind of instrument.</long>
 	</entry>
-	<entry name="game/midi_input" type="string" value="">
+	<entry name="game/midi_input" type="string">
 		<short>Hardware MIDI input device</short>
 		<long>Part of sound card name or its number or empty to use the first available device. Used currently for MIDI drum controllers.</long>
+		<stringvalue>e-drum</stringvalue>
 	</entry>
 	<entry name="game/fallback_encoding" type="int" value="2">
 		<limits>

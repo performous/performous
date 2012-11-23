@@ -1,6 +1,5 @@
 #include "songparser.hh"
 
-#include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>
 #include <stdexcept>
@@ -118,12 +117,11 @@ void SongParser::midParse() {
 			// This number has been extracted from broken song tracks, but
 			// it is probably DIFFICULTYCOUNT * different_frets.
 			if (durCount <= 20) {
-				s.b0rkedTracks = true;
 				nm2.clear();
-				std::ostringstream oss;
-				oss << "Track " << name << " is broken in ";
-				oss << s.path << s.midifilename << std::endl;
-				std::clog << "songparser/warning: " << oss.str(); // More likely to be atomic when written as one string
+				std::string msg = "Track " + name + " is broken (has too few notes).\n";
+				s.b0rked += msg;
+				msg = "songparser/warning: " + s.path + s.midifilename + ": " + msg;
+				std::clog << msg << std::flush; // More likely to be atomic when written as one string
 				s.instrumentTracks.erase(name);
 			}
 		} else {

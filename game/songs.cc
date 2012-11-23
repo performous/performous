@@ -68,13 +68,8 @@ void Songs::reload_internal(fs::path const& parent) {
 		for (fs::directory_iterator dirIt(parent), dirEnd; m_loading && dirIt != dirEnd; ++dirIt) {
 			fs::path p = dirIt->path();
 			if (fs::is_directory(p)) { reload_internal(p); continue; }
-#if BOOST_FILESYSTEM_VERSION < 3
-			std::string name = p.leaf(); // File basename (notes.txt)
-			std::string path = p.directory_string(); // Path without filename
-#else
 			std::string name = p.filename().string(); // File basename (notes.txt)
 			std::string path = p.string(); // Path without filename
-#endif
 			path.erase(path.size() - name.size());
 			if (!regex_match(name.c_str(), match, expression)) continue;
 			try {
@@ -84,22 +79,20 @@ void Songs::reload_internal(fs::path const& parent) {
 				m_songs.push_back(s);
 				m_dirty = true;
 			} catch (SongParserException& e) {
-				if (e.silent()) continue;
-				// Construct error message
-				m_debug << "songs/error: -!- Error in " << path << "\n    " << name;
-				if (e.line()) m_debug << " line " << e.line();
-				m_debug << ": " << e.what() << std::endl;
+				m_debug << e; // Prints formatted message in our log format
 			}
 		}
 	} catch (std::exception const& e) {
-		m_debug << "songs/error: Error accessing " << parent << e.what() << std::endl;
+		m_debug << "songs/error: Error accessing " << parent << ": " << e.what() << std::endl;
 	}
 }
 
 // Make std::find work with shared_ptrs and regular pointers
 static bool operator==(boost::shared_ptr<Song> const& a, Song const* b) { return a.get() == b; }
 
-/// restore selection
+/// Store currently selected song on construction and restore the selection on destruction
+/// Assumes that m_filtered has been modified and finds the old selection by pointer value.
+/// Sets up math_cover so that the old selection is restored if possible, otherwise the first song is selected.
 class Songs::RestoreSel {
 	Songs& m_s;
 	Song const* m_sel;
@@ -113,7 +106,7 @@ class Songs::RestoreSel {
 		if (m_sel) {
 			SongVector& f = m_s.m_filtered;
 			SongVector::iterator it = std::find(f.begin(), f.end(), m_sel);
-			m_s.math_cover.setTarget(0, 0);
+			m_s.math_cover.reset();
 			if (it != f.end()) pos = it - f.begin();
 		}
 		m_s.math_cover.setTarget(pos, m_s.size());
@@ -124,7 +117,7 @@ void Songs::update() {
 	if (m_dirty && m_updateTimer.get() > 0.5) filter_internal(); // Update with newly loaded songs
 	// A hack to move to the first song when the song screen is entered the first time
 	static bool first = true;
-	if (first) { first = false; math_cover.setTarget(0, 0); math_cover.setTarget(0, size()); }
+	if (first) { first = false; math_cover.reset(); math_cover.setTarget(0, size()); }
 }
 
 void Songs::setFilter(std::string const& val) {
@@ -159,7 +152,6 @@ void Songs::filter_internal() {
 	} catch (...) {
 		SongVector(m_songs.begin(), m_songs.end()).swap(m_filtered);  // Invalid regex => copy everything
 	}
-	math_cover.reset();
 	sort_internal();
 }
 

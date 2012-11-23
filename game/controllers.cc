@@ -73,21 +73,22 @@ void input::MidiDrums::process() {
 		unsigned char evnt = ev.message & 0xF0;
 		unsigned char note = ev.message >> 8;
 		unsigned char vel  = ev.message >> 16;
+		unsigned char chan = ev.message & 0x0F;
 #if 0
 		// it is IMHO not a good idea to filter on the channel.
 		// code snippet left here for visibility
-		unsigned char chan = ev.message & 0x0F;
 		if (chan != 0x09) continue; // only accept channel 10 (percussion)
 #endif
 		if (evnt != 0x90) continue; // 0x90 = any channel note-on
 		if (vel  == 0x00) continue; // velocity 0 is often used instead of note-off
 		Map::const_iterator it = map.find(note);
 		if (it == map.end()) {
-			std::cout << "Unassigned MIDI drum event: note " << note << std::endl;
+			std::clog << "controller-midi/warn: Unassigned MIDI drum event: ch=" << unsigned(chan) << " note=" << unsigned(note) << std::endl;
 			continue;
 		}
 		event.button = it->second;
 		event.time = now();
+		std::clog << "controller-midi/info: Processed MIDI drum event: ch=" << unsigned(chan) << " note=" << unsigned(note) << " button=" << event.button << std::endl;
 		for (unsigned int i = 0; i < BUTTONS; ++i) event.pressed[i] = false;
 		event.pressed[it->second] = true;
 		detail::devices.find(devnum)->second.addEvent(event);
@@ -314,7 +315,7 @@ void readControllers(input::Instruments &instruments, fs::path const& file) {
 			if(instruments.find(name) == instruments.end()) {
 				std::clog << "controllers/info:    Adding " << type << ": " << name << std::endl;
 			} else {
-				std::cout << "controllers/info:    Overriding " << type << ": " << name << std::endl;
+				std::clog << "controllers/info:    Overriding " << type << ": " << name << std::endl;
 				instruments.erase(name);
 			}
 			input::Instrument instrument(name, devType, mapping);
@@ -441,7 +442,7 @@ bool joybutton(input::Event event, SDL_Event const& _e, bool state) {
 	for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
 		event.pressed[i] = devices.find(joy_id)->second.pressed(i);
 	}
-	event.type = input::Event::PRESS;
+	event.type = (state ? input::Event::PRESS : input::Event::RELEASE);
 	event.button = button;
 	event.pressed[button] = state;
 	devices.find(joy_id)->second.addEvent(event);

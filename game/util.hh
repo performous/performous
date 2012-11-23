@@ -3,11 +3,15 @@
 #include <limits>
 #include <stdexcept>
 
+#if 0  // We don't need the following in C++11 mode
+
 /** Implement C99 mathematical rounding (which C++ unfortunately currently lacks) **/
 template <typename T> T round(T val) { return int(val + (val >= 0 ? 0.5 : -0.5)); }
 
 /** Implement C99 remainder function (not precisely, but almost) **/
 template <typename T> T remainder(T val, T div) { return val - round(val/div) * div; }
+
+#endif
 
 /** Limit val to range [min, max] **/
 template <typename T> T clamp(T val, T min = 0, T max = 1) {

@@ -13,6 +13,21 @@ Tapio Vierros <aave000 at users.sourceforge.net>
 	* Core developer
 	* Lots of stuff in various areas
 
+
+INACTIVE DEVELOPERS
+-------------------
+
+No commits for a long time, but their stuff is still used.
+
+Stefan Kristiansson  <stekern at users.sourceforge.net>
+	* Core developer
+
+jEsuSdA  <info at jesusda.com>
+	* SVG design (the original lima theme)
+
+Tobias Gehrig <tgehrig at users.sourceforge.net>
+	* Pre-calculate FFT window patch
+
 Topnob <topnob at users.sourceforge.net>
 	* Non-power-of-two texture loading on older hardware
 	* Many other fixes
@@ -27,9 +42,6 @@ zarrn <zarrn at users.sourceforge.net>
 knittl <knittl at users.sourceforge.net>
 	* Code documentation (Doxygen comments)
 	* SVG design
-
-dex7 <dex7 at users.sourceforge.net>
-	* Website layout
 
 Fabian Fingerle  <fabian at datensalat.eu>
 	* Dependency testing
@@ -50,26 +62,8 @@ Matti Kemppainen <mpkemppa at users.sf.net>
 Jaakko Nikkola <jnikkola at users.sourceforge.net>
 	* Dance game developer
 
-John Stumpo <stump at jstump.com>
-	* Windows compilation scripts
-
 Fredrik Klasson <scientica at gmail.com>
 	* Logging stuff, xml i18n, image loading tweaks
-
-
-INACTIVE DEVELOPERS
--------------------
-
-No commits for a long time, but their stuff is still used.
-
-Stefan Kristiansson  <stekern at users.sourceforge.net>
-	* Core developer
-
-jEsuSdA  <info at jesusda.com>
-	* SVG design (the original lima theme)
-
-Tobias Gehrig <tgehrig at users.sourceforge.net>
-	* Pre-calculate FFT window patch
 
 
 GUEST DEVELOPERS
@@ -93,6 +87,12 @@ PAST DEVELOPERS
 
 Cool guys who have contributed to the project in the past, but whose
 contributions have been superceded and are no longer part of the distribution.
+
+John Stumpo <stump at jstump.com>
+	* Windows compilation scripts
+
+dex7 <dex7 at users.sourceforge.net>
+	* Website layout
 
 Jami Pekkanen  <jami.pekkanen at ateco.fi>
 	* Cairotosdl and pitchgraph class

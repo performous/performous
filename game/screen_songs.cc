@@ -184,8 +184,29 @@ void ScreenSongs::drawMultimedia() {
 		double length = m_audio.getLength();
 		double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
 		m_songbg_default->draw();   // Default bg
-		if (m_songbg.get()) m_songbg->draw();
-		if (m_video.get()) m_video->render(time);
+		if (!m_songs.empty()) {
+			Song& song = m_songs.current();
+			if (m_songbg.get()) m_songbg->draw();
+			else if (!song.cover.empty()) {
+				// Create a background image by tiling covers
+				try {
+					Surface& cover = m_covers[song.path + song.cover];
+					Dimensions backup = cover.dimensions;
+					const float s = 0.3;
+					cover.dimensions.fixedWidth(s).screenTop(0.0);
+					cover.dimensions.top(0.0).right(-s); cover.draw();
+					cover.dimensions.top(0.0).right(0.0); cover.draw();
+					cover.dimensions.top(0.0).left(0.0); cover.draw();
+					cover.dimensions.top(0.0).left(s); cover.draw();
+					cover.dimensions.top(s).right(-s); cover.draw();
+					cover.dimensions.top(s).right(0.0); cover.draw();
+					cover.dimensions.top(s).left(0.0); cover.draw();
+					cover.dimensions.top(s).left(s); cover.draw();
+					cover.dimensions = backup;
+				} catch (std::exception const&) {}
+			}
+			if (m_video.get()) m_video->render(time);
+		}
 	}
 	if (!m_jukebox) {
 		m_songbg_ground->draw();

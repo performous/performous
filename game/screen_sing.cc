@@ -27,48 +27,42 @@ namespace {
 		ScreenManager* sm = ScreenManager::getSingletonPtr();
 		sm->flashMessage(ci.getShortDesc() + ": " + ci.getValue());
 	}
+
+	void startSingingCallback(Menu&, void* screenSing) {
+		ScreenSing* ss = static_cast<ScreenSing*>(screenSing);
+		ss->setupVocals();
+	}
 }
 
 void ScreenSing::enter() {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
-	sm->loading(_("Loading song..."), 0.3);
-	// Load the rest of the song
-	if (m_song->loadStatus != Song::FULL) {
-		try { SongParser sp(*m_song); }
-		catch (std::exception& e) {
-			std::cout << e.what() << std::endl;
-			sm->flashMessage(_("Song is broken!"));
-			sm->activateScreen("Songs");
-		}
-	}
 	// Initialize webcam
-	sm->loading(_("Initializing webcam..."), 0.5);
+	sm->loading(_("Initializing webcam..."), 0.1);
 	if (config["graphic/webcam"].b() && Webcam::enabled()) {
 		try {
 			m_cam.reset(new Webcam(config["graphic/webcamid"].i()));
 		} catch (std::exception& e) { std::cout << e.what() << std::endl; };
 	}
 	// Load video
-	sm->loading(_("Loading video..."), 0.6);
+	sm->loading(_("Loading video..."), 0.2);
 	if (!m_song->video.empty() && config["graphic/video"].b()) {
 		m_video.reset(new Video(m_song->path + m_song->video, m_song->videoGap));
 	}
 	boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
 	reloadGL();
-	// Add a singer layout
-	Engine::VocalTrackPtrs selectedTracks;
-	selectedTracks.push_back(&m_song->getVocalTrack(m_selectedTrack));
-	m_layout_singer.clear();
-	m_layout_singer.push_back(new LayoutSinger(*selectedTracks.back(), m_database, theme));
-	// Do we have a second vocal track and a singer for it?
-	std::vector<std::string> tracks = m_song->getVocalTrackNames();
-	if (tracks.size() > 1 && analyzers.size() > 1) {
-		// TODO: Maybe should check that tracks[1] is not LEAD_VOCALS
-		selectedTracks.push_back(&m_song->getVocalTrack(tracks[1]));
-		m_layout_singer.push_back(new LayoutSinger(*selectedTracks.back(), m_database, theme));
+	// Load song notes
+	sm->loading(_("Loading song..."), 0.4);
+	if (m_song->loadStatus != Song::FULL) {
+		try { SongParser sp(*m_song); }
+		catch (SongParserException& e) {
+			std::clog << e;
+			sm->activateScreen("Songs");
+		}
 	}
+	// Notify about broken tracks
+	if (!m_song->b0rked.empty()) sm->dialog(_("Song contains broken tracks!") + std::string("\n\n") + m_song->b0rked);
 	// Load instrument and dance tracks
-	sm->loading(_("Loading instruments..."), 0.8);
+	sm->loading(_("Loading instruments..."), 0.5);
 	{
 		int type = 0; // 0 for dance, 1 for guitars, 2 for drums
 		int idx = 0;
@@ -89,41 +83,66 @@ void ScreenSing::enter() {
 			}
 		}
 	}
-	// Populate the pause menu
-	sm->loading(_("Loading menu..."), 0.9);
+	// Startup delay for instruments is longer than for singing only
+	double setup_delay = (m_instruments.empty() && m_dancers.empty() ? -1.0 : -5.0);
+	m_audio.pause();
+	m_audio.playMusic(m_song->music, false, 0.0, setup_delay);
+	sm->loading(_("Loading menu..."), 0.7);
+	{
+		VocalTracks const& tracks = m_song->vocalTracks;
+		unsigned players = analyzers.size();
+		m_menu.clear();
+		m_menu.add(MenuOption(_("Start"), _("Start performing"), &startSingingCallback, (void*)this));
+		m_duet = ConfigItem(0);
+		if (players > 1) { // Duet toggle
+			m_duet.addEnum(_("Duet mode"));
+			m_duet.addEnum(_("Normal mode"));
+			m_menu.add(MenuOption("", _("Switch between duet and regular singing mode"), &m_duet));
+		}
+		for (unsigned player = 0; player < players; ++player) {
+			ConfigItem& vocalTrack = m_vocalTracks[player];
+			vocalTrack = ConfigItem(0);
+			for (VocalTracks::const_iterator it = tracks.begin(); it != tracks.end(); ++it) {
+				vocalTrack.addEnum(it->second.name);
+			}
+			if (player % 2) ++vocalTrack;  // Every other player gets the second track
+			m_menu.add(MenuOption("", _("Change vocal track"), &vocalTrack));
+		}
+		m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
+		m_menu.open();
+		if (tracks.size() <= 1) setupVocals();  // No duet menu
+	}
+	//sm->loading(_("Finalizing..."), 0.95);
+	sm->showLogo(false);
+	sm->loading(_("Loading complete"), 1.0);
+}
+
+void ScreenSing::setupVocals() {
+	m_layout_singer.clear();
+	Engine::VocalTrackPtrs selectedTracks;
+	boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
+	unsigned players = (m_duet.i() == 0 ? analyzers.size() : 1);
+	std::set<VocalTrack*> shownTracks;  // Tracks to be included in layout_singer (stored by name for proper sorting and merging duplicates)
+	for (unsigned player = 0; player < players; ++player) {
+		VocalTrack* vocal = &m_song->getVocalTrack(m_vocalTracks[player].i());
+		selectedTracks.push_back(vocal);
+		shownTracks.insert(vocal);
+	}
+	if (shownTracks.size() > 2) throw std::runtime_error("Too many tracks chosen. Only two vocal tracks can be used simultaneously.");
+	for (std::set<VocalTrack*>::iterator it = shownTracks.begin(); it != shownTracks.end(); ++it) {
+		m_layout_singer.push_back(new LayoutSinger(**it, m_database, theme));
+	}
+	m_engine.reset(new Engine(m_audio, selectedTracks, analyzers.begin(), analyzers.end(), m_database));
+	createPauseMenu();
+	m_audio.pause(false);
+}
+
+void ScreenSing::createPauseMenu() {
 	m_menu.clear();
 	m_menu.add(MenuOption(_("Resume"), _("Back to performing!")));
 	m_menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning"), "Sing"));
-	{	// Vocal tracks
-		ConfigItem::OptionList opts;
-		std::vector<std::string> voctracks = m_song->getVocalTrackNames();
-		//int cur = 0;
-		// Add vocal tracks to option list
-		for (std::vector<std::string>::const_iterator it = voctracks.begin(); it != voctracks.end(); ++it) {
-			//if (m_selectedTrack == *it) cur = opts.size(); // Find the index of current track
-			opts.push_back(*it);
-		}
-		m_vocalTrackOpts = ConfigItem(opts); // Create a ConfigItem from the option list
-		// FIXME: Add a duet option without breaking track selector
-		/*if (opts.size() > 1) { // Vocal track changer only if there is options
-			m_vocalTrackOpts.select(cur); // Set the selection to current track
-			m_menu.add(MenuOption("", _("Change vocal track\n(restart required)"), &m_vocalTrackOpts));
-			m_selectedTrackLocalized = _(m_selectedTrack.c_str());
-			m_menu.back().setDynamicName(m_selectedTrackLocalized); // Set the title to be dynamic
-		}*/
-	}
 	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
 	m_menu.close();
-	// Startup delay for instruments is longer than for singing only
-	double setup_delay = (m_instruments.empty() && m_dancers.empty() ? -1.0 : -5.0);
-	sm->loading(_("Finalizing..."), 0.95);
-	m_audio.playMusic(m_song->music, false, 0.0, setup_delay);
-	m_engine.reset(new Engine(m_audio, selectedTracks, analyzers.begin(), analyzers.end(), m_database));
-	// Notify about broken tracks
-	if (m_song->b0rkedTracks) ScreenManager::getSingletonPtr()->dialog(_("Song contains broken tracks!"));
-	sm->showLogo(false);
-	sm->loading(_("Loading graphics..."), 0.9);
-	sm->loading(_("Loading complete"), 1.0);
 }
 
 void ScreenSing::reloadGL() {
@@ -297,13 +316,10 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			if (nav == input::START) {
 				m_menu.action();
 				if (!m_menu.isOpen() && m_audio.isPaused()) m_audio.togglePause();
-				// Handle updates
-				if (m_vocalTrackOpts.ol().size() && m_selectedTrack != m_vocalTrackOpts.so()) {
-					m_selectedTrack = m_vocalTrackOpts.so();
-					m_selectedTrackLocalized = _(m_selectedTrack.c_str());
-				}
 				return;
 			}
+			else if (nav == input::LEFT) { m_menu.action(-1); return; }
+			else if (nav == input::RIGHT) { m_menu.action(1); return; }
 			else if (nav == input::DOWN) { m_menu.move(1); return; }
 			else if (nav == input::UP) { m_menu.move(-1); return; }
 		}
@@ -466,9 +482,9 @@ void ScreenSing::draw() {
 		else m_only_singers_alive = !instrumentLayout(time);
 
 		bool fullSinger = m_only_singers_alive && m_layout_singer.size() <= 1;
-		m_layout_singer[0].draw(time, fullSinger ? LayoutSinger::FULL : LayoutSinger::TOP);
-		if (m_layout_singer.size() > 1)
-			m_layout_singer[1].draw(time, LayoutSinger::BOTTOM);
+		for (unsigned i = 0; i < m_layout_singer.size(); ++i) {
+			m_layout_singer[i].draw(time, fullSinger ? LayoutSinger::FULL : (i == 0 ? LayoutSinger::TOP : LayoutSinger::BOTTOM));
+		}
 	}
 
 	Song::Status status = m_song->status(time);

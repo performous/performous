@@ -19,7 +19,7 @@ download(){
 	filename=${filename##*/}
 	if ! test -e filename #file not exists, download it
 	then
-		../wget $1
+		wget $1
 	fi
 }
 

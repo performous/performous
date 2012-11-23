@@ -8,17 +8,6 @@
 #include <stdexcept>
 #include <string>
 
-/// parsing of songfile failed
-struct SongParserException: public std::runtime_error {
-	/// constructor
-	SongParserException(std::string const& msg, unsigned int linenum, bool sil = false): runtime_error(msg), m_linenum(linenum), m_silent(sil) {}
-	unsigned int line() const { return m_linenum; } ///< line in which the error occured
-	bool silent() const { return m_silent; } ///< if the error should not be printed to user (file skipped)
-  private:
-	unsigned int m_linenum;
-	bool m_silent;
-};
-
 class SongParser;
 
 namespace TrackName {
@@ -37,9 +26,9 @@ namespace TrackName {
 /// class to load and parse songfiles
 class Song: boost::noncopyable {
 	friend class SongParser;
+  public:
 	VocalTracks vocalTracks; ///< notes for the sing part
 	VocalTrack dummyVocal; ///< notes for the sing part
-  public:
 	/// constructor
 	Song(std::string const& path_, std::string const& filename_): dummyVocal(TrackName::LEAD_VOCAL), path(path_), filename(filename_) { reload(false); }
 	/// reload song
@@ -77,6 +66,12 @@ class Song: boost::noncopyable {
 			else if (!vocalTracks.empty()) return vocalTracks.begin()->second;
 			else return dummyVocal;
 		}
+	}
+	VocalTrack& getVocalTrack(unsigned idx) {
+		if (idx >= vocalTracks.size()) throw std::logic_error("Index out of bounds in Song::getVocalTrack");
+		VocalTracks::iterator it = vocalTracks.begin();
+		std::advance(it, idx);
+		return it->second;
 	}
 	std::vector<std::string> getVocalTrackNames() const {
 		std::vector<std::string> result;
@@ -129,7 +124,7 @@ class Song: boost::noncopyable {
 	typedef std::vector<double> Beats;
 	Beats beats; ///< related to instrument and dance
 	bool hasBRE; ///< is there a Big Rock Ending? (used for drums only)
-	bool b0rkedTracks; ///< are some tracks broken? (so that user can be notified)
+	std::string b0rked; ///< Is something broken? (so that user can be notified)
 	struct SongSection {
 		std::string name;
 		double begin;
@@ -142,4 +137,27 @@ class Song: boost::noncopyable {
 };
 
 static inline bool operator<(Song const& l, Song const& r) { return l.collateByArtist < r.collateByArtist; }
+
+/// Thrown by SongParser when there is an error
+struct SongParserException: public std::runtime_error {
+	/// constructor
+	SongParserException(Song& s, std::string const& msg, unsigned int linenum, bool sil = false): runtime_error(msg), m_filename(s.path + s.filename), m_linenum(linenum), m_silent(sil) {
+		if (!sil) s.b0rked += msg + '\n';
+	}
+	~SongParserException() throw() {}
+	std::string const& file() const { return m_filename; } ///< file in which the error occured
+	unsigned int line() const { return m_linenum; } ///< line in which the error occured
+	bool silent() const { return m_silent; } ///< if the error should not be printed to user (file skipped)
+private:
+	std::string m_filename;
+	unsigned int m_linenum;
+	bool m_silent;
+};
+
+static inline std::ostream& operator<<(std::ostream& os, SongParserException const& e) {
+	if (e.silent()) return os;
+	os << "songparser/error: " << e.file();
+	if (e.line()) os << ":" << e.line();
+	return os << ": " << e.what() << std::endl;
+}
 

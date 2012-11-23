@@ -38,7 +38,7 @@ LICENSE="GPL-2
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 
-IUSE="debug bittorrent midi songs tools webcam"
+IUSE="debug midi songs tools webcam"
 
 RDEPEND="gnome-base/librsvg
 	>=dev-libs/boost-1.39.0
@@ -51,7 +51,6 @@ RDEPEND="gnome-base/librsvg
 	tools? ( media-gfx/imagemagick[png] )
 	midi? ( media-libs/portmidi )
 	webcam? ( media-libs/opencv[v4l] )
-	bittorrent? ( >=net-libs/rb_libtorrent-0.16.3 )
 	>=media-video/ffmpeg-0.4.9_p20070616-r20
 	media-libs/portaudio
 	sys-apps/help2man
@@ -79,7 +78,6 @@ src_configure() {
 	local mycmakeargs="
 		$(cmake-utils_use_enable tools TOOLS)
 		$(cmake-utils_use_no webcam WEBCAM)
-		$(cmake-utils_use_no bittorrent TORRENT)
 		$(cmake-utils_use_no midi PORTMIDI)
 		-DCMAKE_INSTALL_PREFIX=${GAMES_PREFIX}
 		-DGENTOO_DATA_DIR=${GAMES_DATADIR}/${PN}

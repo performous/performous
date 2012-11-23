@@ -21,6 +21,11 @@ if(NOT CMAKE_BUILD_TYPE)
 	SET(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
 endif(NOT CMAKE_BUILD_TYPE)
 
+# Enable C++11 support
+if(CMAKE_COMPILER_IS_GNUCXX)
+	list(APPEND CMAKE_CXX_FLAGS "-std=c++11")
+endif()
+
 if(WIN32)
 	set(SHARE_INSTALL "." CACHE STRING "Data file install path. Must be a relative path (from CMAKE_INSTALL_PREFIX), with no trailing slash.")
 else(WIN32)
