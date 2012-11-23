@@ -67,6 +67,12 @@ class Song: boost::noncopyable {
 			else return dummyVocal;
 		}
 	}
+	VocalTrack& getVocalTrack(unsigned idx) {
+		if (idx >= vocalTracks.size()) throw std::logic_error("Index out of bounds in Song::getVocalTrack");
+		VocalTracks::iterator it = vocalTracks.begin();
+		std::advance(it, idx);
+		return it->second;
+	}
 	std::vector<std::string> getVocalTrackNames() const {
 		std::vector<std::string> result;
 		BOOST_FOREACH(VocalTracks::value_type const &it, vocalTracks) {

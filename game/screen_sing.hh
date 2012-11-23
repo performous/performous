@@ -59,7 +59,7 @@ class ScreenSing: public Screen {
 	void prepare();
 	void draw();
 
-	void startDuet();
+	void setupVocals();
 
 	void setSong (boost::shared_ptr<Song> song_)
 	{
@@ -101,7 +101,7 @@ class ScreenSing: public Screen {
 	bool m_only_singers_alive;
 	std::string m_selectedTrack;
 	std::string m_selectedTrackLocalized;
-	ConfigItem m_vocalTrackOpts;
+	ConfigItem m_vocalTracks[4];  // One for each Analyzer; FIXME: Use a numeric constant for this and audio.cc
 	ConfigItem m_duet;
 };
 
