@@ -23,7 +23,12 @@ endif(NOT CMAKE_BUILD_TYPE)
 
 # Enable C++11 support
 if(CMAKE_COMPILER_IS_GNUCXX)
-	list(APPEND CMAKE_CXX_FLAGS "-std=c++11")
+	execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+	if (GCC_VERSION VERSION_LESS 4.7)
+		list(APPEND CMAKE_CXX_FLAGS "-std=c++0x")
+	else()
+		list(APPEND CMAKE_CXX_FLAGS "-std=c++11")
+	endif()
 endif()
 
 if(WIN32)
