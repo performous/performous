@@ -112,7 +112,6 @@ void ScreenSing::enter() {
 		m_menu.open();
 		if (tracks.size() <= 1) setupVocals();  // No duet menu
 	}
-	//sm->loading(_("Finalizing..."), 0.95);
 	sm->showLogo(false);
 	sm->loading(_("Loading complete"), 1.0);
 }
@@ -122,18 +121,23 @@ void ScreenSing::setupVocals() {
 		m_layout_singer.clear();
 		Engine::VocalTrackPtrs selectedTracks;
 		boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
-		unsigned players = (m_duet.i() == 0 ? analyzers.size() : 1);
-		std::set<VocalTrack*> shownTracks;  // Tracks to be included in layout_singer (stored by name for proper sorting and merging duplicates)
-		for (unsigned player = 0; player < players; ++player) {
-			VocalTrack* vocal = &m_song->getVocalTrack(m_vocalTracks[player].i());
-			selectedTracks.push_back(vocal);
-			shownTracks.insert(vocal);
+		if (analyzers.size() == 0) {
+			// FIXME: Can't do this because the "Loading complete" message overwrites it immediately
+			//ScreenManager::getSingletonPtr()->flashMessage(_("No microphones configured, ignoring vocals."));
+		} else {
+			unsigned players = (m_duet.i() == 0 ? analyzers.size() : 1);
+			std::set<VocalTrack*> shownTracks;  // Tracks to be included in layout_singer (stored by name for proper sorting and merging duplicates)
+			for (unsigned player = 0; player < players; ++player) {
+				VocalTrack* vocal = &m_song->getVocalTrack(m_vocalTracks[player].i());
+				selectedTracks.push_back(vocal);
+				shownTracks.insert(vocal);
+			}
+			if (shownTracks.size() > 2) throw std::runtime_error("Too many tracks chosen. Only two vocal tracks can be used simultaneously.");
+			for (std::set<VocalTrack*>::iterator it = shownTracks.begin(); it != shownTracks.end(); ++it) {
+				m_layout_singer.push_back(new LayoutSinger(**it, m_database, theme));
+			}
+			m_engine.reset(new Engine(m_audio, selectedTracks, analyzers.begin(), analyzers.end(), m_database));
 		}
-		if (shownTracks.size() > 2) throw std::runtime_error("Too many tracks chosen. Only two vocal tracks can be used simultaneously.");
-		for (std::set<VocalTrack*>::iterator it = shownTracks.begin(); it != shownTracks.end(); ++it) {
-			m_layout_singer.push_back(new LayoutSinger(**it, m_database, theme));
-		}
-		m_engine.reset(new Engine(m_audio, selectedTracks, analyzers.begin(), analyzers.end(), m_database));
 	}
 	createPauseMenu();
 	m_audio.pause(false);
