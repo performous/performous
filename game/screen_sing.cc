@@ -105,7 +105,7 @@ void ScreenSing::enter() {
 			for (VocalTracks::const_iterator it = tracks.begin(); it != tracks.end(); ++it) {
 				vocalTrack.addEnum(it->second.name);
 			}
-			if (player % 2) ++vocalTrack;  // Every other player gets the second track
+			if (tracks.size() > 1 && player % 2) ++vocalTrack;  // Every other player gets the second track
 			m_menu.add(MenuOption("", _("Change vocal track"), &vocalTrack));
 		}
 		m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
@@ -118,21 +118,23 @@ void ScreenSing::enter() {
 }
 
 void ScreenSing::setupVocals() {
-	m_layout_singer.clear();
-	Engine::VocalTrackPtrs selectedTracks;
-	boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
-	unsigned players = (m_duet.i() == 0 ? analyzers.size() : 1);
-	std::set<VocalTrack*> shownTracks;  // Tracks to be included in layout_singer (stored by name for proper sorting and merging duplicates)
-	for (unsigned player = 0; player < players; ++player) {
-		VocalTrack* vocal = &m_song->getVocalTrack(m_vocalTracks[player].i());
-		selectedTracks.push_back(vocal);
-		shownTracks.insert(vocal);
+	if (!m_song->vocalTracks.empty()) {
+		m_layout_singer.clear();
+		Engine::VocalTrackPtrs selectedTracks;
+		boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
+		unsigned players = (m_duet.i() == 0 ? analyzers.size() : 1);
+		std::set<VocalTrack*> shownTracks;  // Tracks to be included in layout_singer (stored by name for proper sorting and merging duplicates)
+		for (unsigned player = 0; player < players; ++player) {
+			VocalTrack* vocal = &m_song->getVocalTrack(m_vocalTracks[player].i());
+			selectedTracks.push_back(vocal);
+			shownTracks.insert(vocal);
+		}
+		if (shownTracks.size() > 2) throw std::runtime_error("Too many tracks chosen. Only two vocal tracks can be used simultaneously.");
+		for (std::set<VocalTrack*>::iterator it = shownTracks.begin(); it != shownTracks.end(); ++it) {
+			m_layout_singer.push_back(new LayoutSinger(**it, m_database, theme));
+		}
+		m_engine.reset(new Engine(m_audio, selectedTracks, analyzers.begin(), analyzers.end(), m_database));
 	}
-	if (shownTracks.size() > 2) throw std::runtime_error("Too many tracks chosen. Only two vocal tracks can be used simultaneously.");
-	for (std::set<VocalTrack*>::iterator it = shownTracks.begin(); it != shownTracks.end(); ++it) {
-		m_layout_singer.push_back(new LayoutSinger(**it, m_database, theme));
-	}
-	m_engine.reset(new Engine(m_audio, selectedTracks, analyzers.begin(), analyzers.end(), m_database));
 	createPauseMenu();
 	m_audio.pause(false);
 }
@@ -327,7 +329,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		if (nav == input::START && m_only_singers_alive && !m_layout_singer.empty() && !m_audio.isPaused()) {
 			// Open score dialog early
 			if (status == Song::FINISHED) {
-				m_engine->kill(); // Kill the engine thread
+				if (m_engine) m_engine->kill(); // Kill the engine thread
 				m_score_window.reset(new ScoreWindow(m_instruments, m_database, m_dancers)); // Song finished, but no score window -> show it
 			}
 			// Skip instrumental breaks
@@ -529,7 +531,7 @@ void ScreenSing::draw() {
 		  && m_audio.getLength() - time <= (m_song->instrumentTracks.empty() && m_song->danceTracks.empty() ? 3.0 : 0.2) )) {
 			// Time to create the score window
 			m_quitTimer.setValue(QUIT_TIMEOUT);
-			m_engine->kill(); // kill the engine thread (to avoid consuming memory)
+			if (m_engine) m_engine->kill(); // kill the engine thread (to avoid consuming memory)
 			m_score_window.reset(new ScoreWindow(m_instruments, m_database, m_dancers));
 		}
 	}
