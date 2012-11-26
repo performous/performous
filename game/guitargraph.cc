@@ -426,12 +426,18 @@ void GuitarGraph::engine() {
 		++m_dead;
 		++m_chordIt;
 	}
-	// Start decreasing correctness instantly if the current note is being played late
+	// Start decreasing correctness instantly if the current note is being played late (don't wait until maxTolerance)
 	if (m_chordIt != m_chords.end() && m_chordIt->begin < time && m_chordIt->status == 0) m_correctness.setTarget(0.0);
 	// Process holds
 	if (!m_drums) {
+		// FIXME: Why do we have per-fret hold handling, why not just as a part of the current chord?
+		// FIXME: Use polyphony from proper chord (which isn't always m_chordIt); now it only counts frets currently held
+		unsigned count = 0, polyphony = 0;
+		bool holds = false;
 		for (int fret = 0; fret < m_pads; ++fret) {
 			if (!m_holds[fret]) continue;
+			holds = true;
+			++polyphony;
 			Event& ev = m_events[m_holds[fret] - 1];
 			ev.glow.setTarget(1.0, true);
 			// Whammy animvalue mangling
@@ -443,21 +449,22 @@ void GuitarGraph::engine() {
 			// Calculate how long the note was held this cycle and score it
 			double last = std::min(time, ev.dur->end);
 			double t = last - ev.holdTime;
-			if (t > 0) {
-				// Is the hold being played correctly?
-				bool early = time - ev.dur->begin < 1.5;  // At the beginning we don't require whammy
-				bool whammy = ev.whammy.get() > 0.01;
-				bool godmode = m_starpower.get() > 0.01;
-				m_correctness.setTarget(early || whammy || godmode ? 1.0 : 0.0);
-				// Score for holding
-				m_score += t * 50.0 * m_correctness.get();
-				// Whammy fills starmeter much faster
-				m_starmeter += t * 50 * ( (ev.whammy.get() > 0.01) ? 2.0 : 1.0 );
-				ev.holdTime = time;
-			}
+			if (t < 0) continue;  // FIXME: What is this for, rewinding?
+			// Is the hold being played correctly?
+			bool early = time - ev.dur->begin < 1.5;  // At the beginning we don't require whammy
+			bool whammy = ev.whammy.get() > 0.01;
+			bool godmode = m_starpower.get() > 0.01;
+			if (early || whammy || godmode) ++count;
+			// Score for holding
+			m_score += t * 50.0 * m_correctness.get();
+			// Whammy fills starmeter much faster
+			m_starmeter += t * 50 * ( (ev.whammy.get() > 0.01) ? 2.0 : 1.0 );
+			ev.holdTime = time;
 			// If end reached, handle it
 			if (last == ev.dur->end) endHold(fret, time);
 		}
+		// Set correctness as a percentage of chord being held
+		if (holds) m_correctness.setTarget(double(count) / m_chordIt->polyphony);
 	}
 	// Update solo status
 	m_solo = false;
@@ -510,6 +517,7 @@ void GuitarGraph::endHold(int fret, double time) {
 			if (time > it->begin + maxTolerance && time < it->end - maxTolerance) {
 				it->releaseTimes[fret] = time;
 				if (time >= it->end - maxTolerance) it->passed = true; // Mark as past note for rewinding
+				else m_correctness.setValue(0.0);  // Note: if still holding some frets, proper percentage will be set in hold handling
 				break;
 			}
 		}
@@ -624,8 +632,10 @@ void GuitarGraph::drumHit(double time, int fret) {
 			// End streak if skipped chords had not been played properly
 			if (m_chordIt->status < m_chordIt->polyphony) endStreak();
 		}
-		m_correctness.setTarget(1.0, true);  // Instantly correct
 		++m_chordIt->status;  // One more drum belonging to the chord hit
+		double percentage = double(m_chordIt->status) / m_chordIt->polyphony;
+		m_correctness.setTarget(1.0, true);  // Instantly correct
+		m_correctness.setTarget(percentage);  // ... but keep fading if chord is incomplete
 		Duration const* dur = m_chordIt->dur[fret];
 		// Record the hit event
 		m_events.push_back(Event(time, 1, fret, dur));

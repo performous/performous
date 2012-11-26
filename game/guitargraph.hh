@@ -15,7 +15,7 @@ struct Chord {
 	int polyphony;
 	bool tappable;
 	bool passed; // Set to true for notes that should not re-appear when rewinding
-	int status; // Guitar: 0 = not played, 10 = tapped, 20 = picked, 30 = released, drums: number of pads hit, all: >100 = past
+	int status; // Guitar: 0 = not played, 1 = tapped, 2 = picked, drums: number of pads hit
 	int score;
 	AnimValue hitAnim[5];
 	double releaseTimes[5];
