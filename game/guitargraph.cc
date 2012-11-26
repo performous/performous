@@ -309,7 +309,6 @@ void GuitarGraph::engine() {
 		}
 	}
 	if (!m_drumfills.empty()) updateDrumFill(time); // Drum Fills / BREs
-	if (m_starpower.get() > 0.001) m_correctness.setTarget(1.0, true);
 	if (joining(time)) m_dead = 0; // Disable dead counting while joining
 	m_whammy = 0;
 	bool difficulty_changed = false;
@@ -411,11 +410,9 @@ void GuitarGraph::engine() {
 	// Countdown to start
 	handleCountdown(time, time < getNotesBeginTime() ? getNotesBeginTime() : m_jointime+1);
 
-	// Skip missed notes
-	// we hold the note a litle bit *before* they go out of the tolerance window
-	// this is important in order for the hit-detection to still accept the notes
-	// FIXME: need to confirm that this timing is reliable,
-	// if a note gets marked as 'past' completing the chord does not re-start the song
+	// Skip missed chords
+	// - Only after we are so much past them that they can no longer be played (maxTolerance)
+	// - For chords played or skipped by playing (i.e. play another chord that quickly follows), ++m_chordIt is done elsewhere
 	while (m_chordIt != m_chords.end() && m_chordIt->begin + maxTolerance < time) {
 		if (m_chordIt->status < m_chordIt->polyphony) endStreak();
 		// Calculate solo total score
@@ -430,7 +427,9 @@ void GuitarGraph::engine() {
 		++m_dead;
 		++m_chordIt;
 	}
-
+	// Start decreasing correctness instantly if the current note is being played late
+	if (m_chordIt != m_chords.end() && m_chordIt->begin < time && m_chordIt->status == 0) m_correctness.setTarget(0.0);
+	
 	if (difficulty_changed) m_dead = 0; // if difficulty is changed, m_dead would get incorrect
 	// Process holds
 	if (!m_drums) {
@@ -468,7 +467,7 @@ void GuitarGraph::engine() {
 	for (Durations::const_iterator it = m_solos.begin(); it != m_solos.end(); ++it) {
 		if (time >= it->begin && time <= it->end) { m_solo = true; break; }
 	}
-	// Check if a long streak goal has been reached
+	// Check if a long streak goal has been reached (display a nasty combo breaker popup)
 	if (m_streak >= getNextBigStreak(m_bigStreak)) {
 		m_bigStreak = getNextBigStreak(m_bigStreak);
 		m_starmeter += streakStarBonus;
@@ -535,6 +534,7 @@ void GuitarGraph::fail(double time, int fret) {
 		// kids tend to play a lot of extra notes just for the fun of it.
 		// need to make sure they don't end up with a score of zero
 		m_score -= (m_level == DIFFICULTY_KIDS) ? points(0)/2.0 : points(0);
+		m_correctness.setTarget(0.0, true);  // Instantly fail correctness
 	}
 	endStreak();
 }
@@ -627,6 +627,7 @@ void GuitarGraph::drumHit(double time, int fret) {
 			// End streak if skipped chords had not been played properly
 			if (m_chordIt->status < m_chordIt->polyphony) endStreak();
 		}
+		m_correctness.setTarget(1.0, true);  // Instantly correct
 		++m_chordIt->status;  // One more drum belonging to the chord hit
 		Duration const* dur = m_chordIt->dur[fret];
 		// Record the hit event
