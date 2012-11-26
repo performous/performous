@@ -1145,8 +1145,8 @@ void GuitarGraph::drawInfo(double time) {
 		ColorTrans c(Color::alpha(std::abs(std::fmod(time, 1.0) - 0.5f) * 2.0f));
 		if (canActivateStarpower()) {
 			m_text.dimensions.screenBottom(-0.02).middle(-0.12);
-			if (m_drums && m_dfIt != m_drumfills.end() && time >= m_dfIt->begin && time <= m_dfIt->end) m_text.draw(_("Drum Fill!"));
-			else m_text.draw(_("God Mode Ready!"));
+			if (!m_drums) m_text.draw(_("God Mode Ready!"));
+			else if (m_dfIt != m_drumfills.end() && time >= m_dfIt->begin && time <= m_dfIt->end) m_text.draw(_("Drum Fill!"));
 		} else if (m_solo) {
 			m_text.dimensions.screenBottom(-0.02).middle(-0.03);
 			m_text.draw(_("Solo!"));
