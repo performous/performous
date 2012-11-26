@@ -12,6 +12,8 @@
 #include <boost/scoped_ptr.hpp>
 #include "libda/portaudio.hpp"
 
+const unsigned AUDIO_MAX_ANALYZERS = 4;
+
 struct Output;
 
 struct Device {

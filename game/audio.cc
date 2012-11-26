@@ -483,7 +483,7 @@ struct Audio::Impl {
 				// Assign mics for all channels of the device
 				int assigned_mics = 0;
 				for (unsigned int j = 0; j < params.in; ++j) {
-					if (analyzers.size() >= 4) break; // Too many mics
+					if (analyzers.size() >= AUDIO_MAX_ANALYZERS) break; // Too many mics
 					std::string const& m = params.mics[j];
 					if (m.empty()) continue; // Input channel not used
 					// Check that the color is not already taken
