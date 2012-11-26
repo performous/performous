@@ -94,6 +94,7 @@ void ScreenSing::enter() {
 		m_menu.clear();
 		m_menu.add(MenuOption(_("Start"), _("Start performing"), &startSingingCallback, (void*)this));
 		m_duet = ConfigItem(0);
+		if (players == 0) players = 1;  // No mic? We display lyrics anyway
 		if (players > 1) { // Duet toggle
 			m_duet.addEnum(_("Duet mode"));
 			m_duet.addEnum(_("Normal mode"));
@@ -121,23 +122,19 @@ void ScreenSing::setupVocals() {
 		m_layout_singer.clear();
 		Engine::VocalTrackPtrs selectedTracks;
 		boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
-		if (analyzers.size() == 0) {
-			// FIXME: Can't do this because the "Loading complete" message overwrites it immediately
-			//ScreenManager::getSingletonPtr()->flashMessage(_("No microphones configured, ignoring vocals."));
-		} else {
-			unsigned players = (m_duet.i() == 0 ? analyzers.size() : 1);
-			std::set<VocalTrack*> shownTracks;  // Tracks to be included in layout_singer (stored by name for proper sorting and merging duplicates)
-			for (unsigned player = 0; player < players; ++player) {
-				VocalTrack* vocal = &m_song->getVocalTrack(m_vocalTracks[player].i());
-				selectedTracks.push_back(vocal);
-				shownTracks.insert(vocal);
-			}
-			if (shownTracks.size() > 2) throw std::runtime_error("Too many tracks chosen. Only two vocal tracks can be used simultaneously.");
-			for (std::set<VocalTrack*>::iterator it = shownTracks.begin(); it != shownTracks.end(); ++it) {
-				m_layout_singer.push_back(new LayoutSinger(**it, m_database, theme));
-			}
-			m_engine.reset(new Engine(m_audio, selectedTracks, analyzers.begin(), analyzers.end(), m_database));
+		unsigned players = (m_duet.i() == 0 ? (analyzers.empty() ? 1 : analyzers.size()) : 1);  // Always at least 1; number of mics if in duet mode
+		std::set<VocalTrack*> shownTracks;  // Tracks to be included in layout_singer (stored by name for proper sorting and merging duplicates)
+		for (unsigned player = 0; player < players; ++player) {
+			VocalTrack* vocal = &m_song->getVocalTrack(m_vocalTracks[player].i());
+			selectedTracks.push_back(vocal);
+			shownTracks.insert(vocal);
 		}
+		if (shownTracks.size() > 2) throw std::runtime_error("Too many tracks chosen. Only two vocal tracks can be used simultaneously.");
+		for (std::set<VocalTrack*>::iterator it = shownTracks.begin(); it != shownTracks.end(); ++it) {
+			m_layout_singer.push_back(new LayoutSinger(**it, m_database, theme));
+		}
+		// Note: Engine maps tracks with analyzers 1:1. If user doesn't have mics, we still want to have singer layout enabled but without engine...
+		if (!analyzers.empty()) m_engine.reset(new Engine(m_audio, selectedTracks, analyzers.begin(), analyzers.end(), m_database));
 	}
 	createPauseMenu();
 	m_audio.pause(false);
