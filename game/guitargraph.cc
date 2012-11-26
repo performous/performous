@@ -417,8 +417,7 @@ void GuitarGraph::engine() {
 	// FIXME: need to confirm that this timing is reliable,
 	// if a note gets marked as 'past' completing the chord does not re-start the song
 	while (m_chordIt != m_chords.end() && m_chordIt->begin + maxTolerance < time) {
-		if ( (m_drums && m_chordIt->status != m_chordIt->polyphony)
-		  || (!m_drums && m_chordIt->status == 0) ) endStreak();
+		if (m_chordIt->status < m_chordIt->polyphony) endStreak();
 		// Calculate solo total score
 		if (m_solo) { m_soloScore += m_chordIt->score; m_soloTotal += m_chordIt->polyphony * points(0);
 		// Solo just ended?
@@ -433,15 +432,6 @@ void GuitarGraph::engine() {
 	}
 
 	if (difficulty_changed) m_dead = 0; // if difficulty is changed, m_dead would get incorrect
-	// Adjust the correctness value
-	if (!m_events.empty() && m_events.back().type == 0) m_correctness.setTarget(0.0, true);
-	else if (m_chordIt != m_chords.end() && m_chordIt->begin <= time) {
-		double level;
-		if (m_drums) level = double(m_chordIt->status) / m_chordIt->polyphony;
-		else level = m_chordIt->status ? 1.0 : 0.0;
-		m_correctness.setTarget(level);
-	}
-	if (m_correctness.get() == 0) endStreak();
 	// Process holds
 	if (!m_drums) {
 		for (int fret = 0; fret < m_pads; ++fret) {
@@ -458,10 +448,13 @@ void GuitarGraph::engine() {
 			double last = std::min(time, ev.dur->end);
 			double t = last - ev.holdTime;
 			if (t > 0) {
-				// No points for long holds unless whammy is used
-				double wfactor = (time - ev.dur->begin < 1.5 || ev.whammy.get() > 0.01
-				  || m_starpower.get() > 0.01) ? 1.0 : 0.0;
-				m_score += t * 50.0 * wfactor;
+				// Is the hold being played correctly?
+				bool early = time - ev.dur->begin < 1.5;  // At the beginning we don't require whammy
+				bool whammy = ev.whammy.get() > 0.01;
+				bool godmode = m_starpower.get() > 0.01;
+				m_correctness.setTarget(early || whammy || godmode ? 1.0 : 0.0);
+				// Score for holding
+				m_score += t * 50.0 * m_correctness.get();
 				// Whammy fills starmeter much faster
 				m_starmeter += t * 50 * ( (ev.whammy.get() > 0.01) ? 2.0 : 1.0 );
 				ev.holdTime = time;
@@ -520,8 +513,7 @@ void GuitarGraph::endHold(int fret, double time) {
 		for (Chords::iterator it = m_chords.begin(); it != m_chords.end(); ++it) {
 			if (time > it->begin + maxTolerance && time < it->end - maxTolerance) {
 				it->releaseTimes[fret] = time;
-				if (it->status < 100 && time >= it->end - maxTolerance)
-					it->status += 100; // Mark as past note for rewinding
+				if (time >= it->end - maxTolerance) it->passed = true; // Mark as past note for rewinding
 				break;
 			}
 		}
@@ -632,8 +624,8 @@ void GuitarGraph::drumHit(double time, int fret) {
 	else {
 		// Skip all chords earlier than the best fit chord
 		for (; best != m_chordIt; ++m_chordIt) {
-			if (m_chordIt->status == m_chordIt->polyphony) continue;
-			endStreak();
+			// End streak if skipped chords had not been played properly
+			if (m_chordIt->status < m_chordIt->polyphony) endStreak();
 		}
 		++m_chordIt->status;  // One more drum belonging to the chord hit
 		Duration const* dur = m_chordIt->dur[fret];
@@ -661,7 +653,6 @@ void GuitarGraph::drumHit(double time, int fret) {
 			// ErrorMeter
 			errorMeter(signed_error);
 		}
-		m_correctness.setTarget(double(m_chordIt->status) / m_chordIt->polyphony, true);
 	}
 }
 
@@ -810,11 +801,11 @@ void GuitarGraph::drawNotes(double time) {
 		float tEnd = m_drums ? tBeg : it->end - time;
 		if (tBeg > future) break;
 		if (tEnd < past) {
-			if (it->status < 100) it->status += 100; // Mark as past note for rewinding
+			it->passed = true; // Mark as past note for rewinding
 			continue;
 		}
 		// Don't show past chords when rewinding
-		if (it->status >= 100 || (tBeg > maxTolerance && it->status > 0)) continue;
+		if (it->passed || (tBeg > maxTolerance && it->status > 0)) continue;
 		// Handle notes during drum fills / BREs
 		if (drumfill && it->begin >= m_dfIt->begin - maxTolerance
 		  && it->begin <= m_dfIt->end + maxTolerance) {
