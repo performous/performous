@@ -311,7 +311,6 @@ void GuitarGraph::engine() {
 	if (!m_drumfills.empty()) updateDrumFill(time); // Drum Fills / BREs
 	if (joining(time)) m_dead = 0; // Disable dead counting while joining
 	m_whammy = 0;
-	bool difficulty_changed = false;
 	// Handle all events
 	for (input::Event ev; m_input.tryPoll(ev);) {
 		// This hack disallows joining with Enter and CTRL-key
@@ -429,8 +428,6 @@ void GuitarGraph::engine() {
 	}
 	// Start decreasing correctness instantly if the current note is being played late
 	if (m_chordIt != m_chords.end() && m_chordIt->begin < time && m_chordIt->status == 0) m_correctness.setTarget(0.0);
-	
-	if (difficulty_changed) m_dead = 0; // if difficulty is changed, m_dead would get incorrect
 	// Process holds
 	if (!m_drums) {
 		for (int fret = 0; fret < m_pads; ++fret) {
