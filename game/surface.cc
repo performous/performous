@@ -178,7 +178,7 @@ void Texture::load(Bitmap const& bitmap) {
 	PixFmt const& f = getPixFmt(bitmap.fmt);
 	glPixelStorei(GL_UNPACK_SWAP_BYTES, f.swap);
 	// Load the data into texture
-	glTexImage2D(type(), 0, internalFormat(), bitmap.width, bitmap.height, 0, f.format, f.type, &bitmap.buf[0]);
+	glTexImage2D(type(), 0, internalFormat(), bitmap.width, bitmap.height, 0, f.format, f.type, bitmap.data());
 	glGenerateMipmap(type());
 }
 
@@ -191,7 +191,7 @@ void Surface::load(Bitmap const& bitmap) {
 	UseTexture texture(m_texture);
 	PixFmt const& f = getPixFmt(bitmap.fmt);
 	glPixelStorei(GL_UNPACK_SWAP_BYTES, f.swap);
-	glTexImage2D(m_texture.type(), 0, internalFormat(), bitmap.width, bitmap.height, 0, f.format, f.type, &bitmap.buf[0]);
+	glTexImage2D(m_texture.type(), 0, internalFormat(), bitmap.width, bitmap.height, 0, f.format, f.type, bitmap.data());
 }
 
 void Surface::draw() const {
