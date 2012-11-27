@@ -7,23 +7,33 @@
 #include <iostream>
 #include <sstream>
 
+namespace {
+	PangoAlignment parseAlignment(std::string const& fontalign) {
+		if (fontalign == "start") return PANGO_ALIGN_LEFT;
+		if (fontalign == "center") return PANGO_ALIGN_CENTER;
+		if (fontalign == "end") return PANGO_ALIGN_RIGHT;
+		throw std::logic_error(fontalign + ": Unknown font alignment (opengl_text.cc)");
+	}
+
+	PangoWeight parseWeight(std::string const& fontweight) {
+		if (fontweight == "normal") return PANGO_WEIGHT_NORMAL;
+		if (fontweight == "bold") return PANGO_WEIGHT_BOLD;
+		if (fontweight == "bolder") return PANGO_WEIGHT_ULTRABOLD;
+		throw std::logic_error(fontweight + ": Unknown font weight (opengl_text.cc)");
+	}
+
+	PangoStyle parseStyle(std::string const& fontstyle) {
+		if (fontstyle == "normal") return PANGO_STYLE_NORMAL;
+		if (fontstyle == "italic") return PANGO_STYLE_ITALIC;
+		if (fontstyle == "oblique") return PANGO_STYLE_OBLIQUE;
+		throw std::logic_error(fontstyle + ": Unknown font style (opengl_text.cc)");
+	}
+}
+
 OpenGLText::OpenGLText(TThemeTxtOpenGL& _text, double m) {
-	if (_text.fontfamily.empty()) _text.fontfamily = "Arial";
-
-	PangoAlignment alignment = PANGO_ALIGN_LEFT;
-	if (_text.fontalign == "start") alignment = PANGO_ALIGN_LEFT;
-	else if (_text.fontalign == "center") alignment = PANGO_ALIGN_CENTER;
-	else if (_text.fontalign == "end") alignment = PANGO_ALIGN_RIGHT;
-
-	PangoWeight weight = PANGO_WEIGHT_NORMAL;
-	if (_text.fontweight == "normal") weight = PANGO_WEIGHT_NORMAL;
-	else if (_text.fontweight == "bold") weight = PANGO_WEIGHT_BOLD;
-	else if (_text.fontweight == "bolder") weight = PANGO_WEIGHT_ULTRABOLD;
-
-	PangoStyle style = PANGO_STYLE_NORMAL;
-	if (_text.fontstyle == "normal") style = PANGO_STYLE_NORMAL;
-	else if (_text.fontstyle == "italic") style = PANGO_STYLE_ITALIC;
-	else if (_text.fontstyle == "oblique") style = PANGO_STYLE_OBLIQUE;
+	PangoAlignment alignment = parseAlignment(_text.fontalign);
+	PangoWeight weight = parseWeight(_text.fontweight);
+	PangoStyle style = parseStyle(_text.fontstyle);
 
 	// set font description
 	PangoFontDescription *desc = pango_font_description_new();
