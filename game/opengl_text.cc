@@ -33,15 +33,21 @@ namespace {
 OpenGLText::OpenGLText(TThemeTxtOpenGL& _text, double m) {
 	// Setup font settings
 	PangoAlignment alignment = parseAlignment(_text.fontalign);
-	boost::shared_ptr<PangoFontDescription> desc(pango_font_description_new(), pango_font_description_free);
+	boost::shared_ptr<PangoFontDescription> desc(
+	  pango_font_description_new(),
+	  pango_font_description_free);
 	pango_font_description_set_weight(desc.get(), parseWeight(_text.fontweight));
 	pango_font_description_set_style(desc.get(), parseStyle(_text.fontstyle));
 	pango_font_description_set_family(desc.get(), _text.fontfamily.c_str());
 	pango_font_description_set_absolute_size(desc.get(), _text.fontsize * PANGO_SCALE * m);
 	double border = _text.stroke_width * m;
 	// Setup Pango context and layout
-	boost::shared_ptr<PangoContext> ctx(pango_font_map_create_context(pango_cairo_font_map_get_default()), g_object_unref);
-	boost::shared_ptr<PangoLayout> layout(pango_layout_new(ctx.get()), g_object_unref);
+	boost::shared_ptr<PangoContext> ctx(
+	  pango_font_map_create_context(pango_cairo_font_map_get_default()),
+	  g_object_unref);
+	boost::shared_ptr<PangoLayout> layout(
+	  pango_layout_new(ctx.get()),
+	  g_object_unref);
 	pango_layout_set_alignment(layout.get(), alignment);
 	pango_layout_set_font_description(layout.get(), desc.get());
 	pango_layout_set_text(layout.get(), _text.text.c_str(), -1);
@@ -55,8 +61,12 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL& _text, double m) {
 		m_y_advance = rec1.y;
 	}
 	// Create Cairo surface and drawing context
-	boost::shared_ptr<cairo_surface_t> surface(cairo_image_surface_create(CAIRO_FORMAT_ARGB32, m_x, m_y), cairo_surface_destroy);
-	boost::shared_ptr<cairo_t> dc(cairo_create(surface.get()), cairo_destroy);
+	boost::shared_ptr<cairo_surface_t> surface(
+	  cairo_image_surface_create(CAIRO_FORMAT_ARGB32, m_x, m_y),
+	  cairo_surface_destroy);
+	boost::shared_ptr<cairo_t> dc(
+	  cairo_create(surface.get()),
+	  cairo_destroy);
 	// Add Pango line and path to proper position on the DC
 	cairo_move_to(dc.get(), 0.5 * border, 0.5 * border);  // Margins needed for border stroke to fit in
 	pango_cairo_update_layout(dc.get(), layout.get());
