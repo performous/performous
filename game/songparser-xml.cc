@@ -204,8 +204,8 @@ void SongParser::xmlParse() {
 				Note n = xmlParseNote(noteNode, ts);
 				if (n.note == 0) continue;
 				// Skip sentences that do not belong to current player
-				if (sentenceSinger == "Solo 1" && player != 0) continue;
-				if (sentenceSinger == "Solo 2" && player != 1) continue;
+				if (player != 0 && sentenceSinger == "Solo 1") continue;
+				if (players > 1 && player != 1 && sentenceSinger == "Solo 2") continue;
 				// Actually add the note to current player's track...
 				addNoteToTrack(vocal, n);
 			}  // notes
