@@ -70,6 +70,17 @@ struct SSDom: public xmlpp::DomParser {
 	}
 };
 
+namespace {
+	/// Parse str (from XML comment node) for header/value and store cleaned up value in result.
+	bool parseComment(std::string const& str, std::string const& header, std::string& result) {
+		if (!boost::starts_with(str, header)) return false;
+		result = boost::replace_all_copy(
+		  boost::trim_left_copy(str.substr(header.size())),
+		  "&amp;", "&");
+		return true;
+	}
+}
+
 /// Parse header data for Songs screen
 void SongParser::xmlParseHeader() {
 	Song& s = m_song;
@@ -103,8 +114,7 @@ void SongParser::xmlParseHeader() {
 		for (xmlpp::NodeSet::iterator it = comments.begin(); it != comments.end(); ++it) {
 			std::string str = dynamic_cast<xmlpp::CommentNode&>(**it).get_content();
 			boost::trim(str);
-			if (boost::starts_with(str, "Artist:")) s.artist = boost::trim_left_copy(str.substr(7));
-			else if (boost::starts_with(str, "Title:")) s.title = boost::trim_left_copy(str.substr(6));
+			parseComment(str, "Artist:", s.artist) || parseComment(str, "Title:", s.title);
 		}
 		if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
 	}
