@@ -82,11 +82,7 @@ void SongParser::xmlParseHeader() {
 
 	for (boost::filesystem::directory_iterator dirIt(s.path), dirEnd; dirIt != dirEnd; ++dirIt) {
 		boost::filesystem::path p = dirIt->path();
-#if BOOST_FILESYSTEM_VERSION < 3
-		std::string name = p.leaf(); // File basename (notes.xml)
-#else
 		std::string name = p.filename().string(); // File basename (notes.xml)
-#endif
 		if (regex_match(name.c_str(), match, coverfile)) {
 			s.cover = name;
 		} else if (regex_match(name.c_str(), match, videofile)) {
