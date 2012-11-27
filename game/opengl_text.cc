@@ -39,7 +39,6 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL& _text, double m) {
 	pango_font_description_set_family(desc.get(), _text.fontfamily.c_str());
 	pango_font_description_set_absolute_size(desc.get(), _text.fontsize * PANGO_SCALE * m);
 	double border = _text.stroke_width * m;
-	double margin = 2.0 * border;
 	// Setup Pango context and layout
 	boost::shared_ptr<PangoContext> ctx(pango_font_map_create_context(pango_cairo_font_map_get_default()), g_object_unref);
 	boost::shared_ptr<PangoLayout> layout(pango_layout_new(ctx.get()), g_object_unref);
@@ -50,8 +49,8 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL& _text, double m) {
 	{
 		PangoRectangle rec1, rec2;
 		pango_layout_get_pixel_extents(layout.get(), &rec1, &rec2);
-		m_x = rec2.width + 2.0 * margin;
-		m_y = rec2.height + 2.0 * margin;
+		m_x = rec2.width + border;  // Add twice half a border for margins
+		m_y = rec2.height + border;
 		m_x_advance = rec1.x;
 		m_y_advance = rec1.y;
 	}
@@ -59,7 +58,7 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL& _text, double m) {
 	boost::shared_ptr<cairo_surface_t> surface(cairo_image_surface_create(CAIRO_FORMAT_ARGB32, m_x, m_y), cairo_surface_destroy);
 	boost::shared_ptr<cairo_t> dc(cairo_create(surface.get()), cairo_destroy);
 	// Add Pango line and path to proper position on the DC
-	cairo_move_to(dc.get(), margin, margin);
+	cairo_move_to(dc.get(), 0.5 * border, 0.5 * border);  // Margins needed for border stroke to fit in
 	pango_cairo_update_layout(dc.get(), layout.get());
 	pango_cairo_show_layout(dc.get(), layout.get());
 	pango_cairo_layout_path(dc.get(), layout.get());
