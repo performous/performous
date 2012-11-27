@@ -101,7 +101,7 @@ class ScreenSing: public Screen {
 	bool m_only_singers_alive;
 	std::string m_selectedTrack;
 	std::string m_selectedTrackLocalized;
-	ConfigItem m_vocalTracks[4];  // One for each Analyzer; FIXME: Use a numeric constant for this and audio.cc
+	ConfigItem m_vocalTracks[AUDIO_MAX_ANALYZERS];
 	ConfigItem m_duet;
 };
 

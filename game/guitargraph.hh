@@ -14,11 +14,12 @@ struct Chord {
 	Duration const* dur[5];
 	int polyphony;
 	bool tappable;
-	int status; // Guitar: 0 = not played, 10 = tapped, 20 = picked, 30 = released, drums: number of pads hit, all: >100 = past
+	bool passed; // Set to true for notes that should not re-appear when rewinding
+	int status; // Guitar: 0 = not played, 1 = tapped, 2 = picked, drums: number of pads hit
 	int score;
 	AnimValue hitAnim[5];
 	double releaseTimes[5];
-	Chord(): begin(), end(), polyphony(), tappable(), status(), score() {
+	Chord(): begin(), end(), polyphony(), tappable(), passed(), status(), score() {
 		std::fill(fret, fret + 5, false);
 		std::fill(fret_tom, fret_tom + 5, false);
 		std::fill(dur, dur + 5, static_cast<Duration const*>(NULL));

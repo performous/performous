@@ -267,7 +267,7 @@ struct Synth {
 	Notes m_notes;
 	double srate; ///< Sample rate
   public:
-	Synth(Notes const& notes, unsigned int sr) : m_notes(notes), srate(sr) {};
+	Synth(Notes const& notes, unsigned int sr) : m_notes(notes), srate(sr) {}
 	void operator()(float* begin, float* end, double position) {
 		static double phase = 0.0;
 		for (float *i = begin; i < end; ++i) *i *= 0.3; // Decrease music volume
@@ -483,7 +483,7 @@ struct Audio::Impl {
 				// Assign mics for all channels of the device
 				int assigned_mics = 0;
 				for (unsigned int j = 0; j < params.in; ++j) {
-					if (analyzers.size() >= 4) break; // Too many mics
+					if (analyzers.size() >= AUDIO_MAX_ANALYZERS) break; // Too many mics
 					std::string const& m = params.mics[j];
 					if (m.empty()) continue; // Input channel not used
 					// Check that the color is not already taken
@@ -514,8 +514,8 @@ struct Audio::Impl {
 Audio::Audio(): self(new Impl) {}
 Audio::~Audio() {}
 
-void Audio::restart() { self.reset(new Impl); };
-void Audio::close() { self.reset(); };
+void Audio::restart() { self.reset(new Impl); }
+void Audio::close() { self.reset(); }
 
 bool Audio::isOpen() const {
 	return !self->devices.empty();

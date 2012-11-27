@@ -46,7 +46,7 @@ class ScreenManager: public Singleton <ScreenManager> {
 	ScreenManager(Window& window);
 	~ScreenManager() { if (currentScreen) currentScreen->exit(); }
 	/// Adds a screen to the manager
-	void addScreen(Screen* s) { std::string tmp = s->getName(); screens.insert(tmp, s); };
+	void addScreen(Screen* s) { std::string tmp = s->getName(); screens.insert(tmp, s); }
 	/// Switches active screen
 	void activateScreen(std::string const& name);
 	/// Does actual switching of screens (if necessary)
@@ -58,11 +58,11 @@ class ScreenManager: public Singleton <ScreenManager> {
 	/// Reload OpenGL resources (after fullscreen toggle etc)
 	void reloadGL() { if (currentScreen) currentScreen->reloadGL(); }
 	/// Returns pointer to current Screen
-	Screen* getCurrentScreen() { return currentScreen; };
+	Screen* getCurrentScreen() { return currentScreen; }
 	/// Returns pointer to Screen for given name
 	Screen* getScreen(std::string const& name);
 	/// Returns a reference to the window
-	Window& window() { return m_window; };
+	Window& window() { return m_window; }
 
 	/// Draw a loading progress indication
 	void loading(std::string const& message, float progress);
@@ -82,9 +82,9 @@ class ScreenManager: public Singleton <ScreenManager> {
 	void drawNotifications();
 
 	/// Sets finished to true
-	void finished() { m_finished = true; };
+	void finished() { m_finished = true; }
 	/// Returns finished state
-	bool isFinished() { return m_finished; };
+	bool isFinished() { return m_finished; }
 
 	void showLogo(bool show = true) { m_logoAnim.setTarget(show ? 1.0 : 0.0); }
 	void drawLogo();

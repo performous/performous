@@ -73,8 +73,10 @@ void ScreenAudioDevices::manageEvent(SDL_Event event) {
 		else if (nav == input::START) { if (save()) sm->activateScreen("Intro"); }
 		else if (nav == input::LEFT && m_selected_column > 0) --m_selected_column;
 		else if (nav == input::RIGHT && m_selected_column < m_mics.size()-1) ++m_selected_column;
-		else if (nav == input::UP && m_mics[m_selected_column].dev > 0) --m_mics[m_selected_column].dev;
-		else if (nav == input::DOWN && m_mics[m_selected_column].dev < m_devs.size()) ++m_mics[m_selected_column].dev;
+		else if (nav == input::UP)
+			m_mics[m_selected_column].dev = (m_mics[m_selected_column].dev + m_devs.size()) % (m_devs.size() + 1);
+		else if (nav == input::DOWN)
+			m_mics[m_selected_column].dev = (m_mics[m_selected_column].dev + 1) % (m_devs.size() + 1);
 	} else if (event.type == SDL_KEYDOWN) {
 		int key = event.key.keysym.sym;
 		SDLMod modifier = event.key.keysym.mod;
