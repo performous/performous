@@ -126,11 +126,7 @@ void mainLoop(std::string const& songlist) {
 	Songs songs(database, songlist);
 	ScreenManager sm(window);
 	try {
-		boost::scoped_ptr<input::MidiDrums> midiDrums;
-		// TODO: Proper error handling...
-		try { midiDrums.reset(new input::MidiDrums); } catch (std::runtime_error& e) {
-			std::clog << "controllers/info: " << e.what() << std::endl;
-		}
+		input::Controllers controllers;
 		// Load audio samples
 		sm.loading(_("Loading audio samples..."), 0.5);
 		audio.loadSample("drum bass", getPath("sounds/drum_bass.ogg"));
@@ -205,7 +201,7 @@ void mainLoop(std::string const& songlist) {
 				}
 				prof("fpsctrl");
 				// Process events for the next frame
-				if (midiDrums) midiDrums->process();
+				controllers.process();
 				checkEvents_SDL(sm);
 				prof("events");
 			} catch (std::runtime_error& e) {
@@ -381,7 +377,7 @@ void outputOptionalFeatureStatus() {
 	std::cout    << "  Internationalization:   " <<
 	(Gettext::enabled() ? "Enabled" : "Disabled")
 	<< std::endl << "  MIDI I/O:               " <<
-	(input::MidiDrums::enabled() ? "Enabled" : "Disabled")
+	(input::Controllers::midiEnabled() ? "Enabled" : "Disabled")
 	<< std::endl << "  Webcam support:         " <<
 	(Webcam::enabled() ? "Enabled" : "Disabled")
 	<< std::endl << std::endl;

@@ -8,19 +8,11 @@
 #include <boost/noncopyable.hpp>
 
 #include "SDL_events.h"
-#include "SDL_joystick.h"
 
 #include "xtime.hh"
 #include "configuration.hh"
 
-#ifdef USE_PORTMIDI
-#include "portmidi.hh"
-#endif
-
 namespace input {
-	enum DevType { GUITAR, DRUMS, KEYBOARD, DANCEPAD };
-	enum NavButton { NONE, UP, DOWN, LEFT, RIGHT, START, SELECT, CANCEL, PAUSE, MOREUP, MOREDOWN, VOLUME_UP, VOLUME_DOWN };
-
 	static const std::size_t BUTTONS = 10;
 	// Guitar buttons
 	static const int GREEN_FRET_BUTTON = 0;
@@ -58,6 +50,30 @@ namespace input {
 	static const int SELECT_BUTTON = 8;
 	static const int START_BUTTON = 9;
 
+	enum SourceType { MIDI, KEYBOARD, JOYSTICK };	
+	enum DevType { GUITAR, DRUMS, KEYTAR, DANCEPAD };
+	enum NavButton { NONE, UP, DOWN, LEFT, RIGHT, START, SELECT, CANCEL, PAUSE, MOREUP, MOREDOWN, VOLUME_UP, VOLUME_DOWN };
+
+	/// Each controller has unique SourceId that can be used for telling players apart etc.
+	struct SourceId {
+		SourceType type;
+		unsigned device, major, minor;
+	};
+
+	bool operator==(SourceId const& a, SourceId const& b) {
+		return a.type == b.type && a.device == b.device && a.major == b.major && a.minor == b.minor;
+	}
+	
+	bool operator!=(SourceId const& a, SourceId const& b) { return !(a == b); }
+	
+	/// NavEvent is a menu navigation event, generalized for all controller type so that the user doesn't need to know about controllers.
+	struct NavEvent {
+		NavButton button;
+		boost::xtime time;
+		unsigned repeat;  ///< Zero for hardware event, increased by one for each auto-repeat
+		SourceId source;
+	};
+	
 	struct Event {
 		enum Type { PRESS, RELEASE, PICK };
 		Type type;
@@ -68,150 +84,40 @@ namespace input {
 		// More stuff later, when it is actually used
 	};
 
-	struct Instrument {
-		Instrument(std::string _name, input::DevType _type, std::vector<int> _mapping) : name(_name), type(_type), mapping(_mapping) {};
-		std::string name;
-		input::DevType type;
-		std::string description;
-		std::string match;
-		std::vector<int> mapping;
+	class SDLDevice;
+	class MidiDevice;
+	
+	class Controllers {
+	public:
+		static bool midiEnabled() { return true; /* FIXME */ }
+		Controllers();
+		~Controllers();
+		/// Internally poll for new events. The current time is passed for reference.
+		void process(boost::xtime const& now);
+		/// Push an SDL event to the queue. Returns true if the event was taken (recognized and accepted).
+		bool pushEvent(SDL_Event event, boost::xtime const& now);
+		/// Return true and an event if there are any in queue. Otherwise return false.
+		bool tryPoll(NavEvent& ev);
+		
+	private:
+		boost::scoped_ptr<SDLDevice> sdldev;
+		boost::ptr_vector<MidiDevice> mididevs;
 	};
-	typedef std::map<std::string, Instrument> Instruments;
-
-	namespace detail {
-		static unsigned int KEYBOARD_GUITAR = UINT_MAX;
-		static unsigned int KEYBOARD_DRUMS = KEYBOARD_GUITAR-1;
-		static unsigned int KEYBOARD_DANCEPAD = KEYBOARD_GUITAR-2;
-		static unsigned int KEYBOARD_KEYBOARD = KEYBOARD_GUITAR-3; // Four ids needed for keyboard guitar/drumkit/dancepad/keyboard
-
-		class InputDevPrivate {
-		  public:
-			InputDevPrivate(const Instrument& _instrument) : m_assigned(false), m_instrument(_instrument) {
-				for(unsigned int i = 0 ; i < BUTTONS ; i++) {
-					m_pressed[i] = false;
-				}
-			};
-			bool tryPoll(Event& _event) {
-				if (m_events.empty()) return false;
-				_event = m_events.front();
-				m_events.pop_front();
-				return true;
-			};
-			void addEvent(Event _event) {
-				// only add event if the device is assigned
-				if (m_assigned) m_events.push_back(_event);
-				/*
-				if (_event.type == Event::PICK)
-					std::cout << "PICK event " << _event.button << std::endl;
-				if (_event.type == Event::PRESS)
-					std::cout << "PRESS event " << _event.button << std::endl;
-				if (_event.type == Event::RELEASE)
-					std::cout << "RELEASE event " << _event.button << std::endl;
-				*/
-				// always keep track of button status
-				for( unsigned int i = 0 ; i < BUTTONS ; ++i) {
-					m_pressed[i] = _event.pressed[i];
-				}
-			};
-			void clearEvents() { m_events.clear(); }
-			void assign() { m_assigned = true; }
-			void unassign() { m_assigned = false; clearEvents(); }
-			bool assigned() const { return m_assigned; }
-			bool pressed(int _button) const { return m_pressed[_button]; }
-			std::string name() const { return m_instrument.name; }
-			bool type_match(DevType _type) const {
-				return _type == m_instrument.type;
-			};
-			int buttonFromSDL(unsigned int sdl_button) {
-				try {
-					return m_instrument.mapping.at(sdl_button);
-				} catch(...) {
-					return -1;
-				}
-			}
-		  private:
-			std::deque<Event> m_events;
-			bool m_assigned;
-			bool m_pressed[BUTTONS];
-			Instrument m_instrument;
-		};
-
-		typedef std::map<unsigned int,InputDevPrivate> InputDevs;
-		extern InputDevs devices;
-	}
-
-	NavButton getNav(SDL_Event const &e);
 
 	struct NoDevError: std::runtime_error {
 		NoDevError(): runtime_error("No instrument of the requested type was available") {}
 	};
 
+	/// A handle that reserves one controller of the given type for gameplay. Throws NoDevError if none are available.
 	class InputDev: boost::noncopyable {
-	  public:
-		// First gives a correct instrument type
-		// Then gives an unknown instrument type
-		// Finally throw an exception if only wrong (or none) instrument are available
-		InputDev(DevType _type): m_dev_type(_type) {
-			for (detail::InputDevs::iterator it = detail::devices.begin() ; it != detail::devices.end() ; ++it) {
-				if (it->first == detail::KEYBOARD_GUITAR && !config["game/keyboard_guitar"].b()) continue;
-				if (it->first == detail::KEYBOARD_DRUMS && !config["game/keyboard_drumkit"].b()) continue;
-				if (it->first == detail::KEYBOARD_DANCEPAD && !config["game/keyboard_dancepad"].b()) continue;
-				if (it->first == detail::KEYBOARD_KEYBOARD && !config["game/keyboard_keyboard"].b()) continue;
-				if (!it->second.assigned() && it->second.type_match(_type)) {
-					m_device_id = it->first;
-					it->second.assign();
-					return;
-				}
-			}
-			throw NoDevError();
-		};
-		~InputDev() {
-			detail::devices.find(m_device_id)->second.unassign();
-		};
-		bool tryPoll(Event& _e) { return detail::devices.find(m_device_id)->second.tryPoll(_e); };
-		void addEvent(Event _e) { detail::devices.find(m_device_id)->second.addEvent(_e); };
-		bool pressed(int _button) { return detail::devices.find(m_device_id)->second.pressed(_button); }; // Current state
-		bool isKeyboard() const { return (m_device_id == detail::KEYBOARD_GUITAR || m_device_id == detail::KEYBOARD_DRUMS || m_device_id == detail::KEYBOARD_DANCEPAD || m_device_id == detail::KEYBOARD_KEYBOARD); };
-		DevType getDevType() const { return m_dev_type; }
-	  private:
-		unsigned int m_device_id; // should be some kind of reference
-		DevType m_dev_type;
-	};
-
-	namespace SDL {
-		typedef std::map<unsigned int,SDL_Joystick*> SDL_devices;
-		extern SDL_devices sdl_devices;
-		void init_devices();
-		// Initialize all event stuffs
-		void init();
-		// Returns true if event is taken, feed an InputDev by transforming SDL_Event into Event
-		bool pushEvent(SDL_Event event, boost::xtime t);
-	}
-
-#ifdef USE_PORTMIDI
-
-	// Warning: MidiDrums should be instanciated after Window (that load joysticks)
-	class MidiDrums {
 	public:
-		static bool enabled() { return true; }
-		MidiDrums();
-		void process();
-		typedef std::map<unsigned, unsigned> Map;
-	private:
-		pm::Input stream;
-		unsigned int devnum;
-		Event event;
-		Map map;
+		const SourceId source;
+		InputDev(Controllers& controllers, DevType type);
+		~InputDev();
+		bool tryPoll(Event& _e);
+		void addEvent(Event _e);
+		bool pressed(int _button);
 	};
-#else
-	class MidiDrums {
-	public:
-		static bool enabled() { return false; }
-		MidiDrums() {};
-		void process() {};
-	private:
-	};
-#endif
 
 }
 
