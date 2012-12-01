@@ -1,0 +1,49 @@
+#ifdef MAKE_BUTTON_MAP
+#define BUTTON(devtype, name, num) m_buttons[devtype][#name] = devtype##_##name;
+#else
+#define BUTTON(devtype, name, num) static const unsigned devtype##_##name = num;
+#endif
+
+#undef MAKE_BUTTON_MAP
+
+namespace input {
+	BUTTON(GUITAR, GREEN, 0)
+	// Guitar buttons
+	static const int GREEN_FRET_BUTTON = 0;
+	static const int RED_FRET_BUTTON = 1;
+	static const int YELLOW_FRET_BUTTON = 2;
+	static const int BLUE_FRET_BUTTON = 3;
+	static const int ORANGE_FRET_BUTTON = 4;
+	static const int GODMODE_BUTTON = 5;
+	static const int WHAMMY_BUTTON = 6;
+	// Drums buttons
+	static const int KICK_BUTTON = 0;
+	static const int RED_TOM_BUTTON = 1;
+	static const int YELLOW_TOM_BUTTON = 2;
+	static const int BLUE_TOM_BUTTON = 3;
+	static const int GREEN_TOM_BUTTON = 4;
+	static const int YELLOW_CYMBAL_BUTTON = 12;
+	static const int BLUE_CYMBAL_BUTTON = 13;
+	static const int GREEN_CYMBAL_BUTTON = 14;
+	// Keytar buttons
+	static const int C_BUTTON = 0;
+	static const int D_BUTTON = 1;
+	static const int E_BUTTON = 2;
+	static const int F_BUTTON = 3;
+	static const int G_BUTTON = 4;
+	// Dance buttons
+	static const int LEFT_DANCE_BUTTON = 0;
+	static const int DOWN_DANCE_BUTTON = 1;
+	static const int UP_DANCE_BUTTON = 2;
+	static const int RIGHT_DANCE_BUTTON = 3;
+	static const int DOWN_LEFT_DANCE_BUTTON = 4;
+	static const int DOWN_RIGHT_DANCE_BUTTON = 5;
+	static const int UP_LEFT_DANCE_BUTTON = 6;
+	static const int UP_RIGHT_DANCE_BUTTON = 7;
+	// Global buttons
+	static const int SELECT_BUTTON = 8;
+	static const int START_BUTTON = 9;
+}
+
+#undef BUTTON
+

@@ -13,79 +13,49 @@
 #include "configuration.hh"
 
 namespace input {
-	static const std::size_t BUTTONS = 10;
-	// Guitar buttons
-	static const int GREEN_FRET_BUTTON = 0;
-	static const int RED_FRET_BUTTON = 1;
-	static const int YELLOW_FRET_BUTTON = 2;
-	static const int BLUE_FRET_BUTTON = 3;
-	static const int ORANGE_FRET_BUTTON = 4;
-	static const int GODMODE_BUTTON = 5;
-	static const int WHAMMY_BUTTON = 6;
-	// Drums buttons
-	static const int KICK_BUTTON = 0;
-	static const int RED_TOM_BUTTON = 1;
-	static const int YELLOW_TOM_BUTTON = 2;
-	static const int BLUE_TOM_BUTTON = 3;
-	static const int GREEN_TOM_BUTTON = 4;
-	static const int ORANGE_TOM_BUTTON = 5;
-	// Keyboard buttons
-	static const int C_BUTTON = 0;
-	static const int D_BUTTON = 1;
-	static const int E_BUTTON = 2;
-	static const int F_BUTTON = 3;
-	static const int G_BUTTON = 4;
-	//static const int GODMODE_BUTTON = 5;
-	//static const int WHAMMY_BUTTON = 6;
-	// Dance buttons
-	static const int LEFT_DANCE_BUTTON = 0;
-	static const int DOWN_DANCE_BUTTON = 1;
-	static const int UP_DANCE_BUTTON = 2;
-	static const int RIGHT_DANCE_BUTTON = 3;
-	static const int DOWN_LEFT_DANCE_BUTTON = 4;
-	static const int DOWN_RIGHT_DANCE_BUTTON = 5;
-	static const int UP_LEFT_DANCE_BUTTON = 6;
-	static const int UP_RIGHT_DANCE_BUTTON = 7;
-	// Global buttons
-	static const int SELECT_BUTTON = 8;
-	static const int START_BUTTON = 9;
-
-	enum SourceType { MIDI, KEYBOARD, JOYSTICK };	
-	enum DevType { GUITAR, DRUMS, KEYTAR, DANCEPAD };
-	enum NavButton { NONE, UP, DOWN, LEFT, RIGHT, START, SELECT, CANCEL, PAUSE, MOREUP, MOREDOWN, VOLUME_UP, VOLUME_DOWN };
+	enum SourceType { SOURCETYPE_JOYSTICK, SOURCETYPE_MIDI, SOURCETYPE_KEYBOARD };
+	enum DevType { DEVTYPE_RAW, DEVTYPE_GUITAR, DEVTYPE_DRUMS, DEVTYPE_KEYTAR, DEVTYPE_PIANO, DEVTYPE_DANCEPAD };
+	/// Generalized mapping of navigation actions
+	enum NavButton { NB_NONE, NB_UP, NB_DOWN, NB_LEFT, NB_RIGHT, NB_START, NB_SELECT, NB_CANCEL, NB_PAUSE, NB_MOREUP, NB_MOREDOWN, NB_VOLUME_UP, NB_VOLUME_DOWN };
+	/// Alternative orientation-agnostic mapping where PRIMARY axis is the one that is easiest to access (e.g. guitar pick) and SECONDARY might not be available on all devices
+	enum NavMenu { NM_NONE, NM_PRIMARY_PREV, NM_PRIMARY_NEXT, NM_SECONDARY_PREV, NM_SECONDARY_NEXT };
 
 	/// Each controller has unique SourceId that can be used for telling players apart etc.
 	struct SourceId {
+		SourceId(SourceType type, unsigned device = 0, unsigned channel = 0): type(type), device(device), channel(channel) {
+			if (device >= 1024) throw std::invalid_argument("SourceId device must be smaller than 1024.");
+			if (channel >= 1024) throw std::invalid_argument("SourceId channel must be smaller than 1024.");
+		}
 		SourceType type;
-		unsigned device, major, minor;
+		unsigned device, channel;  ///< Device number and channel (0..1023)
+		/// Provide numeric conversion for comparison and ordered containers
+		operator unsigned() const { return unsigned(type)<<20 | device<<10 | channel; }
 	};
 
-	bool operator==(SourceId const& a, SourceId const& b) {
-		return a.type == b.type && a.device == b.device && a.major == b.major && a.minor == b.minor;
-	}
-	
-	bool operator!=(SourceId const& a, SourceId const& b) { return !(a == b); }
-	
 	/// NavEvent is a menu navigation event, generalized for all controller type so that the user doesn't need to know about controllers.
 	struct NavEvent {
 		NavButton button;
+		NavMenu menu;
 		boost::xtime time;
 		unsigned repeat;  ///< Zero for hardware event, increased by one for each auto-repeat
 		SourceId source;
 	};
 	
 	struct Event {
-		enum Type { PRESS, RELEASE, PICK };
-		Type type;
-		int button; // Translated button number for press/release events. 0 for pick down, 1 for pick up (NOTE: these are NOT pick press/release events but rather different directions)
-		bool pressed[BUTTONS]; // All events tell the button state right after the event happened
-		NavButton nav; // Event translated to NavButton
-		boost::xtime time;
-		// More stuff later, when it is actually used
+		SourceId source; ///< Where did it originate from
+		unsigned id; ///< Originally hardware button number as-is, later mapped according to controllers.xml
+		double value; ///< Zero for button release, up to 1.0 for press (e.g. velocity value), or axis value (-1.0 .. 1.0)
+		boost::xtime time; ///< When did the event occur
+		DevType devType; ///< What type of device (RAW for events not yet mapped)
+		Event(SourceId source, unsigned id, unsigned value, boost::xtime const& time): source(source), id(id), value(value), time(time), devType(DEVTYPE_RAW) {}
 	};
 
-	class SDLDevice;
-	class MidiDevice;
+	/// EventHandler is a function called to process an event as soon as it arrives. Returns true if the event was accepted.
+	typedef boost::function<bool (Event const& ev)> EventHandler;
+
+	/// MissingEventHandler is a function called if whenever an event not currently assigned an EventHandler is received.
+	/// Returns NULL if such events should be ignored or an EventHandler that will then be instantly called to process the event and bound for any future events.
+	typedef boost::function<EventHandler (DevType devType)> MissingEventHandler;
 	
 	class Controllers {
 	public:
@@ -94,30 +64,20 @@ namespace input {
 		~Controllers();
 		/// Internally poll for new events. The current time is passed for reference.
 		void process(boost::xtime const& now);
-		/// Push an SDL event to the queue. Returns true if the event was taken (recognized and accepted).
+		/// Push an SDL event for processing. Returns true if the event was taken (recognized and accepted).
 		bool pushEvent(SDL_Event event, boost::xtime const& now);
 		/// Return true and an event if there are any in queue. Otherwise return false.
 		bool tryPoll(NavEvent& ev);
-		
+		/// Test if a particular button is currently being held
+		bool pressed(SourceId const&, unsigned button);
+				
 	private:
-		boost::scoped_ptr<SDLDevice> sdldev;
-		boost::ptr_vector<MidiDevice> mididevs;
-	};
-
-	struct NoDevError: std::runtime_error {
-		NoDevError(): runtime_error("No instrument of the requested type was available") {}
-	};
-
-	/// A handle that reserves one controller of the given type for gameplay. Throws NoDevError if none are available.
-	class InputDev: boost::noncopyable {
-	public:
-		const SourceId source;
-		InputDev(Controllers& controllers, DevType type);
-		~InputDev();
-		bool tryPoll(Event& _e);
-		void addEvent(Event _e);
-		bool pressed(int _button);
+		struct Impl;
+		boost::scoped_ptr<Impl> self;
 	};
 
 }
+
+// Button constants
+#include "controllers-const.ii"
 

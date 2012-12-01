@@ -3,19 +3,28 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
 
-input::Instruments g_instruments;
+Instruments g_instruments;
 
 #include "SDL_joystick.h"
 
 #include <libxml++/libxml++.h>
 #include "fs.hh"
 
-
 using namespace input;
 
-Controllers::Controllers() {}
-Controllers::~Controllers() {}
-void Controllers::process() {}
+typedef std::map<unsigned, unsigned> ButtonMapping;
+
+/// A controller definition from controllers.xml
+struct ControllerDef {
+	std::string name;
+	std::string description;
+	SourceType sourceType;
+	DevType devType;
+	boost::regex deviceRegex;
+	std::pair<unsigned, unsigned> deviceMinMax;
+	std::pair<unsigned, unsigned> channelMinMax;
+	ButtonMapping mapping;
+};
 
 namespace {
 	struct XMLError {
@@ -30,183 +39,93 @@ namespace {
 	}
 }
 
-namespace input::detail {
-	class InputDevPrivate {
-	  public:
-		InputDevPrivate(const Instrument& _instrument) : m_assigned(false), m_instrument(_instrument) {
-			for(unsigned int i = 0 ; i < BUTTONS ; i++) {
-				m_pressed[i] = false;
-			}
-		};
-		bool tryPoll(Event& _event) {
-			if (m_events.empty()) return false;
-			_event = m_events.front();
-			m_events.pop_front();
-			return true;
-		};
-		void addEvent(Event _event) {
-			// only add event if the device is assigned
-			if (m_assigned) m_events.push_back(_event);
-			// always keep track of button status
-			for( unsigned int i = 0 ; i < BUTTONS ; ++i) {
-				m_pressed[i] = _event.pressed[i];
-			}
-		};
-		void clearEvents() { m_events.clear(); }
-		void assign() { m_assigned = true; }
-		void unassign() { m_assigned = false; clearEvents(); }
-		bool assigned() const { return m_assigned; }
-		bool pressed(int _button) const { return m_pressed[_button]; }
-		std::string name() const { return m_instrument.name; }
-	  private:
-		std::deque<Event> m_events;
-		bool m_assigned;
-		bool m_pressed[BUTTONS];
-		Instrument m_instrument;
-	};
-
-	typedef std::map<unsigned int,InputDevPrivate> InputDevs;
-	extern InputDevs devices;
-}
 
 
-void readControllers(input::Instruments &instruments, fs::path const& file) {
-	if (!fs::exists(file)) {
-		std::clog << "controllers/info: Skipping " << file << " (not found)" << std::endl;
-		return;
+
+struct Controllers::Impl {
+	std::map<std::string, ControllerDef> ControllerDefs;
+	ControllerDefs m_controllerDefs;
+
+	Impl() {
+		readControllers(g_instruments, getDefaultConfig(fs::path("/config/controllers.xml")));
+		readControllers(g_instruments, getConfigDir() / "controllers.xml");
 	}
-	std::clog << "controllers/info: Parsing " << file << std::endl;
-	xmlpp::DomParser domParser(file.string());
-	try {
-		xmlpp::NodeSet n = domParser.get_document()->get_root_node()->find("/controllers/controller");
+	
+	void readControllers(fs::path const& file) {
+		if (!fs::exists(file)) {
+			std::clog << "controllers/info: Skipping " << file << " (not found)" << std::endl;
+			return;
+		}
+		std::clog << "controllers/info: Parsing " << file << std::endl;
+		xmlpp::DomParser domParser(file.string());
+		try {
+			parseControllers(domParser, "/controllers/joystick/controller", SOURCETYPE_JOYSTICK);
+			parseControllers(domParser, "/controllers/midi/controller", SOURCETYPE_MIDI);
+		} catch (XMLError& e) {
+			int line = e.elem.get_line();
+			std::string name = e.elem.get_name();
+			throw std::runtime_error(file.string() + ":" + boost::lexical_cast<std::string>(line) + " element " + name + " " + e.message);
+		}
+	}
+
+	void parseControllers(xmlpp::DomParser const& dom, std::string const& path, SourceType sourceType) {
+		xmlpp::NodeSet n = domParser.get_document()->get_root_node()->find(path);
 		for (xmlpp::NodeSet::const_iterator nodeit = n.begin(), end = n.end(); nodeit != end; ++nodeit) {
 			xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**nodeit);
-			std::string name = getAttribute(elem, "name");
-			std::string type = getAttribute(elem, "type");
-
-			xmlpp::NodeSet ns;
-			// searching description
-			ns = elem.find("description/text()");
-			if(ns.size()==0) continue;
-			std::string description = dynamic_cast<xmlpp::TextNode&>(*ns[0]).get_content();
-
-			// searching the match
-			ns = elem.find("regexp");
-			if(ns.size()==0) continue;
-			std::string regexp = getAttribute(dynamic_cast<xmlpp::Element&>(*ns[0]), "match");
-
-			// setting the type
-			input::DevType devType;
-			if(type == "guitar") {
-				devType = input::GUITAR;
-			} else if(type == "drumkit") {
-				devType = input::DRUMS;
-			} else if(type == "keyboard") {
-				devType = input::KEYBOARD;
-			} else if(type == "dancepad") {
-				devType = input::DANCEPAD;
-			} else {
-				continue;
+			ControllerDef def;
+			def.name = getAttribute(elem, "name");
+			def.sourceType = sourceType;
+			// Device type
+			{
+				std::string type = getAttribute(elem, "type");
+				if (type == "guitar") def.devType == DEVTYPE_GUITAR;
+				else if (type == "drums") def.devType == DEVTYPE_DRUMS;
+				else if (type == "keytar") def.devType == DEVTYPE_KEYTAR;
+				else if (type == "piano") def.devType == DEVTYPE_PIANO;
+				else if (type == "dancepad") def.devType == DEVTYPE_DANCEPAD;
+				else {
+					std::clog << "controllers/warn: " << type << ": Unknown controller type in controllers.xml (skipped)" << std::endl;
+					continue;
+				}
 			}
+			xmlpp::NodeSet ns;
+			// Device description
+			ns = elem.find("description/text()");
+			if (ns.size() == 1) def.description = dynamic_cast<xmlpp::TextNode&>(*ns[0]).get_content();
 
-			// setting the mapping
-			std::vector<int> mapping(16, -1);
+			// Read filtering rules
+			ns = elem.find("device");
+			if (ns.size() == 1) {
+				xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(*ns[0]);
+				def.deviceRegex = getAttribute(elem, "regex");
+				parseMinMax(elem, def.deviceMinMax);
+			}
+			ns = elem.find("channel");
+			parseMinMax(dynamic_cast<xmlpp::Element&>(*ns[0]), def.channelMinMax);
+
+			// Read button mapping
 			ns = elem.find("mapping/button");
-			static const int SDL_BUTTONS = 16;
-			switch(devType) {
-				case input::GUITAR:
-					for (xmlpp::NodeSet::const_iterator nodeit2 = ns.begin(), end = ns.end(); nodeit2 != end; ++nodeit2) {
-						xmlpp::Element& button_elem = dynamic_cast<xmlpp::Element&>(**nodeit2);
-						int id = boost::lexical_cast<int>(getAttribute(button_elem, "id"));
-						std::string value = getAttribute(button_elem, "value");
-						if(id >= SDL_BUTTONS) break;
-						if(value == "green") mapping[id] = input::GREEN_FRET_BUTTON;
-						else if(value == "red") mapping[id] = input::RED_FRET_BUTTON;
-						else if(value == "yellow") mapping[id] = input::YELLOW_FRET_BUTTON;
-						else if(value == "blue") mapping[id] = input::BLUE_FRET_BUTTON;
-						else if(value == "orange") mapping[id] = input::ORANGE_FRET_BUTTON;
-						else if(value == "godmode") mapping[id] = input::GODMODE_BUTTON;
-						else if(value == "select") mapping[id] = input::SELECT_BUTTON;
-						else if(value == "start") mapping[id] = input::START_BUTTON;
-						else continue;
-					}
-					break;
-				case input::DRUMS:
-					for (xmlpp::NodeSet::const_iterator nodeit2 = ns.begin(), end = ns.end(); nodeit2 != end; ++nodeit2) {
-						xmlpp::Element& button_elem = dynamic_cast<xmlpp::Element&>(**nodeit2);
-						int id = boost::lexical_cast<int>(getAttribute(button_elem, "id"));
-						std::string value = getAttribute(button_elem, "value");
-						if(id >= SDL_BUTTONS) break;
-						if(value == "kick") mapping[id] = input::KICK_BUTTON;
-						else if(value == "red") mapping[id] = input::RED_TOM_BUTTON;
-						else if(value == "yellow") mapping[id] = input::YELLOW_TOM_BUTTON;
-						else if(value == "blue") mapping[id] = input::BLUE_TOM_BUTTON;
-						else if(value == "green") mapping[id] = input::GREEN_TOM_BUTTON;
-						else if(value == "orange") mapping[id] = input::ORANGE_TOM_BUTTON;
-						else if(value == "select") mapping[id] = input::SELECT_BUTTON;
-						else if(value == "start") mapping[id] = input::START_BUTTON;
-						else continue;
-					}
-					break;
-				case input::KEYBOARD:
-					for (xmlpp::NodeSet::const_iterator nodeit2 = ns.begin(), end = ns.end(); nodeit2 != end; ++nodeit2) {
-						xmlpp::Element& button_elem = dynamic_cast<xmlpp::Element&>(**nodeit2);
-						int id = boost::lexical_cast<int>(getAttribute(button_elem, "id"));
-						std::string value = getAttribute(button_elem, "value");
-						if(id >= SDL_BUTTONS) break;
-						if(value == "C") mapping[id] = input::C_BUTTON;
-						else if(value == "D") mapping[id] = input::D_BUTTON;
-						else if(value == "E") mapping[id] = input::E_BUTTON;
-						else if(value == "F") mapping[id] = input::F_BUTTON;
-						else if(value == "G") mapping[id] = input::G_BUTTON;
-						else if(value == "godmode") mapping[id] = input::GODMODE_BUTTON;
-						else continue;
-					}
-					break;
-				case input::DANCEPAD:
-					for (xmlpp::NodeSet::const_iterator nodeit2 = ns.begin(), end = ns.end(); nodeit2 != end; ++nodeit2) {
-						xmlpp::Element& button_elem = dynamic_cast<xmlpp::Element&>(**nodeit2);
-						int id = boost::lexical_cast<int>(getAttribute(button_elem, "id"));
-						std::string value = getAttribute(button_elem, "value");
-						if(id >= SDL_BUTTONS) break;
-						if(value == "left") mapping[id] = input::LEFT_DANCE_BUTTON;
-						else if(value == "down") mapping[id] = input::DOWN_DANCE_BUTTON;
-						else if(value == "up") mapping[id] = input::UP_DANCE_BUTTON;
-						else if(value == "right") mapping[id] = input::RIGHT_DANCE_BUTTON;
-						else if(value == "down-left") mapping[id] = input::DOWN_LEFT_DANCE_BUTTON;
-						else if(value == "down-right") mapping[id] = input::DOWN_RIGHT_DANCE_BUTTON;
-						else if(value == "up-left") mapping[id] = input::UP_LEFT_DANCE_BUTTON;
-						else if(value == "up-right") mapping[id] = input::UP_RIGHT_DANCE_BUTTON;
-						else if(value == "start") mapping[id] = input::START_BUTTON;
-						else if(value == "select") mapping[id] = input::SELECT_BUTTON;
-						else continue;
-					}
-					break;
+			for (xmlpp::NodeSet::const_iterator nodeit2 = ns.begin(), end = ns.end(); nodeit2 != end; ++nodeit2) {
+				xmlpp::Element& button_elem = dynamic_cast<xmlpp::Element&>(**nodeit2);
+				unsigned hw = boost::lexical_cast<unsigned>(getAttribute(button_elem, "hw"));
+				std::string map = getAttribute(button_elem, "map");
+				def.mapping[hw] = boost::lexical_cast<unsigned>(map);
 			}
 
 			// inserting the instrument
-			if(instruments.find(name) == instruments.end()) {
-				std::clog << "controllers/info:    Adding " << type << ": " << name << std::endl;
-			} else {
-				std::clog << "controllers/info:    Overriding " << type << ": " << name << std::endl;
-				instruments.erase(name);
-			}
-			input::Instrument instrument(name, devType, mapping);
-			instrument.match = regexp;
-			instrument.description = description;
-			instruments.insert(std::make_pair(name, instrument));
+			std::clog << "controllers/info: " << (m_controllerDefs.find(name) == m_controllerDefs.end() ? "Controller" : "Overriding")
+			  << " definition: " << def.name << ": " << def.description << std::endl;
+			m_controllerDefs[name] = def;
 		}
-	} catch (XMLError& e) {
-		int line = e.elem.get_line();
-		std::string name = e.elem.get_name();
-		throw std::runtime_error(file.string() + ":" + boost::lexical_cast<std::string>(line) + " element " + name + " " + e.message);
 	}
-}
+};
 
-void input::SDL::init() {
-	readControllers(g_instruments, getDefaultConfig(fs::path("/config/controllers.xml")));
-	readControllers(g_instruments, getConfigDir() / "controllers.xml");
-	std::map<unsigned int, input::Instrument> forced_type;
+Controllers::Controllers(): self(new Controllers::Impl()) {}
+Controllers::~Controllers() {}
+void Controllers::process() {}
+
+void SDL::init() {
+	std::map<unsigned int, Instrument> forced_type;
 	ConfigItem::StringList instruments = config["game/instruments"].sl();
 
 	// Populate controller forcing config items
@@ -215,7 +134,7 @@ void input::SDL::init() {
 	ConfigItem& ci2 = config["game/instrument2"];
 	ConfigItem& ci3 = config["game/instrument3"];
 	int i = 0;
-	for (input::Instruments::const_iterator it = g_instruments.begin(); it != g_instruments.end(); ++it, ++i) {
+	for (Instruments::const_iterator it = g_instruments.begin(); it != g_instruments.end(); ++it, ++i) {
 		// Add the enum
 		std::string title = it->second.description;
 		ci0.addEnum(title);
@@ -240,9 +159,9 @@ void input::SDL::init() {
 			continue;
 		} else {
 			bool found = false;
-			for (input::Instruments::const_iterator it2 = g_instruments.begin(); it2 != g_instruments.end(); ++it2) {
+			for (Instruments::const_iterator it2 = g_instruments.begin(); it2 != g_instruments.end(); ++it2) {
 				if (type == it2->first) {
-					forced_type.insert(std::pair<unsigned int,input::Instrument>(sdl_id, input::Instrument(it2->second)));
+					forced_type.insert(std::pair<unsigned int,Instrument>(sdl_id, Instrument(it2->second)));
 					found = true;
 					break;
 				}
@@ -261,7 +180,7 @@ void input::SDL::init() {
 			SDL_JoystickClose(joy);
 			continue;
 		}
-		input::SDL::sdl_devices[i] = joy;
+		SDL::sdl_devices[i] = joy;
 		std::cout << "  Id: " << i;
 		std::cout << ",  Axes: " << SDL_JoystickNumAxes(joy);
 		std::cout << ", Balls: " << SDL_JoystickNumBalls(joy);
@@ -269,14 +188,14 @@ void input::SDL::init() {
 		std::cout << ", Hats: " << SDL_JoystickNumHats(joy) << std::endl;
 		if( forced_type.find(i) != forced_type.end() ) {
 			std::cout << "  Detected as: " << forced_type.find(i)->second.description << " (forced)" << std::endl;
-			input::detail::devices.insert(std::make_pair(i, input::detail::InputDevPrivate(forced_type.find(i)->second)));
+			detail::devices.insert(std::make_pair(i, detail::InputDevPrivate(forced_type.find(i)->second)));
 		} else {
 			bool found = false;
-			for(input::Instruments::const_iterator it = g_instruments.begin() ; it != g_instruments.end() ; ++it) {
+			for(Instruments::const_iterator it = g_instruments.begin() ; it != g_instruments.end() ; ++it) {
 				boost::regex sdl_name(it->second.match);
 				if (regex_search(name.c_str(), sdl_name)) {
 					std::cout << "  Detected as: " << it->second.description << std::endl;
-					input::detail::devices.insert(std::make_pair(i, input::detail::InputDevPrivate(it->second)));
+					detail::devices.insert(std::make_pair(i, detail::InputDevPrivate(it->second)));
 					found = true;
 					break;
 				}
@@ -290,8 +209,8 @@ void input::SDL::init() {
 	}
 }
 
-bool input::SDL::pushEvent(SDL_Event _e, boost::xtime t) {
-	using namespace input::detail;
+bool SDL::pushEvent(SDL_Event _e, boost::xtime t) {
+	using namespace detail;
 
 	Event event;
 	// Add event time
