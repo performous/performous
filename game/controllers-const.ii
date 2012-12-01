@@ -7,42 +7,43 @@
 #undef MAKE_BUTTON_MAP
 
 namespace input {
-	BUTTON(GUITAR, GREEN, 0)
 	// Guitar buttons
-	static const int GREEN_FRET_BUTTON = 0;
-	static const int RED_FRET_BUTTON = 1;
-	static const int YELLOW_FRET_BUTTON = 2;
-	static const int BLUE_FRET_BUTTON = 3;
-	static const int ORANGE_FRET_BUTTON = 4;
-	static const int GODMODE_BUTTON = 5;
-	static const int WHAMMY_BUTTON = 6;
+	BUTTON(GUITAR, GREEN, 0)
+	BUTTON(GUITAR, RED, 1)
+	BUTTON(GUITAR, YELLOW, 2)
+	BUTTON(GUITAR, BLUE, 3)
+	BUTTON(GUITAR, ORANGE, 4)
+	BUTTON(GUITAR, GODMODE, 5)
+	BUTTON(GUITAR, WHAMMY, 6)
 	// Drums buttons
-	static const int KICK_BUTTON = 0;
-	static const int RED_TOM_BUTTON = 1;
-	static const int YELLOW_TOM_BUTTON = 2;
-	static const int BLUE_TOM_BUTTON = 3;
-	static const int GREEN_TOM_BUTTON = 4;
-	static const int YELLOW_CYMBAL_BUTTON = 12;
-	static const int BLUE_CYMBAL_BUTTON = 13;
-	static const int GREEN_CYMBAL_BUTTON = 14;
+	BUTTON(DRUMS, KICK, 0)
+	BUTTON(DRUMS, RED, 1)
+	BUTTON(DRUMS, YELLOW, 2)
+	BUTTON(DRUMS, BLUE, 3)
+	BUTTON(DRUMS, GREEN, 4)
+	BUTTON(DRUMS, YELLOW_CYMBAL, 12)
+	BUTTON(DRUMS, BLUE_CYMBAL, 13)
+	BUTTON(DRUMS, GREEN_CYMBAL, 14)
 	// Keytar buttons
-	static const int C_BUTTON = 0;
-	static const int D_BUTTON = 1;
-	static const int E_BUTTON = 2;
-	static const int F_BUTTON = 3;
-	static const int G_BUTTON = 4;
+	BUTTON(KEYTAR, C, 0)
+	BUTTON(KEYTAR, D, 1)
+	BUTTON(KEYTAR, E, 2)
+	BUTTON(KEYTAR, F, 3)
+	BUTTON(KEYTAR, G, 4)
+	BUTTON(KEYTAR, GODMODE, 5)
+	BUTTON(KEYTAR, WHAMMY, 6)
 	// Dance buttons
-	static const int LEFT_DANCE_BUTTON = 0;
-	static const int DOWN_DANCE_BUTTON = 1;
-	static const int UP_DANCE_BUTTON = 2;
-	static const int RIGHT_DANCE_BUTTON = 3;
-	static const int DOWN_LEFT_DANCE_BUTTON = 4;
-	static const int DOWN_RIGHT_DANCE_BUTTON = 5;
-	static const int UP_LEFT_DANCE_BUTTON = 6;
-	static const int UP_RIGHT_DANCE_BUTTON = 7;
+	BUTTON(DANCE, LEFT, 0)
+	BUTTON(DANCE, DOWN, 1)
+	BUTTON(DANCE, UP, 2)
+	BUTTON(DANCE, RIGHT, 3)
+	BUTTON(DANCE, DOWN_LEFT, 4)
+	BUTTON(DANCE, DOWN_RIGHT, 5)
+	BUTTON(DANCE, UP_LEFT, 6)
+	BUTTON(DANCE, UP_RIGHT, 7)
 	// Global buttons
-	static const int SELECT_BUTTON = 8;
-	static const int START_BUTTON = 9;
+	BUTTON(GENERIC, SELECT, 0x100)
+	BUTTON(GENERIC, START, 0x101)
 }
 
 #undef BUTTON
