@@ -98,8 +98,6 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 
 	if (!GLEW_ARB_viewport_array && config["graphic/stereo3d"].b()) throw std::runtime_error("OpenGL extension ARB_viewport_array is required but not available when using stereo mode");
 
-	input::SDL::init(); // Joysticks etc.
-
 	if (GLEW_VERSION_3_3) {
 		// Compile geometry shaders when stereo is requested
 		shader("color").compileFile(getThemePath("shaders/stereo3d.geom"));

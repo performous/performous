@@ -126,7 +126,6 @@ void mainLoop(std::string const& songlist) {
 	Songs songs(database, songlist);
 	ScreenManager sm(window);
 	try {
-		input::Controllers controllers;
 		// Load audio samples
 		sm.loading(_("Loading audio samples..."), 0.5);
 		audio.loadSample("drum bass", getPath("sounds/drum_bass.ogg"));

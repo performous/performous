@@ -134,7 +134,7 @@ void SDL::init() {
 	ConfigItem& ci2 = config["game/instrument2"];
 	ConfigItem& ci3 = config["game/instrument3"];
 	int i = 0;
-	for (Instruments::const_iterator it = g_instruments.begin(); it != g_instruments.end(); ++it, ++i) {
+	for (ControllerDefs::const_iterator it = m_controllerDefs.begin(); it != m_controllerDefs.end(); ++it, ++i) {
 		// Add the enum
 		std::string title = it->second.description;
 		ci0.addEnum(title);
@@ -175,27 +175,22 @@ void SDL::init() {
 		std::string name = SDL_JoystickName(i);
 		std::cout << "SDL joystick: " << name << std::endl;
 		SDL_Joystick* joy = SDL_JoystickOpen(i);
-		if (SDL_JoystickNumButtons(joy) == 0) {
-			std::cout << "  Not suitable for Performous" << std::endl;
-			SDL_JoystickClose(joy);
-			continue;
-		}
 		SDL::sdl_devices[i] = joy;
 		std::cout << "  Id: " << i;
 		std::cout << ",  Axes: " << SDL_JoystickNumAxes(joy);
 		std::cout << ", Balls: " << SDL_JoystickNumBalls(joy);
 		std::cout << ", Buttons: " << SDL_JoystickNumButtons(joy);
 		std::cout << ", Hats: " << SDL_JoystickNumHats(joy) << std::endl;
-		if( forced_type.find(i) != forced_type.end() ) {
+		if (forced_type.find(i) != forced_type.end() ) {
 			std::cout << "  Detected as: " << forced_type.find(i)->second.description << " (forced)" << std::endl;
 			detail::devices.insert(std::make_pair(i, detail::InputDevPrivate(forced_type.find(i)->second)));
 		} else {
 			bool found = false;
-			for(Instruments::const_iterator it = g_instruments.begin() ; it != g_instruments.end() ; ++it) {
-				boost::regex sdl_name(it->second.match);
-				if (regex_search(name.c_str(), sdl_name)) {
-					std::cout << "  Detected as: " << it->second.description << std::endl;
-					detail::devices.insert(std::make_pair(i, detail::InputDevPrivate(it->second)));
+			for (ControllerDefs::const_iterator it = m_controllerDefs.begin(); it != m_controllerDefs.end(); ++it) {
+				ControllerDef const& def = it->second;
+				if (regex_search(name.c_str(), def.deviceRegex)) {
+					std::cout << "  Detected as: " << def.description << std::endl;
+					detail::devices.insert(std::make_pair(i, detail::InputDevPrivate(def)));
 					found = true;
 					break;
 				}
@@ -209,9 +204,7 @@ void SDL::init() {
 	}
 }
 
-bool SDL::pushEvent(SDL_Event _e, boost::xtime t) {
-	using namespace detail;
-
+bool Controllers::pushEvent(SDL_Event _e, boost::xtime t) {
 	Event event;
 	// Add event time
 	event.time = t;

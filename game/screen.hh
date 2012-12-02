@@ -1,5 +1,6 @@
 #pragma once
 
+#include "controllers.hh"
 #include "singleton.hh"
 #include "animvalue.hh"
 #include "opengl_text.hh"
@@ -91,6 +92,7 @@ class ScreenManager: public Singleton <ScreenManager> {
 
   private:
 	Window& m_window;
+	input::Controllers m_controllers;
 	bool m_finished;
 	typedef boost::ptr_map<std::string, Screen> screenmap_t;
 	screenmap_t screens;

@@ -94,14 +94,13 @@ class InstrumentGraph {
 	unsigned stream() const { return m_stream; }
 	double correctness() const { return m_correctness.get(); }
 	int getScore() const { return (m_score > 0 ? m_score : 0) * m_scoreFactor; }
-	input::DevType getGraphType() const { return m_input.getDevType(); }
+	input::DevType getGraphType() const { return input::DEVTYPE_GUITAR; /* FIXME */ }
 	virtual double getWhammy() const { return 0; }
 
   protected:
 	// Core stuff
 	Audio& m_audio;
 	Song const& m_song;
-	input::InputDev m_input; /// input device (guitar/drums/keyboard)
 	std::size_t m_stream; /// audio stream number
 	AnimValue m_cx, m_width; /// controls horizontal position and width smoothly
 	struct Event {

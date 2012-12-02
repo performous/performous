@@ -5,6 +5,7 @@
 #include <vector>
 #include <iostream>
 #include <stdexcept>
+#include <boost/smart_ptr/scoped_ptr.hpp>
 #include <boost/noncopyable.hpp>
 
 #include "SDL_events.h"
@@ -16,9 +17,9 @@ namespace input {
 	enum SourceType { SOURCETYPE_JOYSTICK, SOURCETYPE_MIDI, SOURCETYPE_KEYBOARD };
 	enum DevType { DEVTYPE_RAW, DEVTYPE_GUITAR, DEVTYPE_DRUMS, DEVTYPE_KEYTAR, DEVTYPE_PIANO, DEVTYPE_DANCEPAD };
 	/// Generalized mapping of navigation actions
-	enum NavButton { NB_NONE, NB_UP, NB_DOWN, NB_LEFT, NB_RIGHT, NB_START, NB_SELECT, NB_CANCEL, NB_PAUSE, NB_MOREUP, NB_MOREDOWN, NB_VOLUME_UP, NB_VOLUME_DOWN };
+	enum NavButton { NONE, UP, DOWN, LEFT, RIGHT, START, SELECT, CANCEL, PAUSE, MOREUP, MOREDOWN, VOLUME_UP, VOLUME_DOWN };
 	/// Alternative orientation-agnostic mapping where PRIMARY axis is the one that is easiest to access (e.g. guitar pick) and SECONDARY might not be available on all devices
-	enum NavMenu { NM_NONE, NM_PRIMARY_PREV, NM_PRIMARY_NEXT, NM_SECONDARY_PREV, NM_SECONDARY_NEXT };
+	enum NavMenu { NO_MENUNAV, PRIMARY_PREV, PRIMARY_NEXT, SECONDARY_PREV, SECONDARY_NEXT };
 
 	/// Each controller has unique SourceId that can be used for telling players apart etc.
 	struct SourceId {
