@@ -464,7 +464,7 @@ void GuitarGraph::engine() {
 			if (last == ev.dur->end) endHold(fret, time);
 		}
 		// Set correctness as a percentage of chord being held
-		if (holds) m_correctness.setTarget(double(count) / m_chordIt->polyphony);
+		if (holds) m_correctness.setTarget(clamp(double(count) / m_chordIt->polyphony));  // FIXME: polyphony doesn't seem to be set correctly for guitar tracks (workaround by clamping)
 	}
 	// Update solo status
 	m_solo = false;
@@ -633,7 +633,7 @@ void GuitarGraph::drumHit(double time, int fret) {
 			if (m_chordIt->status < m_chordIt->polyphony) endStreak();
 		}
 		++m_chordIt->status;  // One more drum belonging to the chord hit
-		double percentage = double(m_chordIt->status) / m_chordIt->polyphony;
+		double percentage = clamp(double(m_chordIt->status) / m_chordIt->polyphony); // FIXME: clamping should not be necessary but polyphony seems incorrect
 		m_correctness.setTarget(1.0, true);  // Instantly correct
 		m_correctness.setTarget(percentage);  // ... but keep fading if chord is incomplete
 		Duration const* dur = m_chordIt->dur[fret];
