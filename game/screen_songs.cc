@@ -71,43 +71,47 @@ void ScreenSongs::manageSharedKey(input::NavButton nav) {
 	else if (nav == input::RIGHT) { m_songs.advance(1); hiscore_start_pos = 0; }
 }
 
+void ScreenSongs::manageEvent(input::NavEvent const& event) {
+	ScreenManager* sm = ScreenManager::getSingletonPtr();
+	input::NavButton nav = event.button;
+	// Handle basic navigational input that is possible also with instruments
+	m_idleTimer.setValue(0.0);  // Reset idle timer
+	if (m_jukebox) {
+		if (nav == input::CANCEL || m_songs.empty()) m_jukebox = false;
+		else if (nav == input::UP) m_audio.seek(5);
+		else if (nav == input::DOWN) m_audio.seek(-5);
+		else if (nav == input::MOREUP) m_audio.seek(-30);
+		else if (nav == input::MOREDOWN) m_audio.seek(30);
+		else manageSharedKey(nav);
+		return;
+	} else if (show_hiscores) {
+		if (nav == input::CANCEL || m_songs.empty()) show_hiscores = false;
+		else if (nav == input::UP) hiscore_start_pos--;
+		else if (nav == input::DOWN) hiscore_start_pos++;
+		// TODO: change hiscore type listed (all, just vocals, guitar easy, guitar medium, guitar hard, guit
+		else if (nav == input::MOREUP) (hiscore_start_pos > 4) ? hiscore_start_pos -= 5 : hiscore_start_pos = 0;
+		else if (nav == input::MOREDOWN) hiscore_start_pos += 5;
+		else manageSharedKey(nav);
+		return;
+	} else if (nav == input::CANCEL) {
+		if (!m_search.text.empty()) { m_search.text.clear(); m_songs.setFilter(m_search.text); }
+		else if (m_songs.getTypeFilter() != 0) m_songs.setTypeFilter(0);
+		else sm->activateScreen("Intro");
+	}
+	// The rest are only available when there are songs available
+	else if (m_songs.empty()) return;
+	else if (nav == input::UP) m_songs.sortChange(-1);
+	else if (nav == input::DOWN) m_songs.sortChange(1);
+	else if (nav == input::MOREUP) m_songs.advance(-10);
+	else if (nav == input::MOREDOWN) m_songs.advance(10);
+	else manageSharedKey(nav);
+	sm->showLogo(!m_jukebox);
+}
+
 void ScreenSongs::manageEvent(SDL_Event event) {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
-	input::NavButton nav(input::getNav(event));
-	// Handle basic navigational input that is possible also with instruments
-	if (nav != input::NONE) {
-		m_idleTimer.setValue(0.0);  // Reset idle timer
-		if (m_jukebox) {
-			if (nav == input::CANCEL || m_songs.empty()) m_jukebox = false;
-			else if (nav == input::UP) m_audio.seek(5);
-			else if (nav == input::DOWN) m_audio.seek(-5);
-			else if (nav == input::MOREUP) m_audio.seek(-30);
-			else if (nav == input::MOREDOWN) m_audio.seek(30);
-			else manageSharedKey(nav);
-			return;
-		} else if (show_hiscores) {
-			if (nav == input::CANCEL || m_songs.empty()) show_hiscores = false;
-			else if (nav == input::UP) hiscore_start_pos--;
-			else if (nav == input::DOWN) hiscore_start_pos++;
-			// TODO: change hiscore type listed (all, just vocals, guitar easy, guitar medium, guitar hard, guit
-			else if (nav == input::MOREUP) (hiscore_start_pos > 4) ? hiscore_start_pos -= 5 : hiscore_start_pos = 0;
-			else if (nav == input::MOREDOWN) hiscore_start_pos += 5;
-			else manageSharedKey(nav);
-			return;
-		} else if (nav == input::CANCEL) {
-			if (!m_search.text.empty()) { m_search.text.clear(); m_songs.setFilter(m_search.text); }
-			else if (m_songs.getTypeFilter() != 0) m_songs.setTypeFilter(0);
-			else sm->activateScreen("Intro");
-		}
-		// The rest are only available when there are songs available
-		else if (m_songs.empty()) return;
-		else if (nav == input::UP) m_songs.sortChange(-1);
-		else if (nav == input::DOWN) m_songs.sortChange(1);
-		else if (nav == input::MOREUP) m_songs.advance(-10);
-		else if (nav == input::MOREDOWN) m_songs.advance(10);
-		else manageSharedKey(nav);
 	// Handle less common, keyboard only keys
-	} else if (event.type == SDL_KEYDOWN) {
+	if (event.type == SDL_KEYDOWN) {
 		SDL_keysym keysym = event.key.keysym;
 		int key = keysym.sym;
 		SDLMod mod = event.key.keysym.mod;

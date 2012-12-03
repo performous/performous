@@ -36,17 +36,19 @@ void ScreenPractice::exit() {
 	theme.reset();
 }
 
-void ScreenPractice::manageEvent(SDL_Event event) {
-	ScreenManager * sm = ScreenManager::getSingletonPtr();
-	input::NavButton nav(input::getNav(event));
+void ScreenPractice::manageEvent(input::NavEvent const& event) {
+	ScreenManager* sm = ScreenManager::getSingletonPtr();
+	input::NavButton nav = event.button;
 	if (nav == input::CANCEL || nav == input::START || nav == input::SELECT) sm->activateScreen("Intro");
 	else if (nav == input::PAUSE) m_audio.togglePause();
-	// FIXME: This should not use stuff from input::detail namespace!
-	else if (event.type == SDL_JOYBUTTONDOWN // Play drum sounds here
+}
+
+void ScreenPractice::manageEvent(SDL_Event event) {
+	/* FIXME if (event.type == SDL_JOYBUTTONDOWN // Play drum sounds here
 	  && input::detail::devices.find(event.jbutton.which)->second.type_match(input::DRUMS)) {
 		int b = input::detail::devices.find(event.jbutton.which)->second.buttonFromSDL(event.jbutton.button);
 		if (b != -1) m_audio.playSample(m_samples[unsigned(b) % m_samples.size()]);
-	}
+	}*/
 }
 
 void ScreenPractice::draw() {

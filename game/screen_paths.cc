@@ -45,18 +45,16 @@ void ScreenPaths::manageEvent(SDL_Event event) {
 	}
 }
 
-void ScreenPaths::process() {
+void ScreenPaths::manageEvent(input::NavEvent const& ev) {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
-	for (input::NavButton nav; sm->controllers().getNav(nav); ) {
-		if (nav == input::CANCEL || nav == input::SELECT) {
-			if (m_txtinp.text.empty()) sm->activateScreen("Intro");
-			else m_txtinp.text.clear();
-		}
-		else if (nav == input::PAUSE) m_audio.togglePause();
-		else if (nav == input::START) { 
-			// TODO: Save config
-			sm->activateScreen("Intro");
-		}
+	if (ev.button == input::CANCEL || ev.button == input::SELECT) {
+		if (m_txtinp.text.empty()) sm->activateScreen("Intro");
+		else m_txtinp.text.clear();
+	}
+	else if (ev.button == input::PAUSE) m_audio.togglePause();
+	else if (ev.button == input::START) { 
+		// TODO: Save config
+		sm->activateScreen("Intro");
 	}
 }
 

@@ -63,21 +63,24 @@ void ScreenAudioDevices::enter() {
 
 void ScreenAudioDevices::exit() { m_theme.reset(); }
 
+void ScreenAudioDevices::manageEvent(input::NavEvent const& event) {
+	ScreenManager* sm = ScreenManager::getSingletonPtr();
+	input::NavButton nav = event.button;
+	if (nav == input::CANCEL || nav == input::SELECT) sm->activateScreen("Intro");
+	else if (nav == input::PAUSE) m_audio.togglePause();
+	else if (m_devs.empty()) return; // The rest work if there are any devices
+	else if (nav == input::START) { if (save()) sm->activateScreen("Intro"); }
+	else if (nav == input::LEFT && m_selected_column > 0) --m_selected_column;
+	else if (nav == input::RIGHT && m_selected_column < m_mics.size()-1) ++m_selected_column;
+	else if (nav == input::UP)
+		m_mics[m_selected_column].dev = (m_mics[m_selected_column].dev + m_devs.size()) % (m_devs.size() + 1);
+	else if (nav == input::DOWN)
+		m_mics[m_selected_column].dev = (m_mics[m_selected_column].dev + 1) % (m_devs.size() + 1);
+}
+
 void ScreenAudioDevices::manageEvent(SDL_Event event) {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
-	input::NavButton nav(input::getNav(event));
-	if (nav != input::NONE) {
-		if (nav == input::CANCEL || nav == input::SELECT) sm->activateScreen("Intro");
-		else if (nav == input::PAUSE) m_audio.togglePause();
-		else if (m_devs.empty()) return; // The rest work if there are any devices
-		else if (nav == input::START) { if (save()) sm->activateScreen("Intro"); }
-		else if (nav == input::LEFT && m_selected_column > 0) --m_selected_column;
-		else if (nav == input::RIGHT && m_selected_column < m_mics.size()-1) ++m_selected_column;
-		else if (nav == input::UP)
-			m_mics[m_selected_column].dev = (m_mics[m_selected_column].dev + m_devs.size()) % (m_devs.size() + 1);
-		else if (nav == input::DOWN)
-			m_mics[m_selected_column].dev = (m_mics[m_selected_column].dev + 1) % (m_devs.size() + 1);
-	} else if (event.type == SDL_KEYDOWN) {
+	if (event.type == SDL_KEYDOWN) {
 		int key = event.key.keysym.sym;
 		SDLMod modifier = event.key.keysym.mod;
 		if (m_devs.empty()) return; // The rest work if there are any config options

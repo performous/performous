@@ -80,7 +80,7 @@ namespace {
 
 /// Constructor
 DanceGraph::DanceGraph(Audio& audio, Song const& song):
-  InstrumentGraph(audio, song, input::DANCEPAD),
+  InstrumentGraph(audio, song, input::DEVTYPE_DANCEPAD),
   m_level(BEGINNER),
   m_beat(getThemePath("dancebeat.svg")),
   m_arrows(getThemePath("arrows.svg")),
@@ -210,7 +210,7 @@ std::string DanceGraph::getDifficultyString() const {
 
 /// Get a string id for track and difficulty
 std::string DanceGraph::getModeId() const {
-	return m_gamingMode + " - " + diffv[m_level] + (m_input.isKeyboard() ? " (kbd)" : "");
+	return m_gamingMode + " - " + diffv[m_level] + (/* FIXME m_input.isKeyboard()*/ false ? " (kbd)" : "");
 }
 
 /// Attempt to change the difficulty by a step
@@ -268,6 +268,7 @@ void DanceGraph::engine() {
 	if (outsideStop && m_insideStop) m_insideStop = false;
 	if (joining(time)) m_dead = 0; // Disable dead counting while joining
 	bool difficulty_changed = false;
+#if 0 // FIXME
 	// Handle all events
 	for (input::Event ev; m_input.tryPoll(ev);) {
 		m_dead = 0; // Keep alive
@@ -305,6 +306,7 @@ void DanceGraph::engine() {
 			m_pressed_anim[ev.button].setValue(1.0);
 		}
 	}
+#endif
 	// Countdown to start
 	handleCountdown(time, time < getNotesBeginTime() ? getNotesBeginTime() : m_jointime+1);
 
@@ -340,8 +342,8 @@ void DanceGraph::engine() {
 /// Handles scoring and such
 void DanceGraph::dance(double time, input::Event const& ev) {
 	// Handle release events
-	if(ev.type == input::Event::RELEASE) {
-		DanceNotes::iterator it = m_activeNotes[ev.button];
+	if (ev.value == 0.0) {
+		DanceNotes::iterator it = m_activeNotes[ev.id];
 		if(it != m_notes.end()) {
 			if(!it->releaseTime && it->note.end > time + maxTolerance) {
 				it->releaseTime = time;
@@ -354,7 +356,7 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 
 	// So it was a PRESS event
 	for (DanceNotes::iterator it = m_notesIt; it != m_notes.end() && time <= it->note.end + maxTolerance; ++it) {
-		if(!it->isHit && std::abs(time - it->note.begin) <= maxTolerance && ev.button == it->note.note) {
+		if(!it->isHit && std::abs(time - it->note.begin) <= maxTolerance && ev.id == it->note.note) {
 			it->isHit = true;
 			if (it->note.type != Note::MINE) {
 				it->score = points(it->note.begin - time);
@@ -365,7 +367,7 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 				m_score -= points(0);
 				m_streak = 0;
 			}
-			m_activeNotes[ev.button] = it;
+			m_activeNotes[ev.id] = it;
 			break;
 		}
 	}

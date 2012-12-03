@@ -5,8 +5,9 @@
 #include <vector>
 #include <iostream>
 #include <stdexcept>
-#include <boost/smart_ptr/scoped_ptr.hpp>
+#include <boost/function.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/smart_ptr/scoped_ptr.hpp>
 
 #include "SDL_events.h"
 
@@ -14,7 +15,7 @@
 #include "configuration.hh"
 
 namespace input {
-	enum SourceType { SOURCETYPE_JOYSTICK, SOURCETYPE_MIDI, SOURCETYPE_KEYBOARD };
+	enum SourceType { SOURCETYPE_NONE, SOURCETYPE_JOYSTICK, SOURCETYPE_MIDI, SOURCETYPE_KEYBOARD };
 	enum DevType { DEVTYPE_RAW, DEVTYPE_GUITAR, DEVTYPE_DRUMS, DEVTYPE_KEYTAR, DEVTYPE_PIANO, DEVTYPE_DANCEPAD };
 	/// Generalized mapping of navigation actions
 	enum NavButton { NONE, UP, DOWN, LEFT, RIGHT, START, SELECT, CANCEL, PAUSE, MOREUP, MOREDOWN, VOLUME_UP, VOLUME_DOWN };
@@ -23,7 +24,7 @@ namespace input {
 
 	/// Each controller has unique SourceId that can be used for telling players apart etc.
 	struct SourceId {
-		SourceId(SourceType type, unsigned device = 0, unsigned channel = 0): type(type), device(device), channel(channel) {
+		SourceId(SourceType type = SOURCETYPE_NONE, unsigned device = 0, unsigned channel = 0): type(type), device(device), channel(channel) {
 			if (device >= 1024) throw std::invalid_argument("SourceId device must be smaller than 1024.");
 			if (channel >= 1024) throw std::invalid_argument("SourceId channel must be smaller than 1024.");
 		}
@@ -68,7 +69,7 @@ namespace input {
 		/// Push an SDL event for processing. Returns true if the event was taken (recognized and accepted).
 		bool pushEvent(SDL_Event event, boost::xtime const& now);
 		/// Return true and an event if there are any in queue. Otherwise return false.
-		bool tryPoll(NavEvent& ev);
+		bool getNav(NavEvent& ev);
 		/// Test if a particular button is currently being held
 		bool pressed(SourceId const&, unsigned button);
 				

@@ -61,6 +61,9 @@ static void checkEvents_SDL(ScreenManager& sm) {
 	}
 	SDL_Event event;
 	while(SDL_PollEvent(&event) == 1) {
+		// Let the navigation system grab any and all SDL events
+		boost::xtime eventTime = now();
+		sm.controllers.pushEvent(event, eventTime);
 		switch(event.type) {
 		  case SDL_QUIT:
 			sm.finished();
@@ -100,12 +103,10 @@ static void checkEvents_SDL(ScreenManager& sm) {
 			if (sm.closeDialog()) continue;
 			break;
 		}
-		// Close dialog in case of a nav event
-		if (sm.isDialogOpen() && input::getNav(event) != input::NONE) { sm.closeDialog(); continue; }
-		// Forward to screen even if the input system takes it (ignoring pushEvent return value)
-		// This is needed to allow navigation (quiting the song) to function even then
-		boost::xtime eventTime = now();
-		input::SDL::pushEvent(event, eventTime);
+		// If dialog is open, allow any nav event to close it...
+		input::NavEvent ev;
+		if (sm.isDialogOpen() && sm.controllers.getNav(ev)) { sm.closeDialog(); continue; }
+		// Screens always receive SDL events that were not already handled here
 		sm.getCurrentScreen()->manageEvent(event);
 	}
 	if (config["graphic/fullscreen"].b() != sm.window().getFullscreen()) {
@@ -200,7 +201,7 @@ void mainLoop(std::string const& songlist) {
 				}
 				prof("fpsctrl");
 				// Process events for the next frame
-				controllers.process();
+				sm.controllers.process(now());
 				checkEvents_SDL(sm);
 				prof("events");
 			} catch (std::runtime_error& e) {
@@ -326,7 +327,7 @@ int main(int argc, char** argv) try {
 	}
 #ifdef USE_PORTMIDI
 	// Dump a list of MIDI input devices
-	pm::dumpDevices(true);
+	// FIXME: pm::dumpDevices(true);
 #endif
 	// Read config files
 	try {

@@ -18,7 +18,9 @@ class Screen {
 	/// counstructor
 	Screen(std::string const& name): m_name(name) {}
 	virtual ~Screen() {}
-	/// eventhandler
+	/// Event handler for navigation events
+	virtual void manageEvent(input::NavEvent const& event) = 0;
+	/// Event handler for SDL events
 	virtual void manageEvent(SDL_Event event) = 0;
 	/// prepare screen for drawing
 	virtual void prepare() {}
@@ -90,9 +92,11 @@ class ScreenManager: public Singleton <ScreenManager> {
 	void showLogo(bool show = true) { m_logoAnim.setTarget(show ? 1.0 : 0.0); }
 	void drawLogo();
 
-  private:
+private:
 	Window& m_window;
-	input::Controllers m_controllers;
+public:
+	input::Controllers controllers;
+private:
 	bool m_finished;
 	typedef boost::ptr_map<std::string, Screen> screenmap_t;
 	screenmap_t screens;

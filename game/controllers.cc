@@ -3,8 +3,6 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
 
-Instruments g_instruments;
-
 #include "SDL_joystick.h"
 
 #include <libxml++/libxml++.h>
@@ -28,14 +26,18 @@ struct ControllerDef {
 
 namespace {
 	struct XMLError {
-		XMLError(xmlpp::Element& e, std::string msg): elem(e), message(msg) {}
-		xmlpp::Element& elem;
+		XMLError(xmlpp::Element const& e, std::string const& msg): elem(e), message(msg) {}
+		xmlpp::Element const& elem;
 		std::string message;
 	};
-	std::string getAttribute(xmlpp::Element& elem, std::string const& attr) {
-		xmlpp::Attribute* a = elem.get_attribute(attr);
+	std::string getAttribute(xmlpp::Element const& elem, std::string const& attr) {
+		xmlpp::Attribute const* a = elem.get_attribute(attr);
 		if (!a) throw XMLError(elem, "attribute " + attr + " not found");
 		return a->get_value();
+	}
+	template <typename Numeric> void parseMinMax(xmlpp::Element const& elem, std::pair<Numeric, Numeric>& range) {
+		range.first = boost::lexical_cast<Numeric>(getAttribute(elem, "min"));
+		range.second = boost::lexical_cast<Numeric>(getAttribute(elem, "max"));
 	}
 }
 
@@ -43,12 +45,12 @@ namespace {
 
 
 struct Controllers::Impl {
-	std::map<std::string, ControllerDef> ControllerDefs;
+	typedef std::map<std::string, ControllerDef> ControllerDefs;
 	ControllerDefs m_controllerDefs;
 
 	Impl() {
-		readControllers(g_instruments, getDefaultConfig(fs::path("/config/controllers.xml")));
-		readControllers(g_instruments, getConfigDir() / "controllers.xml");
+		readControllers(getDefaultConfig(fs::path("/config/controllers.xml")));
+		readControllers(getConfigDir() / "controllers.xml");
 	}
 	
 	void readControllers(fs::path const& file) {
@@ -69,7 +71,7 @@ struct Controllers::Impl {
 	}
 
 	void parseControllers(xmlpp::DomParser const& dom, std::string const& path, SourceType sourceType) {
-		xmlpp::NodeSet n = domParser.get_document()->get_root_node()->find(path);
+		xmlpp::NodeSet n = dom.get_document()->get_root_node()->find(path);
 		for (xmlpp::NodeSet::const_iterator nodeit = n.begin(), end = n.end(); nodeit != end; ++nodeit) {
 			xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**nodeit);
 			ControllerDef def;
@@ -78,11 +80,11 @@ struct Controllers::Impl {
 			// Device type
 			{
 				std::string type = getAttribute(elem, "type");
-				if (type == "guitar") def.devType == DEVTYPE_GUITAR;
-				else if (type == "drums") def.devType == DEVTYPE_DRUMS;
-				else if (type == "keytar") def.devType == DEVTYPE_KEYTAR;
-				else if (type == "piano") def.devType == DEVTYPE_PIANO;
-				else if (type == "dancepad") def.devType == DEVTYPE_DANCEPAD;
+				if (type == "guitar") def.devType = DEVTYPE_GUITAR;
+				else if (type == "drums") def.devType = DEVTYPE_DRUMS;
+				else if (type == "keytar") def.devType = DEVTYPE_KEYTAR;
+				else if (type == "piano") def.devType = DEVTYPE_PIANO;
+				else if (type == "dancepad") def.devType = DEVTYPE_DANCEPAD;
 				else {
 					std::clog << "controllers/warn: " << type << ": Unknown controller type in controllers.xml (skipped)" << std::endl;
 					continue;
@@ -113,18 +115,23 @@ struct Controllers::Impl {
 			}
 
 			// inserting the instrument
-			std::clog << "controllers/info: " << (m_controllerDefs.find(name) == m_controllerDefs.end() ? "Controller" : "Overriding")
+			std::clog << "controllers/info: " << (m_controllerDefs.find(def.name) == m_controllerDefs.end() ? "Controller" : "Overriding")
 			  << " definition: " << def.name << ": " << def.description << std::endl;
-			m_controllerDefs[name] = def;
+			m_controllerDefs[def.name] = def;
 		}
 	}
 };
 
 Controllers::Controllers(): self(new Controllers::Impl()) {}
 Controllers::~Controllers() {}
-void Controllers::process() {}
+void Controllers::process(boost::xtime const& now) {}
+bool Controllers::pushEvent(SDL_Event event, boost::xtime const& now) { return false; }
+bool Controllers::getNav(NavEvent& ev) { return false; }
+bool Controllers::pressed(SourceId const&, unsigned button) { return false; }
 
-void SDL::init() {
+
+#if 0 // FIXME
+void init() {
 	std::map<unsigned int, Instrument> forced_type;
 	ConfigItem::StringList instruments = config["game/instruments"].sl();
 
@@ -217,4 +224,4 @@ bool Controllers::pushEvent(SDL_Event _e, boost::xtime t) {
 	}
 	return true;
 }
-
+#endif

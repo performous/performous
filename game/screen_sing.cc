@@ -66,6 +66,7 @@ void ScreenSing::enter() {
 	{
 		int type = 0; // 0 for dance, 1 for guitars, 2 for drums
 		int idx = 0;
+#if 0 // FIXME
 		while (1) {
 			try {
 				if (idx == 0) {
@@ -82,6 +83,7 @@ void ScreenSing::enter() {
 				idx = 0;
 			}
 		}
+#endif
 	}
 	// Startup delay for instruments is longer than for singing only
 	double setup_delay = (m_instruments.empty() && m_dancers.empty() ? -1.0 : -5.0);
@@ -290,64 +292,66 @@ void ScreenSing::activateNextScreen()
 	sm->activateScreen("Players");
 }
 
-void ScreenSing::manageEvent(SDL_Event event) {
+void ScreenSing::manageEvent(input::NavEvent const& event) {
+	input::NavButton nav = event.button;
+	m_quitTimer.setValue(QUIT_TIMEOUT);
 	double time = m_audio.getPosition();
 	Song::Status status = m_song->status(time);
-	input::NavButton nav(input::getNav(event));
-	int key = event.key.keysym.sym;
-	// Handle keys
-	if (nav != input::NONE) {
-		m_quitTimer.setValue(QUIT_TIMEOUT);
-		// When score window is displayed
-		if (m_score_window.get()) {
-			if (nav == input::START || nav == input::CANCEL) activateNextScreen();
-			return;  // The rest are only available when score window is not displayed
-		}
-		// Instant quit with CANCEL at the very beginning
-		if (nav == input::CANCEL && time < 1.0) {
-			ScreenManager::getSingletonPtr()->activateScreen("Songs");
+	// When score window is displayed
+	if (m_score_window.get()) {
+		if (nav == input::START || nav == input::CANCEL) activateNextScreen();
+		return;  // The rest are only available when score window is not displayed
+	}
+	// Instant quit with CANCEL at the very beginning
+	if (nav == input::CANCEL && time < 1.0) {
+		ScreenManager::getSingletonPtr()->activateScreen("Songs");
+		return;
+	}
+	// Esc-key needs special handling, it is global pause
+	if ((nav == input::PAUSE /* FIXME || (event.type == SDL_KEYDOWN && key == SDLK_ESCAPE)*/)
+	  && !m_audio.isPaused() && !m_menu.isOpen()) {
+		m_menu.open();
+		m_audio.togglePause();
+	}
+	// Global/singer pause menu navigation
+	if (m_menu.isOpen()) {
+		if (nav == input::START) {
+			m_menu.action();
+			if (!m_menu.isOpen() && m_audio.isPaused()) m_audio.togglePause();
 			return;
 		}
-		// Esc-key needs special handling, it is global pause
-		if ((nav == input::PAUSE || (event.type == SDL_KEYDOWN && key == SDLK_ESCAPE))
-		  && !m_audio.isPaused() && !m_menu.isOpen()) {
-			m_menu.open();
-			m_audio.togglePause();
+		else if (nav == input::LEFT) { m_menu.action(-1); return; }
+		else if (nav == input::RIGHT) { m_menu.action(1); return; }
+		else if (nav == input::DOWN) { m_menu.move(1); return; }
+		else if (nav == input::UP) { m_menu.move(-1); return; }
+	}
+	// Start button has special functions for skipping things (only in singing for now)
+	if (nav == input::START && m_only_singers_alive && !m_layout_singer.empty() && !m_audio.isPaused()) {
+		// Open score dialog early
+		if (status == Song::FINISHED) {
+			if (m_engine) m_engine->kill(); // Kill the engine thread
+			m_score_window.reset(new ScoreWindow(m_instruments, m_database, m_dancers)); // Song finished, but no score window -> show it
 		}
-		// Global/singer pause menu navigation
-		if (m_menu.isOpen()) {
-			if (nav == input::START) {
-				m_menu.action();
-				if (!m_menu.isOpen() && m_audio.isPaused()) m_audio.togglePause();
-				return;
-			}
-			else if (nav == input::LEFT) { m_menu.action(-1); return; }
-			else if (nav == input::RIGHT) { m_menu.action(1); return; }
-			else if (nav == input::DOWN) { m_menu.move(1); return; }
-			else if (nav == input::UP) { m_menu.move(-1); return; }
-		}
-		// Start button has special functions for skipping things (only in singing for now)
-		if (nav == input::START && m_only_singers_alive && !m_layout_singer.empty() && !m_audio.isPaused()) {
-			// Open score dialog early
-			if (status == Song::FINISHED) {
-				if (m_engine) m_engine->kill(); // Kill the engine thread
-				m_score_window.reset(new ScoreWindow(m_instruments, m_database, m_dancers)); // Song finished, but no score window -> show it
-			}
-			// Skip instrumental breaks
-			else if (status == Song::INSTRUMENTAL_BREAK) {
-				if (time < 0) m_audio.seek(0.0);
-				else {
-					// TODO: Instead of calculating here, calculate instrumental breaks right after song loading and store in Song data structures
-					double diff = getNaN();
-					for (size_t i = 0; i < m_layout_singer.size(); ++i) {
-						double d = m_layout_singer[i].lyrics_begin() - 3.0 - time;
-						if (!(d > diff)) diff = d;  // Store smallest d in diff (notice NaN handling)
-					}
-					if (diff > 0.0) m_audio.seek(diff);
+		// Skip instrumental breaks
+		else if (status == Song::INSTRUMENTAL_BREAK) {
+			if (time < 0) m_audio.seek(0.0);
+			else {
+				// TODO: Instead of calculating here, calculate instrumental breaks right after song loading and store in Song data structures
+				double diff = getNaN();
+				for (size_t i = 0; i < m_layout_singer.size(); ++i) {
+					double d = m_layout_singer[i].lyrics_begin() - 3.0 - time;
+					if (!(d > diff)) diff = d;  // Store smallest d in diff (notice NaN handling)
 				}
+				if (diff > 0.0) m_audio.seek(diff);
 			}
 		}
 	}
+}
+
+
+void ScreenSing::manageEvent(SDL_Event event) {
+	double time = m_audio.getPosition();
+	int key = event.key.keysym.sym;
 	// Ctrl combinations that can be used while performing (not when score dialog is displayed)
 	if (event.type == SDL_KEYDOWN && (event.key.keysym.mod & KMOD_CTRL) && !m_score_window.get()) {
 		if (key == SDLK_s) m_audio.toggleSynth(m_song->getVocalTrack(m_selectedTrack).notes);
