@@ -165,24 +165,27 @@ template <GLenum Type> void OpenGLTexture<Type>::drawCropped(Dimensions const& o
 namespace pix { enum Format { INT_ARGB, CHAR_RGBA, RGB, BGR }; }
 
 struct Bitmap {
-	std::vector<unsigned char> buf;
+	std::vector<unsigned char> buf;  // Pixel data if owned by Bitmap
+	unsigned char* ptr;  // Pixel data if owned by someone else
 	unsigned width, height;
 	float ar;
 	pix::Format fmt;
-	Bitmap(): width(), height(), ar(), fmt(pix::CHAR_RGBA) {}
+	Bitmap(unsigned char* ptr = NULL): ptr(ptr), width(), height(), ar(), fmt(pix::CHAR_RGBA) {}
 	void resize(unsigned w, unsigned h) {
-		buf.resize(w * h * 4);
+		if (!ptr) buf.resize(w * h * 4); else buf.clear();
 		width = w;
 		height = h;
 		ar = float(w) / h;
 	}
 	void swap(Bitmap& b) {
+		if (ptr || b.ptr) throw std::logic_error("Cannot Bitmap::swap foreign pointers.");
 		buf.swap(b.buf);
 		std::swap(width, b.width);
 		std::swap(height, b.height);
 		std::swap(ar, b.ar);
 		std::swap(fmt, b.fmt);
 	}
+	unsigned char const* data() const { return ptr ? ptr : &buf[0]; }
 };
 
 void updateSurfaces();

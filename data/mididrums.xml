@@ -4,9 +4,11 @@
 	     PortMidi device name for USB-connected drum controllers Millenium MPS-600 and Alesis DM6 is
 	     "e-drum MIDI 1" (same name even if multiple devices are connected at the same time).
 
-	     Notes below 35 and above 81 are non standardized. Standard MIDI drum channel is 9.
+	     Notes below 35 and above 81 are non standardized. Standard MIDI drum channels are 10 and 11.
 	-->
 	<note id="22" value="yellow" name="Closed Hi-Hat Rim" /><!-- Closed Hi-Hat Rim on MPS-600 -->
+	<note id="23" value="yellow" name="Half-Open Hi-Hat" /><!-- Half-Open Hi-Hat on MPS-600 -->
+	<note id="24" value="yellow" name="Half-Open Hi-Hat Rim" /><!-- Half-Open Hi-Hat Rim on MPS-600 -->
 	<note id="26" value="yellow" name="Open Hi-Hat Rim" /><!-- Open Hi-Hat Rim on MPS-600 -->
 	<note id="35" value="kick" name="Acoustic Bass Drum" />
 	<note id="36" value="kick" name="Bass Drum 1" /><!-- Kick on MPS-600 & DM6 -->

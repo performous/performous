@@ -9,11 +9,7 @@ namespace cache {
 	fs::path constructSVGCacheFileName(fs::path const& svgfilename, double factor){
 		fs::path cache_filename;
 		std::string const lod = (boost::format("%.2f") % factor).str();
-#if BOOST_FILESYSTEM_VERSION < 3
-		std::string const cache_basename = svgfilename.filename() + ".cache_" + lod + ".png";
-#else
 		std::string const cache_basename = svgfilename.filename().string() + ".cache_" + lod + ".png";
-#endif
 
 		if (isThemeResource(svgfilename)) {
 			std::string const theme_name = (config["game/theme"].getEnumName().empty() ? "default" : config["game/theme"].getEnumName());
