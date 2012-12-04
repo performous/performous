@@ -1,4 +1,4 @@
-
+#if 0 // FIXME
 	if (e.type == SDL_KEYDOWN) {
 		// Keyboard
 		int k = e.key.keysym.sym;
@@ -110,4 +110,4 @@ bool keybutton(input::Event event, SDL_Event const& _e, bool state) {
 		default: return false;
 	}
 	return true;
-
+#endif

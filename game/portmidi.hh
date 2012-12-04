@@ -49,10 +49,10 @@ namespace pm {
 			// Errors must be handled here because otherwise PortMidi will just exit() the program...
 			if (devId < 0 || devId >= Pm_CountDevices()) throw std::runtime_error("Invalid PortMidi device ID");
 			PmDeviceInfo const* info = Pm_GetDeviceInfo(devId);
-			if (!info->input) throw std::runtime_error("The PortMidi device is an output device (input device needed)");
-			if (info->opened) throw std::runtime_error("The PortMidi device is already open");
+			if (!info->input) throw std::runtime_error(std::string(info->name) + ": The PortMidi device is an output device (input device needed)");
+			if (info->opened) throw std::runtime_error(std::string(info->name) + ": The PortMidi device is already open");
 			PmError err = Pm_OpenInput(&m_handle, devId, 0, 1024, 0, 0);
-			if (err) throw std::runtime_error("Pm_OpenInput failed");
+			if (err) throw std::runtime_error(std::string(info->name) + ": Pm_OpenInput failed");
 		}
 	};
 }
