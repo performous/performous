@@ -31,6 +31,16 @@
 #include <vector>
 #include <cstdlib>
 
+// Disable main level exception handling for debug builds (because gdb cannot properly catch throwing otherwise)
+#ifdef NDEBUG
+#define RUNTIME_ERROR std::runtime_error
+#define EXCEPTION std::exception
+#else
+namespace { struct Nothing { char const* what() const { return NULL; } }; }
+#define RUNTIME_ERROR Nothing
+#define EXCEPTION Nothing
+#endif
+
 volatile bool g_quit = false;
 
 bool g_take_screenshot = false;
@@ -164,7 +174,7 @@ void mainLoop(std::string const& songlist) {
 				try {
 					window.screenshot();
 					sm.flashMessage(_("Screenshot taken!"));
-				} catch (std::exception& e) {
+				} catch (EXCEPTION& e) {
 					std::cerr << "ERROR: " << e.what() << std::endl;
 					sm.flashMessage(_("Screenshot failed!"));
 				}
@@ -204,12 +214,12 @@ void mainLoop(std::string const& songlist) {
 				sm.controllers.process(now());
 				checkEvents_SDL(sm);
 				prof("events");
-			} catch (std::runtime_error& e) {
+			} catch (RUNTIME_ERROR& e) {
 				std::cerr << "ERROR: " << e.what() << std::endl;
 				sm.flashMessage(std::string("ERROR: ") + e.what());
 			}
 		}
-	} catch (std::exception& e) {
+	} catch (EXCEPTION& e) {
 		sm.fatalError(e.what());  // Notify the user
 		throw;
 	} catch (QuitNow&) {
@@ -248,7 +258,7 @@ void jstestLoop() {
 			boost::thread::sleep(time + 0.01); // Max 100 FPS
 			time = now();
 		}
-	} catch (std::exception& e) {
+	} catch (EXCEPTION& e) {
 		std::cout << "ERROR: " << e.what() << std::endl;
 	} catch (QuitNow&) {
 		std::cout << "Terminated." << std::endl;
@@ -305,7 +315,7 @@ int main(int argc, char** argv) try {
 		po::options_description allopts(cmdline);
 		allopts.add(opt3);
 		po::store(po::command_line_parser(argc, argv).options(allopts).positional(p).run(), vm);
-	} catch (std::exception& e) {
+	} catch (EXCEPTION& e) {
 		std::cout << cmdline << std::endl;
 		std::cout << "ERROR: " << e.what() << std::endl;
 		return EXIT_FAILURE;
@@ -332,7 +342,7 @@ int main(int argc, char** argv) try {
 	// Read config files
 	try {
 		readConfig();
-	} catch (std::exception& e) {
+	} catch (EXCEPTION& e) {
 		std::cerr << e.what() << std::endl;
 		return EXIT_FAILURE;
 	}
@@ -368,7 +378,7 @@ int main(int argc, char** argv) try {
 	mainLoop(songlist);
 
 	return EXIT_SUCCESS; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
-} catch (std::exception& e) {
+} catch (EXCEPTION& e) {
 	std::cerr << "FATAL ERROR: " << e.what() << std::endl;
 	return EXIT_FAILURE;
 }
