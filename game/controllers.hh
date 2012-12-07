@@ -16,12 +16,18 @@
 
 namespace input {
 	enum SourceType { SOURCETYPE_NONE, SOURCETYPE_JOYSTICK, SOURCETYPE_MIDI, SOURCETYPE_KEYBOARD };
-	enum DevType { DEVTYPE_RAW, DEVTYPE_GUITAR, DEVTYPE_DRUMS, DEVTYPE_KEYTAR, DEVTYPE_PIANO, DEVTYPE_DANCEPAD };
+	enum DevType { DEVTYPE_RAW, DEVTYPE_GENERIC, DEVTYPE_GUITAR, DEVTYPE_DRUMS, DEVTYPE_KEYTAR, DEVTYPE_PIANO, DEVTYPE_DANCEPAD, DEVTYPE_N /* The number of devtypes */ };
 	/// Generalized mapping of navigation actions
 	enum NavButton { NONE, UP, DOWN, LEFT, RIGHT, START, SELECT, CANCEL, PAUSE, MOREUP, MOREDOWN, VOLUME_UP, VOLUME_DOWN };
 	/// Alternative orientation-agnostic mapping where PRIMARY axis is the one that is easiest to access (e.g. guitar pick) and SECONDARY might not be available on all devices
 	enum NavMenu { NO_MENUNAV, PRIMARY_PREV, PRIMARY_NEXT, SECONDARY_PREV, SECONDARY_NEXT };
 
+	enum Button {
+		// Button constants
+		#define DEFINE_BUTTON(devtype, name, num) devtype##_##name = num,
+		#include "controllers-buttons.ii"
+	};
+	
 	/// Each controller has unique SourceId that can be used for telling players apart etc.
 	struct SourceId {
 		SourceId(SourceType type = SOURCETYPE_NONE, unsigned device = 0, unsigned channel = 0): type(type), device(device), channel(channel) {
@@ -45,11 +51,13 @@ namespace input {
 	
 	struct Event {
 		SourceId source; ///< Where did it originate from
-		unsigned id; ///< Originally hardware button number as-is, later mapped according to controllers.xml
+		Button id; ///< Originally hardware button number as-is, later mapped according to controllers.xml
 		double value; ///< Zero for button release, up to 1.0 for press (e.g. velocity value), or axis value (-1.0 .. 1.0)
 		boost::xtime time; ///< When did the event occur
 		DevType devType; ///< What type of device (RAW for events not yet mapped)
-		Event(SourceId const& source, unsigned id, unsigned value, boost::xtime const& time): source(source), id(id), value(value), time(time), devType(DEVTYPE_RAW) {}
+		Event(SourceId const& source, Button id, unsigned value, boost::xtime const& time): source(source), id(id), value(value), time(time), devType(DEVTYPE_RAW) {}
+		// FIXME: Remove this compatibility constructor:
+		Event(SourceId const& source, unsigned id, unsigned value, boost::xtime const& time): source(source), id(Button(id)), value(value), time(time), devType(DEVTYPE_RAW) {}
 	};
 
 	/// EventHandler is a function called to process an event as soon as it arrives. Returns true if the event was accepted.
@@ -80,6 +88,4 @@ namespace input {
 
 }
 
-// Button constants
-#include "controllers-const.ii"
 

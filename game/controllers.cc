@@ -1,12 +1,14 @@
 #include "controllers.hh"
 
+#include <boost/algorithm/string/case_conv.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
-
 #include "SDL_joystick.h"
 
 #include <libxml++/libxml++.h>
 #include "fs.hh"
+
+#include <stdexcept>
 
 using namespace input;
 
@@ -35,9 +37,22 @@ namespace {
 		if (!a) throw XMLError(elem, "attribute " + attr + " not found");
 		return a->get_value();
 	}
+	template <typename T> bool tryGetAttribute(xmlpp::Element const& elem, std::string const& attr, T& var) {
+		xmlpp::Attribute const* a = elem.get_attribute(attr);
+		if (!a) return false;
+		try {
+			var = boost::lexical_cast<T>(a->get_value());
+		} catch (std::exception&) {
+			throw XMLError(elem, "attribute " + attr + " value invalid: " + a->get_value());
+		}
+		return true;
+	}
 	template <typename Numeric> void parseMinMax(xmlpp::Element const& elem, std::pair<Numeric, Numeric>& range) {
-		range.first = boost::lexical_cast<Numeric>(getAttribute(elem, "min"));
-		range.second = boost::lexical_cast<Numeric>(getAttribute(elem, "max"));
+		xmlpp::Attribute const* a;
+		a = elem.get_attribute("min");
+		if (a) range.first = boost::lexical_cast<Numeric>(a->get_value());
+		a = elem.get_attribute("max");
+		if (a) range.second = boost::lexical_cast<Numeric>(a->get_value());
 	}
 }
 
@@ -48,7 +63,12 @@ struct Controllers::Impl {
 	typedef std::map<std::string, ControllerDef> ControllerDefs;
 	ControllerDefs m_controllerDefs;
 
+	typedef std::map<std::string, unsigned> NameToButton;
+	NameToButton m_buttons[DEVTYPE_N];
+
 	Impl() {
+		#define DEFINE_BUTTON(devtype, name, num) m_buttons[DEVTYPE_##devtype][#name] = devtype##_##name;
+		#include "controllers-buttons.ii"
 		readControllers(getDefaultConfig(fs::path("/config/controllers.xml")));
 		readControllers(getConfigDir() / "controllers.xml");
 	}
@@ -110,8 +130,11 @@ struct Controllers::Impl {
 			for (xmlpp::NodeSet::const_iterator nodeit2 = ns.begin(), end = ns.end(); nodeit2 != end; ++nodeit2) {
 				xmlpp::Element& button_elem = dynamic_cast<xmlpp::Element&>(**nodeit2);
 				unsigned hw = boost::lexical_cast<unsigned>(getAttribute(button_elem, "hw"));
-				std::string map = getAttribute(button_elem, "map");
-				def.mapping[hw] = boost::lexical_cast<unsigned>(map);
+				std::string map = boost::algorithm::to_upper_copy(getAttribute(button_elem, "map"));
+				NameToButton const& n2b = m_buttons[def.devType];
+				NameToButton::const_iterator mapit = n2b.find(map);
+				if (mapit == n2b.end()) throw XMLError(button_elem, map + ": Invalid value for map attribute");
+				def.mapping[hw] = mapit->second;
 			}
 
 			// inserting the instrument

@@ -248,8 +248,8 @@
 				<button hw="9" map="select" />
 			</mapping>
 		</controller>
-		<controller type="keyboard" name="KEYBOARD_GENERIC">
-			<description>Generic keybard</description>
+		<controller type="keytar" name="KEYTAR_GENERIC">
+			<description>Generic keytar</description>
 			<device regex="NO MATCH" />
 			<mapping>
 				<button hw="0" map="C" />
@@ -274,7 +274,7 @@
 				 Still, we don't want to filter by device here as filtering by channel should be enough.
             -->
 			<!-- Standard MIDI drum channels are 10 and 11. -->
-			<channel min="10" max="11">
+			<channel min="10" max="11" />
 			<mapping>
 				<!-- Notes below 35 and above 81 are non-standardized but tested to work. -->
 				<button hw="22" map="yellow" name="Closed Hi-Hat Rim" /><!-- Closed Hi-Hat Rim on MPS-600 -->
