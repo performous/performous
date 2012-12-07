@@ -277,35 +277,35 @@
 			<channel min="10" max="11" />
 			<mapping>
 				<!-- Notes below 35 and above 81 are non-standardized but tested to work. -->
-				<button hw="22" map="yellow" name="Closed Hi-Hat Rim" /><!-- Closed Hi-Hat Rim on MPS-600 -->
-				<button hw="23" map="yellow" name="Half-Open Hi-Hat" /><!-- Half-Open Hi-Hat on MPS-600 -->
-				<button hw="24" map="yellow" name="Half-Open Hi-Hat Rim" /><!-- Half-Open Hi-Hat Rim on MPS-600 -->
-				<button hw="26" map="yellow" name="Open Hi-Hat Rim" /><!-- Open Hi-Hat Rim on MPS-600 -->
+				<button hw="22" map="yellow-cymbal" name="Closed Hi-Hat Rim" /><!-- Closed Hi-Hat Rim on MPS-600 -->
+				<button hw="23" map="yellow-cymbal" name="Half-Open Hi-Hat" /><!-- Half-Open Hi-Hat on MPS-600 -->
+				<button hw="24" map="yellow-cymbal" name="Half-Open Hi-Hat Rim" /><!-- Half-Open Hi-Hat Rim on MPS-600 -->
+				<button hw="26" map="yellow-cymbal" name="Open Hi-Hat Rim" /><!-- Open Hi-Hat Rim on MPS-600 -->
 				<button hw="35" map="kick" name="Acoustic Bass Drum" />
 				<button hw="36" map="kick" name="Bass Drum 1" /><!-- Kick on MPS-600 & DM6 -->
 				<button hw="37" map="red" name="Side Stick" />
 				<button hw="38" map="red" name="Acoustic Snare" /><!-- Snare on MPS-600 & DM6 -->
-				<button hw="39" map="green" name="Hand Clap" /><!-- Tom 4 Rim on MPS-600 -->
+				<button hw="39" map="green-tom" name="Hand Clap" /><!-- Tom 4 Rim on MPS-600 -->
 				<button hw="40" map="red" name="Electric Snare" /><!-- Snare Rim on MPS-600 & DM6 -->
-				<button hw="41" map="green" name="Low Floor Tom" /><!-- Tom 4 on MPS-600 -->
-				<button hw="42" map="yellow" name="Closed Hi-Hat" /><!-- Closed Hi-Hat on MPS-600 & DM6 -->
-				<button hw="43" map="green" name="High Floor Tom" /><!-- Tom 3 on MPS-600 & DM6 -->
+				<button hw="41" map="green-tom" name="Low Floor Tom" /><!-- Tom 4 on MPS-600 -->
+				<button hw="42" map="yellow-cymbal" name="Closed Hi-Hat" /><!-- Closed Hi-Hat on MPS-600 & DM6 -->
+				<button hw="43" map="green-tom" name="High Floor Tom" /><!-- Tom 3 on MPS-600 & DM6 -->
 				<button hw="44" map="" name="Pedal Hi-Hat" /><!-- Closing Hi-Hat (pedal press) on MPS-600 & DM6 -->
-				<button hw="45" map="blue" name="Low Tom" /><!-- Tom 2 on MPS-600 & DM6 -->
-				<button hw="46" map="yellow" name="Open Hi-Hat" /><!-- Open Hi-Hat on MPS-600 & DM6 -->
-				<button hw="47" map="blue" name="Low-Mid Tom" /><!-- Tom 2 Rim on MPS-600 -->
-				<button hw="48" map="yellow" name="Hi-Mid Tom" /><!-- Tom 1 on MPS-600 & DM6 -->
-				<button hw="49" map="green" name="Crash Cymbal 1" /><!-- Crash 1 on MPS-600 & DM6 -->
-				<button hw="50" map="yellow" name="High Tom" /><!-- Tom 1 Rim on MPS-600 -->
-				<button hw="51" map="blue" name="Ride Cymbal 1" /><!-- Ride on MPS-600 & DM6 -->
-				<button hw="52" map="green" name="Chinese Cymbal" /><!-- Crash 2 Rim on MPS-600 -->
+				<button hw="45" map="blue-tom" name="Low Tom" /><!-- Tom 2 on MPS-600 & DM6 -->
+				<button hw="46" map="yellow-cymbal" name="Open Hi-Hat" /><!-- Open Hi-Hat on MPS-600 & DM6 -->
+				<button hw="47" map="blue-tom" name="Low-Mid Tom" /><!-- Tom 2 Rim on MPS-600 -->
+				<button hw="48" map="yellow-tom" name="Hi-Mid Tom" /><!-- Tom 1 on MPS-600 & DM6 -->
+				<button hw="49" map="green-cymbal" name="Crash Cymbal 1" /><!-- Crash 1 on MPS-600 & DM6 -->
+				<button hw="50" map="yellow-tom" name="High Tom" /><!-- Tom 1 Rim on MPS-600 -->
+				<button hw="51" map="blue-cymbal" name="Ride Cymbal 1" /><!-- Ride on MPS-600 & DM6 -->
+				<button hw="52" map="green-cymbal" name="Chinese Cymbal" /><!-- Crash 2 Rim on MPS-600 -->
 				<button hw="53" map="" name="Ride Bell" />
 				<button hw="54" map="" name="Tambourine" />
-				<button hw="55" map="green" name="Splash Cymbal" /><!-- Crash 1 Rim on MPS-600 -->
+				<button hw="55" map="green-cymbal" name="Splash Cymbal" /><!-- Crash 1 Rim on MPS-600 -->
 				<button hw="56" map="" name="Cowbell" />
-				<button hw="57" map="green" name="Crash Cymbal 2" /><!-- Crash 2 on MPS-600 -->
-				<button hw="58" map="green" name="Vibraslap" /><!-- Tom 3 Rim on MPS-600 -->
-				<button hw="59" map="blue" name="Ride Cymbal 2" /><!-- Ride Rim on MPS-600 -->
+				<button hw="57" map="green-cymbal" name="Crash Cymbal 2" /><!-- Crash 2 on MPS-600 -->
+				<button hw="58" map="green-tom" name="Vibraslap" /><!-- Tom 3 Rim on MPS-600 -->
+				<button hw="59" map="blue-cymbal" name="Ride Cymbal 2" /><!-- Ride Rim on MPS-600 -->
 				<button hw="60" map="" name="Hi Bongo" />
 				<button hw="61" map="" name="Low Bongo" />
 				<button hw="62" map="" name="Mute Hi Conga" />
