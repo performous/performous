@@ -1,30 +1,15 @@
 #include "controllers.hh"
 
-#include <boost/algorithm/string/case_conv.hpp>
+#include "fs.hh"
+#include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
-#include "SDL_joystick.h"
-
 #include <libxml++/libxml++.h>
-#include "fs.hh"
-
+#include <SDL_joystick.h>
+#include <deque>
 #include <stdexcept>
 
 using namespace input;
-
-typedef std::map<unsigned, unsigned> ButtonMapping;
-
-/// A controller definition from controllers.xml
-struct ControllerDef {
-	std::string name;
-	std::string description;
-	SourceType sourceType;
-	DevType devType;
-	boost::regex deviceRegex;
-	std::pair<unsigned, unsigned> deviceMinMax;
-	std::pair<unsigned, unsigned> channelMinMax;
-	ButtonMapping mapping;
-};
 
 namespace {
 	struct XMLError {
@@ -47,30 +32,57 @@ namespace {
 		}
 		return true;
 	}
-	template <typename Numeric> void parseMinMax(xmlpp::Element const& elem, std::pair<Numeric, Numeric>& range) {
-		xmlpp::Attribute const* a;
-		a = elem.get_attribute("min");
-		if (a) range.first = boost::lexical_cast<Numeric>(a->get_value());
-		a = elem.get_attribute("max");
-		if (a) range.second = boost::lexical_cast<Numeric>(a->get_value());
+	template <typename Numeric> struct MinMax {
+		Numeric min, max;
+		MinMax():
+		  min(std::numeric_limits<Numeric>::min()),
+		  max(std::numeric_limits<Numeric>::max())
+		{}
+		void parseFrom(xmlpp::Element const& elem) {
+			tryGetAttribute(elem, "min", min);
+			tryGetAttribute(elem, "max", max);
+		}
+	};
+	NavButton navigation(Button b) {
+		switch (b) {
+			// TODO...
+		}
+		return input::NONE;
 	}
 }
 
+typedef std::map<HWButton, Button> ButtonMapping;
 
-
+/// A controller definition from controllers.xml
+struct ControllerDef {
+	std::string name;
+	std::string description;
+	SourceType sourceType;
+	DevType devType;
+	boost::regex deviceRegex;
+	MinMax<unsigned> deviceMinMax;
+	MinMax<unsigned> channelMinMax;
+	ButtonMapping mapping;
+};
 
 struct Controllers::Impl {
 	typedef std::map<std::string, ControllerDef> ControllerDefs;
 	ControllerDefs m_controllerDefs;
 
-	typedef std::map<std::string, unsigned> NameToButton;
+	typedef std::map<std::string, Button> NameToButton;
 	NameToButton m_buttons[DEVTYPE_N];
 
+	std::vector<Hardware::ptr> m_hw;
+	std::deque<NavEvent> m_navEvents;
+
 	Impl() {
-		#define DEFINE_BUTTON(devtype, name, num) m_buttons[DEVTYPE_##devtype][#name] = devtype##_##name;
+		#define DEFINE_BUTTON(devtype, button, num) m_buttons[DEVTYPE_##devtype][#button] = devtype##_##button;
 		#include "controllers-buttons.ii"
 		readControllers(getDefaultConfig(fs::path("/config/controllers.xml")));
 		readControllers(getConfigDir() / "controllers.xml");
+		m_hw.push_back(constructKeyboard());
+		m_hw.push_back(constructJoysticks());
+		if (Hardware::midiEnabled()) m_hw.push_back(constructMidi());
 	}
 	
 	void readControllers(fs::path const& file) {
@@ -114,54 +126,84 @@ struct Controllers::Impl {
 			// Device description
 			ns = elem.find("description/text()");
 			if (ns.size() == 1) def.description = dynamic_cast<xmlpp::TextNode&>(*ns[0]).get_content();
-
 			// Read filtering rules
 			ns = elem.find("device");
 			if (ns.size() == 1) {
 				xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(*ns[0]);
-				def.deviceRegex = getAttribute(elem, "regex");
-				parseMinMax(elem, def.deviceMinMax);
+				std::string regex;
+				if (tryGetAttribute(elem, "regex", regex)) def.deviceRegex = regex;
+				def.deviceMinMax.parseFrom(elem);
 			}
 			ns = elem.find("channel");
-			parseMinMax(dynamic_cast<xmlpp::Element&>(*ns[0]), def.channelMinMax);
-
+			if (ns.size() == 1) def.channelMinMax.parseFrom(dynamic_cast<xmlpp::Element&>(*ns[0]));
 			// Read button mapping
 			ns = elem.find("mapping/button");
 			for (xmlpp::NodeSet::const_iterator nodeit2 = ns.begin(), end = ns.end(); nodeit2 != end; ++nodeit2) {
 				xmlpp::Element& button_elem = dynamic_cast<xmlpp::Element&>(**nodeit2);
-				unsigned hw = boost::lexical_cast<unsigned>(getAttribute(button_elem, "hw"));
-				std::string map = boost::algorithm::to_upper_copy(getAttribute(button_elem, "map"));
-				NameToButton const& n2b = m_buttons[def.devType];
-				NameToButton::const_iterator mapit = n2b.find(map);
-				if (mapit == n2b.end()) throw XMLError(button_elem, map + ": Invalid value for map attribute");
-				def.mapping[hw] = mapit->second;
+				HWButton hw;
+				tryGetAttribute(button_elem, "hw", hw);
+				Button button = GENERIC_UNASSIGNED;
+				std::string map = getAttribute(button_elem, "map");
+				if (!map.empty()) {
+					boost::algorithm::to_upper(map);
+					boost::algorithm::replace_all(map, "-", "_");
+					NameToButton const& n2b = m_buttons[def.devType];
+					NameToButton::const_iterator mapit = n2b.find(map);
+					if (mapit == n2b.end()) throw XMLError(button_elem, map + ": Invalid value for map attribute");
+					button = mapit->second;
+				}
+				def.mapping[hw] = button;
 			}
-
-			// inserting the instrument
+			// Add/replace the controller definition
 			std::clog << "controllers/info: " << (m_controllerDefs.find(def.name) == m_controllerDefs.end() ? "Controller" : "Overriding")
 			  << " definition: " << def.name << ": " << def.description << std::endl;
 			m_controllerDefs[def.name] = def;
 		}
 	}
+	bool getNav(NavEvent& ev) {
+		if (m_navEvents.empty()) return false;
+		ev = m_navEvents.front();
+		m_navEvents.pop_front();
+		return true;
+	}
+	bool pressed(SourceId const& source, Button button) { return false; }
+	void process(boost::xtime const& now) {
+		for (size_t i = 0; i < m_hw.size(); ++i) {
+			while (true) {
+				Event event;
+				event.time = now;
+				if (!m_hw[i]->process(event)) break;
+				pushHWEvent(event);
+			}
+		}
+	}
+	bool pushEvent(SDL_Event const& sdlEv, boost::xtime const& t) {
+		for (size_t i = 0; i < m_hw.size(); ++i) {
+			Event event;
+			event.time = t;
+			if (m_hw[i]->process(event, sdlEv)) return pushHWEvent(event);
+		}
+		return false;
+	}
+	bool pushHWEvent(Event event) {
+		if (event.navButton == NONE) event.navButton = navigation(event.id);
+		if (event.navButton != NONE && event.value != 0.0) {
+			NavEvent ne;
+			ne.source = event.source;
+			ne.button = event.navButton;
+			ne.time = event.time;
+			m_navEvents.push_back(ne);
+		}
+		return true;
+	}
 };
 
+// External API simply wraps self (pImpl)
 Controllers::Controllers(): self(new Controllers::Impl()) {}
 Controllers::~Controllers() {}
-void Controllers::process(boost::xtime const& now) {}
-bool Controllers::getNav(NavEvent& ev) { return false; }
-bool Controllers::pressed(SourceId const&, unsigned button) { return false; }
+bool Controllers::getNav(NavEvent& ev) { return self->getNav(ev); }
+double Controllers::pressed(SourceId const& source, Button button) { return self->pressed(source, button); }
+void Controllers::process(boost::xtime const& now) { self->process(now); }
+bool Controllers::pushEvent(SDL_Event const& ev, boost::xtime const& t) { return self->pushEvent(ev, t); }
 
-bool Controllers::pushEvent(SDL_Event _e, boost::xtime const& t) {
-/*	Event event;
-	// Add event time
-	event.time = t;
-	// Translate to NavButton
-	event.nav = getNav(_e);
-	switch(_e.type) {
-		case SDL_KEYDOWN: return keybutton(event, _e, true);
-		case SDL_KEYUP: return keybutton(event, _e, false);
-		default: return false;
-	}*/
-	return true;
-}
 

@@ -4,7 +4,7 @@
 #include <vector>
 
 namespace input {
-	struct Joysticks {
+	struct Joysticks: public Hardware {
 		Joysticks() {
 			for (unsigned id = 0; id < SDL_NumJoysticks(); ++id) {
 				m_joysticks.push_back(JoyPtr(SDL_JoystickOpen(id), SDL_JoystickClose));
@@ -17,7 +17,11 @@ namespace input {
 				unsigned num_buttons = SDL_JoystickNumButtons(joy);
 				for( unsigned i = 0; i < num_buttons; ++i) {
 					int state = SDL_JoystickGetButton(joy, i);
-					Event(SourceId(SOURCETYPE_JOYSTICK, idx), i, state, now);
+					Event event;
+					event.source = SourceId(SOURCETYPE_JOYSTICK, idx);
+					event.hw = i;
+					event.value = state;
+					event.time = now;
 				}
 			}
 		}
@@ -25,6 +29,8 @@ namespace input {
 		std::vector<JoyPtr> m_joysticks;
 
 	};
+
+	Hardware::ptr constructJoysticks() { return Hardware::ptr(new Joysticks()); }
 }
 
 

@@ -668,7 +668,7 @@ void GuitarGraph::drumHit(double time, int fret) {
 
 /// Handle guitar events and scoring
 void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
-	bool picked = (ev.id == input::GUITAR_PICK && ev.value != 0.0);
+	bool picked = (ev.id == input::GUITAR_PICK_UP || ev.id == input::GUITAR_PICK_DOWN) && ev.value != 0.0;
 	// Handle Big Rock Ending
 	if (m_dfIt != m_drumfills.end() && time >= m_dfIt->begin - maxTolerance
 	  && time <= m_dfIt->end + maxTolerance) {

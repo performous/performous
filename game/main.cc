@@ -213,6 +213,7 @@ void mainLoop(std::string const& songlist) {
 				// Process events for the next frame
 				sm.controllers.process(now());
 				checkEvents_SDL(sm);
+				for (input::NavEvent nav; sm.controllers.getNav(nav); sm.getCurrentScreen()->manageEvent(nav)) {}
 				prof("events");
 			} catch (RUNTIME_ERROR& e) {
 				std::cerr << "ERROR: " << e.what() << std::endl;
@@ -387,7 +388,7 @@ void outputOptionalFeatureStatus() {
 	std::cout    << "  Internationalization:   " <<
 	(Gettext::enabled() ? "Enabled" : "Disabled")
 	<< std::endl << "  MIDI I/O:               " <<
-	(input::Controllers::midiEnabled() ? "Enabled" : "Disabled")
+	(input::Hardware::midiEnabled() ? "Enabled" : "Disabled")
 	<< std::endl << "  Webcam support:         " <<
 	(Webcam::enabled() ? "Enabled" : "Disabled")
 	<< std::endl << std::endl;
