@@ -186,7 +186,7 @@ struct Controllers::Impl {
 		return false;
 	}
 	bool pushHWEvent(Event event) {
-		if (event.navButton == NONE) event.navButton = navigation(event.id);
+		if (event.navButton == NONE && event.source.type != SOURCETYPE_KEYBOARD) event.navButton = navigation(event.id);
 		if (event.navButton != NONE && event.value != 0.0) {
 			NavEvent ne;
 			ne.source = event.source;
