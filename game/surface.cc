@@ -148,6 +148,10 @@ namespace {
 			#ifndef USE_EGL
 			m[BGR] = PixFmt(GL_BGR, GL_UNSIGNED_BYTE, true);
 			m[INT_ARGB] = PixFmt(GL_BGRA, GL_UNSIGNED_INT_8_8_8_8, true);
+			#else
+			// FIXME: The right pixel formats are not supported
+			m[BGR] = PixFmt(GL_RGB, GL_UNSIGNED_BYTE, true);
+			m[INT_ARGB] = PixFmt(GL_RGBA, GL_UNSIGNED_BYTE, true);
 			#endif
 		}
 	} pixFormats;
