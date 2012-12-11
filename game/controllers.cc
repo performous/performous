@@ -82,6 +82,7 @@ struct ControllerDef {
 		if (!deviceMinMax.matches(ev.source.device)) return false;
 		if (!channelMinMax.matches(ev.source.channel)) return false;
 		// TODO: deviceRegex matching (needs device name)
+		return true;
 	}
 	void mapButton(Event& ev) const {
 		ButtonMapping::const_iterator it = mapping.find(ev.hw);
