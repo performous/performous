@@ -47,23 +47,6 @@ namespace input {
 		if (b == -1) return input::NONE;
 		else if (b == 8) return input::CANCEL;
 		else if (b == 9) return input::START;
-		// Totally different device types need their own custom mappings
-		if (devt.type_match(input::DEVTYPE_DANCEPAD)) {
-			// Dance pad can be used for navigation
-			if (b == 0) return input::LEFT;
-			else if (b == 1) return input::DOWN;
-			else if (b == 2) return input::UP;
-			else if (b == 3) return input::RIGHT;
-			else if (b == 5) return input::MOREUP;
-			else if (b == 6) return input::MOREDOWN;
-			else return input::NONE;
-		} else if (devt.type_match(input::DRUMS)) {
-			// Drums can be used for navigation
-			if (b == 1) return input::LEFT;
-			else if (b == 2) return input::UP;
-			else if (b == 3) return input::DOWN;
-			else if (b == 4) return input::RIGHT;
-		}
 	} else if (e.type == SDL_JOYAXISMOTION) {
 		// Axis motion
 		int axis = e.jaxis.axis;
@@ -94,24 +77,6 @@ namespace input {
 
 // Controller event handling
 
-bool joybutton(input::Event event, SDL_Event const& _e, bool state) {
-	using namespace input;
-	unsigned int joy_id = _e.jbutton.which;
-	if(!devices.find(joy_id)->second.assigned()) return false;
-	int button = devices.find(joy_id)->second.buttonFromSDL(_e.jbutton.button);
-	if( button == -1 ) return false;
-	for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
-		event.pressed[i] = devices.find(joy_id)->second.pressed(i);
-	}
-	event.type = (state ? input::Event::PRESS : input::Event::RELEASE);
-	event.button = button;
-	event.pressed[button] = state;
-	devices.find(joy_id)->second.addEvent(event);
-	return true;
-}
-
-
-
 	switch(_e.type) {
 
 		case SDL_JOYBUTTONDOWN: return joybutton(event, _e, true);
@@ -126,9 +91,6 @@ bool joybutton(input::Event event, SDL_Event const& _e, bool state) {
 			if(!dev.assigned()) return false;
 			if (dev.name() != "GUITAR_GUITARHERO_XPLORER" && (_e.jaxis.axis == 5 || _e.jaxis.axis == 6 || _e.jaxis.axis == 1)) {
 				event.type = input::Event::PICK;
-				for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
-					event.pressed[i] = dev.pressed(i);
-				}
 				// Direction
 				event.button = (_e.jaxis.value > 0 ? 0 /* down */: 1 /* up */);
 				dev.addEvent(event);
@@ -138,9 +100,6 @@ bool joybutton(input::Event event, SDL_Event const& _e, bool state) {
 			  || (dev.name() == "GUITAR_ROCKBAND_XBOXADAPTER" && _e.jaxis.axis == 3))
 			{
 				// Whammy bar (special case for XBox RB guitar
-				for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
-					event.pressed[i] = dev.pressed(i);
-				}
 				event.button = input::WHAMMY_BUTTON;
 				event.type = input::Event::PRESS;
 				event.pressed[event.button] = (_e.jaxis.value > 0);
@@ -151,9 +110,6 @@ bool joybutton(input::Event event, SDL_Event const& _e, bool state) {
 			  || (dev.name() == "GUITAR_ROCKBAND_XBOXADAPTER" && _e.jaxis.axis ==4))
 			{
 				// Tilt sensor as an axis on some guitars
-				for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
-					event.pressed[i] = dev.pressed(i);
-				}
 				event.button = input::GODMODE_BUTTON;
 				if (_e.jaxis.value < -2) {
 					event.type = input::Event::PRESS;
