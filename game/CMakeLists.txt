@@ -69,6 +69,7 @@ if(RASPBERRY_PI)
 	add_definitions("-DUSE_RPI")
 	include_directories("/opt/vc")
 	include_directories("/opt/vc/include")
+	include_directories("/opt/vc/include/interface/vcos/pthreads")
 endif()
 
 if(ENABLE_EGL)

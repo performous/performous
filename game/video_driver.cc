@@ -158,7 +158,7 @@ void initEGL() {
 	dispman_update = vc_dispmanx_update_start(0);
 	dispman_element = vc_dispmanx_element_add(dispman_update, dispman_display,
 		0 /*layer*/, &dst_rect, 0 /*src*/, &src_rect,
-		DISPMANX_PROTECTION_NONE, 0 /*alpha*/, 0 /*clamp*/, 0 /*transform*/);
+		DISPMANX_PROTECTION_NONE, 0 /*alpha*/, 0 /*clamp*/, DISPMANX_NO_ROTATE /*transform*/);
 
 	native_window.element = dispman_element;
 	native_window.width = s_width;
