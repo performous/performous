@@ -1,4 +1,6 @@
-// This header should be included after defining the DEFINE_BUTTON macro so that suitable code will be generated.
+// This header should be used for generating input button definitions and code:
+// #define DEFINE_BUTTON(devtype, button, num, nav) do something with devtype##_##button etc.
+// #include "controllers-buttons.ii"
 
 // Guitar buttons
 DEFINE_BUTTON(GUITAR, GREEN, 0, input::NONE)
