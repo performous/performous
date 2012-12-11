@@ -218,14 +218,16 @@ struct Controllers::Impl {
 	}
 	/// Assign event's source a ControllerDef (if not already assigned) and return it
 	ControllerDef const* assign(Event const& event) {
-		ControllerDef const* def = m_assignments[event.source];
-		if (def) return def;
+		// Attempt insertion (does not override existing values)
+		std::pair<Assignments::iterator, bool> ret = m_assignments.insert(Assignments::value_type(event.source, NULL));
+		ControllerDef const*& def = ret.first->second;  // A reference to the value inside the map
+		if (!ret.second) return def;  // Source already assigned, just return it.
 		// Find a matching ControllerDef
 		for (ControllerDefs::const_iterator it = m_controllerDefs.begin(); it != m_controllerDefs.end() && !def; ++it) {
 			if (it->second.matches(event)) def = &it->second;
 		}
 		std::clog << "controllers/info: Assigned " << event.source << " as " << (def ? def->name : "(none)") << std::endl;
-		return m_assignments[event.source] = def;
+		return def;
 	}
 	/// Handle an incoming hardware event
 	bool pushHWEvent(Event event) {
