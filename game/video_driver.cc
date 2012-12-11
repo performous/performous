@@ -12,11 +12,11 @@
 #include <fstream>
 #include <SDL.h>
 #ifdef USE_RPI
-#include "bcm_host.h"
+# include "bcm_host.h"
 #endif
 #ifdef USE_EGL
-#include "EGL/egl.h"
-#include "EGL/eglext.h"
+# include <EGL/egl.h>
+# include <EGL/eglext.h>
 #endif
 
 #ifndef GLEW_ARB_viewport_array
@@ -98,6 +98,7 @@ unsigned int screenW() { return s_width; }
 unsigned int screenH() { return s_height; }
 
 // FIXME: Window member?
+// FIXME: Remove all the debug prints here
 void initEGL() {
 #ifdef USE_EGL
 	int32_t success = 0;
@@ -108,25 +109,30 @@ void initEGL() {
 	EGLSurface surface;
 	EGLContext context;
 
+	std::cout << "initEGL" << std::endl;
 	// Get an EGL display connection
 	display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
 	if (display == EGL_NO_DISPLAY)
 		throw std::runtime_error("eglGetDisplay failed!");
 	glutil::GLErrorChecker glerror("initEGL");
 
+	std::cout << "eglInitialize" << std::endl;
 	if (!eglInitialize(display, NULL, NULL))
 		throw std::runtime_error("eglInitialize failed!");
 	glerror.check("eglInitialize");
 
+	std::cout << "eglChooseConfig" << std::endl;
 	// Get EGL frame buffer configuration
 	if (!eglChooseConfig(display, egl_attributes, &config, 1, &num_config))
 		throw std::runtime_error("eglChooseConfig failed!");
 	glerror.check("eglChooseConfig");
 
+	std::cout << "eglBindAPI" << std::endl;
 	if (!eglBindAPI(EGL_OPENGL_ES_API))
 		throw std::runtime_error("eglBindAPI failed!");
 	glerror.check("eglBindAPI");
 
+	std::cout << "eglCreateContext" << std::endl;
 	// Create the EGL rendering context
 	context = eglCreateContext(display, config, EGL_NO_CONTEXT, egl_context_attributes);
 	if (context == EGL_NO_CONTEXT)
@@ -140,6 +146,7 @@ void initEGL() {
 	VC_RECT_T dst_rect;
 	VC_RECT_T src_rect;
 
+	std::cout << "graphics_get_display_size" << std::endl;
 	// Create EGL window surface
 	if (graphics_get_display_size(0 /* LCD */, &s_width, &s_height) < 0)
 		throw std::runtime_error("graphics_get_display_size failed!");
@@ -167,23 +174,28 @@ void initEGL() {
 	glerror.check("vc_dispmanx_update_submit_sync");
 	#endif // USE_RPI
 
+	std::cout << "eglCreateWindowSurface" << std::endl;
 	surface = eglCreateWindowSurface(display, config, &native_window, NULL);
 	if (surface == EGL_NO_SURFACE)
 		throw std::runtime_error("eglCreateWindowSurface failed!");
 	glerror.check("eglCreateWindowSurface");
 
+	std::cout << "eglMakeCurrent" << std::endl;
 	// Connect the context to the surface
 	if (!eglMakeCurrent(display, surface, surface, context))
 		throw std::runtime_error("eglMakeCurrent failed!");
 	glerror.check("eglMakeCurrent");
+	std::cout << "initEGL done" << std::endl;
 #endif // USE_EGL
 }
 
 Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(width), m_windowH(height), m_fullscreen(fs), screen() {
 	std::atexit(SDL_Quit);
 	#ifdef USE_RPI
+	std::cout << "Attempting to initialize Raspberry Pi VideoCore" << std::endl;
 	bcm_host_init();
 	std::atexit(bcm_host_deinit);
+	std::cout << "Attempting to initialize SDL" << std::endl;
 	#endif
 	if( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK) == -1 ) throw std::runtime_error("SDL_Init failed");
 	SDL_WM_SetCaption(PACKAGE " " VERSION, PACKAGE);
@@ -196,6 +208,7 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	SDL_VideoInfo const* vi = SDL_GetVideoInfo();
 	m_fsW = vi->current_w;
 	m_fsH = vi->current_h;
+	std::cout << "Attempting to set video mode" << std::endl;
 	resize();
 	SDL_ShowCursor(SDL_DISABLE);
 	SDL_EnableUNICODE(SDL_ENABLE);
