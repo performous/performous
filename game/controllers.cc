@@ -42,6 +42,7 @@ namespace {
 			tryGetAttribute(elem, "min", min);
 			tryGetAttribute(elem, "max", max);
 		}
+		bool matches(Numeric val) const { return val >= min && val <= max; }
 	};
 	// Return a NavButton corresponding to an Event
 	NavButton navigation(Event const& ev) {
@@ -51,6 +52,16 @@ namespace {
 		#define DEFINE_BUTTON(devtype, button, num, nav) if (ev.devType == DEVTYPE_##devtype && ev.id == devtype##_##button) return nav;
 		#include "controllers-buttons.ii"
 		return input::NONE;
+	}
+
+	std::ostream& operator<<(std::ostream& os, SourceId const& source) {
+		switch (source.type) {
+			case SOURCETYPE_NONE: return os << "(none)";
+			case SOURCETYPE_KEYBOARD: return os << "(keyboard " << source.device << " instrument " << source.channel << ")";
+			case SOURCETYPE_JOYSTICK: return os << "(joystick " << source.device << ")";
+			case SOURCETYPE_MIDI: return os << "(midi " << source.device << " channel " << source.channel << ")";
+		}
+		return os << "(unknown SOURCETYPE)";
 	}
 }
 
@@ -66,6 +77,17 @@ struct ControllerDef {
 	MinMax<unsigned> deviceMinMax;
 	MinMax<unsigned> channelMinMax;
 	ButtonMapping mapping;
+	bool matches(Event const& ev) const {
+		if (ev.source.type != sourceType) return false;
+		if (!deviceMinMax.matches(ev.source.device)) return false;
+		if (!channelMinMax.matches(ev.source.channel)) return false;
+		// TODO: deviceRegex matching (needs device name)
+	}
+	void mapButton(Event& ev) const {
+		ButtonMapping::const_iterator it = mapping.find(ev.hw);
+		if (it == mapping.end()) return;
+		ev.id = it->second;
+	}
 };
 
 struct Controllers::Impl {
@@ -75,6 +97,9 @@ struct Controllers::Impl {
 	typedef std::map<std::string, Button> NameToButton;
 	NameToButton m_buttons[DEVTYPE_N];
 
+	typedef std::map<SourceId, ControllerDef const*> Assignments;
+	Assignments m_assignments;
+	
 	std::vector<Hardware::ptr> m_hw;
 	std::deque<NavEvent> m_navEvents;
 
@@ -163,6 +188,7 @@ struct Controllers::Impl {
 			m_controllerDefs[def.name] = def;
 		}
 	}
+	/// Return the next available navigation event from queue, if available
 	bool getNav(NavEvent& ev) {
 		if (m_navEvents.empty()) return false;
 		ev = m_navEvents.front();
@@ -170,6 +196,7 @@ struct Controllers::Impl {
 		return true;
 	}
 	bool pressed(SourceId const& source, Button button) { return false; }
+	/// Do internal event processing (poll for MIDI events etc)
 	void process(boost::xtime const& now) {
 		for (size_t i = 0; i < m_hw.size(); ++i) {
 			while (true) {
@@ -180,6 +207,7 @@ struct Controllers::Impl {
 			}
 		}
 	}
+	/// Handle an incoming SDL event
 	bool pushEvent(SDL_Event const& sdlEv, boost::xtime const& t) {
 		for (size_t i = 0; i < m_hw.size(); ++i) {
 			Event event;
@@ -188,7 +216,21 @@ struct Controllers::Impl {
 		}
 		return false;
 	}
+	/// Assign event's source a ControllerDef (if not already assigned) and return it
+	ControllerDef const* assign(Event const& event) {
+		ControllerDef const* def = m_assignments[event.source];
+		if (def) return def;
+		// Find a matching ControllerDef
+		for (ControllerDefs::const_iterator it = m_controllerDefs.begin(); it != m_controllerDefs.end() && !def; ++it) {
+			if (it->second.matches(event)) def = &it->second;
+		}
+		std::clog << "controllers/info: Assigned " << event.source << " as " << (def ? def->name : "(none)") << std::endl;
+		return m_assignments[event.source] = def;
+	}
+	/// Handle an incoming hardware event
 	bool pushHWEvent(Event event) {
+		ControllerDef const* def = assign(event);
+		if (def) def->mapButton(event);
 		event.navButton = navigation(event);
 		if (event.navButton != input::NONE && event.value != 0.0) {
 			NavEvent ne;

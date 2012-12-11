@@ -44,7 +44,7 @@ namespace input {
 		/// Provide numeric conversion for comparison and ordered containers
 		operator unsigned() const { return unsigned(type)<<20 | device<<10 | channel; }
 	};
-
+	
 	/// NavEvent is a menu navigation event, generalized for all controller type so that the user doesn't need to know about controllers.
 	struct NavEvent {
 		SourceId source;
