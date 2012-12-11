@@ -72,6 +72,8 @@ add_subdirectory(game)
 add_subdirectory(docs)
 
 option(ENABLE_TOOLS "Enable extra tools (e.g. Singstar ripper)" ON)
+option(ENABLE_EGL "Use EGL for graphics window creation" OFF)
+option(RASPBERRY_PI "Compile for Raspberry Pi" OFF)
 
 if (ENABLE_TOOLS)
   add_subdirectory(tools)

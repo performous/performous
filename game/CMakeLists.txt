@@ -64,6 +64,17 @@ endif()
 
 set(SOURCES ${SOURCE_FILES} ${HEADER_FILES} ${RESOURCE_FILES})
 
+if(RASPBERRY_PI)
+	set(ENABLE_EGL ON)
+	add_definitions("-DUSE_RPI")
+	include_directories("/opt/vc")
+	include_directories("/opt/vc/include")
+endif()
+
+if(ENABLE_EGL)
+	add_definitions("-DUSE_EGL")
+endif()
+
 # Libraries
 
 find_package(Boost 1.36 REQUIRED COMPONENTS thread date_time program_options regex filesystem system)
