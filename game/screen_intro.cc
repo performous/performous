@@ -52,6 +52,9 @@ void ScreenIntro::manageEvent(input::NavEvent const& event) {
 	else if (nav == input::LEFT && m_menu.getSubmenuLevel() < 2) m_menu.move(-1); // Instrument nav hack
 	else if (nav == input::START) m_menu.action();
 	else if (nav == input::PAUSE) m_audio.togglePause();
+	// Animation targets
+	m_selAnim.setTarget(m_menu.curIndex());
+	m_submenuAnim.setTarget(m_menu.getSubmenuLevel());
 }
 
 void ScreenIntro::manageEvent(SDL_Event event) {
@@ -67,9 +70,6 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 				? _("Settings saved as system defaults.") : _("Settings saved."));
 		}
 	}
-	// Animation targets
-	m_selAnim.setTarget(m_menu.curIndex());
-	m_submenuAnim.setTarget(m_menu.getSubmenuLevel());
 }
 
 void ScreenIntro::draw_menu_options() {
