@@ -445,7 +445,11 @@ void Window::resize() {
 		GLattrSetter attr_aa(SDL_GL_ACCUM_ALPHA_SIZE, 0);
 		SDL_FreeSurface(screen);
 		#ifdef USE_EGL
-		screen = SDL_SetVideoMode(0, 0, 32, SDL_SWSURFACE);
+		std::cout << "Attempting SDL_SetVideoMode" << std::endl;
+		//screen = SDL_SetVideoMode(0, 0, 32, SDL_SWSURFACE);
+		screen = new SDL_Surface;
+		screen->w = s_width;
+		screen->h = s_height;
 		initEGL();
 		#else
 		screen = SDL_SetVideoMode(width, height, 0, SDL_OPENGL | (m_fullscreen ? SDL_FULLSCREEN : SDL_RESIZABLE));
