@@ -10,20 +10,22 @@ namespace input {
 				m_joysticks.push_back(JoyPtr(SDL_JoystickOpen(id), SDL_JoystickClose));
 			}
 		}
-		void process(boost::xtime const& now) {
-			// Init button state
-			for (size_t idx = 0; idx < m_joysticks.size(); ++idx) {
-				SDL_Joystick* joy = m_joysticks[idx].get();
-				unsigned num_buttons = SDL_JoystickNumButtons(joy);
-				for( unsigned i = 0; i < num_buttons; ++i) {
-					int state = SDL_JoystickGetButton(joy, i);
-					Event event;
-					event.source = SourceId(SOURCETYPE_JOYSTICK, idx);
-					event.hw = i;
-					event.value = state;
-					event.time = now;
-				}
+		bool process(Event& event, SDL_Event const& sdlEv) {
+			if (sdlEv.type == SDL_JOYBUTTONDOWN || sdlEv.type == SDL_JOYBUTTONUP) {
+				event.hw = sdlEv.jbutton.button;
+				event.value = (sdlEv.type == SDL_KEYDOWN ? 1.0 : 0.0);
 			}
+			else if (sdlEv.type == SDL_JOYAXISMOTION) {
+				event.hw = 0x100 + sdlEv.jaxis.axis;
+				event.value = sdlEv.jaxis.value / 32768.0;
+			}
+			else if (sdlEv.type == SDL_JOYHATMOTION) {
+				event.hw = 0x200 + sdlEv.jhat.hat;
+				event.value = sdlEv.jhat.value;  // FIXME: How should we handle this?
+			}
+			else return false;
+			event.source = SourceId(SOURCETYPE_JOYSTICK, sdlEv.jbutton.which);  // All j* structures have .which at the same position as jbutton
+			return true;
 		}
 		typedef boost::shared_ptr<SDL_Joystick> JoyPtr;
 		std::vector<JoyPtr> m_joysticks;
@@ -77,10 +79,6 @@ namespace input {
 
 // Controller event handling
 
-	switch(_e.type) {
-
-		case SDL_JOYBUTTONDOWN: return joybutton(event, _e, true);
-		case SDL_JOYBUTTONUP: return joybutton(event, _e, false);
 		case SDL_JOYAXISMOTION:
 		{
 			unsigned int joy_id = 0;
