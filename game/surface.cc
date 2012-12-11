@@ -144,9 +144,11 @@ namespace {
 		PixFormats() {
 			using namespace pix;
 			m[RGB] = PixFmt(GL_RGB, GL_UNSIGNED_BYTE, false);
-			m[BGR] = PixFmt(GL_BGR, GL_UNSIGNED_BYTE, true);
 			m[CHAR_RGBA] = PixFmt(GL_RGBA, GL_UNSIGNED_BYTE, false);
+			#ifndef USE_EGL
+			m[BGR] = PixFmt(GL_BGR, GL_UNSIGNED_BYTE, true);
 			m[INT_ARGB] = PixFmt(GL_BGRA, GL_UNSIGNED_INT_8_8_8_8, true);
+			#endif
 		}
 	} pixFormats;
 	PixFmt const& getPixFmt(pix::Format format) {
@@ -168,7 +170,9 @@ void Texture::load(Bitmap const& bitmap) {
 	// The texture wraps over at the edges (repeat)
 	glTexParameterf(type(), GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameterf(type(), GL_TEXTURE_WRAP_T, GL_REPEAT);
+	#ifndef USE_EGL
 	glTexParameterf(type(), GL_TEXTURE_MAX_LEVEL, GLEW_VERSION_3_0 ? 4 : 0);  // Mipmaps currently b0rked on Intel, so disable them...
+	#endif
 	glerror.check("glTexParameterf");
 
 	// Anisotropy is potential trouble maker
@@ -176,7 +180,9 @@ void Texture::load(Bitmap const& bitmap) {
 	glerror.check("MAX_ANISOTROPY_EXT");
 
 	PixFmt const& f = getPixFmt(bitmap.fmt);
+	#ifndef USE_EGL
 	glPixelStorei(GL_UNPACK_SWAP_BYTES, f.swap);
+	#endif
 	// Load the data into texture
 	glTexImage2D(type(), 0, internalFormat(), bitmap.width, bitmap.height, 0, f.format, f.type, bitmap.data());
 	glGenerateMipmap(type());
@@ -190,7 +196,9 @@ void Surface::load(Bitmap const& bitmap) {
 	// Load the data into texture
 	UseTexture texture(m_texture);
 	PixFmt const& f = getPixFmt(bitmap.fmt);
+	#ifndef USE_EGL
 	glPixelStorei(GL_UNPACK_SWAP_BYTES, f.swap);
+	#endif
 	glTexImage2D(m_texture.type(), 0, internalFormat(), bitmap.width, bitmap.height, 0, f.format, f.type, bitmap.data());
 }
 

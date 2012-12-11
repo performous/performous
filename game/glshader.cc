@@ -54,7 +54,9 @@ Shader& Shader::compileFile(std::string const& filename) {
 	std::string ext = filename.substr(filename.size() - 5);
 	GLenum type;
 	if (ext == ".vert") type = GL_VERTEX_SHADER;
+	#ifndef USE_EGL
 	else if (ext == ".geom") type = GL_GEOMETRY_SHADER;
+	#endif
 	else if (ext == ".frag") type = GL_FRAGMENT_SHADER;
 	else throw std::logic_error("Unknown file extension on shader " + filename);
 	std::string srccode = loadFile(filename);

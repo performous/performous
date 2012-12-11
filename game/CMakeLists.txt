@@ -77,8 +77,11 @@ endif()
 
 if(ENABLE_EGL)
 	add_definitions("-DUSE_EGL")
-	# TODO: Should move to a Find-script
+	# TODO: Should move to Find-scripts and use the GL-variable
 	list(APPEND LIBS "GLESv2" "EGL")
+	set(GL "")
+else()
+	set(GL "GLEW" "OpenGL")
 endif()
 
 # Libraries
@@ -88,7 +91,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 list(APPEND LIBS ${Boost_LIBRARIES})
 
 # Find all the libs that don't require extra parameters
-foreach(lib ${OUR_LIBS} SDL PangoCairo LibRSVG LibXML++ GLEW AVFormat SWScale OpenGL Z Jpeg Png PortAudio)
+foreach(lib ${OUR_LIBS} SDL PangoCairo LibRSVG LibXML++ AVFormat SWScale ${GL} Z Jpeg Png PortAudio)
 	find_package(${lib} REQUIRED)
 	include_directories(${${lib}_INCLUDE_DIRS})
 	list(APPEND LIBS ${${lib}_LIBRARIES})

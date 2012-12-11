@@ -212,7 +212,9 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	resize();
 	SDL_ShowCursor(SDL_DISABLE);
 	SDL_EnableUNICODE(SDL_ENABLE);
+	#ifndef USE_EGL
 	if (glewInit() != GLEW_OK) throw std::runtime_error("Initializing GLEW failed (is your OpenGL broken?)");
+	#endif
 	// Dump some OpenGL info
 	std::clog << "video/info: GL_VENDOR:     " << glGetString(GL_VENDOR) << std::endl;
 	std::clog << "video/info: GL_VERSION:    " << glGetString(GL_VERSION) << std::endl;
@@ -386,8 +388,10 @@ void Window::view(unsigned num) {
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
 	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	#ifndef USE_EGL
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	glShadeModel(GL_SMOOTH);
+	#endif
 	glEnable(GL_BLEND);
 	if (GL_EXT_framebuffer_sRGB) glEnable(GL_FRAMEBUFFER_SRGB);
 	shader("color").bind();

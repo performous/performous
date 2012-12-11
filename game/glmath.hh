@@ -1,6 +1,6 @@
 #pragma once
 
-#include <GL/glew.h>
+#include "gl.hh"
 #include <algorithm>
 #include <cmath>
 #include <iomanip>

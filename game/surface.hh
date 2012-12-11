@@ -112,7 +112,9 @@ template <GLenum Type> class OpenGLTexture: boost::noncopyable {
 	static Shader& shader() {
 		switch (Type) {
 		case GL_TEXTURE_2D: return getShader("texture");
+		#ifndef USE_EGL
 		case GL_TEXTURE_RECTANGLE: return getShader("surface");
+		#endif
 		}
 		throw std::logic_error("Unknown texture type");
 	}

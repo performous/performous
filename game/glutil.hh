@@ -3,7 +3,6 @@
 
 #include "color.hh"
 #include "glmath.hh"
-#include <GL/glew.h>
 #include <string>
 #include <iostream>
 #include <vector>
@@ -34,14 +33,19 @@ namespace glutil {
 		}
 		static void reset() { glGetError(); }
 		static std::string msg(GLenum err) {
+			// Some are #ifdeffed out because they might not exist on GLES
 			switch(err) {
 				case GL_NO_ERROR: return std::string();
 				case GL_INVALID_ENUM: return "Invalid enum";
 				case GL_INVALID_VALUE: return "Invalid value";
 				case GL_INVALID_OPERATION: return "Invalid operation";
 				case GL_INVALID_FRAMEBUFFER_OPERATION: return "FBO is not complete";
+				#ifdef GL_STACK_OVERFLOW
 				case GL_STACK_OVERFLOW: return "Stack overflow";
+				#endif
+				#ifdef GL_STACK_UNDERFLOW
 				case GL_STACK_UNDERFLOW: return "Stack underflow";
+				#endif
 				case GL_OUT_OF_MEMORY: return "Out of memory";
 				default: return "Unknown error";
 			}
