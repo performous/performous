@@ -11,6 +11,9 @@
 #include <boost/date_time.hpp>
 #include <fstream>
 #include <SDL.h>
+#ifdef USE_RPI
+#include "bcm_host.h"
+#endif
 
 #ifndef GLEW_ARB_viewport_array
 # define GLEW_ARB_viewport_array GL_FALSE
@@ -72,6 +75,10 @@ unsigned int screenH() { return s_height; }
 
 Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(width), m_windowH(height), m_fullscreen(fs), screen() {
 	std::atexit(SDL_Quit);
+	#ifdef USE_RPI
+	bcm_host_init();
+	std::atexit(bcm_host_deinit);
+	#endif
 	if( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK) == -1 ) throw std::runtime_error("SDL_Init failed");
 	SDL_WM_SetCaption(PACKAGE " " VERSION, PACKAGE);
 	{
@@ -318,7 +325,11 @@ void Window::resize() {
 		GLattrSetter attr_ab(SDL_GL_ACCUM_BLUE_SIZE, 0);
 		GLattrSetter attr_aa(SDL_GL_ACCUM_ALPHA_SIZE, 0);
 		SDL_FreeSurface(screen);
+		#ifdef USE_EGL
+		screen = SDL_SetVideoMode(0, 0, 32, SDL_SWSURFACE);
+		#else
 		screen = SDL_SetVideoMode(width, height, 0, SDL_OPENGL | (m_fullscreen ? SDL_FULLSCREEN : SDL_RESIZABLE));
+		#endif
 		if (!screen) throw std::runtime_error(std::string("SDL_SetVideoMode failed: ") + SDL_GetError());
 	}
 	s_width = screen->w;
