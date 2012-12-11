@@ -14,6 +14,10 @@
 #ifdef USE_RPI
 #include "bcm_host.h"
 #endif
+#ifdef USE_EGL
+#include "EGL/egl.h"
+#include "EGL/eglext.h"
+#endif
 
 #ifndef GLEW_ARB_viewport_array
 # define GLEW_ARB_viewport_array GL_FALSE
@@ -68,10 +72,112 @@ namespace {
 	glmath::mat4 g_projection = glmath::mat4::identity();
 	glmath::mat4 g_modelview =  glmath::mat4::identity();
 
+	// FIXME: Move to header
+	#ifdef USE_RPI
+	static EGL_DISPMANX_WINDOW_T native_window;
+	#endif
+
+	#ifdef USE_EGL
+	static const EGLint egl_attributes[] = {
+		EGL_RED_SIZE, 8,
+		EGL_GREEN_SIZE, 8,
+		EGL_BLUE_SIZE, 8,
+		EGL_ALPHA_SIZE, 8,
+		EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+		EGL_NONE
+	};
+
+	static const EGLint egl_context_attributes[] = {
+		EGL_CONTEXT_CLIENT_VERSION, 2,
+		EGL_NONE
+	};
+	#endif
 }
 
 unsigned int screenW() { return s_width; }
 unsigned int screenH() { return s_height; }
+
+// FIXME: Window member?
+void initEGL() {
+#ifdef USE_EGL
+	int32_t success = 0;
+	EGLint num_config;
+	// FIXME: Move these to Window
+	EGLConfig config;
+	EGLDisplay display;
+	EGLSurface surface;
+	EGLContext context;
+
+	// Get an EGL display connection
+	display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+	if (display == EGL_NO_DISPLAY)
+		throw std::runtime_error("eglGetDisplay failed!");
+	glutil::GLErrorChecker glerror("initEGL");
+
+	if (!eglInitialize(display, NULL, NULL))
+		throw std::runtime_error("eglInitialize failed!");
+	glerror.check("eglInitialize");
+
+	// Get EGL frame buffer configuration
+	if (!eglChooseConfig(display, egl_attributes, &config, 1, &num_config))
+		throw std::runtime_error("eglChooseConfig failed!");
+	glerror.check("eglChooseConfig");
+
+	if (!eglBindAPI(EGL_OPENGL_ES_API))
+		throw std::runtime_error("eglBindAPI failed!");
+	glerror.check("eglBindAPI");
+
+	// Create the EGL rendering context
+	context = eglCreateContext(display, config, EGL_NO_CONTEXT, egl_context_attributes);
+	if (context == EGL_NO_CONTEXT)
+		throw std::runtime_error("eglCreateContext failed!");
+	glerror.check("eglCreateContext");
+
+	#ifdef USE_RPI
+	DISPMANX_ELEMENT_HANDLE_T dispman_element;
+	DISPMANX_DISPLAY_HANDLE_T dispman_display;
+	DISPMANX_UPDATE_HANDLE_T dispman_update;
+	VC_RECT_T dst_rect;
+	VC_RECT_T src_rect;
+
+	// Create EGL window surface
+	if (graphics_get_display_size(0 /* LCD */, &s_width, &s_height) < 0)
+		throw std::runtime_error("graphics_get_display_size failed!");
+
+	dst_rect.x = 0;
+	dst_rect.y = 0;
+	dst_rect.width = s_width;
+	dst_rect.height = s_height;
+
+	src_rect.x = 0;
+	src_rect.y = 0;
+	src_rect.width = s_width << 16;
+	src_rect.height = s_height << 16;
+
+	dispman_display = vc_dispmanx_display_open(0 /*LCD*/);
+	dispman_update = vc_dispmanx_update_start(0);
+	dispman_element = vc_dispmanx_element_add(dispman_update, dispman_display,
+		0 /*layer*/, &dst_rect, 0 /*src*/, &src_rect,
+		DISPMANX_PROTECTION_NONE, 0 /*alpha*/, 0 /*clamp*/, 0 /*transform*/);
+
+	native_window.element = dispman_element;
+	native_window.width = s_width;
+	native_window.height = s_height;
+	vc_dispmanx_update_submit_sync(dispman_update);
+	glerror.check("vc_dispmanx_update_submit_sync");
+	#endif // USE_RPI
+
+	surface = eglCreateWindowSurface(display, config, &native_window, NULL);
+	if (surface == EGL_NO_SURFACE)
+		throw std::runtime_error("eglCreateWindowSurface failed!");
+	glerror.check("eglCreateWindowSurface");
+
+	// Connect the context to the surface
+	if (!eglMakeCurrent(display, surface, surface, context))
+		throw std::runtime_error("eglMakeCurrent failed!");
+	glerror.check("eglMakeCurrent");
+#endif // USE_EGL
+}
 
 Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(width), m_windowH(height), m_fullscreen(fs), screen() {
 	std::atexit(SDL_Quit);
@@ -327,6 +433,7 @@ void Window::resize() {
 		SDL_FreeSurface(screen);
 		#ifdef USE_EGL
 		screen = SDL_SetVideoMode(0, 0, 32, SDL_SWSURFACE);
+		initEGL();
 		#else
 		screen = SDL_SetVideoMode(width, height, 0, SDL_OPENGL | (m_fullscreen ? SDL_FULLSCREEN : SDL_RESIZABLE));
 		#endif
