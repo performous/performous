@@ -67,13 +67,18 @@ set(SOURCES ${SOURCE_FILES} ${HEADER_FILES} ${RESOURCE_FILES})
 if(RASPBERRY_PI)
 	set(ENABLE_EGL ON)
 	add_definitions("-DUSE_RPI")
+	# TODO: Should move to a Find-script
 	include_directories("/opt/vc")
 	include_directories("/opt/vc/include")
 	include_directories("/opt/vc/include/interface/vcos/pthreads")
+	link_directories("/opt/vc/lib")
+	list(APPEND LIBS "bcm_host")
 endif()
 
 if(ENABLE_EGL)
 	add_definitions("-DUSE_EGL")
+	# TODO: Should move to a Find-script
+	list(APPEND LIBS "GLESv2" "EGL")
 endif()
 
 # Libraries
