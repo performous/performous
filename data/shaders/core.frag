@@ -1,5 +1,7 @@
+#ifndef GL_ES
 #version 120
 #extension GL_ARB_texture_rectangle : require
+#endif
 
 //DEFINES
 
@@ -18,10 +20,10 @@ varying vec3 lightDir;
 
 #ifdef ENABLE_TEXTURING
 varying vec4 texCoord;
-#if ENABLE_TEXTURING == 1
+#if ENABLE_TEXTURING == 1 && !defined(GL_ES)
 uniform sampler2DRect tex;
 #define TEXFUNC texture2DRect(tex, texCoord.st)
-#elif ENABLE_TEXTURING == 2
+#elif ENABLE_TEXTURING == 2 || defined(GL_ES)
 uniform sampler2D tex;
 #define TEXFUNC texture2D(tex, texCoord.st)
 #else
@@ -63,7 +65,7 @@ void main() {
 	vec3 refl = reflect(-l, n);
 	float spec = dot(refl, n);
 	if (power > 0.0) {
-		power *= pow(spec, 100);
+		power *= pow(spec, 100.0);
 		frag.rgb += vec3(power, power, power);
 	}
 #endif

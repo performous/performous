@@ -1,4 +1,6 @@
+#ifndef GL_ES
 #version 120
+#endif
 
 //DEFINES
 
