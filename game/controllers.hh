@@ -27,7 +27,7 @@ namespace input {
 		GENERIC_START = 0x101,
 		GENERIC_SELECT = 0x102,
 		// Button constants for each DevType
-		#define DEFINE_BUTTON(devtype, button, num) devtype##_##button = num,
+		#define DEFINE_BUTTON(devtype, button, num, nav) devtype##_##button = num,
 		#include "controllers-buttons.ii"
 	};
 

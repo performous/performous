@@ -5,7 +5,7 @@ namespace input {
 	public:
 		bool process(Event& event, SDL_Event const& sdlEv) {
 			if (sdlEv.type != SDL_KEYDOWN && sdlEv.type != SDL_KEYUP) return false;
-			event.source = SourceId(SOURCETYPE_KEYBOARD);
+			event.source = SourceId(SOURCETYPE_KEYBOARD, sdlEv.key.which);  // Device number .which is always zero with SDL 1.2 :(
 			event.hw = sdlEv.key.keysym.sym;
 			event.value = (sdlEv.type == SDL_KEYDOWN ? 1.0 : 0.0);
 			mapping(event);
@@ -66,7 +66,7 @@ namespace input {
 				default: return;
 			}
 			event.id = Button(button);
-			event.source.channel = event.devType;  // Each type gets its own unique SourceId
+			event.source.channel = event.devType;  // Each type gets its own unique SourceId channel
 		}
 		NavButton navigation(Event& event, SDL_Event const& sdlEv) {
 			unsigned k = event.hw;

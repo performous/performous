@@ -43,10 +43,13 @@ namespace {
 			tryGetAttribute(elem, "max", max);
 		}
 	};
-	NavButton navigation(Button b) {
-		switch (b) {
-			// TODO...
-		}
+	// Return a NavButton corresponding to an Event
+	NavButton navigation(Event const& ev) {
+		if (ev.navButton != input::NONE) return ev.navButton;
+		if (ev.source.type == SOURCETYPE_KEYBOARD) return input::NONE;  // No translation is needed for keyboard instruments
+		if (ev.devType == DEVTYPE_NONE) return input::NONE;
+		#define DEFINE_BUTTON(devtype, button, num, nav) if (ev.devType == DEVTYPE_##devtype && ev.id == devtype##_##button) return nav;
+		#include "controllers-buttons.ii"
 		return input::NONE;
 	}
 }
@@ -76,7 +79,7 @@ struct Controllers::Impl {
 	std::deque<NavEvent> m_navEvents;
 
 	Impl() {
-		#define DEFINE_BUTTON(devtype, button, num) m_buttons[DEVTYPE_##devtype][#button] = devtype##_##button;
+		#define DEFINE_BUTTON(devtype, button, num, nav) m_buttons[DEVTYPE_##devtype][#button] = devtype##_##button;
 		#include "controllers-buttons.ii"
 		readControllers(getDefaultConfig(fs::path("/config/controllers.xml")));
 		readControllers(getConfigDir() / "controllers.xml");
@@ -186,8 +189,8 @@ struct Controllers::Impl {
 		return false;
 	}
 	bool pushHWEvent(Event event) {
-		if (event.navButton == NONE && event.source.type != SOURCETYPE_KEYBOARD) event.navButton = navigation(event.id);
-		if (event.navButton != NONE && event.value != 0.0) {
+		event.navButton = navigation(event);
+		if (event.navButton != input::NONE && event.value != 0.0) {
 			NavEvent ne;
 			ne.source = event.source;
 			ne.button = event.navButton;
