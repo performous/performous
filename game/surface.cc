@@ -192,9 +192,10 @@ void Surface::load(Bitmap const& bitmap) {
 	PixFmt const& f = getPixFmt(bitmap.fmt);
 	glPixelStorei(GL_UNPACK_SWAP_BYTES, f.swap);
 	glTexImage2D(m_texture.type(), 0, internalFormat(), bitmap.width, bitmap.height, 0, f.format, f.type, bitmap.data());
+	glGenerateMipmap(m_texture.type());
 }
 
 void Surface::draw() const {
-	if (!empty()) m_texture.draw(dimensions, TexCoords(tex.x1 * m_width, tex.y1 * m_height, tex.x2 * m_width, tex.y2 * m_height));
+	if (!empty()) m_texture.draw(dimensions, TexCoords(tex.x1, tex.y1, tex.x2, tex.y2));
 }
 
