@@ -6,7 +6,7 @@
 namespace input {
 	struct Joysticks: public Hardware {
 		Joysticks() {
-			for (unsigned id = 0; id < SDL_NumJoysticks(); ++id) {
+			for (int id = 0; id < SDL_NumJoysticks(); ++id) {
 				m_joysticks.push_back(JoyPtr(SDL_JoystickOpen(id), SDL_JoystickClose));
 			}
 		}
@@ -16,11 +16,12 @@ namespace input {
 		bool process(Event& event, SDL_Event const& sdlEv) {
 			if (sdlEv.type == SDL_JOYBUTTONDOWN || sdlEv.type == SDL_JOYBUTTONUP) {
 				event.hw = sdlEv.jbutton.button;
-				event.value = (sdlEv.type == SDL_KEYDOWN ? 1.0 : 0.0);
+				event.value = (sdlEv.type == SDL_JOYBUTTONDOWN ? 1.0 : 0.0);
 			}
 			else if (sdlEv.type == SDL_JOYAXISMOTION) {
 				event.hw = 0x100 + sdlEv.jaxis.axis;
-				event.value = sdlEv.jaxis.value / 32768.0;
+				double val = sdlEv.jaxis.value;
+				event.value = val / (val > 0.0 ? 32767.0 : 32768.0);
 			}
 			else if (sdlEv.type == SDL_JOYHATMOTION) {
 				event.hw = 0x200 + sdlEv.jhat.hat;

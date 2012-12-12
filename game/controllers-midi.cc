@@ -12,17 +12,17 @@ namespace input {
 	public:
 		Midi() {
 			// TODO: pm::findDevice(true, config["game/midi_input"].s() not used
-			for (int devId = 0; devId < Pm_CountDevices(); ++devId) {
+			for (int dev = 0; dev < Pm_CountDevices(); ++dev) {
 				try {
-					m_streams.push_back(new pm::Input(devId));
+					m_streams.push_back(new pm::Input(dev));
 				} catch (std::runtime_error& e) {
 					std::clog << "controller-midi/warn: " << e.what() << std::endl;
 					m_streams.push_back(NULL);
 				}
 			}
 		}
-		std::string getName(unsigned device) const {
-			PmDeviceInfo const* info = Pm_GetDeviceInfo(device);
+		std::string getName(unsigned dev) const {
+			PmDeviceInfo const* info = Pm_GetDeviceInfo(dev);
 			return info->name;
 		}
 		bool process(Event& event) {

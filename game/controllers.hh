@@ -63,7 +63,7 @@ namespace input {
 		double value; ///< Zero for button release, up to 1.0 for press (e.g. velocity value), or axis value (-1.0 .. 1.0)
 		boost::xtime time; ///< When did the event occur
 		DevType devType; ///< Device type
-		Event(): source(), hw(), id(GENERIC_UNASSIGNED), value(), time(), devType() {}
+		Event(): source(), hw(), id(GENERIC_UNASSIGNED), navButton(input::NONE), value(), time(), devType() {}
 	};
 
 	/// EventHandler is a function called to process an event as soon as it arrives. Returns true if the event was accepted.

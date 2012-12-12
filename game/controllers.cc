@@ -60,8 +60,9 @@ namespace {
 			case SOURCETYPE_KEYBOARD: return os << "(keyboard " << source.device << " instrument " << source.channel << ")";
 			case SOURCETYPE_JOYSTICK: return os << "(joystick " << source.device << ")";
 			case SOURCETYPE_MIDI: return os << "(midi " << source.device << " channel " << source.channel << ")";
+			case SOURCETYPE_N: break;
 		}
-		return os << "(unknown SOURCETYPE)";
+		throw std::logic_error("Unknown SOURCETYPE in controllers.cc SourceId operator<<");
 	}
 }
 
@@ -77,14 +78,16 @@ struct ControllerDef {
 	MinMax<unsigned> deviceMinMax;
 	MinMax<unsigned> channelMinMax;
 	ButtonMapping mapping;
+	ControllerDef(): sourceType(), devType() {}
 	bool matches(Event const& ev, std::string const& devName) const {
 		if (ev.source.type != sourceType) return false;
 		if (!deviceMinMax.matches(ev.source.device)) return false;
 		if (!channelMinMax.matches(ev.source.channel)) return false;
-		if (!regex_search(devName, deviceRegex)) return false;
+		if (!deviceRegex.empty() && !regex_search(devName, deviceRegex)) return false;
 		return true;
 	}
 	void mapButton(Event& ev) const {
+		ev.devType = devType;
 		ButtonMapping::const_iterator it = mapping.find(ev.hw);
 		if (it == mapping.end()) return;
 		ev.id = it->second;
@@ -233,15 +236,15 @@ struct Controllers::Impl {
 		return def;
 	}
 	/// Handle an incoming hardware event
-	bool pushHWEvent(Event event) {
-		ControllerDef const* def = assign(event);
-		if (def) def->mapButton(event);
-		event.navButton = navigation(event);
-		if (event.navButton != input::NONE && event.value != 0.0) {
+	bool pushHWEvent(Event ev) {
+		ControllerDef const* def = assign(ev);
+		if (def) def->mapButton(ev);
+		ev.navButton = navigation(ev);
+		if (ev.navButton != input::NONE && ev.value != 0.0) {
 			NavEvent ne;
-			ne.source = event.source;
-			ne.button = event.navButton;
-			ne.time = event.time;
+			ne.source = ev.source;
+			ne.button = ev.navButton;
+			ne.time = ev.time;
 			m_navEvents.push_back(ne);
 		}
 		return true;
