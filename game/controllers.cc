@@ -77,11 +77,11 @@ struct ControllerDef {
 	MinMax<unsigned> deviceMinMax;
 	MinMax<unsigned> channelMinMax;
 	ButtonMapping mapping;
-	bool matches(Event const& ev) const {
+	bool matches(Event const& ev, std::string const& devName) const {
 		if (ev.source.type != sourceType) return false;
 		if (!deviceMinMax.matches(ev.source.device)) return false;
 		if (!channelMinMax.matches(ev.source.channel)) return false;
-		// TODO: deviceRegex matching (needs device name)
+		if (!regex_search(devName, deviceRegex)) return false;
 		return true;
 	}
 	void mapButton(Event& ev) const {
@@ -101,7 +101,8 @@ struct Controllers::Impl {
 	typedef std::map<SourceId, ControllerDef const*> Assignments;
 	Assignments m_assignments;
 	
-	std::vector<Hardware::ptr> m_hw;
+	typedef std::map<SourceType, Hardware::ptr> HW;
+	HW m_hw;
 	std::deque<NavEvent> m_navEvents;
 
 	Impl() {
@@ -109,9 +110,9 @@ struct Controllers::Impl {
 		#include "controllers-buttons.ii"
 		readControllers(getDefaultConfig(fs::path("/config/controllers.xml")));
 		readControllers(getConfigDir() / "controllers.xml");
-		m_hw.push_back(constructKeyboard());
-		m_hw.push_back(constructJoysticks());
-		if (Hardware::midiEnabled()) m_hw.push_back(constructMidi());
+		m_hw[SOURCETYPE_KEYBOARD] = constructKeyboard();
+		m_hw[SOURCETYPE_JOYSTICK] = constructJoysticks();
+		if (Hardware::midiEnabled()) m_hw[SOURCETYPE_MIDI] = constructMidi();
 	}
 	
 	void readControllers(fs::path const& file) {
@@ -199,21 +200,21 @@ struct Controllers::Impl {
 	bool pressed(SourceId const& source, Button button) { return false; }
 	/// Do internal event processing (poll for MIDI events etc)
 	void process(boost::xtime const& now) {
-		for (size_t i = 0; i < m_hw.size(); ++i) {
+		for (HW::iterator it = m_hw.begin(); it != m_hw.end(); ++it) {
 			while (true) {
 				Event event;
 				event.time = now;
-				if (!m_hw[i]->process(event)) break;
+				if (!it->second->process(event)) break;
 				pushHWEvent(event);
 			}
 		}
 	}
 	/// Handle an incoming SDL event
 	bool pushEvent(SDL_Event const& sdlEv, boost::xtime const& t) {
-		for (size_t i = 0; i < m_hw.size(); ++i) {
+		for (HW::iterator it = m_hw.begin(); it != m_hw.end(); ++it) {
 			Event event;
 			event.time = t;
-			if (m_hw[i]->process(event, sdlEv)) return pushHWEvent(event);
+			if (it->second->process(event, sdlEv)) return pushHWEvent(event);
 		}
 		return false;
 	}
@@ -223,9 +224,10 @@ struct Controllers::Impl {
 		std::pair<Assignments::iterator, bool> ret = m_assignments.insert(Assignments::value_type(event.source, NULL));
 		ControllerDef const*& def = ret.first->second;  // A reference to the value inside the map
 		if (!ret.second) return def;  // Source already assigned, just return it.
+		std::string devName = m_hw[event.source.type]->getName(event.source.device);
 		// Find a matching ControllerDef
 		for (ControllerDefs::const_iterator it = m_controllerDefs.begin(); it != m_controllerDefs.end() && !def; ++it) {
-			if (it->second.matches(event)) def = &it->second;
+			if (it->second.matches(event, devName)) def = &it->second;
 		}
 		std::clog << "controllers/info: Assigned " << event.source << " as " << (def ? def->name : "(none)") << std::endl;
 		return def;

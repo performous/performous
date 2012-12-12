@@ -95,6 +95,8 @@ namespace input {
 	public:
 		static bool midiEnabled();
 		virtual ~Hardware() {}
+		/// Get the name of a specific device of this type
+		virtual std::string getName(unsigned) const { return std::string(); }
 		/// Return an Event and true if any are available. The Event is pre-initialized with current time.
 		virtual bool process(Event&) { return false; }
 		/// Convert an SDL event into Event. The Event is pre-initialized with event's time. Returns false if SDL_Event was not handled.

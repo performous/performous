@@ -10,6 +10,9 @@ namespace input {
 				m_joysticks.push_back(JoyPtr(SDL_JoystickOpen(id), SDL_JoystickClose));
 			}
 		}
+		std::string getName(unsigned device) const {
+			return SDL_JoystickName(device);
+		}
 		bool process(Event& event, SDL_Event const& sdlEv) {
 			if (sdlEv.type == SDL_JOYBUTTONDOWN || sdlEv.type == SDL_JOYBUTTONUP) {
 				event.hw = sdlEv.jbutton.button;

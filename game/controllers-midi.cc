@@ -17,12 +17,18 @@ namespace input {
 					m_streams.push_back(new pm::Input(devId));
 				} catch (std::runtime_error& e) {
 					std::clog << "controller-midi/warn: " << e.what() << std::endl;
+					m_streams.push_back(NULL);
 				}
 			}
+		}
+		std::string getName(unsigned device) const {
+			PmDeviceInfo const* info = Pm_GetDeviceInfo(device);
+			return info->name;
 		}
 		bool process(Event& event) {
 			PmEvent ev;
 			for (size_t dev = 0; dev < m_streams.size(); ++dev) {
+				if (m_streams.is_null(dev)) continue;
 				if (Pm_Read(m_streams[dev], &ev, 1) != 1) continue;
 				unsigned char evnt = ev.message & 0xF0;
 				unsigned char note = ev.message >> 8;
@@ -39,7 +45,7 @@ namespace input {
 			return false;
 		}
 	private:
-		boost::ptr_vector<pm::Input> m_streams;
+		boost::ptr_vector<boost::nullable<pm::Input> > m_streams;
 	};
 
 	Hardware::ptr constructMidi() { return Hardware::ptr(new Midi()); }
