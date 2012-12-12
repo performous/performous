@@ -66,7 +66,7 @@ void ScreenAudioDevices::exit() { m_theme.reset(); }
 void ScreenAudioDevices::manageEvent(input::NavEvent const& event) {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	input::NavButton nav = event.button;
-	if (nav == input::NAV_CANCEL || nav == input::NAV_SELECT) sm->activateScreen("Intro");
+	if (nav == input::NAV_CANCEL) sm->activateScreen("Intro");
 	else if (nav == input::NAV_PAUSE) m_audio.togglePause();
 	else if (m_devs.empty()) return; // The rest work if there are any devices
 	else if (nav == input::NAV_START) { if (save()) sm->activateScreen("Intro"); }

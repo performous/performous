@@ -32,24 +32,15 @@ namespace {
 		}
 		return true;
 	}
-	template <typename Numeric> struct MinMax {
-		Numeric min, max;
-		MinMax():
-		  min(std::numeric_limits<Numeric>::min()),
-		  max(std::numeric_limits<Numeric>::max())
-		{}
-		void parseFrom(xmlpp::Element const& elem) {
-			tryGetAttribute(elem, "min", min);
-			tryGetAttribute(elem, "max", max);
-		}
-		bool matches(Numeric val) const { return val >= min && val <= max; }
-	};
+	template <typename Numeric> void parse(MinMax<Numeric>& range, xmlpp::Element const& elem) {
+		tryGetAttribute(elem, "min", range.min);
+		tryGetAttribute(elem, "max", range.max);
+	}
 	// Return a NavButton corresponding to an Event
 	NavButton navigation(Event const& ev) {
 		if (ev.navButton != NAV_NONE) return ev.navButton;
 		if (ev.source.type == SOURCETYPE_KEYBOARD) return NAV_NONE;  // No translation is needed for keyboard instruments
-		if (ev.devType == DEVTYPE_NONE) return NAV_NONE;
-		#define DEFINE_BUTTON(devtype, button, num, nav) if (ev.devType == DEVTYPE_##devtype && ev.id == devtype##_##button) return nav;
+		#define DEFINE_BUTTON(devtype, button, num, nav) if ((DEVTYPE_##devtype == DEVTYPE_GENERIC || ev.devType == DEVTYPE_##devtype) && ev.id == devtype##_##button) return nav;
 		#include "controllers-buttons.ii"
 		return NAV_NONE;
 	}
@@ -165,10 +156,10 @@ struct Controllers::Impl {
 				xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(*ns[0]);
 				std::string regex;
 				if (tryGetAttribute(elem, "regex", regex)) def.deviceRegex = regex;
-				def.deviceMinMax.parseFrom(elem);
+				parse(def.deviceMinMax, elem);
 			}
 			ns = elem.find("channel");
-			if (ns.size() == 1) def.channelMinMax.parseFrom(dynamic_cast<xmlpp::Element&>(*ns[0]));
+			if (ns.size() == 1) parse(def.channelMinMax, dynamic_cast<xmlpp::Element&>(*ns[0]));
 			// Read button mapping
 			ns = elem.find("mapping/button");
 			for (xmlpp::NodeSet::const_iterator nodeit2 = ns.begin(), end = ns.end(); nodeit2 != end; ++nodeit2) {
@@ -180,10 +171,8 @@ struct Controllers::Impl {
 				if (!map.empty()) {
 					boost::algorithm::to_upper(map);
 					boost::algorithm::replace_all(map, "-", "_");
-					NameToButton const& n2b = m_buttons[def.devType];
-					NameToButton::const_iterator mapit = n2b.find(map);
-					if (mapit == n2b.end()) throw XMLError(button_elem, map + ": Invalid value for map attribute");
-					button = mapit->second;
+					// Try getting button first from generic names, then device-specific
+					if (!buttonByName(DEVTYPE_GENERIC, map, button) && !buttonByName(def.devType, map, button)) throw XMLError(button_elem, map + ": Invalid value for map attribute");
 				}
 				def.mapping[hw] = button;
 			}
@@ -192,6 +181,13 @@ struct Controllers::Impl {
 			  << " definition: " << def.name << ": " << def.description << std::endl;
 			m_controllerDefs[def.name] = def;
 		}
+	}
+	bool buttonByName(DevType type, std::string const& name, Button& button) {
+		NameToButton const& n2b = m_buttons[type];
+		NameToButton::const_iterator it = n2b.find(name);
+		if (it == n2b.end()) return false;
+		button = it->second;
+		return true;
 	}
 	/// Return the next available navigation event from queue, if available
 	bool getNav(NavEvent& ev) {
@@ -237,13 +233,31 @@ struct Controllers::Impl {
 	}
 	/// Handle an incoming hardware event
 	bool pushHWEvent(Event ev) {
+		// Hack to handle directional controllers
+		if (ev.id == GENERIC_UNASSIGNED && hwIsHat.matches(ev.hw)) {
+			HWButton val = ev.value;
+			ev.id = GENERIC_UP; ev.value = !!(val & SDL_HAT_UP); pushHWEvent(ev);
+			ev.id = GENERIC_LEFT; ev.value = !!(val & SDL_HAT_LEFT); pushHWEvent(ev);
+			ev.id = GENERIC_RIGHT; ev.value = !!(val & SDL_HAT_RIGHT); pushHWEvent(ev);
+			ev.id = GENERIC_DOWN; ev.value = !!(val & SDL_HAT_DOWN); pushHWEvent(ev);
+			return true;
+		}
 		ControllerDef const* def = assign(ev);
 		if (def) def->mapButton(ev);
 		ev.navButton = navigation(ev);
+		// Emit nav event
 		if (ev.navButton != NAV_NONE && ev.value != 0.0) {
 			NavEvent ne;
 			ne.source = ev.source;
 			ne.button = ev.navButton;
+			// Menu navigation mapping
+			{
+				bool vertical = (ev.devType == DEVTYPE_GUITAR);
+				if (ne.button == NAV_UP) ne.menu = (vertical ? NAVMENU_A_PREV : NAVMENU_B_PREV);
+				else if (ne.button == NAV_DOWN) ne.menu = (vertical ? NAVMENU_A_NEXT : NAVMENU_B_NEXT);
+				else if (ne.button == NAV_LEFT) ne.menu = (vertical ? NAVMENU_B_PREV : NAVMENU_A_PREV);
+				else if (ne.button == NAV_RIGHT) ne.menu = (vertical ? NAVMENU_B_NEXT : NAVMENU_A_NEXT);
+			}
 			ne.time = ev.time;
 			m_navEvents.push_back(ne);
 		}
@@ -258,5 +272,4 @@ bool Controllers::getNav(NavEvent& ev) { return self->getNav(ev); }
 double Controllers::pressed(SourceId const& source, Button button) { return self->pressed(source, button); }
 void Controllers::process(boost::xtime const& now) { self->process(now); }
 bool Controllers::pushEvent(SDL_Event const& ev, boost::xtime const& t) { return self->pushEvent(ev, t); }
-
 

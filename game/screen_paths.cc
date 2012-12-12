@@ -47,7 +47,7 @@ void ScreenPaths::manageEvent(SDL_Event event) {
 
 void ScreenPaths::manageEvent(input::NavEvent const& ev) {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
-	if (ev.button == input::NAV_CANCEL || ev.button == input::NAV_SELECT) {
+	if (ev.button == input::NAV_CANCEL) {
 		if (m_txtinp.text.empty()) sm->activateScreen("Intro");
 		else m_txtinp.text.clear();
 	}

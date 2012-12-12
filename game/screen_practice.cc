@@ -39,7 +39,7 @@ void ScreenPractice::exit() {
 void ScreenPractice::manageEvent(input::NavEvent const& event) {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	input::NavButton nav = event.button;
-	if (nav == input::NAV_CANCEL || nav == input::NAV_START || nav == input::NAV_SELECT) sm->activateScreen("Intro");
+	if (nav == input::NAV_CANCEL || nav == input::NAV_START) sm->activateScreen("Intro");
 	else if (nav == input::NAV_PAUSE) m_audio.togglePause();
 }
 

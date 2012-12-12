@@ -19,13 +19,13 @@ namespace input {
 				event.value = (sdlEv.type == SDL_JOYBUTTONDOWN ? 1.0 : 0.0);
 			}
 			else if (sdlEv.type == SDL_JOYAXISMOTION) {
-				event.hw = 0x100 + sdlEv.jaxis.axis;
+				event.hw = hwIsAxis.min + sdlEv.jaxis.axis;
 				double val = sdlEv.jaxis.value;
 				event.value = val / (val > 0.0 ? 32767.0 : 32768.0);
 			}
 			else if (sdlEv.type == SDL_JOYHATMOTION) {
-				event.hw = 0x200 + sdlEv.jhat.hat;
-				event.value = sdlEv.jhat.value;  // FIXME: How should we handle this?
+				event.hw = hwIsHat.min + sdlEv.jhat.hat;
+				event.value = sdlEv.jhat.value;
 			}
 			else return false;
 			event.source = SourceId(SOURCETYPE_JOYSTICK, sdlEv.jbutton.which);  // All j* structures have .which at the same position as jbutton

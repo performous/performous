@@ -10,7 +10,7 @@ namespace input {
 			event.value = (sdlEv.type == SDL_KEYDOWN ? 1.0 : 0.0);
 			mapping(event);
 			event.navButton = navigation(event, sdlEv);
-			return event.devType != DEVTYPE_NONE || event.navButton != NAV_NONE;
+			return event.devType != DEVTYPE_GENERIC || event.navButton != NAV_NONE;
 		}
 		void mapping(Event& event) {
 			unsigned button = 0;

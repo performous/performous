@@ -11,7 +11,7 @@
 				<button hw="3" map="blue" />
 				<button hw="4" map="orange" />
 				<button hw="5" map="godmode" />
-				<button hw="8" map="select" />
+				<button hw="8" map="cancel" />
 				<button hw="9" map="start" />
 			</mapping>
 		</controller>
@@ -24,7 +24,7 @@
 				<button hw="2" map="red" />
 				<button hw="3" map="blue" />
 				<button hw="4" map="orange" />
-				<button hw="8" map="select" />
+				<button hw="8" map="cancel" />
 				<button hw="9" map="start" />
 			</mapping>
 		</controller>
@@ -37,7 +37,7 @@
 				<button hw="2" map="blue" />
 				<button hw="3" map="yellow" />
 				<button hw="4" map="orange" />
-				<button hw="6" map="select" />
+				<button hw="6" map="cancel" />
 				<button hw="7" map="start" />
 			</mapping>
 		</controller>
@@ -50,7 +50,7 @@
 				<button hw="2" map="blue" />
 				<button hw="3" map="yellow" />
 				<button hw="4" map="orange" />
-				<button hw="6" map="select" />
+				<button hw="6" map="cancel" />
 				<button hw="7" map="start" />
 			</mapping>
 		</controller>
@@ -63,7 +63,7 @@
 				<button hw="2" map="blue" />
 				<button hw="3" map="yellow" />
 				<button hw="4" map="orange" />
-				<button hw="10" map="select" />
+				<button hw="10" map="cancel" />
 				<button hw="6" map="start" />
 				<axis hw="4" range="-32768" map="godmode" />
 				<axis hw="3" range="-32768:32767" map="whammy" />
@@ -79,7 +79,7 @@
 				<button hw="3" map="yellow" />
 				<button hw="4" map="orange" />
 				<button hw="5" map="godmode" />
-				<button hw="8" map="select" />
+				<button hw="8" map="cancel" />
 				<button hw="9" map="start" />
 			</mapping>
 		</controller>
@@ -93,7 +93,7 @@
 				<button hw="3" map="orange" />
 				<button hw="4" map="godmode" />
 				<button hw="5" map="green" />
-				<button hw="8" map="select" />
+				<button hw="8" map="cancel" />
 				<button hw="9" map="start" />
 			</mapping>
 		</controller>
@@ -115,7 +115,7 @@
 				<button hw="3" map="yellow" />
 				<button hw="4" map="kick" />
 				<button hw="5" map="green" />
-				<button hw="8" map="select" />
+				<button hw="8" map="cancel" />
 				<button hw="9" map="start" />
 			</mapping>
 		</controller>
@@ -129,7 +129,7 @@
 				<button hw="3" map="yellow" />
 				<button hw="4" map="kick" />
 				<button hw="5" map="green" />
-				<button hw="8" map="select" />
+				<button hw="8" map="cancel" />
 				<button hw="9" map="start" />
 			</mapping>
 		</controller>
@@ -142,7 +142,7 @@
 				<button hw="2" map="red" />
 				<button hw="3" map="yellow" />
 				<button hw="4" map="kick" />
-				<button hw="8" map="select" />
+				<button hw="8" map="cancel" />
 				<button hw="9" map="start" />
 			</mapping>
 		</controller>
@@ -155,7 +155,7 @@
 				<button hw="2" map="red" />
 				<button hw="3" map="yellow" />
 				<button hw="4" map="kick" />
-				<button hw="8" map="select" />
+				<button hw="8" map="cancel" />
 				<button hw="9" map="start" />
 			</mapping>
 		</controller>
@@ -168,7 +168,7 @@
 				<button hw="2" map="blue" />
 				<button hw="3" map="yellow" />
 				<button hw="4" map="kick" />
-				<button hw="6" map="select" />
+				<button hw="6" map="cancel" />
 				<button hw="7" map="start" />
 			</mapping>
 		</controller>
@@ -185,7 +185,7 @@
 				<button hw="6" map="down-left" />
 				<button hw="7" map="down-right" />
 				<button hw="8" map="start" />
-				<button hw="9" map="select" />
+				<button hw="9" map="cancel" />
 			</mapping>
 		</controller>
 		<controller type="dancepad" name="DANCEPAD_TIGERGAME">
@@ -193,7 +193,7 @@
 			<device regex="TigerGame" />
 			<mapping>
 				<button hw="0" map="start" />
-				<button hw="1" map="select" />
+				<button hw="1" map="cancel" />
 				<button hw="8" map="left" />
 				<button hw="9" map="right" />
 				<button hw="10" map="down" />
@@ -209,7 +209,7 @@
 				<button hw="2" map="up-left" />
 				<button hw="3" map="down-right" />
 				<button hw="8" map="start" />
-				<button hw="9" map="select" />
+				<button hw="9" map="cancel" />
 				<button hw="12" map="up" />
 				<button hw="13" map="right" />
 				<button hw="14" map="down" />
@@ -228,7 +228,7 @@
 				<button hw="5" map="up-right" />
 				<button hw="6" map="down-left" />
 				<button hw="7" map="down-right" />
-				<button hw="8" map="select" />
+				<button hw="8" map="cancel" />
 				<button hw="9" map="start" />
 			</mapping>
 		</controller>
@@ -245,7 +245,7 @@
 				<button hw="6" map="down-left" />
 				<button hw="7" map="down-right" />
 				<button hw="8" map="start" />
-				<button hw="9" map="select" />
+				<button hw="9" map="cancel" />
 			</mapping>
 		</controller>
 		<controller type="keytar" name="KEYTAR_GENERIC">

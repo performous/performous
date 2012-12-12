@@ -11,27 +11,27 @@
 
 #include "SDL_events.h"
 
+#include "util.hh"
 #include "xtime.hh"
 #include "configuration.hh"
 
 namespace input {
 	enum SourceType { SOURCETYPE_NONE, SOURCETYPE_JOYSTICK, SOURCETYPE_MIDI, SOURCETYPE_KEYBOARD, SOURCETYPE_N };
-	enum DevType { DEVTYPE_NONE, DEVTYPE_GUITAR, DEVTYPE_DRUMS, DEVTYPE_KEYTAR, DEVTYPE_PIANO, DEVTYPE_DANCEPAD, DEVTYPE_N };
+	enum DevType { DEVTYPE_GENERIC, DEVTYPE_GUITAR, DEVTYPE_DRUMS, DEVTYPE_KEYTAR, DEVTYPE_PIANO, DEVTYPE_DANCEPAD, DEVTYPE_N };
 	/// Generalized mapping of navigation actions
-	enum NavButton { NAV_NONE, NAV_UP, NAV_DOWN, NAV_LEFT, NAV_RIGHT, NAV_START, NAV_SELECT, NAV_CANCEL, NAV_PAUSE, NAV_MOREUP, NAV_MOREDOWN, NAV_VOLUME_UP, NAV_VOLUME_DOWN };
-	/// Alternative orientation-agnostic mapping where PRIMARY axis is the one that is easiest to access (e.g. guitar pick) and SECONDARY might not be available on all devices
-	enum NavMenu { NAVMENU_NONE, NAVMENU_PRIMARY_PREV, NAVMENU_PRIMARY_NEXT, NAVMENU_SECONDARY_PREV, NAVMENU_SECONDARY_NEXT };
+	enum NavButton { NAV_NONE, NAV_UP, NAV_DOWN, NAV_LEFT, NAV_RIGHT, NAV_START, NAV_CANCEL, NAV_PAUSE, NAV_MOREUP, NAV_MOREDOWN, NAV_VOLUME_UP, NAV_VOLUME_DOWN };
+	/// Alternative orientation-agnostic mapping where A axis is the one that is easiest to access (e.g. guitar pick) and B might not be available on all devices
+	enum NavMenu { NAVMENU_NONE, NAVMENU_A_PREV, NAVMENU_A_NEXT, NAVMENU_B_PREV, NAVMENU_B_NEXT };
 
 	enum Button {
-		GENERIC_UNASSIGNED = 0x100,  // Listed in controllers.xml but not used for any function
-		GENERIC_START = 0x101,
-		GENERIC_SELECT = 0x102,
 		// Button constants for each DevType
 		#define DEFINE_BUTTON(devtype, button, num, nav) devtype##_##button = num,
 		#include "controllers-buttons.ii"
 	};
 
 	typedef unsigned HWButton;
+	static const MinMax<HWButton> hwIsAxis(0x10000000u, 0x1000FFFFu);
+	static const MinMax<HWButton> hwIsHat(0x11000000u, 0x1100FFFFu);
 	
 	/// Each controller has unique SourceId that can be used for telling players apart etc.
 	struct SourceId {
