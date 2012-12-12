@@ -207,7 +207,9 @@ void Surface::load(Bitmap const& bitmap) {
 	// The texture wraps over at the edges (repeat)
 	glTexParameterf(m_texture.type(), GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameterf(m_texture.type(), GL_TEXTURE_WRAP_T, GL_REPEAT);
+	#ifndef USE_EGL
 	glTexParameterf(m_texture.type(), GL_TEXTURE_MAX_LEVEL, GLEW_VERSION_3_0 ? 4 : 0);  // Mipmaps currently b0rked on Intel, so disable them...
+	#endif
 	glerror.check("glTexParameterf");
 
 	// Load the data into texture
