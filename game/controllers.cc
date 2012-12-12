@@ -242,6 +242,9 @@ struct Controllers::Impl {
 			ev.id = GENERIC_DOWN; ev.value = !!(val & SDL_HAT_DOWN); pushHWEvent(ev);
 			return true;
 		}
+		if (hwIsAxis.matches(ev.hw)) {
+			unsigned axis = ev.hw - hwIsAxis.min;
+		}
 		ControllerDef const* def = assign(ev);
 		if (def) def->mapButton(ev);
 		ev.navButton = navigation(ev);

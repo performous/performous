@@ -13,6 +13,9 @@
 				<button hw="5" map="godmode" />
 				<button hw="8" map="cancel" />
 				<button hw="9" map="start" />
+				<axis hw="2" positive="whammy" />
+				<axis hw="4" negative="left" positive="right" />
+				<axis hw="5" negative="up" positive="down" />
 			</mapping>
 		</controller>
 		<controller type="guitar" name="GUITAR_GUITARHERO5">
@@ -26,6 +29,9 @@
 				<button hw="4" map="orange" />
 				<button hw="8" map="cancel" />
 				<button hw="9" map="start" />
+				<axis hw="2" positive="whammy" />
+				<axis hw="4" negative="left" positive="right" />
+				<axis hw="5" negative="up" positive="down" />
 			</mapping>
 		</controller>
 		<controller type="guitar" name="GUITAR_GUITARHERO_XPLORER">
@@ -39,6 +45,11 @@
 				<button hw="4" map="orange" />
 				<button hw="6" map="cancel" />
 				<button hw="7" map="start" />
+				<axis hw="1" negative="pick_up" positive="pick_down"/>
+				<axis hw="2" map="whammy" />
+				<axis hw="3" map="godmode"/>
+				<axis hw="4" negative="left" positive="right" />
+				<axis hw="5" negative="up" positive="down" />
 			</mapping>
 		</controller>
 		<controller type="guitar" name="GUITAR_ROCKBAND_XBOX360">
@@ -52,6 +63,8 @@
 				<button hw="4" map="orange" />
 				<button hw="6" map="cancel" />
 				<button hw="7" map="start" />
+				<axis hw="3" negative="godmode"/>
+				<axis hw="4" map="whammy"/>
 			</mapping>
 		</controller>
 		<controller type="guitar" name="GUITAR_ROCKBAND_XBOXADAPTER">
@@ -65,8 +78,8 @@
 				<button hw="4" map="orange" />
 				<button hw="10" map="cancel" />
 				<button hw="6" map="start" />
-				<axis hw="4" range="-32768" map="godmode" />
-				<axis hw="3" range="-32768:32767" map="whammy" />
+				<axis hw="4" map="godmode" />
+				<axis hw="3" map="whammy" />
 			</mapping>
 		</controller>
 		<controller type="guitar" name="GUITAR_ROCKBAND_PS3">
@@ -81,6 +94,9 @@
 				<button hw="5" map="godmode" />
 				<button hw="8" map="cancel" />
 				<button hw="9" map="start" />
+				<axis hw="2" map="whammy" /><!-- -1 (fully released) to 1 (fully pressed) but resets to 0 after a while when fully released -->
+				<axis hw="4" negative="left" positive="right" />
+				<axis hw="5" negative="up" positive="down" />
 			</mapping>
 		</controller>
 		<controller type="guitar" name="GUITAR_HAMA_PS2">
@@ -95,6 +111,8 @@
 				<button hw="5" map="green" />
 				<button hw="8" map="cancel" />
 				<button hw="9" map="start" />
+				<axis hw="4" negative="left" positive="right" />
+				<axis hw="5" negative="up" positive="down" />
 			</mapping>
 		</controller>
 		<!-- Not managed
@@ -106,7 +124,7 @@
 		</controller>
 		-->
 		<controller type="drumkit" name="DRUMS_GUITARHERO">
-			<description>Guitar Hero 4 drum kit (guessed, could be a guitar)</description>
+			<description>Guitar Hero 4 drum kit</description>
 			<device regex="Guitar Hero4" />
 			<mapping>
 				<button hw="0" map="blue" />
@@ -117,6 +135,8 @@
 				<button hw="5" map="green" />
 				<button hw="8" map="cancel" />
 				<button hw="9" map="start" />
+				<axis hw="4" negative="left" positive="right" />
+				<axis hw="5" negative="up" positive="down" />
 			</mapping>
 		</controller>
 		<controller type="drumkit" name="DRUMS_GUITARHERO5">
@@ -131,6 +151,8 @@
 				<button hw="5" map="green" />
 				<button hw="8" map="cancel" />
 				<button hw="9" map="start" />
+				<axis hw="4" negative="left" positive="right" />
+				<axis hw="5" negative="up" positive="down" />
 			</mapping>
 		</controller>
 		<controller type="drumkit" name="DRUMS_ROCKBAND_WII">
@@ -157,6 +179,8 @@
 				<button hw="4" map="kick" />
 				<button hw="8" map="cancel" />
 				<button hw="9" map="start" />
+				<axis hw="4" negative="left" positive="right" />
+				<axis hw="5" negative="up" positive="down" />
 			</mapping>
 		</controller>
 		<controller type="drumkit" name="DRUMS_ROCKBAND_XBOX360">
@@ -258,6 +282,8 @@
 				<button hw="3" map="F" />
 				<button hw="4" map="G" />
 				<button hw="5" map="godmode" />
+				<axis hw="4" negative="left" positive="right" />
+				<axis hw="5" negative="up" positive="down" />
 			</mapping>
 		</controller>
 	</joystick>
