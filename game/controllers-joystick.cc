@@ -48,35 +48,35 @@ namespace input {
 	} else if (e.type == SDL_JOYBUTTONDOWN) {
 		// Joystick buttons
 		unsigned int joy_id = e.jbutton.which;
-		input::detail::InputDevPrivate devt = input::detail::devices.find(joy_id)->second;
+		detail::InputDevPrivate devt = detail::devices.find(joy_id)->second;
 		int b = devt.buttonFromSDL(e.jbutton.button);
-		if (b == -1) return input::NONE;
-		else if (b == 8) return input::CANCEL;
-		else if (b == 9) return input::START;
+		if (b == -1) return NAV_NONE;
+		else if (b == 8) return NAV_CANCEL;
+		else if (b == 9) return NAV_START;
 	} else if (e.type == SDL_JOYAXISMOTION) {
 		// Axis motion
 		int axis = e.jaxis.axis;
 		int value = e.jaxis.value;
-		if (axis == 4 && value > 0) return input::RIGHT;
-		else if (axis == 4 && value < 0) return input::LEFT;
-		else if (axis == 5 && value > 0) return input::DOWN;
-		else if (axis == 5 && value < 0) return input::UP;
+		if (axis == 4 && value > 0) return NAV_RIGHT;
+		else if (axis == 4 && value < 0) return NAV_LEFT;
+		else if (axis == 5 && value > 0) return NAV_DOWN;
+		else if (axis == 5 && value < 0) return NAV_UP;
 	} else if (e.type == SDL_JOYHATMOTION) {
 		// Hat motion
 		int dir = e.jhat.value;
 		// HACK: We probably wan't the guitar strum to scroll songs
 		// and main menu items, but they have different orientation.
 		// These are switched so it works for now (menu scrolls also on left/right).
-		if (input::detail::devices.find(e.jhat.which)->second.type_match(input::GUITAR)) {
-			if (dir == SDL_HAT_UP) return input::LEFT;
-			else if (dir == SDL_HAT_DOWN) return input::RIGHT;
-			else if (dir == SDL_HAT_LEFT) return input::UP;
-			else if (dir == SDL_HAT_RIGHT) return input::DOWN;
+		if (detail::devices.find(e.jhat.which)->second.type_match(GUITAR)) {
+			if (dir == SDL_HAT_UP) return NAV_LEFT;
+			else if (dir == SDL_HAT_DOWN) return NAV_RIGHT;
+			else if (dir == SDL_HAT_LEFT) return NAV_UP;
+			else if (dir == SDL_HAT_RIGHT) return NAV_DOWN;
 		} else {
-			if (dir == SDL_HAT_UP) return input::UP;
-			else if (dir == SDL_HAT_DOWN) return input::DOWN;
-			else if (dir == SDL_HAT_LEFT) return input::LEFT;
-			else if (dir == SDL_HAT_RIGHT) return input::RIGHT;
+			if (dir == SDL_HAT_UP) return NAV_UP;
+			else if (dir == SDL_HAT_DOWN) return NAV_DOWN;
+			else if (dir == SDL_HAT_LEFT) return NAV_LEFT;
+			else if (dir == SDL_HAT_RIGHT) return NAV_RIGHT;
 		}
 	}
 
@@ -92,7 +92,7 @@ namespace input {
 			InputDevPrivate& dev = devices.find(joy_id)->second;
 			if(!dev.assigned()) return false;
 			if (dev.name() != "GUITAR_GUITARHERO_XPLORER" && (_e.jaxis.axis == 5 || _e.jaxis.axis == 6 || _e.jaxis.axis == 1)) {
-				event.type = input::Event::PICK;
+				event.type = Event::PICK;
 				// Direction
 				event.button = (_e.jaxis.value > 0 ? 0 /* down */: 1 /* up */);
 				dev.addEvent(event);
@@ -102,8 +102,8 @@ namespace input {
 			  || (dev.name() == "GUITAR_ROCKBAND_XBOXADAPTER" && _e.jaxis.axis == 3))
 			{
 				// Whammy bar (special case for XBox RB guitar
-				event.button = input::WHAMMY_BUTTON;
-				event.type = input::Event::PRESS;
+				event.button = WHAMMY_BUTTON;
+				event.type = Event::PRESS;
 				event.pressed[event.button] = (_e.jaxis.value > 0);
 				dev.addEvent(event);
 				return true;
@@ -112,12 +112,12 @@ namespace input {
 			  || (dev.name() == "GUITAR_ROCKBAND_XBOXADAPTER" && _e.jaxis.axis ==4))
 			{
 				// Tilt sensor as an axis on some guitars
-				event.button = input::GODMODE_BUTTON;
+				event.button = GODMODE_BUTTON;
 				if (_e.jaxis.value < -2) {
-					event.type = input::Event::PRESS;
+					event.type = Event::PRESS;
 					event.pressed[event.button] = true;
 				} else {
-					event.type = input::Event::RELEASE;
+					event.type = Event::RELEASE;
 					event.pressed[event.button] = false;
 				}
 				dev.addEvent(event);
@@ -130,7 +130,7 @@ namespace input {
 			unsigned int joy_id = _e.jhat.which;
 
 			if(!devices.find(joy_id)->second.assigned()) return false;
-			event.type = input::Event::PICK;
+			event.type = Event::PICK;
 			for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
 				event.pressed[i] = devices.find(joy_id)->second.pressed(i);
 			}

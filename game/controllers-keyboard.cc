@@ -10,7 +10,7 @@ namespace input {
 			event.value = (sdlEv.type == SDL_KEYDOWN ? 1.0 : 0.0);
 			mapping(event);
 			event.navButton = navigation(event, sdlEv);
-			return event.devType != DEVTYPE_NONE || event.navButton != NONE;
+			return event.devType != DEVTYPE_NONE || event.navButton != NAV_NONE;
 		}
 		void mapping(Event& event) {
 			unsigned button = 0;
@@ -71,16 +71,16 @@ namespace input {
 		NavButton navigation(Event& event, SDL_Event const& sdlEv) {
 			unsigned k = event.hw;
 			SDLMod mod = sdlEv.key.keysym.mod;
-			if (k == SDLK_UP) return mod & KMOD_CTRL ? input::VOLUME_UP : input::UP;
-			if (k == SDLK_DOWN) return mod & KMOD_CTRL ? input::VOLUME_DOWN : input::DOWN;
-			if (k == SDLK_LEFT) return input::LEFT;
-			if (k == SDLK_RIGHT) return input::RIGHT;
-			if (k == SDLK_RETURN || k == SDLK_KP_ENTER) return input::START;
-			if (k == SDLK_ESCAPE) return input::CANCEL;
-			if (k == SDLK_PAGEUP) return input::MOREUP;
-			if (k == SDLK_PAGEDOWN) return input::MOREDOWN;
-			if (k == SDLK_PAUSE || (k == SDLK_p && mod & KMOD_CTRL)) return input::PAUSE;
-			return input::NONE;
+			if (k == SDLK_UP) return mod & KMOD_CTRL ? NAV_VOLUME_UP : NAV_UP;
+			if (k == SDLK_DOWN) return mod & KMOD_CTRL ? NAV_VOLUME_DOWN : NAV_DOWN;
+			if (k == SDLK_LEFT) return NAV_LEFT;
+			if (k == SDLK_RIGHT) return NAV_RIGHT;
+			if (k == SDLK_RETURN || k == SDLK_KP_ENTER) return NAV_START;
+			if (k == SDLK_ESCAPE) return NAV_CANCEL;
+			if (k == SDLK_PAGEUP) return NAV_MOREUP;
+			if (k == SDLK_PAGEDOWN) return NAV_MOREDOWN;
+			if (k == SDLK_PAUSE || (k == SDLK_p && mod & KMOD_CTRL)) return NAV_PAUSE;
+			return NAV_NONE;
 		}
 	};
 

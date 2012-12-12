@@ -18,9 +18,9 @@ namespace input {
 	enum SourceType { SOURCETYPE_NONE, SOURCETYPE_JOYSTICK, SOURCETYPE_MIDI, SOURCETYPE_KEYBOARD, SOURCETYPE_N };
 	enum DevType { DEVTYPE_NONE, DEVTYPE_GUITAR, DEVTYPE_DRUMS, DEVTYPE_KEYTAR, DEVTYPE_PIANO, DEVTYPE_DANCEPAD, DEVTYPE_N };
 	/// Generalized mapping of navigation actions
-	enum NavButton { NONE, UP, DOWN, LEFT, RIGHT, START, SELECT, CANCEL, PAUSE, MOREUP, MOREDOWN, VOLUME_UP, VOLUME_DOWN };
+	enum NavButton { NAV_NONE, NAV_UP, NAV_DOWN, NAV_LEFT, NAV_RIGHT, NAV_START, NAV_SELECT, NAV_CANCEL, NAV_PAUSE, NAV_MOREUP, NAV_MOREDOWN, NAV_VOLUME_UP, NAV_VOLUME_DOWN };
 	/// Alternative orientation-agnostic mapping where PRIMARY axis is the one that is easiest to access (e.g. guitar pick) and SECONDARY might not be available on all devices
-	enum NavMenu { NO_MENUNAV, PRIMARY_PREV, PRIMARY_NEXT, SECONDARY_PREV, SECONDARY_NEXT };
+	enum NavMenu { NAVMENU_NONE, NAVMENU_PRIMARY_PREV, NAVMENU_PRIMARY_NEXT, NAVMENU_SECONDARY_PREV, NAVMENU_SECONDARY_NEXT };
 
 	enum Button {
 		GENERIC_UNASSIGNED = 0x100,  // Listed in controllers.xml but not used for any function
@@ -63,7 +63,7 @@ namespace input {
 		double value; ///< Zero for button release, up to 1.0 for press (e.g. velocity value), or axis value (-1.0 .. 1.0)
 		boost::xtime time; ///< When did the event occur
 		DevType devType; ///< Device type
-		Event(): source(), hw(), id(GENERIC_UNASSIGNED), navButton(input::NONE), value(), time(), devType() {}
+		Event(): source(), hw(), id(GENERIC_UNASSIGNED), navButton(NAV_NONE), value(), time(), devType() {}
 	};
 
 	/// EventHandler is a function called to process an event as soon as it arrives. Returns true if the event was accepted.

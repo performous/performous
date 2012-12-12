@@ -49,10 +49,10 @@ void ScreenPlayers::exit() {
 void ScreenPlayers::manageEvent(input::NavEvent const& event) {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	input::NavButton nav = event.button;
-	if (nav == input::CANCEL) {
+	if (nav == input::NAV_CANCEL) {
 		if (m_search.text.empty()) { sm->activateScreen("Songs"); return; }
 		else { m_search.text.clear(); m_players.setFilter(m_search.text); }
-	} else if (nav == input::START) {
+	} else if (nav == input::NAV_START) {
 		if (m_players.empty()) {
 			m_players.addPlayer(m_search.text);
 			m_players.setFilter(m_search.text);
@@ -73,13 +73,13 @@ void ScreenPlayers::manageEvent(input::NavEvent const& event) {
 		}
 	}
 	else if (m_players.empty()) return;
-	else if (nav == input::PAUSE) m_audio.togglePause();
-	else if (nav == input::LEFT) m_players.advance(-1);
-	else if (nav == input::RIGHT) m_players.advance(1);
-	else if (nav == input::UP) m_players.advance(-1);
-	else if (nav == input::DOWN) m_players.advance(1);
-	else if (nav == input::MOREUP) m_players.advance(-10);
-	else if (nav == input::MOREDOWN) m_players.advance(10);
+	else if (nav == input::NAV_PAUSE) m_audio.togglePause();
+	else if (nav == input::NAV_LEFT) m_players.advance(-1);
+	else if (nav == input::NAV_RIGHT) m_players.advance(1);
+	else if (nav == input::NAV_UP) m_players.advance(-1);
+	else if (nav == input::NAV_DOWN) m_players.advance(1);
+	else if (nav == input::NAV_MOREUP) m_players.advance(-10);
+	else if (nav == input::NAV_MOREDOWN) m_players.advance(10);
 }
 
 void ScreenPlayers::manageEvent(SDL_Event event) {

@@ -299,34 +299,34 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 	Song::Status status = m_song->status(time);
 	// When score window is displayed
 	if (m_score_window.get()) {
-		if (nav == input::START || nav == input::CANCEL) activateNextScreen();
+		if (nav == input::NAV_START || nav == input::NAV_CANCEL) activateNextScreen();
 		return;  // The rest are only available when score window is not displayed
 	}
 	// Instant quit with CANCEL at the very beginning
-	if (nav == input::CANCEL && time < 1.0) {
+	if (nav == input::NAV_CANCEL && time < 1.0) {
 		ScreenManager::getSingletonPtr()->activateScreen("Songs");
 		return;
 	}
 	// Esc-key needs special handling, it is global pause
-	if ((nav == input::PAUSE /* FIXME || (event.type == SDL_KEYDOWN && key == SDLK_ESCAPE)*/)
+	if ((nav == input::NAV_PAUSE /* FIXME || (event.type == SDL_KEYDOWN && key == SDLK_ESCAPE)*/)
 	  && !m_audio.isPaused() && !m_menu.isOpen()) {
 		m_menu.open();
 		m_audio.togglePause();
 	}
 	// Global/singer pause menu navigation
 	if (m_menu.isOpen()) {
-		if (nav == input::START) {
+		if (nav == input::NAV_START) {
 			m_menu.action();
 			if (!m_menu.isOpen() && m_audio.isPaused()) m_audio.togglePause();
 			return;
 		}
-		else if (nav == input::LEFT) { m_menu.action(-1); return; }
-		else if (nav == input::RIGHT) { m_menu.action(1); return; }
-		else if (nav == input::DOWN) { m_menu.move(1); return; }
-		else if (nav == input::UP) { m_menu.move(-1); return; }
+		else if (nav == input::NAV_LEFT) { m_menu.action(-1); return; }
+		else if (nav == input::NAV_RIGHT) { m_menu.action(1); return; }
+		else if (nav == input::NAV_DOWN) { m_menu.move(1); return; }
+		else if (nav == input::NAV_UP) { m_menu.move(-1); return; }
 	}
 	// Start button has special functions for skipping things (only in singing for now)
-	if (nav == input::START && m_only_singers_alive && !m_layout_singer.empty() && !m_audio.isPaused()) {
+	if (nav == input::NAV_START && m_only_singers_alive && !m_layout_singer.empty() && !m_audio.isPaused()) {
 		// Open score dialog early
 		if (status == Song::FINISHED) {
 			if (m_engine) m_engine->kill(); // Kill the engine thread

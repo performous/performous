@@ -329,7 +329,7 @@ bool GuitarGraph::difficulty(Difficulty level, bool check_only) {
 			// Strum (strum of keyboard-as-guitar doesn't generate nav-events)
 			else if (ev.type == input::Event::PICK && ev.id == 0) m_menu.move(1);
 			else if (ev.type == input::Event::PICK && ev.id == 1) m_menu.move(-1);
-			else if (ev.nav == input::START || ev.nav == input::CANCEL) m_menu.close();
+			else if (ev.nav == input::NAV_START || ev.nav == input::NAV_CANCEL) m_menu.close();
 			// See if anything changed
 			if (!m_drums && m_selectedTrack.so() != m_track_index->first) setTrack(m_selectedTrack.so());
 			else if (boost::lexical_cast<int>(m_selectedDifficulty.so()) != m_level)
@@ -348,8 +348,8 @@ bool GuitarGraph::difficulty(Difficulty level, bool check_only) {
 
 		// Handle Start/Select keypresses
 		} else if (!m_input.isKeyboard()) {
-			if (ev.nav == input::CANCEL) ev.id = input::GODMODE_BUTTON; // Select = GodMode
-			if (ev.nav == input::START) { m_menu.open(); continue; }
+			if (ev.nav == input::NAV_CANCEL) ev.id = input::GODMODE_BUTTON; // Select = GodMode
+			if (ev.nav == input::NAV_START) { m_menu.open(); continue; }
 		}
 
 		// Guitar specific actions

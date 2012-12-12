@@ -66,15 +66,15 @@ void ScreenAudioDevices::exit() { m_theme.reset(); }
 void ScreenAudioDevices::manageEvent(input::NavEvent const& event) {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	input::NavButton nav = event.button;
-	if (nav == input::CANCEL || nav == input::SELECT) sm->activateScreen("Intro");
-	else if (nav == input::PAUSE) m_audio.togglePause();
+	if (nav == input::NAV_CANCEL || nav == input::NAV_SELECT) sm->activateScreen("Intro");
+	else if (nav == input::NAV_PAUSE) m_audio.togglePause();
 	else if (m_devs.empty()) return; // The rest work if there are any devices
-	else if (nav == input::START) { if (save()) sm->activateScreen("Intro"); }
-	else if (nav == input::LEFT && m_selected_column > 0) --m_selected_column;
-	else if (nav == input::RIGHT && m_selected_column < m_mics.size()-1) ++m_selected_column;
-	else if (nav == input::UP)
+	else if (nav == input::NAV_START) { if (save()) sm->activateScreen("Intro"); }
+	else if (nav == input::NAV_LEFT && m_selected_column > 0) --m_selected_column;
+	else if (nav == input::NAV_RIGHT && m_selected_column < m_mics.size()-1) ++m_selected_column;
+	else if (nav == input::NAV_UP)
 		m_mics[m_selected_column].dev = (m_mics[m_selected_column].dev + m_devs.size()) % (m_devs.size() + 1);
-	else if (nav == input::DOWN)
+	else if (nav == input::NAV_DOWN)
 		m_mics[m_selected_column].dev = (m_mics[m_selected_column].dev + 1) % (m_devs.size() + 1);
 }
 

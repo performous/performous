@@ -40,18 +40,18 @@ void ScreenIntro::exit() {
 void ScreenIntro::manageEvent(input::NavEvent const& event) {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	input::NavButton nav = event.button;
-	if (nav == input::CANCEL) {
+	if (nav == input::NAV_CANCEL) {
 		if (m_menu.getSubmenuLevel() == 0) m_menu.moveToLast();  // Move cursor to quit in main menu
 		else m_menu.closeSubmenu(); // One menu level up
 	}
-	else if (nav == input::DOWN || nav == input::MOREDOWN) m_menu.move(1);
-	else if (nav == input::UP || nav == input::MOREUP) m_menu.move(-1);
-	else if (nav == input::RIGHT && m_menu.getSubmenuLevel() >= 2) m_menu.action(1); // Config menu
-	else if (nav == input::LEFT && m_menu.getSubmenuLevel() >= 2) m_menu.action(-1); // Config menu
-	else if (nav == input::RIGHT && m_menu.getSubmenuLevel() < 2) m_menu.move(1); // Instrument nav hack
-	else if (nav == input::LEFT && m_menu.getSubmenuLevel() < 2) m_menu.move(-1); // Instrument nav hack
-	else if (nav == input::START) m_menu.action();
-	else if (nav == input::PAUSE) m_audio.togglePause();
+	else if (nav == input::NAV_DOWN || nav == input::NAV_MOREDOWN) m_menu.move(1);
+	else if (nav == input::NAV_UP || nav == input::NAV_MOREUP) m_menu.move(-1);
+	else if (nav == input::NAV_RIGHT && m_menu.getSubmenuLevel() >= 2) m_menu.action(1); // Config menu
+	else if (nav == input::NAV_LEFT && m_menu.getSubmenuLevel() >= 2) m_menu.action(-1); // Config menu
+	else if (nav == input::NAV_RIGHT && m_menu.getSubmenuLevel() < 2) m_menu.move(1); // Instrument nav hack
+	else if (nav == input::NAV_LEFT && m_menu.getSubmenuLevel() < 2) m_menu.move(-1); // Instrument nav hack
+	else if (nav == input::NAV_START) m_menu.action();
+	else if (nav == input::NAV_PAUSE) m_audio.togglePause();
 	// Animation targets
 	m_selAnim.setTarget(m_menu.curIndex());
 	m_submenuAnim.setTarget(m_menu.getSubmenuLevel());

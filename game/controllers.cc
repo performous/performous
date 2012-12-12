@@ -46,12 +46,12 @@ namespace {
 	};
 	// Return a NavButton corresponding to an Event
 	NavButton navigation(Event const& ev) {
-		if (ev.navButton != input::NONE) return ev.navButton;
-		if (ev.source.type == SOURCETYPE_KEYBOARD) return input::NONE;  // No translation is needed for keyboard instruments
-		if (ev.devType == DEVTYPE_NONE) return input::NONE;
+		if (ev.navButton != NAV_NONE) return ev.navButton;
+		if (ev.source.type == SOURCETYPE_KEYBOARD) return NAV_NONE;  // No translation is needed for keyboard instruments
+		if (ev.devType == DEVTYPE_NONE) return NAV_NONE;
 		#define DEFINE_BUTTON(devtype, button, num, nav) if (ev.devType == DEVTYPE_##devtype && ev.id == devtype##_##button) return nav;
 		#include "controllers-buttons.ii"
-		return input::NONE;
+		return NAV_NONE;
 	}
 
 	std::ostream& operator<<(std::ostream& os, SourceId const& source) {
@@ -240,7 +240,7 @@ struct Controllers::Impl {
 		ControllerDef const* def = assign(ev);
 		if (def) def->mapButton(ev);
 		ev.navButton = navigation(ev);
-		if (ev.navButton != input::NONE && ev.value != 0.0) {
+		if (ev.navButton != NAV_NONE && ev.value != 0.0) {
 			NavEvent ne;
 			ne.source = ev.source;
 			ne.button = ev.navButton;
