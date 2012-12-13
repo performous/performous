@@ -41,7 +41,7 @@ namespace input {
 				case SDLK_F9: button++;
 				case SDLK_F8: button++;
 				case SDLK_F7:
-					if (!config["game/keyboard_keyboard"].b()) return;  // FIXME: Rename config option to keytar
+					if (!config["game/keyboard_keytar"].b()) return;
 					event.devType = DEVTYPE_KEYTAR;
 					break;
 

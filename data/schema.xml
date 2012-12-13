@@ -60,9 +60,9 @@ to save the current settings to XML.
 		<short>Keyboard as dance pad</short>
 		<long>Enable keyboard as dance pad.</long>
 	</entry>
-	<entry name="game/keyboard_keyboard" type="bool" value="true">
-		<short>Keyboard as keyboard</short>
-		<long>Enable keyboard as keyboard.</long>
+	<entry name="game/keyboard_keytar" type="bool" value="true">
+		<short>Keyboard as keytar</short>
+		<long>Enable keyboard as keytar.</long>
 	</entry>
 	<entry name="game/instrument0" type="int" value="0">
 		<limits>
