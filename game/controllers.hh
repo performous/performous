@@ -94,6 +94,7 @@ namespace input {
 	class Hardware {
 	public:
 		static bool midiEnabled();
+		static void enableKeyboardInstruments(bool state);
 		virtual ~Hardware() {}
 		/// Get the name of a specific device of this type
 		virtual std::string getName(unsigned) const { return std::string(); }

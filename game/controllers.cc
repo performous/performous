@@ -38,8 +38,6 @@ namespace {
 	}
 	// Return a NavButton corresponding to an Event
 	NavButton navigation(Event const& ev) {
-		if (ev.navButton != NAV_NONE) return ev.navButton;
-		if (ev.source.type == SOURCETYPE_KEYBOARD) return NAV_NONE;  // No translation is needed for keyboard instruments
 		#define DEFINE_BUTTON(devtype, button, num, nav) if ((DEVTYPE_##devtype == DEVTYPE_GENERIC || ev.devType == DEVTYPE_##devtype) && ev.id == devtype##_##button) return nav;
 		#include "controllers-buttons.ii"
 		return NAV_NONE;
@@ -55,9 +53,21 @@ namespace {
 		}
 		throw std::logic_error("Unknown SOURCETYPE in controllers.cc SourceId operator<<");
 	}
+	
+	std::string buttonDebug(DevType type, Button b) {
+		#define DEFINE_BUTTON(devtype, button, num, nav) if ((DEVTYPE_##devtype == DEVTYPE_GENERIC || type == DEVTYPE_##devtype) && b == devtype##_##button) return #devtype " " #button " (" #nav ")";
+		#include "controllers-buttons.ii"
+		throw std::logic_error("Invalid Button value in controllers.cc buttonDebug");
+	}
+
 }
 
-typedef std::map<HWButton, Button> ButtonMapping;
+struct ButtonMap {
+	Button map, negative, positive;
+	ButtonMap(): map(GENERIC_UNASSIGNED), negative(GENERIC_UNASSIGNED), positive(GENERIC_UNASSIGNED) {}
+};
+
+typedef std::map<HWButton, ButtonMap> ButtonMapping;
 
 /// A controller definition from controllers.xml
 struct ControllerDef {
@@ -76,12 +86,6 @@ struct ControllerDef {
 		if (!channelMinMax.matches(ev.source.channel)) return false;
 		if (!deviceRegex.empty() && !regex_search(devName, deviceRegex)) return false;
 		return true;
-	}
-	void mapButton(Event& ev) const {
-		ev.devType = devType;
-		ButtonMapping::const_iterator it = mapping.find(ev.hw);
-		if (it == mapping.end()) return;
-		ev.id = it->second;
 	}
 };
 
@@ -161,20 +165,20 @@ struct Controllers::Impl {
 			ns = elem.find("channel");
 			if (ns.size() == 1) parse(def.channelMinMax, dynamic_cast<xmlpp::Element&>(*ns[0]));
 			// Read button mapping
-			ns = elem.find("mapping/button");
+			ns = elem.find("mapping/*");
 			for (xmlpp::NodeSet::const_iterator nodeit2 = ns.begin(), end = ns.end(); nodeit2 != end; ++nodeit2) {
-				xmlpp::Element& button_elem = dynamic_cast<xmlpp::Element&>(**nodeit2);
+				xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**nodeit2);
 				HWButton hw;
-				tryGetAttribute(button_elem, "hw", hw);
-				Button button = GENERIC_UNASSIGNED;
-				std::string map = getAttribute(button_elem, "map");
-				if (!map.empty()) {
-					boost::algorithm::to_upper(map);
-					boost::algorithm::replace_all(map, "-", "_");
-					// Try getting button first from generic names, then device-specific
-					if (!buttonByName(DEVTYPE_GENERIC, map, button) && !buttonByName(def.devType, map, button)) throw XMLError(button_elem, map + ": Invalid value for map attribute");
-				}
-				def.mapping[hw] = button;
+				if (!tryGetAttribute(elem, "hw", hw)) throw XMLError(elem, "Mandatory attribute hw is missing or invalid");
+				if (elem.get_name() == "axis") hw = HWButton(hw + hwIsAxis.min);  // Fix the value for internal axis numbering
+				std::string map, negative, positive;
+				tryGetAttribute(elem, "map", map);
+				tryGetAttribute(elem, "negative", negative);
+				tryGetAttribute(elem, "positive", positive);
+				ButtonMap& m = def.mapping[hw];
+				m.map = findButton(def.devType, map);
+				m.negative = findButton(def.devType, negative);
+				m.positive = findButton(def.devType, positive);
 			}
 			// Add/replace the controller definition
 			std::clog << "controllers/info: " << (m_controllerDefs.find(def.name) == m_controllerDefs.end() ? "Controller" : "Overriding")
@@ -182,6 +186,18 @@ struct Controllers::Impl {
 			m_controllerDefs[def.name] = def;
 		}
 	}
+	/// Find button by name, either of given type or of generic type
+	Button findButton(DevType type, std::string name) {
+		Button button = GENERIC_UNASSIGNED;
+		if (name.empty()) return button;
+		boost::algorithm::to_upper(name);
+		boost::algorithm::replace_all(name, "-", "_");
+		// Try getting button first from generic names, then device-specific
+		buttonByName(DEVTYPE_GENERIC, name, button) || buttonByName(type, name, button) ||
+		  std::clog << "controllers/warn: " << name << ": Unknown button name in controllers.xml." << std::endl;
+		return button;
+	}
+	/// Try to find button of specific type
 	bool buttonByName(DevType type, std::string const& name, Button& button) {
 		NameToButton const& n2b = m_buttons[type];
 		NameToButton::const_iterator it = n2b.find(name);
@@ -213,7 +229,7 @@ struct Controllers::Impl {
 		for (HW::iterator it = m_hw.begin(); it != m_hw.end(); ++it) {
 			Event event;
 			event.time = t;
-			if (it->second->process(event, sdlEv)) return pushHWEvent(event);
+			if (it->second->process(event, sdlEv)) { pushHWEvent(event); return true; }
 		}
 		return false;
 	}
@@ -232,21 +248,34 @@ struct Controllers::Impl {
 		return def;
 	}
 	/// Handle an incoming hardware event
-	bool pushHWEvent(Event ev) {
-		// Hack to handle directional controllers
+	void pushHWEvent(Event ev) {
+		// Hack to handle directional controllers (TODO: do after def assignment?)
 		if (ev.id == GENERIC_UNASSIGNED && hwIsHat.matches(ev.hw)) {
 			HWButton val = ev.value;
 			ev.id = GENERIC_UP; ev.value = !!(val & SDL_HAT_UP); pushHWEvent(ev);
 			ev.id = GENERIC_LEFT; ev.value = !!(val & SDL_HAT_LEFT); pushHWEvent(ev);
 			ev.id = GENERIC_RIGHT; ev.value = !!(val & SDL_HAT_RIGHT); pushHWEvent(ev);
 			ev.id = GENERIC_DOWN; ev.value = !!(val & SDL_HAT_DOWN); pushHWEvent(ev);
-			return true;
-		}
-		if (hwIsAxis.matches(ev.hw)) {
-			unsigned axis = ev.hw - hwIsAxis.min;
+			return;
 		}
 		ControllerDef const* def = assign(ev);
-		if (def) def->mapButton(ev);
+		if (def) {
+			ev.devType = def->devType;
+			ButtonMapping::const_iterator it = def->mapping.find(ev.hw);
+			if (it != def->mapping.end()) {
+				ButtonMap const& m = it->second;
+				double value = ev.value;
+				ev.id = m.map; pushMappedEvent(ev);
+ 				ev.id = m.positive; ev.value = clamp(value); pushMappedEvent(ev);
+				ev.id = m.negative; ev.value = clamp(-value); pushMappedEvent(ev);
+			}
+			else std::clog << "controllers/info: " << ev.source << " unmapped hw=" << ev.hw << " " << buttonDebug(ev.devType, ev.id) << " value=" << ev.value << std::endl;
+		}
+		else pushMappedEvent(ev);  // This is for keyboard events mainly (they have no ControllerDefs)
+	}
+	void pushMappedEvent(Event ev) {
+		if (ev.id == GENERIC_UNASSIGNED) return;
+		std::clog << "controllers/info: " << ev.source << " event " << buttonDebug(ev.devType, ev.id) << " value=" << ev.value << std::endl;
 		ev.navButton = navigation(ev);
 		// Emit nav event
 		if (ev.navButton != NAV_NONE && ev.value != 0.0) {
@@ -264,7 +293,6 @@ struct Controllers::Impl {
 			ne.time = ev.time;
 			m_navEvents.push_back(ne);
 		}
-		return true;
 	}
 };
 

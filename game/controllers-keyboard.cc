@@ -1,5 +1,9 @@
 #include "controllers.hh"
 
+namespace {
+	bool g_enableInstruments = false;
+}
+
 namespace input {
 	class Keyboard: public Hardware {
 	public:
@@ -8,23 +12,24 @@ namespace input {
 			event.source = SourceId(SOURCETYPE_KEYBOARD, sdlEv.key.which);  // Device number .which is always zero with SDL 1.2 :(
 			event.hw = sdlEv.key.keysym.sym;
 			event.value = (sdlEv.type == SDL_KEYDOWN ? 1.0 : 0.0);
-			mapping(event);
-			event.navButton = navigation(event, sdlEv);
-			return event.devType != DEVTYPE_GENERIC || event.navButton != NAV_NONE;
+			if (g_enableInstruments) mapping(event);
+			if (event.id == GENERIC_UNASSIGNED) event.id = navigation(event, sdlEv);
+			return event.id != GENERIC_UNASSIGNED;
 		}
 		void mapping(Event& event) {
 			unsigned button = 0;
 			switch (event.hw) {
 				// Guitar on keyboard
-				case SDLK_RSHIFT: button++;
-				case SDLK_RETURN: case SDLK_KP_ENTER: button++;
-				case SDLK_BACKSPACE: button++;  // Whammy
-				case SDLK_RCTRL: button++;  // God mode
+				case SDLK_BACKSPACE: button = GUITAR_WHAMMY; goto guitar_process;
+				case SDLK_RCTRL: button = GUITAR_GODMODE; goto guitar_process;
+				case SDLK_RSHIFT: button = GUITAR_PICK_UP; goto guitar_process;
+				case SDLK_RETURN: case SDLK_KP_ENTER: button = GUITAR_PICK_DOWN; goto guitar_process;
 				case SDLK_F5: case SDLK_5: case SDLK_b: button++;
 				case SDLK_F4: case SDLK_4: case SDLK_v: button++;
 				case SDLK_F3: case SDLK_3: case SDLK_c: button++;
 				case SDLK_F2: case SDLK_2: case SDLK_x: button++;
 				case SDLK_F1: case SDLK_1: case SDLK_z: case SDLK_w: case SDLK_y:  // Support also French and German layouts
+				guitar_process:
 					if (!config["game/keyboard_guitar"].b()) return;
 					event.devType = DEVTYPE_GUITAR;
 					break;
@@ -68,22 +73,23 @@ namespace input {
 			event.id = Button(button);
 			event.source.channel = event.devType;  // Each type gets its own unique SourceId channel
 		}
-		NavButton navigation(Event& event, SDL_Event const& sdlEv) {
+		Button navigation(Event& event, SDL_Event const& sdlEv) {
 			unsigned k = event.hw;
 			SDLMod mod = sdlEv.key.keysym.mod;
-			if (k == SDLK_UP) return mod & KMOD_CTRL ? NAV_VOLUME_UP : NAV_UP;
-			if (k == SDLK_DOWN) return mod & KMOD_CTRL ? NAV_VOLUME_DOWN : NAV_DOWN;
-			if (k == SDLK_LEFT) return NAV_LEFT;
-			if (k == SDLK_RIGHT) return NAV_RIGHT;
-			if (k == SDLK_RETURN || k == SDLK_KP_ENTER) return NAV_START;
-			if (k == SDLK_ESCAPE) return NAV_CANCEL;
-			if (k == SDLK_PAGEUP) return NAV_MOREUP;
-			if (k == SDLK_PAGEDOWN) return NAV_MOREDOWN;
-			if (k == SDLK_PAUSE || (k == SDLK_p && mod & KMOD_CTRL)) return NAV_PAUSE;
-			return NAV_NONE;
+			if (k == SDLK_UP) return mod & KMOD_CTRL ? GENERIC_VOLUME_UP : GENERIC_UP;
+			if (k == SDLK_DOWN) return mod & KMOD_CTRL ? GENERIC_VOLUME_DOWN : GENERIC_DOWN;
+			if (k == SDLK_LEFT) return GENERIC_LEFT;
+			if (k == SDLK_RIGHT) return GENERIC_RIGHT;
+			if (k == SDLK_RETURN || k == SDLK_KP_ENTER) return GENERIC_START;
+			if (k == SDLK_ESCAPE) return GENERIC_CANCEL;
+			if (k == SDLK_PAGEUP) return GENERIC_MOREUP;
+			if (k == SDLK_PAGEDOWN) return GENERIC_MOREDOWN;
+			if (k == SDLK_PAUSE || (k == SDLK_p && mod & KMOD_CTRL)) return GENERIC_PAUSE;
+			return GENERIC_UNASSIGNED;
 		}
 	};
 
+	void Hardware::enableKeyboardInstruments(bool state) { g_enableInstruments = state; }
 	Hardware::ptr constructKeyboard() { return Hardware::ptr(new Keyboard()); }
 	
 }
