@@ -307,9 +307,9 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 		ScreenManager::getSingletonPtr()->activateScreen("Songs");
 		return;
 	}
-	// Esc-key needs special handling, it is global pause
-	if ((nav == input::NAV_PAUSE /* FIXME || (event.type == SDL_KEYDOWN && key == SDLK_ESCAPE)*/)
-	  && !m_audio.isPaused() && !m_menu.isOpen()) {
+	// Only pause or esc opens the global menu (instruments have their own menus)
+	// TODO: This should probably check if the source is participating as an instrument or not rather than check for its type
+	if (event.source.type == input::SOURCETYPE_KEYBOARD && (nav == input::NAV_PAUSE || nav == input::NAV_CANCEL) && !m_audio.isPaused() && !m_menu.isOpen()) {
 		m_menu.open();
 		m_audio.togglePause();
 	}
