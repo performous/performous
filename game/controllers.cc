@@ -55,7 +55,8 @@ namespace {
 	}
 	
 	std::string buttonDebug(DevType type, Button b) {
-		#define DEFINE_BUTTON(devtype, button, num, nav) if ((DEVTYPE_##devtype == DEVTYPE_GENERIC || type == DEVTYPE_##devtype) && b == devtype##_##button) return #devtype " " #button " (" #nav ")";
+		#define DEFINE_BUTTON(devtype, button, num, nav) if ((DEVTYPE_##devtype == DEVTYPE_GENERIC || type == DEVTYPE_##devtype) && b == devtype##_##button) \
+		  return #devtype " " #button " (" #nav ")";
 		#include "controllers-buttons.ii"
 		throw std::logic_error("Invalid Button value in controllers.cc buttonDebug");
 	}
@@ -249,29 +250,31 @@ struct Controllers::Impl {
 	}
 	/// Handle an incoming hardware event
 	void pushHWEvent(Event ev) {
-		// Hack to handle directional controllers (TODO: do after def assignment?)
-		if (ev.id == GENERIC_UNASSIGNED && hwIsHat.matches(ev.hw)) {
-			HWButton val = ev.value;
-			ev.id = GENERIC_UP; ev.value = !!(val & SDL_HAT_UP); pushHWEvent(ev);
-			ev.id = GENERIC_LEFT; ev.value = !!(val & SDL_HAT_LEFT); pushHWEvent(ev);
-			ev.id = GENERIC_RIGHT; ev.value = !!(val & SDL_HAT_RIGHT); pushHWEvent(ev);
-			ev.id = GENERIC_DOWN; ev.value = !!(val & SDL_HAT_DOWN); pushHWEvent(ev);
+		ControllerDef const* def = assign(ev);
+		if (!def) {
+			pushMappedEvent(ev);  // This is for keyboard events mainly (they have no ControllerDefs)
 			return;
 		}
-		ControllerDef const* def = assign(ev);
-		if (def) {
-			ev.devType = def->devType;
-			ButtonMapping::const_iterator it = def->mapping.find(ev.hw);
-			if (it != def->mapping.end()) {
-				ButtonMap const& m = it->second;
-				double value = ev.value;
-				ev.id = m.map; pushMappedEvent(ev);
- 				ev.id = m.positive; ev.value = clamp(value); pushMappedEvent(ev);
-				ev.id = m.negative; ev.value = clamp(-value); pushMappedEvent(ev);
-			}
-			else std::clog << "controller-events/warn: " << ev.source << " unmapped hw=" << ev.hw << " " << buttonDebug(ev.devType, ev.id) << " value=" << ev.value << std::endl;
+		// Handle directional controllers (not possible via XML)
+		if (hwIsHat.matches(ev.hw)) {
+			HWButton val = ev.value;
+			ev.id = GENERIC_UP; ev.value = !!(val & SDL_HAT_UP); pushMappedEvent(ev);
+			ev.id = GENERIC_LEFT; ev.value = !!(val & SDL_HAT_LEFT); pushMappedEvent(ev);
+			ev.id = GENERIC_RIGHT; ev.value = !!(val & SDL_HAT_RIGHT); pushMappedEvent(ev);
+			ev.id = GENERIC_DOWN; ev.value = !!(val & SDL_HAT_DOWN); pushMappedEvent(ev);
+			return;
 		}
-		else pushMappedEvent(ev);  // This is for keyboard events mainly (they have no ControllerDefs)
+		// Mapping from controllers.xml
+		ev.devType = def->devType;
+		ButtonMapping::const_iterator it = def->mapping.find(ev.hw);
+		if (it != def->mapping.end()) {
+			ButtonMap const& m = it->second;
+			double value = ev.value;
+			ev.id = m.map; pushMappedEvent(ev);
+			ev.id = m.positive; ev.value = clamp(value); pushMappedEvent(ev);
+			ev.id = m.negative; ev.value = clamp(-value); pushMappedEvent(ev);
+		}
+		else std::clog << "controller-events/warn: " << ev.source << " unmapped hw=" << ev.hw << " " << buttonDebug(ev.devType, ev.id) << " value=" << ev.value << std::endl;
 	}
 	void pushMappedEvent(Event ev) {
 		if (ev.id == GENERIC_UNASSIGNED) return;
