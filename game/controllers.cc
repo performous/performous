@@ -296,12 +296,12 @@ struct Controllers::Impl {
 	void pushMappedEvent(Event ev) {
 		if (ev.id == GENERIC_UNASSIGNED) return;
 		std::clog << "controller-events/info: " << ev.source << " processing " << buttonDebug(ev.devType, ev.id) << " value=" << ev.value << std::endl;
-		ev.navButton = navigation(ev);
+		ev.nav = navigation(ev);
 		// Emit nav event
-		if (ev.navButton != NAV_NONE && ev.value != 0.0) {
+		if (ev.nav != NAV_NONE && ev.value != 0.0) {
 			NavEvent ne;
 			ne.source = ev.source;
-			ne.button = ev.navButton;
+			ne.button = ev.nav;
 			// Menu navigation mapping
 			{
 				bool vertical = (ev.devType == DEVTYPE_GUITAR);

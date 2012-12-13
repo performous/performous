@@ -269,14 +269,14 @@ void DanceGraph::engine() {
 	if (joining(time)) m_dead = 0; // Disable dead counting while joining
 	bool difficulty_changed = false;
 	// Handle all events
-	for (input::Event ev; m_dev.getEvent(ev); ) {
+	for (input::Event ev; m_dev->getEvent(ev); ) {
 		m_dead = 0; // Keep alive
 		if (m_jointime != m_jointime) { // Handle joining
 			m_jointime = time < 0.0 ? -1.0 : time + join_delay;
 			break;
 		}
 		// Menu keys
-		if (menuOpen() && ev.type == input::Event::PRESS) {
+		if (menuOpen() && ev.value != 0.0) {
 			if (ev.nav == input::NAV_START || ev.nav == input::NAV_CANCEL) m_menu.close();
 			else if (ev.nav == input::NAV_RIGHT) m_menu.action(1);
 			else if (ev.nav == input::NAV_LEFT) m_menu.action(-1);
@@ -287,19 +287,19 @@ void DanceGraph::engine() {
 			if (m_selectedTrack.so() != m_gamingMode) setTrack(m_selectedTrack.so());
 			else if (boost::lexical_cast<int>(m_selectedDifficulty.so()) != m_level)
 				difficulty(DanceDifficulty(boost::lexical_cast<int>(m_selectedDifficulty.so())));
-			else if (m_rejoin.b()) { unjoin(); setupJoinMenu(); m_input.addEvent(input::Event()); }
+			else if (m_rejoin.b()) { unjoin(); setupJoinMenu(); m_dev->pushEvent(input::Event()); /* FIXME: HACK? */ }
 			// Sync dynamic stuff
 			updateJoinMenu();
 		// Open Menu
-		} else if (!menuOpen() && ev.type == input::Event::PRESS) {
+		} else if (!menuOpen() && ev.value != 0.0) {
 			if (ev.nav == input::NAV_CANCEL || ev.nav == input::NAV_START) m_menu.open();
 		}
 		// Gaming controls
-		if (ev.type == input::Event::RELEASE) {
+		if (ev.value == 0.0) {
 			m_pressed[ev.button] = false;
 			dance(time, ev);
 			m_pressed_anim[ev.button].setTarget(0.0);
-		} else if (ev.type == input::Event::PRESS) {
+		} else if (ev.value != 0.0) {
 			m_pressed[ev.button] = true;
 			dance(time, ev);
 			m_pressed_anim[ev.button].setValue(1.0);
