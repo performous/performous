@@ -318,6 +318,7 @@ struct Controllers::Impl {
 		DevicePtr ptr = m_devices[ev.source].lock();
 		if (!ptr) {
 			ptr.reset(new Device(ev.source, ev.devType));
+			m_orphans.push_back(ptr);
 			m_devices[ev.source] = ptr;
 		}
 		ptr->pushEvent(ev);

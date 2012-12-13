@@ -84,7 +84,7 @@ void InstrumentGraph::drawMenu() {
 	// All these vars are ultimately affected by the scaling matrix
 	const float txth = th.option_selected.h();
 	const float button_margin = m_arrow_up.dimensions.w()
-		* (/*FIXME: m_input.isKeyboard()*/ false && getGraphType() != input::DEVTYPE_DANCEPAD ? 2.0f : 1.0f);
+		* (isKeyboard() && getGraphType() != input::DEVTYPE_DANCEPAD ? 2.0f : 1.0f);
 	const float step = txth * 0.7f;
 	const float h = m_menu.getOptions().size() * step + step;
 	float y = -h * .5f + step;
@@ -130,7 +130,7 @@ void InstrumentGraph::drawMenu() {
 			}
 
 			// Draw the key letters for keyboard (not for dancepad)
-			if (/*FIXME: m_input.isKeyboard()*/ false && getGraphType() != input::DEVTYPE_DANCEPAD) {
+			if (isKeyboard() && getGraphType() != input::DEVTYPE_DANCEPAD) {
 				float leftx = x - button_margin*0.75f;
 				float rightx = xx + button_margin*0.25f;
 				{

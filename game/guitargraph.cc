@@ -253,8 +253,7 @@ std::string GuitarGraph::getDifficultyString() const {
 
 /// Get a string id for track and difficulty
 std::string GuitarGraph::getModeId() const {
-	return m_track_index->first + " - " + diffv[m_level].name
-		+ (/* FIXME: m_input.isKeyboard()*/ false ? " (kbd)" : "");
+	return m_track_index->first + " - " + diffv[m_level].name;
 }
 
 /// Cycle through difficulties
@@ -301,7 +300,7 @@ bool GuitarGraph::difficulty(Difficulty level, bool check_only) {
 	for (input::Event ev; m_input.tryPoll(ev);) {
 		// This hack disallows joining with Enter and CTRL-key
 		// since they cause issues due to also being used in other places
-		if (dead() && m_input.isKeyboard()
+		if (dead() && isKeyboard()
 		  && (ev.type == input::Event::PICK || ev.button == input::GODMODE_BUTTON)) continue;
 		m_dead = 0; // Keep alive
 		// Handle joining
@@ -347,7 +346,7 @@ bool GuitarGraph::difficulty(Difficulty level, bool check_only) {
 			break;
 
 		// Handle Start/Select keypresses
-		} else if (!m_input.isKeyboard()) {
+		} else if (!isKeyboard()) {
 			if (ev.nav == input::NAV_CANCEL) ev.button = input::GODMODE_BUTTON; // Select = GodMode
 			if (ev.nav == input::NAV_START) { m_menu.open(); continue; }
 		}

@@ -97,6 +97,7 @@ public:
 	int getScore() const { return (m_score > 0 ? m_score : 0) * m_scoreFactor; }
 	input::DevType getGraphType() const { return m_dev->type; }
 	virtual double getWhammy() const { return 0; }
+	bool isKeyboard() const { return m_dev->source == input::SOURCETYPE_KEYBOARD; }
 
   protected:
 	// Core stuff
