@@ -39,7 +39,7 @@ namespace {
 	}
 	// Return a NavButton corresponding to an Event
 	NavButton navigation(Event const& ev) {
-		#define DEFINE_BUTTON(devtype, button, num, nav) if ((DEVTYPE_##devtype == DEVTYPE_GENERIC || ev.devType == DEVTYPE_##devtype) && ev.id == devtype##_##button) return nav;
+		#define DEFINE_BUTTON(dt, btn, num, nav) if ((DEVTYPE_##dt == DEVTYPE_GENERIC || ev.devType == DEVTYPE_##dt) && ev.button == dt##_##btn) return nav;
 		#include "controllers-buttons.ii"
 		return NAV_NONE;
 	}
@@ -56,8 +56,8 @@ namespace {
 	}
 	
 	std::string buttonDebug(DevType type, Button b) {
-		#define DEFINE_BUTTON(devtype, button, num, nav) if ((DEVTYPE_##devtype == DEVTYPE_GENERIC || type == DEVTYPE_##devtype) && b == devtype##_##button) \
-		  return #devtype " " #button " (" #nav ")";
+		#define DEFINE_BUTTON(dt, btn, num, nav) if ((DEVTYPE_##dt == DEVTYPE_GENERIC || type == DEVTYPE_##dt) && b == dt##_##btn) \
+		  return #dt " " #btn " (" #nav ")";
 		#include "controllers-buttons.ii"
 		throw std::logic_error("Invalid Button value in controllers.cc buttonDebug");
 	}
@@ -275,10 +275,10 @@ struct Controllers::Impl {
 		// Handle directional controllers (not possible via XML)
 		if (hwIsHat.matches(ev.hw)) {
 			HWButton val = ev.value;
-			ev.id = GENERIC_UP; ev.value = !!(val & SDL_HAT_UP); pushMappedEvent(ev);
-			ev.id = GENERIC_LEFT; ev.value = !!(val & SDL_HAT_LEFT); pushMappedEvent(ev);
-			ev.id = GENERIC_RIGHT; ev.value = !!(val & SDL_HAT_RIGHT); pushMappedEvent(ev);
-			ev.id = GENERIC_DOWN; ev.value = !!(val & SDL_HAT_DOWN); pushMappedEvent(ev);
+			ev.button = GENERIC_UP; ev.value = !!(val & SDL_HAT_UP); pushMappedEvent(ev);
+			ev.button = GENERIC_LEFT; ev.value = !!(val & SDL_HAT_LEFT); pushMappedEvent(ev);
+			ev.button = GENERIC_RIGHT; ev.value = !!(val & SDL_HAT_RIGHT); pushMappedEvent(ev);
+			ev.button = GENERIC_DOWN; ev.value = !!(val & SDL_HAT_DOWN); pushMappedEvent(ev);
 			return;
 		}
 		// Mapping from controllers.xml
@@ -287,15 +287,15 @@ struct Controllers::Impl {
 		if (it != def->mapping.end()) {
 			ButtonMap const& m = it->second;
 			double value = ev.value;
-			ev.id = m.map; pushMappedEvent(ev);
-			ev.id = m.positive; ev.value = clamp(value); pushMappedEvent(ev);
-			ev.id = m.negative; ev.value = clamp(-value); pushMappedEvent(ev);
+			ev.button = m.map; pushMappedEvent(ev);
+			ev.button = m.positive; ev.value = clamp(value); pushMappedEvent(ev);
+			ev.button = m.negative; ev.value = clamp(-value); pushMappedEvent(ev);
 		}
-		else std::clog << "controller-events/warn: " << ev.source << " unmapped hw=" << ev.hw << " " << buttonDebug(ev.devType, ev.id) << " value=" << ev.value << std::endl;
+		else std::clog << "controller-events/warn: " << ev.source << " unmapped hw=" << ev.hw << " " << buttonDebug(ev.devType, ev.button) << " value=" << ev.value << std::endl;
 	}
 	void pushMappedEvent(Event ev) {
-		if (ev.id == GENERIC_UNASSIGNED) return;
-		std::clog << "controller-events/info: " << ev.source << " processing " << buttonDebug(ev.devType, ev.id) << " value=" << ev.value << std::endl;
+		if (ev.button == GENERIC_UNASSIGNED) return;
+		std::clog << "controller-events/info: " << ev.source << " processing " << buttonDebug(ev.devType, ev.button) << " value=" << ev.value << std::endl;
 		ev.nav = navigation(ev);
 		// Emit nav event
 		if (ev.nav != NAV_NONE && ev.value != 0.0) {

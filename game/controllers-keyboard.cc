@@ -13,8 +13,8 @@ namespace input {
 			event.hw = sdlEv.key.keysym.sym;
 			event.value = (sdlEv.type == SDL_KEYDOWN ? 1.0 : 0.0);
 			if (g_enableInstruments) mapping(event);
-			if (event.id == GENERIC_UNASSIGNED) event.id = navigation(event, sdlEv);
-			return event.id != GENERIC_UNASSIGNED;
+			if (event.button == GENERIC_UNASSIGNED) event.button = navigation(event, sdlEv);
+			return event.button != GENERIC_UNASSIGNED;
 		}
 		void mapping(Event& event) {
 			unsigned button = 0;
@@ -70,7 +70,7 @@ namespace input {
 
 				default: return;
 			}
-			event.id = Button(button);
+			event.button = Button(button);
 			event.source.channel = event.devType;  // Each type gets its own unique SourceId channel
 		}
 		Button navigation(Event& event, SDL_Event const& sdlEv) {

@@ -342,7 +342,7 @@ void DanceGraph::engine() {
 void DanceGraph::dance(double time, input::Event const& ev) {
 	// Handle release events
 	if (ev.value == 0.0) {
-		DanceNotes::iterator it = m_activeNotes[ev.id];
+		DanceNotes::iterator it = m_activeNotes[ev.button];
 		if(it != m_notes.end()) {
 			if(!it->releaseTime && it->note.end > time + maxTolerance) {
 				it->releaseTime = time;
@@ -355,7 +355,7 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 
 	// So it was a PRESS event
 	for (DanceNotes::iterator it = m_notesIt; it != m_notes.end() && time <= it->note.end + maxTolerance; ++it) {
-		if(!it->isHit && std::abs(time - it->note.begin) <= maxTolerance && ev.id == it->note.note) {
+		if(!it->isHit && std::abs(time - it->note.begin) <= maxTolerance && ev.button == it->note.note) {
 			it->isHit = true;
 			if (it->note.type != Note::MINE) {
 				it->score = points(it->note.begin - time);
@@ -366,7 +366,7 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 				m_score -= points(0);
 				m_streak = 0;
 			}
-			m_activeNotes[ev.id] = it;
+			m_activeNotes[ev.button] = it;
 			break;
 		}
 	}

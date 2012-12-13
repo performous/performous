@@ -302,7 +302,7 @@ bool GuitarGraph::difficulty(Difficulty level, bool check_only) {
 		// This hack disallows joining with Enter and CTRL-key
 		// since they cause issues due to also being used in other places
 		if (dead() && m_input.isKeyboard()
-		  && (ev.type == input::Event::PICK || ev.id == input::GODMODE_BUTTON)) continue;
+		  && (ev.type == input::Event::PICK || ev.button == input::GODMODE_BUTTON)) continue;
 		m_dead = 0; // Keep alive
 		// Handle joining
 		if (m_jointime != m_jointime) {
@@ -312,23 +312,23 @@ bool GuitarGraph::difficulty(Difficulty level, bool check_only) {
 		// Menu keys
 		if (menuOpen()) {
 			// Pick lefty-mode reversing
-			if (ev.type == input::Event::PICK && m_leftymode.b()) ev.id = (ev.id ? 0 : 1);
+			if (ev.type == input::Event::PICK && m_leftymode.b()) ev.button = (ev.button ? 0 : 1);
 			// Check first regular keys
-			if (ev.type == input::Event::PRESS && ev.id >= 0 && ev.id < m_pads) {
+			if (ev.type == input::Event::PRESS && ev.button >= 0 && ev.button < m_pads) {
 				if (m_drums) { // Drums
-					 if (ev.id == input::DRUMS_KICK) m_menu.action(); // Kick for action
-					 else if (ev.id == input::RED_TOM_BUTTON) m_menu.action(-1); // Red for left
-					 else if (ev.id == input::YELLOW_TOM_BUTTON) m_menu.move(-1); // Yellow for up
-					 else if (ev.id == input::BLUE_TOM_BUTTON) m_menu.move(1); // Blue for down
-					 else if (ev.id == input::GREEN_TOM_BUTTON) m_menu.action(1); // Green for right
+					 if (ev.button == input::DRUMS_KICK) m_menu.action(); // Kick for action
+					 else if (ev.button == input::RED_TOM_BUTTON) m_menu.action(-1); // Red for left
+					 else if (ev.button == input::YELLOW_TOM_BUTTON) m_menu.move(-1); // Yellow for up
+					 else if (ev.button == input::BLUE_TOM_BUTTON) m_menu.move(1); // Blue for down
+					 else if (ev.button == input::GREEN_TOM_BUTTON) m_menu.action(1); // Green for right
 				} else { // Guitar
-					 if (ev.id == input::GREEN_FRET_BUTTON) m_menu.action(-1); // Green for left
-					 else if (ev.id == input::RED_FRET_BUTTON) m_menu.action(1); // Red for right
+					 if (ev.button == input::GREEN_FRET_BUTTON) m_menu.action(-1); // Green for left
+					 else if (ev.button == input::RED_FRET_BUTTON) m_menu.action(1); // Red for right
 				}
 			}
 			// Strum (strum of keyboard-as-guitar doesn't generate nav-events)
-			else if (ev.type == input::Event::PICK && ev.id == 0) m_menu.move(1);
-			else if (ev.type == input::Event::PICK && ev.id == 1) m_menu.move(-1);
+			else if (ev.type == input::Event::PICK && ev.button == 0) m_menu.move(1);
+			else if (ev.type == input::Event::PICK && ev.button == 1) m_menu.move(-1);
 			else if (ev.nav == input::NAV_START || ev.nav == input::NAV_CANCEL) m_menu.close();
 			// See if anything changed
 			if (!m_drums && m_selectedTrack.so() != m_track_index->first) setTrack(m_selectedTrack.so());
@@ -341,26 +341,26 @@ bool GuitarGraph::difficulty(Difficulty level, bool check_only) {
 
 		// If the songs hasn't yet started, we want key presses to bring join menu back (not pause menu)
 		} else if (time < -2 && ev.type == input::Event::PRESS
-		  && ev.id != input::WHAMMY_BUTTON && ev.id != input::GODMODE_BUTTON) {
+		  && ev.button != input::WHAMMY_BUTTON && ev.button != input::GODMODE_BUTTON) {
 			setupJoinMenu();
 			m_menu.open();
 			break;
 
 		// Handle Start/Select keypresses
 		} else if (!m_input.isKeyboard()) {
-			if (ev.nav == input::NAV_CANCEL) ev.id = input::GODMODE_BUTTON; // Select = GodMode
+			if (ev.nav == input::NAV_CANCEL) ev.button = input::GODMODE_BUTTON; // Select = GodMode
 			if (ev.nav == input::NAV_START) { m_menu.open(); continue; }
 		}
 
 		// Guitar specific actions
 		if (!m_drums) {
 			// GodMode
-			if ((ev.type == input::Event::PRESS || ev.type == input::Event::RELEASE) && ev.id == input::GODMODE_BUTTON) {
+			if ((ev.type == input::Event::PRESS || ev.type == input::Event::RELEASE) && ev.button == input::GODMODE_BUTTON) {
 				if (ev.type == input::Event::PRESS) activateStarpower();
 				continue;
 			}
 			// Whammy bar
-			if (ev.id == input::WHAMMY_BUTTON) {
+			if (ev.button == input::WHAMMY_BUTTON) {
 				switch(ev.type) {
 					case input::Event::RELEASE:
 						m_whammy = (1.0 + 0.0 + 2.0*(rand()/double(RAND_MAX))) / 4.0;
@@ -373,20 +373,20 @@ bool GuitarGraph::difficulty(Difficulty level, bool check_only) {
 				}
 			}
 			// End hold
-			if (ev.type == input::Event::RELEASE) endHold(ev.id, time);
+			if (ev.type == input::Event::RELEASE) endHold(ev.button, time);
 
 		// Drum specific actions
 		} else {
 			// Handle drum lefty-mode
-			if (m_leftymode.b() && ev.id > 0 && !menuOpen()) ev.id = m_pads - ev.id;
+			if (m_leftymode.b() && ev.button > 0 && !menuOpen()) ev.button = m_pads - ev.button;
 		}
 
 		// Keypress anims
-		if (ev.type == input::Event::PRESS) m_pressed_anim[!m_drums + ev.id].setValue(1.0);
+		if (ev.type == input::Event::PRESS) m_pressed_anim[!m_drums + ev.button].setValue(1.0);
 		else if (ev.type == input::Event::PICK) m_pressed_anim[0].setValue(1.0);
 		// Playing
 		if (m_drums) {
-			if (ev.type == input::Event::PRESS) drumHit(time, ev.id);
+			if (ev.type == input::Event::PRESS) drumHit(time, ev.button);
 		} else {
 			guitarPlay(time, ev);
 		}
@@ -668,14 +668,14 @@ void GuitarGraph::drumHit(double time, int fret) {
 
 /// Handle guitar events and scoring
 void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
-	bool picked = (ev.id == input::GUITAR_PICK_UP || ev.id == input::GUITAR_PICK_DOWN) && ev.value != 0.0;
+	bool picked = (ev.button == input::GUITAR_PICK_UP || ev.button == input::GUITAR_PICK_DOWN) && ev.value != 0.0;
 	// Handle Big Rock Ending
 	if (m_dfIt != m_drumfills.end() && time >= m_dfIt->begin - maxTolerance
 	  && time <= m_dfIt->end + maxTolerance) {
 		if (ev.value == 0.0) return;  // No processing for release events
 		m_drumfillHits += 1;
-		m_flames[ev.id].push_back(AnimValue(0.0, flameSpd));
-		m_flames[ev.id].back().setTarget(1.0);
+		m_flames[ev.button].push_back(AnimValue(0.0, flameSpd));
+		m_flames[ev.button].back().setTarget(1.0);
 		return;
 	}
 	bool frets[max_panels];  // The combination about to be played
@@ -684,18 +684,18 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 			// FIXME: frets[fret] = ev.pressed[fret];
 		}
 	} else { // Attempt to tap
-		if (ev.id >= m_pads) return;
+		if (ev.button >= m_pads) return;
 		if (m_correctness.get() < 0.5 && m_starpower.get() < 0.001) return; // Hammering not possible at the moment
 		for (int fret = 0; fret < m_pads; ++fret) frets[fret] = false;
-		for (int fret = ev.id + 1; fret < m_pads; ++fret) {
+		for (int fret = ev.button + 1; fret < m_pads; ++fret) {
 			//FIXME: if (ev.pressed[fret]) return; // Extra buttons on right side
 		}
 		if (ev.value != 0.0) {
 			// Hammer-on, the fret pressed is played
-			frets[ev.id] = true;
+			frets[ev.button] = true;
 		} else {
 			// Pull off, find the note to played that way
-			int fret = ev.id;
+			int fret = ev.button;
 			do {
 				if (--fret < 0) return; // No frets pressed -> not a pull off
 			} while (/*FIXME: !ev.pressed[fret]*/ false);
