@@ -47,7 +47,7 @@ static inline bool operator==(Chord const& a, Chord const& b) {
 class GuitarGraph: public InstrumentGraph {
   public:
 	/// constructor
-	GuitarGraph(Audio& audio, Song const& song, bool drums, int number);
+	GuitarGraph(Audio& audio, Song const& song, input::DevicePtr dev, int number);
 	/** draws GuitarGraph
 	 * @param time at which time to draw
 	 */

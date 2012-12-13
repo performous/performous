@@ -4,6 +4,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
+#include <boost/smart_ptr/weak_ptr.hpp>
 #include <libxml++/libxml++.h>
 #include <SDL_joystick.h>
 #include <deque>
@@ -103,8 +104,11 @@ struct Controllers::Impl {
 	typedef std::map<SourceType, Hardware::ptr> HW;
 	HW m_hw;
 	std::deque<NavEvent> m_navEvents;
+	std::deque<DevicePtr> m_orphans;
+	std::map<SourceId, boost::weak_ptr<Device> > m_devices;
+	bool m_eventsEnabled;
 
-	Impl() {
+	Impl(): m_eventsEnabled() {
 		#define DEFINE_BUTTON(devtype, button, num, nav) m_buttons[DEVTYPE_##devtype][#button] = devtype##_##button;
 		#include "controllers-buttons.ii"
 		readControllers(getDefaultConfig(fs::path("/config/controllers.xml")));
@@ -213,6 +217,19 @@ struct Controllers::Impl {
 		m_navEvents.pop_front();
 		return true;
 	}
+	/// Return the next orphan device from queue, if available
+	bool getDevice(DevicePtr& dev) {
+		if (m_orphans.empty()) return false;
+		dev = *m_orphans.begin();
+		m_orphans.erase(m_orphans.begin());
+		return true;
+	}
+	void enableEvents(bool state) {
+		m_eventsEnabled = state;
+		Hardware::enableKeyboardInstruments(state);
+		m_orphans.clear();
+		m_devices.clear();
+	}
 	bool pressed(SourceId const& source, Button button) { return false; }
 	/// Do internal event processing (poll for MIDI events etc)
 	void process(boost::xtime const& now) {
@@ -296,6 +313,14 @@ struct Controllers::Impl {
 			ne.time = ev.time;
 			m_navEvents.push_back(ne);
 		}
+		if (!m_eventsEnabled) return;
+		// Emit Event and construct a new Device first if needed
+		DevicePtr ptr = m_devices[ev.source].lock();
+		if (!ptr) {
+			ptr.reset(new Device(ev.source, ev.devType));
+			m_devices[ev.source] = ptr;
+		}
+		ptr->pushEvent(ev);
 	}
 };
 
@@ -303,7 +328,20 @@ struct Controllers::Impl {
 Controllers::Controllers(): self(new Controllers::Impl()) {}
 Controllers::~Controllers() {}
 bool Controllers::getNav(NavEvent& ev) { return self->getNav(ev); }
+bool Controllers::getDevice(DevicePtr& dev) { return self->getDevice(dev); }
+void Controllers::enableEvents(bool state) { self->enableEvents(state); }
 double Controllers::pressed(SourceId const& source, Button button) { return self->pressed(source, button); }
 void Controllers::process(boost::xtime const& now) { self->process(now); }
 bool Controllers::pushEvent(SDL_Event const& ev, boost::xtime const& t) { return self->pushEvent(ev, t); }
+
+bool Device::getEvent(Event& ev) {
+	if (m_events.empty()) return false;
+	ev = m_events.front();
+	m_events.pop_front();
+	return true;
+}
+
+void Device::pushEvent(Event const& ev) {
+	m_events.push_back(ev);
+}
 

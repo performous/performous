@@ -79,8 +79,8 @@ namespace {
 
 
 /// Constructor
-DanceGraph::DanceGraph(Audio& audio, Song const& song):
-  InstrumentGraph(audio, song, input::DEVTYPE_DANCEPAD),
+DanceGraph::DanceGraph(Audio& audio, Song const& song, input::DevicePtr dev):
+  InstrumentGraph(audio, song, dev),
   m_level(BEGINNER),
   m_beat(getThemePath("dancebeat.svg")),
   m_arrows(getThemePath("arrows.svg")),
@@ -210,7 +210,7 @@ std::string DanceGraph::getDifficultyString() const {
 
 /// Get a string id for track and difficulty
 std::string DanceGraph::getModeId() const {
-	return m_gamingMode + " - " + diffv[m_level] + (/* FIXME m_input.isKeyboard()*/ false ? " (kbd)" : "");
+	return m_gamingMode + " - " + diffv[m_level] + ( m_dev->source.type == input::SOURCETYPE_KEYBOARD ? " (kbd)" : "");
 }
 
 /// Attempt to change the difficulty by a step
@@ -268,9 +268,8 @@ void DanceGraph::engine() {
 	if (outsideStop && m_insideStop) m_insideStop = false;
 	if (joining(time)) m_dead = 0; // Disable dead counting while joining
 	bool difficulty_changed = false;
-#if 0 // FIXME
 	// Handle all events
-	for (input::Event ev; m_input.tryPoll(ev);) {
+	for (input::Event ev; m_dev.getEvent(ev); ) {
 		m_dead = 0; // Keep alive
 		if (m_jointime != m_jointime) { // Handle joining
 			m_jointime = time < 0.0 ? -1.0 : time + join_delay;
@@ -306,7 +305,7 @@ void DanceGraph::engine() {
 			m_pressed_anim[ev.button].setValue(1.0);
 		}
 	}
-#endif
+
 	// Countdown to start
 	handleCountdown(time, time < getNotesBeginTime() ? getNotesBeginTime() : m_jointime+1);
 

@@ -24,7 +24,7 @@ typedef std::vector<DanceNote> DanceNotes;
 class DanceGraph: public InstrumentGraph {
   public:
 	/// constructor
-	DanceGraph(Audio& audio, Song const& song);
+	DanceGraph(Audio& audio, Song const& song, input::DevicePtr dev);
 	/** draws DanceGraph
 	 * @param time at which time to draw
 	 */

@@ -61,32 +61,8 @@ void ScreenSing::enter() {
 	}
 	// Notify about broken tracks
 	if (!m_song->b0rked.empty()) sm->dialog(_("Song contains broken tracks!") + std::string("\n\n") + m_song->b0rked);
-	// Load instrument and dance tracks
-	sm->loading(_("Loading instruments..."), 0.5);
-	{
-		int type = 0; // 0 for dance, 1 for guitars, 2 for drums
-		int idx = 0;
-#if 0 // FIXME
-		while (1) {
-			try {
-				if (idx == 0) {
-					if (type == 0 && !m_song->hasDance()) ++type;
-					if (type == 1 && !m_song->hasGuitars()) ++type;
-					if (type == 2 && !m_song->hasDrums()) ++type;
-					if (type == 3) break;
-				}
-				if (type == 0) m_dancers.push_back(new DanceGraph(m_audio, *m_song));
-				else m_instruments.push_back(new GuitarGraph(m_audio, *m_song, type == 2, idx));
-				++idx;
-			} catch (input::NoDevError&) {
-				++type;
-				idx = 0;
-			}
-		}
-#endif
-	}
 	// Startup delay for instruments is longer than for singing only
-	double setup_delay = (m_instruments.empty() && m_dancers.empty() ? -1.0 : -5.0);
+	double setup_delay = (!m_song->hasControllers() ? -1.0 : -5.0);
 	m_audio.pause();
 	m_audio.playMusic(m_song->music, false, 0.0, setup_delay);
 	sm->loading(_("Loading menu..."), 0.7);
@@ -115,6 +91,7 @@ void ScreenSing::enter() {
 		m_menu.open();
 		if (tracks.size() <= 1) setupVocals();  // No duet menu
 	}
+	sm->controllers.enableEvents(true);
 	sm->showLogo(false);
 	sm->loading(_("Loading complete"), 1.0);
 }
@@ -162,6 +139,7 @@ void ScreenSing::reloadGL() {
 }
 
 void ScreenSing::exit() {
+	ScreenManager::getSingletonPtr()->controllers.enableEvents(false);
 	m_engine.reset();
 	m_score_window.reset();
 	m_menu.clear();
@@ -259,13 +237,15 @@ void ScreenSing::danceLayout(double time) {
 		else if (count_menu > 0 && !m_audio.isPaused()) m_audio.togglePause();
 	}
 	double iw = std::min(0.5, 1.0 / m_dancers.size());
-	for (Dancers::iterator it = m_dancers.begin(); it != m_dancers.end(); ++it) {
+	for (Dancers::iterator it = m_dancers.begin(); it != m_dancers.end();) {
 		it->engine(); // Run engine even when dead so that joining is possible
-		if (!it->dead()) {
-			it->position((0.5 + i - 0.5 * count_alive) * iw, iw); // Do layout stuff
-			it->draw(time);
-			++i;
+		if (it->dead()) {
+			it = m_dancers.erase(it);
+			continue;
 		}
+		it->position((0.5 + i - 0.5 * count_alive) * iw, iw); // Do layout stuff
+		it->draw(time);
+		++i, ++it;
 	}
 	if (time < -0.5 && count_alive == 0) {
 		ColorTrans c(Color::alpha(clamp(-1.0 - 2.0 * time)));
@@ -426,8 +406,14 @@ namespace {
 }
 
 void ScreenSing::prepare() {
+	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	double time = m_audio.getPosition();
 	if (m_video) m_video->prepare(time);
+	for (input::DevicePtr dev; sm->controllers.getDevice(dev); ) {
+		if (dev->type == input::DEVTYPE_DANCEPAD && m_song->hasDance()) m_dancers.push_back(new DanceGraph(m_audio, *m_song, dev));
+		//if (dev->type == input::DEVTYPE_GUITAR && m_song->hasGuitars()) m_dancers.push_back(new GuitarGraph(m_audio, *m_song, dev));
+		//if (dev->type == input::DEVTYPE_DRUMS && m_song->hasDrums()) m_dancers.push_back(new DrumGraph(m_audio, *m_song, dev));
+	}
 }
 
 void ScreenSing::draw() {

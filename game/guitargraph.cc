@@ -93,8 +93,8 @@ void GuitarGraph::initDrums() {
 	//m_samples.push_back("drum tom2");
 }
 
-GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number):
-  InstrumentGraph(audio, song, drums ? input::DEVTYPE_DRUMS : input::DEVTYPE_GUITAR),
+GuitarGraph::GuitarGraph(Audio& audio, Song const& song, input::DevicePtr dev, int number):
+  InstrumentGraph(audio, song, dev),
   m_tail(getThemePath("tail.svg")),
   m_tail_glow(getThemePath("tail_glow.svg")),
   m_tail_drumfill(getThemePath("tail_drumfill.svg")),
@@ -103,7 +103,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, bool drums, int number)
   m_tap(getThemePath("tap.svg")),
   m_neckglow(getThemePath("neck_glow.svg")),
   m_neckglowColor(),
-  m_drums(drums),
+  m_drums(dev->type == input::DEVTYPE_DRUMS),
   m_level(),
   m_track_index(m_instrumentTracks.end()),
   m_dfIt(m_drumfills.end()),

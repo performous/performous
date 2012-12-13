@@ -61,15 +61,16 @@ const unsigned max_panels = 10; // Maximum number of arrow lines / guitar frets
 class Song;
 
 class InstrumentGraph {
-  public:
+public:
 	/// Constructor
-	InstrumentGraph(Audio& audio, Song const& song, input::DevType inp);
+	InstrumentGraph(Audio& audio, Song const& song, input::DevicePtr dev);
 	/// Virtual destructor
 	virtual ~InstrumentGraph() {}
 
 	// Interface functions
 	virtual void draw(double time) = 0;
 	virtual void engine() = 0;
+	virtual void process(input::Event const& ev) {}
 	virtual bool dead() const = 0;
 	virtual std::string getTrack() const = 0;
 	virtual std::string getDifficultyString() const = 0;
@@ -94,7 +95,7 @@ class InstrumentGraph {
 	unsigned stream() const { return m_stream; }
 	double correctness() const { return m_correctness.get(); }
 	int getScore() const { return (m_score > 0 ? m_score : 0) * m_scoreFactor; }
-	input::DevType getGraphType() const { return input::DEVTYPE_GUITAR; /* FIXME */ }
+	input::DevType getGraphType() const { return m_dev->type; }
 	virtual double getWhammy() const { return 0; }
 
   protected:
@@ -102,6 +103,7 @@ class InstrumentGraph {
 	Audio& m_audio;
 	Song const& m_song;
 	std::size_t m_stream; /// audio stream number
+	input::DevicePtr m_dev;
 	AnimValue m_cx, m_width; /// controls horizontal position and width smoothly
 	struct Event {
 		double time;

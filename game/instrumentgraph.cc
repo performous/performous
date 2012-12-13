@@ -5,9 +5,10 @@
 //const unsigned InstrumentGraph::max_panels = 10; // Maximum number of arrow lines / guitar frets
 
 
-InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevType inp):
+InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevicePtr dev):
   m_audio(audio), m_song(song),
   m_stream(),
+  m_dev(dev),
   m_cx(0.0, 0.2), m_width(0.5, 0.4),
   m_menu(),
   m_button(getThemePath("button.svg")),

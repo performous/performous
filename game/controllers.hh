@@ -73,12 +73,30 @@ namespace input {
 	/// Returns NULL if such events should be ignored or an EventHandler that will then be instantly called to process the event and bound for any future events.
 	typedef boost::function<EventHandler (DevType devType)> MissingEventHandler;
 	
-	class Controllers {
+	/// A handle for receiving device events
+	class Device: boost::noncopyable {
+		typedef std::deque<Event> Events;
+		Events m_events;
+	public:
+		const SourceId source;
+		const DevType type;
+		Device(SourceId const& source, DevType type): source(source), type(type) {}
+		bool getEvent(Event&);
+		void pushEvent(Event const&);
+	};
+	typedef boost::shared_ptr<Device> DevicePtr;
+
+	/// The main controller class that contains everything
+	class Controllers: boost::noncopyable {
 	public:
 		Controllers();
 		~Controllers();
-		/// Return true and an event if there are any in queue. Otherwise return false.
+		/// Return true and a nav event if there are any in queue. Otherwise return false.
 		bool getNav(NavEvent& ev);
+		/// Enable or disable event processing (pending events will be cleared).
+		void enableEvents(bool state);
+		/// Return true and an event handler device if there are any in queue. Otherwise return false.
+		bool getDevice(DevicePtr& dev);
 		/// Test if a particular button is currently being held (returns last value, zero if not pressed)
 		double pressed(SourceId const& source, Button button);
 		/// Internally poll for new events. The current time is passed for reference.
@@ -91,7 +109,7 @@ namespace input {
 	};
 
 	/// Base class for different types of hardware backends.
-	class Hardware {
+	class Hardware: boost::noncopyable {
 	public:
 		static bool midiEnabled();
 		static void enableKeyboardInstruments(bool state);
