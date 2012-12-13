@@ -7,7 +7,13 @@ namespace input {
 	struct Joysticks: public Hardware {
 		Joysticks() {
 			for (int id = 0; id < SDL_NumJoysticks(); ++id) {
-				m_joysticks.push_back(JoyPtr(SDL_JoystickOpen(id), SDL_JoystickClose));
+				JoyPtr joy(SDL_JoystickOpen(id), SDL_JoystickClose);
+				std::clog << "controller-joystick/info: Opened joystick " << id << ": " << getName(id) << " ("
+				  << SDL_JoystickNumButtons(joy.get()) << " buttons, "
+				  << SDL_JoystickNumAxes(joy.get()) << " axes, "
+				  << SDL_JoystickNumHats(joy.get()) << " hats, "
+				  << SDL_JoystickNumBalls(joy.get()) << " balls)" << std::endl;
+				m_joysticks.push_back(joy);
 			}
 		}
 		std::string getName(unsigned device) const {
@@ -89,40 +95,6 @@ void init() {
 			if (!found) std::clog << "controllers/error: Controller type \"" << type << "\" unknown" << std::endl;
 		}
 	}
-
-	unsigned int nbjoysticks = SDL_NumJoysticks();
-	for (unsigned int i = 0 ; i < nbjoysticks ; ++i) {
-		std::string name = SDL_JoystickName(i);
-		std::cout << "SDL joystick: " << name << std::endl;
-		SDL_Joystick* joy = SDL_JoystickOpen(i);
-		SDL::sdl_devices[i] = joy;
-		std::cout << "  Id: " << i;
-		std::cout << ",  Axes: " << SDL_JoystickNumAxes(joy);
-		std::cout << ", Balls: " << SDL_JoystickNumBalls(joy);
-		std::cout << ", Buttons: " << SDL_JoystickNumButtons(joy);
-		std::cout << ", Hats: " << SDL_JoystickNumHats(joy) << std::endl;
-		if (forced_type.find(i) != forced_type.end() ) {
-			std::cout << "  Detected as: " << forced_type.find(i)->second.description << " (forced)" << std::endl;
-			detail::devices.insert(std::make_pair(i, detail::InputDevPrivate(forced_type.find(i)->second)));
-		} else {
-			bool found = false;
-			for (ControllerDefs::const_iterator it = m_controllerDefs.begin(); it != m_controllerDefs.end(); ++it) {
-				ControllerDef const& def = it->second;
-				if (regex_search(name.c_str(), def.deviceRegex)) {
-					std::cout << "  Detected as: " << def.description << std::endl;
-					detail::devices.insert(std::make_pair(i, detail::InputDevPrivate(def)));
-					found = true;
-					break;
-				}
-			}
-			if(!found) {
-				std::cout << "  Detected as: Unknown (please report the name; use config to force detection)" << std::endl;
-				SDL_JoystickClose(joy);
-				continue;
-			}
-		}
-	}
-}
 
 #endif
 

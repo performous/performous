@@ -269,13 +269,13 @@ struct Controllers::Impl {
  				ev.id = m.positive; ev.value = clamp(value); pushMappedEvent(ev);
 				ev.id = m.negative; ev.value = clamp(-value); pushMappedEvent(ev);
 			}
-			else std::clog << "controllers/info: " << ev.source << " unmapped hw=" << ev.hw << " " << buttonDebug(ev.devType, ev.id) << " value=" << ev.value << std::endl;
+			else std::clog << "controller-events/warn: " << ev.source << " unmapped hw=" << ev.hw << " " << buttonDebug(ev.devType, ev.id) << " value=" << ev.value << std::endl;
 		}
 		else pushMappedEvent(ev);  // This is for keyboard events mainly (they have no ControllerDefs)
 	}
 	void pushMappedEvent(Event ev) {
 		if (ev.id == GENERIC_UNASSIGNED) return;
-		std::clog << "controllers/info: " << ev.source << " event " << buttonDebug(ev.devType, ev.id) << " value=" << ev.value << std::endl;
+		std::clog << "controller-events/info: " << ev.source << " processing " << buttonDebug(ev.devType, ev.id) << " value=" << ev.value << std::endl;
 		ev.navButton = navigation(ev);
 		// Emit nav event
 		if (ev.navButton != NAV_NONE && ev.value != 0.0) {

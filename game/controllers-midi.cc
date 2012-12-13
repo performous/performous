@@ -15,6 +15,7 @@ namespace input {
 			for (int dev = 0; dev < Pm_CountDevices(); ++dev) {
 				try {
 					m_streams.push_back(new pm::Input(dev));
+					std::clog << "controller-midi/info: Opened MIDI device " << dev << ": " << getName(dev) << std::endl;
 				} catch (std::runtime_error& e) {
 					std::clog << "controller-midi/warn: " << e.what() << std::endl;
 					m_streams.push_back(NULL);
