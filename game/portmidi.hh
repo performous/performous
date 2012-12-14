@@ -12,36 +12,13 @@ namespace pm {
 	class Stream {
 	public:
 		operator PortMidiStream*() { return m_handle; }
-
+		Stream(Stream const&) = delete;
 	protected:
 		PortMidiStream* m_handle;
 		Stream(): m_handle() {}
 		void abort() { Pm_Abort(m_handle); m_handle = NULL; }
 		~Stream() { if (m_handle) Pm_Close(m_handle); }
 	};
-
-	namespace {
-		void dumpDevices(bool input) {
-			std::cout << "MIDI devices:" << std::endl;
-			for (int devId = Pm_CountDevices(); devId--;) {
-				PmDeviceInfo const* info = Pm_GetDeviceInfo(devId);
-				if (info->input != input) continue;
-				if (info->opened) continue;
-				std::cout << "  " << info->name << std::endl << std::endl;
-			}
-		}
-		int findDevice(bool input, std::string const& name = "") {
-			// Loop in reverse order because the last devices are more likely good ones
-			for (int devId = Pm_CountDevices(); devId--;) {
-				PmDeviceInfo const* info = Pm_GetDeviceInfo(devId);
-				if (info->input != input) continue;
-				if (info->opened) continue;
-				if (!name.empty() && std::string(info->name).find(name) == std::string::npos) continue;
-				return devId;
-			}
-			throw std::runtime_error("No matching PortMidi device found");
-		}
-	}
 
 	class Input: public Stream {
 	public:
