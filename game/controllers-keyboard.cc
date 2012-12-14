@@ -76,15 +76,15 @@ namespace input {
 		Button navigation(Event& event, SDL_Event const& sdlEv) {
 			unsigned k = event.hw;
 			SDLMod mod = sdlEv.key.keysym.mod;
-			if (k == SDLK_UP) return mod & KMOD_CTRL ? GENERIC_VOLUME_UP : GENERIC_UP;
-			if (k == SDLK_DOWN) return mod & KMOD_CTRL ? GENERIC_VOLUME_DOWN : GENERIC_DOWN;
+			if (k == SDLK_UP) return mod & KMOD_LCTRL ? GENERIC_VOLUME_UP : GENERIC_UP;
+			if (k == SDLK_DOWN) return mod & KMOD_LCTRL ? GENERIC_VOLUME_DOWN : GENERIC_DOWN;
 			if (k == SDLK_LEFT) return GENERIC_LEFT;
 			if (k == SDLK_RIGHT) return GENERIC_RIGHT;
 			if (k == SDLK_RETURN || k == SDLK_KP_ENTER) return GENERIC_START;
 			if (k == SDLK_ESCAPE) return GENERIC_CANCEL;
 			if (k == SDLK_PAGEUP) return GENERIC_MOREUP;
 			if (k == SDLK_PAGEDOWN) return GENERIC_MOREDOWN;
-			if (k == SDLK_PAUSE || (k == SDLK_p && mod & KMOD_CTRL)) return GENERIC_PAUSE;
+			if (k == SDLK_PAUSE || (k == SDLK_p && mod & KMOD_LCTRL)) return GENERIC_PAUSE;
 			return GENERIC_UNASSIGNED;
 		}
 	};
