@@ -96,7 +96,8 @@ namespace {
 	fs::path origin;  // The primary shared data folder
 	
 	std::string getText(xmlpp::Element const& elem) {
-		return elem.get_child_text()->get_content();
+		xmlpp::TextNode const* n = elem.get_child_text();  // Returns NULL if there is no text
+		return n ? std::string(n->get_content()) : std::string();
 	}
 	
 	std::string getText(xmlpp::Element const& elem, std::string const& path) {
