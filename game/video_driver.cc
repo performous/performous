@@ -15,6 +15,8 @@
 # include "bcm_host.h"
 #endif
 #ifdef USE_EGL
+// Need to define this or we get a conlict on Window
+# define MESA_EGL_NO_X11_HEADERS
 # include <EGL/egl.h>
 # include <EGL/eglext.h>
 #endif
@@ -75,6 +77,8 @@ namespace {
 	// FIXME: Move to header
 	#ifdef USE_RPI
 	static EGL_DISPMANX_WINDOW_T native_window;
+	#elif defined(USE_EGL)
+	static unsigned int native_window;
 	#endif
 
 	#ifdef USE_EGL
@@ -109,7 +113,7 @@ void initEGL() {
 	EGLSurface surface;
 	EGLContext context;
 
-	std::cout << "initEGL" << std::endl;
+	std::cout << "eglGetDisplay" << std::endl;
 	// Get an EGL display connection
 	display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
 	if (display == EGL_NO_DISPLAY)
@@ -175,7 +179,12 @@ void initEGL() {
 	#endif // USE_RPI
 
 	std::cout << "eglCreateWindowSurface" << std::endl;
+	#ifdef USE_RPI
 	surface = eglCreateWindowSurface(display, config, &native_window, NULL);
+	#else
+	surface = eglCreateWindowSurface(display, config, native_window, NULL);
+	#endif
+
 	if (surface == EGL_NO_SURFACE)
 		throw std::runtime_error("eglCreateWindowSurface failed!");
 	glerror.check("eglCreateWindowSurface");
