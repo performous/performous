@@ -303,7 +303,7 @@ void GuitarGraph::engine() {
 	// Handle key markers
 	if (!m_drums) {
 		for (int i = 0; i < m_pads; ++i) {
-			// FIXME:if (m_input.pressed(i)) m_pressed_anim[i + 1].setValue(1.0);
+			if (m_pressed[i]) m_pressed_anim[i + 1].setValue(1.0);
 		}
 	}
 	if (!m_drumfills.empty()) updateDrumFill(time); // Drum Fills / BREs
@@ -313,6 +313,8 @@ void GuitarGraph::engine() {
 	handleCountdown(time, time < getNotesBeginTime() ? getNotesBeginTime() : m_jointime+1);
 	// Handle all events
 	for (input::Event ev; m_dev->getEvent(ev); ) {
+		// Update key pressed status
+		if (ev.button < m_pads) m_pressed[ev.button] = ev.value;
 		// This hack disallows joining with Enter and CTRL-key
 		// since they cause issues due to also being used in other places
 		if (dead() && isKeyboard() && (ev.button == input::GUITAR_PICK_DOWN || ev.button == input::GUITAR_GODMODE)) continue;
@@ -648,14 +650,14 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 	bool frets[max_panels];  // The combination about to be played
 	if (picked) {
 		for (int fret = 0; fret < m_pads; ++fret) {
-			// FIXME: frets[fret] = ev.pressed[fret];
+			frets[fret] = m_pressed[fret];
 		}
 	} else { // Attempt to tap
 		if (ev.button >= m_pads) return;
 		if (m_correctness.get() < 0.5 && m_starpower.get() < 0.001) return; // Hammering not possible at the moment
 		for (int fret = 0; fret < m_pads; ++fret) frets[fret] = false;
 		for (int fret = ev.button + 1; fret < m_pads; ++fret) {
-			//FIXME: if (ev.pressed[fret]) return; // Extra buttons on right side
+			if (frets[fret]) return; // Extra buttons on right side
 		}
 		if (ev.value != 0.0) {
 			// Hammer-on, the fret pressed is played
@@ -665,7 +667,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 			int fret = ev.button;
 			do {
 				if (--fret < 0) return; // No frets pressed -> not a pull off
-			} while (/*FIXME: !ev.pressed[fret]*/ false);
+			} while (!frets[fret]);
 			frets[fret] = true;
 		}
 	}
@@ -1185,7 +1187,7 @@ void GuitarGraph::updateChords() {
 
 	Durations::size_type pos[5] = {}, size[5] = {};
 	Durations const* durations[5] = {};
-	for (int fret = 0; fret < 5; ++fret) {
+	for (int fret = 0; fret < m_pads; ++fret) {
 		int basepitch = diffv[m_level].basepitch;
 		NoteMap::const_iterator it = nm.find(basepitch + fret);
 		if (it == nm.end()) continue;
@@ -1197,7 +1199,7 @@ void GuitarGraph::updateChords() {
 	while (true) {
 		// Find the earliest
 		double t = getInf();
-		for (int fret = 0; fret < 5; ++fret) {
+		for (int fret = 0; fret < m_pads; ++fret) {
 			if (pos[fret] == size[fret]) continue;
 			Durations const& dur = *durations[fret];
 			t = std::min(t, dur[pos[fret]].begin);
@@ -1208,7 +1210,7 @@ void GuitarGraph::updateChords() {
 		Chord c;
 		c.begin = t;
 		int tapfret = -1;
-		for (int fret = 0; fret < 5; ++fret) {
+		for (int fret = 0; fret < m_pads; ++fret) {
 			if (pos[fret] == size[fret]) continue;
 			Durations const& dur = *durations[fret];
 			Duration const& d = dur[pos[fret]];
