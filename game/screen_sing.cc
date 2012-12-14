@@ -411,8 +411,8 @@ void ScreenSing::prepare() {
 	if (m_video) m_video->prepare(time);
 	for (input::DevicePtr dev; sm->controllers.getDevice(dev); ) {
 		if (dev->type == input::DEVTYPE_DANCEPAD && m_song->hasDance()) m_dancers.push_back(new DanceGraph(m_audio, *m_song, dev));
-		if (dev->type == input::DEVTYPE_GUITAR && m_song->hasGuitars()) m_dancers.push_back(new GuitarGraph(m_audio, *m_song, dev, 0));
-		if (dev->type == input::DEVTYPE_DRUMS && m_song->hasDrums()) m_dancers.push_back(new GuitarGraph(m_audio, *m_song, dev, 0));
+		if (dev->type == input::DEVTYPE_GUITAR && m_song->hasGuitars()) m_instruments.push_back(new GuitarGraph(m_audio, *m_song, dev, 0));
+		if (dev->type == input::DEVTYPE_DRUMS && m_song->hasDrums()) m_instruments.push_back(new GuitarGraph(m_audio, *m_song, dev, 0));
 	}
 }
 
