@@ -410,9 +410,27 @@ void ScreenSing::prepare() {
 	double time = m_audio.getPosition();
 	if (m_video) m_video->prepare(time);
 	for (input::DevicePtr dev; sm->controllers.getDevice(dev); ) {
-		if (dev->type == input::DEVTYPE_DANCEPAD && m_song->hasDance()) m_dancers.push_back(new DanceGraph(m_audio, *m_song, dev));
-		if (dev->type == input::DEVTYPE_GUITAR && m_song->hasGuitars()) m_instruments.push_back(new GuitarGraph(m_audio, *m_song, dev, 0));
-		if (dev->type == input::DEVTYPE_DRUMS && m_song->hasDrums()) m_instruments.push_back(new GuitarGraph(m_audio, *m_song, dev, 0));
+		// Eat all events and see if any are valid for joining
+		input::DevType type = input::DEVTYPE_GENERIC;
+		std::string msg;
+		for (input::Event ev; dev->getEvent(ev);) {
+			if (ev.value == 0.0) continue;
+			if (dev->type == input::DEVTYPE_DANCEPAD && m_song->hasDance()) {
+				if (ev.button == input::DANCEPAD_UP) type = dev->type;
+				else msg = _("Dance UP to join!");
+			}
+			else if (dev->type == input::DEVTYPE_GUITAR && m_song->hasGuitars()) {
+				if (ev.button == input::GUITAR_PICK_DOWN || ev.button == input::GUITAR_PICK_UP) type = dev->type;
+				else if (ev.button != input::GUITAR_WHAMMY && ev.button != input::GUITAR_GODMODE) msg = _("PICK the guitar to join!");
+			}
+			else if (dev->type == input::DEVTYPE_DRUMS && m_song->hasDrums()) {
+				if (ev.button == input::DRUMS_KICK) type = dev->type;
+				else msg = _("Play KICK to join!");
+			}
+		}
+		if (!msg.empty()) sm->flashMessage(msg);
+		else if (type == input::DEVTYPE_DANCEPAD) m_dancers.push_back(new DanceGraph(m_audio, *m_song, dev));
+		else if (type != input::DEVTYPE_GENERIC) m_instruments.push_back(new GuitarGraph(m_audio, *m_song, dev, m_instruments.size()));
 	}
 }
 
