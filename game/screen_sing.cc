@@ -290,6 +290,7 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 	// Only pause or esc opens the global menu (instruments have their own menus)
 	// TODO: This should probably check if the source is participating as an instrument or not rather than check for its type
 	if (event.source.type == input::SOURCETYPE_KEYBOARD && (nav == input::NAV_PAUSE || nav == input::NAV_CANCEL) && !m_audio.isPaused() && !m_menu.isOpen()) {
+		input::Hardware::enableKeyboardInstruments(false);
 		m_menu.open();
 		m_audio.togglePause();
 	}
@@ -297,7 +298,11 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 	if (m_menu.isOpen()) {
 		if (nav == input::NAV_START) {
 			m_menu.action();
-			if (!m_menu.isOpen() && m_audio.isPaused()) m_audio.togglePause();
+			// Did the action close the menu?
+			if (!m_menu.isOpen() && m_audio.isPaused()) {
+				m_audio.togglePause();
+				input::Hardware::enableKeyboardInstruments(true);
+			}
 			return;
 		}
 		else if (nav == input::NAV_LEFT) { m_menu.action(-1); return; }
