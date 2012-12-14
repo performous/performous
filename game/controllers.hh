@@ -5,7 +5,6 @@
 #include <vector>
 #include <iostream>
 #include <stdexcept>
-#include <boost/function.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/smart_ptr/scoped_ptr.hpp>
 
@@ -66,13 +65,6 @@ namespace input {
 		Event(): source(), hw(), button(GENERIC_UNASSIGNED), nav(NAV_NONE), value(), time(), devType() {}
 	};
 
-	/// EventHandler is a function called to process an event as soon as it arrives. Returns true if the event was accepted.
-	typedef boost::function<bool (Event const& ev)> EventHandler;
-
-	/// MissingEventHandler is a function called if whenever an event not currently assigned an EventHandler is received.
-	/// Returns NULL if such events should be ignored or an EventHandler that will then be instantly called to process the event and bound for any future events.
-	typedef boost::function<EventHandler (DevType devType)> MissingEventHandler;
-	
 	/// A handle for receiving device events
 	class Device: boost::noncopyable {
 		typedef std::deque<Event> Events;
