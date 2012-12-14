@@ -25,17 +25,21 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebI
 	add_definitions("-DNDEBUG")
 endif()
 
-# Enable C++11 support
-if(CMAKE_COMPILER_IS_GNUCXX)
+# Enable C++11 support and other compiler flags...
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+	message("Detected GCC version ${GCC_VERSION}")
 	if (GCC_VERSION VERSION_LESS 4.7)
-		set(CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS}")
+		set(CMAKE_CXX_FLAGS "-std=c++0x -Wall -Wno-reorder ${CMAKE_CXX_FLAGS}")
 	else()
-		set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
+		set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wno-reorder ${CMAKE_CXX_FLAGS}")
 	endif()
 endif()
 
-message("${CMAKE_CXX_FLAGS}")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+	set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wno-unused-function -Wno-reorder ${CMAKE_CXX_FLAGS}")
+endif()
 
 if(WIN32)
 	set(SHARE_INSTALL "." CACHE STRING "Data file install path. Must be a relative path (from CMAKE_INSTALL_PREFIX), with no trailing slash.")
