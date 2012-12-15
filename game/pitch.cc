@@ -68,8 +68,6 @@ void Analyzer::output(float* begin, float* end) {
 
 
 namespace {
-	bool sqrLT(float a, float b) { return a * a < b * b; }
-
 	struct Peak {
 		double freq;
 		double db;

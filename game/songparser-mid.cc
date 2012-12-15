@@ -1,6 +1,5 @@
 #include "songparser.hh"
 
-#include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>
 #include <stdexcept>
@@ -16,10 +15,6 @@ const std::string HARMONIC_2 = "Harmonic 2";
 const std::string HARMONIC_3 = "Harmonic 3";
 
 namespace {
-	void testAndAdd(Song& s, std::string const& trackid, std::string const& filename) {
-		std::string f = s.path + filename;
-		if (boost::filesystem::exists(f)) s.music[trackid] = f;
-	}
 	bool isVocalTrack(std::string name) {
 		if(name == TrackName::LEAD_VOCAL) return true;
 		else if(name == HARMONIC_1) return true;
@@ -118,12 +113,11 @@ void SongParser::midParse() {
 			// This number has been extracted from broken song tracks, but
 			// it is probably DIFFICULTYCOUNT * different_frets.
 			if (durCount <= 20) {
-				s.b0rkedTracks = true;
 				nm2.clear();
-				std::ostringstream oss;
-				oss << "Track " << name << " is broken in ";
-				oss << s.path << s.midifilename << std::endl;
-				std::clog << "songparser/warning: " << oss.str(); // More likely to be atomic when written as one string
+				std::string msg = "Track " + name + " is broken (has too few notes).\n";
+				s.b0rked += msg;
+				msg = "songparser/warning: " + s.path + s.midifilename + ": " + msg;
+				std::clog << msg << std::flush; // More likely to be atomic when written as one string
 				s.instrumentTracks.erase(name);
 			}
 		} else {

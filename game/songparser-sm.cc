@@ -1,6 +1,5 @@
 #include "songparser.hh"
 
-#include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <algorithm>
 #include <stdexcept>

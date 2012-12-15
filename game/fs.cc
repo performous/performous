@@ -138,11 +138,7 @@ std::vector<std::string> getThemes() {
 			for (fs::directory_iterator dirIt(p), dirEnd; dirIt != dirEnd; ++dirIt) {
 				fs::path p2 = dirIt->path();
 				if (fs::is_directory(p2)) {
-				#if BOOST_FILESYSTEM_VERSION < 3
-					themes.push_back(p2.leaf());
-				#else
 					themes.push_back(p2.filename().string());
-				#endif
 				}
 			}
 		}
@@ -155,11 +151,7 @@ std::vector<std::string> getThemes() {
 
 bool isThemeResource(fs::path filename){
 	try {
-#if BOOST_FILESYSTEM_VERSION < 3
-		std::string themefile = getThemePath(filename.filename());
-#else
 		std::string themefile = getThemePath(filename.filename().string());
-#endif
 		return themefile == filename;
 	} catch (...) { return false; }
 }

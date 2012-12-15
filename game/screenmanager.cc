@@ -55,7 +55,7 @@ void ScreenManager::drawScreen() {
 
 void ScreenManager::loading(std::string const& message, float progress) {
 	// TODO: Create a better one, this is quite ugly
-	flashMessage(message + " " + boost::lexical_cast<std::string>(int(round(progress*100))) + "%", 0.0f, 1.0f, 1.0f);
+	flashMessage(message + " " + boost::lexical_cast<std::string>(int(round(progress*100))) + "%", 0.0f, 0.5f, 0.2f);
 	m_loadingProgress = progress;
 	m_window.blank();
 	m_window.render(boost::bind(&ScreenManager::drawLoading, this));

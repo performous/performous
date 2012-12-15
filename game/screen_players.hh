@@ -27,6 +27,7 @@ class ScreenPlayers : public Screen {
 	void enter();
 	void exit();
 	void manageEvent(SDL_Event event);
+	void manageEvent(input::NavEvent const& event);
 	void draw();
 
 	void setSong (boost::shared_ptr<Song> song_)

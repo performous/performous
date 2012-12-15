@@ -23,11 +23,12 @@ struct Image {
 };
 
 namespace {
-	void readPngHelper(png_structp pngPtr, png_bytep data, png_size_t length) {
-		static_cast<std::istream*>(png_get_io_ptr(pngPtr))->read((char*)data, length);
-	}
 	void writePngHelper(png_structp pngPtr, png_bytep data, png_size_t length) {
 		static_cast<std::ostream*>(png_get_io_ptr(pngPtr))->write((char*)data, length);
+	}
+/*
+	void readPngHelper(png_structp pngPtr, png_bytep data, png_size_t length) {
+		static_cast<std::istream*>(png_get_io_ptr(pngPtr))->read((char*)data, length);
 	}
 	void loadPNG_internal(png_structp pngPtr, png_infop infoPtr, std::ifstream& file, Bitmap& bitmap, std::vector<png_bytep>& rows) {
 		if (setjmp(png_jmpbuf(pngPtr))) throw std::runtime_error("Reading PNG failed");
@@ -42,7 +43,7 @@ namespace {
 		for (unsigned y = 0; y < bitmap.height; ++y) rows[y] = reinterpret_cast<png_bytep>(&bitmap.buf[y * bitmap.width * 4]);
 		png_read_image(pngPtr, &rows[0]);
 	}
-
+*/
 	static void writePNG_internal(png_structp pngPtr, png_infop infoPtr, std::ofstream& file, unsigned w, unsigned h, pix::Format format, bool reverse, const unsigned char *data, std::vector<png_bytep>& rows) {
 		// There must be no objects initialized within this function because longjmp will mess them up
 		if (setjmp(png_jmpbuf(pngPtr))) throw std::runtime_error("Writing PNG failed");

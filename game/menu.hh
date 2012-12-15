@@ -9,14 +9,16 @@
 
 class Surface;
 class MenuOption;
+class Menu;
 
 typedef std::vector<MenuOption> MenuOptions;
 typedef std::vector<MenuOptions*> SubmenuStack;
+typedef void (*MenuOptionCallback)(Menu&, void*);
 
 /// Struct for menu options
 class MenuOption {
   public:
-	enum Type { CLOSE_SUBMENU, OPEN_SUBMENU, CHANGE_VALUE, SET_AND_CLOSE, ACTIVATE_SCREEN } type;
+	enum Type { CLOSE_SUBMENU, OPEN_SUBMENU, CHANGE_VALUE, SET_AND_CLOSE, ACTIVATE_SCREEN, CALLBACK } type;
 
 	/// Construct a submenu closer
 	MenuOption(const std::string& nm, const std::string& comm);
@@ -28,14 +30,16 @@ class MenuOption {
 	MenuOption(const std::string& nm, const std::string& comm, MenuOptions opts, const std::string& img = "");
 	/// Construct a screen changer
 	MenuOption(const std::string& nm, const std::string& comm, const std::string& scrn, const std::string& img = "");
+	/// Construct a callback option
+	MenuOption(const std::string& nm, const std::string&, MenuOptionCallback callback, void* data);
 	/// Sets name to follow a reference
 	void setDynamicName(std::string& nm) { namePtr = &nm; }
 	/// Sets comment to follow a reference
 	void setDynamicComment(std::string& comm) { commentPtr = &comm; }
 	/// Return name
-	const std::string& getName() const { if (namePtr) return *namePtr; else return name; }
+	std::string getName() const;
 	/// Return comment
-	const std::string& getComment() const { if (commentPtr) return *commentPtr; else return comment; }
+	const std::string& getComment() const;
 	/// Check if this option can be selected
 	bool isActive() const;
 	/// Value
@@ -46,6 +50,10 @@ class MenuOption {
 	MenuOptions options;
 	/// Image to use with option
 	boost::shared_ptr<Surface> image;
+	/// Callback
+	MenuOptionCallback callback;
+	/// User data pointer to pass to the callback
+	void* callbackData;
   private:
 	std::string name;        /// Option name (it will be displayed as this)
 	std::string comment;     /// Extended information about the option displayed usually when selected

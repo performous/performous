@@ -267,7 +267,7 @@ struct Synth {
 	Notes m_notes;
 	double srate; ///< Sample rate
   public:
-	Synth(Notes const& notes, unsigned int sr) : m_notes(notes), srate(sr) {};
+	Synth(Notes const& notes, unsigned int sr) : m_notes(notes), srate(sr) {}
 	void operator()(float* begin, float* end, double position) {
 		static double phase = 0.0;
 		for (float *i = begin; i < end; ++i) *i *= 0.3; // Decrease music volume
@@ -430,7 +430,7 @@ struct Audio::Impl {
 		for (ConfigItem::StringList::const_iterator it = devs.begin(), end = devs.end(); it != end; ++it) {
 			try {
 				struct Params {
-					int out, in;
+					unsigned out, in;
 					unsigned int rate;
 					std::string dev;
 					std::vector<std::string> mics;
@@ -485,7 +485,7 @@ struct Audio::Impl {
 					<< ", in: " << params.in << ", out: " << params.out << std::endl;
 				portaudio::DeviceInfo& info = ad.devices[dev];
 				if (info.in < int(params.mics.size())) throw std::runtime_error("Device doesn't have enough input channels");
-				if (info.out < params.out) throw std::runtime_error("Device doesn't have enough output channels");
+				if (info.out < int(params.out)) throw std::runtime_error("Device doesn't have enough output channels");
 				// Match found if we got here, construct a device
 				Device* d = new Device(params.in, params.out, params.rate, info.idx);
 				devices.push_back(d);
@@ -496,7 +496,7 @@ struct Audio::Impl {
 				// Assign mics for all channels of the device
 				int assigned_mics = 0;
 				for (unsigned int j = 0; j < params.in; ++j) {
-					if (analyzers.size() >= 4) break; // Too many mics
+					if (analyzers.size() >= AUDIO_MAX_ANALYZERS) break; // Too many mics
 					std::string const& m = params.mics[j];
 					if (m.empty()) continue; // Input channel not used
 					// Check that the color is not already taken
@@ -530,8 +530,8 @@ struct Audio::Impl {
 Audio::Audio(): self(new Impl) {}
 Audio::~Audio() {}
 
-void Audio::restart() { self.reset(new Impl); };
-void Audio::close() { self.reset(); };
+void Audio::restart() { self.reset(new Impl); }
+void Audio::close() { self.reset(); }
 
 bool Audio::isOpen() const {
 	return !self->devices.empty();

@@ -74,8 +74,6 @@ void Object3d::loadWavefrontObj(std::string filepath, float scale) {
 					}
 				}
 			}
-			// FIXME: We only allow triangle faces since the VBO generator/drawer
-			//        cannot handle anything else (at least for now).
 			if (f.vertices.size() > 0 && f.vertices.size() != 3)
 				throw std::runtime_error("Only triangle faces allowed in "+filepath+":"+boost::lexical_cast<std::string>(linenumber));
 			// Face must have equal number of v, vt, vn or none of a kind

@@ -14,6 +14,13 @@ namespace SongParserUtil {
 			throw std::runtime_error("\"" + str + "\" is not valid integer value");
 		}
 	}
+	void assign(unsigned& var, std::string const& str) {
+		try {
+			var = boost::lexical_cast<int>(str);
+		} catch (...) {
+			throw std::runtime_error("\"" + str + "\" is not valid unsigned integer value");
+		}
+	}
 	void assign(double& var, std::string str) {
 		std::replace(str.begin(), str.end(), ',', '.'); // Fix decimal separators
 		try {
@@ -34,7 +41,7 @@ namespace SongParserUtil {
 
 
 /// constructor
-SongParser::SongParser(Song& s):
+SongParser::SongParser(Song& s) try:
   m_song(s),
   m_linenum(),
   m_relative(),
@@ -50,46 +57,38 @@ SongParser::SongParser(Song& s):
 	// Read the file, determine the type and do some initial validation checks
 	{
 		std::ifstream f((s.path + s.filename).c_str(), std::ios::binary);
-		if (!f.is_open()) throw SongParserException("Could not open song file", 0);
+		if (!f.is_open()) throw SongParserException(s, "Could not open song file", 0);
 		f.seekg(0, std::ios::end);
 		size_t size = f.tellg();
-		if (size < 10 || size > 100000) throw SongParserException("Does not look like a song file (wrong size)", 1, true);
+		if (size < 10 || size > 100000) throw SongParserException(s, "Does not look like a song file (wrong size)", 1, true);
 		f.seekg(0);
 		std::vector<char> data(size);
-		if (!f.read(&data[0], size)) throw SongParserException("Unexpected I/O error", 0);
+		if (!f.read(&data[0], size)) throw SongParserException(s, "Unexpected I/O error", 0);
 		if (smCheck(data)) type = SM;
 		else if (txtCheck(data)) type = TXT;
 		else if (iniCheck(data)) type = INI;
 		else if (xmlCheck(data)) type = XML;
-		else throw SongParserException("Does not look like a song file (wrong header)", 1, true);
+		else throw SongParserException(s, "Does not look like a song file (wrong header)", 1, true);
 		m_ss.write(&data[0], size);
 	}
 	convertToUTF8(m_ss, s.path + s.filename);
 	// Header already parsed?
 	if (s.loadStatus == Song::HEADER) {
-		try {
-			if (type == TXT) txtParse();
-			else if (type == INI) iniParse();
-			else if (type == XML) xmlParse();
-			else if (type == SM) smParse();
-		} catch (std::runtime_error& e) {
-			throw SongParserException(e.what(), m_linenum);
-		}
+		if (type == TXT) txtParse();
+		else if (type == INI) iniParse();
+		else if (type == XML) xmlParse();
+		else if (type == SM) smParse();
 		finalize(); // Do some adjusting to the notes
 		s.loadStatus = Song::FULL;
 		return;
 	}
 	// Parse only header to speed up loading and conserve memory
-	try {
-		if (type == TXT) txtParseHeader();
-		else if (type == INI) iniParseHeader();
-		else if (type == XML) xmlParseHeader();
-		else if (type == SM) { smParseHeader(); s.dropNotes(); } // Hack: drop notes here
-		// Default for preview position if none was specified in header
-		if (s.preview_start != s.preview_start) s.preview_start = (type == INI ? 5.0 : 30.0);  // 5 s for band mode, 30 s for others
-	} catch (std::runtime_error& e) {
-		throw SongParserException(e.what(), m_linenum);
-	}
+	if (type == TXT) txtParseHeader();
+	else if (type == INI) iniParseHeader();
+	else if (type == XML) xmlParseHeader();
+	else if (type == SM) { smParseHeader(); s.dropNotes(); } // Hack: drop notes here
+	// Default for preview position if none was specified in header
+	if (s.preview_start != s.preview_start) s.preview_start = (type == INI ? 5.0 : 30.0);  // 5 s for band mode, 30 s for others
 
 	// Remove bogus entries
 	if (!boost::filesystem::exists(m_song.path + m_song.cover)) m_song.cover = "";
@@ -105,21 +104,17 @@ SongParser::SongParser(Song& s):
 
 		for (boost::filesystem::directory_iterator dirIt(s.path), dirEnd; dirIt != dirEnd; ++dirIt) {
 			boost::filesystem::path p = dirIt->path();
-#if BOOST_FILESYSTEM_VERSION < 3
-			std::string name = p.leaf(); // File basename
-#else
 			std::string name = p.filename().string(); // File basename
-#endif
-			if (m_song.cover.empty() && regex_match(name.c_str(), match, coverfile)) {
-				m_song.cover = name;
-			} else if (m_song.background.empty() && regex_match(name.c_str(), match, backgroundfile)) {
-				m_song.background = name;
-			} else if (m_song.video.empty() && regex_match(name.c_str(), match, videofile)) {
-				m_song.video = name;
-			}
+			if (m_song.cover.empty() && regex_match(name.c_str(), match, coverfile)) m_song.cover = name;
+			else if (m_song.background.empty() && regex_match(name.c_str(), match, backgroundfile)) m_song.background = name;
+			else if (m_song.video.empty() && regex_match(name.c_str(), match, videofile)) m_song.video = name;
 		}
 	}
 	s.loadStatus = Song::HEADER;
+} catch (std::runtime_error& e) {
+	throw SongParserException(m_song, e.what(), m_linenum);
+} catch (std::exception& e) {
+	throw SongParserException(m_song, "Internal error: " + std::string(e.what()), m_linenum);
 }
 
 void SongParser::resetNoteParsingState() {
