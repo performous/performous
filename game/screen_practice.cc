@@ -24,6 +24,7 @@ void ScreenPractice::enter() {
 	m_samples.push_back("drum cymbal");
 	//m_samples.push_back("drum tom2");
 	reloadGL();
+	ScreenManager::getSingletonPtr()->controllers.enableEvents(true);
 }
 
 void ScreenPractice::reloadGL() {
@@ -31,6 +32,7 @@ void ScreenPractice::reloadGL() {
 }
 
 void ScreenPractice::exit() {
+	ScreenManager::getSingletonPtr()->controllers.enableEvents(false);
 	m_vumeters.clear();
 	m_samples.clear();
 	theme.reset();
@@ -43,12 +45,18 @@ void ScreenPractice::manageEvent(input::NavEvent const& event) {
 	else if (nav == input::NAV_PAUSE) m_audio.togglePause();
 }
 
-void ScreenPractice::manageEvent(SDL_Event event) {
-	/* FIXME if (event.type == SDL_JOYBUTTONDOWN // Play drum sounds here
-	  && input::detail::devices.find(event.jbutton.which)->second.type_match(input::DRUMS)) {
-		int b = input::detail::devices.find(event.jbutton.which)->second.buttonFromSDL(event.jbutton.button);
-		if (b != -1) m_audio.playSample(m_samples[unsigned(b) % m_samples.size()]);
-	}*/
+void ScreenPractice::prepare() {
+	ScreenManager* sm = ScreenManager::getSingletonPtr();
+	// Process all instrument events that are available, then throw away the instruments...
+	for (input::DevicePtr dev; sm->controllers.getDevice(dev); ) {
+		for (input::Event ev; dev->getEvent(ev);) {
+			if (ev.value == 0.0) continue;
+			if (dev->type == input::DEVTYPE_DANCEPAD) {}
+			else if (dev->type == input::DEVTYPE_GUITAR) {}
+			else if (dev->type == input::DEVTYPE_DRUMS) m_audio.playSample(m_samples[ev.button.num() % m_samples.size()]);
+		}
+	}
+	// TODO: We could store the DevicePtrs and display the instruments on screen in a meaningful way
 }
 
 void ScreenPractice::draw() {

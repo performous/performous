@@ -17,7 +17,7 @@ class ScreenPractice : public Screen {
 	void enter();
 	void exit();
 	void reloadGL();
-	void manageEvent( SDL_Event event );
+	void prepare();
 	void manageEvent(input::NavEvent const& event);
 	void draw();
 
