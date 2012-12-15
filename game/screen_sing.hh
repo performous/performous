@@ -49,7 +49,7 @@ class ScreenSing: public Screen {
 	/// constructor
 	ScreenSing(std::string const& name, Audio& audio, Database& database, Backgrounds& bgs):
 	  Screen(name), m_audio(audio), m_database(database), m_backgrounds(bgs), m_latencyAV(),
-	  m_only_singers_alive(true), m_selectedTrack(TrackName::LEAD_VOCAL)
+	  m_selectedTrack(TrackName::LEAD_VOCAL)
 	{}
 	void enter();
 	void exit();
@@ -96,7 +96,6 @@ class ScreenSing: public Screen {
 	double m_latencyAV;  // Latency between audio and video output (do not confuse with latencyAR)
 	boost::shared_ptr<ThemeSing> theme;
 	AnimValue m_quitTimer;
-	bool m_only_singers_alive;
 	std::string m_selectedTrack;
 	std::string m_selectedTrackLocalized;
 	ConfigItem m_vocalTracks[AUDIO_MAX_ANALYZERS];
