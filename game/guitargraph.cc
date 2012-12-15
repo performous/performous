@@ -278,8 +278,8 @@ bool GuitarGraph::difficulty(Difficulty level, bool check_only) {
 	// Check if the difficulty level is available
 	uint8_t basepitch = diffv[level].basepitch;
 	NoteMap const& nm = track.nm;
-	int fail = 0;
-	for (int fret = 0; fret < m_pads; ++fret) if (nm.find(basepitch + fret) == nm.end()) ++fail;
+	unsigned fail = 0;
+	for (unsigned fret = 0; fret < m_pads; ++fret) if (nm.find(basepitch + fret) == nm.end()) ++fail;
 	if (fail == m_pads) return false;
 	if (check_only) return true;
 	Difficulty prevLevel = m_level;
@@ -403,7 +403,7 @@ void GuitarGraph::engine() {
 		// FIXME: Use polyphony from proper chord (which isn't always m_chordIt); now it only counts frets currently held
 		unsigned count = 0, polyphony = 0;
 		bool holds = false;
-		for (int fret = 0; fret < m_pads; ++fret) {
+		for (unsigned fret = 0; fret < m_pads; ++fret) {
 			if (!m_holds[fret]) continue;
 			holds = true;
 			++polyphony;
@@ -470,7 +470,7 @@ void GuitarGraph::errorMeter(float error) {
 }
 
 /// Mark the holding of a note as ended
-void GuitarGraph::endHold(int fret, double time) {
+void GuitarGraph::endHold(unsigned fret, double time) {
 	if (fret >= m_pads || !m_holds[fret]) return;
 	m_events[m_holds[fret] - 1].glow.setTarget(0.0);
 	m_events[m_holds[fret] - 1].whammy.setTarget(0.0, true);
@@ -492,7 +492,7 @@ void GuitarGraph::endHold(int fret, double time) {
 void GuitarGraph::fail(double time, int fret) {
 	if (fret == -2) return; // Tapped note
 	if (fret == -1) {
-		for (int i = 0; i < m_pads; ++i) endHold(i, time);
+		for (unsigned i = 0; i < m_pads; ++i) endHold(i, time);
 	}
 	if (m_starpower.get() < 0.01) {
 		// Reduce points and play fail sample only when GodMode is deactivated
@@ -700,7 +700,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 		m_starmeter += score;
 		m_correctness.setTarget(1.0, true); // Instantly go to one
 		errorMeter(signed_error);
-		for (int fret = 0; fret < m_pads; ++fret) {
+		for (unsigned fret = 0; fret < m_pads; ++fret) {
 			if (!m_chordIt->fret[fret]) continue;
 			Duration const* dur = m_chordIt->dur[fret];
 			m_events.push_back(Event(time, 1 + picked, fret, dur));
@@ -787,7 +787,7 @@ void GuitarGraph::drawNotes(double time) {
 			continue;
 		}
 		// Loop through the frets
-		for (int fret = 0; fret < m_pads; ++fret) {
+		for (unsigned fret = 0; fret < m_pads; ++fret) {
 			if (!it->fret[fret] || (tBeg > maxTolerance && it->releaseTimes[fret] > 0)) continue;
 			if (tEnd > future) tEnd = future;
 			unsigned event = m_notes[it->dur[fret]];
@@ -887,7 +887,7 @@ void GuitarGraph::drawNeckStuff(double time) {
 	drawNotes(time);
 
 	// Draw flames
-	for (int fret = 0; fret < m_pads; ++fret) { // Loop through the frets
+	for (unsigned fret = 0; fret < m_pads; ++fret) { // Loop through the frets
 		if (m_drums && fret == input::DRUMS_KICK) { // Skip bass drum
 			m_flames[fret].clear(); continue;
 		}
@@ -1048,7 +1048,7 @@ void GuitarGraph::drawNote(int fret, Color color, float tBeg, float tEnd, float 
 
 /// Draws a drum fill
 void GuitarGraph::drawDrumfill(float tBeg, float tEnd) {
-	for (int fret = m_drums; fret < m_pads; ++fret) { // Loop through the frets
+	for (unsigned fret = m_drums; fret < m_pads; ++fret) { // Loop through the frets
 		float x = -2.0f + fret - 0.5f * m_drums;
 		float yBeg = time2y(tBeg);
 		float yEnd = time2y(tEnd <= future ? tEnd : future);
@@ -1144,7 +1144,7 @@ void GuitarGraph::updateChords() {
 
 	Durations::size_type pos[5] = {}, size[5] = {};
 	Durations const* durations[5] = {};
-	for (int fret = 0; fret < m_pads; ++fret) {
+	for (unsigned fret = 0; fret < m_pads; ++fret) {
 		int basepitch = diffv[m_level].basepitch;
 		NoteMap::const_iterator it = nm.find(basepitch + fret);
 		if (it == nm.end()) continue;
@@ -1156,7 +1156,7 @@ void GuitarGraph::updateChords() {
 	while (true) {
 		// Find the earliest
 		double t = getInf();
-		for (int fret = 0; fret < m_pads; ++fret) {
+		for (unsigned fret = 0; fret < m_pads; ++fret) {
 			if (pos[fret] == size[fret]) continue;
 			Durations const& dur = *durations[fret];
 			t = std::min(t, dur[pos[fret]].begin);
@@ -1167,7 +1167,7 @@ void GuitarGraph::updateChords() {
 		Chord c;
 		c.begin = t;
 		int tapfret = -1;
-		for (int fret = 0; fret < m_pads; ++fret) {
+		for (unsigned fret = 0; fret < m_pads; ++fret) {
 			if (pos[fret] == size[fret]) continue;
 			Durations const& dur = *durations[fret];
 			Duration const& d = dur[pos[fret]];

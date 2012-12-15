@@ -187,7 +187,7 @@ void Window::updateTransforms() {
 void Window::render(boost::function<void (void)> drawFunc) {
 	glutil::GLErrorChecker glerror("Window::render");
 	ViewTrans trans;  // Default frustum
-	if (s_width < screen->w || s_height < screen->h) glClear(GL_COLOR_BUFFER_BIT);  // Black bars
+	if (s_width < unsigned(screen->w) || s_height < unsigned(screen->h)) glClear(GL_COLOR_BUFFER_BIT);  // Black bars
 	bool stereo = config["graphic/stereo3d"].b();
 	int type = config["graphic/stereo3dtype"].i();
 

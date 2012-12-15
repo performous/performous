@@ -342,7 +342,7 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 
 	// So it was a PRESS event
 	for (DanceNotes::iterator it = m_notesIt; it != m_notes.end() && time <= it->note.end + maxTolerance; ++it) {
-		if(!it->isHit && std::abs(time - it->note.begin) <= maxTolerance && ev.button == it->note.note) {
+		if(!it->isHit && std::abs(time - it->note.begin) <= maxTolerance && ev.button == unsigned(it->note.note)) {
 			it->isHit = true;
 			if (it->note.type != Note::MINE) {
 				it->score = points(it->note.begin - time);
@@ -414,7 +414,7 @@ void DanceGraph::draw(double time) {
 			us()["clock"].set(float(time));
 			us()["noteType"].set(0);
 			us()["scale"].set(getScale());
-			for (int arrow_i = 0; arrow_i < m_pads; ++arrow_i) {
+			for (unsigned arrow_i = 0; arrow_i < m_pads; ++arrow_i) {
 				float l = m_pressed_anim[arrow_i].get();
 				us()["hitAnim"].set(l);
 				us()["position"].set(panel2x(arrow_i), time2y(0.0));

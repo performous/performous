@@ -73,7 +73,7 @@ class GuitarGraph: public InstrumentGraph {
 	void activateStarpower();
 	void errorMeter(float error);
 	void fail(double time, int fret);
-	void endHold(int fret, double time = 0.0);
+	void endHold(unsigned fret, double time = 0.0);
 	void endBRE();
 	void endStreak() { m_streak = 0; m_bigStreak = 0; }
 	void updateDrumFill(double time);

@@ -204,7 +204,7 @@ void InstrumentGraph::handleCountdown(double time, double beginTime) {
 }
 
 
-Color const& InstrumentGraph::color(int fret) const {
+Color const& InstrumentGraph::color(unsigned fret) const {
 	static Color fretColors[5] = {
 		Color(0.0, 0.9, 0.0),
 		Color(0.9, 0.0, 0.0),
@@ -212,7 +212,7 @@ Color const& InstrumentGraph::color(int fret) const {
 		Color(0.0, 0.0, 1.0),
 		Color(0.9, 0.4, 0.0)
 	};
-	if (fret < 0 || fret >= m_pads) throw std::logic_error("Invalid fret number in InstrumentGraph::color");
+	if (fret >= m_pads) throw std::logic_error("Invalid fret number in InstrumentGraph::color");
 	if (getGraphType() == input::DEVTYPE_DRUMS) {
 		if (fret == 0) fret = 4;
 		else if (fret == 4) fret = 0;

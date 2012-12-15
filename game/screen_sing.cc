@@ -345,7 +345,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 
 		// Some things must be reset after seeking backwards
 		if (seekback)
-			for (int i = 0; i < m_layout_singer.size(); ++i)
+			for (unsigned i = 0; i < m_layout_singer.size(); ++i)
 				m_layout_singer[i].reset();
 		// Reload current song
 		if (key == SDLK_r) {

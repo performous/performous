@@ -165,7 +165,7 @@ void FFmpeg::decodePacket() {
 		packetSize -= decodeSize; // Move forward within the packet
 		if (!frameFinished) continue;
 		// Update current position if timecode is available
-		if (frame->pkt_pts != uint64_t(AV_NOPTS_VALUE)) {
+		if (int64_t(frame->pkt_pts) != int64_t(AV_NOPTS_VALUE)) {
 			m_position = double(frame->pkt_pts) * av_q2d(m_formatContext->streams[m_streamId]->time_base);
 		}
 		if (m_mediaType == AVMEDIA_TYPE_VIDEO) processVideo(frame); else processAudio(frame);

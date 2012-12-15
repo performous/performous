@@ -21,7 +21,7 @@ class Screen {
 	/// Event handler for navigation events
 	virtual void manageEvent(input::NavEvent const& event) = 0;
 	/// Event handler for SDL events
-	virtual void manageEvent(SDL_Event event) {}
+	virtual void manageEvent(SDL_Event) {}
 	/// prepare screen for drawing
 	virtual void prepare() {}
 	/// draws screen

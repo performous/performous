@@ -70,7 +70,7 @@ public:
 	// Interface functions
 	virtual void draw(double time) = 0;
 	virtual void engine() = 0;
-	virtual void process(input::Event const& ev) {}
+	virtual void process(input::Event const&) {}
 	virtual std::string getTrack() const = 0;
 	virtual std::string getDifficultyString() const = 0;
 	virtual std::string getModeId() const = 0;
@@ -127,7 +127,7 @@ public:
 	void handleCountdown(double time, double beginTime);
 
 	// Functions not really shared, but needed here
-	Color const& color(int fret) const;
+	Color const& color(unsigned fret) const;
 
 	// Media
 	Surface m_button;
@@ -149,7 +149,7 @@ public:
 	std::string m_leftyOpt;
 
 	// Misc counters etc.
-	int m_pads; /// how many panels the current gaming mode uses
+	unsigned m_pads; /// how many panels the current gaming mode uses
 	bool m_pressed[max_panels]; /// is certain panel pressed currently
 	AnimValue m_pressed_anim[max_panels]; /// animation for panel pressing
 	AnimValue m_correctness;
@@ -161,7 +161,7 @@ public:
 	int m_bigStreak; /// next limit when a popup appears
 	int m_countdown; /// countdown counter
 	double m_jointime; /// when the player joined
-	int m_dead; /// how many notes has been passed without hitting buttons
+	unsigned m_dead; /// how many notes has been passed without hitting buttons
 	bool m_ready;
 };
 
