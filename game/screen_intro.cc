@@ -38,7 +38,6 @@ void ScreenIntro::exit() {
 }
 
 void ScreenIntro::manageEvent(input::NavEvent const& event) {
-	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	input::NavButton nav = event.button;
 	if (nav == input::NAV_CANCEL) {
 		if (m_menu.getSubmenuLevel() == 0) m_menu.moveToLast();  // Move cursor to quit in main menu

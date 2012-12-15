@@ -79,7 +79,6 @@ void ScreenAudioDevices::manageEvent(input::NavEvent const& event) {
 }
 
 void ScreenAudioDevices::manageEvent(SDL_Event event) {
-	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	if (event.type == SDL_KEYDOWN) {
 		int key = event.key.keysym.sym;
 		SDLMod modifier = event.key.keysym.mod;

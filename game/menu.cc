@@ -8,36 +8,36 @@ MenuOption::MenuOption(const std::string& nm, const std::string& comm):
 	type(CLOSE_SUBMENU),
 	value(NULL),
 	newValue(),
+	callback(NULL),
+	callbackData(NULL),
 	name(nm),
 	comment(comm),
 	namePtr(NULL),
-	commentPtr(NULL),
-	callback(NULL),
-	callbackData(NULL)
+	commentPtr(NULL)
 {}
 
 MenuOption::MenuOption(const std::string& nm, const std::string& comm, ConfigItem* val):
 	type(CHANGE_VALUE),
 	value(val),
 	newValue(),
+	callback(NULL),
+	callbackData(NULL),
 	name(nm),
 	comment(comm),
 	namePtr(NULL),
-	commentPtr(NULL),
-	callback(NULL),
-	callbackData(NULL)
+	commentPtr(NULL)
 {}
 
 MenuOption::MenuOption(const std::string& nm, const std::string& comm, ConfigItem* val, ConfigItem newval):
 	type(SET_AND_CLOSE),
 	value(val),
 	newValue(newval),
+	callback(NULL),
+	callbackData(NULL),
 	name(nm),
 	comment(comm),
 	namePtr(NULL),
-	commentPtr(NULL),
-	callback(NULL),
-	callbackData(NULL)
+	commentPtr(NULL)
 {}
 
 MenuOption::MenuOption(const std::string& nm, const std::string& comm, MenuOptions opts, const std::string& img):
@@ -45,12 +45,12 @@ MenuOption::MenuOption(const std::string& nm, const std::string& comm, MenuOptio
 	value(NULL),
 	newValue(),
 	options(opts),
+	callback(NULL),
+	callbackData(NULL),
 	name(nm),
 	comment(comm),
 	namePtr(NULL),
-	commentPtr(NULL),
-	callback(NULL),
-	callbackData(NULL)
+	commentPtr(NULL)
 {
 	if (!img.empty()) image.reset(new Surface(getThemePath(img)));
 }
@@ -59,12 +59,12 @@ MenuOption::MenuOption(const std::string& nm, const std::string& comm, const std
 	type(ACTIVATE_SCREEN),
 	value(NULL),
 	newValue(scrn),
+	callback(NULL),
+	callbackData(NULL),
 	name(nm),
 	comment(comm),
 	namePtr(NULL),
-	commentPtr(NULL),
-	callback(NULL),
-	callbackData(NULL)
+	commentPtr(NULL)
 {
 	if (!img.empty()) image.reset(new Surface(getThemePath(img)));
 }
@@ -73,12 +73,12 @@ MenuOption::MenuOption(const std::string& nm, const std::string& comm, MenuOptio
 	type(CALLBACK),
 	value(NULL),
 	newValue(),
+	callback(callback),
+	callbackData(data),
 	name(nm),
 	comment(comm),
 	namePtr(NULL),
-	commentPtr(NULL),
-	callback(callback),
-	callbackData(data)
+	commentPtr(NULL)
 {}
 
 

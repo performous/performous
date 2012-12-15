@@ -83,7 +83,6 @@ void ScreenPlayers::manageEvent(input::NavEvent const& event) {
 }
 
 void ScreenPlayers::manageEvent(SDL_Event event) {
-	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	if (event.type == SDL_KEYDOWN) { // Process keyboard-only keys
 		SDL_keysym keysym = event.key.keysym;
 		//int key = keysym.sym;

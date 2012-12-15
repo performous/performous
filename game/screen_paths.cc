@@ -30,7 +30,6 @@ void ScreenPaths::enter() {
 void ScreenPaths::exit() { m_theme.reset(); }
 
 void ScreenPaths::manageEvent(SDL_Event event) {
-	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	if (event.type == SDL_KEYDOWN) {
 		return; // FIXME: Remove
 		SDLKey key = event.key.keysym.sym;
