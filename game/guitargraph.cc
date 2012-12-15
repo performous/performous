@@ -21,8 +21,6 @@ namespace {
 		{ "Expert", 0x60 }
 	};
 	const size_t diffsz = sizeof(diffv) / sizeof(*diffv);
-	const int death_delay = 20; // Delay in notes after which the player is hidden
-	const float join_delay = 3.0f; // Time after join menu before playing when joining mid-game
 	const float g_angle = 1.4f; // How many radians to rotate the fretboards
 	const float past = -0.2f; // Relative time from cursor that is considered past (out of screen)
 	const float future = 1.5f; // Relative time from cursor that is considered future (out of screen)
@@ -328,11 +326,6 @@ void GuitarGraph::engine() {
 			}
 		}
 		m_dead = 0; // Keep alive
-		// Handle joining
-		if (m_jointime != m_jointime) {
-			m_jointime = time < 0.0 ? -1.0 : time + join_delay;
-			break;
-		}
 		// Menu keys
 		if (menuOpen()) {
 			// Check first regular keys
@@ -457,11 +450,6 @@ void GuitarGraph::engine() {
 	}
 	// During GodMode, correctness is full, no matter what
 	if (m_starpower.get() > 0.01) m_correctness.setTarget(1.0, true);
-}
-
-/// Are we alive?
-bool GuitarGraph::dead() const {
-	return m_jointime != m_jointime || m_dead >= death_delay;
 }
 
 /// Attempt to activate GodMode

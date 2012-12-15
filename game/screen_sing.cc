@@ -161,15 +161,17 @@ void ScreenSing::exit() {
 
 
 /// Manages the instrument drawing
-/// Returns false if no instuments are alive
-bool ScreenSing::instrumentLayout(double time) {
+void ScreenSing::instrumentLayout(double time) {
 	int count_alive = 0, count_menu = 0, i = 0;
-	// Count active instruments
-	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it) {
-		if (!it->dead()) {
-			count_alive++;
-			if (it->menuOpen()) count_menu++;
+	// Remove dead instruments and do the counting
+	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ) {
+		if (it->dead()) {
+			it = m_instruments.erase(it);
+			continue;
 		}
+		++count_alive;
+		if (it->menuOpen()) ++count_menu;
+		++it;
 	}
 	// Handle pause
 	if (count_alive > 0) {
@@ -197,10 +199,6 @@ bool ScreenSing::instrumentLayout(double time) {
 			++i;
 		}
 	}
-	if (time < -1.0 && count_alive == 0) {
-		ColorTrans c(Color::alpha(clamp(-2.0 - 2.0 * time)));
-		m_help->draw();
-	}
 	// Set volume levels (averages of all instruments playing that track)
 	// FIXME: There should NOT be gettext calls here!
 	for( std::map<std::string,std::string>::iterator it = m_song->music.begin() ; it != m_song->music.end() ; ++it ) {
@@ -219,17 +217,19 @@ bool ScreenSing::instrumentLayout(double time) {
 			m_audio.streamBend(it->first, level);
 		}
 	}
-	return (count_alive > 0);
 }
 
 void ScreenSing::danceLayout(double time) {
-	int count_alive = 0, count_menu = 0, i = 0;
-	// Count active dancers
-	for (Dancers::iterator it = m_dancers.begin(); it != m_dancers.end(); ++it) {
-		if (!it->dead()) {
-			count_alive++;
-			if (it->menuOpen()) count_menu++;
+	unsigned count_alive = 0, count_menu = 0;
+	// Remove dead dancers and do the counting
+	for (Dancers::iterator it = m_dancers.begin(); it != m_dancers.end(); ) {
+		if (it->dead()) {
+			it = m_dancers.erase(it);
+			continue;
 		}
+		++count_alive;
+		if (it->menuOpen()) ++count_menu;
+		++it;
 	}
 	// Handle pause
 	if (count_alive > 0) {
@@ -237,19 +237,11 @@ void ScreenSing::danceLayout(double time) {
 		else if (count_menu > 0 && !m_audio.isPaused()) m_audio.togglePause();
 	}
 	double iw = std::min(0.5, 1.0 / m_dancers.size());
-	for (Dancers::iterator it = m_dancers.begin(); it != m_dancers.end();) {
-		it->engine(); // Run engine even when dead so that joining is possible
-		if (it->dead()) {
-			it = m_dancers.erase(it);
-			continue;
-		}
+	unsigned i = 0;
+	for (Dancers::iterator it = m_dancers.begin(); it != m_dancers.end(); ++it, ++i) {
+		it->engine();
 		it->position((0.5 + i - 0.5 * count_alive) * iw, iw); // Do layout stuff
 		it->draw(time);
-		++i, ++it;
-	}
-	if (time < -0.5 && count_alive == 0) {
-		ColorTrans c(Color::alpha(clamp(-1.0 - 2.0 * time)));
-		m_help->draw();
 	}
 }
 
@@ -486,23 +478,21 @@ void ScreenSing::draw() {
 		theme->bg_top.draw();
 	}
 
-	for (int i = 0; i < m_layout_singer.size(); ++i)
-		m_layout_singer[i].hideLyrics(m_audio.isPaused());
+	for (unsigned i = 0; i < m_layout_singer.size(); ++i) m_layout_singer[i].hideLyrics(m_audio.isPaused());
 
-	// Dancing
-	if (!m_dancers.empty()) {
-		danceLayout(time);
-		//m_layout_singer->draw(time, LayoutSinger::LEFT);
-		m_only_singers_alive = false;
-	// Singing & band
-	} else {
-		if (m_instruments.empty()) m_only_singers_alive = true;
-		else m_only_singers_alive = !instrumentLayout(time);
+	danceLayout(time);
+	instrumentLayout(time);
+	m_only_singers_alive = m_dancers.empty() && m_instruments.empty();
 
-		bool fullSinger = m_only_singers_alive && m_layout_singer.size() <= 1;
-		for (unsigned i = 0; i < m_layout_singer.size(); ++i) {
-			m_layout_singer[i].draw(time, fullSinger ? LayoutSinger::FULL : (i == 0 ? LayoutSinger::TOP : LayoutSinger::BOTTOM));
-		}
+	// Dancing and instruments
+	if (time < -0.5 && m_song->hasControllers() && m_only_singers_alive) {
+		ColorTrans c(Color::alpha(clamp(-1.0 - 2.0 * time)));
+		m_help->draw();
+	}
+
+	bool fullSinger = m_only_singers_alive && m_layout_singer.size() <= 1;
+	for (unsigned i = 0; i < m_layout_singer.size(); ++i) {
+		m_layout_singer[i].draw(time, fullSinger ? LayoutSinger::FULL : (i == 0 ? LayoutSinger::TOP : LayoutSinger::BOTTOM));
 	}
 
 	Song::Status status = m_song->status(time);

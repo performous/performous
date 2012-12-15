@@ -30,7 +30,6 @@ class DanceGraph: public InstrumentGraph {
 	 */
 	void draw(double time);
 	void engine();
-	bool dead() const;
 	std::string getTrack() const;
 	std::string getDifficultyString() const;
 	std::string getModeId() const;

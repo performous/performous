@@ -2,6 +2,11 @@
 #include "i18n.hh"
 #include "glutil.hh"
 
+namespace {
+	const double join_delay = 3.0; // Time after join menu before playing when joining mid-game
+	const unsigned death_delay = 20; // Delay in notes after which the player is hidden
+}
+
 //const unsigned InstrumentGraph::max_panels = 10; // Maximum number of arrow lines / guitar frets
 
 
@@ -30,15 +35,18 @@ InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevicePt
   m_longestStreak(),
   m_bigStreak(),
   m_countdown(3), // Display countdown 3 secs before note start
-  m_jointime(getNaN()),
   m_dead(),
   m_ready()
 {
+	double time = m_audio.getPosition();
+	m_jointime = time < 0.0 ? -1.0 : time + join_delay;
+
 	m_popupText.reset(new SvgTxtThemeSimple(getThemePath("sing_popup_text.svg"), config["graphic/text_lod"].f()));
 	m_menuTheme.reset(new ThemeInstrumentMenu());
 	for (size_t i = 0; i < max_panels; ++i) m_pressed[i] = false;
 }
 
+bool InstrumentGraph::dead() const { return m_jointime != m_jointime || m_dead >= death_delay; }
 
 void InstrumentGraph::setupPauseMenu() {
 	m_menu.clear();

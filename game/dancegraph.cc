@@ -18,8 +18,6 @@ namespace {
 	_("Beginner") _("Easy") _("Medium") _("Hard") _("Challenge")
 	#endif
 	const std::string diffv[] = { "Beginner", "Easy", "Medium", "Hard", "Challenge" };
-	const int death_delay = 25; // Delay in notes after which the player is hidden
-	const float join_delay = 3.0f; // Time after join menu before playing when joining mid-game
 	const float past = -0.3f; // Relative time from cursor that is considered past (out of screen)
 	const float future = 2.0f; // Relative time from cursor that is considered future (out of screen)
 	const float timescale = 12.0f; // Multiplier to get graphics units from time
@@ -193,11 +191,6 @@ void DanceGraph::finalizeTrackChange() {
 	m_menu.select(1); // Restore selection to the track item
 }
 
-/// Are we alive?
-bool DanceGraph::dead() const {
-	return m_jointime != m_jointime || m_dead >= death_delay;
-}
-
 /// Get the track string
 std::string DanceGraph::getTrack() const {
 	return _(m_gamingMode.c_str());
@@ -271,10 +264,6 @@ void DanceGraph::engine() {
 	// Handle all events
 	for (input::Event ev; m_dev->getEvent(ev); ) {
 		m_dead = 0; // Keep alive
-		if (m_jointime != m_jointime) { // Handle joining
-			m_jointime = time < 0.0 ? -1.0 : time + join_delay;
-			break;
-		}
 		// Menu keys
 		if (menuOpen() && ev.value != 0.0) {
 			if (ev.nav == input::NAV_START || ev.nav == input::NAV_CANCEL) m_menu.close();

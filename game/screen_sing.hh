@@ -75,7 +75,7 @@ class ScreenSing: public Screen {
 	  - is the hiscore file writable
 	  */
 	void activateNextScreen();
-	bool instrumentLayout(double time);
+	void instrumentLayout(double time);
 	void danceLayout(double time);
 	void createPauseMenu();
 	void drawMenu();
