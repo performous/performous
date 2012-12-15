@@ -299,7 +299,6 @@ void GuitarGraph::engine() {
 	time -= config["audio/controller_delay"].f();
 	doUpdates();
 	if (!m_drumfills.empty()) updateDrumFill(time); // Drum Fills / BREs
-	if (joining(time)) m_dead = 0; // Disable dead counting while joining
 	m_whammy = 0;
 	// Countdown to start
 	handleCountdown(time, time < getNotesBeginTime() ? getNotesBeginTime() : m_jointime+1);
@@ -393,7 +392,7 @@ void GuitarGraph::engine() {
 			m_soloScore = 0;
 			m_soloTotal = 0;
 		}
-		++m_dead;
+		if (!joining(time)) ++m_dead;  // Increment dead counter (but not while joining)
 		++m_chordIt;
 	}
 	// Start decreasing correctness instantly if the current note is being played late (don't wait until maxTolerance)

@@ -259,7 +259,6 @@ void DanceGraph::engine() {
 		time -= it->second;
 	}
 	if (outsideStop && m_insideStop) m_insideStop = false;
-	if (joining(time)) m_dead = 0; // Disable dead counting while joining
 	bool difficulty_changed = false;
 	// Handle all events
 	for (input::Event ev; m_dev->getEvent(ev); ) {
@@ -306,7 +305,7 @@ void DanceGraph::engine() {
 			if(it->note.type != Note::MINE) m_score += it->score;
 			if(!it->releaseTime) it->releaseTime = time;
 		}
-		++m_dead;
+		if (!joining(time)) ++m_dead;  // Increment dead counter (but not while joining)
 	}
 	if (difficulty_changed) m_dead = 0; // if difficulty is changed, m_dead would get incorrect
 
