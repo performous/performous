@@ -52,6 +52,7 @@ namespace input {
 		unsigned device, channel;  ///< Device number and channel (0..1023)
 		/// Provide numeric conversion for comparison and ordered containers
 		operator unsigned() const { return unsigned(type)<<20 | device<<10 | channel; }
+		bool isKeyboard() const { return type == SOURCETYPE_KEYBOARD; }  ///< This is so common test that a helper is provided
 	};
 	
 	/// NavEvent is a menu navigation event, generalized for all controller type so that the user doesn't need to know about controllers.

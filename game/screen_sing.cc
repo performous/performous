@@ -289,7 +289,7 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 	}
 	// Only pause or esc opens the global menu (instruments have their own menus)
 	// TODO: This should probably check if the source is participating as an instrument or not rather than check for its type
-	if (event.source.type == input::SOURCETYPE_KEYBOARD && (nav == input::NAV_PAUSE || nav == input::NAV_CANCEL) && !m_audio.isPaused() && !m_menu.isOpen()) {
+	if (event.source.isKeyboard() && (nav == input::NAV_PAUSE || nav == input::NAV_CANCEL) && !m_audio.isPaused() && !m_menu.isOpen()) {
 		input::Hardware::enableKeyboardInstruments(false);
 		m_menu.open();
 		m_audio.togglePause();
@@ -422,18 +422,20 @@ void ScreenSing::prepare() {
 			if (ev.value == 0.0) continue;
 			if (dev->type == input::DEVTYPE_DANCEPAD && m_song->hasDance()) {
 				if (ev.button == input::DANCEPAD_UP) type = dev->type;
-				else msg = _("Dance UP to join!");
+				else msg = dev->source.isKeyboard() ? _("Press UP to join dance!") : _("Step UP to join!");
 			}
 			else if (dev->type == input::DEVTYPE_GUITAR && m_song->hasGuitars()) {
-				if (ev.button == input::GUITAR_PICK_DOWN || ev.button == input::GUITAR_PICK_UP) type = dev->type;
-				else if (ev.button != input::GUITAR_WHAMMY && ev.button != input::GUITAR_GODMODE) msg = _("PICK the guitar to join!");
+				if (ev.button == input::GUITAR_GREEN) type = dev->type;
+				else if (ev.button != input::GUITAR_WHAMMY && ev.button != input::GUITAR_GODMODE) {
+					msg = dev->source.isKeyboard() ? _("Press 1 to join guitar!") : _("Press GREEN to join!");
+				}
 			}
 			else if (dev->type == input::DEVTYPE_DRUMS && m_song->hasDrums()) {
 				if (ev.button == input::DRUMS_KICK) type = dev->type;
-				else msg = _("Play KICK to join!");
+				else msg = dev->source.isKeyboard() ? _("Press SPACE to join drums!") : _("KICK to join!");
 			}
 		}
-		if (!msg.empty()) sm->flashMessage(msg);
+		if (!msg.empty()) sm->flashMessage(msg, 0.0, 0.1, 0.1);
 		else if (type == input::DEVTYPE_DANCEPAD) m_dancers.push_back(new DanceGraph(m_audio, *m_song, dev));
 		else if (type != input::DEVTYPE_GENERIC) m_instruments.push_back(new GuitarGraph(m_audio, *m_song, dev, m_instruments.size()));
 	}
