@@ -91,7 +91,6 @@ void ScreenSing::enter() {
 		m_menu.open();
 		if (tracks.size() <= 1) setupVocals();  // No duet menu
 	}
-	sm->controllers.enableEvents(true);
 	sm->showLogo(false);
 	sm->loading(_("Loading complete"), 1.0);
 }
@@ -282,7 +281,6 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 	// Only pause or esc opens the global menu (instruments have their own menus)
 	// TODO: This should probably check if the source is participating as an instrument or not rather than check for its type
 	if (event.source.isKeyboard() && (nav == input::NAV_PAUSE || nav == input::NAV_CANCEL) && !m_audio.isPaused() && !m_menu.isOpen()) {
-		input::Hardware::enableKeyboardInstruments(false);
 		m_menu.open();
 		m_audio.togglePause();
 	}
@@ -293,7 +291,6 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 			// Did the action close the menu?
 			if (!m_menu.isOpen() && m_audio.isPaused()) {
 				m_audio.togglePause();
-				input::Hardware::enableKeyboardInstruments(true);
 			}
 			return;
 		}
@@ -405,6 +402,8 @@ namespace {
 void ScreenSing::prepare() {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	double time = m_audio.getPosition();
+	// Enable/disable controllers as needed (mostly so that keyboard navigation will not be obstructed).
+	sm->controllers.enableEvents(m_song->hasControllers() && !m_menu.isOpen() && m_score_window.get());
 	if (m_video) m_video->prepare(time);
 	for (input::DevicePtr dev; sm->controllers.getDevice(dev); ) {
 		// Eat all events and see if any are valid for joining

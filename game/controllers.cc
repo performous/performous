@@ -227,8 +227,10 @@ struct Controllers::Impl {
 	void enableEvents(bool state) {
 		m_eventsEnabled = state;
 		Hardware::enableKeyboardInstruments(state);
-		m_orphans.clear();
-		m_devices.clear();
+		if (!state) {
+			m_orphans.clear();
+			m_devices.clear();
+		}
 	}
 	/// Do internal event processing (poll for MIDI events etc)
 	void process(boost::xtime const& now) {
