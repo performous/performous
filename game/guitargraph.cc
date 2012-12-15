@@ -300,12 +300,6 @@ void GuitarGraph::engine() {
 	double time = m_audio.getPosition();
 	time -= config["audio/controller_delay"].f();
 	doUpdates();
-	// Handle key markers
-	if (!m_drums) {
-		for (int i = 0; i < m_pads; ++i) {
-			if (m_pressed[i]) m_pressed_anim[i + 1].setValue(1.0);
-		}
-	}
 	if (!m_drumfills.empty()) updateDrumFill(time); // Drum Fills / BREs
 	if (joining(time)) m_dead = 0; // Disable dead counting while joining
 	m_whammy = 0;
@@ -313,11 +307,26 @@ void GuitarGraph::engine() {
 	handleCountdown(time, time < getNotesBeginTime() ? getNotesBeginTime() : m_jointime+1);
 	// Handle all events
 	for (input::Event ev; m_dev->getEvent(ev); ) {
-		// Update key pressed status
-		if (ev.button < m_pads) m_pressed[ev.button] = ev.value;
-		// This hack disallows joining with Enter and CTRL-key
-		// since they cause issues due to also being used in other places
-		if (dead() && isKeyboard() && (ev.button == input::GUITAR_PICK_DOWN || ev.button == input::GUITAR_GODMODE)) continue;
+		// Lefty mode flip of buttons
+		if (m_leftymode.b() && m_drums && ev.source.type != input::SOURCETYPE_MIDI) {
+			unsigned layer = ev.button.layer(), num = ev.button.num();
+			// Layers 0-1: reverse all but kick; layer 2: swap yellow and blue cymbals
+			if ((layer < 2 && num >= 1 && num <= 4) || (layer == 2 && num >= 2 && num <= 3)) ev.button = input::Button(layer, 5 - num);
+		}
+		// Keypress anims
+		{
+			unsigned layer = ev.button.layer(), num = ev.button.num();
+			// Guitar numbering hack
+			if (!m_drums) {
+				if (ev.button == input::GUITAR_PICK_DOWN || ev.button == input::GUITAR_PICK_UP) { layer = 0; num = 0; }
+				else ++num;
+			}
+			// Update key pressed status
+			if (layer < 8 && num < max_panels) {
+				if (!m_drums && num > 0) m_pressed[num] = ev.value; // Only guitar frets can be held
+				if (ev.pressed()) m_pressed_anim[num].setValue(1.0); // Hit flash
+			}
+		}
 		m_dead = 0; // Keep alive
 		// Handle joining
 		if (m_jointime != m_jointime) {
@@ -327,7 +336,7 @@ void GuitarGraph::engine() {
 		// Menu keys
 		if (menuOpen()) {
 			// Check first regular keys
-			if (ev.value != 0.0) {
+			if (ev.pressed()) {
 				if (ev.nav == input::NAV_START) m_menu.action();
 				else if (ev.nav == input::NAV_LEFT) m_menu.action(-1);
 				else if (ev.nav == input::NAV_UP) m_menu.move(-1);
@@ -349,7 +358,7 @@ void GuitarGraph::engine() {
 			break;
 
 		// If the songs hasn't yet started, we want key presses to bring join menu back (not pause menu)
-		} else if (time < -2 && ev.value != 0.0 && ev.button != input::GUITAR_WHAMMY && ev.button != input::GUITAR_GODMODE) {
+		} else if (time < -2 && ev.pressed() && ev.button != input::GUITAR_WHAMMY && ev.button != input::GUITAR_GODMODE) {
 			setupJoinMenu();
 			m_menu.open();
 			break;
@@ -361,22 +370,21 @@ void GuitarGraph::engine() {
 
 		// Guitar specific actions
 		if (!m_drums) {
-			if (ev.button == input::GUITAR_GODMODE && ev.value != 0.0) activateStarpower();
+			if (ev.button == input::GUITAR_GODMODE && ev.pressed()) activateStarpower();
 			if (ev.button == input::GUITAR_WHAMMY) m_whammy = (1.0 + ev.value + 2.0*(rand()/double(RAND_MAX))) / 4.0;
-			if (ev.button <= 5 && ev.value == 0.0) endHold(ev.button, time);
+			if (ev.button <= m_pads && !ev.pressed()) endHold(ev.button, time);
 		}
 
-		// Keypress anims
-		if (ev.button <= 5 && ev.value != 0.0) m_pressed_anim[!m_drums + ev.button].setValue(1.0);
-		else if (ev.button == input::GUITAR_PICK_DOWN || ev.button == input::GUITAR_PICK_UP) m_pressed_anim[0].setValue(1.0);
 		// Playing
 		if (m_drums) {
-			if (ev.button <= 5 && ev.value != 0.0) drumHit(time, ev.button);
+			if (ev.pressed() && ev.button.layer() < 8 && ev.button.num() < m_pads) drumHit(time, ev.button.num());
 		} else {
 			guitarPlay(time, ev);
 		}
 		if (m_score < 0) m_score = 0;
 	}
+	// Handle fret hold markers
+	if (!m_drums) for (unsigned num = 0; num < max_panels; ++num) m_pressed_anim[num].setTarget(m_pressed[num] ? 1.0 : 0.0);
 
 	// Skip missed chords
 	// - Only after we are so much past them that they can no longer be played (maxTolerance)
@@ -552,8 +560,7 @@ void GuitarGraph::updateDrumFill(double time) {
 }
 
 /// Handle drum hit scoring
-void GuitarGraph::drumHit(double time, int fret) {
-	if (fret >= m_pads) return;
+void GuitarGraph::drumHit(double time, unsigned fret) {
 	// Handle drum fills
 	if (m_dfIt != m_drumfills.end() && time >= m_dfIt->begin - maxTolerance
 	  && time <= m_dfIt->end + maxTolerance) {
@@ -635,11 +642,11 @@ void GuitarGraph::drumHit(double time, int fret) {
 
 /// Handle guitar events and scoring
 void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
-	bool picked = (ev.button == input::GUITAR_PICK_UP || ev.button == input::GUITAR_PICK_DOWN) && ev.value != 0.0;
+	bool picked = (ev.button == input::GUITAR_PICK_UP || ev.button == input::GUITAR_PICK_DOWN) && ev.pressed();
 	// Handle Big Rock Ending
 	if (m_dfIt != m_drumfills.end() && time >= m_dfIt->begin - maxTolerance
 	  && time <= m_dfIt->end + maxTolerance) {
-		if (ev.value == 0.0) return;  // No processing for release events
+		if (!ev.pressed()) return;  // No processing for release events
 		m_drumfillHits += 1;
 		m_flames[ev.button].push_back(AnimValue(0.0, flameSpd));
 		m_flames[ev.button].back().setTarget(1.0);
@@ -647,17 +654,17 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 	}
 	bool frets[max_panels];  // The combination about to be played
 	if (picked) {
-		for (int fret = 0; fret < m_pads; ++fret) {
-			frets[fret] = m_pressed[fret];
+		for (unsigned fret = 0; fret < m_pads; ++fret) {
+			frets[fret] = m_pressed[fret + 1];
 		}
 	} else { // Attempt to tap
 		if (ev.button >= m_pads) return;
 		if (m_correctness.get() < 0.5 && m_starpower.get() < 0.001) return; // Hammering not possible at the moment
-		for (int fret = 0; fret < m_pads; ++fret) frets[fret] = false;
-		for (int fret = ev.button + 1; fret < m_pads; ++fret) {
+		for (unsigned fret = 0; fret < m_pads; ++fret) frets[fret] = false;
+		for (unsigned fret = ev.button + 1; fret < m_pads; ++fret) {
 			if (frets[fret]) return; // Extra buttons on right side
 		}
-		if (ev.value != 0.0) {
+		if (ev.pressed()) {
 			// Hammer-on, the fret pressed is played
 			frets[ev.button] = true;
 		} else {
@@ -883,15 +890,15 @@ void GuitarGraph::drawNeckStuff(double time) {
 		va.Draw();
 	}
 
-	// Draw the cursor
 	if (!menuOpen()) {
-		float level = m_pressed_anim[0].get();
+		// Draw the cursor
 		{
+			float level = m_pressed_anim[0].get();
 			ColorTrans c(Color(level, level, level));
 			drawBar(0.0, 0.01f);
 		}
 		// Fret buttons on cursor
-		for (int fret = m_drums; fret < m_pads; ++fret) {
+		for (unsigned fret = m_drums; fret < m_pads; ++fret) {
 			float x = getFretX(fret);
 			float l = m_pressed_anim[fret + !m_drums].get();
 			// The note head

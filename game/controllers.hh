@@ -22,10 +22,20 @@ namespace input {
 	/// Alternative orientation-agnostic mapping where A axis is the one that is easiest to access (e.g. guitar pick) and B might not be available on all devices
 	enum NavMenu { NAVMENU_NONE, NAVMENU_A_PREV, NAVMENU_A_NEXT, NAVMENU_B_PREV, NAVMENU_B_NEXT };
 
-	enum Button {
+	enum ButtonId: unsigned {
 		// Button constants for each DevType
 		#define DEFINE_BUTTON(devtype, button, num, nav) devtype##_##button = num,
 		#include "controllers-buttons.ii"
+	};
+
+	struct Button {
+		ButtonId id;
+		Button(ButtonId id = GENERIC_UNASSIGNED): id(id) {}
+		Button(unsigned layer, unsigned num): id(ButtonId(layer << 8 | num)) {}
+		operator ButtonId() const { return id; }
+		unsigned layer() const { return id >> 8; }
+		unsigned num() const { return id & 0xFF; }
+		bool generic() const { return layer() == 0x100; }
 	};
 
 	typedef unsigned HWButton;
@@ -62,7 +72,8 @@ namespace input {
 		double value; ///< Zero for button release, up to 1.0 for press (e.g. velocity value), or axis value (-1.0 .. 1.0)
 		boost::xtime time; ///< When did the event occur
 		DevType devType; ///< Device type
-		Event(): source(), hw(), button(GENERIC_UNASSIGNED), nav(NAV_NONE), value(), time(), devType() {}
+		Event(): source(), hw(), nav(NAV_NONE), value(), time(), devType() {}
+		bool pressed() const { return value != 0.0; }
 	};
 
 	/// A handle for receiving device events
@@ -89,8 +100,6 @@ namespace input {
 		void enableEvents(bool state);
 		/// Return true and an event handler device if there are any in queue. Otherwise return false.
 		bool getDevice(DevicePtr& dev);
-		/// Test if a particular button is currently being held (returns last value, zero if not pressed)
-		double pressed(SourceId const& source, Button button);
 		/// Internally poll for new events. The current time is passed for reference.
 		void process(boost::xtime const& now);
 		/// Push an SDL event for processing. Returns true if the event was taken (recognized and accepted).

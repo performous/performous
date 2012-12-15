@@ -46,11 +46,15 @@ namespace input {
 					break;
 
 				// Drums on keyboard
-				case SDLK_p: button++;
-				case SDLK_o: button++;
-				case SDLK_i: button++;
-				case SDLK_u: button++;
+				case SDLK_8: button = DRUMS_YELLOW_CYMBAL; goto drum_process;
+				case SDLK_9: button = DRUMS_GREEN_CYMBAL; goto drum_process;
+				case SDLK_0: button = DRUMS_BLUE_CYMBAL; goto drum_process;
+				case SDLK_u: button = DRUMS_RED; goto drum_process;
+				case SDLK_i: button = DRUMS_YELLOW_TOM; goto drum_process;
+				case SDLK_o: button = DRUMS_BLUE_TOM; goto drum_process;
+				case SDLK_p: button = DRUMS_GREEN_TOM; goto drum_process;
 				case SDLK_SPACE:
+					drum_process:
 					if (!config["game/keyboard_drumkit"].b()) return;
 					event.devType = DEVTYPE_DRUMS;
 					break;
@@ -70,7 +74,7 @@ namespace input {
 
 				default: return;
 			}
-			event.button = Button(button);
+			event.button = ButtonId(button);
 			event.source.channel = event.devType;  // Each type gets its own unique SourceId channel
 		}
 		Button navigation(Event& event, SDL_Event const& sdlEv) {

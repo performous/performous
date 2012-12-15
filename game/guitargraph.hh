@@ -78,7 +78,7 @@ class GuitarGraph: public InstrumentGraph {
 	void endBRE();
 	void endStreak() { m_streak = 0; m_bigStreak = 0; }
 	void updateDrumFill(double time);
-	void drumHit(double time, int pad);
+	void drumHit(double time, unsigned pad);
 	void guitarPlay(double time, input::Event const& ev);
 
 	// Media

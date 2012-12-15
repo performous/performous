@@ -230,7 +230,6 @@ struct Controllers::Impl {
 		m_orphans.clear();
 		m_devices.clear();
 	}
-	bool pressed(SourceId const& source, Button button) { return false; }
 	/// Do internal event processing (poll for MIDI events etc)
 	void process(boost::xtime const& now) {
 		for (HW::iterator it = m_hw.begin(); it != m_hw.end(); ++it) {
@@ -331,7 +330,6 @@ Controllers::~Controllers() {}
 bool Controllers::getNav(NavEvent& ev) { return self->getNav(ev); }
 bool Controllers::getDevice(DevicePtr& dev) { return self->getDevice(dev); }
 void Controllers::enableEvents(bool state) { self->enableEvents(state); }
-double Controllers::pressed(SourceId const& source, Button button) { return self->pressed(source, button); }
 void Controllers::process(boost::xtime const& now) { self->process(now); }
 bool Controllers::pushEvent(SDL_Event const& ev, boost::xtime const& t) { return self->pushEvent(ev, t); }
 
