@@ -25,6 +25,7 @@ public:
 	void reloadGL();
 	void menuBrowse(int dir); ///< Left/Right on menu options
 	void manageEvent(SDL_Event event);
+	void manageEvent(input::NavEvent const& event);
 	void prepare();
 	void draw();
 	void drawCovers(); ///< draw the cover browser

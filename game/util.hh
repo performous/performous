@@ -21,6 +21,12 @@ template <typename T> T clamp(T val, T min = 0, T max = 1) {
 	return val;
 }
 
+template <typename Numeric> struct MinMax {
+	Numeric min, max;
+	explicit MinMax(Numeric min = std::numeric_limits<Numeric>::min(), Numeric max = std::numeric_limits<Numeric>::max()): min(min), max(max) {}
+	bool matches(Numeric val) const { return val >= min && val <= max; }
+};
+
 /** A convenient way for getting NaNs **/
 static inline double getNaN() { return std::numeric_limits<double>::quiet_NaN(); }
 

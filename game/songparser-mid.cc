@@ -15,10 +15,6 @@ const std::string HARMONIC_2 = "Harmonic 2";
 const std::string HARMONIC_3 = "Harmonic 3";
 
 namespace {
-	void testAndAdd(Song& s, std::string const& trackid, std::string const& filename) {
-		std::string f = s.path + filename;
-		if (boost::filesystem::exists(f)) s.music[trackid] = f;
-	}
 	bool isVocalTrack(std::string name) {
 		if(name == TrackName::LEAD_VOCAL) return true;
 		else if(name == HARMONIC_1) return true;

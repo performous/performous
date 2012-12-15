@@ -65,43 +65,47 @@ void ScreenSongs::menuBrowse(int dir) {
 	}
 }
 
-void ScreenSongs::manageEvent(SDL_Event event) {
+void ScreenSongs::manageEvent(input::NavEvent const& event) {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
-	input::NavButton nav(input::getNav(event));
-	if (nav != input::NONE) {  // Handle generic navigation (also possible with instruments)
-		m_idleTimer.setValue(0.0);  // Reset idle timer
-		if (nav == input::PAUSE) m_audio.togglePause();
-		else if (m_jukebox) {
-			if (nav == input::CANCEL) m_jukebox = false;
-			else if (nav == input::UP) m_audio.seek(5);
-			else if (nav == input::DOWN) m_audio.seek(-5);
-			else if (nav == input::MOREUP) m_audio.seek(-30);
-			else if (nav == input::MOREDOWN) m_audio.seek(30);
-		} else if (nav == input::CANCEL) {
-			if (m_menuPos) m_menuPos = 0;  // Exit menu (back to song selection)
-			else if (!m_search.text.empty()) { m_search.text.clear(); m_songs.setFilter(m_search.text); }  // Clear search
-			else if (m_songs.typeNum()) m_songs.typeChange(0);  // Clear type filter
-			else sm->activateScreen("Intro");
+	input::NavButton nav = event.button;
+	// Handle basic navigational input that is possible also with instruments
+	m_idleTimer.setValue(0.0);  // Reset idle timer
+	if (nav == input::NAV_PAUSE) m_audio.togglePause();
+	else if (nav == input::NAV_LEFT) menuBrowse(-1);
+	else if (nav == input::NAV_RIGHT) menuBrowse(1);
+	else if (nav == input::NAV_MOREUP) m_songs.advance(-10);
+	else if (nav == input::NAV_MOREDOWN) m_songs.advance(10);
+	else if (m_jukebox) {
+		if (nav == input::NAV_CANCEL) m_jukebox = false;
+		else if (nav == input::NAV_UP) m_audio.seek(5);
+		else if (nav == input::NAV_DOWN) m_audio.seek(-5);
+		else if (nav == input::NAV_MOREUP) m_audio.seek(-30);
+		else if (nav == input::NAV_MOREDOWN) m_audio.seek(30);
+	} else if (nav == input::NAV_CANCEL) {
+		if (m_menuPos) m_menuPos = 0;  // Exit menu (back to song selection)
+		else if (!m_search.text.empty()) { m_search.text.clear(); m_songs.setFilter(m_search.text); }  // Clear search
+		else if (m_songs.typeNum()) m_songs.typeChange(0);  // Clear type filter
+		else sm->activateScreen("Intro");
+	}
+	// The rest are only available when there are songs available
+	else if (m_songs.empty()) return;
+	else if (nav == input::NAV_START) {
+		if (m_menuPos == 0) {
+			dynamic_cast<ScreenSing&>(*sm->getScreen("Sing")).setSong(m_songs.currentPtr());
+			sm->activateScreen("Sing");
 		}
-		// The rest are only available when there are songs available
-		else if (m_songs.empty()) return;
-		else if (nav == input::START) {
-			if (m_menuPos == 0) {
-				dynamic_cast<ScreenSing&>(*sm->getScreen("Sing")).setSong(m_songs.currentPtr());
-				sm->activateScreen("Sing");
-			}
-			else if (m_menuPos == 3) {
-				m_menuPos = 0;
-				m_jukebox = true;
-			}
+		else if (m_menuPos == 3) {
+			m_menuPos = 0;
+			m_jukebox = true;
 		}
-		else if (nav == input::LEFT) menuBrowse(-1);
-		else if (nav == input::RIGHT) menuBrowse(1);
-		else if (nav == input::UP && m_menuPos < 3) ++m_menuPos;
-		else if (nav == input::DOWN && m_menuPos > 0) --m_menuPos;
-		else if (nav == input::MOREUP) m_songs.advance(-10);
-		else if (nav == input::MOREDOWN) m_songs.advance(10);
-	} else if (event.type == SDL_KEYDOWN) {  // Handle keyboard-only navigation
+	}
+	else if (nav == input::NAV_UP && m_menuPos < 3) ++m_menuPos;
+	else if (nav == input::NAV_DOWN && m_menuPos > 0) --m_menuPos;
+}
+
+void ScreenSongs::manageEvent(SDL_Event event) {
+	// Handle less common, keyboard only keys
+	if (event.type == SDL_KEYDOWN) {
 		SDL_keysym keysym = event.key.keysym;
 		int key = keysym.sym;
 		SDLMod mod = event.key.keysym.mod;
@@ -112,10 +116,11 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 		}
 	}
 	if (m_songs.empty()) m_jukebox = false;
-	sm->showLogo(!m_jukebox);
 }
 
 void ScreenSongs::update() {
+	ScreenManager* sm = ScreenManager::getSingletonPtr();
+	sm->showLogo(!m_jukebox);
 	if (m_idleTimer.get() < 0.3) return;  // Only update when the user gives us a break
 	m_songs.update(); // Poll for new songs
 	bool songChange = false;  // Do we need to switch songs?
@@ -314,11 +319,8 @@ Surface& ScreenSongs::getCover(Song const& song) {
 }
 
 void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
-
-	bool have_vocals = false;
 	bool have_bass = false;
 	bool have_drums = false;
-	bool have_keyboard = false;
 	bool have_dance = false;
 	bool is_karaoke = false;
 	unsigned char typeFilter = 0;  // FIXME: Remove
@@ -327,10 +329,8 @@ void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
 
 	if( !m_songs.empty() ) {
 		Song const& song = m_songs.current();
-		have_vocals = song.hasVocals();
 		have_bass = isTrackInside(song.instrumentTracks,TrackName::BASS);
 		have_drums = song.hasDrums();
-		have_keyboard = song.hasKeyboard();
 		have_dance = song.hasDance();
 		is_karaoke = (song.music.find("vocals") != song.music.end());
 		vocalCount = song.getVocalTrackNames().size();
@@ -404,20 +404,6 @@ void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
 		va.Color(c).TexCoord(getIconTex(5), 1.0f).Vertex(x, dim.y2());
 		va.Draw();
 	}
-	/*{
-		// keyboard
-		float a = alpha * (have_keyboard ? 1.00f : 0.25f);
-		float m = !(typeFilter & 16);
-		glutil::VertexArray va;
-		glmath::vec4 c(m * 1.0f, 1.0f, m * 1.0f, a);
-		x = dim.x1()+4*xincr*(dim.x2()-dim.x1());
-		va.Color(c).TexCoord(getIconTex(5), 0.0f).Vertex(x, dim.y1());
-		va.Color(c).TexCoord(getIconTex(5), 1.0f).Vertex(x, dim.y2());
-		x = dim.x1()+5*xincr*(dim.x2()-dim.x1());
-		va.Color(c).TexCoord(getIconTex(6), 0.0f).Vertex(x, dim.y1());
-		va.Color(c).TexCoord(getIconTex(6), 1.0f).Vertex(x, dim.y2());
-		va.Draw();
-	}*/
 	{
 		// dancing
 		float a = alpha * (have_dance ? 1.00f : 0.25f);

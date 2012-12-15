@@ -10,7 +10,7 @@ class Song;
 struct Chord {
 	double begin, end;
 	bool fret[5];
-	bool fret_tom[5];
+	bool fret_cymbal[5];
 	Duration const* dur[5];
 	int polyphony;
 	bool tappable;
@@ -21,7 +21,7 @@ struct Chord {
 	double releaseTimes[5];
 	Chord(): begin(), end(), polyphony(), tappable(), passed(), status(), score() {
 		std::fill(fret, fret + 5, false);
-		std::fill(fret_tom, fret_tom + 5, false);
+		std::fill(fret_cymbal, fret_cymbal + 5, false);
 		std::fill(dur, dur + 5, static_cast<Duration const*>(NULL));
 		std::fill(hitAnim, hitAnim + 5, AnimValue(0.0, 1.5));
 		std::fill(releaseTimes, releaseTimes + 5, 0.0);
@@ -47,13 +47,12 @@ static inline bool operator==(Chord const& a, Chord const& b) {
 class GuitarGraph: public InstrumentGraph {
   public:
 	/// constructor
-	GuitarGraph(Audio& audio, Song const& song, bool drums, int number);
+	GuitarGraph(Audio& audio, Song const& song, input::DevicePtr dev, int number);
 	/** draws GuitarGraph
 	 * @param time at which time to draw
 	 */
 	void draw(double time);
 	void engine();
-	bool dead() const;
 	std::string getTrack() const;
 	std::string getDifficultyString() const;
 	std::string getModeId() const;
@@ -74,11 +73,11 @@ class GuitarGraph: public InstrumentGraph {
 	void activateStarpower();
 	void errorMeter(float error);
 	void fail(double time, int fret);
-	void endHold(int fret, double time = 0.0);
+	void endHold(unsigned fret, double time = 0.0);
 	void endBRE();
 	void endStreak() { m_streak = 0; m_bigStreak = 0; }
 	void updateDrumFill(double time);
-	void drumHit(double time, int pad);
+	void drumHit(double time, unsigned pad);
 	void guitarPlay(double time, input::Event const& ev);
 
 	// Media

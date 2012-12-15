@@ -61,16 +61,16 @@ const unsigned max_panels = 10; // Maximum number of arrow lines / guitar frets
 class Song;
 
 class InstrumentGraph {
-  public:
+public:
 	/// Constructor
-	InstrumentGraph(Audio& audio, Song const& song, input::DevType inp);
+	InstrumentGraph(Audio& audio, Song const& song, input::DevicePtr dev);
 	/// Virtual destructor
 	virtual ~InstrumentGraph() {}
 
 	// Interface functions
 	virtual void draw(double time) = 0;
 	virtual void engine() = 0;
-	virtual bool dead() const = 0;
+	virtual void process(input::Event const&) {}
 	virtual std::string getTrack() const = 0;
 	virtual std::string getDifficultyString() const = 0;
 	virtual std::string getModeId() const = 0;
@@ -78,6 +78,7 @@ class InstrumentGraph {
 	virtual void changeDifficulty(int dir = 1) = 0;
 
 	// General shared functions
+	bool dead() const;
 	void setupPauseMenu();
 	void doUpdates();
 	void drawMenu();
@@ -94,15 +95,16 @@ class InstrumentGraph {
 	unsigned stream() const { return m_stream; }
 	double correctness() const { return m_correctness.get(); }
 	int getScore() const { return (m_score > 0 ? m_score : 0) * m_scoreFactor; }
-	input::DevType getGraphType() const { return m_input.getDevType(); }
+	input::DevType getGraphType() const { return m_dev->type; }
 	virtual double getWhammy() const { return 0; }
+	bool isKeyboard() const { return m_dev->source.isKeyboard(); }
 
   protected:
 	// Core stuff
 	Audio& m_audio;
 	Song const& m_song;
-	input::InputDev m_input; /// input device (guitar/drums/keyboard)
 	std::size_t m_stream; /// audio stream number
+	input::DevicePtr m_dev;
 	AnimValue m_cx, m_width; /// controls horizontal position and width smoothly
 	struct Event {
 		double time;
@@ -125,7 +127,7 @@ class InstrumentGraph {
 	void handleCountdown(double time, double beginTime);
 
 	// Functions not really shared, but needed here
-	Color const& color(int fret) const;
+	Color const& color(unsigned fret) const;
 
 	// Media
 	Surface m_button;
@@ -147,7 +149,7 @@ class InstrumentGraph {
 	std::string m_leftyOpt;
 
 	// Misc counters etc.
-	int m_pads; /// how many panels the current gaming mode uses
+	unsigned m_pads; /// how many panels the current gaming mode uses
 	bool m_pressed[max_panels]; /// is certain panel pressed currently
 	AnimValue m_pressed_anim[max_panels]; /// animation for panel pressing
 	AnimValue m_correctness;
@@ -159,7 +161,7 @@ class InstrumentGraph {
 	int m_bigStreak; /// next limit when a popup appears
 	int m_countdown; /// countdown counter
 	double m_jointime; /// when the player joined
-	int m_dead; /// how many notes has been passed without hitting buttons
+	unsigned m_dead; /// how many notes has been passed without hitting buttons
 	bool m_ready;
 };
 

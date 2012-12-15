@@ -10,11 +10,11 @@
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="300"
-   height="400"
+   width="658.31732"
+   height="378.5"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.48.0 r9654"
+   inkscape:version="0.48.3.1 r9886"
    version="1.0"
    sodipodi:docname="instrumentmenu_bg.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
@@ -27,7 +27,7 @@
          offset="0"
          style="stop-color:#ffffff;stop-opacity:0.88554215;" />
       <stop
-         style="stop-color:#81cedf;stop-opacity:0.78313255;"
+         style="stop-color:#b0b0b0;stop-opacity:0.78313255;"
          offset="0.30000001"
          id="stop3903" />
       <stop
@@ -82,17 +82,6 @@
          offset="1"
          id="stop3633-4" />
     </linearGradient>
-    <radialGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient3897"
-       id="radialGradient3893"
-       cx="152.33708"
-       cy="185.20837"
-       fx="152.33708"
-       fy="185.20837"
-       r="140"
-       gradientTransform="matrix(1.8932799,-1.1288249,2.9734822,4.987163,-586.095,-459.97648)"
-       gradientUnits="userSpaceOnUse" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -102,16 +91,20 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.49497475"
-     inkscape:cx="-97.971012"
-     inkscape:cy="231.31119"
+     inkscape:cx="-77.406281"
+     inkscape:cy="220.56135"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1313"
-     inkscape:window-height="722"
-     inkscape:window-x="321"
-     inkscape:window-y="41"
-     inkscape:window-maximized="0" />
+     inkscape:window-width="1920"
+     inkscape:window-height="1053"
+     inkscape:window-x="0"
+     inkscape:window-y="-1"
+     inkscape:window-maximized="1"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -127,15 +120,15 @@
      inkscape:label="Calque 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(0,80)">
+     transform="translate(369.06735,69.25)">
     <rect
-       style="fill:url(#radialGradient3893);fill-opacity:1.0;stroke:#000000;stroke-width:1.50000000000000000;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="opacity:0.79237288;fill:#000000;fill-opacity:1;stroke:none"
        id="rect2383"
-       width="278.5"
+       width="658.31732"
        height="378.5"
-       x="10.75"
+       x="-369.06735"
        y="-69.25"
-       rx="31.357962"
-       ry="55.004662" />
+       rx="31.697433"
+       ry="31.697433" />
   </g>
 </svg>

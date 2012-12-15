@@ -232,6 +232,6 @@ class Surface {
 	Shader& shader() { return m_texture.shader(); }
   private:
 	unsigned int m_width, m_height;
-	OpenGLTexture<GL_TEXTURE_RECTANGLE> m_texture;
+	OpenGLTexture<GL_TEXTURE_2D> m_texture;
 };
 
