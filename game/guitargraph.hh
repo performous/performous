@@ -10,7 +10,7 @@ class Song;
 struct Chord {
 	double begin, end;
 	bool fret[5];
-	bool fret_tom[5];
+	bool fret_cymbal[5];
 	Duration const* dur[5];
 	int polyphony;
 	bool tappable;
@@ -21,7 +21,7 @@ struct Chord {
 	double releaseTimes[5];
 	Chord(): begin(), end(), polyphony(), tappable(), passed(), status(), score() {
 		std::fill(fret, fret + 5, false);
-		std::fill(fret_tom, fret_tom + 5, false);
+		std::fill(fret_cymbal, fret_cymbal + 5, false);
 		std::fill(dur, dur + 5, static_cast<Duration const*>(NULL));
 		std::fill(hitAnim, hitAnim + 5, AnimValue(0.0, 1.5));
 		std::fill(releaseTimes, releaseTimes + 5, 0.0);

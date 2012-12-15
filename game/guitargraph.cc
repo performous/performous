@@ -809,30 +809,11 @@ void GuitarGraph::drawNotes(double time) {
 				c.g += glow * 0.2f;
 				c.b += glow * 0.2f;
 			}
-			if (glow > 0.5f && tEnd < 0.1f && it->hitAnim[fret].get() == 0.0)
-				it->hitAnim[fret].setTarget(1.0);
+			if (glow > 0.5f && tEnd < 0.1f && it->hitAnim[fret].get() == 0.0) it->hitAnim[fret].setTarget(1.0);
 			// Call the actual note drawing function
-			if(!m_hasTomTrack) {
-				// no tom track, normal display (only tom)
-				if(m_drums) {
-					drawNote(fret, c, tBeg, tEnd, whammy, false, glow > 0.5f, it->hitAnim[fret].get(),
-					  it->releaseTimes[fret] > 0.0 ? it->releaseTimes[fret] - time : getNaN());
-				} else {
-					drawNote(fret, c, tBeg, tEnd, whammy, it->tappable, glow > 0.5f, it->hitAnim[fret].get(),
-					  it->releaseTimes[fret] > 0.0 ? it->releaseTimes[fret] - time : getNaN());
-				}
-			} else {
-				// here there is a tom track
-				if(!it->fret_tom[fret] && fret >= input::DRUMS_YELLOW_CYMBAL){
-					// here we should draw a cymbal/HiHat (yellow/blue/green pad with no tom track event)
-					drawNote(fret, c, tBeg, tEnd, whammy, true, glow > 0.5f, it->hitAnim[fret].get(),
-					  it->releaseTimes[fret] > 0.0 ? it->releaseTimes[fret] - time : getNaN());
-				} else {
-					// here we should draw a tom (either red, or a yellow/blue/green pad with tom marker
-					drawNote(fret, c, tBeg, tEnd, whammy, false, glow > 0.5f, it->hitAnim[fret].get(),
-					  it->releaseTimes[fret] > 0.0 ? it->releaseTimes[fret] - time : getNaN());
-				}
-			}
+			bool tap = m_drums ? it->fret_cymbal[fret] : it->tappable;
+			drawNote(fret, c, tBeg, tEnd, whammy, tap, glow > 0.5f, it->hitAnim[fret].get(),
+			  it->releaseTimes[fret] > 0.0 ? it->releaseTimes[fret] - time : getNaN());
 		}
 	}
 	// Mangle neck glow color as needed
@@ -1143,33 +1124,17 @@ void GuitarGraph::drawBar(double time, float h) {
 }
 
 bool GuitarGraph::updateTom(unsigned int tomTrack, unsigned int fretId) {
-	// HiHat/Rack Tom 1 detection
 	NoteMap::const_iterator tomTrackIt = m_track_index->second->nm.find(tomTrack);
-	if (tomTrackIt != m_track_index->second->nm.end()) {
-		if(tomTrack == 110) {
-			//std::cout << "HiHat/Rack Tom 1 detected" << std::endl;
-		} else if(tomTrack == 111) {
-			//std::cout << "Ride Cymbal/Rack Tom 2 detected" << std::endl;
-		} else if(tomTrack == 112) {
-			//std::cout << "Crash Cymbal/Floor Tom detected" << std::endl;
-		} else {
-			//std::cout << "Unknown Tom detected" << std::endl;
+	if (tomTrackIt == m_track_index->second->nm.end()) return false;  // Track not found
+	Chords::iterator chordIt = m_chords.begin();
+	for (Duration const& tom: tomTrackIt->second) {
+		// Iterate over chords of the song
+		for (; chordIt != m_chords.end() && chordIt->begin < tom.end; ++chordIt) {
+			if (!chordIt->fret[fretId]) continue;  // Chord doesn't contain the fret we are looking for
+			chordIt->fret_cymbal[fretId] = (chordIt->begin < tom.begin);  // If not within tom, it is a cymbal
 		}
-		for (Durations::const_iterator it = tomTrackIt->second.begin(); it != tomTrackIt->second.end(); ++it) {
-			//std::cout << " ++ @" << it->begin << "->@" << it->end << std::endl;
-			for (Chords::iterator it2 = m_chords.begin(); it2 != m_chords.end() ; ++it2) {
-				if(it2->begin >= it->begin && it2->begin < it->end && it2->fret[fretId]) {
-					//std::cout << " FOUND !!!!" << it2->begin << std::endl;
-					it2->fret_tom[fretId] = true;
-				} else if(it2->begin >= it->end) {
-					//std::cout << " NO MORE !!!! (next @" << it2->begin << ")" << std::endl;
-					break;
-				}
-			}
-		}
-		return true;
 	}
-	return false;
+	return true;
 }
 
 /// Create the Chord structures for the current track/difficulty level
@@ -1231,11 +1196,11 @@ void GuitarGraph::updateChords() {
 	m_hasTomTrack = false;
 	if(m_drums) {
 		// HiHat/Rack Tom 1 detection
-		m_hasTomTrack = updateTom(110, input::DRUMS_YELLOW_CYMBAL) || m_hasTomTrack;  // FIXME: cymbal/tom reversed?
+		m_hasTomTrack = updateTom(110, input::DRUMS_YELLOW) || m_hasTomTrack;
 		// Ride Cymbal/Rack Tom 2 detection
-		m_hasTomTrack = updateTom(111, input::DRUMS_BLUE_CYMBAL) || m_hasTomTrack;
+		m_hasTomTrack = updateTom(111, input::DRUMS_BLUE) || m_hasTomTrack;
 		// Crash Cymbal/Floor Tom detection
-		m_hasTomTrack = updateTom(112, input::DRUMS_GREEN_CYMBAL) || m_hasTomTrack;
+		m_hasTomTrack = updateTom(112, input::DRUMS_GREEN) || m_hasTomTrack;
 	}
 
 	// Solos
