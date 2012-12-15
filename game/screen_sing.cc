@@ -403,7 +403,7 @@ void ScreenSing::prepare() {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	double time = m_audio.getPosition();
 	// Enable/disable controllers as needed (mostly so that keyboard navigation will not be obstructed).
-	sm->controllers.enableEvents(m_song->hasControllers() && !m_menu.isOpen() && m_score_window.get());
+	sm->controllers.enableEvents(m_song->hasControllers() && !m_menu.isOpen() && !m_score_window.get());
 	if (m_video) m_video->prepare(time);
 	for (input::DevicePtr dev; sm->controllers.getDevice(dev); ) {
 		// Eat all events and see if any are valid for joining
