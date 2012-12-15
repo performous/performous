@@ -63,21 +63,23 @@ void ScreenAudioDevices::enter() {
 
 void ScreenAudioDevices::exit() { m_theme.reset(); }
 
-void ScreenAudioDevices::manageEvent(SDL_Event event) {
+void ScreenAudioDevices::manageEvent(input::NavEvent const& event) {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
-	input::NavButton nav(input::getNav(event));
-	if (nav != input::NONE) {
-		if (nav == input::CANCEL || nav == input::SELECT) sm->activateScreen("Intro");
-		else if (nav == input::PAUSE) m_audio.togglePause();
-		else if (m_devs.empty()) return; // The rest work if there are any devices
-		else if (nav == input::START) { if (save()) sm->activateScreen("Intro"); }
-		else if (nav == input::LEFT && m_selected_column > 0) --m_selected_column;
-		else if (nav == input::RIGHT && m_selected_column < m_mics.size()-1) ++m_selected_column;
-		else if (nav == input::UP)
-			m_mics[m_selected_column].dev = (m_mics[m_selected_column].dev + m_devs.size()) % (m_devs.size() + 1);
-		else if (nav == input::DOWN)
-			m_mics[m_selected_column].dev = (m_mics[m_selected_column].dev + 1) % (m_devs.size() + 1);
-	} else if (event.type == SDL_KEYDOWN) {
+	input::NavButton nav = event.button;
+	if (nav == input::NAV_CANCEL) sm->activateScreen("Intro");
+	else if (nav == input::NAV_PAUSE) m_audio.togglePause();
+	else if (m_devs.empty()) return; // The rest work if there are any devices
+	else if (nav == input::NAV_START) { if (save()) sm->activateScreen("Intro"); }
+	else if (nav == input::NAV_LEFT && m_selected_column > 0) --m_selected_column;
+	else if (nav == input::NAV_RIGHT && m_selected_column < m_mics.size()-1) ++m_selected_column;
+	else if (nav == input::NAV_UP)
+		m_mics[m_selected_column].dev = (m_mics[m_selected_column].dev + m_devs.size()) % (m_devs.size() + 1);
+	else if (nav == input::NAV_DOWN)
+		m_mics[m_selected_column].dev = (m_mics[m_selected_column].dev + 1) % (m_devs.size() + 1);
+}
+
+void ScreenAudioDevices::manageEvent(SDL_Event event) {
+	if (event.type == SDL_KEYDOWN) {
 		int key = event.key.keysym.sym;
 		SDLMod modifier = event.key.keysym.mod;
 		if (m_devs.empty()) return; // The rest work if there are any config options
@@ -162,7 +164,7 @@ bool ScreenAudioDevices::save(bool skip_ui_config) {
 		for (size_t d = 0; d < m_devs.size(); ++d) {
 			std::string mics = "", pdev = "";
 			for (size_t m = 0; m < m_mics.size(); ++m) {
-				if (m_mics[m].dev == m_devs[d].idx) {
+				if (m_mics[m].dev == unsigned(m_devs[d].idx)) {
 					if (m_mics[m].name == "OUT") pdev = "out=2"; // Pdev, only stereo supported
 					else { // Mic
 						if (!mics.empty()) mics += ","; // Add separator if needed

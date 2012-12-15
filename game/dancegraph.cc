@@ -18,8 +18,6 @@ namespace {
 	_("Beginner") _("Easy") _("Medium") _("Hard") _("Challenge")
 	#endif
 	const std::string diffv[] = { "Beginner", "Easy", "Medium", "Hard", "Challenge" };
-	const int death_delay = 25; // Delay in notes after which the player is hidden
-	const float join_delay = 3.0f; // Time after join menu before playing when joining mid-game
 	const float past = -0.3f; // Relative time from cursor that is considered past (out of screen)
 	const float future = 2.0f; // Relative time from cursor that is considered future (out of screen)
 	const float timescale = 12.0f; // Multiplier to get graphics units from time
@@ -30,7 +28,6 @@ namespace {
 		float a = clamp(1.0 - t / future); // Note: we want 1.0 alpha already at zero t.
 		return std::pow(a, 0.8f); // Nicer curve
 	}
-	float y2a(float y) { return time2a(past - y / timescale * (future - past)); }
 	const double maxTolerance = 0.15; // Maximum error in seconds
 	int getNextBigStreak(int prev) { return prev + 10; }
 
@@ -79,8 +76,8 @@ namespace {
 
 
 /// Constructor
-DanceGraph::DanceGraph(Audio& audio, Song const& song):
-  InstrumentGraph(audio, song, input::DANCEPAD),
+DanceGraph::DanceGraph(Audio& audio, Song const& song, input::DevicePtr dev):
+  InstrumentGraph(audio, song, dev),
   m_level(BEGINNER),
   m_beat(getThemePath("dancebeat.svg")),
   m_arrows(getThemePath("arrows.svg")),
@@ -193,11 +190,6 @@ void DanceGraph::finalizeTrackChange() {
 	m_menu.select(1); // Restore selection to the track item
 }
 
-/// Are we alive?
-bool DanceGraph::dead() const {
-	return m_jointime != m_jointime || m_dead >= death_delay;
-}
-
 /// Get the track string
 std::string DanceGraph::getTrack() const {
 	return _(m_gamingMode.c_str());
@@ -210,7 +202,7 @@ std::string DanceGraph::getDifficultyString() const {
 
 /// Get a string id for track and difficulty
 std::string DanceGraph::getModeId() const {
-	return m_gamingMode + " - " + diffv[m_level] + (m_input.isKeyboard() ? " (kbd)" : "");
+	return m_gamingMode + " - " + diffv[m_level] + (isKeyboard() ? " (kbd)" : "");
 }
 
 /// Attempt to change the difficulty by a step
@@ -266,45 +258,41 @@ void DanceGraph::engine() {
 		time -= it->second;
 	}
 	if (outsideStop && m_insideStop) m_insideStop = false;
-	if (joining(time)) m_dead = 0; // Disable dead counting while joining
 	bool difficulty_changed = false;
 	// Handle all events
-	for (input::Event ev; m_input.tryPoll(ev);) {
+	for (input::Event ev; m_dev->getEvent(ev); ) {
 		m_dead = 0; // Keep alive
-		if (m_jointime != m_jointime) { // Handle joining
-			m_jointime = time < 0.0 ? -1.0 : time + join_delay;
-			break;
-		}
 		// Menu keys
-		if (menuOpen() && ev.type == input::Event::PRESS) {
-			if (ev.nav == input::START || ev.nav == input::CANCEL) m_menu.close();
-			else if (ev.nav == input::RIGHT) m_menu.action(1);
-			else if (ev.nav == input::LEFT) m_menu.action(-1);
-			else if (ev.nav == input::UP) m_menu.move(-1);
-			else if (ev.nav == input::DOWN) m_menu.move(1);
+		if (menuOpen() && ev.value != 0.0) {
+			if (ev.nav == input::NAV_START || ev.nav == input::NAV_CANCEL) m_menu.close();
+			else if (ev.nav == input::NAV_RIGHT) m_menu.action(1);
+			else if (ev.nav == input::NAV_LEFT) m_menu.action(-1);
+			else if (ev.nav == input::NAV_UP) m_menu.move(-1);
+			else if (ev.nav == input::NAV_DOWN) m_menu.move(1);
 			difficulty_changed = true;
 			// See if anything changed
 			if (m_selectedTrack.so() != m_gamingMode) setTrack(m_selectedTrack.so());
 			else if (boost::lexical_cast<int>(m_selectedDifficulty.so()) != m_level)
 				difficulty(DanceDifficulty(boost::lexical_cast<int>(m_selectedDifficulty.so())));
-			else if (m_rejoin.b()) { unjoin(); setupJoinMenu(); m_input.addEvent(input::Event()); }
+			else if (m_rejoin.b()) { unjoin(); setupJoinMenu(); m_dev->pushEvent(input::Event()); /* FIXME: HACK? */ }
 			// Sync dynamic stuff
 			updateJoinMenu();
 		// Open Menu
-		} else if (!menuOpen() && ev.type == input::Event::PRESS) {
-			if (ev.nav == input::CANCEL || ev.nav == input::START) m_menu.open();
+		} else if (!menuOpen() && ev.value != 0.0) {
+			if (ev.nav == input::NAV_CANCEL || ev.nav == input::NAV_START) m_menu.open();
 		}
 		// Gaming controls
-		if (ev.type == input::Event::RELEASE) {
+		if (ev.value == 0.0) {
 			m_pressed[ev.button] = false;
 			dance(time, ev);
 			m_pressed_anim[ev.button].setTarget(0.0);
-		} else if (ev.type == input::Event::PRESS) {
+		} else if (ev.value != 0.0) {
 			m_pressed[ev.button] = true;
 			dance(time, ev);
 			m_pressed_anim[ev.button].setValue(1.0);
 		}
 	}
+
 	// Countdown to start
 	handleCountdown(time, time < getNotesBeginTime() ? getNotesBeginTime() : m_jointime+1);
 
@@ -316,7 +304,7 @@ void DanceGraph::engine() {
 			if(it->note.type != Note::MINE) m_score += it->score;
 			if(!it->releaseTime) it->releaseTime = time;
 		}
-		++m_dead;
+		if (!joining(time)) ++m_dead;  // Increment dead counter (but not while joining)
 	}
 	if (difficulty_changed) m_dead = 0; // if difficulty is changed, m_dead would get incorrect
 
@@ -340,7 +328,7 @@ void DanceGraph::engine() {
 /// Handles scoring and such
 void DanceGraph::dance(double time, input::Event const& ev) {
 	// Handle release events
-	if(ev.type == input::Event::RELEASE) {
+	if (ev.value == 0.0) {
 		DanceNotes::iterator it = m_activeNotes[ev.button];
 		if(it != m_notes.end()) {
 			if(!it->releaseTime && it->note.end > time + maxTolerance) {
@@ -354,7 +342,7 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 
 	// So it was a PRESS event
 	for (DanceNotes::iterator it = m_notesIt; it != m_notes.end() && time <= it->note.end + maxTolerance; ++it) {
-		if(!it->isHit && std::abs(time - it->note.begin) <= maxTolerance && ev.button == it->note.note) {
+		if(!it->isHit && std::abs(time - it->note.begin) <= maxTolerance && ev.button == unsigned(it->note.note)) {
 			it->isHit = true;
 			if (it->note.type != Note::MINE) {
 				it->score = points(it->note.begin - time);
@@ -426,7 +414,7 @@ void DanceGraph::draw(double time) {
 			us()["clock"].set(float(time));
 			us()["noteType"].set(0);
 			us()["scale"].set(getScale());
-			for (int arrow_i = 0; arrow_i < m_pads; ++arrow_i) {
+			for (unsigned arrow_i = 0; arrow_i < m_pads; ++arrow_i) {
 				float l = m_pressed_anim[arrow_i].get();
 				us()["hitAnim"].set(l);
 				us()["position"].set(panel2x(arrow_i), time2y(0.0));

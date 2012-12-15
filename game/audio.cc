@@ -417,7 +417,7 @@ struct Audio::Impl {
 		for (ConfigItem::StringList::const_iterator it = devs.begin(), end = devs.end(); it != end; ++it) {
 			try {
 				struct Params {
-					int out, in;
+					unsigned out, in;
 					unsigned int rate;
 					std::string dev;
 					std::vector<std::string> mics;
@@ -472,7 +472,7 @@ struct Audio::Impl {
 					<< ", in: " << params.in << ", out: " << params.out << std::endl;
 				portaudio::DeviceInfo& info = ad.devices[dev];
 				if (info.in < int(params.mics.size())) throw std::runtime_error("Device doesn't have enough input channels");
-				if (info.out < params.out) throw std::runtime_error("Device doesn't have enough output channels");
+				if (info.out < int(params.out)) throw std::runtime_error("Device doesn't have enough output channels");
 				// Match found if we got here, construct a device
 				Device* d = new Device(params.in, params.out, params.rate, info.idx);
 				devices.push_back(d);

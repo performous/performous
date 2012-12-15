@@ -30,19 +30,7 @@ void ScreenPaths::enter() {
 void ScreenPaths::exit() { m_theme.reset(); }
 
 void ScreenPaths::manageEvent(SDL_Event event) {
-	ScreenManager* sm = ScreenManager::getSingletonPtr();
-	input::NavButton nav(input::getNav(event));
-	if (nav != input::NONE) {
-		if (nav == input::CANCEL || nav == input::SELECT) {
-			if (m_txtinp.text.empty()) sm->activateScreen("Intro");
-			else m_txtinp.text.clear();
-		}
-		else if (nav == input::PAUSE) m_audio.togglePause();
-		else if (nav == input::START) { 
-			// TODO: Save config
-			sm->activateScreen("Intro");
-		}
-	} else if (event.type == SDL_KEYDOWN) {
+	if (event.type == SDL_KEYDOWN) {
 		return; // FIXME: Remove
 		SDLKey key = event.key.keysym.sym;
 		SDLMod modifier = event.key.keysym.mod;
@@ -53,6 +41,19 @@ void ScreenPaths::manageEvent(SDL_Event event) {
 			config["paths/system"].reset(modifier & KMOD_ALT);
 			// TODO: Save
 		}
+	}
+}
+
+void ScreenPaths::manageEvent(input::NavEvent const& ev) {
+	ScreenManager* sm = ScreenManager::getSingletonPtr();
+	if (ev.button == input::NAV_CANCEL) {
+		if (m_txtinp.text.empty()) sm->activateScreen("Intro");
+		else m_txtinp.text.clear();
+	}
+	else if (ev.button == input::NAV_PAUSE) m_audio.togglePause();
+	else if (ev.button == input::NAV_START) { 
+		// TODO: Save config
+		sm->activateScreen("Intro");
 	}
 }
 
