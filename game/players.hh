@@ -8,7 +8,7 @@
 
 #include <boost/noncopyable.hpp>
 
-#include "fs.hh"
+//#include "fs.hh"
 #include "player.hh"
 #include "animvalue.hh"
 
@@ -23,10 +23,10 @@ struct PlayersException: public std::runtime_error {
 };
 
 /**A collection of all Players.
- 
+
  The current players plugged in a song can
  be retrieved with Engine::getPlayers().
- 
+
  There are 3 different views united in that collection.
  There is a full players list which are used by the
  database, but also for the filtering.

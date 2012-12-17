@@ -1,10 +1,11 @@
 #pragma once
 
-#include <boost/scoped_ptr.hpp>
 #include "animvalue.hh"
 #include "cachemap.hh"
 #include "screen.hh"
 #include "textinput.hh"
+
+#include <boost/scoped_ptr.hpp>
 
 class Song;
 class Audio;
@@ -14,7 +15,6 @@ class Surface;
 class Database;
 class ThemeSongs;
 class LayoutSinger;
-
 
 /** Player hiscore addition screen.
   Database is passed as argument, but only the players is stored
