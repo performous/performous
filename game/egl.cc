@@ -33,7 +33,6 @@ namespace {
 
 // FIXME: Remove all the debug prints here
 void initEGL() {
-	int32_t success = 0;
 	EGLint num_config;
 	// FIXME: Move these to Window
 	EGLConfig config;
@@ -104,6 +103,8 @@ void initEGL() {
 	native_window.height = s_height;
 	vc_dispmanx_update_submit_sync(dispman_update);
 	glerror.check("vc_dispmanx_update_submit_sync");
+	#else
+	
 	#endif // USE_RPI
 
 	std::cout << "eglCreateWindowSurface" << std::endl;
