@@ -1,7 +1,9 @@
 #include "notegraph.hh"
 
 #include "configuration.hh"
+#include "database.hh"
 #include "engine.hh"
+#include "player.hh"
 
 Dimensions dimensions; // Make a public member variable
 

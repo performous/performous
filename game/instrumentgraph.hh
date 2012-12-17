@@ -2,9 +2,9 @@
 
 #include <vector>
 
+#include "audio.hh"
 #include "animvalue.hh"
 #include "notes.hh"
-#include "audio.hh"
 #include "controllers.hh"
 #include "surface.hh"
 #include "opengl_text.hh"
@@ -12,8 +12,6 @@
 #include "menu.hh"
 #include "screen.hh"
 #include "fs.hh"
-#include "theme.hh"
-
 
 /// Represents popup messages
 class Popup {
@@ -58,7 +56,9 @@ class Popup {
 
 const unsigned max_panels = 10; // Maximum number of arrow lines / guitar frets
 
+class Audio;
 class Song;
+class ThemeInstrumentMenu;
 
 class InstrumentGraph {
 public:
@@ -83,7 +83,7 @@ public:
 	void doUpdates();
 	void drawMenu();
 	void toggleMenu(int forcestate = -1); // 0 = close, 1 = open, -1 = auto/toggle
-	void togglePause(int) { m_audio.togglePause(); }
+	void togglePause(int);
 	void quit(int) { ScreenManager::getSingletonPtr()->activateScreen("Songs"); }
 	void unjoin();
 
@@ -137,7 +137,7 @@ public:
 	Surface m_arrow_right;
 	SvgTxtTheme m_text;
 	boost::scoped_ptr<SvgTxtThemeSimple> m_popupText;
-	boost::scoped_ptr<ThemeInstrumentMenu> m_menuTheme;
+	boost::shared_ptr<ThemeInstrumentMenu> m_menuTheme;
 
 	// Dynamic stuff for join menu
 	ConfigItem m_selectedTrack; /// menu modifies this to select track

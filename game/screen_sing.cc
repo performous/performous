@@ -1,16 +1,20 @@
 #include "screen_sing.hh"
 
+#include "backgrounds.hh"
+#include "dancegraph.hh"
+#include "database.hh"
+#include "engine.hh"
+#include "fs.hh"
+#include "glutil.hh"
+#include "guitargraph.hh"
+#include "i18n.hh"
+#include "layout_singer.hh"
+#include "menu.hh"
+#include "screen_players.hh"
 #include "songparser.hh"
 #include "util.hh"
-#include "screen_players.hh"
-#include "fs.hh"
-#include "database.hh"
 #include "video.hh"
-#include "guitargraph.hh"
-#include "dancegraph.hh"
-#include "glutil.hh"
-#include "i18n.hh"
-#include "menu.hh"
+#include "webcam.hh"
 
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
@@ -32,6 +36,11 @@ namespace {
 		ScreenSing* ss = static_cast<ScreenSing*>(screenSing);
 		ss->setupVocals();
 	}
+}
+
+ScreenSing::ScreenSing(std::string const& name, Audio& audio, Database& database, Backgrounds& bgs):
+	  Screen(name), m_audio(audio), m_database(database), m_backgrounds(bgs), m_latencyAV(),
+	  m_selectedTrack(TrackName::LEAD_VOCAL) {
 }
 
 void ScreenSing::enter() {
@@ -641,3 +650,6 @@ void ScoreWindow::draw() {
 	m_score_rank.draw(m_rank);
 }
 
+bool ScoreWindow::empty() {
+	return m_database.scores.empty();
+}

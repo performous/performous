@@ -40,7 +40,7 @@ namespace {
 			std::vector<char> buf;
 			fp.second.get(buf);
 			f.write(&buf[0], buf.size());
-			std::cout << std::endl;
+			std::cout << "  " << buf.size() << " bytes" << std::endl;
 		}
 	  private:
 		Pak& m_p;

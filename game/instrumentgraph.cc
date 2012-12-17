@@ -1,6 +1,7 @@
 #include "instrumentgraph.hh"
 #include "i18n.hh"
 #include "glutil.hh"
+#include "theme.hh"
 
 namespace {
 	const double join_delay = 3.0; // Time after join menu before playing when joining mid-game
@@ -64,6 +65,9 @@ void InstrumentGraph::doUpdates() {
 	}
 }
 
+void InstrumentGraph::togglePause(int) {
+	m_audio.togglePause();
+}
 
 void InstrumentGraph::toggleMenu(int forcestate) {
 	if (forcestate == 1) { m_menu.open(); return; }
