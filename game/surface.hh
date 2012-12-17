@@ -16,7 +16,7 @@ class Dimensions {
 	/** Initialize with aspect ratio but no size, centered at screen center. **/
 	Dimensions(float ar_ = 0.0f): m_ar(ar_), m_x(), m_y(), m_w(), m_h(), m_xAnchor(), m_yAnchor(), m_screenAnchor() {}
 	/** Initialize with top-left corner and width & height **/
-	Dimensions(float x1, float y1, float w, float h): m_x(x1), m_y(y1), m_w(w), m_h(h), m_xAnchor(LEFT), m_yAnchor(TOP), m_screenAnchor() {}
+	Dimensions(float x1, float y1, float w, float h): m_ar(), m_x(x1), m_y(y1), m_w(w), m_h(h), m_xAnchor(LEFT), m_yAnchor(TOP), m_screenAnchor() {}
 	/// sets middle
 	Dimensions& middle(float x = 0.0f) { m_x = x; m_xAnchor = MIDDLE; return *this; }
 	/// sets left

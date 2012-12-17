@@ -151,11 +151,11 @@ void DanceGraph::changeTrack(int direction) {
 		if (m_curTrackIt == m_song.danceTracks.end())
 			m_curTrackIt = m_song.danceTracks.begin();
 	} else if (direction > 0) {
-		m_curTrackIt++;
+		++m_curTrackIt;
 		if (m_curTrackIt == m_song.danceTracks.end()) m_curTrackIt = m_song.danceTracks.begin();
 	} else if (direction < 0) {
 		if (m_curTrackIt == m_song.danceTracks.begin()) m_curTrackIt = (--m_song.danceTracks.end());
-		else m_curTrackIt--;
+		else --m_curTrackIt;
 	}
 	finalizeTrackChange();
 }
@@ -231,7 +231,7 @@ bool DanceGraph::difficulty(DanceDifficulty level, bool check_only) {
 	m_level = level;
 	for(size_t i = 0; i < max_panels; i++) m_activeNotes[i] = m_notes.end();
 	m_scoreFactor = 1;
-	if(m_notes.size() != 0)
+	if(!m_notes.empty())
 		m_scoreFactor = 10000.0 / (50 * m_notes.size()); // maxpoints / (notepoint * notes)
 	updateJoinMenu();
 	return true;
