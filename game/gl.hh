@@ -20,7 +20,7 @@
 	// FIXME: Need to delete all uses of GL_TEXTURE_RECTANGLE in performous
 	#define GL_TEXTURE_RECTANGLE GL_TEXTURE_2D
 	// GL3 stuff
-	#define glViewportIndexedf
+	#define glViewportIndexedf(i, x, y, w, h)
 	#define GL_FRAMEBUFFER_SRGB 0x8DB9
 	#define GL_SRGB_ALPHA 0x8C42
 #else
