@@ -1,13 +1,14 @@
 #pragma once
 
-#include "audio.hh"
 #include "song.hh"
-#include "configuration.hh"
 #include "database.hh"
 #include <boost/bind.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <boost/thread/thread.hpp>
 #include <list>
 #include <iostream>
+
+class Audio;
 
 /// performous engine
 class Engine {
@@ -52,15 +53,5 @@ class Engine {
 	/// Terminates processing
 	void kill() { m_quit = true; m_thread->join(); }
 	/** Used internally for boost::thread. Do not call this yourself. (boost::thread requires this to be public). **/
-	void operator()() {
-		while (!m_quit) {
-			std::for_each(m_database.cur.begin(), m_database.cur.end(), boost::bind(&Player::prepare, _1));
-			double t = m_audio.getPosition() - config["audio/round-trip"].f();
-			double timeLeft = m_time * TIMESTEP - t;
-			if (timeLeft != timeLeft || timeLeft > 1.0) timeLeft = 1.0;  // FIXME: Workaround for NaN values and other weirdness (should fix the weirdness instead)
-			if (timeLeft > 0.0) { boost::thread::sleep(now() + std::min(TIMESTEP, timeLeft)); continue; }
-			std::for_each(m_database.cur.begin(), m_database.cur.end(), boost::bind(&Player::update, _1));
-			++m_time;
-		}
-	}
+	void operator()();
 };
