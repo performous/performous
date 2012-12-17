@@ -74,6 +74,7 @@ unsigned int screenH() { return s_height; }
 
 #ifdef USE_EGL
 void initEGL(unsigned&, unsigned&); // Defined in egl.cc
+void swapEGL();
 #endif
 
 Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(width), m_windowH(height), m_fullscreen(fs), screen() {
@@ -307,7 +308,11 @@ void Window::view(unsigned num) {
 }
 
 void Window::swap() {
+	#ifdef USE_EGL
+	swapEGL();
+	#else
 	SDL_GL_SwapBuffers();
+	#endif
 }
 
 void Window::setFullscreen(bool _fs) {

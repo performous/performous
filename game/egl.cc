@@ -16,6 +16,11 @@ namespace {
 	static XID native_window;
 	#endif
 
+	EGLConfig config;
+	EGLDisplay display;
+	EGLSurface surface;
+	EGLContext context;
+
 	static const EGLint egl_attributes[] = {
 		EGL_RED_SIZE, 8,
 		EGL_GREEN_SIZE, 8,
@@ -35,10 +40,6 @@ namespace {
 void initEGL(unsigned& s_width, unsigned& s_height) {
 	EGLint num_config;
 	// FIXME: Move these to Window
-	EGLConfig config;
-	EGLDisplay display;
-	EGLSurface surface;
-	EGLContext context;
 
 	std::cout << "eglGetDisplay" << std::endl;
 	// Get an EGL display connection
@@ -124,6 +125,10 @@ void initEGL(unsigned& s_width, unsigned& s_height) {
 		throw std::runtime_error("eglMakeCurrent failed!");
 	glerror.check("eglMakeCurrent");
 	std::cout << "initEGL done" << std::endl;
+}
+
+void swapEGL() {
+	eglSwapBuffers(display, surface);
 }
 
 #endif
