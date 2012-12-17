@@ -37,7 +37,7 @@ struct VideoFrame {
 	std::vector<uint8_t> data;
 	/// constructor
 	VideoFrame(double ts, int w, int h): timestamp(ts), width(w), height(h) {}
-	VideoFrame(): timestamp(getInf()) {} // EOF marker
+	VideoFrame(): timestamp(getInf()), width(), height() {} // EOF marker
 	/// swaps to VideoFrames
 	void swap(VideoFrame& f) {
 		std::swap(timestamp, f.timestamp);

@@ -56,10 +56,10 @@ fs::path getConfigDir() {
 			// Open AppData directory
 			std::string str;
 			ITEMIDLIST* pidl;
-			char AppDir[MAX_PATH];
 			HRESULT hRes = SHGetSpecialFolderLocation( NULL, CSIDL_APPDATA|CSIDL_FLAG_CREATE , &pidl );
 			if (hRes==NOERROR)
 			{
+				char AppDir[MAX_PATH];
 				SHGetPathFromIDList( pidl, AppDir );
 				int i;
 				for (i = 0; AppDir[i] != '\0'; i++) {
@@ -145,7 +145,8 @@ std::vector<std::string> getThemes() {
 	}
 	// No duplicates allowed
 	std::sort(themes.begin(), themes.end());
-	std::unique(themes.begin(), themes.end());
+	std::vector<std::string>::iterator last = std::unique(themes.begin(), themes.end());
+	themes.erase(last, themes.end());
 	return themes;
 }
 

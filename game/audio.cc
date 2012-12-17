@@ -96,7 +96,6 @@ public:
 	*/
 	void timeSync(time_duration audioPos, time_duration length) {
 		const double maxError = 0.1;  // Step the clock instead of skewing if over 100 ms off
-		const double fudgeFactor = 0.1;  // Adjustment ratio
 		// Full correction requires locking, but we can update max without lock too
 		boost::mutex::scoped_try_lock l(m_mutex, boost::defer_lock);
 		double max = getSeconds(audioPos + length);
@@ -111,6 +110,7 @@ public:
 		double diff = audio - sys;
 		// Skew-based correction only if going forward and relatively well synced
 		if (max > m_max && std::abs(diff) < maxError) {
+			const double fudgeFactor = 0.1;  // Adjustment ratio
 			// Update base position (this should not affect the clock)
 			m_baseTime = now;
 			m_basePos = sys;

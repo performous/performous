@@ -93,7 +93,7 @@ bool Song::getNextSection(double pos, SongSection &section) {
 
 bool Song::getPrevSection(double pos, SongSection &section) {
 	if (songsections.empty()) return false;
-	for (std::vector<Song::SongSection>::reverse_iterator it= songsections.rbegin(); it != songsections.rend(); it++) {
+	for (std::vector<Song::SongSection>::reverse_iterator it= songsections.rbegin(); it != songsections.rend(); ++it) {
 		// subtract 1 second so we can jump across a section
 		if (it->begin < pos - 1.0) {
 			section = *it;
