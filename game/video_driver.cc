@@ -73,7 +73,7 @@ unsigned int screenW() { return s_width; }
 unsigned int screenH() { return s_height; }
 
 #ifdef USE_EGL
-void initEGL(); // Defined in egl.cc
+void initEGL(unsigned&, unsigned&); // Defined in egl.cc
 #endif
 
 Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(width), m_windowH(height), m_fullscreen(fs), screen() {
@@ -337,9 +337,9 @@ void Window::resize() {
 		std::cout << "Attempting SDL_SetVideoMode" << std::endl;
 		//screen = SDL_SetVideoMode(0, 0, 32, SDL_SWSURFACE);
 		screen = new SDL_Surface;
+		initEGL(s_width, s_height);
 		screen->w = s_width;
 		screen->h = s_height;
-		initEGL();
 		#else
 		screen = SDL_SetVideoMode(width, height, 0, SDL_OPENGL | (m_fullscreen ? SDL_FULLSCREEN : SDL_RESIZABLE));
 		#endif

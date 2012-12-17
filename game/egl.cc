@@ -32,7 +32,7 @@ namespace {
 }
 
 // FIXME: Remove all the debug prints here
-void initEGL() {
+void initEGL(unsigned& s_width, unsigned& s_height) {
 	EGLint num_config;
 	// FIXME: Move these to Window
 	EGLConfig config;
