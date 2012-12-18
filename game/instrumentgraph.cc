@@ -47,6 +47,8 @@ InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevicePt
 	for (size_t i = 0; i < max_panels; ++i) m_pressed[i] = false;
 }
 
+InstrumentGraph::~InstrumentGraph() {}  // For destruction of scoped_ptrs (only forward-declared in header)
+
 bool InstrumentGraph::dead() const { return m_jointime != m_jointime || m_dead >= death_delay; }
 
 void InstrumentGraph::setupPauseMenu() {
