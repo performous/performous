@@ -99,7 +99,8 @@ namespace portaudio {
 	};
 
 	template <typename Functor> int functorCallback(void const* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* userData) {
-		return (*static_cast<Functor*>(userData))(input, output, frameCount, timeInfo, statusFlags);
+		Functor* ptr = *reinterpret_cast<Functor**>(&userData);
+		return (*ptr)(input, output, frameCount, timeInfo, statusFlags);
 	}
 
 	class Stream {
@@ -124,7 +125,9 @@ namespace portaudio {
 		  unsigned long framesPerBuffer = paFramesPerBufferUnspecified,
 		  PaStreamFlags flags = paNoFlag)
 		{
-			PORTAUDIO_CHECKED(Pa_OpenStream, (&m_handle, input, output, sampleRate, framesPerBuffer, flags, functorCallback<Functor>, &functor));
+			Functor* ptr = &functor;
+			void* voidptr = *reinterpret_cast<void**>(&ptr);  // Trickery to avoid function pointer to data pointer cast (which is illegal in ISO C++)
+			PORTAUDIO_CHECKED(Pa_OpenStream, (&m_handle, input, output, sampleRate, framesPerBuffer, flags, functorCallback<Functor>, voidptr));
 		}
 		~Stream() {
 			// Give audio a little time to shutdown but then just quit
