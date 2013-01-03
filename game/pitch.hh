@@ -50,7 +50,7 @@ class Analyzer {
 	/** Add input data to buffer. This is thread-safe (against other functions). **/
 	template <typename InIt> void input(InIt begin, InIt end) {
 		bool saveOutput = config["audio/pass-through"].b();
-		if (saveOutput && end - begin > m_outbufSwap.size())
+		if (saveOutput && end - begin > static_cast<ptrdiff_t>(m_outbufSwap.size()))
 			m_outbufSwap.resize(end - begin + 10);
 		size_t r = m_bufRead;  // The read position
 		size_t w = m_bufWrite;  // The write position
