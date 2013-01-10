@@ -65,7 +65,7 @@ static void signalSetup() {
 /// can be thrown as an exception to quit the game
 struct QuitNow {};
 
-static void checkEvents_SDL(ScreenManager& sm) {
+static void checkEvents(ScreenManager& sm) {
 	if (g_quit) {
 		std::cout << "Terminating, please wait... (or kill the process)" << std::endl;
 		throw QuitNow();
@@ -110,16 +110,15 @@ static void checkEvents_SDL(ScreenManager& sm) {
 				sm.flashMessage(config[which_vol].getShortDesc() + ": " + config[which_vol].getValue());
 				continue; // Already handled here...
 			}
-			// Eat away the event if there was a dialog open
-			if (sm.closeDialog()) continue;
 			break;
 		}
-		// If dialog is open, allow any nav event to close it...
-		input::NavEvent ev;
-		if (sm.isDialogOpen() && sm.controllers.getNav(ev)) { sm.closeDialog(); continue; }
 		// Screens always receive SDL events that were not already handled here
 		sm.getCurrentScreen()->manageEvent(event);
 	}
+	// If dialog is open, allow any nav event to close it...
+	input::NavEvent ev;
+	if (sm.isDialogOpen() && sm.controllers.getNav(ev)) sm.closeDialog();
+	// Need to toggle full screen mode?
 	if (config["graphic/fullscreen"].b() != sm.window().getFullscreen()) {
 		sm.window().setFullscreen(config["graphic/fullscreen"].b());
 		sm.reloadGL();
@@ -213,7 +212,7 @@ void mainLoop(std::string const& songlist) {
 				prof("fpsctrl");
 				// Process events for the next frame
 				sm.controllers.process(now());
-				checkEvents_SDL(sm);
+				checkEvents(sm);
 				for (input::NavEvent nav; sm.controllers.getNav(nav); sm.getCurrentScreen()->manageEvent(nav)) {}
 				prof("events");
 			} catch (RUNTIME_ERROR& e) {
