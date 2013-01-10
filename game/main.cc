@@ -97,27 +97,31 @@ static void checkEvents(ScreenManager& sm) {
 				sm.finished();
 				continue; // Already handled here...
 			}
-			// Volume control
-			if ((keypressed == SDLK_UP || keypressed == SDLK_DOWN) && modifier & KMOD_CTRL) {
-				std::string curS = sm.getCurrentScreen()->getName();
-				// Pick proper setting
-				std::string which_vol = (curS == "Sing" || curS == "Practice")
-				  ? "audio/music_volume" : "audio/preview_volume";
-				// Adjust value
-				if (keypressed == SDLK_UP) ++config[which_vol];
-				else --config[which_vol];
-				// Show message
-				sm.flashMessage(config[which_vol].getShortDesc() + ": " + config[which_vol].getValue());
-				continue; // Already handled here...
-			}
 			break;
 		}
 		// Screens always receive SDL events that were not already handled here
 		sm.getCurrentScreen()->manageEvent(event);
 	}
-	// If dialog is open, allow any nav event to close it...
-	input::NavEvent ev;
-	if (sm.isDialogOpen() && sm.controllers.getNav(ev)) sm.closeDialog();
+	for (input::NavEvent event; sm.controllers.getNav(event); ) {
+		input::NavButton nav = event.button;
+		// Volume control
+		if (nav == input::NAV_VOLUME_UP || nav == input::NAV_VOLUME_DOWN) {
+			std::string curS = sm.getCurrentScreen()->getName();
+			// Pick proper setting
+			std::string which_vol = (curS == "Sing" || curS == "Practice")
+			  ? "audio/music_volume" : "audio/preview_volume";
+			// Adjust value
+			if (nav == input::NAV_VOLUME_UP) ++config[which_vol]; else --config[which_vol];
+			// Show message
+			sm.flashMessage(config[which_vol].getShortDesc() + ": " + config[which_vol].getValue());
+			continue; // Already handled here...
+		}
+		// If a dialog is open, any nav event will close it
+		if (sm.isDialogOpen()) { sm.closeDialog(); continue; }
+		// Let the current screen handle other events
+		sm.getCurrentScreen()->manageEvent(event);
+	}
+
 	// Need to toggle full screen mode?
 	if (config["graphic/fullscreen"].b() != sm.window().getFullscreen()) {
 		sm.window().setFullscreen(config["graphic/fullscreen"].b());
@@ -213,7 +217,6 @@ void mainLoop(std::string const& songlist) {
 				// Process events for the next frame
 				sm.controllers.process(now());
 				checkEvents(sm);
-				for (input::NavEvent nav; sm.controllers.getNav(nav); sm.getCurrentScreen()->manageEvent(nav)) {}
 				prof("events");
 			} catch (RUNTIME_ERROR& e) {
 				std::cerr << "ERROR: " << e.what() << std::endl;
