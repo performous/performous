@@ -102,4 +102,12 @@ namespace da {
 		return data;
 	}
 
+	template<unsigned P, typename T> void ifft(std::complex<T>* data) {
+		const std::size_t N = 1 << P;
+		for (std::size_t i = 0; i < N; ++i) data[i] = std::conj(data[i]);  // Invert phase so that we can use FFT to do IFFT
+		fft<P>(data);
+		std::complex<T> scale(1.0/N, 0.0);
+		for (std::size_t i = 0; i < N; ++i) data[i] = scale * std::conj(data[i]);  // Invert back, and apply IFFT scaling
+	}
+	
 }
