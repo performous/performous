@@ -457,17 +457,7 @@ struct Audio::Impl {
 					if (iss >> tmp && iss.get() == EOF && tmp >= 0 && tmp < count) dev = tmp;
 				}
 				portaudio::AudioDevices ad;
-				// Try name search with full match
-				for (unsigned i = 0; i < ad.devices.size() && dev < 0; ++i) {
-					portaudio::DeviceInfo& info = ad.devices[i];
-					if (info.name == params.dev) dev = info.idx;
-				}
-				// Try name search with partial match
-				for (unsigned i = 0; i < ad.devices.size() && dev < 0; ++i) {
-					portaudio::DeviceInfo& info = ad.devices[i];
-					if (info.name.find(params.dev) != std::string::npos) dev = info.idx;
-				}
-				if (dev < 0) throw std::runtime_error("No such device.");
+				dev = ad.find(params.dev);
 				std::clog << "audio/info: Trying audio device \"" << params.dev << "\", id: " << dev
 					<< ", in: " << params.in << ", out: " << params.out << std::endl;
 				portaudio::DeviceInfo& info = ad.devices[dev];
