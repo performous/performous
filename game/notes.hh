@@ -87,7 +87,8 @@ struct Note {
 
 typedef std::vector<Note> Notes;
 
-struct VocalTrack {
+class VocalTrack {
+public:
 	VocalTrack(std::string name);
 	void reload();
 	std::string name;

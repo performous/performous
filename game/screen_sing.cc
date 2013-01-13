@@ -121,7 +121,7 @@ void ScreenSing::setupVocals() {
 			m_layout_singer.push_back(new LayoutSinger(**it, m_database, theme));
 		}
 		// Note: Engine maps tracks with analyzers 1:1. If user doesn't have mics, we still want to have singer layout enabled but without engine...
-		if (!analyzers.empty()) m_engine.reset(new Engine(m_audio, selectedTracks, analyzers.begin(), analyzers.end(), m_database));
+		if (!analyzers.empty()) m_engine.reset(new Engine(m_audio, selectedTracks, m_database));
 	}
 	createPauseMenu();
 	m_audio.pause(false);
