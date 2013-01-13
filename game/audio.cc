@@ -95,7 +95,7 @@ public:
 	* @param length the duration of the current audio block
 	*/
 	void timeSync(time_duration audioPos, time_duration length) {
-		const double maxError = 0.1;  // Step the clock instead of skewing if over 100 ms off
+		constexpr double maxError = 0.1;  // Step the clock instead of skewing if over 100 ms off
 		// Full correction requires locking, but we can update max without lock too
 		boost::mutex::scoped_try_lock l(m_mutex, boost::defer_lock);
 		double max = getSeconds(audioPos + length);
@@ -105,21 +105,20 @@ public:
 		}
 		// Mutex locked - do a full update
 		ptime now = getTime();
-		double sys = pos_internal(now);  // Current position (based on system clock + corrections)
-		double audio = getSeconds(audioPos);  // Audio time
-		double diff = audio - sys;
+		const double sys = pos_internal(now);  // Current position (based on system clock + corrections)
+		const double audio = getSeconds(audioPos);  // Audio time
+		const double diff = audio - sys;
 		// Skew-based correction only if going forward and relatively well synced
 		if (max > m_max && std::abs(diff) < maxError) {
-			const double fudgeFactor = 0.1;  // Adjustment ratio
+			constexpr double fudgeFactor = 0.001;  // Adjustment ratio
 			// Update base position (this should not affect the clock)
 			m_baseTime = now;
 			m_basePos = sys;
 			// Apply a VERY ARTIFICIAL correction for clock!
-			double valadj = getSeconds(length) * 0.1 * rand() / RAND_MAX;  // Dither
-			m_skew = 0.99 * m_skew + 0.01 * (diff < valadj ? -1.0 : 1.0) * fudgeFactor;
+			const double valadj = getSeconds(length) * 0.1 * rand() / RAND_MAX;  // Dither
+			m_skew += (diff < valadj ? -1.0 : 1.0) * fudgeFactor;
 			// Limits to keep things sane in abnormal situations
-			if (m_skew > 0.01) m_skew = 0.01;
-			else if (m_skew < -0.01) m_skew = -0.01;
+			m_skew = clamp(m_skew, -0.01, 0.01);
 		} else {
 			// Off too much, step to correct time
 			m_baseTime = now;
