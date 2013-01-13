@@ -339,10 +339,6 @@ int main(int argc, char** argv) try {
 		std::cout << cmdline << "  any arguments without a switch are interpreted as song folders.\n" << std::endl;
 		return EXIT_SUCCESS;
 	}
-#ifdef USE_PORTMIDI
-	// Dump a list of MIDI input devices
-	// FIXME: pm::dumpDevices(true);
-#endif
 	// Read config files
 	try {
 		readConfig();
