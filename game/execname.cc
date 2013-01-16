@@ -3,6 +3,7 @@
 namespace fs = boost::filesystem;
 
 #if defined(_WIN32)
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 fs::path plugin::execname() {
 	char buf[1024];
