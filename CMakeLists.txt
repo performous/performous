@@ -45,6 +45,12 @@ endif()
 
 if(WIN32)
 	set(SHARE_INSTALL "." CACHE STRING "Data file install path. Must be a relative path (from CMAKE_INSTALL_PREFIX), with no trailing slash.")
+	# Make windows.h behave
+	if(MSVC)
+		set(CMAKE_CXX_FLAGS "/DWIN32_LEAN_AND_MEAN ${CMAKE_CXX_FLAGS}")
+	else()
+		set(CMAKE_CXX_FLAGS "-DWIN32_LEAN_AND_MEAN ${CMAKE_CXX_FLAGS}")
+	endif()
 else(WIN32)
 	if(NOT SHARE_INSTALL)
 		set(SHARE_INSTALL "share/games/performous" CACHE STRING "Data file install path. Must be a relative path (from CMAKE_INSTALL_PREFIX), with no trailing slash.")
