@@ -4,62 +4,61 @@ FILE(GLOB SOURCE_FILES "*.cc")
 FILE(GLOB HEADER_FILES "*.hh")
 
 if(WIN32)
-  if(ENABLE_VERSIONING)
-    set(COMMENTS)
-	string(REGEX MATCHALL "([^\\.,^$]+)(\\.|,|$)"  VERSIONING ${PROJECT_VERSION})
-	set(VERSIONS "MAJOR" "MINOR" "PATCH" "TWEAK")
-	foreach(s ${VERSIONING})
-		#we get the most-right number
-		string(REGEX REPLACE "[^0-9]+$" "" s ${s})#removes most right part non-numeric (like .)
-		#now we have a string in format <numbers-letters..........numbers>
-		#take last numbers (if there are)
-		#if string not empty, there are some numbers in right of string
-		#otherwise, set a 0, to be sure that there's a number
-		if(s STREQUAL "")
-			set(s "0")
-		endif()
-		string(REGEX MATCH "[0-9]*$" s ${s})
-		
+	if(ENABLE_VERSIONING)
+		set(COMMENTS)
+		string(REGEX MATCHALL "([^\\.,^$]+)(\\.|,|$)"  VERSIONING ${PROJECT_VERSION})
+		set(VERSIONS "MAJOR" "MINOR" "PATCH" "TWEAK")
+		foreach(s ${VERSIONING})
+			# We get the most-right number
+			string(REGEX REPLACE "[^0-9]+$" "" s ${s})#removes most right part non-numeric (like .)
+			# Now we have a string in format <numbers-letters..........numbers>
+			# Take last numbers (if there are)
+			# If string not empty, there are some numbers in right of string
+			# otherwise, set a 0, to be sure that there's a number
+			if(s STREQUAL "")
+				set(s "0")
+			endif()
+			string(REGEX MATCH "[0-9]*$" s ${s})
+
+			foreach(v ${VERSIONS})
+				if(NOT VERSION_${v}_DONE)
+					set(VERSION_${v}_DONE 1)
+					set(VERSION_${v} "${s}")
+					break()
+				endif()
+			endforeach()
+		endforeach()
+
 		foreach(v ${VERSIONS})
-			if(NOT VERSION_${v}_DONE)
-				set(VERSION_${v}_DONE 1)
-				set(VERSION_${v} "${s}")
-				break()
+			if(NOT VERSION_${v}_DONE OR VERSION_${v} STREQUAL "") #For the substitution did before, in VERSION_${v} we have or a empty string (if all letters) or a number
+				set(VERSION_${v} "0")
 			endif()
 		endforeach()
-	endforeach()
+		message(STATUS "Setting .exe version: ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.${VERSION_TWEAK}")
+	else(ENABLE_VERSIONING)
+		set(COMMENTS "//")
+	endif(ENABLE_VERSIONING)
+	set(RESOURCE_FILES "${CMAKE_BINARY_DIR}/performous.rc")
+	set(RESOURCE_OBJECT)#nothing
 
-	foreach(v ${VERSIONS})
-		if(NOT VERSION_${v}_DONE OR VERSION_${v} STREQUAL "") #For the substitution did before, in VERSION_${v} we have or a empty string (if all letters) or a number
-			set(VERSION_${v} "0")
-		endif()
-	endforeach()
-	message(STATUS "Setting .exe version: ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.${VERSION_TWEAK}")
-  else(ENABLE_VERSIONING)
-    set(COMMENTS "//")
-  endif(ENABLE_VERSIONING)
-  
-  set(RESOURCE_FILES "${CMAKE_BINARY_DIR}/performous.rc")
-  set(RESOURCE_OBJECT)#nothing
-  
-  configure_file("../win32/performous.cmake.rc" "${RESOURCE_FILES}")
-  if(NOT MSVC)
-    #in according to MinGW tools, we need to compile the rc file, and then link it into projects:
-	#windres foo.rc foores.o
-    #gcc -o foo.exe foo.o foores.o
-	find_program(WINDRES windres)
-	if(NOT WINDRES)
-		message(STATUS "Cannot find windres. Will not create a versioned exe")
-		set(RESOURCE_FILES)
-		set(RESOURCE_OBJECT)
-	else()
-		set(RESOURCE_OBJECT "${CMAKE_BINARY_DIR}/performous.rc.o")
-		execute_process(COMMAND "${WINDRES}" "${RESOURCE_FILES}" "${RESOURCE_OBJECT}")
-	endif(NOT WINDRES)
-  endif()
+	configure_file("../win32/performous.cmake.rc" "${RESOURCE_FILES}")
+	if(NOT MSVC)
+		# According to MinGW tools, we need to compile the rc file, and then link it into projects:
+		# windres foo.rc foores.o
+		# gcc -o foo.exe foo.o foores.o
+		find_program(WINDRES windres)
+		if(NOT WINDRES)
+			message(STATUS "Cannot find windres. Will not create a versioned exe")
+			set(RESOURCE_FILES)
+			set(RESOURCE_OBJECT)
+		else()
+			set(RESOURCE_OBJECT "${CMAKE_BINARY_DIR}/performous.rc.o")
+			execute_process(COMMAND "${WINDRES}" "${RESOURCE_FILES}" "${RESOURCE_OBJECT}")
+		endif(NOT WINDRES)
+	endif()
 else()
-  set(RESOURCE_FILES) #nothing
-  set(RESOURCE_OBJECT)#nothing
+	set(RESOURCE_FILES) #nothing
+	set(RESOURCE_OBJECT)#nothing
 endif()
 
 set(SOURCES ${SOURCE_FILES} ${HEADER_FILES} ${RESOURCE_FILES})
