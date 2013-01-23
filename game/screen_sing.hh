@@ -93,7 +93,6 @@ class ScreenSing: public Screen {
 	boost::scoped_ptr<ThemeInstrumentMenu> m_menuTheme;
 	Menu m_menu;
 	Instruments m_instruments;
-	double m_latencyAV;  // Latency between audio and video output (do not confuse with latencyAR)
 	boost::shared_ptr<ThemeSing> theme;
 	AnimValue m_quitTimer;
 	std::string m_selectedTrack;

@@ -39,7 +39,7 @@ namespace {
 }
 
 ScreenSing::ScreenSing(std::string const& name, Audio& audio, Database& database, Backgrounds& bgs):
-	  Screen(name), m_audio(audio), m_database(database), m_backgrounds(bgs), m_latencyAV(),
+	  Screen(name), m_audio(audio), m_database(database), m_backgrounds(bgs),
 	  m_selectedTrack(TrackName::LEAD_VOCAL) {
 }
 

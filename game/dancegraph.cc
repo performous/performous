@@ -84,7 +84,6 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song, input::DevicePtr dev):
   m_arrows_cursor(getThemePath("arrows_cursor.svg")),
   m_arrows_hold(getThemePath("arrows_hold.svg")),
   m_mine(getThemePath("mine.svg")),
-  m_flow_direction(1),
   m_insideStop()
 {
 	// Initialize some arrays

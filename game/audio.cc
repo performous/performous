@@ -235,12 +235,11 @@ public:
 
 struct Sample {
   private:
-	unsigned int srate;
 	double m_pos;
 	FFmpeg mpeg;
 	bool eof;
   public:
-	Sample(std::string const& filename, unsigned sr) : srate(sr), m_pos(), mpeg(false, true, filename, sr), eof(true) { }
+	Sample(std::string const& filename, unsigned sr) : m_pos(), mpeg(false, true, filename, sr), eof(true) { }
 	void operator()(float* begin, float* end) {
 		if(eof) {
 			// No more data to play in this sample
