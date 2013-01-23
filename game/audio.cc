@@ -444,18 +444,8 @@ struct Audio::Impl {
 				// Sync mics/in settings together
 				if (params.in == 0) params.in = params.mics.size();
 				else params.mics.resize(params.in);
-				int count = portaudio::AudioDevices::count();
-				int dev = -1;
-				// Handle empty device
-				if (params.dev.empty()) dev = (params.out == 0 ? Pa_GetDefaultInputDevice() : Pa_GetDefaultOutputDevice());
-				// Try numeric value
-				if (dev < 0) {
-					std::istringstream iss(params.dev);
-					int tmp;
-					if (iss >> tmp && iss.get() == EOF && tmp >= 0 && tmp < count) dev = tmp;
-				}
 				portaudio::AudioDevices ad;
-				dev = ad.find(params.dev);
+				int dev = ad.find(params.dev);
 				std::clog << "audio/info: Trying audio device \"" << params.dev << "\", id: " << dev
 					<< ", in: " << params.in << ", out: " << params.out << std::endl;
 				portaudio::DeviceInfo& info = ad.devices[dev];
