@@ -17,19 +17,24 @@ to save the current settings to XML.
 	<menu>
 		<entry name="game">
 			<short>Game</short>
-			<long>Gameplay settings.</long>
+			<long>Gameplay related options</long>
 		</entry>
 		<entry name="graphic">
 			<short>Graphic</short>
-			<long>Video and rendering settings.</long>
+			<long>Configure rendering and video settings</long>
+		</entry>
+		<entry name="AudioDevices">
+			<!-- Handled internally by Performous -->
+			<short>Audio Devices</short>
+			<long>Setup microphones and playback</long>
 		</entry>
 		<entry name="audio">
 			<short>Audio</short>
-			<long>Audio-related settings.</long>
+			<long>Configure general audio settings</long>
 		</entry>
-		<entry name="paths">
+		<entry name="Paths">
 			<short>Paths</short>
-			<long>System paths.</long>
+			<long>Setup song and data paths</long>
 		</entry>
 	</menu>
 
