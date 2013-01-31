@@ -31,11 +31,6 @@ namespace {
 		ScreenManager* sm = ScreenManager::getSingletonPtr();
 		sm->flashMessage(ci.getShortDesc() + ": " + ci.getValue());
 	}
-
-	void startSingingCallback(Menu&, void* screenSing) {
-		ScreenSing* ss = static_cast<ScreenSing*>(screenSing);
-		ss->setupVocals();
-	}
 }
 
 ScreenSing::ScreenSing(std::string const& name, Audio& audio, Database& database, Backgrounds& bgs):
@@ -79,13 +74,13 @@ void ScreenSing::enter() {
 		VocalTracks const& tracks = m_song->vocalTracks;
 		unsigned players = analyzers.size();
 		m_menu.clear();
-		m_menu.add(MenuOption(_("Start"), _("Start performing"), &startSingingCallback, (void*)this));
+		m_menu.add(MenuOption(_("Start"), _("Start performing")).call(std::bind(&ScreenSing::setupVocals, this)));
 		m_duet = ConfigItem(0);
 		if (players == 0) players = 1;  // No mic? We display lyrics anyway
 		if (players > 1) { // Duet toggle
 			m_duet.addEnum(_("Duet mode"));
 			m_duet.addEnum(_("Normal mode"));
-			m_menu.add(MenuOption("", _("Switch between duet and regular singing mode"), &m_duet));
+			m_menu.add(MenuOption("", _("Switch between duet and regular singing mode")).changer(m_duet));
 		}
 		for (unsigned player = 0; player < players; ++player) {
 			ConfigItem& vocalTrack = m_vocalTracks[player];
@@ -94,9 +89,9 @@ void ScreenSing::enter() {
 				vocalTrack.addEnum(it->second.name);
 			}
 			if (tracks.size() > 1 && player % 2) ++vocalTrack;  // Every other player gets the second track
-			m_menu.add(MenuOption("", _("Change vocal track"), &vocalTrack));
+			m_menu.add(MenuOption("", _("Change vocal track")).changer(vocalTrack));
 		}
-		m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
+		m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).screen("Songs"));
 		m_menu.open();
 		if (tracks.size() <= 1) setupVocals();  // No duet menu
 	}
@@ -130,8 +125,8 @@ void ScreenSing::setupVocals() {
 void ScreenSing::createPauseMenu() {
 	m_menu.clear();
 	m_menu.add(MenuOption(_("Resume"), _("Back to performing!")));
-	m_menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning"), "Sing"));
-	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
+	m_menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning")).screen("Sing"));
+	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).screen("Songs"));
 	m_menu.close();
 }
 

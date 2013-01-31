@@ -158,11 +158,14 @@ SvgTxtTheme& ScreenIntro::getTextObject(std::string const& txt) {
 }
 
 void ScreenIntro::populateMenu() {
+	MenuImage imgSing(new Surface(getThemePath("intro_sing.svg")));
+	MenuImage imgPractice(new Surface(getThemePath("intro_practice.svg")));
+	MenuImage imgConfig(new Surface(getThemePath("intro_configure.svg")));
+	MenuImage imgQuit(new Surface(getThemePath("intro_quit.svg")));
 	m_menu.clear();
-	m_menu.add(MenuOption(_("Perform"), _("Start performing!"), "Songs", "intro_sing.svg"));
-	m_menu.add(MenuOption(_("Practice"), _("Check your skills or test the microphones"), "Practice", "intro_practice.svg"));
+	m_menu.add(MenuOption(_("Perform"), _("Start performing!"), imgSing).screen("Songs"));
+	m_menu.add(MenuOption(_("Practice"), _("Check your skills or test the microphones"), imgPractice).screen("Practice"));
 	// Configure menu + submenu options
-	char const* icon = "intro_configure.svg";
 	MenuOptions configmain;
 	for (MenuEntry const& submenu: configMenu) {
 		if (!submenu.items.empty()) {
@@ -170,13 +173,13 @@ void ScreenIntro::populateMenu() {
 			// Process items that belong to that submenu
 			for (std::string const& item: submenu.items) {
 				ConfigItem& c = config[item];
-				opts.push_back(MenuOption(_(c.getShortDesc().c_str()), _(c.getLongDesc().c_str()), &c));
+				opts.push_back(MenuOption(_(c.getShortDesc().c_str()), _(c.getLongDesc().c_str())).changer(c));
 			}
-			configmain.push_back(MenuOption(_(submenu.shortDesc.c_str()), _(submenu.longDesc.c_str()), opts, icon));
+			configmain.push_back(MenuOption(_(submenu.shortDesc.c_str()), _(submenu.longDesc.c_str()), imgConfig).submenu(opts));
 		} else {
-			configmain.push_back(MenuOption(_(submenu.shortDesc.c_str()), _(submenu.longDesc.c_str()), submenu.name, icon));
+			configmain.push_back(MenuOption(_(submenu.shortDesc.c_str()), _(submenu.longDesc.c_str()), imgConfig).screen(submenu.name));
 		}
 	}
-	m_menu.add(MenuOption(_("Configure"), _("Configure audio and game options"), configmain, icon));
-	m_menu.add(MenuOption(_("Quit"), _("Leave the game"), "", "intro_quit.svg"));
+	m_menu.add(MenuOption(_("Configure"), _("Configure audio and game options"), imgConfig).submenu(configmain));
+	m_menu.add(MenuOption(_("Quit"), _("Leave the game"), imgQuit).screen(""));
 }
