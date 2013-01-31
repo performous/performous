@@ -51,8 +51,7 @@ bool g_take_screenshot = false;
 static void signalSetup();
 
 extern "C" void quit(int) {
-	// shouldn't "not EXIT_SUCCESS" be sent - ^C^C is an abort, not normal termination?
-	if (g_quit) std::exit(EXIT_SUCCESS);  // Instant exit if Ctrl+C is pressed again
+	if (g_quit) quick_exit(2);  // Instant exit if Ctrl+C is pressed again
 	g_quit = true;
 	signalSetup();
 }
