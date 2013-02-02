@@ -168,14 +168,15 @@ struct Bitmap {
 	std::vector<unsigned char> buf;  // Pixel data if owned by Bitmap
 	unsigned char* ptr;  // Pixel data if owned by someone else
 	unsigned width, height;
-	float ar;
+	double ar;  // Aspect ratio
+	double timestamp;  // Used for video frames
 	pix::Format fmt;
-	Bitmap(unsigned char* ptr = NULL): ptr(ptr), width(), height(), ar(), fmt(pix::CHAR_RGBA) {}
+	Bitmap(unsigned char* ptr = NULL): ptr(ptr), width(), height(), ar(), timestamp(), fmt(pix::CHAR_RGBA) {}
 	void resize(unsigned w, unsigned h) {
 		if (!ptr) buf.resize(w * h * 4); else buf.clear();
 		width = w;
 		height = h;
-		ar = float(w) / h;
+		ar = double(w) / h;
 	}
 	void swap(Bitmap& b) {
 		if (ptr || b.ptr) throw std::logic_error("Cannot Bitmap::swap foreign pointers.");
@@ -183,9 +184,11 @@ struct Bitmap {
 		std::swap(width, b.width);
 		std::swap(height, b.height);
 		std::swap(ar, b.ar);
+		std::swap(timestamp, b.timestamp);
 		std::swap(fmt, b.fmt);
 	}
 	unsigned char const* data() const { return ptr ? ptr : &buf[0]; }
+	unsigned char* data() { return ptr ? ptr : &buf[0]; }
 };
 
 void updateSurfaces();

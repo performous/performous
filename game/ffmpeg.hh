@@ -1,5 +1,6 @@
 #pragma once
 
+#include "surface.hh"
 #include "util.hh"
 #include "libda/sample.hpp"
 #include <boost/circular_buffer.hpp>
@@ -27,62 +28,42 @@ struct AudioFrame {
 	AudioFrame(): timestamp(getInf()) {} // EOF marker
 };
 
-/// single video frame
-struct VideoFrame {
-	/// timestamp of video frame
-	double timestamp;
-	int width,  ///< width of frame
-	    height; ///< height of frame
-	/// data array
-	std::vector<uint8_t> data;
-	/// constructor
-	VideoFrame(double ts, int w, int h): timestamp(ts), width(w), height(h) {}
-	VideoFrame(): timestamp(getInf()), width(), height() {} // EOF marker
-	/// swaps to VideoFrames
-	void swap(VideoFrame& f) {
-		std::swap(timestamp, f.timestamp);
-		data.swap(f.data);
-		std::swap(width, f.width);
-		std::swap(height, f.height);
-	}
-};
-
-/// video queue: first in first out
+/// Video queue
 class VideoFifo {
   public:
 	VideoFifo(): m_timestamp(), m_eof() {}
-	/// trys to pop a VideoFrame from queue
-	bool tryPop(VideoFrame& f) {
+	/// trys to pop a video frame from queue
+	bool tryPop(Bitmap& f) {
 		boost::mutex::scoped_lock l(m_mutex);
 		if (m_queue.empty()) return false; // Nothing to deliver
-		if (m_queue.begin()->data.empty()) { m_eof = true; return false; }
+		if (m_queue.begin()->buf.empty()) { m_eof = true; return false; }
 		f.swap(*m_queue.begin());
 		m_queue.pop_front();
 		m_cond.notify_all();
 		m_timestamp = f.timestamp;
 		return true;
 	}
-	/// pushes VideoFrames to queue
-	void push(VideoFrame* f) {
+	/// Add frame to queue
+	void push(Bitmap* f) {
 		boost::mutex::scoped_lock l(m_mutex);
 		while (m_queue.size() > m_max) m_cond.wait(l);
 		if (m_queue.empty()) m_timestamp = f->timestamp;
 		m_queue.push_back(f);
 	}
-	/// resets video queue
+	/// Clear and unlock the queue
 	void reset() {
 		boost::mutex::scoped_lock l(m_mutex);
 		m_queue.clear();
 		m_cond.notify_all();
 		m_eof = false;
 	}
-	/// returns current position
+	/// Returns the current position (seconds)
 	double position() const { return m_timestamp; }
-	/// simple eof check
+	/// Tests if EOF has already been reached
 	double eof() const { return m_eof; }
 
   private:
-	boost::ptr_deque<VideoFrame> m_queue;
+	boost::ptr_deque<Bitmap> m_queue;
 	mutable boost::mutex m_mutex;
 	boost::condition m_cond;
 	double m_timestamp;

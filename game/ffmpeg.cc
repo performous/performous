@@ -85,15 +85,15 @@ void FFmpeg::operator()() {
 			decodePacket();
 			errors = 0;
 		} catch (eof_error&) {
-			videoQueue.push(new VideoFrame()); // EOF marker
+			videoQueue.push(new Bitmap()); // EOF marker
 			boost::thread::sleep(now() + 0.1);
 		} catch (std::exception& e) {
 			std::clog << "ffmpeg/error: " << m_filename << ": " << e.what() << std::endl;
 			if (++errors > 2) { std::clog << "ffmpeg/error: FFMPEG terminating due to multiple errors" << std::endl; m_quit = true; }
 		}
 	}
-	audioQueue.setEof();
-	videoQueue.push(new VideoFrame()); // EOF marker
+	audioQueue.reset();
+	videoQueue.reset();
 	// TODO: use RAII for freeing resources (to prevent memory leaks)
 	boost::mutex::scoped_lock l(s_avcodec_mutex); // avcodec_close is not thread-safe
 	if (m_resampleContext) audio_resample_close(m_resampleContext);
@@ -157,16 +157,16 @@ void FFmpeg::processVideo(AVFrame* frame) {
 	// Convert into RGB and scale the data
 	int w = (m_codecContext->width+15)&~15;
 	int h = m_codecContext->height;
-	std::vector<uint8_t> buffer(w * h * 3);
+	Bitmap* bitmap = new Bitmap();
+	bitmap->timestamp = m_position;
+	bitmap->fmt = pix::RGB;
+	bitmap->resize(w, h);
 	{
-		uint8_t* data = &buffer[0];
+		uint8_t* data = bitmap->data();
 		int linesize = w * 3;
 		sws_scale(m_swsContext, frame->data, frame->linesize, 0, h, &data, &linesize);
 	}
-	// Construct a new video frame and push it to output queue
-	VideoFrame* tmp = new VideoFrame(m_position, w, h);
-	tmp->data.swap(buffer);
-	videoQueue.push(tmp);  // Takes ownership and may block
+	videoQueue.push(bitmap);  // Takes ownership and may block until there is space
 }
 
 void FFmpeg::processAudio(AVFrame* frame) {
