@@ -28,6 +28,7 @@ void Video::prepare(double time) {
 }
 
 void Video::render(double time) {
+	time += m_videoGap;
 	double tdist = std::abs(m_surfaceTime - time);
 	m_alpha.setTarget(tdist < 0.4 ? 1.2f : -0.5f);
 	double alpha = clamp(m_alpha.get());
