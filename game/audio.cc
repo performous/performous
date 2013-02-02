@@ -139,7 +139,7 @@ class Music {
 		FFmpeg mpeg;
 		float fadeLevel;
 		float pitchFactor;
-		Track(std::string const& filename, unsigned int sr): mpeg(false, true, filename, sr), fadeLevel(1.0f), pitchFactor(0.0f) {}
+		Track(std::string const& filename, unsigned int sr): mpeg(filename, sr), fadeLevel(1.0f), pitchFactor(0.0f) {}
 	};
 	typedef boost::ptr_map<std::string, Track> Tracks;
 	Tracks tracks; ///< Audio decoders
@@ -239,7 +239,7 @@ struct Sample {
 	FFmpeg mpeg;
 	bool eof;
   public:
-	Sample(std::string const& filename, unsigned sr) : m_pos(), mpeg(false, true, filename, sr), eof(true) { }
+	Sample(std::string const& filename, unsigned sr) : m_pos(), mpeg(filename, sr), eof(true) { }
 	void operator()(float* begin, float* end) {
 		if(eof) {
 			// No more data to play in this sample

@@ -3,7 +3,7 @@
 #include "util.hh"
 #include <cmath>
 
-Video::Video(std::string const& _videoFile, double videoGap): m_mpeg(true, false, _videoFile), m_videoGap(videoGap), m_surfaceTime(), m_lastTime(), m_alpha(-0.5, 1.5) {}
+Video::Video(std::string const& _videoFile, double videoGap): m_mpeg(_videoFile), m_videoGap(videoGap), m_surfaceTime(), m_lastTime(), m_alpha(-0.5, 1.5) {}
 
 void Video::prepare(double time) {
 	time += m_videoGap;
