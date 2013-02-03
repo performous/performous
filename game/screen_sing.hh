@@ -1,39 +1,41 @@
 #pragma once
 
+#include "animvalue.hh"
+#include "audio.hh" // for AUDIO_MAX_ANALYZERS
+#include "configuration.hh"
+#include "menu.hh"
+#include "opengl_text.hh"
+#include "progressbar.hh"
+#include "screen.hh"
+#include "surface.hh"
+
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <deque>
-#include "layout_singer.hh"
-#include "animvalue.hh"
-#include "engine.hh"
-#include "instrumentgraph.hh"
-#include "screen.hh"
-#include "backgrounds.hh"
-#include "theme.hh"
-#include "surface.hh"
-#include "opengl_text.hh"
-#include "progressbar.hh"
-#include "webcam.hh"
-#include "screen_players.hh"
-#include "configuration.hh"
 
-class Players;
 class Audio;
+class Backgrounds;
 class Database;
+class Engine;
+class InstrumentGraph;
+class LayoutSinger;
+class Players;
+class Song;
+class ThemeInstrumentMenu;
+class ThemeSing;
 class Video;
-class Menu;
+class Webcam;
 
 typedef boost::ptr_vector<InstrumentGraph> Instruments;
-typedef boost::ptr_vector<InstrumentGraph> Dancers;
 
 /// shows score at end of song
 class ScoreWindow {
   public:
 	/// constructor
-	ScoreWindow(Instruments& instruments, Database& database, Dancers& dancers);
+	ScoreWindow(Instruments& instruments, Database& database);
 	/// draws ScoreWindow
 	void draw();
-	bool empty() { return m_database.scores.empty(); }
+	bool empty();
   private:
 	Database& m_database;
 	AnimValue m_pos;
@@ -48,15 +50,16 @@ class ScoreWindow {
 class ScreenSing: public Screen {
   public:
 	/// constructor
-	ScreenSing(std::string const& name, Audio& audio, Database& database, Backgrounds& bgs):
-	  Screen(name), m_audio(audio), m_database(database), m_backgrounds(bgs), m_latencyAV(), m_only_singers_alive(true), m_selectedTrack(TrackName::LEAD_VOCAL)
-	{}
+	ScreenSing(std::string const& name, Audio& audio, Database& database, Backgrounds& bgs);
 	void enter();
 	void exit();
 	void reloadGL();
 	void manageEvent(SDL_Event event);
+	void manageEvent(input::NavEvent const& event);
 	void prepare();
 	void draw();
+
+	void setupVocals();
 
 	void setSong (boost::shared_ptr<Song> song_)
 	{
@@ -71,8 +74,8 @@ class ScreenSing: public Screen {
 	  - is the hiscore file writable
 	  */
 	void activateNextScreen();
-	bool instrumentLayout(double time);
-	void danceLayout(double time);
+	void instrumentLayout(double time);
+	void createPauseMenu();
 	void drawMenu();
 	Audio& m_audio;
 	Database& m_database;
@@ -90,13 +93,11 @@ class ScreenSing: public Screen {
 	boost::scoped_ptr<ThemeInstrumentMenu> m_menuTheme;
 	Menu m_menu;
 	Instruments m_instruments;
-	Dancers m_dancers;
-	double m_latencyAV;  // Latency between audio and video output (do not confuse with latencyAR)
 	boost::shared_ptr<ThemeSing> theme;
 	AnimValue m_quitTimer;
-	bool m_only_singers_alive;
 	std::string m_selectedTrack;
 	std::string m_selectedTrackLocalized;
-	ConfigItem m_vocalTrackOpts;
+	ConfigItem m_vocalTracks[AUDIO_MAX_ANALYZERS];
+	ConfigItem m_duet;
 };
 

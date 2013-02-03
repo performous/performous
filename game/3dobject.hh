@@ -1,15 +1,14 @@
 #pragma once
 
-#include <vector>
 #include <string>
 #include <boost/scoped_ptr.hpp>
 #include <boost/noncopyable.hpp>
-#include "surface.hh"
 #include "glshader.hh"
-#include "glutil.hh"
 
 // TODO: Exception handling
 // TODO: Texture loading
+
+class Texture;
 
 /// A class representing 3d object
 /// Non-copyable because of display lists getting messed up
@@ -26,20 +25,8 @@ class Object3d: boost::noncopyable {
 		load(filepath, texturepath, scale);
 	}
 	/// load a new object file
-	void load(std::string filepath, std::string texturepath = "", float scale = 1.0) {
-		if (!texturepath.empty()) m_texture.reset(new Texture(texturepath));
-		loadWavefrontObj(filepath, scale);
-	}
+	void load(std::string filepath, std::string texturepath = "", float scale = 1.0);
 	void drawVBO();
 	/// draws the object
-	void draw(float x = 0, float y = 0, float z = 0, float s = 1.0) {
-		using namespace glmath;
-		Transform trans(translate(vec3(x, y, z)) * scale(s));  // Move to position and scale
-		if (m_texture) {
-			UseTexture tex(*m_texture);
-			drawVBO();
-		} else {
-			drawVBO();
-		}
-	}
+	void draw(float x = 0, float y = 0, float z = 0, float s = 1.0);
 };

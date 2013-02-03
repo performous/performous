@@ -30,7 +30,7 @@ void Song::reload(bool errorIgnore) {
 	start = 0.0;
 	preview_start = getNaN();
 	hasBRE = false;
-	b0rkedTracks = false;
+	b0rked.clear();
 	try { SongParser(*this); } catch (...) { if (!errorIgnore) throw; }
 	collateUpdate();
 }
@@ -51,7 +51,7 @@ void Song::dropNotes() {
 		for (DanceTracks::iterator it = danceTracks.begin(); it != danceTracks.end(); ++it)
 			it->second.clear();
 	}
-	b0rkedTracks = false;
+	b0rked.clear();
 	loadStatus = HEADER;
 }
 
@@ -93,7 +93,7 @@ bool Song::getNextSection(double pos, SongSection &section) {
 
 bool Song::getPrevSection(double pos, SongSection &section) {
 	if (songsections.empty()) return false;
-	for (std::vector<Song::SongSection>::reverse_iterator it= songsections.rbegin(); it != songsections.rend(); it++) {
+	for (std::vector<Song::SongSection>::reverse_iterator it= songsections.rbegin(); it != songsections.rend(); ++it) {
 		// subtract 1 second so we can jump across a section
 		if (it->begin < pos - 1.0) {
 			section = *it;

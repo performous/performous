@@ -1,12 +1,15 @@
 #include "screen_songs.hh"
 
-#include "screen_sing.hh"
-#include "configuration.hh"
-#include "hiscore.hh"
-#include "util.hh"
-#include "songs.hh"
 #include "audio.hh"
+#include "configuration.hh"
+#include "database.hh"
+#include "hiscore.hh"
 #include "i18n.hh"
+#include "screen_sing.hh"
+#include "songs.hh"
+#include "theme.hh"
+#include "util.hh"
+
 #include <iostream>
 #include <sstream>
 #include <boost/format.hpp>
@@ -58,8 +61,8 @@ void ScreenSongs::exit() {
 /**Add actions here which should effect both the
   jukebox and the normal screen*/
 void ScreenSongs::manageSharedKey(input::NavButton nav) {
-	if (nav == input::PAUSE) m_audio.togglePause();
-	else if (nav == input::START) {
+	if (nav == input::NAV_PAUSE) m_audio.togglePause();
+	else if (nav == input::NAV_START) {
 		ScreenManager* sm = ScreenManager::getSingletonPtr();
 		Screen* s = sm->getScreen("Sing");
 		ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
@@ -67,47 +70,51 @@ void ScreenSongs::manageSharedKey(input::NavButton nav) {
 		ss->setSong(m_songs.currentPtr());
 		sm->activateScreen("Sing");
 	}
-	else if (nav == input::LEFT) { m_songs.advance(-1); hiscore_start_pos = 0; }
-	else if (nav == input::RIGHT) { m_songs.advance(1); hiscore_start_pos = 0; }
+	else if (nav == input::NAV_LEFT) { m_songs.advance(-1); hiscore_start_pos = 0; }
+	else if (nav == input::NAV_RIGHT) { m_songs.advance(1); hiscore_start_pos = 0; }
+}
+
+void ScreenSongs::manageEvent(input::NavEvent const& event) {
+	ScreenManager* sm = ScreenManager::getSingletonPtr();
+	input::NavButton nav = event.button;
+	// Handle basic navigational input that is possible also with instruments
+	m_idleTimer.setValue(0.0);  // Reset idle timer
+	if (m_jukebox) {
+		if (nav == input::NAV_CANCEL || m_songs.empty()) m_jukebox = false;
+		else if (nav == input::NAV_UP) m_audio.seek(5);
+		else if (nav == input::NAV_DOWN) m_audio.seek(-5);
+		else if (nav == input::NAV_MOREUP) m_audio.seek(-30);
+		else if (nav == input::NAV_MOREDOWN) m_audio.seek(30);
+		else manageSharedKey(nav);
+		return;
+	} else if (show_hiscores) {
+		if (nav == input::NAV_CANCEL || m_songs.empty()) show_hiscores = false;
+		else if (nav == input::NAV_UP) hiscore_start_pos--;
+		else if (nav == input::NAV_DOWN) hiscore_start_pos++;
+		// TODO: change hiscore type listed (all, just vocals, guitar easy, guitar medium, guitar hard, guit
+		else if (nav == input::NAV_MOREUP) (hiscore_start_pos > 4) ? hiscore_start_pos -= 5 : hiscore_start_pos = 0;
+		else if (nav == input::NAV_MOREDOWN) hiscore_start_pos += 5;
+		else manageSharedKey(nav);
+		return;
+	} else if (nav == input::NAV_CANCEL) {
+		if (!m_search.text.empty()) { m_search.text.clear(); m_songs.setFilter(m_search.text); }
+		else if (m_songs.getTypeFilter() != 0) m_songs.setTypeFilter(0);
+		else sm->activateScreen("Intro");
+	}
+	// The rest are only available when there are songs available
+	else if (m_songs.empty()) return;
+	else if (nav == input::NAV_UP) m_songs.sortChange(-1);
+	else if (nav == input::NAV_DOWN) m_songs.sortChange(1);
+	else if (nav == input::NAV_MOREUP) m_songs.advance(-10);
+	else if (nav == input::NAV_MOREDOWN) m_songs.advance(10);
+	else manageSharedKey(nav);
+	sm->showLogo(!m_jukebox);
 }
 
 void ScreenSongs::manageEvent(SDL_Event event) {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
-	input::NavButton nav(input::getNav(event));
-	// Handle basic navigational input that is possible also with instruments
-	if (nav != input::NONE) {
-		m_idleTimer.setValue(0.0);  // Reset idle timer
-		if (m_jukebox) {
-			if (nav == input::CANCEL || m_songs.empty()) m_jukebox = false;
-			else if (nav == input::UP) m_audio.seek(5);
-			else if (nav == input::DOWN) m_audio.seek(-5);
-			else if (nav == input::MOREUP) m_audio.seek(-30);
-			else if (nav == input::MOREDOWN) m_audio.seek(30);
-			else manageSharedKey(nav);
-			return;
-		} else if (show_hiscores) {
-			if (nav == input::CANCEL || m_songs.empty()) show_hiscores = false;
-			else if (nav == input::UP) hiscore_start_pos--;
-			else if (nav == input::DOWN) hiscore_start_pos++;
-			// TODO: change hiscore type listed (all, just vocals, guitar easy, guitar medium, guitar hard, guit
-			else if (nav == input::MOREUP) (hiscore_start_pos > 4) ? hiscore_start_pos -= 5 : hiscore_start_pos = 0;
-			else if (nav == input::MOREDOWN) hiscore_start_pos += 5;
-			else manageSharedKey(nav);
-			return;
-		} else if (nav == input::CANCEL) {
-			if (!m_search.text.empty()) { m_search.text.clear(); m_songs.setFilter(m_search.text); }
-			else if (m_songs.getTypeFilter() != 0) m_songs.setTypeFilter(0);
-			else sm->activateScreen("Intro");
-		}
-		// The rest are only available when there are songs available
-		else if (m_songs.empty()) return;
-		else if (nav == input::UP) m_songs.sortChange(-1);
-		else if (nav == input::DOWN) m_songs.sortChange(1);
-		else if (nav == input::MOREUP) m_songs.advance(-10);
-		else if (nav == input::MOREDOWN) m_songs.advance(10);
-		else manageSharedKey(nav);
 	// Handle less common, keyboard only keys
-	} else if (event.type == SDL_KEYDOWN) {
+	if (event.type == SDL_KEYDOWN) {
 		SDL_keysym keysym = event.key.keysym;
 		int key = keysym.sym;
 		SDLMod mod = event.key.keysym.mod;
@@ -117,8 +124,9 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 			if (key == SDLK_F5) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 8); // Vocals
 			if (key == SDLK_F6) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 4); // Guitars
 			if (key == SDLK_F7) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 2); // Drums
-			if (key == SDLK_F8) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 16); // Keyboard
-			if (key == SDLK_F9) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 1); // Dance
+			// TODO: Re-enable when other keyboard features are enabled
+			//if (key == SDLK_F8) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 16); // Keyboard
+			if (key == SDLK_F8) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 1); // Dance
 			// The rest are only available when there are songs available
 			else if (m_songs.empty()) return;
 			else if (!m_jukebox && key == SDLK_F4) m_jukebox = true;
@@ -197,8 +205,29 @@ void ScreenSongs::drawMultimedia() {
 		double length = m_audio.getLength();
 		double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
 		m_songbg_default->draw();   // Default bg
-		if (m_songbg.get()) m_songbg->draw();
-		if (m_video.get()) m_video->render(time);
+		if (!m_songs.empty()) {
+			Song& song = m_songs.current();
+			if (m_songbg.get()) m_songbg->draw();
+			else if (!song.cover.empty()) {
+				// Create a background image by tiling covers
+				try {
+					Surface& cover = m_covers[song.path + song.cover];
+					Dimensions backup = cover.dimensions;
+					const float s = 0.3;
+					cover.dimensions.fixedWidth(s).screenTop(0.0);
+					cover.dimensions.top(0.0).right(-s); cover.draw();
+					cover.dimensions.top(0.0).right(0.0); cover.draw();
+					cover.dimensions.top(0.0).left(0.0); cover.draw();
+					cover.dimensions.top(0.0).left(s); cover.draw();
+					cover.dimensions.top(s).right(-s); cover.draw();
+					cover.dimensions.top(s).right(0.0); cover.draw();
+					cover.dimensions.top(s).left(0.0); cover.draw();
+					cover.dimensions.top(s).left(s); cover.draw();
+					cover.dimensions = backup;
+				} catch (std::exception const&) {}
+			}
+			if (m_video.get()) m_video->render(time);
+		}
 	}
 	if (!m_jukebox) {
 		m_songbg_ground->draw();
@@ -280,7 +309,7 @@ void ScreenSongs::drawCovers() {
 		s.draw();
 		// Draw the reflection
 		Transform transMirror(scale(vec3(1.0f, -1.0f, 1.0f)));
-		ColorTrans c2(Color(0.4f, 0.4f, 0.4f, 0.4f));
+		ColorTrans c2(Color::alpha(0.4));
 		s.draw();
 	}
 }
@@ -305,24 +334,21 @@ Surface& ScreenSongs::getCover(Song const& song) {
 }
 
 void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
-
-	bool have_vocals = false;
 	bool have_bass = false;
 	bool have_drums = false;
-	bool have_keyboard = false;
 	bool have_dance = false;
 	bool is_karaoke = false;
 	unsigned char typeFilter = m_songs.getTypeFilter();
 	int guitarCount = 0;
+	int vocalCount = 0;
 
 	if( !m_songs.empty() ) {
 		Song const& song = m_songs.current();
-		have_vocals = song.hasVocals();
 		have_bass = isTrackInside(song.instrumentTracks,TrackName::BASS);
 		have_drums = song.hasDrums();
-		have_keyboard = song.hasKeyboard();
 		have_dance = song.hasDance();
 		is_karaoke = (song.music.find("vocals") != song.music.end());
+		vocalCount = song.getVocalTrackNames().size();
 		if (isTrackInside(song.instrumentTracks,TrackName::GUITAR)) guitarCount++;
 		if (isTrackInside(song.instrumentTracks,TrackName::GUITAR_COOP)) guitarCount++;
 		if (isTrackInside(song.instrumentTracks,TrackName::GUITAR_RHYTHM)) guitarCount++;
@@ -333,17 +359,20 @@ void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
 	float xincr = 0.2f;
 	{
 		// vocals
-		float a = alpha * (have_vocals ? 1.00 : 0.25);
+		float a = alpha;
 		float m = !(typeFilter & 8);
-		glutil::VertexArray va;
-		glmath::vec4 c(m * a, a, m * (is_karaoke ? 0.25f : 1.0f) * a, a);
-		x = dim.x1()+0.00*(dim.x2()-dim.x1());
-		va.Color(c).TexCoord(getIconTex(1), 0.0f).Vertex(x, dim.y1());
-		va.Color(c).TexCoord(getIconTex(1), 1.0f).Vertex(x, dim.y2());
-		x = dim.x1()+xincr*(dim.x2()-dim.x1());
-		va.Color(c).TexCoord(getIconTex(2), 0.0f).Vertex(x, dim.y1());
-		va.Color(c).TexCoord(getIconTex(2), 1.0f).Vertex(x, dim.y2());
-		va.Draw();
+		if (vocalCount == 0) { vocalCount = 1; a *= 0.25f; }
+		for (int i = vocalCount-1; i >= 0; i--) {
+			glutil::VertexArray va;
+			glmath::vec4 c(m * a, a, m * (is_karaoke ? 0.25f : 1.0f) * a, a);
+			x = dim.x1()+(i*0.03)*(dim.x2()-dim.x1());
+			va.Color(c).TexCoord(getIconTex(1), 0.0f).Vertex(x, dim.y1());
+			va.Color(c).TexCoord(getIconTex(1), 1.0f).Vertex(x, dim.y2());
+			x = dim.x1()+(xincr+i*0.03)*(dim.x2()-dim.x1());
+			va.Color(c).TexCoord(getIconTex(2), 0.0f).Vertex(x, dim.y1());
+			va.Color(c).TexCoord(getIconTex(2), 1.0f).Vertex(x, dim.y2());
+			va.Draw();
+		}
 	}
 	{
 		// guitars
@@ -390,20 +419,6 @@ void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
 		va.Color(c).TexCoord(getIconTex(5), 1.0f).Vertex(x, dim.y2());
 		va.Draw();
 	}
-	/*{
-		// keyboard
-		float a = alpha * (have_keyboard ? 1.00f : 0.25f);
-		float m = !(typeFilter & 16);
-		glutil::VertexArray va;
-		glmath::vec4 c(m * 1.0f, 1.0f, m * 1.0f, a);
-		x = dim.x1()+4*xincr*(dim.x2()-dim.x1());
-		va.Color(c).TexCoord(getIconTex(5), 0.0f).Vertex(x, dim.y1());
-		va.Color(c).TexCoord(getIconTex(5), 1.0f).Vertex(x, dim.y2());
-		x = dim.x1()+5*xincr*(dim.x2()-dim.x1());
-		va.Color(c).TexCoord(getIconTex(6), 0.0f).Vertex(x, dim.y1());
-		va.Color(c).TexCoord(getIconTex(6), 1.0f).Vertex(x, dim.y2());
-		va.Draw();
-	}*/
 	{
 		// dancing
 		float a = alpha * (have_dance ? 1.00f : 0.25f);

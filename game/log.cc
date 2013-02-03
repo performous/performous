@@ -85,7 +85,7 @@ namespace logger {
 
 		if(boost::regex_match(prefix, *level_regex)){
 			boost::mutex::scoped_lock l(log_lock);
-			std::cout << line;
+			std::cout << line << std::flush;
 		}
 
 		return n;

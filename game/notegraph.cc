@@ -1,7 +1,9 @@
 #include "notegraph.hh"
 
 #include "configuration.hh"
+#include "database.hh"
 #include "engine.hh"
+#include "player.hh"
 
 Dimensions dimensions; // Make a public member variable
 
@@ -117,7 +119,7 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 	else if (m_notealpha < 1.0f) m_notealpha += 0.02f;
 	if (m_notealpha <= 0.0f) { m_notealpha = 0.0f; return; }
 
-	ColorTrans c(Color(1.0, 1.0, 1.0, m_notealpha));
+	ColorTrans c(Color::alpha(m_notealpha));
 
 	drawNotes();
 	if (config["game/pitch"].b()) drawWaves(database);
@@ -180,7 +182,7 @@ void NoteGraph::drawNotes() {
 		double h = -m_noteUnit * 2.0; // height: 0.5 border + 1.0 bar + 0.5 border = 2.0
 		drawNotebar(*t1, x, ybeg, yend, w, h);
 		if (alpha > 0.0) {
-			ColorTrans c(Color(1.0f, 1.0f, 1.0f, alpha));
+			ColorTrans c(Color::alpha(alpha));
 			drawNotebar(*t2, x, ybeg, yend, w, h);
 		}
 	}
@@ -231,7 +233,7 @@ void NoteGraph::drawWaves(Database const& database) {
 			else if (hasNote) val = noteIt->note;
 			else val = notePrev->note;
 			// Now val contains the active note value. The following calculates note value for current freq:
-			val += Note::diff(val, m_vocal.scale.getNote(freq));
+			val += Note::diff(val, MusicalScale(m_vocal.scale).setFreq(freq).getNote());
 			// Graphics positioning & animation:
 			double y = m_baseY + val * m_noteUnit;
 			double thickness = clamp(1.0 + pitch[idx].second / 60.0) + 0.5;

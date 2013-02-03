@@ -17,23 +17,28 @@ to save the current settings to XML.
 	<menu>
 		<entry name="game">
 			<short>Game</short>
-			<long>Gameplay settings.</long>
+			<long>Gameplay related options</long>
 		</entry>
 		<entry name="graphic">
 			<short>Graphic</short>
-			<long>Video and rendering settings.</long>
+			<long>Configure rendering and video settings</long>
+		</entry>
+		<entry name="AudioDevices">
+			<!-- Handled internally by Performous -->
+			<short>Audio Devices</short>
+			<long>Setup microphones and playback</long>
 		</entry>
 		<entry name="audio">
 			<short>Audio</short>
-			<long>Audio-related settings.</long>
+			<long>Configure general audio settings</long>
 		</entry>
 		<entry name="dlc">
 			<short>DLC</short>
 			<long>Content downloading settings.</long>
 		</entry>
-		<entry name="paths">
+		<entry name="Paths">
 			<short>Paths</short>
-			<long>System paths.</long>
+			<long>Setup song and data paths</long>
 		</entry>
 	</menu>
 
@@ -64,9 +69,9 @@ to save the current settings to XML.
 		<short>Keyboard as dance pad</short>
 		<long>Enable keyboard as dance pad.</long>
 	</entry>
-	<entry name="game/keyboard_keyboard" type="bool" value="true">
-		<short>Keyboard as keyboard</short>
-		<long>Enable keyboard as keyboard.</long>
+	<entry name="game/keyboard_keytar" type="bool" value="true">
+		<short>Keyboard as keytar</short>
+		<long>Enable keyboard as keytar.</long>
 	</entry>
 	<entry name="game/instrument0" type="int" value="0">
 		<limits>
@@ -108,9 +113,10 @@ to save the current settings to XML.
 		<short>Joystick configuration</short>
 		<long>Force joystick to some kind of instrument.</long>
 	</entry>
-	<entry name="game/midi_input" type="string" value="">
+	<entry name="game/midi_input" type="string">
 		<short>Hardware MIDI input device</short>
-		<long>Part of sound card name or its number or empty to use the first available device. Used currently for MIDI drum controllers.</long>
+		<long>Regex for matching the MIDI devices to use. The default is to use all available devices.</long>
+		<stringvalue></stringvalue>
 	</entry>
 	<entry name="game/fallback_encoding" type="int" value="2">
 		<limits>

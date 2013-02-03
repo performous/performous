@@ -98,8 +98,6 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 
 	if (!GLEW_ARB_viewport_array && config["graphic/stereo3d"].b()) throw std::runtime_error("OpenGL extension ARB_viewport_array is required but not available when using stereo mode");
 
-	input::SDL::init(); // Joysticks etc.
-
 	if (GLEW_VERSION_3_3) {
 		// Compile geometry shaders when stereo is requested
 		shader("color").compileFile(getThemePath("shaders/stereo3d.geom"));
@@ -189,7 +187,7 @@ void Window::updateTransforms() {
 void Window::render(boost::function<void (void)> drawFunc) {
 	glutil::GLErrorChecker glerror("Window::render");
 	ViewTrans trans;  // Default frustum
-	if (s_width < screen->w || s_height < screen->h) glClear(GL_COLOR_BUFFER_BIT);  // Black bars
+	if (s_width < unsigned(screen->w) || s_height < unsigned(screen->h)) glClear(GL_COLOR_BUFFER_BIT);  // Black bars
 	bool stereo = config["graphic/stereo3d"].b();
 	int type = config["graphic/stereo3dtype"].i();
 
@@ -350,7 +348,7 @@ void Window::screenshot() {
 
 ColorTrans::ColorTrans(Color const& c): m_old(g_color) {
 	using namespace glmath;
-	g_color = g_color * mat4::diagonal(vec4(c.r, c.g, c.b, c.a));
+	g_color = g_color * mat4::diagonal(c.linear());
 	ScreenManager::getSingletonPtr()->window().updateColor();
 }
 

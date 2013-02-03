@@ -1,17 +1,18 @@
+#include "backgrounds.hh"
 #include "config.hh"
+#include "controllers.hh"
+#include "database.hh"
 #include "downloader.hh"
 #include "fs.hh"
-#include "screen.hh"
-#include "controllers.hh"
-#include "profiler.hh"
-#include "songs.hh"
-#include "backgrounds.hh"
-#include "database.hh"
-#include "xtime.hh"
-#include "video_driver.hh"
-#include "i18n.hh"
 #include "glutil.hh"
+#include "i18n.hh"
 #include "log.hh"
+#include "profiler.hh"
+#include "screen.hh"
+#include "songs.hh"
+#include "video_driver.hh"
+#include "webcam.hh"
+#include "xtime.hh"
 
 // Screens
 #include "screen_intro.hh"
@@ -33,6 +34,16 @@
 #include <vector>
 #include <cstdlib>
 
+// Disable main level exception handling for debug builds (because gdb cannot properly catch throwing otherwise)
+#ifdef NDEBUG
+#define RUNTIME_ERROR std::runtime_error
+#define EXCEPTION std::exception
+#else
+namespace { struct Nothing { char const* what() const { return NULL; } }; }
+#define RUNTIME_ERROR Nothing
+#define EXCEPTION Nothing
+#endif
+
 volatile bool g_quit = false;
 
 bool g_take_screenshot = false;
@@ -42,8 +53,7 @@ bool g_take_screenshot = false;
 static void signalSetup();
 
 extern "C" void quit(int) {
-	// shouldn't "not EXIT_SUCCESS" be sent - ^C^C is an abort, not normal termination?
-	if (g_quit) std::exit(EXIT_SUCCESS);  // Instant exit if Ctrl+C is pressed again
+	if (g_quit) quick_exit(2);  // Instant exit if Ctrl+C is pressed again
 	g_quit = true;
 	signalSetup();
 }
@@ -56,13 +66,16 @@ static void signalSetup() {
 /// can be thrown as an exception to quit the game
 struct QuitNow {};
 
-static void checkEvents_SDL(ScreenManager& sm) {
+static void checkEvents(ScreenManager& sm) {
 	if (g_quit) {
 		std::cout << "Terminating, please wait... (or kill the process)" << std::endl;
 		throw QuitNow();
 	}
 	SDL_Event event;
 	while(SDL_PollEvent(&event) == 1) {
+		// Let the navigation system grab any and all SDL events
+		boost::xtime eventTime = now();
+		sm.controllers.pushEvent(event, eventTime);
 		switch(event.type) {
 		  case SDL_QUIT:
 			sm.finished();
@@ -85,31 +98,32 @@ static void checkEvents_SDL(ScreenManager& sm) {
 				sm.finished();
 				continue; // Already handled here...
 			}
-			// Volume control
-			if ((keypressed == SDLK_UP || keypressed == SDLK_DOWN) && modifier & KMOD_CTRL) {
-				std::string curS = sm.getCurrentScreen()->getName();
-				// Pick proper setting
-				std::string which_vol = (curS == "Sing" || curS == "Practice")
-				  ? "audio/music_volume" : "audio/preview_volume";
-				// Adjust value
-				if (keypressed == SDLK_UP) ++config[which_vol];
-				else --config[which_vol];
-				// Show message
-				sm.flashMessage(config[which_vol].getShortDesc() + ": " + config[which_vol].getValue());
-				continue; // Already handled here...
-			}
-			// Eat away the event if there was a dialog open
-			if (sm.closeDialog()) continue;
 			break;
 		}
-		// Close dialog in case of a nav event
-		if (sm.isDialogOpen() && input::getNav(event) != input::NONE) { sm.closeDialog(); continue; }
-		// Forward to screen even if the input system takes it (ignoring pushEvent return value)
-		// This is needed to allow navigation (quiting the song) to function even then
-		boost::xtime eventTime = now();
-		input::SDL::pushEvent(event, eventTime);
+		// Screens always receive SDL events that were not already handled here
 		sm.getCurrentScreen()->manageEvent(event);
 	}
+	for (input::NavEvent event; sm.controllers.getNav(event); ) {
+		input::NavButton nav = event.button;
+		// Volume control
+		if (nav == input::NAV_VOLUME_UP || nav == input::NAV_VOLUME_DOWN) {
+			std::string curS = sm.getCurrentScreen()->getName();
+			// Pick proper setting
+			std::string which_vol = (curS == "Sing" || curS == "Practice")
+			  ? "audio/music_volume" : "audio/preview_volume";
+			// Adjust value
+			if (nav == input::NAV_VOLUME_UP) ++config[which_vol]; else --config[which_vol];
+			// Show message
+			sm.flashMessage(config[which_vol].getShortDesc() + ": " + config[which_vol].getValue());
+			continue; // Already handled here...
+		}
+		// If a dialog is open, any nav event will close it
+		if (sm.isDialogOpen()) { sm.closeDialog(); continue; }
+		// Let the current screen handle other events
+		sm.getCurrentScreen()->manageEvent(event);
+	}
+
+	// Need to toggle full screen mode?
 	if (config["graphic/fullscreen"].b() != sm.window().getFullscreen()) {
 		sm.window().setFullscreen(config["graphic/fullscreen"].b());
 		sm.reloadGL();
@@ -129,11 +143,6 @@ void mainLoop(std::string const& songlist) {
 	Songs songs(database, songlist);
 	ScreenManager sm(window);
 	try {
-		boost::scoped_ptr<input::MidiDrums> midiDrums;
-		// TODO: Proper error handling...
-		try { midiDrums.reset(new input::MidiDrums); } catch (std::runtime_error& e) {
-			std::clog << "controllers/info: " << e.what() << std::endl;
-		}
 		// Load audio samples
 		sm.loading(_("Loading audio samples..."), 0.5);
 		audio.loadSample("drum bass", getPath("sounds/drum_bass.ogg"));
@@ -172,7 +181,7 @@ void mainLoop(std::string const& songlist) {
 				try {
 					window.screenshot();
 					sm.flashMessage(_("Screenshot taken!"));
-				} catch (std::exception& e) {
+				} catch (EXCEPTION& e) {
 					std::cerr << "ERROR: " << e.what() << std::endl;
 					sm.flashMessage(_("Screenshot failed!"));
 				}
@@ -209,15 +218,15 @@ void mainLoop(std::string const& songlist) {
 				}
 				prof("fpsctrl");
 				// Process events for the next frame
-				if (midiDrums) midiDrums->process();
-				checkEvents_SDL(sm);
+				sm.controllers.process(now());
+				checkEvents(sm);
 				prof("events");
-			} catch (std::runtime_error& e) {
+			} catch (RUNTIME_ERROR& e) {
 				std::cerr << "ERROR: " << e.what() << std::endl;
 				sm.flashMessage(std::string("ERROR: ") + e.what());
 			}
 		}
-	} catch (std::exception& e) {
+	} catch (EXCEPTION& e) {
 		sm.fatalError(e.what());  // Notify the user
 		throw;
 	} catch (QuitNow&) {
@@ -256,7 +265,7 @@ void jstestLoop() {
 			boost::thread::sleep(time + 0.01); // Max 100 FPS
 			time = now();
 		}
-	} catch (std::exception& e) {
+	} catch (EXCEPTION& e) {
 		std::cout << "ERROR: " << e.what() << std::endl;
 	} catch (QuitNow&) {
 		std::cout << "Terminated." << std::endl;
@@ -313,7 +322,7 @@ int main(int argc, char** argv) try {
 		po::options_description allopts(cmdline);
 		allopts.add(opt3);
 		po::store(po::command_line_parser(argc, argv).options(allopts).positional(p).run(), vm);
-	} catch (std::exception& e) {
+	} catch (EXCEPTION& e) {
 		std::cout << cmdline << std::endl;
 		std::cout << "ERROR: " << e.what() << std::endl;
 		return EXIT_FAILURE;
@@ -333,14 +342,10 @@ int main(int argc, char** argv) try {
 		std::cout << cmdline << "  any arguments without a switch are interpreted as song folders.\n" << std::endl;
 		return EXIT_SUCCESS;
 	}
-#ifdef USE_PORTMIDI
-	// Dump a list of MIDI input devices
-	pm::dumpDevices(true);
-#endif
 	// Read config files
 	try {
 		readConfig();
-	} catch (std::exception& e) {
+	} catch (EXCEPTION& e) {
 		std::cerr << e.what() << std::endl;
 		return EXIT_FAILURE;
 	}
@@ -376,7 +381,7 @@ int main(int argc, char** argv) try {
 	mainLoop(songlist);
 
 	return EXIT_SUCCESS; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
-} catch (std::exception& e) {
+} catch (EXCEPTION& e) {
 	std::cerr << "FATAL ERROR: " << e.what() << std::endl;
 	return EXIT_FAILURE;
 }
@@ -385,7 +390,7 @@ void outputOptionalFeatureStatus() {
 	std::cout    << "  Internationalization:   " <<
 	(Gettext::enabled() ? "Enabled" : "Disabled")
 	<< std::endl << "  MIDI I/O:               " <<
-	(input::MidiDrums::enabled() ? "Enabled" : "Disabled")
+	(input::Hardware::midiEnabled() ? "Enabled" : "Disabled")
 	<< std::endl << "  Webcam support:         " <<
 	(Webcam::enabled() ? "Enabled" : "Disabled")
 	<< std::endl << "  Torrent support:         " <<

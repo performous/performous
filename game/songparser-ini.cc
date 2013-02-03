@@ -1,6 +1,5 @@
 #include "songparser.hh"
 
-#include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>
 #include <stdexcept>
@@ -67,11 +66,7 @@ void SongParser::iniParseHeader() {
 	// Search the dir for the music files
 	for (boost::filesystem::directory_iterator dirIt(s.path), dirEnd; dirIt != dirEnd; ++dirIt) {
 		boost::filesystem::path p = dirIt->path();
-#if BOOST_FILESYSTEM_VERSION < 3
-		std::string name = p.leaf(); // File basename (notes.txt)
-#else
 		std::string name = p.filename().string(); // File basename (notes.txt)
-#endif
 		if (regex_match(name.c_str(), match, midifile)) {
 			 s.midifilename = name;
 		} else if (regex_match(name.c_str(), match, audiofile_background)) {

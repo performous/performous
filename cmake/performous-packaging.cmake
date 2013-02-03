@@ -9,9 +9,6 @@ set(CPACK_SOURCE_IGNORE_FILES
    "/build/"
    "/.svn/"
    "/.git/"
-   "/osx-utils/"
-   "/portage-overlay/"
-   "/win32/"
 )
 set(CPACK_PACKAGE_EXECUTABLES performous)
 set(CPACK_SOURCE_GENERATOR "TBZ2")

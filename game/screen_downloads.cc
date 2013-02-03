@@ -20,15 +20,17 @@ void ScreenDownloads::enter() {
 
 void ScreenDownloads::exit() { m_theme.reset(); }
 
-void ScreenDownloads::manageEvent(SDL_Event event) {
+void ScreenDownloads::manageEvent(input::NavEvent const& event) {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
-	input::NavButton nav(input::getNav(event));
-	if (nav != input::NONE) {
-		if (nav == input::CANCEL || nav == input::SELECT) sm->activateScreen("Intro");
-		else if (nav == input::LEFT && m_selectedTorrent > 0) --m_selectedTorrent;
-		else if (nav == input::RIGHT) ++m_selectedTorrent;
-		else if (nav == input::PAUSE) m_audio.togglePause();
-	} else if (event.type == SDL_KEYDOWN) {
+	input::NavButton nav = event.button;
+	if (nav == input::NAV_CANCEL) sm->activateScreen("Intro");
+	else if (nav == input::NAV_LEFT && m_selectedTorrent > 0) --m_selectedTorrent;
+	else if (nav == input::NAV_RIGHT) ++m_selectedTorrent;
+	else if (nav == input::NAV_PAUSE) m_audio.togglePause();
+}
+
+void ScreenDownloads::manageEvent(SDL_Event event) {
+	if (event.type == SDL_KEYDOWN) {
 		int key = event.key.keysym.sym;
 		SDLMod modifier = event.key.keysym.mod;
 		if (key == SDLK_SPACE) {

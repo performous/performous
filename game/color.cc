@@ -41,3 +41,15 @@ Color::Color(std::string const& str) {
 	*this = Color(1.0, 0.0, 1.0);
 }
 
+namespace {
+	// Convert sRGB color component into linear as per OpenGL specs
+	double lin(double sRGB) {
+		if (sRGB <= 0.04045) return sRGB / 12.92;
+		return std::pow((sRGB + 0.055)/1.055, 2.4);
+	}
+}
+
+glmath::vec4 Color::linear() const {
+	return a * glmath::vec4(lin(r), lin(g), lin(b), 1.0);
+}
+

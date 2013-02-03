@@ -16,6 +16,7 @@ class ScreenDownloads: public Screen {
 	ScreenDownloads(std::string const& name, Audio& audio, Downloader &downloader);
 	void enter();
 	void exit();
+	void manageEvent(input::NavEvent const& event);
 	void manageEvent(SDL_Event event);
 	void draw();
   private:

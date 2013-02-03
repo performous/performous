@@ -8,6 +8,8 @@
 namespace SongParserUtil {
 	/// Parse an int from string and assign it to a variable
 	void assign(int& var, std::string const& str);
+	/// Parse an unsigned int from string and assign it to a variable
+	void assign(unsigned& var, std::string const& str);
 	/// Parse a double from string and assign it to a variable
 	void assign(double& var, std::string str);
 	/// Parse a boolean from string and assign it to a variable
@@ -16,6 +18,8 @@ namespace SongParserUtil {
 	void eraseLast(std::string& s, char ch = ' ');
 }
 
+namespace xmlpp { class Element; };
+
 /// parses songfiles
 class SongParser {
   public:
@@ -23,6 +27,7 @@ class SongParser {
 	SongParser(Song& s);
   private:
 	void finalize();
+	void vocalsTogether();
 
 	Song& m_song;
 	std::stringstream m_ss;
@@ -46,6 +51,7 @@ class SongParser {
 	bool xmlCheck(std::vector<char> const& data) const;
 	void xmlParseHeader();
 	void xmlParse();
+	Note xmlParseNote(xmlpp::Element const& noteNode, unsigned& ts);
 	bool smCheck(std::vector<char> const& data) const;
 	void smParseHeader();
 	void smParse();

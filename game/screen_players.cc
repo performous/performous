@@ -46,43 +46,44 @@ void ScreenPlayers::exit() {
 	m_database.save();
 }
 
-void ScreenPlayers::manageEvent(SDL_Event event) {
+void ScreenPlayers::manageEvent(input::NavEvent const& event) {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
-	input::NavButton nav(input::getNav(event));
-	if (nav != input::NONE) {
-		if (nav == input::CANCEL) {
-			if (m_search.text.empty()) { sm->activateScreen("Songs"); return; }
-			else { m_search.text.clear(); m_players.setFilter(m_search.text); }
-		} else if (nav == input::START) {
-			if (m_players.empty()) {
-				m_players.addPlayer(m_search.text);
-				m_players.setFilter(m_search.text);
-				m_players.update();
-				// the current player is the new created one
-			}
-			m_database.addHiscore(m_song);
-			m_database.scores.pop_front();
-
-			if (m_database.scores.empty() || !m_database.reachedHiscore(m_song)) {
-				// no more highscore, we are now finished
-				sm->activateScreen("Songs");
-			} else {
-				m_search.text.clear();
-				m_players.setFilter("");
-				// add all players which reach highscore because if score is very near or same it might be
-				// frustrating for second one that he cannot enter, so better go for next one...
-			}
+	input::NavButton nav = event.button;
+	if (nav == input::NAV_CANCEL) {
+		if (m_search.text.empty()) { sm->activateScreen("Songs"); return; }
+		else { m_search.text.clear(); m_players.setFilter(m_search.text); }
+	} else if (nav == input::NAV_START) {
+		if (m_players.empty()) {
+			m_players.addPlayer(m_search.text);
+			m_players.setFilter(m_search.text);
+			m_players.update();
+			// the current player is the new created one
 		}
-		else if (m_players.empty()) return;
-		else if (nav == input::PAUSE) m_audio.togglePause();
-		else if (nav == input::LEFT) m_players.advance(-1);
-		else if (nav == input::RIGHT) m_players.advance(1);
-		else if (nav == input::UP) m_players.advance(-1);
-		else if (nav == input::DOWN) m_players.advance(1);
-		else if (nav == input::MOREUP) m_players.advance(-10);
-		else if (nav == input::MOREDOWN) m_players.advance(10);
+		m_database.addHiscore(m_song);
+		m_database.scores.pop_front();
+
+		if (m_database.scores.empty() || !m_database.reachedHiscore(m_song)) {
+			// no more highscore, we are now finished
+			sm->activateScreen("Songs");
+		} else {
+			m_search.text.clear();
+			m_players.setFilter("");
+			// add all players which reach highscore because if score is very near or same it might be
+			// frustrating for second one that he cannot enter, so better go for next one...
+		}
 	}
-	else if (event.type == SDL_KEYDOWN) { // Process keyboard-only keys
+	else if (m_players.empty()) return;
+	else if (nav == input::NAV_PAUSE) m_audio.togglePause();
+	else if (nav == input::NAV_LEFT) m_players.advance(-1);
+	else if (nav == input::NAV_RIGHT) m_players.advance(1);
+	else if (nav == input::NAV_UP) m_players.advance(-1);
+	else if (nav == input::NAV_DOWN) m_players.advance(1);
+	else if (nav == input::NAV_MOREUP) m_players.advance(-10);
+	else if (nav == input::NAV_MOREDOWN) m_players.advance(10);
+}
+
+void ScreenPlayers::manageEvent(SDL_Event event) {
+	if (event.type == SDL_KEYDOWN) { // Process keyboard-only keys
 		SDL_keysym keysym = event.key.keysym;
 		//int key = keysym.sym;
 		//SDLMod mod = event.key.keysym.mod;
@@ -149,7 +150,7 @@ void ScreenPlayers::draw() {
 			// Draw the reflection
 			s.dimensions.top(y + 0.2 * diff); s.tex = TexCoords(0, 1, 1, 0);
 			{
-				ColorTrans c(Color(1.0, 1.0, 1.0, 0.4));
+				ColorTrans c(Color::alpha(0.4));
 				s.draw();
 			}
 			s.tex = TexCoords();

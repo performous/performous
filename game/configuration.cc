@@ -19,15 +19,15 @@ namespace fs = boost::filesystem;
 Config config;
 
 
-ConfigItem::ConfigItem(bool bval): m_type("bool"), m_value(bval) { }
+ConfigItem::ConfigItem(bool bval): m_type("bool"), m_value(bval), m_sel() { }
 
-ConfigItem::ConfigItem(int ival): m_type("int"), m_value(ival) { }
+ConfigItem::ConfigItem(int ival): m_type("int"), m_value(ival), m_sel() { }
 
-ConfigItem::ConfigItem(float fval): m_type("float"), m_value(fval) { }
+ConfigItem::ConfigItem(float fval): m_type("float"), m_value(fval), m_sel() { }
 
-ConfigItem::ConfigItem(std::string sval): m_type("string"), m_value(sval) { }
+ConfigItem::ConfigItem(std::string sval): m_type("string"), m_value(sval), m_sel() { }
 
-ConfigItem::ConfigItem(OptionList opts): m_type("option_list"), m_value(opts), m_sel(0) { }
+ConfigItem::ConfigItem(OptionList opts): m_type("option_list"), m_value(opts), m_sel() { }
 
 
 ConfigItem& ConfigItem::incdec(int dir) {
@@ -96,7 +96,8 @@ namespace {
 	fs::path origin;  // The primary shared data folder
 	
 	std::string getText(xmlpp::Element const& elem) {
-		return elem.get_child_text()->get_content();
+		xmlpp::TextNode const* n = elem.get_child_text();  // Returns NULL if there is no text
+		return n ? std::string(n->get_content()) : std::string();
 	}
 	
 	std::string getText(xmlpp::Element const& elem, std::string const& path) {
@@ -109,7 +110,7 @@ namespace {
 std::string ConfigItem::getValue() const {
 	if (m_type == "int") {
 		int val = boost::get<int>(m_value);
-		if (val >= 0 && val < m_enums.size()) return m_enums[val];
+		if (val >= 0 && val < int(m_enums.size())) return m_enums[val];
 		return numericFormat<int>(m_value, m_multiplier, m_step) + m_unit;
 	}
 	if (m_type == "float") return numericFormat<double>(m_value, m_multiplier, m_step) + m_unit;
@@ -154,7 +155,7 @@ void ConfigItem::addEnum(std::string name) {
 
 std::string ConfigItem::getEnumName() {
 	int val = i();
-	if (val >= 0 && val < m_enums.size()) return m_enums[val];
+	if (val >= 0 && val < int(m_enums.size())) return m_enums[val];
 	return "";
 }
 
@@ -377,7 +378,7 @@ void readConfig() {
 		ConfigItem& ci = config["game/theme"];
 		std::vector<std::string> themes = getThemes();
 		bool useDefaultTheme = (ci.i() == -1);
-		for (int i = 0; i < themes.size(); ++i) {
+		for (size_t i = 0; i < themes.size(); ++i) {
 			ci.addEnum(themes[i]);
 			// Select the default theme is no other is selected
 			if (useDefaultTheme && themes[i] == "default")

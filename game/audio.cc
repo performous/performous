@@ -95,8 +95,7 @@ public:
 	* @param length the duration of the current audio block
 	*/
 	void timeSync(time_duration audioPos, time_duration length) {
-		const double maxError = 0.1;  // Step the clock instead of skewing if over 100 ms off
-		const double fudgeFactor = 0.1;  // Adjustment ratio
+		constexpr double maxError = 0.1;  // Step the clock instead of skewing if over 100 ms off
 		// Full correction requires locking, but we can update max without lock too
 		boost::mutex::scoped_try_lock l(m_mutex, boost::defer_lock);
 		double max = getSeconds(audioPos + length);
@@ -106,20 +105,20 @@ public:
 		}
 		// Mutex locked - do a full update
 		ptime now = getTime();
-		double sys = pos_internal(now);  // Current position (based on system clock + corrections)
-		double audio = getSeconds(audioPos);  // Audio time
-		double diff = audio - sys;
+		const double sys = pos_internal(now);  // Current position (based on system clock + corrections)
+		const double audio = getSeconds(audioPos);  // Audio time
+		const double diff = audio - sys;
 		// Skew-based correction only if going forward and relatively well synced
 		if (max > m_max && std::abs(diff) < maxError) {
+			constexpr double fudgeFactor = 0.001;  // Adjustment ratio
 			// Update base position (this should not affect the clock)
 			m_baseTime = now;
 			m_basePos = sys;
 			// Apply a VERY ARTIFICIAL correction for clock!
-			double valadj = getSeconds(length) * 0.1 * rand() / RAND_MAX;  // Dither
-			m_skew = 0.99 * m_skew + 0.01 * (diff < valadj ? -1.0 : 1.0) * fudgeFactor;
+			const double valadj = getSeconds(length) * 0.1 * rand() / RAND_MAX;  // Dither
+			m_skew += (diff < valadj ? -1.0 : 1.0) * fudgeFactor;
 			// Limits to keep things sane in abnormal situations
-			if (m_skew > 0.01) m_skew = 0.01;
-			else if (m_skew < -0.01) m_skew = -0.01;
+			m_skew = clamp(m_skew, -0.01, 0.01);
 		} else {
 			// Off too much, step to correct time
 			m_baseTime = now;
@@ -140,7 +139,7 @@ class Music {
 		FFmpeg mpeg;
 		float fadeLevel;
 		float pitchFactor;
-		Track(std::string const& filename, unsigned int sr): mpeg(false, true, filename, sr), fadeLevel(1.0f), pitchFactor(0.0f) {}
+		Track(std::string const& filename, unsigned int sr): mpeg(filename, sr), fadeLevel(1.0f), pitchFactor(0.0f) {}
 	};
 	typedef boost::ptr_map<std::string, Track> Tracks;
 	Tracks tracks; ///< Audio decoders
@@ -236,12 +235,11 @@ public:
 
 struct Sample {
   private:
-	unsigned int srate;
 	double m_pos;
 	FFmpeg mpeg;
 	bool eof;
   public:
-	Sample(std::string const& filename, unsigned sr) : srate(sr), m_pos(), mpeg(false, true, filename, sr), eof(true) { }
+	Sample(std::string const& filename, unsigned sr) : m_pos(), mpeg(filename, sr), eof(true) { }
 	void operator()(float* begin, float* end) {
 		if(eof) {
 			// No more data to play in this sample
@@ -267,7 +265,7 @@ struct Synth {
 	Notes m_notes;
 	double srate; ///< Sample rate
   public:
-	Synth(Notes const& notes, unsigned int sr) : m_notes(notes), srate(sr) {};
+	Synth(Notes const& notes, unsigned int sr) : m_notes(notes), srate(sr) {}
 	void operator()(float* begin, float* end, double position) {
 		static double phase = 0.0;
 		for (float *i = begin; i < end; ++i) *i *= 0.3; // Decrease music volume
@@ -279,7 +277,7 @@ struct Synth {
 		if (it == m_notes.end() || it->type == Note::SLEEP || it->begin > position) { phase = 0.0; return; }
 		int note = it->note % 12;
 		double d = (note + 1) / 13.0;
-		double freq = MusicalScale().getNoteFreq(note + 4 * 12);
+		double freq = MusicalScale().setNote(note + 4 * 12).getFreq();
 		double value = 0.0;
 		// Synthesize tones
 		for (size_t i = 0, iend = mixbuf.size(); i != iend; ++i) {
@@ -417,7 +415,7 @@ struct Audio::Impl {
 		for (ConfigItem::StringList::const_iterator it = devs.begin(), end = devs.end(); it != end; ++it) {
 			try {
 				struct Params {
-					int out, in;
+					unsigned out, in;
 					unsigned int rate;
 					std::string dev;
 					std::vector<std::string> mics;
@@ -446,79 +444,44 @@ struct Audio::Impl {
 				// Sync mics/in settings together
 				if (params.in == 0) params.in = params.mics.size();
 				else params.mics.resize(params.in);
-				int count = portaudio::AudioDevices::count();
-				int dev = -1;
-				// Handle empty device
-				if (params.dev.empty()) dev = (params.out == 0 ? Pa_GetDefaultInputDevice() : Pa_GetDefaultOutputDevice());
-				// Try numeric value
-				if (dev < 0) {
-					std::istringstream iss(params.dev);
-					int tmp;
-					if (iss >> tmp && iss.get() == EOF && tmp >= 0 && tmp < count) dev = tmp;
-				}
+				portaudio::AudioDevices ad;
+				int dev = ad.find(params.dev);
 				std::clog << "audio/info: Trying audio device \"" << params.dev << "\", id: " << dev
 					<< ", in: " << params.in << ", out: " << params.out << std::endl;
-				bool skip_partial = false;
-				bool found = false;
-				portaudio::AudioDevices ad;
-				// Try exact match first, then partial
-				for (int match_partial = 0; match_partial < 2 && !skip_partial; ++match_partial) {
-					// Loop through the devices and try everything that matches the name
-					for (int i = -1; i < count && (dev < 0 || i == -1); ++i) {
-						if (dev >= 0 && i == -1) i = dev;
-						else if (i == -1) continue;
-						portaudio::DeviceInfo& info = ad.devices[i];
-						if (info.name.empty()) continue;
-						if (info.in < int(params.mics.size())) continue;
-						if (info.out < params.out) continue;
-						if (dev < 0) { // Try matching by name
-							if (!match_partial && info.name != params.dev) continue;
-							if (match_partial && info.name.find(params.dev) == std::string::npos) continue;
-						}
-						// Match found if we got here
-						int assigned_mics = 0;
-						try {
-							Device* d = new Device(params.in, params.out, params.rate, i);
-							devices.push_back(d);
-							// Start capture/playback on this device (likely to throw due to audio system errors)
-							// NOTE: When it throws we want to keep the device in devices to avoid calling ~Device
-							// which often would hit the Pa_CloseStream hang bug and terminate the application.
-							d->start();
-							// Assign mics for all channels of the device
-							for (unsigned int j = 0; j < params.in; ++j) {
-								if (analyzers.size() >= 4) break; // Too many mics
-								std::string const& m = params.mics[j];
-								if (m.empty()) continue; // Input channel not used
-								// Check that the color is not already taken
-								bool mic_used = false;
-								for (size_t mi = 0; mi < analyzers.size(); ++mi) {
-									if (analyzers[mi].getId() == m) { mic_used = true; break; }
-								}
-								if (mic_used) continue;
-								// Add the new analyzer
-								Analyzer* a = new Analyzer(d->rate, m);
-								analyzers.push_back(a);
-								d->mics[j] = a;
-								++assigned_mics;
-							}
-							// Assign playback output for the first available stereo output
-							if (!playback && d->out == 2) { d->outptr = &output; playback = true; }
-						} catch (std::runtime_error& e) {
-							std::clog << "audio/warning: " << info.name << ": " << e.what() << std::endl;
-							if (dev > 0) { skip_partial = true; break; } // Numeric, end search
-							continue;
-						}
-						skip_partial = true;
-						found = true;
-						std::clog << "audio/info: Using audio device: " << i;
-						if (assigned_mics) std::clog << ", input channels: " << assigned_mics;
-						if (params.out) std::clog << ", output channels: " << params.out;
-						std::clog << std::endl;
-						break;
+				portaudio::DeviceInfo& info = ad.devices[dev];
+				if (info.in < int(params.mics.size())) throw std::runtime_error("Device doesn't have enough input channels");
+				if (info.out < int(params.out)) throw std::runtime_error("Device doesn't have enough output channels");
+				// Match found if we got here, construct a device
+				Device* d = new Device(params.in, params.out, params.rate, info.idx);
+				devices.push_back(d);
+				// Start capture/playback on this device (likely to throw due to audio system errors)
+				// NOTE: When it throws we want to keep the device in devices to avoid calling ~Device
+				// which often would hit the Pa_CloseStream hang bug and terminate the application.
+				d->start();
+				// Assign mics for all channels of the device
+				int assigned_mics = 0;
+				for (unsigned int j = 0; j < params.in; ++j) {
+					if (analyzers.size() >= AUDIO_MAX_ANALYZERS) break; // Too many mics
+					std::string const& m = params.mics[j];
+					if (m.empty()) continue; // Input channel not used
+					// Check that the color is not already taken
+					bool mic_used = false;
+					for (size_t mi = 0; mi < analyzers.size(); ++mi) {
+						if (analyzers[mi].getId() == m) { mic_used = true; break; }
 					}
+					if (mic_used) continue;
+					// Add the new analyzer
+					Analyzer* a = new Analyzer(d->rate, m);
+					analyzers.push_back(a);
+					d->mics[j] = a;
+					++assigned_mics;
 				}
-				// Error handling
-				if (!found) throw std::runtime_error("Not found or already in use.");
+				// Assign playback output for the first available stereo output
+				if (!playback && d->out == 2) { d->outptr = &output; playback = true; }
+				std::clog << "audio/info: Using audio device: " << dev;
+				if (assigned_mics) std::clog << ", input channels: " << assigned_mics;
+				if (params.out) std::clog << ", output channels: " << params.out;
+				std::clog << std::endl;
 			} catch(std::runtime_error& e) {
 				std::clog << "audio/error: Audio device '" << *it << "': " << e.what() << std::endl;
 			}
@@ -529,8 +492,8 @@ struct Audio::Impl {
 Audio::Audio(): self(new Impl) {}
 Audio::~Audio() {}
 
-void Audio::restart() { self.reset(new Impl); };
-void Audio::close() { self.reset(); };
+void Audio::restart() { self.reset(new Impl); }
+void Audio::close() { self.reset(); }
 
 bool Audio::isOpen() const {
 	return !self->devices.empty();

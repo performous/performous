@@ -1,14 +1,17 @@
 project(Performous CXX C)
 cmake_minimum_required(VERSION 2.6)
 cmake_policy(VERSION 2.6)
-set(PROJECT_VERSION "0.6.1+")
+set(PROJECT_VERSION "0.7.0+")
 
 # Avoid source tree pollution
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
 	message(FATAL_ERROR "In-source builds are not permitted. Make a separate folder for building:\nmkdir build; cd build; cmake ..\nBefore that, remove the files already created:\nrm -rf CMakeCache.txt CMakeFiles")
 endif(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
 
-include(cmake/performous-packaging.cmake)
+# Packaging support (CPack) is disabled since Performous 0.7 release.
+# If you are still using this, uncomment the following line (and update the file).
+# Let us know if you still need it because otherwise we'll remove it entirely.
+#include(cmake/performous-packaging.cmake)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
@@ -18,8 +21,36 @@ if(NOT CMAKE_BUILD_TYPE)
 	SET(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
 endif(NOT CMAKE_BUILD_TYPE)
 
+if(CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+	add_definitions("-DNDEBUG")
+endif()
+
+# Enable C++11 support and other compiler flags...
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+	message("Detected GCC version ${GCC_VERSION}")
+	if (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7)
+		set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra -fcx-limited-range ${CMAKE_CXX_FLAGS}")
+	elseif (GCC_VERSION VERSION_GREATER 4.6 OR GCC_VERSION VERSION_EQUAL 4.6)
+		set(CMAKE_CXX_FLAGS "-std=c++0x -Wall -Wextra -fcx-limited-range ${CMAKE_CXX_FLAGS}")
+	else()
+		message(FATAL_ERROR "Your GCC compiler does not support c++11, please install at least gcc 4.6")
+	endif()
+endif()
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+	set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra ${CMAKE_CXX_FLAGS}")
+endif()
+
 if(WIN32)
 	set(SHARE_INSTALL "." CACHE STRING "Data file install path. Must be a relative path (from CMAKE_INSTALL_PREFIX), with no trailing slash.")
+	# Make windows.h behave
+	if(MSVC)
+		set(CMAKE_CXX_FLAGS "/DWIN32_LEAN_AND_MEAN ${CMAKE_CXX_FLAGS}")
+	else()
+		set(CMAKE_CXX_FLAGS "-DWIN32_LEAN_AND_MEAN ${CMAKE_CXX_FLAGS}")
+	endif()
 else(WIN32)
 	if(NOT SHARE_INSTALL)
 		set(SHARE_INSTALL "share/games/performous" CACHE STRING "Data file install path. Must be a relative path (from CMAKE_INSTALL_PREFIX), with no trailing slash.")

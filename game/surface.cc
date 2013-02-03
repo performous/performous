@@ -178,23 +178,36 @@ void Texture::load(Bitmap const& bitmap) {
 	PixFmt const& f = getPixFmt(bitmap.fmt);
 	glPixelStorei(GL_UNPACK_SWAP_BYTES, f.swap);
 	// Load the data into texture
-	glTexImage2D(type(), 0, internalFormat(), bitmap.width, bitmap.height, 0, f.format, f.type, &bitmap.buf[0]);
+	glTexImage2D(type(), 0, internalFormat(), bitmap.width, bitmap.height, 0, f.format, f.type, bitmap.data());
 	glGenerateMipmap(type());
 }
 
+// FIXME: Now that Surface uses GL_TEXTURE_2D, we should share more code between Surface and Texture
 void Surface::load(Bitmap const& bitmap) {
 	glutil::GLErrorChecker glerror("Surface::load");
 	// Initialize dimensions
 	m_width = bitmap.width; m_height = bitmap.height;
 	dimensions = Dimensions(bitmap.ar).fixedWidth(1.0f);
-	// Load the data into texture
+
 	UseTexture texture(m_texture);
+	// When texture area is small, bilinear filter the closest mipmap
+	glTexParameterf(m_texture.type(), GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+	// When texture area is large, bilinear filter the original
+	glTexParameterf(m_texture.type(), GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	// The texture wraps over at the edges (repeat)
+	glTexParameterf(m_texture.type(), GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameterf(m_texture.type(), GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameterf(m_texture.type(), GL_TEXTURE_MAX_LEVEL, GLEW_VERSION_3_0 ? 4 : 0);  // Mipmaps currently b0rked on Intel, so disable them...
+	glerror.check("glTexParameterf");
+
+	// Load the data into texture
 	PixFmt const& f = getPixFmt(bitmap.fmt);
 	glPixelStorei(GL_UNPACK_SWAP_BYTES, f.swap);
-	glTexImage2D(m_texture.type(), 0, internalFormat(), bitmap.width, bitmap.height, 0, f.format, f.type, &bitmap.buf[0]);
+	glTexImage2D(m_texture.type(), 0, internalFormat(), bitmap.width, bitmap.height, 0, f.format, f.type, bitmap.data());
+	glGenerateMipmap(m_texture.type());
 }
 
 void Surface::draw() const {
-	if (!empty()) m_texture.draw(dimensions, TexCoords(tex.x1 * m_width, tex.y1 * m_height, tex.x2 * m_width, tex.y2 * m_height));
+	if (!empty()) m_texture.draw(dimensions, TexCoords(tex.x1, tex.y1, tex.x2, tex.y2));
 }
 

@@ -1,22 +1,25 @@
 #pragma once
 
+#include "glmath.hh"
 #include <istream>
 #include <string>
 
-/// color struct
+/// A struct for holding RGBA color in non-premultiplied non-linear format (sRGB)
 struct Color {
-	/// red part
 	double r;
-	/// green part
 	double g;
-	/// blue part
 	double b;
-	/// alpha part
 	double a;
-	/// constructor
-	Color(double red = 0.0, double grn = 0.0, double blu = 0.0, double alp = 1.0): r(red), g(grn), b(blu), a(alp) {}
-	/** Parse CSS color string **/
-	Color(std::string const& str);
+	/// Default-construct white
+	Color(): r(1.0), g(1.0), b(1.0), a(1.0) {}
+	/// Construct using RGB(A)
+	Color(double red, double grn, double blu, double alp = 1.0): r(red), g(grn), b(blu), a(alp) {}
+	/// Construct white color with alpha
+	static Color alpha(double alp) { return Color(1.0, 1.0, 1.0, alp); }
+	/// Parse CSS color string
+	explicit Color(std::string const& str);
+	/// Return pre-multiplied linear color suitable for use with OpenGL
+	glmath::vec4 linear() const;
 };
 
 static inline Color getColor(std::istream& is) {

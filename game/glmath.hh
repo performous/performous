@@ -7,6 +7,11 @@
 #include <iostream>
 #include <sstream>
 
+// FIXME: Temporary MinGW fix
+#ifndef M_PI
+#define M_PI 3.1415926535
+#endif
+
 namespace glmath {
 
 	template <typename T> T mix(T const& a, T const& b, double blend) {
@@ -35,8 +40,10 @@ namespace glmath {
 
 	inline vec3::vec3(vec4 const& v): x(v.x), y(v.y), z(v.z) {}
 
-	static inline vec3 operator*(float k, vec3 const& v) { return vec3(k * v.x, k * v.y, k * v.z); }
-	static inline vec4 operator*(float k, vec4 const& v) { return vec4(k * v.x, k * v.y, k * v.z, k * v.w); }
+	// Template functions to allow them to work with different types of floating-point values
+
+	template <typename Scalar> static inline vec3 operator*(Scalar k, vec3 const& v) { return vec3(k * v.x, k * v.y, k * v.z); }
+	template <typename Scalar> static inline vec4 operator*(Scalar k, vec4 const& v) { return vec4(k * v.x, k * v.y, k * v.z, k * v.w); }
 
 	static inline vec3 operator+(vec3 const& a, vec4 const& b) { return vec3(a.x + b.x, a.y + b.y, a.z + b.z); }
 	static inline vec4 operator+(vec4 const& a, vec4 const& b) { return vec4(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w); }

@@ -37,22 +37,27 @@ void ScreenIntro::exit() {
 	theme.reset();
 }
 
+void ScreenIntro::manageEvent(input::NavEvent const& event) {
+	input::NavButton nav = event.button;
+	if (nav == input::NAV_CANCEL) {
+		if (m_menu.getSubmenuLevel() == 0) m_menu.moveToLast();  // Move cursor to quit in main menu
+		else m_menu.closeSubmenu(); // One menu level up
+	}
+	else if (nav == input::NAV_DOWN || nav == input::NAV_MOREDOWN) m_menu.move(1);
+	else if (nav == input::NAV_UP || nav == input::NAV_MOREUP) m_menu.move(-1);
+	else if (nav == input::NAV_RIGHT && m_menu.getSubmenuLevel() >= 2) m_menu.action(1); // Config menu
+	else if (nav == input::NAV_LEFT && m_menu.getSubmenuLevel() >= 2) m_menu.action(-1); // Config menu
+	else if (nav == input::NAV_RIGHT && m_menu.getSubmenuLevel() < 2) m_menu.move(1); // Instrument nav hack
+	else if (nav == input::NAV_LEFT && m_menu.getSubmenuLevel() < 2) m_menu.move(-1); // Instrument nav hack
+	else if (nav == input::NAV_START) m_menu.action();
+	else if (nav == input::NAV_PAUSE) m_audio.togglePause();
+	// Animation targets
+	m_selAnim.setTarget(m_menu.curIndex());
+	m_submenuAnim.setTarget(m_menu.getSubmenuLevel());
+}
+
 void ScreenIntro::manageEvent(SDL_Event event) {
-	input::NavButton nav(input::getNav(event));
-	if (nav != input::NONE) {
-		if (nav == input::CANCEL) {
-			if (m_menu.getSubmenuLevel() == 0) m_menu.moveToLast();  // Move cursor to quit in main menu
-			else m_menu.closeSubmenu(); // One menu level up
-		}
-		else if (nav == input::DOWN || nav == input::MOREDOWN) m_menu.move(1);
-		else if (nav == input::UP || nav == input::MOREUP) m_menu.move(-1);
-		else if (nav == input::RIGHT && m_menu.getSubmenuLevel() >= 2) m_menu.action(1); // Config menu
-		else if (nav == input::LEFT && m_menu.getSubmenuLevel() >= 2) m_menu.action(-1); // Config menu
-		else if (nav == input::RIGHT && m_menu.getSubmenuLevel() < 2) m_menu.move(1); // Instrument nav hack
-		else if (nav == input::LEFT && m_menu.getSubmenuLevel() < 2) m_menu.move(-1); // Instrument nav hack
-		else if (nav == input::START) m_menu.action();
-		else if (nav == input::PAUSE) m_audio.togglePause();
-	} else if (event.type == SDL_KEYDOWN && m_menu.getSubmenuLevel() > 0) {
+	if (event.type == SDL_KEYDOWN && m_menu.getSubmenuLevel() > 0) {
 		// These are only available in config menu
 		int key = event.key.keysym.sym;
 		SDLMod modifier = event.key.keysym.mod;
@@ -64,9 +69,6 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 				? _("Settings saved as system defaults.") : _("Settings saved."));
 		}
 	}
-	// Animation targets
-	m_selAnim.setTarget(m_menu.curIndex());
-	m_submenuAnim.setTarget(m_menu.getSubmenuLevel());
 }
 
 void ScreenIntro::draw_menu_options() {
@@ -88,7 +90,7 @@ void ScreenIntro::draw_menu_options() {
 	// Loop the currently visible options
 	for (size_t i = start_i, ii = 0; ii < showopts && i < opts.size(); ++i, ++ii) {
 		MenuOption const& opt = opts[i];
-		ColorTrans c(Color(1.0, 1.0, 1.0, submenuanim));
+		ColorTrans c(Color::alpha(submenuanim));
 
 		// Selection
 		if (i == m_menu.curIndex()) {
@@ -99,7 +101,7 @@ void ScreenIntro::draw_menu_options() {
 			theme->back_h.draw();
 			// Draw the text, dim if option not available
 			{
-				ColorTrans c(Color(1.0, 1.0, 1.0, opt.isActive() ? 1.0f : 0.5f));
+				ColorTrans c(Color::alpha(opt.isActive() ? 1.0 : 0.5));
 				theme->option_selected.dimensions.left(x).center(start_y + ii*0.08);
 				theme->option_selected.draw(opt.getName());
 			}
@@ -115,7 +117,7 @@ void ScreenIntro::draw_menu_options() {
 		} else {
 			std::string title = opt.getName();
 			SvgTxtTheme& txt = getTextObject(title);
-			ColorTrans c(Color(1.0, 1.0, 1.0, opt.isActive() ? 1.0f : 0.5f));
+			ColorTrans c(Color::alpha(opt.isActive() ? 1.0 : 0.5));
 			txt.dimensions.left(x).center(start_y + ii*0.08);
 			txt.draw(title);
 			wcounter = std::max(wcounter, txt.w() + 2 * sel_margin); // Calculate the widest entry
@@ -156,41 +158,29 @@ SvgTxtTheme& ScreenIntro::getTextObject(std::string const& txt) {
 }
 
 void ScreenIntro::populateMenu() {
+	MenuImage imgSing(new Surface(getThemePath("intro_sing.svg")));
+	MenuImage imgPractice(new Surface(getThemePath("intro_practice.svg")));
+	MenuImage imgDLC(new Surface(getThemePath("intro_dlc.svg")));
+	MenuImage imgConfig(new Surface(getThemePath("intro_configure.svg")));
+	MenuImage imgQuit(new Surface(getThemePath("intro_quit.svg")));
 	m_menu.clear();
-	boost::shared_ptr<Surface> config_bg(new Surface(getThemePath("intro_configure.svg")));
-	m_menu.add(MenuOption(_("Perform"), _("Start performing!"), "Songs", "intro_sing.svg"));
-	m_menu.add(MenuOption(_("Practice"), _("Check your skills or test the microphones"), "Practice", "intro_practice.svg"));
-
-	{	// Config submenu
-		MenuOptions audiomenu;
-		MenuOptions gfxmenu;
-		MenuOptions gamemenu;
-		MenuOptions dlcmenu;
-		// Populate the submenus
-		for (Config::iterator it = config.begin(); it != config.end(); ++it) {
-			// Skip items that are configured elsewhere
-			if (it->first == "audio/devices" || it->first.find("paths/") != std::string::npos) continue;
-			MenuOptions* opts = &gamemenu; // Default to game menu
-			if (it->first.find("audio/") != std::string::npos) opts = &audiomenu;
-			else if (it->first.find("graphic/") != std::string::npos) opts = &gfxmenu;
-			else if (it->first.find("dlc/") != std::string::npos) opts = &dlcmenu;
-			// Push the ConfigItem to the submenu
-			opts->push_back(MenuOption(_(it->second.getShortDesc().c_str()), _(it->second.getLongDesc().c_str()), &it->second));
-			opts->back().image = config_bg;
+	m_menu.add(MenuOption(_("Perform"), _("Start performing!"), imgSing).screen("Songs"));
+	m_menu.add(MenuOption(_("Practice"), _("Check your skills or test the microphones"), imgPractice).screen("Practice"));
+	m_menu.add(MenuOption(_("Download"), _("Get free songs or manage DLC"), imgDLC).screen("Downloads"));
+	MenuOptions configmain;
+	for (MenuEntry const& submenu: configMenu) {
+		if (!submenu.items.empty()) {
+			MenuOptions opts;
+			// Process items that belong to that submenu
+			for (std::string const& item: submenu.items) {
+				ConfigItem& c = config[item];
+				opts.push_back(MenuOption(_(c.getShortDesc().c_str()), _(c.getLongDesc().c_str())).changer(c));
+			}
+			configmain.push_back(MenuOption(_(submenu.shortDesc.c_str()), _(submenu.longDesc.c_str()), imgConfig).submenu(opts));
+		} else {
+			configmain.push_back(MenuOption(_(submenu.shortDesc.c_str()), _(submenu.longDesc.c_str()), imgConfig).screen(submenu.name));
 		}
-		// Main DLC menu
-		m_menu.add(MenuOption(_("Download"), _("Get free songs or manage DLC"), "Downloads", "intro_dlc.svg"));
-		// Main config menu
-		MenuOptions configmain;
-		configmain.push_back(MenuOption(_("Audio Devices"), _("Setup microphones and playback"), "AudioDevices", "intro_configure.svg"));
-		configmain.push_back(MenuOption(_("Audio"), _("Configure general audio settings"), audiomenu, "intro_configure.svg"));
-		configmain.push_back(MenuOption(_("Graphics"), _("Configure rendering and video settings"), gfxmenu, "intro_configure.svg"));
-		configmain.push_back(MenuOption(_("Game"), _("Gameplay related options"), gamemenu, "intro_configure.svg"));
-		configmain.push_back(MenuOption(_("DLC"), _("DLC related settings"), dlcmenu, "intro_configure.svg"));
-		configmain.push_back(MenuOption(_("Paths"), _("Setup song and data paths"), "Paths", "intro_configure.svg"));
-		// Add to root menu
-		m_menu.add(MenuOption(_("Configure"), _("Configure audio and game options"), configmain, "intro_configure.svg"));
 	}
-
-	m_menu.add(MenuOption(_("Quit"), _("Leave the game"), "", "intro_quit.svg"));
+	m_menu.add(MenuOption(_("Configure"), _("Configure audio and game options"), imgConfig).submenu(configmain));
+	m_menu.add(MenuOption(_("Quit"), _("Leave the game"), imgQuit).screen(""));
 }

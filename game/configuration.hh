@@ -12,7 +12,7 @@ class ConfigItem {
   public:
 	typedef std::vector<std::string> StringList; ///< a list of strings
 	typedef std::vector<std::string> OptionList; ///< a list of string options
-	ConfigItem() {}
+	ConfigItem() : m_sel() {}
 	ConfigItem(bool bval);
 	ConfigItem(int ival);
 	ConfigItem(float fval);

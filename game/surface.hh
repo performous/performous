@@ -16,7 +16,7 @@ class Dimensions {
 	/** Initialize with aspect ratio but no size, centered at screen center. **/
 	Dimensions(float ar_ = 0.0f): m_ar(ar_), m_x(), m_y(), m_w(), m_h(), m_xAnchor(), m_yAnchor(), m_screenAnchor() {}
 	/** Initialize with top-left corner and width & height **/
-	Dimensions(float x1, float y1, float w, float h): m_x(x1), m_y(y1), m_w(w), m_h(h), m_xAnchor(LEFT), m_yAnchor(TOP), m_screenAnchor() {}
+	Dimensions(float x1, float y1, float w, float h): m_ar(), m_x(x1), m_y(y1), m_w(w), m_h(h), m_xAnchor(LEFT), m_yAnchor(TOP), m_screenAnchor() {}
 	/// sets middle
 	Dimensions& middle(float x = 0.0f) { m_x = x; m_xAnchor = MIDDLE; return *this; }
 	/// sets left
@@ -165,24 +165,30 @@ template <GLenum Type> void OpenGLTexture<Type>::drawCropped(Dimensions const& o
 namespace pix { enum Format { INT_ARGB, CHAR_RGBA, RGB, BGR }; }
 
 struct Bitmap {
-	std::vector<unsigned char> buf;
+	std::vector<unsigned char> buf;  // Pixel data if owned by Bitmap
+	unsigned char* ptr;  // Pixel data if owned by someone else
 	unsigned width, height;
-	float ar;
+	double ar;  // Aspect ratio
+	double timestamp;  // Used for video frames
 	pix::Format fmt;
-	Bitmap(): width(), height(), ar(), fmt(pix::CHAR_RGBA) {}
+	Bitmap(unsigned char* ptr = NULL): ptr(ptr), width(), height(), ar(), timestamp(), fmt(pix::CHAR_RGBA) {}
 	void resize(unsigned w, unsigned h) {
-		buf.resize(w * h * 4);
+		if (!ptr) buf.resize(w * h * 4); else buf.clear();
 		width = w;
 		height = h;
-		ar = float(w) / h;
+		ar = double(w) / h;
 	}
 	void swap(Bitmap& b) {
+		if (ptr || b.ptr) throw std::logic_error("Cannot Bitmap::swap foreign pointers.");
 		buf.swap(b.buf);
 		std::swap(width, b.width);
 		std::swap(height, b.height);
 		std::swap(ar, b.ar);
+		std::swap(timestamp, b.timestamp);
 		std::swap(fmt, b.fmt);
 	}
+	unsigned char const* data() const { return ptr ? ptr : &buf[0]; }
+	unsigned char* data() { return ptr ? ptr : &buf[0]; }
 };
 
 void updateSurfaces();
@@ -229,6 +235,6 @@ class Surface {
 	Shader& shader() { return m_texture.shader(); }
   private:
 	unsigned int m_width, m_height;
-	OpenGLTexture<GL_TEXTURE_RECTANGLE> m_texture;
+	OpenGLTexture<GL_TEXTURE_2D> m_texture;
 };
 

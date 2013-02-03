@@ -7,89 +7,88 @@
 #include <iostream>
 #include <sstream>
 
+namespace {
+	PangoAlignment parseAlignment(std::string const& fontalign) {
+		if (fontalign == "start") return PANGO_ALIGN_LEFT;
+		if (fontalign == "center") return PANGO_ALIGN_CENTER;
+		if (fontalign == "end") return PANGO_ALIGN_RIGHT;
+		throw std::logic_error(fontalign + ": Unknown font alignment (opengl_text.cc)");
+	}
+
+	PangoWeight parseWeight(std::string const& fontweight) {
+		if (fontweight == "normal") return PANGO_WEIGHT_NORMAL;
+		if (fontweight == "bold") return PANGO_WEIGHT_BOLD;
+		if (fontweight == "bolder") return PANGO_WEIGHT_ULTRABOLD;
+		throw std::logic_error(fontweight + ": Unknown font weight (opengl_text.cc)");
+	}
+
+	PangoStyle parseStyle(std::string const& fontstyle) {
+		if (fontstyle == "normal") return PANGO_STYLE_NORMAL;
+		if (fontstyle == "italic") return PANGO_STYLE_ITALIC;
+		if (fontstyle == "oblique") return PANGO_STYLE_OBLIQUE;
+		throw std::logic_error(fontstyle + ": Unknown font style (opengl_text.cc)");
+	}
+}
+
 OpenGLText::OpenGLText(TThemeTxtOpenGL& _text, double m) {
-	if (_text.fontfamily.empty()) _text.fontfamily = "Arial";
-
-	PangoAlignment alignment = PANGO_ALIGN_LEFT;
-	if (_text.fontalign == "start") alignment = PANGO_ALIGN_LEFT;
-	else if (_text.fontalign == "center") alignment = PANGO_ALIGN_CENTER;
-	else if (_text.fontalign == "end") alignment = PANGO_ALIGN_RIGHT;
-
-	PangoWeight weight = PANGO_WEIGHT_NORMAL;
-	if (_text.fontweight == "normal") weight = PANGO_WEIGHT_NORMAL;
-	else if (_text.fontweight == "bold") weight = PANGO_WEIGHT_BOLD;
-	else if (_text.fontweight == "bolder") weight = PANGO_WEIGHT_ULTRABOLD;
-
-	PangoStyle style = PANGO_STYLE_NORMAL;
-	if (_text.fontstyle == "normal") style = PANGO_STYLE_NORMAL;
-	else if (_text.fontstyle == "italic") style = PANGO_STYLE_ITALIC;
-	else if (_text.fontstyle == "oblique") style = PANGO_STYLE_OBLIQUE;
-
-	// set font description
-	PangoFontDescription *desc = pango_font_description_new();
-	pango_font_description_set_weight(desc, weight);
-	pango_font_description_set_style(desc, style);
-	pango_font_description_set_family(desc, _text.fontfamily.c_str());
-	pango_font_description_set_absolute_size(desc, _text.fontsize * PANGO_SCALE * m);
-
+	// Setup font settings
+	PangoAlignment alignment = parseAlignment(_text.fontalign);
+	boost::shared_ptr<PangoFontDescription> desc(
+	  pango_font_description_new(),
+	  pango_font_description_free);
+	pango_font_description_set_weight(desc.get(), parseWeight(_text.fontweight));
+	pango_font_description_set_style(desc.get(), parseStyle(_text.fontstyle));
+	pango_font_description_set_family(desc.get(), _text.fontfamily.c_str());
+	pango_font_description_set_absolute_size(desc.get(), _text.fontsize * PANGO_SCALE * m);
 	double border = _text.stroke_width * m;
-	double margin = 2.0 * border;
-
-	// compute text extents
+	// Setup Pango context and layout
+	boost::shared_ptr<PangoContext> ctx(
+	  pango_font_map_create_context(pango_cairo_font_map_get_default()),
+	  g_object_unref);
+	boost::shared_ptr<PangoLayout> layout(
+	  pango_layout_new(ctx.get()),
+	  g_object_unref);
+	pango_layout_set_alignment(layout.get(), alignment);
+	pango_layout_set_font_description(layout.get(), desc.get());
+	pango_layout_set_text(layout.get(), _text.text.c_str(), -1);
+	// Compute text extents
 	{
-		PangoContext* ctx = pango_font_map_create_context(pango_cairo_font_map_get_default());
-		PangoLayout* layout = pango_layout_new(ctx);
-		pango_layout_set_alignment(layout, alignment);
-		pango_layout_set_font_description (layout, desc);
-		pango_layout_set_text (layout, _text.text.c_str(), -1);
 		PangoRectangle rec1, rec2;
-		pango_layout_get_pixel_extents (layout,&rec1,&rec2);
-		m_x = rec2.width + 2.0 * margin;
-		m_y = rec2.height + 2.0 * margin;
+		pango_layout_get_pixel_extents(layout.get(), &rec1, &rec2);
+		m_x = rec2.width + border;  // Add twice half a border for margins
+		m_y = rec2.height + border;
 		m_x_advance = rec1.x;
 		m_y_advance = rec1.y;
-		g_object_unref (layout);
-		g_object_unref (ctx);
 	}
-
-	// create surface
-	cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, m_x, m_y);
-	cairo_t *dc = cairo_create(surface);
-
-	// draw the surface
-	PangoLayout* layout = pango_cairo_create_layout(dc);
-	pango_layout_set_alignment(layout, alignment);
-	pango_layout_set_font_description(layout, desc);
-	pango_layout_set_text(layout, _text.text.c_str(), -1);
-	cairo_save(dc);
-	cairo_move_to(dc, margin, margin);
-	pango_cairo_show_layout (dc, layout);
-	pango_cairo_layout_path(dc, layout);
+	// Create Cairo surface and drawing context
+	boost::shared_ptr<cairo_surface_t> surface(
+	  cairo_image_surface_create(CAIRO_FORMAT_ARGB32, m_x, m_y),
+	  cairo_surface_destroy);
+	boost::shared_ptr<cairo_t> dc(
+	  cairo_create(surface.get()),
+	  cairo_destroy);
+	// Add Pango line and path to proper position on the DC
+	cairo_move_to(dc.get(), 0.5 * border, 0.5 * border);  // Margins needed for border stroke to fit in
+	pango_cairo_update_layout(dc.get(), layout.get());
+	pango_cairo_show_layout(dc.get(), layout.get());
+	pango_cairo_layout_path(dc.get(), layout.get());
+	// Render text
 	if (_text.fill_col.a > 0.0) {
-		cairo_set_source_rgba(dc, _text.fill_col.r, _text.fill_col.g, _text.fill_col.b, _text.fill_col.a);
-		cairo_fill_preserve(dc);
+		cairo_set_source_rgba(dc.get(), _text.fill_col.r, _text.fill_col.g, _text.fill_col.b, _text.fill_col.a);
+		cairo_fill_preserve(dc.get());
 	}
+	// Render text border
 	if (_text.stroke_col.a > 0.0) {
-		cairo_set_line_width(dc, border);
-		cairo_set_source_rgba(dc, _text.stroke_col.r, _text.stroke_col.g, _text.stroke_col.b, _text.stroke_col.a);
-		cairo_stroke(dc);
+		cairo_set_line_width(dc.get(), border);
+		cairo_set_source_rgba(dc.get(), _text.stroke_col.r, _text.stroke_col.g, _text.stroke_col.b, _text.stroke_col.a);
+		cairo_stroke(dc.get());
 	}
-	pango_cairo_update_layout (dc, layout);
-	cairo_restore(dc);
-	g_object_unref(layout);
-
-	// TODO: Avoid copying of bitmap data?
-	Bitmap bitmap;
+	// Load into m_surface (OpenGL texture)
+	Bitmap bitmap(cairo_image_surface_get_data(surface.get()));
 	bitmap.fmt = pix::INT_ARGB;
-	bitmap.resize(cairo_image_surface_get_width(surface), cairo_image_surface_get_height(surface));
-	std::memcpy(&bitmap.buf[0], cairo_image_surface_get_data(surface), bitmap.buf.size());
+	bitmap.resize(cairo_image_surface_get_width(surface.get()), cairo_image_surface_get_height(surface.get()));
 	m_surface.load(bitmap);
-
-	// delete surface
-	cairo_destroy(dc);
-	cairo_surface_destroy(surface);
-	// delete the font description
-	pango_font_description_free(desc);
+	// We don't want text quality multiplier m to affect rendering size...
 	m_x /= m;
 	m_y /= m;
 	m_x_advance /= m;
