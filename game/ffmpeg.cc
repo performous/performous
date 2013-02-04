@@ -25,7 +25,7 @@ extern "C" {
 namespace {
 	std::string ffversion(unsigned ver) {
 		unsigned major = ver >> 16;
-		unsigned minor = (ver >> 8) && 0xFF;
+		unsigned minor = (ver >> 8) & 0xFF;
 		unsigned micro = ver & 0xFF;
 		std::ostringstream oss;
 		oss << major << "." << minor << "." << micro << (micro >= 100 ? "(ff)" : "(lav)");
