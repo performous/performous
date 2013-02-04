@@ -107,7 +107,7 @@ public:
 		return best;
 	}
 	/** Give data away for mic pass-through */
-	void output(float* begin, float* end);
+	void output(float* begin, float* end, double rate);
 	/** Returns the id (color name) of the mic */
 	std::string const& getId() const { return m_id; }
 

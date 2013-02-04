@@ -361,7 +361,7 @@ struct Output {
 			// All mics included
 			for (size_t i = 0; i < mics.size(); ++i) {
 				if (mics[i])
-					mics[i]->output(begin, end);  // Do the actual mixing
+					mics[i]->output(begin, end, 48000.0 /* FIXME: Get actual output device rate instead of hardcoding */);  // Do the actual mixing
 			}
 		}
 		// Mix in the samples currently playing

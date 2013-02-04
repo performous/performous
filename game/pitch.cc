@@ -49,12 +49,12 @@ Analyzer::Analyzer(double rate, std::string id, std::size_t step):
 	}
 }
 
-void Analyzer::output(float* begin, float* end) {
+void Analyzer::output(float* begin, float* end, double rate) {
 	constexpr unsigned a = 2;
 	const unsigned size = m_passthrough.size();
 	const unsigned out = (end - begin) / 2 /* stereo */;
 	if (out == 0) return;
-	const unsigned in = m_resampleFactor * out + 2 * a + 5;
+	const unsigned in = m_resampleFactor * (m_rate / rate) * out + 2 * a /* lanczos kernel */ + 5 /* safety margin for rounding errors */;
 	float pcm[m_passthrough.capacity];
 	m_passthrough.read(pcm, pcm + in + 4);
 	for (unsigned i = 0; i < out; ++i) {
