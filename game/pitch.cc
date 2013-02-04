@@ -32,18 +32,15 @@ bool Tone::operator==(double f) const {
 }
 
 Analyzer::Analyzer(double rate, std::string id, std::size_t step):
-  m_outbuf(),
-  m_outbufSwap(1024),
   m_step(step),
   m_rate(rate),
   m_id(id),
   m_window(FFT_N),
-  m_bufRead(0),
-  m_bufWrite(0),
   m_fftLastPhase(FFT_N / 2),
   m_peak(0.0),
   m_oldfreq(0.0)
 {
+	if (m_step > FFT_N) throw std::logic_error("Analyzer step is larger that FFT_N (ideally it should be less than a fourth of FFT_N).");
 	// Hamming window
 	for (size_t i=0; i < FFT_N; i++) {
 		m_window[i] = 0.53836 - 0.46164 * std::cos(2.0 * M_PI * i / (FFT_N - 1));
@@ -51,19 +48,16 @@ Analyzer::Analyzer(double rate, std::string id, std::size_t step):
 }
 
 void Analyzer::output(float* begin, float* end) {
-	size_t i = 0;
-	size_t available = m_outbuf.size();
-	boost::mutex::scoped_lock l(m_mutex);
-	while (begin != end && i < available) {
-		float value = m_outbuf[i] * 2.0; // Amplify
-		*begin++ += value; // L channel
-		*begin++ += value; // R channel
-		++i;
+	const unsigned n = (end - begin) / 2 /* stereo */;
+	if (n > m_passthrough.size()) return;
+	float pcm[m_passthrough.capacity];
+	m_passthrough.read(pcm, pcm + n);
+	m_passthrough.pop(n);
+	for (unsigned i = 0; i < n; ++i) {
+		float s = 5.0 * pcm[i];
+		begin[i * 2] += s;
+		begin[i * 2 + 1] += s;
 	}
-	// Remove used data from the buffer
-	m_outbuf.erase(m_outbuf.begin(), m_outbuf.begin() + i);
-	// If the output buffer grows very big, reset it
-	if (m_outbuf.size() > 5000) m_outbuf.clear();
 }
 
 
@@ -93,12 +87,15 @@ namespace {
 
 bool Analyzer::calcFFT() {
 	float pcm[FFT_N];
-	size_t r = m_bufRead;
-	// Test if there is enough audio available
-	if ((BUF_N + m_bufWrite - r) % BUF_N <= FFT_N) return false;
-	// Copy audio to local buffer
-	for (size_t i = 0; i < FFT_N; ++i) pcm[i] = m_buf[(r + i) % BUF_N];
-	m_bufRead = (r + m_step) % BUF_N;
+	// Read FFT_N samples, move forward by m_step samples
+	if (!m_buf.read(pcm, pcm + FFT_N)) return false;
+	m_buf.pop(m_step);
+	// Peak level calculation of the most recent m_step samples (the rest is overlap)
+	for (float const* ptr = pcm + FFT_N - m_step; ptr != pcm + FFT_N; ++ptr) {
+		float s = *ptr;
+		float p = s * s;
+		if (p > m_peak) m_peak = p; else m_peak *= 0.999;
+	}
 	// Calculate FFT
 	m_fft = da::fft<FFT_P>(pcm, m_window);
 	return true;

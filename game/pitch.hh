@@ -3,11 +3,8 @@
 #include <complex>
 #include <vector>
 #include <list>
-#include <deque>
 #include <algorithm>
 #include <cmath>
-#include <boost/thread.hpp>
-#include "configuration.hh"
 
 /// struct to represent tones
 struct Tone {
@@ -34,13 +31,44 @@ static inline bool operator>(Tone const& lhs, Tone const& rhs) { return lhs.freq
 
 static const unsigned FFT_P = 10;
 static const std::size_t FFT_N = 1 << FFT_P;
-static const std::size_t BUF_N = 2 * FFT_N;
+
+/// Lock-free ring buffer. Discards oldest data on overflow (not strictly thread-safe).
+template <size_t SIZE> class RingBuffer {
+public:
+	constexpr static size_t capacity = SIZE;
+	RingBuffer(): m_read(), m_write() {}  ///< Initialize empty buffer
+	template <typename InIt> void insert(InIt begin, InIt end) {
+		unsigned r = m_read;  // The read position
+		unsigned w = m_write;  // The write position
+		bool overflow = false;
+		while (begin != end) {
+			m_buf[w] = *begin++;  // Copy sample
+			w = modulo(w + 1);  // Update cursor
+			if (w == r) overflow = true;
+		}
+		m_write = w;
+		if (overflow) m_read = modulo(w + 1);  // Reset read pointer on overflow
+	}
+	/// Read data from current position if there is enough data to fill the range (otherwise return false). Does not move read pointer.
+	template <typename OutIt> bool read(OutIt begin, OutIt end) {
+		unsigned r = m_read;
+		if (modulo(m_write - r) <= end - begin) return false;  // Not enough audio available
+		while (begin != end) *begin++ = m_buf[r++ % SIZE];  // Copy audio to output iterator
+		return true;
+	}
+	void pop(unsigned n) { m_read = modulo(m_read + n); } ///< Move reading pointer forward.
+	unsigned size() const { return modulo(m_write - m_read); }
+private:
+	static unsigned modulo(unsigned idx) { return (SIZE + idx) % SIZE; }  ///< Modulo operation with proper rounding (handles slightly "negative" idx as well)
+	float m_buf[SIZE];
+	volatile size_t m_read, m_write;  ///< The indices of the next read/write operations. read == write implies that buffer is empty.
+};
 
 /// analyzer class
  /** class to analyze input audio and transform it into useable data
  */
 class Analyzer {
-  public:
+public:
 	/// fast fourier transform vector
 	typedef std::vector<std::complex<float> > fft_t;
 	/// list of tones
@@ -49,31 +77,8 @@ class Analyzer {
 	Analyzer(double rate, std::string id, std::size_t step = 200);
 	/** Add input data to buffer. This is thread-safe (against other functions). **/
 	template <typename InIt> void input(InIt begin, InIt end) {
-		bool saveOutput = config["audio/pass-through"].b();
-		if (saveOutput && end - begin > static_cast<ptrdiff_t>(m_outbufSwap.size()))
-			m_outbufSwap.resize(end - begin + 10);
-		size_t r = m_bufRead;  // The read position
-		size_t w = m_bufWrite;  // The write position
-		size_t i = 0;
-		bool overflow = false;
-		while (begin != end) {
-			float s = *begin++;  // Read input sample
-			if (saveOutput) m_outbufSwap[i++] = s;  // Add to pass-through buffer
-			// Peak level calculation
-			float p = s * s;
-			if (p > m_peak) m_peak = p; else m_peak *= 0.999;
-			m_buf[w] = s;
-			// Cursor updates
-			w = (w + 1) % BUF_N;
-			if (w == r) overflow = true;
-		}
-		m_bufWrite = w;
-		if (overflow) m_bufRead = (w + 1) % BUF_N;  // Reset read pointer on overflow
-		if (!saveOutput) return;
-		// No need to lock the mutex before this
-		boost::mutex::scoped_lock l(m_mutex);
-		// Insert the new values to the pass-through buffer
-		m_outbuf.insert(m_outbuf.end(), m_outbufSwap.begin(), m_outbufSwap.begin() + i);
+		m_buf.insert(begin, end);
+		m_passthrough.insert(begin, end);
 	}
 	/** Call this to process all data input so far. **/
 	void process();
@@ -106,16 +111,13 @@ class Analyzer {
 	/** Returns the id (color name) of the mic */
 	std::string const& getId() const { return m_id; }
 
-  private:
-	boost::mutex m_mutex;
-	std::deque<float> m_outbuf;
-	std::vector<float> m_outbufSwap;
-	std::size_t m_step;
+private:
+	const std::size_t m_step;
+	RingBuffer<2 * FFT_N> m_buf;  // Twice the FFT size should give enough room for sliding window and for engine delays
+	RingBuffer<4096> m_passthrough;
 	double m_rate;
 	std::string m_id;
 	std::vector<float> m_window;
-	float m_buf[2 * BUF_N];
-	volatile size_t m_bufRead, m_bufWrite;
 	fft_t m_fft;
 	std::vector<float> m_fftLastPhase;
 	double m_peak;

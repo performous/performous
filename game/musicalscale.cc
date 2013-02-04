@@ -1,51 +1,47 @@
 #include "musicalscale.hh"
 
+#include "util.hh"
 #include <cmath>
 #include <sstream>
 #include <stdexcept>
 
-// NOTE: This is the C major scale.
-// The format needs to be preserved for isSharp, and any scale changes must be done in getNoteNum manually.
-const char* const noteNames[12] = {"C ","C#","D ","D#","E ","F ","F#","G ","G#","A ","A#","B "};
+MusicalScale& MusicalScale::clear() { m_freq = m_note = getNaN(); return *this; }
 
-std::string MusicalScale::getNoteStr(double freq) const try {
-	int id = getNoteId(freq);
+MusicalScale& MusicalScale::setFreq(double freq) {
+	m_freq = freq;
+	m_note = m_baseId + 12.0 * std::log(freq / m_baseFreq) / std::log(2.0);
+	if (!isValid()) m_note = getNaN();
+	return *this;
+}
+
+MusicalScale& MusicalScale::setNote(double note) {
+	m_note = note;
+	m_freq = m_baseFreq * std::pow(2.0, (m_note - m_baseId) / 12.0);
+	return *this;
+}
+
+unsigned MusicalScale::getNoteId() const {
+	if (!isValid()) throw std::logic_error("MusicalScale::getNoteId must only be called on valid notes.");
+	return round(m_note);
+}
+
+// NOTE: Only C major scale is currently implemented.
+
+static const char* const noteNames[12] = {"C ","C#","D ","D#","E ","F ","F#","G ","G#","A ","A#","B "};
+static const int noteLines[12] = { 0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6 };
+
+std::string MusicalScale::getStr() const {
+	if (!isValid()) return std::string();
 	std::ostringstream oss;
-	oss << noteNames[id % 12] << " " << int(freq + 0.5) << " Hz";
+	oss << noteNames[getNum()] << " " << round(m_freq) << " Hz";
 	return oss.str();
-} catch (std::logic_error&) {
-	return std::string();
 }
 
-unsigned int MusicalScale::getNoteNum(int id) const {
-	// C major scale
-	int n = id % 12;
-	return (n + (n > 4)) / 2;
+int MusicalScale::getNoteLine() const {
+	return (getOctave() - 4) * 7 + noteLines[getNum()];
 }
 
-bool MusicalScale::isSharp(int id) const {
-	if (id < 0) throw std::logic_error("MusicalScale::isSharp: Invalid note ID");
-	return noteNames[id % 12][1] == '#';
-}
-
-double MusicalScale::getNoteFreq(int id) const {
-	if (id == -1) return 0.0;
-	return m_baseFreq * std::pow(2.0, (id - m_baseId) / 12.0);
-}
-
-int MusicalScale::getNoteId(double freq) const {
-	double note = getNote(freq);
-	return int(note + 0.5);  // Mathematical rounding
-}
-
-double MusicalScale::getNote(double freq) const {
-	double note = m_baseId + 12.0 * std::log(freq / m_baseFreq) / std::log(2.0);
-	if (note >= 0.0 && note <= 127.0) return note;
-	throw std::logic_error("MusicalScale::getNote: Invalid freq");
-}
-
-double MusicalScale::getNoteOffset(double freq) const {
-	double note = getNote(freq);
-	return note - int(note + 0.5);
+bool MusicalScale::isSharp() const {
+	return noteNames[getNum()][1] == '#';  // Uses the second character of noteNames!
 }
 

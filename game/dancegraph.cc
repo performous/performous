@@ -84,7 +84,6 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song, input::DevicePtr dev):
   m_arrows_cursor(getThemePath("arrows_cursor.svg")),
   m_arrows_hold(getThemePath("arrows_hold.svg")),
   m_mine(getThemePath("mine.svg")),
-  m_flow_direction(1),
   m_insideStop()
 {
 	// Initialize some arrays
@@ -116,7 +115,7 @@ void DanceGraph::setupJoinMenu() {
 		}
 		m_selectedTrack = ConfigItem(ol); // Create a ConfigItem from the option list
 		m_selectedTrack.select(cur); // Set the selection to current level
-		m_menu.add(MenuOption("", _("Select track"), &m_selectedTrack)); // MenuOption that cycles the options
+		m_menu.add(MenuOption("", _("Select track")).changer(m_selectedTrack)); // MenuOption that cycles the options
 		m_menu.back().setDynamicName(m_trackOpt); // Set the title to be dynamic
 	}
 	{ // Create difficulty opt
@@ -132,10 +131,10 @@ void DanceGraph::setupJoinMenu() {
 		}
 		m_selectedDifficulty = ConfigItem(ol); // Create a ConfigItem from the option list
 		m_selectedDifficulty.select(cur); // Set the selection to current level
-		m_menu.add(MenuOption("", _("Select difficulty"), &m_selectedDifficulty)); // MenuOption that cycles the options
+		m_menu.add(MenuOption("", _("Select difficulty")).changer(m_selectedDifficulty)); // MenuOption that cycles the options
 		m_menu.back().setDynamicName(m_difficultyOpt); // Set the title to be dynamic
 	}
-	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
+	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).screen("Songs"));
 }
 
 void DanceGraph::updateJoinMenu() {

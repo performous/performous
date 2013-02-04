@@ -20,7 +20,7 @@ class Video {
   private:
 	FFmpeg m_mpeg;
 	double m_videoGap;
-	VideoFrame m_videoFrame;
+	Bitmap m_videoFrame;
 	Surface m_surface;
 	double m_surfaceTime;
 	double m_lastTime;

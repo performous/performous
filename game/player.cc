@@ -38,7 +38,7 @@ void Player::update() {
 		// If tone was detected, calculate score
 		m_scoreIt->power *= std::pow(0.05, m_scoreIt->clampDuration(beginTime, endTime));  // Fade glow
 		if (t) {
-			double note = m_vocal.scale.getNote(t->freq);
+			double note = MusicalScale(m_vocal.scale).setFreq(t->freq).getNote();
 			// Add score
 			double score_addition = m_vocal.m_scoreFactor * m_scoreIt->score(note, beginTime, endTime);
 			m_score += score_addition;

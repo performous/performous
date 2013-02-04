@@ -5,6 +5,7 @@
  */
 
 #include <boost/thread.hpp>
+#include <boost/regex.hpp>
 #include <portaudio.h>
 #include <cstdlib>
 #include <stdexcept>
@@ -34,16 +35,18 @@ namespace portaudio {
 	}
 
 	struct DeviceInfo {
-		DeviceInfo(int id, std::string n = "", int i = 0, int o = 0): name(n), idx(id), in(i), out(o) {}
+		DeviceInfo(int id, std::string n = std::string(), int i = 0, int o = 0): name(n), flex(n), idx(id), in(i), out(o) {}
 		std::string desc() {
 			std::ostringstream oss;
 			oss << name << " (";
 			if (in) oss << in << " in";
 			if (in && out) oss << ", ";
 			if (out) oss << out << " out";
-			return oss.str() + ")";
+			oss << ")";
+			return oss.str();
 		}
-		std::string name;
+		std::string name;  ///< Full device name in UTF-8
+		std::string flex;  ///< Modified name that is less specific but still unique (allow device numbers to change)
 		int idx;
 		int in, out;
 	};
@@ -51,7 +54,7 @@ namespace portaudio {
 	typedef std::vector<DeviceInfo> DeviceInfos;
 
 	/// List of useless legacy devices of PortAudio that we want to omit...
-	static char const* g_ignored[] = { "front", "surround40", "surround41", "surround50", "surround51", "surround71", "iec958", "spdif", "dmix", NULL };
+	static char const* const g_ignored[] = { "front", "surround40", "surround41", "surround50", "surround51", "surround71", "iec958", "spdif", "dmix", NULL };
 
 	struct AudioDevices {
 		static int count() { return Pa_GetDeviceCount(); }
@@ -64,17 +67,55 @@ namespace portaudio {
 				for (unsigned j = 0; g_ignored[j] && !name.empty(); ++j) {
 					if (name.find(g_ignored[j]) != std::string::npos) name.clear();
 				}
-				if (!name.empty()) devices.push_back(DeviceInfo(i, name, info->maxInputChannels, info->maxOutputChannels));
+				if (name.empty()) continue;  // No acceptable device found
+				// Verify that the name is unique (haven't seen duplicate names occur though)
+				std::string n = name;
+				while (true) {
+					int num = 1;
+					for (auto& dev: devices) if (dev.name == n) goto rename;
+					break;
+				rename:
+					std::ostringstream oss;
+					oss << name << " #" << ++num;
+					n = oss.str();
+				};
+				devices.push_back(DeviceInfo(i, name, info->maxInputChannels, info->maxOutputChannels));
+			}
+			for (auto& dev: devices) {
+				// Array of regex - replacement pairs
+				static char const* const replacements[][2] = {
+					{ "\\(hw:\\d+,", "(hw:," },  // Remove ALSA device numbers
+					{ " \\(.*\\)", "" },  // Remove the parenthesis part entirely
+				};
+				for (auto const& rep: replacements) {
+					std::string flex = boost::regex_replace(dev.flex, boost::regex(rep[0]), rep[1]);
+					if (flex == dev.flex) continue;  // Nothing changed
+					// Verify that flex doesn't find any wrong devices
+					bool fail = false;
+					try {
+						if (find(flex) != dev.idx) fail = true;
+					} catch (...) {}  // Failure to find anything is success
+					if (!fail) dev.flex = flex;
+				}
 			}
 		}
 		/// Get a printable dump of the devices
 		std::string dump() {
 			std::ostringstream oss;
 			oss << "PortAudio devices:" << std::endl;
-			for (unsigned i = 0; i < devices.size(); ++i)
-				oss << "  " << i << "   " << devices[i].name << " (" << devices[i].in << " in, " << devices[i].out << " out)" << std::endl;
+			for (unsigned i = 0; i < devices.size(); ++i) oss << "  " << devices[i].desc() << std::endl;
 			oss << std::endl;
 			return oss.str();
+		}
+		int find(std::string const& name) {
+			// Try name search with full match
+			for (auto const& dev: devices) if (dev.name == name) return dev.idx;
+			// Try name search with partial/flexible match
+			for (auto const& dev: devices) {
+				if (dev.name.find(name) != std::string::npos) return dev.idx;
+				if (dev.flex.find(name) != std::string::npos) return dev.idx;
+			}
+			throw std::runtime_error("No such device.");
 		}
 		DeviceInfos devices;
 	};
@@ -88,7 +129,7 @@ namespace portaudio {
 		PaStreamParameters params;
 		Params(PaStreamParameters const& init = PaStreamParameters()): params(init) {
 			// Some useful defaults so that things just work
-			channelCount(2).sampleFormat(paFloat32).suggestedLatency(0.01);
+			channelCount(2).sampleFormat(paFloat32).suggestedLatency(0.05);
 		}
 		Params& channelCount(int val) { params.channelCount = val; return *this; }
 		Params& device(PaDeviceIndex val) { params.device = val; return *this; }
@@ -134,7 +175,7 @@ namespace portaudio {
 			boost::thread audiokiller(Pa_CloseStream, m_handle);
 			if (!audiokiller.timed_join(boost::posix_time::milliseconds(5000))) {
 				std::cout << "PortAudio BUG: Pa_CloseStream hung for more than five seconds. Exiting program." << std::endl;
-				exit(1);
+				quick_exit(1);  // Do not kill atexit handlers that are also prone to hang...
 			}
 		}
 		operator PaStream*() { return m_handle; }

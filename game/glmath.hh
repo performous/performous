@@ -7,6 +7,11 @@
 #include <iostream>
 #include <sstream>
 
+// FIXME: Temporary MinGW fix
+#ifndef M_PI
+#define M_PI 3.1415926535
+#endif
+
 namespace glmath {
 
 	template <typename T> T mix(T const& a, T const& b, double blend) {

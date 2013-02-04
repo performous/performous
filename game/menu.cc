@@ -4,114 +4,30 @@
 #include "fs.hh"
 
 
-MenuOption::MenuOption(const std::string& nm, const std::string& comm):
-	type(CLOSE_SUBMENU),
-	value(NULL),
-	newValue(),
-	callback(NULL),
-	callbackData(NULL),
-	name(nm),
-	comment(comm),
-	namePtr(NULL),
-	commentPtr(NULL)
+MenuOption::MenuOption(std::string const& nm, std::string const& comm, MenuImage img):
+  type(), value(), newValue(), callback(), image(img), name(nm), comment(comm), namePtr(), commentPtr()
 {}
-
-MenuOption::MenuOption(const std::string& nm, const std::string& comm, ConfigItem* val):
-	type(CHANGE_VALUE),
-	value(val),
-	newValue(),
-	callback(NULL),
-	callbackData(NULL),
-	name(nm),
-	comment(comm),
-	namePtr(NULL),
-	commentPtr(NULL)
-{}
-
-MenuOption::MenuOption(const std::string& nm, const std::string& comm, ConfigItem* val, ConfigItem newval):
-	type(SET_AND_CLOSE),
-	value(val),
-	newValue(newval),
-	callback(NULL),
-	callbackData(NULL),
-	name(nm),
-	comment(comm),
-	namePtr(NULL),
-	commentPtr(NULL)
-{}
-
-MenuOption::MenuOption(const std::string& nm, const std::string& comm, MenuOptions opts, const std::string& img):
-	type(OPEN_SUBMENU),
-	value(NULL),
-	newValue(),
-	options(opts),
-	callback(NULL),
-	callbackData(NULL),
-	name(nm),
-	comment(comm),
-	namePtr(NULL),
-	commentPtr(NULL)
-{
-	if (!img.empty()) image.reset(new Surface(getThemePath(img)));
-}
-
-MenuOption::MenuOption(const std::string& nm, const std::string& comm, const std::string& scrn, const std::string& img):
-	type(ACTIVATE_SCREEN),
-	value(NULL),
-	newValue(scrn),
-	callback(NULL),
-	callbackData(NULL),
-	name(nm),
-	comment(comm),
-	namePtr(NULL),
-	commentPtr(NULL)
-{
-	if (!img.empty()) image.reset(new Surface(getThemePath(img)));
-}
-
-MenuOption::MenuOption(const std::string& nm, const std::string& comm, MenuOptionCallback callback, void* data):
-	type(CALLBACK),
-	value(NULL),
-	newValue(),
-	callback(callback),
-	callbackData(data),
-	name(nm),
-	comment(comm),
-	namePtr(NULL),
-	commentPtr(NULL)
-{}
-
 
 std::string MenuOption::getName() const {
 	if (namePtr) return *namePtr;
-	else if (!name.empty()) return name;
-	else if (value) return value->getValue();
-	else return "";
+	if (!name.empty()) return name;
+	if (value) return value->getValue();
+	return "";
 }
 
-const std::string& MenuOption::getComment() const {
-	if (commentPtr) return *commentPtr;
-	else return comment;
-}
+const std::string& MenuOption::getComment() const { return commentPtr ? *commentPtr : comment; }
 
 bool MenuOption::isActive() const {
 	if (type == OPEN_SUBMENU && options.empty()) return false;
-	else if (type == CHANGE_VALUE) {
+	if (type == CHANGE_VALUE) {
 		if (!value) return false;
-		if (value->get_type() == "option_list" && value->ol().size() <= 1)
-			return false;
+		if (value->get_type() == "option_list" && value->ol().size() <= 1) return false;
 	}
 	return true;
 }
 
 
-
-Menu::Menu():
-	dimensions(),
-	m_open(true)
-{
-	clear();
-}
+Menu::Menu(): dimensions(), m_open(true) { clear(); }
 
 void Menu::add(MenuOption opt) {
 	root_options.push_back(opt);
@@ -124,8 +40,7 @@ void Menu::move(int dir) {
 }
 
 void Menu::select(unsigned sel) {
-	if (sel < menu_stack.back()->size())
-		selection_stack.back() = sel;
+	if (sel < menu_stack.back()->size()) selection_stack.back() = sel;
 }
 
 void Menu::action(int dir) {
@@ -160,7 +75,7 @@ void Menu::action(int dir) {
 			break;
 		}
 		case MenuOption::CALLBACK: {
-			if (current().callback) current().callback(*this, current().callbackData);
+			if (current().callback) current().callback();
 			break;
 		}
 	}

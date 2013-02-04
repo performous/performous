@@ -1,9 +1,10 @@
 #pragma once
 
+#include "surface.hh"
 #include "util.hh"
 #include "libda/sample.hpp"
 #include <boost/circular_buffer.hpp>
-#include <boost/ptr_container/ptr_set.hpp>
+#include <boost/ptr_container/ptr_deque.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/thread/mutex.hpp>
@@ -27,84 +28,47 @@ struct AudioFrame {
 	AudioFrame(): timestamp(getInf()) {} // EOF marker
 };
 
-/// single video frame
-struct VideoFrame {
-	/// timestamp of video frame
-	double timestamp;
-	int width,  ///< width of frame
-	    height; ///< height of frame
-	/// data array
-	std::vector<uint8_t> data;
-	/// constructor
-	VideoFrame(double ts, int w, int h): timestamp(ts), width(w), height(h) {}
-	VideoFrame(): timestamp(getInf()), width(), height() {} // EOF marker
-	/// swaps to VideoFrames
-	void swap(VideoFrame& f) {
-		std::swap(timestamp, f.timestamp);
-		data.swap(f.data);
-		std::swap(width, f.width);
-		std::swap(height, f.height);
-	}
-};
-
-static bool operator<(VideoFrame const& a, VideoFrame const& b) {
-	return a.timestamp < b.timestamp;
-}
-
-/// video queue: first in first out
+/// Video queue
 class VideoFifo {
   public:
-	VideoFifo(): m_available(), m_timestamp(), m_eof() {}
-	/// trys to pop a VideoFrame from queue
-	bool tryPop(VideoFrame& f) {
+	VideoFifo(): m_timestamp(), m_eof() {}
+	/// trys to pop a video frame from queue
+	bool tryPop(Bitmap& f) {
 		boost::mutex::scoped_lock l(m_mutex);
-		if (!m_queue.empty() && m_queue.begin()->data.empty()) { m_eof = true; return false; }
-		statsUpdate();
-		if (m_available == 0) return false; // Nothing to deliver
+		if (m_queue.empty()) return false; // Nothing to deliver
+		if (m_queue.begin()->buf.empty()) { m_eof = true; return false; }
 		f.swap(*m_queue.begin());
-		m_queue.erase(m_queue.begin());
+		m_queue.pop_front();
 		m_cond.notify_all();
 		m_timestamp = f.timestamp;
-		statsUpdate();
 		return true;
 	}
-	/// pushes VideoFrames to queue
-	void push(VideoFrame* f) {
+	/// Add frame to queue
+	void push(Bitmap* f) {
 		boost::mutex::scoped_lock l(m_mutex);
 		while (m_queue.size() > m_max) m_cond.wait(l);
 		if (m_queue.empty()) m_timestamp = f->timestamp;
-		m_queue.insert(f);
-		statsUpdate();
+		m_queue.push_back(f);
 	}
-	/// updates stats
-	void statsUpdate() {
-		m_available = std::max(0, int(m_queue.size()) - int(m_min));
-		if (m_available == 0 && !m_queue.empty() && m_queue.rbegin()->data.empty()) m_available = m_queue.size() - 1;
-	}
-	/// resets video queue
+	/// Clear and unlock the queue
 	void reset() {
 		boost::mutex::scoped_lock l(m_mutex);
 		m_queue.clear();
 		m_cond.notify_all();
-		statsUpdate();
 		m_eof = false;
 	}
-	/// returns current position
+	/// Returns the current position (seconds)
 	double position() const { return m_timestamp; }
-	/// returns m_available / m_max
-	double percentage() const { return double(m_available) / m_max; }
-	/// simple eof check
+	/// Tests if EOF has already been reached
 	double eof() const { return m_eof; }
 
   private:
-	boost::ptr_set<VideoFrame> m_queue;
+	boost::ptr_deque<Bitmap> m_queue;
 	mutable boost::mutex m_mutex;
 	boost::condition m_cond;
-	volatile unsigned m_available;
 	double m_timestamp;
 	bool m_eof;
-	static const unsigned m_min = 16; // H.264 may have 16 consecutive B frames
-	static const unsigned m_max = 50;
+	static const unsigned m_max = 20;
 };
 
 class AudioBuffer {
@@ -195,7 +159,6 @@ class AudioBuffer {
 
 // ffmpeg forward declarations
 extern "C" {
-  struct AVCodec;
   struct AVCodecContext;
   struct AVFormatContext;
   struct AVFrame;
@@ -206,8 +169,8 @@ extern "C" {
 /// ffmpeg class
 class FFmpeg {
   public:
-	/// constructor
-	FFmpeg(bool decodeVideo, bool decodeAudio, std::string const& file, unsigned int rate = 48000);
+	/// Decode file; if no rate is specified, decode video, otherwise decode audio.
+	FFmpeg(std::string const& file, unsigned int rate = 0);
 	~FFmpeg();
 	void operator()(); ///< Thread runs here, don't call directly
 	unsigned width, ///< width of video
@@ -220,8 +183,6 @@ class FFmpeg {
 	void seek(double time, bool wait = true);
 	/// duration
 	double duration() const;
-	/// return current position
-	double position() { return videoQueue.position(); /* FIXME: remove */ }
 	bool terminating() const { return m_quit; }
 
 	class eof_error: public std::exception {};
@@ -234,16 +195,14 @@ class FFmpeg {
 	std::string m_filename;
 	unsigned int m_rate;
 	volatile bool m_quit;
-	volatile bool m_running;
-	volatile bool m_eof;
 	volatile double m_seekTarget;
 	double m_position;
+	double m_duration;
 	// libav-specific variables
 	int m_streamId;
 	int m_mediaType;  // enum AVMediaType
 	AVFormatContext* m_formatContext;
 	AVCodecContext* m_codecContext;
-	AVCodec* m_codec;
 	ReSampleContext* m_resampleContext;
 	SwsContext* m_swsContext;
 	// Make sure the thread starts only after initializing everything else
