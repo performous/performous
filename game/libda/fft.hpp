@@ -4,7 +4,7 @@
  * @file fft.hpp FFT and related facilities.
  */
 
-#include <cmath>
+#include "sample.hpp"
 #include <complex>
 #include <cstddef>
 #include <vector>

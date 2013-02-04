@@ -1,15 +1,16 @@
 #pragma once
 
+#include <cmath>
+
 /**
  * @file sample.hpp Sample format definition and format conversions.
  */
 
 namespace da {
 
-	// Implement mathematical rounding (which C++ unfortunately currently lacks)
-	template <typename T> T round(T val) { return static_cast<T>(static_cast<int>(val + (val >= 0 ? 0.5 : -0.5))); }
-
-	// WARNING: changing this breaks binary compatibility on the library!
+	using std::round;
+	
+	// Should be a floating-point type
 	typedef float sample_t;
 
 	// A helper function for clamping a value to a certain range
@@ -19,9 +20,23 @@ namespace da {
 		return val;
 	}
 
-	const sample_t max_s16 = 32767.0f, min_s16 = -max_s16 - 1.0f;
-	const sample_t max_s24 = 8388607.0f, min_s24 = -max_s24 - 1.0f;
-	const sample_t max_s32 = 2147483647.0f, min_s32= -max_s32 - 1.0f;
+	constexpr sample_t max_s16(32767), min_s16 = -max_s16 - sample_t(1);
+	constexpr sample_t max_s24(8388607), min_s24 = -max_s24 - sample_t(1);
+	constexpr sample_t max_s32(2147483647), min_s32= -max_s32 - sample_t(1);
+	constexpr double tau(6.2831853071795864769252867665590057683943387987502116);  ///< One full circle
+	constexpr double pi = tau / sample_t(2);  ///< Half circle
+	constexpr double eps(1e-10);  ///< Tiny positive value
+	
+	/// Mathematical sinc function
+	template<typename Float> static inline Float msinc(Float x) { return std::abs(x) < Float(eps) ? Float(1) : std::sin(x) / x; }
+	
+	/// Normalized (signal processing) sinc function
+	template<typename Float> static inline Float sinc(Float x) { return msinc(Float(pi) * x); }
+	
+	/// Lanczos kernel of size A
+	template<unsigned A, typename Float> static inline Float lanc(Float x) {
+		return std::abs(x) < A ? sinc(x) * sinc(x / A) : Float();
+	}
 
 	// The following conversions provide lossless conversions between floats
 	// and integers. Be sure to use only these conversions or otherwise the
