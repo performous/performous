@@ -115,6 +115,8 @@ private:
 	const std::size_t m_step;
 	RingBuffer<2 * FFT_N> m_buf;  // Twice the FFT size should give enough room for sliding window and for engine delays
 	RingBuffer<4096> m_passthrough;
+	double m_resampleFactor;
+	double m_resamplePos;
 	double m_rate;
 	std::string m_id;
 	std::vector<float> m_window;

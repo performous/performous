@@ -33,6 +33,8 @@ bool Tone::operator==(double f) const {
 
 Analyzer::Analyzer(double rate, std::string id, std::size_t step):
   m_step(step),
+  m_resampleFactor(1.0),
+  m_resamplePos(),
   m_rate(rate),
   m_id(id),
   m_window(FFT_N),
@@ -48,15 +50,33 @@ Analyzer::Analyzer(double rate, std::string id, std::size_t step):
 }
 
 void Analyzer::output(float* begin, float* end) {
-	const unsigned n = (end - begin) / 2 /* stereo */;
-	if (n > m_passthrough.size()) return;
+	constexpr unsigned a = 2;
+	const unsigned size = m_passthrough.size();
+	const unsigned out = (end - begin) / 2 /* stereo */;
+	if (out == 0) return;
+	const unsigned in = m_resampleFactor * out + 2 * a + 5;
 	float pcm[m_passthrough.capacity];
-	m_passthrough.read(pcm, pcm + n);
-	m_passthrough.pop(n);
-	for (unsigned i = 0; i < n; ++i) {
-		float s = 5.0 * pcm[i];
+	m_passthrough.read(pcm, pcm + in + 4);
+	for (unsigned i = 0; i < out; ++i) {
+		double s = 0.0;
+		unsigned k = m_resamplePos;
+		double x = m_resamplePos - k;
+		// Lanczos sampling of input at m_resamplePos
+		for (unsigned j = 0; j <= 2 * a; ++j) s += pcm[k + j] * da::lanc<a>(x - j + a);
+		s *= 5.0;
 		begin[i * 2] += s;
 		begin[i * 2 + 1] += s;
+		m_resamplePos += m_resampleFactor;
+	}
+	unsigned num = m_resamplePos;
+	m_resamplePos -= num;
+	if (size > 3000) {
+		// Reset
+		m_passthrough.pop(m_passthrough.size() - 700);
+		m_resampleFactor = 1.0;
+	} else {
+		m_passthrough.pop(num);
+		m_resampleFactor = 0.99 * m_resampleFactor + 0.01 * (size > 700 ? 1.02 : 0.98);
 	}
 }
 
