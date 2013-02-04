@@ -1,21 +1,21 @@
 #pragma once
 
+#include "color.hh"
+#include "controllers.hh"
+#include "fs.hh"
+#include "hiscore.hh"
+#include "players.hh"
+#include "songitems.hh"
 #include <string>
 #include <ostream>
 
-#include "players.hh"
-#include "hiscore.hh"
-#include "songitems.hh"
-#include "color.hh"
-#include "fs.hh"
-
 struct ScoreItem {
 	int score;
-	enum Type { SINGER, INSTRUMENT, DANCER } type;
-	std::string track; // includes difficulty
-	std::string track_simple; // no difficulty
+	input::DevType type;
+	std::string track;  ///< includes difficulty
+	std::string track_simple; ///< no difficulty
 	Color color;
-	bool operator < (ScoreItem const& other) const { return score < other.score; }
+	bool operator<(ScoreItem const& other) const { return score < other.score; }
 };
 
 /**Access to a database for performous which holds
@@ -31,19 +31,18 @@ struct ScoreItem {
   to pass the information which players have won
   to the ScoreScreen and then to the players window.
  */
-class Database
-{
-  public:
+class Database {
+public:
 	/**Will try to load the database.
 	  If it does not succeed the error will be ignored.
 	  Only some information will be printed on stderr.
 	  */
-	Database (fs::path filename);
+	Database(fs::path const& filename);
 	/**Will try to save the database.
 	  This will even be done if the loading failed.
 	  It tries to create the directory above the file.
 	  */
-	~Database ();
+	~Database();
 
 	/**Loads the whole database from xml.
 	  @exception bad_cast may be thrown if xml element is not of correct type
@@ -59,11 +58,6 @@ class Database
 	*/
 	void save();
 
-	/**The filename given by the constructor.
-	  @returns the filename used for the database.
-	  */
-	std::string file();
-
 	friend class ScreenHiscore;
 	friend class ScreenPlayers;
 	friend class ScreenSing;
@@ -71,7 +65,7 @@ class Database
 	friend class LayoutSinger;
 	friend class NoteGraph;
 	friend class Engine;
-  private: // will be bypassed by above friend declaration
+private: // will be bypassed by above friend declaration
 	typedef std::list<Player> cur_players_t;
 	typedef std::list<ScoreItem> cur_scores_t;
 
@@ -79,33 +73,33 @@ class Database
 	cur_players_t cur;
 	cur_scores_t scores;
 
-  public: // methods for database management
+public: // methods for database management
 
 	/**A facade for Players::addPlayer.*/
-	void addPlayer (std::string const& name, std::string const& picture = "", int id = -1);
+	void addPlayer(std::string const& name, std::string const& picture = "", int id = -1);
 	/**A facade for SongItems::addSong.*/
-	void addSong (boost::shared_ptr<Song> s);
+	void addSong(boost::shared_ptr<Song> s);
 	/**A facade for Hiscore::addHiscore.
 	 The ids will be looked up first by using the songs and current players data.
 	 */
-	void addHiscore (boost::shared_ptr<Song> s);
+	void addHiscore(boost::shared_ptr<Song> s);
 
-  public: // methods for database queries
+public: // methods for database queries
 	/**A facade for Hiscore::reachedHiscore.
 	  Queries if the current player with current score has reached a new hiscore
 	  for the song s.
 	 */
-	bool reachedHiscore (boost::shared_ptr<Song> s) const;
+	bool reachedHiscore(boost::shared_ptr<Song> s) const;
 
-	void queryOverallHiscore (std::ostream & os, std::string const& track = "") const;
-	void queryPerSongHiscore (std::ostream & os, boost::shared_ptr<Song> s, std::string const& track = "") const;
-	void queryPerSongHiscore_HiscoreDisplay (std::ostream & os, boost::shared_ptr<Song> s, int& start_pos, unsigned max_displayed, std::string const& track = "") const;
-	void queryPerPlayerHiscore (std::ostream & os, std::string const& track = "") const;
+	void queryOverallHiscore(std::ostream & os, std::string const& track = "") const;
+	void queryPerSongHiscore(std::ostream & os, boost::shared_ptr<Song> s, std::string const& track = "") const;
+	void queryPerSongHiscore_HiscoreDisplay(std::ostream & os, boost::shared_ptr<Song> s, int& start_pos, unsigned max_displayed, std::string const& track = "") const;
+	void queryPerPlayerHiscore(std::ostream & os, std::string const& track = "") const;
 
 	bool hasHiscore(Song& s) const;
 	bool noPlayers() const;
 
-  private:
+private:
 	fs::path m_filename;
 
 	Players m_players;

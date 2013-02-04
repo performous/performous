@@ -549,7 +549,6 @@ void ScreenSing::drawMenu() {
 }
 
 
-
 ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
   m_database(database),
   m_pos(0.8, 2.0),
@@ -563,7 +562,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 	m_database.scores.clear();
 	// Singers
 	for (std::list<Player>::iterator p = m_database.cur.begin(); p != m_database.cur.end();) {
-		ScoreItem item; item.type = ScoreItem::SINGER;
+		ScoreItem item; item.type = input::DEVTYPE_VOCALS;
 		item.score = p->getScore();
 		if (item.score < 500) { p = m_database.cur.erase(p); continue; } // Dead
 		item.track = "Vocals"; // For database
@@ -576,7 +575,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 	// Instruments
 	for (Instruments::iterator it = instruments.begin(); it != instruments.end();) {
 		ScoreItem item;
-		item.type = it->getGraphType() == input::DEVTYPE_DANCEPAD ? ScoreItem::DANCER : ScoreItem::INSTRUMENT;
+		item.type = it->getGraphType();
 		item.score = it->getScore();
 		if (item.score < 100) { it = instruments.erase(it); continue; } // Dead
 		item.track_simple = it->getTrack();
@@ -594,18 +593,16 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 		m_rank = _("No player!");
 	else {
 		// Determine winner
-		ScoreItem winner = m_database.scores.front();
-		for (Database::cur_scores_t::const_iterator it = m_database.scores.begin(); it != m_database.scores.end(); ++it)
-			if (it->score > winner.score) winner = *it;
+		ScoreItem winner = *std::min_element(m_database.scores.begin(), m_database.scores.end());  // Note: best score comes first
 		int topScore = winner.score;
 		// Determine rank
-		if (winner.type == ScoreItem::SINGER) {
+		if (winner.type == input::DEVTYPE_VOCALS) {
 			if (topScore > 8000) m_rank = _("Hit singer");
 			else if (topScore > 6000) m_rank = _("Lead singer");
 			else if (topScore > 4000) m_rank = _("Rising star");
 			else if (topScore > 2000) m_rank = _("Amateur");
 			else m_rank = _("Tone deaf");
-		} else if (winner.type == ScoreItem::DANCER) {
+		} else if (winner.type == input::DEVTYPE_DANCEPAD) {
 			if (topScore > 8000) m_rank = _("Maniac");
 			else if (topScore > 6000) m_rank = _("Hoofer");
 			else if (topScore > 4000) m_rank = _("Rising star");
