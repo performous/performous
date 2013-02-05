@@ -198,7 +198,7 @@
 		</controller>
 		<controller type="dancepad" name="DANCEPAD_GENERIC">
 			<description>Generic dancepad</description>
-			<device regex="Dance mat|RedOctane USB Pad|Redoctane XBOX DDR|Positive Gaming Impact USB pad" />
+			<device regex="Dance mat|RedOctane USB Pad|Redoctane XBOX DDR|Positive Gaming Impact USB pad|WiseGroup\.,Ltd USB Deluxe Dance Mat" />
 			<mapping>
 				<button hw="0" map="left" />
 				<button hw="1" map="down" />

@@ -17,19 +17,24 @@ to save the current settings to XML.
 	<menu>
 		<entry name="game">
 			<short>Game</short>
-			<long>Gameplay settings.</long>
+			<long>Gameplay related options</long>
 		</entry>
 		<entry name="graphic">
 			<short>Graphic</short>
-			<long>Video and rendering settings.</long>
+			<long>Configure rendering and video settings</long>
+		</entry>
+		<entry name="AudioDevices">
+			<!-- Handled internally by Performous -->
+			<short>Audio Devices</short>
+			<long>Setup microphones and playback</long>
 		</entry>
 		<entry name="audio">
 			<short>Audio</short>
-			<long>Audio-related settings.</long>
+			<long>Configure general audio settings</long>
 		</entry>
-		<entry name="paths">
+		<entry name="Paths">
 			<short>Paths</short>
-			<long>System paths.</long>
+			<long>Setup song and data paths</long>
 		</entry>
 	</menu>
 
@@ -241,6 +246,16 @@ to save the current settings to XML.
 		<limits min="0" max="100" step="5" />
 		<short>Failure volume</short>
 		<long>The ingame fail sound volume. Values above 90 are not recommended as distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!</long>
+	</entry>
+	<entry name="audio/pass-through" type="bool" value="false">
+		<short>Microphone pass-through</short>
+		<long>Send captured singing voice to speakers.</long>
+	</entry>
+	<entry name="audio/pass-through_ratio" type="float" value="2.0">
+		<ui unit=" x" />
+		<limits min="0.5" max="4.0" step="0.1" />
+		<short>Pass-through volume ratio</short>
+		<long>How much voice is amplified compared to the music.</long>
 	</entry>
 
 	<!-- Paths -->

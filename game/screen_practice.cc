@@ -67,9 +67,9 @@ void ScreenPractice::draw() {
 void ScreenPractice::draw_analyzers() {
 	theme->note.dimensions.fixedHeight(0.03f);
 	theme->sharp.dimensions.fixedHeight(0.09f);
-	MusicalScale scale;
 	boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
 	if (analyzers.empty()) return;
+	MusicalScale scale;
 	double textPower = -getInf();
 	double textFreq = 0.0;
 
@@ -92,19 +92,15 @@ void ScreenPractice::draw_analyzers() {
 
 			for (Analyzer::tones_t::const_iterator t = tones.begin(); t != tones.end(); ++t) {
 				if (t->age < Tone::MINAGE) continue;
-				int note = scale.getNoteId(t->freq);
-				if (note < 0) continue;
-				int octave = note / 12 - 1;
-				double noteOffset = scale.getNoteNum(note);
-				bool sharp = scale.isSharp(note);
-				noteOffset += (octave - 3) * 7;
-				noteOffset += 0.4 * scale.getNoteOffset(t->freq);
-				float posXnote = -0.25 + 0.2 * i + 0.002 * t->stabledb;
-				float posYnote = .075-noteOffset*0.015;
+				if (!scale.setFreq(t->freq).isValid()) continue;
+				double line = scale.getNoteLine() + 0.4 * scale.getNoteOffset();
+				float posXnote = -0.25 + 0.2 * i + 0.002 * t->stabledb;  // Wiggle horizontally based on volume
+				float posYnote = -0.03 - line * 0.015;  // On treble key (C4), plus offset (lines)
 
 				theme->note.dimensions.left(posXnote).center(posYnote);
 				theme->note.draw();
-				if (sharp) {
+				// Draw # for sharp notes
+				if (scale.isSharp()) {
 					theme->sharp.dimensions.right(posXnote).center(posYnote);
 					theme->sharp.draw();
 				}
@@ -112,5 +108,5 @@ void ScreenPractice::draw_analyzers() {
 		}
 	}
 	// Display note and frequency
-	if (textFreq > 0.0) theme->note_txt.draw(scale.getNoteStr(textFreq));
+	if (textFreq > 0.0) theme->note_txt.draw(scale.setFreq(textFreq).getStr());
 }

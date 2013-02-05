@@ -1,42 +1,23 @@
 #pragma once
 
 #include <set>
+#include <string>
 #include <vector>
-#include <stdexcept>
 
-namespace xmlpp { class Node; class Element; typedef std::vector<Node*>NodeSet; }
+namespace xmlpp { class Node; class Element; typedef std::vector<Node*> NodeSet; }
 
-/**Exception which will be thrown when loading or
-  saving a SongHiscore fails.*/
-struct HiscoreException: public std::runtime_error {
-	HiscoreException (std::string const& msg) :
-		runtime_error(msg)
-	{}
-};
-
-/**This struct holds together information for a
-  single item of a highscore.*/
+/// This struct holds together information for a single item of a highscore.
 struct HiscoreItem {
-	int score;
-
-	int playerid;
-	int songid;
-
+	unsigned score, playerid, songid;
 	std::string track;
-
-	/**Operator for sorting by score.
-	 Reverse order, so that highest is first!*/
-	bool operator < (HiscoreItem const& other) const
-	{
-		return other.score < score;
-	}
+	HiscoreItem(unsigned score, unsigned playerid, unsigned songid, std::string const& track):
+	  score(score), playerid(playerid), songid(songid), track(track) {}
+	/// Operator for sorting by score. Reverse order, so that highest is first!
+	bool operator<(HiscoreItem const& other) const { return other.score < score; }
 };
 
-class Hiscore
-{
-  public:
-	Hiscore ();
-
+class Hiscore {
+public:
 	void load(xmlpp::NodeSet const& n);
 	void save(xmlpp::Element *players);
 
@@ -51,7 +32,7 @@ class Hiscore
 	  @return true if the score make it into the top.
 	  @return false if addNewHiscore does not make sense
 	    for that score.*/
-	bool reachedHiscore(int score, int songid, std::string const& track = "vocals") const;
+	bool reachedHiscore(unsigned score, unsigned songid, std::string const& track) const;
 
 	/**Add a specific highscore into the list.
 
@@ -64,17 +45,15 @@ class Hiscore
 	  in its valid interval. If one of this conditions is not net a
 	  HiscoreException will be raised.
 	  */
-	void addHiscore(int score, int playerid, int songid, std::string const& track = "vocals");
+	void addHiscore(unsigned score, unsigned playerid, unsigned songid, std::string const& track);
 
 	typedef std::vector<HiscoreItem> HiscoreVector;
-	/**This queries the database for a sorted vector of highscores.
-	  The defaults mean to query everything.
-	  @param max limits the number of elements returned.
-	 */
-	HiscoreVector queryHiscore(int max = -1, int playerid = -1, int songid = -1, std::string const& track = "") const;
-	bool hasHiscore(int songid) const;
-  private:
-	typedef std::multiset<HiscoreItem>hiscore_t;
 
+	/// This queries the database for a sorted vector of highscores. The defaults mean to query everything.
+	/// @param max limits the number of elements returned.
+	HiscoreVector queryHiscore(unsigned max, unsigned playerid, unsigned songid, std::string const& track) const;
+	bool hasHiscore(unsigned songid) const;
+private:
+	typedef std::multiset<HiscoreItem> hiscore_t;
 	hiscore_t m_hiscore;
 };

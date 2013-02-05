@@ -27,6 +27,7 @@ class SongParser {
 	SongParser(Song& s);
   private:
 	void finalize();
+	void vocalsTogether();
 
 	Song& m_song;
 	std::stringstream m_ss;
