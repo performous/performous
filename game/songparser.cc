@@ -127,10 +127,48 @@ void SongParser::resetNoteParsingState() {
 	if (m_bpm != 0.0) addBPM(0, m_bpm);
 }
 
+void SongParser::vocalsTogether() {
+	VocalTracks::iterator togetherIt = m_song.vocalTracks.find("Together");
+	if (togetherIt == m_song.vocalTracks.end()) return;
+	Notes& together = togetherIt->second.notes;
+	if (!together.empty()) return;
+	Notes notes;
+	// Collect usable vocal tracks
+	struct TrackInfo {
+		typedef Notes::const_iterator It;
+		It it, end;
+		TrackInfo(It begin, It end): it(begin), end(end) {}
+	};
+	std::vector<TrackInfo> tracks;
+	for (auto& nt: m_song.vocalTracks) {
+		Notes& n = nt.second.notes;
+		if (!n.empty()) tracks.push_back(TrackInfo(n.begin(), n.end()));
+	}
+	if (tracks.empty()) return;
+	// Combine notes
+	// FIXME: This should do combining on sentence level rather than note-by-note
+	TrackInfo* trk = &tracks.front();
+	while (trk) {
+		Note const& n = *trk->it;
+		std::cerr << " " << n.syllable << ": " << n.begin << "-" << n.end << std::endl;
+		notes.push_back(n);
+		++trk->it;
+		trk = NULL;
+		// Iterate all tracks past the processed note and find the new earliest track
+		for (TrackInfo& trk2: tracks) {
+			// Skip until a sentence that begins after the note ended
+			while (trk2.it != trk2.end && trk2.it->begin < n.end) ++trk2.it;
+			if (trk2.it == trk2.end) continue;
+			if (!trk || trk2.it->begin < trk->it->begin) trk = &trk2;
+		}
+	}
+	together.swap(notes);
+}
+
 void SongParser::finalize() {
-	std::vector<std::string> tracks = m_song.getVocalTrackNames();
-	for(std::vector<std::string>::const_iterator it = tracks.begin() ; it != tracks.end() ; ++it) {
-		VocalTrack& vocal = m_song.getVocalTrack(*it);
+	vocalsTogether();
+	for (auto& nt: m_song.vocalTracks) {
+		VocalTrack& vocal = nt.second;
 		// Remove empty sentences
 		{
 			Note::Type lastType = Note::NORMAL;
@@ -157,6 +195,7 @@ void SongParser::finalize() {
 		}
 		// Set begin/end times
 		if (!vocal.notes.empty()) vocal.beginTime = vocal.notes.front().begin, vocal.endTime = vocal.notes.back().end;
+		else vocal.beginTime = vocal.endTime = 0.0;
 		// Compute maximum score
 		double max_score = 0.0;
 		for (Notes::iterator itn = vocal.notes.begin(); itn != vocal.notes.end(); ++itn) {

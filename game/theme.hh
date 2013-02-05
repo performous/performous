@@ -93,7 +93,8 @@ public:
 };
 
 /// theme for instrument menu
-struct ThemeInstrumentMenu: Theme {
+class ThemeInstrumentMenu: public Theme {
+public:
 	ThemeInstrumentMenu();
 	/// back highlight for selected option
 	Surface back_h;

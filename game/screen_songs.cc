@@ -1,12 +1,15 @@
 #include "screen_songs.hh"
 
-#include "screen_sing.hh"
-#include "configuration.hh"
-#include "hiscore.hh"
-#include "util.hh"
-#include "songs.hh"
 #include "audio.hh"
+#include "configuration.hh"
+#include "database.hh"
+#include "hiscore.hh"
 #include "i18n.hh"
+#include "screen_sing.hh"
+#include "songs.hh"
+#include "theme.hh"
+#include "util.hh"
+
 #include <iostream>
 #include <sstream>
 #include <boost/format.hpp>

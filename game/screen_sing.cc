@@ -1,16 +1,20 @@
 #include "screen_sing.hh"
 
+#include "backgrounds.hh"
+#include "dancegraph.hh"
+#include "database.hh"
+#include "engine.hh"
+#include "fs.hh"
+#include "glutil.hh"
+#include "guitargraph.hh"
+#include "i18n.hh"
+#include "layout_singer.hh"
+#include "menu.hh"
+#include "screen_players.hh"
 #include "songparser.hh"
 #include "util.hh"
-#include "screen_players.hh"
-#include "fs.hh"
-#include "database.hh"
 #include "video.hh"
-#include "guitargraph.hh"
-#include "dancegraph.hh"
-#include "glutil.hh"
-#include "i18n.hh"
-#include "menu.hh"
+#include "webcam.hh"
 
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
@@ -27,11 +31,11 @@ namespace {
 		ScreenManager* sm = ScreenManager::getSingletonPtr();
 		sm->flashMessage(ci.getShortDesc() + ": " + ci.getValue());
 	}
+}
 
-	void startSingingCallback(Menu&, void* screenSing) {
-		ScreenSing* ss = static_cast<ScreenSing*>(screenSing);
-		ss->setupVocals();
-	}
+ScreenSing::ScreenSing(std::string const& name, Audio& audio, Database& database, Backgrounds& bgs):
+	  Screen(name), m_audio(audio), m_database(database), m_backgrounds(bgs),
+	  m_selectedTrack(TrackName::LEAD_VOCAL) {
 }
 
 void ScreenSing::enter() {
@@ -70,13 +74,13 @@ void ScreenSing::enter() {
 		VocalTracks const& tracks = m_song->vocalTracks;
 		unsigned players = analyzers.size();
 		m_menu.clear();
-		m_menu.add(MenuOption(_("Start"), _("Start performing"), &startSingingCallback, (void*)this));
+		m_menu.add(MenuOption(_("Start"), _("Start performing")).call(std::bind(&ScreenSing::setupVocals, this)));
 		m_duet = ConfigItem(0);
 		if (players == 0) players = 1;  // No mic? We display lyrics anyway
 		if (players > 1) { // Duet toggle
 			m_duet.addEnum(_("Duet mode"));
 			m_duet.addEnum(_("Normal mode"));
-			m_menu.add(MenuOption("", _("Switch between duet and regular singing mode"), &m_duet));
+			m_menu.add(MenuOption("", _("Switch between duet and regular singing mode")).changer(m_duet));
 		}
 		for (unsigned player = 0; player < players; ++player) {
 			ConfigItem& vocalTrack = m_vocalTracks[player];
@@ -85,9 +89,9 @@ void ScreenSing::enter() {
 				vocalTrack.addEnum(it->second.name);
 			}
 			if (tracks.size() > 1 && player % 2) ++vocalTrack;  // Every other player gets the second track
-			m_menu.add(MenuOption("", _("Change vocal track"), &vocalTrack));
+			m_menu.add(MenuOption("", _("Change vocal track")).changer(vocalTrack));
 		}
-		m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
+		m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).screen("Songs"));
 		m_menu.open();
 		if (tracks.size() <= 1) setupVocals();  // No duet menu
 	}
@@ -112,7 +116,7 @@ void ScreenSing::setupVocals() {
 			m_layout_singer.push_back(new LayoutSinger(**it, m_database, theme));
 		}
 		// Note: Engine maps tracks with analyzers 1:1. If user doesn't have mics, we still want to have singer layout enabled but without engine...
-		if (!analyzers.empty()) m_engine.reset(new Engine(m_audio, selectedTracks, analyzers.begin(), analyzers.end(), m_database));
+		if (!analyzers.empty()) m_engine.reset(new Engine(m_audio, selectedTracks, m_database));
 	}
 	createPauseMenu();
 	m_audio.pause(false);
@@ -121,8 +125,8 @@ void ScreenSing::setupVocals() {
 void ScreenSing::createPauseMenu() {
 	m_menu.clear();
 	m_menu.add(MenuOption(_("Resume"), _("Back to performing!")));
-	m_menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning"), "Sing"));
-	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"), "Songs"));
+	m_menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning")).screen("Sing"));
+	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).screen("Songs"));
 	m_menu.close();
 }
 
@@ -545,7 +549,6 @@ void ScreenSing::drawMenu() {
 }
 
 
-
 ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
   m_database(database),
   m_pos(0.8, 2.0),
@@ -559,7 +562,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 	m_database.scores.clear();
 	// Singers
 	for (std::list<Player>::iterator p = m_database.cur.begin(); p != m_database.cur.end();) {
-		ScoreItem item; item.type = ScoreItem::SINGER;
+		ScoreItem item; item.type = input::DEVTYPE_VOCALS;
 		item.score = p->getScore();
 		if (item.score < 500) { p = m_database.cur.erase(p); continue; } // Dead
 		item.track = "Vocals"; // For database
@@ -572,7 +575,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 	// Instruments
 	for (Instruments::iterator it = instruments.begin(); it != instruments.end();) {
 		ScoreItem item;
-		item.type = it->getGraphType() == input::DEVTYPE_DANCEPAD ? ScoreItem::DANCER : ScoreItem::INSTRUMENT;
+		item.type = it->getGraphType();
 		item.score = it->getScore();
 		if (item.score < 100) { it = instruments.erase(it); continue; } // Dead
 		item.track_simple = it->getTrack();
@@ -590,18 +593,16 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 		m_rank = _("No player!");
 	else {
 		// Determine winner
-		ScoreItem winner = m_database.scores.front();
-		for (Database::cur_scores_t::const_iterator it = m_database.scores.begin(); it != m_database.scores.end(); ++it)
-			if (it->score > winner.score) winner = *it;
+		ScoreItem winner = *std::min_element(m_database.scores.begin(), m_database.scores.end());  // Note: best score comes first
 		int topScore = winner.score;
 		// Determine rank
-		if (winner.type == ScoreItem::SINGER) {
+		if (winner.type == input::DEVTYPE_VOCALS) {
 			if (topScore > 8000) m_rank = _("Hit singer");
 			else if (topScore > 6000) m_rank = _("Lead singer");
 			else if (topScore > 4000) m_rank = _("Rising star");
 			else if (topScore > 2000) m_rank = _("Amateur");
 			else m_rank = _("Tone deaf");
-		} else if (winner.type == ScoreItem::DANCER) {
+		} else if (winner.type == input::DEVTYPE_DANCEPAD) {
 			if (topScore > 8000) m_rank = _("Maniac");
 			else if (topScore > 6000) m_rank = _("Hoofer");
 			else if (topScore > 4000) m_rank = _("Rising star");
@@ -641,3 +642,6 @@ void ScoreWindow::draw() {
 	m_score_rank.draw(m_rank);
 }
 
+bool ScoreWindow::empty() {
+	return m_database.scores.empty();
+}

@@ -4,6 +4,7 @@
 #include "configuration.hh"
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -13,58 +14,56 @@ class Menu;
 
 typedef std::vector<MenuOption> MenuOptions;
 typedef std::vector<MenuOptions*> SubmenuStack;
-typedef void (*MenuOptionCallback)(Menu&, void*);
+typedef std::function<void ()> MenuOptionCallback;
+typedef boost::shared_ptr<Surface> MenuImage;
 
 /// Struct for menu options
 class MenuOption {
-  public:
+public:
 	enum Type { CLOSE_SUBMENU, OPEN_SUBMENU, CHANGE_VALUE, SET_AND_CLOSE, ACTIVATE_SCREEN, CALLBACK } type;
 
-	/// Construct a submenu closer
-	MenuOption(const std::string& nm, const std::string& comm);
-	/// Construct a value changer
-	MenuOption(const std::string& nm, const std::string& comm, ConfigItem* val);
-	/// Construct a value setter
-	MenuOption(const std::string& nm, const std::string& comm, ConfigItem* val, ConfigItem newval);
-	/// Construct a submenu opener
-	MenuOption(const std::string& nm, const std::string& comm, MenuOptions opts, const std::string& img = "");
-	/// Construct a screen changer
-	MenuOption(const std::string& nm, const std::string& comm, const std::string& scrn, const std::string& img = "");
-	/// Construct a callback option
-	MenuOption(const std::string& nm, const std::string&, MenuOptionCallback callback, void* data);
+	/// Construct a menu option. Default function is to close the menu.
+	/// @param nm Name (menu item title)
+	/// @param comm Comment
+	/// @param img Image filename
+	MenuOption(const std::string& nm, const std::string& comm, MenuImage img = MenuImage());
+
+	/// Make the option change values of a ConfigItem.
+	MenuOption& changer(ConfigItem& val) { type = CHANGE_VALUE; value = &val; return *this; }
+	/// Make the option set a given value for ConfigItem and close the menu.
+	MenuOption& setter(ConfigItem& val, ConfigItem newval) { type = SET_AND_CLOSE; value = &val; newValue = newval; return *this; }
+	/// Make the option open a submenu
+	MenuOption& submenu(MenuOptions opts) { type = OPEN_SUBMENU; options = opts; return *this; }
+	/// Make the option activate a screeen
+	MenuOption& screen(std::string const& scrn) { type = ACTIVATE_SCREEN; newValue = scrn; return *this; }
+	/// Make the option call a callback
+	MenuOption& call(MenuOptionCallback f) { type = CALLBACK; callback = f; return *this; }
 	/// Sets name to follow a reference
-	void setDynamicName(std::string& nm) { namePtr = &nm; }
+	MenuOption& setDynamicName(std::string& nm) { namePtr = &nm; return *this; }
 	/// Sets comment to follow a reference
-	void setDynamicComment(std::string& comm) { commentPtr = &comm; }
+	MenuOption& setDynamicComment(std::string& comm) { commentPtr = &comm; return *this; }
 	/// Return name
 	std::string getName() const;
 	/// Return comment
 	const std::string& getComment() const;
 	/// Check if this option can be selected
 	bool isActive() const;
-	/// Value
-	ConfigItem* value;
-	/// Value-to-be-set
-	ConfigItem newValue;
-	/// Submenu
-	MenuOptions options;
-	/// Image to use with option
-	boost::shared_ptr<Surface> image;
-	/// Callback
-	MenuOptionCallback callback;
-	/// User data pointer to pass to the callback
-	void* callbackData;
-  private:
-	std::string name;        /// Option name (it will be displayed as this)
-	std::string comment;     /// Extended information about the option displayed usually when selected
-	std::string* namePtr;    /// Optional pointer to dynamically changing name
-	std::string* commentPtr; /// Optional pointer to dynamically changing comment
+	ConfigItem* value;  ///< Setting to be adjusted
+	ConfigItem newValue;  ///< Value to be set or screen name
+	MenuOptions options;  ///< Submenu
+	MenuOptionCallback callback;  ///< Callback function
+	MenuImage image;  ///< Image to use with option
+private:
+	std::string name;        ///< Option name (it will be displayed as this)
+	std::string comment;     ///< Extended information about the option displayed usually when selected
+	std::string* namePtr;    ///< Optional pointer to dynamically changing name
+	std::string* commentPtr; ///< Optional pointer to dynamically changing comment
 };
 
 
 /// Menu for selecting difficulty etc.
 class Menu {
-  public:
+public:
 	/// constructor
 	Menu();
 	/// add a menu option
@@ -97,7 +96,7 @@ class Menu {
 
 	Dimensions dimensions;
 
-  private:
+private:
 	MenuOptions root_options;
 	SubmenuStack menu_stack;
 	std::vector<size_t> selection_stack;

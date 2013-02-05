@@ -74,10 +74,10 @@ void Object3d::loadWavefrontObj(std::string filepath, float scale) {
 					}
 				}
 			}
-			if (f.vertices.size() > 0 && f.vertices.size() != 3)
+			if (!f.vertices.empty() && f.vertices.size() != 3)
 				throw std::runtime_error("Only triangle faces allowed in "+filepath+":"+boost::lexical_cast<std::string>(linenumber));
 			// Face must have equal number of v, vt, vn or none of a kind
-			if (f.vertices.size() > 0
+			if (!f.vertices.empty()
 			  && (f.texcoords.empty() || (f.texcoords.size() == f.vertices.size()))
 			  && (f.normals.empty()   || (f.normals.size() == f.vertices.size()))) {
 				m_faces.push_back(f);

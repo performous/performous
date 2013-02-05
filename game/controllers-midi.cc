@@ -64,6 +64,8 @@ namespace input {
 
 #else
 
+#include "controllers.hh"
+
 namespace input {
 	Hardware::ptr constructMidi() { return Hardware::ptr(); }
 	bool Hardware::midiEnabled() { return false; }

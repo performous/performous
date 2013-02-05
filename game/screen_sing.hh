@@ -1,27 +1,30 @@
 #pragma once
 
+#include "animvalue.hh"
+#include "audio.hh" // for AUDIO_MAX_ANALYZERS
+#include "configuration.hh"
+#include "menu.hh"
+#include "opengl_text.hh"
+#include "progressbar.hh"
+#include "screen.hh"
+#include "surface.hh"
+
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <deque>
-#include "layout_singer.hh"
-#include "animvalue.hh"
-#include "engine.hh"
-#include "instrumentgraph.hh"
-#include "screen.hh"
-#include "backgrounds.hh"
-#include "theme.hh"
-#include "surface.hh"
-#include "opengl_text.hh"
-#include "progressbar.hh"
-#include "webcam.hh"
-#include "screen_players.hh"
-#include "configuration.hh"
 
-class Players;
 class Audio;
+class Backgrounds;
 class Database;
+class Engine;
+class InstrumentGraph;
+class LayoutSinger;
+class Players;
+class Song;
+class ThemeInstrumentMenu;
+class ThemeSing;
 class Video;
-class Menu;
+class Webcam;
 
 typedef boost::ptr_vector<InstrumentGraph> Instruments;
 
@@ -32,7 +35,7 @@ class ScoreWindow {
 	ScoreWindow(Instruments& instruments, Database& database);
 	/// draws ScoreWindow
 	void draw();
-	bool empty() { return m_database.scores.empty(); }
+	bool empty();
   private:
 	Database& m_database;
 	AnimValue m_pos;
@@ -47,10 +50,7 @@ class ScoreWindow {
 class ScreenSing: public Screen {
   public:
 	/// constructor
-	ScreenSing(std::string const& name, Audio& audio, Database& database, Backgrounds& bgs):
-	  Screen(name), m_audio(audio), m_database(database), m_backgrounds(bgs), m_latencyAV(),
-	  m_selectedTrack(TrackName::LEAD_VOCAL)
-	{}
+	ScreenSing(std::string const& name, Audio& audio, Database& database, Backgrounds& bgs);
 	void enter();
 	void exit();
 	void reloadGL();
@@ -93,7 +93,6 @@ class ScreenSing: public Screen {
 	boost::scoped_ptr<ThemeInstrumentMenu> m_menuTheme;
 	Menu m_menu;
 	Instruments m_instruments;
-	double m_latencyAV;  // Latency between audio and video output (do not confuse with latencyAR)
 	boost::shared_ptr<ThemeSing> theme;
 	AnimValue m_quitTimer;
 	std::string m_selectedTrack;

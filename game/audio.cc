@@ -95,8 +95,7 @@ public:
 	* @param length the duration of the current audio block
 	*/
 	void timeSync(time_duration audioPos, time_duration length) {
-		const double maxError = 0.1;  // Step the clock instead of skewing if over 100 ms off
-		const double fudgeFactor = 0.1;  // Adjustment ratio
+		constexpr double maxError = 0.1;  // Step the clock instead of skewing if over 100 ms off
 		// Full correction requires locking, but we can update max without lock too
 		boost::mutex::scoped_try_lock l(m_mutex, boost::defer_lock);
 		double max = getSeconds(audioPos + length);
@@ -106,20 +105,20 @@ public:
 		}
 		// Mutex locked - do a full update
 		ptime now = getTime();
-		double sys = pos_internal(now);  // Current position (based on system clock + corrections)
-		double audio = getSeconds(audioPos);  // Audio time
-		double diff = audio - sys;
+		const double sys = pos_internal(now);  // Current position (based on system clock + corrections)
+		const double audio = getSeconds(audioPos);  // Audio time
+		const double diff = audio - sys;
 		// Skew-based correction only if going forward and relatively well synced
 		if (max > m_max && std::abs(diff) < maxError) {
+			constexpr double fudgeFactor = 0.001;  // Adjustment ratio
 			// Update base position (this should not affect the clock)
 			m_baseTime = now;
 			m_basePos = sys;
 			// Apply a VERY ARTIFICIAL correction for clock!
-			double valadj = getSeconds(length) * 0.1 * rand() / RAND_MAX;  // Dither
-			m_skew = 0.99 * m_skew + 0.01 * (diff < valadj ? -1.0 : 1.0) * fudgeFactor;
+			const double valadj = getSeconds(length) * 0.1 * rand() / RAND_MAX;  // Dither
+			m_skew += (diff < valadj ? -1.0 : 1.0) * fudgeFactor;
 			// Limits to keep things sane in abnormal situations
-			if (m_skew > 0.01) m_skew = 0.01;
-			else if (m_skew < -0.01) m_skew = -0.01;
+			m_skew = clamp(m_skew, -0.01, 0.01);
 		} else {
 			// Off too much, step to correct time
 			m_baseTime = now;
@@ -140,7 +139,7 @@ class Music {
 		FFmpeg mpeg;
 		float fadeLevel;
 		float pitchFactor;
-		Track(std::string const& filename, unsigned int sr): mpeg(false, true, filename, sr), fadeLevel(1.0f), pitchFactor(0.0f) {}
+		Track(std::string const& filename, unsigned int sr): mpeg(filename, sr), fadeLevel(1.0f), pitchFactor(0.0f) {}
 	};
 	typedef boost::ptr_map<std::string, Track> Tracks;
 	Tracks tracks; ///< Audio decoders
@@ -236,12 +235,11 @@ public:
 
 struct Sample {
   private:
-	unsigned int srate;
 	double m_pos;
 	FFmpeg mpeg;
 	bool eof;
   public:
-	Sample(std::string const& filename, unsigned sr) : srate(sr), m_pos(), mpeg(false, true, filename, sr), eof(true) { }
+	Sample(std::string const& filename, unsigned sr) : m_pos(), mpeg(filename, sr), eof(true) { }
 	void operator()(float* begin, float* end) {
 		if(eof) {
 			// No more data to play in this sample
@@ -279,7 +277,7 @@ struct Synth {
 		if (it == m_notes.end() || it->type == Note::SLEEP || it->begin > position) { phase = 0.0; return; }
 		int note = it->note % 12;
 		double d = (note + 1) / 13.0;
-		double freq = MusicalScale().getNoteFreq(note + 4 * 12);
+		double freq = MusicalScale().setNote(note + 4 * 12).getFreq();
 		double value = 0.0;
 		// Synthesize tones
 		for (size_t i = 0, iend = mixbuf.size(); i != iend; ++i) {
@@ -305,6 +303,7 @@ struct Output {
 	std::auto_ptr<Synth> synth;
 	std::auto_ptr<Music> preloading;
 	boost::ptr_vector<Music> playing, disposing;
+	std::vector<Analyzer*> mics;
 	boost::ptr_map<std::string, Sample> samples;
 	std::vector<Command> commands;
 	volatile bool paused;
@@ -352,6 +351,18 @@ struct Output {
 				continue;
 			}
 			++i;
+		}
+		// Mix in microphones (if pass-through is enabled)
+		if (mics.size() > 0 && config["audio/pass-through"].b()) {
+			// Decrease music volume
+			float amp = 1.0f / config["audio/pass-through_ratio"].f();
+			if (amp != 1.0f)
+				for (float *i = begin; i < end; ++i) *i *= amp;
+			// All mics included
+			for (size_t i = 0; i < mics.size(); ++i) {
+				if (mics[i])
+					mics[i]->output(begin, end, 48000.0 /* FIXME: Get actual output device rate instead of hardcoding */);  // Do the actual mixing
+			}
 		}
 		// Mix in the samples currently playing
 		{
@@ -446,28 +457,8 @@ struct Audio::Impl {
 				// Sync mics/in settings together
 				if (params.in == 0) params.in = params.mics.size();
 				else params.mics.resize(params.in);
-				int count = portaudio::AudioDevices::count();
-				int dev = -1;
-				// Handle empty device
-				if (params.dev.empty()) dev = (params.out == 0 ? Pa_GetDefaultInputDevice() : Pa_GetDefaultOutputDevice());
-				// Try numeric value
-				if (dev < 0) {
-					std::istringstream iss(params.dev);
-					int tmp;
-					if (iss >> tmp && iss.get() == EOF && tmp >= 0 && tmp < count) dev = tmp;
-				}
 				portaudio::AudioDevices ad;
-				// Try name search with full match
-				for (unsigned i = 0; i < ad.devices.size() && dev < 0; ++i) {
-					portaudio::DeviceInfo& info = ad.devices[i];
-					if (info.name == params.dev) dev = info.idx;
-				}
-				// Try name search with partial match
-				for (unsigned i = 0; i < ad.devices.size() && dev < 0; ++i) {
-					portaudio::DeviceInfo& info = ad.devices[i];
-					if (info.name.find(params.dev) != std::string::npos) dev = info.idx;
-				}
-				if (dev < 0) throw std::runtime_error("No such device.");
+				int dev = ad.find(params.dev);
 				std::clog << "audio/info: Trying audio device \"" << params.dev << "\", id: " << dev
 					<< ", in: " << params.in << ", out: " << params.out << std::endl;
 				portaudio::DeviceInfo& info = ad.devices[dev];
@@ -508,6 +499,9 @@ struct Audio::Impl {
 				std::clog << "audio/error: Audio device '" << *it << "': " << e.what() << std::endl;
 			}
 		}
+		// Assign mic buffers to the output for pass-through
+		for (size_t i = 0; i < analyzers.size(); ++i)
+			output.mics.push_back(&analyzers[i]);
 	}
 };
 

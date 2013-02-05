@@ -173,7 +173,7 @@ bool ScreenAudioDevices::save(bool skip_ui_config) {
 				}
 			}
 			if (mics.empty() && pdev.empty()) continue; // Continue looping if device is not used
-			std::string dev = "dev=\"" + m_devs[d].name + "\""; // Use name instead of number for more robustness
+			std::string dev = "dev=\"" + m_devs[d].flex + "\""; // Use flexible name for more robustness
 			// Devices seem to crash less when opened if added separately
 			if (!mics.empty()) devconf.push_back(dev + " mics=" + mics);
 			if (!pdev.empty()) devconf.push_back(dev + " " + pdev);

@@ -1,19 +1,21 @@
 #pragma once
 
-#include <boost/scoped_ptr.hpp>
 #include "animvalue.hh"
 #include "cachemap.hh"
-#include "database.hh"
-#include "screen.hh"
-#include "surface.hh"
-#include "textinput.hh"
-#include "theme.hh"
-#include "video.hh"
 #include "controllers.hh"
+#include "screen.hh"
+#include "song.hh" // for Music class
+#include "textinput.hh"
+#include "video.hh"
 
-class Song;
+#include <boost/scoped_ptr.hpp>
+
 class Audio;
+class Database;
+class Song;
 class Songs;
+class Surface;
+class ThemeSongs;
 
 /// song chooser screen
 class ScreenSongs : public Screen {

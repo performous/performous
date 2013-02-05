@@ -1,16 +1,17 @@
-#include "config.hh"
-#include "fs.hh"
-#include "screen.hh"
-#include "controllers.hh"
-#include "profiler.hh"
-#include "songs.hh"
 #include "backgrounds.hh"
+#include "config.hh"
+#include "controllers.hh"
 #include "database.hh"
-#include "xtime.hh"
-#include "video_driver.hh"
-#include "i18n.hh"
+#include "fs.hh"
 #include "glutil.hh"
+#include "i18n.hh"
 #include "log.hh"
+#include "profiler.hh"
+#include "screen.hh"
+#include "songs.hh"
+#include "video_driver.hh"
+#include "webcam.hh"
+#include "xtime.hh"
 
 // Screens
 #include "screen_intro.hh"
@@ -50,8 +51,7 @@ bool g_take_screenshot = false;
 static void signalSetup();
 
 extern "C" void quit(int) {
-	// shouldn't "not EXIT_SUCCESS" be sent - ^C^C is an abort, not normal termination?
-	if (g_quit) std::exit(EXIT_SUCCESS);  // Instant exit if Ctrl+C is pressed again
+	if (g_quit) quick_exit(2);  // Instant exit if Ctrl+C is pressed again
 	g_quit = true;
 	signalSetup();
 }
@@ -64,7 +64,7 @@ static void signalSetup() {
 /// can be thrown as an exception to quit the game
 struct QuitNow {};
 
-static void checkEvents_SDL(ScreenManager& sm) {
+static void checkEvents(ScreenManager& sm) {
 	if (g_quit) {
 		std::cout << "Terminating, please wait... (or kill the process)" << std::endl;
 		throw QuitNow();
@@ -96,29 +96,32 @@ static void checkEvents_SDL(ScreenManager& sm) {
 				sm.finished();
 				continue; // Already handled here...
 			}
-			// Volume control
-			if ((keypressed == SDLK_UP || keypressed == SDLK_DOWN) && modifier & KMOD_CTRL) {
-				std::string curS = sm.getCurrentScreen()->getName();
-				// Pick proper setting
-				std::string which_vol = (curS == "Sing" || curS == "Practice")
-				  ? "audio/music_volume" : "audio/preview_volume";
-				// Adjust value
-				if (keypressed == SDLK_UP) ++config[which_vol];
-				else --config[which_vol];
-				// Show message
-				sm.flashMessage(config[which_vol].getShortDesc() + ": " + config[which_vol].getValue());
-				continue; // Already handled here...
-			}
-			// Eat away the event if there was a dialog open
-			if (sm.closeDialog()) continue;
 			break;
 		}
-		// If dialog is open, allow any nav event to close it...
-		input::NavEvent ev;
-		if (sm.isDialogOpen() && sm.controllers.getNav(ev)) { sm.closeDialog(); continue; }
 		// Screens always receive SDL events that were not already handled here
 		sm.getCurrentScreen()->manageEvent(event);
 	}
+	for (input::NavEvent event; sm.controllers.getNav(event); ) {
+		input::NavButton nav = event.button;
+		// Volume control
+		if (nav == input::NAV_VOLUME_UP || nav == input::NAV_VOLUME_DOWN) {
+			std::string curS = sm.getCurrentScreen()->getName();
+			// Pick proper setting
+			std::string which_vol = (curS == "Sing" || curS == "Practice")
+			  ? "audio/music_volume" : "audio/preview_volume";
+			// Adjust value
+			if (nav == input::NAV_VOLUME_UP) ++config[which_vol]; else --config[which_vol];
+			// Show message
+			sm.flashMessage(config[which_vol].getShortDesc() + ": " + config[which_vol].getValue());
+			continue; // Already handled here...
+		}
+		// If a dialog is open, any nav event will close it
+		if (sm.isDialogOpen()) { sm.closeDialog(); continue; }
+		// Let the current screen handle other events
+		sm.getCurrentScreen()->manageEvent(event);
+	}
+
+	// Need to toggle full screen mode?
 	if (config["graphic/fullscreen"].b() != sm.window().getFullscreen()) {
 		sm.window().setFullscreen(config["graphic/fullscreen"].b());
 		sm.reloadGL();
@@ -212,8 +215,7 @@ void mainLoop(std::string const& songlist) {
 				prof("fpsctrl");
 				// Process events for the next frame
 				sm.controllers.process(now());
-				checkEvents_SDL(sm);
-				for (input::NavEvent nav; sm.controllers.getNav(nav); sm.getCurrentScreen()->manageEvent(nav)) {}
+				checkEvents(sm);
 				prof("events");
 			} catch (RUNTIME_ERROR& e) {
 				std::cerr << "ERROR: " << e.what() << std::endl;
@@ -336,10 +338,6 @@ int main(int argc, char** argv) try {
 		std::cout << cmdline << "  any arguments without a switch are interpreted as song folders.\n" << std::endl;
 		return EXIT_SUCCESS;
 	}
-#ifdef USE_PORTMIDI
-	// Dump a list of MIDI input devices
-	// FIXME: pm::dumpDevices(true);
-#endif
 	// Read config files
 	try {
 		readConfig();
