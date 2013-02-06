@@ -22,7 +22,7 @@ struct TZoomText {
  *  - global positionning
  * the font{family,style,weight,align} are the one found into SVGs
  */
-struct TThemeTxtOpenGL {
+struct TextStyle {
 	Color fill_col; ///< fill color
 	Color stroke_col; ///< stroke color
 	double stroke_width; ///< stroke thickness
@@ -32,7 +32,7 @@ struct TThemeTxtOpenGL {
 	std::string fontweight; ///< fontweight
 	std::string fontalign; ///< alignment
 	std::string text; ///< text
-	TThemeTxtOpenGL(): stroke_width(), fontsize() {}
+	TextStyle(): stroke_width(), fontsize() {}
 };
 
 /// this class will enable to create a texture from a themed text structure
@@ -41,9 +41,9 @@ struct TThemeTxtOpenGL {
  * it provides size of the texture created (x_power_of_two, y_power_of_two)
  */
 class OpenGLText {
-  public:
+public:
 	/// constructor
-	OpenGLText(TThemeTxtOpenGL &_text, double m);
+	OpenGLText(TextStyle &_text, double m);
 	/// draws area
 	void draw(Dimensions &_dim, TexCoords &_tex);
 	/// draws full texture
@@ -59,7 +59,7 @@ class OpenGLText {
 	/// @returns dimension of texture
 	Dimensions& dimensions() { return m_surface.dimensions; }
 
-  private:
+private:
 	double m_x;
 	double m_y;
 	double m_x_advance;
@@ -69,7 +69,7 @@ class OpenGLText {
 
 /// themed svg texts (simple)
 class SvgTxtThemeSimple {
-  public:
+public:
 	/// constructor
 	SvgTxtThemeSimple(std::string _theme_file, double factor = 1.0);
 	/// renders text
@@ -79,20 +79,16 @@ class SvgTxtThemeSimple {
 	/// gets dimensions
 	Dimensions& dimensions() { return m_opengl_text->dimensions(); }
 
-  private:
+private:
 	boost::scoped_ptr<OpenGLText> m_opengl_text;
 	std::string m_cache_text;
-	TThemeTxtOpenGL m_text;
-	double m_x;
-	double m_y;
-	double m_width;
-	double m_height;
+	TextStyle m_text;
 	double m_factor;
 };
 
 /// themed svg texts
 class SvgTxtTheme {
-  public:
+public:
 	/// enum declaration Gravity:
 	/** <pre>
 	 * +----+---+----+
@@ -156,7 +152,7 @@ class SvgTxtTheme {
 	/// set align
 	void setAlign(Align align) { m_align = align; }
 
-  private:
+private:
 	boost::ptr_vector<OpenGLText> m_opengl_text;
 	Align m_align;
 	double m_x;
@@ -167,6 +163,7 @@ class SvgTxtTheme {
 	double m_texture_width;
 	double m_texture_height;
 	std::string m_cache_text;
-	TThemeTxtOpenGL m_text;
-	TThemeTxtOpenGL m_text_highlight;
+	TextStyle m_text;
+	TextStyle m_text_highlight;
 };
+
