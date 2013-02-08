@@ -64,13 +64,21 @@ static void signalSetup() {
 /// can be thrown as an exception to quit the game
 struct QuitNow {};
 
+#ifdef USE_RAWINPUT
+int RawInput_PollEvent(SDL_Event *event);
+#endif
+
 static void checkEvents(ScreenManager& sm) {
 	if (g_quit) {
 		std::cout << "Terminating, please wait... (or kill the process)" << std::endl;
 		throw QuitNow();
 	}
 	SDL_Event event;
+#ifdef USE_RAWINPUT
+	while(RawInput_PollEvent(&event) == 1) {
+#else
 	while(SDL_PollEvent(&event) == 1) {
+#endif
 		// Let the navigation system grab any and all SDL events
 		boost::xtime eventTime = now();
 		sm.controllers.pushEvent(event, eventTime);

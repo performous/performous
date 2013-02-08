@@ -66,6 +66,7 @@ set(SOURCES ${SOURCE_FILES} ${HEADER_FILES} ${RESOURCE_FILES})
 if(RASPBERRY_PI)
 	set(ENABLE_EGL ON)
 	add_definitions("-DUSE_RPI")
+	add_definitions("-DUSE_RAWINPUT")
 	# TODO: Should move to a Find-script
 	include_directories("/opt/vc")
 	include_directories("/opt/vc/include")
