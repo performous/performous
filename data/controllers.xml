@@ -292,7 +292,7 @@
 			<description>Standard MIDI piano/keyboard</description>
 			<major min="1" max="9" />
 		</controller>
-		<controller type="drums" name="MIDI_DRUMS">
+		<controller type="drumkit" name="MIDI_DRUMS">
 			<description>Standard Midi drums</description>
 			<!--
 				 PortMidi device name for USB-connected drum controllers Millenium MPS-600 and Alesis DM6 is
