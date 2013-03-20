@@ -146,7 +146,7 @@ struct Controllers::Impl {
 			{
 				std::string type = getAttribute(elem, "type");
 				if (type == "guitar") def.devType = DEVTYPE_GUITAR;
-				else if (type == "drums") def.devType = DEVTYPE_DRUMS;
+				else if (type == "drumkit") def.devType = DEVTYPE_DRUMS;
 				else if (type == "keytar") def.devType = DEVTYPE_KEYTAR;
 				else if (type == "piano") def.devType = DEVTYPE_PIANO;
 				else if (type == "dancepad") def.devType = DEVTYPE_DANCEPAD;
