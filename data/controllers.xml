@@ -1,6 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <controllers>
 	<joystick>
+		<controller type="guitar" name="GUITAR_GUITARHERO_OEM">
+			<!-- Licensed by Sony Computer Entertainment Gamepad for PS(R)3 (13 buttons, 4 axes, 1 hats, 0 balls) -->
+			<!-- Use this device in Rock Band mode instead, it works much better. -->
+			<description>OEM wireless guitar in Guitar Hero I/II/III mode</description>
+			<device regex="NO AUTODETECT" />
+			<mapping>
+				<button hw="7" map="green" />
+				<button hw="2" map="red" />
+				<button hw="3" map="yellow" />
+				<button hw="1" map="blue" />
+				<button hw="0" map="orange" />
+				<button hw="6" map="godmode" />
+				<button hw="8" map="cancel" />
+				<button hw="9" map="start" />
+				<button hw="10" map="up" />
+				<button hw="11" map="down" />
+				<button hw="5" map="moreup" /><!-- Red solo button -->
+				<button hw="4" map="moredown" /><!-- Yellow solo button -->
+				<axis hw="0" negative="left" /><!-- Blue solo button -->
+				<axis hw="2" negative="right" /><!-- Orange solo button -->
+				<axis hw="1" negative="whammy" />
+				<axis hw="3" /><!-- Mic switch, gives varying negative and positive values depending on position -->
+				<hat hw="0" up="pick_up" down="pick_down"/><!-- left = Green solo button _not_ pressed, right is unused -->
+			</mapping>
+		</controller>
 		<controller type="guitar" name="GUITAR_GUITARHERO">
 			<description>Guitar Hero 3 guitar</description>
 			<device regex="Guitar Hero3" />
@@ -65,6 +90,7 @@
 				<button hw="7" map="start" />
 				<axis hw="3" negative="godmode"/>
 				<axis hw="4" map="whammy"/>
+				<hat hw="0" up="pick_up" down="pick_down" left="left" right="right" />
 			</mapping>
 		</controller>
 		<controller type="guitar" name="GUITAR_ROCKBAND_XBOXADAPTER">
@@ -80,9 +106,11 @@
 				<button hw="6" map="start" />
 				<axis hw="4" map="godmode" />
 				<axis hw="3" map="whammy" />
+				<hat hw="0" up="pick_up" down="pick_down" left="left" right="right" />
 			</mapping>
 		</controller>
 		<controller type="guitar" name="GUITAR_ROCKBAND_PS3">
+			<!-- Licensed by Sony Computer Entertainment America Harmonix Guitar for PlayStation®3 (13 buttons, 4 axes, 1 hats, 0 balls) -->
 			<description>Rock Band guitar PS3</description>
 			<device regex="Harmonix Guitar .* PlayStation" />
 			<mapping>
@@ -94,9 +122,15 @@
 				<button hw="5" map="godmode" />
 				<button hw="8" map="cancel" />
 				<button hw="9" map="start" />
+				<button hw="6" map="godmode" /><!-- Events on this button appear (almost) right after solo fret button events. -->
 				<axis hw="2" map="whammy" /><!-- -1 (fully released) to 1 (fully pressed) but resets to 0 after a while when fully released -->
+				<axis hw="3" /><!-- Mic switch, values roughly -.9, -.4, .1, .4, .9; sends 0 after a short while -->
+				<!-- My device does not use these events; please report a bug if yours does:
+				<axis hw="1" negative="pick_up" positive="pick_down"/>
 				<axis hw="4" negative="left" positive="right" />
 				<axis hw="5" negative="up" positive="down" />
+				-->
+				<hat hw="0" up="pick_up" down="pick_down" left="left" right="right" />
 			</mapping>
 		</controller>
 		<controller type="guitar" name="GUITAR_HAMA_PS2">
