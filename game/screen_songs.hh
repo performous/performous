@@ -34,7 +34,8 @@ public:
 	Surface& getCover(Song const& song); ///< get appropriate cover image for the song (incl. no cover)
 	void drawJukebox(); ///< draw the songbrowser in jukebox mode (fullscreen, full previews, ...)
 
-protected:
+private:
+	void manageSharedKey(input::NavEvent const& event); ///< same behaviour for jukebox and normal mode
 	void drawInstruments(Dimensions const& dim, float alpha = 1.0f) const;
 	void drawMultimedia();
 	void update();

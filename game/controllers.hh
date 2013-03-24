@@ -18,7 +18,11 @@ namespace input {
 	enum SourceType { SOURCETYPE_NONE, SOURCETYPE_JOYSTICK, SOURCETYPE_MIDI, SOURCETYPE_KEYBOARD, SOURCETYPE_N };
 	enum DevType { DEVTYPE_GENERIC, DEVTYPE_VOCALS, DEVTYPE_GUITAR, DEVTYPE_DRUMS, DEVTYPE_KEYTAR, DEVTYPE_PIANO, DEVTYPE_DANCEPAD, DEVTYPE_N };
 	/// Generalized mapping of navigation actions
-	enum NavButton { NAV_NONE, NAV_UP, NAV_DOWN, NAV_LEFT, NAV_RIGHT, NAV_START, NAV_CANCEL, NAV_PAUSE, NAV_MOREUP, NAV_MOREDOWN, NAV_VOLUME_UP, NAV_VOLUME_DOWN };
+	enum NavButton {
+		NAV_NONE, NAV_START, NAV_CANCEL, NAV_PAUSE,
+		NAV_REPEAT = 0x80 /* Anything after this is auto-repeating */,
+		NAV_UP, NAV_DOWN, NAV_LEFT, NAV_RIGHT, NAV_MOREUP, NAV_MOREDOWN, NAV_VOLUME_UP, NAV_VOLUME_DOWN
+	};
 	/// Alternative orientation-agnostic mapping where A axis is the one that is easiest to access (e.g. guitar pick) and B might not be available on all devices
 	enum NavMenu { NAVMENU_NONE, NAVMENU_A_PREV, NAVMENU_A_NEXT, NAVMENU_B_PREV, NAVMENU_B_NEXT };
 

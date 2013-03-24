@@ -10,7 +10,7 @@ namespace logger {
 	void teardown();
 
 	//! This variable selected the default log level.
-	const char* const default_log_level=".*/error";
+	const char* const default_log_level=".*/warning";
 
 	/** \test Runs some debug tests \internal **/
 	void __log_hh_test();
