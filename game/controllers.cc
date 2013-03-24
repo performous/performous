@@ -99,11 +99,12 @@ struct ControllerDef {
 	std::string description;
 	SourceType sourceType;
 	DevType devType;
+	double latency;
 	boost::regex deviceRegex;
 	MinMax<unsigned> deviceMinMax;
 	MinMax<unsigned> channelMinMax;
 	ButtonMapping mapping;
-	ControllerDef(): sourceType(), devType() {}
+	ControllerDef(): sourceType(), devType(), latency() {}
 	bool matches(Event const& ev, std::string const& devName) const {
 		if (ev.source.type != sourceType) return false;
 		if (!deviceMinMax.matches(ev.source.device)) return false;
@@ -193,6 +194,8 @@ struct Controllers::Impl {
 				std::string regex;
 				if (tryGetAttribute(elem, "regex", regex)) def.deviceRegex = regex;
 				parse(def.deviceMinMax, elem);
+				double latency;
+				if (tryGetAttribute(elem, "latency", latency)) def.latency = latency;
 			}
 			ns = elem.find("channel");
 			if (ns.size() == 1) parse(def.channelMinMax, dynamic_cast<xmlpp::Element&>(*ns[0]));
@@ -321,6 +324,7 @@ struct Controllers::Impl {
 			pushMappedEvent(event);  // This is for keyboard events mainly (they have no ControllerDefs)
 			return;
 		}
+		event.time += -def->latency;
 		event.devType = def->devType;
 		// Mapping from controllers.xml
 		ButtonMapping::const_iterator it = def->mapping.find(event.hw);
