@@ -33,9 +33,9 @@ class Songs: boost::noncopyable {
 	void advance(int diff) {
 		int size = m_filtered.size();
 		if (size == 0) return;  // Do nothing if no songs are available
-		int _current = size ? (int(math_cover.getTarget()) + diff) % size : 0;
-		if (_current < 0) _current += m_filtered.size();
-		math_cover.setTarget(_current,this->size());
+		int _current = (int(math_cover.getTarget()) + diff) % size;
+		if (_current < 0) _current += size;
+		math_cover.setTarget(_current, size);
 	}
 	/// get current id
 	int currentId() const { return math_cover.getTarget(); }
