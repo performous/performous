@@ -133,6 +133,8 @@ struct Controllers::Impl {
 	typedef std::pair<SourceId, ButtonId> UniqueButton;
 	std::map<UniqueButton, double> m_values;
 
+	std::map<NavButton, NavEvent> m_navRepeat;
+	
 	Impl(): m_eventsEnabled() {
 		#define DEFINE_BUTTON(devtype, button, num, nav) m_buttons[DEVTYPE_##devtype][#button] = devtype##_##button;
 		#include "controllers-buttons.ii"
@@ -276,6 +278,17 @@ struct Controllers::Impl {
 				pushHWEvent(event);
 			}
 		}
+		for (auto& kv: m_navRepeat) {
+			NavEvent& ne = kv.second;
+			double delay = 2.0 / (10 + ne.repeat);
+			if (now - ne.time < delay) continue;  // Not yet time to repeat
+			// Emit auto-repeated event
+			// Note: We intentionally only emit one per frame (call to process) to avoid surprises when latency spikes occur.
+			++ne.repeat;
+			ne.time += delay;  // Increment rather than set to now, so that repeating is smoother.
+			std::clog << "controllers/info: NavEvent auto repeat " << ne.repeat << " next=" << now - ne.time << " delay=" << delay << std::endl;
+			m_navEvents.push_back(ne);
+		}
 	}
 	/// Handle an incoming SDL event
 	bool pushEvent(SDL_Event const& sdlEv, boost::xtime const& t) {
@@ -337,7 +350,7 @@ struct Controllers::Impl {
 		std::clog << "controllers/info: processing " << ev << std::endl;
 		ev.nav = navigation(ev);
 		// Emit nav event
-		if (ev.nav != NAV_NONE && ev.value != 0.0) {
+		if (ev.nav != NAV_NONE) {
 			NavEvent ne;
 			ne.source = ev.source;
 			ne.button = ev.nav;
@@ -350,7 +363,12 @@ struct Controllers::Impl {
 				else if (ne.button == NAV_RIGHT) ne.menu = (vertical ? NAVMENU_B_NEXT : NAVMENU_A_NEXT);
 			}
 			ne.time = ev.time;
-			m_navEvents.push_back(ne);
+			if (ev.value != 0.0) {
+				m_navEvents.push_back(ne);
+				if (ne.button >= NAV_REPEAT) m_navRepeat.insert(std::make_pair(ne.button, ne));
+			} else {
+				if (ne.button >= NAV_REPEAT) m_navRepeat.erase(ne.button);
+			}
 		}
 		if (!m_eventsEnabled) return true;
 		// Emit Event and construct a new Device first if needed
