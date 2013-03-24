@@ -273,6 +273,7 @@ struct Controllers::Impl {
 			pushMappedEvent(ev);  // This is for keyboard events mainly (they have no ControllerDefs)
 			return;
 		}
+		ev.devType = def->devType;
 		// Handle directional controllers (not possible via XML)
 		if (hwIsHat.matches(ev.hw)) {
 			HWButton val = ev.value;
@@ -283,7 +284,6 @@ struct Controllers::Impl {
 			return;
 		}
 		// Mapping from controllers.xml
-		ev.devType = def->devType;
 		ButtonMapping::const_iterator it = def->mapping.find(ev.hw);
 		if (it != def->mapping.end()) {
 			ButtonMap const& m = it->second;
