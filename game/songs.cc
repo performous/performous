@@ -191,7 +191,7 @@ namespace {
 std::string Songs::typeDesc() const {
 	switch (m_type) {
 	  case 0: return _("show all songs");
-	  case 1: return _("only dance");
+	  case 1: return _("has dance");
 	  case 2: return _("has vocals");
 	  case 3: return _("has duet");
 	  case 4: return _("has guitar");
