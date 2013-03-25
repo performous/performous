@@ -257,7 +257,7 @@ void ScreenSongs::draw() {
 			if (!m_search.text.empty()) oss_order << m_search.text;
 			else if (m_songs.typeNum()) oss_order << m_songs.typeDesc();
 			else if (m_songs.sortNum()) oss_order << m_songs.sortDesc();
-			else oss_order << _("<type in to search>");
+			else oss_order << _("<type in to search>   ↑ browse menu");
 			//if (!m_songs.empty()) oss_order << "(" << m_songs.currentId() + 1 << "/" << m_songs.size() << ")";
 			break;
 		case 1: oss_order << _("↔ sort order: ") << m_songs.sortDesc(); break;
