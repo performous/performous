@@ -8,14 +8,14 @@
 // TODO: Exception handling
 // TODO: Texture loading
 
-class Texture;
+class Surface;
 
 /// A class representing 3d object
 /// Non-copyable because of display lists getting messed up
 class Object3d: boost::noncopyable {
   private:
 	glutil::VertexArray m_va;
-	boost::scoped_ptr<Texture> m_texture; /// texture
+	boost::scoped_ptr<Surface> m_texture; /// texture
 	/// load a Wavefront .obj 3d object file
 	void loadWavefrontObj(std::string filepath, float scale = 1.0);
   public:

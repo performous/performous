@@ -282,7 +282,7 @@ void ScreenSongs::draw() {
 			theme->order.draw(oss_order.str());
 			theme->has_hiscore.draw(oss_has_hiscore.str());
 		} else theme->hiscores.draw(oss_order.str());
-		if (!show_hiscores) drawInstruments(Dimensions(m_instrumentList->ar()).fixedHeight(0.03).center(-0.04));
+		if (!show_hiscores) drawInstruments(Dimensions(m_instrumentList->dimensions.ar()).fixedHeight(0.03).center(-0.04));
 	}
 }
 
