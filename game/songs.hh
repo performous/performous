@@ -61,6 +61,7 @@ class Songs: boost::noncopyable {
 	void typeChange(int diff);
 	/// Cycle song type filters by filter category (0 = none, 1..4 = different categories)
 	void typeCycle(int cat);
+	int sortNum() const { return m_order; }
 	/// Description of the current sort mode
 	std::string sortDesc() const;
 	/// Change sorting mode (diff is normally -1 or 1)

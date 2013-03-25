@@ -36,7 +36,7 @@ public:
 
 private:
 	void manageSharedKey(input::NavEvent const& event); ///< same behaviour for jukebox and normal mode
-	void drawInstruments(Dimensions const& dim, float alpha = 1.0f) const;
+	void drawInstruments(Dimensions dim) const;
 	void drawMultimedia();
 	void update();
 

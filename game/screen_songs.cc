@@ -229,13 +229,6 @@ void ScreenSongs::drawMultimedia() {
 	}
 }
 
-namespace {
-	float getIconTex(int i) {
-		static int iconcount = 8;
-		return (i-1)/float(iconcount);
-	}
-}
-
 void ScreenSongs::draw() {
 	update();
 	drawMultimedia();
@@ -253,15 +246,20 @@ void ScreenSongs::draw() {
 	} else {
 		Song& song = m_songs.current();
 		// Format the song information text
-		oss_song << song.title << '\n' << song.artist;
-		oss_order << (m_search.text.empty() ? _("<type in to search>") : m_search.text) << "\n\n";
+		oss_song << song.artist << ": " << song.title;
 		// Format the song information text
 		oss_hiscore << _("Hiscore\n");
 		// Get hiscores from database
 		m_database.queryPerSongHiscore_HiscoreDisplay(oss_hiscore, m_songs.currentPtr(), m_infoPos, 5);
 	}
 	switch (m_menuPos) {
-		case 0: if (!m_songs.empty()) oss_order << "(" << m_songs.currentId() + 1 << "/" << m_songs.size() << ")"; break;
+		case 0:
+			if (!m_search.text.empty()) oss_order << m_search.text;
+			else if (m_songs.typeNum()) oss_order << m_songs.typeDesc();
+			else if (m_songs.sortNum()) oss_order << m_songs.sortDesc();
+			else oss_order << _("<type in to search>");
+			//if (!m_songs.empty()) oss_order << "(" << m_songs.currentId() + 1 << "/" << m_songs.size() << ")";
+			break;
 		case 1: oss_order << _("↔ sort order: ") << m_songs.sortDesc(); break;
 		case 2: oss_order << _("↔ type filter: ") << m_songs.typeDesc(); break;
 		case 3: oss_order << _("↔ hiscores   ↵ jukebox mode"); break;
@@ -272,7 +270,7 @@ void ScreenSongs::draw() {
 		// Draw song and order texts
 		theme->song.draw(oss_song.str());
 		theme->order.draw(oss_order.str());
-		drawInstruments(Dimensions(m_instrumentList->ar()).fixedHeight(0.03).center(-0.04));
+		drawInstruments(Dimensions(1.0).fixedHeight(0.03).middle(-0.22).screenBottom(-0.01));
 		using namespace glmath;
 		Transform trans(translate(vec3(0.32, -0.03, 0.0)) * scale(vec3(0.75, 0.75, 1.0)));
 		theme->hiscores.draw(oss_hiscore.str());
@@ -297,6 +295,9 @@ void ScreenSongs::drawCovers() {
 		  * rotate(0.4 * std::sin(std::min(M_PI, i - shift)), vec3(0.0, 1.0, 0.0))
 		);
 		double c = 0.4 + 0.6 * diff;
+		if (m_menuPos == 0 && baseidx + i == m_songs.currentId()) {
+			c = 1.0 + std::pow(std::abs(std::sin(m_idleTimer.get() * 5.0)), 10.0);
+		}
 		ColorTrans c1(Color(c, c, c));
 		s.dimensions.middle(0.0).bottom(0.0).fitInside(0.17, 0.17);
 		// Draw the cover normally
@@ -327,12 +328,26 @@ Surface& ScreenSongs::getCover(Song const& song) {
 	return *cover;
 }
 
-void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
+namespace {
+	float getIconTex(int i) {
+		static int iconcount = 8;
+		return (i-1)/float(iconcount);
+	}
+	void drawIcon(int i, Dimensions const& dim) {
+		glutil::VertexArray va;
+		va.TexCoord(getIconTex(i), 0.0f).Vertex(dim.x1(), dim.y1());
+		va.TexCoord(getIconTex(i), 1.0f).Vertex(dim.x1(), dim.y2());
+		va.TexCoord(getIconTex(i + 1), 0.0f).Vertex(dim.x2(), dim.y1());
+		va.TexCoord(getIconTex(i + 1), 1.0f).Vertex(dim.x2(), dim.y2());
+		va.Draw();
+	}
+}
+
+void ScreenSongs::drawInstruments(Dimensions dim) const {
 	bool have_bass = false;
 	bool have_drums = false;
 	bool have_dance = false;
 	bool is_karaoke = false;
-	unsigned char typeFilter = 0;  // FIXME: Remove
 	int guitarCount = 0;
 	int vocalCount = 0;
 
@@ -349,83 +364,30 @@ void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
 	}
 
 	UseTexture tex(*m_instrumentList);
-	double x;
-	float xincr = 0.2f;
-	{
-		// vocals
-		float a = alpha;
-		float m = !(typeFilter & 8);
-		if (vocalCount == 0) { vocalCount = 1; a *= 0.25f; }
-		for (int i = vocalCount-1; i >= 0; i--) {
-			glutil::VertexArray va;
-			glmath::vec4 c(m * a, a, m * (is_karaoke ? 0.25f : 1.0f) * a, a);
-			x = dim.x1()+(i*0.03)*(dim.x2()-dim.x1());
-			va.Color(c).TexCoord(getIconTex(1), 0.0f).Vertex(x, dim.y1());
-			va.Color(c).TexCoord(getIconTex(1), 1.0f).Vertex(x, dim.y2());
-			x = dim.x1()+(xincr+i*0.03)*(dim.x2()-dim.x1());
-			va.Color(c).TexCoord(getIconTex(2), 0.0f).Vertex(x, dim.y1());
-			va.Color(c).TexCoord(getIconTex(2), 1.0f).Vertex(x, dim.y2());
-			va.Draw();
-		}
+	double x = dim.x1();
+	for (int i = vocalCount-1; i >= 0; i--) {
+		drawIcon(1, dim.left(x));
+		x += (i > 0 ? 0.3 : 1.0) * dim.w();
 	}
-	{
-		// guitars
-		float a = alpha;
-		float m = !(typeFilter & 4);
-		if (guitarCount == 0) { guitarCount = 1; a *= 0.25f; }
-		for (int i = guitarCount-1; i >= 0; i--) {
-			glutil::VertexArray va;
-			glmath::vec4 c(m * a, a, m * a, a);
-			x = dim.x1()+(xincr+i*0.04)*(dim.x2()-dim.x1());
-			va.Color(c).TexCoord(getIconTex(2), 0.0f).Vertex(x, dim.y1());
-			va.Color(c).TexCoord(getIconTex(2), 1.0f).Vertex(x, dim.y2());
-			x = dim.x1()+(2*xincr+i*0.04)*(dim.x2()-dim.x1());
-			va.Color(c).TexCoord(getIconTex(3), 0.0f).Vertex(x, dim.y1());
-			va.Color(c).TexCoord(getIconTex(3), 1.0f).Vertex(x, dim.y2());
-			va.Draw();
-		}
+	// guitars
+	for (int i = guitarCount-1; i >= 0; i--) {
+		drawIcon(2, dim.left(x));
+		x += (i > 0 ? 0.3 : 1.0) * dim.w();
 	}
-	{
-		// bass
-		float a = alpha * (have_bass ? 1.00f : 0.25f);
-		float m = !(typeFilter & 4);
-		glutil::VertexArray va;
-		glmath::vec4 c(m * a, a, m * a, a);
-		x = dim.x1()+2*xincr*(dim.x2()-dim.x1());
-		va.Color(c).TexCoord(getIconTex(3), 0.0f).Vertex(x, dim.y1());
-		va.Color(c).TexCoord(getIconTex(3), 1.0f).Vertex(x, dim.y2());
-		x = dim.x1()+3*xincr*(dim.x2()-dim.x1());
-		va.Color(c).TexCoord(getIconTex(4), 0.0f).Vertex(x, dim.y1());
-		va.Color(c).TexCoord(getIconTex(4), 1.0f).Vertex(x, dim.y2());
-		va.Draw();
+	// bass
+	if (have_bass) {
+		drawIcon(3, dim.left(x));
+		x += dim.w();
 	}
-	{
-		// drums
-		float a = alpha * (have_drums ? 1.00f : 0.25f);
-		float m = !(typeFilter & 2);
-		glutil::VertexArray va;
-		glmath::vec4 c(m * a, a, m * a, a);
-		x = dim.x1()+3*xincr*(dim.x2()-dim.x1());
-		va.Color(c).TexCoord(getIconTex(4), 0.0f).Vertex(x, dim.y1());
-		va.Color(c).TexCoord(getIconTex(4), 1.0f).Vertex(x, dim.y2());
-		x = dim.x1()+4*xincr*(dim.x2()-dim.x1());
-		va.Color(c).TexCoord(getIconTex(5), 0.0f).Vertex(x, dim.y1());
-		va.Color(c).TexCoord(getIconTex(5), 1.0f).Vertex(x, dim.y2());
-		va.Draw();
+	// drums
+	if (have_drums) {
+		drawIcon(4, dim.left(x));
+		x += dim.w();
 	}
-	{
-		// dancing
-		float a = alpha * (have_dance ? 1.00f : 0.25f);
-		float m = !(typeFilter & 1);
-		glutil::VertexArray va;
-		glmath::vec4 c(m * a, a, m * a, a);
-		x = dim.x1()+4*xincr*(dim.x2()-dim.x1());
-		va.Color(c).TexCoord(getIconTex(6), 0.0f).Vertex(x, dim.y1());
-		va.Color(c).TexCoord(getIconTex(6), 1.0f).Vertex(x, dim.y2());
-		x = dim.x1()+5*xincr*(dim.x2()-dim.x1());
-		va.Color(c).TexCoord(getIconTex(7), 0.0f).Vertex(x, dim.y1());
-		va.Color(c).TexCoord(getIconTex(7), 1.0f).Vertex(x, dim.y2());
-		va.Draw();
+	// dancing
+	if (have_dance) {
+		drawIcon(6, dim.left(x));
+		x += dim.w();
 	}
 }
 
