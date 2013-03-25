@@ -194,29 +194,9 @@ struct Bitmap {
 void updateSurfaces();
 
 /**
-* @short Texture wrapper.
-* Textures with non-power-of-two dimensions may be slow to load.
-* If you don't need texturing, use Surface instead.
+* @short High level surface/image wrapper on top of OpenGLTexture
 **/
-class Texture: public OpenGLTexture<GL_TEXTURE_2D> {
-  public:
-	/** Initialize from SVG or PNG file **/
-	Texture(std::string const& filename);
-	~Texture();
-	/** Get aspect ratio (1.0 for square, > 1.0 for wider). **/
-	float ar() const { return m_ar; }
-	/// loads texture into buffer
-	void load(Bitmap const& bitmap);
-
-  private:
-	float m_ar;
-};
-
-/**
-* @short High level surface/image wrapper.
-* Supports non-power-of-two dimensions, but does not support texturing, so keep tex within [0, 1].
-**/
-class Surface {
+class Surface: public OpenGLTexture<GL_TEXTURE_2D> {
   public:
 	struct Impl;
 	/// dimensions
@@ -230,6 +210,7 @@ class Surface {
 	bool empty() const { return m_width * m_height == 0; } ///< Test if the loading has failed
 	/// draws surface
 	void draw() const;
+	using OpenGLTexture<GL_TEXTURE_2D>::draw;
 	/// loads surface into buffer
 	void load(Bitmap const& bitmap);
 	Shader& shader() { return m_texture.shader(); }
@@ -237,4 +218,6 @@ class Surface {
 	unsigned int m_width, m_height;
 	OpenGLTexture<GL_TEXTURE_2D> m_texture;
 };
+
+typedef Surface Texture;  // Backwards compatibility
 
