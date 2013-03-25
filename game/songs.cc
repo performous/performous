@@ -209,6 +209,17 @@ void Songs::typeChange(int diff) {
 	filter_internal();
 }
 
+void Songs::typeCycle(int cat) {
+	static const int categories[types] = { 0, 1, 2, 2, 3, 3 };
+	// Find the next matching category
+	int type = 0;
+	for (int t = (categories[m_type] == cat ? m_type + 1 : 0); t < types; ++t) {
+		if (categories[t] == cat) { type = t; break; }
+	}
+	m_type = type;
+	filter_internal();
+}
+
 std::string Songs::sortDesc() const {
 	std::string str;
 	switch (m_order) {

@@ -59,6 +59,8 @@ class Songs: boost::noncopyable {
 	std::string typeDesc() const;
 	/// Change song type filter (diff is normally -1 or 1; 0 has special meaning of reset)
 	void typeChange(int diff);
+	/// Cycle song type filters by filter category (0 = none, 1..4 = different categories)
+	void typeCycle(int cat);
 	/// Description of the current sort mode
 	std::string sortDesc() const;
 	/// Change sorting mode (diff is normally -1 or 1)
