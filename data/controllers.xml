@@ -38,9 +38,11 @@
 				<button hw="5" map="godmode" />
 				<button hw="8" map="cancel" />
 				<button hw="9" map="start" />
+				<button hw="12" map="godmode" /><!-- PS3 GH3 Les Paul has no button 5, use the PS button -->
 				<axis hw="2" positive="whammy" />
+				<axis hw="3" /><!-- This is the GH:WT solo frets, values roughly: G: -.8, R: -.3, Y: .1, B: .5, O: 1 - Falls back to 0 when idle. -->
 				<axis hw="4" negative="left" positive="right" />
-				<axis hw="5" negative="up" positive="down" />
+				<axis hw="5" negative="pick_up" positive="pick_down" />
 			</mapping>
 		</controller>
 		<controller type="guitar" name="GUITAR_GUITARHERO5">
@@ -122,14 +124,15 @@
 				<button hw="5" map="godmode" />
 				<button hw="8" map="cancel" />
 				<button hw="9" map="start" />
-				<button hw="6" map="godmode" /><!-- Events on this button appear (almost) right after solo fret button events. -->
+				<button hw="6" map="godmode" /><!-- This button is a modifier for the solo frets, doesn't exist by itself -->
+				<button hw="12" /> <!-- PS button -->
 				<axis hw="2" map="whammy" /><!-- -1 (fully released) to 1 (fully pressed) but resets to 0 after a while when fully released -->
 				<axis hw="3" /><!-- Mic switch, values roughly -.9, -.4, .1, .4, .9; sends 0 after a short while -->
 				<!-- My device does not use these events; please report a bug if yours does:
 				<axis hw="1" negative="pick_up" positive="pick_down"/>
-				<axis hw="4" negative="left" positive="right" />
-				<axis hw="5" negative="up" positive="down" />
 				-->
+				<axis hw="4" negative="left" positive="right" />
+				<axis hw="5" negative="pick_up" positive="pick_down" />
 				<hat hw="0" up="pick_up" down="pick_down" left="left" right="right" />
 			</mapping>
 		</controller>
@@ -213,6 +216,7 @@
 				<button hw="4" map="kick" />
 				<button hw="8" map="cancel" />
 				<button hw="9" map="start" />
+				<button hw="12" /><!-- PS button -->
 				<axis hw="4" negative="left" positive="right" />
 				<axis hw="5" negative="up" positive="down" />
 			</mapping>
