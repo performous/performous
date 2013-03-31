@@ -1,24 +1,19 @@
-#ifndef PLAYLIST_HH
-#define PLAYLIST_HH
+#pragma once
 
 #include <iostream>
 #include "song.hh"
+#include <boost/scoped_ptr.hpp>
 
-struct listitem {
-   Song* song;
-   listitem * next;
- };
+using namespace std;
 
-class playlist
+class PlayList
 {
 private:
-    listitem * pList = NULL;
+    vector< boost::shared_ptr<Song> > pList;
 
 public:
-    playlist();
-    void addToList(Song * songToAdd);
+    boost::shared_ptr<Song> getNextSongInQue();
+    void addSongToQue(boost::shared_ptr<Song> song);
     bool isListEmpty();
-    Song * getNextSongInQue();
 };
 
-#endif // PLAYLIST_HH
