@@ -279,7 +279,7 @@ void writeConfig(bool system) {
 	fs::path const& conf = system ? systemConfFile : userConfFile;
 	std::string tmp = conf.string() + "tmp";
 	try {
-		create_directory(conf.parent_path());
+		create_directories(conf.parent_path());
 		if (dirty) doc.write_to_file_formatted(tmp, "UTF-8");
 		if (exists(conf)) remove(conf);
 		if (dirty) {

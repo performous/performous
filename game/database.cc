@@ -26,26 +26,21 @@ void Database::load() {
 }
 
 void Database::save() {
-	fs::path tmp = m_filename.string() + ".tmp";
 	try {
-		xmlpp::Document doc;
-		xmlpp::Node* nodeRoot = doc.create_root_node("performous");
-		m_players.save(nodeRoot->add_child("players"));
-		m_songs.save(nodeRoot->add_child("songs"));
-		m_hiscores.save(nodeRoot->add_child("databases"));
-
-		if (!m_filename.parent_path().empty() && !exists(m_filename.parent_path())) {
-			create_directory(m_filename.parent_path());
+		create_directories(m_filename.parent_path());
+		fs::path tmp = m_filename.string() + ".tmp";
+		{
+			xmlpp::Document doc;
+			xmlpp::Node* nodeRoot = doc.create_root_node("performous");
+			m_players.save(nodeRoot->add_child("players"));
+			m_songs.save(nodeRoot->add_child("songs"));
+			m_hiscores.save(nodeRoot->add_child("databases"));
+			doc.write_to_file_formatted(tmp.string(), "UTF-8");
 		}
-		doc.write_to_file_formatted(tmp.string(), "UTF-8");
+		rename(tmp, m_filename);
 	} catch (std::exception const& e) {
 		std::clog << "database/error: Could not save " + m_filename.string() + ": " + e.what() << std::endl;
 		return;
-	}
-	try {
-		rename(m_filename.string() + ".tmp", m_filename);
-	} catch (std::exception const& e) {
-		std::clog << "database/error: Unable to rename temporary file to " + m_filename.string() + ": " + e.what() << std::endl;
 	}
 }
 
