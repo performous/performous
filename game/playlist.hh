@@ -12,8 +12,8 @@ private:
 	vector< boost::shared_ptr<Song> > pList;
 
 public:
-	boost::shared_ptr<Song> getNextSongInQue();
-	void addSongToQue(boost::shared_ptr<Song> song);
+	boost::shared_ptr<Song> getNextSongInQueue();
+	void addSongToQueue(boost::shared_ptr<Song> song);
 	bool isListEmpty();
 	//needs function that returns the song properties in a list for display on screen
 };

@@ -71,7 +71,7 @@ void ScreenSongs::manageSharedKey(input::NavEvent const& event) {
 		if (m_playlist.isListEmpty()) {
 			ss->setSong(m_songs.currentPtr());
 		} else {
-			ss->setSong(m_playlist.getNextSongInQue());
+			ss->setSong(m_playlist.getNextSongInQueue());
 		}
 		sm->activateScreen("Sing");
 	}
@@ -134,7 +134,7 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 			if (key == SDLK_F8) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 1); // Dance
 			// The rest are only available when there are songs available
 			else if (m_songs.empty()) return;
-			else if (key == SDLK_INSERT) m_playlist.addSongToQue(m_songs.currentPtr());
+			else if (key == SDLK_INSERT) m_playlist.addSongToQueue(m_songs.currentPtr());
 			else if (!m_jukebox && key == SDLK_F4) m_jukebox = true;
 			else if (key == SDLK_END) show_hiscores ? show_hiscores = false : show_hiscores = true;
 		} else if (key == SDLK_END) show_hiscores ? show_hiscores = false : show_hiscores = true;
