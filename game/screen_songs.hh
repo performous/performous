@@ -32,8 +32,7 @@ public:
 	void drawCovers(); ///< draw the cover browser
 	Surface& getCover(Song const& song); ///< get appropriate cover image for the song (incl. no cover)
 	void drawJukebox(); ///< draw the songbrowser in jukebox mode (fullscreen, full previews, ...)
-	PlayList * Plist; ///TODO for testing purposes, i've got trouble with boost shared and scoped pointers
-			  ///TODO should be a singleton class so the future embedded web server can add stuff to the playlist
+	PlayList& getPlaylist() { return m_playlist; }
 
 private:
 	void manageSharedKey(input::NavEvent const& event); ///< same behaviour for jukebox and normal mode
@@ -56,6 +55,7 @@ private:
 	boost::scoped_ptr<Surface> m_danceCover;
 	boost::scoped_ptr<Texture> m_instrumentList;
 	Cachemap<std::string, Surface> m_covers;
+	PlayList m_playlist;
 	bool m_jukebox;
 	bool show_hiscores;
 	int hiscore_start_pos;

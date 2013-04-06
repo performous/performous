@@ -1,20 +1,28 @@
 #pragma once
 
-#include <iostream>
+#include <vector>
 #include "song.hh"
-#include <boost/scoped_ptr.hpp>
-
-using namespace std;
+#include <boost/shared_ptr.hpp>
 
 class PlayList
 {
-private:
-    vector< boost::shared_ptr<Song> > pList;
-
 public:
-    boost::shared_ptr<Song> getNextSongInQueue();
-    void addSongToQue(boost::shared_ptr<Song> song);
-    bool isListEmpty();
     //needs function that returns the song properties in a list for display on screen
+
+	typedef std::vector< boost::shared_ptr<Song> > SongList;
+
+	/// Adds a new song to the queue
+	void addSong(boost::shared_ptr<Song> song);
+	/// Returns the next song and removes it from the queue
+	boost::shared_ptr<Song> getNext();
+	/// Returns all currently queued songs
+	SongList& getList();
+	/// Returns true if the queue is empty
+	bool isEmpty();
+	/// Randomizes the order of the playlist
+	void shuffle();
+
+private:
+	SongList m_list;
 };
 
