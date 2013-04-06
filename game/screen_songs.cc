@@ -25,6 +25,16 @@ ScreenSongs::ScreenSongs(std::string const& name, Audio& audio, Songs& songs, Da
 }
 
 void ScreenSongs::enter() {
+	if(!Plist->isListEmpty())
+	  {
+	    //TODO instructions for displaying the list on screen
+	    ScreenManager* sm = ScreenManager::getSingletonPtr();
+	    Screen* s = sm->getScreen("Sing");
+	    ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
+	    assert(ss);
+	    ss->setSong(Plist->getNextSongInQueue());
+	    sm->activateScreen("Sing");
+	  }
 	m_songs.setFilter(m_search.text);
 	m_audio.fadeout();
 	m_jukebox = false;
@@ -69,14 +79,8 @@ void ScreenSongs::manageSharedKey(input::NavEvent const& event) {
 		Screen* s = sm->getScreen("Sing");
 		ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
 		assert(ss);
-		if(Plist->isListEmpty())
-		  {
-		ss->setSong(m_songs.currentPtr());
-		  }
-		else
-		  {
-		ss->setSong(Plist->getNextSongInQue());
-		  }
+		Plist->addSongToQue(m_songs.currentPtr());
+		ss->setSong(Plist->getNextSongInQueue());
 		sm->activateScreen("Sing");
 	}
 	else if (event.menu == input::NAVMENU_A_PREV) { m_songs.advance(-1); hiscore_start_pos = 0; }
