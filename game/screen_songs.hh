@@ -7,7 +7,7 @@
 #include "song.hh" // for Music class
 #include "textinput.hh"
 #include "video.hh"
-
+#include "playlist.hh"
 #include <boost/scoped_ptr.hpp>
 
 class Audio;
@@ -33,6 +33,7 @@ public:
 	void drawCovers(); ///< draw the cover browser
 	Surface& getCover(Song const& song); ///< get appropriate cover image for the song (incl. no cover)
 	void drawJukebox(); ///< draw the songbrowser in jukebox mode (fullscreen, full previews, ...)
+	PlayList * Plist; /// for testing purposes, i've got trouble with boost shared and scoped pointers
 
 protected:
 	void drawInstruments(Dimensions const& dim, float alpha = 1.0f) const;
