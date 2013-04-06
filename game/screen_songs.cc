@@ -17,11 +17,10 @@
 static const double IDLE_TIMEOUT = 45.0; // seconds
 
 ScreenSongs::ScreenSongs(std::string const& name, Audio& audio, Songs& songs, Database& database):
-  Screen(name), m_audio(audio), m_songs(songs), m_database(database), m_covers(20), m_jukebox(), show_hiscores(), hiscore_start_pos()
+  Screen(name), m_audio(audio), m_songs(songs), m_database(database), m_covers(20), m_playlist(), m_jukebox(), show_hiscores(), hiscore_start_pos()
 {
 	m_songs.setAnimMargins(5.0, 5.0);
 	m_idleTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
-	Plist = new PlayList(); /// for testing purposes, i've got trouble with boost shared and scoped pointers
 }
 
 void ScreenSongs::enter() {
@@ -69,10 +68,10 @@ void ScreenSongs::manageSharedKey(input::NavEvent const& event) {
 		Screen* s = sm->getScreen("Sing");
 		ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
 		assert(ss);
-		if(Plist->isListEmpty()) {
+		if (m_playlist.isListEmpty()) {
 			ss->setSong(m_songs.currentPtr());
 		} else {
-			ss->setSong(Plist->getNextSongInQue());
+			ss->setSong(m_playlist.getNextSongInQue());
 		}
 		sm->activateScreen("Sing");
 	}
@@ -135,7 +134,7 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 			if (key == SDLK_F8) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 1); // Dance
 			// The rest are only available when there are songs available
 			else if (m_songs.empty()) return;
-			else if (key == SDLK_INSERT) Plist->addSongToQue(m_songs.currentPtr());
+			else if (key == SDLK_INSERT) m_playlist.addSongToQue(m_songs.currentPtr());
 			else if (!m_jukebox && key == SDLK_F4) m_jukebox = true;
 			else if (key == SDLK_END) show_hiscores ? show_hiscores = false : show_hiscores = true;
 		} else if (key == SDLK_END) show_hiscores ? show_hiscores = false : show_hiscores = true;
