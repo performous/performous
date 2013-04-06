@@ -1,6 +1,6 @@
 #pragma once
 
-#include <iostream>
+#include <vector>
 #include "song.hh"
 #include <boost/shared_ptr.hpp>
 
@@ -13,8 +13,12 @@ public:
 	void addSong(boost::shared_ptr<Song> song);
 	/// Returns the next song and removes it from the queue
 	boost::shared_ptr<Song> getNext();
+	/// Returns all currently queued songs
+	SongList& getList();
 	/// Returns true if the queue is empty
 	bool isEmpty();
+	/// Randomizes the order of the playlist
+	void shuffle();
 
 private:
 	SongList m_list;
