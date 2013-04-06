@@ -4,12 +4,10 @@
 #include "song.hh"
 #include <boost/scoped_ptr.hpp>
 
-using namespace std;
-
 class PlayList
 {
 private:
-	vector< boost::shared_ptr<Song> > pList;
+	std::vector< boost::shared_ptr<Song> > pList;
 
 public:
 	boost::shared_ptr<Song> getNextSongInQueue();
