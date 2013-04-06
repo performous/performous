@@ -1,20 +1,21 @@
 #include "playlist.hh"
 #include "song.hh"
 
-void PlayList::addSongToQueue(boost::shared_ptr<Song> song)
+void PlayList::addSong(boost::shared_ptr<Song> song)
 {
-	pList.push_back(song);
+	m_list.push_back(song);
 }
 
-bool PlayList::isListEmpty()
+bool PlayList::isEmpty()
 {
-	return pList.empty();
+	return m_list.empty();
 }
 
-boost::shared_ptr<Song> PlayList::getNextSongInQueue()
+boost::shared_ptr<Song> PlayList::getNext()
 {
+	if (isEmpty()) return boost::shared_ptr<Song>();
 	boost::shared_ptr<Song> nextSong;
-	nextSong = pList[0];
-	pList.erase(pList.begin());
+	nextSong = m_list[0];
+	m_list.erase(m_list.begin());
 	return nextSong;
 }
