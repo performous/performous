@@ -69,14 +69,11 @@ void ScreenSongs::manageSharedKey(input::NavEvent const& event) {
 		Screen* s = sm->getScreen("Sing");
 		ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
 		assert(ss);
-		if(Plist->isListEmpty())
-		  {
-		ss->setSong(m_songs.currentPtr());
-		  }
-		else
-		  {
-		ss->setSong(Plist->getNextSongInQue());
-		  }
+		if(Plist->isListEmpty()) {
+			ss->setSong(m_songs.currentPtr());
+		} else {
+			ss->setSong(Plist->getNextSongInQue());
+		}
 		sm->activateScreen("Sing");
 	}
 	else if (event.menu == input::NAVMENU_A_PREV) { m_songs.advance(-1); hiscore_start_pos = 0; }
