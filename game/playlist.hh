@@ -21,6 +21,8 @@ public:
 	bool isEmpty();
 	/// Randomizes the order of the playlist
 	void shuffle();
+    ///clears list
+    void clear();
 
 private:
 	SongList m_list;

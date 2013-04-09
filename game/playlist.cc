@@ -31,3 +31,8 @@ void PlayList::shuffle()
 {
 	std::random_shuffle(m_list.begin(), m_list.end());
 }
+
+void PlayList::clear()
+{
+    m_list.clear();
+}

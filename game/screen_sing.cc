@@ -125,8 +125,9 @@ void ScreenSing::setupVocals() {
 void ScreenSing::createPauseMenu() {
 	m_menu.clear();
 	m_menu.add(MenuOption(_("Resume"), _("Back to performing!")));
-	m_menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning")).screen("Sing"));
-	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).screen("Songs"));
+    m_menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning")).screen("Sing"));
+    m_menu.add(MenuOption(_("Skip"), _("Skip current song")).screen("Songs"));
+    m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).screen("Songs"));
 	m_menu.close();
 }
 
