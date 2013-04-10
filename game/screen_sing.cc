@@ -130,7 +130,7 @@ void ScreenSing::createPauseMenu() {
 	m_menu.add(MenuOption(_("Skip"), _("Skip current song")).screen("Songs"));
 	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).call([]() {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
-	ScreenSongs* songBrowser = (ScreenSongs*) sm->getScreen("Songs");
+	ScreenSongs* songBrowser = dynamic_cast<ScreenSongs*>(sm->getScreen("Songs"));
 	songBrowser->getPlaylist().clear();
 	sm->activateScreen("Songs");
 	}));
