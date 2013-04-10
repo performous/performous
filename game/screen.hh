@@ -7,6 +7,7 @@
 #include "video_driver.hh"
 #include "dialog.hh"
 #include "fbo.hh"
+#include "playlist.hh"
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <SDL.h>
@@ -34,7 +35,6 @@ class Screen {
 	virtual void reloadGL() { exit(); enter(); }
 	/// returns screen name
 	std::string getName() const { return m_name; }
-
   private:
 	std::string m_name;
 };
