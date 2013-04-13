@@ -8,7 +8,12 @@
 #include "textinput.hh"
 #include "video.hh"
 #include "playlist.hh"
+#include "menu.hh"
+#include "opengl_text.hh"
+
 #include <boost/scoped_ptr.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
+
 
 class Audio;
 class Database;
@@ -16,6 +21,9 @@ class Song;
 class Songs;
 class Surface;
 class ThemeSongs;
+
+class Backgrounds;
+class ThemeInstrumentMenu;
 
 /// song chooser screen
 class ScreenSongs : public Screen {
@@ -39,6 +47,8 @@ private:
 	void drawInstruments(Dimensions const& dim, float alpha = 1.0f) const;
 	void drawMultimedia();
 	void update();
+	void drawMenu();
+	void createPlaylistMenu();
 
 	Audio& m_audio;
 	Songs& m_songs;
@@ -54,9 +64,11 @@ private:
 	boost::scoped_ptr<Surface> m_bandCover;
 	boost::scoped_ptr<Surface> m_danceCover;
 	boost::scoped_ptr<Texture> m_instrumentList;
+	boost::scoped_ptr<ThemeInstrumentMenu> m_menuTheme;
 	Cachemap<std::string, Surface> m_covers;
 	PlayList m_playlist;
 	bool m_jukebox;
 	bool show_hiscores;
 	int hiscore_start_pos;
+	Menu m_menu;
 };

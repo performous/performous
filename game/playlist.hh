@@ -21,10 +21,12 @@ public:
 	bool isEmpty();
 	/// Randomizes the order of the playlist
 	void shuffle();
-    ///clears list
-    void clear();
-
+	///clears list
+	void clear();
+	///gets the number of songs in the list
+	int getCount();
 private:
 	SongList m_list;
+	int count=0;
 };
 

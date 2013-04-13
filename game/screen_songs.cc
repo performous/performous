@@ -34,6 +34,7 @@ void ScreenSongs::enter() {
 	    ss->setSong(m_playlist.getNext());
 	    sm->activateScreen("Sing");
 	  }
+	m_menu.close();
 	m_songs.setFilter(m_search.text);
 	m_audio.fadeout();
 	m_jukebox = false;
@@ -46,6 +47,7 @@ void ScreenSongs::enter() {
 
 void ScreenSongs::reloadGL() {
 	theme.reset(new ThemeSongs());
+	m_menuTheme.reset(new ThemeInstrumentMenu());
 	m_songbg_default.reset(new Surface(getThemePath("songs_bg_default.svg")));
 	m_songbg_ground.reset(new Surface(getThemePath("songs_bg_ground.svg")));
 	m_singCover.reset(new Surface(getThemePath("no_cover.svg")));
@@ -57,6 +59,8 @@ void ScreenSongs::reloadGL() {
 
 void ScreenSongs::exit() {
 	m_covers.clear();
+	m_menu.clear();
+	m_menuTheme.reset();
 	m_singCover.reset();
 	m_instrumentCover.reset();
 	m_danceCover.reset();
@@ -68,21 +72,34 @@ void ScreenSongs::exit() {
 	m_songbg_default.reset();
 	m_songbg_ground.reset();
 	m_playing.clear();
+
 }
 
 /**Add actions here which should effect both the
   jukebox and the normal screen*/
 void ScreenSongs::manageSharedKey(input::NavEvent const& event) {
 	input::NavButton nav = event.button;
-	if (nav == input::NAV_PAUSE) m_audio.togglePause();
+	if (m_menu.isOpen()) {
+
+		if (event.menu == input::NAVMENU_A_NEXT) { m_menu.move(1); return; }
+		else if (event.menu == input::NAVMENU_A_PREV) { m_menu.move(-1); return; }
+		else if (event.menu == input::NAVMENU_B_PREV) { m_menu.action(-1); return; }
+		else if (event.menu == input::NAVMENU_B_NEXT) { m_menu.action(1); return; }
+	}
+	else if (nav == input::NAV_PAUSE) m_audio.togglePause();
 	else if (nav == input::NAV_START) {
-		ScreenManager* sm = ScreenManager::getSingletonPtr();
-		Screen* s = sm->getScreen("Sing");
-		ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
-		assert(ss);
-		m_playlist.addSong(m_songs.currentPtr());
-		ss->setSong(m_playlist.getNext());
-		sm->activateScreen("Sing");
+		if (m_menu.isOpen()) {
+		    m_menu.action();
+		    // Did the action close the menu?
+		    if (!m_menu.isOpen() && m_audio.isPaused()) {
+			    m_audio.togglePause();
+		    }
+		 }
+		else {
+		createPlaylistMenu();
+		m_audio.togglePause();
+		m_menu.open();
+		 }
 	}
 	else if (event.menu == input::NAVMENU_A_PREV) { m_songs.advance(-1); hiscore_start_pos = 0; }
 	else if (event.menu == input::NAVMENU_A_NEXT) { m_songs.advance(1); hiscore_start_pos = 0; }
@@ -298,6 +315,8 @@ void ScreenSongs::draw() {
 		} else theme->hiscores.draw(oss_order.str());
 		if (!show_hiscores) drawInstruments(Dimensions(m_instrumentList->dimensions.ar()).fixedHeight(0.03).center(-0.04));
 	}
+	// Menus on top of everything
+	if (m_menu.isOpen()) drawMenu();
 }
 
 void ScreenSongs::drawCovers() {
@@ -450,3 +469,69 @@ void ScreenSongs::drawInstruments(Dimensions const& dim, float alpha) const {
 	}
 }
 
+void ScreenSongs::drawMenu() {
+	if (m_menu.empty()) return;
+	// Some helper vars
+	ThemeInstrumentMenu& th = *m_menuTheme;
+	MenuOptions::const_iterator cur = static_cast<MenuOptions::const_iterator>(&m_menu.current());
+	double w = m_menu.dimensions.w();
+	const float txth = th.option_selected.h();
+	const float step = txth * 0.85f;
+	const float h = m_menu.getOptions().size() * step + step;
+	float y = -h * .5f + step;
+	float x = -w * .5f + step;
+	// Background
+	th.bg.dimensions.middle(0).center(0).stretch(w, h);
+	th.bg.draw();
+	// Loop through menu items
+	w = 0;
+	for (MenuOptions::const_iterator it = m_menu.begin(); it != m_menu.end(); ++it) {
+		// Pick the font object
+		SvgTxtTheme* txt = &th.option_selected;
+		if (cur != it) txt = &(th.getCachedOption(it->getName()));
+		// Set dimensions and draw
+		txt->dimensions.middle(x).center(y);
+		txt->draw(it->getName());
+		w = std::max(w, txt->w() + 2 * step); // Calculate the widest entry
+		y += step;
+	}
+	if (cur->getComment() != "") {
+		th.comment.dimensions.middle(0).screenBottom(-0.12);
+		th.comment.draw(cur->getComment());
+	}
+	m_menu.dimensions.stretch(w, h);
+}
+
+void ScreenSongs::createPlaylistMenu() {
+  ///submenu for playlist support
+  m_menu.clear();
+  m_menu.add(MenuOption(_("Add to playlist"), _("Add this song to the playlist")).call([this]() {
+      this->m_playlist.addSong(m_songs.currentPtr());
+      m_menu.close();
+      }));
+  if(m_playlist.isEmpty()) {
+    m_menu.add(MenuOption(_("Play"), _("Only play this song")).call([this]() {
+        m_menu.close();
+        ScreenManager* sm = ScreenManager::getSingletonPtr();
+        Screen* s = sm->getScreen("Sing");
+        ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
+        assert(ss);
+        this->m_playlist.addSong(m_songs.currentPtr());
+        ss->setSong(m_playlist.getNext());
+        sm->activateScreen("Sing");
+        }));
+    }
+  else {
+      m_menu.add(MenuOption(_("Add and play"), _("Add this song to the end of the playlist and start singing")).call([this]() {
+          this->m_playlist.addSong(m_songs.currentPtr());
+          m_menu.close();
+          ScreenManager* sm = ScreenManager::getSingletonPtr();
+          Screen* s = sm->getScreen("Sing");
+          ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
+          assert(ss);
+          this->m_playlist.addSong(m_songs.currentPtr());
+          ss->setSong(m_playlist.getNext());
+          sm->activateScreen("Sing");
+          }));
+    }
+}
