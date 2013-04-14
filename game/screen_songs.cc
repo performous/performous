@@ -78,31 +78,41 @@ void ScreenSongs::exit() {
 /**Add actions here which should effect both the
   jukebox and the normal screen*/
 void ScreenSongs::manageSharedKey(input::NavEvent const& event) {
-	input::NavButton nav = event.button;
-	if (m_menu.isOpen()) {
+input::NavButton nav = event.button;
+if (nav == input::NAV_PAUSE) m_audio.togglePause();
+else if (nav == input::NAV_START) {
+    if (m_menu.isOpen()) {
+          m_menu.action();
+          // Did the action close the menu?
+          if (!m_menu.isOpen() && m_audio.isPaused()) {
+            m_audio.togglePause();
+          }
+    }
+    else {
+      createPlaylistMenu();
+      m_audio.togglePause();
+      m_menu.open();
+    }
+}
+else if (event.menu == input::NAVMENU_A_PREV) {
+    if(m_menu.isOpen()) {
+        m_menu.move(-1);
+      }
+    else {
+        m_songs.advance(-1);
+        hiscore_start_pos = 0;
+      }
 
-		if (event.menu == input::NAVMENU_A_NEXT) { m_menu.move(1); return; }
-		else if (event.menu == input::NAVMENU_A_PREV) { m_menu.move(-1); return; }
-		else if (event.menu == input::NAVMENU_B_PREV) { m_menu.action(-1); return; }
-		else if (event.menu == input::NAVMENU_B_NEXT) { m_menu.action(1); return; }
-	}
-	else if (nav == input::NAV_PAUSE) m_audio.togglePause();
-	else if (nav == input::NAV_START) {
-		if (m_menu.isOpen()) {
-		    m_menu.action();
-		    // Did the action close the menu?
-		    if (!m_menu.isOpen() && m_audio.isPaused()) {
-			    m_audio.togglePause();
-		    }
-		 }
-		else {
-		createPlaylistMenu();
-		m_audio.togglePause();
-		m_menu.open();
-		 }
-	}
-	else if (event.menu == input::NAVMENU_A_PREV) { m_songs.advance(-1); hiscore_start_pos = 0; }
-	else if (event.menu == input::NAVMENU_A_NEXT) { m_songs.advance(1); hiscore_start_pos = 0; }
+  }
+else if (event.menu == input::NAVMENU_A_NEXT) {
+    if(m_menu.isOpen()) {
+        m_menu.move(1);
+      }
+    else {
+        m_songs.advance(1);
+        hiscore_start_pos = 0;
+      }
+  }
 }
 
 void ScreenSongs::manageEvent(input::NavEvent const& event) {
@@ -134,8 +144,22 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
 	}
 	// The rest are only available when there are songs available
 	else if (m_songs.empty()) return;
-	else if (event.menu == input::NAVMENU_B_PREV) m_songs.sortChange(-1);
-	else if (event.menu == input::NAVMENU_B_NEXT) m_songs.sortChange(1);
+	else if (event.menu == input::NAVMENU_B_PREV) {
+	    if(m_menu.isOpen()) {
+		m_menu.move(-1);
+	      }
+	    else {
+	    m_songs.sortChange(-1);
+	      }
+	  }
+	else if (event.menu == input::NAVMENU_B_NEXT) {
+	    if(m_menu.isOpen()) {
+		m_menu.move(1);
+	      }
+	    else {
+	    m_songs.sortChange(1);
+	      }
+	  }
 	else if (nav == input::NAV_MOREUP) m_songs.advance(-10);
 	else if (nav == input::NAV_MOREDOWN) m_songs.advance(10);
 	else manageSharedKey(event);
@@ -160,7 +184,6 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 			if (key == SDLK_F8) m_songs.setTypeFilter(m_songs.getTypeFilter() ^ 1); // Dance
 			// The rest are only available when there are songs available
             else if (m_songs.empty()) return;
-            else if (key == SDLK_INSERT) m_playlist.addSong(m_songs.currentPtr());
 			else if (!m_jukebox && key == SDLK_F4) m_jukebox = true;
 			else if (key == SDLK_END) show_hiscores ? show_hiscores = false : show_hiscores = true;
 		} else if (key == SDLK_END) show_hiscores ? show_hiscores = false : show_hiscores = true;
@@ -533,5 +556,8 @@ void ScreenSongs::createPlaylistMenu() {
           ss->setSong(m_playlist.getNext());
           sm->activateScreen("Sing");
           }));
+      m_menu.add(MenuOption(_("Shuffle"), _("Randomize the order of the playlist")).call([this]() {
+          m_playlist.shuffle();
+        }));
     }
 }
