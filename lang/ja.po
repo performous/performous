@@ -24,7 +24,7 @@ msgstr "ギタ−"
 
 #: ../game/song.hh:36
 msgid "Coop guitar"
-msgstr ""
+msgstr "コーオップ・ギター"
 
 #: ../game/song.hh:36
 msgid "Rhythm guitar"
@@ -44,15 +44,15 @@ msgstr "ボーカル"
 
 #: ../game/song.hh:36
 msgid "Harmonic 1"
-msgstr ""
+msgstr "ハルモニク 1"
 
 #: ../game/song.hh:36
 msgid "Harmonic 2"
-msgstr ""
+msgstr "ハルモニク 2"
 
 #: ../game/song.hh:36
 msgid "Harmonic 3"
-msgstr ""
+msgstr "ハルモニク 3"
 
 #: ../game/dancegraph.cc:18
 msgid "Beginner"
@@ -120,7 +120,7 @@ msgstr "止まって！"
 #: ../game/dancegraph.cc:335
 #: ../game/guitargraph.cc:482
 msgid "Streak!"
-msgstr ""
+msgstr "ストリーク!"
 
 #: ../game/guitargraph.cc:14
 msgid "Kids"
@@ -133,7 +133,7 @@ msgstr "専門家"
 #: ../game/guitargraph.cc:172
 #: ../game/guitargraph.cc:189
 msgid "Lefty-mode"
-msgstr ""
+msgstr "左手モード"
 
 #: ../game/guitargraph.cc:210
 msgid "ON"
@@ -145,7 +145,7 @@ msgstr "オフ"
 
 #: ../game/guitargraph.cc:211
 msgid "Toggle lefty-mode"
-msgstr ""
+msgstr "左手モードをトグル"
 
 #: ../game/guitargraph.cc:499
 msgid ""
@@ -157,19 +157,19 @@ msgstr ""
 
 #: ../game/guitargraph.cc:500
 msgid "Mistakes ignored!"
-msgstr ""
+msgstr "間違い無視"
 
 #: ../game/guitargraph.cc:1181
 msgid "Drum Fill!"
-msgstr ""
+msgstr "ドラム・フィル"
 
 #: ../game/guitargraph.cc:1182
 msgid "God Mode Ready!"
-msgstr ""
+msgstr "神モードできた"
 
 #: ../game/guitargraph.cc:1185
 msgid "Solo!"
-msgstr ""
+msgstr "ソロー"
 
 #: ../game/configuration.cc:116
 msgid "Enabled"
@@ -177,12 +177,12 @@ msgstr "使用可能"
 
 #: ../game/configuration.cc:116
 msgid "Disabled"
-msgstr ""
+msgstr "使用禁止"
 
 #: ../game/configuration.cc:120
 #, c-format
 msgid "%d items"
-msgstr ""
+msgstr "%d 細目"
 
 #: ../game/screen_sing.cc:34
 msgid "Loading song..."
@@ -194,19 +194,21 @@ msgstr "音楽が壊れています！"
 
 #: ../game/screen_sing.cc:45
 msgid "Initializing webcam..."
-msgstr ""
+msgstr "カメラを組み立ています"
 
+# ます-form (suspended form) + 中 means that something is in progress and is more often used in signs,
+# て+います is more conversational
 #: ../game/screen_sing.cc:52
 msgid "Loading video..."
-msgstr "ビデオを読み替えていまうす…"
+msgstr "ビデオを読み込み中…"
 
 #: ../game/screen_sing.cc:60
 msgid "Loading instruments..."
-msgstr "楽器を読み替えています…"
+msgstr "楽器を読み込み中…"
 
 #: ../game/screen_sing.cc:82
 msgid "Loading menu..."
-msgstr "メニューを読み込みます…"
+msgstr "メニューを読み込み中…"
 
 #: ../game/screen_sing.cc:84
 msgid "Resume"
@@ -224,17 +226,17 @@ msgstr "再起動"
 msgid ""
 "Start the song\n"
 "from the beginning"
-msgstr ""
+msgstr "初めから曲を開始する"
 
 #: ../game/screen_sing.cc:98
 msgid ""
 "Change vocal track\n"
 "(restart required)"
-msgstr ""
+msgstr "歌手トラックを変更する"
 
 #: ../game/screen_sing.cc:107
 msgid "Finalizing..."
-msgstr ""
+msgstr "纏め中"
 
 #: ../game/screen_sing.cc:111
 msgid "Song contains broken tracks!"
@@ -243,27 +245,30 @@ msgstr "音楽には壊れてトラックが含まれます"
 #: ../game/screen_sing.cc:113
 #, fuzzy
 msgid "Loading graphics..."
-msgstr "音楽を読み替えていまうす…"
+msgstr "音楽を読み込み中…"
 
 #: ../game/screen_sing.cc:114
 msgid "Loading complete"
-msgstr ""
+msgstr "良い込みできた"
 
 #: ../game/screen_sing.cc:140
 msgid "Random background..."
-msgstr ""
+msgstr "ランダム・バックグラウンド"
 
 # maybe 無視 instead of skip?
 # is 場合は superflous?
 # インストゥルメンタル could work instead of 楽器の休憩
 # or should a のに construction be used?
+
+# 場合 if a hepothetical situation, とき could be better because it has a wider range of usage
+# 押して下さい is however more polite than 押す
 #: ../game/screen_sing.cc:485
 msgid "   ENTER to skip instrumental break"
-msgstr "   楽器の休憩をスキップ欲しい場合は、エンターキーを押す"
+msgstr "   楽器の休憩をスキップ欲しい場合は、エンターキーを押して下さい"
 
 #: ../game/screen_sing.cc:486
 msgid "   Remember to wait for grading!"
-msgstr "   採点を待って忘れないで"
+msgstr "   採点を待って忘れないで下さい"
 
 #: ../game/screen_sing.cc:618
 msgid "No player!"
@@ -275,44 +280,46 @@ msgstr ""
 
 #: ../game/screen_sing.cc:628
 msgid "Lead singer"
-msgstr ""
+msgstr "歌手一番"
 
 #: ../game/screen_sing.cc:629
 #: ../game/screen_sing.cc:635
 #: ../game/screen_sing.cc:641
 msgid "Rising star"
-msgstr ""
+msgstr "上がる星"
 
 #: ../game/screen_sing.cc:630
 #: ../game/screen_sing.cc:636
 #: ../game/screen_sing.cc:642
 msgid "Amateur"
-msgstr ""
+msgstr "素人"
 
+# from dictionary: 音痴 おんち (n,adj-no) (1) tone-deafness; amusia; having no ear for music; (adj-na) (2) tone-deaf; off-key; (suf) (3) having no sense (of something); being hopeless (when it comes to something)
 #: ../game/screen_sing.cc:631
 #: ../game/screen_sing.cc:643
 msgid "Tone deaf"
-msgstr ""
+msgstr "音痴"
 
 #: ../game/screen_sing.cc:633
 msgid "Maniac"
-msgstr ""
+msgstr "マニアック"
 
 #: ../game/screen_sing.cc:634
 msgid "Hoofer"
-msgstr ""
+msgstr "ホーファー"
 
+# 敗者 はいしゃ (n) the defeated; vanquished; loser; could be here as well
 #: ../game/screen_sing.cc:637
 msgid "Loser"
-msgstr ""
+msgstr "負け犬"
 
 #: ../game/screen_sing.cc:639
 msgid "Virtuoso"
-msgstr ""
+msgstr "妙手"
 
 #: ../game/screen_sing.cc:640
 msgid "Rocker"
-msgstr ""
+msgstr "ロッカー"
 
 #: ../game/songs.cc:205
 msgid "random order"
@@ -351,13 +358,20 @@ msgstr "千住が見つかりませんでした"
 # Unless I'm wrong:
 # [S1]なら[S2] = if S1 then S2 will happen
 # or is 名前に入れば... better?
+
+#なら is same as 入れば only なら should be put after a noun or な-adjective,
+# so 入れば would be better.
+# however, to "insert" text like a name is 入力する and a goal can be described either as ように
+# or as ために, ように is used with verbs that don't contain volition but ために is used with verbs that do.
+# finally, from the dictionary I got: 選手 せんしゅ (n) player (in game); team member; 千住 isn't anything according to my
+
 #: ../game/screen_players.cc:112
 msgid "Enter a name to create a new player."
-msgstr "名前に入るなら千住を作ります"
+msgstr "選手を作るように名前を入力して下さい"
 
 #: ../game/screen_players.cc:114
 msgid "Press enter to create player!"
-msgstr "エンターキーを押せば千住を作って"
+msgstr "エンターキーを押せば選手を作って"
 
 #: ../game/screen_players.cc:121
 msgid "You reached %1% points!"
@@ -387,19 +401,19 @@ msgstr "音楽を読み替えていまうす…"
 
 #: ../game/main.cc:148
 msgid "Creating screens..."
-msgstr ""
+msgstr "画面を作り中"
 
 #: ../game/main.cc:157
 msgid "Entering main menu"
-msgstr "メインメニューに入っています"
+msgstr "メインメニューに入り中"
 
 #: ../game/main.cc:169
 msgid "Screenshot taken!"
-msgstr ""
+msgstr "スクリーンショットを取りました"
 
 #: ../game/main.cc:172
 msgid "Screenshot failed!"
-msgstr ""
+msgstr "スクリーンショットを失敗しました"
 
 #: ../game/screen_audiodevices.cc:56
 msgid ""
