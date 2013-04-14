@@ -5,7 +5,6 @@
 void PlayList::addSong(boost::shared_ptr<Song> song)
 {
 	m_list.push_back(song);
-	count++;
 }
 
 boost::shared_ptr<Song> PlayList::getNext()
@@ -14,7 +13,6 @@ boost::shared_ptr<Song> PlayList::getNext()
 	boost::shared_ptr<Song> nextSong;
 	nextSong = m_list[0];
 	m_list.erase(m_list.begin());
-	count--;
 	return nextSong;
 }
 
@@ -39,7 +37,3 @@ void PlayList::clear()
     m_list.clear();
 }
 
-int PlayList::getCount()
-{
-  return count;
-}

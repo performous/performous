@@ -558,6 +558,14 @@ void ScreenSongs::createPlaylistMenu() {
           }));
       m_menu.add(MenuOption(_("Shuffle"), _("Randomize the order of the playlist")).call([this]() {
           m_playlist.shuffle();
+          m_menu.close();
+        }));
+      m_menu.add(MenuOption(_("Clear playlist"), _("Remove all the songs from the list")).call([this]() {
+          m_playlist.clear();
+          m_menu.close();
         }));
     }
+  m_menu.add(MenuOption(_("Back"), _("Back to song browser")).call([this]() {
+      m_menu.close();
+    }));
 }
