@@ -423,14 +423,18 @@ msgid ""
 "all existing audio device configuration.\n"
 "Your other options changes will be saved too."
 msgstr ""
+"自分の相対立する設定が有るのようです。 \n"
+"この設定をセーブするのは他の機会コンフィグレーションを上書きます。\n"
+"別の設定変更もセーブしますよ。"
+
 
 #: ../game/screen_audiodevices.cc:111
 msgid "- Unassigned -"
-msgstr ""
+msgstr "ー　当たらない　ー"
 
 #: ../game/screen_audiodevices.cc:131
 msgid "Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select to cancel. Ctrl + R to reset defaults"
-msgstr ""
+msgstr "矢印キーはコンフィギアーのに使います。エンターとスタートはセーブとテストのに使ってエスケープとセレクトはキャンセルのにつかいます。ctrl+R は設定を戻るのに使います"
 
 #: ../game/screen_audiodevices.cc:136
 msgid "For advanced device configuration, use command line parameter --audio (use --audiohelp for details)."
@@ -457,7 +461,7 @@ msgstr ""
 # ハイスコア or 高得点?
 #: ../game/screen_songs.cc:224
 msgid "(press END to view hiscores)"
-msgstr "（ハイスコアを見るばあいは、エンドキーを押す）"
+msgstr "（エンドキーを押すとハイスコアを見る事ができます。）"
 
 #: ../game/screen_songs.cc:225
 msgid "<type in to search>"
