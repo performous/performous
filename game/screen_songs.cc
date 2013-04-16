@@ -140,7 +140,11 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
 	} else if (nav == input::NAV_CANCEL) {
 		if (!m_search.text.empty()) { m_search.text.clear(); m_songs.setFilter(m_search.text); }
 		else if (m_songs.getTypeFilter() != 0) m_songs.setTypeFilter(0);
-		else sm->activateScreen("Intro");
+        else {
+            // make sure you clear the playlist or it will start the first song when you select ¨perform¨ from the main menu
+            m_playlist.clear();
+            sm->activateScreen("Intro");
+        }
 	}
 	// The rest are only available when there are songs available
 	else if (m_songs.empty()) return;
