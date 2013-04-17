@@ -6,6 +6,7 @@
 #include "hiscore.hh"
 #include "i18n.hh"
 #include "screen_sing.hh"
+#include "screen_playlist.hh"
 #include "songs.hh"
 #include "theme.hh"
 #include "util.hh"
@@ -24,16 +25,6 @@ ScreenSongs::ScreenSongs(std::string const& name, Audio& audio, Songs& songs, Da
 }
 
 void ScreenSongs::enter() {
-  if(!m_playlist.isEmpty())
-	  {
-	    //TODO instructions for displaying the list on screen
-	    ScreenManager* sm = ScreenManager::getSingletonPtr();
-	    Screen* s = sm->getScreen("Sing");
-	    ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
-	    assert(ss);
-	    ss->setSong(m_playlist.getNext());
-	    sm->activateScreen("Sing");
-	  }
 	m_menu.close();
 	m_songs.setFilter(m_search.text);
 	m_audio.fadeout();

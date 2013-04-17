@@ -1,4 +1,5 @@
 #include "screen_players.hh"
+#include "screen_songs.hh"
 
 #include "configuration.hh"
 #include "audio.hh"
@@ -64,7 +65,15 @@ void ScreenPlayers::manageEvent(input::NavEvent const& event) {
 
 		if (m_database.scores.empty() || !m_database.reachedHiscore(m_song)) {
 			// no more highscore, we are now finished
-			sm->activateScreen("Songs");
+            Screen* s = sm->getScreen("Songs");
+            ScreenSongs* ss =  dynamic_cast<ScreenSongs*> (s);
+            if(ss->getPlaylist().isEmpty()) {
+                sm->activateScreen("Songs");
+                return;
+            }
+            else {
+                sm->activateScreen("PlayList");
+            }
 		} else {
 			m_search.text.clear();
 			m_players.setFilter("");

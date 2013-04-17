@@ -25,22 +25,25 @@ class screen_playlist : public Screen
 public:
   screen_playlist(std::string const& name,Audio& audio, Songs& songs);
   void manageEvent(input::NavEvent const& event);
-  void manageEvent(SDL_Event) = 0;
-  void prepare() = 0;
-  void draw() = 0;
+  void manageEvent(SDL_Event);
+  void prepare();
+  void draw();
   void enter();
   void exit();
   void reloadGL();
 private:
+  bool keyPressed = false;
   Menu m_menu;
   Audio& m_audio;
   Songs& m_songs;
   void updatePlayList();
   void createEditMenu();
+  void drawMenu();
   PlayList m_playlist;
   Cachemap<std::string, Surface> m_covers;
   boost::scoped_ptr<ThemeInstrumentMenu> m_menuTheme;
   boost::scoped_ptr<ThemeSongs> theme;
+  AnimValue m_nextTimer;
 };
 
 
