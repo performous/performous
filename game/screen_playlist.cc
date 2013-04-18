@@ -15,11 +15,11 @@ namespace {
     static const double NEXT_TIMEOUT = 15.0; // go to next song in 15 seconds
 }
 
-screenPlaylist::screenPlaylist(std::string const& name,Audio& audio, Songs& songs):
+ScreenPlaylist::ScreenPlaylist(std::string const& name,Audio& audio, Songs& songs):
     Screen(name) ,m_audio(audio), m_songs(songs), m_covers(20), m_playlist() {
 }
 
-void screenPlaylist::enter() {
+void ScreenPlaylist::enter() {
     m_audio.togglePause();
     updatePlayList();
     if(m_playlist.isEmpty())
@@ -31,19 +31,18 @@ void screenPlaylist::enter() {
     m_nextTimer.setValue(NEXT_TIMEOUT);
     m_menu.close();
     reloadGL();
-    //needs to start timer for 10 seconds here but boost::timer documentation is horrible!
 }
 
-void screenPlaylist::prepare() {
+void ScreenPlaylist::prepare() {
     return;
 }
 
-void screenPlaylist::reloadGL() {
+void ScreenPlaylist::reloadGL() {
     theme.reset(new ThemeSongs());
     m_menuTheme.reset(new ThemeInstrumentMenu());
 }
 
-void screenPlaylist::exit() {
+void ScreenPlaylist::exit() {
     m_menu.clear();
     m_menuTheme.reset();
     theme.reset();
@@ -51,7 +50,7 @@ void screenPlaylist::exit() {
 }
 
 
-void screenPlaylist::updatePlayList() {
+void ScreenPlaylist::updatePlayList() {
     ScreenManager* sm = ScreenManager::getSingletonPtr();
     Screen* s = sm->getScreen("Songs");
     ScreenSongs* ss = dynamic_cast<ScreenSongs*> (s);
@@ -59,15 +58,15 @@ void screenPlaylist::updatePlayList() {
     m_playlist = ss->getPlaylist();
 }
 
-void screenPlaylist::manageEvent(input::NavEvent const& event) {
-    ScreenManager* sm = ScreenManager::getSingletonPtr();
-    input::NavButton nav = event.button;
-    if(keyPressed == false) {
+void ScreenPlaylist::manageEvent(input::NavEvent const& event) {
+  if(keyPressed == false) {
     keyPressed = true;
     createEditMenu();
     m_menu.open();
     }
-    else if (nav == input::NAV_PAUSE) m_audio.togglePause();
+  else {
+    input::NavButton nav = event.button;
+    if (nav == input::NAV_PAUSE) m_audio.togglePause();
     else if (nav == input::NAV_START) {
         if (m_menu.isOpen()) {
               m_menu.action();
@@ -102,14 +101,16 @@ void screenPlaylist::manageEvent(input::NavEvent const& event) {
           m_menu.move(1);
         }
      }
+   }
 }
 
-void screenPlaylist::manageEvent(SDL_Event) {
+void ScreenPlaylist::manageEvent(SDL_Event) {
     return;
 }
 
-void screenPlaylist::draw()
+void ScreenPlaylist::draw()
 {
+    theme->song.draw(m_playlist.getListAsString());
     if (m_nextTimer.get() == 0.0 && keyPressed == false)
     {
         ScreenManager* sm = ScreenManager::getSingletonPtr();
@@ -119,11 +120,19 @@ void screenPlaylist::draw()
         ss->setSong(m_playlist.getNext());
         sm->activateScreen("Sing");
     }
-    if (keyPressed == true && !m_menu.isOpen()) m_menu.open();
-    drawMenu();
+    //menu on top of everything
+    if (keyPressed == true && !m_menu.isOpen()) {
+        m_menu.open();
+        drawMenu();
+    }
+    if (m_menu.isOpen()) {
+        drawMenu();
+    }
+
+
 }
 
-void screenPlaylist::createEditMenu() {
+void ScreenPlaylist::createEditMenu() {
  m_menu.clear();
  m_menu.add(MenuOption(_("Continue"), _("Continue playing")).call([this]() {
      ScreenManager* sm = ScreenManager::getSingletonPtr();
@@ -150,7 +159,7 @@ void screenPlaylist::createEditMenu() {
  }));
 }
 
-void screenPlaylist::drawMenu() {
+void ScreenPlaylist::drawMenu() {
     if (m_menu.empty()) return;
     // Some helper vars
     ThemeInstrumentMenu& th = *m_menuTheme;

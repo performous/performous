@@ -3,6 +3,7 @@
 #include <vector>
 #include "song.hh"
 #include <boost/shared_ptr.hpp>
+#include <sstream>
 
 class PlayList
 {
@@ -23,6 +24,7 @@ public:
 	void shuffle();
 	///clears list
 	void clear();
+	std::string getListAsString();
 private:
 	SongList m_list;
 };

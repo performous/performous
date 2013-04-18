@@ -7,7 +7,7 @@
 #include "animvalue.hh"
 #include "playlist.hh"
 #include "controllers.hh"
-
+#include <vector>
 #include <boost/scoped_ptr.hpp>
 
 class Audio;
@@ -20,10 +20,11 @@ class Backgrounds;
 class ThemeInstrumentMenu;
 
 
-class screenPlaylist : public Screen
+class ScreenPlaylist : public Screen
 {
 public:
-  screenPlaylist(std::string const& name,Audio& audio, Songs& songs);
+  typedef std::vector< boost::shared_ptr<Song> > SongList;
+  ScreenPlaylist(std::string const& name,Audio& audio, Songs& songs);
   void manageEvent(input::NavEvent const& event);
   void manageEvent(SDL_Event);
   void prepare();

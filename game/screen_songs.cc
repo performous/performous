@@ -547,7 +547,6 @@ void ScreenSongs::createPlaylistMenu() {
           Screen* s = sm->getScreen("Sing");
           ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
           assert(ss);
-          this->m_playlist.addSong(m_songs.currentPtr());
           ss->setSong(m_playlist.getNext());
           sm->activateScreen("Sing");
           }));
