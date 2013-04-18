@@ -132,7 +132,7 @@ void ScreenSing::createPauseMenu() {
 	ScreenManager* sm = ScreenManager::getSingletonPtr();
 	ScreenSongs* songBrowser = dynamic_cast<ScreenSongs*>(sm->getScreen("Songs"));
 	songBrowser->getPlaylist().clear();
-	sm->activateScreen("Songs");
+	sm->activateScreen("Playlist");
 	}));
 
 	m_menu.close();
@@ -238,15 +238,7 @@ void ScreenSing::activateNextScreen()
 	m_database.addSong(m_song);
 	if (m_database.scores.empty() || !m_database.reachedHiscore(m_song)) {
 		// if no highscore reached..
-        ScreenSongs* sc =  dynamic_cast<ScreenSongs*> (sm->getScreen("Songs"));
-        if(sc->getPlaylist().isEmpty()) {
-            sm->activateScreen("Songs");
-            return;
-        }
-        else {
             sm->activateScreen("PlayList");
-        }
-
 	}
 
 	// Score window visible -> Enter quits to Players Screen

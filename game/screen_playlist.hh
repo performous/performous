@@ -20,10 +20,10 @@ class Backgrounds;
 class ThemeInstrumentMenu;
 
 
-class screen_playlist : public Screen
+class screenPlaylist : public Screen
 {
 public:
-  screen_playlist(std::string const& name,Audio& audio, Songs& songs);
+  screenPlaylist(std::string const& name,Audio& audio, Songs& songs);
   void manageEvent(input::NavEvent const& event);
   void manageEvent(SDL_Event);
   void prepare();

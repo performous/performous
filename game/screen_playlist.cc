@@ -15,36 +15,43 @@ namespace {
     static const double NEXT_TIMEOUT = 15.0; // go to next song in 15 seconds
 }
 
-screen_playlist::screen_playlist(std::string const& name,Audio& audio, Songs& songs):
+screenPlaylist::screenPlaylist(std::string const& name,Audio& audio, Songs& songs):
     Screen(name) ,m_audio(audio), m_songs(songs), m_covers(20), m_playlist() {
 }
 
-void screen_playlist::enter() {
+void screenPlaylist::enter() {
+    m_audio.togglePause();
+    updatePlayList();
+    if(m_playlist.isEmpty())
+      {
+        ScreenManager* sm = ScreenManager::getSingletonPtr();
+        sm->activateScreen("Songs");
+      }
     keyPressed = false;
     m_nextTimer.setValue(NEXT_TIMEOUT);
     m_menu.close();
-    updatePlayList();
     reloadGL();
     //needs to start timer for 10 seconds here but boost::timer documentation is horrible!
 }
 
-void screen_playlist::prepare() {
+void screenPlaylist::prepare() {
     return;
 }
 
-void screen_playlist::reloadGL() {
+void screenPlaylist::reloadGL() {
     theme.reset(new ThemeSongs());
     m_menuTheme.reset(new ThemeInstrumentMenu());
 }
 
-void screen_playlist::exit() {
+void screenPlaylist::exit() {
     m_menu.clear();
     m_menuTheme.reset();
     theme.reset();
+    m_audio.togglePause();
 }
 
 
-void screen_playlist::updatePlayList() {
+void screenPlaylist::updatePlayList() {
     ScreenManager* sm = ScreenManager::getSingletonPtr();
     Screen* s = sm->getScreen("Songs");
     ScreenSongs* ss = dynamic_cast<ScreenSongs*> (s);
@@ -52,19 +59,56 @@ void screen_playlist::updatePlayList() {
     m_playlist = ss->getPlaylist();
 }
 
-void screen_playlist::manageEvent(input::NavEvent const& event) {
+void screenPlaylist::manageEvent(input::NavEvent const& event) {
+    ScreenManager* sm = ScreenManager::getSingletonPtr();
+    input::NavButton nav = event.button;
     if(keyPressed == false) {
     keyPressed = true;
     createEditMenu();
     m_menu.open();
     }
+    else if (nav == input::NAV_PAUSE) m_audio.togglePause();
+    else if (nav == input::NAV_START) {
+        if (m_menu.isOpen()) {
+              m_menu.action();
+        }
+    }
+    else if (event.menu == input::NAVMENU_A_PREV) {
+        if(m_menu.isOpen()) {
+          m_menu.move(-1);
+        }
+        ///will be for cycling through queued songs later
+        //else {
+        //  m_songs.advance(-1);
+        //}
+     }
+     else if (event.menu == input::NAVMENU_A_NEXT) {
+        if(m_menu.isOpen()) {
+          m_menu.move(1);
+        }
+        ///will be for cycling through queued songs later
+        //else {
+        //  m_songs.advance(1);
+        //}
+     }
+     else if (event.menu == input::NAVMENU_B_PREV) {
+        if(m_menu.isOpen()) {
+          m_menu.move(-1);
+        }
+
+     }
+     else if (event.menu == input::NAVMENU_B_NEXT) {
+        if(m_menu.isOpen()) {
+          m_menu.move(1);
+        }
+     }
 }
 
-void screen_playlist::manageEvent(SDL_Event) {
+void screenPlaylist::manageEvent(SDL_Event) {
     return;
 }
 
-void screen_playlist::draw()
+void screenPlaylist::draw()
 {
     if (m_nextTimer.get() == 0.0 && keyPressed == false)
     {
@@ -79,23 +123,34 @@ void screen_playlist::draw()
     drawMenu();
 }
 
-void screen_playlist::createEditMenu() {
+void screenPlaylist::createEditMenu() {
  m_menu.clear();
  m_menu.add(MenuOption(_("Continue"), _("Continue playing")).call([this]() {
-
+     ScreenManager* sm = ScreenManager::getSingletonPtr();
+     Screen* s = sm->getScreen("Sing");
+     ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
+     s = sm->getScreen("Songs");
+     ScreenSongs* sc = dynamic_cast<ScreenSongs*> (s);
+     assert(ss);
+     ss->setSong(sc->getPlaylist().getNext());
+     sm->activateScreen("Sing");
  }));
- m_menu.add(MenuOption(_("Add songs"), _("Open the song browser to add more songs")).call([this]() {
+ m_menu.add(MenuOption(_("Add songs"), _("Open the song browser to add more songs")).screen("Songs"));
+ 
+ /// will be uncommented when drawing stuff works
+ //m_menu.add(MenuOption(_("Remove song"), _("Remove currently selected song from list")).call([this]() {
 
- }));
- m_menu.add(MenuOption(_("Remove song"), _("Remove currently selected song from list")).call([this]() {
-
- }));
+ //}));
  m_menu.add(MenuOption(_("Quit"), _("Remove all the songs from the list and go back to main menu")).call([this]() {
-
+     ScreenManager* sm = ScreenManager::getSingletonPtr();
+     Screen* s = sm->getScreen("Songs");
+     ScreenSongs* ss = dynamic_cast<ScreenSongs*> (s);
+     ss->getPlaylist().clear();
+     sm->activateScreen("Intro");
  }));
 }
 
-void screen_playlist::drawMenu() {
+void screenPlaylist::drawMenu() {
     if (m_menu.empty()) return;
     // Some helper vars
     ThemeInstrumentMenu& th = *m_menuTheme;
