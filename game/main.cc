@@ -164,7 +164,7 @@ void mainLoop(std::string const& songlist) {
 		sm.addScreen(new ScreenAudioDevices("AudioDevices", audio));
 		sm.addScreen(new ScreenPaths("Paths", audio));
 		sm.addScreen(new ScreenPlayers("Players", audio, database));
-	sm.addScreen(new ScreenPlaylist("Playlist", audio, songs));
+	sm.addScreen(new ScreenPlaylist("Playlist", audio, songs, backgrounds));
 		sm.activateScreen("Intro");
 		sm.loading(_("Entering main menu"), 0.8);
 		sm.updateScreen();  // exit/enter, any exception is fatal error

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "backgrounds.hh"
 #include "screen.hh"
 #include "cachemap.hh"
 #include "menu.hh"
@@ -24,7 +25,7 @@ class ScreenPlaylist : public Screen
 {
 public:
   typedef std::vector< boost::shared_ptr<Song> > SongList;
-  ScreenPlaylist(std::string const& name,Audio& audio, Songs& songs);
+  ScreenPlaylist(std::string const& name,Audio& audio, Songs& songs, Backgrounds& bgs);
   void manageEvent(input::NavEvent const& event);
   void manageEvent(SDL_Event);
   void prepare();
@@ -41,9 +42,11 @@ private:
   void createEditMenu();
   void drawMenu();
   PlayList m_playlist;
+  Backgrounds& m_backgrounds;
   Cachemap<std::string, Surface> m_covers;
   boost::scoped_ptr<ThemeInstrumentMenu> m_menuTheme;
   boost::scoped_ptr<ThemeSongs> theme;
+  boost::scoped_ptr<Surface> m_background;
   AnimValue m_nextTimer;
 };
 

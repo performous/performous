@@ -15,8 +15,8 @@ namespace {
     static const double NEXT_TIMEOUT = 15.0; // go to next song in 15 seconds
 }
 
-ScreenPlaylist::ScreenPlaylist(std::string const& name,Audio& audio, Songs& songs):
-    Screen(name) ,m_audio(audio), m_songs(songs), m_covers(20), m_playlist() {
+ScreenPlaylist::ScreenPlaylist(std::string const& name,Audio& audio, Songs& songs, Backgrounds& bgs):
+    Screen(name) ,m_audio(audio), m_songs(songs), m_covers(20), m_playlist(), m_backgrounds(bgs) {
 }
 
 void ScreenPlaylist::enter() {
@@ -47,6 +47,7 @@ void ScreenPlaylist::exit() {
     m_menuTheme.reset();
     theme.reset();
     m_audio.togglePause();
+    m_background.reset();
 }
 
 
@@ -110,6 +111,8 @@ void ScreenPlaylist::manageEvent(SDL_Event) {
 
 void ScreenPlaylist::draw()
 {
+    if (!m_background || m_background->empty()) m_background.reset(new Surface(m_backgrounds.getRandom()));
+    m_background->draw();
     theme->song.draw(m_playlist.getListAsString());
     if (m_nextTimer.get() == 0.0 && keyPressed == false)
     {
