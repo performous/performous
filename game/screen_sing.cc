@@ -280,8 +280,8 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 			}
 			return;
 		}
-		else if (nav == input::NAV_LEFT) { m_menu.action(-1); return; }
-		else if (nav == input::NAV_RIGHT) { m_menu.action(1); return; }
+        else if (nav == input::NAV_LEFT) { m_menu.move(-1); return; }
+        else if (nav == input::NAV_RIGHT) { m_menu.move(1); return; }
 		else if (nav == input::NAV_DOWN) { m_menu.move(1); return; }
 		else if (nav == input::NAV_UP) { m_menu.move(-1); return; }
 	}
