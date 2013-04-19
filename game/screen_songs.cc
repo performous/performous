@@ -132,9 +132,39 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
 		if (!m_search.text.empty()) { m_search.text.clear(); m_songs.setFilter(m_search.text); }
 		else if (m_songs.getTypeFilter() != 0) m_songs.setTypeFilter(0);
         else {
-            // make sure you clear the playlist or it will start the first song when you select ¨perform¨ from the main menu
-            m_playlist.clear();
-            sm->activateScreen("Intro");
+            if(m_playlist.isEmpty()) sm->activateScreen("Intro");
+            else {
+                m_menu.clear();
+                m_menu.add(MenuOption(_("play"), _("Start the game with all songs in playlist")).call([this]() {
+                    this->m_playlist.addSong(m_songs.currentPtr());
+                    m_menu.close();
+                    ScreenManager* sm = ScreenManager::getSingletonPtr();
+                    Screen* s = sm->getScreen("Sing");
+                    ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
+                    assert(ss);
+                    ss->setSong(m_playlist.getNext());
+                    sm->activateScreen("Sing");
+                    }));
+                m_menu.add(MenuOption(_("Shuffle"), _("Randomize the order of the playlist")).call([this]() {
+                    m_playlist.shuffle();
+                    m_menu.close();
+                  }));
+                m_menu.add(MenuOption(_("Clear playlist"), _("Remove all the songs from the list")).call([this]() {
+                    m_playlist.clear();
+                    m_menu.close();
+                  }));
+                m_menu.add(MenuOption(_("View playlist"), _("View the current playlist")).screen("Playlist"));
+                m_menu.add(MenuOption(_("Back"), _("Back to song browser")).call([this]() {
+                    m_menu.close();
+                  }));
+                m_menu.add(MenuOption(_("Quit"), _("Clear playlist and quit to title screen")).call([this]() {
+                    m_playlist.clear();
+                    ScreenManager* sm = ScreenManager::getSingletonPtr();
+                    sm->activateScreen("Intro");
+                  }));
+                m_menu.open();
+
+            }
         }
 	}
 	// The rest are only available when there are songs available
@@ -550,14 +580,6 @@ void ScreenSongs::createPlaylistMenu() {
           ss->setSong(m_playlist.getNext());
           sm->activateScreen("Sing");
           }));
-      m_menu.add(MenuOption(_("Shuffle"), _("Randomize the order of the playlist")).call([this]() {
-          m_playlist.shuffle();
-          m_menu.close();
-        }));
-      m_menu.add(MenuOption(_("Clear playlist"), _("Remove all the songs from the list")).call([this]() {
-          m_playlist.clear();
-          m_menu.close();
-        }));
     }
   m_menu.add(MenuOption(_("Back"), _("Back to song browser")).call([this]() {
       m_menu.close();
