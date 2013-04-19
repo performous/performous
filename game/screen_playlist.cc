@@ -113,6 +113,8 @@ void ScreenPlaylist::draw()
 {
     if (!m_background || m_background->empty()) m_background.reset(new Surface(m_backgrounds.getRandom()));
     m_background->draw();
+    theme->song.setAlign(SvgTxtTheme::CENTER);
+    theme->song.dimensions.screenCenter().middle();
     theme->song.draw(m_playlist.getListAsString());
     if (m_nextTimer.get() == 0.0 && keyPressed == false)
     {
