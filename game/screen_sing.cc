@@ -61,7 +61,7 @@ void ScreenSing::enter() {
 		try { SongParser sp(*m_song); }
 		catch (SongParserException& e) {
 			std::clog << e;
-			sm->activateScreen("Songs");
+            sm->activateScreen("Playlist");
 		}
 	}
 	// Notify about broken tracks
@@ -261,7 +261,7 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 	}
 	// Instant quit with CANCEL at the very beginning
 	if (nav == input::NAV_CANCEL && time < 1.0) {
-		ScreenManager::getSingletonPtr()->activateScreen("Songs");
+        ScreenManager::getSingletonPtr()->activateScreen("Playlist");
 		return;
 	}
 	// Only pause or esc opens the global menu (instruments have their own menus)
@@ -494,7 +494,7 @@ void ScreenSing::draw() {
 	if (config["game/karaoke_mode"].b()) {
 		if (!m_audio.isPlaying()) {
 			ScreenManager* sm = ScreenManager::getSingletonPtr();
-			sm->activateScreen("Songs");
+            sm->activateScreen("Playlist");
 			return;
 		}
 	} else {
