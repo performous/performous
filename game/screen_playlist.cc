@@ -121,8 +121,9 @@ void ScreenPlaylist::draw()
         ScreenManager* sm = ScreenManager::getSingletonPtr();
         Screen* s = sm->getScreen("Sing");
         ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
+        ScreenSongs* sc = dynamic_cast<ScreenSongs*>(sm->getScreen("Songs"));
         assert(ss);
-        ss->setSong(m_playlist.getNext());
+        ss->setSong(sc->getPlaylist().getNext());
         sm->activateScreen("Sing");
     }
     //menu on top of everything
