@@ -98,7 +98,7 @@ void ScreenManager::dialog(std::string const& text) {
 }
 
 bool ScreenManager::closeDialog() {
-	bool ret = m_dialog;
+	bool ret = !!m_dialog;
 	m_dialog.reset();
 	return ret;
 }
