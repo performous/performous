@@ -48,10 +48,10 @@ void ScreenPlayers::exit() {
 }
 
 void ScreenPlayers::manageEvent(input::NavEvent const& event) {
-	ScreenManager* sm = ScreenManager::getSingletonPtr();
+	GameManager* gm = GameManager::getSingletonPtr();
 	input::NavButton nav = event.button;
 	if (nav == input::NAV_CANCEL) {
-		if (m_search.text.empty()) { sm->activateScreen("Songs"); return; }
+		if (m_search.text.empty()) { gm->activateScreen("Songs"); return; }
 		else { m_search.text.clear(); m_players.setFilter(m_search.text); }
 	} else if (nav == input::NAV_START) {
 		if (m_players.empty()) {
@@ -65,7 +65,7 @@ void ScreenPlayers::manageEvent(input::NavEvent const& event) {
 
 		if (m_database.scores.empty() || !m_database.reachedHiscore(m_song)) {
 			// no more highscore, we are now finished
-                sm->activateScreen("PlayList");
+		gm->activateScreen("PlayList");
 		} else {
 			m_search.text.clear();
 			m_players.setFilter("");

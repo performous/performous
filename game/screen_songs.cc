@@ -107,7 +107,7 @@ else if (event.menu == input::NAVMENU_A_NEXT) {
 }
 
 void ScreenSongs::manageEvent(input::NavEvent const& event) {
-	ScreenManager* sm = ScreenManager::getSingletonPtr();
+	GameManager* gm = GameManager::getSingletonPtr();
 	input::NavButton nav = event.button;
 	// Handle basic navigational input that is possible also with instruments
 	m_idleTimer.setValue(0.0);  // Reset idle timer
@@ -132,18 +132,18 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
 		if (!m_search.text.empty()) { m_search.text.clear(); m_songs.setFilter(m_search.text); }
 		else if (m_songs.getTypeFilter() != 0) m_songs.setTypeFilter(0);
         else {
-            if(m_playlist.isEmpty()) sm->activateScreen("Intro");
+            if(m_playlist.isEmpty()) gm->activateScreen("Intro");
             else {
                 m_menu.clear();
                 m_menu.add(MenuOption(_("play"), _("Start the game with all songs in playlist")).call([this]() {
                     this->m_playlist.addSong(m_songs.currentPtr());
                     m_menu.close();
-                    ScreenManager* sm = ScreenManager::getSingletonPtr();
-                    Screen* s = sm->getScreen("Sing");
+                    GameManager* gm = GameManager::getSingletonPtr();
+                    Screen* s = gm->getScreen("Sing");
                     ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
                     assert(ss);
                     ss->setSong(m_playlist.getNext());
-                    sm->activateScreen("Sing");
+                    gm->activateScreen("Sing");
                     }));
                 m_menu.add(MenuOption(_("Shuffle"), _("Randomize the order of the playlist")).call([this]() {
                     m_playlist.shuffle();
@@ -159,8 +159,8 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
                   }));
                 m_menu.add(MenuOption(_("Quit"), _("Clear playlist and quit to title screen")).call([this]() {
                     m_playlist.clear();
-                    ScreenManager* sm = ScreenManager::getSingletonPtr();
-                    sm->activateScreen("Intro");
+                    GameManager* gm = GameManager::getSingletonPtr();
+                    gm->activateScreen("Intro");
                   }));
                 m_menu.open();
 
@@ -188,11 +188,11 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
 	else if (nav == input::NAV_MOREUP) m_songs.advance(-10);
 	else if (nav == input::NAV_MOREDOWN) m_songs.advance(10);
 	else manageSharedKey(event);
-	sm->showLogo(!m_jukebox);
+	gm->showLogo(!m_jukebox);
 }
 
 void ScreenSongs::manageEvent(SDL_Event event) {
-	ScreenManager* sm = ScreenManager::getSingletonPtr();
+	GameManager* gm = GameManager::getSingletonPtr();
 	// Handle less common, keyboard only keys
 	if (event.type == SDL_KEYDOWN) {
 		SDL_keysym keysym = event.key.keysym;
@@ -213,7 +213,7 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 			else if (key == SDLK_END) show_hiscores ? show_hiscores = false : show_hiscores = true;
 		} else if (key == SDLK_END) show_hiscores ? show_hiscores = false : show_hiscores = true;
 	}
-	sm->showLogo(!m_jukebox);
+	gm->showLogo(!m_jukebox);
 }
 
 void ScreenSongs::update() {
@@ -560,25 +560,25 @@ void ScreenSongs::createPlaylistMenu() {
   if(m_playlist.isEmpty()) {
     m_menu.add(MenuOption(_("Play"), _("Only play this song")).call([this]() {
         m_menu.close();
-        ScreenManager* sm = ScreenManager::getSingletonPtr();
-        Screen* s = sm->getScreen("Sing");
+        GameManager* gm = GameManager::getSingletonPtr();
+        Screen* s = gm->getScreen("Sing");
         ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
         assert(ss);
         this->m_playlist.addSong(m_songs.currentPtr());
         ss->setSong(m_playlist.getNext());
-        sm->activateScreen("Sing");
+        gm->activateScreen("Sing");
         }));
     }
   else {
       m_menu.add(MenuOption(_("Add and play"), _("Add this song to the end of the playlist and start singing")).call([this]() {
           this->m_playlist.addSong(m_songs.currentPtr());
           m_menu.close();
-          ScreenManager* sm = ScreenManager::getSingletonPtr();
-          Screen* s = sm->getScreen("Sing");
+          GameManager* gm = GameManager::getSingletonPtr();
+          Screen* s = gm->getScreen("Sing");
           ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
           assert(ss);
           ss->setSong(m_playlist.getNext());
-          sm->activateScreen("Sing");
+          gm->activateScreen("Sing");
           }));
     }
   m_menu.add(MenuOption(_("Back"), _("Back to song browser")).call([this]() {

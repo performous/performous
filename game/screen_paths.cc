@@ -20,7 +20,7 @@ void ScreenPaths::enter() {
 	m_txtinp.text.clear();
 
 	// FIXME: Temp error message
-	ScreenManager::getSingletonPtr()->dialog(
+	GameManager::getSingletonPtr()->dialog(
 		_("This tool is not yet available.\n"
 		  "Configure paths by adding them\n"
 		  "as command line parameters and\n"
@@ -45,21 +45,21 @@ void ScreenPaths::manageEvent(SDL_Event event) {
 }
 
 void ScreenPaths::manageEvent(input::NavEvent const& ev) {
-	ScreenManager* sm = ScreenManager::getSingletonPtr();
+	GameManager* gm = GameManager::getSingletonPtr();
 	if (ev.button == input::NAV_CANCEL) {
-		if (m_txtinp.text.empty()) sm->activateScreen("Intro");
+		if (m_txtinp.text.empty()) gm->activateScreen("Intro");
 		else m_txtinp.text.clear();
 	}
 	else if (ev.button == input::NAV_PAUSE) m_audio.togglePause();
 	else if (ev.button == input::NAV_START) { 
 		// TODO: Save config
-		sm->activateScreen("Intro");
+		gm->activateScreen("Intro");
 	}
 }
 
 void ScreenPaths::draw() {
-	if (!ScreenManager::getSingletonPtr()->isDialogOpen())
-		ScreenManager::getSingletonPtr()->activateScreen("Intro"); // FIXME: Remove
+	if (!GameManager::getSingletonPtr()->isDialogOpen())
+		GameManager::getSingletonPtr()->activateScreen("Intro"); // FIXME: Remove
 
 	m_theme->bg.draw();
 

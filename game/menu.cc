@@ -67,11 +67,11 @@ void Menu::action(int dir) {
 			break;
 		}
 		case MenuOption::ACTIVATE_SCREEN: {
-			ScreenManager* sm = ScreenManager::getSingletonPtr();
+			GameManager* gm = GameManager::getSingletonPtr();
 			std::string screen = current().newValue.s();
 			clear();
-			if (screen.empty()) sm->finished();
-			else sm->activateScreen(screen);
+			if (screen.empty()) gm->finished();
+			else gm->activateScreen(screen);
 			break;
 		}
 		case MenuOption::CALLBACK: {
