@@ -65,7 +65,7 @@ static void signalSetup() {
 /// can be thrown as an exception to quit the game
 struct QuitNow {};
 
-static void checkEvents(GameManager& gm) {
+static void checkEvents(Game& gm) {
 	if (g_quit) {
 		std::cout << "Terminating, please wait... (or kill the process)" << std::endl;
 		throw QuitNow();
@@ -139,7 +139,7 @@ void mainLoop(std::string const& songlist) {
 	Backgrounds backgrounds;
 	Database database(getConfigDir() / "database.xml");
 	Songs songs(database, songlist);
-	GameManager gm(window);
+    Game gm(window);
 	try {
 		// Load audio samples
 		gm.loading(_("Loading audio samples..."), 0.5);
@@ -189,7 +189,7 @@ void mainLoop(std::string const& songlist) {
 			prof("misc");
 			try {
 				// Draw
-				window.render(boost::bind(&GameManager::drawScreen, &gm));
+                window.render(boost::bind(&Game::drawScreen, &gm));
 				glFinish();
 				prof("draw");
 				// Display (and wait until next frame)

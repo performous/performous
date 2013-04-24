@@ -29,7 +29,7 @@ namespace {
 
 	/// Add a flash message about the state of a config item
 	void dispInFlash(ConfigItem& ci) {
-		GameManager* gm = GameManager::getSingletonPtr();
+        Game* gm = Game::getSingletonPtr();
 		gm->flashMessage(ci.getShortDesc() + ": " + ci.getValue());
 	}
 }
@@ -40,7 +40,7 @@ ScreenSing::ScreenSing(std::string const& name, Audio& audio, Database& database
 }
 
 void ScreenSing::enter() {
-	GameManager* gm = GameManager::getSingletonPtr();
+    Game* gm = Game::getSingletonPtr();
 	// Initialize webcam
 	gm->loading(_("Initializing webcam..."), 0.1);
 	if (config["graphic/webcam"].b() && Webcam::enabled()) {
@@ -129,7 +129,7 @@ void ScreenSing::createPauseMenu() {
 	m_menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning")).screen("Sing"));
     m_menu.add(MenuOption(_("Skip"), _("Skip current song")).screen("Playlist"));
 	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).call([]() {
-    GameManager* gm = GameManager::getSingletonPtr();
+    Game* gm = Game::getSingletonPtr();
     gm->getCurrentPlayList().clear();
 	gm->activateScreen("Playlist");
 	}));
@@ -149,7 +149,7 @@ void ScreenSing::reloadGL() {
 }
 
 void ScreenSing::exit() {
-	GameManager::getSingletonPtr()->controllers.enableEvents(false);
+    Game::getSingletonPtr()->controllers.enableEvents(false);
 	m_engine.reset();
 	m_score_window.reset();
 	m_menu.clear();
@@ -164,7 +164,7 @@ void ScreenSing::exit() {
 	m_menuTheme.reset();
 	theme.reset();
 	if (m_audio.isPaused()) m_audio.togglePause();
-	GameManager::getSingletonPtr()->showLogo();
+    Game::getSingletonPtr()->showLogo();
 }
 
 
@@ -232,7 +232,7 @@ void ScreenSing::instrumentLayout(double time) {
 
 void ScreenSing::activateNextScreen()
 {
-	GameManager* gm = GameManager::getSingletonPtr();
+    Game* gm = Game::getSingletonPtr();
 
 	m_database.addSong(m_song);
 	if (m_database.scores.empty() || !m_database.reachedHiscore(m_song)) {
@@ -260,7 +260,7 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 	}
 	// Instant quit with CANCEL at the very beginning
 	if (nav == input::NAV_CANCEL && time < 1.0) {
-        GameManager::getSingletonPtr()->activateScreen("Playlist");
+        Game::getSingletonPtr()->activateScreen("Playlist");
 		return;
 	}
 	// Only pause or esc opens the global menu (instruments have their own menus)
@@ -385,7 +385,7 @@ namespace {
 }
 
 void ScreenSing::prepare() {
-	GameManager* gm = GameManager::getSingletonPtr();
+    Game* gm = Game::getSingletonPtr();
 	double time = m_audio.getPosition();
 	// Enable/disable controllers as needed (mostly so that keyboard navigation will not be obstructed).
 	gm->controllers.enableEvents(m_song->hasControllers() && !m_menu.isOpen() && !m_score_window.get());
@@ -492,7 +492,7 @@ void ScreenSing::draw() {
 
 	if (config["game/karaoke_mode"].b()) {
 		if (!m_audio.isPlaying()) {
-			GameManager* gm = GameManager::getSingletonPtr();
+            Game* gm = Game::getSingletonPtr();
 	    gm->activateScreen("Playlist");
 			return;
 		}
@@ -563,7 +563,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
   m_score_text(getThemePath("score_txt.svg")),
   m_score_rank(getThemePath("score_rank.svg"))
 {
-	GameManager::getSingletonPtr()->showLogo();
+    Game::getSingletonPtr()->showLogo();
 	m_pos.setTarget(0.0);
 	m_database.scores.clear();
 	// Singers

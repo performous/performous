@@ -24,7 +24,7 @@ void ScreenPractice::enter() {
 	m_samples.push_back("drum cymbal");
 	//m_samples.push_back("drum tom2");
 	reloadGL();
-	GameManager::getSingletonPtr()->controllers.enableEvents(true);
+	Game::getSingletonPtr()->controllers.enableEvents(true);
 }
 
 void ScreenPractice::reloadGL() {
@@ -32,21 +32,21 @@ void ScreenPractice::reloadGL() {
 }
 
 void ScreenPractice::exit() {
-	GameManager::getSingletonPtr()->controllers.enableEvents(false);
+	Game::getSingletonPtr()->controllers.enableEvents(false);
 	m_vumeters.clear();
 	m_samples.clear();
 	theme.reset();
 }
 
 void ScreenPractice::manageEvent(input::NavEvent const& event) {
-	GameManager* gm = GameManager::getSingletonPtr();
+	Game* gm = Game::getSingletonPtr();
 	input::NavButton nav = event.button;
 	if (nav == input::NAV_CANCEL || nav == input::NAV_START) gm->activateScreen("Intro");
 	else if (nav == input::NAV_PAUSE) m_audio.togglePause();
 }
 
 void ScreenPractice::prepare() {
-	GameManager* gm = GameManager::getSingletonPtr();
+	Game* gm = Game::getSingletonPtr();
 	// Process all instrument events that are available, then throw away the instruments...
 	for (input::DevicePtr dev; gm->controllers.getDevice(dev); ) {
 		for (input::Event ev; dev->getEvent(ev);) {

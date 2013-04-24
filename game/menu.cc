@@ -67,7 +67,7 @@ void Menu::action(int dir) {
 			break;
 		}
 		case MenuOption::ACTIVATE_SCREEN: {
-			GameManager* gm = GameManager::getSingletonPtr();
+			Game* gm = Game::getSingletonPtr();
 			std::string screen = current().newValue.s();
 			clear();
 			if (screen.empty()) gm->finished();

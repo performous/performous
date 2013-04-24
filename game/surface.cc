@@ -22,7 +22,7 @@
 using boost::uint32_t;
 
 Shader& getShader(std::string const& name) {
-	return GameManager::getSingletonPtr()->window().shader(name);  // FIXME
+	return Game::getSingletonPtr()->window().shader(name);  // FIXME
 }
 
 float Dimensions::screenY() const {

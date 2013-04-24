@@ -48,7 +48,7 @@ void ScreenPlayers::exit() {
 }
 
 void ScreenPlayers::manageEvent(input::NavEvent const& event) {
-	GameManager* gm = GameManager::getSingletonPtr();
+	Game* gm = Game::getSingletonPtr();
 	input::NavButton nav = event.button;
 	if (nav == input::NAV_CANCEL) {
 		if (m_search.text.empty()) { gm->activateScreen("Songs"); return; }

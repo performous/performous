@@ -14,7 +14,7 @@ ScreenIntro::ScreenIntro(std::string const& name, Audio& audio): Screen(name), m
 }
 
 void ScreenIntro::enter() {
-	GameManager::getSingletonPtr()->showLogo();
+	Game::getSingletonPtr()->showLogo();
 	m_audio.playMusic(getThemePath("menu.ogg"), true);
 	m_selAnim = AnimValue(0.0, 10.0);
 	m_submenuAnim = AnimValue(0.0, 3.0);
@@ -22,7 +22,7 @@ void ScreenIntro::enter() {
 	if( m_first ) {
 		std::string msg;
 		if (!m_audio.hasPlayback()) msg = _("No playback devices could be used.\n");
-		if (!msg.empty()) GameManager::getSingletonPtr()->dialog(msg + _("\nPlease configure some before playing."));
+		if (!msg.empty()) Game::getSingletonPtr()->dialog(msg + _("\nPlease configure some before playing."));
 		m_first = false;
 	}
 	reloadGL();
@@ -65,7 +65,7 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 			m_menu.current().value->reset(modifier & KMOD_ALT);
 		} else if (key == SDLK_s && modifier & KMOD_CTRL) {
 			writeConfig(modifier & KMOD_ALT);
-			GameManager::getSingletonPtr()->flashMessage((modifier & KMOD_ALT)
+			Game::getSingletonPtr()->flashMessage((modifier & KMOD_ALT)
 				? _("Settings saved as system defaults.") : _("Settings saved."));
 		}
 	}

@@ -84,7 +84,7 @@ public:
 	void drawMenu();
 	void toggleMenu(int forcestate = -1); // 0 = close, 1 = open, -1 = auto/toggle
 	void togglePause(int);
-	void quit(int) { GameManager::getSingletonPtr()->activateScreen("Songs"); }
+	void quit(int) { Game::getSingletonPtr()->activateScreen("Songs"); }
 	void unjoin();
 
 	// General getters

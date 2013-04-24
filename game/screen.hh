@@ -43,11 +43,11 @@ class Screen {
 /** manages screens
  * @see Singleton
  */
-class GameManager: public Singleton <GameManager> {
+class Game: public Singleton <Game> {
   public:
 	/// constructor
-	GameManager(Window& window);
-	~GameManager() { if (currentScreen) currentScreen->exit(); }
+    Game(Window& window);
+    ~Game() { if (currentScreen) currentScreen->exit(); }
 	/// Adds a screen to the manager
 	void addScreen(Screen* s) { std::string tmp = s->getName(); screens.insert(tmp, s); }
 	/// Switches active screen

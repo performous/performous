@@ -50,7 +50,7 @@ void ScreenAudioDevices::enter() {
 			if (!countRow("out=", *it, countmap["out="])) { ok = false; break; }
 		}
 		if (!ok)
-			GameManager::getSingletonPtr()->dialog(
+			Game::getSingletonPtr()->dialog(
 				_("It seems you have some manual configurations\nincompatible with this user interface.\nSaving these settings will override\nall existing audio device configuration.\nYour other options changes will be saved too."));
 	}
 	// Populate the mics vector and check open devices
@@ -64,7 +64,7 @@ void ScreenAudioDevices::enter() {
 void ScreenAudioDevices::exit() { m_theme.reset(); }
 
 void ScreenAudioDevices::manageEvent(input::NavEvent const& event) {
-	GameManager* gm = GameManager::getSingletonPtr();
+	Game* gm = Game::getSingletonPtr();
 	input::NavButton nav = event.button;
 	if (nav == input::NAV_CANCEL) gm->activateScreen("Intro");
 	else if (nav == input::NAV_PAUSE) m_audio.togglePause();
@@ -185,12 +185,12 @@ bool ScreenAudioDevices::save(bool skip_ui_config) {
 	// Give audio a little time to shutdown but then just quit
 	boost::thread audiokiller(boost::bind(&Audio::close, boost::ref(m_audio)));
 	if (!audiokiller.timed_join(boost::posix_time::milliseconds(2500)))
-		GameManager::getSingletonPtr()->fatalError("Audio hung for some reason.\nPlease restart Performous.");
+		Game::getSingletonPtr()->fatalError("Audio hung for some reason.\nPlease restart Performous.");
 	m_audio.restart(); // Reload audio to take the new settings into use
 	m_audio.playMusic(getThemePath("menu.ogg"), true); // Start music again
 	// Check that all went well
 	bool ret = verify(unassigned_id);
-	if (!ret) GameManager::getSingletonPtr()->dialog(_("Some devices failed to open!"));
+	if (!ret) Game::getSingletonPtr()->dialog(_("Some devices failed to open!"));
 	// Load the new config back for UI
 	load();
 	return ret;

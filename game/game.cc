@@ -10,9 +10,9 @@
 #include <stdexcept>
 #include <cstdlib>
 
-template<> GameManager* Singleton<GameManager>::ms_Singleton = NULL;
+template<> Game* Singleton<Game>::ms_Singleton = NULL;
 
-GameManager::GameManager(Window& _window):
+Game::Game(Window& _window):
   m_window(_window), m_finished(false), newScreen(), currentScreen(), currentPlaylist(),
   m_timeToFadeIn(), m_timeToFadeOut(), m_timeToShow(), m_message(),
   m_messagePopup(0.0, 1.0), m_textMessage(getThemePath("message_text.svg"), config["graphic/text_lod"].f()),
@@ -21,11 +21,11 @@ GameManager::GameManager(Window& _window):
 	m_textMessage.dimensions.middle().center(-0.05);
 }
 
-void GameManager::activateScreen(std::string const& name) {
+void Game::activateScreen(std::string const& name) {
 	newScreen = getScreen(name);
 }
 
-void GameManager::updateScreen() {
+void Game::updateScreen() {
 	if (!newScreen) return;
 	Screen* s = newScreen;  // A local copy in case exit() or enter() want to change screens again
 	newScreen = NULL;
@@ -35,7 +35,7 @@ void GameManager::updateScreen() {
 	currentScreen = s;
 }
 
-Screen* GameManager::getScreen(std::string const& name) {
+Screen* Game::getScreen(std::string const& name) {
 	try {
 		return &screens.at(name);
 	} catch (boost::bad_ptr_container_operation&) {
@@ -43,26 +43,26 @@ Screen* GameManager::getScreen(std::string const& name) {
 	}
 }
 
-void GameManager::prepareScreen() {
+void Game::prepareScreen() {
 	getCurrentScreen()->prepare();
 }
 
-void GameManager::drawScreen() {
+void Game::drawScreen() {
 	getCurrentScreen()->draw();
 	drawLogo();
 	drawNotifications();
 }
 
-void GameManager::loading(std::string const& message, float progress) {
+void Game::loading(std::string const& message, float progress) {
 	// TODO: Create a better one, this is quite ugly
 	flashMessage(message + " " + boost::lexical_cast<std::string>(int(round(progress*100))) + "%", 0.0f, 0.5f, 0.2f);
 	m_loadingProgress = progress;
 	m_window.blank();
-	m_window.render(boost::bind(&GameManager::drawLoading, this));
+    m_window.render(boost::bind(&Game::drawLoading, this));
 	m_window.swap();
 }
 
-void GameManager::drawLoading() {
+void Game::drawLoading() {
 	drawLogo();
 	drawNotifications();
 	const int maxi = 20;
@@ -76,15 +76,15 @@ void GameManager::drawLoading() {
 	}
 }
 
-void GameManager::fatalError(std::string const& message) {
+void Game::fatalError(std::string const& message) {
 	dialog("FATAL ERROR\n\n" + message);
 	m_window.blank();
-	m_window.render(boost::bind(&GameManager::drawNotifications, this));
+    m_window.render(boost::bind(&Game::drawNotifications, this));
 	m_window.swap();
 	boost::thread::sleep(now() + 4.0);
 }
 
-void GameManager::flashMessage(std::string const& message, float fadeIn, float hold, float fadeOut) {
+void Game::flashMessage(std::string const& message, float fadeIn, float hold, float fadeOut) {
 	m_message = message;
 	m_timeToFadeIn = fadeIn;
 	m_timeToShow = hold;
@@ -93,23 +93,23 @@ void GameManager::flashMessage(std::string const& message, float fadeIn, float h
 	m_messagePopup.setValue(0.0);
 }
 
-void GameManager::dialog(std::string const& text) {
+void Game::dialog(std::string const& text) {
 	m_dialog.reset(new Dialog(text));
 }
 
-bool GameManager::closeDialog() {
+bool Game::closeDialog() {
 	bool ret = m_dialog;
 	m_dialog.reset();
 	return ret;
 }
 
-void GameManager::drawLogo() {
+void Game::drawLogo() {
 	double v = 0.5 - 0.5 * std::cos(M_PI * m_logoAnim.get());
 	m_logo.dimensions.fixedHeight(0.1).left(-0.45).screenTop(-0.1 + 0.11 * v);
 	m_logo.draw();
 }
 
-void GameManager::drawNotifications() {
+void Game::drawNotifications() {
 	double time = m_messagePopup.get();
 	if (time != 0.0) {
 		bool haveToFadeIn = time <= (m_timeToFadeIn); // Is this fade in?
