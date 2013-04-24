@@ -96,7 +96,7 @@ private:
 	Window& m_window;
 public:
 	input::Controllers controllers;
-    PlayList* getCurrentPlayList();
+    PlayList& getCurrentPlayList() { return currentPlaylist; }
 private:
 	bool m_finished;
 	typedef boost::ptr_map<std::string, Screen> screenmap_t;

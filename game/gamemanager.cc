@@ -129,6 +129,3 @@ void GameManager::drawNotifications() {
 	// Dialog
 	if (m_dialog) m_dialog->draw();
 }
-PlayList* GameManager::getCurrentPlayList() {
-    return &currentPlaylist;
-}

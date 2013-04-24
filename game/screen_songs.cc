@@ -132,27 +132,27 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
 		if (!m_search.text.empty()) { m_search.text.clear(); m_songs.setFilter(m_search.text); }
 		else if (m_songs.getTypeFilter() != 0) m_songs.setTypeFilter(0);
         else {
-            if(gm->getCurrentPlayList()->isEmpty()) gm->activateScreen("Intro");
+            if(gm->getCurrentPlayList().isEmpty()) gm->activateScreen("Intro");
             else {
                 m_menu.clear();
                 m_menu.add(MenuOption(_("play"), _("Start the game with all songs in playlist")).call([this]() {
                     GameManager* tm = GameManager::getSingletonPtr();
-                    tm->getCurrentPlayList()->addSong(m_songs.currentPtr());
+                    tm->getCurrentPlayList().addSong(m_songs.currentPtr());
                     m_menu.close();
                     Screen* s = tm->getScreen("Sing");
                     ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
                     assert(ss);
-                    ss->setSong(tm->getCurrentPlayList()->getNext());
+                    ss->setSong(tm->getCurrentPlayList().getNext());
                     tm->activateScreen("Sing");
                     }));
                 m_menu.add(MenuOption(_("Shuffle"), _("Randomize the order of the playlist")).call([this]() {
                     GameManager* tm = GameManager::getSingletonPtr();
-                    tm->getCurrentPlayList()->shuffle();
+                    tm->getCurrentPlayList().shuffle();
                     m_menu.close();
                   }));
                 m_menu.add(MenuOption(_("Clear playlist"), _("Remove all the songs from the list")).call([this]() {
                     GameManager* tm = GameManager::getSingletonPtr();
-                    tm->getCurrentPlayList()->clear();
+                    tm->getCurrentPlayList().clear();
                     m_menu.close();
                   }));
                 m_menu.add(MenuOption(_("View playlist"), _("View the current playlist")).screen("Playlist"));
@@ -161,7 +161,7 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
                   }));
                 m_menu.add(MenuOption(_("Quit"), _("Clear playlist and quit to title screen")).call([this]() {
                     GameManager* tm = GameManager::getSingletonPtr();
-                    tm->getCurrentPlayList()->clear();
+                    tm->getCurrentPlayList().clear();
                     tm->activateScreen("Intro");
                   }));
                 m_menu.open();
@@ -558,30 +558,30 @@ void ScreenSongs::createPlaylistMenu() {
   m_menu.clear();
   m_menu.add(MenuOption(_("Add to playlist"), _("Add this song to the playlist")).call([this]() {
       GameManager* tm = GameManager::getSingletonPtr();
-      tm->getCurrentPlayList()->addSong(m_songs.currentPtr());
+      tm->getCurrentPlayList().addSong(m_songs.currentPtr());
       m_menu.close();
       }));
-  if(gm->getCurrentPlayList()->isEmpty()) {
+  if(gm->getCurrentPlayList().isEmpty()) {
     m_menu.add(MenuOption(_("Play"), _("Only play this song")).call([this]() {
         m_menu.close();
         GameManager* tm = GameManager::getSingletonPtr();
         Screen* s = tm->getScreen("Sing");
         ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
         assert(ss);
-        tm->getCurrentPlayList()->addSong(m_songs.currentPtr());
-        ss->setSong(tm->getCurrentPlayList()->getNext());
+        tm->getCurrentPlayList().addSong(m_songs.currentPtr());
+        ss->setSong(tm->getCurrentPlayList().getNext());
         tm->activateScreen("Sing");
         }));
     }
   else {
       m_menu.add(MenuOption(_("Add and play"), _("Add this song to the end of the playlist and start singing")).call([this]() {
           GameManager* tm = GameManager::getSingletonPtr();
-          tm->getCurrentPlayList()->addSong(m_songs.currentPtr());
+          tm->getCurrentPlayList().addSong(m_songs.currentPtr());
           m_menu.close();
           Screen* s = tm->getScreen("Sing");
           ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
           assert(ss);
-          ss->setSong(tm->getCurrentPlayList()->getNext());
+          ss->setSong(tm->getCurrentPlayList().getNext());
           tm->activateScreen("Sing");
           }));
     }
