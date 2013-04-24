@@ -38,7 +38,6 @@ public:
 	void drawCovers(); ///< draw the cover browser
 	Surface& getCover(Song const& song); ///< get appropriate cover image for the song (incl. no cover)
 	void drawJukebox(); ///< draw the songbrowser in jukebox mode (fullscreen, full previews, ...)
-	PlayList& getPlaylist() { return m_playlist; }
 
 private:
 	void manageSharedKey(input::NavEvent const& event); ///< same behaviour for jukebox and normal mode
@@ -64,7 +63,6 @@ private:
 	boost::scoped_ptr<Texture> m_instrumentList;
 	boost::scoped_ptr<ThemeInstrumentMenu> m_menuTheme;
 	Cachemap<std::string, Surface> m_covers;
-	PlayList m_playlist;
 	bool m_jukebox;
 	bool show_hiscores;
 	int hiscore_start_pos;

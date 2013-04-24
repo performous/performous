@@ -16,15 +16,14 @@ namespace {
 }
 
 ScreenPlaylist::ScreenPlaylist(std::string const& name,Audio& audio, Songs& songs, Backgrounds& bgs):
-    Screen(name) ,m_audio(audio), m_songs(songs), m_covers(20), m_playlist(), m_backgrounds(bgs) {
+    Screen(name) ,m_audio(audio), m_songs(songs), m_covers(20), m_backgrounds(bgs) {
 }
 
 void ScreenPlaylist::enter() {
+    GameManager* gm = GameManager::getSingletonPtr();
     m_audio.togglePause();
-    updatePlayList();
-    if(m_playlist.isEmpty())
+    if(gm->getCurrentPlayList()->isEmpty())
       {
-        GameManager* gm = GameManager::getSingletonPtr();
         gm->activateScreen("Songs");
       }
     keyPressed = false;
@@ -50,14 +49,6 @@ void ScreenPlaylist::exit() {
     m_background.reset();
 }
 
-
-void ScreenPlaylist::updatePlayList() {
-    GameManager* gm = GameManager::getSingletonPtr();
-    Screen* s = gm->getScreen("Songs");
-    ScreenSongs* ss = dynamic_cast<ScreenSongs*> (s);
-    assert(ss);
-    m_playlist = ss->getPlaylist();
-}
 
 void ScreenPlaylist::manageEvent(input::NavEvent const& event) {
   if(keyPressed == false) {
@@ -111,19 +102,18 @@ void ScreenPlaylist::manageEvent(SDL_Event) {
 
 void ScreenPlaylist::draw()
 {
+    GameManager* gm = GameManager::getSingletonPtr();
     if (!m_background || m_background->empty()) m_background.reset(new Surface(m_backgrounds.getRandom()));
     m_background->draw();
     theme->song.setAlign(SvgTxtTheme::CENTER);
     theme->song.dimensions.screenCenter().middle();
-    theme->song.draw(m_playlist.getListAsString());
+    theme->song.draw(gm->getCurrentPlayList()->getListAsString());
     if (m_nextTimer.get() == 0.0 && keyPressed == false)
     {
-        GameManager* gm = GameManager::getSingletonPtr();
         Screen* s = gm->getScreen("Sing");
         ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
-        ScreenSongs* sc = dynamic_cast<ScreenSongs*>(gm->getScreen("Songs"));
         assert(ss);
-        ss->setSong(sc->getPlaylist().getNext());
+        ss->setSong(gm->getCurrentPlayList()->getNext());
         gm->activateScreen("Sing");
     }
     //menu on top of everything
@@ -144,10 +134,8 @@ void ScreenPlaylist::createEditMenu() {
      GameManager* gm = GameManager::getSingletonPtr();
      Screen* s = gm->getScreen("Sing");
      ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
-     s = gm->getScreen("Songs");
-     ScreenSongs* sc = dynamic_cast<ScreenSongs*> (s);
      assert(ss);
-     ss->setSong(sc->getPlaylist().getNext());
+     ss->setSong(gm->getCurrentPlayList()->getNext());
      gm->activateScreen("Sing");
  }));
  m_menu.add(MenuOption(_("Add songs"), _("Open the song browser to add more songs")).screen("Songs"));
@@ -158,9 +146,7 @@ void ScreenPlaylist::createEditMenu() {
  //}));
  m_menu.add(MenuOption(_("Quit"), _("Remove all the songs from the list and go back to main menu")).call([this]() {
      GameManager* gm = GameManager::getSingletonPtr();
-     Screen* s = gm->getScreen("Songs");
-     ScreenSongs* ss = dynamic_cast<ScreenSongs*> (s);
-     ss->getPlaylist().clear();
+     gm->getCurrentPlayList()->clear();
      gm->activateScreen("Intro");
  }));
 }

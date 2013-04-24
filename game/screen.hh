@@ -6,6 +6,7 @@
 #include "opengl_text.hh"
 #include "video_driver.hh"
 #include "dialog.hh"
+#include "playlist.hh"
 #include "fbo.hh"
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -95,12 +96,14 @@ private:
 	Window& m_window;
 public:
 	input::Controllers controllers;
+    PlayList* getCurrentPlayList();
 private:
 	bool m_finished;
 	typedef boost::ptr_map<std::string, Screen> screenmap_t;
 	screenmap_t screens;
 	Screen* newScreen;
 	Screen* currentScreen;
+    PlayList currentPlaylist;
 	// Flash messages members
 	float m_timeToFadeIn;
 	float m_timeToFadeOut;

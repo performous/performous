@@ -38,10 +38,8 @@ private:
   Menu m_menu;
   Audio& m_audio;
   Songs& m_songs;
-  void updatePlayList();
   void createEditMenu();
   void drawMenu();
-  PlayList m_playlist;
   Backgrounds& m_backgrounds;
   Cachemap<std::string, Surface> m_covers;
   boost::scoped_ptr<ThemeInstrumentMenu> m_menuTheme;

@@ -13,7 +13,7 @@
 template<> GameManager* Singleton<GameManager>::ms_Singleton = NULL;
 
 GameManager::GameManager(Window& _window):
-  m_window(_window), m_finished(false), newScreen(), currentScreen(),
+  m_window(_window), m_finished(false), newScreen(), currentScreen(), currentPlaylist(),
   m_timeToFadeIn(), m_timeToFadeOut(), m_timeToShow(), m_message(),
   m_messagePopup(0.0, 1.0), m_textMessage(getThemePath("message_text.svg"), config["graphic/text_lod"].f()),
   m_loadingProgress(0.0f), m_logo(getThemePath("logo.svg")), m_logoAnim(0.0, 0.5)
@@ -128,4 +128,7 @@ void GameManager::drawNotifications() {
 	}
 	// Dialog
 	if (m_dialog) m_dialog->draw();
+}
+PlayList* GameManager::getCurrentPlayList() {
+    return &currentPlaylist;
 }
