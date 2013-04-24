@@ -62,6 +62,14 @@ ThemeInstrumentMenu::ThemeInstrumentMenu():
 {
 	comment.setAlign(SvgTxtTheme::CENTER);
 }
+//at the moment just a copy of themeSong
+ThemePlaylistScreen::ThemePlaylistScreen():
+    Theme(getThemePath("songs_bg.svg")),
+    song(getThemePath("songs_song.svg"), config["graphic/text_lod"].f()),
+    order(getThemePath("songs_order.svg"), config["graphic/text_lod"].f()),
+    has_hiscore(getThemePath("songs_has_hiscore.svg"), config["graphic/text_lod"].f()),
+    hiscores(getThemePath("songs_hiscores.svg"), config["graphic/text_lod"].f())
+{}
 
 SvgTxtTheme& ThemeInstrumentMenu::getCachedOption(const std::string& text) {
 	if (options.contains(text)) return options[text];

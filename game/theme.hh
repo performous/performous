@@ -109,3 +109,17 @@ public:
 	/// get a cached option test
 	SvgTxtTheme& getCachedOption(const std::string& text);
 };
+
+//at the moment just a copy of ThemeSongs
+class ThemePlaylistScreen: public Theme {
+public:
+    ThemePlaylistScreen();
+    /// song display
+    SvgTxtTheme song;
+    /// ordering display
+    SvgTxtTheme order;
+    /// has hiscore display
+    SvgTxtTheme has_hiscore;
+    /// hiscores display
+    SvgTxtTheme hiscores;
+};

@@ -16,7 +16,7 @@ class Database;
 class Song;
 class Songs;
 class Surface;
-class ThemeSongs;
+class ThemePlaylistScreen;
 class Backgrounds;
 class ThemeInstrumentMenu;
 
@@ -43,7 +43,7 @@ private:
   Backgrounds& m_backgrounds;
   Cachemap<std::string, Surface> m_covers;
   boost::scoped_ptr<ThemeInstrumentMenu> m_menuTheme;
-  boost::scoped_ptr<ThemeSongs> theme;
+  boost::scoped_ptr<ThemePlaylistScreen> theme;
   boost::scoped_ptr<Surface> m_background;
   AnimValue m_nextTimer;
 };

@@ -37,7 +37,7 @@ void ScreenPlaylist::prepare() {
 }
 
 void ScreenPlaylist::reloadGL() {
-    theme.reset(new ThemeSongs());
+    theme.reset(new ThemePlaylistScreen());
     m_menuTheme.reset(new ThemeInstrumentMenu());
 }
 
@@ -51,13 +51,13 @@ void ScreenPlaylist::exit() {
 
 
 void ScreenPlaylist::manageEvent(input::NavEvent const& event) {
-  if(keyPressed == false) {
+  input::NavButton nav = event.button;
+    if(keyPressed == false) {
     keyPressed = true;
     createEditMenu();
     m_menu.open();
     }
   else {
-    input::NavButton nav = event.button;
     if (nav == input::NAV_PAUSE) m_audio.togglePause();
     else if (nav == input::NAV_START) {
         if (m_menu.isOpen()) {
