@@ -147,11 +147,19 @@ void ScreenPlaylist::createEscMenu() {
      gm->activateScreen("Sing");
  }));
  esc_menu.add(MenuOption(_("Add songs"), _("Open the song browser to add more songs")).screen("Songs"));
- 
- /// will be uncommented when drawing stuff works
- //m_menu.add(MenuOption(_("Remove song"), _("Remove currently selected song from list")).call([this]() {
-
- //}));
+ esc_menu.add(MenuOption(_("Shuffle"), _("Randomize the order of the playlist")).call([this]() {
+     Game* tm = Game::getSingletonPtr();
+     tm->getCurrentPlayList().shuffle();
+     esc_menu.close();
+   }));
+ esc_menu.add(MenuOption(_("Clear playlist"), _("Remove all the songs from the list")).call([this]() {
+     Game* tm = Game::getSingletonPtr();
+     tm->getCurrentPlayList().clear();
+     esc_menu.close();
+   }));
+ esc_menu.add(MenuOption(_("Back"), _("Back to playlist viewer")).call([this]() {
+     esc_menu.close();
+   }));
  esc_menu.add(MenuOption(_("Quit"), _("Remove all the songs from the list and go back to main menu")).call([this]() {
      Game* gm = Game::getSingletonPtr();
      gm->getCurrentPlayList().clear();
@@ -194,7 +202,7 @@ void ScreenPlaylist::drawMenu() {
 void ScreenPlaylist::draw_menu_options() {
 	// Variables used for positioning and other stuff
 	double wcounter = 0;
-	const size_t showopts = 10; // Show at most 10 options simultaneously
+	const size_t showopts = 5; // Show at most 5 options simultaneously
 	const float x = -0.35;
 	const float start_y = -0.1;
 	const float sel_margin = 0.05;
@@ -260,8 +268,9 @@ void ScreenPlaylist::createSongListMenu() {
     {
       boost::shared_ptr<Song> songToAdd =  (*it);
       oss_playlist << "#" << count << " : " << songToAdd->artist << " - " << songToAdd->title;
-      songlist_menu.add(MenuOption(_(oss_playlist.str().c_str()),_("Press enter to view song options")).call([]() {
-
+      songlist_menu.add(MenuOption(_(oss_playlist.str().c_str()),_("Press enter to view song options")).call([this]() {
+        createSongMenu();
+        esc_menu.open();
         }));
       oss_playlist.str("");
       count++;
@@ -269,5 +278,17 @@ void ScreenPlaylist::createSongListMenu() {
   songlist_menu.add(MenuOption(_("View more options"),_("View general playlist settings")).call([this]() {
       createEscMenu();
       esc_menu.open();
+    }));
+}
+
+void ScreenPlaylist::createSongMenu() {
+  esc_menu.clear();
+  esc_menu.add(MenuOption(_("Remove"), _("Remove this song from the list - to be implemented")).call([this]() {
+      //Game* gm = Game::getSingletonPtr();
+      esc_menu.close();
+      createSongListMenu();
+    }));
+  esc_menu.add(MenuOption(_("Back"), _("Back to playlist viewer")).call([this]() {
+      esc_menu.close();
     }));
 }

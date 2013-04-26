@@ -44,6 +44,7 @@ private:
   Songs& m_songs;
   void createSongListMenu();
   void createEscMenu();
+  void createSongMenu();
   void drawMenu();
   void createMenuFromPlaylist();
   Backgrounds& m_backgrounds;

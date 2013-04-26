@@ -24,7 +24,8 @@ public:
 	void shuffle();
 	///clears list
 	void clear();
-	std::string getListAsString();
+	///removes a song
+	void removeSong(int index);
 private:
 	SongList m_list;
 };

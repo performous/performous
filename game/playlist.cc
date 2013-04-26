@@ -31,15 +31,6 @@ void PlayList::clear() {
 	m_list.clear();
 }
 
-std::string PlayList::getListAsString() {
-  std::ostringstream oss_playlist;
-  int count = 1;
-  for(SongList::iterator it = m_list.begin(); it != m_list.end(); ++it) {
-      if(count <= 9) {
-      boost::shared_ptr<Song> song =  (*it);
-      oss_playlist << "#" << count << " : " << song->artist << " - " << song->title << '\n';
-      count++;
-      }
-  }
-  return oss_playlist.str();
+void PlayList::removeSong(int index) {
+  m_list.erase(m_list.begin() + index);
 }
