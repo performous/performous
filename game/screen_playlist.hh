@@ -35,17 +35,25 @@ public:
   void reloadGL();
 private:
   bool keyPressed = false;
-  Menu m_menu;
+  Menu esc_menu;
+  Menu songlist_menu;
+  bool m_first;
+  AnimValue m_selAnim;
+  AnimValue m_submenuAnim;
   Audio& m_audio;
   Songs& m_songs;
-  void createEditMenu();
+  void createSongListMenu();
+  void createEscMenu();
   void drawMenu();
+  void createMenuFromPlaylist();
   Backgrounds& m_backgrounds;
   Cachemap<std::string, Surface> m_covers;
   boost::scoped_ptr<ThemeInstrumentMenu> m_menuTheme;
   boost::scoped_ptr<ThemePlaylistScreen> theme;
   boost::scoped_ptr<Surface> m_background;
+  SvgTxtTheme& getTextObject(std::string const& txt);
   AnimValue m_nextTimer;
+  void draw_menu_options();
 };
 
 
