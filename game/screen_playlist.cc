@@ -119,9 +119,6 @@ void ScreenPlaylist::draw()
     Game* gm = Game::getSingletonPtr();
     if (!m_background || m_background->empty()) m_background.reset(new Surface(m_backgrounds.getRandom()));
     m_background->draw();
-    //theme->song.setAlign(SvgTxtTheme::CENTER);
-    //theme->song.dimensions.screenCenter().middle();
-    //theme->song.draw(gm->getCurrentPlayList().getListAsString());
     if (m_nextTimer.get() == 0.0 && keyPressed == false)
     {
         Screen* s = gm->getScreen("Sing");
@@ -132,10 +129,6 @@ void ScreenPlaylist::draw()
     }
     draw_menu_options();
     //menu on top of everything
-    if (keyPressed == true && !esc_menu.isOpen()) {
-        esc_menu.open();
-        drawMenu();
-    }
     if (esc_menu.isOpen()) {
         drawMenu();
     }
