@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Sodipodi ("http://www.sodipodi.com/") -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -15,9 +16,8 @@
    height="600.000000"
    id="svg559"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
+   inkscape:version="0.48.3.1 r9886"
    sodipodi:docname="songs_song.svg"
-   sodipodi:docbase="/home/yoda/UltraStar/sf/UltraStar-ng/themes/default"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <metadata
      id="metadata35">
@@ -31,7 +31,7 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="1125"
+     inkscape:window-height="1053"
      inkscape:window-width="1920"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
@@ -42,13 +42,14 @@
      bordercolor="#666666"
      pagecolor="#ffffff"
      id="base"
-     inkscape:zoom="0.89095454"
-     inkscape:cx="141.39663"
-     inkscape:cy="294.51595"
+     inkscape:zoom="1.26"
+     inkscape:cx="335.39093"
+     inkscape:cy="318.08787"
      inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:window-y="-1"
      inkscape:current-layer="svg559"
-     showgrid="false" />
+     showgrid="false"
+     inkscape:window-maximized="1" />
   <defs
      id="defs561">
     <inkscape:perspective
@@ -61,20 +62,18 @@
   </defs>
   <text
      xml:space="preserve"
-     style="font-size:32px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Verdana;-inkscape-font-specification:Verdana Bold"
-     x="401.12238"
-     y="189.30061"
+     style="font-size:24px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;text-anchor:start;fill:#aaddff;fill-opacity:1;stroke:none;font-family:Droid Sans;-inkscape-font-specification:Droid Sans Bold"
+     x="25.426828"
+     y="342.27066"
      id="text1990"><tspan
        sodipodi:role="line"
-       id="tspan1992"
-       x="401.12238"
-       y="189.30061">Artist</tspan><tspan
+       x="25.426828"
+       y="342.27066"
+       id="tspan3151"
+       style="font-size:32px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#aaddff;fill-opacity:1;stroke:none;font-family:Verdana;-inkscape-font-specification:Verdana Bold">Artist - Song</tspan><tspan
        sodipodi:role="line"
-       x="401.12238"
-       y="229.30061"
-       id="tspan3151">Song</tspan><tspan
-       sodipodi:role="line"
-       x="401.12238"
-       y="269.30063"
-       id="tspan3155" /></text>
+       x="25.426828"
+       y="382.27066"
+       id="tspan3155"
+       style="font-size:32px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#aaddff;fill-opacity:1;stroke:none;font-family:Verdana;-inkscape-font-specification:Verdana Bold" /></text>
 </svg>
