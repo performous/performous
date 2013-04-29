@@ -16,7 +16,7 @@ namespace {
 }
 
 ScreenPlaylist::ScreenPlaylist(std::string const& name,Audio& audio, Songs& songs, Backgrounds& bgs):
-	Screen(name) ,m_audio(audio), m_songs(songs), m_covers(20), m_backgrounds(bgs)
+	Screen(name), m_audio(audio), m_songs(songs), m_backgrounds(bgs), m_covers(20)
 {}
 
 void ScreenPlaylist::enter() {
