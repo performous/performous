@@ -13,7 +13,7 @@ include(LibFindMacros)
 libfind_pkg_check_modules(Z_PKGCONF Z)
 
 find_path(Z_INCLUDE_DIR
-  NAMES zconf.h
+  NAMES zlib.h
   PATHS ${Z_PKGCONF_INCLUDE_DIRS}
 )
 

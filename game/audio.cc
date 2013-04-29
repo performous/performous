@@ -303,6 +303,7 @@ struct Output {
 	std::auto_ptr<Synth> synth;
 	std::auto_ptr<Music> preloading;
 	boost::ptr_vector<Music> playing, disposing;
+	std::vector<Analyzer*> mics;
 	boost::ptr_map<std::string, Sample> samples;
 	std::vector<Command> commands;
 	volatile bool paused;
@@ -350,6 +351,18 @@ struct Output {
 				continue;
 			}
 			++i;
+		}
+		// Mix in microphones (if pass-through is enabled)
+		if (mics.size() > 0 && config["audio/pass-through"].b()) {
+			// Decrease music volume
+			float amp = 1.0f / config["audio/pass-through_ratio"].f();
+			if (amp != 1.0f)
+				for (float *i = begin; i < end; ++i) *i *= amp;
+			// All mics included
+			for (size_t i = 0; i < mics.size(); ++i) {
+				if (mics[i])
+					mics[i]->output(begin, end, 48000.0 /* FIXME: Get actual output device rate instead of hardcoding */);  // Do the actual mixing
+			}
 		}
 		// Mix in the samples currently playing
 		{
@@ -486,6 +499,9 @@ struct Audio::Impl {
 				std::clog << "audio/error: Audio device '" << *it << "': " << e.what() << std::endl;
 			}
 		}
+		// Assign mic buffers to the output for pass-through
+		for (size_t i = 0; i < analyzers.size(); ++i)
+			output.mics.push_back(&analyzers[i]);
 	}
 };
 

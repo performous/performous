@@ -80,7 +80,7 @@ class ScreenManager: public Singleton <ScreenManager> {
 	/// Close dialog and return true if it was opened in the first place
 	bool closeDialog();
 	/// Returns true if dialog is open
-	bool isDialogOpen() { return m_dialog; }
+	bool isDialogOpen() { return !!m_dialog; }
 	/// Draw dialogs & flash messages, called automatically by drawScreen
 	void drawNotifications();
 

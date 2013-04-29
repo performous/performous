@@ -24,7 +24,7 @@ namespace input {
 					m_streams.insert(dev, std::auto_ptr<pm::Input>(new pm::Input(dev)));
 					std::clog << "controller-midi/info: Opened MIDI device " << name << std::endl;
 				} catch (std::runtime_error& e) {
-					std::clog << "controller-midi/warn: " << e.what() << std::endl;
+					std::clog << "controller-midi/warning: " << e.what() << std::endl;
 				}
 			}
 		}

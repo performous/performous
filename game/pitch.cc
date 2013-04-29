@@ -33,6 +33,8 @@ bool Tone::operator==(double f) const {
 
 Analyzer::Analyzer(double rate, std::string id, std::size_t step):
   m_step(step),
+  m_resampleFactor(1.0),
+  m_resamplePos(),
   m_rate(rate),
   m_id(id),
   m_window(FFT_N),
@@ -41,11 +43,43 @@ Analyzer::Analyzer(double rate, std::string id, std::size_t step):
   m_oldfreq(0.0)
 {
 	if (m_step > FFT_N) throw std::logic_error("Analyzer step is larger that FFT_N (ideally it should be less than a fourth of FFT_N).");
-  	// Hamming window
+	// Hamming window
 	for (size_t i=0; i < FFT_N; i++) {
 		m_window[i] = 0.53836 - 0.46164 * std::cos(2.0 * M_PI * i / (FFT_N - 1));
 	}
 }
+
+void Analyzer::output(float* begin, float* end, double rate) {
+	constexpr unsigned a = 2;
+	const unsigned size = m_passthrough.size();
+	const unsigned out = (end - begin) / 2 /* stereo */;
+	if (out == 0) return;
+	const unsigned in = m_resampleFactor * (m_rate / rate) * out + 2 * a /* lanczos kernel */ + 5 /* safety margin for rounding errors */;
+	float pcm[m_passthrough.capacity];
+	m_passthrough.read(pcm, pcm + in + 4);
+	for (unsigned i = 0; i < out; ++i) {
+		double s = 0.0;
+		unsigned k = m_resamplePos;
+		double x = m_resamplePos - k;
+		// Lanczos sampling of input at m_resamplePos
+		for (unsigned j = 0; j <= 2 * a; ++j) s += pcm[k + j] * da::lanc<a>(x - j + a);
+		s *= 5.0;
+		begin[i * 2] += s;
+		begin[i * 2 + 1] += s;
+		m_resamplePos += m_resampleFactor;
+	}
+	unsigned num = m_resamplePos;
+	m_resamplePos -= num;
+	if (size > 3000) {
+		// Reset
+		m_passthrough.pop(m_passthrough.size() - 700);
+		m_resampleFactor = 1.0;
+	} else {
+		m_passthrough.pop(num);
+		m_resampleFactor = 0.99 * m_resampleFactor + 0.01 * (size > 700 ? 1.02 : 0.98);
+	}
+}
+
 
 namespace {
 	struct Peak {

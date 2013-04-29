@@ -35,6 +35,7 @@ static const std::size_t FFT_N = 1 << FFT_P;
 /// Lock-free ring buffer. Discards oldest data on overflow (not strictly thread-safe).
 template <size_t SIZE> class RingBuffer {
 public:
+	constexpr static size_t capacity = SIZE;
 	RingBuffer(): m_read(), m_write() {}  ///< Initialize empty buffer
 	template <typename InIt> void insert(InIt begin, InIt end) {
 		unsigned r = m_read;  // The read position
@@ -56,8 +57,9 @@ public:
 		return true;
 	}
 	void pop(unsigned n) { m_read = modulo(m_read + n); } ///< Move reading pointer forward.
+	unsigned size() const { return modulo(m_write - m_read); }
 private:
-	unsigned modulo(unsigned idx) { return (SIZE + idx) % SIZE; }  ///< Modulo operation with proper rounding (handles slightly "negative" idx as well)
+	static unsigned modulo(unsigned idx) { return (SIZE + idx) % SIZE; }  ///< Modulo operation with proper rounding (handles slightly "negative" idx as well)
 	float m_buf[SIZE];
 	volatile size_t m_read, m_write;  ///< The indices of the next read/write operations. read == write implies that buffer is empty.
 };
@@ -66,7 +68,7 @@ private:
  /** class to analyze input audio and transform it into useable data
  */
 class Analyzer {
-  public:
+public:
 	/// fast fourier transform vector
 	typedef std::vector<std::complex<float> > fft_t;
 	/// list of tones
@@ -76,6 +78,7 @@ class Analyzer {
 	/** Add input data to buffer. This is thread-safe (against other functions). **/
 	template <typename InIt> void input(InIt begin, InIt end) {
 		m_buf.insert(begin, end);
+		m_passthrough.insert(begin, end);
 	}
 	/** Call this to process all data input so far. **/
 	void process();
@@ -103,11 +106,17 @@ class Analyzer {
 		m_oldfreq = (best ? best->freq : 0.0);
 		return best;
 	}
+	/** Give data away for mic pass-through */
+	void output(float* begin, float* end, double rate);
+	/** Returns the id (color name) of the mic */
 	std::string const& getId() const { return m_id; }
 
-  private:
+private:
 	const std::size_t m_step;
 	RingBuffer<2 * FFT_N> m_buf;  // Twice the FFT size should give enough room for sliding window and for engine delays
+	RingBuffer<4096> m_passthrough;
+	double m_resampleFactor;
+	double m_resamplePos;
 	double m_rate;
 	std::string m_id;
 	std::vector<float> m_window;

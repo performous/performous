@@ -98,7 +98,7 @@ class AudioBuffer {
 		while (!condition()) m_cond.wait(l);
 		if (m_quit) return;
 		if (timestamp < 0.0) {
-			std::clog << "ffmpeg/warn: Negative audio timestamp " << timestamp << " seconds, frame ignored." << std::endl;
+			std::clog << "ffmpeg/warning: Negative audio timestamp " << timestamp << " seconds, frame ignored." << std::endl;
 			return;
 		}
 		// Insert silence at the beginning if the stream starts later than 0.0

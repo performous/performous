@@ -60,7 +60,8 @@ void ScreenSongs::exit() {
 
 /**Add actions here which should effect both the
   jukebox and the normal screen*/
-void ScreenSongs::manageSharedKey(input::NavButton nav) {
+void ScreenSongs::manageSharedKey(input::NavEvent const& event) {
+	input::NavButton nav = event.button;
 	if (nav == input::NAV_PAUSE) m_audio.togglePause();
 	else if (nav == input::NAV_START) {
 		ScreenManager* sm = ScreenManager::getSingletonPtr();
@@ -70,8 +71,8 @@ void ScreenSongs::manageSharedKey(input::NavButton nav) {
 		ss->setSong(m_songs.currentPtr());
 		sm->activateScreen("Sing");
 	}
-	else if (nav == input::NAV_LEFT) { m_songs.advance(-1); hiscore_start_pos = 0; }
-	else if (nav == input::NAV_RIGHT) { m_songs.advance(1); hiscore_start_pos = 0; }
+	else if (event.menu == input::NAVMENU_A_PREV) { m_songs.advance(-1); hiscore_start_pos = 0; }
+	else if (event.menu == input::NAVMENU_A_NEXT) { m_songs.advance(1); hiscore_start_pos = 0; }
 }
 
 void ScreenSongs::manageEvent(input::NavEvent const& event) {
@@ -81,20 +82,20 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
 	m_idleTimer.setValue(0.0);  // Reset idle timer
 	if (m_jukebox) {
 		if (nav == input::NAV_CANCEL || m_songs.empty()) m_jukebox = false;
-		else if (nav == input::NAV_UP) m_audio.seek(5);
-		else if (nav == input::NAV_DOWN) m_audio.seek(-5);
+		else if (event.menu == input::NAVMENU_B_PREV) m_audio.seek(5);
+		else if (event.menu == input::NAVMENU_B_NEXT) m_audio.seek(-5);
 		else if (nav == input::NAV_MOREUP) m_audio.seek(-30);
 		else if (nav == input::NAV_MOREDOWN) m_audio.seek(30);
-		else manageSharedKey(nav);
+		else manageSharedKey(event);
 		return;
 	} else if (show_hiscores) {
 		if (nav == input::NAV_CANCEL || m_songs.empty()) show_hiscores = false;
-		else if (nav == input::NAV_UP) hiscore_start_pos--;
-		else if (nav == input::NAV_DOWN) hiscore_start_pos++;
+		else if (event.menu == input::NAVMENU_B_PREV) hiscore_start_pos--;
+		else if (event.menu == input::NAVMENU_B_NEXT) hiscore_start_pos++;
 		// TODO: change hiscore type listed (all, just vocals, guitar easy, guitar medium, guitar hard, guit
 		else if (nav == input::NAV_MOREUP) (hiscore_start_pos > 4) ? hiscore_start_pos -= 5 : hiscore_start_pos = 0;
 		else if (nav == input::NAV_MOREDOWN) hiscore_start_pos += 5;
-		else manageSharedKey(nav);
+		else manageSharedKey(event);
 		return;
 	} else if (nav == input::NAV_CANCEL) {
 		if (!m_search.text.empty()) { m_search.text.clear(); m_songs.setFilter(m_search.text); }
@@ -103,11 +104,11 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
 	}
 	// The rest are only available when there are songs available
 	else if (m_songs.empty()) return;
-	else if (nav == input::NAV_UP) m_songs.sortChange(-1);
-	else if (nav == input::NAV_DOWN) m_songs.sortChange(1);
+	else if (event.menu == input::NAVMENU_B_PREV) m_songs.sortChange(-1);
+	else if (event.menu == input::NAVMENU_B_NEXT) m_songs.sortChange(1);
 	else if (nav == input::NAV_MOREUP) m_songs.advance(-10);
 	else if (nav == input::NAV_MOREDOWN) m_songs.advance(10);
-	else manageSharedKey(nav);
+	else manageSharedKey(event);
 	sm->showLogo(!m_jukebox);
 }
 
@@ -281,7 +282,7 @@ void ScreenSongs::draw() {
 			theme->order.draw(oss_order.str());
 			theme->has_hiscore.draw(oss_has_hiscore.str());
 		} else theme->hiscores.draw(oss_order.str());
-		if (!show_hiscores) drawInstruments(Dimensions(m_instrumentList->ar()).fixedHeight(0.03).center(-0.04));
+		if (!show_hiscores) drawInstruments(Dimensions(m_instrumentList->dimensions.ar()).fixedHeight(0.03).center(-0.04));
 	}
 }
 

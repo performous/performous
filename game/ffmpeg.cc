@@ -5,6 +5,7 @@
 #include "xtime.hh"
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <iostream>
+#include <sstream>
 #include <stdexcept>
 
 extern "C" {
@@ -21,13 +22,50 @@ extern "C" {
 
 /*static*/ boost::mutex FFmpeg::s_avcodec_mutex;
 
+namespace {
+	std::string ffversion(unsigned ver) {
+		unsigned major = ver >> 16;
+		unsigned minor = (ver >> 8) & 0xFF;
+		unsigned micro = ver & 0xFF;
+		std::ostringstream oss;
+		oss << major << "." << minor << "." << micro << (micro >= 100 ? "(ff)" : "(lav)");
+		return oss.str();
+	}
+}
+
+
 FFmpeg::FFmpeg(std::string const& _filename, unsigned int rate):
   width(), height(), m_filename(_filename), m_rate(rate), m_quit(),
   m_seekTarget(getNaN()), m_position(), m_duration(), m_streamId(-1),
   m_mediaType(rate ? AVMEDIA_TYPE_AUDIO : AVMEDIA_TYPE_VIDEO),
   m_formatContext(), m_codecContext(), m_resampleContext(), m_swsContext(),
   m_thread(new boost::thread(boost::ref(*this)))
-{}
+{
+	static bool versionChecked = false;
+	if (!versionChecked) {
+		versionChecked = true;
+		bool matches =
+		  LIBAVUTIL_VERSION_INT == avutil_version() &&
+		  LIBAVCODEC_VERSION_INT == avcodec_version() &&
+		  LIBAVFORMAT_VERSION_INT == avformat_version() &&
+		  LIBSWSCALE_VERSION_INT == swscale_version();
+		if (matches) {
+			std::clog << "ffmpeg/info: "
+			  " avutil:" + ffversion(LIBAVUTIL_VERSION_INT) +
+			  " avcodec:" + ffversion(LIBAVCODEC_VERSION_INT) +
+			  " avformat:" + ffversion(LIBAVFORMAT_VERSION_INT) +
+			  " swscale:" + ffversion(LIBSWSCALE_VERSION_INT)
+			  << std::endl;
+		} else {
+			std::clog << "ffmpeg/error: header/lib version mismatch:"
+			  " avutil:" + ffversion(LIBAVUTIL_VERSION_INT) + "/" + ffversion(avutil_version()) +
+			  " avcodec:" + ffversion(LIBAVCODEC_VERSION_INT) + "/" + ffversion(avcodec_version()) +
+			  " avformat:" + ffversion(LIBAVFORMAT_VERSION_INT) + "/" + ffversion(avformat_version()) +
+			  " swscale:" + ffversion(LIBSWSCALE_VERSION_INT) + "/" + ffversion(swscale_version())
+			  << std::endl;
+		}
+	}
+}
 
 FFmpeg::~FFmpeg() {
 	m_quit = true;
@@ -69,7 +107,7 @@ void FFmpeg::open() {
 		  SWS_POINT, NULL, NULL, NULL);
 		break;
 	default:  // Should never be reached but avoids compile warnings
-		break;
+		abort();
 	}
 }
 

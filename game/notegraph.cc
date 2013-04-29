@@ -165,11 +165,11 @@ void NoteGraph::drawNotes() {
 			{
 				Dimensions dim;
 				dim.middle(m_baseX + 0.5 * (it->begin + it->end) * pixUnit).center(m_baseY + it->note * m_noteUnit).stretch((it->end - it->begin) * pixUnit, -m_noteUnit * 12.0);
-				float xoffset = 0.1 * m_time / m_notebarfs.ar();
-				m_notebarfs.draw(dim, TexCoords(xoffset, 0.0, xoffset + dim.ar() / m_notebarfs.ar(), 1.0));
+				float xoffset = 0.1 * m_time / m_notebarfs.dimensions.ar();
+				m_notebarfs.draw(dim, TexCoords(xoffset, 0.0, xoffset + dim.ar() / m_notebarfs.dimensions.ar(), 1.0));
 				if (alpha > 0.0) {
 					float xoffset = rand() / double(RAND_MAX);
-					m_notebarfs_hl.draw(dim, TexCoords(xoffset, 0.0, xoffset + dim.ar() / m_notebarfs_hl.ar(), 1.0));
+					m_notebarfs_hl.draw(dim, TexCoords(xoffset, 0.0, xoffset + dim.ar() / m_notebarfs_hl.dimensions.ar(), 1.0));
 				}
 			}
 			continue;
