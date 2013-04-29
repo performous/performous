@@ -329,7 +329,7 @@ void ScreenSongs::draw() {
 		oss_order << _("↵ start playlist with this song!");
 	      }
 	    else {
-		oss_order << _("↵ Open advanced playlist settings");
+		oss_order << _("↵ open advanced playlist settings");
 	      }
 		break;
 	}	
@@ -495,7 +495,7 @@ void ScreenSongs::drawMenu() {
 }
 
 void ScreenSongs::createPlaylistMenu() {
-  ///submenu for playlist support
+  // Submenu for playlist support
   Game* gm = Game::getSingletonPtr();
   m_menu.clear();
   m_menu.add(MenuOption(_("Add to playlist"), _("Add this song to the playlist")).call([this]() {
@@ -520,7 +520,7 @@ void ScreenSongs::createPlaylistMenu() {
 
 void ScreenSongs::createAdvancedPlaylistMenu() {
   m_menu.clear();
-  m_menu.add(MenuOption(_("play"), _("Start the game with all songs in playlist")).call([this]() {
+  m_menu.add(MenuOption(_("Play"), _("Start the game with all songs in playlist")).call([this]() {
       Game* tm = Game::getSingletonPtr();
       tm->getCurrentPlayList().addSong(m_songs.currentPtr());
       m_menu.close();
