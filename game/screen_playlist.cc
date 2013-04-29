@@ -28,7 +28,7 @@ void ScreenPlaylist::enter() {
       }
     keyPressed = false;
     m_nextTimer.setValue(NEXT_TIMEOUT);
-    esc_menu.close();
+    overlay_menu.close();
     createSongListMenu();
     songlist_menu.open();
     reloadGL();
@@ -44,7 +44,7 @@ void ScreenPlaylist::reloadGL() {
 }
 
 void ScreenPlaylist::exit() {
-    esc_menu.clear();
+    overlay_menu.clear();
     songlist_menu.clear();
     m_menuTheme.reset();
     theme.reset();
@@ -61,13 +61,13 @@ void ScreenPlaylist::manageEvent(input::NavEvent const& event) {
     }
     if(nav == input::NAV_CANCEL) {
     createEscMenu();
-    esc_menu.open();
+    overlay_menu.open();
     }
   else {
     if (nav == input::NAV_PAUSE) m_audio.togglePause();
     else if (nav == input::NAV_START) {
-        if (esc_menu.isOpen()) {
-          esc_menu.action();
+        if (overlay_menu.isOpen()) {
+          overlay_menu.action();
         }
         else {
           songlist_menu.action();
@@ -75,24 +75,24 @@ void ScreenPlaylist::manageEvent(input::NavEvent const& event) {
 
     }
     else if (event.menu == input::NAVMENU_A_PREV) {
-        if(esc_menu.isOpen()) {
-          esc_menu.move(-1);
+        if(overlay_menu.isOpen()) {
+          overlay_menu.move(-1);
         }
         else {
           songlist_menu.move(-1);
         }
      }
      else if (event.menu == input::NAVMENU_A_NEXT) {
-        if(esc_menu.isOpen()) {
-          esc_menu.move(1);
+        if(overlay_menu.isOpen()) {
+          overlay_menu.move(1);
         }
         else {
           songlist_menu.move(1);
         }
      }
      else if (event.menu == input::NAVMENU_B_PREV) {
-        if(esc_menu.isOpen()) {
-          esc_menu.move(-1);
+        if(overlay_menu.isOpen()) {
+          overlay_menu.move(-1);
         }
         else {
           songlist_menu.move(-1);
@@ -100,8 +100,8 @@ void ScreenPlaylist::manageEvent(input::NavEvent const& event) {
 
      }
      else if (event.menu == input::NAVMENU_B_NEXT) {
-        if(esc_menu.isOpen()) {
-          esc_menu.move(1);
+        if(overlay_menu.isOpen()) {
+          overlay_menu.move(1);
         }
         else {
           songlist_menu.move(1);
@@ -129,7 +129,7 @@ void ScreenPlaylist::draw()
     }
     draw_menu_options();
     //menu on top of everything
-    if (esc_menu.isOpen()) {
+    if (overlay_menu.isOpen()) {
         drawMenu();
     }
 
@@ -137,8 +137,8 @@ void ScreenPlaylist::draw()
 }
 
 void ScreenPlaylist::createEscMenu() {
- esc_menu.clear();
- esc_menu.add(MenuOption(_("Continue"), _("Continue playing")).call([this]() {
+ overlay_menu.clear();
+ overlay_menu.add(MenuOption(_("Continue"), _("Continue playing")).call([this]() {
      Game* gm = Game::getSingletonPtr();
      Screen* s = gm->getScreen("Sing");
      ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
@@ -146,21 +146,21 @@ void ScreenPlaylist::createEscMenu() {
      ss->setSong(gm->getCurrentPlayList().getNext());
      gm->activateScreen("Sing");
  }));
- esc_menu.add(MenuOption(_("Add songs"), _("Open the song browser to add more songs")).screen("Songs"));
- esc_menu.add(MenuOption(_("Shuffle"), _("Randomize the order of the playlist")).call([this]() {
+ overlay_menu.add(MenuOption(_("Add songs"), _("Open the song browser to add more songs")).screen("Songs"));
+ overlay_menu.add(MenuOption(_("Shuffle"), _("Randomize the order of the playlist")).call([this]() {
      Game* tm = Game::getSingletonPtr();
      tm->getCurrentPlayList().shuffle();
-     esc_menu.close();
+     overlay_menu.close();
    }));
- esc_menu.add(MenuOption(_("Clear playlist"), _("Remove all the songs from the list")).call([this]() {
+ overlay_menu.add(MenuOption(_("Clear playlist"), _("Remove all the songs from the list")).call([this]() {
      Game* tm = Game::getSingletonPtr();
      tm->getCurrentPlayList().clear();
-     esc_menu.close();
+     overlay_menu.close();
    }));
- esc_menu.add(MenuOption(_("Back"), _("Back to playlist viewer")).call([this]() {
-     esc_menu.close();
+ overlay_menu.add(MenuOption(_("Back"), _("Back to playlist viewer")).call([this]() {
+     overlay_menu.close();
    }));
- esc_menu.add(MenuOption(_("Quit"), _("Remove all the songs from the list and go back to main menu")).call([this]() {
+ overlay_menu.add(MenuOption(_("Quit"), _("Remove all the songs from the list and go back to main menu")).call([this]() {
      Game* gm = Game::getSingletonPtr();
      gm->getCurrentPlayList().clear();
      gm->activateScreen("Intro");
@@ -168,14 +168,14 @@ void ScreenPlaylist::createEscMenu() {
 }
 
 void ScreenPlaylist::drawMenu() {
-    if (esc_menu.empty()) return;
+    if (overlay_menu.empty()) return;
     // Some helper vars
     ThemeInstrumentMenu& th = *m_menuTheme;
-    MenuOptions::const_iterator cur = static_cast<MenuOptions::const_iterator>(&esc_menu.current());
-    double w = esc_menu.dimensions.w();
+    MenuOptions::const_iterator cur = static_cast<MenuOptions::const_iterator>(&overlay_menu.current());
+    double w = overlay_menu.dimensions.w();
     const float txth = th.option_selected.h();
     const float step = txth * 0.85f;
-    const float h = esc_menu.getOptions().size() * step + step;
+    const float h = overlay_menu.getOptions().size() * step + step;
     float y = -h * .5f + step;
     float x = -w * .5f + step;
     // Background
@@ -183,7 +183,7 @@ void ScreenPlaylist::drawMenu() {
     th.bg.draw();
     // Loop through menu items
     w = 0;
-    for (MenuOptions::const_iterator it = esc_menu.begin(); it != esc_menu.end(); ++it) {
+    for (MenuOptions::const_iterator it = overlay_menu.begin(); it != overlay_menu.end(); ++it) {
         // Pick the font object
         SvgTxtTheme* txt = &th.option_selected;
         if (cur != it) txt = &(th.getCachedOption(it->getName()));
@@ -197,7 +197,7 @@ void ScreenPlaylist::drawMenu() {
         th.comment.dimensions.middle(0).screenBottom(-0.12);
         th.comment.draw(cur->getComment());
     }
-    esc_menu.dimensions.stretch(w, h);
+    overlay_menu.dimensions.stretch(w, h);
 }
 void ScreenPlaylist::draw_menu_options() {
 	// Variables used for positioning and other stuff
@@ -268,27 +268,37 @@ void ScreenPlaylist::createSongListMenu() {
     {
       boost::shared_ptr<Song> songToAdd =  (*it);
       oss_playlist << "#" << count << " : " << songToAdd->artist << " - " << songToAdd->title;
-      songlist_menu.add(MenuOption(_(oss_playlist.str().c_str()),_("Press enter to view song options")).call([this]() {
-        createSongMenu();
-        esc_menu.open();
+      songlist_menu.add(MenuOption(_(oss_playlist.str().c_str()),_("Press enter to view song options")).call([this, count]() {
+        createSongMenu(count);
+        overlay_menu.open();
         }));
       oss_playlist.str("");
       count++;
     }
   songlist_menu.add(MenuOption(_("View more options"),_("View general playlist settings")).call([this]() {
       createEscMenu();
-      esc_menu.open();
+      overlay_menu.open();
     }));
 }
 
-void ScreenPlaylist::createSongMenu() {
-  esc_menu.clear();
-  esc_menu.add(MenuOption(_("Remove"), _("Remove this song from the list - to be implemented")).call([this]() {
-      //Game* gm = Game::getSingletonPtr();
-      esc_menu.close();
+void ScreenPlaylist::createSongMenu(int songNumber) {
+  overlay_menu.clear();
+  overlay_menu.add(MenuOption(_("Play first"), _("Ignore the playlist's order and play this song first")).call([this, songNumber]() {
+      Game* gm = Game::getSingletonPtr();
+      Screen* s = gm->getScreen("Sing");
+      ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
+      assert(ss);
+      ss->setSong(gm->getCurrentPlayList().getSong(songNumber - 1));
+      gm->activateScreen("Sing");
+    }));
+  overlay_menu.add(MenuOption(_("Remove"), _("Remove this song from the list - to be implemented")).call([this, songNumber]() {
+      Game* gm = Game::getSingletonPtr();
+      //minus 1 so it doesn´t remove #2 when you´ve selected #1
+      gm->getCurrentPlayList().removeSong(songNumber - 1);
+      overlay_menu.close();
       createSongListMenu();
     }));
-  esc_menu.add(MenuOption(_("Back"), _("Back to playlist viewer")).call([this]() {
-      esc_menu.close();
+  overlay_menu.add(MenuOption(_("Back"), _("Back to playlist viewer")).call([this]() {
+      overlay_menu.close();
     }));
 }

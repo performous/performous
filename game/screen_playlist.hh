@@ -35,7 +35,7 @@ public:
   void reloadGL();
 private:
   bool keyPressed = false;
-  Menu esc_menu;
+  Menu overlay_menu;
   Menu songlist_menu;
   bool m_first;
   AnimValue m_selAnim;
@@ -44,7 +44,7 @@ private:
   Songs& m_songs;
   void createSongListMenu();
   void createEscMenu();
-  void createSongMenu();
+  void createSongMenu(int songNumber);
   void drawMenu();
   void createMenuFromPlaylist();
   Backgrounds& m_backgrounds;

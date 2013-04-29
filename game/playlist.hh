@@ -26,6 +26,8 @@ public:
 	void clear();
 	///removes a song
 	void removeSong(int index);
+	/// gets a specific song and removes it from the queue
+	boost::shared_ptr<Song> getSong(int index);
 private:
 	SongList m_list;
 };
