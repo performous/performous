@@ -65,8 +65,6 @@ ThemeInstrumentMenu::ThemeInstrumentMenu():
 //at the moment just a copy of themeSong
 ThemePlaylistScreen::ThemePlaylistScreen():
     Theme(getThemePath("songs_bg.svg")),
-    song(getThemePath("songs_song.svg"), config["graphic/text_lod"].f()),
-    back_h(getThemePath("mainmenu_back_highlight.svg")),
     options(30),
     option_selected(getThemePath("mainmenu_option_selected.svg"), config["graphic/text_lod"].f()),
     comment(getThemePath("mainmenu_comment.svg"), config["graphic/text_lod"].f()),

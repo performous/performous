@@ -114,10 +114,6 @@ public:
 class ThemePlaylistScreen: public Theme {
 public:
     ThemePlaylistScreen();
-    /// song display
-    SvgTxtTheme song;
-    /// ordering display
-    Surface back_h;
     /// menu option texts
     Cachemap<std::string, SvgTxtTheme> options;
     /// selected menu option text

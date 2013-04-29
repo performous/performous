@@ -208,8 +208,6 @@ void ScreenPlaylist::draw_menu_options() {
 	const float sel_margin = 0.05;
 	const MenuOptions opts = songlist_menu.getOptions();
 	double submenuanim = 1.0 - std::min(1.0, std::abs(m_submenuAnim.get()-songlist_menu.getSubmenuLevel()));
-	theme->back_h.dimensions.fixedHeight(0.08f);
-	theme->back_h.dimensions.stretch(songlist_menu.dimensions.w(), theme->back_h.dimensions.h());
 	// Determine from which item to start
 	int start_i = std::min((int)songlist_menu.curIndex() - 1, (int)opts.size() - (int)showopts
 		+ (songlist_menu.getSubmenuLevel() == 2 ? 1 : 0)); // Hack to counter side-effects from displaying the value inside the menu
@@ -225,8 +223,6 @@ void ScreenPlaylist::draw_menu_options() {
 			// Animate selection higlight moving
 			double selanim = m_selAnim.get() - start_i;
 			if (selanim < 0) selanim = 0;
-			theme->back_h.dimensions.left(x - sel_margin).center(start_y+0.003 + selanim*0.08);
-			theme->back_h.draw();
 			// Draw the text, dim if option not available
 			{
 				ColorTrans c(Color::alpha(opt.isActive() ? 1.0 : 0.5));
