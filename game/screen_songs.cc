@@ -496,7 +496,6 @@ void ScreenSongs::drawMenu() {
 
 void ScreenSongs::createPlaylistMenu() {
   // Submenu for playlist support
-  Game* gm = Game::getSingletonPtr();
   m_menu.clear();
   m_menu.add(MenuOption(_("Add to playlist"), _("Add this song to the playlist")).call([this]() {
       Game* tm = Game::getSingletonPtr();
