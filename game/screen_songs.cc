@@ -109,65 +109,61 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
 		else if (m_songs.typeNum()) m_songs.typeChange(0);  // Clear type filter
 		else if(gm->getCurrentPlayList().isEmpty()) gm->activateScreen("Intro");
 		else {
-		    m_menu.clear();
-		    m_menu.add(MenuOption(_("play"), _("Start the game with all songs in playlist")).call([this]() {
-			Game* tm = Game::getSingletonPtr();
-			tm->getCurrentPlayList().addSong(m_songs.currentPtr());
-			m_menu.close();
-			Screen* s = tm->getScreen("Sing");
-			ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
-			assert(ss);
-			ss->setSong(tm->getCurrentPlayList().getNext());
-			tm->activateScreen("Sing");
-			}));
-		    m_menu.add(MenuOption(_("Shuffle"), _("Randomize the order of the playlist")).call([this]() {
-			Game* tm = Game::getSingletonPtr();
-			tm->getCurrentPlayList().shuffle();
-			m_menu.close();
-		      }));
-		    m_menu.add(MenuOption(_("Clear playlist"), _("Remove all the songs from the list")).call([this]() {
-			Game* tm = Game::getSingletonPtr();
-			tm->getCurrentPlayList().clear();
-			m_menu.close();
-		      }));
-		    m_menu.add(MenuOption(_("View playlist"), _("View the current playlist")).screen("Playlist"));
-		    m_menu.add(MenuOption(_("Back"), _("Back to song browser")).call([this]() {
-			m_menu.close();
-		      }));
-		    m_menu.add(MenuOption(_("Quit"), _("Clear playlist and quit to title screen")).call([this]() {
-			Game* tm = Game::getSingletonPtr();
-			tm->getCurrentPlayList().clear();
-			tm->activateScreen("Intro");
-		      }));
+		    createAdvancedPlaylistMenu();
 		    m_menu.open();
-
-		}
+		  }
 	}
 	// The rest are only available when there are songs available
 	else if (m_songs.empty()) return;
 	else if (nav == input::NAV_START) {
-	if (m_menuPos == 0) {
-    	if (m_menu.isOpen()) {
-          m_menu.action();
-          // Did the action close the menu?
-          if (!m_menu.isOpen() && m_audio.isPaused()) {
-            m_audio.togglePause();
-          }
-    	}
-    	else {
-      	createPlaylistMenu();
-      	m_audio.togglePause();
-      	m_menu.open();
-    	}
-}
-		else if (m_menuPos == 3) {
-			m_menuPos = 0;
-			m_jukebox = true;
+	if (m_menu.isOpen()) {
+	  m_menu.action();
+	  if (!m_menu.isOpen() && m_audio.isPaused()) {
+		m_audio.togglePause();
+	      }
+	    }
+	else if (m_menuPos == 0) {
+	  if(!gm->getCurrentPlayList().isEmpty()){
+	  createPlaylistMenu();
+	  m_audio.togglePause();
+	  m_menu.open();
+	  }
+	  else {
+	    Game* tm = Game::getSingletonPtr();
+	    tm->getCurrentPlayList().addSong(m_songs.currentPtr());
+	    Screen* s = tm->getScreen("Sing");
+	    ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
+	    assert(ss);
+	    ss->setSong(tm->getCurrentPlayList().getNext());
+	    tm->activateScreen("Sing");
+	  }
+	}
+	else if (m_menuPos == 3) {
+	    m_menuPos = 0;
+	    m_jukebox = true;
 		}
+	else if (m_menuPos == 4) {
+	    if(gm->getCurrentPlayList().isEmpty()) {
+	    //fire up the playlist!
+	    m_menuPos = 0;
+	    gm->getCurrentPlayList().addSong(m_songs.currentPtr());
+	      }
+	    else {
+		m_audio.togglePause();
+		createAdvancedPlaylistMenu();
+		m_menu.open();
+	      }
+	  }
 }
 
-	else if (event.menu == input::NAVMENU_B_PREV && m_menuPos < 3) ++m_menuPos;
-	else if (event.menu == input::NAVMENU_B_NEXT && m_menuPos > 0) --m_menuPos;
+	else if (event.menu == input::NAVMENU_B_PREV && m_menuPos < 4) {
+	    if(m_menu.isOpen()) m_menu.move(-1);
+	    else  ++m_menuPos;
+	  }
+	else if (event.menu == input::NAVMENU_B_NEXT && m_menuPos > 0) {
+	    if(m_menu.isOpen()) m_menu.move(1);
+	    else  --m_menuPos;
+	  }
 }
 
 void ScreenSongs::manageEvent(SDL_Event event) {
@@ -327,6 +323,15 @@ void ScreenSongs::draw() {
 		case 1: oss_order << _("↔ sort order: ") << m_songs.sortDesc(); break;
 		case 2: oss_order << _("↔ type filter: ") << m_songs.typeDesc(); break;
 		case 3: oss_order << _("↔ hiscores   ↵ jukebox mode"); break;
+		case 4:
+	    Game* gm = Game::getSingletonPtr();
+	    if(gm->getCurrentPlayList().isEmpty()) {
+		oss_order << _("↵ start playlist with this song!");
+	      }
+	    else {
+		oss_order << _("↵ Open advanced playlist settings");
+	      }
+		break;
 	}	
 
 	if (m_jukebox) drawJukebox();
@@ -498,19 +503,6 @@ void ScreenSongs::createPlaylistMenu() {
       tm->getCurrentPlayList().addSong(m_songs.currentPtr());
       m_menu.close();
       }));
-  if(gm->getCurrentPlayList().isEmpty()) {
-    m_menu.add(MenuOption(_("Play"), _("Only play this song")).call([this]() {
-        m_menu.close();
-        Game* tm = Game::getSingletonPtr();
-        Screen* s = tm->getScreen("Sing");
-        ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
-        assert(ss);
-        tm->getCurrentPlayList().addSong(m_songs.currentPtr());
-        ss->setSong(tm->getCurrentPlayList().getNext());
-        tm->activateScreen("Sing");
-        }));
-    }
-  else {
       m_menu.add(MenuOption(_("Add and play"), _("Add this song to the end of the playlist and start singing")).call([this]() {
           Game* tm = Game::getSingletonPtr();
           tm->getCurrentPlayList().addSong(m_songs.currentPtr());
@@ -521,8 +513,40 @@ void ScreenSongs::createPlaylistMenu() {
           ss->setSong(tm->getCurrentPlayList().getNext());
           tm->activateScreen("Sing");
           }));
-    }
   m_menu.add(MenuOption(_("Back"), _("Back to song browser")).call([this]() {
       m_menu.close();
+    }));
+}
+
+void ScreenSongs::createAdvancedPlaylistMenu() {
+  m_menu.clear();
+  m_menu.add(MenuOption(_("play"), _("Start the game with all songs in playlist")).call([this]() {
+      Game* tm = Game::getSingletonPtr();
+      tm->getCurrentPlayList().addSong(m_songs.currentPtr());
+      m_menu.close();
+      Screen* s = tm->getScreen("Sing");
+      ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
+      assert(ss);
+      ss->setSong(tm->getCurrentPlayList().getNext());
+      tm->activateScreen("Sing");
+      }));
+  m_menu.add(MenuOption(_("Shuffle"), _("Randomize the order of the playlist")).call([this]() {
+      Game* tm = Game::getSingletonPtr();
+      tm->getCurrentPlayList().shuffle();
+      m_menu.close();
+    }));
+  m_menu.add(MenuOption(_("Clear playlist"), _("Remove all the songs from the list")).call([this]() {
+      Game* tm = Game::getSingletonPtr();
+      tm->getCurrentPlayList().clear();
+      m_menu.close();
+    }));
+  m_menu.add(MenuOption(_("View playlist"), _("View the current playlist")).screen("Playlist"));
+  m_menu.add(MenuOption(_("Back"), _("Back to song browser")).call([this]() {
+      m_menu.close();
+    }));
+  m_menu.add(MenuOption(_("Quit"), _("Clear playlist and quit to title screen")).call([this]() {
+      Game* tm = Game::getSingletonPtr();
+      tm->getCurrentPlayList().clear();
+      tm->activateScreen("Intro");
     }));
 }

@@ -47,6 +47,7 @@ private:
 	void update();
 	void drawMenu();
 	void createPlaylistMenu();
+	void createAdvancedPlaylistMenu();
 
 	Audio& m_audio;
 	Songs& m_songs;

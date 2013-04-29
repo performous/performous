@@ -156,6 +156,7 @@ void ScreenPlaylist::createEscMenu() {
      Game* tm = Game::getSingletonPtr();
      tm->getCurrentPlayList().clear();
      overlay_menu.close();
+     tm->activateScreen("Songs");
    }));
  overlay_menu.add(MenuOption(_("Back"), _("Back to playlist viewer")).call([this]() {
      overlay_menu.close();
