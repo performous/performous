@@ -29,18 +29,18 @@ namespace {
 
 	/// Add a flash message about the state of a config item
 	void dispInFlash(ConfigItem& ci) {
-        Game* gm = Game::getSingletonPtr();
+		Game* gm = Game::getSingletonPtr();
 		gm->flashMessage(ci.getShortDesc() + ": " + ci.getValue());
 	}
 }
 
 ScreenSing::ScreenSing(std::string const& name, Audio& audio, Database& database, Backgrounds& bgs):
-	  Screen(name), m_audio(audio), m_database(database), m_backgrounds(bgs),
-	  m_selectedTrack(TrackName::LEAD_VOCAL) {
-}
+	Screen(name), m_audio(audio), m_database(database), m_backgrounds(bgs),
+	m_selectedTrack(TrackName::LEAD_VOCAL)
+{}
 
 void ScreenSing::enter() {
-    Game* gm = Game::getSingletonPtr();
+	Game* gm = Game::getSingletonPtr();
 	// Initialize webcam
 	gm->loading(_("Initializing webcam..."), 0.1);
 	if (config["graphic/webcam"].b() && Webcam::enabled()) {
@@ -127,13 +127,12 @@ void ScreenSing::createPauseMenu() {
 	m_menu.clear();
 	m_menu.add(MenuOption(_("Resume"), _("Back to performing!")));
 	m_menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning")).screen("Sing"));
-    m_menu.add(MenuOption(_("Skip"), _("Skip current song")).screen("Playlist"));
+	m_menu.add(MenuOption(_("Skip"), _("Skip current song")).screen("Playlist"));
 	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).call([]() {
-    Game* gm = Game::getSingletonPtr();
-    gm->getCurrentPlayList().clear();
-	gm->activateScreen("Playlist");
+		Game* gm = Game::getSingletonPtr();
+		gm->getCurrentPlayList().clear();
+		gm->activateScreen("Playlist");
 	}));
-
 	m_menu.close();
 }
 
@@ -164,7 +163,7 @@ void ScreenSing::exit() {
 	m_menuTheme.reset();
 	theme.reset();
 	if (m_audio.isPaused()) m_audio.togglePause();
-    Game::getSingletonPtr()->showLogo();
+	Game::getSingletonPtr()->showLogo();
 }
 
 
@@ -232,7 +231,7 @@ void ScreenSing::instrumentLayout(double time) {
 
 void ScreenSing::activateNextScreen()
 {
-    Game* gm = Game::getSingletonPtr();
+	Game* gm = Game::getSingletonPtr();
 
 	m_database.addSong(m_song);
 	if (m_database.scores.empty() || !m_database.reachedHiscore(m_song)) {
@@ -260,7 +259,7 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 	}
 	// Instant quit with CANCEL at the very beginning
 	if (nav == input::NAV_CANCEL && time < 1.0) {
-        Game::getSingletonPtr()->activateScreen("Playlist");
+		Game::getSingletonPtr()->activateScreen("Playlist");
 		return;
 	}
 	// Only pause or esc opens the global menu (instruments have their own menus)
@@ -279,8 +278,8 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 			}
 			return;
 		}
-        else if (nav == input::NAV_LEFT) { m_menu.move(-1); return; }
-        else if (nav == input::NAV_RIGHT) { m_menu.move(1); return; }
+		else if (nav == input::NAV_LEFT) { m_menu.move(-1); return; }
+		else if (nav == input::NAV_RIGHT) { m_menu.move(1); return; }
 		else if (nav == input::NAV_DOWN) { m_menu.move(1); return; }
 		else if (nav == input::NAV_UP) { m_menu.move(-1); return; }
 	}
@@ -366,7 +365,6 @@ void ScreenSing::manageEvent(SDL_Event event) {
 }
 
 namespace {
-
 	const double arMin = 1.33;
 	const double arMax = 2.35;
 
@@ -381,11 +379,10 @@ namespace {
 		getShader("texture").bind();
 		va.Draw();
 	}
-
 }
 
 void ScreenSing::prepare() {
-    Game* gm = Game::getSingletonPtr();
+	Game* gm = Game::getSingletonPtr();
 	double time = m_audio.getPosition();
 	// Enable/disable controllers as needed (mostly so that keyboard navigation will not be obstructed).
 	gm->controllers.enableEvents(m_song->hasControllers() && !m_menu.isOpen() && !m_score_window.get());
@@ -424,8 +421,6 @@ void ScreenSing::prepare() {
 			if (it->joining(time)) m_menu.close(); else it->toggleMenu(0);
 		}
 	}
-
-
 }
 
 void ScreenSing::draw() {
@@ -492,8 +487,8 @@ void ScreenSing::draw() {
 
 	if (config["game/karaoke_mode"].b()) {
 		if (!m_audio.isPlaying()) {
-            Game* gm = Game::getSingletonPtr();
-	    gm->activateScreen("Playlist");
+			Game* gm = Game::getSingletonPtr();
+			gm->activateScreen("Playlist");
 			return;
 		}
 	} else {
@@ -563,7 +558,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
   m_score_text(getThemePath("score_txt.svg")),
   m_score_rank(getThemePath("score_rank.svg"))
 {
-    Game::getSingletonPtr()->showLogo();
+	Game::getSingletonPtr()->showLogo();
 	m_pos.setTarget(0.0);
 	m_database.scores.clear();
 	// Singers

@@ -64,13 +64,13 @@ ThemeInstrumentMenu::ThemeInstrumentMenu():
 }
 //at the moment just a copy of themeSong
 ThemePlaylistScreen::ThemePlaylistScreen():
-    Theme(getThemePath("songs_bg.svg")),
-    options(30),
-    option_selected(getThemePath("mainmenu_option_selected.svg"), config["graphic/text_lod"].f()),
-    comment(getThemePath("mainmenu_comment.svg"), config["graphic/text_lod"].f()),
-    short_comment(getThemePath("mainmenu_short_comment.svg"), config["graphic/text_lod"].f()),
-    comment_bg(getThemePath("mainmenu_comment_bg.svg")),
-    short_comment_bg(getThemePath("mainmenu_scomment_bg.svg"))
+	Theme(getThemePath("songs_bg.svg")),
+	options(30),
+	option_selected(getThemePath("mainmenu_option_selected.svg"), config["graphic/text_lod"].f()),
+	comment(getThemePath("mainmenu_comment.svg"), config["graphic/text_lod"].f()),
+	short_comment(getThemePath("mainmenu_short_comment.svg"), config["graphic/text_lod"].f()),
+	comment_bg(getThemePath("mainmenu_comment_bg.svg")),
+	short_comment_bg(getThemePath("mainmenu_scomment_bg.svg"))
 {}
 
 SvgTxtTheme& ThemeInstrumentMenu::getCachedOption(const std::string& text) {
