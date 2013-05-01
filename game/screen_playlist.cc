@@ -189,7 +189,7 @@ void ScreenPlaylist::drawMenu() {
 void ScreenPlaylist::draw_menu_options() {
 	// Variables used for positioning and other stuff
 	double wcounter = 0;
-	const size_t showopts = 5; // Show at most 5 options simultaneously
+	const size_t showopts = 9; // Show at most 9 options simultaneously
 	const float x = -0.35;
 	const float start_y = -0.1;
 	const float sel_margin = 0.05;
@@ -213,7 +213,7 @@ void ScreenPlaylist::draw_menu_options() {
 			// Draw the text, dim if option not available
 			{
 				ColorTrans c(Color::alpha(opt.isActive() ? 1.0 : 0.5));
-				theme->option_selected.dimensions.left(x).center(start_y + ii*0.08);
+				theme->option_selected.dimensions.left(x).center(start_y + ii*0.05);
 				theme->option_selected.draw(opt.getName());
 			}
 			wcounter = std::max(wcounter, theme->option_selected.w() + 2 * sel_margin); // Calculate the widest entry
@@ -229,7 +229,7 @@ void ScreenPlaylist::draw_menu_options() {
 			std::string title = opt.getName();
 			SvgTxtTheme& txt = getTextObject(title);
 			ColorTrans c(Color::alpha(opt.isActive() ? 1.0 : 0.5));
-			txt.dimensions.left(x).center(start_y + ii*0.08);
+			txt.dimensions.left(x).center(start_y + ii*0.05);
 			txt.draw(title);
 			wcounter = std::max(wcounter, txt.w() + 2 * sel_margin); // Calculate the widest entry
 		}
@@ -251,7 +251,8 @@ void ScreenPlaylist::createSongListMenu() {
 	for(SongList::iterator it = currentList.begin(); it != currentList.end(); ++it) {
 		boost::shared_ptr<Song> songToAdd =  (*it);
 		oss_playlist << "#" << count << " : " << songToAdd->artist << " - " << songToAdd->title;
-		songlist_menu.add(MenuOption(_(oss_playlist.str().c_str()),_("Press enter to view song options")).call([this, count]() {
+		std::string songinfo = oss_playlist.str();
+		songlist_menu.add(MenuOption(_(songinfo.c_str()),_("Press enter to view song options")).call([this, count]() {
 			createSongMenu(count);
 			overlay_menu.open();
 		}));
