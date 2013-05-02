@@ -189,7 +189,7 @@ void ScreenPlaylist::drawMenu() {
 void ScreenPlaylist::draw_menu_options() {
 	// Variables used for positioning and other stuff
 	double wcounter = 0;
-	const size_t showopts = 9; // Show at most 9 options simultaneously
+	const size_t showopts = 8; // Show at most 8 options simultaneously
 	const float x = -0.35;
 	const float start_y = -0.1;
 	const float sel_margin = 0.05;
