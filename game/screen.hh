@@ -6,6 +6,7 @@
 #include "opengl_text.hh"
 #include "video_driver.hh"
 #include "dialog.hh"
+#include "playlist.hh"
 #include "fbo.hh"
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -34,20 +35,19 @@ class Screen {
 	virtual void reloadGL() { exit(); enter(); }
 	/// returns screen name
 	std::string getName() const { return m_name; }
-
   private:
 	std::string m_name;
 };
 
-/// Manager for screens
+/// Manager for screens and Playlist
 /** manages screens
  * @see Singleton
  */
-class ScreenManager: public Singleton <ScreenManager> {
+class Game: public Singleton <Game> {
   public:
 	/// constructor
-	ScreenManager(Window& window);
-	~ScreenManager() { if (currentScreen) currentScreen->exit(); }
+    Game(Window& window);
+    ~Game() { if (currentScreen) currentScreen->exit(); }
 	/// Adds a screen to the manager
 	void addScreen(Screen* s) { std::string tmp = s->getName(); screens.insert(tmp, s); }
 	/// Switches active screen
@@ -96,12 +96,14 @@ private:
 	Window& m_window;
 public:
 	input::Controllers controllers;
+    PlayList& getCurrentPlayList() { return currentPlaylist; }
 private:
 	bool m_finished;
 	typedef boost::ptr_map<std::string, Screen> screenmap_t;
 	screenmap_t screens;
 	Screen* newScreen;
 	Screen* currentScreen;
+    PlayList currentPlaylist;
 	// Flash messages members
 	float m_timeToFadeIn;
 	float m_timeToFadeOut;

@@ -15,6 +15,7 @@
 #include "util.hh"
 #include "video.hh"
 #include "webcam.hh"
+#include "screen_songs.hh"
 
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
@@ -28,48 +29,48 @@ namespace {
 
 	/// Add a flash message about the state of a config item
 	void dispInFlash(ConfigItem& ci) {
-		ScreenManager* sm = ScreenManager::getSingletonPtr();
-		sm->flashMessage(ci.getShortDesc() + ": " + ci.getValue());
+		Game* gm = Game::getSingletonPtr();
+		gm->flashMessage(ci.getShortDesc() + ": " + ci.getValue());
 	}
 }
 
 ScreenSing::ScreenSing(std::string const& name, Audio& audio, Database& database, Backgrounds& bgs):
-	  Screen(name), m_audio(audio), m_database(database), m_backgrounds(bgs),
-	  m_selectedTrack(TrackName::LEAD_VOCAL) {
-}
+	Screen(name), m_audio(audio), m_database(database), m_backgrounds(bgs),
+	m_selectedTrack(TrackName::LEAD_VOCAL)
+{}
 
 void ScreenSing::enter() {
-	ScreenManager* sm = ScreenManager::getSingletonPtr();
+	Game* gm = Game::getSingletonPtr();
 	// Initialize webcam
-	sm->loading(_("Initializing webcam..."), 0.1);
+	gm->loading(_("Initializing webcam..."), 0.1);
 	if (config["graphic/webcam"].b() && Webcam::enabled()) {
 		try {
 			m_cam.reset(new Webcam(config["graphic/webcamid"].i()));
 		} catch (std::exception& e) { std::cout << e.what() << std::endl; };
 	}
 	// Load video
-	sm->loading(_("Loading video..."), 0.2);
+	gm->loading(_("Loading video..."), 0.2);
 	if (!m_song->video.empty() && config["graphic/video"].b()) {
 		m_video.reset(new Video(m_song->path + m_song->video, m_song->videoGap));
 	}
 	boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
 	reloadGL();
 	// Load song notes
-	sm->loading(_("Loading song..."), 0.4);
+	gm->loading(_("Loading song..."), 0.4);
 	if (m_song->loadStatus != Song::FULL) {
 		try { SongParser sp(*m_song); }
 		catch (SongParserException& e) {
 			std::clog << e;
-			sm->activateScreen("Songs");
+	    gm->activateScreen("Playlist");
 		}
 	}
 	// Notify about broken tracks
-	if (!m_song->b0rked.empty()) sm->dialog(_("Song contains broken tracks!") + std::string("\n\n") + m_song->b0rked);
+	if (!m_song->b0rked.empty()) gm->dialog(_("Song contains broken tracks!") + std::string("\n\n") + m_song->b0rked);
 	// Startup delay for instruments is longer than for singing only
 	double setup_delay = (!m_song->hasControllers() ? -1.0 : -5.0);
 	m_audio.pause();
 	m_audio.playMusic(m_song->music, false, 0.0, setup_delay);
-	sm->loading(_("Loading menu..."), 0.7);
+	gm->loading(_("Loading menu..."), 0.7);
 	{
 		VocalTracks const& tracks = m_song->vocalTracks;
 		unsigned players = analyzers.size();
@@ -95,8 +96,8 @@ void ScreenSing::enter() {
 		m_menu.open();
 		if (tracks.size() <= 1) setupVocals();  // No duet menu
 	}
-	sm->showLogo(false);
-	sm->loading(_("Loading complete"), 1.0);
+	gm->showLogo(false);
+	gm->loading(_("Loading complete"), 1.0);
 }
 
 void ScreenSing::setupVocals() {
@@ -126,7 +127,12 @@ void ScreenSing::createPauseMenu() {
 	m_menu.clear();
 	m_menu.add(MenuOption(_("Resume"), _("Back to performing!")));
 	m_menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning")).screen("Sing"));
-	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).screen("Songs"));
+	m_menu.add(MenuOption(_("Skip"), _("Skip current song")).screen("Playlist"));
+	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).call([]() {
+		Game* gm = Game::getSingletonPtr();
+		gm->getCurrentPlayList().clear();
+		gm->activateScreen("Playlist");
+	}));
 	m_menu.close();
 }
 
@@ -142,7 +148,7 @@ void ScreenSing::reloadGL() {
 }
 
 void ScreenSing::exit() {
-	ScreenManager::getSingletonPtr()->controllers.enableEvents(false);
+    Game::getSingletonPtr()->controllers.enableEvents(false);
 	m_engine.reset();
 	m_score_window.reset();
 	m_menu.clear();
@@ -157,7 +163,7 @@ void ScreenSing::exit() {
 	m_menuTheme.reset();
 	theme.reset();
 	if (m_audio.isPaused()) m_audio.togglePause();
-	ScreenManager::getSingletonPtr()->showLogo();
+	Game::getSingletonPtr()->showLogo();
 }
 
 
@@ -225,21 +231,20 @@ void ScreenSing::instrumentLayout(double time) {
 
 void ScreenSing::activateNextScreen()
 {
-	ScreenManager* sm = ScreenManager::getSingletonPtr();
+	Game* gm = Game::getSingletonPtr();
 
 	m_database.addSong(m_song);
 	if (m_database.scores.empty() || !m_database.reachedHiscore(m_song)) {
 		// if no highscore reached..
-		sm->activateScreen("Songs");
-		return;
+	    gm->activateScreen("Playlist");
 	}
 
 	// Score window visible -> Enter quits to Players Screen
-	Screen* s = sm->getScreen("Players");
+	Screen* s = gm->getScreen("Players");
 	ScreenPlayers* ss = dynamic_cast<ScreenPlayers*> (s);
 	assert(ss);
 	ss->setSong(m_song);
-	sm->activateScreen("Players");
+	gm->activateScreen("Players");
 }
 
 void ScreenSing::manageEvent(input::NavEvent const& event) {
@@ -254,7 +259,7 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 	}
 	// Instant quit with CANCEL at the very beginning
 	if (nav == input::NAV_CANCEL && time < 1.0) {
-		ScreenManager::getSingletonPtr()->activateScreen("Songs");
+		Game::getSingletonPtr()->activateScreen("Playlist");
 		return;
 	}
 	// Only pause or esc opens the global menu (instruments have their own menus)
@@ -273,8 +278,8 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 			}
 			return;
 		}
-		else if (nav == input::NAV_LEFT) { m_menu.action(-1); return; }
-		else if (nav == input::NAV_RIGHT) { m_menu.action(1); return; }
+		else if (nav == input::NAV_LEFT) { m_menu.move(-1); return; }
+		else if (nav == input::NAV_RIGHT) { m_menu.move(1); return; }
 		else if (nav == input::NAV_DOWN) { m_menu.move(1); return; }
 		else if (nav == input::NAV_UP) { m_menu.move(-1); return; }
 	}
@@ -360,7 +365,6 @@ void ScreenSing::manageEvent(SDL_Event event) {
 }
 
 namespace {
-
 	const double arMin = 1.33;
 	const double arMax = 2.35;
 
@@ -375,16 +379,15 @@ namespace {
 		getShader("texture").bind();
 		va.Draw();
 	}
-
 }
 
 void ScreenSing::prepare() {
-	ScreenManager* sm = ScreenManager::getSingletonPtr();
+	Game* gm = Game::getSingletonPtr();
 	double time = m_audio.getPosition();
 	// Enable/disable controllers as needed (mostly so that keyboard navigation will not be obstructed).
-	sm->controllers.enableEvents(m_song->hasControllers() && !m_menu.isOpen() && !m_score_window.get());
+	gm->controllers.enableEvents(m_song->hasControllers() && !m_menu.isOpen() && !m_score_window.get());
 	if (m_video) m_video->prepare(time);
-	for (input::DevicePtr dev; sm->controllers.getDevice(dev); ) {
+	for (input::DevicePtr dev; gm->controllers.getDevice(dev); ) {
 		// Eat all events and see if any are valid for joining
 		input::DevType type = input::DEVTYPE_GENERIC;
 		std::string msg;
@@ -405,7 +408,7 @@ void ScreenSing::prepare() {
 				else msg = dev->source.isKeyboard() ? _("Press SPACE to join drums!") : _("KICK to join!");
 			}
 		}
-		if (!msg.empty()) sm->flashMessage(msg, 0.0, 0.1, 0.1);
+		if (!msg.empty()) gm->flashMessage(msg, 0.0, 0.1, 0.1);
 		else if (type == input::DEVTYPE_DANCEPAD) m_instruments.push_back(new DanceGraph(m_audio, *m_song, dev));
 		else if (type != input::DEVTYPE_GENERIC) m_instruments.push_back(new GuitarGraph(m_audio, *m_song, dev, m_instruments.size()));
 	}
@@ -418,8 +421,6 @@ void ScreenSing::prepare() {
 			if (it->joining(time)) m_menu.close(); else it->toggleMenu(0);
 		}
 	}
-
-
 }
 
 void ScreenSing::draw() {
@@ -486,8 +487,8 @@ void ScreenSing::draw() {
 
 	if (config["game/karaoke_mode"].b()) {
 		if (!m_audio.isPlaying()) {
-			ScreenManager* sm = ScreenManager::getSingletonPtr();
-			sm->activateScreen("Songs");
+			Game* gm = Game::getSingletonPtr();
+			gm->activateScreen("Playlist");
 			return;
 		}
 	} else {
@@ -557,7 +558,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
   m_score_text(getThemePath("score_txt.svg")),
   m_score_rank(getThemePath("score_rank.svg"))
 {
-	ScreenManager::getSingletonPtr()->showLogo();
+	Game::getSingletonPtr()->showLogo();
 	m_pos.setTarget(0.0);
 	m_database.scores.clear();
 	// Singers

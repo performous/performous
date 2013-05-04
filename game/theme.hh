@@ -109,3 +109,21 @@ public:
 	/// get a cached option test
 	SvgTxtTheme& getCachedOption(const std::string& text);
 };
+
+//at the moment just a copy of ThemeSongs
+class ThemePlaylistScreen: public Theme {
+public:
+	ThemePlaylistScreen();
+	/// menu option texts
+	Cachemap<std::string, SvgTxtTheme> options;
+	/// selected menu option text
+	SvgTxtTheme option_selected;
+	/// menu comment text
+	SvgTxtTheme comment;
+	/// configuration comment text (short tip)
+	SvgTxtTheme short_comment;
+	/// configuration comment background
+	Surface comment_bg;
+	/// configuration comment background (short tip)
+	Surface short_comment_bg;
+};

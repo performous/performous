@@ -349,17 +349,17 @@ void Window::screenshot() {
 ColorTrans::ColorTrans(Color const& c): m_old(g_color) {
 	using namespace glmath;
 	g_color = g_color * mat4::diagonal(c.linear());
-	ScreenManager::getSingletonPtr()->window().updateColor();
+	Game::getSingletonPtr()->window().updateColor();
 }
 
 ColorTrans::ColorTrans(glmath::mat4 const& mat): m_old(g_color) {
 	g_color = g_color * mat;
-	ScreenManager::getSingletonPtr()->window().updateColor();
+	Game::getSingletonPtr()->window().updateColor();
 }
 
 ColorTrans::~ColorTrans() {
 	g_color = m_old;
-	ScreenManager::getSingletonPtr()->window().updateColor();
+	Game::getSingletonPtr()->window().updateColor();
 }
 
 ViewTrans::ViewTrans(double offsetX, double offsetY, double frac): m_old(g_projection) {
@@ -377,27 +377,27 @@ ViewTrans::ViewTrans(double offsetX, double offsetY, double frac): m_old(g_proje
 	// Perspective projection + the rest of the offset in eye (world) space
 	g_projection = frustum(f * x1, f * x2, f * y1, f * y2, near_, far_)
 	  * translate(vec3(offsetX - persX, offsetY - persY, -z0));
-	ScreenManager::getSingletonPtr()->window().updateTransforms();
+	Game::getSingletonPtr()->window().updateTransforms();
 }
 
 ViewTrans::ViewTrans(glmath::mat4 const& m): m_old(g_projection) {
 	g_projection = g_projection * m;
-	ScreenManager::getSingletonPtr()->window().updateTransforms();
+	Game::getSingletonPtr()->window().updateTransforms();
 }
 
 ViewTrans::~ViewTrans() {
 	g_projection = m_old;
-	ScreenManager::getSingletonPtr()->window().updateTransforms();
+	Game::getSingletonPtr()->window().updateTransforms();
 }
 
 Transform::Transform(glmath::mat4 const& m): m_old(g_modelview) {
 	g_modelview = g_modelview * m;
-	ScreenManager::getSingletonPtr()->window().updateTransforms();
+	Game::getSingletonPtr()->window().updateTransforms();
 }
 
 Transform::~Transform() {
 	g_modelview = m_old;
-	ScreenManager::getSingletonPtr()->window().updateTransforms();
+	Game::getSingletonPtr()->window().updateTransforms();
 }
 
 glmath::mat4 farTransform() {
