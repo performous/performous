@@ -521,18 +521,13 @@ void ScreenSongs::createAdvancedPlaylistMenu() {
 		tm->getCurrentPlayList().shuffle();
 		m_menu.close();
 	}));
+	m_menu.add(MenuOption(_("View playlist"), _("View the current playlist")).screen("Playlist"));
 	m_menu.add(MenuOption(_("Clear playlist"), _("Remove all the songs from the list")).call([this]() {
 		Game* tm = Game::getSingletonPtr();
 		tm->getCurrentPlayList().clear();
 		m_menu.close();
 	}));
-	m_menu.add(MenuOption(_("View playlist"), _("View the current playlist")).screen("Playlist"));
 	m_menu.add(MenuOption(_("Back"), _("Back to song browser")).call([this]() {
 		m_menu.close();
-	}));
-	m_menu.add(MenuOption(_("Quit"), _("Clear playlist and quit to title screen")).call([this]() {
-		Game* tm = Game::getSingletonPtr();
-		tm->getCurrentPlayList().clear();
-		tm->activateScreen("Intro");
 	}));
 }

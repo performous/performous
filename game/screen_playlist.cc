@@ -117,7 +117,7 @@ void ScreenPlaylist::createEscMenu() {
 		tm->getCurrentPlayList().shuffle();
 		overlay_menu.close();
 	}));
-	overlay_menu.add(MenuOption(_("Clear playlist"), _("Remove all the songs from the list")).call([this]() {
+	overlay_menu.add(MenuOption(_("Clear and exit"), _("Remove all the songs from the list")).call([this]() {
 		Game* tm = Game::getSingletonPtr();
 		tm->getCurrentPlayList().clear();
 		overlay_menu.close();
@@ -125,11 +125,6 @@ void ScreenPlaylist::createEscMenu() {
 	}));
 	overlay_menu.add(MenuOption(_("Back"), _("Back to playlist viewer")).call([this]() {
 		overlay_menu.close();
-	}));
-	overlay_menu.add(MenuOption(_("Quit"), _("Remove all the songs from the list and go back to main menu")).call([this]() {
-		Game* gm = Game::getSingletonPtr();
-		gm->getCurrentPlayList().clear();
-		gm->activateScreen("Intro");
 	}));
 }
 
