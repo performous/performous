@@ -140,13 +140,13 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
 			}
 		}
 	}
-	else if (event.menu == input::NAVMENU_B_PREV && m_menuPos < 4) {
+	else if (event.menu == input::NAVMENU_B_PREV) {
 		if (m_menu.isOpen()) m_menu.move(-1);
-		else ++m_menuPos;
+		else if (m_menuPos < 4) ++m_menuPos;
 	}
-	else if (event.menu == input::NAVMENU_B_NEXT && m_menuPos > 0) {
+	else if (event.menu == input::NAVMENU_B_NEXT) {
 		if (m_menu.isOpen()) m_menu.move(1);
-		else --m_menuPos;
+		else if (m_menuPos > 0) --m_menuPos;
 	}
 }
 
