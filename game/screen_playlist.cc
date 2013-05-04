@@ -190,7 +190,7 @@ void ScreenPlaylist::draw_menu_options() {
 	// Variables used for positioning and other stuff
 	double wcounter = 0;
 	const size_t showopts = 8; // Show at most 8 options simultaneously
-	const float x = -0.35; // x xcoordinate from screen center, the menu should be aligned left of the center therefore it´s negative.
+	const float x = -0.35; // x xcoordinate from screen center, the menu should be aligned left of the center therefore it´s negative.n
 	const float start_y = -0.1;
 	const float sel_margin = 0.05;
 	const MenuOptions opts = songlist_menu.getOptions();
@@ -252,6 +252,9 @@ void ScreenPlaylist::createSongListMenu() {
 		boost::shared_ptr<Song> songToAdd =  (*it);
 		oss_playlist << "#" << count << " : " << songToAdd->artist << " - " << songToAdd->title;
 		std::string songinfo = oss_playlist.str();
+		if(songinfo.length() > 20) {
+		    songinfo = songinfo + "                          >"; //FIXME: ugly hack to make the text scale so it fits on screen!
+		  }
 		songlist_menu.add(MenuOption(_(songinfo.c_str()),_("Press enter to view song options")).call([this, count]() {
 			createSongMenu(count);
 			overlay_menu.open();
