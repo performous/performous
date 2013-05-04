@@ -70,6 +70,7 @@ void ScreenSongs::menuBrowse(int dir) {
 		case 1: m_songs.sortChange(dir); break;
 		case 2: m_songs.typeChange(dir); break;
 		case 3: m_infoPos = (m_infoPos + dir + 5) % 5; break;
+		case 4: m_songs.advance(dir); break;
 	}
 }
 
