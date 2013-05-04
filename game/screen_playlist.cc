@@ -227,13 +227,13 @@ void ScreenPlaylist::createSongListMenu() {
 	int count = 1;
 	songlist_menu.clear();
 	SongList& currentList = gm->getCurrentPlayList().getList();
-	for(SongList::iterator it = currentList.begin(); it != currentList.end(); ++it) {
+	for (SongList::iterator it = currentList.begin(); it != currentList.end(); ++it) {
 		boost::shared_ptr<Song> songToAdd =  (*it);
 		oss_playlist << "#" << count << " : " << songToAdd->artist << " - " << songToAdd->title;
 		std::string songinfo = oss_playlist.str();
-		if(songinfo.length() > 20) {
-		    songinfo = songinfo + "                          >"; //FIXME: ugly hack to make the text scale so it fits on screen!
-		  }
+		if (songinfo.length() > 20) {
+			songinfo = songinfo + "                          >"; //FIXME: ugly hack to make the text scale so it fits on screen!
+		}
 		songlist_menu.add(MenuOption(_(songinfo.c_str()),_("Press enter to view song options")).call([this, count]() {
 			createSongMenu(count);
 			overlay_menu.open();
@@ -249,23 +249,25 @@ void ScreenPlaylist::createSongListMenu() {
 
 void ScreenPlaylist::createSongMenu(int songNumber) {
 	overlay_menu.clear();
-	if(songNumber >= 2) {
-		overlay_menu.add(MenuOption(_("Play first"), _("Ignore the playlist's order and play this song first")).call([this, songNumber]() {
-			Game* gm = Game::getSingletonPtr();
-			Screen* s = gm->getScreen("Sing");
-			ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
-			assert(ss);
-			ss->setSong(gm->getCurrentPlayList().getSong(songNumber - 1));
-			gm->activateScreen("Sing");
-		}));
-		overlay_menu.add(MenuOption(_("Remove"), _("Remove this song from the list - to be implemented")).call([this, songNumber]() {
-			Game* gm = Game::getSingletonPtr();
-			//minus 1 so it doesn´t remove #2 when you´ve selected #1
-			gm->getCurrentPlayList().removeSong(songNumber - 1);
-			overlay_menu.close();
-			createSongListMenu();
-		}));
-	}
+	std::string firstOption = songNumber >= 2 ? _("Play first") : _("Continue");
+	std::string firstDesc = songNumber >= 2 ?
+		_("Ignore the playlist's order and play this song first") :
+		_("Start the song already!");
+	overlay_menu.add(MenuOption(firstOption, firstDesc).call([this, songNumber]() {
+		Game* gm = Game::getSingletonPtr();
+		Screen* s = gm->getScreen("Sing");
+		ScreenSing* ss = dynamic_cast<ScreenSing*>(s);
+		assert(ss);
+		ss->setSong(gm->getCurrentPlayList().getSong(songNumber - 1));
+		gm->activateScreen("Sing");
+	}));
+	overlay_menu.add(MenuOption(_("Remove"), _("Remove this song from the list - to be implemented")).call([this, songNumber]() {
+		Game* gm = Game::getSingletonPtr();
+		//minus 1 so it doesn´t remove #2 when you´ve selected #1
+		gm->getCurrentPlayList().removeSong(songNumber - 1);
+		overlay_menu.close();
+		createSongListMenu();
+	}));
 	overlay_menu.add(MenuOption(_("Back"), _("Back to playlist viewer")).call([this]() {
 		overlay_menu.close();
 	}));
