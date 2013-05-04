@@ -402,7 +402,8 @@ void ScreenSongs::drawInstruments(Dimensions dim) const {
 	bool have_bass = false;
 	bool have_drums = false;
 	bool have_dance = false;
-	bool is_karaoke = false;
+	// TODO: Do something with is_karaoke
+	//bool is_karaoke = false;
 	int guitarCount = 0;
 	int vocalCount = 0;
 
@@ -411,7 +412,7 @@ void ScreenSongs::drawInstruments(Dimensions dim) const {
 		have_bass = isTrackInside(song.instrumentTracks,TrackName::BASS);
 		have_drums = song.hasDrums();
 		have_dance = song.hasDance();
-		is_karaoke = (song.music.find("vocals") != song.music.end());
+		//is_karaoke = (song.music.find("vocals") != song.music.end());
 		vocalCount = song.getVocalTrackNames().size();
 		if (isTrackInside(song.instrumentTracks,TrackName::GUITAR)) guitarCount++;
 		if (isTrackInside(song.instrumentTracks,TrackName::GUITAR_COOP)) guitarCount++;
