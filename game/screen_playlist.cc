@@ -54,48 +54,27 @@ void ScreenPlaylist::exit() {
 
 void ScreenPlaylist::manageEvent(input::NavEvent const& event) {
 	input::NavButton nav = event.button;
-	if (keyPressed == false) {
+	Menu& menu = overlay_menu.isOpen() ? overlay_menu : songlist_menu;
+
+	if (keyPressed == false)
 		keyPressed = true;
-	}
+
 	if (nav == input::NAV_CANCEL) {
 		createEscMenu();
 		overlay_menu.open();
 	} else {
-		if (nav == input::NAV_PAUSE) m_audio.togglePause();
-		else if (nav == input::NAV_START) {
-			if (overlay_menu.isOpen()) {
-				overlay_menu.action();
-			} else {
-				songlist_menu.action();
-			}
-		}
-		else if (event.menu == input::NAVMENU_A_PREV) {
-			if (overlay_menu.isOpen()) {
-				overlay_menu.move(-1);
-			} else {
-				songlist_menu.move(-1);
-			}
-		}
-		else if (event.menu == input::NAVMENU_A_NEXT) {
-			if (overlay_menu.isOpen()) {
-				overlay_menu.move(1);
-			} else {
-				songlist_menu.move(1);
-			}
-		}
-		else if (event.menu == input::NAVMENU_B_PREV) {
-			if (overlay_menu.isOpen()) {
-				overlay_menu.move(-1);
-			} else {
-				songlist_menu.move(-1);
-			}
-		}
-		else if (event.menu == input::NAVMENU_B_NEXT) {
-			if(overlay_menu.isOpen()) {
-				overlay_menu.move(1);
-			} else {
-				songlist_menu.move(1);
-			}
+		if (nav == input::NAV_PAUSE) {
+			m_audio.togglePause();
+		} else if (nav == input::NAV_START) {
+			menu.action();
+		} else if (event.menu == input::NAVMENU_A_PREV) {
+			menu.move(-1);
+		} else if (event.menu == input::NAVMENU_A_NEXT) {
+			menu.move(1);
+		} else if (event.menu == input::NAVMENU_B_PREV) {
+			menu.move(-1);
+		} else if (event.menu == input::NAVMENU_B_NEXT) {
+			menu.move(1);
 		}
 	}
 }
