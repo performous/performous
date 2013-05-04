@@ -110,14 +110,10 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
 	else if (nav == input::NAV_START) {
 		if (m_menu.isOpen()) {
 			m_menu.action();
-			if (!m_menu.isOpen() && m_audio.isPaused()) {
-				m_audio.togglePause();
-			}
 		}
 		else if (m_menuPos == 0) {
 			if (!gm->getCurrentPlayList().isEmpty()) {
 				createPlaylistMenu();
-				m_audio.togglePause();
 				m_menu.open();
 			} else {
 				Game* tm = Game::getSingletonPtr();
@@ -139,7 +135,6 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
 				m_menuPos = 0;
 				gm->getCurrentPlayList().addSong(m_songs.currentPtr());
 			} else {
-				m_audio.togglePause();
 				createAdvancedPlaylistMenu();
 				m_menu.open();
 			}
@@ -450,6 +445,7 @@ void ScreenSongs::drawInstruments(Dimensions dim) const {
 		x += dim.w();
 	}
 }
+
 void ScreenSongs::drawMenu() {
 	if (m_menu.empty()) return;
 	// Some helper vars
