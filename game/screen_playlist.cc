@@ -190,7 +190,7 @@ void ScreenPlaylist::draw_menu_options() {
 	// Variables used for positioning and other stuff
 	double wcounter = 0;
 	const size_t showopts = 8; // Show at most 8 options simultaneously
-	const float x = -0.35;
+	const float x = -0.35; // x xcoordinate from screen center, the menu should be aligned left of the center therefore it´s negative.
 	const float start_y = -0.1;
 	const float sel_margin = 0.05;
 	const MenuOptions opts = songlist_menu.getOptions();
