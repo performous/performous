@@ -13,6 +13,9 @@ Tapio Vierros <aave000 at users.sourceforge.net>
 	* Core developer
 	* Lots of stuff in various areas
 
+Niek Nooijens <https://github.com/nieknooijens>
+	* Playlist Support
+
 
 INACTIVE DEVELOPERS
 -------------------

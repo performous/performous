@@ -23,6 +23,7 @@
 #include "screen_audiodevices.hh"
 #include "screen_paths.hh"
 #include "screen_players.hh"
+#include "screen_playlist.hh"
 
 #include <boost/bind.hpp>
 #include <boost/format.hpp>
@@ -66,7 +67,7 @@ static void signalSetup() {
 /// can be thrown as an exception to quit the game
 struct QuitNow {};
 
-static void checkEvents(ScreenManager& sm) {
+static void checkEvents(Game& gm) {
 	if (g_quit) {
 		std::cout << "Terminating, please wait... (or kill the process)" << std::endl;
 		throw QuitNow();
@@ -75,13 +76,13 @@ static void checkEvents(ScreenManager& sm) {
 	while(SDL_PollEvent(&event) == 1) {
 		// Let the navigation system grab any and all SDL events
 		boost::xtime eventTime = now();
-		sm.controllers.pushEvent(event, eventTime);
+		gm.controllers.pushEvent(event, eventTime);
 		switch(event.type) {
 		  case SDL_QUIT:
-			sm.finished();
+			gm.finished();
 			break;
 		  case SDL_VIDEORESIZE:
-			sm.window().resize(event.resize.w, event.resize.h);
+			gm.window().resize(event.resize.w, event.resize.h);
 			break;
 		  case SDL_KEYDOWN:
 			int keypressed  = event.key.keysym.sym;
@@ -95,38 +96,38 @@ static void checkEvents(ScreenManager& sm) {
 				continue; // Already handled here...
 			}
 			if (keypressed == SDLK_F4 && modifier & KMOD_ALT) {
-				sm.finished();
+				gm.finished();
 				continue; // Already handled here...
 			}
 			break;
 		}
 		// Screens always receive SDL events that were not already handled here
-		sm.getCurrentScreen()->manageEvent(event);
+		gm.getCurrentScreen()->manageEvent(event);
 	}
-	for (input::NavEvent event; sm.controllers.getNav(event); ) {
+	for (input::NavEvent event; gm.controllers.getNav(event); ) {
 		input::NavButton nav = event.button;
 		// Volume control
 		if (nav == input::NAV_VOLUME_UP || nav == input::NAV_VOLUME_DOWN) {
-			std::string curS = sm.getCurrentScreen()->getName();
+			std::string curS = gm.getCurrentScreen()->getName();
 			// Pick proper setting
 			std::string which_vol = (curS == "Sing" || curS == "Practice")
 			  ? "audio/music_volume" : "audio/preview_volume";
 			// Adjust value
 			if (nav == input::NAV_VOLUME_UP) ++config[which_vol]; else --config[which_vol];
 			// Show message
-			sm.flashMessage(config[which_vol].getShortDesc() + ": " + config[which_vol].getValue());
+			gm.flashMessage(config[which_vol].getShortDesc() + ": " + config[which_vol].getValue());
 			continue; // Already handled here...
 		}
 		// If a dialog is open, any nav event will close it
-		if (sm.isDialogOpen()) { sm.closeDialog(); continue; }
+		if (gm.isDialogOpen()) { gm.closeDialog(); continue; }
 		// Let the current screen handle other events
-		sm.getCurrentScreen()->manageEvent(event);
+		gm.getCurrentScreen()->manageEvent(event);
 	}
 
 	// Need to toggle full screen mode?
-	if (config["graphic/fullscreen"].b() != sm.window().getFullscreen()) {
-		sm.window().setFullscreen(config["graphic/fullscreen"].b());
-		sm.reloadGL();
+	if (config["graphic/fullscreen"].b() != gm.window().getFullscreen()) {
+		gm.window().setFullscreen(config["graphic/fullscreen"].b());
+		gm.reloadGL();
 	}
 }
 
@@ -141,10 +142,10 @@ void mainLoop(std::string const& songlist) {
 	Backgrounds backgrounds;
 	Database database(getConfigDir() / "database.xml");
 	Songs songs(database, songlist);
-	ScreenManager sm(window);
+    Game gm(window);
 	try {
 		// Load audio samples
-		sm.loading(_("Loading audio samples..."), 0.5);
+		gm.loading(_("Loading audio samples..."), 0.5);
 		audio.loadSample("drum bass", getPath("sounds/drum_bass.ogg"));
 		audio.loadSample("drum snare", getPath("sounds/drum_snare.ogg"));
 		audio.loadSample("drum hi-hat", getPath("sounds/drum_hi-hat.ogg"));
@@ -158,40 +159,41 @@ void mainLoop(std::string const& songlist) {
 		audio.loadSample("guitar fail5", getPath("sounds/guitar_fail5.ogg"));
 		audio.loadSample("guitar fail6", getPath("sounds/guitar_fail6.ogg"));
 		// Load screens
-		sm.loading(_("Creating screens..."), 0.7);
-		sm.addScreen(new ScreenIntro("Intro", audio));
-		sm.addScreen(new ScreenSongs("Songs", audio, songs, database));
-		sm.addScreen(new ScreenSing("Sing", audio, database, backgrounds));
-		sm.addScreen(new ScreenPractice("Practice", audio));
-		sm.addScreen(new ScreenDownloads("Downloads", audio, downloader));
-		sm.addScreen(new ScreenAudioDevices("AudioDevices", audio));
-		sm.addScreen(new ScreenPaths("Paths", audio));
-		sm.addScreen(new ScreenPlayers("Players", audio, database));
-		sm.activateScreen("Intro");
-		sm.loading(_("Entering main menu"), 0.8);
-		sm.updateScreen();  // exit/enter, any exception is fatal error
-		sm.loading(_("Loading complete"), 1.0);
+		gm.loading(_("Creating screens..."), 0.7);
+		gm.addScreen(new ScreenIntro("Intro", audio));
+		gm.addScreen(new ScreenSongs("Songs", audio, songs, database));
+		gm.addScreen(new ScreenSing("Sing", audio, database, backgrounds));
+		gm.addScreen(new ScreenPractice("Practice", audio));
+		gm.addScreen(new ScreenDownloads("Downloads", audio, downloader));
+		gm.addScreen(new ScreenAudioDevices("AudioDevices", audio));
+		gm.addScreen(new ScreenPaths("Paths", audio));
+		gm.addScreen(new ScreenPlayers("Players", audio, database));
+		gm.addScreen(new ScreenPlaylist("Playlist", audio, songs, backgrounds));
+		gm.activateScreen("Intro");
+		gm.loading(_("Entering main menu"), 0.8);
+		gm.updateScreen();  // exit/enter, any exception is fatal error
+		gm.loading(_("Loading complete"), 1.0);
 		// Main loop
 		boost::xtime time = now();
 		unsigned frames = 0;
-		while (!sm.isFinished()) {
+		while (!gm.isFinished()) {
 			Profiler prof("mainloop");
 			if( g_take_screenshot ) {
 				fs::path filename;
 				try {
 					window.screenshot();
-					sm.flashMessage(_("Screenshot taken!"));
+					gm.flashMessage(_("Screenshot taken!"));
 				} catch (EXCEPTION& e) {
 					std::cerr << "ERROR: " << e.what() << std::endl;
-					sm.flashMessage(_("Screenshot failed!"));
+					gm.flashMessage(_("Screenshot failed!"));
 				}
 				g_take_screenshot = false;
 			}
-			sm.updateScreen();  // exit/enter, any exception is fatal error
+			gm.updateScreen();  // exit/enter, any exception is fatal error
 			prof("misc");
 			try {
 				// Draw
-				window.render(boost::bind(&ScreenManager::drawScreen, &sm));
+                window.render(boost::bind(&Game::drawScreen, &gm));
 				glFinish();
 				prof("draw");
 				// Display (and wait until next frame)
@@ -199,7 +201,7 @@ void mainLoop(std::string const& songlist) {
 				glFinish();
 				prof("swap");
 				updateSurfaces();
-				sm.prepareScreen();
+				gm.prepareScreen();
 				glFinish();
 				prof("surfaces");
 				if (config["graphic/fps"].b()) {
@@ -207,7 +209,7 @@ void mainLoop(std::string const& songlist) {
 					if (now() - time > 1.0) {
 						std::ostringstream oss;
 						oss << frames << " FPS";
-						sm.flashMessage(oss.str());
+						gm.flashMessage(oss.str());
 						time += 1.0;
 						frames = 0;
 					}
@@ -218,16 +220,16 @@ void mainLoop(std::string const& songlist) {
 				}
 				prof("fpsctrl");
 				// Process events for the next frame
-				sm.controllers.process(now());
-				checkEvents(sm);
+				gm.controllers.process(now());
+				checkEvents(gm);
 				prof("events");
 			} catch (RUNTIME_ERROR& e) {
 				std::cerr << "ERROR: " << e.what() << std::endl;
-				sm.flashMessage(std::string("ERROR: ") + e.what());
+				gm.flashMessage(std::string("ERROR: ") + e.what());
 			}
 		}
 	} catch (EXCEPTION& e) {
-		sm.fatalError(e.what());  // Notify the user
+		gm.fatalError(e.what());  // Notify the user
 		throw;
 	} catch (QuitNow&) {
 		std::cout << "Terminated." << std::endl;
