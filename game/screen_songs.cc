@@ -310,7 +310,7 @@ void ScreenSongs::draw() {
 		case 4:
 	    Game* gm = Game::getSingletonPtr();
 	    if(gm->getCurrentPlayList().isEmpty()) {
-		oss_order << _("↵ start playlist with this song!");
+		oss_order << _("↵ start a playlist with this song!");
 	      }
 	    else {
 		oss_order << _("↵ open advanced playlist settings");
