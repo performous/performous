@@ -22,7 +22,7 @@ ScreenPlaylist::ScreenPlaylist(std::string const& name,Audio& audio, Songs& song
 void ScreenPlaylist::enter() {
 	Game* gm = Game::getSingletonPtr();
 	m_audio.togglePause();
-	if(gm->getCurrentPlayList().isEmpty()) {
+	if (gm->getCurrentPlayList().isEmpty()) {
 		gm->activateScreen("Songs");
 	}
 	keyPressed = false;
@@ -261,12 +261,16 @@ void ScreenPlaylist::createSongMenu(int songNumber) {
 		ss->setSong(gm->getCurrentPlayList().getSong(songNumber - 1));
 		gm->activateScreen("Sing");
 	}));
-	overlay_menu.add(MenuOption(_("Remove"), _("Remove this song from the list - to be implemented")).call([this, songNumber]() {
+	overlay_menu.add(MenuOption(_("Remove"), _("Remove this song from the list")).call([this, songNumber]() {
 		Game* gm = Game::getSingletonPtr();
-		//minus 1 so it doesn´t remove #2 when you´ve selected #1
+		// Minus 1 so it doesn´t remove #2 when you´ve selected #1
 		gm->getCurrentPlayList().removeSong(songNumber - 1);
 		overlay_menu.close();
-		createSongListMenu();
+		if (gm->getCurrentPlayList().isEmpty()) {
+			gm->activateScreen("Songs");
+		} else {
+			createSongListMenu();
+		}
 	}));
 	overlay_menu.add(MenuOption(_("Back"), _("Back to playlist viewer")).call([this]() {
 		overlay_menu.close();
