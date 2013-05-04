@@ -65,7 +65,7 @@ void ScreenPlayers::manageEvent(input::NavEvent const& event) {
 
 		if (m_database.scores.empty() || !m_database.reachedHiscore(m_song)) {
 			// no more highscore, we are now finished
-		gm->activateScreen("PlayList");
+		gm->activateScreen("Playlist");
 		} else {
 			m_search.text.clear();
 			m_players.setFilter("");
