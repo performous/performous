@@ -116,6 +116,7 @@ void ScreenPlaylist::createEscMenu() {
 		Game* tm = Game::getSingletonPtr();
 		tm->getCurrentPlayList().shuffle();
 		overlay_menu.close();
+		createSongListMenu();
 	}));
 	overlay_menu.add(MenuOption(_("Clear and exit"), _("Remove all the songs from the list")).call([this]() {
 		Game* tm = Game::getSingletonPtr();
@@ -160,6 +161,7 @@ void ScreenPlaylist::drawMenu() {
 	}
 	overlay_menu.dimensions.stretch(w, h);
 }
+
 void ScreenPlaylist::draw_menu_options() {
 	// Variables used for positioning and other stuff
 	double wcounter = 0;
