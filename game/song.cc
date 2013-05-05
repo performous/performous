@@ -35,7 +35,13 @@ void Song::reload(bool errorIgnore) {
 	collateUpdate();
 }
 
+void Song::loadNotes(bool errorIgnore) {
+	//if (loadStatus == Song::FULL) return;
+	//try { SongParser(*this); } catch (...) { if (!errorIgnore) throw; }
+}
+
 void Song::dropNotes() {
+	return;
 	// Singing
 	if (!vocalTracks.empty()) {
 		for (VocalTracks::iterator it = vocalTracks.begin(); it != vocalTracks.end(); ++it)

@@ -57,12 +57,10 @@ void ScreenSing::enter() {
 	reloadGL();
 	// Load song notes
 	gm->loading(_("Loading song..."), 0.4);
-	if (m_song->loadStatus != Song::FULL) {
-		try { SongParser sp(*m_song); }
-		catch (SongParserException& e) {
-			std::clog << e;
-	    gm->activateScreen("Playlist");
-		}
+	try { m_song->loadNotes(false /* don't ignore errors */); }
+	catch (SongParserException& e) {
+		std::clog << e;
+		gm->activateScreen("Songs");
 	}
 	// Notify about broken tracks
 	if (!m_song->b0rked.empty()) gm->dialog(_("Song contains broken tracks!") + std::string("\n\n") + m_song->b0rked);
