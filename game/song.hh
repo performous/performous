@@ -35,6 +35,8 @@ class Song: boost::noncopyable {
 	void reload(bool errorIgnore = true);
 	/// parse field
 	bool parseField(std::string const& line);
+	/// Load notes (when only header has been loaded)
+	void loadNotes(bool errorIgnore = true);
 	/// drop notes (to conserve memory), but keep info about available tracks
 	void dropNotes();
 	/** Get formatted song label. **/

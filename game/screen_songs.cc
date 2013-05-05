@@ -152,13 +152,14 @@ void ScreenSongs::update() {
 	if (m_playing != music) songChange = true;
 	// Switch songs if needed, only when the user is not browsing for a moment
 	if (!songChange) return;
+	song->loadNotes();
 	m_playing = music;
 	// Clear the old content and load new content if available
 	m_songbg.reset(); m_video.reset();
 	double pstart = (!m_jukebox && song ? song->preview_start : 0.0);
 	m_audio.playMusic(music, true, 2.0, pstart);
 	if (song) {
-		std::string background = song->background;
+		std::string background = song->background.empty() ? song->cover : song->background;
 		std::string video = song->video;
 		if (!background.empty()) try { m_songbg.reset(new Surface(song->path + background)); } catch (std::exception const&) {}
 		if (!video.empty() && config["graphic/video"].b()) m_video.reset(new Video(song->path + video, song->videoGap));
@@ -166,7 +167,7 @@ void ScreenSongs::update() {
 }
 
 void ScreenSongs::prepare() {
-	double time = m_audio.getPosition();
+	double time = m_audio.getPosition() - config["audio/video_delay"].f();
 	if (m_video) m_video->prepare(time);
 }
 
@@ -280,6 +281,7 @@ void ScreenSongs::draw() {
 void ScreenSongs::drawCovers() {
 	double spos = m_songs.currentPosition(); // This needs to be polled to run the animation
 	std::size_t ss = m_songs.size();
+	unsigned currentId = m_songs.currentId();
 	int baseidx = spos + 1.5; --baseidx; // Round correctly
 	double shift = spos - baseidx;
 	for (int i = -2; i < 6; ++i) {
@@ -295,8 +297,17 @@ void ScreenSongs::drawCovers() {
 		  * rotate(0.4 * std::sin(std::min(M_PI, i - shift)), vec3(0.0, 1.0, 0.0))
 		);
 		double c = 0.4 + 0.6 * diff;
-		if (m_menuPos == 0 && baseidx + i == m_songs.currentId()) {
-			c = 1.0 + std::pow(std::abs(std::sin(m_idleTimer.get() * 5.0)), 10.0);
+		if (m_menuPos == 0 && baseidx + i == currentId) {
+			double t = m_audio.getPosition() - config["audio/video_delay"].f();
+			Song::Beats const& beats = m_songs[currentId].beats;
+			auto it = std::lower_bound(beats.begin(), beats.end(), t);
+			if (it != beats.begin() && it != beats.end()) {
+				double t1 = *(it - 1), t2 = *it;
+				t = (t - t1) / (t2 - t1);
+			} else {
+				t = 0.5 + m_idleTimer.get() * 2.0;  // 120 BPM
+			}
+			c = 1.0 + std::pow(std::abs(std::cos(3.141592 * t)), 10.0);
 		}
 		ColorTrans c1(Color(c, c, c));
 		s.dimensions.middle(0.0).bottom(0.0).fitInside(0.17, 0.17);
