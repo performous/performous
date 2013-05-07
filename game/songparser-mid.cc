@@ -113,12 +113,16 @@ void SongParser::midParse() {
 			// This number has been extracted from broken song tracks, but
 			// it is probably DIFFICULTYCOUNT * different_frets.
 			if (durCount <= 20) {
+				// Erase tracks with too few notes
 				nm2.clear();
-				std::string msg = "Track " + name + " is broken (has too few notes).\n";
-				s.b0rked += msg;
-				msg = "songparser/warning: " + s.path + s.midifilename + ": " + msg;
-				std::clog << msg << std::flush; // More likely to be atomic when written as one string
 				s.instrumentTracks.erase(name);
+				// Empty tracks are normal (not an error) but too short tracks are suspicious
+				if (durCount > 0) {
+					std::string msg = "Track " + name + " is broken (has too few notes).\n";
+					s.b0rked += msg;
+					msg = "songparser/warning: " + s.path + s.midifilename + ": " + msg;
+					std::clog << msg << std::flush; // More likely to be atomic when written as one string
+				}
 			}
 		} else {
 			// Process vocal tracks
