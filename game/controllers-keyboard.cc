@@ -9,12 +9,15 @@ namespace input {
 	public:
 		bool process(Event& event, SDL_Event const& sdlEv) {
 			if (sdlEv.type != SDL_KEYDOWN && sdlEv.type != SDL_KEYUP) return false;
-			if ((sdlEv.key.keysym.mod & (KMOD_LCTRL | KMOD_ALT))) return false;
 			event.source = SourceId(SOURCETYPE_KEYBOARD, sdlEv.key.which);  // Device number .which is always zero with SDL 1.2 :(
 			event.hw = sdlEv.key.keysym.sym;
 			event.value = (sdlEv.type == SDL_KEYDOWN ? 1.0 : 0.0);
-			if (g_enableInstruments) mapping(event);
-			if (event.button == GENERIC_UNASSIGNED) event.button = navigation(event, sdlEv);
+			// Get the modifier keys that we actually use as modifiers
+			unsigned mod = sdlEv.key.keysym.mod & (KMOD_LCTRL | KMOD_LALT);
+			// Map to keyboard instruments (sets event.button if matching)
+			if (g_enableInstruments && !mod) mapping(event);
+			// Map to menu navigation
+			if (event.button == GENERIC_UNASSIGNED) event.button = navigation(event.hw, mod);
 			return event.button != GENERIC_UNASSIGNED;
 		}
 		void mapping(Event& event) {
@@ -78,18 +81,23 @@ namespace input {
 			event.button = ButtonId(button);
 			event.source.channel = event.devType;  // Each type gets its own unique SourceId channel
 		}
-		Button navigation(Event& event, SDL_Event const& sdlEv) {
-			unsigned k = event.hw;
-			SDLMod mod = sdlEv.key.keysym.mod;
-			if (k == SDLK_UP) return mod & KMOD_LCTRL ? GENERIC_VOLUME_UP : GENERIC_UP;
-			if (k == SDLK_DOWN) return mod & KMOD_LCTRL ? GENERIC_VOLUME_DOWN : GENERIC_DOWN;
-			if (k == SDLK_LEFT) return GENERIC_LEFT;
-			if (k == SDLK_RIGHT) return GENERIC_RIGHT;
-			if (k == SDLK_RETURN || k == SDLK_KP_ENTER) return GENERIC_START;
-			if (k == SDLK_ESCAPE) return GENERIC_CANCEL;
-			if (k == SDLK_PAGEUP) return GENERIC_MOREUP;
-			if (k == SDLK_PAGEDOWN) return GENERIC_MOREDOWN;
-			if (k == SDLK_PAUSE || (k == SDLK_p && mod & KMOD_LCTRL)) return GENERIC_PAUSE;
+		Button navigation(unsigned k, unsigned mod) {
+			if (!mod) {
+				if (k == SDLK_UP) return GENERIC_UP;
+				if (k == SDLK_DOWN) return GENERIC_DOWN;
+				if (k == SDLK_LEFT) return GENERIC_LEFT;
+				if (k == SDLK_RIGHT) return GENERIC_RIGHT;
+				if (k == SDLK_RETURN || k == SDLK_KP_ENTER) return GENERIC_START;
+				if (k == SDLK_ESCAPE) return GENERIC_CANCEL;
+				if (k == SDLK_PAGEUP) return GENERIC_MOREUP;
+				if (k == SDLK_PAGEDOWN) return GENERIC_MOREDOWN;
+				if (k == SDLK_PAUSE) return GENERIC_PAUSE;
+			}
+			else if (mod == KMOD_LCTRL) {
+				if (k == SDLK_UP) return GENERIC_VOLUME_UP;
+				if (k == SDLK_DOWN) return GENERIC_VOLUME_DOWN;
+				if (k == SDLK_p) return GENERIC_PAUSE;
+			}
 			return GENERIC_UNASSIGNED;
 		}
 	};
