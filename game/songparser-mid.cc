@@ -91,7 +91,7 @@ void SongParser::midParse() {
 		else continue; // not a valid track
 		if (!isVocalTrack(name)) {
 			// Process non-vocal tracks
-			int durCount = 0;
+			double trackEnd = 0.0;
 			s.instrumentTracks.insert(make_pair(name,InstrumentTrack(name)));
 			NoteMap& nm2 = s.instrumentTracks.find(name)->second.nm;
 			for (MidiFileParser::NoteMap::const_iterator it2 = it->notes.begin(); it2 != it->notes.end(); ++it2) {
@@ -106,24 +106,12 @@ void SongParser::midParse() {
 						else end = beg; // Allow 1ms error to counter rounding etc errors
 					}
 					dur.push_back(Duration(beg, end));
-					durCount++;
+					if (trackEnd < end) trackEnd = end;
 				}
 			}
-			// If a track has only 20 or less notes it's most likely b0rked.
-			// This number has been extracted from broken song tracks, but
-			// it is probably DIFFICULTYCOUNT * different_frets.
-			if (durCount <= 20) {
-				// Erase tracks with too few notes
-				nm2.clear();
-				s.instrumentTracks.erase(name);
-				// Empty tracks are normal (not an error) but too short tracks are suspicious
-				if (durCount > 0) {
-					std::string msg = "Track " + name + " is broken (has too few notes).\n";
-					s.b0rked += msg;
-					msg = "songparser/warning: " + s.path + s.midifilename + ": " + msg;
-					std::clog << msg << std::flush; // More likely to be atomic when written as one string
-				}
-			}
+			// Discard empty tracks
+			// Note: some songs have notes at the very beginning (but are otherwise empty)
+			if (trackEnd < 1.0) s.instrumentTracks.erase(name);
 		} else {
 			// Process vocal tracks
 			VocalTrack vocal(name);
