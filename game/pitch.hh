@@ -110,6 +110,7 @@ public:
 	void output(float* begin, float* end, double rate);
 	/** Returns the id (color name) of the mic */
 	std::string const& getId() const { return m_id; }
+	double getRate() { return m_rate; }
 
 private:
 	const std::size_t m_step;
