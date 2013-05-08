@@ -60,8 +60,12 @@ void ScreenPlaylist::manageEvent(input::NavEvent const& event) {
 		keyPressed = true;
 
 	if (nav == input::NAV_CANCEL) {
+	    if(overlay_menu.isOpen()) {
+		overlay_menu.close();
+	      } else {
 		createEscMenu();
 		overlay_menu.open();
+	      }
 	} else {
 		if (nav == input::NAV_PAUSE) {
 			m_audio.togglePause();
