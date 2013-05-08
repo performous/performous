@@ -31,6 +31,7 @@ namespace {
 }
 
 OpenGLText::OpenGLText(TextStyle& _text, double m) {
+	m *= 2.0;  // HACK to improve text quality without affecting compatibility with old versions
 	// Setup font settings
 	PangoAlignment alignment = parseAlignment(_text.fontalign);
 	boost::shared_ptr<PangoFontDescription> desc(
@@ -67,10 +68,11 @@ OpenGLText::OpenGLText(TextStyle& _text, double m) {
 	boost::shared_ptr<cairo_t> dc(
 	  cairo_create(surface.get()),
 	  cairo_destroy);
+	// Keep things sharp and fast, we scale with OpenGL anyway...
+	cairo_set_antialias(dc.get(), CAIRO_ANTIALIAS_NONE);
 	// Add Pango line and path to proper position on the DC
 	cairo_move_to(dc.get(), 0.5 * border, 0.5 * border);  // Margins needed for border stroke to fit in
 	pango_cairo_update_layout(dc.get(), layout.get());
-	pango_cairo_show_layout(dc.get(), layout.get());
 	pango_cairo_layout_path(dc.get(), layout.get());
 	// Render text
 	if (_text.fill_col.a > 0.0) {

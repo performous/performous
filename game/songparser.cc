@@ -111,6 +111,12 @@ SongParser::SongParser(Song& s) try:
 		}
 	}
 	s.loadStatus = Song::HEADER;
+	if (type == TXT) txtParse();
+	else if (type == INI) iniParse();
+	else if (type == XML) xmlParse();
+	else if (type == SM) smParse();
+	finalize(); // Do some adjusting to the notes
+	s.loadStatus = Song::FULL;
 } catch (std::runtime_error& e) {
 	throw SongParserException(m_song, e.what(), m_linenum);
 } catch (std::exception& e) {
