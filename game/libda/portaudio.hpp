@@ -175,6 +175,8 @@ namespace portaudio {
 			boost::thread audiokiller(Pa_CloseStream, m_handle);
 			if (!audiokiller.timed_join(boost::posix_time::milliseconds(5000))) {
 				std::cout << "PortAudio BUG: Pa_CloseStream hung for more than five seconds. Exiting program." << std::endl;
+				// Apparently some implementations put quick_exit in std:: and others in ::
+				using namespace std;
 				quick_exit(1);  // Do not kill atexit handlers that are also prone to hang...
 			}
 		}
