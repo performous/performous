@@ -197,7 +197,7 @@ void ScreenSongs::update() {
 	if (m_playing != music) songChange = true;
 	// Switch songs if needed, only when the user is not browsing for a moment
 	if (!songChange) return;
-	song->loadNotes();
+	//song->loadNotes(); <-- this made the program crash when searching for a specific song, what is it doing here!?? it´ s not neccesary!
 	m_playing = music;
 	// Clear the old content and load new content if available
 	m_songbg.reset(); m_video.reset();
