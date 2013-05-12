@@ -34,7 +34,6 @@ public:
 	void exit();
 	void reloadGL();
 private:
-	bool keyPressed = false;
 	Menu overlay_menu;
 	Menu songlist_menu;
 	bool m_first;
@@ -55,6 +54,7 @@ private:
 	SvgTxtTheme& getTextObject(std::string const& txt);
 	AnimValue m_nextTimer;
 	void draw_menu_options();
+	bool keyPressed;
 };
 
 
