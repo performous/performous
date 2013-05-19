@@ -28,7 +28,7 @@ void ScreenSongs::enter() {
 	m_menu.close();
 	m_songs.setFilter(m_search.text);
 	m_audio.fadeout();
-	m_menuPos = 0;
+	m_menuPos = 1;
 	m_infoPos = 0;
 	m_jukebox = false;
 	reloadGL();
@@ -66,11 +66,11 @@ void ScreenSongs::exit() {
 /// Implement left/right on menu
 void ScreenSongs::menuBrowse(int dir) {
 	switch (m_menuPos) {
+		case 1: m_songs.advance(dir); break;
+		case 2: m_songs.sortChange(dir); break;
+		case 3: m_songs.typeChange(dir); break;
+		case 4: m_infoPos = (m_infoPos + dir + 5) % 5; break;
 		case 0: m_songs.advance(dir); break;
-		case 1: m_songs.sortChange(dir); break;
-		case 2: m_songs.typeChange(dir); break;
-		case 3: m_infoPos = (m_infoPos + dir + 5) % 5; break;
-		case 4: m_songs.advance(dir); break;
 	}
 }
 
@@ -97,7 +97,7 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
 		else if (nav == input::NAV_MOREUP) m_audio.seek(-30);
 		else if (nav == input::NAV_MOREDOWN) m_audio.seek(30);
 	} else if (nav == input::NAV_CANCEL) {
-		if (m_menuPos) m_menuPos = 0;  // Exit menu (back to song selection)
+		if (!m_menuPos) m_menuPos = 1;  // Exit menu (back to song selection)
 		else if (!m_search.text.empty()) { m_search.text.clear(); m_songs.setFilter(m_search.text); }  // Clear search
 		else if (m_songs.typeNum()) m_songs.typeChange(0);  // Clear type filter
 		else if(gm->getCurrentPlayList().isEmpty()) gm->activateScreen("Intro");
@@ -112,7 +112,7 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
 		if (m_menu.isOpen()) {
 			m_menu.action();
 		}
-		else if (m_menuPos == 0) {
+		else if (m_menuPos == 1) {
 			if (!gm->getCurrentPlayList().isEmpty()) {
 				createPlaylistMenu();
 				m_menu.open();
@@ -126,14 +126,14 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
 				tm->activateScreen("Sing");
 			}
 		}
-		else if (m_menuPos == 3) {
-			m_menuPos = 0;
+		else if (m_menuPos == 4) {
+			m_menuPos = 1;
 			m_jukebox = true;
 		}
-		else if (m_menuPos == 4) {
+		else if (m_menuPos == 0) {
 			if (gm->getCurrentPlayList().isEmpty()) {
 				// Fire up the playlist!
-				m_menuPos = 0;
+				m_menuPos = 1;
 				gm->getCurrentPlayList().addSong(m_songs.currentPtr());
 			} else {
 				createAdvancedPlaylistMenu();
@@ -299,17 +299,17 @@ void ScreenSongs::draw() {
 		m_database.queryPerSongHiscore_HiscoreDisplay(oss_hiscore, m_songs.currentPtr(), m_infoPos, 5);
 	}
 	switch (m_menuPos) {
-		case 0:
+		case 1:
 			if (!m_search.text.empty()) oss_order << m_search.text;
 			else if (m_songs.typeNum()) oss_order << m_songs.typeDesc();
 			else if (m_songs.sortNum()) oss_order << m_songs.sortDesc();
-			else oss_order << _("<type in to search>   ↑ browse menu");
+			else oss_order << _("<type in to search>   ↑ browse menu   ↓ playlist    ");
 			//if (!m_songs.empty()) oss_order << "(" << m_songs.currentId() + 1 << "/" << m_songs.size() << ")";
 			break;
-		case 1: oss_order << _("↔ sort order: ") << m_songs.sortDesc(); break;
-		case 2: oss_order << _("↔ type filter: ") << m_songs.typeDesc(); break;
-		case 3: oss_order << _("↔ hiscores   ↵ jukebox mode"); break;
-		case 4:
+		case 2: oss_order << _("↔ sort order: ") << m_songs.sortDesc(); break;
+		case 3: oss_order << _("↔ type filter: ") << m_songs.typeDesc(); break;
+		case 4: oss_order << _("↔ hiscores   ↵ jukebox mode"); break;
+		case 0:
 	    Game* gm = Game::getSingletonPtr();
 	    if(gm->getCurrentPlayList().isEmpty()) {
 		oss_order << _("↵ start a playlist with this song!");
