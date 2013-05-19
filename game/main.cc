@@ -52,7 +52,8 @@ bool g_take_screenshot = false;
 static void signalSetup();
 
 extern "C" void quit(int) {
-	if (g_quit) quick_exit(2);  // Instant exit if Ctrl+C is pressed again
+	using namespace std; // Apparently some implementations put quick_exit in std:: and others in ::
+	if (g_quit) abort();  // Instant exit if Ctrl+C is pressed again
 	g_quit = true;
 	signalSetup();
 }
