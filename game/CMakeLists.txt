@@ -127,6 +127,14 @@ if(UNIX)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
 endif(UNIX)
 
+if(MXE_HACK)
+	execute_process(COMMAND "${CMAKE_SOURCE_DIR}/win32/mxe/libs.sh"
+		OUTPUT_VARIABLE MXE_HACK_STRING
+	)
+	set(CMAKE_CXX_LINK_EXECUTABLE ${CMAKE_CXX_LINK_EXECUTABLE}${MXE_HACK_STRING})
+	add_definitions(-DBOOST_THREAD_USE_LIB -DGLEW_STATIC)
+endif()
+
 if(MSVC)
 	set(SUBSYSTEM_WIN32 WIN32)
 	add_executable(performous-cmd "windows-cmd.cpp")
