@@ -337,7 +337,7 @@ void ScreenSongs::draw() {
 void ScreenSongs::drawCovers() {
 	double spos = m_songs.currentPosition(); // This needs to be polled to run the animation
 	std::size_t ss = m_songs.size();
-	unsigned currentId = m_songs.currentId();
+	int currentId = m_songs.currentId();
 	int baseidx = spos + 1.5; --baseidx; // Round correctly
 	double shift = spos - baseidx;
 	for (int i = -2; i < 6; ++i) {
