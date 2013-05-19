@@ -4,9 +4,10 @@ MXE_PREFIX=/opt/mxe
 JOBS=`nproc 2>/dev/null`
 STAGE="`pwd`/stage"
 BUILD_TYPE="Release"
-if [ $1 = "debug" ]; then
+if [ $1 == "debug" ]; then
 	BUILD_TYPE="Debug"
 	echo "Building with debug symbols"
+	shift
 fi
 
 mkdir -p build
@@ -22,10 +23,11 @@ cmake ../../.. \
 	-DNO_WEBCAM=ON \
 	-DENABLE_TOOLS=OFF
 
-make -j $JOBS
-make install
-
-#python ../copydlls.py "$MXE_PREFIX/usr/i686-pc-mingw32/bin" "$STAGE/bin"
+if [ $1 != "config" ]; then
+	make -j $JOBS
+	make install
+	python ../copydlls.py "$MXE_PREFIX/usr/i686-pc-mingw32/bin" "$STAGE/bin"
+fi
 
 echo "Done"
 
