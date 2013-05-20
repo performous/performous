@@ -194,9 +194,9 @@ void SvgTxtTheme::setHighlight(std::string _theme_file) {
 void SvgTxtTheme::draw(std::vector<std::string> const& _text) {
 	std::vector<TZoomText> tmp;
 
-	for (std::vector<std::string>::const_iterator it = _text.begin(); it != _text.end(); ++it) {
+	for (auto const& str: _text) {
 		TZoomText t;
-		t.string = *it;
+		t.string = str;
 		t.factor = 1.0;
 		tmp.push_back(t);
 	}
@@ -215,13 +215,13 @@ void SvgTxtTheme::draw(std::string _text) {
 
 void SvgTxtTheme::draw(std::vector<TZoomText> const& _text) {
 	std::string tmp;
-	for (unsigned int i = 0 ; i < _text.size(); i++ ) tmp += _text[i].string;
+	for (auto& zt: _text) tmp += zt.string;
 
 	if (m_opengl_text.size() != _text.size() || m_cache_text != tmp) {
 		m_cache_text = tmp;
 		m_opengl_text.clear();
-		for (unsigned int i = 0; i < _text.size(); i++ ) {
-			m_text.text = _text[i].string;
+		for (auto& zt: _text) {
+			m_text.text = zt.string;
 			m_opengl_text.push_back(new OpenGLText(m_text, m_factor));
 		}
 	}

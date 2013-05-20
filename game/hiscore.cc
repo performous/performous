@@ -11,10 +11,10 @@ bool Hiscore::reachedHiscore(unsigned score, unsigned songid, std::string const&
 	if (score < 2000) return false; // come on, did you even try to sing?
 
 	unsigned position = 0;
-	for (hiscore_t::const_iterator it = m_hiscore.begin(); it != m_hiscore.end(); ++it) {
-		if (it->songid != songid) continue;
-		if (it->track != track) continue;
-		if (score > it->score) return true; // seems like you are in top 3!
+	for (auto const& elem: m_hiscore) {
+		if (elem.songid != songid) continue;
+		if (elem.track != track) continue;
+		if (score > elem.score) return true; // seems like you are in top 3!
 		if (++position == 3) return false; // not in top 3 -> leave
 	}
 	return true; // nothing found for that song -> true

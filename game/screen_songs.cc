@@ -377,9 +377,9 @@ void ScreenSongs::drawCovers() {
 }
 
 Surface& ScreenSongs::getCover(Song const& song) {
-	Surface* cover = NULL;
+	Surface* cover = nullptr;
 	// Fetch cover image from cache or try loading it
-	if (!song.cover.empty()) try { cover = &m_covers[song.path + song.cover]; } catch (std::exception const&) {cover = NULL;}
+	if (!song.cover.empty()) try { cover = &m_covers[song.path + song.cover]; } catch (std::exception const&) {cover = nullptr;}
 	// Use empty cover
 	if (!cover) {
 		if(song.hasDance()) {
@@ -463,7 +463,7 @@ void ScreenSongs::drawMenu() {
 	if (m_menu.empty()) return;
 	// Some helper vars
 	ThemeInstrumentMenu& th = *m_menuTheme;
-	MenuOptions::const_iterator cur = static_cast<MenuOptions::const_iterator>(&m_menu.current());
+	auto cur = static_cast<MenuOptions::const_iterator>(&m_menu.current());
 	double w = m_menu.dimensions.w();
 	const float txth = th.option_selected.h();
 	const float step = txth * 0.85f;

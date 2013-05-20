@@ -54,6 +54,7 @@ struct Note {
 	double begin, ///< begin time
 	       end; ///< end time
 	double phase; /// Position within a measure, [0, 1)
+	// FIXME: Remove gameplay variables from here (Note should be immutable).
 	/// power of note (how well it is being hit right now)
 	mutable double power;
 	/// which players sung well

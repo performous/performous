@@ -137,7 +137,7 @@ void ScreenPlaylist::drawMenu() {
 	if (overlay_menu.empty()) return;
 	// Some helper vars
 	ThemeInstrumentMenu& th = *m_menuTheme;
-	MenuOptions::const_iterator cur = static_cast<MenuOptions::const_iterator>(&overlay_menu.current());
+	auto cur = static_cast<MenuOptions::const_iterator>(&overlay_menu.current());
 	double w = overlay_menu.dimensions.w();
 	const float txth = th.option_selected.h();
 	const float step = txth * 0.85f;
@@ -228,9 +228,8 @@ void ScreenPlaylist::createSongListMenu() {
 	int count = 1;
 	songlist_menu.clear();
 	SongList& currentList = gm->getCurrentPlayList().getList();
-	for (SongList::iterator it = currentList.begin(); it != currentList.end(); ++it) {
-		boost::shared_ptr<Song> songToAdd =  (*it);
-		oss_playlist << "#" << count << " : " << songToAdd->artist << " - " << songToAdd->title;
+	for (auto const& song: currentList) {
+		oss_playlist << "#" << count << " : " << song->artist << " - " << song->title;
 		std::string songinfo = oss_playlist.str();
 		if (songinfo.length() > 20) {
 			songinfo = songinfo + "                          >"; //FIXME: ugly hack to make the text scale so it fits on screen!

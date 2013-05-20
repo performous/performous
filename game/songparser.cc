@@ -134,7 +134,7 @@ void SongParser::resetNoteParsingState() {
 }
 
 void SongParser::vocalsTogether() {
-	VocalTracks::iterator togetherIt = m_song.vocalTracks.find("Together");
+	auto togetherIt = m_song.vocalTracks.find("Together");
 	if (togetherIt == m_song.vocalTracks.end()) return;
 	Notes& together = togetherIt->second.notes;
 	if (!together.empty()) return;
@@ -159,7 +159,7 @@ void SongParser::vocalsTogether() {
 		std::cerr << " " << n.syllable << ": " << n.begin << "-" << n.end << std::endl;
 		notes.push_back(n);
 		++trk->it;
-		trk = NULL;
+		trk = nullptr;
 		// Iterate all tracks past the processed note and find the new earliest track
 		for (TrackInfo& trk2: tracks) {
 			// Skip until a sentence that begins after the note ended
@@ -178,7 +178,7 @@ void SongParser::finalize() {
 		// Remove empty sentences
 		{
 			Note::Type lastType = Note::NORMAL;
-			for (Notes::iterator itn = vocal.notes.begin(); itn != vocal.notes.end();) {
+			for (auto itn = vocal.notes.begin(); itn != vocal.notes.end();) {
 				Note::Type type = itn->type;
 				if(type == Note::SLEEP && lastType == Note::SLEEP) {
 					std::clog << "songparser/warning: Discarding empty sentence" << std::endl;
@@ -194,9 +194,9 @@ void SongParser::finalize() {
 			unsigned int shift = (1 - vocal.noteMin / 12) * 12;
 			vocal.noteMin += shift;
 			vocal.noteMax += shift;
-			for (Notes::iterator it = vocal.notes.begin(); it != vocal.notes.end(); ++it) {
-				it->note += shift;
-				it->notePrev += shift;
+			for (auto& elem: vocal.notes) {
+				elem.note += shift;
+				elem.notePrev += shift;
 			}
 		}
 		// Set begin/end times
@@ -204,9 +204,7 @@ void SongParser::finalize() {
 		else vocal.beginTime = vocal.endTime = 0.0;
 		// Compute maximum score
 		double max_score = 0.0;
-		for (Notes::iterator itn = vocal.notes.begin(); itn != vocal.notes.end(); ++itn) {
-			max_score += itn->maxScore();
-		}
+		for (auto& note: vocal.notes) max_score += note.maxScore();
 		vocal.m_scoreFactor = 1.0 / max_score;
 	}
 	if (m_tsPerBeat) {

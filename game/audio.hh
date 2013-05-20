@@ -34,8 +34,7 @@ struct Device {
 	bool isOutput() const { return outptr != NULL; }
 	/// Returns true if this device has the given mic color assigned
 	bool isMic(std::string mic_id) const {
-		for (std::vector<Analyzer*>::const_iterator it = mics.begin(); it != mics.end(); ++it)
-			if (*it && (*it)->getId() == mic_id) return true;
+		for (auto const& m: mics) if (m && m->getId() == mic_id) return true;
 		return false;
 	}
 };

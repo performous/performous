@@ -128,15 +128,15 @@ namespace portaudio {
 	struct Params {
 		PaStreamParameters params;
 		Params(PaStreamParameters const& init = PaStreamParameters()): params(init) {
-			// Some useful defaults so that things just work
-			channelCount(2).sampleFormat(paFloat32).suggestedLatency(0.05);
+			// Some useful defaults so that things just work (channel count must be set by user anyway)
+			if (params.channelCount == 0) sampleFormat(paFloat32).suggestedLatency(0.05);
 		}
 		Params& channelCount(int val) { params.channelCount = val; return *this; }
 		Params& device(PaDeviceIndex val) { params.device = val; return *this; }
 		Params& sampleFormat(PaSampleFormat val) { params.sampleFormat = val; return *this; }
 		Params& suggestedLatency(PaTime val) { params.suggestedLatency = val; return *this; }
 		Params& hostApiSpecificStreamInfo(void* val) { params.hostApiSpecificStreamInfo = val; return *this; }
-		operator PaStreamParameters const*() const { return &params; }
+		operator PaStreamParameters const*() const { return params.channelCount > 0 ? &params : nullptr; }
 	};
 
 	template <typename Functor> int functorCallback(void const* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* userData) {

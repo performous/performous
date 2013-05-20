@@ -47,10 +47,10 @@ namespace logger {
 	static VerboseMessageSink vsm; //!< \internal
 
 	//! \internal used to store the default/original clog buffer.
-	static std::streambuf* __default_ClogBuf=0;
+	static std::streambuf* default_ClogBuf = nullptr;
 
 	//! \internal The log level regular expression.
-	static boost::regex *level_regex = 0;
+	static boost::regex *level_regex = nullptr;
 
 	std::streamsize VerboseMessageSink::write(const char* s, std::streamsize n) {
 		// Note: s is *not* a c-string, thus we must stop after n chars.
@@ -92,8 +92,8 @@ namespace logger {
 	}
 
 	void setup(const std::string &level_regexp_str){
-		if(__default_ClogBuf != 0) throw std::runtime_error("Internal logger error #0");
-		if(level_regex != 0) throw std::runtime_error("Internal logger error #1");
+		if(default_ClogBuf != nullptr) throw std::runtime_error("Internal logger error #0");
+		if(level_regex != nullptr) throw std::runtime_error("Internal logger error #1");
 
 		// since we get the regexp from users, we must check it for sanity
 		// (or live with "undefined behaviour" on exotic regexps)
@@ -109,7 +109,7 @@ namespace logger {
 			boost::mutex::scoped_lock l(log_lock);
 
 			sb.open(vsm);
-			__default_ClogBuf = std::clog.rdbuf();
+			default_ClogBuf = std::clog.rdbuf();
 			std::clog.rdbuf(&sb);
 		}
 		std::clog << "logger/info: Log level is: " << level_regexp_str << std::endl;
@@ -117,18 +117,18 @@ namespace logger {
 
 	// Note: not calling this at exit time introduces a use/dtor-race, which may cause a crash.
 	void teardown(){
-		if(__default_ClogBuf == 0) throw std::runtime_error("Internal logger error #2");
-		if(level_regex == 0) throw std::runtime_error("Internal logger error #3");
+		if(default_ClogBuf == nullptr) throw std::runtime_error("Internal logger error #2");
+		if(level_regex == nullptr) throw std::runtime_error("Internal logger error #3");
 		boost::mutex::scoped_lock l(log_lock);
 
-		std::clog.rdbuf(__default_ClogBuf);
+		std::clog.rdbuf(default_ClogBuf);
 		sb.close();
-		__default_ClogBuf=0;
+		default_ClogBuf=nullptr;
 		delete level_regex;
-		level_regex = 0;
+		level_regex = nullptr;
 	}
 
-	void __log_hh_test(){
+	void log_hh_test(){
 #		ifndef NDEBUG
 		using namespace std;
 		clog << "BEGIN TEST" << endl;
@@ -144,11 +144,11 @@ namespace logger {
 			cout << "Good, caught bad regexp" << endl;
 		}
 
-#		define __LOG_HH_EXPECT_LOG_EXCEPTION(STR) try {				\
+#		define LOG_HH_EXPECT_LOG_EXCEPTION(STR) try {				\
 			clog << STR << endl;									\
 			cout << "FAIL: " << STR << endl;						\
 		} catch(...){ /*cout << "PASS: " << STR << endl;*/ }
-#		define __LOG_HH_EXPECT_LOG_NOTEXCEPT(STR) try {					\
+#		define LOG_HH_EXPECT_LOG_NOTEXCEPT(STR) try {					\
 			clog << STR << endl;										\
 			/*cout << "PASS: " << STR << endl;*/						\
 		} catch(...){ cout << "FAIL: " << STR << endl; }
@@ -156,38 +156,38 @@ namespace logger {
 		setup(".*/.*");
 
 		// Ok messages
-		__LOG_HH_EXPECT_LOG_NOTEXCEPT("core/info: Info class message.");
-		__LOG_HH_EXPECT_LOG_NOTEXCEPT("core/warning: Warning class message.");
-		__LOG_HH_EXPECT_LOG_NOTEXCEPT("core/error: Error class message.");
+		LOG_HH_EXPECT_LOG_NOTEXCEPT("core/info: Info class message.");
+		LOG_HH_EXPECT_LOG_NOTEXCEPT("core/warning: Warning class message.");
+		LOG_HH_EXPECT_LOG_NOTEXCEPT("core/error: Error class message.");
 
 		teardown();
 		setup(".*/(error|info)");
 
 		// Ok messages
-		__LOG_HH_EXPECT_LOG_NOTEXCEPT("core/info: Info class message.");
-		__LOG_HH_EXPECT_LOG_NOTEXCEPT("core/warning: Warning class message.");
-		__LOG_HH_EXPECT_LOG_NOTEXCEPT("core/error: Error class message.");
+		LOG_HH_EXPECT_LOG_NOTEXCEPT("core/info: Info class message.");
+		LOG_HH_EXPECT_LOG_NOTEXCEPT("core/warning: Warning class message.");
+		LOG_HH_EXPECT_LOG_NOTEXCEPT("core/error: Error class message.");
 
 		teardown();
 		setup(".*/error");
 
 		// Ok messages
-		__LOG_HH_EXPECT_LOG_NOTEXCEPT("core/info: Info class message.");
-		__LOG_HH_EXPECT_LOG_NOTEXCEPT("core/warning: Warning class message.");
-		__LOG_HH_EXPECT_LOG_NOTEXCEPT("core/error: Error class message.");
+		LOG_HH_EXPECT_LOG_NOTEXCEPT("core/info: Info class message.");
+		LOG_HH_EXPECT_LOG_NOTEXCEPT("core/warning: Warning class message.");
+		LOG_HH_EXPECT_LOG_NOTEXCEPT("core/error: Error class message.");
 
 		// Bad messages:
-		__LOG_HH_EXPECT_LOG_NOTEXCEPT("core/badclass: Message with invalid class.");
+		LOG_HH_EXPECT_LOG_NOTEXCEPT("core/badclass: Message with invalid class.");
 
 		// Some malformed messages
 		// add any messages that we find causes problems/bugs (if any)
 
-		__LOG_HH_EXPECT_LOG_EXCEPTION("Message with no prefix");
-		__LOG_HH_EXPECT_LOG_EXCEPTION("core/ Message with bad prefix");
-		__LOG_HH_EXPECT_LOG_EXCEPTION("core/: Message with bad prefix");
-		__LOG_HH_EXPECT_LOG_EXCEPTION("/: Message with bad prefix");
-		__LOG_HH_EXPECT_LOG_EXCEPTION("core/: Message with bad prefix");
-		__LOG_HH_EXPECT_LOG_EXCEPTION("/bad Message with bad prefix");
+		LOG_HH_EXPECT_LOG_EXCEPTION("Message with no prefix");
+		LOG_HH_EXPECT_LOG_EXCEPTION("core/ Message with bad prefix");
+		LOG_HH_EXPECT_LOG_EXCEPTION("core/: Message with bad prefix");
+		LOG_HH_EXPECT_LOG_EXCEPTION("/: Message with bad prefix");
+		LOG_HH_EXPECT_LOG_EXCEPTION("core/: Message with bad prefix");
+		LOG_HH_EXPECT_LOG_EXCEPTION("/bad Message with bad prefix");
 
 		teardown();
 		setup(".*/error");
@@ -201,8 +201,8 @@ namespace logger {
 		clog << "core/error: Line 1\nLine 2" << endl << "Line 3" << endl;
 		clog << "core/info: Line 1\nLine 2" << endl << "Line 3" << endl;
 
-#		undef __LOG_HH_EXPECT_LOG_NOTEXCEPT
-#		undef __LOG_HH_EXPECT_LOG_EXCEPTION
+#		undef LOG_HH_EXPECT_LOG_NOTEXCEPT
+#		undef LOG_HH_EXPECT_LOG_EXCEPTION
 
 		teardown();
 

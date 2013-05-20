@@ -180,9 +180,9 @@ MidiFileParser::Track MidiFileParser::read_track(MidiStream& stream) {
 					std::string sect_name = data.substr(sect_pfx.length(), data.length()-sect_pfx.length()-1);
 					if (sect_name != "big_rock_ending") {
 						bool space = true;
-						for (std::string::iterator it = sect_name.begin(); it != sect_name.end(); ++it) {
-							if (space) *it = toupper(*it);        // start in uppercase
-							if (*it == '_') {*it = ' '; space = true;} // underscores to spaces
+						for (auto& ch: sect_name) {
+							if (space) ch = toupper(static_cast<unsigned char>(ch));  // Capitalize first letter of each word
+							if (ch == '_') { ch = ' '; space = true; }  // underscores to spaces
 							else space = false;
 						}
 						// replace gtr => guitar
@@ -291,7 +291,7 @@ void MidiFileParser::cout_midi_event(uint8_t t, uint8_t arg1, uint8_t arg2, uint
 uint64_t MidiFileParser::get_us(uint32_t miditime) {
 	if (tempochanges.empty()) throw std::runtime_error("Unable to calculate note duration without tempo");
 	uint64_t time = 0;
-	std::vector<TempoChange>::iterator i = tempochanges.begin();
+	auto i = tempochanges.begin();
 	// TODO: cache previous
 	for (; i + 1 != tempochanges.end() && (i + 1)->miditime < miditime; ++i) {
 		time += static_cast<uint64_t>(i->value) * ((i + 1)->miditime - i->miditime);
