@@ -154,7 +154,7 @@ bool SongParser::txtParseNote(std::string line) {
 			// Workaround for songs that use semi-random timestamps for sleep
 			if (p.type == Note::SLEEP) {
 				p.end = p.begin;
-				Notes::reverse_iterator it = notes.rbegin();
+				auto it = notes.rbegin();
 				Note& p2 = *++it;
 				if (p2.end < n.begin) p.begin = p.end = n.begin;
 			}

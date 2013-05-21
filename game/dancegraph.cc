@@ -109,7 +109,7 @@ void DanceGraph::setupJoinMenu() {
 		ConfigItem::OptionList ol;
 		int i = 0, cur = 0;
 		// Add tracks to option list
-		for (DanceTracks::const_iterator it = m_song.danceTracks.begin(); it != m_song.danceTracks.end(); ++it, ++i) {
+		for (auto it = m_song.danceTracks.begin(); it != m_song.danceTracks.end(); ++it, ++i) {
 			ol.push_back(it->first);
 			if (m_gamingMode == it->first) cur = i; // Find the index of current track
 		}
@@ -161,7 +161,7 @@ void DanceGraph::changeTrack(int direction) {
 
 /// Attempt to select a specific game mode
 void DanceGraph::setTrack(const std::string& track) {
-	DanceTracks::const_iterator it = m_song.danceTracks.find(track);
+	auto it = m_song.danceTracks.find(track);
 	if (it == m_song.danceTracks.end()) return;
 	m_curTrackIt = it;
 	finalizeTrackChange();
@@ -208,7 +208,7 @@ std::string DanceGraph::getModeId() const {
 void DanceGraph::changeDifficulty(int delta) {
 	int newLevel = m_level + delta;
 	if(newLevel >= DIFFICULTYCOUNT || newLevel < 0) return; // Out of bounds
-	DanceTracks::const_iterator it = m_song.danceTracks.find(m_gamingMode);
+	auto it = m_song.danceTracks.find(m_gamingMode);
 	if(it->second.find((DanceDifficulty)newLevel) != it->second.end())
 		difficulty((DanceDifficulty)newLevel);
 	else
@@ -219,19 +219,16 @@ void DanceGraph::changeDifficulty(int delta) {
 bool DanceGraph::difficulty(DanceDifficulty level, bool check_only) {
 	// TODO: error handling
 	DanceDifficultyMap const& ddm = m_song.danceTracks.find(m_gamingMode)->second;
-	if (ddm.find(level) == ddm.end()) return false;
-	else if (check_only) return true;
+	if (ddm.find(level) == ddm.end()) return false;	else if (check_only) return true;
 	m_notes.clear();
 	DanceTrack const& track = ddm.find(level)->second;
-	for(Notes::const_iterator it = track.notes.begin(); it != track.notes.end(); ++it)
-		m_notes.push_back(DanceNote(*it));
+	for (auto const& n: track.notes) m_notes.push_back(DanceNote(n));
 	std::sort(m_notes.begin(), m_notes.end(), lessEnd()); // for engine's iterators
 	m_notesIt = m_notes.begin();
 	m_level = level;
-	for(size_t i = 0; i < max_panels; i++) m_activeNotes[i] = m_notes.end();
+	for (auto& noteIt: m_activeNotes) noteIt = m_notes.end();
 	m_scoreFactor = 1;
-	if(!m_notes.empty())
-		m_scoreFactor = 10000.0 / (50 * m_notes.size()); // maxpoints / (notepoint * notes)
+	if (!m_notes.empty()) m_scoreFactor = 10000.0 / (50 * m_notes.size()); // maxpoints / (notepoint * notes)
 	updateJoinMenu();
 	return true;
 }
@@ -243,10 +240,10 @@ void DanceGraph::engine() {
 	doUpdates();
 	// Handle stops
 	bool outsideStop = true;
-	for (Song::Stops::const_iterator it = m_song.stops.begin(), end = m_song.stops.end(); it != end; ++it) {
-		if (it->first >= time) break;
-		if (time < it->first + it->second) {  // Inside stop
-			time = it->first;
+	for (auto const& stop: m_song.stops) {
+		if (stop.first >= time) break;
+		if (time < stop.first + stop.second) {  // Inside stop
+			time = stop.first;
 			if (!m_insideStop) {
 				m_popups.push_back(Popup(_("STOP!"),  Color(1.0, 0.8, 0.0), 2.0, m_popupText.get()));
 				m_insideStop = true;
@@ -254,7 +251,7 @@ void DanceGraph::engine() {
 			outsideStop = false;
 			break;
 		}
-		time -= it->second;
+		time -= stop.second;
 	}
 	if (outsideStop && m_insideStop) m_insideStop = false;
 	bool difficulty_changed = false;
@@ -308,7 +305,7 @@ void DanceGraph::engine() {
 	if (difficulty_changed) m_dead = 0; // if difficulty is changed, m_dead would get incorrect
 
 	// Holding button when mine comes?
-	for (DanceNotes::iterator it = m_notesIt; it != m_notes.end() && time <= it->note.begin + maxTolerance; ++it) {
+	for (auto it = m_notesIt; it != m_notes.end() && time <= it->note.begin + maxTolerance; ++it) {
 		if(!it->isHit && it->note.type == Note::MINE && m_pressed[it->note.note] &&
 		  it->note.begin >= time - maxTolerance && it->note.end <= time + maxTolerance) {
 			it->isHit = true;
@@ -328,7 +325,7 @@ void DanceGraph::engine() {
 void DanceGraph::dance(double time, input::Event const& ev) {
 	// Handle release events
 	if (ev.value == 0.0) {
-		DanceNotes::iterator it = m_activeNotes[ev.button];
+		auto it = m_activeNotes[ev.button];
 		if(it != m_notes.end()) {
 			if(!it->releaseTime && it->note.end > time + maxTolerance) {
 				it->releaseTime = time;
@@ -340,7 +337,7 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 	}
 
 	// So it was a PRESS event
-	for (DanceNotes::iterator it = m_notesIt; it != m_notes.end() && time <= it->note.end + maxTolerance; ++it) {
+	for (auto it = m_notesIt; it != m_notes.end() && time <= it->note.end + maxTolerance; ++it) {
 		if(!it->isHit && std::abs(time - it->note.begin) <= maxTolerance && ev.button == unsigned(it->note.note)) {
 			it->isHit = true;
 			if (it->note.type != Note::MINE) {
@@ -389,10 +386,10 @@ void DanceGraph::drawArrow(int arrow_i, Texture& tex, float ty1, float ty2) {
 
 /// Draws the dance graph
 void DanceGraph::draw(double time) {
-	for (Song::Stops::const_iterator it = m_song.stops.begin(), end = m_song.stops.end(); it != end; ++it) {
-		if (it->first >= time) break;
-		if (time < it->first + it->second) { time = it->first; break; } // Inside stop
-		time -= it->second;
+	for (auto const& stop: m_song.stops) {
+		if (stop.first >= time) break;
+		if (time < stop.first + stop.second) { time = stop.first; break; } // Inside stop
+		time -= stop.second;
 	}
 
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
@@ -423,10 +420,10 @@ void DanceGraph::draw(double time) {
 
 		// Draw the notes
 		if (time == time) { // Check that time is not NaN
-			for (DanceNotes::iterator it = m_notes.begin(); it != m_notes.end(); ++it) {
-				if (it->note.end - time < past) continue;
-				if (it->note.begin - time > future) continue;
-				drawNote(*it, time); // Let's just do all the calculating in the sub, instead of passing them as a long list
+			for (auto& n: m_notes) {
+				if (n.note.end - time < past) continue;
+				if (n.note.begin - time > future) continue;
+				drawNote(n, time); // Let's just do all the calculating in the sub, instead of passing them as a long list
 			}
 		}
 	}
@@ -439,7 +436,7 @@ void DanceGraph::drawBeats(double time) {
 	float texCoord = 0.0f;
 	float tBeg = 0.0f, tEnd;
 	float w = 0.5 * m_pads * getScale();
-	for (Song::Beats::const_iterator it = m_song.beats.begin(); it != m_song.beats.end() && tBeg < future; ++it, texCoord += texCoordStep, tBeg = tEnd) {
+	for (auto it = m_song.beats.begin(); it != m_song.beats.end() && tBeg < future; ++it, texCoord += texCoordStep, tBeg = tEnd) {
 		tEnd = *it - time;
 		//if (tEnd < past) continue;
 		/*if (tEnd > future) {

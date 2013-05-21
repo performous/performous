@@ -130,8 +130,8 @@ std::vector<std::string> getThemes() {
 	std::vector<std::string> themes;
 	// Search all paths for themes folders and add them
 	Paths const& paths = getPaths();
-	for (Paths::const_iterator it = paths.begin(); it != paths.end(); ++it) {
-		fs::path p = *it;
+	for (auto p : paths) {
+		
 		p /= fs::path("themes");
 		if (fs::is_directory(p)) {
 			// Gather the themes in this folder
@@ -145,7 +145,7 @@ std::vector<std::string> getThemes() {
 	}
 	// No duplicates allowed
 	std::sort(themes.begin(), themes.end());
-	std::vector<std::string>::iterator last = std::unique(themes.begin(), themes.end());
+	auto last = std::unique(themes.begin(), themes.end());
 	themes.erase(last, themes.end());
 	return themes;
 }
@@ -169,11 +169,9 @@ namespace {
 }
 
 std::string getPath(fs::path const& filename) {
-	Paths const& paths = getPaths();
-	for (Paths::const_iterator it = paths.begin(); it != paths.end(); ++it) {
-		fs::path p = *it;
+	for (auto p: getPaths()) {
 		p /= filename;
-		if( fs::exists(p) ) return p.string();
+		if (fs::exists(p)) return p.string();
 	}
 	throw std::runtime_error("Cannot find file \"" + filename.string() + "\" in any of Performous data folders");
 }
@@ -212,7 +210,7 @@ Paths const& getPaths(bool refresh) {
 	return paths;
 }
 
-fs::path getDefaultConfig(fs::path const &configFile) {
+fs::path getDefaultConfig(fs::path const& configFile) {
 	typedef std::vector<std::string> ConfigList;
 	ConfigList config_list;
 	char const* root = getenv("PERFORMOUS_ROOT");
@@ -229,17 +227,14 @@ fs::path getDefaultConfig(fs::path const &configFile) {
 Paths getPathsConfig(std::string const& confOption) {
 	Paths ret;
 	Paths const& paths = getPaths();
-	ConfigItem::StringList const& sl = config[confOption].sl();
-	for (ConfigItem::StringList::const_iterator it = sl.begin(), end = sl.end(); it != end; ++it) {
-		fs::path p = pathMangle(*it);
+	for (auto const& str: config[confOption].sl()) {
+		fs::path p = pathMangle(str);
 		if (p.empty()) continue;  // Ignore empty paths
 		if (*p.begin() == "DATADIR") {
 			// Remove first element
 			p = p.string().substr(7);
 			// Add all data paths with p appended to them
-			for (Paths::const_iterator it2 = paths.begin(), end2 = paths.end(); it2 != end2; ++it2) {
-				ret.push_back(*it2 / p);
-			}
+			for (auto const& path: paths) ret.push_back(path / p);
 			continue;
 		}
 		ret.push_back(p);

@@ -36,27 +36,14 @@ void Song::reload(bool errorIgnore) {
 }
 
 void Song::loadNotes(bool errorIgnore) {
-	//if (loadStatus == Song::FULL) return;
-	//try { SongParser(*this); } catch (...) { if (!errorIgnore) throw; }
+	if (loadStatus == Song::FULL) return;
+	try { SongParser(*this); } catch (...) { if (!errorIgnore) throw; }
 }
 
 void Song::dropNotes() {
-	return;
-	// Singing
-	if (!vocalTracks.empty()) {
-		for (VocalTracks::iterator it = vocalTracks.begin(); it != vocalTracks.end(); ++it)
-			it->second.notes.clear();
-	}
-	// Instruments
-	if (!instrumentTracks.empty()) {
-		for (InstrumentTracks::iterator it = instrumentTracks.begin(); it != instrumentTracks.end(); ++it)
-			it->second.nm.clear();
-	}
-	// Dancing
-	if (!danceTracks.empty()) {
-		for (DanceTracks::iterator it = danceTracks.begin(); it != danceTracks.end(); ++it)
-			it->second.clear();
-	}
+	for (auto& trk: vocalTracks) trk.second.notes.clear();
+	for (auto& trk: instrumentTracks) trk.second.nm.clear();
+	for (auto& trk: danceTracks) trk.second.clear();
 	b0rked.clear();
 	loadStatus = HEADER;
 }
@@ -86,10 +73,9 @@ Song::Status Song::status(double time) {
 }
 
 bool Song::getNextSection(double pos, SongSection &section) {
-	if (songsections.empty()) return false;
-	for (std::vector<Song::SongSection>::iterator it= songsections.begin(); it != songsections.end(); ++it) {
-		if (it->begin > pos) {
-			section = *it;
+	for (auto& sect: songsections) {
+		if (sect.begin > pos) {
+			section = sect;
 			return true;
 		}
 	}
@@ -98,8 +84,7 @@ bool Song::getNextSection(double pos, SongSection &section) {
 }
 
 bool Song::getPrevSection(double pos, SongSection &section) {
-	if (songsections.empty()) return false;
-	for (std::vector<Song::SongSection>::reverse_iterator it= songsections.rbegin(); it != songsections.rend(); ++it) {
+	for (auto it = songsections.rbegin(); it != songsections.rend(); ++it) {
 		// subtract 1 second so we can jump across a section
 		if (it->begin < pos - 1.0) {
 			section = *it;

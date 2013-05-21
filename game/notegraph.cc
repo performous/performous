@@ -19,8 +19,7 @@ NoteGraph::NoteGraph(VocalTrack const& vocal):
 	dimensions.stretch(1.0, 0.5); // Initial dimensions, probably overridden from somewhere
 	m_nlTop.setTarget(m_vocal.noteMax, true);
 	m_nlBottom.setTarget(m_vocal.noteMin, true);
-	for (Notes::const_iterator it = m_vocal.notes.begin(); it != m_vocal.notes.end(); ++it)
-		it->stars.clear(); // Reset stars
+	for (auto const& n: m_vocal.notes) n.stars.clear(); // Reset stars
 	reset();
 }
 
@@ -78,7 +77,7 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 		int high = m_vocal.noteMin;
 		int low2 = m_vocal.noteMax;
 		int high2 = m_vocal.noteMin;
-		for (Notes::const_iterator it = m_songit; it != m_vocal.notes.end() && it->begin < time + 15.0; ++it) {
+		for (auto it = m_songit; it != m_vocal.notes.end() && it->begin < time + 15.0; ++it) {
 			if (it->type == Note::SLEEP) continue;
 			if (it->note < low) low = it->note;
 			if (it->note > high) high = it->note;
@@ -125,7 +124,7 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 	if (config["game/pitch"].b()) drawWaves(database);
 
 	// Draw a star for well sung notes
-	for (Notes::const_iterator it = m_songit; it != m_vocal.notes.end() && it->begin < m_time - (baseLine - 0.5) / pixUnit; ++it) {
+	for (auto it = m_songit; it != m_vocal.notes.end() && it->begin < m_time - (baseLine - 0.5) / pixUnit; ++it) {
 		float player_star_offset = 0;
 		for (std::vector<Color>::const_iterator it_col = it->stars.begin(); it_col != it->stars.end(); ++it_col) {
 			double x = m_baseX + it->begin * pixUnit + m_noteUnit; // left x coordinate: begin minus border (side borders -noteUnit wide)
@@ -153,7 +152,7 @@ void NoteGraph::drawNotes() {
 	m_notelines.draw(Dimensions().stretch(dimensions.w(), (m_max - m_min - 13) * m_noteUnit).middle(dimensions.xc()).center(dimensions.yc()), TexCoords(0.0, (-m_min - 7.0) / 12.0f, 1.0, (-m_max + 6.0) / 12.0f));
 
 	// Draw notes
-	for (Notes::const_iterator it = m_songit; it != m_vocal.notes.end() && it->begin < m_time - (baseLine - 0.5) / pixUnit; ++it) {
+	for (auto it = m_songit; it != m_vocal.notes.end() && it->begin < m_time - (baseLine - 0.5) / pixUnit; ++it) {
 		if (it->type == Note::SLEEP) continue;
 		double alpha = it->power;
 		Texture* t1;
@@ -198,13 +197,13 @@ namespace {
 void NoteGraph::drawWaves(Database const& database) {
 	if (m_vocal.notes.empty()) return; // Cannot draw without notes
 	UseTexture tblock(m_wave);
-	for (std::list<Player>::const_iterator p = database.cur.begin(); p != database.cur.end(); ++p) {
-		if (p->m_vocal.name != m_vocal.name)
+	for (auto const& player: database.cur) {
+		if (player.m_vocal.name != m_vocal.name)
 			continue;
 		float const texOffset = 2.0 * m_time; // Offset for animating the wave texture
-		Player::pitch_t const& pitch = p->m_pitch;
+		Player::pitch_t const& pitch = player.m_pitch;
 		size_t const beginIdx = std::max(0.0, m_time - 0.5 / pixUnit) / Engine::TIMESTEP; // At which pitch idx to start displaying the wave
-		size_t const endIdx = p->m_pos;
+		size_t const endIdx = player.m_pos;
 		size_t idx = beginIdx;
 		// Go back until silence (NaN freq) to allow proper wave phase to be calculated
 		if (beginIdx < endIdx) while (idx > 0 && pitch[idx].first == pitch[idx].first) --idx;
@@ -213,8 +212,8 @@ void NoteGraph::drawWaves(Database const& database) {
 		double t = idx * Engine::TIMESTEP;
 		double oldval = getNaN();
 		glutil::VertexArray va;
-		Notes::const_iterator noteIt = m_vocal.notes.begin();
-		glmath::vec4 c(p->m_color.r, p->m_color.g, p->m_color.b, 1.0);
+		auto noteIt = m_vocal.notes.begin();
+		glmath::vec4 c(player.m_color.r, player.m_color.g, player.m_color.b, 1.0);
 		for (; idx < endIdx; ++idx, t += Engine::TIMESTEP) {
 			double const freq = pitch[idx].first;
 			// If freq is NaN, we have nothing to process
@@ -224,7 +223,7 @@ void NoteGraph::drawWaves(Database const& database) {
 			double x = -0.2 + (t - m_time) * pixUnit;
 			// Find the currently active note(s)
 			while (noteIt != m_vocal.notes.end() && (noteIt->type == Note::SLEEP || t > noteIt->end)) ++noteIt;
-			Notes::const_iterator notePrev = noteIt;
+			auto notePrev = noteIt;
 			while (notePrev != m_vocal.notes.begin() && (notePrev->type == Note::SLEEP || t < notePrev->begin)) --notePrev;
 			bool hasNote = (noteIt != m_vocal.notes.end());
 			bool hasPrev = notePrev->type != Note::SLEEP && t >= notePrev->begin;

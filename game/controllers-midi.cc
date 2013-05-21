@@ -28,14 +28,14 @@ namespace input {
 				}
 			}
 		}
-		std::string getName(unsigned dev) const {
+		std::string getName(unsigned dev) const override {
 			PmDeviceInfo const* info = Pm_GetDeviceInfo(dev);
 			if (!info) throw std::logic_error("Invalid MIDI device requested in Midi::getName");
 			std::ostringstream name;
 			name << dev << ": " << info->name;
 			return name.str();
 		}
-		bool process(Event& event) {
+		bool process(Event& event) override {
 			PmEvent ev;
 			for (auto kv: m_streams) {
 				if (Pm_Read(*kv.second, &ev, 1) != 1) continue;

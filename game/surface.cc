@@ -54,15 +54,16 @@ struct Loader {
 	~Loader() { m_quit = true; m_condition.notify_one(); m_thread.join(); }
 	void run() {
 		while (!m_quit) {
-			void const* target = NULL;
+			void const* target = nullptr;
 			fs::path name;
 			{
 				// Poll for jobs to be done
 				boost::mutex::scoped_lock l(m_mutex);
-				for (Jobs::iterator it = m_jobs.begin(); it != m_jobs.end(); ++it) {
-					if (it->second.name.empty()) continue;  // Job already done
-					name = it->second.name;
-					target = it->first;
+				for (auto& job: m_jobs) {
+					if (job.second.name.empty()) continue;  // Job already done
+					name = job.second.name;
+					target = job.first;
+					break;
 				}
 				// If not found, wait for one
 				if (!target) {
@@ -84,7 +85,7 @@ struct Loader {
 			}
 			// Store the result
 			boost::mutex::scoped_lock l(m_mutex);
-			Jobs::iterator it = m_jobs.find(target);
+			auto it = m_jobs.find(target);
 			if (it == m_jobs.end()) continue;  // The job has been removed already
 			it->second.name.clear();  // Mark the job completed
 			it->second.bitmap.swap(bitmap);  // Store the bitmap (if we got any)
@@ -101,7 +102,7 @@ struct Loader {
 	}
 	void apply() {
 		boost::mutex::scoped_lock l(m_mutex);
-		for (Jobs::iterator it = m_jobs.begin(); it != m_jobs.end();) {
+		for (auto it = m_jobs.begin(); it != m_jobs.end();) {
 			{
 				Job& j = it->second;
 				if (!j.name.empty()) { ++it; continue; }  // Job incomplete, skip it

@@ -42,7 +42,7 @@ void Songs::reload_internal() {
 	}
 	Profiler prof("songloader");
 	Paths paths = getPathsConfig("paths/songs");
-	for (Paths::iterator it = paths.begin(); m_loading && it != paths.end(); ++it) {
+	for (auto it = paths.begin(); m_loading && it != paths.end(); ++it) {
 		try {
 			if (!fs::is_directory(*it)) { m_debug << "Songs/info: >>> Not scanning: " << *it << " (no such directory)" << std::endl; continue; }
 			m_debug << "songs/info: >>> Scanning " << *it << std::endl;
@@ -98,14 +98,14 @@ class Songs::RestoreSel {
 	Song const* m_sel;
   public:
 	/// constructor
-	RestoreSel(Songs& s): m_s(s), m_sel(s.empty() ? NULL : &s.current()) {}
+	RestoreSel(Songs& s): m_s(s), m_sel(s.empty() ? nullptr : &s.current()) {}
 	/// resets song to given song
-	void reset(Song const* song = NULL) { m_sel = song; }
+	void reset(Song const* song = nullptr) { m_sel = song; }
 	~RestoreSel() {
 		int pos = 0;
 		if (m_sel) {
 			SongVector& f = m_s.m_filtered;
-			SongVector::iterator it = std::find(f.begin(), f.end(), m_sel);
+			auto it = std::find(f.begin(), f.end(), m_sel);
 			m_s.math_cover.reset();
 			if (it != f.end()) pos = it - f.begin();
 		}

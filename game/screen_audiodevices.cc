@@ -147,13 +147,12 @@ void ScreenAudioDevices::load() {
 	m_mics.push_back(Mic("orange", m_devs.size()));
 	m_mics.push_back(Mic("OUT", m_devs.size()));
 	// Get the currently assigned device ids
-	for (boost::ptr_vector<Device>::iterator it = m_audio.devices().begin();
-	  it != m_audio.devices().end(); ++it) {
+	for (auto& d: m_audio.devices()) {
 		for (size_t i = 0; i < m_mics.size()-1; ++i) {
-			if (it->isMic(m_mics[i].name)) m_mics[i].dev = it->dev;
+			if (d.isMic(m_mics[i].name)) m_mics[i].dev = d.dev;
 		}
 		// Last "mic" is playback
-		if (it->isOutput()) m_mics.back().dev = it->dev;
+		if (d.isOutput()) m_mics.back().dev = d.dev;
 	}
 }
 
@@ -161,19 +160,19 @@ bool ScreenAudioDevices::save(bool skip_ui_config) {
 	if (!skip_ui_config) {
 		ConfigItem::StringList devconf;
 		// Loop through the devices and if there is mics/pdev assigned, form a config line
-		for (size_t d = 0; d < m_devs.size(); ++d) {
+		for (auto& d: m_devs) {
 			std::string mics = "", pdev = "";
-			for (size_t m = 0; m < m_mics.size(); ++m) {
-				if (m_mics[m].dev == unsigned(m_devs[d].idx)) {
-					if (m_mics[m].name == "OUT") pdev = "out=2"; // Pdev, only stereo supported
+			for (auto& _m : m_mics) {
+				if (_m.dev == unsigned(d.idx)) {
+					if (_m.name == "OUT") pdev = "out=2"; // Pdev, only stereo supported
 					else { // Mic
 						if (!mics.empty()) mics += ","; // Add separator if needed
-						mics += m_mics[m].name; // Append mic color
+						mics += _m.name; // Append mic color
 					}
 				}
 			}
 			if (mics.empty() && pdev.empty()) continue; // Continue looping if device is not used
-			std::string dev = "dev=\"" + m_devs[d].flex + "\""; // Use flexible name for more robustness
+			std::string dev = "dev=\"" + d.flex + "\""; // Use flexible name for more robustness
 			// Devices seem to crash less when opened if added separately
 			if (!mics.empty()) devconf.push_back(dev + " mics=" + mics);
 			if (!pdev.empty()) devconf.push_back(dev + " " + pdev);
@@ -201,10 +200,9 @@ bool ScreenAudioDevices::verify(size_t unassigned_id) {
 		if (m_mics[i].dev != unassigned_id) { // Only check assigned mics
 			// Find the device
 			bool found = false;
-			for (boost::ptr_vector<Device>::iterator it = m_audio.devices().begin();
-			  it != m_audio.devices().end(); ++it) {
-				if (i < m_mics.size()-1 && it->isMic(m_mics[i].name)) { found = true; break; } // Mic
-				else if (i == m_mics.size()-1 && it->isOutput()) { found = true; break; } // Pdev
+			for (auto const& d: m_audio.devices()) {
+				if (i < m_mics.size()-1 && d.isMic(m_mics[i].name)) { found = true; break; } // Mic
+				else if (i == m_mics.size()-1 && d.isOutput()) { found = true; break; } // Pdev
 			}
 			if (!found) return false;
 		}

@@ -16,8 +16,7 @@ Tone::Tone():
   stabledb(-getInf()),
   age()
 {
-	for (std::size_t i = 0; i < MAXHARM; ++i)
-	  harmonics[i] = -getInf();
+	for (auto& h: harmonics) h = -getInf();
 }
 
 void Tone::print() const {
@@ -89,7 +88,7 @@ namespace {
 		Peak(double _freq = 0.0, double _db = -getInf()):
 		  freq(_freq), db(_db)
 		{
-			for (std::size_t i = 0; i < Tone::MAXHARM; ++i) harm[i] = false;
+			for (auto& h: harm) h = false;
 		}
 		void clear() {
 			freq = 0.0;
@@ -206,20 +205,20 @@ void Analyzer::calcTones() {
 
 void Analyzer::mergeWithOld(tones_t& tones) const {
 	tones.sort();
-	tones_t::iterator it = tones.begin();
+	auto it = tones.begin();
 	// Iterate over old tones
-	for (tones_t::const_iterator oldit = m_tones.begin(); oldit != m_tones.end(); ++oldit) {
+	for (auto const& old: m_tones) {
 		// Try to find a matching new tone
-		while (it != tones.end() && *it < *oldit) ++it;
+		while (it != tones.end() && *it < old) ++it;
 		// If match found
-		if (it != tones.end() && *it == *oldit) {
+		if (it != tones.end() && *it == old) {
 			// Merge the old tone into the new tone
-			it->age = oldit->age + 1;
-			it->stabledb = 0.8 * oldit->stabledb + 0.2 * it->db;
-			it->freq = 0.5 * oldit->freq + 0.5 * it->freq;
-		} else if (oldit->db > -80.0) {
+			it->age = old.age + 1;
+			it->stabledb = 0.8 * old.stabledb + 0.2 * it->db;
+			it->freq = 0.5 * old.freq + 0.5 * it->freq;
+		} else if (old.db > -80.0) {
 			// Insert a decayed version of the old tone into new tones
-			Tone& t = *tones.insert(it, *oldit);
+			Tone& t = *tones.insert(it, old);
 			t.db -= 5.0;
 			t.stabledb -= 0.1;
 		}

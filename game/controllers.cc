@@ -88,7 +88,7 @@ struct ButtonMap {
 	Button map;  // Generic action
 	Button negative, positive;  // Half-axis movement
 	Button up, down, left, right;  // Hat direction
-	ButtonMap() { std::memset(this, 0, sizeof(this)); }
+	ButtonMap() { std::memset(this, 0, sizeof(*this)); }
 };
 
 typedef std::map<HWButton, ButtonMap> ButtonMapping;
@@ -126,6 +126,7 @@ struct Controllers::Impl {
 	
 	typedef std::map<SourceType, Hardware::ptr> HW;
 	HW m_hw;
+
 	std::deque<NavEvent> m_navEvents;
 	std::deque<DevicePtr> m_orphans;
 	std::map<SourceId, boost::weak_ptr<Device> > m_devices;
@@ -244,7 +245,7 @@ struct Controllers::Impl {
 	/// Try to find button of specific type
 	bool buttonByName(DevType type, std::string const& name, Button& button) {
 		NameToButton const& n2b = m_buttons[type];
-		NameToButton::const_iterator it = n2b.find(name);
+		auto it = n2b.find(name);
 		if (it == n2b.end()) return false;
 		button = it->second;
 		return true;
@@ -273,11 +274,11 @@ struct Controllers::Impl {
 	}
 	/// Do internal event processing (poll for MIDI events etc)
 	void process(boost::xtime const& now) {
-		for (HW::iterator it = m_hw.begin(); it != m_hw.end(); ++it) {
+		for (auto& typehw: m_hw) {
 			while (true) {
 				Event event;
 				event.time = now;
-				if (!it->second->process(event)) break;
+				if (!typehw.second->process(event)) break;
 				pushHWEvent(event);
 			}
 		}
@@ -295,17 +296,17 @@ struct Controllers::Impl {
 	}
 	/// Handle an incoming SDL event
 	bool pushEvent(SDL_Event const& sdlEv, boost::xtime const& t) {
-		for (HW::iterator it = m_hw.begin(); it != m_hw.end(); ++it) {
+		for (auto& typehw: m_hw) {
 			Event event;
 			event.time = t;
-			if (it->second->process(event, sdlEv)) { pushHWEvent(event); return true; }
+			if (typehw.second->process(event, sdlEv)) { pushHWEvent(event); return true; }
 		}
 		return false;
 	}
 	/// Assign event's source a ControllerDef (if not already assigned) and return it
 	ControllerDef const* assign(Event const& event) {
 		// Attempt insertion (does not override existing values)
-		std::pair<Assignments::iterator, bool> ret = m_assignments.insert(Assignments::value_type(event.source, NULL));
+		std::pair<Assignments::iterator, bool> ret = m_assignments.insert(Assignments::value_type(event.source, nullptr));
 		ControllerDef const*& def = ret.first->second;  // A reference to the value inside the map
 		if (!ret.second) return def;  // Source already assigned, just return it.
 		std::string devName = m_hw[event.source.type]->getName(event.source.device);
@@ -327,7 +328,7 @@ struct Controllers::Impl {
 		event.time += -def->latency;
 		event.devType = def->devType;
 		// Mapping from controllers.xml
-		ButtonMapping::const_iterator it = def->mapping.find(event.hw);
+		auto it = def->mapping.find(event.hw);
 		if (it != def->mapping.end()) {
 			Event ev = event;  // Make a copy for fiddling
 			bool handled = false;

@@ -46,8 +46,9 @@ private:
 	void drawMultimedia();
 	void update();
 	void drawMenu();
+	bool addSong(); ///< Add current song to playlist. Returns true if the playlist was empty.
+	void sing(); ///< Enter singing screen with current playlist.
 	void createPlaylistMenu();
-	void createAdvancedPlaylistMenu();
 
 	Audio& m_audio;
 	Songs& m_songs;

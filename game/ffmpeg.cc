@@ -78,16 +78,16 @@ void FFmpeg::open() {
 	boost::mutex::scoped_lock l(s_avcodec_mutex);
 	av_register_all();
 	av_log_set_level(AV_LOG_ERROR);
-	if (avformat_open_input(&m_formatContext, m_filename.c_str(), NULL, NULL)) throw std::runtime_error("Cannot open input file");
-	if (avformat_find_stream_info(m_formatContext, NULL) < 0) throw std::runtime_error("Cannot find stream information");
+	if (avformat_open_input(&m_formatContext, m_filename.c_str(), nullptr, nullptr)) throw std::runtime_error("Cannot open input file");
+	if (avformat_find_stream_info(m_formatContext, nullptr) < 0) throw std::runtime_error("Cannot find stream information");
 	m_formatContext->flags |= AVFMT_FLAG_GENPTS;
 	// Find a track and open the codec
-	AVCodec* codec = NULL;
+	AVCodec* codec = nullptr;
 	m_streamId = av_find_best_stream(m_formatContext, (AVMediaType)m_mediaType, -1, -1, &codec, 0);
 	if (m_streamId < 0) throw std::runtime_error("No suitable track found");
 
 	AVCodecContext* cc = m_formatContext->streams[m_streamId]->codec;
-	if (avcodec_open2(cc, codec, NULL) < 0) throw std::runtime_error("Cannot open codec");
+	if (avcodec_open2(cc, codec, nullptr) < 0) throw std::runtime_error("Cannot open codec");
 	cc->workaround_bugs = FF_BUG_AUTODETECT;
 	m_codecContext = cc;
 
@@ -104,7 +104,7 @@ void FFmpeg::open() {
 		m_swsContext = sws_getContext(
 		  cc->width, cc->height, cc->pix_fmt,
 		  width, height, PIX_FMT_RGB24,
-		  SWS_POINT, NULL, NULL, NULL);
+		  SWS_POINT, nullptr, nullptr, nullptr);
 		break;
 	default:  // Should never be reached but avoids compile warnings
 		abort();
@@ -195,7 +195,7 @@ void FFmpeg::processVideo(AVFrame* frame) {
 	// Convert into RGB and scale the data
 	int w = (m_codecContext->width+15)&~15;
 	int h = m_codecContext->height;
-	Bitmap* bitmap = new Bitmap();
+	auto bitmap = new Bitmap();
 	bitmap->timestamp = m_position;
 	bitmap->fmt = pix::RGB;
 	bitmap->resize(w, h);

@@ -76,7 +76,7 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	SDL_WM_SetCaption(PACKAGE " " VERSION, PACKAGE);
 	{
 		SDL_Surface* icon = SDL_LoadBMP(getThemePath("icon.bmp").c_str());
-		SDL_WM_SetIcon(icon, NULL);
+		SDL_WM_SetIcon(icon, nullptr);
 		SDL_FreeSurface(icon);
 	}
 	// SDL_SetVideoMode not called yet => get the desktop resolution for fs mode

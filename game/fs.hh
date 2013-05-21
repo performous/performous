@@ -40,7 +40,7 @@ std::vector<std::string> getThemes();
 std::string getPath(fs::path const& filename);
 
 /** Get full path to a default conguration file **/
-fs::path getDefaultConfig(fs::path const &configFile);
+fs::path getDefaultConfig(fs::path const& configFile);
 
 typedef std::list<fs::path> Paths;
 

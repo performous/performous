@@ -10,7 +10,7 @@
 #include <stdexcept>
 #include <cstdlib>
 
-template<> Game* Singleton<Game>::ms_Singleton = NULL;
+template<> Game* Singleton<Game>::ms_Singleton = nullptr;
 
 Game::Game(Window& _window):
   m_window(_window), m_finished(false), newScreen(), currentScreen(), currentPlaylist(),
@@ -28,9 +28,9 @@ void Game::activateScreen(std::string const& name) {
 void Game::updateScreen() {
 	if (!newScreen) return;
 	Screen* s = newScreen;  // A local copy in case exit() or enter() want to change screens again
-	newScreen = NULL;
+	newScreen = nullptr;
 	if (currentScreen) currentScreen->exit();
-	currentScreen = NULL;  // Exception safety, do not remove
+	currentScreen = nullptr;  // Exception safety, do not remove
 	s->enter();
 	currentScreen = s;
 }

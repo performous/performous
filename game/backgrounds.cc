@@ -27,7 +27,8 @@ void Backgrounds::reload_internal() {
 	}
 	// Go through the background paths
 	Paths paths = getPaths();
-	for (Paths::iterator it = paths.begin(); m_loading && it != paths.end(); ++it) {
+	for (auto it = paths.begin(); m_loading && it != paths.end(); ++it) {
+		if (!m_loading) break;
 		*it /= "backgrounds";
 		if (!fs::is_directory(*it)) { std::clog << "Backgrounds/info: >>> Not scanning for backgrounds: " << *it << " (no such directory)" << std::endl; continue; }
 		std::clog << "Backgrounds/info: >>> Scanning " << *it << " (for backgrounds)" << std::endl;
