@@ -2,8 +2,11 @@
 
 #include <windows.h>
 #include <tchar.h>
-#include <strsafe.h>
 #include <string>
+#include <cstdio>
+#ifdef _MSC_VER
+#include <strsafe.h>
+#endif
 
 #define BUFSIZE 4096
 
@@ -151,14 +154,21 @@ void ErrorExit(PTSTR lpszFunction)
 		dw,
 		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 		(LPTSTR) &lpMsgBuf,
-		0, NULL );
+		0, NULL);
 
 	lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT,
 		(lstrlen((LPCTSTR)lpMsgBuf)+lstrlen((LPCTSTR)lpszFunction)+40)*sizeof(TCHAR));
+#ifdef _MSC_VER
 	StringCchPrintf((LPTSTR)lpDisplayBuf,
 		LocalSize(lpDisplayBuf) / sizeof(TCHAR),
 		TEXT("%s failed with error %d: %s"),
 		lpszFunction, dw, lpMsgBuf);
+#else
+	snprintf((LPTSTR)lpDisplayBuf,
+		LocalSize(lpDisplayBuf) / sizeof(TCHAR),
+		TEXT("%s failed with error %d: %s"),
+		lpszFunction, dw, lpMsgBuf);
+#endif
 	MessageBox(NULL, (LPCTSTR)lpDisplayBuf, TEXT("Error"), MB_OK);
 
 	LocalFree(lpMsgBuf);
