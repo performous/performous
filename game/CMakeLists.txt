@@ -1,12 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
 
-set(EXENAME Performous)
-if(UNIX)
-	# On UNIX, binary name is lowercase with no spaces
-	string(TOLOWER ${EXENAME} EXENAME)
-	string(REPLACE " " "-" EXENAME ${EXENAME})
-endif()
-
 FILE(GLOB SOURCE_FILES "*.cc")
 FILE(GLOB HEADER_FILES "*.hh")
 
@@ -144,22 +137,22 @@ endif()
 
 if(MSVC)
 	set(SUBSYSTEM_WIN32 WIN32)
-	add_executable(Performous-cmd "windows-cmd.cpp")
-	install(TARGETS Performous-cmd DESTINATION bin)
+	add_executable(performous-cmd "windows-cmd.cpp")
+	install(TARGETS performous-cmd DESTINATION bin)
 endif(MSVC)
-add_executable(${EXENAME} ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL_SOURCES} ${RESOURCE_OBJECT})
-target_link_libraries(${EXENAME} ${LIBS})
+add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL_SOURCES} ${RESOURCE_OBJECT})
+target_link_libraries(performous ${LIBS})
 
 # Store library paths in executable
 if(APPLE)
-	set_target_properties(${EXENAME} PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
+	set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 else()
-	set_target_properties(${EXENAME} PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
+	set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 endif()
 
 # Generate config.hh
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.cmake.hh" "${CMAKE_CURRENT_BINARY_DIR}/config.hh" @ONLY)
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
-install(TARGETS ${EXENAME} DESTINATION bin)
+install(TARGETS performous DESTINATION bin)
 
