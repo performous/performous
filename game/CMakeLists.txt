@@ -139,6 +139,7 @@ if(MSVC)
 	set(SUBSYSTEM_WIN32 WIN32)
 	add_executable(performous-cmd "windows-cmd.cpp")
 	install(TARGETS performous-cmd DESTINATION bin)
+	set_target_properties(performous-cmd PROPERTIES OUTPUT_NAME "Performous-cmd")
 endif(MSVC)
 add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL_SOURCES} ${RESOURCE_OBJECT})
 target_link_libraries(performous ${LIBS})
@@ -148,6 +149,11 @@ if(APPLE)
 	set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 else()
 	set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
+endif()
+
+# Capitalized exe names are more beautiful on Windows
+if(WIN32)
+	set_target_properties(performous PROPERTIES OUTPUT_NAME "Performous")
 endif()
 
 # Generate config.hh
