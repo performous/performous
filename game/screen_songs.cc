@@ -197,7 +197,7 @@ void ScreenSongs::update() {
 	if (m_playing != music) songChange = true;
 	// Switch songs if needed, only when the user is not browsing for a moment
 	if (!songChange) return;
-	//song->loadNotes(); <-- this made the program crash when searching for a specific song, what is it doing here!?? it´ s not neccesary!
+	if (song) song->loadNotes();  // Needed for BPM info; TODO: drop notes when switching to another song.
 	m_playing = music;
 	// Clear the old content and load new content if available
 	m_songbg.reset(); m_video.reset();
@@ -353,7 +353,7 @@ void ScreenSongs::drawCovers() {
 		  * rotate(0.4 * std::sin(std::min(M_PI, i - shift)), vec3(0.0, 1.0, 0.0))
 		);
 		double c = 0.4 + 0.6 * diff;
-		if (m_menuPos == 0 && baseidx + i == currentId) {
+		if (m_menuPos == 1 /* Cover browser */ && baseidx + i == currentId) {
 			double t = m_audio.getPosition() - config["audio/video_delay"].f();
 			Song::Beats const& beats = m_songs[currentId].beats;
 			auto it = std::lower_bound(beats.begin(), beats.end(), t);
