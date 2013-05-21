@@ -18,7 +18,7 @@
 static const double IDLE_TIMEOUT = 45.0; // seconds
 
 ScreenSongs::ScreenSongs(std::string const& name, Audio& audio, Songs& songs, Database& database):
-  Screen(name), m_audio(audio), m_songs(songs), m_database(database), m_covers(20)
+  Screen(name), m_audio(audio), m_songs(songs), m_database(database), m_covers(50)
 {
 	m_songs.setAnimMargins(5.0, 5.0);
 	m_idleTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
@@ -340,6 +340,20 @@ void ScreenSongs::drawCovers() {
 	int currentId = m_songs.currentId();
 	int baseidx = spos + 1.5; --baseidx; // Round correctly
 	double shift = spos - baseidx;
+	// Calculate beat
+	double beat = 0.5 + m_idleTimer.get() * 2.0;  // 120 BPM
+	if (ss > 0) {
+		// Use actual song BPM. FIXME: Should only do this if currentId is also playing.
+		double t = m_audio.getPosition() - config["audio/video_delay"].f();
+		Song::Beats const& beats = m_songs[currentId].beats;
+		auto it = std::lower_bound(beats.begin(), beats.end(), t);
+		if (it != beats.begin() && it != beats.end()) {
+			double t1 = *(it - 1), t2 = *it;
+			beat = (t - t1) / (t2 - t1);
+		}
+	}
+	beat = 1.0 + std::pow(std::abs(std::cos(3.141592 * beat)), 10.0);  // Overdrive pulse
+	// Draw covers and reflections
 	for (int i = -2; i < 6; ++i) {
 		if (baseidx + i < 0 || baseidx + i >= int(ss)) continue;
 		Song& song = m_songs[baseidx + i];
@@ -353,25 +367,30 @@ void ScreenSongs::drawCovers() {
 		  * rotate(0.4 * std::sin(std::min(M_PI, i - shift)), vec3(0.0, 1.0, 0.0))
 		);
 		double c = 0.4 + 0.6 * diff;
-		if (m_menuPos == 1 /* Cover browser */ && baseidx + i == currentId) {
-			double t = m_audio.getPosition() - config["audio/video_delay"].f();
-			Song::Beats const& beats = m_songs[currentId].beats;
-			auto it = std::lower_bound(beats.begin(), beats.end(), t);
-			if (it != beats.begin() && it != beats.end()) {
-				double t1 = *(it - 1), t2 = *it;
-				t = (t - t1) / (t2 - t1);
-			} else {
-				t = 0.5 + m_idleTimer.get() * 2.0;  // 120 BPM
-			}
-			c = 1.0 + std::pow(std::abs(std::cos(3.141592 * t)), 10.0);
-		}
+		if (m_menuPos == 1 /* Cover browser */ && baseidx + i == currentId) c = beat;
 		ColorTrans c1(Color(c, c, c));
-		s.dimensions.middle(0.0).bottom(0.0).fitInside(0.17, 0.17);
+		s.dimensions.middle().screenCenter().bottom().fitInside(0.17, 0.17);
 		// Draw the cover normally
 		s.draw();
 		// Draw the reflection
 		Transform transMirror(scale(vec3(1.0f, -1.0f, 1.0f)));
 		ColorTrans c2(Color::alpha(0.4));
+		s.draw();
+	}
+	// Draw the playlist
+    Game* gm = Game::getSingletonPtr();
+	auto const& playlist = gm->getCurrentPlayList().getList();
+	double c = (m_menuPos == 0 /* Playlist */ ? beat : 1.0);
+	ColorTrans c1(Color(c, c, c));
+	for (unsigned i = playlist.size() - 1; i < playlist.size(); --i) {
+		Surface& s = getCover(*playlist[i]);
+		double pos =  i / std::max<double>(5.0, playlist.size());
+		using namespace glmath;
+		Transform trans(
+		  translate(vec3(-0.35 + 0.06 * pos, 0.0, 0.3 - 0.2 * pos))
+		  * rotate(-0.0, vec3(0.0, 1.0, 0.0))
+		);
+		s.dimensions.middle().screenBottom(-0.06).fitInside(0.08, 0.08);
 		s.draw();
 	}
 }
