@@ -5,7 +5,7 @@ JOBS=`nproc 2>/dev/null`
 STAGE="`pwd`/stage"
 BUILD_TYPE="Release"
 if [ "$1" == "debug" ]; then
-	BUILD_TYPE="Debug"
+	BUILD_TYPE="RelWithDebInfo"
 	echo "Building with debug symbols"
 	shift
 fi
