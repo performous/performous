@@ -1,4 +1,6 @@
 #ifdef USE_RAWINPUT
+#include "SDL.h"
+
 
 /// Get raw linux device events and translate them to SDL events
 int RawInput_PollEvent(SDL_Event *event) {
