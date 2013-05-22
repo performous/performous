@@ -225,12 +225,13 @@ void ScreenSongs::drawJukebox() {
 	if (diff < 3.0) {
 		Song& song = m_songs.current();
 		// Draw the cover
-		/*
 		Surface* cover = NULL;
 		if (!song.cover.empty()) try { cover = &m_covers[song.path + song.cover]; } catch (std::exception const&) {}
-		Surface& s = (cover ? *cover : *m_singCover);
-		s.dimensions.right(theme->song.dimensions.x1()).top(theme->song.dimensions.y1()).fitInside(0.1, 0.1); s.draw();
-		*/
+		if (cover) {
+			Surface& s = *cover;
+			s.dimensions.left(theme->song.dimensions.x1()).top(theme->song.dimensions.y2() + 0.05).fitInside(0.15, 0.15);
+			s.draw();
+		}
 		// Format && draw the song information text
 		std::ostringstream oss_song;
 		oss_song << song.title << '\n' << song.artist;
