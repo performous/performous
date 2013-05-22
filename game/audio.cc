@@ -457,10 +457,9 @@ struct Audio::Impl {
 				if (params.in == 0) params.in = params.mics.size();
 				else params.mics.resize(params.in);
 				portaudio::AudioDevices ad;
-				int dev = ad.find(params.dev);
-				std::clog << "audio/info: Trying audio device \"" << params.dev << "\", id: " << dev
+				auto const& info = ad.find(params.dev);
+				std::clog << "audio/info: Trying audio device \"" << params.dev << "\", idx: " << info.idx
 					<< ", in: " << params.in << ", out: " << params.out << std::endl;
-				portaudio::DeviceInfo& info = ad.devices[dev];
 				if (info.in < int(params.mics.size())) throw std::runtime_error("Device doesn't have enough input channels");
 				if (info.out < int(params.out)) throw std::runtime_error("Device doesn't have enough output channels");
 				// Match found if we got here, construct a device
@@ -490,7 +489,7 @@ struct Audio::Impl {
 				}
 				// Assign playback output for the first available stereo output
 				if (!playback && d->out == 2) { d->outptr = &output; playback = true; }
-				std::clog << "audio/info: Using audio device: " << dev;
+				std::clog << "audio/info: Using audio device: " << info.desc();
 				if (assigned_mics) std::clog << ", input channels: " << assigned_mics;
 				if (params.out) std::clog << ", output channels: " << params.out;
 				std::clog << std::endl;
