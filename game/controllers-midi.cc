@@ -24,18 +24,18 @@ namespace input {
 					m_streams.insert(dev, std::auto_ptr<pm::Input>(new pm::Input(dev)));
 					std::clog << "controller-midi/info: Opened MIDI device " << name << std::endl;
 				} catch (std::runtime_error& e) {
-					std::clog << "controller-midi/warn: " << e.what() << std::endl;
+					std::clog << "controller-midi/warning: " << e.what() << std::endl;
 				}
 			}
 		}
-		std::string getName(unsigned dev) const {
+		std::string getName(unsigned dev) const override {
 			PmDeviceInfo const* info = Pm_GetDeviceInfo(dev);
 			if (!info) throw std::logic_error("Invalid MIDI device requested in Midi::getName");
 			std::ostringstream name;
 			name << dev << ": " << info->name;
 			return name.str();
 		}
-		bool process(Event& event) {
+		bool process(Event& event) override {
 			PmEvent ev;
 			for (auto kv: m_streams) {
 				if (Pm_Read(*kv.second, &ev, 1) != 1) continue;

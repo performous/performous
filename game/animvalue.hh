@@ -94,7 +94,6 @@ class AnimAcceleration {
 	unsigned int getTarget() const { return m_target; };
 	/// set target
 	void setTarget(unsigned int target, unsigned int songs) {
-		m_time = now();
 		m_target = target;
 		if (m_songs == songs) return;
 		// Number of songs has changed => reset animation

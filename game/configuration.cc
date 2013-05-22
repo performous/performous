@@ -247,9 +247,9 @@ void writeConfig(bool system) {
 	xmlpp::Document doc;
 	xmlpp::Node* nodeRoot = doc.create_root_node("performous");
 	bool dirty = false;
-	for (Config::iterator it = config.begin(); it != config.end(); ++it) {
-		ConfigItem& item = it->second;
-		std::string name = it->first;
+	for (auto& elem: config) {
+		ConfigItem& item = elem.second;
+		std::string name = elem.first;
 		if (item.isDefault(system)) continue; // No need to save settings with default values
 		dirty = true;
 		xmlpp::Element* entryNode = nodeRoot->add_child("entry");
@@ -261,25 +261,17 @@ void writeConfig(bool system) {
 		else if (type == "float") entryNode->set_attribute("value",boost::lexical_cast<std::string>(item.f()));
 		else if (item.get_type() == "string") entryNode->add_child("stringvalue")->add_child_text(item.s());
 		else if (item.get_type() == "string_list") {
-			std::vector<std::string> const& value = item.sl();
-			for(std::vector<std::string>::const_iterator it = value.begin(); it != value.end(); ++it) {
-				xmlpp::Element* stringvalueNode = entryNode->add_child("stringvalue");
-				stringvalueNode->add_child_text(*it);
-			}
+			for (auto const& str: item.sl()) entryNode->add_child("stringvalue")->add_child_text(str);
 		}
 		else if (item.get_type() == "option_list") {
 			//TODO: Write selected also (as attribute?)
-			ConfigItem::OptionList const& value = item.ol();
-			for(ConfigItem::OptionList::const_iterator it = value.begin(); it != value.end(); ++it) {
-				xmlpp::Element* stringvalueNode = entryNode->add_child("stringvalue");
-				stringvalueNode->add_child_text(*it);
-			}
+			for (auto const& str: item.ol()) entryNode->add_child("stringvalue")->add_child_text(str);
 		}
 	}
 	fs::path const& conf = system ? systemConfFile : userConfFile;
 	std::string tmp = conf.string() + "tmp";
 	try {
-		create_directory(conf.parent_path());
+		create_directories(conf.parent_path());
 		if (dirty) doc.write_to_file_formatted(tmp, "UTF-8");
 		if (exists(conf)) remove(conf);
 		if (dirty) {
@@ -293,7 +285,7 @@ void writeConfig(bool system) {
 	}
 	if (!system) return;
 	// Tell the items that we have changed the system default
-	for (Config::iterator it = config.begin(); it != config.end(); ++it) it->second.makeSystem();
+	for (auto& elem: config) elem.second.makeSystem();
 	// User config is no longer needed
 	if (exists(userConfFile)) remove(userConfFile);
 }
@@ -327,7 +319,7 @@ void readConfigXML(fs::path const& file, int mode) {
 			xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**nodeit);
 			std::string name = getAttribute(elem, "name");
 			if (name.empty()) throw std::runtime_error(file.string() + " element Entry missing name attribute");
-			Config::iterator it = config.find(name);
+			auto it = config.find(name);
 			if (mode == 0) { // Schema
 				if (it != config.end()) throw std::runtime_error("Configuration schema contains the same value twice: " + name);
 				config[name].update(elem, 0);
@@ -335,9 +327,9 @@ void readConfigXML(fs::path const& file, int mode) {
 				bool hidden = false;
 				try { if (getAttribute(elem, "hidden") == "true") hidden = true; } catch (XMLError&) {}
 				if (!hidden) {
-					for (ConfigMenu::iterator it = configMenu.begin(), end = configMenu.end(); it != end; ++it) {
-						std::string prefix = it->name + '/';
-						if (name.substr(0, prefix.size()) == prefix) { it->items.push_back(name); break; }
+					for (auto& elem: configMenu) {
+						std::string prefix = elem.name + '/';
+						if (name.substr(0, prefix.size()) == prefix) { elem.items.push_back(name); break; }
 					}
 				}
 			} else {

@@ -15,6 +15,7 @@
 #include "util.hh"
 #include "video.hh"
 #include "webcam.hh"
+#include "screen_songs.hh"
 
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
@@ -28,48 +29,46 @@ namespace {
 
 	/// Add a flash message about the state of a config item
 	void dispInFlash(ConfigItem& ci) {
-		ScreenManager* sm = ScreenManager::getSingletonPtr();
-		sm->flashMessage(ci.getShortDesc() + ": " + ci.getValue());
+		Game* gm = Game::getSingletonPtr();
+		gm->flashMessage(ci.getShortDesc() + ": " + ci.getValue());
 	}
 }
 
 ScreenSing::ScreenSing(std::string const& name, Audio& audio, Database& database, Backgrounds& bgs):
-	  Screen(name), m_audio(audio), m_database(database), m_backgrounds(bgs),
-	  m_selectedTrack(TrackName::LEAD_VOCAL) {
-}
+	Screen(name), m_audio(audio), m_database(database), m_backgrounds(bgs),
+	m_selectedTrack(TrackName::LEAD_VOCAL)
+{}
 
 void ScreenSing::enter() {
-	ScreenManager* sm = ScreenManager::getSingletonPtr();
+	Game* gm = Game::getSingletonPtr();
 	// Initialize webcam
-	sm->loading(_("Initializing webcam..."), 0.1);
+	gm->loading(_("Initializing webcam..."), 0.1);
 	if (config["graphic/webcam"].b() && Webcam::enabled()) {
 		try {
 			m_cam.reset(new Webcam(config["graphic/webcamid"].i()));
 		} catch (std::exception& e) { std::cout << e.what() << std::endl; };
 	}
 	// Load video
-	sm->loading(_("Loading video..."), 0.2);
+	gm->loading(_("Loading video..."), 0.2);
 	if (!m_song->video.empty() && config["graphic/video"].b()) {
 		m_video.reset(new Video(m_song->path + m_song->video, m_song->videoGap));
 	}
 	boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
 	reloadGL();
 	// Load song notes
-	sm->loading(_("Loading song..."), 0.4);
-	if (m_song->loadStatus != Song::FULL) {
-		try { SongParser sp(*m_song); }
-		catch (SongParserException& e) {
-			std::clog << e;
-			sm->activateScreen("Songs");
-		}
+	gm->loading(_("Loading song..."), 0.4);
+	try { m_song->loadNotes(false /* don't ignore errors */); }
+	catch (SongParserException& e) {
+		std::clog << e;
+		gm->activateScreen("Songs");
 	}
 	// Notify about broken tracks
-	if (!m_song->b0rked.empty()) sm->dialog(_("Song contains broken tracks!") + std::string("\n\n") + m_song->b0rked);
+	if (!m_song->b0rked.empty()) gm->dialog(_("Song contains broken tracks!") + std::string("\n\n") + m_song->b0rked);
 	// Startup delay for instruments is longer than for singing only
 	double setup_delay = (!m_song->hasControllers() ? -1.0 : -5.0);
 	m_audio.pause();
 	m_audio.playMusic(m_song->music, false, 0.0, setup_delay);
-	sm->loading(_("Loading menu..."), 0.7);
+	gm->loading(_("Loading menu..."), 0.7);
 	{
 		VocalTracks const& tracks = m_song->vocalTracks;
 		unsigned players = analyzers.size();
@@ -82,12 +81,11 @@ void ScreenSing::enter() {
 			m_duet.addEnum(_("Normal mode"));
 			m_menu.add(MenuOption("", _("Switch between duet and regular singing mode")).changer(m_duet));
 		}
+		// Add vocal track selector for each player
 		for (unsigned player = 0; player < players; ++player) {
 			ConfigItem& vocalTrack = m_vocalTracks[player];
 			vocalTrack = ConfigItem(0);
-			for (VocalTracks::const_iterator it = tracks.begin(); it != tracks.end(); ++it) {
-				vocalTrack.addEnum(it->second.name);
-			}
+			for (auto const& track: tracks) vocalTrack.addEnum(track.second.name);
 			if (tracks.size() > 1 && player % 2) ++vocalTrack;  // Every other player gets the second track
 			m_menu.add(MenuOption("", _("Change vocal track")).changer(vocalTrack));
 		}
@@ -95,8 +93,8 @@ void ScreenSing::enter() {
 		m_menu.open();
 		if (tracks.size() <= 1) setupVocals();  // No duet menu
 	}
-	sm->showLogo(false);
-	sm->loading(_("Loading complete"), 1.0);
+	gm->showLogo(false);
+	gm->loading(_("Loading complete"), 1.0);
 }
 
 void ScreenSing::setupVocals() {
@@ -112,9 +110,7 @@ void ScreenSing::setupVocals() {
 			shownTracks.insert(vocal);
 		}
 		if (shownTracks.size() > 2) throw std::runtime_error("Too many tracks chosen. Only two vocal tracks can be used simultaneously.");
-		for (std::set<VocalTrack*>::iterator it = shownTracks.begin(); it != shownTracks.end(); ++it) {
-			m_layout_singer.push_back(new LayoutSinger(**it, m_database, theme));
-		}
+		for (auto const& trk: shownTracks) m_layout_singer.push_back(new LayoutSinger(*trk, m_database, theme));
 		// Note: Engine maps tracks with analyzers 1:1. If user doesn't have mics, we still want to have singer layout enabled but without engine...
 		if (!analyzers.empty()) m_engine.reset(new Engine(m_audio, selectedTracks, m_database));
 	}
@@ -126,7 +122,11 @@ void ScreenSing::createPauseMenu() {
 	m_menu.clear();
 	m_menu.add(MenuOption(_("Resume"), _("Back to performing!")));
 	m_menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning")).screen("Sing"));
-	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).screen("Songs"));
+	m_menu.add(MenuOption(_("Skip"), _("Skip current song")).screen("Playlist"));
+	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).call([]() {
+		Game* gm = Game::getSingletonPtr();
+		gm->activateScreen("Songs");
+	}));
 	m_menu.close();
 }
 
@@ -142,7 +142,7 @@ void ScreenSing::reloadGL() {
 }
 
 void ScreenSing::exit() {
-	ScreenManager::getSingletonPtr()->controllers.enableEvents(false);
+    Game::getSingletonPtr()->controllers.enableEvents(false);
 	m_engine.reset();
 	m_score_window.reset();
 	m_menu.clear();
@@ -157,7 +157,7 @@ void ScreenSing::exit() {
 	m_menuTheme.reset();
 	theme.reset();
 	if (m_audio.isPaused()) m_audio.togglePause();
-	ScreenManager::getSingletonPtr()->showLogo();
+	Game::getSingletonPtr()->showLogo();
 }
 
 
@@ -204,42 +204,40 @@ void ScreenSing::instrumentLayout(double time) {
 		}
 	}
 	// Set volume levels (averages of all instruments playing that track)
-	// FIXME: There should NOT be gettext calls here!
-	for( std::map<std::string,std::string>::iterator it = m_song->music.begin() ; it != m_song->music.end() ; ++it ) {
+	for (auto const& track: m_song->music) {
+		std::string const& name = track.first;
+		std::string locName = _(name.c_str());  // FIXME: There should NOT be gettext calls here!
 		double level = 1.0;
-		if (volume.find(_(it->first.c_str())) == volume.end()) {
-			m_audio.streamFade(it->first, level);
-		} else {
-			CountSum cs = volume[_(it->first.c_str())];
+		if (volume.find(locName) != volume.end()) {
+			CountSum cs = volume[locName];
 			if (cs.first > 0) level = cs.second / cs.first;
 			if (m_song->music.size() <= 1) level = std::max(0.333, level);
-			m_audio.streamFade(it->first, level);
 		}
-		if (pitchbend.find(_(it->first.c_str())) != pitchbend.end()) {
-			CountSum cs = pitchbend[_(it->first.c_str())];
+		m_audio.streamFade(name, level);
+		if (pitchbend.find(locName) != pitchbend.end()) {
+			CountSum cs = pitchbend[locName];
 			level = cs.second;
-			m_audio.streamBend(it->first, level);
+			m_audio.streamBend(name, level);
 		}
 	}
 }
 
 void ScreenSing::activateNextScreen()
 {
-	ScreenManager* sm = ScreenManager::getSingletonPtr();
+	Game* gm = Game::getSingletonPtr();
 
 	m_database.addSong(m_song);
 	if (m_database.scores.empty() || !m_database.reachedHiscore(m_song)) {
 		// if no highscore reached..
-		sm->activateScreen("Songs");
-		return;
+	    gm->activateScreen("Playlist");
 	}
 
 	// Score window visible -> Enter quits to Players Screen
-	Screen* s = sm->getScreen("Players");
+	Screen* s = gm->getScreen("Players");
 	ScreenPlayers* ss = dynamic_cast<ScreenPlayers*> (s);
 	assert(ss);
 	ss->setSong(m_song);
-	sm->activateScreen("Players");
+	gm->activateScreen("Players");
 }
 
 void ScreenSing::manageEvent(input::NavEvent const& event) {
@@ -254,7 +252,7 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 	}
 	// Instant quit with CANCEL at the very beginning
 	if (nav == input::NAV_CANCEL && time < 1.0) {
-		ScreenManager::getSingletonPtr()->activateScreen("Songs");
+		Game::getSingletonPtr()->activateScreen("Playlist");
 		return;
 	}
 	// Only pause or esc opens the global menu (instruments have their own menus)
@@ -273,8 +271,8 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 			}
 			return;
 		}
-		else if (nav == input::NAV_LEFT) { m_menu.action(-1); return; }
-		else if (nav == input::NAV_RIGHT) { m_menu.action(1); return; }
+		else if (nav == input::NAV_LEFT) { m_menu.move(-1); return; }
+		else if (nav == input::NAV_RIGHT) { m_menu.move(1); return; }
 		else if (nav == input::NAV_DOWN) { m_menu.move(1); return; }
 		else if (nav == input::NAV_UP) { m_menu.move(-1); return; }
 	}
@@ -360,7 +358,6 @@ void ScreenSing::manageEvent(SDL_Event event) {
 }
 
 namespace {
-
 	const double arMin = 1.33;
 	const double arMax = 2.35;
 
@@ -375,16 +372,15 @@ namespace {
 		getShader("texture").bind();
 		va.Draw();
 	}
-
 }
 
 void ScreenSing::prepare() {
-	ScreenManager* sm = ScreenManager::getSingletonPtr();
+	Game* gm = Game::getSingletonPtr();
 	double time = m_audio.getPosition();
 	// Enable/disable controllers as needed (mostly so that keyboard navigation will not be obstructed).
-	sm->controllers.enableEvents(m_song->hasControllers() && !m_menu.isOpen() && !m_score_window.get());
+	gm->controllers.enableEvents(m_song->hasControllers() && !m_menu.isOpen() && !m_score_window.get());
 	if (m_video) m_video->prepare(time);
-	for (input::DevicePtr dev; sm->controllers.getDevice(dev); ) {
+	for (input::DevicePtr dev; gm->controllers.getDevice(dev); ) {
 		// Eat all events and see if any are valid for joining
 		input::DevType type = input::DEVTYPE_GENERIC;
 		std::string msg;
@@ -405,7 +401,7 @@ void ScreenSing::prepare() {
 				else msg = dev->source.isKeyboard() ? _("Press SPACE to join drums!") : _("KICK to join!");
 			}
 		}
-		if (!msg.empty()) sm->flashMessage(msg, 0.0, 0.1, 0.1);
+		if (!msg.empty()) gm->flashMessage(msg, 0.0, 0.1, 0.1);
 		else if (type == input::DEVTYPE_DANCEPAD) m_instruments.push_back(new DanceGraph(m_audio, *m_song, dev));
 		else if (type != input::DEVTYPE_GENERIC) m_instruments.push_back(new GuitarGraph(m_audio, *m_song, dev, m_instruments.size()));
 	}
@@ -414,12 +410,10 @@ void ScreenSing::prepare() {
 	// We don't allow instrument menus during global menu
 	// except for joining, in which case global menu is closed
 	if (m_menu.isOpen()) {
-		for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it) {
-			if (it->joining(time)) m_menu.close(); else it->toggleMenu(0);
+		for (auto& i: m_instruments) {
+			if (i.joining(time)) m_menu.close(); else i.toggleMenu(0);
 		}
 	}
-
-
 }
 
 void ScreenSing::draw() {
@@ -486,8 +480,8 @@ void ScreenSing::draw() {
 
 	if (config["game/karaoke_mode"].b()) {
 		if (!m_audio.isPlaying()) {
-			ScreenManager* sm = ScreenManager::getSingletonPtr();
-			sm->activateScreen("Songs");
+			Game* gm = Game::getSingletonPtr();
+			gm->activateScreen("Playlist");
 			return;
 		}
 	} else {
@@ -510,7 +504,7 @@ void ScreenSing::draw() {
 	}
 
 	// Menus on top of everything
-	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it) if (it->menuOpen()) it->drawMenu();
+	for (auto& i: m_instruments) if (i.menuOpen()) i.drawMenu();
 	if (m_menu.isOpen()) drawMenu();
 }
 
@@ -519,7 +513,7 @@ void ScreenSing::drawMenu() {
 	if (m_menu.empty()) return;
 	// Some helper vars
 	ThemeInstrumentMenu& th = *m_menuTheme;
-	MenuOptions::const_iterator cur = static_cast<MenuOptions::const_iterator>(&m_menu.current());
+	auto cur = static_cast<MenuOptions::const_iterator>(&m_menu.current());
 	double w = m_menu.dimensions.w();
 	const float txth = th.option_selected.h();
 	const float step = txth * 0.85f;
@@ -557,11 +551,11 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
   m_score_text(getThemePath("score_txt.svg")),
   m_score_rank(getThemePath("score_rank.svg"))
 {
-	ScreenManager::getSingletonPtr()->showLogo();
+	Game::getSingletonPtr()->showLogo();
 	m_pos.setTarget(0.0);
 	m_database.scores.clear();
 	// Singers
-	for (std::list<Player>::iterator p = m_database.cur.begin(); p != m_database.cur.end();) {
+	for (auto p = m_database.cur.begin(); p != m_database.cur.end();) {
 		ScoreItem item; item.type = input::DEVTYPE_VOCALS;
 		item.score = p->getScore();
 		if (item.score < 500) { p = m_database.cur.erase(p); continue; } // Dead

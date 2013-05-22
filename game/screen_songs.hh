@@ -7,8 +7,11 @@
 #include "song.hh" // for Music class
 #include "textinput.hh"
 #include "video.hh"
+#include "playlist.hh"
+#include "menu.hh"
 
 #include <boost/scoped_ptr.hpp>
+
 
 class Audio;
 class Database;
@@ -16,6 +19,9 @@ class Song;
 class Songs;
 class Surface;
 class ThemeSongs;
+
+class Backgrounds;
+class ThemeInstrumentMenu;
 
 /// song chooser screen
 class ScreenSongs : public Screen {
@@ -25,7 +31,7 @@ public:
 	void enter();
 	void exit();
 	void reloadGL();
-	void manageSharedKey(input::NavButton nav); ///< same behaviour for jukebox and normal mode
+	void menuBrowse(int dir); ///< Left/Right on menu options
 	void manageEvent(SDL_Event event);
 	void manageEvent(input::NavEvent const& event);
 	void prepare();
@@ -34,10 +40,15 @@ public:
 	Surface& getCover(Song const& song); ///< get appropriate cover image for the song (incl. no cover)
 	void drawJukebox(); ///< draw the songbrowser in jukebox mode (fullscreen, full previews, ...)
 
-protected:
-	void drawInstruments(Dimensions const& dim, float alpha = 1.0f) const;
+private:
+	void manageSharedKey(input::NavEvent const& event); ///< same behaviour for jukebox and normal mode
+	void drawInstruments(Dimensions dim) const;
 	void drawMultimedia();
 	void update();
+	void drawMenu();
+	bool addSong(); ///< Add current song to playlist. Returns true if the playlist was empty.
+	void sing(); ///< Enter singing screen with current playlist.
+	void createPlaylistMenu();
 
 	Audio& m_audio;
 	Songs& m_songs;
@@ -53,8 +64,11 @@ protected:
 	boost::scoped_ptr<Surface> m_bandCover;
 	boost::scoped_ptr<Surface> m_danceCover;
 	boost::scoped_ptr<Texture> m_instrumentList;
+	boost::scoped_ptr<ThemeInstrumentMenu> m_menuTheme;
 	Cachemap<std::string, Surface> m_covers;
+	int m_menuPos, m_infoPos;
 	bool m_jukebox;
 	bool show_hiscores;
 	int hiscore_start_pos;
+	Menu m_menu;
 };

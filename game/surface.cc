@@ -22,7 +22,7 @@
 using boost::uint32_t;
 
 Shader& getShader(std::string const& name) {
-	return ScreenManager::getSingletonPtr()->window().shader(name);  // FIXME
+	return Game::getSingletonPtr()->window().shader(name);  // FIXME
 }
 
 float Dimensions::screenY() const {
@@ -54,15 +54,16 @@ struct Loader {
 	~Loader() { m_quit = true; m_condition.notify_one(); m_thread.join(); }
 	void run() {
 		while (!m_quit) {
-			void const* target = NULL;
+			void const* target = nullptr;
 			fs::path name;
 			{
 				// Poll for jobs to be done
 				boost::mutex::scoped_lock l(m_mutex);
-				for (Jobs::iterator it = m_jobs.begin(); it != m_jobs.end(); ++it) {
-					if (it->second.name.empty()) continue;  // Job already done
-					name = it->second.name;
-					target = it->first;
+				for (auto& job: m_jobs) {
+					if (job.second.name.empty()) continue;  // Job already done
+					name = job.second.name;
+					target = job.first;
+					break;
 				}
 				// If not found, wait for one
 				if (!target) {
@@ -84,7 +85,7 @@ struct Loader {
 			}
 			// Store the result
 			boost::mutex::scoped_lock l(m_mutex);
-			Jobs::iterator it = m_jobs.find(target);
+			auto it = m_jobs.find(target);
 			if (it == m_jobs.end()) continue;  // The job has been removed already
 			it->second.name.clear();  // Mark the job completed
 			it->second.bitmap.swap(bitmap);  // Store the bitmap (if we got any)
@@ -101,7 +102,7 @@ struct Loader {
 	}
 	void apply() {
 		boost::mutex::scoped_lock l(m_mutex);
-		for (Jobs::iterator it = m_jobs.begin(); it != m_jobs.end();) {
+		for (auto it = m_jobs.begin(); it != m_jobs.end();) {
 			{
 				Job& j = it->second;
 				if (!j.name.empty()) { ++it; continue; }  // Job incomplete, skip it
@@ -124,9 +125,7 @@ template <typename T> void loader(T* target, fs::path const& name) {
 	ldr.push(target, Job(name, boost::bind(&T::load, target, _1)));
 }
 
-Texture::Texture(std::string const& filename) { loader(this, filename); }
 Surface::Surface(std::string const& filename) { loader(this, filename); }
-Texture::~Texture() { ldr.remove(this); }
 Surface::~Surface() { ldr.remove(this); }
 
 // Stuff for converting pix::Format into OpenGL enum values
@@ -163,17 +162,21 @@ namespace {
 	GLint internalFormat() { return GL_EXT_framebuffer_sRGB ? GL_SRGB_ALPHA : GL_RGBA; }
 }
 
-void Texture::load(Bitmap const& bitmap) {
-	glutil::GLErrorChecker glerror("Texture::load");
-	m_ar = bitmap.ar;
+void Surface::load(Bitmap const& bitmap) {
+	glutil::GLErrorChecker glerror("Surface::load");
+	// Initialize dimensions
+	m_width = bitmap.width; m_height = bitmap.height;
+	dimensions = Dimensions(bitmap.ar).fixedWidth(1.0f);
+
 	UseTexture texture(*this);
 	// When texture area is small, bilinear filter the closest mipmap
 	glTexParameterf(type(), GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
 	// When texture area is large, bilinear filter the original
 	glTexParameterf(type(), GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	// The texture wraps over at the edges (repeat)
-	glTexParameterf(type(), GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameterf(type(), GL_TEXTURE_WRAP_T, GL_REPEAT);
+	const bool repeating = true;  // FIXME: Make configurable per surface, default to false
+	glTexParameterf(type(), GL_TEXTURE_WRAP_S, repeating ? GL_REPEAT : GL_CLAMP);
+	glTexParameterf(type(), GL_TEXTURE_WRAP_T, repeating ? GL_REPEAT : GL_CLAMP);
 	#ifndef USE_EGL
 	glTexParameterf(type(), GL_TEXTURE_MAX_LEVEL, GLEW_VERSION_3_0 ? 4 : 0);  // Mipmaps currently b0rked on Intel, so disable them...
 	#endif
@@ -183,6 +186,7 @@ void Texture::load(Bitmap const& bitmap) {
 	if (GLEW_EXT_texture_filter_anisotropic) glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16.0f);
 	glerror.check("MAX_ANISOTROPY_EXT");
 
+	// Load the data into texture
 	PixFmt const& f = getPixFmt(bitmap.fmt);
 	#ifndef USE_EGL
 	glPixelStorei(GL_UNPACK_SWAP_BYTES, f.swap);
@@ -192,36 +196,7 @@ void Texture::load(Bitmap const& bitmap) {
 	glGenerateMipmap(type());
 }
 
-// FIXME: Now that Surface uses GL_TEXTURE_2D, we should share more code between Surface and Texture
-void Surface::load(Bitmap const& bitmap) {
-	glutil::GLErrorChecker glerror("Surface::load");
-	// Initialize dimensions
-	m_width = bitmap.width; m_height = bitmap.height;
-	dimensions = Dimensions(bitmap.ar).fixedWidth(1.0f);
-
-	UseTexture texture(m_texture);
-	// When texture area is small, bilinear filter the closest mipmap
-	glTexParameterf(m_texture.type(), GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-	// When texture area is large, bilinear filter the original
-	glTexParameterf(m_texture.type(), GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	// The texture wraps over at the edges (repeat)
-	glTexParameterf(m_texture.type(), GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameterf(m_texture.type(), GL_TEXTURE_WRAP_T, GL_REPEAT);
-	#ifndef USE_EGL
-	glTexParameterf(m_texture.type(), GL_TEXTURE_MAX_LEVEL, GLEW_VERSION_3_0 ? 4 : 0);  // Mipmaps currently b0rked on Intel, so disable them...
-	#endif
-	glerror.check("glTexParameterf");
-
-	// Load the data into texture
-	PixFmt const& f = getPixFmt(bitmap.fmt);
-	#ifndef USE_EGL
-	glPixelStorei(GL_UNPACK_SWAP_BYTES, f.swap);
-	#endif
-	glTexImage2D(m_texture.type(), 0, internalFormat(), bitmap.width, bitmap.height, 0, f.format, f.type, bitmap.data());
-	glGenerateMipmap(m_texture.type());
-}
-
 void Surface::draw() const {
-	if (!empty()) m_texture.draw(dimensions, TexCoords(tex.x1, tex.y1, tex.x2, tex.y2));
+	if (!empty()) draw(dimensions, TexCoords(tex.x1, tex.y1, tex.x2, tex.y2));
 }
 

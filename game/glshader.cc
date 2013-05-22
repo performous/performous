@@ -78,7 +78,7 @@ Shader& Shader::compileCode(std::string const& srccode, GLenum type) {
 	GLenum new_shader = glCreateShader(type);
 	ec.check("glCreateShader");
 	char const* source = srccode.c_str();
-	glShaderSource(new_shader, 1, &source, NULL);
+	glShaderSource(new_shader, 1, &source, nullptr);
 	ec.check("glShaderSource");
 
 	glCompileShader(new_shader);
@@ -128,7 +128,7 @@ Shader& Shader::bind() {
 Uniform Shader::operator[](const std::string& uniform) {
 	bind();
 	// Try to use a cached value
-	UniformMap::iterator it = uniforms.find(uniform);
+	auto it = uniforms.find(uniform);
 	if (it != uniforms.end()) return Uniform(it->second);
 	// Get the value and cache it
 	GLint var = glGetUniformLocation(program, uniform.c_str());

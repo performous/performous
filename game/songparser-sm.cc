@@ -13,9 +13,9 @@ using namespace SongParserUtil;
 /// 'Magick' to check if this file looks like correct format
 bool SongParser::smCheck(std::vector<char> const& data) const {
 	if (data[0] != '#' || data[1] < 'A' || data[1] > 'Z') return false;
-	for (std::vector<char>::const_iterator it = data.begin(); it != data.end(); ++it){
-		if (*it == '\n') return false;
-		else if (*it == ';') return true;
+	for (char ch: data) {
+		if (ch == '\n') return false;
+		if (ch == ';') return true;
 	}
 	return false;
 }
@@ -194,9 +194,9 @@ Notes SongParser::smParseNotes(std::string line) {
 			for (unsigned note = 0; note < div; ++note) {
 				double t = begin + note * step;
 				double phase = double(note) / div;
-				for (DanceChord::iterator it = chords[note].begin(), end = chords[note].end(); it != end; ++it) {
-					int& holdIdx = holdMarks[it->first];  // holdIdx for current arrow
-					Note& n = it->second;
+				for (auto& elem: chords[note]) {
+					int& holdIdx = holdMarks[elem.first];  // holdIdx for current arrow
+					Note& n = elem.second;
 					n.begin = n.end = t;
 					n.phase = phase;
 					// TODO: Proper LIFT handling

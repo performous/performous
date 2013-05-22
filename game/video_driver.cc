@@ -89,7 +89,7 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	SDL_WM_SetCaption(PACKAGE " " VERSION, PACKAGE);
 	{
 		SDL_Surface* icon = SDL_LoadBMP(getThemePath("icon.bmp").c_str());
-		SDL_WM_SetIcon(icon, NULL);
+		SDL_WM_SetIcon(icon, nullptr);
 		SDL_FreeSurface(icon);
 	}
 	// SDL_SetVideoMode not called yet => get the desktop resolution for fs mode
@@ -331,12 +331,8 @@ void Window::resize() {
 		GLattrSetter attr_a(SDL_GL_ALPHA_SIZE, 8);
 		GLattrSetter attr_buf(SDL_GL_BUFFER_SIZE, 32);
 		GLattrSetter attr_d(SDL_GL_DEPTH_SIZE, 24);
-		GLattrSetter attr_s(SDL_GL_STENCIL_SIZE, 8);
+		GLattrSetter attr_s(SDL_GL_STENCIL_SIZE, 0);
 		GLattrSetter attr_db(SDL_GL_DOUBLEBUFFER, 1);
-		GLattrSetter attr_ar(SDL_GL_ACCUM_RED_SIZE, 0);
-		GLattrSetter attr_ag(SDL_GL_ACCUM_GREEN_SIZE, 0);
-		GLattrSetter attr_ab(SDL_GL_ACCUM_BLUE_SIZE, 0);
-		GLattrSetter attr_aa(SDL_GL_ACCUM_ALPHA_SIZE, 0);
 		SDL_FreeSurface(screen);
 		#ifdef USE_EGL
 		std::cout << "Attempting SDL_SetVideoMode" << std::endl;
@@ -380,17 +376,17 @@ void Window::screenshot() {
 ColorTrans::ColorTrans(Color const& c): m_old(g_color) {
 	using namespace glmath;
 	g_color = g_color * mat4::diagonal(c.linear());
-	ScreenManager::getSingletonPtr()->window().updateColor();
+	Game::getSingletonPtr()->window().updateColor();
 }
 
 ColorTrans::ColorTrans(glmath::mat4 const& mat): m_old(g_color) {
 	g_color = g_color * mat;
-	ScreenManager::getSingletonPtr()->window().updateColor();
+	Game::getSingletonPtr()->window().updateColor();
 }
 
 ColorTrans::~ColorTrans() {
 	g_color = m_old;
-	ScreenManager::getSingletonPtr()->window().updateColor();
+	Game::getSingletonPtr()->window().updateColor();
 }
 
 ViewTrans::ViewTrans(double offsetX, double offsetY, double frac): m_old(g_projection) {
@@ -408,27 +404,27 @@ ViewTrans::ViewTrans(double offsetX, double offsetY, double frac): m_old(g_proje
 	// Perspective projection + the rest of the offset in eye (world) space
 	g_projection = frustum(f * x1, f * x2, f * y1, f * y2, near_, far_)
 	  * translate(vec3(offsetX - persX, offsetY - persY, -z0));
-	ScreenManager::getSingletonPtr()->window().updateTransforms();
+	Game::getSingletonPtr()->window().updateTransforms();
 }
 
 ViewTrans::ViewTrans(glmath::mat4 const& m): m_old(g_projection) {
 	g_projection = g_projection * m;
-	ScreenManager::getSingletonPtr()->window().updateTransforms();
+	Game::getSingletonPtr()->window().updateTransforms();
 }
 
 ViewTrans::~ViewTrans() {
 	g_projection = m_old;
-	ScreenManager::getSingletonPtr()->window().updateTransforms();
+	Game::getSingletonPtr()->window().updateTransforms();
 }
 
 Transform::Transform(glmath::mat4 const& m): m_old(g_modelview) {
 	g_modelview = g_modelview * m;
-	ScreenManager::getSingletonPtr()->window().updateTransforms();
+	Game::getSingletonPtr()->window().updateTransforms();
 }
 
 Transform::~Transform() {
 	g_modelview = m_old;
-	ScreenManager::getSingletonPtr()->window().updateTransforms();
+	Game::getSingletonPtr()->window().updateTransforms();
 }
 
 glmath::mat4 farTransform() {

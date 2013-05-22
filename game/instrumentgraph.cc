@@ -44,7 +44,7 @@ InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevicePt
 
 	m_popupText.reset(new SvgTxtThemeSimple(getThemePath("sing_popup_text.svg"), config["graphic/text_lod"].f()));
 	m_menuTheme.reset(new ThemeInstrumentMenu());
-	for (size_t i = 0; i < max_panels; ++i) m_pressed[i] = false;
+	for (auto& elem: m_pressed) elem = false;
 }
 
 InstrumentGraph::~InstrumentGraph() {}  // For destruction of scoped_ptrs (only forward-declared in header)
@@ -90,7 +90,7 @@ void InstrumentGraph::drawMenu() {
 	m_arrow_down.dimensions.stretch(0.05, 0.05);
 	m_arrow_left.dimensions.stretch(0.05, 0.05);
 	m_arrow_right.dimensions.stretch(0.05, 0.05);
-	MenuOptions::const_iterator cur = static_cast<MenuOptions::const_iterator>(&m_menu.current());
+	auto cur = static_cast<MenuOptions::const_iterator>(&m_menu.current());
 	double w = m_menu.dimensions.w();
 	const float s = std::min(m_width.get(), 0.5) / w;
 	Transform trans(glmath::scale(s));  // Fit better menu on screen
@@ -193,7 +193,7 @@ void InstrumentGraph::drawMenu() {
 
 
 void InstrumentGraph::drawPopups() {
-	for (Popups::iterator it = m_popups.begin(); it != m_popups.end(); ) {
+	for (auto it = m_popups.begin(); it != m_popups.end(); ) {
 		if (!it->draw()) { it = m_popups.erase(it); continue; }
 		++it;
 	}

@@ -32,10 +32,10 @@ struct Device {
 	int operator()(void const* input, void* output, unsigned long frames, const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags);
 	/// Returns true if this device is opened for output
 	bool isOutput() const { return outptr != NULL; }
-	/// Returns true if this device has the given mic color assigned
-	bool isMic(std::string mic_id) const {
-		for (std::vector<Analyzer*>::const_iterator it = mics.begin(); it != mics.end(); ++it)
-			if (*it && (*it)->getId() == mic_id) return true;
+	/// Returns true if this device is assigned to the named channel (mic color or "OUT")
+	bool isChannel(std::string const& name) const {
+		if (name == "OUT") return isOutput();
+		for (auto const& m: mics) if (m && m->getId() == name) return true;
 		return false;
 	}
 };

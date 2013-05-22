@@ -10,7 +10,7 @@
 namespace {
 	PangoAlignment parseAlignment(std::string const& fontalign) {
 		if (fontalign == "start") return PANGO_ALIGN_LEFT;
-		if (fontalign == "center") return PANGO_ALIGN_CENTER;
+		if (fontalign == "center" || fontalign == "middle") return PANGO_ALIGN_CENTER;
 		if (fontalign == "end") return PANGO_ALIGN_RIGHT;
 		throw std::logic_error(fontalign + ": Unknown font alignment (opengl_text.cc)");
 	}
@@ -30,7 +30,8 @@ namespace {
 	}
 }
 
-OpenGLText::OpenGLText(TThemeTxtOpenGL& _text, double m) {
+OpenGLText::OpenGLText(TextStyle& _text, double m) {
+	m *= 2.0;  // HACK to improve text quality without affecting compatibility with old versions
 	// Setup font settings
 	PangoAlignment alignment = parseAlignment(_text.fontalign);
 	boost::shared_ptr<PangoFontDescription> desc(
@@ -67,10 +68,11 @@ OpenGLText::OpenGLText(TThemeTxtOpenGL& _text, double m) {
 	boost::shared_ptr<cairo_t> dc(
 	  cairo_create(surface.get()),
 	  cairo_destroy);
+	// Keep things sharp and fast, we scale with OpenGL anyway...
+	cairo_set_antialias(dc.get(), CAIRO_ANTIALIAS_NONE);
 	// Add Pango line and path to proper position on the DC
 	cairo_move_to(dc.get(), 0.5 * border, 0.5 * border);  // Margins needed for border stroke to fit in
 	pango_cairo_update_layout(dc.get(), layout.get());
-	pango_cairo_show_layout(dc.get(), layout.get());
 	pango_cairo_layout_path(dc.get(), layout.get());
 	// Render text
 	if (_text.fill_col.a > 0.0) {
@@ -105,63 +107,65 @@ void OpenGLText::draw(Dimensions &_dim, TexCoords &_tex) {
 	m_surface.draw();
 }
 
-void parseTheme( std::string _theme_file, TThemeTxtOpenGL &_theme, double &_width, double &_height, double &_x, double &_y, SvgTxtTheme::Align& _align) {
-	// this should stay here for the moment
-	_theme.fontalign = "center";
-
-	xmlpp::Node::PrefixNsMap nsmap;
-	nsmap["svg"] = "http://www.w3.org/2000/svg";
-	xmlpp::DomParser dom(_theme_file);
-	xmlpp::NodeSet n;
-
-	n = dom.get_document()->get_root_node()->find("/svg:svg/@width",nsmap);
-	if (n.empty()) throw std::runtime_error("Unable to find text theme info width in "+_theme_file);
-	xmlpp::Attribute& width = dynamic_cast<xmlpp::Attribute&>(*n[0]);
-	_width = boost::lexical_cast<double>(width.get_value());
-	n = dom.get_document()->get_root_node()->find("/svg:svg/@height",nsmap);
-	if (n.empty()) throw std::runtime_error("Unable to find text theme info height in "+_theme_file);
-	xmlpp::Attribute& height = dynamic_cast<xmlpp::Attribute&>(*n[0]);
-	_height = boost::lexical_cast<double>(height.get_value());
-
-	n = dom.get_document()->get_root_node()->find("/svg:svg//svg:text/@style",nsmap);
-	if (n.empty()) throw std::runtime_error("Unable to find text theme info style in "+_theme_file);
-	xmlpp::Attribute& style = dynamic_cast<xmlpp::Attribute&>(*n[0]);
-	std::istringstream iss(style.get_value());
-	std::string token;
-	while (std::getline(iss, token, ';')) {
-		std::istringstream iss2(token);
-		std::getline(iss2, token, ':');
-		if (token == "font-size") iss2 >> _theme.fontsize;
-		else if (token == "font-family") std::getline(iss2, _theme.fontfamily);
-		else if (token == "font-style") std::getline(iss2, _theme.fontstyle);
-		else if (token == "font-weight") std::getline(iss2, _theme.fontweight);
-		else if (token == "stroke-width") iss2 >> _theme.stroke_width;
-		else if (token == "stroke-opacity") iss2 >> _theme.stroke_col.a;
-		else if (token == "fill-opacity") iss2 >> _theme.fill_col.a;
-		else if (token == "fill") _theme.fill_col = getColor(iss2);
-		else if (token == "stroke") _theme.stroke_col = getColor(iss2);
-		else if (token == "text-anchor") {
-			std::string value;
-			std::getline(iss2, value);
-			if (value == "start") _align = SvgTxtTheme::LEFT;
-			else if (value == "middle") _align = SvgTxtTheme::CENTER;
-			else if (value == "end") _align = SvgTxtTheme::RIGHT;
+namespace {
+	void parseTheme( std::string _theme_file, TextStyle &_theme, double &_width, double &_height, double &_x, double &_y, SvgTxtTheme::Align& _align) {
+		xmlpp::Node::PrefixNsMap nsmap;
+		nsmap["svg"] = "http://www.w3.org/2000/svg";
+		xmlpp::DomParser dom(_theme_file);
+		xmlpp::NodeSet n;
+		// Parse width attribute
+		n = dom.get_document()->get_root_node()->find("/svg:svg/@width",nsmap);
+		if (n.empty()) throw std::runtime_error("Unable to find text theme info width in "+_theme_file);
+		xmlpp::Attribute& width = dynamic_cast<xmlpp::Attribute&>(*n[0]);
+		_width = boost::lexical_cast<double>(width.get_value());
+		// Parse height attribute
+		n = dom.get_document()->get_root_node()->find("/svg:svg/@height",nsmap);
+		if (n.empty()) throw std::runtime_error("Unable to find text theme info height in "+_theme_file);
+		xmlpp::Attribute& height = dynamic_cast<xmlpp::Attribute&>(*n[0]);
+		_height = boost::lexical_cast<double>(height.get_value());
+		// Parse text style attribute (CSS rules)
+		n = dom.get_document()->get_root_node()->find("/svg:svg//svg:text/@style",nsmap);
+		if (n.empty()) throw std::runtime_error("Unable to find text theme info style in "+_theme_file);
+		xmlpp::Attribute& style = dynamic_cast<xmlpp::Attribute&>(*n[0]);
+		std::istringstream iss(style.get_value());
+		std::string token;
+		while (std::getline(iss, token, ';')) {
+			std::istringstream iss2(token);
+			std::getline(iss2, token, ':');
+			if (token == "font-size") iss2 >> _theme.fontsize;
+			else if (token == "font-family") std::getline(iss2, _theme.fontfamily);
+			else if (token == "font-style") std::getline(iss2, _theme.fontstyle);
+			else if (token == "font-weight") std::getline(iss2, _theme.fontweight);
+			else if (token == "stroke-width") iss2 >> _theme.stroke_width;
+			else if (token == "stroke-opacity") iss2 >> _theme.stroke_col.a;
+			else if (token == "fill-opacity") iss2 >> _theme.fill_col.a;
+			else if (token == "fill") _theme.fill_col = getColor(iss2);
+			else if (token == "stroke") _theme.stroke_col = getColor(iss2);
+			else if (token == "text-anchor") {
+				std::string value;
+				std::getline(iss2, value);
+				_theme.fontalign = value;
+				if (value == "start") _align = SvgTxtTheme::LEFT;
+				else if (value == "middle") _align = SvgTxtTheme::CENTER;
+				else if (value == "end") _align = SvgTxtTheme::RIGHT;
+			}
 		}
+		// Parse x and y attributes
+		n = dom.get_document()->get_root_node()->find("/svg:svg//svg:text/@x",nsmap);
+		if (n.empty()) throw std::runtime_error("Unable to find text theme info x in "+_theme_file);
+		xmlpp::Attribute& x = dynamic_cast<xmlpp::Attribute&>(*n[0]);
+		_x = boost::lexical_cast<double>(x.get_value());
+		n = dom.get_document()->get_root_node()->find("/svg:svg//svg:text/@y",nsmap);
+		if (n.empty()) throw std::runtime_error("Unable to find text theme info y in "+_theme_file);
+		xmlpp::Attribute& y = dynamic_cast<xmlpp::Attribute&>(*n[0]);
+		_y = boost::lexical_cast<double>(y.get_value());
 	}
-
-	n = dom.get_document()->get_root_node()->find("/svg:svg//svg:text/@x",nsmap);
-	if (n.empty()) throw std::runtime_error("Unable to find text theme info x in "+_theme_file);
-	xmlpp::Attribute& x = dynamic_cast<xmlpp::Attribute&>(*n[0]);
-	_x = boost::lexical_cast<double>(x.get_value());
-	n = dom.get_document()->get_root_node()->find("/svg:svg//svg:text/@y",nsmap);
-	if (n.empty()) throw std::runtime_error("Unable to find text theme info y in "+_theme_file);
-	xmlpp::Attribute& y = dynamic_cast<xmlpp::Attribute&>(*n[0]);
-	_y = boost::lexical_cast<double>(y.get_value());
 }
 
 SvgTxtThemeSimple::SvgTxtThemeSimple(std::string _theme_file, double factor) : m_factor(factor) {
 	SvgTxtTheme::Align a;
-	parseTheme(_theme_file, m_text, m_width, m_height, m_x, m_y, a);
+	double tmp;
+	parseTheme(_theme_file, m_text, tmp, tmp, tmp, tmp, a);
 }
 
 void SvgTxtThemeSimple::render(std::string _text) {
@@ -190,9 +194,9 @@ void SvgTxtTheme::setHighlight(std::string _theme_file) {
 void SvgTxtTheme::draw(std::vector<std::string> const& _text) {
 	std::vector<TZoomText> tmp;
 
-	for (std::vector<std::string>::const_iterator it = _text.begin(); it != _text.end(); ++it) {
+	for (auto const& str: _text) {
 		TZoomText t;
-		t.string = *it;
+		t.string = str;
 		t.factor = 1.0;
 		tmp.push_back(t);
 	}
@@ -211,13 +215,13 @@ void SvgTxtTheme::draw(std::string _text) {
 
 void SvgTxtTheme::draw(std::vector<TZoomText> const& _text) {
 	std::string tmp;
-	for (unsigned int i = 0 ; i < _text.size(); i++ ) tmp += _text[i].string;
+	for (auto& zt: _text) tmp += zt.string;
 
 	if (m_opengl_text.size() != _text.size() || m_cache_text != tmp) {
 		m_cache_text = tmp;
 		m_opengl_text.clear();
-		for (unsigned int i = 0; i < _text.size(); i++ ) {
-			m_text.text = _text[i].string;
+		for (auto& zt: _text) {
+			m_text.text = zt.string;
 			m_opengl_text.push_back(new OpenGLText(m_text, m_factor));
 		}
 	}

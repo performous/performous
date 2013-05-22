@@ -35,6 +35,8 @@ class Song: boost::noncopyable {
 	void reload(bool errorIgnore = true);
 	/// parse field
 	bool parseField(std::string const& line);
+	/// Load notes (when only header has been loaded)
+	void loadNotes(bool errorIgnore = true);
 	/// drop notes (to conserve memory), but keep info about available tracks
 	void dropNotes();
 	/** Get formatted song label. **/
@@ -88,6 +90,7 @@ class Song: boost::noncopyable {
 	bool hasKeyboard() const { return instrumentTracks.find(TrackName::KEYBOARD) != instrumentTracks.end(); }
 	bool hasGuitars() const { return instrumentTracks.size() - hasDrums() - hasKeyboard(); }
 	bool hasVocals() const { return !vocalTracks.empty(); }
+	bool hasDuet() const { return vocalTracks.size() > 1; }
 	bool hasControllers() const { return !danceTracks.empty() || !instrumentTracks.empty(); }
 	std::string path; ///< path of songfile
 	std::string filename; ///< name of songfile

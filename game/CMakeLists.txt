@@ -148,13 +148,25 @@ if(UNIX)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
 endif(UNIX)
 
-if(MSVC)
+if(MXE_HACK)
+	execute_process(COMMAND "${CMAKE_SOURCE_DIR}/win32/mxe/libs.sh"
+		OUTPUT_VARIABLE MXE_HACK_STRING
+	)
+	set(CMAKE_CXX_LINK_EXECUTABLE ${CMAKE_CXX_LINK_EXECUTABLE}${MXE_HACK_STRING})
+	add_definitions(-DBOOST_THREAD_USE_LIB -DGLEW_STATIC)
+endif()
+
+add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL_SOURCES} ${RESOURCE_OBJECT})
+target_link_libraries(performous ${LIBS})
+
+if(WIN32)
 	set(SUBSYSTEM_WIN32 WIN32)
 	add_executable(performous-cmd "windows-cmd.cpp")
 	install(TARGETS performous-cmd DESTINATION bin)
-endif(MSVC)
-add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL_SOURCES} ${RESOURCE_OBJECT})
-target_link_libraries(performous ${LIBS})
+	# Capitalized exe names are more beautiful on Windows
+	set_target_properties(performous-cmd PROPERTIES OUTPUT_NAME "Performous-cmd")
+	set_target_properties(performous PROPERTIES OUTPUT_NAME "Performous")
+endif(WIN32)
 
 # Store library paths in executable
 if(APPLE)

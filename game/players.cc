@@ -24,8 +24,8 @@ Players::~Players()
 { }
 
 void Players::load(xmlpp::NodeSet const& n) {
-	for (xmlpp::NodeSet::const_iterator it = n.begin(); it != n.end(); ++it) {
-		xmlpp::Element& element = dynamic_cast<xmlpp::Element&>(**it);
+	for (auto const& elem: n) {
+		xmlpp::Element& element = dynamic_cast<xmlpp::Element&>(*elem);
 		xmlpp::Attribute* a_name = element.get_attribute("name");
 		if (!a_name) throw PlayersException("Attribute name not found");
 		xmlpp::Attribute* a_id = element.get_attribute("id");
@@ -45,14 +45,14 @@ void Players::load(xmlpp::NodeSet const& n) {
 }
 
 void Players::save(xmlpp::Element *players) {
-	for (players_t::const_iterator it = m_players.begin(); it!=m_players.end(); ++it) {
+	for (auto const& p: m_players) {
 		xmlpp::Element* player = players->add_child("player");
-		player->set_attribute("name", it->name);
-		player->set_attribute("id", boost::lexical_cast<std::string>(it->id));
-		if (it->picture != "")
+		player->set_attribute("name", p.name);
+		player->set_attribute("id", boost::lexical_cast<std::string>(p.id));
+		if (p.picture != "")
 		{
 			xmlpp::Element* picture = player->add_child("picture");
-			picture->add_child_text(it->picture);
+			picture->add_child_text(p.picture);
 		}
 	}
 }
@@ -62,8 +62,8 @@ void Players::update() {
 }
 
 int Players::lookup(std::string const& name) const {
-	for (players_t::const_iterator it = m_players.begin(); it != m_players.end(); ++it) {
-		if (it->name == name) return it->id;
+	for (auto const& p: m_players) {
+		if (p.name == name) return p.id;
 	}
 
 	return -1;
@@ -72,7 +72,7 @@ int Players::lookup(std::string const& name) const {
 std::string Players::lookup(int id) const {
 	PlayerItem pi;
 	pi.id = id;
-	players_t::const_iterator it = m_players.find(pi);
+	auto it = m_players.find(pi);
 	if (it == m_players.end()) return "Unkown Player";
 	else return it->name;
 }
@@ -113,7 +113,7 @@ void Players::setFilter(std::string const& val) {
 }
 
 int Players::assign_id_internal() {
-	players_t::const_reverse_iterator it = m_players.rbegin();
+	auto it = m_players.rbegin();
 	if (it != m_players.rend()) return it->id+1;
 	else return 1; // empty set
 }
@@ -124,8 +124,8 @@ void Players::filter_internal() {
 
 	try {
 		fplayers_t filtered;
-		for (players_t::const_iterator it = m_players.begin(); it != m_players.end(); ++it) {
-			if (regex_search(it->name, boost::regex(m_filter, boost::regex_constants::icase))) filtered.push_back(*it);
+		for (auto const& p: m_players) {
+			if (regex_search(p.name, boost::regex(m_filter, boost::regex_constants::icase))) filtered.push_back(p);
 		}
 		m_filtered.swap(filtered);
 	} catch (...) {
@@ -136,7 +136,7 @@ void Players::filter_internal() {
 	// Restore old selection
 	int pos = 0;
 	if (selection.name != "") {
-		fplayers_t::iterator it = std::find(m_filtered.begin(), m_filtered.end(), selection);
+		auto it = std::find(m_filtered.begin(), m_filtered.end(), selection);
 		math_cover.setTarget(0, 0);
 		if (it != m_filtered.end()) pos = it - m_filtered.begin();
 	}

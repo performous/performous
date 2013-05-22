@@ -18,8 +18,11 @@ varying vec4 color;
 varying vec3 lightDir;
 #endif
 
-#ifdef ENABLE_TEXTURING
+#if defined(ENABLE_TEXTURING) || defined(ENABLE_SPECULAR_MAP) || defined(ENABLE_EMISSION_MAP)
 varying vec4 texCoord;
+#endif
+
+#ifdef ENABLE_TEXTURING
 #if ENABLE_TEXTURING == 1 && !defined(GL_ES)
 uniform sampler2DRect tex;
 #define TEXFUNC texture2DRect(tex, texCoord.st)
@@ -34,6 +37,15 @@ uniform sampler2D tex;
 #ifndef TEXFUNC
 #define TEXFUNC vec4(1,1,1,1)
 #endif
+
+#ifdef ENABLE_SPECULAR_MAP
+uniform sampler2D specularTex;
+#endif
+
+#ifdef ENABLE_EMISSION_MAP
+uniform sampler2D emissionTex;
+#endif
+
 
 void main() {
 	vec4 frag = TEXFUNC;
@@ -66,8 +78,15 @@ void main() {
 	float spec = dot(refl, n);
 	if (power > 0.0) {
 		power *= pow(spec, 100.0);
+		#ifdef ENABLE_SPECULAR_MAP
+		power *= texture2D(specularTex, texCoord.st);
+		#endif
 		frag.rgb += vec3(power, power, power);
 	}
+
+	#ifdef ENABLE_EMISSION_MAP
+	frag.xyz += texture2D(emissionTex, texCoord.st);
+	#endif
 #endif
 
 	gl_FragColor = frag;

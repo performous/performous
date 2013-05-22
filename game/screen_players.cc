@@ -1,4 +1,5 @@
 #include "screen_players.hh"
+#include "screen_songs.hh"
 
 #include "configuration.hh"
 #include "audio.hh"
@@ -30,6 +31,9 @@ void ScreenPlayers::enter() {
 	m_search.text.clear();
 	m_players.setFilter(m_search.text);
 	m_audio.fadeout();
+	if (m_database.scores.empty() || !m_database.reachedHiscore(m_song)) {
+		Game::getSingletonPtr()->activateScreen("Playlist");
+	}
 }
 
 void ScreenPlayers::exit() {
@@ -47,10 +51,10 @@ void ScreenPlayers::exit() {
 }
 
 void ScreenPlayers::manageEvent(input::NavEvent const& event) {
-	ScreenManager* sm = ScreenManager::getSingletonPtr();
+	Game* gm = Game::getSingletonPtr();
 	input::NavButton nav = event.button;
 	if (nav == input::NAV_CANCEL) {
-		if (m_search.text.empty()) { sm->activateScreen("Songs"); return; }
+		if (m_search.text.empty()) { gm->activateScreen("Songs"); return; }
 		else { m_search.text.clear(); m_players.setFilter(m_search.text); }
 	} else if (nav == input::NAV_START) {
 		if (m_players.empty()) {
@@ -64,7 +68,7 @@ void ScreenPlayers::manageEvent(input::NavEvent const& event) {
 
 		if (m_database.scores.empty() || !m_database.reachedHiscore(m_song)) {
 			// no more highscore, we are now finished
-			sm->activateScreen("Songs");
+			gm->activateScreen("Playlist");
 		} else {
 			m_search.text.clear();
 			m_players.setFilter("");
@@ -115,6 +119,8 @@ void ScreenPlayers::draw() {
 			oss_song << _("Press enter to create player!");
 			oss_order << m_search.text << '\n';
 		}
+	} else if (m_database.scores.empty()) {
+		oss_song << _("No players worth mentioning!");
 	} else {
 		// Format the player information text
 		oss_song << m_database.scores.front().track << '\n';
@@ -136,7 +142,7 @@ void ScreenPlayers::draw() {
 		for (int i = -2; i < 5; ++i) {
 			PlayerItem player_display = m_players[baseidx + i];
 			if (baseidx + i < 0 || baseidx + i >= int(ss)) continue;
-			Surface* cover = 0;
+			Surface* cover = nullptr;
 			if (player_display.path != "")
 			{
 				try { cover = &m_covers[player_display.path]; }

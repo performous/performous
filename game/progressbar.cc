@@ -5,7 +5,7 @@
 #include <stdexcept>
 
 ProgressBar::ProgressBar(std::string const& bg, std::string const& bar, Mode mode, float begin, float end, bool sliding):
-  m_bg(bg), m_bar(bar), m_mode(mode), m_begin(begin), m_end(end), m_sliding(sliding), dimensions(m_bg.ar())
+  m_bg(bg), m_bar(bar), m_mode(mode), m_begin(begin), m_end(end), m_sliding(sliding), dimensions(m_bg.dimensions)
 {}
 
 void ProgressBar::draw(float value) {
@@ -41,5 +41,5 @@ void ProgressBar::draw(float value) {
 	  default: throw std::logic_error("ProgressBar::draw(): unknown m_mode value");
 	}
 	// Reset dimensions due to async image loading
-	dimensions = Dimensions(m_bg.ar());
+	dimensions = m_bg.dimensions;
 }
