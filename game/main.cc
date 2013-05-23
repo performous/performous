@@ -190,6 +190,7 @@ void mainLoop(std::string const& songlist) {
 			gm.updateScreen();  // exit/enter, any exception is fatal error
 			if (benchmarking) prof("misc");
 			try {
+				window.blank();
 				// Draw
 				window.render(boost::bind(&Game::drawScreen, &gm));
 				if (benchmarking) { glFinish(); prof("draw"); }
