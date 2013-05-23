@@ -228,7 +228,7 @@ void ScreenSongs::drawJukebox() {
 		// Draw the cover
 		Surface* cover = NULL;
 		if (!song.cover.empty()) try { cover = &m_covers[song.cover]; } catch (std::exception const&) {}
-		if (cover) {
+		if (cover && !cover->empty()) {
 			Surface& s = *cover;
 			s.dimensions.left(theme->song.dimensions.x1()).top(theme->song.dimensions.y2() + 0.05).fitInside(0.15, 0.15);
 			s.draw();
@@ -387,7 +387,9 @@ void ScreenSongs::drawCovers() {
 Surface& ScreenSongs::getCover(Song const& song) {
 	Surface* cover = nullptr;
 	// Fetch cover image from cache or try loading it
-	if (!song.cover.empty()) try { cover = &m_covers[song.cover]; } catch (std::exception const&) {cover = nullptr;}
+	if (!song.cover.empty()) try { cover = &m_covers[song.cover]; } catch (std::exception const&) {}
+	// Fallback to background image as cover if needed
+	if (!cover && !song.background.empty()) try { cover = &m_covers[song.background]; } catch (std::exception const&) {}
 	// Use empty cover
 	if (!cover) {
 		if(song.hasDance()) {
