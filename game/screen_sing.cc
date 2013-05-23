@@ -51,7 +51,7 @@ void ScreenSing::enter() {
 	// Load video
 	gm->loading(_("Loading video..."), 0.2);
 	if (!m_song->video.empty() && config["graphic/video"].b()) {
-		m_video.reset(new Video(m_song->path + m_song->video, m_song->videoGap));
+		m_video.reset(new Video(m_song->video, m_song->videoGap));
 	}
 	boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
 	reloadGL();
@@ -138,7 +138,7 @@ void ScreenSing::reloadGL() {
 	m_help.reset(new Surface(getThemePath("instrumenthelp.svg")));
 	m_progress.reset(new ProgressBar(getThemePath("sing_progressbg.svg"), getThemePath("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01f, 0.01f, true));
 	// Load background
-	if (!m_song->background.empty()) m_background.reset(new Surface(m_song->path + m_song->background));
+	if (!m_song->background.empty()) m_background.reset(new Surface(m_song->background));
 }
 
 void ScreenSing::exit() {

@@ -43,7 +43,7 @@ class MidiFileParser{
 	 *
 	 * @param name Name of midifile, which want to be read
 	 */
-	MidiFileParser(std::string name);
+	MidiFileParser(char const* name);
 
 	struct TempoChange {
 		uint32_t miditime;

@@ -2,11 +2,13 @@
 
 #include "notes.hh"
 #include "i18n.hh"
-#include <boost/noncopyable.hpp>
+#include <boost/filesystem/path.hpp>
 #include <boost/foreach.hpp>
-
+#include <boost/noncopyable.hpp>
 #include <stdexcept>
 #include <string>
+
+namespace fs = boost::filesystem;  // Used globally in Performous
 
 class SongParser;
 
@@ -30,7 +32,7 @@ class Song: boost::noncopyable {
 	VocalTracks vocalTracks; ///< notes for the sing part
 	VocalTrack dummyVocal; ///< notes for the sing part
 	/// constructor
-	Song(std::string const& path_, std::string const& filename_): dummyVocal(TrackName::LEAD_VOCAL), path(path_), filename(filename_) { reload(false); }
+	Song(fs::path const& path_, fs::path const& filename_): dummyVocal(TrackName::LEAD_VOCAL), path(path_), filename(filename_) { reload(false); }
 	/// reload song
 	void reload(bool errorIgnore = true);
 	/// parse field
@@ -42,7 +44,7 @@ class Song: boost::noncopyable {
 	/** Get formatted song label. **/
 	std::string str() const { return title + "  by  " + artist; }
 	/** Get full song information (used by the search function). **/
-	std::string strFull() const { return title + "\n" + artist + "\n" + genre + "\n" + edition + "\n" + path; }
+	std::string strFull() const { return title + "\n" + artist + "\n" + genre + "\n" + edition + "\n" + path.string(); }
 	/// Is the song parsed from the file yet?
 	enum LoadStatus { NONE, HEADER, FULL } loadStatus;
 	/// status of song
@@ -92,9 +94,9 @@ class Song: boost::noncopyable {
 	bool hasVocals() const { return !vocalTracks.empty(); }
 	bool hasDuet() const { return vocalTracks.size() > 1; }
 	bool hasControllers() const { return !danceTracks.empty() || !instrumentTracks.empty(); }
-	std::string path; ///< path of songfile
-	std::string filename; ///< name of songfile
-	std::string midifilename; ///< name of midi file in FoF format
+	fs::path path; ///< path of songfile
+	fs::path filename; ///< name of songfile
+	fs::path midifilename; ///< name of midi file in FoF format
 	std::vector<std::string> category; ///< category of song
 	std::string genre; ///< genre
 	std::string edition; ///< license
@@ -103,11 +105,11 @@ class Song: boost::noncopyable {
 	std::string text; ///< songtext
 	std::string creator; ///< creator
 	std::string language; ///< language
-	typedef std::map<std::string,std::string> Music;
+	typedef std::map<std::string, fs::path> Music;
 	Music music; ///< music files (background, guitar, rhythm/bass, drums, vocals)
-	std::string cover; ///< cd cover
-	std::string background; ///< background image
-	std::string video; ///< video
+	fs::path cover; ///< cd cover
+	fs::path background; ///< background image
+	fs::path video; ///< video
 	/// Variables used for comparisons (sorting)
 	std::string collateByTitle;
 	std::string collateByTitleOnly;
@@ -144,15 +146,15 @@ static inline bool operator<(Song const& l, Song const& r) { return l.collateByA
 /// Thrown by SongParser when there is an error
 struct SongParserException: public std::runtime_error {
 	/// constructor
-	SongParserException(Song& s, std::string const& msg, unsigned int linenum, bool sil = false): runtime_error(msg), m_filename(s.path + s.filename), m_linenum(linenum), m_silent(sil) {
+	SongParserException(Song& s, std::string const& msg, unsigned int linenum, bool sil = false): runtime_error(msg), m_filename(s.filename), m_linenum(linenum), m_silent(sil) {
 		if (!sil) s.b0rked += msg + '\n';
 	}
 	~SongParserException() throw() {}
-	std::string const& file() const { return m_filename; } ///< file in which the error occured
+	fs::path const& file() const { return m_filename; } ///< file in which the error occured
 	unsigned int line() const { return m_linenum; } ///< line in which the error occured
 	bool silent() const { return m_silent; } ///< if the error should not be printed to user (file skipped)
 private:
-	std::string m_filename;
+	fs::path m_filename;
 	unsigned int m_linenum;
 	bool m_silent;
 };

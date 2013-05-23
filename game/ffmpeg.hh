@@ -4,6 +4,7 @@
 #include "util.hh"
 #include "libda/sample.hpp"
 #include <boost/circular_buffer.hpp>
+#include <boost/filesystem/path.hpp>
 #include <boost/ptr_container/ptr_deque.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/condition.hpp>
@@ -12,6 +13,8 @@
 #include <boost/thread/thread.hpp>
 #include <vector>
 #include <iostream>
+
+namespace fs = boost::filesystem;
 
 using boost::uint8_t;
 using boost::int16_t;
@@ -170,7 +173,7 @@ extern "C" {
 class FFmpeg {
   public:
 	/// Decode file; if no rate is specified, decode video, otherwise decode audio.
-	FFmpeg(std::string const& file, unsigned int rate = 0);
+	FFmpeg(fs::path const& file, unsigned int rate = 0);
 	~FFmpeg();
 	void operator()(); ///< Thread runs here, don't call directly
 	unsigned width, ///< width of video
@@ -192,7 +195,7 @@ class FFmpeg {
 	void decodePacket();
 	void processVideo(AVFrame* frame);
 	void processAudio(AVFrame* frame);
-	std::string m_filename;
+	fs::path m_filename;
 	unsigned int m_rate;
 	volatile bool m_quit;
 	volatile double m_seekTarget;

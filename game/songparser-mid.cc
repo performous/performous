@@ -57,7 +57,7 @@ namespace {
 void SongParser::midParseHeader() {
 	Song& s = m_song;
 	// Parse tracks from midi
-	MidiFileParser midi(s.path + "/" + s.midifilename);
+	MidiFileParser midi(s.midifilename.c_str());
 	for (MidiFileParser::Tracks::const_iterator it = midi.tracks.begin(); it != midi.tracks.end(); ++it) {
 		// Figure out the track name
 		std::string name = it->name;
@@ -80,7 +80,7 @@ void SongParser::midParse() {
 	Song& s = m_song;
 	s.instrumentTracks.clear();
 
-	MidiFileParser midi(s.path + "/" + s.midifilename);
+	MidiFileParser midi(s.midifilename.c_str());
 	int reversedNoteCount = 0;
 	for (uint32_t ts = 0, end = midi.ts_last + midi.division; ts < end; ts += midi.division) s.beats.push_back(midi.get_seconds(ts)+s.start);
 	for (MidiFileParser::Tracks::const_iterator it = midi.tracks.begin(); it != midi.tracks.end(); ++it) {

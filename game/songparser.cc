@@ -56,7 +56,7 @@ SongParser::SongParser(Song& s) try:
 	enum { NONE, TXT, XML, INI, SM } type = NONE;
 	// Read the file, determine the type and do some initial validation checks
 	{
-		std::ifstream f((s.path + s.filename).c_str(), std::ios::binary);
+		std::ifstream f(s.filename.c_str(), std::ios::binary);
 		if (!f.is_open()) throw SongParserException(s, "Could not open song file", 0);
 		f.seekg(0, std::ios::end);
 		size_t size = f.tellg();
@@ -71,7 +71,8 @@ SongParser::SongParser(Song& s) try:
 		else throw SongParserException(s, "Does not look like a song file (wrong header)", 1, true);
 		m_ss.write(&data[0], size);
 	}
-	convertToUTF8(m_ss, s.path + s.filename);
+	// Convert m_ss; filename supplied for possible warning messages
+	convertToUTF8(m_ss, s.filename.string());
 	// Header already parsed?
 	if (s.loadStatus == Song::HEADER) {
 		if (type == TXT) txtParse();
@@ -101,7 +102,7 @@ SongParser::SongParser(Song& s) try:
 
 void SongParser::guessFiles() {
 	// List of fields containing filenames, and auto-matching regexps
-	std::vector<std::pair<std::string*, char const*>> fields = {
+	std::vector<std::pair<fs::path*, char const*>> fields = {
 		{ &m_song.cover, R"((cover|album|label|\[co\])\.(png|jpeg|jpg|svg)$)" },
 		{ &m_song.background, R"(\.(png|jpeg|jpg|svg)$)" },
 		{ &m_song.video, R"(\.(avi|mpg|mpeg|flv|mov|mp4)$)" },
@@ -116,12 +117,12 @@ void SongParser::guessFiles() {
 	std::vector<boost::regex> regexps;
 	bool missing = false;
 	for (auto const& p: fields) {
-		std::string name = m_song.path + *p.first;
-		if (!fs::exists(name)) {
-			p.first->clear();
-			logMissing += " \"" + name + "\"";
+		fs::path& file = *p.first;
+		if (!file.empty() && !is_regular_file(file)) {
+			logMissing += " \"" + file.filename().string() + "\"";
+			file.clear();
 		}
-		if (p.first->empty()) missing = true;
+		if (file.empty()) missing = true;
 		regexps.emplace_back(p.second, boost::regex_constants::icase);
 	}
 
@@ -134,18 +135,46 @@ void SongParser::guessFiles() {
 			auto& field = *fields[i].first;
 			if (!field.empty()) continue;  // Valid filename is already known
 			if (!regex_search(name, regexps[i])) continue;  // No match for current file
-			field = name;
-			logFound += " \"" + field + "\"";
+			field = dirIt->path();
+			logFound += " \"" + name + "\"";
 			goto next_file;  // Necessary for intelligent cover/bg detection
 		}
 		next_file:;
 	}
 	
 	if (logFound.empty() && logMissing.empty()) return;
-	std::clog << "songparser/info: \"" + m_song.path + "\":";
+	std::clog << "songparser/warning: \"" + m_song.path.string() + "\":";
 	if (!logMissing.empty()) std::clog << logMissing + " not found  ";
 	if (!logFound.empty()) std::clog << logFound + " autodetected";
 	std::clog << std::endl;
+
+/*
+	// Search the dir for the music files
+	for (boost::filesystem::directory_iterator dirIt(s.path), dirEnd; dirIt != dirEnd; ++dirIt) {
+		boost::filesystem::path p = dirIt->path();
+		std::string name = p.filename().string(); // File basename (notes.txt)
+		if (regex_match(name.c_str(), match, midifile)) {
+			 s.midifilename = name;
+		} else if (regex_match(name.c_str(), match, audiofile_background)) {
+			testAndAdd(s, "background", name);
+		} else if (regex_match(name.c_str(), match, audiofile_guitar)) {
+			testAndAdd(s, TrackName::GUITAR, name);
+		} else if (regex_match(name.c_str(), match, audiofile_bass)) {
+			testAndAdd(s, TrackName::BASS, name);
+		} else if (regex_match(name.c_str(), match, audiofile_keyboard)) {
+			testAndAdd(s, TrackName::KEYBOARD, name);
+		} else if (regex_match(name.c_str(), match, audiofile_drums)) {
+			testAndAdd(s, TrackName::DRUMS, name);
+		} else if (regex_match(name.c_str(), match, audiofile_vocals)) {
+			testAndAdd(s, "vocals", name);
+#if 0  // TODO: process preview.ogg properly? In any case, do not print debug to console...
+		} else if (regex_match(name.c_str(), match, audiofile_other)) {
+			std::cout << "Found unknown ogg file: " << name << std::endl;
+#endif
+		}
+	}
+*/
+
 }
 
 void SongParser::resetNoteParsingState() {

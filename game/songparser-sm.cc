@@ -38,10 +38,6 @@ void SongParser::smParseHeader() {
 	while (getline(line) && smParseField(line)) {}
 	if (m_song.danceTracks.empty() ) throw std::runtime_error("No note data in the file");
 	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
-	std::string& music = s.music["background"];
-	std::string tmp = s.path + "music.ogg";
-	namespace fs = boost::filesystem;
-	if ((music.empty() || !fs::exists(music)) && fs::exists(tmp)) music = tmp;
 	// Convert stops to the format required in Song
 	s.stops.resize(m_stops.size());
 	for (std::size_t i = 0; i < m_stops.size(); ++i) s.stops[i] = stopConvert(m_stops[i]);
@@ -126,7 +122,7 @@ bool SongParser::smParseField(std::string line) {
 	if (key == "TITLE") m_song.title = value.substr(value.find_first_not_of(" :"));
 	else if (key == "ARTIST") m_song.artist = value.substr(value.find_first_not_of(" "));
 	else if (key == "BANNER") m_song.cover = value;
-	else if (key == "MUSIC") m_song.music["background"] = m_song.path + value;
+	else if (key == "MUSIC") m_song.music["background"] = fs::absolute(value, m_song.path);
 	else if (key == "BACKGROUND") m_song.background = value;
 	else if (key == "OFFSET") { assign(m_gap, value); m_gap *= -1; }
 	else if (key == "SAMPLESTART") assign(m_song.preview_start, value);

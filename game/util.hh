@@ -1,7 +1,10 @@
 #pragma once
 
+#include <boost/filesystem/path.hpp>
 #include <limits>
 #include <stdexcept>
+
+namespace fs = boost::filesystem;
 
 #if 0  // We don't need the following in C++11 mode
 

@@ -34,7 +34,7 @@ namespace {
 }
 
 
-FFmpeg::FFmpeg(std::string const& _filename, unsigned int rate):
+FFmpeg::FFmpeg(fs::path const& _filename, unsigned int rate):
   width(), height(), m_filename(_filename), m_rate(rate), m_quit(),
   m_seekTarget(getNaN()), m_position(), m_duration(), m_streamId(-1),
   m_mediaType(rate ? AVMEDIA_TYPE_AUDIO : AVMEDIA_TYPE_VIDEO),
