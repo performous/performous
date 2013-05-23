@@ -8,6 +8,7 @@
 #include "profiler.hh"
 
 #include <boost/bind.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
@@ -60,7 +61,6 @@ void Songs::reload_internal() {
 }
 
 void Songs::reload_internal(fs::path const& parent) {
-	namespace fs = fs;
 	if (std::distance(parent.begin(), parent.end()) > 20) { m_debug << "songs/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)" << std::endl; return; }
 	try {
 		boost::regex expression(R"((\.txt|^song\.ini|^notes\.xml|\.sm)$)", boost::regex_constants::icase);

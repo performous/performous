@@ -5,16 +5,14 @@
 #include "execname.hpp"
 #include "i18n.hh"
 #include <boost/filesystem.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
+#include <boost/lexical_cast.hpp>
 #include <libxml++/libxml++.h>
 #include <algorithm>
 #include <iomanip>
 #include <stdexcept>
 #include <iostream>
 #include <cmath>
-
-namespace fs = boost::filesystem;
 
 Config config;
 

@@ -1,14 +1,12 @@
 #pragma once
 
-#include "notes.hh"
 #include "i18n.hh"
-#include <boost/filesystem/path.hpp>
+#include "notes.hh"
+#include "util.hh"
 #include <boost/foreach.hpp>
 #include <boost/noncopyable.hpp>
 #include <stdexcept>
 #include <string>
-
-namespace fs = boost::filesystem;  // Used globally in Performous
 
 class SongParser;
 

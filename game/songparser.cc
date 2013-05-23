@@ -123,7 +123,6 @@ void SongParser::guessFiles() {
 	std::string logMissing, logFound;
 	
 	// Run checks, remove bogus values and construct regexps
-	namespace fs = boost::filesystem;
 	std::vector<boost::regex> regexps;
 	bool missing = false;
 	for (auto const& p: fields) {

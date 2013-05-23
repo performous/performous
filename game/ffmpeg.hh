@@ -4,7 +4,6 @@
 #include "util.hh"
 #include "libda/sample.hpp"
 #include <boost/circular_buffer.hpp>
-#include <boost/filesystem/path.hpp>
 #include <boost/ptr_container/ptr_deque.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/condition.hpp>
@@ -13,8 +12,6 @@
 #include <boost/thread/thread.hpp>
 #include <vector>
 #include <iostream>
-
-namespace fs = boost::filesystem;
 
 using boost::uint8_t;
 using boost::int16_t;

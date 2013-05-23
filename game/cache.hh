@@ -2,7 +2,7 @@
 
 #include "configuration.hh"
 #include "fs.hh"
-
+#include <boost/filesystem.hpp>
 #include <cstring>
 #include <stdexcept>
 
@@ -15,7 +15,7 @@ namespace cache {
 	template <typename T> bool loadSVG(T& target, fs::path const& source_filename, double factor) {
 		fs::path const cache_filename = cache::constructSVGCacheFileName(source_filename, factor);
 		// Verify that a cached file exists and that it is more recent than the original SVG
-		if (!fs::exists(cache_filename)) return false;
+		if (!fs::is_regular_file(cache_filename)) return false;
 		if (fs::last_write_time(source_filename) > fs::last_write_time(cache_filename)) return false;
 		// Try to load the cached file		
 		try { loadPNG(target, cache_filename.string()); } catch( ... ) { return false; }
