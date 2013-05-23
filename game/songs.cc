@@ -220,12 +220,6 @@ std::string Songs::sortDesc() const {
 	  case 6: str = _("sorted by language"); break;
 	  default: throw std::logic_error("Internal error: unknown sort order in Songs::sortDesc");
 	}
-	if (!empty()) {
-		if (m_order == 3) str += " (" + current().edition + ")";
-		if (m_order == 4) str += " (" + current().genre + ")";
-		if (m_order == 5) str += " (" + current().path.filename().string() + ")";
-		if (m_order == 6) str += " (" + current().language + ")";
-	}
 	return str;
 }
 
