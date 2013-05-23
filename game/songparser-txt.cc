@@ -63,6 +63,15 @@ bool SongParser::txtParseField(std::string const& line) {
 	std::string key = boost::trim_copy(line.substr(1, pos - 1));
 	std::string value = boost::trim_copy(line.substr(pos + 1));
 	if (value.empty()) return true;
+
+	// Parse header data that is stored in SongParser rather than in song (and thus needs to be read every time)
+	if (key == "BPM") assign(m_bpm, value);
+	else if (key == "RELATIVE") assign(m_relative, value);
+	else if (key == "GAP") { assign(m_gap, value); m_gap *= 1e-3; }
+
+	if (m_song.loadStatus >= Song::HEADER) return true;  // Only re-parsing now, skip any other data
+
+	// Parse header data that is directly stored in m_song
 	if (key == "TITLE") m_song.title = value.substr(value.find_first_not_of(" :"));
 	else if (key == "ARTIST") m_song.artist = value.substr(value.find_first_not_of(" "));
 	else if (key == "EDITION") m_song.edition = value.substr(value.find_first_not_of(" "));
@@ -76,9 +85,6 @@ bool SongParser::txtParseField(std::string const& line) {
 	else if (key == "START") assign(m_song.start, value);
 	else if (key == "VIDEOGAP") assign(m_song.videoGap, value);
 	else if (key == "PREVIEWSTART") assign(m_song.preview_start, value);
-	else if (key == "RELATIVE") assign(m_relative, value);
-	else if (key == "GAP") { assign(m_gap, value); m_gap *= 1e-3; }
-	else if (key == "BPM") assign(m_bpm, value);
 	else if (key == "LANGUAGE") m_song.language= value.substr(value.find_first_not_of(" "));
 	return true;
 }

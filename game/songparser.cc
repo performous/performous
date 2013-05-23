@@ -91,23 +91,23 @@ SongParser::SongParser(Song& s) try:
 	if (s.preview_start != s.preview_start) s.preview_start = (type == INI ? 5.0 : 30.0);  // 5 s for band mode, 30 s for others
 
 	// Remove bogus entries
-	if (!boost::filesystem::exists(m_song.path + m_song.cover)) m_song.cover = "";
-	if (!boost::filesystem::exists(m_song.path + m_song.background)) m_song.background = "";
-	if (!boost::filesystem::exists(m_song.path + m_song.video)) m_song.video = "";
+	using boost::filesystem::exists;
+	if (!exists(m_song.path + m_song.cover)) m_song.cover.clear();
+	if (!exists(m_song.path + m_song.background)) m_song.background.clear();
+	if (!exists(m_song.path + m_song.video)) m_song.video.clear();
 
 	// In case no images/videos were specified, try to guess them
 	if (m_song.cover.empty() || m_song.background.empty() || m_song.video.empty()) {
-		boost::regex coverfile("((cover|album|label|\\[co\\])\\.(png|jpeg|jpg|svg))$", boost::regex_constants::icase);
-		boost::regex backgroundfile("((background|bg||\\[bg\\])\\.(png|jpeg|jpg|svg))$", boost::regex_constants::icase);
-		boost::regex videofile("(.*\\.(avi|mpg|mpeg|flv|mov|mp4))$", boost::regex_constants::icase);
-		boost::cmatch match;
+		boost::regex coverRE(R"((cover|album|label|\[co\])\.(png|jpeg|jpg|svg)$)", boost::regex_constants::icase);
+		boost::regex backgroundRE(R"(\.(png|jpeg|jpg|svg)$)", boost::regex_constants::icase);
+		boost::regex videoRE(R"(\.(avi|mpg|mpeg|flv|mov|mp4)$)", boost::regex_constants::icase);
 
 		for (boost::filesystem::directory_iterator dirIt(s.path), dirEnd; dirIt != dirEnd; ++dirIt) {
 			boost::filesystem::path p = dirIt->path();
 			std::string name = p.filename().string(); // File basename
-			if (m_song.cover.empty() && regex_match(name.c_str(), match, coverfile)) m_song.cover = name;
-			else if (m_song.background.empty() && regex_match(name.c_str(), match, backgroundfile)) m_song.background = name;
-			else if (m_song.video.empty() && regex_match(name.c_str(), match, videofile)) m_song.video = name;
+			if (m_song.cover.empty() && regex_search(name, coverRE)) m_song.cover = name;
+			else if (m_song.background.empty() && regex_search(name, backgroundRE)) m_song.background = name;
+			else if (m_song.video.empty() && regex_search(name, videoRE)) m_song.video = name;
 		}
 	}
 	s.loadStatus = Song::HEADER;
