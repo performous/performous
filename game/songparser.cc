@@ -90,31 +90,62 @@ SongParser::SongParser(Song& s) try:
 	// Default for preview position if none was specified in header
 	if (s.preview_start != s.preview_start) s.preview_start = (type == INI ? 5.0 : 30.0);  // 5 s for band mode, 30 s for others
 
-	// Remove bogus entries
-	using boost::filesystem::exists;
-	if (!exists(m_song.path + m_song.cover)) m_song.cover.clear();
-	if (!exists(m_song.path + m_song.background)) m_song.background.clear();
-	if (!exists(m_song.path + m_song.video)) m_song.video.clear();
+	guessFiles();
 
-	// In case no images/videos were specified, try to guess them
-	if (m_song.cover.empty() || m_song.background.empty() || m_song.video.empty()) {
-		boost::regex coverRE(R"((cover|album|label|\[co\])\.(png|jpeg|jpg|svg)$)", boost::regex_constants::icase);
-		boost::regex backgroundRE(R"(\.(png|jpeg|jpg|svg)$)", boost::regex_constants::icase);
-		boost::regex videoRE(R"(\.(avi|mpg|mpeg|flv|mov|mp4)$)", boost::regex_constants::icase);
-
-		for (boost::filesystem::directory_iterator dirIt(s.path), dirEnd; dirIt != dirEnd; ++dirIt) {
-			boost::filesystem::path p = dirIt->path();
-			std::string name = p.filename().string(); // File basename
-			if (m_song.cover.empty() && regex_search(name, coverRE)) m_song.cover = name;
-			else if (m_song.background.empty() && regex_search(name, backgroundRE)) m_song.background = name;
-			else if (m_song.video.empty() && regex_search(name, videoRE)) m_song.video = name;
-		}
-	}
 	s.loadStatus = Song::HEADER;
 } catch (std::runtime_error& e) {
 	throw SongParserException(m_song, e.what(), m_linenum);
 } catch (std::exception& e) {
 	throw SongParserException(m_song, "Internal error: " + std::string(e.what()), m_linenum);
+}
+
+void SongParser::guessFiles() {
+	// List of fields containing filenames, and auto-matching regexps
+	std::vector<std::pair<std::string*, char const*>> fields = {
+		{ &m_song.cover, R"((cover|album|label|\[co\])\.(png|jpeg|jpg|svg)$)" },
+		{ &m_song.background, R"(\.(png|jpeg|jpg|svg)$)" },
+		{ &m_song.video, R"(\.(avi|mpg|mpeg|flv|mov|mp4)$)" },
+		{ &m_song.midifilename, R"(\.(mid)$)" },
+	};
+	//if (m_song.music.size() == 1) fields.emplace_back(&m_song.music.begin()->second, R"(\.(mp3|ogg)$)");
+
+	std::string logMissing, logFound;
+	
+	// Run checks, remove bogus values and construct regexps
+	namespace fs = boost::filesystem;
+	std::vector<boost::regex> regexps;
+	bool missing = false;
+	for (auto const& p: fields) {
+		std::string name = m_song.path + *p.first;
+		if (!fs::exists(name)) {
+			p.first->clear();
+			logMissing += " \"" + name + "\"";
+		}
+		if (p.first->empty()) missing = true;
+		regexps.emplace_back(p.second, boost::regex_constants::icase);
+	}
+
+	if (!missing) return;  // All OK!
+		
+	// Scan the entire folder for matching files
+	for (fs::directory_iterator dirIt(m_song.path), dirEnd; dirIt != dirEnd; ++dirIt) {
+		std::string name = dirIt->path().filename().string(); // File basename
+		for (unsigned i = 0; i < fields.size(); ++i) {
+			auto& field = *fields[i].first;
+			if (!field.empty()) continue;  // Valid filename is already known
+			if (!regex_search(name, regexps[i])) continue;  // No match for current file
+			field = name;
+			logFound += " \"" + field + "\"";
+			goto next_file;  // Necessary for intelligent cover/bg detection
+		}
+		next_file:;
+	}
+	
+	if (logFound.empty() && logMissing.empty()) return;
+	std::clog << "songparser/info: \"" + m_song.path + "\":";
+	if (!logMissing.empty()) std::clog << logMissing + " not found  ";
+	if (!logFound.empty()) std::clog << logFound + " autodetected";
+	std::clog << std::endl;
 }
 
 void SongParser::resetNoteParsingState() {
