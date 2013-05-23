@@ -13,6 +13,7 @@ namespace fs = boost::filesystem;  // Used globally in Performous
 class SongParser;
 
 namespace TrackName {
+	const std::string BGMUSIC = "background";
 	const std::string GUITAR = "Guitar";
 	const std::string GUITAR_COOP = "Coop guitar";
 	const std::string GUITAR_RHYTHM = "Rhythm guitar";

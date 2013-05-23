@@ -147,9 +147,9 @@ bool SongParser::smParseField(std::string line) {
 	// Parse header data that is directly stored in m_song
 	if (key == "TITLE") m_song.title = value.substr(value.find_first_not_of(" :"));
 	else if (key == "ARTIST") m_song.artist = value.substr(value.find_first_not_of(" "));
-	else if (key == "BANNER") m_song.cover = value;
-	else if (key == "MUSIC") m_song.music["background"] = fs::absolute(value, m_song.path);
-	else if (key == "BACKGROUND") m_song.background = value;
+	else if (key == "BANNER") m_song.cover = fs::absolute(value, m_song.path);
+	else if (key == "MUSIC") m_song.music[TrackName::BGMUSIC] = fs::absolute(value, m_song.path);
+	else if (key == "BACKGROUND") m_song.background = fs::absolute(value, m_song.path);
 	else if (key == "SAMPLESTART") assign(m_song.preview_start, value);
 	/*.sm fileformat has also the following constants but they are ignored in this version of the parser:
 	#SUBTITLE
