@@ -38,19 +38,13 @@ void SongParser::txtParse() {
 	resetNoteParsingState();
 	while (txtParseNote(line) && getline(line)) {} // Parse notes
 
-	{
-		// Workaround for the terminating : 1 0 0 line, written by some converters
-		VocalTrack& vocal = m_song.getVocalTrack(TrackName::LEAD_VOCAL);
-		if (!vocal.notes.empty() && vocal.notes.back().type != Note::SLEEP
-		  && vocal.notes.back().begin == vocal.notes.back().end) vocal.notes.pop_back();
-	}{
-		// Workaround for the terminating : 1 0 0 line, written by some converters
-		VocalTrack& vocal = m_song.getVocalTrack(DUET_P2);
-		if (!vocal.notes.empty() && vocal.notes.back().type != Note::SLEEP
-		  && vocal.notes.back().begin == vocal.notes.back().end) vocal.notes.pop_back();
-		// Erase if empty
-		else if (vocal.notes.empty())
-			m_song.eraseVocalTrack(vocal.name);
+	// Workaround for the terminating : 1 0 0 line, written by some converters
+	// FIXME: Should we do this for all tracks?
+	for (auto const& name: { TrackName::LEAD_VOCAL, DUET_P2 }) {
+		Notes& notes = m_song.getVocalTrack(name).notes;
+		auto it = notes.rbegin();
+		if (!notes.empty() && it->type != Note::SLEEP && it->begin == it->end) notes.pop_back();
+		if (notes.empty()) m_song.eraseVocalTrack(name);
 	}
 
 }
