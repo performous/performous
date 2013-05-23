@@ -150,9 +150,9 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 			else if (m_search.process(keysym)) m_songs.setFilter(m_search.text);
 			// Shortcut keys for accessing different type filter modes
 			if (key == SDLK_TAB) m_songs.sortChange(1);
-			if (key == SDLK_F5) m_songs.typeCycle(1);
-			if (key == SDLK_F6) m_songs.typeCycle(2);
-			if (key == SDLK_F7) m_songs.typeCycle(3);
+			if (key == SDLK_F5) m_songs.typeCycle(2);
+			if (key == SDLK_F6) m_songs.typeCycle(3);
+			if (key == SDLK_F7) m_songs.typeCycle(1);
 			if (key == SDLK_F8) m_songs.typeCycle(4);
 		}
 	}
