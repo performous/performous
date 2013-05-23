@@ -57,6 +57,7 @@ private:
 	boost::scoped_ptr<Video> m_video;
 	boost::scoped_ptr<ThemeSongs> theme;
 	Song::Music m_playing;
+	AnimValue m_clock;
 	AnimValue m_idleTimer;
 	TextInput m_search;
 	boost::scoped_ptr<Surface> m_singCover;

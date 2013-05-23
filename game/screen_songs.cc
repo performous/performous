@@ -21,7 +21,9 @@ ScreenSongs::ScreenSongs(std::string const& name, Audio& audio, Songs& songs, Da
   Screen(name), m_audio(audio), m_songs(songs), m_database(database), m_covers(50)
 {
 	m_songs.setAnimMargins(5.0, 5.0);
-	m_idleTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
+	// Using AnimValues as a simple timers counting seconds
+	m_clock.setTarget(getInf());
+	m_idleTimer.setTarget(getInf());
 }
 
 void ScreenSongs::enter() {
@@ -240,34 +242,22 @@ void ScreenSongs::drawJukebox() {
 }
 
 void ScreenSongs::drawMultimedia() {
-	{
+	if (!m_songs.empty()) {
 		Transform ft(farTransform());  // 3D effect
 		double length = m_audio.getLength();
 		double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
 		m_songbg_default->draw();   // Default bg
-		if (!m_songs.empty()) {
-			Song& song = m_songs.current();
-			if (m_songbg.get()) m_songbg->draw();
-			else if (!song.cover.empty()) {
-				// Create a background image by tiling covers
-				try {
-					Surface& cover = m_covers[song.path + song.cover];
-					Dimensions backup = cover.dimensions;
-					const float s = 0.3;
-					cover.dimensions.fixedWidth(s).screenTop(0.0);
-					cover.dimensions.top(0.0).right(-s); cover.draw();
-					cover.dimensions.top(0.0).right(0.0); cover.draw();
-					cover.dimensions.top(0.0).left(0.0); cover.draw();
-					cover.dimensions.top(0.0).left(s); cover.draw();
-					cover.dimensions.top(s).right(-s); cover.draw();
-					cover.dimensions.top(s).right(0.0); cover.draw();
-					cover.dimensions.top(s).left(0.0); cover.draw();
-					cover.dimensions.top(s).left(s); cover.draw();
-					cover.dimensions = backup;
-				} catch (std::exception const&) {}
+		if (m_songbg.get() && !m_video.get()) {
+			if (m_songbg->width() > 512 && m_songbg->dimensions.ar() > 1.1) {
+				// Full screen mode
+				m_songbg->draw();
+			} else {
+				// Low res texture or cover image, render in tiled mode
+				double x = 0.05 * m_clock.get();
+				m_songbg->draw(m_songbg->dimensions, TexCoords(x, 0.0, x + 5.0, 5.0));
 			}
-			if (m_video.get()) m_video->render(time);
 		}
+		if (m_video.get()) m_video->render(time);
 	}
 	if (!m_jukebox) {
 		m_songbg_ground->draw();
