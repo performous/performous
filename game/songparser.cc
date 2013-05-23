@@ -101,14 +101,21 @@ SongParser::SongParser(Song& s) try:
 }
 
 void SongParser::guessFiles() {
-	// List of fields containing filenames, and auto-matching regexps
-	std::vector<std::pair<fs::path*, char const*>> fields = {
-		{ &m_song.cover, R"((cover|album|label|\[co\])\.(png|jpeg|jpg|svg)$)" },
+	// List of fields containing filenames, and auto-matching regexps, in order of priority
+	const std::vector<std::pair<fs::path*, char const*>> fields = {
+		{ &m_song.cover, R"((cover|album|label|banner|bn|\[co\])\.(png|jpeg|jpg|svg)$)" },
+		{ &m_song.background, R"((background|bg|\[bg\])\.(png|jpeg|jpg|svg)$)" },
+		{ &m_song.cover, R"(\.(png|jpeg|jpg|svg)$)" },
 		{ &m_song.background, R"(\.(png|jpeg|jpg|svg)$)" },
 		{ &m_song.video, R"(\.(avi|mpg|mpeg|flv|mov|mp4)$)" },
 		{ &m_song.midifilename, R"(\.(mid)$)" },
+		{ &m_song.music[TrackName::GUITAR], R"(guitar\.(mp3|ogg|aac)$)" },
+		{ &m_song.music[TrackName::BASS], R"(rhythm\.(mp3|ogg|aac)$)" },
+		{ &m_song.music[TrackName::DRUMS], R"(drums\.(mp3|ogg|aac)$)" },
+		{ &m_song.music[TrackName::KEYBOARD], R"(keyboard\.(mp3|ogg|aac)$)" },
+		{ &m_song.music[TrackName::BGMUSIC], R"(song\.(mp3|ogg|aac)$)" },
+		{ &m_song.music[TrackName::BGMUSIC], R"(\.(mp3|ogg|aac)$)" },
 	};
-	//if (m_song.music.size() == 1) fields.emplace_back(&m_song.music.begin()->second, R"(\.(mp3|ogg)$)");
 
 	std::string logMissing, logFound;
 	
@@ -127,53 +134,25 @@ void SongParser::guessFiles() {
 	}
 
 	if (!missing) return;  // All OK!
-		
-	// Scan the entire folder for matching files
-	for (fs::directory_iterator dirIt(m_song.path), dirEnd; dirIt != dirEnd; ++dirIt) {
-		std::string name = dirIt->path().filename().string(); // File basename
-		for (unsigned i = 0; i < fields.size(); ++i) {
-			auto& field = *fields[i].first;
-			if (!field.empty()) continue;  // Valid filename is already known
+
+	std::set<fs::path> files(fs::directory_iterator{m_song.path}, fs::directory_iterator{});
+	
+	for (unsigned i = 0; i < fields.size(); ++i) {
+		fs::path& field = *fields[i].first;
+		if (field.empty()) for (fs::path const& f: files) {
+			std::string name = f.filename().string(); // File basename
 			if (!regex_search(name, regexps[i])) continue;  // No match for current file
-			field = dirIt->path();
+			field = f;
 			logFound += " \"" + name + "\"";
-			goto next_file;  // Necessary for intelligent cover/bg detection
 		}
-		next_file:;
+		files.erase(field);  // Remove from available options
 	}
 	
 	if (logFound.empty() && logMissing.empty()) return;
-	std::clog << "songparser/warning: \"" + m_song.path.string() + "\":";
+	std::clog << "songparser/" << (logMissing.empty() ? "info" : "warning") << ": \"" + m_song.filename.string() + "\":";
 	if (!logMissing.empty()) std::clog << logMissing + " not found  ";
 	if (!logFound.empty()) std::clog << logFound + " autodetected";
 	std::clog << std::endl;
-
-/*
-	// Search the dir for the music files
-	for (boost::filesystem::directory_iterator dirIt(s.path), dirEnd; dirIt != dirEnd; ++dirIt) {
-		boost::filesystem::path p = dirIt->path();
-		std::string name = p.filename().string(); // File basename (notes.txt)
-		if (regex_match(name.c_str(), match, midifile)) {
-			 s.midifilename = name;
-		} else if (regex_match(name.c_str(), match, audiofile_background)) {
-			testAndAdd(s, "background", name);
-		} else if (regex_match(name.c_str(), match, audiofile_guitar)) {
-			testAndAdd(s, TrackName::GUITAR, name);
-		} else if (regex_match(name.c_str(), match, audiofile_bass)) {
-			testAndAdd(s, TrackName::BASS, name);
-		} else if (regex_match(name.c_str(), match, audiofile_keyboard)) {
-			testAndAdd(s, TrackName::KEYBOARD, name);
-		} else if (regex_match(name.c_str(), match, audiofile_drums)) {
-			testAndAdd(s, TrackName::DRUMS, name);
-		} else if (regex_match(name.c_str(), match, audiofile_vocals)) {
-			testAndAdd(s, "vocals", name);
-#if 0  // TODO: process preview.ogg properly? In any case, do not print debug to console...
-		} else if (regex_match(name.c_str(), match, audiofile_other)) {
-			std::cout << "Found unknown ogg file: " << name << std::endl;
-#endif
-		}
-	}
-*/
 
 }
 
