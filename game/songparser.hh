@@ -45,7 +45,6 @@ class SongParser {
 	bool txtParseNote(std::string line);
 	bool iniCheck(std::vector<char> const& data) const;
 	void iniParseHeader();
-	void iniParse();
 	bool midCheck(std::vector<char> const& data) const;
 	void midParseHeader();
 	void midParse();

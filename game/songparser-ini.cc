@@ -42,26 +42,5 @@ void SongParser::iniParseHeader() {
 		// Before adding other tags: they should be checked with the already-existing tags in FoF format; in case any tag doesn't exist there, it should be discussed with FoFiX developers before adding it here.
 	}
 	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
-
-	// Parse additional data from midi file - required to get tracks info
-	s.midifilename = "notes.mid";
-	// Compose regexps to find music files
-	boost::regex midifile("(.*\\.mid)$", boost::regex_constants::icase);
-	boost::regex audiofile_background("(song\\.ogg)$", boost::regex_constants::icase);
-	boost::regex audiofile_guitar("(guitar\\.ogg)$", boost::regex_constants::icase);
-	boost::regex audiofile_drums("(drums\\.ogg)$", boost::regex_constants::icase);
-	boost::regex audiofile_bass("(rhythm\\.ogg)$", boost::regex_constants::icase);
-	boost::regex audiofile_keyboard("(keyboard\\.ogg)$", boost::regex_constants::icase);
-	boost::regex audiofile_vocals("(vocals\\.ogg)$", boost::regex_constants::icase);
-	boost::regex audiofile_other("(.*\\.ogg)$", boost::regex_constants::icase);
-	boost::cmatch match;
-
-	midParseHeader();
 }
-
-/// Parse notes
-void SongParser::iniParse() {
-	midParse();
-}
-
 
