@@ -31,9 +31,9 @@ void SongParser::iniParseHeader() {
 		// Supported tags
 		if (key == "name") s.title = value;
 		else if (key == "artist") s.artist = value;
-		else if (key == "cover") s.cover = value;
-		else if (key == "background") s.background = value;
-		else if (key == "video") s.video = value;
+		else if (key == "cover") s.cover = fs::absolute(value, s.path);
+		else if (key == "background") s.background = fs::absolute(value, s.path);
+		else if (key == "video") s.video = fs::absolute(value, s.path);
 		else if (key == "genre") s.genre = value;
 		else if (key == "frets") s.creator = value;
 		else if (key == "delay") { assign(s.start, value); s.start/=1000.0; }

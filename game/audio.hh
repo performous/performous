@@ -7,13 +7,11 @@
 #include "ffmpeg.hh"
 #include "notes.hh"
 #include "pitch.hh"
+#include "util.hh"
 #include <boost/date_time.hpp>
-#include <boost/filesystem/path.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/scoped_ptr.hpp>
 #include "libda/portaudio.hpp"
-
-namespace fs = boost::filesystem;
 
 const unsigned AUDIO_MAX_ANALYZERS = 4;
 
