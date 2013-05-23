@@ -308,14 +308,14 @@ void ScreenSongs::draw() {
 			oss_order << _("↵ open the playlist menu");
 		}
 		break;
-	}	
+	}
 
 	if (m_jukebox) drawJukebox();
 	else {
 		// Draw song and order texts
 		theme->song.draw(oss_song.str());
 		theme->order.draw(oss_order.str());
-		drawInstruments(Dimensions(1.0).fixedHeight(0.03).middle(-0.22).screenBottom(-0.01));
+		drawInstruments(Dimensions(1.0).fixedHeight(0.09).right(0.45).screenTop(0.02));
 		using namespace glmath;
 		Transform trans(translate(vec3(0.32, -0.03, 0.0)) * scale(vec3(0.75, 0.75, 1.0)));
 		theme->hiscores.draw(oss_hiscore.str());
@@ -441,29 +441,29 @@ void ScreenSongs::drawInstruments(Dimensions dim) const {
 
 	UseTexture tex(*m_instrumentList);
 	double x = dim.x1();
-	for (int i = vocalCount-1; i >= 0; i--) {
-		drawIcon(1, dim.left(x));
-		x += (i > 0 ? 0.3 : 1.0) * dim.w();
-	}
-	// guitars
-	for (int i = guitarCount-1; i >= 0; i--) {
-		drawIcon(2, dim.left(x));
-		x += (i > 0 ? 0.3 : 1.0) * dim.w();
-	}
-	// bass
-	if (have_bass) {
-		drawIcon(3, dim.left(x));
-		x += dim.w();
+	// dancing
+	if (have_dance) {
+		drawIcon(6, dim.left(x));
+		x -= dim.w();
 	}
 	// drums
 	if (have_drums) {
 		drawIcon(4, dim.left(x));
-		x += dim.w();
+		x -= dim.w();
 	}
-	// dancing
-	if (have_dance) {
-		drawIcon(6, dim.left(x));
-		x += dim.w();
+	// bass
+	if (have_bass) {
+		drawIcon(3, dim.left(x));
+		x -= dim.w();
+	}
+	// guitars
+	for (int i = guitarCount-1; i >= 0; i--) {
+		drawIcon(2, dim.left(x));
+		x -= (i > 0 ? 0.3 : 1.0) * dim.w();
+	}
+	for (int i = vocalCount-1; i >= 0; i--) {
+		drawIcon(1, dim.left(x));
+		x -= (i > 0 ? 0.3 : 1.0) * dim.w();
 	}
 }
 
