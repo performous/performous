@@ -17,7 +17,7 @@
    height="800"
    id="svg559"
    sodipodi:version="0.32"
-   inkscape:version="0.48.0 r9654"
+   inkscape:version="0.48.4 r9939"
    sodipodi:docname="songs_bg_ground.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <metadata
@@ -28,13 +28,13 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="992"
-     inkscape:window-width="1920"
+     inkscape:window-height="870"
+     inkscape:window-width="1249"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      guidetolerance="10.0"
@@ -45,15 +45,15 @@
      pagecolor="#ffffff"
      id="base"
      inkscape:zoom="0.43503001"
-     inkscape:cx="483.32183"
+     inkscape:cx="76.453348"
      inkscape:cy="419.08372"
-     inkscape:window-x="0"
-     inkscape:window-y="29"
+     inkscape:window-x="220"
+     inkscape:window-y="94"
      inkscape:current-layer="svg559"
      showgrid="false"
      showguides="true"
      inkscape:guide-bbox="true"
-     inkscape:window-maximized="1" />
+     inkscape:window-maximized="0" />
   <defs
      id="defs561">
     <linearGradient
@@ -220,9 +220,13 @@
     <linearGradient
        id="linearGradient6053-8">
       <stop
-         style="stop-color:#000000;stop-opacity:1;"
+         style="stop-color:#000000;stop-opacity:0;"
          offset="0"
          id="stop6055-7" />
+      <stop
+         id="stop3782"
+         offset="0.33000001"
+         style="stop-color:#2f2f2f;stop-opacity:1;" />
       <stop
          style="stop-color:#5f5f5f;stop-opacity:1;"
          offset="1"
