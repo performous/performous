@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-05-24 01:00+0200\n"
+"POT-Creation-Date: 2013-05-24 01:38+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Tapio Vierros\n"
 "Language-Team: \n"
@@ -208,11 +208,11 @@ msgstr "Lisää kappaleita"
 msgid "Open the song browser to add more songs"
 msgstr "Avaa musiikkiselain lisätäksesi kappaleita"
 
-#: ../game/screen_playlist.cc:119 ../game/screen_songs.cc:514
+#: ../game/screen_playlist.cc:119 ../game/screen_songs.cc:513
 msgid "Shuffle"
 msgstr "Sekoita"
 
-#: ../game/screen_playlist.cc:119 ../game/screen_songs.cc:514
+#: ../game/screen_playlist.cc:119 ../game/screen_songs.cc:513
 msgid "Randomize the order of the playlist"
 msgstr "Sekoittaa soittolistan järjestyksen"
 
@@ -220,12 +220,12 @@ msgstr "Sekoittaa soittolistan järjestyksen"
 msgid "Clear and exit"
 msgstr "Tyhjennä ja poistu"
 
-#: ../game/screen_playlist.cc:125 ../game/screen_songs.cc:521
+#: ../game/screen_playlist.cc:125 ../game/screen_songs.cc:520
 msgid "Remove all the songs from the list"
 msgstr "Poista kaikki kappaleet listasta"
 
 #: ../game/screen_playlist.cc:131 ../game/screen_playlist.cc:275
-#: ../game/screen_songs.cc:527
+#: ../game/screen_songs.cc:526
 msgid "Back"
 msgstr "Takaisin"
 
@@ -316,58 +316,58 @@ msgstr ""
 "osoitteesta performous.org"
 
 #: ../game/screen_songs.cc:282
-msgid "no songs match search"
-msgstr "yksikään kappale ei vastannut hakuasi"
+msgid "Sorry, no songs match the search!"
+msgstr "Yksikään kappale ei vastannut hakuasi!"
 
-#: ../game/screen_songs.cc:290
+#: ../game/screen_songs.cc:289
 msgid "Hiscore\n"
 msgstr "Ennätykset\n"
 
-#: ../game/screen_songs.cc:299
+#: ../game/screen_songs.cc:298
 msgid "<type in to search>   ↔ songs    ↕ options"
 msgstr "<kirjota etsiäksesi>   ↔ kappaleet    ↕ valinnat"
 
-#: ../game/screen_songs.cc:302
+#: ../game/screen_songs.cc:301
 msgid "↔ sort order: "
 msgstr "↔ järjestys: "
 
-#: ../game/screen_songs.cc:303
+#: ../game/screen_songs.cc:302
 msgid "↔ type filter: "
 msgstr "↔ tyyppisuodin: "
 
-#: ../game/screen_songs.cc:304
+#: ../game/screen_songs.cc:303
 msgid "↔ hiscores   ↵ jukebox mode"
 msgstr "↔ ennätykset   ↵ jukeboksi"
 
-#: ../game/screen_songs.cc:308
+#: ../game/screen_songs.cc:307
 msgid "↵ start a playlist with this song!"
 msgstr "↵ aloita soittolista tällä kappaleella"
 
-#: ../game/screen_songs.cc:310
+#: ../game/screen_songs.cc:309
 msgid "↵ open the playlist menu"
 msgstr "↵ avaa soittolistavalikko"
 
-#: ../game/screen_songs.cc:507
+#: ../game/screen_songs.cc:506
 msgid "Play"
 msgstr "Pelaa"
 
-#: ../game/screen_songs.cc:507
+#: ../game/screen_songs.cc:506
 msgid "Start the game with all songs in playlist"
 msgstr "Aloita peli kaikilla soittolistan kappaleilla"
 
-#: ../game/screen_songs.cc:520
+#: ../game/screen_songs.cc:519
 msgid "View playlist"
 msgstr "Näytä soittolista"
 
-#: ../game/screen_songs.cc:520
+#: ../game/screen_songs.cc:519
 msgid "View the current playlist"
 msgstr "Näytä tämän hetkinen soittolista"
 
-#: ../game/screen_songs.cc:521
+#: ../game/screen_songs.cc:520
 msgid "Clear playlist"
 msgstr "Tyhjennä soittolista"
 
-#: ../game/screen_songs.cc:527
+#: ../game/screen_songs.cc:526
 msgid "Back to song browser"
 msgstr "Takaisin kappalevalintaan"
 
@@ -602,55 +602,59 @@ msgstr "Pois"
 msgid "%d items"
 msgstr "%d kohtaa"
 
-#: ../game/songs.cc:193
+#: ../game/songs.cc:194
 msgid "show all songs"
 msgstr "näytä kaikki kappaleet"
 
-#: ../game/songs.cc:194
+#: ../game/songs.cc:195
 msgid "has dance"
 msgstr "tanssi"
 
-#: ../game/songs.cc:195
+#: ../game/songs.cc:196
 msgid "has vocals"
 msgstr "laulu"
 
-#: ../game/songs.cc:196
+#: ../game/songs.cc:197
 msgid "has duet"
 msgstr "duetto"
 
-#: ../game/songs.cc:197
+#: ../game/songs.cc:198
 msgid "has guitar"
 msgstr "kitara"
 
-#: ../game/songs.cc:198
+#: ../game/songs.cc:199
 msgid "drums or keytar"
 msgstr "rummut tai koskettimisto"
 
-#: ../game/songs.cc:226
+#: ../game/songs.cc:200
+msgid "full band"
+msgstr "täysi bändi"
+
+#: ../game/songs.cc:228
 msgid "random order"
 msgstr "satunnainen järjestys"
 
-#: ../game/songs.cc:227
+#: ../game/songs.cc:229
 msgid "sorted by song"
 msgstr "järjestetty kappaleen mukaan"
 
-#: ../game/songs.cc:228
+#: ../game/songs.cc:230
 msgid "sorted by artist"
 msgstr "järjestetty esittäjän mukaan"
 
-#: ../game/songs.cc:229
+#: ../game/songs.cc:231
 msgid "sorted by edition"
 msgstr "järjestetty julkaisun mukaan"
 
-#: ../game/songs.cc:230
+#: ../game/songs.cc:232
 msgid "sorted by genre"
 msgstr "järjestetty lajityypin mukaan"
 
-#: ../game/songs.cc:231
+#: ../game/songs.cc:233
 msgid "sorted by path"
 msgstr "järjestetty polun mukaan"
 
-#: ../game/songs.cc:232
+#: ../game/songs.cc:234
 msgid "sorted by language"
 msgstr "järjestetty kielen mukaan"
 
@@ -698,153 +702,153 @@ msgstr "Harmonia 2"
 msgid "Harmonic 3"
 msgstr "Harmonia 3"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:2
+#: /tmp/xml2gettext.KBiqEGEqXN:2
 msgid "Game"
 msgstr "Peli"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:3
+#: /tmp/xml2gettext.KBiqEGEqXN:3
 msgid "Gameplay related options"
 msgstr "Peliasetukset"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:4
+#: /tmp/xml2gettext.KBiqEGEqXN:4
 msgid "Graphic"
 msgstr "Grafiikka"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:5
+#: /tmp/xml2gettext.KBiqEGEqXN:5
 msgid "Configure rendering and video settings"
 msgstr "Muokkaa grafiikka- ja videoasetuksia"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:6
+#: /tmp/xml2gettext.KBiqEGEqXN:6
 msgid "Audio Devices"
 msgstr "Äänilaitteet"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:7
+#: /tmp/xml2gettext.KBiqEGEqXN:7
 msgid "Setup microphones and playback"
 msgstr "Tee mikrofoni- ja äänentoistoasetukset"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:8
+#: /tmp/xml2gettext.KBiqEGEqXN:8
 msgid "Audio"
 msgstr "Ääni"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:9
+#: /tmp/xml2gettext.KBiqEGEqXN:9
 msgid "Configure general audio settings"
 msgstr "Muokkaa yleisiä ääniasetuksia"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:10
+#: /tmp/xml2gettext.KBiqEGEqXN:10
 msgid "Paths"
 msgstr "Tiedostopolut"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:11
+#: /tmp/xml2gettext.KBiqEGEqXN:11
 msgid "Setup song and data paths"
 msgstr "Aseta musiikki- ja datakansioiden polut"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:12
+#: /tmp/xml2gettext.KBiqEGEqXN:12
 msgid "Karaoke mode"
 msgstr "Karaoketila"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:13
+#: /tmp/xml2gettext.KBiqEGEqXN:13
 msgid "Hide pitch wave, notes and scoring."
 msgstr "Piilota ääniaallon piirto, nuotit ja pisteytys."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:14
+#: /tmp/xml2gettext.KBiqEGEqXN:14
 msgid "Pitch waves"
 msgstr "Äänenkorkeusaallot"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:15
+#: /tmp/xml2gettext.KBiqEGEqXN:15
 msgid "Enable singing pitch display (when not in karaoke mode)."
 msgstr ""
 "Ota käyttöön laulun äänenkorkeuden näyttäminen (kun ei olla karaokemoodissa)."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:16
+#: /tmp/xml2gettext.KBiqEGEqXN:16
 msgid "Theme"
 msgstr "Teema"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:17
+#: /tmp/xml2gettext.KBiqEGEqXN:17
 msgid "Name of the theme to use."
 msgstr "Käytettävän teeman nimi."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:18
+#: /tmp/xml2gettext.KBiqEGEqXN:18
 msgid "Keyboard as guitar"
 msgstr "Näppäimistö kitarana"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:19
+#: /tmp/xml2gettext.KBiqEGEqXN:19
 msgid "Enable keyboard as guitar (Frets on Fire mode)."
 msgstr "Käytä näppäimistöä kitarana (Frets on Fire -pelitila)."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:20
+#: /tmp/xml2gettext.KBiqEGEqXN:20
 msgid "Keyboard as drumkit"
 msgstr "Näppäimistö rumpuina"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:21
+#: /tmp/xml2gettext.KBiqEGEqXN:21
 msgid "Enable keyboard as drumkit."
 msgstr "Käytä näppäimistöä rumpusettinä."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:22
+#: /tmp/xml2gettext.KBiqEGEqXN:22
 msgid "Keyboard as dance pad"
 msgstr "Näppäimistö tanssimattona"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:23
+#: /tmp/xml2gettext.KBiqEGEqXN:23
 msgid "Enable keyboard as dance pad."
 msgstr "Käytä näppäimistöä tanssimattona."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:24
+#: /tmp/xml2gettext.KBiqEGEqXN:24
 msgid "Keyboard as keytar"
 msgstr "Näppäimistö pianona"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:25
+#: /tmp/xml2gettext.KBiqEGEqXN:25
 msgid "Enable keyboard as keytar."
 msgstr "Käytä näppäimistöä pianona."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:26
+#: /tmp/xml2gettext.KBiqEGEqXN:26
 msgid "Force controller A's type"
 msgstr "Pakota peliohjain A:n tyyppi"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:27
+#: /tmp/xml2gettext.KBiqEGEqXN:27
 msgid ""
 "Override autodetection and force the first controller to the given type."
 msgstr ""
 "Ohita automaattinen tunnistus ja pakota ensimmäisen peliohjaimen tyyppi."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:28
+#: /tmp/xml2gettext.KBiqEGEqXN:28
 msgid "Force controller B's type"
 msgstr "Pakota peliohjain B:n tyyppi"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:29
+#: /tmp/xml2gettext.KBiqEGEqXN:29
 msgid ""
 "Override autodetection and force the second controller to the given type."
 msgstr "Ohita automaattinen tunnistus ja pakota toisen peliohjaimen tyyppi."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:30
+#: /tmp/xml2gettext.KBiqEGEqXN:30
 msgid "Force controller C's type"
 msgstr "Pakota peliohjain C:n tyyppi"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:31
+#: /tmp/xml2gettext.KBiqEGEqXN:31
 msgid ""
 "Override autodetection and force the third controller to the given type."
 msgstr "Ohita automaattinen tunnistus ja pakota kolmannen peliohjaimen tyyppi."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:32
+#: /tmp/xml2gettext.KBiqEGEqXN:32
 msgid "Force controller D's type"
 msgstr "Pakota peliohjain D:n tyyppi"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:33
+#: /tmp/xml2gettext.KBiqEGEqXN:33
 msgid ""
 "Override autodetection and force the fourth controller to the given type."
 msgstr "Ohita automaattinen tunnistus ja pakota neljännen peliohjaimen tyyppi."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:34
+#: /tmp/xml2gettext.KBiqEGEqXN:34
 msgid "Joystick configuration"
 msgstr "Peliohjain säädöt"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:35
+#: /tmp/xml2gettext.KBiqEGEqXN:35
 msgid "Force joystick to some kind of instrument."
 msgstr "Pakota peliohjain jonkinlaiseksi instrumentiksi."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:36
+#: /tmp/xml2gettext.KBiqEGEqXN:36
 msgid "Hardware MIDI input device"
 msgstr "MIDI sisääntulolaite"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:37
+#: /tmp/xml2gettext.KBiqEGEqXN:37
 msgid ""
 "Regex for matching the MIDI devices to use. The default is to use all "
 "available devices."
@@ -852,70 +856,70 @@ msgstr ""
 "Säännöllinen lauseke MIDI laitteen valitsemiseksi. Oletuksena käytetään "
 "kaikkia saatavilla olevia."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:38
+#: /tmp/xml2gettext.KBiqEGEqXN:38
 msgid "Fallback song encoding"
 msgstr "Tekstin varakoodaus"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:39
+#: /tmp/xml2gettext.KBiqEGEqXN:39
 msgid "Pick the text codec used for song files that are not UTF-8."
 msgstr "Tekstin koodaus jos se ei ole UTF-8."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:40
+#: /tmp/xml2gettext.KBiqEGEqXN:40
 msgid "Windowed width"
 msgstr "Ikkunoitu leveys"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:41
+#: /tmp/xml2gettext.KBiqEGEqXN:41
 msgid "The width of the window."
 msgstr "Ikkunan leveys."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:42
+#: /tmp/xml2gettext.KBiqEGEqXN:42
 msgid "Windowed height"
 msgstr "Ikkunoitu korkeus"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:43
+#: /tmp/xml2gettext.KBiqEGEqXN:43
 msgid "The height of the window."
 msgstr "Ikkunan korkeus."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:44
+#: /tmp/xml2gettext.KBiqEGEqXN:44
 msgid "Fullscreen mode"
 msgstr "Kokoruututila"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:45
+#: /tmp/xml2gettext.KBiqEGEqXN:45
 msgid "Enable fullscreen mode on startup."
 msgstr "Ota kokoruututila käyttöön."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:46
+#: /tmp/xml2gettext.KBiqEGEqXN:46
 msgid "Stereoscopic 3D"
 msgstr "Stereo 3D"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:47
+#: /tmp/xml2gettext.KBiqEGEqXN:47
 msgid "Enable 3D rendering of Performous."
 msgstr "Aktivoi Performouksen 3D renderöinti."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:48
+#: /tmp/xml2gettext.KBiqEGEqXN:48
 msgid "Stereo3D type"
 msgstr "Stereo 3D:n tyyppi"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:49
+#: /tmp/xml2gettext.KBiqEGEqXN:49
 msgid "Some modes may only get activated in fullscreen mode."
 msgstr "Jotkin tilat aktivoituvat vain kokoruudun tilassa."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:50
+#: /tmp/xml2gettext.KBiqEGEqXN:50
 msgid "Stereo3D separation"
 msgstr "Stereoerotus"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:51
+#: /tmp/xml2gettext.KBiqEGEqXN:51
 msgid ""
 "The strength of the effect. Experiment with different settings for best "
 "results."
 msgstr ""
 "Efektin voimakkuus. Kokeile erilaisia arvoja saavuttaaksesi parhaan tuloksen."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:52
+#: /tmp/xml2gettext.KBiqEGEqXN:52
 msgid "Video playback"
 msgstr "Videotoisto"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:53
+#: /tmp/xml2gettext.KBiqEGEqXN:53
 msgid ""
 "Allows completely disabling background videos. It is recommended to leave "
 "this enabled as Performous will still smoothly fade out the video if your "
@@ -925,11 +929,11 @@ msgstr ""
 "Performous osaa häivyttää ne automaattisesti, jos tietokoneesta näyttää "
 "loppuvan tehot."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:54
+#: /tmp/xml2gettext.KBiqEGEqXN:54
 msgid "Webcam background"
 msgstr "Web-kamera taustana"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:55
+#: /tmp/xml2gettext.KBiqEGEqXN:55
 msgid ""
 "Performous can use webcam as a background video. Disable it if Performous "
 "crashes while entering a song."
@@ -937,22 +941,22 @@ msgstr ""
 "Performous voi yrittää käyttää web-kameran videota kappaleiden taustakuvana. "
 "Poista käytöstä jos peli kaatuu kappaletta ladatessa."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:56
+#: /tmp/xml2gettext.KBiqEGEqXN:56
 msgid "Webcam id"
 msgstr "Web-kameran tunniste"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:57
+#: /tmp/xml2gettext.KBiqEGEqXN:57
 msgid ""
 "Use -1 to autodetect or a number starting from 0 to choose specific device."
 msgstr ""
 "Arvo -1 valitsee kameran automaattisesti, sitä suuremmat kokonaisluvut "
 "valitsevat tietyn laitteen."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:58
+#: /tmp/xml2gettext.KBiqEGEqXN:58
 msgid "SVG quality"
 msgstr "Vektorikuvien laatu"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:59
+#: /tmp/xml2gettext.KBiqEGEqXN:59
 msgid ""
 "Larger numbers cause vector graphics to be rendered in higher resolution. "
 "Decrease this to make navigating in menus faster."
@@ -960,11 +964,11 @@ msgstr ""
 "Suuremmilla luvuilla vektorikuvat luodaan korkeammalla tarkkuudella. "
 "Pienentämällä arvoa valikoissa liikkuminen nopeutuu."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:60
+#: /tmp/xml2gettext.KBiqEGEqXN:60
 msgid "Text quality"
 msgstr "Tekstin laatu"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:61
+#: /tmp/xml2gettext.KBiqEGEqXN:61
 msgid ""
 "Larger numbers cause text to be rendered in higher resolution. Decrease this "
 "to make everything a little faster."
@@ -972,11 +976,11 @@ msgstr ""
 "Suuremmilla arvoilla teksti piirretään tarkempana. Tämä vaikuttaa hieman "
 "suorituskykyyn lähes kaikkialla."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:62
+#: /tmp/xml2gettext.KBiqEGEqXN:62
 msgid "Benchmark mode"
 msgstr "Suorituskyvynmittaustila"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:63
+#: /tmp/xml2gettext.KBiqEGEqXN:63
 msgid ""
 "Framerate limit of 100 FPS is removed and the game instead renders at full "
 "speed. FPS values are printed to console. Please note that the display "
@@ -986,11 +990,11 @@ msgstr ""
 "tulostetaan terminaaliin. Huomaa, että näytönohjainajurit saattavat vielä "
 "rajoittaa nopeutta."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:64
+#: /tmp/xml2gettext.KBiqEGEqXN:64
 msgid "Suggested latency"
 msgstr "Toivottu latenssi"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:65
+#: /tmp/xml2gettext.KBiqEGEqXN:65
 msgid ""
 "This is a hint for the audio engine about the desired latency. Set this as "
 "low as possible while retaining clear audio playback. Requires restart."
@@ -998,11 +1002,11 @@ msgstr ""
 "Vihje äänilaitteille kuinka pieni latenssi halutaan. Aseta niin matalaksi "
 "kuin mahdollista ilman äänen häiriöitä. Vaatii uudelleenkäynnistyksen. "
 
-#: /tmp/xml2gettext.MpcDHx1McZ:66
+#: /tmp/xml2gettext.KBiqEGEqXN:66
 msgid "Audio/video latency"
 msgstr "Ääni/video latenssi"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:67
+#: /tmp/xml2gettext.KBiqEGEqXN:67
 msgid ""
 "Affects all modes. Use negative value if your display input lag is greater "
 "than the sound card output latency, positive values in the opposite case and "
@@ -1015,11 +1019,11 @@ msgstr ""
 "Tämän pitäisi olla säädetty siten, että nuotit ohittavat \"kursorin\" samaan "
 "aikaan kun ääni kuullaan. Ctrl+F1/F2 säätävät pelin aikana."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:68
+#: /tmp/xml2gettext.KBiqEGEqXN:68
 msgid "Audio round-trip latency"
 msgstr "Äänen edestakainen latenssi"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:69
+#: /tmp/xml2gettext.KBiqEGEqXN:69
 msgid ""
 "Affects singing only. The time it takes for Performous playback to reach "
 "your speakers, fly to the microphone and all the way back until Performous "
@@ -1031,11 +1035,11 @@ msgstr ""
 "kaapattavaksi ja analysoitavaksi. Pelatessa, paina Ctrl+S aktivoidaksesi "
 "syntetisaattoritilan ja säädä Ctrl+F3/F4 näppäimillä."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:70
+#: /tmp/xml2gettext.KBiqEGEqXN:70
 msgid "Audio/controller latency"
 msgstr "Ääni/peliohjain latenssi"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:71
+#: /tmp/xml2gettext.KBiqEGEqXN:71
 msgid ""
 "Affects instruments and dancing only. The total of USB (guitar or dance pad) "
 "latency combined with audio output latency. Adjust so that you can hit the "
@@ -1046,28 +1050,28 @@ msgstr ""
 "yhdistettynä äänen ulostuloviiveeseen. Säädä siten, että osut nuotteihin "
 "hyvin pelkän kuulon avulla. Ctrl+F5/F6 pelin aikana."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:72
+#: /tmp/xml2gettext.KBiqEGEqXN:72
 msgid "Audio devices"
 msgstr "Äänilaitteet"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:73
+#: /tmp/xml2gettext.KBiqEGEqXN:73
 msgid "List of audio devices to try."
 msgstr "Lista kokeiltavista äänilaitteista."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:74
+#: /tmp/xml2gettext.KBiqEGEqXN:74
 msgid "Menu volume"
 msgstr "Valikkojen äänenvoimakkuus"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:75
+#: /tmp/xml2gettext.KBiqEGEqXN:75
 msgid "The volume level of menus, song previews and jukebox mode."
 msgstr ""
 "Äänenvoimakkuus valikoissa, kappaleiden esikuunteluissa ja jukeboksi tilassa."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:76
+#: /tmp/xml2gettext.KBiqEGEqXN:76
 msgid "Music volume"
 msgstr "Musiikin voimakkuus"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:77
+#: /tmp/xml2gettext.KBiqEGEqXN:77
 msgid ""
 "The ingame music volume. Values above 90 are not recommended as distortion "
 "may occur."
@@ -1075,11 +1079,11 @@ msgstr ""
 "Pelin äänenvoimakkuus. Arvot yli 90 eivät ole suositeltuja mahdollisen äänen "
 "vääristymisen takia."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:78
+#: /tmp/xml2gettext.KBiqEGEqXN:78
 msgid "Failure volume"
 msgstr "Virheiden äänenvoimakkuus"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:79
+#: /tmp/xml2gettext.KBiqEGEqXN:79
 msgid ""
 "The ingame fail sound volume. Values above 90 are not recommended as "
 "distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
@@ -1087,27 +1091,27 @@ msgstr ""
 "Virheäänien voimakkuus. Arvot yli 90 eivät ole suositeltuja mahdollisen "
 "äänen vääristymisen takia."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:80
+#: /tmp/xml2gettext.KBiqEGEqXN:80
 msgid "Microphone pass-through"
 msgstr "Äänen läpivienti"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:81
+#: /tmp/xml2gettext.KBiqEGEqXN:81
 msgid "Send captured singing voice to speakers."
 msgstr "Lähetä mikrofonista nauhoitettu ääni kaiuttimille."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:82
+#: /tmp/xml2gettext.KBiqEGEqXN:82
 msgid "Pass-through volume ratio"
 msgstr "Läpiviennin äänenvoimakkuussuhde"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:83
+#: /tmp/xml2gettext.KBiqEGEqXN:83
 msgid "How much voice is amplified compared to the music."
 msgstr "Kuinka paljon laulun tasoa suurennetaan musiikkiin suhteutettuna."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:84
+#: /tmp/xml2gettext.KBiqEGEqXN:84
 msgid "Song folders"
 msgstr "Kappaleiden sijainnit"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:85
+#: /tmp/xml2gettext.KBiqEGEqXN:85
 msgid ""
 "Where to recursively look for songs. DATADIR at the beginning means all "
 "Performous data folders."
@@ -1115,11 +1119,11 @@ msgstr ""
 "Mistä etsiä rekursiivisesti kappaleita. DATADIR alussa tarkoittaa kaikkia "
 "Performouksen järjestelmäkansioita."
 
-#: /tmp/xml2gettext.MpcDHx1McZ:86
+#: /tmp/xml2gettext.KBiqEGEqXN:86
 msgid "Base folders for data"
 msgstr "Järjestelmäkansiot"
 
-#: /tmp/xml2gettext.MpcDHx1McZ:87
+#: /tmp/xml2gettext.KBiqEGEqXN:87
 msgid ""
 "System defaults are included automatically. Additional paths can be added "
 "here."

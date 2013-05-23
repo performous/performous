@@ -279,8 +279,7 @@ void ScreenSongs::draw() {
 			oss_song << _("No songs found!");
 			oss_order << _("Visit performous.org\nfor free songs");
 		} else {
-			oss_song << _("no songs match search");
-			oss_order << m_search.text << "\n\n";
+			oss_song << _("Sorry, no songs match the search!");
 		}
 	} else {
 		Song& song = m_songs.current();
