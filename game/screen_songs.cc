@@ -250,6 +250,8 @@ void ScreenSongs::drawMultimedia() {
 		if (m_songbg.get() && !m_video.get()) {
 			if (m_songbg->width() > 512 && m_songbg->dimensions.ar() > 1.1) {
 				// Full screen mode
+				float s = sin(m_clock.get()) * 0.15 + 1.15;
+				Transform sc(scale(glmath::vec3(s, s, s)));
 				m_songbg->draw();
 			} else {
 				// Low res texture or cover image, render in tiled mode
