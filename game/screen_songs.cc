@@ -152,8 +152,8 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 			if (key == SDLK_TAB) m_songs.sortChange(1);
 			if (key == SDLK_F5) m_songs.typeCycle(2);
 			if (key == SDLK_F6) m_songs.typeCycle(3);
-			if (key == SDLK_F7) m_songs.typeCycle(1);
-			if (key == SDLK_F8) m_songs.typeCycle(4);
+			if (key == SDLK_F7) m_songs.typeCycle(4);
+			if (key == SDLK_F8) m_songs.typeCycle(1);
 		}
 	}
 	if (m_songs.empty()) m_jukebox = false;
