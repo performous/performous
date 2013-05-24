@@ -2,235 +2,82 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-08-01 22:10+0200\n"
-"PO-Revision-Date: 2011-08-01 22:11+0200\n"
+"POT-Creation-Date: 2013-05-24 12:48+0100\n"
+"PO-Revision-Date: 2013-05-24 12:49+0100\n"
 "Last-Translator: Tapio Vierros <tapiovierros@gmail.com>\n"
 "Language-Team: \n"
-"Language: \n"
+"Language: sv_SE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: _;gettext;gettext_noop\n"
 "X-Poedit-Basepath: .\n"
-"X-Poedit-Language: Swedish\n"
-"X-Poedit-Country: SWEDEN\n"
 "X-Poedit-SourceCharset: utf-8\n"
+"X-Generator: Poedit 1.5.4\n"
 "X-Poedit-SearchPath-0: ../game\n"
 "X-Poedit-SearchPath-1: ../data\n"
 
-#: ../game/song.hh:36
-msgid "Guitar"
-msgstr "Gitarr"
-
-#: ../game/song.hh:36
-msgid "Coop guitar"
-msgstr ""
-
-#: ../game/song.hh:36
-msgid "Rhythm guitar"
-msgstr "Kompgitarr"
-
-#: ../game/song.hh:36
-msgid "Bass"
-msgstr "Bas"
-
-#: ../game/song.hh:36
-msgid "Drums"
-msgstr "Trummor"
-
-# Vokal (musik), Sång, etc
-#: ../game/song.hh:36
-msgid "Vocals"
-msgstr "Såmg"
-
-#: ../game/song.hh:36
-msgid "Harmonic 1"
-msgstr "Överton 1"
-
-#: ../game/song.hh:36
-msgid "Harmonic 2"
-msgstr "Överton 2"
-
-#: ../game/song.hh:36
-msgid "Harmonic 3"
-msgstr "Överton 3"
-
-#: ../game/dancegraph.cc:18
-msgid "Beginner"
-msgstr "Nybörjare"
-
-# Lätt eller enkel
-#: ../game/dancegraph.cc:18
-#: ../game/guitargraph.cc:14
-msgid "Easy"
-msgstr "Lätt"
-
-# Medium eller mellan kanske
-#: ../game/dancegraph.cc:18
-#: ../game/guitargraph.cc:14
-msgid "Medium"
-msgstr "Medium"
-
-#: ../game/dancegraph.cc:18
-#: ../game/guitargraph.cc:14
-msgid "Hard"
-msgstr "Svårt"
-
-#: ../game/dancegraph.cc:18
-msgid "Challenge"
-msgstr "Utmaning"
-
-# Redo! eller klar!
-#: ../game/dancegraph.cc:111
-#: ../game/guitargraph.cc:197
-msgid "Ready!"
-msgstr "Redo!"
-
-# ...
-#: ../game/dancegraph.cc:111
-#: ../game/guitargraph.cc:197
-msgid "Start performing!"
-msgstr "Börja uppträd!"
-
-#: ../game/dancegraph.cc:122
-#: ../game/guitargraph.cc:186
-msgid "Select track"
-msgstr "Välj spår"
-
-#: ../game/dancegraph.cc:138
-#: ../game/guitargraph.cc:166
-msgid "Select difficulty"
-msgstr "Välj svårighetsgrad"
-
-#: ../game/dancegraph.cc:141
-#: ../game/guitargraph.cc:203
-msgid "Quit"
-msgstr "Avsluta"
-
-# låt/sång
-#: ../game/dancegraph.cc:141
-#: ../game/guitargraph.cc:203
-msgid "Exit to song browser"
-msgstr "Återgå till låt bläddraren"
-
-# stanna eller sluta?
-#: ../game/dancegraph.cc:260
-msgid "STOP!"
-msgstr "STANNA!"
-
-# [RFC:sv] "Stråk!" känns rumphugget, "Vinnar Stråk!" inte heller bra. "Serie" blir också konstigt...
-#: ../game/dancegraph.cc:335
-#: ../game/guitargraph.cc:482
-msgid "Streak!"
-msgstr ""
-
-#: ../game/guitargraph.cc:14
-msgid "Kids"
-msgstr "Barn"
-
-#: ../game/guitargraph.cc:14
-msgid "Expert"
-msgstr "Expert"
-
-#: ../game/guitargraph.cc:172
-#: ../game/guitargraph.cc:189
-msgid "Lefty-mode"
-msgstr "Vänsterläge"
-
-#: ../game/guitargraph.cc:210
-msgid "ON"
-msgstr "PÅ"
-
-#: ../game/guitargraph.cc:210
-msgid "OFF"
-msgstr "AV"
-
-#: ../game/guitargraph.cc:211
-msgid "Toggle lefty-mode"
-msgstr "Växla vänsterläge"
-
-# ...
-#: ../game/guitargraph.cc:499
+#: ../game/screen_paths.cc:24
 msgid ""
-"God Mode\n"
-"Activated!"
+"This tool is not yet available.\n"
+"Configure paths by adding them\n"
+"as command line parameters and\n"
+"then save them in configuration menu."
 msgstr ""
-"God Mode\n"
-"Aktiverat!"
+"Detta verktyget är inte tillgängligt ännu.\n"
+"Ställ in sökvägar genom att lägga till\n"
+"dem som kommandoradsargument och\n"
+"spara dem sedan i inställningsmenyn."
 
-#: ../game/guitargraph.cc:500
-msgid "Mistakes ignored!"
-msgstr "Misstag ignorerade"
+#: ../game/screen_paths.cc:70
+msgid "Press any key to exit."
+msgstr "Tryck på valfri knapp för att avsluta."
 
-# ...
-# kör på en översättning av tysk översättningen :P
-#: ../game/guitargraph.cc:1181
-msgid "Drum Fill!"
-msgstr "Trum-insats!"
+#: ../game/screen_paths.cc:75
+msgid ""
+"Windows users can also use ConfigureSongDirectory.bat in the bin-directory."
+msgstr ""
+"Windows användare kan också använda ConfigureSongDirectory.bat i bin-"
+"katalogen"
 
-# ...
-# förberet?
-#: ../game/guitargraph.cc:1182
-msgid "God Mode Ready!"
-msgstr "God Mode Redo!"
-
-#: ../game/guitargraph.cc:1185
-msgid "Solo!"
-msgstr "Solo!"
-
-#: ../game/configuration.cc:116
+#: ../game/configuration.cc:117
 msgid "Enabled"
 msgstr "Aktiverad"
 
-#: ../game/configuration.cc:116
+#: ../game/configuration.cc:117
 msgid "Disabled"
 msgstr "Inaktiverad"
 
 # alternativ verkar passa med string_list i koden
-#: ../game/configuration.cc:120
+#: ../game/configuration.cc:121
 #, c-format
 msgid "%d items"
 msgstr "%d alternativ"
 
-#: ../game/screen_sing.cc:34
-msgid "Loading song..."
-msgstr "Laddar låt..."
-
-#: ../game/screen_sing.cc:40
-msgid "Song is broken!"
-msgstr "Låten är trasig!"
-
-#: ../game/screen_sing.cc:45
-msgid "Initializing webcam..."
-msgstr "Sätter upp web-kamera"
-
-#: ../game/screen_sing.cc:52
-msgid "Loading video..."
-msgstr "Laddar video..."
-
-#: ../game/screen_sing.cc:60
-msgid "Loading instruments..."
-msgstr "Laddar instrument..."
-
-#: ../game/screen_sing.cc:82
-msgid "Loading menu..."
-msgstr "Laddar meny..."
-
-#: ../game/screen_sing.cc:84
+#: ../game/instrumentgraph.cc:56 ../game/screen_sing.cc:123
 msgid "Resume"
 msgstr "Fortsätt"
 
 # ...
-#: ../game/screen_sing.cc:84
+#: ../game/instrumentgraph.cc:56 ../game/screen_sing.cc:123
 msgid "Back to performing!"
 msgstr "Tillbaks till uppträdande"
 
-#: ../game/screen_sing.cc:85
+#: ../game/instrumentgraph.cc:57
+msgid "Rejoin"
+msgstr "Välj om"
+
+# ...
+#: ../game/instrumentgraph.cc:57
+msgid "Change selections"
+msgstr "Ändra val"
+
+#: ../game/instrumentgraph.cc:58 ../game/screen_sing.cc:124
 msgid "Restart"
 msgstr "Börja om"
 
 # start <-> restart?
-#: ../game/screen_sing.cc:85
+#: ../game/instrumentgraph.cc:58 ../game/screen_sing.cc:124
 msgid ""
 "Start the song\n"
 "from the beginning"
@@ -238,250 +85,168 @@ msgstr ""
 "Börja låten\n"
 "från början"
 
-#: ../game/screen_sing.cc:98
-msgid ""
-"Change vocal track\n"
-"(restart required)"
+#: ../game/instrumentgraph.cc:59 ../game/guitargraph.cc:200
+#: ../game/screen_intro.cc:184 ../game/dancegraph.cc:137
+#: ../game/screen_sing.cc:92 ../game/screen_sing.cc:126
+msgid "Quit"
+msgstr "Avsluta"
+
+# låt/sång
+#: ../game/instrumentgraph.cc:59 ../game/guitargraph.cc:200
+#: ../game/dancegraph.cc:137 ../game/screen_sing.cc:92
+#: ../game/screen_sing.cc:126
+msgid "Exit to song browser"
+msgstr "Återgå till låt bläddraren"
+
+#: ../game/guitargraph.cc:14
+msgid "Kids"
+msgstr "Barn"
+
+# Lätt eller enkel
+#: ../game/guitargraph.cc:14 ../game/dancegraph.cc:18
+msgid "Easy"
+msgstr "Lätt"
+
+# Medium eller mellan kanske
+#: ../game/guitargraph.cc:14 ../game/dancegraph.cc:18
+msgid "Medium"
+msgstr "Medium"
+
+#: ../game/guitargraph.cc:14 ../game/dancegraph.cc:18
+msgid "Hard"
+msgstr "Svårt"
+
+#: ../game/guitargraph.cc:14
+msgid "Expert"
+msgstr "Expert"
+
+#: ../game/guitargraph.cc:163 ../game/dancegraph.cc:134
+msgid "Select difficulty"
+msgstr "Välj svårighetsgrad"
+
+#: ../game/guitargraph.cc:169 ../game/guitargraph.cc:186
+msgid "Lefty-mode"
+msgstr "Vänsterläge"
+
+#: ../game/guitargraph.cc:183 ../game/dancegraph.cc:118
+msgid "Select track"
+msgstr "Välj spår"
+
+# Redo! eller klar!
+#: ../game/guitargraph.cc:194 ../game/dancegraph.cc:107
+msgid "Ready!"
+msgstr "Redo!"
+
+# ...
+#: ../game/guitargraph.cc:194 ../game/screen_intro.cc:166
+#: ../game/dancegraph.cc:107
+msgid "Start performing!"
+msgstr "Börja uppträd!"
+
+#: ../game/guitargraph.cc:207
+msgid "ON"
+msgstr "PÅ"
+
+#: ../game/guitargraph.cc:207
+msgid "OFF"
+msgstr "AV"
+
+#: ../game/guitargraph.cc:208
+msgid "Toggle lefty-mode"
+msgstr "Växla vänsterläge"
+
+# [RFC:sv] "Stråk!" känns rumphugget, "Vinnar Stråk!" inte heller bra. "Serie" blir också konstigt...
+#: ../game/guitargraph.cc:447 ../game/dancegraph.cc:319
+msgid "Streak!"
 msgstr ""
-"Byt röst spår\n"
-"(omstart krävs)"
 
-#: ../game/screen_sing.cc:107
-msgid "Finalizing..."
-msgstr "Slutför..."
+# ...
+#: ../game/guitargraph.cc:459
+msgid ""
+"God Mode\n"
+"Activated!"
+msgstr ""
+"God Mode\n"
+"Aktiverat!"
 
-#: ../game/screen_sing.cc:111
-msgid "Song contains broken tracks!"
-msgstr "Låten innehåller trasiga spår!"
+#: ../game/guitargraph.cc:460
+msgid "Mistakes ignored!"
+msgstr "Misstag ignorerade"
 
-#: ../game/screen_sing.cc:113
+# ...
+# förberet?
+#: ../game/guitargraph.cc:1102
+msgid "God Mode Ready!"
+msgstr "God Mode Redo!"
+
+# ...
+# kör på en översättning av tysk översättningen :P
+#: ../game/guitargraph.cc:1103
+msgid "Drum Fill!"
+msgstr "Trum-insats!"
+
+#: ../game/guitargraph.cc:1106
+msgid "Solo!"
+msgstr "Solo!"
+
+#: ../game/songs.cc:194
+msgid "show all songs"
+msgstr ""
+
+#: ../game/songs.cc:195
+msgid "has dance"
+msgstr ""
+
+# Vokal (musik), Sång, etc
+#: ../game/songs.cc:196
 #, fuzzy
-msgid "Loading graphics..."
-msgstr "Laddar låt..."
+msgid "has vocals"
+msgstr "Såmg"
 
-#: ../game/screen_sing.cc:114
-msgid "Loading complete"
-msgstr "Laddning klar"
+#: ../game/songs.cc:197
+msgid "has duet"
+msgstr ""
 
-#: ../game/screen_sing.cc:140
-msgid "Random background..."
-msgstr "Slumpmässig bakgrund"
+#: ../game/songs.cc:198
+#, fuzzy
+msgid "has guitar"
+msgstr "Kompgitarr"
 
-# skippa/hoppa över
-# ... instrumentalt mellanspel ...
-#: ../game/screen_sing.cc:485
-msgid "   ENTER to skip instrumental break"
-msgstr "   ENTER för att skippa mellanspel"
+#: ../game/songs.cc:199
+msgid "drums or keytar"
+msgstr ""
 
-# gradering eller betygsättning?
-#: ../game/screen_sing.cc:486
-msgid "   Remember to wait for grading!"
-msgstr "   Kom ihåg att vänta på graderingen!"
+#: ../game/songs.cc:200
+msgid "full band"
+msgstr ""
 
-#: ../game/screen_sing.cc:618
-msgid "No player!"
-msgstr "Ingen spelare!"
-
-#: ../game/screen_sing.cc:627
-msgid "Hit singer"
-msgstr "Hit sångare"
-
-# ...
-#: ../game/screen_sing.cc:628
-msgid "Lead singer"
-msgstr "Lead sångare"
-
-#: ../game/screen_sing.cc:629
-#: ../game/screen_sing.cc:635
-#: ../game/screen_sing.cc:641
-msgid "Rising star"
-msgstr "Stjärnskott"
-
-#: ../game/screen_sing.cc:630
-#: ../game/screen_sing.cc:636
-#: ../game/screen_sing.cc:642
-msgid "Amateur"
-msgstr "Amatör"
-
-#: ../game/screen_sing.cc:631
-#: ../game/screen_sing.cc:643
-msgid "Tone deaf"
-msgstr "Tondöv"
-
-#: ../game/screen_sing.cc:633
-msgid "Maniac"
-msgstr "Galning"
-
-# ...
-#: ../game/screen_sing.cc:634
-msgid "Hoofer"
-msgstr "Dansare"
-
-#: ../game/screen_sing.cc:637
-msgid "Loser"
-msgstr "Förlorare"
-
-#: ../game/screen_sing.cc:639
-msgid "Virtuoso"
-msgstr "Virtuos"
-
-# ...
-#: ../game/screen_sing.cc:640
-msgid "Rocker"
-msgstr "Rockare"
-
-#: ../game/songs.cc:205
+#: ../game/songs.cc:228
 msgid "random order"
 msgstr "slumpmässig ordning"
 
-#: ../game/songs.cc:206
+#: ../game/songs.cc:229
 msgid "sorted by song"
 msgstr "sorterat efter låt"
 
-#: ../game/songs.cc:207
+#: ../game/songs.cc:230
 msgid "sorted by artist"
 msgstr "sorterat efter artist"
 
-#: ../game/songs.cc:208
+#: ../game/songs.cc:231
 msgid "sorted by edition"
 msgstr "sorterat efter utgåva"
 
-#: ../game/songs.cc:209
+#: ../game/songs.cc:232
 msgid "sorted by genre"
 msgstr "sorterat efter genre"
 
-#: ../game/songs.cc:210
+#: ../game/songs.cc:233
 msgid "sorted by path"
 msgstr "sorterat efter sökväg"
 
-#: ../game/songs.cc:211
+#: ../game/songs.cc:234
 msgid "sorted by language"
 msgstr "sorterat efter språk"
-
-#: ../game/screen_players.cc:111
-msgid "No players found!"
-msgstr "Inga spelare funna!"
-
-#: ../game/screen_players.cc:112
-msgid "Enter a name to create a new player."
-msgstr "Ange ett namn för att skapa spelare."
-
-#: ../game/screen_players.cc:114
-msgid "Press enter to create player!"
-msgstr "Tryck på enter för att skapa spelaren!"
-
-# fick/klarade/tog/plockade
-#: ../game/screen_players.cc:121
-msgid "You reached %1% points!"
-msgstr "Du fick %1% poäng!"
-
-#: ../game/screen_players.cc:122
-msgid "Change player with arrow keys."
-msgstr "Byt spelare med piltangenterna."
-
-#: ../game/screen_players.cc:123
-msgid "Name:"
-msgstr "Namn:"
-
-#: ../game/screen_players.cc:126
-msgid "Type text to filter or create a new player."
-msgstr "Skriv in en text för att filtrera eller skapa spelare"
-
-#: ../game/screen_players.cc:126
-msgid "Search Text:"
-msgstr "Sök text:"
-
-#: ../game/main.cc:134
-msgid "Loading audio samples..."
-msgstr "Laddar ljud..."
-
-#: ../game/main.cc:148
-msgid "Creating screens..."
-msgstr "Skapar skärmar..."
-
-#: ../game/main.cc:157
-msgid "Entering main menu"
-msgstr "Går in i huvudmenyn"
-
-#: ../game/main.cc:169
-msgid "Screenshot taken!"
-msgstr "Skärmdump tagen!"
-
-#: ../game/main.cc:172
-msgid "Screenshot failed!"
-msgstr "Misslyckades att ta skärmdump!"
-
-#: ../game/screen_audiodevices.cc:56
-msgid ""
-"It seems you have some manual configurations\n"
-"incompatible with this user interface.\n"
-"Saving these settings will override\n"
-"all existing audio device configuration.\n"
-"Your other options changes will be saved too."
-msgstr ""
-"Det ser ut som om du har några manuella inställningar\n"
-"som är inkompatibla med detta användargränssnittet.\n"
-"Sparande av dessa inställningar kommer skriva över\n"
-"alla befintliga alternativ för ljudenhetskonfiguration.\n"
-"Alla andra ändringar av alternativ kommer sparas också."
-
-#: ../game/screen_audiodevices.cc:111
-msgid "- Unassigned -"
-msgstr "- Ej tilldelad -"
-
-#: ../game/screen_audiodevices.cc:131
-msgid "Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select to cancel. Ctrl + R to reset defaults"
-msgstr "Använd piltangenterna för att konfigurera. Tryck Enter/Start för att spara och testa eller Esc/Select för att avbryta. Ctrl + R för att återställa standardvärden"
-
-#: ../game/screen_audiodevices.cc:136
-msgid "For advanced device configuration, use command line parameter --audio (use --audiohelp for details)."
-msgstr "För avancerad enhetskonfiguration, använd kommandoradsparametern --audio (använd --audiohelp för detaljer)."
-
-#: ../game/screen_audiodevices.cc:191
-msgid "Some devices failed to open!"
-msgstr "Några enheter kunde inte öppnas!"
-
-#: ../game/screen_songs.cc:213
-msgid "No songs found!"
-msgstr "Inga låtar funna"
-
-# gratis eller fria?
-# (tysk översättning ger freie)
-#: ../game/screen_songs.cc:214
-msgid ""
-"Visit performous.org\n"
-"for free songs"
-msgstr ""
-"Besök performous.org\n"
-"för fria låtar"
-
-#: ../game/screen_songs.cc:216
-msgid "no songs match search"
-msgstr "inga låtar matchar sökningen"
-
-# ...
-# poängtabell, njae...
-#: ../game/screen_songs.cc:224
-msgid "(press END to view hiscores)"
-msgstr "(tryck på END för att visa highscore-tabellen)"
-
-#: ../game/screen_songs.cc:225
-msgid "<type in to search>"
-msgstr "<börja skriva för att söka>"
-
-# ...
-#: ../game/screen_songs.cc:230
-msgid "Hisccore for %1%\n"
-msgstr "Highscore för %1%\n"
-
-#: ../game/instrumentgraph.cc:49
-msgid "Rejoin"
-msgstr "Välj om"
-
-# ...
-#: ../game/instrumentgraph.cc:49
-msgid "Change selections"
-msgstr "Ändra val"
 
 #: ../game/screen_intro.cc:24
 msgid "No playback devices could be used.\n"
@@ -496,423 +261,957 @@ msgstr ""
 "\n"
 "Var god och konfigurera något innan du spelar."
 
-#: ../game/screen_intro.cc:64
+#: ../game/screen_intro.cc:69
 msgid "Settings saved as system defaults."
 msgstr ""
 
-#: ../game/screen_intro.cc:64
+#: ../game/screen_intro.cc:69
 msgid "Settings saved."
 msgstr ""
 
 # add "ESC returns" to it?
-#: ../game/screen_intro.cc:146
+#: ../game/screen_intro.cc:149
 msgid "Ctrl + S to save, Ctrl + R to reset defaults"
 msgstr "Ctrl + S sparar, Ctrl + R återställer ursprungsvärden"
 
 # ...
-#: ../game/screen_intro.cc:160
+#: ../game/screen_intro.cc:166
 msgid "Perform"
 msgstr "Uppträd"
 
-#: ../game/screen_intro.cc:161
+#: ../game/screen_intro.cc:167
 msgid "Practice"
 msgstr "Träna"
 
-#: ../game/screen_intro.cc:161
+#: ../game/screen_intro.cc:167
 msgid "Check your skills or test the microphones"
 msgstr "Testa dina förmågor eller mikrofoner"
 
-#: ../game/screen_intro.cc:180
-msgid "Audio Devices"
-msgstr "Ljudenheter"
-
-#: ../game/screen_intro.cc:180
-msgid "Setup microphones and playback"
-msgstr "Ställ in mikrofoner och uppspelning"
-
-#: ../game/screen_intro.cc:181
-msgid "Audio"
-msgstr "Ljud"
-
-#: ../game/screen_intro.cc:181
-msgid "Configure general audio settings"
-msgstr "Konfigurera allmänna ljudalternativ"
-
-#: ../game/screen_intro.cc:182
-msgid "Graphics"
-msgstr "Grafik"
-
-#: ../game/screen_intro.cc:182
-msgid "Configure rendering and video settings"
-msgstr "Ställ in renderings- och videoalternativ"
-
 #: ../game/screen_intro.cc:183
-msgid "Game"
-msgstr "Spel"
-
-# Gameplay skulle nog tom kunna funka...
-#: ../game/screen_intro.cc:183
-msgid "Gameplay related options"
-msgstr "Spelstils relaterade alternativ"
-
-#: ../game/screen_intro.cc:184
-msgid "Paths"
-msgstr "Sökvägar"
-
-#: ../game/screen_intro.cc:184
-msgid "Setup song and data paths"
-msgstr "Ställ in låt- och datasökvägar"
-
-#: ../game/screen_intro.cc:186
 msgid "Configure"
 msgstr "Konfigurera"
 
-#: ../game/screen_intro.cc:186
+#: ../game/screen_intro.cc:183
 msgid "Configure audio and game options"
 msgstr "Ställ in ljud- och spelalternativ"
 
 # Avsluta/Lämna
-#: ../game/screen_intro.cc:189
+#: ../game/screen_intro.cc:184
 msgid "Leave the game"
 msgstr "Avsluta spelet"
 
-#: ../game/screen_paths.cc:24
-msgid ""
-"This tool is not yet available.\n"
-"Configure paths by adding them\n"
-"as command line parameters and\n"
-"then save them in configuration menu."
+#: ../game/dancegraph.cc:18
+msgid "Beginner"
+msgstr "Nybörjare"
+
+#: ../game/dancegraph.cc:18
+msgid "Challenge"
+msgstr "Utmaning"
+
+# stanna eller sluta?
+#: ../game/dancegraph.cc:248
+msgid "STOP!"
+msgstr "STANNA!"
+
+#: ../game/screen_playlist.cc:110 ../game/screen_playlist.cc:252
+msgid "Continue"
 msgstr ""
-"Detta verktyget är inte tillgängligt ännu.\n"
-"Ställ in sökvägar genom att lägga till\n"
-"dem som kommandoradsargument och\n"
-"spara dem sedan i inställningsmenyn."
 
-#: ../game/screen_paths.cc:69
-msgid "Press any key to exit."
-msgstr "Tryck på valfri knapp för att avsluta."
+#: ../game/screen_playlist.cc:110
+msgid "Continue playing"
+msgstr ""
 
-#: ../game/screen_paths.cc:74
-msgid "Windows users can also use ConfigureSongDirectory.bat in the bin-directory."
-msgstr "Windows användare kan också använda ConfigureSongDirectory.bat i bin-katalogen"
+#: ../game/screen_playlist.cc:118
+msgid "Add songs"
+msgstr ""
+
+#: ../game/screen_playlist.cc:118
+msgid "Open the song browser to add more songs"
+msgstr ""
+
+#: ../game/screen_playlist.cc:119 ../game/screen_songs.cc:513
+msgid "Shuffle"
+msgstr ""
+
+#: ../game/screen_playlist.cc:119 ../game/screen_songs.cc:513
+msgid "Randomize the order of the playlist"
+msgstr ""
+
+#: ../game/screen_playlist.cc:125
+msgid "Clear and exit"
+msgstr ""
+
+#: ../game/screen_playlist.cc:125 ../game/screen_songs.cc:520
+msgid "Remove all the songs from the list"
+msgstr ""
+
+#: ../game/screen_playlist.cc:131 ../game/screen_playlist.cc:275
+#: ../game/screen_songs.cc:526
+msgid "Back"
+msgstr ""
+
+#: ../game/screen_playlist.cc:131 ../game/screen_playlist.cc:275
+msgid "Back to playlist viewer"
+msgstr ""
+
+#: ../game/screen_playlist.cc:237
+msgid "Press enter to view song options"
+msgstr ""
+
+#: ../game/screen_playlist.cc:244
+msgid "View more options"
+msgstr ""
+
+#: ../game/screen_playlist.cc:244
+#, fuzzy
+msgid "View general playlist settings"
+msgstr "Konfigurera allmänna ljudalternativ"
+
+#: ../game/screen_playlist.cc:252
+msgid "Play first"
+msgstr ""
+
+#: ../game/screen_playlist.cc:254
+msgid "Ignore the playlist's order and play this song first"
+msgstr ""
+
+#: ../game/screen_playlist.cc:255
+msgid "Start the song already!"
+msgstr ""
+
+#: ../game/screen_playlist.cc:264
+msgid "Remove"
+msgstr ""
+
+#: ../game/screen_playlist.cc:264
+msgid "Remove this song from the list"
+msgstr ""
+
+#: ../game/main.cc:146
+msgid "Loading audio samples..."
+msgstr "Laddar ljud..."
+
+#: ../game/main.cc:160
+msgid "Creating screens..."
+msgstr "Skapar skärmar..."
+
+#: ../game/main.cc:170
+msgid "Entering main menu"
+msgstr "Går in i huvudmenyn"
+
+#: ../game/main.cc:172 ../game/screen_sing.cc:97
+msgid "Loading complete"
+msgstr "Laddning klar"
+
+#: ../game/main.cc:183
+msgid "Screenshot taken!"
+msgstr "Skärmdump tagen!"
+
+#: ../game/main.cc:186
+msgid "Screenshot failed!"
+msgstr "Misslyckades att ta skärmdump!"
+
+#: ../game/screen_sing.cc:45
+msgid "Initializing webcam..."
+msgstr "Sätter upp web-kamera"
+
+#: ../game/screen_sing.cc:52
+msgid "Loading video..."
+msgstr "Laddar video..."
+
+#: ../game/screen_sing.cc:59
+msgid "Loading song..."
+msgstr "Laddar låt..."
+
+#: ../game/screen_sing.cc:66
+msgid "Song contains broken tracks!"
+msgstr "Låten innehåller trasiga spår!"
+
+#: ../game/screen_sing.cc:71
+msgid "Loading menu..."
+msgstr "Laddar meny..."
+
+#: ../game/screen_sing.cc:76
+#, fuzzy
+msgid "Start"
+msgstr "Börja om"
+
+# ...
+#: ../game/screen_sing.cc:76
+#, fuzzy
+msgid "Start performing"
+msgstr "Börja uppträd!"
+
+#: ../game/screen_sing.cc:80
+#, fuzzy
+msgid "Duet mode"
+msgstr "Vänsterläge"
+
+#: ../game/screen_sing.cc:81
+#, fuzzy
+msgid "Normal mode"
+msgstr "Karaoke-läge"
+
+#: ../game/screen_sing.cc:82
+msgid "Switch between duet and regular singing mode"
+msgstr ""
+
+#: ../game/screen_sing.cc:90
+#, fuzzy
+msgid "Change vocal track"
+msgstr ""
+"Byt röst spår\n"
+"(omstart krävs)"
+
+#: ../game/screen_sing.cc:125
+msgid "Skip"
+msgstr ""
+
+#: ../game/screen_sing.cc:125
+msgid "Skip current song"
+msgstr ""
+
+#: ../game/screen_sing.cc:391
+msgid "Press UP to join dance!"
+msgstr ""
+
+#: ../game/screen_sing.cc:391
+msgid "Step UP to join!"
+msgstr ""
+
+#: ../game/screen_sing.cc:396
+msgid "Press 1 to join guitar!"
+msgstr ""
+
+#: ../game/screen_sing.cc:396
+msgid "Press GREEN to join!"
+msgstr ""
+
+#: ../game/screen_sing.cc:401
+msgid "Press SPACE to join drums!"
+msgstr ""
+
+#: ../game/screen_sing.cc:401
+msgid "KICK to join!"
+msgstr ""
+
+# skippa/hoppa över
+# ... instrumentalt mellanspel ...
+#: ../game/screen_sing.cc:475
+msgid "   ENTER to skip instrumental break"
+msgstr "   ENTER för att skippa mellanspel"
+
+# gradering eller betygsättning?
+#: ../game/screen_sing.cc:476
+msgid "   Remember to wait for grading!"
+msgstr "   Kom ihåg att vänta på graderingen!"
+
+#: ../game/screen_sing.cc:587
+msgid "No player!"
+msgstr "Ingen spelare!"
+
+#: ../game/screen_sing.cc:594
+msgid "Hit singer"
+msgstr "Hit sångare"
+
+# ...
+#: ../game/screen_sing.cc:595
+msgid "Lead singer"
+msgstr "Lead sångare"
+
+#: ../game/screen_sing.cc:596 ../game/screen_sing.cc:602
+#: ../game/screen_sing.cc:608
+msgid "Rising star"
+msgstr "Stjärnskott"
+
+#: ../game/screen_sing.cc:597 ../game/screen_sing.cc:603
+#: ../game/screen_sing.cc:609
+msgid "Amateur"
+msgstr "Amatör"
+
+#: ../game/screen_sing.cc:598 ../game/screen_sing.cc:610
+msgid "Tone deaf"
+msgstr "Tondöv"
+
+#: ../game/screen_sing.cc:600
+msgid "Maniac"
+msgstr "Galning"
+
+# ...
+#: ../game/screen_sing.cc:601
+msgid "Hoofer"
+msgstr "Dansare"
+
+#: ../game/screen_sing.cc:604
+msgid "Loser"
+msgstr "Förlorare"
+
+#: ../game/screen_sing.cc:606
+msgid "Virtuoso"
+msgstr "Virtuos"
+
+# ...
+#: ../game/screen_sing.cc:607
+msgid "Rocker"
+msgstr "Rockare"
+
+#: ../game/screen_songs.cc:279
+msgid "No songs found!"
+msgstr "Inga låtar funna"
+
+# gratis eller fria?
+# (tysk översättning ger freie)
+#: ../game/screen_songs.cc:280
+msgid ""
+"Visit performous.org\n"
+"for free songs"
+msgstr ""
+"Besök performous.org\n"
+"för fria låtar"
+
+#: ../game/screen_songs.cc:282
+#, fuzzy
+msgid "Sorry, no songs match the search!"
+msgstr "inga låtar matchar sökningen"
+
+# ...
+#: ../game/screen_songs.cc:289
+#, fuzzy
+msgid "Hiscore\n"
+msgstr "Highscore för %1%\n"
+
+#: ../game/screen_songs.cc:298
+msgid "<type in to search>   ↔ songs    ↕ options"
+msgstr ""
+
+#: ../game/screen_songs.cc:301
+msgid "↔ sort order: "
+msgstr ""
+
+#: ../game/screen_songs.cc:302
+msgid "↔ type filter: "
+msgstr ""
+
+#: ../game/screen_songs.cc:303
+msgid "↔ hiscores   ↵ jukebox mode"
+msgstr ""
+
+#: ../game/screen_songs.cc:307
+msgid "↵ start a playlist with this song!"
+msgstr ""
+
+#: ../game/screen_songs.cc:309
+msgid "↵ open the playlist menu"
+msgstr ""
+
+#: ../game/screen_songs.cc:506
+msgid "Play"
+msgstr ""
+
+#: ../game/screen_songs.cc:506
+msgid "Start the game with all songs in playlist"
+msgstr ""
+
+#: ../game/screen_songs.cc:519
+msgid "View playlist"
+msgstr ""
+
+#: ../game/screen_songs.cc:519
+msgid "View the current playlist"
+msgstr ""
+
+#: ../game/screen_songs.cc:520
+msgid "Clear playlist"
+msgstr ""
+
+# låt/sång
+#: ../game/screen_songs.cc:526
+#, fuzzy
+msgid "Back to song browser"
+msgstr "Återgå till låt bläddraren"
+
+#: ../game/screen_players.cc:115
+msgid "No players found!"
+msgstr "Inga spelare funna!"
+
+#: ../game/screen_players.cc:116
+msgid "Enter a name to create a new player."
+msgstr "Ange ett namn för att skapa spelare."
+
+#: ../game/screen_players.cc:118
+msgid "Press enter to create player!"
+msgstr "Tryck på enter för att skapa spelaren!"
+
+#: ../game/screen_players.cc:122
+#, fuzzy
+msgid "No players worth mentioning!"
+msgstr "Inga spelare funna!"
+
+# fick/klarade/tog/plockade
+#: ../game/screen_players.cc:127
+msgid "You reached %1% points!"
+msgstr "Du fick %1% poäng!"
+
+#: ../game/screen_players.cc:128
+msgid "Change player with arrow keys."
+msgstr "Byt spelare med piltangenterna."
+
+#: ../game/screen_players.cc:129
+msgid "Name:"
+msgstr "Namn:"
+
+#: ../game/screen_players.cc:132
+msgid "Type text to filter or create a new player."
+msgstr "Skriv in en text för att filtrera eller skapa spelare"
+
+#: ../game/screen_players.cc:132
+msgid "Search Text:"
+msgstr "Sök text:"
+
+#: ../game/screen_audiodevices.cc:55
+msgid ""
+"It seems you have some manual configurations\n"
+"incompatible with this user interface.\n"
+"Saving these settings will override\n"
+"all existing audio device configuration.\n"
+"Your other options changes will be saved too."
+msgstr ""
+"Det ser ut som om du har några manuella inställningar\n"
+"som är inkompatibla med detta användargränssnittet.\n"
+"Sparande av dessa inställningar kommer skriva över\n"
+"alla befintliga alternativ för ljudenhetskonfiguration.\n"
+"Alla andra ändringar av alternativ kommer sparas också."
+
+#: ../game/screen_audiodevices.cc:114
+msgid "- Unassigned -"
+msgstr "- Ej tilldelad -"
+
+#: ../game/screen_audiodevices.cc:135
+msgid ""
+"Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select "
+"to cancel. Ctrl + R to reset defaults"
+msgstr ""
+"Använd piltangenterna för att konfigurera. Tryck Enter/Start för att spara "
+"och testa eller Esc/Select för att avbryta. Ctrl + R för att återställa "
+"standardvärden"
+
+#: ../game/screen_audiodevices.cc:140
+msgid ""
+"For advanced device configuration, use command line parameter --audio (use --"
+"audiohelp for details)."
+msgstr ""
+"För avancerad enhetskonfiguration, använd kommandoradsparametern --audio "
+"(använd --audiohelp för detaljer)."
+
+#: ../game/screen_audiodevices.cc:188
+msgid "Some devices failed to open!"
+msgstr "Några enheter kunde inte öppnas!"
 
 # items -> players?
-#: ../game/database.cc:107
-#: ../game/database.cc:127
+#: ../game/database.cc:89 ../game/database.cc:107
 msgid "No Items up to now."
 msgstr "Inga spelare ännu."
 
-#: ../game/database.cc:108
-#: ../game/database.cc:128
+#: ../game/database.cc:90 ../game/database.cc:108
 msgid "Be the first to be listed here!"
 msgstr "Bli den första att bli listad här!"
 
-# Gameplay skulle nog tom kunna funka...
-#: /tmp/xml2gettext.E2x76p4B7c:3
-msgid "Gameplay settings."
-msgstr "Spelstils alternativ."
+#: ../game/song.hh:22
+msgid "Guitar"
+msgstr "Gitarr"
 
-#: /tmp/xml2gettext.E2x76p4B7c:4
+#: ../game/song.hh:22
+msgid "Coop guitar"
+msgstr ""
+
+#: ../game/song.hh:22
+msgid "Rhythm guitar"
+msgstr "Kompgitarr"
+
+#: ../game/song.hh:22
+msgid "Bass"
+msgstr "Bas"
+
+#: ../game/song.hh:22
+msgid "Drums"
+msgstr "Trummor"
+
+# Vokal (musik), Sång, etc
+#: ../game/song.hh:22
+msgid "Vocals"
+msgstr "Såmg"
+
+#: ../game/song.hh:22
+msgid "Harmonic 1"
+msgstr "Överton 1"
+
+#: ../game/song.hh:22
+msgid "Harmonic 2"
+msgstr "Överton 2"
+
+#: ../game/song.hh:22
+msgid "Harmonic 3"
+msgstr "Överton 3"
+
+#: /tmp/xml2gettext.pJaf2puMzZ:2
+msgid "Game"
+msgstr "Spel"
+
+# Gameplay skulle nog tom kunna funka...
+#: /tmp/xml2gettext.pJaf2puMzZ:3
+msgid "Gameplay related options"
+msgstr "Spelstils relaterade alternativ"
+
+#: /tmp/xml2gettext.pJaf2puMzZ:4
 msgid "Graphic"
 msgstr "Grafik"
 
-#: /tmp/xml2gettext.E2x76p4B7c:5
-msgid "Video and rendering settings."
-msgstr "Video- och renderingsinställningar"
+#: /tmp/xml2gettext.pJaf2puMzZ:5
+msgid "Configure rendering and video settings"
+msgstr "Ställ in renderings- och videoalternativ"
 
-#: /tmp/xml2gettext.E2x76p4B7c:7
-msgid "Audio-related settings."
-msgstr "Ljud relaterade inställningar"
+#: /tmp/xml2gettext.pJaf2puMzZ:6
+msgid "Audio Devices"
+msgstr "Ljudenheter"
 
-#: /tmp/xml2gettext.E2x76p4B7c:9
-msgid "System paths."
-msgstr "Systemsökvägar"
+#: /tmp/xml2gettext.pJaf2puMzZ:7
+msgid "Setup microphones and playback"
+msgstr "Ställ in mikrofoner och uppspelning"
 
-#: /tmp/xml2gettext.E2x76p4B7c:10
+#: /tmp/xml2gettext.pJaf2puMzZ:8
+msgid "Audio"
+msgstr "Ljud"
+
+#: /tmp/xml2gettext.pJaf2puMzZ:9
+msgid "Configure general audio settings"
+msgstr "Konfigurera allmänna ljudalternativ"
+
+#: /tmp/xml2gettext.pJaf2puMzZ:10
+msgid "Paths"
+msgstr "Sökvägar"
+
+#: /tmp/xml2gettext.pJaf2puMzZ:11
+msgid "Setup song and data paths"
+msgstr "Ställ in låt- och datasökvägar"
+
+#: /tmp/xml2gettext.pJaf2puMzZ:12
 msgid "Karaoke mode"
 msgstr "Karaoke-läge"
 
-#: /tmp/xml2gettext.E2x76p4B7c:11
+#: /tmp/xml2gettext.pJaf2puMzZ:13
 msgid "Hide pitch wave, notes and scoring."
 msgstr "Döljer tonhöjdsvågorna, noterna och poängräkningen"
 
-#: /tmp/xml2gettext.E2x76p4B7c:12
+#: /tmp/xml2gettext.pJaf2puMzZ:14
 msgid "Pitch waves"
 msgstr "Tonhöjdsvågor"
 
-#: /tmp/xml2gettext.E2x76p4B7c:13
+#: /tmp/xml2gettext.pJaf2puMzZ:15
 msgid "Enable singing pitch display (when not in karaoke mode)."
 msgstr "Aktivera tonhöjds visning (när ej i karaoke-läge)"
 
-#: /tmp/xml2gettext.E2x76p4B7c:14
+#: /tmp/xml2gettext.pJaf2puMzZ:16
 msgid "Theme"
 msgstr "Tema"
 
-#: /tmp/xml2gettext.E2x76p4B7c:15
-msgid "Name of the theme to use or absolute path to theme folder."
+#: /tmp/xml2gettext.pJaf2puMzZ:17
+#, fuzzy
+msgid "Name of the theme to use."
 msgstr "Namnet på temat att använda eller absolut sökväg till temakatalogen"
 
-#: /tmp/xml2gettext.E2x76p4B7c:16
+#: /tmp/xml2gettext.pJaf2puMzZ:18
 msgid "Keyboard as guitar"
 msgstr "Tangentbord som gitarr"
 
 # ...
 # Enable -> Use?
-#: /tmp/xml2gettext.E2x76p4B7c:17
+#: /tmp/xml2gettext.pJaf2puMzZ:19
 msgid "Enable keyboard as guitar (Frets on Fire mode)."
 msgstr "Använd tangentbordet som gitarr (Frets on Fire läge)"
 
-#: /tmp/xml2gettext.E2x76p4B7c:18
+#: /tmp/xml2gettext.pJaf2puMzZ:20
 msgid "Keyboard as drumkit"
 msgstr "Tangentbord som trumkit"
 
 # ...
 # Enable -> Use?
-#: /tmp/xml2gettext.E2x76p4B7c:19
+#: /tmp/xml2gettext.pJaf2puMzZ:21
 msgid "Enable keyboard as drumkit."
 msgstr "Använd tangentbordet som trumkit "
 
-#: /tmp/xml2gettext.E2x76p4B7c:20
+#: /tmp/xml2gettext.pJaf2puMzZ:22
 msgid "Keyboard as dance pad"
 msgstr "Tangentbord som dansmatta"
 
 # ...
 # Enable -> Use?
-#: /tmp/xml2gettext.E2x76p4B7c:21
+#: /tmp/xml2gettext.pJaf2puMzZ:23
 msgid "Enable keyboard as dance pad."
 msgstr "Använd tangentbordet som dansmatta"
 
-#: /tmp/xml2gettext.E2x76p4B7c:22
+#: /tmp/xml2gettext.pJaf2puMzZ:24
 #, fuzzy
-msgid "Keyboard as keyboard"
+msgid "Keyboard as keytar"
 msgstr "Tangentbord som gitarr"
 
 # ...
 # Enable -> Use?
-#: /tmp/xml2gettext.E2x76p4B7c:23
+#: /tmp/xml2gettext.pJaf2puMzZ:25
 #, fuzzy
-msgid "Enable keyboard as keyboard."
+msgid "Enable keyboard as keytar."
 msgstr "Använd tangentbordet som dansmatta"
 
-#: /tmp/xml2gettext.E2x76p4B7c:24
+#: /tmp/xml2gettext.pJaf2puMzZ:26
+msgid "Force controller A's type"
+msgstr ""
+
+#: /tmp/xml2gettext.pJaf2puMzZ:27
+msgid ""
+"Override autodetection and force the first controller to the given type."
+msgstr ""
+
+#: /tmp/xml2gettext.pJaf2puMzZ:28
+msgid "Force controller B's type"
+msgstr ""
+
+#: /tmp/xml2gettext.pJaf2puMzZ:29
+msgid ""
+"Override autodetection and force the second controller to the given type."
+msgstr ""
+
+#: /tmp/xml2gettext.pJaf2puMzZ:30
+msgid "Force controller C's type"
+msgstr ""
+
+#: /tmp/xml2gettext.pJaf2puMzZ:31
+msgid ""
+"Override autodetection and force the third controller to the given type."
+msgstr ""
+
+#: /tmp/xml2gettext.pJaf2puMzZ:32
+msgid "Force controller D's type"
+msgstr ""
+
+#: /tmp/xml2gettext.pJaf2puMzZ:33
+msgid ""
+"Override autodetection and force the fourth controller to the given type."
+msgstr ""
+
+#: /tmp/xml2gettext.pJaf2puMzZ:34
 msgid "Joystick configuration"
 msgstr "Joystick-konfiguration"
 
-#: /tmp/xml2gettext.E2x76p4B7c:25
+#: /tmp/xml2gettext.pJaf2puMzZ:35
 msgid "Force joystick to some kind of instrument."
 msgstr "Tvinga joysticken till något from av instrument"
 
-#: /tmp/xml2gettext.E2x76p4B7c:26
+#: /tmp/xml2gettext.pJaf2puMzZ:36
 msgid "Hardware MIDI input device"
 msgstr "Hårdvaru MIDI indataenhet"
 
-#: /tmp/xml2gettext.E2x76p4B7c:27
-msgid "Part of sound card name or its number or empty to use the first available device. Used currently for MIDI drum controllers."
-msgstr "Del av ljudkortsnamnet, dess nummer eller lämna tomt för att välja första tillgängliga enhet. Används för närvarande bara för MIDI-trum kontroller."
+#: /tmp/xml2gettext.pJaf2puMzZ:37
+msgid ""
+"Regex for matching the MIDI devices to use. The default is to use all "
+"available devices."
+msgstr ""
 
-#: /tmp/xml2gettext.E2x76p4B7c:28
+#: /tmp/xml2gettext.pJaf2puMzZ:38
+msgid "Fallback song encoding"
+msgstr ""
+
+#: /tmp/xml2gettext.pJaf2puMzZ:39
+msgid "Pick the text codec used for song files that are not UTF-8."
+msgstr ""
+
+#: /tmp/xml2gettext.pJaf2puMzZ:40
 msgid "Windowed width"
 msgstr "Fönsterbredd"
 
-#: /tmp/xml2gettext.E2x76p4B7c:29
+#: /tmp/xml2gettext.pJaf2puMzZ:41
 msgid "The width of the window."
 msgstr "Fönstrets bredd i fönsterläge"
 
-#: /tmp/xml2gettext.E2x76p4B7c:30
+#: /tmp/xml2gettext.pJaf2puMzZ:42
 msgid "Windowed height"
 msgstr "Fönsterhöjd"
 
-#: /tmp/xml2gettext.E2x76p4B7c:31
+#: /tmp/xml2gettext.pJaf2puMzZ:43
 msgid "The height of the window."
 msgstr "Fönstrets höjd i fönsterläge"
 
-#: /tmp/xml2gettext.E2x76p4B7c:32
+#: /tmp/xml2gettext.pJaf2puMzZ:44
 msgid "Fullscreen mode"
 msgstr "Helskärmsläge"
 
-#: /tmp/xml2gettext.E2x76p4B7c:33
+#: /tmp/xml2gettext.pJaf2puMzZ:45
 msgid "Enable fullscreen mode on startup."
 msgstr "Aktivera helskärmsläge vid uppstart"
 
-#: /tmp/xml2gettext.E2x76p4B7c:34
+#: /tmp/xml2gettext.pJaf2puMzZ:46
 msgid "Stereoscopic 3D"
 msgstr ""
 
-#: /tmp/xml2gettext.E2x76p4B7c:35
+#: /tmp/xml2gettext.pJaf2puMzZ:47
 msgid "Enable 3D rendering of Performous."
 msgstr ""
 
-#: /tmp/xml2gettext.E2x76p4B7c:36
+#: /tmp/xml2gettext.pJaf2puMzZ:48
 msgid "Stereo3D type"
 msgstr ""
 
-#: /tmp/xml2gettext.E2x76p4B7c:37
+#: /tmp/xml2gettext.pJaf2puMzZ:49
 msgid "Some modes may only get activated in fullscreen mode."
 msgstr ""
 
-#: /tmp/xml2gettext.E2x76p4B7c:38
+#: /tmp/xml2gettext.pJaf2puMzZ:50
 msgid "Stereo3D separation"
 msgstr ""
 
-#: /tmp/xml2gettext.E2x76p4B7c:39
-msgid "The strength of the effect. Experiment with different settings for best results."
+#: /tmp/xml2gettext.pJaf2puMzZ:51
+msgid ""
+"The strength of the effect. Experiment with different settings for best "
+"results."
 msgstr ""
 
-#: /tmp/xml2gettext.E2x76p4B7c:40
+#: /tmp/xml2gettext.pJaf2puMzZ:52
 msgid "Video playback"
 msgstr "Video uppspelning"
 
-#: /tmp/xml2gettext.E2x76p4B7c:41
-msgid "Allows completely disabling background videos. It is recommended to leave this enabled as Performous will still smoothly fade out the video if your computer is not fast enough."
-msgstr "Möjliggör total avstängning av bakgrundsvideor. Det är rekommenderat att lämna detta aktiverat eftersom Performous automatiskt tonar ut video om din dator inte är snabb nog."
+#: /tmp/xml2gettext.pJaf2puMzZ:53
+msgid ""
+"Allows completely disabling background videos. It is recommended to leave "
+"this enabled as Performous will still smoothly fade out the video if your "
+"computer is not fast enough."
+msgstr ""
+"Möjliggör total avstängning av bakgrundsvideor. Det är rekommenderat att "
+"lämna detta aktiverat eftersom Performous automatiskt tonar ut video om din "
+"dator inte är snabb nog."
 
-#: /tmp/xml2gettext.E2x76p4B7c:42
+#: /tmp/xml2gettext.pJaf2puMzZ:54
 msgid "Webcam background"
 msgstr "Web-kamerabakgrund"
 
-#: /tmp/xml2gettext.E2x76p4B7c:43
+#: /tmp/xml2gettext.pJaf2puMzZ:55
 #, fuzzy
-msgid "Performous can use webcam as a background video. Disable it if Performous crashes while entering a song."
-msgstr "Performous kan försöka använda web-kameran som bakgrundsvideo. Du kan stänga av detta om det stör dig."
+msgid ""
+"Performous can use webcam as a background video. Disable it if Performous "
+"crashes while entering a song."
+msgstr ""
+"Performous kan försöka använda web-kameran som bakgrundsvideo. Du kan stänga "
+"av detta om det stör dig."
 
-#: /tmp/xml2gettext.E2x76p4B7c:44
+#: /tmp/xml2gettext.pJaf2puMzZ:56
 msgid "Webcam id"
 msgstr "Web-kamera id"
 
-#: /tmp/xml2gettext.E2x76p4B7c:45
-msgid "Use -1 to autodetect or a number starting from 0 to choose specific device."
-msgstr "Använd -1 för autodetektering eller ett tal med början från 0 för att välja en specifik enhet."
+#: /tmp/xml2gettext.pJaf2puMzZ:57
+msgid ""
+"Use -1 to autodetect or a number starting from 0 to choose specific device."
+msgstr ""
+"Använd -1 för autodetektering eller ett tal med början från 0 för att välja "
+"en specifik enhet."
 
-#: /tmp/xml2gettext.E2x76p4B7c:46
-msgid "3D notes"
-msgstr "3D-noter"
-
-#: /tmp/xml2gettext.E2x76p4B7c:47
-msgid "Draw instrument notes as 3-dimensional objects. May hurt performance on older hardware."
-msgstr "Rita instrumentnoterna som 3D objekt. Kan minska prestandarden på äldre hårdvara."
-
-#: /tmp/xml2gettext.E2x76p4B7c:48
+#: /tmp/xml2gettext.pJaf2puMzZ:58
 msgid "SVG quality"
 msgstr "SVG-kvalitet"
 
-#: /tmp/xml2gettext.E2x76p4B7c:49
-msgid "Larger numbers cause vector graphics to be rendered in higher resolution. Decrease this to make navigating in menus faster."
-msgstr "Större tal gör att vektorgrafiken renderas is högre upplösning. Minska detta för att göra menynavigation snabbare."
+#: /tmp/xml2gettext.pJaf2puMzZ:59
+msgid ""
+"Larger numbers cause vector graphics to be rendered in higher resolution. "
+"Decrease this to make navigating in menus faster."
+msgstr ""
+"Större tal gör att vektorgrafiken renderas is högre upplösning. Minska detta "
+"för att göra menynavigation snabbare."
 
-#: /tmp/xml2gettext.E2x76p4B7c:50
+#: /tmp/xml2gettext.pJaf2puMzZ:60
 msgid "Text quality"
 msgstr "Textkvalitet"
 
-#: /tmp/xml2gettext.E2x76p4B7c:51
-msgid "Larger numbers cause text to be rendered in higher resolution. Decrease this to make everything a little faster."
-msgstr "Större tal gör att text renderas is högre upplösning. Minska detta för att göra allt lite snabbare."
+#: /tmp/xml2gettext.pJaf2puMzZ:61
+msgid ""
+"Larger numbers cause text to be rendered in higher resolution. Decrease this "
+"to make everything a little faster."
+msgstr ""
+"Större tal gör att text renderas is högre upplösning. Minska detta för att "
+"göra allt lite snabbare."
 
-#: /tmp/xml2gettext.E2x76p4B7c:52
+#: /tmp/xml2gettext.pJaf2puMzZ:62
 msgid "Benchmark mode"
 msgstr "Prestandamätnings-läge"
 
-#: /tmp/xml2gettext.E2x76p4B7c:53
-msgid "Framerate limit of 100 FPS is removed and the game instead renders at full speed. FPS values are printed to console. Please note that the display drivers may still limit the rendering speed to the screen refresh rate."
-msgstr "Ramhastighetsbegränsningen på 100 FPS tas bort och spelet renderas istället i full hastighet. FPS värden skrivs ut till konsollen. Notera att skärmens drivrutin fortfarande kan begränsa renderingshastigheten till skärmens uppdateringshastighet."
+#: /tmp/xml2gettext.pJaf2puMzZ:63
+msgid ""
+"Framerate limit of 100 FPS is removed and the game instead renders at full "
+"speed. FPS values are printed to console. Please note that the display "
+"drivers may still limit the rendering speed to the screen refresh rate."
+msgstr ""
+"Ramhastighetsbegränsningen på 100 FPS tas bort och spelet renderas istället "
+"i full hastighet. FPS värden skrivs ut till konsollen. Notera att skärmens "
+"drivrutin fortfarande kan begränsa renderingshastigheten till skärmens "
+"uppdateringshastighet."
 
-#: /tmp/xml2gettext.E2x76p4B7c:54
+#: /tmp/xml2gettext.pJaf2puMzZ:64
 msgid "Suggested latency"
 msgstr "Föreslagen fördröjning"
 
-#: /tmp/xml2gettext.E2x76p4B7c:55
-msgid "This is a hint for the audio engine about the desired latency. Set this as low as possible while retaining clear audio playback. Requires restart."
-msgstr "Detta är en ledtråd till ljudmotorn om den önskade fördröjningen. Ställ in detta till lägsta möjliga värde med bibehållet klar ljuduppspelning. Kräver omstart."
+#: /tmp/xml2gettext.pJaf2puMzZ:65
+msgid ""
+"This is a hint for the audio engine about the desired latency. Set this as "
+"low as possible while retaining clear audio playback. Requires restart."
+msgstr ""
+"Detta är en ledtråd till ljudmotorn om den önskade fördröjningen. Ställ in "
+"detta till lägsta möjliga värde med bibehållet klar ljuduppspelning. Kräver "
+"omstart."
 
-#: /tmp/xml2gettext.E2x76p4B7c:56
+#: /tmp/xml2gettext.pJaf2puMzZ:66
 msgid "Audio/video latency"
 msgstr "Ljud/video-fördröjning"
 
 # display input lag.
 # sound card output latency.
 # IMO: the details ("Use neg...") should be *after* the "This should be set". (translation preserves current order.)
-#: /tmp/xml2gettext.E2x76p4B7c:57
-msgid "Affects all modes. Use negative value if your display input lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal. This should be set so that the notes pass the cursor at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while performing."
-msgstr "Påverkar alla lägen. Använd negativa värden om skräm in eftersläpet är större än ljudkortets ut fördröjning, välj positiva värden om det är tvärtom och noll om de lika stora. Detta bör ställas in så att noterna passerar markören samtidigt som ljudet hörs. Använd Ctrl+F1/F2 för att justera under pågående uppträdande."
+#: /tmp/xml2gettext.pJaf2puMzZ:67
+msgid ""
+"Affects all modes. Use negative value if your display input lag is greater "
+"than the sound card output latency, positive values in the opposite case and "
+"zero if they are equal. This should be set so that the notes pass the cursor "
+"at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while "
+"performing."
+msgstr ""
+"Påverkar alla lägen. Använd negativa värden om skräm in eftersläpet är "
+"större än ljudkortets ut fördröjning, välj positiva värden om det är tvärtom "
+"och noll om de lika stora. Detta bör ställas in så att noterna passerar "
+"markören samtidigt som ljudet hörs. Använd Ctrl+F1/F2 för att justera under "
+"pågående uppträdande."
 
 # ...
-#: /tmp/xml2gettext.E2x76p4B7c:58
+#: /tmp/xml2gettext.pJaf2puMzZ:68
 msgid "Audio round-trip latency"
 msgstr "Ljud round-trip fördröjning"
 
-#: /tmp/xml2gettext.E2x76p4B7c:59
-msgid "Affects singing only. The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. While performing, press Ctrl+S for synth mode and adjust with Ctrl+F3/F4."
-msgstr "Påverkar endast sjungande. Tiden det tar för Performous ljuduppspelning att från högtalarna, till mikrofonen och hela vägen tillbaks tills Performous plockar upp det och analyserar det. Tryck Ctrl+S för synt-läge under pågående uppträdande och justera med Ctrl+F3/F4."
+#: /tmp/xml2gettext.pJaf2puMzZ:69
+msgid ""
+"Affects singing only. The time it takes for Performous playback to reach "
+"your speakers, fly to the microphone and all the way back until Performous "
+"captures and analyzes it. While performing, press Ctrl+S for synth mode and "
+"adjust with Ctrl+F3/F4."
+msgstr ""
+"Påverkar endast sjungande. Tiden det tar för Performous ljuduppspelning att "
+"från högtalarna, till mikrofonen och hela vägen tillbaks tills Performous "
+"plockar upp det och analyserar det. Tryck Ctrl+S för synt-läge under "
+"pågående uppträdande och justera med Ctrl+F3/F4."
 
-#: /tmp/xml2gettext.E2x76p4B7c:60
+#: /tmp/xml2gettext.pJaf2puMzZ:70
 msgid "Audio/controller latency"
 msgstr "Ljud/kontroll-fördröjning"
 
-#: /tmp/xml2gettext.E2x76p4B7c:61
-msgid "Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to adjust while performing."
-msgstr "Påverkar endast instrument och dans. Den totala USB (gitarr eller dansmatta) fördröjningen kombinerat med utgående ljud-fördröjning. Justera så att du kan träffa noterna när du spelar efter känsla (inte ser på skärmen). Använd Ctrl+F5/F6 för att justera under uppträdande."
+#: /tmp/xml2gettext.pJaf2puMzZ:71
+msgid ""
+"Affects instruments and dancing only. The total of USB (guitar or dance pad) "
+"latency combined with audio output latency. Adjust so that you can hit the "
+"notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to "
+"adjust while performing."
+msgstr ""
+"Påverkar endast instrument och dans. Den totala USB (gitarr eller dansmatta) "
+"fördröjningen kombinerat med utgående ljud-fördröjning. Justera så att du "
+"kan träffa noterna när du spelar efter känsla (inte ser på skärmen). Använd "
+"Ctrl+F5/F6 för att justera under uppträdande."
 
-#: /tmp/xml2gettext.E2x76p4B7c:62
+#: /tmp/xml2gettext.pJaf2puMzZ:72
 msgid "Audio devices"
 msgstr "Ljudenheter"
 
-#: /tmp/xml2gettext.E2x76p4B7c:63
+#: /tmp/xml2gettext.pJaf2puMzZ:73
 msgid "List of audio devices to try."
 msgstr "Lista med ljudenheter att prova."
 
-#: /tmp/xml2gettext.E2x76p4B7c:64
+#: /tmp/xml2gettext.pJaf2puMzZ:74
 msgid "Menu volume"
 msgstr "Meny-volym"
 
-#: /tmp/xml2gettext.E2x76p4B7c:65
+#: /tmp/xml2gettext.pJaf2puMzZ:75
 msgid "The volume level of menus, song previews and jukebox mode."
 msgstr "Ljudvolymen i menyer, vid förhandsgranskning av låtar och jukebox-läge"
 
-#: /tmp/xml2gettext.E2x76p4B7c:66
+#: /tmp/xml2gettext.pJaf2puMzZ:76
 msgid "Music volume"
 msgstr "Musik-volym"
 
-#: /tmp/xml2gettext.E2x76p4B7c:67
-msgid "The ingame music volume. Values above 90 are not recommended as distortion may occur."
-msgstr "Ljudvolymen i spelet. Värden över 90 rekommenderas inte då distortion kan ske."
+#: /tmp/xml2gettext.pJaf2puMzZ:77
+msgid ""
+"The ingame music volume. Values above 90 are not recommended as distortion "
+"may occur."
+msgstr ""
+"Ljudvolymen i spelet. Värden över 90 rekommenderas inte då distortion kan "
+"ske."
 
-#: /tmp/xml2gettext.E2x76p4B7c:68
+#: /tmp/xml2gettext.pJaf2puMzZ:78
 msgid "Failure volume"
 msgstr "Misslyckande-volym"
 
 # ... heh?
 # Following the german trans: ignoring "89 louder!"
-#: /tmp/xml2gettext.E2x76p4B7c:69
-msgid "The ingame fail sound volume. Values above 90 are not recommended as distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
-msgstr "Ljudvolymen vid misslyckande under spel. Värden över 90 rekommenderas inte eftersom förvrängning kan ske. 11 är högre än 10, men dessa går upp till 100."
+#: /tmp/xml2gettext.pJaf2puMzZ:79
+msgid ""
+"The ingame fail sound volume. Values above 90 are not recommended as "
+"distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
+msgstr ""
+"Ljudvolymen vid misslyckande under spel. Värden över 90 rekommenderas inte "
+"eftersom förvrängning kan ske. 11 är högre än 10, men dessa går upp till 100."
+
+#: /tmp/xml2gettext.pJaf2puMzZ:80
+msgid "Microphone pass-through"
+msgstr ""
+
+#: /tmp/xml2gettext.pJaf2puMzZ:81
+msgid "Send captured singing voice to speakers."
+msgstr ""
+
+#: /tmp/xml2gettext.pJaf2puMzZ:82
+msgid "Pass-through volume ratio"
+msgstr ""
+
+#: /tmp/xml2gettext.pJaf2puMzZ:83
+msgid "How much voice is amplified compared to the music."
+msgstr ""
 
 # Låt/Sång
-#: /tmp/xml2gettext.E2x76p4B7c:70
+#: /tmp/xml2gettext.pJaf2puMzZ:84
 msgid "Song folders"
 msgstr "Låtkataloger"
 
-#: /tmp/xml2gettext.E2x76p4B7c:71
-msgid "Where to recursively look for songs. DATADIR at the beginning means all Performous data folders."
-msgstr "Anger var rekursiv sökning efter låtar sker. DATADIR i början innebär alla Performous datakataloger."
+#: /tmp/xml2gettext.pJaf2puMzZ:85
+msgid ""
+"Where to recursively look for songs. DATADIR at the beginning means all "
+"Performous data folders."
+msgstr ""
+"Anger var rekursiv sökning efter låtar sker. DATADIR i början innebär alla "
+"Performous datakataloger."
 
-#: /tmp/xml2gettext.E2x76p4B7c:72
+#: /tmp/xml2gettext.pJaf2puMzZ:86
 msgid "Base folders for data"
 msgstr "Baskatalog för data"
 
-#: /tmp/xml2gettext.E2x76p4B7c:73
-msgid "System defaults are included automatically. Additional paths can be added here."
-msgstr "Systemets standardvärden inkluderas automatiskt. Extra sökvägar kan läggas till här."
+#: /tmp/xml2gettext.pJaf2puMzZ:87
+msgid ""
+"System defaults are included automatically. Additional paths can be added "
+"here."
+msgstr ""
+"Systemets standardvärden inkluderas automatiskt. Extra sökvägar kan läggas "
+"till här."
 
-#~ msgid "Loading theme..."
-#~ msgstr "Laddar tema..."
+#~ msgid "Song is broken!"
+#~ msgstr "Låten är trasig!"
 
-#~ msgid "Loading background..."
-#~ msgstr "Laddar bakgrund..."
+#~ msgid "Loading instruments..."
+#~ msgstr "Laddar instrument..."
 
-#~ msgid "Loading user interface..."
-#~ msgstr "Laddar användargränssnit..."
+#~ msgid "Finalizing..."
+#~ msgstr "Slutför..."
 
-#~ msgid "Audio..."
-#~ msgstr "Ljud..."
+#, fuzzy
+#~ msgid "Loading graphics..."
+#~ msgstr "Laddar låt..."
 
-#~ msgid "Launching background loaders..."
-#~ msgstr "Startar bakgrundsladdare..."
+#~ msgid "Random background..."
+#~ msgstr "Slumpmässig bakgrund"
