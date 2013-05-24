@@ -102,7 +102,7 @@ msgstr "Afsluiten"
 #: ../game/dancegraph.cc:141
 #: ../game/guitargraph.cc:203
 msgid "Exit to song browser"
-msgstr "Ga naar liedjesverkenner"
+msgstr "Ga naar muziekverkenner"
 
 #: ../game/dancegraph.cc:260
 msgid "STOP!"
@@ -124,7 +124,7 @@ msgstr "Expert"
 #: ../game/guitargraph.cc:172
 #: ../game/guitargraph.cc:189
 msgid "Lefty-mode"
-msgstr "Linkse modus"
+msgstr "Linkshandige modus"
 
 #: ../game/guitargraph.cc:210
 msgid "ON"
@@ -136,7 +136,7 @@ msgstr "UIT"
 
 #: ../game/guitargraph.cc:211
 msgid "Toggle lefty-mode"
-msgstr "Linkse modus aan/uit"
+msgstr "Linkshandige modus aan/uit"
 
 #: ../game/guitargraph.cc:499
 msgid ""
@@ -177,11 +177,11 @@ msgstr "%d items"
 
 #: ../game/screen_sing.cc:34
 msgid "Loading song..."
-msgstr "Laden lied..."
+msgstr "Laden nummer..."
 
 #: ../game/screen_sing.cc:40
 msgid "Song is broken!"
-msgstr "Muziekbestand is kapot!"
+msgstr "Nummer is kapot!"
 
 #: ../game/screen_sing.cc:45
 msgid "Initializing webcam..."
@@ -205,7 +205,7 @@ msgstr "Hervatten"
 
 #: ../game/screen_sing.cc:84
 msgid "Back to performing!"
-msgstr "Terug naar opvoering!"
+msgstr "Terug naar optreden!"
 
 #: ../game/screen_sing.cc:85
 msgid "Restart"
@@ -224,7 +224,7 @@ msgid ""
 "Change vocal track\n"
 "(restart required)"
 msgstr ""
-"Verander van zanglijn\n"
+"Verander van zanger\n"
 "(herstart vereist)"
 
 #: ../game/screen_sing.cc:107
@@ -242,7 +242,7 @@ msgstr "Laden lied..."
 
 #: ../game/screen_sing.cc:114
 msgid "Loading complete"
-msgstr "Laden vervolledigd"
+msgstr "Laden afgerond"
 
 #: ../game/screen_sing.cc:140
 msgid "Random background..."
@@ -254,7 +254,7 @@ msgstr "   ENTER: sla muzikaal stuk over"
 
 #: ../game/screen_sing.cc:486
 msgid "   Remember to wait for grading!"
-msgstr "   Even wachten op de uitslag!"
+msgstr "   Wacht A.U.B. op de uitslag!"
 
 #: ../game/screen_sing.cc:618
 msgid "No player!"
@@ -295,7 +295,7 @@ msgstr "Professional"
 
 #: ../game/screen_sing.cc:637
 msgid "Loser"
-msgstr "Loser"
+msgstr "Verliezer"
 
 #: ../game/screen_sing.cc:639
 msgid "Virtuoso"
@@ -393,11 +393,11 @@ msgid ""
 "all existing audio device configuration.\n"
 "Your other options changes will be saved too."
 msgstr ""
-"Het lijkt erop dat je enkele manuele opties hebt\n"
+"Het lijkt erop dat je enkele handmatige opties hebt\n"
 "die niet compatibel zijn met deze interface.\n"
 "Opslaan van deze instellingen zal de bestaande\n"
 "opties voor audio-apparaten overschrijven.\n"
-"De andere optiewijzigingen zullen ook opgeslaan worden."
+"De andere optiewijzigingen zullen ook opgeslagen worden."
 
 #: ../game/screen_audiodevices.cc:111
 msgid "- Unassigned -"
@@ -425,7 +425,7 @@ msgid ""
 "for free songs"
 msgstr ""
 "Bezoek performous.org\n"
-"voor gratis liedjes"
+"voor gratis nummers"
 
 #: ../game/screen_songs.cc:216
 msgid "no songs match search"
@@ -433,7 +433,7 @@ msgstr "filter geeft geen resultaat"
 
 #: ../game/screen_songs.cc:224
 msgid "(press END to view hiscores)"
-msgstr "(duw op END om recordscores te zien)"
+msgstr "(gebruik END-toets om recordscores te zien)"
 
 #: ../game/screen_songs.cc:225
 msgid "<type in to search>"
@@ -445,7 +445,7 @@ msgstr "Recordscores voor %1%\n"
 
 #: ../game/instrumentgraph.cc:49
 msgid "Rejoin"
-msgstr "Terug meedoen"
+msgstr "Opnieuw meedoen"
 
 #: ../game/instrumentgraph.cc:49
 msgid "Change selections"
@@ -465,11 +465,11 @@ msgstr ""
 
 #: ../game/screen_intro.cc:64
 msgid "Settings saved as system defaults."
-msgstr ""
+msgstr "Instellingen opgeslagen als systeem-standaard"
 
 #: ../game/screen_intro.cc:64
 msgid "Settings saved."
-msgstr ""
+msgstr "Instellingen opgeslagen"
 
 #: ../game/screen_intro.cc:146
 msgid "Ctrl + S to save, Ctrl + R to reset defaults"
@@ -477,7 +477,7 @@ msgstr "Ctrl + S: opslaan, Ctrl + R: standaardinstellingen"
 
 #: ../game/screen_intro.cc:160
 msgid "Perform"
-msgstr "Performen"
+msgstr "Optreden"
 
 #: ../game/screen_intro.cc:161
 msgid "Practice"
@@ -501,11 +501,11 @@ msgstr "Geluid"
 
 #: ../game/screen_intro.cc:181
 msgid "Configure general audio settings"
-msgstr "Aanpassen algemene geluidsinstellingen"
+msgstr "Pas algemene geluidsinstellingen aan"
 
 #: ../game/screen_intro.cc:182
 msgid "Graphics"
-msgstr "Beeld"
+msgstr "Visueel"
 
 #: ../game/screen_intro.cc:182
 msgid "Configure rendering and video settings"
@@ -517,7 +517,7 @@ msgstr "Spel"
 
 #: ../game/screen_intro.cc:183
 msgid "Gameplay related options"
-msgstr "Opties voor spelvorm"
+msgstr "Aan spel gerelateerde opties"
 
 #: ../game/screen_intro.cc:184
 msgid "Paths"
@@ -575,15 +575,15 @@ msgstr "Spelopties."
 
 #: /tmp/xml2gettext.q0BoeZosdV:4
 msgid "Graphic"
-msgstr "Beeld"
+msgstr "Grafisch"
 
 #: /tmp/xml2gettext.q0BoeZosdV:5
 msgid "Video and rendering settings."
-msgstr "Beeld- en renderopties."
+msgstr "Beeld- en tekenopties."
 
 #: /tmp/xml2gettext.q0BoeZosdV:7
 msgid "Audio-related settings."
-msgstr "Geluidgerelateerde opties."
+msgstr "Aan geluid gerelateerde opties."
 
 #: /tmp/xml2gettext.q0BoeZosdV:9
 msgid "System paths."
@@ -689,27 +689,27 @@ msgstr "Gebruik fullscreen modus vanaf het starten."
 
 #: /tmp/xml2gettext.q0BoeZosdV:34
 msgid "Stereoscopic 3D"
-msgstr ""
+msgstr "Stereoscopisch 3D"
 
 #: /tmp/xml2gettext.q0BoeZosdV:35
 msgid "Enable 3D rendering of Performous."
-msgstr ""
+msgstr "Schake 3D-tekeningen van Performous in."
 
 #: /tmp/xml2gettext.q0BoeZosdV:36
 msgid "Stereo3D type"
-msgstr ""
+msgstr "Stereo3D-type"
 
 #: /tmp/xml2gettext.q0BoeZosdV:37
 msgid "Some modes may only get activated in fullscreen mode."
-msgstr ""
+msgstr "Sommige functies zullen alleen werken in Volledig-scherm modus."
 
 #: /tmp/xml2gettext.q0BoeZosdV:38
 msgid "Stereo3D separation"
-msgstr ""
+msgstr "Stereo3D-sterkte"
 
 #: /tmp/xml2gettext.q0BoeZosdV:39
 msgid "The strength of the effect. Experiment with different settings for best results."
-msgstr ""
+msgstr "De sterkte van het effect, Probeer verschillende instellingen voor de beste resultaten."
 
 #: /tmp/xml2gettext.q0BoeZosdV:40
 msgid "Video playback"
@@ -725,8 +725,9 @@ msgstr "Webcam achtergrond"
 
 #: /tmp/xml2gettext.q0BoeZosdV:43
 #, fuzzy
+# this was translated as "disable it if it annoys you"
 msgid "Performous can use webcam as a background video. Disable it if Performous crashes while entering a song."
-msgstr "Performous kan een webcam als achtergrond proberen te gebruiken. Je kan dit afzetten als dit jou ergert."
+msgstr "Performous kan een webcam als achtergrond proberen te gebruiken. Je kan dit afzetten als performous vastloopt bij het spelen van een nummer."
 
 #: /tmp/xml2gettext.q0BoeZosdV:44
 msgid "Webcam id"
@@ -842,7 +843,7 @@ msgstr "Locatie om recursief te zoeken naar liedjes. DATADIR in het begin beteke
 
 #: /tmp/xml2gettext.q0BoeZosdV:72
 msgid "Base folders for data"
-msgstr "Basismappen voor data"
+msgstr "Basismappen voor gegevens"
 
 #: /tmp/xml2gettext.q0BoeZosdV:73
 msgid "System defaults are included automatically. Additional paths can be added here."
