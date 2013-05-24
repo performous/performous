@@ -142,6 +142,7 @@ void Songs::filter_internal() {
 			if (m_type == 3 && !s.hasDuet()) continue;
 			if (m_type == 4 && !s.hasGuitars()) continue;
 			if (m_type == 5 && !s.hasDrums() && !s.hasKeyboard()) continue;
+			if (m_type == 6 && (!s.hasVocals() || !s.hasGuitars() || (!s.hasDrums() && !s.hasKeyboard()))) continue;
 			if (regex_search(s.strFull(), boost::regex(m_filter, boost::regex_constants::icase))) filtered.push_back(*it);
 		}
 		m_filtered.swap(filtered);
@@ -169,21 +170,22 @@ namespace {
 		}
 	};
 
-    /// A helper for easily constructing CmpByField objects
-    template <typename T> CmpByField<T> comparator(T Song::*field) { return CmpByField<T>(field); }
+	/// A helper for easily constructing CmpByField objects
+	template <typename T> CmpByField<T> comparator(T Song::*field) { return CmpByField<T>(field); }
 
-	static const int types = 6, orders = 7;
+	static const int types = 7, orders = 7;
 
 }
 
 std::string Songs::typeDesc() const {
 	switch (m_type) {
-	  case 0: return _("show all songs");
-	  case 1: return _("has dance");
-	  case 2: return _("has vocals");
-	  case 3: return _("has duet");
-	  case 4: return _("has guitar");
-	  case 5: return _("drums or keytar");
+		case 0: return _("show all songs");
+		case 1: return _("has dance");
+		case 2: return _("has vocals");
+		case 3: return _("has duet");
+		case 4: return _("has guitar");
+		case 5: return _("drums or keytar");
+		case 6: return _("full band");
 	}
 	throw std::logic_error("Internal error: unknown type filter in Songs::typeDesc");
 }
@@ -198,7 +200,7 @@ void Songs::typeChange(int diff) {
 }
 
 void Songs::typeCycle(int cat) {
-	static const int categories[types] = { 0, 1, 2, 2, 3, 3 };
+	static const int categories[types] = { 0, 1, 2, 2, 3, 3, 4 };
 	// Find the next matching category
 	int type = 0;
 	for (int t = (categories[m_type] == cat ? m_type + 1 : 0); t < types; ++t) {

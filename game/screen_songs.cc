@@ -150,10 +150,10 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 			else if (m_search.process(keysym)) m_songs.setFilter(m_search.text);
 			// Shortcut keys for accessing different type filter modes
 			if (key == SDLK_TAB) m_songs.sortChange(1);
-			if (key == SDLK_F5) m_songs.typeCycle(1);
-			if (key == SDLK_F6) m_songs.typeCycle(2);
-			if (key == SDLK_F7) m_songs.typeCycle(3);
-			if (key == SDLK_F8) m_songs.typeCycle(4);
+			if (key == SDLK_F5) m_songs.typeCycle(2);
+			if (key == SDLK_F6) m_songs.typeCycle(3);
+			if (key == SDLK_F7) m_songs.typeCycle(4);
+			if (key == SDLK_F8) m_songs.typeCycle(1);
 		}
 	}
 	if (m_songs.empty()) m_jukebox = false;
@@ -249,6 +249,8 @@ void ScreenSongs::drawMultimedia() {
 		if (m_songbg.get() && !m_video.get()) {
 			if (m_songbg->width() > 512 && m_songbg->dimensions.ar() > 1.1) {
 				// Full screen mode
+				float s = sin(m_clock.get()) * 0.15 + 1.15;
+				Transform sc(scale(glmath::vec3(s, s, s)));
 				m_songbg->draw();
 			} else {
 				// Low res texture or cover image, render in tiled mode
@@ -276,8 +278,7 @@ void ScreenSongs::draw() {
 			oss_song << _("No songs found!");
 			oss_order << _("Visit performous.org\nfor free songs");
 		} else {
-			oss_song << _("no songs match search");
-			oss_order << m_search.text << "\n\n";
+			oss_song << _("Sorry, no songs match the search!");
 		}
 	} else {
 		Song& song = m_songs.current();
@@ -307,14 +308,14 @@ void ScreenSongs::draw() {
 			oss_order << _("↵ open the playlist menu");
 		}
 		break;
-	}	
+	}
 
 	if (m_jukebox) drawJukebox();
 	else {
 		// Draw song and order texts
 		theme->song.draw(oss_song.str());
 		theme->order.draw(oss_order.str());
-		drawInstruments(Dimensions(1.0).fixedHeight(0.03).middle(-0.22).screenBottom(-0.01));
+		drawInstruments(Dimensions(1.0).fixedHeight(0.09).right(0.45).screenTop(0.02));
 		using namespace glmath;
 		Transform trans(translate(vec3(0.32, -0.03, 0.0)) * scale(vec3(0.75, 0.75, 1.0)));
 		theme->hiscores.draw(oss_hiscore.str());
@@ -442,29 +443,29 @@ void ScreenSongs::drawInstruments(Dimensions dim) const {
 
 	UseTexture tex(*m_instrumentList);
 	double x = dim.x1();
-	for (int i = vocalCount-1; i >= 0; i--) {
-		drawIcon(1, dim.left(x));
-		x += (i > 0 ? 0.3 : 1.0) * dim.w();
-	}
-	// guitars
-	for (int i = guitarCount-1; i >= 0; i--) {
-		drawIcon(2, dim.left(x));
-		x += (i > 0 ? 0.3 : 1.0) * dim.w();
-	}
-	// bass
-	if (have_bass) {
-		drawIcon(3, dim.left(x));
-		x += dim.w();
+	// dancing
+	if (have_dance) {
+		drawIcon(6, dim.left(x));
+		x -= dim.w();
 	}
 	// drums
 	if (have_drums) {
 		drawIcon(4, dim.left(x));
-		x += dim.w();
+		x -= dim.w();
 	}
-	// dancing
-	if (have_dance) {
-		drawIcon(6, dim.left(x));
-		x += dim.w();
+	// bass
+	if (have_bass) {
+		drawIcon(3, dim.left(x));
+		x -= dim.w();
+	}
+	// guitars
+	for (int i = guitarCount-1; i >= 0; i--) {
+		drawIcon(2, dim.left(x));
+		x -= (i > 0 ? 0.3 : 1.0) * dim.w();
+	}
+	for (int i = vocalCount-1; i >= 0; i--) {
+		drawIcon(1, dim.left(x));
+		x -= (i > 0 ? 0.3 : 1.0) * dim.w();
 	}
 }
 
