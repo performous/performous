@@ -276,7 +276,7 @@ msgstr "選手がいません！"
 
 #: ../game/screen_sing.cc:627
 msgid "Hit singer"
-msgstr ""
+msgstr "ヒット歌手"
 
 #: ../game/screen_sing.cc:628
 msgid "Lead singer"
@@ -387,7 +387,7 @@ msgstr "名前："
 
 #: ../game/screen_players.cc:126
 msgid "Type text to filter or create a new player."
-msgstr ""
+msgstr "新しい選手を作るように字を入力して下さい"
 
 # will search criteria do? 検索テクスト feels wrong to me (僕がでもが外人だ… ;)
 #: ../game/screen_players.cc:126
@@ -442,17 +442,17 @@ msgstr ""
 
 #: ../game/screen_audiodevices.cc:191
 msgid "Some devices failed to open!"
-msgstr ""
+msgstr "機械をあけません。"
 
 #: ../game/screen_songs.cc:213
 msgid "No songs found!"
-msgstr ""
+msgstr "曲が全然見つけませんでした。"
 
 #: ../game/screen_songs.cc:214
 msgid ""
 "Visit performous.org\n"
 "for free songs"
-msgstr ""
+msgstr "無料曲に「performous.org」行って下さい"
 
 #: ../game/screen_songs.cc:216
 msgid "no songs match search"
@@ -465,7 +465,7 @@ msgstr "（エンドキーを押すとハイスコアを見る事ができます
 
 #: ../game/screen_songs.cc:225
 msgid "<type in to search>"
-msgstr ""
+msgstr "曲をさがすように字を入力して下さい"
 
 # ハイスコア or 高得点?
 #: ../game/screen_songs.cc:230
@@ -474,11 +474,11 @@ msgstr "%1%の高得点\n"
 
 #: ../game/instrumentgraph.cc:49
 msgid "Rejoin"
-msgstr ""
+msgstr "再加入"
 
 #: ../game/instrumentgraph.cc:49
 msgid "Change selections"
-msgstr ""
+msgstr "曲目を変更"
 
 #: ../game/screen_intro.cc:24
 msgid "No playback devices could be used.\n"
