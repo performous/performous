@@ -7,6 +7,7 @@
 #include "image.hh"
 #include "screen.hh"
 
+#include <boost/filesystem.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>

@@ -1,13 +1,13 @@
 #pragma once
-#include <boost/cstdint.hpp>
+#include "util.hh"
 #include <map>
 #include <string>
 #include <vector>
 
-using boost::uint8_t;
-using boost::uint16_t;
-using boost::uint32_t;
-using boost::uint64_t;
+using std::uint8_t;
+using std::uint16_t;
+using std::uint32_t;
+using std::uint64_t;
 
 #if 0
 
@@ -33,9 +33,8 @@ class MidiStream;
  * The Parser class, that contains needed information of given midi-file
  */
 
-class MidiFileParser{
-
-  public:
+class MidiFileParser {
+public:
 
 	/** Constructor
 	 *
@@ -43,7 +42,7 @@ class MidiFileParser{
 	 *
 	 * @param name Name of midifile, which want to be read
 	 */
-	MidiFileParser(char const* name);
+	MidiFileParser(fs::path const& name);
 
 	struct TempoChange {
 		uint32_t miditime;
@@ -97,7 +96,7 @@ class MidiFileParser{
 	/** Ticks per beat == number of divisions per every quarter note **/
 	uint16_t division;
 	uint32_t ts_last;
-  private:
+private:
 	std::string m_lyric;
 };
 
