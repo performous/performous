@@ -430,7 +430,6 @@ void ScreenSongs::drawInstruments(Dimensions dim) const {
 	int vocalCount = 0;
 	if( !m_songs.empty() ) {
 		Song const& song = m_songs.current();
-		have_bass = isTrackInside(song.instrumentTracks,TrackName::BASS);
 		have_drums = song.hasDrums();
 		have_dance = song.hasDance();
 		//is_karaoke = (song.music.find("vocals") != song.music.end());
@@ -438,6 +437,7 @@ void ScreenSongs::drawInstruments(Dimensions dim) const {
 		if (isTrackInside(song.instrumentTracks,TrackName::GUITAR)) guitarCount++;
 		if (isTrackInside(song.instrumentTracks,TrackName::GUITAR_COOP)) guitarCount++;
 		if (isTrackInside(song.instrumentTracks,TrackName::GUITAR_RHYTHM)) guitarCount++;
+		if (isTrackInside(song.instrumentTracks,TrackName::BASS)) { guitarCount++; have_bass = true; }
 	}
 
 	UseTexture tex(*m_instrumentList);
@@ -452,14 +452,9 @@ void ScreenSongs::drawInstruments(Dimensions dim) const {
 		drawIcon(4, dim.left(x));
 		x -= dim.w();
 	}
-	// bass
-	if (have_bass) {
-		drawIcon(3, dim.left(x));
-		x -= dim.w();
-	}
-	// guitars
+	// guitars & bass
 	for (int i = guitarCount-1; i >= 0; i--) {
-		drawIcon(2, dim.left(x));
+		drawIcon(i == 0 && have_bass ? 3 : 2, dim.left(x));
 		x -= (i > 0 ? 0.3 : 1.0) * dim.w();
 	}
 	for (int i = vocalCount-1; i >= 0; i--) {
