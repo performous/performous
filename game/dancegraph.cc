@@ -277,15 +277,17 @@ void DanceGraph::engine() {
 		} else if (!menuOpen() && ev.value != 0.0) {
 			if (ev.nav == input::NAV_CANCEL || ev.nav == input::NAV_START) m_menu.open();
 		}
-		// Gaming controls
-		if (ev.value == 0.0) {
-			m_pressed[ev.button] = false;
-			dance(time, ev);
-			m_pressed_anim[ev.button].setTarget(0.0);
-		} else if (ev.value != 0.0) {
-			m_pressed[ev.button] = true;
-			dance(time, ev);
-			m_pressed_anim[ev.button].setValue(1.0);
+		if (ev.button < max_panels) {
+			// Gaming controls
+			if (ev.value == 0.0) {
+				m_pressed[ev.button] = false;
+				dance(time, ev);
+				m_pressed_anim[ev.button].setTarget(0.0);
+			} else if (ev.value != 0.0) {
+				m_pressed[ev.button] = true;
+				dance(time, ev);
+				m_pressed_anim[ev.button].setValue(1.0);
+			}
 		}
 	}
 
