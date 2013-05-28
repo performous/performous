@@ -276,7 +276,7 @@ void ScreenSongs::draw() {
 		// Format the song information text
 		if (m_search.text.empty() && !m_songs.typeNum()) {
 			oss_song << _("No songs found!");
-			oss_order << _("Visit performous.org\nfor free songs");
+			oss_order << _("Visit performous.org for free songs");
 		} else {
 			oss_song << _("Sorry, no songs match the search!");
 		}
@@ -288,26 +288,26 @@ void ScreenSongs::draw() {
 		oss_hiscore << _("Hiscore\n");
 		// Get hiscores from database
 		m_database.queryPerSongHiscore_HiscoreDisplay(oss_hiscore, m_songs.currentPtr(), m_infoPos, 5);
-	}
-	switch (m_menuPos) {
-		case 1:
-			if (!m_search.text.empty()) oss_order << m_search.text;
-			else if (m_songs.typeNum()) oss_order << m_songs.typeDesc();
-			else if (m_songs.sortNum()) oss_order << m_songs.sortDesc();
-			else oss_order << _("<type in to search>   ↔ songs    ↕ options");
-			//if (!m_songs.empty()) oss_order << "(" << m_songs.currentId() + 1 << "/" << m_songs.size() << ")";
+		switch (m_menuPos) {
+			case 1:
+				if (!m_search.text.empty()) oss_order << m_search.text;
+				else if (m_songs.typeNum()) oss_order << m_songs.typeDesc();
+				else if (m_songs.sortNum()) oss_order << m_songs.sortDesc();
+				else oss_order << _("<type in to search>   ↔ songs    ↕ options");
+				//if (!m_songs.empty()) oss_order << "(" << m_songs.currentId() + 1 << "/" << m_songs.size() << ")";
+				break;
+			case 2: oss_order << _("↔ sort order: ") << m_songs.sortDesc(); break;
+			case 3: oss_order << _("↔ type filter: ") << m_songs.typeDesc(); break;
+			case 4: oss_order << _("↔ hiscores   ↵ jukebox mode"); break;
+			case 0:
+			Game* gm = Game::getSingletonPtr();
+			if(gm->getCurrentPlayList().isEmpty()) {
+				oss_order << _("↵ start a playlist with this song!");
+			} else {
+				oss_order << _("↵ open the playlist menu");
+			}
 			break;
-		case 2: oss_order << _("↔ sort order: ") << m_songs.sortDesc(); break;
-		case 3: oss_order << _("↔ type filter: ") << m_songs.typeDesc(); break;
-		case 4: oss_order << _("↔ hiscores   ↵ jukebox mode"); break;
-		case 0:
-	    Game* gm = Game::getSingletonPtr();
-		if(gm->getCurrentPlayList().isEmpty()) {
-			oss_order << _("↵ start a playlist with this song!");
-		} else {
-			oss_order << _("↵ open the playlist menu");
 		}
-		break;
 	}
 
 	if (m_jukebox) drawJukebox();

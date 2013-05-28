@@ -64,7 +64,7 @@
   <text
      x="1.4361764"
      y="16.829205"
-     style="font-size:13.92899985px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr;text-anchor:start;fill:#060000;fill-opacity:1;stroke:none;display:inline;font-family:Arial;-inkscape-font-specification:Arial"
+     style="font-size:13.92899985px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr;text-anchor:start;fill:#060000;fill-opacity:1;stroke:none;display:inline;font-family:Goblin;-inkscape-font-specification:Goblin"
      id="text10203"
      xml:space="preserve"
      sodipodi:linespacing="125%"
@@ -72,5 +72,5 @@
        x="1.4361764"
        y="16.829205"
        id="tspan10205"
-       style="font-size:13.92899985px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;text-anchor:start;fill:#060000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial;writing-mode:lr;line-height:125%">Comment</tspan></text>
+       style="font-size:13.92899985px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;text-anchor:start;fill:#060000;fill-opacity:1;stroke:none;font-family:Goblin;-inkscape-font-specification:Goblin;writing-mode:lr;line-height:125%">Comment</tspan></text>
 </svg>
