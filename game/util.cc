@@ -5,7 +5,7 @@
 
 BinaryBuffer readFile(fs::path const& path) {
 	BinaryBuffer ret;
-	std::ifstream f(path.c_str(), std::ios::binary);
+	std::ifstream f(path.string(), std::ios::binary);
 	f.seekg(0, std::ios::end);
 	ret.resize(f.tellg());
 	f.seekg(0);
@@ -13,4 +13,3 @@ BinaryBuffer readFile(fs::path const& path) {
 	if (!f) throw std::runtime_error("File cannot be read: " + path.string());
 	return ret;
 }
-

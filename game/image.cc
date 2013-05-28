@@ -118,7 +118,7 @@ namespace {
 
 void writePNG(fs::path const& filename, Image const& img) {
 	std::vector<png_bytep> rows(img.h);
-	std::ofstream file(filename.c_str(), std::ios::binary);
+	std::ofstream file(filename.string(), std::ios::binary);
 	png_structp pngPtr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	if (!pngPtr) throw std::runtime_error("png_create_read_struct failed");
 	png_infop infoPtr = NULL;
@@ -183,7 +183,7 @@ void loadPNG(Bitmap& bitmap, fs::path const& filename) {
 
 /*
 void loadPNG(Bitmap& bitmap, fs::path const& filename) {
-	std::ifstream file(filename.c_str(), std::ios::binary);
+	std::ifstream file(filename.string(), std::ios::binary);
 	png_structp pngPtr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	if (!pngPtr) throw std::runtime_error("png_create_read_struct failed");
 	png_infop infoPtr = NULL;
