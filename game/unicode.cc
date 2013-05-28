@@ -53,7 +53,7 @@ void convertToUTF8(std::stringstream &_stream, std::string _filename) {
 
 std::string convertToUTF8(std::string const& str) {
 	std::stringstream ss(str);
-	convertToUTF8(ss, "");
+	convertToUTF8(ss);
 	return ss.str();
 }
 
