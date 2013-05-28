@@ -168,11 +168,7 @@ void Surface::load(Bitmap const& bitmap) {
 	glTexParameterf(type(), GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
 	// When texture area is large, bilinear filter the original
 	glTexParameterf(type(), GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	// The texture wraps over at the edges (repeat)
-	const bool repeating = true;  // FIXME: Make configurable per surface, default to false
-	glTexParameterf(type(), GL_TEXTURE_WRAP_S, repeating ? GL_REPEAT : GL_CLAMP);
-	glTexParameterf(type(), GL_TEXTURE_WRAP_T, repeating ? GL_REPEAT : GL_CLAMP);
-	glTexParameterf(type(), GL_TEXTURE_MAX_LEVEL, GLEW_VERSION_3_0 ? 4 : 0);  // Mipmaps currently b0rked on Intel, so disable them...
+	glTexParameterf(type(), GL_TEXTURE_MAX_LEVEL, 4);
 	glerror.check("glTexParameterf");
 
 	// Anisotropy is potential trouble maker
