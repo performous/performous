@@ -77,7 +77,7 @@
      id="text2954"
      y="434.98087"
      x="323.69031"
-     style="font-size:48.68118668000000300px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.01400006000000010;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;font-family:Verdana;-inkscape-font-specification:Verdana Bold"
+     style="font-size:48.68118668000000300px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.01400006000000010;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;font-family:Goblin;-inkscape-font-specification:Goblin Bold"
      xml:space="preserve"><tspan
        style="text-align:center;text-anchor:start;stroke:#000000;stroke-width:1.01400006000000010;stroke-miterlimit:4;stroke-dasharray:none"
        y="434.98087"
@@ -295,7 +295,7 @@
      style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none" />
   <text
      xml:space="preserve"
-     style="font-size:8.49492264px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Verdana;-inkscape-font-specification:Verdana"
+     style="font-size:8.49492264px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Goblin;-inkscape-font-specification:Goblin"
      x="16.143225"
      y="-519.48566"
      id="text3227"
@@ -313,7 +313,7 @@
      id="text3231"
      y="-532.89868"
      x="44.19733"
-     style="font-size:6.65984917px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Verdana;-inkscape-font-specification:Verdana"
+     style="font-size:6.65984917px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Goblin;-inkscape-font-specification:Goblin"
      xml:space="preserve"><tspan
        y="-532.89868"
        x="44.19733"
@@ -321,7 +321,7 @@
        sodipodi:role="line">PICK</tspan></text>
   <text
      xml:space="preserve"
-     style="font-size:28px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:start;opacity:0.95;fill:#ffffff;fill-opacity:0.95;fill-rule:nonzero;stroke:#000000;stroke-width:0.89999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;font-family:Verdana;-inkscape-font-specification:Verdana"
+     style="font-size:28px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:start;opacity:0.95;fill:#ffffff;fill-opacity:0.95;fill-rule:nonzero;stroke:#000000;stroke-width:0.89999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;font-family:Goblin;-inkscape-font-specification:Goblin"
      x="548.48071"
      y="373.84677"
      id="text3235"><tspan
@@ -348,7 +348,7 @@
      id="path3259" />
   <text
      xml:space="preserve"
-     style="font-size:48.68118668px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.01400006;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;font-family:Verdana;-inkscape-font-specification:Verdana Bold"
+     style="font-size:48.68118668px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.01400006;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;font-family:Goblin;-inkscape-font-specification:Goblin Bold"
      x="370.76126"
      y="155.65428"
      id="text3263"
@@ -365,7 +365,7 @@
        style="stroke-width:1.01400006;stroke-miterlimit:4;stroke-dasharray:none">INSTRUMENTS</tspan></text>
   <text
      xml:space="preserve"
-     style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+     style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Goblin"
      x="370.25256"
      y="559.18805"
      id="text2867"><tspan
@@ -431,7 +431,7 @@
      id="path3253-1" />
   <text
      xml:space="preserve"
-     style="font-size:28px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;opacity:0.95;fill:#ffffff;fill-opacity:0.95;fill-rule:nonzero;stroke:#000000;stroke-width:0.89999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;font-family:Verdana;-inkscape-font-specification:Verdana"
+     style="font-size:28px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;opacity:0.95;fill:#ffffff;fill-opacity:0.95;fill-rule:nonzero;stroke:#000000;stroke-width:0.89999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;font-family:Goblin;-inkscape-font-specification:Goblin"
      x="233.86311"
      y="327.96237"
      id="text3241-7"><tspan
@@ -442,7 +442,7 @@
        style="fill-rule:nonzero;stroke-width:0.89999998;stroke-miterlimit:4;stroke-dasharray:none">Dancing</tspan></text>
   <text
      xml:space="preserve"
-     style="font-size:48.68118668px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.01400006;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;font-family:Verdana;-inkscape-font-specification:Verdana Bold"
+     style="font-size:48.68118668px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.01400006;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;font-family:Goblin;-inkscape-font-specification:Goblin Bold"
      x="297.83939"
      y="495.83029"
      id="text2891"

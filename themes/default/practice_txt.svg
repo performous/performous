@@ -63,12 +63,8 @@
   <text
      x="450"
      y="430"
-     style="font-size:40px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#ffd100;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;display:inline;font-family:Verdana"
+     style="font-size:40px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#ffd100;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;display:inline;font-family:Droid Sans Mono"
      id="text10203"
      xml:space="preserve"
-     sodipodi:linespacing="125%"><tspan
-       x="450"
-       y="430"
-       id="tspan10205"
-       style="font-weight:bold;fill:#ffd100;fill-opacity:1;font-family:DejaVu Sans Mono">A#</tspan></text>
+     sodipodi:linespacing="125%">A#</text>
 </svg>
