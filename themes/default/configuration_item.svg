@@ -62,7 +62,7 @@
      inkscape:window-maximized="0" />
   <text
      xml:space="preserve"
-     style="font-size:32px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Arial;text-anchor:middle;text-align:center;-inkscape-font-specification:Arial;font-stretch:normal;font-variant:normal;writing-mode:lr;line-height:125%"
+     style="font-size:32px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Goblin;text-anchor:middle;text-align:center;-inkscape-font-specification:Goblin;font-stretch:normal;font-variant:normal;writing-mode:lr;line-height:125%"
      x="400"
      y="213"
      id="text1990"
@@ -71,5 +71,5 @@
        id="tspan1992"
        x="400"
        y="213"
-       style="-inkscape-font-specification:Arial;font-family:Arial;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-size:32px;text-anchor:middle;text-align:center;writing-mode:lr;line-height:125%">item</tspan></text>
+       style="-inkscape-font-specification:Goblin;font-family:Goblin;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-size:32px;text-anchor:middle;text-align:center;writing-mode:lr;line-height:125%">item</tspan></text>
 </svg>

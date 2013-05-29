@@ -308,7 +308,6 @@ void Window::resize() {
 		GLattrSetter attr_a(SDL_GL_ALPHA_SIZE, 8);
 		GLattrSetter attr_buf(SDL_GL_BUFFER_SIZE, 32);
 		GLattrSetter attr_d(SDL_GL_DEPTH_SIZE, 24);
-		GLattrSetter attr_s(SDL_GL_STENCIL_SIZE, 0);
 		GLattrSetter attr_db(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_FreeSurface(screen);
 		screen = SDL_SetVideoMode(width, height, 0, SDL_OPENGL | (m_fullscreen ? SDL_FULLSCREEN : SDL_RESIZABLE));

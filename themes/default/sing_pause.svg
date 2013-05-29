@@ -79,7 +79,7 @@
        ry="55.004662" />
     <text
        xml:space="preserve"
-       style="font-size:49.19297028px;font-style:normal;font-weight:normal;text-align:center;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       style="font-size:49.19297028px;font-style:normal;font-weight:normal;text-align:center;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Goblin"
        x="127.49952"
        y="10.672979"
        id="text3179"
@@ -88,10 +88,10 @@
          id="tspan3181"
          x="127.49952"
          y="10.672979"
-         style="-inkscape-font-specification:arial;font-family:arial">QUIT NOW?</tspan></text>
+         style="-inkscape-font-specification:Goblin;font-family:Goblin">QUIT NOW?</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:28px;font-style:normal;font-weight:normal;text-align:center;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       style="font-size:28px;font-style:normal;font-weight:normal;text-align:center;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Goblin"
        x="139.50516"
        y="255.35054"
        id="text2817"><tspan
@@ -99,7 +99,7 @@
          x="139.50516"
          y="255.35054"
          id="tspan2823"
-         style="-inkscape-font-specification:arial;font-family:arial">Enter/Start to quit</tspan><tspan
+         style="-inkscape-font-specification:Goblin;font-family:Goblin">Enter/Start to quit</tspan><tspan
          sodipodi:role="line"
          x="139.50516"
          y="290.35056"
