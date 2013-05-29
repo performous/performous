@@ -8,6 +8,7 @@
 #include "profiler.hh"
 
 #include <boost/bind.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
@@ -60,20 +61,15 @@ void Songs::reload_internal() {
 }
 
 void Songs::reload_internal(fs::path const& parent) {
-	namespace fs = fs;
 	if (std::distance(parent.begin(), parent.end()) > 20) { m_debug << "songs/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)" << std::endl; return; }
 	try {
-		boost::regex expression("(.*\\.txt|^song\\.ini|notes\\.xml|.*\\.sm)$", boost::regex_constants::icase);
-		boost::cmatch match;
+		boost::regex expression(R"((\.txt|^song\.ini|^notes\.xml|\.sm)$)", boost::regex_constants::icase);
 		for (fs::directory_iterator dirIt(parent), dirEnd; m_loading && dirIt != dirEnd; ++dirIt) {
 			fs::path p = dirIt->path();
 			if (fs::is_directory(p)) { reload_internal(p); continue; }
-			std::string name = p.filename().string(); // File basename (notes.txt)
-			std::string path = p.string(); // Path without filename
-			path.erase(path.size() - name.size());
-			if (!regex_match(name.c_str(), match, expression)) continue;
+			if (!regex_search(p.filename().string(), expression)) continue;
 			try {
-				boost::shared_ptr<Song>s(new Song(path, name));
+				boost::shared_ptr<Song>s(new Song(p.parent_path(), p));
 				s->randomIdx = rand();
 				boost::mutex::scoped_lock l(m_mutex);
 				m_songs.push_back(s);
@@ -177,14 +173,6 @@ namespace {
 	/// A helper for easily constructing CmpByField objects
 	template <typename T> CmpByField<T> comparator(T Song::*field) { return CmpByField<T>(field); }
 
-	std::string pathtrim(std::string path) {
-		std::string::size_type pos = path.rfind('/', path.size() - 1);
-		pos = path.rfind('/', pos - 1);
-		pos = path.rfind('/', pos - 1);
-		if (pos == std::string::npos) pos = 0; else ++pos;
-		return path.substr(pos, path.size() - pos - 1);
-	}
-
 	static const int types = 7, orders = 7;
 
 }
@@ -234,12 +222,6 @@ std::string Songs::sortDesc() const {
 	  case 6: str = _("sorted by language"); break;
 	  default: throw std::logic_error("Internal error: unknown sort order in Songs::sortDesc");
 	}
-	if (!empty()) {
-		if (m_order == 3) str += " (" + current().edition + ")";
-		if (m_order == 4) str += " (" + current().genre + ")";
-		if (m_order == 5) str += " (" + pathtrim(current().path) + ")";
-		if (m_order == 6) str += " (" + current().language + ")";
-	}
 	return str;
 }
 
@@ -266,12 +248,11 @@ void Songs::sort_internal() {
 namespace {
 	void dumpCover(xmlpp::Element* song, Song const& s, size_t num) {
 		try {
-			std::string ext = s.cover.substr(s.cover.rfind('.'));
-			fs::path cover = s.path + s.cover;
-			if (fs::exists(cover)) {
+			std::string ext = s.cover.extension().string();
+			if (exists(s.cover)) {
 				std::string coverlink = "covers/" + (boost::format("%|04|") % num).str() + ext;
 				if (fs::is_symlink(coverlink)) fs::remove(coverlink);
-				create_symlink(cover, coverlink);
+				create_symlink(s.cover, coverlink);
 				song->add_child("cover")->set_child_text(coverlink);
 			}
 		} catch (std::exception& e) {

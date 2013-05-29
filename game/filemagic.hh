@@ -26,23 +26,12 @@ namespace filemagic {
 	template <size_t prefix_size>
 	bool signaturePrefix(fs::path const& filename, boost::uint8_t const (& bytes)[prefix_size], const std::streamoff offset=0) {
 		uint8_t buf[prefix_size];
-		std::ifstream file /*(filename.string().c_str(), std::ios::binary)*/;
-		// note: explicit open needed to get an exception on error since we can't set the exception mask in the ctor.
-		file.exceptions( std::ifstream::eofbit | std::ifstream::failbit | std::ifstream::badbit );
-
-		// since C++ doesn't specify the bit size of it's data types we must
-		// make the following assertion
-		//   sizeof(char) = 1*n = sizeof(int8_t)*n for integer n >= 1
-		// (N.B: char is almost always exactly 1 (or 2) byte, but
-		// theoretically it could be an arbitrary number of bits!)
-		try {
-			file.open(filename.string().c_str(), std::ifstream::in | std::ifstream::binary);
-			file.seekg(offset * sizeof(char)/sizeof(uint8_t));
-			file.read(reinterpret_cast<char *>(&buf), prefix_size * sizeof(char)/sizeof(uint8_t) );
-			file.close();
-		} catch( ... ) {
+		{
+			std::ifstream file(filename.string(), std::ios::binary);
+			file.seekg(offset);
+			file.read(reinterpret_cast<char*>(&buf), prefix_size);
 			// any error here makes it impossible for us to continue, thus, we won't find the prefix we seek.
-			return false;
+			if (!file) return false;
 		}
 
 #		ifdef DEBUG_FILEMAGIC_PREFIX

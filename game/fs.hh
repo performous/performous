@@ -1,10 +1,7 @@
 #pragma once
 
-#include <boost/filesystem.hpp>
+#include "util.hh"
 #include <list>
-
-// Define this useful alias for the overlong namespace name (yes, for everyone who includes this header)
-namespace fs = boost::filesystem;
 
 /** Get user's home folder **/
 fs::path getHomeDir();

@@ -3,6 +3,7 @@
 #include "config.hh"
 #include "configuration.hh"
 #include "execname.hpp"
+#include <boost/filesystem.hpp>
 #include <cstdlib>
 #include <iostream>
 #include <sstream>
@@ -34,7 +35,7 @@ fs::path getLocaleDir() {
 	if(LOCALEDIR[0] == '/') {
 		dir = LOCALEDIR;
 	} else {
-		dir = plugin::execname().parent_path().parent_path() / LOCALEDIR;
+		dir = execname().parent_path().parent_path() / LOCALEDIR;
 	}
 
 	return dir;
@@ -189,7 +190,7 @@ Paths const& getPaths(bool refresh) {
 		dirs.push_back(getDataDir());
 
 		// Adding relative path from executable
-		dirs.push_back(plugin::execname().parent_path().parent_path() / shareDir);
+		dirs.push_back(execname().parent_path().parent_path() / shareDir);
 #ifndef _WIN32
 		// Adding XDG_DATA_DIRS
 		{
@@ -215,7 +216,7 @@ fs::path getDefaultConfig(fs::path const& configFile) {
 	ConfigList config_list;
 	char const* root = getenv("PERFORMOUS_ROOT");
 	if (root) config_list.push_back(std::string(root) + "/" SHARED_DATA_DIR + configFile.string());
-	fs::path exec = plugin::execname();
+	fs::path exec = execname();
 	if (!exec.empty()) config_list.push_back(exec.parent_path().string() + "/../" SHARED_DATA_DIR + configFile.string());
 	ConfigList::const_iterator it = std::find_if(config_list.begin(), config_list.end(), static_cast<bool(&)(fs::path const&)>(fs::exists));
 	if (it == config_list.end()) {

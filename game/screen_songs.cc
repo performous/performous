@@ -191,10 +191,9 @@ void ScreenSongs::update() {
 	double pstart = (!m_jukebox && song ? song->preview_start : 0.0);
 	m_audio.playMusic(music, true, 2.0, pstart);
 	if (song) {
-		std::string background = song->background.empty() ? song->cover : song->background;
-		std::string video = song->video;
-		if (!background.empty()) try { m_songbg.reset(new Surface(song->path + background)); } catch (std::exception const&) {}
-		if (!video.empty() && config["graphic/video"].b()) m_video.reset(new Video(song->path + video, song->videoGap));
+		fs::path const& background = song->background.empty() ? song->cover : song->background;
+		if (!background.empty()) try { m_songbg.reset(new Surface(background)); } catch (std::exception const&) {}
+		if (!song->video.empty() && config["graphic/video"].b()) m_video.reset(new Video(song->video, song->videoGap));
 	}
 }
 
@@ -228,8 +227,8 @@ void ScreenSongs::drawJukebox() {
 		Song& song = m_songs.current();
 		// Draw the cover
 		Surface* cover = NULL;
-		if (!song.cover.empty()) try { cover = &m_covers[song.path + song.cover]; } catch (std::exception const&) {}
-		if (cover) {
+		if (!song.cover.empty()) try { cover = &m_covers[song.cover]; } catch (std::exception const&) {}
+		if (cover && !cover->empty()) {
 			Surface& s = *cover;
 			s.dimensions.left(theme->song.dimensions.x1()).top(theme->song.dimensions.y2() + 0.05).fitInside(0.15, 0.15);
 			s.draw();
@@ -389,7 +388,9 @@ void ScreenSongs::drawCovers() {
 Surface& ScreenSongs::getCover(Song const& song) {
 	Surface* cover = nullptr;
 	// Fetch cover image from cache or try loading it
-	if (!song.cover.empty()) try { cover = &m_covers[song.path + song.cover]; } catch (std::exception const&) {cover = nullptr;}
+	if (!song.cover.empty()) try { cover = &m_covers[song.cover]; } catch (std::exception const&) {}
+	// Fallback to background image as cover if needed
+	if (!cover && !song.background.empty()) try { cover = &m_covers[song.background]; } catch (std::exception const&) {}
 	// Use empty cover
 	if (!cover) {
 		if(song.hasDance()) {

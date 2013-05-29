@@ -56,7 +56,7 @@ SongParser::SongParser(Song& s) try:
 	enum { NONE, TXT, XML, INI, SM } type = NONE;
 	// Read the file, determine the type and do some initial validation checks
 	{
-		std::ifstream f((s.path + s.filename).c_str(), std::ios::binary);
+		std::ifstream f(s.filename.string(), std::ios::binary);
 		if (!f.is_open()) throw SongParserException(s, "Could not open song file", 0);
 		f.seekg(0, std::ios::end);
 		size_t size = f.tellg();
@@ -71,11 +71,12 @@ SongParser::SongParser(Song& s) try:
 		else throw SongParserException(s, "Does not look like a song file (wrong header)", 1, true);
 		m_ss.write(&data[0], size);
 	}
-	convertToUTF8(m_ss, s.path + s.filename);
+	// Convert m_ss; filename supplied for possible warning messages
+	convertToUTF8(m_ss, s.filename.string());
 	// Header already parsed?
 	if (s.loadStatus == Song::HEADER) {
 		if (type == TXT) txtParse();
-		else if (type == INI) iniParse();
+		else if (type == INI) midParse();  // INI doesn't contain notes, parse those from MIDI
 		else if (type == XML) xmlParse();
 		else if (type == SM) smParse();
 		finalize(); // Do some adjusting to the notes
@@ -91,6 +92,7 @@ SongParser::SongParser(Song& s) try:
 	if (s.preview_start != s.preview_start) s.preview_start = (type == INI ? 5.0 : 30.0);  // 5 s for band mode, 30 s for others
 
 	guessFiles();
+	if (!m_song.midifilename.empty()) midParseHeader();
 
 	s.loadStatus = Song::HEADER;
 } catch (std::runtime_error& e) {
@@ -100,52 +102,60 @@ SongParser::SongParser(Song& s) try:
 }
 
 void SongParser::guessFiles() {
-	// List of fields containing filenames, and auto-matching regexps
-	std::vector<std::pair<std::string*, char const*>> fields = {
-		{ &m_song.cover, R"((cover|album|label|\[co\])\.(png|jpeg|jpg|svg)$)" },
+	// List of fields containing filenames, and auto-matching regexps, in order of priority
+	const std::vector<std::pair<fs::path*, char const*>> fields = {
+		{ &m_song.cover, R"((cover|album|label|banner|bn|\[co\])\.(png|jpeg|jpg|svg)$)" },
+		{ &m_song.background, R"((background|bg|\[bg\])\.(png|jpeg|jpg|svg)$)" },
+		{ &m_song.cover, R"(\.(png|jpeg|jpg|svg)$)" },
 		{ &m_song.background, R"(\.(png|jpeg|jpg|svg)$)" },
 		{ &m_song.video, R"(\.(avi|mpg|mpeg|flv|mov|mp4)$)" },
-		{ &m_song.midifilename, R"(\.(mid)$)" },
+		{ &m_song.midifilename, R"(notes\.mid$)" },
+		{ &m_song.midifilename, R"(\.mid$)" },
+		{ &m_song.music[TrackName::GUITAR], R"(guitar\.(mp3|ogg|aac)$)" },
+		{ &m_song.music[TrackName::BASS], R"(rhythm\.(mp3|ogg|aac)$)" },
+		{ &m_song.music[TrackName::DRUMS], R"(drums\.(mp3|ogg|aac)$)" },
+		{ &m_song.music[TrackName::KEYBOARD], R"(keyboard\.(mp3|ogg|aac)$)" },
+		{ &m_song.music[TrackName::LEAD_VOCAL], R"(vocals\.(mp3|ogg|aac)$)" },
+		{ &m_song.music[TrackName::BGMUSIC], R"(song\.(mp3|ogg|aac)$)" },
+		{ &m_song.music[TrackName::BGMUSIC], R"(\.(mp3|ogg|aac)$)" },
 	};
-	//if (m_song.music.size() == 1) fields.emplace_back(&m_song.music.begin()->second, R"(\.(mp3|ogg)$)");
 
 	std::string logMissing, logFound;
 	
 	// Run checks, remove bogus values and construct regexps
-	namespace fs = boost::filesystem;
 	std::vector<boost::regex> regexps;
 	bool missing = false;
 	for (auto const& p: fields) {
-		std::string name = m_song.path + *p.first;
-		if (!fs::exists(name)) {
-			p.first->clear();
-			logMissing += " \"" + name + "\"";
+		fs::path& file = *p.first;
+		if (!file.empty() && !is_regular_file(file)) {
+			logMissing += " \"" + file.filename().string() + "\"";
+			file.clear();
 		}
-		if (p.first->empty()) missing = true;
+		if (file.empty()) missing = true;
 		regexps.emplace_back(p.second, boost::regex_constants::icase);
 	}
 
 	if (!missing) return;  // All OK!
-		
-	// Scan the entire folder for matching files
-	for (fs::directory_iterator dirIt(m_song.path), dirEnd; dirIt != dirEnd; ++dirIt) {
-		std::string name = dirIt->path().filename().string(); // File basename
-		for (unsigned i = 0; i < fields.size(); ++i) {
-			auto& field = *fields[i].first;
-			if (!field.empty()) continue;  // Valid filename is already known
-			if (!regex_search(name, regexps[i])) continue;  // No match for current file
-			field = name;
-			logFound += " \"" + field + "\"";
-			goto next_file;  // Necessary for intelligent cover/bg detection
-		}
-		next_file:;
-	}
+
+	std::set<fs::path> files(fs::directory_iterator{m_song.path}, fs::directory_iterator{});
 	
+	for (unsigned i = 0; i < fields.size(); ++i) {
+		fs::path& field = *fields[i].first;
+		if (field.empty()) for (fs::path const& f: files) {
+			std::string name = f.filename().string(); // File basename
+			if (!regex_search(name, regexps[i])) continue;  // No match for current file
+			field = f;
+			logFound += " \"" + name + "\"";
+		}
+		files.erase(field);  // Remove from available options
+	}
+
 	if (logFound.empty() && logMissing.empty()) return;
-	std::clog << "songparser/info: \"" + m_song.path + "\":";
+	std::clog << "songparser/" << (logMissing.empty() ? "info" : "warning") << ": \"" + m_song.filename.string() + "\":";
 	if (!logMissing.empty()) std::clog << logMissing + " not found  ";
 	if (!logFound.empty()) std::clog << logFound + " autodetected";
 	std::clog << std::endl;
+
 }
 
 void SongParser::resetNoteParsingState() {
@@ -206,7 +216,7 @@ void SongParser::finalize() {
 			for (auto itn = vocal.notes.begin(); itn != vocal.notes.end();) {
 				Note::Type type = itn->type;
 				if(type == Note::SLEEP && lastType == Note::SLEEP) {
-					std::clog << "songparser/warning: Discarding empty sentence" << std::endl;
+					std::clog << "songparser/warning: " + m_song.filename.string() + ": Discarding empty sentence" << std::endl;
 					itn = vocal.notes.erase(itn);
 				} else {
 					++itn;

@@ -2,6 +2,7 @@
 
 #include "fs.hh"
 #include <boost/algorithm/string.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
 #include <boost/smart_ptr/weak_ptr.hpp>
@@ -148,7 +149,7 @@ struct Controllers::Impl {
 	}
 	
 	void readControllers(fs::path const& file) {
-		if (!fs::exists(file)) {
+		if (!fs::is_regular_file(file)) {
 			std::clog << "controllers/info: Skipping " << file << " (not found)" << std::endl;
 			return;
 		}

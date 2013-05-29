@@ -66,7 +66,7 @@ private:
 	boost::scoped_ptr<Surface> m_danceCover;
 	boost::scoped_ptr<Texture> m_instrumentList;
 	boost::scoped_ptr<ThemeInstrumentMenu> m_menuTheme;
-	Cachemap<std::string, Surface> m_covers;
+	Cachemap<fs::path, Surface> m_covers;
 	int m_menuPos, m_infoPos;
 	bool m_jukebox;
 	bool show_hiscores;

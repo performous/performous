@@ -71,11 +71,11 @@ bool SongParser::txtParseField(std::string const& line) {
 	else if (key == "EDITION") m_song.edition = value.substr(value.find_first_not_of(" "));
 	else if (key == "GENRE") m_song.genre = value.substr(value.find_first_not_of(" "));
 	else if (key == "CREATOR") m_song.creator = value.substr(value.find_first_not_of(" "));
-	else if (key == "COVER") m_song.cover = value;
-	else if (key == "MP3") m_song.music["background"] = m_song.path + value;
-	else if (key == "VOCALS") m_song.music["vocals"] = m_song.path + value;
-	else if (key == "VIDEO") m_song.video = value;
-	else if (key == "BACKGROUND") m_song.background = value;
+	else if (key == "COVER") m_song.cover = fs::absolute(value, m_song.path);
+	else if (key == "MP3") m_song.music["background"] = fs::absolute(value, m_song.path);
+	else if (key == "VOCALS") m_song.music["vocals"] = fs::absolute(value, m_song.path);
+	else if (key == "VIDEO") m_song.video = fs::absolute(value, m_song.path);
+	else if (key == "BACKGROUND") m_song.background = fs::absolute(value, m_song.path);
 	else if (key == "START") assign(m_song.start, value);
 	else if (key == "VIDEOGAP") assign(m_song.videoGap, value);
 	else if (key == "PREVIEWSTART") assign(m_song.preview_start, value);
@@ -163,7 +163,7 @@ bool SongParser::txtParseNote(std::string line) {
 			else if (m_song.b0rked.empty()) { // Cannot fix, warn and skip
 				std::string msg = "Skipped overlapping notes.\n";
 				m_song.b0rked = msg;
-				std::clog << "songparser/warning: " + m_song.path + m_song.filename + ": " + msg << std::flush; // More likely to be atomic when written as one string
+				std::clog << "songparser/warning: " + m_song.filename.string() + ": " + msg << std::endl;
 				return true;
 			}
 		} else throw std::runtime_error("The first note has negative timestamp");

@@ -24,8 +24,8 @@ class MidiStream {
 	 *
 	 * @param file MidiFile to be read
 	 */
-	MidiStream(std::string const& file) {
-		std::ifstream ifs(file.c_str(), std::ios::binary);
+	MidiStream(fs::path const& file) {
+		std::ifstream ifs(file.string(), std::ios::binary);
 #if MIDI_DEBUG_LEVEL > 1
 		std::cout << "Opening file: " << file << std::endl;
 #endif
@@ -117,10 +117,10 @@ void MidiStream::Riff::seek_back(size_t o) {
 }
 
 
-MidiFileParser::MidiFileParser(std::string name):
+MidiFileParser::MidiFileParser(fs::path const& name):
   format(0), division(0), ts_last(0)
 {
-	MidiStream stream(name.c_str());
+	MidiStream stream(name);
 	size_t ntracks = parse_header(stream);
 	if (format > 0) {
 		// First track is a control track

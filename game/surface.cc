@@ -7,6 +7,7 @@
 #include "image.hh"
 #include "screen.hh"
 
+#include <boost/filesystem.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
@@ -125,7 +126,7 @@ template <typename T> void loader(T* target, fs::path const& name) {
 	ldr.push(target, Job(name, boost::bind(&T::load, target, _1)));
 }
 
-Surface::Surface(std::string const& filename) { loader(this, filename); }
+Surface::Surface(fs::path const& filename) { loader(this, filename); }
 Surface::~Surface() { ldr.remove(this); }
 
 // Stuff for converting pix::Format into OpenGL enum values

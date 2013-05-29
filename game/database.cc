@@ -1,8 +1,9 @@
 #include "database.hh"
-#include "i18n.hh"
 
-#include <iostream>
+#include "i18n.hh"
+#include <boost/filesystem.hpp>
 #include <libxml++/libxml++.h>
+#include <iostream>
 
 Database::Database(fs::path const& filename): m_filename(filename) {
 	load();
