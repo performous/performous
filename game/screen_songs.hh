@@ -46,8 +46,9 @@ private:
 	void drawMultimedia();
 	void update();
 	void drawMenu();
+	bool addSong(); ///< Add current song to playlist. Returns true if the playlist was empty.
+	void sing(); ///< Enter singing screen with current playlist.
 	void createPlaylistMenu();
-	void createAdvancedPlaylistMenu();
 
 	Audio& m_audio;
 	Songs& m_songs;
@@ -56,6 +57,7 @@ private:
 	boost::scoped_ptr<Video> m_video;
 	boost::scoped_ptr<ThemeSongs> theme;
 	Song::Music m_playing;
+	AnimValue m_clock;
 	AnimValue m_idleTimer;
 	TextInput m_search;
 	boost::scoped_ptr<Surface> m_singCover;

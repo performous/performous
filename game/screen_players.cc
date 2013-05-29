@@ -99,7 +99,6 @@ void ScreenPlayers::manageEvent(SDL_Event event) {
 }
 
 void ScreenPlayers::draw() {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	m_players.update(); // Poll for new players
 	double length = m_audio.getLength();
 	double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
@@ -142,7 +141,7 @@ void ScreenPlayers::draw() {
 		for (int i = -2; i < 5; ++i) {
 			PlayerItem player_display = m_players[baseidx + i];
 			if (baseidx + i < 0 || baseidx + i >= int(ss)) continue;
-			Surface* cover = 0;
+			Surface* cover = nullptr;
 			if (player_display.path != "")
 			{
 				try { cover = &m_covers[player_display.path]; }

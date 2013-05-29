@@ -38,19 +38,13 @@ void SongParser::txtParse() {
 	resetNoteParsingState();
 	while (txtParseNote(line) && getline(line)) {} // Parse notes
 
-	{
-		// Workaround for the terminating : 1 0 0 line, written by some converters
-		VocalTrack& vocal = m_song.getVocalTrack(TrackName::LEAD_VOCAL);
-		if (!vocal.notes.empty() && vocal.notes.back().type != Note::SLEEP
-		  && vocal.notes.back().begin == vocal.notes.back().end) vocal.notes.pop_back();
-	}{
-		// Workaround for the terminating : 1 0 0 line, written by some converters
-		VocalTrack& vocal = m_song.getVocalTrack(DUET_P2);
-		if (!vocal.notes.empty() && vocal.notes.back().type != Note::SLEEP
-		  && vocal.notes.back().begin == vocal.notes.back().end) vocal.notes.pop_back();
-		// Erase if empty
-		else if (vocal.notes.empty())
-			m_song.eraseVocalTrack(vocal.name);
+	// Workaround for the terminating : 1 0 0 line, written by some converters
+	// FIXME: Should we do this for all tracks?
+	for (auto const& name: { TrackName::LEAD_VOCAL, DUET_P2 }) {
+		Notes& notes = m_song.getVocalTrack(name).notes;
+		auto it = notes.rbegin();
+		if (!notes.empty() && it->type != Note::SLEEP && it->begin == it->end) notes.pop_back();
+		if (notes.empty()) m_song.eraseVocalTrack(name);
 	}
 
 }
@@ -63,6 +57,15 @@ bool SongParser::txtParseField(std::string const& line) {
 	std::string key = boost::trim_copy(line.substr(1, pos - 1));
 	std::string value = boost::trim_copy(line.substr(pos + 1));
 	if (value.empty()) return true;
+
+	// Parse header data that is stored in SongParser rather than in song (and thus needs to be read every time)
+	if (key == "BPM") assign(m_bpm, value);
+	else if (key == "RELATIVE") assign(m_relative, value);
+	else if (key == "GAP") { assign(m_gap, value); m_gap *= 1e-3; }
+
+	if (m_song.loadStatus >= Song::HEADER) return true;  // Only re-parsing now, skip any other data
+
+	// Parse header data that is directly stored in m_song
 	if (key == "TITLE") m_song.title = value.substr(value.find_first_not_of(" :"));
 	else if (key == "ARTIST") m_song.artist = value.substr(value.find_first_not_of(" "));
 	else if (key == "EDITION") m_song.edition = value.substr(value.find_first_not_of(" "));
@@ -76,9 +79,6 @@ bool SongParser::txtParseField(std::string const& line) {
 	else if (key == "START") assign(m_song.start, value);
 	else if (key == "VIDEOGAP") assign(m_song.videoGap, value);
 	else if (key == "PREVIEWSTART") assign(m_song.preview_start, value);
-	else if (key == "RELATIVE") assign(m_relative, value);
-	else if (key == "GAP") { assign(m_gap, value); m_gap *= 1e-3; }
-	else if (key == "BPM") assign(m_bpm, value);
 	else if (key == "LANGUAGE") m_song.language= value.substr(value.find_first_not_of(" "));
 	return true;
 }
@@ -154,7 +154,7 @@ bool SongParser::txtParseNote(std::string line) {
 			// Workaround for songs that use semi-random timestamps for sleep
 			if (p.type == Note::SLEEP) {
 				p.end = p.begin;
-				Notes::reverse_iterator it = notes.rbegin();
+				auto it = notes.rbegin();
 				Note& p2 = *++it;
 				if (p2.end < n.begin) p.begin = p.end = n.begin;
 			}

@@ -7,7 +7,7 @@ namespace {
 namespace input {
 	class Keyboard: public Hardware {
 	public:
-		bool process(Event& event, SDL_Event const& sdlEv) {
+		bool process(Event& event, SDL_Event const& sdlEv) override {
 			if (sdlEv.type != SDL_KEYDOWN && sdlEv.type != SDL_KEYUP) return false;
 			event.source = SourceId(SOURCETYPE_KEYBOARD, sdlEv.key.which);  // Device number .which is always zero with SDL 1.2 :(
 			event.hw = sdlEv.key.keysym.sym;

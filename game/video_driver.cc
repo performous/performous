@@ -76,7 +76,7 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	SDL_WM_SetCaption(PACKAGE " " VERSION, PACKAGE);
 	{
 		SDL_Surface* icon = SDL_LoadBMP(getThemePath("icon.bmp").c_str());
-		SDL_WM_SetIcon(icon, NULL);
+		SDL_WM_SetIcon(icon, nullptr);
 		SDL_FreeSurface(icon);
 	}
 	// SDL_SetVideoMode not called yet => get the desktop resolution for fs mode
@@ -187,7 +187,6 @@ void Window::updateTransforms() {
 void Window::render(boost::function<void (void)> drawFunc) {
 	glutil::GLErrorChecker glerror("Window::render");
 	ViewTrans trans;  // Default frustum
-	if (s_width < unsigned(screen->w) || s_height < unsigned(screen->h)) glClear(GL_COLOR_BUFFER_BIT);  // Black bars
 	bool stereo = config["graphic/stereo3d"].b();
 	int type = config["graphic/stereo3dtype"].i();
 

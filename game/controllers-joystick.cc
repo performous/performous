@@ -16,10 +16,10 @@ namespace input {
 				m_joysticks.push_back(joy);
 			}
 		}
-		std::string getName(unsigned device) const {
+		std::string getName(unsigned device) const override {
 			return SDL_JoystickName(device);
 		}
-		bool process(Event& event, SDL_Event const& sdlEv) {
+		bool process(Event& event, SDL_Event const& sdlEv) override {
 			if (sdlEv.type == SDL_JOYBUTTONDOWN || sdlEv.type == SDL_JOYBUTTONUP) {
 				event.hw = sdlEv.jbutton.button;
 				event.value = (sdlEv.type == SDL_JOYBUTTONDOWN ? 1.0 : 0.0);

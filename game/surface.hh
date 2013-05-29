@@ -197,7 +197,7 @@ void updateSurfaces();
 * @short High level surface/image wrapper on top of OpenGLTexture
 **/
 class Surface: public OpenGLTexture<GL_TEXTURE_2D> {
-  public:
+public:
 	struct Impl;
 	/// dimensions
 	Dimensions dimensions;
@@ -214,8 +214,10 @@ class Surface: public OpenGLTexture<GL_TEXTURE_2D> {
 	/// loads surface into buffer
 	void load(Bitmap const& bitmap);
 	Shader& shader() { return m_texture.shader(); }
-  private:
-	unsigned int m_width, m_height;
+	unsigned width() const { return m_width; }
+	unsigned height() const { return m_height; }
+private:
+	unsigned m_width, m_height;
 	OpenGLTexture<GL_TEXTURE_2D> m_texture;
 };
 

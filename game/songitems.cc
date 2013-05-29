@@ -11,9 +11,8 @@
 
 
 void SongItems::load(xmlpp::NodeSet const& n) {
-	for (xmlpp::NodeSet::const_iterator it = n.begin(); it != n.end(); ++it)
-	{
-		xmlpp::Element& element = dynamic_cast<xmlpp::Element&>(**it);
+	for (auto const& elem: n) {
+		xmlpp::Element& element = dynamic_cast<xmlpp::Element&>(*elem);
 
 		xmlpp::Attribute* a_id = element.get_attribute("id");
 		if (!a_id) throw SongItemsException("No attribute id");
@@ -28,13 +27,12 @@ void SongItems::load(xmlpp::NodeSet const& n) {
 	}
 }
 
-void SongItems::save(xmlpp::Element *songs) {
-	for (songs_t::const_iterator it = m_songs.begin(); it != m_songs.end(); ++it)
-	{
-		xmlpp::Element* song = songs->add_child("song");
-		song->set_attribute("id", boost::lexical_cast<std::string>(it->id));
-		song->set_attribute("artist", it->artist);
-		song->set_attribute("title", it->title);
+void SongItems::save(xmlpp::Element* songs) {
+	for (auto const& song: m_songs) {
+		xmlpp::Element* element = songs->add_child("song");
+		element->set_attribute("id", boost::lexical_cast<std::string>(song.id));
+		element->set_attribute("artist", song.artist);
+		element->set_attribute("title", song.title);
 	}
 }
 
@@ -63,7 +61,7 @@ void SongItems::addSong(boost::shared_ptr<Song> song) {
 
 	SongItem si;
 	si.id = id;
-	songs_t::iterator it = m_songs.find(si);
+	auto it = m_songs.find(si);
 	if (it == m_songs.end()) throw SongItemsException("Cant find song which was added just before");
 	// it->song.reset(song); // does not work, it is a read only structure...
 
@@ -77,23 +75,23 @@ void SongItems::addSong(boost::shared_ptr<Song> song) {
 }
 
 int SongItems::lookup(boost::shared_ptr<Song> song) const {
-	for (songs_t::const_iterator it = m_songs.begin(); it != m_songs.end(); ++it) {
-		if (song->collateByArtistOnly == it->artist && song->collateByTitleOnly == it->title) return it->id;
+	for (auto const& s: m_songs) {
+		if (song->collateByArtistOnly == s.artist && song->collateByTitleOnly == s.title) return s.id;
 	}
 	return -1;
 }
 
 int SongItems::lookup(Song& song) const {
-	for (songs_t::const_iterator it = m_songs.begin(); it != m_songs.end(); ++it) {
-		if (song.collateByArtistOnly == it->artist && song.collateByTitleOnly == it->title) return it->id;
+	for (auto const& s: m_songs) {
+		if (song.collateByArtistOnly == s.artist && song.collateByTitleOnly == s.title) return s.id;
 	}
 	return -1;
 }
 
-std::string SongItems::lookup (int id) const {
+std::string SongItems::lookup(int id) const {
 	SongItem si;
 	si.id = id;
-	songs_t::const_iterator it = m_songs.find(si);
+	auto it = m_songs.find(si);
 	if (it == m_songs.end()) return "Unkown Song";
 	else if (!it->song) return it->artist + " - " + it->title;
 	else return it->song->artist + " - " + it->song->title;
@@ -101,7 +99,7 @@ std::string SongItems::lookup (int id) const {
 
 int SongItems::assign_id_internal() const {
 	// use the last one with highest id
-	songs_t::const_reverse_iterator it = m_songs.rbegin();
+	auto it = m_songs.rbegin();
 	if (it != m_songs.rend()) return it->id+1;
 	else return 1; // empty set
 }

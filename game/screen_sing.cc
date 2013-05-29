@@ -81,12 +81,11 @@ void ScreenSing::enter() {
 			m_duet.addEnum(_("Normal mode"));
 			m_menu.add(MenuOption("", _("Switch between duet and regular singing mode")).changer(m_duet));
 		}
+		// Add vocal track selector for each player
 		for (unsigned player = 0; player < players; ++player) {
 			ConfigItem& vocalTrack = m_vocalTracks[player];
 			vocalTrack = ConfigItem(0);
-			for (VocalTracks::const_iterator it = tracks.begin(); it != tracks.end(); ++it) {
-				vocalTrack.addEnum(it->second.name);
-			}
+			for (auto const& track: tracks) vocalTrack.addEnum(track.second.name);
 			if (tracks.size() > 1 && player % 2) ++vocalTrack;  // Every other player gets the second track
 			m_menu.add(MenuOption("", _("Change vocal track")).changer(vocalTrack));
 		}
@@ -111,9 +110,7 @@ void ScreenSing::setupVocals() {
 			shownTracks.insert(vocal);
 		}
 		if (shownTracks.size() > 2) throw std::runtime_error("Too many tracks chosen. Only two vocal tracks can be used simultaneously.");
-		for (std::set<VocalTrack*>::iterator it = shownTracks.begin(); it != shownTracks.end(); ++it) {
-			m_layout_singer.push_back(new LayoutSinger(**it, m_database, theme));
-		}
+		for (auto const& trk: shownTracks) m_layout_singer.push_back(new LayoutSinger(*trk, m_database, theme));
 		// Note: Engine maps tracks with analyzers 1:1. If user doesn't have mics, we still want to have singer layout enabled but without engine...
 		if (!analyzers.empty()) m_engine.reset(new Engine(m_audio, selectedTracks, m_database));
 	}
@@ -128,8 +125,7 @@ void ScreenSing::createPauseMenu() {
 	m_menu.add(MenuOption(_("Skip"), _("Skip current song")).screen("Playlist"));
 	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).call([]() {
 		Game* gm = Game::getSingletonPtr();
-		gm->getCurrentPlayList().clear();
-		gm->activateScreen("Playlist");
+		gm->activateScreen("Songs");
 	}));
 	m_menu.close();
 }
@@ -208,21 +204,20 @@ void ScreenSing::instrumentLayout(double time) {
 		}
 	}
 	// Set volume levels (averages of all instruments playing that track)
-	// FIXME: There should NOT be gettext calls here!
-	for( std::map<std::string,std::string>::iterator it = m_song->music.begin() ; it != m_song->music.end() ; ++it ) {
+	for (auto const& track: m_song->music) {
+		std::string const& name = track.first;
+		std::string locName = _(name.c_str());  // FIXME: There should NOT be gettext calls here!
 		double level = 1.0;
-		if (volume.find(_(it->first.c_str())) == volume.end()) {
-			m_audio.streamFade(it->first, level);
-		} else {
-			CountSum cs = volume[_(it->first.c_str())];
+		if (volume.find(locName) != volume.end()) {
+			CountSum cs = volume[locName];
 			if (cs.first > 0) level = cs.second / cs.first;
 			if (m_song->music.size() <= 1) level = std::max(0.333, level);
-			m_audio.streamFade(it->first, level);
 		}
-		if (pitchbend.find(_(it->first.c_str())) != pitchbend.end()) {
-			CountSum cs = pitchbend[_(it->first.c_str())];
+		m_audio.streamFade(name, level);
+		if (pitchbend.find(locName) != pitchbend.end()) {
+			CountSum cs = pitchbend[locName];
 			level = cs.second;
-			m_audio.streamBend(it->first, level);
+			m_audio.streamBend(name, level);
 		}
 	}
 }
@@ -415,8 +410,8 @@ void ScreenSing::prepare() {
 	// We don't allow instrument menus during global menu
 	// except for joining, in which case global menu is closed
 	if (m_menu.isOpen()) {
-		for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it) {
-			if (it->joining(time)) m_menu.close(); else it->toggleMenu(0);
+		for (auto& i: m_instruments) {
+			if (i.joining(time)) m_menu.close(); else i.toggleMenu(0);
 		}
 	}
 }
@@ -509,7 +504,7 @@ void ScreenSing::draw() {
 	}
 
 	// Menus on top of everything
-	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it) if (it->menuOpen()) it->drawMenu();
+	for (auto& i: m_instruments) if (i.menuOpen()) i.drawMenu();
 	if (m_menu.isOpen()) drawMenu();
 }
 
@@ -518,7 +513,7 @@ void ScreenSing::drawMenu() {
 	if (m_menu.empty()) return;
 	// Some helper vars
 	ThemeInstrumentMenu& th = *m_menuTheme;
-	MenuOptions::const_iterator cur = static_cast<MenuOptions::const_iterator>(&m_menu.current());
+	auto cur = static_cast<MenuOptions::const_iterator>(&m_menu.current());
 	double w = m_menu.dimensions.w();
 	const float txth = th.option_selected.h();
 	const float step = txth * 0.85f;
@@ -560,7 +555,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 	m_pos.setTarget(0.0);
 	m_database.scores.clear();
 	// Singers
-	for (std::list<Player>::iterator p = m_database.cur.begin(); p != m_database.cur.end();) {
+	for (auto p = m_database.cur.begin(); p != m_database.cur.end();) {
 		ScoreItem item; item.type = input::DEVTYPE_VOCALS;
 		item.score = p->getScore();
 		if (item.score < 500) { p = m_database.cur.erase(p); continue; } // Dead

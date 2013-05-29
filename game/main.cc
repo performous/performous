@@ -52,7 +52,8 @@ bool g_take_screenshot = false;
 static void signalSetup();
 
 extern "C" void quit(int) {
-	if (g_quit) quick_exit(2);  // Instant exit if Ctrl+C is pressed again
+	using namespace std; // Apparently some implementations put quick_exit in std:: and others in ::
+	if (g_quit) abort();  // Instant exit if Ctrl+C is pressed again
 	g_quit = true;
 	signalSetup();
 }
@@ -139,7 +140,7 @@ void mainLoop(std::string const& songlist) {
 	Backgrounds backgrounds;
 	Database database(getConfigDir() / "database.xml");
 	Songs songs(database, songlist);
-    Game gm(window);
+	Game gm(window);
 	try {
 		// Load audio samples
 		gm.loading(_("Loading audio samples..."), 0.5);
@@ -174,6 +175,7 @@ void mainLoop(std::string const& songlist) {
 		unsigned frames = 0;
 		while (!gm.isFinished()) {
 			Profiler prof("mainloop");
+			bool benchmarking = config["graphic/fps"].b();
 			if( g_take_screenshot ) {
 				fs::path filename;
 				try {
@@ -186,21 +188,19 @@ void mainLoop(std::string const& songlist) {
 				g_take_screenshot = false;
 			}
 			gm.updateScreen();  // exit/enter, any exception is fatal error
-			prof("misc");
+			if (benchmarking) prof("misc");
 			try {
+				window.blank();
 				// Draw
-                window.render(boost::bind(&Game::drawScreen, &gm));
-				glFinish();
-				prof("draw");
+				window.render(boost::bind(&Game::drawScreen, &gm));
+				if (benchmarking) { glFinish(); prof("draw"); }
 				// Display (and wait until next frame)
 				window.swap();
-				glFinish();
-				prof("swap");
+				if (benchmarking) { glFinish(); prof("swap"); }
 				updateSurfaces();
 				gm.prepareScreen();
-				glFinish();
-				prof("surfaces");
-				if (config["graphic/fps"].b()) {
+				if (benchmarking) { glFinish(); prof("surfaces"); }
+				if (benchmarking) {
 					++frames;
 					if (now() - time > 1.0) {
 						std::ostringstream oss;
@@ -214,11 +214,11 @@ void mainLoop(std::string const& songlist) {
 					time = now();
 					frames = 0;
 				}
-				prof("fpsctrl");
+				if (benchmarking) prof("fpsctrl");
 				// Process events for the next frame
 				gm.controllers.process(now());
 				checkEvents(gm);
-				prof("events");
+				if (benchmarking) prof("events");
 			} catch (RUNTIME_ERROR& e) {
 				std::cerr << "ERROR: " << e.what() << std::endl;
 				gm.flashMessage(std::string("ERROR: ") + e.what());
@@ -288,7 +288,7 @@ int main(int argc, char** argv) try {
 	signalSetup();
 	outputOptionalFeatureStatus();
 	std::ios::sync_with_stdio(false);  // We do not use C stdio
-	std::srand(std::time(NULL));
+	std::srand(std::time(nullptr));
 	// Parse commandline options
 	std::vector<std::string> devices;
 	std::vector<std::string> songdirs;

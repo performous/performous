@@ -34,6 +34,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra -fcx-limited-range ${CMAKE_CXX_FLAGS}")
 	elseif (GCC_VERSION VERSION_GREATER 4.6 OR GCC_VERSION VERSION_EQUAL 4.6)
 		set(CMAKE_CXX_FLAGS "-std=c++0x -Wall -Wextra -fcx-limited-range ${CMAKE_CXX_FLAGS}")
+		add_definitions("-Doverride=")  # Hack: GCC 4.6 doesn't understand C++11 "override" keyword
 	else()
 		message(FATAL_ERROR "Your GCC compiler does not support c++11, please install at least gcc 4.6")
 	endif()

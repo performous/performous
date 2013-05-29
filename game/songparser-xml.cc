@@ -54,7 +54,7 @@ struct SSDom: public xmlpp::DomParser {
 		}
 		nsmap["ss"] = get_document()->get_root_node()->get_namespace_uri();
 	}
-	bool find(xmlpp::Element& elem, std::string xpath, xmlpp::NodeSet& n) {
+	bool find(xmlpp::Element const& elem, std::string xpath, xmlpp::NodeSet& n) {
 		if (nsmap["ss"].empty()) boost::erase_all(xpath, "ss:");
 		n = elem.find(xpath, nsmap);
 		return !n.empty();
@@ -111,8 +111,8 @@ void SongParser::xmlParseHeader() {
 	{
 		xmlpp::NodeSet comments;
 		dom.find("/ss:MELODY/comment()", comments);
-		for (xmlpp::NodeSet::iterator it = comments.begin(); it != comments.end(); ++it) {
-			std::string str = dynamic_cast<xmlpp::CommentNode&>(**it).get_content();
+		for (auto const& node: comments) {
+			std::string str = dynamic_cast<xmlpp::CommentNode const&>(*node).get_content();
 			boost::trim(str);
 			parseComment(str, "Artist:", s.artist) || parseComment(str, "Title:", s.title);
 		}
@@ -122,8 +122,8 @@ void SongParser::xmlParseHeader() {
 	std::string singers;  // Only used for "Together" track
 	xmlpp::NodeSet tracks;
 	dom.find("/ss:MELODY/ss:TRACK", tracks);
-	for (xmlpp::NodeSet::iterator it = tracks.begin(); it != tracks.end(); ++it ) {
-		xmlpp::Element& trackNode = dynamic_cast<xmlpp::Element&>(**it);
+	for (auto const& elem: tracks) {
+		auto const& trackNode = dynamic_cast<xmlpp::Element const&>(*elem);
 		std::string name = trackNode.get_attribute("Name")->get_value();  // "Player1" or "Player2"
 		xmlpp::Attribute* attr = trackNode.get_attribute("Artist");
 		std::string artist = attr ? std::string(attr->get_value()) : name;  // Singer name
@@ -155,7 +155,7 @@ void SongParser::xmlParse() {
 	{
 		xmlpp::NodeSet n;
 		if (!dom.find("/ss:MELODY", n)) throw std::runtime_error("Unable to find BPM info");
-		xmlpp::Element& e = dynamic_cast<xmlpp::Element&>(*n[0]);
+		auto const& e = dynamic_cast<xmlpp::Element const&>(*n[0]);
 		std::string res = e.get_attribute("Resolution")->get_value();
 		SongParserUtil::assign(m_bpm, e.get_attribute("Tempo")->get_value().c_str());
 		if (res == "Semiquaver") {}
@@ -171,17 +171,17 @@ void SongParser::xmlParse() {
 	if (tracks.empty()) throw std::runtime_error("No valid tracks or sentences found");
 	// Process each vocalTrack separately; use the same XML (version 1) track twice if needed
 	unsigned players = clamp<unsigned>(s.vocalTracks.size(), 1, 2);  // Don't count "Together" track
-	VocalTracks::iterator vocalIt = s.vocalTracks.begin();
+	auto vocalIt = s.vocalTracks.begin();
 	for (unsigned player = 0; player < players; ++player, ++vocalIt) {
 		if (vocalIt == s.vocalTracks.end()) throw std::logic_error("SongParser-xml vocalIt past the end");
 		VocalTrack& vocal = vocalIt->second;
-		xmlpp::Element& trackElem = dynamic_cast<xmlpp::Element&>(*tracks[player % tracks.size()]);
+		auto const& trackElem = dynamic_cast<xmlpp::Element const&>(*tracks[player % tracks.size()]);
 		std::string sentenceSinger = "Solo 1";  // The default value
 		xmlpp::NodeSet sentences;
 		dom.find(trackElem, "ss:SENTENCE", sentences);
 		unsigned ts = 0;
 		for (xmlpp::NodeSet::const_iterator it = sentences.begin(); it != sentences.end(); ++it ) {
-			xmlpp::Element& sentenceNode = dynamic_cast<xmlpp::Element&>(**it);
+			auto const& sentenceNode = dynamic_cast<xmlpp::Element const&>(**it);
 			// Check if SENTENCE has new attributes
 			{
 				xmlpp::Attribute* attr = sentenceNode.get_attribute("Part");
@@ -199,8 +199,8 @@ void SongParser::xmlParse() {
 			// Notes of a sentence
 			xmlpp::NodeSet notes;
 			dom.find(sentenceNode, "ss:NOTE", notes);
-			for (xmlpp::NodeSet::iterator it2 = notes.begin(); it2 != notes.end(); ++it2 ) {
-				xmlpp::Element& noteNode = dynamic_cast<xmlpp::Element&>(**it2);
+			for (auto const& elem: notes) {
+				auto const& noteNode = dynamic_cast<xmlpp::Element const&>(*elem);
 				Note n = xmlParseNote(noteNode, ts);
 				if (n.note == 0) continue;
 				// Skip sentences that do not belong to current player

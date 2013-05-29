@@ -14,7 +14,9 @@ ThemeSongs::ThemeSongs():
 	order(getThemePath("songs_order.svg"), config["graphic/text_lod"].f()),
 	has_hiscore(getThemePath("songs_has_hiscore.svg"), config["graphic/text_lod"].f()),
 	hiscores(getThemePath("songs_hiscores.svg"), config["graphic/text_lod"].f())
-{}
+{
+	order.dimensions.screenBottom(-0.03f);
+}
 
 ThemePractice::ThemePractice():
 	Theme(getThemePath("practice_bg.svg")),

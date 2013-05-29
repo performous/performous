@@ -90,37 +90,62 @@ SongParser::SongParser(Song& s) try:
 	// Default for preview position if none was specified in header
 	if (s.preview_start != s.preview_start) s.preview_start = (type == INI ? 5.0 : 30.0);  // 5 s for band mode, 30 s for others
 
-	// Remove bogus entries
-	if (!boost::filesystem::exists(m_song.path + m_song.cover)) m_song.cover = "";
-	if (!boost::filesystem::exists(m_song.path + m_song.background)) m_song.background = "";
-	if (!boost::filesystem::exists(m_song.path + m_song.video)) m_song.video = "";
+	guessFiles();
 
-	// In case no images/videos were specified, try to guess them
-	if (m_song.cover.empty() || m_song.background.empty() || m_song.video.empty()) {
-		boost::regex coverfile("((cover|album|label|\\[co\\])\\.(png|jpeg|jpg|svg))$", boost::regex_constants::icase);
-		boost::regex backgroundfile("((background|bg||\\[bg\\])\\.(png|jpeg|jpg|svg))$", boost::regex_constants::icase);
-		boost::regex videofile("(.*\\.(avi|mpg|mpeg|flv|mov|mp4))$", boost::regex_constants::icase);
-		boost::cmatch match;
-
-		for (boost::filesystem::directory_iterator dirIt(s.path), dirEnd; dirIt != dirEnd; ++dirIt) {
-			boost::filesystem::path p = dirIt->path();
-			std::string name = p.filename().string(); // File basename
-			if (m_song.cover.empty() && regex_match(name.c_str(), match, coverfile)) m_song.cover = name;
-			else if (m_song.background.empty() && regex_match(name.c_str(), match, backgroundfile)) m_song.background = name;
-			else if (m_song.video.empty() && regex_match(name.c_str(), match, videofile)) m_song.video = name;
-		}
-	}
 	s.loadStatus = Song::HEADER;
-	if (type == TXT) txtParse();
-	else if (type == INI) iniParse();
-	else if (type == XML) xmlParse();
-	else if (type == SM) smParse();
-	finalize(); // Do some adjusting to the notes
-	s.loadStatus = Song::FULL;
 } catch (std::runtime_error& e) {
 	throw SongParserException(m_song, e.what(), m_linenum);
 } catch (std::exception& e) {
 	throw SongParserException(m_song, "Internal error: " + std::string(e.what()), m_linenum);
+}
+
+void SongParser::guessFiles() {
+	// List of fields containing filenames, and auto-matching regexps
+	std::vector<std::pair<std::string*, char const*>> fields = {
+		{ &m_song.cover, R"((cover|album|label|\[co\])\.(png|jpeg|jpg|svg)$)" },
+		{ &m_song.background, R"(\.(png|jpeg|jpg|svg)$)" },
+		{ &m_song.video, R"(\.(avi|mpg|mpeg|flv|mov|mp4)$)" },
+		{ &m_song.midifilename, R"(\.(mid)$)" },
+	};
+	//if (m_song.music.size() == 1) fields.emplace_back(&m_song.music.begin()->second, R"(\.(mp3|ogg)$)");
+
+	std::string logMissing, logFound;
+	
+	// Run checks, remove bogus values and construct regexps
+	namespace fs = boost::filesystem;
+	std::vector<boost::regex> regexps;
+	bool missing = false;
+	for (auto const& p: fields) {
+		std::string name = m_song.path + *p.first;
+		if (!fs::exists(name)) {
+			p.first->clear();
+			logMissing += " \"" + name + "\"";
+		}
+		if (p.first->empty()) missing = true;
+		regexps.emplace_back(p.second, boost::regex_constants::icase);
+	}
+
+	if (!missing) return;  // All OK!
+		
+	// Scan the entire folder for matching files
+	for (fs::directory_iterator dirIt(m_song.path), dirEnd; dirIt != dirEnd; ++dirIt) {
+		std::string name = dirIt->path().filename().string(); // File basename
+		for (unsigned i = 0; i < fields.size(); ++i) {
+			auto& field = *fields[i].first;
+			if (!field.empty()) continue;  // Valid filename is already known
+			if (!regex_search(name, regexps[i])) continue;  // No match for current file
+			field = name;
+			logFound += " \"" + field + "\"";
+			goto next_file;  // Necessary for intelligent cover/bg detection
+		}
+		next_file:;
+	}
+	
+	if (logFound.empty() && logMissing.empty()) return;
+	std::clog << "songparser/info: \"" + m_song.path + "\":";
+	if (!logMissing.empty()) std::clog << logMissing + " not found  ";
+	if (!logFound.empty()) std::clog << logFound + " autodetected";
+	std::clog << std::endl;
 }
 
 void SongParser::resetNoteParsingState() {
@@ -134,7 +159,7 @@ void SongParser::resetNoteParsingState() {
 }
 
 void SongParser::vocalsTogether() {
-	VocalTracks::iterator togetherIt = m_song.vocalTracks.find("Together");
+	auto togetherIt = m_song.vocalTracks.find("Together");
 	if (togetherIt == m_song.vocalTracks.end()) return;
 	Notes& together = togetherIt->second.notes;
 	if (!together.empty()) return;
@@ -156,10 +181,10 @@ void SongParser::vocalsTogether() {
 	TrackInfo* trk = &tracks.front();
 	while (trk) {
 		Note const& n = *trk->it;
-		std::cerr << " " << n.syllable << ": " << n.begin << "-" << n.end << std::endl;
+		//std::cerr << " " << n.syllable << ": " << n.begin << "-" << n.end << std::endl;
 		notes.push_back(n);
 		++trk->it;
-		trk = NULL;
+		trk = nullptr;
 		// Iterate all tracks past the processed note and find the new earliest track
 		for (TrackInfo& trk2: tracks) {
 			// Skip until a sentence that begins after the note ended
@@ -178,7 +203,7 @@ void SongParser::finalize() {
 		// Remove empty sentences
 		{
 			Note::Type lastType = Note::NORMAL;
-			for (Notes::iterator itn = vocal.notes.begin(); itn != vocal.notes.end();) {
+			for (auto itn = vocal.notes.begin(); itn != vocal.notes.end();) {
 				Note::Type type = itn->type;
 				if(type == Note::SLEEP && lastType == Note::SLEEP) {
 					std::clog << "songparser/warning: Discarding empty sentence" << std::endl;
@@ -194,9 +219,9 @@ void SongParser::finalize() {
 			unsigned int shift = (1 - vocal.noteMin / 12) * 12;
 			vocal.noteMin += shift;
 			vocal.noteMax += shift;
-			for (Notes::iterator it = vocal.notes.begin(); it != vocal.notes.end(); ++it) {
-				it->note += shift;
-				it->notePrev += shift;
+			for (auto& elem: vocal.notes) {
+				elem.note += shift;
+				elem.notePrev += shift;
 			}
 		}
 		// Set begin/end times
@@ -204,9 +229,7 @@ void SongParser::finalize() {
 		else vocal.beginTime = vocal.endTime = 0.0;
 		// Compute maximum score
 		double max_score = 0.0;
-		for (Notes::iterator itn = vocal.notes.begin(); itn != vocal.notes.end(); ++itn) {
-			max_score += itn->maxScore();
-		}
+		for (auto& note: vocal.notes) max_score += note.maxScore();
 		vocal.m_scoreFactor = 1.0 / max_score;
 	}
 	if (m_tsPerBeat) {
