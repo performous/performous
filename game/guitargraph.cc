@@ -633,7 +633,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 	// Handle Big Rock Ending
 	if (m_dfIt != m_drumfills.end() && time >= m_dfIt->begin - maxTolerance
 	  && time <= m_dfIt->end + maxTolerance) {
-		if (!ev.pressed()) return;  // No processing for release events
+		if (!ev.pressed() || ev.button >= m_pads) return;  // No processing for release events or non-fret buttons
 		m_drumfillHits += 1;
 		m_flames[ev.button].push_back(AnimValue(0.0, flameSpd));
 		m_flames[ev.button].back().setTarget(1.0);
