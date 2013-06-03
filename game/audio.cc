@@ -417,8 +417,8 @@ int Device::operator()(void const* input, void* output, unsigned long frames, co
 struct Audio::Impl {
 	Output output;
 	portaudio::Init init;
-	boost::ptr_vector<Device> devices;
 	boost::ptr_vector<Analyzer> analyzers;
+	boost::ptr_vector<Device> devices;
 	bool playback;
 	Impl(): init(), playback() {
 		// Parse audio devices from config
