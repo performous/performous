@@ -288,23 +288,25 @@ void ScreenSongs::draw() {
 		oss_hiscore << _("Hiscore\n");
 		// Get hiscores from database
 		m_database.queryPerSongHiscore_HiscoreDisplay(oss_hiscore, m_songs.currentPtr(), m_infoPos, 5);
+		// Here we use horrible raw utf-8 bytes in place of nice arrow chars ↵↕↔
+		// because otherwise we get garbage output on Windows for some reason
 		switch (m_menuPos) {
 			case 1:
 				if (!m_search.text.empty()) oss_order << m_search.text;
 				else if (m_songs.typeNum()) oss_order << m_songs.typeDesc();
 				else if (m_songs.sortNum()) oss_order << m_songs.sortDesc();
-				else oss_order << _("<type in to search>   ↔ songs    ↕ options");
+				else oss_order << _("<type in to search>   \xe2\x86\x94 songs    \xe2\x86\x95 options");
 				//if (!m_songs.empty()) oss_order << "(" << m_songs.currentId() + 1 << "/" << m_songs.size() << ")";
 				break;
-			case 2: oss_order << _("↔ sort order: ") << m_songs.sortDesc(); break;
-			case 3: oss_order << _("↔ type filter: ") << m_songs.typeDesc(); break;
-			case 4: oss_order << _("↔ hiscores   ↵ jukebox mode"); break;
+			case 2: oss_order << _("\xe2\x86\x94 sort order: ") << m_songs.sortDesc(); break;
+			case 3: oss_order << _("\xe2\x86\x94 type filter: ") << m_songs.typeDesc(); break;
+			case 4: oss_order << _("\xe2\x86\x94 hiscores   \xe2\x86\xb5 jukebox mode"); break;
 			case 0:
 			Game* gm = Game::getSingletonPtr();
 			if(gm->getCurrentPlayList().isEmpty()) {
-				oss_order << _("↵ start a playlist with this song!");
+				oss_order << _("\xe2\x86\xb5 start a playlist with this song!");
 			} else {
-				oss_order << _("↵ open the playlist menu");
+				oss_order << _("\xe2\x86\xb5 open the playlist menu");
 			}
 			break;
 		}
