@@ -16,7 +16,7 @@ namespace {
 	void writePngHelper(png_structp pngPtr, png_bytep data, png_size_t length) {
 		static_cast<std::ostream*>(png_get_io_ptr(pngPtr))->write((char*)data, length);
 	}
-/*
+
 	void readPngHelper(png_structp pngPtr, png_bytep data, png_size_t length) {
 		static_cast<std::istream*>(png_get_io_ptr(pngPtr))->read((char*)data, length);
 	}
@@ -33,7 +33,7 @@ namespace {
 		for (unsigned y = 0; y < bitmap.height; ++y) rows[y] = reinterpret_cast<png_bytep>(&bitmap.buf[y * bitmap.width * 4]);
 		png_read_image(pngPtr, &rows[0]);
 	}
-*/
+
 	static void writePNG_internal(png_structp pngPtr, png_infop infoPtr, std::ofstream& file, unsigned w, unsigned h, pix::Format format, bool reverse, const unsigned char *data, std::vector<png_bytep>& rows) {
 		// There must be no objects initialized within this function because longjmp will mess them up
 		if (setjmp(png_jmpbuf(pngPtr))) throw std::runtime_error("Writing PNG failed");
@@ -166,6 +166,7 @@ void loadSVG(Bitmap& bitmap, fs::path const& filename) {
 	cairo_surface_write_to_png(surface.get(), cache_filename.string().c_str());
 }
 
+/*
 void loadPNG(Bitmap& bitmap, fs::path const& filename) {
 	// Raster with Cairo
 	boost::shared_ptr<cairo_surface_t> surface(
@@ -180,8 +181,8 @@ void loadPNG(Bitmap& bitmap, fs::path const& filename) {
 	bitmap.fmt = pix::INT_ARGB;
 	std::copy(buf, buf + bitmap.buf.size(), bitmap.buf.begin());
 }
+*/
 
-/*
 void loadPNG(Bitmap& bitmap, fs::path const& filename) {
 	std::ifstream file(filename.string(), std::ios::binary);
 	png_structp pngPtr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
@@ -198,7 +199,6 @@ void loadPNG(Bitmap& bitmap, fs::path const& filename) {
 	std::vector<png_bytep> rows;
 	loadPNG_internal(pngPtr, infoPtr, file, bitmap, rows);
 }
-*/
 
 void loadJPEG(Bitmap& bitmap, fs::path const& filename) {
 	bitmap.fmt = pix::RGB;
