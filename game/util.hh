@@ -1,16 +1,9 @@
 #pragma once
 
-#include <boost/filesystem/path.hpp>
 #include <cstdint>
 #include <limits>
 #include <vector>
-
-namespace fs = boost::filesystem;
-
-typedef std::vector<std::uint8_t> BinaryBuffer;
-
-/// Read an entire file into a buffer
-BinaryBuffer readFile(fs::path const& path);
+#include <stdexcept>
 
 /** Limit val to range [min, max] **/
 template <typename T> T clamp(T val, T min = 0, T max = 1) {

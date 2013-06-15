@@ -1,7 +1,15 @@
 #pragma once
 
-#include "util.hh"
+#include <boost/filesystem/path.hpp>
+#include <fstream>
 #include <list>
+
+namespace fs = boost::filesystem;
+
+typedef std::vector<std::uint8_t> BinaryBuffer;
+
+/// Read an entire file into a buffer
+BinaryBuffer readFile(fs::path const& path);
 
 /** Get user's home folder **/
 fs::path getHomeDir();

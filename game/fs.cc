@@ -30,6 +30,8 @@ namespace {
 		return true;
 	}
 
+	const fs::path performous = "performous";
+
 	struct PathCache {
 		/// Expand a path specifier as a list of actual paths. Expands ~ (home) and DATADIR (Performous search path).
 		Paths pathExpand(fs::path p) {
@@ -50,7 +52,6 @@ namespace {
 		/// during static construction. Initialization must be done manually.
 		void init() {
 			std::string logmsg = "fs/info: Determining system paths:\n";
-			const fs::path performous = "performous";
 			// Base
 			base = execname().parent_path().parent_path();
 			logmsg += "  base:     " + base.string() + '\n';
@@ -230,4 +231,14 @@ void resetPaths() {
 	cache.init();
 }
 
+BinaryBuffer readFile(fs::path const& path) {
+	BinaryBuffer ret;
+	std::ifstream f(path.string(), std::ios::binary);
+	f.seekg(0, std::ios::end);
+	ret.resize(f.tellg());
+	f.seekg(0);
+	f.read(reinterpret_cast<char*>(ret.data()), ret.size());
+	if (!f) throw std::runtime_error("File cannot be read: " + path.string());
+	return ret;
+}
 
