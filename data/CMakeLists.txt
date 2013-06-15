@@ -10,16 +10,16 @@ if(UNIX)
 	install(FILES ${PIXMAP_FILE} DESTINATION "share/pixmaps/" RENAME "performous.svg")
 	install(FILES ${FONT_FILES} DESTINATION "share/fonts/truetype/performous")
 else()
-	install(FILES ${FONT_FILES} DESTINATION "bin")  # FIXME: Does this work, or where should we put them?
+	install(FILES ${FONT_FILES} DESTINATION "${SHARE_INSTALL}/fonts/")
 endif()
 
-install(FILES ${CONFIG_FILE} DESTINATION "${SHARE_INSTALL}/config/")
-install(FILES ${CONTROLLERS_FILE} DESTINATION "${SHARE_INSTALL}/config/")
+file(GLOB CONFIG_FILES "config/*")
+install(FILES ${CONFIG_FILES} DESTINATION "${SHARE_INSTALL}/config/")
 
-file(GLOB XSL_FILES "*.xsl")
+file(GLOB XSL_FILES "xsl/*")
 install(FILES ${XSL_FILES} DESTINATION "${SHARE_INSTALL}/xsl/")
 
-file(GLOB SOUND_FILES "sounds/*.ogg")
+file(GLOB SOUND_FILES "sounds/*")
 install(FILES ${SOUND_FILES} DESTINATION "${SHARE_INSTALL}/sounds/")
 
 file(GLOB BG_FILES "backgrounds/*")
