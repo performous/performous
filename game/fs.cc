@@ -2,7 +2,7 @@
 
 #include "config.hh"
 #include "configuration.hh"
-#include "execname.hpp"
+#include "execname.hh"
 #include <boost/filesystem.hpp>
 #include <cstdlib>
 #include <iostream>

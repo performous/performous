@@ -2,7 +2,6 @@
 
 #include "fs.hh"
 #include "util.hh"
-#include "execname.hpp"
 #include "i18n.hh"
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>

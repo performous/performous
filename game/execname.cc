@@ -1,4 +1,4 @@
-#include "execname.hpp"
+#include "execname.hh"
 
 #if defined(_WIN32)
 #include <windows.h>
