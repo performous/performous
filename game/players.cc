@@ -52,7 +52,7 @@ void Players::save(xmlpp::Element *players) {
 		if (p.picture != "")
 		{
 			xmlpp::Element* picture = player->add_child("picture");
-			picture->add_child_text(p.picture);
+			picture->add_child_text(p.picture.string());
 		}
 	}
 }

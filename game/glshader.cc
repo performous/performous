@@ -9,14 +9,14 @@ using namespace glutil;
 
 namespace {
 	/// Loads a file into memory
-	std::string loadFile(const std::string& filepath) {
-		std::ifstream f(filepath.c_str(), std::ios::binary);
-		if (!f.is_open()) throw std::runtime_error(std::string("Couldn't open ") + filepath);
+	std::string loadFile(fs::path const& filepath) {
+		std::ifstream f(filepath.string().c_str(), std::ios::binary);
+		if (!f) throw std::runtime_error(std::string("Couldn't open ") + filepath.string());
 		f.seekg(0, std::ios::end);
 		size_t size = f.tellg();
 		f.seekg(0);
 		std::vector<char> data(size+1); // +1 for terminating null
-		if (!f.read(&data[0], size)) throw std::runtime_error(std::string("Unexpected I/O error in ") + filepath);
+		if (!f.read(&data[0], size)) throw std::runtime_error(std::string("Unexpected I/O error in ") + filepath.string());
 		data.back() = '\0';
 		return std::string(&data[0]);
 	}
@@ -50,13 +50,13 @@ Shader::~Shader() {
 	//std::clog << "shader/info: Shader program " << (unsigned)program << " deleted." << std::endl;
 }
 
-Shader& Shader::compileFile(std::string const& filename) {
-	std::string ext = filename.substr(filename.size() - 5);
+Shader& Shader::compileFile(fs::path const& filename) {
+	fs::path ext = filename.extension();
 	GLenum type;
 	if (ext == ".vert") type = GL_VERTEX_SHADER;
 	else if (ext == ".geom") type = GL_GEOMETRY_SHADER;
 	else if (ext == ".frag") type = GL_FRAGMENT_SHADER;
-	else throw std::logic_error("Unknown file extension on shader " + filename);
+	else throw std::logic_error("Unknown file extension on shader " + filename.string());
 	std::string srccode = loadFile(filename);
 	// Replace "//DEFINES" with defs
 	if (!defs.empty()) {
@@ -66,7 +66,7 @@ Shader& Shader::compileFile(std::string const& filename) {
 	try {
 		return compileCode(srccode, type);
 	} catch (std::runtime_error& e) {
-		throw std::runtime_error(filename + ": " + e.what());
+		throw std::runtime_error(filename.string() + ": " + e.what());
 	}
 }
 

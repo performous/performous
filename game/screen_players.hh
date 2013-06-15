@@ -48,6 +48,6 @@ class ScreenPlayers : public Screen {
 	AnimValue m_playTimer;
 	TextInput m_search;
 	boost::scoped_ptr<Surface> m_emptyCover;
-	Cachemap<std::string, Surface> m_covers;
+	Cachemap<fs::path, Surface> m_covers;
 	boost::scoped_ptr<LayoutSinger> m_layout_singer;
 };

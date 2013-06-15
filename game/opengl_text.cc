@@ -108,24 +108,24 @@ void OpenGLText::draw(Dimensions &_dim, TexCoords &_tex) {
 }
 
 namespace {
-	void parseTheme( std::string _theme_file, TextStyle &_theme, double &_width, double &_height, double &_x, double &_y, SvgTxtTheme::Align& _align) {
+	void parseTheme(fs::path const& themeFile, TextStyle &_theme, double &_width, double &_height, double &_x, double &_y, SvgTxtTheme::Align& _align) {
 		xmlpp::Node::PrefixNsMap nsmap;
 		nsmap["svg"] = "http://www.w3.org/2000/svg";
-		xmlpp::DomParser dom(_theme_file);
+		xmlpp::DomParser dom(themeFile.string());
 		xmlpp::NodeSet n;
 		// Parse width attribute
 		n = dom.get_document()->get_root_node()->find("/svg:svg/@width",nsmap);
-		if (n.empty()) throw std::runtime_error("Unable to find text theme info width in "+_theme_file);
+		if (n.empty()) throw std::runtime_error("Unable to find text theme info width in "+themeFile.string());
 		xmlpp::Attribute& width = dynamic_cast<xmlpp::Attribute&>(*n[0]);
 		_width = boost::lexical_cast<double>(width.get_value());
 		// Parse height attribute
 		n = dom.get_document()->get_root_node()->find("/svg:svg/@height",nsmap);
-		if (n.empty()) throw std::runtime_error("Unable to find text theme info height in "+_theme_file);
+		if (n.empty()) throw std::runtime_error("Unable to find text theme info height in "+themeFile.string());
 		xmlpp::Attribute& height = dynamic_cast<xmlpp::Attribute&>(*n[0]);
 		_height = boost::lexical_cast<double>(height.get_value());
 		// Parse text style attribute (CSS rules)
 		n = dom.get_document()->get_root_node()->find("/svg:svg//svg:text/@style",nsmap);
-		if (n.empty()) throw std::runtime_error("Unable to find text theme info style in "+_theme_file);
+		if (n.empty()) throw std::runtime_error("Unable to find text theme info style in "+themeFile.string());
 		xmlpp::Attribute& style = dynamic_cast<xmlpp::Attribute&>(*n[0]);
 		std::istringstream iss(style.get_value());
 		std::string token;
@@ -152,20 +152,20 @@ namespace {
 		}
 		// Parse x and y attributes
 		n = dom.get_document()->get_root_node()->find("/svg:svg//svg:text/@x",nsmap);
-		if (n.empty()) throw std::runtime_error("Unable to find text theme info x in "+_theme_file);
+		if (n.empty()) throw std::runtime_error("Unable to find text theme info x in "+themeFile.string());
 		xmlpp::Attribute& x = dynamic_cast<xmlpp::Attribute&>(*n[0]);
 		_x = boost::lexical_cast<double>(x.get_value());
 		n = dom.get_document()->get_root_node()->find("/svg:svg//svg:text/@y",nsmap);
-		if (n.empty()) throw std::runtime_error("Unable to find text theme info y in "+_theme_file);
+		if (n.empty()) throw std::runtime_error("Unable to find text theme info y in "+themeFile.string());
 		xmlpp::Attribute& y = dynamic_cast<xmlpp::Attribute&>(*n[0]);
 		_y = boost::lexical_cast<double>(y.get_value());
 	}
 }
 
-SvgTxtThemeSimple::SvgTxtThemeSimple(std::string _theme_file, double factor) : m_factor(factor) {
+SvgTxtThemeSimple::SvgTxtThemeSimple(fs::path const& themeFile, double factor) : m_factor(factor) {
 	SvgTxtTheme::Align a;
 	double tmp;
-	parseTheme(_theme_file, m_text, tmp, tmp, tmp, tmp, a);
+	parseTheme(themeFile, m_text, tmp, tmp, tmp, tmp, a);
 }
 
 void SvgTxtThemeSimple::render(std::string _text) {
@@ -180,15 +180,15 @@ void SvgTxtThemeSimple::draw() {
 	m_opengl_text->draw();
 }
 
-SvgTxtTheme::SvgTxtTheme(std::string _theme_file, double factor): m_align(),m_factor(factor) {
-	parseTheme(_theme_file, m_text, m_width, m_height, m_x, m_y, m_align);
+SvgTxtTheme::SvgTxtTheme(fs::path const& themeFile, double factor): m_align(),m_factor(factor) {
+	parseTheme(themeFile, m_text, m_width, m_height, m_x, m_y, m_align);
 	dimensions.stretch(0.0, 0.0).middle(-0.5 + m_x / m_width).center((m_y - 0.5 * m_height) / m_width);
 }
 
-void SvgTxtTheme::setHighlight(std::string _theme_file) {
+void SvgTxtTheme::setHighlight(fs::path const& themeFile) {
 	double a,b,c,d;
 	Align e;
-	parseTheme(_theme_file, m_text_highlight, a, b, c, d, e);
+	parseTheme(themeFile, m_text_highlight, a, b, c, d, e);
 }
 
 void SvgTxtTheme::draw(std::vector<std::string> const& _text) {

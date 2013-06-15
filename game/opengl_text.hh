@@ -71,7 +71,7 @@ private:
 class SvgTxtThemeSimple {
 public:
 	/// constructor
-	SvgTxtThemeSimple(std::string _theme_file, double factor = 1.0);
+	SvgTxtThemeSimple(fs::path const& themeFile, double factor = 1.0);
 	/// renders text
 	void render(std::string _text);
 	/// draws texture
@@ -136,7 +136,7 @@ public:
 	/// dimensions, what else
 	Dimensions dimensions;
 	/// constructor
-	SvgTxtTheme(std::string _theme_file, double factor = 1.0);
+	SvgTxtTheme(fs::path const& themeFile, double factor = 1.0);
 	/// draws text with alpha
 	void draw(std::vector<TZoomText> const& _text);
 	/// draw texts
@@ -144,7 +144,7 @@ public:
 	/// draw text with alpha
 	void draw(std::string _text);
 	/// sets highlight
-	void setHighlight(std::string _theme_file);
+	void setHighlight(fs::path const& themeFile);
 	/// width
 	double w() const { return m_texture_width; }
 	/// height

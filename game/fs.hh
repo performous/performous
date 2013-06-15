@@ -19,13 +19,13 @@ fs::path getCacheDir();
 fs::path getLocaleDir();
 
 /** Get full path to a file from the current theme **/
-std::string /* FIXME: use fs::path */ getThemePath(fs::path const& filename);
+fs::path getThemePath(fs::path const& filename);
 
 /** Get available theme names **/
 std::vector<std::string> getThemes();
 
 /** Get full path to a share file **/
-std::string getPath(fs::path const& filename);
+fs::path getPath(fs::path const& filename);
 
 /** Get full path to a default conguration file **/
 fs::path getDefaultConfig(fs::path const& configFile);
