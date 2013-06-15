@@ -8,11 +8,13 @@ namespace input {
 		Joysticks() {
 			for (int id = 0; id < SDL_NumJoysticks(); ++id) {
 				JoyPtr joy(SDL_JoystickOpen(id), SDL_JoystickClose);
-				std::clog << "controller-joystick/info: Opened joystick " << id << ": " << getName(id) << " ("
+				std::ostringstream oss;
+				oss << "controller-joystick/info: Opened joystick " << id << ": " << getName(id) << " ("
 				  << SDL_JoystickNumButtons(joy.get()) << " buttons, "
 				  << SDL_JoystickNumAxes(joy.get()) << " axes, "
 				  << SDL_JoystickNumHats(joy.get()) << " hats, "
-				  << SDL_JoystickNumBalls(joy.get()) << " balls)" << std::endl;
+				  << SDL_JoystickNumBalls(joy.get()) << " balls)";
+				std::clog << oss.str() << std::endl;  // Logging system barks if this is not one atomic write (thus the ostringstream).
 				m_joysticks.push_back(joy);
 			}
 		}
