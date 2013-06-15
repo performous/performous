@@ -421,6 +421,7 @@ struct Audio::Impl {
 	boost::ptr_vector<Device> devices;
 	bool playback;
 	Impl(): init(), playback() {
+		std::clog << "audio/info: " << portaudio::AudioDevices().dump() << std::flush;
 		// Parse audio devices from config
 		ConfigItem::StringList devs = config["audio/devices"].sl();
 		for (ConfigItem::StringList::const_iterator it = devs.begin(), end = devs.end(); it != end; ++it) {

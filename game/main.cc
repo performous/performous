@@ -132,10 +132,6 @@ static void checkEvents(Game& gm) {
 
 void mainLoop(std::string const& songlist) {
 	Audio audio;
-	{ // Print the devices
-		portaudio::AudioDevices ads;
-		std::clog << "audio/info:\n" << ads.dump();
-	}
 	Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());
 	Backgrounds backgrounds;
 	Database database(getConfigDir() / "database.xml");
