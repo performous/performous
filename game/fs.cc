@@ -3,7 +3,8 @@
 #include "config.hh"
 #include "configuration.hh"
 #include "execname.hh"
-#include <boost/filesystem.hpp>
+#include <boost/filesystem/fstream.hpp>
+#include <boost/filesystem/operations.hpp>
 #include <cstdlib>
 #include <iostream>
 #include <mutex>
@@ -233,7 +234,7 @@ void resetPaths() {
 
 BinaryBuffer readFile(fs::path const& path) {
 	BinaryBuffer ret;
-	std::ifstream f(path.string(), std::ios::binary);
+	fs::ifstream f(path, std::ios::binary);
 	f.seekg(0, std::ios::end);
 	ret.resize(f.tellg());
 	f.seekg(0);

@@ -1,11 +1,10 @@
 #include "3dobject.hh"
 
 #include "surface.hh"
-
-#include <sstream>
-#include <fstream>
-#include <stdexcept>
+#include <boost/filesystem/fstream.hpp>
 #include <boost/lexical_cast.hpp>
+#include <sstream>
+#include <stdexcept>
 
 // TODO: test & fix faces that doesn't have texcoords in the file
 // TODO: group handling for loader
@@ -35,7 +34,7 @@ struct Face {
 void Object3d::loadWavefrontObj(fs::path const& filepath, float scale) {
 	int linenumber = 0;
 	std::string row;
-	std::ifstream file(filepath.string().c_str(), std::ios::binary);
+	fs::ifstream file(filepath, std::ios::binary);
 	if (!file) throw std::runtime_error("Couldn't open object file "+filepath.string());
 	std::vector<glmath::vec4> m_vertices, m_normals, m_texcoords;
 	std::vector<Face> m_faces;

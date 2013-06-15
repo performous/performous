@@ -1,26 +1,20 @@
 #include "surface.hh"
 
 #include "filemagic.hh"
-#include "fs.hh"
 #include "configuration.hh"
 #include "video_driver.hh"
 #include "image.hh"
 #include "screen.hh"
-
 #include <boost/filesystem.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
-#include <fstream>
+#include <cctype>
 #include <stdexcept>
 #include <sstream>
 #include <vector>
 
-#include <cctype>
-
-#include <boost/cstdint.hpp>
-#include <boost/format.hpp>
-using boost::uint32_t;
+using std::uint32_t;
 
 Shader& getShader(std::string const& name) {
 	return Game::getSingletonPtr()->window().shader(name);  // FIXME

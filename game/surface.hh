@@ -1,7 +1,6 @@
 #pragma once
 
 #include "glutil.hh"
-#include "util.hh"
 #include "video_driver.hh"
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>

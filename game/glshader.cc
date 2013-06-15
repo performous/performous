@@ -1,8 +1,8 @@
 #include "glshader.hh"
 
 #include "glutil.hh"
+#include <boost/filesystem/fstream.hpp>
 #include <algorithm>
-#include <fstream>
 #include <stdexcept>
 
 using namespace glutil;
@@ -10,7 +10,7 @@ using namespace glutil;
 namespace {
 	/// Loads a file into memory
 	std::string loadFile(fs::path const& filepath) {
-		std::ifstream f(filepath.string().c_str(), std::ios::binary);
+		fs::ifstream f(filepath, std::ios::binary);
 		if (!f) throw std::runtime_error(std::string("Couldn't open ") + filepath.string());
 		f.seekg(0, std::ios::end);
 		size_t size = f.tellg();

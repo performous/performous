@@ -9,7 +9,6 @@
 #include "controllers.hh"
 #include "screen.hh"
 #include <boost/date_time.hpp>
-#include <fstream>
 #include <SDL.h>
 
 #ifndef GLEW_ARB_viewport_array

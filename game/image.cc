@@ -2,10 +2,13 @@
 
 #include "cache.hh"
 #include "configuration.hh"
+#include <boost/filesystem/fstream.hpp>
 #include <jpeglib.h>
 #include <librsvg/rsvg.h>
 #include <png.h>
-#include <fstream>
+
+using fs::ofstream;
+using fs::ifstream;
 
 // Avoid deprecation messages with new versions since Ubuntu 12.10.
 #if LIBRSVG_MAJOR_VERSION * 10000 + LIBRSVG_MINOR_VERSION * 100 + LIBRSVG_MICRO_VERSION < 23602
@@ -20,7 +23,7 @@ namespace {
 	void readPngHelper(png_structp pngPtr, png_bytep data, png_size_t length) {
 		static_cast<std::istream*>(png_get_io_ptr(pngPtr))->read((char*)data, length);
 	}
-	void loadPNG_internal(png_structp pngPtr, png_infop infoPtr, std::ifstream& file, Bitmap& bitmap, std::vector<png_bytep>& rows) {
+	void loadPNG_internal(png_structp pngPtr, png_infop infoPtr, ifstream& file, Bitmap& bitmap, std::vector<png_bytep>& rows) {
 		if (setjmp(png_jmpbuf(pngPtr))) throw std::runtime_error("Reading PNG failed");
 		png_set_read_fn(pngPtr,(png_voidp)&file, readPngHelper);
 		png_read_info(pngPtr, infoPtr);
@@ -34,7 +37,7 @@ namespace {
 		png_read_image(pngPtr, &rows[0]);
 	}
 
-	static void writePNG_internal(png_structp pngPtr, png_infop infoPtr, std::ofstream& file, unsigned w, unsigned h, pix::Format format, bool reverse, const unsigned char *data, std::vector<png_bytep>& rows) {
+	static void writePNG_internal(png_structp pngPtr, png_infop infoPtr, ofstream& file, unsigned w, unsigned h, pix::Format format, bool reverse, const unsigned char *data, std::vector<png_bytep>& rows) {
 		// There must be no objects initialized within this function because longjmp will mess them up
 		if (setjmp(png_jmpbuf(pngPtr))) throw std::runtime_error("Writing PNG failed");
 		png_set_write_fn(pngPtr, &file, writePngHelper, NULL);
@@ -118,7 +121,7 @@ namespace {
 
 void writePNG(fs::path const& filename, Image const& img) {
 	std::vector<png_bytep> rows(img.h);
-	std::ofstream file(filename.string(), std::ios::binary);
+	ofstream file(filename, std::ios::binary);
 	png_structp pngPtr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	if (!pngPtr) throw std::runtime_error("png_create_read_struct failed");
 	png_infop infoPtr = NULL;
@@ -166,25 +169,8 @@ void loadSVG(Bitmap& bitmap, fs::path const& filename) {
 	cairo_surface_write_to_png(surface.get(), cache_filename.string().c_str());
 }
 
-/*
 void loadPNG(Bitmap& bitmap, fs::path const& filename) {
-	// Raster with Cairo
-	boost::shared_ptr<cairo_surface_t> surface(
-	  cairo_image_surface_create_from_png(filename.string().c_str()),
-	  cairo_surface_destroy);
-	cairo_surface_flush(surface.get());
-	unsigned char* buf = cairo_image_surface_get_data(surface.get());
-	// Prepare the pixel buffer
-	bitmap.resize(
-	  cairo_image_surface_get_width(surface.get()),
-	  cairo_image_surface_get_height(surface.get()));
-	bitmap.fmt = pix::INT_ARGB;
-	std::copy(buf, buf + bitmap.buf.size(), bitmap.buf.begin());
-}
-*/
-
-void loadPNG(Bitmap& bitmap, fs::path const& filename) {
-	std::ifstream file(filename.string(), std::ios::binary);
+	ifstream file(filename, std::ios::binary);
 	png_structp pngPtr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	if (!pngPtr) throw std::runtime_error("png_create_read_struct failed");
 	png_infop infoPtr = NULL;

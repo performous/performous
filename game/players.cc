@@ -1,15 +1,9 @@
 #include "players.hh"
 
-#include "fs.hh"
 #include "configuration.hh"
-
-#include <set>
-#include <fstream>
-#include <iostream>
-
+#include "fs.hh"
 #include <boost/regex.hpp>
 #include <boost/lexical_cast.hpp>
-
 #include <libxml++/libxml++.h>
 
 Players::Players():

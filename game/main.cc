@@ -28,7 +28,6 @@
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
 #include <csignal>
-#include <fstream>
 #include <string>
 #include <vector>
 #include <cstdlib>

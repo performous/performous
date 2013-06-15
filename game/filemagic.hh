@@ -1,10 +1,7 @@
 #pragma once
 
 #include "fs.hh"
-
-#include <fstream>
-
-#include <boost/cstdint.hpp>
+#include <boost/filesystem/fstream.hpp>
 
 /** Helper functions that determinate file type **/
 namespace filemagic {
@@ -27,7 +24,7 @@ namespace filemagic {
 	bool signaturePrefix(fs::path const& filename, boost::uint8_t const (& bytes)[prefix_size], const std::streamoff offset=0) {
 		uint8_t buf[prefix_size];
 		{
-			std::ifstream file(filename.string(), std::ios::binary);
+			fs::ifstream file(filename, std::ios::binary);
 			file.seekg(offset);
 			file.read(reinterpret_cast<char*>(&buf), prefix_size);
 			// any error here makes it impossible for us to continue, thus, we won't find the prefix we seek.
