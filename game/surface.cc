@@ -1,10 +1,10 @@
 #include "surface.hh"
 
-#include "filemagic.hh"
 #include "configuration.hh"
 #include "video_driver.hh"
 #include "image.hh"
 #include "screen.hh"
+#include <boost/algorithm/string/case_conv.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/thread/mutex.hpp>
@@ -69,12 +69,12 @@ struct Loader {
 			Bitmap bitmap;
 			try {
 				// Load bitmap from disk
-				std::string const filename = name.string();
-				if (!fs::exists(name) || fs::is_directory(name)) throw std::runtime_error("File not found: " + filename);
-				else if (filemagic::SVG(name)) loadSVG(bitmap, filename);
-				else if (filemagic::JPEG(name)) loadJPEG(bitmap, filename);
-				else if (filemagic::PNG(name)) loadPNG(bitmap, filename);
-				else throw std::runtime_error("Unable to load the image: " + filename);
+				std::string ext = boost::algorithm::to_lower_copy(name.extension().string());
+				if (!fs::is_regular_file(name)) throw std::runtime_error("File not found: " + name.string());
+				else if (ext == ".svg") loadSVG(bitmap, name);
+				else if (ext == ".jpg" || ext == ".jpeg") loadJPEG(bitmap, name);
+				else if (ext == ".png") loadPNG(bitmap, name);
+				else throw std::runtime_error("Unknown image file format: " + name.string());
 			} catch (std::exception& e) {
 				std::clog << "image/error: " << e.what() << std::endl;
 			}
