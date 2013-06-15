@@ -375,4 +375,5 @@ void readConfig() {
 				ci.i() = i;
 		}
 	}
+	resetPaths();
 }

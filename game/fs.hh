@@ -15,20 +15,11 @@ fs::path getDataDir();
 /** Get the users cache folder **/
 fs::path getCacheDir();
 
-/** Get the users theme folder **/
-fs::path getThemeDir();
-
-/** Is the file a theme resource **/
-bool isThemeResource(fs::path);
-
-/** Get the localec folder **/
+/** Get the locale folder **/
 fs::path getLocaleDir();
 
-/** Do mangling to convert user-entered path into path suitable for use with stdlib etc. **/
-fs::path pathMangle(fs::path const& dir);
-
 /** Get full path to a file from the current theme **/
-std::string getThemePath(std::string const& filename);
+std::string /* FIXME: use fs::path */ getThemePath(fs::path const& filename);
 
 /** Get available theme names **/
 std::vector<std::string> getThemes();
@@ -46,3 +37,6 @@ Paths const& getPaths(bool refresh = false);
 
 /** Get all paths listed in a config option **/
 Paths getPathsConfig(std::string const& confOption);
+
+void resetPaths();
+

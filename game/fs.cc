@@ -6,6 +6,8 @@
 #include <boost/filesystem.hpp>
 #include <cstdlib>
 #include <iostream>
+#include <mutex>
+#include <set>
 #include <sstream>
 #include <algorithm>
 
@@ -14,201 +16,190 @@
 #include <shlobj.h>
 #endif
 
-fs::path getHomeDir() {
-	static fs::path dir;
-	static bool initialized = false;
-	if (!initialized) {
-		initialized = true;
-		#ifdef _WIN32
-		char const* home = getenv("USERPROFILE");
-		#else
-		char const* home = getenv("HOME");
-		#endif
-		if (home) dir = home;
-	}
-	return dir;
-}
-
-fs::path getLocaleDir() {
-	static fs::path dir;
-
-	if(LOCALEDIR[0] == '/') {
-		dir = LOCALEDIR;
-	} else {
-		dir = execname().parent_path().parent_path() / LOCALEDIR;
-	}
-
-	return dir;
-}
-
-fs::path getConfigDir() {
-	static fs::path dir;
-	static bool initialized = false;
-	if (!initialized) {
-		initialized = true;
-		#ifndef _WIN32
-		{
-			char const* conf = getenv("XDG_CONFIG_HOME");
-			if (conf) dir = fs::path(conf) / "performous";
-			else dir = getHomeDir() / ".config" / "performous";
-		}
-		#else
-		{
-			// Open AppData directory
-			std::string str;
-			ITEMIDLIST* pidl;
-			HRESULT hRes = SHGetSpecialFolderLocation( NULL, CSIDL_APPDATA|CSIDL_FLAG_CREATE , &pidl );
-			if (hRes==NOERROR)
-			{
-				char AppDir[MAX_PATH];
-				SHGetPathFromIDList( pidl, AppDir );
-				int i;
-				for (i = 0; AppDir[i] != '\0'; i++) {
-					if (AppDir[i] == '\\') str += '/';
-					else str += AppDir[i];
-				}
-				dir = fs::path(str) / "performous";
-			}
-		}
-		#endif
-	}
-	return dir;
-}
-
-fs::path getDataDir() {
-#ifdef _WIN32
-	return getConfigDir();  // APPDATA/performous
-#else
-	fs::path shortDir = "performous";
-	fs::path shareDir = SHARED_DATA_DIR;
-	char const* xdg_data_home = getenv("XDG_DATA_HOME");
-	// FIXME: Should this use "games" or not?
-	return (xdg_data_home ? xdg_data_home / shortDir : getHomeDir() / ".local" / shareDir);
-#endif
-}
-
-fs::path getCacheDir() {
-#ifdef _WIN32
-	return getConfigDir() / "cache";  // APPDATA/performous
-#else
-	fs::path shortDir = "performous";
-	char const* xdg_cache_home = getenv("XDG_CACHE_HOME");
-	// FIXME: Should this use "games" or not?
-	return (xdg_cache_home ? xdg_cache_home / shortDir : getHomeDir() / ".cache" / shortDir);
-#endif
-}
-
-fs::path getThemeDir() {
-	std::string theme = config["game/theme"].getEnumName();
-	static const std::string defaultTheme = "default";
-	if (theme.empty()) theme = defaultTheme;
-	return getDataDir() / "themes" / theme;
-}
-
-fs::path pathMangle(fs::path const& dir) {
-	fs::path ret;
-	for (fs::path::const_iterator it = dir.begin(); it != dir.end(); ++it) {
-		if (it == dir.begin() && *it == "~") {
-			ret = getHomeDir();
-			continue;
-		}
-		ret /= *it;
-	}
-	return ret;
-}
-
-std::string getThemePath(std::string const& filename) {
-	std::string theme = config["game/theme"].getEnumName();
-	static const std::string defaultTheme = "default";
-	if (theme.empty()) theme = defaultTheme;
-	// Try current theme and if that fails, try default theme and finally data dir
-	try { return getPath(fs::path("themes") / theme / filename); } catch (std::runtime_error&) {}
-	if (theme != defaultTheme) try { return getPath(fs::path("themes") / defaultTheme / filename); } catch (std::runtime_error&) {}
-	return getPath(filename);
-}
-
-std::vector<std::string> getThemes() {
-	std::vector<std::string> themes;
-	// Search all paths for themes folders and add them
-	Paths const& paths = getPaths();
-	for (auto p : paths) {
-		
-		p /= fs::path("themes");
-		if (fs::is_directory(p)) {
-			// Gather the themes in this folder
-			for (fs::directory_iterator dirIt(p), dirEnd; dirIt != dirEnd; ++dirIt) {
-				fs::path p2 = dirIt->path();
-				if (fs::is_directory(p2)) {
-					themes.push_back(p2.filename().string());
-				}
-			}
-		}
-	}
-	// No duplicates allowed
-	std::sort(themes.begin(), themes.end());
-	auto last = std::unique(themes.begin(), themes.end());
-	themes.erase(last, themes.end());
-	return themes;
-}
-
-bool isThemeResource(fs::path filename){
-	try {
-		std::string themefile = getThemePath(filename.filename().string());
-		return themefile == filename;
-	} catch (...) { return false; }
-}
-
 namespace {
-	bool pathNotExist(fs::path const& p) {
-		if (exists(p)) {
-			std::clog << "fs/info: Using data path \"" << p.string() << "\"" << std::endl;
-			return false;
+	/// Test if a path begins with name and if so, remove that element and return true
+	/// Mostly a workaround for fs::path's crippled API that makes this operation difficult
+	bool pathRootHack(fs::path& p, std::string const& name) {
+		if (p.empty() || p.begin()->string() != name) return false;
+		fs::path ret;
+		for (auto const& dir: p) {
+			if (&dir == &*p.begin()) continue;  // Skip the first element
+			ret /= dir;
 		}
-		std::clog << "fs/info: Not using \"" << p.string() << "\" (does not exist)" << std::endl;
+		p = ret;
 		return true;
 	}
+
+	struct PathCache {
+		/// Expand a path specifier as a list of actual paths. Expands ~ (home) and DATADIR (Performous search path).
+		Paths pathExpand(fs::path p) {
+			Paths ret;
+			if (pathRootHack(p, "~")) ret.push_back(home / p);
+			else if (pathRootHack(p, "DATADIR")) {
+				// Add all data paths with p appended to them
+				for (auto const& path: paths) ret.push_back(path / p);
+			}
+			else ret.push_back(p);
+			return ret;
+		}
+
+		fs::path base, home, locale, conf, data, cache;
+		Paths paths;
+		/// Initialize paths
+		/// Note: Not done in constructor because logging and config are not initialized
+		/// during static construction. Initialization must be done manually.
+		void init() {
+			std::string logmsg = "fs/info: Determining system paths:\n";
+			const fs::path performous = "performous";
+			// Base
+			base = execname().parent_path().parent_path();
+			logmsg += "  base:     " + base.string() + '\n';
+			// Locale
+			locale = fs::absolute(LOCALEDIR, base);
+			logmsg += "  locale:   " + locale.string() + '\n';
+			// Home
+			{
+			#ifdef _WIN32
+				char const* p = getenv("USERPROFILE");
+			#else
+				char const* p = getenv("HOME");
+			#endif
+				if (p) home = p;
+				logmsg += "  home:     " + home.string() + '\n';
+			}
+			// Config
+			{
+			#ifdef _WIN32
+				ITEMIDLIST* pidl;
+				HRESULT hRes = SHGetSpecialFolderLocation(nullptr, CSIDL_APPDATA|CSIDL_FLAG_CREATE, &pidl);
+				if (hRes != NOERROR) throw std::runtime_error("Unable to determine where Application Data is stored");
+				char p[MAX_PATH];
+				SHGetPathFromIDList(pidl, p);
+				conf = p;
+			#else
+				char const* p = getenv("XDG_CONFIG_HOME");
+				conf = (p ? p : home / ".config");
+			#endif
+				conf /= performous;
+				logmsg += "  config:   " + conf.string() + '\n';
+			}
+			// Data
+			{
+			#ifdef _WIN32
+				data = config;
+			#else
+				char const* p = getenv("XDG_DATA_HOME");
+				data = (p ? p / performous : home / ".local" / performous);
+			#endif
+				logmsg += "  data:     " + data.string() + '\n';
+			}
+			// Cache
+			{
+			#ifdef _WIN32
+				cache = data / "cache";  // FIXME: Should we use GetTempPath?
+			#else
+				char const* p = getenv("XDG_CACHE_HOME");
+				cache = (p ? p / performous : home / ".cache" / performous);
+			#endif
+				logmsg += "  cache:    " + cache.string() + '\n';
+			}
+			std::clog << logmsg << std::flush;
+			// Data dirs
+			logmsg = "fs/info: Determining data dirs (search path):\n";
+			{
+				const fs::path shareDir = SHARED_DATA_DIR;
+				Paths dirs;
+				dirs.push_back(data);  // Adding user's data dir
+				dirs.push_back(base / shareDir);  // Adding relative path from executable
+			#ifndef _WIN32
+				// Adding XDG_DATA_DIRS
+				{
+					char const* xdg_data_dirs = getenv("XDG_DATA_DIRS");
+					std::istringstream iss(xdg_data_dirs ? xdg_data_dirs : "/usr/local/share/:/usr/share/");
+					for (std::string p; std::getline(iss, p, ':'); dirs.push_back(p / performous)) {}
+				}
+			#endif
+				// Adding paths from config file
+				auto const& conf = config["paths/system"].sl();
+				for (std::string const& dir: conf) dirs.splice(dirs.end(), pathExpand(dir));
+				// Check if they actually exist and print debug
+				paths.clear();
+				std::set<fs::path> used;
+				for (auto dir: dirs) {
+					dir = fs::absolute(dir);
+					if (used.find(dir) != used.end()) continue;
+					logmsg += "  " + dir.string() + '\n';
+					paths.push_back(dir);
+					used.insert(dir);
+				}
+			}
+			std::clog << logmsg << std::flush;
+		}
+	} cache;
+	std::mutex mutex;
+	typedef std::lock_guard<std::mutex> Lock;
+}
+
+fs::path getHomeDir() { Lock l(mutex); return cache.home; }
+fs::path getLocaleDir() { Lock l(mutex); return cache.home; }
+fs::path getConfigDir() { Lock l(mutex); return cache.conf; }
+fs::path getDataDir() { Lock l(mutex); return cache.data; }
+fs::path getCacheDir() { Lock l(mutex); return cache.cache; }
+
+Paths const& getPaths(bool refresh) {
+	Lock l(mutex);
+	if (refresh) cache.init();
+	return cache.paths;
+}
+
+fs::path findFile(fs::path const& filename, Paths const& infixes = Paths(1)) {
+	if (filename.empty()) throw std::logic_error("findFile expects a filename.");
+	if (filename.is_absolute()) throw std::logic_error("findFile expects a filename without path.");
+	Paths list;
+	for (auto infix: infixes) {
+		for (auto p: getPaths()) {
+			p /= infix / filename;
+			list.push_back(p);
+			if (fs::exists(p)) return p.string();
+		}
+	}
+	std::string logmsg = "fs/error: Unable to locate data file, tried:\n";
+	for (auto const& p: list) logmsg += "  " + p.string() + '\n';
+	std::clog << logmsg << std::flush;
+	return fs::path();
 }
 
 std::string getPath(fs::path const& filename) {
-	for (auto p: getPaths()) {
-		p /= filename;
-		if (fs::exists(p)) return p.string();
-	}
-	throw std::runtime_error("Cannot find file \"" + filename.string() + "\" in any of Performous data folders");
+	fs::path file = findFile(filename);
+	if (file.empty()) throw std::runtime_error("Cannot find file \"" + filename.string() + "\" in any of Performous data folders");
+	return file.string();
 }
 
-Paths const& getPaths(bool refresh) {
-	static Paths paths;
-	static bool initialized = false;
-	if (!initialized || refresh) {
-		initialized = true;
-		fs::path shortDir = "performous";
-		fs::path shareDir = SHARED_DATA_DIR;
-		Paths dirs;
+std::string getThemePath(fs::path const& filename) {
+	const fs::path themes = "themes";
+	const fs::path def = "default";
+	std::string theme = config["game/theme"].getEnumName();
+	// Try current theme and if that fails, try default theme and finally data dirs
+	Paths infixes = { themes / def, fs::path() };
+	if (!theme.empty() && theme != def) infixes.push_front(themes / theme);
+	fs::path file = findFile(filename, infixes);
+	if (file.empty()) throw std::runtime_error("Cannot find file \"" + filename.string() + "\" in Performous theme folders");
+	return file.string();
+}
 
-		// Adding users data dir
-		dirs.push_back(getDataDir());
-
-		// Adding relative path from executable
-		dirs.push_back(execname().parent_path().parent_path() / shareDir);
-#ifndef _WIN32
-		// Adding XDG_DATA_DIRS
-		{
-			char const* xdg_data_dirs = getenv("XDG_DATA_DIRS");
-			std::istringstream iss(xdg_data_dirs ? xdg_data_dirs : "/usr/local/share/:/usr/share/");
-			for (std::string p; std::getline(iss, p, ':'); dirs.push_back(p / shortDir)) {}
+std::vector<std::string> getThemes() {
+	std::set<std::string> themes;
+	// Search all paths for themes folders and add them
+	for (auto p: getPaths()) {
+		p /= "themes";
+		if (!fs::is_directory(p)) continue;
+		// Gather the themes in this folder
+		for (fs::directory_iterator dirIt(p), dirEnd; dirIt != dirEnd; ++dirIt) {
+			fs::path p2 = dirIt->path();
+			if (fs::is_directory(p2)) themes.insert(p2.filename().string());
 		}
-#endif
-		// Adding paths from config file
-		std::vector<std::string> const& confPaths = config["paths/system"].sl();
-		std::transform(confPaths.begin(), confPaths.end(), std::inserter(dirs, dirs.end()), pathMangle);
-		// Check if they actually exist and print debug
-		paths.clear();
-		std::remove_copy_if(dirs.begin(), dirs.end(), std::inserter(paths, paths.end()), pathNotExist);
-		// Assure that each path appears only once
-		paths.erase(std::unique(paths.begin(), paths.end()), paths.end());
 	}
-	return paths;
+	return std::vector<std::string>(themes.begin(), themes.end());
 }
 
 fs::path getDefaultConfig(fs::path const& configFile) {
@@ -226,20 +217,17 @@ fs::path getDefaultConfig(fs::path const& configFile) {
 }
 
 Paths getPathsConfig(std::string const& confOption) {
+	Lock l(mutex);
 	Paths ret;
-	Paths const& paths = getPaths();
 	for (auto const& str: config[confOption].sl()) {
-		fs::path p = pathMangle(str);
-		if (p.empty()) continue;  // Ignore empty paths
-		if (*p.begin() == "DATADIR") {
-			// Remove first element
-			p = p.string().substr(7);
-			// Add all data paths with p appended to them
-			for (auto const& path: paths) ret.push_back(path / p);
-			continue;
-		}
-		ret.push_back(p);
+		ret.splice(ret.end(), cache.pathExpand(str));  // Add expanded paths to ret.
 	}
 	return ret;
 }
+
+void resetPaths() {
+	Lock l(mutex);
+	cache.init();
+}
+
 
