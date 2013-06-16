@@ -45,14 +45,14 @@ void Songs::reload_internal() {
 	Paths paths = getPathsConfig("paths/songs");
 	for (auto it = paths.begin(); m_loading && it != paths.end(); ++it) {
 		try {
-			if (!fs::is_directory(*it)) { m_debug << "songs/info: >>> Not scanning: " << *it << " (no such directory)" << std::endl; continue; }
+			if (!fs::is_directory(*it)) { m_debug << "songs/info: >>> Not scanning: " << *it << " (no such directory)\n"; continue; }
 			m_debug << "songs/info: >>> Scanning " << *it << std::endl;
 			size_t count = m_songs.size();
 			reload_internal(*it);
 			size_t diff = m_songs.size() - count;
-			if (diff > 0 && m_loading) m_debug << diff << " songs loaded" << std::endl;
+			if (diff > 0 && m_loading) m_debug << "songs/info: " << diff << " songs loaded\n";
 		} catch (std::exception& e) {
-			m_debug << "songs/error: >>> Error scanning " << *it << ": " << e.what() << std::endl;
+			m_debug << "songs/error: >>> Error scanning " << *it << ": " << e.what() << '\n';
 		}
 	}
 	prof("total");
