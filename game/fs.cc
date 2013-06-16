@@ -7,7 +7,7 @@
 #include <boost/filesystem/operations.hpp>
 #include <cstdlib>
 #include <iostream>
-#include <mutex>
+#include <boost/thread.hpp>
 #include <set>
 #include <sstream>
 #include <algorithm>
@@ -174,8 +174,8 @@ namespace {
 			if (!bootstrapping) std::clog << logmsg << std::flush;
 		}
 	} cache;
-	std::mutex mutex;
-	typedef std::lock_guard<std::mutex> Lock;
+	boost::mutex mutex;
+	typedef boost::lock_guard<boost::mutex> Lock;
 }
 
 fs::path pathBootstrap() { Lock l(mutex); return cache.pathBootstrap(); }
