@@ -117,7 +117,7 @@ namespace {
 			// Data
 			{
 			#ifdef _WIN32
-				data = config;
+				data = conf;
 			#else
 				char const* p = getenv("XDG_DATA_HOME");
 				data = (p ? p / performous : home / ".local" / SHARED_DATA_DIR);
