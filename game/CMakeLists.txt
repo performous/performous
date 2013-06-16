@@ -147,8 +147,8 @@ add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL_SOURCES} ${RESOURC
 target_link_libraries(performous ${LIBS})
 install(TARGETS performous DESTINATION ${BIN_INSTALL})
 
-# Store library paths in executable
-set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
+set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)  # Store library paths in executable
+set_target_properties(performous PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})  # Produce executable in build/, not build/game/
 
 if(WIN32)
 	add_executable(performous-cmd "windows-cmd.cpp")
@@ -156,6 +156,7 @@ if(WIN32)
 	# Capitalized exe names are more beautiful on Windows
 	set_target_properties(performous-cmd PROPERTIES OUTPUT_NAME "Performous-cmd")
 	set_target_properties(performous PROPERTIES OUTPUT_NAME "Performous")
+	set_target_properties(performous-cmd PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 endif(WIN32)
 
 # Generate config.hh
