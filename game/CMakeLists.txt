@@ -46,15 +46,17 @@ if(WIN32)
 		# According to MinGW tools, we need to compile the rc file, and then link it into projects:
 		# windres foo.rc foores.o
 		# gcc -o foo.exe foo.o foores.o
-		find_program(WINDRES windres)
-		if(NOT WINDRES)
-			message(STATUS "Cannot find windres. Will not create a versioned exe")
+		if(NOT CMAKE_RC_COMPILER)
+			find_program(CMAKE_RC_COMPILER windres)
+		endif()
+		if(NOT CMAKE_RC_COMPILER)
+			message(STATUS "Cannot find windres. Will not create a versioned exe.")
 			set(RESOURCE_FILES)
 			set(RESOURCE_OBJECT)
 		else()
 			set(RESOURCE_OBJECT "${CMAKE_BINARY_DIR}/performous.rc.o")
-			execute_process(COMMAND "${WINDRES}" "${RESOURCE_FILES}" "${RESOURCE_OBJECT}")
-		endif(NOT WINDRES)
+			execute_process(COMMAND "${CMAKE_RC_COMPILER}" "${RESOURCE_FILES}" "${RESOURCE_OBJECT}")
+		endif()
 	endif()
 else()
 	set(RESOURCE_FILES) #nothing
