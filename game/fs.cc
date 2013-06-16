@@ -23,10 +23,9 @@ namespace {
 	bool pathRootHack(fs::path& p, std::string const& name) {
 		if (p.empty() || p.begin()->string() != name) return false;
 		fs::path ret;
-		for (auto const& dir: p) {
-			if (&dir == &*p.begin()) continue;  // Skip the first element
-			ret /= dir;
-		}
+		// Add all but first element
+		for (auto dir = ++p.begin(); dir != p.end(); ++dir)
+			ret /= *dir;
 		p = ret;
 		return true;
 	}
