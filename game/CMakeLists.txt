@@ -135,28 +135,30 @@ if(MXE_HACK)
 	add_definitions(-DBOOST_THREAD_USE_LIB -DGLEW_STATIC)
 endif()
 
+if(WIN32)
+	set(BIN_INSTALL .)  # Straight to Program Files/Performous with no bin subfolder.
+	set(SUBSYSTEM_WIN32 WIN32)
+else()
+	set(BIN_INSTALL bin)
+endif()
+
+# Build main executable
 add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL_SOURCES} ${RESOURCE_OBJECT})
 target_link_libraries(performous ${LIBS})
+install(TARGETS performous DESTINATION ${BIN_INSTALL})
+
+# Store library paths in executable
+set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 if(WIN32)
-	set(SUBSYSTEM_WIN32 WIN32)
 	add_executable(performous-cmd "windows-cmd.cpp")
-	install(TARGETS performous-cmd DESTINATION bin)
+	install(TARGETS performous-cmd DESTINATION ${BIN_INSTALL})
 	# Capitalized exe names are more beautiful on Windows
 	set_target_properties(performous-cmd PROPERTIES OUTPUT_NAME "Performous-cmd")
 	set_target_properties(performous PROPERTIES OUTPUT_NAME "Performous")
 endif(WIN32)
 
-# Store library paths in executable
-if(APPLE)
-	set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
-else()
-	set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
-endif()
-
 # Generate config.hh
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.cmake.hh" "${CMAKE_CURRENT_BINARY_DIR}/config.hh" @ONLY)
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
-
-install(TARGETS performous DESTINATION bin)
 

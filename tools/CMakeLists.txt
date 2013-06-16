@@ -80,5 +80,9 @@ add_executable(ss_ipu_conv ipu_conv.cpp ipuconvmain.cpp pak.cpp)
 set(targets ${targets} gh_xen_decrypt ss_adpcm_decode ss_ipu_conv)
 
 # add install target:
-install(TARGETS ${targets} DESTINATION bin)
+if(WIN32)
+	install(TARGETS ${targets} DESTINATION tools)
+else()
+	install(TARGETS ${targets} DESTINATION bin)
+endif()
 
