@@ -10,6 +10,8 @@ typedef std::vector<std::uint8_t> BinaryBuffer;
 /// Read an entire file into a buffer
 BinaryBuffer readFile(fs::path const& path);
 
+typedef std::list<fs::path> Paths;
+
 /** Get user's home folder **/
 fs::path getHomeDir();
 
@@ -21,6 +23,9 @@ fs::path getDataDir();
 
 /** Get the users cache folder **/
 fs::path getCacheDir();
+
+/** Get the shared data folder **/
+fs::path getShareDir();
 
 /** Get the locale folder **/
 fs::path getLocaleDir();
@@ -34,16 +39,15 @@ std::vector<std::string> getThemes();
 /** Get full path to a share file **/
 fs::path getPath(fs::path const& filename);
 
-/** Get full path to a default conguration file **/
-fs::path getDefaultConfig(fs::path const& configFile);
-
-typedef std::list<fs::path> Paths;
-
 /** Get all shared data paths in preference order **/
-Paths const& getPaths(bool refresh = false);
+Paths const& getPaths();
 
 /** Get all paths listed in a config option **/
 Paths getPathsConfig(std::string const& confOption);
 
-void resetPaths();
+/// Determine where the important system paths and most importantly the config schema are.
+fs::path pathBootstrap();
+
+/// Do full data dir (search path) init or re-init after config options are set.
+void pathInit();
 

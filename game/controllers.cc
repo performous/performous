@@ -141,7 +141,7 @@ struct Controllers::Impl {
 	Impl(): m_eventsEnabled() {
 		#define DEFINE_BUTTON(devtype, button, num, nav) m_buttons[DEVTYPE_##devtype][#button] = devtype##_##button;
 		#include "controllers-buttons.ii"
-		readControllers(getDefaultConfig(fs::path("/config/controllers.xml")));
+		readControllers(getShareDir() / "config/controllers.xml");
 		readControllers(getConfigDir() / "controllers.xml");
 		m_hw[SOURCETYPE_KEYBOARD] = constructKeyboard();
 		m_hw[SOURCETYPE_JOYSTICK] = constructJoysticks();

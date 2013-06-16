@@ -32,6 +32,7 @@ namespace {
 	}
 
 	const fs::path performous = "performous";
+	const fs::path configSchema = "config/schema.xml";
 
 	struct PathCache {
 		/// Expand a path specifier as a list of actual paths. Expands ~ (home) and DATADIR (Performous search path).
@@ -46,19 +47,38 @@ namespace {
 			return ret;
 		}
 
-		fs::path base, home, locale, conf, data, cache;
+		fs::path base, share, home, locale, conf, data, cache;
 		Paths paths;
-		/// Initialize paths
-		/// Note: Not done in constructor because logging and config are not initialized
-		/// during static construction. Initialization must be done manually.
-		void init() {
+		// Note: three-phase init:
+		// 1. Default constructor runs in static context (before main) and cannot do much
+		// 2. pathBootstrap is called to find out static system paths, and enable loading of config files
+		// 3. pathInit is called to process the full search path, using config settings
+		/// Initialize static system paths, returns config schema path.
+		fs::path pathBootstrap() {
 			std::string logmsg = "fs/info: Determining system paths:\n";
-			// Base
-			base = execname().parent_path().parent_path();
-			logmsg += "  base:     " + base.string() + '\n';
-			// Locale
-			locale = fs::absolute(LOCALEDIR, base);
-			logmsg += "  locale:   " + locale.string() + '\n';
+			// Base (e.g. /usr/local), share (src or installed data files) and locale (built or installed .mo files)
+			{
+				char const* root = getenv("PERFORMOUS_ROOT");
+				base = fs::absolute(root ? root : execname().parent_path());
+				do {
+					if (base.empty()) throw std::runtime_error("Unable to find Performous data files. Install properly or set environment variable PERFORMOUS_ROOT.");
+					for (fs::path const& infix: { fs::path(SHARED_DATA_DIR), fs::path("data"), fs::path() }) {
+						if (!fs::exists(base / infix / configSchema)) continue;
+						share = base / infix;
+						goto found;
+					}
+					// Use locale .mo files from build folder?
+					if (base.filename() == "build" && fs::exists(base / "lang")) {
+						locale = base / "lang";
+					}
+					base = base.parent_path();
+				} while (true);
+			found:;
+				if (locale.empty() && fs::exists(base / LOCALEDIR)) locale = base / LOCALEDIR;
+				logmsg += "  base:     " + base.string() + '\n';
+				logmsg += "  share:    " + share.string() + '\n';
+				logmsg += "  locale:   " + locale.string() + '\n';
+			}
 			// Home
 			{
 			#ifdef _WIN32
@@ -91,7 +111,7 @@ namespace {
 				data = config;
 			#else
 				char const* p = getenv("XDG_DATA_HOME");
-				data = (p ? p / performous : home / ".local" / performous);
+				data = (p ? p / performous : home / ".local" / SHARED_DATA_DIR);
 			#endif
 				logmsg += "  data:     " + data.string() + '\n';
 			}
@@ -106,13 +126,18 @@ namespace {
 				logmsg += "  cache:    " + cache.string() + '\n';
 			}
 			std::clog << logmsg << std::flush;
+			pathInit();
+			return share / configSchema;
+		}
+		/// Initialize/reset data dirs (search path).
+		void pathInit() {
+			bool bootstrapping = paths.empty();  // The first run (during bootstrap)
 			// Data dirs
-			logmsg = "fs/info: Determining data dirs (search path):\n";
+			std::string logmsg = "fs/info: Determining data dirs (search path):\n";
 			{
-				const fs::path shareDir = SHARED_DATA_DIR;
 				Paths dirs;
 				dirs.push_back(data);  // Adding user's data dir
-				dirs.push_back(base / shareDir);  // Adding relative path from executable
+				dirs.push_back(share);  // Adding system data dir (relative to performous executable or PERFORMOUS_ROOT)
 			#ifndef _WIN32
 				// Adding XDG_DATA_DIRS
 				{
@@ -121,9 +146,11 @@ namespace {
 					for (std::string p; std::getline(iss, p, ':'); dirs.push_back(p / performous)) {}
 				}
 			#endif
-				// Adding paths from config file
-				auto const& conf = config["paths/system"].sl();
-				for (std::string const& dir: conf) dirs.splice(dirs.end(), pathExpand(dir));
+				// Adding paths from config file (during bootstrap config options are not yet available)
+				if (!bootstrapping) {
+					auto const& conf = config["paths/system"].sl();
+					for (std::string const& dir: conf) dirs.splice(dirs.end(), pathExpand(dir));
+				}
 				// Check if they actually exist and print debug
 				paths.clear();
 				std::set<fs::path> used;
@@ -135,24 +162,22 @@ namespace {
 					used.insert(dir);
 				}
 			}
-			std::clog << logmsg << std::flush;
+			if (!bootstrapping) std::clog << logmsg << std::flush;
 		}
 	} cache;
 	std::mutex mutex;
 	typedef std::lock_guard<std::mutex> Lock;
 }
 
+fs::path pathBootstrap() { Lock l(mutex); return cache.pathBootstrap(); }
+void pathInit() { Lock l(mutex); cache.pathInit(); }
 fs::path getHomeDir() { Lock l(mutex); return cache.home; }
+fs::path getShareDir() { Lock l(mutex); return cache.share; }
 fs::path getLocaleDir() { Lock l(mutex); return cache.home; }
 fs::path getConfigDir() { Lock l(mutex); return cache.conf; }
 fs::path getDataDir() { Lock l(mutex); return cache.data; }
 fs::path getCacheDir() { Lock l(mutex); return cache.cache; }
-
-Paths const& getPaths(bool refresh) {
-	Lock l(mutex);
-	if (refresh) cache.init();
-	return cache.paths;
-}
+Paths const& getPaths() { Lock l(mutex); return cache.paths; }
 
 fs::path findFile(fs::path const& filename, Paths const& infixes = Paths(1)) {
 	if (filename.empty()) throw std::logic_error("findFile expects a filename.");
@@ -204,20 +229,6 @@ std::vector<std::string> getThemes() {
 	return std::vector<std::string>(themes.begin(), themes.end());
 }
 
-fs::path getDefaultConfig(fs::path const& configFile) {
-	typedef std::vector<std::string> ConfigList;
-	ConfigList config_list;
-	char const* root = getenv("PERFORMOUS_ROOT");
-	if (root) config_list.push_back(std::string(root) + "/" SHARED_DATA_DIR + configFile.string());
-	fs::path exec = execname();
-	if (!exec.empty()) config_list.push_back(exec.parent_path().string() + "/../" SHARED_DATA_DIR + configFile.string());
-	ConfigList::const_iterator it = std::find_if(config_list.begin(), config_list.end(), static_cast<bool(&)(fs::path const&)>(fs::exists));
-	if (it == config_list.end()) {
-		throw std::runtime_error("Could not find default config file " + configFile.string());
-	}
-	return *it;
-}
-
 Paths getPathsConfig(std::string const& confOption) {
 	Lock l(mutex);
 	Paths ret;
@@ -225,11 +236,6 @@ Paths getPathsConfig(std::string const& confOption) {
 		ret.splice(ret.end(), cache.pathExpand(str));  // Add expanded paths to ret.
 	}
 	return ret;
-}
-
-void resetPaths() {
-	Lock l(mutex);
-	cache.init();
 }
 
 BinaryBuffer readFile(fs::path const& path) {
