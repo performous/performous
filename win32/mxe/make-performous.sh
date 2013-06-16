@@ -26,7 +26,7 @@ cmake ../../.. \
 if [ "$1" != "config" ]; then
 	make -j $JOBS
 	make install
-	python ../copydlls.py "$MXE_PREFIX/usr/i686-pc-mingw32/bin" "$STAGE/bin"
+	python ../copydlls.py "$MXE_PREFIX/usr/i686-pc-mingw32/bin" "$STAGE"
 fi
 
 echo "Done"
