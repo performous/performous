@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 
-FILE(GLOB SOURCE_FILES "*.cc")
-FILE(GLOB HEADER_FILES "*.hh")
+file(GLOB SOURCE_FILES "*.cc")
+file(GLOB HEADER_FILES "*.hh")
 
 if(WIN32)
 	if(ENABLE_VERSIONING)
@@ -87,7 +87,8 @@ else()
 	message(STATUS "Internationalization: Disabled (libintl not found)")
 endif()
 
-if(NOT NO_PORTMIDI)
+option(ENABLE_MIDI "Enable support for MIDI hardware (e-drums with USB/MIDI connection)." ON)
+if(ENABLE_MIDI)
 	find_package(PortMidi)
 	if(PortMidi_FOUND)
 		include_directories(${PortMidi_INCLUDE_DIRS})
@@ -101,7 +102,8 @@ else()
 	message(STATUS "MIDI I/O: Disabled (explicitly disabled)")
 endif()
 
-if(NOT NO_WEBCAM)
+option(ENABLE_WEBCAM "Enable webcam support (OpenCV)." ON)
+if(ENABLE_WEBCAM)
 	find_package(OpenCV)
 	if(OpenCV_FOUND)
 		include_directories(${OpenCV_INCLUDE_DIRS})
@@ -127,15 +129,16 @@ if(UNIX)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
 endif(UNIX)
 
-if(MXE_HACK)
-	execute_process(COMMAND "${CMAKE_SOURCE_DIR}/win32/mxe/libs.sh"
-		OUTPUT_VARIABLE MXE_HACK_STRING
-	)
-	set(CMAKE_CXX_LINK_EXECUTABLE ${CMAKE_CXX_LINK_EXECUTABLE}${MXE_HACK_STRING})
-	add_definitions(-DBOOST_THREAD_USE_LIB -DGLEW_STATIC)
-endif()
-
 if(WIN32)
+	option(MXE_HACK "Features horrible hacks, but is able to compile a static performous.exe (that may not work)." OFF)
+	mark_as_advanced(MXE_HACK)
+	if(MXE_HACK)
+		execute_process(COMMAND "${CMAKE_SOURCE_DIR}/win32/mxe/libs.sh"
+			OUTPUT_VARIABLE MXE_HACK_STRING
+		)
+		set(CMAKE_CXX_LINK_EXECUTABLE ${CMAKE_CXX_LINK_EXECUTABLE}${MXE_HACK_STRING})
+		add_definitions(-DBOOST_THREAD_USE_LIB -DGLEW_STATIC)
+	endif()
 	set(BIN_INSTALL .)  # Straight to Program Files/Performous with no bin subfolder.
 	set(SUBSYSTEM_WIN32 WIN32)
 else()

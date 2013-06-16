@@ -1,17 +1,11 @@
+cmake_minimum_required(VERSION 2.8)
 project(Performous CXX C)
-cmake_minimum_required(VERSION 2.6)
-cmake_policy(VERSION 2.6)
 set(PROJECT_VERSION "0.7.0+")
 
 # Avoid source tree pollution
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
 	message(FATAL_ERROR "In-source builds are not permitted. Make a separate folder for building:\nmkdir build; cd build; cmake ..\nBefore that, remove the files already created:\nrm -rf CMakeCache.txt CMakeFiles")
 endif(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
-
-# Packaging support (CPack) is disabled since Performous 0.7 release.
-# If you are still using this, uncomment the following line (and update the file).
-# Let us know if you still need it because otherwise we'll remove it entirely.
-#include(cmake/performous-packaging.cmake)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
@@ -21,12 +15,11 @@ if(NOT CMAKE_BUILD_TYPE)
 	SET(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
 endif(NOT CMAKE_BUILD_TYPE)
 
-if(CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
 	add_definitions("-DNDEBUG")
 endif()
 
 # Enable C++11 support and other compiler flags...
-
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
 	message("Detected GCC version ${GCC_VERSION}")
@@ -45,57 +38,40 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 endif()
 
 if(WIN32)
-	set(SHARE_INSTALL "." CACHE STRING "Data file install path. Must be a relative path (from CMAKE_INSTALL_PREFIX), with no trailing slash.")
-	# Make windows.h behave
-	if(MSVC)
-		set(CMAKE_CXX_FLAGS "/DWIN32_LEAN_AND_MEAN ${CMAKE_CXX_FLAGS}")
-	else()
-		set(CMAKE_CXX_FLAGS "-DWIN32_LEAN_AND_MEAN ${CMAKE_CXX_FLAGS}")
-	endif()
-else(WIN32)
-	if(NOT SHARE_INSTALL)
-		set(SHARE_INSTALL "share/games/performous" CACHE STRING "Data file install path. Must be a relative path (from CMAKE_INSTALL_PREFIX), with no trailing slash.")
-	endif(NOT SHARE_INSTALL)
-endif(WIN32)
+	set(CMAKE_CXX_FLAGS "-DWIN32_LEAN_AND_MEAN ${CMAKE_CXX_FLAGS}")
+	set(SHARE_INSTALL_DEFAULT ".")
+	SET(LOCALE_DIR_DEFAULT "bin/locale")
+else()
+	set(SHARE_INSTALL_DEFAULT "share/games/performous")
+	SET(LOCALE_DIR_DEFAULT "share/locale")
+endif()
 
+set(SHARE_INSTALL "${SHARE_INSTALL_DEFAULT}" CACHE STRING "Data file install path. Must be a relative path (from CMAKE_INSTALL_PREFIX), with no trailing slash.")
 mark_as_advanced(SHARE_INSTALL)
 
-#need to put here do setting LOCALE_DIR variable
+set(LOCALE_DIR "${LOCALE_DIR_DEFAULT}" CACHE STRING "Locale file install path. Must be a relative path (from CMAKE_INSTALL_PREFIX), with no trailing slash.")
+mark_as_advanced(LOCALE_DIR)
+
 find_package(Gettext)
-if(Gettext_FOUND)
-	if(NOT LOCALE_DIR)
-		if(WIN32)
-			SET(LOCALE_DIR "bin/locale")
-		elseif(APPLE)
-			SET(LOCALE_DIR "share/locale")
-		else()#other os
-			SET(LOCALE_DIR "share/locale")
-		endif(WIN32)
-	endif(NOT LOCALE_DIR)
-	
-	if(NOT LOCALE_DIR)
-		message(QUIET "Set LOCALE_DIR to path to get Gettext working")
-	else()
-		find_package(Msgfmt)
-		if(Msgfmt_FOUND)
-			message(STATUS "Found msgfmt to convert language file. Translation enabled")
-			add_subdirectory(lang)
-		else()
-			message(STATUS "Cannot find msgfmt to convert language file. Translation won't be enabled")
-		endif()
-	endif(NOT LOCALE_DIR)
-endif(Gettext_FOUND)
+find_package(Msgfmt)
+if(Gettext_FOUND AND Msgfmt_FOUND)
+	message(STATUS "Localization enabled: Building and installing .mo files")
+	add_subdirectory(lang)
+else()
+	message(STATUS "Localization disabled: Gettext or Msgfmt missing")
+endif()
+
 add_subdirectory(data)
 add_subdirectory(game)
 add_subdirectory(docs)
 
-option(ENABLE_TOOLS "Enable extra tools (e.g. Singstar ripper)" ON)
-
-if (ENABLE_TOOLS)
-  add_subdirectory(tools)
-endif (ENABLE_TOOLS)
+option(ENABLE_TOOLS "Enable building of song extraction utilities for SingStar and Guitar Hero." ON)
+if(ENABLE_TOOLS)
+	add_subdirectory(tools)
+endif()
 
 if(WIN32)
-	option(ENABLE_VERSIONING "Add number version information. This allows to add version information to exe. Be carefull, in beta (and a lot useless)" OFF)
-	install(FILES win32/ConfigureSongDirectory.bat DESTINATION bin)
-endif(WIN32)
+	option(ENABLE_VERSIONING "Add version number information. This allows adding version information to the EXE. Be careful, in beta." OFF)
+	install(FILES win32/ConfigureSongDirectory.bat DESTINATION .)
+endif()
+
