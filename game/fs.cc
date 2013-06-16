@@ -47,7 +47,7 @@ namespace {
 			return ret;
 		}
 
-		fs::path base, share, home, locale, conf, data, cache;
+		fs::path base, share, locale, sysConf, home, conf, data, cache;
 		Paths paths;
 		// Note: three-phase init:
 		// 1. Default constructor runs in static context (before main) and cannot do much
@@ -78,6 +78,15 @@ namespace {
 				logmsg += "  base:     " + base.string() + '\n';
 				logmsg += "  share:    " + share.string() + '\n';
 				logmsg += "  locale:   " + locale.string() + '\n';
+			}
+			// System-wide config files
+			{
+			#ifdef _WIN32
+				sysConf = execname().parent_path() / "config";  // I.e. Program Files/Performous/config or build/config/
+			#else
+				sysConf = "/etc/xdg/performous";
+			#endif
+				logmsg += "  sysConf:  " + sysConf.string() + '\n';
 			}
 			// Home
 			{
@@ -173,8 +182,9 @@ fs::path pathBootstrap() { Lock l(mutex); return cache.pathBootstrap(); }
 void pathInit() { Lock l(mutex); cache.pathInit(); }
 fs::path getHomeDir() { Lock l(mutex); return cache.home; }
 fs::path getShareDir() { Lock l(mutex); return cache.share; }
-fs::path getLocaleDir() { Lock l(mutex); return cache.home; }
+fs::path getLocaleDir() { Lock l(mutex); return cache.locale; }
 fs::path getConfigDir() { Lock l(mutex); return cache.conf; }
+fs::path getSysConfigDir() { Lock l(mutex); return cache.sysConf; }
 fs::path getDataDir() { Lock l(mutex); return cache.data; }
 fs::path getCacheDir() { Lock l(mutex); return cache.cache; }
 Paths const& getPaths() { Lock l(mutex); return cache.paths; }

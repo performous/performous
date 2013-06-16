@@ -235,8 +235,9 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) try {
 	throw std::runtime_error(boost::lexical_cast<std::string>(line) + ": Error while reading entry: " + e.what());
 }
 
-fs::path systemConfFile = "/etc/xdg/performous/config.xml";
-fs::path userConfFile = getConfigDir() / "config.xml";
+// These are set in readConfig, once the paths have been bootstrapped.
+fs::path systemConfFile;
+fs::path userConfFile;
 
 void writeConfig(bool system) {
 	xmlpp::Document doc;
@@ -347,6 +348,8 @@ void readConfigXML(fs::path const& file, int mode) {
 void readConfig() {
 	// Find config schema
 	fs::path schemaFile = pathBootstrap();
+	systemConfFile = getSysConfigDir() / "config.xml";
+	userConfFile = getConfigDir() / "config.xml";
 	readConfigXML(schemaFile, 0);  // Read schema and defaults
 	readConfigXML(systemConfFile, 1);  // Update defaults with system config
 	readConfigXML(userConfFile, 2);  // Read user settings

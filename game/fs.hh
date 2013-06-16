@@ -18,6 +18,9 @@ fs::path getHomeDir();
 /** Get the users configuration folder **/
 fs::path getConfigDir();
 
+/// Get all users' configuration folder
+fs::path getSysConfigDir();
+
 /** Get the users data folder **/
 fs::path getDataDir();
 
