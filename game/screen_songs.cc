@@ -333,11 +333,11 @@ void ScreenSongs::drawCovers() {
 	int baseidx = spos + 1.5; --baseidx; // Round correctly
 	double shift = spos - baseidx;
 	// Calculate beat
-	double beat = 0.5 + m_idleTimer.get() * 2.0;  // 120 BPM
+	double beat = 0.5 + m_idleTimer.get() / 2.0;  // 30 BPM
 	if (ss > 0) {
 		// Use actual song BPM. FIXME: Should only do this if currentId is also playing.
 		double t = m_audio.getPosition() - config["audio/video_delay"].f();
-		Song::Beats const& beats = m_songs[currentId].beats;
+		Song::Beats const& beats = m_songs.current().beats;
 		auto it = std::lower_bound(beats.begin(), beats.end(), t);
 		if (it != beats.begin() && it != beats.end()) {
 			double t1 = *(it - 1), t2 = *it;
