@@ -31,11 +31,11 @@ void Backgrounds::reload_internal() {
 		if (!m_loading) break;
 		*it /= "backgrounds";
 		if (!fs::is_directory(*it)) { std::clog << "Backgrounds/info: >>> Not scanning for backgrounds: " << *it << " (no such directory)" << std::endl; continue; }
-		std::clog << "Backgrounds/info: >>> Scanning " << *it << " (for backgrounds)" << std::endl;
+		std::clog << "backgrounds/info: >>> Scanning " << *it << " (for backgrounds)" << std::endl;
 		size_t count = m_bgs.size();
 		reload_internal(*it); // Scan the found folder
 		size_t diff = m_bgs.size() - count;
-		if (diff > 0 && m_loading) std::clog << "Backgrounds/info: " << diff << " backgrounds loaded" << std::endl;
+		if (diff > 0 && m_loading) std::clog << "backgrounds/info: " << diff << " backgrounds loaded" << std::endl;
 	}
 	m_loading = false;
 	{	// Randomize the order
@@ -47,7 +47,7 @@ void Backgrounds::reload_internal() {
 }
 
 void Backgrounds::reload_internal(fs::path const& parent) {
-	if (std::distance(parent.begin(), parent.end()) > 20) { std::clog << "Backgrounds/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)" << std::endl; return; }
+	if (std::distance(parent.begin(), parent.end()) > 20) { std::clog << "backgrounds/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)" << std::endl; return; }
 	try {
 		// Find suitable file formats
 		boost::regex expression(R"(\.(png|jpeg|jpg|svg)$)", boost::regex_constants::icase);
