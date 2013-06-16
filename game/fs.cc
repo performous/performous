@@ -50,11 +50,10 @@ namespace {
 		Paths paths;
 		// Note: three-phase init:
 		// 1. Default constructor runs in static context (before main) and cannot do much
-		// 2. pathBootstrap is called to find out static system paths, and enable loading of config files
+		// 2. pathBootstrap is called to find out static system paths (critical for logging and for loading config files)
 		// 3. pathInit is called to process the full search path, using config settings
-		/// Initialize static system paths, returns config schema path.
-		fs::path pathBootstrap() {
-			std::string logmsg = "fs/info: Determining system paths:\n";
+		void pathBootstrap() {
+			if (!base.empty()) return;  // Only bootstrap once
 			// Base (e.g. /usr/local), share (src or installed data files) and locale (built or installed .mo files)
 			{
 				char const* root = getenv("PERFORMOUS_ROOT");
@@ -74,9 +73,6 @@ namespace {
 				} while (true);
 			found:;
 				if (locale.empty() && fs::exists(base / LOCALEDIR)) locale = base / LOCALEDIR;
-				logmsg += "  base:     " + base.string() + '\n';
-				logmsg += "  share:    " + share.string() + '\n';
-				logmsg += "  locale:   " + locale.string() + '\n';
 			}
 			// System-wide config files
 			{
@@ -85,7 +81,6 @@ namespace {
 			#else
 				sysConf = "/etc/xdg/performous";
 			#endif
-				logmsg += "  sysConf:  " + sysConf.string() + '\n';
 			}
 			// Home
 			{
@@ -95,7 +90,6 @@ namespace {
 				char const* p = getenv("HOME");
 			#endif
 				if (p) home = p;
-				logmsg += "  home:     " + home.string() + '\n';
 			}
 			// Config
 			{
@@ -111,7 +105,6 @@ namespace {
 				conf = (p ? p : home / ".config");
 			#endif
 				conf /= performous;
-				logmsg += "  config:   " + conf.string() + '\n';
 			}
 			// Data
 			{
@@ -121,7 +114,6 @@ namespace {
 				char const* p = getenv("XDG_DATA_HOME");
 				data = (p ? p / performous : home / ".local" / SHARED_DATA_DIR);
 			#endif
-				logmsg += "  data:     " + data.string() + '\n';
 			}
 			// Cache
 			{
@@ -131,15 +123,24 @@ namespace {
 				char const* p = getenv("XDG_CACHE_HOME");
 				cache = (p ? p / performous : home / ".cache" / performous);
 			#endif
-				logmsg += "  cache:    " + cache.string() + '\n';
 			}
-			std::clog << logmsg << std::flush;
 			pathInit();
-			return share / configSchema;
 		}
 		/// Initialize/reset data dirs (search path).
 		void pathInit() {
 			bool bootstrapping = paths.empty();  // The first run (during bootstrap)
+			if (!bootstrapping) {
+				std::string logmsg = "fs/info: Determining system paths:\n";
+				logmsg += "  base:     " + base.string() + '\n';
+				logmsg += "  share:    " + share.string() + '\n';
+				logmsg += "  locale:   " + locale.string() + '\n';
+				logmsg += "  sysConf:  " + sysConf.string() + '\n';
+				logmsg += "  home:     " + home.string() + '\n';
+				logmsg += "  config:   " + conf.string() + '\n';
+				logmsg += "  data:     " + data.string() + '\n';
+				logmsg += "  cache:    " + cache.string() + '\n';
+				std::clog << logmsg << std::flush;
+			}
 			// Data dirs
 			std::string logmsg = "fs/info: Determining data dirs (search path):\n";
 			{
@@ -177,8 +178,10 @@ namespace {
 	typedef boost::lock_guard<boost::mutex> Lock;
 }
 
-fs::path pathBootstrap() { Lock l(mutex); return cache.pathBootstrap(); }
+void pathBootstrap() { Lock l(mutex); cache.pathBootstrap(); }
 void pathInit() { Lock l(mutex); cache.pathInit(); }
+fs::path getLogFilename() { Lock l(mutex); return cache.cache / "infolog.txt"; }
+fs::path getSchemaFilename() { Lock l(mutex); return cache.share / configSchema; }
 fs::path getHomeDir() { Lock l(mutex); return cache.home; }
 fs::path getShareDir() { Lock l(mutex); return cache.share; }
 fs::path getLocaleDir() { Lock l(mutex); return cache.locale; }
@@ -223,7 +226,7 @@ fs::path getThemePath(fs::path const& filename) {
 	return file;
 }
 
-std::vector<std::string> getThemes() {
+std::list<std::string> getThemes() {
 	std::set<std::string> themes;
 	// Search all paths for themes folders and add them
 	for (auto p: getPaths()) {
@@ -235,7 +238,7 @@ std::vector<std::string> getThemes() {
 			if (fs::is_directory(p2)) themes.insert(p2.filename().string());
 		}
 	}
-	return std::vector<std::string>(themes.begin(), themes.end());
+	return std::list<std::string>(themes.begin(), themes.end());
 }
 
 Paths getPathsConfig(std::string const& confOption) {

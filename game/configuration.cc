@@ -148,6 +148,13 @@ void ConfigItem::addEnum(std::string name) {
 	m_step = 1;
 }
 
+void ConfigItem::selectEnum(std::string const& name) {
+	auto it = std::find(m_enums.begin(), m_enums.end(), name);
+	if (it == m_enums.end()) throw std::runtime_error("Enum value " + name + " not found in " + m_shortDesc);
+	i() = it - m_enums.begin();
+}
+
+
 std::string ConfigItem::getEnumName() {
 	int val = i();
 	if (val >= 0 && val < int(m_enums.size())) return m_enums[val];
@@ -347,7 +354,7 @@ void readConfigXML(fs::path const& file, int mode) {
 
 void readConfig() {
 	// Find config schema
-	fs::path schemaFile = pathBootstrap();
+	fs::path schemaFile = getSchemaFilename();
 	systemConfFile = getSysConfigDir() / "config.xml";
 	userConfFile = getConfigDir() / "config.xml";
 	readConfigXML(schemaFile, 0);  // Read schema and defaults
@@ -355,15 +362,8 @@ void readConfig() {
 	readConfigXML(userConfFile, 2);  // Read user settings
 	pathInit();
 	// Populate themes
-	{
-		ConfigItem& ci = config["game/theme"];
-		std::vector<std::string> themes = getThemes();
-		bool useDefaultTheme = (ci.i() == -1);
-		for (size_t i = 0; i < themes.size(); ++i) {
-			ci.addEnum(themes[i]);
-			// Select the default theme is no other is selected
-			if (useDefaultTheme && themes[i] == "default") ci.i() = i;
-		}
-	}
+	ConfigItem& ci = config["game/theme"];
+	for (std::string const& theme: getThemes()) ci.addEnum(theme);
+	if (ci.i() == -1) ci.selectEnum("default");  // Select the default theme if nothing is selected
 }
 

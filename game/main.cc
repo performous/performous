@@ -290,10 +290,10 @@ int main(int argc, char** argv) try {
 	namespace po = boost::program_options;
 	po::options_description opt1("Generic options");
 	std::string songlist;
-	std::string loglevel_regexp;
+	std::string loglevel;
 	opt1.add_options()
 	  ("help,h", "you are viewing it")
-	  ("log,l", po::value<std::string>(&loglevel_regexp)->default_value(logger::default_log_level), "selects log level")
+	  ("log,l", po::value<std::string>(&loglevel), "subsystem name or minimum level to log")
 	  ("version,v", "display version number")
 	  ("songlist", po::value<std::string>(&songlist), "save a list of songs in the specified folder");
 	po::options_description opt2("Configuration options");
@@ -322,10 +322,7 @@ int main(int argc, char** argv) try {
 	}
 	po::notify(vm);
 
-	// Initialize the verbose message sink
-	//logger::__log_hh_test(); // debug
-	logger::setup(loglevel_regexp);
-	atexit(logger::teardown); // We might exit from many places due to audio hangs
+	Logger logger(loglevel);
 
 	if (vm.count("version")) {
 		// Already printed the version string in the beginning...

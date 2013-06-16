@@ -127,7 +127,8 @@ void Songs::filter_internal() {
 	boost::mutex::scoped_lock l(m_mutex);
 	// Print messages when loading has finished
 	if (!m_loading) {
-		std::clog << m_debug.str();
+		// Logging system requires flushing after each message (i.e. after each line because songparser errors are oneliners).
+		for (std::string line; std::getline(m_debug, line); std::clog << line << std::endl) {}
 		m_debug.str(""); m_debug.clear();
 	}
 	m_dirty = false;
