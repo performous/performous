@@ -84,7 +84,7 @@ void Players::addPlayer (std::string const& name, std::string const& picture, in
 	if (pi.picture != "") // no picture, so don't search path
 	{
 		try {
-			pi.path =  getPath(fs::path("pictures") / pi.picture);
+			pi.path =  findFile(fs::path("pictures") / pi.picture);
 		} catch (std::runtime_error const& e)
 		{
 			std::cerr << e.what() << std::endl;

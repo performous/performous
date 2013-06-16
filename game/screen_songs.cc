@@ -39,13 +39,13 @@ void ScreenSongs::enter() {
 void ScreenSongs::reloadGL() {
 	theme.reset(new ThemeSongs());
 	m_menuTheme.reset(new ThemeInstrumentMenu());
-	m_songbg_default.reset(new Surface(getThemePath("songs_bg_default.svg")));
-	m_songbg_ground.reset(new Surface(getThemePath("songs_bg_ground.svg")));
-	m_singCover.reset(new Surface(getThemePath("no_cover.svg")));
-	m_instrumentCover.reset(new Surface(getThemePath("instrument_cover.svg")));
-	m_bandCover.reset(new Surface(getThemePath("band_cover.svg")));
-	m_danceCover.reset(new Surface(getThemePath("dance_cover.svg")));
-	m_instrumentList.reset(new Texture(getThemePath("instruments.svg")));
+	m_songbg_default.reset(new Surface(findFile("songs_bg_default.svg")));
+	m_songbg_ground.reset(new Surface(findFile("songs_bg_ground.svg")));
+	m_singCover.reset(new Surface(findFile("no_cover.svg")));
+	m_instrumentCover.reset(new Surface(findFile("instrument_cover.svg")));
+	m_bandCover.reset(new Surface(findFile("band_cover.svg")));
+	m_danceCover.reset(new Surface(findFile("dance_cover.svg")));
+	m_instrumentList.reset(new Texture(findFile("instruments.svg")));
 }
 
 void ScreenSongs::exit() {

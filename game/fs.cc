@@ -208,13 +208,7 @@ fs::path findFile(fs::path const& filename, Paths const& infixes = Paths(1)) {
 	return fs::path();
 }
 
-fs::path getPath(fs::path const& filename) {
-	fs::path file = findFile(filename);
-	if (file.empty()) throw std::runtime_error("Cannot find file \"" + filename.string() + "\" in any of Performous data folders");
-	return file;
-}
-
-fs::path getThemePath(fs::path const& filename) {
+fs::path findFile(fs::path const& filename) {
 	const fs::path themes = "themes";
 	const fs::path def = "default";
 	std::string theme = config["game/theme"].getEnumName();
@@ -222,7 +216,7 @@ fs::path getThemePath(fs::path const& filename) {
 	Paths infixes = { themes / def, fs::path() };
 	if (!theme.empty() && theme != def) infixes.push_front(themes / theme);
 	fs::path file = findFile(filename, infixes);
-	if (file.empty()) throw std::runtime_error("Cannot find file \"" + filename.string() + "\" in Performous theme folders");
+	if (file.empty()) throw std::runtime_error("Cannot find file \"" + filename.string() + "\" in Performous theme or data folders");
 	return file;
 }
 

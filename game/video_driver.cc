@@ -74,7 +74,7 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	if( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK) == -1 ) throw std::runtime_error("SDL_Init failed");
 	SDL_WM_SetCaption(PACKAGE " " VERSION, PACKAGE);
 	{
-		SDL_Surface* icon = SDL_LoadBMP(getThemePath("icon.bmp").string().c_str());
+		SDL_Surface* icon = SDL_LoadBMP(findFile("icon.bmp").string().c_str());
 		SDL_WM_SetIcon(icon, nullptr);
 		SDL_FreeSurface(icon);
 	}
@@ -99,11 +99,11 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 
 	if (GLEW_VERSION_3_3) {
 		// Compile geometry shaders when stereo is requested
-		shader("color").compileFile(getThemePath("shaders/stereo3d.geom"));
-		shader("surface").compileFile(getThemePath("shaders/stereo3d.geom"));
-		shader("texture").compileFile(getThemePath("shaders/stereo3d.geom"));
-		shader("3dobject").compileFile(getThemePath("shaders/stereo3d.geom"));
-		shader("dancenote").compileFile(getThemePath("shaders/stereo3d.geom"));
+		shader("color").compileFile(findFile("shaders/stereo3d.geom"));
+		shader("surface").compileFile(findFile("shaders/stereo3d.geom"));
+		shader("texture").compileFile(findFile("shaders/stereo3d.geom"));
+		shader("3dobject").compileFile(findFile("shaders/stereo3d.geom"));
+		shader("dancenote").compileFile(findFile("shaders/stereo3d.geom"));
 		if (!GLEW_VERSION_4_1) {
 			// Enable bugfix for some older Nvidia cards
 			for (ShaderMap::iterator it = m_shaders.begin(); it != m_shaders.end(); ++it) {
@@ -115,30 +115,30 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 
 	shader("color")
 	  .addDefines("#define ENABLE_VERTEX_COLOR\n")
-	  .compileFile(getThemePath("shaders/core.vert"))
-	  .compileFile(getThemePath("shaders/core.frag"))
+	  .compileFile(findFile("shaders/core.vert"))
+	  .compileFile(findFile("shaders/core.frag"))
 	  .link();
 	shader("surface")
 	  .addDefines("#define ENABLE_TEXTURING 1\n")
-	  .compileFile(getThemePath("shaders/core.vert"))
-	  .compileFile(getThemePath("shaders/core.frag"))
+	  .compileFile(findFile("shaders/core.vert"))
+	  .compileFile(findFile("shaders/core.frag"))
 	  .link();
 	shader("texture")
 	  .addDefines("#define ENABLE_TEXTURING 2\n")
 	  .addDefines("#define ENABLE_VERTEX_COLOR\n")
-	  .compileFile(getThemePath("shaders/core.vert"))
-	  .compileFile(getThemePath("shaders/core.frag"))
+	  .compileFile(findFile("shaders/core.vert"))
+	  .compileFile(findFile("shaders/core.frag"))
 	  .link();
 	shader("3dobject")
 	  .addDefines("#define ENABLE_LIGHTING\n")
-	  .compileFile(getThemePath("shaders/core.vert"))
-	  .compileFile(getThemePath("shaders/core.frag"))
+	  .compileFile(findFile("shaders/core.vert"))
+	  .compileFile(findFile("shaders/core.frag"))
 	  .link();
 	shader("dancenote")
 	  .addDefines("#define ENABLE_TEXTURING 2\n")
 	  .addDefines("#define ENABLE_VERTEX_COLOR\n")
-	  .compileFile(getThemePath("shaders/dancenote.vert"))
-	  .compileFile(getThemePath("shaders/core.frag"))
+	  .compileFile(findFile("shaders/dancenote.vert"))
+	  .compileFile(findFile("shaders/core.frag"))
 	  .link();
 
 	updateColor();

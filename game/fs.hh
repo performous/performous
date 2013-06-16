@@ -30,8 +30,7 @@ fs::path getCacheDir();  ///< Get user-writable temporary folder.
 fs::path getShareDir();  ///< Get Performous system-level data folder.
 fs::path getLocaleDir();  ///< Get the system local folder.
 
-fs::path getThemePath(fs::path const& filename);  ///< Look for the specified file in theme folders.
-fs::path getPath(fs::path const& filename);  ///< Look for the specified file in data folders.
+fs::path findFile(fs::path const& filename);  ///< Look for the specified file in theme and data folders.
 
 typedef std::list<fs::path> Paths;
 

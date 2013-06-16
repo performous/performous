@@ -134,9 +134,9 @@ void ScreenSing::reloadGL() {
 	// Load UI graphics
 	theme.reset(new ThemeSing());
 	m_menuTheme.reset(new ThemeInstrumentMenu());
-	m_pause_icon.reset(new Surface(getThemePath("sing_pause.svg")));
-	m_help.reset(new Surface(getThemePath("instrumenthelp.svg")));
-	m_progress.reset(new ProgressBar(getThemePath("sing_progressbg.svg"), getThemePath("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01f, 0.01f, true));
+	m_pause_icon.reset(new Surface(findFile("sing_pause.svg")));
+	m_help.reset(new Surface(findFile("instrumenthelp.svg")));
+	m_progress.reset(new ProgressBar(findFile("sing_progressbg.svg"), findFile("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01f, 0.01f, true));
 	// Load background
 	if (!m_song->background.empty()) m_background.reset(new Surface(m_song->background));
 }
@@ -546,10 +546,10 @@ void ScreenSing::drawMenu() {
 ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
   m_database(database),
   m_pos(0.8, 2.0),
-  m_bg(getThemePath("score_window.svg")),
-  m_scoreBar(getThemePath("score_bar_bg.svg"), getThemePath("score_bar_fg.svg"), ProgressBar::VERTICAL, 0.0, 0.0, false),
-  m_score_text(getThemePath("score_txt.svg")),
-  m_score_rank(getThemePath("score_rank.svg"))
+  m_bg(findFile("score_window.svg")),
+  m_scoreBar(findFile("score_bar_bg.svg"), findFile("score_bar_fg.svg"), ProgressBar::VERTICAL, 0.0, 0.0, false),
+  m_score_text(findFile("score_txt.svg")),
+  m_score_rank(findFile("score_rank.svg"))
 {
 	Game::getSingletonPtr()->showLogo();
 	m_pos.setTarget(0.0);

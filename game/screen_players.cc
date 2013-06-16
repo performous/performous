@@ -27,7 +27,7 @@ void ScreenPlayers::enter() {
 	m_layout_singer.reset(new LayoutSinger(m_song->getVocalTrack(), m_database));
 
 	theme.reset(new ThemeSongs());
-	m_emptyCover.reset(new Surface(getThemePath("no_player_image.svg")));
+	m_emptyCover.reset(new Surface(findFile("no_player_image.svg")));
 	m_search.text.clear();
 	m_players.setFilter(m_search.text);
 	m_audio.fadeout();

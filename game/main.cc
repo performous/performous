@@ -139,18 +139,18 @@ void mainLoop(std::string const& songlist) {
 	try {
 		// Load audio samples
 		gm.loading(_("Loading audio samples..."), 0.5);
-		audio.loadSample("drum bass", getPath("sounds/drum_bass.ogg"));
-		audio.loadSample("drum snare", getPath("sounds/drum_snare.ogg"));
-		audio.loadSample("drum hi-hat", getPath("sounds/drum_hi-hat.ogg"));
-		audio.loadSample("drum tom1", getPath("sounds/drum_tom1.ogg"));
-		audio.loadSample("drum cymbal", getPath("sounds/drum_cymbal.ogg"));
-		//audio.loadSample("drum tom2", getPath("sounds/drum_tom2.ogg"));
-		audio.loadSample("guitar fail1", getPath("sounds/guitar_fail1.ogg"));
-		audio.loadSample("guitar fail2", getPath("sounds/guitar_fail2.ogg"));
-		audio.loadSample("guitar fail3", getPath("sounds/guitar_fail3.ogg"));
-		audio.loadSample("guitar fail4", getPath("sounds/guitar_fail4.ogg"));
-		audio.loadSample("guitar fail5", getPath("sounds/guitar_fail5.ogg"));
-		audio.loadSample("guitar fail6", getPath("sounds/guitar_fail6.ogg"));
+		audio.loadSample("drum bass", findFile("sounds/drum_bass.ogg"));
+		audio.loadSample("drum snare", findFile("sounds/drum_snare.ogg"));
+		audio.loadSample("drum hi-hat", findFile("sounds/drum_hi-hat.ogg"));
+		audio.loadSample("drum tom1", findFile("sounds/drum_tom1.ogg"));
+		audio.loadSample("drum cymbal", findFile("sounds/drum_cymbal.ogg"));
+		//audio.loadSample("drum tom2", findFile("sounds/drum_tom2.ogg"));
+		audio.loadSample("guitar fail1", findFile("sounds/guitar_fail1.ogg"));
+		audio.loadSample("guitar fail2", findFile("sounds/guitar_fail2.ogg"));
+		audio.loadSample("guitar fail3", findFile("sounds/guitar_fail3.ogg"));
+		audio.loadSample("guitar fail4", findFile("sounds/guitar_fail4.ogg"));
+		audio.loadSample("guitar fail5", findFile("sounds/guitar_fail5.ogg"));
+		audio.loadSample("guitar fail6", findFile("sounds/guitar_fail6.ogg"));
 		// Load screens
 		gm.loading(_("Creating screens..."), 0.7);
 		gm.addScreen(new ScreenIntro("Intro", audio));

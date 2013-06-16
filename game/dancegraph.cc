@@ -79,11 +79,11 @@ namespace {
 DanceGraph::DanceGraph(Audio& audio, Song const& song, input::DevicePtr dev):
   InstrumentGraph(audio, song, dev),
   m_level(BEGINNER),
-  m_beat(getThemePath("dancebeat.svg")),
-  m_arrows(getThemePath("arrows.svg")),
-  m_arrows_cursor(getThemePath("arrows_cursor.svg")),
-  m_arrows_hold(getThemePath("arrows_hold.svg")),
-  m_mine(getThemePath("mine.svg")),
+  m_beat(findFile("dancebeat.svg")),
+  m_arrows(findFile("arrows.svg")),
+  m_arrows_cursor(findFile("arrows_cursor.svg")),
+  m_arrows_hold(findFile("arrows_hold.svg")),
+  m_mine(findFile("mine.svg")),
   m_insideStop()
 {
 	// Initialize some arrays
