@@ -74,7 +74,7 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	if( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK) == -1 ) throw std::runtime_error("SDL_Init failed");
 	SDL_WM_SetCaption(PACKAGE " " VERSION, PACKAGE);
 	{
-		SDL_Surface* icon = SDL_LoadBMP(getThemePath("icon.bmp").c_str());
+		SDL_Surface* icon = SDL_LoadBMP(getThemePath("icon.bmp").string().c_str());
 		SDL_WM_SetIcon(icon, nullptr);
 		SDL_FreeSurface(icon);
 	}
