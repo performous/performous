@@ -57,11 +57,12 @@ void Songs::reload_internal() {
 	}
 	prof("total");
 	if (m_loading) dumpSongs_internal(); // Dump the songlist to file (if requested)
+	m_debug << std::flush;
 	m_loading = false;
 }
 
 void Songs::reload_internal(fs::path const& parent) {
-	if (std::distance(parent.begin(), parent.end()) > 20) { m_debug << "songs/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)" << std::endl; return; }
+	if (std::distance(parent.begin(), parent.end()) > 20) { m_debug << "songs/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)\n"; return; }
 	try {
 		boost::regex expression(R"((\.txt|^song\.ini|^notes\.xml|\.sm)$)", boost::regex_constants::icase);
 		for (fs::directory_iterator dirIt(parent), dirEnd; m_loading && dirIt != dirEnd; ++dirIt) {
@@ -79,7 +80,7 @@ void Songs::reload_internal(fs::path const& parent) {
 			}
 		}
 	} catch (std::exception const& e) {
-		m_debug << "songs/error: Error accessing " << parent << ": " << e.what() << std::endl;
+		m_debug << "songs/error: Error accessing " << parent << ": " << e.what() << '\n';
 	}
 }
 

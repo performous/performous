@@ -291,7 +291,7 @@ struct Controllers::Impl {
 			// Note: We intentionally only emit one per frame (call to process) to avoid surprises when latency spikes occur.
 			++ne.repeat;
 			ne.time += delay;  // Increment rather than set to now, so that repeating is smoother.
-			std::clog << "controllers/info: NavEvent auto repeat " << ne.repeat << " next=" << now - ne.time << " delay=" << delay << std::endl;
+			std::clog << "controllers/debug: NavEvent auto repeat " << ne.repeat << " next=" << now - ne.time << " delay=" << delay << std::endl;
 			m_navEvents.push_back(ne);
 		}
 	}
@@ -353,7 +353,7 @@ struct Controllers::Impl {
 	bool pushMappedEvent(Event& ev) {
 		if (ev.button == GENERIC_UNASSIGNED) return false;
 		if (!valueChanged(ev)) return false;  // Avoid repeated or other useless events
-		std::clog << "controllers/info: processing " << ev << std::endl;
+		std::clog << "controllers/debug: processing " << ev << std::endl;
 		ev.nav = navigation(ev);
 		// Emit nav event
 		if (ev.nav != NAV_NONE) {

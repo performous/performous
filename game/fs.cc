@@ -130,7 +130,7 @@ namespace {
 		void pathInit() {
 			bool bootstrapping = paths.empty();  // The first run (during bootstrap)
 			if (!bootstrapping) {
-				std::string logmsg = "fs/info: Determining system paths:\n";
+				std::string logmsg = "fs/info: Found system paths:\n";
 				logmsg += "  base:     " + base.string() + '\n';
 				logmsg += "  share:    " + share.string() + '\n';
 				logmsg += "  locale:   " + locale.string() + '\n';

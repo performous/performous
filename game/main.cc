@@ -67,7 +67,7 @@ struct QuitNow {};
 
 static void checkEvents(Game& gm) {
 	if (g_quit) {
-		std::cout << "Terminating, please wait... (or kill the process)" << std::endl;
+		std::cerr << "Terminating, please wait... (or kill the process)" << std::endl;
 		throw QuitNow();
 	}
 	SDL_Event event;
@@ -130,7 +130,9 @@ static void checkEvents(Game& gm) {
 }
 
 void mainLoop(std::string const& songlist) {
+	std::clog << "core/notice: Starting the audio subsystem (errors printed on console may be ignored)." << std::endl;
 	Audio audio;
+	std::clog << "core/info: Loading assets." << std::endl;
 	Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());
 	Backgrounds backgrounds;
 	Database database(getConfigDir() / "database.xml");
@@ -168,6 +170,7 @@ void mainLoop(std::string const& songlist) {
 		// Main loop
 		boost::xtime time = now();
 		unsigned frames = 0;
+		std::clog << "core/info: Assets loaded, entering main loop." << std::endl;
 		while (!gm.isFinished()) {
 			Profiler prof("mainloop");
 			bool benchmarking = config["graphic/fps"].b();
@@ -220,10 +223,11 @@ void mainLoop(std::string const& songlist) {
 			}
 		}
 	} catch (EXCEPTION& e) {
+		std::clog << "core/error: Exiting due to fatal error: " << e.what() << std::endl;
 		gm.fatalError(e.what());  // Notify the user
 		throw;
 	} catch (QuitNow&) {
-		std::cout << "Terminated." << std::endl;
+		std::cerr << "Terminated." << std::endl;
 	}
 }
 
@@ -259,9 +263,9 @@ void jstestLoop() {
 			time = now();
 		}
 	} catch (EXCEPTION& e) {
-		std::cout << "ERROR: " << e.what() << std::endl;
+		std::cerr << "ERROR: " << e.what() << std::endl;
 	} catch (QuitNow&) {
-		std::cout << "Terminated." << std::endl;
+		std::cerr << "Terminated." << std::endl;
 	}
 	return;
 }
@@ -276,12 +280,8 @@ template <typename Container> void confOverride(Container const& c, std::string 
 void outputOptionalFeatureStatus();
 
 int main(int argc, char** argv) try {
-	// initialize gettext
-	Gettext gettext(PACKAGE);
-
-	std::cout << PACKAGE " " VERSION << std::endl;
+	Gettext gettext(PACKAGE);  // Initialize gettext
 	signalSetup();
-	outputOptionalFeatureStatus();
 	std::ios::sync_with_stdio(false);  // We do not use C stdio
 	std::srand(std::time(nullptr));
 	// Parse commandline options
@@ -316,30 +316,33 @@ int main(int argc, char** argv) try {
 		allopts.add(opt3);
 		po::store(po::command_line_parser(argc, argv).options(allopts).positional(p).run(), vm);
 	} catch (EXCEPTION& e) {
-		std::cout << cmdline << std::endl;
-		std::cout << "ERROR: " << e.what() << std::endl;
+		std::cerr << cmdline << std::endl;
+		std::cerr << "ERROR: " << e.what() << std::endl;
 		return EXIT_FAILURE;
 	}
 	po::notify(vm);
 
-	Logger logger(loglevel);
-
 	if (vm.count("version")) {
-		// Already printed the version string in the beginning...
+		std::cout << PACKAGE " " VERSION << std::endl;
 		return EXIT_SUCCESS;
 	}
 	if (vm.count("help")) {
 		std::cout << cmdline << "  any arguments without a switch are interpreted as song folders.\n" << std::endl;
 		return EXIT_SUCCESS;
 	}
+
+	Logger logger(loglevel);
+	outputOptionalFeatureStatus();
+
 	// Read config files
 	try {
 		readConfig();
 	} catch (EXCEPTION& e) {
-		std::cerr << e.what() << std::endl;
+		std::clog << "core/error: Error loading configuration: " << e.what() << std::endl;
 		return EXIT_FAILURE;
 	}
 	if (vm.count("audiohelp")) {
+		std::clog << "core/notice: Starting audio subsystem for audiohelp (errors printed on console may be ignored)." << std::endl;
 		Audio audio;
 		// Print the devices
 		portaudio::AudioDevices ads;
@@ -353,7 +356,7 @@ int main(int argc, char** argv) try {
 		// Give audio a little time to shutdown but then just quit
 		boost::thread audiokiller(boost::bind(&Audio::close, boost::ref(audio)));
 		if (!audiokiller.timed_join(boost::posix_time::milliseconds(2000)))
-			std::cout << "Audio hung." << std::endl;
+		  std::clog << "core/warning: Closing audio hung for over two seconds." << std::endl;
 		return EXIT_SUCCESS;
 	}
 	// Override XML config for options that were specified from commandline or performous.conf
@@ -361,6 +364,7 @@ int main(int argc, char** argv) try {
 	confOverride(devices, "audio/devices");
 	getPaths(); // Initialize paths before other threads start
 	if (vm.count("jstest")) { // Joystick test program
+		std::clog << "core/notice: Starting jstest input test utility." << std::endl;
 		std::cout << std::endl << "Joystick utility - Touch your joystick to see buttons here" << std::endl
 		<< "Hit ESC (window focused) to quit" << std::endl << std::endl;
 		jstestLoop();
@@ -377,11 +381,10 @@ int main(int argc, char** argv) try {
 }
 
 void outputOptionalFeatureStatus() {
-	std::cout    << "  Internationalization:   " <<
-	(Gettext::enabled() ? "Enabled" : "Disabled")
-	<< std::endl << "  MIDI I/O:               " <<
-	(input::Hardware::midiEnabled() ? "Enabled" : "Disabled")
-	<< std::endl << "  Webcam support:         " <<
-	(Webcam::enabled() ? "Enabled" : "Disabled")
-	<< std::endl << std::endl;
+	std::clog << "core/notice: " PACKAGE " " VERSION " starting..."
+	  << "\n  Build date:           " __DATE__
+	  << "\n  Internationalization: " << (Gettext::enabled() ? "Enabled" : "Disabled")
+	  << "\n  MIDI Hardware I/O:    " << (input::Hardware::midiEnabled() ? "Enabled" : "Disabled")
+	  << "\n  Webcam support:       " << (Webcam::enabled() ? "Enabled" : "Disabled")
+	  << std::endl;
 }
