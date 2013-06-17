@@ -155,14 +155,10 @@ install(TARGETS performous DESTINATION ${BIN_INSTALL})
 set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)  # Store library paths in executable
 set_target_properties(performous PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})  # Produce executable in build/, not build/game/
 
+# Capitalized Performous.exe on Windows (this is considered more beautiful).
 if(WIN32)
-	add_executable(performous-cmd "windows-cmd.cpp")
-	install(TARGETS performous-cmd DESTINATION ${BIN_INSTALL})
-	# Capitalized exe names are more beautiful on Windows
-	set_target_properties(performous-cmd PROPERTIES OUTPUT_NAME "Performous-cmd")
 	set_target_properties(performous PROPERTIES OUTPUT_NAME "Performous")
-	set_target_properties(performous-cmd PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-endif(WIN32)
+endif()
 
 # Generate config.hh
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.cmake.hh" "${CMAKE_CURRENT_BINARY_DIR}/config.hh" @ONLY)
