@@ -10,23 +10,33 @@
 /** \file
  * \brief The std::clog logger.
  *
- * The classification is \e discretionary, meaning that you can specify any message class you want but there are only 4 recommended classes: \p debug, \p info, \p warning and \p error.
- * \attention Each new line (ended by <tt>std::endl</tt>) must be prefixed with the message classification. New lines by <tt>"\n"</tt> will belong to the previous line as far as the filter is concerned.
- *
- * The default log level is specified by logger::default_log_level.
- *
- * General message format: <tt>subsystem/class: message</tt>
+ * General message format: <tt>subsystem/level: message</tt>
  *
  * Example:
  * \code
- * std::clog << "subsystem/info: Here's an info message from subsystem" << std::endl;
+ * std::clog << "foo/info: Here's an info message from subsystem foo" << std::endl;
  * \endcode
  *
- * \todo setup and teardown could probably be RAII-ized away by making a class and having fun by making them dtor/ctor. (it'd be nice if we could make it init itself before any other component that might use it does)
+ * Each message may contain newlines and flushing the stream (i.e. by std::endl or std::flush) must be done
+ * when and only when the message is complete.
+ *
+ * Any lower-case subsystem name including hyphens may be used. The levels, in descending order of priority
+ * are as follows:
+ *
+ * error    A serious and rare message that usually means that a function requested by user cannot be completed.
+ * warning  Less critical errors that should still be emitted sparingly (consider using "debug" for repeated warnings).
+ * notice   A non-error situation that might still require user attention (the lowest level displayed by default).
+ * info     Any information that might be of interest but that does not appear too often and glog the log output.
+ * debug    Any information that is flooded so much that it should normally be suppressed.
+ *
+ * The user may either choose a desired level of messages to emit, or he may choose a specific subsystem (by
+ * substring search) to be monitored all the way down to debug level, in which case only errors from any other
+ * subsystems will be printed.
+ *
  **/
 
 /** \internal
- * Guard to ensure we're atomically printing to cout/cerr.
+ * Guard to ensure we're atomically printing to cerr.
  * \attention This only guards from multiple clog interleaving, not other console I/O.
  */
 boost::mutex log_lock;
@@ -58,8 +68,9 @@ void writeLog(std::string const& msg) {
 int numeric(std::string const& level) {
 	if (level == "debug") return 0;
 	if (level == "info") return 1;
-	if (level == "warning") return 2;
-	if (level == "error") return 3;
+	if (level == "notice") return 2;
+	if (level == "warning") return 3;
+	if (level == "error") return 4;
 	return -1;
 }
 
@@ -89,30 +100,44 @@ std::streamsize VerboseMessageSink::write(const char* s, std::streamsize n) {
 
 Logger::Logger(std::string const& level) {
 	if (default_ClogBuf) throw std::logic_error("Multiple loggers constructed. There can only be one.");
-	if (level.find('/') != std::string::npos) throw std::runtime_error("Invalid logging level specified. Specify either a subsystem name or a level (debug, info, warning, error).");
+	if (level.find_first_of(":/_* ") != std::string::npos) throw std::runtime_error("Invalid logging level specified. Specify either a subsystem name or a level (debug, info, notice, warning, error).");
 	pathBootstrap();  // So that log filename is known...
-	boost::mutex::scoped_lock l(log_lock);
-	if (level.empty()) {
-		minLevel = 2;  // Display all warnings and errors
-	} else if (level == "none") {
-		minLevel = 100;
-	} else {
-		minLevel = numeric(level);
-		if (minLevel == -1 /* Not a valid level name */) {
-			minLevel = 3;  // Display errors from any subsystem
-			target = level;  // All messages from the given subsystem
+	std::string msg = "logger/notice: Logging ";
+	{
+		boost::mutex::scoped_lock l(log_lock);
+		if (level.empty()) {
+			minLevel = 2;  // Display all notices, warnings and errors
+			msg += "all notices, warnings and errors.";
+		} else if (level == "none") {
+			minLevel = 100;
+			msg += "disabled.";  // No-one will see this, so what's the point? :)
+		} else {
+			minLevel = numeric(level);
+			if (minLevel == -1 /* Not a valid level name */) {
+				minLevel = 4;  // Display errors from any subsystem
+				target = level;  // All messages from the given subsystem
+				msg += "everything from subsystem " + target + " and all errors.";
+			} else {
+				msg += "any events of " + level + " or higher level.";
+			}
 		}
+		if (minLevel < 100) {
+			fs::path name = getLogFilename();
+			file.open(name);
+			msg += " Log file: " + name.string();
+		}
+		sb.open(vsm);
+		default_ClogBuf = std::clog.rdbuf();
+		std::clog.rdbuf(&sb);
+		atexit(Logger::teardown);
 	}
-	if (minLevel < 100) file.open(getLogFilename());
-	sb.open(vsm);
-	default_ClogBuf = std::clog.rdbuf();
-	std::clog.rdbuf(&sb);
-	atexit(Logger::teardown);
+	std::clog << msg << std::endl;
 }
 
 Logger::~Logger() { teardown(); }
 
 void Logger::teardown() {
+	if (default_ClogBuf) std::clog << "logger/info: Exiting normally." << std::endl;
 	boost::mutex::scoped_lock l(log_lock);
 	if (!default_ClogBuf) return;
 	std::clog.rdbuf(default_ClogBuf);
