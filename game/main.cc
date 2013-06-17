@@ -175,7 +175,6 @@ void mainLoop(std::string const& songlist) {
 			Profiler prof("mainloop");
 			bool benchmarking = config["graphic/fps"].b();
 			if( g_take_screenshot ) {
-				fs::path filename;
 				try {
 					window.screenshot();
 					gm.flashMessage(_("Screenshot taken!"));
