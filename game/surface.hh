@@ -99,6 +99,11 @@ struct TexCoords {
 	/// constructor
 	TexCoords(float x1_ = 0.0, float y1_ = 0.0, float x2_ = 1.0, float y2_ = 1.0):
 	  x1(x1_), y1(y1_), x2(x2_), y2(y2_) {}
+	bool outOfBounds() const {
+		return test(x1) || test(y1) || test(x2) || test(y2);
+	}
+private:
+	static bool test(float x) { return x < 0.0 || x > 1.0; }
 };
 
 /// This function hides the ugly global vari-- I mean singleton access to ScreenManager...
@@ -143,6 +148,11 @@ template <GLenum Type> void OpenGLTexture<Type>::draw(Dimensions const& dim, Tex
 	glutil::VertexArray va;
 
 	UseTexture texture(*this);
+
+	// The texture wraps over at the edges (repeat)
+	const bool repeating = tex.outOfBounds();
+	glTexParameterf(type(), GL_TEXTURE_WRAP_S, repeating ? GL_REPEAT : GL_CLAMP);
+	glTexParameterf(type(), GL_TEXTURE_WRAP_T, repeating ? GL_REPEAT : GL_CLAMP);
 
 	va.TexCoord(tex.x1, tex.y1).Vertex(dim.x1(), dim.y1());
 	va.TexCoord(tex.x2, tex.y1).Vertex(dim.x2(), dim.y1());
@@ -197,7 +207,7 @@ void updateSurfaces();
 * @short High level surface/image wrapper on top of OpenGLTexture
 **/
 class Surface: public OpenGLTexture<GL_TEXTURE_2D> {
-  public:
+public:
 	struct Impl;
 	/// dimensions
 	Dimensions dimensions;
@@ -205,7 +215,7 @@ class Surface: public OpenGLTexture<GL_TEXTURE_2D> {
 	TexCoords tex;
 	Surface(): m_width(0), m_height(0) {}
 	/// creates surface from file
-	Surface(std::string const& filename);
+	Surface(fs::path const& filename);
 	~Surface();
 	bool empty() const { return m_width * m_height == 0; } ///< Test if the loading has failed
 	/// draws surface
@@ -214,8 +224,10 @@ class Surface: public OpenGLTexture<GL_TEXTURE_2D> {
 	/// loads surface into buffer
 	void load(Bitmap const& bitmap);
 	Shader& shader() { return m_texture.shader(); }
-  private:
-	unsigned int m_width, m_height;
+	unsigned width() const { return m_width; }
+	unsigned height() const { return m_height; }
+private:
+	unsigned m_width, m_height;
 	OpenGLTexture<GL_TEXTURE_2D> m_texture;
 };
 

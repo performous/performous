@@ -27,7 +27,7 @@ void ScreenPlayers::enter() {
 	m_layout_singer.reset(new LayoutSinger(m_song->getVocalTrack(), m_database));
 
 	theme.reset(new ThemeSongs());
-	m_emptyCover.reset(new Surface(getThemePath("no_player_image.svg")));
+	m_emptyCover.reset(new Surface(findFile("no_player_image.svg")));
 	m_search.text.clear();
 	m_players.setFilter(m_search.text);
 	m_audio.fadeout();
@@ -99,7 +99,6 @@ void ScreenPlayers::manageEvent(SDL_Event event) {
 }
 
 void ScreenPlayers::draw() {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	m_players.update(); // Poll for new players
 	double length = m_audio.getLength();
 	double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);

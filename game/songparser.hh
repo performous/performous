@@ -28,7 +28,8 @@ class SongParser {
   private:
 	void finalize();
 	void vocalsTogether();
-
+	void guessFiles();
+	
 	Song& m_song;
 	std::stringstream m_ss;
 	unsigned int m_linenum;
@@ -44,7 +45,6 @@ class SongParser {
 	bool txtParseNote(std::string line);
 	bool iniCheck(std::vector<char> const& data) const;
 	void iniParseHeader();
-	void iniParse();
 	bool midCheck(std::vector<char> const& data) const;
 	void midParseHeader();
 	void midParse();

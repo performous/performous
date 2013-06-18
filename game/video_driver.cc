@@ -9,7 +9,6 @@
 #include "controllers.hh"
 #include "screen.hh"
 #include <boost/date_time.hpp>
-#include <fstream>
 #include <SDL.h>
 
 #ifndef GLEW_ARB_viewport_array
@@ -75,7 +74,7 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	if( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK) == -1 ) throw std::runtime_error("SDL_Init failed");
 	SDL_WM_SetCaption(PACKAGE " " VERSION, PACKAGE);
 	{
-		SDL_Surface* icon = SDL_LoadBMP(getThemePath("icon.bmp").c_str());
+		SDL_Surface* icon = SDL_LoadBMP(findFile("icon.bmp").string().c_str());
 		SDL_WM_SetIcon(icon, nullptr);
 		SDL_FreeSurface(icon);
 	}
@@ -100,11 +99,11 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 
 	if (GLEW_VERSION_3_3) {
 		// Compile geometry shaders when stereo is requested
-		shader("color").compileFile(getThemePath("shaders/stereo3d.geom"));
-		shader("surface").compileFile(getThemePath("shaders/stereo3d.geom"));
-		shader("texture").compileFile(getThemePath("shaders/stereo3d.geom"));
-		shader("3dobject").compileFile(getThemePath("shaders/stereo3d.geom"));
-		shader("dancenote").compileFile(getThemePath("shaders/stereo3d.geom"));
+		shader("color").compileFile(findFile("shaders/stereo3d.geom"));
+		shader("surface").compileFile(findFile("shaders/stereo3d.geom"));
+		shader("texture").compileFile(findFile("shaders/stereo3d.geom"));
+		shader("3dobject").compileFile(findFile("shaders/stereo3d.geom"));
+		shader("dancenote").compileFile(findFile("shaders/stereo3d.geom"));
 		if (!GLEW_VERSION_4_1) {
 			// Enable bugfix for some older Nvidia cards
 			for (ShaderMap::iterator it = m_shaders.begin(); it != m_shaders.end(); ++it) {
@@ -116,30 +115,30 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 
 	shader("color")
 	  .addDefines("#define ENABLE_VERTEX_COLOR\n")
-	  .compileFile(getThemePath("shaders/core.vert"))
-	  .compileFile(getThemePath("shaders/core.frag"))
+	  .compileFile(findFile("shaders/core.vert"))
+	  .compileFile(findFile("shaders/core.frag"))
 	  .link();
 	shader("surface")
 	  .addDefines("#define ENABLE_TEXTURING 1\n")
-	  .compileFile(getThemePath("shaders/core.vert"))
-	  .compileFile(getThemePath("shaders/core.frag"))
+	  .compileFile(findFile("shaders/core.vert"))
+	  .compileFile(findFile("shaders/core.frag"))
 	  .link();
 	shader("texture")
 	  .addDefines("#define ENABLE_TEXTURING 2\n")
 	  .addDefines("#define ENABLE_VERTEX_COLOR\n")
-	  .compileFile(getThemePath("shaders/core.vert"))
-	  .compileFile(getThemePath("shaders/core.frag"))
+	  .compileFile(findFile("shaders/core.vert"))
+	  .compileFile(findFile("shaders/core.frag"))
 	  .link();
 	shader("3dobject")
 	  .addDefines("#define ENABLE_LIGHTING\n")
-	  .compileFile(getThemePath("shaders/core.vert"))
-	  .compileFile(getThemePath("shaders/core.frag"))
+	  .compileFile(findFile("shaders/core.vert"))
+	  .compileFile(findFile("shaders/core.frag"))
 	  .link();
 	shader("dancenote")
 	  .addDefines("#define ENABLE_TEXTURING 2\n")
 	  .addDefines("#define ENABLE_VERTEX_COLOR\n")
-	  .compileFile(getThemePath("shaders/dancenote.vert"))
-	  .compileFile(getThemePath("shaders/core.frag"))
+	  .compileFile(findFile("shaders/dancenote.vert"))
+	  .compileFile(findFile("shaders/core.frag"))
 	  .link();
 
 	updateColor();
@@ -187,14 +186,13 @@ void Window::updateTransforms() {
 void Window::render(boost::function<void (void)> drawFunc) {
 	glutil::GLErrorChecker glerror("Window::render");
 	ViewTrans trans;  // Default frustum
-	if (s_width < unsigned(screen->w) || s_height < unsigned(screen->h)) glClear(GL_COLOR_BUFFER_BIT);  // Black bars
 	bool stereo = config["graphic/stereo3d"].b();
 	int type = config["graphic/stereo3dtype"].i();
 
 	// Over/under only available in fullscreen
 	if (stereo && type == 2 && !m_fullscreen) stereo = false;
 
-	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	updateStereo(stereo ? getSeparation() : 0.0);
 	glerror.check("setup");
 	// Can we do direct to framebuffer rendering (no FBO)?
@@ -257,7 +255,7 @@ void Window::view(unsigned num) {
 	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
-	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_BLEND);
@@ -309,7 +307,6 @@ void Window::resize() {
 		GLattrSetter attr_a(SDL_GL_ALPHA_SIZE, 8);
 		GLattrSetter attr_buf(SDL_GL_BUFFER_SIZE, 32);
 		GLattrSetter attr_d(SDL_GL_DEPTH_SIZE, 24);
-		GLattrSetter attr_s(SDL_GL_STENCIL_SIZE, 0);
 		GLattrSetter attr_db(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_FreeSurface(screen);
 		screen = SDL_SetVideoMode(width, height, 0, SDL_OPENGL | (m_fullscreen ? SDL_FULLSCREEN : SDL_RESIZABLE));

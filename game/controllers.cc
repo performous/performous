@@ -2,6 +2,7 @@
 
 #include "fs.hh"
 #include <boost/algorithm/string.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
 #include <boost/smart_ptr/weak_ptr.hpp>
@@ -140,7 +141,7 @@ struct Controllers::Impl {
 	Impl(): m_eventsEnabled() {
 		#define DEFINE_BUTTON(devtype, button, num, nav) m_buttons[DEVTYPE_##devtype][#button] = devtype##_##button;
 		#include "controllers-buttons.ii"
-		readControllers(getDefaultConfig(fs::path("/config/controllers.xml")));
+		readControllers(getShareDir() / "config/controllers.xml");
 		readControllers(getConfigDir() / "controllers.xml");
 		m_hw[SOURCETYPE_KEYBOARD] = constructKeyboard();
 		m_hw[SOURCETYPE_JOYSTICK] = constructJoysticks();
@@ -148,7 +149,7 @@ struct Controllers::Impl {
 	}
 	
 	void readControllers(fs::path const& file) {
-		if (!fs::exists(file)) {
+		if (!fs::is_regular_file(file)) {
 			std::clog << "controllers/info: Skipping " << file << " (not found)" << std::endl;
 			return;
 		}
@@ -290,7 +291,7 @@ struct Controllers::Impl {
 			// Note: We intentionally only emit one per frame (call to process) to avoid surprises when latency spikes occur.
 			++ne.repeat;
 			ne.time += delay;  // Increment rather than set to now, so that repeating is smoother.
-			std::clog << "controllers/info: NavEvent auto repeat " << ne.repeat << " next=" << now - ne.time << " delay=" << delay << std::endl;
+			std::clog << "controllers/debug: NavEvent auto repeat " << ne.repeat << " next=" << now - ne.time << " delay=" << delay << std::endl;
 			m_navEvents.push_back(ne);
 		}
 	}
@@ -352,7 +353,7 @@ struct Controllers::Impl {
 	bool pushMappedEvent(Event& ev) {
 		if (ev.button == GENERIC_UNASSIGNED) return false;
 		if (!valueChanged(ev)) return false;  // Avoid repeated or other useless events
-		std::clog << "controllers/info: processing " << ev << std::endl;
+		std::clog << "controllers/debug: processing " << ev << std::endl;
 		ev.nav = navigation(ev);
 		// Emit nav event
 		if (ev.nav != NAV_NONE) {

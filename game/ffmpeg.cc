@@ -34,7 +34,7 @@ namespace {
 }
 
 
-FFmpeg::FFmpeg(std::string const& _filename, unsigned int rate):
+FFmpeg::FFmpeg(fs::path const& _filename, unsigned int rate):
   width(), height(), m_filename(_filename), m_rate(rate), m_quit(),
   m_seekTarget(getNaN()), m_position(), m_duration(), m_streamId(-1),
   m_mediaType(rate ? AVMEDIA_TYPE_AUDIO : AVMEDIA_TYPE_VIDEO),
@@ -78,7 +78,7 @@ void FFmpeg::open() {
 	boost::mutex::scoped_lock l(s_avcodec_mutex);
 	av_register_all();
 	av_log_set_level(AV_LOG_ERROR);
-	if (avformat_open_input(&m_formatContext, m_filename.c_str(), nullptr, nullptr)) throw std::runtime_error("Cannot open input file");
+	if (avformat_open_input(&m_formatContext, m_filename.string().c_str(), nullptr, nullptr)) throw std::runtime_error("Cannot open input file");
 	if (avformat_find_stream_info(m_formatContext, nullptr) < 0) throw std::runtime_error("Cannot find stream information");
 	m_formatContext->flags |= AVFMT_FLAG_GENPTS;
 	// Find a track and open the codec

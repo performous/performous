@@ -1,25 +1,20 @@
 #include "surface.hh"
 
-#include "filemagic.hh"
-#include "fs.hh"
 #include "configuration.hh"
 #include "video_driver.hh"
 #include "image.hh"
 #include "screen.hh"
-
+#include <boost/algorithm/string/case_conv.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
-#include <fstream>
+#include <cctype>
 #include <stdexcept>
 #include <sstream>
 #include <vector>
 
-#include <cctype>
-
-#include <boost/cstdint.hpp>
-#include <boost/format.hpp>
-using boost::uint32_t;
+using std::uint32_t;
 
 Shader& getShader(std::string const& name) {
 	return Game::getSingletonPtr()->window().shader(name);  // FIXME
@@ -74,12 +69,12 @@ struct Loader {
 			Bitmap bitmap;
 			try {
 				// Load bitmap from disk
-				std::string const filename = name.string();
-				if (!fs::exists(name) || fs::is_directory(name)) throw std::runtime_error("File not found: " + filename);
-				else if (filemagic::SVG(name)) loadSVG(bitmap, filename);
-				else if (filemagic::JPEG(name)) loadJPEG(bitmap, filename);
-				else if (filemagic::PNG(name)) loadPNG(bitmap, filename);
-				else throw std::runtime_error("Unable to load the image: " + filename);
+				std::string ext = boost::algorithm::to_lower_copy(name.extension().string());
+				if (!fs::is_regular_file(name)) throw std::runtime_error("File not found: " + name.string());
+				else if (ext == ".svg") loadSVG(bitmap, name);
+				else if (ext == ".jpg" || ext == ".jpeg") loadJPEG(bitmap, name);
+				else if (ext == ".png") loadPNG(bitmap, name);
+				else throw std::runtime_error("Unknown image file format: " + name.string());
 			} catch (std::exception& e) {
 				std::clog << "image/error: " << e.what() << std::endl;
 			}
@@ -125,7 +120,7 @@ template <typename T> void loader(T* target, fs::path const& name) {
 	ldr.push(target, Job(name, boost::bind(&T::load, target, _1)));
 }
 
-Surface::Surface(std::string const& filename) { loader(this, filename); }
+Surface::Surface(fs::path const& filename) { loader(this, filename); }
 Surface::~Surface() { ldr.remove(this); }
 
 // Stuff for converting pix::Format into OpenGL enum values
@@ -167,11 +162,7 @@ void Surface::load(Bitmap const& bitmap) {
 	glTexParameterf(type(), GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
 	// When texture area is large, bilinear filter the original
 	glTexParameterf(type(), GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	// The texture wraps over at the edges (repeat)
-	const bool repeating = true;  // FIXME: Make configurable per surface, default to false
-	glTexParameterf(type(), GL_TEXTURE_WRAP_S, repeating ? GL_REPEAT : GL_CLAMP);
-	glTexParameterf(type(), GL_TEXTURE_WRAP_T, repeating ? GL_REPEAT : GL_CLAMP);
-	glTexParameterf(type(), GL_TEXTURE_MAX_LEVEL, GLEW_VERSION_3_0 ? 4 : 0);  // Mipmaps currently b0rked on Intel, so disable them...
+	glTexParameterf(type(), GL_TEXTURE_MAX_LEVEL, 4);
 	glerror.check("glTexParameterf");
 
 	// Anisotropy is potential trouble maker

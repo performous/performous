@@ -1,11 +1,10 @@
 #include "3dobject.hh"
 
 #include "surface.hh"
-
-#include <sstream>
-#include <fstream>
-#include <stdexcept>
+#include <boost/filesystem/fstream.hpp>
 #include <boost/lexical_cast.hpp>
+#include <sstream>
+#include <stdexcept>
 
 // TODO: test & fix faces that doesn't have texcoords in the file
 // TODO: group handling for loader
@@ -32,11 +31,11 @@ struct Face {
 };
 
 /// Load a Wavefront .obj file and possibly scale it also
-void Object3d::loadWavefrontObj(std::string filepath, float scale) {
+void Object3d::loadWavefrontObj(fs::path const& filepath, float scale) {
 	int linenumber = 0;
 	std::string row;
-	std::ifstream file(filepath.c_str(), std::ios::binary);
-	if (!file.is_open()) throw std::runtime_error("Couldn't open object file "+filepath);
+	fs::ifstream file(filepath, std::ios::binary);
+	if (!file) throw std::runtime_error("Couldn't open object file "+filepath.string());
 	std::vector<glmath::vec4> m_vertices, m_normals, m_texcoords;
 	std::vector<Face> m_faces;
 	while (getline(file, row)) {
@@ -53,7 +52,7 @@ void Object3d::loadWavefrontObj(std::string filepath, float scale) {
 		} else if (row.substr(0,2) == "vn") {  // Normals
 			srow >> tempst >> x >> y >> z;
 			double sum = std::abs(x)+std::abs(y)+std::abs(z);
-			if (sum == 0) throw std::runtime_error("Invalid normal in "+filepath+":"+boost::lexical_cast<std::string>(linenumber));
+			if (sum == 0) throw std::runtime_error("Invalid normal in "+filepath.string()+":"+boost::lexical_cast<std::string>(linenumber));
 			x /= sum; y /= sum; z /= sum; // Normalize components
 			m_normals.push_back(glmath::vec4(x, y, z, 0.0));
 		} else if (row.substr(0,2) == "f ") {  // Faces
@@ -75,14 +74,14 @@ void Object3d::loadWavefrontObj(std::string filepath, float scale) {
 				}
 			}
 			if (!f.vertices.empty() && f.vertices.size() != 3)
-				throw std::runtime_error("Only triangle faces allowed in "+filepath+":"+boost::lexical_cast<std::string>(linenumber));
+				throw std::runtime_error("Only triangle faces allowed in "+filepath.string()+":"+boost::lexical_cast<std::string>(linenumber));
 			// Face must have equal number of v, vt, vn or none of a kind
 			if (!f.vertices.empty()
 			  && (f.texcoords.empty() || (f.texcoords.size() == f.vertices.size()))
 			  && (f.normals.empty()   || (f.normals.size() == f.vertices.size()))) {
 				m_faces.push_back(f);
 			} else {
-				throw std::runtime_error("Invalid face in "+filepath+":"+boost::lexical_cast<std::string>(linenumber));
+				throw std::runtime_error("Invalid face in "+filepath.string()+":"+boost::lexical_cast<std::string>(linenumber));
 			}
 		}
 	}
@@ -99,7 +98,7 @@ void Object3d::loadWavefrontObj(std::string filepath, float scale) {
 
 }
 
-void Object3d::load(std::string filepath, std::string texturepath, float scale) {
+void Object3d::load(fs::path const& filepath, fs::path const& texturepath, float scale) {
 	if (!texturepath.empty()) m_texture.reset(new Texture(texturepath));
 	loadWavefrontObj(filepath, scale);
 }

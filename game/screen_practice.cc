@@ -12,10 +12,10 @@ ScreenPractice::ScreenPractice(std::string const& name, Audio& audio):
 {}
 
 void ScreenPractice::enter() {
-	m_audio.playMusic(getThemePath("practice.ogg"));
+	m_audio.playMusic(findFile("practice.ogg"));
 	// draw vu meters
 	for (unsigned int i = 0, mics = m_audio.analyzers().size(); i < mics; ++i) {
-		m_vumeters.push_back(new ProgressBar(getThemePath("vumeter_bg.svg"), getThemePath("vumeter_fg.svg"), ProgressBar::VERTICAL, 0.136, 0.023));
+		m_vumeters.push_back(new ProgressBar(findFile("vumeter_bg.svg"), findFile("vumeter_fg.svg"), ProgressBar::VERTICAL, 0.136, 0.023));
 	}
 	m_samples.push_back("drum bass");
 	m_samples.push_back("drum snare");

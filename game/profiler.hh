@@ -52,7 +52,7 @@ class Profiler {
 		m_checkpoints[tag].add(t);
 	}
 	/// Dump current stats to log and reset
-	void dump(std::string const& level = "info") {
+	void dump(std::string const& level = "debug") {
 		if (m_checkpoints.empty()) return;
 		if (level.empty()) { m_checkpoints.clear(); return; }
 		std::vector<Pair> cps(m_checkpoints.begin(), m_checkpoints.end());

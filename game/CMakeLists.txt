@@ -1,14 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 
-set(EXENAME Performous)
-if(UNIX)
-	# On UNIX, binary name is lowercase with no spaces
-	string(TOLOWER ${EXENAME} EXENAME)
-	string(REPLACE " " "-" EXENAME ${EXENAME})
-endif()
-
-FILE(GLOB SOURCE_FILES "*.cc")
-FILE(GLOB HEADER_FILES "*.hh")
+file(GLOB SOURCE_FILES "*.cc")
+file(GLOB HEADER_FILES "*.hh")
 
 if(WIN32)
 	if(ENABLE_VERSIONING)
@@ -53,15 +46,17 @@ if(WIN32)
 		# According to MinGW tools, we need to compile the rc file, and then link it into projects:
 		# windres foo.rc foores.o
 		# gcc -o foo.exe foo.o foores.o
-		find_program(WINDRES windres)
-		if(NOT WINDRES)
-			message(STATUS "Cannot find windres. Will not create a versioned exe")
+		if(NOT CMAKE_RC_COMPILER)
+			find_program(CMAKE_RC_COMPILER windres)
+		endif()
+		if(NOT CMAKE_RC_COMPILER)
+			message(STATUS "Cannot find windres. Will not create a versioned exe.")
 			set(RESOURCE_FILES)
 			set(RESOURCE_OBJECT)
 		else()
 			set(RESOURCE_OBJECT "${CMAKE_BINARY_DIR}/performous.rc.o")
-			execute_process(COMMAND "${WINDRES}" "${RESOURCE_FILES}" "${RESOURCE_OBJECT}")
-		endif(NOT WINDRES)
+			execute_process(COMMAND "${CMAKE_RC_COMPILER}" "${RESOURCE_FILES}" "${RESOURCE_OBJECT}")
+		endif()
 	endif()
 else()
 	set(RESOURCE_FILES) #nothing
@@ -94,7 +89,8 @@ else()
 	message(STATUS "Internationalization: Disabled (libintl not found)")
 endif()
 
-if(NOT NO_PORTMIDI)
+option(ENABLE_MIDI "Enable support for MIDI hardware (e-drums with USB/MIDI connection)." ON)
+if(ENABLE_MIDI)
 	find_package(PortMidi)
 	if(PortMidi_FOUND)
 		include_directories(${PortMidi_INCLUDE_DIRS})
@@ -108,7 +104,8 @@ else()
 	message(STATUS "MIDI I/O: Disabled (explicitly disabled)")
 endif()
 
-if(NOT NO_WEBCAM)
+option(ENABLE_WEBCAM "Enable webcam support (OpenCV)." ON)
+if(ENABLE_WEBCAM)
 	find_package(OpenCV)
 	if(OpenCV_FOUND)
 		include_directories(${OpenCV_INCLUDE_DIRS})
@@ -149,32 +146,36 @@ if(UNIX)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
 endif(UNIX)
 
-if(MXE_HACK)
-	execute_process(COMMAND "${CMAKE_SOURCE_DIR}/win32/mxe/libs.sh"
-		OUTPUT_VARIABLE MXE_HACK_STRING
-	)
-	set(CMAKE_CXX_LINK_EXECUTABLE ${CMAKE_CXX_LINK_EXECUTABLE}${MXE_HACK_STRING})
-	add_definitions(-DBOOST_THREAD_USE_LIB -DGLEW_STATIC)
+if(WIN32)
+	option(MXE_HACK "Features horrible hacks, but is able to compile a static performous.exe (that may not work)." OFF)
+	mark_as_advanced(MXE_HACK)
+	if(MXE_HACK)
+		execute_process(COMMAND "${CMAKE_SOURCE_DIR}/win32/mxe/libs.sh"
+			OUTPUT_VARIABLE MXE_HACK_STRING
+		)
+		set(CMAKE_CXX_LINK_EXECUTABLE ${CMAKE_CXX_LINK_EXECUTABLE}${MXE_HACK_STRING})
+		add_definitions(-DBOOST_THREAD_USE_LIB -DGLEW_STATIC)
+	endif()
+	set(BIN_INSTALL .)  # Straight to Program Files/Performous with no bin subfolder.
+	set(SUBSYSTEM_WIN32 WIN32)
+else()
+	set(BIN_INSTALL bin)
 endif()
 
-if(MSVC)
-	set(SUBSYSTEM_WIN32 WIN32)
-	add_executable(Performous-cmd "windows-cmd.cpp")
-	install(TARGETS Performous-cmd DESTINATION bin)
-endif(MSVC)
-add_executable(${EXENAME} ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL_SOURCES} ${RESOURCE_OBJECT})
-target_link_libraries(${EXENAME} ${LIBS})
+# Build main executable
+add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL_SOURCES} ${RESOURCE_OBJECT})
+target_link_libraries(performous ${LIBS})
+install(TARGETS performous DESTINATION ${BIN_INSTALL})
 
-# Store library paths in executable
-if(APPLE)
-	set_target_properties(${EXENAME} PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
-else()
-	set_target_properties(${EXENAME} PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
+set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)  # Store library paths in executable
+set_target_properties(performous PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})  # Produce executable in build/, not build/game/
+
+# Capitalized Performous.exe on Windows (this is considered more beautiful).
+if(WIN32)
+	set_target_properties(performous PROPERTIES OUTPUT_NAME "Performous")
 endif()
 
 # Generate config.hh
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.cmake.hh" "${CMAKE_CURRENT_BINARY_DIR}/config.hh" @ONLY)
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
-
-install(TARGETS ${EXENAME} DESTINATION bin)
 

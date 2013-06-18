@@ -15,7 +15,7 @@ ScreenIntro::ScreenIntro(std::string const& name, Audio& audio): Screen(name), m
 
 void ScreenIntro::enter() {
 	Game::getSingletonPtr()->showLogo();
-	m_audio.playMusic(getThemePath("menu.ogg"), true);
+	m_audio.playMusic(findFile("menu.ogg"), true);
 	m_selAnim = AnimValue(0.0, 10.0);
 	m_submenuAnim = AnimValue(0.0, 3.0);
 	populateMenu();
@@ -154,15 +154,15 @@ void ScreenIntro::draw() {
 
 SvgTxtTheme& ScreenIntro::getTextObject(std::string const& txt) {
 	if (theme->options.contains(txt)) return theme->options[txt];
-	return *theme->options.insert(txt, new SvgTxtTheme(getThemePath("mainmenu_option.svg"), config["graphic/text_lod"].f()))->second;
+	return *theme->options.insert(txt, new SvgTxtTheme(findFile("mainmenu_option.svg"), config["graphic/text_lod"].f()))->second;
 }
 
 void ScreenIntro::populateMenu() {
-	MenuImage imgSing(new Surface(getThemePath("intro_sing.svg")));
-	MenuImage imgPractice(new Surface(getThemePath("intro_practice.svg")));
-	MenuImage imgDLC(new Surface(getThemePath("intro_dlc.svg")));
-	MenuImage imgConfig(new Surface(getThemePath("intro_configure.svg")));
-	MenuImage imgQuit(new Surface(getThemePath("intro_quit.svg")));
+	MenuImage imgSing(new Surface(findFile("intro_sing.svg")));
+	MenuImage imgPractice(new Surface(findFile("intro_practice.svg")));
+	MenuImage imgDLC(new Surface(findFile("intro_dlc.svg")));
+	MenuImage imgConfig(new Surface(findFile("intro_configure.svg")));
+	MenuImage imgQuit(new Surface(findFile("intro_quit.svg")));
 	m_menu.clear();
 	m_menu.add(MenuOption(_("Perform"), _("Start performing!"), imgSing).screen("Songs"));
 	m_menu.add(MenuOption(_("Practice"), _("Check your skills or test the microphones"), imgPractice).screen("Practice"));

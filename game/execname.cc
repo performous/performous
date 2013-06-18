@@ -1,10 +1,8 @@
-#include "execname.hpp"
-
-namespace fs = boost::filesystem;
+#include "execname.hh"
 
 #if defined(_WIN32)
 #include <windows.h>
-fs::path plugin::execname() {
+fs::path execname() {
 	char buf[1024];
 	DWORD ret = GetModuleFileName(NULL, buf, sizeof(buf));
 	if (ret == 0 || ret == sizeof(buf)) return std::string();
@@ -12,7 +10,7 @@ fs::path plugin::execname() {
 }
 #elif defined(__APPLE__)
 #include <mach-o/dyld.h>
-fs::path plugin::execname() {
+fs::path execname() {
 	char buf[1024];
 	uint32_t size = sizeof(buf);
 	int ret = _NSGetExecutablePath(buf, &size);
@@ -21,12 +19,12 @@ fs::path plugin::execname() {
 }
 #elif defined(sun) || defined(__sun)
 #include <stdlib.h>
-fs::path plugin::execname() {
+fs::path execname() {
 	return getexecname();
 }
 #elif defined(__FreeBSD__)
 #include <sys/sysctl.h>
-fs::path plugin::execname() {
+fs::path execname() {
 	int mib[4];
 	mib[0] = CTL_KERN;
 	mib[1] = KERN_PROC;
@@ -42,7 +40,7 @@ fs::path plugin::execname() {
 }
 #elif defined(__linux__)
 #include <unistd.h>
-fs::path plugin::execname() {
+fs::path execname() {
 	char buf[1024];
 	ssize_t maxchars = sizeof(buf) - 1;
 	ssize_t size = readlink("/proc/self/exe", buf, sizeof(buf));
@@ -51,7 +49,7 @@ fs::path plugin::execname() {
 	return buf;
 }
 #else
-fs::path plugin::execname() {
+fs::path execname() {
 	return fs::path();
 }
 #endif

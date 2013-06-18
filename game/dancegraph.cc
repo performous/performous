@@ -79,11 +79,11 @@ namespace {
 DanceGraph::DanceGraph(Audio& audio, Song const& song, input::DevicePtr dev):
   InstrumentGraph(audio, song, dev),
   m_level(BEGINNER),
-  m_beat(getThemePath("dancebeat.svg")),
-  m_arrows(getThemePath("arrows.svg")),
-  m_arrows_cursor(getThemePath("arrows_cursor.svg")),
-  m_arrows_hold(getThemePath("arrows_hold.svg")),
-  m_mine(getThemePath("mine.svg")),
+  m_beat(findFile("dancebeat.svg")),
+  m_arrows(findFile("arrows.svg")),
+  m_arrows_cursor(findFile("arrows_cursor.svg")),
+  m_arrows_hold(findFile("arrows_hold.svg")),
+  m_mine(findFile("mine.svg")),
   m_insideStop()
 {
 	// Initialize some arrays
@@ -277,15 +277,17 @@ void DanceGraph::engine() {
 		} else if (!menuOpen() && ev.value != 0.0) {
 			if (ev.nav == input::NAV_CANCEL || ev.nav == input::NAV_START) m_menu.open();
 		}
-		// Gaming controls
-		if (ev.value == 0.0) {
-			m_pressed[ev.button] = false;
-			dance(time, ev);
-			m_pressed_anim[ev.button].setTarget(0.0);
-		} else if (ev.value != 0.0) {
-			m_pressed[ev.button] = true;
-			dance(time, ev);
-			m_pressed_anim[ev.button].setValue(1.0);
+		if (ev.button < max_panels) {
+			// Gaming controls
+			if (ev.value == 0.0) {
+				m_pressed[ev.button] = false;
+				dance(time, ev);
+				m_pressed_anim[ev.button].setTarget(0.0);
+			} else if (ev.value != 0.0) {
+				m_pressed[ev.button] = true;
+				dance(time, ev);
+				m_pressed_anim[ev.button].setValue(1.0);
+			}
 		}
 	}
 

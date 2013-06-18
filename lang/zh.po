@@ -8,13 +8,14 @@ msgstr ""
 "Project-Id-Version: performous 0.6.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-10-24 13:04+0100\n"
-"PO-Revision-Date: 2010-10-27 15:23+0800\n"
+"PO-Revision-Date: 2013-05-24 12:49+0100\n"
 "Last-Translator: Wei-Lun Chao <william.chao@ossii.com.tw>\n"
 "Language-Team: Chinese (traditional) <zh-l10n@linux.org.tw>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 1.5.4\n"
 
 #: ../game/main.cc:133
 msgid "Loading audio samples..."
@@ -391,8 +392,10 @@ msgid "Press any key to exit."
 msgstr "按下任何鍵以離開。"
 
 #: ../game/screen_paths.cc:74
-msgid "Windows users can also use ConfigureSongDirectory.bat in the bin-directory."
-msgstr "Windows 使用者也可以使用在 bin-directory 中的 ConfigureSongDirectory.bat。"
+msgid ""
+"Windows users can also use ConfigureSongDirectory.bat in the bin-directory."
+msgstr ""
+"Windows 使用者也可以使用在 bin-directory 中的 ConfigureSongDirectory.bat。"
 
 #: ../game/screen_audiodevices.cc:55
 msgid ""
@@ -413,12 +416,19 @@ msgid "- Unassigned -"
 msgstr "- 未賦值的 -"
 
 #: ../game/screen_audiodevices.cc:126
-msgid "Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select to cancel. Ctrl + R to reset defaults"
-msgstr "使用方向鍵以組配。點擊 輸入/開始 以儲存與測試，或 Esc/選取 以取消。Ctrl + R 以重置預設值"
+msgid ""
+"Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select "
+"to cancel. Ctrl + R to reset defaults"
+msgstr ""
+"使用方向鍵以組配。點擊 輸入/開始 以儲存與測試，或 Esc/選取 以取消。Ctrl + R "
+"以重置預設值"
 
 #: ../game/screen_audiodevices.cc:131
-msgid "For advanced device configuration, use command line parameter --audio (use --audiohelp for details)."
-msgstr "使用命令列參數 --audio (使用 --audiohelp 以瞭解細節) 用於進階裝置組態。"
+msgid ""
+"For advanced device configuration, use command line parameter --audio (use --"
+"audiohelp for details)."
+msgstr ""
+"使用命令列參數 --audio (使用 --audiohelp 以瞭解細節) 用於進階裝置組態。"
 
 #: ../game/screen_audiodevices.cc:186
 msgid "Some devices failed to open!"
@@ -634,8 +644,12 @@ msgid "Hardware MIDI input device"
 msgstr "硬體 MIDI 輸入裝置"
 
 #: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:25
-msgid "Part of sound card name or its number or empty to use the first available device. Used currently for MIDI drum controllers."
-msgstr "音效卡的部分名稱、它的編號或是空白，以使用第一個可用裝置。使用目前的做為 MIDI 鼓聲控制器。"
+msgid ""
+"Part of sound card name or its number or empty to use the first available "
+"device. Used currently for MIDI drum controllers."
+msgstr ""
+"音效卡的部分名稱、它的編號或是空白，以使用第一個可用裝置。使用目前的做為 "
+"MIDI 鼓聲控制器。"
 
 #: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:26
 msgid "Windowed width"
@@ -666,23 +680,32 @@ msgid "Video playback"
 msgstr "影像播放控制"
 
 #: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:33
-msgid "Allows completely disabling background videos. It is recommended to leave this enabled as Performous will still smoothly fade out the video if your computer is not fast enough."
-msgstr "允許完全停用背景影像。建議保持其為啟用，因為如果您的電腦不夠快，Performous 仍將平滑淡出影像。"
+msgid ""
+"Allows completely disabling background videos. It is recommended to leave "
+"this enabled as Performous will still smoothly fade out the video if your "
+"computer is not fast enough."
+msgstr ""
+"允許完全停用背景影像。建議保持其為啟用，因為如果您的電腦不夠快，Performous 仍"
+"將平滑淡出影像。"
 
 #: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:34
 msgid "Webcam background"
 msgstr "網路攝影機背景"
 
 #: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:35
-msgid "Performous can try to use webcam as a background video. You can disable it if it annoys you."
-msgstr "Performous 可以試著使用網路攝影機做為背景影像。如果它使您厭煩，您可以停用它。"
+msgid ""
+"Performous can try to use webcam as a background video. You can disable it "
+"if it annoys you."
+msgstr ""
+"Performous 可以試著使用網路攝影機做為背景影像。如果它使您厭煩，您可以停用它。"
 
 #: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:36
 msgid "Webcam id"
 msgstr "網路攝影機識別號"
 
 #: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:37
-msgid "Use -1 to autodetect or a number starting from 0 to choose specific device."
+msgid ""
+"Use -1 to autodetect or a number starting from 0 to choose specific device."
 msgstr "使用 -1 以自動偵測，或是一個從 0 開始的數字以選擇特定的裝置。"
 
 #: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:38
@@ -690,7 +713,9 @@ msgid "3D notes"
 msgstr "立體音符"
 
 #: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:39
-msgid "Draw instrument notes as 3-dimensional objects. May hurt performance on older hardware."
+msgid ""
+"Draw instrument notes as 3-dimensional objects. May hurt performance on "
+"older hardware."
 msgstr "以立體物件繪製樂器音符。在舊硬體上也許有損效能。"
 
 #: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:40
@@ -698,7 +723,9 @@ msgid "SVG quality"
 msgstr "SVG 品質"
 
 #: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:41
-msgid "Larger numbers cause vector graphics to be rendered in higher resolution. Decrease this to make navigating in menus faster."
+msgid ""
+"Larger numbers cause vector graphics to be rendered in higher resolution. "
+"Decrease this to make navigating in menus faster."
 msgstr "較大的數字會造成向量圖形以較高解析度進行潤算。減少它以便較快巡覽選單。"
 
 #: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:42
@@ -706,7 +733,9 @@ msgid "Text quality"
 msgstr "文字品質"
 
 #: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:43
-msgid "Larger numbers cause text to be rendered in higher resolution. Decrease this to make everything a little faster."
+msgid ""
+"Larger numbers cause text to be rendered in higher resolution. Decrease this "
+"to make everything a little faster."
 msgstr "較大的數字會造成文字以較高解析度進行潤算。減少它好讓所有東西快一點。"
 
 #: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:44
@@ -714,40 +743,71 @@ msgid "Benchmark mode"
 msgstr "效能評定模式"
 
 #: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:45
-msgid "Framerate limit of 100 FPS is removed and the game instead renders at full speed. FPS values are printed to console. Please note that the display drivers may still limit the rendering speed to the screen refresh rate."
-msgstr "已移除 100 FPS 的影格率限制，遊戲則以全速進行潤算。FPS 值已印出至主控臺。要注意的是，顯示卡驅動程式也許仍然會限制潤算速度為螢幕重新整理速率。"
+msgid ""
+"Framerate limit of 100 FPS is removed and the game instead renders at full "
+"speed. FPS values are printed to console. Please note that the display "
+"drivers may still limit the rendering speed to the screen refresh rate."
+msgstr ""
+"已移除 100 FPS 的影格率限制，遊戲則以全速進行潤算。FPS 值已印出至主控臺。要注"
+"意的是，顯示卡驅動程式也許仍然會限制潤算速度為螢幕重新整理速率。"
 
 #: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:46
 msgid "Suggested latency"
 msgstr "建議的延時"
 
 #: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:47
-msgid "This is a hint for the audio engine about the desired latency. Set this as low as possible while retaining clear audio playback. Requires restart."
-msgstr "這是關於所設想延時用於音效引擎的提示。在保持乾淨的音效播放條件下，儘可能將它設低一點。需要重新啟動。"
+msgid ""
+"This is a hint for the audio engine about the desired latency. Set this as "
+"low as possible while retaining clear audio playback. Requires restart."
+msgstr ""
+"這是關於所設想延時用於音效引擎的提示。在保持乾淨的音效播放條件下，儘可能將它"
+"設低一點。需要重新啟動。"
 
 #: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:48
 msgid "Audio/video latency"
 msgstr "音效/影像延時"
 
 #: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:49
-msgid "Affects all modes. Use negative value if your display input lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal. This should be set so that the notes pass the cursor at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while performing."
-msgstr "會影響所有模式。如果您的顯示輸入滯後大於音效卡輸出延時就使用負值，反之則用正值，如果它們相等就為零。這個應該要設定才會讓音符經過游標的同時也會聽到音效。執行時期可以使用 Ctrl+F1/F2 來調整它。"
+msgid ""
+"Affects all modes. Use negative value if your display input lag is greater "
+"than the sound card output latency, positive values in the opposite case and "
+"zero if they are equal. This should be set so that the notes pass the cursor "
+"at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while "
+"performing."
+msgstr ""
+"會影響所有模式。如果您的顯示輸入滯後大於音效卡輸出延時就使用負值，反之則用正"
+"值，如果它們相等就為零。這個應該要設定才會讓音符經過游標的同時也會聽到音效。"
+"執行時期可以使用 Ctrl+F1/F2 來調整它。"
 
 #: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:50
 msgid "Audio round-trip latency"
 msgstr "音效往返延時"
 
 #: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:51
-msgid "Affects singing only. The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. While performing, press Ctrl+S for synth mode and adjust with Ctrl+F3/F4."
-msgstr "只會影響歌唱。Performous 的播放控制到達您的揚聲器所需的時間，傳到麥克風然後一路回來直到 Performous 擷取並分析它。執行時期可以按下 Ctrl+S 進入同步模式，並利用 Ctrl+F3/F4 來調整。"
+msgid ""
+"Affects singing only. The time it takes for Performous playback to reach "
+"your speakers, fly to the microphone and all the way back until Performous "
+"captures and analyzes it. While performing, press Ctrl+S for synth mode and "
+"adjust with Ctrl+F3/F4."
+msgstr ""
+"只會影響歌唱。Performous 的播放控制到達您的揚聲器所需的時間，傳到麥克風然後一"
+"路回來直到 Performous 擷取並分析它。執行時期可以按下 Ctrl+S 進入同步模式，並"
+"利用 Ctrl+F3/F4 來調整。"
 
 #: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:52
 msgid "Audio/controller latency"
 msgstr "音效/控制器延時"
 
 #: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:53
-msgid "Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to adjust while performing."
-msgstr "只會影響樂器和跳舞。USB 裝置(吉他或舞墊) 與音效輸出延時合併的延時總計。如此調整您就可以很好地經由聽聲音而點擊音符 (不需要看著螢幕)。執行時期可以使用 Ctrl+F5/F6 來調整它。"
+msgid ""
+"Affects instruments and dancing only. The total of USB (guitar or dance pad) "
+"latency combined with audio output latency. Adjust so that you can hit the "
+"notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to "
+"adjust while performing."
+msgstr ""
+"只會影響樂器和跳舞。USB 裝置(吉他或舞墊) 與音效輸出延時合併的延時總計。如此調"
+"整您就可以很好地經由聽聲音而點擊音符 (不需要看著螢幕)。執行時期可以使用 Ctrl"
+"+F5/F6 來調整它。"
 
 #: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:54
 msgid "Audio devices"
@@ -770,7 +830,9 @@ msgid "Music volume"
 msgstr "音樂音量"
 
 #: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:59
-msgid "The ingame music volume. Values above 90 are not recommended as distortion may occur."
+msgid ""
+"The ingame music volume. Values above 90 are not recommended as distortion "
+"may occur."
 msgstr "遊戲時音樂音量。不建議 90 以上的值，因為也許會發生扭曲。"
 
 #: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:60
@@ -778,15 +840,21 @@ msgid "Failure volume"
 msgstr "失敗音量"
 
 #: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:61
-msgid "The ingame fail sound volume. Values above 90 are not recommended as distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
-msgstr "遊戲時失敗音量。不建議 90 以上的值，因為也許會發生扭曲。11 要比 10 大聲，但是這些會到 100。89 比較大聲！"
+msgid ""
+"The ingame fail sound volume. Values above 90 are not recommended as "
+"distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
+msgstr ""
+"遊戲時失敗音量。不建議 90 以上的值，因為也許會發生扭曲。11 要比 10 大聲，但是"
+"這些會到 100。89 比較大聲！"
 
 #: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:62
 msgid "Song folders"
 msgstr "歌曲資料夾"
 
 #: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:63
-msgid "Where to recursively look for songs. DATADIR at the beginning means all Performous data folders."
+msgid ""
+"Where to recursively look for songs. DATADIR at the beginning means all "
+"Performous data folders."
 msgstr "遞迴找尋歌曲的位置。起始部分的 DATADIR 表示所有 Performous 的資料夾。"
 
 #: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:64
@@ -794,5 +862,7 @@ msgid "Base folders for data"
 msgstr "資料的基底資料夾"
 
 #: /tmp/.private/frekla/xml2gettext.T7e8dmCntE:65
-msgid "System defaults are included automatically. Additional paths can be added here."
+msgid ""
+"System defaults are included automatically. Additional paths can be added "
+"here."
 msgstr "自動會包含系統預設值。可以在此加入額外路徑。"

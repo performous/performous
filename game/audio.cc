@@ -140,7 +140,7 @@ class Music {
 		FFmpeg mpeg;
 		float fadeLevel;
 		float pitchFactor;
-		Track(std::string const& filename, unsigned int sr): mpeg(filename, sr), fadeLevel(1.0f), pitchFactor(0.0f) {}
+		Track(fs::path const& filename, unsigned int sr): mpeg(filename, sr), fadeLevel(1.0f), pitchFactor(0.0f) {}
 	};
 	typedef boost::ptr_map<std::string, Track> Tracks;
 	Tracks tracks; ///< Audio decoders
@@ -152,9 +152,8 @@ class Music {
 public:
 	double fadeLevel;
 	double fadeRate;
-	typedef std::map<std::string,std::string> Files;
 	typedef std::vector<float> Buffer;
-	Music(Files const& files, unsigned int sr, bool preview):
+	Music(Audio::Files const& files, unsigned int sr, bool preview):
 	  srate(sr), m_pos(), m_preview(preview), fadeLevel(), fadeRate()
 	{
 		for (auto const& tf /* trackname-filename pair */: files) {
@@ -240,7 +239,7 @@ struct Sample {
 	FFmpeg mpeg;
 	bool eof;
   public:
-	Sample(std::string const& filename, unsigned sr) : m_pos(), mpeg(filename, sr), eof(true) { }
+	Sample(fs::path const& filename, unsigned sr) : m_pos(), mpeg(filename, sr), eof(true) { }
 	void operator()(float* begin, float* end) {
 		if(eof) {
 			// No more data to play in this sample
@@ -418,10 +417,11 @@ int Device::operator()(void const* input, void* output, unsigned long frames, co
 struct Audio::Impl {
 	Output output;
 	portaudio::Init init;
-	boost::ptr_vector<Device> devices;
 	boost::ptr_vector<Analyzer> analyzers;
+	boost::ptr_vector<Device> devices;
 	bool playback;
 	Impl(): init(), playback() {
+		std::clog << "audio/info: " << portaudio::AudioDevices().dump() << std::flush;
 		// Parse audio devices from config
 		ConfigItem::StringList devs = config["audio/devices"].sl();
 		for (ConfigItem::StringList::const_iterator it = devs.begin(), end = devs.end(); it != end; ++it) {
@@ -457,10 +457,9 @@ struct Audio::Impl {
 				if (params.in == 0) params.in = params.mics.size();
 				else params.mics.resize(params.in);
 				portaudio::AudioDevices ad;
-				int dev = ad.find(params.dev);
-				std::clog << "audio/info: Trying audio device \"" << params.dev << "\", id: " << dev
+				auto const& info = ad.find(params.dev);
+				std::clog << "audio/info: Trying audio device \"" << params.dev << "\", idx: " << info.idx
 					<< ", in: " << params.in << ", out: " << params.out << std::endl;
-				portaudio::DeviceInfo& info = ad.devices[dev];
 				if (info.in < int(params.mics.size())) throw std::runtime_error("Device doesn't have enough input channels");
 				if (info.out < int(params.out)) throw std::runtime_error("Device doesn't have enough output channels");
 				// Match found if we got here, construct a device
@@ -490,7 +489,7 @@ struct Audio::Impl {
 				}
 				// Assign playback output for the first available stereo output
 				if (!playback && d->out == 2) { d->outptr = &output; playback = true; }
-				std::clog << "audio/info: Using audio device: " << dev;
+				std::clog << "audio/info: Using audio device: " << info.desc();
 				if (assigned_mics) std::clog << ", input channels: " << assigned_mics;
 				if (params.out) std::clog << ", output channels: " << params.out;
 				std::clog << std::endl;
@@ -520,7 +519,7 @@ bool Audio::hasPlayback() const {
 	return false;
 }
 
-void Audio::loadSample(std::string const& streamId, std::string const& filename) {
+void Audio::loadSample(std::string const& streamId, fs::path const& filename) {
 	boost::mutex::scoped_lock l(self->output.samples_mutex);
 	self->output.samples.insert(streamId, std::auto_ptr<Sample>(new Sample(filename, getSR())));
 }
@@ -537,7 +536,7 @@ void Audio::unloadSample(std::string const& streamId) {
 	self->output.samples.erase(streamId);
 }
 
-void Audio::playMusic(std::map<std::string,std::string> const& filenames, bool preview, double fadeTime, double startPos) {
+void Audio::playMusic(Audio::Files const& filenames, bool preview, double fadeTime, double startPos) {
 	Output& o = self->output;
 	boost::mutex::scoped_lock l(o.mutex);
 	o.disposing.clear();  // Delete disposed streams
@@ -548,15 +547,14 @@ void Audio::playMusic(std::map<std::string,std::string> const& filenames, bool p
 	o.commands.clear();  // Remove old unprocessed commands (they should not apply to the new music)
 }
 
-void Audio::playMusic(std::string const& filename, bool preview, double fadeTime, double startPos) {
-	std::map<std::string,std::string> m;
+void Audio::playMusic(fs::path const& filename, bool preview, double fadeTime, double startPos) {
+	Audio::Files m;
 	m["MAIN"] = filename;
 	playMusic(m, preview, fadeTime, startPos);
 }
 
 void Audio::stopMusic() {
-	std::map<std::string,std::string> m;
-	playMusic(m, false, 0.0);
+	playMusic(Audio::Files(), false, 0.0);
 	{
 		Output& o = self->output;
 		// stop synth when music is stopped
@@ -566,8 +564,7 @@ void Audio::stopMusic() {
 }
 
 void Audio::fadeout(double fadeTime) {
-	std::map<std::string,std::string> m;
-	playMusic(m, false, fadeTime);
+	playMusic(Audio::Files(), false, fadeTime);
 	{
 		Output& o = self->output;
 		// stop synth when music is stopped

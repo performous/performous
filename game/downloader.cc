@@ -164,10 +164,11 @@ class Downloader::Impl {
 
 	void addTorrent(std::string url) {
 		// search for save path
-		fs::path savePath = pathMangle(fs::path(config["dlc/save_path"].s()));
-		if(*savePath.begin() == "DATADIR") {
-			savePath = savePath.string().substr(7);
-			savePath = getDataDir() / savePath;
+		fs::path savePath;
+		{
+			Paths tmp = getPathsConfig("dlc/save_path");
+			if (tmp.empty()) throw std::runtime_error("DLC save path not specified.");
+			savePath = tmp.front();
 		}
 		// fill torrent params
 		error_code ec;

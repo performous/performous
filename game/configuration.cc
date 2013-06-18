@@ -2,19 +2,16 @@
 
 #include "fs.hh"
 #include "util.hh"
-#include "execname.hpp"
 #include "i18n.hh"
 #include <boost/filesystem.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
+#include <boost/lexical_cast.hpp>
 #include <libxml++/libxml++.h>
 #include <algorithm>
 #include <iomanip>
 #include <stdexcept>
 #include <iostream>
 #include <cmath>
-
-namespace fs = boost::filesystem;
 
 Config config;
 
@@ -93,8 +90,6 @@ namespace {
 		return fmter.str();
 	}
 
-	fs::path origin;  // The primary shared data folder
-	
 	std::string getText(xmlpp::Element const& elem) {
 		xmlpp::TextNode const* n = elem.get_child_text();  // Returns NULL if there is no text
 		return n ? std::string(n->get_content()) : std::string();
@@ -152,6 +147,13 @@ void ConfigItem::addEnum(std::string name) {
 	m_max = int(m_enums.size() - 1);
 	m_step = 1;
 }
+
+void ConfigItem::selectEnum(std::string const& name) {
+	auto it = std::find(m_enums.begin(), m_enums.end(), name);
+	if (it == m_enums.end()) throw std::runtime_error("Enum value " + name + " not found in " + m_shortDesc);
+	i() = it - m_enums.begin();
+}
+
 
 std::string ConfigItem::getEnumName() {
 	int val = i();
@@ -240,8 +242,9 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) try {
 	throw std::runtime_error(boost::lexical_cast<std::string>(line) + ": Error while reading entry: " + e.what());
 }
 
-fs::path systemConfFile = "/etc/xdg/performous/config.xml";
-fs::path userConfFile = getConfigDir() / "config.xml";
+// These are set in readConfig, once the paths have been bootstrapped.
+fs::path systemConfFile;
+fs::path userConfFile;
 
 void writeConfig(bool system) {
 	xmlpp::Document doc;
@@ -349,32 +352,18 @@ void readConfigXML(fs::path const& file, int mode) {
 	}
 }
 
-#define CONFIG_SCHEMA "/config/schema.xml"  // Relative to shared data path. Update readConfig and actual file location if you change this
-
 void readConfig() {
 	// Find config schema
-	fs::path schemafile;
-	try {
-		schemafile = getDefaultConfig(fs::path(CONFIG_SCHEMA));
-		origin = fs::path(schemafile).parent_path().parent_path(); // Assuming that two times parent from config file = origin
-	} catch(...) {
-		std::ostringstream oss;
-		oss << "No config schema file found.\n";
-		oss << "Install the file or define environment variable PERFORMOUS_ROOT\n";
-		throw std::runtime_error(oss.str());
-	}
-	readConfigXML(schemafile, 0);  // Read schema and defaults
+	fs::path schemaFile = getSchemaFilename();
+	systemConfFile = getSysConfigDir() / "config.xml";
+	userConfFile = getConfigDir() / "config.xml";
+	readConfigXML(schemaFile, 0);  // Read schema and defaults
 	readConfigXML(systemConfFile, 1);  // Update defaults with system config
 	readConfigXML(userConfFile, 2);  // Read user settings
-	{ // Populate themes
-		ConfigItem& ci = config["game/theme"];
-		std::vector<std::string> themes = getThemes();
-		bool useDefaultTheme = (ci.i() == -1);
-		for (size_t i = 0; i < themes.size(); ++i) {
-			ci.addEnum(themes[i]);
-			// Select the default theme is no other is selected
-			if (useDefaultTheme && themes[i] == "default")
-				ci.i() = i;
-		}
-	}
+	pathInit();
+	// Populate themes
+	ConfigItem& ci = config["game/theme"];
+	for (std::string const& theme: getThemes()) ci.addEnum(theme);
+	if (ci.i() == -1) ci.selectEnum("default");  // Select the default theme if nothing is selected
 }
+
