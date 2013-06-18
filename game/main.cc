@@ -133,6 +133,7 @@ void mainLoop(std::string const& songlist) {
 	std::clog << "core/notice: Starting the audio subsystem (errors printed on console may be ignored)." << std::endl;
 	Audio audio;
 	std::clog << "core/info: Loading assets." << std::endl;
+	Gettext localization(PACKAGE);
 	Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());
 	Backgrounds backgrounds;
 	Database database(getConfigDir() / "database.xml");
@@ -279,7 +280,6 @@ template <typename Container> void confOverride(Container const& c, std::string 
 void outputOptionalFeatureStatus();
 
 int main(int argc, char** argv) try {
-	Gettext gettext(PACKAGE);  // Initialize gettext
 	signalSetup();
 	std::ios::sync_with_stdio(false);  // We do not use C stdio
 	std::srand(std::time(nullptr));
