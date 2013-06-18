@@ -45,24 +45,24 @@ void Songs::reload_internal() {
 	Paths paths = getPathsConfig("paths/songs");
 	for (auto it = paths.begin(); m_loading && it != paths.end(); ++it) {
 		try {
-			if (!fs::is_directory(*it)) { m_debug << "songs/info: >>> Not scanning: " << *it << " (no such directory)\n"; continue; }
-			m_debug << "songs/info: >>> Scanning " << *it << std::endl;
+			if (!fs::is_directory(*it)) { std::clog << "songs/info: >>> Not scanning: " << *it << " (no such directory)\n"; continue; }
+			std::clog << "songs/info: >>> Scanning " << *it << std::endl;
 			size_t count = m_songs.size();
 			reload_internal(*it);
 			size_t diff = m_songs.size() - count;
-			if (diff > 0 && m_loading) m_debug << "songs/info: " << diff << " songs loaded\n";
+			if (diff > 0 && m_loading) std::clog << "songs/info: " << diff << " songs loaded\n";
 		} catch (std::exception& e) {
-			m_debug << "songs/error: >>> Error scanning " << *it << ": " << e.what() << '\n';
+			std::clog << "songs/error: >>> Error scanning " << *it << ": " << e.what() << '\n';
 		}
 	}
 	prof("total");
 	if (m_loading) dumpSongs_internal(); // Dump the songlist to file (if requested)
-	m_debug << std::flush;
+	std::clog << std::flush;
 	m_loading = false;
 }
 
 void Songs::reload_internal(fs::path const& parent) {
-	if (std::distance(parent.begin(), parent.end()) > 20) { m_debug << "songs/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)\n"; return; }
+	if (std::distance(parent.begin(), parent.end()) > 20) { std::clog << "songs/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)\n"; return; }
 	try {
 		boost::regex expression(R"((\.txt|^song\.ini|^notes\.xml|\.sm)$)", boost::regex_constants::icase);
 		for (fs::directory_iterator dirIt(parent), dirEnd; m_loading && dirIt != dirEnd; ++dirIt) {
@@ -76,11 +76,11 @@ void Songs::reload_internal(fs::path const& parent) {
 				m_songs.push_back(s);
 				m_dirty = true;
 			} catch (SongParserException& e) {
-				m_debug << e; // Prints formatted message in our log format
+				std::clog << e;
 			}
 		}
 	} catch (std::exception const& e) {
-		m_debug << "songs/error: Error accessing " << parent << ": " << e.what() << '\n';
+		std::clog << "songs/error: Error accessing " << parent << ": " << e.what() << '\n';
 	}
 }
 
@@ -126,12 +126,6 @@ void Songs::setFilter(std::string const& val) {
 void Songs::filter_internal() {
 	m_updateTimer.setValue(0.0);
 	boost::mutex::scoped_lock l(m_mutex);
-	// Print messages when loading has finished
-	if (!m_loading) {
-		// Logging system requires flushing after each message (i.e. after each line because songparser errors are oneliners).
-		for (std::string line; std::getline(m_debug, line); std::clog << line << std::endl) {}
-		m_debug.str(""); m_debug.clear();
-	}
 	m_dirty = false;
 	RestoreSel restore(*this);
 	try {

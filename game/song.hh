@@ -158,10 +158,6 @@ private:
 	bool m_silent;
 };
 
-static inline std::ostream& operator<<(std::ostream& os, SongParserException const& e) {
-	if (e.silent()) return os;
-	os << "songparser/error: " << e.file();
-	if (e.line()) os << ":" << e.line();
-	return os << ": " << e.what() << std::endl;
-}
+/// Print a SongParserException in a format suitable for the logging system.
+std::ostream& operator<<(std::ostream& os, SongParserException const& e);
 

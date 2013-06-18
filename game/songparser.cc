@@ -95,6 +95,8 @@ SongParser::SongParser(Song& s) try:
 	if (!m_song.midifilename.empty()) midParseHeader();
 
 	s.loadStatus = Song::HEADER;
+} catch (SongParserException&) {
+	throw;
 } catch (std::runtime_error& e) {
 	throw SongParserException(m_song, e.what(), m_linenum);
 } catch (std::exception& e) {
@@ -128,7 +130,7 @@ void SongParser::guessFiles() {
 	for (auto const& p: fields) {
 		fs::path& file = *p.first;
 		if (!file.empty() && !is_regular_file(file)) {
-			logMissing += " \"" + file.filename().string() + "\"";
+			logMissing += "  " + file.filename().string();
 			file.clear();
 		}
 		if (file.empty()) missing = true;
@@ -145,16 +147,16 @@ void SongParser::guessFiles() {
 			std::string name = f.filename().string(); // File basename
 			if (!regex_search(name, regexps[i])) continue;  // No match for current file
 			field = f;
-			logFound += " \"" + name + "\"";
+			logFound += "  " + name;
 		}
 		files.erase(field);  // Remove from available options
 	}
 
 	if (logFound.empty() && logMissing.empty()) return;
-	std::clog << "songparser/" << (logMissing.empty() ? "info" : "warning") << ": \"" + m_song.filename.string() + "\":";
-	if (!logMissing.empty()) std::clog << logMissing + " not found  ";
-	if (!logFound.empty()) std::clog << logFound + " autodetected";
-	std::clog << std::endl;
+	std::clog << "songparser/" << (logMissing.empty() ? "debug" : "notice") << ": " + m_song.filename.string() + ":\n";
+	if (!logMissing.empty()) std::clog << "  Not found:    " + logMissing + "\n";
+	if (!logFound.empty()) std::clog << "  Autodetected: " + logFound + "\n";
+	std::clog << std::flush;
 
 }
 

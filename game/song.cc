@@ -94,3 +94,11 @@ bool Song::getPrevSection(double pos, SongSection &section) {
 	// returning false here will jump backwards by 5s (see screen_sing.cc)
 	return false;
 }
+
+std::ostream& operator<<(std::ostream& os, SongParserException const& e) {
+	os << (e.silent() ? "songparser/debug: " : "songparser/warning: ") << e.file().string();
+	if (e.line()) os << ":" << e.line();
+	os << ":\n  " << e.what() << std::endl;
+	return os;
+}
+
