@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.6)
 
 # Libraries
 
-find_package(Boost 1.34 REQUIRED COMPONENTS filesystem program_options)
+find_package(Boost 1.34 REQUIRED COMPONENTS filesystem program_options system)
 include_directories(${Boost_INCLUDE_DIRS})
 
 # Find all the libs that don't require extra parameters
