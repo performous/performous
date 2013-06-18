@@ -218,7 +218,7 @@ void SongParser::finalize() {
 			for (auto itn = vocal.notes.begin(); itn != vocal.notes.end();) {
 				Note::Type type = itn->type;
 				if(type == Note::SLEEP && lastType == Note::SLEEP) {
-					std::clog << "songparser/warning: " + m_song.filename.string() + ": Discarding empty sentence" << std::endl;
+					std::clog << "songparser/info: " + m_song.filename.string() + ": Discarding empty sentence" << std::endl;
 					itn = vocal.notes.erase(itn);
 				} else {
 					++itn;

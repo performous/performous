@@ -208,9 +208,8 @@ void SongParser::midParse() {
 	// Output some warning
 	if (reversedNoteCount > 0) {
 		std::ostringstream oss;
-		oss << "Skipping " << reversedNoteCount << " reversed note(s) in ";
-		oss << s.path << s.midifilename << std::endl;
-		std::clog << "songparser/warning: " << oss.str(); // More likely to be atomic when written as one string
+		oss << "songparser/notice: Skipping " << reversedNoteCount << " reversed note(s) in " << s.midifilename.string();
+		std::clog << oss.str() << std::endl; // More likely to be atomic when written as one string
 	}
 	// copy midi sections to song section
 	// design goals: (1) keep midi parser free of dependencies on song (2) store data in song as parsers are discarded before song
