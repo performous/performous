@@ -83,7 +83,8 @@ void SongParser::xmlParseHeader() {
 	// Extract artist and title from XML comments
 	{
 		xmlpp::NodeSet comments;
-		dom.find("/ss:MELODY/comment()", comments);
+		// Comments inside or before root element
+		dom.find("/ss:MELODY/comment()", comments) || dom.find("/ss:MELODY/../comment()", comments);
 		for (auto const& node: comments) {
 			std::string str = dynamic_cast<xmlpp::CommentNode const&>(*node).get_content();
 			boost::trim(str);
