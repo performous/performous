@@ -352,8 +352,7 @@ struct Controllers::Impl {
 	}
 	bool pushMappedEvent(Event& ev) {
 		if (ev.button == GENERIC_UNASSIGNED) return false;
-		// FIXME: Do we need this? Enabling it causes pause menu to require two Enter presses
-		//if (!valueChanged(ev)) return false;  // Avoid repeated or other useless events
+		if (!valueChanged(ev)) return false;  // Avoid repeated or other useless events
 		std::clog << "controllers/debug: processing " << ev << std::endl;
 		ev.nav = navigation(ev);
 		// Emit nav event
