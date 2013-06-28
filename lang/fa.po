@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-06-28 12:07+0330\n"
+"POT-Creation-Date: 2013-06-28 14:24+0330\n"
 "PO-Revision-Date: \n"
 "Last-Translator: sajjadg <sajjad.gerami@gmail.com>\n"
 "Language-Team: GeramiBros <sajjad.gerami@gmail.com>\n"
@@ -283,7 +283,7 @@ msgstr "هیچ آهنگی با واژه جستجو شده مطابقت ندار�
 # \n
 #: ../game/screen_songs.cc:288
 msgid "Hiscore\n"
-msgstr "برترین امتیازات %1%\n"
+msgstr "برترین امتیازات\n"
 
 #: ../game/screen_songs.cc:298
 msgid "<type in to search>   ↔ songs    ↕ options"
@@ -508,11 +508,11 @@ msgstr "برای اضافه شدن ضربه بزن"
 
 #: ../game/screen_sing.cc:475
 msgid "   ENTER to skip instrumental break"
-msgstr "    کلید Enter بزنید برای پخش نشدن صدای خراب کردن ساز"
+msgstr "برای پخش نشدن صدای خراب کردن ساز کلید Enter بزنید"
 
 #: ../game/screen_sing.cc:476
 msgid "   Remember to wait for grading!"
-msgstr "  بیاد آورید که برای درجه بندی صبر کنید!"
+msgstr "  فراموش نکنید که برای درجه بندی صبر کنید!"
 
 #: ../game/screen_sing.cc:587
 msgid "No player!"
@@ -668,6 +668,468 @@ msgstr "درام پر است!"
 msgid "Solo!"
 msgstr "تک نوازی!"
 
+#: ../game/song.hh:23
+msgid "Guitar"
+msgstr "گیتار"
+
+#: ../game/song.hh:23
+msgid "Coop guitar"
+msgstr "گیتار دوم"
+
+#: ../game/song.hh:23
+msgid "Rhythm guitar"
+msgstr "گیتار ریتم"
+
+#: ../game/song.hh:23
+msgid "Bass"
+msgstr "باس"
+
+#: ../game/song.hh:23
+msgid "Drums"
+msgstr "تمبک"
+
+#: ../game/song.hh:23
+msgid "Vocals"
+msgstr "خوانندگی"
+
+#: ../game/song.hh:23
+msgid "Harmonic 1"
+msgstr "هارمونیک ۱"
+
+#: ../game/song.hh:23
+msgid "Harmonic 2"
+msgstr "هارمونیک ۲"
+
+#: ../game/song.hh:23
+msgid "Harmonic 3"
+msgstr "هارمونیک ۳"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:2
+msgid "Game"
+msgstr "بازی"
+
+# ترجمه جایگزین برای گیم پلی چیست؟
+#: /tmp/xml2gettext.ULKRBsk8PL:3
+msgid "Gameplay related options"
+msgstr "تنظیمات مریوط به گیم پلی"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:4
+msgid "Graphic"
+msgstr "گرافیک (نگاره)"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:5
+msgid "Configure rendering and video settings"
+msgstr "پیکربندی رندر کردن و تنظیمات تصویر"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:6
+msgid "Audio Devices"
+msgstr "دستگاه های صوتی"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:7
+msgid "Setup microphones and playback"
+msgstr "راه اندازی میکروفن(دهنی) و بازبخش"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:8
+msgid "Audio"
+msgstr "صوت"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:9
+msgid "Configure general audio settings"
+msgstr "پیکربندی کلی تنظیمات صوتی"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:10
+msgid "Paths"
+msgstr "مسیر"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:11
+msgid "Setup song and data paths"
+msgstr "راه اندازی آهنگ و مسیرهای داده"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:12
+msgid "Karaoke mode"
+msgstr "حالت همخوانی"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:13
+msgid "Hide pitch wave, notes and scoring."
+msgstr "مخفی کردن دانگ صدا نت ها و امتیازها"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:14
+msgid "Pitch waves"
+msgstr "دانگ‌ اصوات"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:15
+msgid "Enable singing pitch display (when not in karaoke mode)."
+msgstr "فعال کردن نمایش زیر و بمی صدا (زمانی که در حالت همخوانی نیستید)"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:16
+msgid "Theme"
+msgstr "پوسته"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:17
+msgid "Name of the theme to use."
+msgstr "نام پوسته یا مسیر پوشه ی پوسته ها"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:18
+msgid "Keyboard as guitar"
+msgstr "صفحه کلید به جای گیتار"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:19
+msgid "Enable keyboard as guitar (Frets on Fire mode)."
+msgstr "فعال کردن صفحه کلید بجای گیتار(حالت Frets on Fire)"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:20
+msgid "Keyboard as drumkit"
+msgstr "صفحه کلید بجای درام"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:21
+msgid "Enable keyboard as drumkit."
+msgstr "فعال کردن صفحه کلید بجای درام"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:22
+msgid "Keyboard as dance pad"
+msgstr "صفحه کلید بجای تخته رقص"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:23
+msgid "Enable keyboard as dance pad."
+msgstr "فعال کردن صفحه کلید بجای تخته رقص."
+
+#: /tmp/xml2gettext.ULKRBsk8PL:24
+msgid "Keyboard as keytar"
+msgstr "صفحه کلید بجای کیتار."
+
+#: /tmp/xml2gettext.ULKRBsk8PL:25
+msgid "Enable keyboard as keytar."
+msgstr "فعال کردن صفحه کلید بجای کیتار."
+
+#: /tmp/xml2gettext.ULKRBsk8PL:26
+msgid "Force controller A's type"
+msgstr "مدل A دسته را اعمال کن"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:27
+msgid ""
+"Override autodetection and force the first controller to the given type."
+msgstr "شناسایی خودکار را با اولین نوع دسته داده شده جایگزین کن"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:28
+msgid "Force controller B's type"
+msgstr "مدل B دسته را اعمال کن"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:29
+msgid ""
+"Override autodetection and force the second controller to the given type."
+msgstr "شناسایی خودکار را با دومین نوع دسته داده شده جایگزین کن"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:30
+msgid "Force controller C's type"
+msgstr "مدل C دسته را اعمال کن"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:31
+msgid ""
+"Override autodetection and force the third controller to the given type."
+msgstr "شناسایی خودکار را با سومین نوع دسته داده شده جایگزین کن"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:32
+msgid "Force controller D's type"
+msgstr "مدل D دسته را اعمال کن"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:33
+msgid ""
+"Override autodetection and force the fourth controller to the given type."
+msgstr "شناسایی خودکار را با چهارمین نوع دسته داده شده جایگزین کن"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:34
+msgid "Joystick configuration"
+msgstr "پیکربندی دسته فرمان"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:35
+msgid "Force joystick to some kind of instrument."
+msgstr "اجبار کردن دسته فرمان برای ساز"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:36
+msgid "Hardware MIDI input device"
+msgstr "دستگاه سخت افزار ورودی MIDI"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:37
+msgid ""
+"Regex for matching the MIDI devices to use. The default is to use all "
+"available devices."
+msgstr "الگوی تطابق دستگاه های MIDI. پیش فرض استفاده از همه دستگاه هاست."
+
+#: /tmp/xml2gettext.ULKRBsk8PL:38
+msgid "Fallback song encoding"
+msgstr "رمزگزاری آهنگ جایگزین"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:39
+msgid "Pick the text codec used for song files that are not UTF-8."
+msgstr "برای آهنگ هایی که UTF-8 نیستند رمزگشای متن را استفاده کن."
+
+#: /tmp/xml2gettext.ULKRBsk8PL:40
+msgid "Windowed width"
+msgstr "عرض صفحه"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:41
+msgid "The width of the window."
+msgstr "عرض صفحه"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:42
+msgid "Windowed height"
+msgstr "ارتفاع صفحه"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:43
+msgid "The height of the window."
+msgstr "ارتفاع صفحه"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:44
+msgid "Fullscreen mode"
+msgstr "حالت تمام صفحه"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:45
+msgid "Enable fullscreen mode on startup."
+msgstr "فعال کردن حالت تمام صفحه هنگام شروع"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:46
+msgid "Stereoscopic 3D"
+msgstr "برجسته بین سه بعدی"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:47
+msgid "Enable 3D rendering of Performous."
+msgstr "فعال کردن حالت سه یعدی پرفورمیوس"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:48
+msgid "Stereo3D type"
+msgstr "حالت سه بعدی"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:49
+msgid "Some modes may only get activated in fullscreen mode."
+msgstr "بعضی از حالات فقط در حالت تمام صفحه فعال می شوند"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:50
+msgid "Stereo3D separation"
+msgstr "تفکیک سه بعدی"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:51
+msgid ""
+"The strength of the effect. Experiment with different settings for best "
+"results."
+msgstr "قدرت اثر. برای نتیجه بهتر با یک تنظیم دیگر امتحان کنید."
+
+#: /tmp/xml2gettext.ULKRBsk8PL:52
+msgid "Video playback"
+msgstr "پخش تصویر"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:53
+msgid ""
+"Allows completely disabling background videos. It is recommended to leave "
+"this enabled as Performous will still smoothly fade out the video if your "
+"computer is not fast enough."
+msgstr ""
+"اجازه دادن برای غیر فعال کردن کامل پس ضمینه ی تصویری. توصیه می شود این گزینه "
+"را در حالت فعال قرار دهید چون که اگر رایانه شما به اندازه کافی سریع نباشد "
+"پرفورمیوس تصویر را به نرمی محو می کند."
+
+#: /tmp/xml2gettext.ULKRBsk8PL:54
+msgid "Webcam background"
+msgstr "تصویر زمینه دوربین..."
+
+#: /tmp/xml2gettext.ULKRBsk8PL:55
+msgid ""
+"Performous can use webcam as a background video. Disable it if Performous "
+"crashes while entering a song."
+msgstr ""
+"پرفورمیوس میتواند از دوربین به عنوان تصویر پس ضمینه استفاده کند. اگر "
+"پرفورمیوس موقع ورود به یک آهنگ متوقف شد این گزینه را غیر فعال کنید."
+
+#: /tmp/xml2gettext.ULKRBsk8PL:56
+msgid "Webcam id"
+msgstr "شماره دوربین"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:57
+msgid ""
+"Use -1 to autodetect or a number starting from 0 to choose specific device."
+msgstr ""
+"برای شناسایی خودکار -۱ و یا یک عدد که با ۰ شروع می شود را برای انتخاب دستگاه "
+"خاص وارد کنید."
+
+#: /tmp/xml2gettext.ULKRBsk8PL:58
+msgid "SVG quality"
+msgstr "کیفیت SVG"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:59
+msgid ""
+"Larger numbers cause vector graphics to be rendered in higher resolution. "
+"Decrease this to make navigating in menus faster."
+msgstr ""
+"مقادیر بزرگ باعث می شود که بردارهای گرافیکی با کیفیت بالا نقش شوند. کاهش "
+"مقادیر باعث سرعت منو می شود."
+
+#: /tmp/xml2gettext.ULKRBsk8PL:60
+msgid "Text quality"
+msgstr "کیفیت متن"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:61
+msgid ""
+"Larger numbers cause text to be rendered in higher resolution. Decrease this "
+"to make everything a little faster."
+msgstr ""
+"مقادیر بزرگ باعث می شود که متون با کیفیت بالا نقش شوند. کاهش مقادیر باعث "
+"سرعت اندکی در همه چیز می شود."
+
+#: /tmp/xml2gettext.ULKRBsk8PL:62
+msgid "Benchmark mode"
+msgstr "حالت محک"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:63
+msgid ""
+"Framerate limit of 100 FPS is removed and the game instead renders at full "
+"speed. FPS values are printed to console. Please note that the display "
+"drivers may still limit the rendering speed to the screen refresh rate."
+msgstr ""
+"حد نرخ عبور تصویر(FPS) برابر ۱۰۰ حذف گردید و بازی با سرعت بالا نگاره می شود. "
+"مقادیر FPS در کنسول چاپ می شود. لطفا توجه داشته باشید که درایور صفحه نمایش "
+"هنوز هم ممکن است سرعت نگاره را با سرعت جاروب صفحه نمایش محدود کند."
+
+#: /tmp/xml2gettext.ULKRBsk8PL:64
+msgid "Suggested latency"
+msgstr "زمان تاخیر پیشنهادی"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:65
+msgid ""
+"This is a hint for the audio engine about the desired latency. Set this as "
+"low as possible while retaining clear audio playback. Requires restart."
+msgstr ""
+"این یک تذکر برای متور صدا درمورد تاخیر خواسته شده است. اگر کیفیت صدای پایین "
+"دارید این مقدار را پایین بیاورید. نیاز به شروع مجدد دارد."
+
+#: /tmp/xml2gettext.ULKRBsk8PL:66
+msgid "Audio/video latency"
+msgstr "تاخیر صدا و تصویر"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:67
+msgid ""
+"Affects all modes. Use negative value if your display input lag is greater "
+"than the sound card output latency, positive values in the opposite case and "
+"zero if they are equal. This should be set so that the notes pass the cursor "
+"at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while "
+"performing."
+msgstr ""
+"روی همه ی حالت ها تاثر دارد. اگر تاخیر در ورودی نمایش بزرگتر از تاخیر کارت "
+"صداست از مقادیر منفی استفاده کنید در حالت برعکس از مقادیر مثبت و صفر اگر "
+"باهم برابر است. این مقدار باید تنظیم شود تا نت همان زمانی که صدایش شنیده می "
+"شود از خط عبور کند. از کلید Ctrl+F1/F2 در حال اجرا برای تنظیم استفاده کنید."
+
+#: /tmp/xml2gettext.ULKRBsk8PL:68
+msgid "Audio round-trip latency"
+msgstr "تاخیر در رفت و آمد صدا"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:69
+msgid ""
+"Affects singing only. The time it takes for Performous playback to reach "
+"your speakers, fly to the microphone and all the way back until Performous "
+"captures and analyzes it. While performing, press Ctrl+S for synth mode and "
+"adjust with Ctrl+F3/F4."
+msgstr ""
+"فقط روی خواندن تاثیر میگذارد. زمانی که طول می کشد که پخش پرفورمیوس به "
+"بلندگوی شما برسد از میکروفن عبور کند و پرفورمیوس آن را دریافت کند و تجزیه و "
+"تحلیل کند. در زمان اجرا Ctrl+S بزنید تا به حالت تنظیم بروید و با Ctrl+F3/F4 "
+"تنظیم کنید."
+
+#: /tmp/xml2gettext.ULKRBsk8PL:70
+msgid "Audio/controller latency"
+msgstr "تاخیر در صدا و کنترلر"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:71
+msgid ""
+"Affects instruments and dancing only. The total of USB (guitar or dance pad) "
+"latency combined with audio output latency. Adjust so that you can hit the "
+"notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to "
+"adjust while performing."
+msgstr ""
+"فقط روی ساز و رقص تاثیر دارد. کل تاخیر یو اس بی (گیتار و تخته رقص) به همراه "
+"تاخیر خروجی صدا. تنظیم کنید تا بتوانید در بهترین حالت زمانی که نت را می "
+"شنوید بزنید (نه زمانی که نت را روی صفحه می بینید). از کلید Ctrl+F5/F6 برای "
+"تنظیم حین اجرا استفاده کنید."
+
+#: /tmp/xml2gettext.ULKRBsk8PL:72
+msgid "Audio devices"
+msgstr "دستگاه های صوتی"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:73
+msgid "List of audio devices to try."
+msgstr "فهرستی از دستگاه های صدا برای آزمایش کردن."
+
+#: /tmp/xml2gettext.ULKRBsk8PL:74
+msgid "Menu volume"
+msgstr "میزان صدای منو"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:75
+msgid "The volume level of menus, song previews and jukebox mode."
+msgstr "میزان صدای منوها پیش نمایش آهنگ ها و حالت جعبه موزیک"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:76
+msgid "Music volume"
+msgstr "میزان صدای آهنگ"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:77
+msgid ""
+"The ingame music volume. Values above 90 are not recommended as distortion "
+"may occur."
+msgstr ""
+"میزان صدای آهنگ داخل بازی. مقادیر بالاتر از ۹۰ توصیه نمی شوند چون ممکن است "
+"باعث اغتشاش صوتی گردند."
+
+#: /tmp/xml2gettext.ULKRBsk8PL:78
+msgid "Failure volume"
+msgstr "میزان صدای خراب کردن آهنگ"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:79
+msgid ""
+"The ingame fail sound volume. Values above 90 are not recommended as "
+"distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
+msgstr ""
+"میزان صدای خراب کردن آهنگ داخل بازی. مقادیر بالاتر از ۹۰ توصیه نمی شوند چون "
+"ممکن است باعث اغتشاش صوتی گردند. 11 بلندتر از 9 است اما تا ۱۰۰ می رود. 89 "
+"بلندترین"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:80
+msgid "Microphone pass-through"
+msgstr "صدای میانی میکروفن"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:81
+msgid "Send captured singing voice to speakers."
+msgstr "ارسال صدای خواننده به بلندگو"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:82
+msgid "Pass-through volume ratio"
+msgstr "میزان حجم صدای میانی"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:83
+msgid "How much voice is amplified compared to the music."
+msgstr "چقدر صدا در مقایسه با موسیقی بلند شده."
+
+#: /tmp/xml2gettext.ULKRBsk8PL:84
+msgid "Song folders"
+msgstr "پوشه آهنگ ها"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:85
+msgid ""
+"Where to recursively look for songs. DATADIR at the beginning means all "
+"Performous data folders."
+msgstr ""
+"جایی که به صورت بازگشتی به دنبال آهنگ میگردد. DATADIR در آغاز به معنی تمامی "
+"پوشه های پرفورمیوس است."
+
+#: /tmp/xml2gettext.ULKRBsk8PL:86
+msgid "Base folders for data"
+msgstr "پوشه اصلی اطلاعات"
+
+#: /tmp/xml2gettext.ULKRBsk8PL:87
+msgid ""
+"System defaults are included automatically. Additional paths can be added "
+"here."
+msgstr ""
+"پیش فرض های سیستم بصورت خودکار اضافه شده اند. مسیر های اضافی را اینجا وارد "
+"کنید."
+
 #~ msgid "Start the game with all songs in playlist"
 #~ msgstr "بازی را با همه آهنگ های درون لیست پخش اجرا کن"
 
@@ -676,379 +1138,6 @@ msgstr "تک نوازی!"
 
 #~ msgid "Back to song browser"
 #~ msgstr "بازگشت به مرورگر آهنگ"
-
-#~ msgid "Guitar"
-#~ msgstr "گیتار"
-
-#~ msgid "Coop guitar"
-#~ msgstr "گیتار دوم"
-
-#~ msgid "Rhythm guitar"
-#~ msgstr "گیتار ریتم"
-
-#~ msgid "Bass"
-#~ msgstr "باس"
-
-#~ msgid "Drums"
-#~ msgstr "تمبک"
-
-#~ msgid "Vocals"
-#~ msgstr "خوانندگی"
-
-#~ msgid "Harmonic 1"
-#~ msgstr "هارمونیک ۱"
-
-#~ msgid "Harmonic 2"
-#~ msgstr "هارمونیک ۲"
-
-#~ msgid "Harmonic 3"
-#~ msgstr "هارمونیک ۳"
-
-#~ msgid "Game"
-#~ msgstr "بازی"
-
-# ترجمه جایگزین برای گیم پلی چیست؟
-#~ msgid "Gameplay related options"
-#~ msgstr "تنظیمات مریوط به گیم پلی"
-
-#~ msgid "Graphic"
-#~ msgstr "گرافیک (نگاره)"
-
-#~ msgid "Configure rendering and video settings"
-#~ msgstr "پیکربندی رندر کردن و تنظیمات تصویر"
-
-#~ msgid "Audio Devices"
-#~ msgstr "دستگاه های صوتی"
-
-#~ msgid "Setup microphones and playback"
-#~ msgstr "راه اندازی میکروفن(دهنی) و بازبخش"
-
-#~ msgid "Audio"
-#~ msgstr "صوت"
-
-#~ msgid "Configure general audio settings"
-#~ msgstr "پیکربندی کلی تنظیمات صوتی"
-
-#~ msgid "Paths"
-#~ msgstr "مسیر"
-
-#~ msgid "Setup song and data paths"
-#~ msgstr "راه اندازی آهنگ و مسیرهای داده"
-
-#~ msgid "Karaoke mode"
-#~ msgstr "حالت همخوانی"
-
-#~ msgid "Hide pitch wave, notes and scoring."
-#~ msgstr "مخفی کردن دانگ صدا نت ها و امتیازها"
-
-#~ msgid "Pitch waves"
-#~ msgstr "دانگ‌ اصوات"
-
-#~ msgid "Enable singing pitch display (when not in karaoke mode)."
-#~ msgstr "فعال کردن نمایش زیر و بمی صدا (زمانی که در حالت همخوانی نیستید)"
-
-#~ msgid "Theme"
-#~ msgstr "پوسته"
-
-#~ msgid "Name of the theme to use."
-#~ msgstr "نام پوسته یا مسیر پوشه ی پوسته ها"
-
-#~ msgid "Keyboard as guitar"
-#~ msgstr "صفحه کلید به جای گیتار"
-
-#~ msgid "Enable keyboard as guitar (Frets on Fire mode)."
-#~ msgstr "فعال کردن صفحه کلید بجای گیتار(حالت Frets on Fire)"
-
-#~ msgid "Keyboard as drumkit"
-#~ msgstr "صفحه کلید بجای درام"
-
-#~ msgid "Enable keyboard as drumkit."
-#~ msgstr "فعال کردن صفحه کلید بجای درام"
-
-#~ msgid "Keyboard as dance pad"
-#~ msgstr "صفحه کلید بجای تخته رقص"
-
-#~ msgid "Enable keyboard as dance pad."
-#~ msgstr "فعال کردن صفحه کلید بجای تخته رقص."
-
-#~ msgid "Keyboard as keytar"
-#~ msgstr "صفحه کلید بجای کیتار."
-
-#~ msgid "Enable keyboard as keytar."
-#~ msgstr "فعال کردن صفحه کلید بجای کیتار."
-
-#~ msgid "Force controller A's type"
-#~ msgstr "مدل A دسته را اعمال کن"
-
-#~ msgid ""
-#~ "Override autodetection and force the first controller to the given type."
-#~ msgstr "شناسایی خودکار را با اولین نوع دسته داده شده جایگزین کن"
-
-#~ msgid "Force controller B's type"
-#~ msgstr "مدل B دسته را اعمال کن"
-
-#~ msgid ""
-#~ "Override autodetection and force the second controller to the given type."
-#~ msgstr "شناسایی خودکار را با دومین نوع دسته داده شده جایگزین کن"
-
-#~ msgid "Force controller C's type"
-#~ msgstr "مدل C دسته را اعمال کن"
-
-#~ msgid ""
-#~ "Override autodetection and force the third controller to the given type."
-#~ msgstr "شناسایی خودکار را با سومین نوع دسته داده شده جایگزین کن"
-
-#~ msgid "Force controller D's type"
-#~ msgstr "مدل D دسته را اعمال کن"
-
-#~ msgid ""
-#~ "Override autodetection and force the fourth controller to the given type."
-#~ msgstr "شناسایی خودکار را با چهارمین نوع دسته داده شده جایگزین کن"
-
-#~ msgid "Joystick configuration"
-#~ msgstr "پیکربندی دسته فرمان"
-
-#~ msgid "Force joystick to some kind of instrument."
-#~ msgstr "اجبار کردن دسته فرمان برای ساز"
-
-#~ msgid "Hardware MIDI input device"
-#~ msgstr "دستگاه سخت افزار ورودی MIDI"
-
-#~ msgid ""
-#~ "Regex for matching the MIDI devices to use. The default is to use all "
-#~ "available devices."
-#~ msgstr "الگوی تطابق دستگاه های MIDI. پیش فرض استفاده از همه دستگاه هاست."
-
-#, fuzzy
-#~ msgid "Fallback song encoding"
-#~ msgstr "رمزگزاری آهنگ جایگزین"
-
-#~ msgid "Pick the text codec used for song files that are not UTF-8."
-#~ msgstr "برای آهنگ هایی که UTF-8 نیستند رمزگشای متن را استفاده کن."
-
-#~ msgid "Windowed width"
-#~ msgstr "عرض صفحه"
-
-#~ msgid "The width of the window."
-#~ msgstr "عرض صفحه"
-
-#~ msgid "Windowed height"
-#~ msgstr "ارتفاع صفحه"
-
-#~ msgid "The height of the window."
-#~ msgstr "ارتفاع صفحه"
-
-#~ msgid "Fullscreen mode"
-#~ msgstr "حالت تمام صفحه"
-
-#~ msgid "Enable fullscreen mode on startup."
-#~ msgstr "فعال کردن حالت تمام صفحه هنگام شروع"
-
-#~ msgid "Stereoscopic 3D"
-#~ msgstr "برجسته بین سه بعدی"
-
-#~ msgid "Enable 3D rendering of Performous."
-#~ msgstr "فعال کردن حالت سه یعدی پرفورمیوس"
-
-#~ msgid "Stereo3D type"
-#~ msgstr "حالت سه بعدی"
-
-#~ msgid "Some modes may only get activated in fullscreen mode."
-#~ msgstr "بعضی از حالات فقط در حالت تمام صفحه فعال می شوند"
-
-#~ msgid "Stereo3D separation"
-#~ msgstr "تفکیک سه بعدی"
-
-#~ msgid ""
-#~ "The strength of the effect. Experiment with different settings for best "
-#~ "results."
-#~ msgstr "قدرت اثر. برای نتیجه بهتر با یک تنظیم دیگر امتحان کنید."
-
-#~ msgid "Video playback"
-#~ msgstr "پخش تصویر"
-
-#~ msgid ""
-#~ "Allows completely disabling background videos. It is recommended to leave "
-#~ "this enabled as Performous will still smoothly fade out the video if your "
-#~ "computer is not fast enough."
-#~ msgstr ""
-#~ "اجازه دادن برای غیر فعال کردن کامل پس ضمینه ی تصویری. توصیه می شود این "
-#~ "گزینه را در حالت فعال قرار دهید چون که اگر رایانه شما به اندازه کافی سریع "
-#~ "نباشد پرفورمیوس تصویر را به نرمی محو می کند."
-
-#~ msgid "Webcam background"
-#~ msgstr "تصویر زمینه دوربین..."
-
-#~ msgid ""
-#~ "Performous can use webcam as a background video. Disable it if Performous "
-#~ "crashes while entering a song."
-#~ msgstr ""
-#~ "پرفورمیوس میتواند از دوربین به عنوان تصویر پس ضمینه استفاده کند. اگر "
-#~ "پرفورمیوس موقع ورود به یک آهنگ متوقف شد این گزینه را غیر فعال کنید."
-
-#~ msgid "Webcam id"
-#~ msgstr "شماره دوربین"
-
-#~ msgid ""
-#~ "Use -1 to autodetect or a number starting from 0 to choose specific "
-#~ "device."
-#~ msgstr ""
-#~ "برای شناسایی خودکار -۱ و یا یک عدد که با ۰ شروع می شود را برای انتخاب "
-#~ "دستگاه خاص وارد کنید."
-
-#~ msgid "SVG quality"
-#~ msgstr "کیفیت SVG"
-
-#~ msgid ""
-#~ "Larger numbers cause vector graphics to be rendered in higher resolution. "
-#~ "Decrease this to make navigating in menus faster."
-#~ msgstr ""
-#~ "مقادیر بزرگ باعث می شود که بردارهای گرافیکی با کیفیت بالا نقش شوند. کاهش "
-#~ "مقادیر باعث سرعت منو می شود."
-
-#~ msgid "Text quality"
-#~ msgstr "کیفیت متن"
-
-#~ msgid ""
-#~ "Larger numbers cause text to be rendered in higher resolution. Decrease "
-#~ "this to make everything a little faster."
-#~ msgstr ""
-#~ "مقادیر بزرگ باعث می شود که متون با کیفیت بالا نقش شوند. کاهش مقادیر باعث "
-#~ "سرعت اندکی در همه چیز می شود."
-
-#~ msgid "Benchmark mode"
-#~ msgstr "حالت محک"
-
-#~ msgid ""
-#~ "Framerate limit of 100 FPS is removed and the game instead renders at "
-#~ "full speed. FPS values are printed to console. Please note that the "
-#~ "display drivers may still limit the rendering speed to the screen refresh "
-#~ "rate."
-#~ msgstr ""
-#~ "حد نرخ عبور تصویر(FPS) برابر ۱۰۰ حذف گردید و بازی با سرعت بالا نگاره می "
-#~ "شود. مقادیر FPS در کنسول چاپ می شود. لطفا توجه داشته باشید که درایور صفحه "
-#~ "نمایش هنوز هم ممکن است سرعت نگاره را با سرعت جاروب صفحه نمایش محدود کند."
-
-#~ msgid "Suggested latency"
-#~ msgstr "زمان تاخیر پیشنهادی"
-
-#~ msgid ""
-#~ "This is a hint for the audio engine about the desired latency. Set this "
-#~ "as low as possible while retaining clear audio playback. Requires restart."
-#~ msgstr ""
-#~ "این یک تذکر برای متور صدا درمورد تاخیر خواسته شده است. اگر کیفیت صدای "
-#~ "پایین دارید این مقدار را پایین بیاورید. نیاز به شروع مجدد دارد."
-
-#~ msgid "Audio/video latency"
-#~ msgstr "تاخیر صدا و تصویر"
-
-#~ msgid ""
-#~ "Affects all modes. Use negative value if your display input lag is "
-#~ "greater than the sound card output latency, positive values in the "
-#~ "opposite case and zero if they are equal. This should be set so that the "
-#~ "notes pass the cursor at the same time the audio is heard. Use Ctrl+F1/F2 "
-#~ "to adjust this while performing."
-#~ msgstr ""
-#~ "روی همه ی حالت ها تاثر دارد. اگر تاخیر در ورودی نمایش بزرگتر از تاخیر "
-#~ "کارت صداست از مقادیر منفی استفاده کنید در حالت برعکس از مقادیر مثبت و صفر "
-#~ "اگر باهم برابر است. این مقدار باید تنظیم شود تا نت همان زمانی که صدایش "
-#~ "شنیده می شود از خط عبور کند. از کلید Ctrl+F1/F2 در حال اجرا برای تنظیم "
-#~ "استفاده کنید."
-
-#~ msgid "Audio round-trip latency"
-#~ msgstr "تاخیر در رفت و آمد صدا"
-
-#~ msgid ""
-#~ "Affects singing only. The time it takes for Performous playback to reach "
-#~ "your speakers, fly to the microphone and all the way back until "
-#~ "Performous captures and analyzes it. While performing, press Ctrl+S for "
-#~ "synth mode and adjust with Ctrl+F3/F4."
-#~ msgstr ""
-#~ "فقط روی خواندن تاثیر میگذارد. زمانی که طول می کشد که پخش پرفورمیوس به "
-#~ "بلندگوی شما برسد از میکروفن عبور کند و پرفورمیوس آن را دریافت کند و تجزیه "
-#~ "و تحلیل کند. در زمان اجرا Ctrl+S بزنید تا به حالت تنظیم بروید و با Ctrl"
-#~ "+F3/F4 تنظیم کنید."
-
-#~ msgid "Audio/controller latency"
-#~ msgstr "تاخیر در صدا و کنترلر"
-
-#~ msgid ""
-#~ "Affects instruments and dancing only. The total of USB (guitar or dance "
-#~ "pad) latency combined with audio output latency. Adjust so that you can "
-#~ "hit the notes best when playing by ear (not looking on screen). Use Ctrl"
-#~ "+F5/F6 to adjust while performing."
-#~ msgstr ""
-#~ "فقط روی ساز و رقص تاثیر دارد. کل تاخیر یو اس بی (گیتار و تخته رقص) به "
-#~ "همراه تاخیر خروجی صدا. تنظیم کنید تا بتوانید در بهترین حالت زمانی که نت "
-#~ "را می شنوید بزنید (نه زمانی که نت را روی صفحه می بینید). از کلید Ctrl+F5/"
-#~ "F6 برای تنظیم حین اجرا استفاده کنید."
-
-#~ msgid "Audio devices"
-#~ msgstr "دستگاه های صوتی"
-
-#~ msgid "List of audio devices to try."
-#~ msgstr "فهرستی از دستگاه های صدا برای آزمایش کردن."
-
-#~ msgid "Menu volume"
-#~ msgstr "میزان صدای منو"
-
-#~ msgid "The volume level of menus, song previews and jukebox mode."
-#~ msgstr "میزان صدای منوها پیش نمایش آهنگ ها و حالت جعبه موزیک"
-
-#~ msgid "Music volume"
-#~ msgstr "میزان صدای آهنگ"
-
-#~ msgid ""
-#~ "The ingame music volume. Values above 90 are not recommended as "
-#~ "distortion may occur."
-#~ msgstr ""
-#~ "میزان صدای آهنگ داخل بازی. مقادیر بالاتر از ۹۰ توصیه نمی شوند چون ممکن "
-#~ "است باعث اغتشاش صوتی گردند."
-
-#~ msgid "Failure volume"
-#~ msgstr "میزان صدای خراب کردن آهنگ"
-
-#~ msgid ""
-#~ "The ingame fail sound volume. Values above 90 are not recommended as "
-#~ "distortion may occur. 11 is louder than 10, but these go to 100. 89 "
-#~ "louder!"
-#~ msgstr ""
-#~ "میزان صدای خراب کردن آهنگ داخل بازی. مقادیر بالاتر از ۹۰ توصیه نمی شوند "
-#~ "چون ممکن است باعث اغتشاش صوتی گردند. 11 بلندتر از 9 است اما تا ۱۰۰ می "
-#~ "رود. 89 بلندترین"
-
-#~ msgid "Microphone pass-through"
-#~ msgstr "صدای میانی میکروفن"
-
-#~ msgid "Send captured singing voice to speakers."
-#~ msgstr "ارسال صدای خواننده به بلندگو"
-
-#, fuzzy
-#~ msgid "Pass-through volume ratio"
-#~ msgstr "میزان حجم صدای میانی"
-
-#~ msgid "How much voice is amplified compared to the music."
-#~ msgstr "چقدر صدا در مقایسه با موسیقی بلند شده."
-
-#~ msgid "Song folders"
-#~ msgstr "پوشه آهنگ ها"
-
-#~ msgid ""
-#~ "Where to recursively look for songs. DATADIR at the beginning means all "
-#~ "Performous data folders."
-#~ msgstr ""
-#~ "جایی که به صورت بازگشتی به دنبال آهنگ میگردد. DATADIR در آغاز به معنی "
-#~ "تمامی پوشه های پرفورمیوس است."
-
-#~ msgid "Base folders for data"
-#~ msgstr "پوشه اصلی اطلاعات"
-
-#~ msgid ""
-#~ "System defaults are included automatically. Additional paths can be added "
-#~ "here."
-#~ msgstr ""
-#~ "پیش فرض های سیستم بصورت خودکار اضافه شده اند. مسیر های اضافی را اینجا "
-#~ "وارد کنید."
 
 #~ msgid "(press END to view hiscores)"
 #~ msgstr "(برای مشاهده جدول امتیازات END را بزنید)"
