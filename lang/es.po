@@ -4,7 +4,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-05-24 12:47+0100\n"
 "PO-Revision-Date: \n"
-"Last-Translator: Alvaro Fernando García <alvarofernandogarcía@gmail.com>\n"
+"Last-Translator: Miguel Sánchez de León Peque <msdeleonpeque@gmail.com>\n"
 "Language-Team: \n"
 "Language: es_ES\n"
 "MIME-Version: 1.0\n"
@@ -179,33 +179,31 @@ msgstr "¡Solo!"
 
 #: ../game/songs.cc:194
 msgid "show all songs"
-msgstr ""
+msgstr "mostrar todas las canciones"
 
 #: ../game/songs.cc:195
 msgid "has dance"
-msgstr ""
+msgstr "tiene baile"
 
 #: ../game/songs.cc:196
-#, fuzzy
 msgid "has vocals"
-msgstr "Voz"
+msgstr "tiene voz"
 
 #: ../game/songs.cc:197
 msgid "has duet"
-msgstr ""
+msgstr "tiene dúo"
 
 #: ../game/songs.cc:198
-#, fuzzy
 msgid "has guitar"
-msgstr "Guitarra rítmica"
+msgstr "tiene guitarra"
 
 #: ../game/songs.cc:199
 msgid "drums or keytar"
-msgstr ""
+msgstr "batería o guitarra-teclado"
 
 #: ../game/songs.cc:200
 msgid "full band"
-msgstr ""
+msgstr "banda completa"
 
 #: ../game/songs.cc:228
 msgid "random order"
@@ -299,77 +297,78 @@ msgstr "¡PARA!"
 
 #: ../game/screen_playlist.cc:110 ../game/screen_playlist.cc:252
 msgid "Continue"
-msgstr ""
+msgstr "Continuar"
 
 #: ../game/screen_playlist.cc:110
 msgid "Continue playing"
-msgstr ""
+msgstr "Continuar reproduciendo"
 
 #: ../game/screen_playlist.cc:118
 msgid "Add songs"
-msgstr ""
+msgstr "Añadir canciones"
 
 #: ../game/screen_playlist.cc:118
 msgid "Open the song browser to add more songs"
-msgstr ""
+msgstr "Abrir el buscador de canciones para añadir más canciones"
 
 #: ../game/screen_playlist.cc:119 ../game/screen_songs.cc:513
 msgid "Shuffle"
-msgstr ""
+msgstr "Aleatorizar"
 
 #: ../game/screen_playlist.cc:119 ../game/screen_songs.cc:513
 msgid "Randomize the order of the playlist"
-msgstr ""
+msgstr "Aleatorizar el orden de la lista de reproducción"
 
 #: ../game/screen_playlist.cc:125
 msgid "Clear and exit"
-msgstr ""
+msgstr "Limpiar y salir"
 
 #: ../game/screen_playlist.cc:125 ../game/screen_songs.cc:520
 msgid "Remove all the songs from the list"
-msgstr ""
+msgstr "Borrar todas las canciones de la lista"
 
 #: ../game/screen_playlist.cc:131 ../game/screen_playlist.cc:275
 #: ../game/screen_songs.cc:526
 msgid "Back"
-msgstr ""
+msgstr "Atrás"
 
 #: ../game/screen_playlist.cc:131 ../game/screen_playlist.cc:275
 msgid "Back to playlist viewer"
-msgstr ""
+msgstr "Volver al visor de lista de reproducción"
 
 #: ../game/screen_playlist.cc:237
 msgid "Press enter to view song options"
-msgstr ""
+msgstr "Presiona ENTRAR para ver las opciones de canción"
 
 #: ../game/screen_playlist.cc:244
 msgid "View more options"
-msgstr ""
+msgstr "Ver más opciones"
 
 #: ../game/screen_playlist.cc:244
-#, fuzzy
 msgid "View general playlist settings"
-msgstr "Configurar las opciones generales de audio"
+msgstr "Ver configuración general de lista de reproducción"
 
 #: ../game/screen_playlist.cc:252
 msgid "Play first"
-msgstr ""
+msgstr "Reproducir primero"
 
 #: ../game/screen_playlist.cc:254
 msgid "Ignore the playlist's order and play this song first"
 msgstr ""
+"Ignorar el orden de la lista de reproducción y reproducir primero esta "
+"canción"
 
 #: ../game/screen_playlist.cc:255
 msgid "Start the song already!"
-msgstr ""
+msgstr "¡Iniciar la canción ya!"
 
 #: ../game/screen_playlist.cc:264
 msgid "Remove"
-msgstr ""
+msgstr "Borrar"
 
 #: ../game/screen_playlist.cc:264
 msgid "Remove this song from the list"
-msgstr ""
+msgstr "Borrar esta canción de la lista"
 
 #: ../game/main.cc:146
 msgid "Loading audio samples..."
@@ -416,67 +415,60 @@ msgid "Loading menu..."
 msgstr "Cargando el menú..."
 
 #: ../game/screen_sing.cc:76
-#, fuzzy
 msgid "Start"
-msgstr "Reiniciar"
+msgstr "Comenzar"
 
 #: ../game/screen_sing.cc:76
-#, fuzzy
 msgid "Start performing"
-msgstr "¡Comienza una partida!"
+msgstr "Comenzar"
 
 #: ../game/screen_sing.cc:80
-#, fuzzy
 msgid "Duet mode"
-msgstr "Modo zurdo"
+msgstr "Modo dúo"
 
 #: ../game/screen_sing.cc:81
-#, fuzzy
 msgid "Normal mode"
-msgstr "Modo karaoke"
+msgstr "Modo normal"
 
 #: ../game/screen_sing.cc:82
 msgid "Switch between duet and regular singing mode"
-msgstr ""
+msgstr "Cambiar entre modo dúo y modo normal"
 
 #: ../game/screen_sing.cc:90
-#, fuzzy
 msgid "Change vocal track"
-msgstr ""
-"Cambiar la pista de voz\n"
-"(requiere reinicio)"
+msgstr "Cambiar la pista de voz"
 
 #: ../game/screen_sing.cc:125
 msgid "Skip"
-msgstr ""
+msgstr "Pasar"
 
 #: ../game/screen_sing.cc:125
 msgid "Skip current song"
-msgstr ""
+msgstr "Pasar la canción actual"
 
 #: ../game/screen_sing.cc:391
 msgid "Press UP to join dance!"
-msgstr ""
+msgstr "¡Presiona ARRIBA para unirte a bailar!"
 
 #: ../game/screen_sing.cc:391
 msgid "Step UP to join!"
-msgstr ""
+msgstr "¡Pisa ARRIBA para unirte!"
 
 #: ../game/screen_sing.cc:396
 msgid "Press 1 to join guitar!"
-msgstr ""
+msgstr "¡Presiona 1 para unirte con la guitarra!"
 
 #: ../game/screen_sing.cc:396
 msgid "Press GREEN to join!"
-msgstr ""
+msgstr "¡Presiona VERDE para unirte!"
 
 #: ../game/screen_sing.cc:401
 msgid "Press SPACE to join drums!"
-msgstr ""
+msgstr "¡Presiona ESPACIO para unirte con la batería!"
 
 #: ../game/screen_sing.cc:401
 msgid "KICK to join!"
-msgstr ""
+msgstr "¡Da con el pie para unirte!"
 
 #: ../game/screen_sing.cc:475
 msgid "   ENTER to skip instrumental break"
@@ -545,65 +537,60 @@ msgstr ""
 "para descargar canciones gratuitas"
 
 #: ../game/screen_songs.cc:282
-#, fuzzy
 msgid "Sorry, no songs match the search!"
-msgstr "ninguna canción satisface el criterio de búsqueda"
+msgstr "¡Ninguna canción satisface el criterio de búsqueda!"
 
 #: ../game/screen_songs.cc:289
-#, fuzzy
 msgid "Hiscore\n"
-msgstr "Mejores puntuaciones para %1%\n"
+msgstr "Mejor puntuación\n"
 
 #: ../game/screen_songs.cc:298
 msgid "<type in to search>   ↔ songs    ↕ options"
-msgstr ""
+msgstr "<escribe para buscar>   ↔ canciones    ↕ opciones"
 
 #: ../game/screen_songs.cc:301
 msgid "↔ sort order: "
-msgstr ""
+msgstr "↔ ordenar por: "
 
 #: ../game/screen_songs.cc:302
 msgid "↔ type filter: "
-msgstr ""
+msgstr "↔ tipo de filtro: "
 
 #: ../game/screen_songs.cc:303
 msgid "↔ hiscores   ↵ jukebox mode"
-msgstr ""
+msgstr "↔ mejores puntuaciones   ↵ modo \"jukebox\""
 
 #: ../game/screen_songs.cc:307
 msgid "↵ start a playlist with this song!"
-msgstr ""
+msgstr "↵ ¡comenzar una lista de reproducción con esta canción!"
 
 #: ../game/screen_songs.cc:309
 msgid "↵ open the playlist menu"
-msgstr ""
+msgstr "↵ abrir el menú de lista de reproducción"
 
 #: ../game/screen_songs.cc:506
 msgid "Play"
-msgstr ""
+msgstr "Reproducir"
 
 #: ../game/screen_songs.cc:506
 msgid "Start the game with all songs in playlist"
-msgstr ""
+msgstr "Comenzar el juego con todas las canciones en la lista de reproducción"
 
 #: ../game/screen_songs.cc:519
 msgid "View playlist"
-msgstr ""
+msgstr "Ver lista de reproducción"
 
 #: ../game/screen_songs.cc:519
 msgid "View the current playlist"
-msgstr ""
+msgstr "Ver lista de reproducción actual"
 
 #: ../game/screen_songs.cc:520
 msgid "Clear playlist"
-msgstr ""
+msgstr "Limpiar lista de reproducción"
 
 #: ../game/screen_songs.cc:526
-#, fuzzy
 msgid "Back to song browser"
-msgstr ""
-"Salir al menú de\n"
-"selección de canciones"
+msgstr "De vuelta al buscador de canciones"
 
 #: ../game/screen_players.cc:115
 msgid "No players found!"
@@ -618,9 +605,8 @@ msgid "Press enter to create player!"
 msgstr "Presiona \"enter\" para crear el nuevo jugador:"
 
 #: ../game/screen_players.cc:122
-#, fuzzy
 msgid "No players worth mentioning!"
-msgstr "¡No se han encontrado jugadores!"
+msgstr "¡Ningún jugador destacable!"
 
 #: ../game/screen_players.cc:127
 msgid "You reached %1% points!"
