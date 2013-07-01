@@ -9,6 +9,7 @@ class WebServer
 {
 public:
 	WebServer();
+	~WebServer();
 private:
 	boost::thread serverthread;
 };
