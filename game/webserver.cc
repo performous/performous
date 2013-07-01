@@ -30,3 +30,7 @@ WebServer::WebServer()
 	:serverthread(&StartServer) {
 	serverthread.start_thread();
 }
+
+WebServer::~WebServer(){
+	serverthread.join();
+}
