@@ -7,6 +7,7 @@
 #include "video_driver.hh"
 #include "dialog.hh"
 #include "playlist.hh"
+#include "webserver.hh"
 #include "fbo.hh"
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -104,7 +105,8 @@ private:
 	screenmap_t screens;
 	Screen* newScreen;
 	Screen* currentScreen;
-    PlayList currentPlaylist;
+	PlayList currentPlaylist;
+	WebServer server;
 	// Flash messages members
 	float m_timeToFadeIn;
 	float m_timeToFadeOut;
