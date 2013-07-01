@@ -87,7 +87,6 @@ class Songs: boost::noncopyable {
 	void sort_internal();
 	volatile bool m_dirty;
 	volatile bool m_loading;
-	std::stringstream m_debug;
 	boost::scoped_ptr<boost::thread> m_thread;
 	mutable boost::mutex m_mutex;
 };

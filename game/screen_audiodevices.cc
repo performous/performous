@@ -21,9 +21,9 @@ namespace {
 }
 
 ScreenAudioDevices::ScreenAudioDevices(std::string const& name, Audio& audio): Screen(name), m_audio(audio) {
-	m_selector.reset(new Surface(getThemePath("device_selector.svg")));
-	m_mic_icon.reset(new Surface(getThemePath("sing_pbox.svg")));
-	m_pdev_icon.reset(new Surface(getThemePath("icon_pdev.svg")));
+	m_selector.reset(new Surface(findFile("device_selector.svg")));
+	m_mic_icon.reset(new Surface(findFile("sing_pbox.svg")));
+	m_pdev_icon.reset(new Surface(findFile("icon_pdev.svg")));
 	m_colorMap["blue"] = Color(0.2, 0.5, 0.7);
 	m_colorMap["red"] = Color(0.8, 0.3, 0.3);
 	m_colorMap["green"] = Color(0.2, 0.9, 0.2);
@@ -182,7 +182,7 @@ bool ScreenAudioDevices::save(bool skip_ui_config) {
 	if (!audiokiller.timed_join(boost::posix_time::milliseconds(2500)))
 		Game::getSingletonPtr()->fatalError("Audio hung for some reason.\nPlease restart Performous.");
 	m_audio.restart(); // Reload audio to take the new settings into use
-	m_audio.playMusic(getThemePath("menu.ogg"), true); // Start music again
+	m_audio.playMusic(findFile("menu.ogg"), true); // Start music again
 	// Check that all went well
 	bool ret = verify();
 	if (!ret) Game::getSingletonPtr()->dialog(_("Some devices failed to open!"));

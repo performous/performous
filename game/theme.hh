@@ -10,7 +10,7 @@
 class Theme: boost::noncopyable {
 protected:
 	Theme();
-	Theme(const std::string& path); ///< creates theme from path
+	Theme(fs::path const& path); ///< creates theme from path
 public:
 	/// background image for theme
 	Surface bg;

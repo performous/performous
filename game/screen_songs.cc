@@ -39,13 +39,13 @@ void ScreenSongs::enter() {
 void ScreenSongs::reloadGL() {
 	theme.reset(new ThemeSongs());
 	m_menuTheme.reset(new ThemeInstrumentMenu());
-	m_songbg_default.reset(new Surface(getThemePath("songs_bg_default.svg")));
-	m_songbg_ground.reset(new Surface(getThemePath("songs_bg_ground.svg")));
-	m_singCover.reset(new Surface(getThemePath("no_cover.svg")));
-	m_instrumentCover.reset(new Surface(getThemePath("instrument_cover.svg")));
-	m_bandCover.reset(new Surface(getThemePath("band_cover.svg")));
-	m_danceCover.reset(new Surface(getThemePath("dance_cover.svg")));
-	m_instrumentList.reset(new Texture(getThemePath("instruments.svg")));
+	m_songbg_default.reset(new Surface(findFile("songs_bg_default.svg")));
+	m_songbg_ground.reset(new Surface(findFile("songs_bg_ground.svg")));
+	m_singCover.reset(new Surface(findFile("no_cover.svg")));
+	m_instrumentCover.reset(new Surface(findFile("instrument_cover.svg")));
+	m_bandCover.reset(new Surface(findFile("band_cover.svg")));
+	m_danceCover.reset(new Surface(findFile("dance_cover.svg")));
+	m_instrumentList.reset(new Texture(findFile("instruments.svg")));
 }
 
 void ScreenSongs::exit() {
@@ -191,10 +191,9 @@ void ScreenSongs::update() {
 	double pstart = (!m_jukebox && song ? song->preview_start : 0.0);
 	m_audio.playMusic(music, true, 2.0, pstart);
 	if (song) {
-		std::string background = song->background.empty() ? song->cover : song->background;
-		std::string video = song->video;
-		if (!background.empty()) try { m_songbg.reset(new Surface(song->path + background)); } catch (std::exception const&) {}
-		if (!video.empty() && config["graphic/video"].b()) m_video.reset(new Video(song->path + video, song->videoGap));
+		fs::path const& background = song->background.empty() ? song->cover : song->background;
+		if (!background.empty()) try { m_songbg.reset(new Surface(background)); } catch (std::exception const&) {}
+		if (!song->video.empty() && config["graphic/video"].b()) m_video.reset(new Video(song->video, song->videoGap));
 	}
 }
 
@@ -228,8 +227,8 @@ void ScreenSongs::drawJukebox() {
 		Song& song = m_songs.current();
 		// Draw the cover
 		Surface* cover = NULL;
-		if (!song.cover.empty()) try { cover = &m_covers[song.path + song.cover]; } catch (std::exception const&) {}
-		if (cover) {
+		if (!song.cover.empty()) try { cover = &m_covers[song.cover]; } catch (std::exception const&) {}
+		if (cover && !cover->empty()) {
 			Surface& s = *cover;
 			s.dimensions.left(theme->song.dimensions.x1()).top(theme->song.dimensions.y2() + 0.05).fitInside(0.15, 0.15);
 			s.draw();
@@ -289,23 +288,25 @@ void ScreenSongs::draw() {
 		oss_hiscore << _("Hiscore\n");
 		// Get hiscores from database
 		m_database.queryPerSongHiscore_HiscoreDisplay(oss_hiscore, m_songs.currentPtr(), m_infoPos, 5);
+		// Here we use horrible raw utf-8 bytes in place of nice arrow chars ↵↕↔
+		// because otherwise we get garbage output on Windows for some reason
 		switch (m_menuPos) {
 			case 1:
 				if (!m_search.text.empty()) oss_order << m_search.text;
 				else if (m_songs.typeNum()) oss_order << m_songs.typeDesc();
 				else if (m_songs.sortNum()) oss_order << m_songs.sortDesc();
-				else oss_order << _("<type in to search>   ↔ songs    ↕ options");
+				else oss_order << _("<type in to search>   \xe2\x86\x94 songs    \xe2\x86\x95 options");
 				//if (!m_songs.empty()) oss_order << "(" << m_songs.currentId() + 1 << "/" << m_songs.size() << ")";
 				break;
-			case 2: oss_order << _("↔ sort order: ") << m_songs.sortDesc(); break;
-			case 3: oss_order << _("↔ type filter: ") << m_songs.typeDesc(); break;
-			case 4: oss_order << _("↔ hiscores   ↵ jukebox mode"); break;
+			case 2: oss_order << _("\xe2\x86\x94 sort order: ") << m_songs.sortDesc(); break;
+			case 3: oss_order << _("\xe2\x86\x94 type filter: ") << m_songs.typeDesc(); break;
+			case 4: oss_order << _("\xe2\x86\x94 hiscores   \xe2\x86\xb5 jukebox mode"); break;
 			case 0:
 			Game* gm = Game::getSingletonPtr();
 			if(gm->getCurrentPlayList().isEmpty()) {
-				oss_order << _("↵ start a playlist with this song!");
+				oss_order << _("\xe2\x86\xb5 start a playlist with this song!");
 			} else {
-				oss_order << _("↵ open the playlist menu");
+				oss_order << _("\xe2\x86\xb5 open the playlist menu");
 			}
 			break;
 		}
@@ -332,11 +333,11 @@ void ScreenSongs::drawCovers() {
 	int baseidx = spos + 1.5; --baseidx; // Round correctly
 	double shift = spos - baseidx;
 	// Calculate beat
-	double beat = 0.5 + m_idleTimer.get() * 2.0;  // 120 BPM
+	double beat = 0.5 + m_idleTimer.get() / 2.0;  // 30 BPM
 	if (ss > 0) {
 		// Use actual song BPM. FIXME: Should only do this if currentId is also playing.
 		double t = m_audio.getPosition() - config["audio/video_delay"].f();
-		Song::Beats const& beats = m_songs[currentId].beats;
+		Song::Beats const& beats = m_songs.current().beats;
 		auto it = std::lower_bound(beats.begin(), beats.end(), t);
 		if (it != beats.begin() && it != beats.end()) {
 			double t1 = *(it - 1), t2 = *it;
@@ -389,7 +390,9 @@ void ScreenSongs::drawCovers() {
 Surface& ScreenSongs::getCover(Song const& song) {
 	Surface* cover = nullptr;
 	// Fetch cover image from cache or try loading it
-	if (!song.cover.empty()) try { cover = &m_covers[song.path + song.cover]; } catch (std::exception const&) {cover = nullptr;}
+	if (!song.cover.empty()) try { cover = &m_covers[song.cover]; } catch (std::exception const&) {}
+	// Fallback to background image as cover if needed
+	if (!cover && !song.background.empty()) try { cover = &m_covers[song.background]; } catch (std::exception const&) {}
 	// Use empty cover
 	if (!cover) {
 		if(song.hasDance()) {
@@ -498,27 +501,27 @@ void ScreenSongs::drawMenu() {
 
 void ScreenSongs::createPlaylistMenu() {
 	m_menu.clear();
-	m_menu.add(MenuOption(_("Play"), _("Start the game with all songs in playlist")).call([this]() {
+	m_menu.add(MenuOption(_("Play"), "").call([this]() {
 		Game* tm = Game::getSingletonPtr();
 		tm->getCurrentPlayList().addSong(m_songs.currentPtr());
 		m_menuPos = 1;
 		m_menu.close();
 		sing();
 	}));
-	m_menu.add(MenuOption(_("Shuffle"), _("Randomize the order of the playlist")).call([this]() {
+	m_menu.add(MenuOption(_("Shuffle"), "").call([this]() {
 		Game* tm = Game::getSingletonPtr();
 		tm->getCurrentPlayList().shuffle();
 		m_menuPos = 1;
 		m_menu.close();
 	}));
-	m_menu.add(MenuOption(_("View playlist"), _("View the current playlist")).screen("Playlist"));
-	m_menu.add(MenuOption(_("Clear playlist"), _("Remove all the songs from the list")).call([this]() {
+	m_menu.add(MenuOption(_("View playlist"), "").screen("Playlist"));
+	m_menu.add(MenuOption(_("Clear playlist"), "").call([this]() {
 		Game* tm = Game::getSingletonPtr();
 		tm->getCurrentPlayList().clear();
 		m_menuPos = 1;
 		m_menu.close();
 	}));
-	m_menu.add(MenuOption(_("Back"), _("Back to song browser")).call([this]() {
+	m_menu.add(MenuOption(_("Back"), "").call([this]() {
 		m_menuPos = 1;
 		m_menu.close();
 	}));

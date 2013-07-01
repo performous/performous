@@ -1,0 +1,239 @@
+#!/usr/bin/env python
+
+"""Ultrastar TXT file duet merger
+=================================
+
+This program merges Ultrastar TXT files into a duet. Preconditions are:
+
+* All metadata but TITLE and GAP match
+* The files match the author's highly subjective perception of well-formedness,
+  which is influenced by the documentation available on [1] and [2], but can
+  not be regardes as canonical for lack of proper documentation.
+
+[1] http://thebrickyblog.wordpress.com/2011/01/27/ultrastar-txt-files-in-more-depth/
+[2] http://www.ultrastarstuff.com/html/tutorialtxtfile.html
+"""
+
+# Copyright (C) 2013 chrysn <chrysn@fsfe.org>
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+import sys
+import os.path
+from collections import OrderedDict
+import argparse
+
+class FileFormatViolation(Exception): "An input file is not formed as the author of this program expects it."
+
+class TXTFile(object):
+    """UltraStar TXT song description"""
+    def __init__(self, filelike):
+        self.headers = OrderedDict()
+
+        self.players = {}
+        self.unnamedplayer = []
+
+        current_player = self.unnamedplayer
+
+        done = False
+
+        for line in filelike:
+            line = line.rstrip('\n\r')
+
+            if done:
+                raise FileFormatViolation('Garbage after end of file ("E").')
+
+            if line.startswith('#') and ':' in line:
+                key, value = line[1:].split(':', 2)
+                if key in self.headers:
+                    raise FileFormatViolation('Duplicate header line.')
+                self.headers[key] = value
+            elif line.startswith('E'):
+                done = True
+            elif line.startswith('P'):
+                try:
+                    playernumber = int(line[1:].strip())
+                except ValueError:
+                    raise FileFormatViolation("Non-numeric player identity")
+                if playernumber in self.players:
+                    raise FileFormatViolation("Dupliate player identity")
+                current_player = []
+                self.players[playernumber] = current_player
+            elif line[0] in ':*F-':
+                parts = line.split(' ', 4)
+                current_player.append(parts)
+            else:
+                raise FileFormatViolation("Unknown line (%s)"%line)
+
+        if not done:
+            raise FileFormatViolation('Missing end of file ("E").')
+
+        if self.players and self.unnamedplayer:
+            raise FileFormatViolation('Contains both singleplayer and multiplayer data')
+
+    def to_multiplayer_first(self):
+        if self.players:
+            raise ValueError("Can not convert multiplayer file to multiplayer mode")
+
+        self.players[1] = self.unnamedplayer
+        self.unnamedplayer = []
+
+    def merge(self, other, new_headers):
+        if other.players:
+            raise ValueError("Can not merge multi-player files")
+
+        own_gap = self.get_float_header('GAP')
+        other_gap = other.get_float_header('GAP')
+
+        if own_gap > other_gap:
+            self.adjust_gap_transparent(other_gap)
+        if other_gap > own_gap:
+            other.adjust_gap_transparent(own_gap)
+
+        for k,v in self.headers.items():
+            if k in new_headers:
+                continue
+            if other.headers[k] != v:
+                raise ValueError("Can not merge files: header field %r differs (%r, %r)"%(k, v, other.headers[k]))
+
+        self.players[max(self.players) + 1] = other.unnamedplayer
+
+        self.headers.update(new_headers)
+
+    def get_float_header(self, name):
+        return float(self.headers[name].replace(',', '.'))
+
+    def set_float_header(self, name, value):
+        # the limit of 16 digits is somewhat arbitrary, but the normal string
+        # formatter would go to exponential notation, and that's probably not
+        # compatible with txt files
+        self.headers[name] = "{:.8f}".format(value).rstrip('0').rstrip('.').replace('.', ',')
+
+    def adjust_gap_transparent(self, new_gap):
+        """Change the value of GAP, but modify all lines there is no change in
+        the song itself"""
+
+        old_gap = self.get_float_header('GAP')
+
+        summand = (old_gap - new_gap) / 60000 * self.get_float_header('BPM') * 4
+        if summand == 0:
+            return
+
+        rounded = int(round(summand))
+        error = max(summand / rounded, rounded / summand) - 1
+
+        if error >= 0.0001: # a reasonable epsilon
+            raise ValueError("Incompatible GAP values, would have to use finer BPM")
+
+        self.shift_lines(rounded)
+
+        self.set_float_header('GAP', new_gap)
+
+    def shift_lines(self, summand):
+        """Add summand to all start times of lines in a file"""
+
+        if self.headers.get('RELATIVE', 'NO') != 'NO':
+            raise ValueError("Can not shift around lines in relative mode")
+
+        for player in [self.unnamedplayer] + list(self.players.values()):
+            for line in player:
+                try:
+                    old_start = int(line[1])
+                except (KeyError, ValueError):
+                    raise FileFormatViolation("Can not determine start time of %r"%(line,))
+
+                new_start = old_start + summand
+                if new_start < 0:
+                    raise ValueError("Can not shift start times to negative values")
+                line[1] = str(old_start + summand)
+
+    def serialize(self, outfile):
+        for (k, v) in self.headers.items():
+            outfile.write('#%s:%s\r\n'%(k, v))
+        for line in self.unnamedplayer:
+            outfile.write(" ".join(line) + '\r\n')
+        for (player_id, lines) in self.players.items():
+            outfile.write('P%d\r\n'%player_id)
+            for line in lines:
+                outfile.write(" ".join(line) + '\r\n')
+        outfile.write('E\r\n')
+
+def merge(infiles, outfile, title):
+    indata = [TXTFile(open(i)) for i in infiles]
+
+    if title is None:
+        try:
+            title = mergeguesser(list(d.headers['TITLE'] for d in indata))
+        except (ValueError, KeyError):
+            raise ValueError("Can not guess shared title, please provide one")
+
+    if outfile is None:
+        filenames, exts = zip(*(os.path.splitext(f) for f in infiles))
+        try:
+            outfile = mergeguesser(filenames) + exts[0]
+        except ValueError:
+            raise ValueError("Can not guess output file name, please provide one")
+
+    original = indata[0]
+    original.to_multiplayer_first()
+    for m in indata[1:]:
+        original.merge(m, {'TITLE': title})
+
+    with open(outfile, 'w') as of:
+        original.serialize(of)
+
+def mergeguesser(strings):
+    """Given a number of strings, guess how a duet composed of all those files
+    could be called. Raises a ValueError if no reasonable guess can be made."""
+
+    parens = {'(':')', '[': ']', '{': '}', '<': '>'}
+
+    if len(strings) < 2:
+        raise ValueError("Not enough strings to guess")
+
+    for i in range(max(len(x) for x in strings), 4, -1): # 4 is the arbitrary minimum lenth of a common substring to be considered "reasonable"
+        subs = [x[:i] for x in strings]
+        if all(x == subs[0] for x in subs):
+            break
+    else:
+        raise ValueError("No reasonable common substring")
+
+    substring = subs[0]
+
+    if substring[-1] in parens:
+        return substring + 'Duet' + parens[substring[-1]]
+
+    return substring + ' (Duet)'
+
+def main():
+    p = argparse.ArgumentParser(description=__doc__.split('\n')[0].strip())
+    p.add_argument('--output', metavar='FILE', type=str, help='Name of the resulting file')
+    p.add_argument('--title', type=str, help='Title of the merged song')
+    p.add_argument('input', type=str, nargs='+', help='Files to be merged')
+    p.add_argument('--debug', help='Show backtraces instead of error messages')
+
+    args = p.parse_args()
+
+    if args.debug:
+        merge(args.input, args.output, args.title)
+    else:
+        try:
+            merge(args.input, args.output, args.title)
+        except (FileFormatViolation, ValueError), e:
+            sys.stderr.write("Could not complete merging: %s\n"%e)
+            sys.exit(1)
+
+if __name__ == "__main__":
+    main()

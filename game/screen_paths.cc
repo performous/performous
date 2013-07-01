@@ -69,8 +69,10 @@ void ScreenPaths::draw() {
 	m_theme->comment.dimensions.left(-0.48).screenBottom(-0.067);
 	m_theme->comment.draw(_("Press any key to exit."));
 	// Additional info
+	#ifdef _WIN32
 	m_theme->comment_bg.dimensions.middle().screenBottom(-0.01);
 	m_theme->comment_bg.draw();
 	m_theme->comment.dimensions.left(-0.48).screenBottom(-0.023);
-	m_theme->comment.draw(_("Windows users can also use ConfigureSongDirectory.bat in the bin-directory."));
+	m_theme->comment.draw(_("Windows users can also use ConfigureSongDirectory.bat script."));
+	#endif
 }

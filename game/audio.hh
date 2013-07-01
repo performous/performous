@@ -7,6 +7,7 @@
 #include "ffmpeg.hh"
 #include "notes.hh"
 #include "pitch.hh"
+#include "util.hh"
 #include <boost/date_time.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -46,6 +47,7 @@ class Audio {
 	struct Impl;
 	boost::scoped_ptr<Impl> self;
 public:
+	typedef std::map<std::string, fs::path> Files;
 	Audio();
 	~Audio();
 	void restart();
@@ -60,11 +62,11 @@ public:
 	 * @param fadeTime time to fade
 	 * @param startPos starting position
 	 */
-	void playMusic(std::string const& filename, bool preview = false, double fadeTime = 0.5, double startPos = 0.0);
+	void playMusic(fs::path const& filename, bool preview = false, double fadeTime = 0.5, double startPos = 0.0);
 	/** Plays a list of songs **/
-	void playMusic(std::map<std::string,std::string> const& filenames, bool preview = false, double fadeTime = 0.5, double startPos = 0.0);
+	void playMusic(Files const& filenames, bool preview = false, double fadeTime = 0.5, double startPos = 0.0);
 	/** Loads/plays/unloads a sample **/
-	void loadSample(std::string const& streamId, std::string const& filename);
+	void loadSample(std::string const& streamId, fs::path const& filename);
 	void playSample(std::string const& streamId);
 	void unloadSample(std::string const& streamId);
 	/** Stops music **/

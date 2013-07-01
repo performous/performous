@@ -1,51 +1,39 @@
 #pragma once
 
-#include <boost/filesystem.hpp>
+#include <boost/filesystem/path.hpp>
 #include <list>
 
-// Define this useful alias for the overlong namespace name (yes, for everyone who includes this header)
 namespace fs = boost::filesystem;
 
-/** Get user's home folder **/
-fs::path getHomeDir();
+typedef std::vector<std::uint8_t> BinaryBuffer;
 
-/** Get the users configuration folder **/
-fs::path getConfigDir();
+/// Read an entire file into a buffer
+BinaryBuffer readFile(fs::path const& path);
 
-/** Get the users data folder **/
-fs::path getDataDir();
+/// Determine where the important system paths and most importantly the config schema are. Must be run before any of the functions below.
+void pathBootstrap();
 
-/** Get the users cache folder **/
-fs::path getCacheDir();
+/// Do full data dir (search path) init or re-init after config options have been modified.
+/// - Full search path and themes will only be available after this.
+/// - Logging and config must be running before pathInit (pathInit is first called from configuration.cc).
+void pathInit();
 
-/** Get the users theme folder **/
-fs::path getThemeDir();
+std::list<std::string> getThemes();  ///< Find all theme folders and return theme names.
 
-/** Is the file a theme resource **/
-bool isThemeResource(fs::path);
+fs::path getLogFilename();  ///< Get the log filename.
+fs::path getSchemaFilename();  ///< Get the config schema filename.
+fs::path getHomeDir();  ///< Get user's home folder.
+fs::path getConfigDir();  ///< Get user-writable Performous config folder.
+fs::path getSysConfigDir();  ///< Get root-writable Performous config folder.
+fs::path getDataDir();  ///< Get user-writable Performous data folder.
+fs::path getCacheDir();  ///< Get user-writable temporary folder.
+fs::path getShareDir();  ///< Get Performous system-level data folder.
+fs::path getLocaleDir();  ///< Get the system local folder.
 
-/** Get the localec folder **/
-fs::path getLocaleDir();
-
-/** Do mangling to convert user-entered path into path suitable for use with stdlib etc. **/
-fs::path pathMangle(fs::path const& dir);
-
-/** Get full path to a file from the current theme **/
-std::string getThemePath(std::string const& filename);
-
-/** Get available theme names **/
-std::vector<std::string> getThemes();
-
-/** Get full path to a share file **/
-std::string getPath(fs::path const& filename);
-
-/** Get full path to a default conguration file **/
-fs::path getDefaultConfig(fs::path const& configFile);
+fs::path findFile(fs::path const& filename);  ///< Look for the specified file in theme and data folders.
 
 typedef std::list<fs::path> Paths;
 
-/** Get all shared data paths in preference order **/
-Paths const& getPaths(bool refresh = false);
+Paths const& getPaths();  ///< Get the data file search path
+Paths getPathsConfig(std::string const& confOption);  ///< Return expanded list of paths specified by a path config option
 
-/** Get all paths listed in a config option **/
-Paths getPathsConfig(std::string const& confOption);

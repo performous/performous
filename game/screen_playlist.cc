@@ -219,7 +219,7 @@ void ScreenPlaylist::draw_menu_options() {
 
 SvgTxtTheme& ScreenPlaylist::getTextObject(std::string const& txt) {
 	if (theme->options.contains(txt)) return theme->options[txt];
-	return *theme->options.insert(txt, new SvgTxtTheme(getThemePath("mainmenu_option.svg"), config["graphic/text_lod"].f()))->second;
+	return *theme->options.insert(txt, new SvgTxtTheme(findFile("mainmenu_option.svg"), config["graphic/text_lod"].f()))->second;
 }
 
 void ScreenPlaylist::createSongListMenu() {

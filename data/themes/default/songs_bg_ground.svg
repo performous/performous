@@ -33,8 +33,8 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="870"
-     inkscape:window-width="1249"
+     inkscape:window-height="859"
+     inkscape:window-width="1537"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      guidetolerance="10.0"
@@ -44,11 +44,11 @@
      bordercolor="#666666"
      pagecolor="#ffffff"
      id="base"
-     inkscape:zoom="0.43503001"
-     inkscape:cx="76.453348"
-     inkscape:cy="419.08372"
-     inkscape:window-x="220"
-     inkscape:window-y="94"
+     inkscape:zoom="0.87006002"
+     inkscape:cx="232.66006"
+     inkscape:cy="328.41019"
+     inkscape:window-x="225"
+     inkscape:window-y="127"
      inkscape:current-layer="svg559"
      showgrid="false"
      showguides="true"
@@ -225,8 +225,8 @@
          id="stop6055-7" />
       <stop
          id="stop3782"
-         offset="0.33000001"
-         style="stop-color:#2f2f2f;stop-opacity:1;" />
+         offset="0.20999999"
+         style="stop-color:#242424;stop-opacity:1;" />
       <stop
          style="stop-color:#5f5f5f;stop-opacity:1;"
          offset="1"
@@ -237,7 +237,7 @@
        x2="410.25833"
        y1="-446.23236"
        x1="410.25833"
-       gradientTransform="matrix(3.0616996,0,0,3.9597975,-718.21316,1166.9898)"
+       gradientTransform="matrix(3.0616996,0,0,4.7562535,-718.21316,1562.6214)"
        gradientUnits="userSpaceOnUse"
        id="linearGradient4031"
        xlink:href="#linearGradient6053-8"
@@ -256,7 +256,7 @@
   <rect
      y="-800"
      x="0"
-     height="200"
+     height="240.22711"
      width="1000"
      id="rect6051"
      style="fill:url(#linearGradient4031);fill-opacity:1"

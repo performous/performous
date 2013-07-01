@@ -215,7 +215,7 @@ public:
 	TexCoords tex;
 	Surface(): m_width(0), m_height(0) {}
 	/// creates surface from file
-	Surface(std::string const& filename);
+	Surface(fs::path const& filename);
 	~Surface();
 	bool empty() const { return m_width * m_height == 0; } ///< Test if the loading has failed
 	/// draws surface

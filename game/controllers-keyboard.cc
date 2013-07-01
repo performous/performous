@@ -1,21 +1,54 @@
 #include "controllers.hh"
 
+#include <set>
+
 namespace {
 	bool g_enableInstruments = false;
 }
 
 namespace input {
 	class Keyboard: public Hardware {
+		std::set<unsigned> m_pressed;
+		bool m_guitar, m_keytar, m_drumkit, m_dancepad;
+		/// Set the value of an instrument bool from a config variable and return a log message snippet if value was changed.
+		static std::string setMode(bool& var, std::string const& name) {
+			bool value = config["game/keyboard_" + name].b();
+			if (var == value) return std::string();
+			var = value;
+			return " " + name + (value ? " enabled." : " disabled.");
+		}
 	public:
+		Keyboard(): m_guitar(), m_keytar(), m_drumkit(), m_dancepad() {}
 		bool process(Event& event, SDL_Event const& sdlEv) override {
 			if (sdlEv.type != SDL_KEYDOWN && sdlEv.type != SDL_KEYUP) return false;
+			// Switch modes only when no keys are pressed (avoids buttons getting stuck on mode change)
+			if (m_pressed.empty()) {
+				std::string msg;
+				if (g_enableInstruments) {
+					msg += setMode(m_guitar, "guitar");
+					msg += setMode(m_keytar, "keytar");
+					msg += setMode(m_drumkit, "drumkit");
+					msg += setMode(m_dancepad, "dancepad");
+				} else if (m_guitar || m_keytar || m_drumkit || m_dancepad) {
+					msg = " all instruments disabled.";
+					m_guitar = m_keytar = m_drumkit = m_dancepad = false;
+				}
+				if (!msg.empty()) std::clog << "controller-keyboard/info: Mode change:" + msg << std::endl;
+			}
+			// Keep track of pressed keys
+			{
+				unsigned pressedId = sdlEv.key.which << 16 | sdlEv.key.keysym.sym;
+				if (sdlEv.type == SDL_KEYDOWN) m_pressed.insert(pressedId);
+				else m_pressed.erase(pressedId);
+			}
+			// Convert SDL event into controller Event
 			event.source = SourceId(SOURCETYPE_KEYBOARD, sdlEv.key.which);  // Device number .which is always zero with SDL 1.2 :(
 			event.hw = sdlEv.key.keysym.sym;
 			event.value = (sdlEv.type == SDL_KEYDOWN ? 1.0 : 0.0);
 			// Get the modifier keys that we actually use as modifiers
 			unsigned mod = sdlEv.key.keysym.mod & (KMOD_LCTRL | KMOD_LALT);
 			// Map to keyboard instruments (sets event.button if matching)
-			if (g_enableInstruments && !mod) mapping(event);
+			if (!mod) mapping(event);
 			// Map to menu navigation
 			if (event.button == GENERIC_UNASSIGNED) event.button = navigation(event.hw, mod);
 			return event.button != GENERIC_UNASSIGNED;
@@ -34,7 +67,7 @@ namespace input {
 				case SDLK_F2: case SDLK_2: case SDLK_x: button++;
 				case SDLK_F1: case SDLK_1: case SDLK_z: case SDLK_w: case SDLK_y:  // Support also French and German layouts
 				guitar_process:
-					if (!config["game/keyboard_guitar"].b()) return;
+					if (!m_guitar) return;
 					event.devType = DEVTYPE_GUITAR;
 					break;
 
@@ -45,7 +78,7 @@ namespace input {
 				case SDLK_F9: button++;
 				case SDLK_F8: button++;
 				case SDLK_F7:
-					if (!config["game/keyboard_keytar"].b()) return;
+					if (!m_keytar) return;
 					event.devType = DEVTYPE_KEYTAR;
 					break;
 
@@ -59,7 +92,7 @@ namespace input {
 				case SDLK_p: button = DRUMS_GREEN_TOM; goto drum_process;
 				case SDLK_SPACE:
 					drum_process:
-					if (!config["game/keyboard_drumkit"].b()) return;
+					if (!m_drumkit) return;
 					event.devType = DEVTYPE_DRUMS;
 					break;
 
@@ -72,7 +105,7 @@ namespace input {
 				case SDLK_KP8: case SDLK_UP: button++;
 				case SDLK_KP2: case SDLK_DOWN: case SDLK_KP5: button++;
 				case SDLK_KP4: case SDLK_LEFT:
-					if (!config["game/keyboard_dancepad"].b()) return;
+					if (!m_dancepad) return;
 					event.devType = DEVTYPE_DANCEPAD;
 					break;
 

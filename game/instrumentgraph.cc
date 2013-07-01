@@ -17,12 +17,12 @@ InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevicePt
   m_dev(dev),
   m_cx(0.0, 0.2), m_width(0.5, 0.4),
   m_menu(),
-  m_button(getThemePath("button.svg")),
-  m_arrow_up(getThemePath("arrow_button_up.svg")),
-  m_arrow_down(getThemePath("arrow_button_down.svg")),
-  m_arrow_left(getThemePath("arrow_button_left.svg")),
-  m_arrow_right(getThemePath("arrow_button_right.svg")),
-  m_text(getThemePath("sing_timetxt.svg"), config["graphic/text_lod"].f()),
+  m_button(findFile("button.svg")),
+  m_arrow_up(findFile("arrow_button_up.svg")),
+  m_arrow_down(findFile("arrow_button_down.svg")),
+  m_arrow_left(findFile("arrow_button_left.svg")),
+  m_arrow_right(findFile("arrow_button_right.svg")),
+  m_text(findFile("sing_timetxt.svg"), config["graphic/text_lod"].f()),
   m_selectedTrack(""),
   m_selectedDifficulty(0),
   m_rejoin(false),
@@ -42,7 +42,7 @@ InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevicePt
 	double time = m_audio.getPosition();
 	m_jointime = time < 0.0 ? -1.0 : time + join_delay;
 
-	m_popupText.reset(new SvgTxtThemeSimple(getThemePath("sing_popup_text.svg"), config["graphic/text_lod"].f()));
+	m_popupText.reset(new SvgTxtThemeSimple(findFile("sing_popup_text.svg"), config["graphic/text_lod"].f()));
 	m_menuTheme.reset(new ThemeInstrumentMenu());
 	for (auto& elem: m_pressed) elem = false;
 }

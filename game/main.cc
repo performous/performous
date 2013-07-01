@@ -28,7 +28,6 @@
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
 #include <csignal>
-#include <fstream>
 #include <string>
 #include <vector>
 #include <cstdlib>
@@ -68,7 +67,7 @@ struct QuitNow {};
 
 static void checkEvents(Game& gm) {
 	if (g_quit) {
-		std::cout << "Terminating, please wait... (or kill the process)" << std::endl;
+		std::cerr << "Terminating, please wait... (or kill the process)" << std::endl;
 		throw QuitNow();
 	}
 	SDL_Event event;
@@ -131,11 +130,10 @@ static void checkEvents(Game& gm) {
 }
 
 void mainLoop(std::string const& songlist) {
+	std::clog << "core/notice: Starting the audio subsystem (errors printed on console may be ignored)." << std::endl;
 	Audio audio;
-	{ // Print the devices
-		portaudio::AudioDevices ads;
-		std::clog << "audio/info:\n" << ads.dump();
-	}
+	std::clog << "core/info: Loading assets." << std::endl;
+	Gettext localization(PACKAGE);
 	Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());
 	Backgrounds backgrounds;
 	Database database(getConfigDir() / "database.xml");
@@ -144,18 +142,18 @@ void mainLoop(std::string const& songlist) {
 	try {
 		// Load audio samples
 		gm.loading(_("Loading audio samples..."), 0.5);
-		audio.loadSample("drum bass", getPath("sounds/drum_bass.ogg"));
-		audio.loadSample("drum snare", getPath("sounds/drum_snare.ogg"));
-		audio.loadSample("drum hi-hat", getPath("sounds/drum_hi-hat.ogg"));
-		audio.loadSample("drum tom1", getPath("sounds/drum_tom1.ogg"));
-		audio.loadSample("drum cymbal", getPath("sounds/drum_cymbal.ogg"));
-		//audio.loadSample("drum tom2", getPath("sounds/drum_tom2.ogg"));
-		audio.loadSample("guitar fail1", getPath("sounds/guitar_fail1.ogg"));
-		audio.loadSample("guitar fail2", getPath("sounds/guitar_fail2.ogg"));
-		audio.loadSample("guitar fail3", getPath("sounds/guitar_fail3.ogg"));
-		audio.loadSample("guitar fail4", getPath("sounds/guitar_fail4.ogg"));
-		audio.loadSample("guitar fail5", getPath("sounds/guitar_fail5.ogg"));
-		audio.loadSample("guitar fail6", getPath("sounds/guitar_fail6.ogg"));
+		audio.loadSample("drum bass", findFile("sounds/drum_bass.ogg"));
+		audio.loadSample("drum snare", findFile("sounds/drum_snare.ogg"));
+		audio.loadSample("drum hi-hat", findFile("sounds/drum_hi-hat.ogg"));
+		audio.loadSample("drum tom1", findFile("sounds/drum_tom1.ogg"));
+		audio.loadSample("drum cymbal", findFile("sounds/drum_cymbal.ogg"));
+		//audio.loadSample("drum tom2", findFile("sounds/drum_tom2.ogg"));
+		audio.loadSample("guitar fail1", findFile("sounds/guitar_fail1.ogg"));
+		audio.loadSample("guitar fail2", findFile("sounds/guitar_fail2.ogg"));
+		audio.loadSample("guitar fail3", findFile("sounds/guitar_fail3.ogg"));
+		audio.loadSample("guitar fail4", findFile("sounds/guitar_fail4.ogg"));
+		audio.loadSample("guitar fail5", findFile("sounds/guitar_fail5.ogg"));
+		audio.loadSample("guitar fail6", findFile("sounds/guitar_fail6.ogg"));
 		// Load screens
 		gm.loading(_("Creating screens..."), 0.7);
 		gm.addScreen(new ScreenIntro("Intro", audio));
@@ -173,11 +171,11 @@ void mainLoop(std::string const& songlist) {
 		// Main loop
 		boost::xtime time = now();
 		unsigned frames = 0;
+		std::clog << "core/info: Assets loaded, entering main loop." << std::endl;
 		while (!gm.isFinished()) {
 			Profiler prof("mainloop");
 			bool benchmarking = config["graphic/fps"].b();
 			if( g_take_screenshot ) {
-				fs::path filename;
 				try {
 					window.screenshot();
 					gm.flashMessage(_("Screenshot taken!"));
@@ -225,10 +223,11 @@ void mainLoop(std::string const& songlist) {
 			}
 		}
 	} catch (EXCEPTION& e) {
+		std::clog << "core/error: Exiting due to fatal error: " << e.what() << std::endl;
 		gm.fatalError(e.what());  // Notify the user
 		throw;
 	} catch (QuitNow&) {
-		std::cout << "Terminated." << std::endl;
+		std::cerr << "Terminated." << std::endl;
 	}
 }
 
@@ -264,9 +263,9 @@ void jstestLoop() {
 			time = now();
 		}
 	} catch (EXCEPTION& e) {
-		std::cout << "ERROR: " << e.what() << std::endl;
+		std::cerr << "ERROR: " << e.what() << std::endl;
 	} catch (QuitNow&) {
-		std::cout << "Terminated." << std::endl;
+		std::cerr << "Terminated." << std::endl;
 	}
 	return;
 }
@@ -281,12 +280,7 @@ template <typename Container> void confOverride(Container const& c, std::string 
 void outputOptionalFeatureStatus();
 
 int main(int argc, char** argv) try {
-	// initialize gettext
-	Gettext gettext(PACKAGE);
-
-	std::cout << PACKAGE " " VERSION << std::endl;
 	signalSetup();
-	outputOptionalFeatureStatus();
 	std::ios::sync_with_stdio(false);  // We do not use C stdio
 	std::srand(std::time(nullptr));
 	// Parse commandline options
@@ -295,10 +289,10 @@ int main(int argc, char** argv) try {
 	namespace po = boost::program_options;
 	po::options_description opt1("Generic options");
 	std::string songlist;
-	std::string loglevel_regexp;
+	std::string loglevel;
 	opt1.add_options()
 	  ("help,h", "you are viewing it")
-	  ("log,l", po::value<std::string>(&loglevel_regexp)->default_value(logger::default_log_level), "selects log level")
+	  ("log,l", po::value<std::string>(&loglevel), "subsystem name or minimum level to log")
 	  ("version,v", "display version number")
 	  ("songlist", po::value<std::string>(&songlist), "save a list of songs in the specified folder");
 	po::options_description opt2("Configuration options");
@@ -321,33 +315,33 @@ int main(int argc, char** argv) try {
 		allopts.add(opt3);
 		po::store(po::command_line_parser(argc, argv).options(allopts).positional(p).run(), vm);
 	} catch (EXCEPTION& e) {
-		std::cout << cmdline << std::endl;
-		std::cout << "ERROR: " << e.what() << std::endl;
+		std::cerr << cmdline << std::endl;
+		std::cerr << "ERROR: " << e.what() << std::endl;
 		return EXIT_FAILURE;
 	}
 	po::notify(vm);
 
-	// Initialize the verbose message sink
-	//logger::__log_hh_test(); // debug
-	logger::setup(loglevel_regexp);
-	atexit(logger::teardown); // We might exit from many places due to audio hangs
-
 	if (vm.count("version")) {
-		// Already printed the version string in the beginning...
+		std::cout << PACKAGE " " VERSION << std::endl;
 		return EXIT_SUCCESS;
 	}
 	if (vm.count("help")) {
 		std::cout << cmdline << "  any arguments without a switch are interpreted as song folders.\n" << std::endl;
 		return EXIT_SUCCESS;
 	}
+
+	Logger logger(loglevel);
+	outputOptionalFeatureStatus();
+
 	// Read config files
 	try {
 		readConfig();
 	} catch (EXCEPTION& e) {
-		std::cerr << e.what() << std::endl;
+		std::clog << "core/error: Error loading configuration: " << e.what() << std::endl;
 		return EXIT_FAILURE;
 	}
 	if (vm.count("audiohelp")) {
+		std::clog << "core/notice: Starting audio subsystem for audiohelp (errors printed on console may be ignored)." << std::endl;
 		Audio audio;
 		// Print the devices
 		portaudio::AudioDevices ads;
@@ -361,7 +355,7 @@ int main(int argc, char** argv) try {
 		// Give audio a little time to shutdown but then just quit
 		boost::thread audiokiller(boost::bind(&Audio::close, boost::ref(audio)));
 		if (!audiokiller.timed_join(boost::posix_time::milliseconds(2000)))
-			std::cout << "Audio hung." << std::endl;
+		  std::clog << "core/warning: Closing audio hung for over two seconds." << std::endl;
 		return EXIT_SUCCESS;
 	}
 	// Override XML config for options that were specified from commandline or performous.conf
@@ -369,6 +363,7 @@ int main(int argc, char** argv) try {
 	confOverride(devices, "audio/devices");
 	getPaths(); // Initialize paths before other threads start
 	if (vm.count("jstest")) { // Joystick test program
+		std::clog << "core/notice: Starting jstest input test utility." << std::endl;
 		std::cout << std::endl << "Joystick utility - Touch your joystick to see buttons here" << std::endl
 		<< "Hit ESC (window focused) to quit" << std::endl << std::endl;
 		jstestLoop();
@@ -385,11 +380,10 @@ int main(int argc, char** argv) try {
 }
 
 void outputOptionalFeatureStatus() {
-	std::cout    << "  Internationalization:   " <<
-	(Gettext::enabled() ? "Enabled" : "Disabled")
-	<< std::endl << "  MIDI I/O:               " <<
-	(input::Hardware::midiEnabled() ? "Enabled" : "Disabled")
-	<< std::endl << "  Webcam support:         " <<
-	(Webcam::enabled() ? "Enabled" : "Disabled")
-	<< std::endl << std::endl;
+	std::clog << "core/notice: " PACKAGE " " VERSION " starting..."
+	  << "\n  Build date:           " __DATE__
+	  << "\n  Internationalization: " << (Gettext::enabled() ? "Enabled" : "Disabled")
+	  << "\n  MIDI Hardware I/O:    " << (input::Hardware::midiEnabled() ? "Enabled" : "Disabled")
+	  << "\n  Webcam support:       " << (Webcam::enabled() ? "Enabled" : "Disabled")
+	  << std::endl;
 }

@@ -93,13 +93,13 @@ void GuitarGraph::initDrums() {
 
 GuitarGraph::GuitarGraph(Audio& audio, Song const& song, input::DevicePtr dev, int number):
   InstrumentGraph(audio, song, dev),
-  m_tail(getThemePath("tail.svg")),
-  m_tail_glow(getThemePath("tail_glow.svg")),
-  m_tail_drumfill(getThemePath("tail_drumfill.svg")),
-  m_flame(getThemePath("flame.svg")),
-  m_flame_godmode(getThemePath("flame_godmode.svg")),
-  m_tap(getThemePath("tap.svg")),
-  m_neckglow(getThemePath("neck_glow.svg")),
+  m_tail(findFile("tail.svg")),
+  m_tail_glow(findFile("tail_glow.svg")),
+  m_tail_drumfill(findFile("tail_drumfill.svg")),
+  m_flame(findFile("flame.svg")),
+  m_flame_godmode(findFile("flame_godmode.svg")),
+  m_tap(findFile("tap.svg")),
+  m_neckglow(findFile("neck_glow.svg")),
   m_neckglowColor(),
   m_drums(dev->type == input::DEVTYPE_DRUMS),
   m_level(),
@@ -125,11 +125,11 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, input::DevicePtr dev, i
 		initGuitar();
 	}
 	// Load 3D fret objects
-	m_fretObj.load(getThemePath("fret.obj"));
-	m_tappableObj.load(getThemePath("fret_tap.obj"));
+	m_fretObj.load(findFile("fret.obj"));
+	m_tappableObj.load(findFile("fret_tap.obj"));
 	// Score calculator (TODO a better one)
-	m_scoreText.reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
-	m_streakText.reset(new SvgTxtThemeSimple(getThemePath("sing_score_text.svg"), config["graphic/text_lod"].f()));
+	m_scoreText.reset(new SvgTxtThemeSimple(findFile("sing_score_text.svg"), config["graphic/text_lod"].f()));
+	m_streakText.reset(new SvgTxtThemeSimple(findFile("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	for (size_t i = 0; i < max_panels; ++i) {
 		m_pressed_anim[i].setRate(5.0);
 		m_holds[i] = 0;
@@ -212,10 +212,10 @@ void GuitarGraph::updateJoinMenu() {
 void GuitarGraph::updateNeck() {
 	// TODO: Optimize with texture cache
 	std::string index = m_track_index->first;
-	if (index == TrackName::DRUMS) m_neck.reset(new Texture(getThemePath("drumneck.svg")));
-	else if (index == TrackName::KEYBOARD) m_neck.reset(new Texture(getThemePath("guitarneck.svg")));
-	else if (index == TrackName::BASS) m_neck.reset(new Texture(getThemePath("bassneck.svg")));
-	else m_neck.reset(new Texture(getThemePath("guitarneck.svg")));
+	if (index == TrackName::DRUMS) m_neck.reset(new Texture(findFile("drumneck.svg")));
+	else if (index == TrackName::KEYBOARD) m_neck.reset(new Texture(findFile("guitarneck.svg")));
+	else if (index == TrackName::BASS) m_neck.reset(new Texture(findFile("bassneck.svg")));
+	else m_neck.reset(new Texture(findFile("guitarneck.svg")));
 }
 
 /// Cycle through the different tracks
@@ -633,7 +633,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 	// Handle Big Rock Ending
 	if (m_dfIt != m_drumfills.end() && time >= m_dfIt->begin - maxTolerance
 	  && time <= m_dfIt->end + maxTolerance) {
-		if (!ev.pressed()) return;  // No processing for release events
+		if (!ev.pressed() || ev.button >= m_pads) return;  // No processing for release events or non-fret buttons
 		m_drumfillHits += 1;
 		m_flames[ev.button].push_back(AnimValue(0.0, flameSpd));
 		m_flames[ev.button].back().setTarget(1.0);

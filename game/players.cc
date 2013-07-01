@@ -1,15 +1,9 @@
 #include "players.hh"
 
-#include "fs.hh"
 #include "configuration.hh"
-
-#include <set>
-#include <fstream>
-#include <iostream>
-
+#include "fs.hh"
 #include <boost/regex.hpp>
 #include <boost/lexical_cast.hpp>
-
 #include <libxml++/libxml++.h>
 
 Players::Players():
@@ -52,7 +46,7 @@ void Players::save(xmlpp::Element *players) {
 		if (p.picture != "")
 		{
 			xmlpp::Element* picture = player->add_child("picture");
-			picture->add_child_text(p.picture);
+			picture->add_child_text(p.picture.string());
 		}
 	}
 }
@@ -90,7 +84,7 @@ void Players::addPlayer (std::string const& name, std::string const& picture, in
 	if (pi.picture != "") // no picture, so don't search path
 	{
 		try {
-			pi.path =  getPath(fs::path("pictures") / pi.picture);
+			pi.path =  findFile(fs::path("pictures") / pi.picture);
 		} catch (std::runtime_error const& e)
 		{
 			std::cerr << e.what() << std::endl;

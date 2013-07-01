@@ -4,7 +4,7 @@
 
 #include <stdexcept>
 
-ProgressBar::ProgressBar(std::string const& bg, std::string const& bar, Mode mode, float begin, float end, bool sliding):
+ProgressBar::ProgressBar(fs::path const& bg, fs::path const& bar, Mode mode, float begin, float end, bool sliding):
   m_bg(bg), m_bar(bar), m_mode(mode), m_begin(begin), m_end(end), m_sliding(sliding), dimensions(m_bg.dimensions)
 {}
 

@@ -16,13 +16,6 @@ bool SongParser::xmlCheck(std::vector<char> const& data) const {
 	return std::equal(header.begin(), header.end(), data.begin());
 }
 
-namespace {
-	void testAndAdd(Song& s, std::string const& trackid, std::string const& filename) {
-		std::string f = s.path + filename;
-		if (boost::filesystem::exists(f)) s.music[trackid] = f;
-	}
-}
-
 #include <libxml++/libxml++.h>
 #include <glibmm/convert.h>
 
@@ -85,32 +78,13 @@ namespace {
 void SongParser::xmlParseHeader() {
 	Song& s = m_song;
 
-	boost::cmatch match;
-	boost::regex coverfile("(cover\\..*)$", boost::regex_constants::icase);
-	boost::regex videofile("(video\\..*)$", boost::regex_constants::icase);
-	boost::regex musicfile("(music\\..*)$", boost::regex_constants::icase);
-	boost::regex vocalsfile("(vocals\\..*)$", boost::regex_constants::icase);
-
-	for (boost::filesystem::directory_iterator dirIt(s.path), dirEnd; dirIt != dirEnd; ++dirIt) {
-		boost::filesystem::path p = dirIt->path();
-		std::string name = p.filename().string(); // File basename (notes.xml)
-		if (regex_match(name.c_str(), match, coverfile)) {
-			s.cover = name;
-		} else if (regex_match(name.c_str(), match, videofile)) {
-			s.video = name;
-		} else if (regex_match(name.c_str(), match, musicfile)) {
-			testAndAdd(s, "background", name);
-		} else if (regex_match(name.c_str(), match, vocalsfile)) {
-			testAndAdd(s, "vocals", name);
-		}
-	}
-
 	// Parse notes.xml
 	SSDom dom(m_ss);
 	// Extract artist and title from XML comments
 	{
 		xmlpp::NodeSet comments;
-		dom.find("/ss:MELODY/comment()", comments);
+		// Comments inside or before root element
+		dom.find("/ss:MELODY/comment()", comments) || dom.find("/ss:MELODY/../comment()", comments);
 		for (auto const& node: comments) {
 			std::string str = dynamic_cast<xmlpp::CommentNode const&>(*node).get_content();
 			boost::trim(str);

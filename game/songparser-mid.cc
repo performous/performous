@@ -57,7 +57,7 @@ namespace {
 void SongParser::midParseHeader() {
 	Song& s = m_song;
 	// Parse tracks from midi
-	MidiFileParser midi(s.path + "/" + s.midifilename);
+	MidiFileParser midi(s.midifilename);
 	for (MidiFileParser::Tracks::const_iterator it = midi.tracks.begin(); it != midi.tracks.end(); ++it) {
 		// Figure out the track name
 		std::string name = it->name;
@@ -80,7 +80,7 @@ void SongParser::midParse() {
 	Song& s = m_song;
 	s.instrumentTracks.clear();
 
-	MidiFileParser midi(s.path + "/" + s.midifilename);
+	MidiFileParser midi(s.midifilename);
 	int reversedNoteCount = 0;
 	for (uint32_t ts = 0, end = midi.ts_last + midi.division; ts < end; ts += midi.division) s.beats.push_back(midi.get_seconds(ts)+s.start);
 	for (MidiFileParser::Tracks::const_iterator it = midi.tracks.begin(); it != midi.tracks.end(); ++it) {
@@ -208,9 +208,8 @@ void SongParser::midParse() {
 	// Output some warning
 	if (reversedNoteCount > 0) {
 		std::ostringstream oss;
-		oss << "Skipping " << reversedNoteCount << " reversed note(s) in ";
-		oss << s.path << s.midifilename << std::endl;
-		std::clog << "songparser/warning: " << oss.str(); // More likely to be atomic when written as one string
+		oss << "songparser/notice: Skipping " << reversedNoteCount << " reversed note(s) in " << s.midifilename.string();
+		std::clog << oss.str() << std::endl; // More likely to be atomic when written as one string
 	}
 	// copy midi sections to song section
 	// design goals: (1) keep midi parser free of dependencies on song (2) store data in song as parsers are discarded before song
