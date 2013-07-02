@@ -38,15 +38,30 @@ struct Job {
 	Job(fs::path const& n, ApplyFunc const& a): name(n), apply(a) {}
 };
 
-struct Loader {
+class SurfaceLoader::Impl {
+	/// Load a file from disk into a buffer
+	static void load(Bitmap& bitmap, fs::path const& name) {
+		try {
+			std::string ext = boost::algorithm::to_lower_copy(name.extension().string());
+			if (!fs::is_regular_file(name)) throw std::runtime_error("File not found: " + name.string());
+			else if (ext == ".svg") loadSVG(bitmap, name);
+			else if (ext == ".jpg" || ext == ".jpeg") loadJPEG(bitmap, name);
+			else if (ext == ".png") loadPNG(bitmap, name);
+			else throw std::runtime_error("Unknown image file format: " + name.string());
+		} catch (std::exception& e) {
+			std::clog << "image/error: " << e.what() << std::endl;
+		}
+	}
 	volatile bool m_quit;
 	boost::thread m_thread;
 	boost::mutex m_mutex;
 	boost::condition m_condition;
 	typedef std::map<void const*, Job> Jobs;
 	Jobs m_jobs;
-	Loader(): m_quit(), m_thread(&Loader::run, this) {}
-	~Loader() { m_quit = true; m_condition.notify_one(); m_thread.join(); }
+public:
+	Impl(): m_quit(), m_thread(&Impl::run, this) {}
+	~Impl() { m_quit = true; m_condition.notify_one(); m_thread.join(); }
+	/// The loader main loop: poll for image load jobs and load into RAM
 	void run() {
 		while (!m_quit) {
 			void const* target = nullptr;
@@ -66,18 +81,9 @@ struct Loader {
 					continue;
 				}
 			}
+			// Load image file into buffer
 			Bitmap bitmap;
-			try {
-				// Load bitmap from disk
-				std::string ext = boost::algorithm::to_lower_copy(name.extension().string());
-				if (!fs::is_regular_file(name)) throw std::runtime_error("File not found: " + name.string());
-				else if (ext == ".svg") loadSVG(bitmap, name);
-				else if (ext == ".jpg" || ext == ".jpeg") loadJPEG(bitmap, name);
-				else if (ext == ".png") loadPNG(bitmap, name);
-				else throw std::runtime_error("Unknown image file format: " + name.string());
-			} catch (std::exception& e) {
-				std::clog << "image/error: " << e.what() << std::endl;
-			}
+			load(bitmap, name);
 			// Store the result
 			boost::mutex::scoped_lock l(m_mutex);
 			auto it = m_jobs.find(target);
@@ -86,29 +92,41 @@ struct Loader {
 			it->second.bitmap.swap(bitmap);  // Store the bitmap (if we got any)
 		}
 	}
+	/// Add a new job, using calling Surface's address as unique ID.
 	void push(void const* t, Job const& job) {
 		boost::mutex::scoped_lock l(m_mutex);
 		m_jobs[t] = job;
 		m_condition.notify_one();
 	}
+	/// Cancel a job in progress (no effect if the job has already completed)
 	void remove(void const* t) {
 		boost::mutex::scoped_lock l(m_mutex);
 		m_jobs.erase(t);
 	}
+	/// Upload all completed jobs to OpenGL (must be called from a valid OpenGL context)
 	void apply() {
 		boost::mutex::scoped_lock l(m_mutex);
 		for (auto it = m_jobs.begin(); it != m_jobs.end();) {
 			{
 				Job& j = it->second;
 				if (!j.name.empty()) { ++it; continue; }  // Job incomplete, skip it
-				j.apply(j.bitmap);  // Load to OpenGL
+				j.apply(j.bitmap);  // Upload to OpenGL
 			}
 			m_jobs.erase(it++);
 		}
 	}
-} ldr;
+};
 
-void updateSurfaces() { ldr.apply(); }
+std::unique_ptr<SurfaceLoader::Impl> ldr = nullptr;
+
+SurfaceLoader::SurfaceLoader() {
+	if (ldr) throw std::logic_error("Surface Loader initialized twice. There can be only one.");
+	ldr.reset(new Impl());
+}
+
+SurfaceLoader::~SurfaceLoader() { ldr.reset(); }
+
+void updateSurfaces() { ldr->apply(); }
 
 template <typename T> void loader(T* target, fs::path const& name) {
 	// Temporarily add 1x1 pixel black texture
@@ -117,11 +135,11 @@ template <typename T> void loader(T* target, fs::path const& name) {
 	bitmap.resize(1, 1);
 	target->load(bitmap);
 	// Ask the loader to retrieve the image
-	ldr.push(target, Job(name, boost::bind(&T::load, target, _1)));
+	ldr->push(target, Job(name, boost::bind(&T::load, target, _1)));
 }
 
 Surface::Surface(fs::path const& filename) { loader(this, filename); }
-Surface::~Surface() { ldr.remove(this); }
+Surface::~Surface() { ldr->remove(this); }
 
 // Stuff for converting pix::Format into OpenGL enum values
 namespace {

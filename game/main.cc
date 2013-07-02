@@ -135,6 +135,7 @@ void mainLoop(std::string const& songlist) {
 	std::clog << "core/info: Loading assets." << std::endl;
 	Gettext localization(PACKAGE);
 	Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());
+	SurfaceLoader m_loader;
 	Backgrounds backgrounds;
 	Database database(getConfigDir() / "database.xml");
 	Songs songs(database, songlist);

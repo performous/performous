@@ -25,11 +25,6 @@
 # warning "Your version of GLEW is too old, Performous is smart and let you compile it anyway"
 #endif
 
-/*
-/home/yoda/performous/game/video_driver.cc: In member function âid Window::render(boost::function<void()>)â/home/yoda/performous/game/video_driver.cc:193:43: error: âViewportIndexedfâas not declared in this scope
-/home/yoda/performous/game/video_driver.cc: In member function âid Window::view(unsigned int)â/home/yoda/performous/game/video_driver.cc:256:46: error: âViewportIndexedfâas not declared in this scope
-*/
-
 
 namespace {
 	unsigned s_width;

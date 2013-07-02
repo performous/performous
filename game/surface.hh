@@ -233,3 +233,12 @@ private:
 
 typedef Surface Texture;  // Backwards compatibility
 
+/// A RAII wrapper for surface loading worker thread. There must be exactly one (global) instance whenever any Surfaces exist.
+class SurfaceLoader {
+public:
+	SurfaceLoader();
+	~SurfaceLoader();
+	class Impl;
+};
+
+
