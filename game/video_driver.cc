@@ -319,19 +319,20 @@ void Window::resize() {
 }
 
 void Window::screenshot() {
-	Image img;
-	img.w = m_fullscreen ? m_fsW : m_windowW;
-	img.h = m_fullscreen ? m_fsH : m_windowH;
-	img.data.resize(((img.w + 3) & ~3) * img.h * 3);
-	img.format = pix::RGB;
-	img.reverse = true;
+	Bitmap img;
+	img.width = m_fullscreen ? m_fsW : m_windowW;
+	img.height = m_fullscreen ? m_fsH : m_windowH;
+	unsigned stride = (img.width * 3 + 3) & ~3;  // Rows are aligned to 4 byte boundaries
+	img.buf.resize(stride * img.height);
+	img.fmt = pix::RGB;
+	img.bottomFirst = true;
 	// Get pixel data from OpenGL
-	glReadPixels(0, 0, img.w, img.h, GL_RGB, GL_UNSIGNED_BYTE, &img.data[0]);
+	glReadPixels(0, 0, img.width, img.height, GL_RGB, GL_UNSIGNED_BYTE, img.data());
 	// Compose filename from timestamp
 	fs::path filename = getHomeDir() / ("Performous_" + to_iso_string(boost::posix_time::second_clock::local_time()) + ".png");
 	// Save to disk
-	writePNG(filename.string(), img);
-	std::clog << "video/info: Screenshot taken: " << filename << " (" << img.w << "x" << img.h << ")" << std::endl;
+	writePNG(filename.string(), img, stride);
+	std::clog << "video/info: Screenshot taken: " << filename << " (" << img.width << "x" << img.height << ")" << std::endl;
 }
 
 ColorTrans::ColorTrans(Color const& c): m_old(g_color) {

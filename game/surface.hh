@@ -172,7 +172,12 @@ template <GLenum Type> void OpenGLTexture<Type>::drawCropped(Dimensions const& o
 	draw(dim, tex);
 }
 
-namespace pix { enum Format { INT_ARGB, CHAR_RGBA, RGB, BGR }; }
+namespace pix { enum Format {
+	INT_ARGB,  // Cairo's pixel format (SVG, text): premultiplied linear RGB (BGRA byte order)
+	CHAR_RGBA,  // libpng w/ alpha: non-premul sRGB (RGBA byte order)
+	RGB,  // libpng w/o alpha, libjpeg, ffmpeg: sRGB (RGB byte order, no padding)
+	BGR  // OpenCV/webcam: sRGB (BGR byte order, no padding)
+}; }
 
 struct Bitmap {
 	std::vector<unsigned char> buf;  // Pixel data if owned by Bitmap
@@ -181,7 +186,9 @@ struct Bitmap {
 	double ar;  // Aspect ratio
 	double timestamp;  // Used for video frames
 	pix::Format fmt;
-	Bitmap(unsigned char* ptr = NULL): ptr(ptr), width(), height(), ar(), timestamp(), fmt(pix::CHAR_RGBA) {}
+	bool linearPremul;  // Is the data linear RGB and premultiplied (as opposed to sRGB and non-premultiplied)
+	bool bottomFirst;  // Upside-down (only used for taking screenshots)
+	Bitmap(unsigned char* ptr = NULL): ptr(ptr), width(), height(), ar(), timestamp(), fmt(pix::CHAR_RGBA), linearPremul(), bottomFirst() {}
 	void resize(unsigned w, unsigned h) {
 		if (!ptr) buf.resize(w * h * 4); else buf.clear();
 		width = w;
@@ -213,7 +220,7 @@ public:
 	Dimensions dimensions;
 	/// texture coordinates
 	TexCoords tex;
-	Surface(): m_width(0), m_height(0) {}
+	Surface(): m_width(0), m_height(0), m_premultiplied(true) {}
 	/// creates surface from file
 	Surface(fs::path const& filename);
 	~Surface();
@@ -228,6 +235,7 @@ public:
 	unsigned height() const { return m_height; }
 private:
 	unsigned m_width, m_height;
+	bool m_premultiplied;
 	OpenGLTexture<GL_TEXTURE_2D> m_texture;
 };
 

@@ -141,14 +141,14 @@ template <typename T> void loader(T* target, fs::path const& name) {
 Surface::Surface(fs::path const& filename) { loader(this, filename); }
 Surface::~Surface() { ldr->remove(this); }
 
-// Stuff for converting pix::Format into OpenGL enum values
+// Stuff for converting pix::Format into OpenGL enum values & other flags
 namespace {
 	struct PixFmt {
 		PixFmt(): swap() {} // Required by std::map
 		PixFmt(GLenum f, GLenum t, bool s): format(f), type(t), swap(s) {}
 		GLenum format;
 		GLenum type;
-		bool swap;
+		bool swap;  // Reverse byte order
 	};
 	struct PixFormats {
 		typedef std::map<pix::Format, PixFmt> Map;
@@ -166,7 +166,9 @@ namespace {
 		if (it != pixFormats.m.end()) return it->second;
 		throw std::logic_error("Unknown pixel format");
 	}
-	GLint internalFormat() { return GL_EXT_framebuffer_sRGB ? GL_SRGB_ALPHA : GL_RGBA; }
+	GLint internalFormat(bool linear) {
+		return (!linear && GL_EXT_framebuffer_sRGB ? GL_SRGB_ALPHA : GL_RGBA);
+	}
 }
 
 void Surface::load(Bitmap const& bitmap) {
@@ -174,7 +176,7 @@ void Surface::load(Bitmap const& bitmap) {
 	// Initialize dimensions
 	m_width = bitmap.width; m_height = bitmap.height;
 	dimensions = Dimensions(bitmap.ar).fixedWidth(1.0f);
-
+	m_premultiplied = bitmap.linearPremul;
 	UseTexture texture(*this);
 	// When texture area is small, bilinear filter the closest mipmap
 	glTexParameterf(type(), GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
@@ -190,11 +192,15 @@ void Surface::load(Bitmap const& bitmap) {
 	// Load the data into texture
 	PixFmt const& f = getPixFmt(bitmap.fmt);
 	glPixelStorei(GL_UNPACK_SWAP_BYTES, f.swap);
-	glTexImage2D(type(), 0, internalFormat(), bitmap.width, bitmap.height, 0, f.format, f.type, bitmap.data());
+	glTexImage2D(type(), 0, internalFormat(bitmap.linearPremul), bitmap.width, bitmap.height, 0, f.format, f.type, bitmap.data());
 	glGenerateMipmap(type());
 }
 
 void Surface::draw() const {
-	if (!empty()) draw(dimensions, TexCoords(tex.x1, tex.y1, tex.x2, tex.y2));
+	if (empty()) return;
+	// FIXME: This gets image alpha handling right but our ColorMatrix system always assumes premultiplied alpha
+	// (will produce incorrect results for fade effects)
+	glBlendFunc(m_premultiplied ? GL_ONE : GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	draw(dimensions, TexCoords(tex.x1, tex.y1, tex.x2, tex.y2));
 }
 
