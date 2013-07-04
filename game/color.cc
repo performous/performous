@@ -2,37 +2,51 @@
 #include <cstdio>
 #include <iostream>
 #include <map>
+#include <string>
+
+std::istream& operator>>(std::istream& is, Color& color) {
+	std::string str;
+	is >> str;
+	color = Color(str);
+	return is;
+}
 
 namespace {
 	struct ColorNames {
 		typedef std::map<std::string, Color> Map;
 		Map m;
 		ColorNames() {
-			m["none"] = Color(0.0, 0.0, 0.0, 0.0);
-			m["black"] = Color(0.0, 0.0, 0.0);
-			m["gray"] = Color(0.5, 0.5, 0.5);
-			m["silver"] = Color(0.75, 0.75, 0.75);
-			m["white"] = Color(1.0, 1.0, 1.0);
-			m["maroon"] = Color(0.5, 0.0, 0.0);
-			m["red"] = Color(1.0, 0.0, 0.0);
-			m["green"] = Color(0.0, 0.5, 0.0);
-			m["lime"] = Color(0.0, 1.0, 0.0);
-			m["navy"] = Color(0.0, 0.0, 0.5);
-			m["blue"] = Color(0.0, 0.0, 1.0);
-			m["purple"] = Color(0.5, 0.0, 0.5);
-			m["fuchsia"] = Color(1.0, 0.5, 1.0);
-			m["olive"] = Color(0.5, 0.5, 0.0);
-			m["yellow"] = Color(1.0, 1.0, 0.0);
-			m["teal"] = Color(0.0, 0.5, 0.5);
-			m["aqua"] = Color(0.0, 1.0, 1.0);
+			m["none"] = Color("#00000000");
+			m["black"] = Color("#000000");
+			m["gray"] = Color("#808080");
+			m["silver"] = Color("#C0C0C0");
+			m["white"] = Color("#FFFFFF");
+			m["maroon"] = Color("#800000");
+			m["red"] = Color("#FF0000");
+			m["green"] = Color("#008000");
+			m["lime"] = Color("#00FF00");
+			m["navy"] = Color("#000080");
+			m["blue"] = Color("#0000FF");
+			m["purple"] = Color("#800080");
+			m["fuchsia"] = Color("#FF00FF");
+			m["olive"] = Color("#808000");
+			m["yellow"] = Color("#FFFF00");
+			m["teal"] = Color("#008080");
+			m["aqua"] = Color("#00FFFF");
 		}
 	} colors;
+
+	// Convert sRGB color component into linear as per OpenGL specs
+	double lin(double sRGB) {
+		if (sRGB <= 0.04045) return sRGB / 12.92;
+		return std::pow((sRGB + 0.055)/1.055, 2.4);
+	}
 }
 
 Color::Color(std::string const& str) {
-	unsigned int r = 0, g = 0, b = 0;
-	if (str.size() == 7 && str[0] == '#' && sscanf(str.c_str() + 1, "%02x %02x %02x", &r, &g, &b) == 3) {
-		*this = Color(r / 255.0, g / 255.0, b / 255.0);
+	unsigned int r = 0, g = 0, b = 0, a = 255;
+	if (str.size() > 0 && str[0] == '#' && sscanf(str.c_str() + 1, "%02x %02x %02x %02x", &r, &g, &b, &a) >= 3) {
+		*this = Color(lin(r / 255.0), lin(g / 255.0), lin(b / 255.0), a / 255.0);
 		return;
 	}
 	ColorNames::Map::const_iterator it = colors.m.find(str);
@@ -41,15 +55,7 @@ Color::Color(std::string const& str) {
 	*this = Color(1.0, 0.0, 1.0);
 }
 
-namespace {
-	// Convert sRGB color component into linear as per OpenGL specs
-	double lin(double sRGB) {
-		if (sRGB <= 0.04045) return sRGB / 12.92;
-		return std::pow((sRGB + 0.055)/1.055, 2.4);
-	}
-}
-
 glmath::vec4 Color::linear() const {
-	return a * glmath::vec4(lin(r), lin(g), lin(b), 1.0);
+	return a * glmath::vec4(r, g, b, 1.0);
 }
 

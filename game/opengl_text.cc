@@ -140,8 +140,8 @@ namespace {
 			else if (token == "stroke-width") iss2 >> _theme.stroke_width;
 			else if (token == "stroke-opacity") iss2 >> _theme.stroke_col.a;
 			else if (token == "fill-opacity") iss2 >> _theme.fill_col.a;
-			else if (token == "fill") _theme.fill_col = getColor(iss2);
-			else if (token == "stroke") _theme.stroke_col = getColor(iss2);
+			else if (token == "fill") iss2 >> _theme.fill_col;
+			else if (token == "stroke") iss2 >> _theme.stroke_col;
 			else if (token == "text-anchor") {
 				std::string value;
 				std::getline(iss2, value);
