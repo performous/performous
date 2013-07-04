@@ -27,9 +27,8 @@ public:
 	  This is because it will take forever to fill more.
 	  And people refuse to enter their names if they are not close to the top.
 
-	  @param score is a value between 0 and 10000
-	    values below 500 will lead to returning false
-	  @return true if the score make it into the top.
+	  @param score is a value between 0 and 10000. values below 2000 will lead to instant disqualification.
+	  @return true if the score make it into the list
 	  @return false if addNewHiscore does not make sense
 	    for that score.*/
 	bool reachedHiscore(unsigned score, unsigned songid, std::string const& track) const;
@@ -53,6 +52,7 @@ public:
 	/// @param max limits the number of elements returned.
 	HiscoreVector queryHiscore(unsigned max, unsigned playerid, unsigned songid, std::string const& track) const;
 	bool hasHiscore(unsigned songid) const;
+	std::size_t size() const { return m_hiscore.size(); }
 private:
 	typedef std::multiset<HiscoreItem> hiscore_t;
 	hiscore_t m_hiscore;

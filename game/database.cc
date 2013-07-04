@@ -20,7 +20,8 @@ void Database::load() {
 		xmlpp::Node* nodeRoot = domParser.get_document()->get_root_node();
 		m_players.load(nodeRoot->find("/performous/players/player"));
 		m_songs.load(nodeRoot->find("/performous/songs/song"));
-		m_hiscores.load(nodeRoot->find("/performous/databases/database"));
+		m_hiscores.load(nodeRoot->find("/performous/hiscores/hiscore"));
+		std::clog << "database/info: Loaded " << m_players.size() << " players and " << m_hiscores.size() << " hiscores from " << m_filename.string() << std::endl;
 	} catch (std::exception& e) {
 		std::clog << "database/error: Error loading " + m_filename.string() + ": " + e.what() << std::endl;
 	}
@@ -35,10 +36,11 @@ void Database::save() {
 			xmlpp::Node* nodeRoot = doc.create_root_node("performous");
 			m_players.save(nodeRoot->add_child("players"));
 			m_songs.save(nodeRoot->add_child("songs"));
-			m_hiscores.save(nodeRoot->add_child("databases"));
+			m_hiscores.save(nodeRoot->add_child("hiscores"));
 			doc.write_to_file_formatted(tmp.string(), "UTF-8");
 		}
 		rename(tmp, m_filename);
+		std::clog << "database/info: Saved " << m_players.size() << " players and " << m_hiscores.size() << " hiscores to " << m_filename.string() << std::endl;
 	} catch (std::exception const& e) {
 		std::clog << "database/error: Could not save " + m_filename.string() + ": " + e.what() << std::endl;
 		return;
@@ -60,6 +62,7 @@ void Database::addHiscore(boost::shared_ptr<Song> s) {
 	int songid = m_songs.lookup(s);
 
 	m_hiscores.addHiscore(score, playerid, songid, track);
+	std::clog << "database/info: Added new hiscore " << score << " points on track " << track << " of songid " << songid << std::endl;
 }
 
 bool Database::reachedHiscore(boost::shared_ptr<Song> s) const {
