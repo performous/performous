@@ -284,10 +284,8 @@ void ScreenSongs::draw() {
 		Song& song = m_songs.current();
 		// Format the song information text
 		oss_song << song.artist << ": " << song.title;
-		// Format the song information text
-		oss_hiscore << _("Hiscore\n");
 		// Get hiscores from database
-		m_database.queryPerSongHiscore_HiscoreDisplay(oss_hiscore, m_songs.currentPtr(), m_infoPos, 5);
+		m_database.queryPerSongHiscore(oss_hiscore, m_songs.currentPtr());
 		// Here we use horrible raw utf-8 bytes in place of nice arrow chars ↵↕↔
 		// because otherwise we get garbage output on Windows for some reason
 		switch (m_menuPos) {
@@ -318,8 +316,6 @@ void ScreenSongs::draw() {
 		theme->song.draw(oss_song.str());
 		theme->order.draw(oss_order.str());
 		drawInstruments(Dimensions(1.0).fixedHeight(0.09).right(0.45).screenTop(0.02));
-		using namespace glmath;
-		Transform trans(translate(vec3(0.32, -0.03, 0.0)) * scale(vec3(0.75, 0.75, 1.0)));
 		theme->hiscores.draw(oss_hiscore.str());
 	}
 	// Menus on top of everything

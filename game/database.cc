@@ -21,7 +21,7 @@ void Database::load() {
 		m_players.load(nodeRoot->find("/performous/players/player"));
 		m_songs.load(nodeRoot->find("/performous/songs/song"));
 		m_hiscores.load(nodeRoot->find("/performous/hiscores/hiscore"));
-		std::clog << "database/info: Loaded " << m_players.size() << " players and " << m_hiscores.size() << " hiscores from " << m_filename.string() << std::endl;
+		std::clog << "database/info: Loaded " << m_players.size() << " players, " << m_songs.size() << " songs and " << m_hiscores.size() << " hiscores from " << m_filename.string() << std::endl;
 	} catch (std::exception& e) {
 		std::clog << "database/error: Error loading " + m_filename.string() + ": " + e.what() << std::endl;
 	}
@@ -40,7 +40,7 @@ void Database::save() {
 			doc.write_to_file_formatted(tmp.string(), "UTF-8");
 		}
 		rename(tmp, m_filename);
-		std::clog << "database/info: Saved " << m_players.size() << " players and " << m_hiscores.size() << " hiscores to " << m_filename.string() << std::endl;
+		std::clog << "database/info: Saved " << m_players.size() << " players, " << m_songs.size() << " songs and " << m_hiscores.size() << " hiscores to " << m_filename.string() << std::endl;
 	} catch (std::exception const& e) {
 		std::clog << "database/error: Could not save " + m_filename.string() + ": " + e.what() << std::endl;
 		return;
@@ -75,8 +75,7 @@ bool Database::reachedHiscore(boost::shared_ptr<Song> s) const {
 
 void Database::queryOverallHiscore(std::ostream & os, std::string const& track) const {
 	std::vector<HiscoreItem> hi = m_hiscores.queryHiscore (10, -1, -1, track);
-	for (size_t i=0; i<hi.size(); ++i)
-	{
+	for (size_t i=0; i<hi.size(); ++i) {
 		os << i+1 << ".\t"
 		   << m_players.lookup(hi[i].playerid) << "\t"
 		   << m_songs.lookup(hi[i].songid) << "\t"
@@ -87,41 +86,16 @@ void Database::queryOverallHiscore(std::ostream & os, std::string const& track) 
 
 void Database::queryPerSongHiscore(std::ostream & os, boost::shared_ptr<Song> s, std::string const& track) const {
 	int songid = m_songs.lookup(s);
-	std::vector<HiscoreItem> hi = m_hiscores.queryHiscore(10, -1, songid, track);
-
-	if (songid == -1 || hi.empty()) {
-		os << _("No Items up to now.") << '\n';
-		os << _("Be the first to be listed here!") << '\n';
-		return;
-	}
-
-	for (size_t i=0; i<hi.size(); ++i) {
-		os << i+1 << ".\t"
-		   << m_players.lookup(hi[i].playerid) << "\t"
-		   << hi[i].score << "\t"
-		   << "(" << hi[i].track << ")\n";
-	}
-}
-
-void Database::queryPerSongHiscore_HiscoreDisplay(std::ostream & os, boost::shared_ptr<Song> s, int& start_pos, unsigned max_displayed, std::string const& track) const {
-	int songid = m_songs.lookup(s);
-	std::vector<HiscoreItem> hi = m_hiscores.queryHiscore(10, -1, songid, track);
-
-	if (songid == -1 || hi.empty()) {
-		os << _("No Items up to now.") << '\n';
-		os << _("Be the first to be listed here!") << '\n';
-		return;
-	}
-
-	// Limits
-	if (start_pos > (int)hi.size() - (int)max_displayed) start_pos = hi.size() - max_displayed;
-	if (start_pos < 0 || hi.size() <= max_displayed) start_pos = 0;
-
-	for (size_t i = 0; i < hi.size() && i < max_displayed; ++i) {
-		os << i+start_pos+1 << "\t"
-		   << m_players.lookup(hi[i+start_pos].playerid) << "\t"
-		   << hi[i+start_pos].score << "\t"
-		   << "(" << hi[i+start_pos].track << ")\n";
+	if (songid == -1) return;  // Song not included in database (yet)
+	// Reorder hiscores by track / score
+	std::map<std::string, std::multiset<HiscoreItem>> scoresByTrack;
+	for (HiscoreItem const& hi: m_hiscores.queryHiscore(-1, -1, songid, track)) scoresByTrack[hi.track].insert(hi);
+	for (auto const& hiv: scoresByTrack) {
+		os << hiv.first << ":\n";
+		for (auto const& hi: hiv.second) {
+			os << "\t" << hi.score << "\t" << m_players.lookup(hi.playerid) << "\n";
+		}
+		os << "\n";
 	}
 }
 
