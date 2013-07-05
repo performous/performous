@@ -290,25 +290,24 @@ void ScreenSongs::draw() {
 		oss_song << song.artist << ": " << song.title;
 		// Get hiscores from database
 		m_database.queryPerSongHiscore(oss_hiscore, m_songs.currentPtr());
-		// Here we use horrible raw utf-8 bytes in place of nice arrow chars ↵↕↔
-		// because otherwise we get garbage output on Windows for some reason
+		// Escaped bytes of UTF-8 must be used here for compatibility with Windows (MSVC, mingw)
+		char const* VERT_ARROW = "\xe2\x86\x95 ";  // ↕
+		char const* HORIZ_ARROW = "\xe2\x86\x94 ";  // ↔
+		char const* ENTER = "\xe2\x86\xb5 ";  // ↵
+		char const* PAD = "   ";
 		switch (m_menuPos) {
-			case 1:
-				if (!m_search.text.empty()) oss_order << m_search.text;
-				else if (m_songs.typeNum()) oss_order << m_songs.typeDesc();
-				else if (m_songs.sortNum()) oss_order << m_songs.sortDesc();
-				else oss_order << _("<type in to search>   \xe2\x86\x94 songs    \xe2\x86\x95 options");
-				break;
-			case 2: oss_order << _("\xe2\x86\x94 sort order: ") << m_songs.sortDesc(); break;
-			case 3: oss_order << _("\xe2\x86\x94 type filter: ") << m_songs.typeDesc(); break;
-			case 4: oss_order << _("\xe2\x86\x94 hiscores   \xe2\x86\xb5 jukebox mode"); break;
-			case 0:
-			Game* gm = Game::getSingletonPtr();
-			if(gm->getCurrentPlayList().isEmpty()) {
-				oss_order << _("\xe2\x86\xb5 start a playlist with this song!");
-			} else {
-				oss_order << _("\xe2\x86\xb5 open the playlist menu");
-			}
+		case 1:
+			if (!m_search.text.empty()) oss_order << m_search.text;
+			else if (m_songs.typeNum()) oss_order << m_songs.typeDesc();
+			else if (m_songs.sortNum()) oss_order << m_songs.sortDesc();
+			else oss_order << _("<type in to search>") << PAD << HORIZ_ARROW << _("songs") << PAD << VERT_ARROW << _("options");
+			break;
+		case 2: oss_order << HORIZ_ARROW << _("sort order: ") << m_songs.sortDesc(); break;
+		case 3: oss_order << HORIZ_ARROW << _("type filter: ") << m_songs.typeDesc(); break;
+		case 4: oss_order << HORIZ_ARROW << _("hiscores") << PAD << ENTER << _("jukebox mode"); break;
+		case 0:
+			bool empty = Game::getSingletonPtr()->getCurrentPlayList().isEmpty();
+			oss_order << ENTER << (empty ? _("start a playlist with this song!") : _("open the playlist menu"));
 			break;
 		}
 	}
