@@ -27,6 +27,11 @@ if [ "$1" != "config" ]; then
 	make -j $JOBS
 	make install
 	python ../copydlls.py "$MXE_PREFIX/usr/i686-pc-mingw32/bin" "$STAGE"
+
+	if [ "$BUILD_TYPE" == "Release" ]; then
+		echo "Stripping EXEs as this is a release build..."
+		strip "$STAGE/"*.exe "$STAGE/tools/"*.exe
+	fi
 fi
 
 echo "Done"
