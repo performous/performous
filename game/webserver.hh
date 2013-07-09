@@ -18,7 +18,7 @@ struct handler {
 	void operator() (http_server::request const &request,
 	http_server::response &response) {
 		response = http_server::response::stock_reply(
-		http_server::response::ok, "performous web-frontend!");
+		http_server::response::ok, "<html><head><title>Performous web frontend</title></head><body><h1>Performous web frontend</h1> <br> <h2> Current Playlist:</h2></body></html>");
 	}
 
 	void log(http_server::string_type const &info) {

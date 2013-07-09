@@ -7,7 +7,7 @@ namespace http = boost::network::http;
 void WebServer::StartServer() {
 	handler handler_;
 	http_server::options options(handler_);
-	server_ = new http_server(options.address("127.0.0.1").port("8000"));
+	server_ = new http_server(options.address("192.168.1.123").port("8000"));
 	server_->run();
 }
 
