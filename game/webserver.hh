@@ -30,5 +30,7 @@ struct handler {
 private:
 	boost::scoped_ptr<boost::thread> serverthread;
 	void StartServer();
+	http_server* server_; //FIXME should be boost::scoped_ptr or boost:: shared_ptr
+
 };
 
