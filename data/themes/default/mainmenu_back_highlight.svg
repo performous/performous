@@ -33,8 +33,8 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="1145"
-     inkscape:window-width="1920"
+     inkscape:window-height="879"
+     inkscape:window-width="1376"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      guidetolerance="10.0"
@@ -44,16 +44,16 @@
      bordercolor="#666666"
      pagecolor="#ffffff"
      id="base"
-     inkscape:zoom="1.2304507"
-     inkscape:cx="-28.954239"
-     inkscape:cy="35.400925"
-     inkscape:window-x="0"
-     inkscape:window-y="27"
+     inkscape:zoom="2.4609014"
+     inkscape:cx="264.61648"
+     inkscape:cy="41.573564"
+     inkscape:window-x="330"
+     inkscape:window-y="55"
      inkscape:current-layer="svg559"
      showgrid="false"
      showguides="true"
      inkscape:guide-bbox="true"
-     inkscape:window-maximized="1" />
+     inkscape:window-maximized="0" />
   <defs
      id="defs561">
     <linearGradient
@@ -231,24 +231,22 @@
     <linearGradient
        id="linearGradient6499-1-4">
       <stop
-         style="stop-color:#ffffff;stop-opacity:0.50273222;"
+         style="stop-color:#000000;stop-opacity:0.627451;"
          offset="0"
          id="stop3786" />
       <stop
          id="stop6503-0-4"
          offset="1"
-         style="stop-color:#ffffff;stop-opacity:0;" />
+         style="stop-color:#000000;stop-opacity:0;" />
     </linearGradient>
-    <radialGradient
+    <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient6499-1-4"
-       id="radialGradient3788"
-       cx="203.14932"
-       cy="44.166206"
-       fx="203.14932"
-       fy="44.166206"
-       r="198.77565"
-       gradientTransform="matrix(0.77108296,0,0,0.19507245,36.853328,32.197103)"
+       id="linearGradient3786"
+       x1="27.637432"
+       y1="154.99852"
+       x2="403.24554"
+       y2="-42.490097"
        gradientUnits="userSpaceOnUse" />
   </defs>
   <text
@@ -267,7 +265,7 @@
      height="77.551308"
      width="397.5513"
      id="rect6405"
-     style="fill:url(#radialGradient3788);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.44869374999999989;stroke-opacity:1;marker:none;visibility:visible;display:inline;overflow:visible"
-     rx="17.669563"
-     ry="14.354104" />
+     style="fill:url(#linearGradient3786);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.44899988000000013;marker:none;visibility:visible;display:inline;overflow:visible"
+     rx="2.6344144"
+     ry="3.6571968" />
 </svg>
