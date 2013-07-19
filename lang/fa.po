@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-06-28 14:24+0330\n"
+"POT-Creation-Date: 2013-07-12 14:55+0330\n"
 "PO-Revision-Date: \n"
 "Last-Translator: sajjadg <sajjad.gerami@gmail.com>\n"
 "Language-Team: GeramiBros <sajjad.gerami@gmail.com>\n"
@@ -211,9 +211,9 @@ msgstr "اضافه کردن آهنگ"
 msgid "Open the song browser to add more songs"
 msgstr "برای اضافه کردن آهنگ جدید، پویشگر آهنگ را باز کن"
 
-#: ../game/screen_playlist.cc:119 ../game/screen_songs.cc:511
+#: ../game/screen_playlist.cc:119 ../game/screen_songs.cc:509
 msgid "Shuffle"
-msgstr "گلماچ"
+msgstr "مخلوط کردن"
 
 #: ../game/screen_playlist.cc:119
 msgid "Randomize the order of the playlist"
@@ -228,7 +228,7 @@ msgid "Remove all the songs from the list"
 msgstr "همه آهنگ ها را از لیست حذف کن"
 
 #: ../game/screen_playlist.cc:131 ../game/screen_playlist.cc:275
-#: ../game/screen_songs.cc:524
+#: ../game/screen_songs.cc:522
 msgid "Back"
 msgstr "بازگشت"
 
@@ -269,77 +269,69 @@ msgid "Remove this song from the list"
 msgstr "حذف این آهنگ رو از لیست"
 
 #: ../game/screen_songs.cc:278
-msgid "No songs found!"
-msgstr "هیچ آهنگی یافت نشد!"
-
-#: ../game/screen_songs.cc:279
-msgid "Visit performous.org for free songs"
-msgstr "برای دریافت موسیقی رایگان به سایت www.performous.org مراجعه کنید."
-
-#: ../game/screen_songs.cc:281
 msgid "Sorry, no songs match the search!"
 msgstr "هیچ آهنگی با واژه جستجو شده مطابقت ندارد!"
 
-# \n
-#: ../game/screen_songs.cc:288
-msgid "Hiscore\n"
-msgstr "برترین امتیازات\n"
+#: ../game/screen_songs.cc:281
+msgid "Sorry, no songs match the filter!"
+msgstr "ببخشید، هیچ آهنگی با واژه جستجو شده مطابقت ندارد!"
 
-#: ../game/screen_songs.cc:298
-msgid "<type in to search>   ↔ songs    ↕ options"
-msgstr "<تایت کن تا بگردم>         ↔ آهنگ        ↕ تنظیمات"
+#: ../game/screen_songs.cc:284
+msgid "No songs found!"
+msgstr "هیچ آهنگی یافت نشد!"
 
-#: ../game/screen_songs.cc:301
-msgid "↔ sort order: "
-msgstr "↔ اولویت مرتب سازی"
-
-#: ../game/screen_songs.cc:302
-msgid "↔ type filter: "
-msgstr "↔  تایپ فیلتر"
+#: ../game/screen_songs.cc:285
+msgid "Visit performous.org for free songs"
+msgstr "برای دریافت موسیقی رایگان به سایت www.performous.org مراجعه کنید."
 
 #: ../game/screen_songs.cc:303
-msgid "↔ hiscores   ↵ jukebox mode"
-msgstr "↔ برترین امتیازات    ↵ جعبه آهنگ"
+msgid "<type in to search>"
+msgstr "<تایپ کن تا بگردم>"
+
+#: ../game/screen_songs.cc:303
+msgid "songs"
+msgstr "آهنگ ها"
+
+#: ../game/screen_songs.cc:303
+msgid "options"
+msgstr "تنظیمات"
+
+#: ../game/screen_songs.cc:305
+msgid "sort order: "
+msgstr "مرتب سازی اولویت"
+
+#: ../game/screen_songs.cc:306
+msgid "type filter: "
+msgstr "فیلتر رو تایپ کن:"
+
+# \n
+#: ../game/screen_songs.cc:307
+msgid "hiscores"
+msgstr "برترین امتیازات"
 
 #: ../game/screen_songs.cc:307
-msgid "↵ start a playlist with this song!"
-msgstr "↵ لیست پخشی با این آهنگ بساز"
+msgid "jukebox mode"
+msgstr "حالت جوکباکس"
 
-#: ../game/screen_songs.cc:309
-msgid "↵ open the playlist menu"
-msgstr "↵ لیست پخش را باز کن"
+#: ../game/screen_songs.cc:310
+msgid "start a playlist with this song!"
+msgstr "لیست پخشی با این آهنگ بساز"
 
-#: ../game/screen_songs.cc:504
+#: ../game/screen_songs.cc:310
+msgid "open the playlist menu"
+msgstr "لیست پخش را باز کن"
+
+#: ../game/screen_songs.cc:502
 msgid "Play"
 msgstr "اجرا"
 
-#: ../game/screen_songs.cc:517
+#: ../game/screen_songs.cc:515
 msgid "View playlist"
 msgstr "لیست پخش رو ببین"
 
-#: ../game/screen_songs.cc:518
+#: ../game/screen_songs.cc:516
 msgid "Clear playlist"
 msgstr "لیست پخش را پاک کن"
-
-# تا کنون هیچ موردی
-# یا
-# هیچ موردی تا کنون
-# یا
-# تا این لحظه هیچ موردی
-# یا
-# هیچ موردی تا این لحظه
-#: ../game/database.cc:90 ../game/database.cc:108
-msgid "No Items up to now."
-msgstr "تا به حال هیچ موردی."
-
-# اولین نفری باشید که اینجا فهرست می شود.
-# یا
-# اولین نفری باشید که اینجا ثبت می شود.
-# یا
-# اولین نفری باشید که اینجا لیست می شود.
-#: ../game/database.cc:91 ../game/database.cc:109
-msgid "Be the first to be listed here!"
-msgstr "اولین نفری باشید که در فهرست ثبت می شود."
 
 #: ../game/songs.cc:178
 msgid "show all songs"
@@ -351,11 +343,11 @@ msgstr "رقص دار"
 
 #: ../game/songs.cc:180
 msgid "has vocals"
-msgstr "خوانندگی"
+msgstr "خوانندگی دار"
 
 #: ../game/songs.cc:181
 msgid "has duet"
-msgstr "دو نوازی"
+msgstr "دو نوازی دار"
 
 #: ../game/songs.cc:182
 msgid "has guitar"
@@ -470,7 +462,7 @@ msgstr "تغییر بین دونوازی و تک نوازی"
 msgid "Change vocal track"
 msgstr "تغییر شیار صوتی"
 
-#: ../game/screen_sing.cc:97 ../game/main.cc:170
+#: ../game/screen_sing.cc:97 ../game/main.cc:171
 msgid "Loading complete"
 msgstr "بارگزاری کامل شد"
 
@@ -600,23 +592,23 @@ msgstr ""
 msgid "Some devices failed to open!"
 msgstr "باز کردن بعضی از دستگاه ها با مشکل مواجه شد!"
 
-#: ../game/main.cc:144
+#: ../game/main.cc:145
 msgid "Loading audio samples..."
 msgstr "در حال بارگزاری آهنگ ..."
 
-#: ../game/main.cc:158
+#: ../game/main.cc:159
 msgid "Creating screens..."
 msgstr "در حال ایجاد صفحات ..."
 
-#: ../game/main.cc:168
+#: ../game/main.cc:169
 msgid "Entering main menu"
 msgstr "ورود به منو اصلی"
 
-#: ../game/main.cc:181
+#: ../game/main.cc:182
 msgid "Screenshot taken!"
 msgstr "عکس صفحه گرفته شد!"
 
-#: ../game/main.cc:184
+#: ../game/main.cc:185
 msgid "Screenshot failed!"
 msgstr "گرفتن عکس صفحه با شکست مواجه شد!"
 
@@ -704,220 +696,220 @@ msgstr "هارمونیک ۲"
 msgid "Harmonic 3"
 msgstr "هارمونیک ۳"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:2
+#: /tmp/xml2gettext.KLMLVC3iaY:2
 msgid "Game"
 msgstr "بازی"
 
 # ترجمه جایگزین برای گیم پلی چیست؟
-#: /tmp/xml2gettext.ULKRBsk8PL:3
+#: /tmp/xml2gettext.KLMLVC3iaY:3
 msgid "Gameplay related options"
 msgstr "تنظیمات مریوط به گیم پلی"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:4
+#: /tmp/xml2gettext.KLMLVC3iaY:4
 msgid "Graphic"
 msgstr "گرافیک (نگاره)"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:5
+#: /tmp/xml2gettext.KLMLVC3iaY:5
 msgid "Configure rendering and video settings"
 msgstr "پیکربندی رندر کردن و تنظیمات تصویر"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:6
+#: /tmp/xml2gettext.KLMLVC3iaY:6
 msgid "Audio Devices"
 msgstr "دستگاه های صوتی"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:7
+#: /tmp/xml2gettext.KLMLVC3iaY:7
 msgid "Setup microphones and playback"
 msgstr "راه اندازی میکروفن(دهنی) و بازبخش"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:8
+#: /tmp/xml2gettext.KLMLVC3iaY:8
 msgid "Audio"
 msgstr "صوت"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:9
+#: /tmp/xml2gettext.KLMLVC3iaY:9
 msgid "Configure general audio settings"
 msgstr "پیکربندی کلی تنظیمات صوتی"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:10
+#: /tmp/xml2gettext.KLMLVC3iaY:10
 msgid "Paths"
 msgstr "مسیر"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:11
+#: /tmp/xml2gettext.KLMLVC3iaY:11
 msgid "Setup song and data paths"
 msgstr "راه اندازی آهنگ و مسیرهای داده"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:12
+#: /tmp/xml2gettext.KLMLVC3iaY:12
 msgid "Karaoke mode"
 msgstr "حالت همخوانی"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:13
+#: /tmp/xml2gettext.KLMLVC3iaY:13
 msgid "Hide pitch wave, notes and scoring."
 msgstr "مخفی کردن دانگ صدا نت ها و امتیازها"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:14
+#: /tmp/xml2gettext.KLMLVC3iaY:14
 msgid "Pitch waves"
 msgstr "دانگ‌ اصوات"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:15
+#: /tmp/xml2gettext.KLMLVC3iaY:15
 msgid "Enable singing pitch display (when not in karaoke mode)."
 msgstr "فعال کردن نمایش زیر و بمی صدا (زمانی که در حالت همخوانی نیستید)"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:16
+#: /tmp/xml2gettext.KLMLVC3iaY:16
 msgid "Theme"
 msgstr "پوسته"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:17
+#: /tmp/xml2gettext.KLMLVC3iaY:17
 msgid "Name of the theme to use."
 msgstr "نام پوسته یا مسیر پوشه ی پوسته ها"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:18
+#: /tmp/xml2gettext.KLMLVC3iaY:18
 msgid "Keyboard as guitar"
 msgstr "صفحه کلید به جای گیتار"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:19
+#: /tmp/xml2gettext.KLMLVC3iaY:19
 msgid "Enable keyboard as guitar (Frets on Fire mode)."
 msgstr "فعال کردن صفحه کلید بجای گیتار(حالت Frets on Fire)"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:20
+#: /tmp/xml2gettext.KLMLVC3iaY:20
 msgid "Keyboard as drumkit"
 msgstr "صفحه کلید بجای درام"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:21
+#: /tmp/xml2gettext.KLMLVC3iaY:21
 msgid "Enable keyboard as drumkit."
 msgstr "فعال کردن صفحه کلید بجای درام"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:22
+#: /tmp/xml2gettext.KLMLVC3iaY:22
 msgid "Keyboard as dance pad"
 msgstr "صفحه کلید بجای تخته رقص"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:23
+#: /tmp/xml2gettext.KLMLVC3iaY:23
 msgid "Enable keyboard as dance pad."
 msgstr "فعال کردن صفحه کلید بجای تخته رقص."
 
-#: /tmp/xml2gettext.ULKRBsk8PL:24
+#: /tmp/xml2gettext.KLMLVC3iaY:24
 msgid "Keyboard as keytar"
 msgstr "صفحه کلید بجای کیتار."
 
-#: /tmp/xml2gettext.ULKRBsk8PL:25
+#: /tmp/xml2gettext.KLMLVC3iaY:25
 msgid "Enable keyboard as keytar."
 msgstr "فعال کردن صفحه کلید بجای کیتار."
 
-#: /tmp/xml2gettext.ULKRBsk8PL:26
+#: /tmp/xml2gettext.KLMLVC3iaY:26
 msgid "Force controller A's type"
 msgstr "مدل A دسته را اعمال کن"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:27
+#: /tmp/xml2gettext.KLMLVC3iaY:27
 msgid ""
 "Override autodetection and force the first controller to the given type."
 msgstr "شناسایی خودکار را با اولین نوع دسته داده شده جایگزین کن"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:28
+#: /tmp/xml2gettext.KLMLVC3iaY:28
 msgid "Force controller B's type"
 msgstr "مدل B دسته را اعمال کن"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:29
+#: /tmp/xml2gettext.KLMLVC3iaY:29
 msgid ""
 "Override autodetection and force the second controller to the given type."
 msgstr "شناسایی خودکار را با دومین نوع دسته داده شده جایگزین کن"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:30
+#: /tmp/xml2gettext.KLMLVC3iaY:30
 msgid "Force controller C's type"
 msgstr "مدل C دسته را اعمال کن"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:31
+#: /tmp/xml2gettext.KLMLVC3iaY:31
 msgid ""
 "Override autodetection and force the third controller to the given type."
 msgstr "شناسایی خودکار را با سومین نوع دسته داده شده جایگزین کن"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:32
+#: /tmp/xml2gettext.KLMLVC3iaY:32
 msgid "Force controller D's type"
 msgstr "مدل D دسته را اعمال کن"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:33
+#: /tmp/xml2gettext.KLMLVC3iaY:33
 msgid ""
 "Override autodetection and force the fourth controller to the given type."
 msgstr "شناسایی خودکار را با چهارمین نوع دسته داده شده جایگزین کن"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:34
+#: /tmp/xml2gettext.KLMLVC3iaY:34
 msgid "Joystick configuration"
 msgstr "پیکربندی دسته فرمان"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:35
+#: /tmp/xml2gettext.KLMLVC3iaY:35
 msgid "Force joystick to some kind of instrument."
 msgstr "اجبار کردن دسته فرمان برای ساز"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:36
+#: /tmp/xml2gettext.KLMLVC3iaY:36
 msgid "Hardware MIDI input device"
 msgstr "دستگاه سخت افزار ورودی MIDI"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:37
+#: /tmp/xml2gettext.KLMLVC3iaY:37
 msgid ""
 "Regex for matching the MIDI devices to use. The default is to use all "
 "available devices."
 msgstr "الگوی تطابق دستگاه های MIDI. پیش فرض استفاده از همه دستگاه هاست."
 
-#: /tmp/xml2gettext.ULKRBsk8PL:38
+#: /tmp/xml2gettext.KLMLVC3iaY:38
 msgid "Fallback song encoding"
 msgstr "رمزگزاری آهنگ جایگزین"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:39
+#: /tmp/xml2gettext.KLMLVC3iaY:39
 msgid "Pick the text codec used for song files that are not UTF-8."
 msgstr "برای آهنگ هایی که UTF-8 نیستند رمزگشای متن را استفاده کن."
 
-#: /tmp/xml2gettext.ULKRBsk8PL:40
+#: /tmp/xml2gettext.KLMLVC3iaY:40
 msgid "Windowed width"
 msgstr "عرض صفحه"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:41
+#: /tmp/xml2gettext.KLMLVC3iaY:41
 msgid "The width of the window."
 msgstr "عرض صفحه"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:42
+#: /tmp/xml2gettext.KLMLVC3iaY:42
 msgid "Windowed height"
 msgstr "ارتفاع صفحه"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:43
+#: /tmp/xml2gettext.KLMLVC3iaY:43
 msgid "The height of the window."
 msgstr "ارتفاع صفحه"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:44
+#: /tmp/xml2gettext.KLMLVC3iaY:44
 msgid "Fullscreen mode"
 msgstr "حالت تمام صفحه"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:45
+#: /tmp/xml2gettext.KLMLVC3iaY:45
 msgid "Enable fullscreen mode on startup."
 msgstr "فعال کردن حالت تمام صفحه هنگام شروع"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:46
+#: /tmp/xml2gettext.KLMLVC3iaY:46
 msgid "Stereoscopic 3D"
 msgstr "برجسته بین سه بعدی"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:47
+#: /tmp/xml2gettext.KLMLVC3iaY:47
 msgid "Enable 3D rendering of Performous."
 msgstr "فعال کردن حالت سه یعدی پرفورمیوس"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:48
+#: /tmp/xml2gettext.KLMLVC3iaY:48
 msgid "Stereo3D type"
 msgstr "حالت سه بعدی"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:49
+#: /tmp/xml2gettext.KLMLVC3iaY:49
 msgid "Some modes may only get activated in fullscreen mode."
 msgstr "بعضی از حالات فقط در حالت تمام صفحه فعال می شوند"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:50
+#: /tmp/xml2gettext.KLMLVC3iaY:50
 msgid "Stereo3D separation"
 msgstr "تفکیک سه بعدی"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:51
+#: /tmp/xml2gettext.KLMLVC3iaY:51
 msgid ""
 "The strength of the effect. Experiment with different settings for best "
 "results."
 msgstr "قدرت اثر. برای نتیجه بهتر با یک تنظیم دیگر امتحان کنید."
 
-#: /tmp/xml2gettext.ULKRBsk8PL:52
+#: /tmp/xml2gettext.KLMLVC3iaY:52
 msgid "Video playback"
 msgstr "پخش تصویر"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:53
+#: /tmp/xml2gettext.KLMLVC3iaY:53
 msgid ""
 "Allows completely disabling background videos. It is recommended to leave "
 "this enabled as Performous will still smoothly fade out the video if your "
@@ -927,11 +919,11 @@ msgstr ""
 "را در حالت فعال قرار دهید چون که اگر رایانه شما به اندازه کافی سریع نباشد "
 "پرفورمیوس تصویر را به نرمی محو می کند."
 
-#: /tmp/xml2gettext.ULKRBsk8PL:54
+#: /tmp/xml2gettext.KLMLVC3iaY:54
 msgid "Webcam background"
 msgstr "تصویر زمینه دوربین..."
 
-#: /tmp/xml2gettext.ULKRBsk8PL:55
+#: /tmp/xml2gettext.KLMLVC3iaY:55
 msgid ""
 "Performous can use webcam as a background video. Disable it if Performous "
 "crashes while entering a song."
@@ -939,22 +931,22 @@ msgstr ""
 "پرفورمیوس میتواند از دوربین به عنوان تصویر پس ضمینه استفاده کند. اگر "
 "پرفورمیوس موقع ورود به یک آهنگ متوقف شد این گزینه را غیر فعال کنید."
 
-#: /tmp/xml2gettext.ULKRBsk8PL:56
+#: /tmp/xml2gettext.KLMLVC3iaY:56
 msgid "Webcam id"
 msgstr "شماره دوربین"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:57
+#: /tmp/xml2gettext.KLMLVC3iaY:57
 msgid ""
 "Use -1 to autodetect or a number starting from 0 to choose specific device."
 msgstr ""
 "برای شناسایی خودکار -۱ و یا یک عدد که با ۰ شروع می شود را برای انتخاب دستگاه "
 "خاص وارد کنید."
 
-#: /tmp/xml2gettext.ULKRBsk8PL:58
+#: /tmp/xml2gettext.KLMLVC3iaY:58
 msgid "SVG quality"
 msgstr "کیفیت SVG"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:59
+#: /tmp/xml2gettext.KLMLVC3iaY:59
 msgid ""
 "Larger numbers cause vector graphics to be rendered in higher resolution. "
 "Decrease this to make navigating in menus faster."
@@ -962,11 +954,11 @@ msgstr ""
 "مقادیر بزرگ باعث می شود که بردارهای گرافیکی با کیفیت بالا نقش شوند. کاهش "
 "مقادیر باعث سرعت منو می شود."
 
-#: /tmp/xml2gettext.ULKRBsk8PL:60
+#: /tmp/xml2gettext.KLMLVC3iaY:60
 msgid "Text quality"
 msgstr "کیفیت متن"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:61
+#: /tmp/xml2gettext.KLMLVC3iaY:61
 msgid ""
 "Larger numbers cause text to be rendered in higher resolution. Decrease this "
 "to make everything a little faster."
@@ -974,11 +966,11 @@ msgstr ""
 "مقادیر بزرگ باعث می شود که متون با کیفیت بالا نقش شوند. کاهش مقادیر باعث "
 "سرعت اندکی در همه چیز می شود."
 
-#: /tmp/xml2gettext.ULKRBsk8PL:62
+#: /tmp/xml2gettext.KLMLVC3iaY:62
 msgid "Benchmark mode"
 msgstr "حالت محک"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:63
+#: /tmp/xml2gettext.KLMLVC3iaY:63
 msgid ""
 "Framerate limit of 100 FPS is removed and the game instead renders at full "
 "speed. FPS values are printed to console. Please note that the display "
@@ -988,11 +980,11 @@ msgstr ""
 "مقادیر FPS در کنسول چاپ می شود. لطفا توجه داشته باشید که درایور صفحه نمایش "
 "هنوز هم ممکن است سرعت نگاره را با سرعت جاروب صفحه نمایش محدود کند."
 
-#: /tmp/xml2gettext.ULKRBsk8PL:64
+#: /tmp/xml2gettext.KLMLVC3iaY:64
 msgid "Suggested latency"
 msgstr "زمان تاخیر پیشنهادی"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:65
+#: /tmp/xml2gettext.KLMLVC3iaY:65
 msgid ""
 "This is a hint for the audio engine about the desired latency. Set this as "
 "low as possible while retaining clear audio playback. Requires restart."
@@ -1000,11 +992,11 @@ msgstr ""
 "این یک تذکر برای متور صدا درمورد تاخیر خواسته شده است. اگر کیفیت صدای پایین "
 "دارید این مقدار را پایین بیاورید. نیاز به شروع مجدد دارد."
 
-#: /tmp/xml2gettext.ULKRBsk8PL:66
+#: /tmp/xml2gettext.KLMLVC3iaY:66
 msgid "Audio/video latency"
 msgstr "تاخیر صدا و تصویر"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:67
+#: /tmp/xml2gettext.KLMLVC3iaY:67
 msgid ""
 "Affects all modes. Use negative value if your display input lag is greater "
 "than the sound card output latency, positive values in the opposite case and "
@@ -1017,11 +1009,11 @@ msgstr ""
 "باهم برابر است. این مقدار باید تنظیم شود تا نت همان زمانی که صدایش شنیده می "
 "شود از خط عبور کند. از کلید Ctrl+F1/F2 در حال اجرا برای تنظیم استفاده کنید."
 
-#: /tmp/xml2gettext.ULKRBsk8PL:68
+#: /tmp/xml2gettext.KLMLVC3iaY:68
 msgid "Audio round-trip latency"
 msgstr "تاخیر در رفت و آمد صدا"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:69
+#: /tmp/xml2gettext.KLMLVC3iaY:69
 msgid ""
 "Affects singing only. The time it takes for Performous playback to reach "
 "your speakers, fly to the microphone and all the way back until Performous "
@@ -1033,11 +1025,11 @@ msgstr ""
 "تحلیل کند. در زمان اجرا Ctrl+S بزنید تا به حالت تنظیم بروید و با Ctrl+F3/F4 "
 "تنظیم کنید."
 
-#: /tmp/xml2gettext.ULKRBsk8PL:70
+#: /tmp/xml2gettext.KLMLVC3iaY:70
 msgid "Audio/controller latency"
 msgstr "تاخیر در صدا و کنترلر"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:71
+#: /tmp/xml2gettext.KLMLVC3iaY:71
 msgid ""
 "Affects instruments and dancing only. The total of USB (guitar or dance pad) "
 "latency combined with audio output latency. Adjust so that you can hit the "
@@ -1049,27 +1041,27 @@ msgstr ""
 "شنوید بزنید (نه زمانی که نت را روی صفحه می بینید). از کلید Ctrl+F5/F6 برای "
 "تنظیم حین اجرا استفاده کنید."
 
-#: /tmp/xml2gettext.ULKRBsk8PL:72
+#: /tmp/xml2gettext.KLMLVC3iaY:72
 msgid "Audio devices"
 msgstr "دستگاه های صوتی"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:73
+#: /tmp/xml2gettext.KLMLVC3iaY:73
 msgid "List of audio devices to try."
 msgstr "فهرستی از دستگاه های صدا برای آزمایش کردن."
 
-#: /tmp/xml2gettext.ULKRBsk8PL:74
+#: /tmp/xml2gettext.KLMLVC3iaY:74
 msgid "Menu volume"
 msgstr "میزان صدای منو"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:75
+#: /tmp/xml2gettext.KLMLVC3iaY:75
 msgid "The volume level of menus, song previews and jukebox mode."
 msgstr "میزان صدای منوها پیش نمایش آهنگ ها و حالت جعبه موزیک"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:76
+#: /tmp/xml2gettext.KLMLVC3iaY:76
 msgid "Music volume"
 msgstr "میزان صدای آهنگ"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:77
+#: /tmp/xml2gettext.KLMLVC3iaY:77
 msgid ""
 "The ingame music volume. Values above 90 are not recommended as distortion "
 "may occur."
@@ -1077,11 +1069,11 @@ msgstr ""
 "میزان صدای آهنگ داخل بازی. مقادیر بالاتر از ۹۰ توصیه نمی شوند چون ممکن است "
 "باعث اغتشاش صوتی گردند."
 
-#: /tmp/xml2gettext.ULKRBsk8PL:78
+#: /tmp/xml2gettext.KLMLVC3iaY:78
 msgid "Failure volume"
 msgstr "میزان صدای خراب کردن آهنگ"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:79
+#: /tmp/xml2gettext.KLMLVC3iaY:79
 msgid ""
 "The ingame fail sound volume. Values above 90 are not recommended as "
 "distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
@@ -1090,27 +1082,27 @@ msgstr ""
 "ممکن است باعث اغتشاش صوتی گردند. 11 بلندتر از 9 است اما تا ۱۰۰ می رود. 89 "
 "بلندترین"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:80
+#: /tmp/xml2gettext.KLMLVC3iaY:80
 msgid "Microphone pass-through"
 msgstr "صدای میانی میکروفن"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:81
+#: /tmp/xml2gettext.KLMLVC3iaY:81
 msgid "Send captured singing voice to speakers."
 msgstr "ارسال صدای خواننده به بلندگو"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:82
+#: /tmp/xml2gettext.KLMLVC3iaY:82
 msgid "Pass-through volume ratio"
 msgstr "میزان حجم صدای میانی"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:83
+#: /tmp/xml2gettext.KLMLVC3iaY:83
 msgid "How much voice is amplified compared to the music."
 msgstr "چقدر صدا در مقایسه با موسیقی بلند شده."
 
-#: /tmp/xml2gettext.ULKRBsk8PL:84
+#: /tmp/xml2gettext.KLMLVC3iaY:84
 msgid "Song folders"
 msgstr "پوشه آهنگ ها"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:85
+#: /tmp/xml2gettext.KLMLVC3iaY:85
 msgid ""
 "Where to recursively look for songs. DATADIR at the beginning means all "
 "Performous data folders."
@@ -1118,11 +1110,11 @@ msgstr ""
 "جایی که به صورت بازگشتی به دنبال آهنگ میگردد. DATADIR در آغاز به معنی تمامی "
 "پوشه های پرفورمیوس است."
 
-#: /tmp/xml2gettext.ULKRBsk8PL:86
+#: /tmp/xml2gettext.KLMLVC3iaY:86
 msgid "Base folders for data"
 msgstr "پوشه اصلی اطلاعات"
 
-#: /tmp/xml2gettext.ULKRBsk8PL:87
+#: /tmp/xml2gettext.KLMLVC3iaY:87
 msgid ""
 "System defaults are included automatically. Additional paths can be added "
 "here."
@@ -1130,26 +1122,8 @@ msgstr ""
 "پیش فرض های سیستم بصورت خودکار اضافه شده اند. مسیر های اضافی را اینجا وارد "
 "کنید."
 
-#~ msgid "Start the game with all songs in playlist"
-#~ msgstr "بازی را با همه آهنگ های درون لیست پخش اجرا کن"
+#~ msgid "<type in to search>   ↔ songs    ↕ options"
+#~ msgstr "<تایت کن تا بگردم>         ↔ آهنگ        ↕ تنظیمات"
 
-#~ msgid "View the current playlist"
-#~ msgstr "لیست فعلی را ببین"
-
-#~ msgid "Back to song browser"
-#~ msgstr "بازگشت به مرورگر آهنگ"
-
-#~ msgid "(press END to view hiscores)"
-#~ msgstr "(برای مشاهده جدول امتیازات END را بزنید)"
-
-#~ msgid "<type in to search>"
-#~ msgstr "<تایپ کن تا بگردم>"
-
-#~ msgid "Song is broken!"
-#~ msgstr "آهنگ خراب است!"
-
-#~ msgid "Loading instruments..."
-#~ msgstr "در حال بارگیری سازها..."
-
-#~ msgid "Finalizing..."
-#~ msgstr "نهایی سازی..."
+#~ msgid "↔ hiscores   ↵ jukebox mode"
+#~ msgstr "↔ برترین امتیازات    ↵ جعبه آهنگ"

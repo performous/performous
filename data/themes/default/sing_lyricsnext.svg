@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -13,9 +14,8 @@
    height="600"
    id="svg3465"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
+   inkscape:version="0.48.4 r9939"
    sodipodi:docname="sing_lyricsnext.svg"
-   sodipodi:docbase="/home/jesusda/docs/curro/yo/ultrastar-ng/base/theme-pod/themes/default"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <metadata
      id="metadata19">
@@ -32,8 +32,8 @@
      inkscape:cy="417.84947"
      inkscape:cx="305.25953"
      inkscape:zoom="0.43415836"
-     inkscape:window-height="726"
-     inkscape:window-width="645"
+     inkscape:window-height="616"
+     inkscape:window-width="762"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      guidetolerance="10.0"
@@ -46,7 +46,8 @@
      showgrid="false"
      inkscape:window-x="10"
      inkscape:window-y="97"
-     inkscape:current-layer="svg3465" />
+     inkscape:current-layer="svg3465"
+     inkscape:window-maximized="0" />
   <defs
      id="defs3467">
     <inkscape:perspective
@@ -62,12 +63,12 @@
     <text
        x="400"
        y="575.25488"
-       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;line-height:125%;writing-mode:lr-tb;text-anchor:middle;fill:#d3d7cf;fill-opacity:1;stroke:black;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:inline;font-family:Goblin"
+       style="font-size:30px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;line-height:125%;writing-mode:lr-tb;text-anchor:middle;fill:#d3d7cf;fill-opacity:1;stroke:black;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:inline;font-family:Goblin"
        id="text6611"
        xml:space="preserve"><tspan
          x="400"
          y="575.25488"
          id="tspan6613"
-         style="fill:#d3d7cf;text-anchor:middle;text-align:center">lyrics</tspan></text>
+         style="fill:#d3d7cf;text-anchor:middle;text-align:center;font-size:30px">lyrics</tspan></text>
   </g>
 </svg>

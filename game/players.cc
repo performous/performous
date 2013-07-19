@@ -12,10 +12,9 @@ Players::Players():
 	m_filter(),
 	math_cover(),
 	m_dirty(false)
-{ }
+{}
 
-Players::~Players()
-{ }
+Players::~Players() {}
 
 void Players::load(xmlpp::NodeSet const& n) {
 	for (auto const& elem: n) {
@@ -36,6 +35,7 @@ void Players::load(xmlpp::NodeSet const& n) {
 		}
 		addPlayer(a_name->get_value(), picture, id);
 	}
+	filter_internal();
 }
 
 void Players::save(xmlpp::Element *players) {

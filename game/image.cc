@@ -37,34 +37,12 @@ namespace {
 		png_read_image(pngPtr, &rows[0]);
 	}
 
-	static void writePNG_internal(png_structp pngPtr, png_infop infoPtr, ofstream& file, unsigned w, unsigned h, pix::Format format, bool reverse, const unsigned char *data, std::vector<png_bytep>& rows) {
+	static void writePNG_internal(png_structp pngPtr, png_infop infoPtr, ofstream& file, unsigned w, unsigned h, int colorType, std::vector<png_bytep>& rows) {
 		// There must be no objects initialized within this function because longjmp will mess them up
 		if (setjmp(png_jmpbuf(pngPtr))) throw std::runtime_error("Writing PNG failed");
 		png_set_write_fn(pngPtr, &file, writePngHelper, NULL);
-		unsigned char bpp = 3;
-		switch(format) {
-			case pix::RGB:
-				png_set_IHDR(pngPtr, infoPtr, w, h, 8, PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
-				bpp = 3;
-				break;
-			case pix::CHAR_RGBA:
-				png_set_IHDR(pngPtr, infoPtr, w, h, 8, PNG_COLOR_TYPE_RGBA, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
-				bpp = 4;
-				break;
-			default:
-				// Note: INT_ARGB uses premultiplied alpha and cannot be supported by libpng
-				throw std::logic_error("Unsupported pixel format in writePNG_internal");
-		}
+		png_set_IHDR(pngPtr, infoPtr, w, h, 8, colorType, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 		png_write_info(pngPtr, infoPtr);
-		unsigned stride = (w * bpp + 3) & ~3;  // Number of bytes per row (word-aligned)
-		unsigned pos = reverse ? h * stride : -stride;
-		for (unsigned y = 0; y < h; ++y) {
-			if(reverse)
-				pos -= stride;
-			else
-				pos += stride;
-			rows[y] = (png_bytep)(&data[pos]);
-		}
 		png_write_image(pngPtr, &rows[0]);
 		png_write_end(pngPtr, NULL);
 	}
@@ -119,9 +97,30 @@ namespace {
 
 }
 
-void writePNG(fs::path const& filename, Image const& img) {
-	std::vector<png_bytep> rows(img.h);
-	ofstream file(filename, std::ios::binary);
+void writePNG(fs::path const& filename, Bitmap const& img, unsigned stride) {
+	fs::path name = filename;
+	// We use PNG in a non-standard way, with premultiplied alpha, signified by .premul.png extension.
+	std::clog << "image/debug: Saving PNG: " + name.string() << std::endl;
+	std::vector<png_bytep> rows(img.height);
+	// Determine color type and bytes per pixel
+	unsigned char bpp;
+	int colorType;
+	switch (img.fmt) {
+		case pix::RGB: bpp = 3; colorType = PNG_COLOR_TYPE_RGB; break;
+		case pix::CHAR_RGBA: bpp = 4; colorType = PNG_COLOR_TYPE_RGBA; break;
+		default:
+			// Byte order would need to be changed for other formats and we don't currently need them...
+			throw std::logic_error("Unsupported pixel format in writePNG_internal");
+	}
+	// Construct row pointers
+	bool reverse = img.bottomFirst;
+	if (stride == 0) stride = img.width * bpp;
+	unsigned pos = reverse ? img.height * stride : -stride;
+	for (unsigned y = 0; y < img.height; ++y) {
+		pos += (reverse ? -stride : stride);
+		rows[y] = (png_bytep)(&img.data()[pos]);
+	}
+	// Initialize libpng structures
 	png_structp pngPtr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	if (!pngPtr) throw std::runtime_error("png_create_read_struct failed");
 	png_infop infoPtr = NULL;
@@ -133,13 +132,17 @@ void writePNG(fs::path const& filename, Image const& img) {
 	} cleanup(pngPtr, infoPtr);
 	infoPtr = png_create_info_struct(pngPtr);
 	if (!infoPtr) throw std::runtime_error("png_create_info_struct failed");
-	writePNG_internal(pngPtr, infoPtr, file, img.w, img.h, img.format, img.reverse, img.data.data(), rows);
+	png_set_gAMA(pngPtr, infoPtr, img.linearPremul ? 1.0 : 2.2);
+	// Write file
+	ofstream file(name, std::ios::binary);
+	writePNG_internal(pngPtr, infoPtr, file, img.width, img.height, colorType, rows);
 }
 
 void loadSVG(Bitmap& bitmap, fs::path const& filename) {
 	double factor = config["graphic/svg_lod"].f();
 	// Try to load a cached PNG instead
 	if (cache::loadSVG(bitmap, filename, factor)) return;
+	std::clog << "image/debug: Loading SVG: " + filename.string() << std::endl;
 	// Open the SVG file in librsvg
 #if !GLIB_CHECK_VERSION(2, 36, 0)   // Avoid deprecation warnings
 	g_type_init();
@@ -156,6 +159,7 @@ void loadSVG(Bitmap& bitmap, fs::path const& filename) {
 	// Prepare the pixel buffer
 	bitmap.resize(svgDimension.width*factor, svgDimension.height*factor);
 	bitmap.fmt = pix::INT_ARGB;
+	bitmap.linearPremul = true;
 	// Raster with Cairo
 	boost::shared_ptr<cairo_surface_t> surface(
 	  cairo_image_surface_create_for_data(&bitmap.buf[0], CAIRO_FORMAT_ARGB32, bitmap.width, bitmap.height, bitmap.width * 4),
@@ -163,13 +167,23 @@ void loadSVG(Bitmap& bitmap, fs::path const& filename) {
 	boost::shared_ptr<cairo_t> dc(cairo_create(surface.get()), cairo_destroy);
 	cairo_scale(dc.get(), factor, factor);
 	rsvg_handle_render_cairo(svgHandle.get(), dc.get());
+	// Change byte order from BGRA to RGBA
+	for (uint32_t *ptr = reinterpret_cast<uint32_t*>(&*bitmap.buf.begin()), *end = ptr + bitmap.buf.size() / 4; ptr < end; ++ptr) {
+		uint8_t* pixel = reinterpret_cast<uint8_t*>(ptr);
+		uint8_t r = pixel[2], g = pixel[1], b = pixel[0], a = pixel[3];
+		pixel[0] = r; pixel[1] = g; pixel[2] = b; pixel[3] = a;
+	}
+	bitmap.fmt = pix::CHAR_RGBA;
 	// Write to cache so that it can be loaded faster the next time
 	fs::path cache_filename = cache::constructSVGCacheFileName(filename, factor);
 	fs::create_directories(cache_filename.parent_path());
-	cairo_surface_write_to_png(surface.get(), cache_filename.string().c_str());
+	writePNG(cache_filename, bitmap);
 }
 
 void loadPNG(Bitmap& bitmap, fs::path const& filename) {
+	std::clog << "image/debug: Loading PNG: " + filename.string() << std::endl;
+	// A hack to assume linear premultiplied data if file extension is .premul.png (used for cached SVGs)
+	if (filename.stem().extension() == "premul") bitmap.linearPremul = true;
 	ifstream file(filename, std::ios::binary);
 	png_structp pngPtr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	if (!pngPtr) throw std::runtime_error("png_create_read_struct failed");
@@ -187,6 +201,7 @@ void loadPNG(Bitmap& bitmap, fs::path const& filename) {
 }
 
 void loadJPEG(Bitmap& bitmap, fs::path const& filename) {
+	std::clog << "image/debug: Loading JPEG: " + filename.string() << std::endl;
 	bitmap.fmt = pix::RGB;
 	struct my_jpeg_error_mgr jerr;
 	BinaryBuffer data = readFile(filename);

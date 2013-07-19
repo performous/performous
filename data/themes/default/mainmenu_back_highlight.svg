@@ -17,8 +17,8 @@
    height="80"
    id="svg559"
    sodipodi:version="0.32"
-   inkscape:version="0.47pre4 r22446"
-   sodipodi:docname="menu_back_highlight.svg"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="mainmenu_back_highlight.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <metadata
      id="metadata35">
@@ -33,8 +33,8 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="726"
-     inkscape:window-width="1280"
+     inkscape:window-height="879"
+     inkscape:window-width="1376"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      guidetolerance="10.0"
@@ -44,16 +44,16 @@
      bordercolor="#666666"
      pagecolor="#ffffff"
      id="base"
-     inkscape:zoom="1.2304507"
-     inkscape:cx="114.89549"
-     inkscape:cy="35.400925"
-     inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:zoom="2.4609014"
+     inkscape:cx="264.61648"
+     inkscape:cy="41.573564"
+     inkscape:window-x="330"
+     inkscape:window-y="55"
      inkscape:current-layer="svg559"
      showgrid="false"
      showguides="true"
      inkscape:guide-bbox="true"
-     inkscape:window-maximized="1" />
+     inkscape:window-maximized="0" />
   <defs
      id="defs561">
     <linearGradient
@@ -231,24 +231,23 @@
     <linearGradient
        id="linearGradient6499-1-4">
       <stop
-         id="stop6501-3-4"
+         style="stop-color:#000000;stop-opacity:0.627451;"
          offset="0"
-         style="stop-color:#a5dbea;stop-opacity:1;" />
+         id="stop3786" />
       <stop
          id="stop6503-0-4"
          offset="1"
-         style="stop-color:white;stop-opacity:0;" />
+         style="stop-color:#000000;stop-opacity:0;" />
     </linearGradient>
     <linearGradient
-       y2="260.4765"
-       x2="358.07056"
-       y1="260.4765"
-       x1="44.868057"
-       gradientTransform="matrix(1.5954958,0,0,1.7716569,-170.6897,-421.47588)"
-       gradientUnits="userSpaceOnUse"
-       id="linearGradient2863"
+       inkscape:collect="always"
        xlink:href="#linearGradient6499-1-4"
-       inkscape:collect="always" />
+       id="linearGradient3786"
+       x1="27.637432"
+       y1="154.99852"
+       x2="403.24554"
+       y2="-42.490097"
+       gradientUnits="userSpaceOnUse" />
   </defs>
   <text
      xml:space="preserve"
@@ -266,7 +265,7 @@
      height="77.551308"
      width="397.5513"
      id="rect6405"
-     style="fill:url(#linearGradient2863);fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:2.44869375;stroke-opacity:1;marker:none;visibility:visible;display:inline;overflow:visible"
-     rx="17.669563"
-     ry="14.354104" />
+     style="fill:url(#linearGradient3786);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.44899988000000013;marker:none;visibility:visible;display:inline;overflow:visible"
+     rx="2.6344144"
+     ry="3.6571968" />
 </svg>

@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-05-24 12:47+0100\n"
+"POT-Creation-Date: 2013-07-13 17:59+0200\n"
 "PO-Revision-Date: \n"
-"Last-Translator: niek nooijens <nieknooijens@gmail.com>\n"
+"Last-Translator: FooBar\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -14,6 +14,92 @@ msgstr ""
 "X-Generator: Poedit 1.5.4\n"
 "X-Poedit-SearchPath-0: ../game\n"
 "X-Poedit-SearchPath-1: ../data\n"
+
+#: ../game/configuration.cc:112
+msgid "Enabled"
+msgstr "Ingeschakeld"
+
+#: ../game/configuration.cc:112
+msgid "Disabled"
+msgstr "Uitgeschakeld"
+
+#: ../game/configuration.cc:116
+#, c-format
+msgid "%d items"
+msgstr "%d items"
+
+#: ../game/screen_playlist.cc:110 ../game/screen_playlist.cc:252
+msgid "Continue"
+msgstr "Doorgaan"
+
+#: ../game/screen_playlist.cc:110
+msgid "Continue playing"
+msgstr "Doorgaan met spelen"
+
+#: ../game/screen_playlist.cc:118
+msgid "Add songs"
+msgstr "Nummers toevoegen"
+
+#: ../game/screen_playlist.cc:118
+msgid "Open the song browser to add more songs"
+msgstr "Open de muziekverkenner om meer nummers toe te voegen."
+
+#: ../game/screen_playlist.cc:119 ../game/screen_songs.cc:509
+msgid "Shuffle"
+msgstr "Door elkaar"
+
+#: ../game/screen_playlist.cc:119
+msgid "Randomize the order of the playlist"
+msgstr "Gooi de volgorde van de afspeellijst door elkaar"
+
+#: ../game/screen_playlist.cc:125
+msgid "Clear and exit"
+msgstr "Leegmaken en afsluiten"
+
+#: ../game/screen_playlist.cc:125
+msgid "Remove all the songs from the list"
+msgstr "Haal alle nummers uit de lijst"
+
+#: ../game/screen_playlist.cc:131 ../game/screen_playlist.cc:275
+#: ../game/screen_songs.cc:522
+msgid "Back"
+msgstr "Terug"
+
+#: ../game/screen_playlist.cc:131 ../game/screen_playlist.cc:275
+msgid "Back to playlist viewer"
+msgstr "Terug naar afspeellijstoverzicht"
+
+#: ../game/screen_playlist.cc:237
+msgid "Press enter to view song options"
+msgstr "Druk op enter om nummeropties weer te geven."
+
+#: ../game/screen_playlist.cc:244
+msgid "View more options"
+msgstr "Meer opties"
+
+#: ../game/screen_playlist.cc:244
+msgid "View general playlist settings"
+msgstr "Pas algemene afspeellijstinstellingen aan"
+
+#: ../game/screen_playlist.cc:252
+msgid "Play first"
+msgstr "Speel als eerste"
+
+#: ../game/screen_playlist.cc:254
+msgid "Ignore the playlist's order and play this song first"
+msgstr "Negeer de volgorde van de afspeellijst en speel dit nummer als eerste"
+
+#: ../game/screen_playlist.cc:255
+msgid "Start the song already!"
+msgstr "Start het nummer eens!"
+
+#: ../game/screen_playlist.cc:264
+msgid "Remove"
+msgstr "Verwijderen"
+
+#: ../game/screen_playlist.cc:264
+msgid "Remove this song from the list"
+msgstr "Verwijder dit nummer uit de lijst"
 
 #: ../game/screen_paths.cc:24
 msgid ""
@@ -31,25 +117,69 @@ msgstr ""
 msgid "Press any key to exit."
 msgstr "Druk een toets om dit scherm te verlaten."
 
-#: ../game/screen_paths.cc:75
-msgid ""
-"Windows users can also use ConfigureSongDirectory.bat in the bin-directory."
+#: ../game/screen_paths.cc:76
+#, fuzzy
+msgid "Windows users can also use ConfigureSongDirectory.bat script."
 msgstr ""
 "Windowsgebruikers kunnen ook gebruik maken van ConfigureSongDirectory.bat in "
 "de bin-directory."
 
-#: ../game/configuration.cc:117
-msgid "Enabled"
-msgstr "Ingeschakeld"
+#: ../game/dancegraph.cc:18
+msgid "Beginner"
+msgstr "Beginner"
 
-#: ../game/configuration.cc:117
-msgid "Disabled"
-msgstr "Uitgeschakeld"
+#: ../game/dancegraph.cc:18 ../game/guitargraph.cc:14
+msgid "Easy"
+msgstr "Gemakkelijk"
 
-#: ../game/configuration.cc:121
-#, c-format
-msgid "%d items"
-msgstr "%d items"
+#: ../game/dancegraph.cc:18 ../game/guitargraph.cc:14
+msgid "Medium"
+msgstr "Medium"
+
+#: ../game/dancegraph.cc:18 ../game/guitargraph.cc:14
+msgid "Hard"
+msgstr "Moeilijk"
+
+#: ../game/dancegraph.cc:18
+msgid "Challenge"
+msgstr "Daag uit"
+
+#: ../game/dancegraph.cc:107 ../game/guitargraph.cc:194
+msgid "Ready!"
+msgstr "Klaar!"
+
+#: ../game/dancegraph.cc:107 ../game/guitargraph.cc:194
+#: ../game/screen_intro.cc:166
+msgid "Start performing!"
+msgstr "Opvoering starten!"
+
+#: ../game/dancegraph.cc:118 ../game/guitargraph.cc:183
+msgid "Select track"
+msgstr "Selecteer track"
+
+#: ../game/dancegraph.cc:134 ../game/guitargraph.cc:163
+msgid "Select difficulty"
+msgstr "Selecteer moeilijkheidsgraad"
+
+#: ../game/dancegraph.cc:137 ../game/instrumentgraph.cc:59
+#: ../game/guitargraph.cc:200 ../game/screen_intro.cc:184
+#: ../game/screen_sing.cc:92 ../game/screen_sing.cc:126
+msgid "Quit"
+msgstr "Afsluiten"
+
+#: ../game/dancegraph.cc:137 ../game/instrumentgraph.cc:59
+#: ../game/guitargraph.cc:200 ../game/screen_sing.cc:92
+#: ../game/screen_sing.cc:126
+msgid "Exit to song browser"
+msgstr "Ga naar muziekverkenner"
+
+#: ../game/dancegraph.cc:248
+msgid "STOP!"
+msgstr "STOP!"
+
+#: ../game/dancegraph.cc:321 ../game/guitargraph.cc:447
+msgid "Streak!"
+msgstr "Streak!"
 
 #: ../game/instrumentgraph.cc:56 ../game/screen_sing.cc:123
 msgid "Resume"
@@ -79,58 +209,135 @@ msgstr ""
 "Start het lied\n"
 "vanaf het begin"
 
-#: ../game/instrumentgraph.cc:59 ../game/guitargraph.cc:200
-#: ../game/screen_intro.cc:184 ../game/dancegraph.cc:137
-#: ../game/screen_sing.cc:92 ../game/screen_sing.cc:126
-msgid "Quit"
-msgstr "Afsluiten"
+#: ../game/songs.cc:178
+msgid "show all songs"
+msgstr "Laat alle nummers zien"
 
-#: ../game/instrumentgraph.cc:59 ../game/guitargraph.cc:200
-#: ../game/dancegraph.cc:137 ../game/screen_sing.cc:92
-#: ../game/screen_sing.cc:126
-msgid "Exit to song browser"
-msgstr "Ga naar muziekverkenner"
+#: ../game/songs.cc:179
+msgid "has dance"
+msgstr "heeft dans"
+
+#: ../game/songs.cc:180
+msgid "has vocals"
+msgstr "heeft zang"
+
+#: ../game/songs.cc:181
+msgid "has duet"
+msgstr "heeft duet"
+
+#: ../game/songs.cc:182
+msgid "has guitar"
+msgstr "heeft gitaar"
+
+#: ../game/songs.cc:183
+msgid "drums or keytar"
+msgstr "drums of toetsengitaar"
+
+#: ../game/songs.cc:184
+msgid "full band"
+msgstr "volledige band"
+
+#: ../game/songs.cc:212
+msgid "random order"
+msgstr "willekeurige volgorde"
+
+#: ../game/songs.cc:213
+msgid "sorted by song"
+msgstr "gesorteerd op titel"
+
+#: ../game/songs.cc:214
+msgid "sorted by artist"
+msgstr "gesorteerd op artiest"
+
+#: ../game/songs.cc:215
+msgid "sorted by edition"
+msgstr "gesorteerd op editie"
+
+#: ../game/songs.cc:216
+msgid "sorted by genre"
+msgstr "gesorteerd op genre"
+
+#: ../game/songs.cc:217
+msgid "sorted by path"
+msgstr "gesorteerd op pad"
+
+#: ../game/songs.cc:218
+msgid "sorted by language"
+msgstr "gesorteerd op taal"
+
+#: ../game/screen_audiodevices.cc:55
+msgid ""
+"It seems you have some manual configurations\n"
+"incompatible with this user interface.\n"
+"Saving these settings will override\n"
+"all existing audio device configuration.\n"
+"Your other options changes will be saved too."
+msgstr ""
+"Het lijkt erop dat je enkele handmatige opties hebt\n"
+"die niet compatibel zijn met deze interface.\n"
+"Opslaan van deze instellingen zal de bestaande\n"
+"opties voor audio-apparaten overschrijven.\n"
+"De andere optiewijzigingen zullen ook opgeslagen worden."
+
+#: ../game/screen_audiodevices.cc:114
+msgid "- Unassigned -"
+msgstr "- Niet toegewezen -"
+
+#: ../game/screen_audiodevices.cc:135
+msgid ""
+"Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select "
+"to cancel. Ctrl + R to reset defaults"
+msgstr ""
+"Gebruik de pijltjestoetsen om aan te passen. Duw Enter/Start om op te slaan "
+"en te testen of Esc/Select om te annuleren. Ctrl + R laadt de standaardopties"
+
+#: ../game/screen_audiodevices.cc:140
+msgid ""
+"For advanced device configuration, use command line parameter --audio (use --"
+"audiohelp for details)."
+msgstr ""
+"Voor geavanceerde apparaatinstellingen, gebruik de commandolijnparameter --"
+"audio (voor details: --audiohelp)."
+
+#: ../game/screen_audiodevices.cc:188
+msgid "Some devices failed to open!"
+msgstr "Openen van sommige apparaten is gefaald!"
+
+#: ../game/main.cc:145
+msgid "Loading audio samples..."
+msgstr "Laden geluiden..."
+
+#: ../game/main.cc:159
+msgid "Creating screens..."
+msgstr "Schermen aanmaken..."
+
+#: ../game/main.cc:169
+msgid "Entering main menu"
+msgstr "Hoofdmenu tonen"
+
+#: ../game/main.cc:171 ../game/screen_sing.cc:97
+msgid "Loading complete"
+msgstr "Laden afgerond"
+
+#: ../game/main.cc:182
+msgid "Screenshot taken!"
+msgstr "Schermafdruk genomen!"
+
+#: ../game/main.cc:185
+msgid "Screenshot failed!"
+msgstr "Schermafdruk nemen mislukt!"
 
 #: ../game/guitargraph.cc:14
 msgid "Kids"
 msgstr "Kinderen"
 
-#: ../game/guitargraph.cc:14 ../game/dancegraph.cc:18
-msgid "Easy"
-msgstr "Gemakkelijk"
-
-#: ../game/guitargraph.cc:14 ../game/dancegraph.cc:18
-msgid "Medium"
-msgstr "Medium"
-
-#: ../game/guitargraph.cc:14 ../game/dancegraph.cc:18
-msgid "Hard"
-msgstr "Moeilijk"
-
 #: ../game/guitargraph.cc:14
 msgid "Expert"
 msgstr "Expert"
 
-#: ../game/guitargraph.cc:163 ../game/dancegraph.cc:134
-msgid "Select difficulty"
-msgstr "Selecteer moeilijkheidsgraad"
-
 #: ../game/guitargraph.cc:169 ../game/guitargraph.cc:186
 msgid "Lefty-mode"
 msgstr "Linkshandige modus"
-
-#: ../game/guitargraph.cc:183 ../game/dancegraph.cc:118
-msgid "Select track"
-msgstr "Selecteer track"
-
-#: ../game/guitargraph.cc:194 ../game/dancegraph.cc:107
-msgid "Ready!"
-msgstr "Klaar!"
-
-#: ../game/guitargraph.cc:194 ../game/screen_intro.cc:166
-#: ../game/dancegraph.cc:107
-msgid "Start performing!"
-msgstr "Opvoering starten!"
 
 #: ../game/guitargraph.cc:207
 msgid "ON"
@@ -143,10 +350,6 @@ msgstr "UIT"
 #: ../game/guitargraph.cc:208
 msgid "Toggle lefty-mode"
 msgstr "Linkshandige modus aan/uit"
-
-#: ../game/guitargraph.cc:447 ../game/dancegraph.cc:319
-msgid "Streak!"
-msgstr "Streak!"
 
 #: ../game/guitargraph.cc:459
 msgid ""
@@ -172,61 +375,69 @@ msgstr "Drum Fill!"
 msgid "Solo!"
 msgstr "Solo!"
 
-#: ../game/songs.cc:194
-msgid "show all songs"
-msgstr "Laat alle nummers zien"
+#: ../game/screen_songs.cc:278
+msgid "Sorry, no songs match the search!"
+msgstr "filter geeft geen resultaat"
 
-#: ../game/songs.cc:195
-msgid "has dance"
-msgstr "heeft dans"
+#: ../game/screen_songs.cc:281
+msgid "Sorry, no songs match the filter!"
+msgstr "Filter geeft geen resultaat"
 
-#: ../game/songs.cc:196
-msgid "has vocals"
-msgstr "heeft zang"
+#: ../game/screen_songs.cc:284
+msgid "No songs found!"
+msgstr "Geen liedjes gevonden!"
 
-#: ../game/songs.cc:197
-msgid "has duet"
-msgstr "heeft duet"
+#: ../game/screen_songs.cc:285
+msgid "Visit performous.org for free songs"
+msgstr "Bezoek performous.org voor gratis nummers"
 
-#: ../game/songs.cc:198
-msgid "has guitar"
-msgstr "heeft gitaar"
+#: ../game/screen_songs.cc:303
+msgid "<type in to search>"
+msgstr "<typ tekst om te zoeken>"
 
-#: ../game/songs.cc:199
-msgid "drums or keytar"
-msgstr "drums of toetsengitaar"
+#: ../game/screen_songs.cc:303
+msgid "songs"
+msgstr "nummers"
 
-#: ../game/songs.cc:200
-msgid "full band"
-msgstr "volledige band"
+#: ../game/screen_songs.cc:303
+msgid "options"
+msgstr "opties"
 
-#: ../game/songs.cc:228
-msgid "random order"
-msgstr "willekeurige volgorde"
+#: ../game/screen_songs.cc:305
+msgid "sort order: "
+msgstr "sorteervolgorde:"
 
-#: ../game/songs.cc:229
-msgid "sorted by song"
-msgstr "gesorteerd op titel"
+#: ../game/screen_songs.cc:306
+msgid "type filter: "
+msgstr "type sortering:"
 
-#: ../game/songs.cc:230
-msgid "sorted by artist"
-msgstr "gesorteerd op artiest"
+#: ../game/screen_songs.cc:307
+msgid "hiscores"
+msgstr "scores"
 
-#: ../game/songs.cc:231
-msgid "sorted by edition"
-msgstr "gesorteerd op editie"
+#: ../game/screen_songs.cc:307
+msgid "jukebox mode"
+msgstr "jukebox modus"
 
-#: ../game/songs.cc:232
-msgid "sorted by genre"
-msgstr "gesorteerd op genre"
+#: ../game/screen_songs.cc:310
+msgid "start a playlist with this song!"
+msgstr "begin een afspeellijst met dit nummer!"
 
-#: ../game/songs.cc:233
-msgid "sorted by path"
-msgstr "gesorteerd op pad"
+#: ../game/screen_songs.cc:310
+msgid "open the playlist menu"
+msgstr "open het afspeellijst menu"
 
-#: ../game/songs.cc:234
-msgid "sorted by language"
-msgstr "gesorteerd op taal"
+#: ../game/screen_songs.cc:502
+msgid "Play"
+msgstr "Afspelen"
+
+#: ../game/screen_songs.cc:515
+msgid "View playlist"
+msgstr "Bekijk afspeellijst"
+
+#: ../game/screen_songs.cc:516
+msgid "Clear playlist"
+msgstr "Afspeellijst wissen"
 
 #: ../game/screen_intro.cc:24
 msgid "No playback devices could be used.\n"
@@ -276,114 +487,41 @@ msgstr "Aanpassen geluids- en spelinstellingen"
 msgid "Leave the game"
 msgstr "Spel verlaten"
 
-#: ../game/dancegraph.cc:18
-msgid "Beginner"
-msgstr "Beginner"
+#: ../game/screen_players.cc:115
+msgid "No players found!"
+msgstr "Geen spelers gevonden!"
 
-#: ../game/dancegraph.cc:18
-msgid "Challenge"
-msgstr "Daag uit"
+#: ../game/screen_players.cc:116
+msgid "Enter a name to create a new player."
+msgstr "Voer een naam in om een nieuwe speler aan te maken."
 
-#: ../game/dancegraph.cc:248
-msgid "STOP!"
-msgstr "STOP!"
+#: ../game/screen_players.cc:118
+msgid "Press enter to create player!"
+msgstr "Druk op enter om de nieuwe speler te maken!"
 
-#: ../game/screen_playlist.cc:110 ../game/screen_playlist.cc:252
-msgid "Continue"
-msgstr "Doorgaan"
+#: ../game/screen_players.cc:122
+msgid "No players worth mentioning!"
+msgstr "Geen spelers gevonden!"
 
-#: ../game/screen_playlist.cc:110
-msgid "Continue playing"
-msgstr "Doorgaan met spelen"
+#: ../game/screen_players.cc:127
+msgid "You reached %1% points!"
+msgstr "Je hebt %1% punten behaald!"
 
-#: ../game/screen_playlist.cc:118
-msgid "Add songs"
-msgstr "Nummers toevoegen"
+#: ../game/screen_players.cc:128
+msgid "Change player with arrow keys."
+msgstr "Verander de speler met de pijltjes-toetsen"
 
-#: ../game/screen_playlist.cc:118
-msgid "Open the song browser to add more songs"
-msgstr "Open de muziekverkenner om meer nummers toe te voegen."
+#: ../game/screen_players.cc:129
+msgid "Name:"
+msgstr "Naam:"
 
-#: ../game/screen_playlist.cc:119 ../game/screen_songs.cc:513
-msgid "Shuffle"
-msgstr "Door elkaar"
+#: ../game/screen_players.cc:132
+msgid "Type text to filter or create a new player."
+msgstr "Typ tekst om te zoeken of een nieuwe speler aan te maken."
 
-#: ../game/screen_playlist.cc:119 ../game/screen_songs.cc:513
-msgid "Randomize the order of the playlist"
-msgstr "Gooi de volgorde van de afspeellijst door elkaar"
-
-#: ../game/screen_playlist.cc:125
-msgid "Clear and exit"
-msgstr "Leegmaken en afsluiten"
-
-#: ../game/screen_playlist.cc:125 ../game/screen_songs.cc:520
-msgid "Remove all the songs from the list"
-msgstr "Haal alle nummers uit de lijst"
-
-#: ../game/screen_playlist.cc:131 ../game/screen_playlist.cc:275
-#: ../game/screen_songs.cc:526
-msgid "Back"
-msgstr "Terug"
-
-#: ../game/screen_playlist.cc:131 ../game/screen_playlist.cc:275
-msgid "Back to playlist viewer"
-msgstr "Terug naar afspeellijstoverzicht"
-
-#: ../game/screen_playlist.cc:237
-msgid "Press enter to view song options"
-msgstr "Druk op enter om nummeropties weer te geven."
-
-#: ../game/screen_playlist.cc:244
-msgid "View more options"
-msgstr "Meer opties"
-
-#: ../game/screen_playlist.cc:244
-msgid "View general playlist settings"
-msgstr "Pas algemene afspeellijstinstellingen aan"
-
-#: ../game/screen_playlist.cc:252
-msgid "Play first"
-msgstr "Speel als eerste"
-
-#: ../game/screen_playlist.cc:254
-msgid "Ignore the playlist's order and play this song first"
-msgstr "Negeer de volgorde van de afspeellijst en speel dit nummer als eerste"
-
-#: ../game/screen_playlist.cc:255
-msgid "Start the song already!"
-msgstr "Start het nummer eens!"
-
-#: ../game/screen_playlist.cc:264
-msgid "Remove"
-msgstr "Verwijderen"
-
-#: ../game/screen_playlist.cc:264
-msgid "Remove this song from the list"
-msgstr "Verwijder dit nummer uit de lijst"
-
-#: ../game/main.cc:146
-msgid "Loading audio samples..."
-msgstr "Laden geluiden..."
-
-#: ../game/main.cc:160
-msgid "Creating screens..."
-msgstr "Schermen aanmaken..."
-
-#: ../game/main.cc:170
-msgid "Entering main menu"
-msgstr "Hoofdmenu tonen"
-
-#: ../game/main.cc:172 ../game/screen_sing.cc:97
-msgid "Loading complete"
-msgstr "Laden afgerond"
-
-#: ../game/main.cc:183
-msgid "Screenshot taken!"
-msgstr "Schermafdruk genomen!"
-
-#: ../game/main.cc:186
-msgid "Screenshot failed!"
-msgstr "Schermafdruk nemen mislukt!"
+#: ../game/screen_players.cc:132
+msgid "Search Text:"
+msgstr "Zoek op tekst:"
 
 #: ../game/screen_sing.cc:45
 msgid "Initializing webcam..."
@@ -517,191 +655,53 @@ msgstr "Virtuoos"
 msgid "Rocker"
 msgstr "Rocker"
 
-#: ../game/screen_songs.cc:279
-msgid "No songs found!"
-msgstr "Geen liedjes gevonden!"
+#~ msgid "<type in to search>   ↔ songs    ↕ options"
+#~ msgstr "<typ om te zoeken> ↔ nummers  ↕ opties"
 
-#: ../game/screen_songs.cc:280
-msgid ""
-"Visit performous.org\n"
-"for free songs"
-msgstr ""
-"Bezoek performous.org\n"
-"voor gratis nummers"
+#~ msgid "↔ hiscores   ↵ jukebox mode"
+#~ msgstr "↔ scores  ↵ jukebox mode"
 
-#: ../game/screen_songs.cc:282
-msgid "Sorry, no songs match the search!"
-msgstr "filter geeft geen resultaat"
+#~ msgid "Start the game with all songs in playlist"
+#~ msgstr "Start het spel met alle nummers in de afspeellijst"
 
-#: ../game/screen_songs.cc:289
-msgid "Hiscore\n"
-msgstr "Scores voor %1%\n"
+#~ msgid "View the current playlist"
+#~ msgstr "Bekijk de huidige afspellijst"
 
-#: ../game/screen_songs.cc:298
-msgid "<type in to search>   ↔ songs    ↕ options"
-msgstr "<typ om te zoeken> ↔ nummers  ↕ opties"
+#~ msgid "Back to song browser"
+#~ msgstr "Ga naar muziekverkenner"
 
-#: ../game/screen_songs.cc:301
-msgid "↔ sort order: "
-msgstr "↔ sorteervolgorde:"
+#~ msgid "No Items up to now."
+#~ msgstr "Geen item tot nu toe."
 
-#: ../game/screen_songs.cc:302
-msgid "↔ type filter: "
-msgstr "↔ type sortering:"
+#~ msgid "Be the first to be listed here!"
+#~ msgstr "Wees de eerste hier!"
 
-#: ../game/screen_songs.cc:303
-msgid "↔ hiscores   ↵ jukebox mode"
-msgstr "↔ scores  ↵ jukebox mode"
+#~ msgid "Guitar"
+#~ msgstr "Gitaar"
 
-#: ../game/screen_songs.cc:307
-msgid "↵ start a playlist with this song!"
-msgstr "↵ begin een afspeellijst met dit nummer!"
+#~ msgid "Coop guitar"
+#~ msgstr "Coop gitaar"
 
-#: ../game/screen_songs.cc:309
-msgid "↵ open the playlist menu"
-msgstr "↵ open het afspeellijst menu"
+#~ msgid "Rhythm guitar"
+#~ msgstr "Ritmegitaar"
 
-#: ../game/screen_songs.cc:506
-msgid "Play"
-msgstr "Afspelen"
+#~ msgid "Bass"
+#~ msgstr "Bas"
 
-#: ../game/screen_songs.cc:506
-msgid "Start the game with all songs in playlist"
-msgstr "Start het spel met alle nummers in de afspeellijst"
+#~ msgid "Drums"
+#~ msgstr "Drum"
 
-#: ../game/screen_songs.cc:519
-msgid "View playlist"
-msgstr "Bekijk afspeellijst"
+#~ msgid "Vocals"
+#~ msgstr "Stemmen"
 
-#: ../game/screen_songs.cc:519
-msgid "View the current playlist"
-msgstr "Bekijk de huidige afspellijst"
+#~ msgid "Harmonic 1"
+#~ msgstr "Harmonische 1"
 
-#: ../game/screen_songs.cc:520
-msgid "Clear playlist"
-msgstr "Afspeellijst wissen"
+#~ msgid "Harmonic 2"
+#~ msgstr "Harmonische 2"
 
-#: ../game/screen_songs.cc:526
-msgid "Back to song browser"
-msgstr "Ga naar muziekverkenner"
-
-#: ../game/screen_players.cc:115
-msgid "No players found!"
-msgstr "Geen spelers gevonden!"
-
-#: ../game/screen_players.cc:116
-msgid "Enter a name to create a new player."
-msgstr "Voer een naam in om een nieuwe speler aan te maken."
-
-#: ../game/screen_players.cc:118
-msgid "Press enter to create player!"
-msgstr "Druk op enter om de nieuwe speler te maken!"
-
-#: ../game/screen_players.cc:122
-msgid "No players worth mentioning!"
-msgstr "Geen spelers gevonden!"
-
-#: ../game/screen_players.cc:127
-msgid "You reached %1% points!"
-msgstr "Je hebt %1% punten behaald!"
-
-#: ../game/screen_players.cc:128
-msgid "Change player with arrow keys."
-msgstr "Verander de speler met de pijltjes-toetsen"
-
-#: ../game/screen_players.cc:129
-msgid "Name:"
-msgstr "Naam:"
-
-#: ../game/screen_players.cc:132
-msgid "Type text to filter or create a new player."
-msgstr "Typ tekst om te zoeken of een nieuwe speler aan te maken."
-
-#: ../game/screen_players.cc:132
-msgid "Search Text:"
-msgstr "Zoek op tekst:"
-
-#: ../game/screen_audiodevices.cc:55
-msgid ""
-"It seems you have some manual configurations\n"
-"incompatible with this user interface.\n"
-"Saving these settings will override\n"
-"all existing audio device configuration.\n"
-"Your other options changes will be saved too."
-msgstr ""
-"Het lijkt erop dat je enkele handmatige opties hebt\n"
-"die niet compatibel zijn met deze interface.\n"
-"Opslaan van deze instellingen zal de bestaande\n"
-"opties voor audio-apparaten overschrijven.\n"
-"De andere optiewijzigingen zullen ook opgeslagen worden."
-
-#: ../game/screen_audiodevices.cc:114
-msgid "- Unassigned -"
-msgstr "- Niet toegewezen -"
-
-#: ../game/screen_audiodevices.cc:135
-msgid ""
-"Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select "
-"to cancel. Ctrl + R to reset defaults"
-msgstr ""
-"Gebruik de pijltjestoetsen om aan te passen. Duw Enter/Start om op te slaan "
-"en te testen of Esc/Select om te annuleren. Ctrl + R laadt de standaardopties"
-
-#: ../game/screen_audiodevices.cc:140
-msgid ""
-"For advanced device configuration, use command line parameter --audio (use --"
-"audiohelp for details)."
-msgstr ""
-"Voor geavanceerde apparaatinstellingen, gebruik de commandolijnparameter --"
-"audio (voor details: --audiohelp)."
-
-#: ../game/screen_audiodevices.cc:188
-msgid "Some devices failed to open!"
-msgstr "Openen van sommige apparaten is gefaald!"
-
-#: ../game/database.cc:89 ../game/database.cc:107
-msgid "No Items up to now."
-msgstr "Geen item tot nu toe."
-
-#: ../game/database.cc:90 ../game/database.cc:108
-msgid "Be the first to be listed here!"
-msgstr "Wees de eerste hier!"
-
-#: ../game/song.hh:22
-msgid "Guitar"
-msgstr "Gitaar"
-
-#: ../game/song.hh:22
-msgid "Coop guitar"
-msgstr "Coop gitaar"
-
-#: ../game/song.hh:22
-msgid "Rhythm guitar"
-msgstr "Ritmegitaar"
-
-#: ../game/song.hh:22
-msgid "Bass"
-msgstr "Bas"
-
-#: ../game/song.hh:22
-msgid "Drums"
-msgstr "Drum"
-
-#: ../game/song.hh:22
-msgid "Vocals"
-msgstr "Stemmen"
-
-#: ../game/song.hh:22
-msgid "Harmonic 1"
-msgstr "Harmonische 1"
-
-#: ../game/song.hh:22
-msgid "Harmonic 2"
-msgstr "Harmonische 2"
-
-#: ../game/song.hh:22
-msgid "Harmonic 3"
-msgstr "Harmonische 3"
+#~ msgid "Harmonic 3"
+#~ msgstr "Harmonische 3"
 
 #~ msgid "Song is broken!"
 #~ msgstr "Nummer is kapot!"
@@ -721,9 +721,6 @@ msgstr "Harmonische 3"
 
 #~ msgid "(press END to view hiscores)"
 #~ msgstr "(gebruik END-toets om recordscores te zien)"
-
-#~ msgid "<type in to search>"
-#~ msgstr "<typ tekst om te zoeken>"
 
 #~ msgid "Audio Devices"
 #~ msgstr "Geluidsapparaten"

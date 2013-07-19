@@ -91,10 +91,9 @@ public: // methods for database queries
 	 */
 	bool reachedHiscore(boost::shared_ptr<Song> s) const;
 
-	void queryOverallHiscore(std::ostream & os, std::string const& track = "") const;
-	void queryPerSongHiscore(std::ostream & os, boost::shared_ptr<Song> s, std::string const& track = "") const;
-	void queryPerSongHiscore_HiscoreDisplay(std::ostream & os, boost::shared_ptr<Song> s, int& start_pos, unsigned max_displayed, std::string const& track = "") const;
-	void queryPerPlayerHiscore(std::ostream & os, std::string const& track = "") const;
+	void queryOverallHiscore(std::ostream & os, std::string const& track = std::string()) const;
+	void queryPerSongHiscore(std::ostream & os, boost::shared_ptr<Song> s, std::string const& track = std::string()) const;
+	void queryPerPlayerHiscore(std::ostream & os, std::string const& track = std::string()) const;
 
 	bool hasHiscore(Song& s) const;
 	bool noPlayers() const;

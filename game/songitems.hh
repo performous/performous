@@ -55,8 +55,8 @@ struct SongItem
 
   When one of the methods is to slow, it can be optimized
   easily. */
-struct SongItems
-{
+class SongItems {
+public:
 	void load(xmlpp::NodeSet const& n);
 	void save(xmlpp::Element *players);
 
@@ -89,7 +89,9 @@ struct SongItems
 	  */
 	std::string lookup (int id) const;
 
-  private:
+	std::size_t size() const { return m_songs.size(); }
+
+private:
 	int assign_id_internal() const;
 
 	typedef std::set<SongItem> songs_t;

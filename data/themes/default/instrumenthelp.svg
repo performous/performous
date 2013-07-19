@@ -11,7 +11,7 @@
    height="700"
    id="svg5215"
    sodipodi:version="0.32"
-   inkscape:version="0.47 r22583"
+   inkscape:version="0.48.4 r9939"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    sodipodi:docname="instrumenthelp.svg"
    version="1.0">
@@ -65,33 +65,33 @@
      showgrid="false"
      showguides="true"
      inkscape:guide-bbox="true"
-     inkscape:zoom="1"
-     inkscape:cx="602.01716"
-     inkscape:cy="358.48892"
+     inkscape:zoom="2"
+     inkscape:cx="503.82147"
+     inkscape:cy="476.32724"
      inkscape:window-x="58"
-     inkscape:window-y="24"
+     inkscape:window-y="27"
      inkscape:current-layer="svg5215"
      inkscape:window-maximized="0" />
   <text
      transform="scale(0.89213371,1.1209082)"
      id="text2954"
      y="434.98087"
-     x="323.69031"
-     style="font-size:48.68118668000000300px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.01400006000000010;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;font-family:Goblin;-inkscape-font-specification:Goblin Bold"
+     x="553.4765"
+     style="font-size:48.68118668px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.01400006;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;font-family:Goblin;-inkscape-font-specification:Goblin Bold"
      xml:space="preserve"><tspan
-       style="text-align:center;text-anchor:start;stroke:#000000;stroke-width:1.01400006000000010;stroke-miterlimit:4;stroke-dasharray:none"
+       style="text-align:center;text-anchor:middle;stroke:#000000;stroke-width:1.01400006;stroke-miterlimit:4;stroke-dasharray:none"
        y="434.98087"
-       x="323.69031"
+       x="553.4765"
        sodipodi:role="line"
        id="tspan2905"><tspan
-   style="fill:#ff6600;stroke:#000000;stroke-width:1.01400006000000010"
+   style="text-align:center;text-anchor:middle;fill:#ff6600;stroke:#000000;stroke-width:1.01400006"
    id="tspan2873">PRESS</tspan> A BUTTON</tspan><tspan
-       style="text-align:center;text-anchor:start;stroke:#000000;stroke-width:1.01400006000000010;stroke-miterlimit:4;stroke-dasharray:none"
+       style="text-align:center;text-anchor:middle;stroke:#000000;stroke-width:1.01400006;stroke-miterlimit:4;stroke-dasharray:none"
        y="434.98087"
-       x="323.69031"
+       x="553.4765"
        sodipodi:role="line"
        id="tspan2970"><tspan
-         style="fill:#ffff00;stroke:#000000;stroke-width:1.01400006000000010"
+         style="text-align:center;text-anchor:middle;fill:#ffff00;stroke:#000000;stroke-width:1.01400006"
          id="tspan2911" /></tspan></text>
   <!-- EMR_SETMAPMODE -->
   <!-- EMR_SETWINDOWEXTEX -->
@@ -295,33 +295,34 @@
      style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none" />
   <text
      xml:space="preserve"
-     style="font-size:8.49492264px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Goblin;-inkscape-font-specification:Goblin"
-     x="16.143225"
-     y="-519.48566"
+     style="font-size:5.19999981px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Goblin;-inkscape-font-specification:Goblin"
+     x="16.636446"
+     y="-520.85742"
      id="text3227"
      transform="matrix(-0.6328411,0.7742817,-0.7742817,-0.6328411,0,0)"
      inkscape:transform-center-x="160.30374"
      inkscape:transform-center-y="104.4831"><tspan
        sodipodi:role="line"
        id="tspan3229"
-       x="16.143225"
-       y="-519.48566">PICK</tspan></text>
+       x="16.636446"
+       y="-520.85742">PICK</tspan></text>
   <text
      inkscape:transform-center-y="100.81871"
      inkscape:transform-center-x="143.0233"
      transform="matrix(-0.6612382,0.7410299,-0.8090256,-0.6056635,0,0)"
      id="text3231"
-     y="-532.89868"
-     x="44.19733"
-     style="font-size:6.65984917px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Goblin;-inkscape-font-specification:Goblin"
+     y="-533.45447"
+     x="43.743084"
+     style="font-size:4.69999981px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Goblin;-inkscape-font-specification:Goblin"
      xml:space="preserve"><tspan
-       y="-532.89868"
-       x="44.19733"
+       y="-533.45447"
+       x="43.743084"
        id="tspan3233"
-       sodipodi:role="line">PICK</tspan></text>
+       sodipodi:role="line"
+       style="font-size:4.69999981px">PICK</tspan></text>
   <text
      xml:space="preserve"
-     style="font-size:28px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:start;opacity:0.95;fill:#ffffff;fill-opacity:0.95;fill-rule:nonzero;stroke:#000000;stroke-width:0.89999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;font-family:Goblin;-inkscape-font-specification:Goblin"
+     style="font-size:22px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:start;opacity:0.95;fill:#ffffff;fill-opacity:0.95;fill-rule:nonzero;stroke:#000000;stroke-width:0.89999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;font-family:Goblin;-inkscape-font-specification:Goblin"
      x="548.48071"
      y="373.84677"
      id="text3235"><tspan
@@ -329,40 +330,28 @@
        x="548.48071"
        y="373.84677"
        id="tspan3239"
-       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.89999998;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none">Navigate guitar menu</tspan></text>
-  <path
-     style="fill:none;stroke:#000000;stroke-width:1.98200011;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
-     d="M 557.1897,348.34804 C 504.84576,364.89347 501.307,360.2599 501.307,360.2599"
-     id="path3253" />
-  <path
-     style="fill:none;stroke:#000000;stroke-width:1.98199999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
-     d="m 514.6891,342.09125 47.26706,6.63398"
-     id="path3255" />
-  <path
-     style="fill:none;stroke:#000000;stroke-width:1.98199999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
-     d="m 527.33512,331.72567 34.41373,16.99956 -22.38966,-29.85288"
-     id="path3257" />
+       style="font-size:22px;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.89999998;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none">Guitar</tspan></text>
   <path
      style="fill:none;stroke:#000000;stroke-width:1.98199999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
      d="m 553.04176,309.95795 8.49977,38.14534"
      id="path3259" />
   <text
      xml:space="preserve"
-     style="font-size:48.68118668px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.01400006;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;font-family:Goblin;-inkscape-font-specification:Goblin Bold"
-     x="370.76126"
+     style="font-size:48.68118668px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.01400006;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;font-family:Goblin;-inkscape-font-specification:Goblin Bold"
+     x="551.75928"
      y="155.65428"
      id="text3263"
      transform="scale(0.89213371,1.1209082)"><tspan
        sodipodi:role="line"
        id="tspan3265"
-       x="370.76126"
+       x="551.75928"
        y="155.65428"
-       style="stroke-width:1.01400006;stroke-miterlimit:4;stroke-dasharray:none">PICK UP YOUR</tspan><tspan
+       style="text-align:center;text-anchor:middle;stroke-width:1.01400006;stroke-miterlimit:4;stroke-dasharray:none">PICK UP YOUR</tspan><tspan
        sodipodi:role="line"
-       x="370.76126"
+       x="551.75928"
        y="216.50577"
        id="tspan3267"
-       style="stroke-width:1.01400006;stroke-miterlimit:4;stroke-dasharray:none">INSTRUMENTS</tspan></text>
+       style="text-align:center;text-anchor:middle;stroke-width:1.01400006;stroke-miterlimit:4;stroke-dasharray:none">INSTRUMENTS</tspan></text>
   <text
      xml:space="preserve"
      style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Goblin"
@@ -427,11 +416,13 @@
      id="path3693" />
   <path
      style="fill:none;stroke:#000000;stroke-width:1.98199999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
-     d="m 306.06196,335.46267 c 57.80316,44.1993 54.96622,49.66213 54.96622,49.66213"
-     id="path3253-1" />
+     d="m 306.06196,335.46267 c 1.80316,6.1993 66.96622,37.16213 66.96622,37.16213"
+     id="path3253-1"
+     inkscape:connector-curvature="0"
+     sodipodi:nodetypes="cc" />
   <text
      xml:space="preserve"
-     style="font-size:28px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;opacity:0.95;fill:#ffffff;fill-opacity:0.95;fill-rule:nonzero;stroke:#000000;stroke-width:0.89999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;font-family:Goblin;-inkscape-font-specification:Goblin"
+     style="font-size:22px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;opacity:0.95;fill:#ffffff;fill-opacity:0.95;fill-rule:nonzero;stroke:#000000;stroke-width:0.89999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;font-family:Goblin;-inkscape-font-specification:Goblin"
      x="233.86311"
      y="327.96237"
      id="text3241-7"><tspan
@@ -439,17 +430,45 @@
        x="233.86311"
        y="327.96237"
        id="tspan3245-0"
-       style="fill-rule:nonzero;stroke-width:0.89999998;stroke-miterlimit:4;stroke-dasharray:none">Dancing</tspan></text>
+       style="font-size:22px;fill-rule:nonzero;stroke-width:0.89999998;stroke-miterlimit:4;stroke-dasharray:none">Dance</tspan></text>
   <text
      xml:space="preserve"
-     style="font-size:48.68118668px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.01400006;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;font-family:Goblin;-inkscape-font-specification:Goblin Bold"
-     x="297.83939"
+     style="font-size:48.68118668px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.01400006;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;font-family:Goblin;-inkscape-font-specification:Goblin Bold"
+     x="552.28552"
      y="495.83029"
      id="text2891"
      transform="scale(0.89213371,1.1209082)"><tspan
        id="tspan2897"
        sodipodi:role="line"
-       x="297.83939"
+       x="552.28552"
        y="495.83029"
-       style="text-align:center;text-anchor:start;stroke-width:1.01400006;stroke-miterlimit:4;stroke-dasharray:none">TO JOIN THE GAME</tspan></text>
+       style="text-align:center;text-anchor:middle;stroke-width:1.01400006;stroke-miterlimit:4;stroke-dasharray:none">TO JOIN THE GAME</tspan></text>
+  <text
+     id="text3063"
+     y="277.46237"
+     x="252.86311"
+     style="font-size:22px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;opacity:0.95;fill:#ffffff;fill-opacity:0.95;fill-rule:nonzero;stroke:#000000;stroke-width:0.89999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;font-family:Goblin;-inkscape-font-specification:Goblin"
+     xml:space="preserve"><tspan
+       style="font-size:22px;fill-rule:nonzero;stroke-width:0.89999998;stroke-miterlimit:4;stroke-dasharray:none"
+       id="tspan3065"
+       y="277.46237"
+       x="252.86311"
+       sodipodi:role="line">Drums</tspan></text>
+  <path
+     id="path3067"
+     d="m 355.56196,282.46267 c 17.30316,4.1993 65.46622,-4.33787 65.46622,-4.33787"
+     style="fill:none;stroke:#000000;stroke-width:1.98199999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+     inkscape:connector-curvature="0"
+     sodipodi:nodetypes="cc" />
+  <text
+     xml:space="preserve"
+     style="font-size:12px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+     x="497"
+     y="419.5"
+     id="text3079"
+     sodipodi:linespacing="125%"><tspan
+       sodipodi:role="line"
+       id="tspan3081"
+       x="497"
+       y="419.5" /></text>
 </svg>
