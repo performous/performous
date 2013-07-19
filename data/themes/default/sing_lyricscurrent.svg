@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -13,9 +14,8 @@
    height="600"
    id="svg3465"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
+   inkscape:version="0.48.4 r9939"
    sodipodi:docname="sing_lyricscurrent.svg"
-   sodipodi:docbase="/home/jesusda/docs/curro/yo/ultrastar-ng/base/theme-pod/themes/default"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <metadata
      id="metadata19">
@@ -46,7 +46,8 @@
      inkscape:window-x="101"
      inkscape:window-y="100"
      inkscape:current-layer="svg3465"
-     showgrid="false" />
+     showgrid="false"
+     inkscape:window-maximized="0" />
   <defs
      id="defs3467">
     <inkscape:perspective
@@ -61,10 +62,10 @@
      sodipodi:linespacing="125%"
      xml:space="preserve"
      id="text3481"
-     style="font-size:40px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;line-height:125%;writing-mode:lr-tb;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:inline;font-family:Goblin"
+     style="font-size:30px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;line-height:125%;writing-mode:lr-tb;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:inline;font-family:Goblin"
      y="527.65424"
      x="400"><tspan
-       style="font-size:40px;text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1"
+       style="font-size:30px;text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1"
        id="tspan2921"
        y="527.65424"
        x="400">lyrics</tspan></text>

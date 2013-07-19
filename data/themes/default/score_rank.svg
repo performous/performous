@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Sodipodi ("http://www.sodipodi.com/") -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -15,9 +16,8 @@
    height="600.000000"
    id="svg559"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
+   inkscape:version="0.48.4 r9939"
    sodipodi:docname="score_rank.svg"
-   sodipodi:docbase="/home/pim/tmp/UltraStar-ng/themes/lima"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    sodipodi:modified="true">
   <metadata
@@ -32,8 +32,8 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="1125"
-     inkscape:window-width="1920"
+     inkscape:window-height="879"
+     inkscape:window-width="1531"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      guidetolerance="10.0"
@@ -46,10 +46,11 @@
      inkscape:zoom="1.26"
      inkscape:cx="285.76321"
      inkscape:cy="363.49206"
-     inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:window-x="168"
+     inkscape:window-y="122"
      inkscape:current-layer="svg559"
-     showgrid="false" />
+     showgrid="false"
+     inkscape:window-maximized="0" />
   <defs
      id="defs561">
     <inkscape:perspective
@@ -62,13 +63,13 @@
   </defs>
   <text
      x="400"
-     y="104.21307"
-     style="font-size:90px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;line-height:125%;writing-mode:lr-tb;text-anchor:middle;opacity:1;fill:#ffd100;fill-opacity:1;stroke:#000000;stroke-width:1.58534133;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:inline;font-family:Goblin"
+     y="119.71297"
+     style="font-size:70px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;line-height:125%;writing-mode:lr-tb;text-anchor:middle;fill:#ffd100;fill-opacity:1;stroke:#000000;stroke-width:1.58534133;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;display:inline;font-family:Goblin"
      id="text10203"
      xml:space="preserve"
      sodipodi:linespacing="125%"><tspan
        x="400"
-       y="104.21307"
+       y="119.71297"
        id="tspan10205"
-       style="font-size:90px;text-align:center;text-anchor:middle;fill:#ffd100;fill-opacity:1;stroke-width:1.58534133">Lead Singer</tspan></text>
+       style="font-size:70px;text-align:center;text-anchor:middle;fill:#ffd100;fill-opacity:1;stroke-width:1.58534133">Lead Singer</tspan></text>
 </svg>

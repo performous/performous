@@ -274,40 +274,40 @@ void ScreenSongs::draw() {
 	// Test if there are no songs
 	if (m_songs.empty()) {
 		// Format the song information text
-		if (m_search.text.empty() && !m_songs.typeNum()) {
+		if (!m_search.text.empty()) {
+			oss_song << _("Sorry, no songs match the search!");
+			oss_order << m_search.text;
+		} else if (m_songs.typeNum()) {
+			oss_song << _("Sorry, no songs match the filter!");
+			oss_order << m_songs.typeDesc();
+		} else {
 			oss_song << _("No songs found!");
 			oss_order << _("Visit performous.org for free songs");
-		} else {
-			oss_song << _("Sorry, no songs match the search!");
 		}
 	} else {
 		Song& song = m_songs.current();
 		// Format the song information text
 		oss_song << song.artist << ": " << song.title;
-		// Format the song information text
-		oss_hiscore << _("Hiscore\n");
 		// Get hiscores from database
-		m_database.queryPerSongHiscore_HiscoreDisplay(oss_hiscore, m_songs.currentPtr(), m_infoPos, 5);
-		// Here we use horrible raw utf-8 bytes in place of nice arrow chars ↵↕↔
-		// because otherwise we get garbage output on Windows for some reason
+		m_database.queryPerSongHiscore(oss_hiscore, m_songs.currentPtr());
+		// Escaped bytes of UTF-8 must be used here for compatibility with Windows (MSVC, mingw)
+		char const* VERT_ARROW = "\xe2\x86\x95 ";  // ↕
+		char const* HORIZ_ARROW = "\xe2\x86\x94 ";  // ↔
+		char const* ENTER = "\xe2\x86\xb5 ";  // ↵
+		char const* PAD = "   ";
 		switch (m_menuPos) {
-			case 1:
-				if (!m_search.text.empty()) oss_order << m_search.text;
-				else if (m_songs.typeNum()) oss_order << m_songs.typeDesc();
-				else if (m_songs.sortNum()) oss_order << m_songs.sortDesc();
-				else oss_order << _("<type in to search>   \xe2\x86\x94 songs    \xe2\x86\x95 options");
-				//if (!m_songs.empty()) oss_order << "(" << m_songs.currentId() + 1 << "/" << m_songs.size() << ")";
-				break;
-			case 2: oss_order << _("\xe2\x86\x94 sort order: ") << m_songs.sortDesc(); break;
-			case 3: oss_order << _("\xe2\x86\x94 type filter: ") << m_songs.typeDesc(); break;
-			case 4: oss_order << _("\xe2\x86\x94 hiscores   \xe2\x86\xb5 jukebox mode"); break;
-			case 0:
-			Game* gm = Game::getSingletonPtr();
-			if(gm->getCurrentPlayList().isEmpty()) {
-				oss_order << _("\xe2\x86\xb5 start a playlist with this song!");
-			} else {
-				oss_order << _("\xe2\x86\xb5 open the playlist menu");
-			}
+		case 1:
+			if (!m_search.text.empty()) oss_order << m_search.text;
+			else if (m_songs.typeNum()) oss_order << m_songs.typeDesc();
+			else if (m_songs.sortNum()) oss_order << m_songs.sortDesc();
+			else oss_order << _("<type in to search>") << PAD << HORIZ_ARROW << _("songs") << PAD << VERT_ARROW << _("options");
+			break;
+		case 2: oss_order << HORIZ_ARROW << _("sort order: ") << m_songs.sortDesc(); break;
+		case 3: oss_order << HORIZ_ARROW << _("type filter: ") << m_songs.typeDesc(); break;
+		case 4: oss_order << HORIZ_ARROW << _("hiscores") << PAD << ENTER << _("jukebox mode"); break;
+		case 0:
+			bool empty = Game::getSingletonPtr()->getCurrentPlayList().isEmpty();
+			oss_order << ENTER << (empty ? _("start a playlist with this song!") : _("open the playlist menu"));
 			break;
 		}
 	}
@@ -318,8 +318,6 @@ void ScreenSongs::draw() {
 		theme->song.draw(oss_song.str());
 		theme->order.draw(oss_order.str());
 		drawInstruments(Dimensions(1.0).fixedHeight(0.09).right(0.45).screenTop(0.02));
-		using namespace glmath;
-		Transform trans(translate(vec3(0.32, -0.03, 0.0)) * scale(vec3(0.75, 0.75, 1.0)));
 		theme->hiscores.draw(oss_hiscore.str());
 	}
 	// Menus on top of everything

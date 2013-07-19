@@ -77,10 +77,10 @@ void ScreenIntro::draw_menu_options() {
 	const size_t showopts = 4; // Show at most 4 options simultaneously
 	const float x = -0.35;
 	const float start_y = -0.1;
-	const float sel_margin = 0.05;
+	const float sel_margin = 0.03;
 	const MenuOptions opts = m_menu.getOptions();
 	double submenuanim = 1.0 - std::min(1.0, std::abs(m_submenuAnim.get()-m_menu.getSubmenuLevel()));
-	theme->back_h.dimensions.fixedHeight(0.08f);
+	theme->back_h.dimensions.fixedHeight(0.065f);
 	theme->back_h.dimensions.stretch(m_menu.dimensions.w(), theme->back_h.dimensions.h());
 	// Determine from which item to start
 	int start_i = std::min((int)m_menu.curIndex() - 1, (int)opts.size() - (int)showopts
@@ -97,7 +97,7 @@ void ScreenIntro::draw_menu_options() {
 			// Animate selection higlight moving
 			double selanim = m_selAnim.get() - start_i;
 			if (selanim < 0) selanim = 0;
-			theme->back_h.dimensions.left(x - sel_margin).center(start_y+0.003 + selanim*0.08);
+			theme->back_h.dimensions.left(x - sel_margin).center(start_y + selanim*0.08);
 			theme->back_h.draw();
 			// Draw the text, dim if option not available
 			{
