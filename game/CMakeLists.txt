@@ -72,7 +72,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 list(APPEND LIBS ${Boost_LIBRARIES})
 
 # Find all the libs that don't require extra parameters
-foreach(lib ${OUR_LIBS} SDL PangoCairo LibRSVG LibXML++ GLEW AVFormat SWScale OpenGL Z Jpeg Png PortAudio)
+foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ GLEW AVFormat SWScale OpenGL Z Jpeg Png PortAudio)
 	find_package(${lib} REQUIRED)
 	include_directories(${${lib}_INCLUDE_DIRS})
 	list(APPEND LIBS ${${lib}_LIBRARIES})
@@ -148,7 +148,7 @@ else()
 endif()
 
 # Build main executable
-add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL_SOURCES} ${RESOURCE_OBJECT})
+add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL2_SOURCES} ${RESOURCE_OBJECT})
 target_link_libraries(performous ${LIBS})
 install(TARGETS performous DESTINATION ${BIN_INSTALL})
 
