@@ -7,22 +7,28 @@ struct WebServer::handler {
 	void operator() (http_server::request const &request,
 	http_server::response &response) {
 	//destination describes the file to be loaded, by default it's "/"
-		if(request.destination == "/") {
-		fs::ifstream f(findFile("index.html"), std::ios::binary);
-		f.seekg(0, std::ios::end);
-		size_t size = f.tellg();
-		f.seekg(0);
-		char responseBuffer[size + 2];
-		f.read(responseBuffer, size);
+		if(request.method == "GET") {
+			if(request.destination == "/") {
+			fs::ifstream f(findFile("index.html"), std::ios::binary);
+			f.seekg(0, std::ios::end);
+			size_t size = f.tellg();
+			f.seekg(0);
+			char responseBuffer[size + 2];
+			f.read(responseBuffer, size);
+			response = http_server::response::stock_reply(
+			http_server::response::ok, responseBuffer);
+			} else {
+			/*here needs code to serve other files, unfortunately using the same method as above will fail
+			this is because the webbrowser requests an .ico file, which cannot be send as text.
+			*/
+			}
+		} else if(request.method == "POST") {
 		response = http_server::response::stock_reply(
-		http_server::response::ok, responseBuffer);
+			http_server::response::ok, "Post request");
 		} else {
-		/*here needs code to serve other files, unfortunately using the same method as above will fail
-		this is because the webbrowser requests an .ico file, which cannot be send as text.
-		*/
+		response = http_server::response::stock_reply(
+			http_server::response::ok, "other request");
 		}
-
-
 	}
 
 	void log(http_server::string_type const &info) {
