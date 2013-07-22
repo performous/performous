@@ -17,11 +17,27 @@ struct WebServer::handler {
 			f.read(responseBuffer, size);
 			response = http_server::response::stock_reply(
 			http_server::response::ok, responseBuffer);
+			} else if(request.destination == "/codiqa.ext.js"){
+					fs::ifstream f(findFile("codiqa.ext.js"), std::ios::binary);
+					f.seekg(0, std::ios::end);
+					size_t size = f.tellg();
+					f.seekg(0);
+					char responseBuffer[size + 2];
+					f.read(responseBuffer, size);
+					response = http_server::response::stock_reply(
+					http_server::response::ok, responseBuffer);
+			} else if(request.destination == "/codiqa.ext.css") {
+					fs::ifstream f(findFile("codiqa.ext.css"), std::ios::binary);
+					f.seekg(0, std::ios::end);
+					size_t size = f.tellg();
+					f.seekg(0);
+					char responseBuffer[size + 2];
+					f.read(responseBuffer, size);
+					response = http_server::response::stock_reply(
+					http_server::response::ok, responseBuffer);
 			} else {
-			/*here needs code to serve other files, unfortunately using the same method as above will fail
-			this is because the webbrowser requests an .ico file, which cannot be send as text.
-			*/
-			}
+					//other files
+				}
 		} else if(request.method == "POST") {
 		response = http_server::response::stock_reply(
 			http_server::response::ok, "Post request");
@@ -43,6 +59,7 @@ void WebServer::StartServer() {
 	server_->run();
 }
 
+
 WebServer::WebServer() {
 	serverthread.reset(new boost::thread(boost::bind(&WebServer::StartServer,boost::ref(*this))));
 }
@@ -52,4 +69,3 @@ WebServer::~WebServer() {
 	serverthread->join();
 	delete server_;
 }
-
