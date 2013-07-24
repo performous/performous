@@ -4,6 +4,7 @@
 namespace http = boost::network::http;
 
 struct WebServer::handler {
+	WebServer& m_server;
 	void operator() (http_server::request const &request,
 	http_server::response &response) {
 	//destination describes the file to be loaded, by default it's "/"
@@ -63,7 +64,7 @@ struct WebServer::handler {
 };
 
 void WebServer::StartServer() {
-	handler handler_;
+	handler handler_{*this};
 	http_server::options options(handler_);
 	server_ = new http_server(options.address("0.0.0.0").port("8000"));
 	server_->run();
