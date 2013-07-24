@@ -12,6 +12,7 @@
 #include "video_driver.hh"
 #include "webcam.hh"
 #include "xtime.hh"
+#include "webserver.hh"
 
 // Screens
 #include "screen_intro.hh"
@@ -140,6 +141,7 @@ void mainLoop(std::string const& songlist) {
 	Database database(getConfigDir() / "database.xml");
 	Songs songs(database, songlist);
 	Game gm(window);
+	WebServer server(database);
 	try {
 		// Load audio samples
 		gm.loading(_("Loading audio samples..."), 0.5);

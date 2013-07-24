@@ -43,7 +43,8 @@ void WebServer::StartServer() {
 	server_->run();
 }
 
-WebServer::WebServer() {
+WebServer::WebServer(Database& db):
+m_database(db){
 	serverthread.reset(new boost::thread(boost::bind(&WebServer::StartServer,boost::ref(*this))));
 }
 
