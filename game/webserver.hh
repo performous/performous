@@ -6,7 +6,8 @@
 #include <boost/filesystem/fstream.hpp>
 #include <string>
 #include "fs.hh"
-#include "database.hh"
+#include "songs.hh"
+#include "song.hh"
 
 using boost::thread;
 
@@ -18,12 +19,12 @@ public:
 struct handler;
 typedef http::server<handler> http_server;
 
-	WebServer(Database& db);
+	WebServer(Songs& songs);
 	~WebServer();
 private:
 	boost::scoped_ptr<boost::thread> serverthread;
 	void StartServer();
 	http_server* server_; //FIXME should be boost::scoped_ptr or boost:: shared_ptr
-	Database& m_database;
+	Songs& m_songs;
 };
 

@@ -35,6 +35,16 @@ struct WebServer::handler {
 					f.read(responseBuffer, size);
 					response = http_server::response::stock_reply(
 					http_server::response::ok, responseBuffer);
+			} else if(request.destination == "/api/getDataBase.json") {
+			std:: stringstream JSONDB;
+			JSONDB << "[";
+			//no access to upper class yet
+			//for(int i=0; i<m_songs.size(); i++) {
+				//JSONDB << "{/nTitle: " << m_songs[i].title << "/nArtist: ";
+				//JSONDB << m_songs[i].artist << "/nGenre: " << m_songs[i].edition << "/nLanguage: " << m_songs[i].language;
+				//JSONDB << "/nCreator" << m_songs[i].creator << "/n}";
+				//}
+			//JSONDB << "/n]"
 			} else {
 					//other files
 				}
@@ -59,8 +69,8 @@ void WebServer::StartServer() {
 	server_->run();
 }
 
-WebServer::WebServer(Database& db):
-m_database(db){
+WebServer::WebServer(Songs& songs):
+m_songs(songs){
 	serverthread.reset(new boost::thread(boost::bind(&WebServer::StartServer,boost::ref(*this))));
 }
 
