@@ -3,55 +3,17 @@
 
 namespace http = boost::network::http;
 
+typedef http::server<WebServer::handler> http_server;
+
 struct WebServer::handler {
 	WebServer& m_server;
 	void operator() (http_server::request const &request,
 	http_server::response &response) {
 	//destination describes the file to be loaded, by default it's "/"
 		if(request.method == "GET") {
-			if(request.destination == "/") {
-			fs::ifstream f(findFile("index.html"), std::ios::binary);
-			f.seekg(0, std::ios::end);
-			size_t size = f.tellg();
-			f.seekg(0);
-			char responseBuffer[size + 2];
-			f.read(responseBuffer, size);
-			response = http_server::response::stock_reply(
-			http_server::response::ok, responseBuffer);
-			} else if(request.destination == "/codiqa.ext.js"){
-					fs::ifstream f(findFile("codiqa.ext.js"), std::ios::binary);
-					f.seekg(0, std::ios::end);
-					size_t size = f.tellg();
-					f.seekg(0);
-					char responseBuffer[size + 2];
-					f.read(responseBuffer, size);
-					response = http_server::response::stock_reply(
-					http_server::response::ok, responseBuffer);
-			} else if(request.destination == "/codiqa.ext.css") {
-					fs::ifstream f(findFile("codiqa.ext.css"), std::ios::binary);
-					f.seekg(0, std::ios::end);
-					size_t size = f.tellg();
-					f.seekg(0);
-					char responseBuffer[size + 2];
-					f.read(responseBuffer, size);
-					response = http_server::response::stock_reply(
-					http_server::response::ok, responseBuffer);
-			} else if(request.destination == "/api/getDataBase.json") {
-			std:: stringstream JSONDB;
-			JSONDB << "[";
-			//no access to upper class yet
-			//for(int i=0; i<m_songs.size(); i++) {
-				//JSONDB << "{/nTitle: " << m_songs[i].title << "/nArtist: ";
-				//JSONDB << m_songs[i].artist << "/nGenre: " << m_songs[i].edition << "/nLanguage: " << m_songs[i].language;
-				//JSONDB << "/nCreator" << m_songs[i].creator << "/n}";
-				//}
-			//JSONDB << "/n]"
-			} else {
-					//other files
-				}
+		response = m_server.GETresponse(request);
 		} else if(request.method == "POST") {
-		response = http_server::response::stock_reply(
-			http_server::response::ok, "Post request");
+		response = m_server.POSTresponse(request);
 		} else {
 		response = http_server::response::stock_reply(
 			http_server::response::ok, "other request");
@@ -62,6 +24,7 @@ struct WebServer::handler {
 		std::cerr << "ERROR: " << info << '\n';
 	}
 };
+
 
 void WebServer::StartServer() {
 	handler handler_{*this};
@@ -81,3 +44,63 @@ WebServer::~WebServer() {
 	delete server_;
 }
 
+http_server::response WebServer::GETresponse(const http_server::request &request) {
+	if(request.destination == "/") { //default
+		fs::ifstream f(findFile("index.html"), std::ios::binary);
+		f.seekg(0, std::ios::end);
+		size_t size = f.tellg();
+		f.seekg(0);
+		char responseBuffer[size + 2];
+		f.read(responseBuffer, size);
+		return http_server::response::stock_reply(
+		http_server::response::ok, responseBuffer);
+		} else if(request.destination == "/api/getDataBase.json") { //get database
+		std:: stringstream JSONDB;
+		JSONDB << "[\n";
+		//no access to upper class yet
+		for(int i=0; i<m_songs.size(); i++) {
+			JSONDB << "{\nTitle: " << m_songs[i].title << "\nArtist: ";
+			JSONDB << m_songs[i].artist << "\nEdition: " << m_songs[i].edition << "\nLanguage: " << m_songs[i].language;
+			JSONDB << "\nCreator: " << m_songs[i].creator << "\n}";
+		}
+		JSONDB << "\n]";
+		return http_server::response::stock_reply(
+		http_server::response::ok, JSONDB.str());
+	} else if(request.destination == "/api/getCurrentPlaylist.json") { //get playlist
+	Game * gm = Game::getSingletonPtr();
+	std:: stringstream JSONPlayList;
+		JSONPlayList << "[\n";
+		for(auto const& song : gm->getCurrentPlayList().getList()) {
+			JSONPlayList << "{\nTitle: " << song->title << "\nArtist: ";
+			JSONPlayList << song->artist << "\nEdition: " << song->edition << "\nLanguage: " << song->language;
+			JSONPlayList << "\nCreator: " << song->creator << "\n}";
+		}
+		JSONPlayList << "\n]";
+		return http_server::response::stock_reply(
+		http_server::response::ok,JSONPlayList.str());
+
+	} else {
+		//other text files
+		try {
+		std::string destination = request.destination;
+		destination.erase(0,1);
+		fs::ifstream f(findFile(destination), std::ios::binary);
+		f.seekg(0, std::ios::end);
+		size_t size = f.tellg();
+		f.seekg(0);
+		char responseBuffer[size + 2];
+		f.read(responseBuffer, size);
+		return http_server::response::stock_reply(
+		http_server::response::ok, responseBuffer);
+		}
+		catch(std::exception e) {
+		return http_server::response::stock_reply(
+		http_server::response::ok, "not a text file");
+		}
+	}
+}
+
+http_server::response WebServer::POSTresponse(const http_server::request &request) {
+return http_server::response::stock_reply(
+		http_server::response::ok, "not yet implemented");
+}
