@@ -59,9 +59,9 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 		JSONDB << "[\n";
 		//no access to upper class yet
 		for(int i=0; i<m_songs.size(); i++) {
-			JSONDB << "\n{\n\"Title\": \"" << m_songs[i].title << "\"\n\"Artist\": \"";
-			JSONDB << m_songs[i].artist << "\"\nEdition\": \"" << m_songs[i].edition << "\"\n\"Language\": \"" << m_songs[i].language;
-			JSONDB << "\"\n\"Creator\": \"" << m_songs[i].creator << "\"\n}";
+			JSONDB << "\n{\n\"Title\": \"" << m_songs[i].title << "\",\n\"Artist\": \"";
+			JSONDB << m_songs[i].artist << "\",\nEdition\": \"" << m_songs[i].edition << "\",\n\"Language\": \"" << m_songs[i].language;
+			JSONDB << "\",\n\"Creator\": \"" << m_songs[i].creator << "\",\n},";
 		}
 		JSONDB << "\n]";
 		return http_server::response::stock_reply(
@@ -71,9 +71,9 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 	std:: stringstream JSONPlayList;
 		JSONPlayList << "[\n";
 		for(auto const& song : gm->getCurrentPlayList().getList()) {
-			JSONPlayList << "\n{\n\"Title\": \"" << song->title << "\"\n\"Artist\": \"";
-			JSONPlayList << song->artist << "\"\n\"Edition\": \"" << song->edition << "\"\n\"Language\": \"" << song->language;
-			JSONPlayList << "\"\n\"Creator\": \"" << song->creator << "\"\n}";
+			JSONPlayList << "\n{\n\"Title\": \"" << song->title << "\",\n\"Artist\": \"";
+			JSONPlayList << song->artist << "\",\n\"Edition\": \"" << song->edition << "\",\n\"Language\": \"" << song->language;
+			JSONPlayList << "\",\n\"Creator\": \"" << song->creator << "\",\n},";
 		}
 		JSONPlayList << "\n]";
 		return http_server::response::stock_reply(
