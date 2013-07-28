@@ -57,15 +57,16 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 		} else if(request.destination == "/api/getDataBase.json") { //get database
 		std:: stringstream JSONDB;
 		JSONDB << "[\n";
-		//no access to upper class yet
 		for(int i=0; i<m_songs.size(); i++) {
 			JSONDB << "\n{\n\"Title\": \"" << m_songs[i].title << "\",\n\"Artist\": \"";
 			JSONDB << m_songs[i].artist << "\",\nEdition\": \"" << m_songs[i].edition << "\",\n\"Language\": \"" << m_songs[i].language;
-			JSONDB << "\",\n\"Creator\": \"" << m_songs[i].creator << "\",\n},";
+			JSONDB << "\",\n\"Creator\": \"" << m_songs[i].creator << "\"\n},";
 		}
-		JSONDB << "\n]";
+		std::string output = JSONDB.str(); //remove the last comma
+		output.pop_back(); //remove the last comma
+		output += "\n]";
 		return http_server::response::stock_reply(
-		http_server::response::ok, JSONDB.str());
+		http_server::response::ok, output);
 	} else if(request.destination == "/api/getCurrentPlaylist.json") { //get playlist
 	Game * gm = Game::getSingletonPtr();
 	std:: stringstream JSONPlayList;
@@ -73,11 +74,13 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 		for(auto const& song : gm->getCurrentPlayList().getList()) {
 			JSONPlayList << "\n{\n\"Title\": \"" << song->title << "\",\n\"Artist\": \"";
 			JSONPlayList << song->artist << "\",\n\"Edition\": \"" << song->edition << "\",\n\"Language\": \"" << song->language;
-			JSONPlayList << "\",\n\"Creator\": \"" << song->creator << "\",\n},";
+			JSONPlayList << "\",\n\"Creator\": \"" << song->creator << "\"\n},";
 		}
-		JSONPlayList << "\n]";
+		std::string output = JSONPlayList.str();
+		output.pop_back(); //remove the last comma
+		output += "\n]";
 		return http_server::response::stock_reply(
-		http_server::response::ok,JSONPlayList.str());
+		http_server::response::ok,output);
 
 	} else {
 		//other text files
