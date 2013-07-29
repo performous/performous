@@ -59,7 +59,7 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 		JSONDB << "[\n";
 		for(int i=0; i<m_songs.size(); i++) {
 			JSONDB << "\n{\n\"Title\": \"" << m_songs[i].title << "\",\n\"Artist\": \"";
-			JSONDB << m_songs[i].artist << "\",\nEdition\": \"" << m_songs[i].edition << "\",\n\"Language\": \"" << m_songs[i].language;
+			JSONDB << m_songs[i].artist << "\",\n\"Edition\": \"" << m_songs[i].edition << "\",\n\"Language\": \"" << m_songs[i].language;
 			JSONDB << "\",\n\"Creator\": \"" << m_songs[i].creator << "\"\n},";
 		}
 		std::string output = JSONDB.str(); //remove the last comma
@@ -124,6 +124,56 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 }
 
 boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
-std::cout << JsonDoc << std::endl;
+	struct JsonSong {
+	std::string edition;
+	std::string title;
+	std::string artist;
+	std::string creator;
+	std::string language;
+	};
+	JsonSong SongToFind;
+
+	if(JsonDoc[0] != '{') return NULL; //check if someone did send the correct stuff.
+	std::string currentIdentifier;
+	bool ReadingIdentifier = false;
+	bool IdentifierRead = false;
+	bool ReadingContent = false;
+	for(size_t i=0; i <= JsonDoc.length(); i++) {
+		if(JsonDoc[i] == '}') {
+			break;
+		} else if(JsonDoc[i] == '\"') {
+			if(IdentifierRead) {
+			ReadingContent = true;
+			IdentifierRead = false;
+			} else if(ReadingIdentifier) {
+			ReadingIdentifier = false;
+			IdentifierRead = true;
+			} else if(ReadingContent) {
+			ReadingContent = false;
+			currentIdentifier = "";
+			} else {
+			ReadingIdentifier = true;
+			}
+		} else {
+			if(ReadingIdentifier) {
+			currentIdentifier += JsonDoc[i];
+			} else if (ReadingContent) {
+			std::cout << currentIdentifier << std::endl;
+				if(currentIdentifier == "Title") {
+				SongToFind.title += JsonDoc[i];
+				} else if (currentIdentifier == "Artist") {
+				SongToFind.artist += JsonDoc[i];
+				} else if (currentIdentifier == "Edition") {
+				SongToFind.edition += JsonDoc[i];
+				} else if (currentIdentifier == "Creator") {
+				SongToFind.creator += JsonDoc[i];
+				} else if (currentIdentifier == "Language") {
+				SongToFind.language += JsonDoc[i];
+				}
+			}
+		}
+	}
+	std::cout << "Title:" << SongToFind.title << "Artist:" << SongToFind.artist <<
+	"Edition: " << SongToFind.edition << "Creator:" << SongToFind.creator << "Language:"<< SongToFind.language << std::endl;
 	return m_songs.currentPtr(); //placeholder to see if mechanism works.
 }
