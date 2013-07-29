@@ -104,6 +104,26 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 }
 
 http_server::response WebServer::POSTresponse(const http_server::request &request) {
-return http_server::response::stock_reply(
+	if(request.destination == "/api/add") {
+		Game * gm = Game::getSingletonPtr();
+		boost::shared_ptr<Song> pointer = GetSongFromJSON(request.body);
+		if(pointer == NULL) {
+			return http_server::response::stock_reply(
+			http_server::response::ok, "failure");
+		} else {
+		std::cout << pointer->title << std::endl;
+		gm->getCurrentPlayList().addSong(pointer);
+		return http_server::response::stock_reply(
+			http_server::response::ok, "success");
+		}
+	} else {
+		return http_server::response::stock_reply(
 		http_server::response::ok, "not yet implemented");
+	}
+
+}
+
+boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
+std::cout << JsonDoc << std::endl;
+	return m_songs.currentPtr(); //placeholder to see if mechanism works.
 }
