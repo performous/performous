@@ -1,5 +1,6 @@
 ///This file contains implementation of dlc class
 #include "dlc.hh"
+#include "fs.hh"
 
 #include <string>
 #include <fstream>
@@ -14,7 +15,6 @@ Dlc::Dlc(DlcConfig dlcConfig){}
 Dlc::Dlc(){}
 Dlc::~Dlc(){}
 
-std::string url = "localhost/catalog.xml";
 std::string hostname = "localhost";
 std::string filename = "/catalog.xml";
 
@@ -29,16 +29,16 @@ std::string get_filename(const uri::uri &url) {
     return filename.empty()? "index.html" : filename;
 }
 */
-/*
-void Dlc::getTheCatalog() {
 
 #include <boost/network/protocol/http/client.hpp>
 #include <boost/network/uri.hpp>
 
+void Dlc::getTheCatalog() {
 
 	namespace http = boost::network::http;
 	namespace uri = boost::network::uri;
-
+	std::string url = "localhost/catalog.xml";
+    
     try {
         http::client client;
         http::client::request request(url);
@@ -55,13 +55,12 @@ void Dlc::getTheCatalog() {
         //return 1;
     }
 }
-*/
 
 std::string outputFilename = "catalog.xml";
 std::string port = "80";
-unsigned int timeout = 800;
+unsigned int timeout = 8000;
 	
-/// This function try to get the song catalog from server using boost asio 	
+/// This function trys to get the song catalog from server using boost asio 	
 void Dlc::getCatalog(){
 	
 	std::ofstream out_(outputFilename);
