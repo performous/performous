@@ -11,7 +11,7 @@
 include(LibFindMacros)
 
 # Use pkg-config to get hints about paths
-libfind_pkg_check_modules(Ssl_PKGCONF ssl)
+libfind_pkg_check_modules(Ssl_PKGCONF openssl)
 
 # Include dir
 find_path(Ssl_INCLUDE_DIR
