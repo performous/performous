@@ -52,6 +52,6 @@ find_library(Cppnetlib_server_parsers_LIBRARY
 #  string(REGEX REPLACE ".*#define SND_LIB_VERSION_STR[ \t]*\"([^\n]*)\".*" "\\1" ALSA_VERSION "${_ALSA_VERSION_H_CONTENTS}")
 #endif(Cppnetlib_INCLUDE_DIR)
 
-set(Cppnetlib_PROCESS_INCLUDES Cppnetlib_INCLUDE_DIR BOOST_INCLUDE_DIRS)
+set(Cppnetlib_PROCESS_INCLUDES Cppnetlib_INCLUDE_DIR BOOST_INCLUDE_DIRS Crypto_INCLUDE_DIRS Ssl_INCLUDE_DIRS)
 set(Cppnetlib_PROCESS_LIBS Cppnetlib_url_LIBRARY Cppnetlib_client_connections_LIBRARY Cppnetlib_server_parsers_LIBRARY BOOST_LIBRARIES Crypto_LIBRARIES Ssl_LIBRARIES)
 libfind_process(Cppnetlib)
