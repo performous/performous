@@ -21,16 +21,16 @@ class WebServer
 public:
 struct handler;
 typedef http::server<handler> http_server;
-	WebServer(Songs& songs);
-	~WebServer();
+	Songs& m_songs;
 private:
 	boost::scoped_ptr<boost::thread> serverthread;
 	http_server* server_; //FIXME should be boost::scoped_ptr or boost:: shared_ptr
 public:
-	Songs& m_songs;
-	//this looks silly but this stuf has to be public or they won´t be accessible from the handler struct
+	//this looks silly but this stuff has to be public or they won´t be accessible from the handler struct
 	http_server::response GETresponse(http_server::request const &request);
 	http_server::response POSTresponse(http_server::request const &request);
+	WebServer(Songs& songs);
+	~WebServer();
 private:
 	void StartServer();
 	boost::shared_ptr<Song> GetSongFromJSON(std::string JsonDoc);

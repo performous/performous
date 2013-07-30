@@ -131,7 +131,7 @@ boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
 	std::string creator;
 	std::string language;
 	};
-	JsonSong SongToFind;
+	JsonSong SongToFind {"","","","",""};
 
 	if(JsonDoc[0] != '{') return NULL; //check if someone did send the correct stuff.
 	std::string currentIdentifier;
@@ -173,7 +173,12 @@ boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
 			}
 		}
 	}
-	std::cout << "Title:" << SongToFind.title << "Artist:" << SongToFind.artist <<
-	"Edition: " << SongToFind.edition << "Creator:" << SongToFind.creator << "Language:"<< SongToFind.language << std::endl;
-	return m_songs.currentPtr(); //placeholder to see if mechanism works.
+	for(int i = 0; i<= m_songs.size(); i++) {
+		if(m_songs[i].title == SongToFind.title && m_songs[i].artist == SongToFind.artist && m_songs[i].edition == SongToFind.edition &&
+		m_songs[i].creator == SongToFind.creator && m_songs[i].language == SongToFind.language) { //if these are all correct we can assume it's the correct song
+		boost::shared_ptr<Song> songToAdd(&m_songs[i]);
+		return songToAdd;
+		}
+	}
+	return NULL;
 }
