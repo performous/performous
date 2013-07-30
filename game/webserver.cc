@@ -107,7 +107,7 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 	if(request.destination == "/api/add") {
 		Game * gm = Game::getSingletonPtr();
 		boost::shared_ptr<Song> pointer = GetSongFromJSON(request.body);
-		if(pointer == NULL) {
+		if (!pointer) {
 			return http_server::response::stock_reply(
 			http_server::response::ok, "failure");
 		} else {
@@ -133,7 +133,7 @@ boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
 	};
 	JsonSong SongToFind {"","","","",""};
 
-	if(JsonDoc[0] != '{') return NULL; //check if someone did send the correct stuff.
+	if(JsonDoc[0] != '{') return boost::shared_ptr<Song>(); //check if someone did send the correct stuff.
 	std::string currentIdentifier;
 	bool ReadingIdentifier = false;
 	bool IdentifierRead = false;
