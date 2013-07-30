@@ -11,7 +11,7 @@
 include(LibFindMacros)
 
 # Use pkg-config to get hints about paths
-libfind_pkg_check_modules(Crypto_PKGCONF crypto)
+libfind_pkg_check_modules(Crypto_PKGCONF libcrypto)
 
 # Include dir
 find_path(Crypto_INCLUDE_DIR

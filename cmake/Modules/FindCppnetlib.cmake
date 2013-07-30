@@ -20,7 +20,7 @@ find_package(Ssl REQUIRED)
 #libfind_package(Cppnetlib Crypto)
 
 # Use pkg-config to get hints about paths
-libfind_pkg_check_modules(Cppnetlib_PKGCONF cpp-netlib)
+#libfind_pkg_check_modules(Cppnetlib_PKGCONF cpp-netlib)
 
 # Include dir
 find_path(Cppnetlib_INCLUDE_DIR
