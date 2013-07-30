@@ -138,10 +138,10 @@ void mainLoop(std::string const& songlist) {
 	std::clog << "core/info: Loading assets." << std::endl;
 
 	//Initialing DLC
-	std::clog << "********** try to get the catalog ***********" << std::endl;
+//	std::clog << "********** try to get the catalog ***********" << std::endl;
 	Dlc dlc;
 	dlc.getCatalog();
-	std::clog << "********** GOT the catalog :) ***********" << std::endl;
+//	std::clog << "********** out of getCatalog() ***********" << std::endl;
 	Downloader downloader;
 	Gettext localization(PACKAGE);
 	Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());

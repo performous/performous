@@ -30,9 +30,8 @@ class Dlc {
 		
 		/*	this function trys to download catalog.xml from server 
 			using the server address and port specified before.	*/
-		void getTheCatalog();
+		//void getTheCatalog();
 		void getCatalog();
-		
 		
 		/*	This function gets new Dlc Configuration 
 			then set and save them.	*/
