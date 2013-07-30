@@ -100,11 +100,15 @@ bool SongParser::txtParseNote(std::string line) {
 	if (line[0] == 'P') {
 		if (m_relative) // FIXME?
 			throw std::runtime_error("Relative note timing not supported with multiple singers");
-		if (line.size() < 2) throw std::runtime_error("Invalid player info line");
-		if (line[1] == '1') m_curSinger = P1;
+		if (line.size() < 2) throw std::runtime_error("Invalid player info line [too short]: " + line);
+		else if (line[1] == '1') m_curSinger = P1;
 		else if (line[1] == '2') m_curSinger = P2;
 		else if (line[1] == '3') m_curSinger = BOTH;
-		else throw std::runtime_error("Invalid player info line");
+		else if (line.size() < 3) throw std::runtime_error("Invalid player info line [too short]: " + line);
+		else if (line[2] == '1') m_curSinger = P1;
+		else if (line[2] == '2') m_curSinger = P2;
+		else if (line[2] == '3') m_curSinger = BOTH;
+		else throw std::runtime_error("Invalid player info line [malformed]: " + line);
 		resetNoteParsingState();
 		return true;
 	}
