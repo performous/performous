@@ -11,6 +11,7 @@ boost::shared_ptr<Song> PlayList::getNext() {
 	boost::shared_ptr<Song> nextSong;
 	nextSong = m_list[0];
 	m_list.erase(m_list.begin());
+	currentlyActive == nextSong;
 	return nextSong;
 }
 
@@ -40,5 +41,6 @@ boost::shared_ptr<Song> PlayList::getSong(int index) {
 	boost::shared_ptr<Song> nextSong;
 	nextSong = m_list[index];
 	m_list.erase(m_list.begin() + index);
+	currentlyActive == nextSong;
 	return nextSong;
 }
