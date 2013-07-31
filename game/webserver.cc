@@ -173,7 +173,17 @@ boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
 			}
 		}
 	}
+	Game* gm = Game::getSingletonPtr();
 	for(int i = 0; i<= m_songs.size(); i++) {
+		///this is to fix the crash when adding the currently-playing song.
+		if(gm->getCurrentPlayList().currentlyActive != NULL) {
+			if(gm->getCurrentPlayList().currentlyActive->title == SongToFind.title && gm->getCurrentPlayList().currentlyActive->artist == SongToFind.artist &&
+			gm->getCurrentPlayList().currentlyActive->creator == SongToFind.creator && gm->getCurrentPlayList().currentlyActive->edition == SongToFind.edition &&
+			gm->getCurrentPlayList().currentlyActive->language == SongToFind.language) {
+				return gm->getCurrentPlayList().currentlyActive;
+			}
+		}
+		///this is for all other songs.
 		if(m_songs[i].title == SongToFind.title && m_songs[i].artist == SongToFind.artist && m_songs[i].edition == SongToFind.edition &&
 		m_songs[i].creator == SongToFind.creator && m_songs[i].language == SongToFind.language) { //if these are all correct we can assume it's the correct song
 		boost::shared_ptr<Song> songToAdd(&m_songs[i]);
