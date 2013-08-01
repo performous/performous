@@ -21,7 +21,7 @@ endif()
 
 # Enable C++11 support and other compiler flags...
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+	execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
 	message("Detected GCC version ${GCC_VERSION}")
 	if (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7)
 		set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra -fcx-limited-range ${CMAKE_CXX_FLAGS}")
