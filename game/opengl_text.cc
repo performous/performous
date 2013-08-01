@@ -1,11 +1,21 @@
 #include "opengl_text.hh"
 
 #include <boost/lexical_cast.hpp>
+#include "fontconfig/fontconfig.h"
 #include <libxml++/libxml++.h>
 #include <pango/pangocairo.h>
 #include <cmath>
 #include <iostream>
 #include <sstream>
+#include "fs.hh"
+
+void loadFonts() {
+	FcConfig *config = FcInitLoadConfigAndFonts();
+	for (fs::path const& font: listFiles("fonts")) {
+		FcConfigAppFontAddFile(config, reinterpret_cast<const FcChar8*>(font.string().c_str()));
+	}
+	FcConfigSetCurrent(config);
+}
 
 namespace {
 	PangoAlignment parseAlignment(std::string const& fontalign) {
