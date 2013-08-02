@@ -10,60 +10,28 @@
 #include <fstream>
 #include <vector>
 #include <boost/asio.hpp>
+#include <json/json.h>
 
-Dlc::Dlc(DlcConfig dlcConfig){}
+//#include <json.h>
+
+//Dlc::Dlc(DlcConfig dlcConfig){ }
 Dlc::Dlc(){}
 Dlc::~Dlc(){}
 
 std::string hostname = "localhost";
-std::string filename = "/catalog.xml";
+std::string filename = "/catalog.json";
+std::string catalogFilename = "catalog.json";
 
-// below commented code  
-//#define BOOST_THREAD_USE_LIB
-/*
-namespace {
-std::string get_filename(const uri::uri &url) {
-    std::string path = uri::path(url);
-    std::size_t index = path.find_last_of('/');
-    std::string filename = path.substr(index + 1);
-    return filename.empty()? "index.html" : filename;
-}
-*/
-
-#include <boost/network/protocol/http/client.hpp>
-#include <boost/network/uri.hpp>
-
-void Dlc::getTheCatalog() {
-
-	namespace http = boost::network::http;
-	namespace uri = boost::network::uri;
-	std::string url = "localhost/catalog.xml";
-    
-    try {
-        http::client client;
-        http::client::request request(url);
-        http::client::response response = client.get(request);
-
-        //std::string filename = get_filename(request.uri());
-        std::string filename = "catalog12.xml";
-        std::cout << "Saving to: " << filename << std::endl;
-        std::ofstream ofs(filename.c_str());
-        ofs << static_cast<std::string>(body(response)) << std::endl;
-    }
-    catch (std::exception &e) {
-        std::cerr << e.what() << std::endl;
-        //return 1;
-    }
-}
-
-std::string outputFilename = "catalog.xml";
+//TODO save to config dir. also edit getCatalogFilename()
+std::string outputFilename = "catalog.json";
 std::string port = "80";
 unsigned int timeout = 8000;
+
 	
 /// This function trys to get the song catalog from server using boost asio 	
 void Dlc::getCatalog(){
 	
-	std::ofstream out_(outputFilename);
+    std::ofstream outFile(outputFilename);
 	std::vector<std::string> headers;
 
 	try{
@@ -111,7 +79,8 @@ void Dlc::getCatalog(){
         std::string header;
         while (std::getline(request_stream, header) && header != "\r")
             headers.push_back(header);
-        out_ << request_stream.rdbuf();
+        outFile << request_stream.rdbuf();
+        outFile.close();
         //return status_code;
     }catch(std::exception &e){
         std::clog << e.what() << std::endl;
@@ -121,13 +90,88 @@ void Dlc::getCatalog(){
     std::clog<<"[DLC INFO]  got the catalog from server["<<hostname<<"] port ["<<port<<"] and saved to ["<<outputFilename<<"]"<<endl;
 }
 
-void Dlc::setDlcConfig(DlcConfig newDlcConfig){
+void printSongInfo(Json::Value song){
+	std::clog<<"\n-----------printing a song-------------\n";
+	std::clog<<"Name="<<song["name"];
+	std::clog<<"Artist="<<song["artist"];
 }
 
-void Dlc::addDownload(int songId){
+void Dlc::parseCatalog(){
+
+	std::ifstream catalogFile(catalogFilename);
+	
+	Json::Value root;   // will contains the root value after parsing.
+	Json::Reader reader;
+	bool parsingSuccessful = reader.parse( catalogFile, root );
+	if ( !parsingSuccessful ){
+		// report to the user the failure and their locations in the document.
+		std::clog  << "Failed to parse configuration\n"
+		           << reader.getFormattedErrorMessages();
+		return;
+	}
+	
+	//parsing songs
+	const Json::Value songs = root["songs"];
+	for ( int index = 0; index < songs.size(); ++index ){  // Iterates over the sequence elements.
+	   printSongInfo(songs[index] );
+	}
 }
+
 
 void Dlc::removeDownload(int songId){
 }
 
+
+void Dlc::setDlcConfig(DlcConfig newDlcConfig){
+}
+
+void Dlc::addDownload(int songId){
+
+//magnetlink 192.2 kB
+// magnet:?xt=urn:btih:cd74d5be7a53cb956a77679219893cd514aeb7ee&dn=Maya Banks - Stay With Me - Epub+pirateflix&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80&tr=udp%3A%2F%2Ftracker.istole.it%3A6969&tr=udp%3A%2F%2Ftracker.ccc.de%3A80
+	
+//magnet 2  3.41 MB
+// magnet:?xt=urn:btih:8e5999b45e4b5c9506cf70d39b14cf571edad7d3&dn=The Wall Street Journal Europe - July 30 2013+pirateflix&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80&tr=udp%3A%2F%2Ftracker.istole.it%3A6969&tr=udp%3A%2F%2Ftracker.ccc.de%3A80
+
+}
+
+
+// below commented code  
+//#define BOOST_THREAD_USE_LIB
+/*
+namespace {
+std::string get_filename(const uri::uri &url) {
+    std::string path = uri::path(url);
+    std::size_t index = path.find_last_of('/');
+    std::string filename = path.substr(index + 1);
+    return filename.empty()? "index.html" : filename;
+}
+*/
+/*
+#include <boost/network/protocol/http/client.hpp>
+#include <boost/network/uri.hpp>
+
+void Dlc::getTheCatalog() {
+
+	namespace http = boost::network::http;
+	namespace uri = boost::network::uri;
+	std::string url = "localhost/catalog.xml";
+    
+    try {
+        http::client client;
+        http::client::request request(url);
+        http::client::response response = client.get(request);
+
+        //std::string filename = get_filename(request.uri());
+        std::string filename = "catalog12.xml";
+        std::cout << "Saving to: " << filename << std::endl;
+        std::ofstream ofs(filename.c_str());
+        ofs << static_cast<std::string>(body(response)) << std::endl;
+    }
+    catch (std::exception &e) {
+        std::cerr << e.what() << std::endl;
+        //return 1;
+    }
+}
+*/
 

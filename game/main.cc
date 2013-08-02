@@ -142,6 +142,10 @@ void mainLoop(std::string const& songlist) {
 	Dlc dlc;
 	dlc.getCatalog();
 //	std::clog << "********** out of getCatalog() ***********" << std::endl;
+	std::clog << "********** Parsing songs ***********" << std::endl;
+	dlc.parseCatalog();
+	std::clog << "********** END of Parsing songs ***********" << std::endl;
+	
 	Downloader downloader;
 	Gettext localization(PACKAGE);
 	Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());

@@ -16,29 +16,31 @@ DLC cycle can be something like this
 using namespace std;
 
 struct DlcConfig{
-	DlcConfig(){};
+    DlcConfig(){}
 	std::string DlcAddr;
 	int DlcPort;
 };
 
 class Dlc {
 	public:
-		//constructor and desctructor declaration
+		/// Constructor and desctructor declaration
 		Dlc();
-		Dlc(DlcConfig dlcConfig);
+		//Dlc(DlcConfig dlcConfig);
 		~Dlc();
 		
-		/*	this function trys to download catalog.xml from server 
-			using the server address and port specified before.	*/
+		/// This function trys to download catalog.xml from server using the server address and port specified before.	
 		void getTheCatalog();
+		
+		/// [BROKEN] This method also download the catalog but using cpp-netlib 
 		void getCatalog();
 		
-		/*	This function gets new Dlc Configuration 
-			then set and save them.	*/
+		/// This method loads the catalog and parse it and ...
+		void parseCatalog();
+		
+		/// This function gets new Dlc Configuration then set and save them.
 		void setDlcConfig(DlcConfig newDlcConfig);
 		
-		/*	This function gets a songID and try to add it to
-			download list	*/
+		/// This function gets a songID and try to add it to download list
 		void addDownload(int songId);
 		
 		void removeDownload(int songId);
