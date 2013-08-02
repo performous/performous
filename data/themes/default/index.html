@@ -19,7 +19,17 @@
   <script src="https://d10ajoocuyu32n.cloudfront.net/mobile/1.3.1/jquery.mobile-1.3.1.min.js"></script>
 
   <!-- Extra Codiqa features -->
-  <script src="https://d10ajoocuyu32n.cloudfront.net/codiqa.ext.js"></script>
+  <script src="https://d10ajoocuyu32n.cloudfront.net/codiqa.ext.js"></script>  
+  
+  <!--script bindings-->
+  <script>
+    $(document).bind ("mobileinit", function ()
+    {
+
+      alert ("mobileinit");
+
+    });
+  </script> 
    
 </head>
 <body>
@@ -32,17 +42,17 @@
         <div data-role="navbar" data-iconpos="top">
             <ul>
                 <li>
-                    <a href="#page1" data-transition="fade" data-theme="" data-icon="" class="ui-btn-active ui-state-persist">
+                    <a href="#page1" data-transition="flip" data-theme="" data-icon="" class="ui-btn-active ui-state-persist">
                         Add songs
                     </a>
                 </li>
                 <li>
-                    <a href="#page1" data-transition="fade" data-theme="" data-icon="">
+                    <a href="#page2" data-transition="flip" data-theme="" data-icon="">
                         View playlist
                     </a>
                 </li>
                 <li>
-                    <a href="#page1" data-transition="fade" data-theme="" data-icon="">
+                    <a href="#page3" data-transition="flip" data-theme="" data-icon="">
                         Remote Control
                     </a>
                 </li>
@@ -80,5 +90,102 @@
         </div>
     </div>
 </div>
+
+<!--page 2 PLAYLIST!!!!-->
+<div data-role="page" id="page2">
+    <div data-theme="a" data-role="header">
+        <h3>
+            Performous web frontend
+        </h3>
+        <div data-role="navbar" data-iconpos="top">
+            <ul>
+                <li>
+                    <a href="#page1" data-transition="flip" data-theme="" data-icon="">
+                        Add songs
+                    </a>
+                </li>
+                <li>
+                    <a href="#page2" data-transition="flip" data-theme="" data-icon="" class="ui-btn-active ui-state-persist">
+                        View playlist
+                    </a>
+                </li>
+                <li>
+                    <a href="#page3" data-transition="flip" data-theme="" data-icon="">
+                        Remote Control
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div data-role="content">		
+		 <div class="ui-grid-d">
+            <div class="ui-block-d1">
+                <a id="playlistRefreshButton" data-role="button" href="#page2" data-icon="refresh" data-iconpos="top">
+                    Refresh Playlist
+                </a>
+            </div>
+      </div>
+      current playlist:
+		
+   </div>
+</div>
+
+<!--page 3 Remote control!!!!-->
+<div data-role="page" id="page3">
+    <div data-theme="a" data-role="header">
+        <h3>
+            Performous web frontend
+        </h3>
+        <div data-role="navbar" data-iconpos="top">
+            <ul>
+                <li>
+                    <a href="#page1" data-transition="flip" data-theme="" data-icon="">
+                        Add songs
+                    </a>
+                </li>
+                <li>
+                    <a href="#page2" data-transition="flip" data-theme="" data-icon="">
+                        View playlist
+                    </a>
+                </li>
+                <li>
+                    <a href="#page3" data-transition="flip" data-theme="" data-icon="" class="ui-btn-active ui-state-persist">
+                        Remote Control
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
 </body>
 </html>
+
+
+<!-- down here will be all functions -->
+ <script>
+
+
+$(document).ready (function ()
+{
+
+  alert ("Welcome to the web-control of performous this is currently a work in process so not everything will work yet");
+
+});
+
+
+</script>
+
+<script>
+
+ $("#playlistRefreshButton").bind ("click", function (event)
+
+{
+
+  alert ("Refreshing playlist!");
+
+});
+
+
+</script>
