@@ -78,7 +78,7 @@
         </div>
         <div class="ui-grid-a">
             <div class="ui-block-a">
-                <a data-role="button" href="#page1" data-icon="refresh" data-iconpos="top">
+                <a id="databaseRefreshButton" data-role="button" href="#page1" data-icon="refresh" data-iconpos="top">
                     Refresh database
                 </a>
             </div>
@@ -117,15 +117,15 @@
             </ul>
         </div>
     </div>
-    <div data-role="content">		
-		 <div class="ui-grid-d">
+    <div data-role="content">	
             <div class="ui-block-d1">
                 <a id="playlistRefreshButton" data-role="button" href="#page2" data-icon="refresh" data-iconpos="top">
                     Refresh Playlist
                 </a>
-            </div>
-      </div>
+      		</div>
       current playlist:
+      <playlist>
+      </playlist>
 		
    </div>
 </div>
@@ -166,7 +166,7 @@
 <!-- down here will be all functions -->
  <script>
 
-
+<!-- page 1-->
 $(document).ready (function ()
 {
 
@@ -179,13 +179,30 @@ $(document).ready (function ()
 
 <script>
 
- $("#playlistRefreshButton").bind ("click", function (event)
-
+ $("#databaseRefreshButton").bind ("click", function (event)
 {
-
-  alert ("Refreshing playlist!");
-
+ $.get("api/getDataBase.json", function(data){
+  alert("Data: " + data);
+});
 });
 
 
 </script>
+
+
+<!-- page 2-->
+<script>
+
+ $("#playlistRefreshButton").bind ("click", function (event)
+{
+ $.get("api/getCurrentPlaylist.json", function(data){
+ var SongList = JSON.parse(data);
+alert("Data: " + data);
+alert("Data: " + SongList);
+  
+});
+});
+
+
+</script>
+
