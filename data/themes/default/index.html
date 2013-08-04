@@ -124,9 +124,10 @@
                 </a>
       		</div>
       current playlist:
+      <ol type="1">
       <playlist>
       </playlist>
-		
+      </ol>
    </div>
 </div>
 
@@ -196,10 +197,11 @@ $(document).ready (function ()
  $("#playlistRefreshButton").bind ("click", function (event)
 {
  $.get("api/getCurrentPlaylist.json", function(data){
+ $("playlist").empty();
  var SongList = JSON.parse(data);
-alert("Data: " + data);
-alert("Data: " + SongList);
-  
+	for(i in SongList) {
+ 	$("playlist").append("<li>" + SongList[i].Artist + " - " + SongList[i].Title + "</li>");
+	}
 });
 });
 
