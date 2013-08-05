@@ -60,22 +60,18 @@
         </div>
     </div>
     <div data-role="content">
-        <ul data-role="listview" data-divider-theme="b" data-inset="true">
+        <ul data-role="listview" id="SongListViewer" data-divider-theme="b" data-filter="true">
             <li data-role="list-divider" role="heading">
                 Available songs
             </li>
             <li data-theme="c">
                 <a href="#" data-transition="slide">
-                    Button
+                    knop!
                 </a>
             </li>
         </ul>
-        <div data-role="fieldcontain">
-            <label for="searchinput1">
-                search database
-            </label>
-            <input name="" id="searchinput1" placeholder="" value="" type="search">
-        </div>
+        
+        <br> <br> <br>
         <div class="ui-grid-a">
             <div class="ui-block-a">
                 <a id="databaseRefreshButton" data-role="button" href="#page1" data-icon="refresh" data-iconpos="top">
@@ -171,7 +167,7 @@
 $(document).ready (function ()
 {
 
-  alert ("Welcome to the web-control of performous this is currently a work in process so not everything will work yet");
+  alert ("Welcome to the web-control of performous! here you can view the current playlist, add songs to it and control performous remotely. this is currently a work in progress so not everything will work yet");
 
 });
 
@@ -182,8 +178,20 @@ $(document).ready (function ()
 
  $("#databaseRefreshButton").bind ("click", function (event)
 {
- $.get("api/getDataBase.json", function(data){
-  alert("Data: " + data);
+alert ("refreshing now");
+ $.get("api/getDataBase.json", function(data) {
+ alert(data);
+$('#SongListViewer').empty();
+  var DataBase = JSON.parse(data);
+  alert("data parsed");
+  
+  $('#SongListViewer').append("<li data-role=\"list-divider\" role=\"heading\">Available songs </li> <li data-theme=\"c\">\n");
+  
+  for (i in DataBase) {
+ $('#SongListViewer').append(" <li data-theme=\"c\"><a href=\"#\" data-transition=\"slide\">" + DataBase[i].Artist + " - " + DataBase[i].Title + "</a> </li>\n");
+ alert(DataBase[i].Title);
+}  
+$('#SongListViewer').listview('refresh');
 });
 });
 
