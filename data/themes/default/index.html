@@ -178,24 +178,24 @@ $(document).ready (function ()
 
  $("#databaseRefreshButton").bind ("click", function (event)
 {
-alert ("refreshing now");
  $.get("api/getDataBase.json", function(data) {
- alert(data);
 $('#SongListViewer').empty();
-  var DataBase = JSON.parse(data);
-  alert("data parsed");
-  
+  DataBase = JSON.parse(data);
   $('#SongListViewer').append("<li data-role=\"list-divider\" role=\"heading\">Available songs </li> <li data-theme=\"c\">\n");
   
   for (i in DataBase) {
- $('#SongListViewer').append(" <li data-theme=\"c\"><a href=\"#\" data-transition=\"slide\">" + DataBase[i].Artist + " - " + DataBase[i].Title + "</a> </li>\n");
- alert(DataBase[i].Title);
+ $('#SongListViewer').append(" <li data-theme=\"c\"><a href=\"javascript:AddSong("+ i + ")\" data-transition=\"slide\">" + DataBase[i].Artist + " - " + DataBase[i].Title + "</a> </li>\n");
 }  
 $('#SongListViewer').listview('refresh');
 });
 });
 
 
+</script>
+<script>
+function AddSong(number) {
+$.post("api/add", JSON.stringify(DataBase[number]));
+}
 </script>
 
 
@@ -206,7 +206,7 @@ $('#SongListViewer').listview('refresh');
 {
  $.get("api/getCurrentPlaylist.json", function(data){
  $("playlist").empty();
- var SongList = JSON.parse(data);
+ SongList = JSON.parse(data);
 	for(i in SongList) {
  	$("playlist").append("<li>" + SongList[i].Artist + " - " + SongList[i].Title + "</li>");
 	}
