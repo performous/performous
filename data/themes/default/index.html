@@ -66,23 +66,15 @@
             </li>
             <li data-theme="c">
                 <a href="#" data-transition="slide">
-                    knop!
+                    Please press refresh.
                 </a>
             </li>
         </ul>
         
         <br> <br> <br>
-        <div class="ui-grid-a">
-            <div class="ui-block-a">
                 <a id="databaseRefreshButton" data-role="button" href="#page1" data-icon="refresh" data-iconpos="top">
                     Refresh database
                 </a>
-            </div>
-            <div class="ui-block-b">
-                <a data-role="button" href="#page1" data-icon="plus" data-iconpos="top">
-                    Add song to playlist
-                </a>
-            </div>
         </div>
     </div>
 </div>
@@ -184,7 +176,7 @@ $('#SongListViewer').empty();
   $('#SongListViewer').append("<li data-role=\"list-divider\" role=\"heading\">Available songs </li> <li data-theme=\"c\">\n");
   
   for (i in DataBase) {
- $('#SongListViewer').append(" <li data-theme=\"c\"><a href=\"javascript:AddSong("+ i + ")\" data-transition=\"slide\">" + DataBase[i].Artist + " - " + DataBase[i].Title + "</a> </li>\n");
+ $('#SongListViewer').append(" <li data-theme=\"c\" data-icon=\"plus\"><a href=\"javascript:AddSong("+ i + ")\" data-transition=\"slide\">" + DataBase[i].Artist + " - " + DataBase[i].Title + "</a> </li>\n");
 }  
 $('#SongListViewer').listview('refresh');
 });
