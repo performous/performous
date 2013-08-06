@@ -58,9 +58,9 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 		std:: stringstream JSONDB;
 		JSONDB << "[\n";
 		for(int i=0; i<m_songs.size(); i++) {
-			JSONDB << "\n{\n\"Title\": \"" << m_songs[i].title << "\",\n\"Artist\": \"";
-			JSONDB << m_songs[i].artist << "\",\n\"Edition\": \"" << m_songs[i].edition << "\",\n\"Language\": \"" << m_songs[i].language;
-			JSONDB << "\",\n\"Creator\": \"" << m_songs[i].creator << "\"\n},";
+			JSONDB << "\n{\n\"Title\": \"" << escapeCharacters(m_songs[i].title) << "\",\n\"Artist\": \"";
+			JSONDB << escapeCharacters(m_songs[i].artist) << "\",\n\"Edition\": \"" << escapeCharacters(m_songs[i].edition) << "\",\n\"Language\": \"" << escapeCharacters(m_songs[i].language);
+			JSONDB << "\",\n\"Creator\": \"" << escapeCharacters(m_songs[i].creator) << "\"\n},";
 		}
 		std::string output = JSONDB.str(); //remove the last comma
 		output.pop_back(); //remove the last comma
@@ -72,9 +72,9 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 	std:: stringstream JSONPlayList;
 		JSONPlayList << "[\n";
 		for(auto const& song : gm->getCurrentPlayList().getList()) {
-			JSONPlayList << "\n{\n\"Title\": \"" << song->title << "\",\n\"Artist\": \"";
-			JSONPlayList << song->artist << "\",\n\"Edition\": \"" << song->edition << "\",\n\"Language\": \"" << song->language;
-			JSONPlayList << "\",\n\"Creator\": \"" << song->creator << "\"\n},";
+			JSONPlayList << "\n{\n\"Title\": \"" << escapeCharacters(song->title) << "\",\n\"Artist\": \"";
+			JSONPlayList << escapeCharacters(song->artist) << "\",\n\"Edition\": \"" << escapeCharacters(song->edition) << "\",\n\"Language\": \"" << escapeCharacters(song->language);
+			JSONPlayList << "\",\n\"Creator\": \"" << escapeCharacters(song->creator) << "\"\n},";
 		}
 		std::string output = JSONPlayList.str();
 		output.pop_back(); //remove the last comma
@@ -141,7 +141,7 @@ boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
 	for(size_t i=0; i <= JsonDoc.length(); i++) {
 		if(JsonDoc[i] == '}') {
 			break;
-		} else if(JsonDoc[i] == '\"') {
+		} else if(JsonDoc[i] == '\"' &&JsonDoc[i-1] != '\\' ) { //make sure it's not an escaped character :-)
 			if(IdentifierRead) {
 			ReadingContent = true;
 			IdentifierRead = false;
@@ -173,6 +173,15 @@ boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
 			}
 		}
 	}
+	//remove the json escape chars
+	SongToFind.title = unEscapeCharacters(SongToFind.title);
+	SongToFind.artist = unEscapeCharacters(SongToFind.artist);
+	SongToFind.edition = unEscapeCharacters(SongToFind.edition);
+	SongToFind.creator = unEscapeCharacters(SongToFind.creator);
+	SongToFind.language = unEscapeCharacters(SongToFind.language);
+
+
+	//TODO: the game often segfaults here! needs a lock on the songs-object.
 	Game* gm = Game::getSingletonPtr();
 	for(int i = 0; i<= m_songs.size(); i++) {
 		///this is to fix the crash when adding the currently-playing song.
@@ -191,4 +200,26 @@ boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
 		}
 	}
 	return NULL;
+}
+
+std::string WebServer::escapeCharacters(std::string input) {
+	size_t pos = 0;
+	std::string search = "\"";
+	std::string replace = "\\\"";
+	while ((pos = input.find(search, pos)) != std::string::npos) {
+		input.replace(pos, search.length(), replace);
+		pos += replace.length();
+	}
+	return input;
+}
+
+std::string WebServer::unEscapeCharacters(std::string input) {
+	size_t pos = 0;
+	std::string search = "\\\"";
+	std::string replace = "\"";
+	while ((pos = input.find(search, pos)) != std::string::npos) {
+		input.replace(pos, search.length(), replace);
+		pos += replace.length();
+	}
+	return input;
 }
