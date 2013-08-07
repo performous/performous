@@ -11,11 +11,11 @@ struct WebServer::handler {
 	http_server::response &response) {
 	//destination describes the file to be loaded, by default it's "/"
 		if(request.method == "GET") {
-		response = m_server.GETresponse(request);
+			response = m_server.GETresponse(request);
 		} else if(request.method == "POST") {
-		response = m_server.POSTresponse(request);
+			response = m_server.POSTresponse(request);
 		} else {
-		response = http_server::response::stock_reply(
+			response = http_server::response::stock_reply(
 			http_server::response::ok, "other request");
 		}
 	}
@@ -54,7 +54,7 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 		f.read(responseBuffer, size);
 		return http_server::response::stock_reply(
 		http_server::response::ok, responseBuffer);
-		} else if(request.destination == "/api/getDataBase.json") { //get database
+	} else if(request.destination == "/api/getDataBase.json") { //get database
 		std:: stringstream JSONDB;
 		JSONDB << "[\n";
 		for(int i=0; i<m_songs.size(); i++) {
@@ -68,8 +68,8 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 		return http_server::response::stock_reply(
 		http_server::response::ok, output);
 	} else if(request.destination == "/api/getCurrentPlaylist.json") { //get playlist
-	Game * gm = Game::getSingletonPtr();
-	std:: stringstream JSONPlayList;
+		Game * gm = Game::getSingletonPtr();
+		std:: stringstream JSONPlayList;
 		JSONPlayList << "[\n";
 		for(auto const& song : gm->getCurrentPlayList().getList()) {
 			JSONPlayList << "\n{\n\"Title\": \"" << escapeCharacters(song->title) << "\",\n\"Artist\": \"";
@@ -84,20 +84,20 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 	} else {
 		//other text files
 		try {
-		std::string destination = request.destination;
-		destination.erase(0,1);
-		fs::ifstream f(findFile(destination), std::ios::binary);
-		f.seekg(0, std::ios::end);
-		size_t size = f.tellg();
-		f.seekg(0);
-		char responseBuffer[size + 2];
-		f.read(responseBuffer, size);
-		return http_server::response::stock_reply(
-		http_server::response::ok, responseBuffer);
+			std::string destination = request.destination;
+			destination.erase(0,1);
+			fs::ifstream f(findFile(destination), std::ios::binary);
+			f.seekg(0, std::ios::end);
+			size_t size = f.tellg();
+			f.seekg(0);
+			char responseBuffer[size + 2];
+			f.read(responseBuffer, size);
+			return http_server::response::stock_reply(
+			http_server::response::ok, responseBuffer);
 		}
 		catch(std::exception e) {
-		return http_server::response::stock_reply(
-		http_server::response::ok, "not a text file");
+			return http_server::response::stock_reply(
+			http_server::response::ok, "not a text file");
 		}
 	}
 }
@@ -142,16 +142,16 @@ boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
 			break;
 		} else if(JsonDoc[i] == '\"' &&JsonDoc[i-1] != '\\' ) { //make sure it's not an escaped character :-)
 			if(IdentifierRead) {
-			ReadingContent = true;
-			IdentifierRead = false;
+				ReadingContent = true;
+				IdentifierRead = false;
 			} else if(ReadingIdentifier) {
-			ReadingIdentifier = false;
-			IdentifierRead = true;
+				ReadingIdentifier = false;
+				IdentifierRead = true;
 			} else if(ReadingContent) {
-			ReadingContent = false;
-			currentIdentifier = "";
+				ReadingContent = false;
+				currentIdentifier = "";
 			} else {
-			ReadingIdentifier = true;
+				ReadingIdentifier = true;
 			}
 		} else {
 			if(ReadingIdentifier) {
@@ -159,15 +159,15 @@ boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
 			} else if (ReadingContent) {
 			std::cout << currentIdentifier << std::endl;
 				if(currentIdentifier == "Title") {
-				SongToFind.title += JsonDoc[i];
+					SongToFind.title += JsonDoc[i];
 				} else if (currentIdentifier == "Artist") {
-				SongToFind.artist += JsonDoc[i];
+					SongToFind.artist += JsonDoc[i];
 				} else if (currentIdentifier == "Edition") {
-				SongToFind.edition += JsonDoc[i];
+					SongToFind.edition += JsonDoc[i];
 				} else if (currentIdentifier == "Creator") {
-				SongToFind.creator += JsonDoc[i];
+					SongToFind.creator += JsonDoc[i];
 				} else if (currentIdentifier == "Language") {
-				SongToFind.language += JsonDoc[i];
+					SongToFind.language += JsonDoc[i];
 				}
 			}
 		}
