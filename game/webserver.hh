@@ -36,5 +36,6 @@ private:
 	boost::shared_ptr<Song> GetSongFromJSON(std::string JsonDoc);
 	std::string escapeCharacters(std::string input);
 	std::string unEscapeCharacters(std::string input);
+	boost::mutex mutex;
 };
 

@@ -55,6 +55,7 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 		return http_server::response::stock_reply(
 		http_server::response::ok, responseBuffer);
 		} else if(request.destination == "/api/getDataBase.json") { //get database
+		boost::mutex::scoped_lock(mutex);
 		std:: stringstream JSONDB;
 		JSONDB << "[\n";
 		for(int i=0; i<m_songs.size(); i++) {
@@ -68,6 +69,7 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 		return http_server::response::stock_reply(
 		http_server::response::ok, output);
 	} else if(request.destination == "/api/getCurrentPlaylist.json") { //get playlist
+	boost::mutex::scoped_lock(mutex);
 	Game * gm = Game::getSingletonPtr();
 	std:: stringstream JSONPlayList;
 		JSONPlayList << "[\n";
@@ -181,7 +183,7 @@ boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
 	SongToFind.language = unEscapeCharacters(SongToFind.language);
 
 
-	//TODO: the game often segfaults here! needs a lock on the songs-object.
+	boost::mutex::scoped_lock(mutex);
 	Game* gm = Game::getSingletonPtr();
 	for(int i = 0; i<= m_songs.size(); i++) {
 		///this is to fix the crash when adding the currently-playing song.
