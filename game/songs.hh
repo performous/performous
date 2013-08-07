@@ -24,9 +24,7 @@ class Songs: boost::noncopyable {
 	/// reloads songlist
 	void reload();
 	/// array access
-	Song& operator[](std::size_t pos) {
-	boost::mutex::scoped_lock l(m_mutex);
-	 return *m_filtered[pos]; }
+	Song& operator[](std::size_t pos) { return *m_filtered[pos]; }
 	/// number of songs
 	int size() const { return m_filtered.size(); }
 	/// true if empty
