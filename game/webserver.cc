@@ -9,7 +9,7 @@ struct WebServer::handler {
 	WebServer& m_server;
 	void operator() (http_server::request const &request,
 	http_server::response &response) {
-	//destination describes the file to be loaded, by default it's "/"
+		//destination describes the file to be loaded, by default it's "/"
 		if(request.method == "GET") {
 			response = m_server.GETresponse(request);
 		} else if(request.method == "POST") {
@@ -34,7 +34,7 @@ void WebServer::StartServer() {
 }
 
 WebServer::WebServer(Songs& songs):
-m_songs(songs){
+m_songs(songs) {
 	serverthread.reset(new boost::thread(boost::bind(&WebServer::StartServer,boost::ref(*this))));
 }
 
@@ -110,29 +110,29 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 			return http_server::response::stock_reply(
 			http_server::response::ok, "failure");
 		} else {
-		std::cout << pointer->title << std::endl;
-		gm->getCurrentPlayList().addSong(pointer);
-		return http_server::response::stock_reply(
+			std::cout << pointer->title << std::endl;
+			gm->getCurrentPlayList().addSong(pointer);
+			return http_server::response::stock_reply(
 			http_server::response::ok, "success");
 		}
 	} else {
 		return http_server::response::stock_reply(
 		http_server::response::ok, "not yet implemented");
 	}
-
 }
 
 boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
 	struct JsonSong {
-	std::string edition;
-	std::string title;
-	std::string artist;
-	std::string creator;
-	std::string language;
+		std::string edition;
+		std::string title;
+		std::string artist;
+		std::string creator;
+		std::string language;
 	};
 	JsonSong SongToFind {"","","","",""};
 
 	if(JsonDoc[0] != '{') return boost::shared_ptr<Song>(); //check if someone did send the correct stuff.
+
 	std::string currentIdentifier;
 	bool ReadingIdentifier = false;
 	bool IdentifierRead = false;
@@ -155,9 +155,9 @@ boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
 			}
 		} else {
 			if(ReadingIdentifier) {
-			currentIdentifier += JsonDoc[i];
+				currentIdentifier += JsonDoc[i];
 			} else if (ReadingContent) {
-			std::cout << currentIdentifier << std::endl;
+				std::cout << currentIdentifier << std::endl;
 				if(currentIdentifier == "Title") {
 					SongToFind.title += JsonDoc[i];
 				} else if (currentIdentifier == "Artist") {
@@ -194,8 +194,8 @@ boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
 		///this is where the shit segfaults!
 		if(m_songs[i].title == SongToFind.title && m_songs[i].artist == SongToFind.artist && m_songs[i].edition == SongToFind.edition &&
 		m_songs[i].creator == SongToFind.creator && m_songs[i].language == SongToFind.language) { //if these are all correct we can assume it's the correct song
-		boost::shared_ptr<Song> songToAdd(&m_songs[i]);
-		return songToAdd;
+			boost::shared_ptr<Song> songToAdd(&m_songs[i]);
+			return songToAdd;
 		}
 	}
 	return NULL;
