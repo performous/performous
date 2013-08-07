@@ -5,6 +5,7 @@
 #include "util.hh"
 #include <boost/foreach.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/thread/mutex.hpp>
 #include <stdexcept>
 #include <string>
 
@@ -43,7 +44,9 @@ class Song: boost::noncopyable {
 	/** Get formatted song label. **/
 	std::string str() const { return title + "  by  " + artist; }
 	/** Get full song information (used by the search function). **/
-	std::string strFull() const { return title + "\n" + artist + "\n" + genre + "\n" + edition + "\n" + path.string(); }
+	std::string strFull() const {
+	boost::mutex::scoped_lock l(m_mutex);
+	return title + "\n" + artist + "\n" + genre + "\n" + edition + "\n" + path.string(); }
 	/// Is the song parsed from the file yet?
 	enum LoadStatus { NONE, HEADER, FULL } loadStatus;
 	/// status of song
@@ -83,7 +86,7 @@ class Song: boost::noncopyable {
 		}
 		return result;
 	}
-
+	mutable boost::mutex m_mutex;
 	InstrumentTracks instrumentTracks; ///< guitar etc. notes for this song
 	DanceTracks danceTracks; ///< dance tracks
 	bool hasDance() const { return !danceTracks.empty(); }

@@ -55,7 +55,6 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 		return http_server::response::stock_reply(
 		http_server::response::ok, responseBuffer);
 		} else if(request.destination == "/api/getDataBase.json") { //get database
-		boost::mutex::scoped_lock lock(mutex);
 		std:: stringstream JSONDB;
 		JSONDB << "[\n";
 		for(int i=0; i<m_songs.size(); i++) {
@@ -69,7 +68,6 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 		return http_server::response::stock_reply(
 		http_server::response::ok, output);
 	} else if(request.destination == "/api/getCurrentPlaylist.json") { //get playlist
-	boost::mutex::scoped_lock lock(mutex);
 	Game * gm = Game::getSingletonPtr();
 	std:: stringstream JSONPlayList;
 		JSONPlayList << "[\n";
@@ -83,7 +81,6 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 		output += "\n]";
 		return http_server::response::stock_reply(
 		http_server::response::ok,output);
-
 	} else {
 		//other text files
 		try {
@@ -183,7 +180,6 @@ boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
 	SongToFind.language = unEscapeCharacters(SongToFind.language);
 
 
-	boost::mutex::scoped_lock lock(mutex);
 	Game* gm = Game::getSingletonPtr();
 	for(int i = 0; i<= m_songs.size(); i++) {
 		///this is to fix the crash when adding the currently-playing song.
@@ -195,6 +191,7 @@ boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
 			}
 		}
 		///this is for all other songs.
+		///this is where the shit segfaults!
 		if(m_songs[i].title == SongToFind.title && m_songs[i].artist == SongToFind.artist && m_songs[i].edition == SongToFind.edition &&
 		m_songs[i].creator == SongToFind.creator && m_songs[i].language == SongToFind.language) { //if these are all correct we can assume it's the correct song
 		boost::shared_ptr<Song> songToAdd(&m_songs[i]);
