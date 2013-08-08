@@ -31,7 +31,7 @@ public:
 	/// gets a specific song and removes it from the queue
 	boost::shared_ptr<Song> getSong(int index);
 	/// this is for the webserver, to avoid crashing when adding the current playing song
-	boost::shared_ptr<Song> currentlyActive = NULL;
+	boost::shared_ptr<Song> currentlyActive;
 private:
 	SongList m_list;
 };

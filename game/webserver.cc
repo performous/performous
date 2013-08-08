@@ -198,7 +198,7 @@ boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
 			return songToAdd;
 		}
 	}
-	return NULL;
+	return boost::shared_ptr<Song>();
 }
 
 std::string WebServer::escapeCharacters(std::string input) {
