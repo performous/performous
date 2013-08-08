@@ -10,9 +10,9 @@ struct WebServer::handler {
 	void operator() (http_server::request const &request,
 	http_server::response &response) {
 		//destination describes the file to be loaded, by default it's "/"
-		if(request.method == "GET") {
+		if (request.method == "GET") {
 			response = m_server.GETresponse(request);
-		} else if(request.method == "POST") {
+		} else if (request.method == "POST") {
 			response = m_server.POSTresponse(request);
 		} else {
 			response = http_server::response::stock_reply(
@@ -45,13 +45,13 @@ WebServer::~WebServer() {
 }
 
 http_server::response WebServer::GETresponse(const http_server::request &request) {
-	if(request.destination == "/") { //default
+	if (request.destination == "/") { //default
 		BinaryBuffer buf = readFile(findFile("index.html"));
 		return http_server::response::stock_reply(http_server::response::ok, std::string(buf.begin(), buf.end()));
-	} else if(request.destination == "/api/getDataBase.json") { //get database
+	} else if (request.destination == "/api/getDataBase.json") { //get database
 		std:: stringstream JSONDB;
 		JSONDB << "[\n";
-		for(int i=0; i<m_songs.size(); i++) {
+		for (int i=0; i<m_songs.size(); i++) {
 			JSONDB << "\n{\n\"Title\": \"" << escapeCharacters(m_songs[i].title) << "\",\n\"Artist\": \"";
 			JSONDB << escapeCharacters(m_songs[i].artist) << "\",\n\"Edition\": \"" << escapeCharacters(m_songs[i].edition) << "\",\n\"Language\": \"" << escapeCharacters(m_songs[i].language);
 			JSONDB << "\",\n\"Creator\": \"" << escapeCharacters(m_songs[i].creator) << "\"\n},";
@@ -61,11 +61,11 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 		output += "\n]";
 		return http_server::response::stock_reply(
 		http_server::response::ok, output);
-	} else if(request.destination == "/api/getCurrentPlaylist.json") { //get playlist
+	} else if (request.destination == "/api/getCurrentPlaylist.json") { //get playlist
 		Game* gm = Game::getSingletonPtr();
 		std:: stringstream JSONPlayList;
 		JSONPlayList << "[\n";
-		for(auto const& song : gm->getCurrentPlayList().getList()) {
+		for (auto const& song : gm->getCurrentPlayList().getList()) {
 			JSONPlayList << "\n{\n\"Title\": \"" << escapeCharacters(song->title) << "\",\n\"Artist\": \"";
 			JSONPlayList << escapeCharacters(song->artist) << "\",\n\"Edition\": \"" << escapeCharacters(song->edition) << "\",\n\"Language\": \"" << escapeCharacters(song->language);
 			JSONPlayList << "\",\n\"Creator\": \"" << escapeCharacters(song->creator) << "\"\n},";
@@ -90,7 +90,7 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 }
 
 http_server::response WebServer::POSTresponse(const http_server::request &request) {
-	if(request.destination == "/api/add") {
+	if (request.destination == "/api/add") {
 		Game * gm = Game::getSingletonPtr();
 		boost::shared_ptr<Song> pointer = GetSongFromJSON(request.body);
 		if (!pointer) {
@@ -109,6 +109,7 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 }
 
 boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
+	// TODO: Implement operator== here, to avoid repeating very long if (...) everywhere where comparisons are needed.
 	struct JsonSong {
 		std::string edition;
 		std::string title;
@@ -116,36 +117,36 @@ boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
 		std::string creator;
 		std::string language;
 	};
-	JsonSong SongToFind {"","","","",""};
+	JsonSong SongToFind;
 
-	if(JsonDoc[0] != '{') return boost::shared_ptr<Song>(); //check if someone did send the correct stuff.
+	if (JsonDoc[0] != '{') return boost::shared_ptr<Song>(); //check if someone did send the correct stuff.
 
 	std::string currentIdentifier;
 	bool ReadingIdentifier = false;
 	bool IdentifierRead = false;
 	bool ReadingContent = false;
-	for(size_t i=0; i <= JsonDoc.length(); i++) {
-		if(JsonDoc[i] == '}') {
+	for (size_t i=0; i <= JsonDoc.length(); i++) {
+		if (JsonDoc[i] == '}') {
 			break;
-		} else if(JsonDoc[i] == '\"' &&JsonDoc[i-1] != '\\' ) { //make sure it's not an escaped character :-)
-			if(IdentifierRead) {
+		} else if (JsonDoc[i] == '\"' &&JsonDoc[i-1] != '\\' ) { //make sure it's not an escaped character :-)
+			if (IdentifierRead) {
 				ReadingContent = true;
 				IdentifierRead = false;
-			} else if(ReadingIdentifier) {
+			} else if (ReadingIdentifier) {
 				ReadingIdentifier = false;
 				IdentifierRead = true;
-			} else if(ReadingContent) {
+			} else if (ReadingContent) {
 				ReadingContent = false;
 				currentIdentifier = "";
 			} else {
 				ReadingIdentifier = true;
 			}
 		} else {
-			if(ReadingIdentifier) {
+			if (ReadingIdentifier) {
 				currentIdentifier += JsonDoc[i];
 			} else if (ReadingContent) {
 				std::cout << currentIdentifier << std::endl;
-				if(currentIdentifier == "Title") {
+				if (currentIdentifier == "Title") {
 					SongToFind.title += JsonDoc[i];
 				} else if (currentIdentifier == "Artist") {
 					SongToFind.artist += JsonDoc[i];
@@ -168,21 +169,25 @@ boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
 
 
 	Game* gm = Game::getSingletonPtr();
-	for(int i = 0; i<= m_songs.size(); i++) {
+	for (int i = 0; i<= m_songs.size(); i++) {
 		///this is to fix the crash when adding the currently-playing song.
-if(gm->getCurrentPlayList().currentlyActive != NULL) {
-if(gm->getCurrentPlayList().currentlyActive->title == SongToFind.title && gm->getCurrentPlayList().currentlyActive->artist == SongToFind.artist &&
-gm->getCurrentPlayList().currentlyActive->creator == SongToFind.creator && gm->getCurrentPlayList().currentlyActive->edition == SongToFind.edition &&
-gm->getCurrentPlayList().currentlyActive->language == SongToFind.language) {
-return gm->getCurrentPlayList().currentlyActive;
+		if (gm->getCurrentPlayList().currentlyActive) {
+			Song const& s = *gm->getCurrentPlayList().currentlyActive;
+			if (s.title == SongToFind.title && s.artist == SongToFind.artist &&
+			  s.creator == SongToFind.creator && s.edition == SongToFind.edition &&
+			  s.language == SongToFind.language)
+			{
+				return gm->getCurrentPlayList().currentlyActive;
 			}
 		}
 		///this is for all other songs.
 		///this is where the shit segfaults!
-		if(m_songs[i].title == SongToFind.title && m_songs[i].artist == SongToFind.artist && m_songs[i].edition == SongToFind.edition &&
-		m_songs[i].creator == SongToFind.creator && m_songs[i].language == SongToFind.language) { //if these are all correct we can assume it's the correct song
-			boost::shared_ptr<Song> songToAdd(&m_songs[i]);
-			return songToAdd;
+		Song& s = m_songs[i];
+		// if these are all correct we can assume it's the correct song
+		if (s.title == SongToFind.title && s.artist == SongToFind.artist && s.edition == SongToFind.edition &&
+		  s.creator == SongToFind.creator && s.language == SongToFind.language)
+		{
+			return boost::shared_ptr<Song>(&s);  // FIXME: This doesn't do the right thing (it should merely copy the original shared_ptr from songs, not create a new one).
 		}
 	}
 	return boost::shared_ptr<Song>();
