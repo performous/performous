@@ -46,14 +46,8 @@ WebServer::~WebServer() {
 
 http_server::response WebServer::GETresponse(const http_server::request &request) {
 	if(request.destination == "/") { //default
-		fs::ifstream f(findFile("index.html"), std::ios::binary);
-		f.seekg(0, std::ios::end);
-		size_t size = f.tellg();
-		f.seekg(0);
-		char responseBuffer[size + 2];
-		f.read(responseBuffer, size);
-		return http_server::response::stock_reply(
-		http_server::response::ok, responseBuffer);
+		BinaryBuffer buf = readFile(findFile("index.html"));
+		return http_server::response::stock_reply(http_server::response::ok, std::string(buf.begin(), buf.end()));
 	} else if(request.destination == "/api/getDataBase.json") { //get database
 		std:: stringstream JSONDB;
 		JSONDB << "[\n";
@@ -68,7 +62,7 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 		return http_server::response::stock_reply(
 		http_server::response::ok, output);
 	} else if(request.destination == "/api/getCurrentPlaylist.json") { //get playlist
-		Game * gm = Game::getSingletonPtr();
+		Game* gm = Game::getSingletonPtr();
 		std:: stringstream JSONPlayList;
 		JSONPlayList << "[\n";
 		for(auto const& song : gm->getCurrentPlayList().getList()) {
@@ -79,21 +73,14 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 		std::string output = JSONPlayList.str();
 		output.pop_back(); //remove the last comma
 		output += "\n]";
-		return http_server::response::stock_reply(
-		http_server::response::ok,output);
+		return http_server::response::stock_reply(http_server::response::ok, output);
 	} else {
 		//other text files
 		try {
 			std::string destination = request.destination;
-			destination.erase(0,1);
-			fs::ifstream f(findFile(destination), std::ios::binary);
-			f.seekg(0, std::ios::end);
-			size_t size = f.tellg();
-			f.seekg(0);
-			char responseBuffer[size + 2];
-			f.read(responseBuffer, size);
-			return http_server::response::stock_reply(
-			http_server::response::ok, responseBuffer);
+			destination.erase(0,1);  // FIXME: This removes the beginning slash but THERE IS A GAPING SECURITY HOLE with /../../../etc/passwd and other relative paths.
+			BinaryBuffer buf = readFile(findFile(destination));
+			return http_server::response::stock_reply(http_server::response::ok, std::string(buf.begin(), buf.end()));
 		}
 		catch(std::exception e) {
 			return http_server::response::stock_reply(
@@ -183,11 +170,11 @@ boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
 	Game* gm = Game::getSingletonPtr();
 	for(int i = 0; i<= m_songs.size(); i++) {
 		///this is to fix the crash when adding the currently-playing song.
-		if(gm->getCurrentPlayList().currentlyActive != NULL) {
-			if(gm->getCurrentPlayList().currentlyActive->title == SongToFind.title && gm->getCurrentPlayList().currentlyActive->artist == SongToFind.artist &&
-			gm->getCurrentPlayList().currentlyActive->creator == SongToFind.creator && gm->getCurrentPlayList().currentlyActive->edition == SongToFind.edition &&
-			gm->getCurrentPlayList().currentlyActive->language == SongToFind.language) {
-				return gm->getCurrentPlayList().currentlyActive;
+if(gm->getCurrentPlayList().currentlyActive != NULL) {
+if(gm->getCurrentPlayList().currentlyActive->title == SongToFind.title && gm->getCurrentPlayList().currentlyActive->artist == SongToFind.artist &&
+gm->getCurrentPlayList().currentlyActive->creator == SongToFind.creator && gm->getCurrentPlayList().currentlyActive->edition == SongToFind.edition &&
+gm->getCurrentPlayList().currentlyActive->language == SongToFind.language) {
+return gm->getCurrentPlayList().currentlyActive;
 			}
 		}
 		///this is for all other songs.
