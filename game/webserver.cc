@@ -51,9 +51,9 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 		std:: stringstream JSONDB;
 		JSONDB << "[\n";
 		for (int i=0; i<m_songs.size(); i++) {
-			JSONDB << "\n{\n\"Title\": \"" << escapeCharacters(m_songs[i].title) << "\",\n\"Artist\": \"";
-			JSONDB << escapeCharacters(m_songs[i].artist) << "\",\n\"Edition\": \"" << escapeCharacters(m_songs[i].edition) << "\",\n\"Language\": \"" << escapeCharacters(m_songs[i].language);
-			JSONDB << "\",\n\"Creator\": \"" << escapeCharacters(m_songs[i].creator) << "\"\n},";
+			JSONDB << "\n{\n\"Title\": \"" << escapeCharacters(m_songs[i]->title) << "\",\n\"Artist\": \"";
+			JSONDB << escapeCharacters(m_songs[i]->artist) << "\",\n\"Edition\": \"" << escapeCharacters(m_songs[i]->edition) << "\",\n\"Language\": \"" << escapeCharacters(m_songs[i]->language);
+			JSONDB << "\",\n\"Creator\": \"" << escapeCharacters(m_songs[i]->creator) << "\"\n},";
 		}
 		std::string output = JSONDB.str(); //remove the last comma
 		output.pop_back(); //remove the last comma
@@ -181,12 +181,12 @@ boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
 		}
 		///this is for all other songs.
 		///this is where the shit segfaults!
-		Song& s = m_songs[i];
+		boost::shared_ptr<Song> s = m_songs[i];
 		// if these are all correct we can assume it's the correct song
-		if (s.title == SongToFind.title && s.artist == SongToFind.artist && s.edition == SongToFind.edition &&
-		  s.creator == SongToFind.creator && s.language == SongToFind.language)
+		if (s->title == SongToFind.title && s->artist == SongToFind.artist && s->edition == SongToFind.edition &&
+		  s->creator == SongToFind.creator && s->language == SongToFind.language)
 		{
-			return boost::shared_ptr<Song>(&s);  // FIXME: This doesn't do the right thing (it should merely copy the original shared_ptr from songs, not create a new one).
+			return s;
 		}
 	}
 	return boost::shared_ptr<Song>();
