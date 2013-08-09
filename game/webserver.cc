@@ -29,7 +29,7 @@ struct WebServer::handler {
 void WebServer::StartServer() {
 	handler handler_{*this};
 	http_server::options options(handler_);
-	server_ = new http_server(options.address("0.0.0.0").port("8000"));
+	server_.reset(new http_server(options.address("0.0.0.0").port("8000")));
 	server_->run();
 }
 
@@ -41,7 +41,6 @@ m_songs(songs) {
 WebServer::~WebServer() {
 	server_->stop();
 	serverthread->join();
-	delete server_;
 }
 
 http_server::response WebServer::GETresponse(const http_server::request &request) {
