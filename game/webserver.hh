@@ -1,7 +1,6 @@
 #pragma once
 #include <boost/network/protocol/http/server.hpp>
 #include <boost/thread/thread.hpp>
-#include <boost/scoped_ptr.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <boost/shared_ptr.hpp>
@@ -23,8 +22,8 @@ struct handler;
 typedef http::server<handler> http_server;
 	Songs& m_songs;
 private:
-	boost::scoped_ptr<boost::thread> serverthread;
-	http_server* server_; //FIXME should be boost::scoped_ptr or boost:: shared_ptr
+	boost::shared_ptr<boost::thread> serverthread;
+	boost::shared_ptr<http_server> server_;
 public:
 	//this looks silly but this stuff has to be public or they won´t be accessible from the handler struct
 	http_server::response GETresponse(http_server::request const &request);
