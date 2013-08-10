@@ -180,7 +180,6 @@ boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
 			}
 		}
 		///this is for all other songs.
-		///this is where the shit segfaults!
 		boost::shared_ptr<Song> s = m_songs[i];
 		// if these are all correct we can assume it's the correct song
 		if (s->title == SongToFind.title && s->artist == SongToFind.artist && s->edition == SongToFind.edition &&
