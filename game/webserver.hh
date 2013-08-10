@@ -10,6 +10,7 @@
 #include "song.hh"
 #include "screen.hh"
 #include "playlist.hh"
+#include "screen_playlist.hh"
 
 using boost::thread;
 

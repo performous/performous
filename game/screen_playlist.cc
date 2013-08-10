@@ -103,6 +103,11 @@ void ScreenPlaylist::draw() {
 	if (overlay_menu.isOpen()) {
 		drawMenu();
 	}
+	if(needsUpdate) {
+	boost::mutex::scoped_lock l(m_mutex);
+	createSongListMenu();
+	needsUpdate = false;
+	}
 }
 
 void ScreenPlaylist::createEscMenu() {
@@ -275,4 +280,9 @@ void ScreenPlaylist::createSongMenu(int songNumber) {
 	overlay_menu.add(MenuOption(_("Back"), _("Back to playlist viewer")).call([this]() {
 		overlay_menu.close();
 	}));
+}
+
+void ScreenPlaylist::triggerSongListUpdate() {
+boost::mutex::scoped_lock l (m_mutex);
+needsUpdate = true;
 }

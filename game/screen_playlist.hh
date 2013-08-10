@@ -10,6 +10,7 @@
 #include "controllers.hh"
 #include <vector>
 #include <boost/scoped_ptr.hpp>
+#include <boost/thread/mutex.hpp>
 
 class Audio;
 class Database;
@@ -33,6 +34,7 @@ public:
 	void enter();
 	void exit();
 	void reloadGL();
+	void triggerSongListUpdate();
 private:
 	Menu overlay_menu;
 	Menu songlist_menu;
@@ -55,6 +57,8 @@ private:
 	AnimValue m_nextTimer;
 	void draw_menu_options();
 	bool keyPressed;
+	bool needsUpdate = false;
+	mutable boost::mutex m_mutex;
 };
 
 

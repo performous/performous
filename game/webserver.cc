@@ -98,6 +98,8 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 		} else {
 			std::cout << pointer->title << std::endl;
 			gm->getCurrentPlayList().addSong(pointer);
+			ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(gm->getScreen("Playlist"));
+			m_pp->triggerSongListUpdate(); //this way the screen_playlist does a live-update just like the screen_songs
 			return http_server::response::stock_reply(
 			http_server::response::ok, "success");
 		}
