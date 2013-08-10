@@ -13,6 +13,7 @@
 #include "webcam.hh"
 #include <vector>
 #include <boost/scoped_ptr.hpp>
+#include <boost/thread/mutex.hpp>
 
 
 class Audio;
@@ -35,6 +36,7 @@ public:
 	void enter();
 	void exit();
 	void reloadGL();
+	void triggerSongListUpdate();
 private:
 	Menu overlay_menu;
 	Menu songlist_menu;
@@ -57,6 +59,8 @@ private:
 	AnimValue m_nextTimer;
 	void draw_menu_options();
 	bool keyPressed;
+	bool needsUpdate = false;
+	mutable boost::mutex m_mutex;
 	Surface& getCover(Song const& song);
 	boost::scoped_ptr<Surface> m_singCover;
 	boost::scoped_ptr<Surface> m_instrumentCover;

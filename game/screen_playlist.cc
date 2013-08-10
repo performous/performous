@@ -125,6 +125,11 @@ void ScreenPlaylist::draw() {
 	if (overlay_menu.isOpen()) {
 		drawMenu();
 	}
+	if(needsUpdate) {
+		boost::mutex::scoped_lock l(m_mutex);
+		createSongListMenu();
+		needsUpdate = false;
+	}
 	auto const& playlist = gm->getCurrentPlayList().getList();
 	for (unsigned i = playlist.size() - 1; i < playlist.size(); --i) {
 		if(i < 9) { //only draw the first 9 covers
@@ -350,4 +355,9 @@ void ScreenPlaylist::createSongMenu(int songNumber) {
 	overlay_menu.add(MenuOption(_("Back"), _("Back to playlist viewer")).call([this]() {
 		overlay_menu.close();
 	}));
+}
+
+void ScreenPlaylist::triggerSongListUpdate() {
+boost::mutex::scoped_lock l (m_mutex);
+needsUpdate = true;
 }
