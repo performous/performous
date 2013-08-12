@@ -23,7 +23,6 @@
   <script>
     $(document).bind ("mobileinit", function ()
     {
-
       alert ("mobileinit");
 
     });
@@ -115,9 +114,16 @@
                     Refresh Playlist
                 </a>
       		</div>
-   </div>
+      		<br>
+      		<div data-role="fieldcontain">
+<label for="flipupdate">Update every 30 sec.</label>
+<select name="flipupdate" id="flipupdate" data-role="slider" data-mini="false">
+<option value="off">No</option>
+<option value="on">Yes</option>
+</select>
 </div>
-
+	</div>
+</div>
 <!--page 3 Remote control!!!!-->
 <div data-role="page" id="page3">
     <div data-theme="a" data-role="header">
@@ -157,7 +163,7 @@
 <!-- page 1-->
 $(document).ready (function ()
 {
-
+	update = false;
   alert ("Welcome to the web-control of performous! here you can view the current playlist, add songs to it and control performous remotely. this is currently a work in progress so not everything will work yet");
 
 });
@@ -223,4 +229,21 @@ $.post("api/remove",songnumber.toString());
 RefreshPlayList();
 }
 }
+</script>
+
+<script>
+$( '#flipupdate' ).bind( "change", function(event, ui) {
+ if(update) {
+	update = false; 
+ } else {
+	update = true; 
+ }
+});
+
+window.setInterval(function(){
+if(update) {
+	RefreshPlayList();
+}
+
+}, 30000);
 </script>
