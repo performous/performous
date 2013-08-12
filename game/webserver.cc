@@ -115,6 +115,10 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 			return http_server::response::stock_reply(
 			http_server::response::ok, "failure");
 		}
+	} else if(request.destination == "/api/control") {
+		Navigate(request.body);
+		return http_server::response::stock_reply(
+		http_server::response::ok, "success");
 	} else {
 		return http_server::response::stock_reply(
 		http_server::response::ok, "not yet implemented");
@@ -225,4 +229,18 @@ std::string WebServer::unEscapeCharacters(std::string input) {
 		pos += replace.length();
 	}
 	return input;
+}
+
+void WebServer::Navigate(std::string button) {
+Game* gm = Game::getSingletonPtr();
+input::NavEvent event;
+if(button == "NAV_UP") event.button = input::NAV_UP;
+else if(button == "NAV_DOWN") event.button = input::NAV_DOWN;
+else if(button == "NAV_LEFT") event.button = input::NAV_LEFT;
+else if(button == "NAV_RIGHT") event.button = input::NAV_RIGHT;
+else if(button == "NAV_START") event.button = input::NAV_START;
+else if(button == "NAV_CANCEL") event.button = input::NAV_CANCEL;
+else if(button == "NAV_VOLUME_UP") event.button = input::NAV_VOLUME_UP;
+else if(button == "NAV_VOLUME_DOWN") event.button = input::NAV_VOLUME_DOWN;
+
 }
