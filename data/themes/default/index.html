@@ -150,6 +150,53 @@
             </ul>
         </div>
     </div>
+    <div data-role="content">
+        <div class="ui-grid-b">
+            <div class="ui-block-a">
+                <a id="BTN_VOLUP" data-role="button" data-theme="e" href="#page3" data-icon="plus" data-iconpos="left">
+                    Vol Up
+                </a>
+            </div>
+            <div class="ui-block-b">
+                <a id="BTN_UP" data-role="button" data-theme="b" href="#page3" data-icon="arrow-u" data-iconpos="left">
+                    Up
+                </a>
+            </div>
+            <div class="ui-block-c">
+                <a id="BTN_VOLDOWN" data-role="button" data-theme="e" href="#page3" data-icon="minus" data-iconpos="left">
+ 						Vol Down
+                </a>
+            </div>
+            <div class="ui-block-a">
+                <a id="BTN_LEFT" data-role="button" data-theme="b" href="#page3" data-icon="arrow-l" data-iconpos="left">
+                    Left
+                </a>
+            </div>
+            <div class="ui-block-b">
+                <a id="BTN_SELECT" data-role="button" data-theme="a" href="#page3" data-icon="star" data-iconpos="left">
+                    Select
+                </a>
+            </div>
+            <div class="ui-block-c">
+                <a id="BTN_RIGHT" data-role="button" data-theme="b" href="#page3" data-icon="arrow-r"  data-iconpos="left">
+                    Right
+                </a>
+            </div>
+            <div class="ui-block-a">
+                <a id="BTN_BACK" data-role="button" data-theme="a" href="#page3" data-icon="back" data-iconpos="left">
+                    Back
+                </a>
+            </div>
+            <div class="ui-block-b">
+                <a id="BTN_DOWN" data-role="button" data-theme="b" href="#page3" data-icon="arrow-d"
+                data-iconpos="left">
+                    Down
+                </a>
+            </div>
+            <div class="ui-block-c">
+            </div>
+        </div>
+    </div>
 </div>
 
 
@@ -231,7 +278,7 @@ RefreshPlayList();
 }
 </script>
 
-<script>
+<script> <!-- togglebutton-->
 $( '#flipupdate' ).bind( "change", function(event, ui) {
  if(update) {
 	update = false; 
@@ -247,3 +294,32 @@ if(update) {
 
 }, 30000);
 </script>
+
+<!-- page 3-->
+<script>
+$("#BTN_VOLUP").bind ("click", function (event) {
+$.post("api/control","NAV_VOLUME_UP");
+});
+$("#BTN_UP").bind ("click", function (event) {
+$.post("api/control","NAV_UP");
+});
+$("#BTN_VOLDOWN").bind ("click", function (event) {
+$.post("api/control","NAV_VOLUME_DOWN");
+});
+$("#BTN_LEFT").bind ("click", function (event) {
+$.post("api/control","NAV_LEFT");
+});
+$("#BTN_SELECT").bind ("click", function (event) {
+$.post("api/control","NAV_START");
+});
+$("#BTN_RIGHT").bind ("click", function (event) {
+$.post("api/control","NAV_RIGHT");
+});
+$("#BTN_BACK").bind ("click", function (event) {
+$.post("api/control","NAV_CANCEL");
+});
+$("#BTN_DOWN").bind ("click", function (event) {
+$.post("api/control","NAV_DOWN");
+});
+</script>
+

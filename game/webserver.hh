@@ -12,6 +12,7 @@
 #include "screen.hh"
 #include "playlist.hh"
 #include "screen_playlist.hh"
+#include "controllers.hh"
 
 using boost::thread;
 
@@ -37,5 +38,6 @@ private:
 	boost::shared_ptr<Song> GetSongFromJSON(std::string JsonDoc);
 	std::string escapeCharacters(std::string input);
 	std::string unEscapeCharacters(std::string input);
+	void Navigate(std::string button);
 };
 
