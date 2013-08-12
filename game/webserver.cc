@@ -89,8 +89,8 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 }
 
 http_server::response WebServer::POSTresponse(const http_server::request &request) {
+	Game * gm = Game::getSingletonPtr();
 	if (request.destination == "/api/add") {
-		Game * gm = Game::getSingletonPtr();
 		boost::shared_ptr<Song> pointer = GetSongFromJSON(request.body);
 		if (!pointer) {
 			return http_server::response::stock_reply(
@@ -102,6 +102,18 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 			m_pp->triggerSongListUpdate(); //this way the screen_playlist does a live-update just like the screen_songs
 			return http_server::response::stock_reply(
 			http_server::response::ok, "success");
+		}
+	} else if(request.destination == "/api/remove") {
+		try { // this is for those idiots that send text instead of numbers.
+			int songToDelete = boost::lexical_cast<int>(request.body);
+			gm->getCurrentPlayList().removeSong(songToDelete);
+			ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(gm->getScreen("Playlist"));
+			m_pp->triggerSongListUpdate(); //this way the screen_playlist does a live-update just like the screen_songs
+			return http_server::response::stock_reply(
+			http_server::response::ok, "success");
+		} catch(std::exception e) {
+			return http_server::response::stock_reply(
+			http_server::response::ok, "failure");
 		}
 	} else {
 		return http_server::response::stock_reply(
