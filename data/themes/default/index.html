@@ -186,6 +186,7 @@ $('#SongListViewer').listview('refresh');
 <script>
 function AddSong(number) {
 $.post("api/add", JSON.stringify(DataBase[number]));
+RefreshPlayList();
 }
 </script>
 
@@ -195,7 +196,12 @@ $.post("api/add", JSON.stringify(DataBase[number]));
 
  $("#playlistRefreshButton").bind ("click", function (event)
 {
- $.get("api/getCurrentPlaylist.json", function(data){
+ RefreshPlayList();
+});
+</script>
+<script>
+function RefreshPlayList() {
+$.get("api/getCurrentPlaylist.json", function(data){
 $('#PlayListView').empty();
  SongList = JSON.parse(data);
  $('#PlayListView').append("<li data-role=\"list-divider\" role=\"heading\">Upcoming songs: </li> <li data-theme=\"c\">\n");
@@ -205,7 +211,7 @@ $('#PlayListView').empty();
 	}
 	$('#PlayListView').listview('refresh');
 });
-});
+}
 </script>
 
 <script>
@@ -214,6 +220,7 @@ if(confirm("Title: " + SongList[songnumber].Title + "\nArtist: " + SongList[song
 "\nEdition: " + SongList[songnumber].Edition + "\nLanguage: " + SongList[songnumber].Language + "\nCreator: " 
 + SongList[songnumber].Creator + "\n \n Do you want to Remove this song from the list?")) {
 $.post("api/remove",songnumber.toString());
+RefreshPlayList();
 }
 }
 </script>
