@@ -135,9 +135,9 @@ boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
 		std::string language;
 		bool operator==(JsonSong rhs) {
 			if(this->title == rhs.title && this->edition == rhs.edition && this->artist == rhs.artist && this->creator == rhs.creator && this->language == rhs.language) {
-			return true;
+				return true;
 			} else {
-			return false;
+				return false;
 			}
 		}
 	};
