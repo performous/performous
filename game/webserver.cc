@@ -126,13 +126,20 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 }
 
 boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
-	// TODO: Implement operator== here, to avoid repeating very long if (...) everywhere where comparisons are needed.
+	// DONE: Implement operator== here, to avoid repeating very long if (...) everywhere where comparisons are needed.
 	struct JsonSong {
 		std::string edition;
 		std::string title;
 		std::string artist;
 		std::string creator;
 		std::string language;
+		bool operator==(JsonSong rhs) {
+			if(this->title == rhs.title && this->edition == rhs.edition && this->artist == rhs.artist && this->creator == rhs.creator && this->language == rhs.language) {
+			return true;
+			} else {
+			return false;
+			}
+		}
 	};
 	JsonSong SongToFind;
 
@@ -199,10 +206,9 @@ boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
 		}
 		///this is for all other songs.
 		boost::shared_ptr<Song> s = m_songs[i];
-		// if these are all correct we can assume it's the correct song
-		if (s->title == SongToFind.title && s->artist == SongToFind.artist && s->edition == SongToFind.edition &&
-		  s->creator == SongToFind.creator && s->language == SongToFind.language)
-		{
+		JsonSong m_compare = {s->edition, s->title, s->artist, s->creator, s->language};
+
+		if (SongToFind == m_compare) {
 			return s;
 		}
 	}
