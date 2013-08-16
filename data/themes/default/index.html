@@ -48,11 +48,6 @@
                         View playlist
                     </a>
                 </li>
-                <li>
-                    <a href="#page3" data-transition="flip" data-theme="" data-icon="gear" data-iconpos="top">
-                        Remote Control
-                    </a>
-                </li>
             </ul>
         </div>
     </div>
@@ -91,11 +86,6 @@
                         View playlist
                     </a>
                 </li>
-                <li>
-                    <a href="#page3" data-transition="flip" data-theme="" data-icon="gear" data-iconpos="top">
-                        Remote Control
-                    </a>
-                </li>
             </ul>
         </div>
     </div>
@@ -122,85 +112,9 @@
 <option value="on">Yes</option>
 </select>
 </div> 
+<small> Web interface by Niek Nooijens, for full credits regarding Performous see /docs/Authors.txt</small>
 	</div>
 </div>
-<!--page 3 Remote control!!!!-->
-<div data-role="page" id="page3">
-    <div data-theme="a" data-role="header">
-        <h3>
-            Performous web frontend
-        </h3>
-        <div data-role="navbar" data-iconpos="top">
-            <ul>
-                <li>
-                    <a href="#page1" data-transition="flip" data-theme="" data-icon="plus" data-iconpos="top">
-                        Add songs
-                    </a>
-                </li>
-                <li>
-                    <a href="#page2" data-transition="flip" data-theme="" data-icon="grid" data-iconpos="top">
-                        View playlist
-                    </a>
-                </li>
-                <li>
-                    <a href="#page3" data-transition="flip" data-theme="" data-icon="gear" data-iconpos="top" class="ui-btn-active ui-state-persist">
-                        Remote Control
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
-    <div data-role="content">
-        <div class="ui-grid-b">
-            <div class="ui-block-a">
-                <a id="BTN_VOLUP" data-role="button" data-theme="e" href="#page3" data-icon="plus" data-iconpos="left">
-                    Vol Up
-                </a>
-            </div>
-            <div class="ui-block-b">
-                <a id="BTN_UP" data-role="button" data-theme="b" href="#page3" data-icon="arrow-u" data-iconpos="left">
-                    Up
-                </a>
-            </div>
-            <div class="ui-block-c">
-                <a id="BTN_VOLDOWN" data-role="button" data-theme="e" href="#page3" data-icon="minus" data-iconpos="left">
- 						Vol Down
-                </a>
-            </div>
-            <div class="ui-block-a">
-                <a id="BTN_LEFT" data-role="button" data-theme="b" href="#page3" data-icon="arrow-l" data-iconpos="left">
-                    Left
-                </a>
-            </div>
-            <div class="ui-block-b">
-                <a id="BTN_SELECT" data-role="button" data-theme="a" href="#page3" data-icon="star" data-iconpos="left">
-                    Select
-                </a>
-            </div>
-            <div class="ui-block-c">
-                <a id="BTN_RIGHT" data-role="button" data-theme="b" href="#page3" data-icon="arrow-r"  data-iconpos="left">
-                    Right
-                </a>
-            </div>
-            <div class="ui-block-a">
-                <a id="BTN_BACK" data-role="button" data-theme="a" href="#page3" data-icon="back" data-iconpos="left">
-                    Back
-                </a>
-            </div>
-            <div class="ui-block-b">
-                <a id="BTN_DOWN" data-role="button" data-theme="b" href="#page3" data-icon="arrow-d"
-                data-iconpos="left">
-                    Down
-                </a>
-            </div>
-            <div class="ui-block-c">
-            </div>
-        </div>
-        <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br>
-<small> Web interface by Niek Nooijens, for full credits regarding Performous see /docs/Authors.txt</small>
-    </div>
-</div>
-
 
 </body>
 </html>
@@ -213,7 +127,7 @@
 $(document).ready (function ()
 {
 	update = false;
-  alert ("Welcome to the web-control of performous! here you can view the current playlist, add songs to it and control performous remotely. this is currently a work in progress so not everything will work yet");
+  alert ("Welcome to the web-control of performous! here you can view the current playlist and add songs to it.");
 
 });
 
