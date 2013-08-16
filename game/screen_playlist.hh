@@ -8,6 +8,7 @@
 #include "animvalue.hh"
 #include "playlist.hh"
 #include "controllers.hh"
+#include "configuration.hh"
 #include <vector>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/mutex.hpp>

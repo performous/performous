@@ -29,13 +29,23 @@ struct WebServer::handler {
 void WebServer::StartServer() {
 	handler handler_{*this};
 	http_server::options options(handler_);
-	server_.reset(new http_server(options.address("0.0.0.0").port("8000")));
+	if(config["game/WebserverAccess"].i() == 1) {
+		std::cout << "Webserver/Notice: starting local only" << std::endl;
+		server_.reset(new http_server(options.address("127.0.0.1").port(std::to_string(config["game/WebserverPort"].i()))));
+	} else {
+		server_.reset(new http_server(options.address("0.0.0.0").port(std::to_string(config["game/WebserverPort"].i()))));
+		std::cout << "Webserver/Notice: starting server for all ports" << std::endl;
+	}
 	server_->run();
 }
 
 WebServer::WebServer(Songs& songs):
 m_songs(songs) {
-	serverthread.reset(new boost::thread(boost::bind(&WebServer::StartServer,boost::ref(*this))));
+	if(config["game/WebserverAccess"].i() == 0) {
+		std::cout << "Webserver/Notice: not starting webserver" << std::endl;
+	} else {
+		serverthread.reset(new boost::thread(boost::bind(&WebServer::StartServer,boost::ref(*this))));
+	}
 }
 
 WebServer::~WebServer() {
@@ -78,7 +88,7 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 		try {
 			std::string destination = request.destination;
 			///this is to make sure the tree is only accessible downwards
-			while(destination[1] == '.' && destination[2] == '.' && destination[3] == '//') {
+			while(destination[1] == '.' && destination[2] == '.' && destination[3] == '/') {
 				destination.erase(1,4);
 			}
 			destination.erase(0,1);//remove the first /

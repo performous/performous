@@ -13,6 +13,7 @@
 #include "playlist.hh"
 #include "screen_playlist.hh"
 #include "controllers.hh"
+#include "configuration.hh"
 
 using boost::thread;
 
