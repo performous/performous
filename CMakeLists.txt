@@ -63,12 +63,13 @@ endif()
 
 add_subdirectory(data)
 add_subdirectory(game)
-add_subdirectory(docs)
 
 option(ENABLE_TOOLS "Enable building of song extraction utilities for SingStar and Guitar Hero." ON)
 if(ENABLE_TOOLS)
 	add_subdirectory(tools)
 endif()
+
+add_subdirectory(docs)
 
 if(WIN32)
 	option(ENABLE_VERSIONING "Add version number information. This allows adding version information to the EXE. Be careful, in beta." OFF)
