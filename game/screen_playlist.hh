@@ -11,6 +11,7 @@
 #include "songs.hh"
 #include "surface.hh"
 #include "webcam.hh"
+#include "configuration.hh"
 #include <vector>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/mutex.hpp>

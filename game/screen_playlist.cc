@@ -10,9 +10,6 @@
 #include <sstream>
 #include <boost/format.hpp>
 
-namespace {
-	static const double NEXT_TIMEOUT = 15.0; // go to next song in 15 seconds
-}
 
 ScreenPlaylist::ScreenPlaylist(std::string const& name,Audio& audio, Songs& songs, Backgrounds& bgs):
 	Screen(name), m_audio(audio), m_songs(songs), m_backgrounds(bgs), m_covers(20), keyPressed()
@@ -42,7 +39,7 @@ void ScreenPlaylist::enter() {
 		}
 	}
 	keyPressed = false;
-	m_nextTimer.setValue(NEXT_TIMEOUT);
+	m_nextTimer.setValue(config["game/PlaylistScreenTimeout"].i());
 	overlay_menu.close();
 	createSongListMenu();
 	songlist_menu.open();
