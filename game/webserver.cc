@@ -77,7 +77,11 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 		//other text files
 		try {
 			std::string destination = request.destination;
-			destination.erase(0,1);  // FIXME: This removes the beginning slash but THERE IS A GAPING SECURITY HOLE with /../../../etc/passwd and other relative paths.
+			///this is to make sure the tree is only accessible downwards
+			while(destination[1] == '.' && destination[2] == '.' && destination[3] == '//') {
+				destination.erase(1,4);
+			}
+			destination.erase(0,1);//remove the first /
 			BinaryBuffer buf = readFile(findFile(destination));
 			return http_server::response::stock_reply(http_server::response::ok, std::string(buf.begin(), buf.end()));
 		}
