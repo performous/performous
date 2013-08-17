@@ -211,31 +211,4 @@ if(update) {
 }, 30000);
 </script>
 
-<!-- page 3-->
-<script>
-$("#BTN_VOLUP").bind ("click", function (event) {
-$.post("api/control","NAV_VOLUME_UP");
-});
-$("#BTN_UP").bind ("click", function (event) {
-$.post("api/control","NAV_UP");
-});
-$("#BTN_VOLDOWN").bind ("click", function (event) {
-$.post("api/control","NAV_VOLUME_DOWN");
-});
-$("#BTN_LEFT").bind ("click", function (event) {
-$.post("api/control","NAV_LEFT");
-});
-$("#BTN_SELECT").bind ("click", function (event) {
-$.post("api/control","NAV_START");
-});
-$("#BTN_RIGHT").bind ("click", function (event) {
-$.post("api/control","NAV_RIGHT");
-});
-$("#BTN_BACK").bind ("click", function (event) {
-$.post("api/control","NAV_CANCEL");
-});
-$("#BTN_DOWN").bind ("click", function (event) {
-$.post("api/control","NAV_DOWN");
-});
-</script>
 

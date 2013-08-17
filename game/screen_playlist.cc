@@ -39,7 +39,7 @@ void ScreenPlaylist::enter() {
 		}
 	}
 	keyPressed = false;
-	m_nextTimer.setValue(config["game/PlaylistScreenTimeout"].i());
+	m_nextTimer.setValue(config["game/playlist_screen_timeout"].i());
 	overlay_menu.close();
 	createSongListMenu();
 	songlist_menu.open();
