@@ -30,11 +30,11 @@ void WebServer::StartServer() {
 	handler handler_{*this};
 	http_server::options options(handler_);
 	if(config["game/webserver_access"].i() == 1) {
-		std::cout << "Webserver/Notice: starting local only" << std::endl;
+		std::clog << "webserver/notice: Starting local server." << std::endl;
 		server_.reset(new http_server(options.address("127.0.0.1").port(std::to_string(config["game/webserver_port"].i()))));
 	} else {
 		server_.reset(new http_server(options.address("0.0.0.0").port(std::to_string(config["game/webserver_port"].i()))));
-		std::cout << "Webserver/Notice: starting server for all ports" << std::endl;
+		std::clog << "webserver/notice: Starting public server." << std::endl;
 	}
 	server_->run();
 }
@@ -42,7 +42,7 @@ void WebServer::StartServer() {
 WebServer::WebServer(Songs& songs):
 m_songs(songs) {
 	if(config["game/webserver_access"].i() == 0) {
-		std::cout << "Webserver/Notice: not starting webserver" << std::endl;
+		std::clog << "webserver/notice: Not starting webserver." << std::endl;
 	} else {
 		serverthread.reset(new boost::thread(boost::bind(&WebServer::StartServer,boost::ref(*this))));
 	}
