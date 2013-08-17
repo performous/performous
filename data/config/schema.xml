@@ -56,7 +56,7 @@ to save the current settings to XML.
 	<entry name="game/playlist_screen_timeout" type="int" value="15">
 		<limits min="0" max="60" step="5" />
 		<short>Playlist screen timeout</short>
-		<long>How long it will take before the next song in the playlist starts automatically</long>
+		<long>How long it will take before the next song in the playlist starts automatically.</long>
 	</entry>
 	<entry name="game/webserver_access" type="int" value="0">
 		<limits>
@@ -64,14 +64,14 @@ to save the current settings to XML.
 			<enum>Localhost </enum>
 			<enum>All connections</enum>
 		</limits>
-		<short>Webserver Access</short>
-		<long>Define if you want to control performous remotely with web interface (requires restart)</long>
+		<short>Webserver access</short>
+		<long>Define if you want to control performous remotely with web interface (requires restart).</long>
 	</entry>
 	<entry name="game/webserver_port" type="int" value="8000">
 		<!-- maximum of 16 bit is 65536, so 60000 should be a nice upper-limit -->
 		<limits min="0" max="60000" step="1" />
-		<short>Webserver Port</short>
-		<long>Port to use for the server note: choose a port that isn't used by other games!</long>
+		<short>Webserver port</short>
+		<long>Port to use for the web server. Choose one that is not used by other applications.</long>
 	</entry>
 	<entry name="game/keyboard_guitar" type="bool" value="true">
 		<short>Keyboard as guitar</short>
