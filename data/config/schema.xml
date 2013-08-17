@@ -53,12 +53,12 @@ to save the current settings to XML.
 		<short>Theme</short>
 		<long>Name of the theme to use.</long>
 	</entry>
-	<entry name="game/PlaylistScreenTimeout" type="int" value="15">
+	<entry name="game/playlist_screen_timeout" type="int" value="15">
 		<limits min="0" max="60" step="5" />
 		<short>Playlist screen timeout</short>
 		<long>How long it will take before the next song in the playlist starts automatically</long>
 	</entry>
-	<entry name="game/WebserverAccess" type="int" value="0">
+	<entry name="game/webserver_access" type="int" value="0">
 		<limits>
 			<enum>Disabled</enum>
 			<enum>Localhost </enum>
@@ -67,8 +67,9 @@ to save the current settings to XML.
 		<short>Webserver Access</short>
 		<long>Define if you want to control performous remotely with web interface (requires restart)</long>
 	</entry>
-	<entry name="game/WebserverPort" type="int" value="8000">
-		<limits min="0" max="999999" step="1" />
+	<entry name="game/webserver_port" type="int" value="8000">
+		<!-- maximum of 16 bit is 65536, so 60000 should be a nice upper-limit -->
+		<limits min="0" max="60000" step="1" />
 		<short>Webserver Port</short>
 		<long>Port to use for the server note: choose a port that isn't used by other games!</long>
 	</entry>
