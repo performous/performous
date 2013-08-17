@@ -7,9 +7,9 @@ typedef http::server<WebServer::handler> http_server;
 
 struct WebServer::handler {
 	WebServer& m_server;
-	void operator() (http_server::request const &request,
-	http_server::response &response) {
-		//destination describes the file to be loaded, by default it's "/"
+
+	void operator() (http_server::request const &request, http_server::response &response) {
+		// Destination describes the file to be loaded, by default it's "/"
 		if (request.method == "GET") {
 			response = m_server.GETresponse(request);
 		} else if (request.method == "POST") {
@@ -21,7 +21,7 @@ struct WebServer::handler {
 	}
 
 	void log(http_server::string_type const &info) {
-		std::cerr << "ERROR: " << info << '\n';
+		std::clog << "webserver/error: " << info << std::endl;
 	}
 };
 
@@ -31,26 +31,27 @@ void WebServer::StartServer() {
 	http_server::options options(handler_);
 	if(config["game/webserver_access"].i() == 1) {
 		std::clog << "webserver/notice: Starting local server." << std::endl;
-		server_.reset(new http_server(options.address("127.0.0.1").port(std::to_string(config["game/webserver_port"].i()))));
+		m_server.reset(new http_server(options.address("127.0.0.1").port(std::to_string(config["game/webserver_port"].i()))));
 	} else {
-		server_.reset(new http_server(options.address("0.0.0.0").port(std::to_string(config["game/webserver_port"].i()))));
+		m_server.reset(new http_server(options.address("0.0.0.0").port(std::to_string(config["game/webserver_port"].i()))));
 		std::clog << "webserver/notice: Starting public server." << std::endl;
 	}
-	server_->run();
+	m_server->run();
 }
 
-WebServer::WebServer(Songs& songs):
-m_songs(songs) {
+WebServer::WebServer(Songs& songs)
+: m_songs(songs)
+{
 	if(config["game/webserver_access"].i() == 0) {
 		std::clog << "webserver/notice: Not starting webserver." << std::endl;
 	} else {
-		serverthread.reset(new boost::thread(boost::bind(&WebServer::StartServer,boost::ref(*this))));
+		m_serverThread.reset(new boost::thread(boost::bind(&WebServer::StartServer,boost::ref(*this))));
 	}
 }
 
 WebServer::~WebServer() {
-	server_->stop();
-	serverthread->join();
+	m_server->stop();
+	m_serverThread->join();
 }
 
 http_server::response WebServer::GETresponse(const http_server::request &request) {
@@ -68,8 +69,7 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 		std::string output = JSONDB.str(); //remove the last comma
 		output.pop_back(); //remove the last comma
 		output += "\n]";
-		return http_server::response::stock_reply(
-		http_server::response::ok, output);
+		return http_server::response::stock_reply(http_server::response::ok, output);
 	} else if (request.destination == "/api/getCurrentPlaylist.json") { //get playlist
 		Game* gm = Game::getSingletonPtr();
 		std:: stringstream JSONPlayList;
@@ -96,8 +96,7 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 			return http_server::response::stock_reply(http_server::response::ok, std::string(buf.begin(), buf.end()));
 		}
 		catch(std::exception e) {
-			return http_server::response::stock_reply(
-			http_server::response::ok, "not a text file");
+			return http_server::response::stock_reply(http_server::response::ok, "not a text file");
 		}
 	}
 }
@@ -110,12 +109,11 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 			return http_server::response::stock_reply(
 			http_server::response::ok, "failure");
 		} else {
-			std::cout << pointer->title << std::endl;
+			std::clog << "webserver/debug: Add " << pointer->title << std::endl;
 			gm->getCurrentPlayList().addSong(pointer);
 			ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(gm->getScreen("Playlist"));
 			m_pp->triggerSongListUpdate(); //this way the screen_playlist does a live-update just like the screen_songs
-			return http_server::response::stock_reply(
-			http_server::response::ok, "success");
+			return http_server::response::stock_reply(http_server::response::ok, "success");
 		}
 	} else if(request.destination == "/api/remove") {
 		try { // this is for those idiots that send text instead of numbers.
@@ -123,32 +121,26 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 			gm->getCurrentPlayList().removeSong(songToDelete);
 			ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(gm->getScreen("Playlist"));
 			m_pp->triggerSongListUpdate(); //this way the screen_playlist does a live-update just like the screen_songs
-			return http_server::response::stock_reply(
-			http_server::response::ok, "success");
+			return http_server::response::stock_reply(http_server::response::ok, "success");
 		} catch(std::exception e) {
-			return http_server::response::stock_reply(
-			http_server::response::ok, "failure");
+			return http_server::response::stock_reply(http_server::response::ok, "failure");
 		}
 	} else {
-		return http_server::response::stock_reply(
-		http_server::response::ok, "not yet implemented");
+		return http_server::response::stock_reply(http_server::response::ok, "not yet implemented");
 	}
 }
 
 boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
-	// DONE: Implement operator== here, to avoid repeating very long if (...) everywhere where comparisons are needed.
 	struct JsonSong {
 		std::string edition;
 		std::string title;
 		std::string artist;
 		std::string creator;
 		std::string language;
-		bool operator==(JsonSong rhs) {
-			if(this->title == rhs.title && this->edition == rhs.edition && this->artist == rhs.artist && this->creator == rhs.creator && this->language == rhs.language) {
-				return true;
-			} else {
-				return false;
-			}
+		bool operator==(const JsonSong& rhs) {
+			 return title == rhs.title && edition == rhs.edition
+				&& artist == rhs.artist && creator == rhs.creator
+				&& language == rhs.language;
 		}
 	};
 	JsonSong SongToFind;
@@ -179,7 +171,6 @@ boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
 			if (ReadingIdentifier) {
 				currentIdentifier += JsonDoc[i];
 			} else if (ReadingContent) {
-				std::cout << currentIdentifier << std::endl;
 				if (currentIdentifier == "Title") {
 					SongToFind.title += JsonDoc[i];
 				} else if (currentIdentifier == "Artist") {
