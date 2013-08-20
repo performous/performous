@@ -50,7 +50,7 @@ private:
 	void drawMenu();
 	void createMenuFromPlaylist();
 	Backgrounds& m_backgrounds;
-	Cachemap<std::string, Surface> m_covers;
+	Cachemap<fs::path, Surface> m_covers;
 	boost::scoped_ptr<ThemeInstrumentMenu> m_menuTheme;
 	boost::scoped_ptr<ThemePlaylistScreen> theme;
 	boost::scoped_ptr<Surface> m_background;
@@ -60,6 +60,11 @@ private:
 	bool keyPressed;
 	bool needsUpdate = false;
 	mutable boost::mutex m_mutex;
+	Surface& getCover(Song const& song);
+	boost::scoped_ptr<Surface> m_singCover;
+	boost::scoped_ptr<Surface> m_instrumentCover;
+	boost::scoped_ptr<Surface> m_bandCover;
+	boost::scoped_ptr<Surface> m_danceCover;
 };
 
 
