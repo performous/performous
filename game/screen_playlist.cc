@@ -103,6 +103,48 @@ void ScreenPlaylist::draw() {
 	if (overlay_menu.isOpen()) {
 		drawMenu();
 	}
+<<<<<<< HEAD
+=======
+	if(needsUpdate) {
+	boost::mutex::scoped_lock l(m_mutex);
+	createSongListMenu();
+	needsUpdate = false;
+	}
+	auto const& playlist = gm->getCurrentPlayList().getList();
+	for (unsigned i = playlist.size() - 1; i < playlist.size(); --i) {
+		if(i < 9) { //only draw the first 9 covers
+			Surface& s = getCover(*playlist[i]);
+			double pos =  i / std::max<double>(9, 9);
+			using namespace glmath;
+			Transform trans(
+			  translate(vec3(-0.4 + 0.9 * pos, 0.045)) //vec3(horizontal-offset-from-center, vertical offset from screen_bottom)
+			  * rotate(-0.0, vec3(0.0, 1.0, 0.0))
+			);
+			s.dimensions.middle().screenBottom(-0.06).fitInside(0.08, 0.08);
+			s.draw();
+		}
+	}
+}
+Surface& ScreenPlaylist::getCover(Song const& song) {
+	Surface* cover = nullptr;
+	// Fetch cover image from cache or try loading it
+	if (!song.cover.empty()) try { cover = &m_covers[song.cover]; } catch (std::exception const&) {}
+	// Fallback to background image as cover if needed
+	if (!cover && !song.background.empty()) try { cover = &m_covers[song.background]; } catch (std::exception const&) {}
+	// Use empty cover
+	if (!cover) {
+		if(song.hasDance()) {
+			cover = m_danceCover.get();
+		} else if(song.hasDrums()) {
+			cover = m_bandCover.get();
+		} else {
+			size_t tracks = song.instrumentTracks.size();
+			if (tracks == 0) cover = m_singCover.get();
+			else cover = m_instrumentCover.get();
+		}
+	}
+	return *cover;
+>>>>>>> 96f29b4... covers are now drawn in playlist screen
 }
 
 void ScreenPlaylist::createEscMenu() {
@@ -169,10 +211,10 @@ void ScreenPlaylist::drawMenu() {
 void ScreenPlaylist::draw_menu_options() {
 	// Variables used for positioning and other stuff
 	double wcounter = 0;
-	const size_t showopts = 8; // Show at most 8 options simultaneously
+	const size_t showopts = 7; // Show at most 8 options simultaneously
 	const float x = -0.35; // x xcoordinate from screen center, the menu should be aligned left of the center therefore it´s negative.n
-	const float start_y = -0.1;
-	const float sel_margin = 0.05;
+	const float start_y = -0.15;
+	const float sel_margin = 0.04;
 	const MenuOptions opts = songlist_menu.getOptions();
 	double submenuanim = 1.0 - std::min(1.0, std::abs(m_submenuAnim.get()-songlist_menu.getSubmenuLevel()));
 	// Determine from which item to start
@@ -193,7 +235,7 @@ void ScreenPlaylist::draw_menu_options() {
 			// Draw the text, dim if option not available
 			{
 				ColorTrans c(Color::alpha(opt.isActive() ? 1.0 : 0.5));
-				theme->option_selected.dimensions.left(x).center(start_y + ii*0.05);
+				theme->option_selected.dimensions.left(x).center(start_y + ii*0.049);
 				theme->option_selected.draw(opt.getName());
 			}
 			wcounter = std::max(wcounter, theme->option_selected.w() + 2 * sel_margin); // Calculate the widest entry
