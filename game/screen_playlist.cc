@@ -37,6 +37,10 @@ void ScreenPlaylist::prepare() {
 void ScreenPlaylist::reloadGL() {
 	theme.reset(new ThemePlaylistScreen());
 	m_menuTheme.reset(new ThemeInstrumentMenu());
+	m_singCover.reset(new Surface(findFile("no_cover.svg")));
+	m_instrumentCover.reset(new Surface(findFile("instrument_cover.svg")));
+	m_bandCover.reset(new Surface(findFile("band_cover.svg")));
+	m_danceCover.reset(new Surface(findFile("dance_cover.svg")));
 }
 
 void ScreenPlaylist::exit() {
