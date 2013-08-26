@@ -104,11 +104,7 @@ void ScreenPlaylist::draw() {
 	if (overlay_menu.isOpen()) {
 		drawMenu();
 	}
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
->>>>>>> master
+
 	if(needsUpdate) {
 	boost::mutex::scoped_lock l(m_mutex);
 	createSongListMenu();
@@ -148,10 +144,7 @@ Surface& ScreenPlaylist::getCover(Song const& song) {
 		}
 	}
 	return *cover;
-<<<<<<< HEAD
-=======
->>>>>>> 96f29b4... covers are now drawn in playlist screen
->>>>>>> master
+
 }
 
 void ScreenPlaylist::createEscMenu() {
