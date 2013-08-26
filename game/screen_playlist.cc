@@ -64,12 +64,12 @@ void ScreenPlaylist::manageEvent(input::NavEvent const& event) {
 		keyPressed = true;
 
 	if (nav == input::NAV_CANCEL) {
-	    if(overlay_menu.isOpen()) {
-		overlay_menu.close();
-	      } else {
-		createEscMenu();
-		overlay_menu.open();
-	      }
+		if(overlay_menu.isOpen()) {
+			overlay_menu.close();
+		} else {
+			createEscMenu();
+			overlay_menu.open();
+		}
 	} else {
 		if (nav == input::NAV_PAUSE) {
 			m_audio.togglePause();
@@ -107,13 +107,6 @@ void ScreenPlaylist::draw() {
 	if (overlay_menu.isOpen()) {
 		drawMenu();
 	}
-<<<<<<< HEAD
-=======
-	if(needsUpdate) {
-	boost::mutex::scoped_lock l(m_mutex);
-	createSongListMenu();
-	needsUpdate = false;
-	}
 	auto const& playlist = gm->getCurrentPlayList().getList();
 	for (unsigned i = playlist.size() - 1; i < playlist.size(); --i) {
 		if(i < 9) { //only draw the first 9 covers
@@ -148,7 +141,6 @@ Surface& ScreenPlaylist::getCover(Song const& song) {
 		}
 	}
 	return *cover;
->>>>>>> 96f29b4... covers are now drawn in playlist screen
 }
 
 void ScreenPlaylist::createEscMenu() {

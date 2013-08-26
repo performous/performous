@@ -55,16 +55,11 @@ private:
 	AnimValue m_nextTimer;
 	void draw_menu_options();
 	bool keyPressed;
-<<<<<<< HEAD
-=======
-	bool needsUpdate = false;
-	mutable boost::mutex m_mutex;
 	Surface& getCover(Song const& song);
 	boost::scoped_ptr<Surface> m_singCover;
 	boost::scoped_ptr<Surface> m_instrumentCover;
 	boost::scoped_ptr<Surface> m_bandCover;
 	boost::scoped_ptr<Surface> m_danceCover;
->>>>>>> 96f29b4... covers are now drawn in playlist screen
 };
 
 
