@@ -43,7 +43,7 @@ to save the current settings to XML.
 		<short>Karaoke mode</short>
 		<long>Hide pitch wave, notes and scoring.</long>
 	</entry>
-	<entry name="game/single_player_text_in_center_of_screen" type="bool" value="false">
+	<entry name="game/karaoke_centered_lyrics" type="bool" value="false">
 		<short>Karaoke mode centered text</short>
 		<long>place the text in center of the screen during karaoke-mode</long>
 	</entry>
