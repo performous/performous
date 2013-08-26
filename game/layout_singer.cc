@@ -121,7 +121,7 @@ void LayoutSinger::draw(double time, PositionMode position) {
 		Dimensions pos;
 		switch(position) {
 			case LayoutSinger::FULL:
-				if(config["game/single_player_text_in_center_of_screen"].b() && config["game/karaoke_mode"].b()) {
+				if(config["game/karaoke_centered_lyrics"].b() && config["game/karaoke_mode"].b()) {
 					pos.center(0);
 				} else {
 					pos.screenBottom(-0.1);
